@@ -2,191 +2,476 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 767D64BC2D5
-	for <lists+kvm@lfdr.de>; Sat, 19 Feb 2022 00:23:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0EB114BC2DD
+	for <lists+kvm@lfdr.de>; Sat, 19 Feb 2022 00:30:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238701AbiBRXXp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Feb 2022 18:23:45 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:58734 "EHLO
+        id S232249AbiBRX3G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Feb 2022 18:29:06 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:47966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232859AbiBRXXn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Feb 2022 18:23:43 -0500
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 568E71A58FD
-        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 15:23:25 -0800 (PST)
-Received: by mail-io1-f72.google.com with SMTP id n13-20020a056602340d00b006361f2312deso5358360ioz.9
-        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 15:23:25 -0800 (PST)
+        with ESMTP id S230343AbiBRX3F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Feb 2022 18:29:05 -0500
+Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA86B220DC
+        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 15:28:46 -0800 (PST)
+Received: by mail-io1-xd32.google.com with SMTP id t11so3641937ioi.7
+        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 15:28:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linuxfoundation.org; s=google;
+        h=subject:to:references:from:message-id:date:user-agent:mime-version
+         :in-reply-to:content-language:content-transfer-encoding;
+        bh=WdyRbSqxjRN1Kn8UJVUm0MbimiQX+217FfELPaU3/mo=;
+        b=So2XH78/2595kAYYKMXPWI9MBLaanBtHaVGj+8tMhL2jAiQtdtMjFgn2Wt6CDsh/u3
+         TR34w2Vl+WqieKRHoe0bR0w2XuiMfdnv3LrzFE+B6Vcs0jGSHaHGs51Oii2MuvHVZrFh
+         I/IZ0LRqi7EEW7qvKWvYWPRgRj8BzKHB4vSDM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=v37WmmuQxHLCms18PJ5QMpDsXXstoYyBMaC9ie0LWzM=;
-        b=JU0QC8bk51r6uliEaX19BJ3IYOhBBkq6WUzV7pwD2NE4jTbe2ayr0/aHqp6qON2pNF
-         9KRhfPrFY2Qtvpc2/WGsn4XvbDp8D7Wf4YnwOJF16KKd/RU0WipRlOKt7L8TYi52wNQo
-         7WA1xUCzGV76v0vCo1dRfNS59vFe0NGoVou16Ecmu1qvYtHwDLdDPLCx/KRkZiPWYYDZ
-         NMQcZAK04RSNPFBn+hy3+u45yyrBp48Wdhom/0aV7JFQ2aKGvwvycdfNyqxt35/EFxrd
-         foH7ap+//qBAP+8vYvR4Ep1OPO6LGtn8+sBHAwUBY5idclXyYverM6SSkFSVPqOnE/5g
-         gbLw==
-X-Gm-Message-State: AOAM531QlzMfyhOLq8iSaNGRUBJ9Ii+QLEjNmWRJrZAc8WdghTcVLNRv
-        rhdp7VnTSJr/uCtu/edYADi1IptFnQGKGoAbdwIOFe4YbiVT
-X-Google-Smtp-Source: ABdhPJzyU4fEIQbGqzKUTj7EZSZhDW/DaciWhPnkDlkDZorGahMSAhfCpwmV1Shg575lNlsYPyiBw7jhwJxunjS0hfFG5iBiaCJv
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=WdyRbSqxjRN1Kn8UJVUm0MbimiQX+217FfELPaU3/mo=;
+        b=nPJJy/Wzf0QZx/BzDcgt0pyzIBOnTVf7KXxJ2IYFjE+ofIylJwfLoP3XbgclpIMRE6
+         04bsdxDWqOECUI/SgaEMSIRLPGSjYtnM/Pzzq4NPrtfrZ/xzCcTolGCc39yzmhlmYjGj
+         VnXWxR+nm/XD6AqKgtt9zHnlA6RgJdL8C71iEGhzofpHG5pTN5Mi80WtE3qAng1crd6j
+         agfALM+Dg7wL1FhjrCw3lO40Ofa9/6X2b+GaGjBqbE9PxN4jTsr3PTE7d2MrFSO+NRkJ
+         JYVOE0FPMd40vgUQ8wvPRI8+c7QJKCWXoqZEoqStQE7q5wnjvP4PrV4EL6Fe4DV6wQo+
+         As6Q==
+X-Gm-Message-State: AOAM533959XlNI2tK/XAt43drfxJEC35uu6jyrphWlH1OF0L/OGQCo3O
+        l4d+GSM1UfFPrPWBQHQA641v5w==
+X-Google-Smtp-Source: ABdhPJxmcycqlgoMN58L6oxhcMc4rumhOI+6qqD7jI8B6nrdWJoKhQN+KJXjBlbPEIJq21Mo9AC9CQ==
+X-Received: by 2002:a02:cc55:0:b0:311:bd14:fe74 with SMTP id i21-20020a02cc55000000b00311bd14fe74mr6960161jaq.84.1645226926133;
+        Fri, 18 Feb 2022 15:28:46 -0800 (PST)
+Received: from [192.168.1.128] ([71.205.29.0])
+        by smtp.gmail.com with ESMTPSA id m14sm3821705ioj.34.2022.02.18.15.28.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 18 Feb 2022 15:28:45 -0800 (PST)
+Subject: Re: [PATCH 3/3] selftests: drivers/s390x: Add uvdevice tests
+To:     Steffen Eiden <seiden@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
+        Shuah Khan <skhan@linuxfoundation.org>
+References: <20220217113717.46624-1-seiden@linux.ibm.com>
+ <20220217113717.46624-4-seiden@linux.ibm.com>
+From:   Shuah Khan <skhan@linuxfoundation.org>
+Message-ID: <e624fe39-51e2-cfd0-fcdc-d04080272386@linuxfoundation.org>
+Date:   Fri, 18 Feb 2022 16:28:44 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:15ca:b0:2bf:ad58:4a6d with SMTP id
- q10-20020a056e0215ca00b002bfad584a6dmr7111912ilu.13.1645226604587; Fri, 18
- Feb 2022 15:23:24 -0800 (PST)
-Date:   Fri, 18 Feb 2022 15:23:24 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000057702a05d8532b18@google.com>
-Subject: [syzbot] INFO: task hung in vhost_work_dev_flush
-From:   syzbot <syzbot+0abd373e2e50d704db87@syzkaller.appspotmail.com>
-To:     jasowang@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mst@redhat.com,
-        netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        virtualization@lists.linux-foundation.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
-        SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
-        autolearn_force=no version=3.4.6
+In-Reply-To: <20220217113717.46624-4-seiden@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
+On 2/17/22 4:37 AM, Steffen Eiden wrote:
+> Adds some selftests to test ioctl error paths of the uv-uapi.
+> 
 
-syzbot found the following issue on:
+Please add information on how to run this test and example output.
 
-HEAD commit:    e6251ab4551f Merge tag 'nfs-for-5.17-2' of git://git.linux..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=163caa3c700000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=266de9da75c71a45
-dashboard link: https://syzkaller.appspot.com/bug?extid=0abd373e2e50d704db87
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=108514a4700000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16ca671c700000
+> Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
+> ---
+>   MAINTAINERS                                   |   1 +
+>   tools/testing/selftests/Makefile              |   1 +
+>   tools/testing/selftests/drivers/.gitignore    |   1 +
+>   .../selftests/drivers/s390x/uvdevice/Makefile |  22 ++
+>   .../selftests/drivers/s390x/uvdevice/config   |   1 +
+>   .../drivers/s390x/uvdevice/test_uvdevice.c    | 280 ++++++++++++++++++
+>   6 files changed, 306 insertions(+)
+>   create mode 100644 tools/testing/selftests/drivers/s390x/uvdevice/Makefile
+>   create mode 100644 tools/testing/selftests/drivers/s390x/uvdevice/config
+>   create mode 100644 tools/testing/selftests/drivers/s390x/uvdevice/test_uvdevice.c
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index c7d8d0fe48cf..c6a0311c3fa8 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -10462,6 +10462,7 @@ F:	arch/s390/kernel/uv.c
+>   F:	arch/s390/kvm/
+>   F:	arch/s390/mm/gmap.c
+>   F:	drivers/s390/char/uvdevice.c
+> +F:	tools/testing/selftests/drivers/s390x/uvdevice/
+>   F:	tools/testing/selftests/kvm/*/s390x/
+>   F:	tools/testing/selftests/kvm/s390x/
+>   
+> diff --git a/tools/testing/selftests/Makefile b/tools/testing/selftests/Makefile
+> index c852eb40c4f7..3b8abaee9271 100644
+> --- a/tools/testing/selftests/Makefile
+> +++ b/tools/testing/selftests/Makefile
+> @@ -9,6 +9,7 @@ TARGETS += core
+>   TARGETS += cpufreq
+>   TARGETS += cpu-hotplug
+>   TARGETS += drivers/dma-buf
+> +TARGETS += drivers/s390x/uvdevice
+>   TARGETS += efivarfs
+>   TARGETS += exec
+>   TARGETS += filesystems
+> diff --git a/tools/testing/selftests/drivers/.gitignore b/tools/testing/selftests/drivers/.gitignore
+> index ca74f2e1c719..09e23b5afa96 100644
+> --- a/tools/testing/selftests/drivers/.gitignore
+> +++ b/tools/testing/selftests/drivers/.gitignore
+> @@ -1,2 +1,3 @@
+>   # SPDX-License-Identifier: GPL-2.0-only
+>   /dma-buf/udmabuf
+> +/s390x/uvdevice/test_uvdevice
+> diff --git a/tools/testing/selftests/drivers/s390x/uvdevice/Makefile b/tools/testing/selftests/drivers/s390x/uvdevice/Makefile
+> new file mode 100644
+> index 000000000000..5e701d2708d4
+> --- /dev/null
+> +++ b/tools/testing/selftests/drivers/s390x/uvdevice/Makefile
+> @@ -0,0 +1,22 @@
+> +include ../../../../../build/Build.include
+> +
+> +UNAME_M := $(shell uname -m)
+> +
+> +ifneq ($(UNAME_M),s390x)
+> +nothing:
+> +.PHONY: all clean run_tests install
+> +.SILENT:
+> +else
+> +
+> +TEST_GEN_PROGS := test_uvdevice
+> +
+> +top_srcdir ?= ../../../../../..
+> +KSFT_KHDR_INSTALL := 1
+> +khdr_dir = $(top_srcdir)/usr/include
+> +LINUX_TOOL_ARCH_INCLUDE = $(top_srcdir)/tools/arch/$(ARCH)/include
+> +
+> +CFLAGS += -Wall -Werror -static -I$(khdr_dir) -I$(LINUX_TOOL_ARCH_INCLUDE)
+> +
+> +include ../../../lib.mk
+> +
+> +endif
+> diff --git a/tools/testing/selftests/drivers/s390x/uvdevice/config b/tools/testing/selftests/drivers/s390x/uvdevice/config
+> new file mode 100644
+> index 000000000000..f28a04b99eff
+> --- /dev/null
+> +++ b/tools/testing/selftests/drivers/s390x/uvdevice/config
+> @@ -0,0 +1 @@
+> +CONFIG_S390_UV_UAPI=y
+> diff --git a/tools/testing/selftests/drivers/s390x/uvdevice/test_uvdevice.c b/tools/testing/selftests/drivers/s390x/uvdevice/test_uvdevice.c
+> new file mode 100644
+> index 000000000000..f23663bcab03
+> --- /dev/null
+> +++ b/tools/testing/selftests/drivers/s390x/uvdevice/test_uvdevice.c
+> @@ -0,0 +1,280 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + *  selftest for the Ultravisor UAPI device
+> + *
+> + *  Copyright IBM Corp. 2022
+> + *  Author(s): Steffen Eiden <seiden@linux.ibm.com>
+> + */
+> +
+> +#include <stdint.h>
+> +#include <fcntl.h>
+> +#include <errno.h>
+> +#include <sys/ioctl.h>
+> +#include <sys/mman.h>
+> +
+> +#include <asm/uvdevice.h>
+> +
+> +#include "../../../kselftest_harness.h"
+> +
+> +#define BUFFER_SIZE 0x200
+> +FIXTURE(uvio_fixture) {
+> +	int uv_fd;
+> +	struct uvio_ioctl_cb uvio_ioctl;
+> +	uint8_t buffer[BUFFER_SIZE];
+> +	__u64 fault_page;
+> +};
+> +
+> +FIXTURE_VARIANT(uvio_fixture) {
+> +	unsigned long ioctl_cmd;
+> +	uint32_t arg_size;
+> +};
+> +
+> +FIXTURE_VARIANT_ADD(uvio_fixture, qui) {
+> +	.ioctl_cmd = UVIO_IOCTL_QUI,
+> +	.arg_size = BUFFER_SIZE,
+> +};
+> +
+> +FIXTURE_VARIANT_ADD(uvio_fixture, att) {
+> +	.ioctl_cmd = UVIO_IOCTL_ATT,
+> +	.arg_size = sizeof(struct uvio_attest),
+> +};
+> +
+> +FIXTURE_SETUP(uvio_fixture)
+> +{
+> +	self->uv_fd = open("/dev/uv", O_RDWR);
+> +
+> +	self->uvio_ioctl.argument_addr = (__u64)self->buffer;
+> +	self->uvio_ioctl.argument_len = variant->arg_size;
+> +	self->fault_page =
+> +		(__u64)mmap(NULL, (size_t)getpagesize(), PROT_NONE, MAP_ANONYMOUS, -1, 0);
+> +}
+> +
+> +FIXTURE_TEARDOWN(uvio_fixture)
+> +{
+> +	if (self->uv_fd)
+> +		close(self->uv_fd);
+> +	munmap((void *)self->fault_page, (size_t)getpagesize());
+> +}
+> +
+> +TEST_F(uvio_fixture, fault_ioctl_arg)
+> +{
+> +	int rc, errno_cache;
+> +
+> +	rc = ioctl(self->uv_fd, variant->ioctl_cmd, NULL);
+> +	errno_cache = errno;
+> +	ASSERT_EQ(rc, -1);
+> +	ASSERT_EQ(errno_cache, EFAULT);
+> +
+> +	rc = ioctl(self->uv_fd, variant->ioctl_cmd, self->fault_page);
+> +	errno_cache = errno;
+> +	ASSERT_EQ(rc, -1);
+> +	ASSERT_EQ(errno_cache, EFAULT);
+> +}
+> +
+> +TEST_F(uvio_fixture, fault_uvio_arg)
+> +{
+> +	int rc, errno_cache;
+> +
+> +	self->uvio_ioctl.argument_addr = 0;
+> +	rc = ioctl(self->uv_fd, variant->ioctl_cmd, &self->uvio_ioctl);
+> +	errno_cache = errno;
+> +	ASSERT_EQ(rc, -1);
+> +	ASSERT_EQ(errno_cache, EFAULT);
+> +
+> +	self->uvio_ioctl.argument_addr = self->fault_page;
+> +	rc = ioctl(self->uv_fd, variant->ioctl_cmd, &self->uvio_ioctl);
+> +	errno_cache = errno;
+> +	ASSERT_EQ(rc, -1);
+> +	ASSERT_EQ(errno_cache, EFAULT);
+> +}
+> +
+> +/*
+> + * Test to verify that IOCTLs with invalid values in the ioctl_control block
+> + * are rejected.
+> + */
+> +TEST_F(uvio_fixture, inval_ioctl_cb)
+> +{
+> +	int rc, errno_cache;
+> +
+> +	self->uvio_ioctl.argument_len = 0;
+> +	rc = ioctl(self->uv_fd, variant->ioctl_cmd, &self->uvio_ioctl);
+> +	errno_cache = errno;
+> +	ASSERT_EQ(rc, -1);
+> +	ASSERT_EQ(errno_cache, EINVAL);
+> +
+> +	self->uvio_ioctl.argument_len = (uint32_t)-1;
+> +	rc = ioctl(self->uv_fd, variant->ioctl_cmd, &self->uvio_ioctl);
+> +	errno_cache = errno;
+> +	ASSERT_EQ(rc, -1);
+> +	ASSERT_EQ(errno_cache, EINVAL);
+> +	self->uvio_ioctl.argument_len = variant->arg_size;
+> +
+> +	self->uvio_ioctl.flags = (uint32_t)-1;
+> +	rc = ioctl(self->uv_fd, variant->ioctl_cmd, &self->uvio_ioctl);
+> +	errno_cache = errno;
+> +	ASSERT_EQ(rc, -1);
+> +	ASSERT_EQ(errno_cache, EINVAL);
+> +	self->uvio_ioctl.flags = 0;
+> +
+> +	memset(self->uvio_ioctl.reserved14, 0xff, sizeof(self->uvio_ioctl.reserved14));
+> +	rc = ioctl(self->uv_fd, variant->ioctl_cmd, &self->uvio_ioctl);
+> +	errno_cache = errno;
+> +	ASSERT_EQ(rc, -1);
+> +	ASSERT_EQ(errno_cache, EINVAL);
+> +
+> +	memset(&self->uvio_ioctl, 0x11, sizeof(self->uvio_ioctl));
+> +	rc = ioctl(self->uv_fd, variant->ioctl_cmd, &self->uvio_ioctl);
+> +	ASSERT_EQ(rc, -1);
+> +}
+> +
+> +TEST_F(uvio_fixture, inval_ioctl_cmd)
+> +{
+> +	int rc, errno_cache;
+> +	uint8_t nr = _IOC_NR(variant->ioctl_cmd);
+> +	unsigned long cmds[] = {
+> +		_IOWR('a', nr, struct uvio_ioctl_cb),
+> +		_IOWR(UVIO_TYPE_UVC, nr, int),
+> +		_IO(UVIO_TYPE_UVC, nr),
+> +		_IOR(UVIO_TYPE_UVC, nr, struct uvio_ioctl_cb),
+> +		_IOW(UVIO_TYPE_UVC, nr, struct uvio_ioctl_cb),
+> +	};
+> +
+> +	for (size_t i = 0; i < ARRAY_SIZE(cmds); i++) {
+> +		rc = ioctl(self->uv_fd, cmds[i], &self->uvio_ioctl);
+> +		errno_cache = errno;
+> +		ASSERT_EQ(rc, -1);
+> +		ASSERT_EQ(errno_cache, EINVAL);
+> +	}
+> +}
+> +
+> +struct test_attest_buffer {
+> +	uint8_t arcb[0x180];
+> +	uint8_t meas[64];
+> +	uint8_t add[32];
+> +};
+> +
+> +FIXTURE(attest_fixture) {
+> +	int uv_fd;
+> +	struct uvio_ioctl_cb uvio_ioctl;
+> +	struct uvio_attest uvio_attest;
+> +	struct test_attest_buffer attest_buffer;
+> +	__u64 fault_page;
+> +};
+> +
+> +FIXTURE_SETUP(attest_fixture)
+> +{
+> +	self->uv_fd = open("/dev/uv", O_RDWR);
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+0abd373e2e50d704db87@syzkaller.appspotmail.com
+So each test opne and closes the devuce. Can this file stay open
+for the duraction of the test run and close it in main() after
+test exits?
 
-INFO: task syz-executor117:3632 blocked for more than 143 seconds.
-      Not tainted 5.17.0-rc3-syzkaller-00029-ge6251ab4551f #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor117 state:D stack:27512 pid: 3632 ppid:  3631 flags:0x00004002
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:4986 [inline]
- __schedule+0xab2/0x4db0 kernel/sched/core.c:6295
- schedule+0xd2/0x260 kernel/sched/core.c:6368
- schedule_timeout+0x1db/0x2a0 kernel/time/timer.c:1857
- do_wait_for_common kernel/sched/completion.c:85 [inline]
- __wait_for_common kernel/sched/completion.c:106 [inline]
- wait_for_common kernel/sched/completion.c:117 [inline]
- wait_for_completion+0x174/0x270 kernel/sched/completion.c:138
- vhost_work_dev_flush.part.0+0xbb/0xf0 drivers/vhost/vhost.c:243
- vhost_work_dev_flush drivers/vhost/vhost.c:238 [inline]
- vhost_poll_flush+0x5e/0x80 drivers/vhost/vhost.c:252
- vhost_vsock_flush drivers/vhost/vsock.c:710 [inline]
- vhost_vsock_dev_release+0x1be/0x4b0 drivers/vhost/vsock.c:757
- __fput+0x286/0x9f0 fs/file_table.c:311
- task_work_run+0xdd/0x1a0 kernel/task_work.c:164
- exit_task_work include/linux/task_work.h:32 [inline]
- do_exit+0xb29/0x2a30 kernel/exit.c:806
- do_group_exit+0xd2/0x2f0 kernel/exit.c:935
- __do_sys_exit_group kernel/exit.c:946 [inline]
- __se_sys_exit_group kernel/exit.c:944 [inline]
- __x64_sys_exit_group+0x3a/0x50 kernel/exit.c:944
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x7fbf04b83b89
-RSP: 002b:00007fff5bc9ca18 EFLAGS: 00000246 ORIG_RAX: 00000000000000e7
-RAX: ffffffffffffffda RBX: 00007fbf04bf8330 RCX: 00007fbf04b83b89
-RDX: 000000000000003c RSI: 00000000000000e7 RDI: 0000000000000000
-RBP: 0000000000000000 R08: ffffffffffffffc0 R09: 00007fff5bc9cc08
-R10: 00007fff5bc9cc08 R11: 0000000000000246 R12: 00007fbf04bf8330
-R13: 0000000000000001 R14: 0000000000000000 R15: 0000000000000001
- </TASK>
+> +
+> +	self->uvio_ioctl.argument_addr = (__u64)&self->uvio_attest;
+> +	self->uvio_ioctl.argument_len = sizeof(self->uvio_attest);
+> +
+> +	self->uvio_attest.arcb_addr = (__u64)&self->attest_buffer.arcb;
+> +	self->uvio_attest.arcb_len = sizeof(self->attest_buffer.arcb);
+> +
+> +	self->uvio_attest.meas_addr = (__u64)&self->attest_buffer.meas;
+> +	self->uvio_attest.meas_len = sizeof(self->attest_buffer.meas);
+> +
+> +	self->uvio_attest.add_data_addr = (__u64)&self->attest_buffer.add;
+> +	self->uvio_attest.add_data_len = sizeof(self->attest_buffer.add);
+> +	self->fault_page =
+> +		(__u64)mmap(NULL, (size_t)getpagesize(), PROT_NONE, MAP_ANONYMOUS, -1, 0);
+> +}
+> +
+> +FIXTURE_TEARDOWN(attest_fixture)
+> +{
+> +	if (self->uv_fd)
+> +		close(self->uv_fd);
+> +	munmap((void *)self->fault_page, (size_t)getpagesize());
+> +}
+> +
+> +static void att_inval_sizes_test(uint32_t *size, uint32_t max_size, bool test_zero,
+> +				 struct __test_metadata *_metadata,
+> +				 FIXTURE_DATA(attest_fixture) *self)
+> +{
+> +	int rc, errno_cache;
+> +	uint32_t tmp = *size;
+> +
+> +	if (test_zero) {
+> +		*size = 0;
+> +		rc = ioctl(self->uv_fd, UVIO_IOCTL_ATT, &self->uvio_ioctl);
+> +		errno_cache = errno;
+> +		ASSERT_EQ(rc, -1);
+> +		ASSERT_EQ(errno_cache, EINVAL);
+> +	}
+> +	*size = max_size + 1;
+> +	rc = ioctl(self->uv_fd, UVIO_IOCTL_ATT, &self->uvio_ioctl);
+> +	errno_cache = errno;
+> +	ASSERT_EQ(rc, -1);
+> +	ASSERT_EQ(errno_cache, EINVAL);
+> +	*size = tmp;
+> +}
+> +
+> +/*
+> + * Test to verify that attestation IOCTLs with invalid values in the UVIO
+> + * attestation control block are rejected.
+> + */
+> +TEST_F(attest_fixture, att_inval_request)
+> +{
+> +	int rc, errno_cache;
+> +
+> +	att_inval_sizes_test(&self->uvio_attest.add_data_len, UVIO_ATT_ADDITIONAL_MAX_LEN,
+> +			     false, _metadata, self);
+> +	att_inval_sizes_test(&self->uvio_attest.meas_len, UVIO_ATT_MEASUREMENT_MAX_LEN,
+> +			     true, _metadata, self);
+> +	att_inval_sizes_test(&self->uvio_attest.arcb_len, UVIO_ATT_ARCB_MAX_LEN,
+> +			     true, _metadata, self);
+> +
+> +	self->uvio_attest.reserved136 = (uint16_t)-1;
+> +	rc = ioctl(self->uv_fd, UVIO_IOCTL_ATT, &self->uvio_ioctl);
+> +	errno_cache = errno;
+> +	ASSERT_EQ(rc, -1);
+> +	ASSERT_EQ(errno_cache, EINVAL);
+> +
+> +	memset(&self->uvio_attest, 0x11, sizeof(self->uvio_attest));
+> +	rc = ioctl(self->uv_fd, UVIO_IOCTL_ATT, &self->uvio_ioctl);
+> +	ASSERT_EQ(rc, -1);
+> +}
+> +
+> +static void att_inval_addr_test(__u64 *addr, struct __test_metadata *_metadata,
+> +				FIXTURE_DATA(attest_fixture) *self)
+> +{
+> +	int rc, errno_cache;
+> +	__u64 tmp = *addr;
+> +
+> +	*addr = 0;
+> +	rc = ioctl(self->uv_fd, UVIO_IOCTL_ATT, &self->uvio_ioctl);
+> +	errno_cache = errno;
+> +	ASSERT_EQ(rc, -1);
+> +	ASSERT_EQ(errno_cache, EFAULT);
+> +	*addr = self->fault_page;
+> +	rc = ioctl(self->uv_fd, UVIO_IOCTL_ATT, &self->uvio_ioctl);
+> +	errno_cache = errno;
+> +	ASSERT_EQ(rc, -1);
+> +	ASSERT_EQ(errno_cache, EFAULT);
+> +	*addr = tmp;
+> +}
+> +
+> +TEST_F(attest_fixture, att_inval_addr)
+> +{
+> +	att_inval_addr_test(&self->uvio_attest.arcb_addr, _metadata, self);
+> +	att_inval_addr_test(&self->uvio_attest.add_data_addr, _metadata, self);
+> +	att_inval_addr_test(&self->uvio_attest.meas_addr, _metadata, self);
+> +}
+> +
+> +static void __attribute__((constructor)) __constructor_order_last(void)
+> +{
+> +	if (!__constructor_order)
+> +		__constructor_order = _CONSTRUCTOR_ORDER_BACKWARD;
+> +}
+> +
+> +int main(int argc, char **argv)
+> +{
+> +	int fd = open("/dev/uv", O_RDWR);
+> +
+> +	if (fd < 0) {
+> +		ksft_exit_skip("No uv-device.\n");
 
-Showing all locks held in the system:
-1 lock held by khungtaskd/26:
- #0: ffffffff8bb83c20 (rcu_read_lock){....}-{1:2}, at: debug_show_all_locks+0x53/0x260 kernel/locking/lockdep.c:6460
-2 locks held by getty/3275:
- #0: ffff88807f0db098 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_ref_wait+0x22/0x80 drivers/tty/tty_ldisc.c:244
- #1: ffffc90002b662e8 (&ldata->atomic_read_lock){+.+.}-{3:3}, at: n_tty_read+0xcf0/0x1230 drivers/tty/n_tty.c:2077
-1 lock held by vhost-3632/3633:
+Please add information on which confg options need to be enabled
+to run this test - CONFIG_S390_UV_UAPI?
 
-=============================================
+Also add a check and skip when run by non-root if this test requires
+root privileges.
 
-NMI backtrace for cpu 0
-CPU: 0 PID: 26 Comm: khungtaskd Not tainted 5.17.0-rc3-syzkaller-00029-ge6251ab4551f #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
- nmi_cpu_backtrace.cold+0x47/0x144 lib/nmi_backtrace.c:111
- nmi_trigger_cpumask_backtrace+0x1b3/0x230 lib/nmi_backtrace.c:62
- trigger_all_cpu_backtrace include/linux/nmi.h:146 [inline]
- check_hung_uninterruptible_tasks kernel/hung_task.c:212 [inline]
- watchdog+0xc1d/0xf50 kernel/hung_task.c:369
- kthread+0x2e9/0x3a0 kernel/kthread.c:377
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
- </TASK>
-Sending NMI from CPU 0 to CPUs 1:
-NMI backtrace for cpu 1
-CPU: 1 PID: 3633 Comm: vhost-3632 Not tainted 5.17.0-rc3-syzkaller-00029-ge6251ab4551f #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-RIP: 0010:check_kcov_mode kernel/kcov.c:166 [inline]
-RIP: 0010:__sanitizer_cov_trace_pc+0xd/0x60 kernel/kcov.c:200
-Code: 00 00 e9 c6 41 66 02 66 0f 1f 44 00 00 48 8b be b0 01 00 00 e8 b4 ff ff ff 31 c0 c3 90 65 8b 05 29 f7 89 7e 89 c1 48 8b 34 24 <81> e1 00 01 00 00 65 48 8b 14 25 00 70 02 00 a9 00 01 ff 00 74 0e
-RSP: 0018:ffffc90000cd7c78 EFLAGS: 00000246
-RAX: 0000000080000000 RBX: ffff888079ca8a80 RCX: 0000000080000000
-RDX: 0000000000000000 RSI: ffffffff86d3f8fb RDI: 0000000000000003
-RBP: 0000000000000000 R08: 0000000000000000 R09: ffffc90000cd7c77
-R10: ffffffff86d3f8ed R11: 0000000000000001 R12: 0000000000000000
-R13: 0000000000000000 R14: 0000000000000001 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007ffdf716a3b8 CR3: 00000000235b6000 CR4: 00000000003506e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- iotlb_access_ok+0x21b/0x3e0 drivers/vhost/vhost.c:1340
- vq_meta_prefetch+0xbc/0x280 drivers/vhost/vhost.c:1366
- vhost_transport_do_send_pkt+0xe0/0xfd0 drivers/vhost/vsock.c:104
- vhost_worker+0x23d/0x3d0 drivers/vhost/vhost.c:372
- kthread+0x2e9/0x3a0 kernel/kthread.c:377
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
- </TASK>
-----------------
-Code disassembly (best guess):
-   0:	00 00                	add    %al,(%rax)
-   2:	e9 c6 41 66 02       	jmpq   0x26641cd
-   7:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
-   d:	48 8b be b0 01 00 00 	mov    0x1b0(%rsi),%rdi
-  14:	e8 b4 ff ff ff       	callq  0xffffffcd
-  19:	31 c0                	xor    %eax,%eax
-  1b:	c3                   	retq
-  1c:	90                   	nop
-  1d:	65 8b 05 29 f7 89 7e 	mov    %gs:0x7e89f729(%rip),%eax        # 0x7e89f74d
-  24:	89 c1                	mov    %eax,%ecx
-  26:	48 8b 34 24          	mov    (%rsp),%rsi
-* 2a:	81 e1 00 01 00 00    	and    $0x100,%ecx <-- trapping instruction
-  30:	65 48 8b 14 25 00 70 	mov    %gs:0x27000,%rdx
-  37:	02 00
-  39:	a9 00 01 ff 00       	test   $0xff0100,%eax
-  3e:	74 0e                	je     0x4e
+> +		ksft_exit(KSFT_SKIP);
+
+You don't need this - ksft_exit_skip() calls exit(KSFT_SKIP)
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+> +	}
+> +	close(fd);
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-syzbot can test patches for this issue, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+Closing the file before test inocation?
+
+> +	return test_harness_run(argc, argv);
+> +}
+> 
+
+thanks,
+-- Shuah
