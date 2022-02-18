@@ -2,64 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E9FDC4BB7DD
-	for <lists+kvm@lfdr.de>; Fri, 18 Feb 2022 12:12:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F5A04BB7F0
+	for <lists+kvm@lfdr.de>; Fri, 18 Feb 2022 12:20:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234339AbiBRLMr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Feb 2022 06:12:47 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:41576 "EHLO
+        id S232993AbiBRLUc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Feb 2022 06:20:32 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:46478 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229946AbiBRLMp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Feb 2022 06:12:45 -0500
-Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8CDD25E5D4;
-        Fri, 18 Feb 2022 03:12:29 -0800 (PST)
-Received: by mail-pg1-x52e.google.com with SMTP id d16so7532544pgd.9;
-        Fri, 18 Feb 2022 03:12:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=cscMbHy8lEh8C4QC/LiR+iHTGNH1GOnDZKV+ex6QkPY=;
-        b=GqHiSW1HOPlPxbDAK9Q8LwKimZTAunQFhF/3AnaFtKeNqAHqQczs3YI+hLoUsInU0S
-         eAzCK8i6i00cv2C22DYNML+psbunMt8xoFmvMK6AKyok2pfhzsk49D9UDh1U1sieJCqm
-         JWBiMVcfcvvJdVW/4esDoXSBky1kE8zX73cHzcYK/ncaTQWQ0A+nptOJXKaAWyf2d3j2
-         TGmT6lZvh7ORX2XqrmInZFXMBzfJ96tE82lpHChtyu74AKMTBXWRAS50PDue6Fb7ujpC
-         XSSpQPFCr5WoBA6rEe0TP31fncwOPZ4AWClZDJK4dFV2Yfr70suB8t3mBROgKPe4jqX/
-         l7iw==
+        with ESMTP id S230475AbiBRLUb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Feb 2022 06:20:31 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 15811433BF
+        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 03:20:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645183214;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=cKb0cZODYYb004G8vkUpXzl5M5sjvEaMEp61UfVhGYE=;
+        b=UtjgM1tUJosEHw/U96wCmDS1JVVmZ1H3jaUtHz7XJ+RGTXVRZQ9yHr4jAPrElJh/XldCpC
+        zF9sMJrpg6TDh1KK/1SoGMOB3poITE3507mU6CvaH2C0J+KFoY0LAyEItT3ghetJTB71qn
+        oifdIrxHvauXQ+uCMXyMcEAYbCiX9gI=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-646-fZP9uASMO92laWPntN1BNw-1; Fri, 18 Feb 2022 06:20:13 -0500
+X-MC-Unique: fZP9uASMO92laWPntN1BNw-1
+Received: by mail-ej1-f71.google.com with SMTP id h22-20020a1709060f5600b006b11a2d3dcfso2923133ejj.4
+        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 03:20:12 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=cscMbHy8lEh8C4QC/LiR+iHTGNH1GOnDZKV+ex6QkPY=;
-        b=Y21xZ1Z6xtjvLjaNqPujXTd3jz07koeOuHCkYRg0NXaXvnVsCQzqT09carIIftM0C0
-         1t7SEUIPmuBEZYYo9SoGFUQxRWsjmBk/uuMuPvF0UfPN9Hzm4Lrz2DMDq2rpZAlNtInb
-         Et45B0/sS5MhMFu/gKsDHO+Ryu+M5zzgS/j2mb1mOyez8hna+3D3WtKAqYJBqsYxRHlM
-         VEcn5Z8jRJO3MwO/DbvZejpTic2dyNbjvZCMmFJx9ivIrU6j9OKMLi5dgPjMH0KWx/4C
-         d1ADoGe67ABPLcEAF+aAweA3hzx5NE67PIEm0+K7h+5Q8hORWZ8nhfY32TefrFYbn2LR
-         uIEw==
-X-Gm-Message-State: AOAM5301cGORskQuV9Op1r44q+XYbgmeRqvrh+p78HdSMT+AcF/Prpzv
-        ikCeQCjjfVf7y2ZE5b3bkOD4g/ve3PKKKaNS
-X-Google-Smtp-Source: ABdhPJxvlApAgttSSo4vryp0sdTyBOOUFliuJmsD5tjzxGjepTzqPoMl4MQIup1SWZy7zq9+qYeBhw==
-X-Received: by 2002:a62:7e06:0:b0:4e0:f0f8:9b86 with SMTP id z6-20020a627e06000000b004e0f0f89b86mr7542341pfc.26.1645182749358;
-        Fri, 18 Feb 2022 03:12:29 -0800 (PST)
-Received: from FLYINGPENG-MB0.tencent.com ([103.7.29.30])
-        by smtp.gmail.com with ESMTPSA id 189sm2806426pfv.133.2022.02.18.03.12.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Feb 2022 03:12:29 -0800 (PST)
-From:   Peng Hao <flyingpenghao@gmail.com>
-X-Google-Original-From: Peng Hao <flyingpeng@tencent.com>
-To:     pbonzini@redhat.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH]  kvm/vmx: Make setup/unsetup under the same conditions
-Date:   Fri, 18 Feb 2022 19:11:13 +0800
-Message-Id: <20220218111113.11861-1-flyingpeng@tencent.com>
-X-Mailer: git-send-email 2.30.1 (Apple Git-130)
+        bh=cKb0cZODYYb004G8vkUpXzl5M5sjvEaMEp61UfVhGYE=;
+        b=1gNU56rTf6CM9yOYrE7bMq14izkL1hvV+LcEE0CywtGtbQgy9VaGDl774rrFoPz7ZZ
+         6uSRPCEz0Grh944bcs9hJ5tdIXSiTQxFyFJwXs4vEjorrex+Xq/ESCLKXut70zQAgdJA
+         EKWag6TzmJEIA+l6t8wm4BoagFbE+L97KkrpGowU+DfSY5b/7Wuuc4OISqfMenXUZCbX
+         RA7YgJDEy51eaO/s89fT62rYoEUTC1nQ3w2O/SLUrOR/7eqeCspICzP+ofDJ5MQn3eGR
+         AUo7qbqlW6XSx++f5FCsvausNp473u+raZNKfKeJhyPX+d63euKgvZxgXL+XkmFsOWMF
+         cvtA==
+X-Gm-Message-State: AOAM530STIBM7mH6S59bDD0Btr+ze8yvjPaWSxCg1KX49ueD2DcaS8EC
+        zLNgbcskdY1hnp7ZfwiaIbKstKhaUdbxiYQN1xgwtNMX6fwZZbVSLP4sOrfFjNLMv/TShy1FZgJ
+        4tmp+Yv9giB7C
+X-Received: by 2002:a17:906:ae4a:b0:6d0:9eee:e951 with SMTP id lf10-20020a170906ae4a00b006d09eeee951mr1899259ejb.2.1645183211910;
+        Fri, 18 Feb 2022 03:20:11 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzopxqIdnzTGCmNYL+f43fQvHudwEnkN8EXmuI9QZ7YMXotpNyJWu9FUG2Za6Ja9QauUua0qA==
+X-Received: by 2002:a17:906:ae4a:b0:6d0:9eee:e951 with SMTP id lf10-20020a170906ae4a00b006d09eeee951mr1899251ejb.2.1645183211720;
+        Fri, 18 Feb 2022 03:20:11 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id b7sm4403880edv.58.2022.02.18.03.20.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 18 Feb 2022 03:20:11 -0800 (PST)
+Message-ID: <12b84d17-94cc-6ee7-bde4-340b609c16d2@redhat.com>
+Date:   Fri, 18 Feb 2022 12:20:08 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH 2/2] KVM: x86/pmu: Protect kvm->arch.pmu_event_filter with
+ SRCU
+Content-Language: en-US
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Eric Hankland <ehankland@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20220217083601.24829-1-likexu@tencent.com>
+ <20220217083601.24829-2-likexu@tencent.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20220217083601.24829-2-likexu@tencent.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -67,27 +87,44 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Make sure nested_vmx_hardware_setup/unsetup are called in pairs under
-the same conditions.
+On 2/17/22 09:36, Like Xu wrote:
+> From: Like Xu<likexu@tencent.com>
+> 
+> Fix the following positive warning:
+> 
+>   =============================
+>   WARNING: suspicious RCU usage
+>   arch/x86/kvm/pmu.c:190 suspicious rcu_dereference_check() usage!
+>   other info that might help us debug this:
+>   rcu_scheduler_active = 2, debug_locks = 1
+>   1 lock held by CPU 28/KVM/370841:
+>   #0: ff11004089f280b8 (&vcpu->mutex){+.+.}-{3:3}, at: kvm_vcpu_ioctl+0x87/0x730 [kvm]
+>   Call Trace:
+>    <TASK>
+>    dump_stack_lvl+0x59/0x73
+>    reprogram_fixed_counter+0x15d/0x1a0 [kvm]
+>    kvm_pmu_trigger_event+0x1a3/0x260 [kvm]
+>    ? free_moved_vector+0x1b4/0x1e0
+>    complete_fast_pio_in+0x8a/0xd0 [kvm]
+>    [...]
 
-Signed-off-by: Peng Hao <flyingpeng@tencent.com>
----
- arch/x86/kvm/vmx/vmx.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I think the right fix is to add SRCU protection to complete_userspace_io 
+in kvm_arch_vcpu_ioctl_run.  Most calls of complete_userspace_io can 
+execute similar code to vmexits.
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 0ffcfe54eea5..5392def71093 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7852,7 +7852,7 @@ static __init int hardware_setup(void)
- 	vmx_set_cpu_caps();
- 
- 	r = alloc_kvm_area();
--	if (r)
-+	if (r && nested)
- 		nested_vmx_hardware_unsetup();
- 
- 	kvm_set_posted_intr_wakeup_handler(pi_wakeup_handler);
--- 
-2.27.0
+> Fixes: 66bb8a065f5a ("KVM: x86: PMU Event Filter")
+
+It fixes 9cd803d496e7 ("KVM: x86: Update vPMCs when retiring 
+instructions", 2022-01-07), actually.  That is when the PMU filter was 
+added to kvm_skip_emulated_instruction (called by kvm_fast_pio_in).
+
+Thanks,
+
+Paolo
+
+> It's possible to call KVM_SET_PMU_EVENT_FILTER ioctl with the vCPU running.
+> Similar to "kvm->arch.msr_filter", KVM should guarantee that vCPUs will
+> see either the previous filter or the new filter so that guest pmu events
+> with identical settings in both the old and new filter have deterministic
+> behavior.
 
