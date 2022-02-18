@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 932674BAED8
-	for <lists+kvm@lfdr.de>; Fri, 18 Feb 2022 02:00:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 255E84BAEC5
+	for <lists+kvm@lfdr.de>; Fri, 18 Feb 2022 02:00:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230464AbiBRA6y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Feb 2022 19:58:54 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:40110 "EHLO
+        id S230523AbiBRA7B (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Feb 2022 19:59:01 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:40732 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230436AbiBRA6t (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Feb 2022 19:58:49 -0500
+        with ESMTP id S230477AbiBRA64 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Feb 2022 19:58:56 -0500
 Received: from mga06.intel.com (mga06.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2254F45AD0;
-        Thu, 17 Feb 2022 16:58:28 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2467A1451E8;
+        Thu, 17 Feb 2022 16:58:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1645145908; x=1676681908;
+  t=1645145919; x=1676681919;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=oUncDBL+5vMy4n8DugjyhG+MWYfr+VE0+QodZOTRghw=;
-  b=mSdlnybd3XuqxdUSzAM1emNq8c0Q3JLYzF9yk5M1M4os5QkWQeBMDoB5
-   FD9j6G986bOsS8zcJGF2ciLuL5iXVTZoSkumrmzF9TWUYNemLjojA/72e
-   CHVa2x5Gp6rcNgZpX4hWBWOdboPHz8+95n/xiomVkVsPfyrlGnoL4ye9N
-   DlokP6OL4cUYESusN6gKjj1FALgSC/1Xp9Kspt/Vy44TYu9Z9LRJlZnxZ
-   jqVCcbKtygk2zFV0uZHbXhSnGQYIJVoxDGTP3WFaNN7eAVTOGcuIMXgb3
-   Yv5CkUEDqZVhavDymnJbgdDTIz36PLQvQw5qO4N8TcNntDcbWVDTFZV3l
-   Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10261"; a="311760197"
+  bh=f6wc9OlSg4rQokL1ZkwL4XG3KnhfZB89/WTbGAYuHAc=;
+  b=Q7APPgVcE4rDSHsGCQ7B2gKU0ggepCSUTiGamCpP3CGjGPfeGFP3ZEOb
+   S40vTmW6OLD//g/vp1HKZU2SY47AtdqlLkEZT10QqzC7ILOFMKTMbV+YL
+   fqyCD2guPdX0FerArVx7EusCLY/oPe6ObMqIjqdJnTC/qs9aesYqPdKNY
+   GfE+gUH2/d1dDPSZa3TRjOP2T/B61nGNARqfDL5FwmAt+JbDG5bk6uDK2
+   0mmJC+DtuT8EGk3nrYVX1WnxT3+3miXLVs9gurdzqNx8Qyq3+tkwrZPYu
+   /GfAsernpJ8rrSyBZNnf357ezId9x4ipqsBndnx6NSKtzu8lYsj+vmgS8
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10261"; a="311760207"
 X-IronPort-AV: E=Sophos;i="5.88,377,1635231600"; 
-   d="scan'208";a="311760197"
+   d="scan'208";a="311760207"
 Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Feb 2022 16:57:23 -0800
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Feb 2022 16:57:30 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.88,377,1635231600"; 
-   d="scan'208";a="637490930"
+   d="scan'208";a="637491059"
 Received: from allen-box.sh.intel.com ([10.239.159.118])
-  by orsmga004.jf.intel.com with ESMTP; 17 Feb 2022 16:57:16 -0800
+  by orsmga004.jf.intel.com with ESMTP; 17 Feb 2022 16:57:23 -0800
 From:   Lu Baolu <baolu.lu@linux.intel.com>
 To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Joerg Roedel <joro@8bytes.org>,
@@ -65,9 +65,9 @@ Cc:     Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
         iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Lu Baolu <baolu.lu@linux.intel.com>
-Subject: [PATCH v6 04/11] bus: platform,amba,fsl-mc,PCI: Add device DMA ownership management
-Date:   Fri, 18 Feb 2022 08:55:14 +0800
-Message-Id: <20220218005521.172832-5-baolu.lu@linux.intel.com>
+Subject: [PATCH v6 05/11] PCI: pci_stub: Set driver_managed_dma
+Date:   Fri, 18 Feb 2022 08:55:15 +0800
+Message-Id: <20220218005521.172832-6-baolu.lu@linux.intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220218005521.172832-1-baolu.lu@linux.intel.com>
 References: <20220218005521.172832-1-baolu.lu@linux.intel.com>
@@ -83,361 +83,35 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The devices on platform/amba/fsl-mc/PCI buses could be bound to drivers
-with the device DMA managed by kernel drivers or user-space applications.
-Unfortunately, multiple devices may be placed in the same IOMMU group
-because they cannot be isolated from each other. The DMA on these devices
-must either be entirely under kernel control or userspace control, never
-a mixture. Otherwise the driver integrity is not guaranteed because they
-could access each other through the peer-to-peer accesses which by-pass
-the IOMMU protection.
+The current VFIO implementation allows pci-stub driver to be bound to
+a PCI device with other devices in the same IOMMU group being assigned
+to userspace. The pci-stub driver has no dependencies on DMA or the
+IOVA mapping of the device, but it does prevent the user from having
+direct access to the device, which is useful in some circumstances.
 
-This checks and sets the default DMA mode during driver binding, and
-cleanups during driver unbinding. In the default mode, the device DMA is
-managed by the device driver which handles DMA operations through the
-kernel DMA APIs (see Documentation/core-api/dma-api.rst).
+The pci_dma_configure() marks the iommu_group as containing only devices
+with kernel drivers that manage DMA. For compatibility with the VFIO
+usage, avoid this default behavior for the pci_stub. This allows the
+pci_stub still able to be used by the admin to block driver binding after
+applying the DMA ownership to VFIO.
 
-For cases where the devices are assigned for userspace control through the
-userspace driver framework(i.e. VFIO), the drivers(for example, vfio_pci/
-vfio_platfrom etc.) may set a new flag (driver_managed_dma) to skip this
-default setting in the assumption that the drivers know what they are
-doing with the device DMA.
-
-With the IOMMU layer knowing DMA ownership of each device, above problem
-can be solved.
-
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Bjorn Helgaas <bhelgaas@google.com>
-Cc: Stuart Yoder <stuyoder@gmail.com>
-Cc: Laurentiu Tudor <laurentiu.tudor@nxp.com>
 Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
 ---
- include/linux/amba/bus.h        |  8 ++++++++
- include/linux/fsl/mc.h          |  8 ++++++++
- include/linux/pci.h             |  8 ++++++++
- include/linux/platform_device.h |  8 ++++++++
- drivers/amba/bus.c              | 20 ++++++++++++++++++++
- drivers/base/platform.c         | 20 ++++++++++++++++++++
- drivers/bus/fsl-mc/fsl-mc-bus.c | 26 ++++++++++++++++++++++++--
- drivers/pci/pci-driver.c        | 21 +++++++++++++++++++++
- 8 files changed, 117 insertions(+), 2 deletions(-)
+ drivers/pci/pci-stub.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/include/linux/amba/bus.h b/include/linux/amba/bus.h
-index 6c7f47846971..e9cd981be94e 100644
---- a/include/linux/amba/bus.h
-+++ b/include/linux/amba/bus.h
-@@ -79,6 +79,14 @@ struct amba_driver {
- 	void			(*remove)(struct amba_device *);
- 	void			(*shutdown)(struct amba_device *);
- 	const struct amba_id	*id_table;
-+	/*
-+	 * For most device drivers, no need to care about this flag as long as
-+	 * all DMAs are handled through the kernel DMA API. For some special
-+	 * ones, for example VFIO drivers, they know how to manage the DMA
-+	 * themselves and set this flag so that the IOMMU layer will allow them
-+	 * to setup and manage their own I/O address space.
-+	 */
-+	bool driver_managed_dma;
+diff --git a/drivers/pci/pci-stub.c b/drivers/pci/pci-stub.c
+index e408099fea52..d1f4c1ce7bd1 100644
+--- a/drivers/pci/pci-stub.c
++++ b/drivers/pci/pci-stub.c
+@@ -36,6 +36,7 @@ static struct pci_driver stub_driver = {
+ 	.name		= "pci-stub",
+ 	.id_table	= NULL,	/* only dynamic id's */
+ 	.probe		= pci_stub_probe,
++	.driver_managed_dma = true,
  };
  
- /*
-diff --git a/include/linux/fsl/mc.h b/include/linux/fsl/mc.h
-index 7b6c42bfb660..27efef8affb1 100644
---- a/include/linux/fsl/mc.h
-+++ b/include/linux/fsl/mc.h
-@@ -32,6 +32,13 @@ struct fsl_mc_io;
-  * @shutdown: Function called at shutdown time to quiesce the device
-  * @suspend: Function called when a device is stopped
-  * @resume: Function called when a device is resumed
-+ * @driver_managed_dma: Device driver doesn't use kernel DMA API for DMA.
-+ *		For most device drivers, no need to care about this flag
-+ *		as long as all DMAs are handled through the kernel DMA API.
-+ *		For some special ones, for example VFIO drivers, they know
-+ *		how to manage the DMA themselves and set this flag so that
-+ *		the IOMMU layer will allow them to setup and manage their
-+ *		own I/O address space.
-  *
-  * Generic DPAA device driver object for device drivers that are registered
-  * with a DPRC bus. This structure is to be embedded in each device-specific
-@@ -45,6 +52,7 @@ struct fsl_mc_driver {
- 	void (*shutdown)(struct fsl_mc_device *dev);
- 	int (*suspend)(struct fsl_mc_device *dev, pm_message_t state);
- 	int (*resume)(struct fsl_mc_device *dev);
-+	bool driver_managed_dma;
- };
- 
- #define to_fsl_mc_driver(_drv) \
-diff --git a/include/linux/pci.h b/include/linux/pci.h
-index 8253a5413d7c..b94bce839b83 100644
---- a/include/linux/pci.h
-+++ b/include/linux/pci.h
-@@ -894,6 +894,13 @@ struct module;
-  *              created once it is bound to the driver.
-  * @driver:	Driver model structure.
-  * @dynids:	List of dynamically added device IDs.
-+ * @driver_managed_dma: Device driver doesn't use kernel DMA API for DMA.
-+ *		For most device drivers, no need to care about this flag
-+ *		as long as all DMAs are handled through the kernel DMA API.
-+ *		For some special ones, for example VFIO drivers, they know
-+ *		how to manage the DMA themselves and set this flag so that
-+ *		the IOMMU layer will allow them to setup and manage their
-+ *		own I/O address space.
-  */
- struct pci_driver {
- 	struct list_head	node;
-@@ -912,6 +919,7 @@ struct pci_driver {
- 	const struct attribute_group **dev_groups;
- 	struct device_driver	driver;
- 	struct pci_dynids	dynids;
-+	bool driver_managed_dma;
- };
- 
- static inline struct pci_driver *to_pci_driver(struct device_driver *drv)
-diff --git a/include/linux/platform_device.h b/include/linux/platform_device.h
-index 17fde717df68..b3d9c744f1e5 100644
---- a/include/linux/platform_device.h
-+++ b/include/linux/platform_device.h
-@@ -210,6 +210,14 @@ struct platform_driver {
- 	struct device_driver driver;
- 	const struct platform_device_id *id_table;
- 	bool prevent_deferred_probe;
-+	/*
-+	 * For most device drivers, no need to care about this flag as long as
-+	 * all DMAs are handled through the kernel DMA API. For some special
-+	 * ones, for example VFIO drivers, they know how to manage the DMA
-+	 * themselves and set this flag so that the IOMMU layer will allow them
-+	 * to setup and manage their own I/O address space.
-+	 */
-+	bool driver_managed_dma;
- };
- 
- #define to_platform_driver(drv)	(container_of((drv), struct platform_driver, \
-diff --git a/drivers/amba/bus.c b/drivers/amba/bus.c
-index 8392f4aa251b..cebf03522524 100644
---- a/drivers/amba/bus.c
-+++ b/drivers/amba/bus.c
-@@ -22,6 +22,7 @@
- #include <linux/of_irq.h>
- #include <linux/of_device.h>
- #include <linux/acpi.h>
-+#include <linux/iommu.h>
- 
- #define to_amba_driver(d)	container_of(d, struct amba_driver, drv)
- 
-@@ -277,9 +278,16 @@ static void amba_shutdown(struct device *dev)
- 
- static int amba_dma_configure(struct device *dev)
- {
-+	struct amba_driver *drv = to_amba_driver(dev->driver);
- 	enum dev_dma_attr attr;
- 	int ret = 0;
- 
-+	if (!drv->driver_managed_dma) {
-+		ret = iommu_device_use_default_domain(dev);
-+		if (ret)
-+			return ret;
-+	}
-+
- 	if (dev->of_node) {
- 		ret = of_dma_configure(dev, dev->of_node, true);
- 	} else if (has_acpi_companion(dev)) {
-@@ -287,9 +295,20 @@ static int amba_dma_configure(struct device *dev)
- 		ret = acpi_dma_configure(dev, attr);
- 	}
- 
-+	if (ret && !drv->driver_managed_dma)
-+		iommu_device_unuse_default_domain(dev);
-+
- 	return ret;
- }
- 
-+static void amba_dma_cleanup(struct device *dev)
-+{
-+	struct amba_driver *drv = to_amba_driver(dev->driver);
-+
-+	if (!drv->driver_managed_dma)
-+		iommu_device_unuse_default_domain(dev);
-+}
-+
- #ifdef CONFIG_PM
- /*
-  * Hooks to provide runtime PM of the pclk (bus clock).  It is safe to
-@@ -359,6 +378,7 @@ struct bus_type amba_bustype = {
- 	.remove		= amba_remove,
- 	.shutdown	= amba_shutdown,
- 	.dma_configure	= amba_dma_configure,
-+	.dma_cleanup	= amba_dma_cleanup,
- 	.pm		= &amba_pm,
- };
- EXPORT_SYMBOL_GPL(amba_bustype);
-diff --git a/drivers/base/platform.c b/drivers/base/platform.c
-index acbc6eae37b8..ad8ea9453cdb 100644
---- a/drivers/base/platform.c
-+++ b/drivers/base/platform.c
-@@ -30,6 +30,7 @@
- #include <linux/property.h>
- #include <linux/kmemleak.h>
- #include <linux/types.h>
-+#include <linux/iommu.h>
- 
- #include "base.h"
- #include "power/power.h"
-@@ -1456,9 +1457,16 @@ static void platform_shutdown(struct device *_dev)
- 
- static int platform_dma_configure(struct device *dev)
- {
-+	struct platform_driver *drv = to_platform_driver(dev->driver);
- 	enum dev_dma_attr attr;
- 	int ret = 0;
- 
-+	if (!drv->driver_managed_dma) {
-+		ret = iommu_device_use_default_domain(dev);
-+		if (ret)
-+			return ret;
-+	}
-+
- 	if (dev->of_node) {
- 		ret = of_dma_configure(dev, dev->of_node, true);
- 	} else if (has_acpi_companion(dev)) {
-@@ -1466,9 +1474,20 @@ static int platform_dma_configure(struct device *dev)
- 		ret = acpi_dma_configure(dev, attr);
- 	}
- 
-+	if (ret && !drv->driver_managed_dma)
-+		iommu_device_unuse_default_domain(dev);
-+
- 	return ret;
- }
- 
-+static void platform_dma_cleanup(struct device *dev)
-+{
-+	struct platform_driver *drv = to_platform_driver(dev->driver);
-+
-+	if (!drv->driver_managed_dma)
-+		iommu_device_unuse_default_domain(dev);
-+}
-+
- static const struct dev_pm_ops platform_dev_pm_ops = {
- 	SET_RUNTIME_PM_OPS(pm_generic_runtime_suspend, pm_generic_runtime_resume, NULL)
- 	USE_PLATFORM_PM_SLEEP_OPS
-@@ -1483,6 +1502,7 @@ struct bus_type platform_bus_type = {
- 	.remove		= platform_remove,
- 	.shutdown	= platform_shutdown,
- 	.dma_configure	= platform_dma_configure,
-+	.dma_cleanup	= platform_dma_cleanup,
- 	.pm		= &platform_dev_pm_ops,
- };
- EXPORT_SYMBOL_GPL(platform_bus_type);
-diff --git a/drivers/bus/fsl-mc/fsl-mc-bus.c b/drivers/bus/fsl-mc/fsl-mc-bus.c
-index 8fd4a356a86e..eca3406a14ce 100644
---- a/drivers/bus/fsl-mc/fsl-mc-bus.c
-+++ b/drivers/bus/fsl-mc/fsl-mc-bus.c
-@@ -140,15 +140,36 @@ static int fsl_mc_dma_configure(struct device *dev)
- {
- 	struct device *dma_dev = dev;
- 	struct fsl_mc_device *mc_dev = to_fsl_mc_device(dev);
-+	struct fsl_mc_driver *mc_drv = to_fsl_mc_driver(dev->driver);
- 	u32 input_id = mc_dev->icid;
-+	int ret;
-+
-+	if (!mc_drv->driver_managed_dma) {
-+		ret = iommu_device_use_default_domain(dev);
-+		if (ret)
-+			return ret;
-+	}
- 
- 	while (dev_is_fsl_mc(dma_dev))
- 		dma_dev = dma_dev->parent;
- 
- 	if (dev_of_node(dma_dev))
--		return of_dma_configure_id(dev, dma_dev->of_node, 0, &input_id);
-+		ret = of_dma_configure_id(dev, dma_dev->of_node, 0, &input_id);
-+	else
-+		ret = acpi_dma_configure_id(dev, DEV_DMA_COHERENT, &input_id);
-+
-+	if (ret && !mc_drv->driver_managed_dma)
-+		iommu_device_unuse_default_domain(dev);
-+
-+	return ret;
-+}
-+
-+static void fsl_mc_dma_cleanup(struct device *dev)
-+{
-+	struct fsl_mc_driver *mc_drv = to_fsl_mc_driver(dev->driver);
- 
--	return acpi_dma_configure_id(dev, DEV_DMA_COHERENT, &input_id);
-+	if (!mc_drv->driver_managed_dma)
-+		iommu_device_unuse_default_domain(dev);
- }
- 
- static ssize_t modalias_show(struct device *dev, struct device_attribute *attr,
-@@ -312,6 +333,7 @@ struct bus_type fsl_mc_bus_type = {
- 	.match = fsl_mc_bus_match,
- 	.uevent = fsl_mc_bus_uevent,
- 	.dma_configure  = fsl_mc_dma_configure,
-+	.dma_cleanup = fsl_mc_dma_cleanup,
- 	.dev_groups = fsl_mc_dev_groups,
- 	.bus_groups = fsl_mc_bus_groups,
- };
-diff --git a/drivers/pci/pci-driver.c b/drivers/pci/pci-driver.c
-index 588588cfda48..893a8707c179 100644
---- a/drivers/pci/pci-driver.c
-+++ b/drivers/pci/pci-driver.c
-@@ -20,6 +20,7 @@
- #include <linux/of_device.h>
- #include <linux/acpi.h>
- #include <linux/dma-map-ops.h>
-+#include <linux/iommu.h>
- #include "pci.h"
- #include "pcie/portdrv.h"
- 
-@@ -1590,9 +1591,16 @@ static int pci_bus_num_vf(struct device *dev)
-  */
- static int pci_dma_configure(struct device *dev)
- {
-+	struct pci_driver *driver = to_pci_driver(dev->driver);
- 	struct device *bridge;
- 	int ret = 0;
- 
-+	if (!driver->driver_managed_dma) {
-+		ret = iommu_device_use_default_domain(dev);
-+		if (ret)
-+			return ret;
-+	}
-+
- 	bridge = pci_get_host_bridge_device(to_pci_dev(dev));
- 
- 	if (IS_ENABLED(CONFIG_OF) && bridge->parent &&
-@@ -1605,9 +1613,21 @@ static int pci_dma_configure(struct device *dev)
- 	}
- 
- 	pci_put_host_bridge_device(bridge);
-+
-+	if (ret && !driver->driver_managed_dma)
-+		iommu_device_unuse_default_domain(dev);
-+
- 	return ret;
- }
- 
-+static void pci_dma_cleanup(struct device *dev)
-+{
-+	struct pci_driver *driver = to_pci_driver(dev->driver);
-+
-+	if (!driver->driver_managed_dma)
-+		iommu_device_unuse_default_domain(dev);
-+}
-+
- struct bus_type pci_bus_type = {
- 	.name		= "pci",
- 	.match		= pci_bus_match,
-@@ -1621,6 +1641,7 @@ struct bus_type pci_bus_type = {
- 	.pm		= PCI_PM_OPS_PTR,
- 	.num_vf		= pci_bus_num_vf,
- 	.dma_configure	= pci_dma_configure,
-+	.dma_cleanup	= pci_dma_cleanup,
- };
- EXPORT_SYMBOL(pci_bus_type);
- 
+ static int __init pci_stub_init(void)
 -- 
 2.25.1
 
