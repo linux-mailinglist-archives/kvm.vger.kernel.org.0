@@ -2,143 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 754F54BC179
-	for <lists+kvm@lfdr.de>; Fri, 18 Feb 2022 22:00:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BE4034BC19B
+	for <lists+kvm@lfdr.de>; Fri, 18 Feb 2022 22:15:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239583AbiBRVAe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Feb 2022 16:00:34 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:50576 "EHLO
+        id S239664AbiBRVPr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Feb 2022 16:15:47 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:40260 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232495AbiBRVAd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Feb 2022 16:00:33 -0500
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD03928B601
-        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 13:00:15 -0800 (PST)
-Received: by mail-pf1-x42b.google.com with SMTP id x18so3268608pfh.5
-        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 13:00:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Ppc9rsVLzqVWtK070SvGtZchGh4xpXqU4H0M4qURuO0=;
-        b=jkjcJyTXKrFG7Cfpf1oJxu4akk3Y8QK6woOEI7qAS1nykAWpR41q5LM89ZMeQV9k+D
-         bi6nfMYXMACrxCGTeZttsnt4hqECI8/N7eSmdIwMBU+8YQ/km4TGdKcy23WSwtw0uEYO
-         +8EUrTaNN+hvkPeN3B6Y8784ufGzwgkq2K0L2/+KSYJ4cgVQzMDPDAzJhERmaGUWZVEG
-         6qDQ0VTcxMbnDbxrQ5sZtzLqxYNHVhFRPP88x/mmucTHHCWzPXKTWHWxFClFouoqmVjd
-         4dxrNHE7nOxuTbKKBbOLKvqxiZbdMpCzX3gMajs7ychKZg4V9U3llxCQh1Hv0OrNavtf
-         vs5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Ppc9rsVLzqVWtK070SvGtZchGh4xpXqU4H0M4qURuO0=;
-        b=EIhhO5re4on6ZVCGXKAPNlL6cCVQQwmdw6a2uS87V6vlDRwaZabhYVP8F5nxk4d87t
-         Y+xsqBfn92iMHZ/xu1lyJ5UQw4U6UAQSUMIMNWzFOc6cNGngQPDNY7AXX8wSbAmCnWdR
-         zlPq/dwNhBHOZnTXmoL9XGksksc5nSSLEj5hxn0XPRCDeM9IdY72VwrHmGoqv1LwPHwr
-         +zfVqRiADdIHwFxptG087Ci+H6Yh7f4kibyP9z73fEWbUBUim14deWcdAHIb8rGOvqGr
-         23d8UvPPpcEv3X7awIUeWpre5bLwqyso6p6aqhxTc0zgIWLNSG/2KdMDIxp6NHdgS3Dq
-         2RsQ==
-X-Gm-Message-State: AOAM532E/H3mdtSzYgiS/u+fgBLTbeTmx+9SWPYsQYrondkX9ChEi4+y
-        33n5DJCRwi6dV3EWojnQFK+mWA==
-X-Google-Smtp-Source: ABdhPJxFVgpb8w4kSbkk18MqG/QeUI7RyHLKeNkLntUZ/rgT0cBwGdk+DZCu5bMdZoXPiohswop1PQ==
-X-Received: by 2002:a05:6a00:218a:b0:4e1:9ed6:c399 with SMTP id h10-20020a056a00218a00b004e19ed6c399mr9276500pfi.8.1645218015002;
-        Fri, 18 Feb 2022 13:00:15 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id y23sm3840220pfa.67.2022.02.18.13.00.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Feb 2022 13:00:14 -0800 (PST)
-Date:   Fri, 18 Feb 2022 21:00:10 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v2 15/18] KVM: x86/mmu: rename kvm_mmu_new_pgd, introduce
- variant that calls get_guest_pgd
-Message-ID: <YhAI2rq9ms+rhFy5@google.com>
-References: <20220217210340.312449-1-pbonzini@redhat.com>
- <20220217210340.312449-16-pbonzini@redhat.com>
- <ae3002da-e931-1e08-7a23-8cd296bf8313@redhat.com>
+        with ESMTP id S239653AbiBRVPo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Feb 2022 16:15:44 -0500
+X-Greylist: delayed 605 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 18 Feb 2022 13:15:26 PST
+Received: from relay68.bu.edu (relay68.bu.edu [128.197.228.73])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1B9423D5D2
+        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 13:15:26 -0800 (PST)
+X-Envelope-From: alxndr@bu.edu
+X-BU-AUTH: mozz.bu.edu [128.197.127.33]
+Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated bits=0)
+        by relay68.bu.edu (8.14.3/8.14.3) with ESMTP id 21IL3g24031480
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Fri, 18 Feb 2022 16:03:50 -0500
+Date:   Fri, 18 Feb 2022 16:03:42 -0500
+From:   Alexander Bulekov <alxndr@bu.edu>
+To:     Stefan Hajnoczi <stefanha@gmail.com>
+Cc:     qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>,
+        Rust-VMM Mailing List <rust-vmm@lists.opendev.org>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Dmitry Fomichev <Dmitry.Fomichev@wdc.com>,
+        Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+        Hannes Reinecke <hare@suse.de>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+        "Florescu, Andreea" <fandree@amazon.com>, hreitz@redhat.com,
+        Alex Agache <aagch@amazon.com>,
+        =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        John Snow <jsnow@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>, bdas@redhat.com,
+        darren.kenny@oracle.com
+Subject: Re: Call for GSoC and Outreachy project ideas for summer 2022
+Message-ID: <20220218210323.hw2kkid25l7jczjo@mozz.bu.edu>
+References: <CAJSP0QX7O_auRgTKFjHkBbkBK=B3Z-59S6ZZi10tzFTv1_1hkQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ae3002da-e931-1e08-7a23-8cd296bf8313@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+In-Reply-To: <CAJSP0QX7O_auRgTKFjHkBbkBK=B3Z-59S6ZZi10tzFTv1_1hkQ@mail.gmail.com>
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,HK_RANDOM_ENVFROM,
+        HK_RANDOM_FROM,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 18, 2022, Paolo Bonzini wrote:
-> On 2/17/22 22:03, Paolo Bonzini wrote:
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index adcee7c305ca..9800c8883a48 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -1189,7 +1189,7 @@ int kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
-> >   		return 1;
-> >   	if (cr3 != kvm_read_cr3(vcpu))
-> > -		kvm_mmu_new_pgd(vcpu, cr3);
-> > +		kvm_mmu_update_root(vcpu);
-> >   	vcpu->arch.cr3 = cr3;
-> >   	kvm_register_mark_dirty(vcpu, VCPU_EXREG_CR3);
+On 220128 1547, Stefan Hajnoczi wrote:
+> Dear QEMU, KVM, and rust-vmm communities,
+> QEMU will apply for Google Summer of Code 2022
+> (https://summerofcode.withgoogle.com/) and has been accepted into
+> Outreachy May-August 2022 (https://www.outreachy.org/). You can now
+> submit internship project ideas for QEMU, KVM, and rust-vmm!
 > 
-> Uh-oh, this has to become:
+> If you have experience contributing to QEMU, KVM, or rust-vmm you can
+> be a mentor. It's a great way to give back and you get to work with
+> people who are just starting out in open source.
 > 
->  	vcpu->arch.cr3 = cr3;
->  	kvm_register_mark_dirty(vcpu, VCPU_EXREG_CR3);
-> 	if (!is_pae_paging(vcpu))
-> 		kvm_mmu_update_root(vcpu);
+> Please reply to this email by February 21st with your project ideas.
 > 
-> The regression would go away after patch 16, but this is more tidy apart
-> from having to check is_pae_paging *again*.
+> Good project ideas are suitable for remote work by a competent
+> programmer who is not yet familiar with the codebase. In
+> addition, they are:
+> - Well-defined - the scope is clear
+> - Self-contained - there are few dependencies
+> - Uncontroversial - they are acceptable to the community
+> - Incremental - they produce deliverables along the way
 > 
-> Incremental patch:
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index adcee7c305ca..0085e9fba372 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -1188,11 +1189,11 @@ int kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
->  	if (is_pae_paging(vcpu) && !load_pdptrs(vcpu, cr3))
->  		return 1;
-> -	if (cr3 != kvm_read_cr3(vcpu))
-> -		kvm_mmu_update_root(vcpu);
-> -
->  	vcpu->arch.cr3 = cr3;
->  	kvm_register_mark_dirty(vcpu, VCPU_EXREG_CR3);
-> +	if (!is_pae_paging(vcpu))
-> +		kvm_mmu_update_root(vcpu);
-> +
->  	/* Do not call post_set_cr3, we do not get here for confidential guests.  */
-> 
-> An alternative is to move the vcpu->arch.cr3 update in load_pdptrs.
-> Reviewers, let me know if you prefer that, then I'll send v3.
+> Feel free to post ideas even if you are unable to mentor the project.
+> It doesn't hurt to share the idea!
 
-  c) None of the above.
+Here are two fuzzing-related ideas:
 
-MOV CR3 never requires a new root if TDP is enabled, and the guest_mmu is used if
-and only if TDP is enabled.  Even when KVM intercepts CR3 when EPT=1 && URG=0, it
-does so only to snapshot vcpu->arch.cr3, there's no need to get a new PGD.
+Summary: Implement rapid guest-initiated snapshot/restore functionality (for
+Fuzzing).
 
-Unless I'm missing something, your original suggestion of checking tdp_enabled is
-the way to go.
+Description:
+Many recent fuzzing projects rely on snapshot/restore functionality
+[1,2,3,4,5]. For example tests/fuzzers that target large targets, such as OS
+kernels and browsers benefit from full-VM snapshots, where solutions such as
+manual state-cleanup and fork-servers are insufficient. 
+Many of the existing solutions are based on QEMU, however there is currently no
+upstream-solution. Furthermore, hypervisors, such as Xen have already
+incorporated support for snapshot-fuzzing.
+In this project, you will implement a virtual-device for snapshot fuzzing,
+following a spec agreed-upon by the community.  The device will implement
+standard fuzzing APIs that allow fuzzing using engines, such as libFuzzer and
+AFL++. The simple APIs exposed by the device will allow fuzzer developers to
+build custom harnesses in the VM to request snapshots, memory/device/register
+restores, request new inputs, and report coverage.
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 6e0f7f22c6a7..2b02029c63d0 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -1187,7 +1187,7 @@ int kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
-        if (is_pae_paging(vcpu) && !load_pdptrs(vcpu, cr3))
-                return 1;
+[1] https://arxiv.org/pdf/2111.03013.pdf
+[2] https://blog.mozilla.org/attack-and-defense/2021/01/27/effectively-fuzzing-the-ipc-layer-in-firefox/
+[3] https://www.usenix.org/system/files/sec20-song.pdf
+[4] https://github.com/intel/kernel-fuzzer-for-xen-project
+[5] https://github.com/quarkslab/rewind
 
--       if (cr3 != kvm_read_cr3(vcpu))
-+       if (!tdp_enabled && cr3 != kvm_read_cr3(vcpu))
-                kvm_mmu_new_pgd(vcpu, cr3);
+Skill level: Intermediate with interest and experience in fuzzing.
+Language/Skills: C
+Topic/Skill Areas: Fuzzing, OS/Systems/Drivers
 
-        vcpu->arch.cr3 = cr3;
+Summary: Implement a coverage-guided fuzzer for QEMU images
 
+Description:
+QEMU has a qcow2 fuzzer (see tests/image-fuzzer). However, this fuzzer is not
+coverage-guided, and is limited to qcow2 images. Furthermore, it does not run
+on OSS-Fuzz. In some contexts, qemu-img is expected to handle untrusted disk
+images. As such, it is important to effectively fuzz this code.
+Your task will be to create a coverage-guided fuzzer for image formats
+supported by QEMU. Beyond basic image-parsing code, the fuzzer should be able
+to find bugs in image-conversion code.  Combined with a corpus of QEMU images,
+the fuzzer harness will need less information about image layout.
 
+Skill level: Intermediate
+Language/Skills: C
+Topic/Skill Areas: Fuzzing, libFuzzer/AFL
+
+Thanks
+-Alex
