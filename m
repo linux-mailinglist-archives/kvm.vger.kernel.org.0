@@ -2,85 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D1924BBC7E
-	for <lists+kvm@lfdr.de>; Fri, 18 Feb 2022 16:52:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B431D4BBCF2
+	for <lists+kvm@lfdr.de>; Fri, 18 Feb 2022 17:03:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237227AbiBRPw1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Feb 2022 10:52:27 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:40970 "EHLO
+        id S235774AbiBRQD3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Feb 2022 11:03:29 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:54596 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233041AbiBRPwZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Feb 2022 10:52:25 -0500
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A84236314
-        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 07:52:09 -0800 (PST)
-Received: by mail-pg1-x533.google.com with SMTP id w37so1840634pga.7
-        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 07:52:09 -0800 (PST)
+        with ESMTP id S233766AbiBRQD1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Feb 2022 11:03:27 -0500
+Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B45148E47
+        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 08:03:08 -0800 (PST)
+Received: by mail-wm1-x32f.google.com with SMTP id m126-20020a1ca384000000b0037bb8e379feso8938486wme.5
+        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 08:03:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=6TSRYisI11TAgCQBrFqDAThitIb+GPMmpzMU4WS3apc=;
-        b=NdyomdpsrJELKx7oL9mgw4SmSILqmSgqrkTyigEVnxocv/MaFbeTc02oW/6+Sy7XO1
-         RLmhvlmBewehRotjQLwpLRiDeeV7xp/vtOQGLZj3S+/ngCoIQS3Wvoor+75nZ6t0hjH/
-         4WY6yxQ6aTjR0shAZ1py6WqiIQEpxLEtl6y2DDXR1etz+Z30Ur5ZlVaXBqINnl7dWXUZ
-         Fbcuk9sBSMANatmLJfkImQ1SCrQUXedbF4+mpWo9VeS4ah+Yhmh0BAvs5WwvDm3n8rus
-         AmF9a1C70u26CKXoaOm53+u+ndiFTF49myq7rhT97pPrjHeYDE95S5o/tvfFCcMNwMd5
-         GqWA==
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=hdEBdEgMAGoMMquMfCuquQI2IgK+7lsvGYCzg23q+pY=;
+        b=HIbM9GEcPAdWel1GPQAYNkLrGCZXGJVyam9WRq5/TQ1aWf33WZGroJW9qfZcJtxp9X
+         cv6B0kg0SgPunT8uUkpNMGGVDOkuJiMSaTGijjkbC2Aqh6l+UmLm8DmfZeBiJuO5fJNv
+         bighsVOGhEoYFgW/n2hOZwZ0lYiyqJm+ShpTcr3fsNalw00g5ALeTdrFBpDPIotm7pxq
+         ceNT4uZtUsYDChPAjzpaWvGLqLANbckwESIp9fA1N5zROZ2iGNyW87rue+z2bq3U/6mw
+         D8/4rZG1M+44XOrfbReHp+bYXyK2u/G4a0/DNcKy06QGTA2rXSkJDTO2SJENeyZskPsk
+         TZtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=6TSRYisI11TAgCQBrFqDAThitIb+GPMmpzMU4WS3apc=;
-        b=ut91HBLiusaKFRmh4gKH3L8RlRzmkrtQqguzupkX4XtmNskMstRsPvPxscU1PaPIOo
-         SRjCvJfcOoEfNaAWjNlmNAdRV1RCsmr+yOMNwyAjUcm/ldJQlnmmrfBzNEhTOtYLYITM
-         aNNdDylfIp40hoSC+phA/0yu0uNv9qFy2pChIcq8hrn4soJpNgoAVkg6RmwZxX4Veftl
-         Uxjr11KZA0hwfnfvLhBojEVepqe2KC6qhy424j/sRxO055haG43N5OgGj2jNXrwLZZ81
-         uz9D+6nx/fPItw2enAi9Bj+h7BkuwgLhj69eEA73vkewvlAc1YeFXoO3qZwZkw10/2vd
-         uNYg==
-X-Gm-Message-State: AOAM531iVooA+ZFX00L2UVD612/SlLYKs1N6lE3+NPyt7rUAaN9Ywi49
-        Xj8eKQeI/Xy2wpMWANcGIYghlDS20/NV0A==
-X-Google-Smtp-Source: ABdhPJzQvFTK1YdORlSGsV0PeaQIkdrquMN8iJ7oendQPTrI9bCRs0tpiXuV/2zxQMCbsmNcaenNBA==
-X-Received: by 2002:a63:6a85:0:b0:35d:8508:9208 with SMTP id f127-20020a636a85000000b0035d85089208mr6817828pgc.17.1645199528759;
-        Fri, 18 Feb 2022 07:52:08 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id h20sm3321728pfq.162.2022.02.18.07.52.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Feb 2022 07:52:08 -0800 (PST)
-Date:   Fri, 18 Feb 2022 15:52:04 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v3 3/6] KVM: x86: remove KVM_X86_OP_NULL and mark
- optional kvm_x86_ops
-Message-ID: <Yg/ApEKNxiGSUF0K@google.com>
-References: <20220217180831.288210-1-pbonzini@redhat.com>
- <20220217180831.288210-4-pbonzini@redhat.com>
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=hdEBdEgMAGoMMquMfCuquQI2IgK+7lsvGYCzg23q+pY=;
+        b=ZgCdxqCnr27sLxAe8AxUcLHMHpoQrxopJ2+usyIxkJT8/8IwFkKMHOKkqtivot6SVl
+         2Siz4OsciLxASF2syJy81XFzTCkVsJD0TqNROj+4S6yVa9vVbfOWPg8p1jaPCHrUEige
+         L1yOtyJ6g+AnlHHmcbdev+TRIUJ26pIFwrs37u7Fka/B/brc4CHVE/mEAfbjcqyAqRux
+         o54ZbFZgwHjYi935NcwNJDTlZMNHfwLX1KMRPTTPEtyqtPpSnS5wTAHbk3sP80YTB2yt
+         Q+OANu5OeSxop4OM88l2lwAkHgvjHPDbvxiQSXapRHI/1T+YXfKYrjWM9lhMdCxQEdXX
+         Mcng==
+X-Gm-Message-State: AOAM532ZrHI173l2Pd6kmvUh+EErPEOSPh17ZgJvmVGChp7+VI3o9tsh
+        itFbMjyOePWRCRB1IG3KzfgUqOxbI8E=
+X-Google-Smtp-Source: ABdhPJwYk6wfmchLYpV2XOs1LZaJURYhlU3B+hmIdXZBD8/54KTr4qo/6KZ5BqIN9+dIxA6D2k1v4g==
+X-Received: by 2002:a1c:e915:0:b0:37b:d847:e127 with SMTP id q21-20020a1ce915000000b0037bd847e127mr7758594wmc.180.1645200187157;
+        Fri, 18 Feb 2022 08:03:07 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id u15sm49790633wrs.18.2022.02.18.08.03.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 18 Feb 2022 08:03:06 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <ad4e6ea2-df38-005a-5d60-375ec9be8c0e@redhat.com>
+Date:   Fri, 18 Feb 2022 17:03:05 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220217180831.288210-4-pbonzini@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: Call for GSoC and Outreachy project ideas for summer 2022
+Content-Language: en-US
+To:     =?UTF-8?B?TWljaGFsIFByw612b3puw61r?= <mprivozn@redhat.com>,
+        Stefan Hajnoczi <stefanha@gmail.com>,
+        qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>,
+        "libvir-list@redhat.com" <libvir-list@redhat.com>
+References: <CAJSP0QX7O_auRgTKFjHkBbkBK=B3Z-59S6ZZi10tzFTv1_1hkQ@mail.gmail.com>
+ <f7dc638d-0de1-baa8-d883-fd8435ae13f2@redhat.com>
+ <bf97384a-2244-c997-ba75-e3680d576401@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <bf97384a-2244-c997-ba75-e3680d576401@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 17, 2022, Paolo Bonzini wrote:
-> The original use of KVM_X86_OP_NULL, which was to mark calls
-> that do not follow a specific naming convention, is not in use
-> anymore.  Instead, let's mark calls that are optional because
-> they are always invoked within conditionals or with static_call_cond.
-> Those that are _not_, i.e. those that are defined with KVM_X86_OP,
-> must be defined by both vendor modules or some kind of NULL pointer
-> dereference is bound to happen at runtime.
+On 2/18/22 12:39, Michal Prívozník wrote:
+> On 2/17/22 18:52, Paolo Bonzini wrote:
+>> I would like to co-mentor one or more projects about adding more
+>> statistics to Mark Kanda's newly-born introspectable statistics
+>> subsystem in QEMU
+>> (https://patchew.org/QEMU/20220215150433.2310711-1-mark.kanda@oracle.com/),
+>> for example integrating "info blockstats"; and/or, to add matching
+>> functionality to libvirt.
+>>
+>> However, I will only be available for co-mentoring unfortunately.
 > 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
+> I'm happy to offer my helping hand in this. I mean the libvirt part,
+> since I am a libvirt developer.
+> 
+> I believe this will be listed in QEMU's ideas list, right?
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+Does Libvirt participate to GSoC as an independent organization this 
+year?  If not, I'll add it as a Libvirt project on the QEMU ideas list.
+
+Paolo
