@@ -2,314 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D36884BBA66
-	for <lists+kvm@lfdr.de>; Fri, 18 Feb 2022 15:06:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 82FD44BBA97
+	for <lists+kvm@lfdr.de>; Fri, 18 Feb 2022 15:28:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235453AbiBROGl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Feb 2022 09:06:41 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:37328 "EHLO
+        id S236029AbiBRO2o (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Feb 2022 09:28:44 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:39508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234223AbiBROGk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Feb 2022 09:06:40 -0500
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2042.outbound.protection.outlook.com [40.107.220.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 385061A6A6D;
-        Fri, 18 Feb 2022 06:06:23 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=n76pgRFU/e+Hk6CCNmBXCeZnyvGlqiaZkZHYQly3qnOK637J9gLV6/3QjmGFygTCCNGtsIYz5Hf3BLhY2IyL9GMuDo2EW9HZ7ai/4OjZ58RIdNtyfsgqy0sUxC7qH7y9c2ZYQ6wbRJ3Ujy3MOjBE4cPLRubBnXZ3zguH/WLXteeXsutypXZy6g/IrBMd4iDlochRZ6KUd6NE9Jagt3HcUe1LSNZhzZmo7dZt2mX3hcAPzkPeekDb3vHVuL/OOKJOG8RQ883M8V3GBiTdDeoBqb9jiUDZpKrN+eMQo26gzzqxA5NgnuKHf0BsCfiSihB+dvyXlvfbqCjZbtpem/xeng==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TjmjNV6n2ajws89g2hYoNYGmr1iLKwYQK8HAeANBEDk=;
- b=m1TMU65Y5s+oEpfyCREU/5l150R1rteZNE5Sg+/AFFhXS40McuR3z/nF8gwv+Nuf2QQCnTJGDucGwBv80L/3kYsrPfq+MJxyPhbgJK8vL6sXfvhubJdMf0oNTKEaZSIzvcnwFTHvRIIvIH6NiUzYq0A6IsJNLKVAjX8pdeIJcjYcj4yCJ+2AXOC0829IPeJqx9zBcn2cD3076I9Um22ngdTcL9s/xxlNqnE+ZAN14BjL39eQtbA97TikRFK6G40+RMpbRaoopfrGn67bsCT2dmxSVQBPuq4kwIaepcqIFWs056l4OJLU0WLbahmHf4Qn9Xnw6oBphzx+fgAFQb0nAg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TjmjNV6n2ajws89g2hYoNYGmr1iLKwYQK8HAeANBEDk=;
- b=mA4YJaA8e0oc1XaM9abQmjRVQOGqjtDpII7w71t/D4jGm8l/AWCCvIiQmnsyxuA3CD1jlkRiTglnIf61Rlb6grYNEdeM1dmQYPNsKuU+PPWgedgOtMrW1vpba53NixdI/PB23wIurNyQfd8lD4tU2ufYvZHka7m1DKXgw7keI6ZhRLMBfgzin7jds4QMlNLlNTWLQfnQ2TsgYgM3ZwiMDuFHLkpSdFzfU09qerX/p4PcAHPyS9F1xmq/dVZ1K9lmzPPVQdPpGJHbb5qRFoc1nV0mUZQJlNgZnR5fy7/rWh6MabPzy1GumqrRrtZH1s/BrqQheLaRaGgcdgPkvkZ7PQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by BL0PR12MB2450.namprd12.prod.outlook.com (2603:10b6:207:4d::32) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4995.16; Fri, 18 Feb
- 2022 14:06:20 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::e8f4:9793:da37:1bd3]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::e8f4:9793:da37:1bd3%5]) with mapi id 15.20.4995.024; Fri, 18 Feb 2022
- 14:06:20 +0000
-Date:   Fri, 18 Feb 2022 10:06:18 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Yishai Hadas <yishaih@nvidia.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "bhelgaas@google.com" <bhelgaas@google.com>,
-        "saeedm@nvidia.com" <saeedm@nvidia.com>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "kuba@kernel.org" <kuba@kernel.org>,
-        "leonro@nvidia.com" <leonro@nvidia.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
-        "maorg@nvidia.com" <maorg@nvidia.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>
-Subject: Re: [PATCH V7 mlx5-next 15/15] vfio: Extend the device migration
- protocol with PRE_COPY
-Message-ID: <20220218140618.GO4160@nvidia.com>
-References: <20220207172216.206415-1-yishaih@nvidia.com>
- <20220207172216.206415-16-yishaih@nvidia.com>
- <BN9PR11MB527683AAB1D4CA76EB16ACF68C379@BN9PR11MB5276.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BN9PR11MB527683AAB1D4CA76EB16ACF68C379@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-ClientProxiedBy: MN2PR16CA0004.namprd16.prod.outlook.com
- (2603:10b6:208:134::17) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
+        with ESMTP id S233235AbiBRO2n (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Feb 2022 09:28:43 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4625424F31;
+        Fri, 18 Feb 2022 06:28:26 -0800 (PST)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21IE9omQ007940;
+        Fri, 18 Feb 2022 14:28:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : to : cc : references : from : subject : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Z8dNbVExJb8zpq6cyPgkrsfOTk73ZVL7Je36KLvKvdM=;
+ b=aJ7Gy9vLGnti+iJnRS6S1QoHHIclkNXfRKBwQ0dif08LWZaxifdJh27wLIJ+dbE77DCH
+ 866UOssIfNFhSebD09c/cR7rGjqK17acJpyvc0EmvjBLCXNBlU+SLwqT9kBxY2taSKcd
+ vuj7QDosqB8Nko5RWMlgvYiSd+oSDnB937Qy0XrVlm1wHlljBHq7Z0efF3XQqYmhry9t
+ LfQ4o+3U8F3n1PFm60C6J0uON4D4CbDfnlM6dODhE/oSR3kiY6z1rbfT57Gqp6sK6Onf
+ Aaz4q/3DTS8ppiNalWl6QvKk4roJGHsZfLAVQPJmIouhG89HodEzXoIN45CUWe82Pu6p qA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3eaat8bgcp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 18 Feb 2022 14:28:25 +0000
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21IEC02J013616;
+        Fri, 18 Feb 2022 14:28:25 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3eaat8bgc1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 18 Feb 2022 14:28:24 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21IESL8t028197;
+        Fri, 18 Feb 2022 14:28:23 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma03fra.de.ibm.com with ESMTP id 3e64har2m1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 18 Feb 2022 14:28:23 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21IESJp844958048
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 18 Feb 2022 14:28:19 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6011411C050;
+        Fri, 18 Feb 2022 14:28:19 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B739E11C04A;
+        Fri, 18 Feb 2022 14:28:18 +0000 (GMT)
+Received: from [9.145.173.190] (unknown [9.145.173.190])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 18 Feb 2022 14:28:18 +0000 (GMT)
+Message-ID: <b9828696-f5d4-dd72-9b0e-a27b1480b799@linux.ibm.com>
+Date:   Fri, 18 Feb 2022 15:28:18 +0100
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 9ebca669-7750-42df-1326-08d9f2e7d69e
-X-MS-TrafficTypeDiagnostic: BL0PR12MB2450:EE_
-X-Microsoft-Antispam-PRVS: <BL0PR12MB2450253E9F5A699CBA6A4E09C2379@BL0PR12MB2450.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ZL5uMozRLEUczP9NRqMFjB97bCD7UpoXnzvFRC4Mgg9bnYYVp7lTrF+1xtRfBYFYZtqTPNOEULiezHyINe4M6bsbjHoIU+76AhQxMReMzExXR+LRzQoTKqaJvbGbmGx9v55r79ucXQGi3c/xhL/F1HYx+xAKlR5jrn/IDzwp3F6EkDU6/bCuznczP2VsNV1E2hm9up0NM5zJBNEyhoYagO2gNlJ0UjQnE3csh5Kk08frGHGtIYb0zSV8V5GlKS3Bh1Ic1JiyJKIuNyvhlzFkRSWHahFudnLt96ATLNJ4lgRWPfWGxR6GTvwC8usOSHNCQrLJF1ZjuCKMTSzLOimVOrkEg7g+6CakZgWBldkE1Pw8N0PxwJG2ToZK52dtL17fO0fiK2vaet2EqQOZcSPcLTD4GvT7YXYod+PBnRZ3OzVWOFqQNwKSbyZ5O5SDg0c4pTfjz6In5GPRFyHBVKvQ3YJJ+6y5D/MHXmIwA9Oxef1CcdNQJ0r88vWWmiPbv9jqyzfOJg6VkuHrXk4El0ELcdW1rwSu5SEyzniTdcOIWtdEmEZWviFPPVnLXcbrtRcWsugieqKnaBJZUmEC5jJXt3tL3QNIdbRevDCDBc4a2Q50yItWql6E5b61h4PxXVUvwmB8f8U52l1eWRvZUHwMHw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(6486002)(508600001)(8936002)(1076003)(2616005)(186003)(26005)(66946007)(38100700002)(54906003)(33656002)(316002)(2906002)(83380400001)(6916009)(5660300002)(66556008)(8676002)(4326008)(36756003)(66476007)(6506007)(86362001)(6512007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?hBGVKL3sEt8Yyz7eeJVCyev58um9mCVWH9ysft6fk73jIAlgJpurSa8kJelZ?=
- =?us-ascii?Q?SFwuYwOZxg+QFjyJNuNyNtTBSixKqV16IC38/worKbFz3q8aKoPElfEyhGR3?=
- =?us-ascii?Q?cYj05gA4zq3xjwHU6WghUJWWfEyWKzHbxsJXQIJIQcwVvtUSdEf65oGfu2r7?=
- =?us-ascii?Q?JBRD4zE/GA3vnoMU/q6x+GBIEa1K197GsRXSf09P5WLlS2RvRFUCo6+7VePr?=
- =?us-ascii?Q?Oj/yCJSBW2xEDiHB4sOK+Q0W/9LwmDdNoJWPY/ZO91B/aM2rEkCz2nFFOjNz?=
- =?us-ascii?Q?/tst80APCBGCAZTUT4IlQaRLzr4MetiBNfhqVZzw0Sd795SSAId3/pGdMSZX?=
- =?us-ascii?Q?PkCjHpP/bW8KSYbWdNmRsWevPbQiPGVX6Aj2SekF0Saqf+T1G791idNHp/dk?=
- =?us-ascii?Q?L4TqeshorgPN3zoFRLT0yfSFLacfdLbCc1Yu78OVzdwTuXkTXWNi7Iudr7s7?=
- =?us-ascii?Q?ckbzkqxqsX6SiO+5PlvzUvWvIDjVCpdhZjySKesACaQ+oxQkY6ZcoFmzuGPQ?=
- =?us-ascii?Q?tQlb3A/Q1pPMPBYQ9Jp09pgrC3ghLwypw1XbOn03wiFKE0rxZjyMyIAxkNB5?=
- =?us-ascii?Q?sULizUmLToxxmWSIOi5L5QU9l4f0SLsS1T1Y/98SNdB0YyjoHAtu1qWwtT85?=
- =?us-ascii?Q?m8M7aTwVCcPsZT76KDkgr34OFFXCvi/PN6kS9lxy6TEMjTg8szQQR014MVl8?=
- =?us-ascii?Q?WsithoXG3K7bDpnv23dVxBsmVmasIVrr2UnsixEICyw59fWP1jUMcXQTMOgf?=
- =?us-ascii?Q?IMYwRl2KLkazgRSFn/PNho9F+8ifCGreMBZBgxAtJzbMV8qbwfQ6FbNb3hFa?=
- =?us-ascii?Q?0eZGASefywWlj3vgOa9PnWnjrGFgE53YiVzDdLSvUWcE8cTilLm8CeMy/Ck2?=
- =?us-ascii?Q?jP6uLpYtOIPDjpn6TGHGAEhSysMTGwFbw80iCSbf0AoBMoS5VDr+Vrr9JTEC?=
- =?us-ascii?Q?wKPb2zg+s/Kdt/9pyDVIBPGb/pbwA+rhhZkC0Mj3A1+RvV+2W8B80gSc0Y6w?=
- =?us-ascii?Q?EjP43Z8/9EDuE4RiQ3qUta8VSLKcOoEM8+aPSuSi/bgsRSRQEvg9UxHdXWIN?=
- =?us-ascii?Q?bhIGPrMMJhdgl2ZEXTgOGB4ckIG9wqoT1YOmtQ7KFj1c6zUGHQSIQKKSmaC3?=
- =?us-ascii?Q?/NZY35N3OxERLo6ZTKVH8VAcoIMsNr8dAJjfQzP/bq3jW5GTb1xdxGElIp54?=
- =?us-ascii?Q?NxIOACUmfQVtcbxhLUxQHQ0bsQzFkD/QHdGSYtOuHP7PpcOcprMJUeX+FW2t?=
- =?us-ascii?Q?k14PlJQU0rOJOe2sPXril78GKGlSE/UFKX8EzEZTja1ukOGOEQOZ7H5TgzSe?=
- =?us-ascii?Q?ycHUUITtN1kL7A+E8QeBJgN/v4tuc5NBdDvP0EpwG3IhVe38RN25Ww8Snek4?=
- =?us-ascii?Q?B0sLTziUUH8D+TUmAtSEH1BIIi4JYn880Wal72NCzfjmG9vnMiYWoYrlJe3D?=
- =?us-ascii?Q?qcJiD/1jVqtT733M5/R1HViOobnBx5lhJVjLiy1Fuicpj758jmBo25g+YElk?=
- =?us-ascii?Q?NbilriBauw/fitZM7GpiqpLnMWX7dARD8zwTLE7AmZvYD+4+JcOTbw5Lvr77?=
- =?us-ascii?Q?3jZaTi+T2Ur8llaAIlA=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9ebca669-7750-42df-1326-08d9f2e7d69e
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Feb 2022 14:06:20.4980
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: tZc4ZKMi6zIK4vuYm38165Ldxd0YihqSPwX9LPAV0PFRwhANwWKQTDvJVMKjz5Ma
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR12MB2450
-X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Content-Language: en-US
+To:     Pierre Morel <pmorel@linux.ibm.com>,
+        Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com,
+        thuth@redhat.com, imbrenda@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, wintera@linux.ibm.com, seiden@linux.ibm.com
+References: <20220217095923.114489-1-pmorel@linux.ibm.com>
+ <20220217095923.114489-2-pmorel@linux.ibm.com>
+ <f0bf737abf480d6d16af6e5335bb195061f3d076.camel@linux.ibm.com>
+ <97af6268-ff7a-cfb6-5ea4-217b5162cfe7@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH v7 1/1] s390x: KVM: guest support for topology function
+In-Reply-To: <97af6268-ff7a-cfb6-5ea4-217b5162cfe7@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Zipx9pmGXkX7wC_a8e5MLzjGY-3jwv2q
+X-Proofpoint-GUID: uZxLUop_QTzjpMZYElXB8rDdjt5nz8zi
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-02-18_05,2022-02-18_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
+ priorityscore=1501 impostorscore=0 suspectscore=0 mlxlogscore=999
+ mlxscore=0 malwarescore=0 lowpriorityscore=0 phishscore=0 clxscore=1015
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2201110000 definitions=main-2202180091
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 18, 2022 at 08:01:47AM +0000, Tian, Kevin wrote:
- 
-> > A new ioctl VFIO_DEVICE_MIG_PRECOPY is provided to allow userspace to
-> > query the progress of the precopy operation in the driver with the idea it
-> > will judge to move to STOP_COPY at least once the initial data set is
-> > transferred, and possibly after the dirty size has shrunk appropriately.
-> > 
-> > We think there may also be merit in future extensions to the
-> > VFIO_DEVICE_MIG_PRECOPY ioctl to also command the device to throttle the
-> > rate it generates internal dirty state.
-> > 
-> > Compared to the v1 clarification, STOP_COPY -> PRE_COPY is made optional
-> 
-> essentially it's *BLOCKED* per following context.
-
-Yes I suppose now that we have the cap bits not the arc discovery this
-isn't worded well
-
-> > and to be defined in future. While making the whole PRE_COPY feature
-> > optional eliminates the concern from mlx5, this is still a complicated arc
-> > to implement and seems prudent to leave it closed until a proper use case
-> 
-> Can you shed some light on the complexity here?
-
-It is with the data_fd, once a driver enters STOP_COPY it should stuff
-its final state into the data_fd. If this is aborted back to PRE_COPY
-then the data_fd needs to return to streaming changes. Managing this
-transition is not trivial - it is something that has to be signaled to
-the receiver.
-
-There is also something of a race here where the data_fd can reach
-end-of-stream and then the user can do STOP_COPY->PRE_COPY and
-continue stuffing data. This makes the construction of the data stream
-framing "interesting" as there is no longer a possible in-band end of
-stream marker. See the other discussion about async operation why this
-is not ideal.
-
-Basically, it is behavior current qemu doesn't trigger that requires
-significant complexity and testing in any driver to support
-properly. No driver proposed
-
-> Could a driver pretend supporting PRE_COPY by simply returning both 
-> initial_bytes and dirty_bytes as ZERO?
-
-I think so, yes.
-
-> and even if the driver doesn't support the base arc (STOP_COPY->
-> PRE_COPY_P2P) what about the combination arc (STOP_COPY->STOP->
-> RUNNING_P2P->PRE_COPY_P2P)?
-
-Userspace can walk through this sequence on its own, but it cannot be
-part of the FSM because it violates the construction rules. The
-data_fd is open in two places.
-
-> current FSM already allows STOP->RUNNING_P2P->PRE_COPY_P2P and in
-> concept STOP_COPY and STOP have exact same device behavior.
-
-This is allowed because it follows the FSM rules. The data_fd is the
-key difference.
-
-> with that combination arc the interim transition from STOP_COPY to
-> STOP will terminate the current data stream and RUNNING_P2P to
-> PRE_COPY_P2P will return a new data fd. This does violate the definition
-> about transition between three 'saving group' of states, which says
-> moving between them does not terminate or otherwise affect the
-> associated fd.
-
-Right, and because this happens the VMM wuld have to terminate the
-resuming session as well. Remember the output of a single saving
-data_fd can be sent to a single receiving resuming data_fd - they
-cannot be spliced.
-
-> > is developed. We also split the pending_bytes report into the initial and
-> > sustaining values, and define the protocol to get an event via poll() for
-> 
-> I guess this split must have been aligned in earlier discussion but it's still
-> useful if some words can be put here for the motivation. Otherwise one 
-> could easily ask why not treating the 1st read of pending_bytes as the 
-> initial size.
-
-As everything is estimates the approach allows the estimate to be
-refined as we go along. PRE_COPY can stop at any time, but knowing
-some initial mandatory stage has passed is somewhat consistent with
-how qemu seems to treat this.
-
-> > @@ -1596,25 +1596,59 @@ int vfio_mig_get_next_state(struct vfio_device
-> > *device,
-> >  	 *         RUNNING -> STOP
-> >  	 *         STOP -> RUNNING
-> 
-> The comment for above should be updated too, which currently says:
-> 
-> 	 * Without P2P the driver must implement:
-> 
-> and also move it to the end as it talks about the arcs when neither
-> P2P nor PRECOPY is supported.
-
-Yes
-
-> > + * PRE_COPY_P2P -> RUNNING_P2P
-> >   * RUNNING -> RUNNING_P2P
-> >   * STOP -> RUNNING_P2P
-> >   *   While in RUNNING_P2P the device is partially running in the P2P
-> > quiescent
-> >   *   state defined below.
-> >   *
-> > + *   The PRE_COPY arc will terminate a data transfer session.
-> 
-> PRE_COPY_P2P
-
-Yes
-
-> 
-> > + *
-> > + * RUNNING -> PRE_COPY
-> > + * RUNNING_P2P -> PRE_COPY_P2P
-> >   * STOP -> STOP_COPY
-> > - *   This arc begin the process of saving the device state and will return a
-> > - *   new data_fd.
-> > + *   PRE_COPY, PRE_COPY_P2P and STOP_COPY form the "saving group" of
-> > states
-> > + *   which share a data transfer session. Moving between these states alters
-> > + *   what is streamed in session, but does not terminate or otherwise effect
-> 
-> 'effect' -> 'affect'?
-
-yes
-
-> > @@ -959,6 +1007,8 @@ struct vfio_device_feature_mig_state {
-> >   * above FSM arcs. As there are multiple paths through the FSM arcs the
-> > path
-> >   * should be selected based on the following rules:
-> >   *   - Select the shortest path.
-> > + *   - The path cannot have saving group states as interior arcs, only
-> > + *     starting/end states.
-> 
-> what about PRECOPY->PRECOPY_P2P->STOP_COPY? In this case
-> PRECOPY_P2P is used as interior arc.
-
-It isn't an interior arc because there are only two arcs :) But yes,
-it is bit unclear.
-
-> and if we disallow a non-saving-group state as interior arc when both 
-> start and end states are saving-group states (e.g. 
-> STOP_COPY->STOP->RUNNING_P2P->PRE_COPY_P2P as I asked in
-> the start) then it might be another rule to be specified...
-
-This isn't a shortest path.
-
-> > @@ -972,6 +1022,9 @@ struct vfio_device_feature_mig_state {
-> >   * support them. The user can disocver if these states are supported by using
-> >   * VFIO_DEVICE_FEATURE_MIGRATION. By using combination transitions the
-> > user can
-> >   * avoid knowing about these optional states if the kernel driver supports
-> > them.
-> > + *
-> > + * Arcs touching PRE_COPY and PRE_COPY_P2P are removed if support for
-> > PRE_COPY
-> > + * is not present.
-> 
-> why adding this sentence particularly for PRE_COPY? Isn't it already
-> explained by last paragraph for optional states?
-
-Well, I thought it was clarifying about how the optionality is
-constructed.
-
-> > + * Drivers should attempt to return estimates so that initial_bytes +
-> > + * dirty_bytes matches the amount of data an immediate transition to
-> > STOP_COPY
-> > + * will require to be streamed.
-> 
-> I didn't understand this requirement. In an immediate transition to
-> STOP_COPY I expect the amount of data covers the entire device
-> state, i.e. initial_bytes. dirty_bytes are dynamic and iteratively returned
-> then why we need set some expectation on the sum of 
-> initial+round1_dity+round2_dirty+... 
-
-"will require to be streamed" means additional data from this point
-forward, not including anything already sent.
-
-It turns into the estimate of how long STOP_COPY will take.
-
-Jason
+T24gMi8xOC8yMiAxNDoxMywgUGllcnJlIE1vcmVsIHdyb3RlOg0KPiANCj4gDQo+IE9uIDIv
+MTcvMjIgMTg6MTcsIE5pY28gQm9laHIgd3JvdGU6DQo+PiBPbiBUaHUsIDIwMjItMDItMTcg
+YXQgMTA6NTkgKzAxMDAsIFBpZXJyZSBNb3JlbCB3cm90ZToNCj4+IFsuLi5dDQo+Pj4gZGlm
+ZiAtLWdpdCBhL2FyY2gvczM5MC9rdm0va3ZtLXMzOTAuYyBiL2FyY2gvczM5MC9rdm0va3Zt
+LXMzOTAuYw0KPj4+IGluZGV4IDIyOTZiMWZmMWUwMi4uYWY3ZWE4NDg4ZmEyIDEwMDY0NA0K
+Pj4+IC0tLSBhL2FyY2gvczM5MC9rdm0va3ZtLXMzOTAuYw0KPj4+ICsrKyBiL2FyY2gvczM5
+MC9rdm0va3ZtLXMzOTAuYw0KPj4gWy4uLl0NCg0KV2h5IGlzIHRoZXJlIG5vIGludGVyZmFj
+ZSB0byBjbGVhciB0aGUgU0NBX1VUSUxJVFlfTVRDUiBvbiBhIHN1YnN5c3RlbSANCnJlc2V0
+Pw0KDQoNCj4+PiAgICANCj4+PiAtdm9pZCBrdm1fYXJjaF92Y3B1X2xvYWQoc3RydWN0IGt2
+bV92Y3B1ICp2Y3B1LCBpbnQgY3B1KQ0KPj4+ICsvKioNCj4+PiArICoga3ZtX3MzOTBfdmNw
+dV9zZXRfbXRjcg0KPj4+ICsgKiBAdmNwOiB0aGUgdmlydHVhbCBDUFUNCj4+PiArICoNCj4+
+PiArICogSXMgb25seSByZWxldmFudCBpZiB0aGUgdG9wb2xvZ3kgZmFjaWxpdHkgaXMgcHJl
+c2VudC4NCj4+PiArICoNCj4+PiArICogVXBkYXRlcyB0aGUgTXVsdGlwcm9jZXNzb3IgVG9w
+b2xvZ3ktQ2hhbmdlLVJlcG9ydCB0byBzaWduYWwNCj4+PiArICogdGhlIGd1ZXN0IHdpdGgg
+YSB0b3BvbG9neSBjaGFuZ2UuDQo+Pj4gKyAqLw0KPj4+ICtzdGF0aWMgdm9pZCBrdm1fczM5
+MF92Y3B1X3NldF9tdGNyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkNCj4+PiAgIMKgew0KPj4+
+ICvCoMKgwqDCoMKgwqDCoHN0cnVjdCBlc2NhX2Jsb2NrICplc2NhID0gdmNwdS0+a3ZtLT5h
+cmNoLnNjYTsNCj4+DQo+PiB1dGlsaXR5IGlzIGF0IHRoZSBzYW1lIG9mZnNldCBmb3IgdGhl
+IGJzY2EgYW5kIHRoZSBlc2NhLCBzdGlsbA0KPj4gd29uZGVyaW5nIHdoZXRoZXIgaXQgaXMg
+YSBnb29kIGlkZWEgdG8gYXNzdW1lIGVzY2EgaGVyZS4uLg0KPiANCj4gV2UgY2FuIHRha2Ug
+YnNjYSB0byBiZSBjb2hlcmVudCB3aXRoIHRoZSBpbmNsdWRlIGZpbGUgd2hlcmUgd2UgZGVm
+aW5lDQo+IEVTQ0FfVVRJTElUWV9NVENSIGluc2lkZSB0aGUgYnNjYS4NCj4gQW5kIHdlIGNh
+biByZW5hbWUgdGhlIGRlZmluZSB0byBTQ0FfVVRJTElUWV9NVENSIGFzIGl0IGlzIGNvbW1v
+biBmb3INCj4gYm90aCBCU0NBIGFuZCBFU0NBIHRoZSAoRSkgaXMgdG9vIG11Y2guDQoNClll
+cyBhbmQgbWF5YmUgYWRkIGEgY29tbWVudCB0aGF0IGl0J3MgYXQgdGhlIHNhbWUgb2Zmc2V0
+IGZvciBlc2NhIHNvIA0KdGhlcmUgd29uJ3QgY29tZSB1cCBmdXJ0aGVyIHF1ZXN0aW9ucyBp
+biB0aGUgZnV0dXJlLg0KDQo+IA0KPj4NCj4+IFsuLi5dDQo+Pj4gZGlmZiAtLWdpdCBhL2Fy
+Y2gvczM5MC9rdm0va3ZtLXMzOTAuaCBiL2FyY2gvczM5MC9rdm0va3ZtLXMzOTAuaA0KPj4+
+IGluZGV4IDA5ODgzMWU4MTVlNi4uYWYwNGZmYmZkNTg3IDEwMDY0NA0KPj4+IC0tLSBhL2Fy
+Y2gvczM5MC9rdm0va3ZtLXMzOTAuaA0KPj4+ICsrKyBiL2FyY2gvczM5MC9rdm0va3ZtLXMz
+OTAuaA0KPj4+IEBAIC01MDMsNCArNTAzLDI5IEBAIHZvaWQga3ZtX3MzOTBfdmNwdV9jcnlw
+dG9fcmVzZXRfYWxsKHN0cnVjdCBrdm0NCj4+PiAqa3ZtKTsNCj4+PiAgIMKgICovDQo+Pj4g
+ICDCoGV4dGVybiB1bnNpZ25lZCBpbnQgZGlhZzljX2ZvcndhcmRpbmdfaHo7DQo+Pj4gICAg
+DQo+Pj4gKyNkZWZpbmUgUzM5MF9LVk1fVE9QT0xPR1lfTkVXX0NQVSAtMQ0KPj4+ICsvKioN
+Cj4+PiArICoga3ZtX3MzOTBfdG9wb2xvZ3lfY2hhbmdlZA0KPj4+ICsgKiBAdmNwdTogdGhl
+IHZpcnR1YWwgQ1BVDQo+Pj4gKyAqDQo+Pj4gKyAqIElmIHRoZSB0b3BvbG9neSBmYWNpbGl0
+eSBpcyBwcmVzZW50LCBjaGVja3MgaWYgdGhlIENQVSB0b3Bsb2d5DQo+Pj4gKyAqIHZpZXdl
+ZCBieSB0aGUgZ3Vlc3QgY2hhbmdlZCBkdWUgdG8gbG9hZCBiYWxhbmNpbmcgb3IgQ1BVIGhv
+dHBsdWcuDQo+Pj4gKyAqLw0KPj4+ICtzdGF0aWMgaW5saW5lIGJvb2wga3ZtX3MzOTBfdG9w
+b2xvZ3lfY2hhbmdlZChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpDQo+Pj4gK3sNCj4+PiArwqDC
+oMKgwqDCoMKgwqBpZiAoIXRlc3Rfa3ZtX2ZhY2lsaXR5KHZjcHUtPmt2bSwgMTEpKQ0KPj4+
+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqByZXR1cm4gZmFsc2U7DQo+Pj4gKw0K
+Pj4+ICvCoMKgwqDCoMKgwqDCoC8qIEEgbmV3IHZDUFUgaGFzIGJlZW4gaG90cGx1Z2dlZCAq
+Lw0KPj4+ICvCoMKgwqDCoMKgwqDCoGlmICh2Y3B1LT5hcmNoLnByZXZfY3B1ID09IFMzOTBf
+S1ZNX1RPUE9MT0dZX05FV19DUFUpDQo+Pj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoHJldHVybiB0cnVlOw0KPj4+ICsNCj4+PiArwqDCoMKgwqDCoMKgwqAvKiBUaGUgcmVh
+bCBDUFUgYmFja2luZyB1cCB0aGUgdkNQVSBtb3ZlZCB0byBhbm90aGVyIHNvY2tldA0KPj4+
+ICovDQo+Pj4gK8KgwqDCoMKgwqDCoMKgaWYgKHRvcG9sb2d5X3BoeXNpY2FsX3BhY2thZ2Vf
+aWQodmNwdS0+Y3B1KSAhPQ0KPj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoCB0b3BvbG9neV9w
+aHlzaWNhbF9wYWNrYWdlX2lkKHZjcHUtPmFyY2gucHJldl9jcHUpKQ0KPj4+ICvCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqByZXR1cm4gdHJ1ZTsNCj4+DQo+PiBXaHkgaXMgaXQg
+T0sgdG8gbG9vayBqdXN0IGF0IHRoZSBwaHlzaWNhbCBwYWNrYWdlIElEIGhlcmU/IFdoYXQg
+aWYgdGhlDQo+PiB2Y3B1IGZvciBleGFtcGxlIG1vdmVzIHRvIGEgZGlmZmVyZW50IGJvb2ss
+IHdoaWNoIGhhcyBhIGNvcmUgd2l0aCB0aGUNCj4+IHNhbWUgcGh5c2ljYWwgcGFja2FnZSBJ
+RD8NCg0KSSdsbCBuZWVkIHRvIGxvb2sgdXAgc3RzaSAxNSogb3V0cHV0IHRvIHVuZGVyc3Rh
+bmQgdGhpcy4NCkJ1dCB0aGUgYXJjaGl0ZWN0dXJlIHN0YXRlcyB0aGF0IGFueSBjaGFuZ2Ug
+dG8gdGhlIHN0c2kgMTUgb3V0cHV0IHNldHMgDQp0aGUgY2hhbmdlIGJpdCBzbyBJJ2QgZ3Vl
+c3MgTmljbyBpcyBjb3JyZWN0Lg0KDQo+Pg0KPiANCj4gWW91IGFyZSByaWdodCwgd2Ugc2hv
+dWxkIGxvb2sgYXQgdGhlIGRyYXdlciBhbmQgYm9vayBpZCB0b28uDQo+IFNvbWV0aGluZyBs
+aWtlIHRoYXQgSSB0aGluazoNCj4gDQo+ICAgICAgICAgICBpZiAoKHRvcG9sb2d5X3BoeXNp
+Y2FsX3BhY2thZ2VfaWQodmNwdS0+Y3B1KSAhPQ0KPiAgICAgICAgICAgICAgICB0b3BvbG9n
+eV9waHlzaWNhbF9wYWNrYWdlX2lkKHZjcHUtPmFyY2gucHJldl9jcHUpKSB8fA0KPiAgICAg
+ICAgICAgICAgICh0b3BvbG9neV9ib29rX2lkKHZjcHUtPmNwdSkgIT0NCj4gICAgICAgICAg
+ICAgICAgdG9wb2xvZ3lfYm9va19pZCh2Y3B1LT5hcmNoLnByZXZfY3B1KSkgfHwNCj4gICAg
+ICAgICAgICAgICAodG9wb2xvZ3lfZHJhd2VyX2lkKHZjcHUtPmNwdSkgIT0NCj4gICAgICAg
+ICAgICAgICAgdG9wb2xvZ3lfZHJhd2VyX2lkKHZjcHUtPmFyY2gucHJldl9jcHUpKSkNCj4g
+ICAgICAgICAgICAgICAgICAgcmV0dXJuIHRydWU7DQo+IA0KPiANCj4gVGhhbmtzLA0KPiBy
+ZWdhcmRzLA0KPiBQaWVycmUNCg0K
