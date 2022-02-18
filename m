@@ -2,158 +2,254 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6DD1E4BADDE
-	for <lists+kvm@lfdr.de>; Fri, 18 Feb 2022 01:05:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 44C1D4BAEDD
+	for <lists+kvm@lfdr.de>; Fri, 18 Feb 2022 02:00:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229783AbiBRADe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Feb 2022 19:03:34 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:35108 "EHLO
+        id S230343AbiBRA6T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Feb 2022 19:58:19 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:37342 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229893AbiBRADc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Feb 2022 19:03:32 -0500
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2044.outbound.protection.outlook.com [40.107.223.44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6248415A38;
-        Thu, 17 Feb 2022 16:03:10 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MF0OojIi0DHgEdAXVzKq+Gk4yGwdA8fP/9m8oWMQbQ3vum9u647b1oupAwEWiDZCp84H2h04aZvQduTOtYIblz3vOOSqRN4dk8AMo6lyEeLXc9+pizDB+5XIK76O3+Pi4Mezde8kr1ZBlw75YKKD7qredYgF+ctU4IOXkEJ618xYFyIzKID8EM2vT5yqf040mJYZr7C4tiHlNMDajL1s9H40kyTIeoNFpBnWizpV3Pwm4hcgpdHur71ggtZcOZHs3bmPSNlz7DP8/CWiAMDCfHs2qnkajLk9GA/xPI4IxHEkqSBJLOmeBpkFsjY9X5oRYDi+2R8pl54Mc2GHGyPWjQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=HS8PWxY/fjuT2svUrLbwj/FhdkvC0bIpEav5owJfP9w=;
- b=akm7clyahuQh0/2RbgQmZpW4HwDKFkfG3p6qT890W+Us0v9efOpLOsXKSbDkzvFjgLXN3kyPRpr6EUF2viSxjKbzE5+oz17omZ7FpIqBUSNpoE5KIAcMLdYAB8G9Md5+AOdvK0x3tMQxiQA2gZ/VV30PcH18ZXS5dASRK5QczLGUB7NztNOzSG67md02OpYUq7dn9ymbrNtHkzi06myE7/VE0kln1EvW7hfTppL/ZTJV5+KqSNL8LkTdn8RXiEoS/mCNBjnNFNRmupQCju1lg0HCnz0WRJ6pnPDTwVJYvb1h0MSE66IiuLIyMWLdB7UREsh5ErXLUkkg1XuRqGGq1A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HS8PWxY/fjuT2svUrLbwj/FhdkvC0bIpEav5owJfP9w=;
- b=hu/ffBdUbh6PWDhajjjOtYrqvK7ZVhNkw8evwiZqqw2sSL+KvpbMXmaJQtc3TPYem4q+g8bAlaUtRVfnZeWGH+4Tv3QCLXfxIzNHLGlzUJIGDB74WEWSNrGpknpfcJ+fbC5QrmxjPwtZMI3C3tjUXyA9E7p/tyJE0dHQQWc9gx//GgrDAAxYptqE0PXTZ+YfZrTXzFpbUm7FS8waOqVK1LULO0BF/TMdWP2CUgzWq5qv8r1RcuQiLD3T/uU35LaF5qyhuAsEFohH1CVCOtMtHA6ftcN7pALpVjdwNM81OnmrRx4QDUz160rYQdXHDZsQrB+idCwvh9Ss5ZjUqffoxg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (52.135.49.15) by
- BY5PR12MB4273.namprd12.prod.outlook.com (10.255.126.144) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4995.15; Fri, 18 Feb 2022 00:03:08 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::e8f4:9793:da37:1bd3]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::e8f4:9793:da37:1bd3%5]) with mapi id 15.20.4995.018; Fri, 18 Feb 2022
- 00:03:08 +0000
-Date:   Thu, 17 Feb 2022 20:03:06 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
-        saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
-        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com,
-        ashok.raj@intel.com, kevin.tian@intel.com,
-        shameerali.kolothum.thodi@huawei.com
-Subject: Re: [PATCH V7 mlx5-next 15/15] vfio: Extend the device migration
- protocol with PRE_COPY
-Message-ID: <20220218000306.GM4160@nvidia.com>
-References: <20220207172216.206415-1-yishaih@nvidia.com>
- <20220207172216.206415-16-yishaih@nvidia.com>
- <20220217101554.26f05eb1.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220217101554.26f05eb1.alex.williamson@redhat.com>
-X-ClientProxiedBy: BLAPR03CA0035.namprd03.prod.outlook.com
- (2603:10b6:208:32d::10) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
+        with ESMTP id S230310AbiBRA6T (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Feb 2022 19:58:19 -0500
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F26B7EDB6;
+        Thu, 17 Feb 2022 16:58:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1645145883; x=1676681883;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=uf+I8UtnZ7Y4AV3dujG6YDVo/YCtBNEl6LPfYyzEmWk=;
+  b=CHUgnTnkhi+5UJ2LVmoRJT6N1XBccQOVxsrB1AHvBcyPdc6j3k3BUTbS
+   s8wmFk7ggUMtwdHIohQ3XC+dviaYurj9rOr+1VllKRji5jTl9iZwlkntH
+   CAHNW2/dPGSN4TyRLTD7sCddPS/2+k63usp3vp7O5bNlPjEDXc7CPyzJr
+   EChuAP3OmjdzHidPFgDTaVcyR4CDhnSkoicdLSUm5KZVhb6654IFHfAma
+   63aFAYiFW1+5fuGOQPpKI3Bajt37G891G6TWyjg5oRmu50oBQtn2j5P+j
+   wjpQVfNOPZmCIjuN0qlb0S6SjTSh51XbBgWb+DIUSiurl5z6SYtGKSs3V
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10261"; a="249851819"
+X-IronPort-AV: E=Sophos;i="5.88,377,1635231600"; 
+   d="scan'208";a="249851819"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Feb 2022 16:56:54 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,377,1635231600"; 
+   d="scan'208";a="637490503"
+Received: from allen-box.sh.intel.com ([10.239.159.118])
+  by orsmga004.jf.intel.com with ESMTP; 17 Feb 2022 16:56:46 -0800
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>
+Cc:     Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+        Dan Williams <dan.j.williams@intel.com>, rafael@kernel.org,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Liu Yi L <yi.l.liu@intel.com>,
+        Jacob jun Pan <jacob.jun.pan@intel.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Stuart Yoder <stuyoder@gmail.com>,
+        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Li Yang <leoyang.li@nxp.com>,
+        Dmitry Osipenko <digetx@gmail.com>,
+        iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Lu Baolu <baolu.lu@linux.intel.com>
+Subject: [PATCH v6 00/11] Fix BUG_ON in vfio_iommu_group_notifier()
+Date:   Fri, 18 Feb 2022 08:55:10 +0800
+Message-Id: <20220218005521.172832-1-baolu.lu@linux.intel.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: e393ada6-d783-448a-96f0-08d9f2720b5f
-X-MS-TrafficTypeDiagnostic: BY5PR12MB4273:EE_
-X-Microsoft-Antispam-PRVS: <BY5PR12MB427360BBAD62BFFFBCE885B9C2379@BY5PR12MB4273.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ZoX+1wNg3cEKyD1zL1tzyTFzrdgafxLvrnSP5bVscI9v4jNOGjjNPKWcJQVSvEmFOCZ3P2WeQYvmU+By6sEBORxVWd8Hsi2kw90aSFvxJmDwxAnOwi4XkOAsjHY0P2T4IS26FcnZIfdT8/G0sJPnUDVASUCgo/foFaaKYfiqwrrJd5GEpuXhn2kbHxl0zxC62NtBQ0Y2nbI6UoSgAXZfk9U9jtKn5nel07mZq/u8aIr+dgt+6DkWN9zqmQSGdjfuLVQ14vnh3oXThJ9afq7ZvtAGNtN3hxUxQBJsVN6MzejMNobnKxwHGDFLFju0ez3S/W6s/FEwZPM/TiNoowDwp39EJxmrQPYniJL2W7ZS4QjpjsEMpm+RvMw24pq+qLkt4PyDyh2EUonKtQCboRDGxx/AGP//PBbyPJ4HiPWr2KVOuXSsBqZjfzNMmlYPtmTTpMh4jOePnm+A7+vsYVIFzkwpBaaawpBCNdHUGeGqnN+jihnR2lilIr/MYrGTR8IxKcAePeGayxLaJxP6xjbl7SJ9gzsnW1d2uYhWmapCEk89CDp32uzNvpd6PgJfNqSsDzhZs69WexzOEjSUOLTgSAehNV+78GMStrgXacS3aFKQHraRy5Kt/C4V4o0uXyqrH82lcDrAgTp2BPBVmzDE4A==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(6506007)(6486002)(508600001)(186003)(26005)(2616005)(36756003)(5660300002)(8936002)(6512007)(66946007)(316002)(1076003)(66556008)(2906002)(4326008)(6916009)(66476007)(38100700002)(86362001)(8676002)(33656002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?zYXdrCUqeQsxfbfTJUKjpBY5icyTYER858BGI09YMtFNrK0q62G/zhYFRKpK?=
- =?us-ascii?Q?/85AK6xVw3llwrO5NKBpUBOZbEPyYhFiAwb1fS0YteTlbcRP8/EIUS/DgRby?=
- =?us-ascii?Q?psutQDrCe7JG1r/CsBVQ5znb+H2UHc/6tGMaYF99WcQQxXx2nyj2gNmxD3tp?=
- =?us-ascii?Q?sdeukA+XGkjUEj6TQWewfpYj++b6zlKZQ2vR39T+Jg96o5RBPUHvOFXq5Rn2?=
- =?us-ascii?Q?Dxkpu7lsX4kHzyRWIKZmkb/rSMVNPsGpYCQuikJMJa3SrCy3GL/tRtIEBW2U?=
- =?us-ascii?Q?rYeNC8T5hJwJq2BEJbN+n0jR67dn/qvUpyQg4CF9C0/M7ynx0k1k7s5smW5g?=
- =?us-ascii?Q?Lu7V75TvANjLxQ7TGaSe/xcxN6PRvs4bCuH4bqCvdFp/FQxbHxrEU8dqlH02?=
- =?us-ascii?Q?zklDvm2BG5wfE6VJfp7BIp23C79t0LNWrxwHw0vy2xCDuHTz5MNsLFgeZa4u?=
- =?us-ascii?Q?yfvH5MgaZXzCUmewsPm2LcJ1flKVicKlDeEIIvImQy1pFHvtLgU2OyXCxCef?=
- =?us-ascii?Q?tdUwLGWWZ6KbTsRj8OtwDjuBM34s7jt90wo87B/CY/qZD+gW8f3yVkTIxx6L?=
- =?us-ascii?Q?tMP5KSx+Qcb35HgwQCTgm6+Ovo+6152Dg3iV6nD+00VfY3LlC4fpczX1+v98?=
- =?us-ascii?Q?W1V+ZE7rcKAvottwFQmV0SgxnuCr9lPpd13aWaiAlqQ4KMpYRR+j/ruWss7J?=
- =?us-ascii?Q?cfzx+fWCfEXJBqAXmOJPNqvOIq3TyVoB4e13EszakvTvGbMhc7Cej9rgwaGa?=
- =?us-ascii?Q?LggNdhFCV67wS8umEMJJgCUaslXXGxHktHc4EAFuNWI+V0cORju7WvKbJLcz?=
- =?us-ascii?Q?PdeOZRe11i1YPPvuHbQcgimNdWC7ILz8ZRjOCTDRlTVL5f1CC20RXmAV4XL1?=
- =?us-ascii?Q?13BgaL4coJQmnsVaYEbbxb1Ry89A6N6Xpp/d6O3WBDGPeN5s5/ZlK3C4V5nq?=
- =?us-ascii?Q?1EQ4rzWuVhgWPN8rJRRBls6EZTF0C88IFzP/CIYnFYqu2hTjVGhIPA8LKOFF?=
- =?us-ascii?Q?P3z5OinkPmzQMEGjOwkJsdU/q0oXjsCl34O3zkwaYrZ7ungtwz1WQGlX2jjZ?=
- =?us-ascii?Q?mlKIzaEfLGl9VDsKF58FuGmLU1pDcLrK42IrbD8yR3IPIxW3Tnr91YVfICN4?=
- =?us-ascii?Q?VppcUcot9610dYXeXSLGdY9TvT1d+KU1wu5Ow4KrRhQfo9rrI4fI5uEEiN1o?=
- =?us-ascii?Q?kPlnnVI2ZXlC4MIJB47PF2GBl6B6Kti3L1xcAnBQxYFAKqzFenDJ8XJnkuPL?=
- =?us-ascii?Q?CqL4Z9lzl6FJ2ien5C4EK5yJATE1WqjZcfDnf+tfJt4UEd/3NCl+RjFKgSIv?=
- =?us-ascii?Q?/6FjnUcxXvG7Mdq521V8rNyd1SfB+HqL8sLHROWw2ReGcQZvc+So4pFxPvzu?=
- =?us-ascii?Q?ThM8OZeulmdEASfeoAsedLr4BNv/IfX5aq62m3VGmQBuXlmyA4HJXov2TnoO?=
- =?us-ascii?Q?Zy4Duh2BrFuFt6sV0+NMjRth1TVFEcwimRLoJ8Y3mhj8dmGI2JX65eTawhLe?=
- =?us-ascii?Q?NTKdJHbWFmxIaLhl+pfNxVPxlfwKlYsmF2ZW6AvRAT9ZzYcczA+LRAAHIyKt?=
- =?us-ascii?Q?rytfoNF6vs49N5kUKPs=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e393ada6-d783-448a-96f0-08d9f2720b5f
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Feb 2022 00:03:08.5017
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 9QlXYI6ACPVmoF1b3iVyiyBXULfkJlR775HjbK8hPT0VtYwOT7zvbGQ9Pkvv3oxZ
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4273
-X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 17, 2022 at 10:15:54AM -0700, Alex Williamson wrote:
+Hi folks,
 
-> I feel obligated to ask, is PRE_COPY support essentially RFC at this
-> point since we have no proposed in-kernel users?
+The iommu group is the minimal isolation boundary for DMA. Devices in
+a group can access each other's MMIO registers via peer to peer DMA
+and also need share the same I/O address space.
 
-Yes, it is included here because the kernel in v1 had PRE_COPY, so it
-seemed essential to show how this could continue to look to evaluate
-v2.
+Once the I/O address space is assigned to user control it is no longer
+available to the dma_map* API, which effectively makes the DMA API
+non-working.
 
-NVIDIA has an out of tree driver that implemented PRE_COPY in the v1
-protocol, and we have some future plan to use it in a in-tree driver.
+Second, userspace can use DMA initiated by a device that it controls
+to access the MMIO spaces of other devices in the group. This allows
+userspace to indirectly attack any kernel owned device and it's driver.
 
-> It seems like we're winding down comments on the remainder of the
-> series and I feel ok with where it's headed and the options we have
-> available for future extensions.  
+Therefore groups must either be entirely under kernel control or
+userspace control, never a mixture. Unfortunately some systems have
+problems with the granularity of groups and there are a couple of
+important exceptions:
 
-Thanks, it was a lot of work for everyone to get here!
+ - pci_stub allows the admin to block driver binding on a device and
+   make it permanently shared with userspace. Since PCI stub does not
+   do DMA it is safe, however the admin must understand that using
+   pci_stub allows userspace to attack whatever device it was bound
+   it.
 
-Yishai has all the revisions from Kevin included, he will sent it on
-Sunday. Based on this Leon will make a formal PR next week so it can
-go into linux-next through your tree. We have to stay co-ordinated
-with our netdev driver branch..
+ - PCI bridges are sometimes included in groups. Typically PCI bridges
+   do not use DMA, and generally do not have MMIO regions.
 
-I will ping the acc team and make it priority to review their next
-vresion. Let's try to include their driver as well.
+Generally any device that does not have any MMIO registers is a
+possible candidate for an exception.
 
-We'll start to make a more review ready qemu series.
+Currently vfio adopts a workaround to detect violations of the above
+restrictions by monitoring the driver core BOUND event, and hardwiring
+the above exceptions. Since there is no way for vfio to reject driver
+binding at this point, BUG_ON() is triggered if a violation is
+captured (kernel driver BOUND event on a group which already has some
+devices assigned to userspace). Aside from the bad user experience
+this opens a way for root userspace to crash the kernel, even in high
+integrity configurations, by manipulating the module binding and
+triggering the BUG_ON.
 
-> PS - Why is this a stand-alone ioctl rather than a DEVICE_FEATURE?
+This series solves this problem by making the user/kernel ownership a
+core concept at the IOMMU layer. The driver core enforces kernel
+ownership while drivers are bound and violations now result in a error
+codes during probe, not BUG_ON failures.
 
-You asked for the ioctl to be on the data_fd, so there is no
-DEVICE_FEATURE infrastructure and I think it doesn't make sense to put
-a multiplexor there. We have lots of ioctl numbers and don't want this
-to be complicated for performance.
+Patch partitions:
+  [PATCH 1-4]: Detect DMA ownership conflicts during driver binding;
+  [PATCH 5-7]: Add security context management for assigned devices;
+  [PATCH 8-11]: Various cleanups.
 
-Thanks,
-Jason
+This is also part one of three initial series for IOMMUFD:
+ * Move IOMMU Group security into the iommu layer
+ - Generic IOMMUFD implementation
+ - VFIO ability to consume IOMMUFD
+
+Change log:
+v1: initial post
+  - https://lore.kernel.org/linux-iommu/20211115020552.2378167-1-baolu.lu@linux.intel.com/
+
+v2:
+  - https://lore.kernel.org/linux-iommu/20211128025051.355578-1-baolu.lu@linux.intel.com/
+
+  - Move kernel dma ownership auto-claiming from driver core to bus
+    callback. [Greg/Christoph/Robin/Jason]
+    https://lore.kernel.org/linux-iommu/20211115020552.2378167-1-baolu.lu@linux.intel.com/T/#m153706912b770682cb12e3c28f57e171aa1f9d0c
+
+  - Code and interface refactoring for iommu_set/release_dma_owner()
+    interfaces. [Jason]
+    https://lore.kernel.org/linux-iommu/20211115020552.2378167-1-baolu.lu@linux.intel.com/T/#mea70ed8e4e3665aedf32a5a0a7db095bf680325e
+
+  - [NEW]Add new iommu_attach/detach_device_shared() interfaces for
+    multiple devices group. [Robin/Jason]
+    https://lore.kernel.org/linux-iommu/20211115020552.2378167-1-baolu.lu@linux.intel.com/T/#mea70ed8e4e3665aedf32a5a0a7db095bf680325e
+
+  - [NEW]Use iommu_attach/detach_device_shared() in drm/tegra drivers.
+
+  - Refactoring and description refinement.
+
+v3:
+  - https://lore.kernel.org/linux-iommu/20211206015903.88687-1-baolu.lu@linux.intel.com/
+
+  - Rename bus_type::dma_unconfigure to bus_type::dma_cleanup. [Greg]
+    https://lore.kernel.org/linux-iommu/c3230ace-c878-39db-1663-2b752ff5384e@linux.intel.com/T/#m6711e041e47cb0cbe3964fad0a3466f5ae4b3b9b
+
+  - Avoid _platform_dma_configure for platform_bus_type::dma_configure.
+    [Greg]
+    https://lore.kernel.org/linux-iommu/c3230ace-c878-39db-1663-2b752ff5384e@linux.intel.com/T/#m43fc46286611aa56a5c0eeaad99d539e5519f3f6
+
+  - Patch "0012-iommu-Add-iommu_at-de-tach_device_shared-for-mult.patch"
+    and "0018-drm-tegra-Use-the-iommu-dma_owner-mechanism.patch" have
+    been tested by Dmitry Osipenko <digetx@gmail.com>.
+
+v4:
+  - https://lore.kernel.org/linux-iommu/20211217063708.1740334-1-baolu.lu@linux.intel.com/
+  - Remove unnecessary tegra->domain chech in the tegra patch. (Jason)
+  - Remove DMA_OWNER_NONE. (Joerg)
+  - Change refcount to unsigned int. (Christoph)
+  - Move mutex lock into group set_dma_owner functions. (Christoph)
+  - Add kernel doc for iommu_attach/detach_domain_shared(). (Christoph)
+  - Move dma auto-claim into driver core. (Jason/Christoph)
+
+v5:
+  - https://lore.kernel.org/linux-iommu/20220104015644.2294354-1-baolu.lu@linux.intel.com/
+  - Move kernel dma ownership auto-claiming from driver core to bus
+    callback. (Greg)
+  - Refactor the iommu interfaces to make them more specific.
+    (Jason/Robin)
+  - Simplify the dma ownership implementation by removing the owner
+    type. (Jason)
+  - Commit message refactoring for PCI drivers. (Bjorn)
+  - Move iommu_attach/detach_device() improvement patches into another
+    series as there are a lot of code refactoring and cleanup staffs
+    in various device drivers.
+
+v6:
+  - Refine comments and commit mesages.
+  - Rename iommu_group_set_dma_owner() to iommu_group_claim_dma_owner().
+  - Rename iommu_device_use/unuse_kernel_dma() to
+    iommu_device_use/unuse_default_domain().
+  - Remove unnecessary EXPORT_SYMBOL_GPL.
+  - Change flag name from no_kernel_api_dma to driver_managed_dma.
+  - Merge 4 "Add driver dma ownership management" patches into single
+    one.
+
+This is based on next branch of linux-iommu tree:
+https://git.kernel.org/pub/scm/linux/kernel/git/joro/iommu.git
+and also available on github:
+https://github.com/LuBaolu/intel-iommu/commits/iommu-dma-ownership-v6
+
+Best regards,
+baolu
+
+Jason Gunthorpe (1):
+  vfio: Delete the unbound_list
+
+Lu Baolu (10):
+  iommu: Add dma ownership management interfaces
+  driver core: Add dma_cleanup callback in bus_type
+  amba: Stop sharing platform_dma_configure()
+  bus: platform,amba,fsl-mc,PCI: Add device DMA ownership management
+  PCI: pci_stub: Set driver_managed_dma
+  PCI: portdrv: Set driver_managed_dma
+  vfio: Set DMA ownership for VFIO devices
+  vfio: Remove use of vfio_group_viable()
+  vfio: Remove iommu group notifier
+  iommu: Remove iommu group changes notifier
+
+ include/linux/amba/bus.h              |   8 +
+ include/linux/device/bus.h            |   3 +
+ include/linux/fsl/mc.h                |   8 +
+ include/linux/iommu.h                 |  54 +++---
+ include/linux/pci.h                   |   8 +
+ include/linux/platform_device.h       |  10 +-
+ drivers/amba/bus.c                    |  39 +++-
+ drivers/base/dd.c                     |   5 +
+ drivers/base/platform.c               |  23 ++-
+ drivers/bus/fsl-mc/fsl-mc-bus.c       |  26 ++-
+ drivers/iommu/iommu.c                 | 233 ++++++++++++++++--------
+ drivers/pci/pci-driver.c              |  21 +++
+ drivers/pci/pci-stub.c                |   1 +
+ drivers/pci/pcie/portdrv_pci.c        |   2 +
+ drivers/vfio/fsl-mc/vfio_fsl_mc.c     |   1 +
+ drivers/vfio/pci/vfio_pci.c           |   1 +
+ drivers/vfio/platform/vfio_amba.c     |   1 +
+ drivers/vfio/platform/vfio_platform.c |   1 +
+ drivers/vfio/vfio.c                   | 245 ++------------------------
+ 19 files changed, 352 insertions(+), 338 deletions(-)
+
+-- 
+2.25.1
+
