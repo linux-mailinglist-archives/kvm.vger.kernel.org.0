@@ -2,125 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 67BB94BC2A1
-	for <lists+kvm@lfdr.de>; Fri, 18 Feb 2022 23:36:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 07FFA4BC2AD
+	for <lists+kvm@lfdr.de>; Fri, 18 Feb 2022 23:50:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240136AbiBRWgX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Feb 2022 17:36:23 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:51514 "EHLO
+        id S240121AbiBRWuW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Feb 2022 17:50:22 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:50152 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236664AbiBRWgW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Feb 2022 17:36:22 -0500
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 976065419B
-        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 14:36:04 -0800 (PST)
-Received: by mail-ej1-x62c.google.com with SMTP id a8so18121003ejc.8
-        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 14:36:04 -0800 (PST)
+        with ESMTP id S240086AbiBRWuW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Feb 2022 17:50:22 -0500
+Received: from mail-oo1-xc35.google.com (mail-oo1-xc35.google.com [IPv6:2607:f8b0:4864:20::c35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49DB727374F
+        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 14:50:04 -0800 (PST)
+Received: by mail-oo1-xc35.google.com with SMTP id d134-20020a4a528c000000b00319244f4b04so5293900oob.8
+        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 14:50:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=u+sFcg1Jrzd7RdQxBiVyHyjcrIIMdAB2S95NaiORBYQ=;
-        b=cGWMjVauB1J5Kz60+ee5aWzyXC1AM3YWk9YtVYIpDse5G74x18lvIyFkPja0Abo2BE
-         x35vQ/IgynKUwIAXySKdR7gESn/FCFxB+0QwV5+MYdhS+G+r+74C3G2GEbQ/KuACKSPg
-         FGOM54bwhNMTJiu59gOKFKakEbIm3IhB8DdsdONoBkbNGLPhaDpiI23vY1/A4LizwOr+
-         GU08VQDrmHuVY4hMkqkbJYpHgIH3shY7nppq7yL8Dj1EXvF8eFWdALTYd9V78sQra+cQ
-         a8jdHCxrpmXpRDydmzrnQYWMNvTubkLbi0lCjjinCA3Iw9u8kWX9ZB6pvn5soobO7Dtz
-         bFbQ==
+        bh=+cdiIGkssQ+NChVNtB3F7NzFL5cEUK11+I7KTdnPHCg=;
+        b=RLI1w2G6OXRv9chHjkl3uFc/Me0bhCfGJIT8IcPlguaxc0fqvFtNRl5+5VgBzzkCsm
+         b40D8Rp/rZas7tZmbAUZCcvFdexD/jDXb7d0XUjpvhXiBEqfvTVi414nViOoTVjzSzy4
+         m+5WKB/qLSGvGT/NXNBeVbvC7wIfSQa9eEsUAc3/6cF1sZqRldOoWBkt9XOp1YKQQPCu
+         wM7GPJVy3VgplHTx5ULmug3ZLxE8KjDJ5S0DAlJcQm8fFbnXjWzgdfaVuRMEMaUgqg3u
+         P91MqNq31GL194KCHEiCj+xw1xYz70sYN1Gy8oSSnu7iFjOcZb9xw9QuHMQYTIvSNbDN
+         UaWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=u+sFcg1Jrzd7RdQxBiVyHyjcrIIMdAB2S95NaiORBYQ=;
-        b=CJP1nbGM61S2h5c+OwYMjhzdYEhVzM5yPOQ67HJjQO/FnBCYjaqcCPbHWUTjUyJ8uH
-         U/OTt1ymB2QpauKrEBfhiDMoGZDJmg+AKrNoClKPDKSvuFM3/vdkOOrijfwsU+Cr8oOx
-         UbmpKkzOyRwJljlpGJhHMXvEnbXiyrBLFhRyRXSTVXavz2gryVRbz1qE/9g7ELeLYYQW
-         6K+inVwpcUX3kMMukPshPKlYf8fXy37Ubw7gvM2/Bn+BA6UxLs5qnRUmYM9IjV8nqPIf
-         SjTttpIHdMp1SlQzu+JoL4hYQKdPVwTgjBk6f+Ok8qGswkTNAaU1bv0ENcgN01MQtX1n
-         T+VA==
-X-Gm-Message-State: AOAM533qUgoB+CvPrNgYe0/NdFOUt8jc2k6+8P/ZnwJo1d5jnaPoPrg6
-        eq5NiFMcHzXleg2oazhpSZGeJE1NAl5aGeHF5ir6Mg==
-X-Google-Smtp-Source: ABdhPJxCAq71uudZo1yeq2i43zfSBGdz40+2gbUVJ11hY+5K5ovbv3z9+MmVE7/NFhdhZ2/awk1paWaMMa6UYaynntU=
-X-Received: by 2002:a17:906:7751:b0:6ce:e3c:81a6 with SMTP id
- o17-20020a170906775100b006ce0e3c81a6mr7806909ejn.278.1645223762896; Fri, 18
- Feb 2022 14:36:02 -0800 (PST)
+        bh=+cdiIGkssQ+NChVNtB3F7NzFL5cEUK11+I7KTdnPHCg=;
+        b=HhgumDudbw2CxgBmHx1l7dt1OyCJGunBBofCrimjZFtHM5tleq872cVJ1wZ7VZO51t
+         EEmeINgXjEPdUbTtWotEWvDHHcz4NPq/k8X9/rdbUJwOeuh2LFtT5YzFaEAJLC7Oxu1A
+         aEVx3kcfQ2vnLbh2qBNUBwVJh+h07PSAWXzGTMgkxShowc888VmGFFpRdZD4GLgevQVB
+         xfTL+2k7kUDYWffGPMfJ00zec0uF38z37wICK6SgS8XMOSKQDD/+yodQEBcArOBqD856
+         Ia4WGya+4vmyh1yj/JrUa9//jozt+d/xbv9ZNMWiLcXO2Du6xfLIW1cEjptVQzIbHDXC
+         i0IQ==
+X-Gm-Message-State: AOAM530nC4ftXqzVBWSts30pAt8RVCbiskLWKaA/jmSbQEyQb8vWLHsC
+        mlMmkLKTBA8+om6y1kVxMZpoqqJs8vUSoH6mZsi31w==
+X-Google-Smtp-Source: ABdhPJxnI9G31O1tb1jcxHv5OWlRyDwN+PgaZ15TmgRAyLnIT8LAwDMBVuQOI4o3yLZw3jLVMECRNbFjySI4RzRAhkA=
+X-Received: by 2002:a05:6870:2890:b0:d3:f439:2cbb with SMTP id
+ gy16-20020a056870289000b000d3f4392cbbmr1196901oab.139.1645224602006; Fri, 18
+ Feb 2022 14:50:02 -0800 (PST)
 MIME-Version: 1.0
-References: <20211111020738.2512932-1-seanjc@google.com> <20211111020738.2512932-10-seanjc@google.com>
- <YfrQzoIWyv9lNljh@google.com> <CABCJKufg=ONNOvF8+BRXfLoTUfeiZZsdd8TnpV-GaNK_o-HuaA@mail.gmail.com>
- <202202061011.A255DE55B@keescook> <YgAvhG4wvnslbTqP@hirez.programming.kicks-ass.net>
- <202202061854.B5B11282@keescook>
-In-Reply-To: <202202061854.B5B11282@keescook>
-From:   Will McVicker <willmcvicker@google.com>
-Date:   Fri, 18 Feb 2022 14:35:47 -0800
-Message-ID: <CABYd82ZmDbgmEGhdWOJ5Um8tiFd4TeQ-QZ2+xwxwqqQs6oi0xg@mail.gmail.com>
-Subject: Re: [PATCH v4 09/17] perf/core: Use static_call to optimize perf_guest_info_callbacks
-To:     Kees Cook <keescook@chromium.org>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Sami Tolvanen <samitolvanen@google.com>,
+References: <20220218221820.950118-1-swine@google.com>
+In-Reply-To: <20220218221820.950118-1-swine@google.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Fri, 18 Feb 2022 14:49:51 -0800
+Message-ID: <CALMp9eQzCQQ7ADMkNDDjHu1Rkx1qr2ABY+aA8e8rt976hLbVdg@mail.gmail.com>
+Subject: Re: [PATCH 1/2] kvm/x86: rename kvm's read_tsc() as kvm_read_host_tsc()
+To:     Pete Swain <swine@google.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        kvmarm <kvmarm@lists.cs.columbia.edu>, kvm@vger.kernel.org
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        John Stultz <john.stultz@linaro.org>,
+        Stephen Boyd <sboyd@kernel.org>,
+        "Maciej W. Rozycki" <macro@orcam.me.uk>,
+        Johan Hovold <johan@kernel.org>,
+        Feng Tang <feng.tang@intel.com>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Juergen Gross <jgross@suse.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-15.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,HK_RANDOM_ENVFROM,HK_RANDOM_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=no autolearn_force=no
-        version=3.4.6
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Feb 6, 2022 at 6:56 PM Kees Cook <keescook@chromium.org> wrote:
+On Fri, Feb 18, 2022 at 2:18 PM Pete Swain <swine@google.com> wrote:
 >
-> On Sun, Feb 06, 2022 at 09:28:52PM +0100, Peter Zijlstra wrote:
-> > On Sun, Feb 06, 2022 at 10:45:15AM -0800, Kees Cook wrote:
-> >
-> > > I'm digging through the macros to sort this out, but IIUC, an example of
-> > > the problem is:
-> > >
-> >
-> > > so the caller is expecting "unsigned int (*)(void)" but the prototype
-> > > of __static_call_return0 is "long (*)(void)":
-> > >
-> > > long __static_call_return0(void);
-> > >
-> > > Could we simply declare a type-matched ret0 trampoline too?
-> >
-> > That'll work for this case, but the next case the function will have
-> > arguments we'll need even more nonsense...
+> Avoid clash with host driver's INDIRECT_CALLABLE_SCOPE read_tsc()
 >
-> Shouldn't the typeof() work there too, though? I.e. as long as the
-> return value can hold a "0", it'd work.
->
-> > And as stated in that other email, there's tb_stub_func() having the
-> > exact same problem as well.
->
-> Yeah, I'd need to go look at that again.
->
-> > The x86_64 CFI patches had a work-around for this, that could trivially
-> > be lifted I suppose.
->
-> Yeah, I think it'd be similar. I haven't had a chance to go look at that
-> again...
->
-> --
-> Kees Cook
-
-
-Hi All,
-
-I noticed that this thread kind of died out. Does anyone have any
-action items that need to be followed up to help resolve this issue?
-The offending patch is breaking the ARM64 Android Common Kernels
-(Pixel 6 in particular) and I imagine it might also have an impact on
-other ARM64 platforms upstream that just haven't hit this perf_trace
-case yet.
-
-If anyone needs help verifying any fixes, I'm happy to test it out.
-
-Thanks,
-Will
+> Signed-off-by: Pete Swain <swine@google.com>
+Reviewed-by: Jim Mattson <jmattson@google.com>
