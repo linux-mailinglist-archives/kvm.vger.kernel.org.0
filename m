@@ -2,136 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 79E144BC565
-	for <lists+kvm@lfdr.de>; Sat, 19 Feb 2022 05:50:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E9B644BC6B7
+	for <lists+kvm@lfdr.de>; Sat, 19 Feb 2022 08:33:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241304AbiBSEvH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Feb 2022 23:51:07 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:47352 "EHLO
+        id S241202AbiBSHc2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 19 Feb 2022 02:32:28 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:52808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232527AbiBSEvG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Feb 2022 23:51:06 -0500
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 449B150B22
-        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 20:50:49 -0800 (PST)
-Received: by mail-pg1-x531.google.com with SMTP id w37so3148861pga.7
-        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 20:50:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Z9SuVj1fi5RP4o5bRwa6K8lcyqW640R9G+/Kdms/XR0=;
-        b=X7S/AZ9fBPKIrVhySnCY+U7UWblLfCMaFM8lqCHiY9l7y6+mVO7sm3AZqiX46+RhS7
-         GqTWzh9NBy6I5w+iswXplY/uyx2XLH/TqbxUAx5y3njh2VL8Snf4cLmnj6pNp7bFwvfZ
-         YW1Fq8TUyi0cEgFTHA1ykNFD52tBgHmxgMaDIveXWKMrzgDVwZeIife1Mh6ivuPya6BH
-         BiPFouxhuF51Wx0IjKNfAwnLdAF3OAghcyU6dM/lnDRX0hZO5I4wUSNcSJ4c57kabSt7
-         3kc7cEtAqlG5BEJyhNtNKNGr1abUDhQf1WOg8PxtfoAeZ7TK/Myw48jFV/dcT0KXc9/A
-         MZFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Z9SuVj1fi5RP4o5bRwa6K8lcyqW640R9G+/Kdms/XR0=;
-        b=5kmBrYBgu0WnRhjc/l722POfqwKwlPHWWTiueIbnjSvyVdN7v84zpTpXsUQJK+4lkz
-         qnRivT297XzeSboDSWWCBY3bMpYzvskW9TwXPzt3UQxrXIDh2Va8Zg2/cD+ktAc7anTK
-         lmqYXDRYUVUyqIIE6/a5t/1T3pq1zYylUV6qx+CQTnRRu7EWyt+bw/WlkAetUNGWMNia
-         VHJL67XB6nODYqY+B/GcE8YFDRZvvBmPvIMat20u84AIDAE86GbmUhwH+e92GW0UM2H5
-         oCsjPRFkoI1o32CCnNoS9t8UtI0zFnQaL10Sk5bvkj9XQZj0QxRYoGPQO0RgvfHnNJvQ
-         Qh/Q==
-X-Gm-Message-State: AOAM532pAGW2tQHX49NhvjzqCY9+9ZmtwX9crOhri1asJRu8rh6b9fMj
-        ZcizNN50/HSQZtPWWuLhs7/D8oi5qLP8s8pu7fmjxw==
-X-Google-Smtp-Source: ABdhPJzzTlaezoX5387HfzWh1w/HYes2SMd46QCY6Bv5pDQwuPKmNPS1FuUAtf8Yh5hmsZI8gAHEwFlZKh5Pna/qX3c=
-X-Received: by 2002:a63:de46:0:b0:364:cad7:bf3b with SMTP id
- y6-20020a63de46000000b00364cad7bf3bmr8775132pgi.491.1645246248595; Fri, 18
- Feb 2022 20:50:48 -0800 (PST)
+        with ESMTP id S229737AbiBSHc1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 19 Feb 2022 02:32:27 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBF4046179;
+        Fri, 18 Feb 2022 23:32:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=sqAnJz8uVZ8Q/dp+lB46Xah1mFGaVnx8u72C4fMPl04=; b=rP4bE3sgbuBhtx1bYdIiik7xle
+        rKcv/uKt73U/LsdlA6ROBkmJq+fXwMS6uHEC8qmvy9pyt1GeMS0eaZzkVYzOAJGgXTgydYWLpQ9xh
+        HurXlTCgi/VzX9c7ZnTwLwXPRvSx+lAhnLjbn4JAkqTW0foCDvE2ZBJ40p3AE7tZtvO8K2TcRKduo
+        gd1hGdBcsevj0xXkYK8dKa1LXMn1VuAaCEh+PldyPGvcs1THypyd1CM1btGGAy3qQZOwpn8wKBdVg
+        oAJYM8fgMtO1fJLR0mgiyXnxCUuf4sCc9jW7yCKkusjUeHqpepsTWF8H7t9hundXbECdrLsDL/vda
+        j1FYt9Kw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nLKDi-00GMxk-09; Sat, 19 Feb 2022 07:31:54 +0000
+Date:   Fri, 18 Feb 2022 23:31:53 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Lu Baolu <baolu.lu@linux.intel.com>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>, kvm@vger.kernel.org,
+        rafael@kernel.org, David Airlie <airlied@linux.ie>,
+        linux-pci@vger.kernel.org,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Dmitry Osipenko <digetx@gmail.com>,
+        Will Deacon <will@kernel.org>,
+        Stuart Yoder <stuyoder@gmail.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        linux-kernel@vger.kernel.org, Li Yang <leoyang.li@nxp.com>,
+        iommu@lists.linux-foundation.org,
+        Jacob jun Pan <jacob.jun.pan@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Robin Murphy <robin.murphy@arm.com>
+Subject: Re: [PATCH v6 01/11] iommu: Add dma ownership management interfaces
+Message-ID: <YhCc6dKyojInJe7u@infradead.org>
+References: <20220218005521.172832-1-baolu.lu@linux.intel.com>
+ <20220218005521.172832-2-baolu.lu@linux.intel.com>
 MIME-Version: 1.0
-References: <20220217034947.180935-1-reijiw@google.com> <20220217034947.180935-2-reijiw@google.com>
- <Yg3Uer/K6n/h6oBz@google.com> <874k4x502u.wl-maz@kernel.org>
-In-Reply-To: <874k4x502u.wl-maz@kernel.org>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Fri, 18 Feb 2022 20:50:32 -0800
-Message-ID: <CAAeT=FxbbBq0sxUZAOSJW_wM+6M=xQe-p+=aeqpg=-y9VbpnnA@mail.gmail.com>
-Subject: Re: [PATCH 2/2] KVM: arm64: selftests: Introduce get_set_regs_perf test
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Oliver Upton <oupton@google.com>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220218005521.172832-2-baolu.lu@linux.intel.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+The overall API and patch looks fine, but:
 
-On Thu, Feb 17, 2022 at 1:12 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> On Thu, 17 Feb 2022 04:52:10 +0000,
-> Oliver Upton <oupton@google.com> wrote:
-> >
-> > Hi Reiji,
-> >
-> > First off, thanks for looking into this! Seems like a very useful thing
-> > to test :-)
-> >
-> > On Wed, Feb 16, 2022 at 07:49:47PM -0800, Reiji Watanabe wrote:
-> > > Introduce a simple performance test of KVM_GET_ONE_REG/KVM_SET_ONE_REG
-> > > for registers that are returned by KVM_GET_REG_LIST. This is a pseudo
-> > > process of saving/restoring registers during live migration, and this
-> > > test quantifies the performance of the process.
-> > >
-> > > Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> > > ---
-> > >  tools/testing/selftests/kvm/.gitignore        |   1 +
-> > >  tools/testing/selftests/kvm/Makefile          |   1 +
-> > >  .../selftests/kvm/aarch64/get_set_regs_perf.c | 456 ++++++++++++++++++
-> >
->
-> [...]
->
-> > Would it make sense to test some opt-in capabilities that expose
-> > additional registers (PMU, SVE, etc.)?
->
-> I think this is important. System registers are usually saved/restored
+> + * iommu_group_dma_owner_claimed() - Query group dma ownership status
+> + * @group: The group.
+> + *
+> + * This provides status query on a given group. It is racey and only for
+> + * non-binding status reporting.
 
-Yes, I will fix the test to include registers for opt-in features
-when supported.
+s/racey/racy/
 
-> in groups, and due to the way we walk the sysreg array, timings are
-> unlikely to be uniform. Getting a grip on that could help restructure
-> the walking if required (either per-group arrays, or maybe a tree
-> structure).
+> + */
+> +bool iommu_group_dma_owner_claimed(struct iommu_group *group)
+> +{
+> +	unsigned int user;
+> +
+> +	mutex_lock(&group->mutex);
+> +	user = group->owner_cnt;
+> +	mutex_unlock(&group->mutex);
+> +
+> +	return user;
+> +}
+> +EXPORT_SYMBOL_GPL(iommu_group_dma_owner_claimed);
 
-The biggest system register table that I know is sys_reg_descs[],
-and KVM_SET_ONE_REG/KVM_GET_ONE_REG/emulation code already uses
-binary search to find the target entry.  So, the search itself
-isn't that bad.  The difference between the min and the max
-latency of KVM_GET_ONE_REG for the registers is always around
-200nsec on Ampere Altra machine as far as I checked.
-
-
-> Note that all of this could equally apply to the guest trapping (the
-> walk is the same).
->
-> And yes, there are a lot of commonalities with get-reg-list, so
-> reusing some of the existing infrastructure would be a good thing.
-
-I will look into that.
-
-Thanks,
-Reiji
+Still no no need for the lock here.
