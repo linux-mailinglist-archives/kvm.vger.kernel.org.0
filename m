@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DDC624BC718
-	for <lists+kvm@lfdr.de>; Sat, 19 Feb 2022 10:35:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 624C84BC71F
+	for <lists+kvm@lfdr.de>; Sat, 19 Feb 2022 10:35:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239199AbiBSJak (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 19 Feb 2022 04:30:40 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:43732 "EHLO
+        id S240072AbiBSJea (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 19 Feb 2022 04:34:30 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:57134 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234088AbiBSJah (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 19 Feb 2022 04:30:37 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 42A1EB3C
-        for <kvm@vger.kernel.org>; Sat, 19 Feb 2022 01:30:18 -0800 (PST)
+        with ESMTP id S235403AbiBSJe3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 19 Feb 2022 04:34:29 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 84D324F443
+        for <kvm@vger.kernel.org>; Sat, 19 Feb 2022 01:34:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645263017;
+        s=mimecast20190719; t=1645263250;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding;
-        bh=Eykr1P2rsfvs48+0JEfbWc+i1A5Hcx0MrMIOUCrzskw=;
-        b=A7mQM1hbz5uEUlLVCTRFt1eTYZdAThPAMaw7zU7mapI92glny6aXxUIbZGHfeP0VW6tY6E
-        PjrJGVMM8blKmPQRhu1vINFJkbpqUK3dswCLBg9zcNCbKp4lC51GSqDvNdcm4aBatg1feh
-        MoAQ2ZXUCwd73SPMz7NsUAVX5SCkmQc=
+        bh=/eT1aTzLbHhei4jVP2A2obc4oMSZLheYvq0FaqENuG8=;
+        b=NFQgAQ+JflBYGOUzuZFWhJlGlg4IcOOp6lg/b5n3Aim3y0WtgT7Yh3K1MbUDqoslRkg/p4
+        QOLb0gBZjvu9W4RM67EHeipZqW9inHzpNVihUa39TZpo5HMc9hTdPAtzzK4yW7OneRml6B
+        5eLYqtuO8JyeM/Blb8yXU2QJe4cfRrg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-196-myxr16Q1NVuGBLuVCycMeg-1; Sat, 19 Feb 2022 04:30:13 -0500
-X-MC-Unique: myxr16Q1NVuGBLuVCycMeg-1
+ us-mta-489-SQr6FPP4OhW-A8FLK-_r-A-1; Sat, 19 Feb 2022 04:34:07 -0500
+X-MC-Unique: SQr6FPP4OhW-A8FLK-_r-A-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 524A21006AA0;
-        Sat, 19 Feb 2022 09:30:12 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D457D2F45;
+        Sat, 19 Feb 2022 09:34:05 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AF2052A18C;
-        Sat, 19 Feb 2022 09:30:11 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4BBE42A18F;
+        Sat, 19 Feb 2022 09:34:05 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     seanjc@google.com, Like Xu <likexu@tencent.com>
-Subject: [PATCH] KVM: x86: pull kvm->srcu read-side to kvm_arch_vcpu_ioctl_run
-Date:   Sat, 19 Feb 2022 04:29:56 -0500
-Message-Id: <20220219092956.366301-1-pbonzini@redhat.com>
+Subject: [PATCH v2] KVM: x86: pull kvm->srcu read-side to kvm_arch_vcpu_ioctl_run
+Date:   Sat, 19 Feb 2022 04:34:04 -0500
+Message-Id: <20220219093404.367207-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -82,11 +82,14 @@ svm_skip_emulated_instruction().
 Reported-by: Like Xu <likexu@tencent.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
+	v2: actually commit what I tested... srcu_read_lock must be
+	    before all "goto out"s.
+
  arch/x86/kvm/x86.c | 19 ++++++++-----------
  1 file changed, 8 insertions(+), 11 deletions(-)
 
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 82a9dcd8c67f..66efe1a67c1d 100644
+index 82a9dcd8c67f..e55de9b48d1a 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
 @@ -9180,6 +9180,7 @@ static int dm_request_for_irq_injection(struct kvm_vcpu *vcpu)
@@ -161,14 +164,14 @@ index 82a9dcd8c67f..66efe1a67c1d 100644
  	int r;
  
  	vcpu_load(vcpu);
-@@ -10450,6 +10445,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
- 		}
- 	}
+@@ -10405,6 +10400,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 	kvm_run->flags = 0;
+ 	kvm_load_guest_fpu(vcpu);
  
 +	vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
- 	if (unlikely(vcpu->arch.complete_userspace_io)) {
- 		int (*cui)(struct kvm_vcpu *) = vcpu->arch.complete_userspace_io;
- 		vcpu->arch.complete_userspace_io = NULL;
+ 	if (unlikely(vcpu->arch.mp_state == KVM_MP_STATE_UNINITIALIZED)) {
+ 		if (kvm_run->immediate_exit) {
+ 			r = -EINTR;
 @@ -10475,8 +10471,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
  	if (kvm_run->kvm_valid_regs)
  		store_regs(vcpu);
