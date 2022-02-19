@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E9B644BC6B7
+	by mail.lfdr.de (Postfix) with ESMTP id 6A9784BC6B6
 	for <lists+kvm@lfdr.de>; Sat, 19 Feb 2022 08:33:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241202AbiBSHc2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 19 Feb 2022 02:32:28 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:52808 "EHLO
+        id S241501AbiBSHdI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 19 Feb 2022 02:33:08 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:55800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229737AbiBSHc1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 19 Feb 2022 02:32:27 -0500
+        with ESMTP id S229830AbiBSHdC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 19 Feb 2022 02:33:02 -0500
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBF4046179;
-        Fri, 18 Feb 2022 23:32:07 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B84E254BF8;
+        Fri, 18 Feb 2022 23:32:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=sqAnJz8uVZ8Q/dp+lB46Xah1mFGaVnx8u72C4fMPl04=; b=rP4bE3sgbuBhtx1bYdIiik7xle
-        rKcv/uKt73U/LsdlA6ROBkmJq+fXwMS6uHEC8qmvy9pyt1GeMS0eaZzkVYzOAJGgXTgydYWLpQ9xh
-        HurXlTCgi/VzX9c7ZnTwLwXPRvSx+lAhnLjbn4JAkqTW0foCDvE2ZBJ40p3AE7tZtvO8K2TcRKduo
-        gd1hGdBcsevj0xXkYK8dKa1LXMn1VuAaCEh+PldyPGvcs1THypyd1CM1btGGAy3qQZOwpn8wKBdVg
-        oAJYM8fgMtO1fJLR0mgiyXnxCUuf4sCc9jW7yCKkusjUeHqpepsTWF8H7t9hundXbECdrLsDL/vda
-        j1FYt9Kw==;
+        bh=7eqdhnHI2SxSJ00bmOAf2xivBvyxyv0i9DUvwzQp/5c=; b=y8QNB+LFsQoRt0/Ug2MT7R5jm/
+        Pz50D6Dr1Owrb9/23C4jgfcqtSEBXwHo0qBohWZY48AK7rWIDK7cD4EW7HIMXlrN1YABbgedFv7GN
+        SfGQIre7H5o7+AoB5fFMsX+yT0jy/4/nsEEHgCRsi794ATO1E4BmyM5/9zWEoNKInh2w/Zsuvepj6
+        qVLr+n1wjm4gwEc7Fruj99WZ8y8hdPvBh9yy5DJSC40S5Z9QjwQmlmZlCh92tBXpy3tNcD/qOqwV3
+        C76W32A48372jZouRhAu//ZVsnbwjk8EiFdYucVqX6yJS8z5J/mD+cZoS4xozEg/+P5Y1Y2u6JW1c
+        PC9U+8OA==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nLKDi-00GMxk-09; Sat, 19 Feb 2022 07:31:54 +0000
-Date:   Fri, 18 Feb 2022 23:31:53 -0800
+        id 1nLKEM-00GN21-4h; Sat, 19 Feb 2022 07:32:34 +0000
+Date:   Fri, 18 Feb 2022 23:32:34 -0800
 From:   Christoph Hellwig <hch@infradead.org>
 To:     Lu Baolu <baolu.lu@linux.intel.com>
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -53,14 +53,15 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Jacob jun Pan <jacob.jun.pan@intel.com>,
         Daniel Vetter <daniel@ffwll.ch>,
         Robin Murphy <robin.murphy@arm.com>
-Subject: Re: [PATCH v6 01/11] iommu: Add dma ownership management interfaces
-Message-ID: <YhCc6dKyojInJe7u@infradead.org>
+Subject: Re: [PATCH v6 02/11] driver core: Add dma_cleanup callback in
+ bus_type
+Message-ID: <YhCdEmC2lYStmUSL@infradead.org>
 References: <20220218005521.172832-1-baolu.lu@linux.intel.com>
- <20220218005521.172832-2-baolu.lu@linux.intel.com>
+ <20220218005521.172832-3-baolu.lu@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220218005521.172832-2-baolu.lu@linux.intel.com>
+In-Reply-To: <20220218005521.172832-3-baolu.lu@linux.intel.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
@@ -72,27 +73,5 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The overall API and patch looks fine, but:
-
-> + * iommu_group_dma_owner_claimed() - Query group dma ownership status
-> + * @group: The group.
-> + *
-> + * This provides status query on a given group. It is racey and only for
-> + * non-binding status reporting.
-
-s/racey/racy/
-
-> + */
-> +bool iommu_group_dma_owner_claimed(struct iommu_group *group)
-> +{
-> +	unsigned int user;
-> +
-> +	mutex_lock(&group->mutex);
-> +	user = group->owner_cnt;
-> +	mutex_unlock(&group->mutex);
-> +
-> +	return user;
-> +}
-> +EXPORT_SYMBOL_GPL(iommu_group_dma_owner_claimed);
-
-Still no no need for the lock here.
+So we are back to the callback madness instead of the nice and simple
+flag?  Sigh.
