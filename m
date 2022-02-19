@@ -2,69 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 35CDC4BC345
-	for <lists+kvm@lfdr.de>; Sat, 19 Feb 2022 01:23:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EA9B94BC372
+	for <lists+kvm@lfdr.de>; Sat, 19 Feb 2022 01:31:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240343AbiBSAXO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Feb 2022 19:23:14 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:40988 "EHLO
+        id S240432AbiBSAbT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Feb 2022 19:31:19 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:43342 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234622AbiBSAXN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Feb 2022 19:23:13 -0500
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED3D06E34B
-        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 16:22:55 -0800 (PST)
-Received: by mail-pg1-x52b.google.com with SMTP id d16so9184321pgd.9
-        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 16:22:55 -0800 (PST)
+        with ESMTP id S240424AbiBSAbS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Feb 2022 19:31:18 -0500
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3F1A12E9E7
+        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 16:31:00 -0800 (PST)
+Received: by mail-pl1-x62d.google.com with SMTP id x11so8374489pll.10
+        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 16:31:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=PKozzWeotfW0H/XChUhKVfvoVAWx3v86SwCGH78y65k=;
-        b=YJr7T4GPIwDLm8MhhOOQayyse45vPIFv4uPo7XIm+miZ9JCsK1JdIoXK3rAPZLB5X4
-         A5CrKN2EGzd1cx5YPsdVhNoBP2nvJvTS/4QmYgq19BFsLKn3YLZYB9LJ8xgqA/uchgUP
-         ipCYRjqs/l0CY3IVqWzqCQtTcQeA0rNGszozpIa2Zx6netouSyuIUZq28gdMEIF9VStY
-         JKN6n7q0vweWxZEDIlaG78NXQVOwViN+B2oSQp+FSwOTjG11PB1XxaW1DqIS6HFxZ69S
-         qc5rB61GQSn1mjkgAWZJ8+Bx6Bjc+qVnwuCDcLglHfqIMXvEWaayvbu8KmVN9SES6FNm
-         H2KA==
+        bh=8aZ16UFG/qN8SDATqq+xbNjeyEK8F2U4AYeI8Q7W9Mw=;
+        b=HArcINaTCCHq36tGrqoEk7mWbIGxWYrZtNbvjNwmDNrmBHrKF3eJlEmgsdsTdOVnMq
+         gwU0FIiZ3lb3nTu1nqY4vVwwJnHUzAC66FxLehc7wPjjnFMa8nrC2vIKci/NI+cgdx0O
+         5mv4Zjt08mwVjFMhablIrVrKKZ0tJ7ZkS+DWkG6oHr8ISvrHErku953L0IAfmJ5H1IwE
+         tpcPZ0e+eZl3ta4rPpfIMbwMD/rATwJYXVln33HESHVem5AggYKENrLDu9hCiM6AeD+L
+         65Y6x9O5zH7k0GE7uQdIZ4ZIvC3mSThjkE1YaZhLPfx0/4C+JHfEqBOdh+HVxKvriHUS
+         0uSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=PKozzWeotfW0H/XChUhKVfvoVAWx3v86SwCGH78y65k=;
-        b=V9YJgD1pzWVOmJG4GJaQ9wO0bnsjDlhWBc3vPd9aJ4CVG8qFgbgNG8ufmI7dCsWnCX
-         o4wfAt0+I12iexTHqmUkYlQ8Khzq4sHv83da7OkwB85+E1XXkOV16ONIdryQCQIOpxid
-         4TYhf7rKIVyykb5lHJChQG5dfKk3UAU8wa3JKpucsmyH9mbhwfq+1R8yyGG/SOjgOkCM
-         NgzfGm8QysqIsfVzx8F+5TTeD9DmrhOYJBy74Ywqz7WYpL2UhgdNNC7I7cHhpniu1pT0
-         b456mh3SRBEAB2DV0A5cZoBUeCJsTScMjywjsrOqz1S+bqAPm9q/OhyNMx0x/RoMx0Ba
-         FXqQ==
-X-Gm-Message-State: AOAM533OiiCfRSX9xAPqt2Hs26QtEs6otqnwfhjj6QmS10cXK34x+6d0
-        T7Pr7j89VKs0cYXrZYoeXY1u0Q==
-X-Google-Smtp-Source: ABdhPJyam7kTYq5rTQAMSu2ALEE50Ee8PLPQAi1b3BzbfQybJRbIYqYjX74rsUr8nmhHftAfrz1Whw==
-X-Received: by 2002:a05:6a00:2391:b0:4a8:d88:9cd with SMTP id f17-20020a056a00239100b004a80d8809cdmr9879701pfc.11.1645230175301;
-        Fri, 18 Feb 2022 16:22:55 -0800 (PST)
+        bh=8aZ16UFG/qN8SDATqq+xbNjeyEK8F2U4AYeI8Q7W9Mw=;
+        b=aCts3Bej83iIkP5tJlahWGkwnRidx3keDB2USbaXIvJox9I4DH0Hz9gd63ufTWY59X
+         gh6qNO9R6f+yw2rrISxA/En8qH2BnCo8ZEXSVM9vufGmZQZApiSbA4f7oil7DqWmItKK
+         P0Am5EUZj4eAWMGgndWrioFxSGZuEJSY16zNOeXbPN8++l6vY1jN6mtA4p13+uYVU3Kh
+         wDrd/rxz/GSqxeMN+ozRK2z/jvDtXxAFIqCaAII0sjbFWc7h1UbcY5Cve8mbK3txfOHo
+         hEcTl8KqC4l/SGpmgkczBGciVqRDosGUc3wSKFaFIGNOsOtMk5WhCN8kGcPK11KG09xL
+         DQbA==
+X-Gm-Message-State: AOAM533f00qVh7NMW5kMWLkOzcLC5i9mQ/tIVGbpZehv9blBYnGp6QFX
+        JQveGPI+cRuOYzgdqJPkW3mGMg==
+X-Google-Smtp-Source: ABdhPJzSAZ6U4sxN5IKhc/gevNuxGBEtDf2fuX3iCreS0CIEogpHitT+hzBHDWMZx2JytIHaobdHSg==
+X-Received: by 2002:a17:90b:e89:b0:1b9:19d0:432c with SMTP id fv9-20020a17090b0e8900b001b919d0432cmr14919792pjb.154.1645230660174;
+        Fri, 18 Feb 2022 16:31:00 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id i17sm12004965pgv.8.2022.02.18.16.22.54
+        by smtp.gmail.com with ESMTPSA id x6sm4127791pfo.152.2022.02.18.16.30.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Feb 2022 16:22:54 -0800 (PST)
-Date:   Sat, 19 Feb 2022 00:22:50 +0000
+        Fri, 18 Feb 2022 16:30:59 -0800 (PST)
+Date:   Sat, 19 Feb 2022 00:30:56 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v2 13/18] KVM: x86: reset and reinitialize the MMU in
- __set_sregs_common
-Message-ID: <YhA4WkeqPxbA3IEJ@google.com>
-References: <20220217210340.312449-1-pbonzini@redhat.com>
- <20220217210340.312449-14-pbonzini@redhat.com>
+Cc:     kernel test robot <lkp@intel.com>,
+        Vipin Sharma <vipinsh@google.com>, kbuild-all@lists.01.org,
+        mkoutny@suse.com, tj@kernel.org, lizefan.x@bytedance.com,
+        hannes@cmpxchg.org, dmatlack@google.com, jiangshanlai@gmail.com,
+        kvm@vger.kernel.org, cgroups@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3] KVM: Move VM's worker kthreads back to the original
+ cgroup before exiting.
+Message-ID: <YhA6QIDME2wFbgIU@google.com>
+References: <20220217061616.3303271-1-vipinsh@google.com>
+ <202202172046.GuW8pHQc-lkp@intel.com>
+ <3113f00a-e910-2dfb-479f-268566445630@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220217210340.312449-14-pbonzini@redhat.com>
+In-Reply-To: <3113f00a-e910-2dfb-479f-268566445630@redhat.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -72,33 +78,33 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Thu, Feb 17, 2022, Paolo Bonzini wrote:
-> Do a full unload of the MMU in KVM_SET_SREGS and KVM_SEST_REGS2, in
-> preparation for not doing so in kvm_mmu_reset_context.  There is no
-> need to delay the reset until after the return, so do it directly in
-> the __set_sregs_common function and remove the mmu_reset_needed output
-> parameter.
+> On 2/17/22 13:34, kernel test robot wrote:
+> > > 5859		reattach_err = cgroup_attach_task_all(current->real_parent, current);
 > 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
+> This needs to be within rcu_dereference().
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+As Vipin found out the hard way, cgroup_attach_task_all() can't be inside an RCU
+critical section as it might sleep due to mutex_lock().
 
-> +	kvm_init_mmu(vcpu);
->  	if (update_pdptrs) {
->  		idx = srcu_read_lock(&vcpu->kvm->srcu);
-> -		if (is_pae_paging(vcpu)) {
-> +		if (is_pae_paging(vcpu))
->  			load_pdptrs(vcpu, kvm_read_cr3(vcpu));
-> -			*mmu_reset_needed = 1;
+My sched knowledge is sketchy at best, but I believe KVM just needs to guarantee
+the liveliness of real_parent when passing it to cgroup_attach_task_all().
+Presumably kthreadd_task can (in theory) be killed/exiting while this is going on,
+but at that point I doubt anyone cares much about cgroup accuracy.
 
-Eww (not your code, just this whole pile).  It might be worth calling out in the
-changelog that calling kvm_init_mmu() before load_pdptrs() will (subtly) _not_
-impact the functionality of load_pdptrs().  If the MMU is nested, kvm_init_mmu()
-will modify vcpu->arch.nested_mmu, whereas kvm_translate_gpa() will walk
-vcpu->arch.guest_mmu.  And if the MMU is not nested, kvm_translate_gpa() will not
-consuming vcpu->arch.mmu other than to check if it's == &guest_mmu.
+So I think this can be:
 
-> -		}
->  		srcu_read_unlock(&vcpu->kvm->srcu, idx);
->  	}
->  
+	rcu_read_lock();
+	parent = rcu_dereference(current->real_parent);
+	get_task_struct(parent);
+	rcu_read_unlock();
+
+	(void)cgroup_attach_task_all(parent, current);
+        put_task_struct(parent);
+
+
+> >    5860		if (reattach_err) {
+> >    5861			kvm_err("%s: cgroup_attach_task_all failed on reattach with err %d\n",
+> >    5862				__func__, reattach_err);
+
+Eh, I wouldn't bother logging the error, userspace can't take action on it, and
+if the system is OOM it's just more noise in the log to dig through.
