@@ -2,78 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B3734BC48D
-	for <lists+kvm@lfdr.de>; Sat, 19 Feb 2022 02:26:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 690CD4BC53C
+	for <lists+kvm@lfdr.de>; Sat, 19 Feb 2022 04:23:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240970AbiBSBZx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Feb 2022 20:25:53 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:44788 "EHLO
+        id S238396AbiBSDXS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Feb 2022 22:23:18 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:55482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240560AbiBSBZt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Feb 2022 20:25:49 -0500
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2122D1FC414
-        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 17:25:31 -0800 (PST)
-Received: by mail-pl1-x630.google.com with SMTP id j4so8440758plj.8
-        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 17:25:31 -0800 (PST)
+        with ESMTP id S230240AbiBSDXR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Feb 2022 22:23:17 -0500
+Received: from mail-vs1-xe34.google.com (mail-vs1-xe34.google.com [IPv6:2607:f8b0:4864:20::e34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CE775418B
+        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 19:22:59 -0800 (PST)
+Received: by mail-vs1-xe34.google.com with SMTP id w4so12058488vsq.1
+        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 19:22:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=eomPfhD5NoE4ReiW8wh04qcYSzWi8YJKF2p0Yl/Ax40=;
-        b=S8xauw5eRNvVHc2VyhqbjiCO2WntkzltXL1GUn0HpbTYNKQOyd6QrAnf0yjbIE8Hv8
-         jDEdSSo7qwP82g+foZZwj2v6xMiCARHcjSxxPB/EdYs+qaAWDRS4DNvVlE3MEMgdSXgs
-         PJRHrM0NpsOOKzMNWIsblly5o0bToNRMJH1Cs8MKvTiJLWzhyOUNrSi04Ou/NTHpAbgc
-         krd+t5Shs8I2aZ4wNxWpOBS6klYiV3r5nXX3+1CbWTS1WAw6UeyfIV3sz4gZMk4F3Mcy
-         a/24x+zQnNeQg6rfYUeWaOBVCSY1ifPqPBEdOkAUAz3qthMvrPfeOGCRiPdbnM7ruxTT
-         5GBA==
+        d=gmail.com; s=20210112;
+        h=mime-version:from:date:message-id:subject:to
+         :content-transfer-encoding;
+        bh=qjYa/2NkGCm4gmPOmla0FkCh+CgKJrjMOVp02V6Ou2s=;
+        b=LpAvbqmpycOC+7dXewxhz88wQm27FF4fyJVlzlmi5syeuW2ygmrn+RmjrZQG6li19I
+         VH4XCxsEWeZREYLWR2+/tLxasj3Y3IlD4Ge39WrWIgkNDitmwpcJLlMEchVlbKDi8b+2
+         SuypNCtIp7hFEuX3oGPw3IZvwsGKW/dKoGjIJ7wjNAwaPQZ/IZnKQvxMm66vTx+KQEgN
+         NEVhjDK3RoRYdY6mzz32f1W/QKV0ezyIn8YJaRin78A5ejW0tSHZ8SefVQu5WCQLv6N6
+         52kr/gy25s/VXf9GUyfYeb5sH9qmHmzwX7rV9HiaDu/dV8ZTA6NUXIE4fUurAmQtjJOC
+         4ryg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=eomPfhD5NoE4ReiW8wh04qcYSzWi8YJKF2p0Yl/Ax40=;
-        b=uM+yznlRI8pEfMldvQp8aTLASB+Go+dqfkbJpeUwwt6tRx8EJSGd1/HBXrhQecQxLA
-         +KXK7/aMiKnPU86MwmHzJiVwEkm6V7UoOkBrizUfwo9kJcXTSO6rU9YrTIO0awPy58Fy
-         6HDTcgIVUMqkOlS2c2TM9+NbFtEICJwX4u1vQZn9bingsf036+nlOFmL8dAgekSyLrid
-         jyTyoJFQokT3EwVU9l31IzVaijEjoGI3U9Utzd6bhRc0I51sc33sJ4zTscPZ/2R2T4DX
-         FASnvl9SCDaI+6U3imNTwmZ3QY3TiUj5P17TaiSzv3SG04bZNP+nO7JW2/FGEVKPFx8t
-         NGyw==
-X-Gm-Message-State: AOAM530XaugPfKTZoVj9V7lMeGGoXHrgiHBqr6EDHsn57gqYUd5Uj3Ia
-        E9OQRZlarSpgg1/kjDRtXgrUiQ==
-X-Google-Smtp-Source: ABdhPJwKZkMsYoqfoi2MYYRBw1N1Ik+gH49OpV+P7SHPFenQxJmGHAQpLwAa8F22627Bkfl62i8i3Q==
-X-Received: by 2002:a17:903:1210:b0:14e:e194:2f2c with SMTP id l16-20020a170903121000b0014ee1942f2cmr9832626plh.130.1645233930397;
-        Fri, 18 Feb 2022 17:25:30 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id kx15-20020a17090b228f00b001bbb3ec3422sm473914pjb.43.2022.02.18.17.25.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Feb 2022 17:25:29 -0800 (PST)
-Date:   Sat, 19 Feb 2022 01:25:26 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        leksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Peter Feiner <pfeiner@google.com>,
-        Andrew Jones <drjones@redhat.com>, maciej.szmigiero@oracle.com,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH 03/23] KVM: x86/mmu: Decompose kvm_mmu_get_page() into
- separate functions
-Message-ID: <YhBHBuObbNZLUQGR@google.com>
-References: <20220203010051.2813563-1-dmatlack@google.com>
- <20220203010051.2813563-4-dmatlack@google.com>
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to
+         :content-transfer-encoding;
+        bh=qjYa/2NkGCm4gmPOmla0FkCh+CgKJrjMOVp02V6Ou2s=;
+        b=TWzM5DRvFRbHzMmH2CWO+iwr5pYByKsFyXkyiAXvQHaIPuHQW0K60aoYWaxl8H4s0c
+         /bBM7sBDZvDJIdyZin1eA0WUcuzyEhYQkixdLh//yOlD/0haO0KAXJl+sebas4YjiUjf
+         3tj1hf7gnE2L5Tg5Zu4b2Rcic/qsAVpEHof3/fkY2U3TkgKizsPEOunhd2ah+CDQoJRk
+         rOC5mGlnUyzrAL2wfaIPJ4IKXCyBzMCqOeS8y/2I1dctDrW4oNUInhvziCmKfKvx4h1f
+         TzgkTYFCfsctS2tx8E1aqg6WNLoeHF8Sf92gcICe3MvoIIHJExZj+lFFkpCy7BLUSNu1
+         sfsA==
+X-Gm-Message-State: AOAM532+LxWRY5rutUbhSLN80u1aX0sMpF3XjehpOChaq7ASFI24ryIv
+        HEm22o/7WG/+7dpQcLH3BZiafm6j/hUlvRARWydL6TIFCs8n/s9h
+X-Google-Smtp-Source: ABdhPJy79ugbVD18xNKgeJJS7R7I9nPbJRri2hmZvqYNv5xJmUbCZ+Bw18AvqxwtMQU8vlxFZSr21upUZuxx/sHlYLA=
+X-Received: by 2002:a67:ee53:0:b0:31b:90ff:6a17 with SMTP id
+ g19-20020a67ee53000000b0031b90ff6a17mr4756824vsp.84.1645240978155; Fri, 18
+ Feb 2022 19:22:58 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220203010051.2813563-4-dmatlack@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+From:   =?UTF-8?B?RMSBdmlzIE1vc8SBbnM=?= <davispuh@gmail.com>
+Date:   Sat, 19 Feb 2022 05:22:47 +0200
+Message-ID: <CAOE4rSyvnWW6jcGjTvT3Z+=BtykfUN2A9v7d+qGn2rA_fipkTw@mail.gmail.com>
+Subject: WARN_ON(!svm->tsc_scaling_enabled)
+To:     kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -81,42 +62,57 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 03, 2022, David Matlack wrote:
-> Decompose kvm_mmu_get_page() into separate helper functions to increase
-> readability and prepare for allocating shadow pages without a vcpu
-> pointer.
-> 
-> Specifically, pull the guts of kvm_mmu_get_page() into 3 helper
-> functions:
-> 
-> kvm_mmu_get_existing_sp_mabye_unsync() -
+Hi,
 
-Heh, this ain't Java.   Just add two underscores to whatever it's primary caller
-ends up being named; that succinctly documents the relationship _and_ suggests
-that there's some "danger" in using the inner helper.
+I'm using:
 
->   Walks the page hash checking for any existing mmu pages that match the
->   given gfn and role. Does not attempt to synchronize the page if it is
->   unsync.
-> 
-> kvm_mmu_get_existing_sp() -
+kvm ignore_msrs=3D1
+kvm_amd nested=3D1
 
-Meh.  We should really be able to distill this down to something like
-kvm_mmu_find_sp().  I'm also tempted to say we go with shadow_page instead of
-"sp" for these helpers, so long as the line lengths don't get too brutal.  KVM
-uses "sp" and "spte" in lots of places, but I suspect it would be helpful to
-KVM newbies if the core routines actually spell out shadow_page, a la
-to_shadow_page().
+invtsc=3Don
+tsc-deadline=3Don
+tsc-scale=3Doff
+svm=3Don
 
->   Gets an existing page from the page hash if it exists and guarantees
->   the page, if one is returned, is synced.  Implemented as a thin wrapper
->   around kvm_mmu_get_existing_page_mabye_unsync. Requres access to a vcpu
->   pointer in order to sync the page.
-> 
-> kvm_mmu_create_sp()
+and my dmesg gets spammed with warnings like every second.
+Also sometimes guest VM freezes when booting.
 
-Probably prefer s/create/alloc to match existing terminology for allocating roots.
-Though looking through the series, there's going to be a lot of juggling of names.
 
-It probably makes sense to figure out what names we want to end up with and then
-work back from there.  I'll be back next week for a proper bikeshed session. :-)
+if (svm->tsc_ratio_msr !=3D kvm_default_tsc_scaling_ratio) {
+    WARN_ON(!svm->tsc_scaling_enabled);
+    nested_svm_update_tsc_ratio_msr(vcpu);
+}
+
+WARNING: CPU: 6 PID: 21336 at arch/x86/kvm/svm/nested.c:582
+nested_vmcb02_prepare_control (arch/x86/kvm/svm/nested.c:582
+(discriminator 1)) kvm_amd
+RIP: 0010:nested_vmcb02_prepare_control (arch/x86/kvm/svm/nested.c:582
+(discriminator 1)) kvm_amd
+Call Trace:
+ <TASK>
+enter_svm_guest_mode (arch/x86/kvm/svm/nested.c:480 (discriminator 3)
+arch/x86/kvm/svm/nested.c:491 (discriminator 3)
+arch/x86/kvm/svm/nested.c:647 (discriminator 3)) kvm_amd
+nested_svm_vmrun (arch/x86/kvm/svm/nested.c:726) kvm_amd
+kvm_arch_vcpu_ioctl_run (arch/x86/kvm/x86.c:10243 arch/x86/kvm/x86.c:10449)=
+ kvm
+kvm_vcpu_ioctl (arch/x86/kvm/../../../virt/kvm/kvm_main.c:3908) kvm
+__x64_sys_ioctl (fs/ioctl.c:52 fs/ioctl.c:874 fs/ioctl.c:860 fs/ioctl.c:860=
+)
+do_syscall_64 (arch/x86/entry/common.c:50 arch/x86/entry/common.c:80)
+? kvm_on_user_return (./arch/x86/include/asm/paravirt.h:194
+./arch/x86/include/asm/paravirt.h:227 arch/x86/kvm/x86.c:370) kvm
+? fire_user_return_notifiers (kernel/user-return-notifier.c:42
+(discriminator 11))
+? exit_to_user_mode_prepare (./arch/x86/include/asm/entry-common.h:53
+kernel/entry/common.c:209)
+? syscall_exit_to_user_mode (./arch/x86/include/asm/jump_label.h:55
+./arch/x86/include/asm/nospec-branch.h:302
+./arch/x86/include/asm/entry-common.h:94 kernel/entry/common.c:131
+kernel/entry/common.c:302)
+? do_syscall_64 (arch/x86/entry/common.c:87)
+
+Maybe this warning is wrong?
+
+Best regards,
+D=C4=81vis
