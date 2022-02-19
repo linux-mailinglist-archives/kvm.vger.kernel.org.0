@@ -2,51 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 858264BC711
-	for <lists+kvm@lfdr.de>; Sat, 19 Feb 2022 10:19:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DDC624BC718
+	for <lists+kvm@lfdr.de>; Sat, 19 Feb 2022 10:35:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241762AbiBSJSs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 19 Feb 2022 04:18:48 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:59994 "EHLO
+        id S239199AbiBSJak (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 19 Feb 2022 04:30:40 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:43732 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235598AbiBSJSo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 19 Feb 2022 04:18:44 -0500
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 677F749698
-        for <kvm@vger.kernel.org>; Sat, 19 Feb 2022 01:18:25 -0800 (PST)
-Received: by mail-io1-f69.google.com with SMTP id r11-20020a6b5d0b000000b0063daa93a4aaso6107977iob.8
-        for <kvm@vger.kernel.org>; Sat, 19 Feb 2022 01:18:25 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=GpEXurb/S08muFuH03jM5Ro3DWfUqzEGOWNpjHYvW64=;
-        b=nrTHsEz0NPAsBTpUiplHJoqW5cHWlJQqAxzuO9V+ZfbfJmUxEI5mYylOrIxq5v02tH
-         e2G4ssS8b8LgTg9XUFJ25yD2tFIGx24yIEHMpmex2wKvswYAFjSvOuo39n9idn7JsyGq
-         I+OGvYKq1npGoV5lBakyLIWZqf8k3By9D/xo9rOuQrlm8TT+NBCLBRpAhuhZVB9ZBM4m
-         u/bfrfbSCvq3cJWwvSgtkKFDKrThc2xAC84zdoQt7QsxgTCanifZPJZ7FgcdFvE6q6tJ
-         K4lilR3XnJzDltWVQ2jGqvG88I5aVLTvtSuwAIRdEc8ji2ORRdLTnt8PGZ3TyRtmZBlu
-         cRZg==
-X-Gm-Message-State: AOAM533mxfcuwUEVX3dJYqsdgE7vvSduNPXryYBV+QEMzm4333A7D7kW
-        yhB0+hsfGNKscm67m80Fv52m/oKOgAjyQ7DWGQov/tz9BcO1
-X-Google-Smtp-Source: ABdhPJy7o5V/bFBQz2imOBcrDumDi+pVL5Q7QH7hQubElYJ+VI+abvTgyXM7ya+foBKe3TBq5Xb+CdElFM80pygMpLGrta3hCrO/
+        with ESMTP id S234088AbiBSJah (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 19 Feb 2022 04:30:37 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 42A1EB3C
+        for <kvm@vger.kernel.org>; Sat, 19 Feb 2022 01:30:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645263017;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=Eykr1P2rsfvs48+0JEfbWc+i1A5Hcx0MrMIOUCrzskw=;
+        b=A7mQM1hbz5uEUlLVCTRFt1eTYZdAThPAMaw7zU7mapI92glny6aXxUIbZGHfeP0VW6tY6E
+        PjrJGVMM8blKmPQRhu1vINFJkbpqUK3dswCLBg9zcNCbKp4lC51GSqDvNdcm4aBatg1feh
+        MoAQ2ZXUCwd73SPMz7NsUAVX5SCkmQc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-196-myxr16Q1NVuGBLuVCycMeg-1; Sat, 19 Feb 2022 04:30:13 -0500
+X-MC-Unique: myxr16Q1NVuGBLuVCycMeg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 524A21006AA0;
+        Sat, 19 Feb 2022 09:30:12 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id AF2052A18C;
+        Sat, 19 Feb 2022 09:30:11 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     seanjc@google.com, Like Xu <likexu@tencent.com>
+Subject: [PATCH] KVM: x86: pull kvm->srcu read-side to kvm_arch_vcpu_ioctl_run
+Date:   Sat, 19 Feb 2022 04:29:56 -0500
+Message-Id: <20220219092956.366301-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1a66:b0:2c1:888d:b9cb with SMTP id
- w6-20020a056e021a6600b002c1888db9cbmr7494872ilv.74.1645262304803; Sat, 19 Feb
- 2022 01:18:24 -0800 (PST)
-Date:   Sat, 19 Feb 2022 01:18:24 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000003d82b405d85b7be9@google.com>
-Subject: [syzbot] general protection fault in vhost_iotlb_itree_first
-From:   syzbot <syzbot+bbb030fc51d6f3c5d067@syzkaller.appspotmail.com>
-To:     jasowang@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mst@redhat.com,
-        netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        virtualization@lists.linux-foundation.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
-        SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -54,94 +55,131 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
+kvm_arch_vcpu_ioctl_run is already doing srcu_read_lock/unlock in two
+places, namely vcpu_run and post_kvm_run_save, and a third is actually
+needed around the call to vcpu->arch.complete_userspace_io to avoid
+the following splat:
 
-syzbot found the following issue on:
+  WARNING: suspicious RCU usage
+  arch/x86/kvm/pmu.c:190 suspicious rcu_dereference_check() usage!
+  other info that might help us debug this:
+  rcu_scheduler_active = 2, debug_locks = 1
+  1 lock held by CPU 28/KVM/370841:
+  #0: ff11004089f280b8 (&vcpu->mutex){+.+.}-{3:3}, at: kvm_vcpu_ioctl+0x87/0x730 [kvm]
+  Call Trace:
+   <TASK>
+   dump_stack_lvl+0x59/0x73
+   reprogram_fixed_counter+0x15d/0x1a0 [kvm]
+   kvm_pmu_trigger_event+0x1a3/0x260 [kvm]
+   ? free_moved_vector+0x1b4/0x1e0
+   complete_fast_pio_in+0x8a/0xd0 [kvm]
 
-HEAD commit:    359303076163 tty: n_tty: do not look ahead for EOL charact..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=16b34b54700000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=da674567f7b6043d
-dashboard link: https://syzkaller.appspot.com/bug?extid=bbb030fc51d6f3c5d067
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+This splat is not at all unexpected, since complete_userspace_io
+callbacks can execute similar code to vmexits.  For example, SVM
+with nrips=false will call into the emulator from
+svm_skip_emulated_instruction().
 
-Unfortunately, I don't have any reproducer for this issue yet.
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+bbb030fc51d6f3c5d067@syzkaller.appspotmail.com
-
-general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN
-KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
-CPU: 1 PID: 17981 Comm: vhost-17980 Not tainted 5.17.0-rc4-syzkaller-00052-g359303076163 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-RIP: 0010:vhost_iotlb_itree_iter_first drivers/vhost/iotlb.c:19 [inline]
-RIP: 0010:vhost_iotlb_itree_first+0x29/0x280 drivers/vhost/iotlb.c:169
-Code: 00 41 57 41 56 41 55 49 89 d5 41 54 55 48 89 fd 53 48 89 f3 e8 e8 eb a0 fa 48 89 ea 48 b8 00 00 00 00 00 fc ff df 48 c1 ea 03 <80> 3c 02 00 0f 85 e8 01 00 00 4c 8b 65 00 4d 85 e4 0f 84 b3 01 00
-RSP: 0018:ffffc90004f57ac8 EFLAGS: 00010246
-RAX: dffffc0000000000 RBX: 30303030320a0028 RCX: ffffc900103dc000
-RDX: 0000000000000000 RSI: ffffffff86d72738 RDI: 0000000000000000
-RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000002
-R10: ffffffff86d62d88 R11: 0000000000000000 R12: ffff8880260e4d68
-R13: 303030305f3a3057 R14: dffffc0000000000 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f2d46121901 CR3: 000000001d652000 CR4: 00000000003506e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- translate_desc+0x11e/0x3e0 drivers/vhost/vhost.c:2054
- vhost_get_vq_desc+0x662/0x22c0 drivers/vhost/vhost.c:2300
- vhost_vsock_handle_tx_kick+0x277/0xa20 drivers/vhost/vsock.c:522
- vhost_worker+0x23d/0x3d0 drivers/vhost/vhost.c:372
- kthread+0x2e9/0x3a0 kernel/kthread.c:377
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:vhost_iotlb_itree_iter_first drivers/vhost/iotlb.c:19 [inline]
-RIP: 0010:vhost_iotlb_itree_first+0x29/0x280 drivers/vhost/iotlb.c:169
-Code: 00 41 57 41 56 41 55 49 89 d5 41 54 55 48 89 fd 53 48 89 f3 e8 e8 eb a0 fa 48 89 ea 48 b8 00 00 00 00 00 fc ff df 48 c1 ea 03 <80> 3c 02 00 0f 85 e8 01 00 00 4c 8b 65 00 4d 85 e4 0f 84 b3 01 00
-RSP: 0018:ffffc90004f57ac8 EFLAGS: 00010246
-RAX: dffffc0000000000 RBX: 30303030320a0028 RCX: ffffc900103dc000
-RDX: 0000000000000000 RSI: ffffffff86d72738 RDI: 0000000000000000
-RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000002
-R10: ffffffff86d62d88 R11: 0000000000000000 R12: ffff8880260e4d68
-R13: 303030305f3a3057 R14: dffffc0000000000 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f2d449f6718 CR3: 000000001d652000 CR4: 00000000003506e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	00 41 57             	add    %al,0x57(%rcx)
-   3:	41 56                	push   %r14
-   5:	41 55                	push   %r13
-   7:	49 89 d5             	mov    %rdx,%r13
-   a:	41 54                	push   %r12
-   c:	55                   	push   %rbp
-   d:	48 89 fd             	mov    %rdi,%rbp
-  10:	53                   	push   %rbx
-  11:	48 89 f3             	mov    %rsi,%rbx
-  14:	e8 e8 eb a0 fa       	callq  0xfaa0ec01
-  19:	48 89 ea             	mov    %rbp,%rdx
-  1c:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
-  23:	fc ff df
-  26:	48 c1 ea 03          	shr    $0x3,%rdx
-* 2a:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1) <-- trapping instruction
-  2e:	0f 85 e8 01 00 00    	jne    0x21c
-  34:	4c 8b 65 00          	mov    0x0(%rbp),%r12
-  38:	4d 85 e4             	test   %r12,%r12
-  3b:	0f                   	.byte 0xf
-  3c:	84                   	.byte 0x84
-  3d:	b3 01                	mov    $0x1,%bl
-
-
+Reported-by: Like Xu <likexu@tencent.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ arch/x86/kvm/x86.c | 19 ++++++++-----------
+ 1 file changed, 8 insertions(+), 11 deletions(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 82a9dcd8c67f..66efe1a67c1d 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9180,6 +9180,7 @@ static int dm_request_for_irq_injection(struct kvm_vcpu *vcpu)
+ 		likely(!pic_in_kernel(vcpu->kvm));
+ }
+ 
++/* Called within kvm->srcu read side.  */
+ static void post_kvm_run_save(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_run *kvm_run = vcpu->run;
+@@ -9188,16 +9189,9 @@ static void post_kvm_run_save(struct kvm_vcpu *vcpu)
+ 	kvm_run->cr8 = kvm_get_cr8(vcpu);
+ 	kvm_run->apic_base = kvm_get_apic_base(vcpu);
+ 
+-	/*
+-	 * The call to kvm_ready_for_interrupt_injection() may end up in
+-	 * kvm_xen_has_interrupt() which may require the srcu lock to be
+-	 * held, to protect against changes in the vcpu_info address.
+-	 */
+-	vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
+ 	kvm_run->ready_for_interrupt_injection =
+ 		pic_in_kernel(vcpu->kvm) ||
+ 		kvm_vcpu_ready_for_interrupt_injection(vcpu);
+-	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
+ 
+ 	if (is_smm(vcpu))
+ 		kvm_run->flags |= KVM_RUN_X86_SMM;
+@@ -9815,6 +9809,7 @@ void __kvm_request_immediate_exit(struct kvm_vcpu *vcpu)
+ EXPORT_SYMBOL_GPL(__kvm_request_immediate_exit);
+ 
+ /*
++ * Called within kvm->srcu read side.
+  * Returns 1 to let vcpu_run() continue the guest execution loop without
+  * exiting to the userspace.  Otherwise, the value will be returned to the
+  * userspace.
+@@ -10193,6 +10188,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 	return r;
+ }
+ 
++/* Called within kvm->srcu read side.  */
+ static inline int vcpu_block(struct kvm *kvm, struct kvm_vcpu *vcpu)
+ {
+ 	bool hv_timer;
+@@ -10252,12 +10248,12 @@ static inline bool kvm_vcpu_running(struct kvm_vcpu *vcpu)
+ 		!vcpu->arch.apf.halted);
+ }
+ 
++/* Called within kvm->srcu read side.  */
+ static int vcpu_run(struct kvm_vcpu *vcpu)
+ {
+ 	int r;
+ 	struct kvm *kvm = vcpu->kvm;
+ 
+-	vcpu->srcu_idx = srcu_read_lock(&kvm->srcu);
+ 	vcpu->arch.l1tf_flush_l1d = true;
+ 
+ 	for (;;) {
+@@ -10291,8 +10287,6 @@ static int vcpu_run(struct kvm_vcpu *vcpu)
+ 		}
+ 	}
+ 
+-	srcu_read_unlock(&kvm->srcu, vcpu->srcu_idx);
+-
+ 	return r;
+ }
+ 
+@@ -10398,6 +10392,7 @@ static void kvm_put_guest_fpu(struct kvm_vcpu *vcpu)
+ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_run *kvm_run = vcpu->run;
++	struct kvm *kvm = vcpu->kvm;
+ 	int r;
+ 
+ 	vcpu_load(vcpu);
+@@ -10450,6 +10445,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 		}
+ 	}
+ 
++	vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
+ 	if (unlikely(vcpu->arch.complete_userspace_io)) {
+ 		int (*cui)(struct kvm_vcpu *) = vcpu->arch.complete_userspace_io;
+ 		vcpu->arch.complete_userspace_io = NULL;
+@@ -10475,8 +10471,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 	if (kvm_run->kvm_valid_regs)
+ 		store_regs(vcpu);
+ 	post_kvm_run_save(vcpu);
+-	kvm_sigset_deactivate(vcpu);
++	srcu_read_unlock(&kvm->srcu, vcpu->srcu_idx);
+ 
++	kvm_sigset_deactivate(vcpu);
+ 	vcpu_put(vcpu);
+ 	return r;
+ }
+-- 
+2.31.1
+
