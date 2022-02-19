@@ -2,76 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0AEBF4BC729
-	for <lists+kvm@lfdr.de>; Sat, 19 Feb 2022 10:42:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3BCF04BC777
+	for <lists+kvm@lfdr.de>; Sat, 19 Feb 2022 11:05:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234214AbiBSJmp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 19 Feb 2022 04:42:45 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:51618 "EHLO
+        id S239718AbiBSKEN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 19 Feb 2022 05:04:13 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:56930 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231863AbiBSJmn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 19 Feb 2022 04:42:43 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 958DA6622E
-        for <kvm@vger.kernel.org>; Sat, 19 Feb 2022 01:42:24 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 4F276B80881
-        for <kvm@vger.kernel.org>; Sat, 19 Feb 2022 09:42:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E747CC004E1;
-        Sat, 19 Feb 2022 09:42:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1645263742;
-        bh=JHGMB5wyXhuUeu/pJD4Q++IqqHBbSh5JNv1xBjTAPEA=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=CSFEtGbLDSfNNskaealbTBWwp5XwQV4VUJ6arAPCR4vH1cHFzWXl3FW/exhom/Tc3
-         AAsAhGeSLlPWBb0j4cX8KN2yKftFgH8nLbv5fprXL0I7sQAPJtdo6XOcuhDEV6lIwE
-         IhICjv5j+WER0/YYudn+WmplDvUF2u414sqrX8dy538qwrrV1Gjw40PzusVIld4dhl
-         dSC03amXgOTf6aBwicxF+zyhxTEQPo+UoXU7A7ALYXHPqF1jd3dlTGThhCAlhFxS/y
-         ptnRQgnG8PpTTI7YX2a+7q7tIYziIMAI5FAuJk6Rf08W1fTQImOrAhAJZ1Siwox6c+
-         s/YKMlwyu9JNA==
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1nLMFv-008xGO-Ul; Sat, 19 Feb 2022 09:42:20 +0000
+        with ESMTP id S233728AbiBSKEL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 19 Feb 2022 05:04:11 -0500
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF8E74F9F4;
+        Sat, 19 Feb 2022 02:03:52 -0800 (PST)
+Received: by mail-ed1-x52c.google.com with SMTP id c6so16866711edk.12;
+        Sat, 19 Feb 2022 02:03:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=e8sLN6vkZrz7khSRwbfrA2x7wxsnzRm53OM6VfGG9Ts=;
+        b=dqfgGPL9Inj94Y03GiY39z2k92/jaNO8XsInxdyb90ADDo0ZnLZl8OALy2xrARDhIH
+         bHDrlMkuHcmEktY/E5z+QeNMwAFGYTUUvf2yiGDEp0WQMQwRxtrpDjCjdOu4ylpiYlKM
+         pOvTK3I1ZnxC4WUZVhB/uK9mxtLSrjRM8RXDjGxXgo3jN7AXupAYrwBblr2I1l6Xs38s
+         S53+M6id7Fu58rNF8/f63u2ZdNCASa23o3ytZzchZglZ+XACgHug908ERD5dvTcTFvQ/
+         ZWZiIU5Uu/hcUjwh8PN7Kh6/0KcsM7fo84M9t06n1Pw6bazJx4Rdm6kWv0Bc+Zk9rcol
+         L+pg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=e8sLN6vkZrz7khSRwbfrA2x7wxsnzRm53OM6VfGG9Ts=;
+        b=0i/m763cJ90I6nI7+CeiXeY2dwizwFw59NJfo8s3j6fSNHPhQ/H14U1pBIyvwKWz1k
+         8u23jxHVjshGSaRpx1iz3hLQJksdS7+NP5rRigD7M3n5DFjIh9VWfw21PhoIkb+BqwXp
+         5P5JQLZl5bDg8nsXvqm3lIJlc/n6Xylg3S/QlgFetoWGjwQXR+Oc+LS/jS6QtvEcSvqa
+         FPIIVATNl4gKyUYQ1kOeowU/J8BOHhBPxFADZtaBcLBfUmL3KjhSXsZ0V9leRJsUxJcF
+         gZ9ZME3VoHaloj2Ka3xad5QRVRRlkGlzWkqMflv7hmYkRe9sfypImwDunCke6J/C828a
+         HI/A==
+X-Gm-Message-State: AOAM532jfYarMk3FbnP6J6TNlhL4N4arB568KKgmjHOhMHQfQCz71yg1
+        qnmYxBoveYYrj1lcQhUVSAc=
+X-Google-Smtp-Source: ABdhPJwYTq/zuccUutieRVqseJ1kObi/ppnw9r/8MTAdtkU1qc5An4S35BM4Q2IKvnGmxml5rAFc7Q==
+X-Received: by 2002:aa7:d3d9:0:b0:410:7a81:c0cf with SMTP id o25-20020aa7d3d9000000b004107a81c0cfmr12150696edr.177.1645265031366;
+        Sat, 19 Feb 2022 02:03:51 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.googlemail.com with ESMTPSA id z11sm6194528edd.75.2022.02.19.02.03.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 19 Feb 2022 02:03:50 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <55ef796b-6433-b72f-6f5c-b7499284c9a4@redhat.com>
+Date:   Sat, 19 Feb 2022 11:03:49 +0100
 MIME-Version: 1.0
-Date:   Sat, 19 Feb 2022 09:42:19 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Reiji Watanabe <reijiw@google.com>
-Cc:     Oliver Upton <oupton@google.com>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>
-Subject: Re: [PATCH 2/2] KVM: arm64: selftests: Introduce get_set_regs_perf
- test
-In-Reply-To: <CAAeT=FxbbBq0sxUZAOSJW_wM+6M=xQe-p+=aeqpg=-y9VbpnnA@mail.gmail.com>
-References: <20220217034947.180935-1-reijiw@google.com>
- <20220217034947.180935-2-reijiw@google.com> <Yg3Uer/K6n/h6oBz@google.com>
- <874k4x502u.wl-maz@kernel.org>
- <CAAeT=FxbbBq0sxUZAOSJW_wM+6M=xQe-p+=aeqpg=-y9VbpnnA@mail.gmail.com>
-User-Agent: Roundcube Webmail/1.4.13
-Message-ID: <3878ff49741733d6dd76aae57b594cb2@kernel.org>
-X-Sender: maz@kernel.org
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH v2 14/18] KVM: x86/mmu: avoid indirect call for get_cr3
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20220217210340.312449-1-pbonzini@redhat.com>
+ <20220217210340.312449-15-pbonzini@redhat.com> <YhAB1d1/nQbx6yvk@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <YhAB1d1/nQbx6yvk@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: reijiw@google.com, oupton@google.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, drjones@redhat.com, pbonzini@redhat.com, will@kernel.org, pshier@google.com, ricarkol@google.com, jingzhangos@google.com, rananta@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -79,45 +76,62 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Reiji,
-
-On 2022-02-19 04:50, Reiji Watanabe wrote:
-> Hi Marc,
+On 2/18/22 21:30, Sean Christopherson wrote:
+> On Thu, Feb 17, 2022, Paolo Bonzini wrote:
+>> Most of the time, calls to get_guest_pgd result in calling
+>> kvm_read_cr3 (the exception is only nested TDP).  Hardcode
+>> the default instead of using the get_cr3 function, avoiding
+>> a retpoline if they are enabled.
+>>
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>> ---
+>>   arch/x86/kvm/mmu.h             | 13 +++++++++++++
+>>   arch/x86/kvm/mmu/mmu.c         | 15 +++++----------
+>>   arch/x86/kvm/mmu/paging_tmpl.h |  2 +-
+>>   arch/x86/kvm/x86.c             |  2 +-
+>>   4 files changed, 20 insertions(+), 12 deletions(-)
+>>
+>> diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+>> index 1d0c1904d69a..1808d6814ddb 100644
+>> --- a/arch/x86/kvm/mmu.h
+>> +++ b/arch/x86/kvm/mmu.h
+>> @@ -116,6 +116,19 @@ static inline void kvm_mmu_load_pgd(struct kvm_vcpu *vcpu)
+>>   					  vcpu->arch.mmu->shadow_root_level);
+>>   }
+>>   
+>> +static inline gpa_t __kvm_mmu_get_guest_pgd(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu)
+>> +{
 > 
-> On Thu, Feb 17, 2022 at 1:12 AM Marc Zyngier <maz@kernel.org> wrote:
->> 
->> On Thu, 17 Feb 2022 04:52:10 +0000,
->> Oliver Upton <oupton@google.com> wrote:
->> 
->> > Would it make sense to test some opt-in capabilities that expose
->> > additional registers (PMU, SVE, etc.)?
->> 
->> I think this is important. System registers are usually saved/restored
+> I'd prefer to do what we do for page faults.  That approach avoids the need for a
+> comment to document NULL and avoids a conditional when RETPOLINE is not enabled.
 > 
-> Yes, I will fix the test to include registers for opt-in features
-> when supported.
+> Might be worth renaming get_cr3 => get_guest_cr3 though.
+
+I did it this way to avoid a slightly gratuitous extern function just 
+because kvm_mmu_get_guest_pgd and kvm_read_cr3 are both inline.  But at 
+least it's not an export since there are no callers in vmx/svm, so it's 
+okay to do it as you suggested.
+
+> #ifdef CONFIG_RETPOLINE
+> 	if (mmu->get_guest_pgd = get_guest_cr3)
+> 		return kvm_read_cr3(vcpu);
+> #endif
+> 	return mmu->get_guest_pgd(vcpu);
 > 
->> in groups, and due to the way we walk the sysreg array, timings are
->> unlikely to be uniform. Getting a grip on that could help restructure
->> the walking if required (either per-group arrays, or maybe a tree
->> structure).
 > 
-> The biggest system register table that I know is sys_reg_descs[],
-> and KVM_SET_ONE_REG/KVM_GET_ONE_REG/emulation code already uses
-> binary search to find the target entry.  So, the search itself
-> isn't that bad.  The difference between the min and the max
-> latency of KVM_GET_ONE_REG for the registers is always around
-> 200nsec on Ampere Altra machine as far as I checked.
+>> +	if (!mmu->get_guest_pgd)
+>> +		return kvm_read_cr3(vcpu);
+>> +	else
+>> +		return mmu->get_guest_pgd(vcpu);
+>> +}
+>> +
+>> +static inline gpa_t kvm_mmu_get_guest_pgd(struct kvm_vcpu *vcpu)
+>> +{
+>> +	return __kvm_mmu_get_guest_pgd(vcpu, vcpu->arch.mmu);
+> 
+> I'd much prefer we don't provide an @vcpu-only variant and force the caller to
+> provide the mmu.
 
-Even if it is OK so far, it is bound to get worse over time, as
-the architecture keeps adding all sort of things that we'll
-eventually have to save/restore.
+No problem.
 
-I see this test as a way to monitor this trend and work out when
-we need to invest in something better.
-
-Thanks,
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
+Paolo
