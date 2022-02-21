@@ -2,73 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DE6274BE215
-	for <lists+kvm@lfdr.de>; Mon, 21 Feb 2022 18:54:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 23CCC4BE7EB
+	for <lists+kvm@lfdr.de>; Mon, 21 Feb 2022 19:04:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378711AbiBUPBp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Feb 2022 10:01:45 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:60646 "EHLO
+        id S1378735AbiBUPEP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Feb 2022 10:04:15 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:40602 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1378712AbiBUPBm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Feb 2022 10:01:42 -0500
-Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80D32220F2;
-        Mon, 21 Feb 2022 07:01:13 -0800 (PST)
-Received: by mail-ej1-x632.google.com with SMTP id gb39so34054496ejc.1;
-        Mon, 21 Feb 2022 07:01:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=BPtReENKQxU85jH52Zt/PBlxinx1W4smwidmo2G0UFE=;
-        b=ZYjkp8GXtoEuZsbdo36X31dNE58cEe2rktTPHZPI8K7LlbRXI15qdvpryRujuzD5yW
-         MdX9ot123swKKMOIRmHlnVw2I3OlHKCQdh+V6bOc4voyapFiJBSe1KzZCT7qANOMaO+Q
-         kOwtN5IYE/ZM+ureSYHG2urtq303JzY7H6NemmADZPUtWEqszgXfQvnqzUmR/60GtVec
-         UVuy7e64UNSgHsAs67hjzEiJZ3soH0Pbekm2OYiANrDp+oRtkz7205AR12t9jKvIp5c5
-         Ke+JBjYVg/gsEk6X2kD3TYxBQue5nRPinL5dL9W0uNV3tJ0R1uXsmBaaIVlj6/yq17yP
-         Cyrg==
+        with ESMTP id S1378694AbiBUPEN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Feb 2022 10:04:13 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 44312BF6B
+        for <kvm@vger.kernel.org>; Mon, 21 Feb 2022 07:03:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645455828;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=mr/1CQBSFnmPM+qg+tsLOOwlovqhtz4/EPWnJbnRwCM=;
+        b=JegRAUzgndjmGQi91V2l3UVjltxeWYdyHL5jbTer9MqW+oLb5DQGw2qexOrrNboj8zMWaz
+        CKgFyke6rro/5y8yfcLO8DY7v5sEbaF1khwE6vA7Ma4VTAhQ5xFL4Kc3HBjSS4ZLTZ0MvG
+        eXZYh2yqi/QgQHLO6iw9poh0F2yrMdM=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-54-MvT3LTfTM_Cl9EyyozbZtg-1; Mon, 21 Feb 2022 10:03:47 -0500
+X-MC-Unique: MvT3LTfTM_Cl9EyyozbZtg-1
+Received: by mail-wr1-f71.google.com with SMTP id g17-20020adfa591000000b001da86c91c22so7528902wrc.5
+        for <kvm@vger.kernel.org>; Mon, 21 Feb 2022 07:03:46 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=BPtReENKQxU85jH52Zt/PBlxinx1W4smwidmo2G0UFE=;
-        b=zFcm/BBmwaAKg1tAMXHl29ag3aoP/2D7q0ka8TRkRW7gseEQHP31CNeY9rUAgYhs0C
-         gz5THIYN/IUHRe0XUNc8U+gNBJiY1HE15bxXRSRdXK2Qz9M7W4nd+1FIpppv2qjIjHVN
-         kMSQv4rzjXkdJkhRka1+uVtrO5sRj5C40B+SgjCyeIDjS14O7xbhwAlLqnTsY21HVlz9
-         KjiqXQCtNWbB3GmVeLWh9O30EzBazs++U2mMwUhTENVpDOIpNgg/MjOoX8SbDeq7pNF3
-         +N8q3fJWoviBQyVgKziLQg3QfzNvuXoczFoU6O/7GPOhGNqRiIEP2FQ+Lh07uc+Pquew
-         WufQ==
-X-Gm-Message-State: AOAM533GDxOJw9HZbGyy9mN00DnTlKLTQKhvULbGxowyGxTZnu9v8xAR
-        QNu42iTFXSmOPEltXcT4//vMaLn1kvg=
-X-Google-Smtp-Source: ABdhPJxNhaNGp2hDd0eH4fg7BlyY2bIDbqrZh0nD6r+9ifRR9vGIu7fml3FGrd4hK2xU3AwZGJWCOg==
-X-Received: by 2002:a17:906:1393:b0:6ce:eac4:4ebe with SMTP id f19-20020a170906139300b006ceeac44ebemr15622997ejc.643.1645455671858;
-        Mon, 21 Feb 2022 07:01:11 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id j18sm5261552ejc.166.2022.02.21.07.01.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Feb 2022 07:01:11 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <3863d7f1-a551-129d-d218-c4cce40041d3@redhat.com>
-Date:   Mon, 21 Feb 2022 16:01:10 +0100
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=mr/1CQBSFnmPM+qg+tsLOOwlovqhtz4/EPWnJbnRwCM=;
+        b=i2Ya+f908E3yZUgCEuwoBvJsKtJzznP1N8VMjzqW0u/XHkZeFJDHF0w4SkwtjnZaXi
+         bcPTUhW4kv6bJQjyIJ3PEd/zr/iLkMdgVwR8tY/PBUvSQ0QV9/7vYOB+F6aQywPaqW1/
+         D6TOln0ERopeX841dOOnH5FLKUDf0UOpMiw625mK9wh/Ex7TBLMTIliSGgGSKTackpQ6
+         UpqF8AYC+ZisTayeWG/RdIX8z+qeOIk2YYoxGaecRJKpgL573QtWf2MQy0SSWKVYLbCk
+         /imN93Dlq3KM6L21WAq1/AUPv4uQDfx83tVf5sYMKdj7FeonsU77rjllx318lt043agH
+         nleg==
+X-Gm-Message-State: AOAM530gEKszOMMnzbZblol/RJ+he63ldF2sfyD+4BidIdRORXFv0Zbg
+        oFRqF1mSImQR/NEBKinA+VtbFxi6ZCNCAJfHw2z+sdkF5WfEVwt5EvW0QtUuPyaLXs3/YRij8+j
+        UK8a7R8kmNcfy
+X-Received: by 2002:adf:fbd0:0:b0:1e6:8ec3:570 with SMTP id d16-20020adffbd0000000b001e68ec30570mr17166371wrs.396.1645455825784;
+        Mon, 21 Feb 2022 07:03:45 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzV1pmRzjoWzZVTM1CFvom60MmV/YsWRRt4E8ofGC8c5/iOYk+2qzFWrG5At7u3dNopXHgX7g==
+X-Received: by 2002:adf:fbd0:0:b0:1e6:8ec3:570 with SMTP id d16-20020adffbd0000000b001e68ec30570mr17166351wrs.396.1645455825521;
+        Mon, 21 Feb 2022 07:03:45 -0800 (PST)
+Received: from redhat.com ([2.55.129.240])
+        by smtp.gmail.com with ESMTPSA id b7sm39967572wrp.23.2022.02.21.07.03.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Feb 2022 07:03:43 -0800 (PST)
+Date:   Mon, 21 Feb 2022 10:03:39 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     linux-kernel@vger.kernel.org,
+        Mike Christie <michael.christie@oracle.com>,
+        Jason Wang <jasowang@redhat.com>, netdev@vger.kernel.org,
+        Asias He <asias@redhat.com>,
+        virtualization@lists.linux-foundation.org,
+        Stefan Hajnoczi <stefanha@redhat.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH] vhost/vsock: don't check owner in vhost_vsock_stop()
+ while releasing
+Message-ID: <20220221094829-mutt-send-email-mst@kernel.org>
+References: <20220221114916.107045-1-sgarzare@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH v2 17/18] KVM: x86: flush TLB separately from MMU reset
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20220217210340.312449-1-pbonzini@redhat.com>
- <20220217210340.312449-18-pbonzini@redhat.com> <YhAyX+Bc3x4+ZMTG@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YhAyX+Bc3x4+ZMTG@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220221114916.107045-1-sgarzare@redhat.com>
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,21 +80,82 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/19/22 00:57, Sean Christopherson wrote:
-> I appreciate the cleverness in changing only a single like, but I think both
-> pieces warrant a mention.  How 'bout this, to squeak by with two lines?
+On Mon, Feb 21, 2022 at 12:49:16PM +0100, Stefano Garzarella wrote:
+> vhost_vsock_stop() calls vhost_dev_check_owner() to check the device
+> ownership. It expects current->mm to be valid.
 > 
-> 	/*
-> 	 * Reset the MMU and flush the TLB if paging was enabled (INIT only, as
-> 	 * CR0 is currently guaranteed to be '0' prior to RESET).  Unlike the
+> vhost_vsock_stop() is also called by vhost_vsock_dev_release() when
+> the user has not done close(), so when we are in do_exit(). In this
+> case current->mm is invalid and we're releasing the device, so we
+> should clean it anyway.
+> 
+> Let's check the owner only when vhost_vsock_stop() is called
+> by an ioctl.
 
-Let's just make it clearer:
 
-          * On the standard CR0/CR4/EFER modification paths, there are several
-          * complex conditions determining whether the MMU has to be reset and/or
-          * which PCIDs have to be flushed.  However, CR0.WP and the paging-related
-          * bits in CR4 and EFER are irrelevant if CR0.PG was '0'; and a reset+flush
-          * is needed anyway if CR0.PG was '1' (which can only happen for INIT, as
-          * CR0 will be '0' prior to RESET).  So we only need to check CR0.PG here.
 
-Paolo
+
+> Fixes: 433fc58e6bf2 ("VSOCK: Introduce vhost_vsock.ko")
+> Cc: stable@vger.kernel.org
+> Reported-by: syzbot+1e3ea63db39f2b4440e0@syzkaller.appspotmail.com
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> ---
+>  drivers/vhost/vsock.c | 14 ++++++++------
+>  1 file changed, 8 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+> index d6ca1c7ad513..f00d2dfd72b7 100644
+> --- a/drivers/vhost/vsock.c
+> +++ b/drivers/vhost/vsock.c
+> @@ -629,16 +629,18 @@ static int vhost_vsock_start(struct vhost_vsock *vsock)
+>  	return ret;
+>  }
+>  
+> -static int vhost_vsock_stop(struct vhost_vsock *vsock)
+> +static int vhost_vsock_stop(struct vhost_vsock *vsock, bool check_owner)
+
+>  {
+>  	size_t i;
+>  	int ret;
+>  
+>  	mutex_lock(&vsock->dev.mutex);
+>  
+> -	ret = vhost_dev_check_owner(&vsock->dev);
+> -	if (ret)
+> -		goto err;
+> +	if (check_owner) {
+> +		ret = vhost_dev_check_owner(&vsock->dev);
+> +		if (ret)
+> +			goto err;
+> +	}
+>  
+>  	for (i = 0; i < ARRAY_SIZE(vsock->vqs); i++) {
+>  		struct vhost_virtqueue *vq = &vsock->vqs[i];
+> @@ -753,7 +755,7 @@ static int vhost_vsock_dev_release(struct inode *inode, struct file *file)
+>  	 * inefficient.  Room for improvement here. */
+>  	vsock_for_each_connected_socket(vhost_vsock_reset_orphans);
+>  
+> -	vhost_vsock_stop(vsock);
+
+Let's add an explanation:
+
+When invoked from release we can not fail so we don't
+check return code of vhost_vsock_stop.
+We need to stop vsock even if it's not the owner.
+
+> +	vhost_vsock_stop(vsock, false);
+>  	vhost_vsock_flush(vsock);
+>  	vhost_dev_stop(&vsock->dev);
+>  
+> @@ -868,7 +870,7 @@ static long vhost_vsock_dev_ioctl(struct file *f, unsigned int ioctl,
+>  		if (start)
+>  			return vhost_vsock_start(vsock);
+>  		else
+> -			return vhost_vsock_stop(vsock);
+> +			return vhost_vsock_stop(vsock, true);
+>  	case VHOST_GET_FEATURES:
+>  		features = VHOST_VSOCK_FEATURES;
+>  		if (copy_to_user(argp, &features, sizeof(features)))
+> -- 
+> 2.35.1
+
