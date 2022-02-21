@@ -2,146 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 56ED24BE403
-	for <lists+kvm@lfdr.de>; Mon, 21 Feb 2022 18:58:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 825F74BE97A
+	for <lists+kvm@lfdr.de>; Mon, 21 Feb 2022 19:07:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235979AbiBULtr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Feb 2022 06:49:47 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:44774 "EHLO
+        id S1356824AbiBULwi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Feb 2022 06:52:38 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:49628 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231810AbiBULtp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Feb 2022 06:49:45 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3F0C31EEE8
-        for <kvm@vger.kernel.org>; Mon, 21 Feb 2022 03:49:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645444161;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=12CjzIfm9u48VcTin9bYn/mbYSt9Byr6lQhm+jL2Tdg=;
-        b=ghOanVcIIx1ygXHpL+lBeLbLRsEqPrrhybxOerlaygsFE7K7D64LfQTQYsj6ZImacVYL48
-        CByO/0JDZjxim7GudoDBmOu1Ue3adE97t5jCFzOTdwLaUUL6Yyefdf6H5QgFi4/HxsfKJR
-        i4r/wwgdIOMT3i7bJVwYzNTWUHspEfc=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-257-aAXovElGOlWlRpU29zOCeA-1; Mon, 21 Feb 2022 06:49:20 -0500
-X-MC-Unique: aAXovElGOlWlRpU29zOCeA-1
-Received: by mail-wr1-f70.google.com with SMTP id s22-20020adf9796000000b001e7e75ab581so7242925wrb.23
-        for <kvm@vger.kernel.org>; Mon, 21 Feb 2022 03:49:19 -0800 (PST)
+        with ESMTP id S1356845AbiBULwg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Feb 2022 06:52:36 -0500
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E5A31FA42;
+        Mon, 21 Feb 2022 03:52:13 -0800 (PST)
+Received: by mail-pl1-x62e.google.com with SMTP id m11so9144563pls.5;
+        Mon, 21 Feb 2022 03:52:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Q9EVapK/pPTWvrGkIuS0gkdfg4WRi8A2dJLpE97G/j0=;
+        b=c15fHKyorTTeBgbqVh4Saep5MTSKXM0Wpe+4pl01EVerXlX8i2TOvQ54kAJYb9tQ/H
+         5Ul7FDxOv675f2fXPh+7k9Q/RU02OSTWpNHaFN/97Rrq1N8kRTHx65H4+5qj7VidNcSX
+         K862UhDRMAbhxuwimfhfGhzd5hb3JtHNqg1KXO+hudB7gwasY7Gzgz/3MNU5ZElsudss
+         SyqwgPQPff9iSjZjxJIeV/8dKW0gaOhRNvHPAwOYElMeOLtyd4KYUJAozWOdwo5h7j6Z
+         0ye5DoTT5y9rDL3jN8o1gOGsngTXHwTwmFohoA3qDSD9fqPdRFNP+joNUBW00YKoy1cP
+         BAoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=12CjzIfm9u48VcTin9bYn/mbYSt9Byr6lQhm+jL2Tdg=;
-        b=KV8F29H190fLKxAT1R69DUVOg79KrAstdK+4//9t6BygemW1FzgF46+sHrS3yjyuAw
-         GyEbhondi9y+cRIYFCepIQRzVGGsmzVaM0SA3ZWGaX/jNeXtnp67vn3GKR6YfZE+snz9
-         UYMkbHSxoQLce/K+gD3UIIqIvLGM7VvNXr6IaI7sPv3ov95tVSeERdDZPxJljBMihhkW
-         FGN/ZN6uLVLQkKhlG6hYRUFBa/VjKbcW4E9MYd48QCOZgh2QubmFeskGNPLmmrTmKMmj
-         6DMi1LfAYjuIAjZhc4eRtRH1qxk4EmmGdhERV7fPk2InprjLwB48EI8oDJI+wRbBMFgf
-         wbsA==
-X-Gm-Message-State: AOAM532Sm/wEAdsCFF4JO1RkrDDD5g8rEE+rw7Mt/NVSnNFFaOQt1zDF
-        /H62pw78hfmMMQN9GXJYGBdAw5MB4Co+VvSfx3/f/KRdVGaN4nvRPgoDdVyFvrcLJWSiy7XRtc7
-        eRGFA8KKC3WbT
-X-Received: by 2002:a7b:c844:0:b0:37b:b986:7726 with SMTP id c4-20020a7bc844000000b0037bb9867726mr17401387wml.160.1645444158956;
-        Mon, 21 Feb 2022 03:49:18 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJz80NBK4xySdNK92dBVDo686zdoILiLjZ8DrwJxbn6DUuDBzdF93Cfrshx7zCott46Y92HTgQ==
-X-Received: by 2002:a7b:c844:0:b0:37b:b986:7726 with SMTP id c4-20020a7bc844000000b0037bb9867726mr17401363wml.160.1645444158689;
-        Mon, 21 Feb 2022 03:49:18 -0800 (PST)
-Received: from step1.redhat.com (host-95-248-229-156.retail.telecomitalia.it. [95.248.229.156])
-        by smtp.gmail.com with ESMTPSA id o6-20020a05600c338600b0037c322d1425sm7141176wmp.8.2022.02.21.03.49.17
+        bh=Q9EVapK/pPTWvrGkIuS0gkdfg4WRi8A2dJLpE97G/j0=;
+        b=MH2aNsM4bqqz2ibxrUjDFSIJAA5W2CjTemNoC6zuLKxy7DqcXDMD+aQJnnTH62nG8b
+         OstPOOzSeQEwCs9GjDLupKpTPwnnVYG6cQiLkR7rhCGf8iZjjtWGr77r2bMRycLQx76K
+         4mvlWcybjRbtTszQ9m88PyviFXXg3Tb6zPj87aPFkYJ6LCNgOn50DAoX9hFdEB3Tf5uC
+         09F2PRmgNTNCaVmu4BMcdCqbwYi09X19QEx/3kSkN3BKfOgrdFSmaeap2mU0WtS726Sn
+         BVpzd0zaalA2Zj1E0enAnUy5bktJ9/cgV1z/zsOC9spk/WEKV1dnkIcisOZvyhlZrS78
+         TPSg==
+X-Gm-Message-State: AOAM530x7pozj6g8+FWo5uRoLJlxAyjCX5jG1TaeQJXDOeswpg41/sEU
+        3tt6wJzMJ2KUAWJp/rb2p4s=
+X-Google-Smtp-Source: ABdhPJzIOpX6LkU8ZlmEhbzW8KQ7EIpl63rw0DNq2i8r/bXk7KMe0ahf3LljPUtlg0nplo6q8JJXNQ==
+X-Received: by 2002:a17:90a:480e:b0:1bc:1d88:8d4e with SMTP id a14-20020a17090a480e00b001bc1d888d4emr7801756pjh.157.1645444332617;
+        Mon, 21 Feb 2022 03:52:12 -0800 (PST)
+Received: from localhost.localdomain ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id z14sm13055011pfe.30.2022.02.21.03.52.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Feb 2022 03:49:17 -0800 (PST)
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     linux-kernel@vger.kernel.org,
-        Mike Christie <michael.christie@oracle.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Jason Wang <jasowang@redhat.com>, netdev@vger.kernel.org,
-        Asias He <asias@redhat.com>,
-        virtualization@lists.linux-foundation.org,
-        Stefan Hajnoczi <stefanha@redhat.com>, kvm@vger.kernel.org
-Subject: [PATCH] vhost/vsock: don't check owner in vhost_vsock_stop() while releasing
-Date:   Mon, 21 Feb 2022 12:49:16 +0100
-Message-Id: <20220221114916.107045-1-sgarzare@redhat.com>
-X-Mailer: git-send-email 2.35.1
+        Mon, 21 Feb 2022 03:52:12 -0800 (PST)
+From:   Like Xu <like.xu.linux@gmail.com>
+X-Google-Original-From: Like Xu <likexu@tencent.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Like Xu <likexu@tencent.com>
+Subject: [PATCH 00/11] KVM: x86/pmu: Get rid of PERF_TYPE_HARDWAR and other minor fixes
+Date:   Mon, 21 Feb 2022 19:51:50 +0800
+Message-Id: <20220221115201.22208-1-likexu@tencent.com>
+X-Mailer: git-send-email 2.35.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-vhost_vsock_stop() calls vhost_dev_check_owner() to check the device
-ownership. It expects current->mm to be valid.
+Hi,
 
-vhost_vsock_stop() is also called by vhost_vsock_dev_release() when
-the user has not done close(), so when we are in do_exit(). In this
-case current->mm is invalid and we're releasing the device, so we
-should clean it anyway.
+This is a follow up to [0]. By keeping the same semantics of eventsel
+for gp and fixed counters, the reprogram code could be made more
+symmetrical, simpler and even faster [1], and it also fixes the
+obsolescence amd_event_mapping issue [2].
 
-Let's check the owner only when vhost_vsock_stop() is called
-by an ioctl.
+One of the notable changes is that we ended up removing the
+reprogram_{gp, fixed}_counter() functions and replacing it with the
+merged reprogram_counter(), where KVM programs pmc->perf_event
+with only the PERF_TYPE_RAW type for any type of counter
+(suggested by Jim as well).  PeterZ confirmed the idea, "think so;
+the HARDWARE is just a convenience wrapper over RAW IIRC". 
 
-Fixes: 433fc58e6bf2 ("VSOCK: Introduce vhost_vsock.ko")
-Cc: stable@vger.kernel.org
-Reported-by: syzbot+1e3ea63db39f2b4440e0@syzkaller.appspotmail.com
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
----
- drivers/vhost/vsock.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+Practically, this change drops the guest pmu support on the hosts without
+X86_FEATURE_ARCH_PERFMON  (the oldest Pentium 4), where the
+PERF_TYPE_HARDWAR is intentionally introduced so that hosts can
+map the architectural guest PMU events to their own.
 
-diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-index d6ca1c7ad513..f00d2dfd72b7 100644
---- a/drivers/vhost/vsock.c
-+++ b/drivers/vhost/vsock.c
-@@ -629,16 +629,18 @@ static int vhost_vsock_start(struct vhost_vsock *vsock)
- 	return ret;
- }
- 
--static int vhost_vsock_stop(struct vhost_vsock *vsock)
-+static int vhost_vsock_stop(struct vhost_vsock *vsock, bool check_owner)
- {
- 	size_t i;
- 	int ret;
- 
- 	mutex_lock(&vsock->dev.mutex);
- 
--	ret = vhost_dev_check_owner(&vsock->dev);
--	if (ret)
--		goto err;
-+	if (check_owner) {
-+		ret = vhost_dev_check_owner(&vsock->dev);
-+		if (ret)
-+			goto err;
-+	}
- 
- 	for (i = 0; i < ARRAY_SIZE(vsock->vqs); i++) {
- 		struct vhost_virtqueue *vq = &vsock->vqs[i];
-@@ -753,7 +755,7 @@ static int vhost_vsock_dev_release(struct inode *inode, struct file *file)
- 	 * inefficient.  Room for improvement here. */
- 	vsock_for_each_connected_socket(vhost_vsock_reset_orphans);
- 
--	vhost_vsock_stop(vsock);
-+	vhost_vsock_stop(vsock, false);
- 	vhost_vsock_flush(vsock);
- 	vhost_dev_stop(&vsock->dev);
- 
-@@ -868,7 +870,7 @@ static long vhost_vsock_dev_ioctl(struct file *f, unsigned int ioctl,
- 		if (start)
- 			return vhost_vsock_start(vsock);
- 		else
--			return vhost_vsock_stop(vsock);
-+			return vhost_vsock_stop(vsock, true);
- 	case VHOST_GET_FEATURES:
- 		features = VHOST_VSOCK_FEATURES;
- 		if (copy_to_user(argp, &features, sizeof(features)))
+Some code refactoring helps to review key changes more easily.
+Patches are based on top of kvm/master (ec756e40e271).
+
+The last patch removes the call trace in the commit message while we still
+think that kvm->arch.pmu_event_filter requires SRCU protection in terms
+of pmu_event_filter functionality, similar to "kvm->arch.msr_filter".
+
+Please check more details in each commit and feel free to comment.
+
+[0] https://lore.kernel.org/kvm/20211116122030.4698-1-likexu@tencent.com/
+[1] https://lore.kernel.org/kvm/ebfac3c7-fbc6-78a5-50c5-005ea11cc6ca@gmail.com/
+[2] https://lore.kernel.org/kvm/20220117085307.93030-1-likexu@tencent.com/
+
+Like Xu (11):
+  KVM: x86/pmu: Update comments for AMD gp counters
+  KVM: x86/pmu: Extract check_pmu_event_filter() from the same semantics
+  KVM: x86/pmu: Pass only "struct kvm_pmc *pmc" to reprogram_counter()
+  KVM: x86/pmu: Drop "u64 eventsel" for reprogram_gp_counter()
+  KVM: x86/pmu: Drop "u8 ctrl, int idx" for reprogram_fixed_counter()
+  KVM: x86/pmu: Use only the uniformly exported interface
+    reprogram_counter()
+  KVM: x86/pmu: Use PERF_TYPE_RAW to merge reprogram_{gp,
+    fixed}counter()
+  perf: x86/core: Add interface to query perfmon_event_map[] directly
+  KVM: x86/pmu: Replace pmc_perf_hw_id() with perf_get_hw_event_config()
+  KVM: x86/pmu: Drop amd_event_mapping[] in the KVM context
+  KVM: x86/pmu: Protect kvm->arch.pmu_event_filter with SRCU
+
+ arch/x86/events/core.c            |  11 ++
+ arch/x86/include/asm/perf_event.h |   6 +
+ arch/x86/kvm/pmu.c                | 188 ++++++++++++------------------
+ arch/x86/kvm/pmu.h                |   6 +-
+ arch/x86/kvm/svm/pmu.c            |  37 +-----
+ arch/x86/kvm/vmx/pmu_intel.c      |  62 +++++-----
+ 6 files changed, 130 insertions(+), 180 deletions(-)
+
 -- 
-2.35.1
+2.35.0
 
