@@ -2,111 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EB83A4BEB79
-	for <lists+kvm@lfdr.de>; Mon, 21 Feb 2022 20:57:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A8584BEC04
+	for <lists+kvm@lfdr.de>; Mon, 21 Feb 2022 21:43:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233313AbiBUT6O (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Feb 2022 14:58:14 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:37192 "EHLO
+        id S233933AbiBUUoG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Feb 2022 15:44:06 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:56472 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233319AbiBUT6L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Feb 2022 14:58:11 -0500
-Received: from sender4-of-o53.zoho.com (sender4-of-o53.zoho.com [136.143.188.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC25C22531;
-        Mon, 21 Feb 2022 11:57:47 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1645473463; cv=none; 
-        d=zohomail.com; s=zohoarc; 
-        b=GFCIllRM0JXstnfQu9dNJpdQ1FXf/mLTbryY4AGBuFfplzvxcLxU4zEfUaqf0ex6Rmbtm1Zz1vaR/hGOQURrYCQJeIPi6uwz0i1vKck76P5vur4/2EmtxWnIiM0d6HqTvelA7XaGVFvGhqTzyqp5qzAYMmJL8BWht0P6WyWtyQk=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-        t=1645473463; h=Content-Type:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:To; 
-        bh=qgsrilDNczksuq7T/Z/KkzqksxwwWB5R95lUSLH4//U=; 
-        b=iVoUitgIWGeSz5o7a4BMa7xPpmJsb++7kuKpuYuszNg9N5QN4X2ZHnlV1VThC2Z13DGQwn20fimXqdbnIGs5SzS7BsOBsdnNVPUIsS+0bCP/FDRZPkTOkT3PSjJfdO712N95rzOlTKG/srj3b/pE1ReFvcui3poAhQIpi2YQ7Do=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-        dkim=pass  header.i=anirudhrb.com;
-        spf=pass  smtp.mailfrom=mail@anirudhrb.com;
-        dmarc=pass header.from=<mail@anirudhrb.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1645473463;
-        s=zoho; d=anirudhrb.com; i=mail@anirudhrb.com;
-        h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:Content-Type:In-Reply-To;
-        bh=qgsrilDNczksuq7T/Z/KkzqksxwwWB5R95lUSLH4//U=;
-        b=OmkZ9IRBCeIMYWEmEyk8ni0n+jZqP1SqJcMlER3IOqdAB9buvzG752p8HOB2DT+P
-        pSXv5ZBk01wvMNfJ9lVi28rM2/t8LjesDFZTIzrt5ktfJAVQXxrYrEypdKaKzSXkDS5
-        UyI9TIwRnOg36eFZAkquCNhEWYZ1TKSwvcQ0lzyY=
-Received: from anirudhrb.com (49.207.206.107 [49.207.206.107]) by mx.zohomail.com
-        with SMTPS id 1645473461841291.94881628695555; Mon, 21 Feb 2022 11:57:41 -0800 (PST)
-Date:   Tue, 22 Feb 2022 01:27:35 +0530
-From:   Anirudh Rayabharam <mail@anirudhrb.com>
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        syzbot+0abd373e2e50d704db87@syzkaller.appspotmail.com,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] vhost: handle zero regions in vhost_set_memory
-Message-ID: <YhPur8ymuiiHirUc@anirudhrb.com>
-References: <20220221072852.31820-1-mail@anirudhrb.com>
- <20220221164817.obpw477w74auxlkn@sgarzare-redhat>
+        with ESMTP id S229929AbiBUUoF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Feb 2022 15:44:05 -0500
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 80065237F0;
+        Mon, 21 Feb 2022 12:43:41 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 47AEA1063;
+        Mon, 21 Feb 2022 12:43:41 -0800 (PST)
+Received: from [10.57.40.147] (unknown [10.57.40.147])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 51ACA3F66F;
+        Mon, 21 Feb 2022 12:43:37 -0800 (PST)
+Message-ID: <1d8004d3-1887-4fc7-08d2-0e2ee6b5fdcb@arm.com>
+Date:   Mon, 21 Feb 2022 20:43:33 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220221164817.obpw477w74auxlkn@sgarzare-redhat>
-X-ZohoMailClient: External
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.1
+Subject: Re: [PATCH v6 02/11] driver core: Add dma_cleanup callback in
+ bus_type
+Content-Language: en-GB
+To:     Christoph Hellwig <hch@infradead.org>,
+        Lu Baolu <baolu.lu@linux.intel.com>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>, kvm@vger.kernel.org,
+        rafael@kernel.org, David Airlie <airlied@linux.ie>,
+        linux-pci@vger.kernel.org,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Dmitry Osipenko <digetx@gmail.com>,
+        Will Deacon <will@kernel.org>,
+        Stuart Yoder <stuyoder@gmail.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        linux-kernel@vger.kernel.org, Li Yang <leoyang.li@nxp.com>,
+        iommu@lists.linux-foundation.org,
+        Jacob jun Pan <jacob.jun.pan@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>
+References: <20220218005521.172832-1-baolu.lu@linux.intel.com>
+ <20220218005521.172832-3-baolu.lu@linux.intel.com>
+ <YhCdEmC2lYStmUSL@infradead.org>
+From:   Robin Murphy <robin.murphy@arm.com>
+In-Reply-To: <YhCdEmC2lYStmUSL@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 21, 2022 at 05:48:17PM +0100, Stefano Garzarella wrote:
-> On Mon, Feb 21, 2022 at 12:58:51PM +0530, Anirudh Rayabharam wrote:
-> > Return early when userspace sends zero regions in the VHOST_SET_MEM_TABLE
-> > ioctl.
-> > 
-> > Otherwise, this causes an erroneous entry to be added to the iotlb. This
-> > entry has a range size of 0 (due to u64 overflow). This then causes
-> > iotlb_access_ok() to loop indefinitely resulting in a hung thread.
-> > Syzbot has reported this here:
-> > 
-> > https://syzkaller.appspot.com/bug?extid=0abd373e2e50d704db87
-> 
-> IIUC vhost_iotlb_add_range() in the for loop is never called if mem.nregions
-> is 0, so I'm not sure the problem reported by syzbot is related.
-> 
-> In any case maybe this patch is fine, but currently I think we're just
-> registering an iotlb without any regions, which in theory shouldn't cause
-> any problems.
+On 2022-02-19 07:32, Christoph Hellwig wrote:
+> So we are back to the callback madness instead of the nice and simple
+> flag?  Sigh.
 
-Sent a new patch: https://lore.kernel.org/lkml/20220221195303.13560-1-mail@anirudhrb.com/T/#u
+TBH, I *think* this part could be a fair bit simpler. It looks like this 
+whole callback mess is effectively just to decrement group->owner_cnt, 
+but since we should only care about ownership at probe, hotplug, and 
+other places well outside critical fast-paths, I'm not sure we really 
+need to keep track of that anyway - it can always be recalculated by 
+walking the group->devices list, and some of the relevant places have to 
+do that anyway. It should be pretty straightforward for 
+iommu_bus_notifier to clear group->owner automatically upon an unbind of 
+the matching driver when it's no longer bound to any other devices in 
+the group either. And if we still want to entertain the notion of VFIO 
+being able to release ownership without unbinding (I'm not entirely 
+convinced that's a realistically necessary use-case) then it should be 
+up to VFIO to decide when it's finally finished with the whole group, 
+rather than pretending we can keep track of nested ownership claims from 
+inside the API.
 
-> 
-> Thanks,
-> Stefano
-> 
-> > 
-> > Reported-and-tested-by: syzbot+0abd373e2e50d704db87@syzkaller.appspotmail.com
-> > Signed-off-by: Anirudh Rayabharam <mail@anirudhrb.com>
-> > ---
-> > drivers/vhost/vhost.c | 2 ++
-> > 1 file changed, 2 insertions(+)
-> > 
-> > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> > index 59edb5a1ffe2..821aba60eac2 100644
-> > --- a/drivers/vhost/vhost.c
-> > +++ b/drivers/vhost/vhost.c
-> > @@ -1428,6 +1428,8 @@ static long vhost_set_memory(struct vhost_dev *d, struct vhost_memory __user *m)
-> > 		return -EFAULT;
-> > 	if (mem.padding)
-> > 		return -EOPNOTSUPP;
-> > +	if (mem.nregions == 0)
-> > +		return 0;
-> > 	if (mem.nregions > max_mem_regions)
-> > 		return -E2BIG;
-> > 	newmem = kvzalloc(struct_size(newmem, regions, mem.nregions),
-> > -- 
-> > 2.35.1
-> > 
-> 
+Furthermore, If Greg was willing to compromise just far enough to let us 
+put driver_managed_dma in the 3-byte hole in the generic struct 
+device_driver, we wouldn't have to have quite so much boilerplate 
+repeated across the various bus implementations (I'm not suggesting to 
+move any actual calls back into the driver core, just the storage of 
+flag itself). FWIW I have some ideas for re-converging .dma_configure in 
+future which I think should probably be able to subsume this into a 
+completely generic common path, given a common flag.
+
+Robin.
