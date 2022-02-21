@@ -2,109 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 693254BDF11
-	for <lists+kvm@lfdr.de>; Mon, 21 Feb 2022 18:49:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8DCCA4BE9CC
+	for <lists+kvm@lfdr.de>; Mon, 21 Feb 2022 19:08:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379037AbiBUPXy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Feb 2022 10:23:54 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:41820 "EHLO
+        id S1379120AbiBUP0b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Feb 2022 10:26:31 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:43976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379055AbiBUPXq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Feb 2022 10:23:46 -0500
+        with ESMTP id S1379109AbiBUP0a (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Feb 2022 10:26:30 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C799B220FA
-        for <kvm@vger.kernel.org>; Mon, 21 Feb 2022 07:23:22 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D7CD422524
+        for <kvm@vger.kernel.org>; Mon, 21 Feb 2022 07:26:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645457002;
+        s=mimecast20190719; t=1645457164;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=L7D+Gz5qc5+200bg5kld6rn86i5+1h5B3y6lWwEfErY=;
-        b=dyutw1o6GVU8MlHjFMoykYFu9QflFzd3jxs/6YU7SU7Mnu63ahF0bD0P7CApYByVUpPp3/
-        KsOjyGLiyPo4Uf6m9MOBUZ8y4DdocRbQTFjqOIvzbOTwmWhSXoKA7prQ+RcPRg/4BfUryw
-        mCENnS6IMKFh2MnmfYnRno7YtkGyJo4=
+        bh=bsC6JL568sbdyYnWiEMpxMWwRlMor+KD7E6fcBWHZlI=;
+        b=iis+UMh7KnO0XG1eisMg63DUIPM4lzNdWxlVux5oG8iCwd14QiBoD5SnlbIJTidMhufPOT
+        sdsAOwYy5fcgGUkA+hOhfLKNtpFjoYVH7ykO3+Xnd3/DLSs3HGEv4B0nWMFpfBiEjKAvoA
+        FfknTMZPrb2iOelteuY87KQVDIrCUCE=
 Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
  [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-618-4aS8IaltMXWFN-7V3rfdrg-1; Mon, 21 Feb 2022 10:23:20 -0500
-X-MC-Unique: 4aS8IaltMXWFN-7V3rfdrg-1
-Received: by mail-ed1-f72.google.com with SMTP id f9-20020a0564021e8900b00412d0a6ef0dso5327837edf.11
-        for <kvm@vger.kernel.org>; Mon, 21 Feb 2022 07:23:20 -0800 (PST)
+ us-mta-230-X3aussZ-M7iiSXqg0AA6sw-1; Mon, 21 Feb 2022 10:26:02 -0500
+X-MC-Unique: X3aussZ-M7iiSXqg0AA6sw-1
+Received: by mail-ed1-f72.google.com with SMTP id y13-20020aa7c24d000000b00411925b7829so10143063edo.22
+        for <kvm@vger.kernel.org>; Mon, 21 Feb 2022 07:26:02 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=L7D+Gz5qc5+200bg5kld6rn86i5+1h5B3y6lWwEfErY=;
-        b=b2DFgn+XTh9/W5NcFTqUIaUl+e5ZJ8KvM+aBurhZl9lkQcNdeuK7aU+ju8Cg/LHqcM
-         Xc9BPRvPBvs/vtcR6hFvcJwsZ1ubx0Hi6c/nT/+g45CTvjw23qWovIo5SLMsxBBiwLb4
-         xCHR29NCPOk8iErTXhK4jXBeX/CzyEfWg+JUkWSz3e6R6HEFWA4M2taSlKVOZRGBVGzS
-         NJWPaPbX6PJ7MKgYqTFpX2aujCirdPEp1yL2gGimIoMrdJH+Chu+yXmcHlSIFpYkfys3
-         q9JfXBPAelMlDmnR0m8xmpk+wnHvwHbcT+0nuUb8t+4Al+w0eSj29js9Guh2P2kZAHWm
-         XJGg==
-X-Gm-Message-State: AOAM533WDyuHzieSzvTFmxMKiiqXXVMefV8HkOrJc3Pgu87CclKox2gy
-        G9VKU0uUGfiQwzUCmwW9YZJIOSx5e8Cl+cEaxjKfucZtH4dCGXRPcusB9+8dGUrOw54/4DzwMuk
-        JOgeRe0Sh5tfN
-X-Received: by 2002:a50:f144:0:b0:40f:29ce:c68e with SMTP id z4-20020a50f144000000b0040f29cec68emr21882154edl.307.1645456999561;
-        Mon, 21 Feb 2022 07:23:19 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyoTFuwv0JsZHH8RoTxcAfeLNi2DR2BVP//7ZNa4gKcLutUIrwPppkNV4bX+28chRF/hoFl9w==
-X-Received: by 2002:a50:f144:0:b0:40f:29ce:c68e with SMTP id z4-20020a50f144000000b0040f29cec68emr21882131edl.307.1645456999388;
-        Mon, 21 Feb 2022 07:23:19 -0800 (PST)
-Received: from [10.43.2.56] (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id j8sm9256909edw.40.2022.02.21.07.23.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Feb 2022 07:23:18 -0800 (PST)
-Message-ID: <03b5523b-ba5a-a729-40d7-61bd469f8e0f@redhat.com>
-Date:   Mon, 21 Feb 2022 16:23:18 +0100
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=bsC6JL568sbdyYnWiEMpxMWwRlMor+KD7E6fcBWHZlI=;
+        b=qyaiM4I1wEebDtvdaiAdzh5L3oTktSS/6ztUZPGl7TY/1I7+VQmeyEz5e4YP6myYJ1
+         GWRNj46/+pijZDQrG4vGXrTSCIJBIzUi+Lt8POJGQmXkPUSdKa2xBBw8wGh/cD5CLbLL
+         c02O9GJ6iMvrMwPXuWpDg8x/v6drY6f1Y4/q5JOiG+YbGDvMzAQAZlpFPls9uJHo4FKH
+         mA0WdXuYsoN5ZoIHkBjMvEo6KicC0HqiuZk+LV/k+RZhOYcFhW5nDe6kG3/IXGcRjRXd
+         Wp05qgwcn09hvDgnyRdn3XnrvVSzfx4bTWMCCKpM3H8LenECPSyl7UaQGG5dD9RJdIJ9
+         I9Ew==
+X-Gm-Message-State: AOAM532bjL2O+y14iRk1Y7TKSuiPBYKTl45SzfKJlgRmBDokIkPSppeo
+        E0zg+bhWmnU5rO37JJcjxDkQio/FRdTfO6F8EcZi4xgAVUYz1ZEf0TO4MJTThI0tSPDHwAT1dvs
+        mBELyeXy9mb7b
+X-Received: by 2002:a17:906:5c4:b0:6cd:8d9c:3c7d with SMTP id t4-20020a17090605c400b006cd8d9c3c7dmr17116068ejt.554.1645457161418;
+        Mon, 21 Feb 2022 07:26:01 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxUNEWNQRGucsx57XmiGuEtUAyHJPdiCt27h3j/JoUXNwc0vfmtM7u1vOW06BhLo5Owt5h7Wg==
+X-Received: by 2002:a17:906:5c4:b0:6cd:8d9c:3c7d with SMTP id t4-20020a17090605c400b006cd8d9c3c7dmr17116049ejt.554.1645457161141;
+        Mon, 21 Feb 2022 07:26:01 -0800 (PST)
+Received: from gator (cst2-173-70.cust.vodafone.cz. [31.30.173.70])
+        by smtp.gmail.com with ESMTPSA id z22sm9204018edd.45.2022.02.21.07.26.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Feb 2022 07:26:00 -0800 (PST)
+Date:   Mon, 21 Feb 2022 16:25:58 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Zixuan Wang <zxwang42@gmail.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, marcorr@google.com,
+        erdemaktas@google.com, rientjes@google.com, seanjc@google.com,
+        brijesh.singh@amd.com, Thomas.Lendacky@amd.com,
+        varad.gautam@suse.com, jroedel@suse.de, bp@suse.de,
+        kraxel@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v1 0/3] x86 UEFI: pass envs and args
+Message-ID: <20220221152558.2fwtzrkoq53t66ie@gator>
+References: <20220220224234.422499-1-zxwang42@gmail.com>
+ <20220221084056.edgpsgqdm2xph4kv@gator>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.1
-Subject: Re: Call for GSoC and Outreachy project ideas for summer 2022
-Content-Language: en-US
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@gmail.com>
-Cc:     "libvir-list@redhat.com" <libvir-list@redhat.com>,
-        qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>
-References: <CAJSP0QX7O_auRgTKFjHkBbkBK=B3Z-59S6ZZi10tzFTv1_1hkQ@mail.gmail.com>
- <f7dc638d-0de1-baa8-d883-fd8435ae13f2@redhat.com>
- <bf97384a-2244-c997-ba75-e3680d576401@redhat.com>
- <ad4e6ea2-df38-005a-5d60-375ec9be8c0e@redhat.com>
- <CAJSP0QVNjdr+9GNr+EG75tv4SaenV0TSk3RiuLG01iqHxhY7gQ@mail.gmail.com>
- <d2af5caf-5201-70aa-92cc-16790a8159d1@redhat.com>
- <1b38c5ea-d908-fe36-05e1-022d402cedbc@redhat.com>
-From:   =?UTF-8?B?TWljaGFsIFByw612b3puw61r?= <mprivozn@redhat.com>
-In-Reply-To: <1b38c5ea-d908-fe36-05e1-022d402cedbc@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220221084056.edgpsgqdm2xph4kv@gator>
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/21/22 12:27, Paolo Bonzini wrote:
-> On 2/21/22 10:36, Michal Prívozník wrote:
->> Indeed. Libvirt's participating on its own since 2016, IIRC. Since we're
->> still in org acceptance phase we have some time to decide this,
->> actually. We can do the final decision after participating orgs are
->> announced. My gut feeling says that it's going to be more work on QEMU
->> side which would warrant it to be on the QEMU ideas page.
+On Mon, Feb 21, 2022 at 09:40:56AM +0100, Andrew Jones wrote:
+> On Sun, Feb 20, 2022 at 02:42:31PM -0800, Zixuan Wang wrote:
+> > Hello,
+> > 
+> > This patch series enables kvm-unit-tests to get envs and args under
+> > UEFI. The host passes envs and args through files:
+> > 
+> > 1. The host stores envs into ENVS.TXT and args into ARGS.TXT
 > 
-> There are multiple projects that can be done on this topic, some
-> QEMU-only, some Libvirt-only.  For now I would announce the project on
-> the Libvirt side (and focus on those projects) since you are comentoring.
+> EFI already has support for an environment and EFI apps can accept args.
+> Why not find a way to convert kvm-unit-tests ENV and unit tests args
+> into the EFI system and then use that?
 > 
+> efi_setup_argv()[*] in my original PoC does that. It uses gnu-efi, but
+> it should be easy to strip away the gnu-efi stuff and go straight for
+> the underlining EFI functions.
+> 
+> [*] https://github.com/rhdrjones/kvm-unit-tests/commit/12a49a2e97b457e23af10bb25cd972362b379951#:~:text=static%20void%20efi_setup_argv(EFI_HANDLE%20Image%2C%20EFI_SYSTEM_TABLE%20*SysTab)
+> 
+> If you want to mimic efi_setup_argv(), then you'll also need 85baf398
+> ("lib/argv: Allow environ to be primed") from that same branch.
+> 
+> EFI wrapper scripts for each unit test can be generated to pass the args
+> to the unit test EFI apps automatically. For the environment, the EFI
+> vars can be set as usual for the system. For QEMU, that means creating
+> a VARS.fd and then adding another flash device to the VM to exposes it.
 
-Alright then. I've listed the project idea here:
+BTW, this tool from Gerd might be useful for that
 
-https://gitlab.com/libvirt/libvirt/-/issues/276
+https://gitlab.com/kraxel/edk2-tests/-/blob/master/tools/vars.py
 
-Please let me know what do you think.
+Thanks,
+drew
 
-Michal
+> 
+> Thanks,
+> drew
+> 
+> 
+> > 2. The guest boots up and reads data from these files through UEFI file
+> > operation services
+> > 3. The file data is passed to corresponding setup functions
+> > 
+> > As a result, several x86 test cases (e.g., kvmclock_test and vmexit)
+> > can now get envs/args from the host [1], thus do not report FAIL when
+> > running ./run-tests.sh.
+> > 
+> > An alternative approach for envs/args passing under UEFI is to use
+> > QEMU's -append/-initrd options. However, this approach requires EFI
+> > binaries to be passed through QEMU's -kernel option. While currently,
+> > EFI binaries are loaded from a disk image. Changing this bootup process
+> > may make kvm-unit-tests (under UEFI) unable to run on bare-metal [2].
+> > On the other hand, passing envs/args through files should work on
+> > bare-metal because UEFI's file operation services do not rely on QEMU's
+> > functionalities, thus working on bare-metal.
+> > 
+> > The summary of this patch series:
+> > 
+> > Patch #1 pulls Linux kernel's UEFI definitions for file operations.
+> > 
+> > Patch #2 implements file read functions and envs setup functions.
+> > 
+> > Patch #3 implements the args setup functions.
+> > 
+> > Best regards,
+> > Zixuan
+> > 
+> > [1] https://github.com/TheNetAdmin/KVM-Unit-Tests-dev-fork/issues/8
+> > [2] https://lore.kernel.org/kvm/CAEDJ5ZQLm1rz+0a7MPPz3wMAoeTq2oH9z92sd0ZhCxEjWMkOpg@mail.gmail.com
+> > 
+> > Zixuan Wang (3):
+> >   x86 UEFI: pull UEFI definitions for file operations
+> >   x86 UEFI: read envs from file
+> >   x86 UEFI: read args from file
+> > 
+> >  lib/efi.c       | 150 ++++++++++++++++++++++++++++++++++++++++++++++++
+> >  lib/linux/efi.h |  82 +++++++++++++++++++++++++-
+> >  x86/efi/run     |  36 +++++++++++-
+> >  3 files changed, 265 insertions(+), 3 deletions(-)
+> > 
+> > -- 
+> > 2.35.1
+> > 
 
