@@ -2,78 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CC11B4BE47C
-	for <lists+kvm@lfdr.de>; Mon, 21 Feb 2022 18:59:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9985A4BE205
+	for <lists+kvm@lfdr.de>; Mon, 21 Feb 2022 18:54:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354951AbiBUKar (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Feb 2022 05:30:47 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:38050 "EHLO
+        id S1343757AbiBUKm2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Feb 2022 05:42:28 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:59728 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354419AbiBUKag (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Feb 2022 05:30:36 -0500
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAE4035272
-        for <kvm@vger.kernel.org>; Mon, 21 Feb 2022 01:51:54 -0800 (PST)
-Received: by mail-pj1-x1030.google.com with SMTP id q8-20020a17090a178800b001bc299b8de1so3392131pja.1
-        for <kvm@vger.kernel.org>; Mon, 21 Feb 2022 01:51:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=LQH0oXYOtonMJ/YymHMO0iip6tbgo2yPt2wFBQnpQPs=;
-        b=XNWvK9S3nmEtvFBsP3LXBaxUCwjZOXwAkCFcPuTkxQxDO7C3fsigVPNu2UuKBxk9J6
-         H+7aEAGVVLOBMMPU/KUI3Z4lu/96YSBLpThoIBGlJdxz1foqj7V4X0tKup1OGLjCGKNx
-         U99TUt3ME5SEdOjrTmnv1EgKeV2Eqy+biejfqB3e+mBJvcPyYVb0lpVX4kT6bnboqoJh
-         1DLizOA2TAa8HSn8z/wbeY3RdR76AxRktYdA+XQWGErJpq4l5MoUvaKoFtJuj5arhGoB
-         1z1pdEW/lm2f5b0vSnjX6UUv80u0t2MfjW9xEDMQeaOCNS8zYwq4IhUSs9rEkVFo4tBD
-         M6Dw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=LQH0oXYOtonMJ/YymHMO0iip6tbgo2yPt2wFBQnpQPs=;
-        b=VjVbjSMujSQCBpOjGMpLqP2NWVL8qkdatYyoPB2GGwFMYS3WMD/W2XE6UEeeFNhDDf
-         SMWy4U8gQdLNWJgxk7TjeqrFI0nd6wbINHVnurOYopGbXDi0NX3+QH1R9Xg9rpQ8qcfU
-         UaKgkxPJFNEXal82J+5RkJJt8+TjHQnALu2Ges2avk3SPIrbBeNvV0CJ3DmZGv7y4Sh2
-         j4tsMMKQRl2XM7KuArFEqHTwSPVOrsBDlB0F9F6IDjtelS0ytSQ1PON6Si7E84MP6kHw
-         GjE3Hr4O6GQN1JqE7iDlkmirx2f+5Jvob8lX0xCCNm5XHapOuegYPyNxBp92FlR7C6EC
-         daQg==
-X-Gm-Message-State: AOAM531lwHOHha+v/X/Dbg5f5r18aWGA3eSAvOzXBPQdC01uPEHCgrYQ
-        IBpUoBQPJXQd2m7kRXwFABZiozOeyFkquZY+Hkcdz7f34vA=
-X-Google-Smtp-Source: ABdhPJzj+ZuQk9cqdUsx94ps+dYux2wLeG8B+O6heHBti9pS88aj8InSxsgxxilaFe0Uhs7eDP8gW7FQ4DbiNTQeX+k=
-X-Received: by 2002:a17:902:e8c2:b0:14d:bc86:be4d with SMTP id
- v2-20020a170902e8c200b0014dbc86be4dmr18375051plg.106.1645437113439; Mon, 21
- Feb 2022 01:51:53 -0800 (PST)
+        with ESMTP id S1355276AbiBUKkM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Feb 2022 05:40:12 -0500
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A93761027;
+        Mon, 21 Feb 2022 02:02:11 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=evBQi/e4SgIDMf7Sap2/1PGseafIXtgjsnbfAIfddoEqZtHqcVJTp7ZxAsANqDwIki8zXhmcL0hGSWiRUw7euE7KYhF85bXWPZx+Ty3EzQ1qdKzM5ehgBDLDGc2ykkrImBCB2PkfPEHJEzgNOLo80e4GrcivdxNsliHOaQ71jloeVvMptRZx4ApTbLLeRP8CJ9NBBt9Y+unh0gID2g5oPbl+jeWBCmAlOLVXrSg7qZX/mQIbqZZz/SOgTUkkXuaAVF2fV57yykwI5fnrOe7woQix9zcnSnrnpms8lDpK5JjhO/18nyCKPssnnnlqc9i5TOxmmLLO+LakftR3ixo78Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=X8fDrWoLKcLYbCJkPPLWWhj0PpvXc0NNRdd51yUypoU=;
+ b=oQeRv2eoTp55QLFHZMRUcp+CuBrUOw5zgRBvrOiKDGBKnh8KZ8Q4XUevk5Cwx85eobDvnaR/VZjnPK2qk3A9rVcm8CCmJPIVTyITVd11ikF9fNluW4YhpIm0sc3bo6uYTkdF3sLPaf0qeXEjhtOG4MAPKb92Yfwja1sht9rRgMjdy0qA30qlHdzANsPGtr49k9LnNZ/avOrQmEWWeHmg4Pl75sKC453YOswYp5pEx/hPKpMZPJW2Mm8ANyH5CRU8NeDYfH0Rd0fkbfp509DXhBteDlT1k8WNxvj4AhxqWJIFpNYQpFOm8Xc3fVlv+II+lt9zSzXuHR/UVFv1/RJ1FA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=X8fDrWoLKcLYbCJkPPLWWhj0PpvXc0NNRdd51yUypoU=;
+ b=XYvZvTdd931oFAowclmkZc8ipa54VuD8TVZyT90bb6cacxJLKPyF+918tssveCxwthJoo6IToY/yliGIFQ6+PAJzHbOhjFs2LMHIAhD1qHwPWxudFe6AEO66DlSiKDbRmKXpzHE2HLau/NU17nWTdaS1ejj3InZiemE7QXlAwUI=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from MN2PR12MB3053.namprd12.prod.outlook.com (2603:10b6:208:c7::24)
+ by BN9PR12MB5196.namprd12.prod.outlook.com (2603:10b6:408:11d::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4995.15; Mon, 21 Feb
+ 2022 10:02:09 +0000
+Received: from MN2PR12MB3053.namprd12.prod.outlook.com
+ ([fe80::9117:ca88:805a:6d5b]) by MN2PR12MB3053.namprd12.prod.outlook.com
+ ([fe80::9117:ca88:805a:6d5b%4]) with mapi id 15.20.4995.027; Mon, 21 Feb 2022
+ 10:02:09 +0000
+Message-ID: <80fce7df-d387-773d-ad7d-3540c2d411d1@amd.com>
+Date:   Mon, 21 Feb 2022 15:31:49 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.1
+Subject: Re: [PATCH 3/3] KVM: x86/pmu: Segregate Intel and AMD specific logic
+Content-Language: en-US
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     seanjc@google.com, jmattson@google.com,
+        dave.hansen@linux.intel.com, peterz@infradead.org,
+        alexander.shishkin@linux.intel.com, eranian@google.com,
+        daviddunn@google.com, ak@linux.intel.com,
+        kan.liang@linux.intel.com, x86@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kim.phillips@amd.com,
+        santosh.shukla@amd.com,
+        "Paolo Bonzini - Distinguished Engineer (kernel-recipes.org) (KVM HoF)" 
+        <pbonzini@redhat.com>, Ravi Bangoria <ravi.bangoria@amd.com>
+References: <20220221073140.10618-1-ravi.bangoria@amd.com>
+ <20220221073140.10618-4-ravi.bangoria@amd.com>
+ <1e0fc70a-1135-1845-b534-79f409e0c29d@gmail.com>
+From:   Ravi Bangoria <ravi.bangoria@amd.com>
+In-Reply-To: <1e0fc70a-1135-1845-b534-79f409e0c29d@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: PN3PR01CA0080.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:9a::22) To MN2PR12MB3053.namprd12.prod.outlook.com
+ (2603:10b6:208:c7::24)
 MIME-Version: 1.0
-References: <CAJSP0QX7O_auRgTKFjHkBbkBK=B3Z-59S6ZZi10tzFTv1_1hkQ@mail.gmail.com>
- <YhMtxWcFMjdQTioe@apples>
-In-Reply-To: <YhMtxWcFMjdQTioe@apples>
-From:   Stefan Hajnoczi <stefanha@gmail.com>
-Date:   Mon, 21 Feb 2022 09:51:42 +0000
-Message-ID: <CAJSP0QVNRYTOGDsjCJJLOT=7yo1EB6D9LBwgQ4-CE539HdgHNQ@mail.gmail.com>
-Subject: Re: Call for GSoC and Outreachy project ideas for summer 2022
-To:     Klaus Jensen <its@irrelevant.dk>
-Cc:     qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>,
-        Rust-VMM Mailing List <rust-vmm@lists.opendev.org>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Sergio Lopez <slp@redhat.com>,
-        Dmitry Fomichev <Dmitry.Fomichev@wdc.com>,
-        =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
-        Hannes Reinecke <hare@suse.de>,
-        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
-        "Florescu, Andreea" <fandree@amazon.com>,
-        Hanna Reitz <hreitz@redhat.com>,
-        Alex Agache <aagch@amazon.com>,
-        =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        John Snow <jsnow@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Keith Busch <kbusch@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 263ddc83-cb52-421c-d54d-08d9f5213927
+X-MS-TrafficTypeDiagnostic: BN9PR12MB5196:EE_
+X-Microsoft-Antispam-PRVS: <BN9PR12MB5196E2AB958B3E60D31DB2F8E03A9@BN9PR12MB5196.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: JrEvX2msA/iN2yJwOmM1GD/NENm6tySyM0h2RqKaX0wumCBtMWFys9BHl4/oQMf/vX+N/Z5v0eITXzfREy4c0F/HJsf3AvW1dDitVKoHYzstelv/kxgtmCegI/jxlfr8acemqlSytt3yFPuKKuEINyzywrbFKBoSaQnhX4YpmvjuPJBoXqgCqKjjDlpCejX227oLgmaxdpoeq8qMIAVlma2ldNHu13usDr4hdBz72IO+dScjfaozGMo++XFlwoBpZyV1pw+8r3hsjZFNRXSFXdI8rxtc28ov5TryxaPpLF3auH4VeGntxO1OtV0wIjj+nA0aTOFF8SHeKyEa9JmcXeI7o8OzBHe9CuJUSyVWwcIakE7BcULCi4MJC/lgaFFLi0+6kjbqT3+1XIOl5gHmXxfETjjbAF4tK23w8ecqYdYmm38xaUEGJHj2VYaNBIWefRykFjSPjr0WvKuyWs9y9tS6QeNyhl2c+M7PEkIWPh1tIwhn1oA3iurBsBjTD7CIT4Vy5mALtVd0mctotMLWaRgoLxo0c/Gid4MZAiTwiMEbUlx0Z1zezrwbgQGfb4tPF5cGsBARlKB+aJSCrbudwpZ87sZHzfGRSdHHZGr+w4f8SGMj9wSFo48xeyB9MynDyDsGq5cRfGosewmycN3EsTHt0ZUxFvKUA0SDO5jcd0PbVYp+ind6X6DI8uCR+aMADmmVgOWS+E4fOKlBrW2VYSjNYOnU8PDCZSLje+HDSH8=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB3053.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(6512007)(54906003)(6916009)(316002)(508600001)(6666004)(6506007)(53546011)(31686004)(36756003)(44832011)(66556008)(4744005)(38100700002)(8676002)(4326008)(66476007)(6486002)(31696002)(26005)(186003)(2616005)(8936002)(86362001)(7416002)(5660300002)(66946007)(2906002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?OGUvZlZ5aW56M3VvenpDWDF6bFI5dmVCT2tNQ3lEOWlOUWh1ZlRBYTVmOXZq?=
+ =?utf-8?B?TTlTYThyNUZWQzlmcEx0bGp3V29ycjh4Wk54S3NzcG9FRThkQUVWbDhSdVFH?=
+ =?utf-8?B?d0Ntb2ZUVFFaUmNYSHFXdG8vZW44OE9VYm9mdVQ4THNSM0JuVFpmcitwMmJw?=
+ =?utf-8?B?OXYvOGlJQzRSRHdiWWVOVEZubWc2WW9TOGlnTXFJcHZxeUVFbUttMmtkOWhM?=
+ =?utf-8?B?c1JTaU5sV003NUZ3dzJtOE9pck52VDQxK2hHNkFySk5mR0FNNjZnZXV3NkVy?=
+ =?utf-8?B?YTZnL2l2VEQ5MUtZUWMwNjh2QjUrTEhEckVWeFdHdXNwZnlWdzlVOU44Y2xT?=
+ =?utf-8?B?VjZpTmVvU0pLT1JoY2pWVFZLYzhGcjBjbUVwSTdFRTEvbThpNFZEenhpeGdQ?=
+ =?utf-8?B?SWROZ21yNjE4U0dRVFByQjFyRjcyazFTY29IeGRGcmlqbVFPYXdvWlIwejJp?=
+ =?utf-8?B?TUZNZlRvRFVqNncyVGhyRlZzTmNIZmJ5Nlg4Z1J5YStzcWlRTWZpb09qd3R3?=
+ =?utf-8?B?K2xQdllhUXFCeG1SNG5YVzZOeG5nN3ZTekZEMyt3eVFvU001YW5KTHZEOFFL?=
+ =?utf-8?B?UWJTRERGenlYaVZsWVYvcmZKSmxlZVJ3WTdveDJpOFVVdnZLRUJaYUhwaVNJ?=
+ =?utf-8?B?YjZUL09jeHFPQVdvUE1CeVlFRHVKT0NKcEJZVkdDTmQrbkYvY2o2aEppNTNW?=
+ =?utf-8?B?YTh6R2N1MEZ4NitGRWt0aHhjd2lhczB0WU9OaHNGZFVyeGx5b0JELzJsVzB5?=
+ =?utf-8?B?Z1ZmL2xiQ2FZenU0Qmx4dlJZM04zd0RXUmUrYUVtTjRSanc3NjZsQm9mMCs0?=
+ =?utf-8?B?REh3M0oxUnZOVS9UazlRbnlVUW85NXBVNCsxSUdhRlM0aUNHL0E4UjdxSldD?=
+ =?utf-8?B?NElhM3JMZDJ1dnArTm5VblZQS1dDNTRmR0s5NDF1UzhlME84NWNXMjhnKzBN?=
+ =?utf-8?B?aFRzWEg3RjREbnorTHlNMFpmOGpqY0hTU3VpdWZuNWdpN3ZjVUdmbWxlczdh?=
+ =?utf-8?B?aUp5RDhER3UxMU5qWlJIYUppdUUrRzM2VVczQkpZZ0hxVFZSQlZyK2pmRHkr?=
+ =?utf-8?B?ekRwTkhIVXZZUXVOTkJGQWp4dGJTdnQ1WVd0dXU3ejRWYlJESzJQaDhxWkZ0?=
+ =?utf-8?B?SFMzUGNGbTZBRUVlWUdDcGVOY0FrY2kxc091L3VVazk2SkhPUndrUytMcWJh?=
+ =?utf-8?B?Q3FwU2tCZU5HY044aDlIZzVOKzJJUjluUDA2M0RmNm1yeFFzOVN3aHRsZW5U?=
+ =?utf-8?B?UHlvSnd0SFhsTllPblpzekllSk8wVHRBd00rRGJnaXVVbCswc1JyN0hpZU56?=
+ =?utf-8?B?cHYva2E2cUdFbFpnMFRDWjQyRDNKbDV4YnNYSmV2aTdvb2lDNFovc0hxWWZp?=
+ =?utf-8?B?WHhvUkRTMWRGeUZtQ1VUYTdPdW5tTjE0bW1JYnF0NXFIUjAxTnJ0eUoxYmZZ?=
+ =?utf-8?B?T050ZjQ1TGE5VS8wWDJzMHlHa0xJWFB0TDMzZXpnRFNCRHVNaTNKYlVxUmpX?=
+ =?utf-8?B?VWZ3S3ZNMmdBbjBYMmM2eitWVzB5V1hSRlkxbGJ1cm9QOHVqUFdIelZCU1FC?=
+ =?utf-8?B?U1RlOXVRSWV0c2M1eEZoRllSbTB4NmRZNnF4eERhNEIydndxNnlNVVkrTU93?=
+ =?utf-8?B?YVAyZG1iTm5sUnFKT21CNGQ0anRIRGtrdy9zczBSMVZ6ZDBoL0Nsam5VMVJ1?=
+ =?utf-8?B?TTZhb25RRlEzcmEzRVFCTlB2clJjN1NteHQ3aWRDakRLWG9HRVM5L3BLalE3?=
+ =?utf-8?B?NHJKTFpsVHlJSG1rS25yakh5UFdxdmVnM3FZdXdkNUhjdEdNbkVIbE1HWFZM?=
+ =?utf-8?B?SmwvK1gvZS9CV3Q5azVKYmtwa2JrS3l3YWhDUm91MWNwaFhvazN5SFp0cEZ2?=
+ =?utf-8?B?MHp5ckIxOVZxTUJxbmZHR3pNSGd3OFVFTFBERGlnRWEvcEswQ3A4TlU4S3NR?=
+ =?utf-8?B?QlhjcUlwU3hUTSt2T3RQeFdVb0Z6ODJOdXlibDVqbVZ0Yncwbmh3T2NEZ21G?=
+ =?utf-8?B?TFlQRjFHdWJMMURCZG93UXhwTXdNYmF6aFB5UVpmN2hMYnQvQWV4VC90Z0J1?=
+ =?utf-8?B?UjFEalJyS1djR21MekJrcG50T2pVNXlUdysrS2VhNGtQdGN3MHZkNkoyU3dO?=
+ =?utf-8?B?QlFRZ24rUDJreGRlR1I1SEhRaGZYRHVudzVNdGtwMnB5TnpZQmI2TW10K2p6?=
+ =?utf-8?Q?IzyZbcVtQRfX29eXj2aIjs0=3D?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 263ddc83-cb52-421c-d54d-08d9f5213927
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB3053.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Feb 2022 10:02:09.5492
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6jBGEljQY1/b7VZT847plKicw8ah9PtL5f+0dpurSEkrsm+UFWWR+obTell/AATzyVmNL6WaHVPR0+O8+bo3xg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR12MB5196
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -81,87 +134,21 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 21 Feb 2022 at 06:14, Klaus Jensen <its@irrelevant.dk> wrote:
->
-> On Jan 28 15:47, Stefan Hajnoczi wrote:
-> > Dear QEMU, KVM, and rust-vmm communities,
-> > QEMU will apply for Google Summer of Code 2022
-> > (https://summerofcode.withgoogle.com/) and has been accepted into
-> > Outreachy May-August 2022 (https://www.outreachy.org/). You can now
-> > submit internship project ideas for QEMU, KVM, and rust-vmm!
-> >
-> > If you have experience contributing to QEMU, KVM, or rust-vmm you can
-> > be a mentor. It's a great way to give back and you get to work with
-> > people who are just starting out in open source.
-> >
-> > Please reply to this email by February 21st with your project ideas.
-> >
-> > Good project ideas are suitable for remote work by a competent
-> > programmer who is not yet familiar with the codebase. In
-> > addition, they are:
-> > - Well-defined - the scope is clear
-> > - Self-contained - there are few dependencies
-> > - Uncontroversial - they are acceptable to the community
-> > - Incremental - they produce deliverables along the way
-> >
-> > Feel free to post ideas even if you are unable to mentor the project.
-> > It doesn't hurt to share the idea!
-> >
-> > I will review project ideas and keep you up-to-date on QEMU's
-> > acceptance into GSoC.
-> >
-> > Internship program details:
-> > - Paid, remote work open source internships
-> > - GSoC projects are 175 or 350 hours, Outreachy projects are 30
-> > hrs/week for 12 weeks
-> > - Mentored by volunteers from QEMU, KVM, and rust-vmm
-> > - Mentors typically spend at least 5 hours per week during the coding period
-> >
-> > Changes since last year: GSoC now has 175 or 350 hour project sizes
-> > instead of 12 week full-time projects. GSoC will accept applicants who
-> > are not students, before it was limited to students.
-> >
-> > For more background on QEMU internships, check out this video:
-> > https://www.youtube.com/watch?v=xNVCX7YMUL8
-> >
-> > Please let me know if you have any questions!
-> >
-> > Stefan
-> >
->
-> Hi,
->
-> I'd like to revive the "NVMe Performance" proposal from Paolo and Stefan
-> from two years ago.
->
->   https://wiki.qemu.org/Internships/ProjectIdeas/NVMePerformance
->
-> I'd like to mentor, but since this is "iothread-heavy", I'd like to be
-> able to draw a bit on Stefan, Paolo if possible.
 
-Hi Klaus,
-I can give input but I probably will not have enough time to
-participate as a full co-mentor or review every line of every patch.
 
-If you want to go ahead with the project, please let me know and I'll post it.
+On 21-Feb-22 1:27 PM, Like Xu wrote:
+> On 21/2/2022 3:31 pm, Ravi Bangoria wrote:
+>>   void reprogram_counter(struct kvm_pmu *pmu, int pmc_idx)
+>>   {
+>>       struct kvm_pmc *pmc = kvm_x86_ops.pmu_ops->pmc_idx_to_pmc(pmu, pmc_idx);
+>> +    bool is_intel = !strncmp(kvm_x86_ops.name, "kvm_intel", 9);
+> 
+> How about using guest_cpuid_is_intel(vcpu)
 
-One thing I noticed about the project idea is that KVM ioeventfd
-doesn't have the right semantics to emulate the traditional Submission
-Queue Tail Doorbell register. The issue is that ioeventfd does not
-capture the value written by the driver to the MMIO register. eventfd
-is a simple counter so QEMU just sees that the guest has written but
-doesn't know which value. Although ioeventfd has modes for matching
-specific values, I don't think that can be used for NVMe Submission
-Queues because there are too many possible register values and each
-one requires a separate file descriptor. It might request 100s of
-ioeventfds per sq, which won't scale.
+Yeah, that's better then strncmp().
 
-The good news is that when the Shadow Doorbell Buffer is implemented
-and enabled by the driver, then I think it becomes possible to use
-ioeventfd for the Submission Queue Tail Doorbell.
+> directly in the reprogram_gp_counter() ?
 
-I wanted to mention this so applicants/interns don't go down a dead
-end trying to figure out how to use ioeventfd for the traditional
-Submission Queue Tail Doorbell register.
+We need this flag in reprogram_fixed_counter() as well.
 
-Stefan
+- Ravi
