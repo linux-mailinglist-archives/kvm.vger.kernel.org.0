@@ -2,164 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8DCCA4BE9CC
-	for <lists+kvm@lfdr.de>; Mon, 21 Feb 2022 19:08:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B0CF84BE7C4
+	for <lists+kvm@lfdr.de>; Mon, 21 Feb 2022 19:03:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379120AbiBUP0b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Feb 2022 10:26:31 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:43976 "EHLO
+        id S1379205AbiBUPbE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Feb 2022 10:31:04 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:49886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379109AbiBUP0a (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Feb 2022 10:26:30 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D7CD422524
-        for <kvm@vger.kernel.org>; Mon, 21 Feb 2022 07:26:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645457164;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=bsC6JL568sbdyYnWiEMpxMWwRlMor+KD7E6fcBWHZlI=;
-        b=iis+UMh7KnO0XG1eisMg63DUIPM4lzNdWxlVux5oG8iCwd14QiBoD5SnlbIJTidMhufPOT
-        sdsAOwYy5fcgGUkA+hOhfLKNtpFjoYVH7ykO3+Xnd3/DLSs3HGEv4B0nWMFpfBiEjKAvoA
-        FfknTMZPrb2iOelteuY87KQVDIrCUCE=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-230-X3aussZ-M7iiSXqg0AA6sw-1; Mon, 21 Feb 2022 10:26:02 -0500
-X-MC-Unique: X3aussZ-M7iiSXqg0AA6sw-1
-Received: by mail-ed1-f72.google.com with SMTP id y13-20020aa7c24d000000b00411925b7829so10143063edo.22
-        for <kvm@vger.kernel.org>; Mon, 21 Feb 2022 07:26:02 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=bsC6JL568sbdyYnWiEMpxMWwRlMor+KD7E6fcBWHZlI=;
-        b=qyaiM4I1wEebDtvdaiAdzh5L3oTktSS/6ztUZPGl7TY/1I7+VQmeyEz5e4YP6myYJ1
-         GWRNj46/+pijZDQrG4vGXrTSCIJBIzUi+Lt8POJGQmXkPUSdKa2xBBw8wGh/cD5CLbLL
-         c02O9GJ6iMvrMwPXuWpDg8x/v6drY6f1Y4/q5JOiG+YbGDvMzAQAZlpFPls9uJHo4FKH
-         mA0WdXuYsoN5ZoIHkBjMvEo6KicC0HqiuZk+LV/k+RZhOYcFhW5nDe6kG3/IXGcRjRXd
-         Wp05qgwcn09hvDgnyRdn3XnrvVSzfx4bTWMCCKpM3H8LenECPSyl7UaQGG5dD9RJdIJ9
-         I9Ew==
-X-Gm-Message-State: AOAM532bjL2O+y14iRk1Y7TKSuiPBYKTl45SzfKJlgRmBDokIkPSppeo
-        E0zg+bhWmnU5rO37JJcjxDkQio/FRdTfO6F8EcZi4xgAVUYz1ZEf0TO4MJTThI0tSPDHwAT1dvs
-        mBELyeXy9mb7b
-X-Received: by 2002:a17:906:5c4:b0:6cd:8d9c:3c7d with SMTP id t4-20020a17090605c400b006cd8d9c3c7dmr17116068ejt.554.1645457161418;
-        Mon, 21 Feb 2022 07:26:01 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxUNEWNQRGucsx57XmiGuEtUAyHJPdiCt27h3j/JoUXNwc0vfmtM7u1vOW06BhLo5Owt5h7Wg==
-X-Received: by 2002:a17:906:5c4:b0:6cd:8d9c:3c7d with SMTP id t4-20020a17090605c400b006cd8d9c3c7dmr17116049ejt.554.1645457161141;
-        Mon, 21 Feb 2022 07:26:01 -0800 (PST)
-Received: from gator (cst2-173-70.cust.vodafone.cz. [31.30.173.70])
-        by smtp.gmail.com with ESMTPSA id z22sm9204018edd.45.2022.02.21.07.26.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Feb 2022 07:26:00 -0800 (PST)
-Date:   Mon, 21 Feb 2022 16:25:58 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Zixuan Wang <zxwang42@gmail.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, marcorr@google.com,
-        erdemaktas@google.com, rientjes@google.com, seanjc@google.com,
-        brijesh.singh@amd.com, Thomas.Lendacky@amd.com,
-        varad.gautam@suse.com, jroedel@suse.de, bp@suse.de,
-        kraxel@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v1 0/3] x86 UEFI: pass envs and args
-Message-ID: <20220221152558.2fwtzrkoq53t66ie@gator>
-References: <20220220224234.422499-1-zxwang42@gmail.com>
- <20220221084056.edgpsgqdm2xph4kv@gator>
+        with ESMTP id S1379132AbiBUPbC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Feb 2022 10:31:02 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C7CA1EADC;
+        Mon, 21 Feb 2022 07:30:39 -0800 (PST)
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21LEZnot030632;
+        Mon, 21 Feb 2022 15:30:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=WgZycox58fsYtKlQQbFRdVXd703jyRfjROOaii2dXxI=;
+ b=oY1ud5+QJ2NI5yQJ7xV/7X0T4gZRsPPozUzGNRAT9MgCFq9Q+RngLcIYEsNaw3I544Fh
+ t4/xDsuKMBc5duVEybtBrbHDd9CN/pQWDDU9IeBiDb3bVlzLUCGBZc3k9/M9DEj2DdLu
+ RsVAYSyXA9qn9uVhLnojhUb3uHcdhAvHsjdd3CuBmBeNJnn2IZK+umYJGdAPHAhJnerE
+ v03JXPpgBmkgCk1Mmrb2vf7/QDcpIoVE7d3hTY23ELU+jobNOBOesqsZfkK8khK/vCwu
+ 2dKoHx2vEWSC9QkgraiEmoB1mEAwautekNAm4o+O+Ao/4bucZWBADICg88G7x3lyp71C fw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ec0eu8aae-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 21 Feb 2022 15:30:39 +0000
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21LEoOOS032474;
+        Mon, 21 Feb 2022 15:30:38 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ec0eu8a9m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 21 Feb 2022 15:30:38 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21LFCvLX013525;
+        Mon, 21 Feb 2022 15:30:36 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 3ear68up01-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 21 Feb 2022 15:30:36 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21LFUWCd44630520
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 21 Feb 2022 15:30:32 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CF0135204E;
+        Mon, 21 Feb 2022 15:30:32 +0000 (GMT)
+Received: from [9.145.32.243] (unknown [9.145.32.243])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 9285552057;
+        Mon, 21 Feb 2022 15:30:32 +0000 (GMT)
+Message-ID: <0bb8a574-059c-f356-fcd1-74d0bc41fa1a@linux.ibm.com>
+Date:   Mon, 21 Feb 2022 16:30:32 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220221084056.edgpsgqdm2xph4kv@gator>
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [kvm-unit-tests PATCH v2 0/8] s390x: Extend instruction
+ interception tests
+Content-Language: en-US
+To:     Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Cc:     imbrenda@linux.ibm.com, thuth@redhat.com, david@redhat.com
+References: <20220221130746.1754410-1-nrb@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <20220221130746.1754410-1-nrb@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: iyPC6vc6scEMOF6Q07XiFU7uE01Cgevn
+X-Proofpoint-ORIG-GUID: CgoUOab80u_P-mPiDmO5Siag8ZS7bRjC
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-02-21_07,2022-02-21_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 suspectscore=0
+ priorityscore=1501 phishscore=0 spamscore=0 mlxlogscore=999 clxscore=1015
+ malwarescore=0 bulkscore=0 lowpriorityscore=0 impostorscore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2201110000
+ definitions=main-2202210089
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 21, 2022 at 09:40:56AM +0100, Andrew Jones wrote:
-> On Sun, Feb 20, 2022 at 02:42:31PM -0800, Zixuan Wang wrote:
-> > Hello,
-> > 
-> > This patch series enables kvm-unit-tests to get envs and args under
-> > UEFI. The host passes envs and args through files:
-> > 
-> > 1. The host stores envs into ENVS.TXT and args into ARGS.TXT
+On 2/21/22 14:07, Nico Boehr wrote:
+> This series extends the instruction interception tests for s390x.
 > 
-> EFI already has support for an environment and EFI apps can accept args.
-> Why not find a way to convert kvm-unit-tests ENV and unit tests args
-> into the EFI system and then use that?
+> For most instructions, there is already coverage in existing tests, but they are
+> not covering some failure cases, e.g. bad alignment. In this case, the existing
+> tests were extended.
 > 
-> efi_setup_argv()[*] in my original PoC does that. It uses gnu-efi, but
-> it should be easy to strip away the gnu-efi stuff and go straight for
-> the underlining EFI functions.
+> SCK was not under test anywhere yet, hence a new test file was added.
 > 
-> [*] https://github.com/rhdrjones/kvm-unit-tests/commit/12a49a2e97b457e23af10bb25cd972362b379951#:~:text=static%20void%20efi_setup_argv(EFI_HANDLE%20Image%2C%20EFI_SYSTEM_TABLE%20*SysTab)
-> 
-> If you want to mimic efi_setup_argv(), then you'll also need 85baf398
-> ("lib/argv: Allow environ to be primed") from that same branch.
-> 
-> EFI wrapper scripts for each unit test can be generated to pass the args
-> to the unit test EFI apps automatically. For the environment, the EFI
-> vars can be set as usual for the system. For QEMU, that means creating
-> a VARS.fd and then adding another flash device to the VM to exposes it.
+> The EPSW test gets it's own file, too, because it requires a I/O device, more
+> details in the respective commit.
 
-BTW, this tool from Gerd might be useful for that
+Could you please push this to devel so we can get CI data?
 
-https://gitlab.com/kraxel/edk2-tests/-/blob/master/tools/vars.py
+To me it seems like only STSCH needs review so we should be done with 
+this soonish.
 
-Thanks,
-drew
 
 > 
-> Thanks,
-> drew
+> Changelog from v1:
+> ----
+> - Reset pmcw flags at test end
+> - Rebase
 > 
+> Nico Boehr (8):
+>    s390x: Add more tests for MSCH
+>    s390x: Add test for PFMF low-address protection
+>    s390x: Add sck tests
+>    s390x: Add tests for STCRW
+>    s390x: Add more tests for SSCH
+>    s390x: Add more tests for STSCH
+>    s390x: Add tests for TSCH
+>    s390x: Add EPSW test
 > 
-> > 2. The guest boots up and reads data from these files through UEFI file
-> > operation services
-> > 3. The file data is passed to corresponding setup functions
-> > 
-> > As a result, several x86 test cases (e.g., kvmclock_test and vmexit)
-> > can now get envs/args from the host [1], thus do not report FAIL when
-> > running ./run-tests.sh.
-> > 
-> > An alternative approach for envs/args passing under UEFI is to use
-> > QEMU's -append/-initrd options. However, this approach requires EFI
-> > binaries to be passed through QEMU's -kernel option. While currently,
-> > EFI binaries are loaded from a disk image. Changing this bootup process
-> > may make kvm-unit-tests (under UEFI) unable to run on bare-metal [2].
-> > On the other hand, passing envs/args through files should work on
-> > bare-metal because UEFI's file operation services do not rely on QEMU's
-> > functionalities, thus working on bare-metal.
-> > 
-> > The summary of this patch series:
-> > 
-> > Patch #1 pulls Linux kernel's UEFI definitions for file operations.
-> > 
-> > Patch #2 implements file read functions and envs setup functions.
-> > 
-> > Patch #3 implements the args setup functions.
-> > 
-> > Best regards,
-> > Zixuan
-> > 
-> > [1] https://github.com/TheNetAdmin/KVM-Unit-Tests-dev-fork/issues/8
-> > [2] https://lore.kernel.org/kvm/CAEDJ5ZQLm1rz+0a7MPPz3wMAoeTq2oH9z92sd0ZhCxEjWMkOpg@mail.gmail.com
-> > 
-> > Zixuan Wang (3):
-> >   x86 UEFI: pull UEFI definitions for file operations
-> >   x86 UEFI: read envs from file
-> >   x86 UEFI: read args from file
-> > 
-> >  lib/efi.c       | 150 ++++++++++++++++++++++++++++++++++++++++++++++++
-> >  lib/linux/efi.h |  82 +++++++++++++++++++++++++-
-> >  x86/efi/run     |  36 +++++++++++-
-> >  3 files changed, 265 insertions(+), 3 deletions(-)
-> > 
-> > -- 
-> > 2.35.1
-> > 
+>   lib/s390x/css.h     |  17 +++
+>   lib/s390x/css_lib.c |  60 ++++++++++
+>   s390x/Makefile      |   2 +
+>   s390x/css.c         | 278 ++++++++++++++++++++++++++++++++++++++++++++
+>   s390x/epsw.c        | 113 ++++++++++++++++++
+>   s390x/pfmf.c        |  29 +++++
+>   s390x/sck.c         | 127 ++++++++++++++++++++
+>   s390x/unittests.cfg |   7 ++
+>   8 files changed, 633 insertions(+)
+>   create mode 100644 s390x/epsw.c
+>   create mode 100644 s390x/sck.c
+> 
 
