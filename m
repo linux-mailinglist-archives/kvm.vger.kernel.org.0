@@ -2,75 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3CF4B4BE83D
-	for <lists+kvm@lfdr.de>; Mon, 21 Feb 2022 19:05:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EC4FB4BE853
+	for <lists+kvm@lfdr.de>; Mon, 21 Feb 2022 19:05:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235354AbiBUQli (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Feb 2022 11:41:38 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:51052 "EHLO
+        id S1381032AbiBUQo6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Feb 2022 11:44:58 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:58872 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1380935AbiBUQkF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Feb 2022 11:40:05 -0500
+        with ESMTP id S1380997AbiBUQox (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Feb 2022 11:44:53 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 282DE27FC9
-        for <kvm@vger.kernel.org>; Mon, 21 Feb 2022 08:39:19 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8EB8F21E1B
+        for <kvm@vger.kernel.org>; Mon, 21 Feb 2022 08:44:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645461559;
+        s=mimecast20190719; t=1645461869;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=SoyoRMJ/nAu1Wuy1hoTYHjBEoixwT5p2+nHN8seM7W0=;
-        b=CQ3JbgAEP1RQ01i6zYVJxLZQ+xFYN0JvZgKNiXhiHKXUCud8viqkjL6OPvo3gWiNZ68oeJ
-        YR26Qgo6MAtXM3QT9Y8svqdyvYksY1HD6afcyzo/tO8F92wL/qZVQlfnx2VCtQ/QRYzmPA
-        s6SgIsxhQG/stPmKD6Bmwi9uZSwHjdA=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=VNieaTwekELLlfDmLcMtpN2ymnlly2vIEQ3lgNT3la0=;
+        b=RlHDYW/oWNSOZabieGNo8Iaqd7Wv0Ig4jDoEYrEk6sehYqHgbe1MhfD4le0QGv/SRUJeYL
+        QaJyMtR/5VxataocwbTrb9srd7fGIQHLpO1FBCO+fNSTfpXOyDPtKf8iBaOErLqBQeGmtk
+        0Bk6xbabPkBLzFrocSipOUfam0eql0s=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-558--pISFNqMMA-fcTg2BSwzvw-1; Mon, 21 Feb 2022 11:39:17 -0500
-X-MC-Unique: -pISFNqMMA-fcTg2BSwzvw-1
-Received: by mail-qk1-f198.google.com with SMTP id r20-20020a37a814000000b00648f4cddf6bso1954967qke.5
-        for <kvm@vger.kernel.org>; Mon, 21 Feb 2022 08:39:17 -0800 (PST)
+ us-mta-520-nspw2gtBMa-_CLUk9qNUyQ-1; Mon, 21 Feb 2022 11:44:28 -0500
+X-MC-Unique: nspw2gtBMa-_CLUk9qNUyQ-1
+Received: by mail-qk1-f199.google.com with SMTP id s71-20020a37a94a000000b00648c7f2b289so5036643qke.12
+        for <kvm@vger.kernel.org>; Mon, 21 Feb 2022 08:44:28 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=SoyoRMJ/nAu1Wuy1hoTYHjBEoixwT5p2+nHN8seM7W0=;
-        b=Dqi6OBkegHvjUFF8UphvaDs6Vyh86GTm27AK2kha0EKQjPeo65n0TcvyfG68VHZwU3
-         +o86aVXlvI2KnHbQQSPchs1Kl1BNZKQENaY00/wmFdtF93BYN+X5l5+dSlFEqD2M0kY2
-         +6BLZA9QKdC2sG3ItVC5HmfaeWr1NgMwFG+7e8Wcb+E3FBR6faASYhq4/UZ3ihBnVpzW
-         W/cdxJZSSnGaVomf3DOdpZUALf+orzOpDlMnY+JNwXESH/zXPlsxigF+XwdEWNdWaIzr
-         ghQ5J+p3keqgsQgCU8UADFjbURzrCHS5zk718Q4Nmslon4J/oj0A3TemuazSWsf9fnZi
-         8JMQ==
-X-Gm-Message-State: AOAM532+WQyXxqqUwv2IQqiiQWgLbv0eIZRdojTAXIFvv+ScPl1//kaH
-        x29oBJMuRSaNp+O62q8f+a0Nih9MCfN0/a3hQdHpJYOhdXjoOZ+wNh6gAHa7Kwymxvxm3UhGaK9
-        VnlNNADWol1c8
-X-Received: by 2002:a05:6214:19ed:b0:42c:289b:860e with SMTP id q13-20020a05621419ed00b0042c289b860emr15949413qvc.73.1645461557329;
-        Mon, 21 Feb 2022 08:39:17 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJz9nKNisYnQkAL2AwPf/8jKoIFZMeIDLW9aeCMNDkG4GM65TKhRDd3JisZSgS51F0AT0t1yNg==
-X-Received: by 2002:a05:6214:19ed:b0:42c:289b:860e with SMTP id q13-20020a05621419ed00b0042c289b860emr15949399qvc.73.1645461557115;
-        Mon, 21 Feb 2022 08:39:17 -0800 (PST)
+        bh=VNieaTwekELLlfDmLcMtpN2ymnlly2vIEQ3lgNT3la0=;
+        b=uycuOk+mUfMeQhtp8ot8GPU5fLZ+aUknOg/1856P2bYKsu9Z1jJHNnwTYgcmXWi6Ss
+         1kGfS8KMZfyOAQZkS/AcpCRAcmVBh+iu9ETi2hbxBf+fzHZnnqqcizsQFlc659JpgLZW
+         uWC1/YSDNqBnMbrScxkeSz7cBN8cMw1rfoAZ421k/+nRVuzSsu81say/g3OuwkU+cdrO
+         6ZY/+/Cn4o+tzi4+/prOsrwVTFZeR6Qp73Lbl83Ku4LHwD3oARO6FChCEJl8ZeKGW7FA
+         qvaRaWd1y9VQdJf8uuMZ7ZKocTVUpN6j0dP+G6ayH6ESgYrim4Am8sTvBmtAczqEb9bF
+         u+sQ==
+X-Gm-Message-State: AOAM531XecAxvz+Q1cUqKv2552gIbPcuyxIx6RHI2SBXMhmTVxGTXu0J
+        QVprTQsPIZa+jSktUoEZdOZWJsQX6wK42+vH+jwBeQbEZNEQbzkqvrBLnu22Obt8IKAaG7ut6+d
+        3zApqK25f2q1x
+X-Received: by 2002:a37:9cd6:0:b0:5dd:184f:a6a6 with SMTP id f205-20020a379cd6000000b005dd184fa6a6mr12426916qke.76.1645461867986;
+        Mon, 21 Feb 2022 08:44:27 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJy9+BSp31qAHOQzN7kKtZNi6gPPEeZ2f6xPuAzosuYqWftvxHapdtxcfYdSzcIVRhUHsRkkXA==
+X-Received: by 2002:a37:9cd6:0:b0:5dd:184f:a6a6 with SMTP id f205-20020a379cd6000000b005dd184fa6a6mr12426906qke.76.1645461867775;
+        Mon, 21 Feb 2022 08:44:27 -0800 (PST)
 Received: from sgarzare-redhat (host-95-248-229-156.retail.telecomitalia.it. [95.248.229.156])
-        by smtp.gmail.com with ESMTPSA id s5sm7471966qtn.35.2022.02.21.08.39.14
+        by smtp.gmail.com with ESMTPSA id y15sm27100949qko.133.2022.02.21.08.44.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Feb 2022 08:39:16 -0800 (PST)
-Date:   Mon, 21 Feb 2022 17:39:09 +0100
+        Mon, 21 Feb 2022 08:44:27 -0800 (PST)
+Date:   Mon, 21 Feb 2022 17:44:20 +0100
 From:   Stefano Garzarella <sgarzare@redhat.com>
 To:     Anirudh Rayabharam <mail@anirudhrb.com>
-Cc:     syzbot <syzbot+0abd373e2e50d704db87@syzkaller.appspotmail.com>,
-        Jason Wang <jasowang@redhat.com>, kvm <kvm@vger.kernel.org>,
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
         kernel list <linux-kernel@vger.kernel.org>,
-        Michael Tsirkin <mst@redhat.com>,
-        netdev <netdev@vger.kernel.org>, syzkaller-bugs@googlegroups.com,
-        Linux Virtualization <virtualization@lists.linux-foundation.org>
-Subject: Re: [syzbot] INFO: task hung in vhost_work_dev_flush
-Message-ID: <20220221163909.xfrgt6slp3ksqr2w@sgarzare-redhat>
-References: <00000000000057702a05d8532b18@google.com>
- <CAGxU2F4nGWxG0wymrDZzd8Hwhm2=8syuEB3fLMd+t7bbN7qWrQ@mail.gmail.com>
- <YhO1YL0A6OjtXmIy@anirudhrb.com>
+        Mike Christie <michael.christie@oracle.com>,
+        Jason Wang <jasowang@redhat.com>,
+        netdev <netdev@vger.kernel.org>,
+        Linux Virtualization <virtualization@lists.linux-foundation.org>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        kvm <kvm@vger.kernel.org>, Hillf Danton <hdanton@sina.com>
+Subject: Re: [PATCH] vhost/vsock: don't check owner in vhost_vsock_stop()
+ while releasing
+Message-ID: <20220221164420.cnhs6sgxizc6tcok@sgarzare-redhat>
+References: <20220221114916.107045-1-sgarzare@redhat.com>
+ <CAGxU2F6aMqTaNaeO7xChtf=veDJYtBjDRayRRYkZ_FOq4CYJWQ@mail.gmail.com>
+ <YhO6bwu7iDtUFQGj@anirudhrb.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <YhO1YL0A6OjtXmIy@anirudhrb.com>
+In-Reply-To: <YhO6bwu7iDtUFQGj@anirudhrb.com>
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
@@ -81,30 +84,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 21, 2022 at 09:23:04PM +0530, Anirudh Rayabharam wrote:
->On Mon, Feb 21, 2022 at 03:12:33PM +0100, Stefano Garzarella wrote:
->> #syz test: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/
->> f71077a4d84b
+On Mon, Feb 21, 2022 at 09:44:39PM +0530, Anirudh Rayabharam wrote:
+>On Mon, Feb 21, 2022 at 02:59:30PM +0100, Stefano Garzarella wrote:
+>> On Mon, Feb 21, 2022 at 12:49 PM Stefano Garzarella <sgarzare@redhat.com> wrote:
+>> >
+>> > vhost_vsock_stop() calls vhost_dev_check_owner() to check the device
+>> > ownership. It expects current->mm to be valid.
+>> >
+>> > vhost_vsock_stop() is also called by vhost_vsock_dev_release() when
+>> > the user has not done close(), so when we are in do_exit(). In this
+>> > case current->mm is invalid and we're releasing the device, so we
+>> > should clean it anyway.
+>> >
+>> > Let's check the owner only when vhost_vsock_stop() is called
+>> > by an ioctl.
+>> >
+>> > Fixes: 433fc58e6bf2 ("VSOCK: Introduce vhost_vsock.ko")
+>> > Cc: stable@vger.kernel.org
+>> > Reported-by: syzbot+1e3ea63db39f2b4440e0@syzkaller.appspotmail.com
+>> > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+>> > ---
+>> >  drivers/vhost/vsock.c | 14 ++++++++------
+>> >  1 file changed, 8 insertions(+), 6 deletions(-)
 >>
->> Patch sent upstream:
->> https://lore.kernel.org/virtualization/20220221114916.107045-1-sgarzare@redhat.com/T/#u
+>> Reported-and-tested-by: syzbot+0abd373e2e50d704db87@syzkaller.appspotmail.com
 >
->I don't see how your patch fixes this issue. It looks unrelated. It is
->surprising that syzbot is happy with it.
->
->I have sent a patch for this issue here:
->https://lore.kernel.org/lkml/20220221072852.31820-1-mail@anirudhrb.com/
+>I don't think this patch fixes "INFO: task hung in vhost_work_dev_flush"
+>even though syzbot says so. I am able to reproduce the issue locally
+>even with this patch applied.
 
-It is related because the worker thread is accessing the iotlb that is 
-going to be freed, so it could be corrupted/invalid.
+Are you using the sysbot reproducer or another test?
+In that case, can you share it?
 
-Your patch seems right, but simply prevents iotlb from being set for the 
-the specific test case, so it remains NULL and iotlb_access_ok() exits 
-immediately.
+ From the stack trace it seemed to me that the worker accesses a zone 
+that has been cleaned (iotlb), so it is invalid and fails.
+That's why I had this patch tested which should stop the worker before 
+cleaning.
 
-Anyway, currently if nregions is 0 vhost_set_memory() sets an iotlb with 
-no regions (the for loop is not executed), so I'm not sure 
-iotlb_access_ok() cycles infinitely.
-
+Thanks,
 Stefano
 
