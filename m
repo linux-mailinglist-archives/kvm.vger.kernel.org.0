@@ -2,17 +2,17 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 154FC4BE08F
-	for <lists+kvm@lfdr.de>; Mon, 21 Feb 2022 18:52:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 01ADE4BDD44
+	for <lists+kvm@lfdr.de>; Mon, 21 Feb 2022 18:45:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357036AbiBUQYM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Feb 2022 11:24:12 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:53598 "EHLO
+        id S1380281AbiBUQXr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Feb 2022 11:23:47 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:53622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1380248AbiBUQXV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Feb 2022 11:23:21 -0500
+        with ESMTP id S1380252AbiBUQXW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Feb 2022 11:23:22 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2137C275C2
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id CDA82275E4
         for <kvm@vger.kernel.org>; Mon, 21 Feb 2022 08:22:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
         s=mimecast20190719; t=1645460577;
@@ -20,29 +20,29 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=i3nje5ezz2l8EdII+5hi4MIxNm8UaLF4TH8gVbuFagw=;
-        b=V4cpdK47fRVuVUnmKhfekpv6Kon+2rNkU9sKacaK2xMX8tRShCt/oY4aqlapQErHNM86xQ
-        TVEN/Sv+5ciD/k9+AtJxNfqm/Bl3har1iyKiadbEC5htpahcp92l3ayJCWO7KtlBjFAk/K
-        scNomuG3zl4Dh/N2PH7b5ZN2tc+2QVk=
+        bh=wHGN6zxyDVkn7jr8uMe3K7F2sy2WSgPe2xYpHBh23mU=;
+        b=Mi9zj+BwDPBQlk92OctU/Uf8ac4N39PlIBaJXmeweWf1wRNU2EVS6/Tgh5smKCxsQqrka8
+        w1bD7RZjIq/jgNtU+1RHS+y+CH4FD6qTGHFdnpVlfsYW6vi8jRb+l7tzBwxE0XeLB0NJUR
+        8VPtIo48wgjcIg2776xmcWKavs7tilI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-590--lw84rjrO9OLbYqALxnYAg-1; Mon, 21 Feb 2022 11:22:53 -0500
-X-MC-Unique: -lw84rjrO9OLbYqALxnYAg-1
+ us-mta-364-6jTrldkjMgWmgswhnEZgEw-1; Mon, 21 Feb 2022 11:22:54 -0500
+X-MC-Unique: 6jTrldkjMgWmgswhnEZgEw-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E0EB11091DA1;
-        Mon, 21 Feb 2022 16:22:52 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6504181424C;
+        Mon, 21 Feb 2022 16:22:53 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 826E37611B;
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 076C578AA5;
         Mon, 21 Feb 2022 16:22:52 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     dmatlack@google.com, seanjc@google.com
-Subject: [PATCH v2 17/25] KVM: x86/mmu: remove redundant bits from extended role
-Date:   Mon, 21 Feb 2022 11:22:35 -0500
-Message-Id: <20220221162243.683208-18-pbonzini@redhat.com>
+Subject: [PATCH v2 18/25] KVM: x86/mmu: remove valid from extended role
+Date:   Mon, 21 Feb 2022 11:22:36 -0500
+Message-Id: <20220221162243.683208-19-pbonzini@redhat.com>
 In-Reply-To: <20220221162243.683208-1-pbonzini@redhat.com>
 References: <20220221162243.683208-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -58,78 +58,72 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Before the separation of the CPU and the MMU role, CR0.PG was not
-available in the base MMU role, because two-dimensional paging always
-used direct=1 in the MMU role.  However, now that the raw role is
-snapshotted in mmu->cpu_mode, CR0.PG *can* be found (though inverted)
-as !cpu_mode.base.direct.  There is no need to store it again in union
-kvm_mmu_extended_role; instead, write an is_cr0_pg accessor by hand that
-takes care of the inversion.
-
-Likewise, CR4.PAE is now always present in the CPU mode as
-!cpu_mode.base.has_4_byte_gpte.  The inversion makes certain tests on
-the MMU role easier, and is easily hidden by the is_cr4_pae accessor
-when operating on the CPU mode.
+The level and direct field of the CPU mode can act as a marker for validity
+instead: exactly one of them is guaranteed to be nonzero, so a zero value
+for both means that the role is invalid and the MMU properties will be
+computed again.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/include/asm/kvm_host.h |  2 --
- arch/x86/kvm/mmu/mmu.c          | 14 ++++++++++----
- 2 files changed, 10 insertions(+), 6 deletions(-)
+ arch/x86/include/asm/kvm_host.h | 4 +---
+ arch/x86/kvm/mmu/mmu.c          | 8 +++-----
+ 2 files changed, 4 insertions(+), 8 deletions(-)
 
 diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 3dbe0be075f5..14f391582738 100644
+index 14f391582738..b8b115b2038f 100644
 --- a/arch/x86/include/asm/kvm_host.h
 +++ b/arch/x86/include/asm/kvm_host.h
-@@ -362,8 +362,6 @@ union kvm_mmu_extended_role {
+@@ -342,8 +342,7 @@ union kvm_mmu_page_role {
+  * kvm_mmu_extended_role complements kvm_mmu_page_role, tracking properties
+  * relevant to the current MMU configuration.   When loading CR0, CR4, or EFER,
+  * including on nested transitions, if nothing in the full role changes then
+- * MMU re-configuration can be skipped. @valid bit is set on first usage so we
+- * don't treat all-zero structure as valid data.
++ * MMU re-configuration can be skipped.
+  *
+  * The properties that are tracked in the extended role but not the page role
+  * are for things that either (a) do not affect the validity of the shadow page
+@@ -360,7 +359,6 @@ union kvm_mmu_page_role {
+ union kvm_mmu_extended_role {
+ 	u32 word;
  	struct {
- 		unsigned int valid:1;
+-		unsigned int valid:1;
  		unsigned int execonly:1;
--		unsigned int cr0_pg:1;
--		unsigned int cr4_pae:1;
  		unsigned int cr4_pse:1;
  		unsigned int cr4_pke:1;
- 		unsigned int cr4_smap:1;
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 61499fd7d017..eb7c62c11700 100644
+index eb7c62c11700..d657e2e2ceec 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -223,16 +223,24 @@ static inline bool __maybe_unused is_##reg##_##name(struct kvm_mmu *mmu)	\
- {								\
- 	return !!(mmu->cpu_mode. base_or_ext . reg##_##name);	\
+@@ -4699,7 +4699,6 @@ kvm_calc_cpu_mode(struct kvm_vcpu *vcpu, const struct kvm_mmu_role_regs *regs)
+ 		role.ext.efer_lma = ____is_efer_lma(regs);
+ 	}
+ 
+-	role.ext.valid = 1;
+ 	return role;
  }
--BUILD_MMU_ROLE_ACCESSOR(ext,  cr0, pg);
- BUILD_MMU_ROLE_ACCESSOR(base, cr0, wp);
- BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, pse);
--BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, pae);
- BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, smep);
- BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, smap);
- BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, pke);
- BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, la57);
- BUILD_MMU_ROLE_ACCESSOR(base, efer, nx);
  
-+static inline bool is_cr0_pg(struct kvm_mmu *mmu)
-+{
-+        return !mmu->cpu_mode.base.direct;
-+}
-+
-+static inline bool is_cr4_pae(struct kvm_mmu *mmu)
-+{
-+        return !mmu->cpu_mode.base.has_4_byte_gpte;
-+}
-+
- static struct kvm_mmu_role_regs vcpu_to_role_regs(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_mmu_role_regs regs = {
-@@ -4681,8 +4689,6 @@ kvm_calc_cpu_mode(struct kvm_vcpu *vcpu, const struct kvm_mmu_role_regs *regs)
- 		else
- 			role.base.level = PT32_ROOT_LEVEL;
+@@ -4874,7 +4873,6 @@ kvm_calc_shadow_ept_root_page_role(struct kvm_vcpu *vcpu, bool accessed_dirty,
  
--		role.ext.cr0_pg = 1;
--		role.ext.cr4_pae = ____is_cr4_pae(regs);
- 		role.ext.cr4_smep = ____is_cr4_smep(regs);
- 		role.ext.cr4_smap = ____is_cr4_smap(regs);
- 		role.ext.cr4_pse = ____is_cr4_pse(regs);
+ 	role.ext.word = 0;
+ 	role.ext.execonly = execonly;
+-	role.ext.valid = 1;
+ 
+ 	return role;
+ }
+@@ -4994,9 +4992,9 @@ void kvm_mmu_after_set_cpuid(struct kvm_vcpu *vcpu)
+ 	vcpu->arch.root_mmu.root_role.word = 0;
+ 	vcpu->arch.guest_mmu.root_role.word = 0;
+ 	vcpu->arch.nested_mmu.root_role.word = 0;
+-	vcpu->arch.root_mmu.cpu_mode.ext.valid = 0;
+-	vcpu->arch.guest_mmu.cpu_mode.ext.valid = 0;
+-	vcpu->arch.nested_mmu.cpu_mode.ext.valid = 0;
++	vcpu->arch.root_mmu.cpu_mode.as_u64 = 0;
++	vcpu->arch.guest_mmu.cpu_mode.as_u64 = 0;
++	vcpu->arch.nested_mmu.cpu_mode.as_u64 = 0;
+ 	kvm_mmu_reset_context(vcpu);
+ 
+ 	/*
 -- 
 2.31.1
 
