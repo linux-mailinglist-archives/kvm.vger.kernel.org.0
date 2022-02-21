@@ -2,52 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A46D4BE0AA
-	for <lists+kvm@lfdr.de>; Mon, 21 Feb 2022 18:52:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CACAC4BE0B5
+	for <lists+kvm@lfdr.de>; Mon, 21 Feb 2022 18:52:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1380218AbiBUQXR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Feb 2022 11:23:17 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:53378 "EHLO
+        id S1380278AbiBUQX1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Feb 2022 11:23:27 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:53418 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1380191AbiBUQXN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Feb 2022 11:23:13 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E666E27154
+        with ESMTP id S1380200AbiBUQXP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Feb 2022 11:23:15 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0B6E927161
         for <kvm@vger.kernel.org>; Mon, 21 Feb 2022 08:22:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645460568;
+        s=mimecast20190719; t=1645460569;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=TTbfjz2iff8ZLMo4yQHOTt0V56zvOG1AVXw8qi9cYUA=;
-        b=A9BjB0c/HHHB0MbXdN8ke+u97A11/p1RDDem1WVBpvv3WVHRF+C+2DgDqQAATSmGrJqBor
-        zlYBCn5FVR8iMjEvLc2IxciPQCpKqoPjbHDU98vGD+GzmgSJNoz/5XkUxOh1HQZUcg7KrE
-        K/aTx+wQZCCrhjYbW5feNBn46pZ9d34=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=2XJ0yshtegx69ruzpbBfy1QKJqb0fPwNdzHSAhgukq8=;
+        b=hQb4rAcKJxSVJ03FpoQmvFHVhW1+sRPl3Z8clufF782SgnbXGjKRTWVKpV1z5gnCDWzLZf
+        KnvyZwECReyCJDnG9rnO5OwkrAXT1MWpxosc+1t9NjaRUSPk4s4mHpX2Stah/Q3Qw6bmrT
+        ZbJtsBEQT5e55MMpjJViwki2I6z1E58=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-271-V-PuRMCpM7apgjDa6ZhrJw-1; Mon, 21 Feb 2022 11:22:45 -0500
-X-MC-Unique: V-PuRMCpM7apgjDa6ZhrJw-1
+ us-mta-140-eXY4jakrOzSVHFt96THSvA-1; Mon, 21 Feb 2022 11:22:45 -0500
+X-MC-Unique: eXY4jakrOzSVHFt96THSvA-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EEA981926DA0;
-        Mon, 21 Feb 2022 16:22:43 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7232B1006AA3;
+        Mon, 21 Feb 2022 16:22:44 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8A29277474;
-        Mon, 21 Feb 2022 16:22:43 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1577B77474;
+        Mon, 21 Feb 2022 16:22:44 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     dmatlack@google.com, seanjc@google.com
-Subject: [PATCH v2 00/25] KVM MMU refactoring part 2: role changes
-Date:   Mon, 21 Feb 2022 11:22:18 -0500
-Message-Id: <20220221162243.683208-1-pbonzini@redhat.com>
+Subject: [PATCH v2 01/25] KVM: x86/mmu: avoid indirect call for get_cr3
+Date:   Mon, 21 Feb 2022 11:22:19 -0500
+Message-Id: <20220221162243.683208-2-pbonzini@redhat.com>
+In-Reply-To: <20220221162243.683208-1-pbonzini@redhat.com>
+References: <20220221162243.683208-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -55,52 +58,131 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is the MMU root role vs. CPU mode split.  While not a requirement
-in absolute terms for further hacking, it makes it much clearer to reason
-on whether the previous root is still valid.
+Most of the time, calls to get_guest_pgd result in calling kvm_read_cr3
+(the exception is only nested TDP).  Check if that is the case if
+retpolines are enabled, thus avoiding an expensive indirect call.
 
-Paolo
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/mmu.h             | 10 ++++++++++
+ arch/x86/kvm/mmu/mmu.c         | 15 ++++++++-------
+ arch/x86/kvm/mmu/paging_tmpl.h |  2 +-
+ arch/x86/kvm/x86.c             |  2 +-
+ 4 files changed, 20 insertions(+), 9 deletions(-)
 
-Paolo Bonzini (25):
-  KVM: x86/mmu: avoid indirect call for get_cr3
-  KVM: x86/mmu: nested EPT cannot be used in SMM
-  KVM: x86/mmu: constify uses of struct kvm_mmu_role_regs
-  KVM: x86/mmu: pull computation of kvm_mmu_role_regs to kvm_init_mmu
-  KVM: x86/mmu: rephrase unclear comment
-  KVM: nVMX/nSVM: do not monkey-patch inject_page_fault callback
-  KVM: x86/mmu: remove "bool base_only" arguments
-  KVM: x86/mmu: split cpu_mode from mmu_role
-  KVM: x86/mmu: do not recompute root level from kvm_mmu_role_regs
-  KVM: x86/mmu: remove ept_ad field
-  KVM: x86/mmu: remove kvm_calc_shadow_root_page_role_common
-  KVM: x86/mmu: cleanup computation of MMU roles for two-dimensional
-    paging
-  KVM: x86/mmu: cleanup computation of MMU roles for shadow paging
-  KVM: x86/mmu: store shadow EFER.NX in the MMU role
-  KVM: x86/mmu: remove extended bits from mmu_role, rename field
-  KVM: x86/mmu: rename kvm_mmu_role union
-  KVM: x86/mmu: remove redundant bits from extended role
-  KVM: x86/mmu: remove valid from extended role
-  KVM: x86/mmu: simplify and/or inline computation of shadow MMU roles
-  KVM: x86/mmu: pull CPU mode computation to kvm_init_mmu
-  KVM: x86/mmu: replace shadow_root_level with root_role.level
-  KVM: x86/mmu: replace root_level with cpu_mode.base.level
-  KVM: x86/mmu: replace direct_map with root_role.direct
-  KVM: x86/mmu: initialize constant-value fields just once
-  KVM: x86/mmu: extract initialization of the page walking data
-
- arch/x86/include/asm/kvm_host.h |  25 +-
- arch/x86/kvm/mmu.h              |  12 +-
- arch/x86/kvm/mmu/mmu.c          | 479 +++++++++++++-------------------
- arch/x86/kvm/mmu/paging_tmpl.h  |  16 +-
- arch/x86/kvm/mmu/tdp_mmu.c      |   4 +-
- arch/x86/kvm/svm/nested.c       |  13 +-
- arch/x86/kvm/svm/svm.c          |   2 +-
- arch/x86/kvm/vmx/nested.c       |   9 +-
- arch/x86/kvm/vmx/vmx.c          |   2 +-
- arch/x86/kvm/x86.c              |  31 ++-
- 10 files changed, 260 insertions(+), 333 deletions(-)
-
+diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+index 1d0c1904d69a..6ee4436e46f1 100644
+--- a/arch/x86/kvm/mmu.h
++++ b/arch/x86/kvm/mmu.h
+@@ -116,6 +116,16 @@ static inline void kvm_mmu_load_pgd(struct kvm_vcpu *vcpu)
+ 					  vcpu->arch.mmu->shadow_root_level);
+ }
+ 
++extern unsigned long kvm_get_guest_cr3(struct kvm_vcpu *vcpu);
++static inline unsigned long kvm_mmu_get_guest_pgd(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu)
++{
++#ifdef CONFIG_RETPOLINE
++	if (mmu->get_guest_pgd == kvm_get_guest_cr3)
++		return kvm_read_cr3(vcpu);
++#endif
++	return mmu->get_guest_pgd(vcpu);
++}
++
+ struct kvm_page_fault {
+ 	/* arguments to kvm_mmu_do_page_fault.  */
+ 	const gpa_t addr;
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index b2c1c4eb6007..7051040e15b3 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -3435,7 +3435,7 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
+ 	unsigned i;
+ 	int r;
+ 
+-	root_pgd = mmu->get_guest_pgd(vcpu);
++	root_pgd = kvm_mmu_get_guest_pgd(vcpu, mmu);
+ 	root_gfn = root_pgd >> PAGE_SHIFT;
+ 
+ 	if (mmu_check_root(vcpu, root_gfn))
+@@ -3854,12 +3854,13 @@ static void shadow_page_table_clear_flood(struct kvm_vcpu *vcpu, gva_t addr)
+ static bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+ 				    gfn_t gfn)
+ {
++	struct kvm_mmu *mmu = vcpu->arch.mmu;
+ 	struct kvm_arch_async_pf arch;
+ 
+ 	arch.token = (vcpu->arch.apf.id++ << 12) | vcpu->vcpu_id;
+ 	arch.gfn = gfn;
+-	arch.direct_map = vcpu->arch.mmu->direct_map;
+-	arch.cr3 = vcpu->arch.mmu->get_guest_pgd(vcpu);
++	arch.direct_map = mmu->direct_map;
++	arch.cr3 = kvm_mmu_get_guest_pgd(vcpu, mmu);
+ 
+ 	return kvm_setup_async_pf(vcpu, cr2_or_gpa,
+ 				  kvm_vcpu_gfn_to_hva(vcpu, gfn), &arch);
+@@ -4208,7 +4209,7 @@ void kvm_mmu_new_pgd(struct kvm_vcpu *vcpu, gpa_t new_pgd)
+ }
+ EXPORT_SYMBOL_GPL(kvm_mmu_new_pgd);
+ 
+-static unsigned long get_cr3(struct kvm_vcpu *vcpu)
++unsigned long kvm_get_guest_cr3(struct kvm_vcpu *vcpu)
+ {
+ 	return kvm_read_cr3(vcpu);
+ }
+@@ -4767,7 +4768,7 @@ static void init_kvm_tdp_mmu(struct kvm_vcpu *vcpu)
+ 	context->invlpg = NULL;
+ 	context->shadow_root_level = kvm_mmu_get_tdp_level(vcpu);
+ 	context->direct_map = true;
+-	context->get_guest_pgd = get_cr3;
++	context->get_guest_pgd = kvm_get_guest_cr3;
+ 	context->get_pdptr = kvm_pdptr_read;
+ 	context->inject_page_fault = kvm_inject_page_fault;
+ 	context->root_level = role_regs_to_root_level(&regs);
+@@ -4942,7 +4943,7 @@ static void init_kvm_softmmu(struct kvm_vcpu *vcpu)
+ 
+ 	kvm_init_shadow_mmu(vcpu, &regs);
+ 
+-	context->get_guest_pgd     = get_cr3;
++	context->get_guest_pgd	   = kvm_get_guest_cr3;
+ 	context->get_pdptr         = kvm_pdptr_read;
+ 	context->inject_page_fault = kvm_inject_page_fault;
+ }
+@@ -4974,7 +4975,7 @@ static void init_kvm_nested_mmu(struct kvm_vcpu *vcpu)
+ 		return;
+ 
+ 	g_context->mmu_role.as_u64 = new_role.as_u64;
+-	g_context->get_guest_pgd     = get_cr3;
++	g_context->get_guest_pgd     = kvm_get_guest_cr3;
+ 	g_context->get_pdptr         = kvm_pdptr_read;
+ 	g_context->inject_page_fault = kvm_inject_page_fault;
+ 	g_context->root_level        = new_role.base.level;
+diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+index 252c77805eb9..80b4b291002a 100644
+--- a/arch/x86/kvm/mmu/paging_tmpl.h
++++ b/arch/x86/kvm/mmu/paging_tmpl.h
+@@ -362,7 +362,7 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
+ 	trace_kvm_mmu_pagetable_walk(addr, access);
+ retry_walk:
+ 	walker->level = mmu->root_level;
+-	pte           = mmu->get_guest_pgd(vcpu);
++	pte           = kvm_mmu_get_guest_pgd(vcpu, mmu);
+ 	have_ad       = PT_HAVE_ACCESSED_DIRTY(mmu);
+ 
+ #if PTTYPE == 64
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 6552360d8888..da33d3a88a8d 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -12190,7 +12190,7 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
+ 		return;
+ 
+ 	if (!vcpu->arch.mmu->direct_map &&
+-	      work->arch.cr3 != vcpu->arch.mmu->get_guest_pgd(vcpu))
++	      work->arch.cr3 != kvm_mmu_get_guest_pgd(vcpu, vcpu->arch.mmu))
+ 		return;
+ 
+ 	kvm_mmu_do_page_fault(vcpu, work->cr2_or_gpa, 0, true);
 -- 
 2.31.1
+
 
