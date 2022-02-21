@@ -2,64 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3BA3F4BEAB7
-	for <lists+kvm@lfdr.de>; Mon, 21 Feb 2022 20:36:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 016524BEAD6
+	for <lists+kvm@lfdr.de>; Mon, 21 Feb 2022 20:37:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231958AbiBUSOn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Feb 2022 13:14:43 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:41724 "EHLO
+        id S231636AbiBUSSL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Feb 2022 13:18:11 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:41786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232294AbiBUSMe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Feb 2022 13:12:34 -0500
-Received: from sender4-of-o53.zoho.com (sender4-of-o53.zoho.com [136.143.188.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B56E195;
-        Mon, 21 Feb 2022 10:03:31 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1645466599; cv=none; 
-        d=zohomail.com; s=zohoarc; 
-        b=YZyMF51P4+/S3dlgHlVUpxcI7aWblCY2sMq8Mn+tA5JO5mh2/dGB1qSkvIywCFZMGWxNADVWG3JvceJWo0j+8DnPkt+j7/d35uztkjl9wjpIxh+ucPTAl/0dwHmt02PiaSqHXZkWlXmlSrnaP9egmkFqAdSN/rSxunRFP5K6acQ=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-        t=1645466599; h=Content-Type:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:To; 
-        bh=fsIUXYehvEEwhdbyTVnwdNs58dADoiqa7FrNZpH5MvQ=; 
-        b=NvDSgUrgG2JK77anNLKyUhkXHdKaC5MSGK1LjlVJNAnX5Jsbw6nmpyNvN6KfcDUM2VMW6N9R9vG+/YOplUKG/kTA4BtA1JZXTrvNHiztsWiWwXGA3sXBTApJnJCNXkgaYF2kKSiP1zheqAuAmUSXEKYqvjJlkILzmbKoFeE3Jxk=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-        dkim=pass  header.i=anirudhrb.com;
-        spf=pass  smtp.mailfrom=mail@anirudhrb.com;
-        dmarc=pass header.from=<mail@anirudhrb.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1645466599;
-        s=zoho; d=anirudhrb.com; i=mail@anirudhrb.com;
-        h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:Content-Type:In-Reply-To;
-        bh=fsIUXYehvEEwhdbyTVnwdNs58dADoiqa7FrNZpH5MvQ=;
-        b=pIbnLjTv5NJg42fxoUE97UNJyrtYslgTpEEwhf8FdicVjVcQBYZsqyxvEUboafkZ
-        +VGYCbnfFkHHKrPiu0l0pSOhitli54K1wStQJTP0RNkgCZWmc6Ak+xTpQ5S0zM6dSg7
-        sFjN+o6xvbtIPIpq2CvLUxXU6P1j5MMzaqloFxPY=
-Received: from anirudhrb.com (49.207.206.107 [49.207.206.107]) by mx.zohomail.com
-        with SMTPS id 1645466598393587.852076311628; Mon, 21 Feb 2022 10:03:18 -0800 (PST)
-Date:   Mon, 21 Feb 2022 23:33:11 +0530
-From:   Anirudh Rayabharam <mail@anirudhrb.com>
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        kernel list <linux-kernel@vger.kernel.org>,
-        Mike Christie <michael.christie@oracle.com>,
-        Jason Wang <jasowang@redhat.com>,
-        netdev <netdev@vger.kernel.org>,
-        Linux Virtualization <virtualization@lists.linux-foundation.org>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        kvm <kvm@vger.kernel.org>, Hillf Danton <hdanton@sina.com>
-Subject: Re: [PATCH] vhost/vsock: don't check owner in vhost_vsock_stop()
- while releasing
-Message-ID: <YhPT37ETuSfmxr5G@anirudhrb.com>
-References: <20220221114916.107045-1-sgarzare@redhat.com>
- <CAGxU2F6aMqTaNaeO7xChtf=veDJYtBjDRayRRYkZ_FOq4CYJWQ@mail.gmail.com>
- <YhO6bwu7iDtUFQGj@anirudhrb.com>
- <20220221164420.cnhs6sgxizc6tcok@sgarzare-redhat>
+        with ESMTP id S232589AbiBUSQA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Feb 2022 13:16:00 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F39CDFFF;
+        Mon, 21 Feb 2022 10:06:33 -0800 (PST)
+Received: from zn.tnic (dslb-088-067-221-104.088.067.pools.vodafone-ip.de [88.67.221.104])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 6FFC01EC0531;
+        Mon, 21 Feb 2022 19:06:26 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1645466786;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=MWw/afFsOSxJd3d13rKUZHwqChPZ/A+IszeqZt9+ZxE=;
+        b=Zk1raW6/fw1YdurcyqLzeJQ7rNXBWPIoUVEVWPfTnDlK2Nwh9wuLji4gF4dQ7Po3Fh4lTz
+        UOJLIha0PKE4e4iR6cRUEl0q+kqm+K9Gv+Fppz5xJ2HVXKKgBiY4u3QfZGeYH6b7LHNOMA
+        suVVW2daCREEY+ZHQxlrBtkZRhicKz8=
+Date:   Mon, 21 Feb 2022 19:06:29 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     "Kirill A. Shutemov" <kirill@shutemov.name>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        brijesh.ksingh@gmail.com, tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH v10 21/45] x86/mm: Add support to validate memory when
+ changing C-bit
+Message-ID: <YhPUpauLlfsPnfbr@zn.tnic>
+References: <Ygz88uacbwuTTNat@zn.tnic.mbx>
+ <20220216160457.1748381-1-brijesh.singh@amd.com>
+ <20220221174121.ceeplpoaz63q72kv@box>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20220221164420.cnhs6sgxizc6tcok@sgarzare-redhat>
-X-ZohoMailClient: External
+In-Reply-To: <20220221174121.ceeplpoaz63q72kv@box>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -67,54 +76,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 21, 2022 at 05:44:20PM +0100, Stefano Garzarella wrote:
-> On Mon, Feb 21, 2022 at 09:44:39PM +0530, Anirudh Rayabharam wrote:
-> > On Mon, Feb 21, 2022 at 02:59:30PM +0100, Stefano Garzarella wrote:
-> > > On Mon, Feb 21, 2022 at 12:49 PM Stefano Garzarella <sgarzare@redhat.com> wrote:
-> > > >
-> > > > vhost_vsock_stop() calls vhost_dev_check_owner() to check the device
-> > > > ownership. It expects current->mm to be valid.
-> > > >
-> > > > vhost_vsock_stop() is also called by vhost_vsock_dev_release() when
-> > > > the user has not done close(), so when we are in do_exit(). In this
-> > > > case current->mm is invalid and we're releasing the device, so we
-> > > > should clean it anyway.
-> > > >
-> > > > Let's check the owner only when vhost_vsock_stop() is called
-> > > > by an ioctl.
-> > > >
-> > > > Fixes: 433fc58e6bf2 ("VSOCK: Introduce vhost_vsock.ko")
-> > > > Cc: stable@vger.kernel.org
-> > > > Reported-by: syzbot+1e3ea63db39f2b4440e0@syzkaller.appspotmail.com
-> > > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> > > > ---
-> > > >  drivers/vhost/vsock.c | 14 ++++++++------
-> > > >  1 file changed, 8 insertions(+), 6 deletions(-)
-> > > 
-> > > Reported-and-tested-by: syzbot+0abd373e2e50d704db87@syzkaller.appspotmail.com
-> > 
-> > I don't think this patch fixes "INFO: task hung in vhost_work_dev_flush"
-> > even though syzbot says so. I am able to reproduce the issue locally
-> > even with this patch applied.
+On Mon, Feb 21, 2022 at 08:41:21PM +0300, Kirill A. Shutemov wrote:
+> On Wed, Feb 16, 2022 at 10:04:57AM -0600, Brijesh Singh wrote:
+> > @@ -287,6 +301,7 @@ struct x86_platform_ops {
+> >  	struct x86_legacy_features legacy;
+> >  	void (*set_legacy_features)(void);
+> >  	struct x86_hyper_runtime hyper;
+> > +	struct x86_guest guest;
+> >  };
 > 
-> Are you using the sysbot reproducer or another test?
-> In that case, can you share it?
+> I used 'cc' instead of 'guest'. 'guest' looks too generic.
 
-I am using the syzbot reproducer.
+But guest is what is needed there. Not all cases where the kernel runs
+as a guest are confidential ones.
 
-> 
-> From the stack trace it seemed to me that the worker accesses a zone that
-> has been cleaned (iotlb), so it is invalid and fails.
+Later, that hyperv thing should be merged into the guest one too as the
+hyperv should be a guest too. AFAICT.
 
-Would the thread hang in that case? How?
+> Also, I'm not sure why not to use pointer to ops struct instead of stroing
+> them directly in x86_platform. Yes, it is consistent with 'hyper', but I
+> don't see it as a strong argument.
 
-Thanks,
+There should be no big difference but we're doing it with direct struct
+member assignment so far so we should keep doing the same and not start
+doing pointers now, all of a sudden.
 
-	- Anirudh.
+> This doesn't cover difference in flushing requirements. Can we get it too?
 
-> That's why I had this patch tested which should stop the worker before
-> cleaning.
-> 
-> Thanks,
-> Stefano
-> 
+What are the requirements you have for TDX on this path?
+
+This is the main reason why I'm asking you to review this - I'd like to
+have one version which works for both and then I'll queue it on a common
+branch.
+
+This is also why I'd like for you and SEV folks to agree on all the
+common code so that I can apply it and you can both base your patchsets
+ontop.
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
