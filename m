@@ -2,87 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E41B4BDCE1
-	for <lists+kvm@lfdr.de>; Mon, 21 Feb 2022 18:43:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D789A4BDEFE
+	for <lists+kvm@lfdr.de>; Mon, 21 Feb 2022 18:49:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358588AbiBUNI3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Feb 2022 08:08:29 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:40022 "EHLO
+        id S1358688AbiBUNNM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Feb 2022 08:13:12 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:47842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358561AbiBUNIV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Feb 2022 08:08:21 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 769661EAFB;
-        Mon, 21 Feb 2022 05:07:58 -0800 (PST)
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21LA1RUH015805;
-        Mon, 21 Feb 2022 13:07:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=Zqbky2/cC7AetT8vZX04ajXKKos844KHqybipcQnzXo=;
- b=CwxjaKo8q/Wd4lI3x4LDPiPaq3G8MdHf07q4zEyK1OZn0Zy54LT41dpFeS6widLG/R5J
- e809UGlkIRadzGp3z61UI7rv/tU01cfxs0/IPIfxCrWtAgTq01L4zOHQge/mLga4DrAW
- xHblFhzFYbnKObbgZv/h+tbLYhz9jJanVAjQ0eGoJwLpkmuzTjZw4gj4F0Bd7cQ3Gpd/
- pVlKTuAtSjcmT+kAcR/ck+H+QIr1H9dA0Xb6s/wEwfYMqnt2jFDPQMLS4mUX5Ui7ddCK
- hzOxyD6CAfFpXMc+jTvoC+OQkaz6Zm3g12cnTwKEAH4BT2S5ENIT7pSRzJjd/44yrlv6 tA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3ec5q0fsdu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 21 Feb 2022 13:07:58 +0000
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21LCgfrX015248;
-        Mon, 21 Feb 2022 13:07:57 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3ec5q0fscw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 21 Feb 2022 13:07:57 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21LCwnu2007238;
-        Mon, 21 Feb 2022 13:07:55 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma01fra.de.ibm.com with ESMTP id 3ear68stdd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 21 Feb 2022 13:07:55 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21LD7ovO55771532
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 21 Feb 2022 13:07:50 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0974F4C05E;
-        Mon, 21 Feb 2022 13:07:50 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BB0474C058;
-        Mon, 21 Feb 2022 13:07:49 +0000 (GMT)
-Received: from t46lp57.lnxne.boe (unknown [9.152.108.100])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 21 Feb 2022 13:07:49 +0000 (GMT)
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com,
-        david@redhat.com
-Subject: [kvm-unit-tests PATCH v2 8/8] s390x: Add EPSW test
-Date:   Mon, 21 Feb 2022 14:07:46 +0100
-Message-Id: <20220221130746.1754410-9-nrb@linux.ibm.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20220221130746.1754410-1-nrb@linux.ibm.com>
-References: <20220221130746.1754410-1-nrb@linux.ibm.com>
+        with ESMTP id S1358694AbiBUNNJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Feb 2022 08:13:09 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 769641EEE0
+        for <kvm@vger.kernel.org>; Mon, 21 Feb 2022 05:12:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645449162;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ppzDXyf5qUdHu/qahqx1jXO12LO18Enabwf41mMpCt8=;
+        b=X5zy4qh1hAyQdCvpDAhhrdeuJaSVegW0EYx0YZgiomwkvbMKsjB49OW+bXvFDx8htlUARH
+        NQ3GVusKJ1+gj2GTC+8nYnd/Oba/nuL6PYrx64enFQaHDV7CjYw/5Wb0hSAXhb7ysv0qBb
+        ImyPxLUmqz3Ba704dAE1wi2CAMgHB/I=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-256-5AsxBhjfOXaUVV7uBruABQ-1; Mon, 21 Feb 2022 08:12:41 -0500
+X-MC-Unique: 5AsxBhjfOXaUVV7uBruABQ-1
+Received: by mail-wr1-f69.google.com with SMTP id v17-20020adf8b51000000b001e336bf3be7so7413191wra.1
+        for <kvm@vger.kernel.org>; Mon, 21 Feb 2022 05:12:41 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=ppzDXyf5qUdHu/qahqx1jXO12LO18Enabwf41mMpCt8=;
+        b=5ilr1x9RfO0FYqxWIQ6pDWplTyZohYFdpOAM7Ab6cFCcCav4uaIauT2lEmM/+cUkcP
+         Zwg4/ZegYoKC5FATszjfZ/BUmdOvY8GD5gCL8sizZJom6oqAt+t1Xw9vg6bSfKKjs2U5
+         ojJWrC8HM/5Qa356/lgpeArvV+WQYzbjPbn1ozN6XccDfMbCLBSfI82wJg33Vw8eV+mG
+         fVS33f+hX+8pMx9cUJCpenxaZbn1P3uSB0weIxVDLhE+nD5p4devVjwFyyYLsoqDeecy
+         iHrjDaUcEIjfZGpg/w+hy2RjbfUf6CBYCJghuZc3ah7InRMe9YlciYTKqjeB3kmVT8tZ
+         xOgw==
+X-Gm-Message-State: AOAM532kk/weLZRjt5tvUcl4KGjTwHCPyUwAk76/QZWkdN6S8yeK1okm
+        Y0qZFdlGzQ+/if8uzYyWFT3K7ZNehkj1Fi4Jg62CmTp8qp/2ncAg0WZCHSnXJ03WxMxzEm0HiF9
+        0cEXlvYQmhxRr
+X-Received: by 2002:a5d:46d2:0:b0:1e4:a653:e010 with SMTP id g18-20020a5d46d2000000b001e4a653e010mr16634538wrs.77.1645449160023;
+        Mon, 21 Feb 2022 05:12:40 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzU8ZEgdy82UVhvG2xdvSW8GSdGfZpb0TmrUMBvl4ZKTzAJyuQlzFVef+h5XXvOG89RBX1XXA==
+X-Received: by 2002:a5d:46d2:0:b0:1e4:a653:e010 with SMTP id g18-20020a5d46d2000000b001e4a653e010mr16634524wrs.77.1645449159811;
+        Mon, 21 Feb 2022 05:12:39 -0800 (PST)
+Received: from sgarzare-redhat (host-95-248-229-156.retail.telecomitalia.it. [95.248.229.156])
+        by smtp.gmail.com with ESMTPSA id f7sm43525089wrz.40.2022.02.21.05.12.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Feb 2022 05:12:39 -0800 (PST)
+Date:   Mon, 21 Feb 2022 14:12:36 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     syzbot <syzbot+bbb030fc51d6f3c5d067@syzkaller.appspotmail.com>
+Cc:     jasowang@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, mst@redhat.com,
+        netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+        virtualization@lists.linux-foundation.org
+Subject: Re: [syzbot] general protection fault in vhost_iotlb_itree_first
+Message-ID: <20220221131236.ekihumv67fpsjsoq@sgarzare-redhat>
+References: <0000000000003d82b405d85b7be9@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: W0_Grn92Rw7gkReVRS-6h2ad1IbmExWb
-X-Proofpoint-GUID: W22tTyjRLaGbbwfkU2lHMXzci6bR-y4t
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-02-21_06,2022-02-21_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
- malwarescore=0 adultscore=0 phishscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxlogscore=999 priorityscore=1501 bulkscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2202210078
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <0000000000003d82b405d85b7be9@google.com>
+X-Spam-Status: No, score=-0.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SORTED_RECIPS,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=no
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -90,179 +77,99 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-EPSW is only intercepted in certain cases. One of these cases is if we
-have a CRW pending and machine check interrupts are masked. This can be
-achieved by issuing a RCHP on a valid channel path. This is why we need
-the CSS lib and an IO device in this test and hence need to skip it
-when not running under QEMU.
+#syz test: https://github.com/stefano-garzarella/linux.git vsock-fix-stop
 
-Three special cases deserve our attention:
-
-- upper 32 bits of both operands are never modified,
-- second operand is not modified if it is zero.
-- when both operands are zero, bits 0-11 and 13-31 of the PSW are
-  stored in r0.
-
-We also verify we get the correct contents when the second operand is
-zero. To do so, we save the data stored at the first operand in the
-first case as a reference. As we don't mess with the PSW, the only thing
-that might change is the Condition Code (CC) due to some instruction in
-between, so we zero it out using zero_out_cc_from_epsw_op1().
-
-This test must be fenced when running in non-QEMU.
-
-Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
----
- s390x/Makefile      |   1 +
- s390x/epsw.c        | 113 ++++++++++++++++++++++++++++++++++++++++++++
- s390x/unittests.cfg |   4 ++
- 3 files changed, 118 insertions(+)
- create mode 100644 s390x/epsw.c
-
-diff --git a/s390x/Makefile b/s390x/Makefile
-index a76b78e5a011..25449708da0d 100644
---- a/s390x/Makefile
-+++ b/s390x/Makefile
-@@ -27,6 +27,7 @@ tests += $(TEST_DIR)/edat.elf
- tests += $(TEST_DIR)/mvpg-sie.elf
- tests += $(TEST_DIR)/spec_ex-sie.elf
- tests += $(TEST_DIR)/firq.elf
-+tests += $(TEST_DIR)/epsw.elf
- 
- pv-tests += $(TEST_DIR)/pv-diags.elf
- 
-diff --git a/s390x/epsw.c b/s390x/epsw.c
-new file mode 100644
-index 000000000000..192115cf2fac
---- /dev/null
-+++ b/s390x/epsw.c
-@@ -0,0 +1,113 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * EPSW Interception Tests
-+ *
-+ * Copyright IBM Corp. 2022
-+ *
-+ * Authors:
-+ *  Nico Boehr <nrb@linux.ibm.com>
-+ */
-+#include <libcflat.h>
-+#include <css.h>
-+#include <vm.h>
-+
-+static uint32_t zero_out_cc_from_epsw_op1(uint32_t epsw_op1)
-+{
-+	return epsw_op1 & ~GENMASK(31 - 18, 31 - 20);
-+}
-+
-+static void generate_crw(void)
-+{
-+	int test_device_sid = css_enumerate();
-+	int cc, ret;
-+
-+	if (!(test_device_sid & SCHID_ONE)) {
-+		report_fail("No I/O device found");
-+		return;
-+	}
-+
-+	cc = css_enable(test_device_sid, IO_SCH_ISC);
-+	report(cc == 0, "Enable subchannel %08x", test_device_sid);
-+
-+	ret = css_generate_crw(test_device_sid);
-+	if (ret)
-+		report_fail("Couldn't generate CRW");
-+}
-+
-+static void test_epsw(void)
-+{
-+	const uint64_t MAGIC1 = 0x1234567890abcdefUL;
-+	const uint64_t MAGIC2 = 0xcafedeadbeeffaceUL;
-+
-+	uint64_t op1 = MAGIC1;
-+	uint64_t op2 = MAGIC2;
-+	uint32_t prev_epsw_op1;
-+
-+	/*
-+	 * having machine check interrupts masked and pending CRW ensures
-+	 * EPSW is intercepted under KVM
-+	 */
-+	generate_crw();
-+
-+	report_prefix_push("both operands given");
-+	asm volatile(
-+		"epsw %0, %1\n"
-+		: "+&d" (op1), "+&a" (op2));
-+	report(upper_32_bits(op1) == upper_32_bits(MAGIC1) &&
-+	       upper_32_bits(op2) == upper_32_bits(MAGIC2),
-+	       "upper 32 bits unmodified");
-+	report(lower_32_bits(op1) != lower_32_bits(MAGIC1) &&
-+	       lower_32_bits(op2) != lower_32_bits(MAGIC2),
-+	       "lower 32 bits modified");
-+	prev_epsw_op1 = zero_out_cc_from_epsw_op1(lower_32_bits(op1));
-+	report_prefix_pop();
-+
-+	report_prefix_push("second operand 0");
-+	op1 = MAGIC1;
-+	op2 = MAGIC2;
-+	asm volatile(
-+		"	lgr 0,%[op2]\n"
-+		"	epsw %[op1], 0\n"
-+		"	lgr %[op2],0\n"
-+		: [op2] "+&d" (op2), [op1] "+&a" (op1)
-+		:
-+		: "0");
-+	report(upper_32_bits(op1) == upper_32_bits(MAGIC1),
-+	       "upper 32 bits of first operand unmodified");
-+	report(zero_out_cc_from_epsw_op1(lower_32_bits(op1)) == prev_epsw_op1,
-+	       "first operand matches previous reading");
-+	report(op2 == MAGIC2, "r0 unmodified");
-+	report_prefix_pop();
-+
-+	report_prefix_push("both operands 0");
-+	op1 = MAGIC1;
-+	asm volatile(
-+		"	lgr 0,%[op1]\n"
-+		"	epsw 0, 0\n"
-+		"	lgr %[op1],0\n"
-+		: [op1] "+&d" (op1)
-+		:
-+		: "0");
-+	report(upper_32_bits(op1) == upper_32_bits(MAGIC1),
-+	       "upper 32 bits of first operand unmodified");
-+	report(zero_out_cc_from_epsw_op1(lower_32_bits(op1)) == prev_epsw_op1,
-+	       "first operand matches previous reading");
-+	report_prefix_pop();
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	if (!vm_is_kvm() && !vm_is_tcg()) {
-+		report_skip("Not running under QEMU");
-+		goto done;
-+	}
-+
-+	report_prefix_push("epsw");
-+
-+	test_epsw();
-+
-+done:
-+	report_prefix_pop();
-+
-+	return report_summary();
-+}
-diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-index 8b148fe31ac0..aeb82246dddf 100644
---- a/s390x/unittests.cfg
-+++ b/s390x/unittests.cfg
-@@ -139,3 +139,7 @@ accel = tcg
- 
- [sck]
- file = sck.elf
-+
-+[epsw]
-+file = epsw.elf
-+extra_params = -device virtio-net-ccw
--- 
-2.31.1
+On Sat, Feb 19, 2022 at 01:18:24AM -0800, syzbot wrote:
+>Hello,
+>
+>syzbot found the following issue on:
+>
+>HEAD commit:    359303076163 tty: n_tty: do not look ahead for EOL charact..
+>git tree:       upstream
+>console output: https://syzkaller.appspot.com/x/log.txt?x=16b34b54700000
+>kernel config:  https://syzkaller.appspot.com/x/.config?x=da674567f7b6043d
+>dashboard link: https://syzkaller.appspot.com/bug?extid=bbb030fc51d6f3c5d067
+>compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+>
+>Unfortunately, I don't have any reproducer for this issue yet.
+>
+>IMPORTANT: if you fix the issue, please add the following tag to the commit:
+>Reported-by: syzbot+bbb030fc51d6f3c5d067@syzkaller.appspotmail.com
+>
+>general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN
+>KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+>CPU: 1 PID: 17981 Comm: vhost-17980 Not tainted 5.17.0-rc4-syzkaller-00052-g359303076163 #0
+>Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+>RIP: 0010:vhost_iotlb_itree_iter_first drivers/vhost/iotlb.c:19 [inline]
+>RIP: 0010:vhost_iotlb_itree_first+0x29/0x280 drivers/vhost/iotlb.c:169
+>Code: 00 41 57 41 56 41 55 49 89 d5 41 54 55 48 89 fd 53 48 89 f3 e8 e8 eb a0 fa 48 89 ea 48 b8 00 00 00 00 00 fc ff df 48 c1 ea 03 <80> 3c 02 00 0f 85 e8 01 00 00 4c 8b 65 00 4d 85 e4 0f 84 b3 01 00
+>RSP: 0018:ffffc90004f57ac8 EFLAGS: 00010246
+>RAX: dffffc0000000000 RBX: 30303030320a0028 RCX: ffffc900103dc000
+>RDX: 0000000000000000 RSI: ffffffff86d72738 RDI: 0000000000000000
+>RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000002
+>R10: ffffffff86d62d88 R11: 0000000000000000 R12: ffff8880260e4d68
+>R13: 303030305f3a3057 R14: dffffc0000000000 R15: 0000000000000000
+>FS:  0000000000000000(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
+>CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>CR2: 00007f2d46121901 CR3: 000000001d652000 CR4: 00000000003506e0
+>DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+>DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+>Call Trace:
+> <TASK>
+> translate_desc+0x11e/0x3e0 drivers/vhost/vhost.c:2054
+> vhost_get_vq_desc+0x662/0x22c0 drivers/vhost/vhost.c:2300
+> vhost_vsock_handle_tx_kick+0x277/0xa20 drivers/vhost/vsock.c:522
+> vhost_worker+0x23d/0x3d0 drivers/vhost/vhost.c:372
+> kthread+0x2e9/0x3a0 kernel/kthread.c:377
+> ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
+> </TASK>
+>Modules linked in:
+>---[ end trace 0000000000000000 ]---
+>RIP: 0010:vhost_iotlb_itree_iter_first drivers/vhost/iotlb.c:19 [inline]
+>RIP: 0010:vhost_iotlb_itree_first+0x29/0x280 drivers/vhost/iotlb.c:169
+>Code: 00 41 57 41 56 41 55 49 89 d5 41 54 55 48 89 fd 53 48 89 f3 e8 e8 eb a0 fa 48 89 ea 48 b8 00 00 00 00 00 fc ff df 48 c1 ea 03 <80> 3c 02 00 0f 85 e8 01 00 00 4c 8b 65 00 4d 85 e4 0f 84 b3 01 00
+>RSP: 0018:ffffc90004f57ac8 EFLAGS: 00010246
+>RAX: dffffc0000000000 RBX: 30303030320a0028 RCX: ffffc900103dc000
+>RDX: 0000000000000000 RSI: ffffffff86d72738 RDI: 0000000000000000
+>RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000002
+>R10: ffffffff86d62d88 R11: 0000000000000000 R12: ffff8880260e4d68
+>R13: 303030305f3a3057 R14: dffffc0000000000 R15: 0000000000000000
+>FS:  0000000000000000(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
+>CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>CR2: 00007f2d449f6718 CR3: 000000001d652000 CR4: 00000000003506e0
+>DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+>DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+>----------------
+>Code disassembly (best guess):
+>   0:	00 41 57             	add    %al,0x57(%rcx)
+>   3:	41 56                	push   %r14
+>   5:	41 55                	push   %r13
+>   7:	49 89 d5             	mov    %rdx,%r13
+>   a:	41 54                	push   %r12
+>   c:	55                   	push   %rbp
+>   d:	48 89 fd             	mov    %rdi,%rbp
+>  10:	53                   	push   %rbx
+>  11:	48 89 f3             	mov    %rsi,%rbx
+>  14:	e8 e8 eb a0 fa       	callq  0xfaa0ec01
+>  19:	48 89 ea             	mov    %rbp,%rdx
+>  1c:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
+>  23:	fc ff df
+>  26:	48 c1 ea 03          	shr    $0x3,%rdx
+>* 2a:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1) <-- trapping instruction
+>  2e:	0f 85 e8 01 00 00    	jne    0x21c
+>  34:	4c 8b 65 00          	mov    0x0(%rbp),%r12
+>  38:	4d 85 e4             	test   %r12,%r12
+>  3b:	0f                   	.byte 0xf
+>  3c:	84                   	.byte 0x84
+>  3d:	b3 01                	mov    $0x1,%bl
+>
+>
+>---
+>This report is generated by a bot. It may contain errors.
+>See https://goo.gl/tpsmEJ for more information about syzbot.
+>syzbot engineers can be reached at syzkaller@googlegroups.com.
+>
+>syzbot will keep track of this issue. See:
+>https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+>
 
