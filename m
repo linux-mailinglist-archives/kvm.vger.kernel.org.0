@@ -2,153 +2,226 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9985A4BE205
-	for <lists+kvm@lfdr.de>; Mon, 21 Feb 2022 18:54:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 571004BDEB9
+	for <lists+kvm@lfdr.de>; Mon, 21 Feb 2022 18:47:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343757AbiBUKm2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Feb 2022 05:42:28 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:59728 "EHLO
+        id S1355410AbiBUKpB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Feb 2022 05:45:01 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:43894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1355276AbiBUKkM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Feb 2022 05:40:12 -0500
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A93761027;
-        Mon, 21 Feb 2022 02:02:11 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=evBQi/e4SgIDMf7Sap2/1PGseafIXtgjsnbfAIfddoEqZtHqcVJTp7ZxAsANqDwIki8zXhmcL0hGSWiRUw7euE7KYhF85bXWPZx+Ty3EzQ1qdKzM5ehgBDLDGc2ykkrImBCB2PkfPEHJEzgNOLo80e4GrcivdxNsliHOaQ71jloeVvMptRZx4ApTbLLeRP8CJ9NBBt9Y+unh0gID2g5oPbl+jeWBCmAlOLVXrSg7qZX/mQIbqZZz/SOgTUkkXuaAVF2fV57yykwI5fnrOe7woQix9zcnSnrnpms8lDpK5JjhO/18nyCKPssnnnlqc9i5TOxmmLLO+LakftR3ixo78Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=X8fDrWoLKcLYbCJkPPLWWhj0PpvXc0NNRdd51yUypoU=;
- b=oQeRv2eoTp55QLFHZMRUcp+CuBrUOw5zgRBvrOiKDGBKnh8KZ8Q4XUevk5Cwx85eobDvnaR/VZjnPK2qk3A9rVcm8CCmJPIVTyITVd11ikF9fNluW4YhpIm0sc3bo6uYTkdF3sLPaf0qeXEjhtOG4MAPKb92Yfwja1sht9rRgMjdy0qA30qlHdzANsPGtr49k9LnNZ/avOrQmEWWeHmg4Pl75sKC453YOswYp5pEx/hPKpMZPJW2Mm8ANyH5CRU8NeDYfH0Rd0fkbfp509DXhBteDlT1k8WNxvj4AhxqWJIFpNYQpFOm8Xc3fVlv+II+lt9zSzXuHR/UVFv1/RJ1FA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=X8fDrWoLKcLYbCJkPPLWWhj0PpvXc0NNRdd51yUypoU=;
- b=XYvZvTdd931oFAowclmkZc8ipa54VuD8TVZyT90bb6cacxJLKPyF+918tssveCxwthJoo6IToY/yliGIFQ6+PAJzHbOhjFs2LMHIAhD1qHwPWxudFe6AEO66DlSiKDbRmKXpzHE2HLau/NU17nWTdaS1ejj3InZiemE7QXlAwUI=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from MN2PR12MB3053.namprd12.prod.outlook.com (2603:10b6:208:c7::24)
- by BN9PR12MB5196.namprd12.prod.outlook.com (2603:10b6:408:11d::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4995.15; Mon, 21 Feb
- 2022 10:02:09 +0000
-Received: from MN2PR12MB3053.namprd12.prod.outlook.com
- ([fe80::9117:ca88:805a:6d5b]) by MN2PR12MB3053.namprd12.prod.outlook.com
- ([fe80::9117:ca88:805a:6d5b%4]) with mapi id 15.20.4995.027; Mon, 21 Feb 2022
- 10:02:09 +0000
-Message-ID: <80fce7df-d387-773d-ad7d-3540c2d411d1@amd.com>
-Date:   Mon, 21 Feb 2022 15:31:49 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.1
-Subject: Re: [PATCH 3/3] KVM: x86/pmu: Segregate Intel and AMD specific logic
-Content-Language: en-US
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     seanjc@google.com, jmattson@google.com,
-        dave.hansen@linux.intel.com, peterz@infradead.org,
-        alexander.shishkin@linux.intel.com, eranian@google.com,
-        daviddunn@google.com, ak@linux.intel.com,
-        kan.liang@linux.intel.com, x86@kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kim.phillips@amd.com,
-        santosh.shukla@amd.com,
-        "Paolo Bonzini - Distinguished Engineer (kernel-recipes.org) (KVM HoF)" 
-        <pbonzini@redhat.com>, Ravi Bangoria <ravi.bangoria@amd.com>
-References: <20220221073140.10618-1-ravi.bangoria@amd.com>
- <20220221073140.10618-4-ravi.bangoria@amd.com>
- <1e0fc70a-1135-1845-b534-79f409e0c29d@gmail.com>
-From:   Ravi Bangoria <ravi.bangoria@amd.com>
-In-Reply-To: <1e0fc70a-1135-1845-b534-79f409e0c29d@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: PN3PR01CA0080.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:9a::22) To MN2PR12MB3053.namprd12.prod.outlook.com
- (2603:10b6:208:c7::24)
+        with ESMTP id S229710AbiBUKoq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Feb 2022 05:44:46 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 037736E797
+        for <kvm@vger.kernel.org>; Mon, 21 Feb 2022 02:05:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645437906;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=a7pC/8c3cMpM8i5986p+h+SJ6tgl0KTE+K3MKLjypsA=;
+        b=QDghDm6L4aPi1yZJ7aNQuA8kjPScrrczg0tCu8Zyr+uUJE3YByJ8UW3PlfytVxeDp8I9Dv
+        imxZLJAquwRO+9OSQvr69EyD3JzBuwAg4fXIAmJ2XGwhXyJ61GOPkxTZlxLYCSivgAIxR9
+        hUMN5znXzxmtPJbSL+TtsHghYpF/ZPo=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-7-NxwON6GnO7-MMaWecse_7w-1; Mon, 21 Feb 2022 05:05:05 -0500
+X-MC-Unique: NxwON6GnO7-MMaWecse_7w-1
+Received: by mail-wr1-f72.google.com with SMTP id k20-20020adfc714000000b001e305cd1597so7180753wrg.19
+        for <kvm@vger.kernel.org>; Mon, 21 Feb 2022 02:05:05 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=a7pC/8c3cMpM8i5986p+h+SJ6tgl0KTE+K3MKLjypsA=;
+        b=tu4gLQYlsOWAULRjrK4GGzdYaSFjfncoArhdCzlDkouPGTwBPv/kZ9QYkuA7kRvdRI
+         07q3AxGAHQrPUD3D/Yz6EquuJH6/70D19LVju4Fh5/Lq/DBM08jJt6Jym8BDtiRNiaje
+         y0ANVh5T+jL7/0YjqbjOP2UEVZtZ4isIDo3DJ+k23Altz7hMLSg6SZh5D0faQiWwKASi
+         ng1VTGdCNa9OHakY2K0WRLSNTQKmQ9XzCFSZMj6VzIX2GVYVIz+DUCqfOMh+BwDCibrO
+         Jn/sB1Yw2gJudopCnKpKRFg4UttLwZarsqcBGSkTOXZ3e0e5nGMVDFivNa8Kw9qFgzwx
+         aNIg==
+X-Gm-Message-State: AOAM531UYPy7QIygeJH5ZYOJBIHVCcitFxn1aQOb0Z83KJY5IiIj2bMA
+        BPGG9C5LZ6HsRqhQTFyR3TntHIxDhnnFCvVctSLcH2wQ5v0yZzp3nlxIen+iK8y4ANKBfrj3k2c
+        krzFddm7fQHlo
+X-Received: by 2002:adf:cf12:0:b0:1e3:25ac:7b25 with SMTP id o18-20020adfcf12000000b001e325ac7b25mr15345139wrj.196.1645437904144;
+        Mon, 21 Feb 2022 02:05:04 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwvL0v2ye0HlLbbizXym02UGy3yMeTg2IZU57hEMg6++fpRjZHeoaP1iJDYrJhnJl0FoOTdYg==
+X-Received: by 2002:adf:cf12:0:b0:1e3:25ac:7b25 with SMTP id o18-20020adfcf12000000b001e325ac7b25mr15345112wrj.196.1645437903844;
+        Mon, 21 Feb 2022 02:05:03 -0800 (PST)
+Received: from sgarzare-redhat (host-95-248-229-156.retail.telecomitalia.it. [95.248.229.156])
+        by smtp.gmail.com with ESMTPSA id w18sm32300769wrl.62.2022.02.21.02.05.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Feb 2022 02:05:03 -0800 (PST)
+Date:   Mon, 21 Feb 2022 11:05:00 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Mike Christie <michael.christie@oracle.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        syzbot <syzbot+1e3ea63db39f2b4440e0@syzkaller.appspotmail.com>,
+        kvm <kvm@vger.kernel.org>, netdev <netdev@vger.kernel.org>,
+        syzkaller-bugs@googlegroups.com,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: [syzbot] WARNING in vhost_dev_cleanup (2)
+Message-ID: <20220221100500.2x3s2sddqahgdfyt@sgarzare-redhat>
+References: <0000000000006f656005d82d24e2@google.com>
+ <CACGkMEsyWBBmx3g613tr97nidHd3-avMyO=WRxS8RpcEk7j2=A@mail.gmail.com>
+ <20220217023550-mutt-send-email-mst@kernel.org>
+ <CACGkMEtuL_4eRYYWd4aQj6rG=cJDQjjr86DWpid3o_N-6xvTWQ@mail.gmail.com>
+ <20220217024359-mutt-send-email-mst@kernel.org>
+ <CAGxU2F7CjNu5Wxg3k1hQF8A8uRt-wKLjMW6TMjb+UVCF+MHZbw@mail.gmail.com>
+ <0b2a5c63-024b-b7a5-e4d1-aa12390bdd38@oracle.com>
+ <a5fca5da-c139-b9bb-1929-d7621c06163d@oracle.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 263ddc83-cb52-421c-d54d-08d9f5213927
-X-MS-TrafficTypeDiagnostic: BN9PR12MB5196:EE_
-X-Microsoft-Antispam-PRVS: <BN9PR12MB5196E2AB958B3E60D31DB2F8E03A9@BN9PR12MB5196.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: JrEvX2msA/iN2yJwOmM1GD/NENm6tySyM0h2RqKaX0wumCBtMWFys9BHl4/oQMf/vX+N/Z5v0eITXzfREy4c0F/HJsf3AvW1dDitVKoHYzstelv/kxgtmCegI/jxlfr8acemqlSytt3yFPuKKuEINyzywrbFKBoSaQnhX4YpmvjuPJBoXqgCqKjjDlpCejX227oLgmaxdpoeq8qMIAVlma2ldNHu13usDr4hdBz72IO+dScjfaozGMo++XFlwoBpZyV1pw+8r3hsjZFNRXSFXdI8rxtc28ov5TryxaPpLF3auH4VeGntxO1OtV0wIjj+nA0aTOFF8SHeKyEa9JmcXeI7o8OzBHe9CuJUSyVWwcIakE7BcULCi4MJC/lgaFFLi0+6kjbqT3+1XIOl5gHmXxfETjjbAF4tK23w8ecqYdYmm38xaUEGJHj2VYaNBIWefRykFjSPjr0WvKuyWs9y9tS6QeNyhl2c+M7PEkIWPh1tIwhn1oA3iurBsBjTD7CIT4Vy5mALtVd0mctotMLWaRgoLxo0c/Gid4MZAiTwiMEbUlx0Z1zezrwbgQGfb4tPF5cGsBARlKB+aJSCrbudwpZ87sZHzfGRSdHHZGr+w4f8SGMj9wSFo48xeyB9MynDyDsGq5cRfGosewmycN3EsTHt0ZUxFvKUA0SDO5jcd0PbVYp+ind6X6DI8uCR+aMADmmVgOWS+E4fOKlBrW2VYSjNYOnU8PDCZSLje+HDSH8=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB3053.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(6512007)(54906003)(6916009)(316002)(508600001)(6666004)(6506007)(53546011)(31686004)(36756003)(44832011)(66556008)(4744005)(38100700002)(8676002)(4326008)(66476007)(6486002)(31696002)(26005)(186003)(2616005)(8936002)(86362001)(7416002)(5660300002)(66946007)(2906002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?OGUvZlZ5aW56M3VvenpDWDF6bFI5dmVCT2tNQ3lEOWlOUWh1ZlRBYTVmOXZq?=
- =?utf-8?B?TTlTYThyNUZWQzlmcEx0bGp3V29ycjh4Wk54S3NzcG9FRThkQUVWbDhSdVFH?=
- =?utf-8?B?d0Ntb2ZUVFFaUmNYSHFXdG8vZW44OE9VYm9mdVQ4THNSM0JuVFpmcitwMmJw?=
- =?utf-8?B?OXYvOGlJQzRSRHdiWWVOVEZubWc2WW9TOGlnTXFJcHZxeUVFbUttMmtkOWhM?=
- =?utf-8?B?c1JTaU5sV003NUZ3dzJtOE9pck52VDQxK2hHNkFySk5mR0FNNjZnZXV3NkVy?=
- =?utf-8?B?YTZnL2l2VEQ5MUtZUWMwNjh2QjUrTEhEckVWeFdHdXNwZnlWdzlVOU44Y2xT?=
- =?utf-8?B?VjZpTmVvU0pLT1JoY2pWVFZLYzhGcjBjbUVwSTdFRTEvbThpNFZEenhpeGdQ?=
- =?utf-8?B?SWROZ21yNjE4U0dRVFByQjFyRjcyazFTY29IeGRGcmlqbVFPYXdvWlIwejJp?=
- =?utf-8?B?TUZNZlRvRFVqNncyVGhyRlZzTmNIZmJ5Nlg4Z1J5YStzcWlRTWZpb09qd3R3?=
- =?utf-8?B?K2xQdllhUXFCeG1SNG5YVzZOeG5nN3ZTekZEMyt3eVFvU001YW5KTHZEOFFL?=
- =?utf-8?B?UWJTRERGenlYaVZsWVYvcmZKSmxlZVJ3WTdveDJpOFVVdnZLRUJaYUhwaVNJ?=
- =?utf-8?B?YjZUL09jeHFPQVdvUE1CeVlFRHVKT0NKcEJZVkdDTmQrbkYvY2o2aEppNTNW?=
- =?utf-8?B?YTh6R2N1MEZ4NitGRWt0aHhjd2lhczB0WU9OaHNGZFVyeGx5b0JELzJsVzB5?=
- =?utf-8?B?Z1ZmL2xiQ2FZenU0Qmx4dlJZM04zd0RXUmUrYUVtTjRSanc3NjZsQm9mMCs0?=
- =?utf-8?B?REh3M0oxUnZOVS9UazlRbnlVUW85NXBVNCsxSUdhRlM0aUNHL0E4UjdxSldD?=
- =?utf-8?B?NElhM3JMZDJ1dnArTm5VblZQS1dDNTRmR0s5NDF1UzhlME84NWNXMjhnKzBN?=
- =?utf-8?B?aFRzWEg3RjREbnorTHlNMFpmOGpqY0hTU3VpdWZuNWdpN3ZjVUdmbWxlczdh?=
- =?utf-8?B?aUp5RDhER3UxMU5qWlJIYUppdUUrRzM2VVczQkpZZ0hxVFZSQlZyK2pmRHkr?=
- =?utf-8?B?ekRwTkhIVXZZUXVOTkJGQWp4dGJTdnQ1WVd0dXU3ejRWYlJESzJQaDhxWkZ0?=
- =?utf-8?B?SFMzUGNGbTZBRUVlWUdDcGVOY0FrY2kxc091L3VVazk2SkhPUndrUytMcWJh?=
- =?utf-8?B?Q3FwU2tCZU5HY044aDlIZzVOKzJJUjluUDA2M0RmNm1yeFFzOVN3aHRsZW5U?=
- =?utf-8?B?UHlvSnd0SFhsTllPblpzekllSk8wVHRBd00rRGJnaXVVbCswc1JyN0hpZU56?=
- =?utf-8?B?cHYva2E2cUdFbFpnMFRDWjQyRDNKbDV4YnNYSmV2aTdvb2lDNFovc0hxWWZp?=
- =?utf-8?B?WHhvUkRTMWRGeUZtQ1VUYTdPdW5tTjE0bW1JYnF0NXFIUjAxTnJ0eUoxYmZZ?=
- =?utf-8?B?T050ZjQ1TGE5VS8wWDJzMHlHa0xJWFB0TDMzZXpnRFNCRHVNaTNKYlVxUmpX?=
- =?utf-8?B?VWZ3S3ZNMmdBbjBYMmM2eitWVzB5V1hSRlkxbGJ1cm9QOHVqUFdIelZCU1FC?=
- =?utf-8?B?U1RlOXVRSWV0c2M1eEZoRllSbTB4NmRZNnF4eERhNEIydndxNnlNVVkrTU93?=
- =?utf-8?B?YVAyZG1iTm5sUnFKT21CNGQ0anRIRGtrdy9zczBSMVZ6ZDBoL0Nsam5VMVJ1?=
- =?utf-8?B?TTZhb25RRlEzcmEzRVFCTlB2clJjN1NteHQ3aWRDakRLWG9HRVM5L3BLalE3?=
- =?utf-8?B?NHJKTFpsVHlJSG1rS25yakh5UFdxdmVnM3FZdXdkNUhjdEdNbkVIbE1HWFZM?=
- =?utf-8?B?SmwvK1gvZS9CV3Q5azVKYmtwa2JrS3l3YWhDUm91MWNwaFhvazN5SFp0cEZ2?=
- =?utf-8?B?MHp5ckIxOVZxTUJxbmZHR3pNSGd3OFVFTFBERGlnRWEvcEswQ3A4TlU4S3NR?=
- =?utf-8?B?QlhjcUlwU3hUTSt2T3RQeFdVb0Z6ODJOdXlibDVqbVZ0Yncwbmh3T2NEZ21G?=
- =?utf-8?B?TFlQRjFHdWJMMURCZG93UXhwTXdNYmF6aFB5UVpmN2hMYnQvQWV4VC90Z0J1?=
- =?utf-8?B?UjFEalJyS1djR21MekJrcG50T2pVNXlUdysrS2VhNGtQdGN3MHZkNkoyU3dO?=
- =?utf-8?B?QlFRZ24rUDJreGRlR1I1SEhRaGZYRHVudzVNdGtwMnB5TnpZQmI2TW10K2p6?=
- =?utf-8?Q?IzyZbcVtQRfX29eXj2aIjs0=3D?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 263ddc83-cb52-421c-d54d-08d9f5213927
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB3053.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Feb 2022 10:02:09.5492
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 6jBGEljQY1/b7VZT847plKicw8ah9PtL5f+0dpurSEkrsm+UFWWR+obTell/AATzyVmNL6WaHVPR0+O8+bo3xg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR12MB5196
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <a5fca5da-c139-b9bb-1929-d7621c06163d@oracle.com>
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, Feb 18, 2022 at 12:23:10PM -0600, Mike Christie wrote:
+>On 2/18/22 11:53 AM, Mike Christie wrote:
+>> On 2/17/22 3:48 AM, Stefano Garzarella wrote:
+>>>
+>>> On Thu, Feb 17, 2022 at 8:50 AM Michael S. Tsirkin <mst@redhat.com> wrote:
+>>>>
+>>>> On Thu, Feb 17, 2022 at 03:39:48PM +0800, Jason Wang wrote:
+>>>>> On Thu, Feb 17, 2022 at 3:36 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+>>>>>>
+>>>>>> On Thu, Feb 17, 2022 at 03:34:13PM +0800, Jason Wang wrote:
+>>>>>>> On Thu, Feb 17, 2022 at 10:01 AM syzbot
+>>>>>>> <syzbot+1e3ea63db39f2b4440e0@syzkaller.appspotmail.com> wrote:
+>>>>>>>>
+>>>>>>>> Hello,
+>>>>>>>>
+>>>>>>>> syzbot found the following issue on:
+>>>>>>>>
+>>>>>>>> HEAD commit:    c5d9ae265b10 Merge tag 'for-linus' of git://git.kernel.org..
+>>>>>>>> git tree:       upstream
+>>>>>>>> console output: https://urldefense.com/v3/__https://syzkaller.appspot.com/x/log.txt?x=132e687c700000__;!!ACWV5N9M2RV99hQ!fLqQTyosTBm7FK50IVmo0ozZhsvUEPFCivEHFDGU3GjlAHDWl07UdOa-t9uf9YisMihn$
+>>>>>>>> kernel config:  https://urldefense.com/v3/__https://syzkaller.appspot.com/x/.config?x=a78b064590b9f912__;!!ACWV5N9M2RV99hQ!fLqQTyosTBm7FK50IVmo0ozZhsvUEPFCivEHFDGU3GjlAHDWl07UdOa-t9uf9RjOhplp$
+>>>>>>>> dashboard link: https://urldefense.com/v3/__https://syzkaller.appspot.com/bug?extid=1e3ea63db39f2b4440e0__;!!ACWV5N9M2RV99hQ!fLqQTyosTBm7FK50IVmo0ozZhsvUEPFCivEHFDGU3GjlAHDWl07UdOa-t9uf9bBf5tv0$
+>>>>>>>> compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+>>>>>>>>
+>>>>>>>> Unfortunately, I don't have any reproducer for this issue yet.
+>>>>>>>>
+>>>>>>>> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+>>>>>>>> Reported-by: syzbot+1e3ea63db39f2b4440e0@syzkaller.appspotmail.com
+>>>>>>>>
+>>>>>>>> WARNING: CPU: 1 PID: 10828 at drivers/vhost/vhost.c:715 vhost_dev_cleanup+0x8b8/0xbc0 drivers/vhost/vhost.c:715
+>>>>>>>> Modules linked in:
+>>>>>>>> CPU: 0 PID: 10828 Comm: syz-executor.0 Not tainted 5.17.0-rc4-syzkaller-00051-gc5d9ae265b10 #0
+>>>>>>>> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+>>>>>>>> RIP: 0010:vhost_dev_cleanup+0x8b8/0xbc0 drivers/vhost/vhost.c:715
+>>>>>>>
+>>>>>>> Probably a hint that we are missing a flush.
+>>>>>>>
+>>>>>>> Looking at vhost_vsock_stop() that is called by vhost_vsock_dev_release():
+>>>>>>>
+>>>>>>> static int vhost_vsock_stop(struct vhost_vsock *vsock)
+>>>>>>> {
+>>>>>>> size_t i;
+>>>>>>>         int ret;
+>>>>>>>
+>>>>>>>         mutex_lock(&vsock->dev.mutex);
+>>>>>>>
+>>>>>>>         ret = vhost_dev_check_owner(&vsock->dev);
+>>>>>>>         if (ret)
+>>>>>>>                 goto err;
+>>>>>>>
+>>>>>>> Where it could fail so the device is not actually stopped.
+>>>>>>>
+>>>>>>> I wonder if this is something related.
+>>>>>>>
+>>>>>>> Thanks
+>>>>>>
+>>>>>>
+>>>>>> But then if that is not the owner then no work should be running, right?
+>>>>>
+>>>>> Could it be a buggy user space that passes the fd to another process
+>>>>> and changes the owner just before the mutex_lock() above?
+>>>>>
+>>>>> Thanks
+>>>>
+>>>> Maybe, but can you be a bit more explicit? what is the set of
+>>>> conditions you see that can lead to this?
+>>>
+>>> I think the issue could be in the vhost_vsock_stop() as Jason mentioned,
+>>> but not related to fd passing, but related to the do_exit() function.
+>>>
+>>> Looking the stack trace, we are in exit_task_work(), that is called
+>>> after exit_mm(), so the vhost_dev_check_owner() can fail because
+>>> current->mm should be NULL at that point.
+>>>
+>>> It seems the fput work is queued by fput_many() in a worker queue, and
+>>> in some cases (maybe a lot of files opened?) the work is still queued
+>>> when we enter in do_exit().
+>> It normally happens if userspace doesn't do a close() when the VM
+>
+>Just one clarification. I meant to say it "always" happens when userspace
+>doesn't do a close.
+>
+>It doesn't have anything to do with lots of files or something like that.
+>We are actually running the vhost device's release function from
+>do_exit->task_work_run and so all those __fputs are done from something
+>like qemu's context (current == that process).
+>
+>We are *not* hitting the case:
+>
+>do_exit->exit_files->put_files_struct->filp_close->fput->fput_many
+>
+>and then in there hitting the schedule_delayed_work path. For that
+>the last __fput would be done from a workqueue thread and so the current
+>pointer would point to a completely different thread.
+>
+>
+>
+>> is shutdown and instead let's the kernel's reaper code cleanup. The qemu
+>> vhost-scsi code doesn't do a close() during shutdown and so this is our
+>> normal code path. It also happens when something like qemu is not
+>> gracefully shutdown like during a crash.
+>>
+>> So fire up qemu, start IO, then crash it or kill 9 it while IO is still
+>> running and you can hit it.
 
+Thank you very much for this detailed explanation!
 
-On 21-Feb-22 1:27 PM, Like Xu wrote:
-> On 21/2/2022 3:31 pm, Ravi Bangoria wrote:
->>   void reprogram_counter(struct kvm_pmu *pmu, int pmc_idx)
->>   {
->>       struct kvm_pmc *pmc = kvm_x86_ops.pmu_ops->pmc_idx_to_pmc(pmu, pmc_idx);
->> +    bool is_intel = !strncmp(kvm_x86_ops.name, "kvm_intel", 9);
-> 
-> How about using guest_cpuid_is_intel(vcpu)
+>>
+>>>
+>>> That said, I don't know if we can simply remove that check in
+>>> vhost_vsock_stop(), or check if current->mm is NULL, to understand if
+>>> the process is exiting.
+>>>
+>>
+>> Should the caller do the vhost_dev_check_owner or tell vhost_vsock_stop
+>> when to check?
+>>
+>> - vhost_vsock_dev_ioctl always wants to check for ownership right?
+>>
+>> - For vhost_vsock_dev_release ownership doesn't matter because we
+>> always want to clean up or it doesn't hurt too much.
+>>
+>> For the case where we just do open then close and no ioctls then
+>> running vhost_vq_set_backend in vhost_vsock_stop is just a minor
+>> hit of extra work. If we've done ioctls, but are now in
+>> vhost_vsock_dev_release then we know for the graceful and ungraceful
+>> case that nothing is going to be accessing this device in the future
+>> and it's getting completely freed so we must completely clean it up.
 
-Yeah, that's better then strncmp().
+Yep, I think the easiest way is to add a parameter to vhost_vsock_stop() 
+to tell when to call vhost_dev_check_owner() or not.  This is because 
+dev->mm is protected by dev->mutex, acquired in vhost_vsock_stop().
 
-> directly in the reprogram_gp_counter() ?
+I will send a patch right away, it would be great if you can review.
 
-We need this flag in reprogram_fixed_counter() as well.
+Thanks,
+Stefano
 
-- Ravi
