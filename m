@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 252B04BD7F7
-	for <lists+kvm@lfdr.de>; Mon, 21 Feb 2022 09:40:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F316A4BD845
+	for <lists+kvm@lfdr.de>; Mon, 21 Feb 2022 09:41:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346822AbiBUIGV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Feb 2022 03:06:21 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:33974 "EHLO
+        id S1346831AbiBUIGW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Feb 2022 03:06:22 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:33976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346810AbiBUIGU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1346815AbiBUIGU (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 21 Feb 2022 03:06:20 -0500
 Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEF38635E;
-        Mon, 21 Feb 2022 00:05:57 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F20C21B;
+        Mon, 21 Feb 2022 00:05:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1645430757; x=1676966757;
+  t=1645430758; x=1676966758;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references;
-  bh=5VNRZNN7CqeqZx9FxLdMANtkHPO8VyZj8Jmc3XU1Ow8=;
-  b=XBhYrprlixfhGhRHwrWnanH2TWfv739m3W7WZtk+/ZeWFAZc1DaUBvIx
-   qkE5GoE5UdH064IsllWXjG4oHNUOO0nOFT2gGEBAV2gLIZ8Av0Q5ria0D
-   KtZ3Dbd3zNXzhtk+8kPddjo3U/6VEWa/ZXXgYDCw6SpATdB7RgBUuoqrN
-   Q6BLS3z4BIni5dID3xcCD8r6lC4+GXlWrB0dr8OwR36gHprouj3QDqlsO
-   gSWIXJsjxEdURy2iXtTZv4vjWTPEcc3JOfJtwFq+MFJGs3h15lPbP+DU0
-   Yg5g4WZpafPVdQeAGlcD2e/NYLi47xafqyUgw93WH9bQSNvyaZr0xhonm
+  bh=bQS4lZ96m57YbacKYWmxwktghmoyo+/heYviDldSwgE=;
+  b=D5uZm4iYWKG658D314cU5nML/r6AIeCBUkuF77f7/naYQuXWfVrclWoG
+   dFL7i8/OCefhkxPkThtpICElaPVRQ2caEYOA0O56g0ynjPpnWMLHkIgp6
+   E2q6++4Ld4c8onI+SWr/MXaf8eo5vd46/uPtFNqLeqN34R2h2f2UP/k7L
+   s5knPYiNaHldn3ouFRlh85W7r940u99DJ9GgchyT04o4XkWPMzEB0dErO
+   5Tq/f2TCSFHpLJrFYUufkV4XedVHqOT7YAOHrZuyye8cfO6EBTbSTej8c
+   m3glDV2bTyEf1iDmDT8YUfwHn2HhgkyLN2hIEfpjQssSGMJ5yXQVWS91N
    Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10264"; a="250277843"
+X-IronPort-AV: E=McAfee;i="6200,9189,10264"; a="250277855"
 X-IronPort-AV: E=Sophos;i="5.88,385,1635231600"; 
-   d="scan'208";a="250277843"
+   d="scan'208";a="250277855"
 Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2022 00:05:41 -0800
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2022 00:05:44 -0800
 X-IronPort-AV: E=Sophos;i="5.88,385,1635231600"; 
-   d="scan'208";a="638472239"
+   d="scan'208";a="638472260"
 Received: from unknown (HELO chenyi-pc.sh.intel.com) ([10.239.159.73])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2022 00:05:38 -0800
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2022 00:05:41 -0800
 From:   Chenyi Qiang <chenyi.qiang@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
@@ -46,9 +46,9 @@ To:     Paolo Bonzini <pbonzini@redhat.com>,
         Xiaoyao Li <xiaoyao.li@intel.com>
 Cc:     Chenyi Qiang <chenyi.qiang@intel.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v6 1/7] KVM: VMX: Introduce PKS VMCS fields
-Date:   Mon, 21 Feb 2022 16:08:34 +0800
-Message-Id: <20220221080840.7369-2-chenyi.qiang@intel.com>
+Subject: [PATCH v6 2/7] KVM: VMX: Add proper cache tracking for PKRS
+Date:   Mon, 21 Feb 2022 16:08:35 +0800
+Message-Id: <20220221080840.7369-3-chenyi.qiang@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20220221080840.7369-1-chenyi.qiang@intel.com>
 References: <20220221080840.7369-1-chenyi.qiang@intel.com>
@@ -62,65 +62,102 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PKS(Protection Keys for Supervisor Pages) is a feature that extends the
-Protection Key architecture to support thread-specific permission
-restrictions on supervisor pages.
+Add PKRS caching into the standard register caching mechanism in order
+to take advantage of the availability checks provided by regs_avail.
 
-A new PKS MSR(PKRS) is defined in kernel to support PKS, which holds a
-set of permissions associated with each protection domain.
-
-Two VMCS fields {HOST,GUEST}_IA32_PKRS are introduced in
-{host,guest}-state area to store the respective values of PKRS.
-
-Every VM exit saves PKRS into guest-state area.
-If VM_EXIT_LOAD_IA32_PKRS = 1, VM exit loads PKRS from the host-state
-area.
-If VM_ENTRY_LOAD_IA32_PKRS = 1, VM entry loads PKRS from the guest-state
-area.
+This is because vcpu->arch.pkrs will be rarely acceesed by KVM, only in
+the case of host userspace MSR reads and GVA->GPA translation in
+following patches. It is unnecessary to keep it up-to-date at all times.
 
 Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
-Reviewed-by: Jim Mattson <jmattson@google.com>
 ---
- arch/x86/include/asm/vmx.h | 6 ++++++
- 1 file changed, 6 insertions(+)
+ arch/x86/include/asm/kvm_host.h |  2 ++
+ arch/x86/kvm/kvm_cache_regs.h   |  7 +++++++
+ arch/x86/kvm/vmx/vmx.c          | 11 +++++++++++
+ arch/x86/kvm/vmx/vmx.h          |  3 ++-
+ 4 files changed, 22 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
-index 0ffaa3156a4e..7962d506ba91 100644
---- a/arch/x86/include/asm/vmx.h
-+++ b/arch/x86/include/asm/vmx.h
-@@ -95,6 +95,7 @@
- #define VM_EXIT_CLEAR_BNDCFGS                   0x00800000
- #define VM_EXIT_PT_CONCEAL_PIP			0x01000000
- #define VM_EXIT_CLEAR_IA32_RTIT_CTL		0x02000000
-+#define VM_EXIT_LOAD_IA32_PKRS			0x20000000
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 1384517d7709..75940aeb5f67 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -177,6 +177,7 @@ enum kvm_reg {
+ 	VCPU_EXREG_SEGMENTS,
+ 	VCPU_EXREG_EXIT_INFO_1,
+ 	VCPU_EXREG_EXIT_INFO_2,
++	VCPU_EXREG_PKRS,
+ };
  
- #define VM_EXIT_ALWAYSON_WITHOUT_TRUE_MSR	0x00036dff
+ enum {
+@@ -632,6 +633,7 @@ struct kvm_vcpu_arch {
+ 	unsigned long cr8;
+ 	u32 host_pkru;
+ 	u32 pkru;
++	u32 pkrs;
+ 	u32 hflags;
+ 	u64 efer;
+ 	u64 apic_base;
+diff --git a/arch/x86/kvm/kvm_cache_regs.h b/arch/x86/kvm/kvm_cache_regs.h
+index 3febc342360c..2b2540ca584f 100644
+--- a/arch/x86/kvm/kvm_cache_regs.h
++++ b/arch/x86/kvm/kvm_cache_regs.h
+@@ -177,6 +177,13 @@ static inline u64 kvm_read_edx_eax(struct kvm_vcpu *vcpu)
+ 		| ((u64)(kvm_rdx_read(vcpu) & -1u) << 32);
+ }
  
-@@ -108,6 +109,7 @@
- #define VM_ENTRY_LOAD_BNDCFGS                   0x00010000
- #define VM_ENTRY_PT_CONCEAL_PIP			0x00020000
- #define VM_ENTRY_LOAD_IA32_RTIT_CTL		0x00040000
-+#define VM_ENTRY_LOAD_IA32_PKRS			0x00400000
++static inline u32 kvm_read_pkrs(struct kvm_vcpu *vcpu)
++{
++	if (!kvm_register_is_available(vcpu, VCPU_EXREG_PKRS))
++		static_call(kvm_x86_cache_reg)(vcpu, VCPU_EXREG_PKRS);
++	return vcpu->arch.pkrs;
++}
++
+ static inline void enter_guest_mode(struct kvm_vcpu *vcpu)
+ {
+ 	vcpu->arch.hflags |= HF_GUEST_MASK;
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 4ac676066d60..0496afe786fa 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -2269,6 +2269,7 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ static void vmx_cache_reg(struct kvm_vcpu *vcpu, enum kvm_reg reg)
+ {
+ 	unsigned long guest_owned_bits;
++	u64 ia32_pkrs;
  
- #define VM_ENTRY_ALWAYSON_WITHOUT_TRUE_MSR	0x000011ff
+ 	kvm_register_mark_available(vcpu, reg);
  
-@@ -245,12 +247,16 @@ enum vmcs_field {
- 	GUEST_BNDCFGS_HIGH              = 0x00002813,
- 	GUEST_IA32_RTIT_CTL		= 0x00002814,
- 	GUEST_IA32_RTIT_CTL_HIGH	= 0x00002815,
-+	GUEST_IA32_PKRS			= 0x00002818,
-+	GUEST_IA32_PKRS_HIGH		= 0x00002819,
- 	HOST_IA32_PAT			= 0x00002c00,
- 	HOST_IA32_PAT_HIGH		= 0x00002c01,
- 	HOST_IA32_EFER			= 0x00002c02,
- 	HOST_IA32_EFER_HIGH		= 0x00002c03,
- 	HOST_IA32_PERF_GLOBAL_CTRL	= 0x00002c04,
- 	HOST_IA32_PERF_GLOBAL_CTRL_HIGH	= 0x00002c05,
-+	HOST_IA32_PKRS			= 0x00002c06,
-+	HOST_IA32_PKRS_HIGH		= 0x00002c07,
- 	PIN_BASED_VM_EXEC_CONTROL       = 0x00004000,
- 	CPU_BASED_VM_EXEC_CONTROL       = 0x00004002,
- 	EXCEPTION_BITMAP                = 0x00004004,
+@@ -2303,6 +2304,16 @@ static void vmx_cache_reg(struct kvm_vcpu *vcpu, enum kvm_reg reg)
+ 		vcpu->arch.cr4 &= ~guest_owned_bits;
+ 		vcpu->arch.cr4 |= vmcs_readl(GUEST_CR4) & guest_owned_bits;
+ 		break;
++	case VCPU_EXREG_PKRS:
++		/*
++		 * The high 32 bits of PKRS are reserved and attempting to write
++		 * non-zero value will cause #GP. KVM intentionally drops those
++		 * bits.
++		 */
++		ia32_pkrs = vmcs_read64(GUEST_IA32_PKRS);
++		WARN_ON_ONCE(ia32_pkrs >> 32);
++		vcpu->arch.pkrs = ia32_pkrs;
++		break;
+ 	default:
+ 		KVM_BUG_ON(1, vcpu->kvm);
+ 		break;
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index 7f2c82e7f38f..da5e95a6694c 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -500,7 +500,8 @@ BUILD_CONTROLS_SHADOW(secondary_exec, SECONDARY_VM_EXEC_CONTROL)
+ 				(1 << VCPU_EXREG_CR3) |         \
+ 				(1 << VCPU_EXREG_CR4) |         \
+ 				(1 << VCPU_EXREG_EXIT_INFO_1) | \
+-				(1 << VCPU_EXREG_EXIT_INFO_2))
++				(1 << VCPU_EXREG_EXIT_INFO_2) | \
++				(1 << VCPU_EXREG_PKRS))
+ 
+ static inline struct kvm_vmx *to_kvm_vmx(struct kvm *kvm)
+ {
 -- 
 2.17.1
 
