@@ -2,99 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A8584BEC04
-	for <lists+kvm@lfdr.de>; Mon, 21 Feb 2022 21:43:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 250984BEC26
+	for <lists+kvm@lfdr.de>; Mon, 21 Feb 2022 21:58:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233933AbiBUUoG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Feb 2022 15:44:06 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:56472 "EHLO
+        id S234112AbiBUU7K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Feb 2022 15:59:10 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:34302 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229929AbiBUUoF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Feb 2022 15:44:05 -0500
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 80065237F0;
-        Mon, 21 Feb 2022 12:43:41 -0800 (PST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 47AEA1063;
-        Mon, 21 Feb 2022 12:43:41 -0800 (PST)
-Received: from [10.57.40.147] (unknown [10.57.40.147])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 51ACA3F66F;
-        Mon, 21 Feb 2022 12:43:37 -0800 (PST)
-Message-ID: <1d8004d3-1887-4fc7-08d2-0e2ee6b5fdcb@arm.com>
-Date:   Mon, 21 Feb 2022 20:43:33 +0000
+        with ESMTP id S234099AbiBUU7J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Feb 2022 15:59:09 -0500
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81FEF237F4;
+        Mon, 21 Feb 2022 12:58:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1645477125; x=1677013125;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Q8VbVq+l2O93VD3PU9iLNfpkN2dA3vfhrpThY/iQv7k=;
+  b=CuSW0yR16nYDmv8KQCiFubbtrGT6I8N3Nxt/QWSg9FmW3Rs1NafrOEnU
+   /tOkJgomlM6ErdLdFHoYL/TshgcVLX4JU5GZKakl70q2dFA9fy4dBLddE
+   DuKSKM5Yg0lFoYWgtFnPy5LJjGSaclI84CDN3hPwIWJLpeSfmhc7Dm3/f
+   pDW6glRrcIbHatrxanc6TCf1A5g/p0nssFTl6v87KK4v6kkCv/X7NAtFx
+   eEUGmBEjShdSYcZ86YpECfm0OZyLlX44mBd6Au4PYw6WbDNEq369gVOg0
+   IQnQuii7TT7j25gTfPwpyRpv6B0JgT0aBcjht6K/CthihvzCNZ0nmmPwZ
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10265"; a="238984546"
+X-IronPort-AV: E=Sophos;i="5.88,386,1635231600"; 
+   d="scan'208";a="238984546"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2022 12:58:44 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,386,1635231600"; 
+   d="scan'208";a="591075000"
+Received: from lkp-server01.sh.intel.com (HELO da3212ac2f54) ([10.239.97.150])
+  by fmsmga008.fm.intel.com with ESMTP; 21 Feb 2022 12:58:41 -0800
+Received: from kbuild by da3212ac2f54 with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1nMFlZ-0001ya-5Z; Mon, 21 Feb 2022 20:58:41 +0000
+Date:   Tue, 22 Feb 2022 04:57:51 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Like Xu <like.xu.linux@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>
+Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Like Xu <likexu@tencent.com>
+Subject: Re: [PATCH 09/11] KVM: x86/pmu: Replace pmc_perf_hw_id() with
+ perf_get_hw_event_config()
+Message-ID: <202202220414.dzxjtMiF-lkp@intel.com>
+References: <20220221115201.22208-10-likexu@tencent.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101
- Thunderbird/91.6.1
-Subject: Re: [PATCH v6 02/11] driver core: Add dma_cleanup callback in
- bus_type
-Content-Language: en-GB
-To:     Christoph Hellwig <hch@infradead.org>,
-        Lu Baolu <baolu.lu@linux.intel.com>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Joerg Roedel <joro@8bytes.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Ashok Raj <ashok.raj@intel.com>, kvm@vger.kernel.org,
-        rafael@kernel.org, David Airlie <airlied@linux.ie>,
-        linux-pci@vger.kernel.org,
-        Thierry Reding <thierry.reding@gmail.com>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        Dmitry Osipenko <digetx@gmail.com>,
-        Will Deacon <will@kernel.org>,
-        Stuart Yoder <stuyoder@gmail.com>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        linux-kernel@vger.kernel.org, Li Yang <leoyang.li@nxp.com>,
-        iommu@lists.linux-foundation.org,
-        Jacob jun Pan <jacob.jun.pan@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>
-References: <20220218005521.172832-1-baolu.lu@linux.intel.com>
- <20220218005521.172832-3-baolu.lu@linux.intel.com>
- <YhCdEmC2lYStmUSL@infradead.org>
-From:   Robin Murphy <robin.murphy@arm.com>
-In-Reply-To: <YhCdEmC2lYStmUSL@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220221115201.22208-10-likexu@tencent.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2022-02-19 07:32, Christoph Hellwig wrote:
-> So we are back to the callback madness instead of the nice and simple
-> flag?  Sigh.
+Hi Like,
 
-TBH, I *think* this part could be a fair bit simpler. It looks like this 
-whole callback mess is effectively just to decrement group->owner_cnt, 
-but since we should only care about ownership at probe, hotplug, and 
-other places well outside critical fast-paths, I'm not sure we really 
-need to keep track of that anyway - it can always be recalculated by 
-walking the group->devices list, and some of the relevant places have to 
-do that anyway. It should be pretty straightforward for 
-iommu_bus_notifier to clear group->owner automatically upon an unbind of 
-the matching driver when it's no longer bound to any other devices in 
-the group either. And if we still want to entertain the notion of VFIO 
-being able to release ownership without unbinding (I'm not entirely 
-convinced that's a realistically necessary use-case) then it should be 
-up to VFIO to decide when it's finally finished with the whole group, 
-rather than pretending we can keep track of nested ownership claims from 
-inside the API.
+Thank you for the patch! Perhaps something to improve:
 
-Furthermore, If Greg was willing to compromise just far enough to let us 
-put driver_managed_dma in the 3-byte hole in the generic struct 
-device_driver, we wouldn't have to have quite so much boilerplate 
-repeated across the various bus implementations (I'm not suggesting to 
-move any actual calls back into the driver core, just the storage of 
-flag itself). FWIW I have some ideas for re-converging .dma_configure in 
-future which I think should probably be able to subsume this into a 
-completely generic common path, given a common flag.
+[auto build test WARNING on kvm/master]
+[also build test WARNING on linus/master v5.17-rc5 next-20220217]
+[cannot apply to tip/perf/core mst-vhost/linux-next]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
 
-Robin.
+url:    https://github.com/0day-ci/linux/commits/Like-Xu/KVM-x86-pmu-Get-rid-of-PERF_TYPE_HARDWAR-and-other-minor-fixes/20220221-195359
+base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git master
+config: x86_64-randconfig-c007-20220221 (https://download.01.org/0day-ci/archive/20220222/202202220414.dzxjtMiF-lkp@intel.com/config)
+compiler: clang version 15.0.0 (https://github.com/llvm/llvm-project d271fc04d5b97b12e6b797c6067d3c96a8d7470e)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/0day-ci/linux/commit/29bdfb8b85a85f36e3fca739146845d7050a372d
+        git remote add linux-review https://github.com/0day-ci/linux
+        git fetch --no-tags linux-review Like-Xu/KVM-x86-pmu-Get-rid-of-PERF_TYPE_HARDWAR-and-other-minor-fixes/20220221-195359
+        git checkout 29bdfb8b85a85f36e3fca739146845d7050a372d
+        # save the config file to linux build tree
+        mkdir build_dir
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=x86_64 SHELL=/bin/bash arch/x86/kvm/
+
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
+
+All warnings (new ones prefixed by >>):
+
+>> arch/x86/kvm/pmu.c:471:66: warning: use of logical '&&' with constant operand [-Wconstant-logical-operand]
+           return !((pmc->eventsel ^ perf_get_hw_event_config(perf_hw_id)) &&
+                                                                           ^
+   arch/x86/kvm/pmu.c:471:66: note: use '&' for a bitwise operation
+           return !((pmc->eventsel ^ perf_get_hw_event_config(perf_hw_id)) &&
+                                                                           ^~
+                                                                           &
+   arch/x86/kvm/pmu.c:471:66: note: remove constant to silence this warning
+           return !((pmc->eventsel ^ perf_get_hw_event_config(perf_hw_id)) &&
+                                                                          ~^~
+   1 warning generated.
+
+
+vim +471 arch/x86/kvm/pmu.c
+
+   467	
+   468	static inline bool eventsel_match_perf_hw_id(struct kvm_pmc *pmc,
+   469		unsigned int perf_hw_id)
+   470	{
+ > 471		return !((pmc->eventsel ^ perf_get_hw_event_config(perf_hw_id)) &&
+   472			AMD64_RAW_EVENT_MASK_NB);
+   473	}
+   474	
+
+---
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
