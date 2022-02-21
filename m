@@ -2,114 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A1F034BE964
-	for <lists+kvm@lfdr.de>; Mon, 21 Feb 2022 19:07:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A8284BDC8D
+	for <lists+kvm@lfdr.de>; Mon, 21 Feb 2022 18:42:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359021AbiBUNWy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Feb 2022 08:22:54 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:58798 "EHLO
+        id S1377184AbiBUOAC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Feb 2022 09:00:02 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:59396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1359011AbiBUNWv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Feb 2022 08:22:51 -0500
+        with ESMTP id S1347740AbiBUOAB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Feb 2022 09:00:01 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E15E5220C6
-        for <kvm@vger.kernel.org>; Mon, 21 Feb 2022 05:22:23 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 70AD51A3A8
+        for <kvm@vger.kernel.org>; Mon, 21 Feb 2022 05:59:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645449743;
+        s=mimecast20190719; t=1645451977;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=IUxPuTiqjwjRtgGd1O/WAIWMjnIm6uWh+GDnc5nUQEw=;
-        b=IB4YgrJgVLp0JgSxQ35ZXrvv9HojWAAUcSiZ+PkQ+l4bulLzCO7GkyfPV2/D0CLogES5M7
-        4PHvS+P/WThuSaT2s7MIVBNOtUQ565aA0/brx0r7LpThKhsewjvhpXStIhstiYRw9BklIa
-        GRa3hzmUsSVrrMVo6yHBsiEuqtZKVsQ=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=RSVIW7WKSNU5PqfuEaIi9kuilnpf4QQg552O4p0c0vg=;
+        b=Vokr/A4fohDcKbA6ZR0nwGtofkFZt+UdAxvewAbmPgr7KnQUK+eBVNj/l+nLxvtj9Hf0X+
+        8o/vSAYnOHMb8P73LsckGMivAk3jiEPsrGWBC7OYMiGsCsPyiRRz55W2dnQZkMAKaOl5Up
+        sw/AxxIgkslViqRai2fxVEC+utoqSNE=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-615-Gb7KXMI1MWmt3SA8SZ8bkg-1; Mon, 21 Feb 2022 08:22:21 -0500
-X-MC-Unique: Gb7KXMI1MWmt3SA8SZ8bkg-1
-Received: by mail-ed1-f72.google.com with SMTP id bq19-20020a056402215300b0040f276105a4so10150985edb.2
-        for <kvm@vger.kernel.org>; Mon, 21 Feb 2022 05:22:21 -0800 (PST)
+ us-mta-335-MA5NvAcnMiqeO6X2K1SkVA-1; Mon, 21 Feb 2022 08:59:36 -0500
+X-MC-Unique: MA5NvAcnMiqeO6X2K1SkVA-1
+Received: by mail-wr1-f69.google.com with SMTP id e11-20020adf9bcb000000b001e316b01456so7428238wrc.21
+        for <kvm@vger.kernel.org>; Mon, 21 Feb 2022 05:59:36 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=IUxPuTiqjwjRtgGd1O/WAIWMjnIm6uWh+GDnc5nUQEw=;
-        b=T8XQRz6d4hgGY/0sBvPjqacIJz+lLgDXfM4/8uBG3ubOHlUpa9E4SQfbwwhzQZzzL6
-         KNoBYrwYGFCWPhLHgSan0Zmn6EVpwywfwniWu6T2kl/Yu77E6/+93/dijTpwK7g5pZdZ
-         e/Tuwa8bhdFW+aqfFsuJgBRm0a3PxkcAa+31BfGBmZe+UgVhkxxjqGxnK7YSOWanGjeq
-         pMI4GoiKACMoVeyoXlp+dsP4yn9WMBDXADcltK44XyFlpHXJZoX+RswfZaztyIccXwtv
-         cDLrvdQLN3Vg9zgs/eyR44djZjJySw/SrSCLwehfQvzeLspRy1Ovqh2uzZJr6/xsl3+7
-         ZRpA==
-X-Gm-Message-State: AOAM530o7xcOPjasZkRzdtpfjdLLs1O8mF7Ardng+ZaMHM4P6WN4Li0+
-        JfflBsRxGFqCC7IfctBroXpP0XHP0+3GWfA1fl9XkMlmw1MD1KrXjMxovENAMtOMbG07jnvQLOM
-        d0DFY39YQ7r6L
-X-Received: by 2002:a05:6402:1e8c:b0:411:7180:7dfc with SMTP id f12-20020a0564021e8c00b0041171807dfcmr21552011edf.74.1645449740574;
-        Mon, 21 Feb 2022 05:22:20 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJy2jozE/HKpdYV2YtHKjdyhTYjY8fpRSimjhfi/b8wrwkoJU700GkPkJr7G7EmpUZFD0rqW1w==
-X-Received: by 2002:a05:6402:1e8c:b0:411:7180:7dfc with SMTP id f12-20020a0564021e8c00b0041171807dfcmr21551991edf.74.1645449740361;
-        Mon, 21 Feb 2022 05:22:20 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id hs25sm5167755ejc.172.2022.02.21.05.22.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Feb 2022 05:22:19 -0800 (PST)
-Message-ID: <76493240-46c4-61d1-8ce5-a4c5f6c1ecb8@redhat.com>
-Date:   Mon, 21 Feb 2022 14:22:19 +0100
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=RSVIW7WKSNU5PqfuEaIi9kuilnpf4QQg552O4p0c0vg=;
+        b=Umxgipz2LfLqL4/PaUEgLCJU6zo1yMGzxffJYWRH2umbmb4vd6u8xEZU13tiSozXxX
+         skiBS+LJsQABdsI2DE5uu6eyM3t3dCxmB2kObfkS9lBgaGFM/vTK13ZkunTItICQZ/1w
+         TisEU8BOIYqKpsTE40UhBWndTXRceucHNblp4HTAwO7ykP0LrVHKIpTgJrLtGeDG+0s7
+         Ckj5UNLgf05nktN3VCgRoD3tSmlNYMWXAwWNzPNrd3tOWhm+Gnt95h1TVNzHIKO5umi1
+         rF0VAPcLTiSZu+Qy7v7/BvOfmd7XlBihwFQVVphtQixPZF/60iL7+uB/ChzcFW4iu/2J
+         NiMg==
+X-Gm-Message-State: AOAM530Tv/3r8Hv7ZN4zpZBKNyHV0lzKbBw6dq9EF8iUwKIly9kbvYy/
+        nvtaBC7TzjILn/3cUC1+q/ZL36HwTScelNel4/LcjYoKb/cqGwNyKgRkniF2ujgsF9jnCN2oZeE
+        xsq7g10en+yS3
+X-Received: by 2002:adf:9f4a:0:b0:1e3:1c28:c298 with SMTP id f10-20020adf9f4a000000b001e31c28c298mr15464347wrg.233.1645451975136;
+        Mon, 21 Feb 2022 05:59:35 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxFnMEd+AorTKgUxxWlJ80t1TpsoeHG7oT0Zc9X8kQornxrzt1FVqy8lGYBIKPsefgfErXU1w==
+X-Received: by 2002:adf:9f4a:0:b0:1e3:1c28:c298 with SMTP id f10-20020adf9f4a000000b001e31c28c298mr15464328wrg.233.1645451974972;
+        Mon, 21 Feb 2022 05:59:34 -0800 (PST)
+Received: from sgarzare-redhat (host-95-248-229-156.retail.telecomitalia.it. [95.248.229.156])
+        by smtp.gmail.com with ESMTPSA id i13sm13512139wrp.87.2022.02.21.05.59.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Feb 2022 05:59:34 -0800 (PST)
+Date:   Mon, 21 Feb 2022 14:59:30 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     kernel list <linux-kernel@vger.kernel.org>,
+        Mike Christie <michael.christie@oracle.com>,
+        Jason Wang <jasowang@redhat.com>,
+        netdev <netdev@vger.kernel.org>,
+        Linux Virtualization <virtualization@lists.linux-foundation.org>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        kvm <kvm@vger.kernel.org>, Hillf Danton <hdanton@sina.com>
+Subject: Re: [PATCH] vhost/vsock: don't check owner in vhost_vsock_stop()
+ while releasing
+Message-ID: <CAGxU2F6aMqTaNaeO7xChtf=veDJYtBjDRayRRYkZ_FOq4CYJWQ@mail.gmail.com>
+References: <20220221114916.107045-1-sgarzare@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH] KVM: nSVM: fix nested tsc scaling when not enabled but
- MSR_AMD64_TSC_RATIO set
-Content-Language: en-US
-To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-        =?UTF-8?B?RMSBdmlzIE1vc8SBbnM=?= <davispuh@gmail.com>
-References: <0a0b61c5c071415f213a4704ebd73e65761ec1a3.camel@redhat.com>
- <20220221103331.58956-1-mlevitsk@redhat.com>
- <44604447-9686-24b3-4216-71d52eb1a6c2@redhat.com>
- <263fc33973fa6cea8001bddceed1f69153db5174.camel@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <263fc33973fa6cea8001bddceed1f69153db5174.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220221114916.107045-1-sgarzare@redhat.com>
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/21/22 14:17, Maxim Levitsky wrote:
->> It's not clear how QEMU ends up writing MSR_AMD64_TSC_RATIO_DEFAULT
->> rather than 0, but we clearly have a bug in KVM.  It should not allow
->> writing 0 in the first place if tsc-ratio is not available in the VM.
-> 
-> Qemu currently (the code is very new so it can be changed) writes the initial value of
-> 0 to this msr if tsc scaling is disabled in the guest, or MSR_AMD64_TSC_RATIO_DEFAULT
-> if the tsc scaling is enabled.
+On Mon, Feb 21, 2022 at 12:49 PM Stefano Garzarella <sgarzare@redhat.com> wrote:
+>
+> vhost_vsock_stop() calls vhost_dev_check_owner() to check the device
+> ownership. It expects current->mm to be valid.
+>
+> vhost_vsock_stop() is also called by vhost_vsock_dev_release() when
+> the user has not done close(), so when we are in do_exit(). In this
+> case current->mm is invalid and we're releasing the device, so we
+> should clean it anyway.
+>
+> Let's check the owner only when vhost_vsock_stop() is called
+> by an ioctl.
+>
+> Fixes: 433fc58e6bf2 ("VSOCK: Introduce vhost_vsock.ko")
+> Cc: stable@vger.kernel.org
+> Reported-by: syzbot+1e3ea63db39f2b4440e0@syzkaller.appspotmail.com
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> ---
+>  drivers/vhost/vsock.c | 14 ++++++++------
+>  1 file changed, 8 insertions(+), 6 deletions(-)
 
-It's released in 6.2, though, right?
-
-> The guest can change it only when TSC scaling is enabled for it.
-> If tsc scaling is not enabled, both guest reads or writes of this MSR get #GP.
-> I only allowed qemu writes of this msr because I thought that qemu might
-> first set the MSR and then set guest CPUID.
-> 
-> Also, for example the MSR_IA32_XSS uses the same logic in KVM.
-> 
-> As for why qemu sets this msr regardless of guest CPUID bit,
-> it seemed to be cleaner this way - kvm_put_msrs in qemu seems not to
-> check guest CPUID but rather only check that KVM supports this msr,
-> which will be true regardless of guest's CPUID bit.
-
-Yes, I agree it's cleaner in QEMU and consistent with others in KVM. 
-However the value that is written should be the default one (which is 
-usually zero, but not always and not in this case).
-
-Paolo
+Reported-and-tested-by: syzbot+0abd373e2e50d704db87@syzkaller.appspotmail.com
+Reported-and-tested-by: syzbot+3140b17cb44a7b174008@syzkaller.appspotmail.com
 
