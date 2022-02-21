@@ -2,189 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DBFDE4BDF1A
-	for <lists+kvm@lfdr.de>; Mon, 21 Feb 2022 18:49:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CE08F4BE3AB
+	for <lists+kvm@lfdr.de>; Mon, 21 Feb 2022 18:57:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358014AbiBUMdq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Feb 2022 07:33:46 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:49422 "EHLO
+        id S1358553AbiBUNIU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Feb 2022 08:08:20 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:39970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358005AbiBUMdo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Feb 2022 07:33:44 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1C8EE15A0C
-        for <kvm@vger.kernel.org>; Mon, 21 Feb 2022 04:33:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645446800;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=shdZPAdKixSR65xoDRGdlm8dprYC8n8jO7XaRNiILE0=;
-        b=TcDyZY6+ItH6vHgLGrG0EgcNS9XC/sZDoPMDu2TM4JDxjGGAvE0Jnpm267e9oJGGUsqiIB
-        rIIajdtRSyrJ2xvER8GP1I+WNO73lohBIbMHsTkDhFB4n+lWeGZ1fCdTsvTSQY9zItszNh
-        ClbaeECEhdnEpH5FwuS2uxZSyS0t+hw=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-511-v50ghHtfO9WfchWYsTTcHw-1; Mon, 21 Feb 2022 07:33:17 -0500
-X-MC-Unique: v50ghHtfO9WfchWYsTTcHw-1
-Received: by mail-ed1-f70.google.com with SMTP id bq19-20020a056402215300b0040f276105a4so10084552edb.2
-        for <kvm@vger.kernel.org>; Mon, 21 Feb 2022 04:33:16 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=shdZPAdKixSR65xoDRGdlm8dprYC8n8jO7XaRNiILE0=;
-        b=xUUF41TzYnrTfBNl6KT4UXNMwJIDht+Iy8Dweim23YS2CFUo9M6vMytvKeBzJcmfxv
-         4FE3jqxB5YtxB/6bsaCngqUgZAOWdafIR5/A6apnt4WNv8fVilinchvfy9Dj67/sfqBf
-         t27wqRMKUsfkTjyScX6qQmtJ44RakX0tmB7aerH382aWSYe81XFd6YyuUQIm8/HMljtV
-         Xf1KEEKi4QW1T9/CgkN3X8s+/zta2RK9cobiTqLYx6gVtCDtWq9megWgLd4e26SQpHJ9
-         BOl0AY298LjT+YsRJuN7edGp7bnzdmvkYNqd91/peyS025UfOBsi4pO3wK07LitQ2sz1
-         dZsQ==
-X-Gm-Message-State: AOAM532LsNissstWg2dRrHZpORqptaYp3+fYUZVEJQso3JPloDOljmp5
-        7LboekHN/Xr6tFDnOVdRta0HvPu1BUlocSXyqrfKAbzKbSnAQP2loUoE5SW0wb2EMiyY3Oc0SD8
-        KzS7iVotJXQ8Y
-X-Received: by 2002:a17:907:7618:b0:6cf:5756:26c4 with SMTP id jx24-20020a170907761800b006cf575626c4mr15431641ejc.492.1645446795891;
-        Mon, 21 Feb 2022 04:33:15 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxAwRMB80aGegelnclPGNxrWxMk5t1WkcOGbK1qKbIEQgnnRqPmh3qRCNgNi4hGfXky91N3DA==
-X-Received: by 2002:a17:907:7618:b0:6cf:5756:26c4 with SMTP id jx24-20020a170907761800b006cf575626c4mr15431626ejc.492.1645446795640;
-        Mon, 21 Feb 2022 04:33:15 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id ci16sm5113729ejb.128.2022.02.21.04.33.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Feb 2022 04:33:15 -0800 (PST)
-Message-ID: <44604447-9686-24b3-4216-71d52eb1a6c2@redhat.com>
-Date:   Mon, 21 Feb 2022 13:33:13 +0100
+        with ESMTP id S233376AbiBUNIT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Feb 2022 08:08:19 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3416E1EAFB;
+        Mon, 21 Feb 2022 05:07:54 -0800 (PST)
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21LCCBqW020136;
+        Mon, 21 Feb 2022 13:07:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=ZmBY9+AvODRxpQRzREpNEPh35MCCjgnrfk7sVn1Afj0=;
+ b=ZIqs+Gj5ymLU6Hbgyt3Vh7E6F/bGXtzFDZcapi6xMrwi+nB5BrTISwlbHSNtcydcdWLA
+ AZ4JW6zFCHEQEyVvClE8sQWMCqHKtoESpqfpNgcKO30nWr+hF0/y4ILvqERvgYW3Yt/N
+ fnCAkI//rG+6LC0Y3aHEIlivvHhFPGG0VhzmgLHspie4kXaK4lV2ve4mMA6Yx8NmzJI+
+ /1HN8/teE2hfqXNayVe5V2o8jkxTrhn3SFZocfg9V1ODgZMhM3eSNc/zCbA3bEjqrIdw
+ DUKizZJdvi7z3OaHhqSUvqAzJ6Fp9wWt45KbMNoF0kmM4/QxEQ2LjT/74l0HEFUUuih/ Gg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ecahjh3vm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 21 Feb 2022 13:07:53 +0000
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21LD3LLf018155;
+        Mon, 21 Feb 2022 13:07:53 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ecahjh3v3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 21 Feb 2022 13:07:53 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21LCwjMR012698;
+        Mon, 21 Feb 2022 13:07:51 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma03fra.de.ibm.com with ESMTP id 3ear68stgt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 21 Feb 2022 13:07:50 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21LD7ldM48890246
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 21 Feb 2022 13:07:47 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6FCDF4C05A;
+        Mon, 21 Feb 2022 13:07:47 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 231FD4C04A;
+        Mon, 21 Feb 2022 13:07:47 +0000 (GMT)
+Received: from t46lp57.lnxne.boe (unknown [9.152.108.100])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 21 Feb 2022 13:07:47 +0000 (GMT)
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com,
+        david@redhat.com
+Subject: [kvm-unit-tests PATCH v2 0/8] s390x: Extend instruction interception tests
+Date:   Mon, 21 Feb 2022 14:07:38 +0100
+Message-Id: <20220221130746.1754410-1-nrb@linux.ibm.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH] KVM: nSVM: fix nested tsc scaling when not enabled but
- MSR_AMD64_TSC_RATIO set
-Content-Language: en-US
-To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-        =?UTF-8?B?RMSBdmlzIE1vc8SBbnM=?= <davispuh@gmail.com>
-References: <0a0b61c5c071415f213a4704ebd73e65761ec1a3.camel@redhat.com>
- <20220221103331.58956-1-mlevitsk@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220221103331.58956-1-mlevitsk@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: i_Qidz9YPtDdopemna0NuQvM1n6Jo9Mv
+X-Proofpoint-ORIG-GUID: Dj-YzL5P5GSAUA85P0JeNM6q-e5TyRAD
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-02-21_06,2022-02-21_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ bulkscore=0 impostorscore=0 priorityscore=1501 mlxlogscore=910
+ suspectscore=0 mlxscore=0 clxscore=1015 spamscore=0 malwarescore=0
+ adultscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2201110000 definitions=main-2202210078
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/21/22 11:33, Maxim Levitsky wrote:
-> For compatibility with userspace the MSR_AMD64_TSC_RATIO can be set
-> even when the feature is not exposed to the guest, which breaks assumptions
-> that it has the default value in this case.
-> 
-> Fixes: 5228eb96a487 ("KVM: x86: nSVM: implement nested TSC scaling")
-> Cc: stable@vger.kernel.org
-> 
-> Reported-by: Dāvis Mosāns <davispuh@gmail.com>
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+This series extends the instruction interception tests for s390x.
 
-It's not clear how QEMU ends up writing MSR_AMD64_TSC_RATIO_DEFAULT 
-rather than 0, but we clearly have a bug in KVM.  It should not allow 
-writing 0 in the first place if tsc-ratio is not available in the VM.
+For most instructions, there is already coverage in existing tests, but they are
+not covering some failure cases, e.g. bad alignment. In this case, the existing
+tests were extended.
 
-If QEMU really can get itself in this situation, we cannot fix this 
-except with KVM_CAP_DISABLE_QUIRKS (a quirk that would accept and ignore 
-host-initiated writes if the CPUID bit is not available) or perhaps with 
-a pr_warn_ratelimited and a quick deprecation cycle, until some time 
-after 6.2.1 is released.
+SCK was not under test anywhere yet, hence a new test file was added.
 
-Hmmm... maybe the issue is actually that KVM *returns* 0 from 
-KVM_GET_MSRS?  And in this case, fixing KVM would also prevent QEMU from 
-sending the bogus KVM_SET_MSRS?
+The EPSW test gets it's own file, too, because it requires a I/O device, more
+details in the respective commit. 
 
-Thanks,
+Changelog from v1:
+----
+- Reset pmcw flags at test end
+- Rebase
 
-Paolo
+Nico Boehr (8):
+  s390x: Add more tests for MSCH
+  s390x: Add test for PFMF low-address protection
+  s390x: Add sck tests
+  s390x: Add tests for STCRW
+  s390x: Add more tests for SSCH
+  s390x: Add more tests for STSCH
+  s390x: Add tests for TSCH
+  s390x: Add EPSW test
 
-> ---
->   arch/x86/kvm/svm/nested.c | 10 ++++------
->   arch/x86/kvm/svm/svm.c    |  5 +++--
->   arch/x86/kvm/svm/svm.h    |  1 +
->   3 files changed, 8 insertions(+), 8 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> index 1218b5a342fc..a2e2436057dc 100644
-> --- a/arch/x86/kvm/svm/nested.c
-> +++ b/arch/x86/kvm/svm/nested.c
-> @@ -574,14 +574,12 @@ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm)
->   	vcpu->arch.tsc_offset = kvm_calc_nested_tsc_offset(
->   			vcpu->arch.l1_tsc_offset,
->   			svm->nested.ctl.tsc_offset,
-> -			svm->tsc_ratio_msr);
-> +			svm_get_l2_tsc_multiplier(vcpu));
->   
->   	svm->vmcb->control.tsc_offset = vcpu->arch.tsc_offset;
->   
-> -	if (svm->tsc_ratio_msr != kvm_default_tsc_scaling_ratio) {
-> -		WARN_ON(!svm->tsc_scaling_enabled);
-> +	if (svm_get_l2_tsc_multiplier(vcpu) != kvm_default_tsc_scaling_ratio)
->   		nested_svm_update_tsc_ratio_msr(vcpu);
-> -	}
->   
->   	svm->vmcb->control.int_ctl             =
->   		(svm->nested.ctl.int_ctl & int_ctl_vmcb12_bits) |
-> @@ -867,8 +865,7 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
->   		vmcb_mark_dirty(svm->vmcb, VMCB_INTERCEPTS);
->   	}
->   
-> -	if (svm->tsc_ratio_msr != kvm_default_tsc_scaling_ratio) {
-> -		WARN_ON(!svm->tsc_scaling_enabled);
-> +	if (svm_get_l2_tsc_multiplier(vcpu) != kvm_default_tsc_scaling_ratio) {
->   		vcpu->arch.tsc_scaling_ratio = vcpu->arch.l1_tsc_scaling_ratio;
->   		svm_write_tsc_multiplier(vcpu, vcpu->arch.tsc_scaling_ratio);
->   	}
-> @@ -1264,6 +1261,7 @@ void nested_svm_update_tsc_ratio_msr(struct kvm_vcpu *vcpu)
->   {
->   	struct vcpu_svm *svm = to_svm(vcpu);
->   
-> +	WARN_ON_ONCE(!svm->tsc_scaling_enabled);
->   	vcpu->arch.tsc_scaling_ratio =
->   		kvm_calc_nested_tsc_multiplier(vcpu->arch.l1_tsc_scaling_ratio,
->   					       svm->tsc_ratio_msr);
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 975be872cd1a..5cf6bb5bfd3e 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -911,11 +911,12 @@ static u64 svm_get_l2_tsc_offset(struct kvm_vcpu *vcpu)
->   	return svm->nested.ctl.tsc_offset;
->   }
->   
-> -static u64 svm_get_l2_tsc_multiplier(struct kvm_vcpu *vcpu)
-> +u64 svm_get_l2_tsc_multiplier(struct kvm_vcpu *vcpu)
->   {
->   	struct vcpu_svm *svm = to_svm(vcpu);
->   
-> -	return svm->tsc_ratio_msr;
-> +	return svm->tsc_scaling_enabled ? svm->tsc_ratio_msr :
-> +	       kvm_default_tsc_scaling_ratio;
->   }
->   
->   static void svm_write_tsc_offset(struct kvm_vcpu *vcpu, u64 offset)
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index 852b12aee03d..006571dd30df 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -542,6 +542,7 @@ int nested_svm_check_exception(struct vcpu_svm *svm, unsigned nr,
->   			       bool has_error_code, u32 error_code);
->   int nested_svm_exit_special(struct vcpu_svm *svm);
->   void nested_svm_update_tsc_ratio_msr(struct kvm_vcpu *vcpu);
-> +u64 svm_get_l2_tsc_multiplier(struct kvm_vcpu *vcpu);
->   void svm_write_tsc_multiplier(struct kvm_vcpu *vcpu, u64 multiplier);
->   void nested_copy_vmcb_control_to_cache(struct vcpu_svm *svm,
->   				       struct vmcb_control_area *control);
+ lib/s390x/css.h     |  17 +++
+ lib/s390x/css_lib.c |  60 ++++++++++
+ s390x/Makefile      |   2 +
+ s390x/css.c         | 278 ++++++++++++++++++++++++++++++++++++++++++++
+ s390x/epsw.c        | 113 ++++++++++++++++++
+ s390x/pfmf.c        |  29 +++++
+ s390x/sck.c         | 127 ++++++++++++++++++++
+ s390x/unittests.cfg |   7 ++
+ 8 files changed, 633 insertions(+)
+ create mode 100644 s390x/epsw.c
+ create mode 100644 s390x/sck.c
+
+-- 
+2.31.1
 
