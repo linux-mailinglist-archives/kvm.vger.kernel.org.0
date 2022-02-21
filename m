@@ -2,55 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A12274BE5F1
-	for <lists+kvm@lfdr.de>; Mon, 21 Feb 2022 19:01:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DEB974BE6C7
+	for <lists+kvm@lfdr.de>; Mon, 21 Feb 2022 19:02:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358692AbiBUNNU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Feb 2022 08:13:20 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:47840 "EHLO
+        id S1358828AbiBUNS0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Feb 2022 08:18:26 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:53064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358709AbiBUNNM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Feb 2022 08:13:12 -0500
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 638221EEF8
-        for <kvm@vger.kernel.org>; Mon, 21 Feb 2022 05:12:46 -0800 (PST)
-Received: by mail-io1-f70.google.com with SMTP id v123-20020a6bc581000000b0063d8771a58aso9593137iof.0
-        for <kvm@vger.kernel.org>; Mon, 21 Feb 2022 05:12:46 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to:cc;
-        bh=MJCRQcTNaOuw0J+t9DmTL6f/nxjstKT6G2s40iYRbfI=;
-        b=HUgVWd7YZ2rnt3w2jgN+96Yz+f3h8exKZ1Gd/58TkCM2DViJnAPe29nzrvdCOLR+U2
-         7nvydRTO2XLVXOy9TkEAuCTH2/Jo7mTzDhW+zpWDdvUvqn47AXJyas5v09gXiktIN15T
-         bUNL0tJj/OJL8vzBfhVNty8oz46NRgfHCdYvsy8LXEe/ZClrPXoTXPimVAL1ZwaUBgwL
-         0axBCOiIH7fDsRBAnPoEKrV0z8B0AlBFG/7tlCC8jnC1GMMDE1gA6FLyX7D8SeGWLFaK
-         VSIijj5/VQPSiuK8PEw8pg9Sr7Nx+rD6B0zxcfmx0jnacjudUp7PyfEu1dzk16qxh6zT
-         KeYQ==
-X-Gm-Message-State: AOAM530Lgf80b4i3ozdub6w0DOvSzd7p640JmN9XI1Tlp6BpIKbGWhM/
-        knDUYXGQBOBEk9lee/2gtCdgvt19muakJcIE+ord5qTEGB7+
-X-Google-Smtp-Source: ABdhPJxs6d7TUGoLF15yyTZxzDOnxXQcBCts1wy8sEkS9o9R+dFgcbnIRVimKrne0Z170U5cPwTjTMNt1OsNB4Q6uImQjrhvPEVU
-MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1d0d:b0:2c2:1d2c:5b2d with SMTP id
- i13-20020a056e021d0d00b002c21d2c5b2dmr7354706ila.168.1645449165777; Mon, 21
- Feb 2022 05:12:45 -0800 (PST)
-Date:   Mon, 21 Feb 2022 05:12:45 -0800
-In-Reply-To: <20220221131236.ekihumv67fpsjsoq@sgarzare-redhat>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000005d3df05d886fd4a@google.com>
-Subject: Re: [syzbot] general protection fault in vhost_iotlb_itree_first
-From:   syzbot <syzbot+bbb030fc51d6f3c5d067@syzkaller.appspotmail.com>
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     jasowang@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mst@redhat.com,
-        netdev@vger.kernel.org, sgarzare@redhat.com,
-        syzkaller-bugs@googlegroups.com,
-        virtualization@lists.linux-foundation.org
+        with ESMTP id S1358825AbiBUNSS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Feb 2022 08:18:18 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4D24E1EEDA
+        for <kvm@vger.kernel.org>; Mon, 21 Feb 2022 05:17:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645449473;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=jpxAHuJa9t90aXC8zU1qGrExrwiV9NbX8bXL14xuDgg=;
+        b=a7FI/Hn762P+fEOXjwbbfjOlW3opxqLiOOokVWN/bOnH0b+K17C/JuIGne7Rg3UbqW7wYQ
+        ilOZ7xhlAuiK6494OikgH2cFdL6fb0YkT4kz8yXRvHoRiA5pXyCcve0TuRWAYTkFWKdHoH
+        zAma/GtJapBKuYHISXVLueKwuQN1fYA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-279-rl_wM3ypPOigoSMEa4kSaA-1; Mon, 21 Feb 2022 08:17:50 -0500
+X-MC-Unique: rl_wM3ypPOigoSMEa4kSaA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 32526814243;
+        Mon, 21 Feb 2022 13:17:49 +0000 (UTC)
+Received: from starship (unknown [10.40.195.190])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8B2B9105C884;
+        Mon, 21 Feb 2022 13:17:47 +0000 (UTC)
+Message-ID: <263fc33973fa6cea8001bddceed1f69153db5174.camel@redhat.com>
+Subject: Re: [PATCH] KVM: nSVM: fix nested tsc scaling when not enabled but
+ MSR_AMD64_TSC_RATIO set
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+        =?UTF-8?Q?D=C4=81vis_Mos=C4=81ns?= <davispuh@gmail.com>
+Date:   Mon, 21 Feb 2022 15:17:46 +0200
+In-Reply-To: <44604447-9686-24b3-4216-71d52eb1a6c2@redhat.com>
+References: <0a0b61c5c071415f213a4704ebd73e65761ec1a3.camel@redhat.com>
+         <20220221103331.58956-1-mlevitsk@redhat.com>
+         <44604447-9686-24b3-4216-71d52eb1a6c2@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -58,102 +64,135 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> #syz test: https://github.com/stefano-garzarella/linux.git vsock-fix-stop
+On Mon, 2022-02-21 at 13:33 +0100, Paolo Bonzini wrote:
+> On 2/21/22 11:33, Maxim Levitsky wrote:
+> > For compatibility with userspace the MSR_AMD64_TSC_RATIO can be set
+> > even when the feature is not exposed to the guest, which breaks assumptions
+> > that it has the default value in this case.
+> > 
+> > Fixes: 5228eb96a487 ("KVM: x86: nSVM: implement nested TSC scaling")
+> > Cc: stable@vger.kernel.org
+> > 
+> > Reported-by: Dāvis Mosāns <davispuh@gmail.com>
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> 
+> It's not clear how QEMU ends up writing MSR_AMD64_TSC_RATIO_DEFAULT 
+> rather than 0, but we clearly have a bug in KVM.  It should not allow 
+> writing 0 in the first place if tsc-ratio is not available in the VM.
 
-This crash does not have a reproducer. I cannot test it.
+Qemu currently (the code is very new so it can be changed) writes the initial value of
+0 to this msr if tsc scaling is disabled in the guest, or MSR_AMD64_TSC_RATIO_DEFAULT
+if the tsc scaling is enabled.
 
->
-> On Sat, Feb 19, 2022 at 01:18:24AM -0800, syzbot wrote:
->>Hello,
->>
->>syzbot found the following issue on:
->>
->>HEAD commit:    359303076163 tty: n_tty: do not look ahead for EOL charact..
->>git tree:       upstream
->>console output: https://syzkaller.appspot.com/x/log.txt?x=16b34b54700000
->>kernel config:  https://syzkaller.appspot.com/x/.config?x=da674567f7b6043d
->>dashboard link: https://syzkaller.appspot.com/bug?extid=bbb030fc51d6f3c5d067
->>compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
->>
->>Unfortunately, I don't have any reproducer for this issue yet.
->>
->>IMPORTANT: if you fix the issue, please add the following tag to the commit:
->>Reported-by: syzbot+bbb030fc51d6f3c5d067@syzkaller.appspotmail.com
->>
->>general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN
->>KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
->>CPU: 1 PID: 17981 Comm: vhost-17980 Not tainted 5.17.0-rc4-syzkaller-00052-g359303076163 #0
->>Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
->>RIP: 0010:vhost_iotlb_itree_iter_first drivers/vhost/iotlb.c:19 [inline]
->>RIP: 0010:vhost_iotlb_itree_first+0x29/0x280 drivers/vhost/iotlb.c:169
->>Code: 00 41 57 41 56 41 55 49 89 d5 41 54 55 48 89 fd 53 48 89 f3 e8 e8 eb a0 fa 48 89 ea 48 b8 00 00 00 00 00 fc ff df 48 c1 ea 03 <80> 3c 02 00 0f 85 e8 01 00 00 4c 8b 65 00 4d 85 e4 0f 84 b3 01 00
->>RSP: 0018:ffffc90004f57ac8 EFLAGS: 00010246
->>RAX: dffffc0000000000 RBX: 30303030320a0028 RCX: ffffc900103dc000
->>RDX: 0000000000000000 RSI: ffffffff86d72738 RDI: 0000000000000000
->>RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000002
->>R10: ffffffff86d62d88 R11: 0000000000000000 R12: ffff8880260e4d68
->>R13: 303030305f3a3057 R14: dffffc0000000000 R15: 0000000000000000
->>FS:  0000000000000000(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
->>CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->>CR2: 00007f2d46121901 CR3: 000000001d652000 CR4: 00000000003506e0
->>DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
->>DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
->>Call Trace:
->> <TASK>
->> translate_desc+0x11e/0x3e0 drivers/vhost/vhost.c:2054
->> vhost_get_vq_desc+0x662/0x22c0 drivers/vhost/vhost.c:2300
->> vhost_vsock_handle_tx_kick+0x277/0xa20 drivers/vhost/vsock.c:522
->> vhost_worker+0x23d/0x3d0 drivers/vhost/vhost.c:372
->> kthread+0x2e9/0x3a0 kernel/kthread.c:377
->> ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
->> </TASK>
->>Modules linked in:
->>---[ end trace 0000000000000000 ]---
->>RIP: 0010:vhost_iotlb_itree_iter_first drivers/vhost/iotlb.c:19 [inline]
->>RIP: 0010:vhost_iotlb_itree_first+0x29/0x280 drivers/vhost/iotlb.c:169
->>Code: 00 41 57 41 56 41 55 49 89 d5 41 54 55 48 89 fd 53 48 89 f3 e8 e8 eb a0 fa 48 89 ea 48 b8 00 00 00 00 00 fc ff df 48 c1 ea 03 <80> 3c 02 00 0f 85 e8 01 00 00 4c 8b 65 00 4d 85 e4 0f 84 b3 01 00
->>RSP: 0018:ffffc90004f57ac8 EFLAGS: 00010246
->>RAX: dffffc0000000000 RBX: 30303030320a0028 RCX: ffffc900103dc000
->>RDX: 0000000000000000 RSI: ffffffff86d72738 RDI: 0000000000000000
->>RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000002
->>R10: ffffffff86d62d88 R11: 0000000000000000 R12: ffff8880260e4d68
->>R13: 303030305f3a3057 R14: dffffc0000000000 R15: 0000000000000000
->>FS:  0000000000000000(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
->>CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->>CR2: 00007f2d449f6718 CR3: 000000001d652000 CR4: 00000000003506e0
->>DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
->>DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
->>----------------
->>Code disassembly (best guess):
->>   0:	00 41 57             	add    %al,0x57(%rcx)
->>   3:	41 56                	push   %r14
->>   5:	41 55                	push   %r13
->>   7:	49 89 d5             	mov    %rdx,%r13
->>   a:	41 54                	push   %r12
->>   c:	55                   	push   %rbp
->>   d:	48 89 fd             	mov    %rdi,%rbp
->>  10:	53                   	push   %rbx
->>  11:	48 89 f3             	mov    %rsi,%rbx
->>  14:	e8 e8 eb a0 fa       	callq  0xfaa0ec01
->>  19:	48 89 ea             	mov    %rbp,%rdx
->>  1c:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
->>  23:	fc ff df
->>  26:	48 c1 ea 03          	shr    $0x3,%rdx
->>* 2a:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1) <-- trapping instruction
->>  2e:	0f 85 e8 01 00 00    	jne    0x21c
->>  34:	4c 8b 65 00          	mov    0x0(%rbp),%r12
->>  38:	4d 85 e4             	test   %r12,%r12
->>  3b:	0f                   	.byte 0xf
->>  3c:	84                   	.byte 0x84
->>  3d:	b3 01                	mov    $0x1,%bl
->>
->>
->>---
->>This report is generated by a bot. It may contain errors.
->>See https://goo.gl/tpsmEJ for more information about syzbot.
->>syzbot engineers can be reached at syzkaller@googlegroups.com.
->>
->>syzbot will keep track of this issue. See:
->>https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
->>
->
+The guest can change it only when TSC scaling is enabled for it.
+If tsc scaling is not enabled, both guest reads or writes of this MSR get #GP.
+
+I only allowed qemu writes of this msr because I thought that qemu might
+first set the MSR and then set guest CPUID.
+
+Also, for example the MSR_IA32_XSS uses the same logic in KVM.
+
+As for why qemu sets this msr regardless of guest CPUID bit,
+it seemed to be cleaner this way - kvm_put_msrs in qemu seems not to 
+check guest CPUID but rather only check that KVM supports this msr,
+which will be true regardless of guest's CPUID bit.
+
+What do you think?
+
+Best regards,
+	Maxim Levitsky
+
+
+> 
+> If QEMU really can get itself in this situation, we cannot fix this 
+> except with KVM_CAP_DISABLE_QUIRKS (a quirk that would accept and ignore 
+> host-initiated writes if the CPUID bit is not available) or perhaps with 
+> a pr_warn_ratelimited and a quick deprecation cycle, until some time 
+> after 6.2.1 is released.
+> 
+> Hmmm... maybe the issue is actually that KVM *returns* 0 from 
+> KVM_GET_MSRS?  And in this case, fixing KVM would also prevent QEMU from 
+> sending the bogus KVM_SET_MSRS?
+> 
+> Thanks,
+> 
+> Paolo
+> 
+> > ---
+> >   arch/x86/kvm/svm/nested.c | 10 ++++------
+> >   arch/x86/kvm/svm/svm.c    |  5 +++--
+> >   arch/x86/kvm/svm/svm.h    |  1 +
+> >   3 files changed, 8 insertions(+), 8 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> > index 1218b5a342fc..a2e2436057dc 100644
+> > --- a/arch/x86/kvm/svm/nested.c
+> > +++ b/arch/x86/kvm/svm/nested.c
+> > @@ -574,14 +574,12 @@ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm)
+> >   	vcpu->arch.tsc_offset = kvm_calc_nested_tsc_offset(
+> >   			vcpu->arch.l1_tsc_offset,
+> >   			svm->nested.ctl.tsc_offset,
+> > -			svm->tsc_ratio_msr);
+> > +			svm_get_l2_tsc_multiplier(vcpu));
+> >   
+> >   	svm->vmcb->control.tsc_offset = vcpu->arch.tsc_offset;
+> >   
+> > -	if (svm->tsc_ratio_msr != kvm_default_tsc_scaling_ratio) {
+> > -		WARN_ON(!svm->tsc_scaling_enabled);
+> > +	if (svm_get_l2_tsc_multiplier(vcpu) != kvm_default_tsc_scaling_ratio)
+> >   		nested_svm_update_tsc_ratio_msr(vcpu);
+> > -	}
+> >   
+> >   	svm->vmcb->control.int_ctl             =
+> >   		(svm->nested.ctl.int_ctl & int_ctl_vmcb12_bits) |
+> > @@ -867,8 +865,7 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
+> >   		vmcb_mark_dirty(svm->vmcb, VMCB_INTERCEPTS);
+> >   	}
+> >   
+> > -	if (svm->tsc_ratio_msr != kvm_default_tsc_scaling_ratio) {
+> > -		WARN_ON(!svm->tsc_scaling_enabled);
+> > +	if (svm_get_l2_tsc_multiplier(vcpu) != kvm_default_tsc_scaling_ratio) {
+> >   		vcpu->arch.tsc_scaling_ratio = vcpu->arch.l1_tsc_scaling_ratio;
+> >   		svm_write_tsc_multiplier(vcpu, vcpu->arch.tsc_scaling_ratio);
+> >   	}
+> > @@ -1264,6 +1261,7 @@ void nested_svm_update_tsc_ratio_msr(struct kvm_vcpu *vcpu)
+> >   {
+> >   	struct vcpu_svm *svm = to_svm(vcpu);
+> >   
+> > +	WARN_ON_ONCE(!svm->tsc_scaling_enabled);
+> >   	vcpu->arch.tsc_scaling_ratio =
+> >   		kvm_calc_nested_tsc_multiplier(vcpu->arch.l1_tsc_scaling_ratio,
+> >   					       svm->tsc_ratio_msr);
+> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> > index 975be872cd1a..5cf6bb5bfd3e 100644
+> > --- a/arch/x86/kvm/svm/svm.c
+> > +++ b/arch/x86/kvm/svm/svm.c
+> > @@ -911,11 +911,12 @@ static u64 svm_get_l2_tsc_offset(struct kvm_vcpu *vcpu)
+> >   	return svm->nested.ctl.tsc_offset;
+> >   }
+> >   
+> > -static u64 svm_get_l2_tsc_multiplier(struct kvm_vcpu *vcpu)
+> > +u64 svm_get_l2_tsc_multiplier(struct kvm_vcpu *vcpu)
+> >   {
+> >   	struct vcpu_svm *svm = to_svm(vcpu);
+> >   
+> > -	return svm->tsc_ratio_msr;
+> > +	return svm->tsc_scaling_enabled ? svm->tsc_ratio_msr :
+> > +	       kvm_default_tsc_scaling_ratio;
+> >   }
+> >   
+> >   static void svm_write_tsc_offset(struct kvm_vcpu *vcpu, u64 offset)
+> > diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> > index 852b12aee03d..006571dd30df 100644
+> > --- a/arch/x86/kvm/svm/svm.h
+> > +++ b/arch/x86/kvm/svm/svm.h
+> > @@ -542,6 +542,7 @@ int nested_svm_check_exception(struct vcpu_svm *svm, unsigned nr,
+> >   			       bool has_error_code, u32 error_code);
+> >   int nested_svm_exit_special(struct vcpu_svm *svm);
+> >   void nested_svm_update_tsc_ratio_msr(struct kvm_vcpu *vcpu);
+> > +u64 svm_get_l2_tsc_multiplier(struct kvm_vcpu *vcpu);
+> >   void svm_write_tsc_multiplier(struct kvm_vcpu *vcpu, u64 multiplier);
+> >   void nested_copy_vmcb_control_to_cache(struct vcpu_svm *svm,
+> >   				       struct vmcb_control_area *control);
+
+
