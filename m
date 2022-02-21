@@ -2,60 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 23CCC4BE7EB
-	for <lists+kvm@lfdr.de>; Mon, 21 Feb 2022 19:04:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8411F4BE7D6
+	for <lists+kvm@lfdr.de>; Mon, 21 Feb 2022 19:04:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378735AbiBUPEP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Feb 2022 10:04:15 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:40602 "EHLO
+        id S1379010AbiBUPXM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Feb 2022 10:23:12 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:41286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1378694AbiBUPEN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Feb 2022 10:04:13 -0500
+        with ESMTP id S235506AbiBUPXL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Feb 2022 10:23:11 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 44312BF6B
-        for <kvm@vger.kernel.org>; Mon, 21 Feb 2022 07:03:49 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 90195BCA3
+        for <kvm@vger.kernel.org>; Mon, 21 Feb 2022 07:22:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645455828;
+        s=mimecast20190719; t=1645456966;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=mr/1CQBSFnmPM+qg+tsLOOwlovqhtz4/EPWnJbnRwCM=;
-        b=JegRAUzgndjmGQi91V2l3UVjltxeWYdyHL5jbTer9MqW+oLb5DQGw2qexOrrNboj8zMWaz
-        CKgFyke6rro/5y8yfcLO8DY7v5sEbaF1khwE6vA7Ma4VTAhQ5xFL4Kc3HBjSS4ZLTZ0MvG
-        eXZYh2yqi/QgQHLO6iw9poh0F2yrMdM=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=//ocvqSZP1Bqt7GMZm3TubXy/TDW1Bh0IsBpphamyS8=;
+        b=hLJ2MBj8rINfwVCD2b7mdqOBLEJr9Hpytt27R+lLNFLNmusfy2gllLCDaG0Kj71m+QwSNU
+        cLfN1niW2U6GQO7VT18HPlJ9YnwVQkYGI4x0LAEa4owB9QBF6pA+Ii8ReeAeglfOHmLb1P
+        GbSt5NfXq++e7v00gkBd5D+zs5huezc=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-54-MvT3LTfTM_Cl9EyyozbZtg-1; Mon, 21 Feb 2022 10:03:47 -0500
-X-MC-Unique: MvT3LTfTM_Cl9EyyozbZtg-1
-Received: by mail-wr1-f71.google.com with SMTP id g17-20020adfa591000000b001da86c91c22so7528902wrc.5
-        for <kvm@vger.kernel.org>; Mon, 21 Feb 2022 07:03:46 -0800 (PST)
+ us-mta-204-8eed2VLpPhCxumohtczesA-1; Mon, 21 Feb 2022 10:22:45 -0500
+X-MC-Unique: 8eed2VLpPhCxumohtczesA-1
+Received: by mail-wm1-f70.google.com with SMTP id c7-20020a1c3507000000b0034a0dfc86aaso8146943wma.6
+        for <kvm@vger.kernel.org>; Mon, 21 Feb 2022 07:22:45 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=mr/1CQBSFnmPM+qg+tsLOOwlovqhtz4/EPWnJbnRwCM=;
-        b=i2Ya+f908E3yZUgCEuwoBvJsKtJzznP1N8VMjzqW0u/XHkZeFJDHF0w4SkwtjnZaXi
-         bcPTUhW4kv6bJQjyIJ3PEd/zr/iLkMdgVwR8tY/PBUvSQ0QV9/7vYOB+F6aQywPaqW1/
-         D6TOln0ERopeX841dOOnH5FLKUDf0UOpMiw625mK9wh/Ex7TBLMTIliSGgGSKTackpQ6
-         UpqF8AYC+ZisTayeWG/RdIX8z+qeOIk2YYoxGaecRJKpgL573QtWf2MQy0SSWKVYLbCk
-         /imN93Dlq3KM6L21WAq1/AUPv4uQDfx83tVf5sYMKdj7FeonsU77rjllx318lt043agH
-         nleg==
-X-Gm-Message-State: AOAM530gEKszOMMnzbZblol/RJ+he63ldF2sfyD+4BidIdRORXFv0Zbg
-        oFRqF1mSImQR/NEBKinA+VtbFxi6ZCNCAJfHw2z+sdkF5WfEVwt5EvW0QtUuPyaLXs3/YRij8+j
-        UK8a7R8kmNcfy
-X-Received: by 2002:adf:fbd0:0:b0:1e6:8ec3:570 with SMTP id d16-20020adffbd0000000b001e68ec30570mr17166371wrs.396.1645455825784;
-        Mon, 21 Feb 2022 07:03:45 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzV1pmRzjoWzZVTM1CFvom60MmV/YsWRRt4E8ofGC8c5/iOYk+2qzFWrG5At7u3dNopXHgX7g==
-X-Received: by 2002:adf:fbd0:0:b0:1e6:8ec3:570 with SMTP id d16-20020adffbd0000000b001e68ec30570mr17166351wrs.396.1645455825521;
-        Mon, 21 Feb 2022 07:03:45 -0800 (PST)
-Received: from redhat.com ([2.55.129.240])
-        by smtp.gmail.com with ESMTPSA id b7sm39967572wrp.23.2022.02.21.07.03.41
+        bh=//ocvqSZP1Bqt7GMZm3TubXy/TDW1Bh0IsBpphamyS8=;
+        b=WvYFl6xKaJb4S8BheDKqQChpKjI0zLhUvpT4yxzL0jmDQcumxjQhfYxSD+jHyLi/hQ
+         vwjGMz2fiQ3aYFToyYrO4Jm5rYX3UJ911NbCJ+ZGTF4J5uLE++T6AD1PknrMswI1JfHr
+         yz00QSsildk5CGPcy9wHkb4/fvjYqUP5SusgTrAO8fbID3W5PC2AgqpDbbGB2j12eOd3
+         5OWeESseIecaKaaPF0PY8t902wT1jrxtVUIE7X+OgdiPU67cWV92ChUJpd9SbSfkj+RI
+         lGu6bIiQ7q2CYsViqxM1e71tz52GgcZ1sovmsgYZK1LMDhtg8iqvmWeaPOTFRMIXyvec
+         9mCw==
+X-Gm-Message-State: AOAM5315YvT1iC4GGPAqI6D/Ov1v7w4625K1Vb6Zn//enzPGNlL6mJjd
+        vmpELctA8ZPhYpI21zub6V2JHMyUJ6eQsddmD31pqaz4K6UREgRpQUdmqOaYlZK25X3qclnMR70
+        3IXNob5mgciLd
+X-Received: by 2002:adf:f3cc:0:b0:1e7:4fd9:6fd3 with SMTP id g12-20020adff3cc000000b001e74fd96fd3mr15663045wrp.266.1645456964079;
+        Mon, 21 Feb 2022 07:22:44 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyRe76b/qP2XEzCDRn/yzRVG9vTAJA8nQ+6DymsN10XGTOpBA26zz1vt6D+IC5eOeVGMUheYA==
+X-Received: by 2002:adf:f3cc:0:b0:1e7:4fd9:6fd3 with SMTP id g12-20020adff3cc000000b001e74fd96fd3mr15663016wrp.266.1645456963802;
+        Mon, 21 Feb 2022 07:22:43 -0800 (PST)
+Received: from sgarzare-redhat (host-95-248-229-156.retail.telecomitalia.it. [95.248.229.156])
+        by smtp.gmail.com with ESMTPSA id j5-20020a05600c410500b0037bc3e4b526sm7745956wmi.7.2022.02.21.07.22.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Feb 2022 07:03:43 -0800 (PST)
-Date:   Mon, 21 Feb 2022 10:03:39 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Stefano Garzarella <sgarzare@redhat.com>
+        Mon, 21 Feb 2022 07:22:43 -0800 (PST)
+Date:   Mon, 21 Feb 2022 16:22:40 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
 Cc:     linux-kernel@vger.kernel.org,
         Mike Christie <michael.christie@oracle.com>,
         Jason Wang <jasowang@redhat.com>, netdev@vger.kernel.org,
@@ -64,12 +64,13 @@ Cc:     linux-kernel@vger.kernel.org,
         Stefan Hajnoczi <stefanha@redhat.com>, kvm@vger.kernel.org
 Subject: Re: [PATCH] vhost/vsock: don't check owner in vhost_vsock_stop()
  while releasing
-Message-ID: <20220221094829-mutt-send-email-mst@kernel.org>
+Message-ID: <20220221152240.nbdthe4grii577zd@sgarzare-redhat>
 References: <20220221114916.107045-1-sgarzare@redhat.com>
+ <20220221094829-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20220221114916.107045-1-sgarzare@redhat.com>
+In-Reply-To: <20220221094829-mutt-send-email-mst@kernel.org>
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
@@ -80,82 +81,72 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 21, 2022 at 12:49:16PM +0100, Stefano Garzarella wrote:
-> vhost_vsock_stop() calls vhost_dev_check_owner() to check the device
-> ownership. It expects current->mm to be valid.
-> 
-> vhost_vsock_stop() is also called by vhost_vsock_dev_release() when
-> the user has not done close(), so when we are in do_exit(). In this
-> case current->mm is invalid and we're releasing the device, so we
-> should clean it anyway.
-> 
-> Let's check the owner only when vhost_vsock_stop() is called
-> by an ioctl.
+On Mon, Feb 21, 2022 at 10:03:39AM -0500, Michael S. Tsirkin wrote:
+>On Mon, Feb 21, 2022 at 12:49:16PM +0100, Stefano Garzarella wrote:
+>> vhost_vsock_stop() calls vhost_dev_check_owner() to check the device
+>> ownership. It expects current->mm to be valid.
+>>
+>> vhost_vsock_stop() is also called by vhost_vsock_dev_release() when
+>> the user has not done close(), so when we are in do_exit(). In this
+>> case current->mm is invalid and we're releasing the device, so we
+>> should clean it anyway.
+>>
+>> Let's check the owner only when vhost_vsock_stop() is called
+>> by an ioctl.
+>
+>
+>
+>
+>> Fixes: 433fc58e6bf2 ("VSOCK: Introduce vhost_vsock.ko")
+>> Cc: stable@vger.kernel.org
+>> Reported-by: syzbot+1e3ea63db39f2b4440e0@syzkaller.appspotmail.com
+>> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+>> ---
+>>  drivers/vhost/vsock.c | 14 ++++++++------
+>>  1 file changed, 8 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+>> index d6ca1c7ad513..f00d2dfd72b7 100644
+>> --- a/drivers/vhost/vsock.c
+>> +++ b/drivers/vhost/vsock.c
+>> @@ -629,16 +629,18 @@ static int vhost_vsock_start(struct vhost_vsock *vsock)
+>>  	return ret;
+>>  }
+>>
+>> -static int vhost_vsock_stop(struct vhost_vsock *vsock)
+>> +static int vhost_vsock_stop(struct vhost_vsock *vsock, bool check_owner)
+>
+>>  {
+>>  	size_t i;
+>>  	int ret;
+>>
+>>  	mutex_lock(&vsock->dev.mutex);
+>>
+>> -	ret = vhost_dev_check_owner(&vsock->dev);
+>> -	if (ret)
+>> -		goto err;
+>> +	if (check_owner) {
+>> +		ret = vhost_dev_check_owner(&vsock->dev);
+>> +		if (ret)
+>> +			goto err;
+>> +	}
+>>
+>>  	for (i = 0; i < ARRAY_SIZE(vsock->vqs); i++) {
+>>  		struct vhost_virtqueue *vq = &vsock->vqs[i];
+>> @@ -753,7 +755,7 @@ static int vhost_vsock_dev_release(struct inode *inode, struct file *file)
+>>  	 * inefficient.  Room for improvement here. */
+>>  	vsock_for_each_connected_socket(vhost_vsock_reset_orphans);
+>>
+>> -	vhost_vsock_stop(vsock);
+>
+>Let's add an explanation:
+>
+>When invoked from release we can not fail so we don't
+>check return code of vhost_vsock_stop.
+>We need to stop vsock even if it's not the owner.
 
+Do you want me to send a v2 by adding this as a comment in the code?
 
-
-
-> Fixes: 433fc58e6bf2 ("VSOCK: Introduce vhost_vsock.ko")
-> Cc: stable@vger.kernel.org
-> Reported-by: syzbot+1e3ea63db39f2b4440e0@syzkaller.appspotmail.com
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> ---
->  drivers/vhost/vsock.c | 14 ++++++++------
->  1 file changed, 8 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-> index d6ca1c7ad513..f00d2dfd72b7 100644
-> --- a/drivers/vhost/vsock.c
-> +++ b/drivers/vhost/vsock.c
-> @@ -629,16 +629,18 @@ static int vhost_vsock_start(struct vhost_vsock *vsock)
->  	return ret;
->  }
->  
-> -static int vhost_vsock_stop(struct vhost_vsock *vsock)
-> +static int vhost_vsock_stop(struct vhost_vsock *vsock, bool check_owner)
-
->  {
->  	size_t i;
->  	int ret;
->  
->  	mutex_lock(&vsock->dev.mutex);
->  
-> -	ret = vhost_dev_check_owner(&vsock->dev);
-> -	if (ret)
-> -		goto err;
-> +	if (check_owner) {
-> +		ret = vhost_dev_check_owner(&vsock->dev);
-> +		if (ret)
-> +			goto err;
-> +	}
->  
->  	for (i = 0; i < ARRAY_SIZE(vsock->vqs); i++) {
->  		struct vhost_virtqueue *vq = &vsock->vqs[i];
-> @@ -753,7 +755,7 @@ static int vhost_vsock_dev_release(struct inode *inode, struct file *file)
->  	 * inefficient.  Room for improvement here. */
->  	vsock_for_each_connected_socket(vhost_vsock_reset_orphans);
->  
-> -	vhost_vsock_stop(vsock);
-
-Let's add an explanation:
-
-When invoked from release we can not fail so we don't
-check return code of vhost_vsock_stop.
-We need to stop vsock even if it's not the owner.
-
-> +	vhost_vsock_stop(vsock, false);
->  	vhost_vsock_flush(vsock);
->  	vhost_dev_stop(&vsock->dev);
->  
-> @@ -868,7 +870,7 @@ static long vhost_vsock_dev_ioctl(struct file *f, unsigned int ioctl,
->  		if (start)
->  			return vhost_vsock_start(vsock);
->  		else
-> -			return vhost_vsock_stop(vsock);
-> +			return vhost_vsock_stop(vsock, true);
->  	case VHOST_GET_FEATURES:
->  		features = VHOST_VSOCK_FEATURES;
->  		if (copy_to_user(argp, &features, sizeof(features)))
-> -- 
-> 2.35.1
+Thanks,
+Stefano
 
