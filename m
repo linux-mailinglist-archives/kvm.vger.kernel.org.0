@@ -2,146 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A7E8C4BF1B2
-	for <lists+kvm@lfdr.de>; Tue, 22 Feb 2022 06:49:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 627144BF119
+	for <lists+kvm@lfdr.de>; Tue, 22 Feb 2022 06:21:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229873AbiBVFoB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Feb 2022 00:44:01 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:45994 "EHLO
+        id S229503AbiBVFTd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Feb 2022 00:19:33 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:35682 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229786AbiBVFoA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Feb 2022 00:44:00 -0500
-Received: from sender4-of-o53.zoho.com (sender4-of-o53.zoho.com [136.143.188.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68C89DEA9
-        for <kvm@vger.kernel.org>; Mon, 21 Feb 2022 21:43:36 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1645505868; cv=none; 
-        d=zohomail.com; s=zohoarc; 
-        b=h0xPrwJ5xGaQ7hS8AtO3/fYL0N55YKxhd/jXerhoKjn3RngVKcJegU23fFugjn1UH8BpOWBFc5nUFdGYC40Kc4RbEs016Tw1UgKJOi2FlzlGUoX8QiCkpPCHolRBLoAZWzgc3GXN9xE06e0/MBr8WRtdkpQwC8EhocN8eOR1GaU=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-        t=1645505868; h=Content-Type:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:To; 
-        bh=/UkmmgY62YSyoybGQMVGKnMB0V73rrqLXwcLwXohdrE=; 
-        b=kYZTgbEAgUrQLWj81hitkI22wm9QRkAiIQFETNvereHyAu4zZ4I9f4PmgoiX3XAsWmiDX7XzBaoIGDYOdyFDjbRJcuylseav/4KCeS0RztWsc5VOEEFURAoN+kEIfhvjN8nRUf8D0SHJ5uqmJUqUR/+HuxpDV3L51uAiprOF+Lw=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-        dkim=pass  header.i=anirudhrb.com;
-        spf=pass  smtp.mailfrom=mail@anirudhrb.com;
-        dmarc=pass header.from=<mail@anirudhrb.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1645505868;
-        s=zoho; d=anirudhrb.com; i=mail@anirudhrb.com;
-        h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:Content-Type:In-Reply-To;
-        bh=/UkmmgY62YSyoybGQMVGKnMB0V73rrqLXwcLwXohdrE=;
-        b=DAL4UQbqhqYw/lUDKJshckOaV4YzQjaPqIyk1j7FJkZXEalmunG2DDMx7RPN4/lB
-        V5zcrEdZTscUbzSHDt5R2xdWmJvAO834PlW+fNVJAFj7W8+PEud/cErIJk9+MNVObTW
-        8xIgrctPAzzo8I9vrfTu2Z+BI2szWm98PX46O3Yg=
-Received: from anirudhrb.com (49.207.226.61 [49.207.226.61]) by mx.zohomail.com
-        with SMTPS id 1645505864771584.2630304556701; Mon, 21 Feb 2022 20:57:44 -0800 (PST)
-Date:   Tue, 22 Feb 2022 10:27:36 +0530
-From:   Anirudh Rayabharam <mail@anirudhrb.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        syzbot+0abd373e2e50d704db87@syzkaller.appspotmail.com,
-        kvm <kvm@vger.kernel.org>,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        netdev <netdev@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] vhost: validate range size before adding to iotlb
-Message-ID: <YhRtQEWBF0kqWMsI@anirudhrb.com>
-References: <20220221195303.13560-1-mail@anirudhrb.com>
- <CACGkMEvLE=kV4PxJLRjdSyKArU+MRx6b_mbLGZHSUgoAAZ+-Fg@mail.gmail.com>
+        with ESMTP id S229379AbiBVFT2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Feb 2022 00:19:28 -0500
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3ADEEEA72
+        for <kvm@vger.kernel.org>; Mon, 21 Feb 2022 21:18:57 -0800 (PST)
+Received: by mail-io1-f69.google.com with SMTP id y11-20020a056602164b00b00640ddd94d80so3662704iow.11
+        for <kvm@vger.kernel.org>; Mon, 21 Feb 2022 21:18:57 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=OoHalkeGw+3WmTkM0UYjuhTqCHPPQ1/v7C2mH0CvZos=;
+        b=JYfux7/KaPISGaelp0P3Gz586PQbOuL+fSom5gqE3OBISQ8RjGyPM0CEpI2TPZE93i
+         sxdj5jELy8ATUe3hAoLDV1FQelgcStatQk2Sm0V/34HMyvIvB7HB2BGDVXBwt8rjd/ra
+         PRqrtxm3UnFscdWRPp4ThLoo7KLoNfnALhYT/tqVVkiUqWrklBEB674InwaqXlU4741Z
+         v1I17vgm6tTxwbCLrnoFfiws7nN6lAyMRrBjcgIaWyqCbvzk/C8jXRumYGzsMf3aDP17
+         OeLCFaj2B3T+UQCbY/mivQcD1infGHtvzWCZEQ77sSk41tPVUFWgZwyfj7VkPTNfsFe+
+         Gx8Q==
+X-Gm-Message-State: AOAM5317y/NAMJOVNMSycMXwhk6CPm7X0zMrjfeWr485uak8yPuuZHvN
+        upPQKLA1Ys97/8yt/pUpnlepT2qlJoLRbHoA15oMInc9NPeb
+X-Google-Smtp-Source: ABdhPJxB6U+s6r8NY7+MQc5zQbVVzpQtlYSlCHJsryRsTsSmJJmcaYKCqrltGE8PXjkn4+2VI3SbYSUdnZu4deIhKMzfsUw5TKdt
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CACGkMEvLE=kV4PxJLRjdSyKArU+MRx6b_mbLGZHSUgoAAZ+-Fg@mail.gmail.com>
-X-ZohoMailClient: External
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Received: by 2002:a5d:85d2:0:b0:5ed:a17c:a25c with SMTP id
+ e18-20020a5d85d2000000b005eda17ca25cmr18265498ios.85.1645507097811; Mon, 21
+ Feb 2022 21:18:17 -0800 (PST)
+Date:   Mon, 21 Feb 2022 21:18:17 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000000a5eae05d8947adb@google.com>
+Subject: [syzbot] WARNING in handle_exception_nmi (2)
+From:   syzbot <syzbot+4688c50a9c8e68e7aaa1@syzkaller.appspotmail.com>
+To:     bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
+        jmattson@google.com, joro@8bytes.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, mingo@redhat.com,
+        pbonzini@redhat.com, seanjc@google.com,
+        syzkaller-bugs@googlegroups.com, tglx@linutronix.de,
+        vkuznets@redhat.com, wanpengli@tencent.com, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
+        SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 22, 2022 at 10:50:20AM +0800, Jason Wang wrote:
-> On Tue, Feb 22, 2022 at 3:53 AM Anirudh Rayabharam <mail@anirudhrb.com> wrote:
-> >
-> > In vhost_iotlb_add_range_ctx(), validate the range size is non-zero
-> > before proceeding with adding it to the iotlb.
-> >
-> > Range size can overflow to 0 when start is 0 and last is (2^64 - 1).
-> > One instance where it can happen is when userspace sends an IOTLB
-> > message with iova=size=uaddr=0 (vhost_process_iotlb_msg). So, an
-> > entry with size = 0, start = 0, last = (2^64 - 1) ends up in the
-> > iotlb. Next time a packet is sent, iotlb_access_ok() loops
-> > indefinitely due to that erroneous entry:
-> >
-> >         Call Trace:
-> >          <TASK>
-> >          iotlb_access_ok+0x21b/0x3e0 drivers/vhost/vhost.c:1340
-> >          vq_meta_prefetch+0xbc/0x280 drivers/vhost/vhost.c:1366
-> >          vhost_transport_do_send_pkt+0xe0/0xfd0 drivers/vhost/vsock.c:104
-> >          vhost_worker+0x23d/0x3d0 drivers/vhost/vhost.c:372
-> >          kthread+0x2e9/0x3a0 kernel/kthread.c:377
-> >          ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
-> >          </TASK>
-> >
-> > Reported by syzbot at:
-> >         https://syzkaller.appspot.com/bug?extid=0abd373e2e50d704db87
-> >
-> > Reported-by: syzbot+0abd373e2e50d704db87@syzkaller.appspotmail.com
-> > Tested-by: syzbot+0abd373e2e50d704db87@syzkaller.appspotmail.com
-> > Signed-off-by: Anirudh Rayabharam <mail@anirudhrb.com>
-> > ---
-> >  drivers/vhost/iotlb.c | 6 ++++--
-> >  1 file changed, 4 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/drivers/vhost/iotlb.c b/drivers/vhost/iotlb.c
-> > index 670d56c879e5..b9de74bd2f9c 100644
-> > --- a/drivers/vhost/iotlb.c
-> > +++ b/drivers/vhost/iotlb.c
-> > @@ -53,8 +53,10 @@ int vhost_iotlb_add_range_ctx(struct vhost_iotlb *iotlb,
-> >                               void *opaque)
-> >  {
-> >         struct vhost_iotlb_map *map;
-> > +       u64 size = last - start + 1;
-> >
-> > -       if (last < start)
-> > +       // size can overflow to 0 when start is 0 and last is (2^64 - 1).
-> > +       if (last < start || size == 0)
-> >                 return -EFAULT;
-> 
-> I'd move this check to vhost_chr_iter_write(), then for the device who
-> has its own msg handler (e.g vDPA) can benefit from it as well.
+Hello,
 
-Thanks for reviewing!
+syzbot found the following issue on:
 
-I kept the check here thinking that all devices would benefit from it
-because they would need to call vhost_iotlb_add_range() to add an entry
-to the iotlb. Isn't that correct? Do you see any other benefit in moving
-it to vhost_chr_iter_write()?
+HEAD commit:    80d47f5de5e3 mm: don't try to NUMA-migrate COW pages that ..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=12a7324c700000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=f6a069ed94a1ed1d
+dashboard link: https://syzkaller.appspot.com/bug?extid=4688c50a9c8e68e7aaa1
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
 
-One concern I have is that if we move it out some future caller to
-vhost_iotlb_add_range() might forget to handle this case.
+Unfortunately, I don't have any reproducer for this issue yet.
 
-Thanks!
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+4688c50a9c8e68e7aaa1@syzkaller.appspotmail.com
 
-	- Anirudh.
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 7975 at arch/x86/kvm/vmx/vmx.c:4906 handle_exception_nmi+0xfdc/0x1190 arch/x86/kvm/vmx/vmx.c:4906
+Modules linked in:
+CPU: 0 PID: 7975 Comm: syz-executor.0 Not tainted 5.17.0-rc4-syzkaller-00055-g80d47f5de5e3 #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.14.0-2 04/01/2014
+RIP: 0010:handle_exception_nmi+0xfdc/0x1190 arch/x86/kvm/vmx/vmx.c:4906
+Code: 0f 84 c8 f3 ff ff e8 03 a8 56 00 48 89 ef c7 85 a4 0d 00 00 00 00 00 00 e8 51 1a ec ff 41 89 c4 e9 af f3 ff ff e8 e4 a7 56 00 <0f> 0b e9 69 f6 ff ff e8 d8 a7 56 00 be f5 ff ff ff bf 01 00 00 00
+RSP: 0018:ffffc9000615fad8 EFLAGS: 00010216
+RAX: 000000000001e2fd RBX: 0000000000000000 RCX: ffffc90002b71000
+RDX: 0000000000040000 RSI: ffffffff81216b3c RDI: 0000000000000003
+RBP: ffff888025308040 R08: 0000000000000000 R09: 0000000000000000
+R10: ffffffff812161a4 R11: 0000000000000000 R12: fffffffffffffc4d
+R13: ffff888025308288 R14: 0000000000000000 R15: 0000000080000300
+FS:  00007f47cabb1700(0000) GS:ffff88802cd00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000000000111c960 CR3: 000000001bb69000 CR4: 0000000000152ee0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ __vmx_handle_exit arch/x86/kvm/vmx/vmx.c:6179 [inline]
+ vmx_handle_exit+0x498/0x1950 arch/x86/kvm/vmx/vmx.c:6196
+ vcpu_enter_guest+0x29dd/0x4450 arch/x86/kvm/x86.c:10163
+ vcpu_run arch/x86/kvm/x86.c:10245 [inline]
+ kvm_arch_vcpu_ioctl_run+0x521/0x21a0 arch/x86/kvm/x86.c:10451
+ kvm_vcpu_ioctl+0x570/0xf30 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3908
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:874 [inline]
+ __se_sys_ioctl fs/ioctl.c:860 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:860
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x7f47cc23c059
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f47cabb1168 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f47cc34ef60 RCX: 00007f47cc23c059
+RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 0000000000000005
+RBP: 00007f47cc29608d R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007ffd6f43c1df R14: 00007f47cabb1300 R15: 0000000000022000
+ </TASK>
 
-> 
-> Thanks
-> 
-> >
-> >         if (iotlb->limit &&
-> > @@ -69,7 +71,7 @@ int vhost_iotlb_add_range_ctx(struct vhost_iotlb *iotlb,
-> >                 return -ENOMEM;
-> >
-> >         map->start = start;
-> > -       map->size = last - start + 1;
-> > +       map->size = size;
-> >         map->last = last;
-> >         map->addr = addr;
-> >         map->perm = perm;
-> > --
-> > 2.35.1
-> >
-> 
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
