@@ -2,222 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DDC224BF4FD
-	for <lists+kvm@lfdr.de>; Tue, 22 Feb 2022 10:48:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DA9744BF50B
+	for <lists+kvm@lfdr.de>; Tue, 22 Feb 2022 10:49:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230272AbiBVJsq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Feb 2022 04:48:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50298 "EHLO
+        id S230294AbiBVJtp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Feb 2022 04:49:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55776 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230221AbiBVJso (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Feb 2022 04:48:44 -0500
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0471D98F6C
-        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 01:48:18 -0800 (PST)
-Received: by mail-pf1-x436.google.com with SMTP id x18so11453021pfh.5
-        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 01:48:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=3TX4mJmzZJRe/EtqwIKj6zFku/q+ZjEK8yMiZWRvR1A=;
-        b=C4/0COoCAvM4SF9804iJLGXS9TynxssLy9jCZ9js85ErtyxBF5SpflorQ19hE1H0xP
-         G1X43F4lKRLPiX936lC81vgP7GxgQlpxoBOrj5i2I+TgYwrAOmTE0i9bgDpy3c395yg+
-         kw7zpbjFBnKM1yv69gG4kR1OO7dZg46iD0W6/UOCbNCWu3j88NOIjCEJQNDNyHosyF1P
-         nl7KPHec1RX8EgQdOYCgY+rtFwHIV7yPKZaHxR2O86SgbAgzsyPx0vFionXCZ0ZwPMDi
-         uvyC1hG+Elb0BgWDvQCsb8MLp2mmafrDyfqPTFAWzEjgAEU5Zm6HwU3lHCbV2LUWTcxW
-         Mfbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=3TX4mJmzZJRe/EtqwIKj6zFku/q+ZjEK8yMiZWRvR1A=;
-        b=cev3JUrwzdJLJ/uempppX4MPQAzgfh9ztBcKTkfwoVJ20LOURDL5jZ2/bcUvMXXnCn
-         Rh0FA3pJO495UPfAb4IkQeq4TEx3ncJ4R5uUY4cNbl/sQshN4r6fhNDBo7Wa8/IseIkC
-         1alh9TdEE4zbINrc9QRYsg5M0xkVg5lnLgyr2/O6S9Lr1NYD9kLSVBqLo9dpbufZGejr
-         eO/md1QHoW9al0pbSqN1Dxp1XGbbH2Que5rkdRZCuTwqInSdBTZSZFOEKKLwaODEhuDD
-         2vNKuNMegeovswkSA+fTgds/7IQ3BeLAMjG5jXM/VXso3jZK+3HSjP/wqm1Ns5O0DSh8
-         5SdQ==
-X-Gm-Message-State: AOAM533jpi9o9bZEOcOHqRQwsjYMeOvMoHeH5qxIujvHU5GDPDIvf9y6
-        DzJvEESL3Oz4a+aiCrC4edgEEWxr5V2+tQLt5LY=
-X-Google-Smtp-Source: ABdhPJx9aq1ReLVoodmp08Qg6AavV5Y1VRCuI7eR6LhO7U9ELoGiWEuCondvAtJkFdaf09TXOx8/h/gMcK0sZ7qbg4Y=
-X-Received: by 2002:a63:d1d:0:b0:359:b894:23d1 with SMTP id
- c29-20020a630d1d000000b00359b89423d1mr18860809pgl.132.1645523297494; Tue, 22
- Feb 2022 01:48:17 -0800 (PST)
+        with ESMTP id S229953AbiBVJtn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Feb 2022 04:49:43 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B92B4BBE1F;
+        Tue, 22 Feb 2022 01:49:18 -0800 (PST)
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21M9IaHE035574;
+        Tue, 22 Feb 2022 09:49:18 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=aGu1/OV1b80PAfQFSXG+657PvJczt7AlFVXysG0fZKo=;
+ b=RWZ29F7mGnIXJxf6g/TFclLxrgVjVyufwMQYdCpKslQnjFt+38z/0e8QapvXYBGVST4v
+ xLQE4FCGnOAR+fQdaRl2ajvCOu/uarBQqwGdE5isUCdnkoSOZdC+VqL42YHu2Qhnb8sV
+ vqzJ7M8MiGbLnOTiw6pXF81y7foAJPwv9bVVgIHrWtRch2fGIqHEPDBr7qHAY1IfqTlx
+ /2lVXcAoWWajorbUiQ7utPyOOGLRJgB0l9J6GxfyBJyDQ2ayPeLhvIRA3A5OEpuJLu4V
+ ZMMLgDcg2Wvinxzd6vvKD6vJ6+j7LedlCeYjjuRfl+0T/dp4HlfO7Czn42RZ/IwixwqN Dw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ecw3a8jju-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 22 Feb 2022 09:49:18 +0000
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21M9kL0G002828;
+        Tue, 22 Feb 2022 09:49:17 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ecw3a8jjb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 22 Feb 2022 09:49:17 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21M9lOZU000657;
+        Tue, 22 Feb 2022 09:49:15 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma06ams.nl.ibm.com with ESMTP id 3eaqtj1kb8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 22 Feb 2022 09:49:15 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21M9nBp557016704
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 22 Feb 2022 09:49:11 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C927752054;
+        Tue, 22 Feb 2022 09:49:11 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id B347352050;
+        Tue, 22 Feb 2022 09:49:11 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
+        id 58027E04DC; Tue, 22 Feb 2022 10:49:11 +0100 (CET)
+From:   Christian Borntraeger <borntraeger@linux.ibm.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     KVM <kvm@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>
+Subject: [GIT PULL 00/13] KVM: s390: Changes for 5.18 part1
+Date:   Tue, 22 Feb 2022 10:48:57 +0100
+Message-Id: <20220222094910.18331-1-borntraeger@linux.ibm.com>
+X-Mailer: git-send-email 2.35.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: eAyqdknrZnqhg2pE7Dv5PEsLV7yjYHSb
+X-Proofpoint-ORIG-GUID: pZWGbtQUsyey98P8KiAwN7XbIINiyVMz
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-References: <CAJSP0QX7O_auRgTKFjHkBbkBK=B3Z-59S6ZZi10tzFTv1_1hkQ@mail.gmail.com>
- <YhMtxWcFMjdQTioe@apples> <CAJSP0QVNRYTOGDsjCJJLOT=7yo1EB6D9LBwgQ4-CE539HdgHNQ@mail.gmail.com>
- <YhN+5wz3MXVm3vXU@apples>
-In-Reply-To: <YhN+5wz3MXVm3vXU@apples>
-From:   Stefan Hajnoczi <stefanha@gmail.com>
-Date:   Tue, 22 Feb 2022 09:48:06 +0000
-Message-ID: <CAJSP0QXz6kuwx6mycYz_xzxiVjdVR_AqHnpygwV4Ht-7B9pYmw@mail.gmail.com>
-Subject: Re: Call for GSoC and Outreachy project ideas for summer 2022
-To:     Klaus Jensen <its@irrelevant.dk>
-Cc:     qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>,
-        Rust-VMM Mailing List <rust-vmm@lists.opendev.org>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Sergio Lopez <slp@redhat.com>,
-        Dmitry Fomichev <Dmitry.Fomichev@wdc.com>,
-        =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
-        Hannes Reinecke <hare@suse.de>,
-        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
-        "Florescu, Andreea" <fandree@amazon.com>,
-        Hanna Reitz <hreitz@redhat.com>,
-        Alex Agache <aagch@amazon.com>,
-        =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        John Snow <jsnow@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Keith Busch <kbusch@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-02-22_02,2022-02-21_02,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ bulkscore=0 clxscore=1015 lowpriorityscore=0 suspectscore=0 phishscore=0
+ spamscore=0 mlxscore=0 adultscore=0 malwarescore=0 impostorscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2201110000 definitions=main-2202220054
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 21 Feb 2022 at 12:00, Klaus Jensen <its@irrelevant.dk> wrote:
->
-> On Feb 21 09:51, Stefan Hajnoczi wrote:
-> > On Mon, 21 Feb 2022 at 06:14, Klaus Jensen <its@irrelevant.dk> wrote:
-> > >
-> > > On Jan 28 15:47, Stefan Hajnoczi wrote:
-> > > > Dear QEMU, KVM, and rust-vmm communities,
-> > > > QEMU will apply for Google Summer of Code 2022
-> > > > (https://summerofcode.withgoogle.com/) and has been accepted into
-> > > > Outreachy May-August 2022 (https://www.outreachy.org/). You can now
-> > > > submit internship project ideas for QEMU, KVM, and rust-vmm!
-> > > >
-> > > > If you have experience contributing to QEMU, KVM, or rust-vmm you can
-> > > > be a mentor. It's a great way to give back and you get to work with
-> > > > people who are just starting out in open source.
-> > > >
-> > > > Please reply to this email by February 21st with your project ideas.
-> > > >
-> > > > Good project ideas are suitable for remote work by a competent
-> > > > programmer who is not yet familiar with the codebase. In
-> > > > addition, they are:
-> > > > - Well-defined - the scope is clear
-> > > > - Self-contained - there are few dependencies
-> > > > - Uncontroversial - they are acceptable to the community
-> > > > - Incremental - they produce deliverables along the way
-> > > >
-> > > > Feel free to post ideas even if you are unable to mentor the project.
-> > > > It doesn't hurt to share the idea!
-> > > >
-> > > > I will review project ideas and keep you up-to-date on QEMU's
-> > > > acceptance into GSoC.
-> > > >
-> > > > Internship program details:
-> > > > - Paid, remote work open source internships
-> > > > - GSoC projects are 175 or 350 hours, Outreachy projects are 30
-> > > > hrs/week for 12 weeks
-> > > > - Mentored by volunteers from QEMU, KVM, and rust-vmm
-> > > > - Mentors typically spend at least 5 hours per week during the coding period
-> > > >
-> > > > Changes since last year: GSoC now has 175 or 350 hour project sizes
-> > > > instead of 12 week full-time projects. GSoC will accept applicants who
-> > > > are not students, before it was limited to students.
-> > > >
-> > > > For more background on QEMU internships, check out this video:
-> > > > https://www.youtube.com/watch?v=xNVCX7YMUL8
-> > > >
-> > > > Please let me know if you have any questions!
-> > > >
-> > > > Stefan
-> > > >
-> > >
-> > > Hi,
-> > >
-> > > I'd like to revive the "NVMe Performance" proposal from Paolo and Stefan
-> > > from two years ago.
-> > >
-> > >   https://wiki.qemu.org/Internships/ProjectIdeas/NVMePerformance
-> > >
-> > > I'd like to mentor, but since this is "iothread-heavy", I'd like to be
-> > > able to draw a bit on Stefan, Paolo if possible.
-> >
-> > Hi Klaus,
-> > I can give input but I probably will not have enough time to
-> > participate as a full co-mentor or review every line of every patch.
-> >
->
-> Of course Stefan, I understand - I did not expect you to co-mentor :)
->
-> > If you want to go ahead with the project, please let me know and I'll post it.
-> >
->
-> Yes, I'll go ahead as mentor for this.
->
-> @Keith, if you want to join in, let us know :)
->
-> > One thing I noticed about the project idea is that KVM ioeventfd
-> > doesn't have the right semantics to emulate the traditional Submission
-> > Queue Tail Doorbell register. The issue is that ioeventfd does not
-> > capture the value written by the driver to the MMIO register. eventfd
-> > is a simple counter so QEMU just sees that the guest has written but
-> > doesn't know which value. Although ioeventfd has modes for matching
-> > specific values, I don't think that can be used for NVMe Submission
-> > Queues because there are too many possible register values and each
-> > one requires a separate file descriptor. It might request 100s of
-> > ioeventfds per sq, which won't scale.
-> >
-> > The good news is that when the Shadow Doorbell Buffer is implemented
-> > and enabled by the driver, then I think it becomes possible to use
-> > ioeventfd for the Submission Queue Tail Doorbell.
-> >
->
-> Yes, I agree.
->
-> > I wanted to mention this so applicants/interns don't go down a dead
-> > end trying to figure out how to use ioeventfd for the traditional
-> > Submission Queue Tail Doorbell register.
-> >
->
-> Yeah, thats what the Shadow Doorbell mechanic is for.
->
-> Suggested updated summary:
->
-> QEMU's NVMe emulation uses the traditional trap-and-emulation method to
-> emulate I/Os, thus the performance suffers due to frequent VM-exits.
-> Version 1.3 of the NVMe specification defines a new feature to update
-> doorbell registers using a Shadow Doorbell Buffer. This can be utilized
-> to enhance performance of emulated controllers by reducing the number of
-> Submission Queue Tail Doorbell writes.
->
-> Further more, it is possible to run emulation in a dedicated thread
-> called an IOThread. Emulating NVMe in a separate thread allows the vcpu
-> thread to continue execution and results in better performance.
->
-> Finally, it is possible for the emulation code to watch for changes to
-> the queue memory instead of waiting for doorbell writes. This technique
-> is called polling and reduces notification latency at the expense of an
-> another thread consuming CPU to detect queue activity.
->
-> The goal of this project is to add implement these optimizations so
-> QEMU's NVMe emulation performance becomes comparable to virtio-blk
-> performance.
->
-> Tasks include:
->
->     Add Shadow Doorbell Buffer support to reduce doorbell writes
->     Add Submission Queue polling
->     Add IOThread support so emulation can run in a dedicated thread
->
-> Maybe add a link to this previous discussion as well:
->
-> https://lore.kernel.org/qemu-devel/1447825624-17011-1-git-send-email-mlin@kernel.org/T/#u
+Paolo,
 
-Great, I have added the project idea. I left in the sq doorbell
-ioeventfd task but moved it after the Shadow Doorbell Buffer support
-task and made it clear that the ioeventfd can only be used when the
-Shadow Doorbell Buffer is enabled:
-https://wiki.qemu.org/Google_Summer_of_Code_2022#NVMe_Emulation_Performance_Optimization
+first part of the s390 parts of KVM for 5.18. This is on top of the fix
+that went into Linus tree, so it will move kvm/next to something between
+rc3 and rc4.
 
-Stefan
+I added 2 later fixups for the storage key patches on top. Let me know if
+you prefer them folded in.
+
+We might do a 2nd pull request later on depending on timing, review and
+other constraints
+with
+- rewritten selftest for memop
+- ultravisor device (could also go via s390 tree)
+- parts/all of Claudios lazy destroy
+- parts/all of PCI passthru (could be later and might go via s390 tree as
+  well via a topic branch)
+- followup to guest entry/exit work if we find a small solution
+- adapter interruption virtualization facility for secure guests
+
+The following changes since commit 09a93c1df3eafa43bcdfd7bf837c574911f12f55:
+
+  Merge tag 'kvm-s390-kernel-access' from emailed bundle (2022-02-09 09:14:22 -0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git  tags/kvm-s390-next-5.18-1
+
+for you to fetch changes up to 3d9042f8b923810c169ece02d91c70ec498eff0b:
+
+  KVM: s390: Add missing vm MEM_OP size check (2022-02-22 09:16:18 +0100)
+
+----------------------------------------------------------------
+KVM: s390: Changes for 5.18 part1
+
+- add Claudio as Maintainer
+- first step to do proper storage key checking
+- testcase for missing memop check
+
+----------------------------------------------------------------
+Christian Borntraeger (1):
+      KVM: s390: MAINTAINERS: promote Claudio Imbrenda
+
+Janis Schoetterl-Glausch (11):
+      s390/uaccess: Add copy_from/to_user_key functions
+      KVM: s390: Honor storage keys when accessing guest memory
+      KVM: s390: handle_tprot: Honor storage keys
+      KVM: s390: selftests: Test TEST PROTECTION emulation
+      KVM: s390: Add optional storage key checking to MEMOP IOCTL
+      KVM: s390: Add vm IOCTL for key checked guest absolute memory access
+      KVM: s390: Rename existing vcpu memop functions
+      KVM: s390: Add capability for storage key extension of MEM_OP IOCTL
+      KVM: s390: Update api documentation for memop ioctl
+      KVM: s390: Clarify key argument for MEM_OP in api docs
+      KVM: s390: Add missing vm MEM_OP size check
+
+Thomas Huth (1):
+      selftests: kvm: Check whether SIDA memop fails for normal guests
+
+ Documentation/virt/kvm/api.rst            | 112 ++++++++++---
+ MAINTAINERS                               |   2 +-
+ arch/s390/include/asm/ctl_reg.h           |   2 +
+ arch/s390/include/asm/page.h              |   2 +
+ arch/s390/include/asm/uaccess.h           |  22 +++
+ arch/s390/kvm/gaccess.c                   | 250 ++++++++++++++++++++++++++++--
+ arch/s390/kvm/gaccess.h                   |  86 ++++++++--
+ arch/s390/kvm/intercept.c                 |  12 +-
+ arch/s390/kvm/kvm-s390.c                  | 132 +++++++++++++---
+ arch/s390/kvm/priv.c                      |  66 ++++----
+ arch/s390/lib/uaccess.c                   |  81 +++++++---
+ include/uapi/linux/kvm.h                  |  11 +-
+ tools/testing/selftests/kvm/.gitignore    |   1 +
+ tools/testing/selftests/kvm/Makefile      |   1 +
+ tools/testing/selftests/kvm/s390x/memop.c |  15 ++
+ tools/testing/selftests/kvm/s390x/tprot.c | 227 +++++++++++++++++++++++++++
+ 16 files changed, 897 insertions(+), 125 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/s390x/tprot.c
