@@ -2,100 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E5AE74BF212
-	for <lists+kvm@lfdr.de>; Tue, 22 Feb 2022 07:28:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AFAC94BF231
+	for <lists+kvm@lfdr.de>; Tue, 22 Feb 2022 07:44:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230259AbiBVGZr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Feb 2022 01:25:47 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:52692 "EHLO
+        id S230060AbiBVGpA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Feb 2022 01:45:00 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:33014 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230249AbiBVGZq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Feb 2022 01:25:46 -0500
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AF7EF41;
-        Mon, 21 Feb 2022 22:25:21 -0800 (PST)
-Received: by mail-pj1-x1034.google.com with SMTP id gf13-20020a17090ac7cd00b001bbfb9d760eso1404778pjb.2;
-        Mon, 21 Feb 2022 22:25:21 -0800 (PST)
+        with ESMTP id S229847AbiBVGo7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Feb 2022 01:44:59 -0500
+Received: from mail-yw1-x1133.google.com (mail-yw1-x1133.google.com [IPv6:2607:f8b0:4864:20::1133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88CD1111189
+        for <kvm@vger.kernel.org>; Mon, 21 Feb 2022 22:44:34 -0800 (PST)
+Received: by mail-yw1-x1133.google.com with SMTP id 00721157ae682-2d66f95f1d1so162437677b3.0
+        for <kvm@vger.kernel.org>; Mon, 21 Feb 2022 22:44:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=EXIviZBFa0roKyh42LUJ3zl7p19OISm2ntSverQdUJI=;
-        b=GWMk/2qo7wq8+StKOI9p6fdIRRP8rfFC/BKhB9jWPqXp8bR71jZlkdE2UzznR6rdQr
-         rRTxKrYaJ7MLoxCGZ3rcSYyG7uX0uhOY8e3PENuO8BogHYsPqX0/8f6JnbWB1T52RJwx
-         dg3AVowgFmD0dw4hZoRmuLrRBbgJFPQmkANatWBC8vgN2uDkIKutXWjxRKBMqrGDZa74
-         kIC4SiZxpWmvWEIHk0CG9IZvMDIycXwbgSWX27JGm1e9AJU7EBWZ6DQ7jkFz1ziQnlOo
-         QpiK16tvPte2Sd0svpxy6g4DoAF/TFLRqLUqm4zTjt/JyATaMFyRnQlV28imTNsoPyXl
-         2S/w==
+        h=mime-version:sender:from:date:message-id:subject:to;
+        bh=oeXnfgK9BOKBTMDptF2I1vpIGSBc56TF64IaWy5xIn0=;
+        b=HsW8s1+N2ZpLpjvjRjF+XG8nLT1rcg5vSz2bjS/Z5BNqD7hHg81BLos8bT//+mL3Dh
+         JUyxityJ1GrsnaoDXlIJxB9VHkVBOIz4WMCea9tWwB+0fGD5OYq5Gg/kjv819zf8+dem
+         NPC5rYxgQUb4Rc8FoZC6F42fNu4O+NDCg7PUbCgfLGumlcz6lJFnuYkpoHjUEEJCPo3x
+         F3HWnGJGOpPrnx+Ypa24ZrsZtMmJnFnZnddLL4OyyoRLIHjMdyWJ7ooH7xdWtKuxRSCE
+         RvZ1jHVsCMQ2PcKz2lU04qOntv5ELx8N9aWh9f+nWOUOuFcpw9jarq/7lchdjkxzPItz
+         xwlg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=EXIviZBFa0roKyh42LUJ3zl7p19OISm2ntSverQdUJI=;
-        b=wORK75ARWOj956PK+y7UNFLEE7jrV4wHSAego1GBOsFXD/sgciL4lu0ED+qeK68p6X
-         //pfsahg0+wbmcNTATFNqIdqS9WcTVi/NAcjs7TQZ2nkHB7SAPiPlDzeAYgndcAVaXSY
-         9FFPv7KARoeMHz4TDzED4C+n3dINXiFLvHJRKIfcNi85v77fWhk0gCor3Wy9xUfrlf76
-         Nc+WPcC72khcB2pHcOOxhqnNgQD0xWequo7rNRLdtQpWUdmnRW51lvKhhToWwSosslKm
-         OupiHM4q1AEBhjc4f9LbQYS200GhQ2hcoNDd7fBTPCT48N5SmxSffltp6THsvSOiReg3
-         YvLA==
-X-Gm-Message-State: AOAM5303x2uId2hx6RPID9129kn394mAQi0lZjQwAxiouoKCbYzXiOjt
-        D0huV625Z3dyxSLQLDBR/mM=
-X-Google-Smtp-Source: ABdhPJwgJmJ7+1iUAqCpgtNcr5GpMo9SmxEMZp37UaoNOLP/zctOG14kOsrjhI5bk2SKGg293403uw==
-X-Received: by 2002:a17:902:b204:b0:14f:26a7:9f61 with SMTP id t4-20020a170902b20400b0014f26a79f61mr21997285plr.97.1645511120964;
-        Mon, 21 Feb 2022 22:25:20 -0800 (PST)
-Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id l17sm15389954pfu.61.2022.02.21.22.25.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Feb 2022 22:25:20 -0800 (PST)
-From:   Like Xu <like.xu.linux@gmail.com>
-X-Google-Original-From: Like Xu <likexu@tencent.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Like Xu <likexu@tencent.com>
-Subject: [PATCH] KVM: x86: Fix function address when kvm_x86_ops.func is NULL
-Date:   Tue, 22 Feb 2022 14:25:10 +0800
-Message-Id: <20220222062510.48592-1-likexu@tencent.com>
-X-Mailer: git-send-email 2.35.0
+        h=x-gm-message-state:mime-version:sender:from:date:message-id:subject
+         :to;
+        bh=oeXnfgK9BOKBTMDptF2I1vpIGSBc56TF64IaWy5xIn0=;
+        b=5E/1ZIQbgssHa1KCsWjT7rAf31HhVuigaqK0r5ODrALMF9c3uEo0//J4J6i8BlSPEu
+         H2gAY2B/QMXprWAzfyo6xPAecggFLL6BneQtidAWuMj8+FvHHNn5iiziShXds13ckAKM
+         Bx7TFVFsTnDTLuzTcoOkum3MQT6xlLgwUC6gv2tT5Ml9yiDU9vpnlZh+Z+Aq+E7Xq5Tv
+         byOlk7um0jcCWFo5Ii5hpiHyzpmwSegSMJShLwz8ZszbaCF0DHgZn5IHp5qHzUv7DoIV
+         Kdkf+pCilPgB7bypi1+G1HpxoeZdl+9rn3u1rBENA9eD4oAKDqGkJNGmPnmPnCj7IryT
+         zrOw==
+X-Gm-Message-State: AOAM530ebE3fYWcuzsBW/vtctnYdqd+ZYkTr/+i4KJnSnY2TLo1GACri
+        ylIB74Ataajq89JQMzzpHIOBKjrAjCYyJ+aYYP8=
+X-Google-Smtp-Source: ABdhPJymrJiFjtzEPK4dus+1liQlkKoHhqZ1kdSbQOzgHFBvJbLYVWWXfnzatdkP/f9KgCEu/fePtUVI9qkWrZTn1PE=
+X-Received: by 2002:a81:e0b:0:b0:2ca:287c:6be1 with SMTP id
+ 11-20020a810e0b000000b002ca287c6be1mr22538189ywo.134.1645512273770; Mon, 21
+ Feb 2022 22:44:33 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Sender: vmrjude906@gmail.com
+Received: by 2002:a05:7010:9810:b0:210:8a2e:596d with HTTP; Mon, 21 Feb 2022
+ 22:44:33 -0800 (PST)
+From:   "Mrs.Joan Chen" <mrs.joan71chen@gmail.com>
+Date:   Tue, 22 Feb 2022 06:44:33 +0000
+X-Google-Sender-Auth: G7bpALhvEFrPzpOmGVU5rrlqzpo
+Message-ID: <CAHKUWg_ejWNOUfYW_fJm-ssSr-+9hu97-COhC6znnzNhuUtRww@mail.gmail.com>
+Subject: Dear Child of God
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: Yes, score=7.9 required=5.0 tests=ADVANCE_FEE_5_NEW_MONEY,
+        BAYES_50,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        FREEMAIL_ENVFROM_END_DIGIT,FREEMAIL_FROM,HK_SCAM,LOTS_OF_MONEY,
+        MONEY_FRAUD_8,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_HK_NAME_FM_MR_MRS,T_SCC_BODY_TEXT_LINE,UNDISC_MONEY,URG_BIZ
+        autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Report: * -0.0 RCVD_IN_DNSWL_NONE RBL: Sender listed at
+        *      https://www.dnswl.org/, no trust
+        *      [2607:f8b0:4864:20:0:0:0:1133 listed in]
+        [list.dnswl.org]
+        *  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
+        *      [score: 0.5002]
+        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
+        *  0.0 FREEMAIL_FROM Sender email is commonly abused enduser mail
+        *      provider
+        *      [mrs.joan71chen[at]gmail.com]
+        * -0.0 SPF_PASS SPF: sender matches SPF record
+        *  0.2 FREEMAIL_ENVFROM_END_DIGIT Envelope-from freemail username ends
+        *       in digit
+        *      [vmrjude906[at]gmail.com]
+        *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
+        *       valid
+        * -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
+        * -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
+        *      author's domain
+        * -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
+        *      envelope-from domain
+        *  0.0 HK_SCAM No description available.
+        * -0.0 T_SCC_BODY_TEXT_LINE No description available.
+        *  0.0 T_HK_NAME_FM_MR_MRS No description available.
+        *  0.6 URG_BIZ Contains urgent matter
+        *  0.0 LOTS_OF_MONEY Huge... sums of money
+        *  0.0 MONEY_FRAUD_8 Lots of money and very many fraud phrases
+        *  3.0 ADVANCE_FEE_5_NEW_MONEY Advance Fee fraud and lots of money
+        *  3.5 UNDISC_MONEY Undisclosed recipients + money/fraud signs
+X-Spam-Level: *******
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <likexu@tencent.com>
+Dear Child of God,
 
-Fix the function address for __static_call_return0() which is used by
-static_call_update() when a func in struct kvm_x86_ops is NULL.
+Calvary Greetings in the name of the LORD Almighty and Our LORD JESUS
+CHRIST the giver of every good thing. Good day and compliments of the
+seasons, i know this letter will definitely come to you as a huge
+surprise, but I implore you to take the time to go through it
+carefully as the decision you make will go off a long way to determine
+my future and continued existence. I am Mrs.Joan Chen aging widow of
+57 years old suffering from long time illness.I have some funds I
+inherited from my late husband, the sum of (21 Million Dollars) and I
+needed a very honest and God fearing who can withdraw this money then
+use the funds for Charity works. I WISH TO GIVE THIS FUNDS TO YOU FOR
+CHARITY WORKS. I found your email address from the internet after
+honest prayers to the LORD to bring me a helper and i decided to
+contact you if you may be willing and interested to handle these trust
+funds in good faith before anything happens to me.
 
-Fixes: 5be2226f417d ("KVM: x86: allow defining return-0 static calls")
-Signed-off-by: Like Xu <likexu@tencent.com>
----
- arch/x86/include/asm/kvm_host.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I accept this decision because I do not have any child who will
+inherit this money after I die. I want your urgent reply to me so that
+I will give you the deposit receipt which the SECURITY COMPANY issued
+to me as next of kin for immediate transfer of the money to your
+account in your country, to start the good work of God, I want you to
+use the 20/percent of the total amount to help yourself in doing the
+project. I am desperately in keen need of assistance and I have
+summoned up courage to contact you for this task, you must not fail me
+and the millions of the poor people in our todays WORLD. This is no
+stolen money and there are no dangers involved,100% RISK FREE with
+full legal proof. Please if you would be able to use the funds for the
+Charity works kindly let me know immediately.I will appreciate your
+utmost confidentiality and trust in this matter to accomplish my heart
+desire, as I don't want anything that will jeopardize my last wish.
+Please
+kindly respond quickly for further details.
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 713e08f62385..312f5ee19514 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1548,7 +1548,7 @@ static inline void kvm_ops_static_call_update(void)
- #define KVM_X86_OP_OPTIONAL __KVM_X86_OP
- #define KVM_X86_OP_OPTIONAL_RET0(func) \
- 	static_call_update(kvm_x86_##func, kvm_x86_ops.func ? : \
--			   (void *) __static_call_return0);
-+			   (void *)&__static_call_return0);
- #include <asm/kvm-x86-ops.h>
- #undef __KVM_X86_OP
- }
--- 
-2.35.0
+Hoping to receive your response as soon as possible.
 
+Your urgently responses is needed
+
+Thanks and Remain blessed
+Mrs.Joan Chen
