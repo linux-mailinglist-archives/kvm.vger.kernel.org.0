@@ -2,126 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4CAFB4C011A
-	for <lists+kvm@lfdr.de>; Tue, 22 Feb 2022 19:18:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E11254C01CA
+	for <lists+kvm@lfdr.de>; Tue, 22 Feb 2022 20:05:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234933AbiBVSSu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Feb 2022 13:18:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41408 "EHLO
+        id S234772AbiBVTFd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Feb 2022 14:05:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234659AbiBVSSs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Feb 2022 13:18:48 -0500
+        with ESMTP id S232572AbiBVTFc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Feb 2022 14:05:32 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id CCDF091AD6
-        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 10:18:22 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 363951168C3
+        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 11:05:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645553901;
+        s=mimecast20190719; t=1645556704;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=2PmKrKI3EWZmz7GdObnPojUMJef667KazfUaDx+B+HE=;
-        b=cumtYu7/9XObZZJq8zTjEXQSUm4jIGPWNgYbvVQA2K2JutSNFfOHF4tFEL1LaDMVv2vp9E
-        0pPqCORu1U8RFTKxaj91NLYwDLpVDQA9OwBIRnOlVBOJmL5VCJkm79rnsvD2kdJKkst6K9
-        tc6kmbTiCSsk6urQeHJm2G4rFxTrI8U=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=187+FGRx7EusHu1HGYCu4Vg/fgHrmwo/AFwe4LUvMAY=;
+        b=iKrp9ZBWYFagU+8zH9mFeXPVzU2e7mq2JmetZcJYdd8RChuwGClYjZXhQVVxugTaXs3MAv
+        hyOgyPoEgFdqbGwXSVTXvwg2ECjFp65A4yUkqXbQ1nOoySi4izPAzNpeAmBEbBzAYJcZHc
+        CMbFyV/kTUFpDACMNr/shxvUv24pZbg=
+Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
+ [209.85.210.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-240-WMXOc445PY2PXeS-nJTaGg-1; Tue, 22 Feb 2022 13:18:20 -0500
-X-MC-Unique: WMXOc445PY2PXeS-nJTaGg-1
-Received: by mail-ej1-f69.google.com with SMTP id kw5-20020a170907770500b006ba314a753eso6095214ejc.21
-        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 10:18:20 -0800 (PST)
+ us-mta-446-LEoUO2jMPIu2v_jVf_Dihg-1; Tue, 22 Feb 2022 14:05:03 -0500
+X-MC-Unique: LEoUO2jMPIu2v_jVf_Dihg-1
+Received: by mail-ot1-f71.google.com with SMTP id 71-20020a9d034d000000b005af37922de5so4929315otv.10
+        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 11:05:03 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=2PmKrKI3EWZmz7GdObnPojUMJef667KazfUaDx+B+HE=;
-        b=MJeCYgYUQSSWOzq/eJjiVahjdMe4FyZjEimnRUfjvy3+o18FOXFptKcfHtcovPc3II
-         F/qUCBKJQngnhQKd6Gy1VcrgS+fsbjyDENbbfJuUHih4kZVr91LjguHbhbd7KqZqsnOp
-         A6/pwwpl+ioZCqNY87WHHuF3SDJIh63uSTyddTBNFLrgJ5QS0+3+Ca8N+ba8MxCC4tdB
-         u5r8FaQZp/TSEWXvwoKiHnGadYD7dyjd1SFXxDyvzjN6hZ4qrHRwyhbsDVYf48oboW3B
-         xDmoIeIls840gAZOD0XvPnxDAGLD0//bOMmwaBeVV/5I0nxiP324QrLj5ZP4/9dfOG+1
-         gqQw==
-X-Gm-Message-State: AOAM531lKbHr9nEr1zp4fPDF91y92Ih+L+MQDxliGFFOo9d6X/oaR6di
-        /6fRzplOUUtAd7TXiNO0Zz7CPhZNNuVtmleRI2r4iatQIn5oWOIuE8NIAuzKqhAXtWzxCddFYvb
-        eiV41FKGm9lDp
-X-Received: by 2002:a17:906:8a86:b0:6ae:9c35:35c7 with SMTP id mu6-20020a1709068a8600b006ae9c3535c7mr20962708ejc.494.1645553899423;
-        Tue, 22 Feb 2022 10:18:19 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwCwlo4F988pYzuSYl9uB+mnzlLrkaQM96Qe8NKdt8vVTBhD0xY2FSj6fRNGqyRK6exjOLlxA==
-X-Received: by 2002:a17:906:8a86:b0:6ae:9c35:35c7 with SMTP id mu6-20020a1709068a8600b006ae9c3535c7mr20962694ejc.494.1645553899163;
-        Tue, 22 Feb 2022 10:18:19 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id h19sm10718682edt.6.2022.02.22.10.18.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Feb 2022 10:18:18 -0800 (PST)
-Message-ID: <d6c6803c-518f-8ab3-a2a5-b73f600ebafb@redhat.com>
-Date:   Tue, 22 Feb 2022 19:18:17 +0100
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=187+FGRx7EusHu1HGYCu4Vg/fgHrmwo/AFwe4LUvMAY=;
+        b=lxsJRYJHE014w+ljiv4MnGrVJd3fdy4+Rx6Y9RHAT7aoS6Cb4AFhHRQmIDTlHQIfBn
+         OugBinS2A6nqV2zmpf0hKgET7PnueCGgS4hpAQk8SLdCQpo3kIFhkbk0wqLkpV8dZtIL
+         jJ+MvVtZGS95G8a/gs0DznXmmv/XOX1R3Vm1TCH4vPSYFPqr1VDoXkMO1J8yxP+Or5F/
+         YR10eFDG/barNp1AUkhRfLVdbFoYl07jdv23dmKfc2KNbF6J7jyM9qOoxpeMCR8lEDzQ
+         oUCq7rA+YfzWjYakDshVz3GehIO4tUT8qy9VsIDXP/tu3G8xBm+p5TUF7dW6UO+dT9mU
+         2/bg==
+X-Gm-Message-State: AOAM533wGtZTZXMi8/iuZBBJHa7IvY7XjxkUZ353lggmqKfs/jYM6LWD
+        HY22/dphb7pLqaCfsnq9fmHxUP5GQFC96OtsFC/R0Fw2t96QTgI3SI2kp1uFoQclEwk4eZ+uDUx
+        UWnxpME8Fn8oj
+X-Received: by 2002:a05:6808:d4d:b0:2d4:8fe6:fc4 with SMTP id w13-20020a0568080d4d00b002d48fe60fc4mr2575873oik.235.1645556702745;
+        Tue, 22 Feb 2022 11:05:02 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyo/c9slhC5S61X87AcVm/IK2FJA3uqQWEzKCfQ5Rvxt7dMTdmq7zsi0YUKkaQX5usT9/Pqvg==
+X-Received: by 2002:a05:6808:d4d:b0:2d4:8fe6:fc4 with SMTP id w13-20020a0568080d4d00b002d48fe60fc4mr2575861oik.235.1645556702484;
+        Tue, 22 Feb 2022 11:05:02 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id bj38sm6068143oib.20.2022.02.22.11.05.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Feb 2022 11:05:02 -0800 (PST)
+Date:   Tue, 22 Feb 2022 12:05:00 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     David Stevens <stevensd@chromium.org>
+Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org
+Subject: Re: VFIO_IOMMU_TYPE1 inefficiencies for certain use cases
+Message-ID: <20220222120500.6094849c.alex.williamson@redhat.com>
+In-Reply-To: <CAD=HUj7QkS8Yh6-AF_wj0FSubsyxsb9JfTbaVHJmRyXw+gepUg@mail.gmail.com>
+References: <CAD=HUj7QkS8Yh6-AF_wj0FSubsyxsb9JfTbaVHJmRyXw+gepUg@mail.gmail.com>
+Organization: Red Hat
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [GIT PULL 00/13] KVM: s390: Changes for 5.18 part1
-Content-Language: en-US
-To:     Christian Borntraeger <borntraeger@linux.ibm.com>
-Cc:     KVM <kvm@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>
-References: <20220222094910.18331-1-borntraeger@linux.ibm.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220222094910.18331-1-borntraeger@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/22/22 10:48, Christian Borntraeger wrote:
-> Paolo,
-> 
-> first part of the s390 parts of KVM for 5.18. This is on top of the fix
-> that went into Linus tree, so it will move kvm/next to something between
-> rc3 and rc4.
-> 
-> I added 2 later fixups for the storage key patches on top. Let me know if
-> you prefer them folded in.
-> 
-> We might do a 2nd pull request later on depending on timing, review and
-> other constraints
-> with
-> - rewritten selftest for memop
-> - ultravisor device (could also go via s390 tree)
-> - parts/all of Claudios lazy destroy
-> - parts/all of PCI passthru (could be later and might go via s390 tree as
->    well via a topic branch)
-> - followup to guest entry/exit work if we find a small solution
-> - adapter interruption virtualization facility for secure guests
-> 
-> The following changes since commit 09a93c1df3eafa43bcdfd7bf837c574911f12f55:
-> 
->    Merge tag 'kvm-s390-kernel-access' from emailed bundle (2022-02-09 09:14:22 -0800)
-> 
-> are available in the Git repository at:
-> 
->    git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git  tags/kvm-s390-next-5.18-1
-> 
-> for you to fetch changes up to 3d9042f8b923810c169ece02d91c70ec498eff0b:
-> 
->    KVM: s390: Add missing vm MEM_OP size check (2022-02-22 09:16:18 +0100)
+Hi David,
 
-Pulled, thanks.
+On Fri, 18 Feb 2022 19:17:12 +0900
+David Stevens <stevensd@chromium.org> wrote:
 
-Paolo
+> Hi all,
+> 
+> I'm working on a consumer virtualization project that uses VFIO for
+> passthrough devices. However, the way it's using them is a little
+> unusual, and that results in some pretty significant inefficiencies in
+> the vfio_iommu_type1 implementation. Before going ahead and trying to
+> address the problems myself, I'm hoping to get some guidance about
+> what sort of changes might be able to be merged upstream.
+> 
+> The usage pattern that is not well supported by VFIO is many small,
+> dynamic mappings. We have this pattern because we are using
+> virtio-iommu to isolate some untrusted passthrough devices within the
+> guest, and also because for the rest of the passthrough devices we're
+> using coIOMMU [1] to support overcommit of memory in the host by not
+> pinning all of the guest's memory. Both of these rely on using
+> VFIO_IOMMU_MAP_DMA at the page granularity. This results in a lot of
+> metadata overhead from the struct vfio_dma. At 80 bytes of metadata
+> per page (actually 128 due to rounding in kmalloc), 1-2% of total
+> system memory can end up being used for VFIO metadata.
+> 
+> First, is this sort of use case something that upstream wants to address?
+> 
+> If it's something that is worth addressing, here are two possible
+> approaches I've thought of. I haven't implemented either yet, so there
+> might be details I'm missing, or the API changes or maintenance costs
+> might not be acceptable. Both are a little bit different from
+> VFIO_TYPE1_IOMMU, so they would probably require at least a
+> VFIO_TYPE1v3_IOMMU type.
+> 
+> 1) Add an alternative xarray implementation for vfio_iommu.dma_list
+> that maintains the iova -> vaddr mapping at the page granularity. Most
+> of the metadata in struct vfio_dma can be packed into the extra bits
+> in the vaddr. The two exceptions are vfio_dma.task and
+> vfio_dma.pfn_list. The lack of space for vfio_dma.task could be
+> addressed by requiring that all mappings have the same task. Without
+> vfio_dma.pfn_list, we would lose the refcount maintained by struct
+> vfio_pfn, which means every call to vfio_iommu_type1_pin_pages would
+> require re-pinning the page. This might be a bit more inefficient,
+> although it seems like it should be okay from a correctness
+> standpoint.
+> 
+> One downside of this approach is that it is only more memory efficient
+> than the rbtree if the mapping is quite dense, since a struct xa_node
+> is quite a bit larger than a struct vfio_dma. This would help the most
+> problematic coIOMMU cases, but it would still leave certain
+> virtio-iommu cases unaddressed. Also, although most of the struct
+> vfio_dma metadata could be packed into the xarray today, that might no
+> longer be the case if more metadata was added in the future.
+> 
+> 2) A second alternative would be to drop the VFIO metadata altogether
+> and basically directly expose the iommu APIs (with the required
+> locking/validation). This would be incompatible with mediated devices,
+> and it wouldn't be able to support the various bells and whistles of
+> the VFIO api. However, I think the core mapping/unmapping logic could
+> still be shared between the normal struct vfio_dma tree and this
+> approach. Personally, I'm a little more in favor of this one, since it
+> completely avoids VFIO memory overhead in both of my use cases.
+> 
+> Do either of those approaches sound like something that might work? If
+> neither is okay, are there any suggestions for approaches to take?
+
+I'd advise looking at discussions[1][2] (and hopefully patch series
+before too long) around development of the iommufd.  This driver is
+meant to provide a common iommu mapping interface for various userspace
+use cases, including both vfio and vdpa.  I think the best approach at
+this point would be to work with that effort to champion a low-latency,
+space efficient, page mapping interface that could be used with your
+design.  Perhaps a nested paging solution, which is clearly something
+the iommufd work intends to enable, would fit your needs.
+
+In the interim, I don't think we want to promote further extensions to
+the existing vfio type1 backend.  Thanks,
+
+Alex
+
+[1]https://lore.kernel.org/all/?q=iommufd
+[2]https://lore.kernel.org/all/20210919063848.1476776-1-yi.l.liu@intel.com/
 
