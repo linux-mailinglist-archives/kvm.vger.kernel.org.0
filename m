@@ -2,349 +2,206 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F7614BFB4C
-	for <lists+kvm@lfdr.de>; Tue, 22 Feb 2022 15:55:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 604AB4BFBD2
+	for <lists+kvm@lfdr.de>; Tue, 22 Feb 2022 16:03:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232987AbiBVOzi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Feb 2022 09:55:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43938 "EHLO
+        id S233369AbiBVPDn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Feb 2022 10:03:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232969AbiBVOzh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Feb 2022 09:55:37 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CDAE10C52E;
-        Tue, 22 Feb 2022 06:55:11 -0800 (PST)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21MDi5lc029849;
-        Tue, 22 Feb 2022 14:55:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=92iJyNuF+Ym9VokFFCdNXi3MYQdquI9c0lcWpZl2Bv8=;
- b=FgehloX/557uvTVegDMe+/UwyO820BkIcAJbfB6pK4VkN0Zwvyd2xPvA9XGi3EyAIptB
- X2GwFcpubunNLtfNb9Fxkhdc6vz/VFSq6RefRzsffGsINB9NE2ntXQ5/ScvVSFQxb0hn
- Nc142LnUSVF9tJoDGpDVuMwCCSO/FG21D4tHWzqWqLSV6Feo0YbEpBwUAzaPptaTfkXp
- Vv/xthBxf5cRlTbS9IocyVKOJiWTc+9ocDp6zkg0Qoi0zWEALfM4bJLy6G7qDW0Haya0
- v4egKodVHDjPPP2DVqgUgrnuz66ZvOG99RGhjc1nySsITf28Sy2EUEtmn6WEaYIgjcL8 EQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3ed0yh9tah-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 22 Feb 2022 14:55:10 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21MEiaJm027399;
-        Tue, 22 Feb 2022 14:55:10 GMT
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3ed0yh9t9u-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 22 Feb 2022 14:55:10 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21MEh7dS006090;
-        Tue, 22 Feb 2022 14:55:08 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma05fra.de.ibm.com with ESMTP id 3ear69ae4p-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 22 Feb 2022 14:55:08 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21MEt5jA27460006
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 22 Feb 2022 14:55:05 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5C8B9A405B;
-        Tue, 22 Feb 2022 14:55:05 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 171D1A4068;
-        Tue, 22 Feb 2022 14:55:04 +0000 (GMT)
-Received: from linux7.. (unknown [9.114.12.92])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 22 Feb 2022 14:55:03 +0000 (GMT)
-From:   Steffen Eiden <seiden@linux.ibm.com>
-To:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v3 5/5] s390x: uv-guest: Add attestation tests
-Date:   Tue, 22 Feb 2022 14:54:56 +0000
-Message-Id: <20220222145456.9956-6-seiden@linux.ibm.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20220222145456.9956-1-seiden@linux.ibm.com>
-References: <20220222145456.9956-1-seiden@linux.ibm.com>
+        with ESMTP id S233699AbiBVPDS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Feb 2022 10:03:18 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id F1F2F1101
+        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 07:02:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645542157;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=rdi/qxR3vXLdPYSOnT7lLR4Cj8YvfdXVSXReKwN9fr0=;
+        b=jHJUx/IxtF5pv78FB6X/pPcDi4MV/tswxRO7JszdY8LN1ufK7z26HnfhDd5iDq878oREob
+        POG2qv1YO+z4MsenQLPxMtsO8jo2SgPEVWGB5I5EGJKtq0KkAaL9HBvRtNWBqwGrjPKjdo
+        3vGTAx2GIUOYnKCwNdUO3NH/te7Hu9A=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-367-IlwOIQJNOwmOqO50UXKtXg-1; Tue, 22 Feb 2022 10:02:34 -0500
+X-MC-Unique: IlwOIQJNOwmOqO50UXKtXg-1
+Received: by mail-ed1-f70.google.com with SMTP id l14-20020aa7cace000000b003f7f8e1cbbdso12092417edt.20
+        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 07:02:34 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=rdi/qxR3vXLdPYSOnT7lLR4Cj8YvfdXVSXReKwN9fr0=;
+        b=7wsrBxj2uNBHUsBCrs+KdHtylg3JyOpRSQo7gcxuZR5s64dQvQvWRQpfNJOQLOC1WD
+         1VL4anGNx8Tu08CkIO95ZC45uXbRUfbmNGCFX+r9m2yn8KBOLZZ8cGo6cTZQ0HTbrpbc
+         nLFnZkIj/uDSRv5nQ2juooDR/l1wReHbCZpHwMkEKxbb6zU/3biTLFVpKk7wNW4bA73P
+         YlxhltkkLnepmcniabuODvwCiql0jhon1Z/WdKBlrZg2P00z+YXn8674k+XQl5+H9/+K
+         ybA/Rs7uP3hqQmWFaBZYG4lAeWagiRSyCMl2vAAZXOxbWyV30XpZjS46nd9z1OGfbHAz
+         zDIg==
+X-Gm-Message-State: AOAM533u9On3OnEF4J4ZAygbLGZuDqmV4JjMacaWh/zHjFm5YkqSvq8c
+        VvVNveydzsTRNJJiUKwSTBqsSyFikXWEqlMfugcI6+kBiXlQ6dtnwzcazzoBIpYJWvUx2uT3lLY
+        LoLq34iVrqPtS
+X-Received: by 2002:a17:906:2991:b0:6cf:1fd4:39a3 with SMTP id x17-20020a170906299100b006cf1fd439a3mr19565084eje.21.1645542153504;
+        Tue, 22 Feb 2022 07:02:33 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwfs/vKQLHNEKKWfGdfWtjrGEHBFte8MvKz5Y50OjDrG513NxeN/Cw3t2XJvu4U4AxkMg15eQ==
+X-Received: by 2002:a17:906:2991:b0:6cf:1fd4:39a3 with SMTP id x17-20020a170906299100b006cf1fd439a3mr19565062eje.21.1645542153204;
+        Tue, 22 Feb 2022 07:02:33 -0800 (PST)
+Received: from redhat.com ([2.55.129.240])
+        by smtp.gmail.com with ESMTPSA id q16sm5998109ejc.21.2022.02.22.07.02.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Feb 2022 07:02:32 -0800 (PST)
+Date:   Tue, 22 Feb 2022 10:02:29 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Anirudh Rayabharam <mail@anirudhrb.com>,
+        syzbot+0abd373e2e50d704db87@syzkaller.appspotmail.com,
+        kvm <kvm@vger.kernel.org>,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        netdev <netdev@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] vhost: validate range size before adding to iotlb
+Message-ID: <20220222090511-mutt-send-email-mst@kernel.org>
+References: <20220221195303.13560-1-mail@anirudhrb.com>
+ <CACGkMEvLE=kV4PxJLRjdSyKArU+MRx6b_mbLGZHSUgoAAZ+-Fg@mail.gmail.com>
+ <YhRtQEWBF0kqWMsI@anirudhrb.com>
+ <CACGkMEvd7ETC_ANyrOSAVz_i64xqpYYazmm=+39E51=DMRFXdw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 354OVdo2FIzHOdQ1GCjBU0Kc5yQY1WvH
-X-Proofpoint-GUID: _v4iap-M6Yc8MzOrFZu97KdlIOPsokTg
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-02-22_03,2022-02-21_02,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- mlxlogscore=999 lowpriorityscore=0 suspectscore=0 adultscore=0 spamscore=0
- clxscore=1015 impostorscore=0 phishscore=0 bulkscore=0 priorityscore=1501
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2202220091
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CACGkMEvd7ETC_ANyrOSAVz_i64xqpYYazmm=+39E51=DMRFXdw@mail.gmail.com>
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Adds several tests to verify correct error paths of attestation.
+On Tue, Feb 22, 2022 at 03:11:07PM +0800, Jason Wang wrote:
+> On Tue, Feb 22, 2022 at 12:57 PM Anirudh Rayabharam <mail@anirudhrb.com> wrote:
+> >
+> > On Tue, Feb 22, 2022 at 10:50:20AM +0800, Jason Wang wrote:
+> > > On Tue, Feb 22, 2022 at 3:53 AM Anirudh Rayabharam <mail@anirudhrb.com> wrote:
+> > > >
+> > > > In vhost_iotlb_add_range_ctx(), validate the range size is non-zero
+> > > > before proceeding with adding it to the iotlb.
+> > > >
+> > > > Range size can overflow to 0 when start is 0 and last is (2^64 - 1).
+> > > > One instance where it can happen is when userspace sends an IOTLB
+> > > > message with iova=size=uaddr=0 (vhost_process_iotlb_msg). So, an
+> > > > entry with size = 0, start = 0, last = (2^64 - 1) ends up in the
+> > > > iotlb. Next time a packet is sent, iotlb_access_ok() loops
+> > > > indefinitely due to that erroneous entry:
+> > > >
+> > > >         Call Trace:
+> > > >          <TASK>
+> > > >          iotlb_access_ok+0x21b/0x3e0 drivers/vhost/vhost.c:1340
+> > > >          vq_meta_prefetch+0xbc/0x280 drivers/vhost/vhost.c:1366
+> > > >          vhost_transport_do_send_pkt+0xe0/0xfd0 drivers/vhost/vsock.c:104
+> > > >          vhost_worker+0x23d/0x3d0 drivers/vhost/vhost.c:372
+> > > >          kthread+0x2e9/0x3a0 kernel/kthread.c:377
+> > > >          ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
+> > > >          </TASK>
+> > > >
+> > > > Reported by syzbot at:
+> > > >         https://syzkaller.appspot.com/bug?extid=0abd373e2e50d704db87
+> > > >
+> > > > Reported-by: syzbot+0abd373e2e50d704db87@syzkaller.appspotmail.com
+> > > > Tested-by: syzbot+0abd373e2e50d704db87@syzkaller.appspotmail.com
+> > > > Signed-off-by: Anirudh Rayabharam <mail@anirudhrb.com>
+> > > > ---
+> > > >  drivers/vhost/iotlb.c | 6 ++++--
+> > > >  1 file changed, 4 insertions(+), 2 deletions(-)
+> > > >
+> > > > diff --git a/drivers/vhost/iotlb.c b/drivers/vhost/iotlb.c
+> > > > index 670d56c879e5..b9de74bd2f9c 100644
+> > > > --- a/drivers/vhost/iotlb.c
+> > > > +++ b/drivers/vhost/iotlb.c
+> > > > @@ -53,8 +53,10 @@ int vhost_iotlb_add_range_ctx(struct vhost_iotlb *iotlb,
+> > > >                               void *opaque)
+> > > >  {
+> > > >         struct vhost_iotlb_map *map;
+> > > > +       u64 size = last - start + 1;
+> > > >
+> > > > -       if (last < start)
+> > > > +       // size can overflow to 0 when start is 0 and last is (2^64 - 1).
+> > > > +       if (last < start || size == 0)
+> > > >                 return -EFAULT;
+> > >
+> > > I'd move this check to vhost_chr_iter_write(), then for the device who
+> > > has its own msg handler (e.g vDPA) can benefit from it as well.
+> >
+> > Thanks for reviewing!
+> >
+> > I kept the check here thinking that all devices would benefit from it
+> > because they would need to call vhost_iotlb_add_range() to add an entry
+> > to the iotlb. Isn't that correct?
+> 
+> Correct for now but not for the future, it's not guaranteed that the
+> per device iotlb message handler will use vhost iotlb.
+> 
+> But I agree that we probably don't need to care about it too much now.
+> 
+> > Do you see any other benefit in moving
+> > it to vhost_chr_iter_write()?
+> >
+> > One concern I have is that if we move it out some future caller to
+> > vhost_iotlb_add_range() might forget to handle this case.
+> 
+> Yes.
+> 
+> Rethink the whole fix, we're basically rejecting [0, ULONG_MAX] range
+> which seems a little bit odd.
 
-Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
----
- lib/s390x/asm/uv.h |   5 +-
- s390x/uv-guest.c   | 193 ++++++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 196 insertions(+), 2 deletions(-)
+Well, I guess ideally we'd split this up as two entries - this kind of
+thing is after all one of the reasons we initially used first,last as
+the API - as opposed to first,size.
 
-diff --git a/lib/s390x/asm/uv.h b/lib/s390x/asm/uv.h
-index c330c0f8..e5f7aa72 100644
---- a/lib/s390x/asm/uv.h
-+++ b/lib/s390x/asm/uv.h
-@@ -108,7 +108,10 @@ struct uv_cb_qui {
- 	u8  reserved88[158 - 136];	/* 0x0088 */
- 	uint16_t max_guest_cpus;	/* 0x009e */
- 	u64 uv_feature_indications;	/* 0x00a0 */
--	u8  reserveda8[200 - 168];	/* 0x00a8 */
-+	uint8_t  reserveda8[224 - 168];	/* 0x00a8 */
-+	uint64_t supp_att_hdr_ver;	/* 0x00e0 */
-+	uint64_t supp_paf;		/* 0x00e8 */
-+	uint8_t  reservedf0[256 - 240];	/* 0x00f0 */
- }  __attribute__((packed))  __attribute__((aligned(8)));
- 
- struct uv_cb_cgc {
-diff --git a/s390x/uv-guest.c b/s390x/uv-guest.c
-index 77057bd2..77edbba2 100644
---- a/s390x/uv-guest.c
-+++ b/s390x/uv-guest.c
-@@ -2,10 +2,11 @@
- /*
-  * Guest Ultravisor Call tests
-  *
-- * Copyright (c) 2020 IBM Corp
-+ * Copyright IBM Corp. 2020, 2022
-  *
-  * Authors:
-  *  Janosch Frank <frankja@linux.ibm.com>
-+ *  Steffen Eiden <seiden@linux.ibm.com>
-  */
- 
- #include <libcflat.h>
-@@ -53,6 +54,15 @@ static void test_priv(void)
- 	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
- 	report_prefix_pop();
- 
-+	report_prefix_push("attest");
-+	uvcb.cmd = UVC_CMD_ATTESTATION;
-+	uvcb.len = sizeof(struct uv_cb_attest);
-+	expect_pgm_int();
-+	enter_pstate();
-+	uv_call_once(0, (uint64_t)&uvcb);
-+	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
-+	report_prefix_pop();
-+
- 	report_prefix_pop();
- }
- 
-@@ -111,7 +121,187 @@ static void test_sharing(void)
- 	cc = uv_call(0, (u64)&uvcb);
- 	report(cc == 0 && uvcb.header.rc == UVC_RC_EXECUTED, "unshare");
- 	report_prefix_pop();
-+}
-+
-+#define ARCB_VERSION_NONE 0
-+#define ARCB_VERSION_1 0x0100
-+#define ARCB_MEAS_NONE 0
-+#define ARCB_MEAS_HMAC_SHA512 1
-+#define MEASUREMENT_SIZE_HMAC_SHA512 64
-+#define PAF_PHKH_ATT (1ULL << 61)
-+#define ADDITIONAL_SIZE_PAF_PHKH_ATT 32
-+/* arcb with one key slot and no nonce */
-+struct uv_arcb_v1 {
-+	uint64_t reserved0;		/* 0x0000 */
-+	uint32_t req_ver;		/* 0x0008 */
-+	uint32_t req_len;		/* 0x000c */
-+	uint8_t  iv[12];		/* 0x0010 */
-+	uint32_t reserved1c;		/* 0x001c */
-+	uint8_t  reserved20[7];		/* 0x0020 */
-+	uint8_t  nks;			/* 0x0027 */
-+	uint32_t reserved28;		/* 0x0028 */
-+	uint32_t sea;			/* 0x002c */
-+	uint64_t plaint_att_flags;	/* 0x0030 */
-+	uint32_t meas_alg_id;		/* 0x0038 */
-+	uint32_t reserved3c;		/* 0x003c */
-+	uint8_t  cpk[160];		/* 0x0040 */
-+	uint8_t  key_slot[80];		/* 0x00e0 */
-+	uint8_t  meas_key[64];		/* 0x0130 */
-+	uint8_t  tag[16];		/* 0x0170 */
-+} __attribute__((packed));
-+
-+struct attest_request_v1 {
-+	struct uv_arcb_v1 arcb;
-+	uint8_t measurement[MEASUREMENT_SIZE_HMAC_SHA512];
-+	uint8_t additional[ADDITIONAL_SIZE_PAF_PHKH_ATT];
-+};
-+
-+static void test_attest_v1(u64 supported_paf)
-+{
-+	struct uv_cb_attest uvcb = {
-+		.header.cmd = UVC_CMD_ATTESTATION,
-+		.header.len = sizeof(uvcb),
-+	};
-+	struct attest_request_v1 *attest_req = (void *)page;
-+	struct uv_arcb_v1 *arcb = &attest_req->arcb;
-+	int cc;
-+
-+	memset((void *)page, 0, PAGE_SIZE);
-+
-+	/*
-+	 * Create a minimal arcb/uvcb such that FW has everything to start
-+	 * unsealing the request. However, this unsealing will fail as the
-+	 * kvm-unit-test framework provides no cryptography functions that
-+	 * would be needed to seal such requests.
-+	 */
-+	arcb->req_ver = ARCB_VERSION_1;
-+	arcb->req_len = sizeof(*arcb);
-+	arcb->nks = 1;
-+	arcb->sea = sizeof(arcb->meas_key);
-+	arcb->plaint_att_flags = PAF_PHKH_ATT;
-+	arcb->meas_alg_id = ARCB_MEAS_HMAC_SHA512;
-+	uvcb.arcb_addr = (uint64_t)&attest_req->arcb;
-+	uvcb.measurement_address = (uint64_t)attest_req->measurement;
-+	uvcb.measurement_length = sizeof(attest_req->measurement);
-+	uvcb.add_data_address = (uint64_t)attest_req->additional;
-+	uvcb.add_data_length = sizeof(attest_req->additional);
-+
-+	uvcb.continuation_token = 0xff;
-+	cc = uv_call(0, (uint64_t)&uvcb);
-+	report(cc == 1 && uvcb.header.rc == 0x0101, "invalid continuation token");
-+	uvcb.continuation_token = 0;
-+
-+	uvcb.user_data_length = sizeof(uvcb.user_data) + 1;
-+	cc = uv_call(0, (uint64_t)&uvcb);
-+	report(cc == 1 && uvcb.header.rc == 0x0102, "invalid user data size");
-+	uvcb.user_data_length = 0;
-+
-+	uvcb.arcb_addr = get_ram_size() + PAGE_SIZE;
-+	cc = uv_call(0, (uint64_t)&uvcb);
-+	report(cc == 1 && uvcb.header.rc == 0x0103, "invalid address arcb");
-+	uvcb.arcb_addr = page;
-+
-+	/* 0104 - 0105 need an unseal-able request */
-+
-+	arcb->req_ver = ARCB_VERSION_NONE;
-+	cc = uv_call(0, (uint64_t)&uvcb);
-+	report(cc == 1 && uvcb.header.rc == 0x0106, "unsupported version");
-+	arcb->req_ver = ARCB_VERSION_1;
-+
-+	arcb->req_len += 1;
-+	cc = uv_call(0, (uint64_t)&uvcb);
-+	report(cc == 1 && uvcb.header.rc == 0x0107, "invalid arcb size 1");
-+	arcb->req_len -= 1;
-+
-+	/*
-+	 * The arcb needs to grow as well if number of key slots (nks)
-+	 * is increased. However, this is not the case and there is no explicit
-+	 * 'too many/less nks for that arcb size' error code -> expect 0x0107
-+	 */
-+	arcb->nks = 2;
-+	cc = uv_call(0, (uint64_t)&uvcb);
-+	report(cc == 1 && uvcb.header.rc == 0x0107, "invalid arcb size 2");
-+	arcb->nks = 1;
-+
-+	arcb->nks = 0;
-+	cc = uv_call(0, (uint64_t)&uvcb);
-+	report(cc == 1 && uvcb.header.rc == 0x0108, "invalid num key slots");
-+	arcb->nks = 1;
-+
-+	/*
-+	 * Possible valid size (when using nonce).
-+	 * However, req_len too small to host a nonce
-+	 */
-+	arcb->sea = 80;
-+	cc = uv_call(0, (uint64_t)&uvcb);
-+	report(cc == 1 && uvcb.header.rc == 0x0109, "invalid encrypted size 1");
-+	arcb->sea = 17;
-+	cc = uv_call(0, (uint64_t)&uvcb);
-+	report(cc == 1 && uvcb.header.rc == 0x0109, "invalid encrypted size 2");
-+	arcb->sea = 64;
-+
-+	arcb->plaint_att_flags = supported_paf ^ GENMASK_ULL(63, 0);
-+	cc = uv_call(0, (uint64_t)&uvcb);
-+	report(cc == 1 && uvcb.header.rc == 0x010a, "invalid flag");
-+	arcb->plaint_att_flags = PAF_PHKH_ATT;
-+
-+	arcb->meas_alg_id = ARCB_MEAS_NONE;
-+	cc = uv_call(0, (uint64_t)&uvcb);
-+	report(cc == 1 && uvcb.header.rc == 0x010b, "invalid measurement algorithm");
-+	arcb->meas_alg_id = ARCB_MEAS_HMAC_SHA512;
- 
-+	cc = uv_call(0, (uint64_t)&uvcb);
-+	report(cc == 1 && uvcb.header.rc == 0x010c, "unable unseal");
-+
-+	uvcb.measurement_length = 0;
-+	cc = uv_call(0, (uint64_t)&uvcb);
-+	report(cc == 1 && uvcb.header.rc == 0x010d, "invalid measurement size");
-+	uvcb.measurement_length = sizeof(attest_req->measurement);
-+
-+	uvcb.add_data_length = 0;
-+	cc = uv_call(0, (uint64_t)&uvcb);
-+	report(cc == 1 && uvcb.header.rc == 0x010e, "invalid additional size");
-+	uvcb.add_data_length = sizeof(attest_req->additional);
-+}
-+
-+static void test_attest(void)
-+{
-+	struct uv_cb_attest uvcb = {
-+		.header.cmd = UVC_CMD_ATTESTATION,
-+		.header.len = sizeof(uvcb),
-+	};
-+	const struct uv_cb_qui *uvcb_qui = uv_get_query_data();
-+	int cc;
-+
-+	report_prefix_push("attest");
-+
-+	if (!uv_query_test_call(BIT_UVC_CMD_ATTESTATION)) {
-+		report_skip("Attestation not supported.");
-+		goto done;
-+	}
-+
-+	/* Verify that the UV supports at least one header version */
-+	report(uvcb_qui->supp_att_hdr_ver, "has hdr support");
-+
-+	memset((void *)page, 0, PAGE_SIZE);
-+
-+	uvcb.header.len -= 1;
-+	cc = uv_call(0, (uint64_t)&uvcb);
-+	report(cc && uvcb.header.rc == UVC_RC_INV_LEN, "invalid uvcb size 1");
-+	uvcb.header.len += 1;
-+
-+	uvcb.header.len += 1;
-+	cc = uv_call(0, (uint64_t)&uvcb);
-+	report(cc && uvcb.header.rc == UVC_RC_INV_LEN, "invalid uvcb size 2");
-+	uvcb.header.len -= 1;
-+
-+	report_prefix_push("v1");
-+	if (test_bit_inv(0, &uvcb_qui->supp_att_hdr_ver))
-+		test_attest_v1(uvcb_qui->supp_paf);
-+	else
-+		report_skip("Attestation version 1 not supported");
-+	report_prefix_pop();
-+done:
- 	report_prefix_pop();
- }
- 
-@@ -193,6 +383,7 @@ int main(void)
- 	test_invalid();
- 	test_query();
- 	test_sharing();
-+	test_attest();
- 	free_page((void *)page);
- done:
- 	report_prefix_pop();
--- 
-2.30.2
+Anirudh, could you do it like this instead of rejecting?
+
+
+> I wonder if it's better to just remove
+> the map->size. Having a quick glance at the the user, I don't see any
+> blocker for this.
+> 
+> Thanks
+
+I think it's possible but won't solve the bug by itself, and we'd need
+to review and fix all users - a high chance of introducing
+another regression. And I think there's value of fitting under the
+stable rule of 100 lines with context.
+So sure, but let's fix the bug first.
+
+
+
+> >
+> > Thanks!
+> >
+> >         - Anirudh.
+> >
+> > >
+> > > Thanks
+> > >
+> > > >
+> > > >         if (iotlb->limit &&
+> > > > @@ -69,7 +71,7 @@ int vhost_iotlb_add_range_ctx(struct vhost_iotlb *iotlb,
+> > > >                 return -ENOMEM;
+> > > >
+> > > >         map->start = start;
+> > > > -       map->size = last - start + 1;
+> > > > +       map->size = size;
+> > > >         map->last = last;
+> > > >         map->addr = addr;
+> > > >         map->perm = perm;
+> > > > --
+> > > > 2.35.1
+> > > >
+> > >
+> >
 
