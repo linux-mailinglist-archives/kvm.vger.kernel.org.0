@@ -2,157 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D4B884C0592
-	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 00:53:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EDC9F4C0599
+	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 00:54:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236332AbiBVXxe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Feb 2022 18:53:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38600 "EHLO
+        id S236453AbiBVXye (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Feb 2022 18:54:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43102 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236310AbiBVXxc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Feb 2022 18:53:32 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3A663639C
-        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 15:53:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645573984;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=EDsu5aTczzOvR3oKds5AvRCwltMBcJ/oF6EuAWc1T2c=;
-        b=KhmmPFGmVpygmr980VbZh3J7sskJxt+6aFtFccI2eRvrCIq5y+GI4tAt0rnSJDInxPSHDG
-        rE9oV2lpZn0gAAiK8W2OEcgOfQN+XzK0+kwMkg5E15Nz09k8nTkOONZXtPOquiLfm453oQ
-        8M2UdmlUF1g5rdR97BtL0wj833QmB6g=
-Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com
- [209.85.167.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-345-LBat7aw5NOGhdr4roi7O5Q-1; Tue, 22 Feb 2022 18:53:02 -0500
-X-MC-Unique: LBat7aw5NOGhdr4roi7O5Q-1
-Received: by mail-oi1-f198.google.com with SMTP id r4-20020aca4404000000b002d4f32967bdso3867398oia.12
-        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 15:53:02 -0800 (PST)
+        with ESMTP id S236381AbiBVXy2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Feb 2022 18:54:28 -0500
+Received: from mail-yb1-xb32.google.com (mail-yb1-xb32.google.com [IPv6:2607:f8b0:4864:20::b32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAC4262D9
+        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 15:53:59 -0800 (PST)
+Received: by mail-yb1-xb32.google.com with SMTP id c6so44593660ybk.3
+        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 15:53:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=atishpatra.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=dpzVG0KOz8Fj+NV1zL23tj2BFq6GNDaGLyfBrIVD5jE=;
+        b=PyuvmgVYjrMy43NHY161nkmfLiq4r+5QP/M/Shz+icoZQO2uxkc4Db0hbBtw0ClTlS
+         0IgWnqOrCbCQQqeGkcvjXv8uP+NGTHWtzINHx3f726Fw+ZpgNJYYmMntVgzMqG/lz0zO
+         hC6O4gQkUYgxE7eBQgrN3fQuI8HquIa7HAgYw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=EDsu5aTczzOvR3oKds5AvRCwltMBcJ/oF6EuAWc1T2c=;
-        b=MJi5E93n2/QKwKCAZje3R5N0qi93y/Yer+fhO80720SdXrlD0upiKnNV9qbt/b76qA
-         KhDn6KFjSXPx6IBfXKopPFdbkoZkkVlm7uuP1wbyxyhdXM1+jndWe+AmiSw7vbxKZNUv
-         TPqgWU5Rxb1/RojQ4OgmePaAjhrBMdfUwPIrKAFWo4JN/6psFnCr2VT6K1NOz6Ofdrd+
-         mT7eGGJgjuwSj4o+rK4ytg0bWjTsAXxzrO30MHRGSj18fGtJC24XJ2fpfuKEI4yM5Xxk
-         HckQ0YdwyIHFY6jKNG7t6fqSb8w953IRheCj4NDxTLHxojo50ptstN+VbKD/FFRyZH7/
-         WoWw==
-X-Gm-Message-State: AOAM533OOD9SiHGdkUgFwFDuvR08ShX3bntI5UpOnydyUaZJQW1ARJTS
-        1+scWgzEmq/8l9dfE9EnkjhQZcQUZlimcv8d5mGL40J4HQHuD7b3RIVtugOpmD4QbwAvrFKij/x
-        1lQTTNGyPXGQw
-X-Received: by 2002:aca:b957:0:b0:2d4:cf0f:ce1e with SMTP id j84-20020acab957000000b002d4cf0fce1emr3145178oif.22.1645573982130;
-        Tue, 22 Feb 2022 15:53:02 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxDVey3GFc827L22t9gWEfGNj6vtWvCa3s3QmPNAs+QhKqYofPao9S/0+I8RDpFjiMHDHgHGQ==
-X-Received: by 2002:aca:b957:0:b0:2d4:cf0f:ce1e with SMTP id j84-20020acab957000000b002d4cf0fce1emr3145169oif.22.1645573981895;
-        Tue, 22 Feb 2022 15:53:01 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id 8sm6711150ota.60.2022.02.22.15.53.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Feb 2022 15:53:01 -0800 (PST)
-Date:   Tue, 22 Feb 2022 16:53:00 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Yishai Hadas <yishaih@nvidia.com>
-Cc:     <bhelgaas@google.com>, <jgg@nvidia.com>, <saeedm@nvidia.com>,
-        <linux-pci@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <kuba@kernel.org>, <leonro@nvidia.com>,
-        <kwankhede@nvidia.com>, <mgurtovoy@nvidia.com>, <maorg@nvidia.com>,
-        <cohuck@redhat.com>, <ashok.raj@intel.com>, <kevin.tian@intel.com>,
-        <shameerali.kolothum.thodi@huawei.com>
-Subject: Re: [PATCH V8 mlx5-next 09/15] vfio: Define device migration
- protocol v2
-Message-ID: <20220222165300.4a8dd044.alex.williamson@redhat.com>
-In-Reply-To: <20220220095716.153757-10-yishaih@nvidia.com>
-References: <20220220095716.153757-1-yishaih@nvidia.com>
-        <20220220095716.153757-10-yishaih@nvidia.com>
-Organization: Red Hat
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=dpzVG0KOz8Fj+NV1zL23tj2BFq6GNDaGLyfBrIVD5jE=;
+        b=WLBfDkwXQtljL/BrAUEeLaO4pLw3C9t7IxxYZKe3kEexZQ5TeFU6xgduKXVDXqvfWS
+         Uq8s4zwOUhIyrfJmgWqvZrTCD1reQQTd8M78wsBinqXA4YgGXHXptv0iUhf0dD+Z1/Hw
+         tN3hm0c7HvOJQtU0FomNX0pURHqxxzDOqIwKqIHaMlKC948QejsVGAl6oKg3luZNJ7dK
+         cs3hWurR65sH8fOOye5HSRCCpEafaCj2ay+7xR3yxZcoe3dHpVgj+n8gvQn/nF1zhK5a
+         df+4VyHM524JKJxxmmSEXY/g54hGtwIB2eJZoQMKJ6lJw7gNuUeXzlM6+hscswpYVl12
+         RieQ==
+X-Gm-Message-State: AOAM53187CuQEYHzeQTv2PBzbKZ1eohIBe6ynWlHlJ18i6e1ceHlK3zx
+        aCazKUv8jMimrOMhXOqvEszEbjfkVTXybAgJIGxu
+X-Google-Smtp-Source: ABdhPJy6UzaGIddYbaCVbtXfioSbcvvSa1AporZq/9wCtEio4EIeXwWb/+d8dyiBe2FBgbDIAvz25JsnqNdgGunLs54=
+X-Received: by 2002:a25:d294:0:b0:61d:9809:9917 with SMTP id
+ j142-20020a25d294000000b0061d98099917mr25644565ybg.289.1645574038489; Tue, 22
+ Feb 2022 15:53:58 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+References: <20220201082227.361967-1-apatel@ventanamicro.com> <20220201082227.361967-2-apatel@ventanamicro.com>
+In-Reply-To: <20220201082227.361967-2-apatel@ventanamicro.com>
+From:   Atish Patra <atishp@atishpatra.org>
+Date:   Tue, 22 Feb 2022 15:53:47 -0800
+Message-ID: <CAOnJCUKKHVxRUA2kdrCRD3-q=DQWP=_gAJn8UovR3jXk3N-qOw@mail.gmail.com>
+Subject: Re: [PATCH 1/6] RISC-V: KVM: Upgrade SBI spec version to v0.3
+To:     Anup Patel <apatel@ventanamicro.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        Anup Patel <anup@brainfault.org>,
+        KVM General <kvm@vger.kernel.org>,
+        kvm-riscv@lists.infradead.org,
+        linux-riscv <linux-riscv@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, 20 Feb 2022 11:57:10 +0200
-Yishai Hadas <yishaih@nvidia.com> wrote:
+On Tue, Feb 1, 2022 at 12:23 AM Anup Patel <apatel@ventanamicro.com> wrote:
+>
+> We upgrade SBI spec version implemented by KVM RISC-V to v0.3 so
+> that Guest kernel can probe and use SBI extensions added by the
+> SBI v0.3 specification.
+>
+> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+> ---
+>  arch/riscv/include/asm/kvm_vcpu_sbi.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/arch/riscv/include/asm/kvm_vcpu_sbi.h b/arch/riscv/include/asm/kvm_vcpu_sbi.h
+> index 76e4e17a3e00..04cd81f2ab5b 100644
+> --- a/arch/riscv/include/asm/kvm_vcpu_sbi.h
+> +++ b/arch/riscv/include/asm/kvm_vcpu_sbi.h
+> @@ -12,7 +12,7 @@
+>  #define KVM_SBI_IMPID 3
+>
+>  #define KVM_SBI_VERSION_MAJOR 0
+> -#define KVM_SBI_VERSION_MINOR 2
+> +#define KVM_SBI_VERSION_MINOR 3
+>
+>  struct kvm_vcpu_sbi_extension {
+>         unsigned long extid_start;
+> --
+> 2.25.1
+>
 
-> From: Jason Gunthorpe <jgg@nvidia.com>
-> 
-> Replace the existing region based migration protocol with an ioctl based
-> protocol. The two protocols have the same general semantic behaviors, but
-> the way the data is transported is changed.
-> 
-> This is the STOP_COPY portion of the new protocol, it defines the 5 states
-> for basic stop and copy migration and the protocol to move the migration
-> data in/out of the kernel.
-> 
-> Compared to the clarification of the v1 protocol Alex proposed:
-> 
-> https://lore.kernel.org/r/163909282574.728533.7460416142511440919.stgit@omen
-> 
-> This has a few deliberate functional differences:
-> 
->  - ERROR arcs allow the device function to remain unchanged.
-> 
->  - The protocol is not required to return to the original state on
->    transition failure. Instead userspace can execute an unwind back to
->    the original state, reset, or do something else without needing kernel
->    support. This simplifies the kernel design and should userspace choose
->    a policy like always reset, avoids doing useless work in the kernel
->    on error handling paths.
-> 
->  - PRE_COPY is made optional, userspace must discover it before using it.
->    This reflects the fact that the majority of drivers we are aware of
->    right now will not implement PRE_COPY.
-> 
->  - segmentation is not part of the data stream protocol, the receiver
->    does not have to reproduce the framing boundaries.
 
-I'm not sure how to reconcile the statement above with:
+Reviewed-by: Atish Patra <atishp@rivosinc.com>
 
-	"The user must consider the migration data segments carried
-	 over the FD to be opaque and non-fungible. During RESUMING, the
-	 data segments must be written in the same order they came out
-	 of the saving side FD."
-
-This is subtly conflicting that it's not segmented, but segments must
-be written in order.  We'll naturally have some segmentation due to
-buffering in kernel and userspace, but I think referring to it as a
-stream suggests that the user can cut and join segments arbitrarily so
-long as byte order is preserved, right?  I suspect the commit log
-comment is referring to the driver imposed segmentation and framing
-relative to region offsets.
-
-Maybe something like:
-
-	"The user must consider the migration data stream carried over
-	 the FD to be opaque and must preserve the byte order of the
-	 stream.  The user is not required to preserve buffer
-	 segmentation when writing the data stream during the RESUMING
-	 operation."
-
-This statement also gives me pause relative to Jason's comments
-regarding async support:
-
-> + * The kernel migration driver must fully transition the device to the new state
-> + * value before the operation returns to the user.
-
-The above statement certainly doesn't preclude asynchronous
-availability of data on the stream FD, but it does demand that the
-device state transition itself is synchronous and can cannot be
-shortcut.  If the state transition itself exceeds migration SLAs, we're
-in a pickle.  Thanks,
-
-Alex
-
+--
+Regards,
+Atish
