@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7BCEE4BF64A
+	by mail.lfdr.de (Postfix) with ESMTP id ECAF14BF64B
 	for <lists+kvm@lfdr.de>; Tue, 22 Feb 2022 11:42:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231149AbiBVKlj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Feb 2022 05:41:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47512 "EHLO
+        id S230421AbiBVKmO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Feb 2022 05:42:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49116 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229462AbiBVKli (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Feb 2022 05:41:38 -0500
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3664815A232;
-        Tue, 22 Feb 2022 02:41:13 -0800 (PST)
-Received: by mail-pf1-x42a.google.com with SMTP id u16so11567692pfg.12;
-        Tue, 22 Feb 2022 02:41:13 -0800 (PST)
+        with ESMTP id S229462AbiBVKmN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Feb 2022 05:42:13 -0500
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E767E6C3C;
+        Tue, 22 Feb 2022 02:41:48 -0800 (PST)
+Received: by mail-pj1-x1033.google.com with SMTP id cp23-20020a17090afb9700b001bbfe0fbe94so2122304pjb.3;
+        Tue, 22 Feb 2022 02:41:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=I9dQ69bEOiFN9+rBuQg6s1G1Wep3TZE77BZiSV92wtQ=;
-        b=OyiB4gaHOIdaE3uBgx1J9AQUorgVfhqoRVazWydswpKKADdLEhtA0AlnJoHM9NESfi
-         mY/PuOK7XWgaGly+85IauWN3qJ5QjlUlYIlINRLH8oPNcHYQ1qz3pNMd5PJqz3/L1Ud3
-         v0CVrMUnM+U/ujprQxpCtVKVdzizn6eYB6wEkQvwAOkeylMk1dqtc6eY7c2gADTxkcJd
-         pedmYwe1sHm3coNOF871kF4XSZZmLmZGD+LfqX2uv7i5lK9YJRgv2U4IOOkAteHa3WI4
-         aTLe+BAuGnrGfzm2rfhtJ3rZvVRPM4PZVd7dXzXQsLCphHcfGESpmshp0Yib95lbdCsR
-         iePw==
+        bh=1NOc3SMhUPuBWYuzpTacLcC5sGu7ZMcAFSKQLrvWVRo=;
+        b=ntLoOw60zJoi0qPzAfgf2CP171VvJ/NXamfGEp/vc4jRos7KfxeY6PmhXDWooo7JCA
+         w+B6mNZ8+1Lu48hOUXYaoewTvs67f7d3ywGicFwNJWWGpGo3/AH80/00mHXfks9oH+q7
+         QsmSrKJU1rvjprr/hWLcbJACQDMgw8lg6LdXO7bzvkLazgaGscFeZ3aVk3Y/6J6VnpRO
+         UfiqrETrcMoF1AZ2YNSTgmowV0w6vhV1tHStF3pWYzSwh3soer43+pRbl1Z6wTvQuAEw
+         Nf+KlcE+s49JKP6QWqDpzzW27WQMhk77bB17PoxnzYnkIcRDoPHxgeNJhcwVN8WA2T0N
+         zB1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=I9dQ69bEOiFN9+rBuQg6s1G1Wep3TZE77BZiSV92wtQ=;
-        b=hV7TNVdl20kK178pC82FL35dwPd4KagWdgRPQGvlkwljr4PFTTmdnksLnyFo3BHW6s
-         fj6HbgQ1I5MjzCUth2SFLFAydnXqAlXIWbI0Igfd12yMsm6yIR6KXcZzhgdTdm7w7RSw
-         8q4S8YqKsjYaPK4s5aH2QFbIdU645i+TJOEDF9YT3b1DfzX3ieDSVhe6oA+Kvxm4rtPe
-         6rH+iooydRovqkaC4GJ/r4A0skDi1VlCvUsBbYnnbq2F+7WVo+68/0iljPfqKLWYACyQ
-         qLAurs4ffQxIMGk+01FzhwskwCOrKlEeAtbV3MEB3qeGmeLSkIpTNqYFBJLPtdONr/8P
-         PGWQ==
-X-Gm-Message-State: AOAM533o/6nKqiCrJsveq7qn8AHxNYCKOdrhi8QBRFlgp0Nn7SY02ZoX
-        AXhGV7KAlJt+Koone/mF92g=
-X-Google-Smtp-Source: ABdhPJwVYvxsdwWft3Upv9hJNaf86IJIoBwMd0geiyLwJiw1zwbzptyXbbqHmilqNRGXHJjPrNnXPA==
-X-Received: by 2002:a63:ad0c:0:b0:374:50b4:c955 with SMTP id g12-20020a63ad0c000000b0037450b4c955mr6698033pgf.530.1645526472766;
-        Tue, 22 Feb 2022 02:41:12 -0800 (PST)
+        bh=1NOc3SMhUPuBWYuzpTacLcC5sGu7ZMcAFSKQLrvWVRo=;
+        b=PrMRUj/23lhGY8OlUPIc4PbYPYOTvcHqjLPmUYDhGz+B4DX5LuovlSGOz5gdbj6rPE
+         WtKPWmE6Q0z4AjWMSYqX3O3JLmKKnwmwPOQKQfJ76jtPnoSRn1NP1IJBRfRITlPaxki6
+         nhcn5btdThmBX91v1/JeIBBJ1+rsObYTmd0wQXlNLN0iLReGmG68s9JHGwkXVZIEo3bc
+         5iTqtW679AjZlSbENaPo0rrNWxZj18SmObD0+KVast7LJaT9nQk/g+hf3vfhiWV/Tip9
+         clkLnAbf6OQuTj8XNfJnKOjqKXtmEAQPb8Rht3xW33+uhdngTpVWVwbzbVG5HhmNKKnB
+         h9TQ==
+X-Gm-Message-State: AOAM530abygWRcv7NzKsYMY/QwKQemc+nR91Z8zTlndQH3G7H61GUH1o
+        jcydw9Jd/Bs48TaiYrcB23A=
+X-Google-Smtp-Source: ABdhPJwxreu1SuM+bR7uo6M+mk8zg4/IhR+4ETPnAqIkFJR0FT82ZnckB7MfW0mMgzwWfdDyZJq/Kw==
+X-Received: by 2002:a17:903:230f:b0:14f:95e1:8706 with SMTP id d15-20020a170903230f00b0014f95e18706mr12878041plh.154.1645526507617;
+        Tue, 22 Feb 2022 02:41:47 -0800 (PST)
 Received: from FLYINGPENG-MB0.tencent.com ([103.7.29.30])
-        by smtp.gmail.com with ESMTPSA id l14sm2189424pjz.32.2022.02.22.02.41.11
+        by smtp.gmail.com with ESMTPSA id c13sm16837311pfi.177.2022.02.22.02.41.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Feb 2022 02:41:12 -0800 (PST)
+        Tue, 22 Feb 2022 02:41:47 -0800 (PST)
 From:   Peng Hao <flyingpenghao@gmail.com>
 X-Google-Original-From: Peng Hao <flyingpeng@tencent.com>
 To:     pbonzini@redhat.com, seanjc@google.com
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2] KVM:VMX:Remove scratch 'cpu' variable that shadows an identical scratch var
-Date:   Tue, 22 Feb 2022 18:39:54 +0800
-Message-Id: <20220222103954.70062-1-flyingpeng@tencent.com>
+Subject: [PATCH v2] kvm:vmx: Fix typos comment in __loaded_vmcs_clear()
+Date:   Tue, 22 Feb 2022 18:40:29 +0800
+Message-Id: <20220222104029.70129-1-flyingpeng@tencent.com>
 X-Mailer: git-send-email 2.30.1 (Apple Git-130)
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -67,31 +67,37 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
- From: Peng Hao <flyingpeng@tencent.com> 
+From: Peng Hao <flyingpeng@tencent.com>
 
- Remove a redundant 'cpu' declaration from inside an if-statement that
- that shadows an identical declaration at function scope.  Both variables
- are used as scratch variables in for_each_*_cpu() loops, thus there's no
- harm in sharing a variable.
+Fix a comment documenting the memory barrier related to clearing a
+loaded_vmcs; loaded_vmcs tracks the host CPU the VMCS is loaded on via
+the field 'cpu', it doesn't have a 'vcpu' field.
 
 Reviewed-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Peng Hao <flyingpeng@tencent.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 1 -
- 1 file changed, 1 deletion(-)
+ arch/x86/kvm/vmx/vmx.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index ba66c171d951..6101c2980a9c 100644
+index 6101c2980a9c..75ed7d6f35cc 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7931,7 +7931,6 @@ static int __init vmx_init(void)
- 	    ms_hyperv.hints & HV_X64_ENLIGHTENED_VMCS_RECOMMENDED &&
- 	    (ms_hyperv.nested_features & HV_X64_ENLIGHTENED_VMCS_VERSION) >=
- 	    KVM_EVMCS_VERSION) {
--		int cpu;
+@@ -644,10 +644,10 @@ static void __loaded_vmcs_clear(void *arg)
  
- 		/* Check that we have assist pages on all online CPUs */
- 		for_each_online_cpu(cpu) {
+ 	/*
+ 	 * Ensure all writes to loaded_vmcs, including deleting it from its
+-	 * current percpu list, complete before setting loaded_vmcs->vcpu to
+-	 * -1, otherwise a different cpu can see vcpu == -1 first and add
+-	 * loaded_vmcs to its percpu list before it's deleted from this cpu's
+-	 * list. Pairs with the smp_rmb() in vmx_vcpu_load_vmcs().
++	 * current percpu list, complete before setting loaded_vmcs->cpu to
++	 * -1, otherwise a different cpu can see loaded_vmcs->cpu == -1 first
++	 * and add loaded_vmcs to its percpu list before it's deleted from this
++	 * cpu's list. Pairs with the smp_rmb() in vmx_vcpu_load_vmcs().
+ 	 */
+ 	smp_wmb();
+ 
 -- 
 2.27.0
 
