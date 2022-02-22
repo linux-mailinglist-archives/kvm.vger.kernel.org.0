@@ -2,124 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6693F4BEF92
-	for <lists+kvm@lfdr.de>; Tue, 22 Feb 2022 03:43:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9604A4BF1DC
+	for <lists+kvm@lfdr.de>; Tue, 22 Feb 2022 07:02:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239194AbiBVCeH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Feb 2022 21:34:07 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:54226 "EHLO
+        id S230134AbiBVF6E (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Feb 2022 00:58:04 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:33318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232505AbiBVCeG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Feb 2022 21:34:06 -0500
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EBF225C5E;
-        Mon, 21 Feb 2022 18:33:37 -0800 (PST)
-Received: from dggpemm500020.china.huawei.com (unknown [172.30.72.55])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4K2jqr6ZkYzcffw;
-        Tue, 22 Feb 2022 10:32:24 +0800 (CST)
-Received: from dggpemm500003.china.huawei.com (7.185.36.56) by
- dggpemm500020.china.huawei.com (7.185.36.49) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Tue, 22 Feb 2022 10:33:35 +0800
-Received: from huawei.com (10.175.104.170) by dggpemm500003.china.huawei.com
- (7.185.36.56) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.21; Tue, 22 Feb
- 2022 10:33:35 +0800
-From:   Liang Zhang <zhangliang5@huawei.com>
-To:     <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
-        <dave.hansen@linux.intel.com>, <x86@kernel.org>
-CC:     <pbonzini@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
-        <wanpengli@tencent.com>, <jmattson@google.com>, <joro@8bytes.org>,
-        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <wangzhigang17@huawei.com>, <zhangliang5@huawei.com>
-Subject: [RESEND PATCH] KVM: x86/mmu: make apf token non-zero to fix bug
-Date:   Tue, 22 Feb 2022 11:12:39 +0800
-Message-ID: <20220222031239.1076682-1-zhangliang5@huawei.com>
-X-Mailer: git-send-email 2.30.0
+        with ESMTP id S230086AbiBVF6C (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Feb 2022 00:58:02 -0500
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 484D98E192;
+        Mon, 21 Feb 2022 21:57:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1645509458; x=1677045458;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=7bEcFXv/PBrDnpJkRJDcOGeL+LDolQ6d+dndBSOh350=;
+  b=K6lG22bBANh7vO+MZkeL9DQEOQvHvzY1CHN2nxl1iL8SuCJtiJ6zS+x7
+   loZmz4zG9cGn03doJDazMIVlrOcmZFhb56+/5a7SoPTFbQGnNAuO0AZwA
+   ujpE2bT/mlMYD54qlaYAlqAYeuQzo5DiI/b3XQxQkSbGnVeO0+FYLI1aB
+   FZTxv6EB0jn9LUda5nxGa232om7at/Jxh7Re0KMR7zhHvAW2hXUmZGHsh
+   rg6sbToORhbJQZqKrTzYjCbViaV9WitlJeC/JJAeuvhRan9dnr8mcRzWe
+   IF8ny2bF+fqCBnqVs94g+e+UEain4na0fxZJTa8kdDp//TPlxdPIz5hNy
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10265"; a="250432165"
+X-IronPort-AV: E=Sophos;i="5.88,387,1635231600"; 
+   d="scan'208";a="250432165"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2022 20:50:12 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,387,1635231600"; 
+   d="scan'208";a="683385469"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.118]) ([10.239.159.118])
+  by fmsmga001.fm.intel.com with ESMTP; 21 Feb 2022 20:50:06 -0800
+Message-ID: <c212094a-399e-1038-99e0-7a08d0da2a61@linux.intel.com>
+Date:   Tue, 22 Feb 2022 12:48:39 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.104.170]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpemm500003.china.huawei.com (7.185.36.56)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Cc:     baolu.lu@linux.intel.com, Christoph Hellwig <hch@infradead.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>, kvm@vger.kernel.org,
+        rafael@kernel.org, David Airlie <airlied@linux.ie>,
+        linux-pci@vger.kernel.org,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Dmitry Osipenko <digetx@gmail.com>,
+        Will Deacon <will@kernel.org>,
+        Stuart Yoder <stuyoder@gmail.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        linux-kernel@vger.kernel.org, Li Yang <leoyang.li@nxp.com>,
+        iommu@lists.linux-foundation.org,
+        Jacob jun Pan <jacob.jun.pan@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>
+Subject: Re: [PATCH v6 02/11] driver core: Add dma_cleanup callback in
+ bus_type
+Content-Language: en-US
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Robin Murphy <robin.murphy@arm.com>
+References: <20220218005521.172832-1-baolu.lu@linux.intel.com>
+ <20220218005521.172832-3-baolu.lu@linux.intel.com>
+ <YhCdEmC2lYStmUSL@infradead.org>
+ <1d8004d3-1887-4fc7-08d2-0e2ee6b5fdcb@arm.com>
+ <20220221234837.GA10061@nvidia.com>
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+In-Reply-To: <20220221234837.GA10061@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In current async pagefault logic, when a page is ready, KVM relies on
-kvm_arch_can_dequeue_async_page_present() to determine whether to deliver
-a READY event to the Guest. This function test token value of struct
-kvm_vcpu_pv_apf_data, which must be reset to zero by Guest kernel when a
-READY event is finished by Guest. If value is zero meaning that a READY
-event is done, so the KVM can deliver another.
-But the kvm_arch_setup_async_pf() may produce a valid token with zero
-value, which is confused with previous mention and may lead the loss of
-this READY event.
+On 2/22/22 7:48 AM, Jason Gunthorpe wrote:
+>> since we should only care about ownership at probe, hotplug, and other
+>> places well outside critical fast-paths, I'm not sure we really need to keep
+>> track of that anyway - it can always be recalculated by walking the
+>> group->devices list,
+> It has to be locked against concurrent probe, and there isn't
+> currently any locking scheme that can support this. The owner_cnt is
+> effectively a new lock for this purpose. It is the same issue we
+> talked about with that VFIO patch you showed me.
+> 
+> So, using the group->device_list would require adding something else
+> somewhere - which I think should happen when someone has
+> justification for another use of whatever that something else is.
 
-This bug may cause task blocked forever in Guest:
- INFO: task stress:7532 blocked for more than 1254 seconds.
-       Not tainted 5.10.0 #16
- "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
- task:stress          state:D stack:    0 pid: 7532 ppid:  1409
- flags:0x00000080
- Call Trace:
-  __schedule+0x1e7/0x650
-  schedule+0x46/0xb0
-  kvm_async_pf_task_wait_schedule+0xad/0xe0
-  ? exit_to_user_mode_prepare+0x60/0x70
-  __kvm_handle_async_pf+0x4f/0xb0
-  ? asm_exc_page_fault+0x8/0x30
-  exc_page_fault+0x6f/0x110
-  ? asm_exc_page_fault+0x8/0x30
-  asm_exc_page_fault+0x1e/0x30
- RIP: 0033:0x402d00
- RSP: 002b:00007ffd31912500 EFLAGS: 00010206
- RAX: 0000000000071000 RBX: ffffffffffffffff RCX: 00000000021a32b0
- RDX: 000000000007d011 RSI: 000000000007d000 RDI: 00000000021262b0
- RBP: 00000000021262b0 R08: 0000000000000003 R09: 0000000000000086
- R10: 00000000000000eb R11: 00007fefbdf2baa0 R12: 0000000000000000
- R13: 0000000000000002 R14: 000000000007d000 R15: 0000000000001000
+This series was originated from the similar idea by adding some fields
+in driver structure and intercepting it in iommu core. We stopped doing
+that due to the lack of lock mechanism between iommu and driver core.
+It then evolved into what it is today.
 
-Signed-off-by: Liang Zhang <zhangliang5@huawei.com>
----
- arch/x86/kvm/mmu/mmu.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 593093b52395..8e24f73bf60b 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3889,12 +3889,23 @@ static void shadow_page_table_clear_flood(struct kvm_vcpu *vcpu, gva_t addr)
- 	walk_shadow_page_lockless_end(vcpu);
- }
- 
-+static u32 alloc_apf_token(struct kvm_vcpu *vcpu)
-+{
-+	/* make sure the token value is not 0 */
-+	u32 id = vcpu->arch.apf.id;
-+
-+	if (id << 12 == 0)
-+		vcpu->arch.apf.id = 1;
-+
-+	return (vcpu->arch.apf.id++ << 12) | vcpu->vcpu_id;
-+}
-+
- static bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 				    gfn_t gfn)
- {
- 	struct kvm_arch_async_pf arch;
- 
--	arch.token = (vcpu->arch.apf.id++ << 12) | vcpu->vcpu_id;
-+	arch.token = alloc_apf_token(vcpu);
- 	arch.gfn = gfn;
- 	arch.direct_map = vcpu->arch.mmu->direct_map;
- 	arch.cr3 = vcpu->arch.mmu->get_guest_pgd(vcpu);
--- 
-2.30.0
-
+Best regards,
+baolu
