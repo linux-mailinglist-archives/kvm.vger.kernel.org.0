@@ -2,42 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4386F4BFB22
-	for <lists+kvm@lfdr.de>; Tue, 22 Feb 2022 15:50:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BEBED4BFB42
+	for <lists+kvm@lfdr.de>; Tue, 22 Feb 2022 15:55:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232916AbiBVOvA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Feb 2022 09:51:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40128 "EHLO
+        id S232956AbiBVOza (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Feb 2022 09:55:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232641AbiBVOu7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Feb 2022 09:50:59 -0500
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E738B2739
-        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 06:50:33 -0800 (PST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B3CAA106F;
-        Tue, 22 Feb 2022 06:50:33 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 853783F5A1;
-        Tue, 22 Feb 2022 06:50:32 -0800 (PST)
-Date:   Tue, 22 Feb 2022 14:50:56 +0000
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Sebastian Ene <sebastianene@google.com>, kvm@vger.kernel.org,
-        will@kernel.org, kvmarm@lists.cs.columbia.edu,
-        andre.przywara@arm.com
-Subject: Re: [PATCH kvmtool v3] aarch64: Add stolen time support
-Message-ID: <YhT4UJ99SXCx0YlM@monolith.localdoman>
-References: <YhS2Htrzwks/allO@google.com>
- <YhTsGfoAh4NDo8+j@monolith.localdoman>
- <d5a3d28a964813bd28c79c63e8e3b247@kernel.org>
- <YhTy9j+4HIsnrsSG@monolith.localdoman>
- <2772b40f99a30ecd475fa83641d40994@kernel.org>
+        with ESMTP id S229679AbiBVOz3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Feb 2022 09:55:29 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B2AC10C513;
+        Tue, 22 Feb 2022 06:55:04 -0800 (PST)
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21MDhVXK008641;
+        Tue, 22 Feb 2022 14:55:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=WasIFNVspPrrzPbL8xLUvMFJeNc3XqAvekSgehFfi20=;
+ b=Vod4WPSFBbiayYgCy30r2HM15daNcc/JDMXJ/XKpA7jfUUq7/Cw+kigl6qjXqQ8SzTQI
+ CLqAZUsLhXyUBU3pTgM/BFh4U0kXIBAgUgSt9WGgkkGZIMchIe0ezllK3Xj/piEsfHI4
+ CrTis5OSxR5jRkGmlOxiMQqrKfXAwvAiKaWQkhCukNCwFmf6e1iGsfv0S6L7/Ps4NWQJ
+ 5CyGInMQmIL69fmBeyKC+6Db47oCnQ5O7dyzt/xXrdc0PRkakQFVrex78kI31WmiTavJ
+ R8IRooxZaRFyN1v03jae4NL35akyy2NAyUjkiV5P62cUQvA2erZJ+WiviWsCnPwzFhD/ rw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3ed0pwtdr1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 22 Feb 2022 14:55:03 +0000
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21MEqx68013445;
+        Tue, 22 Feb 2022 14:55:03 GMT
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3ed0pwtdqe-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 22 Feb 2022 14:55:03 +0000
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21MEguC5011763;
+        Tue, 22 Feb 2022 14:55:01 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma01fra.de.ibm.com with ESMTP id 3ear692fuf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 22 Feb 2022 14:55:01 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21MEsw6o45351252
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 22 Feb 2022 14:54:58 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0DF29A4054;
+        Tue, 22 Feb 2022 14:54:58 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C890BA4060;
+        Tue, 22 Feb 2022 14:54:56 +0000 (GMT)
+Received: from linux7.. (unknown [9.114.12.92])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 22 Feb 2022 14:54:56 +0000 (GMT)
+From:   Steffen Eiden <seiden@linux.ibm.com>
+To:     Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: [kvm-unit-tests PATCH v3 0/5] s390x: Attestation tests
+Date:   Tue, 22 Feb 2022 14:54:51 +0000
+Message-Id: <20220222145456.9956-1-seiden@linux.ibm.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2772b40f99a30ecd475fa83641d40994@kernel.org>
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: TbooUvHV8ilGI7yusbF72c0JjCyzCDkA
+X-Proofpoint-ORIG-GUID: veF9STmdeu7PRvBCs0CT-cquFoIypKbg
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-02-22_03,2022-02-21_02,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ adultscore=0 suspectscore=0 spamscore=0 clxscore=1015 malwarescore=0
+ lowpriorityscore=0 impostorscore=0 mlxlogscore=999 phishscore=0 mlxscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2201110000 definitions=main-2202220091
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -46,130 +89,40 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+This series adds some test in s390x/uv-guest.c verifying error paths of the
+Request Attestation Measurement UVC.
+Also adds a test in s390x/uv-host.c to verify that the
+Request Attestation Measurement UVC cannot be called in guest1.
 
-On Tue, Feb 22, 2022 at 02:35:24PM +0000, Marc Zyngier wrote:
-> On 2022-02-22 14:28, Alexandru Elisei wrote:
-> > Hi,
-> > 
-> > On Tue, Feb 22, 2022 at 02:18:40PM +0000, Marc Zyngier wrote:
-> > > On 2022-02-22 13:58, Alexandru Elisei wrote:
-> > > > Hi,
-> > > >
-> > > > On Tue, Feb 22, 2022 at 10:08:30AM +0000, Sebastian Ene wrote:
-> > > > > This patch adds support for stolen time by sharing a memory region
-> > > > > with the guest which will be used by the hypervisor to store the
-> > > > > stolen
-> > > > > time information. The exact format of the structure stored by the
-> > > > > hypervisor is described in the ARM DEN0057A document.
-> > > > >
-> > > > > Signed-off-by: Sebastian Ene <sebastianene@google.com>
-> > > > > ---
-> > > > >  Changelog since v2:
-> > > > >  - Moved the AARCH64_PVTIME_* definitions from arm-common/kvm-arch.h
-> > > > > to
-> > > > >    arm64/pvtime.c as pvtime is only available for arm64.
-> > > > >
-> > > > >  Changelog since v1:
-> > > > >  - Removed the pvtime.h header file and moved the definitions to
-> > > > > kvm-cpu-arch.h
-> > > > >    Verified if the stolen time capability is supported before
-> > > > > allocating
-> > > > >    and mapping the memory.
-> > > > >
-> > > > >  Makefile                               |  1 +
-> > > > >  arm/aarch64/arm-cpu.c                  |  1 +
-> > > > >  arm/aarch64/include/kvm/kvm-cpu-arch.h |  1 +
-> > > > >  arm/aarch64/pvtime.c                   | 89
-> > > > > ++++++++++++++++++++++++++
-> > > > >  arm/kvm-cpu.c                          | 14 ++--
-> > > > >  5 files changed, 99 insertions(+), 7 deletions(-)
-> > > > >  create mode 100644 arm/aarch64/pvtime.c
-> > > > >
-> > > > > diff --git a/Makefile b/Makefile
-> > > > > index f251147..e9121dc 100644
-> > > > > --- a/Makefile
-> > > > > +++ b/Makefile
-> > > > > @@ -182,6 +182,7 @@ ifeq ($(ARCH), arm64)
-> > > > >  	OBJS		+= arm/aarch64/arm-cpu.o
-> > > > >  	OBJS		+= arm/aarch64/kvm-cpu.o
-> > > > >  	OBJS		+= arm/aarch64/kvm.o
-> > > > > +	OBJS		+= arm/aarch64/pvtime.o
-> > > > >  	ARCH_INCLUDE	:= $(HDRS_ARM_COMMON)
-> > > > >  	ARCH_INCLUDE	+= -Iarm/aarch64/include
-> > > > >
-> > > > > diff --git a/arm/aarch64/arm-cpu.c b/arm/aarch64/arm-cpu.c
-> > > > > index d7572b7..326fb20 100644
-> > > > > --- a/arm/aarch64/arm-cpu.c
-> > > > > +++ b/arm/aarch64/arm-cpu.c
-> > > > > @@ -22,6 +22,7 @@ static void generate_fdt_nodes(void *fdt, struct
-> > > > > kvm *kvm)
-> > > > >  static int arm_cpu__vcpu_init(struct kvm_cpu *vcpu)
-> > > > >  {
-> > > > >  	vcpu->generate_fdt_nodes = generate_fdt_nodes;
-> > > > > +	kvm_cpu__setup_pvtime(vcpu);
-> > > > >  	return 0;
-> > > > >  }
-> > > > >
-> > > > > diff --git a/arm/aarch64/include/kvm/kvm-cpu-arch.h
-> > > > > b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-> > > > > index 8dfb82e..b57d6e6 100644
-> > > > > --- a/arm/aarch64/include/kvm/kvm-cpu-arch.h
-> > > > > +++ b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-> > > > > @@ -19,5 +19,6 @@
-> > > > >
-> > > > >  void kvm_cpu__select_features(struct kvm *kvm, struct kvm_vcpu_init
-> > > > > *init);
-> > > > >  int kvm_cpu__configure_features(struct kvm_cpu *vcpu);
-> > > > > +void kvm_cpu__setup_pvtime(struct kvm_cpu *vcpu);
-> > > > >
-> > > > >  #endif /* KVM__KVM_CPU_ARCH_H */
-> > > > > diff --git a/arm/aarch64/pvtime.c b/arm/aarch64/pvtime.c
-> > > > > new file mode 100644
-> > > > > index 0000000..247e4f3
-> > > > > --- /dev/null
-> > > > > +++ b/arm/aarch64/pvtime.c
-> > > > > @@ -0,0 +1,89 @@
-> > > > > +#include "kvm/kvm.h"
-> > > > > +#include "kvm/kvm-cpu.h"
-> > > > > +#include "kvm/util.h"
-> > > > > +
-> > > > > +#include <linux/byteorder.h>
-> > > > > +#include <linux/types.h>
-> > > > > +
-> > > > > +#define AARCH64_PVTIME_IPA_MAX_SIZE	SZ_64K
-> > > > > +#define AARCH64_PVTIME_IPA_START	(ARM_MEMORY_AREA - \
-> > > > > +					 AARCH64_PVTIME_IPA_MAX_SIZE)
-> > > >
-> > > > This doesn't change the fact that it overlaps with KVM_PCI_MMIO_AREA,
-> > > > which is
-> > > > exposed to the guest in the DTB (see my reply to v2).
-> > > 
-> > > Yup, this is a bit of a problem, and overlapping regions are
-> > > a big no-no. Why can't the pvtime region be dynamically placed
-> > > after the RAM (after checking that there is enough space to
-> > > register it in the IPA space)?
-> > 
-> > In theory, is there something to stop someone from creating a VM with
-> > enough
-> > memory to reach the end of the IPA space?
-> 
-> No, but we can either steal 64kB from that upper limit if that's the
-> case, or let the user know that stolen time is disabled because they
-> have been greedy...
+Additionally, adds a shared bit test and removes duplicated tests.
 
-If we decide to go with having the pvtime region after RAM, I would prefer to
-disable it if there's no room, and print a big warning letting the user know
-what is happening and why, instead of silently shrinking the memory size
-specified by the user.
+v2->v3:
+  * added test for share bits as new PATCH 4/5
+  * added r-b from Claudio in PATCH 1/4
+  * replaced all u* with uint*_t
+  * incorporated misc feedback from Claudio
 
-I've CC'ed Andre, he's the last one who made changes to the memory layout when
-he added the flash device.
+v1->v2:
+  * renamed 'uv_get_info(void)' to 'uv_get_query_data(void)'
+  * renamed various fields in 'struct uv_arcb_v1'
+  * added a test for invalid additional size
+  * added r-b from Janosch in PATCH 1/4
+  * added r-b from Janosch in PATCH 3/4
 
-Thanks,
-Alex
+Steffen Eiden (5):
+  s390x: uv-host: Add attestation test
+  s390x: lib: Add QUI getter
+  s390x: uv-guest: remove duplicated checks
+  s390x: uv-guest: add share bit test
+  s390x: uv-guest: Add attestation tests
 
-> 
->         M.
-> -- 
-> Jazz is not dead. It just smells funny...
+ lib/s390x/asm/uv.h |  28 +++++-
+ lib/s390x/uv.c     |   8 ++
+ lib/s390x/uv.h     |   1 +
+ s390x/uv-guest.c   | 229 +++++++++++++++++++++++++++++++++++++++++----
+ s390x/uv-host.c    |   1 +
+ 5 files changed, 249 insertions(+), 18 deletions(-)
+
+-- 
+2.30.2
+
