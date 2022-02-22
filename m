@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ECAF14BF64B
-	for <lists+kvm@lfdr.de>; Tue, 22 Feb 2022 11:42:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B66944BF64D
+	for <lists+kvm@lfdr.de>; Tue, 22 Feb 2022 11:42:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230421AbiBVKmO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Feb 2022 05:42:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49116 "EHLO
+        id S231361AbiBVKmj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Feb 2022 05:42:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51376 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229462AbiBVKmN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Feb 2022 05:42:13 -0500
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E767E6C3C;
-        Tue, 22 Feb 2022 02:41:48 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id cp23-20020a17090afb9700b001bbfe0fbe94so2122304pjb.3;
-        Tue, 22 Feb 2022 02:41:48 -0800 (PST)
+        with ESMTP id S231336AbiBVKmh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Feb 2022 05:42:37 -0500
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79D50EF780;
+        Tue, 22 Feb 2022 02:42:12 -0800 (PST)
+Received: by mail-pf1-x436.google.com with SMTP id y5so11577865pfe.4;
+        Tue, 22 Feb 2022 02:42:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=1NOc3SMhUPuBWYuzpTacLcC5sGu7ZMcAFSKQLrvWVRo=;
-        b=ntLoOw60zJoi0qPzAfgf2CP171VvJ/NXamfGEp/vc4jRos7KfxeY6PmhXDWooo7JCA
-         w+B6mNZ8+1Lu48hOUXYaoewTvs67f7d3ywGicFwNJWWGpGo3/AH80/00mHXfks9oH+q7
-         QsmSrKJU1rvjprr/hWLcbJACQDMgw8lg6LdXO7bzvkLazgaGscFeZ3aVk3Y/6J6VnpRO
-         UfiqrETrcMoF1AZ2YNSTgmowV0w6vhV1tHStF3pWYzSwh3soer43+pRbl1Z6wTvQuAEw
-         Nf+KlcE+s49JKP6QWqDpzzW27WQMhk77bB17PoxnzYnkIcRDoPHxgeNJhcwVN8WA2T0N
-         zB1g==
+        bh=cFyD+UgCrTcUW9G1yzwrnBI2RM1+18GRQxUARdZiYVI=;
+        b=R06JlyETbL5bONA+qdLfLjl5gXLYW0sHJUrXUueGYXoJwJprAKtTXTRAmjfqj7Kvjn
+         0MFBCIW9z83rn6iUJHu5UXObhc+cgrD1WARpsZ+WocTmbDFfymWOYo/cIoPD4cWmYIQx
+         oM0uRSZrejlaFQ7zvyycQRY+YzXbXMcSwWDYAKLEqXttvQP1GEww95b4B32CWz/ixBzO
+         TorxzLunYGNAD6k/Y0eZkF47WcH98+zMS7qenNXDwA7wZ918sTLUltuPRyifMqvCxkO1
+         azONXbvhMOB1o1k7KnwDo90bXd9lCGIPVUv2EWrE2+0HMjFiK/u2KTlSuAeFC9m7ndwq
+         3hkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=1NOc3SMhUPuBWYuzpTacLcC5sGu7ZMcAFSKQLrvWVRo=;
-        b=PrMRUj/23lhGY8OlUPIc4PbYPYOTvcHqjLPmUYDhGz+B4DX5LuovlSGOz5gdbj6rPE
-         WtKPWmE6Q0z4AjWMSYqX3O3JLmKKnwmwPOQKQfJ76jtPnoSRn1NP1IJBRfRITlPaxki6
-         nhcn5btdThmBX91v1/JeIBBJ1+rsObYTmd0wQXlNLN0iLReGmG68s9JHGwkXVZIEo3bc
-         5iTqtW679AjZlSbENaPo0rrNWxZj18SmObD0+KVast7LJaT9nQk/g+hf3vfhiWV/Tip9
-         clkLnAbf6OQuTj8XNfJnKOjqKXtmEAQPb8Rht3xW33+uhdngTpVWVwbzbVG5HhmNKKnB
-         h9TQ==
-X-Gm-Message-State: AOAM530abygWRcv7NzKsYMY/QwKQemc+nR91Z8zTlndQH3G7H61GUH1o
-        jcydw9Jd/Bs48TaiYrcB23A=
-X-Google-Smtp-Source: ABdhPJwxreu1SuM+bR7uo6M+mk8zg4/IhR+4ETPnAqIkFJR0FT82ZnckB7MfW0mMgzwWfdDyZJq/Kw==
-X-Received: by 2002:a17:903:230f:b0:14f:95e1:8706 with SMTP id d15-20020a170903230f00b0014f95e18706mr12878041plh.154.1645526507617;
-        Tue, 22 Feb 2022 02:41:47 -0800 (PST)
+        bh=cFyD+UgCrTcUW9G1yzwrnBI2RM1+18GRQxUARdZiYVI=;
+        b=Q9pQ89EHRzBqPp1hLnNobsEX/JGmi4FP6ecWYLfncZFJKlzXyPpBSkduPj0l6P8or1
+         v4ufKwqCvlIK9KFRLYy+eNfuvoJgcEFRM8vblyAyA75LjQCXermS+IymoexNelJ1Uu6f
+         zHlbfeXQgT3ZZZsQH2wlqiWRSmENLsNUrWr5YfqwNNJ6e8thWyVAQc2sUhRXJdm37bht
+         tpQUyFyW/MjST9CBXJH+cohVclJSSRJPk/RMJcX3Yf5TRKuW1IdU3xwyq+6ucahPNEvf
+         VT+ZoZNKnGNr0x6XgC0PvrVrKVmd4s6bOmu60Onwb8SwUrIRDARS4B1VywrbBKa41yJB
+         SEpA==
+X-Gm-Message-State: AOAM531jR93kEvb0PzzpEs+KSiDywpWi0SBtC3NQ8QNiZ4iodoCczhlX
+        BjSRk6ShimXR5GhnEqHUOG2gTXp8k3x0Uphs
+X-Google-Smtp-Source: ABdhPJy6xALR3G9TRXkG0mmujcuIssNWrolD7ptOty5o4IR9YOo2qQxuZUPNgrg+yYk5OuBvDsKoBQ==
+X-Received: by 2002:a62:7b8d:0:b0:4f1:2d08:5e90 with SMTP id w135-20020a627b8d000000b004f12d085e90mr8967401pfc.31.1645526532087;
+        Tue, 22 Feb 2022 02:42:12 -0800 (PST)
 Received: from FLYINGPENG-MB0.tencent.com ([103.7.29.30])
-        by smtp.gmail.com with ESMTPSA id c13sm16837311pfi.177.2022.02.22.02.41.46
+        by smtp.gmail.com with ESMTPSA id t9sm9192235pgp.5.2022.02.22.02.42.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Feb 2022 02:41:47 -0800 (PST)
+        Tue, 22 Feb 2022 02:42:11 -0800 (PST)
 From:   Peng Hao <flyingpenghao@gmail.com>
 X-Google-Original-From: Peng Hao <flyingpeng@tencent.com>
 To:     pbonzini@redhat.com, seanjc@google.com
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2] kvm:vmx: Fix typos comment in __loaded_vmcs_clear()
-Date:   Tue, 22 Feb 2022 18:40:29 +0800
-Message-Id: <20220222104029.70129-1-flyingpeng@tencent.com>
+Subject: [PATCH v2] KVM:nVMX: Make setup/unsetup under the same conditions
+Date:   Tue, 22 Feb 2022 18:40:54 +0800
+Message-Id: <20220222104054.70286-1-flyingpeng@tencent.com>
 X-Mailer: git-send-email 2.30.1 (Apple Git-130)
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -69,35 +69,31 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Peng Hao <flyingpeng@tencent.com>
 
-Fix a comment documenting the memory barrier related to clearing a
-loaded_vmcs; loaded_vmcs tracks the host CPU the VMCS is loaded on via
-the field 'cpu', it doesn't have a 'vcpu' field.
+Make sure nested_vmx_hardware_setup/unsetup() are called in pairs under
+the same conditions.  Calling nested_vmx_hardware_unsetup() when nested
+is false "works" right now because it only calls free_page() on zero-
+initialized pointers, but it's possible that more code will be added to
+nested_vmx_hardware_unsetup() in the future.
 
 Reviewed-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Peng Hao <flyingpeng@tencent.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 6101c2980a9c..75ed7d6f35cc 100644
+index 75ed7d6f35cc..9fad3c73395a 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -644,10 +644,10 @@ static void __loaded_vmcs_clear(void *arg)
+@@ -7852,7 +7852,7 @@ static __init int hardware_setup(void)
+ 	vmx_set_cpu_caps();
  
- 	/*
- 	 * Ensure all writes to loaded_vmcs, including deleting it from its
--	 * current percpu list, complete before setting loaded_vmcs->vcpu to
--	 * -1, otherwise a different cpu can see vcpu == -1 first and add
--	 * loaded_vmcs to its percpu list before it's deleted from this cpu's
--	 * list. Pairs with the smp_rmb() in vmx_vcpu_load_vmcs().
-+	 * current percpu list, complete before setting loaded_vmcs->cpu to
-+	 * -1, otherwise a different cpu can see loaded_vmcs->cpu == -1 first
-+	 * and add loaded_vmcs to its percpu list before it's deleted from this
-+	 * cpu's list. Pairs with the smp_rmb() in vmx_vcpu_load_vmcs().
- 	 */
- 	smp_wmb();
+ 	r = alloc_kvm_area();
+-	if (r)
++	if (r && nested)
+ 		nested_vmx_hardware_unsetup();
  
+ 	kvm_set_posted_intr_wakeup_handler(pi_wakeup_handler);
 -- 
 2.27.0
 
