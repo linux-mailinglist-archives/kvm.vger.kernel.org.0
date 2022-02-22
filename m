@@ -2,143 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 557FF4BEFB0
-	for <lists+kvm@lfdr.de>; Tue, 22 Feb 2022 03:54:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6693F4BEF92
+	for <lists+kvm@lfdr.de>; Tue, 22 Feb 2022 03:43:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239281AbiBVCvC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Feb 2022 21:51:02 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:60330 "EHLO
+        id S239194AbiBVCeH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Feb 2022 21:34:07 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:54226 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232960AbiBVCvA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Feb 2022 21:51:00 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 12A9D25C77
-        for <kvm@vger.kernel.org>; Mon, 21 Feb 2022 18:50:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645498235;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=sMERnC5Lx3ZdDjMyWgRECzQ+geOBGfR8Zn1RSSoIhoE=;
-        b=asXGZ6ltdQl6llfZZyqUulCI4PWgQqsTQMgAi5t+TQp92F4T33sVVfBpZYzDHcI1XoDa80
-        Kq70/xzehSU+MTcOKPB7OqJXqUd5k44mM4Il+VZtQrfrwyt6BnfOK8Qqk3unrygded++Rs
-        /sjuZB7cNHfuaJBxGWSnt0vhMs/45Ws=
-Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
- [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-649-17fD4GECPq6K3OOXcON0fw-1; Mon, 21 Feb 2022 21:50:33 -0500
-X-MC-Unique: 17fD4GECPq6K3OOXcON0fw-1
-Received: by mail-lj1-f198.google.com with SMTP id b27-20020a2ebc1b000000b00246209c497dso4991220ljf.11
-        for <kvm@vger.kernel.org>; Mon, 21 Feb 2022 18:50:33 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=sMERnC5Lx3ZdDjMyWgRECzQ+geOBGfR8Zn1RSSoIhoE=;
-        b=H3NTuLftG49gi/wC44Q60PVUiy6bg+YJMbfEEwdP5WES0Igmj4fBhg6XWEvAn3VSg6
-         EviZX7KfGpIdWIWuutO25pQFzP+nyzH3lbbd1e90XJRPsdrEYuWduFz1r23mwUlxW713
-         IaG2vCaJwTfiqBpAjA1yjFWAy5fBPl9SVrFtSuWNabl4xb0Zkm9khaMxzoYNp6O1A/Fl
-         T/BqLD+amVhaUPlv7aejkyWZjneB7vM5SF7nephlBV1ltOh1V2vZm8aEEjxhInLbUFRP
-         l33KUm6CJetesF58b4z36OCta1Yy/0nP8Z3ElatEu64kK9DLENWFkDf4QfeDT6ikAkmM
-         DJfg==
-X-Gm-Message-State: AOAM533R6PkBH7hUGsEmDfVihB4QROZK6vxE2cWSgi8BwWbpDnYnaFZW
-        Gx/PebXGFGRi7Lx8VziO1ApUv3zDbjnmD7ky59aoNB19Bh1ispmtbAy6Ot05eyWaZKixsnVaGRI
-        OD3zE5jJnGq3yfUoWhusNy/2Ksw44
-X-Received: by 2002:ac2:5dc9:0:b0:443:5db1:244c with SMTP id x9-20020ac25dc9000000b004435db1244cmr16189696lfq.84.1645498232049;
-        Mon, 21 Feb 2022 18:50:32 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyCDJBSK5aeabUkY9YzJtmGlAXsaWKwi+31r65bcAa3YUsXyGltr5v5jpXObhmF/f1wYMJQ7FAIEVVK/vj/AiU=
-X-Received: by 2002:ac2:5dc9:0:b0:443:5db1:244c with SMTP id
- x9-20020ac25dc9000000b004435db1244cmr16189687lfq.84.1645498231872; Mon, 21
- Feb 2022 18:50:31 -0800 (PST)
+        with ESMTP id S232505AbiBVCeG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Feb 2022 21:34:06 -0500
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EBF225C5E;
+        Mon, 21 Feb 2022 18:33:37 -0800 (PST)
+Received: from dggpemm500020.china.huawei.com (unknown [172.30.72.55])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4K2jqr6ZkYzcffw;
+        Tue, 22 Feb 2022 10:32:24 +0800 (CST)
+Received: from dggpemm500003.china.huawei.com (7.185.36.56) by
+ dggpemm500020.china.huawei.com (7.185.36.49) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Tue, 22 Feb 2022 10:33:35 +0800
+Received: from huawei.com (10.175.104.170) by dggpemm500003.china.huawei.com
+ (7.185.36.56) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.21; Tue, 22 Feb
+ 2022 10:33:35 +0800
+From:   Liang Zhang <zhangliang5@huawei.com>
+To:     <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
+        <dave.hansen@linux.intel.com>, <x86@kernel.org>
+CC:     <pbonzini@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
+        <wanpengli@tencent.com>, <jmattson@google.com>, <joro@8bytes.org>,
+        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <wangzhigang17@huawei.com>, <zhangliang5@huawei.com>
+Subject: [RESEND PATCH] KVM: x86/mmu: make apf token non-zero to fix bug
+Date:   Tue, 22 Feb 2022 11:12:39 +0800
+Message-ID: <20220222031239.1076682-1-zhangliang5@huawei.com>
+X-Mailer: git-send-email 2.30.0
 MIME-Version: 1.0
-References: <20220221195303.13560-1-mail@anirudhrb.com>
-In-Reply-To: <20220221195303.13560-1-mail@anirudhrb.com>
-From:   Jason Wang <jasowang@redhat.com>
-Date:   Tue, 22 Feb 2022 10:50:20 +0800
-Message-ID: <CACGkMEvLE=kV4PxJLRjdSyKArU+MRx6b_mbLGZHSUgoAAZ+-Fg@mail.gmail.com>
-Subject: Re: [PATCH] vhost: validate range size before adding to iotlb
-To:     Anirudh Rayabharam <mail@anirudhrb.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        syzbot+0abd373e2e50d704db87@syzkaller.appspotmail.com,
-        kvm <kvm@vger.kernel.org>,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        netdev <netdev@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.104.170]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpemm500003.china.huawei.com (7.185.36.56)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 22, 2022 at 3:53 AM Anirudh Rayabharam <mail@anirudhrb.com> wrote:
->
-> In vhost_iotlb_add_range_ctx(), validate the range size is non-zero
-> before proceeding with adding it to the iotlb.
->
-> Range size can overflow to 0 when start is 0 and last is (2^64 - 1).
-> One instance where it can happen is when userspace sends an IOTLB
-> message with iova=size=uaddr=0 (vhost_process_iotlb_msg). So, an
-> entry with size = 0, start = 0, last = (2^64 - 1) ends up in the
-> iotlb. Next time a packet is sent, iotlb_access_ok() loops
-> indefinitely due to that erroneous entry:
->
->         Call Trace:
->          <TASK>
->          iotlb_access_ok+0x21b/0x3e0 drivers/vhost/vhost.c:1340
->          vq_meta_prefetch+0xbc/0x280 drivers/vhost/vhost.c:1366
->          vhost_transport_do_send_pkt+0xe0/0xfd0 drivers/vhost/vsock.c:104
->          vhost_worker+0x23d/0x3d0 drivers/vhost/vhost.c:372
->          kthread+0x2e9/0x3a0 kernel/kthread.c:377
->          ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
->          </TASK>
->
-> Reported by syzbot at:
->         https://syzkaller.appspot.com/bug?extid=0abd373e2e50d704db87
->
-> Reported-by: syzbot+0abd373e2e50d704db87@syzkaller.appspotmail.com
-> Tested-by: syzbot+0abd373e2e50d704db87@syzkaller.appspotmail.com
-> Signed-off-by: Anirudh Rayabharam <mail@anirudhrb.com>
-> ---
->  drivers/vhost/iotlb.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/vhost/iotlb.c b/drivers/vhost/iotlb.c
-> index 670d56c879e5..b9de74bd2f9c 100644
-> --- a/drivers/vhost/iotlb.c
-> +++ b/drivers/vhost/iotlb.c
-> @@ -53,8 +53,10 @@ int vhost_iotlb_add_range_ctx(struct vhost_iotlb *iotlb,
->                               void *opaque)
->  {
->         struct vhost_iotlb_map *map;
-> +       u64 size = last - start + 1;
->
-> -       if (last < start)
-> +       // size can overflow to 0 when start is 0 and last is (2^64 - 1).
-> +       if (last < start || size == 0)
->                 return -EFAULT;
+In current async pagefault logic, when a page is ready, KVM relies on
+kvm_arch_can_dequeue_async_page_present() to determine whether to deliver
+a READY event to the Guest. This function test token value of struct
+kvm_vcpu_pv_apf_data, which must be reset to zero by Guest kernel when a
+READY event is finished by Guest. If value is zero meaning that a READY
+event is done, so the KVM can deliver another.
+But the kvm_arch_setup_async_pf() may produce a valid token with zero
+value, which is confused with previous mention and may lead the loss of
+this READY event.
 
-I'd move this check to vhost_chr_iter_write(), then for the device who
-has its own msg handler (e.g vDPA) can benefit from it as well.
+This bug may cause task blocked forever in Guest:
+ INFO: task stress:7532 blocked for more than 1254 seconds.
+       Not tainted 5.10.0 #16
+ "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+ task:stress          state:D stack:    0 pid: 7532 ppid:  1409
+ flags:0x00000080
+ Call Trace:
+  __schedule+0x1e7/0x650
+  schedule+0x46/0xb0
+  kvm_async_pf_task_wait_schedule+0xad/0xe0
+  ? exit_to_user_mode_prepare+0x60/0x70
+  __kvm_handle_async_pf+0x4f/0xb0
+  ? asm_exc_page_fault+0x8/0x30
+  exc_page_fault+0x6f/0x110
+  ? asm_exc_page_fault+0x8/0x30
+  asm_exc_page_fault+0x1e/0x30
+ RIP: 0033:0x402d00
+ RSP: 002b:00007ffd31912500 EFLAGS: 00010206
+ RAX: 0000000000071000 RBX: ffffffffffffffff RCX: 00000000021a32b0
+ RDX: 000000000007d011 RSI: 000000000007d000 RDI: 00000000021262b0
+ RBP: 00000000021262b0 R08: 0000000000000003 R09: 0000000000000086
+ R10: 00000000000000eb R11: 00007fefbdf2baa0 R12: 0000000000000000
+ R13: 0000000000000002 R14: 000000000007d000 R15: 0000000000001000
 
-Thanks
+Signed-off-by: Liang Zhang <zhangliang5@huawei.com>
+---
+ arch/x86/kvm/mmu/mmu.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
->
->         if (iotlb->limit &&
-> @@ -69,7 +71,7 @@ int vhost_iotlb_add_range_ctx(struct vhost_iotlb *iotlb,
->                 return -ENOMEM;
->
->         map->start = start;
-> -       map->size = last - start + 1;
-> +       map->size = size;
->         map->last = last;
->         map->addr = addr;
->         map->perm = perm;
-> --
-> 2.35.1
->
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 593093b52395..8e24f73bf60b 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -3889,12 +3889,23 @@ static void shadow_page_table_clear_flood(struct kvm_vcpu *vcpu, gva_t addr)
+ 	walk_shadow_page_lockless_end(vcpu);
+ }
+ 
++static u32 alloc_apf_token(struct kvm_vcpu *vcpu)
++{
++	/* make sure the token value is not 0 */
++	u32 id = vcpu->arch.apf.id;
++
++	if (id << 12 == 0)
++		vcpu->arch.apf.id = 1;
++
++	return (vcpu->arch.apf.id++ << 12) | vcpu->vcpu_id;
++}
++
+ static bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+ 				    gfn_t gfn)
+ {
+ 	struct kvm_arch_async_pf arch;
+ 
+-	arch.token = (vcpu->arch.apf.id++ << 12) | vcpu->vcpu_id;
++	arch.token = alloc_apf_token(vcpu);
+ 	arch.gfn = gfn;
+ 	arch.direct_map = vcpu->arch.mmu->direct_map;
+ 	arch.cr3 = vcpu->arch.mmu->get_guest_pgd(vcpu);
+-- 
+2.30.0
 
