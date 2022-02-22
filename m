@@ -2,206 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 604AB4BFBD2
-	for <lists+kvm@lfdr.de>; Tue, 22 Feb 2022 16:03:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 59EE54BFBDD
+	for <lists+kvm@lfdr.de>; Tue, 22 Feb 2022 16:03:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233369AbiBVPDn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Feb 2022 10:03:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48852 "EHLO
+        id S232878AbiBVPER (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Feb 2022 10:04:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233699AbiBVPDS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Feb 2022 10:03:18 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id F1F2F1101
-        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 07:02:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645542157;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=rdi/qxR3vXLdPYSOnT7lLR4Cj8YvfdXVSXReKwN9fr0=;
-        b=jHJUx/IxtF5pv78FB6X/pPcDi4MV/tswxRO7JszdY8LN1ufK7z26HnfhDd5iDq878oREob
-        POG2qv1YO+z4MsenQLPxMtsO8jo2SgPEVWGB5I5EGJKtq0KkAaL9HBvRtNWBqwGrjPKjdo
-        3vGTAx2GIUOYnKCwNdUO3NH/te7Hu9A=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-367-IlwOIQJNOwmOqO50UXKtXg-1; Tue, 22 Feb 2022 10:02:34 -0500
-X-MC-Unique: IlwOIQJNOwmOqO50UXKtXg-1
-Received: by mail-ed1-f70.google.com with SMTP id l14-20020aa7cace000000b003f7f8e1cbbdso12092417edt.20
-        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 07:02:34 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=rdi/qxR3vXLdPYSOnT7lLR4Cj8YvfdXVSXReKwN9fr0=;
-        b=7wsrBxj2uNBHUsBCrs+KdHtylg3JyOpRSQo7gcxuZR5s64dQvQvWRQpfNJOQLOC1WD
-         1VL4anGNx8Tu08CkIO95ZC45uXbRUfbmNGCFX+r9m2yn8KBOLZZ8cGo6cTZQ0HTbrpbc
-         nLFnZkIj/uDSRv5nQ2juooDR/l1wReHbCZpHwMkEKxbb6zU/3biTLFVpKk7wNW4bA73P
-         YlxhltkkLnepmcniabuODvwCiql0jhon1Z/WdKBlrZg2P00z+YXn8674k+XQl5+H9/+K
-         ybA/Rs7uP3hqQmWFaBZYG4lAeWagiRSyCMl2vAAZXOxbWyV30XpZjS46nd9z1OGfbHAz
-         zDIg==
-X-Gm-Message-State: AOAM533u9On3OnEF4J4ZAygbLGZuDqmV4JjMacaWh/zHjFm5YkqSvq8c
-        VvVNveydzsTRNJJiUKwSTBqsSyFikXWEqlMfugcI6+kBiXlQ6dtnwzcazzoBIpYJWvUx2uT3lLY
-        LoLq34iVrqPtS
-X-Received: by 2002:a17:906:2991:b0:6cf:1fd4:39a3 with SMTP id x17-20020a170906299100b006cf1fd439a3mr19565084eje.21.1645542153504;
-        Tue, 22 Feb 2022 07:02:33 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwfs/vKQLHNEKKWfGdfWtjrGEHBFte8MvKz5Y50OjDrG513NxeN/Cw3t2XJvu4U4AxkMg15eQ==
-X-Received: by 2002:a17:906:2991:b0:6cf:1fd4:39a3 with SMTP id x17-20020a170906299100b006cf1fd439a3mr19565062eje.21.1645542153204;
-        Tue, 22 Feb 2022 07:02:33 -0800 (PST)
-Received: from redhat.com ([2.55.129.240])
-        by smtp.gmail.com with ESMTPSA id q16sm5998109ejc.21.2022.02.22.07.02.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Feb 2022 07:02:32 -0800 (PST)
-Date:   Tue, 22 Feb 2022 10:02:29 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     Anirudh Rayabharam <mail@anirudhrb.com>,
-        syzbot+0abd373e2e50d704db87@syzkaller.appspotmail.com,
-        kvm <kvm@vger.kernel.org>,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        netdev <netdev@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] vhost: validate range size before adding to iotlb
-Message-ID: <20220222090511-mutt-send-email-mst@kernel.org>
-References: <20220221195303.13560-1-mail@anirudhrb.com>
- <CACGkMEvLE=kV4PxJLRjdSyKArU+MRx6b_mbLGZHSUgoAAZ+-Fg@mail.gmail.com>
- <YhRtQEWBF0kqWMsI@anirudhrb.com>
- <CACGkMEvd7ETC_ANyrOSAVz_i64xqpYYazmm=+39E51=DMRFXdw@mail.gmail.com>
+        with ESMTP id S233274AbiBVPEJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Feb 2022 10:04:09 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D198910EC64
+        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 07:03:39 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 53E9D6152E
+        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 15:03:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CE1CC340E8;
+        Tue, 22 Feb 2022 15:03:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1645542218;
+        bh=sF29agGyHsX8Udu48FPCpvs/QyXfpzPgjgx5kraSddQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=f3dsrr0hoHdYTBf6UbJFOKQ+S+xQzLXMxVRXUzG1yPzzaz8CIqigtGy7weXYheNW+
+         ha4/yrxPLMPW5w0NsBZ66wlB5D9/zq7n+hKDbBmT+HudU2/6lxUryeSUbFuB9p4T8D
+         3euJoh+8xmA7a102HjWhUks7/FPGlzMArzkyTIPJFd5e4ha05TcBRKOSHje+57a1Be
+         aaGXMV5b9+UcoVPx5Xq+3tySqxTuEofCjivfWck2TwmmjtLF/ltpRH8EqmI9cKCbpu
+         y9RGo2LpA6XLf3XyhEkS3VK3fjDIh07KqFwThMwLoWoIcnziACpri9Ar450kvLj5Lv
+         hqJtwdE2TGvZQ==
+Date:   Tue, 22 Feb 2022 07:03:35 -0800
+From:   Keith Busch <kbusch@kernel.org>
+To:     Stefan Hajnoczi <stefanha@gmail.com>
+Cc:     Klaus Jensen <its@irrelevant.dk>,
+        qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>,
+        Rust-VMM Mailing List <rust-vmm@lists.opendev.org>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Dmitry Fomichev <Dmitry.Fomichev@wdc.com>,
+        Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+        Hannes Reinecke <hare@suse.de>,
+        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
+        "Florescu, Andreea" <fandree@amazon.com>,
+        Hanna Reitz <hreitz@redhat.com>,
+        Alex Agache <aagch@amazon.com>,
+        =?iso-8859-1?Q?Marc-Andr=E9?= Lureau 
+        <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+        John Snow <jsnow@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>
+Subject: Re: Call for GSoC and Outreachy project ideas for summer 2022
+Message-ID: <20220222150335.GA1497257@dhcp-10-100-145-180.wdc.com>
+References: <CAJSP0QX7O_auRgTKFjHkBbkBK=B3Z-59S6ZZi10tzFTv1_1hkQ@mail.gmail.com>
+ <YhMtxWcFMjdQTioe@apples>
+ <CAJSP0QVNRYTOGDsjCJJLOT=7yo1EB6D9LBwgQ4-CE539HdgHNQ@mail.gmail.com>
+ <YhN+5wz3MXVm3vXU@apples>
+ <CAJSP0QXz6kuwx6mycYz_xzxiVjdVR_AqHnpygwV4Ht-7B9pYmw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CACGkMEvd7ETC_ANyrOSAVz_i64xqpYYazmm=+39E51=DMRFXdw@mail.gmail.com>
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+In-Reply-To: <CAJSP0QXz6kuwx6mycYz_xzxiVjdVR_AqHnpygwV4Ht-7B9pYmw@mail.gmail.com>
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 22, 2022 at 03:11:07PM +0800, Jason Wang wrote:
-> On Tue, Feb 22, 2022 at 12:57 PM Anirudh Rayabharam <mail@anirudhrb.com> wrote:
+On Tue, Feb 22, 2022 at 09:48:06AM +0000, Stefan Hajnoczi wrote:
+> On Mon, 21 Feb 2022 at 12:00, Klaus Jensen <its@irrelevant.dk> wrote:
 > >
-> > On Tue, Feb 22, 2022 at 10:50:20AM +0800, Jason Wang wrote:
-> > > On Tue, Feb 22, 2022 at 3:53 AM Anirudh Rayabharam <mail@anirudhrb.com> wrote:
-> > > >
-> > > > In vhost_iotlb_add_range_ctx(), validate the range size is non-zero
-> > > > before proceeding with adding it to the iotlb.
-> > > >
-> > > > Range size can overflow to 0 when start is 0 and last is (2^64 - 1).
-> > > > One instance where it can happen is when userspace sends an IOTLB
-> > > > message with iova=size=uaddr=0 (vhost_process_iotlb_msg). So, an
-> > > > entry with size = 0, start = 0, last = (2^64 - 1) ends up in the
-> > > > iotlb. Next time a packet is sent, iotlb_access_ok() loops
-> > > > indefinitely due to that erroneous entry:
-> > > >
-> > > >         Call Trace:
-> > > >          <TASK>
-> > > >          iotlb_access_ok+0x21b/0x3e0 drivers/vhost/vhost.c:1340
-> > > >          vq_meta_prefetch+0xbc/0x280 drivers/vhost/vhost.c:1366
-> > > >          vhost_transport_do_send_pkt+0xe0/0xfd0 drivers/vhost/vsock.c:104
-> > > >          vhost_worker+0x23d/0x3d0 drivers/vhost/vhost.c:372
-> > > >          kthread+0x2e9/0x3a0 kernel/kthread.c:377
-> > > >          ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
-> > > >          </TASK>
-> > > >
-> > > > Reported by syzbot at:
-> > > >         https://syzkaller.appspot.com/bug?extid=0abd373e2e50d704db87
-> > > >
-> > > > Reported-by: syzbot+0abd373e2e50d704db87@syzkaller.appspotmail.com
-> > > > Tested-by: syzbot+0abd373e2e50d704db87@syzkaller.appspotmail.com
-> > > > Signed-off-by: Anirudh Rayabharam <mail@anirudhrb.com>
-> > > > ---
-> > > >  drivers/vhost/iotlb.c | 6 ++++--
-> > > >  1 file changed, 4 insertions(+), 2 deletions(-)
-> > > >
-> > > > diff --git a/drivers/vhost/iotlb.c b/drivers/vhost/iotlb.c
-> > > > index 670d56c879e5..b9de74bd2f9c 100644
-> > > > --- a/drivers/vhost/iotlb.c
-> > > > +++ b/drivers/vhost/iotlb.c
-> > > > @@ -53,8 +53,10 @@ int vhost_iotlb_add_range_ctx(struct vhost_iotlb *iotlb,
-> > > >                               void *opaque)
-> > > >  {
-> > > >         struct vhost_iotlb_map *map;
-> > > > +       u64 size = last - start + 1;
-> > > >
-> > > > -       if (last < start)
-> > > > +       // size can overflow to 0 when start is 0 and last is (2^64 - 1).
-> > > > +       if (last < start || size == 0)
-> > > >                 return -EFAULT;
-> > >
-> > > I'd move this check to vhost_chr_iter_write(), then for the device who
-> > > has its own msg handler (e.g vDPA) can benefit from it as well.
+> > Yes, I'll go ahead as mentor for this.
 > >
-> > Thanks for reviewing!
+> > @Keith, if you want to join in, let us know :)
+
+Thank you for setting this up, I would be happy assist with the cause!
+
+> > Suggested updated summary:
 > >
-> > I kept the check here thinking that all devices would benefit from it
-> > because they would need to call vhost_iotlb_add_range() to add an entry
-> > to the iotlb. Isn't that correct?
+> > QEMU's NVMe emulation uses the traditional trap-and-emulation method to
+> > emulate I/Os, thus the performance suffers due to frequent VM-exits.
+> > Version 1.3 of the NVMe specification defines a new feature to update
+> > doorbell registers using a Shadow Doorbell Buffer. This can be utilized
+> > to enhance performance of emulated controllers by reducing the number of
+> > Submission Queue Tail Doorbell writes.
+> >
+> > Further more, it is possible to run emulation in a dedicated thread
+> > called an IOThread. Emulating NVMe in a separate thread allows the vcpu
+> > thread to continue execution and results in better performance.
+> >
+> > Finally, it is possible for the emulation code to watch for changes to
+> > the queue memory instead of waiting for doorbell writes. This technique
+> > is called polling and reduces notification latency at the expense of an
+> > another thread consuming CPU to detect queue activity.
+> >
+> > The goal of this project is to add implement these optimizations so
+> > QEMU's NVMe emulation performance becomes comparable to virtio-blk
+> > performance.
+> >
+> > Tasks include:
+> >
+> >     Add Shadow Doorbell Buffer support to reduce doorbell writes
+> >     Add Submission Queue polling
+> >     Add IOThread support so emulation can run in a dedicated thread
+> >
+> > Maybe add a link to this previous discussion as well:
+> >
+> > https://lore.kernel.org/qemu-devel/1447825624-17011-1-git-send-email-mlin@kernel.org/T/#u
 > 
-> Correct for now but not for the future, it's not guaranteed that the
-> per device iotlb message handler will use vhost iotlb.
-> 
-> But I agree that we probably don't need to care about it too much now.
-> 
-> > Do you see any other benefit in moving
-> > it to vhost_chr_iter_write()?
-> >
-> > One concern I have is that if we move it out some future caller to
-> > vhost_iotlb_add_range() might forget to handle this case.
-> 
-> Yes.
-> 
-> Rethink the whole fix, we're basically rejecting [0, ULONG_MAX] range
-> which seems a little bit odd.
+> Great, I have added the project idea. I left in the sq doorbell
+> ioeventfd task but moved it after the Shadow Doorbell Buffer support
+> task and made it clear that the ioeventfd can only be used when the
+> Shadow Doorbell Buffer is enabled:
+> https://wiki.qemu.org/Google_Summer_of_Code_2022#NVMe_Emulation_Performance_Optimization
 
-Well, I guess ideally we'd split this up as two entries - this kind of
-thing is after all one of the reasons we initially used first,last as
-the API - as opposed to first,size.
-
-Anirudh, could you do it like this instead of rejecting?
-
-
-> I wonder if it's better to just remove
-> the map->size. Having a quick glance at the the user, I don't see any
-> blocker for this.
-> 
-> Thanks
-
-I think it's possible but won't solve the bug by itself, and we'd need
-to review and fix all users - a high chance of introducing
-another regression. And I think there's value of fitting under the
-stable rule of 100 lines with context.
-So sure, but let's fix the bug first.
-
-
-
-> >
-> > Thanks!
-> >
-> >         - Anirudh.
-> >
-> > >
-> > > Thanks
-> > >
-> > > >
-> > > >         if (iotlb->limit &&
-> > > > @@ -69,7 +71,7 @@ int vhost_iotlb_add_range_ctx(struct vhost_iotlb *iotlb,
-> > > >                 return -ENOMEM;
-> > > >
-> > > >         map->start = start;
-> > > > -       map->size = last - start + 1;
-> > > > +       map->size = size;
-> > > >         map->last = last;
-> > > >         map->addr = addr;
-> > > >         map->perm = perm;
-> > > > --
-> > > > 2.35.1
-> > > >
-> > >
-> >
-
+Looks great, this seems like a very useful addition to have. I like that
+the feature can be broken down into two parts. Hopefully that makes it
+more approachable.
