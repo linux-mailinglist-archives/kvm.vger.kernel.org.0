@@ -2,134 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B2794C1045
-	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 11:26:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 70A614C1056
+	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 11:34:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239488AbiBWK1Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Feb 2022 05:27:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34558 "EHLO
+        id S239578AbiBWKfV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Feb 2022 05:35:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45920 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230447AbiBWK1O (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Feb 2022 05:27:14 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5EE202E0BA
-        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 02:26:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645612006;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Dc7XLh6K2KrBr7j9Ohe2YtIT5ilZsSkfLQurBsKqNYk=;
-        b=Rz5zDT8U7rer0YShnMwguuVHWW8bFIUbq7g8DbzBK9TpI27sixsbQ5i5vKsOmx5ngmyo8C
-        xQrNhn1L+K2O0SSg49PffNWmrG6GRabEDzzEJNrATBXrIucR8KBR6nR0kIQO73VuTFk1sJ
-        Fhv5D1kvkGcqes+Tu+pfyziL+POAuh0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-448-L544UElrM8iAQ36cIJMnQg-1; Wed, 23 Feb 2022 05:26:43 -0500
-X-MC-Unique: L544UElrM8iAQ36cIJMnQg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9553EFC80;
-        Wed, 23 Feb 2022 10:26:40 +0000 (UTC)
-Received: from starship (unknown [10.40.195.190])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5FC771038AC1;
-        Wed, 23 Feb 2022 10:26:32 +0000 (UTC)
-Message-ID: <7e7d16f2919f4bc708a0da3237161b4325a867c5.camel@redhat.com>
-Subject: Re: [PATCH v5 7/8] KVM: VMX: Update PID-pointer table entry when
- APIC ID is changed
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Chao Gao <chao.gao@intel.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Zeng Guang <guang.zeng@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jethro Beekman <jethro@fortanix.com>,
-        "Huang, Kai" <kai.huang@intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Hu, Robert" <robert.hu@intel.com>
-Date:   Wed, 23 Feb 2022 12:26:31 +0200
-In-Reply-To: <20220223061037.GA21263@gao-cwp>
-References: <640e82f3-489d-60af-1d31-25096bef1a46@amd.com>
-         <4eee5de5-ab76-7094-17aa-adc552032ba0@intel.com>
-         <aa86022c-2816-4155-8d77-f4faf6018255@amd.com>
-         <aa7db6d2-8463-2517-95ce-c0bba22e80d4@intel.com>
-         <d058f7464084cadc183bd9dbf02c7f525bb9f902.camel@redhat.com>
-         <20220110074523.GA18434@gao-cwp>
-         <1ff69ed503faa4c5df3ad1b5abe8979d570ef2b8.camel@redhat.com>
-         <YeClaZWM1cM+WLjH@google.com> <YfsSjvnoQcfzdo68@google.com>
-         <Yfw5ddGNOnDqxMLs@google.com> <20220223061037.GA21263@gao-cwp>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        with ESMTP id S232665AbiBWKfU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Feb 2022 05:35:20 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73151674DD
+        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 02:34:53 -0800 (PST)
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21N9Cdps004525
+        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 10:34:53 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=PpJSMSOT9djok2PkLNLEWRXr2KZB8F0HVsuthEQAgcc=;
+ b=gOeQewcvp//yZI+KG6HNeUx46YueGK91y9nS+EB7lmylMuP25lIle/GJYQO97Abvmza5
+ m+Klsa0HydzKNKGW0Xo4gs6KL/crZFqQ1RqDbtUm5I2HCqeAo+wJCzEIX5Z9TZKk5UH6
+ M7oKg++9cPB8bJm0O8i/6pSSCUFhzyumDoURyz6wqnKJU2hBNxVJTqqc5MPsUhuBx9H7
+ bEIiJZ74xwcC/gqnLCAFJs05LGx/oMUSskmo6zNaCy18kEREERZS9/7jDEOpCnVuavOw
+ KQFSF06kN3N1i0XCyg6Da1lN0vwjIozEelMQuCb/o6jVrwy3K/3Yw7p1mxGZmjzhULYJ 9Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3edj3fsk2x-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 10:34:52 +0000
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21NA0FQB020645
+        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 10:34:52 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3edj3fsk29-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 23 Feb 2022 10:34:52 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21NAWSuI026204;
+        Wed, 23 Feb 2022 10:34:50 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma03fra.de.ibm.com with ESMTP id 3ear697kq0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 23 Feb 2022 10:34:50 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21NAYlWX44761498
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 23 Feb 2022 10:34:47 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 00123A4070;
+        Wed, 23 Feb 2022 10:34:46 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B1E15A406B;
+        Wed, 23 Feb 2022 10:34:46 +0000 (GMT)
+Received: from t46lp57.lnxne.boe (unknown [9.152.108.100])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 23 Feb 2022 10:34:46 +0000 (GMT)
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com,
+        drjones@redhat.com, pbonzini@redhat.com
+Subject: [kvm-unit-tests RFC PATCH 0/1] Detecting crashes in TAP output
+Date:   Wed, 23 Feb 2022 11:34:45 +0100
+Message-Id: <20220223103446.2681293-1-nrb@linux.ibm.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: EMR05esBJBuGbpw8fH_gY6hxxK35j_-W
+X-Proofpoint-ORIG-GUID: s42us3yfs0-qNL9z1Yq2bK06yeki_aqf
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-02-23_03,2022-02-23_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
+ impostorscore=0 adultscore=0 mlxscore=0 phishscore=0 mlxlogscore=959
+ priorityscore=1501 lowpriorityscore=0 suspectscore=0 clxscore=1015
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2201110000 definitions=main-2202230058
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2022-02-23 at 14:10 +0800, Chao Gao wrote:
-> On Thu, Feb 03, 2022 at 08:22:13PM +0000, Sean Christopherson wrote:
-> > i.e. ACPI_NUMA gets priority and thus amd_numa_init() will never be reached if
-> > the NUMA topology is enumerated in the ACPI tables.  Furthermore, the VMM would
-> > have to actually emulate an old AMD northbridge, which is also extremely unlikely.
-> > 
-> > The odds of breaking a guest are further diminised given that KVM doesn't emulate
-> > the xAPIC ID => x2APIC ID hilarity on AMD CPUs and no one has complained.
-> > 
-> > So, rather than tie this to IPI virtualization, I think we should either make
-> > the xAPIC ID read-only across the board,
-> 
-> We will go this way and defer the introduction of "xapic_id_writable" to the
-> emergence of the "crazy" use case.
-> 
-> Levitsky, we plan to revise your patch 13 "[PATCH RESEND 13/30] KVM: x86: lapic:
-> don't allow to change APIC ID when apic acceleration is enabled" to make xAPIC
-> ID read-only regardless of APICv/AVIC and include it into IPI virtualization
-> series (to eliminate the dependency on your AVIC series). Is it fine with you?
+Hi,
 
+I recently had a test on s390x which caused an exception in the guest. As
+expected, run_tests.sh reported it as failing:
 
-Absolutely!
-> And does this patch 13 depend on other patches in your fixes?
+    FAIL sometest (1 tests)
 
-This patch doesn't depend on anything.
+However, when I turn on the TAP output everything looks like it is fine:
 
-There is also patch 14 in this series which closes a case where malicious userspace
-could upload non default _x2apic id_. I  haven't yet written a unit test
-to demonstrate this, but I will soon.
+    TAP version 13
+    ok 1 - sometest: sometest: some report
+    1..1
 
-You don't need that patch for now IMHO.
+There is no way to see from the TAP output the test actually had an unexpected
+exception. Our internal scripts rely on the TAP output and will thus believe
+everything is fine, even though it really isn't.
 
-> 
-> > or if we want to hedge in case someone
-> > has a crazy use case, make the xAPIC ID read-only by default, add a module param
-> > to let userspace opt-in to a writable xAPIC ID, and report x2APIC and APICv as
-> > unsupported if the xAPIC ID is writable.  E.g. rougly this, plus your AVIC patches
-> > if we want to hedge.
+In the logfile, one can at least see the exception backtrace, but if something
+exits silently, there is no indication something went wrong there either.
 
+TAP provides the test plan (the "1..1") as a solution to this problem. It
+gives the expected number of test lines if all tests would run. The harness can
+count test lines in TAP output and compare this to the number of tests in the
+plan and report an error if it doesn't match.
 
-Best regards,
-	Maxim Levitsky
+This won't work with kvm-unit-tests, since there really isn't any way to know
+how many report()s and thus test lines you will have without actually running
+the tests.
+
+That's why I came up with an alternative approach in the patch below. It
+adds an additional test line to the TAP output and the logfiles which
+states the overall result of a test.
+
+With the attached patch, the TAP output of the test above will now look like
+this:
+
+    TAP version 13
+    ok 1 - sometest: sometest: some report
+    not ok 2 - sometest: (1 tests)
+    1..2
+
+This shows something went wrong.
+
+Your feedback or alternative solutions to this problem are welcome.
+
+Nico Boehr (1):
+  scripts/runtime: add test result to log and TAP output
+
+ scripts/runtime.bash | 2 ++
+ 1 file changed, 2 insertions(+)
+
+-- 
+2.31.1
 
