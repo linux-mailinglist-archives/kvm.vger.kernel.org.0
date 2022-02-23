@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 75A234C0C09
-	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 06:27:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 603C34C0C1F
+	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 06:28:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238460AbiBWF1U (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Feb 2022 00:27:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58046 "EHLO
+        id S238514AbiBWF1y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Feb 2022 00:27:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58084 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238371AbiBWF0j (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Feb 2022 00:26:39 -0500
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0BEB6E576
-        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 21:25:07 -0800 (PST)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-2d07ae11467so163389687b3.12
-        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 21:25:07 -0800 (PST)
+        with ESMTP id S238341AbiBWF0t (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Feb 2022 00:26:49 -0500
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57B3A6D1A2
+        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 21:25:09 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id z15-20020a25bb0f000000b00613388c7d99so26693968ybg.8
+        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 21:25:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=Wjvyoa2FJqkBAKFP17bCuJdeRktO4ffR+raoUv+wC04=;
-        b=IuC+day3sN1PmeI3q0+DeqehWlmR6vmu4lqtMz2zTkSs/sLWgZjKSMjbDxjarGYK3w
-         hUZZQKn00coi8l0R0gTq63im2iXgDqy8kS7ZoG/GfBb24X2etuAVLlEbTVnHHQVOpffA
-         7kJw+tCwaYdWlS1krugMDGNM7sJ3OTIDt7ytbn7/z+HK1a8ew2aSceVwKePXDv9f7WZz
-         m0Q/zwZ6fjCsUI3xB5Psf0pqjVkAy2TXCzeSjVt+m4RXqs776AhpaQ80FhrK9Kk/bCDo
-         Sz1kG0HnL9LnI2+RNBaFmgg3coHxCTDPj+PGc/Rc5iXJGNpAzaSB6KONLlzImp2qWQaO
-         osLQ==
+        bh=8mE7Rl7hvX81PshmRchAKXUw+5mI1RoqZfuGnjfnK/Y=;
+        b=nQn+PHDiNT2rMQDvqUgnDcQMr757vUw1xTfeWksvd/uBs+Y7jycIPiRL7S70urPZ7R
+         8fkcrVfE/buziQatz1VzPrbZiKkVL88UDR47kWH9EmA5cOthED7jMA11HUYJo4xm65uX
+         LbfLzZbh1vmkmQVGPzCZHhrvQkG2yMMs6jlVlPGs+f1MYI9eWUOQGRHF/yHWkKAQuG9+
+         90/ZWnlFIBlEl9DgOrfwf+XgiBD2V3yGyekMz3rvqGQAKX6yRkMkTlYi4dCG11i6F1bh
+         Phi+HrSt7E6OdAajjE7T2WGE+PvAmrOCFwLD3vGl5nSuUdeg1Ly1y8XU57nLBdCyfJFb
+         Mrkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=Wjvyoa2FJqkBAKFP17bCuJdeRktO4ffR+raoUv+wC04=;
-        b=ZMWAb3gDJDGAIxAg12N2DkBPm8sCQdUMQWT23E/UKkzu83AuNIfNcynW3X42GLuMsh
-         14hb/MeaALY6cxQ2D2BzIW6l2RVZhCT6qbwsmIB9zyyVgdwqP3M8xyHRfvcnqGFbb60z
-         hmgwzqnYeIRGFEz/q1xo71FedgawKmdNPI5OD9jXmHRurKfKDX6FQQbGJZ/pAsHHneGm
-         Vb73maWwgUjj98GEZ2GE6gylmc1wTnAbK4qxay3bnIvohB1HdYDKHqbZ2VM5mKojKDpf
-         UPw09OGQJf+eXOd5IBT64nVFRaekALWqqsRkpU/XU3ETVsDcGpRr8TyQ4tlRQBbigg61
-         8+JQ==
-X-Gm-Message-State: AOAM533advuWf8e0mJVeO1Mu14t76QMnwuxPWYwjJflAwL65wTi2WXlf
-        /crNmh+93Ws75RJ3UY+9TK4OrR4yaNSO
-X-Google-Smtp-Source: ABdhPJyc5lR4Rjfv+Xgr2/PVDwYzQX3XdlHXcXxiuT59EhJPeYW9yxuIt2bJoEcFUWJJKvKStyvmN4Ecr+Gy
+        bh=8mE7Rl7hvX81PshmRchAKXUw+5mI1RoqZfuGnjfnK/Y=;
+        b=Uesk2CEKgc4E1BbLIOIa121hddf52Jlcxsa+KyRiyC4MNVTLOIP2W3WIx3R+l9w8Sn
+         EPsSOGH/17xyxTtSJaigoCtd7sEDfuACMv2e3Wiu4Gs5gDRZdEnu2nOOECOZxNz3QY83
+         5k0PIN3HUCANZaMJPxY6IiI/8fJYjYshNC3hNl7+rOUufCdyS9+tT6w1vo9t8MQS4UzB
+         d1oTKAfS5H5Bz7syP5egMqzAPNc0J4FnIaO/mwOMpaBYmIGxyBUegsyTZBc294UHCLdM
+         OlBt+AVDoG/0uQH+Ptl8xVdcUDbZ7BLL/e3Ito0WTV4rYubk1F35HoJLQdMG4I/PJMDY
+         v0pQ==
+X-Gm-Message-State: AOAM530GaDCKUAAx8BNA+oWdtIzGmjmmaEEY4t/9eggLTn2hjcFfA4mD
+        IG5Xiq3Xc9WvrtfMg/3puRBKJ6tAWfBw
+X-Google-Smtp-Source: ABdhPJw219sWzgLSxca1tmB8U/7JNof+qQBV1MFnda0VeJBWRGjfZ3IqT80R/0u8HdfUK/arZaU6tbXLeppv
 X-Received: from js-desktop.svl.corp.google.com ([2620:15c:2cd:202:ccbe:5d15:e2e6:322])
- (user=junaids job=sendgmr) by 2002:a0d:e4c2:0:b0:2d4:da21:cc07 with SMTP id
- n185-20020a0de4c2000000b002d4da21cc07mr27147139ywe.16.1645593894760; Tue, 22
- Feb 2022 21:24:54 -0800 (PST)
-Date:   Tue, 22 Feb 2022 21:22:07 -0800
+ (user=junaids job=sendgmr) by 2002:a0d:df4e:0:b0:2d0:ab1e:6055 with SMTP id
+ i75-20020a0ddf4e000000b002d0ab1e6055mr27301388ywe.333.1645593896772; Tue, 22
+ Feb 2022 21:24:56 -0800 (PST)
+Date:   Tue, 22 Feb 2022 21:22:08 -0800
 In-Reply-To: <20220223052223.1202152-1-junaids@google.com>
-Message-Id: <20220223052223.1202152-32-junaids@google.com>
+Message-Id: <20220223052223.1202152-33-junaids@google.com>
 Mime-Version: 1.0
 References: <20220223052223.1202152-1-junaids@google.com>
 X-Mailer: git-send-email 2.35.1.473.g83b2b277ed-goog
-Subject: [RFC PATCH 31/47] mm: asi: Support for non-sensitive SLUB caches
+Subject: [RFC PATCH 32/47] x86: asi: Allocate FPU state separately when ASI is enabled.
 From:   Junaid Shahid <junaids@google.com>
 To:     linux-kernel@vger.kernel.org
 Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com,
@@ -63,376 +63,236 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This adds support for allocating global and local non-sensitive objects
-using the SLUB allocator. Similar to SLAB, per-process child caches are
-created for locally non-sensitive allocations. This mechanism is based
-on a modified form of the earlier implementation of per-memcg caches.
+We are going to be mapping the task_struct in the restricted ASI
+address space. However, the task_struct also contains the FPU
+register state embedded inside it, which can contain sensitive
+information. So when ASI is enabled, always allocate the FPU
+state from a separate slab cache to keep it out of task_struct.
 
 Signed-off-by: Junaid Shahid <junaids@google.com>
 
 
 ---
- include/linux/slub_def.h |   6 ++
- mm/slab.h                |   5 ++
- mm/slab_common.c         |  33 +++++++--
- mm/slub.c                | 140 ++++++++++++++++++++++++++++++++++++++-
- security/Kconfig         |   3 +-
- 5 files changed, 179 insertions(+), 8 deletions(-)
+ arch/x86/include/asm/fpu/api.h |  1 +
+ arch/x86/kernel/fpu/core.c     | 45 ++++++++++++++++++++++++++++++++--
+ arch/x86/kernel/fpu/init.c     |  7 ++++--
+ arch/x86/kernel/fpu/internal.h |  1 +
+ arch/x86/kernel/fpu/xstate.c   | 21 +++++++++++++---
+ arch/x86/kernel/process.c      |  7 +++++-
+ 6 files changed, 74 insertions(+), 8 deletions(-)
 
-diff --git a/include/linux/slub_def.h b/include/linux/slub_def.h
-index 0fa751b946fa..6e185b61582c 100644
---- a/include/linux/slub_def.h
-+++ b/include/linux/slub_def.h
-@@ -137,6 +137,12 @@ struct kmem_cache {
- 	struct kasan_cache kasan_info;
- #endif
+diff --git a/arch/x86/include/asm/fpu/api.h b/arch/x86/include/asm/fpu/api.h
+index c2767a6a387e..6f5ca3c2ef4a 100644
+--- a/arch/x86/include/asm/fpu/api.h
++++ b/arch/x86/include/asm/fpu/api.h
+@@ -112,6 +112,7 @@ extern void fpu__init_cpu(void);
+ extern void fpu__init_system(struct cpuinfo_x86 *c);
+ extern void fpu__init_check_bugs(void);
+ extern void fpu__resume_cpu(void);
++extern void fpstate_cache_init(void);
  
-+#ifdef CONFIG_ADDRESS_SPACE_ISOLATION
-+	struct kmem_local_cache_info local_cache_info;
-+	/* For propagation, maximum size of a stored attr */
-+	unsigned int max_attr_size;
-+#endif
+ #ifdef CONFIG_MATH_EMULATION
+ extern void fpstate_init_soft(struct swregs_state *soft);
+diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
+index 8ea306b1bf8e..d7859573973d 100644
+--- a/arch/x86/kernel/fpu/core.c
++++ b/arch/x86/kernel/fpu/core.c
+@@ -59,6 +59,8 @@ static DEFINE_PER_CPU(bool, in_kernel_fpu);
+  */
+ DEFINE_PER_CPU(struct fpu *, fpu_fpregs_owner_ctx);
+ 
++struct kmem_cache *fpstate_cachep;
 +
- 	unsigned int useroffset;	/* Usercopy region offset */
- 	unsigned int usersize;		/* Usercopy region size */
- 
-diff --git a/mm/slab.h b/mm/slab.h
-index b9e11038be27..8799bcdd2fff 100644
---- a/mm/slab.h
-+++ b/mm/slab.h
-@@ -216,6 +216,7 @@ int __kmem_cache_shutdown(struct kmem_cache *);
- void __kmem_cache_release(struct kmem_cache *);
- int __kmem_cache_shrink(struct kmem_cache *);
- void slab_kmem_cache_release(struct kmem_cache *);
-+void kmem_cache_shrink_all(struct kmem_cache *s);
- 
- struct seq_file;
- struct file;
-@@ -344,6 +345,7 @@ void restore_page_nonsensitive_metadata(struct page *page,
- }
- 
- void set_nonsensitive_cache_params(struct kmem_cache *s);
-+void init_local_cache_info(struct kmem_cache *s, struct kmem_cache *root);
- 
- #else /* CONFIG_ADDRESS_SPACE_ISOLATION */
- 
-@@ -380,6 +382,9 @@ static inline void restore_page_nonsensitive_metadata(struct page *page,
- 
- static inline void set_nonsensitive_cache_params(struct kmem_cache *s) { }
- 
-+static inline
-+void init_local_cache_info(struct kmem_cache *s, struct kmem_cache *root) { }
-+
- #endif /* CONFIG_ADDRESS_SPACE_ISOLATION */
- 
- #ifdef CONFIG_MEMCG_KMEM
-diff --git a/mm/slab_common.c b/mm/slab_common.c
-index b486b72d6344..efa61b97902a 100644
---- a/mm/slab_common.c
-+++ b/mm/slab_common.c
-@@ -142,7 +142,7 @@ int __kmem_cache_alloc_bulk(struct kmem_cache *s, gfp_t flags, size_t nr,
- 
- LIST_HEAD(slab_root_caches);
- 
--static void init_local_cache_info(struct kmem_cache *s, struct kmem_cache *root)
-+void init_local_cache_info(struct kmem_cache *s, struct kmem_cache *root)
+ static bool kernel_fpu_disabled(void)
  {
- 	if (root) {
- 		s->local_cache_info.root_cache = root;
-@@ -194,9 +194,6 @@ void set_nonsensitive_cache_params(struct kmem_cache *s)
+ 	return this_cpu_read(in_kernel_fpu);
+@@ -443,7 +445,9 @@ static void __fpstate_reset(struct fpstate *fpstate)
+ void fpstate_reset(struct fpu *fpu)
+ {
+ 	/* Set the fpstate pointer to the default fpstate */
+-	fpu->fpstate = &fpu->__fpstate;
++	if (!cpu_feature_enabled(X86_FEATURE_ASI))
++		fpu->fpstate = &fpu->__fpstate;
++
+ 	__fpstate_reset(fpu->fpstate);
  
- #else
- 
--static inline
--void init_local_cache_info(struct kmem_cache *s, struct kmem_cache *root) { }
--
- static inline void cleanup_local_cache_info(struct kmem_cache *s) { }
- 
- #endif /* CONFIG_ADDRESS_SPACE_ISOLATION */
-@@ -644,6 +641,34 @@ int kmem_cache_shrink(struct kmem_cache *cachep)
+ 	/* Initialize the permission related info in fpu */
+@@ -464,6 +468,26 @@ static inline void fpu_inherit_perms(struct fpu *dst_fpu)
+ 	}
  }
- EXPORT_SYMBOL(kmem_cache_shrink);
  
-+/**
-+ * kmem_cache_shrink_all - shrink a cache and all child caches for root cache
-+ * @s: The cache pointer
-+ */
-+void kmem_cache_shrink_all(struct kmem_cache *s)
++void fpstate_cache_init(void)
 +{
-+	struct kmem_cache *c;
++	if (cpu_feature_enabled(X86_FEATURE_ASI)) {
++		size_t fpstate_size;
 +
-+	if (!static_asi_enabled() || !is_root_cache(s)) {
-+		kmem_cache_shrink(s);
-+		return;
++		/* TODO: Is the ALIGN-64 really needed? */
++		fpstate_size = fpu_kernel_cfg.default_size +
++			       ALIGN(offsetof(struct fpstate, regs), 64);
++
++		fpstate_cachep = kmem_cache_create_usercopy(
++						"fpstate",
++						fpstate_size,
++						__alignof__(struct fpstate),
++						SLAB_PANIC | SLAB_ACCOUNT,
++						offsetof(struct fpstate, regs),
++						fpu_kernel_cfg.default_size,
++						NULL);
 +	}
-+
-+	kasan_cache_shrink(s);
-+	__kmem_cache_shrink(s);
-+
-+	/*
-+	 * We have to take the slab_mutex to protect from the child cache list
-+	 * modification.
-+	 */
-+	mutex_lock(&slab_mutex);
-+	for_each_child_cache(c, s) {
-+		kasan_cache_shrink(c);
-+		__kmem_cache_shrink(c);
-+	}
-+	mutex_unlock(&slab_mutex);
 +}
 +
- bool slab_is_available(void)
+ /* Clone current's FPU state on fork */
+ int fpu_clone(struct task_struct *dst, unsigned long clone_flags)
  {
- 	return slab_state >= UP;
-diff --git a/mm/slub.c b/mm/slub.c
-index abe7db581d68..df0191f8b0e2 100644
---- a/mm/slub.c
-+++ b/mm/slub.c
-@@ -289,6 +289,21 @@ static void debugfs_slab_add(struct kmem_cache *);
- static inline void debugfs_slab_add(struct kmem_cache *s) { }
- #endif
+@@ -473,6 +497,22 @@ int fpu_clone(struct task_struct *dst, unsigned long clone_flags)
+ 	/* The new task's FPU state cannot be valid in the hardware. */
+ 	dst_fpu->last_cpu = -1;
  
-+#if defined(CONFIG_SYSFS) && defined(CONFIG_ADDRESS_SPACE_ISOLATION)
-+static void propagate_slab_attrs_from_parent(struct kmem_cache *s);
-+static void propagate_slab_attr_to_children(struct kmem_cache *s,
-+					    struct attribute *attr,
-+					    const char *buf, size_t len);
-+#else
-+static inline void propagate_slab_attrs_from_parent(struct kmem_cache *s) { }
-+
-+static inline
-+void propagate_slab_attr_to_children(struct kmem_cache *s,
-+				     struct attribute *attr,
-+				     const char *buf, size_t len)
-+{ }
-+#endif
-+
- static inline void stat(const struct kmem_cache *s, enum stat_item si)
- {
- #ifdef CONFIG_SLUB_STATS
-@@ -2015,6 +2030,7 @@ static void __free_slab(struct kmem_cache *s, struct page *page)
- 	if (current->reclaim_state)
- 		current->reclaim_state->reclaimed_slab += pages;
- 	unaccount_slab_page(page, order, s);
-+	restore_page_nonsensitive_metadata(page, s);
- 	__free_pages(page, order);
- }
- 
-@@ -4204,6 +4220,8 @@ static int kmem_cache_open(struct kmem_cache *s, slab_flags_t flags)
- 		}
- 	}
- 
-+	set_nonsensitive_cache_params(s);
-+
- #if defined(CONFIG_HAVE_CMPXCHG_DOUBLE) && \
-     defined(CONFIG_HAVE_ALIGNED_STRUCT_PAGE)
- 	if (system_has_cmpxchg_double() && (s->flags & SLAB_NO_CMPXCHG) == 0)
-@@ -4797,6 +4815,10 @@ static struct kmem_cache * __init bootstrap(struct kmem_cache *static_cache)
- #endif
- 	}
- 	list_add(&s->list, &slab_caches);
-+	init_local_cache_info(s, NULL);
-+#ifdef CONFIG_ADDRESS_SPACE_ISOLATION
-+	list_del(&static_cache->root_caches_node);
-+#endif
- 	return s;
- }
- 
-@@ -4863,7 +4885,7 @@ struct kmem_cache *
- __kmem_cache_alias(const char *name, unsigned int size, unsigned int align,
- 		   slab_flags_t flags, void (*ctor)(void *))
- {
--	struct kmem_cache *s;
-+	struct kmem_cache *s, *c;
- 
- 	s = find_mergeable(size, align, flags, name, ctor);
- 	if (s) {
-@@ -4876,6 +4898,11 @@ __kmem_cache_alias(const char *name, unsigned int size, unsigned int align,
- 		s->object_size = max(s->object_size, size);
- 		s->inuse = max(s->inuse, ALIGN(size, sizeof(void *)));
- 
-+		for_each_child_cache(c, s) {
-+			c->object_size = s->object_size;
-+			c->inuse = max(c->inuse, ALIGN(size, sizeof(void *)));
-+		}
-+
- 		if (sysfs_slab_alias(s, name)) {
- 			s->refcount--;
- 			s = NULL;
-@@ -4889,6 +4916,9 @@ int __kmem_cache_create(struct kmem_cache *s, slab_flags_t flags)
- {
- 	int err;
- 
-+	if (!static_asi_enabled())
-+		flags &= ~SLAB_NONSENSITIVE;
-+
- 	err = kmem_cache_open(s, flags);
- 	if (err)
- 		return err;
-@@ -4897,6 +4927,8 @@ int __kmem_cache_create(struct kmem_cache *s, slab_flags_t flags)
- 	if (slab_state <= UP)
- 		return 0;
- 
-+	propagate_slab_attrs_from_parent(s);
-+
- 	err = sysfs_slab_add(s);
- 	if (err) {
- 		__kmem_cache_release(s);
-@@ -5619,7 +5651,7 @@ static ssize_t shrink_store(struct kmem_cache *s,
- 			const char *buf, size_t length)
- {
- 	if (buf[0] == '1')
--		kmem_cache_shrink(s);
-+		kmem_cache_shrink_all(s);
- 	else
- 		return -EINVAL;
- 	return length;
-@@ -5829,6 +5861,87 @@ static ssize_t slab_attr_show(struct kobject *kobj,
- 	return err;
- }
- 
-+#ifdef CONFIG_ADDRESS_SPACE_ISOLATION
-+
-+static void propagate_slab_attrs_from_parent(struct kmem_cache *s)
-+{
-+	int i;
-+	char *buffer = NULL;
-+	struct kmem_cache *root_cache;
-+
-+	if (is_root_cache(s))
-+		return;
-+
-+	root_cache = s->local_cache_info.root_cache;
-+
-+	/*
-+	 * This mean this cache had no attribute written. Therefore, no point
-+	 * in copying default values around
-+	 */
-+	if (!root_cache->max_attr_size)
-+		return;
-+
-+	for (i = 0; i < ARRAY_SIZE(slab_attrs); i++) {
-+		char mbuf[64];
-+		char *buf;
-+		struct slab_attribute *attr = to_slab_attr(slab_attrs[i]);
-+		ssize_t len;
-+
-+		if (!attr || !attr->store || !attr->show)
-+			continue;
++	if (cpu_feature_enabled(X86_FEATURE_ASI)) {
++		dst_fpu->fpstate = kmem_cache_alloc_node(
++						fpstate_cachep, GFP_KERNEL,
++						page_to_nid(virt_to_page(dst)));
++		if (!dst_fpu->fpstate)
++			return -ENOMEM;
 +
 +		/*
-+		 * It is really bad that we have to allocate here, so we will
-+		 * do it only as a fallback. If we actually allocate, though,
-+		 * we can just use the allocated buffer until the end.
-+		 *
-+		 * Most of the slub attributes will tend to be very small in
-+		 * size, but sysfs allows buffers up to a page, so they can
-+		 * theoretically happen.
++		 * TODO: We may be able to skip the copy since the registers are
++		 * restored below anyway.
 +		 */
-+		if (buffer) {
-+			buf = buffer;
-+		} else if (root_cache->max_attr_size < ARRAY_SIZE(mbuf) &&
-+			 !IS_ENABLED(CONFIG_SLUB_STATS)) {
-+			buf = mbuf;
-+		} else {
-+			buffer = (char *)get_zeroed_page(GFP_KERNEL);
-+			if (WARN_ON(!buffer))
-+				continue;
-+			buf = buffer;
-+		}
-+
-+		len = attr->show(root_cache, buf);
-+		if (len > 0)
-+			attr->store(s, buf, len);
++		memcpy(dst_fpu->fpstate, src_fpu->fpstate,
++		       fpu_kernel_cfg.default_size +
++		       offsetof(struct fpstate, regs));
 +	}
 +
-+	if (buffer)
-+		free_page((unsigned long)buffer);
-+}
-+
-+static void propagate_slab_attr_to_children(struct kmem_cache *s,
-+					    struct attribute *attr,
-+					    const char *buf, size_t len)
-+{
-+	struct kmem_cache *c;
-+	struct slab_attribute *attribute = to_slab_attr(attr);
-+
-+	if (static_asi_enabled()) {
-+		mutex_lock(&slab_mutex);
-+
-+		if (s->max_attr_size < len)
-+			s->max_attr_size = len;
-+
-+		for_each_child_cache(c, s)
-+			attribute->store(c, buf, len);
-+
-+		mutex_unlock(&slab_mutex);
-+	}
-+}
-+
-+#endif
-+
- static ssize_t slab_attr_store(struct kobject *kobj,
- 				struct attribute *attr,
- 				const char *buf, size_t len)
-@@ -5844,6 +5957,27 @@ static ssize_t slab_attr_store(struct kobject *kobj,
- 		return -EIO;
+ 	fpstate_reset(dst_fpu);
  
- 	err = attribute->store(s, buf, len);
-+
-+	/*
-+	 * This is a best effort propagation, so this function's return
-+	 * value will be determined by the parent cache only. This is
-+	 * basically because not all attributes will have a well
-+	 * defined semantics for rollbacks - most of the actions will
-+	 * have permanent effects.
-+	 *
-+	 * Returning the error value of any of the children that fail
-+	 * is not 100 % defined, in the sense that users seeing the
-+	 * error code won't be able to know anything about the state of
-+	 * the cache.
-+	 *
-+	 * Only returning the error code for the parent cache at least
-+	 * has well defined semantics. The cache being written to
-+	 * directly either failed or succeeded, in which case we loop
-+	 * through the descendants with best-effort propagation.
-+	 */
-+	if (slab_state >= FULL && err >= 0 && is_root_cache(s))
-+		propagate_slab_attr_to_children(s, attr, buf, len);
-+
- 	return err;
- }
- 
-@@ -5866,7 +6000,7 @@ static struct kset *slab_kset;
- 
- static inline struct kset *cache_kset(struct kmem_cache *s)
+ 	if (!cpu_feature_enabled(X86_FEATURE_FPU))
+@@ -531,7 +571,8 @@ int fpu_clone(struct task_struct *dst, unsigned long clone_flags)
+ void fpu_thread_struct_whitelist(unsigned long *offset, unsigned long *size)
  {
--	return slab_kset;
-+	return is_root_cache(s) ? slab_kset : NULL;
+ 	*offset = offsetof(struct thread_struct, fpu.__fpstate.regs);
+-	*size = fpu_kernel_cfg.default_size;
++	*size = cpu_feature_enabled(X86_FEATURE_ASI)
++		? 0 : fpu_kernel_cfg.default_size;
  }
  
- #define ID_STR_LENGTH 64
-diff --git a/security/Kconfig b/security/Kconfig
-index 070a948b5266..a5cfb09352b0 100644
---- a/security/Kconfig
-+++ b/security/Kconfig
-@@ -68,7 +68,8 @@ config PAGE_TABLE_ISOLATION
- config ADDRESS_SPACE_ISOLATION
- 	bool "Allow code to run with a reduced kernel address space"
- 	default n
--	depends on X86_64 && !UML && SLAB && !NEED_PER_CPU_KM
-+	depends on X86_64 && !UML && !NEED_PER_CPU_KM
-+	depends on SLAB || SLUB
- 	depends on !PARAVIRT
- 	depends on !MEMORY_HOTPLUG
- 	help
+ /*
+diff --git a/arch/x86/kernel/fpu/init.c b/arch/x86/kernel/fpu/init.c
+index 621f4b6cac4a..8b722bf98135 100644
+--- a/arch/x86/kernel/fpu/init.c
++++ b/arch/x86/kernel/fpu/init.c
+@@ -161,9 +161,11 @@ static void __init fpu__init_task_struct_size(void)
+ 
+ 	/*
+ 	 * Add back the dynamically-calculated register state
+-	 * size.
++	 * size, except when ASI is enabled, since in that case
++	 * the FPU state is always allocated dynamically.
+ 	 */
+-	task_size += fpu_kernel_cfg.default_size;
++	if (!cpu_feature_enabled(X86_FEATURE_ASI))
++		task_size += fpu_kernel_cfg.default_size;
+ 
+ 	/*
+ 	 * We dynamically size 'struct fpu', so we require that
+@@ -223,6 +225,7 @@ static void __init fpu__init_init_fpstate(void)
+  */
+ void __init fpu__init_system(struct cpuinfo_x86 *c)
+ {
++	current->thread.fpu.fpstate = &current->thread.fpu.__fpstate;
+ 	fpstate_reset(&current->thread.fpu);
+ 	fpu__init_system_early_generic(c);
+ 
+diff --git a/arch/x86/kernel/fpu/internal.h b/arch/x86/kernel/fpu/internal.h
+index dbdb31f55fc7..30acc7d0cb1a 100644
+--- a/arch/x86/kernel/fpu/internal.h
++++ b/arch/x86/kernel/fpu/internal.h
+@@ -3,6 +3,7 @@
+ #define __X86_KERNEL_FPU_INTERNAL_H
+ 
+ extern struct fpstate init_fpstate;
++extern struct kmem_cache *fpstate_cachep;
+ 
+ /* CPU feature check wrappers */
+ static __always_inline __pure bool use_xsave(void)
+diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
+index d28829403ed0..96d12f351f19 100644
+--- a/arch/x86/kernel/fpu/xstate.c
++++ b/arch/x86/kernel/fpu/xstate.c
+@@ -13,6 +13,7 @@
+ #include <linux/seq_file.h>
+ #include <linux/proc_fs.h>
+ #include <linux/vmalloc.h>
++#include <linux/slab.h>
+ 
+ #include <asm/fpu/api.h>
+ #include <asm/fpu/regset.h>
+@@ -1495,8 +1496,15 @@ arch_initcall(xfd_update_static_branch)
+ 
+ void fpstate_free(struct fpu *fpu)
+ {
+-	if (fpu->fpstate && fpu->fpstate != &fpu->__fpstate)
+-		vfree(fpu->fpstate);
++	WARN_ON_ONCE(cpu_feature_enabled(X86_FEATURE_ASI) &&
++		     fpu->fpstate == &fpu->__fpstate);
++
++	if (fpu->fpstate && fpu->fpstate != &fpu->__fpstate) {
++		if (fpu->fpstate->is_valloc)
++			vfree(fpu->fpstate);
++		else
++			kmem_cache_free(fpstate_cachep, fpu->fpstate);
++	}
+ }
+ 
+ /**
+@@ -1574,7 +1582,14 @@ static int fpstate_realloc(u64 xfeatures, unsigned int ksize,
+ 
+ 	fpregs_unlock();
+ 
+-	vfree(curfps);
++	WARN_ON_ONCE(cpu_feature_enabled(X86_FEATURE_ASI) && !curfps);
++	if (curfps) {
++		if (curfps->is_valloc)
++			vfree(curfps);
++		else
++			kmem_cache_free(fpstate_cachep, curfps);
++	}
++
+ 	return 0;
+ }
+ 
+diff --git a/arch/x86/kernel/process.c b/arch/x86/kernel/process.c
+index c8d4a00a4de7..f9bd1c3415d4 100644
+--- a/arch/x86/kernel/process.c
++++ b/arch/x86/kernel/process.c
+@@ -80,6 +80,11 @@ EXPORT_PER_CPU_SYMBOL(cpu_tss_rw);
+ DEFINE_PER_CPU(bool, __tss_limit_invalid);
+ EXPORT_PER_CPU_SYMBOL_GPL(__tss_limit_invalid);
+ 
++void __init arch_task_cache_init(void)
++{
++	fpstate_cache_init();
++}
++
+ /*
+  * this gets called so that we can store lazy state into memory and copy the
+  * current task into the new thread.
+@@ -101,7 +106,7 @@ int arch_dup_task_struct(struct task_struct *dst, struct task_struct *src)
+ #ifdef CONFIG_X86_64
+ void arch_release_task_struct(struct task_struct *tsk)
+ {
+-	if (fpu_state_size_dynamic())
++	if (fpu_state_size_dynamic() || cpu_feature_enabled(X86_FEATURE_ASI))
+ 		fpstate_free(&tsk->thread.fpu);
+ }
+ #endif
 -- 
 2.35.1.473.g83b2b277ed-goog
 
