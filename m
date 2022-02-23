@@ -2,57 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 512764C0B04
-	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 05:20:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B70324C0B05
+	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 05:20:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238110AbiBWEUf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Feb 2022 23:20:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48466 "EHLO
+        id S238138AbiBWEUi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Feb 2022 23:20:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48538 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238100AbiBWEU0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Feb 2022 23:20:26 -0500
-Received: from mail-io1-xd4a.google.com (mail-io1-xd4a.google.com [IPv6:2607:f8b0:4864:20::d4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA4373B550
-        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 20:19:59 -0800 (PST)
-Received: by mail-io1-xd4a.google.com with SMTP id z23-20020a5ec917000000b0064142c95dc1so4077423iol.20
-        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 20:19:59 -0800 (PST)
+        with ESMTP id S237834AbiBWEU2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Feb 2022 23:20:28 -0500
+Received: from mail-il1-x149.google.com (mail-il1-x149.google.com [IPv6:2607:f8b0:4864:20::149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC6B93B2BE
+        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 20:20:01 -0800 (PST)
+Received: by mail-il1-x149.google.com with SMTP id y9-20020a927d09000000b002c24b428ff4so4575710ilc.18
+        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 20:20:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=i98hnG6qtGbABTs3j3QXd9dWCgzrVG+u5f8yLDrE9OQ=;
-        b=YBAhhNZXsuZ52Ml9yB6SFT5gzAnvK703/uJsaiQO/3XBbULguXGz4eUcK7Iwx0jrB+
-         BhCR6xI4LMSyobe3yqiRvNJFIlAkFrCpg25eRUJRMqTCPL1+3aGzT9jjZWQUf6QtrSOL
-         MFdYsE76aqx8nEgsSPFfnv3ub9boa4S6JJawLfX2AVjqeWMsSN9VuLivLBxcHYzq/1Js
-         uHiN538s7Ufr8y/64m9Vz14I/O8iWZiv7rHrIkqF9Ha9v98rkOhULZroUrj2qh0iRMTb
-         kB8SszgWhRubTmwuM1iI5Dtxp5eUJOtuX5tgG7V2SRTfMD77l9vS6RS679+PayqZPUWZ
-         VX7Q==
+        bh=Ln5NpBpAQfeJH+D9rE91ZmcHe7YhrG7E3g5O/Fn36fE=;
+        b=Xjc9neOk8jLLu+5+Yti4DACQgrQiyssQHoAN7SFgxpMJyEW3cYy+lMA8PkZGdKa2/Z
+         suF9pIyrCUOYdJJDUKrMbl8SC+woir18EsBPWNqzPzpKUdm8/53eOBdpSJtWvwu4Jtci
+         qhrqwwZhKcQsO0a8HFMlK+1YEa8YCothulVqpLiPz3MEYxNhNOO8/yxB4W6vkc5mspmj
+         v1N6wuKoaSiWKhN13VjP3x3VK3YJJDwBcY9T3IU6LoKRCOLSVGjNm3eABUMVNgbkPWQ8
+         kjo1bqmvbsPpgbCpPFxoFG3FfwcFuuK7tTIwAT59RcWtut6JZnjS2XnB75pDTVKpj8GB
+         Zy5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=i98hnG6qtGbABTs3j3QXd9dWCgzrVG+u5f8yLDrE9OQ=;
-        b=RzeYq+bN2pKMTyx5FFcKCfV9HUsFY6NxC3+tommLZZknlc2eCy7wpnGZO3alEZeS+a
-         8mlRni6U5bO5FxlvyrElT60y4ubt07VwsAlrpc/m6nP/hCUUqBcKy3rmEZWkxGjp26PM
-         oPNU7VB5bgQU8AIWd/y5FhOov6r9PFJH+ixmSMfqXfFWhNM4iFrEO8LcQgVwh+gU7iwJ
-         cMDqBLjQZiK8bihIK0aNGd+v26Nqsk6cpJiRlTFlfksgIVasE02u5N5xkfX+jDPXe93y
-         wcAPOJOestQpCP7UmLSvQt0AlWJ3Z+E+JoJg85rzgfu2adyzLBHbUCLNjid0dDEO8ZUE
-         bT6g==
-X-Gm-Message-State: AOAM533NdqmcmSgHYkTWwD87AA2Yia4N8p7if9J5h/i5S7UGX6fkVMpF
-        HcESy/l7ifcvxL55RjrbSodb7AAheNo=
-X-Google-Smtp-Source: ABdhPJxZPc1WYaO4N3CymGo4vz22DvGFH7vPk5M8cHUCqUrPSPImWyzkemXzMuR+yAGmHzxYihfCCkrqH/0=
+        bh=Ln5NpBpAQfeJH+D9rE91ZmcHe7YhrG7E3g5O/Fn36fE=;
+        b=2cyK9e5Biia/8VfXdxIM3KY56/3ZE6s4QocSrY/FGuvYHc0vVnzDVR0lFXsvJrgc8C
+         MbN0gtyBfhp4QhtxOeJfeUjI0dpD5ymvuoAFliABaYRmQS+X6ihUr0wR5ZDsPknRiucJ
+         xKexUIuP3W4Rs9IRzWXx9Ionx58y26WOTH9NDagItUeuCvOgehNZi+kDesbVyjlfnyNp
+         oB5ALKx//mjhjFS0C4gZ8dBK11n9/6N1XbMtga7QPNHqBK5vdmIXgaHlKHoYYzZ68U6+
+         1Fj3BYyANoei/2Yuakv4bCOwxM34Mo32Gja7PVHX1yDrDLrwpKuPWzOHb9EUclAqVjo6
+         KOSA==
+X-Gm-Message-State: AOAM532mFYJRPNV81GcXusxfWyRFZSlZn3KX1+Kcy0j5SYuc9qClV1vw
+        w/s8CS5tSa+gGNtSsUjpD/mPhD+FU88=
+X-Google-Smtp-Source: ABdhPJxixMOimHhRWdkDlokvYZ9TdxE7WefirH3ZQMjiEuPl8GdS7TYGQs/MgM2jjjoBQ5O+TiFAkrLSadw=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a05:6638:25c2:b0:314:cb35:412 with SMTP id
- u2-20020a05663825c200b00314cb350412mr12995818jat.216.1645589999299; Tue, 22
- Feb 2022 20:19:59 -0800 (PST)
-Date:   Wed, 23 Feb 2022 04:18:43 +0000
+ (user=oupton job=sendgmr) by 2002:a5d:8b8c:0:b0:613:8223:321a with SMTP id
+ p12-20020a5d8b8c000000b006138223321amr21146843iol.203.1645590001085; Tue, 22
+ Feb 2022 20:20:01 -0800 (PST)
+Date:   Wed, 23 Feb 2022 04:18:44 +0000
 In-Reply-To: <20220223041844.3984439-1-oupton@google.com>
-Message-Id: <20220223041844.3984439-19-oupton@google.com>
+Message-Id: <20220223041844.3984439-20-oupton@google.com>
 Mime-Version: 1.0
 References: <20220223041844.3984439-1-oupton@google.com>
 X-Mailer: git-send-email 2.35.1.473.g83b2b277ed-goog
-Subject: [PATCH v3 18/19] selftests: KVM: Refactor psci_test to make it
- amenable to new tests
+Subject: [PATCH v3 19/19] selftests: KVM: Test SYSTEM_SUSPEND PSCI call
 From:   Oliver Upton <oupton@google.com>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
@@ -71,8 +70,7 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
         Ricardo Koller <ricarkol@google.com>,
         Raghavendra Rao Ananta <rananta@google.com>,
         Jing Zhang <jingzhangos@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Andrew Jones <drjones@redhat.com>
+        Oliver Upton <oupton@google.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -84,152 +82,108 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Split up the current test into several helpers that will be useful to
-subsequent test cases added to the PSCI test suite.
+Assert that the vCPU exits to userspace with KVM_SYSTEM_EVENT_SUSPEND if
+it correctly executes the SYSTEM_SUSPEND PSCI call. Additionally, assert
+that the guest PSCI call fails if preconditions are not met (more than 1
+running vCPU).
 
 Signed-off-by: Oliver Upton <oupton@google.com>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
 ---
- .../testing/selftests/kvm/aarch64/psci_test.c | 97 ++++++++++++-------
- 1 file changed, 60 insertions(+), 37 deletions(-)
+ .../testing/selftests/kvm/aarch64/psci_test.c | 74 +++++++++++++++++++
+ 1 file changed, 74 insertions(+)
 
 diff --git a/tools/testing/selftests/kvm/aarch64/psci_test.c b/tools/testing/selftests/kvm/aarch64/psci_test.c
-index fe1d5d343a2f..535130d5e97f 100644
+index 535130d5e97f..ef7fd58af675 100644
 --- a/tools/testing/selftests/kvm/aarch64/psci_test.c
 +++ b/tools/testing/selftests/kvm/aarch64/psci_test.c
-@@ -45,21 +45,6 @@ static uint64_t psci_affinity_info(uint64_t target_affinity,
+@@ -45,6 +45,16 @@ static uint64_t psci_affinity_info(uint64_t target_affinity,
  	return res.a0;
  }
  
--static void guest_main(uint64_t target_cpu)
--{
--	GUEST_ASSERT(!psci_cpu_on(target_cpu, CPU_ON_ENTRY_ADDR, CPU_ON_CONTEXT_ID));
--	uint64_t target_state;
--
--	do {
--		target_state = psci_affinity_info(target_cpu, 0);
--
--		GUEST_ASSERT((target_state == PSCI_0_2_AFFINITY_LEVEL_ON) ||
--			     (target_state == PSCI_0_2_AFFINITY_LEVEL_OFF));
--	} while (target_state != PSCI_0_2_AFFINITY_LEVEL_ON);
--
--	GUEST_DONE();
--}
--
++static uint64_t psci_system_suspend(uint64_t entry_addr, uint64_t context_id)
++{
++	struct arm_smccc_res res;
++
++	smccc_hvc(PSCI_1_0_FN64_SYSTEM_SUSPEND, entry_addr, context_id,
++		  0, 0, 0, 0, 0, &res);
++
++	return res.a0;
++}
++
  static void vcpu_power_off(struct kvm_vm *vm, uint32_t vcpuid)
  {
  	struct kvm_mp_state mp_state = {
-@@ -69,12 +54,10 @@ static void vcpu_power_off(struct kvm_vm *vm, uint32_t vcpuid)
- 	vcpu_set_mp_state(vm, vcpuid, &mp_state);
+@@ -137,8 +147,72 @@ static void host_test_cpu_on(void)
+ 	kvm_vm_free(vm);
  }
  
--int main(void)
-+static struct kvm_vm *setup_vm(void *guest_code)
- {
--	uint64_t target_mpidr, obs_pc, obs_x0;
- 	struct kvm_vcpu_init init;
- 	struct kvm_vm *vm;
--	struct ucall uc;
- 
- 	vm = vm_create(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES, O_RDWR);
- 	kvm_vm_elf_load(vm, program_invocation_name);
-@@ -83,31 +66,28 @@ int main(void)
- 	vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init);
- 	init.features[0] |= (1 << KVM_ARM_VCPU_PSCI_0_2);
- 
--	aarch64_vcpu_add_default(vm, VCPU_ID_SOURCE, &init, guest_main);
--	aarch64_vcpu_add_default(vm, VCPU_ID_TARGET, &init, guest_main);
-+	aarch64_vcpu_add_default(vm, VCPU_ID_SOURCE, &init, guest_code);
-+	aarch64_vcpu_add_default(vm, VCPU_ID_TARGET, &init, guest_code);
- 
--	/*
--	 * make sure the target is already off when executing the test.
--	 */
--	vcpu_power_off(vm, VCPU_ID_TARGET);
-+	return vm;
-+}
- 
--	get_reg(vm, VCPU_ID_TARGET, KVM_ARM64_SYS_REG(SYS_MPIDR_EL1), &target_mpidr);
--	vcpu_args_set(vm, VCPU_ID_SOURCE, 1, target_mpidr & MPIDR_HWID_BITMASK);
--	vcpu_run(vm, VCPU_ID_SOURCE);
-+static void enter_guest(struct kvm_vm *vm, uint32_t vcpuid)
++static void enable_system_suspend(struct kvm_vm *vm)
 +{
-+	struct ucall uc;
- 
--	switch (get_ucall(vm, VCPU_ID_SOURCE, &uc)) {
--	case UCALL_DONE:
--		break;
--	case UCALL_ABORT:
-+	vcpu_run(vm, vcpuid);
-+	if (get_ucall(vm, vcpuid, &uc) == UCALL_ABORT)
- 		TEST_FAIL("%s at %s:%ld", (const char *)uc.args[0], __FILE__,
- 			  uc.args[1]);
--		break;
--	default:
--		TEST_FAIL("Unhandled ucall: %lu", uc.cmd);
--	}
++	struct kvm_enable_cap cap = {
++		.cap = KVM_CAP_ARM_SYSTEM_SUSPEND,
++	};
++
++	vm_enable_cap(vm, &cap);
 +}
 +
-+static void assert_vcpu_reset(struct kvm_vm *vm, uint32_t vcpuid)
++static void guest_test_system_suspend(void)
 +{
-+	uint64_t obs_pc, obs_x0;
- 
--	get_reg(vm, VCPU_ID_TARGET, ARM64_CORE_REG(regs.pc), &obs_pc);
--	get_reg(vm, VCPU_ID_TARGET, ARM64_CORE_REG(regs.regs[0]), &obs_x0);
-+	get_reg(vm, vcpuid, ARM64_CORE_REG(regs.pc), &obs_pc);
-+	get_reg(vm, vcpuid, ARM64_CORE_REG(regs.regs[0]), &obs_x0);
- 
- 	TEST_ASSERT(obs_pc == CPU_ON_ENTRY_ADDR,
- 		    "unexpected target cpu pc: %lx (expected: %lx)",
-@@ -115,7 +95,50 @@ int main(void)
- 	TEST_ASSERT(obs_x0 == CPU_ON_CONTEXT_ID,
- 		    "unexpected target context id: %lx (expected: %lx)",
- 		    obs_x0, CPU_ON_CONTEXT_ID);
++	uint64_t r = psci_system_suspend(CPU_ON_ENTRY_ADDR, CPU_ON_CONTEXT_ID);
++
++	GUEST_SYNC(r);
 +}
 +
-+static void guest_test_cpu_on(uint64_t target_cpu)
++static void host_test_system_suspend(void)
 +{
-+	uint64_t target_state;
++	struct kvm_run *run;
++	struct kvm_vm *vm;
 +
-+	GUEST_ASSERT(!psci_cpu_on(target_cpu, CPU_ON_ENTRY_ADDR, CPU_ON_CONTEXT_ID));
++	vm = setup_vm(guest_test_system_suspend);
++	enable_system_suspend(vm);
 +
-+	do {
-+		target_state = psci_affinity_info(target_cpu, 0);
++	vcpu_power_off(vm, VCPU_ID_TARGET);
++	run = vcpu_state(vm, VCPU_ID_SOURCE);
 +
-+		GUEST_ASSERT((target_state == PSCI_0_2_AFFINITY_LEVEL_ON) ||
-+			     (target_state == PSCI_0_2_AFFINITY_LEVEL_OFF));
-+	} while (target_state != PSCI_0_2_AFFINITY_LEVEL_ON);
++	enter_guest(vm, VCPU_ID_SOURCE);
 +
-+	GUEST_DONE();
++	TEST_ASSERT(run->exit_reason == KVM_EXIT_SYSTEM_EVENT,
++		    "Unhandled exit reason: %u (%s)",
++		    run->exit_reason, exit_reason_str(run->exit_reason));
++	TEST_ASSERT(run->system_event.type == KVM_SYSTEM_EVENT_SUSPEND,
++		    "Unhandled system event: %u (expected: %u)",
++		    run->system_event.type, KVM_SYSTEM_EVENT_SUSPEND);
++
++	kvm_vm_free(vm);
 +}
 +
-+static void host_test_cpu_on(void)
++static void host_test_system_suspend_fails(void)
 +{
-+	uint64_t target_mpidr;
 +	struct kvm_vm *vm;
 +	struct ucall uc;
 +
-+	vm = setup_vm(guest_test_cpu_on);
++	vm = setup_vm(guest_test_system_suspend);
++	enable_system_suspend(vm);
 +
-+	/*
-+	 * make sure the target is already off when executing the test.
-+	 */
-+	vcpu_power_off(vm, VCPU_ID_TARGET);
-+
-+	get_reg(vm, VCPU_ID_TARGET, KVM_ARM64_SYS_REG(SYS_MPIDR_EL1), &target_mpidr);
-+	vcpu_args_set(vm, VCPU_ID_SOURCE, 1, target_mpidr & MPIDR_HWID_BITMASK);
 +	enter_guest(vm, VCPU_ID_SOURCE);
++	TEST_ASSERT(get_ucall(vm, VCPU_ID_SOURCE, &uc) == UCALL_SYNC,
++		    "Unhandled ucall: %lu", uc.cmd);
++	TEST_ASSERT(uc.args[1] == PSCI_RET_DENIED,
++		    "Unrecognized PSCI return code: %lu (expected: %u)",
++		    uc.args[1], PSCI_RET_DENIED);
 +
-+	if (get_ucall(vm, VCPU_ID_SOURCE, &uc) != UCALL_DONE)
-+		TEST_FAIL("Unhandled ucall: %lu", uc.cmd);
- 
-+	assert_vcpu_reset(vm, VCPU_ID_TARGET);
- 	kvm_vm_free(vm);
++	kvm_vm_free(vm);
 +}
 +
-+int main(void)
-+{
-+	host_test_cpu_on();
+ int main(void)
+ {
++	if (!kvm_check_cap(KVM_CAP_ARM_SYSTEM_SUSPEND)) {
++		print_skip("KVM_CAP_ARM_SYSTEM_SUSPEND not supported");
++		exit(KSFT_SKIP);
++	}
++
+ 	host_test_cpu_on();
++	host_test_system_suspend();
++	host_test_system_suspend_fails();
  	return 0;
  }
 -- 
