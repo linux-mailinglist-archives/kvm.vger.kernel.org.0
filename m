@@ -2,156 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0BD864C1AA7
-	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 19:08:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BFB944C1AB4
+	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 19:13:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243773AbiBWSIb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Feb 2022 13:08:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40402 "EHLO
+        id S243789AbiBWSN6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Feb 2022 13:13:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44346 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238559AbiBWSI3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Feb 2022 13:08:29 -0500
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam08on2077.outbound.protection.outlook.com [40.107.102.77])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA11547AD5;
-        Wed, 23 Feb 2022 10:08:01 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dkC0aavrr/txrYm1kSFZT6z+MM6GNp6VG1MtJSQVVt7Er8Pv0uWNDjXg3LE54+F/0dT81o8QgW6J9nF+wQn/wWdhPuBlm2AUieROcuxyjnqIDMKiKtJZgUCViBuEz9IBCG9WM0vMLmlL1UzyESvD+TBxZZgJ+fmFwyir3zxseZYx0PwHzCt8/zStWUbTv8jO6+gz1AcCi77utJjBWw6t5oEbfRFJCV7nLYZQWNwNmbOVtLGNCFR5cadpJ5aXP/z8YCMlMbcGHcHKbfD7FaEqWZSkVCizbFVDVH4qbigq9keeACZtnXioPOmPUsBkhkxYqcsXA5XqF8RFXTrMf0fACA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=12Hz9js7KDfbI5QSDLHQIcZLBTn7JHgz3yGlgqSjU44=;
- b=VuBhiyxBS3n7YNr46pzIIEdBN38BVre4GgzhsO3dyrI6s0884YRo/0I+QolNkX3/GlnwPiAyQtg6uaBhTc9I6mGH7encxwU2HNj/CaCyCLnwSuivqfNKspMcAFAo8Wn+GOb6/8jg1N6CWDTwgWxCoSYvFSrno9roniq6z5sjbbabyyvWAjQsE0qIV6oTU9ssE9ArcEzqKaNFeX1Ru19sM0Rv+zjjk1N6n3NRfcaNrcoq/RnNenag4rgKmcIGLF1VGha3Q0QkqhSvxqVfmLRzWSk2STUVodvKGQNTDzD/p7XOADfA2RaNtpPFcz1jrQUR1/q24KMCYWsB+RdVformNA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=12Hz9js7KDfbI5QSDLHQIcZLBTn7JHgz3yGlgqSjU44=;
- b=jQNPUlSWGS7kDnOfrb3sNt9CBjL1pVIySVS1Kop4QKQ815ljYP+1Ld29cXIR1AJpd9qHHnFB4TP7nMmQrjMqhvMiZhVU9vhdNQNpsCxoYdlOFrejy0T842DSxYuJWVJebQGrbQr/nPPKcK/tF7S7WGewTr1zlWi5RCFbrzM8fIcwjU2CvuXKgloop9YkSjNQJMDw8XunYkynswTth97A8CIEAuGMhwtWbtkGF2nfRo/ZzBxNV35lntfqEVpzezq0QJ/yi72HQBl5thGWt8lQKt/y19lLagryJy9sat6L0VcMpj894HHY5lY4hMpjiV72I0z77CIyU8lPk9qRY77VZQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by LV2PR12MB5725.namprd12.prod.outlook.com (2603:10b6:408:17f::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5017.22; Wed, 23 Feb
- 2022 18:07:59 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::e8f4:9793:da37:1bd3]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::e8f4:9793:da37:1bd3%4]) with mapi id 15.20.5017.022; Wed, 23 Feb 2022
- 18:07:59 +0000
-Date:   Wed, 23 Feb 2022 14:07:57 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Bjorn Helgaas <helgaas@kernel.org>
-Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Joerg Roedel <joro@8bytes.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Ashok Raj <ashok.raj@intel.com>, kvm@vger.kernel.org,
-        rafael@kernel.org, David Airlie <airlied@linux.ie>,
-        linux-pci@vger.kernel.org,
-        Thierry Reding <thierry.reding@gmail.com>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        Dmitry Osipenko <digetx@gmail.com>,
-        Will Deacon <will@kernel.org>,
-        Stuart Yoder <stuyoder@gmail.com>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        linux-kernel@vger.kernel.org, Li Yang <leoyang.li@nxp.com>,
-        iommu@lists.linux-foundation.org,
-        Jacob jun Pan <jacob.jun.pan@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Robin Murphy <robin.murphy@arm.com>
-Subject: Re: [PATCH v5 07/14] PCI: Add driver dma ownership management
-Message-ID: <20220223180757.GB390403@nvidia.com>
-References: <20220104015644.2294354-8-baolu.lu@linux.intel.com>
- <20220223180056.GA140951@bhelgaas>
+        with ESMTP id S243783AbiBWSN4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Feb 2022 13:13:56 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3811348315;
+        Wed, 23 Feb 2022 10:13:29 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C83DD61580;
+        Wed, 23 Feb 2022 18:13:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 138E8C340E7;
+        Wed, 23 Feb 2022 18:13:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1645640008;
+        bh=puW8dgOC6u58SDIMkZaeJA/5QfThrRACFwNlmW5mRnU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=So3I9zMvNKYHhpDsnpmxh7H1xHymIHJtd0I1kFTMKLG3PcYYnkVIOgEvEVbOJP7Gp
+         7zsdrFI0DtUsX5Vu0KX5cNfb8+J9nqNgLa/fA9/IO3FR1CGfGLIqgGpFdb27XmczlL
+         a4/hDIjCMJt0DptTo2hW+PEA7JGrZDCqo5triI9Q1kEoGiP0xQTdzXgd2IUkHOJ716
+         ugklpcYNY4F9G2vPdoA0+/ud4Cpx8bJV9xF2VwoSjOn9LWLHUYB5SmHzmr8+AGvS/6
+         LbVmtF+30SRWWojGh6bMk/8or0GQsjt6lZ7GfhFVN4cc+DkmD1MnlqZnFPw58zoxJL
+         +iNR9hqLLePAA==
+Date:   Wed, 23 Feb 2022 11:13:23 -0700
+From:   Nathan Chancellor <nathan@kernel.org>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        llvm@lists.linux.dev, linux-kernel@vger.kernel.org,
+        Like Xu <like.xu.linux@gmail.com>
+Subject: Re: [PATCH] KVM: x86: Fix pointer mistmatch warning when patching
+ RET0 static calls
+Message-ID: <YhZ5Q8DNoGGWUBLh@dev-arch.archlinux-ax161>
+References: <20220223162355.3174907-1-seanjc@google.com>
+ <YhZuk8eA6rsDuJkd@dev-arch.archlinux-ax161>
+ <YhZ16cMMcHQIvS9d@google.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220223180056.GA140951@bhelgaas>
-X-ClientProxiedBy: MN2PR16CA0052.namprd16.prod.outlook.com
- (2603:10b6:208:234::21) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: e020f4bc-2242-4e41-4156-08d9f6f76c8f
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5725:EE_
-X-Microsoft-Antispam-PRVS: <LV2PR12MB572525E9478A3A3C4A7949ECC23C9@LV2PR12MB5725.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: olCHE8zc5XfLcbu6uOnuY2LCz0rqHzRBcN0nNvenC3VnvYH1UCbiT2qcRA5iKuEOCvOQtEM3B7lcKg8RL3Drmps/XR/PQjG3RXOve6rQ18RYdaokDhkp2LCzI6V1B2lnQ0M0WKYIkTIQ/QDOf0GBNWr0DsVsCl0TFYV29tsUCJmteb6B2FzZZU/xvGOIrZLvfJ7HP0pDg/Ii+1jeriwpfoOPWeHk5jOUDF3Xo2ZB+2ok/bCAfuYZi3YqMeqrZLGtM99tqNJ/SWt+68im13YfTbpeC9FYGmhzqlzdrdT1hQ/AbRa1BwKO5+iAkDrt3sYj2qNAeLBHtIr4m4/jnNSX3L23m6ZelTgLXl2MlYGKLQpubEYSqsddzt4WwbEDjdBZJwwwZXBqRDJ/3S5zqe8y3hKPXiTSXyPgau5D+Qu2WKIkgXQGceC+7G5QlgKusmM4XCjulHtUfx3k0VdaAbjcFPi4sMTy7BsYDe3Vzv/9xB3KA3gEErTMFYp8hssd6LljSRh8HmCBWQAQGgasGc8jAaChUU4CmzswO6cJ85K4nQ7bXPZGNAX+z70vLoiCqWADE+Ul29XUnTtrdbkVw50PlKCsgiknRLP9SZHrHGMI2S5NB2w1F/z15Y6n76VvY4FVZDBYwtS8viJ7MtHSE1Q9RUSeoaJUCWUj3AMPm9v5t+iHp47v+nvkYU6aNLZVFOCWmICxr+gFP3pwZ0BqABfjMoBEQty0YwYPQDN4mzN+anjL7j/85C7FhkLO0oi3hFnOjg5gckECFNB9Wmm6DmV7v+mVRUM//TYEUxxCF5+IzUE=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(38100700002)(7416002)(66946007)(5660300002)(33656002)(66476007)(66556008)(4744005)(36756003)(8936002)(8676002)(4326008)(2906002)(86362001)(316002)(2616005)(6506007)(508600001)(6486002)(966005)(186003)(6512007)(26005)(6916009)(54906003)(1076003)(27376004);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?FpbtMjuatORMwTaEvelmoGxuApSepVwQVRBv44uAKW8Xz/5Zos3Pc0EtP250?=
- =?us-ascii?Q?9YYupISDh+BCK82gZtWvylaBH7HMihGcyY0y/C9oU0SWdAgZf9Xplhvp7zgs?=
- =?us-ascii?Q?9cVTpq2sm1e5hdjMoFCk8mhVk0fvh3xRTAia1nkSflhCVUCLCIII08ozkJg7?=
- =?us-ascii?Q?Nvy7IDdbH7Ic+ykhqFRIYliqJ6Fcpg4Ytf7MyKJoyOQYh51UuRaJbbWYAqXg?=
- =?us-ascii?Q?9komUfbUy6GHJKFn/6CzOegvuoZ1FpFBLroD0b1gAaYnfy4QjB6/wnbqzX/8?=
- =?us-ascii?Q?UcfuV9rX4UcsQSo6DjxOo+NrU5VVbi1M6EfjMGVqCSy+IeqnymSJlcIW5BNL?=
- =?us-ascii?Q?AyGywc7wPPAOVUSaqwdWZbuns4XznogVkQVHlccV7JLZCWTQ6XjoG/llnrhi?=
- =?us-ascii?Q?0l7JUdbiYrYPTefePoktO3mz6AF0RHto5IMFR5WFimMembNkuQu3OCOE2/ST?=
- =?us-ascii?Q?6KGIhzdj2sHM3aPrG9YIVSRhuUxc5gcq3wOwXu+xqA+OjoPEbQgtm9n8e9vH?=
- =?us-ascii?Q?9S3L7GqCMgmQPlG/3XgxRW63mMVrp1ZA+o8hze7d8acr4kTluP3Toyan0CIH?=
- =?us-ascii?Q?G1GWv7vKw3gG0t9mUsU0FBUqTErR0LwveGWeBmkoatU7nbX0UM4oZ9ifjJ1t?=
- =?us-ascii?Q?CJeuaZqJ5/ItT2AEx8z9kFIUcpnQQtNLI/8J5rXROg2DJA8xNIy2AAIw37EG?=
- =?us-ascii?Q?7Sppv0WcKgCtjNuixesWJd1l5lkAvfOhEKWIpRF24S8ubbFZSpcDwkkttYXl?=
- =?us-ascii?Q?jpYS0Hge8YDWTi1/P1vPgmzDhpKEoekg/WCbDEotszvGFa+EneMXmUMoCIhn?=
- =?us-ascii?Q?4kNC9IDucqn4iuGJtsOtAAWQIY8+bmS+LwmcQUf9a7eeMOHRQFJsd1sp3tdZ?=
- =?us-ascii?Q?ZlmJhEKSNgEp1DR6uq9z023ijFgbbVwJ0T9s+WS0aS5nQKVRcUkw9bbonvEN?=
- =?us-ascii?Q?/MM3mJ4gwSPYhxjaZo1XuM/ni2/LpHb0/iyuzQt2+qKcSUVR6/R5Jn0kfDSo?=
- =?us-ascii?Q?/iQdpg73iotuMRkA0jg7vLyNsc9dNTelOB3nSnASeNMM9j3nHu9S/j/mdBmw?=
- =?us-ascii?Q?gHGlk2StTLZUPVbVCQG0U4IeH/Go+ifsTpMTDdqHHrmO2gAHYE7/v6DS1U3e?=
- =?us-ascii?Q?YWCKDctmyLiVEkI2gyRbsAX+hcXvXTu6thW0WyyZ6r4EAoJSTFhyktUUYi2c?=
- =?us-ascii?Q?NfokRVDnm81Cjo0mNn6DHFsvzFYTblBpgFNuffzUTRRXaCGREjrN5fFUWQhE?=
- =?us-ascii?Q?KubamzMk26eDUbnf/Kw+u0SvkHRTrAVoPBD1qVt4Z6B56e+0NsTqvABI1x/8?=
- =?us-ascii?Q?Ydi5kyqh0R+cOpmpLUZbgtVZ8tmXazvbo35BpEQ/Ewnh/ISkgmtQsQhw14Nn?=
- =?us-ascii?Q?GijK1yn9VriRk3Tu5nmb0nEAUGRswuVkQRGI179TVib7ORFzanH3L6da6pnJ?=
- =?us-ascii?Q?ZMJCYGuBnD9UfFDKqAvcq+hgAOhIzWmo6Z7e86mPn/VDd8pmhhwKER2CVMCc?=
- =?us-ascii?Q?DPvgCtURiVzBr0zAWBsXTTLvjVAlxqZjtIjml+KXb2NmJXxSEq78HVszfKzv?=
- =?us-ascii?Q?RlMt2PbQnt9tAs8/tbw=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e020f4bc-2242-4e41-4156-08d9f6f76c8f
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Feb 2022 18:07:58.9412
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: GmAVWC6BLRA3EJEt028YJBmDgnrlnHE8aThiPJ7BzZ41BcfJs9flCwQqriVOKniR
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5725
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <YhZ16cMMcHQIvS9d@google.com>
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 23, 2022 at 12:00:56PM -0600, Bjorn Helgaas wrote:
-
-> >  static int pci_dma_configure(struct device *dev)
-> >  {
-> > +	struct pci_driver *driver = to_pci_driver(dev->driver);
-> >  	struct device *bridge;
-> >  	int ret = 0;
-> >  
-> > +	if (!driver->no_kernel_api_dma) {
+On Wed, Feb 23, 2022 at 05:59:05PM +0000, Sean Christopherson wrote:
+> On Wed, Feb 23, 2022, Nathan Chancellor wrote:
+> > Hi Sean,
+> > 
+> > On Wed, Feb 23, 2022 at 04:23:55PM +0000, Sean Christopherson wrote:
+> > > Cast kvm_x86_ops.func to 'void *' when updating KVM static calls that are
+> > > conditionally patched to __static_call_return0().  clang complains about
+> > > using mismatching pointers in the ternary operator, which breaks the
+> > > build when compiling with CONFIG_KVM_WERROR=y.
+> > > 
+> > >   >> arch/x86/include/asm/kvm-x86-ops.h:82:1: warning: pointer type mismatch
+> > >   ('bool (*)(struct kvm_vcpu *)' and 'void *') [-Wpointer-type-mismatch]
+> > > 
+> > > Fixes: 5be2226f417d ("KVM: x86: allow defining return-0 static calls")
+> > > Reported-by: Like Xu <like.xu.linux@gmail.com>
+> > > Reported-by: kernel test robot <lkp@intel.com>
+> > > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > 
+> > Thank you for the patch! Is this a bug in clang?
 > 
-> Ugh.  Double negative, totally agree this needs a better name that
-> reverses the sense.  Every place you use it, you negate it again.
+> IMO, no.  I think it's completely reasonable for the compiler to complain that KVM
+> is generating two different pointer types out of a ternary operator.
+> 
+> clang is somewhat inconsistent, though it may be deliberate.  clang doesn't complain
+> about implicitly casting a 'void *' to another data type, e.g. this complies clean,
+> where "data" is a 'void *'
+> 
+> 	struct kvm_vcpu *x = vcpu ? : data;
 
-Greg came up with driver_managed_dma which is in the v6 version:
+Right, I would assume this is deliberate. I think warning in this case
+might be quite noisy, as the kernel implicitly converts 'void *' to
+typed pointers for certain function pointer callbacks (although this
+particular case is probably pretty rare).
 
-https://lore.kernel.org/all/20220218005521.172832-5-baolu.lu@linux.intel.com/
+> But changing it to a function on the lhs triggers the warn:
+> 
+> 	typeof(kvm_x86_ops.vcpu_run) x = kvm_x86_ops.vcpu_run ? : data;
+> 
+> Again, complaining in the function pointer case seems reasonable.
 
-Thanks,
-Jason
+Ack, thank you for the clarification and explanation!
+
+Cheers,
+Nathan
