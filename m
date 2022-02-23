@@ -2,62 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F360E4C1C21
-	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 20:25:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DD97E4C1C85
+	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 20:46:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244372AbiBWT0X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Feb 2022 14:26:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42506 "EHLO
+        id S244489AbiBWTrU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Feb 2022 14:47:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45738 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233668AbiBWT0U (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Feb 2022 14:26:20 -0500
-Received: from mga06.intel.com (mga06.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0783546144;
-        Wed, 23 Feb 2022 11:25:51 -0800 (PST)
+        with ESMTP id S244415AbiBWTrS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Feb 2022 14:47:18 -0500
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3694340D8;
+        Wed, 23 Feb 2022 11:46:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1645644352; x=1677180352;
+  t=1645645609; x=1677181609;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=amQaGc1KIsJ13G32G3Xr6iYz+fX7KyuUC+u3T0GfmjI=;
-  b=bE/QBsf1mAu4B1lGxZjwL5R3bUW+5iKW+W/eA+aD1e/UbC68uJ8oRtJf
-   i5y+TqbuYGS9E3G2HDUhi1qAj/gIr0hbiQCp/sVFpVVemz5zV8MGq2ReM
-   71rrBC9puTcIpaCaGetkMJF33YJbiaEpCYXxc3nRpG3GfOcNrHU009c8R
-   oXA/GCzR1NG5lLidVMDp8OVXXUNAg03/7mWgr5lcBDwfoIEzGai1R0A39
-   kgGXoYyOtcFvLR8byiwAPjtQgLCxR6xz88DXAqEyRugbDOqQr1o1tw3eZ
-   0NUx8VzFJglpfJxNmgGLMdXOSnpe4SGrCDxl8X1V/ASysbaDrcNtJq8zl
-   g==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10267"; a="312779112"
+  bh=gA2PEXZwL/NQTTul/+BF1zLlwkEDilbgAxnSaDLm/EA=;
+  b=jIBtrlYpPYa91fMCDOi4GwBOU/HBenV3lpMv1JaBWz4/BtumWP/NltiM
+   0KdUfHxNTly47XVnrmFPrdb9u+hS0SGXF4DZYd+vRdGDaP32w1T7ZJlOW
+   PILZy4aRWehs6Tb5H2C5IVBSsw2eXKGqROPr6IRjCkt11ES5kqEDb6t5l
+   Z9GI7K9R9FxYG/4omVUus5mqoUyMIspDjDBmXVXn32oVm2rV8LeCydwbV
+   7/ckLQ8NTUdhfVofDkoFOXGK5WV6r/CZWv/iG7pqx2ArgUXHYrrJogX+M
+   ZQx94OUuFRkwx8z6XixedWSfEZfsGpyoionYrxQVCHJ5c+oxudJ/dvzFJ
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10267"; a="239460195"
 X-IronPort-AV: E=Sophos;i="5.88,391,1635231600"; 
-   d="scan'208";a="312779112"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Feb 2022 11:25:51 -0800
+   d="scan'208";a="239460195"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Feb 2022 11:46:48 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.88,391,1635231600"; 
-   d="scan'208";a="543437237"
+   d="scan'208";a="684022275"
 Received: from lkp-server01.sh.intel.com (HELO 788b1cd46f0d) ([10.239.97.150])
-  by fmsmga007.fm.intel.com with ESMTP; 23 Feb 2022 11:25:45 -0800
+  by fmsmga001.fm.intel.com with ESMTP; 23 Feb 2022 11:46:45 -0800
 Received: from kbuild by 788b1cd46f0d with local (Exim 4.92)
         (envelope-from <lkp@intel.com>)
-        id 1nMxGi-0001jZ-Cv; Wed, 23 Feb 2022 19:25:44 +0000
-Date:   Thu, 24 Feb 2022 03:25:32 +0800
+        id 1nMxb3-0001l6-6L; Wed, 23 Feb 2022 19:46:45 +0000
+Date:   Thu, 24 Feb 2022 03:46:30 +0800
 From:   kernel test robot <lkp@intel.com>
 To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
 Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org,
         linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
         david@redhat.com, borntraeger@linux.ibm.com
-Subject: Re: [PATCH 6/9] kvm: s390: Add configuration dump functionality
-Message-ID: <202202240358.kEydOdbz-lkp@intel.com>
-References: <20220223092007.3163-7-frankja@linux.ibm.com>
+Subject: Re: [PATCH 7/9] kvm: s390: Add CPU dump functionality
+Message-ID: <202202240337.wksMLgVn-lkp@intel.com>
+References: <20220223092007.3163-8-frankja@linux.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220223092007.3163-7-frankja@linux.ibm.com>
+In-Reply-To: <20220223092007.3163-8-frankja@linux.ibm.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -77,17 +77,17 @@ https://git-scm.com/docs/git-format-patch]
 
 url:    https://github.com/0day-ci/linux/commits/Janosch-Frank/kvm-s390-Add-PV-dump-support/20220223-172213
 base:   https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git next
-config: s390-randconfig-c005-20220223 (https://download.01.org/0day-ci/archive/20220224/202202240358.kEydOdbz-lkp@intel.com/config)
+config: s390-randconfig-r044-20220223 (https://download.01.org/0day-ci/archive/20220224/202202240337.wksMLgVn-lkp@intel.com/config)
 compiler: clang version 15.0.0 (https://github.com/llvm/llvm-project d271fc04d5b97b12e6b797c6067d3c96a8d7470e)
 reproduce (this is a W=1 build):
         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
         chmod +x ~/bin/make.cross
         # install s390 cross compiling tool for clang build
         # apt-get install binutils-s390x-linux-gnu
-        # https://github.com/0day-ci/linux/commit/63a2029ece7e8fee92aa5ad277e2cbd8b13b7e6b
+        # https://github.com/0day-ci/linux/commit/8e5a2c1d95d561cf1530c7a3427a1a367ab67364
         git remote add linux-review https://github.com/0day-ci/linux
         git fetch --no-tags linux-review Janosch-Frank/kvm-s390-Add-PV-dump-support/20220223-172213
-        git checkout 63a2029ece7e8fee92aa5ad277e2cbd8b13b7e6b
+        git checkout 8e5a2c1d95d561cf1530c7a3427a1a367ab67364
         # save the config file to linux build tree
         mkdir build_dir
         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=s390 SHELL=/bin/bash arch/s390/kvm/
@@ -97,7 +97,7 @@ Reported-by: kernel test robot <lkp@intel.com>
 
 All warnings (new ones prefixed by >>):
 
-   In file included from arch/s390/kvm/pv.c:9:
+   In file included from arch/s390/kvm/kvm-s390.c:23:
    In file included from include/linux/kvm_host.h:41:
    In file included from include/linux/kvm_para.h:5:
    In file included from include/uapi/linux/kvm_para.h:37:
@@ -120,7 +120,7 @@ All warnings (new ones prefixed by >>):
    include/uapi/linux/swab.h:102:54: note: expanded from macro '__swab16'
    #define __swab16(x) (__u16)__builtin_bswap16((__u16)(x))
                                                         ^
-   In file included from arch/s390/kvm/pv.c:9:
+   In file included from arch/s390/kvm/kvm-s390.c:23:
    In file included from include/linux/kvm_host.h:41:
    In file included from include/linux/kvm_para.h:5:
    In file included from include/uapi/linux/kvm_para.h:37:
@@ -140,7 +140,7 @@ All warnings (new ones prefixed by >>):
    include/uapi/linux/swab.h:115:54: note: expanded from macro '__swab32'
    #define __swab32(x) (__u32)__builtin_bswap32((__u32)(x))
                                                         ^
-   In file included from arch/s390/kvm/pv.c:9:
+   In file included from arch/s390/kvm/kvm-s390.c:23:
    In file included from include/linux/kvm_host.h:41:
    In file included from include/linux/kvm_para.h:5:
    In file included from include/uapi/linux/kvm_para.h:37:
@@ -178,100 +178,64 @@ All warnings (new ones prefixed by >>):
    include/asm-generic/io.h:652:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
            writesl(PCI_IOBASE + addr, buffer, count);
                    ~~~~~~~~~~ ^
-   arch/s390/kvm/pv.c:369:6: warning: variable 'cc' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
-           if (!buff_kvm)
-               ^~~~~~~~~
-   arch/s390/kvm/pv.c:411:6: note: uninitialized use occurs here
-           if (cc || ret)
-               ^~
-   arch/s390/kvm/pv.c:369:2: note: remove the 'if' if its condition is always false
-           if (!buff_kvm)
-           ^~~~~~~~~~~~~~
-   arch/s390/kvm/pv.c:357:6: warning: variable 'cc' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
-           if (!buff_user_len ||
-               ^~~~~~~~~~~~~~~~~
-   arch/s390/kvm/pv.c:411:6: note: uninitialized use occurs here
-           if (cc || ret)
-               ^~
-   arch/s390/kvm/pv.c:357:2: note: remove the 'if' if its condition is always false
-           if (!buff_user_len ||
-           ^~~~~~~~~~~~~~~~~~~~~
->> arch/s390/kvm/pv.c:357:6: warning: variable 'cc' is used uninitialized whenever '||' condition is true [-Wsometimes-uninitialized]
-           if (!buff_user_len ||
-               ^~~~~~~~~~~~~~
-   arch/s390/kvm/pv.c:411:6: note: uninitialized use occurs here
-           if (cc || ret)
-               ^~
-   arch/s390/kvm/pv.c:357:6: note: remove the '||' if its condition is always false
-           if (!buff_user_len ||
-               ^~~~~~~~~~~~~~~~~
-   arch/s390/kvm/pv.c:348:6: warning: variable 'cc' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
-           if (*gaddr & ~HPAGE_MASK)
-               ^~~~~~~~~~~~~~~~~~~~
-   arch/s390/kvm/pv.c:411:6: note: uninitialized use occurs here
-           if (cc || ret)
-               ^~
-   arch/s390/kvm/pv.c:348:2: note: remove the 'if' if its condition is always false
-           if (*gaddr & ~HPAGE_MASK)
-           ^~~~~~~~~~~~~~~~~~~~~~~~~
-   arch/s390/kvm/pv.c:344:8: note: initialize the variable 'cc' to silence this warning
-           int cc, ret;
-                 ^
-                  = 0
-   16 warnings generated.
+>> arch/s390/kvm/kvm-s390.c:5088:5: warning: no previous prototype for function 'kvm_s390_handle_pv_vcpu_dump' [-Wmissing-prototypes]
+   int kvm_s390_handle_pv_vcpu_dump(struct kvm_vcpu *vcpu, struct kvm_pv_cmd *cmd)
+       ^
+   arch/s390/kvm/kvm-s390.c:5088:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+   int kvm_s390_handle_pv_vcpu_dump(struct kvm_vcpu *vcpu, struct kvm_pv_cmd *cmd)
+   ^
+   static 
+   13 warnings generated.
 
 
-vim +357 arch/s390/kvm/pv.c
+vim +/kvm_s390_handle_pv_vcpu_dump +5088 arch/s390/kvm/kvm-s390.c
 
-   309	
-   310	/*
-   311	 * kvm_s390_pv_dump_stor_state
-   312	 *
-   313	 * @kvm: pointer to the guest's KVM struct
-   314	 * @buff_user: Userspace pointer where we will write the results to
-   315	 * @gaddr: Starting absolute guest address for which the storage state
-   316	 *         is requested. This value will be updated with the last
-   317	 *         address for which data was written when returning to
-   318	 *         userspace.
-   319	 * @buff_user_len: Length of the buff_user buffer
-   320	 * @rc: Pointer to where the uvcb return code is stored
-   321	 * @rrc: Pointer to where the uvcb return reason code is stored
-   322	 *
-   323	 * Return:
-   324	 *  0 on success
-   325	 *  -ENOMEM if allocating the cache fails
-   326	 *  -EINVAL if gaddr is not aligned to 1MB
-   327	 *  -EINVAL if buff_user_len is not aligned to uv_info.conf_dump_storage_state_len
-   328	 *  -EINVAL if the UV call fails, rc and rrc will be set in this case
-   329	 *  -EFAULT if copying the result to buff_user failed
-   330	 */
-   331	int kvm_s390_pv_dump_stor_state(struct kvm *kvm, void __user *buff_user,
-   332					u64 *gaddr, u64 buff_user_len, u16 *rc, u16 *rrc)
-   333	{
-   334		struct uv_cb_dump_stor_state uvcb = {
-   335			.header.cmd = UVC_CMD_DUMP_CONF_STOR_STATE,
-   336			.header.len = sizeof(uvcb),
-   337			.config_handle = kvm->arch.pv.handle,
-   338			.gaddr = *gaddr,
-   339			.dump_area_origin = 0,
-   340		};
-   341		size_t buff_kvm_size;
-   342		size_t size_done = 0;
-   343		u8 *buff_kvm = NULL;
-   344		int cc, ret;
-   345	
-   346		ret = -EINVAL;
-   347		/* UV call processes 1MB guest storage chunks at a time */
-   348		if (*gaddr & ~HPAGE_MASK)
-   349			goto out;
-   350	
-   351		/*
-   352		 * We provide the storage state for 1MB chunks of guest
-   353		 * storage. The buffer will need to be aligned to
-   354		 * conf_dump_storage_state_len so we don't end on a partial
-   355		 * chunk.
-   356		 */
- > 357		if (!buff_user_len ||
+  5087	
+> 5088	int kvm_s390_handle_pv_vcpu_dump(struct kvm_vcpu *vcpu, struct kvm_pv_cmd *cmd)
+  5089	{
+  5090		struct kvm_s390_pv_dmp dmp;
+  5091		void *data;
+  5092		int ret;
+  5093	
+  5094		/* Dump initialization is a prerequisite */
+  5095		if (!vcpu->kvm->arch.pv.dumping)
+  5096			return -EINVAL;
+  5097	
+  5098		if (copy_from_user(&dmp, (__u8 __user *)cmd->data, sizeof(dmp)))
+  5099			return -EFAULT;
+  5100	
+  5101		/* We only handle this subcmd right now */
+  5102		if (dmp.subcmd != KVM_PV_DUMP_CPU)
+  5103			return -EINVAL;
+  5104	
+  5105		/* CPU dump length is the same as create cpu storage donation. */
+  5106		if (dmp.buff_len != uv_info.guest_cpu_stor_len)
+  5107			return -EINVAL;
+  5108	
+  5109		data = vzalloc(uv_info.guest_cpu_stor_len);
+  5110		if (!data)
+  5111			return -ENOMEM;
+  5112	
+  5113		ret = kvm_s390_pv_dump_cpu(vcpu, data, &cmd->rc, &cmd->rrc);
+  5114	
+  5115		VCPU_EVENT(vcpu, 3, "PROTVIRT DUMP CPU %d rc %x rrc %x",
+  5116			   vcpu->vcpu_id, cmd->rc, cmd->rrc);
+  5117	
+  5118		if (ret) {
+  5119			vfree(data);
+  5120			return -EINVAL;
+  5121		}
+  5122	
+  5123		/* On success copy over the dump data */
+  5124		if (copy_to_user((__u8 __user *)dmp.buff_addr, data, uv_info.guest_cpu_stor_len)) {
+  5125			vfree(data);
+  5126			return -EFAULT;
+  5127		}
+  5128	
+  5129		vfree(data);
+  5130		return 0;
+  5131	}
+  5132	
 
 ---
 0-DAY CI Kernel Test Service, Intel Corporation
