@@ -2,144 +2,208 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 902644C1057
-	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 11:34:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B12CF4C1147
+	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 12:30:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239598AbiBWKfW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Feb 2022 05:35:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45924 "EHLO
+        id S239874AbiBWLbK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Feb 2022 06:31:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42346 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233965AbiBWKfV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Feb 2022 05:35:21 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3E5F692A7
-        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 02:34:53 -0800 (PST)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21N8FwAG025097
-        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 10:34:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=cxmMYJYFVhk4IHnneokE4nkJ1kIT3KikGrN/d/RihM4=;
- b=iN3eknnzVONjNPjlUvqxjKLLAo70ljuFKptCtbrvMzQr4wN7xnLwpyy14ryKDhYagq9a
- ikpea3bkTfZ0/JRcAOdq2l1HVLRJU3cKtpn0t7DlCjjkSrhRSQhKKvavXA0WTbDbcC7O
- Rud1JkodmkVB+gQ1hDc3eYaSHVsebEiuyvAzjMebB3SJpvcqYR14kUKD/W0bNtrokMJh
- AhQ3sDN+lDcAu+BgNtIVGqbbpmBJGO/yJWqOlx7Fyd3lTh+exIIopY5Q9hel7XcPGbnh
- N9BB3fl34JJa+kq0o52kpH/sFMbU6J6ap4XIIStlU7bPmymKr7RXW31a64qxM84tnEvK oA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3edh8xjg75-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 10:34:52 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21NAYqpT010364
-        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 10:34:52 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3edh8xjg6r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Feb 2022 10:34:52 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21NAX4B9014733;
-        Wed, 23 Feb 2022 10:34:50 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma01fra.de.ibm.com with ESMTP id 3ear697k83-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Feb 2022 10:34:50 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21NAYl2w45416938
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 23 Feb 2022 10:34:47 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4CA6DA406F;
-        Wed, 23 Feb 2022 10:34:47 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0B8C4A4071;
-        Wed, 23 Feb 2022 10:34:47 +0000 (GMT)
-Received: from t46lp57.lnxne.boe (unknown [9.152.108.100])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 23 Feb 2022 10:34:46 +0000 (GMT)
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com,
-        drjones@redhat.com, pbonzini@redhat.com
-Subject: [kvm-unit-tests RFC PATCH 1/1] scripts/runtime: add test result to log and TAP output
-Date:   Wed, 23 Feb 2022 11:34:46 +0100
-Message-Id: <20220223103446.2681293-2-nrb@linux.ibm.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20220223103446.2681293-1-nrb@linux.ibm.com>
-References: <20220223103446.2681293-1-nrb@linux.ibm.com>
+        with ESMTP id S239846AbiBWLbI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Feb 2022 06:31:08 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 405BA90268
+        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 03:30:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645615840;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=gE7c+TJZwdJ+gVzSVPXnxEm5PYurvMoN/2kz7QXDHUQ=;
+        b=PJ3L2ZFl6cYyRqfmfQFcuH7AlEGndm2dCKPcIcipp+DLqTIppouT3CuwYutp8t4AVZxG46
+        M2le/z5HYOI8dxREYvSg8Dcj45HjOtT2o8D5fbjV8En2yagOTcCL32nkG1yjkuOqdp2CfT
+        QAj0Vh1BYAvp1QUkmUW/iFoflfANeyI=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-547-986Dce37PLGvxVJpnbAEPA-1; Wed, 23 Feb 2022 06:30:39 -0500
+X-MC-Unique: 986Dce37PLGvxVJpnbAEPA-1
+Received: by mail-wr1-f70.google.com with SMTP id j27-20020adfb31b000000b001ea8356972bso2377431wrd.1
+        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 03:30:38 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=gE7c+TJZwdJ+gVzSVPXnxEm5PYurvMoN/2kz7QXDHUQ=;
+        b=6FpJn+ifonIP/cTSbPZ9pPNdK1gTeFT1oKNUapf8Y1/qhikqoL38N4pbKzMQhCs/q5
+         8CCju02xa6g0+3I35R2kFa7irESiGDRjGJLRa2Ob1AddDJ1loOp1R0SPpDi45Y95Rw0L
+         IKcRlYQtTLTKJbTu03Wg39M8XleQwhS+zblbbmIzxjuAg/KxqTUIAMygBY3+7Lhv+iWA
+         /kJ9ZsCzqjTo+JH/at9QSCxie/7VIuT4QhEfd1Uv5OzNsqaqls5261kY4XYHd7GPF6yb
+         aojYqGWbPQ2PS+cn1hX+m82hy8BDR3rFXaMf+Tg785wss/8eZUGtUHdfqSBqDCZMSvi5
+         rx4Q==
+X-Gm-Message-State: AOAM530hIhKvOeEiA/3hikgAsZ1zBr4j/intF1fOFAPQnlWWcm8I7fVu
+        yXuCTecUBLYNSHvLnEsnxpJaX4QuUCQq7MOnQBKCu328FedITEJu0pcZF9HCYPTBsreNpG7W546
+        12LRnM9QljKrN
+X-Received: by 2002:a05:6000:1d99:b0:1ed:bc55:34ad with SMTP id bk25-20020a0560001d9900b001edbc5534admr920990wrb.427.1645615837922;
+        Wed, 23 Feb 2022 03:30:37 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyszBOWYlHNQwLxhXHNusl4BU8vLtOvldGHIca7YPyki7EvMfBkXxUePbm2YmXVo7pCzEFZHg==
+X-Received: by 2002:a05:6000:1d99:b0:1ed:bc55:34ad with SMTP id bk25-20020a0560001d9900b001edbc5534admr920975wrb.427.1645615837592;
+        Wed, 23 Feb 2022 03:30:37 -0800 (PST)
+Received: from [10.33.192.232] (nat-pool-str-t.redhat.com. [149.14.88.106])
+        by smtp.gmail.com with ESMTPSA id t1sm67945067wre.45.2022.02.23.03.30.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 23 Feb 2022 03:30:37 -0800 (PST)
+Message-ID: <b2fd362a-eefa-8fa7-1016-55bedd3fa6ee@redhat.com>
+Date:   Wed, 23 Feb 2022 12:30:36 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: Ja6ltMd9QIgrcEuYNJG29qU93z7SjEzO
-X-Proofpoint-GUID: gwSh7kimgrDLCjisQSggcuOlx9N48cbg
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-02-23_03,2022-02-23_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- spamscore=0 clxscore=1015 suspectscore=0 phishscore=0 mlxlogscore=999
- adultscore=0 mlxscore=0 impostorscore=0 lowpriorityscore=0 malwarescore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2202230058
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH 3/9] KVM: s390: pv: Add query interface
+Content-Language: en-US
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        david@redhat.com, borntraeger@linux.ibm.com
+References: <20220223092007.3163-1-frankja@linux.ibm.com>
+ <20220223092007.3163-4-frankja@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <20220223092007.3163-4-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Currently, when a test exits prematurely for whatever reason (crash, guest
-exception, ...) the test is correctly reported as FAIL by run_tests.sh - even
-when all report()s up to that point passed.
+On 23/02/2022 10.20, Janosch Frank wrote:
+> Some of the query information is already available via sysfs but
+> having a IOCTL makes the information easier to retrieve.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>   arch/s390/kvm/kvm-s390.c | 47 ++++++++++++++++++++++++++++++++++++++++
+>   include/uapi/linux/kvm.h | 23 ++++++++++++++++++++
+>   2 files changed, 70 insertions(+)
+> 
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index faa85397b6fb..837f898ad2ff 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -2217,6 +2217,34 @@ static int kvm_s390_cpus_to_pv(struct kvm *kvm, u16 *rc, u16 *rrc)
+>   	return r;
+>   }
+>   
+> +static int kvm_s390_handle_pv_info(struct kvm_s390_pv_info *info)
+> +{
+> +	u32 len;
+> +
+> +	switch (info->header.id) {
+> +	case KVM_PV_INFO_VM: {
+> +		len =  sizeof(info->header) + sizeof(info->vm);
+> +
+> +		if (info->header.len < len)
+> +			return -EINVAL;
+> +
+> +		memcpy(info->vm.inst_calls_list,
+> +		       uv_info.inst_calls_list,
+> +		       sizeof(uv_info.inst_calls_list));
+> +
+> +		/* It's max cpuidm not max cpus so it's off by one */
+> +		info->vm.max_cpus = uv_info.max_guest_cpu_id + 1;
+> +		info->vm.max_guests = uv_info.max_num_sec_conf;
+> +		info->vm.max_guest_addr = uv_info.max_sec_stor_addr;
+> +		info->vm.feature_indication = uv_info.uv_feature_indications;
+> +
+> +		return 0;
+> +	}
+> +	default:
+> +		return -EINVAL;
+> +	}
+> +}
+> +
+>   static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
+>   {
+>   	int r = 0;
+> @@ -2353,6 +2381,25 @@ static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
+>   			     cmd->rc, cmd->rrc);
+>   		break;
+>   	}
+> +	case KVM_PV_INFO: {
+> +		struct kvm_s390_pv_info info = {};
+> +
+> +		if (copy_from_user(&info, argp, sizeof(info.header)))
+> +			return -EFAULT;
+> +
+> +		if (info.header.len < sizeof(info.header))
+> +			return -EINVAL;
+> +
+> +		r = kvm_s390_handle_pv_info(&info);
+> +		if (r)
+> +			return r;
+> +
+> +		r = copy_to_user(argp, &info, sizeof(info));
 
-The failure is reported by print_result which checks (among others) the exit
-code of the arch-specific run script.
+sizeof(info) is currently OK ... but this might break if somebody later 
+extends the kvm_s390_pv_info struct, I guess? ==> Maybe also better use 
+sizeof(info->header) + sizeof(info->vm) here, too? Or let 
+kvm_s390_handle_pv_info() return the amount of bytes that should be copied here?
 
-But, as soon as one enables the TAP output in run_tests.sh, there is no way to
-see that any more, as the print_result is discarded and only the run script's
-output is converted to TAP.
+  Thomas
 
-External test runners relying on TAP output will thus believe everything is
-fine even though we got a crash.
 
-The same also applies to the logfiles.
-
-As a simple fix, have print_result also print to RUNTIME_log_stderr.  For each
-test, we will then get an additional test line in the TAP which reports the
-test's result:
-
-  not ok 36 - css: (35 tests, 2 unexpected failures)
-
-The log files will also contain the result:
-
-  FAIL: (35 tests, 2 unexpected failures)
-
-This makes it easy to see whether we had a premature exit in the test. The
-disadvantage being the number of test lines in the TAP will no longer match the
-number of report()s in a test.
-
-Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
----
- scripts/runtime.bash | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-index 6d5fced94246..7bb70d50012a 100644
---- a/scripts/runtime.bash
-+++ b/scripts/runtime.bash
-@@ -60,8 +60,10 @@ function print_result()
- 
-     if [ -z "$reason" ]; then
-         echo "`$status` $testname $summary"
-+        RUNTIME_log_stderr "$testname" <<< "$status: $summary"
-     else
-         echo "`$status` $testname ($reason)"
-+        RUNTIME_log_stderr "$testname" <<< "$status: $reason"
-     fi
- }
- 
--- 
-2.31.1
+> +		if (r)
+> +			return -EFAULT;
+> +		return 0;
+> +	}
+>   	default:
+>   		r = -ENOTTY;
+>   	}
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index dbc550bbd9fa..96fceb204a92 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1642,6 +1642,28 @@ struct kvm_s390_pv_unp {
+>   	__u64 tweak;
+>   };
+>   
+> +enum pv_cmd_info_id {
+> +	KVM_PV_INFO_VM,
+> +};
+> +
+> +struct kvm_s390_pv_info_vm {
+> +	__u64 inst_calls_list[4];
+> +	__u64 max_cpus;
+> +	__u64 max_guests;
+> +	__u64 max_guest_addr;
+> +	__u64 feature_indication;
+> +};
+> +
+> +struct kvm_s390_pv_info_header {
+> +	__u32 id;
+> +	__u32 len;
+> +};
+> +
+> +struct kvm_s390_pv_info {
+> +	struct kvm_s390_pv_info_header header;
+> +	struct kvm_s390_pv_info_vm vm;
+> +};
+> +
+>   enum pv_cmd_id {
+>   	KVM_PV_ENABLE,
+>   	KVM_PV_DISABLE,
+> @@ -1650,6 +1672,7 @@ enum pv_cmd_id {
+>   	KVM_PV_VERIFY,
+>   	KVM_PV_PREP_RESET,
+>   	KVM_PV_UNSHARE_ALL,
+> +	KVM_PV_INFO,
+>   };
+>   
+>   struct kvm_pv_cmd {
 
