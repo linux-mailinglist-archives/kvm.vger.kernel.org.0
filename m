@@ -2,119 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2FA6F4C18A6
-	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 17:34:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D9E34C18CD
+	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 17:36:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242815AbiBWQfS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Feb 2022 11:35:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45334 "EHLO
+        id S242913AbiBWQhQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Feb 2022 11:37:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241813AbiBWQfQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Feb 2022 11:35:16 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 41C3A50E3A
-        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 08:34:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645634087;
+        with ESMTP id S239792AbiBWQhO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Feb 2022 11:37:14 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C1603D48B;
+        Wed, 23 Feb 2022 08:36:46 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 1168AB81EB0;
+        Wed, 23 Feb 2022 16:36:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D506C340F0;
+        Wed, 23 Feb 2022 16:36:43 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="dBbUnj8Q"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1645634199;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=nQ3OobjVOllFjF//341g+8FVMNuOOL65pOBy6n0VyaU=;
-        b=Ejj2iU4cZ/2qtJPBUiHrCiWJ7Qm1ARp14iPAWckKRRG7uYyZ1RsXc6U3UlHe5mVi0wsEkm
-        HmoivDhmm5y8UcYHjfUi/sS6Po1SYvd3KFL82ZaOx2ibrYGsYld9k6nvNhpHuQkRe6FPk9
-        agdZKBpV80/o9Oohwkz8DCssXw99BQo=
-Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
- [209.85.210.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-62-yUu-HzZdM1iXnXSJCXP3iw-1; Wed, 23 Feb 2022 11:34:46 -0500
-X-MC-Unique: yUu-HzZdM1iXnXSJCXP3iw-1
-Received: by mail-ot1-f70.google.com with SMTP id d3-20020a9d4f03000000b005af2a6014f7so6948802otl.23
-        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 08:34:45 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=nQ3OobjVOllFjF//341g+8FVMNuOOL65pOBy6n0VyaU=;
-        b=15BpTXtP+ufLJjR2wdYPtVxCdZpgabNF8rXdm2zSVH5p+2zKU7E9Ty4Kr8pnQ/GfD6
-         MFRnL1JynKQKtp/Iq3JlKf8trlqPv9gWUy/n+EG8QwUE5sVdwchjWiq2LUxHL3aK9x+b
-         HT0EsmsQ6vVwql9Q3gko3YQiawmMWzFMitzVn05sEwQ+NRuMUYO54UapEf3qZqv/sGiE
-         fbdGjosN8F6of0e6KeBOpISSl2SHkau93Qbkw5fRucBNC18axve84YsVgJY33Wq3cMge
-         kQe5TMkbJQA3GuJKi0nX1IraQLdepaSckLIVfFunRB2YLuAK9eXEt9KJp7CCWerpVh2M
-         3rkQ==
-X-Gm-Message-State: AOAM532O/KOBNyWSCyC2SYl4pDafbQkdCAD3WjLycY60gHzspqIhN/Ui
-        XmKTHGaASYGNexIziQSjJhGRWqklqbixahd/ftwpTqp1XkSvosWqdQkQ1nOyVZXo+NfvuB9iOGT
-        sXRFIE2vsUHxj
-X-Received: by 2002:a54:4085:0:b0:2d4:6f0b:f3b7 with SMTP id i5-20020a544085000000b002d46f0bf3b7mr258688oii.148.1645634085370;
-        Wed, 23 Feb 2022 08:34:45 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxaP/1ZvmMsLm7zZq6HfYZWjNtio48LTCUjFpR9oZZdGxGMhkpLSdC41ujeIjXVdKBnwi0P6A==
-X-Received: by 2002:a54:4085:0:b0:2d4:6f0b:f3b7 with SMTP id i5-20020a544085000000b002d46f0bf3b7mr258680oii.148.1645634085157;
-        Wed, 23 Feb 2022 08:34:45 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id s9sm55235otg.6.2022.02.23.08.34.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Feb 2022 08:34:44 -0800 (PST)
-Date:   Wed, 23 Feb 2022 09:34:43 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, cohuck@redhat.com,
-        mgurtovoy@nvidia.com, yishaih@nvidia.com, linuxarm@huawei.com,
-        liulongfang@huawei.com, prime.zeng@hisilicon.com,
-        jonathan.cameron@huawei.com, wangzhou1@hisilicon.com
-Subject: Re: [PATCH v5 7/8] hisi_acc_vfio_pci: Add support for VFIO live
- migration
-Message-ID: <20220223093443.367ee531.alex.williamson@redhat.com>
-In-Reply-To: <20220223005251.GJ10061@nvidia.com>
-References: <20220221114043.2030-1-shameerali.kolothum.thodi@huawei.com>
-        <20220221114043.2030-8-shameerali.kolothum.thodi@huawei.com>
-        <20220223005251.GJ10061@nvidia.com>
-Organization: Red Hat
+        bh=bHA9wsYJ+CM1DPnmNfQ6U6t4ARYsrAUZwd944SZ1sxQ=;
+        b=dBbUnj8Ql1rn7FAM9tUx7QOeccnJ0Z+J90QA2NRMB22oXGOrYQ4THPe1b9gNNNzuDc2Rbg
+        WFKaEvpmre/V326ePYzLARj899oTaO940Lp4D0jow0owG2+cfPO43/K8JgfsXjhbfX6w3C
+        pTSz8qk0fkkwt5cQUp8mR9mxmGFUdSM=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 12a21bdc (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Wed, 23 Feb 2022 16:36:39 +0000 (UTC)
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-2d07ae0b1c4so217495627b3.11;
+        Wed, 23 Feb 2022 08:36:36 -0800 (PST)
+X-Gm-Message-State: AOAM531ZzDp8T9MDua0yyllGNbHUpN0ZeGck1o7sIP1h4pYFj2M9G5Mx
+        sWaLNfG8d1sE/I1Oz64kjt2fk4WE/OsZ6f/VtJQ=
+X-Google-Smtp-Source: ABdhPJxStncU0YhKj17fIfB92poX/i/hhH2go/+XupHLqAIG9vQtznWxOa4DHx+xY4+pyQBawqCM+CsOCCrLmtJDEw8=
+X-Received: by 2002:a81:184c:0:b0:2d7:607f:4b00 with SMTP id
+ 73-20020a81184c000000b002d7607f4b00mr423650ywy.499.1645634196037; Wed, 23 Feb
+ 2022 08:36:36 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+References: <20220223131231.403386-1-Jason@zx2c4.com> <20220223131231.403386-3-Jason@zx2c4.com>
+In-Reply-To: <20220223131231.403386-3-Jason@zx2c4.com>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Wed, 23 Feb 2022 17:36:25 +0100
+X-Gmail-Original-Message-ID: <CAHmME9oWUJr3fYKFOy=aRdd0uE8H8ke9o+KXde0zAnAwnWUPMA@mail.gmail.com>
+Message-ID: <CAHmME9oWUJr3fYKFOy=aRdd0uE8H8ke9o+KXde0zAnAwnWUPMA@mail.gmail.com>
+Subject: Re: [PATCH RFC v1 2/2] drivers/virt: add vmgenid driver for
+ reinitializing RNG
+To:     "K . Y . Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+        linux-hyperv@vger.kernel.org
+Cc:     "Woodhouse, David" <dwmw@amazon.co.uk>,
+        "Catangiu, Adrian Costin" <acatan@amazon.com>, graf@amazon.com,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        "Singh, Balbir" <sblbir@amazon.com>,
+        "Weiss, Radu" <raduweis@amazon.com>, Jann Horn <jannh@google.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Theodore Ts'o" <tytso@mit.edu>,
+        Igor Mammedov <imammedo@redhat.com>, ehabkost@redhat.com,
+        KVM list <kvm@vger.kernel.org>, adrian@parity.io,
+        ben@skyportsystems.com, "Michael S. Tsirkin" <mst@redhat.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        lersek@redhat.com, linux-s390@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        QEMU Developers <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-6.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 22 Feb 2022 20:52:51 -0400
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+Adding the Hyper-V people to this:
 
-> On Mon, Feb 21, 2022 at 11:40:42AM +0000, Shameer Kolothum wrote:
-> 
-> > +	/*
-> > +	 * ACC VF dev BAR2 region consists of both functional register space
-> > +	 * and migration control register space. For migration to work, we
-> > +	 * need access to both. Hence, we map the entire BAR2 region here.
-> > +	 * But from a security point of view, we restrict access to the
-> > +	 * migration control space from Guest(Please see mmap/ioctl/read/write
-> > +	 * override functions).
-> > +	 *
-> > +	 * Also the HiSilicon ACC VF devices supported by this driver on
-> > +	 * HiSilicon hardware platforms are integrated end point devices
-> > +	 * and has no capability to perform PCIe P2P.  
-> 
-> If that is the case why not implement the RUNNING_P2P as well as a
-> NOP?
-> 
-> Alex expressed concerned about proliferation of non-P2P devices as it
-> complicates qemu to support mixes
+On Wed, Feb 23, 2022 at 2:13 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+>
+> VM Generation ID is a feature from Microsoft, described at
+> <https://go.microsoft.com/fwlink/?LinkId=260709>, and supported by
+> Hyper-V and QEMU. Its usage is described in Microsoft's RNG whitepaper,
+> <https://aka.ms/win10rng>, as:
+>
+>     If the OS is running in a VM, there is a problem that most
+>     hypervisors can snapshot the state of the machine and later rewind
+>     the VM state to the saved state. This results in the machine running
+>     a second time with the exact same RNG state, which leads to serious
+>     security problems.  To reduce the window of vulnerability, Windows
+>     10 on a Hyper-V VM will detect when the VM state is reset, retrieve
+>     a unique (not random) value from the hypervisor, and reseed the root
+>     RNG with that unique value.  This does not eliminate the
+>     vulnerability, but it greatly reduces the time during which the RNG
+>     system will produce the same outputs as it did during a previous
+>     instantiation of the same VM state.
+>
+> Linux has the same issue, and given that vmgenid is supported already by
+> multiple hypervisors, we can implement more or less the same solution.
+> So this commit wires up the vmgenid ACPI notification to the RNG's newly
+> added add_vmfork_randomness() function.
+>
+> This driver builds on prior work from Adrian Catangiu at Amazon, and it
+> is my hope that that team can resume maintenance of this driver.
 
-I read the above as more of a statement about isolation, ie. grouping.
-Given that all DMA from the device is translated by the IOMMU, how is
-it possible that a device can entirely lack p2p support, or even know
-that the target address post-translation is to a peer device rather
-than system memory.  If this is the case, it sounds like a restriction
-of the SMMU not supporting translations that reflect back to the I/O
-bus rather than a feature of the device itself.  Thanks,
+If any of you have some experience with the Hyper-V side of this
+protocol, could you take a look at this and see if it matches the way
+this is supposed to work? It appears to work fine with QEMU's
+behavior, at least, but I know Hyper-V has a lot of additional
+complexities.
 
-Alex
-
+Thanks,
+Jason
