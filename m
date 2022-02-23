@@ -2,32 +2,34 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C1D64C1362
+	by mail.lfdr.de (Postfix) with ESMTP id 773714C1363
 	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 13:58:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240703AbiBWM5t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Feb 2022 07:57:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51906 "EHLO
+        id S240705AbiBWM5u (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Feb 2022 07:57:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51904 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240684AbiBWM5o (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S240685AbiBWM5o (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 23 Feb 2022 07:57:44 -0500
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 398B0B850
-        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 04:57:14 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2D2E8DEC3
+        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 04:57:16 -0800 (PST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5C22EED1;
-        Wed, 23 Feb 2022 04:57:14 -0800 (PST)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EE825139F;
+        Wed, 23 Feb 2022 04:57:15 -0800 (PST)
 Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 08E283F70D;
-        Wed, 23 Feb 2022 04:57:12 -0800 (PST)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9DA8E3F70D;
+        Wed, 23 Feb 2022 04:57:14 -0800 (PST)
 From:   Alexandru Elisei <alexandru.elisei@arm.com>
 To:     pbonzini@redhat.com, thuth@redhat.com, drjones@redhat.com,
         varad.gautam@suse.com, zixuanwang@google.com, kvm@vger.kernel.org,
         kvmarm@lists.cs.columbia.edu
-Subject: [kvm-unit-tests PATCH v2 0/3] configure changes and rename --target-efi
-Date:   Wed, 23 Feb 2022 12:55:34 +0000
-Message-Id: <20220223125537.41529-1-alexandru.elisei@arm.com>
+Subject: [kvm-unit-tests PATCH v2 1/3] configure: Fix whitespaces for the --gen-se-header help text
+Date:   Wed, 23 Feb 2022 12:55:35 +0000
+Message-Id: <20220223125537.41529-2-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.35.1
+In-Reply-To: <20220223125537.41529-1-alexandru.elisei@arm.com>
+References: <20220223125537.41529-1-alexandru.elisei@arm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
@@ -39,41 +41,37 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The first two patches are fixes for stuff I found while working on patch
-#3.
+Replace some of the tabs with spaces to display the help text for the
+--gen-se-header option like this:
 
-Patch #3 ("Rename --target-efi to --[enable|disable]-efi") is where the
-configure option --target-efi gets renamed.
+    --gen-se-header=GEN_SE_HEADER
+                           Provide an executable to generate a PV header
+                           requires --host-key-document. (s390x-snippets only)
 
-Changes in v2:
+instead of:
 
-* Dropped what was patch #3, which made arm/arm64 configure option
-  --target available to all architectures.
+    --gen-se-header=GEN_SE_HEADER
+                           Provide an executable to generate a PV header
+   requires --host-key-document. (s390x-snippets only)
 
-* Renamed --target-efi to --[enable|disable]-efi instead of --efi-payload.
+Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+---
+ configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Alexandru Elisei (3):
-  configure: Fix whitespaces for the --gen-se-header help text
-  configure: Restrict --target-efi to x86_64
-  Rename --target-efi to --[enable|disable]-efi
-
- Makefile             | 10 +++-------
- configure            | 22 +++++++++++++++-------
- lib/x86/acpi.c       |  4 ++--
- lib/x86/amd_sev.h    |  4 ++--
- lib/x86/asm/page.h   |  8 ++++----
- lib/x86/asm/setup.h  |  4 ++--
- lib/x86/setup.c      |  4 ++--
- lib/x86/vm.c         | 12 ++++++------
- scripts/runtime.bash |  4 ++--
- x86/Makefile.common  |  6 +++---
- x86/Makefile.x86_64  |  6 +++---
- x86/access_test.c    |  2 +-
- x86/efi/README.md    |  2 +-
- x86/efi/run          |  2 +-
- x86/run              |  4 ++--
- 15 files changed, 49 insertions(+), 45 deletions(-)
-
+diff --git a/configure b/configure
+index 2d9c3e051103..0ac9c85502ff 100755
+--- a/configure
++++ b/configure
+@@ -58,7 +58,7 @@ usage() {
+ 	                           a PVM image with 'genprotimg' (s390x only)
+ 	    --gen-se-header=GEN_SE_HEADER
+ 	                           Provide an executable to generate a PV header
+-				   requires --host-key-document. (s390x-snippets only)
++	                           requires --host-key-document. (s390x-snippets only)
+ 	    --page-size=PAGE_SIZE
+ 	                           Specify the page size (translation granule) (4k, 16k or
+ 	                           64k, default is 64k, arm64 only)
 -- 
 2.35.1
 
