@@ -2,138 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C60EB4C11E5
-	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 12:50:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AABD24C11FB
+	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 12:55:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240139AbiBWLug (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Feb 2022 06:50:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52578 "EHLO
+        id S240187AbiBWLz4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Feb 2022 06:55:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56830 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240101AbiBWLua (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Feb 2022 06:50:30 -0500
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E30FA1AF0E;
-        Wed, 23 Feb 2022 03:50:02 -0800 (PST)
+        with ESMTP id S233405AbiBWLzz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Feb 2022 06:55:55 -0500
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E53B985A7;
+        Wed, 23 Feb 2022 03:55:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1645617002; x=1677153002;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
+  t=1645617328; x=1677153328;
+  h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=h059MTs1GCpelszK6wn0Y7AYm7QzLTn2WIrQltgpYTY=;
-  b=nRRHW7f03jxQyNdvkoUZh5f8aLof2IJfkPM3Gi1QJoyN2RDvBK/HO2Qj
-   vVuK3qlBD5KhKq4NfK9bwruNXAohTAfX4eWqfz/ko1TTVt0bjobwaVx+K
-   hDmJYTV2qO0aB5hZLX9nASNJO/0yHrnluqRNLmrUITUewsktX3ncG9XHG
-   Koj2TPTskERaZTku8Yc9Ry31LMmUMpCaGNlUDqjHIL9+hEqEl9pJ9J3OS
-   eplZZIdYBIciiHLrpYBmC4sYjpvRwcNHw8Fuv40a+4RTA3pFD0pDoeRF5
-   oWAhpvP41unbXK3PwmVqRUBldnphL2sXAvfmPh/ZvfzwlXixxdQqHJWwh
-   w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10266"; a="239335570"
+  bh=+1Bvis2CoK18o2+hcc1CoTOk4DpVvvkAux/lXlSU73s=;
+  b=C7PRhKhK1zTjECozRERSHMtlRvggiq499Mo6MdQsbTLQwtrqT7SDq92j
+   9ypDV5kcTiC3qutUIckN2IwB9+KMV1WN8Iwd+4NayddnU/UFq7CFYRCGV
+   pFg5WJOy5a3ZwY1Ooy3TrPUc0onJKbE0lnGjCDVJ+ZjWiH0aU8UdFeuiF
+   VU2w4p/QaUbpmjhlzeg+L9DATI/G1aiYc5r8bCNlcKeR8gia/KjmXsaGc
+   BSR6SiHEBn7Ezw5nOT5xm96EfOBxugu24/mDfXbpyWPrgRVMgDmWMjhzZ
+   UKWNoVD73mzwiBdviFCpj2DrZg+DmhBmpaVYHOXeRPyDzX1MMmmY/YO7X
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10266"; a="251865460"
 X-IronPort-AV: E=Sophos;i="5.88,390,1635231600"; 
-   d="scan'208";a="239335570"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Feb 2022 03:50:02 -0800
+   d="scan'208";a="251865460"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Feb 2022 03:55:28 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.88,390,1635231600"; 
-   d="scan'208";a="532650031"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.101])
-  by orsmga007.jf.intel.com with ESMTP; 23 Feb 2022 03:49:55 -0800
-Date:   Wed, 23 Feb 2022 19:49:35 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     Andy Lutomirski <luto@kernel.org>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        qemu-devel@nongnu.org, Linux API <linux-api@vger.kernel.org>,
+   d="scan'208";a="573791285"
+Received: from black.fi.intel.com ([10.237.72.28])
+  by orsmga001.jf.intel.com with ESMTP; 23 Feb 2022 03:55:23 -0800
+Received: by black.fi.intel.com (Postfix, from userid 1000)
+        id 06350142; Wed, 23 Feb 2022 13:55:39 +0200 (EET)
+Date:   Wed, 23 Feb 2022 14:55:39 +0300
+From:   "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
         Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        "Nakajima, Jun" <jun.nakajima@intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Andi Kleen <ak@linux.intel.com>,
-        David Hildenbrand <david@redhat.com>,
-        Steven Price <steven.price@arm.com>
-Subject: Re: [PATCH v4 01/12] mm/shmem: Introduce F_SEAL_INACCESSIBLE
-Message-ID: <20220223114935.GA53733@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <20220118132121.31388-1-chao.p.peng@linux.intel.com>
- <20220118132121.31388-2-chao.p.peng@linux.intel.com>
- <619547ad-de96-1be9-036b-a7b4e99b09a6@kernel.org>
- <20220217130631.GB32679@chaop.bj.intel.com>
- <2ca78dcb-61d9-4c9d-baa9-955b6f4298bb@www.fastmail.com>
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        David Rientjes <rientjes@google.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Andi Kleen <ak@linux.intel.com>
+Subject: Re: [PATCH] x86/mm/cpa: Generalize __set_memory_enc_pgtable()
+Message-ID: <20220223115539.pqk7624xku2qwhlu@black.fi.intel.com>
+References: <20220222185740.26228-1-kirill.shutemov@linux.intel.com>
+ <20220223043528.2093214-1-brijesh.singh@amd.com>
+ <YhYbLDTFLIksB/qp@zn.tnic>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2ca78dcb-61d9-4c9d-baa9-955b6f4298bb@www.fastmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <YhYbLDTFLIksB/qp@zn.tnic>
 X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 17, 2022 at 11:09:35AM -0800, Andy Lutomirski wrote:
-> On Thu, Feb 17, 2022, at 5:06 AM, Chao Peng wrote:
-> > On Fri, Feb 11, 2022 at 03:33:35PM -0800, Andy Lutomirski wrote:
-> >> On 1/18/22 05:21, Chao Peng wrote:
-> >> > From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-> >> > 
-> >> > Introduce a new seal F_SEAL_INACCESSIBLE indicating the content of
-> >> > the file is inaccessible from userspace through ordinary MMU access
-> >> > (e.g., read/write/mmap). However, the file content can be accessed
-> >> > via a different mechanism (e.g. KVM MMU) indirectly.
-> >> > 
-> >> > It provides semantics required for KVM guest private memory support
-> >> > that a file descriptor with this seal set is going to be used as the
-> >> > source of guest memory in confidential computing environments such
-> >> > as Intel TDX/AMD SEV but may not be accessible from host userspace.
-> >> > 
-> >> > At this time only shmem implements this seal.
-> >> > 
-> >> 
-> >> I don't dislike this *that* much, but I do dislike this. F_SEAL_INACCESSIBLE
-> >> essentially transmutes a memfd into a different type of object.  While this
-> >> can apparently be done successfully and without races (as in this code),
-> >> it's at least awkward.  I think that either creating a special inaccessible
-> >> memfd should be a single operation that create the correct type of object or
-> >> there should be a clear justification for why it's a two-step process.
-> >
-> > Now one justification maybe from Stever's comment to patch-00: for ARM
-> > usage it can be used with creating a normal memfd, (partially)populate
-> > it with initial guest memory content (e.g. firmware), and then
-> > F_SEAL_INACCESSIBLE it just before the first time lunch of the guest in
-> > KVM (definitely the current code needs to be changed to support that).
-> 
-> Except we don't allow F_SEAL_INACCESSIBLE on a non-empty file, right?  So this won't work.
+On Wed, Feb 23, 2022 at 12:31:56PM +0100, Borislav Petkov wrote:
+> @@ -2024,11 +2026,9 @@ static int __set_memory_enc_pgtable(unsigned long addr, int numpages, bool enc)
+>  	 */
+>  	cpa_flush(&cpa, 0);
+>  
+> -	/*
+> -	 * Notify hypervisor that a given memory range is mapped encrypted
+> -	 * or decrypted.
+> -	 */
+> -	notify_range_enc_status_changed(addr, numpages, enc);
+> +	/* Notify hypervisor that we have successfully set/clr encryption attribute. */
+> +	if (!ret)
+> +		x86_platform.guest.enc_status_change_finish(addr, numpages, enc);
+>  
+>  	return ret;
+>  }
 
-Hmm, right, if we set F_SEAL_INACCESSIBLE on a non-empty file, we will 
-need to make sure access to existing mmap-ed area should be prevented,
-but that is hard.
+This operation can fail for TDX. We need to be able to return error code
+here:
+	/* Notify hypervisor that we have successfully set/clr encryption attribute. */
+	if (!ret)
+		ret = x86_platform.guest.enc_status_change_finish(addr, numpages, enc);
 
-> 
-> In any case, the whole confidential VM initialization story is a bit buddy.  From the earlier emails, it sounds like ARM expects the host to fill in guest memory and measure it.  From my recollection of Intel's scheme (which may well be wrong, and I could easily be confusing it with SGX), TDX instead measures what is essentially a transcript of the series of operations that initializes the VM.  These are fundamentally not the same thing even if they accomplish the same end goal.  For TDX, we unavoidably need an operation (ioctl or similar) that initializes things according to the VM's instructions, and ARM ought to be able to use roughly the same mechanism.
-
-Yes, TDX requires a ioctl. Steven may comment on the ARM part.
-
-Chao
-> 
-> Also, if we ever get fancy and teach the page allocator about memory with reduced directmap permissions, it may well be more efficient for userspace to shove data into a memfd via ioctl than it is to mmap it and write the data.
-
-
-
+-- 
+ Kirill A. Shutemov
