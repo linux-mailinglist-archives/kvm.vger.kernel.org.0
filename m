@@ -2,95 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 71A904C1CBB
-	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 21:00:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EDEA24C1E08
+	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 22:53:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244586AbiBWUA5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Feb 2022 15:00:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35018 "EHLO
+        id S242724AbiBWVyP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Feb 2022 16:54:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234260AbiBWUAy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Feb 2022 15:00:54 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89DCD27FC4;
-        Wed, 23 Feb 2022 12:00:26 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id D03D5617A4;
-        Wed, 23 Feb 2022 20:00:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0123C340E7;
-        Wed, 23 Feb 2022 20:00:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1645646425;
-        bh=DNaS5nEsaghqF5/p/pvOR81erUDcQR6ZRHgWGUSoSUE=;
-        h=From:To:Cc:Subject:Date:From;
-        b=RMZjxwhTDl5y3mpkk24R6+2nCsCs56AjgVjmRNJHsUp3IBpqMFANmIYL34eHucMcB
-         XYQis2gr/78mwJftWTkXZfjKUT4AOlnjDI4+uM6RPwUu8VtuMpRxzoSqI/Uh1Z/rec
-         XCXH+cDyMHrl57rGAkKaNXiqZoEzywJATcKxs/7BjGKrXDzQvIWjHA3Q/l+23cWCKQ
-         0DRTBjZJsMyeWlsLztJkXrdVK5angB8yaTZPEJgX0YaUNFgvqdZppXEsp0H485dTRR
-         DTDeIxYDX5+lNUJxjVGX8zlFvgHlRgpCvkkks7RePeGv+h99yzYe//pl36rl5L9PBW
-         9CUlZD7atb5+g==
-From:   broonie@kernel.org
-To:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
-Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Nicholas Piggin <npiggin@gmail.com>
-Subject: linux-next: manual merge of the kvm tree with the kvm-fixes tree
-Date:   Wed, 23 Feb 2022 20:00:19 +0000
-Message-Id: <20220223200019.1891646-1-broonie@kernel.org>
-X-Mailer: git-send-email 2.30.2
+        with ESMTP id S233532AbiBWVyO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Feb 2022 16:54:14 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D718A3D4A1
+        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 13:53:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645653224;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=QHc4p6P496hz/XkslW9zde1DsEfB8iSDkjx5qIKJc48=;
+        b=L7gzNj9StIEUcC5xQmVVb7HRsLT5sLhhcaIhW9mJYoxtkxTnPxnn9jUZngwhqyxyO1b4/q
+        Dux5YbnbShPYmAYm9nAjhXL4fQLqVlxjG/5oklcogr/gdk19Y9+IqD7vG73pJtTr1HRKEu
+        re0RjXwzql23zYF7RCeTKdJIC3Zx6/g=
+Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com
+ [209.85.210.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-433-RoyRoYjNNRSc5dY5a2DX1A-1; Wed, 23 Feb 2022 16:53:42 -0500
+X-MC-Unique: RoyRoYjNNRSc5dY5a2DX1A-1
+Received: by mail-ot1-f69.google.com with SMTP id 88-20020a9d0f61000000b005ad1fe3c347so12343256ott.16
+        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 13:53:42 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=QHc4p6P496hz/XkslW9zde1DsEfB8iSDkjx5qIKJc48=;
+        b=74h/yzrEr4oMAf0MiudZZNypBnaVZ86DoFBkqvkTY03ILPNmX9KXLOhbK06c36GEPY
+         r9pNL4uv1O617MLeIAHwIzQMxp4q5uSQRUagaZZpab+gwxBrvrajxVvTeEs0laIMX0Ro
+         uZth+AplS2speG5ZZeSwjXv1oVpV1pQdt6osTFyrxnb2GwQw5fVw1HewBEb20i+0GNyI
+         +B3UqxU8fIMN03I2FOjGwNNLhg2FrOrDi5cGj3vzljcIBylPXkFfSxkb4teTZpLgLBhp
+         Gtdu/mMOgH5W9ABcuENduGe2ocoe+Q+JTzpIIvBzX1iG06tScYcZyLu4RD3EE+mJ+tou
+         f47w==
+X-Gm-Message-State: AOAM531vevm+RRxOIIN9pL0mSXiAznQUJVwNoEOvvPnF6re/UHkQTsd5
+        wcTHwKJqEEjh16ZCBleWiycl8X9gSsvkIw2UQGvJGxNOHACS6sLkKV4VNQ0LdOVPQCxeM7b23g9
+        TFcrIzUDjj4WX
+X-Received: by 2002:a05:6870:3e0d:b0:d3:fe6d:57c3 with SMTP id lk13-20020a0568703e0d00b000d3fe6d57c3mr780582oab.225.1645653222084;
+        Wed, 23 Feb 2022 13:53:42 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxVZWjYYf1lHUEZ749G1CD7yMY7PoElR7MtLZJgwYZu5lf142+Ut2Mxb4MgP1wHkjXeQTJkxQ==
+X-Received: by 2002:a05:6870:3e0d:b0:d3:fe6d:57c3 with SMTP id lk13-20020a0568703e0d00b000d3fe6d57c3mr780550oab.225.1645653221851;
+        Wed, 23 Feb 2022 13:53:41 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id 128sm369711oor.15.2022.02.23.13.53.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Feb 2022 13:53:41 -0800 (PST)
+Date:   Wed, 23 Feb 2022 14:53:39 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Lu Baolu <baolu.lu@linux.intel.com>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>, kvm@vger.kernel.org,
+        rafael@kernel.org, David Airlie <airlied@linux.ie>,
+        linux-pci@vger.kernel.org,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Dmitry Osipenko <digetx@gmail.com>,
+        Will Deacon <will@kernel.org>,
+        Stuart Yoder <stuyoder@gmail.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        linux-kernel@vger.kernel.org, Li Yang <leoyang.li@nxp.com>,
+        iommu@lists.linux-foundation.org,
+        Jacob jun Pan <jacob.jun.pan@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Robin Murphy <robin.murphy@arm.com>
+Subject: Re: [PATCH v6 10/11] vfio: Remove iommu group notifier
+Message-ID: <20220223145339.57ed632e.alex.williamson@redhat.com>
+In-Reply-To: <20220218005521.172832-11-baolu.lu@linux.intel.com>
+References: <20220218005521.172832-1-baolu.lu@linux.intel.com>
+        <20220218005521.172832-11-baolu.lu@linux.intel.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi all,
+On Fri, 18 Feb 2022 08:55:20 +0800
+Lu Baolu <baolu.lu@linux.intel.com> wrote:
 
-FIXME: Add owner of second tree to To:
-       Add author(s)/SOB of conflicting commits.
+> The iommu core and driver core have been enhanced to avoid unsafe driver
+> binding to a live group after iommu_group_set_dma_owner(PRIVATE_USER)
+> has been called. There's no need to register iommu group notifier. This
+> removes the iommu group notifer which contains BUG_ON() and WARN().
+> 
+> The commit 5f096b14d421b ("vfio: Whitelist PCI bridges") allowed all
+> pcieport drivers to be bound with devices while the group is assigned to
+> user space. This is not always safe. For example, The shpchp_core driver
+> relies on the PCI MMIO access for the controller functionality. With its
+> downstream devices assigned to the userspace, the MMIO might be changed
+> through user initiated P2P accesses without any notification. This might
+> break the kernel driver integrity and lead to some unpredictable
+> consequences. As the result, currently we only allow the portdrv driver.
+> 
+> For any bridge driver, in order to avoiding default kernel DMA ownership
+> claiming, we should consider:
+> 
+>  1) Does the bridge driver use DMA? Calling pci_set_master() or
+>     a dma_map_* API is a sure indicate the driver is doing DMA
+> 
+>  2) If the bridge driver uses MMIO, is it tolerant to hostile
+>     userspace also touching the same MMIO registers via P2P DMA
+>     attacks?
+> 
+> Conservatively if the driver maps an MMIO region at all, we can say that
+> it fails the test.
 
-Today's linux-next merge of the kvm tree got a conflict in:
+IIUC, there's a chance we're going to break user configurations if
+they're assigning devices from a group containing a bridge that uses a
+driver other than pcieport.  The recommendation to such an affected user
+would be that the previously allowed host bridge driver was unsafe for
+this use case and to continue to enable assignment of devices within
+that group, the driver should be unbound from the bridge device or
+replaced with the pci-stub driver.  Is that right?
 
-  include/uapi/linux/kvm.h
+Unfortunately I also think a bisect of such a breakage wouldn't land
+here, I think it was actually broken in "vfio: Set DMA ownership for
+VFIO" since that's where vfio starts to make use of
+iommu_group_claim_dma_owner() which should fail due to
+pci_dma_configure() calling iommu_device_use_default_domain() for
+any driver not identifying itself as driver_managed_dma.
 
-between commit:
+If that's correct, can we leave a breadcrumb in the correct commit log
+indicating why this potential breakage is intentional and how the
+bridge driver might be reconfigured to continue to allow assignment from
+within the group more safely?  Thanks,
 
-  93b71801a8274 ("KVM: PPC: reserve capability 210 for KVM_CAP_PPC_AIL_MODE_3")
+Alex
 
-from the kvm-fixes tree and commit:
-
-  d004079edc166 ("KVM: s390: Add capability for storage key extension of MEM_OP IOCTL")
-
-from the kvm tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
-diff --cc include/uapi/linux/kvm.h
-index 507ee1f2aa96b,dbc550bbd9fa3..0000000000000
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@@ -1134,7 -1140,7 +1140,8 @@@ struct kvm_ppc_resize_hpt 
-  #define KVM_CAP_VM_GPA_BITS 207
-  #define KVM_CAP_XSAVE2 208
-  #define KVM_CAP_SYS_ATTRIBUTES 209
- -#define KVM_CAP_S390_MEM_OP_EXTENSION 210
- +#define KVM_CAP_PPC_AIL_MODE_3 210
-++#define KVM_CAP_S390_MEM_OP_EXTENSION 211
-  
-  #ifdef KVM_CAP_IRQ_ROUTING
-  
