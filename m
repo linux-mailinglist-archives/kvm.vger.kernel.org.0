@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ADEE74C0AE1
-	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 05:19:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DF1254C0AE3
+	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 05:19:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236694AbiBWETe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Feb 2022 23:19:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46996 "EHLO
+        id S237496AbiBWETi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Feb 2022 23:19:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47056 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235118AbiBWETd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Feb 2022 23:19:33 -0500
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48C7C3B2BE
-        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 20:19:07 -0800 (PST)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-2d61b4ef6cdso161201307b3.11
-        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 20:19:07 -0800 (PST)
+        with ESMTP id S236919AbiBWETg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Feb 2022 23:19:36 -0500
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 696C73B540
+        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 20:19:09 -0800 (PST)
+Received: by mail-yb1-xb49.google.com with SMTP id d17-20020a253611000000b006244e94b7b4so14044058yba.4
+        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 20:19:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=EnWXwLktezdYxVf4VXehGQaziGIoOwllvHGoxXaFkSk=;
-        b=NEjgsqtOFotB8rwtwgxw3nTKJIjcy3ygfSUnOerwYC8jtMBPV+WVzZP7gk6Sw+8rAQ
-         slf46M+kM70WVhS9OC1Dftw3Fd9xageH2ezIhLlTlAULl2ZNqEtjXEmfHcoJ1z3leWRL
-         Y2Q1TcuhaUfhM2y4Zu233zlNlZGcXS3xiPunbw9VaVelj8gALfVkGtKFjWS3HblWVNcC
-         NT9R6s5QfOf9QdyEMQqnPnfyVE5Wy62eKrQt/uytmG3x55QlnmP9RAbpQYjYLerhDRcE
-         OfRn3H4RXHIkN70lq1/ZumftMAc3OSme/5IwSAT1z1FCoR/lHXYabE0J7Det7jXyh8pM
-         WGOg==
+        bh=ahiLAnvGk5WOtmVeGA8iuyeZCq4rGSdqLgd0ZvQyT98=;
+        b=BX8y9VlBKsn8jL1RlTr1OBGGetvgQI1VN5gscUGj5PvXkxsZa7UrKQLI20x3uUoO7l
+         ncIJvGbFbopGWOm/mzOqa2srOo9k0/7J/0wCD0l0hzyb2ACFqXFzdziavo7hYedyUxSX
+         2G1OWLZcKybblkzNl1aDXnnyJ4zm7cxyAVrc1SkOxupJQ54jHriMPA3K5+DoykZJx3+6
+         cGjkgTeHFlKqwPaLgFiuAId2JpQ47d5NIPiPVsYPeeYgkVxzI/9tWIHbQw4QcwXyjR3W
+         WJbG90pWIu3Kc+kOKVeGCQokZE25D0T8AeN5qTr2SoRYKK2vm291FZYaZUeETUE9hM4/
+         2YYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=EnWXwLktezdYxVf4VXehGQaziGIoOwllvHGoxXaFkSk=;
-        b=PtnPnG8veOGlCx8Z0MVSHOktG9ZQftq5+W83/f7LPQeyZyEpV+I2PzcieRCt9YByvs
-         cC6l38kR2yDNaq/YXFpFMCvN+acPPddhWzPvZuclsqj+vr9uIyHgnPKZjugFM/jMjplt
-         XIhNVlj1aYvUtHH2pw+VxoamHWfWJwd/CIoxA0mMGb8rjIP2gzyF+gt6tgy79ZtwKVVM
-         563iU/LcdFxc1OWPLYaFM0mNhPjznXepRJmFs422AqgLv3bm26Kc7p+8/3SKc8XiIdFA
-         FpCDY6rP12JGJmROEER/YI0X0NWNSzpp+JyHO+3DONPxLm6cOUEMNAR2Sjvu4jTYBhOi
-         0ntA==
-X-Gm-Message-State: AOAM530gDq7wRplLUQf43Jr3PQcM2bWj2cWszRE7HIA9NnW5NoMA5pZp
-        saxl8QhBJqDBMqePhEgaTvqa6Egodf0=
-X-Google-Smtp-Source: ABdhPJyjm1Ng5s7CW1KhrIyzYIpmZbuuYhZ/Y0UPWEqvGtpWPaulnfintVKcauly/pEhuTNpasU+6iJod1Q=
+        bh=ahiLAnvGk5WOtmVeGA8iuyeZCq4rGSdqLgd0ZvQyT98=;
+        b=xBgqDe261XAYoDZaoTa31xKRvYGQ0N59681rvI+I7lGSn4VfkEMwVpCMoITZ66mD54
+         wws32mJ1VjKxIr8ZDm3/hjC0qnpY5ERryLpq6tU/V8qRH2D5zwEnpXn9VF5po5ocjBVf
+         th6xRkotEm2FMaJJ4tuwzbeo9dPYA66oChN9Vb8fpv8uGC5qJb3egNb2oKXUwdmO84ao
+         DgR3PdSRLadpx2oNdZu5vUNVmDLixPqs3V8QVwMN4AiRfXKY0gmtnbB8R6bK6LOr2RgG
+         zpxYph2ebwg7fA/X7sok559ENpm4ZHuTZOrrf5aDJ7meOK6fXm1BCz8zWSX4rmecSHdq
+         63Ow==
+X-Gm-Message-State: AOAM531rEhw1lMnsa1/k+/jkyYSu3hsxNmg7c5mPz94NtScRJGwdygG7
+        wWUyfiwY/EGH4wrZz8AO+o8T3JpEDnE=
+X-Google-Smtp-Source: ABdhPJx9rCAmlwDD8ZGLtxOAhcQ0e/5TNwlmLC3bRH71Gh8ABg+5APqO9HlhVqrCvDpcvj9jNZU6c7uzBKk=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a25:8b0a:0:b0:61a:4aab:3e78 with SMTP id
- i10-20020a258b0a000000b0061a4aab3e78mr26177594ybl.619.1645589946470; Tue, 22
- Feb 2022 20:19:06 -0800 (PST)
-Date:   Wed, 23 Feb 2022 04:18:27 +0000
+ (user=oupton job=sendgmr) by 2002:a81:9e04:0:b0:2d5:84ae:13c9 with SMTP id
+ m4-20020a819e04000000b002d584ae13c9mr26571752ywj.435.1645589948342; Tue, 22
+ Feb 2022 20:19:08 -0800 (PST)
+Date:   Wed, 23 Feb 2022 04:18:28 +0000
 In-Reply-To: <20220223041844.3984439-1-oupton@google.com>
-Message-Id: <20220223041844.3984439-3-oupton@google.com>
+Message-Id: <20220223041844.3984439-4-oupton@google.com>
 Mime-Version: 1.0
 References: <20220223041844.3984439-1-oupton@google.com>
 X-Mailer: git-send-email 2.35.1.473.g83b2b277ed-goog
-Subject: [PATCH v3 02/19] KVM: arm64: Create a helper to check if IPA is valid
+Subject: [PATCH v3 03/19] KVM: arm64: Reject invalid addresses for CPU_ON PSCI call
 From:   Oliver Upton <oupton@google.com>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
@@ -82,55 +82,73 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Create a helper that tests if a given IPA fits within the guest's
-address space.
+DEN0022D.b 5.6.2 "Caller responsibilities" states that a PSCI
+implementation may return INVALID_ADDRESS for the CPU_ON call if the
+provided entry address is known to be invalid. There is an additional
+caveat to this rule. Prior to PSCI v1.0, the INVALID_PARAMETERS error
+is returned instead. Check the guest's PSCI version and return the
+appropriate error if the IPA is invalid.
 
+Reported-by: Reiji Watanabe <reijiw@google.com>
 Signed-off-by: Oliver Upton <oupton@google.com>
 ---
- arch/arm64/include/asm/kvm_mmu.h      | 9 +++++++++
- arch/arm64/kvm/vgic/vgic-kvm-device.c | 2 +-
- 2 files changed, 10 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/psci.c | 24 ++++++++++++++++++++++--
+ 1 file changed, 22 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 81839e9a8a24..78e8be7ea627 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -111,6 +111,7 @@ alternative_cb_end
- #else
+diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
+index a0c10c11f40e..de1cf554929d 100644
+--- a/arch/arm64/kvm/psci.c
++++ b/arch/arm64/kvm/psci.c
+@@ -12,6 +12,7 @@
  
- #include <linux/pgtable.h>
-+#include <linux/kvm_host.h>
- #include <asm/pgalloc.h>
- #include <asm/cache.h>
- #include <asm/cacheflush.h>
-@@ -147,6 +148,14 @@ static __always_inline unsigned long __kern_hyp_va(unsigned long v)
- #define kvm_phys_size(kvm)		(_AC(1, ULL) << kvm_phys_shift(kvm))
- #define kvm_phys_mask(kvm)		(kvm_phys_size(kvm) - _AC(1, ULL))
+ #include <asm/cputype.h>
+ #include <asm/kvm_emulate.h>
++#include <asm/kvm_mmu.h>
  
-+/*
-+ * Returns true if the provided IPA exists within the VM's IPA space.
-+ */
-+static inline bool kvm_ipa_valid(struct kvm *kvm, phys_addr_t guest_ipa)
-+{
-+	return !(guest_ipa & ~kvm_phys_mask(kvm));
-+}
+ #include <kvm/arm_psci.h>
+ #include <kvm/arm_hypercalls.h>
+@@ -70,12 +71,31 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+ 	struct vcpu_reset_state *reset_state;
+ 	struct kvm *kvm = source_vcpu->kvm;
+ 	struct kvm_vcpu *vcpu = NULL;
+-	unsigned long cpu_id;
++	unsigned long cpu_id, entry_addr;
+ 
+ 	cpu_id = smccc_get_arg1(source_vcpu);
+ 	if (!kvm_psci_valid_affinity(source_vcpu, cpu_id))
+ 		return PSCI_RET_INVALID_PARAMS;
+ 
++	/*
++	 * Basic sanity check: ensure the requested entry address actually
++	 * exists within the guest's address space.
++	 */
++	entry_addr = smccc_get_arg2(source_vcpu);
++	if (!kvm_ipa_valid(kvm, entry_addr)) {
 +
- #include <asm/kvm_pgtable.h>
- #include <asm/stage2_pgtable.h>
++		/*
++		 * Before PSCI v1.0, the INVALID_PARAMETERS error is returned
++		 * instead of INVALID_ADDRESS.
++		 *
++		 * For more details, see ARM DEN0022D.b 5.6 "CPU_ON".
++		 */
++		if (kvm_psci_version(source_vcpu) < KVM_ARM_PSCI_1_0)
++			return PSCI_RET_INVALID_PARAMS;
++		else
++			return PSCI_RET_INVALID_ADDRESS;
++	}
++
+ 	vcpu = kvm_mpidr_to_vcpu(kvm, cpu_id);
  
-diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-index c6d52a1fd9c8..e3853a75cb00 100644
---- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
-+++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-@@ -27,7 +27,7 @@ int vgic_check_iorange(struct kvm *kvm, phys_addr_t ioaddr,
- 	if (addr + size < addr)
- 		return -EINVAL;
+ 	/*
+@@ -93,7 +113,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
  
--	if (addr & ~kvm_phys_mask(kvm) || addr + size > kvm_phys_size(kvm))
-+	if (!kvm_ipa_valid(kvm, addr) || addr + size > kvm_phys_size(kvm))
- 		return -E2BIG;
+ 	reset_state = &vcpu->arch.reset_state;
  
- 	return 0;
+-	reset_state->pc = smccc_get_arg2(source_vcpu);
++	reset_state->pc = entry_addr;
+ 
+ 	/* Propagate caller endianness */
+ 	reset_state->be = kvm_vcpu_is_be(source_vcpu);
 -- 
 2.35.1.473.g83b2b277ed-goog
 
