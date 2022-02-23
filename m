@@ -2,100 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3491F4C1C99
-	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 20:50:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 71A904C1CBB
+	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 21:00:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244526AbiBWTvG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Feb 2022 14:51:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52524 "EHLO
+        id S244586AbiBWUA5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Feb 2022 15:00:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35018 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238759AbiBWTvF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Feb 2022 14:51:05 -0500
-Received: from mail-oo1-xc30.google.com (mail-oo1-xc30.google.com [IPv6:2607:f8b0:4864:20::c30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 963E64BFC6
-        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 11:50:37 -0800 (PST)
-Received: by mail-oo1-xc30.google.com with SMTP id i10-20020a4aab0a000000b002fccf890d5fso101800oon.5
-        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 11:50:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=2zfiF9IZTxtJd2EhXrwpK4rauNyPJ/NDU/OsjD6A3H4=;
-        b=oRdeGBXEqd+NldzBBr1Yv9nlwd/OIPOYZf4Tg1ZiJDmUSBrUmIFbta/kfp1iHOZZBB
-         aLZoO4EhySArgHUsaLijLXiU3DGIpHINEgRXvQnU4mJyTtTzCCM+lqsks5Ldwk5cGgMK
-         BK69t6kkZwbZuSIaDSFH8H1KN02BSwiMtQO6J5GDkuFISuqbvUwDm56t9Nh5iIje5RRl
-         cPpcFSFxwyAmGFsFvYaemfnX383YmBn1svtjbFF8LAfkatWrwuTeFEgOW1nVja90MuU/
-         9E8z6ySfcbJIkDeWoR9jk/2BT10ffFC+5BQk8rIIRX4yowSI5Yw8WBcVG4odskgCWYMs
-         oPpw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=2zfiF9IZTxtJd2EhXrwpK4rauNyPJ/NDU/OsjD6A3H4=;
-        b=wDPvRpqLciiBUPNrt4PP1tNH7wx17lL7o9ugGWoFz/xR/6uaB5+Uf+2pbP/he3hLBi
-         6uPksvPUw0xEJTtnRh0t00peQcDFoIm7ZrVXqXm3SG/X4qER2jknz46EdwGcKkhLlgdU
-         fCEpUS2t3VKe2EgzP63uJ/lg9nymVUpC+niLpVMLWTNrPTHSCjwvmMAFZcjXT5N9X0Gj
-         s2BJmg/iXTdaRXL4x8JbtIfcx4uaUlQ2KtL0UVxkLTQKoHAjkPpYYIC2wFS68gPragJT
-         vz3JrRA1BfzDzliU+51ryBkylThorSrkr3KbXcL8ubm2meDxo5x9+7HuhZbQBz+lp8RF
-         5qRg==
-X-Gm-Message-State: AOAM531aKX1eLBLNK0haWv4uqU0CR8C0ga67tDelZXfRKtFN/AnidWpq
-        Z5Bm1fDQodfCF9Uwzf1//fQj6bEYQ4eLM+8YW72lgg==
-X-Google-Smtp-Source: ABdhPJz1Rd9SoSeQf7txnVmqe8vlmFpgBN6BMy1tx+iUD1iNn+0o46hlSuyMGLmhUrLD0cUdwb/TrvC2zOIh2Y59o7I=
-X-Received: by 2002:a05:6870:2890:b0:d3:f439:2cbb with SMTP id
- gy16-20020a056870289000b000d3f4392cbbmr563277oab.139.1645645836752; Wed, 23
- Feb 2022 11:50:36 -0800 (PST)
+        with ESMTP id S234260AbiBWUAy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Feb 2022 15:00:54 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89DCD27FC4;
+        Wed, 23 Feb 2022 12:00:26 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D03D5617A4;
+        Wed, 23 Feb 2022 20:00:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0123C340E7;
+        Wed, 23 Feb 2022 20:00:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1645646425;
+        bh=DNaS5nEsaghqF5/p/pvOR81erUDcQR6ZRHgWGUSoSUE=;
+        h=From:To:Cc:Subject:Date:From;
+        b=RMZjxwhTDl5y3mpkk24R6+2nCsCs56AjgVjmRNJHsUp3IBpqMFANmIYL34eHucMcB
+         XYQis2gr/78mwJftWTkXZfjKUT4AOlnjDI4+uM6RPwUu8VtuMpRxzoSqI/Uh1Z/rec
+         XCXH+cDyMHrl57rGAkKaNXiqZoEzywJATcKxs/7BjGKrXDzQvIWjHA3Q/l+23cWCKQ
+         0DRTBjZJsMyeWlsLztJkXrdVK5angB8yaTZPEJgX0YaUNFgvqdZppXEsp0H485dTRR
+         DTDeIxYDX5+lNUJxjVGX8zlFvgHlRgpCvkkks7RePeGv+h99yzYe//pl36rl5L9PBW
+         9CUlZD7atb5+g==
+From:   broonie@kernel.org
+To:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
+Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Nicholas Piggin <npiggin@gmail.com>
+Subject: linux-next: manual merge of the kvm tree with the kvm-fixes tree
+Date:   Wed, 23 Feb 2022 20:00:19 +0000
+Message-Id: <20220223200019.1891646-1-broonie@kernel.org>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-References: <20220221115201.22208-1-likexu@tencent.com> <20220221115201.22208-2-likexu@tencent.com>
-In-Reply-To: <20220221115201.22208-2-likexu@tencent.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 23 Feb 2022 11:50:25 -0800
-Message-ID: <CALMp9eTSyWdDe8yd_g2rp2ipx5CerP8CQ2a0H-1HMZsuxWOpfw@mail.gmail.com>
-Subject: Re: [PATCH 01/11] KVM: x86/pmu: Update comments for AMD gp counters
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Like Xu <likexu@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 21, 2022 at 3:52 AM Like Xu <like.xu.linux@gmail.com> wrote:
->
-> From: Like Xu <likexu@tencent.com>
->
-> The obsolete comment could more accurately state that AMD platforms
-> have two base MSR addresses and two different maximum numbers
-> for gp counters, depending on the X86_FEATURE_PERFCTR_CORE feature.
->
-> Signed-off-by: Like Xu <likexu@tencent.com>
-> ---
->  arch/x86/kvm/pmu.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-> index b1a02993782b..c4692f0ff87e 100644
-> --- a/arch/x86/kvm/pmu.c
-> +++ b/arch/x86/kvm/pmu.c
-> @@ -34,7 +34,7 @@
->   *   However AMD doesn't support fixed-counters;
->   * - There are three types of index to access perf counters (PMC):
->   *     1. MSR (named msr): For example Intel has MSR_IA32_PERFCTRn and AMD
-> - *        has MSR_K7_PERFCTRn.
-> + *        has MSR_F15H_PERF_CTRn or MSR_K7_PERFCTRn.
+Hi all,
 
-"Or" sounds exclusive. Maybe it would be better to say:
+FIXME: Add owner of second tree to To:
+       Add author(s)/SOB of conflicting commits.
 
-has MSR_K7_PERFCTRn and, for families 15H and later,
-MSR_F15H_PERF_CTRn, where MSR_F15H_PERF_CTR[0-3] are aliased to
-MSR_K7_PERFCTRn.
+Today's linux-next merge of the kvm tree got a conflict in:
+
+  include/uapi/linux/kvm.h
+
+between commit:
+
+  93b71801a8274 ("KVM: PPC: reserve capability 210 for KVM_CAP_PPC_AIL_MODE_3")
+
+from the kvm-fixes tree and commit:
+
+  d004079edc166 ("KVM: s390: Add capability for storage key extension of MEM_OP IOCTL")
+
+from the kvm tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+diff --cc include/uapi/linux/kvm.h
+index 507ee1f2aa96b,dbc550bbd9fa3..0000000000000
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@@ -1134,7 -1140,7 +1140,8 @@@ struct kvm_ppc_resize_hpt 
+  #define KVM_CAP_VM_GPA_BITS 207
+  #define KVM_CAP_XSAVE2 208
+  #define KVM_CAP_SYS_ATTRIBUTES 209
+ -#define KVM_CAP_S390_MEM_OP_EXTENSION 210
+ +#define KVM_CAP_PPC_AIL_MODE_3 210
+++#define KVM_CAP_S390_MEM_OP_EXTENSION 211
+  
+  #ifdef KVM_CAP_IRQ_ROUTING
+  
