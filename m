@@ -2,94 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8ADBD4C1248
-	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 13:04:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 27FD84C1252
+	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 13:05:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234296AbiBWME2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Feb 2022 07:04:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35626 "EHLO
+        id S237803AbiBWMGE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Feb 2022 07:06:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38120 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234733AbiBWME1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Feb 2022 07:04:27 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D31959A9A6
-        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 04:03:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645617839;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=RsEaduhosj3scr7jqtk40yT4gGh5J+A6qQR3OfG+EYs=;
-        b=V6PxV1zkwGL/LaFr5TgA7o71/4WiQGOyOnUE540fjBEFMFuA0IC/ma6EIR1WBakloByL/D
-        KCARzDILy7s6Exoa3y8ZjnnAEPjvYF/fEZTd1LmpTobxRCI3Eslo6RemiZRVk2lcdLgjJX
-        LBG6bLbDALaf7m4mHZ+YnsNML8wo7rE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-449--vK5pthYOSiVxFMwfTldAA-1; Wed, 23 Feb 2022 07:03:57 -0500
-X-MC-Unique: -vK5pthYOSiVxFMwfTldAA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6D742801AB2
-        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 12:03:56 +0000 (UTC)
-Received: from starship (unknown [10.40.195.190])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B95E684948
-        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 12:03:55 +0000 (UTC)
-Message-ID: <38346acd4f7b9cb5a38c3a1e2fba0ee01a82dc5b.camel@redhat.com>
-Subject: Re: [PATCH 0/7] My set of KVM unit tests + fixes
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     kvm@vger.kernel.org
-Date:   Wed, 23 Feb 2022 14:03:54 +0200
-In-Reply-To: <20220208122148.912913-1-mlevitsk@redhat.com>
-References: <20220208122148.912913-1-mlevitsk@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        with ESMTP id S232761AbiBWMGC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Feb 2022 07:06:02 -0500
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 032E09A981;
+        Wed, 23 Feb 2022 04:05:34 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B9AA7ED1;
+        Wed, 23 Feb 2022 04:05:33 -0800 (PST)
+Received: from [10.57.37.225] (unknown [10.57.37.225])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 960A63F70D;
+        Wed, 23 Feb 2022 04:05:29 -0800 (PST)
+Message-ID: <71a06402-6743-bfd2-bbd4-997f8e256554@arm.com>
+Date:   Wed, 23 Feb 2022 12:05:28 +0000
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH v4 01/12] mm/shmem: Introduce F_SEAL_INACCESSIBLE
+Content-Language: en-GB
+To:     Chao Peng <chao.p.peng@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        qemu-devel@nongnu.org, Linux API <linux-api@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        "Nakajima, Jun" <jun.nakajima@intel.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Andi Kleen <ak@linux.intel.com>,
+        David Hildenbrand <david@redhat.com>
+References: <20220118132121.31388-1-chao.p.peng@linux.intel.com>
+ <20220118132121.31388-2-chao.p.peng@linux.intel.com>
+ <619547ad-de96-1be9-036b-a7b4e99b09a6@kernel.org>
+ <20220217130631.GB32679@chaop.bj.intel.com>
+ <2ca78dcb-61d9-4c9d-baa9-955b6f4298bb@www.fastmail.com>
+ <20220223114935.GA53733@chaop.bj.intel.com>
+From:   Steven Price <steven.price@arm.com>
+In-Reply-To: <20220223114935.GA53733@chaop.bj.intel.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-02-08 at 14:21 +0200, Maxim Levitsky wrote:
-> Those are few kvm unit tests tha I developed.
+On 23/02/2022 11:49, Chao Peng wrote:
+> On Thu, Feb 17, 2022 at 11:09:35AM -0800, Andy Lutomirski wrote:
+>> On Thu, Feb 17, 2022, at 5:06 AM, Chao Peng wrote:
+>>> On Fri, Feb 11, 2022 at 03:33:35PM -0800, Andy Lutomirski wrote:
+>>>> On 1/18/22 05:21, Chao Peng wrote:
+>>>>> From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+>>>>>
+>>>>> Introduce a new seal F_SEAL_INACCESSIBLE indicating the content of
+>>>>> the file is inaccessible from userspace through ordinary MMU access
+>>>>> (e.g., read/write/mmap). However, the file content can be accessed
+>>>>> via a different mechanism (e.g. KVM MMU) indirectly.
+>>>>>
+>>>>> It provides semantics required for KVM guest private memory support
+>>>>> that a file descriptor with this seal set is going to be used as the
+>>>>> source of guest memory in confidential computing environments such
+>>>>> as Intel TDX/AMD SEV but may not be accessible from host userspace.
+>>>>>
+>>>>> At this time only shmem implements this seal.
+>>>>>
+>>>>
+>>>> I don't dislike this *that* much, but I do dislike this. F_SEAL_INACCESSIBLE
+>>>> essentially transmutes a memfd into a different type of object.  While this
+>>>> can apparently be done successfully and without races (as in this code),
+>>>> it's at least awkward.  I think that either creating a special inaccessible
+>>>> memfd should be a single operation that create the correct type of object or
+>>>> there should be a clear justification for why it's a two-step process.
+>>>
+>>> Now one justification maybe from Stever's comment to patch-00: for ARM
+>>> usage it can be used with creating a normal memfd, (partially)populate
+>>> it with initial guest memory content (e.g. firmware), and then
+>>> F_SEAL_INACCESSIBLE it just before the first time lunch of the guest in
+>>> KVM (definitely the current code needs to be changed to support that).
+>>
+>> Except we don't allow F_SEAL_INACCESSIBLE on a non-empty file, right?  So this won't work.
 > 
-> Best regards,
->     Maxim Levitsky
+> Hmm, right, if we set F_SEAL_INACCESSIBLE on a non-empty file, we will 
+> need to make sure access to existing mmap-ed area should be prevented,
+> but that is hard.
 > 
-> Maxim Levitsky (7):
->   pmu_lbr: few fixes
->   svm: Fix reg_corruption test, to avoid timer interrupt firing in later
->     tests.
->   svm: NMI is an "exception" and not interrupt in x86 land
->   svm: intercept shutdown in all svm tests by default
->   svm: add SVM_BARE_VMRUN
->   svm: add tests for LBR virtualization
->   svm: add tests for case when L1 intercepts various hardware interrupts
->     (an interrupt, SMI, NMI), but lets L2 control either EFLAG.IF or GIF
+>>
+>> In any case, the whole confidential VM initialization story is a bit buddy.  From the earlier emails, it sounds like ARM expects the host to fill in guest memory and measure it.  From my recollection of Intel's scheme (which may well be wrong, and I could easily be confusing it with SGX), TDX instead measures what is essentially a transcript of the series of operations that initializes the VM.  These are fundamentally not the same thing even if they accomplish the same end goal.  For TDX, we unavoidably need an operation (ioctl or similar) that initializes things according to the VM's instructions, and ARM ought to be able to use roughly the same mechanism.
 > 
->  lib/x86/processor.h |   1 +
->  x86/pmu_lbr.c       |   6 +
->  x86/svm.c           |  41 +---
->  x86/svm.h           |  63 ++++++-
->  x86/svm_tests.c     | 447 +++++++++++++++++++++++++++++++++++++++++++-
->  x86/unittests.cfg   |   3 +-
->  6 files changed, 521 insertions(+), 40 deletions(-)
-> 
-> -- 
-> 2.26.3
-> 
-> 
-Any update on these patches?
+> Yes, TDX requires a ioctl. Steven may comment on the ARM part.
 
-Best regards,
-	Maxim Levitsky
+The Arm story is evolving so I can't give a definite answer yet. Our
+current prototyping works by creating the initial VM content in a
+memslot as with a normal VM and then calling an ioctl which throws the
+big switch and converts all the (populated) pages to be protected. At
+this point the RMM performs a measurement of the data that the VM is
+being populated with.
+
+The above (in our prototype) suffers from all the expected problems with
+a malicious VMM being able to trick the host kernel into accessing those
+pages after they have been protected (causing a fault detected by the
+hardware).
+
+The ideal (from our perspective) approach would be to follow the same
+flow but where the VMM populates a memfd rather than normal anonymous
+pages. The memfd could then be sealed and the pages converted to
+protected ones (with the RMM measuring them in the process).
+
+The question becomes how is that memfd populated? It would be nice if
+that could be done using normal operations on a memfd (i.e. using
+mmap()) and therefore this code could be (relatively) portable. This
+would mean that any pages mapped from the memfd would either need to
+block the sealing or be revoked at the time of sealing.
+
+The other approach is we could of course implement a special ioctl which
+effectively does a memcpy into the (created empty and sealed) memfd and
+does the necessary dance with the RMM to measure the contents. This
+would match the "transcript of the series of operations" described above
+- but seems much less ideal from the viewpoint of the VMM.
+
+Steve
+
+> Chao
+>>
+>> Also, if we ever get fancy and teach the page allocator about memory with reduced directmap permissions, it may well be more efficient for userspace to shove data into a memfd via ioctl than it is to mmap it and write the data.
+> 
+> 
+> 
 
