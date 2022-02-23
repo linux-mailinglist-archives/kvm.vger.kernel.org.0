@@ -2,458 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EE4434C136D
-	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 13:58:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E4EF4C1386
+	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 14:04:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240708AbiBWM6M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Feb 2022 07:58:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52162 "EHLO
+        id S240620AbiBWNEi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Feb 2022 08:04:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58408 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240736AbiBWM55 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Feb 2022 07:57:57 -0500
+        with ESMTP id S236296AbiBWNEg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Feb 2022 08:04:36 -0500
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4A62511A13
-        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 04:57:20 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2C5899319C;
+        Wed, 23 Feb 2022 05:04:09 -0800 (PST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 80B61139F;
-        Wed, 23 Feb 2022 04:57:20 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 536F93F70D;
-        Wed, 23 Feb 2022 04:57:18 -0800 (PST)
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     pbonzini@redhat.com, thuth@redhat.com, drjones@redhat.com,
-        varad.gautam@suse.com, zixuanwang@google.com, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu
-Subject: [kvm-unit-tests PATCH v2 3/3] Rename --target-efi to --[enable|disable]-efi
-Date:   Wed, 23 Feb 2022 12:55:37 +0000
-Message-Id: <20220223125537.41529-4-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220223125537.41529-1-alexandru.elisei@arm.com>
-References: <20220223125537.41529-1-alexandru.elisei@arm.com>
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D5EEAED1;
+        Wed, 23 Feb 2022 05:04:08 -0800 (PST)
+Received: from [10.57.40.147] (unknown [10.57.40.147])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id ACA053F70D;
+        Wed, 23 Feb 2022 05:04:04 -0800 (PST)
+Message-ID: <880a269d-d39d-bab3-8d19-b493e874ec99@arm.com>
+Date:   Wed, 23 Feb 2022 13:04:00 +0000
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.1
+Subject: Re: [PATCH v6 02/11] driver core: Add dma_cleanup callback in
+ bus_type
+Content-Language: en-GB
+To:     Lu Baolu <baolu.lu@linux.intel.com>,
+        Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>, kvm@vger.kernel.org,
+        rafael@kernel.org, David Airlie <airlied@linux.ie>,
+        linux-pci@vger.kernel.org,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Dmitry Osipenko <digetx@gmail.com>,
+        Will Deacon <will@kernel.org>,
+        Stuart Yoder <stuyoder@gmail.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        linux-kernel@vger.kernel.org, Li Yang <leoyang.li@nxp.com>,
+        iommu@lists.linux-foundation.org,
+        Jacob jun Pan <jacob.jun.pan@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>
+References: <20220218005521.172832-1-baolu.lu@linux.intel.com>
+ <20220218005521.172832-3-baolu.lu@linux.intel.com>
+ <YhCdEmC2lYStmUSL@infradead.org>
+ <1d8004d3-1887-4fc7-08d2-0e2ee6b5fdcb@arm.com>
+ <20220221234837.GA10061@nvidia.com>
+ <1acb8748-8d44-688d-2380-f39ec820776f@arm.com>
+ <20220222151632.GB10061@nvidia.com>
+ <3d4c3bf1-fed6-f640-dc20-36d667de7461@arm.com>
+ <20220222235353.GF10061@nvidia.com>
+ <171bec90-5ea6-b35b-f027-1b5e961f5ddf@linux.intel.com>
+From:   Robin Murphy <robin.murphy@arm.com>
+In-Reply-To: <171bec90-5ea6-b35b-f027-1b5e961f5ddf@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Rename --target-efi to --enable-efi to make it similar to autoconf's
-configure script options. Add the --disable-efi option for symmetry and to
-make it easy for the option to change from disabled by default to enabled
-by default in the future.
+On 2022-02-23 05:01, Lu Baolu wrote:
+> On 2/23/22 7:53 AM, Jason Gunthorpe wrote:
+>>> To spell it out, the scheme I'm proposing looks like this:
+>> Well, I already got this, it is what is in driver_or_DMA_API_token()
+>> that matters
+>>
+>> I think you are suggesting to do something like:
+>>
+>>     if (!READ_ONCE(dev->driver) ||  ???)
+>>         return NULL;
+>>     return group;  // A DMA_API 'token'
+>>
+>> Which is locklessly reading dev->driver, and why you are talking about
+>> races, I guess.
+>>
+> 
+> I am afraid that we are not able to implement a race-free
+> driver_or_DMA_API_token() helper. The lock problem between the IOMMU
+> core and driver core always exists.
 
-Suggested-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
- Makefile             |  6 +++---
- configure            | 19 +++++++++++--------
- lib/x86/acpi.c       |  4 ++--
- lib/x86/amd_sev.h    |  4 ++--
- lib/x86/asm/page.h   |  8 ++++----
- lib/x86/asm/setup.h  |  4 ++--
- lib/x86/setup.c      |  4 ++--
- lib/x86/vm.c         | 12 ++++++------
- scripts/runtime.bash |  4 ++--
- x86/Makefile.common  |  6 +++---
- x86/Makefile.x86_64  |  6 +++---
- x86/access_test.c    |  2 +-
- x86/efi/README.md    |  2 +-
- x86/efi/run          |  2 +-
- x86/run              |  4 ++--
- 15 files changed, 45 insertions(+), 42 deletions(-)
+It's not race-free. My point is that the races aren't harmful because 
+what we might infer from the "wrong" information still leads to the 
+right action. dev->driver is obviously always valid and constant for 
+*claiming* ownership, since that either happens for the DMA API in the 
+middle of really_probe() binding driver to dev, or while driver is 
+actively using dev and calling iommu_group_claim_dma_owner(). The races 
+exist during remove, but both probe and remove are serialised on the 
+group mutex after respectively setting/clearing dev->driver, there are 
+only 4 possibilities for the state of any other group sibling "tmp" 
+during the time that dev holds that mutex in its remove path:
 
-diff --git a/Makefile b/Makefile
-index 5af17f129ced..24686dddb4fd 100644
---- a/Makefile
-+++ b/Makefile
-@@ -39,9 +39,9 @@ LIBFDT_archive = $(LIBFDT_objdir)/libfdt.a
- OBJDIRS += $(LIBFDT_objdir)
- 
- # EFI App
--ifeq ($(TARGET_EFI),y)
-+ifeq ($(CONFIG_EFI),y)
- EFI_ARCH = x86_64
--EFI_CFLAGS := -DTARGET_EFI
-+EFI_CFLAGS := -DCONFIG_EFI
- # The following CFLAGS and LDFLAGS come from:
- #   - GNU-EFI/Makefile.defaults
- #   - GNU-EFI/apps/Makefile
-@@ -81,7 +81,7 @@ COMMON_CFLAGS += $(fno_stack_protector)
- COMMON_CFLAGS += $(fno_stack_protector_all)
- COMMON_CFLAGS += $(wno_frame_address)
- COMMON_CFLAGS += $(if $(U32_LONG_FMT),-D__U32_LONG_FMT__,)
--ifeq ($(TARGET_EFI),y)
-+ifeq ($(CONFIG_EFI),y)
- COMMON_CFLAGS += $(EFI_CFLAGS)
- else
- COMMON_CFLAGS += $(fno_pic) $(no_pie)
-diff --git a/configure b/configure
-index 6620e78ec09c..6b5229b91cbb 100755
---- a/configure
-+++ b/configure
-@@ -29,7 +29,7 @@ host_key_document=
- gen_se_header=
- page_size=
- earlycon=
--target_efi=
-+efi=
- 
- usage() {
-     cat <<-EOF
-@@ -74,7 +74,7 @@ usage() {
- 	               pl011,mmio32,ADDR
- 	                           Specify a PL011 compatible UART at address ADDR. Supported
- 	                           register stride is 32 bit only.
--	    --target-efi           Boot and run from UEFI (x86_64 only)
-+	    --[enable|disable]-efi Boot and run from UEFI (disabled by default, x86_64 only)
- EOF
-     exit 1
- }
-@@ -142,8 +142,11 @@ while [[ "$1" = -* ]]; do
- 	--earlycon)
- 	    earlycon="$arg"
- 	    ;;
--	--target-efi)
--	    target_efi=y
-+	--enable-efi)
-+	    efi=y
-+	    ;;
-+	--disable-efi)
-+	    efi=n
- 	    ;;
- 	--help)
- 	    usage
-@@ -177,8 +180,8 @@ else
-     fi
- fi
- 
--if [ "$target_efi" ] && [ "$arch" != "x86_64" ]; then
--    echo "--target-efi is not supported for $arch"
-+if [ "$efi" ] && [ "$arch" != "x86_64" ]; then
-+    echo "--[enable|disable]-efi is not supported for $arch"
-     usage
- fi
- 
-@@ -278,7 +281,7 @@ if [ -f "$srcdir/$testdir/run" ]; then
- fi
- 
- testsubdir=$testdir
--if [ -n "$target_efi" ]; then
-+if [ "$efi" = "y" ]; then
-     testsubdir=$testdir/efi
- fi
- 
-@@ -367,7 +370,7 @@ U32_LONG_FMT=$u32_long
- WA_DIVIDE=$wa_divide
- GENPROTIMG=${GENPROTIMG-genprotimg}
- HOST_KEY_DOCUMENT=$host_key_document
--TARGET_EFI=$target_efi
-+CONFIG_EFI=$efi
- GEN_SE_HEADER=$gen_se_header
- EOF
- if [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
-diff --git a/lib/x86/acpi.c b/lib/x86/acpi.c
-index 1a82ced0b90f..de275caf3146 100644
---- a/lib/x86/acpi.c
-+++ b/lib/x86/acpi.c
-@@ -1,7 +1,7 @@
- #include "libcflat.h"
- #include "acpi.h"
- 
--#ifdef TARGET_EFI
-+#ifdef CONFIG_EFI
- struct rsdp_descriptor *efi_rsdp = NULL;
- 
- void set_efi_rsdp(struct rsdp_descriptor *rsdp)
-@@ -34,7 +34,7 @@ static struct rsdp_descriptor *get_rsdp(void)
- 
- 	return rsdp;
- }
--#endif /* TARGET_EFI */
-+#endif /* CONFIG_EFI */
- 
- void* find_acpi_table_addr(u32 sig)
- {
-diff --git a/lib/x86/amd_sev.h b/lib/x86/amd_sev.h
-index 6a10f845daba..ed6e3385340c 100644
---- a/lib/x86/amd_sev.h
-+++ b/lib/x86/amd_sev.h
-@@ -12,7 +12,7 @@
- #ifndef _X86_AMD_SEV_H_
- #define _X86_AMD_SEV_H_
- 
--#ifdef TARGET_EFI
-+#ifdef CONFIG_EFI
- 
- #include "libcflat.h"
- #include "desc.h"
-@@ -58,6 +58,6 @@ void setup_ghcb_pte(pgd_t *page_table);
- unsigned long long get_amd_sev_c_bit_mask(void);
- unsigned long long get_amd_sev_addr_upperbound(void);
- 
--#endif /* TARGET_EFI */
-+#endif /* CONFIG_EFI */
- 
- #endif /* _X86_AMD_SEV_H_ */
-diff --git a/lib/x86/asm/page.h b/lib/x86/asm/page.h
-index c25bc66b7aa4..298e7e8efb57 100644
---- a/lib/x86/asm/page.h
-+++ b/lib/x86/asm/page.h
-@@ -25,11 +25,11 @@ typedef unsigned long pgd_t;
- #define LARGE_PAGE_SIZE	(1024 * PAGE_SIZE)
- #endif
- 
--#ifdef TARGET_EFI
-+#ifdef CONFIG_EFI
- /* lib/x86/amd_sev.c */
- extern unsigned long long get_amd_sev_c_bit_mask(void);
- extern unsigned long long get_amd_sev_addr_upperbound(void);
--#endif /* TARGET_EFI */
-+#endif /* CONFIG_EFI */
- 
- #define PT_PRESENT_MASK		(1ull << 0)
- #define PT_WRITABLE_MASK	(1ull << 1)
-@@ -47,11 +47,11 @@ extern unsigned long long get_amd_sev_addr_upperbound(void);
-  */
- #define PT_ADDR_UPPER_BOUND_DEFAULT	(51)
- 
--#ifdef TARGET_EFI
-+#ifdef CONFIG_EFI
- #define PT_ADDR_UPPER_BOUND	(get_amd_sev_addr_upperbound())
- #else
- #define PT_ADDR_UPPER_BOUND	(PT_ADDR_UPPER_BOUND_DEFAULT)
--#endif /* TARGET_EFI */
-+#endif /* CONFIG_EFI */
- 
- #define PT_ADDR_LOWER_BOUND	(PAGE_SHIFT)
- #define PT_ADDR_MASK		GENMASK_ULL(PT_ADDR_UPPER_BOUND, PT_ADDR_LOWER_BOUND)
-diff --git a/lib/x86/asm/setup.h b/lib/x86/asm/setup.h
-index dbfb2a22bc1b..24d4fa9dc76a 100644
---- a/lib/x86/asm/setup.h
-+++ b/lib/x86/asm/setup.h
-@@ -3,7 +3,7 @@
- 
- unsigned long setup_tss(u8 *stacktop);
- 
--#ifdef TARGET_EFI
-+#ifdef CONFIG_EFI
- #include "x86/acpi.h"
- #include "x86/apic.h"
- #include "x86/processor.h"
-@@ -14,6 +14,6 @@ unsigned long setup_tss(u8 *stacktop);
- 
- efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo);
- void setup_5level_page_table(void);
--#endif /* TARGET_EFI */
-+#endif /* CONFIG_EFI */
- 
- #endif /* _X86_ASM_SETUP_H_ */
-diff --git a/lib/x86/setup.c b/lib/x86/setup.c
-index bbd34682b79e..38893eddef96 100644
---- a/lib/x86/setup.c
-+++ b/lib/x86/setup.c
-@@ -167,7 +167,7 @@ void setup_multiboot(struct mbi_bootinfo *bi)
- 	initrd_size = mods->end - mods->start;
- }
- 
--#ifdef TARGET_EFI
-+#ifdef CONFIG_EFI
- 
- /* From x86/efi/efistart64.S */
- extern void load_idt(void);
-@@ -330,7 +330,7 @@ efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo)
- 	return EFI_SUCCESS;
- }
- 
--#endif /* TARGET_EFI */
-+#endif /* CONFIG_EFI */
- 
- void setup_libcflat(void)
- {
-diff --git a/lib/x86/vm.c b/lib/x86/vm.c
-index 56be57be673a..25a4f5fbfe17 100644
---- a/lib/x86/vm.c
-+++ b/lib/x86/vm.c
-@@ -26,9 +26,9 @@ pteval_t *install_pte(pgd_t *cr3,
-                 pt_page = 0;
- 	    memset(new_pt, 0, PAGE_SIZE);
- 	    pt[offset] = virt_to_phys(new_pt) | PT_PRESENT_MASK | PT_WRITABLE_MASK | pte_opt_mask;
--#ifdef TARGET_EFI
-+#ifdef CONFIG_EFI
- 	    pt[offset] |= get_amd_sev_c_bit_mask();
--#endif /* TARGET_EFI */
-+#endif /* CONFIG_EFI */
- 	}
- 	pt = phys_to_virt(pt[offset] & PT_ADDR_MASK);
-     }
-@@ -98,18 +98,18 @@ pteval_t *get_pte_level(pgd_t *cr3, void *virt, int pte_level)
- pteval_t *install_large_page(pgd_t *cr3, phys_addr_t phys, void *virt)
- {
-     phys_addr_t flags = PT_PRESENT_MASK | PT_WRITABLE_MASK | pte_opt_mask | PT_PAGE_SIZE_MASK;
--#ifdef TARGET_EFI
-+#ifdef CONFIG_EFI
-     flags |= get_amd_sev_c_bit_mask();
--#endif /* TARGET_EFI */
-+#endif /* CONFIG_EFI */
-     return install_pte(cr3, 2, virt, phys | flags, 0);
- }
- 
- pteval_t *install_page(pgd_t *cr3, phys_addr_t phys, void *virt)
- {
-     phys_addr_t flags = PT_PRESENT_MASK | PT_WRITABLE_MASK | pte_opt_mask;
--#ifdef TARGET_EFI
-+#ifdef CONFIG_EFI
-     flags |= get_amd_sev_c_bit_mask();
--#endif /* TARGET_EFI */
-+#endif /* CONFIG_EFI */
-     return install_pte(cr3, 1, virt, phys | flags, 0);
- }
- 
-diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-index 6d5fced94246..b4771f9c0e28 100644
---- a/scripts/runtime.bash
-+++ b/scripts/runtime.bash
-@@ -82,7 +82,7 @@ function run()
-     local accel="$8"
-     local timeout="${9:-$TIMEOUT}" # unittests.cfg overrides the default
- 
--    if [ "${TARGET_EFI}" == "y" ]; then
-+    if [ "${CONFIG_EFI}" == "y" ]; then
-         kernel=$(basename $kernel .flat)
-     fi
- 
-@@ -132,7 +132,7 @@ function run()
- 
-     last_line=$(premature_failure > >(tail -1)) && {
-         skip=true
--        if [ "${TARGET_EFI}" == "y" ] && [[ "${last_line}" =~ "enabling apic" ]]; then
-+        if [ "${CONFIG_EFI}" == "y" ] && [[ "${last_line}" =~ "enabling apic" ]]; then
-             skip=false
-         fi
-         if [ ${skip} == true ]; then
-diff --git a/x86/Makefile.common b/x86/Makefile.common
-index ff02d9822321..b90398829e7b 100644
---- a/x86/Makefile.common
-+++ b/x86/Makefile.common
-@@ -22,7 +22,7 @@ cflatobjs += lib/x86/acpi.o
- cflatobjs += lib/x86/stack.o
- cflatobjs += lib/x86/fault_test.o
- cflatobjs += lib/x86/delay.o
--ifeq ($(TARGET_EFI),y)
-+ifeq ($(CONFIG_EFI),y)
- cflatobjs += lib/x86/amd_sev.o
- cflatobjs += lib/efi.o
- cflatobjs += x86/efi/reloc_x86_64.o
-@@ -44,7 +44,7 @@ KEEP_FRAME_POINTER := y
- 
- FLATLIBS = lib/libcflat.a
- 
--ifeq ($(TARGET_EFI),y)
-+ifeq ($(CONFIG_EFI),y)
- .PRECIOUS: %.efi %.so
- 
- %.so: %.o $(FLATLIBS) $(SRCDIR)/x86/efi/elf_x86_64_efi.lds $(cstart.o)
-@@ -89,7 +89,7 @@ tests-common = $(TEST_DIR)/vmexit.$(exe) $(TEST_DIR)/tsc.$(exe) \
- # The following test cases are disabled when building EFI tests because they
- # use absolute addresses in their inline assembly code, which cannot compile
- # with the '-fPIC' flag
--ifneq ($(TARGET_EFI),y)
-+ifneq ($(CONFIG_EFI),y)
- tests-common += $(TEST_DIR)/realmode.$(exe)
- endif
- 
-diff --git a/x86/Makefile.x86_64 b/x86/Makefile.x86_64
-index a3cb75ae5868..f18c1e20fd27 100644
---- a/x86/Makefile.x86_64
-+++ b/x86/Makefile.x86_64
-@@ -1,7 +1,7 @@
- cstart.o = $(TEST_DIR)/cstart64.o
- bits = 64
- ldarch = elf64-x86-64
--ifeq ($(TARGET_EFI),y)
-+ifeq ($(CONFIG_EFI),y)
- exe = efi
- bin = so
- FORMAT = efi-app-x86_64
-@@ -32,14 +32,14 @@ tests += $(TEST_DIR)/rdpru.$(exe)
- tests += $(TEST_DIR)/pks.$(exe)
- tests += $(TEST_DIR)/pmu_lbr.$(exe)
- 
--ifeq ($(TARGET_EFI),y)
-+ifeq ($(CONFIG_EFI),y)
- tests += $(TEST_DIR)/amd_sev.$(exe)
- endif
- 
- # The following test cases are disabled when building EFI tests because they
- # use absolute addresses in their inline assembly code, which cannot compile
- # with the '-fPIC' flag
--ifneq ($(TARGET_EFI),y)
-+ifneq ($(CONFIG_EFI),y)
- tests += $(TEST_DIR)/access_test.$(exe)
- tests += $(TEST_DIR)/svm.$(exe)
- tests += $(TEST_DIR)/vmx.$(exe)
-diff --git a/x86/access_test.c b/x86/access_test.c
-index ef1243f0c151..67e9a08081c9 100644
---- a/x86/access_test.c
-+++ b/x86/access_test.c
-@@ -10,7 +10,7 @@ int main(void)
-     printf("starting test\n\n");
-     r = ac_test_run(PT_LEVEL_PML4);
- 
--#ifndef TARGET_EFI
-+#ifndef CONFIG_EFI
-     /*
-      * Not supported yet for UEFI, because setting up 5
-      * level page table requires entering real mode.
-diff --git a/x86/efi/README.md b/x86/efi/README.md
-index a39f509cd9aa..aa1dbcdd405f 100644
---- a/x86/efi/README.md
-+++ b/x86/efi/README.md
-@@ -15,7 +15,7 @@ The following dependencies should be installed:
- 
- To build:
- 
--    ./configure --target-efi
-+    ./configure --enable-efi
-     make
- 
- ### Run test cases with UEFI
-diff --git a/x86/efi/run b/x86/efi/run
-index ac368a59ba9f..322cb7567fdc 100755
---- a/x86/efi/run
-+++ b/x86/efi/run
-@@ -8,7 +8,7 @@ if [ $# -eq 0 ]; then
- fi
- 
- if [ ! -f config.mak ]; then
--	echo "run './configure --target-efi && make' first. See ./configure -h"
-+	echo "run './configure --enable-efi && make' first. See ./configure -h"
- 	exit 2
- fi
- source config.mak
-diff --git a/x86/run b/x86/run
-index 582d1eda0fd9..4d53b72e8358 100755
---- a/x86/run
-+++ b/x86/run
-@@ -39,12 +39,12 @@ fi
- 
- command="${qemu} --no-reboot -nodefaults $pc_testdev -vnc none -serial stdio $pci_testdev"
- command+=" -machine accel=$ACCEL"
--if [ "${TARGET_EFI}" != y ]; then
-+if [ "${CONFIG_EFI}" != y ]; then
- 	command+=" -kernel"
- fi
- command="$(timeout_cmd) $command"
- 
--if [ "${TARGET_EFI}" = y ]; then
-+if [ "${CONFIG_EFI}" = y ]; then
- 	# Set ENVIRON_DEFAULT=n to remove '-initrd' flag for QEMU (see
- 	# 'scripts/arch-run.bash' for more details). This is because when using
- 	# UEFI, the test case binaries are passed to QEMU through the disk
--- 
-2.35.1
+1 - tmp->driver is non-NULL because tmp is already bound.
+   1.a - If tmp->driver->driver_managed_dma == 0, the group must 
+currently be DMA-API-owned as a whole. Regardless of what driver dev has 
+unbound from, its removal does not release someone else's DMA API 
+(co-)ownership.
+   1.b - If tmp->driver->driver_managed_dma == 1 and tmp->driver == 
+group->owner, then dev must have unbound from the same driver, but 
+either way that driver has not yet released ownership so dev's removal 
+does not change anything.
+   1.c - If tmp->driver->driver_managed_dma == 1 and tmp->driver != 
+group->owner, it doesn't matter. Even if tmp->driver is currently 
+waiting to attempt to claim ownership it can't do so until we release 
+the mutex.
 
+2 - tmp->driver is non-NULL because tmp is in the process of binding.
+   2.a - If tmp->driver->driver_managed_dma == 0, tmp can be assumed to 
+be waiting on the group mutex to claim DMA API ownership.
+     2.a.i - If the group is DMA API owned, this race is simply a 
+short-cut to case 1.a - dev's ownership is effectively handed off 
+directly to tmp, rather than potentially being released and immediately 
+reclaimed. Once tmp gets its turn, it finds the group already 
+DMA-API-owned as it wanted and all is well. This may be "unfair" if an 
+explicit claim was also waiting, but not incorrect.
+     2.a.ii - If the group is driver-owned, it doesn't matter. Removing 
+dev does not change the current ownership, and tmp's probe will 
+eventually get its turn and find whatever it finds at that point in future.
+   2.b - If tmp->driver->driver_managed_dma == 1, it doesn't matter. 
+Either that driver already owns the group, or it might try to claim it 
+after we've resolved dev's removal and released the mutex, in which case 
+it will find whatever it finds.
+
+3 - tmp->driver is NULL because tmp is unbound. Obviously no impact.
+
+4 - tmp->driver is NULL because tmp is in the process of unbinding.
+   4.a - If the group is DMA-API-owned, either way tmp has no further 
+influence.
+     4.a.i - If tmp has unbound from a driver_managed_dma=0 driver, it 
+must be waiting to release its DMA API ownership, thus if tmp would 
+otherwise be the only remaining DMA API owner, the race is that dev's 
+removal releases ownership on behalf of both devices. When tmp's own 
+removal subsequently gets the mutex, it will either see that the group 
+is already unowned, or maybe that someone else has re-claimed it in the 
+interim, and either way do nothing, which is fine.
+     4.a.ii - If tmp has unbound from a driver_managed_dma=1 driver, it 
+doesn't matter, as in case 1.c.
+   4.b - If the group is driver-owned, it doesn't matter. That ownership 
+can only change if that driver releases it, which isn't happening while 
+we hold the mutex.
+
+As I said yesterday, I'm really just airing out an idea here; I might 
+write up some proper patches as part of the bus ops work, and we can 
+give it proper scrutiny then.
+
+> For example, when we implemented iommu_group_store_type() to change the
+> default domain type of a device through sysfs, we could only comprised
+> and limited this functionality to singleton groups to avoid the lock
+> issue.
+
+Indeed, but once the probe and remove paths for grouped devices have to 
+serialise on the group mutex, as we're introducing here, the story 
+changes and we gain a lot more power. In fact that's a good point I 
+hadn't considered yet - that sysfs constraint is functionally equivalent 
+to the one in iommu_attach_device(), so once we land this ownership 
+concept we should be free to relax it from "singleton" to "unowned" in 
+much the same way as your other series is doing for attach.
+
+> Unfortunately, that compromise cannot simply applied to the problem to
+> be solved by this series, because the iommu core cannot abort the driver
+> binding when the conflict is detected in the bus notifier.
+
+No, I've never proposed that probe-time DMA ownership can be claimed 
+from a notifier, we all know why that doesn't work. It's only the 
+dma_cleanup() step that *could* be punted back to iommu_bus_notifier vs. 
+the driver core having to know about it. Either way we're still 
+serialising remove/failure against probe/remove of other devices in a 
+group, and that's the critical aspect.
+
+Thanks,
+Robin.
