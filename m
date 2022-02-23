@@ -2,110 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BCEA34C1890
-	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 17:24:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8D96F4C189E
+	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 17:33:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242763AbiBWQYa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Feb 2022 11:24:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35580 "EHLO
+        id S242806AbiBWQda (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Feb 2022 11:33:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44176 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242780AbiBWQY1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Feb 2022 11:24:27 -0500
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91DA8C621E
-        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 08:23:58 -0800 (PST)
-Received: by mail-pg1-x549.google.com with SMTP id a12-20020a65640c000000b003756296df5cso966296pgv.19
-        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 08:23:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
-        bh=Zq5O8IKBkl9yeultGadXfU2kv4EOG3DlmV7KiCyDcKM=;
-        b=crEwl8LrnedZBA2+Md/f5sPIkTNDd3HYfHlrpjl5H/7KtrpKygDWvmlRLs4DvoXySZ
-         B4oBmQ3HULN70w4taFlDvkgBuurBxC3QH9oshKsZ6UeJKsve0PTZdHGCMKIbR/A8Akd8
-         fYcloBZvCg7y9iwDTa8g0OBJ1uuYqzyg+LAWyGZtCZbUQ5p8Fl65UCP3NR31QEZRHE7l
-         PBrFDDztQdyQhT1PTlBKCLawcgtH/F5Z8zmU03CqPk5yRRuRh0PiJUkmzcD2RjOB7eg9
-         6zCDwQfOTxiDUgMMN7TP9lrdV5zphFC5iM5NjO0qVJaLrNIyqpYMEjnw/JYRxSJOMhsD
-         lYPg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
-         :from:to:cc;
-        bh=Zq5O8IKBkl9yeultGadXfU2kv4EOG3DlmV7KiCyDcKM=;
-        b=MCUkRhiFHy+cYb9d/mRInOoknfjI9Slz2w426QmK/ALMTQ29Rxf7ejE5LqeirIbbUu
-         op8J4l0wQb0xOVJVQA4aKqzimDQ2ewMH2/joIJHjNjezjQwFpAgXKBoKPCs1oh9btBnf
-         gxZtcVDaEF5ARjtOlAaP//gjKcfFSNay2pm5o4+Wa/c6Tyuw/dW3mkzd3XIJ6nfrLY39
-         7c+fbJSZfIzlb/WFd3eAFGBwjFkEmXNjwe02btSwG18Tevx/KSf0D4V3zdPdF8Hk/G8Y
-         UM2b5jnYGgXiSHADHFHWwWKZ2K/8VOMl1dcIq9blqftAEIKlaCpgL1Xhdh1B8SxlXjey
-         Br1Q==
-X-Gm-Message-State: AOAM530epuJVYOmZdYEiDr6JPrjxwRGGVneYPLzvVMZhj1GnDFV00Juy
-        +RkFTH8BdNOwCIXRLcKEXdjPqoSP6EQ=
-X-Google-Smtp-Source: ABdhPJzZQ0B8p6pIOm8+cCuTOJozWKUbW01GUCzK1dfNF6PIug84YVze+NcLDSwys7PuOxQ3ArOXBy0YDUA=
-X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:90b:4f43:b0:1bc:7e5c:e024 with SMTP id
- pj3-20020a17090b4f4300b001bc7e5ce024mr57612pjb.0.1645633437536; Wed, 23 Feb
- 2022 08:23:57 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 23 Feb 2022 16:23:55 +0000
-Message-Id: <20220223162355.3174907-1-seanjc@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.35.1.473.g83b2b277ed-goog
-Subject: [PATCH] KVM: x86: Fix pointer mistmatch warning when patching RET0
- static calls
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        llvm@lists.linux.dev, linux-kernel@vger.kernel.org,
-        Like Xu <like.xu.linux@gmail.com>
+        with ESMTP id S237219AbiBWQd2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Feb 2022 11:33:28 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 769D04F47B
+        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 08:33:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645633979;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=eJFcVMvv6yQets9GHtEootWOFNlstKVit+WEDgtDqA8=;
+        b=GwkIIkCyotnKLYkshTr7wdSrsIKuAG3Ocw016VsP6ePoloWluHd6me0OAnkDcs9rN6j1jj
+        QX+aQORNhoWbsw6pZdplWXAx18uCgQLCN+FXxNFGszGlcb0vSY3OfF7gNYAi9qUwsOrGOg
+        ioce9hUFvgk6knU9s6kwZLgTGa7TFNQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-57-k7jpMBl1Psy5uqDeQ85eJQ-1; Wed, 23 Feb 2022 11:32:56 -0500
+X-MC-Unique: k7jpMBl1Psy5uqDeQ85eJQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3D15B801AAD;
+        Wed, 23 Feb 2022 16:32:55 +0000 (UTC)
+Received: from starship (unknown [10.40.195.190])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D65DB2ED8D;
+        Wed, 23 Feb 2022 16:32:53 +0000 (UTC)
+Message-ID: <7f18cfd048609276cc298dbfa01628bd2fa15937.camel@redhat.com>
+Subject: Re: [PATCH v2 12/18] KVM: x86/mmu: clear MMIO cache when unloading
+ the MMU
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     seanjc@google.com
+Date:   Wed, 23 Feb 2022 18:32:52 +0200
+In-Reply-To: <20220217210340.312449-13-pbonzini@redhat.com>
+References: <20220217210340.312449-1-pbonzini@redhat.com>
+         <20220217210340.312449-13-pbonzini@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Cast kvm_x86_ops.func to 'void *' when updating KVM static calls that are
-conditionally patched to __static_call_return0().  clang complains about
-using mismatching pointers in the ternary operator, which breaks the
-build when compiling with CONFIG_KVM_WERROR=y.
+On Thu, 2022-02-17 at 16:03 -0500, Paolo Bonzini wrote:
+> For cleanliness, do not leave a stale GVA in the cache after all the roots are
+> cleared.  In practice, kvm_mmu_load will go through kvm_mmu_sync_roots if
+> paging is on, and will not use vcpu_match_mmio_gva at all if paging is off.
+> However, leaving data in the cache might cause bugs in the future.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index b01160716c6a..4e8e3e9530ca 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -5111,6 +5111,7 @@ void kvm_mmu_unload(struct kvm_vcpu *vcpu)
+>  {
+>  	__kvm_mmu_unload(vcpu->kvm, &vcpu->arch.root_mmu);
+>  	__kvm_mmu_unload(vcpu->kvm, &vcpu->arch.guest_mmu);
+> +	vcpu_clear_mmio_info(vcpu, MMIO_GVA_ANY);
+>  }
+>  
+>  static bool need_remote_flush(u64 old, u64 new)
 
-  >> arch/x86/include/asm/kvm-x86-ops.h:82:1: warning: pointer type mismatch
-  ('bool (*)(struct kvm_vcpu *)' and 'void *') [-Wpointer-type-mismatch]
 
-Fixes: 5be2226f417d ("KVM: x86: allow defining return-0 static calls")
-Reported-by: Like Xu <like.xu.linux@gmail.com>
-Reported-by: kernel test robot <lkp@intel.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/include/asm/kvm_host.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+One thing that bothers me for a while with all of this is that
+vcpu->arch.{mmio_gva|mmio_access|mmio_gfn|mmio_gen} are often called mmio cache,
+while we also install reserved bit SPTEs and also call this a mmio cache.
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 713e08f62385..f285ddb8b66b 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1547,8 +1547,8 @@ static inline void kvm_ops_static_call_update(void)
- 	WARN_ON(!kvm_x86_ops.func); __KVM_X86_OP(func)
- #define KVM_X86_OP_OPTIONAL __KVM_X86_OP
- #define KVM_X86_OP_OPTIONAL_RET0(func) \
--	static_call_update(kvm_x86_##func, kvm_x86_ops.func ? : \
--			   (void *) __static_call_return0);
-+	static_call_update(kvm_x86_##func, (void *)kvm_x86_ops.func ? : \
-+					   (void *)__static_call_return0);
- #include <asm/kvm-x86-ops.h>
- #undef __KVM_X86_OP
- }
+The above is basically a cache of a cache sort of.
 
-base-commit: f4bc051fc91ab9f1d5225d94e52d369ef58bec58
--- 
-2.35.1.473.g83b2b277ed-goog
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+
+Best regards,
+	Maxim Levitsky
 
