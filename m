@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 162654C0C18
+	by mail.lfdr.de (Postfix) with ESMTP id AC5694C0C1A
 	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 06:28:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238505AbiBWF1w (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Feb 2022 00:27:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58104 "EHLO
+        id S238339AbiBWF1r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Feb 2022 00:27:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238377AbiBWF0t (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Feb 2022 00:26:49 -0500
+        with ESMTP id S238379AbiBWF0u (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Feb 2022 00:26:50 -0500
 Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 095BB6D19B
-        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 21:25:10 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id e129-20020a25d387000000b006245d830ca6so12324499ybf.13
-        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 21:25:10 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E1CB6D392
+        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 21:25:12 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id b18-20020a25fa12000000b0062412a8200eso20209666ybe.22
+        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 21:25:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=vfUNGUzwKPwc6P8NLNU+G63bl3V3MlYghQJcmtOSBSE=;
-        b=C/GDnUFZL4LltMsvS5FMOZ/XDx/Be18sR4fVDAdJWkBYRmDcKo9NUb1We9xS3LmtRX
-         yqMgXlP8N7xZF8Ux9+U55HvDcm/rY0cp41ABtNZNYkR8wwwnlp5Tc/Z+WHg/tqCClya8
-         drGn7Okq0DGr0wllM266iYWMJ6XzagvRVWp/SuheBkEQDwBl5n0u5tK2RWK5glZ9ZfVv
-         eEvwT9dopjeCYjYsqzOL8esps1cNs0pAqvlGBd0CeJIX0vdenIhUxI0GrChVSsd4iQJA
-         j46UlOr9zWrPPZy9HcKzVHRGC9BZ83U6lLLZDxYZVj1AeRVrqyWEuBaLgII5jGj/PpWl
-         RKzQ==
+        bh=ADygLqIPpXiMqBEcZG+FIIc+2sjjDL7sC0SphzjVQM8=;
+        b=XTSLmsGvhvcUg1TWPppXBzPUQLRac82+QtTaWAJbfENnf+LFsbfGfYAYKSS2y7fP86
+         xw06QgEtf7pep5PqE6Q1aM+NyxahQ7SmgpjVkx80n1ORA4q/bqa1CVOsjpTMMWmZloKQ
+         uucN4SETymYCsva4W1OHKwzmwTJIk9TZAOYPJ1y+ZPVUmyQQ1PbH7n1l3q9WUPnCWwcM
+         Cb3CxmDXmSaVEz0TvEtPSskpBLRm0AocmFGmy3Znq/tmFUH/ahr88pzMeI+oucZvgSN3
+         VZ4LlqahzSCUtRhfh8h6InSjlirWGXuPDeznUvG9vYUdMzAnIxg/DQM0QaE6Bs8x3s0G
+         p5Tg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=vfUNGUzwKPwc6P8NLNU+G63bl3V3MlYghQJcmtOSBSE=;
-        b=qNj/b5WdTsA/gaTIOCt19vcjRTIOXfNx0qHhTxvazPiTo2F5sPtxouZ6HQWmelDnkX
-         Juzu/tUc24IbDfllfwv0/y6GdRVqqrEN44cDFEBVmiwMTXB//NumsdpahXVrj8g9Ucut
-         rVxrOGTikHJBAL7K6lARuEIOWDMnRwrlht4oh8UFT0+hnHCjud50arn1bwQG8srzRIfg
-         RNcMjzxYigjyPa2t7nnLPzTmXdUwuRPSYC7tag3LpdXcioA7fjdJC2OVNx83QBmP7+qd
-         YP46UVYiOEjHZh61oREzXZTTmLajBd950ZRc1QP8qnF5dx1T93XU7TzAWeq4qtTa5cjC
-         6UGg==
-X-Gm-Message-State: AOAM5305ZlyD9dW/pKzFPee2b5bl/Tsb8BBpntkqQ1r5diOEXF1BseSx
-        axg6u13wtMwP3OKNErn5Kc7O9BQXPMn7
-X-Google-Smtp-Source: ABdhPJzDIIPPMetTAHkgCVvjLqBOhwyQ9fOAQZEm98thqfQ3nuARy106JiYU5crLZ1jrdqAZ9ScyawbA4X0V
+        bh=ADygLqIPpXiMqBEcZG+FIIc+2sjjDL7sC0SphzjVQM8=;
+        b=ZRM68Djh+36Vb9PkNCWi/gySYia/x2fnL/HYNKU8gMwGtzW/hGha/4gBtgI3TKpRrF
+         H4dSAEp+5u7CdRU8Dx+NBocuwOR9wKA6XidOBFMSUjaiNuETewB3yhDTA8sm9zF/9iN4
+         teNDm4ENFS8Syti9VYTmP+wC8oEcs5+m1xTvFj/zuyzTvS+sNy5cs5V1dV44i3wIEOId
+         fNRXpJgwfBl1TWtcEWaVAdkYDvBsQw4rDeaeg+Mj1ckaz++H0zXF69l2jO8Sx290z6dF
+         8UAX+mzkclom2j9uTED5xuwFmI/RewHk1OxVl58Lqenfu7dDE4XdNQBoSj3fTMDqQ/2D
+         rqJA==
+X-Gm-Message-State: AOAM5306gq8SetoQsDOU49p30rKkPf+AB8eUjWkQg3PQG1T9w/mwIn8G
+        /MNcbyA/FOn4DfVUTPDzFG6wIPUezJVy
+X-Google-Smtp-Source: ABdhPJxnEaZg6RVeib/qxGX0ultucEuvlDuM1/3KZuHHbAgoAGzQNWHho88GWzU0EQgaqkKLhw8qsZUiJNi/
 X-Received: from js-desktop.svl.corp.google.com ([2620:15c:2cd:202:ccbe:5d15:e2e6:322])
- (user=junaids job=sendgmr) by 2002:a81:945:0:b0:2ca:287c:6cf3 with SMTP id
- 66-20020a810945000000b002ca287c6cf3mr26007076ywj.408.1645593899054; Tue, 22
- Feb 2022 21:24:59 -0800 (PST)
-Date:   Tue, 22 Feb 2022 21:22:09 -0800
+ (user=junaids job=sendgmr) by 2002:a81:354f:0:b0:2d0:e91f:c26 with SMTP id
+ c76-20020a81354f000000b002d0e91f0c26mr27033178ywa.318.1645593901360; Tue, 22
+ Feb 2022 21:25:01 -0800 (PST)
+Date:   Tue, 22 Feb 2022 21:22:10 -0800
 In-Reply-To: <20220223052223.1202152-1-junaids@google.com>
-Message-Id: <20220223052223.1202152-34-junaids@google.com>
+Message-Id: <20220223052223.1202152-35-junaids@google.com>
 Mime-Version: 1.0
 References: <20220223052223.1202152-1-junaids@google.com>
 X-Mailer: git-send-email 2.35.1.473.g83b2b277ed-goog
-Subject: [RFC PATCH 33/47] kvm: asi: Map guest memory into restricted ASI
- address space
+Subject: [RFC PATCH 34/47] kvm: asi: Unmap guest memory from ASI address space
+ when using nested virt
 From:   Junaid Shahid <junaids@google.com>
 To:     linux-kernel@vger.kernel.org
 Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com,
@@ -71,314 +71,121 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-A module parameter treat_all_userspace_as_nonsensitive is added,
-which if set, maps the entire userspace of the process running the VM
-into the ASI restricted address space.
+L1 guest memory as a whole cannot be considered non-sensitive when an
+L2 is running. Even if L1 is using its own mitigations, L2 VM Exits
+could, in theory, bring into the cache some sensitive L1 memory without
+L1 getting a chance to flush it.
 
-If the flag is not set (the default), then just the userspace memory
-mapped into the VM's address space is mapped into the ASI restricted
-address space.
+For simplicity, we just unmap the entire L1 memory from the ASI
+restricted address space when nested virtualization is turned on. Though
+this is overridden if the treat_all_userspace_as_nonsensitive flag is
+enabled.
+
+In the future, we could potentially map some portions of L1 memory
+which are known to contain non-sensitive memory, which would reduce ASI
+overhead during nested virtualization.
+
+Note that unmapping the guest memory still leaves a slight hole because
+L2 could also potentially access copies of L1 VCPU registers stored in
+L0 kernel structures. In the future, this could be mitigated by having
+a separate ASI address space for each VCPU and treating the associated
+structures as locally non-sensitive only within that VCPU's ASI address
+space.
 
 Signed-off-by: Junaid Shahid <junaids@google.com>
 
 
 ---
- arch/x86/include/asm/kvm_host.h |  2 ++
- arch/x86/kvm/mmu.h              |  6 ++++
- arch/x86/kvm/mmu/mmu.c          | 54 +++++++++++++++++++++++++++++++++
- arch/x86/kvm/mmu/paging_tmpl.h  | 14 +++++++++
- arch/x86/kvm/x86.c              | 19 +++++++++++-
- include/linux/kvm_host.h        |  3 ++
- virt/kvm/kvm_main.c             |  7 +++++
- 7 files changed, 104 insertions(+), 1 deletion(-)
+ arch/x86/include/asm/kvm_host.h |  6 ++++++
+ arch/x86/kvm/mmu/mmu.c          | 10 ++++++++++
+ arch/x86/kvm/vmx/nested.c       | 22 ++++++++++++++++++++++
+ 3 files changed, 38 insertions(+)
 
 diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 98cbd6447e3e..e63a2f244d7b 100644
+index e63a2f244d7b..8ba88bbcf895 100644
 --- a/arch/x86/include/asm/kvm_host.h
 +++ b/arch/x86/include/asm/kvm_host.h
-@@ -681,6 +681,8 @@ struct kvm_vcpu_arch {
- 	struct kvm_mmu_memory_cache mmu_gfn_array_cache;
- 	struct kvm_mmu_memory_cache mmu_page_header_cache;
+@@ -1200,6 +1200,12 @@ struct kvm_arch {
+ 	 */
+ 	struct list_head tdp_mmu_pages;
  
-+	struct asi_pgtbl_pool asi_pgtbl_pool;
++	/*
++	 * Number of VCPUs that have enabled nested virtualization.
++	 * Currently only maintained when ASI is enabled.
++	 */
++	int nested_virt_enabled_count;
 +
  	/*
- 	 * QEMU userspace and the guest each have their own FPU state.
- 	 * In vcpu_run, we switch between the user and guest FPU contexts.
-diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-index 9ae6168d381e..60b84331007d 100644
---- a/arch/x86/kvm/mmu.h
-+++ b/arch/x86/kvm/mmu.h
-@@ -49,6 +49,12 @@
- 
- #define KVM_MMU_CR0_ROLE_BITS (X86_CR0_PG | X86_CR0_WP)
- 
-+#ifdef CONFIG_ADDRESS_SPACE_ISOLATION
-+extern bool treat_all_userspace_as_nonsensitive;
-+#else
-+#define treat_all_userspace_as_nonsensitive true
-+#endif
-+
- static __always_inline u64 rsvd_bits(int s, int e)
- {
- 	BUILD_BUG_ON(__builtin_constant_p(e) && __builtin_constant_p(s) && e < s);
+ 	 * Protects accesses to the following fields when the MMU lock
+ 	 * is held in read mode:
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index fcdf3f8bb59a..485c0ba3ce8b 100644
+index 485c0ba3ce8b..5785a0d02558 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -91,6 +91,11 @@ __MODULE_PARM_TYPE(nx_huge_pages_recovery_period_ms, "uint");
- static bool __read_mostly force_flush_and_sync_on_reuse;
- module_param_named(flush_on_reuse, force_flush_and_sync_on_reuse, bool, 0644);
+@@ -94,6 +94,7 @@ module_param_named(flush_on_reuse, force_flush_and_sync_on_reuse, bool, 0644);
+ #ifdef CONFIG_ADDRESS_SPACE_ISOLATION
+ bool __ro_after_init treat_all_userspace_as_nonsensitive;
+ module_param(treat_all_userspace_as_nonsensitive, bool, 0444);
++EXPORT_SYMBOL_GPL(treat_all_userspace_as_nonsensitive);
+ #endif
  
-+#ifdef CONFIG_ADDRESS_SPACE_ISOLATION
-+bool __ro_after_init treat_all_userspace_as_nonsensitive;
-+module_param(treat_all_userspace_as_nonsensitive, bool, 0444);
-+#endif
-+
  /*
-  * When setting this variable to true it enables Two-Dimensional-Paging
-  * where the hardware walks 2 page tables:
-@@ -2757,6 +2762,21 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
- 	return ret;
- }
+@@ -2769,6 +2770,15 @@ static void asi_map_gfn_range(struct kvm_vcpu *vcpu,
+ 	int err;
+ 	size_t hva = __gfn_to_hva_memslot(slot, gfn);
  
-+static void asi_map_gfn_range(struct kvm_vcpu *vcpu,
-+			      struct kvm_memory_slot *slot,
-+			      gfn_t gfn, size_t npages)
-+{
-+	int err;
-+	size_t hva = __gfn_to_hva_memslot(slot, gfn);
-+
-+	err = asi_map_user(vcpu->kvm->asi, (void *)hva, PAGE_SIZE * npages,
-+			   &vcpu->arch.asi_pgtbl_pool, slot->userspace_addr,
-+			   slot->userspace_addr + slot->npages * PAGE_SIZE);
-+	if (err)
-+		kvm_err("asi_map_user for %lx-%lx failed with code %d", hva,
-+			hva + PAGE_SIZE * npages, err);
-+}
-+
- static int direct_pte_prefetch_many(struct kvm_vcpu *vcpu,
- 				    struct kvm_mmu_page *sp,
- 				    u64 *start, u64 *end)
-@@ -2776,6 +2796,9 @@ static int direct_pte_prefetch_many(struct kvm_vcpu *vcpu,
- 	if (ret <= 0)
- 		return -1;
- 
-+	if (!treat_all_userspace_as_nonsensitive)
-+		asi_map_gfn_range(vcpu, slot, gfn, ret);
-+
- 	for (i = 0; i < ret; i++, gfn++, start++) {
- 		mmu_set_spte(vcpu, slot, start, access, gfn,
- 			     page_to_pfn(pages[i]), NULL);
-@@ -3980,6 +4003,15 @@ static bool kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
- 	return true;
- }
- 
-+static void vcpu_fill_asi_pgtbl_pool(struct kvm_vcpu *vcpu)
-+{
-+	int err = asi_fill_pgtbl_pool(&vcpu->arch.asi_pgtbl_pool,
-+				      CONFIG_PGTABLE_LEVELS - 1, GFP_KERNEL);
-+
-+	if (err)
-+		kvm_err("asi_fill_pgtbl_pool failed with code %d", err);
-+}
-+
- /*
-  * Returns true if the page fault is stale and needs to be retried, i.e. if the
-  * root was invalidated by a memslot update or a relevant mmu_notifier fired.
-@@ -4013,6 +4045,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- 	bool is_tdp_mmu_fault = is_tdp_mmu(vcpu->arch.mmu);
- 
- 	unsigned long mmu_seq;
-+	bool try_asi_map;
- 	int r;
- 
- 	fault->gfn = fault->addr >> PAGE_SHIFT;
-@@ -4038,6 +4071,12 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- 	if (handle_abnormal_pfn(vcpu, fault, ACC_ALL, &r))
- 		return r;
- 
-+	try_asi_map = !treat_all_userspace_as_nonsensitive &&
-+		      !is_noslot_pfn(fault->pfn);
-+
-+	if (try_asi_map)
-+		vcpu_fill_asi_pgtbl_pool(vcpu);
-+
- 	r = RET_PF_RETRY;
- 
- 	if (is_tdp_mmu_fault)
-@@ -4052,6 +4091,9 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- 	if (r)
- 		goto out_unlock;
- 
-+	if (try_asi_map)
-+		asi_map_gfn_range(vcpu, fault->slot, fault->gfn, 1);
-+
- 	if (is_tdp_mmu_fault)
- 		r = kvm_tdp_mmu_map(vcpu, fault);
- 	else
-@@ -5584,6 +5626,8 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
- 
- 	vcpu->arch.nested_mmu.translate_gpa = translate_nested_gpa;
- 
-+	asi_init_pgtbl_pool(&vcpu->arch.asi_pgtbl_pool);
-+
- 	ret = __kvm_mmu_create(vcpu, &vcpu->arch.guest_mmu);
- 	if (ret)
- 		return ret;
-@@ -5713,6 +5757,15 @@ static void kvm_mmu_invalidate_zap_pages_in_memslot(struct kvm *kvm,
- 			struct kvm_memory_slot *slot,
- 			struct kvm_page_track_notifier_node *node)
- {
 +	/*
-+	 * Currently, we just zap the entire address range, instead of only the
-+	 * memslot. So we also just asi_unmap the entire userspace. But in the
-+	 * future, if we zap only the range belonging to the memslot, then we
-+	 * should also asi_unmap only that range.
++	 * For now, we just don't map any guest memory when using nested
++	 * virtualization. In the future, we could potentially map some
++	 * portions of guest memory which are known to contain only memory
++	 * which would be considered non-sensitive.
 +	 */
-+	if (!treat_all_userspace_as_nonsensitive)
-+		asi_unmap_user(kvm->asi, 0, TASK_SIZE_MAX);
++	if (vcpu->kvm->arch.nested_virt_enabled_count)
++		return;
 +
- 	kvm_mmu_zap_all_fast(kvm);
+ 	err = asi_map_user(vcpu->kvm->asi, (void *)hva, PAGE_SIZE * npages,
+ 			   &vcpu->arch.asi_pgtbl_pool, slot->userspace_addr,
+ 			   slot->userspace_addr + slot->npages * PAGE_SIZE);
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 9c941535f78c..0a0092e4102d 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -318,6 +318,14 @@ static void free_nested(struct kvm_vcpu *vcpu)
+ 	nested_release_evmcs(vcpu);
+ 
+ 	free_loaded_vmcs(&vmx->nested.vmcs02);
++
++	if (cpu_feature_enabled(X86_FEATURE_ASI) &&
++	    !treat_all_userspace_as_nonsensitive) {
++		write_lock(&vcpu->kvm->mmu_lock);
++		WARN_ON(vcpu->kvm->arch.nested_virt_enabled_count <= 0);
++		vcpu->kvm->arch.nested_virt_enabled_count--;
++		write_unlock(&vcpu->kvm->mmu_lock);
++	}
  }
  
-@@ -6194,6 +6247,7 @@ void kvm_mmu_destroy(struct kvm_vcpu *vcpu)
- 	free_mmu_pages(&vcpu->arch.root_mmu);
- 	free_mmu_pages(&vcpu->arch.guest_mmu);
- 	mmu_free_memory_caches(vcpu);
-+	asi_clear_pgtbl_pool(&vcpu->arch.asi_pgtbl_pool);
- }
+ /*
+@@ -4876,6 +4884,20 @@ static int enter_vmx_operation(struct kvm_vcpu *vcpu)
+ 		pt_update_intercept_for_msr(vcpu);
+ 	}
  
- void kvm_mmu_module_exit(void)
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index 708a5d297fe1..193317ad60a4 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -584,6 +584,9 @@ FNAME(prefetch_gpte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
- 	if (is_error_pfn(pfn))
- 		return false;
- 
-+	if (!treat_all_userspace_as_nonsensitive)
-+		asi_map_gfn_range(vcpu, slot, gfn, 1);
++	if (cpu_feature_enabled(X86_FEATURE_ASI) &&
++	    !treat_all_userspace_as_nonsensitive) {
++		/*
++		 * We do the increment under the MMU lock in order to prevent
++		 * it from happening concurrently with asi_map_gfn_range().
++		 */
++		write_lock(&vcpu->kvm->mmu_lock);
++		WARN_ON(vcpu->kvm->arch.nested_virt_enabled_count < 0);
++		vcpu->kvm->arch.nested_virt_enabled_count++;
++		write_unlock(&vcpu->kvm->mmu_lock);
 +
- 	mmu_set_spte(vcpu, slot, spte, pte_access, gfn, pfn, NULL);
- 	kvm_release_pfn_clean(pfn);
- 	return true;
-@@ -836,6 +839,7 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- 	int r;
- 	unsigned long mmu_seq;
- 	bool is_self_change_mapping;
-+	bool try_asi_map;
- 
- 	pgprintk("%s: addr %lx err %x\n", __func__, fault->addr, fault->error_code);
- 	WARN_ON_ONCE(fault->is_tdp);
-@@ -890,6 +894,12 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- 	if (handle_abnormal_pfn(vcpu, fault, walker.pte_access, &r))
- 		return r;
- 
-+	try_asi_map = !treat_all_userspace_as_nonsensitive &&
-+		      !is_noslot_pfn(fault->pfn);
++		asi_unmap_user(vcpu->kvm->asi, 0, TASK_SIZE_MAX);
++	}
 +
-+	if (try_asi_map)
-+		vcpu_fill_asi_pgtbl_pool(vcpu);
-+
- 	/*
- 	 * Do not change pte_access if the pfn is a mmio page, otherwise
- 	 * we will cache the incorrect access into mmio spte.
-@@ -919,6 +929,10 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- 	r = make_mmu_pages_available(vcpu);
- 	if (r)
- 		goto out_unlock;
-+
-+	if (try_asi_map)
-+		asi_map_gfn_range(vcpu, fault->slot, walker.gfn, 1);
-+
- 	r = FNAME(fetch)(vcpu, fault, &walker);
- 	kvm_mmu_audit(vcpu, AUDIT_POST_PAGE_FAULT);
- 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index dd07f677d084..d0df14deae80 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -8722,7 +8722,10 @@ int kvm_arch_init(void *opaque)
- 		goto out_free_percpu;
- 
- 	if (ops->runtime_ops->flush_sensitive_cpu_state) {
--		r = asi_register_class("KVM", ASI_MAP_STANDARD_NONSENSITIVE,
-+		r = asi_register_class("KVM",
-+				       ASI_MAP_STANDARD_NONSENSITIVE |
-+				       (treat_all_userspace_as_nonsensitive ?
-+					ASI_MAP_ALL_USERSPACE : 0),
- 				       &kvm_asi_hooks);
- 		if (r < 0)
- 			goto out_mmu_exit;
-@@ -9675,6 +9678,17 @@ void kvm_arch_mmu_notifier_invalidate_range(struct kvm *kvm,
- 	apic_address = gfn_to_hva(kvm, APIC_DEFAULT_PHYS_BASE >> PAGE_SHIFT);
- 	if (start <= apic_address && apic_address < end)
- 		kvm_make_all_cpus_request(kvm, KVM_REQ_APIC_PAGE_RELOAD);
-+
-+	if (!treat_all_userspace_as_nonsensitive)
-+		asi_unmap_user(kvm->asi, (void *)start, end - start);
-+}
-+
-+void kvm_arch_mmu_notifier_invalidate_range_start(struct kvm *kvm,
-+						  unsigned long start,
-+						  unsigned long end)
-+{
-+	if (!treat_all_userspace_as_nonsensitive)
-+		asi_unmap_user(kvm->asi, (void *)start, end - start);
- }
- 
- void kvm_vcpu_reload_apic_access_page(struct kvm_vcpu *vcpu)
-@@ -11874,6 +11888,9 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
- 
- void kvm_arch_flush_shadow_all(struct kvm *kvm)
- {
-+	if (!treat_all_userspace_as_nonsensitive)
-+		asi_unmap_user(kvm->asi, 0, TASK_SIZE_MAX);
-+
- 	kvm_mmu_zap_all(kvm);
- }
- 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 9dd63ed21f75..f31f7442eced 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1819,6 +1819,9 @@ static inline long kvm_arch_vcpu_async_ioctl(struct file *filp,
- 
- void kvm_arch_mmu_notifier_invalidate_range(struct kvm *kvm,
- 					    unsigned long start, unsigned long end);
-+void kvm_arch_mmu_notifier_invalidate_range_start(struct kvm *kvm,
-+						  unsigned long start,
-+						  unsigned long end);
- 
- #ifdef CONFIG_HAVE_KVM_VCPU_RUN_PID_CHANGE
- int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu);
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 72c4e6b39389..e8e9c8588908 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -162,6 +162,12 @@ __weak void kvm_arch_mmu_notifier_invalidate_range(struct kvm *kvm,
- {
- }
- 
-+__weak void kvm_arch_mmu_notifier_invalidate_range_start(struct kvm *kvm,
-+							 unsigned long start,
-+							 unsigned long end)
-+{
-+}
-+
- bool kvm_is_zone_device_pfn(kvm_pfn_t pfn)
- {
- 	/*
-@@ -685,6 +691,7 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
- 	spin_unlock(&kvm->mn_invalidate_lock);
- 
- 	__kvm_handle_hva_range(kvm, &hva_range);
-+	kvm_arch_mmu_notifier_invalidate_range_start(kvm, range->start, range->end);
- 
  	return 0;
- }
+ 
+ out_shadow_vmcs:
 -- 
 2.35.1.473.g83b2b277ed-goog
 
