@@ -2,214 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 322734C16E3
-	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 16:34:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 123584C17B0
+	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 16:49:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242103AbiBWPed (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Feb 2022 10:34:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43096 "EHLO
+        id S242468AbiBWPtd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Feb 2022 10:49:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233112AbiBWPec (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Feb 2022 10:34:32 -0500
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BC8EB91F1
-        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 07:34:04 -0800 (PST)
-Received: by mail-pg1-x529.google.com with SMTP id 75so20303484pgb.4
-        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 07:34:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=KMel7Fz8t8HlxJOCBu85KHEQ5yzL0wyZ+rcFmUgdy0E=;
-        b=M+U0kyMPm3TH6C4hYPCfETqlvkW8OeZMDr3MxrOQKcgjjscL6+NhewFa3tmrV4kQS0
-         oj6eVETfJCzUCfynDvnhaXpiYZVSoGOKyZITyS7u/4634W26YJutH6JmzKw2gvcnfgTt
-         ukY1Ni2TWuisX7b8AAlkumyBIftwI/defLPa2zdsLed1VXMiYbTQkycANJf3f2i8RYlE
-         8OAQABbUCX5Ed2MHQ/Jfu9lUEBicYuxysVoCopPyOzAQBiX6gcaLEYz81824sGa+6hnN
-         DTgNrTUQY+Vg908seSlMrU+mxmOP0eiN9cys8KzmRSeK5hviuHI/Qdsh6+qtAo2v/uEr
-         YrjA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=KMel7Fz8t8HlxJOCBu85KHEQ5yzL0wyZ+rcFmUgdy0E=;
-        b=RMIbcN70pKGNbrUEAgnkbnztiQachC+m44awb+Mp+tEDb/7+hThLQ+mRvGBH3/ut/p
-         vEvm1+kTAWAeKlpCbvrOdbjgGsxsOUyIscrbCEqyGUFDrL/cEtq4d6RYgoaUIqkuPUIb
-         5SPvGfZA/C3EX9j4/ZjnDZSGI1k8tOHjy2k/KkKgg+LZcKIIadsDHV30sUj16vEQIM4C
-         0353ZmV8F/aFEeqJEPA6ad7qW9j7ZabAFDQQKhngOr9tfvzAx/RpiOP9uFzhifKfguzj
-         yghJqK0E70S2Doy0b9JYw9fUndIoEANV+KGdfF+pmXBTkwq03c+4NUY1uwZVTh3L8vFI
-         0WeQ==
-X-Gm-Message-State: AOAM5334Dw0zTSiDQf4VpmHK5zMIuY6qvRTipDJxQLLnvySuWm6Mvlyw
-        wrtL2TJLIqyKnM2Ozq0KVxM=
-X-Google-Smtp-Source: ABdhPJwoyjwr4QcmMC4pRtKeQOfjk0yapbRuUrL4W2UNSTw0Si5DrRoixfr0Vy9erLQ104mC2Yay5w==
-X-Received: by 2002:a05:6a00:1251:b0:4f1:2a1:3073 with SMTP id u17-20020a056a00125100b004f102a13073mr317957pfi.72.1645630444036;
-        Wed, 23 Feb 2022 07:34:04 -0800 (PST)
-Received: from bobo.ozlabs.ibm.com (115-64-212-59.static.tpgi.com.au. [115.64.212.59])
-        by smtp.gmail.com with ESMTPSA id l14sm3271165pjz.32.2022.02.23.07.34.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Feb 2022 07:34:03 -0800 (PST)
-From:   Nicholas Piggin <npiggin@gmail.com>
-To:     linuxppc-dev@lists.ozlabs.org
-Cc:     Nicholas Piggin <npiggin@gmail.com>, kvm@vger.kernel.org,
-        Mark Rutland <mark.rutland@arm.com>
-Subject: [RFC PATCH] KVM: PPC: Book3S HV: Update guest state entry/exit accounting to new API
-Date:   Thu, 24 Feb 2022 01:33:52 +1000
-Message-Id: <20220223153352.2590602-1-npiggin@gmail.com>
-X-Mailer: git-send-email 2.23.0
+        with ESMTP id S242458AbiBWPta (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Feb 2022 10:49:30 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A1E2B82EE;
+        Wed, 23 Feb 2022 07:49:02 -0800 (PST)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21NFDFpj029752;
+        Wed, 23 Feb 2022 15:49:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=fqs4ajVPfMszPVnIcH172ne7Ko45oGQI0DBTFEGdxRE=;
+ b=A9e2LKh7S4ZkWrUr2lJU20fkgbyzgi4R5j4EMdbLrehdtCegn5UFa5mv8rBfLDbVD3Y9
+ K7jVppFPIpuj1fGt8amzI4HyiB5CwAaMd0kqSjg+qouoAE3PCwNihu/HEl2ulLps0V7C
+ QRYFZxtJ6ssM4nuaKyWM0UXb6npjFJm6TG0DnxtbEYPddXrj1abPcx2jkH4wVth/+Urt
+ C4nL1kN4YxX2oeQ2DmKj2aXkNRuEeh9a9tBWK8y8mA3mzx382g0nx3bv79LTkl2PlHd0
+ AP4R8Rw9ubpc4LvdADdappfSsa27mNUBilwV32iZvVBuIPhgbAa4S6H4Oamjyf5HCBOS 3A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3edqc90xch-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 23 Feb 2022 15:49:02 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21NFENaR006898;
+        Wed, 23 Feb 2022 15:49:01 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3edqc90xbr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 23 Feb 2022 15:49:01 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21NFhjYC003875;
+        Wed, 23 Feb 2022 15:48:59 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma04ams.nl.ibm.com with ESMTP id 3ear69b8d4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 23 Feb 2022 15:48:59 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21NFmubJ48365864
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 23 Feb 2022 15:48:56 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DFE1511C06C;
+        Wed, 23 Feb 2022 15:48:55 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8CA1511C05E;
+        Wed, 23 Feb 2022 15:48:55 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.2.54])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 23 Feb 2022 15:48:55 +0000 (GMT)
+Date:   Wed, 23 Feb 2022 16:36:12 +0100
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Steffen Eiden <seiden@linux.ibm.com>
+Cc:     Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH v3 4/5] s390x: uv-guest: add share bit
+ test
+Message-ID: <20220223163612.598bc966@p-imbrenda>
+In-Reply-To: <20220222145456.9956-5-seiden@linux.ibm.com>
+References: <20220222145456.9956-1-seiden@linux.ibm.com>
+        <20220222145456.9956-5-seiden@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: mOJ22Q_8P6CStMmmdLB05IKNt0D8EJq1
+X-Proofpoint-GUID: AxyV_opFKDmS6lCwA6gJ1xcT1ToA7lNN
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-02-23_07,2022-02-23_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 impostorscore=0
+ clxscore=1015 priorityscore=1501 lowpriorityscore=0 suspectscore=0
+ bulkscore=0 mlxlogscore=999 adultscore=0 malwarescore=0 spamscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2201110000 definitions=main-2202230087
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Update the guest state and timing entry/exit accounting to use the new
-API, which was introduced following issues found[1]. KVM HV does not
-seem to suffer from those issues listed, but it does call srcu inside
-the guest context which is fragile at best. The new API allows guest
-entry timing to be de-coupled from state entry.
+On Tue, 22 Feb 2022 14:54:55 +0000
+Steffen Eiden <seiden@linux.ibm.com> wrote:
 
-Change to the new API, move the srcu_read_lock/unlock outside the guest
-context, move tracing related entry/exit together with the guest state
-switches, and extend timing coverage out to include the secondary thread
-gathering in the P7/8 path.
+> The UV facility bits shared/unshared must both be set or none.
+> 
+> Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
 
-[1] https://lore.kernel.org/lkml/20220201132926.3301912-1-mark.rutland@arm.com/
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
-Cc: Mark Rutland <mark.rutland@arm.com>
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
----
-KVM PR and BookE possibly have more issues (like taking host interrupts
-in guest context) but look harder to fix.
-
-Thanks,
-Nick
-
- arch/powerpc/kvm/book3s_hv.c | 39 ++++++++++++------------------------
- 1 file changed, 13 insertions(+), 26 deletions(-)
-
-diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index 84c89f08ae9a..4f0915509dbb 100644
---- a/arch/powerpc/kvm/book3s_hv.c
-+++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -3683,6 +3683,8 @@ static noinline void kvmppc_run_core(struct kvmppc_vcore *vc)
- 		return;
- 	}
- 
-+	guest_timing_enter_irqoff();
-+
- 	kvmppc_clear_host_core(pcpu);
- 
- 	/* Decide on micro-threading (split-core) mode */
-@@ -3812,23 +3814,15 @@ static noinline void kvmppc_run_core(struct kvmppc_vcore *vc)
- 	for (sub = 0; sub < core_info.n_subcores; ++sub)
- 		spin_unlock(&core_info.vc[sub]->lock);
- 
--	guest_enter_irqoff();
--
- 	srcu_idx = srcu_read_lock(&vc->kvm->srcu);
- 
-+	guest_state_enter_irqoff();
- 	this_cpu_disable_ftrace();
- 
--	/*
--	 * Interrupts will be enabled once we get into the guest,
--	 * so tell lockdep that we're about to enable interrupts.
--	 */
--	trace_hardirqs_on();
--
- 	trap = __kvmppc_vcore_entry();
- 
--	trace_hardirqs_off();
--
- 	this_cpu_enable_ftrace();
-+	guest_state_exit_irqoff();
- 
- 	srcu_read_unlock(&vc->kvm->srcu, srcu_idx);
- 
-@@ -3863,11 +3857,10 @@ static noinline void kvmppc_run_core(struct kvmppc_vcore *vc)
- 
- 	kvmppc_set_host_core(pcpu);
- 
--	context_tracking_guest_exit();
- 	if (!vtime_accounting_enabled_this_cpu()) {
- 		local_irq_enable();
- 		/*
--		 * Service IRQs here before vtime_account_guest_exit() so any
-+		 * Service IRQs here before guest_timing_exit_irqoff() so any
- 		 * ticks that occurred while running the guest are accounted to
- 		 * the guest. If vtime accounting is enabled, accounting uses
- 		 * TB rather than ticks, so it can be done without enabling
-@@ -3876,7 +3869,7 @@ static noinline void kvmppc_run_core(struct kvmppc_vcore *vc)
- 		 */
- 		local_irq_disable();
- 	}
--	vtime_account_guest_exit();
-+	guest_timing_exit_irqoff();
- 
- 	local_irq_enable();
- 
-@@ -4520,33 +4513,28 @@ int kvmhv_run_single_vcpu(struct kvm_vcpu *vcpu, u64 time_limit,
- 
- 	__kvmppc_create_dtl_entry(vcpu, pcpu, tb + vc->tb_offset, 0);
- 
--	trace_kvm_guest_enter(vcpu);
--
--	guest_enter_irqoff();
--
- 	srcu_idx = srcu_read_lock(&kvm->srcu);
- 
-+	trace_kvm_guest_enter(vcpu);
-+	guest_timing_enter_irqoff();
-+	guest_state_enter_irqoff();
- 	this_cpu_disable_ftrace();
- 
--	/* Tell lockdep that we're about to enable interrupts */
--	trace_hardirqs_on();
--
- 	trap = kvmhv_p9_guest_entry(vcpu, time_limit, lpcr, &tb);
- 	vcpu->arch.trap = trap;
- 
--	trace_hardirqs_off();
--
- 	this_cpu_enable_ftrace();
-+	guest_state_exit_irqoff();
-+	trace_kvm_guest_exit(vcpu);
- 
- 	srcu_read_unlock(&kvm->srcu, srcu_idx);
- 
- 	set_irq_happened(trap);
- 
--	context_tracking_guest_exit();
- 	if (!vtime_accounting_enabled_this_cpu()) {
- 		local_irq_enable();
- 		/*
--		 * Service IRQs here before vtime_account_guest_exit() so any
-+		 * Service IRQs here before guest_timing_exit_irqoff() so any
- 		 * ticks that occurred while running the guest are accounted to
- 		 * the guest. If vtime accounting is enabled, accounting uses
- 		 * TB rather than ticks, so it can be done without enabling
-@@ -4555,7 +4543,7 @@ int kvmhv_run_single_vcpu(struct kvm_vcpu *vcpu, u64 time_limit,
- 		 */
- 		local_irq_disable();
- 	}
--	vtime_account_guest_exit();
-+	guest_timing_exit_irqoff();
- 
- 	vcpu->cpu = -1;
- 	vcpu->arch.thread_cpu = -1;
-@@ -4575,7 +4563,6 @@ int kvmhv_run_single_vcpu(struct kvm_vcpu *vcpu, u64 time_limit,
- 			  kvmppc_get_gpr(vcpu, 3) == H_ENTER_NESTED)))
- 		kvmppc_core_dequeue_dec(vcpu);
- 
--	trace_kvm_guest_exit(vcpu);
- 	r = RESUME_GUEST;
- 	if (trap) {
- 		if (!nested)
--- 
-2.23.0
+> ---
+>  s390x/uv-guest.c | 14 ++++++++++++++
+>  1 file changed, 14 insertions(+)
+> 
+> diff --git a/s390x/uv-guest.c b/s390x/uv-guest.c
+> index 728c60aa..77057bd2 100644
+> --- a/s390x/uv-guest.c
+> +++ b/s390x/uv-guest.c
+> @@ -159,6 +159,14 @@ static void test_invalid(void)
+>  	report_prefix_pop();
+>  }
+>  
+> +static void test_share_bits(void)
+> +{
+> +	bool unshare = uv_query_test_call(BIT_UVC_CMD_REMOVE_SHARED_ACCESS);
+> +	bool share = uv_query_test_call(BIT_UVC_CMD_SET_SHARED_ACCESS);
+> +
+> +	report(!(share ^ unshare), "share bits");
+> +}
+> +
+>  int main(void)
+>  {
+>  	bool has_uvc = test_facility(158);
+> @@ -169,6 +177,12 @@ int main(void)
+>  		goto done;
+>  	}
+>  
+> +	/*
+> +	 * Needs to be done before the guest-fence,
+> +	 * as the fence tests if both shared bits are present
+> +	 */
+> +	test_share_bits();
+> +
+>  	if (!uv_os_is_guest()) {
+>  		report_skip("Not a protected guest");
+>  		goto done;
 
