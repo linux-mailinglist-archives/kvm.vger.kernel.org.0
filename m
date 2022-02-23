@@ -2,258 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 791FB4C1540
-	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 15:18:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 739AB4C157E
+	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 15:35:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234631AbiBWOTD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Feb 2022 09:19:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38522 "EHLO
+        id S241629AbiBWOfp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Feb 2022 09:35:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241486AbiBWOTC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Feb 2022 09:19:02 -0500
-Received: from sender4-of-o53.zoho.com (sender4-of-o53.zoho.com [136.143.188.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC9F9B1883;
-        Wed, 23 Feb 2022 06:18:34 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1645625907; cv=none; 
-        d=zohomail.com; s=zohoarc; 
-        b=UrwIb/WJ/uYjuuuZus0IHsiZu79svndTZoDj82Wu+cftsHxovtIVfkA0GVXHlxHD2Sf2rMnlX52CCSvijKTPBUtS5ugA5HhKTnDxH2VhxFJbtB7zkSZM8omzUY2ygKHvls4M+lWlpum+DmI9S5OjeoAUXnQis+AS0mLjQGsC5iQ=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-        t=1645625907; h=Content-Type:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:To; 
-        bh=+9XgQsvu0aB3Q0wKO7XwI7OtAKR679L/PrTdzO6tuLc=; 
-        b=d6f5zAQ5z4LQSa8Bbz+2gM4nCgnTXEWWRBbgSQ4ip+AYcwhSrCJIpO5515Sco/ZIHhuC4wwPo3GiY07rdnGhnZgv7nlLSNZ4FbmGb0/rsa0av/nVKqu3zeksl6Fmk9to9lUBySn+nv9HE/SUXWKgk2pvTIMrtuWsW6gnERQNrBg=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-        dkim=pass  header.i=anirudhrb.com;
-        spf=pass  smtp.mailfrom=mail@anirudhrb.com;
-        dmarc=pass header.from=<mail@anirudhrb.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1645625907;
-        s=zoho; d=anirudhrb.com; i=mail@anirudhrb.com;
-        h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:Content-Type:In-Reply-To;
-        bh=+9XgQsvu0aB3Q0wKO7XwI7OtAKR679L/PrTdzO6tuLc=;
-        b=LV1FMclBeQ5GQ8oqbEubgN0kqJPESWl0GocyQwS8k7b15mUEHrZZUEC0DY50MIi+
-        6Sxl+/ohWyFc5gAbOLLbcVMkvYx5xh/6U1bEJC4Fv0P4G/FbKPKvHFplizvJRdJVb5k
-        x8kfEfj3tR5i1N/byAP6WBxoMWJUlC4omjFOj5YM=
-Received: from anirudhrb.com (49.207.192.178 [49.207.192.178]) by mx.zohomail.com
-        with SMTPS id 1645625904873288.6295271150792; Wed, 23 Feb 2022 06:18:24 -0800 (PST)
-Date:   Wed, 23 Feb 2022 19:48:18 +0530
-From:   Anirudh Rayabharam <mail@anirudhrb.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Jason Wang <jasowang@redhat.com>,
-        syzbot+0abd373e2e50d704db87@syzkaller.appspotmail.com,
-        kvm <kvm@vger.kernel.org>,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        netdev <netdev@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] vhost: validate range size before adding to iotlb
-Message-ID: <YhZCKii8KwkcU8fM@anirudhrb.com>
-References: <20220221195303.13560-1-mail@anirudhrb.com>
- <CACGkMEvLE=kV4PxJLRjdSyKArU+MRx6b_mbLGZHSUgoAAZ+-Fg@mail.gmail.com>
- <YhRtQEWBF0kqWMsI@anirudhrb.com>
- <CACGkMEvd7ETC_ANyrOSAVz_i64xqpYYazmm=+39E51=DMRFXdw@mail.gmail.com>
- <20220222090511-mutt-send-email-mst@kernel.org>
- <YhUdDUSxuXTLltpZ@anirudhrb.com>
- <20220222181927-mutt-send-email-mst@kernel.org>
-MIME-Version: 1.0
+        with ESMTP id S241635AbiBWOfo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Feb 2022 09:35:44 -0500
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1anam02on2085.outbound.protection.outlook.com [40.107.96.85])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A683B45BF;
+        Wed, 23 Feb 2022 06:35:14 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=c18o4g8XBZ1iDSURzCyCEWHxagDJrIVpifqNEk37XQ2E2cD8D7J6Rl48WnPibYjgiQ4MvNMfn+AGzAY7e+XfwBkJF0i4YKyMW2EAMsHeJkFR2RJL0pU0uGuzit/FW7L2ZR/h8TbWZ/YFaJGcUzjYdmsL+mft8wlhhsmbXIvxqLtTazCZq7yhXofCX5oI8KDwPGag9z6GLBiKRgj8KOyzU4N7cHwclMunC6IIQdv2O9REIkt+LuisADfleqyB/9sk2CXaf406QzbGrwWvf/30spkG56ED9idM92/kybZI6Aoo/++37ObhH4CxsLG2RoutCgEtu4iZS313X1qDGM19Eg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=WL1TS1p/lixYsoXYxqyDN4AyHHjts+sv8JrtimALgLQ=;
+ b=BOrxhsmv7pK3561P6qu63TfXY3x12ONWoCWxlZUhQvMs0QSJAQxOqYYDL6s2UMzx/mON4BQJdoaZAfUqW0bd3v4GT5D8N9m7MO8zULUW9cEPPQhmHZtD0z2UcF6yoJfhsfBJr3sD7sRkMj7OgkkmlyrRNgqVAsF932VKDF1VINCBYx6iknt9+iVKMJ+QhBsUq3Gppu24xXV1pGHNdYCqIJFr0XzUdqCd+76d4pJwBHp/d93VFUpi+G4wbeGkts7O9qeRFFBy9X7wd5aGKrWVKrvxiUMj9YfHEo57Xr6cYY3FqvhKqHh+UvsqXm7q12vU11pZ6AixxguTxFsY5KpMug==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WL1TS1p/lixYsoXYxqyDN4AyHHjts+sv8JrtimALgLQ=;
+ b=jV5M6oHtUdm3C0uc1/tdHRobumHls7qYy0ujdZzlstz4NTyzTQ6ndz7zOeLocmO2TZksGZYBDLDZjAAyIHIRvBLfNwwvEB4SGDMDxqKQAkc6pnBc/mYaHwJkOzPSIj5pFlXuoxOE2oPWiG5ezMkd95cIqfnDWIJ1umCNAlceU6QAeTVFZeWGNBoPBNHHlQ454iJ7D7tYAPLw2Y+PAn/oSHYzgRtvinR7a/bJUS6w5QH9EGLBj8/Dl2OCKjrgFVrghDWDeUOtZR4iMm8+XX1vpLcl1i7WMOw1DYBSEGKk408zmpRLndHNrO1lFBW0eVvZfW1ha6VZeSxZ/H5pYGzHcw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by DM6PR12MB4420.namprd12.prod.outlook.com (2603:10b6:5:2a7::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5017.21; Wed, 23 Feb
+ 2022 14:35:12 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::e8f4:9793:da37:1bd3]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::e8f4:9793:da37:1bd3%4]) with mapi id 15.20.5017.022; Wed, 23 Feb 2022
+ 14:35:12 +0000
+Date:   Wed, 23 Feb 2022 10:30:11 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     Robin Murphy <robin.murphy@arm.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>, kvm@vger.kernel.org,
+        rafael@kernel.org, David Airlie <airlied@linux.ie>,
+        linux-pci@vger.kernel.org,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Dmitry Osipenko <digetx@gmail.com>,
+        Will Deacon <will@kernel.org>,
+        Stuart Yoder <stuyoder@gmail.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        linux-kernel@vger.kernel.org, Li Yang <leoyang.li@nxp.com>,
+        iommu@lists.linux-foundation.org,
+        Jacob jun Pan <jacob.jun.pan@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>
+Subject: Re: [PATCH v6 02/11] driver core: Add dma_cleanup callback in
+ bus_type
+Message-ID: <20220223143011.GQ10061@nvidia.com>
+References: <20220221234837.GA10061@nvidia.com>
+ <1acb8748-8d44-688d-2380-f39ec820776f@arm.com>
+ <20220222151632.GB10061@nvidia.com>
+ <3d4c3bf1-fed6-f640-dc20-36d667de7461@arm.com>
+ <20220222235353.GF10061@nvidia.com>
+ <171bec90-5ea6-b35b-f027-1b5e961f5ddf@linux.intel.com>
+ <880a269d-d39d-bab3-8d19-b493e874ec99@arm.com>
+ <20220223134627.GO10061@nvidia.com>
+ <YhY/a9wTjmYXsuwt@kroah.com>
+ <20220223140901.GP10061@nvidia.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220222181927-mutt-send-email-mst@kernel.org>
-X-ZohoMailClient: External
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20220223140901.GP10061@nvidia.com>
+X-ClientProxiedBy: MN2PR05CA0021.namprd05.prod.outlook.com
+ (2603:10b6:208:c0::34) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: b1bd182d-7367-4820-8905-08d9f6d9b328
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4420:EE_
+X-Microsoft-Antispam-PRVS: <DM6PR12MB4420AF0B55B53FFB0F0813ECC23C9@DM6PR12MB4420.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: GMwxsdhf5N1EGDt2mATS00qLr83KYwx3BKCWaOfMVeBoaENTt8MB+I2X4CekdV4C0+tNfpmoTNr6JRR0HytaMo+2zhZUCDDEJNPFB6o1sDiiW6rBmHafw7wFcmPmpkfix7z3BPBt41YwvYYcJrQe0RKh7Exr5+rhup1R0s6TAIhntpnd7+aLVVsWDCbRb7JWaFJYoT7OEbFam07nXIZcig5bWwdQNfwikNq12G2hljkprwt0j4kfLaDoeyKrp2vY/980j+pxni/lhVsMqMjLXUXCj7W95mrQJTIJgWwDrvcpIzROdmZtq601XcT/YIxv80ZmjO+BgYIcR3/g5spS2MBN4BsvsyrCNNEjVRFcD7LARLSywMhqQKxyTSfKPDAKwqCP8Ql89igAun3EsCzyDeh5Br35Wr4s9wRc12qBDMPE6Hj0sYKfsNWbtdef0tFRi0MNMx5EyWnWEYZ2Vjl8yczKpT87KUZWD/I8cANUgvxwq7jerzoKxhR3VomqO/8De0ywbgHtGlIJz+crZV1o7w4AwiXyYnTuLpqnHLP3A1J4043s7P2f2x0TbZFPQMEe7BEbvoX5B/veb20Bp19rGr+iXOrtE1VYI/0S7qGkBPgnNcRCTQEVqYADzEFP2oiCuqi5z5fyWVmz6xL/Be9m3w==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(66556008)(2906002)(316002)(38100700002)(6512007)(1076003)(7416002)(54906003)(5660300002)(83380400001)(2616005)(33656002)(6916009)(8936002)(6506007)(4326008)(66476007)(8676002)(6486002)(66946007)(36756003)(86362001)(26005)(186003)(508600001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?qnO0uq0QtCt3Odf1MSFlaGQzcEhkR98xPLHoVFtSBkIb+49DlqoaV9oSlATu?=
+ =?us-ascii?Q?vDZTJFXQWBxGFxbwTVYSq15kf38ka2rrSiSAlUd1RtJ4IKEZFg4MgWAh6xYG?=
+ =?us-ascii?Q?WTc+E2KmewOGzqvjrSt7n/RQfY55vK0mZ5g39Y1osXNNDUgcyPiyonfO/qsD?=
+ =?us-ascii?Q?8nmOY6nigAEueLV0OmSGYUv67OTni8zwheQ4aIbo19ZYUZQLanSvjAN2pp1I?=
+ =?us-ascii?Q?TVmbTBTh6GnMzKTjfuLC+ZqoQC2WkL5DpF2VUAhzPkx19COwgWZShT+uVhqN?=
+ =?us-ascii?Q?t7Fb1gsFsigmAWcczp6l/btzyea53DWPTBsqz84ZhKmeZLiy5DvGKebtE1B7?=
+ =?us-ascii?Q?V5kYhpoXTXsqcK+8T7in1lHv1I/GH5kl82oEDDaez4jPf1OA+B4bZbzy5dXY?=
+ =?us-ascii?Q?iv0+HWKsyTyXzZPCuYe+gkwSlMW+6Xbe3/T7Ba0B1a6W+80sskYRdB09FIvY?=
+ =?us-ascii?Q?Za7ExPqaHHrzIq4uqgJ0wUhgebFL/tWAcYYkF1+CEBT6lfyCONNdkG70XhF4?=
+ =?us-ascii?Q?jYX1BkeWE0FkRWbOtUCtLvidf16BLim9FYf8wLorhy40PILca7xJG9b4s7Af?=
+ =?us-ascii?Q?WL/VjIKvT/o2C+nzOhg/dzG2+ouq7Us+YareUL0T8c78kW7mbDn0UjD6k2H/?=
+ =?us-ascii?Q?KB3K9jdPhHf7gxvv85utemeReq3VMdb3I2X857YwWm4H/oFdcq6vTHTqxuPR?=
+ =?us-ascii?Q?iNn8HYkZC3iXYk3drUzo6N6q/1KMP+cdERaExYtJu5q6fv6jnzbWdFW7jn+/?=
+ =?us-ascii?Q?bLURlxzwOf6XD7VKoozldtDXkdjMSP0qXLinkTNCWwcXRTOZEYkuJCB81/xZ?=
+ =?us-ascii?Q?LIVjNgLKOQiaYNSEQAJfjykEILQnzZssHMJUlnJjeQ5VFsoS7nC6wSH9Uh/c?=
+ =?us-ascii?Q?yPI7Sat4Liypp37s7pKKq7Wfl4ssHgJ1H8gOBdo5hXP9qDiDzudHdcEsj6mR?=
+ =?us-ascii?Q?B6o/1fAcWktHkUMoMOl//2DV+B9eR9Bn7jzBxPeQz/pA7bv1/cyVYI7f0ath?=
+ =?us-ascii?Q?57bBrTwujfOnGpObSPR3IGc3XQOLo2JUSVJVfrutlQVhI7DMTArU+Il2LQuC?=
+ =?us-ascii?Q?Jbn15cYWG0+mV2V+FpKzTgED+r1GvC8UNXRnmnjd53ycjJl8Gu95BrEt1dA8?=
+ =?us-ascii?Q?hXD7bCuf7NgvtZ6hdjXnnuE4voxNIRxDvHxPMOj+WIdP+fDFE/whhQNXSpiO?=
+ =?us-ascii?Q?LIlP08DYhYyycHHwDqgi9/sdFWjFQ40B85bG1njvRhRbFqJz+JQjv6u+JbOj?=
+ =?us-ascii?Q?CJo4wPyXdROyNh2og/JsQjFhVMyCpVNn09bQApvcRcS3+RYxaW+8UrHBvRPg?=
+ =?us-ascii?Q?cA0+w/nKsNUF8HSrWhNW1hsU73QVx4voonKd7VUDgioFygclEiIsIdRdWgfo?=
+ =?us-ascii?Q?UTOm1MXKZBVCXLckrIVc0kSUWtHUPwR5pDBazIGxofODfHYm3p4OGoOBzAjs?=
+ =?us-ascii?Q?6xz0AFgKq7OfD3BsbQhUBTiw1s2BupcRlhhNE/oQcXDxn8A19lS0JGwdA3Mp?=
+ =?us-ascii?Q?9FLwJ4xg1okQ8hl4k65gY+Yl2Il3Jk/QscVR6E2EDUmyDPhNciUD6HT5XHzL?=
+ =?us-ascii?Q?zhkhpq3hdZTiDwEOzl8=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b1bd182d-7367-4820-8905-08d9f6d9b328
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Feb 2022 14:35:12.5156
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: TUOeJnORouauzivGz2xYR6zeCUS1sPuXL7xYEG/NDBZ1SxPplWPGv8TvWZndv52u
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4420
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 22, 2022 at 06:21:50PM -0500, Michael S. Tsirkin wrote:
-> On Tue, Feb 22, 2022 at 10:57:41PM +0530, Anirudh Rayabharam wrote:
-> > On Tue, Feb 22, 2022 at 10:02:29AM -0500, Michael S. Tsirkin wrote:
-> > > On Tue, Feb 22, 2022 at 03:11:07PM +0800, Jason Wang wrote:
-> > > > On Tue, Feb 22, 2022 at 12:57 PM Anirudh Rayabharam <mail@anirudhrb.com> wrote:
-> > > > >
-> > > > > On Tue, Feb 22, 2022 at 10:50:20AM +0800, Jason Wang wrote:
-> > > > > > On Tue, Feb 22, 2022 at 3:53 AM Anirudh Rayabharam <mail@anirudhrb.com> wrote:
-> > > > > > >
-> > > > > > > In vhost_iotlb_add_range_ctx(), validate the range size is non-zero
-> > > > > > > before proceeding with adding it to the iotlb.
-> > > > > > >
-> > > > > > > Range size can overflow to 0 when start is 0 and last is (2^64 - 1).
-> > > > > > > One instance where it can happen is when userspace sends an IOTLB
-> > > > > > > message with iova=size=uaddr=0 (vhost_process_iotlb_msg). So, an
-> > > > > > > entry with size = 0, start = 0, last = (2^64 - 1) ends up in the
-> > > > > > > iotlb. Next time a packet is sent, iotlb_access_ok() loops
-> > > > > > > indefinitely due to that erroneous entry:
-> > > > > > >
-> > > > > > >         Call Trace:
-> > > > > > >          <TASK>
-> > > > > > >          iotlb_access_ok+0x21b/0x3e0 drivers/vhost/vhost.c:1340
-> > > > > > >          vq_meta_prefetch+0xbc/0x280 drivers/vhost/vhost.c:1366
-> > > > > > >          vhost_transport_do_send_pkt+0xe0/0xfd0 drivers/vhost/vsock.c:104
-> > > > > > >          vhost_worker+0x23d/0x3d0 drivers/vhost/vhost.c:372
-> > > > > > >          kthread+0x2e9/0x3a0 kernel/kthread.c:377
-> > > > > > >          ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
-> > > > > > >          </TASK>
-> > > > > > >
-> > > > > > > Reported by syzbot at:
-> > > > > > >         https://syzkaller.appspot.com/bug?extid=0abd373e2e50d704db87
-> > > > > > >
-> > > > > > > Reported-by: syzbot+0abd373e2e50d704db87@syzkaller.appspotmail.com
-> > > > > > > Tested-by: syzbot+0abd373e2e50d704db87@syzkaller.appspotmail.com
-> > > > > > > Signed-off-by: Anirudh Rayabharam <mail@anirudhrb.com>
-> > > > > > > ---
-> > > > > > >  drivers/vhost/iotlb.c | 6 ++++--
-> > > > > > >  1 file changed, 4 insertions(+), 2 deletions(-)
-> > > > > > >
-> > > > > > > diff --git a/drivers/vhost/iotlb.c b/drivers/vhost/iotlb.c
-> > > > > > > index 670d56c879e5..b9de74bd2f9c 100644
-> > > > > > > --- a/drivers/vhost/iotlb.c
-> > > > > > > +++ b/drivers/vhost/iotlb.c
-> > > > > > > @@ -53,8 +53,10 @@ int vhost_iotlb_add_range_ctx(struct vhost_iotlb *iotlb,
-> > > > > > >                               void *opaque)
-> > > > > > >  {
-> > > > > > >         struct vhost_iotlb_map *map;
-> > > > > > > +       u64 size = last - start + 1;
-> > > > > > >
-> > > > > > > -       if (last < start)
-> > > > > > > +       // size can overflow to 0 when start is 0 and last is (2^64 - 1).
-> > > > > > > +       if (last < start || size == 0)
-> > > > > > >                 return -EFAULT;
-> > > > > >
-> > > > > > I'd move this check to vhost_chr_iter_write(), then for the device who
-> > > > > > has its own msg handler (e.g vDPA) can benefit from it as well.
-> > > > >
-> > > > > Thanks for reviewing!
-> > > > >
-> > > > > I kept the check here thinking that all devices would benefit from it
-> > > > > because they would need to call vhost_iotlb_add_range() to add an entry
-> > > > > to the iotlb. Isn't that correct?
-> > > > 
-> > > > Correct for now but not for the future, it's not guaranteed that the
-> > > > per device iotlb message handler will use vhost iotlb.
-> > > > 
-> > > > But I agree that we probably don't need to care about it too much now.
-> > > > 
-> > > > > Do you see any other benefit in moving
-> > > > > it to vhost_chr_iter_write()?
-> > > > >
-> > > > > One concern I have is that if we move it out some future caller to
-> > > > > vhost_iotlb_add_range() might forget to handle this case.
-> > > > 
-> > > > Yes.
-> > > > 
-> > > > Rethink the whole fix, we're basically rejecting [0, ULONG_MAX] range
-> > > > which seems a little bit odd.
+On Wed, Feb 23, 2022 at 10:09:01AM -0400, Jason Gunthorpe wrote:
+> On Wed, Feb 23, 2022 at 03:06:35PM +0100, Greg Kroah-Hartman wrote:
+> > On Wed, Feb 23, 2022 at 09:46:27AM -0400, Jason Gunthorpe wrote:
+> > > On Wed, Feb 23, 2022 at 01:04:00PM +0000, Robin Murphy wrote:
 > > > 
-> > > Well, I guess ideally we'd split this up as two entries - this kind of
-> > > thing is after all one of the reasons we initially used first,last as
-> > > the API - as opposed to first,size.
+> > > > 1 - tmp->driver is non-NULL because tmp is already bound.
+> > > >   1.a - If tmp->driver->driver_managed_dma == 0, the group must currently be
+> > > > DMA-API-owned as a whole. Regardless of what driver dev has unbound from,
+> > > > its removal does not release someone else's DMA API (co-)ownership.
+> > > 
+> > > This is an uncommon locking pattern, but it does work. It relies on
+> > > the mutex being an effective synchronization barrier for an unlocked
+> > > store:
+> > > 
+> > > 				      WRITE_ONCE(dev->driver, NULL)
 > > 
-> > IIUC, the APIs exposed to userspace accept first,size.
+> > Only the driver core should be messing with the dev->driver pointer as
+> > when it does so, it already has the proper locks held.  Do I need to
+> > move that to a "private" location so that nothing outside of the driver
+> > core can mess with it?
 > 
-> Some of them.
-> 
-> 
-> /* vhost vdpa IOVA range
->  * @first: First address that can be mapped by vhost-vDPA
->  * @last: Last address that can be mapped by vhost-vDPA
->  */
-> struct vhost_vdpa_iova_range {
->         __u64 first;
->         __u64 last;
-> };
+> It would be nice, I've seen a abuse and mislocking of it in drivers
 
-Alright, I will split it into two entries. That doesn't fully address
-the bug though. I would also need to validate size in vhost_chr_iter_write().
+Though to be clear, what Robin is describing is still keeping the
+dev->driver stores in dd.c, just reading it in a lockless way from
+other modules.
 
-Should I do both in one patch or as a two patch series?
-
-> 
-> but
-> 
-> struct vhost_iotlb_msg {
->         __u64 iova;
->         __u64 size;
->         __u64 uaddr;
-> #define VHOST_ACCESS_RO      0x1
-> #define VHOST_ACCESS_WO      0x2
-> #define VHOST_ACCESS_RW      0x3
->         __u8 perm;
-> #define VHOST_IOTLB_MISS           1
-> #define VHOST_IOTLB_UPDATE         2
-> #define VHOST_IOTLB_INVALIDATE     3
-> #define VHOST_IOTLB_ACCESS_FAIL    4
-> /*
->  * VHOST_IOTLB_BATCH_BEGIN and VHOST_IOTLB_BATCH_END allow modifying
->  * multiple mappings in one go: beginning with
->  * VHOST_IOTLB_BATCH_BEGIN, followed by any number of
->  * VHOST_IOTLB_UPDATE messages, and ending with VHOST_IOTLB_BATCH_END.
->  * When one of these two values is used as the message type, the rest
->  * of the fields in the message are ignored. There's no guarantee that
->  * these changes take place automatically in the device.
->  */
-> #define VHOST_IOTLB_BATCH_BEGIN    5
-> #define VHOST_IOTLB_BATCH_END      6
->         __u8 type;
-> };
-> 
-> 
-> 
-> > Which means that
-> > right now there is now way for userspace to map this range. So, is there
-> > any value in not simply rejecting this range?
-> > 
-> > > 
-> > > Anirudh, could you do it like this instead of rejecting?
-> > > 
-> > > 
-> > > > I wonder if it's better to just remove
-> > > > the map->size. Having a quick glance at the the user, I don't see any
-> > > > blocker for this.
-> > > > 
-> > > > Thanks
-> > > 
-> > > I think it's possible but won't solve the bug by itself, and we'd need
-> > > to review and fix all users - a high chance of introducing
-> > > another regression. 
-> > 
-> > Agreed, I did a quick review of the usages and getting rid of size
-> > didn't seem trivial.
-> > 
-> > Thanks,
-> > 
-> > 	- Anirudh.
-> > 
-> > > And I think there's value of fitting under the
-> > > stable rule of 100 lines with context.
-> > > So sure, but let's fix the bug first.
-> > > 
-> > > 
-> > > 
-> > > > >
-> > > > > Thanks!
-> > > > >
-> > > > >         - Anirudh.
-> > > > >
-> > > > > >
-> > > > > > Thanks
-> > > > > >
-> > > > > > >
-> > > > > > >         if (iotlb->limit &&
-> > > > > > > @@ -69,7 +71,7 @@ int vhost_iotlb_add_range_ctx(struct vhost_iotlb *iotlb,
-> > > > > > >                 return -ENOMEM;
-> > > > > > >
-> > > > > > >         map->start = start;
-> > > > > > > -       map->size = last - start + 1;
-> > > > > > > +       map->size = size;
-> > > > > > >         map->last = last;
-> > > > > > >         map->addr = addr;
-> > > > > > >         map->perm = perm;
-> > > > > > > --
-> > > > > > > 2.35.1
-> > > > > > >
-> > > > > >
-> > > > >
-> > > 
-> 
+Jason
