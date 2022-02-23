@@ -2,208 +2,344 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B12CF4C1147
-	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 12:30:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8B8F84C114C
+	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 12:32:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239874AbiBWLbK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Feb 2022 06:31:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42346 "EHLO
+        id S239889AbiBWLc3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Feb 2022 06:32:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239846AbiBWLbI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Feb 2022 06:31:08 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 405BA90268
-        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 03:30:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645615840;
+        with ESMTP id S239846AbiBWLc1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Feb 2022 06:32:27 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64D052BB38;
+        Wed, 23 Feb 2022 03:31:59 -0800 (PST)
+Received: from zn.tnic (dslb-088-067-221-104.088.067.pools.vodafone-ip.de [88.67.221.104])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id BE0D71EC0529;
+        Wed, 23 Feb 2022 12:31:53 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1645615914;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=gE7c+TJZwdJ+gVzSVPXnxEm5PYurvMoN/2kz7QXDHUQ=;
-        b=PJ3L2ZFl6cYyRqfmfQFcuH7AlEGndm2dCKPcIcipp+DLqTIppouT3CuwYutp8t4AVZxG46
-        M2le/z5HYOI8dxREYvSg8Dcj45HjOtT2o8D5fbjV8En2yagOTcCL32nkG1yjkuOqdp2CfT
-        QAj0Vh1BYAvp1QUkmUW/iFoflfANeyI=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-547-986Dce37PLGvxVJpnbAEPA-1; Wed, 23 Feb 2022 06:30:39 -0500
-X-MC-Unique: 986Dce37PLGvxVJpnbAEPA-1
-Received: by mail-wr1-f70.google.com with SMTP id j27-20020adfb31b000000b001ea8356972bso2377431wrd.1
-        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 03:30:38 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=gE7c+TJZwdJ+gVzSVPXnxEm5PYurvMoN/2kz7QXDHUQ=;
-        b=6FpJn+ifonIP/cTSbPZ9pPNdK1gTeFT1oKNUapf8Y1/qhikqoL38N4pbKzMQhCs/q5
-         8CCju02xa6g0+3I35R2kFa7irESiGDRjGJLRa2Ob1AddDJ1loOp1R0SPpDi45Y95Rw0L
-         IKcRlYQtTLTKJbTu03Wg39M8XleQwhS+zblbbmIzxjuAg/KxqTUIAMygBY3+7Lhv+iWA
-         /kJ9ZsCzqjTo+JH/at9QSCxie/7VIuT4QhEfd1Uv5OzNsqaqls5261kY4XYHd7GPF6yb
-         aojYqGWbPQ2PS+cn1hX+m82hy8BDR3rFXaMf+Tg785wss/8eZUGtUHdfqSBqDCZMSvi5
-         rx4Q==
-X-Gm-Message-State: AOAM530hIhKvOeEiA/3hikgAsZ1zBr4j/intF1fOFAPQnlWWcm8I7fVu
-        yXuCTecUBLYNSHvLnEsnxpJaX4QuUCQq7MOnQBKCu328FedITEJu0pcZF9HCYPTBsreNpG7W546
-        12LRnM9QljKrN
-X-Received: by 2002:a05:6000:1d99:b0:1ed:bc55:34ad with SMTP id bk25-20020a0560001d9900b001edbc5534admr920990wrb.427.1645615837922;
-        Wed, 23 Feb 2022 03:30:37 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyszBOWYlHNQwLxhXHNusl4BU8vLtOvldGHIca7YPyki7EvMfBkXxUePbm2YmXVo7pCzEFZHg==
-X-Received: by 2002:a05:6000:1d99:b0:1ed:bc55:34ad with SMTP id bk25-20020a0560001d9900b001edbc5534admr920975wrb.427.1645615837592;
-        Wed, 23 Feb 2022 03:30:37 -0800 (PST)
-Received: from [10.33.192.232] (nat-pool-str-t.redhat.com. [149.14.88.106])
-        by smtp.gmail.com with ESMTPSA id t1sm67945067wre.45.2022.02.23.03.30.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Feb 2022 03:30:37 -0800 (PST)
-Message-ID: <b2fd362a-eefa-8fa7-1016-55bedd3fa6ee@redhat.com>
-Date:   Wed, 23 Feb 2022 12:30:36 +0100
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=vRub8upnFVgTuk1CuLQ7RycyBOT/S3x02567AirM60Y=;
+        b=bHo4xk4Bmr79VIea9IqgozdD0mALSViHVN39ZTluSS9L+EhT8GJnWJa7fNgYCPI+/nxqo/
+        XVICSy/1IMDusAS6w++XgNwem7xf7N8f9+uK5dk+z6pi13NUZM0tyFWwKA9uANMl5lKD26
+        Zht1Nm1H5LhQvnKzgXaItk1zMGC4s24=
+Date:   Wed, 23 Feb 2022 12:31:56 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        David Rientjes <rientjes@google.com>,
+        Michael Roth <michael.roth@amd.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Andi Kleen <ak@linux.intel.com>
+Subject: Re: [PATCH] x86/mm/cpa: Generalize __set_memory_enc_pgtable()
+Message-ID: <YhYbLDTFLIksB/qp@zn.tnic>
+References: <20220222185740.26228-1-kirill.shutemov@linux.intel.com>
+ <20220223043528.2093214-1-brijesh.singh@amd.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH 3/9] KVM: s390: pv: Add query interface
-Content-Language: en-US
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
-        david@redhat.com, borntraeger@linux.ibm.com
-References: <20220223092007.3163-1-frankja@linux.ibm.com>
- <20220223092007.3163-4-frankja@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <20220223092007.3163-4-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20220223043528.2093214-1-brijesh.singh@amd.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23/02/2022 10.20, Janosch Frank wrote:
-> Some of the query information is already available via sysfs but
-> having a IOCTL makes the information easier to retrieve.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->   arch/s390/kvm/kvm-s390.c | 47 ++++++++++++++++++++++++++++++++++++++++
->   include/uapi/linux/kvm.h | 23 ++++++++++++++++++++
->   2 files changed, 70 insertions(+)
-> 
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index faa85397b6fb..837f898ad2ff 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -2217,6 +2217,34 @@ static int kvm_s390_cpus_to_pv(struct kvm *kvm, u16 *rc, u16 *rrc)
->   	return r;
->   }
->   
-> +static int kvm_s390_handle_pv_info(struct kvm_s390_pv_info *info)
-> +{
-> +	u32 len;
-> +
-> +	switch (info->header.id) {
-> +	case KVM_PV_INFO_VM: {
-> +		len =  sizeof(info->header) + sizeof(info->vm);
-> +
-> +		if (info->header.len < len)
-> +			return -EINVAL;
-> +
-> +		memcpy(info->vm.inst_calls_list,
-> +		       uv_info.inst_calls_list,
-> +		       sizeof(uv_info.inst_calls_list));
-> +
-> +		/* It's max cpuidm not max cpus so it's off by one */
-> +		info->vm.max_cpus = uv_info.max_guest_cpu_id + 1;
-> +		info->vm.max_guests = uv_info.max_num_sec_conf;
-> +		info->vm.max_guest_addr = uv_info.max_sec_stor_addr;
-> +		info->vm.feature_indication = uv_info.uv_feature_indications;
-> +
-> +		return 0;
-> +	}
-> +	default:
-> +		return -EINVAL;
-> +	}
-> +}
-> +
->   static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
->   {
->   	int r = 0;
-> @@ -2353,6 +2381,25 @@ static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
->   			     cmd->rc, cmd->rrc);
->   		break;
->   	}
-> +	case KVM_PV_INFO: {
-> +		struct kvm_s390_pv_info info = {};
-> +
-> +		if (copy_from_user(&info, argp, sizeof(info.header)))
-> +			return -EFAULT;
-> +
-> +		if (info.header.len < sizeof(info.header))
-> +			return -EINVAL;
-> +
-> +		r = kvm_s390_handle_pv_info(&info);
-> +		if (r)
-> +			return r;
-> +
-> +		r = copy_to_user(argp, &info, sizeof(info));
+On Tue, Feb 22, 2022 at 10:35:28PM -0600, Brijesh Singh wrote:
+> Depends on Krill's CC cleanup
+> https://lore.kernel.org/all/20220222185740.26228-1-kirill.shutemov@linux.intel.com/
 
-sizeof(info) is currently OK ... but this might break if somebody later 
-extends the kvm_s390_pv_info struct, I guess? ==> Maybe also better use 
-sizeof(info->header) + sizeof(info->vm) here, too? Or let 
-kvm_s390_handle_pv_info() return the amount of bytes that should be copied here?
+I've massaged it into what it should be, see below.
 
-  Thomas
+The BUG_ON() is gone because we don't do BUG_ONs - if you had used
+checkpatch, it would've told you. So I've added noops like that x86_init
+stuff is usually done.
+
+Anyway, Kirill, your turn. Is the below enough for TDX?
+
+---
+From daa6fb150e495511c699820bce925d89e55e96d4 Mon Sep 17 00:00:00 2001
+From: Brijesh Singh <brijesh.singh@amd.com>
+Date: Tue, 22 Feb 2022 22:35:28 -0600
+Subject: [PATCH] x86/mm/cpa: Generalize __set_memory_enc_pgtable()
+
+The kernel provides infrastructure to set or clear the encryption mask
+from the pages for AMD SEV, but TDX requires few tweaks.
+
+- TDX and SEV have different requirements to the cache and TLB
+  flushing.
+
+- TDX has own routine to notify VMM about page encryption status change.
+
+Modify __set_memory_enc_pgtable() and make it flexible enough to cover
+both AMD SEV and Intel TDX. The AMD-specific behavior is isolated in
+callback under x86_platform_cc. TDX will provide own version of the
+callbacks.
+
+  [ bp: Beat into submission. ]
+
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+Signed-off-by: Borislav Petkov <bp@suse.de>
+Link: https://lore.kernel.org/r/20220223043528.2093214-1-brijesh.singh@amd.com
+---
+ arch/x86/include/asm/set_memory.h |  1 -
+ arch/x86/include/asm/x86_init.h   | 16 +++++++
+ arch/x86/kernel/x86_init.c        | 16 ++++++-
+ arch/x86/mm/mem_encrypt_amd.c     | 71 +++++++++++++++++++++----------
+ arch/x86/mm/pat/set_memory.c      | 18 ++++----
+ 5 files changed, 88 insertions(+), 34 deletions(-)
+
+diff --git a/arch/x86/include/asm/set_memory.h b/arch/x86/include/asm/set_memory.h
+index ff0f2d90338a..ce8dd215f5b3 100644
+--- a/arch/x86/include/asm/set_memory.h
++++ b/arch/x86/include/asm/set_memory.h
+@@ -84,7 +84,6 @@ int set_pages_rw(struct page *page, int numpages);
+ int set_direct_map_invalid_noflush(struct page *page);
+ int set_direct_map_default_noflush(struct page *page);
+ bool kernel_page_present(struct page *page);
+-void notify_range_enc_status_changed(unsigned long vaddr, int npages, bool enc);
+ 
+ extern int kernel_set_to_readonly;
+ 
+diff --git a/arch/x86/include/asm/x86_init.h b/arch/x86/include/asm/x86_init.h
+index 22b7412c08f6..dfdcd3152f8d 100644
+--- a/arch/x86/include/asm/x86_init.h
++++ b/arch/x86/include/asm/x86_init.h
+@@ -141,6 +141,21 @@ struct x86_init_acpi {
+ 	void (*reduced_hw_early_init)(void);
+ };
+ 
++/**
++ * struct x86_guest - Functions used by misc guest incarnations like SEV, TDX, etc.
++ *
++ * @enc_status_change_prepare	Notify HV before the encryption status of a range is changed
++ * @enc_status_change_finish	Notify HV after the encryption status of a range is changed
++ * @enc_tlb_flush_required	Returns true if a TLB flush is needed before changing page encryption status
++ * @enc_cache_flush_required	Returns true if a cache flush is needed before changing page encryption status
++ */
++struct x86_guest {
++	void (*enc_status_change_prepare)(unsigned long vaddr, int npages, bool enc);
++	void (*enc_status_change_finish)(unsigned long vaddr, int npages, bool enc);
++	bool (*enc_tlb_flush_required)(bool enc);
++	bool (*enc_cache_flush_required)(void);
++};
++
+ /**
+  * struct x86_init_ops - functions for platform specific setup
+  *
+@@ -287,6 +302,7 @@ struct x86_platform_ops {
+ 	struct x86_legacy_features legacy;
+ 	void (*set_legacy_features)(void);
+ 	struct x86_hyper_runtime hyper;
++	struct x86_guest guest;
+ };
+ 
+ struct x86_apic_ops {
+diff --git a/arch/x86/kernel/x86_init.c b/arch/x86/kernel/x86_init.c
+index 7d20c1d34a3c..bb57410dde2d 100644
+--- a/arch/x86/kernel/x86_init.c
++++ b/arch/x86/kernel/x86_init.c
+@@ -129,6 +129,11 @@ struct x86_cpuinit_ops x86_cpuinit = {
+ 
+ static void default_nmi_init(void) { };
+ 
++static void enc_status_change_prepare_noop(unsigned long vaddr, int npages, bool enc) { }
++static void enc_status_change_finish_noop(unsigned long vaddr, int npages, bool enc) { }
++static bool enc_tlb_flush_required_noop(bool enc) { return false; }
++static bool enc_cache_flush_required_noop(void) { return false; }
++
+ struct x86_platform_ops x86_platform __ro_after_init = {
+ 	.calibrate_cpu			= native_calibrate_cpu_early,
+ 	.calibrate_tsc			= native_calibrate_tsc,
+@@ -138,9 +143,16 @@ struct x86_platform_ops x86_platform __ro_after_init = {
+ 	.is_untracked_pat_range		= is_ISA_range,
+ 	.nmi_init			= default_nmi_init,
+ 	.get_nmi_reason			= default_get_nmi_reason,
+-	.save_sched_clock_state 	= tsc_save_sched_clock_state,
+-	.restore_sched_clock_state 	= tsc_restore_sched_clock_state,
++	.save_sched_clock_state		= tsc_save_sched_clock_state,
++	.restore_sched_clock_state	= tsc_restore_sched_clock_state,
+ 	.hyper.pin_vcpu			= x86_op_int_noop,
++
++	.guest = {
++		.enc_status_change_prepare = enc_status_change_prepare_noop,
++		.enc_status_change_finish  = enc_status_change_finish_noop,
++		.enc_tlb_flush_required	   = enc_tlb_flush_required_noop,
++		.enc_cache_flush_required  = enc_cache_flush_required_noop,
++	},
+ };
+ 
+ EXPORT_SYMBOL_GPL(x86_platform);
+diff --git a/arch/x86/mm/mem_encrypt_amd.c b/arch/x86/mm/mem_encrypt_amd.c
+index 2b2d018ea345..4c57c8988f37 100644
+--- a/arch/x86/mm/mem_encrypt_amd.c
++++ b/arch/x86/mm/mem_encrypt_amd.c
+@@ -177,25 +177,6 @@ void __init sme_map_bootdata(char *real_mode_data)
+ 	__sme_early_map_unmap_mem(__va(cmdline_paddr), COMMAND_LINE_SIZE, true);
+ }
+ 
+-void __init sme_early_init(void)
+-{
+-	unsigned int i;
+-
+-	if (!sme_me_mask)
+-		return;
+-
+-	early_pmd_flags = __sme_set(early_pmd_flags);
+-
+-	__supported_pte_mask = __sme_set(__supported_pte_mask);
+-
+-	/* Update the protection map with memory encryption mask */
+-	for (i = 0; i < ARRAY_SIZE(protection_map); i++)
+-		protection_map[i] = pgprot_encrypted(protection_map[i]);
+-
+-	if (cc_platform_has(CC_ATTR_GUEST_MEM_ENCRYPT))
+-		swiotlb_force = SWIOTLB_FORCE;
+-}
+-
+ void __init sev_setup_arch(void)
+ {
+ 	phys_addr_t total_mem = memblock_phys_mem_size();
+@@ -256,7 +237,17 @@ static unsigned long pg_level_to_pfn(int level, pte_t *kpte, pgprot_t *ret_prot)
+ 	return pfn;
+ }
+ 
+-void notify_range_enc_status_changed(unsigned long vaddr, int npages, bool enc)
++static bool amd_enc_tlb_flush_required(bool enc)
++{
++	return true;
++}
++
++static bool amd_enc_cache_flush_required(void)
++{
++	return !cpu_feature_enabled(X86_FEATURE_SME_COHERENT);
++}
++
++static void enc_dec_hypercall(unsigned long vaddr, int npages, bool enc)
+ {
+ #ifdef CONFIG_PARAVIRT
+ 	unsigned long sz = npages << PAGE_SHIFT;
+@@ -287,6 +278,18 @@ void notify_range_enc_status_changed(unsigned long vaddr, int npages, bool enc)
+ #endif
+ }
+ 
++static void amd_enc_status_change_prepare(unsigned long vaddr, int npages, bool enc)
++{
++}
++
++static void amd_enc_status_change_finish(unsigned long vaddr, int npages, bool enc)
++{
++	if (cc_platform_has(CC_ATTR_HOST_MEM_ENCRYPT))
++		return;
++
++	enc_dec_hypercall(vaddr, npages, enc);
++}
++
+ static void __init __set_clr_pte_enc(pte_t *kpte, int level, bool enc)
+ {
+ 	pgprot_t old_prot, new_prot;
+@@ -392,7 +395,7 @@ static int __init early_set_memory_enc_dec(unsigned long vaddr,
+ 
+ 	ret = 0;
+ 
+-	notify_range_enc_status_changed(start, PAGE_ALIGN(size) >> PAGE_SHIFT, enc);
++	early_set_mem_enc_dec_hypercall(start, PAGE_ALIGN(size) >> PAGE_SHIFT, enc);
+ out:
+ 	__flush_tlb_all();
+ 	return ret;
+@@ -410,7 +413,31 @@ int __init early_set_memory_encrypted(unsigned long vaddr, unsigned long size)
+ 
+ void __init early_set_mem_enc_dec_hypercall(unsigned long vaddr, int npages, bool enc)
+ {
+-	notify_range_enc_status_changed(vaddr, npages, enc);
++	enc_dec_hypercall(vaddr, npages, enc);
++}
++
++void __init sme_early_init(void)
++{
++	unsigned int i;
++
++	if (!sme_me_mask)
++		return;
++
++	early_pmd_flags = __sme_set(early_pmd_flags);
++
++	__supported_pte_mask = __sme_set(__supported_pte_mask);
++
++	/* Update the protection map with memory encryption mask */
++	for (i = 0; i < ARRAY_SIZE(protection_map); i++)
++		protection_map[i] = pgprot_encrypted(protection_map[i]);
++
++	if (cc_platform_has(CC_ATTR_GUEST_MEM_ENCRYPT))
++		swiotlb_force = SWIOTLB_FORCE;
++
++	x86_platform.guest.enc_status_change_prepare = amd_enc_status_change_prepare;
++	x86_platform.guest.enc_status_change_finish  = amd_enc_status_change_finish;
++	x86_platform.guest.enc_tlb_flush_required    = amd_enc_tlb_flush_required;
++	x86_platform.guest.enc_cache_flush_required  = amd_enc_cache_flush_required;
+ }
+ 
+ void __init mem_encrypt_free_decrypted_mem(void)
+diff --git a/arch/x86/mm/pat/set_memory.c b/arch/x86/mm/pat/set_memory.c
+index af77dbfd143c..92c26828265c 100644
+--- a/arch/x86/mm/pat/set_memory.c
++++ b/arch/x86/mm/pat/set_memory.c
+@@ -2008,10 +2008,12 @@ static int __set_memory_enc_pgtable(unsigned long addr, int numpages, bool enc)
+ 	kmap_flush_unused();
+ 	vm_unmap_aliases();
+ 
+-	/*
+-	 * Before changing the encryption attribute, we need to flush caches.
+-	 */
+-	cpa_flush(&cpa, !this_cpu_has(X86_FEATURE_SME_COHERENT));
++	/* Flush the caches as needed before changing the encryption attribute. */
++	if (x86_platform.guest.enc_tlb_flush_required(enc))
++		cpa_flush(&cpa, x86_platform.guest.enc_cache_flush_required());
++
++	/* Notify hypervisor that we are about to set/clr encryption attribute. */
++	x86_platform.guest.enc_status_change_prepare(addr, numpages, enc);
+ 
+ 	ret = __change_page_attr_set_clr(&cpa, 1);
+ 
+@@ -2024,11 +2026,9 @@ static int __set_memory_enc_pgtable(unsigned long addr, int numpages, bool enc)
+ 	 */
+ 	cpa_flush(&cpa, 0);
+ 
+-	/*
+-	 * Notify hypervisor that a given memory range is mapped encrypted
+-	 * or decrypted.
+-	 */
+-	notify_range_enc_status_changed(addr, numpages, enc);
++	/* Notify hypervisor that we have successfully set/clr encryption attribute. */
++	if (!ret)
++		x86_platform.guest.enc_status_change_finish(addr, numpages, enc);
+ 
+ 	return ret;
+ }
+-- 
+2.29.2
 
 
-> +		if (r)
-> +			return -EFAULT;
-> +		return 0;
-> +	}
->   	default:
->   		r = -ENOTTY;
->   	}
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index dbc550bbd9fa..96fceb204a92 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1642,6 +1642,28 @@ struct kvm_s390_pv_unp {
->   	__u64 tweak;
->   };
->   
-> +enum pv_cmd_info_id {
-> +	KVM_PV_INFO_VM,
-> +};
-> +
-> +struct kvm_s390_pv_info_vm {
-> +	__u64 inst_calls_list[4];
-> +	__u64 max_cpus;
-> +	__u64 max_guests;
-> +	__u64 max_guest_addr;
-> +	__u64 feature_indication;
-> +};
-> +
-> +struct kvm_s390_pv_info_header {
-> +	__u32 id;
-> +	__u32 len;
-> +};
-> +
-> +struct kvm_s390_pv_info {
-> +	struct kvm_s390_pv_info_header header;
-> +	struct kvm_s390_pv_info_vm vm;
-> +};
-> +
->   enum pv_cmd_id {
->   	KVM_PV_ENABLE,
->   	KVM_PV_DISABLE,
-> @@ -1650,6 +1672,7 @@ enum pv_cmd_id {
->   	KVM_PV_VERIFY,
->   	KVM_PV_PREP_RESET,
->   	KVM_PV_UNSHARE_ALL,
-> +	KVM_PV_INFO,
->   };
->   
->   struct kvm_pv_cmd {
+-- 
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
