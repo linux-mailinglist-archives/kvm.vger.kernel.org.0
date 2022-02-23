@@ -2,119 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1B0CF4C1971
-	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 18:06:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AB0454C198C
+	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 18:09:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241226AbiBWRHF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Feb 2022 12:07:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56718 "EHLO
+        id S243273AbiBWRJu convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Wed, 23 Feb 2022 12:09:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33948 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243188AbiBWRG4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Feb 2022 12:06:56 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3C70C5D670
-        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 09:06:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645635981;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=OdhMSjzenM1uAIsnbqo9rXhRZ5TBT2FTULmZ23R9wDg=;
-        b=T09sRrhF1hX+Do5Y4Laf6pIbnRIYjoyIGDhxJHCoxMazqfGazLdfBRUiwfoALKAG8R7rKK
-        Uo/NmO6AnAbJp/oSEYvuFZR0BC11fCoX4nr5J80WhiQM9NdMLM34/nXpDeUJJIMt4OtHDn
-        7Ddyk+OnFoBL+aPu7fRT6HXlJlcka3o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-42---G7p4icMOm0TjUV1mgtbQ-1; Wed, 23 Feb 2022 12:06:17 -0500
-X-MC-Unique: --G7p4icMOm0TjUV1mgtbQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A5E3C1091DA1;
-        Wed, 23 Feb 2022 17:06:15 +0000 (UTC)
-Received: from localhost (unknown [10.39.193.96])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 43153804F8;
-        Wed, 23 Feb 2022 17:06:15 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Yishai Hadas <yishaih@nvidia.com>, alex.williamson@redhat.com,
-        bhelgaas@google.com, jgg@nvidia.com, saeedm@nvidia.com
-Cc:     linux-pci@vger.kernel.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
-        kwankhede@nvidia.com, mgurtovoy@nvidia.com, yishaih@nvidia.com,
-        maorg@nvidia.com, ashok.raj@intel.com, kevin.tian@intel.com,
-        shameerali.kolothum.thodi@huawei.com
-Subject: Re: [PATCH V8 mlx5-next 09/15] vfio: Define device migration
- protocol v2
-In-Reply-To: <20220220095716.153757-10-yishaih@nvidia.com>
-Organization: Red Hat GmbH
-References: <20220220095716.153757-1-yishaih@nvidia.com>
- <20220220095716.153757-10-yishaih@nvidia.com>
-User-Agent: Notmuch/0.34 (https://notmuchmail.org)
-Date:   Wed, 23 Feb 2022 18:06:13 +0100
-Message-ID: <87ley17bsq.fsf@redhat.com>
+        with ESMTP id S243241AbiBWRHr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Feb 2022 12:07:47 -0500
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8CF45D19A;
+        Wed, 23 Feb 2022 09:07:16 -0800 (PST)
+Received: from fraeml734-chm.china.huawei.com (unknown [172.18.147.206])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4K3j5G4wg6z680ZP;
+        Thu, 24 Feb 2022 01:02:26 +0800 (CST)
+Received: from lhreml715-chm.china.huawei.com (10.201.108.66) by
+ fraeml734-chm.china.huawei.com (10.206.15.215) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Wed, 23 Feb 2022 18:07:07 +0100
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ lhreml715-chm.china.huawei.com (10.201.108.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Wed, 23 Feb 2022 17:07:06 +0000
+Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
+ lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
+ 15.01.2308.021; Wed, 23 Feb 2022 17:07:06 +0000
+From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
+        "yishaih@nvidia.com" <yishaih@nvidia.com>,
+        Linuxarm <linuxarm@huawei.com>,
+        liulongfang <liulongfang@huawei.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        Jonathan Cameron <jonathan.cameron@huawei.com>,
+        "Wangzhou (B)" <wangzhou1@hisilicon.com>
+Subject: RE: [PATCH v5 7/8] hisi_acc_vfio_pci: Add support for VFIO live
+ migration
+Thread-Topic: [PATCH v5 7/8] hisi_acc_vfio_pci: Add support for VFIO live
+ migration
+Thread-Index: AQHYJxgOEQAq1mellU2EgPXLuddEUaygUS2AgAEHKICAAAi68A==
+Date:   Wed, 23 Feb 2022 17:07:06 +0000
+Message-ID: <60d48005f88a4d63b9a9228c0f4d95b9@huawei.com>
+References: <20220221114043.2030-1-shameerali.kolothum.thodi@huawei.com>
+        <20220221114043.2030-8-shameerali.kolothum.thodi@huawei.com>
+        <20220223005251.GJ10061@nvidia.com>
+ <20220223093443.367ee531.alex.williamson@redhat.com>
+In-Reply-To: <20220223093443.367ee531.alex.williamson@redhat.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.47.27.208]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Feb 20 2022, Yishai Hadas <yishaih@nvidia.com> wrote:
 
-> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-> index ca69516f869d..3bbadcdbc9c8 100644
-> --- a/include/linux/vfio.h
-> +++ b/include/linux/vfio.h
-> @@ -56,6 +56,14 @@ struct vfio_device {
->   *         match, -errno for abort (ex. match with insufficient or incorrect
->   *         additional args)
->   * @device_feature: Fill in the VFIO_DEVICE_FEATURE ioctl
-> + * @migration_set_state: Optional callback to change the migration state for
-> + *         devices that support migration. The returned FD is used for data
-> + *         transfer according to the FSM definition. The driver is responsible
-> + *         to ensure that FD reaches end of stream or error whenever the
-> + *         migration FSM leaves a data transfer state or before close_device()
-> + *         returns.
-> + * @migration_get_state: Optional callback to get the migration state for
-> + *         devices that support migration.
 
-Nit: I'd add "mandatory for VFIO_DEVICE_FEATURE_MIGRATION migration
-support" to both descriptions to be a bit more explicit.
+> -----Original Message-----
+> From: Alex Williamson [mailto:alex.williamson@redhat.com]
+> Sent: 23 February 2022 16:35
+> To: Jason Gunthorpe <jgg@nvidia.com>
+> Cc: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
+> kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
+> linux-crypto@vger.kernel.org; cohuck@redhat.com; mgurtovoy@nvidia.com;
+> yishaih@nvidia.com; Linuxarm <linuxarm@huawei.com>; liulongfang
+> <liulongfang@huawei.com>; Zengtao (B) <prime.zeng@hisilicon.com>;
+> Jonathan Cameron <jonathan.cameron@huawei.com>; Wangzhou (B)
+> <wangzhou1@hisilicon.com>
+> Subject: Re: [PATCH v5 7/8] hisi_acc_vfio_pci: Add support for VFIO live
+> migration
+> 
+> On Tue, 22 Feb 2022 20:52:51 -0400
+> Jason Gunthorpe <jgg@nvidia.com> wrote:
+> 
+> > On Mon, Feb 21, 2022 at 11:40:42AM +0000, Shameer Kolothum wrote:
+> >
+> > > +	/*
+> > > +	 * ACC VF dev BAR2 region consists of both functional register space
+> > > +	 * and migration control register space. For migration to work, we
+> > > +	 * need access to both. Hence, we map the entire BAR2 region here.
+> > > +	 * But from a security point of view, we restrict access to the
+> > > +	 * migration control space from Guest(Please see mmap/ioctl/read/write
+> > > +	 * override functions).
+> > > +	 *
+> > > +	 * Also the HiSilicon ACC VF devices supported by this driver on
+> > > +	 * HiSilicon hardware platforms are integrated end point devices
+> > > +	 * and has no capability to perform PCIe P2P.
+> >
+> > If that is the case why not implement the RUNNING_P2P as well as a
+> > NOP?
+> >
+> > Alex expressed concerned about proliferation of non-P2P devices as it
+> > complicates qemu to support mixes
+> 
+> I read the above as more of a statement about isolation, ie. grouping.
 
-(...)
+That's right. That's what I meant by " no capability to perform PCIe P2P"
 
-> +/*
-> + * Indicates the device can support the migration API through
-> + * VFIO_DEVICE_FEATURE_MIG_DEVICE_STATE. If present flags must be non-zero and
-> + * VFIO_DEVICE_FEATURE_MIG_DEVICE_STATE is supported. The RUNNING and
+Thanks,
+Shameer
 
-I'm having trouble parsing this. I think what it tries to say is that at
-least one of the flags defined below must be set?
-
-> + * ERROR states are always supported if this GET succeeds.
-
-What about the following instead:
-
-"Indicates device support for the migration API through
-VFIO_DEVICE_FEATURE_MIG_DEVICE_STATE. If present, the RUNNING and ERROR
-states are always supported. Support for additional states is indicated
-via the flags field; at least one of the flags defined below must be
-set."
-
-> + *
-> + * VFIO_MIGRATION_STOP_COPY means that STOP, STOP_COPY and
-> + * RESUMING are supported.
-> + */
-> +struct vfio_device_feature_migration {
-> +	__aligned_u64 flags;
-> +#define VFIO_MIGRATION_STOP_COPY	(1 << 0)
-> +};
+> Given that all DMA from the device is translated by the IOMMU, how is
+> it possible that a device can entirely lack p2p support, or even know
+> that the target address post-translation is to a peer device rather
+> than system memory.  If this is the case, it sounds like a restriction
+> of the SMMU not supporting translations that reflect back to the I/O
+> bus rather than a feature of the device itself.  Thanks,
+> 
+> Alex
 
