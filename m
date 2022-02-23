@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 180374C0C06
-	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 06:26:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 75A234C0C09
+	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 06:27:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237990AbiBWF1A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Feb 2022 00:27:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57808 "EHLO
+        id S238460AbiBWF1U (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Feb 2022 00:27:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58046 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238328AbiBWF0Z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Feb 2022 00:26:25 -0500
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 546D86E4F2
-        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 21:25:04 -0800 (PST)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-2d07ae1145aso162070187b3.4
-        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 21:25:04 -0800 (PST)
+        with ESMTP id S238371AbiBWF0j (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Feb 2022 00:26:39 -0500
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0BEB6E576
+        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 21:25:07 -0800 (PST)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-2d07ae11467so163389687b3.12
+        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 21:25:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=vK4stcDcFWOmnS7XFdl48O2PCgqnR6b+h+9UyqGSKHo=;
-        b=WeE4/kJf1JBwoHaoRE1hNnNZMWwTToI7DEJHTID7WIxYsRDDOQgqC+1Tt7v7oX0Gpi
-         ZmRLZAZ2vDdsuIDB2S8uWUw1YsFiIl0loYVOvIAhqXAjeeol/TFwLp8ORGxcWp10Znnv
-         Fm89xpJAHuDIyCGkiR6qSwg/Ed2RYqbaYiZbeHx1AcGw15lQM8m5E4AwvqrpiEZ4xaWB
-         fo5SYVGmwmAcFx/4QD/6NyE3+JjhT+8OXDlEZf2AotxVIkqYFj/Rh40KkPJ8CI4n5jQK
-         7ZdRdvip/O5Och4s64bR2f4QDQ48Fke+i6WKvHWJfT9D9ayGbTZXm6UK8dYn9Je6DvRz
-         f9cA==
+        bh=Wjvyoa2FJqkBAKFP17bCuJdeRktO4ffR+raoUv+wC04=;
+        b=IuC+day3sN1PmeI3q0+DeqehWlmR6vmu4lqtMz2zTkSs/sLWgZjKSMjbDxjarGYK3w
+         hUZZQKn00coi8l0R0gTq63im2iXgDqy8kS7ZoG/GfBb24X2etuAVLlEbTVnHHQVOpffA
+         7kJw+tCwaYdWlS1krugMDGNM7sJ3OTIDt7ytbn7/z+HK1a8ew2aSceVwKePXDv9f7WZz
+         m0Q/zwZ6fjCsUI3xB5Psf0pqjVkAy2TXCzeSjVt+m4RXqs776AhpaQ80FhrK9Kk/bCDo
+         Sz1kG0HnL9LnI2+RNBaFmgg3coHxCTDPj+PGc/Rc5iXJGNpAzaSB6KONLlzImp2qWQaO
+         osLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=vK4stcDcFWOmnS7XFdl48O2PCgqnR6b+h+9UyqGSKHo=;
-        b=JdAk0l+W5r0qTLImIASWFQEwfbsiJEMIEBjjgjwyiqm0JL15ftqJApDNS7ZHD6aYPm
-         ECwOyTrOIUtDYZ8UzpveFH32dlZQK3Ku4gndZTGv+9JFI9i1UjyDftVYPRzBk7SBB3Wy
-         WbiFB5+QgD1tWOSzhBVe4GyaljlhK8UJN/nzT/mF97VyHFTrbFvM90Nt+nY4lDSWJd06
-         BWt83cS9h2kBhQOls8j8i4MwwNHehyLJdJuvI7VnC4KKXDWYSlqRj9RinBqXDi++Pi8U
-         6VC+MIePdopb/+YzNlsv+ts8QyiHDSLz+FPAiQ1Uxls+R4ReoRAofvNrKEaYdg9rLnvO
-         hJfg==
-X-Gm-Message-State: AOAM531PnwcO2hPMBVsV5n4/FOb7bHRp1dOr8qzrw2AiGKzFKiqd0rMf
-        NNQ1+HqIo3B61dkrrcbp5EQ0a62P6HJN
-X-Google-Smtp-Source: ABdhPJyP9PANVGMHQ1NQcOMu/RGh/MDmkswDGY7BrfXZ28lpcuzIVCL0D2Bn/aYlOJdsoN0ZdyV9/jnSWe04
+        bh=Wjvyoa2FJqkBAKFP17bCuJdeRktO4ffR+raoUv+wC04=;
+        b=ZMWAb3gDJDGAIxAg12N2DkBPm8sCQdUMQWT23E/UKkzu83AuNIfNcynW3X42GLuMsh
+         14hb/MeaALY6cxQ2D2BzIW6l2RVZhCT6qbwsmIB9zyyVgdwqP3M8xyHRfvcnqGFbb60z
+         hmgwzqnYeIRGFEz/q1xo71FedgawKmdNPI5OD9jXmHRurKfKDX6FQQbGJZ/pAsHHneGm
+         Vb73maWwgUjj98GEZ2GE6gylmc1wTnAbK4qxay3bnIvohB1HdYDKHqbZ2VM5mKojKDpf
+         UPw09OGQJf+eXOd5IBT64nVFRaekALWqqsRkpU/XU3ETVsDcGpRr8TyQ4tlRQBbigg61
+         8+JQ==
+X-Gm-Message-State: AOAM533advuWf8e0mJVeO1Mu14t76QMnwuxPWYwjJflAwL65wTi2WXlf
+        /crNmh+93Ws75RJ3UY+9TK4OrR4yaNSO
+X-Google-Smtp-Source: ABdhPJyc5lR4Rjfv+Xgr2/PVDwYzQX3XdlHXcXxiuT59EhJPeYW9yxuIt2bJoEcFUWJJKvKStyvmN4Ecr+Gy
 X-Received: from js-desktop.svl.corp.google.com ([2620:15c:2cd:202:ccbe:5d15:e2e6:322])
- (user=junaids job=sendgmr) by 2002:a05:6902:543:b0:61d:c152:bd19 with SMTP id
- z3-20020a056902054300b0061dc152bd19mr27379968ybs.377.1645593892611; Tue, 22
- Feb 2022 21:24:52 -0800 (PST)
-Date:   Tue, 22 Feb 2022 21:22:06 -0800
+ (user=junaids job=sendgmr) by 2002:a0d:e4c2:0:b0:2d4:da21:cc07 with SMTP id
+ n185-20020a0de4c2000000b002d4da21cc07mr27147139ywe.16.1645593894760; Tue, 22
+ Feb 2022 21:24:54 -0800 (PST)
+Date:   Tue, 22 Feb 2022 21:22:07 -0800
 In-Reply-To: <20220223052223.1202152-1-junaids@google.com>
-Message-Id: <20220223052223.1202152-31-junaids@google.com>
+Message-Id: <20220223052223.1202152-32-junaids@google.com>
 Mime-Version: 1.0
 References: <20220223052223.1202152-1-junaids@google.com>
 X-Mailer: git-send-email 2.35.1.473.g83b2b277ed-goog
-Subject: [RFC PATCH 30/47] mm: asi: Add API for mapping userspace address ranges
+Subject: [RFC PATCH 31/47] mm: asi: Support for non-sensitive SLUB caches
 From:   Junaid Shahid <junaids@google.com>
 To:     linux-kernel@vger.kernel.org
 Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com,
@@ -70,441 +70,369 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-asi_map_user()/asi_unmap_user() can be used to map userspace address
-ranges for ASI classes that do not specify ASI_MAP_ALL_USERSPACE.
-In addition, another structure, asi_pgtbl_pool, allows for
-pre-allocating a set of pages to avoid having to allocate memory
-for page tables within asi_map_user(), which makes it easier to use
-that function while holding locks.
+This adds support for allocating global and local non-sensitive objects
+using the SLUB allocator. Similar to SLAB, per-process child caches are
+created for locally non-sensitive allocations. This mechanism is based
+on a modified form of the earlier implementation of per-memcg caches.
 
 Signed-off-by: Junaid Shahid <junaids@google.com>
 
 
 ---
- arch/x86/include/asm/asi.h |  19 +++
- arch/x86/mm/asi.c          | 252 ++++++++++++++++++++++++++++++++++---
- include/asm-generic/asi.h  |  21 ++++
- include/linux/mm_types.h   |   2 +-
- 4 files changed, 275 insertions(+), 19 deletions(-)
+ include/linux/slub_def.h |   6 ++
+ mm/slab.h                |   5 ++
+ mm/slab_common.c         |  33 +++++++--
+ mm/slub.c                | 140 ++++++++++++++++++++++++++++++++++++++-
+ security/Kconfig         |   3 +-
+ 5 files changed, 179 insertions(+), 8 deletions(-)
 
-diff --git a/arch/x86/include/asm/asi.h b/arch/x86/include/asm/asi.h
-index 35421356584b..bdb2f70d4f85 100644
---- a/arch/x86/include/asm/asi.h
-+++ b/arch/x86/include/asm/asi.h
-@@ -44,6 +44,12 @@ struct asi {
- 	atomic64_t *tlb_gen;
- 	atomic64_t __tlb_gen;
- 	int64_t asi_ref_count;
-+	rwlock_t user_map_lock;
-+};
-+
-+struct asi_pgtbl_pool {
-+	struct page *pgtbl_list;
-+	uint count;
- };
+diff --git a/include/linux/slub_def.h b/include/linux/slub_def.h
+index 0fa751b946fa..6e185b61582c 100644
+--- a/include/linux/slub_def.h
++++ b/include/linux/slub_def.h
+@@ -137,6 +137,12 @@ struct kmem_cache {
+ 	struct kasan_cache kasan_info;
+ #endif
  
- DECLARE_PER_CPU_ALIGNED(struct asi_state, asi_cpu_state);
-@@ -74,6 +80,19 @@ void asi_do_lazy_map(struct asi *asi, size_t addr);
- void asi_clear_user_pgd(struct mm_struct *mm, size_t addr);
- void asi_clear_user_p4d(struct mm_struct *mm, size_t addr);
++#ifdef CONFIG_ADDRESS_SPACE_ISOLATION
++	struct kmem_local_cache_info local_cache_info;
++	/* For propagation, maximum size of a stored attr */
++	unsigned int max_attr_size;
++#endif
++
+ 	unsigned int useroffset;	/* Usercopy region offset */
+ 	unsigned int usersize;		/* Usercopy region size */
  
-+int  asi_map_user(struct asi *asi, void *addr, size_t len,
-+		  struct asi_pgtbl_pool *pool,
-+		  size_t allowed_start, size_t allowed_end);
-+void asi_unmap_user(struct asi *asi, void *va, size_t len);
-+int  asi_fill_pgtbl_pool(struct asi_pgtbl_pool *pool, uint count, gfp_t flags);
-+void asi_clear_pgtbl_pool(struct asi_pgtbl_pool *pool);
-+
-+static inline void asi_init_pgtbl_pool(struct asi_pgtbl_pool *pool)
-+{
-+	pool->pgtbl_list = NULL;
-+	pool->count = 0;
-+}
-+
- static inline void asi_init_thread_state(struct thread_struct *thread)
- {
- 	thread->intr_nest_depth = 0;
-diff --git a/arch/x86/mm/asi.c b/arch/x86/mm/asi.c
-index 29c74b6d4262..9b1bd005f343 100644
---- a/arch/x86/mm/asi.c
-+++ b/arch/x86/mm/asi.c
-@@ -86,6 +86,55 @@ void asi_unregister_class(int index)
+diff --git a/mm/slab.h b/mm/slab.h
+index b9e11038be27..8799bcdd2fff 100644
+--- a/mm/slab.h
++++ b/mm/slab.h
+@@ -216,6 +216,7 @@ int __kmem_cache_shutdown(struct kmem_cache *);
+ void __kmem_cache_release(struct kmem_cache *);
+ int __kmem_cache_shrink(struct kmem_cache *);
+ void slab_kmem_cache_release(struct kmem_cache *);
++void kmem_cache_shrink_all(struct kmem_cache *s);
+ 
+ struct seq_file;
+ struct file;
+@@ -344,6 +345,7 @@ void restore_page_nonsensitive_metadata(struct page *page,
  }
- EXPORT_SYMBOL_GPL(asi_unregister_class);
  
-+static ulong get_pgtbl_from_pool(struct asi_pgtbl_pool *pool)
+ void set_nonsensitive_cache_params(struct kmem_cache *s);
++void init_local_cache_info(struct kmem_cache *s, struct kmem_cache *root);
+ 
+ #else /* CONFIG_ADDRESS_SPACE_ISOLATION */
+ 
+@@ -380,6 +382,9 @@ static inline void restore_page_nonsensitive_metadata(struct page *page,
+ 
+ static inline void set_nonsensitive_cache_params(struct kmem_cache *s) { }
+ 
++static inline
++void init_local_cache_info(struct kmem_cache *s, struct kmem_cache *root) { }
++
+ #endif /* CONFIG_ADDRESS_SPACE_ISOLATION */
+ 
+ #ifdef CONFIG_MEMCG_KMEM
+diff --git a/mm/slab_common.c b/mm/slab_common.c
+index b486b72d6344..efa61b97902a 100644
+--- a/mm/slab_common.c
++++ b/mm/slab_common.c
+@@ -142,7 +142,7 @@ int __kmem_cache_alloc_bulk(struct kmem_cache *s, gfp_t flags, size_t nr,
+ 
+ LIST_HEAD(slab_root_caches);
+ 
+-static void init_local_cache_info(struct kmem_cache *s, struct kmem_cache *root)
++void init_local_cache_info(struct kmem_cache *s, struct kmem_cache *root)
+ {
+ 	if (root) {
+ 		s->local_cache_info.root_cache = root;
+@@ -194,9 +194,6 @@ void set_nonsensitive_cache_params(struct kmem_cache *s)
+ 
+ #else
+ 
+-static inline
+-void init_local_cache_info(struct kmem_cache *s, struct kmem_cache *root) { }
+-
+ static inline void cleanup_local_cache_info(struct kmem_cache *s) { }
+ 
+ #endif /* CONFIG_ADDRESS_SPACE_ISOLATION */
+@@ -644,6 +641,34 @@ int kmem_cache_shrink(struct kmem_cache *cachep)
+ }
+ EXPORT_SYMBOL(kmem_cache_shrink);
+ 
++/**
++ * kmem_cache_shrink_all - shrink a cache and all child caches for root cache
++ * @s: The cache pointer
++ */
++void kmem_cache_shrink_all(struct kmem_cache *s)
 +{
-+	struct page *pgtbl;
++	struct kmem_cache *c;
 +
-+	if (pool->count == 0)
-+		return 0;
-+
-+	pgtbl = pool->pgtbl_list;
-+	pool->pgtbl_list = pgtbl->asi_pgtbl_pool_next;
-+	pgtbl->asi_pgtbl_pool_next = NULL;
-+	pool->count--;
-+
-+	return (ulong)page_address(pgtbl);
-+}
-+
-+static void return_pgtbl_to_pool(struct asi_pgtbl_pool *pool, ulong virt)
-+{
-+	struct page *pgtbl = virt_to_page(virt);
-+
-+	pgtbl->asi_pgtbl_pool_next = pool->pgtbl_list;
-+	pool->pgtbl_list = pgtbl;
-+	pool->count++;
-+}
-+
-+int asi_fill_pgtbl_pool(struct asi_pgtbl_pool *pool, uint count, gfp_t flags)
-+{
-+	if (!static_cpu_has(X86_FEATURE_ASI))
-+		return 0;
-+
-+	while (pool->count < count) {
-+		ulong pgtbl = get_zeroed_page(flags);
-+
-+		if (!pgtbl)
-+			return -ENOMEM;
-+
-+		return_pgtbl_to_pool(pool, pgtbl);
++	if (!static_asi_enabled() || !is_root_cache(s)) {
++		kmem_cache_shrink(s);
++		return;
 +	}
 +
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(asi_fill_pgtbl_pool);
++	kasan_cache_shrink(s);
++	__kmem_cache_shrink(s);
 +
-+void asi_clear_pgtbl_pool(struct asi_pgtbl_pool *pool)
-+{
-+	while (pool->count > 0)
-+		free_page(get_pgtbl_from_pool(pool));
++	/*
++	 * We have to take the slab_mutex to protect from the child cache list
++	 * modification.
++	 */
++	mutex_lock(&slab_mutex);
++	for_each_child_cache(c, s) {
++		kasan_cache_shrink(c);
++		__kmem_cache_shrink(c);
++	}
++	mutex_unlock(&slab_mutex);
 +}
-+EXPORT_SYMBOL_GPL(asi_clear_pgtbl_pool);
 +
- static void asi_clone_pgd(pgd_t *dst_table, pgd_t *src_table, size_t addr)
+ bool slab_is_available(void)
  {
- 	pgd_t *src = pgd_offset_pgd(src_table, addr);
-@@ -110,10 +159,12 @@ static void asi_clone_pgd(pgd_t *dst_table, pgd_t *src_table, size_t addr)
- #define DEFINE_ASI_PGTBL_ALLOC(base, level)				\
- static level##_t * asi_##level##_alloc(struct asi *asi,			\
- 				       base##_t *base, ulong addr,	\
--				       gfp_t flags)			\
-+				       gfp_t flags,			\
-+				       struct asi_pgtbl_pool *pool)	\
- {									\
- 	if (unlikely(base##_none(*base))) {				\
--		ulong pgtbl = get_zeroed_page(flags);			\
-+		ulong pgtbl = pool ? get_pgtbl_from_pool(pool)		\
-+				   : get_zeroed_page(flags);		\
- 		phys_addr_t pgtbl_pa;					\
- 									\
- 		if (pgtbl == 0)						\
-@@ -127,7 +178,10 @@ static level##_t * asi_##level##_alloc(struct asi *asi,			\
- 			mm_inc_nr_##level##s(asi->mm);			\
- 		} else {						\
- 			paravirt_release_##level(PHYS_PFN(pgtbl_pa));	\
--			free_page(pgtbl);				\
-+			if (pool)					\
-+				return_pgtbl_to_pool(pool, pgtbl);	\
-+			else						\
-+				free_page(pgtbl);			\
- 		}							\
- 									\
- 		/* NOP on native. PV call on Xen. */			\
-@@ -336,6 +390,7 @@ int asi_init(struct mm_struct *mm, int asi_index, struct asi **out_asi)
- 	asi->class = &asi_class[asi_index];
- 	asi->mm = mm;
- 	asi->pcid_index = asi_index;
-+	rwlock_init(&asi->user_map_lock);
+ 	return slab_state >= UP;
+diff --git a/mm/slub.c b/mm/slub.c
+index abe7db581d68..df0191f8b0e2 100644
+--- a/mm/slub.c
++++ b/mm/slub.c
+@@ -289,6 +289,21 @@ static void debugfs_slab_add(struct kmem_cache *);
+ static inline void debugfs_slab_add(struct kmem_cache *s) { }
+ #endif
  
- 	if (asi->class->flags & ASI_MAP_STANDARD_NONSENSITIVE) {
- 		uint i;
-@@ -650,11 +705,6 @@ static bool follow_physaddr(struct mm_struct *mm, size_t virt,
- /*
-  * Map the given range into the ASI page tables. The source of the mapping
-  * is the regular unrestricted page tables.
-- * Can be used to map any kernel memory.
-- *
-- * The caller MUST ensure that the source mapping will not change during this
-- * function. For dynamic kernel memory, this is generally ensured by mapping
-- * the memory within the allocator.
-  *
-  * If the source mapping is a large page and the range being mapped spans the
-  * entire large page, then it will be mapped as a large page in the ASI page
-@@ -664,19 +714,17 @@ static bool follow_physaddr(struct mm_struct *mm, size_t virt,
-  * destination page, but that should be ok for now, as usually in such cases,
-  * the range would consist of a small-ish number of pages.
-  */
--int asi_map_gfp(struct asi *asi, void *addr, size_t len, gfp_t gfp_flags)
-+int __asi_map(struct asi *asi, size_t start, size_t end, gfp_t gfp_flags,
-+	      struct asi_pgtbl_pool *pool,
-+	      size_t allowed_start, size_t allowed_end)
++#if defined(CONFIG_SYSFS) && defined(CONFIG_ADDRESS_SPACE_ISOLATION)
++static void propagate_slab_attrs_from_parent(struct kmem_cache *s);
++static void propagate_slab_attr_to_children(struct kmem_cache *s,
++					    struct attribute *attr,
++					    const char *buf, size_t len);
++#else
++static inline void propagate_slab_attrs_from_parent(struct kmem_cache *s) { }
++
++static inline
++void propagate_slab_attr_to_children(struct kmem_cache *s,
++				     struct attribute *attr,
++				     const char *buf, size_t len)
++{ }
++#endif
++
+ static inline void stat(const struct kmem_cache *s, enum stat_item si)
  {
- 	size_t virt;
--	size_t start = (size_t)addr;
--	size_t end = start + len;
- 	size_t page_size;
- 
--	if (!static_cpu_has(X86_FEATURE_ASI) || !asi)
--		return 0;
--
- 	VM_BUG_ON(start & ~PAGE_MASK);
--	VM_BUG_ON(len & ~PAGE_MASK);
--	VM_BUG_ON(start < TASK_SIZE_MAX);
-+	VM_BUG_ON(end & ~PAGE_MASK);
-+	VM_BUG_ON(end > allowed_end);
-+	VM_BUG_ON(start < allowed_start);
- 
- 	gfp_flags &= GFP_RECLAIM_MASK;
- 
-@@ -702,14 +750,15 @@ int asi_map_gfp(struct asi *asi, void *addr, size_t len, gfp_t gfp_flags)
- 				continue;				       \
- 			}						       \
- 									       \
--			level = asi_##level##_alloc(asi, base, virt, gfp_flags);\
-+			level = asi_##level##_alloc(asi, base, virt,	       \
-+						    gfp_flags, pool);	       \
- 			if (!level)					       \
- 				return -ENOMEM;				       \
- 									       \
- 			if (page_size >= LEVEL##_SIZE &&		       \
- 			    (level##_none(*level) || level##_leaf(*level)) &&  \
- 			    is_page_within_range(virt, LEVEL##_SIZE,	       \
--						 start, end)) {		       \
-+						 allowed_start, allowed_end)) {\
- 				page_size = LEVEL##_SIZE;		       \
- 				phys &= LEVEL##_MASK;			       \
- 									       \
-@@ -737,6 +786,26 @@ int asi_map_gfp(struct asi *asi, void *addr, size_t len, gfp_t gfp_flags)
- 	return 0;
+ #ifdef CONFIG_SLUB_STATS
+@@ -2015,6 +2030,7 @@ static void __free_slab(struct kmem_cache *s, struct page *page)
+ 	if (current->reclaim_state)
+ 		current->reclaim_state->reclaimed_slab += pages;
+ 	unaccount_slab_page(page, order, s);
++	restore_page_nonsensitive_metadata(page, s);
+ 	__free_pages(page, order);
  }
  
-+/*
-+ * Maps the given kernel address range into the ASI page tables.
-+ *
-+ * The caller MUST ensure that the source mapping will not change during this
-+ * function. For dynamic kernel memory, this is generally ensured by mapping
-+ * the memory within the allocator.
-+ */
-+int asi_map_gfp(struct asi *asi, void *addr, size_t len, gfp_t gfp_flags)
-+{
-+	size_t start = (size_t)addr;
-+	size_t end = start + len;
+@@ -4204,6 +4220,8 @@ static int kmem_cache_open(struct kmem_cache *s, slab_flags_t flags)
+ 		}
+ 	}
+ 
++	set_nonsensitive_cache_params(s);
 +
-+	if (!static_cpu_has(X86_FEATURE_ASI) || !asi)
-+		return 0;
-+
-+	VM_BUG_ON(start < TASK_SIZE_MAX);
-+
-+	return __asi_map(asi, start, end, gfp_flags, NULL, start, end);
-+}
-+
- int asi_map(struct asi *asi, void *addr, size_t len)
- {
- 	return asi_map_gfp(asi, addr, len, GFP_KERNEL);
-@@ -935,3 +1004,150 @@ void asi_clear_user_p4d(struct mm_struct *mm, size_t addr)
- 	if (!pgtable_l5_enabled())
- 		__asi_clear_user_pgd(mm, addr);
+ #if defined(CONFIG_HAVE_CMPXCHG_DOUBLE) && \
+     defined(CONFIG_HAVE_ALIGNED_STRUCT_PAGE)
+ 	if (system_has_cmpxchg_double() && (s->flags & SLAB_NO_CMPXCHG) == 0)
+@@ -4797,6 +4815,10 @@ static struct kmem_cache * __init bootstrap(struct kmem_cache *static_cache)
+ #endif
+ 	}
+ 	list_add(&s->list, &slab_caches);
++	init_local_cache_info(s, NULL);
++#ifdef CONFIG_ADDRESS_SPACE_ISOLATION
++	list_del(&static_cache->root_caches_node);
++#endif
+ 	return s;
  }
+ 
+@@ -4863,7 +4885,7 @@ struct kmem_cache *
+ __kmem_cache_alias(const char *name, unsigned int size, unsigned int align,
+ 		   slab_flags_t flags, void (*ctor)(void *))
+ {
+-	struct kmem_cache *s;
++	struct kmem_cache *s, *c;
+ 
+ 	s = find_mergeable(size, align, flags, name, ctor);
+ 	if (s) {
+@@ -4876,6 +4898,11 @@ __kmem_cache_alias(const char *name, unsigned int size, unsigned int align,
+ 		s->object_size = max(s->object_size, size);
+ 		s->inuse = max(s->inuse, ALIGN(size, sizeof(void *)));
+ 
++		for_each_child_cache(c, s) {
++			c->object_size = s->object_size;
++			c->inuse = max(c->inuse, ALIGN(size, sizeof(void *)));
++		}
 +
-+/*
-+ * Maps the given userspace address range into the ASI page tables.
-+ *
-+ * The caller MUST ensure that the source mapping will not change during this
-+ * function e.g. by synchronizing via MMU notifiers or acquiring the
-+ * appropriate locks.
-+ */
-+int asi_map_user(struct asi *asi, void *addr, size_t len,
-+		 struct asi_pgtbl_pool *pool,
-+		 size_t allowed_start, size_t allowed_end)
+ 		if (sysfs_slab_alias(s, name)) {
+ 			s->refcount--;
+ 			s = NULL;
+@@ -4889,6 +4916,9 @@ int __kmem_cache_create(struct kmem_cache *s, slab_flags_t flags)
+ {
+ 	int err;
+ 
++	if (!static_asi_enabled())
++		flags &= ~SLAB_NONSENSITIVE;
++
+ 	err = kmem_cache_open(s, flags);
+ 	if (err)
+ 		return err;
+@@ -4897,6 +4927,8 @@ int __kmem_cache_create(struct kmem_cache *s, slab_flags_t flags)
+ 	if (slab_state <= UP)
+ 		return 0;
+ 
++	propagate_slab_attrs_from_parent(s);
++
+ 	err = sysfs_slab_add(s);
+ 	if (err) {
+ 		__kmem_cache_release(s);
+@@ -5619,7 +5651,7 @@ static ssize_t shrink_store(struct kmem_cache *s,
+ 			const char *buf, size_t length)
+ {
+ 	if (buf[0] == '1')
+-		kmem_cache_shrink(s);
++		kmem_cache_shrink_all(s);
+ 	else
+ 		return -EINVAL;
+ 	return length;
+@@ -5829,6 +5861,87 @@ static ssize_t slab_attr_show(struct kobject *kobj,
+ 	return err;
+ }
+ 
++#ifdef CONFIG_ADDRESS_SPACE_ISOLATION
++
++static void propagate_slab_attrs_from_parent(struct kmem_cache *s)
 +{
-+	int err;
-+	size_t start = (size_t)addr;
-+	size_t end = start + len;
++	int i;
++	char *buffer = NULL;
++	struct kmem_cache *root_cache;
 +
-+	if (!static_cpu_has(X86_FEATURE_ASI) || !asi)
-+		return 0;
-+
-+	VM_BUG_ON(end > TASK_SIZE_MAX);
-+
-+	read_lock(&asi->user_map_lock);
-+	err = __asi_map(asi, start, end, GFP_NOWAIT, pool,
-+			allowed_start, allowed_end);
-+	read_unlock(&asi->user_map_lock);
-+
-+	return err;
-+}
-+EXPORT_SYMBOL_GPL(asi_map_user);
-+
-+static bool
-+asi_unmap_free_pte_range(struct asi_pgtbl_pool *pgtbls_to_free,
-+			 pte_t *pte, size_t addr, size_t end)
-+{
-+	do {
-+		pte_clear(NULL, addr, pte);
-+	} while (pte++, addr += PAGE_SIZE, addr != end);
-+
-+	return true;
-+}
-+
-+#define DEFINE_ASI_UNMAP_FREE_RANGE(level, LEVEL, next_level, NEXT_LVL_SIZE)   \
-+static bool								       \
-+asi_unmap_free_##level##_range(struct asi_pgtbl_pool *pgtbls_to_free,	       \
-+			       level##_t *level, size_t addr, size_t end)      \
-+{									       \
-+	bool unmapped = false;						       \
-+	size_t next;							       \
-+									       \
-+	do {								       \
-+		next = level##_addr_end(addr, end);			       \
-+		if (level##_none(*level))				       \
-+			continue;					       \
-+									       \
-+		if (IS_ALIGNED(addr, LEVEL##_SIZE) &&			       \
-+		    IS_ALIGNED(next, LEVEL##_SIZE)) {			       \
-+			if (!level##_large(*level)) {			       \
-+				ulong pgtbl = level##_page_vaddr(*level);      \
-+				struct page *page = virt_to_page(pgtbl);       \
-+									       \
-+				page->private = PG_LEVEL_##NEXT_LVL_SIZE;      \
-+				return_pgtbl_to_pool(pgtbls_to_free, pgtbl);   \
-+			}						       \
-+			level##_clear(level);				       \
-+			unmapped = true;				       \
-+		} else {						       \
-+			/*						       \
-+			 * At this time, we don't have a case where we need to \
-+			 * unmap a subset of a huge page. But that could arise \
-+			 * in the future. In that case, we'll need to split    \
-+			 * the huge mapping here.			       \
-+			 */						       \
-+			if (WARN_ON(level##_large(*level)))		       \
-+				continue;				       \
-+									       \
-+			unmapped |= asi_unmap_free_##next_level##_range(       \
-+					pgtbls_to_free,			       \
-+					next_level##_offset(level, addr),      \
-+					addr, next);			       \
-+		}							       \
-+	} while (level++, addr = next, addr != end);			       \
-+									       \
-+	return unmapped;						       \
-+}
-+
-+DEFINE_ASI_UNMAP_FREE_RANGE(pmd, PMD, pte, 4K)
-+DEFINE_ASI_UNMAP_FREE_RANGE(pud, PUD, pmd, 2M)
-+DEFINE_ASI_UNMAP_FREE_RANGE(p4d, P4D, pud, 1G)
-+DEFINE_ASI_UNMAP_FREE_RANGE(pgd, PGDIR, p4d, 512G)
-+
-+static bool asi_unmap_and_free_range(struct asi_pgtbl_pool *pgtbls_to_free,
-+				     struct asi *asi, size_t addr, size_t end)
-+{
-+	size_t next;
-+	bool unmapped = false;
-+	pgd_t *pgd = pgd_offset_pgd(asi->pgd, addr);
-+
-+	BUILD_BUG_ON((void *)&((struct page *)NULL)->private ==
-+		     (void *)&((struct page *)NULL)->asi_pgtbl_pool_next);
-+
-+	if (pgtable_l5_enabled())
-+		return asi_unmap_free_pgd_range(pgtbls_to_free, pgd, addr, end);
-+
-+	do {
-+		next = pgd_addr_end(addr, end);
-+		unmapped |= asi_unmap_free_p4d_range(pgtbls_to_free,
-+						     p4d_offset(pgd, addr),
-+						     addr, next);
-+	} while (pgd++, addr = next, addr != end);
-+
-+	return unmapped;
-+}
-+
-+void asi_unmap_user(struct asi *asi, void *addr, size_t len)
-+{
-+	static void (*const free_pgtbl_at_level[])(struct asi *, size_t) = {
-+		NULL,
-+		asi_free_pte,
-+		asi_free_pmd,
-+		asi_free_pud,
-+		asi_free_p4d
-+	};
-+
-+	struct asi_pgtbl_pool pgtbls_to_free = { 0 };
-+	size_t start = (size_t)addr;
-+	size_t end = start + len;
-+	bool unmapped;
-+
-+	if (!static_cpu_has(X86_FEATURE_ASI) || !asi)
++	if (is_root_cache(s))
 +		return;
 +
-+	write_lock(&asi->user_map_lock);
-+	unmapped = asi_unmap_and_free_range(&pgtbls_to_free, asi, start, end);
-+	write_unlock(&asi->user_map_lock);
++	root_cache = s->local_cache_info.root_cache;
 +
-+	if (unmapped)
-+		asi_flush_tlb_range(asi, addr, len);
++	/*
++	 * This mean this cache had no attribute written. Therefore, no point
++	 * in copying default values around
++	 */
++	if (!root_cache->max_attr_size)
++		return;
 +
-+	while (pgtbls_to_free.count > 0) {
-+		size_t pgtbl = get_pgtbl_from_pool(&pgtbls_to_free);
-+		struct page *page = virt_to_page(pgtbl);
++	for (i = 0; i < ARRAY_SIZE(slab_attrs); i++) {
++		char mbuf[64];
++		char *buf;
++		struct slab_attribute *attr = to_slab_attr(slab_attrs[i]);
++		ssize_t len;
 +
-+		VM_BUG_ON(page->private >= PG_LEVEL_NUM);
-+		free_pgtbl_at_level[page->private](asi, pgtbl);
++		if (!attr || !attr->store || !attr->show)
++			continue;
++
++		/*
++		 * It is really bad that we have to allocate here, so we will
++		 * do it only as a fallback. If we actually allocate, though,
++		 * we can just use the allocated buffer until the end.
++		 *
++		 * Most of the slub attributes will tend to be very small in
++		 * size, but sysfs allows buffers up to a page, so they can
++		 * theoretically happen.
++		 */
++		if (buffer) {
++			buf = buffer;
++		} else if (root_cache->max_attr_size < ARRAY_SIZE(mbuf) &&
++			 !IS_ENABLED(CONFIG_SLUB_STATS)) {
++			buf = mbuf;
++		} else {
++			buffer = (char *)get_zeroed_page(GFP_KERNEL);
++			if (WARN_ON(!buffer))
++				continue;
++			buf = buffer;
++		}
++
++		len = attr->show(root_cache, buf);
++		if (len > 0)
++			attr->store(s, buf, len);
++	}
++
++	if (buffer)
++		free_page((unsigned long)buffer);
++}
++
++static void propagate_slab_attr_to_children(struct kmem_cache *s,
++					    struct attribute *attr,
++					    const char *buf, size_t len)
++{
++	struct kmem_cache *c;
++	struct slab_attribute *attribute = to_slab_attr(attr);
++
++	if (static_asi_enabled()) {
++		mutex_lock(&slab_mutex);
++
++		if (s->max_attr_size < len)
++			s->max_attr_size = len;
++
++		for_each_child_cache(c, s)
++			attribute->store(c, buf, len);
++
++		mutex_unlock(&slab_mutex);
 +	}
 +}
-+EXPORT_SYMBOL_GPL(asi_unmap_user);
-diff --git a/include/asm-generic/asi.h b/include/asm-generic/asi.h
-index 8513d0d7865a..fffb323d2a00 100644
---- a/include/asm-generic/asi.h
-+++ b/include/asm-generic/asi.h
-@@ -26,6 +26,7 @@
- 
- struct asi_hooks {};
- struct asi {};
-+struct asi_pgtbl_pool {};
- 
- static inline
- int asi_register_class(const char *name, uint flags,
-@@ -92,6 +93,26 @@ void asi_clear_user_pgd(struct mm_struct *mm, size_t addr) { }
- static inline
- void asi_clear_user_p4d(struct mm_struct *mm, size_t addr) { }
- 
-+static inline
-+int asi_map_user(struct asi *asi, void *addr, size_t len,
-+		 struct asi_pgtbl_pool *pool,
-+		 size_t allowed_start, size_t allowed_end)
-+{
-+	return 0;
-+}
 +
-+static inline void asi_unmap_user(struct asi *asi, void *va, size_t len) { }
++#endif
 +
-+static inline
-+int asi_fill_pgtbl_pool(struct asi_pgtbl_pool *pool, uint count, gfp_t flags)
-+{
-+	return 0;
-+}
-+
-+static inline void asi_clear_pgtbl_pool(struct asi_pgtbl_pool *pool) { }
-+
-+static inline void asi_init_pgtbl_pool(struct asi_pgtbl_pool *pool) { }
-+
- static inline
- void asi_flush_tlb_range(struct asi *asi, void *addr, size_t len) { }
+ static ssize_t slab_attr_store(struct kobject *kobj,
+ 				struct attribute *attr,
+ 				const char *buf, size_t len)
+@@ -5844,6 +5957,27 @@ static ssize_t slab_attr_store(struct kobject *kobj,
+ 		return -EIO;
  
-diff --git a/include/linux/mm_types.h b/include/linux/mm_types.h
-index 7d38229ca85c..c3f209720a84 100644
---- a/include/linux/mm_types.h
-+++ b/include/linux/mm_types.h
-@@ -198,7 +198,7 @@ struct page {
- 			/* Links the pages_to_free_async list */
- 			struct llist_node async_free_node;
+ 	err = attribute->store(s, buf, len);
++
++	/*
++	 * This is a best effort propagation, so this function's return
++	 * value will be determined by the parent cache only. This is
++	 * basically because not all attributes will have a well
++	 * defined semantics for rollbacks - most of the actions will
++	 * have permanent effects.
++	 *
++	 * Returning the error value of any of the children that fail
++	 * is not 100 % defined, in the sense that users seeing the
++	 * error code won't be able to know anything about the state of
++	 * the cache.
++	 *
++	 * Only returning the error code for the parent cache at least
++	 * has well defined semantics. The cache being written to
++	 * directly either failed or succeeded, in which case we loop
++	 * through the descendants with best-effort propagation.
++	 */
++	if (slab_state >= FULL && err >= 0 && is_root_cache(s))
++		propagate_slab_attr_to_children(s, attr, buf, len);
++
+ 	return err;
+ }
  
--			unsigned long _asi_pad_1;
-+			struct page *asi_pgtbl_pool_next;
- 			u64 asi_tlb_gen;
+@@ -5866,7 +6000,7 @@ static struct kset *slab_kset;
  
- 			union {
+ static inline struct kset *cache_kset(struct kmem_cache *s)
+ {
+-	return slab_kset;
++	return is_root_cache(s) ? slab_kset : NULL;
+ }
+ 
+ #define ID_STR_LENGTH 64
+diff --git a/security/Kconfig b/security/Kconfig
+index 070a948b5266..a5cfb09352b0 100644
+--- a/security/Kconfig
++++ b/security/Kconfig
+@@ -68,7 +68,8 @@ config PAGE_TABLE_ISOLATION
+ config ADDRESS_SPACE_ISOLATION
+ 	bool "Allow code to run with a reduced kernel address space"
+ 	default n
+-	depends on X86_64 && !UML && SLAB && !NEED_PER_CPU_KM
++	depends on X86_64 && !UML && !NEED_PER_CPU_KM
++	depends on SLAB || SLUB
+ 	depends on !PARAVIRT
+ 	depends on !MEMORY_HOTPLUG
+ 	help
 -- 
 2.35.1.473.g83b2b277ed-goog
 
