@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A6AF4C0F0A
-	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 10:20:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C4774C0F0C
+	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 10:20:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239264AbiBWJVA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Feb 2022 04:21:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45082 "EHLO
+        id S239267AbiBWJVB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Feb 2022 04:21:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45098 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239246AbiBWJU4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Feb 2022 04:20:56 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BA548303E;
+        with ESMTP id S239249AbiBWJU5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Feb 2022 04:20:57 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04B1C38BCE;
         Wed, 23 Feb 2022 01:20:27 -0800 (PST)
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21N8alrP031228;
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21N8mJF0012704;
         Wed, 23 Feb 2022 09:20:27 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=UIWnVQBZ2zpz8KpKSfmcU+hYWjmE4n1Sy0WTE7ASNdg=;
- b=NBDZwcjiSB6j7+TY0kNmVsGbaBzHtTHNZaFaJKsk8FHSyGtYVzS+pJ7CPSjF3lzCa3P7
- NyTaARhYXxH6O2LI+nYbB6+nmaK14ur+wyM6qweBV+ySDSL+70zHLZp6i8kmp2+gnPF+
- RQI9v/ML9fr609hNafBiwFfY79kYPHSer/Dqz2Sk0cCvB8qpZ0EV6R9U8EDOmUaK16Yw
- I9f/eDUVC0TOZgFRbe6ob6dQS+bvNySX0J4shsVbGPWUePDe/N0w5BMDfbWzqglMSShL
- O288DXkLH7+APXj3IJxCYTckPzo42V1VbgLcqKkXbgkZ2FuozSkAe7iXCVDjawe4TLJU XA== 
+ bh=K3TuszPjoli9EXbxkW683wrO8QKLR8uKmL18mv8C1Oc=;
+ b=kxWDOLE1Pk4p8kdcZlasjItFXY3d8yBZyj68omYQTJRMWhbo7sR3mG5Tk+19iFJjixcc
+ kMSt2v4MkRjhDI8kIhjho+xF9n4qf8wq+eLmzKqMSI8VnXxzqYRnn+o9Z0kX4GhY6AFQ
+ sACv0MiC4W4gmaUMF5v3d1RkkRj5VyOdXHFWjsVvnoF05x9ewcD6A2r78kRHbENcimVd
+ /3x4FQ6IZikmnif/e3s6+S5/nr6E+AGMEQeVyNEAjc2z15ElQN6+pAAal2xJrcCPenBx
+ C6hze/Ft9tUWb+CmmSCmy+cPcoWU1kF3XuwBPjCBRRwnt3I3J5wg8f0cYUpPIFiAmKcD Yw== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3ede6smh36-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3edhqs8jav-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Feb 2022 09:20:26 +0000
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21N9IPwL011176;
+        Wed, 23 Feb 2022 09:20:27 +0000
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21N9GpBX022247;
         Wed, 23 Feb 2022 09:20:26 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3ede6smh27-1
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3edhqs8ja0-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Wed, 23 Feb 2022 09:20:26 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21N9CNCI017242;
-        Wed, 23 Feb 2022 09:20:24 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma06ams.nl.ibm.com with ESMTP id 3eaqtj8nds-1
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21N9Dqux030079;
+        Wed, 23 Feb 2022 09:20:25 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma05fra.de.ibm.com with ESMTP id 3ear69f1wa-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Feb 2022 09:20:23 +0000
+        Wed, 23 Feb 2022 09:20:24 +0000
 Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21N9KK9w55771456
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21N9KLok13631982
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 23 Feb 2022 09:20:20 GMT
+        Wed, 23 Feb 2022 09:20:21 GMT
 Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CB52F11C054;
-        Wed, 23 Feb 2022 09:20:20 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 8DF6D11C054;
+        Wed, 23 Feb 2022 09:20:21 +0000 (GMT)
 Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3B1C811C05E;
+        by IMSVA (Postfix) with ESMTP id F1D0211C052;
         Wed, 23 Feb 2022 09:20:20 +0000 (GMT)
 Received: from linux6.. (unknown [9.114.12.104])
         by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
@@ -61,25 +61,25 @@ From:   Janosch Frank <frankja@linux.ibm.com>
 To:     kvm@vger.kernel.org
 Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
         david@redhat.com, borntraeger@linux.ibm.com
-Subject: [PATCH 4/9] KVM: s390: pv: Add dump support definitions
-Date:   Wed, 23 Feb 2022 09:20:02 +0000
-Message-Id: <20220223092007.3163-5-frankja@linux.ibm.com>
+Subject: [PATCH 5/9] KVM: s390: pv: Add query dump information
+Date:   Wed, 23 Feb 2022 09:20:03 +0000
+Message-Id: <20220223092007.3163-6-frankja@linux.ibm.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20220223092007.3163-1-frankja@linux.ibm.com>
 References: <20220223092007.3163-1-frankja@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: vXEbWtXciFLIrEXGdQiCDMXqxk1T-URL
-X-Proofpoint-ORIG-GUID: It0ztphCNM-QmWau8eKJzaWH41YLyaOT
+X-Proofpoint-GUID: g8Kv3D2rkrfQsr-kmMDALAf67unTMbz9
+X-Proofpoint-ORIG-GUID: Ja50mY_W8DF2bD3XUQ2WpG-kyxOwzqV5
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
  definitions=2022-02-23_03,2022-02-21_02,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
- priorityscore=1501 phishscore=0 impostorscore=0 mlxlogscore=940
- clxscore=1015 mlxscore=0 malwarescore=0 adultscore=0 suspectscore=0
- spamscore=0 lowpriorityscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2201110000 definitions=main-2202230049
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
+ bulkscore=0 priorityscore=1501 lowpriorityscore=0 suspectscore=0
+ adultscore=0 mlxlogscore=876 phishscore=0 impostorscore=0 spamscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2201110000 definitions=main-2202230049
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
@@ -90,72 +90,68 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Lets add the constants and structure definitions needed for the dump
-support.
+The dump API requires userspace to provide buffers into which we will
+store data. The dump information added in this patch tells userspace
+how big those buffers need to be.
 
 Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 ---
- arch/s390/include/asm/uv.h | 33 +++++++++++++++++++++++++++++++++
- 1 file changed, 33 insertions(+)
+ arch/s390/kvm/kvm-s390.c | 11 +++++++++++
+ include/uapi/linux/kvm.h | 12 +++++++++++-
+ 2 files changed, 22 insertions(+), 1 deletion(-)
 
-diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
-index b79e516d4424..b593fbcfd448 100644
---- a/arch/s390/include/asm/uv.h
-+++ b/arch/s390/include/asm/uv.h
-@@ -50,6 +50,10 @@
- #define UVC_CMD_SET_UNSHARE_ALL		0x0340
- #define UVC_CMD_PIN_PAGE_SHARED		0x0341
- #define UVC_CMD_UNPIN_PAGE_SHARED	0x0342
-+#define UVC_CMD_DUMP_INIT		0x0400
-+#define UVC_CMD_DUMP_CONF_STOR_STATE	0x0401
-+#define UVC_CMD_DUMP_CPU		0x0402
-+#define UVC_CMD_DUMP_COMPLETE		0x0403
- #define UVC_CMD_SET_SHARED_ACCESS	0x1000
- #define UVC_CMD_REMOVE_SHARED_ACCESS	0x1001
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index 837f898ad2ff..8de53803c1ca 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -2240,6 +2240,17 @@ static int kvm_s390_handle_pv_info(struct kvm_s390_pv_info *info)
  
-@@ -76,6 +80,10 @@ enum uv_cmds_inst {
- 	BIT_UVC_CMD_UNSHARE_ALL = 20,
- 	BIT_UVC_CMD_PIN_PAGE_SHARED = 21,
- 	BIT_UVC_CMD_UNPIN_PAGE_SHARED = 22,
-+	BIT_UVC_CMD_DUMP_INIT = 24,
-+	BIT_UVC_CMD_DUMP_CONFIG_STOR_STATE = 25,
-+	BIT_UVC_CMD_DUMP_CPU = 26,
-+	BIT_UVC_CMD_DUMP_COMPLETE = 27,
+ 		return 0;
+ 	}
++	case KVM_PV_INFO_DUMP: {
++		len =  sizeof(info->header) + sizeof(info->dump);
++
++		if (info->header.len < len)
++			return -EINVAL;
++
++		info->dump.dump_cpu_buffer_len = uv_info.guest_cpu_stor_len;
++		info->dump.dump_config_mem_buffer_per_1m = uv_info.conf_dump_storage_state_len;
++		info->dump.dump_config_finalize_len = uv_info.conf_dump_finalize_len;
++		return 0;
++	}
+ 	default:
+ 		return -EINVAL;
+ 	}
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 96fceb204a92..d58cd5a40e62 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1644,6 +1644,13 @@ struct kvm_s390_pv_unp {
+ 
+ enum pv_cmd_info_id {
+ 	KVM_PV_INFO_VM,
++	KVM_PV_INFO_DUMP,
++};
++
++struct kvm_s390_pv_info_dump {
++	__u64 dump_cpu_buffer_len;
++	__u64 dump_config_mem_buffer_per_1m;
++	__u64 dump_config_finalize_len;
  };
  
- enum uv_feat_ind {
-@@ -224,6 +232,31 @@ struct uv_cb_share {
- 	u64 reserved28;
- } __packed __aligned(8);
+ struct kvm_s390_pv_info_vm {
+@@ -1661,7 +1668,10 @@ struct kvm_s390_pv_info_header {
  
-+struct uv_cb_dump_cpu {
-+	struct uv_cb_header header;
-+	u64 reserved08[2];
-+	u64 cpu_handle;
-+	u64 dump_area_origin;
-+	u64 reserved28[5];
-+} __packed __aligned(8);
-+
-+struct uv_cb_dump_stor_state {
-+	struct uv_cb_header header;
-+	u64 reserved08[2];
-+	u64 config_handle;
-+	u64 dump_area_origin;
-+	u64 gaddr;
-+	u64 reserved28[4];
-+} __packed __aligned(8);
-+
-+struct uv_cb_dump_complete {
-+	struct uv_cb_header header;
-+	u64 reserved08[2];
-+	u64 config_handle;
-+	u64 dump_area_origin;
-+	u64 reserved30[5];
-+} __packed __aligned(8);
-+
- static inline int __uv_call(unsigned long r1, unsigned long r2)
- {
- 	int cc;
+ struct kvm_s390_pv_info {
+ 	struct kvm_s390_pv_info_header header;
+-	struct kvm_s390_pv_info_vm vm;
++	union {
++		struct kvm_s390_pv_info_dump dump;
++		struct kvm_s390_pv_info_vm vm;
++	};
+ };
+ 
+ enum pv_cmd_id {
 -- 
 2.32.0
 
