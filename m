@@ -2,84 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D2BD24C1AD7
-	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 19:20:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5386E4C1AFB
+	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 19:33:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243817AbiBWSVP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Feb 2022 13:21:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51752 "EHLO
+        id S243931AbiBWSde (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Feb 2022 13:33:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243811AbiBWSVN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Feb 2022 13:21:13 -0500
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0AA804A3DF;
-        Wed, 23 Feb 2022 10:20:45 -0800 (PST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B22C8D6E;
-        Wed, 23 Feb 2022 10:20:44 -0800 (PST)
-Received: from [10.57.40.147] (unknown [10.57.40.147])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 23D623F70D;
-        Wed, 23 Feb 2022 10:20:41 -0800 (PST)
-Message-ID: <2114e6e6-68cc-4552-8781-0a824de2c0de@arm.com>
-Date:   Wed, 23 Feb 2022 18:20:36 +0000
+        with ESMTP id S243922AbiBWSdc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Feb 2022 13:33:32 -0500
+Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5F0F123;
+        Wed, 23 Feb 2022 10:33:02 -0800 (PST)
+Received: from MUA
+        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94.2)
+        (envelope-from <mail@maciej.szmigiero.name>)
+        id 1nMwRP-0003AV-QA; Wed, 23 Feb 2022 19:32:43 +0100
+Message-ID: <7822c00f-5a2d-b6a2-2f81-cf3330801ad3@maciej.szmigiero.name>
+Date:   Wed, 23 Feb 2022 19:32:37 +0100
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.6.1
-Subject: Re: [PATCH v6 01/11] iommu: Add dma ownership management interfaces
-Content-Language: en-GB
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Stuart Yoder <stuyoder@gmail.com>, rafael@kernel.org,
-        David Airlie <airlied@linux.ie>, linux-pci@vger.kernel.org,
-        Thierry Reding <thierry.reding@gmail.com>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        Dmitry Osipenko <digetx@gmail.com>,
-        Will Deacon <will@kernel.org>, Ashok Raj <ashok.raj@intel.com>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        kvm@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        linux-kernel@vger.kernel.org, Li Yang <leoyang.li@nxp.com>,
-        iommu@lists.linux-foundation.org,
-        Jacob jun Pan <jacob.jun.pan@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>
-References: <20220218005521.172832-1-baolu.lu@linux.intel.com>
- <20220218005521.172832-2-baolu.lu@linux.intel.com>
- <f830c268-daca-8e8f-a429-0c80496a7273@arm.com>
- <20220223180244.GA390403@nvidia.com>
-From:   Robin Murphy <robin.murphy@arm.com>
-In-Reply-To: <20220223180244.GA390403@nvidia.com>
+Content-Language: en-US
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, kvm@vger.kernel.org,
+        Borislav Petkov <bp@alien8.de>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, qemu-devel@nongnu.org
+References: <20220118132121.31388-1-chao.p.peng@linux.intel.com>
+ <20220118132121.31388-13-chao.p.peng@linux.intel.com>
+ <a121e766-900d-2135-1516-e1d3ba716834@maciej.szmigiero.name>
+ <20220217134548.GA33836@chaop.bj.intel.com>
+ <45148f5f-fe79-b452-f3b2-482c5c3291c4@maciej.szmigiero.name>
+ <20220223120047.GB53733@chaop.bj.intel.com>
+From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Subject: Re: [PATCH v4 12/12] KVM: Expose KVM_MEM_PRIVATE
+In-Reply-To: <20220223120047.GB53733@chaop.bj.intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2022-02-23 18:02, Jason Gunthorpe via iommu wrote:
-> On Wed, Feb 23, 2022 at 06:00:06PM +0000, Robin Murphy wrote:
+On 23.02.2022 13:00, Chao Peng wrote:
+> On Tue, Feb 22, 2022 at 02:16:46AM +0100, Maciej S. Szmigiero wrote:
+>> On 17.02.2022 14:45, Chao Peng wrote:
+>>> On Tue, Jan 25, 2022 at 09:20:39PM +0100, Maciej S. Szmigiero wrote:
+>>>> On 18.01.2022 14:21, Chao Peng wrote:
+>>>>> KVM_MEM_PRIVATE is not exposed by default but architecture code can turn
+>>>>> on it by implementing kvm_arch_private_memory_supported().
+>>>>>
+>>>>> Also private memslot cannot be movable and the same file+offset can not
+>>>>> be mapped into different GFNs.
+>>>>>
+>>>>> Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+>>>>> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+>>>>> ---
+>>>> (..)
+>>>>>     static bool kvm_check_memslot_overlap(struct kvm_memslots *slots, int id,
+>>>>> -				      gfn_t start, gfn_t end)
+>>>>> +				      struct file *file,
+>>>>> +				      gfn_t start, gfn_t end,
+>>>>> +				      loff_t start_off, loff_t end_off)
+>>>>>     {
+>>>>>     	struct kvm_memslot_iter iter;
+>>>>> +	struct kvm_memory_slot *slot;
+>>>>> +	struct inode *inode;
+>>>>> +	int bkt;
+>>>>>     	kvm_for_each_memslot_in_gfn_range(&iter, slots, start, end) {
+>>>>>     		if (iter.slot->id != id)
+>>>>>     			return true;
+>>>>>     	}
+>>>>> +	/* Disallow mapping the same file+offset into multiple gfns. */
+>>>>> +	if (file) {
+>>>>> +		inode = file_inode(file);
+>>>>> +		kvm_for_each_memslot(slot, bkt, slots) {
+>>>>> +			if (slot->private_file &&
+>>>>> +			     file_inode(slot->private_file) == inode &&
+>>>>> +			     !(end_off <= slot->private_offset ||
+>>>>> +			       start_off >= slot->private_offset
+>>>>> +					     + (slot->npages >> PAGE_SHIFT)))
+>>>>> +				return true;
+>>>>> +		}
+>>>>> +	}
+>>>>
+>>>> That's a linear scan of all memslots on each CREATE (and MOVE) operation
+>>>> with a fd - we just spent more than a year rewriting similar linear scans
+>>>> into more efficient operations in KVM.
+>>>
+(..)
+>>> So linear scan is used before I can find a better way.
+>>
+>> Another option would be to simply not check for overlap at add or move
+>> time, declare such configuration undefined behavior under KVM API and
+>> make sure in MMU notifiers that nothing bad happens to the host kernel
+>> if it turns out somebody actually set up a VM this way (it could be
+>> inefficient in this case, since it's not supposed to ever happen
+>> unless there is a bug somewhere in the userspace part).
 > 
->> ...and equivalently just set owner_cnt directly to 0 here. I don't see a
->> realistic use-case for any driver to claim the same group more than once,
->> and allowing it in the API just feels like opening up various potential
->> corners for things to get out of sync.
-> 
-> I am Ok if we toss it out to get this merged, as there is no in-kernel
-> user right now.
-> 
-> Something will have to come back for iommufd, but we can look at what
-> is best suited then.
+> Specific to TDX case, SEAMMODULE will fail the overlapping case and then
+> KVM prints a message to the kernel log. It will not cause any other side
+> effect, it does look weird however. Yes warn that in the API document
+> can help to some extent.
 
-If iommufd plans to be too dumb to keep track of whether it already owns 
-a given group or not, I can't see it dealing with attaching that group 
-to a single domain no more than once, either ;)
+So for the functionality you are adding this code for (TDX) this scan
+isn't necessary and the overlapping case (not supported anyway) is safely
+handled by the hardware (or firmware)?
+Then I would simply remove the scan and, maybe, add a comment instead
+that the overlap check is done by the hardware.
 
-Robin.
+By the way, if a kernel log message could be triggered by (misbehaving)
+userspace then it should be rate limited (if it isn't already).
+
+> Thanks,
+> Chao
+
+Thanks,
+Maciej
