@@ -2,110 +2,200 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EC4504C1865
-	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 17:20:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A5B94C186C
+	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 17:21:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242693AbiBWQUe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Feb 2022 11:20:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56642 "EHLO
+        id S242741AbiBWQVU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Feb 2022 11:21:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234267AbiBWQUd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Feb 2022 11:20:33 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2A9AC2E57;
-        Wed, 23 Feb 2022 08:20:05 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 3558161991;
-        Wed, 23 Feb 2022 16:20:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16D36C340E7;
-        Wed, 23 Feb 2022 16:20:04 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="UStiHDap"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1645633199;
+        with ESMTP id S242728AbiBWQVR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Feb 2022 11:21:17 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A7B77C4E22
+        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 08:20:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645633248;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=mnNQghKSAwgVNaMKLb/7Trnd/MlpODo5RAJNJEkv+10=;
-        b=UStiHDapBFGqlKj1XnAopIV0s/o4/wZAQt9kfn6UaRkkAF7dlnJ3QqN5tRoz/ZORj1iyB8
-        vZrQhcosPVD9IGzkANuD0g+v6mzrFASmeIaYq1MLaU1R7pw64al2PYmaHQo/tzRlnilQV3
-        twyhhu3J7BJ8itNYnKzpSPL2yJlYi2o=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id f2b47955 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Wed, 23 Feb 2022 16:19:59 +0000 (UTC)
-Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-2d07c4a0d06so216796747b3.13;
-        Wed, 23 Feb 2022 08:19:58 -0800 (PST)
-X-Gm-Message-State: AOAM532sMYVig0AJIED7HaxncuMXSE8p8sWohVSJNx6/ZVLkj0euEdTq
-        m5rVDcd9iq/dXWrkcJ7jgXyexa+1tBy2PSK9AZI=
-X-Google-Smtp-Source: ABdhPJzwqPvYWBp9LmD+Jha02PrV5WLBK/ki8ek/2uyVWgeaMR+4EcGUKMupw6bI8EUKZpQFGjPwDZfx/kujcdtLLBc=
-X-Received: by 2002:a81:5c83:0:b0:2d2:c136:70f3 with SMTP id
- q125-20020a815c83000000b002d2c13670f3mr401327ywb.404.1645633196792; Wed, 23
- Feb 2022 08:19:56 -0800 (PST)
-MIME-Version: 1.0
-References: <20220223131231.403386-1-Jason@zx2c4.com> <CAHmME9ogH_mx724n_deFfva7-xPCmma1-=2Mv0JdnZ-fC4JCjg@mail.gmail.com>
-In-Reply-To: <CAHmME9ogH_mx724n_deFfva7-xPCmma1-=2Mv0JdnZ-fC4JCjg@mail.gmail.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Wed, 23 Feb 2022 17:19:45 +0100
-X-Gmail-Original-Message-ID: <CAHmME9o9-eBCcjJMrJSdr23VfUEfvx12e4qRdtE5Sv3+Qcf-Bg@mail.gmail.com>
-Message-ID: <CAHmME9o9-eBCcjJMrJSdr23VfUEfvx12e4qRdtE5Sv3+Qcf-Bg@mail.gmail.com>
-Subject: Re: [PATCH RFC v1 0/2] VM fork detection for RNG
-To:     LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        QEMU Developers <qemu-devel@nongnu.org>,
-        KVM list <kvm@vger.kernel.org>, linux-s390@vger.kernel.org,
-        adrian@parity.io
-Cc:     "Woodhouse, David" <dwmw@amazon.co.uk>,
-        "Catangiu, Adrian Costin" <acatan@amazon.com>, graf@amazon.com,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        "Singh, Balbir" <sblbir@amazon.com>,
-        "Weiss, Radu" <raduweis@amazon.com>, Jann Horn <jannh@google.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Theodore Ts'o" <tytso@mit.edu>,
-        Igor Mammedov <imammedo@redhat.com>, ehabkost@redhat.com,
-        ben@skyportsystems.com, "Michael S. Tsirkin" <mst@redhat.com>,
-        lersek@redhat.com
+        bh=TiO1yBPh8R5cpx6Ex6jDuaNR/N/orDWr7M4nBkkNmDQ=;
+        b=Hu2ZnTwZrsnxPPmGeRHhyO0zNDYCksnZjypx2BO9hzjxsbIf2V/xGzPO9AtAjt/WxFwqXJ
+        Rm9+LhzNFOBeCWv19zlp5W9rMV4aI6+A/fFEQJf0fPydQLWHE014xBgjZGQl+EsJv7fm4C
+        qcMuuQ19sWs73cEijnsuvoLjEPRQRy0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-442-KraB3RmFOe6YNaelxlfj1g-1; Wed, 23 Feb 2022 11:20:43 -0500
+X-MC-Unique: KraB3RmFOe6YNaelxlfj1g-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 65E9AFC82;
+        Wed, 23 Feb 2022 16:20:42 +0000 (UTC)
+Received: from starship (unknown [10.40.195.190])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0B2A29BEBD;
+        Wed, 23 Feb 2022 16:20:40 +0000 (UTC)
+Message-ID: <fd1cc09c83c1424cea7003eb9e8ec937276fe3f8.camel@redhat.com>
+Subject: Re: [PATCH v2 10/18] KVM: x86/mmu: load new PGD after the shadow
+ MMU is initialized
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     seanjc@google.com
+Date:   Wed, 23 Feb 2022 18:20:39 +0200
+In-Reply-To: <20220217210340.312449-11-pbonzini@redhat.com>
+References: <20220217210340.312449-1-pbonzini@redhat.com>
+         <20220217210340.312449-11-pbonzini@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-6.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 23, 2022 at 5:08 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->
-> On Wed, Feb 23, 2022 at 2:12 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-> > second patch is the reason this is just an RFC: it's a cleanup of the
-> > ACPI driver from last year, and I don't really have much experience
-> > writing, testing, debugging, or maintaining these types of drivers.
-> > Ideally this thread would yield somebody saying, "I see the intent of
-> > this; I'm happy to take over ownership of this part." That way, I can
-> > focus on the RNG part, and whoever steps up for the paravirt ACPI part
-> > can focus on that.
->
-> I actually managed to test this in QEMU, and it seems to work quite well. Steps:
->
-> $ qemu-system-x86_64 ... -device vmgenid,guid=auto -monitor stdio
-> (qemu) savevm blah
-> (qemu) quit
-> $ qemu-system-x86_64 ... -device vmgenid,guid=auto -monitor stdio
-> (qemu) loadvm blah
->
-> Doing this successfully triggers the function to reinitialize the RNG
-> with the new GUID. (It appears there's a bug in QEMU which prevents
-> the GUID from being reinitialized when running `loadvm` without
-> quitting first; I suppose this should be discussed with QEMU
-> upstream.)
->
-> So that's very positive. But I would appreciate hearing from some
-> ACPI/Virt/Amazon people about this.
+On Thu, 2022-02-17 at 16:03 -0500, Paolo Bonzini wrote:
+> Now that __kvm_mmu_new_pgd does not look at the MMU's root_level and
+> shadow_root_level anymore, pull the PGD load after the initialization of
+> the shadow MMUs.
 
-Because something something picture thousand words something, here's a
-gif to see this working as expected:
-https://data.zx2c4.com/vmgenid-appears-to-work.gif
+Again, thanks a million for this! I once spend at least a hour figuring
+out why my kernel panics when I did a similiar change, only to figure out
+that __kvm_mmu_new_pgd needs to happen before mmu re-initialization.
 
-Jason
+> 
+> Besides being more intuitive, this enables future simplifications
+> and optimizations because it's not necessary anymore to compute the
+> role outside kvm_init_mmu.  In particular, kvm_mmu_reset_context was not
+> attempting to use a cached PGD to avoid having to figure out the new role.
+> It will soon be able to follow what nested_{vmx,svm}_load_cr3 are doing,
+> and avoid unloading all the cached roots.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c    | 37 +++++++++++++++++--------------------
+>  arch/x86/kvm/svm/nested.c |  6 +++---
+>  arch/x86/kvm/vmx/nested.c |  6 +++---
+>  3 files changed, 23 insertions(+), 26 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index da324a317000..906a9244ad28 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -4903,9 +4903,8 @@ void kvm_init_shadow_npt_mmu(struct kvm_vcpu *vcpu, unsigned long cr0,
+>  
+>  	new_role = kvm_calc_shadow_npt_root_page_role(vcpu, &regs);
+>  
+> -	__kvm_mmu_new_pgd(vcpu, nested_cr3, new_role.base);
+> -
+>  	shadow_mmu_init_context(vcpu, context, &regs, new_role);
+> +	__kvm_mmu_new_pgd(vcpu, nested_cr3, new_role.base);
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_init_shadow_npt_mmu);
+>  
+> @@ -4943,27 +4942,25 @@ void kvm_init_shadow_ept_mmu(struct kvm_vcpu *vcpu, bool execonly,
+>  		kvm_calc_shadow_ept_root_page_role(vcpu, accessed_dirty,
+>  						   execonly, level);
+>  
+> -	__kvm_mmu_new_pgd(vcpu, new_eptp, new_role.base);
+> -
+> -	if (new_role.as_u64 == context->mmu_role.as_u64)
+> -		return;
+> -
+> -	context->mmu_role.as_u64 = new_role.as_u64;
+> +	if (new_role.as_u64 != context->mmu_role.as_u64) {
+> +		context->mmu_role.as_u64 = new_role.as_u64;
+>  
+> -	context->shadow_root_level = level;
+> +		context->shadow_root_level = level;
+>  
+> -	context->ept_ad = accessed_dirty;
+> -	context->page_fault = ept_page_fault;
+> -	context->gva_to_gpa = ept_gva_to_gpa;
+> -	context->sync_page = ept_sync_page;
+> -	context->invlpg = ept_invlpg;
+> -	context->root_level = level;
+> -	context->direct_map = false;
+> +		context->ept_ad = accessed_dirty;
+> +		context->page_fault = ept_page_fault;
+> +		context->gva_to_gpa = ept_gva_to_gpa;
+> +		context->sync_page = ept_sync_page;
+> +		context->invlpg = ept_invlpg;
+> +		context->root_level = level;
+> +		context->direct_map = false;
+> +		update_permission_bitmask(context, true);
+> +		context->pkru_mask = 0;
+> +		reset_rsvds_bits_mask_ept(vcpu, context, execonly, huge_page_level);
+> +		reset_ept_shadow_zero_bits_mask(context, execonly);
+> +	}
+>  
+> -	update_permission_bitmask(context, true);
+> -	context->pkru_mask = 0;
+> -	reset_rsvds_bits_mask_ept(vcpu, context, execonly, huge_page_level);
+> -	reset_ept_shadow_zero_bits_mask(context, execonly);
+> +	__kvm_mmu_new_pgd(vcpu, new_eptp, new_role.base);
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_init_shadow_ept_mmu);
+>  
+> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> index f284e61451c8..96bab464967f 100644
+> --- a/arch/x86/kvm/svm/nested.c
+> +++ b/arch/x86/kvm/svm/nested.c
+> @@ -492,14 +492,14 @@ static int nested_svm_load_cr3(struct kvm_vcpu *vcpu, unsigned long cr3,
+>  	    CC(!load_pdptrs(vcpu, cr3)))
+>  		return -EINVAL;
+>  
+> -	if (!nested_npt)
+> -		kvm_mmu_new_pgd(vcpu, cr3);
+> -
+>  	vcpu->arch.cr3 = cr3;
+>  
+>  	/* Re-initialize the MMU, e.g. to pick up CR4 MMU role changes. */
+>  	kvm_init_mmu(vcpu);
+>  
+> +	if (!nested_npt)
+> +		kvm_mmu_new_pgd(vcpu, cr3);
+> +
+>  	return 0;
+>  }
+>  
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index b7bc634d35e2..1dfe23963a9e 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -1126,15 +1126,15 @@ static int nested_vmx_load_cr3(struct kvm_vcpu *vcpu, unsigned long cr3,
+>  		return -EINVAL;
+>  	}
+>  
+> -	if (!nested_ept)
+> -		kvm_mmu_new_pgd(vcpu, cr3);
+> -
+>  	vcpu->arch.cr3 = cr3;
+>  	kvm_register_mark_dirty(vcpu, VCPU_EXREG_CR3);
+>  
+>  	/* Re-initialize the MMU, e.g. to pick up CR4 MMU role changes. */
+>  	kvm_init_mmu(vcpu);
+>  
+> +	if (!nested_ept)
+> +		kvm_mmu_new_pgd(vcpu, cr3);
+> +
+>  	return 0;
+>  }
+>  
+
+
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+
+Best regards,
+	Maxim Levitsky
+
