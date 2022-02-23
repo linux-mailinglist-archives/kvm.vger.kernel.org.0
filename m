@@ -2,157 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 880AB4C19ED
-	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 18:33:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9CAF64C1A04
+	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 18:42:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243271AbiBWReA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Feb 2022 12:34:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50708 "EHLO
+        id S232539AbiBWRnW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Feb 2022 12:43:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32958 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242934AbiBWRd6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Feb 2022 12:33:58 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 777EA54FA2;
-        Wed, 23 Feb 2022 09:33:29 -0800 (PST)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21NFJ3mc007703;
-        Wed, 23 Feb 2022 17:33:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=X3U/Tx69BZex1BAIM+2U4fWBQxgbxoGuv6xHDjIFm/Y=;
- b=rg5TuWqJxBIOkMtFqVVP519VGFwWzWqwc5T1+EKHrhtN2QyRr3AUT1j2QBZnyNp2pBeD
- ApiwQ2iar2GMc6PF8qCZuwbCy9Xgh7pWVYE1untffjZdMZkbeOn5nLSxE2fwcpg4TThQ
- stgs/OiluMAUXDjAWwqmIA47UY6l0ap9rMdoaunpMMUci/SRHgXtFILiqtgoVgsarL6o
- 6FcBxrG2JTzdfxkG3IuCuCZvQ6hdhyb4by0/+4n2rlmjEUmGqOJksM4o+Vj3xprpEswl
- 3PmVFiTwJps4TcgW5KL+HzF4IPjYGPZ5NoOt3bjOKp1zUDi1rUTP4bued946C6TgCPCH hA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3edqf3k65n-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Feb 2022 17:33:28 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21NHJmKt027675;
-        Wed, 23 Feb 2022 17:33:28 GMT
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3edqf3k63u-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Feb 2022 17:33:27 +0000
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21NHSbtS027137;
-        Wed, 23 Feb 2022 17:33:21 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma02fra.de.ibm.com with ESMTP id 3ear69a6y6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Feb 2022 17:33:21 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21NHXH6A54198638
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 23 Feb 2022 17:33:18 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D1EA04204B;
-        Wed, 23 Feb 2022 17:33:17 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6E3A142047;
-        Wed, 23 Feb 2022 17:33:17 +0000 (GMT)
-Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1.ibm.com (unknown [9.171.74.176])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 23 Feb 2022 17:33:17 +0000 (GMT)
-Message-ID: <99ec1cf03d17b3de2d47c497882f091f922713bf.camel@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v3 6/8] s390x: Add more tests for STSCH
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Cc:     imbrenda@linux.ibm.com, Pierre Morel <pmorel@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>, thuth@redhat.com,
-        david@redhat.com
-Date:   Wed, 23 Feb 2022 18:33:17 +0100
-In-Reply-To: <04daca6a-5863-d205-ea98-096163a2296a@linux.ibm.com>
-References: <20220223132940.2765217-1-nrb@linux.ibm.com>
-         <20220223132940.2765217-7-nrb@linux.ibm.com>
-         <04daca6a-5863-d205-ea98-096163a2296a@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
+        with ESMTP id S243431AbiBWRnW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Feb 2022 12:43:22 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 94A7741320
+        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 09:42:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645638173;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=qRjIpFpl+Y8ZaB7CKEGYDkJ5geifVDa7MyqJpWBf+L4=;
+        b=HUPm+bE0QDTQhMDELIZs6BnR0/P2kaRMiFQ9wAwPf5mbkOIDpevduxe91h7sT4MV2JfYch
+        zsQB1hmKPMvW6KcR7DlsmPrqWKi/V7+KFLb4io+JbRmhXg/YTcp0M33ZRNwFAX4ccTkKVR
+        crvzx/0SNpvE9Q2psxE6OlrPhccZADg=
+Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com
+ [209.85.161.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-638-XrOQvvFNOJmhXCnfJtfDLg-1; Wed, 23 Feb 2022 12:42:51 -0500
+X-MC-Unique: XrOQvvFNOJmhXCnfJtfDLg-1
+Received: by mail-oo1-f69.google.com with SMTP id k17-20020a4adfb1000000b0031c228d26a2so8715437ook.6
+        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 09:42:51 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=qRjIpFpl+Y8ZaB7CKEGYDkJ5geifVDa7MyqJpWBf+L4=;
+        b=xRgzzm5bC+L3PGCtZaAvSsojz+Y5YkGsDSuI7FzXNltizX9Lv9djQs/RQ2A5wujkKA
+         ixYV6uPZCu6FIS1IqMSZ0vzaFW59RlxqOmpeh/U8Jm6rzJlI0DxwGjNs/tv1cBCVo2q1
+         fj9EDGmcF8g72qyMsS6S8kuDvYEdSj+5E06VTgFnO90ZXn0ZqpRyVb0v0Udt5c28VlW3
+         KKWj3ictyw7Q5l0Ue7SniR3bbGH7Bmauaowh78YIjHUBPQYkmmIaJUkb/rsFJzUXoAnT
+         4kgnpRx6yTI4/soCEMRYYck7MSQXUgb9V8E3QIAyErjSKTUnUEFvzD9UcoQpjj/yULHL
+         NVJA==
+X-Gm-Message-State: AOAM532mKidHk3huAWRw3J23MaBJUbmK4MWJUMJ2+j/XRY/D4uQqfmBF
+        RrEjWBC5mrNYX2QSeuBrlt6rJe3MLFw/uO0HzNJ8qutop/NzuN+jdyus3GWn6Rr9kdFDthW4Q/i
+        idoAowydsHvjF
+X-Received: by 2002:a05:6870:6106:b0:d4:473f:7671 with SMTP id s6-20020a056870610600b000d4473f7671mr310508oae.327.1645638170978;
+        Wed, 23 Feb 2022 09:42:50 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxq0hTPAXAa/qHrjN+Zp6BCaCXgRevYM49duz7eMMH+DpMmv9okVH5/L0hZhHRf8S2uYX0pUw==
+X-Received: by 2002:a05:6870:6106:b0:d4:473f:7671 with SMTP id s6-20020a056870610600b000d4473f7671mr310487oae.327.1645638170742;
+        Wed, 23 Feb 2022 09:42:50 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id n11sm125550oal.1.2022.02.23.09.42.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Feb 2022 09:42:50 -0800 (PST)
+Date:   Wed, 23 Feb 2022 10:42:48 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Yishai Hadas <yishaih@nvidia.com>
+Cc:     <bhelgaas@google.com>, <jgg@nvidia.com>, <saeedm@nvidia.com>,
+        <linux-pci@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <kuba@kernel.org>, <leonro@nvidia.com>,
+        <kwankhede@nvidia.com>, <mgurtovoy@nvidia.com>, <maorg@nvidia.com>,
+        <cohuck@redhat.com>, <ashok.raj@intel.com>, <kevin.tian@intel.com>,
+        <shameerali.kolothum.thodi@huawei.com>
+Subject: Re: [PATCH V8 mlx5-next 10/15] vfio: Extend the device migration
+ protocol with RUNNING_P2P
+Message-ID: <20220223104248.62b7ad12.alex.williamson@redhat.com>
+In-Reply-To: <20220220095716.153757-11-yishaih@nvidia.com>
+References: <20220220095716.153757-1-yishaih@nvidia.com>
+        <20220220095716.153757-11-yishaih@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: YGgnOs_t1BU2zagkI2kXfiwjHNxT01oX
-X-Proofpoint-GUID: 67LIQehrSHAjKCugolYGfPgZq0TF2Vo5
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-02-23_09,2022-02-23_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 suspectscore=0
- phishscore=0 clxscore=1015 mlxlogscore=999 spamscore=0 mlxscore=0
- malwarescore=0 adultscore=0 priorityscore=1501 impostorscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2202230100
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2022-02-23 at 16:39 +0100, Janosch Frank wrote:
-> On 2/23/22 14:29, Nico Boehr wrote:
-> > 
-[...]
-> >   
-> > +static void test_stsch(void)
-> > +{
-> > 
-[...]
-> > +       report_prefix_push("Bit 47 in SID is zero");
-> > +       expect_pgm_int();
-> > +       stsch(0x0000ffff, &schib);
-> > +       check_pgm_int_code(PGM_INT_CODE_OPERAND);
-> > +       report_prefix_pop();
-> 
-> Add a comment:
-> No matter if the multiple-subchannel-set facility is installed or
-> not, 
-> bit 47 always needs to be 1.
+On Sun, 20 Feb 2022 11:57:11 +0200
+Yishai Hadas <yishaih@nvidia.com> wrote:
+> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+> index 3bbadcdbc9c8..3176cb5d4464 100644
+> --- a/include/linux/vfio.h
+> +++ b/include/linux/vfio.h
+> @@ -33,6 +33,7 @@ struct vfio_device {
+>  	struct vfio_group *group;
+>  	struct vfio_device_set *dev_set;
+>  	struct list_head dev_set_list;
+> +	unsigned int migration_flags;
 
-Will do.
+Maybe paranoia, but should we sanity test this in __vfio_register_dev()
+to reinforce to driver authors that not all bit combinations are valid?
+Thanks,
 
-> Do we have the MSS facility?
+Alex
 
-Not an IO expert, but it seems like it's enabled by QEMU in pc-
-bios/s390-ccw/main.c, css_setup(). The comment suggests it's always
-there.
-
-> If yes, could we disable it to test the 32-47 == 0x0001 case?
-
-I see ioinst_handle_chsc_sda() in QEMU to enable it. Disabling only
-works with a full reset of the CSS (see css_reset()) which can be
-triggered from a subsystem_reset(), which basically means we need to
-IPL. I think that's not really viable or do you see any other way?
-
-Halil, Pierre, can you confirm?
-
-> 
-> > +}
-> > +
-> > +static void test_pmcw_bit5(void)
-> > +{
-> > +       int cc;
-> > +       uint16_t old_pmcw_flags;
-> 
-> I need a comment here for further reference since that behavior is 
-> documented at the description of the schib and not where STSCH is
-> described:
-> According to architecture MSCH does ignore bit 5 of the second word
-> but 
-> STSCH will store bit 5 as zero.
-
-Will add the comment above the function, OK?
-
-> We could check if bits 0,1 and 6,7 are also zero but I'm not sure if 
-> that's interesting since MSCH does not ignore those bits and should 
-> result in an operand exception when trying to set them.
-
-I already have a test in MSCH which checks for the operand exception.
-It's simple enough to extend it to do a STSCH after the MSCH and check
-the respective bits is clear. Will be added in v4.
