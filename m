@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 15B414C05A8
-	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 00:56:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4308D4C05AE
+	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 01:00:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236304AbiBVX5M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Feb 2022 18:57:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50444 "EHLO
+        id S236263AbiBWABG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Feb 2022 19:01:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233645AbiBVX5J (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Feb 2022 18:57:09 -0500
-Received: from mail-yb1-xb2e.google.com (mail-yb1-xb2e.google.com [IPv6:2607:f8b0:4864:20::b2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1B28275D3
-        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 15:56:41 -0800 (PST)
-Received: by mail-yb1-xb2e.google.com with SMTP id y189so22979634ybe.4
-        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 15:56:41 -0800 (PST)
+        with ESMTP id S234027AbiBWABE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Feb 2022 19:01:04 -0500
+Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B17B3B0A
+        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 16:00:38 -0800 (PST)
+Received: by mail-yb1-xb2f.google.com with SMTP id y6so44585280ybc.5
+        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 16:00:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=atishpatra.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=mllQGFC3WEKp6XzrSESCPgbl5djA3qBbKDbZz6ohprU=;
-        b=b3f8otBFJYUqBdQ5FOW9Khjl/pgCWSsFZtcnO6RW/TELNG0zf6paeKnMOXYsHc4JcO
-         WWFVwCwn9FIt8lJsazJR1HEzCfWexKUT00gLWv4j9Sw9je3WTvIBSGJFDgXd4DiyWo4U
-         F6afkvMCMwoXlSe2lriyUrildW9AQJwwJcVVU=
+        bh=KSiA3S1xm7pTjQu/oWXgbDLtQEnGSkP+ktjeX6MfsjM=;
+        b=Bu6a3ODl5Dt10lmJ5M8HJj4XhWyMZUaPvnc5LHBO10SuKJ0H6a1+Gft6VaKaQipiGt
+         OIEB7d4uZNNxcC61l1LBWuQ1YYW6u6j5j7NORForrUCLX4n9gYHjjv4rse1jN401KuaQ
+         OElEcQ7cvC+9l9AaJQVhISosQFpNVruxJxwJw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=mllQGFC3WEKp6XzrSESCPgbl5djA3qBbKDbZz6ohprU=;
-        b=uL42Q6SWCirzH2qe8Z1vptQdzdOG8UrEa5qyHIAYTM96spj8bO1Ga7d5aYLufS9yQY
-         XfNFW2b7T+DuUmfmabpz1ztTvSZis+oHpe5d+tE4KnLDLow1R1wi1Gj1lBSYFGM4DDWR
-         i0gklfoxQuHLbf4skWcLB+EyIAmMnxxgDM+HT4TAwJeFeH/O64DmMKZFv0TIwI2hRLkn
-         CJUIs84bdHUS6TQW2uR11hoOP9eoHFU9ycX75EcKfHGdalMZ5vPNoojLf0sAMu/Z7xux
-         vsx79Q5M/G8yfxB/45NkMbXg8Ah5ahvwvaSVuSzp1Z0wPaXU21/py+UFdmzArvuKQSya
-         uJyA==
-X-Gm-Message-State: AOAM532XJ8w75EfhjzobNsQXFpg7C/b088SiRDtEMhuyKQgHf1A3ctVH
-        lJRtuG4G9AF81YYCbb02WnmIfy8GQZz+0KPK+hPZ
-X-Google-Smtp-Source: ABdhPJxsoD0Z8T2CTk4jVbbagwhfA7izzMw0d3AiTk0jpyHcRUq6W3KAAWums7n1VjTy5jsG0KgnVmM55gDHETLRu00=
-X-Received: by 2002:a25:d294:0:b0:61d:9809:9917 with SMTP id
- j142-20020a25d294000000b0061d98099917mr25651792ybg.289.1645574200901; Tue, 22
- Feb 2022 15:56:40 -0800 (PST)
+        bh=KSiA3S1xm7pTjQu/oWXgbDLtQEnGSkP+ktjeX6MfsjM=;
+        b=XRQzb10d8suWANQVjin9zs8YbJReaHmqHHkSpVQeND1xMqvaq2jF+Jww/YkiyR14Ac
+         Y9MAyUtGrs/NPReBWjVmlV+DmPjo71XOm08mkjEMUiguqkHN32Y6vOu1SCUDrbGC4mwh
+         OJ23kRFnv7IL2b2LgC/uY9N7xBy2xNR9IoygxPngq/R1InRRiSN7EvX4bmoB+D0issUr
+         i0NY2FgbpLV/u59rw67QcyZymwj8URX3meDVh7ImAkNfTbg3i1AmIbgoCFM8RkdIz46L
+         NpdPDK835MD1grZDGCBoDaioXjGnnWGVj4SLbqv3ig9hfXXJIBtMPTsnvp7qtngl0fUD
+         A2yQ==
+X-Gm-Message-State: AOAM530sBcb09Y1COorUHK2p2qY4TesUpVshax8t8LhnxiplJ9faL59b
+        /IpLfVMACMH57WFRvPt+QgA/7YVZdvIjCgZUQCOLX4Q4Rw0d
+X-Google-Smtp-Source: ABdhPJw/3qzihNlONhEyWS53iUqO28cZ5mxXYNwCukNQR9UtK83rnxFwjJmDBuKON6Y+0IknNK19j5XplikMTJtDQ18=
+X-Received: by 2002:a25:b205:0:b0:624:6faf:d090 with SMTP id
+ i5-20020a25b205000000b006246fafd090mr15268936ybj.14.1645574437937; Tue, 22
+ Feb 2022 16:00:37 -0800 (PST)
 MIME-Version: 1.0
-References: <20220201082227.361967-1-apatel@ventanamicro.com> <20220201082227.361967-4-apatel@ventanamicro.com>
-In-Reply-To: <20220201082227.361967-4-apatel@ventanamicro.com>
+References: <20220201082227.361967-1-apatel@ventanamicro.com> <20220201082227.361967-5-apatel@ventanamicro.com>
+In-Reply-To: <20220201082227.361967-5-apatel@ventanamicro.com>
 From:   Atish Patra <atishp@atishpatra.org>
-Date:   Tue, 22 Feb 2022 15:56:30 -0800
-Message-ID: <CAOnJCUKPw-kiYZWAECPU5z9QS600s1AUREon=WuB+gPG+rprvw@mail.gmail.com>
-Subject: Re: [PATCH 3/6] RISC-V: KVM: Implement SBI v0.3 SRST extension
+Date:   Tue, 22 Feb 2022 16:00:27 -0800
+Message-ID: <CAOnJCU+Xfd5Y-ZLrY1JVoYFOtgw7eSahO=QwZVT57VV_UVjQVg@mail.gmail.com>
+Subject: Re: [PATCH 4/6] RISC-V: Add SBI HSM suspend related defines
 To:     Anup Patel <apatel@ventanamicro.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Palmer Dabbelt <palmer@dabbelt.com>,
@@ -62,7 +62,7 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,88 +72,87 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On Tue, Feb 1, 2022 at 12:23 AM Anup Patel <apatel@ventanamicro.com> wrote:
 >
-> The SBI v0.3 specification defines SRST (System Reset) extension which
-> provides a standard poweroff and reboot interface. This patch implements
-> SRST extension for the KVM Guest.
+> We add defines related to SBI HSM suspend call and also update HSM states
+> naming as-per the latest SBI specification.
 >
 > Signed-off-by: Anup Patel <apatel@ventanamicro.com>
 > ---
->  arch/riscv/kvm/vcpu_sbi.c         |  2 ++
->  arch/riscv/kvm/vcpu_sbi_replace.c | 44 +++++++++++++++++++++++++++++++
->  2 files changed, 46 insertions(+)
+>  arch/riscv/include/asm/sbi.h    | 27 ++++++++++++++++++++++-----
+>  arch/riscv/kernel/cpu_ops_sbi.c |  2 +-
+>  arch/riscv/kvm/vcpu_sbi_hsm.c   |  4 ++--
+>  3 files changed, 25 insertions(+), 8 deletions(-)
 >
-> diff --git a/arch/riscv/kvm/vcpu_sbi.c b/arch/riscv/kvm/vcpu_sbi.c
-> index 11ae4f621f0d..a09ecb97b890 100644
-> --- a/arch/riscv/kvm/vcpu_sbi.c
-> +++ b/arch/riscv/kvm/vcpu_sbi.c
-> @@ -45,6 +45,7 @@ extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_base;
->  extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_time;
->  extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_ipi;
->  extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_rfence;
-> +extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_srst;
->  extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_hsm;
->  extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_experimental;
->  extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_vendor;
-> @@ -55,6 +56,7 @@ static const struct kvm_vcpu_sbi_extension *sbi_ext[] = {
->         &vcpu_sbi_ext_time,
->         &vcpu_sbi_ext_ipi,
->         &vcpu_sbi_ext_rfence,
-> +       &vcpu_sbi_ext_srst,
->         &vcpu_sbi_ext_hsm,
->         &vcpu_sbi_ext_experimental,
->         &vcpu_sbi_ext_vendor,
-> diff --git a/arch/riscv/kvm/vcpu_sbi_replace.c b/arch/riscv/kvm/vcpu_sbi_replace.c
-> index 1bc0608a5bfd..0f217365c287 100644
-> --- a/arch/riscv/kvm/vcpu_sbi_replace.c
-> +++ b/arch/riscv/kvm/vcpu_sbi_replace.c
-> @@ -130,3 +130,47 @@ const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_rfence = {
->         .extid_end = SBI_EXT_RFENCE,
->         .handler = kvm_sbi_ext_rfence_handler,
+> diff --git a/arch/riscv/include/asm/sbi.h b/arch/riscv/include/asm/sbi.h
+> index d1c37479d828..06133b4f8e20 100644
+> --- a/arch/riscv/include/asm/sbi.h
+> +++ b/arch/riscv/include/asm/sbi.h
+> @@ -71,15 +71,32 @@ enum sbi_ext_hsm_fid {
+>         SBI_EXT_HSM_HART_START = 0,
+>         SBI_EXT_HSM_HART_STOP,
+>         SBI_EXT_HSM_HART_STATUS,
+> +       SBI_EXT_HSM_HART_SUSPEND,
 >  };
+>
+> -enum sbi_hsm_hart_status {
+> -       SBI_HSM_HART_STATUS_STARTED = 0,
+> -       SBI_HSM_HART_STATUS_STOPPED,
+> -       SBI_HSM_HART_STATUS_START_PENDING,
+> -       SBI_HSM_HART_STATUS_STOP_PENDING,
+> +enum sbi_hsm_hart_state {
+> +       SBI_HSM_STATE_STARTED = 0,
+> +       SBI_HSM_STATE_STOPPED,
+> +       SBI_HSM_STATE_START_PENDING,
+> +       SBI_HSM_STATE_STOP_PENDING,
+> +       SBI_HSM_STATE_SUSPENDED,
+> +       SBI_HSM_STATE_SUSPEND_PENDING,
+> +       SBI_HSM_STATE_RESUME_PENDING,
+>  };
+>
+> +#define SBI_HSM_SUSP_BASE_MASK                 0x7fffffff
+> +#define SBI_HSM_SUSP_NON_RET_BIT               0x80000000
+> +#define SBI_HSM_SUSP_PLAT_BASE                 0x10000000
 > +
-> +static int kvm_sbi_ext_srst_handler(struct kvm_vcpu *vcpu,
-> +                                   struct kvm_run *run,
-> +                                   unsigned long *out_val,
-> +                                   struct kvm_cpu_trap *utrap, bool *exit)
-> +{
-> +       struct kvm_cpu_context *cp = &vcpu->arch.guest_context;
-> +       unsigned long funcid = cp->a6;
-> +       u32 reason = cp->a1;
-> +       u32 type = cp->a0;
-> +       int ret = 0;
+> +#define SBI_HSM_SUSPEND_RET_DEFAULT            0x00000000
+> +#define SBI_HSM_SUSPEND_RET_PLATFORM           SBI_HSM_SUSP_PLAT_BASE
+> +#define SBI_HSM_SUSPEND_RET_LAST               SBI_HSM_SUSP_BASE_MASK
+> +#define SBI_HSM_SUSPEND_NON_RET_DEFAULT                SBI_HSM_SUSP_NON_RET_BIT
+> +#define SBI_HSM_SUSPEND_NON_RET_PLATFORM       (SBI_HSM_SUSP_NON_RET_BIT | \
+> +                                                SBI_HSM_SUSP_PLAT_BASE)
+> +#define SBI_HSM_SUSPEND_NON_RET_LAST           (SBI_HSM_SUSP_NON_RET_BIT | \
+> +                                                SBI_HSM_SUSP_BASE_MASK)
 > +
-> +       switch (funcid) {
-> +       case SBI_EXT_SRST_RESET:
-> +               switch (type) {
-> +               case SBI_SRST_RESET_TYPE_SHUTDOWN:
-> +                       kvm_riscv_vcpu_sbi_system_reset(vcpu, run,
-> +                                               KVM_SYSTEM_EVENT_SHUTDOWN,
-> +                                               reason);
-> +                       *exit = true;
-> +                       break;
-> +               case SBI_SRST_RESET_TYPE_COLD_REBOOT:
-> +               case SBI_SRST_RESET_TYPE_WARM_REBOOT:
-> +                       kvm_riscv_vcpu_sbi_system_reset(vcpu, run,
-> +                                               KVM_SYSTEM_EVENT_RESET,
-> +                                               reason);
-> +                       *exit = true;
-> +                       break;
-> +               default:
-> +                       ret = -EOPNOTSUPP;
-> +               }
-> +               break;
-> +       default:
-> +               ret = -EOPNOTSUPP;
-> +       }
-> +
-> +       return ret;
-> +}
-> +
-> +const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_srst = {
-> +       .extid_start = SBI_EXT_SRST,
-> +       .extid_end = SBI_EXT_SRST,
-> +       .handler = kvm_sbi_ext_srst_handler,
-> +};
+>  enum sbi_ext_srst_fid {
+>         SBI_EXT_SRST_RESET = 0,
+>  };
+> diff --git a/arch/riscv/kernel/cpu_ops_sbi.c b/arch/riscv/kernel/cpu_ops_sbi.c
+> index dae29cbfe550..2e16f6732cdf 100644
+> --- a/arch/riscv/kernel/cpu_ops_sbi.c
+> +++ b/arch/riscv/kernel/cpu_ops_sbi.c
+> @@ -111,7 +111,7 @@ static int sbi_cpu_is_stopped(unsigned int cpuid)
+>
+>         rc = sbi_hsm_hart_get_status(hartid);
+>
+> -       if (rc == SBI_HSM_HART_STATUS_STOPPED)
+> +       if (rc == SBI_HSM_STATE_STOPPED)
+>                 return 0;
+>         return rc;
+>  }
+> diff --git a/arch/riscv/kvm/vcpu_sbi_hsm.c b/arch/riscv/kvm/vcpu_sbi_hsm.c
+> index 2e383687fa48..1ac4b2e8e4ec 100644
+> --- a/arch/riscv/kvm/vcpu_sbi_hsm.c
+> +++ b/arch/riscv/kvm/vcpu_sbi_hsm.c
+> @@ -60,9 +60,9 @@ static int kvm_sbi_hsm_vcpu_get_status(struct kvm_vcpu *vcpu)
+>         if (!target_vcpu)
+>                 return -EINVAL;
+>         if (!target_vcpu->arch.power_off)
+> -               return SBI_HSM_HART_STATUS_STARTED;
+> +               return SBI_HSM_STATE_STARTED;
+>         else
+> -               return SBI_HSM_HART_STATUS_STOPPED;
+> +               return SBI_HSM_STATE_STOPPED;
+>  }
+>
+>  static int kvm_sbi_ext_hsm_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
 > --
 > 2.25.1
 >
