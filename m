@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D13874C0C20
-	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 06:28:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 609284C0C23
+	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 06:28:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238342AbiBWF2g (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Feb 2022 00:28:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58124 "EHLO
+        id S238387AbiBWF2n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Feb 2022 00:28:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57660 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238376AbiBWF1T (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S238447AbiBWF1T (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 23 Feb 2022 00:27:19 -0500
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D7986D4EA
-        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 21:25:26 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id b11-20020a5b008b000000b00624ea481d55so2533763ybp.19
-        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 21:25:26 -0800 (PST)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AF6F6E286
+        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 21:25:29 -0800 (PST)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-2d306e372e5so163267937b3.5
+        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 21:25:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=OyDHTZ7Ac6r1LQol+lgAiZ5efN30RaXmeX7z0hPyuqA=;
-        b=DdkDTnIiPn6TLdbXCmFvIo19iJFubFIhdETlSTTLRRjgZ4Sbw2XRK1yw+KEVLoro4T
-         wP84t15CnH7WoNP9nOE1xCfFjeXiFihRdrvEeEaqbhIrww6MkpxMl0Beadw+zBAHg4Wm
-         Y49K0SbIs0XAjHP26SPAuOOPd/FRd4AzW+548DKIXzxHOTL9Gnv2I7DesA74Y2aSN1w7
-         bukmgHnjTzQ3TsZeAD6EjoZj4bz08/67lWCDyTLOclgldihhQFgdX/f7KijewY11x+pe
-         ztyxmT3V40T+w3mwFuSkO23/qUqxo0xoLiD6fHheWqBlYJ4PhhilLPTmelIkwEUqdEVv
-         YRGg==
+        bh=1Ak925Pk776XAKxLwtqmq+2ujMHKkPdWGXyWe6mB81I=;
+        b=qruJowqTdMVz7fZkxeG4xVb20iJ53LrE4dT1CKYoVmqpJaSFmZqssZFPvLDlocajG+
+         0ZNfohsXrp0SvmtgoKo+3GpbCl6Ek66LSSQDb5QhwDTmpTY3IZR68hTWLTakDK649FWd
+         NcBzCkwDsR687gBw9hUAZO42EBgmkkjWUtK9c7iThbB5OJvWqulI+ZjA4At9vc3jDdQv
+         V3RzFrXEtxS3BFQakXKK5JYagS7g37QYbi+N7FduEDd6mJWAl6cR1xbe48z+M34xGgJb
+         +aIJO9WdvPWGVowL+cjeTIFBzTQnJ9oyaKZdWhvwquAx5l+fbfWtWxe31CFQ765daVDd
+         WYtQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=OyDHTZ7Ac6r1LQol+lgAiZ5efN30RaXmeX7z0hPyuqA=;
-        b=Q/OeopjTqdqlThJK85rRc1a1W7ua51QstB6p+iS22B1MpQy/GXaKS5rix979CGDomg
-         rRnuCTP4dy2kGiHVgfXHwFmyIVzO7s/QUP2xeT+plHBVyvY6U4nrMb9dT1tfmaUBE/D7
-         3bWjatswTsm8g28Ft+yvyVigRXRXSjnLQvGNUzBI2qHTW3eaXpRTg2+qSkFnjqbu9vDt
-         lH0zkX26+S0q/2pkR41zbjmaRFn1ayV4q7phIPwggqHTKcZlhu1mJ+IHdW1X3TKuUOyt
-         CsA5cJ43KE9yshHfNQJ8bQbRy8f0ZALxVEIMRGPHZQNnCivvTw1/hQeT4Yr0gAV3M6lF
-         OXRA==
-X-Gm-Message-State: AOAM5339bUPTve32ERqhlQ4Xqo1vJ/8rtFmPBxYe2vfwTIQUiVr94hLq
-        ioAFeMs3iWoyFlfvkUuOiKjrI/EUj18e
-X-Google-Smtp-Source: ABdhPJzJ67z80Uc/VNlFr/C8BlwDxiZI69VgqPgglpNrTFnLyw6IzyUmF2cWMgeuQwRsundlA5eSPH6P2ztJ
+        bh=1Ak925Pk776XAKxLwtqmq+2ujMHKkPdWGXyWe6mB81I=;
+        b=OvgR4tD9gicEgXR0psvOqiNvEtYnXrjIGLw5yHVAjd/sUzRYGPnT4rM9YZl847ZCyj
+         lHflg2bSnkOWcbn8B0k192V0JpHfOiC3hQJMpISjQQOEZvba81xFEHPPHbFFC6e9EwTj
+         Vr9Vku3ybismzUwzDLzAAAitojauadAm/EOJuSfoQJlii2ngnwPmQz3roszSYkT0jGZj
+         jkIaHbYVmI1dvUyNjazFAGKxsShJ7t9GsKVHGmqfPOAPCCe3wTZPZtfU720fd2+Nzf8b
+         B3l0RcA6Pe1rjxtewLjhr1+75Tdkw1IWgsGyWDaYcaVLUaiVWACVU7xPgTfdwOV7aPOg
+         ZcMQ==
+X-Gm-Message-State: AOAM532OQDlj9hJQVNz4wB9Gr9/Vl2qJM5+Gy9hkiQ0GY+VYsCJetNK/
+        BqEZThQnmyUunnkzmZRxNPK7zDb5wQ9S
+X-Google-Smtp-Source: ABdhPJz+8yu7dLdPv2zaC0fb4RR9so3iE3HoEaEWayOmFqlvYUtwhO3rWaAyrQMIf9/n3UzRyvpRD4FVMxcA
 X-Received: from js-desktop.svl.corp.google.com ([2620:15c:2cd:202:ccbe:5d15:e2e6:322])
- (user=junaids job=sendgmr) by 2002:a81:e45:0:b0:2d6:bc2e:3f66 with SMTP id
- 66-20020a810e45000000b002d6bc2e3f66mr22941292ywo.54.1645593919291; Tue, 22
- Feb 2022 21:25:19 -0800 (PST)
-Date:   Tue, 22 Feb 2022 21:22:18 -0800
+ (user=junaids job=sendgmr) by 2002:a25:bad2:0:b0:620:fe28:ff53 with SMTP id
+ a18-20020a25bad2000000b00620fe28ff53mr26733639ybk.340.1645593921610; Tue, 22
+ Feb 2022 21:25:21 -0800 (PST)
+Date:   Tue, 22 Feb 2022 21:22:19 -0800
 In-Reply-To: <20220223052223.1202152-1-junaids@google.com>
-Message-Id: <20220223052223.1202152-43-junaids@google.com>
+Message-Id: <20220223052223.1202152-44-junaids@google.com>
 Mime-Version: 1.0
 References: <20220223052223.1202152-1-junaids@google.com>
 X-Mailer: git-send-email 2.35.1.473.g83b2b277ed-goog
-Subject: [RFC PATCH 42/47] mm: asi: Annotation of PERCPU variables to be nonsensitive
+Subject: [RFC PATCH 43/47] mm: asi: Annotation of dynamic variables to be nonsensitive
 From:   Junaid Shahid <junaids@google.com>
 To:     linux-kernel@vger.kernel.org
 Cc:     Ofir Weisse <oweisse@google.com>, kvm@vger.kernel.org,
@@ -73,16 +73,15 @@ X-Mailing-List: kvm@vger.kernel.org
 From: Ofir Weisse <oweisse@google.com>
 
 The heart of ASI is to diffrentiate between sensitive and non-sensitive
-data access. This commit marks certain static PERCPU variables as not
+data access. This commit marks certain dynamic allocations as not
 sensitive.
 
-Some static variables are accessed frequently and therefore would cause
+Some dynamic variables are accessed frequently and therefore would cause
 many ASI exits. The frequency of these accesses is monitored by tracing
 asi_exits and analyzing the accessed addresses. Many of these variables
 don't contain sensitive information and can therefore be mapped into the
-global ASI region. This commit modified
-DEFINE_PER_CPU --> DEFINE_PER_CPU_ASI_NOT_SENSITIVE to variables which
-are frequenmtly-accessed yet not sensitive variables.
+global ASI region. This commit adds GFP_LOCAL/GLOBAL_NONSENSITIVE
+attributes to these frequenmtly-accessed yet not sensitive variables.
 The end result is a very significant reduction in ASI exits on real
 benchmarks.
 
@@ -90,1052 +89,939 @@ Signed-off-by: Ofir Weisse <oweisse@google.com>
 
 
 ---
- arch/x86/events/core.c                |  2 +-
- arch/x86/events/intel/bts.c           |  2 +-
- arch/x86/events/perf_event.h          |  2 +-
- arch/x86/include/asm/asi.h            |  2 +-
- arch/x86/include/asm/current.h        |  2 +-
- arch/x86/include/asm/debugreg.h       |  2 +-
- arch/x86/include/asm/desc.h           |  2 +-
- arch/x86/include/asm/fpu/api.h        |  2 +-
- arch/x86/include/asm/hardirq.h        |  2 +-
- arch/x86/include/asm/hw_irq.h         |  2 +-
- arch/x86/include/asm/percpu.h         |  2 +-
- arch/x86/include/asm/preempt.h        |  2 +-
- arch/x86/include/asm/processor.h      | 12 ++++++------
- arch/x86/include/asm/smp.h            |  2 +-
- arch/x86/include/asm/tlbflush.h       |  4 ++--
- arch/x86/include/asm/topology.h       |  2 +-
- arch/x86/kernel/apic/apic.c           |  2 +-
- arch/x86/kernel/apic/x2apic_cluster.c |  6 +++---
- arch/x86/kernel/cpu/common.c          | 12 ++++++------
- arch/x86/kernel/fpu/core.c            |  2 +-
- arch/x86/kernel/hw_breakpoint.c       |  2 +-
- arch/x86/kernel/irq.c                 |  2 +-
- arch/x86/kernel/irqinit.c             |  2 +-
- arch/x86/kernel/nmi.c                 |  6 +++---
- arch/x86/kernel/process.c             |  4 ++--
- arch/x86/kernel/setup_percpu.c        |  4 ++--
- arch/x86/kernel/smpboot.c             |  3 ++-
- arch/x86/kernel/tsc.c                 |  2 +-
- arch/x86/kvm/x86.c                    |  2 +-
- arch/x86/kvm/x86.h                    |  2 +-
- arch/x86/mm/asi.c                     |  2 +-
- arch/x86/mm/init.c                    |  2 +-
- arch/x86/mm/tlb.c                     |  2 +-
- include/asm-generic/irq_regs.h        |  2 +-
- include/linux/arch_topology.h         |  2 +-
- include/linux/hrtimer.h               |  2 +-
- include/linux/interrupt.h             |  2 +-
- include/linux/kernel_stat.h           |  4 ++--
- include/linux/prandom.h               |  2 +-
- kernel/events/core.c                  |  6 +++---
- kernel/irq_work.c                     |  6 +++---
- kernel/rcu/tree.c                     |  2 +-
- kernel/sched/core.c                   |  6 +++---
- kernel/sched/cpufreq.c                |  3 ++-
- kernel/sched/cputime.c                |  2 +-
- kernel/sched/sched.h                  | 21 +++++++++++----------
- kernel/sched/topology.c               | 14 +++++++-------
- kernel/smp.c                          |  7 ++++---
- kernel/softirq.c                      |  2 +-
- kernel/time/hrtimer.c                 |  2 +-
- kernel/time/tick-common.c             |  2 +-
- kernel/time/tick-internal.h           |  4 ++--
- kernel/time/tick-sched.c              |  2 +-
- kernel/time/timer.c                   |  2 +-
- kernel/trace/trace.c                  |  2 +-
- kernel/trace/trace_preemptirq.c       |  2 +-
- kernel/watchdog.c                     | 12 ++++++------
- lib/irq_regs.c                        |  2 +-
- lib/random32.c                        |  3 ++-
- virt/kvm/kvm_main.c                   |  2 +-
- 60 files changed, 112 insertions(+), 107 deletions(-)
+ arch/x86/include/asm/kvm_host.h       |  3 ++-
+ arch/x86/kernel/apic/x2apic_cluster.c |  2 +-
+ arch/x86/kvm/cpuid.c                  |  4 ++-
+ arch/x86/kvm/lapic.c                  |  9 ++++---
+ arch/x86/kvm/mmu/mmu.c                |  7 ++++++
+ arch/x86/kvm/vmx/vmx.c                |  6 +++--
+ arch/x86/kvm/x86.c                    |  8 +++---
+ fs/binfmt_elf.c                       |  2 +-
+ fs/eventfd.c                          |  2 +-
+ fs/eventpoll.c                        | 10 +++++---
+ fs/exec.c                             |  2 ++
+ fs/file.c                             |  3 ++-
+ fs/timerfd.c                          |  2 +-
+ include/linux/kvm_host.h              |  2 +-
+ include/linux/kvm_types.h             |  3 +++
+ kernel/cgroup/cgroup.c                |  4 +--
+ kernel/events/core.c                  | 15 +++++++----
+ kernel/exit.c                         |  2 ++
+ kernel/fork.c                         | 36 +++++++++++++++++++++------
+ kernel/rcu/srcutree.c                 |  3 ++-
+ kernel/sched/core.c                   |  6 +++--
+ kernel/sched/cpuacct.c                |  8 +++---
+ kernel/sched/fair.c                   |  3 ++-
+ kernel/sched/topology.c               | 14 +++++++----
+ kernel/smp.c                          | 17 +++++++------
+ kernel/trace/ring_buffer.c            |  5 ++--
+ kernel/tracepoint.c                   |  2 +-
+ lib/radix-tree.c                      |  6 ++---
+ mm/memcontrol.c                       |  7 +++---
+ mm/util.c                             |  3 ++-
+ mm/vmalloc.c                          |  3 ++-
+ net/core/skbuff.c                     |  2 +-
+ net/core/sock.c                       |  2 +-
+ virt/kvm/coalesced_mmio.c             |  2 +-
+ virt/kvm/eventfd.c                    |  5 ++--
+ virt/kvm/kvm_main.c                   | 12 ++++++---
+ 36 files changed, 148 insertions(+), 74 deletions(-)
 
-diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
-index db825bf053fd..2d9829d774d7 100644
---- a/arch/x86/events/core.c
-+++ b/arch/x86/events/core.c
-@@ -47,7 +47,7 @@
- struct x86_pmu x86_pmu __asi_not_sensitive_readmostly;
- static struct pmu pmu;
- 
--DEFINE_PER_CPU(struct cpu_hw_events, cpu_hw_events) = {
-+DEFINE_PER_CPU_ASI_NOT_SENSITIVE(struct cpu_hw_events, cpu_hw_events) = {
- 	.enabled = 1,
- 	.pmu = &pmu,
- };
-diff --git a/arch/x86/events/intel/bts.c b/arch/x86/events/intel/bts.c
-index 974e917e65b2..06d9de514b0d 100644
---- a/arch/x86/events/intel/bts.c
-+++ b/arch/x86/events/intel/bts.c
-@@ -36,7 +36,7 @@ enum {
- 	BTS_STATE_ACTIVE,
- };
- 
--static DEFINE_PER_CPU(struct bts_ctx, bts_ctx);
-+static DEFINE_PER_CPU_ASI_NOT_SENSITIVE(struct bts_ctx, bts_ctx);
- 
- #define BTS_RECORD_SIZE		24
- #define BTS_SAFETY_MARGIN	4080
-diff --git a/arch/x86/events/perf_event.h b/arch/x86/events/perf_event.h
-index 27cca7fd6f17..9a4855e6ffa6 100644
---- a/arch/x86/events/perf_event.h
-+++ b/arch/x86/events/perf_event.h
-@@ -1036,7 +1036,7 @@ static inline bool x86_pmu_has_lbr_callstack(void)
- 		x86_pmu.lbr_sel_map[PERF_SAMPLE_BRANCH_CALL_STACK_SHIFT] > 0;
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index b7292c4fece7..34a05add5e77 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1562,7 +1562,8 @@ static inline void kvm_ops_static_call_update(void)
+ #define __KVM_HAVE_ARCH_VM_ALLOC
+ static inline struct kvm *kvm_arch_alloc_vm(void)
+ {
+-	return __vmalloc(kvm_x86_ops.vm_size, GFP_KERNEL_ACCOUNT | __GFP_ZERO);
++	return __vmalloc(kvm_x86_ops.vm_size, GFP_KERNEL_ACCOUNT | __GFP_ZERO |
++                         __GFP_GLOBAL_NONSENSITIVE);
  }
  
--DECLARE_PER_CPU(struct cpu_hw_events, cpu_hw_events);
-+DECLARE_PER_CPU_ASI_NOT_SENSITIVE(struct cpu_hw_events, cpu_hw_events);
- 
- int x86_perf_event_set_period(struct perf_event *event);
- 
-diff --git a/arch/x86/include/asm/asi.h b/arch/x86/include/asm/asi.h
-index d43f6aadffee..6148e65fb0c2 100644
---- a/arch/x86/include/asm/asi.h
-+++ b/arch/x86/include/asm/asi.h
-@@ -52,7 +52,7 @@ struct asi_pgtbl_pool {
- 	uint count;
- };
- 
--DECLARE_PER_CPU_ALIGNED(struct asi_state, asi_cpu_state);
-+DECLARE_PER_CPU_ALIGNED_ASI_NOT_SENSITIVE(struct asi_state, asi_cpu_state);
- 
- extern pgd_t asi_global_nonsensitive_pgd[];
- 
-diff --git a/arch/x86/include/asm/current.h b/arch/x86/include/asm/current.h
-index 3e204e6140b5..a4bcf1f305bf 100644
---- a/arch/x86/include/asm/current.h
-+++ b/arch/x86/include/asm/current.h
-@@ -8,7 +8,7 @@
- #ifndef __ASSEMBLY__
- struct task_struct;
- 
--DECLARE_PER_CPU(struct task_struct *, current_task);
-+DECLARE_PER_CPU_ASI_NOT_SENSITIVE(struct task_struct *, current_task);
- 
- static __always_inline struct task_struct *get_current(void)
- {
-diff --git a/arch/x86/include/asm/debugreg.h b/arch/x86/include/asm/debugreg.h
-index cfdf307ddc01..fa67db27b098 100644
---- a/arch/x86/include/asm/debugreg.h
-+++ b/arch/x86/include/asm/debugreg.h
-@@ -6,7 +6,7 @@
- #include <linux/bug.h>
- #include <uapi/asm/debugreg.h>
- 
--DECLARE_PER_CPU(unsigned long, cpu_dr7);
-+DECLARE_PER_CPU_ASI_NOT_SENSITIVE(unsigned long, cpu_dr7);
- 
- #ifndef CONFIG_PARAVIRT_XXL
- /*
-diff --git a/arch/x86/include/asm/desc.h b/arch/x86/include/asm/desc.h
-index ab97b22ac04a..7d9fff8c9543 100644
---- a/arch/x86/include/asm/desc.h
-+++ b/arch/x86/include/asm/desc.h
-@@ -298,7 +298,7 @@ static inline void native_load_tls(struct thread_struct *t, unsigned int cpu)
- 		gdt[GDT_ENTRY_TLS_MIN + i] = t->tls_array[i];
- }
- 
--DECLARE_PER_CPU(bool, __tss_limit_invalid);
-+DECLARE_PER_CPU_ASI_NOT_SENSITIVE(bool, __tss_limit_invalid);
- 
- static inline void force_reload_TR(void)
- {
-diff --git a/arch/x86/include/asm/fpu/api.h b/arch/x86/include/asm/fpu/api.h
-index 6f5ca3c2ef4a..15abb1b05fbc 100644
---- a/arch/x86/include/asm/fpu/api.h
-+++ b/arch/x86/include/asm/fpu/api.h
-@@ -121,7 +121,7 @@ static inline void fpstate_init_soft(struct swregs_state *soft) {}
- #endif
- 
- /* State tracking */
--DECLARE_PER_CPU(struct fpu *, fpu_fpregs_owner_ctx);
-+DECLARE_PER_CPU_ASI_NOT_SENSITIVE(struct fpu *, fpu_fpregs_owner_ctx);
- 
- /* Process cleanup */
- #ifdef CONFIG_X86_64
-diff --git a/arch/x86/include/asm/hardirq.h b/arch/x86/include/asm/hardirq.h
-index 275e7fd20310..2f70deca4a20 100644
---- a/arch/x86/include/asm/hardirq.h
-+++ b/arch/x86/include/asm/hardirq.h
-@@ -46,7 +46,7 @@ typedef struct {
- #endif
- } ____cacheline_aligned irq_cpustat_t;
- 
--DECLARE_PER_CPU_SHARED_ALIGNED(irq_cpustat_t, irq_stat);
-+DECLARE_PER_CPU_SHARED_ALIGNED_ASI_NOT_SENSITIVE(irq_cpustat_t, irq_stat);
- 
- #define __ARCH_IRQ_STAT
- 
-diff --git a/arch/x86/include/asm/hw_irq.h b/arch/x86/include/asm/hw_irq.h
-index d465ece58151..e561abfce735 100644
---- a/arch/x86/include/asm/hw_irq.h
-+++ b/arch/x86/include/asm/hw_irq.h
-@@ -128,7 +128,7 @@ extern char spurious_entries_start[];
- #define VECTOR_RETRIGGERED	((void *)-2L)
- 
- typedef struct irq_desc* vector_irq_t[NR_VECTORS];
--DECLARE_PER_CPU(vector_irq_t, vector_irq);
-+DECLARE_PER_CPU_ASI_NOT_SENSITIVE(vector_irq_t, vector_irq);
- 
- #endif /* !ASSEMBLY_ */
- 
-diff --git a/arch/x86/include/asm/percpu.h b/arch/x86/include/asm/percpu.h
-index a3c33b79fb86..f9486bbe8a76 100644
---- a/arch/x86/include/asm/percpu.h
-+++ b/arch/x86/include/asm/percpu.h
-@@ -390,7 +390,7 @@ static inline bool x86_this_cpu_variable_test_bit(int nr,
- #include <asm-generic/percpu.h>
- 
- /* We can use this directly for local CPU (faster). */
--DECLARE_PER_CPU_READ_MOSTLY(unsigned long, this_cpu_off);
-+DECLARE_PER_CPU_ASI_NOT_SENSITIVE(unsigned long, this_cpu_off);
- 
- #endif /* !__ASSEMBLY__ */
- 
-diff --git a/arch/x86/include/asm/preempt.h b/arch/x86/include/asm/preempt.h
-index fe5efbcba824..204a8532b870 100644
---- a/arch/x86/include/asm/preempt.h
-+++ b/arch/x86/include/asm/preempt.h
-@@ -7,7 +7,7 @@
- #include <linux/thread_info.h>
- #include <linux/static_call_types.h>
- 
--DECLARE_PER_CPU(int, __preempt_count);
-+DECLARE_PER_CPU_ASI_NOT_SENSITIVE(int, __preempt_count);
- 
- /* We use the MSB mostly because its available */
- #define PREEMPT_NEED_RESCHED	0x80000000
-diff --git a/arch/x86/include/asm/processor.h b/arch/x86/include/asm/processor.h
-index 20116efd2756..63831f9a503b 100644
---- a/arch/x86/include/asm/processor.h
-+++ b/arch/x86/include/asm/processor.h
-@@ -417,14 +417,14 @@ struct tss_struct {
- 	struct x86_io_bitmap	io_bitmap;
- } __aligned(PAGE_SIZE);
- 
--DECLARE_PER_CPU_PAGE_ALIGNED(struct tss_struct, cpu_tss_rw);
-+DECLARE_PER_CPU_PAGE_ALIGNED_ASI_NOT_SENSITIVE(struct tss_struct, cpu_tss_rw);
- 
- /* Per CPU interrupt stacks */
- struct irq_stack {
- 	char		stack[IRQ_STACK_SIZE];
- } __aligned(IRQ_STACK_SIZE);
- 
--DECLARE_PER_CPU(unsigned long, cpu_current_top_of_stack);
-+DECLARE_PER_CPU_ASI_NOT_SENSITIVE(unsigned long, cpu_current_top_of_stack);
- 
- #ifdef CONFIG_X86_64
- struct fixed_percpu_data {
-@@ -448,8 +448,8 @@ static inline unsigned long cpu_kernelmode_gs_base(int cpu)
- 	return (unsigned long)per_cpu(fixed_percpu_data.gs_base, cpu);
- }
- 
--DECLARE_PER_CPU(void *, hardirq_stack_ptr);
--DECLARE_PER_CPU(bool, hardirq_stack_inuse);
-+DECLARE_PER_CPU_ASI_NOT_SENSITIVE(void *, hardirq_stack_ptr);
-+DECLARE_PER_CPU_ASI_NOT_SENSITIVE(bool, hardirq_stack_inuse);
- extern asmlinkage void ignore_sysret(void);
- 
- /* Save actual FS/GS selectors and bases to current->thread */
-@@ -458,8 +458,8 @@ void current_save_fsgs(void);
- #ifdef CONFIG_STACKPROTECTOR
- DECLARE_PER_CPU(unsigned long, __stack_chk_guard);
- #endif
--DECLARE_PER_CPU(struct irq_stack *, hardirq_stack_ptr);
--DECLARE_PER_CPU(struct irq_stack *, softirq_stack_ptr);
-+DECLARE_PER_CPU_ASI_NOT_SENSITIVE(struct irq_stack *, hardirq_stack_ptr);
-+DECLARE_PER_CPU_ASI_NOT_SENSITIVE(struct irq_stack *, softirq_stack_ptr);
- #endif	/* !X86_64 */
- 
- struct perf_event;
-diff --git a/arch/x86/include/asm/smp.h b/arch/x86/include/asm/smp.h
-index 81a0211a372d..8d85a918532e 100644
---- a/arch/x86/include/asm/smp.h
-+++ b/arch/x86/include/asm/smp.h
-@@ -19,7 +19,7 @@ DECLARE_PER_CPU_READ_MOSTLY(cpumask_var_t, cpu_llc_shared_map);
- DECLARE_PER_CPU_READ_MOSTLY(cpumask_var_t, cpu_l2c_shared_map);
- DECLARE_PER_CPU_READ_MOSTLY(u16, cpu_llc_id);
- DECLARE_PER_CPU_READ_MOSTLY(u16, cpu_l2c_id);
--DECLARE_PER_CPU_READ_MOSTLY(int, cpu_number);
-+DECLARE_PER_CPU_ASI_NOT_SENSITIVE(int, cpu_number);
- 
- static inline struct cpumask *cpu_llc_shared_mask(int cpu)
- {
-diff --git a/arch/x86/include/asm/tlbflush.h b/arch/x86/include/asm/tlbflush.h
-index 7d04aa2a5f86..adcdeb58d817 100644
---- a/arch/x86/include/asm/tlbflush.h
-+++ b/arch/x86/include/asm/tlbflush.h
-@@ -151,7 +151,7 @@ struct tlb_state {
- 	 */
- 	struct tlb_context ctxs[TLB_NR_DYN_ASIDS];
- };
--DECLARE_PER_CPU_ALIGNED(struct tlb_state, cpu_tlbstate);
-+DECLARE_PER_CPU_SHARED_ALIGNED_ASI_NOT_SENSITIVE(struct tlb_state, cpu_tlbstate);
- 
- struct tlb_state_shared {
- 	/*
-@@ -171,7 +171,7 @@ struct tlb_state_shared {
- 	 */
- 	bool is_lazy;
- };
--DECLARE_PER_CPU_SHARED_ALIGNED(struct tlb_state_shared, cpu_tlbstate_shared);
-+DECLARE_PER_CPU_SHARED_ALIGNED_ASI_NOT_SENSITIVE(struct tlb_state_shared, cpu_tlbstate_shared);
- 
- bool nmi_uaccess_okay(void);
- #define nmi_uaccess_okay nmi_uaccess_okay
-diff --git a/arch/x86/include/asm/topology.h b/arch/x86/include/asm/topology.h
-index cc164777e661..bff1a9123469 100644
---- a/arch/x86/include/asm/topology.h
-+++ b/arch/x86/include/asm/topology.h
-@@ -203,7 +203,7 @@ DECLARE_STATIC_KEY_FALSE(arch_scale_freq_key);
- 
- #define arch_scale_freq_invariant() static_branch_likely(&arch_scale_freq_key)
- 
--DECLARE_PER_CPU(unsigned long, arch_freq_scale);
-+DECLARE_PER_CPU_ASI_NOT_SENSITIVE(unsigned long, arch_freq_scale);
- 
- static inline long arch_scale_freq_capacity(int cpu)
- {
-diff --git a/arch/x86/kernel/apic/apic.c b/arch/x86/kernel/apic/apic.c
-index b70344bf6600..5fa0ce0ecfb3 100644
---- a/arch/x86/kernel/apic/apic.c
-+++ b/arch/x86/kernel/apic/apic.c
-@@ -548,7 +548,7 @@ static struct clock_event_device lapic_clockevent = {
- 	.rating				= 100,
- 	.irq				= -1,
- };
--static DEFINE_PER_CPU(struct clock_event_device, lapic_events);
-+static DEFINE_PER_CPU_ASI_NOT_SENSITIVE(struct clock_event_device, lapic_events);
- 
- static const struct x86_cpu_id deadline_match[] __initconst = {
- 	X86_MATCH_INTEL_FAM6_MODEL_STEPPINGS(HASWELL_X, X86_STEPPINGS(0x2, 0x2), 0x3a), /* EP */
+ #define __KVM_HAVE_ARCH_VM_FREE
 diff --git a/arch/x86/kernel/apic/x2apic_cluster.c b/arch/x86/kernel/apic/x2apic_cluster.c
-index e696e22d0531..655fe820a240 100644
+index 655fe820a240..a1f6eb51ecb7 100644
 --- a/arch/x86/kernel/apic/x2apic_cluster.c
 +++ b/arch/x86/kernel/apic/x2apic_cluster.c
-@@ -20,10 +20,10 @@ struct cluster_mask {
-  * x86_cpu_to_logical_apicid for all online cpus in a sequential way.
-  * Using per cpu variable would cost one cache line per cpu.
-  */
--static u32 *x86_cpu_to_logical_apicid __read_mostly;
-+static u32 *x86_cpu_to_logical_apicid __asi_not_sensitive_readmostly;
+@@ -144,7 +144,7 @@ static int alloc_clustermask(unsigned int cpu, int node)
+ 	}
  
--static DEFINE_PER_CPU(cpumask_var_t, ipi_mask);
--static DEFINE_PER_CPU_READ_MOSTLY(struct cluster_mask *, cluster_masks);
-+static DEFINE_PER_CPU_ASI_NOT_SENSITIVE(cpumask_var_t, ipi_mask);
-+static DEFINE_PER_CPU_ASI_NOT_SENSITIVE(struct cluster_mask *, cluster_masks);
- static struct cluster_mask *cluster_hotplug_mask;
+ 	cluster_hotplug_mask = kzalloc_node(sizeof(*cluster_hotplug_mask),
+-					    GFP_KERNEL, node);
++					    GFP_KERNEL | __GFP_GLOBAL_NONSENSITIVE, node);
+ 	if (!cluster_hotplug_mask)
+ 		return -ENOMEM;
+ 	cluster_hotplug_mask->node = node;
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 07e9215e911d..dedabfdd292e 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -310,7 +310,9 @@ int kvm_vcpu_ioctl_set_cpuid(struct kvm_vcpu *vcpu,
+ 		if (IS_ERR(e))
+ 			return PTR_ERR(e);
  
- static int x2apic_acpi_madt_oem_check(char *oem_id, char *oem_table_id)
-diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
-index 0083464de5e3..471b3a42db64 100644
---- a/arch/x86/kernel/cpu/common.c
-+++ b/arch/x86/kernel/cpu/common.c
-@@ -1775,17 +1775,17 @@ EXPORT_PER_CPU_SYMBOL_GPL(fixed_percpu_data);
-  * The following percpu variables are hot.  Align current_task to
-  * cacheline size such that they fall in the same cacheline.
-  */
--DEFINE_PER_CPU(struct task_struct *, current_task) ____cacheline_aligned =
-+DEFINE_PER_CPU_ASI_NOT_SENSITIVE(struct task_struct *, current_task) ____cacheline_aligned =
- 	&init_task;
- EXPORT_PER_CPU_SYMBOL(current_task);
+-		e2 = kvmalloc_array(cpuid->nent, sizeof(*e2), GFP_KERNEL_ACCOUNT);
++		e2 = kvmalloc_array(cpuid->nent, sizeof(*e2),
++                                    GFP_KERNEL_ACCOUNT |
++                                    __GFP_LOCAL_NONSENSITIVE);
+ 		if (!e2) {
+ 			r = -ENOMEM;
+ 			goto out_free_cpuid;
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 213bbdfab49e..3a550299f015 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -213,7 +213,7 @@ void kvm_recalculate_apic_map(struct kvm *kvm)
  
--DEFINE_PER_CPU(void *, hardirq_stack_ptr);
--DEFINE_PER_CPU(bool, hardirq_stack_inuse);
-+DEFINE_PER_CPU_ASI_NOT_SENSITIVE(void *, hardirq_stack_ptr);
-+DEFINE_PER_CPU_ASI_NOT_SENSITIVE(bool, hardirq_stack_inuse);
+ 	new = kvzalloc(sizeof(struct kvm_apic_map) +
+ 	                   sizeof(struct kvm_lapic *) * ((u64)max_id + 1),
+-			   GFP_KERNEL_ACCOUNT);
++			   GFP_KERNEL_ACCOUNT | __GFP_LOCAL_NONSENSITIVE);
  
--DEFINE_PER_CPU(int, __preempt_count) = INIT_PREEMPT_COUNT;
-+DEFINE_PER_CPU_ASI_NOT_SENSITIVE(int, __preempt_count) = INIT_PREEMPT_COUNT;
- EXPORT_PER_CPU_SYMBOL(__preempt_count);
+ 	if (!new)
+ 		goto out;
+@@ -993,7 +993,7 @@ bool kvm_irq_delivery_to_apic_fast(struct kvm *kvm, struct kvm_lapic *src,
+ 	*r = -1;
  
--DEFINE_PER_CPU(unsigned long, cpu_current_top_of_stack) = TOP_OF_INIT_STACK;
-+DEFINE_PER_CPU_ASI_NOT_SENSITIVE(unsigned long, cpu_current_top_of_stack) = TOP_OF_INIT_STACK;
+ 	if (irq->shorthand == APIC_DEST_SELF) {
+-		*r = kvm_apic_set_irq(src->vcpu, irq, dest_map);
++              *r = kvm_apic_set_irq(src->vcpu, irq, dest_map);
+ 		return true;
+ 	}
  
- /* May not be marked __init: used by software suspend */
- void syscall_init(void)
-@@ -1826,7 +1826,7 @@ void syscall_init(void)
+@@ -2455,13 +2455,14 @@ int kvm_create_lapic(struct kvm_vcpu *vcpu, int timer_advance_ns)
  
- #else	/* CONFIG_X86_64 */
+ 	ASSERT(vcpu != NULL);
  
--DEFINE_PER_CPU(struct task_struct *, current_task) = &init_task;
-+DEFINE_PER_CPU_ASI_NOT_SENSITIVE(struct task_struct *, current_task) = &init_task;
- EXPORT_PER_CPU_SYMBOL(current_task);
- DEFINE_PER_CPU(int, __preempt_count) = INIT_PREEMPT_COUNT;
- EXPORT_PER_CPU_SYMBOL(__preempt_count);
-diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
-index d7859573973d..b59317c5721f 100644
---- a/arch/x86/kernel/fpu/core.c
-+++ b/arch/x86/kernel/fpu/core.c
-@@ -57,7 +57,7 @@ static DEFINE_PER_CPU(bool, in_kernel_fpu);
- /*
-  * Track which context is using the FPU on the CPU:
-  */
--DEFINE_PER_CPU(struct fpu *, fpu_fpregs_owner_ctx);
-+DEFINE_PER_CPU_ASI_NOT_SENSITIVE(struct fpu *, fpu_fpregs_owner_ctx);
+-	apic = kzalloc(sizeof(*apic), GFP_KERNEL_ACCOUNT);
++	apic = kzalloc(sizeof(*apic), GFP_KERNEL_ACCOUNT | __GFP_LOCAL_NONSENSITIVE);
+ 	if (!apic)
+ 		goto nomem;
  
- struct kmem_cache *fpstate_cachep;
+ 	vcpu->arch.apic = apic;
  
-diff --git a/arch/x86/kernel/hw_breakpoint.c b/arch/x86/kernel/hw_breakpoint.c
-index 668a4a6533d9..c2ceea8f6801 100644
---- a/arch/x86/kernel/hw_breakpoint.c
-+++ b/arch/x86/kernel/hw_breakpoint.c
-@@ -36,7 +36,7 @@
- #include <asm/tlbflush.h>
+-	apic->regs = (void *)get_zeroed_page(GFP_KERNEL_ACCOUNT);
++	apic->regs = (void *)get_zeroed_page(GFP_KERNEL_ACCOUNT
++                                             | __GFP_LOCAL_NONSENSITIVE);
+ 	if (!apic->regs) {
+ 		printk(KERN_ERR "malloc apic regs error for vcpu %x\n",
+ 		       vcpu->vcpu_id);
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 5785a0d02558..a2ada1104c2d 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -5630,6 +5630,13 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
+ 	vcpu->arch.mmu_page_header_cache.gfp_zero = __GFP_ZERO;
  
- /* Per cpu debug control register value */
--DEFINE_PER_CPU(unsigned long, cpu_dr7);
-+DEFINE_PER_CPU_ASI_NOT_SENSITIVE(unsigned long, cpu_dr7);
- EXPORT_PER_CPU_SYMBOL(cpu_dr7);
+ 	vcpu->arch.mmu_shadow_page_cache.gfp_zero = __GFP_ZERO;
++#ifdef CONFIG_ADDRESS_SPACE_ISOLATION
++	if (static_cpu_has(X86_FEATURE_ASI) && mm_asi_enabled(current->mm))
++	        vcpu->arch.mmu_shadow_page_cache.gfp_asi =
++                                                      __GFP_LOCAL_NONSENSITIVE;
++        else
++	        vcpu->arch.mmu_shadow_page_cache.gfp_asi = 0;
++#endif
  
- /* Per cpu debug address registers values */
-diff --git a/arch/x86/kernel/irq.c b/arch/x86/kernel/irq.c
-index 766ffe3ba313..5c5aa75050a5 100644
---- a/arch/x86/kernel/irq.c
-+++ b/arch/x86/kernel/irq.c
-@@ -26,7 +26,7 @@
- #define CREATE_TRACE_POINTS
- #include <asm/trace/irq_vectors.h>
+ 	vcpu->arch.mmu = &vcpu->arch.root_mmu;
+ 	vcpu->arch.walk_mmu = &vcpu->arch.root_mmu;
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index e1ad82c25a78..6e1bb017b696 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -2629,7 +2629,7 @@ void free_loaded_vmcs(struct loaded_vmcs *loaded_vmcs)
+ 	free_vmcs(loaded_vmcs->vmcs);
+ 	loaded_vmcs->vmcs = NULL;
+ 	if (loaded_vmcs->msr_bitmap)
+-		free_page((unsigned long)loaded_vmcs->msr_bitmap);
++                kfree(loaded_vmcs->msr_bitmap);
+ 	WARN_ON(loaded_vmcs->shadow_vmcs != NULL);
+ }
  
--DEFINE_PER_CPU_SHARED_ALIGNED(irq_cpustat_t, irq_stat);
-+DEFINE_PER_CPU_SHARED_ALIGNED_ASI_NOT_SENSITIVE(irq_cpustat_t, irq_stat);
- EXPORT_PER_CPU_SYMBOL(irq_stat);
+@@ -2648,7 +2648,9 @@ int alloc_loaded_vmcs(struct loaded_vmcs *loaded_vmcs)
  
- atomic_t irq_err_count;
-diff --git a/arch/x86/kernel/irqinit.c b/arch/x86/kernel/irqinit.c
-index beb1bada1b0a..d7893e040695 100644
---- a/arch/x86/kernel/irqinit.c
-+++ b/arch/x86/kernel/irqinit.c
-@@ -46,7 +46,7 @@
-  * (these are usually mapped into the 0x30-0xff vector range)
-  */
- 
--DEFINE_PER_CPU(vector_irq_t, vector_irq) = {
-+DEFINE_PER_CPU_ASI_NOT_SENSITIVE(vector_irq_t, vector_irq) = {
- 	[0 ... NR_VECTORS - 1] = VECTOR_UNUSED,
- };
- 
-diff --git a/arch/x86/kernel/nmi.c b/arch/x86/kernel/nmi.c
-index 4bce802d25fb..ef95071228ca 100644
---- a/arch/x86/kernel/nmi.c
-+++ b/arch/x86/kernel/nmi.c
-@@ -469,9 +469,9 @@ enum nmi_states {
- 	NMI_EXECUTING,
- 	NMI_LATCHED,
- };
--static DEFINE_PER_CPU(enum nmi_states, nmi_state);
--static DEFINE_PER_CPU(unsigned long, nmi_cr2);
--static DEFINE_PER_CPU(unsigned long, nmi_dr7);
-+static DEFINE_PER_CPU_ASI_NOT_SENSITIVE(enum nmi_states, nmi_state);
-+static DEFINE_PER_CPU_ASI_NOT_SENSITIVE(unsigned long, nmi_cr2);
-+static DEFINE_PER_CPU_ASI_NOT_SENSITIVE(unsigned long, nmi_dr7);
- 
- DEFINE_IDTENTRY_RAW(exc_nmi)
- {
-diff --git a/arch/x86/kernel/process.c b/arch/x86/kernel/process.c
-index f9bd1c3415d4..e4a32490dda0 100644
---- a/arch/x86/kernel/process.c
-+++ b/arch/x86/kernel/process.c
-@@ -56,7 +56,7 @@
-  * section. Since TSS's are completely CPU-local, we want them
-  * on exact cacheline boundaries, to eliminate cacheline ping-pong.
-  */
--__visible DEFINE_PER_CPU_PAGE_ALIGNED(struct tss_struct, cpu_tss_rw) = {
-+__visible DEFINE_PER_CPU_PAGE_ALIGNED_ASI_NOT_SENSITIVE(struct tss_struct, cpu_tss_rw) = {
- 	.x86_tss = {
- 		/*
- 		 * .sp0 is only used when entering ring 0 from a lower
-@@ -77,7 +77,7 @@ __visible DEFINE_PER_CPU_PAGE_ALIGNED(struct tss_struct, cpu_tss_rw) = {
- };
- EXPORT_PER_CPU_SYMBOL(cpu_tss_rw);
- 
--DEFINE_PER_CPU(bool, __tss_limit_invalid);
-+DEFINE_PER_CPU_ASI_NOT_SENSITIVE(bool, __tss_limit_invalid);
- EXPORT_PER_CPU_SYMBOL_GPL(__tss_limit_invalid);
- 
- void __init arch_task_cache_init(void)
-diff --git a/arch/x86/kernel/setup_percpu.c b/arch/x86/kernel/setup_percpu.c
-index 7b65275544b2..13c94a512b7e 100644
---- a/arch/x86/kernel/setup_percpu.c
-+++ b/arch/x86/kernel/setup_percpu.c
-@@ -23,7 +23,7 @@
- #include <asm/cpu.h>
- #include <asm/stackprotector.h>
- 
--DEFINE_PER_CPU_READ_MOSTLY(int, cpu_number);
-+DEFINE_PER_CPU_ASI_NOT_SENSITIVE(int, cpu_number);
- EXPORT_PER_CPU_SYMBOL(cpu_number);
- 
- #ifdef CONFIG_X86_64
-@@ -32,7 +32,7 @@ EXPORT_PER_CPU_SYMBOL(cpu_number);
- #define BOOT_PERCPU_OFFSET 0
- #endif
- 
--DEFINE_PER_CPU_READ_MOSTLY(unsigned long, this_cpu_off) = BOOT_PERCPU_OFFSET;
-+DEFINE_PER_CPU_ASI_NOT_SENSITIVE(unsigned long, this_cpu_off) = BOOT_PERCPU_OFFSET;
- EXPORT_PER_CPU_SYMBOL(this_cpu_off);
- 
- unsigned long __per_cpu_offset[NR_CPUS] __ro_after_init = {
-diff --git a/arch/x86/kernel/smpboot.c b/arch/x86/kernel/smpboot.c
-index 617012f4619f..0cfc4fdc2476 100644
---- a/arch/x86/kernel/smpboot.c
-+++ b/arch/x86/kernel/smpboot.c
-@@ -2224,7 +2224,8 @@ static void disable_freq_invariance_workfn(struct work_struct *work)
- static DECLARE_WORK(disable_freq_invariance_work,
- 		    disable_freq_invariance_workfn);
- 
--DEFINE_PER_CPU(unsigned long, arch_freq_scale) = SCHED_CAPACITY_SCALE;
-+DEFINE_PER_CPU_ASI_NOT_SENSITIVE(unsigned long, arch_freq_scale) =
-+                                                        SCHED_CAPACITY_SCALE;
- 
- void arch_scale_freq_tick(void)
- {
-diff --git a/arch/x86/kernel/tsc.c b/arch/x86/kernel/tsc.c
-index d7169da99b01..39c441409dec 100644
---- a/arch/x86/kernel/tsc.c
-+++ b/arch/x86/kernel/tsc.c
-@@ -59,7 +59,7 @@ struct cyc2ns {
- 
- }; /* fits one cacheline */
- 
--static DEFINE_PER_CPU_ALIGNED(struct cyc2ns, cyc2ns);
-+static DEFINE_PER_CPU_ALIGNED_ASI_NOT_SENSITIVE(struct cyc2ns, cyc2ns);
- 
- static int __init tsc_early_khz_setup(char *buf)
- {
+ 	if (cpu_has_vmx_msr_bitmap()) {
+ 		loaded_vmcs->msr_bitmap = (unsigned long *)
+-				__get_free_page(GFP_KERNEL_ACCOUNT);
++				kzalloc(PAGE_SIZE,
++                                        GFP_KERNEL_ACCOUNT |
++                                        __GFP_LOCAL_NONSENSITIVE );
+ 		if (!loaded_vmcs->msr_bitmap)
+ 			goto out_vmcs;
+ 		memset(loaded_vmcs->msr_bitmap, 0xff, PAGE_SIZE);
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 0df88eadab60..451872d178e5 100644
+index 451872d178e5..dd862edc1b5a 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -8523,7 +8523,7 @@ static void kvm_timer_init(void)
- 			  kvmclock_cpu_online, kvmclock_cpu_down_prep);
+@@ -329,7 +329,8 @@ static struct kmem_cache *kvm_alloc_emulator_cache(void)
+ 
+ 	return kmem_cache_create_usercopy("x86_emulator", size,
+ 					  __alignof__(struct x86_emulate_ctxt),
+-					  SLAB_ACCOUNT, useroffset,
++					  SLAB_ACCOUNT|SLAB_LOCAL_NONSENSITIVE,
++                                          useroffset,
+ 					  size - useroffset, NULL);
  }
  
--DEFINE_PER_CPU(struct kvm_vcpu *, current_vcpu);
-+DEFINE_PER_CPU_ASI_NOT_SENSITIVE(struct kvm_vcpu *, current_vcpu);
- EXPORT_PER_CPU_SYMBOL_GPL(current_vcpu);
+@@ -10969,7 +10970,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
  
- int kvm_is_in_guest(void)
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index 4abcd8d9836d..3d5da4daaf53 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -392,7 +392,7 @@ static inline bool kvm_cstate_in_guest(struct kvm *kvm)
- 	return kvm->arch.cstate_in_guest;
- }
+ 	r = -ENOMEM;
  
--DECLARE_PER_CPU(struct kvm_vcpu *, current_vcpu);
-+DECLARE_PER_CPU_ASI_NOT_SENSITIVE(struct kvm_vcpu *, current_vcpu);
+-	page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
++	page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO | __GFP_LOCAL_NONSENSITIVE);
+ 	if (!page)
+ 		goto fail_free_lapic;
+ 	vcpu->arch.pio_data = page_address(page);
+@@ -11718,7 +11719,8 @@ static int kvm_alloc_memslot_metadata(struct kvm *kvm,
  
- static inline void kvm_before_interrupt(struct kvm_vcpu *vcpu)
- {
-diff --git a/arch/x86/mm/asi.c b/arch/x86/mm/asi.c
-index fdc117929fc7..04628949e89d 100644
---- a/arch/x86/mm/asi.c
-+++ b/arch/x86/mm/asi.c
-@@ -20,7 +20,7 @@
- static struct asi_class asi_class[ASI_MAX_NUM] __asi_not_sensitive;
- static DEFINE_SPINLOCK(asi_class_lock __asi_not_sensitive);
+ 		lpages = __kvm_mmu_slot_lpages(slot, npages, level);
  
--DEFINE_PER_CPU_ALIGNED(struct asi_state, asi_cpu_state);
-+DEFINE_PER_CPU_ALIGNED_ASI_NOT_SENSITIVE(struct asi_state, asi_cpu_state);
- EXPORT_PER_CPU_SYMBOL_GPL(asi_cpu_state);
+-		linfo = kvcalloc(lpages, sizeof(*linfo), GFP_KERNEL_ACCOUNT);
++		linfo = kvcalloc(lpages, sizeof(*linfo),
++				 GFP_KERNEL_ACCOUNT | __GFP_LOCAL_NONSENSITIVE);
+ 		if (!linfo)
+ 			goto out_free;
  
- __aligned(PAGE_SIZE) pgd_t asi_global_nonsensitive_pgd[PTRS_PER_PGD];
-diff --git a/arch/x86/mm/init.c b/arch/x86/mm/init.c
-index dfff17363365..012631d03c4f 100644
---- a/arch/x86/mm/init.c
-+++ b/arch/x86/mm/init.c
-@@ -1025,7 +1025,7 @@ void __init zone_sizes_init(void)
- 	free_area_init(max_zone_pfns);
- }
+diff --git a/fs/binfmt_elf.c b/fs/binfmt_elf.c
+index f8c7f26f1fbb..b0550951da59 100644
+--- a/fs/binfmt_elf.c
++++ b/fs/binfmt_elf.c
+@@ -477,7 +477,7 @@ static struct elf_phdr *load_elf_phdrs(const struct elfhdr *elf_ex,
+ 	if (size == 0 || size > 65536 || size > ELF_MIN_ALIGN)
+ 		goto out;
  
--__visible DEFINE_PER_CPU_ALIGNED(struct tlb_state, cpu_tlbstate) = {
-+__visible DEFINE_PER_CPU_SHARED_ALIGNED_ASI_NOT_SENSITIVE(struct tlb_state, cpu_tlbstate) = {
- 	.loaded_mm = &init_mm,
- 	.next_asid = 1,
- 	.cr4 = ~0UL,	/* fail hard if we screw up cr4 shadow initialization */
-diff --git a/arch/x86/mm/tlb.c b/arch/x86/mm/tlb.c
-index fcd2c8e92f83..36d41356ed04 100644
---- a/arch/x86/mm/tlb.c
-+++ b/arch/x86/mm/tlb.c
-@@ -972,7 +972,7 @@ static bool tlb_is_not_lazy(int cpu)
+-	elf_phdata = kmalloc(size, GFP_KERNEL);
++	elf_phdata = kmalloc(size, GFP_KERNEL | __GFP_GLOBAL_NONSENSITIVE);
+ 	if (!elf_phdata)
+ 		goto out;
  
- static DEFINE_PER_CPU(cpumask_t, flush_tlb_mask);
+diff --git a/fs/eventfd.c b/fs/eventfd.c
+index 3627dd7d25db..c748433e52af 100644
+--- a/fs/eventfd.c
++++ b/fs/eventfd.c
+@@ -415,7 +415,7 @@ static int do_eventfd(unsigned int count, int flags)
+ 	if (flags & ~EFD_FLAGS_SET)
+ 		return -EINVAL;
  
--DEFINE_PER_CPU_SHARED_ALIGNED(struct tlb_state_shared, cpu_tlbstate_shared);
-+DEFINE_PER_CPU_SHARED_ALIGNED_ASI_NOT_SENSITIVE(struct tlb_state_shared, cpu_tlbstate_shared);
- EXPORT_PER_CPU_SYMBOL(cpu_tlbstate_shared);
+-	ctx = kmalloc(sizeof(*ctx), GFP_KERNEL);
++	ctx = kmalloc(sizeof(*ctx), GFP_KERNEL | __GFP_GLOBAL_NONSENSITIVE);
+ 	if (!ctx)
+ 		return -ENOMEM;
  
- STATIC_NOPV void native_flush_tlb_multi(const struct cpumask *cpumask,
-diff --git a/include/asm-generic/irq_regs.h b/include/asm-generic/irq_regs.h
-index 2e7c6e89d42e..3225bdb2aefa 100644
---- a/include/asm-generic/irq_regs.h
-+++ b/include/asm-generic/irq_regs.h
-@@ -14,7 +14,7 @@
-  * Per-cpu current frame pointer - the location of the last exception frame on
-  * the stack
+diff --git a/fs/eventpoll.c b/fs/eventpoll.c
+index 06f4c5ae1451..b28826c9f079 100644
+--- a/fs/eventpoll.c
++++ b/fs/eventpoll.c
+@@ -1239,7 +1239,7 @@ static void ep_ptable_queue_proc(struct file *file, wait_queue_head_t *whead,
+ 	if (unlikely(!epi))	// an earlier allocation has failed
+ 		return;
+ 
+-	pwq = kmem_cache_alloc(pwq_cache, GFP_KERNEL);
++	pwq = kmem_cache_alloc(pwq_cache, GFP_KERNEL | __GFP_GLOBAL_NONSENSITIVE);
+ 	if (unlikely(!pwq)) {
+ 		epq->epi = NULL;
+ 		return;
+@@ -1453,7 +1453,8 @@ static int ep_insert(struct eventpoll *ep, const struct epoll_event *event,
+ 		return -ENOSPC;
+ 	percpu_counter_inc(&ep->user->epoll_watches);
+ 
+-	if (!(epi = kmem_cache_zalloc(epi_cache, GFP_KERNEL))) {
++	if (!(epi = kmem_cache_zalloc(epi_cache,
++                                      GFP_KERNEL | __GFP_GLOBAL_NONSENSITIVE))) {
+ 		percpu_counter_dec(&ep->user->epoll_watches);
+ 		return -ENOMEM;
+ 	}
+@@ -2373,11 +2374,12 @@ static int __init eventpoll_init(void)
+ 
+ 	/* Allocates slab cache used to allocate "struct epitem" items */
+ 	epi_cache = kmem_cache_create("eventpoll_epi", sizeof(struct epitem),
+-			0, SLAB_HWCACHE_ALIGN|SLAB_PANIC|SLAB_ACCOUNT, NULL);
++			0, SLAB_HWCACHE_ALIGN|SLAB_PANIC|SLAB_ACCOUNT|SLAB_GLOBAL_NONSENSITIVE, NULL);
+ 
+ 	/* Allocates slab cache used to allocate "struct eppoll_entry" */
+ 	pwq_cache = kmem_cache_create("eventpoll_pwq",
+-		sizeof(struct eppoll_entry), 0, SLAB_PANIC|SLAB_ACCOUNT, NULL);
++		sizeof(struct eppoll_entry), 0,
++                SLAB_PANIC|SLAB_ACCOUNT|SLAB_GLOBAL_NONSENSITIVE, NULL);
+ 
+ 	ephead_cache = kmem_cache_create("ep_head",
+ 		sizeof(struct epitems_head), 0, SLAB_PANIC|SLAB_ACCOUNT, NULL);
+diff --git a/fs/exec.c b/fs/exec.c
+index 537d92c41105..76f3b433e80d 100644
+--- a/fs/exec.c
++++ b/fs/exec.c
+@@ -1238,6 +1238,8 @@ int begin_new_exec(struct linux_binprm * bprm)
+ 	struct task_struct *me = current;
+ 	int retval;
+ 
++        /* TODO: (oweisse) unmap the stack from ASI */
++
+ 	/* Once we are committed compute the creds */
+ 	retval = bprm_creds_from_file(bprm);
+ 	if (retval)
+diff --git a/fs/file.c b/fs/file.c
+index 97d212a9b814..85bfa5d70323 100644
+--- a/fs/file.c
++++ b/fs/file.c
+@@ -117,7 +117,8 @@ static struct fdtable * alloc_fdtable(unsigned int nr)
+ 	if (!fdt)
+ 		goto out;
+ 	fdt->max_fds = nr;
+-	data = kvmalloc_array(nr, sizeof(struct file *), GFP_KERNEL_ACCOUNT);
++	data = kvmalloc_array(nr, sizeof(struct file *),
++                              GFP_KERNEL_ACCOUNT | __GFP_LOCAL_NONSENSITIVE);
+ 	if (!data)
+ 		goto out_fdt;
+ 	fdt->fd = data;
+diff --git a/fs/timerfd.c b/fs/timerfd.c
+index e9c96a0c79f1..385fbb29837d 100644
+--- a/fs/timerfd.c
++++ b/fs/timerfd.c
+@@ -425,7 +425,7 @@ SYSCALL_DEFINE2(timerfd_create, int, clockid, int, flags)
+ 	    !capable(CAP_WAKE_ALARM))
+ 		return -EPERM;
+ 
+-	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
++	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL | __GFP_GLOBAL_NONSENSITIVE);
+ 	if (!ctx)
+ 		return -ENOMEM;
+ 
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index f31f7442eced..dfbb26d7a185 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1085,7 +1085,7 @@ int kvm_arch_create_vm_debugfs(struct kvm *kvm);
   */
--DECLARE_PER_CPU(struct pt_regs *, __irq_regs);
-+DECLARE_PER_CPU_ASI_NOT_SENSITIVE(struct pt_regs *, __irq_regs);
- 
- static inline struct pt_regs *get_irq_regs(void)
+ static inline struct kvm *kvm_arch_alloc_vm(void)
  {
-diff --git a/include/linux/arch_topology.h b/include/linux/arch_topology.h
-index b97cea83b25e..35fdf256777a 100644
---- a/include/linux/arch_topology.h
-+++ b/include/linux/arch_topology.h
-@@ -23,7 +23,7 @@ static inline unsigned long topology_get_cpu_scale(int cpu)
- 
- void topology_set_cpu_scale(unsigned int cpu, unsigned long capacity);
- 
--DECLARE_PER_CPU(unsigned long, arch_freq_scale);
-+DECLARE_PER_CPU_ASI_NOT_SENSITIVE(unsigned long, arch_freq_scale);
- 
- static inline unsigned long topology_get_freq_scale(int cpu)
- {
-diff --git a/include/linux/hrtimer.h b/include/linux/hrtimer.h
-index 0ee140176f10..68b2f10aaa46 100644
---- a/include/linux/hrtimer.h
-+++ b/include/linux/hrtimer.h
-@@ -355,7 +355,7 @@ static inline void timerfd_clock_was_set(void) { }
- static inline void timerfd_resume(void) { }
+-	return kzalloc(sizeof(struct kvm), GFP_KERNEL);
++	return kzalloc(sizeof(struct kvm), GFP_KERNEL | __GFP_LOCAL_NONSENSITIVE);
+ }
  #endif
  
--DECLARE_PER_CPU(struct tick_device, tick_cpu_device);
-+DECLARE_PER_CPU_ASI_NOT_SENSITIVE(struct tick_device, tick_cpu_device);
- 
- #ifdef CONFIG_PREEMPT_RT
- void hrtimer_cancel_wait_running(const struct hrtimer *timer);
-diff --git a/include/linux/interrupt.h b/include/linux/interrupt.h
-index 1f22a30c0963..6ae485d2ebb3 100644
---- a/include/linux/interrupt.h
-+++ b/include/linux/interrupt.h
-@@ -554,7 +554,7 @@ extern void __raise_softirq_irqoff(unsigned int nr);
- extern void raise_softirq_irqoff(unsigned int nr);
- extern void raise_softirq(unsigned int nr);
- 
--DECLARE_PER_CPU(struct task_struct *, ksoftirqd);
-+DECLARE_PER_CPU_ASI_NOT_SENSITIVE(struct task_struct *, ksoftirqd);
- 
- static inline struct task_struct *this_cpu_ksoftirqd(void)
- {
-diff --git a/include/linux/kernel_stat.h b/include/linux/kernel_stat.h
-index 69ae6b278464..89609dc5d30f 100644
---- a/include/linux/kernel_stat.h
-+++ b/include/linux/kernel_stat.h
-@@ -40,8 +40,8 @@ struct kernel_stat {
- 	unsigned int softirqs[NR_SOFTIRQS];
+diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
+index 234eab059839..a5a810db85ca 100644
+--- a/include/linux/kvm_types.h
++++ b/include/linux/kvm_types.h
+@@ -64,6 +64,9 @@ struct gfn_to_hva_cache {
+ struct kvm_mmu_memory_cache {
+ 	int nobjs;
+ 	gfp_t gfp_zero;
++#ifdef CONFIG_ADDRESS_SPACE_ISOLATION
++	gfp_t gfp_asi;
++#endif
+ 	struct kmem_cache *kmem_cache;
+ 	void *objects[KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE];
  };
+diff --git a/kernel/cgroup/cgroup.c b/kernel/cgroup/cgroup.c
+index 729495e17363..79692dafd2be 100644
+--- a/kernel/cgroup/cgroup.c
++++ b/kernel/cgroup/cgroup.c
+@@ -1221,7 +1221,7 @@ static struct css_set *find_css_set(struct css_set *old_cset,
+ 	if (cset)
+ 		return cset;
  
--DECLARE_PER_CPU(struct kernel_stat, kstat);
--DECLARE_PER_CPU(struct kernel_cpustat, kernel_cpustat);
-+DECLARE_PER_CPU_ASI_NOT_SENSITIVE(struct kernel_stat, kstat);
-+DECLARE_PER_CPU_ASI_NOT_SENSITIVE(struct kernel_cpustat, kernel_cpustat);
+-	cset = kzalloc(sizeof(*cset), GFP_KERNEL);
++	cset = kzalloc(sizeof(*cset), GFP_KERNEL | __GFP_GLOBAL_NONSENSITIVE);
+ 	if (!cset)
+ 		return NULL;
  
- /* Must have preemption disabled for this to be meaningful. */
- #define kstat_this_cpu this_cpu_ptr(&kstat)
-diff --git a/include/linux/prandom.h b/include/linux/prandom.h
-index 056d31317e49..f02392ca6dc2 100644
---- a/include/linux/prandom.h
-+++ b/include/linux/prandom.h
-@@ -16,7 +16,7 @@ void prandom_bytes(void *buf, size_t nbytes);
- void prandom_seed(u32 seed);
- void prandom_reseed_late(void);
+@@ -5348,7 +5348,7 @@ static struct cgroup *cgroup_create(struct cgroup *parent, const char *name,
  
--DECLARE_PER_CPU(unsigned long, net_rand_noise);
-+DECLARE_PER_CPU_ASI_NOT_SENSITIVE(unsigned long, net_rand_noise);
+ 	/* allocate the cgroup and its ID, 0 is reserved for the root */
+ 	cgrp = kzalloc(struct_size(cgrp, ancestor_ids, (level + 1)),
+-		       GFP_KERNEL);
++		       GFP_KERNEL | __GFP_GLOBAL_NONSENSITIVE);
+ 	if (!cgrp)
+ 		return ERR_PTR(-ENOMEM);
  
- #define PRANDOM_ADD_NOISE(a, b, c, d) \
- 	prandom_u32_add_noise((unsigned long)(a), (unsigned long)(b), \
 diff --git a/kernel/events/core.c b/kernel/events/core.c
-index 6ea559b6e0f4..1914cc538cab 100644
+index 1914cc538cab..64eeb2c67d92 100644
 --- a/kernel/events/core.c
 +++ b/kernel/events/core.c
-@@ -1207,7 +1207,7 @@ void perf_pmu_enable(struct pmu *pmu)
- 		pmu->pmu_enable(pmu);
+@@ -4586,7 +4586,8 @@ alloc_perf_context(struct pmu *pmu, struct task_struct *task)
+ {
+ 	struct perf_event_context *ctx;
+ 
+-	ctx = kzalloc(sizeof(struct perf_event_context), GFP_KERNEL);
++	ctx = kzalloc(sizeof(struct perf_event_context),
++                      GFP_KERNEL | __GFP_GLOBAL_NONSENSITIVE);
+ 	if (!ctx)
+ 		return NULL;
+ 
+@@ -11062,7 +11063,8 @@ int perf_pmu_register(struct pmu *pmu, const char *name, int type)
+ 
+ 	mutex_lock(&pmus_lock);
+ 	ret = -ENOMEM;
+-	pmu->pmu_disable_count = alloc_percpu(int);
++	pmu->pmu_disable_count = alloc_percpu_gfp(int,
++                                        GFP_KERNEL | __GFP_GLOBAL_NONSENSITIVE);
+ 	if (!pmu->pmu_disable_count)
+ 		goto unlock;
+ 
+@@ -11112,7 +11114,8 @@ int perf_pmu_register(struct pmu *pmu, const char *name, int type)
+ 		goto got_cpu_context;
+ 
+ 	ret = -ENOMEM;
+-	pmu->pmu_cpu_context = alloc_percpu(struct perf_cpu_context);
++	pmu->pmu_cpu_context = alloc_percpu_gfp(struct perf_cpu_context,
++                                                GFP_KERNEL | __GFP_GLOBAL_NONSENSITIVE);
+ 	if (!pmu->pmu_cpu_context)
+ 		goto free_dev;
+ 
+@@ -11493,7 +11496,8 @@ perf_event_alloc(struct perf_event_attr *attr, int cpu,
+ 	}
+ 
+ 	node = (cpu >= 0) ? cpu_to_node(cpu) : -1;
+-	event = kmem_cache_alloc_node(perf_event_cache, GFP_KERNEL | __GFP_ZERO,
++	event = kmem_cache_alloc_node(perf_event_cache,
++                                      GFP_KERNEL | __GFP_ZERO | __GFP_GLOBAL_NONSENSITIVE,
+ 				      node);
+ 	if (!event)
+ 		return ERR_PTR(-ENOMEM);
+@@ -13378,7 +13382,8 @@ void __init perf_event_init(void)
+ 	ret = init_hw_breakpoint();
+ 	WARN(ret, "hw_breakpoint initialization failed with: %d", ret);
+ 
+-	perf_event_cache = KMEM_CACHE(perf_event, SLAB_PANIC);
++	perf_event_cache = KMEM_CACHE(perf_event,
++                                      SLAB_PANIC | SLAB_GLOBAL_NONSENSITIVE);
+ 
+ 	/*
+ 	 * Build time assertion that we keep the data_head at the intended
+diff --git a/kernel/exit.c b/kernel/exit.c
+index f702a6a63686..ab2749cf6887 100644
+--- a/kernel/exit.c
++++ b/kernel/exit.c
+@@ -768,6 +768,8 @@ void __noreturn do_exit(long code)
+ 	profile_task_exit(tsk);
+ 	kcov_task_exit(tsk);
+ 
++        /* TODO: (oweisse) unmap the stack from ASI */
++
+ 	coredump_task_exit(tsk);
+ 	ptrace_event(PTRACE_EVENT_EXIT, code);
+ 
+diff --git a/kernel/fork.c b/kernel/fork.c
+index d7f55de00947..cb147a72372d 100644
+--- a/kernel/fork.c
++++ b/kernel/fork.c
+@@ -168,6 +168,8 @@ static struct kmem_cache *task_struct_cachep;
+ 
+ static inline struct task_struct *alloc_task_struct_node(int node)
+ {
++        /* TODO: Figure how to allocate this propperly to ASI process map. This
++         * should be mapped in a __GFP_LOCAL_NONSENSITIVE slab. */
+ 	return kmem_cache_alloc_node(task_struct_cachep, GFP_KERNEL, node);
  }
  
--static DEFINE_PER_CPU(struct list_head, active_ctx_list);
-+static DEFINE_PER_CPU_ASI_NOT_SENSITIVE(struct list_head, active_ctx_list);
+@@ -214,6 +216,7 @@ static int free_vm_stack_cache(unsigned int cpu)
  
- /*
-  * perf_event_ctx_activate(), perf_event_ctx_deactivate(), and
-@@ -4007,8 +4007,8 @@ do {					\
- 	return div64_u64(dividend, divisor);
+ static unsigned long *alloc_thread_stack_node(struct task_struct *tsk, int node)
+ {
++  /* TODO: (oweisse) Add annotation to map the stack into ASI */
+ #ifdef CONFIG_VMAP_STACK
+ 	void *stack;
+ 	int i;
+@@ -242,9 +245,13 @@ static unsigned long *alloc_thread_stack_node(struct task_struct *tsk, int node)
+ 	 * so memcg accounting is performed manually on assigning/releasing
+ 	 * stacks to tasks. Drop __GFP_ACCOUNT.
+ 	 */
++        /* ASI: We intentionally don't pass VM_LOCAL_NONSENSITIVE nor
++         * __GFP_LOCAL_NONSENSITIVE since we don't have an mm yet. Later on we'll
++         * map the stack into the mm asi map. That being said, we do care about
++         * the stack weing allocaed below VMALLOC_LOCAL_NONSENSITIVE_END */
+ 	stack = __vmalloc_node_range(THREAD_SIZE, THREAD_ALIGN,
+-				     VMALLOC_START, VMALLOC_END,
+-				     THREADINFO_GFP & ~__GFP_ACCOUNT,
++				     VMALLOC_START, VMALLOC_LOCAL_NONSENSITIVE_END,
++				     (THREADINFO_GFP & (~__GFP_ACCOUNT)),
+ 				     PAGE_KERNEL,
+ 				     0, node, __builtin_return_address(0));
+ 
+@@ -346,7 +353,8 @@ struct vm_area_struct *vm_area_alloc(struct mm_struct *mm)
+ {
+ 	struct vm_area_struct *vma;
+ 
+-	vma = kmem_cache_alloc(vm_area_cachep, GFP_KERNEL);
++	vma = kmem_cache_alloc(vm_area_cachep,
++                               GFP_KERNEL);
+ 	if (vma)
+ 		vma_init(vma, mm);
+ 	return vma;
+@@ -683,6 +691,8 @@ static void check_mm(struct mm_struct *mm)
+ #endif
  }
  
--static DEFINE_PER_CPU(int, perf_throttled_count);
--static DEFINE_PER_CPU(u64, perf_throttled_seq);
-+static DEFINE_PER_CPU_ASI_NOT_SENSITIVE(int, perf_throttled_count);
-+static DEFINE_PER_CPU_ASI_NOT_SENSITIVE(u64, perf_throttled_seq);
++/* TODO: (oweisse) ASI: we need to allocate mm such that it will only be visible
++ * within itself. */
+ #define allocate_mm()	(kmem_cache_alloc(mm_cachep, GFP_KERNEL))
+ #define free_mm(mm)	(kmem_cache_free(mm_cachep, (mm)))
  
- static void perf_adjust_period(struct perf_event *event, u64 nsec, u64 count, bool disable)
- {
-diff --git a/kernel/irq_work.c b/kernel/irq_work.c
-index f7df715ec28e..10df3577c733 100644
---- a/kernel/irq_work.c
-+++ b/kernel/irq_work.c
-@@ -22,9 +22,9 @@
- #include <asm/processor.h>
- #include <linux/kasan.h>
+@@ -823,9 +833,12 @@ void __init fork_init(void)
  
--static DEFINE_PER_CPU(struct llist_head, raised_list);
--static DEFINE_PER_CPU(struct llist_head, lazy_list);
--static DEFINE_PER_CPU(struct task_struct *, irq_workd);
-+static DEFINE_PER_CPU_ASI_NOT_SENSITIVE(struct llist_head, raised_list);
-+static DEFINE_PER_CPU_ASI_NOT_SENSITIVE(struct llist_head, lazy_list);
-+static DEFINE_PER_CPU_ASI_NOT_SENSITIVE(struct task_struct *, irq_workd);
+ 	/* create a slab on which task_structs can be allocated */
+ 	task_struct_whitelist(&useroffset, &usersize);
++        /* TODO: (oweisse) for the time being this cache is shared among all tasks. We
++         * mark it SLAB_NONSENSITIVE so task_struct can be accessed withing ASI.
++         * A final secure solution should have this memory LOCAL, not GLOBAL.*/
+ 	task_struct_cachep = kmem_cache_create_usercopy("task_struct",
+ 			arch_task_struct_size, align,
+-			SLAB_PANIC|SLAB_ACCOUNT,
++			SLAB_PANIC|SLAB_ACCOUNT|SLAB_GLOBAL_NONSENSITIVE,
+ 			useroffset, usersize, NULL);
+ #endif
  
- static void wake_irq_workd(void)
- {
-diff --git a/kernel/rcu/tree.c b/kernel/rcu/tree.c
-index 284d2722cf0c..aee2b6994bc2 100644
---- a/kernel/rcu/tree.c
-+++ b/kernel/rcu/tree.c
-@@ -74,7 +74,7 @@
+@@ -1601,6 +1614,7 @@ static int copy_sighand(unsigned long clone_flags, struct task_struct *tsk)
+ 		refcount_inc(&current->sighand->count);
+ 		return 0;
+ 	}
++        /* TODO: (oweisse) ASI replace with proper ASI allcation. */
+ 	sig = kmem_cache_alloc(sighand_cachep, GFP_KERNEL);
+ 	RCU_INIT_POINTER(tsk->sighand, sig);
+ 	if (!sig)
+@@ -1649,6 +1663,8 @@ static int copy_signal(unsigned long clone_flags, struct task_struct *tsk)
+ 	if (clone_flags & CLONE_THREAD)
+ 		return 0;
  
- /* Data structures. */
++        /* TODO: (oweisse) figure out how to properly allocate this in ASI for local
++         * process */
+ 	sig = kmem_cache_zalloc(signal_cachep, GFP_KERNEL);
+ 	tsk->signal = sig;
+ 	if (!sig)
+@@ -2923,7 +2939,8 @@ void __init proc_caches_init(void)
+ 			SLAB_ACCOUNT, sighand_ctor);
+ 	signal_cachep = kmem_cache_create("signal_cache",
+ 			sizeof(struct signal_struct), 0,
+-			SLAB_HWCACHE_ALIGN|SLAB_PANIC|SLAB_ACCOUNT,
++			SLAB_HWCACHE_ALIGN|SLAB_PANIC|SLAB_ACCOUNT|
++                        SLAB_GLOBAL_NONSENSITIVE,
+ 			NULL);
+ 	files_cachep = kmem_cache_create("files_cache",
+ 			sizeof(struct files_struct), 0,
+@@ -2941,13 +2958,18 @@ void __init proc_caches_init(void)
+ 	 */
+ 	mm_size = sizeof(struct mm_struct) + cpumask_size();
  
--static DEFINE_PER_CPU_SHARED_ALIGNED(struct rcu_data, rcu_data) = {
-+static DEFINE_PER_CPU_SHARED_ALIGNED_ASI_NOT_SENSITIVE(struct rcu_data, rcu_data) = {
- 	.dynticks_nesting = 1,
- 	.dynticks_nmi_nesting = DYNTICK_IRQ_NONIDLE,
- 	.dynticks = ATOMIC_INIT(1),
++        /* TODO: (oweisse) ASI replace with proper ASI allcation. */
+ 	mm_cachep = kmem_cache_create_usercopy("mm_struct",
+ 			mm_size, ARCH_MIN_MMSTRUCT_ALIGN,
+-			SLAB_HWCACHE_ALIGN|SLAB_PANIC|SLAB_ACCOUNT,
++			SLAB_HWCACHE_ALIGN|SLAB_PANIC|SLAB_ACCOUNT
++                        |SLAB_GLOBAL_NONSENSITIVE,
+ 			offsetof(struct mm_struct, saved_auxv),
+ 			sizeof_field(struct mm_struct, saved_auxv),
+ 			NULL);
+-	vm_area_cachep = KMEM_CACHE(vm_area_struct, SLAB_PANIC|SLAB_ACCOUNT);
++
++        /* TODO: (oweisse) ASI replace with proper ASI allcation. */
++	vm_area_cachep = KMEM_CACHE(vm_area_struct,
++                                    SLAB_PANIC|SLAB_ACCOUNT|SLAB_LOCAL_NONSENSITIVE);
+ 	mmap_init();
+ 	nsproxy_cache_init();
+ }
+diff --git a/kernel/rcu/srcutree.c b/kernel/rcu/srcutree.c
+index 6833d8887181..553221503803 100644
+--- a/kernel/rcu/srcutree.c
++++ b/kernel/rcu/srcutree.c
+@@ -171,7 +171,8 @@ static int init_srcu_struct_fields(struct srcu_struct *ssp, bool is_static)
+ 	atomic_set(&ssp->srcu_barrier_cpu_cnt, 0);
+ 	INIT_DELAYED_WORK(&ssp->work, process_srcu);
+ 	if (!is_static)
+-		ssp->sda = alloc_percpu(struct srcu_data);
++		ssp->sda = alloc_percpu_gfp(struct srcu_data,
++					GFP_KERNEL | __GFP_GLOBAL_NONSENSITIVE);
+ 	if (!ssp->sda)
+ 		return -ENOMEM;
+ 	init_srcu_struct_nodes(ssp);
 diff --git a/kernel/sched/core.c b/kernel/sched/core.c
-index e1c08ff4130e..7c96f0001c7f 100644
+index 7c96f0001c7f..7515f0612f5c 100644
 --- a/kernel/sched/core.c
 +++ b/kernel/sched/core.c
-@@ -43,7 +43,7 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(sched_util_est_cfs_tp);
- EXPORT_TRACEPOINT_SYMBOL_GPL(sched_util_est_se_tp);
- EXPORT_TRACEPOINT_SYMBOL_GPL(sched_update_nr_running_tp);
+@@ -9329,7 +9329,8 @@ void __init sched_init(void)
+ #endif /* CONFIG_RT_GROUP_SCHED */
  
--DEFINE_PER_CPU_SHARED_ALIGNED(struct rq, runqueues);
-+DEFINE_PER_CPU_SHARED_ALIGNED_ASI_NOT_SENSITIVE(struct rq, runqueues);
+ #ifdef CONFIG_CGROUP_SCHED
+-	task_group_cache = KMEM_CACHE(task_group, 0);
++        /* TODO: (oweisse) add SLAB_NONSENSITIVE */
++	task_group_cache = KMEM_CACHE(task_group, SLAB_GLOBAL_NONSENSITIVE);
  
- #ifdef CONFIG_SCHED_DEBUG
- /*
-@@ -5104,8 +5104,8 @@ void sched_exec(void)
+ 	list_add(&root_task_group.list, &task_groups);
+ 	INIT_LIST_HEAD(&root_task_group.children);
+@@ -9741,7 +9742,8 @@ struct task_group *sched_create_group(struct task_group *parent)
+ {
+ 	struct task_group *tg;
  
- #endif
+-	tg = kmem_cache_alloc(task_group_cache, GFP_KERNEL | __GFP_ZERO);
++	tg = kmem_cache_alloc(task_group_cache,
++                              GFP_KERNEL | __GFP_ZERO | __GFP_GLOBAL_NONSENSITIVE);
+ 	if (!tg)
+ 		return ERR_PTR(-ENOMEM);
  
--DEFINE_PER_CPU(struct kernel_stat, kstat);
--DEFINE_PER_CPU(struct kernel_cpustat, kernel_cpustat);
-+DEFINE_PER_CPU_ASI_NOT_SENSITIVE(struct kernel_stat, kstat);
-+DEFINE_PER_CPU_ASI_NOT_SENSITIVE(struct kernel_cpustat, kernel_cpustat);
+diff --git a/kernel/sched/cpuacct.c b/kernel/sched/cpuacct.c
+index 6e3da149125c..e8b0b29b4d37 100644
+--- a/kernel/sched/cpuacct.c
++++ b/kernel/sched/cpuacct.c
+@@ -64,15 +64,17 @@ cpuacct_css_alloc(struct cgroup_subsys_state *parent_css)
+ 	if (!parent_css)
+ 		return &root_cpuacct.css;
  
- EXPORT_PER_CPU_SYMBOL(kstat);
- EXPORT_PER_CPU_SYMBOL(kernel_cpustat);
-diff --git a/kernel/sched/cpufreq.c b/kernel/sched/cpufreq.c
-index 7c2fe50fd76d..c55a47f8e963 100644
---- a/kernel/sched/cpufreq.c
-+++ b/kernel/sched/cpufreq.c
-@@ -9,7 +9,8 @@
+-	ca = kzalloc(sizeof(*ca), GFP_KERNEL);
++	ca = kzalloc(sizeof(*ca), GFP_KERNEL | __GFP_GLOBAL_NONSENSITIVE);
+ 	if (!ca)
+ 		goto out;
  
- #include "sched.h"
+-	ca->cpuusage = alloc_percpu(struct cpuacct_usage);
++	ca->cpuusage = alloc_percpu_gfp(struct cpuacct_usage,
++                                        GFP_KERNEL | __GFP_GLOBAL_NONSENSITIVE);
+ 	if (!ca->cpuusage)
+ 		goto out_free_ca;
  
--DEFINE_PER_CPU(struct update_util_data __rcu *, cpufreq_update_util_data);
-+DEFINE_PER_CPU_ASI_NOT_SENSITIVE(struct update_util_data __rcu *,
-+                                 cpufreq_update_util_data);
+-	ca->cpustat = alloc_percpu(struct kernel_cpustat);
++	ca->cpustat = alloc_percpu_gfp(struct kernel_cpustat,
++                                   GFP_KERNEL | __GFP_GLOBAL_NONSENSITIVE);
+ 	if (!ca->cpustat)
+ 		goto out_free_cpuusage;
  
- /**
-  * cpufreq_add_update_util_hook - Populate the CPU's update_util_data pointer.
-diff --git a/kernel/sched/cputime.c b/kernel/sched/cputime.c
-index 623b5feb142a..d3ad13308889 100644
---- a/kernel/sched/cputime.c
-+++ b/kernel/sched/cputime.c
-@@ -17,7 +17,7 @@
-  * task when irq is in progress while we read rq->clock. That is a worthy
-  * compromise in place of having locks on each irq in account_system_time.
-  */
--DEFINE_PER_CPU(struct irqtime, cpu_irqtime);
-+DEFINE_PER_CPU_ASI_NOT_SENSITIVE(struct irqtime, cpu_irqtime);
+diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
+index dc9b6133b059..97d70f1eb2c5 100644
+--- a/kernel/sched/fair.c
++++ b/kernel/sched/fair.c
+@@ -11486,7 +11486,8 @@ int alloc_fair_sched_group(struct task_group *tg, struct task_group *parent)
  
- static int __asi_not_sensitive sched_clock_irqtime;
+ 	for_each_possible_cpu(i) {
+ 		cfs_rq = kzalloc_node(sizeof(struct cfs_rq),
+-				      GFP_KERNEL, cpu_to_node(i));
++				      GFP_KERNEL | __GFP_GLOBAL_NONSENSITIVE,
++                                      cpu_to_node(i));
+ 		if (!cfs_rq)
+ 			goto err;
  
-diff --git a/kernel/sched/sched.h b/kernel/sched/sched.h
-index 517c70a29a57..4188c1a570db 100644
---- a/kernel/sched/sched.h
-+++ b/kernel/sched/sched.h
-@@ -1360,7 +1360,7 @@ static inline void update_idle_core(struct rq *rq)
- static inline void update_idle_core(struct rq *rq) { }
- #endif
- 
--DECLARE_PER_CPU_SHARED_ALIGNED(struct rq, runqueues);
-+DECLARE_PER_CPU_SHARED_ALIGNED_ASI_NOT_SENSITIVE(struct rq, runqueues);
- 
- #define cpu_rq(cpu)		(&per_cpu(runqueues, (cpu)))
- #define this_rq()		this_cpu_ptr(&runqueues)
-@@ -1760,13 +1760,13 @@ static inline struct sched_domain *lowest_flag_domain(int cpu, int flag)
- 	return sd;
- }
- 
--DECLARE_PER_CPU(struct sched_domain __rcu *, sd_llc);
--DECLARE_PER_CPU(int, sd_llc_size);
--DECLARE_PER_CPU(int, sd_llc_id);
--DECLARE_PER_CPU(struct sched_domain_shared __rcu *, sd_llc_shared);
--DECLARE_PER_CPU(struct sched_domain __rcu *, sd_numa);
--DECLARE_PER_CPU(struct sched_domain __rcu *, sd_asym_packing);
--DECLARE_PER_CPU(struct sched_domain __rcu *, sd_asym_cpucapacity);
-+DECLARE_PER_CPU_ASI_NOT_SENSITIVE(struct sched_domain __rcu *, sd_llc);
-+DECLARE_PER_CPU_ASI_NOT_SENSITIVE(int, sd_llc_size);
-+DECLARE_PER_CPU_ASI_NOT_SENSITIVE(int, sd_llc_id);
-+DECLARE_PER_CPU_ASI_NOT_SENSITIVE(struct sched_domain_shared __rcu *, sd_llc_shared);
-+DECLARE_PER_CPU_ASI_NOT_SENSITIVE(struct sched_domain __rcu *, sd_numa);
-+DECLARE_PER_CPU_ASI_NOT_SENSITIVE(struct sched_domain __rcu *, sd_asym_packing);
-+DECLARE_PER_CPU_ASI_NOT_SENSITIVE(struct sched_domain __rcu *, sd_asym_cpucapacity);
- extern struct static_key_false sched_asym_cpucapacity;
- 
- struct sched_group_capacity {
-@@ -2753,7 +2753,7 @@ struct irqtime {
- 	struct u64_stats_sync	sync;
- };
- 
--DECLARE_PER_CPU(struct irqtime, cpu_irqtime);
-+DECLARE_PER_CPU_ASI_NOT_SENSITIVE(struct irqtime, cpu_irqtime);
- 
- /*
-  * Returns the irqtime minus the softirq time computed by ksoftirqd.
-@@ -2776,7 +2776,8 @@ static inline u64 irq_time_read(int cpu)
- #endif /* CONFIG_IRQ_TIME_ACCOUNTING */
- 
- #ifdef CONFIG_CPU_FREQ
--DECLARE_PER_CPU(struct update_util_data __rcu *, cpufreq_update_util_data);
-+DECLARE_PER_CPU_ASI_NOT_SENSITIVE(struct update_util_data __rcu *,
-+                                  cpufreq_update_util_data);
- 
- /**
-  * cpufreq_update_util - Take a note about CPU utilization changes.
 diff --git a/kernel/sched/topology.c b/kernel/sched/topology.c
-index d201a7052a29..1dcea6a6133e 100644
+index 1dcea6a6133e..2ad96c78306c 100644
 --- a/kernel/sched/topology.c
 +++ b/kernel/sched/topology.c
-@@ -641,13 +641,13 @@ static void destroy_sched_domains(struct sched_domain *sd)
-  * the cpumask of the domain), this allows us to quickly tell if
-  * two CPUs are in the same cache domain, see cpus_share_cache().
-  */
--DEFINE_PER_CPU(struct sched_domain __rcu *, sd_llc);
--DEFINE_PER_CPU(int, sd_llc_size);
--DEFINE_PER_CPU(int, sd_llc_id);
--DEFINE_PER_CPU(struct sched_domain_shared __rcu *, sd_llc_shared);
--DEFINE_PER_CPU(struct sched_domain __rcu *, sd_numa);
--DEFINE_PER_CPU(struct sched_domain __rcu *, sd_asym_packing);
--DEFINE_PER_CPU(struct sched_domain __rcu *, sd_asym_cpucapacity);
-+DEFINE_PER_CPU_ASI_NOT_SENSITIVE(struct sched_domain __rcu *, sd_llc);
-+DEFINE_PER_CPU_ASI_NOT_SENSITIVE(int, sd_llc_size);
-+DEFINE_PER_CPU_ASI_NOT_SENSITIVE(int, sd_llc_id);
-+DEFINE_PER_CPU_ASI_NOT_SENSITIVE(struct sched_domain_shared __rcu *, sd_llc_shared);
-+DEFINE_PER_CPU_ASI_NOT_SENSITIVE(struct sched_domain __rcu *, sd_numa);
-+DEFINE_PER_CPU_ASI_NOT_SENSITIVE(struct sched_domain __rcu *, sd_asym_packing);
-+DEFINE_PER_CPU_ASI_NOT_SENSITIVE(struct sched_domain __rcu *, sd_asym_cpucapacity);
- DEFINE_STATIC_KEY_FALSE(sched_asym_cpucapacity);
+@@ -569,7 +569,7 @@ static struct root_domain *alloc_rootdomain(void)
+ {
+ 	struct root_domain *rd;
  
- static void update_top_cache_domain(int cpu)
+-	rd = kzalloc(sizeof(*rd), GFP_KERNEL);
++	rd = kzalloc(sizeof(*rd), GFP_KERNEL | __GFP_GLOBAL_NONSENSITIVE);
+ 	if (!rd)
+ 		return NULL;
+ 
+@@ -2044,21 +2044,24 @@ static int __sdt_alloc(const struct cpumask *cpu_map)
+ 			struct sched_group_capacity *sgc;
+ 
+ 			sd = kzalloc_node(sizeof(struct sched_domain) + cpumask_size(),
+-					GFP_KERNEL, cpu_to_node(j));
++					GFP_KERNEL | __GFP_GLOBAL_NONSENSITIVE,
++                                        cpu_to_node(j));
+ 			if (!sd)
+ 				return -ENOMEM;
+ 
+ 			*per_cpu_ptr(sdd->sd, j) = sd;
+ 
+ 			sds = kzalloc_node(sizeof(struct sched_domain_shared),
+-					GFP_KERNEL, cpu_to_node(j));
++					GFP_KERNEL | __GFP_GLOBAL_NONSENSITIVE,
++                                        cpu_to_node(j));
+ 			if (!sds)
+ 				return -ENOMEM;
+ 
+ 			*per_cpu_ptr(sdd->sds, j) = sds;
+ 
+ 			sg = kzalloc_node(sizeof(struct sched_group) + cpumask_size(),
+-					GFP_KERNEL, cpu_to_node(j));
++					GFP_KERNEL | __GFP_GLOBAL_NONSENSITIVE,
++                                        cpu_to_node(j));
+ 			if (!sg)
+ 				return -ENOMEM;
+ 
+@@ -2067,7 +2070,8 @@ static int __sdt_alloc(const struct cpumask *cpu_map)
+ 			*per_cpu_ptr(sdd->sg, j) = sg;
+ 
+ 			sgc = kzalloc_node(sizeof(struct sched_group_capacity) + cpumask_size(),
+-					GFP_KERNEL, cpu_to_node(j));
++					GFP_KERNEL | __GFP_GLOBAL_NONSENSITIVE,
++                                        cpu_to_node(j));
+ 			if (!sgc)
+ 				return -ENOMEM;
+ 
 diff --git a/kernel/smp.c b/kernel/smp.c
-index c51fd981a4a9..3c1b328f0a09 100644
+index 3c1b328f0a09..db9ab5a58e2c 100644
 --- a/kernel/smp.c
 +++ b/kernel/smp.c
-@@ -92,9 +92,10 @@ struct call_function_data {
- 	cpumask_var_t		cpumask_ipi;
- };
+@@ -103,15 +103,18 @@ int smpcfd_prepare_cpu(unsigned int cpu)
+ {
+ 	struct call_function_data *cfd = &per_cpu(cfd_data, cpu);
  
--static DEFINE_PER_CPU_ALIGNED(struct call_function_data, cfd_data);
-+static DEFINE_PER_CPU_ALIGNED_ASI_NOT_SENSITIVE(struct call_function_data, cfd_data);
+-	if (!zalloc_cpumask_var_node(&cfd->cpumask, GFP_KERNEL,
++	if (!zalloc_cpumask_var_node(&cfd->cpumask,
++				     GFP_KERNEL | __GFP_GLOBAL_NONSENSITIVE,
+ 				     cpu_to_node(cpu)))
+ 		return -ENOMEM;
+-	if (!zalloc_cpumask_var_node(&cfd->cpumask_ipi, GFP_KERNEL,
++	if (!zalloc_cpumask_var_node(&cfd->cpumask_ipi,
++				     GFP_KERNEL | __GFP_GLOBAL_NONSENSITIVE,
+ 				     cpu_to_node(cpu))) {
+ 		free_cpumask_var(cfd->cpumask);
+ 		return -ENOMEM;
+ 	}
+-	cfd->pcpu = alloc_percpu(struct cfd_percpu);
++	cfd->pcpu = alloc_percpu_gfp(struct cfd_percpu,
++				     GFP_KERNEL | __GFP_GLOBAL_NONSENSITIVE);
+ 	if (!cfd->pcpu) {
+ 		free_cpumask_var(cfd->cpumask);
+ 		free_cpumask_var(cfd->cpumask_ipi);
+@@ -179,10 +182,10 @@ static int __init csdlock_debug(char *str)
+ }
+ early_param("csdlock_debug", csdlock_debug);
  
--static DEFINE_PER_CPU_SHARED_ALIGNED(struct llist_head, call_single_queue);
-+static DEFINE_PER_CPU_SHARED_ALIGNED_ASI_NOT_SENSITIVE(struct llist_head,
-+                                                       call_single_queue);
+-static DEFINE_PER_CPU(call_single_data_t *, cur_csd);
+-static DEFINE_PER_CPU(smp_call_func_t, cur_csd_func);
+-static DEFINE_PER_CPU(void *, cur_csd_info);
+-static DEFINE_PER_CPU(struct cfd_seq_local, cfd_seq_local);
++static DEFINE_PER_CPU_ASI_NOT_SENSITIVE(call_single_data_t *, cur_csd);
++static DEFINE_PER_CPU_ASI_NOT_SENSITIVE(smp_call_func_t, cur_csd_func);
++static DEFINE_PER_CPU_ASI_NOT_SENSITIVE(void *, cur_csd_info);
++static DEFINE_PER_CPU_ASI_NOT_SENSITIVE(struct cfd_seq_local, cfd_seq_local);
  
- static void flush_smp_call_function_queue(bool warn_cpu_offline);
+ #define CSD_LOCK_TIMEOUT (5ULL * NSEC_PER_SEC)
+ static atomic_t csd_bug_count = ATOMIC_INIT(0);
+diff --git a/kernel/trace/ring_buffer.c b/kernel/trace/ring_buffer.c
+index 2699e9e562b1..9ad7d4569d4b 100644
+--- a/kernel/trace/ring_buffer.c
++++ b/kernel/trace/ring_buffer.c
+@@ -1539,7 +1539,8 @@ static int __rb_allocate_pages(struct ring_buffer_per_cpu *cpu_buffer,
+ 	 * gracefully without invoking oom-killer and the system is not
+ 	 * destabilized.
+ 	 */
+-	mflags = GFP_KERNEL | __GFP_RETRY_MAYFAIL;
++        /* TODO(oweisse): this is a hack to enable ASI tracing. */
++	mflags = GFP_KERNEL | __GFP_RETRY_MAYFAIL | __GFP_GLOBAL_NONSENSITIVE;
  
-@@ -464,7 +465,7 @@ static __always_inline void csd_unlock(struct __call_single_data *csd)
- 	smp_store_release(&csd->node.u_flags, 0);
+ 	/*
+ 	 * If a user thread allocates too much, and si_mem_available()
+@@ -1718,7 +1719,7 @@ struct trace_buffer *__ring_buffer_alloc(unsigned long size, unsigned flags,
+ 
+ 	/* keep it in its own cache line */
+ 	buffer = kzalloc(ALIGN(sizeof(*buffer), cache_line_size()),
+-			 GFP_KERNEL);
++			 GFP_KERNEL | __GFP_GLOBAL_NONSENSITIVE);
+ 	if (!buffer)
+ 		return NULL;
+ 
+diff --git a/kernel/tracepoint.c b/kernel/tracepoint.c
+index 64ea283f2f86..0ae6c38ee121 100644
+--- a/kernel/tracepoint.c
++++ b/kernel/tracepoint.c
+@@ -107,7 +107,7 @@ static void tp_stub_func(void)
+ static inline void *allocate_probes(int count)
+ {
+ 	struct tp_probes *p  = kmalloc(struct_size(p, probes, count),
+-				       GFP_KERNEL);
++				       GFP_KERNEL | __GFP_GLOBAL_NONSENSITIVE);
+ 	return p == NULL ? NULL : p->probes;
  }
  
--static DEFINE_PER_CPU_SHARED_ALIGNED(call_single_data_t, csd_data);
-+static DEFINE_PER_CPU_SHARED_ALIGNED_ASI_NOT_SENSITIVE(call_single_data_t, csd_data);
+diff --git a/lib/radix-tree.c b/lib/radix-tree.c
+index b3afafe46fff..c7d3342a7b30 100644
+--- a/lib/radix-tree.c
++++ b/lib/radix-tree.c
+@@ -248,8 +248,7 @@ radix_tree_node_alloc(gfp_t gfp_mask, struct radix_tree_node *parent,
+ 		 * cache first for the new node to get accounted to the memory
+ 		 * cgroup.
+ 		 */
+-		ret = kmem_cache_alloc(radix_tree_node_cachep,
+-				       gfp_mask | __GFP_NOWARN);
++		ret = kmem_cache_alloc(radix_tree_node_cachep, gfp_mask | __GFP_NOWARN);
+ 		if (ret)
+ 			goto out;
  
- void __smp_call_single_queue(int cpu, struct llist_node *node)
+@@ -1597,9 +1596,10 @@ void __init radix_tree_init(void)
+ 	BUILD_BUG_ON(RADIX_TREE_MAX_TAGS + __GFP_BITS_SHIFT > 32);
+ 	BUILD_BUG_ON(ROOT_IS_IDR & ~GFP_ZONEMASK);
+ 	BUILD_BUG_ON(XA_CHUNK_SIZE > 255);
++        /*TODO: (oweisse) ASI add SLAB_NONSENSITIVE */
+ 	radix_tree_node_cachep = kmem_cache_create("radix_tree_node",
+ 			sizeof(struct radix_tree_node), 0,
+-			SLAB_PANIC | SLAB_RECLAIM_ACCOUNT,
++			SLAB_PANIC | SLAB_RECLAIM_ACCOUNT | SLAB_GLOBAL_NONSENSITIVE,
+ 			radix_tree_node_ctor);
+ 	ret = cpuhp_setup_state_nocalls(CPUHP_RADIX_DEAD, "lib/radix:dead",
+ 					NULL, radix_tree_cpu_dead);
+diff --git a/mm/memcontrol.c b/mm/memcontrol.c
+index a66d6b222ecf..fbc42e96b157 100644
+--- a/mm/memcontrol.c
++++ b/mm/memcontrol.c
+@@ -5143,20 +5143,21 @@ static struct mem_cgroup *mem_cgroup_alloc(void)
+ 	size = sizeof(struct mem_cgroup);
+ 	size += nr_node_ids * sizeof(struct mem_cgroup_per_node *);
+ 
+-	memcg = kzalloc(size, GFP_KERNEL);
++	memcg = kzalloc(size, GFP_KERNEL | __GFP_GLOBAL_NONSENSITIVE);
+ 	if (!memcg)
+ 		return ERR_PTR(error);
+ 
+ 	memcg->id.id = idr_alloc(&mem_cgroup_idr, NULL,
+ 				 1, MEM_CGROUP_ID_MAX,
+-				 GFP_KERNEL);
++				 GFP_KERNEL | __GFP_GLOBAL_NONSENSITIVE);
+ 	if (memcg->id.id < 0) {
+ 		error = memcg->id.id;
+ 		goto fail;
+ 	}
+ 
+ 	memcg->vmstats_percpu = alloc_percpu_gfp(struct memcg_vmstats_percpu,
+-						 GFP_KERNEL_ACCOUNT);
++						 GFP_KERNEL_ACCOUNT |
++                                                 __GFP_GLOBAL_NONSENSITIVE);
+ 	if (!memcg->vmstats_percpu)
+ 		goto fail;
+ 
+diff --git a/mm/util.c b/mm/util.c
+index 741ba32a43ac..0a49e15a0765 100644
+--- a/mm/util.c
++++ b/mm/util.c
+@@ -196,7 +196,8 @@ void *vmemdup_user(const void __user *src, size_t len)
  {
-diff --git a/kernel/softirq.c b/kernel/softirq.c
-index c462b7fab4d3..d2660a59feab 100644
---- a/kernel/softirq.c
-+++ b/kernel/softirq.c
-@@ -59,7 +59,7 @@ EXPORT_PER_CPU_SYMBOL(irq_stat);
- static struct softirq_action softirq_vec[NR_SOFTIRQS]
- __asi_not_sensitive ____cacheline_aligned;
+ 	void *p;
  
--DEFINE_PER_CPU(struct task_struct *, ksoftirqd);
-+DEFINE_PER_CPU_ASI_NOT_SENSITIVE(struct task_struct *, ksoftirqd);
+-	p = kvmalloc(len, GFP_USER);
++        /* TODO(oweisse): is this secure? */
++	p = kvmalloc(len, GFP_USER | __GFP_LOCAL_NONSENSITIVE);
+ 	if (!p)
+ 		return ERR_PTR(-ENOMEM);
  
- const char * const softirq_to_name[NR_SOFTIRQS] = {
- 	"HI", "TIMER", "NET_TX", "NET_RX", "BLOCK", "IRQ_POLL",
-diff --git a/kernel/time/hrtimer.c b/kernel/time/hrtimer.c
-index 8b176f5c01f2..74cfc89a17c4 100644
---- a/kernel/time/hrtimer.c
-+++ b/kernel/time/hrtimer.c
-@@ -65,7 +65,7 @@
-  * to reach a base using a clockid, hrtimer_clockid_to_base()
-  * is used to convert from clockid to the proper hrtimer_base_type.
-  */
--DEFINE_PER_CPU(struct hrtimer_cpu_base, hrtimer_bases) =
-+DEFINE_PER_CPU_ASI_NOT_SENSITIVE(struct hrtimer_cpu_base, hrtimer_bases) =
+diff --git a/mm/vmalloc.c b/mm/vmalloc.c
+index a89866a926f6..659560f286b0 100644
+--- a/mm/vmalloc.c
++++ b/mm/vmalloc.c
+@@ -3309,7 +3309,8 @@ EXPORT_SYMBOL(vzalloc);
+ void *vmalloc_user(unsigned long size)
  {
- 	.lock = __RAW_SPIN_LOCK_UNLOCKED(hrtimer_bases.lock),
- 	.clock_base =
-diff --git a/kernel/time/tick-common.c b/kernel/time/tick-common.c
-index cbe75661ca74..67180cb44394 100644
---- a/kernel/time/tick-common.c
-+++ b/kernel/time/tick-common.c
-@@ -25,7 +25,7 @@
- /*
-  * Tick devices
-  */
--DEFINE_PER_CPU(struct tick_device, tick_cpu_device);
-+DEFINE_PER_CPU_ASI_NOT_SENSITIVE(struct tick_device, tick_cpu_device);
- /*
-  * Tick next event: keeps track of the tick time. It's updated by the
-  * CPU which handles the tick and protected by jiffies_lock. There is
-diff --git a/kernel/time/tick-internal.h b/kernel/time/tick-internal.h
-index ed7e2a18060a..6961318d41b7 100644
---- a/kernel/time/tick-internal.h
-+++ b/kernel/time/tick-internal.h
-@@ -13,7 +13,7 @@
- # define TICK_DO_TIMER_NONE	-1
- # define TICK_DO_TIMER_BOOT	-2
+ 	return __vmalloc_node_range(size, SHMLBA,  VMALLOC_START, VMALLOC_END,
+-				    GFP_KERNEL | __GFP_ZERO, PAGE_KERNEL,
++				    GFP_KERNEL | __GFP_ZERO
++                                    | __GFP_LOCAL_NONSENSITIVE, PAGE_KERNEL,
+ 				    VM_USERMAP, NUMA_NO_NODE,
+ 				    __builtin_return_address(0));
+ }
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index 909db87d7383..ce8c331386fb 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -404,7 +404,7 @@ struct sk_buff *__alloc_skb(unsigned int size, gfp_t gfp_mask,
+ 		? skbuff_fclone_cache : skbuff_head_cache;
  
--DECLARE_PER_CPU(struct tick_device, tick_cpu_device);
-+DECLARE_PER_CPU_ASI_NOT_SENSITIVE(struct tick_device, tick_cpu_device);
- extern ktime_t tick_next_period;
- extern int tick_do_timer_cpu;
+ 	if (sk_memalloc_socks() && (flags & SKB_ALLOC_RX))
+-		gfp_mask |= __GFP_MEMALLOC;
++		gfp_mask |= __GFP_MEMALLOC | __GFP_GLOBAL_NONSENSITIVE;
  
-@@ -161,7 +161,7 @@ static inline void timers_update_nohz(void) { }
- #define tick_nohz_active (0)
- #endif
- 
--DECLARE_PER_CPU(struct hrtimer_cpu_base, hrtimer_bases);
-+DECLARE_PER_CPU_ASI_NOT_SENSITIVE(struct hrtimer_cpu_base, hrtimer_bases);
- 
- extern u64 get_next_timer_interrupt(unsigned long basej, u64 basem);
- void timer_clear_idle(void);
-diff --git a/kernel/time/tick-sched.c b/kernel/time/tick-sched.c
-index c23fecbb68c2..afd393b85577 100644
---- a/kernel/time/tick-sched.c
-+++ b/kernel/time/tick-sched.c
-@@ -36,7 +36,7 @@
- /*
-  * Per-CPU nohz control structure
-  */
--static DEFINE_PER_CPU(struct tick_sched, tick_cpu_sched);
-+static DEFINE_PER_CPU_ASI_NOT_SENSITIVE(struct tick_sched, tick_cpu_sched);
- 
- struct tick_sched *tick_get_tick_sched(int cpu)
+ 	/* Get the HEAD */
+ 	if ((flags & (SKB_ALLOC_FCLONE | SKB_ALLOC_NAPI)) == SKB_ALLOC_NAPI &&
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 41e91d0f7061..6f6e0bd5ebf1 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -2704,7 +2704,7 @@ bool skb_page_frag_refill(unsigned int sz, struct page_frag *pfrag, gfp_t gfp)
+ 		/* Avoid direct reclaim but allow kswapd to wake */
+ 		pfrag->page = alloc_pages((gfp & ~__GFP_DIRECT_RECLAIM) |
+ 					  __GFP_COMP | __GFP_NOWARN |
+-					  __GFP_NORETRY,
++					  __GFP_NORETRY | __GFP_GLOBAL_NONSENSITIVE,
+ 					  SKB_FRAG_PAGE_ORDER);
+ 		if (likely(pfrag->page)) {
+ 			pfrag->size = PAGE_SIZE << SKB_FRAG_PAGE_ORDER;
+diff --git a/virt/kvm/coalesced_mmio.c b/virt/kvm/coalesced_mmio.c
+index 0be80c213f7f..5b87476566c4 100644
+--- a/virt/kvm/coalesced_mmio.c
++++ b/virt/kvm/coalesced_mmio.c
+@@ -111,7 +111,7 @@ int kvm_coalesced_mmio_init(struct kvm *kvm)
  {
-diff --git a/kernel/time/timer.c b/kernel/time/timer.c
-index 0b09c99b568c..9567df187420 100644
---- a/kernel/time/timer.c
-+++ b/kernel/time/timer.c
-@@ -212,7 +212,7 @@ struct timer_base {
- 	struct hlist_head	vectors[WHEEL_SIZE];
- } ____cacheline_aligned;
+ 	struct page *page;
  
--static DEFINE_PER_CPU(struct timer_base, timer_bases[NR_BASES]);
-+static DEFINE_PER_CPU_ASI_NOT_SENSITIVE(struct timer_base, timer_bases[NR_BASES]);
+-	page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
++	page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO | __GFP_LOCAL_NONSENSITIVE);
+ 	if (!page)
+ 		return -ENOMEM;
  
- #ifdef CONFIG_NO_HZ_COMMON
+diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
+index 2ad013b8bde9..40acb841135c 100644
+--- a/virt/kvm/eventfd.c
++++ b/virt/kvm/eventfd.c
+@@ -306,7 +306,8 @@ kvm_irqfd_assign(struct kvm *kvm, struct kvm_irqfd *args)
+ 	if (!kvm_arch_irqfd_allowed(kvm, args))
+ 		return -EINVAL;
  
-diff --git a/kernel/trace/trace.c b/kernel/trace/trace.c
-index eaec3814c5a4..b82f478caf4e 100644
---- a/kernel/trace/trace.c
-+++ b/kernel/trace/trace.c
-@@ -106,7 +106,7 @@ dummy_set_flag(struct trace_array *tr, u32 old_flags, u32 bit, int set)
-  * tracing is active, only save the comm when a trace event
-  * occurred.
-  */
--static DEFINE_PER_CPU(bool, trace_taskinfo_save);
-+static DEFINE_PER_CPU_ASI_NOT_SENSITIVE(bool, trace_taskinfo_save);
+-	irqfd = kzalloc(sizeof(*irqfd), GFP_KERNEL_ACCOUNT);
++	irqfd = kzalloc(sizeof(*irqfd),
++                        GFP_KERNEL_ACCOUNT | __GFP_GLOBAL_NONSENSITIVE);
+ 	if (!irqfd)
+ 		return -ENOMEM;
  
- /*
-  * Kill all tracing for good (never come back).
-diff --git a/kernel/trace/trace_preemptirq.c b/kernel/trace/trace_preemptirq.c
-index f4938040c228..177de3501677 100644
---- a/kernel/trace/trace_preemptirq.c
-+++ b/kernel/trace/trace_preemptirq.c
-@@ -17,7 +17,7 @@
+@@ -813,7 +814,7 @@ static int kvm_assign_ioeventfd_idx(struct kvm *kvm,
+ 	if (IS_ERR(eventfd))
+ 		return PTR_ERR(eventfd);
  
- #ifdef CONFIG_TRACE_IRQFLAGS
- /* Per-cpu variable to prevent redundant calls when IRQs already off */
--static DEFINE_PER_CPU(int, tracing_irq_cpu);
-+static DEFINE_PER_CPU_ASI_NOT_SENSITIVE(int, tracing_irq_cpu);
- 
- /*
-  * Like trace_hardirqs_on() but without the lockdep invocation. This is
-diff --git a/kernel/watchdog.c b/kernel/watchdog.c
-index ad912511a0c0..c2bf55024202 100644
---- a/kernel/watchdog.c
-+++ b/kernel/watchdog.c
-@@ -174,13 +174,13 @@ static bool softlockup_initialized __read_mostly;
- static u64 __read_mostly sample_period;
- 
- /* Timestamp taken after the last successful reschedule. */
--static DEFINE_PER_CPU(unsigned long, watchdog_touch_ts);
-+static DEFINE_PER_CPU_ASI_NOT_SENSITIVE(unsigned long, watchdog_touch_ts);
- /* Timestamp of the last softlockup report. */
--static DEFINE_PER_CPU(unsigned long, watchdog_report_ts);
--static DEFINE_PER_CPU(struct hrtimer, watchdog_hrtimer);
--static DEFINE_PER_CPU(bool, softlockup_touch_sync);
--static DEFINE_PER_CPU(unsigned long, hrtimer_interrupts);
--static DEFINE_PER_CPU(unsigned long, hrtimer_interrupts_saved);
-+static DEFINE_PER_CPU_ASI_NOT_SENSITIVE(unsigned long, watchdog_report_ts);
-+static DEFINE_PER_CPU_ASI_NOT_SENSITIVE(struct hrtimer, watchdog_hrtimer);
-+static DEFINE_PER_CPU_ASI_NOT_SENSITIVE(bool, softlockup_touch_sync);
-+static DEFINE_PER_CPU_ASI_NOT_SENSITIVE(unsigned long, hrtimer_interrupts);
-+static DEFINE_PER_CPU_ASI_NOT_SENSITIVE(unsigned long, hrtimer_interrupts_saved);
- static unsigned long soft_lockup_nmi_warn;
- 
- static int __init nowatchdog_setup(char *str)
-diff --git a/lib/irq_regs.c b/lib/irq_regs.c
-index 0d545a93070e..8b3c6be06a7a 100644
---- a/lib/irq_regs.c
-+++ b/lib/irq_regs.c
-@@ -9,6 +9,6 @@
- #include <asm/irq_regs.h>
- 
- #ifndef ARCH_HAS_OWN_IRQ_REGS
--DEFINE_PER_CPU(struct pt_regs *, __irq_regs);
-+DEFINE_PER_CPU_ASI_NOT_SENSITIVE(struct pt_regs *, __irq_regs);
- EXPORT_PER_CPU_SYMBOL(__irq_regs);
- #endif
-diff --git a/lib/random32.c b/lib/random32.c
-index a57a0e18819d..e4c1cb1a70b4 100644
---- a/lib/random32.c
-+++ b/lib/random32.c
-@@ -339,7 +339,8 @@ struct siprand_state {
- };
- 
- static DEFINE_PER_CPU(struct siprand_state, net_rand_state) __latent_entropy;
--DEFINE_PER_CPU(unsigned long, net_rand_noise);
-+/* TODO(oweisse): Is this entropy sensitive?? */
-+DEFINE_PER_CPU_ASI_NOT_SENSITIVE(unsigned long, net_rand_noise);
- EXPORT_PER_CPU_SYMBOL(net_rand_noise);
- 
- /*
+-	p = kzalloc(sizeof(*p), GFP_KERNEL_ACCOUNT);
++	p = kzalloc(sizeof(*p), GFP_KERNEL_ACCOUNT | __GFP_GLOBAL_NONSENSITIVE);
+ 	if (!p) {
+ 		ret = -ENOMEM;
+ 		goto fail;
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 0af973b950c2..8d2d76de5bd0 100644
+index 8d2d76de5bd0..587a75428da8 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -110,7 +110,7 @@ static atomic_t hardware_enable_failed;
- static struct kmem_cache *kvm_vcpu_cache;
+@@ -370,6 +370,9 @@ static inline void *mmu_memory_cache_alloc_obj(struct kvm_mmu_memory_cache *mc,
+ 					       gfp_t gfp_flags)
+ {
+ 	gfp_flags |= mc->gfp_zero;
++#ifdef CONFIG_ADDRESS_SPACE_ISOLATION
++	gfp_flags |= mc->gfp_asi;
++#endif
  
- static __read_mostly struct preempt_ops kvm_preempt_ops;
--static DEFINE_PER_CPU(struct kvm_vcpu *, kvm_running_vcpu);
-+static DEFINE_PER_CPU_ASI_NOT_SENSITIVE(struct kvm_vcpu *, kvm_running_vcpu);
+ 	if (mc->kmem_cache)
+ 		return kmem_cache_alloc(mc->kmem_cache, gfp_flags);
+@@ -863,7 +866,8 @@ static struct kvm_memslots *kvm_alloc_memslots(void)
+ 	int i;
+ 	struct kvm_memslots *slots;
  
- struct dentry *kvm_debugfs_dir;
- EXPORT_SYMBOL_GPL(kvm_debugfs_dir);
+-	slots = kvzalloc(sizeof(struct kvm_memslots), GFP_KERNEL_ACCOUNT);
++	slots = kvzalloc(sizeof(struct kvm_memslots),
++                         GFP_KERNEL_ACCOUNT | __GFP_LOCAL_NONSENSITIVE);
+ 	if (!slots)
+ 		return NULL;
+ 
+@@ -1529,7 +1533,7 @@ static struct kvm_memslots *kvm_dup_memslots(struct kvm_memslots *old,
+ 	else
+ 		new_size = kvm_memslots_size(old->used_slots);
+ 
+-	slots = kvzalloc(new_size, GFP_KERNEL_ACCOUNT);
++	slots = kvzalloc(new_size, GFP_KERNEL_ACCOUNT | __GFP_LOCAL_NONSENSITIVE);
+ 	if (likely(slots))
+ 		kvm_copy_memslots(slots, old);
+ 
+@@ -3565,7 +3569,7 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
+ 	}
+ 
+ 	BUILD_BUG_ON(sizeof(struct kvm_run) > PAGE_SIZE);
+-	page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
++	page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO | __GFP_LOCAL_NONSENSITIVE);
+ 	if (!page) {
+ 		r = -ENOMEM;
+ 		goto vcpu_free;
+@@ -4959,7 +4963,7 @@ int kvm_io_bus_register_dev(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
+ 		return -ENOSPC;
+ 
+ 	new_bus = kmalloc(struct_size(bus, range, bus->dev_count + 1),
+-			  GFP_KERNEL_ACCOUNT);
++			  GFP_KERNEL_ACCOUNT | __GFP_LOCAL_NONSENSITIVE);
+ 	if (!new_bus)
+ 		return -ENOMEM;
+ 
 -- 
 2.35.1.473.g83b2b277ed-goog
 
