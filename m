@@ -2,63 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 47AD94C0BF5
-	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 06:26:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 03CFE4C0BFA
+	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 06:26:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238329AbiBWF02 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Feb 2022 00:26:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57702 "EHLO
+        id S238310AbiBWF0c (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Feb 2022 00:26:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57704 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238325AbiBWFZl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Feb 2022 00:25:41 -0500
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3A0D6D87A
-        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 21:24:48 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id b11-20020a5b008b000000b00624ea481d55so2532575ybp.19
-        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 21:24:48 -0800 (PST)
+        with ESMTP id S238332AbiBWFZm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Feb 2022 00:25:42 -0500
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 723886D95A
+        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 21:24:49 -0800 (PST)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-2d6b6cf0cafso150372667b3.21
+        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 21:24:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=eHvI/S5CbFiuxrTOsf9OKECf8MKQA40+sVHVsgBWXTI=;
-        b=V0N2AQ61NCzV6BZmqiQxUYs5pGX63pZ6VVRWlptLLGQUiVMxzlkVsCzNfrYnsMXVug
-         KGkm/PYQEu9If/h+TwyTP773A843C1vccvswNpzQzC+CWF0lyH9rv4lYVpwygBHxjjxF
-         KtfQ48TD03/CH3MJc6uQdii7U/orjcd6yROvM49vbkxsBatJT7hHIeSSgYOHhBpNRFtZ
-         ikDCPeVq4k3/1dGPRt9rMDvqd7qp2qvlw0rdUxHJz6cMzz6PpmzwFKFFGSl65Hota3P/
-         hcaYP68KMD05XrecJbTtx+liHxuoMDRkdxyvRDaTUelX+R7q43SiNNrm4qp+y/niXgLp
-         +m3g==
+        bh=migmFG7UQDaW8MeCncNCopIOLc7/KCi4nAx8Y23Kqls=;
+        b=ZIf827+EcfBkAYznkNAzIxjepuJOo5jGJUpKJJAWVlbJLp/v2xx9WndG0Zfv0Y30pp
+         QVoiE4x5/isYQS6r529V5FuPTwvJXepA8/Ig/UwtVbwxtSPhO5eBWW/xZu7GdKR2hwRD
+         noJsJ3Ur8bMBMS1eL71R7PXbr8K1C4T4AmgEfBVK5/+rkrUOvlO+o5qBs5UJm8vfEFH8
+         iWvYMGLx9ZnbGLPu3ZtgRIXCqWDVhmvwLhi1ORJZdwX1PxFlhSsfJbPaCpw4raGaKYCV
+         43iNhXkj/THFgjjQb9mrwbCVq0tdVwLBhSI29IV5lijsBJ9zHJayAmn0j12b9dgg/i30
+         Q+4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=eHvI/S5CbFiuxrTOsf9OKECf8MKQA40+sVHVsgBWXTI=;
-        b=dHIUEeSOMx5fnegQGm9viOJITsXM9581abAF2WcUl6gXXpWhpmFbUS22vg3tzVXEhG
-         1x6tlFQwiWQshnNxNBFmRQumZU5Uxy9w9ZZU3FgcL4rF+1WAPEatAXvWpjzAsctH1ikb
-         Md+/RFnKJLuX1QSnvvlVMscI9nHftb5VAhyvCmj9grP1h8+uehgEgNc2OMALmwo0Ft9e
-         3kqqWWuHqCSibAf+xzX/YqlWFFicglnIYHR1m7yJx8P9mg0Gio4Dt1yYGrmCkomKeyOU
-         iAKGBMqI0WribylqJ1C6Jrigqt4ozN7aD3F7wNVFEbc7WWLZ7DDNrryyZKI6SA7T+MR6
-         989g==
-X-Gm-Message-State: AOAM5338lUPABtvbk0mt+IAYKR0WDHeXZNHndKxCg64Go9P2UTLMaOn5
-        BJByu6V1C35z32iOLIArgYgYsOQn3+rr
-X-Google-Smtp-Source: ABdhPJylISnqnK8ITQ9nblGksWK/PwAayD9axmVlFF61BCPqFWoHn9afvvtl0MNwA3JR60UblOXBCmfjIzzy
+        bh=migmFG7UQDaW8MeCncNCopIOLc7/KCi4nAx8Y23Kqls=;
+        b=MtmvUQzKhCiQXqcZs/hUsPqCHuMddkIclhc7IfIrlEN4uaawNXnPzg0DOJ3BwHzaRI
+         KE3Rn1B43k7JSku9TLo7sXif9v58l2gcjqlc/sMzO5dGuJCtVdtfnrDRSaHPjzsCTVXO
+         wfyNxRAnVGrDg1XUmvWVZ4Hy5vbeDCe80vrl5rBoC/7S7DO+7U+o9GUOK3uvz9wWEq4A
+         keC3xk1wpYy1kEw0lUpugF8Pa/npRp0eqNv5pDRfn4bSnMTg+C3wt1xHPyIWjqiRL9Ak
+         BJuZjK3TXNhRri2zVnkX8HRPxAEhWy79yCwzxLDzSL22rxHONt0TQ+wNZlp1zR4AYHKD
+         59hQ==
+X-Gm-Message-State: AOAM531flawy7j1Bm/HliOjuFOsBWia97uyrlTIQLMtprf9OgM4GBqD2
+        rM7mqbQNBnlbnGXIsKqZe13l5SWFUvZj
+X-Google-Smtp-Source: ABdhPJzpSBL0VJdokvTlUTI5d1w3wFKyOwiaPENifHATjNeM+qviCG3MD0z5nH5EeDzE1oVe+ERWkd3RD0Jr
 X-Received: from js-desktop.svl.corp.google.com ([2620:15c:2cd:202:ccbe:5d15:e2e6:322])
- (user=junaids job=sendgmr) by 2002:a81:7951:0:b0:2d6:b7bf:216a with SMTP id
- u78-20020a817951000000b002d6b7bf216amr24436525ywc.258.1645593874907; Tue, 22
- Feb 2022 21:24:34 -0800 (PST)
-Date:   Tue, 22 Feb 2022 21:21:58 -0800
+ (user=junaids job=sendgmr) by 2002:a81:84d5:0:b0:2d1:e85:bf04 with SMTP id
+ u204-20020a8184d5000000b002d10e85bf04mr27926930ywf.465.1645593877093; Tue, 22
+ Feb 2022 21:24:37 -0800 (PST)
+Date:   Tue, 22 Feb 2022 21:21:59 -0800
 In-Reply-To: <20220223052223.1202152-1-junaids@google.com>
-Message-Id: <20220223052223.1202152-23-junaids@google.com>
+Message-Id: <20220223052223.1202152-24-junaids@google.com>
 Mime-Version: 1.0
 References: <20220223052223.1202152-1-junaids@google.com>
 X-Mailer: git-send-email 2.35.1.473.g83b2b277ed-goog
-Subject: [RFC PATCH 22/47] mm: asi: Added refcounting when initilizing an asi
+Subject: [RFC PATCH 23/47] mm: asi: Add support for mapping all userspace
+ memory into ASI
 From:   Junaid Shahid <junaids@google.com>
 To:     linux-kernel@vger.kernel.org
-Cc:     Ofir Weisse <oweisse@google.com>, kvm@vger.kernel.org,
-        pbonzini@redhat.com, jmattson@google.com, pjt@google.com,
-        alexandre.chartre@oracle.com, rppt@linux.ibm.com,
-        dave.hansen@linux.intel.com, peterz@infradead.org,
-        tglx@linutronix.de, luto@kernel.org, linux-mm@kvack.org
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com,
+        pjt@google.com, oweisse@google.com, alexandre.chartre@oracle.com,
+        rppt@linux.ibm.com, dave.hansen@linux.intel.com,
+        peterz@infradead.org, tglx@linutronix.de, luto@kernel.org,
+        linux-mm@kvack.org
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -70,167 +71,186 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Ofir Weisse <oweisse@google.com>
+This adds a new ASI class flag, ASI_MAP_ALL_USERSPACE, which if set,
+would automatically map all userspace addresses into that ASI address
+space. This is achieved by lazily cloning the userspace PGD entries
+during page faults encountered while in that restricted address space.
 
-Some KVM tests initilize multiple VMs in a single process. For these
-cases, we want to suppurt multiple callse to asi_init() before a single
-asi_destroy is called. We want the initilization to happen exactly once.
-IF asi_destroy() is called, release the resources only if the counter
-reached zero. In our current implementation, asi's are tied to
-a specific mm. This may change in a future implementation. In which
-case, the mutex for the refcounting will need to move to struct asi.
+When the userspace PGD entry is cleared (e.g. in munmap()), we go
+through all restricted address spaces with the ASI_MAP_ALL_USERSPACE
+flag and clear the corresponding entry in those address spaces as well.
 
-Signed-off-by: Ofir Weisse <oweisse@google.com>
+Signed-off-by: Junaid Shahid <junaids@google.com>
 
 
 ---
- arch/x86/include/asm/asi.h |  1 +
- arch/x86/mm/asi.c          | 52 +++++++++++++++++++++++++++++++++-----
- include/linux/mm_types.h   |  2 ++
- kernel/fork.c              |  3 +++
- 4 files changed, 51 insertions(+), 7 deletions(-)
+ arch/x86/include/asm/asi.h |  2 +
+ arch/x86/mm/asi.c          | 81 ++++++++++++++++++++++++++++++++++++++
+ include/asm-generic/asi.h  |  7 ++++
+ mm/memory.c                |  2 +
+ 4 files changed, 92 insertions(+)
 
 diff --git a/arch/x86/include/asm/asi.h b/arch/x86/include/asm/asi.h
-index e3cbf6d8801e..2dc465f78bcc 100644
+index 2dc465f78bcc..062ccac07fd9 100644
 --- a/arch/x86/include/asm/asi.h
 +++ b/arch/x86/include/asm/asi.h
-@@ -40,6 +40,7 @@ struct asi {
- 	pgd_t *pgd;
- 	struct asi_class *class;
- 	struct mm_struct *mm;
-+        int64_t asi_ref_count;
- };
+@@ -68,6 +68,8 @@ void asi_unmap(struct asi *asi, void *addr, size_t len, bool flush_tlb);
+ void asi_flush_tlb_range(struct asi *asi, void *addr, size_t len);
+ void asi_sync_mapping(struct asi *asi, void *addr, size_t len);
+ void asi_do_lazy_map(struct asi *asi, size_t addr);
++void asi_clear_user_pgd(struct mm_struct *mm, size_t addr);
++void asi_clear_user_p4d(struct mm_struct *mm, size_t addr);
  
- DECLARE_PER_CPU_ALIGNED(struct asi_state, asi_cpu_state);
+ static inline void asi_init_thread_state(struct thread_struct *thread)
+ {
 diff --git a/arch/x86/mm/asi.c b/arch/x86/mm/asi.c
-index 91e5ff1224ff..ac35323193a3 100644
+index ac35323193a3..a3d96be76fa9 100644
 --- a/arch/x86/mm/asi.c
 +++ b/arch/x86/mm/asi.c
-@@ -282,9 +282,25 @@ static int __init asi_global_init(void)
+@@ -702,6 +702,41 @@ static bool is_addr_in_local_nonsensitive_range(size_t addr)
+ 	       addr < VMALLOC_GLOBAL_NONSENSITIVE_START;
  }
- subsys_initcall(asi_global_init)
  
-+/* We're assuming we hold mm->asi_init_lock */
-+static void __asi_destroy(struct asi *asi)
++static void asi_clone_user_pgd(struct asi *asi, size_t addr)
 +{
-+	if (!boot_cpu_has(X86_FEATURE_ASI))
++	pgd_t *src = pgd_offset_pgd(asi->mm->pgd, addr);
++	pgd_t *dst = pgd_offset_pgd(asi->pgd, addr);
++	pgdval_t old_src, curr_src;
++
++	if (pgd_val(*dst))
 +		return;
 +
-+        /* If refcount is non-zero, it means asi_init() was called multiple
-+         * times. We free the asi pgd only when the last VM is destroyed. */
-+        if (--(asi->asi_ref_count) > 0)
-+                return;
++	VM_BUG_ON(!irqs_disabled());
 +
-+	asi_free_pgd(asi);
-+	memset(asi, 0, sizeof(struct asi));
++	/*
++	 * This synchronizes against the PGD entry getting cleared by
++	 * free_pgd_range(). That path has the following steps:
++	 * 1. pgd_clear
++	 * 2. asi_clear_user_pgd
++	 * 3. Remote TLB Flush
++	 * 4. Free page tables
++	 *
++	 * (3) will be blocked for the duration of this function because the
++	 * IPI will remain pending until interrupts are re-enabled.
++	 *
++	 * The following loop ensures that if we read the PGD value before
++	 * (1) and write it after (2), we will re-read the value and write
++	 * the new updated value.
++	 */
++	curr_src = pgd_val(*src);
++	do {
++		set_pgd(dst, __pgd(curr_src));
++		smp_mb();
++		old_src = curr_src;
++		curr_src = pgd_val(*src);
++	} while (old_src != curr_src);
 +}
 +
- int asi_init(struct mm_struct *mm, int asi_index, struct asi **out_asi)
+ void asi_do_lazy_map(struct asi *asi, size_t addr)
  {
--	struct asi *asi = &mm->asi[asi_index];
-+        int err = 0;
-+        struct asi *asi = &mm->asi[asi_index];
+ 	if (!static_cpu_has(X86_FEATURE_ASI) || !asi)
+@@ -710,6 +745,9 @@ void asi_do_lazy_map(struct asi *asi, size_t addr)
+ 	if ((asi->class->flags & ASI_MAP_STANDARD_NONSENSITIVE) &&
+ 	    is_addr_in_local_nonsensitive_range(addr))
+ 		asi_clone_pgd(asi->pgd, asi->mm->asi[0].pgd, addr);
++	else if ((asi->class->flags & ASI_MAP_ALL_USERSPACE) &&
++		 addr < TASK_SIZE_MAX)
++		asi_clone_user_pgd(asi, addr);
+ }
  
- 	*out_asi = NULL;
- 
-@@ -295,6 +311,15 @@ int asi_init(struct mm_struct *mm, int asi_index, struct asi **out_asi)
- 	WARN_ON(asi_index == 0 || asi_index >= ASI_MAX_NUM);
- 	WARN_ON(asi->pgd != NULL);
- 
-+        /* Currently, mm and asi structs are conceptually tied together. In
-+         * future implementations an asi object might be unrelated to a specicic
-+         * mm. In that future implementation - the mutex will have to be inside
-+         * asi. */
+ /*
+@@ -766,3 +804,46 @@ void __init asi_vmalloc_init(void)
+ 	VM_BUG_ON(vmalloc_local_nonsensitive_end >= VMALLOC_END);
+ 	VM_BUG_ON(vmalloc_global_nonsensitive_start <= VMALLOC_START);
+ }
++
++static void __asi_clear_user_pgd(struct mm_struct *mm, size_t addr)
++{
++	uint i;
++
++	if (!static_cpu_has(X86_FEATURE_ASI) || !mm_asi_enabled(mm))
++		return;
++
++	/*
++	 * This function is called right after pgd_clear/p4d_clear.
++	 * We need to be sure that the preceding pXd_clear is visible before
++	 * the ASI pgd clears below. Compare with asi_clone_user_pgd().
++	 */
++	smp_mb__before_atomic();
++
++	/*
++	 * We need to ensure that the ASI PGD tables do not get freed from
++	 * under us. We can potentially use RCU to avoid that, but since
++	 * this path is probably not going to be too performance sensitive,
++	 * so we just acquire the lock to block asi_destroy().
++	 */
 +	mutex_lock(&mm->asi_init_lock);
 +
-+        if (asi->asi_ref_count++ > 0)
-+                goto exit_unlock; /* err is 0 */
++	for (i = 1; i < ASI_MAX_NUM; i++)
++		if (mm->asi[i].class &&
++		    (mm->asi[i].class->flags & ASI_MAP_ALL_USERSPACE))
++			set_pgd(pgd_offset_pgd(mm->asi[i].pgd, addr),
++				native_make_pgd(0));
 +
- 	/*
- 	 * For now, we allocate 2 pages to avoid any potential problems with
- 	 * KPTI code. This won't be needed once KPTI is folded into the ASI
-@@ -302,8 +327,10 @@ int asi_init(struct mm_struct *mm, int asi_index, struct asi **out_asi)
- 	 */
- 	asi->pgd = (pgd_t *)__get_free_pages(GFP_PGTABLE_USER,
- 					     PGD_ALLOCATION_ORDER);
--	if (!asi->pgd)
--		return -ENOMEM;
-+	if (!asi->pgd) {
-+                err = -ENOMEM;
-+		goto exit_unlock;
-+        }
- 
- 	asi->class = &asi_class[asi_index];
- 	asi->mm = mm;
-@@ -328,19 +355,30 @@ int asi_init(struct mm_struct *mm, int asi_index, struct asi **out_asi)
- 			set_pgd(asi->pgd + i, asi_global_nonsensitive_pgd[i]);
- 	}
- 
--	*out_asi = asi;
-+exit_unlock:
-+	if (err)
-+		__asi_destroy(asi);
- 
--	return 0;
-+        /* This unlock signals future asi_init() callers that we finished. */
 +	mutex_unlock(&mm->asi_init_lock);
++}
 +
-+	if (!err)
-+		*out_asi = asi;
-+	return err;
- }
- EXPORT_SYMBOL_GPL(asi_init);
- 
- void asi_destroy(struct asi *asi)
- {
-+        struct mm_struct *mm;
++void asi_clear_user_pgd(struct mm_struct *mm, size_t addr)
++{
++	if (pgtable_l5_enabled())
++		__asi_clear_user_pgd(mm, addr);
++}
 +
- 	if (!boot_cpu_has(X86_FEATURE_ASI) || !asi)
- 		return;
++void asi_clear_user_p4d(struct mm_struct *mm, size_t addr)
++{
++	if (!pgtable_l5_enabled())
++		__asi_clear_user_pgd(mm, addr);
++}
+diff --git a/include/asm-generic/asi.h b/include/asm-generic/asi.h
+index 7c50d8b64fa4..8513d0d7865a 100644
+--- a/include/asm-generic/asi.h
++++ b/include/asm-generic/asi.h
+@@ -6,6 +6,7 @@
  
--	asi_free_pgd(asi);
--	memset(asi, 0, sizeof(struct asi));
-+        mm = asi->mm;
-+        mutex_lock(&mm->asi_init_lock);
-+        __asi_destroy(asi);
-+        mutex_unlock(&mm->asi_init_lock);
+ /* ASI class flags */
+ #define ASI_MAP_STANDARD_NONSENSITIVE	1
++#define ASI_MAP_ALL_USERSPACE		2
+ 
+ #ifndef CONFIG_ADDRESS_SPACE_ISOLATION
+ 
+@@ -85,6 +86,12 @@ void asi_unmap(struct asi *asi, void *addr, size_t len, bool flush_tlb) { }
+ static inline
+ void asi_do_lazy_map(struct asi *asi, size_t addr) { }
+ 
++static inline
++void asi_clear_user_pgd(struct mm_struct *mm, size_t addr) { }
++
++static inline
++void asi_clear_user_p4d(struct mm_struct *mm, size_t addr) { }
++
+ static inline
+ void asi_flush_tlb_range(struct asi *asi, void *addr, size_t len) { }
+ 
+diff --git a/mm/memory.c b/mm/memory.c
+index 8f1de811a1dc..667ece86e051 100644
+--- a/mm/memory.c
++++ b/mm/memory.c
+@@ -296,6 +296,7 @@ static inline void free_pud_range(struct mmu_gather *tlb, p4d_t *p4d,
+ 
+ 	pud = pud_offset(p4d, start);
+ 	p4d_clear(p4d);
++	asi_clear_user_p4d(tlb->mm, start);
+ 	pud_free_tlb(tlb, pud, start);
+ 	mm_dec_nr_puds(tlb->mm);
  }
- EXPORT_SYMBOL_GPL(asi_destroy);
+@@ -330,6 +331,7 @@ static inline void free_p4d_range(struct mmu_gather *tlb, pgd_t *pgd,
  
-diff --git a/include/linux/mm_types.h b/include/linux/mm_types.h
-index f9702d070975..e6980ae31323 100644
---- a/include/linux/mm_types.h
-+++ b/include/linux/mm_types.h
-@@ -16,6 +16,7 @@
- #include <linux/page-flags-layout.h>
- #include <linux/workqueue.h>
- #include <linux/seqlock.h>
-+#include <linux/mutex.h>
+ 	p4d = p4d_offset(pgd, start);
+ 	pgd_clear(pgd);
++	asi_clear_user_pgd(tlb->mm, start);
+ 	p4d_free_tlb(tlb, p4d, start);
+ }
  
- #include <asm/mmu.h>
- #include <asm/asi.h>
-@@ -628,6 +629,7 @@ struct mm_struct {
-                  * these resources for every mm in the system, we expect that
-                  * only VM mm's will have this flag set. */
- 		bool asi_enabled;
-+                struct mutex asi_init_lock;
- #endif
- 		struct user_namespace *user_ns;
- 
-diff --git a/kernel/fork.c b/kernel/fork.c
-index dd5a86e913ea..68b3aeab55ac 100644
---- a/kernel/fork.c
-+++ b/kernel/fork.c
-@@ -1084,6 +1084,9 @@ static struct mm_struct *mm_init(struct mm_struct *mm, struct task_struct *p,
- 
- 	mm->user_ns = get_user_ns(user_ns);
- 
-+#ifdef CONFIG_ADDRESS_SPACE_ISOLATION
-+        mutex_init(&mm->asi_init_lock);
-+#endif
- 	return mm;
- 
- fail_noasi:
 -- 
 2.35.1.473.g83b2b277ed-goog
 
