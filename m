@@ -2,139 +2,285 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C2B34C1649
-	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 16:14:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 112E44C164C
+	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 16:15:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241230AbiBWPPW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Feb 2022 10:15:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51074 "EHLO
+        id S241350AbiBWPPk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Feb 2022 10:15:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241147AbiBWPPS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Feb 2022 10:15:18 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD262B8B52;
-        Wed, 23 Feb 2022 07:14:50 -0800 (PST)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21NEJpHH005576;
-        Wed, 23 Feb 2022 15:14:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=Pn5AcjC6ZVxdQykgoeqQzW1l1N5MOUDdOibZNkRteX4=;
- b=GQkc7igA5PL/8QFW4yxAvAEzDa/gWTAGLFR1zxNYHbpZyuvJsGxCldrfysnAvqrgKE83
- vq9OcSd0sINDbt3NtqVI9m2MniGZ9ePp4VqcMEeDAzDY9qywf9T6TkvKvHoRzClbKaTP
- JLZz1MRQlZJ31CkIasokaXgRcymmrWzSE7kfwcepGFyJV47HLaNn4/4joWEhCOnPYCdM
- EOh4YYMRvVL4yLDlPqMEWVHcBAlQ+pshaMzwKOM77Y1L3wIKu9cp3kqmSbPEQ0FcmJrV
- ROyKFoQYiRs4g1efuBG0VRi5mTYwm7WMUGYiHbTxkfQn8U8aPgcMLERLTPQarqwxeKTh Kg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3edmbrcrgw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Feb 2022 15:14:49 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21NC87nB017854;
-        Wed, 23 Feb 2022 15:14:49 GMT
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3edmbrcrg6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Feb 2022 15:14:49 +0000
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21NFCXiE010378;
-        Wed, 23 Feb 2022 15:14:47 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma06fra.de.ibm.com with ESMTP id 3eaqtjsfgv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Feb 2022 15:14:47 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21NFEild54460912
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 23 Feb 2022 15:14:44 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5217442045;
-        Wed, 23 Feb 2022 15:14:44 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 083AA4203F;
-        Wed, 23 Feb 2022 15:14:44 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.2.54])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 23 Feb 2022 15:14:43 +0000 (GMT)
-Date:   Wed, 23 Feb 2022 16:14:40 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Nico Boehr <nrb@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, thuth@redhat.com, david@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v3 0/8] s390x: Extend instruction
- interception tests
-Message-ID: <20220223161440.1eee5eb8@p-imbrenda>
-In-Reply-To: <20220223132940.2765217-1-nrb@linux.ibm.com>
-References: <20220223132940.2765217-1-nrb@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        with ESMTP id S241278AbiBWPPi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Feb 2022 10:15:38 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C7672B8B51
+        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 07:15:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645629309;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=dCMgKviucmFb+0BPWDTsDuPd2Zjl1OVfg24GCc4UdXM=;
+        b=Qi6357Gh/XqeRyj9XIz4uKpY0jv1vSZafqIr+05BtusX6CMyI5nMDDY8mO2nxUFMbcw0aO
+        m55pdtJ63a850TnqaegEkFaXd4K/y+A+lqGVlzFs/i2nw910zLw2ab3gmVRZU3FOyCWBvx
+        O+c1QaC/g5N4nvXZgdIf2rHcuN85F6w=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-210-YVxuTkxsMc24IH8m1w0pPw-1; Wed, 23 Feb 2022 10:15:08 -0500
+X-MC-Unique: YVxuTkxsMc24IH8m1w0pPw-1
+Received: by mail-ej1-f70.google.com with SMTP id ga31-20020a1709070c1f00b006cec400422fso7210346ejc.22
+        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 07:15:08 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=dCMgKviucmFb+0BPWDTsDuPd2Zjl1OVfg24GCc4UdXM=;
+        b=SWvI/17amAls+8152EFzkC9xmnEgx+Ja5Gxx54Ir5faVxOBAuJlf3b+y2QnJzvbis/
+         DGvazR/O0Ram3tjwXkWM0hs2bOH2kGc3ocGbITdw4BkrzFEqCCC0UvXNNiNGlI066fRh
+         19aef+9KHj/HcwgLU6wiqlPavzgwQhZT4h2lqZNpLgrFZh3tj8ykUkvQ5wW/gKbYxXS/
+         XJJVWXDzwoltnDpPM3NJ2aQIFWh49RqE+7+vmjaW5kVbnwuEgROTF3kNX+vaS6ssUcz9
+         LQmc/0D6vgPIB34EVH69XcE7IqpnAcNI5t2idi6qZBm/crKkG1EswBgcab87DBTSK64J
+         IZiw==
+X-Gm-Message-State: AOAM5300HhQtZVGffboeo9aUl0NLcs1lm8CJJqljqxtjbulBFsxeYuBk
+        CMEQ8vJNzqwmYcoQGo6YhlL6o5cU/8MF5tZjnww632re6JmJO269JjgMMU9YimREwxHHz92T29B
+        63H6zS6uSmfhZ
+X-Received: by 2002:a05:6402:4396:b0:412:b131:fca6 with SMTP id o22-20020a056402439600b00412b131fca6mr30292900edc.133.1645629307349;
+        Wed, 23 Feb 2022 07:15:07 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxJu+kZxsMB4UspF1AR/QTJajCnFTlZ0ieR7BV0uotNY1PHMc9JdY3Is/f5a5BQjRJmjZzSqA==
+X-Received: by 2002:a05:6402:4396:b0:412:b131:fca6 with SMTP id o22-20020a056402439600b00412b131fca6mr30292872edc.133.1645629307050;
+        Wed, 23 Feb 2022 07:15:07 -0800 (PST)
+Received: from redhat.com ([2.55.144.92])
+        by smtp.gmail.com with ESMTPSA id n2sm7925253ejl.86.2022.02.23.07.15.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Feb 2022 07:15:05 -0800 (PST)
+Date:   Wed, 23 Feb 2022 10:15:01 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Anirudh Rayabharam <mail@anirudhrb.com>
+Cc:     Jason Wang <jasowang@redhat.com>,
+        syzbot+0abd373e2e50d704db87@syzkaller.appspotmail.com,
+        kvm <kvm@vger.kernel.org>,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        netdev <netdev@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] vhost: validate range size before adding to iotlb
+Message-ID: <20220223101303-mutt-send-email-mst@kernel.org>
+References: <20220221195303.13560-1-mail@anirudhrb.com>
+ <CACGkMEvLE=kV4PxJLRjdSyKArU+MRx6b_mbLGZHSUgoAAZ+-Fg@mail.gmail.com>
+ <YhRtQEWBF0kqWMsI@anirudhrb.com>
+ <CACGkMEvd7ETC_ANyrOSAVz_i64xqpYYazmm=+39E51=DMRFXdw@mail.gmail.com>
+ <20220222090511-mutt-send-email-mst@kernel.org>
+ <YhUdDUSxuXTLltpZ@anirudhrb.com>
+ <20220222181927-mutt-send-email-mst@kernel.org>
+ <YhZCKii8KwkcU8fM@anirudhrb.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: VBae9F7m9D1gKJxzME47m1s6XI8ovdga
-X-Proofpoint-GUID: K9A3jnaO1D0qMkQKpAC08MU90OxbrApG
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-02-23_06,2022-02-23_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
- impostorscore=0 phishscore=0 adultscore=0 clxscore=1015 suspectscore=0
- priorityscore=1501 mlxlogscore=999 bulkscore=0 malwarescore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2201110000
- definitions=main-2202230085
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YhZCKii8KwkcU8fM@anirudhrb.com>
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 23 Feb 2022 14:29:32 +0100
-Nico Boehr <nrb@linux.ibm.com> wrote:
+On Wed, Feb 23, 2022 at 07:48:18PM +0530, Anirudh Rayabharam wrote:
+> On Tue, Feb 22, 2022 at 06:21:50PM -0500, Michael S. Tsirkin wrote:
+> > On Tue, Feb 22, 2022 at 10:57:41PM +0530, Anirudh Rayabharam wrote:
+> > > On Tue, Feb 22, 2022 at 10:02:29AM -0500, Michael S. Tsirkin wrote:
+> > > > On Tue, Feb 22, 2022 at 03:11:07PM +0800, Jason Wang wrote:
+> > > > > On Tue, Feb 22, 2022 at 12:57 PM Anirudh Rayabharam <mail@anirudhrb.com> wrote:
+> > > > > >
+> > > > > > On Tue, Feb 22, 2022 at 10:50:20AM +0800, Jason Wang wrote:
+> > > > > > > On Tue, Feb 22, 2022 at 3:53 AM Anirudh Rayabharam <mail@anirudhrb.com> wrote:
+> > > > > > > >
+> > > > > > > > In vhost_iotlb_add_range_ctx(), validate the range size is non-zero
+> > > > > > > > before proceeding with adding it to the iotlb.
+> > > > > > > >
+> > > > > > > > Range size can overflow to 0 when start is 0 and last is (2^64 - 1).
+> > > > > > > > One instance where it can happen is when userspace sends an IOTLB
+> > > > > > > > message with iova=size=uaddr=0 (vhost_process_iotlb_msg). So, an
+> > > > > > > > entry with size = 0, start = 0, last = (2^64 - 1) ends up in the
+> > > > > > > > iotlb. Next time a packet is sent, iotlb_access_ok() loops
+> > > > > > > > indefinitely due to that erroneous entry:
+> > > > > > > >
+> > > > > > > >         Call Trace:
+> > > > > > > >          <TASK>
+> > > > > > > >          iotlb_access_ok+0x21b/0x3e0 drivers/vhost/vhost.c:1340
+> > > > > > > >          vq_meta_prefetch+0xbc/0x280 drivers/vhost/vhost.c:1366
+> > > > > > > >          vhost_transport_do_send_pkt+0xe0/0xfd0 drivers/vhost/vsock.c:104
+> > > > > > > >          vhost_worker+0x23d/0x3d0 drivers/vhost/vhost.c:372
+> > > > > > > >          kthread+0x2e9/0x3a0 kernel/kthread.c:377
+> > > > > > > >          ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
+> > > > > > > >          </TASK>
+> > > > > > > >
+> > > > > > > > Reported by syzbot at:
+> > > > > > > >         https://syzkaller.appspot.com/bug?extid=0abd373e2e50d704db87
+> > > > > > > >
+> > > > > > > > Reported-by: syzbot+0abd373e2e50d704db87@syzkaller.appspotmail.com
+> > > > > > > > Tested-by: syzbot+0abd373e2e50d704db87@syzkaller.appspotmail.com
+> > > > > > > > Signed-off-by: Anirudh Rayabharam <mail@anirudhrb.com>
+> > > > > > > > ---
+> > > > > > > >  drivers/vhost/iotlb.c | 6 ++++--
+> > > > > > > >  1 file changed, 4 insertions(+), 2 deletions(-)
+> > > > > > > >
+> > > > > > > > diff --git a/drivers/vhost/iotlb.c b/drivers/vhost/iotlb.c
+> > > > > > > > index 670d56c879e5..b9de74bd2f9c 100644
+> > > > > > > > --- a/drivers/vhost/iotlb.c
+> > > > > > > > +++ b/drivers/vhost/iotlb.c
+> > > > > > > > @@ -53,8 +53,10 @@ int vhost_iotlb_add_range_ctx(struct vhost_iotlb *iotlb,
+> > > > > > > >                               void *opaque)
+> > > > > > > >  {
+> > > > > > > >         struct vhost_iotlb_map *map;
+> > > > > > > > +       u64 size = last - start + 1;
+> > > > > > > >
+> > > > > > > > -       if (last < start)
+> > > > > > > > +       // size can overflow to 0 when start is 0 and last is (2^64 - 1).
+> > > > > > > > +       if (last < start || size == 0)
+> > > > > > > >                 return -EFAULT;
+> > > > > > >
+> > > > > > > I'd move this check to vhost_chr_iter_write(), then for the device who
+> > > > > > > has its own msg handler (e.g vDPA) can benefit from it as well.
+> > > > > >
+> > > > > > Thanks for reviewing!
+> > > > > >
+> > > > > > I kept the check here thinking that all devices would benefit from it
+> > > > > > because they would need to call vhost_iotlb_add_range() to add an entry
+> > > > > > to the iotlb. Isn't that correct?
+> > > > > 
+> > > > > Correct for now but not for the future, it's not guaranteed that the
+> > > > > per device iotlb message handler will use vhost iotlb.
+> > > > > 
+> > > > > But I agree that we probably don't need to care about it too much now.
+> > > > > 
+> > > > > > Do you see any other benefit in moving
+> > > > > > it to vhost_chr_iter_write()?
+> > > > > >
+> > > > > > One concern I have is that if we move it out some future caller to
+> > > > > > vhost_iotlb_add_range() might forget to handle this case.
+> > > > > 
+> > > > > Yes.
+> > > > > 
+> > > > > Rethink the whole fix, we're basically rejecting [0, ULONG_MAX] range
+> > > > > which seems a little bit odd.
+> > > > 
+> > > > Well, I guess ideally we'd split this up as two entries - this kind of
+> > > > thing is after all one of the reasons we initially used first,last as
+> > > > the API - as opposed to first,size.
+> > > 
+> > > IIUC, the APIs exposed to userspace accept first,size.
+> > 
+> > Some of them.
+> > 
+> > 
+> > /* vhost vdpa IOVA range
+> >  * @first: First address that can be mapped by vhost-vDPA
+> >  * @last: Last address that can be mapped by vhost-vDPA
+> >  */
+> > struct vhost_vdpa_iova_range {
+> >         __u64 first;
+> >         __u64 last;
+> > };
+> 
+> Alright, I will split it into two entries. That doesn't fully address
+> the bug though. I would also need to validate size in vhost_chr_iter_write().
 
-> This series extends the instruction interception tests for s390x.
-
-looks good, I'll queue it, thanks
+Do you mean vhost_chr_write_iter?
 
 > 
-> For most instructions, there is already coverage in existing tests, but they are
-> not covering some failure cases, e.g. bad alignment. In this case, the existing
-> tests were extended.
-> 
-> SCK was not under test anywhere yet, hence a new test file was added.
-> 
-> The EPSW test gets it's own file, too, because it requires a I/O device, more
-> details in the respective commit. 
-> 
-> Changelog from v2:
-> ----
-> - Don't run the sck test under PV
-> - Include commit of the QEMU PMCW fix in the MSCH and STSCH commit messages
-> 
-> Nico Boehr (8):
->   s390x: Add more tests for MSCH
->   s390x: Add test for PFMF low-address protection
->   s390x: Add sck tests
->   s390x: Add tests for STCRW
->   s390x: Add more tests for SSCH
->   s390x: Add more tests for STSCH
->   s390x: Add tests for TSCH
->   s390x: Add EPSW test
-> 
->  lib/s390x/css.h     |  17 +++
->  lib/s390x/css_lib.c |  60 ++++++++++
->  s390x/Makefile      |   2 +
->  s390x/css.c         | 278 ++++++++++++++++++++++++++++++++++++++++++++
->  s390x/epsw.c        | 113 ++++++++++++++++++
->  s390x/pfmf.c        |  29 +++++
->  s390x/sck.c         | 134 +++++++++++++++++++++
->  s390x/unittests.cfg |   7 ++
->  8 files changed, 640 insertions(+)
->  create mode 100644 s390x/epsw.c
->  create mode 100644 s390x/sck.c
-> 
+> Should I do both in one patch or as a two patch series?
+
+I'm not sure why we need to do validation in vhost_chr_iter_write,
+hard to say without seeing the patch.
+
+> > 
+> > but
+> > 
+> > struct vhost_iotlb_msg {
+> >         __u64 iova;
+> >         __u64 size;
+> >         __u64 uaddr;
+> > #define VHOST_ACCESS_RO      0x1
+> > #define VHOST_ACCESS_WO      0x2
+> > #define VHOST_ACCESS_RW      0x3
+> >         __u8 perm;
+> > #define VHOST_IOTLB_MISS           1
+> > #define VHOST_IOTLB_UPDATE         2
+> > #define VHOST_IOTLB_INVALIDATE     3
+> > #define VHOST_IOTLB_ACCESS_FAIL    4
+> > /*
+> >  * VHOST_IOTLB_BATCH_BEGIN and VHOST_IOTLB_BATCH_END allow modifying
+> >  * multiple mappings in one go: beginning with
+> >  * VHOST_IOTLB_BATCH_BEGIN, followed by any number of
+> >  * VHOST_IOTLB_UPDATE messages, and ending with VHOST_IOTLB_BATCH_END.
+> >  * When one of these two values is used as the message type, the rest
+> >  * of the fields in the message are ignored. There's no guarantee that
+> >  * these changes take place automatically in the device.
+> >  */
+> > #define VHOST_IOTLB_BATCH_BEGIN    5
+> > #define VHOST_IOTLB_BATCH_END      6
+> >         __u8 type;
+> > };
+> > 
+> > 
+> > 
+> > > Which means that
+> > > right now there is now way for userspace to map this range. So, is there
+> > > any value in not simply rejecting this range?
+> > > 
+> > > > 
+> > > > Anirudh, could you do it like this instead of rejecting?
+> > > > 
+> > > > 
+> > > > > I wonder if it's better to just remove
+> > > > > the map->size. Having a quick glance at the the user, I don't see any
+> > > > > blocker for this.
+> > > > > 
+> > > > > Thanks
+> > > > 
+> > > > I think it's possible but won't solve the bug by itself, and we'd need
+> > > > to review and fix all users - a high chance of introducing
+> > > > another regression. 
+> > > 
+> > > Agreed, I did a quick review of the usages and getting rid of size
+> > > didn't seem trivial.
+> > > 
+> > > Thanks,
+> > > 
+> > > 	- Anirudh.
+> > > 
+> > > > And I think there's value of fitting under the
+> > > > stable rule of 100 lines with context.
+> > > > So sure, but let's fix the bug first.
+> > > > 
+> > > > 
+> > > > 
+> > > > > >
+> > > > > > Thanks!
+> > > > > >
+> > > > > >         - Anirudh.
+> > > > > >
+> > > > > > >
+> > > > > > > Thanks
+> > > > > > >
+> > > > > > > >
+> > > > > > > >         if (iotlb->limit &&
+> > > > > > > > @@ -69,7 +71,7 @@ int vhost_iotlb_add_range_ctx(struct vhost_iotlb *iotlb,
+> > > > > > > >                 return -ENOMEM;
+> > > > > > > >
+> > > > > > > >         map->start = start;
+> > > > > > > > -       map->size = last - start + 1;
+> > > > > > > > +       map->size = size;
+> > > > > > > >         map->last = last;
+> > > > > > > >         map->addr = addr;
+> > > > > > > >         map->perm = perm;
+> > > > > > > > --
+> > > > > > > > 2.35.1
+> > > > > > > >
+> > > > > > >
+> > > > > >
+> > > > 
+> > 
 
