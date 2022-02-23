@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 781674C0BE6
-	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 06:25:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AC3C14C0BF9
+	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 06:26:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238263AbiBWFZq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Feb 2022 00:25:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56740 "EHLO
+        id S238141AbiBWF0A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Feb 2022 00:26:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58122 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238271AbiBWFZh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Feb 2022 00:25:37 -0500
+        with ESMTP id S238185AbiBWFZi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Feb 2022 00:25:38 -0500
 Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40DE46C1F1
-        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 21:24:37 -0800 (PST)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-2d306e372e5so163255917b3.5
-        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 21:24:37 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FD176C921
+        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 21:24:39 -0800 (PST)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-2d6bca75aa2so141248237b3.18
+        for <kvm@vger.kernel.org>; Tue, 22 Feb 2022 21:24:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=orMBAJTu5bZfo+ZjtAIW/XRZfJpT6yrC1YB1ci4mdhQ=;
-        b=i488SXIT1e9g9PD4iGqqQ5k0m2F8EhUxsfxeEhnLAG3wqUbodJtbO+eBa1paYhzivd
-         f6qEUMrlJuQyIim27Unr9cJtD2qOlwrJ3Vb92Q7HTAPrjZK/4FZKPxvkHiWfCGgfeGks
-         wPJV2pOqdvyTeI1kLDQCnafd3hNR4RZrBUmWr4GBRfp9dxcFXFHOnNlY5ByTNaX9Ovn7
-         medb8pTA3zAjMiK0tjiHROjMfziSZ3ZN7ikLLMgh9Do8+8uTWIEbihQ6o2v0V8CMkelT
-         vayq0rCzDDSabPvpcm7/0+wlNG5uCJLTrXlA3oAlDMciITRnUAJzKr5xLZ2ttczqv0Td
-         DGUA==
+        bh=1WKa+KZIcaa+dJcFTsqZOSts6oD//SyJ1kbRYfoMX2c=;
+        b=sZHRLO9kxK5TzWD0X0seDuzrMm3IaK4jRNNmTtrhccA0nwFV9CPHeE86cjQT27AmkI
+         v7sdoVjafaJDxmnspYK1IJDte5ixXIP4NlIpzJcvsi6oStzTdw2xXhTTK6hSh2PE8S4p
+         mF1cpkFTM3aKbNKaOvkN2Z8/pjjAmAg7yV5uvedIm/mcA50u4mXY9mOc7gt5zMPS72Jb
+         jLpByILet1L0UsVaxDROFUGR6gYkZbc/Z5Ipq4VnAgrCI+T/jtIuqYuHmNGwLB/tOVe/
+         jw6HvYSt2X5Np3Q4sH2T+yBRKnSfg6rhn+2SA7NrFtkru9npVZHpssAQN1BJYkVWWTVb
+         OPZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=orMBAJTu5bZfo+ZjtAIW/XRZfJpT6yrC1YB1ci4mdhQ=;
-        b=Mu1ygqrRKoKTxdZF8G0rzpXav1Lvq90+6I1YlsFnv7wJAQ1CYgYNXvbINSwxQ0O0V2
-         zQWRP24u0wVxtZLn3/Sc8GbIFzobQkcckseXFosxSFXIY/TaGtZztIIrJRssBh+fOUnv
-         UZfpc5oCiD51nLaW8cMi8HHByBhrnZ3AvzjRlX9u2zkGzsWYNDS4oAd76kSkoMgX23b1
-         vWwD3I5jflHV1rVNCNCzvI3Chi3fqalW7WIsZIC5zOxcuRgzFSusZpHDlgm75ibdgi/o
-         E0tHPCGXLO51et9FfpUW/rPiug3Plo/eE5h9tkDeSPNoeY2rUbHUWMH0gZkSqEK/V3Bh
-         orjA==
-X-Gm-Message-State: AOAM532puqeVbGs7Yz8BJgMo8zZnbjY84QXs5Z/iS1AMDw2xTq7ztvOB
-        LmLePbZszr7f9VZ0IKEfY2aKc9H7o95k
-X-Google-Smtp-Source: ABdhPJz6tUJjJr3TTCqxc+szuwfGgWLkVUJz81MU2cNZP+P/jcoAt0UrWZKKXpvg67XLb/VTmlwpxyNA5Syq
+        bh=1WKa+KZIcaa+dJcFTsqZOSts6oD//SyJ1kbRYfoMX2c=;
+        b=gkPZsJOMdSUuJMM1JHifFjBV/sR2RbqqgG+qqUx9GhFwKprgqU3/M7T0GwfCxiekup
+         xGWsaJn87HC6ocRDihPakY3Ob3dDHjRYtqLODNtymUiSjs3TF2QimdQ/5BMUybYYP/Ok
+         hgKZiV8ybdk4zfWPr5be3o2kN7mzqKm4zfqvSjEM0a3IlyiuRtjdP/TELBwqhf2X29BC
+         A1mXxViYXtsTAsfGHR/cpzgHYDKEzeEKuGD7ohNjU1SNnmpZdoRgltol7r1Kr548e0iC
+         eNZ2RTP5+qqB62qk1b4VSljf/BtcYRA9m6Kfm5Ijpuein8yH0CSjtXrUnGr3pnTkroiF
+         4noQ==
+X-Gm-Message-State: AOAM531XirV/BhVI//JavWf13belizr6g4MWkNfcUWat5pqSdVXtJWFC
+        mMu6vFsH59Oa8Hz1OJqFABs8qq9s+IrN
+X-Google-Smtp-Source: ABdhPJzkV7QmjkoELH2kQlDpniWdBZ4HcBwkQjVMUj/MiMOJhgvGDpbnFOCshsSuGHfkjD35goEqd0h2ttTQ
 X-Received: from js-desktop.svl.corp.google.com ([2620:15c:2cd:202:ccbe:5d15:e2e6:322])
- (user=junaids job=sendgmr) by 2002:a25:a4e8:0:b0:61e:1eb6:19bd with SMTP id
- g95-20020a25a4e8000000b0061e1eb619bdmr27268416ybi.168.1645593863676; Tue, 22
- Feb 2022 21:24:23 -0800 (PST)
-Date:   Tue, 22 Feb 2022 21:21:53 -0800
+ (user=junaids job=sendgmr) by 2002:a81:7848:0:b0:2ca:287c:6ce3 with SMTP id
+ t69-20020a817848000000b002ca287c6ce3mr26938064ywc.392.1645593865848; Tue, 22
+ Feb 2022 21:24:25 -0800 (PST)
+Date:   Tue, 22 Feb 2022 21:21:54 -0800
 In-Reply-To: <20220223052223.1202152-1-junaids@google.com>
-Message-Id: <20220223052223.1202152-18-junaids@google.com>
+Message-Id: <20220223052223.1202152-19-junaids@google.com>
 Mime-Version: 1.0
 References: <20220223052223.1202152-1-junaids@google.com>
 X-Mailer: git-send-email 2.35.1.473.g83b2b277ed-goog
-Subject: [RFC PATCH 17/47] mm: asi: Aliased direct map for local non-sensitive allocations
+Subject: [RFC PATCH 18/47] mm: asi: Support for pre-ASI-init local
+ non-sensitive allocations
 From:   Junaid Shahid <junaids@google.com>
 To:     linux-kernel@vger.kernel.org
 Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com,
@@ -70,484 +71,269 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This creates a second copy of the direct map, which mirrors the normal
-direct map in the regular unrestricted kernel page tables. But in the
-ASI restricted address spaces, the page tables for this aliased direct
-map would be local to each process. So this aliased map can be used for
-locally non-sensitive page allocations.
-
-Because of the lack of available kernel virtual address space, we have
-to reduce the max possible direct map size by half. That should be fine
-with 5 level page tables but could be an issue with 4 level page tables
-(as max 32 TB RAM could be supported instead of 64 TB).
-
-An alternative vmap-style implementation of an aliased local region is
-possible without this limitation, but that has some other compromises
-and would be usable only if we trim down the types of structures marked
-as local non-sensitive by limiting the designation to only those that
-really are locally non-sensitive but globally sensitive.
-That is certainly ideal and likely feasible, and would also allow
-removal of some other relatively complex infrastructure introduced in
-later patches. But we are including this implementation here just for
-demonstration of a fully general mechanism.
-
-An altogether different alternative to a separate aliased region is also
-possible by just partitioning the regular direct map (either statically
-or dynamically via additional page-block types), which is certainly
-feasible but would require more effort to implement properly.
+Local non-sensitive allocations can be made before an actual ASI
+instance is initialized. To support this, a process-wide pseudo-PGD
+is created, which contains mappings for all locally non-sensitive
+allocations. Memory can be mapped into this pseudo-PGD by using
+ASI_LOCAL_NONSENSITIVE when calling asi_map(). The mappings will be
+copied to an actual ASI PGD when an ASI instance is initialized in
+that process, by copying all the PGD entries in the local
+non-sensitive range from the pseudo-PGD to the ASI PGD. In addition,
+the page fault handler will copy any new PGD entries that get added
+after the initialization of the ASI instance.
 
 Signed-off-by: Junaid Shahid <junaids@google.com>
 
 
 ---
- arch/x86/include/asm/page.h          | 19 +++++++-
- arch/x86/include/asm/page_64.h       | 25 +++++++++-
- arch/x86/include/asm/page_64_types.h | 20 ++++++++
- arch/x86/kernel/e820.c               |  7 ++-
- arch/x86/mm/asi.c                    | 69 +++++++++++++++++++++++++++-
- arch/x86/mm/kaslr.c                  | 34 +++++++++++++-
- arch/x86/mm/mm_internal.h            |  2 +
- arch/x86/mm/physaddr.c               |  8 ++++
- include/linux/page-flags.h           |  3 ++
- include/trace/events/mmflags.h       |  3 +-
- security/Kconfig                     |  1 +
- 11 files changed, 183 insertions(+), 8 deletions(-)
+ arch/x86/include/asm/asi.h |  6 +++-
+ arch/x86/mm/asi.c          | 74 +++++++++++++++++++++++++++++++++++++-
+ arch/x86/mm/fault.c        |  7 ++++
+ include/asm-generic/asi.h  | 12 ++++++-
+ kernel/fork.c              |  8 +++--
+ 5 files changed, 102 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/include/asm/page.h b/arch/x86/include/asm/page.h
-index 4d5810c8fab7..7688ba9d3542 100644
---- a/arch/x86/include/asm/page.h
-+++ b/arch/x86/include/asm/page.h
-@@ -18,6 +18,7 @@
+diff --git a/arch/x86/include/asm/asi.h b/arch/x86/include/asm/asi.h
+index f69e1f2f09a4..f11010c0334b 100644
+--- a/arch/x86/include/asm/asi.h
++++ b/arch/x86/include/asm/asi.h
+@@ -16,6 +16,7 @@
+ #define ASI_MAX_NUM		(1 << ASI_MAX_NUM_ORDER)
  
- struct page;
+ #define ASI_GLOBAL_NONSENSITIVE	(&init_mm.asi[0])
++#define ASI_LOCAL_NONSENSITIVE	(&current->mm->asi[0])
  
-+#include <linux/jump_label.h>
- #include <linux/range.h>
- extern struct range pfn_mapped[];
- extern int nr_pfn_mapped;
-@@ -56,8 +57,24 @@ static inline void copy_user_page(void *to, void *from, unsigned long vaddr,
- 	__phys_addr_symbol(__phys_reloc_hide((unsigned long)(x)))
+ struct asi_state {
+ 	struct asi *curr_asi;
+@@ -45,7 +46,8 @@ DECLARE_PER_CPU_ALIGNED(struct asi_state, asi_cpu_state);
  
- #ifndef __va
--#define __va(x)			((void *)((unsigned long)(x)+PAGE_OFFSET))
-+
-+#define ___va(x)		((void *)((unsigned long)(x)+PAGE_OFFSET))
-+
-+#ifndef CONFIG_ADDRESS_SPACE_ISOLATION
-+#define __va(x)			___va(x)
-+#else
-+
-+DECLARE_STATIC_KEY_FALSE(asi_local_map_initialized);
-+void *asi_va(unsigned long pa);
-+
-+/*
-+ * This might significantly increase the size of the jump table.
-+ * If that turns out to be a problem, we should use a non-static branch.
-+ */
-+#define __va(x)		(static_branch_likely(&asi_local_map_initialized) \
-+			 ? asi_va((unsigned long)(x)) : ___va(x))
- #endif
-+#endif /* __va */
+ extern pgd_t asi_global_nonsensitive_pgd[];
  
- #define __boot_va(x)		__va(x)
- #define __boot_pa(x)		__pa(x)
-diff --git a/arch/x86/include/asm/page_64.h b/arch/x86/include/asm/page_64.h
-index 4bde0dc66100..2845eca02552 100644
---- a/arch/x86/include/asm/page_64.h
-+++ b/arch/x86/include/asm/page_64.h
-@@ -5,6 +5,7 @@
- #include <asm/page_64_types.h>
+-void asi_init_mm_state(struct mm_struct *mm);
++int  asi_init_mm_state(struct mm_struct *mm);
++void asi_free_mm_state(struct mm_struct *mm);
  
- #ifndef __ASSEMBLY__
-+#include <linux/jump_label.h>
- #include <asm/alternative.h>
+ int  asi_register_class(const char *name, uint flags,
+ 			const struct asi_hooks *ops);
+@@ -61,6 +63,8 @@ int  asi_map_gfp(struct asi *asi, void *addr, size_t len, gfp_t gfp_flags);
+ int  asi_map(struct asi *asi, void *addr, size_t len);
+ void asi_unmap(struct asi *asi, void *addr, size_t len, bool flush_tlb);
+ void asi_flush_tlb_range(struct asi *asi, void *addr, size_t len);
++void asi_sync_mapping(struct asi *asi, void *addr, size_t len);
++void asi_do_lazy_map(struct asi *asi, size_t addr);
  
- /* duplicated to the one in bootmem.h */
-@@ -15,12 +16,34 @@ extern unsigned long page_offset_base;
- extern unsigned long vmalloc_base;
- extern unsigned long vmemmap_base;
- 
-+#ifdef CONFIG_ADDRESS_SPACE_ISOLATION
-+
-+extern unsigned long asi_local_map_base;
-+DECLARE_STATIC_KEY_FALSE(asi_local_map_initialized);
-+
-+#else
-+
-+/* Should never be used if ASI is not enabled */
-+#define asi_local_map_base (*(ulong *)NULL)
-+
-+#endif
-+
- static inline unsigned long __phys_addr_nodebug(unsigned long x)
+ static inline void asi_init_thread_state(struct thread_struct *thread)
  {
- 	unsigned long y = x - __START_KERNEL_map;
-+	unsigned long map_start = PAGE_OFFSET;
- 
-+#ifdef CONFIG_ADDRESS_SPACE_ISOLATION
-+	/*
-+	 * This might significantly increase the size of the jump table.
-+	 * If that turns out to be a problem, we should use a non-static branch.
-+	 */
-+	if (static_branch_likely(&asi_local_map_initialized) &&
-+	    x > ASI_LOCAL_MAP)
-+		map_start = ASI_LOCAL_MAP;
-+#endif
- 	/* use the carry flag to determine if x was < __START_KERNEL_map */
--	x = y + ((x > y) ? phys_base : (__START_KERNEL_map - PAGE_OFFSET));
-+	x = y + ((x > y) ? phys_base : (__START_KERNEL_map - map_start));
- 
- 	return x;
- }
-diff --git a/arch/x86/include/asm/page_64_types.h b/arch/x86/include/asm/page_64_types.h
-index e9e2c3ba5923..bd27ebe51a8c 100644
---- a/arch/x86/include/asm/page_64_types.h
-+++ b/arch/x86/include/asm/page_64_types.h
-@@ -2,6 +2,8 @@
- #ifndef _ASM_X86_PAGE_64_DEFS_H
- #define _ASM_X86_PAGE_64_DEFS_H
- 
-+#include <asm/sparsemem.h>
-+
- #ifndef __ASSEMBLY__
- #include <asm/kaslr.h>
- #endif
-@@ -47,6 +49,24 @@
- #define __PAGE_OFFSET           __PAGE_OFFSET_BASE_L4
- #endif /* CONFIG_DYNAMIC_MEMORY_LAYOUT */
- 
-+#ifdef CONFIG_ADDRESS_SPACE_ISOLATION
-+
-+#define __ASI_LOCAL_MAP_BASE (__PAGE_OFFSET +				       \
-+			      ALIGN(_BITUL(MAX_PHYSMEM_BITS - 1), PGDIR_SIZE))
-+
-+#ifdef CONFIG_DYNAMIC_MEMORY_LAYOUT
-+#define ASI_LOCAL_MAP		asi_local_map_base
-+#else
-+#define ASI_LOCAL_MAP		__ASI_LOCAL_MAP_BASE
-+#endif
-+
-+#else /* CONFIG_ADDRESS_SPACE_ISOLATION */
-+
-+/* Should never be used if ASI is not enabled */
-+#define ASI_LOCAL_MAP		(*(ulong *)NULL)
-+
-+#endif
-+
- #define __START_KERNEL_map	_AC(0xffffffff80000000, UL)
- 
- /* See Documentation/x86/x86_64/mm.rst for a description of the memory map. */
-diff --git a/arch/x86/kernel/e820.c b/arch/x86/kernel/e820.c
-index bc0657f0deed..e2ea4d6bfbdf 100644
---- a/arch/x86/kernel/e820.c
-+++ b/arch/x86/kernel/e820.c
-@@ -880,6 +880,11 @@ static void __init early_panic(char *msg)
- 
- static int userdef __initdata;
- 
-+u64 __init set_phys_mem_limit(u64 size)
-+{
-+	return e820__range_remove(size, ULLONG_MAX - size, E820_TYPE_RAM, 1);
-+}
-+
- /* The "mem=nopentium" boot option disables 4MB page tables on 32-bit kernels: */
- static int __init parse_memopt(char *p)
- {
-@@ -905,7 +910,7 @@ static int __init parse_memopt(char *p)
- 	if (mem_size == 0)
- 		return -EINVAL;
- 
--	e820__range_remove(mem_size, ULLONG_MAX - mem_size, E820_TYPE_RAM, 1);
-+	set_phys_mem_limit(mem_size);
- 
- #ifdef CONFIG_MEMORY_HOTPLUG
- 	max_mem_size = mem_size;
 diff --git a/arch/x86/mm/asi.c b/arch/x86/mm/asi.c
-index 58d1c532274a..38eaa650bac1 100644
+index 38eaa650bac1..3ba0971a318d 100644
 --- a/arch/x86/mm/asi.c
 +++ b/arch/x86/mm/asi.c
-@@ -22,6 +22,12 @@ EXPORT_PER_CPU_SYMBOL_GPL(asi_cpu_state);
- 
- __aligned(PAGE_SIZE) pgd_t asi_global_nonsensitive_pgd[PTRS_PER_PGD];
- 
-+DEFINE_STATIC_KEY_FALSE(asi_local_map_initialized);
-+EXPORT_SYMBOL(asi_local_map_initialized);
-+
-+unsigned long asi_local_map_base __ro_after_init;
-+EXPORT_SYMBOL(asi_local_map_base);
-+
- int asi_register_class(const char *name, uint flags,
- 		       const struct asi_hooks *ops)
- {
-@@ -181,8 +187,44 @@ static void asi_free_pgd(struct asi *asi)
- 
- static int __init set_asi_param(char *str)
- {
--	if (strcmp(str, "on") == 0)
-+	if (strcmp(str, "on") == 0) {
-+		/* TODO: We should eventually add support for KASAN. */
-+		if (IS_ENABLED(CONFIG_KASAN)) {
-+			pr_warn("ASI is currently not supported with KASAN");
-+			return 0;
-+		}
-+
-+		/*
-+		 * We create a second copy of the direct map for the aliased
-+		 * ASI Local Map, so we can support only half of the max
-+		 * amount of RAM. That should be fine with 5 level page tables
-+		 * but could be an issue with 4 level page tables.
-+		 *
-+		 * An alternative vmap-style implementation of an aliased local
-+		 * region is possible without this limitation, but that has
-+		 * some other compromises and would be usable only if
-+		 * we trim down the types of structures marked as local
-+		 * non-sensitive by limiting the designation to only those that
-+		 * really are locally non-sensitive but globally sensitive.
-+		 * That is certainly ideal and likely feasible, and would also
-+		 * allow removal of some other relatively complex infrastructure
-+		 * introduced in later patches. But we are including this
-+		 * implementation here just for demonstration of a fully general
-+		 * mechanism.
-+		 *
-+		 * An altogether different alternative to a separate aliased
-+		 * region is also possible by just partitioning the regular
-+		 * direct map (either statically or dynamically via additional
-+		 * page-block types), which is certainly feasible but would
-+		 * require more effort to implement properly.
-+		 */
-+		if (set_phys_mem_limit(MAXMEM / 2))
-+			pr_warn("Limiting Memory Size to %llu", MAXMEM / 2);
-+
-+		asi_local_map_base = __ASI_LOCAL_MAP_BASE;
-+
- 		setup_force_cpu_cap(X86_FEATURE_ASI);
-+	}
- 
- 	return 0;
+@@ -73,6 +73,17 @@ void asi_unregister_class(int index)
  }
-@@ -190,6 +232,8 @@ early_param("asi", set_asi_param);
+ EXPORT_SYMBOL_GPL(asi_unregister_class);
  
- static int __init asi_global_init(void)
- {
-+	uint i, n;
-+
- 	if (!boot_cpu_has(X86_FEATURE_ASI))
- 		return 0;
- 
-@@ -203,6 +247,14 @@ static int __init asi_global_init(void)
- 				    VMALLOC_GLOBAL_NONSENSITIVE_END,
- 				    "ASI Global Non-sensitive vmalloc");
- 
-+	/* TODO: We should also handle memory hotplug. */
-+	n = DIV_ROUND_UP(PFN_PHYS(max_pfn), PGDIR_SIZE);
-+	for (i = 0; i < n; i++)
-+		swapper_pg_dir[pgd_index(ASI_LOCAL_MAP) + i] =
-+			swapper_pg_dir[pgd_index(PAGE_OFFSET) + i];
-+
-+	static_branch_enable(&asi_local_map_initialized);
-+
- 	return 0;
- }
- subsys_initcall(asi_global_init)
-@@ -236,7 +288,11 @@ int asi_init(struct mm_struct *mm, int asi_index, struct asi **out_asi)
- 	if (asi->class->flags & ASI_MAP_STANDARD_NONSENSITIVE) {
- 		uint i;
- 
--		for (i = KERNEL_PGD_BOUNDARY; i < PTRS_PER_PGD; i++)
-+		for (i = KERNEL_PGD_BOUNDARY; i < pgd_index(ASI_LOCAL_MAP); i++)
-+			set_pgd(asi->pgd + i, asi_global_nonsensitive_pgd[i]);
-+
-+		for (i = pgd_index(VMALLOC_GLOBAL_NONSENSITIVE_START);
-+		     i < PTRS_PER_PGD; i++)
- 			set_pgd(asi->pgd + i, asi_global_nonsensitive_pgd[i]);
- 	}
- 
-@@ -534,3 +590,12 @@ void asi_flush_tlb_range(struct asi *asi, void *addr, size_t len)
- 	/* Later patches will do a more optimized flush. */
- 	flush_tlb_kernel_range((ulong)addr, (ulong)addr + len);
- }
-+
-+void *asi_va(unsigned long pa)
++static void asi_clone_pgd(pgd_t *dst_table, pgd_t *src_table, size_t addr)
 +{
-+	struct page *page = pfn_to_page(PHYS_PFN(pa));
++	pgd_t *src = pgd_offset_pgd(src_table, addr);
++	pgd_t *dst = pgd_offset_pgd(dst_table, addr);
 +
-+	return (void *)(pa + (PageLocalNonSensitive(page)
-+			      ? ASI_LOCAL_MAP : PAGE_OFFSET));
++	if (!pgd_val(*dst))
++		set_pgd(dst, *src);
++	else
++		VM_BUG_ON(pgd_val(*dst) != pgd_val(*src));
 +}
-+EXPORT_SYMBOL(asi_va);
-diff --git a/arch/x86/mm/kaslr.c b/arch/x86/mm/kaslr.c
-index 557f0fe25dff..2e68ce84767c 100644
---- a/arch/x86/mm/kaslr.c
-+++ b/arch/x86/mm/kaslr.c
-@@ -48,6 +48,7 @@ static const unsigned long vaddr_end = CPU_ENTRY_AREA_BASE;
- static __initdata struct kaslr_memory_region {
- 	unsigned long *base;
- 	unsigned long size_tb;
-+	unsigned long extra_bytes;
- } kaslr_regions[] = {
- 	{ &page_offset_base, 0 },
- 	{ &vmalloc_base, 0 },
-@@ -57,7 +58,7 @@ static __initdata struct kaslr_memory_region {
- /* Get size in bytes used by the memory region */
- static inline unsigned long get_padding(struct kaslr_memory_region *region)
++
+ #ifndef mm_inc_nr_p4ds
+ #define mm_inc_nr_p4ds(mm)	do {} while (false)
+ #endif
+@@ -291,6 +302,11 @@ int asi_init(struct mm_struct *mm, int asi_index, struct asi **out_asi)
+ 		for (i = KERNEL_PGD_BOUNDARY; i < pgd_index(ASI_LOCAL_MAP); i++)
+ 			set_pgd(asi->pgd + i, asi_global_nonsensitive_pgd[i]);
+ 
++		for (i = pgd_index(ASI_LOCAL_MAP);
++		     i <= pgd_index(ASI_LOCAL_MAP + PFN_PHYS(max_possible_pfn));
++		     i++)
++			set_pgd(asi->pgd + i, mm->asi[0].pgd[i]);
++
+ 		for (i = pgd_index(VMALLOC_GLOBAL_NONSENSITIVE_START);
+ 		     i < PTRS_PER_PGD; i++)
+ 			set_pgd(asi->pgd + i, asi_global_nonsensitive_pgd[i]);
+@@ -379,7 +395,7 @@ void asi_exit(void)
+ }
+ EXPORT_SYMBOL_GPL(asi_exit);
+ 
+-void asi_init_mm_state(struct mm_struct *mm)
++int asi_init_mm_state(struct mm_struct *mm)
  {
--	return (region->size_tb << TB_SHIFT);
-+	return (region->size_tb << TB_SHIFT) + region->extra_bytes;
- }
+ 	struct mem_cgroup *memcg = get_mem_cgroup_from_mm(mm);
  
- /* Initialize base and padding for each memory region randomized with KASLR */
-@@ -69,6 +70,8 @@ void __init kernel_randomize_memory(void)
- 	struct rnd_state rand_state;
- 	unsigned long remain_entropy;
- 	unsigned long vmemmap_size;
-+	unsigned int max_physmem_bits = MAX_PHYSMEM_BITS -
-+					!!boot_cpu_has(X86_FEATURE_ASI);
- 
- 	vaddr_start = pgtable_l5_enabled() ? __PAGE_OFFSET_BASE_L5 : __PAGE_OFFSET_BASE_L4;
- 	vaddr = vaddr_start;
-@@ -85,7 +88,7 @@ void __init kernel_randomize_memory(void)
- 	if (!kaslr_memory_enabled())
- 		return;
- 
--	kaslr_regions[0].size_tb = 1 << (MAX_PHYSMEM_BITS - TB_SHIFT);
-+	kaslr_regions[0].size_tb = 1 << (max_physmem_bits - TB_SHIFT);
- 	kaslr_regions[1].size_tb = VMALLOC_SIZE_TB;
- 
- 	/*
-@@ -100,6 +103,18 @@ void __init kernel_randomize_memory(void)
- 	if (memory_tb < kaslr_regions[0].size_tb)
- 		kaslr_regions[0].size_tb = memory_tb;
- 
-+	if (boot_cpu_has(X86_FEATURE_ASI)) {
-+		ulong direct_map_size = kaslr_regions[0].size_tb << TB_SHIFT;
-+
-+		/* Reserve additional space for the ASI Local Map */
-+		direct_map_size = round_up(direct_map_size, PGDIR_SIZE);
-+		direct_map_size *= 2;
-+		VM_BUG_ON(direct_map_size % (1UL << TB_SHIFT));
-+
-+		kaslr_regions[0].size_tb = direct_map_size >> TB_SHIFT;
-+		kaslr_regions[0].extra_bytes = PGDIR_SIZE;
-+	}
-+
- 	/*
- 	 * Calculate the vmemmap region size in TBs, aligned to a TB
- 	 * boundary.
-@@ -136,6 +151,21 @@ void __init kernel_randomize_memory(void)
- 		vaddr = round_up(vaddr + 1, PUD_SIZE);
- 		remain_entropy -= entropy;
+@@ -395,6 +411,28 @@ void asi_init_mm_state(struct mm_struct *mm)
+ 				  memcg->use_asi;
+ 		css_put(&memcg->css);
  	}
 +
++	if (!mm->asi_enabled)
++		return 0;
++
++	mm->asi[0].mm = mm;
++	mm->asi[0].pgd = (pgd_t *)__get_free_page(GFP_PGTABLE_USER);
++	if (!mm->asi[0].pgd)
++		return -ENOMEM;
++
++	return 0;
++}
++
++void asi_free_mm_state(struct mm_struct *mm)
++{
++	if (!boot_cpu_has(X86_FEATURE_ASI) || !mm->asi_enabled)
++		return;
++
++	asi_free_pgd_range(&mm->asi[0], pgd_index(ASI_LOCAL_MAP),
++			   pgd_index(ASI_LOCAL_MAP +
++				     PFN_PHYS(max_possible_pfn)) + 1);
++
++	free_page((ulong)mm->asi[0].pgd);
+ }
+ 
+ static bool is_page_within_range(size_t addr, size_t page_size,
+@@ -599,3 +637,37 @@ void *asi_va(unsigned long pa)
+ 			      ? ASI_LOCAL_MAP : PAGE_OFFSET));
+ }
+ EXPORT_SYMBOL(asi_va);
++
++static bool is_addr_in_local_nonsensitive_range(size_t addr)
++{
++	return addr >= ASI_LOCAL_MAP &&
++	       addr < VMALLOC_GLOBAL_NONSENSITIVE_START;
++}
++
++void asi_do_lazy_map(struct asi *asi, size_t addr)
++{
++	if (!static_cpu_has(X86_FEATURE_ASI) || !asi)
++		return;
++
++	if ((asi->class->flags & ASI_MAP_STANDARD_NONSENSITIVE) &&
++	    is_addr_in_local_nonsensitive_range(addr))
++		asi_clone_pgd(asi->pgd, asi->mm->asi[0].pgd, addr);
++}
++
++/*
++ * Should be called after asi_map(ASI_LOCAL_NONSENSITIVE,...) for any mapping
++ * that is required to exist prior to asi_enter() (e.g. thread stacks)
++ */
++void asi_sync_mapping(struct asi *asi, void *start, size_t len)
++{
++	size_t addr = (size_t)start;
++	size_t end = addr + len;
++
++	if (!static_cpu_has(X86_FEATURE_ASI) || !asi)
++		return;
++
++	if ((asi->class->flags & ASI_MAP_STANDARD_NONSENSITIVE) &&
++	    is_addr_in_local_nonsensitive_range(addr))
++		for (; addr < end; addr = pgd_addr_end(addr, end))
++			asi_clone_pgd(asi->pgd, asi->mm->asi[0].pgd, addr);
++}
+diff --git a/arch/x86/mm/fault.c b/arch/x86/mm/fault.c
+index 4bfed53e210e..8692eb50f4a5 100644
+--- a/arch/x86/mm/fault.c
++++ b/arch/x86/mm/fault.c
+@@ -1498,6 +1498,12 @@ DEFINE_IDTENTRY_RAW_ERRORCODE(exc_page_fault)
+ {
+ 	unsigned long address = read_cr2();
+ 	irqentry_state_t state;
 +	/*
-+	 * This ensures that the ASI Local Map does not share a PGD entry with
-+	 * the regular direct map, and also that the alignment of the two
-+	 * regions is the same.
-+	 *
-+	 * We are relying on the fact that the region following the ASI Local
-+	 * Map will be the local non-sensitive portion of the VMALLOC region.
-+	 * If that were not the case and the next region was a global one,
-+	 * then we would need extra padding after the ASI Local Map to ensure
-+	 * that it doesn't share a PGD entry with that global region.
++	 * There is a very small chance that an NMI could cause an asi_exit()
++	 * before this asi_get_current(), but that is ok, we will just do
++	 * the fixup on the next page fault.
 +	 */
-+	if (cpu_feature_enabled(X86_FEATURE_ASI))
-+		asi_local_map_base = page_offset_base + PGDIR_SIZE +
-+				     ((kaslr_regions[0].size_tb / 2) << TB_SHIFT);
++	struct asi *asi = asi_get_current();
+ 
+ 	prefetchw(&current->mm->mmap_lock);
+ 
+@@ -1539,6 +1545,7 @@ DEFINE_IDTENTRY_RAW_ERRORCODE(exc_page_fault)
+ 
+ 	instrumentation_begin();
+ 	handle_page_fault(regs, error_code, address);
++	asi_do_lazy_map(asi, address);
+ 	instrumentation_end();
+ 
+ 	irqentry_exit(regs, state);
+diff --git a/include/asm-generic/asi.h b/include/asm-generic/asi.h
+index 51c9c4a488e8..a1c8ebff70e8 100644
+--- a/include/asm-generic/asi.h
++++ b/include/asm-generic/asi.h
+@@ -13,6 +13,7 @@
+ #define ASI_MAX_NUM			0
+ 
+ #define ASI_GLOBAL_NONSENSITIVE		NULL
++#define ASI_LOCAL_NONSENSITIVE		NULL
+ 
+ #define VMALLOC_GLOBAL_NONSENSITIVE_START	VMALLOC_START
+ #define VMALLOC_GLOBAL_NONSENSITIVE_END		VMALLOC_END
+@@ -31,7 +32,9 @@ int asi_register_class(const char *name, uint flags,
+ 
+ static inline void asi_unregister_class(int asi_index) { }
+ 
+-static inline void asi_init_mm_state(struct mm_struct *mm) { }
++static inline int asi_init_mm_state(struct mm_struct *mm) { return 0; }
++
++static inline void asi_free_mm_state(struct mm_struct *mm) { }
+ 
+ static inline
+ int asi_init(struct mm_struct *mm, int asi_index, struct asi **out_asi)
+@@ -67,9 +70,16 @@ static inline int asi_map(struct asi *asi, void *addr, size_t len)
+ 	return 0;
  }
  
- void __meminit init_trampoline_kaslr(void)
-diff --git a/arch/x86/mm/mm_internal.h b/arch/x86/mm/mm_internal.h
-index a1e8c523ab08..ace1d0b6d2d9 100644
---- a/arch/x86/mm/mm_internal.h
-+++ b/arch/x86/mm/mm_internal.h
-@@ -28,4 +28,6 @@ void update_cache_mode_entry(unsigned entry, enum page_cache_mode cache);
- 
- extern unsigned long tlb_single_page_flush_ceiling;
- 
-+u64 set_phys_mem_limit(u64 size);
++static inline
++void asi_sync_mapping(struct asi *asi, void *addr, size_t len) { }
 +
- #endif	/* __X86_MM_INTERNAL_H */
-diff --git a/arch/x86/mm/physaddr.c b/arch/x86/mm/physaddr.c
-index fc3f3d3e2ef2..2cd6cee942da 100644
---- a/arch/x86/mm/physaddr.c
-+++ b/arch/x86/mm/physaddr.c
-@@ -21,6 +21,9 @@ unsigned long __phys_addr(unsigned long x)
- 		x = y + phys_base;
+ static inline
+ void asi_unmap(struct asi *asi, void *addr, size_t len, bool flush_tlb) { }
  
- 		VIRTUAL_BUG_ON(y >= KERNEL_IMAGE_SIZE);
-+	} else if (cpu_feature_enabled(X86_FEATURE_ASI) && x > ASI_LOCAL_MAP) {
-+		x -= ASI_LOCAL_MAP;
-+		VIRTUAL_BUG_ON(!phys_addr_valid(x));
- 	} else {
- 		x = y + (__START_KERNEL_map - PAGE_OFFSET);
++
++static inline
++void asi_do_lazy_map(struct asi *asi, size_t addr) { }
++
+ static inline
+ void asi_flush_tlb_range(struct asi *asi, void *addr, size_t len) { }
  
-@@ -28,6 +31,7 @@ unsigned long __phys_addr(unsigned long x)
- 		VIRTUAL_BUG_ON((x > y) || !phys_addr_valid(x));
+diff --git a/kernel/fork.c b/kernel/fork.c
+index 3695a32ee9bd..dd5a86e913ea 100644
+--- a/kernel/fork.c
++++ b/kernel/fork.c
+@@ -699,6 +699,7 @@ void __mmdrop(struct mm_struct *mm)
+ 	mm_free_pgd(mm);
+ 	destroy_context(mm);
+ 	mmu_notifier_subscriptions_destroy(mm);
++	asi_free_mm_state(mm);
+ 	check_mm(mm);
+ 	put_user_ns(mm->user_ns);
+ 	free_mm(mm);
+@@ -1072,17 +1073,20 @@ static struct mm_struct *mm_init(struct mm_struct *mm, struct task_struct *p,
+ 		mm->def_flags = 0;
  	}
  
-+	VIRTUAL_BUG_ON(!pfn_valid(x >> PAGE_SHIFT));
- 	return x;
- }
- EXPORT_SYMBOL(__phys_addr);
-@@ -54,6 +58,10 @@ bool __virt_addr_valid(unsigned long x)
+-	asi_init_mm_state(mm);
+-
+ 	if (mm_alloc_pgd(mm))
+ 		goto fail_nopgd;
  
- 		if (y >= KERNEL_IMAGE_SIZE)
- 			return false;
-+	} else if (cpu_feature_enabled(X86_FEATURE_ASI) && x > ASI_LOCAL_MAP) {
-+		x -= ASI_LOCAL_MAP;
-+		if (!phys_addr_valid(x))
-+			return false;
- 	} else {
- 		x = y + (__START_KERNEL_map - PAGE_OFFSET);
+ 	if (init_new_context(p, mm))
+ 		goto fail_nocontext;
  
-diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
-index a07434cc679c..e5223a05c41a 100644
---- a/include/linux/page-flags.h
-+++ b/include/linux/page-flags.h
-@@ -143,6 +143,7 @@ enum pageflags {
- #endif
- #ifdef CONFIG_ADDRESS_SPACE_ISOLATION
- 	PG_global_nonsensitive,
-+	PG_local_nonsensitive,
- #endif
- 	__NR_PAGEFLAGS,
++	if (asi_init_mm_state(mm))
++		goto fail_noasi;
++
+ 	mm->user_ns = get_user_ns(user_ns);
++
+ 	return mm;
  
-@@ -547,8 +548,10 @@ PAGEFLAG(Idle, idle, PF_ANY)
- 
- #ifdef CONFIG_ADDRESS_SPACE_ISOLATION
- __PAGEFLAG(GlobalNonSensitive, global_nonsensitive, PF_ANY);
-+__PAGEFLAG(LocalNonSensitive, local_nonsensitive, PF_ANY);
- #else
- __PAGEFLAG_FALSE(GlobalNonSensitive, global_nonsensitive);
-+__PAGEFLAG_FALSE(LocalNonSensitive, local_nonsensitive);
- #endif
- 
- #ifdef CONFIG_KASAN_HW_TAGS
-diff --git a/include/trace/events/mmflags.h b/include/trace/events/mmflags.h
-index 73a49197ef54..96e61d838bec 100644
---- a/include/trace/events/mmflags.h
-+++ b/include/trace/events/mmflags.h
-@@ -129,7 +129,8 @@ IF_HAVE_PG_IDLE(PG_young,		"young"		)		\
- IF_HAVE_PG_IDLE(PG_idle,		"idle"		)		\
- IF_HAVE_PG_ARCH_2(PG_arch_2,		"arch_2"	)		\
- IF_HAVE_PG_SKIP_KASAN_POISON(PG_skip_kasan_poison, "skip_kasan_poison")	\
--IF_HAVE_ASI(PG_global_nonsensitive,	"global_nonsensitive")
-+IF_HAVE_ASI(PG_global_nonsensitive,	"global_nonsensitive")		\
-+IF_HAVE_ASI(PG_local_nonsensitive,	"local_nonsensitive")
- 
- #define show_page_flags(flags)						\
- 	(flags) ? __print_flags(flags, "|",				\
-diff --git a/security/Kconfig b/security/Kconfig
-index e89c2658e6cf..070a948b5266 100644
---- a/security/Kconfig
-+++ b/security/Kconfig
-@@ -70,6 +70,7 @@ config ADDRESS_SPACE_ISOLATION
- 	default n
- 	depends on X86_64 && !UML && SLAB && !NEED_PER_CPU_KM
- 	depends on !PARAVIRT
-+	depends on !MEMORY_HOTPLUG
- 	help
- 	   This feature provides the ability to run some kernel code
- 	   with a reduced kernel address space. This can be used to
++fail_noasi:
+ fail_nocontext:
+ 	mm_free_pgd(mm);
+ fail_nopgd:
 -- 
 2.35.1.473.g83b2b277ed-goog
 
