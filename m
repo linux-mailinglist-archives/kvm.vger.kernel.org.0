@@ -2,73 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AABD24C11FB
-	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 12:55:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CA54F4C1205
+	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 12:57:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240187AbiBWLz4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Feb 2022 06:55:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56830 "EHLO
+        id S240122AbiBWL5e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Feb 2022 06:57:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58908 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233405AbiBWLzz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Feb 2022 06:55:55 -0500
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E53B985A7;
-        Wed, 23 Feb 2022 03:55:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1645617328; x=1677153328;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=+1Bvis2CoK18o2+hcc1CoTOk4DpVvvkAux/lXlSU73s=;
-  b=C7PRhKhK1zTjECozRERSHMtlRvggiq499Mo6MdQsbTLQwtrqT7SDq92j
-   9ypDV5kcTiC3qutUIckN2IwB9+KMV1WN8Iwd+4NayddnU/UFq7CFYRCGV
-   pFg5WJOy5a3ZwY1Ooy3TrPUc0onJKbE0lnGjCDVJ+ZjWiH0aU8UdFeuiF
-   VU2w4p/QaUbpmjhlzeg+L9DATI/G1aiYc5r8bCNlcKeR8gia/KjmXsaGc
-   BSR6SiHEBn7Ezw5nOT5xm96EfOBxugu24/mDfXbpyWPrgRVMgDmWMjhzZ
-   UKWNoVD73mzwiBdviFCpj2DrZg+DmhBmpaVYHOXeRPyDzX1MMmmY/YO7X
-   g==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10266"; a="251865460"
-X-IronPort-AV: E=Sophos;i="5.88,390,1635231600"; 
-   d="scan'208";a="251865460"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Feb 2022 03:55:28 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,390,1635231600"; 
-   d="scan'208";a="573791285"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by orsmga001.jf.intel.com with ESMTP; 23 Feb 2022 03:55:23 -0800
-Received: by black.fi.intel.com (Postfix, from userid 1000)
-        id 06350142; Wed, 23 Feb 2022 13:55:39 +0200 (EET)
-Date:   Wed, 23 Feb 2022 14:55:39 +0300
-From:   "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        David Rientjes <rientjes@google.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Andi Kleen <ak@linux.intel.com>
-Subject: Re: [PATCH] x86/mm/cpa: Generalize __set_memory_enc_pgtable()
-Message-ID: <20220223115539.pqk7624xku2qwhlu@black.fi.intel.com>
-References: <20220222185740.26228-1-kirill.shutemov@linux.intel.com>
- <20220223043528.2093214-1-brijesh.singh@amd.com>
- <YhYbLDTFLIksB/qp@zn.tnic>
+        with ESMTP id S237142AbiBWL5e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Feb 2022 06:57:34 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DF2B748E6E
+        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 03:57:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645617426;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=FrHNPEyG6nsY8vSxBc+AukKgMz3uheQuxIiQLdF9C+U=;
+        b=A6bACiBiM3GVT27lBHVwNk38I07NU09M+BpPrS4z976ut8uTF+2TIjypTrlFuVZFYkFCdV
+        5TEao3kfdKAk567JEvIG3WZqnYr/lpACvbHQS4/cUvFHsCWkEzvFQHKQZgnmJV8qMjlmjS
+        6PcRQsUXZz5v1HLYAc3Y6HJuOJVEE7w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-6-8g0W7KG7MVeaeL96ezgi0g-1; Wed, 23 Feb 2022 06:57:02 -0500
+X-MC-Unique: 8g0W7KG7MVeaeL96ezgi0g-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DBCBD1006AA6;
+        Wed, 23 Feb 2022 11:57:01 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.40.195.190])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 934C884948;
+        Wed, 23 Feb 2022 11:56:50 +0000 (UTC)
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>,
+        stable@vger.kernel.org
+Subject: [PATCH] KVM: x86: nSVM: disallow userspace setting of MSR_AMD64_TSC_RATIO to non default value when tsc scaling disabled
+Date:   Wed, 23 Feb 2022 13:56:49 +0200
+Message-Id: <20220223115649.319134-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YhYbLDTFLIksB/qp@zn.tnic>
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,28 +57,52 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 23, 2022 at 12:31:56PM +0100, Borislav Petkov wrote:
-> @@ -2024,11 +2026,9 @@ static int __set_memory_enc_pgtable(unsigned long addr, int numpages, bool enc)
->  	 */
->  	cpa_flush(&cpa, 0);
->  
-> -	/*
-> -	 * Notify hypervisor that a given memory range is mapped encrypted
-> -	 * or decrypted.
-> -	 */
-> -	notify_range_enc_status_changed(addr, numpages, enc);
-> +	/* Notify hypervisor that we have successfully set/clr encryption attribute. */
-> +	if (!ret)
-> +		x86_platform.guest.enc_status_change_finish(addr, numpages, enc);
->  
->  	return ret;
->  }
+If nested tsc scaling is disabled, MSR_AMD64_TSC_RATIO should
+never have non default value.
 
-This operation can fail for TDX. We need to be able to return error code
-here:
-	/* Notify hypervisor that we have successfully set/clr encryption attribute. */
-	if (!ret)
-		ret = x86_platform.guest.enc_status_change_finish(addr, numpages, enc);
+Due to way nested tsc scaling support was implmented in qemu,
+it would set this msr to 0 when nested tsc scaling was disabled.
+Ignore that value for now, as it causes no harm.
 
+
+Fixes: 5228eb96a487 ("KVM: x86: nSVM: implement nested TSC scaling")
+Cc: stable@vger.kernel.org
+
+Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+---
+ arch/x86/kvm/svm/svm.c | 19 +++++++++++++++++--
+ 1 file changed, 17 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 7038c76fa841..b80ad471776f 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -2705,8 +2705,23 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
+ 	u64 data = msr->data;
+ 	switch (ecx) {
+ 	case MSR_AMD64_TSC_RATIO:
+-		if (!msr->host_initiated && !svm->tsc_scaling_enabled)
+-			return 1;
++
++		if (!svm->tsc_scaling_enabled) {
++
++			if (!msr->host_initiated)
++				return 1;
++			/*
++			 * In case TSC scaling is not enabled, always
++			 * leave this MSR at the default value.
++			 *
++			 * Due to bug in qemu 6.2.0, it would try to set
++			 * this msr to 0 if tsc scaling is not enabled.
++			 * Ignore this value as well.
++			 */
++			if (data != 0 && data != svm->tsc_ratio_msr)
++				return 1;
++			break;
++		}
+ 
+ 		if (data & TSC_RATIO_RSVD)
+ 			return 1;
 -- 
- Kirill A. Shutemov
+2.26.3
+
