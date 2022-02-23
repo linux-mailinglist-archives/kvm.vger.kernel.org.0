@@ -2,234 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 37CB14C16FF
-	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 16:39:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A183B4C174C
+	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 16:42:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242182AbiBWPj4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Feb 2022 10:39:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48702 "EHLO
+        id S242251AbiBWPnG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Feb 2022 10:43:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55022 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242170AbiBWPjo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Feb 2022 10:39:44 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE0F1BD2C3;
-        Wed, 23 Feb 2022 07:39:15 -0800 (PST)
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21NDlfu3016577;
-        Wed, 23 Feb 2022 15:39:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date : to :
- cc : references : from : subject : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=PaRikS2lHJXMoCbgRH4ZYKDmlc9yznXSXaa+a9DPKWc=;
- b=NpWgDiogahYGbiu0VEUT2aEisihmJ1jEsp69PZP9Ddwy6ihu/hl8fwu1SW4FSmEYF0f6
- U4KRz+edCOkERIc3FVzobU78CKKiOzMOU0fjr9GRnAp8RhUeQaxSmClvx8y3tHFADLoV
- qPlzA0eoKfAySQ3qXff7//5tC9z3ioDrTFff+X5eoZYcZQtHct0CpejoqXvHWfmgj2UQ
- bMlI4MAV7Y2jc9xUu4abTWe9hVVYobnCysjDkGezbd8kIZpEk+Tfb1OGPhSoK8c5xJT5
- fnLcxCHa0idthrBM/Q1V/AKUkUAriseYxAYidd65zNaJHUd80putipwrxKbDS4nCnGQU pQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3edp4f2vtf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Feb 2022 15:39:14 +0000
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21NEvaTl030626;
-        Wed, 23 Feb 2022 15:39:14 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3edp4f2vss-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Feb 2022 15:39:14 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21NFWZIp027391;
-        Wed, 23 Feb 2022 15:39:12 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma03ams.nl.ibm.com with ESMTP id 3ear69b801-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Feb 2022 15:39:12 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21NFd8pi54788514
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 23 Feb 2022 15:39:08 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E1A2911C052;
-        Wed, 23 Feb 2022 15:39:07 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 83B2811C058;
-        Wed, 23 Feb 2022 15:39:07 +0000 (GMT)
-Received: from [9.145.59.38] (unknown [9.145.59.38])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 23 Feb 2022 15:39:07 +0000 (GMT)
-Message-ID: <04daca6a-5863-d205-ea98-096163a2296a@linux.ibm.com>
-Date:   Wed, 23 Feb 2022 16:39:07 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Content-Language: en-US
-To:     Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Cc:     imbrenda@linux.ibm.com, Pierre Morel <pmorel@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>, imbrenda@linux.ibm.com,
-        thuth@redhat.com, david@redhat.com
-References: <20220223132940.2765217-1-nrb@linux.ibm.com>
- <20220223132940.2765217-7-nrb@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v3 6/8] s390x: Add more tests for STSCH
-In-Reply-To: <20220223132940.2765217-7-nrb@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: qH7Rnr0O8YUPwtdNISpEcZxOFT6eTXi4
-X-Proofpoint-ORIG-GUID: CfmvwUomLHt-MYPSsksq6nsdxnvXqvAm
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        with ESMTP id S242342AbiBWPnA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Feb 2022 10:43:00 -0500
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D12C92D1E5
+        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 07:42:32 -0800 (PST)
+Received: by mail-pf1-x42a.google.com with SMTP id d17so15709956pfl.0
+        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 07:42:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=5eKMkbn3vkPpm7UY1+T/n4u23dYrThYK2hTdMcTSqbk=;
+        b=iQzHOuBdRTgUUwt6x2XL6c8dfG05Yq2gL7QStu4+rU71gTwZCdVG62tkmnrcJ/f8dH
+         zQcDF4w85f82eNBReN8+eMUSdqm5waegLQY0IJNLiNjN36p+1FuyVSmEaSe7kUixtrVV
+         VB1yF9AAN0VGCT3TMx+zfqBN2hQ1DdRRM7EcMByLGE+QkDfDbbN2X8+o+i4np2ejbMbL
+         Znzp7xrygfK0NJmiU89eEIQGozNaVvTJUs6eEHx/+tBNY7jg4mQrXTTQU4EmoCMkCRYP
+         htRsgSUx6DkOhgpD32eQl1emvmhW19tNmjDmqL+Js+IARGf+990k4VCkK+vyZfmRlbTy
+         k5mw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=5eKMkbn3vkPpm7UY1+T/n4u23dYrThYK2hTdMcTSqbk=;
+        b=oIQNl4NZFa8HruE5thkEEowNKy4ypqcdlrBMOg9B4ew/UYajXFXcGSv0xnPgYUWzyo
+         ljFQPlu5Yv2XYB8XezmmuEgjgzfb7lthgpyX6B2YAjK0jto/nF2yG8yujS9jqryPcKF0
+         sdDfG0OC3ulSv2VWOsOm0sEXEiuRzKWNsspGaBvzCFNUuVZWZJpoQpyeieH0ydhRSJ/Z
+         tj0bp22+koBrLogpcZQ+tWSNOmdqt8j1MUJvKotkx1jTZWM9/EByseTGCchUrkSmBL21
+         58gcZvu0V3tyLxI0T/xqx6665PB7UPPRllhpQreeMNXWAFrCVWyXcWql2eceiLhPV63i
+         MLBA==
+X-Gm-Message-State: AOAM531L9S8KikPhnpn/HunbZj+BCwx/tvuEJIFuFc3lHbT2W2E8W8yR
+        7UTZ08MCqrMeTX5kv0Nk+a91KQ==
+X-Google-Smtp-Source: ABdhPJwC6BFJXKTBBXCtBd1U+4hyOlzH0X/agA3nwjmP1Umj4h9d1LMS/fMMYwwkm2ORUHx4O6X1YA==
+X-Received: by 2002:a62:fb0d:0:b0:4f1:a584:71f with SMTP id x13-20020a62fb0d000000b004f1a584071fmr10767700pfm.2.1645630951771;
+        Wed, 23 Feb 2022 07:42:31 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id s24sm24789695pgq.51.2022.02.23.07.42.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Feb 2022 07:42:31 -0800 (PST)
+Date:   Wed, 23 Feb 2022 15:42:27 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH v2 05/18] KVM: x86/mmu: use struct kvm_mmu_root_info for
+ mmu->root
+Message-ID: <YhZV4yFw5dk3N5o7@google.com>
+References: <20220217210340.312449-1-pbonzini@redhat.com>
+ <20220217210340.312449-6-pbonzini@redhat.com>
+ <cb338203d9abf040fc1b68763ce60369cc8342a6.camel@redhat.com>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-02-23_06,2022-02-23_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 clxscore=1015
- adultscore=0 phishscore=0 suspectscore=0 priorityscore=1501 spamscore=0
- mlxscore=0 impostorscore=0 mlxlogscore=999 malwarescore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2202230087
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cb338203d9abf040fc1b68763ce60369cc8342a6.camel@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/23/22 14:29, Nico Boehr wrote:
-> css_lib extensively uses STSCH, but two more cases deserve their own
-> tests:
+On Wed, Feb 23, 2022, Maxim Levitsky wrote:
+> On Thu, 2022-02-17 at 16:03 -0500, Paolo Bonzini wrote:
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index b912eef5dc1a..c0d7256e3a78 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -762,7 +762,7 @@ bool kvm_inject_emulated_page_fault(struct kvm_vcpu *vcpu,
+> >  	if ((fault->error_code & PFERR_PRESENT_MASK) &&
+> >  	    !(fault->error_code & PFERR_RSVD_MASK))
+> >  		kvm_mmu_invalidate_gva(vcpu, fault_mmu, fault->address,
+> > -				       fault_mmu->root_hpa);
+> > +				       fault_mmu->root.hpa);
+> >  
+> >  	fault_mmu->inject_page_fault(vcpu, fault);
+> >  	return fault->nested_page_fault;
 > 
-> - unaligned address for SCHIB. We check for misalignment by 1 and 2
->    bytes.
-> - channel not operational
-> - bit 47 in SID not set
-> - bit 5 of PMCW flags.
->    As per the principles of operation, bit 5 of the PMCW flags shall be
->    ignored by msch and always stored as zero by stsch.
 > 
->    Older QEMU versions require this bit to always be zero on msch,
->    which is why this test may fail. A fix is available in QEMU master
->    commit 2df59b73e086 ("s390x/css: fix PMCW invalid mask"). >
-> Here's the QEMU PMCW invalid mask fix: https://lists.nongnu.org/archive/html/qemu-s390x/2021-12/msg00100.html
-> 
-> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-> ---
->   s390x/css.c | 74 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 74 insertions(+)
-> 
-> diff --git a/s390x/css.c b/s390x/css.c
-> index a90a0cd64e2b..021eb12573c0 100644
-> --- a/s390x/css.c
-> +++ b/s390x/css.c
-> @@ -496,6 +496,78 @@ static void test_ssch(void)
->   	report_prefix_pop();
->   }
->   
-> +static void test_stsch(void)
-> +{
-> +	const int align_to = 4;
-> +	struct schib schib;
-> +	int cc;
-> +
-> +	if (!test_device_sid) {
-> +		report_skip("No device");
-> +		return;
-> +	}
-> +
-> +	report_prefix_push("Unaligned");
-> +	for (int i = 1; i < align_to; i *= 2) {
-> +		report_prefix_pushf("%d", i);
-> +
-> +		expect_pgm_int();
-> +		stsch(test_device_sid, (struct schib *)(alignment_test_page + i));
-> +		check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
-> +
-> +		report_prefix_pop();
-> +	}
-> +	report_prefix_pop();
-> +
-> +	report_prefix_push("Invalid subchannel number");
-> +	cc = stsch(0x0001ffff, &schib);
-> +	report(cc == 3, "Channel not operational");
-> +	report_prefix_pop();
-> +
-> +	report_prefix_push("Bit 47 in SID is zero");
-> +	expect_pgm_int();
-> +	stsch(0x0000ffff, &schib);
-> +	check_pgm_int_code(PGM_INT_CODE_OPERAND);
-> +	report_prefix_pop();
+> As a follow up to this patch I suggest that we should also rename pgd to just 'gpa'.
 
-Add a comment:
-No matter if the multiple-subchannel-set facility is installed or not, 
-bit 47 always needs to be 1.
+Hmm, I prefer 'pgd' over 'gpa' because it provides a hint/reminder that the field
+is unused for TDP.  It also pairs with e.g. kvm_mmu_new_pgd(), though I suppose we
+could rename those to something else too.
 
-Do we have the MSS facility?
-If yes, could we disable it to test the 32-47 == 0x0001 case?
+> This also brings a question, what pgd acronym actually means? 
+> I guess paging guest directory?
 
-> +}
-> +
-> +static void test_pmcw_bit5(void)
-> +{
-> +	int cc;
-> +	uint16_t old_pmcw_flags;
-
-I need a comment here for further reference since that behavior is 
-documented at the description of the schib and not where STSCH is described:
-According to architecture MSCH does ignore bit 5 of the second word but 
-STSCH will store bit 5 as zero.
-
-
-We could check if bits 0,1 and 6,7 are also zero but I'm not sure if 
-that's interesting since MSCH does not ignore those bits and should 
-result in an operand exception when trying to set them.
-
-@Halil, @Pierre: Any opinions?
-
-> +
-> +	cc = stsch(test_device_sid, &schib);
-> +	if (cc) {
-> +		report_fail("stsch: sch %08x failed with cc=%d", test_device_sid, cc);
-> +		return;
-> +	}
-> +	old_pmcw_flags = schib.pmcw.flags;
-> +
-> +	report_prefix_push("Bit 5 set");
-> +
-> +	schib.pmcw.flags = old_pmcw_flags | BIT(15 - 5);
-> +	cc = msch(test_device_sid, &schib);
-> +	report(!cc, "MSCH cc == 0");
-> +
-> +	cc = stsch(test_device_sid, &schib);
-> +	report(!cc, "STSCH cc == 0");
-> +	report(!(schib.pmcw.flags & BIT(15 - 5)), "STSCH PMCW Bit 5 is clear");
-> +
-> +	report_prefix_pop();
-> +
-> +	report_prefix_push("Bit 5 clear");
-> +
-> +	schib.pmcw.flags = old_pmcw_flags & ~BIT(15 - 5);
-> +	cc = msch(test_device_sid, &schib);
-> +	report(!cc, "MSCH cc == 0");
-> +
-> +	cc = stsch(test_device_sid, &schib);
-> +	report(!cc, "STSCH cc == 0");
-> +	report(!(schib.pmcw.flags & BIT(15 - 5)), "STSCH PMCW Bit 5 is clear");
-> +
-> +	report_prefix_pop();
-> +}
-> +
->   static struct {
->   	const char *name;
->   	void (*func)(void);
-> @@ -511,6 +583,8 @@ static struct {
->   	{ "msch", test_msch },
->   	{ "stcrw", test_stcrw },
->   	{ "ssch", test_ssch },
-> +	{ "stsch", test_stsch },
-> +	{ "pmcw bit 5 ignored", test_pmcw_bit5 },
->   	{ NULL, NULL }
->   };
->   
-
+Page Global Directory, borrowed from the kernel's arch-agnostic paging terminology.
