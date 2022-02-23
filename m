@@ -2,75 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3309F4C17E1
-	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 16:58:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C2F1C4C17EC
+	for <lists+kvm@lfdr.de>; Wed, 23 Feb 2022 16:58:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229842AbiBWP6b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Feb 2022 10:58:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50026 "EHLO
+        id S242543AbiBWP6g convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Wed, 23 Feb 2022 10:58:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50264 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242521AbiBWP6a (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Feb 2022 10:58:30 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 626D0BD2CF;
-        Wed, 23 Feb 2022 07:58:02 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 1E302B820CB;
-        Wed, 23 Feb 2022 15:58:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46C37C340E7;
-        Wed, 23 Feb 2022 15:57:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1645631879;
-        bh=dSU3WtzpUD98nEOWYdE8NQwT4RAMWaALAJhA92a+OEQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=CV2+iDyXVjcH5VLXkvC0EUjFupUO0+HMmWPkAk5SIaOu+YFuioWg8s1qvuaPFjnaP
-         pDaei6OrXwEw7M/bZrlZsfDqoagpel8f2rb4nTtbmgwRj873OW9ix/P7x6A2uw5F7R
-         3CRzANk/ebwN4DS01fme21lBTAIwXfMqQlQ2OtzM=
-Date:   Wed, 23 Feb 2022 16:57:57 +0100
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Steffen Eiden <seiden@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v2 1/3] drivers/s390/char: Add Ultravisor io device
-Message-ID: <YhZZhfokG+kWXSSF@kroah.com>
-References: <20220223144830.44039-1-seiden@linux.ibm.com>
- <20220223144830.44039-2-seiden@linux.ibm.com>
+        with ESMTP id S242541AbiBWP6f (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Feb 2022 10:58:35 -0500
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42F5CC249C;
+        Wed, 23 Feb 2022 07:58:06 -0800 (PST)
+Received: from fraeml739-chm.china.huawei.com (unknown [172.18.147.206])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4K3gYS5RWYz67mB8;
+        Wed, 23 Feb 2022 23:53:16 +0800 (CST)
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ fraeml739-chm.china.huawei.com (10.206.15.220) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Wed, 23 Feb 2022 16:58:04 +0100
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ lhreml710-chm.china.huawei.com (10.201.108.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Wed, 23 Feb 2022 15:58:03 +0000
+Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
+ lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
+ 15.01.2308.021; Wed, 23 Feb 2022 15:58:03 +0000
+From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
+        "yishaih@nvidia.com" <yishaih@nvidia.com>,
+        Linuxarm <linuxarm@huawei.com>,
+        liulongfang <liulongfang@huawei.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        Jonathan Cameron <jonathan.cameron@huawei.com>,
+        "Wangzhou (B)" <wangzhou1@hisilicon.com>
+Subject: RE: [PATCH v5 7/8] hisi_acc_vfio_pci: Add support for VFIO live
+ migration
+Thread-Topic: [PATCH v5 7/8] hisi_acc_vfio_pci: Add support for VFIO live
+ migration
+Thread-Index: AQHYJxgOEQAq1mellU2EgPXLuddEUaygUS2AgAD74UA=
+Date:   Wed, 23 Feb 2022 15:58:03 +0000
+Message-ID: <76efe90279f64afb9a157b4f3fb45e4f@huawei.com>
+References: <20220221114043.2030-1-shameerali.kolothum.thodi@huawei.com>
+ <20220221114043.2030-8-shameerali.kolothum.thodi@huawei.com>
+ <20220223005251.GJ10061@nvidia.com>
+In-Reply-To: <20220223005251.GJ10061@nvidia.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.202.227.178]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220223144830.44039-2-seiden@linux.ibm.com>
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 23, 2022 at 09:48:28AM -0500, Steffen Eiden wrote:
-> --- /dev/null
-> +++ b/drivers/s390/char/uvdevice.c
-> @@ -0,0 +1,145 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + *  Copyright IBM Corp. 2022
-> + *  Author(s): Steffen Eiden <seiden@linux.ibm.com>
-> + */
-> +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt ".\n"
 
-Nit, this isn't needed as you do not have any pr_* calls that use it :)
 
-thanks,
+> -----Original Message-----
+> From: Jason Gunthorpe [mailto:jgg@nvidia.com]
+> Sent: 23 February 2022 00:53
+> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+> Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
+> linux-crypto@vger.kernel.org; alex.williamson@redhat.com;
+> cohuck@redhat.com; mgurtovoy@nvidia.com; yishaih@nvidia.com; Linuxarm
+> <linuxarm@huawei.com>; liulongfang <liulongfang@huawei.com>; Zengtao (B)
+> <prime.zeng@hisilicon.com>; Jonathan Cameron
+> <jonathan.cameron@huawei.com>; Wangzhou (B) <wangzhou1@hisilicon.com>
+> Subject: Re: [PATCH v5 7/8] hisi_acc_vfio_pci: Add support for VFIO live
+> migration
+> 
+> On Mon, Feb 21, 2022 at 11:40:42AM +0000, Shameer Kolothum wrote:
+> 
+> > +	/*
+> > +	 * ACC VF dev BAR2 region consists of both functional register space
+> > +	 * and migration control register space. For migration to work, we
+> > +	 * need access to both. Hence, we map the entire BAR2 region here.
+> > +	 * But from a security point of view, we restrict access to the
+> > +	 * migration control space from Guest(Please see mmap/ioctl/read/write
+> > +	 * override functions).
+> > +	 *
+> > +	 * Also the HiSilicon ACC VF devices supported by this driver on
+> > +	 * HiSilicon hardware platforms are integrated end point devices
+> > +	 * and has no capability to perform PCIe P2P.
+> 
+> If that is the case why not implement the RUNNING_P2P as well as a
+> NOP?
+> 
+> Alex expressed concerned about proliferation of non-P2P devices as it
+> complicates qemu to support mixes
 
-greg k-h
+Since both PRE_COPY and P2P are optional, Qemu anyway will have to check and
+add the support, right?. Just worried the FSM will look complicated with both
+PRE_COPY and P2P arcs now.
+
+Thanks,
+Shameer
