@@ -2,127 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 980224C1FC3
-	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 00:35:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A9EFB4C1FCA
+	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 00:37:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244840AbiBWXgN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Feb 2022 18:36:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56134 "EHLO
+        id S244865AbiBWXhj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Feb 2022 18:37:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241997AbiBWXgM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Feb 2022 18:36:12 -0500
-Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEE7159A72
-        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 15:35:43 -0800 (PST)
-Received: by mail-ej1-x62e.google.com with SMTP id vz16so768217ejb.0
-        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 15:35:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=6BEVhwDl0o7tKtwDnwmP6riaeuofFGCv6jbqHEWrC/Q=;
-        b=I0DlJiYDFHk7IF6jgaZdkpolAJPlSmSQOOtbxqc6Q1Xs65GoWrnPlbmQTZHMcVAXoE
-         1jnnkyrRYDXGObI7TPCx3N3nQdHvi2EXY0Q4/GagaiPI9Di4AVB9ytf5OXYT9Ykxp8Bi
-         egnTcg+o0fTO5sutqDGkSe4Xp11+qccGeJNXjTw4FPiTYXShZ91yrSf6wrNHoOmNi/CX
-         yqOzsTmkTbZsrCOVDQS9MhvluzSVHJzJ9CMLydsigfzYTdO6NyOCqsz7CsMX49lGbreB
-         J92sVN3EfHLVc+ORGxdYZEPf6tGVFB3Drm1qU00UigKsn7d+nPNiw3xIcfnIMCJxP5U+
-         cUMg==
+        with ESMTP id S244831AbiBWXhi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Feb 2022 18:37:38 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B81225A0A3
+        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 15:37:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645659427;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=T4uZUFplVlE5Y8frdrAqmVb5e+dpaoHXAN39OVRnAh4=;
+        b=HfvT7Km9xEzosgW97guxKGspVDkjt76JZH5i66eL0dZz+5SAiA89HX/SFfSMixfdbkUm9/
+        R7JL5Qr89KYMQccOueAEwl2IQj2VVwk1PkhhUBlSmq4bS+8bM/H7kC18jbKblhgpge/qDb
+        9aWlteAKioJ7b1PZ3bjUdTgWo2Q00V0=
+Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com
+ [209.85.167.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-148-aWGSSt5tPKaAiWgABKdeWw-1; Wed, 23 Feb 2022 18:37:06 -0500
+X-MC-Unique: aWGSSt5tPKaAiWgABKdeWw-1
+Received: by mail-oi1-f197.google.com with SMTP id w19-20020a0568080d5300b002d54499cc1eso306499oik.19
+        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 15:37:06 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=6BEVhwDl0o7tKtwDnwmP6riaeuofFGCv6jbqHEWrC/Q=;
-        b=BlaX6E5V5G1GZ5qprq1+ssnsifEbiCMpdY8QTL/uJqa9UMI1t7lsCopmyzOXUZqtLb
-         ac4pSxPqBTSYn5FJ4bV7+QkEwvZbEtbKwajEwouKZU/an531EdnQjixYbJLmlnYJ5uZN
-         67/b4WzSyLJGR8tau5/bu4c9ucGKKtc/CReiai06nxdfvUZeMGSkV51+8EIk2tNMBZ1q
-         hkHqD7UWKmrYKZhG/qBWc83fFLyosh+Z4a+i9QBsiiCqY7E2IGNSYBEq+XmRUQf4GtNk
-         uUo43NSaLC1IL3yCXqJ9EbEolEiD372MWgwHw+yAYh0IDco/ikItM//VC0k25JYQypt5
-         Vnbw==
-X-Gm-Message-State: AOAM533atJRqSKhFO8T5g11AtY2brw7Fb60Oy4CHS5iQ2m+ckCjH8GvQ
-        e1u1DjxCDMKos5HvaXPtaliG98TcoYKb6x8KiHgGEQ==
-X-Google-Smtp-Source: ABdhPJyyDhEOfnAjb2BcESRXKyd3HSF18oP1vowA94k2h9qm3UvRRAIEvjmnJKRIxHrcOHt+ZZ2ZwcKXN9A2QCz5VfQ=
-X-Received: by 2002:a17:906:be1:b0:6ce:c3c8:b4b6 with SMTP id
- z1-20020a1709060be100b006cec3c8b4b6mr36366ejg.617.1645659342359; Wed, 23 Feb
- 2022 15:35:42 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=T4uZUFplVlE5Y8frdrAqmVb5e+dpaoHXAN39OVRnAh4=;
+        b=wM18lqwApbQgwKLV/swyfwebtWa27m8H+tIOrUt7GF8Lk8zen1wefPnWmyq8bOQNJT
+         p2ErAoYCng+c8Idssw78B8TjTD0hQMj66nBs8cRsPM4sqt1biNZe6sqc8ttzxal50HuS
+         mT5ME4t7iLPpaVdZW5G8EQA1aS/tv4gpBjP7TkXeqUXdBMIH663cA/DEbLwrv9V0Z+Mc
+         CQw/crL1RHsP5XZr2ZAteCgtgHZabP4uk1PaTzz+UJOUBMgCesGsbK+V+n4BVSDVdxzt
+         XDdfiO4YRDWpEjlV/lCrAxiM3ufzYRb9joxgG0aKjxFyWrDbMdJNrGr1fsVt3IORorGx
+         kRiQ==
+X-Gm-Message-State: AOAM5315cJmNmz9Enm6w3nasqBGpWaAp4wdEOVI6i1V+vafP2C3jZjFK
+        B8OW2Ux0hztQ8dyDykzu7ep59Ufszk13T1peevb4umaFABQ5kIGYtdXGBUJUHD2VW9z3tQ+bZh5
+        t6ND4XjA/d/j3
+X-Received: by 2002:a9d:7016:0:b0:5af:157b:685 with SMTP id k22-20020a9d7016000000b005af157b0685mr10031otj.16.1645659425852;
+        Wed, 23 Feb 2022 15:37:05 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxofdQSoSC1/kDx6fUUcLtOCsSdUzQ0Bk8PapztMnNq1yES+yHaSrNxhft1rMXuy1CFcMCgtg==
+X-Received: by 2002:a9d:7016:0:b0:5af:157b:685 with SMTP id k22-20020a9d7016000000b005af157b0685mr10026otj.16.1645659425637;
+        Wed, 23 Feb 2022 15:37:05 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id q73sm422469ooq.33.2022.02.23.15.37.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Feb 2022 15:37:05 -0800 (PST)
+Date:   Wed, 23 Feb 2022 16:37:03 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Cc:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>, <jgg@nvidia.com>,
+        <cohuck@redhat.com>, <mgurtovoy@nvidia.com>, <yishaih@nvidia.com>,
+        <linuxarm@huawei.com>, <liulongfang@huawei.com>,
+        <prime.zeng@hisilicon.com>, <jonathan.cameron@huawei.com>,
+        <wangzhou1@hisilicon.com>
+Subject: Re: [PATCH v5 5/8] hisi_acc_vfio_pci: Restrict access to VF dev
+ BAR2 migration region
+Message-ID: <20220223163703.20690b29.alex.williamson@redhat.com>
+In-Reply-To: <20220221114043.2030-6-shameerali.kolothum.thodi@huawei.com>
+References: <20220221114043.2030-1-shameerali.kolothum.thodi@huawei.com>
+        <20220221114043.2030-6-shameerali.kolothum.thodi@huawei.com>
+Organization: Red Hat
 MIME-Version: 1.0
-References: <20220203010051.2813563-1-dmatlack@google.com> <20220203010051.2813563-14-dmatlack@google.com>
- <CANgfPd-h7J=j8r_APaHRWSsvJtaP69aYtNGpb=m3h_H6QuR_DA@mail.gmail.com>
-In-Reply-To: <CANgfPd-h7J=j8r_APaHRWSsvJtaP69aYtNGpb=m3h_H6QuR_DA@mail.gmail.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Wed, 23 Feb 2022 15:35:31 -0800
-Message-ID: <CANgfPd_wSncCH7QDJk5Ece14ZQ8OQRk0sYTfZ8BmAzY=v8h2Mg@mail.gmail.com>
-Subject: Re: [PATCH 13/23] KVM: x86/mmu: Update page stats in __rmap_add()
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        leksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Peter Feiner <pfeiner@google.com>,
-        Andrew Jones <drjones@redhat.com>,
-        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
-        kvm <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 23, 2022 at 3:32 PM Ben Gardon <bgardon@google.com> wrote:
->
-> On Wed, Feb 2, 2022 at 5:02 PM David Matlack <dmatlack@google.com> wrote:
-> >
-> > Update the page stats in __rmap_add() rather than at the call site. This
-> > will avoid having to manually update page stats when splitting huge
-> > pages in a subsequent commit.
-> >
-> > No functional change intended.
-> >
->
-> Reviewed-by: Ben Gardon <bgardon@google.com>
->
-> > Signed-off-by: David Matlack <dmatlack@google.com>
-> > ---
-> >  arch/x86/kvm/mmu/mmu.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index c2f7f026d414..ae1564e67e49 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -1621,6 +1621,8 @@ static void __rmap_add(struct kvm *kvm,
-> >         rmap_head = gfn_to_rmap(gfn, sp->role.level, slot);
-> >         rmap_count = pte_list_add(cache, spte, rmap_head);
-> >
-> > +       kvm_update_page_stats(kvm, sp->role.level, 1);
-> > +
+On Mon, 21 Feb 2022 11:40:40 +0000
+Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
+>  
+> +static const struct vfio_device_ops hisi_acc_vfio_pci_migrn_ops = {
+> +	.name = "hisi-acc-vfio-pci",
 
-Strictly speaking, this is a functional change since you're moving the
-stat update after the rmap update, but there's no synchronization on
-the stats anyway, so I don't think it matters if it's updated before
-or after.
+Use a different name from the ops below?  Thanks,
 
-> >         if (rmap_count > RMAP_RECYCLE_THRESHOLD) {
-> >                 kvm_unmap_rmapp(kvm, rmap_head, NULL, gfn, sp->role.level, __pte(0));
-> >                 kvm_flush_remote_tlbs_with_address(
-> > @@ -2831,7 +2833,6 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
-> >
-> >         if (!was_rmapped) {
-> >                 WARN_ON_ONCE(ret == RET_PF_SPURIOUS);
-> > -               kvm_update_page_stats(vcpu->kvm, level, 1);
-> >                 rmap_add(vcpu, slot, sptep, gfn);
-> >         }
-> >
-> > --
-> > 2.35.0.rc2.247.g8bbb082509-goog
-> >
+Alex
+
+> +	.open_device = hisi_acc_vfio_pci_open_device,
+> +	.close_device = vfio_pci_core_close_device,
+> +	.ioctl = hisi_acc_vfio_pci_ioctl,
+> +	.device_feature = vfio_pci_core_ioctl_feature,
+> +	.read = hisi_acc_vfio_pci_read,
+> +	.write = hisi_acc_vfio_pci_write,
+> +	.mmap = hisi_acc_vfio_pci_mmap,
+> +	.request = vfio_pci_core_request,
+> +	.match = vfio_pci_core_match,
+> +};
+> +
+>  static const struct vfio_device_ops hisi_acc_vfio_pci_ops = {
+>  	.name = "hisi-acc-vfio-pci",
+>  	.open_device = hisi_acc_vfio_pci_open_device,
+
