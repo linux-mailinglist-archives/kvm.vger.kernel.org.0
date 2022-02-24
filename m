@@ -2,179 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5078E4C3306
-	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 18:04:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9EC1F4C3362
+	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 18:19:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231731AbiBXRCh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Feb 2022 12:02:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53282 "EHLO
+        id S230349AbiBXRTM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Feb 2022 12:19:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229587AbiBXRCY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Feb 2022 12:02:24 -0500
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2053.outbound.protection.outlook.com [40.107.237.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34FE5793BD;
-        Thu, 24 Feb 2022 08:59:17 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RHQk9g6C1Vs6wkguT2p62cBTqgZmWPA3X+PVZnrfHoSt8v81Pxql58XSLDkbOuk+FyRFIk5ETgkFFOOWCGJRczdxSCpuj6vHbUfV44Omq0IykiB/N9Zqsn6FaRlSx6SLSphxNexUq1D2VIs3VY3A3jGrCnK7KdrskgmeIUCNTM5JeuUZwWZhdtCsL+rGoqmOO++7IFGnd9NY3JffrhhFADHwrDtpiZHdhSkSkpvNdpS0K3btp2+hPHDkgBsqXt+By1onSEmGcwRQ5qr6UgyoJfB/IyF1F78G6oLAv6x9nHyea8qPzPKLlFEQ20RNKKShPP4fipul7w3pNeO1TEPBtQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=lbvaTYmaqxdr+kYYkpTp/E6MXTk5T4w/SS2QoHRoiF4=;
- b=DGfw0UPdd3Yv7MEJz5deti9m1eRGK9EYXt3dxPNdNuaAvDkZw+ulXoRpFcTuhtIuufPkyfFqfFmo4iPHmujPAKv9PW8fAFT4TXDIfffJybTw1FsR4FK9/H8EWsEPuHbyjUHOBnKbUiyjVWVUeiJQ5jL2r0Nm3VLrH0Z2IM9/+WSaBwABKGql7hAqCwfKKC0RYR3/mOWQZfrO2aQMob88z84/XwFcF5k8obsAJzj0w6nZwaTFHscUQX2GoYwh9LJCrPqqt6A8UW/kOppkI06r4TQ893quXUP/5ZpyXOrYIUYGz2tMVMThLfeU5O18FCzWrFk6EBkj0qrsre7gp9nTVw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lbvaTYmaqxdr+kYYkpTp/E6MXTk5T4w/SS2QoHRoiF4=;
- b=B+wSRBWRJ5hZrTLAJ2GWHAVm9IK3qynSdoyVNBRYI1QtNm4ZhoF/IHpS/Y8N5eA0yvAqh1vChbJZB9W4u778GXzKMjZdP6of25YoSIN2KWrryNsbfyAsHSLl7o56nNR9PTqcmtbmQzAb23sC2A3NcF2evfw3ApfU0VIOx7feDOM=
-Received: from DM5PR13CA0046.namprd13.prod.outlook.com (2603:10b6:3:7b::32) by
- BL0PR12MB2514.namprd12.prod.outlook.com (2603:10b6:207:43::12) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5017.21; Thu, 24 Feb 2022 16:59:15 +0000
-Received: from DM6NAM11FT034.eop-nam11.prod.protection.outlook.com
- (2603:10b6:3:7b:cafe::c9) by DM5PR13CA0046.outlook.office365.com
- (2603:10b6:3:7b::32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5038.9 via Frontend
- Transport; Thu, 24 Feb 2022 16:59:14 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com;
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DM6NAM11FT034.mail.protection.outlook.com (10.13.173.47) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5017.22 via Frontend Transport; Thu, 24 Feb 2022 16:59:14 +0000
-Received: from sbrijesh-desktop.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.18; Thu, 24 Feb
- 2022 10:59:11 -0600
-From:   Brijesh Singh <brijesh.singh@amd.com>
-To:     <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kvm@vger.kernel.org>, <linux-efi@vger.kernel.org>,
-        <platform-driver-x86@vger.kernel.org>,
-        <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>
-CC:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        "Vitaly Kuznetsov" <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        "Andy Lutomirski" <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        "Peter Zijlstra" <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        <brijesh.ksingh@gmail.com>, <tony.luck@intel.com>,
-        <marcorr@google.com>, <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Subject: [PATCH v11 45/45] virt: sevguest: Add documentation for SEV-SNP CPUID Enforcement
-Date:   Thu, 24 Feb 2022 10:56:25 -0600
-Message-ID: <20220224165625.2175020-46-brijesh.singh@amd.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220224165625.2175020-1-brijesh.singh@amd.com>
-References: <20220224165625.2175020-1-brijesh.singh@amd.com>
+        with ESMTP id S229635AbiBXRTL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Feb 2022 12:19:11 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 53D9429F40C
+        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 09:18:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645723120;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=9zS1exBQ8/i7GE0yNuNzJ4368SmU3x1bv1hKHvRyPw8=;
+        b=IFdfjkeUB6pIsyWSuTXR7HMYDx3AhyXXAtoXulby8soAypXmE1HCfiAjVf/VLGzuEGTuOv
+        /PJb1C85tvozaPRWjlzqQFci9LsWbDvFDg0tEzgTge/hXUchsVFqRVg7UFrz98QG25naOj
+        vKsRHVKrEKKcxLhGKeuTQ0uHmaQyCDQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-83-HjQKu-n9MBu3I-8CPxWnAQ-1; Thu, 24 Feb 2022 12:18:37 -0500
+X-MC-Unique: HjQKu-n9MBu3I-8CPxWnAQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9E31E1006AA6;
+        Thu, 24 Feb 2022 17:18:35 +0000 (UTC)
+Received: from starship (unknown [10.40.195.190])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2765F841D3;
+        Thu, 24 Feb 2022 17:18:32 +0000 (UTC)
+Message-ID: <9143d9d24d1b169668062a18a5f49bb8cf8e877b.camel@redhat.com>
+Subject: Re: [RFC PATCH 05/13] KVM: SVM: Update max number of vCPUs
+ supported for x2AVIC mode
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, seanjc@google.com, joro@8bytes.org,
+        jon.grimm@amd.com, wei.huang2@amd.com, terry.bowman@amd.com
+Date:   Thu, 24 Feb 2022 19:18:31 +0200
+In-Reply-To: <20220221021922.733373-6-suravee.suthikulpanit@amd.com>
+References: <20220221021922.733373-1-suravee.suthikulpanit@amd.com>
+         <20220221021922.733373-6-suravee.suthikulpanit@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 5aefc08b-9bea-4e07-037a-08d9f7b6fc90
-X-MS-TrafficTypeDiagnostic: BL0PR12MB2514:EE_
-X-Microsoft-Antispam-PRVS: <BL0PR12MB2514B7AF55CF351B596D867AE53D9@BL0PR12MB2514.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: PM4fly/+FQ6FsUXRLeuEXR3vYtiFtqswb+DtfMIlweBk8+aC/o8maJYMZQA22woGeNxzU49qjSN9HNdYVsiXUD4bYXNh0SCFkOPGRZSEG7WtHVhY/sKUS/3YXzM/SY9XIbWzgMUf7F+iVNEeIxYxQX9vRn1m41VI1ggAF3HBK8NxN280CFur3gud0y0koHL1K6uQlU0arAN/JMbRarWuO9UsGx/eCD2y47glWW+Kf+ELWudZHK/W9nsPeECFy8YahrVlBL+eSDnjI4d438YB0JdR9q6GDXrWACE35a5ppK6OCwIWi+F6hgLvKr1LEgyWIs8Sija9yPMeRaNqYBtRXy1eXYlcBIQwISmB8kr2/8sN1+NC2RE/tOv85XDOV0jZ17rmnL1T1wO0QJ9chZZcI4T42RZhiWkFsZe+ahTpSc2LHOpiymffeaysIkza4m9wA05hdMZ6x66ejGH2b+yUYQm4eGwcHWgNrDrQL4Xh/1kPtdEBf1C5GrT8FMsxoVvdA6krpt+Y9EYQ2JFoCIvBxqF2hjXchc46x5HGDI44uGgb8yFPZMJuczN+/ABnZzpOCS65uV+c9qUBYxC2Usk+eo4LukmdRokp+CDejhU70IZvEWvdezFvwkWKozIcbH9k1EGGvEV4oo/O/dCfBHoHIgTge6rfhEGU2GK6lPjn/DYU1ABs7/fR9g6dZ1fVFX2X3nL3AX/oWNV0SXbj8YOe85Kmh68c5zpeJe/gCqJUB0Q=
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230001)(4636009)(46966006)(40470700004)(36840700001)(47076005)(356005)(316002)(426003)(36860700001)(40460700003)(336012)(26005)(2616005)(1076003)(186003)(54906003)(110136005)(81166007)(2906002)(7416002)(4326008)(86362001)(82310400004)(7406005)(70206006)(7696005)(8676002)(8936002)(5660300002)(508600001)(16526019)(36756003)(83380400001)(44832011)(70586007)(6666004)(36900700001)(2101003);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Feb 2022 16:59:14.1947
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5aefc08b-9bea-4e07-037a-08d9f7b6fc90
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT034.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR12MB2514
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Michael Roth <michael.roth@amd.com>
+On Sun, 2022-02-20 at 20:19 -0600, Suravee Suthikulpanit wrote:
+> xAVIC and x2AVIC modes can support diffferent number of vcpus.
+> Update existing logics to support each mode accordingly.
+> 
+> Also, modify the maximum physical APIC ID for AVIC to 255 to reflect
+> the actual value supported by the architecture.
+> 
+> Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+> ---
+>  arch/x86/include/asm/svm.h | 12 +++++++++---
+>  arch/x86/kvm/svm/avic.c    |  8 +++++---
+>  2 files changed, 14 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
+> index 7a7a2297165b..681a348a9365 100644
+> --- a/arch/x86/include/asm/svm.h
+> +++ b/arch/x86/include/asm/svm.h
+> @@ -250,10 +250,16 @@ enum avic_ipi_failure_cause {
+>  
+>  
+>  /*
+> - * 0xff is broadcast, so the max index allowed for physical APIC ID
+> - * table is 0xfe.  APIC IDs above 0xff are reserved.
+> + * For AVIC, the max index allowed for physical APIC ID
+> + * table is 0xff (255).
+>   */
+> -#define AVIC_MAX_PHYSICAL_ID_COUNT	0xff
+> +#define AVIC_MAX_PHYSICAL_ID		0XFFULL
+> +
+> +/*
+> + * For x2AVIC, the max index allowed for physical APIC ID
+> + * table is 0x1ff (511).
+> + */
+> +#define X2AVIC_MAX_PHYSICAL_ID		0x1FFUL
 
-Update the documentation with information regarding SEV-SNP CPUID
-Enforcement details and what sort of assurances it provides to guests.
+Yep, physid page can't hold more entries...
 
-Signed-off-by: Michael Roth <michael.roth@amd.com>
-Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
----
- Documentation/virt/coco/sevguest.rst | 29 ++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
+This brings the inventible question of what to do when a VM has more
+that 512 vCPUs...
 
-diff --git a/Documentation/virt/coco/sevguest.rst b/Documentation/virt/coco/sevguest.rst
-index 0f352056572d..48d66e10305b 100644
---- a/Documentation/virt/coco/sevguest.rst
-+++ b/Documentation/virt/coco/sevguest.rst
-@@ -118,6 +118,35 @@ be updated with the expected value.
- 
- See GHCB specification for further detail on how to parse the certificate blob.
- 
-+3. SEV-SNP CPUID Enforcement
-+============================
-+
-+SEV-SNP guests can access a special page that contains a table of CPUID values
-+that have been validated by the PSP as part of the SNP_LAUNCH_UPDATE firmware
-+command. It provides the following assurances regarding the validity of CPUID
-+values:
-+
-+ - Its address is obtained via bootloader/firmware (via CC blob), and those
-+   binaries will be measured as part of the SEV-SNP attestation report.
-+ - Its initial state will be encrypted/pvalidated, so attempts to modify
-+   it during run-time will result in garbage being written, or #VC exceptions
-+   being generated due to changes in validation state if the hypervisor tries
-+   to swap the backing page.
-+ - Attempts to bypass PSP checks by the hypervisor by using a normal page, or
-+   a non-CPUID encrypted page will change the measurement provided by the
-+   SEV-SNP attestation report.
-+ - The CPUID page contents are *not* measured, but attempts to modify the
-+   expected contents of a CPUID page as part of guest initialization will be
-+   gated by the PSP CPUID enforcement policy checks performed on the page
-+   during SNP_LAUNCH_UPDATE, and noticeable later if the guest owner
-+   implements their own checks of the CPUID values.
-+
-+It is important to note that this last assurance is only useful if the kernel
-+has taken care to make use of the SEV-SNP CPUID throughout all stages of boot.
-+Otherwise, guest owner attestation provides no assurance that the kernel wasn't
-+fed incorrect values at some point during boot.
-+
-+
- Reference
- ---------
- 
--- 
-2.25.1
+With AVIC, since it is xapic, it would be easy - xapic supports up to
+254 CPUs.
+
+But with x2apic, there is no such restriction on max 512 CPUs,
+thus it is legal to create a VM with x2apic and more that 512 CPUs,
+and x2AVIC won't work well in this case.
+
+I guess AVIC_IPI_FAILURE_INVALID_TARGET, has to be extened to support those
+cases, even with loss of performance, or we need to inhibit x2AVIC.
+
+Best regards,
+	Maxim Levitsky
+
+>  
+>  #define AVIC_HPA_MASK	~((0xFFFULL << 52) | 0xFFF)
+>  #define VMCB_AVIC_APIC_BAR_MASK		0xFFFFFFFFFF000ULL
+> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> index 0040824e4376..1999076966fd 100644
+> --- a/arch/x86/kvm/svm/avic.c
+> +++ b/arch/x86/kvm/svm/avic.c
+> @@ -195,7 +195,7 @@ void avic_init_vmcb(struct vcpu_svm *svm)
+>  	vmcb->control.avic_backing_page = bpa & AVIC_HPA_MASK;
+>  	vmcb->control.avic_logical_id = lpa & AVIC_HPA_MASK;
+>  	vmcb->control.avic_physical_id = ppa & AVIC_HPA_MASK;
+> -	vmcb->control.avic_physical_id |= AVIC_MAX_PHYSICAL_ID_COUNT;
+> +	vmcb->control.avic_physical_id |= AVIC_MAX_PHYSICAL_ID;
+>  	vmcb->control.avic_vapic_bar = APIC_DEFAULT_PHYS_BASE & VMCB_AVIC_APIC_BAR_MASK;
+>  
+>  	if (kvm_apicv_activated(svm->vcpu.kvm))
+> @@ -210,7 +210,8 @@ static u64 *avic_get_physical_id_entry(struct kvm_vcpu *vcpu,
+>  	u64 *avic_physical_id_table;
+>  	struct kvm_svm *kvm_svm = to_kvm_svm(vcpu->kvm);
+>  
+> -	if (index >= AVIC_MAX_PHYSICAL_ID_COUNT)
+> +	if ((avic_mode == AVIC_MODE_X1 && index > AVIC_MAX_PHYSICAL_ID) ||
+> +	    (avic_mode == AVIC_MODE_X2 && index > X2AVIC_MAX_PHYSICAL_ID))
+>  		return NULL;
+>  
+>  	avic_physical_id_table = page_address(kvm_svm->avic_physical_id_table_page);
+> @@ -257,7 +258,8 @@ static int avic_init_backing_page(struct kvm_vcpu *vcpu)
+>  	int id = vcpu->vcpu_id;
+>  	struct vcpu_svm *svm = to_svm(vcpu);
+>  
+> -	if (id >= AVIC_MAX_PHYSICAL_ID_COUNT)
+> +	if ((avic_mode == AVIC_MODE_X1 && id > AVIC_MAX_PHYSICAL_ID) ||
+> +	    (avic_mode == AVIC_MODE_X2 && id > X2AVIC_MAX_PHYSICAL_ID))
+>  		return -EINVAL;
+>  
+>  	if (!vcpu->arch.apic->regs)
+
 
