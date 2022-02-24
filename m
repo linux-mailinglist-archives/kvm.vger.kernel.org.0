@@ -2,171 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 203E34C24DE
-	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 09:08:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AE97D4C251E
+	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 09:12:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231559AbiBXIIg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Feb 2022 03:08:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56730 "EHLO
+        id S231572AbiBXILl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Feb 2022 03:11:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37352 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229737AbiBXIIf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Feb 2022 03:08:35 -0500
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 166111B988A;
-        Thu, 24 Feb 2022 00:08:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1645690086; x=1677226086;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   mime-version:in-reply-to;
-  bh=zEoJWzKmpcYe9rSTl+BlseiX6qsVqXPhxybFv18kU3Y=;
-  b=YmXVklXWeL5w30rG/hRcjNLdX8WWQVkkme0P4DW7eUh3yPHii0CrJU0E
-   BXClZehcmm9xlnMr6xxiw6djBiS8pHNdhJX+4HAsjaXjz8hNrDs5c2uiJ
-   TnNyJvVpOx/7GqUAW3go9UiTOCyw6jbMNLul4GOTuYQRfLlDC0EQy11Dq
-   EMkjBydr4sn+mybv/Rb97UgHaeCT8ZnKVrcQD0e6c3uv4ViR5W93wMptF
-   LNnb9IuGb34vbTHJtZTaupOHnLI1PBB0PBYMkK4boP/X937bSTydQ/eLP
-   AZTYtfVRygMRXPDobTS/9QfFQY3bamfZ16ZO+RCaPmc89ofqQA4llys2e
-   g==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10267"; a="251004744"
-X-IronPort-AV: E=Sophos;i="5.88,393,1635231600"; 
-   d="scan'208";a="251004744"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2022 00:08:05 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,393,1635231600"; 
-   d="scan'208";a="637745308"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.101])
-  by fmsmga002.fm.intel.com with ESMTP; 24 Feb 2022 00:07:58 -0800
-Date:   Thu, 24 Feb 2022 16:07:39 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Cc:     Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, kvm@vger.kernel.org,
-        Borislav Petkov <bp@alien8.de>, x86@kernel.org,
-        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, qemu-devel@nongnu.org
-Subject: Re: [PATCH v4 12/12] KVM: Expose KVM_MEM_PRIVATE
-Message-ID: <20220224080739.GA6672@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <20220118132121.31388-1-chao.p.peng@linux.intel.com>
- <20220118132121.31388-13-chao.p.peng@linux.intel.com>
- <a121e766-900d-2135-1516-e1d3ba716834@maciej.szmigiero.name>
- <20220217134548.GA33836@chaop.bj.intel.com>
- <45148f5f-fe79-b452-f3b2-482c5c3291c4@maciej.szmigiero.name>
- <20220223120047.GB53733@chaop.bj.intel.com>
- <7822c00f-5a2d-b6a2-2f81-cf3330801ad3@maciej.szmigiero.name>
+        with ESMTP id S229485AbiBXILk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Feb 2022 03:11:40 -0500
+Received: from out30-43.freemail.mail.aliyun.com (out30-43.freemail.mail.aliyun.com [115.124.30.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F5F520B387;
+        Thu, 24 Feb 2022 00:11:08 -0800 (PST)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04395;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=34;SR=0;TI=SMTPD_---0V5NDo4w_1645690262;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0V5NDo4w_1645690262)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Thu, 24 Feb 2022 16:11:03 +0800
+From:   Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Cc:     Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Mark Gross <markgross@kernel.org>,
+        Vadim Pasternak <vadimp@nvidia.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Johannes Berg <johannes.berg@intel.com>,
+        Vincent Whitchurch <vincent.whitchurch@axis.com>,
+        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        linux-um@lists.infradead.org, platform-driver-x86@vger.kernel.org,
+        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, bpf@vger.kernel.org
+Subject: [PATCH v6 00/26] virtio pci support VIRTIO_F_RING_RESET
+Date:   Thu, 24 Feb 2022 16:10:36 +0800
+Message-Id: <20220224081102.80224-1-xuanzhuo@linux.alibaba.com>
+X-Mailer: git-send-email 2.31.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7822c00f-5a2d-b6a2-2f81-cf3330801ad3@maciej.szmigiero.name>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+X-Git-Hash: bd1c915e263f
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 23, 2022 at 07:32:37PM +0100, Maciej S. Szmigiero wrote:
-> On 23.02.2022 13:00, Chao Peng wrote:
-> > On Tue, Feb 22, 2022 at 02:16:46AM +0100, Maciej S. Szmigiero wrote:
-> > > On 17.02.2022 14:45, Chao Peng wrote:
-> > > > On Tue, Jan 25, 2022 at 09:20:39PM +0100, Maciej S. Szmigiero wrote:
-> > > > > On 18.01.2022 14:21, Chao Peng wrote:
-> > > > > > KVM_MEM_PRIVATE is not exposed by default but architecture code can turn
-> > > > > > on it by implementing kvm_arch_private_memory_supported().
-> > > > > > 
-> > > > > > Also private memslot cannot be movable and the same file+offset can not
-> > > > > > be mapped into different GFNs.
-> > > > > > 
-> > > > > > Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-> > > > > > Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> > > > > > ---
-> > > > > (..)
-> > > > > >     static bool kvm_check_memslot_overlap(struct kvm_memslots *slots, int id,
-> > > > > > -				      gfn_t start, gfn_t end)
-> > > > > > +				      struct file *file,
-> > > > > > +				      gfn_t start, gfn_t end,
-> > > > > > +				      loff_t start_off, loff_t end_off)
-> > > > > >     {
-> > > > > >     	struct kvm_memslot_iter iter;
-> > > > > > +	struct kvm_memory_slot *slot;
-> > > > > > +	struct inode *inode;
-> > > > > > +	int bkt;
-> > > > > >     	kvm_for_each_memslot_in_gfn_range(&iter, slots, start, end) {
-> > > > > >     		if (iter.slot->id != id)
-> > > > > >     			return true;
-> > > > > >     	}
-> > > > > > +	/* Disallow mapping the same file+offset into multiple gfns. */
-> > > > > > +	if (file) {
-> > > > > > +		inode = file_inode(file);
-> > > > > > +		kvm_for_each_memslot(slot, bkt, slots) {
-> > > > > > +			if (slot->private_file &&
-> > > > > > +			     file_inode(slot->private_file) == inode &&
-> > > > > > +			     !(end_off <= slot->private_offset ||
-> > > > > > +			       start_off >= slot->private_offset
-> > > > > > +					     + (slot->npages >> PAGE_SHIFT)))
-> > > > > > +				return true;
-> > > > > > +		}
-> > > > > > +	}
-> > > > > 
-> > > > > That's a linear scan of all memslots on each CREATE (and MOVE) operation
-> > > > > with a fd - we just spent more than a year rewriting similar linear scans
-> > > > > into more efficient operations in KVM.
-> > > > 
-> (..)
-> > > > So linear scan is used before I can find a better way.
-> > > 
-> > > Another option would be to simply not check for overlap at add or move
-> > > time, declare such configuration undefined behavior under KVM API and
-> > > make sure in MMU notifiers that nothing bad happens to the host kernel
-> > > if it turns out somebody actually set up a VM this way (it could be
-> > > inefficient in this case, since it's not supposed to ever happen
-> > > unless there is a bug somewhere in the userspace part).
-> > 
-> > Specific to TDX case, SEAMMODULE will fail the overlapping case and then
-> > KVM prints a message to the kernel log. It will not cause any other side
-> > effect, it does look weird however. Yes warn that in the API document
-> > can help to some extent.
-> 
-> So for the functionality you are adding this code for (TDX) this scan
-> isn't necessary and the overlapping case (not supported anyway) is safely
-> handled by the hardware (or firmware)?
+The virtio spec already supports the virtio queue reset function. This patch set
+is to add this function to the kernel. The relevant virtio spec information is
+here:
 
-Yes, it will be handled by the firmware.
+    https://github.com/oasis-tcs/virtio-spec/issues/124
 
-> Then I would simply remove the scan and, maybe, add a comment instead
-> that the overlap check is done by the hardware.
+Also regarding MMIO support for queue reset, I plan to support it after this
+patch is passed.
 
-Sure.
+Performing reset on a queue is divided into four steps:
+     1. virtio_reset_vq()              - notify the device to reset the queue
+     2. virtqueue_detach_unused_buf()  - recycle the buffer submitted
+     3. virtqueue_reset_vring()        - reset the vring (may re-alloc)
+     4. virtio_enable_resetq()         - mmap vring to device, and enable the queue
 
-> 
-> By the way, if a kernel log message could be triggered by (misbehaving)
-> userspace then it should be rate limited (if it isn't already).
+The first part 1-17 of this patch set implements virtio pci's support and API
+for queue reset. The latter part is to make virtio-net support set_ringparam. Do
+these things for this feature:
 
-Thanks for mention.
+      1. virtio-net support rx,tx reset
+      2. find_vqs() support to special the max size of each vq
+      3. virtio-net support set_ringparam
 
-Chao
-> 
-> > Thanks,
-> > Chao
-> 
-> Thanks,
-> Maciej
+#1 -#3 :       prepare
+#4 -#12:       virtio ring support reset vring of the vq
+#13-#14:       add helper
+#15-#17:       virtio pci support reset queue and re-enable
+#18-#21:       find_vqs() support sizes to special the max size of each vq
+#23-#24:       virtio-net support rx, tx reset
+#22, #25, #26: virtio-net support set ringparam
+
+Please review. Thanks.
+
+v6:
+  1. virtio_pci: use synchronize_irq(irq) to sync the irq callbacks
+  2. Introduce virtqueue_reset_vring() to implement the reset of vring during
+     the reset process. May use the old vring if num of the vq not change.
+  3. find_vqs() support sizes to special the max size of each vq
+
+v5:
+  1. add virtio-net support set_ringparam
+
+v4:
+  1. just the code of virtio, without virtio-net
+  2. Performing reset on a queue is divided into these steps:
+    1. reset_vq: reset one vq
+    2. recycle the buffer from vq by virtqueue_detach_unused_buf()
+    3. release the ring of the vq by vring_release_virtqueue()
+    4. enable_reset_vq: re-enable the reset queue
+  3. Simplify the parameters of enable_reset_vq()
+  4. add container structures for virtio_pci_common_cfg
+
+v3:
+  1. keep vq, irq unreleased
+
+Xuan Zhuo (26):
+  virtio_pci: struct virtio_pci_common_cfg add queue_notify_data
+  virtio: queue_reset: add VIRTIO_F_RING_RESET
+  virtio: add helper virtqueue_get_vring_max_size()
+  virtio_ring: split: extract the logic of creating vring
+  virtio_ring: split: extract the logic of init vq and attach vring
+  virtio_ring: packed: extrace the logic of creating vring
+  virtio_ring: packed: extract the logic of init vq and attach vring
+  virtio_ring: extract the logic of freeing vring
+  virtio_ring: split: implement virtqueue_reset_vring_split()
+  virtio_ring: packed: implement virtqueue_reset_vring_packed()
+  virtio_ring: introduce virtqueue_reset_vring()
+  virtio_ring: update the document of the virtqueue_detach_unused_buf
+    for queue reset
+  virtio: queue_reset: struct virtio_config_ops add callbacks for
+    queue_reset
+  virtio: add helper for queue reset
+  virtio_pci: queue_reset: update struct virtio_pci_common_cfg and
+    option functions
+  virtio_pci: queue_reset: extract the logic of active vq for modern pci
+  virtio_pci: queue_reset: support VIRTIO_F_RING_RESET
+  virtio: find_vqs() add arg sizes
+  virtio_pci: support the arg sizes of find_vqs()
+  virtio_mmio: support the arg sizes of find_vqs()
+  virtio: add helper virtio_find_vqs_ctx_size()
+  virtio_net: get ringparam by virtqueue_get_vring_max_size()
+  virtio_net: split free_unused_bufs()
+  virtio_net: support rx/tx queue reset
+  virtio_net: set the default max ring size by find_vqs()
+  virtio_net: support set_ringparam
+
+ arch/um/drivers/virtio_uml.c             |   2 +-
+ drivers/net/virtio_net.c                 | 257 ++++++++--
+ drivers/platform/mellanox/mlxbf-tmfifo.c |   3 +-
+ drivers/remoteproc/remoteproc_virtio.c   |   2 +-
+ drivers/s390/virtio/virtio_ccw.c         |   2 +-
+ drivers/virtio/virtio_mmio.c             |  12 +-
+ drivers/virtio/virtio_pci_common.c       |  28 +-
+ drivers/virtio/virtio_pci_common.h       |   3 +-
+ drivers/virtio/virtio_pci_legacy.c       |   8 +-
+ drivers/virtio/virtio_pci_modern.c       | 146 +++++-
+ drivers/virtio/virtio_pci_modern_dev.c   |  36 ++
+ drivers/virtio/virtio_ring.c             | 584 +++++++++++++++++------
+ drivers/virtio/virtio_vdpa.c             |   2 +-
+ include/linux/virtio.h                   |  12 +
+ include/linux/virtio_config.h            |  74 ++-
+ include/linux/virtio_pci_modern.h        |   2 +
+ include/uapi/linux/virtio_config.h       |   7 +-
+ include/uapi/linux/virtio_pci.h          |  14 +
+ 18 files changed, 979 insertions(+), 215 deletions(-)
+
+--
+2.31.0
+
