@@ -2,62 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AFBD64C2C30
-	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 13:53:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6705F4C2CED
+	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 14:25:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233767AbiBXMyP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Feb 2022 07:54:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58300 "EHLO
+        id S234809AbiBXNZk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Feb 2022 08:25:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232323AbiBXMyO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Feb 2022 07:54:14 -0500
-Received: from mail-yb1-xb30.google.com (mail-yb1-xb30.google.com [IPv6:2607:f8b0:4864:20::b30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FB0020E5A2
-        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 04:53:45 -0800 (PST)
-Received: by mail-yb1-xb30.google.com with SMTP id v186so3631210ybg.1
-        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 04:53:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=GRBDVTzcuYqNGgw6Uwjpe8bJtuUyK1gPxnqjvDUw3sY=;
-        b=mMrfglo5n+wTbPRSovXb4CuODGjWbQqENjwShu1rj4DQrWgRUEHFY/gxXNpdvCZaHB
-         a1HMJQr2Exp7S3qkg3s3gR6+NVALnzdDhueHrnfV6U+TrDr7AkgNcrwjKiJqLq7U6XSE
-         2n/d08WXuGExO8kGVJIhrxabgko3TkjbrWs5y0ESxpqyhWTF8Z6bOVrDTLgzuLeLviyb
-         rPzAOuycbaWWlTyWj703HKbsSelB+Tm7EzllMQc36mazMfNgjTfbsoSOc7qfL9tkjCRx
-         NsdGd5E1alKq0RWb32cgC1EpxmGsuKRmwelzI47FDHqNSxgzYPbg1ZjxTpqx/tJ8dZLZ
-         wdFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=GRBDVTzcuYqNGgw6Uwjpe8bJtuUyK1gPxnqjvDUw3sY=;
-        b=cHTdfzeqNLCNFjRTvKmfR6nbMmUJMs27jLrcHKiSIAhvKFoVklpdH58R/TL6b2GfXD
-         AvCOGkYo0UJEsbgMeVLT0bYXiLUg6t07/IagW6zSDrKOeDJ0kZWEYLotsCuZQqA7nC9y
-         fxGVj3tSEX/JXcrz3fbk1DLCVxyv/GpTB+N6AZXay1inZYrlT/3dw+4UzipNniHWuzrB
-         lT1+UPXacthcXThIRFB5/6WcT/9Rqzd/gUM9HkLBCKIBQagyJengfOpCTSL7FlAdM/cE
-         o5KdtJI+pcXMoPsHw0W0AegA5VK40jO3UQ7t9kHyCPh6rPhCAVl5GEHBpAMZxb1NTW88
-         gVJw==
-X-Gm-Message-State: AOAM531/hBWAVMc8qus/6bDiWDH+FGGbI3feH2fUO2uhmiZ5tK/KkECF
-        eMSJH++vCeW8EUT5g4sLk1cZpgCP9ZsT8sWgCtXGW90Q/uM=
-X-Google-Smtp-Source: ABdhPJzSbdZNrPR6oefMAKAEMiILHM9FCzkK5Z2IeEfDhOl9KuqVD8IOjjXQzEp9vQmzNcmPhdlgxatAachlPLJRwVQ=
-X-Received: by 2002:a25:69c4:0:b0:624:4ee4:a142 with SMTP id
- e187-20020a2569c4000000b006244ee4a142mr2290233ybc.85.1645707224336; Thu, 24
- Feb 2022 04:53:44 -0800 (PST)
-MIME-Version: 1.0
-References: <20220213035753.34577-1-akihiko.odaki@gmail.com>
-In-Reply-To: <20220213035753.34577-1-akihiko.odaki@gmail.com>
-From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Thu, 24 Feb 2022 12:53:33 +0000
-Message-ID: <CAFEAcA9eXpxC7R_qcDsBh4C9Aur5417kTzAhs4c7p2YRCFQUKQ@mail.gmail.com>
-Subject: Re: [PATCH v2] target/arm: Support PSCI 1.1 and SMCCC 1.0
-To:     Akihiko Odaki <akihiko.odaki@gmail.com>
-Cc:     qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Alexander Graf <agraf@csgraf.de>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        with ESMTP id S231263AbiBXNZi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Feb 2022 08:25:38 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B29D415B3FE
+        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 05:25:08 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4315361326
+        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 13:25:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89057C340E9;
+        Thu, 24 Feb 2022 13:25:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1645709107;
+        bh=ghy4WLrY8wvb6Rr3yyRVAEc7K1NUtdUPKaXRp4DBEk4=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=Z+ZETFYs2muatikVBbhWGgjeXlaPc7dJKGWn/RPsJunh4RQB+peu08qA7rnVODXOE
+         +5Ojsko/AKfdtoYA/5pn+r9VoEUtNyVoZsHfwR8vO9Lgk5dU/YfCbv4SAk5LWJ6wVt
+         tn7z3DejepTGfmeyqxkxq1SRLCPyLIbBkdHxaLcQY8BgCe9xQeLW50boPhxqLNC8ov
+         YciJ81Uw+Zs+6F1cXSgHD8InznQCW/EOscGptmCC2FSg5LuvOC1d1+rAa5IOEACNoW
+         axh5mQIVJ81GDnHhjFqwx7kiA+veFVMpo1LU8m4Hj6jk8U/0MvepHSCkLwxaM5lHxa
+         63kYxOdRRIVDQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nNE7F-00ABpW-6B; Thu, 24 Feb 2022 13:25:05 +0000
+Date:   Thu, 24 Feb 2022 13:25:04 +0000
+Message-ID: <87y2202y8f.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oupton@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, Peter Shier <pshier@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>,
+        Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH v3 06/19] KVM: arm64: Track vCPU power state using MP state values
+In-Reply-To: <20220223041844.3984439-7-oupton@google.com>
+References: <20220223041844.3984439-1-oupton@google.com>
+        <20220223041844.3984439-7-oupton@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@google.com, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, anup@brainfault.org, atishp@atishpatra.org, seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, pshier@google.com, reijiw@google.com, ricarkol@google.com, rananta@google.com, jingzhangos@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -66,23 +79,180 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, 13 Feb 2022 at 03:58, Akihiko Odaki <akihiko.odaki@gmail.com> wrote:
->
-> Support the latest PSCI on TCG and HVF. A 64-bit function called from
-> AArch32 now returns NOT_SUPPORTED, which is necessary to adhere to SMC
-> Calling Convention 1.0. It is still not compliant with SMCCC 1.3 since
-> they do not implement mandatory functions.
->
-> Signed-off-by: Akihiko Odaki <akihiko.odaki@gmail.com>
+On Wed, 23 Feb 2022 04:18:31 +0000,
+Oliver Upton <oupton@google.com> wrote:
+> 
+> A subsequent change to KVM will add support for additional power states.
+> Store the MP state by value rather than keeping track of it as a
+> boolean.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Oliver Upton <oupton@google.com>
 > ---
+>  arch/arm64/include/asm/kvm_host.h |  5 +++--
+>  arch/arm64/kvm/arm.c              | 22 ++++++++++++----------
+>  arch/arm64/kvm/psci.c             | 10 +++++-----
+>  3 files changed, 20 insertions(+), 17 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index cacc9efd2e70..3e8bfecaa95b 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -350,8 +350,8 @@ struct kvm_vcpu_arch {
+>  		u32	mdscr_el1;
+>  	} guest_debug_preserved;
+>  
+> -	/* vcpu power-off state */
+> -	bool power_off;
+> +	/* vcpu power state */
+> +	u32 mp_state;
 
-Applied, thanks.
+nit: why don't you just carry a kvm_mp_state structure instead of
+open-coding a u32? Same size, stronger typing.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/7.0
-for any user-visible changes.
+>  
+>  	/* Don't run the guest (internal implementation need) */
+>  	bool pause;
+> @@ -800,5 +800,6 @@ static inline void kvm_hyp_reserve(void) { }
+>  #endif
+>  
+>  void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu);
+> +bool kvm_arm_vcpu_powered_off(struct kvm_vcpu *vcpu);
+>  
+>  #endif /* __ARM64_KVM_HOST_H__ */
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 07c6a176cdcc..b4987b891f38 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -428,18 +428,20 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+>  
+>  void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu)
+>  {
+> -	vcpu->arch.power_off = true;
+> +	vcpu->arch.mp_state = KVM_MP_STATE_STOPPED;
+>  	kvm_make_request(KVM_REQ_SLEEP, vcpu);
+>  	kvm_vcpu_kick(vcpu);
+>  }
+>  
+> +bool kvm_arm_vcpu_powered_off(struct kvm_vcpu *vcpu)
+> +{
+> +	return vcpu->arch.mp_state == KVM_MP_STATE_STOPPED;
 
-(I noticed while reviewing this that we report KVM's PSCI via
-the DTB as only 0.2 even if KVM's actually implementing better
-than that; I'll write a patch to clean that up.)
+nit: if we're fully embracing the MP_STATE concept, just renamed this
+to kvm_arm_vcpu_stopped().
 
--- PMM
+> +}
+> +
+>  int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
+>  				    struct kvm_mp_state *mp_state)
+>  {
+> -	if (vcpu->arch.power_off)
+> -		mp_state->mp_state = KVM_MP_STATE_STOPPED;
+> -	else
+> -		mp_state->mp_state = KVM_MP_STATE_RUNNABLE;
+> +	mp_state->mp_state = vcpu->arch.mp_state;
+>
+>  	return 0;
+>  }
+> @@ -451,7 +453,7 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+>  
+>  	switch (mp_state->mp_state) {
+>  	case KVM_MP_STATE_RUNNABLE:
+> -		vcpu->arch.power_off = false;
+> +		vcpu->arch.mp_state = mp_state->mp_state;
+>  		break;
+>  	case KVM_MP_STATE_STOPPED:
+>  		kvm_arm_vcpu_power_off(vcpu);
+> @@ -474,7 +476,7 @@ int kvm_arch_vcpu_runnable(struct kvm_vcpu *v)
+>  {
+>  	bool irq_lines = *vcpu_hcr(v) & (HCR_VI | HCR_VF);
+>  	return ((irq_lines || kvm_vgic_vcpu_pending_irq(v))
+> -		&& !v->arch.power_off && !v->arch.pause);
+> +		&& !kvm_arm_vcpu_powered_off(v) && !v->arch.pause);
+>  }
+>  
+>  bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu)
+> @@ -668,10 +670,10 @@ static void vcpu_req_sleep(struct kvm_vcpu *vcpu)
+>  	struct rcuwait *wait = kvm_arch_vcpu_get_wait(vcpu);
+>  
+>  	rcuwait_wait_event(wait,
+> -			   (!vcpu->arch.power_off) &&(!vcpu->arch.pause),
+> +			   (!kvm_arm_vcpu_powered_off(vcpu)) && (!vcpu->arch.pause),
+>  			   TASK_INTERRUPTIBLE);
+>  
+> -	if (vcpu->arch.power_off || vcpu->arch.pause) {
+> +	if (kvm_arm_vcpu_powered_off(vcpu) || vcpu->arch.pause) {
+>  		/* Awaken to handle a signal, request we sleep again later. */
+>  		kvm_make_request(KVM_REQ_SLEEP, vcpu);
+>  	}
+> @@ -1181,7 +1183,7 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
+>  	if (test_bit(KVM_ARM_VCPU_POWER_OFF, vcpu->arch.features))
+>  		kvm_arm_vcpu_power_off(vcpu);
+>  	else
+> -		vcpu->arch.power_off = false;
+> +		vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
+>  
+>  	return 0;
+>  }
+> diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
+> index e3f93b7f8d38..77a00913cdfd 100644
+> --- a/arch/arm64/kvm/psci.c
+> +++ b/arch/arm64/kvm/psci.c
+> @@ -97,7 +97,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+>  	 */
+>  	if (!vcpu)
+>  		return PSCI_RET_INVALID_PARAMS;
+> -	if (!vcpu->arch.power_off) {
+> +	if (!kvm_arm_vcpu_powered_off(vcpu)) {
+>  		if (kvm_psci_version(source_vcpu) != KVM_ARM_PSCI_0_1)
+>  			return PSCI_RET_ALREADY_ON;
+>  		else
+> @@ -122,11 +122,11 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+>  
+>  	/*
+>  	 * Make sure the reset request is observed if the change to
+> -	 * power_off is observed.
+> +	 * mp_state is observed.
+
+You want to expand this comment a bit, as this is not strictly a
+binary state anymore.
+
+>  	 */
+>  	smp_wmb();
+>  
+> -	vcpu->arch.power_off = false;
+> +	vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
+>  	kvm_vcpu_wake_up(vcpu);
+>  
+>  	return PSCI_RET_SUCCESS;
+> @@ -164,7 +164,7 @@ static unsigned long kvm_psci_vcpu_affinity_info(struct kvm_vcpu *vcpu)
+>  		mpidr = kvm_vcpu_get_mpidr_aff(tmp);
+>  		if ((mpidr & target_affinity_mask) == target_affinity) {
+>  			matching_cpus++;
+> -			if (!tmp->arch.power_off)
+> +			if (!kvm_arm_vcpu_powered_off(tmp))
+>  				return PSCI_0_2_AFFINITY_LEVEL_ON;
+>  		}
+>  	}
+> @@ -190,7 +190,7 @@ static void kvm_prepare_system_event(struct kvm_vcpu *vcpu, u32 type)
+>  	 * re-initialized.
+>  	 */
+>  	kvm_for_each_vcpu(i, tmp, vcpu->kvm)
+> -		tmp->arch.power_off = true;
+> +		tmp->arch.mp_state = KVM_MP_STATE_STOPPED;
+>  	kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_SLEEP);
+>  
+>  	memset(&vcpu->run->system_event, 0, sizeof(vcpu->run->system_event));
+
+You also may want to initialise the mp_state to RUNNABLE by default in
+kvm_arch_vcpu_create(). We are currently relying on power_off to be
+false thanks to the vcpu struct being zeroed, but we may as well make
+it clearer (RUNNABLE is also 0, so there is no actual bug here).
+
+Otherwise, looks good.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
