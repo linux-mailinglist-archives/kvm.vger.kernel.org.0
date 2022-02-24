@@ -2,215 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F06A4C1FDE
-	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 00:38:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 34E4E4C2083
+	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 01:14:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244907AbiBWXih (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Feb 2022 18:38:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59074 "EHLO
+        id S245221AbiBXAOt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Feb 2022 19:14:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40412 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244921AbiBWXif (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Feb 2022 18:38:35 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2FB4A5A5A0
-        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 15:38:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645659485;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=TQseIfHyNHbxRxCOXDDjbxsPCfu7bqnMBIdUTwy6mvg=;
-        b=M0EjJ+aZoVau9eCd5yPlEPOBTF+Fola8l2gwVMsKjbIRk2goaVuJFxZk6mo1MvZThODJfv
-        FdfvaxAtY5nQ+1gvXGNuRegi2n1pkj171Hhvtws3Frv7iIrrxBlcVX7Xqx5tucgMOzsCRt
-        Sw4kmdQAIfD32yHb4xvg7D2u2ydMMdE=
-Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com
- [209.85.210.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-25-eZCr53FRMd6_d_VZNBJJSA-1; Wed, 23 Feb 2022 18:38:04 -0500
-X-MC-Unique: eZCr53FRMd6_d_VZNBJJSA-1
-Received: by mail-ot1-f72.google.com with SMTP id l3-20020a9d4c03000000b005ad1283cdabso151822otf.6
-        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 15:38:04 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=TQseIfHyNHbxRxCOXDDjbxsPCfu7bqnMBIdUTwy6mvg=;
-        b=K4DGt4F6cC6IflOdMS5r9mtc3xLYA7qs5Ebiwx4djClIPkzmeRWVqkPoD489skl+Ml
-         cFPWi/uzybXfyoecSi66bAp/qYFVLj57Byz5pGtXSnICAIQ09jUS4wE1nFQ6+ewYmM5X
-         9eqjDGyQ2UicKiEZyTKWDjslq7ivXZfyBuWFPwICA9YZAZOZ87nplKh8IaJzA2f7nLVF
-         fS3G5cFyE6dp2kc3SxlcO8mv9qdjucSkZNE6IPwRfuziEJUtByjzmF6xG3UutG62JFoQ
-         GVfPoNS1Kf+EGpj8IYkgrqnV/E8fCT8QXj/vQ88SNMKekFU/Mcw4/hPQbuu+gLrxpZC7
-         dPsQ==
-X-Gm-Message-State: AOAM532WDbunRR76tjqqShV5x3J5xeXQUHZAD8aYOG/vHbrJAJPKgZ2o
-        MwHYUYa9gEBueHbgxxqJd8BggNnZ7+LKDv3v2k+XoA1BjenAY6WiBmeaXQOBYAgfSd3LGHOwr/b
-        g28TWGlSn/3iE
-X-Received: by 2002:a05:6808:1597:b0:2d4:c9fd:b11c with SMTP id t23-20020a056808159700b002d4c9fdb11cmr1090227oiw.319.1645659483428;
-        Wed, 23 Feb 2022 15:38:03 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyTOMQrxcWbrjZEEnIVd77niRF3IebauKAnN/LNVNCDSL2buHj2AtUPxw2dFUF8pky3GMpDWg==
-X-Received: by 2002:a05:6808:1597:b0:2d4:c9fd:b11c with SMTP id t23-20020a056808159700b002d4c9fdb11cmr1090208oiw.319.1645659483191;
-        Wed, 23 Feb 2022 15:38:03 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id y17sm475713otk.70.2022.02.23.15.38.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Feb 2022 15:38:02 -0800 (PST)
-Date:   Wed, 23 Feb 2022 16:38:01 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Cc:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>, <jgg@nvidia.com>,
-        <cohuck@redhat.com>, <mgurtovoy@nvidia.com>, <yishaih@nvidia.com>,
-        <linuxarm@huawei.com>, <liulongfang@huawei.com>,
-        <prime.zeng@hisilicon.com>, <jonathan.cameron@huawei.com>,
-        <wangzhou1@hisilicon.com>
-Subject: Re: [PATCH v5 7/8] hisi_acc_vfio_pci: Add support for VFIO live
- migration
-Message-ID: <20220223163801.10f32e99.alex.williamson@redhat.com>
-In-Reply-To: <20220221114043.2030-8-shameerali.kolothum.thodi@huawei.com>
-References: <20220221114043.2030-1-shameerali.kolothum.thodi@huawei.com>
-        <20220221114043.2030-8-shameerali.kolothum.thodi@huawei.com>
-Organization: Red Hat
+        with ESMTP id S239973AbiBXAOj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Feb 2022 19:14:39 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AC295F4D1;
+        Wed, 23 Feb 2022 16:14:11 -0800 (PST)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21NLhq6Q026619;
+        Thu, 24 Feb 2022 00:14:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=GhboOXHgk3Su1hpuvZIuOcREjqdoASGy2DRZzIEOD0w=;
+ b=KJWWyU8pdsTZTerTRF+VDBiE6eldBoftdcYkhgHSznKlEdfaAEKEhMa3K5HBsbOEPeAM
+ zojoNE2KUVnIUKn/Omj0FUWJFj5dM342GeaW4fWcyxKFrc1gG/quZ1zdze6Gi83fC3NE
+ EIOshF5D1spwwfoMZj3AsUkYyugbZi7MjX0SwGsZ8qNUfoqKAVnq9B5vUPsdilX1nBry
+ yv5gHowtYfnG2lbkNFFz3ffTF4oP9IeAoUTevH/drOq69WXOUWX11K16FicEArni/CSk
+ 9xRcXr4G83aTeWCQabCtv6k+IFsm9a4nRfKG4NHAtZXh4VIFrzZhdgGE0jNMGJDjpQDA Rw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3edw3bjja4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 24 Feb 2022 00:14:10 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21O0CHVh005761;
+        Thu, 24 Feb 2022 00:14:10 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3edw3bjj97-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 24 Feb 2022 00:14:10 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21O07m9r026156;
+        Thu, 24 Feb 2022 00:14:07 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma04ams.nl.ibm.com with ESMTP id 3ear69de68-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 24 Feb 2022 00:14:07 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21O0E3Rv47186394
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 24 Feb 2022 00:14:03 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0595E4203F;
+        Thu, 24 Feb 2022 00:14:03 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7C93142041;
+        Thu, 24 Feb 2022 00:14:02 +0000 (GMT)
+Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.69.173])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with SMTP;
+        Thu, 24 Feb 2022 00:14:02 +0000 (GMT)
+Date:   Thu, 24 Feb 2022 01:13:59 +0100
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Nico Boehr <nrb@linux.ibm.com>
+Cc:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        Pierre Morel <pmorel@linux.ibm.com>, thuth@redhat.com,
+        david@redhat.com, Halil Pasic <pasic@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v3 6/8] s390x: Add more tests for STSCH
+Message-ID: <20220224011359.59572002.pasic@linux.ibm.com>
+In-Reply-To: <99ec1cf03d17b3de2d47c497882f091f922713bf.camel@linux.ibm.com>
+References: <20220223132940.2765217-1-nrb@linux.ibm.com>
+        <20220223132940.2765217-7-nrb@linux.ibm.com>
+        <04daca6a-5863-d205-ea98-096163a2296a@linux.ibm.com>
+        <99ec1cf03d17b3de2d47c497882f091f922713bf.camel@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: SzAWcnfsc4IWYZEIta4IGSW8Bbe8kO86
+X-Proofpoint-GUID: EgVMsl5ni9KDHOE2Zx649PwF8lEkAMMS
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-02-23_09,2022-02-23_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 clxscore=1015
+ priorityscore=1501 lowpriorityscore=0 malwarescore=0 adultscore=0
+ phishscore=0 impostorscore=0 spamscore=0 mlxscore=0 bulkscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2201110000 definitions=main-2202230136
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 21 Feb 2022 11:40:42 +0000
-Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
-> @@ -159,23 +1110,46 @@ static long hisi_acc_vfio_pci_ioctl(struct vfio_device *core_vdev, unsigned int
->  
->  static int hisi_acc_vfio_pci_open_device(struct vfio_device *core_vdev)
->  {
-> -	struct vfio_pci_core_device *vdev =
-> -		container_of(core_vdev, struct vfio_pci_core_device, vdev);
-> +	struct hisi_acc_vf_core_device *hisi_acc_vdev = container_of(core_vdev,
-> +			struct hisi_acc_vf_core_device, core_device.vdev);
-> +	struct vfio_pci_core_device *vdev = &hisi_acc_vdev->core_device;
->  	int ret;
->  
->  	ret = vfio_pci_core_enable(vdev);
->  	if (ret)
->  		return ret;
->  
-> -	vfio_pci_core_finish_enable(vdev);
-> +	if (core_vdev->migration_flags != VFIO_MIGRATION_STOP_COPY) {
+On Wed, 23 Feb 2022 18:33:17 +0100
+Nico Boehr <nrb@linux.ibm.com> wrote:
 
-This looks like a minor synchronization issue with
-hisi_acc_vfio_pci_migrn_init(), I think it might be cleaner to test
-core_vdev->ops against the migration enabled set.
+> On Wed, 2022-02-23 at 16:39 +0100, Janosch Frank wrote:
+> > On 2/23/22 14:29, Nico Boehr wrote:  
+> > >   
+> [...]
+> > >   
+> > > +static void test_stsch(void)
+> > > +{
+> > >   
+> [...]
+> > > +       report_prefix_push("Bit 47 in SID is zero");
+> > > +       expect_pgm_int();
+> > > +       stsch(0x0000ffff, &schib);
+> > > +       check_pgm_int_code(PGM_INT_CODE_OPERAND);
+> > > +       report_prefix_pop();  
+> > 
+> > Add a comment:
+> > No matter if the multiple-subchannel-set facility is installed or
+> > not, 
+> > bit 47 always needs to be 1.  
+> 
+> Will do.
+> 
+> > Do we have the MSS facility?  
+> 
+> Not an IO expert, but it seems like it's enabled by QEMU in pc-
+> bios/s390-ccw/main.c, css_setup(). The comment suggests it's always
+> there.
+> 
 
-> +		vfio_pci_core_finish_enable(vdev);
-> +		return 0;
-> +	}
-> +
-> +	ret = hisi_acc_vf_qm_init(hisi_acc_vdev);
-> +	if (ret) {
-> +		vfio_pci_core_disable(vdev);
-> +		return ret;
-> +	}
->  
-> +	hisi_acc_vdev->mig_state = VFIO_DEVICE_STATE_RUNNING;
+AFAIR. The MSS facility is unconditionally implemented by QEMU thus
+it is always indicated as installed, but lies dormant per default
+and needs to be enabled.
 
-Change the polarity of the if() above and encompass this all within
-that branch scope so we can use the finish/return below for both cases?
+The idea is that a non-enlightened OS would not enable the facility,
+and thus effectively end up specifying zeros and using the
+subchannel-set 0, and would observe no changes whatsoever compared
+to running on a machine that does not have MSS facility installed.
 
-> +
-> +	vfio_pci_core_finish_enable(vdev);
->  	return 0;
->  }
->  
-> +static void hisi_acc_vfio_pci_close_device(struct vfio_device *core_vdev)
-> +{
-> +	struct hisi_acc_vf_core_device *hisi_acc_vdev = container_of(core_vdev,
-> +			struct hisi_acc_vf_core_device, core_device.vdev);
-> +	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
-> +
-> +	iounmap(vf_qm->io_base);
-> +	vfio_pci_core_close_device(core_vdev);
-> +}
-> +
->  static const struct vfio_device_ops hisi_acc_vfio_pci_migrn_ops = {
->  	.name = "hisi-acc-vfio-pci",
->  	.open_device = hisi_acc_vfio_pci_open_device,
-> -	.close_device = vfio_pci_core_close_device,
-> +	.close_device = hisi_acc_vfio_pci_close_device,
->  	.ioctl = hisi_acc_vfio_pci_ioctl,
->  	.device_feature = vfio_pci_core_ioctl_feature,
->  	.read = hisi_acc_vfio_pci_read,
-> @@ -183,6 +1157,8 @@ static const struct vfio_device_ops hisi_acc_vfio_pci_migrn_ops = {
->  	.mmap = hisi_acc_vfio_pci_mmap,
->  	.request = vfio_pci_core_request,
->  	.match = vfio_pci_core_match,
-> +	.migration_set_state = hisi_acc_vfio_pci_set_device_state,
-> +	.migration_get_state = hisi_acc_vfio_pci_get_device_state,
->  };
->  
->  static const struct vfio_device_ops hisi_acc_vfio_pci_ops = {
-> @@ -198,38 +1174,71 @@ static const struct vfio_device_ops hisi_acc_vfio_pci_ops = {
->  	.match = vfio_pci_core_match,
->  };
->  
-> +static int
-> +hisi_acc_vfio_pci_migrn_init(struct hisi_acc_vf_core_device *hisi_acc_vdev,
-> +			     struct pci_dev *pdev, struct hisi_qm *pf_qm)
-> +{
-> +	int vf_id;
-> +
-> +	vf_id = pci_iov_vf_id(pdev);
-> +	if (vf_id < 0)
-> +		return vf_id;
-> +
-> +	hisi_acc_vdev->vf_id = vf_id + 1;
-> +	hisi_acc_vdev->core_device.vdev.migration_flags =
-> +					VFIO_MIGRATION_STOP_COPY;
-> +	hisi_acc_vdev->pf_qm = pf_qm;
-> +	hisi_acc_vdev->vf_dev = pdev;
-> +	mutex_init(&hisi_acc_vdev->state_mutex);
-> +
-> +	return 0;
-> +}
-> +
->  static int hisi_acc_vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
->  {
-> -	struct vfio_pci_core_device *vdev;
-> +	struct hisi_acc_vf_core_device *hisi_acc_vdev;
-> +	struct hisi_qm *pf_qm;
->  	int ret;
->  
-> -	vdev = kzalloc(sizeof(*vdev), GFP_KERNEL);
-> -	if (!vdev)
-> +	hisi_acc_vdev = kzalloc(sizeof(*hisi_acc_vdev), GFP_KERNEL);
-> +	if (!hisi_acc_vdev)
->  		return -ENOMEM;
->  
-> -	vfio_pci_core_init_device(vdev, pdev, &hisi_acc_vfio_pci_ops);
-> +	pf_qm = hisi_acc_get_pf_qm(pdev);
-> +	if (pf_qm && pf_qm->ver >= QM_HW_V3) {
-> +		ret = hisi_acc_vfio_pci_migrn_init(hisi_acc_vdev, pdev, pf_qm);
-> +		if (ret < 0) {
-> +			kfree(hisi_acc_vdev);
-> +			return ret;
-> +		}
+Whether MSS is installed in some configuration or not can be detected
+via the facility bit 47 of Store Channel-Subsystem Characteristics.
 
-This error path can only occur if the VF ID lookup fails, but should we
-fall through to the non-migration ops, maybe with a dev_warn()?  Thanks,
+> > If yes, could we disable it to test the 32-47 == 0x0001 case?  
+> 
+> I see ioinst_handle_chsc_sda() in QEMU to enable it. Disabling only
+> works with a full reset of the CSS (see css_reset()) which can be
+> triggered from a subsystem_reset(), which basically means we need to
+> IPL. I think that's not really viable or do you see any other way?
+> 
+> Halil, Pierre, can you confirm?
 
-Alex
+I don't think there is an other way, and there is usually no good reason
+to attempt that. If your OS enables it is enlightened, and it won't
+become non-enlightened. It is basically an opt-in. Eventually you may
+want to IPL something different, and you are covered by the subsystem
+reset.
 
-> +
-> +		vfio_pci_core_init_device(&hisi_acc_vdev->core_device, pdev,
-> +					  &hisi_acc_vfio_pci_migrn_ops);
-> +	} else {
-> +		vfio_pci_core_init_device(&hisi_acc_vdev->core_device, pdev,
-> +					  &hisi_acc_vfio_pci_ops);
-> +	}
+The best way to test this would be to not enable the facility. I have
+no idea if there is a way for a kvm-unit-test to accomplish that.
 
+Regards,
+Halil
