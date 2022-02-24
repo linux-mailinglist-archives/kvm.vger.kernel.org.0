@@ -2,126 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A9454C33DE
-	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 18:42:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C9DB4C340A
+	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 18:52:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232152AbiBXRl4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Feb 2022 12:41:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47912 "EHLO
+        id S232342AbiBXRvS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Feb 2022 12:51:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38390 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232134AbiBXRlx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Feb 2022 12:41:53 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 661D61C2F60
-        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 09:41:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645724482;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=70SduNrAiaotDuCIZO647ys8w2/fadsYzkVqmSb6sHw=;
-        b=TyYX9oWOqAW6YugnNUsxMTtW6wyFESLlV4ED7b7euRcFTJK9UBFDkPJ6vbqpbMerAmd/UE
-        hR+Xeo1jX2uY5MhVmM0huZY3UgpA7NVpr+/tO1XifM3psKkBkjQsyz/pOY8Ar3NCIRcbtP
-        s+FmZ47pnZ49AYsKU9MsPIeZmtb1GgU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-126-Wg3qdFI8OLuymlgHy0vicQ-1; Thu, 24 Feb 2022 12:41:17 -0500
-X-MC-Unique: Wg3qdFI8OLuymlgHy0vicQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 70B5E80573C;
-        Thu, 24 Feb 2022 17:41:14 +0000 (UTC)
-Received: from starship (unknown [10.40.195.190])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E50D51077CBF;
-        Thu, 24 Feb 2022 17:41:11 +0000 (UTC)
-Message-ID: <55c391a51bf6b7d3927493ff56333e9846e04a4a.camel@redhat.com>
-Subject: Re: [RFC PATCH 08/13] KVM: SVM: Do not update logical APIC ID table
- when in x2APIC mode
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, seanjc@google.com, joro@8bytes.org,
-        jon.grimm@amd.com, wei.huang2@amd.com, terry.bowman@amd.com
-Date:   Thu, 24 Feb 2022 19:41:10 +0200
-In-Reply-To: <20220221021922.733373-9-suravee.suthikulpanit@amd.com>
-References: <20220221021922.733373-1-suravee.suthikulpanit@amd.com>
-         <20220221021922.733373-9-suravee.suthikulpanit@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        with ESMTP id S232334AbiBXRvQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Feb 2022 12:51:16 -0500
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED7561C6670
+        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 09:50:46 -0800 (PST)
+Received: by mail-pl1-x636.google.com with SMTP id s1so2408565plg.12
+        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 09:50:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=vhKKmYtw9SaXOcf6Vm61pOGRR9SjgnfuDr4ZszyuH1g=;
+        b=V2/30CJh3gAARgxkDKqdir6SuxF5FkwxCggMoOympO2DxRpr6R0+eCCQSRST3VuMAA
+         UXdkOJbO9F99ygqXcBVn1lzWmfHxuKtviUskfMmjRpCjtFZbAFBBTL4Dxze0XLLiXE3z
+         1YwqIbncHdbKH2jOmvPBRTVKP6NhMXVOVC8jF+jytta1PbEdn/5sxes/Qtl+UVcgDGfE
+         BUoMGidlmqOqkXZEor0vKchR7Mo6gPqNQKTrzYdV4lpKZnrqvrW1hwips5dCuiV0Fm8W
+         r1Q7KZXXBah40FCrZVAr9oXQcVWrpZBCc1EY+eKb41Yd59d+OJV0SU46gx2gvJ8+O3Ij
+         2WDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=vhKKmYtw9SaXOcf6Vm61pOGRR9SjgnfuDr4ZszyuH1g=;
+        b=N5APe1KKR7bVbwujkqQqLNcoawqa2EzOtE2zq8tLdiiySAevvHnzLPyTKggQFleJqq
+         sVUdJw0spJPyA6rICf6UwVR4ym/l8mzxqmf7q0sqOXplXC8RO+ueklZNm4IEGPqiDWvU
+         yG9iRAWSW4uHtSf6G06SeZbgPHWfN8D++xsn26xga+2E/UDufYrhTTnM0o3FtuCtpzq1
+         feHLP3cDtYu6g9VHwBWkfWA3uri9ii9ayHXrn3jdCPV6dl1lXsxuR0vB4jeL9S+AFDs7
+         aFDR4EMrtDcjJeQMx693VJsJfy5wwVg1W431GkR0HD3bg8xm9JgAIkz+D/0djhWkfCSl
+         AahQ==
+X-Gm-Message-State: AOAM532wxV8PYesLsyxO4ntYUxPpyWzs1ppDLUVa5prHsnEKNIshO+dG
+        vZ4r4FLNm540OQq5MTX0jxa9Wg==
+X-Google-Smtp-Source: ABdhPJxgo1/EIT6OVLXXzTIAis9Z7qLpGO1epE04nsLzME4XY1pqGDJlaiVz4M+x/v6j3OhQOE/1cA==
+X-Received: by 2002:a17:902:e949:b0:14b:1f32:e926 with SMTP id b9-20020a170902e94900b0014b1f32e926mr3753799pll.170.1645725046327;
+        Thu, 24 Feb 2022 09:50:46 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id g7-20020a056a000b8700b004e1bed5c3bfsm131956pfj.68.2022.02.24.09.50.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Feb 2022 09:50:45 -0800 (PST)
+Date:   Thu, 24 Feb 2022 17:50:42 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Wanpeng Li <kernellwp@gmail.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Lai Jiangshan <laijs@linux.alibaba.com>
+Subject: Re: [PATCH 0/3] KVM: x86: Fixes for kvm/queue
+Message-ID: <YhfFcqeVzUoFlntf@google.com>
+References: <20211216021938.11752-1-jiangshanlai@gmail.com>
+ <7fc9348d-5bee-b5b6-4457-6bde1e749422@redhat.com>
+ <CANRm+CyHfgOyxyk7KPzYR714dQaakPrVbwSf_cyvBMo+vQcmAw@mail.gmail.com>
+ <YgaPZcET90k14fBa@google.com>
+ <f9b5c079-ba10-b528-a2fc-efb40cbb5d8f@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f9b5c079-ba10-b528-a2fc-efb40cbb5d8f@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, 2022-02-20 at 20:19 -0600, Suravee Suthikulpanit wrote:
-> In X2APIC mode the Logical Destination Register is read-only,
-> which provides a fixed mapping between the logical and physical
-> APIC IDs. Therefore, there is no Logical APIC ID table in X2AVIC
-> and the processor uses the X2APIC ID in the backing page to create
-> a vCPU’s logical ID.
+On Fri, Feb 11, 2022, Paolo Bonzini wrote:
+> On 2/11/22 17:31, Sean Christopherson wrote:
+> > > Maybe the patch "Revert "KVM: VMX: Save HOST_CR3 in
+> > > vmx_prepare_switch_to_guest()"" is still missing in the latest
+> > > kvm/queue, I saw the same warning.
+> > 
+> > It hasn't made it way to Linus either.
 > 
-> Therefore, add logic to check x2APIC mode before updating logical
-> APIC ID table.
+> This was supposed to fix the buggy patch, too:
 > 
-> Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-> ---
->  arch/x86/kvm/svm/avic.c | 11 ++++++++++-
->  1 file changed, 10 insertions(+), 1 deletion(-)
+>     commit a9f2705ec84449e3b8d70c804766f8e97e23080d
+>     Author: Lai Jiangshan <laijs@linux.alibaba.com>
+>     Date:   Thu Dec 16 10:19:36 2021 +0800
 > 
-> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> index 215d8a7dbc1d..55b3b703b93b 100644
-> --- a/arch/x86/kvm/svm/avic.c
-> +++ b/arch/x86/kvm/svm/avic.c
-> @@ -417,6 +417,10 @@ static int avic_ldr_write(struct kvm_vcpu *vcpu, u8 g_physical_id, u32 ldr)
->  	bool flat;
->  	u32 *entry, new_entry;
->  
-> +	/* Note: x2AVIC does not use logical APIC ID table */
-> +	if (apic_x2apic_mode(vcpu->arch.apic))
-> +		return 0;
-> +
->  	flat = kvm_lapic_get_reg(vcpu->arch.apic, APIC_DFR) == APIC_DFR_FLAT;
->  	entry = avic_get_logical_id_entry(vcpu, ldr, flat);
->  	if (!entry)
-> @@ -435,8 +439,13 @@ static void avic_invalidate_logical_id_entry(struct kvm_vcpu *vcpu)
->  {
->  	struct vcpu_svm *svm = to_svm(vcpu);
->  	bool flat = svm->dfr_reg == APIC_DFR_FLAT;
-> -	u32 *entry = avic_get_logical_id_entry(vcpu, svm->ldr_reg, flat);
-> +	u32 *entry;
-> +
-> +	/* Note: x2AVIC does not use logical APIC ID table */
-> +	if (apic_x2apic_mode(vcpu->arch.apic))
-> +		return;
->  
-> +	entry = avic_get_logical_id_entry(vcpu, svm->ldr_reg, flat);
->  	if (entry)
->  		clear_bit(AVIC_LOGICAL_ID_ENTRY_VALID_BIT, (unsigned long *)entry);
->  }
+>     KVM: VMX: Save HOST_CR3 in vmx_set_host_fs_gs()
+>     The host CR3 in the vcpu thread can only be changed when scheduling,
+>     so commit 15ad9762d69f ("KVM: VMX: Save HOST_CR3 in vmx_prepare_switch_to_guest()")
+>     changed vmx.c to only save it in vmx_prepare_switch_to_guest().
+>     However, it also has to be synced in vmx_sync_vmcs_host_state() when switching VMCS.
+>     vmx_set_host_fs_gs() is called in both places, so rename it to
+>     vmx_set_vmcs_host_state() and make it update HOST_CR3.
+>     Fixes: 15ad9762d69f ("KVM: VMX: Save HOST_CR3 in vmx_prepare_switch_to_guest()")
+>     Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
+>     Message-Id: <20211216021938.11752-2-jiangshanlai@gmail.com>
+>     Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-
-Here actually the good apic_x2apic_mode was used.
-
-However, shouldn't we inject #GP in avic_ldr_write to make this read realy read-only?
-It might be too late to do so here, since most AVIC writes are trap like.
-
-Thus we need to make the msr that corresponds to LDR to be write protected in the msr bitmap,
-and inject #GP when write it attempted.
-
-Then we can add WARN_ON in this function for this case instead.
-
-Best regards,
-	Maxim Levitsky
-
+The underlying premise that CR3 can change only when scheduling is wrong, reverts
+incoming...
