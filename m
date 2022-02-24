@@ -2,185 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3986C4C2B71
-	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 13:11:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A4E74C2BC0
+	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 13:32:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233418AbiBXMLO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Feb 2022 07:11:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43274 "EHLO
+        id S234330AbiBXMbX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Feb 2022 07:31:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43538 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232374AbiBXMLN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Feb 2022 07:11:13 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9C6D15F35B;
-        Thu, 24 Feb 2022 04:10:43 -0800 (PST)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21OB4RTP018868;
-        Thu, 24 Feb 2022 12:10:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=lfNtwr7eb2JuNBAmnns9BNmMkIRRwqI6ayiqTSjdMTE=;
- b=c0cefLeUz3Rhhvm3nDBECapKk0Sr5lvwfeR/jctMMGk6tQhEgU3zn+4D//33jjaARAu7
- DBAv37hI2xIAvJMXlIKl9P/BfqJKXP+QYWbmms/Yc3BGenxBoFztPuzyIVxjAkm/lYGA
- n/XjqCBZSd3egAFB5K7V+TkYF4f0kQpxv8iHSYn0wbRwk8mG9BT7AKOUwOF+5qKXFp89
- CXBWcm0IOBh9P94c8XSJzT2AS0p6VlDM0vuSkmbQpYKI38wfnGsOvJaQXYiEQiNWP81Q
- gi1k6W8Kv5wOdwwFvml0EAFLLfYCVYDmgGw7a+n8Iv1yntM+VtGbs3TsAYYmCIM+lXfH ZQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3edh6xgqa9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 24 Feb 2022 12:10:42 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21OBwW9Q020413;
-        Thu, 24 Feb 2022 12:10:42 GMT
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3edh6xgq9g-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 24 Feb 2022 12:10:42 +0000
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21OC2uQN017049;
-        Thu, 24 Feb 2022 12:10:40 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma06fra.de.ibm.com with ESMTP id 3eaqtjy9y0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 24 Feb 2022 12:10:39 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21OCAZQh44499282
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 24 Feb 2022 12:10:35 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6E13642047;
-        Thu, 24 Feb 2022 12:10:35 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E223942042;
-        Thu, 24 Feb 2022 12:10:34 +0000 (GMT)
-Received: from [9.145.90.75] (unknown [9.145.90.75])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 24 Feb 2022 12:10:34 +0000 (GMT)
-Message-ID: <3640a910-60fe-0935-4dfc-55bb65a75ce5@linux.ibm.com>
-Date:   Thu, 24 Feb 2022 13:10:34 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.6.1
-Subject: Re: [PATCH v1 1/1] KVM: s390: Don't cast parameter in bit operations
-Content-Language: en-US
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>
-References: <20220223164420.45344-1-andriy.shevchenko@linux.intel.com>
- <20220224123620.57fd6c8b@p-imbrenda>
-From:   Michael Mueller <mimu@linux.ibm.com>
-In-Reply-To: <20220224123620.57fd6c8b@p-imbrenda>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: qZ7sDXfe6HZhKQSr02k2dl-TvwntKCTj
-X-Proofpoint-ORIG-GUID: Gx9qIV04xEish0q8S5keb9iWX4WXSEMy
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-02-24_02,2022-02-24_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- spamscore=0 clxscore=1011 bulkscore=0 adultscore=0 mlxscore=0
- suspectscore=0 mlxlogscore=999 phishscore=0 malwarescore=0
- lowpriorityscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2201110000 definitions=main-2202240072
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S231460AbiBXMbW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Feb 2022 07:31:22 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 331082649AD
+        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 04:30:53 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C1C1A61940
+        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 12:30:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C98BC340E9;
+        Thu, 24 Feb 2022 12:30:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1645705852;
+        bh=WlTwlp+iGoNWQX8+jkkxXRvSX9F450dOOqw8J4p+j6U=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=g4W1JS2TbyuCxfzMTJPmdO0Fg8nUt+j6Yqgz8zqlLyJk1Ye0aC7bEcakRTJzar3e7
+         JsG5vs7N3r8oDCI1i2ameCOPgQ9mlJH2pAAtZMLV+fPj3ntYGrOO1r2xlnt/Z0v2oJ
+         q3WoQ4OgmhfUCZaE65GIpkUla+9QDezZLPPr8L8HxLnkX5svr3chZNKuDgHPHBErDK
+         icPSPxCXhZhFQqLw5GhuoaOYPEhd+RIM4oZjYOJ2f72r6Y2zYn1JR44B/wlIRQAZRf
+         BTDqYw0o5uBdvUhYwMY0/gxA52M99QMgxFpyuGIZ91WtlvOsKz+AEmQeqUctzgH+ut
+         +/mqCiW33+fHg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nNDGj-00AB4h-Ls; Thu, 24 Feb 2022 12:30:49 +0000
+Date:   Thu, 24 Feb 2022 12:30:49 +0000
+Message-ID: <87zgmg30qu.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oupton@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, Peter Shier <pshier@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>,
+        Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH v3 03/19] KVM: arm64: Reject invalid addresses for CPU_ON PSCI call
+In-Reply-To: <20220223041844.3984439-4-oupton@google.com>
+References: <20220223041844.3984439-1-oupton@google.com>
+        <20220223041844.3984439-4-oupton@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@google.com, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, anup@brainfault.org, atishp@atishpatra.org, seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, pshier@google.com, reijiw@google.com, ricarkol@google.com, rananta@google.com, jingzhangos@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 24.02.22 12:36, Claudio Imbrenda wrote:
-> On Wed, 23 Feb 2022 18:44:20 +0200
-> Andy Shevchenko <andriy.shevchenko@linux.intel.com> wrote:
+On Wed, 23 Feb 2022 04:18:28 +0000,
+Oliver Upton <oupton@google.com> wrote:
 > 
->> While in this particular case it would not be a (critical) issue,
->> the pattern itself is bad and error prone in case somebody blindly
->> copies to their code.
->>
->> Don't cast parameter to unsigned long pointer in the bit operations.
->> Instead copy to a local variable on stack of a proper type and use.
->>
->> Fixes: d77e64141e32 ("KVM: s390: implement GISA IPM related primitives")
->> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
->> ---
->>   arch/s390/include/asm/kvm_host.h | 5 ++++-
->>   arch/s390/kvm/interrupt.c        | 6 +++---
->>   2 files changed, 7 insertions(+), 4 deletions(-)
->>
->> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
->> index a22c9266ea05..f1c4a1b9b360 100644
->> --- a/arch/s390/include/asm/kvm_host.h
->> +++ b/arch/s390/include/asm/kvm_host.h
->> @@ -867,7 +867,10 @@ struct kvm_s390_gisa {
->>   			u8  reserved03[11];
->>   			u32 airq_count;
->>   		} g1;
->> -		struct {
->> +		struct { /* as a 256-bit bitmap */
->> +			DECLARE_BITMAP(b, 256);
->> +		} bitmap;
->> +		struct { /* as a set of 64-bit words */
->>   			u64 word[4];
->>   		} u64;
->>   	};
->> diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
->> index db933c252dbc..04e055cbd080 100644
->> --- a/arch/s390/kvm/interrupt.c
->> +++ b/arch/s390/kvm/interrupt.c
->> @@ -304,7 +304,7 @@ static inline int gisa_in_alert_list(struct kvm_s390_gisa *gisa)
->>   
->>   static inline void gisa_set_ipm_gisc(struct kvm_s390_gisa *gisa, u32 gisc)
->>   {
->> -	set_bit_inv(IPM_BIT_OFFSET + gisc, (unsigned long *) gisa);
->> +	set_bit_inv(IPM_BIT_OFFSET + gisc, gisa->bitmap.b);
+> DEN0022D.b 5.6.2 "Caller responsibilities" states that a PSCI
+> implementation may return INVALID_ADDRESS for the CPU_ON call if the
+> provided entry address is known to be invalid. There is an additional
+> caveat to this rule. Prior to PSCI v1.0, the INVALID_PARAMETERS error
+> is returned instead. Check the guest's PSCI version and return the
+> appropriate error if the IPA is invalid.
 > 
-> wouldn't it be enough to pass gisa->u64.word here?
-> then no cast would be necessary
-
-
-we do that at several places
-
-arch/s390/kernel/processor.c:	for_each_set_bit_inv(bit, (long 
-*)&stfle_fac_list, MAX_FACILITY_BIT)
-arch/s390/kvm/interrupt.c:	set_bit_inv(IPM_BIT_OFFSET + gisc, (unsigned 
-long *) gisa);
-arch/s390/kvm/kvm-s390.c:		set_bit_inv(vcpu->vcpu_id, (unsigned long *) 
-sca->mcn);
-arch/s390/kvm/kvm-s390.c:		set_bit_inv(vcpu->vcpu_id, (unsigned long *) 
-&sca->mcn);
-
+> Reported-by: Reiji Watanabe <reijiw@google.com>
+> Signed-off-by: Oliver Upton <oupton@google.com>
+> ---
+>  arch/arm64/kvm/psci.c | 24 ++++++++++++++++++++++--
+>  1 file changed, 22 insertions(+), 2 deletions(-)
 > 
->>   }
->>   
->>   static inline u8 gisa_get_ipm(struct kvm_s390_gisa *gisa)
->> @@ -314,12 +314,12 @@ static inline u8 gisa_get_ipm(struct kvm_s390_gisa *gisa)
->>   
->>   static inline void gisa_clear_ipm_gisc(struct kvm_s390_gisa *gisa, u32 gisc)
->>   {
->> -	clear_bit_inv(IPM_BIT_OFFSET + gisc, (unsigned long *) gisa);
->> +	clear_bit_inv(IPM_BIT_OFFSET + gisc, gisa->bitmap.b);
->>   }
->>   
->>   static inline int gisa_tac_ipm_gisc(struct kvm_s390_gisa *gisa, u32 gisc)
->>   {
->> -	return test_and_clear_bit_inv(IPM_BIT_OFFSET + gisc, (unsigned long *) gisa);
->> +	return test_and_clear_bit_inv(IPM_BIT_OFFSET + gisc, gisa->bitmap.b);
->>   }
->>   
->>   static inline unsigned long pending_irqs_no_gisa(struct kvm_vcpu *vcpu)
-> 
+> diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
+> index a0c10c11f40e..de1cf554929d 100644
+> --- a/arch/arm64/kvm/psci.c
+> +++ b/arch/arm64/kvm/psci.c
+> @@ -12,6 +12,7 @@
+>  
+>  #include <asm/cputype.h>
+>  #include <asm/kvm_emulate.h>
+> +#include <asm/kvm_mmu.h>
+>  
+>  #include <kvm/arm_psci.h>
+>  #include <kvm/arm_hypercalls.h>
+> @@ -70,12 +71,31 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+>  	struct vcpu_reset_state *reset_state;
+>  	struct kvm *kvm = source_vcpu->kvm;
+>  	struct kvm_vcpu *vcpu = NULL;
+> -	unsigned long cpu_id;
+> +	unsigned long cpu_id, entry_addr;
+>  
+>  	cpu_id = smccc_get_arg1(source_vcpu);
+>  	if (!kvm_psci_valid_affinity(source_vcpu, cpu_id))
+>  		return PSCI_RET_INVALID_PARAMS;
+>  
+> +	/*
+> +	 * Basic sanity check: ensure the requested entry address actually
+> +	 * exists within the guest's address space.
+> +	 */
+> +	entry_addr = smccc_get_arg2(source_vcpu);
+> +	if (!kvm_ipa_valid(kvm, entry_addr)) {
+> +
+> +		/*
+> +		 * Before PSCI v1.0, the INVALID_PARAMETERS error is returned
+> +		 * instead of INVALID_ADDRESS.
+> +		 *
+> +		 * For more details, see ARM DEN0022D.b 5.6 "CPU_ON".
+> +		 */
+> +		if (kvm_psci_version(source_vcpu) < KVM_ARM_PSCI_1_0)
+> +			return PSCI_RET_INVALID_PARAMS;
+> +		else
+> +			return PSCI_RET_INVALID_ADDRESS;
+> +	}
+> +
+
+If you're concerned with this, should you also check for the PC
+alignment, or the presence of a memslot covering the address you are
+branching to?  Le latter is particularly hard to implement reliably.
+
+So far, my position has been that the guest is free to shoot itself in
+the foot if that's what it wants to do, and that babysitting it was a
+waste of useful bits! ;-)
+
+Or have you identified something that makes it a requirement to handle
+this case (and possibly others)  in the hypervisor?
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
