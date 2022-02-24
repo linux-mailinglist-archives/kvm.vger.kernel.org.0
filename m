@@ -2,57 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E21084C27EE
-	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 10:18:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 25B6A4C281B
+	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 10:33:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231854AbiBXJSF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Feb 2022 04:18:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51048 "EHLO
+        id S232746AbiBXJdK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Feb 2022 04:33:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45844 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232781AbiBXJRw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Feb 2022 04:17:52 -0500
+        with ESMTP id S232185AbiBXJdI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Feb 2022 04:33:08 -0500
 Received: from de-smtp-delivery-102.mimecast.com (de-smtp-delivery-102.mimecast.com [194.104.111.102])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 219261323E8
-        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 01:17:21 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFA5520A952
+        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 01:32:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=mimecast20200619;
-        t=1645694240;
+        t=1645695157;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=rUyon0ziXzbCoYk4LAHmM5G5cE9HdiJvxQMgR85UqUI=;
-        b=fz5+ehQ3AVDGhQEwhNBwTEpYqyTWjhOpX7giFm784ZEeheIzbEMCWJBUpEM6EWongGackc
-        WOY2iKXDrCqmZ9+RL5IZ4xaDfT/SyKWWYpmhNOdDy/C2knUzZ7qvdi844kgNwfyb1v25Hl
-        l3ileAvxjAeoGJ4qAJ9qaNYEiRi3jeM=
-Received: from EUR01-VE1-obe.outbound.protection.outlook.com
- (mail-ve1eur01lp2056.outbound.protection.outlook.com [104.47.1.56]) by
+        bh=Y4O/HdGpGjOiTVfdh24aOScfl1geCjzMNOvwE4Y+kKw=;
+        b=KZ9YMPKzpJzQJITRMrBIhy84r1fI2PuOwd9tBe+s9f96bBVwNTGrp6fMJ8oFpXd3FkAWhn
+        19frdOyBlBF22RjWfZ1MBgyMEBjZKIhyuZAMnB1kEhutuVwhMSylTYx9nDnLvZLq00bEsp
+        gwmpMMLbNV0XdXa7cLNZP3B28FQqepE=
+Received: from EUR03-AM5-obe.outbound.protection.outlook.com
+ (mail-am5eur03lp2053.outbound.protection.outlook.com [104.47.8.53]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- de-mta-18-fK45O7iNOVyX1kM3PRT2Dw-1; Thu, 24 Feb 2022 10:17:18 +0100
-X-MC-Unique: fK45O7iNOVyX1kM3PRT2Dw-1
+ de-mta-36-ySfGYEkaM5y9OUJ62JJzjw-1; Thu, 24 Feb 2022 10:32:35 +0100
+X-MC-Unique: ySfGYEkaM5y9OUJ62JJzjw-1
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=eeQPPraoSTzHI6MHC7pKqNvo2myC0itdV5DCzEUdM0WAVy65el4uDsc6c9tbJwBLOcyHI8z+G9igtfYOWS/BkSyRcVE+bu/f1NtWcT/g6asfETY9P+Vq3xv/+M7FH9nadFnhxY3/t7VLakHYrfnPXK1fGSCDCu3gW6kDIit/CdrDK007aPvAmkYh1svaIbDlP00fE7KZVJ9YnGxWlleyZ0Vh6PejoE0yhnXvFZ5hgMkEg5p1sJSXnIaZiAbEf6uwykxEn91YD20meuwibc4t3PHFQSRV7ZE2rdLEzm32f0eg7i60LxaA3qWXnrb6FayHgk9JoEhFe+13bSH1w8RBqA==
+ b=KLPTvASo6sqN5dgZ4mS2wwXtyoP7cy8VLX9yxLUVaf5WgKw6YDPPFwZOsGQ6aW7Piso0T5a/6Xvfohxmo5rJ0YGAIWXQY9MgEJnZTnMTcJHeKRPG8P1yLWXFCVrk9wA2f2xKzixOWRng9whz+vvcH4zb4+U4n9yImMQ0kPfy31dnddN6hVUwt2nkGlnCoX/SWg28DRtjbu/TzuY73DdXSng79nL7fHhrh8RqgPWsFsLYRuZ/kto4A9CsbaMX6Cp7mWa18zin5NYgU7E2hQxw+ejfdXotgbGbv/ZZ0z4/a8slqtYu5qLPqmMU7uGb+OuUbPdflf3fuQZYF4Cpie60gA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rUyon0ziXzbCoYk4LAHmM5G5cE9HdiJvxQMgR85UqUI=;
- b=aSPomVYSEqhUQFuGXr5E3oO1X7Wx4RdUwHH5iGrUQJh1mWr8+dyudFVaFn2xdw06uuT6fyZbdEj4W/1Jms/yry3Xu7WJl6VUF43f0LCHAZ/V0c3LIeoJFuprVEF++zqXENc/j4PtY4pn2DRGARDdGuoQzW/E92j1Ru7RIP4C08exoUG4jL4rYB84B+I6SSAZWEKOtXu4MQtR5GALCMxRitw+b6aovLYpKTk614gU3gajbH9PYPNRlcKLbX98Kpg0/pSKP8ZPbbKB8BomyilzYVu/om6Bua3KveXQamfUXEKGJhMOlMPI/21XVkg2XRu6rPzdryqjJ3zB3htSGFAV5w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
- dkim=pass header.d=suse.com; arc=none
+ bh=Y4O/HdGpGjOiTVfdh24aOScfl1geCjzMNOvwE4Y+kKw=;
+ b=CnHymAUiTQBQv/gZ2DIts6e8aEScQ1LV4KjGPOj1wq6xcJuL2w4flnXTMRgZgYFXkftMOInsFUY6dOAP9gEerjd4INsn0MQlwqjUfMIIXoVYR/4kjaz4fu5INHYDM7M3bbBLq3lCxXhWIula/fUxs5bZiXwee8HLwkTX+fot7c/eYUtyO7fqU7mbpjRwgelSbsq7n8s6YePmZQ7UHwfui/q8b4zwFYvvmrQRW2PLtBVTqpxbRwkyV90N1acDtb5fKSRn8yHu2B1RwPWhmSXi4PCssdzXDSUHNwIjNfVV91+h8vY/xUhT0ZZlqMYYK0EuO4AwxLOxs6VORgXkHfbMAw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=suse.com;
 Received: from AM0PR04MB5650.eurprd04.prod.outlook.com (2603:10a6:208:128::18)
- by DB3PR0402MB3866.eurprd04.prod.outlook.com (2603:10a6:8:e::20) with
+ by AM6PR04MB4566.eurprd04.prod.outlook.com (2603:10a6:20b:1b::24) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4995.27; Thu, 24 Feb
- 2022 09:17:17 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4975.19; Thu, 24 Feb
+ 2022 09:32:34 +0000
 Received: from AM0PR04MB5650.eurprd04.prod.outlook.com
  ([fe80::59d3:d855:d7ba:16b6]) by AM0PR04MB5650.eurprd04.prod.outlook.com
  ([fe80::59d3:d855:d7ba:16b6%5]) with mapi id 15.20.5017.024; Thu, 24 Feb 2022
- 09:17:17 +0000
-Subject: Re: [kvm-unit-tests PATCH v2 04/10] x86: AMD SEV-ES: Pull related
- GHCB definitions and helpers from Linux
+ 09:32:34 +0000
+Subject: Re: [kvm-unit-tests PATCH v2 05/10] x86: AMD SEV-ES: Prepare for #VC
+ processing
 To:     Marc Orr <marcorr@google.com>
 Cc:     kvm list <kvm@vger.kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -65,79 +64,79 @@ Cc:     kvm list <kvm@vger.kernel.org>,
         "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
         Joerg Roedel <jroedel@suse.de>, bp@suse.de
 References: <20220209164420.8894-1-varad.gautam@suse.com>
- <20220209164420.8894-5-varad.gautam@suse.com>
- <CAA03e5ECgoC-2aSdVWJOAbMjq6iFZYbswWNWnA7movt5OK5dfw@mail.gmail.com>
+ <20220209164420.8894-6-varad.gautam@suse.com>
+ <CAA03e5G9Ler28JsLWU914Hg5w8cNEaQxoF_=K185vvTKo0MLcg@mail.gmail.com>
 From:   Varad Gautam <varad.gautam@suse.com>
-Message-ID: <eae63b62-284e-21e6-673a-6dd7b197aafd@suse.com>
-Date:   Thu, 24 Feb 2022 10:17:19 +0100
+Message-ID: <e6ae2f8e-f2d8-670e-6a22-337ba4d67f48@suse.com>
+Date:   Thu, 24 Feb 2022 10:32:37 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.13.0
-In-Reply-To: <CAA03e5ECgoC-2aSdVWJOAbMjq6iFZYbswWNWnA7movt5OK5dfw@mail.gmail.com>
+In-Reply-To: <CAA03e5G9Ler28JsLWU914Hg5w8cNEaQxoF_=K185vvTKo0MLcg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR2P281CA0010.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:a::20) To AM0PR04MB5650.eurprd04.prod.outlook.com
+X-ClientProxiedBy: AM6P192CA0064.EURP192.PROD.OUTLOOK.COM
+ (2603:10a6:209:82::41) To AM0PR04MB5650.eurprd04.prod.outlook.com
  (2603:10a6:208:128::18)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: ca7f9114-d5d8-4bad-eba8-08d9f77673c3
-X-MS-TrafficTypeDiagnostic: DB3PR0402MB3866:EE_
-X-Microsoft-Antispam-PRVS: <DB3PR0402MB386623293EC4B067B9980C88E03D9@DB3PR0402MB3866.eurprd04.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: 6548c954-44c7-4d43-a7a0-08d9f77896aa
+X-MS-TrafficTypeDiagnostic: AM6PR04MB4566:EE_
+X-Microsoft-Antispam-PRVS: <AM6PR04MB45667E8D227700DA37120407E03D9@AM6PR04MB4566.eurprd04.prod.outlook.com>
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: tYRTzzQEH6BXb+j+Lonb/3T529Vi14sT26zgJePcS8TewxFy17Oro1G/0iPFG+8bjGn1G0eX2ip9v5vmFuVHB1Tnxl6vC4O4iEipoWihz5iwqPotT+ZBwcLVgPIEU1MBIyuUMTOJ6g0uhS+7cgo8u+S0dPUSmxap7mitNEkQISCXsSGO2t9cfnOjhYSlrjEYCEDc8JldZtyGZRCBEGvovip4xRt9IxLssWmKiWdwEll2Vqt8x3wHilMODtDv1v0pgYQ56a/ZmjhmdG5M6tA7MbiAGafNHQKEz7GMLPFh5wdNoNMHlp1kzxGGs8xIBMND1r4eyksnAk1ZoYPF1GML4CTFWdfFU5SlK3QQrJri2B2QvfO3VEPeTz41hiQqSR2O8SM6gcsqH2Bj5guvC0GITdmYaVkOUpipSBxYEAGB31vRC/i8yoHi3onT0tWY7XI/p4XK5J6CvUiSOuzubBgDO0+eCN+BxmKBLIQQFWMFyODzjaiNSE/GBnwkqnB2IRJFImcS7UdRWNReAIl2j2tU9Q2R2znXGcuSpAhJjk0WOLnGjdwPMllRt3i0XisK0/UhSWMdnB9O+XQm6qkpFWr0KfecDde5RxHiNKerolvJlcPw19VS5aNmHVfmPn1/UgYCb4ALc8UC2k3KmtHKpJZ8NTiseeRXU3kdKReE8g7sfPS/aQsck6Utxk4bVn2fUHg+g3wos9VdQ4kx3gBon4sgFishTubPL4DA/dytYVTgViE=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB5650.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(44832011)(4326008)(5660300002)(2616005)(2906002)(8676002)(31686004)(83380400001)(66476007)(66946007)(66556008)(316002)(54906003)(508600001)(86362001)(38100700002)(6512007)(6506007)(6486002)(31696002)(36756003)(186003)(7416002)(53546011)(8936002)(26005)(6916009)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: DdDtCOyg9gEpqpswWrtosOUYoU9ZNFV5RSjDKLsFusuAFxYzu3oHxPMW3JYuzqFOTX2bKBQwB3iEWt72+dlaha2WDs9Mz181z7APR3cwR3nEtmaTJQMCe1RqANOz52PpsiQXKYq/WqS/dOkmsnrc7/pI4Cm7zjboNgnIquRGw1YJaP2EE6QwZnRwj5iFdJlBLN2jdN5sfPrm+TEz9yPDsG+8k9vsKz+gF5H0YApO/DoYxn9V7f0SKluIeMoynmTDafspfOrTBWHWijHXFVejvo575EsQeq6SCPXwz17R4EeEfB70xIeiYmnN87LgMC/9rRcRvAfUpjCDRVm1Fxn26lZRj0PmiJD0u8K+SRg3gEKxA4KVZseyE2a3e28z82vY2/Ivcgod2Kd5mDUxeSgjpP3nm5xAZ+r73cmP6maJ/yDW+U36lic0rN5gZf12o39aBzaFeoGtMsDKV05C9z/BZNhANzlqt+y+OBHU4GQK550jIHAz8jdcYSP6j+VDtFAuy02p1knCzVi27YS/trIJOrOAk97B3SVhjOf6xDawXtup7RXBcFugiLjhW5YV82utMGfpSyBnhjoXNJrcl3SPX4X+gljns91AEkDpFzhkspqgi/VxvYppOBwcIfM2PgWNEGDbqkFo7zM5yLz+gspx1332HfCrPCjHW16EXidCY2gLvwtnMydoNkVkNCT5yN3BRJG0SkP3bhHMPEisx5nGTSX5Qykm5uVsdmtCI65K3jo=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB5650.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(31686004)(66556008)(38100700002)(66476007)(316002)(66946007)(4326008)(6486002)(8676002)(6916009)(54906003)(36756003)(6512007)(2906002)(8936002)(5660300002)(86362001)(31696002)(508600001)(6506007)(2616005)(7416002)(186003)(26005)(44832011)(53546011)(83380400001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?V3BEdjlTelNLQ1dyRkgzLytXaWp5K0pPQ0J5SG9EZzJyVWJDYUE2V2FXdVpn?=
- =?utf-8?B?elI5R2U2ckRpNHlDSmlPRjFWUnd6d1VoeHlvSFExVTd2aUg5b1V4MlhheExC?=
- =?utf-8?B?YWY5aU9kbUUzRTJlemN3c1BNaStWZmJjeVZCQVNmSHgwaFF4dGFHTmZiTmpQ?=
- =?utf-8?B?RG1pdjF4TDMxOU5XQmVrR3dOZW5LN2RpNFJ5U1JGY3VjN3BqVUdzWldyNllL?=
- =?utf-8?B?ZjQ5T2hNVHdTemp3N2FPY2xQSjRVaTVRZHdKVTFzMGV0dnZTV1YyRTFWRkJP?=
- =?utf-8?B?ZzRsRysrcWVoRW1HWGVJajkyL1dRZ3d1blVGQmU0RDdLVGpZU096eng0NWxa?=
- =?utf-8?B?YVFEdFE0YktaZ3BwTFB5YjBrMnZlaFNIUGRUOW13TzI4dFZIR2xTMkhma2JS?=
- =?utf-8?B?Z1VLbkxUZVBic1hCU1N1MXFVZDc5K0Q2SGMvZndZTXNpWU5OaSt1dTFLNTl3?=
- =?utf-8?B?NkorVmVoRWZHRUdBMVk1dnorS2hCUFZkbDFYTWF4NzZmMEhXL1p1SHFoczRP?=
- =?utf-8?B?QmRDSW5HQmpVWFRYeHdPVnQ4eW1iN2hpZE1IS2w2VXFrVEY4bVlCd1B4Tkta?=
- =?utf-8?B?MWxHUHU2YXQvQ2wxa2lHTTRWUWlrMFVHQitJbXNCcTA0Rk5xeUJYc3RWOVRU?=
- =?utf-8?B?QXllMk5HU3dvZjRkNHE4V2EzK09yVFZlTSt0TzFMaGdYWVBQQ3VHUTh6c25E?=
- =?utf-8?B?YUxoK3F1YUtkUkxvWmJOMW5adEpQaGZhcEpSR3I5bjdMUW1rUUZBdmRyMVZV?=
- =?utf-8?B?b0wvcy9hZVNsUGRkNW9mMW5FUjRqT0kyS2JTSzk3WFlxUFZPRG1YZTFBZ1JU?=
- =?utf-8?B?VmlzZ3h5OE5TVHd3aS8vM1FzNUhkZEI1RU9IZGVwTnE0L3VXNWozWEs2VCtT?=
- =?utf-8?B?MHU5OER2VUNZK3ZDRmFybWNpcUkxUkMyenFOdTJCUGExVVk2cHZSZXVwOFVU?=
- =?utf-8?B?YWpNSDljOVlOLzFJNFFMNEgreGdWeU1Ea1B3QVFjWnNxR2tHTjBGZHlJZml6?=
- =?utf-8?B?dzhZQnlTQ0RKWC9iOWNtWm9JMmRQdFJLMllIaG13Tk5aRW4wS1hpWjJSKzhQ?=
- =?utf-8?B?aGFZVGU3Q2doZW9Jcnc2N2t6Q0wvcW5YUlF5TlArSnR5UDBhdEtESUdQcit1?=
- =?utf-8?B?djJiVmdLM1hJaE0wNXNCRmYreGx1Y21jeDlQUk5vc0lmcjFFN3JjdTNqeHkw?=
- =?utf-8?B?WStXdDFZT3pLV0Q2eG9CaE15NmQ5RG5KbEpDRlVERndCRDdSbS8raVlBVXN6?=
- =?utf-8?B?TlVJTGpGYUtISEZ3VjNZUndUcGR1QzNDVWJQaGZZTElMUllkVFRBV011Ulp4?=
- =?utf-8?B?akV4YktNMVNCdEpUU1VscU5hSGNMS0QxQ1JkbkNKd2F0QUV4cVEzL01CejRN?=
- =?utf-8?B?WFdjVllBbUZSUXBLSlJQdWNQVG5WcnNXU0M5bFMva3JVNS9kLy9DVWQrUmNJ?=
- =?utf-8?B?YmYzOUh6Ly9lTjVCWTI5NEJHbUx0UFg3TzJpZ04zRTQ0T2lwNlQ5akJ1ckt4?=
- =?utf-8?B?UDgzVlBzbE1NNmhEcVdDeDZEVHRITVl1YUpBYzFiZ3l6cEpMUCtwcG5GaHl3?=
- =?utf-8?B?OGhMQnZVQjEyc0tJeGVTVFJ1cEw0TjcrNkNYNEFIVnFzMU10c1RCRFk5cFUx?=
- =?utf-8?B?MHNMMGxhYkpiV3Z1bmVDMDFKaXo2N3F3TGpldkxIcGFsUEp3c1k5bDZyNlRa?=
- =?utf-8?B?RU5LdEFFWVcwTWJJenp1eURjQzg4Uk5FNmh2Y2ZZNHloZm9jQXVKVlVBeStI?=
- =?utf-8?B?ZlpZdGgrU1NMK1p3ak1Zck1scXpXZWt4cHM3d05yUmN0NkVncUh6bTJTSHUr?=
- =?utf-8?B?VG1MNVl5alV1OFQzYmRDWHg5N0RyaXhqUFhsZVZRdHg3QVR4UURyQnRHVDFn?=
- =?utf-8?B?bnl0aVM3NnNTcVdxb0tpaVBnM1ZjcEFSTERWZlVsRHk0ZFhsMXA0d2xpUFBB?=
- =?utf-8?B?N1dFbFp2a2duaG1VdnBTUnZHMVdpUFo4NGRaYUs0N0JmeVFpOUJpc2V0cm5I?=
- =?utf-8?B?Z2diSW51UTdzSDBOUGd2TzZ4bVZ6dnRqdC8vekJiYnJGTEhLT0ZjZW1Kam5n?=
- =?utf-8?B?NXZwd2VIc2tpWGdHNHNDQUh4bXlRWU5JMkN5R2tWbXRNbnplVEhMb3MrcVAr?=
- =?utf-8?B?MXhnU3BKWUpYTmRMNDZvclYvM3hiRzBrc2g0V1B2YXo2bTNQd2Y3TlB5MTFi?=
- =?utf-8?Q?o0gpSnaIeUnk0WlFwtFOzcw=3D?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Nk94MGRaTSt1bHlkVHRDQi9iczlPYzVVY085UHlsTngwZzdiQUdhbHF3Unhq?=
+ =?utf-8?B?aGFRN0RxTWVRZEdNWWVEOHV6YzhMRW9JZmxWQkZ2cEhKZ3FRZVo2S0F1NTZJ?=
+ =?utf-8?B?ZnhOVDVuRmhEMnBiR2VBVCs5U1prbUYxRVRDQSs1OWdZVXZhZVhGZnhNQ0tG?=
+ =?utf-8?B?U1didk1tVEo2b2d0VWN3VWNUS1IyV2xUUXAwMmpyVHVYdXgyelFkckRkd0NH?=
+ =?utf-8?B?R0JDcHJrb1FtbUlWcGVGS1VUSTBwUC9LaTVIeFZzMHJ0U1pldVVvMGlRWkIx?=
+ =?utf-8?B?TWtRZlptb0RyZEVWS25GV3JkcXB2NmJXYjNMdFpHUWNaeC9MM0t3bFJ4aC9J?=
+ =?utf-8?B?MEFoVjh1YmhabFRmS3dIS2tTa28xS1krdS9WQ3pBbElrRTBtdUZPOUtySExp?=
+ =?utf-8?B?ZUhoOWFVWUN4SlFhNFhtQVMzVWx3c04zRGxZMkNkcDNFdGxsZkhMYzFtVVZT?=
+ =?utf-8?B?cVhoWUVmclhUd1IvMmoxdGQ2NUlSbmlGelZwOVpBemRkUmgvd2pIaGRzQ20z?=
+ =?utf-8?B?MkpaN1NPNDBRQXVzZ2JTNTNZOTJ1WlJOYjM0YnJjMWFHYUpqNHFSL015dThw?=
+ =?utf-8?B?THgxQUsvM1d1U1NIVEprQXJxblI5MGwrMjRNU05VZ2tqQi82QjVlZHg5RTNN?=
+ =?utf-8?B?cmFqMDFXMEhzRnQ4QUlwWXpmcy9ibFBaS1VWNUVnU3AyTWxCcDBBRHpldVc5?=
+ =?utf-8?B?Yk1HdWtlOW9xSy9NUkh4UzdCb1IwUFFweW9CVlQvL05KcFN0dnlreVhLRTRw?=
+ =?utf-8?B?M2czamR0VGQ2UXd4ZUY2bkgyUGJrdnl2cjZJcGhIZGlsc2tPODZsOGZMWDVB?=
+ =?utf-8?B?WkZIblIzQnBESmp0Y1cxVUxtOTlvOXNQdTJGelNBeXBVdk9Sd3dUWXN5QjY2?=
+ =?utf-8?B?dUFXMTBrZzI5YWQzRXVLKzBFOXlwUEs4Z3ZYb3ZDVFFYZVZKc1JHZXN1VzA1?=
+ =?utf-8?B?YkRMRmVSUCtPcnRZd0J1USsyOElWWGVHNTlqdlAwSHREb1hMSVM2dS9OYk9u?=
+ =?utf-8?B?cXMzNitzcEJWYU5zdjFtZE1HSy80K0JZd0J4WDZKWlkwSXJBaGR6ay8zRHJP?=
+ =?utf-8?B?aFByejVQUCs2UzN6OXVNcWNVS082eXQ1V2NDOFl3c09LQnhjOGJJdGJFY0hH?=
+ =?utf-8?B?dkRLbm9rZC9PbDd4VGR5a2FWTytBQ2J2RkczZ0JtUUxSc3c2a1pic3VlREtz?=
+ =?utf-8?B?SFRiWnNnWFhWZWRkTi9BZHArNzZMMHJtdW9XR0Foa2dYQW1mWlVOT2Exekxi?=
+ =?utf-8?B?alhhd2VhV1ZoM1pYMVJFY1VQeUU1WXJpeFlmL0d1cS96NFBHTHAwM09hY2V6?=
+ =?utf-8?B?RlM5SUt6MkhCMmtwZ1NHb3R2TlB1NStrQjNPaXRoSENpTERCOEcvb25KMmhz?=
+ =?utf-8?B?amNBYTNtR1F0UUdsSU8zRzNSaUVQcGRHdGVNTWdHL1R0SlZ3Z1pZR29oZmVi?=
+ =?utf-8?B?SzZuUUVsbnJGMlNDUzBqVUhiRmJzeGtLakEzS1l3Vy9NbkQ4TGpiaGkwL2ow?=
+ =?utf-8?B?VzJzU1ZuK2sxYVpCL2diVGMvak8yVCtKWmRNR0hEUTg2ZklwV2JsTDMwQU1q?=
+ =?utf-8?B?TkpmQ1FpMm1TNUJKMnlmWWEwNG52RXlnS0RpRXlCVE5kbFErMCt1UzQzNXN2?=
+ =?utf-8?B?a0F5ZjVyQi9hREw0d0RicmtjY3BOdmRaRmVicjVSWDZEOWpTSHA2TWR6Rzgv?=
+ =?utf-8?B?TW5MNVN2eDlPak9ueWFLV2tIVmNjNktVTWh3T2FwNW5DN2JIelhBRnBiY0Yr?=
+ =?utf-8?B?dWR4Q0tmRnNMUGI3amx2dkNvdTlBd3BoZWpFb01pNldGSno1alRsaGpkcFhu?=
+ =?utf-8?B?SFNYMlJBQ29OMzJBZVByeVhrdXFaQWxPY1d3Ujl3UWg4Q0JkM1l3YXR2RTc0?=
+ =?utf-8?B?UGFINnM1bmQ5TnEvN3QrQ1IrQnV3bmFOYWVnSzFtdHhxVHFvTEFwTG54Uzg3?=
+ =?utf-8?B?OW5sdGxDeHdVei83anNkTzZ1WmRYVUJZV2UwKy9yQTFWcmNvUmF1clBJeTRn?=
+ =?utf-8?B?TCtDVS9MRG9JOVJIRzFhM0VWRWRPMjZMSzEvMGtUcnpHYTZaVkFCWHoxbU9L?=
+ =?utf-8?B?NjVDaW5va0VaN2ZuSEZoRTJZQ29jWUxFajVVckxnSUFqL3hQMnFGd3JxTUF5?=
+ =?utf-8?B?Q3dvL2xwT3FnekoweksxelgwQ2tWOWY0QjFmV0NDNGwrUWhxUWJKUUloYjhE?=
+ =?utf-8?Q?UMqKA0s5vz0NoCn0ap2awb4=3D?=
 X-OriginatorOrg: suse.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ca7f9114-d5d8-4bad-eba8-08d9f77673c3
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6548c954-44c7-4d43-a7a0-08d9f77896aa
 X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB5650.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Feb 2022 09:17:17.2088
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Feb 2022 09:32:34.6475
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: BE1tFuarlDWUXZ+tDc8h/zWfJRMbGIGnsUEygED268ZHmtel7egJOuOjGZZxLXcBTNFOdR7yvsADVcmtlPm4OQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB3PR0402MB3866
+X-MS-Exchange-CrossTenant-UserPrincipalName: bP8paWOzHBNVpgCygMD9zn3suNoXefTxBtKILQXOYImG9HSCK7u5Ah918wKctf7cz5827AuRCgUb+InFik1h3g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR04MB4566
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,
         RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
@@ -148,262 +147,132 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/12/22 8:09 PM, Marc Orr wrote:
+On 2/12/22 9:54 PM, Marc Orr wrote:
 > On Wed, Feb 9, 2022 at 8:44 AM Varad Gautam <varad.gautam@suse.com> wrote:
 >>
->> Origin: Linux 64222515138e43da1fcf288f0289ef1020427b87
->>
->> Suppress -Waddress-of-packed-member to allow taking addresses on struct
->> ghcb / struct vmcb_save_area fields.
+>> Lay the groundwork for processing #VC exceptions in the handler.
+>> This includes clearing the GHCB, decoding the insn that triggered
+>> this #VC, and continuing execution after the exception has been
+>> processed.
+> 
+> This description does not mention that this code is copied from Linux.
+> Should we have a comment in this patch description, similar to the
+> other patches?
+> 
+> Also, in general, I wonder if we need to mention where this code came
+> from in a comment header at the top of the file.
+> 
 >>
 >> Signed-off-by: Varad Gautam <varad.gautam@suse.com>
 >> ---
->>  lib/x86/amd_sev.h   | 106 ++++++++++++++++++++++++++++++++++++++++++++
->>  lib/x86/svm.h       |  37 ++++++++++++++++
->>  x86/Makefile.x86_64 |   1 +
->>  3 files changed, 144 insertions(+)
+>>  lib/x86/amd_sev_vc.c | 78 ++++++++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 78 insertions(+)
 >>
->> diff --git a/lib/x86/amd_sev.h b/lib/x86/amd_sev.h
->> index afbacf3..ed71c18 100644
->> --- a/lib/x86/amd_sev.h
->> +++ b/lib/x86/amd_sev.h
->> @@ -18,6 +18,49 @@
->>  #include "desc.h"
->>  #include "asm/page.h"
->>  #include "efi.h"
->> +#include "processor.h"
->> +#include "insn/insn.h"
+>> diff --git a/lib/x86/amd_sev_vc.c b/lib/x86/amd_sev_vc.c
+>> index 8226121..142f2cd 100644
+>> --- a/lib/x86/amd_sev_vc.c
+>> +++ b/lib/x86/amd_sev_vc.c
+>> @@ -1,14 +1,92 @@
+>>  /* SPDX-License-Identifier: GPL-2.0 */
+>>
+>>  #include "amd_sev.h"
 >> +#include "svm.h"
->> +
->> +struct __attribute__ ((__packed__)) ghcb {
->> +       struct vmcb_save_area save;
->> +       u8 reserved_save[2048 - sizeof(struct vmcb_save_area)];
->> +
->> +       u8 shared_buffer[2032];
->> +
->> +       u8 reserved_1[10];
->> +       u16 protocol_version;   /* negotiated SEV-ES/GHCB protocol version */
->> +       u32 ghcb_usage;
->> +};
->> +
->> +/* SEV definitions from linux's include/asm/sev.h */
-> 
-> nit: "include/asm/sev.h" should be "arch/x86/include/asm/sev.h".
-> 
-> Also, while I feel that I like verbose comments more than many, it
-> might be best to skip this one. Because when this code diverges from
-> Linux, it's just going to cause confusion.
-> 
-
-Ack, dropping the comment.
-
->> +#define GHCB_PROTO_OUR         0x0001UL
->> +#define GHCB_PROTOCOL_MAX      1ULL
->> +#define GHCB_DEFAULT_USAGE     0ULL
->> +
->> +#define        VMGEXIT()                       { asm volatile("rep; vmmcall\n\r"); }
->> +
->> +enum es_result {
->> +       ES_OK,                  /* All good */
->> +       ES_UNSUPPORTED,         /* Requested operation not supported */
->> +       ES_VMM_ERROR,           /* Unexpected state from the VMM */
->> +       ES_DECODE_FAILED,       /* Instruction decoding failed */
->> +       ES_EXCEPTION,           /* Instruction caused exception */
->> +       ES_RETRY,               /* Retry instruction emulation */
->> +};
->> +
->> +struct es_fault_info {
->> +       unsigned long vector;
->> +       unsigned long error_code;
->> +       unsigned long cr2;
->> +};
->> +
->> +/* ES instruction emulation context */
->> +struct es_em_ctxt {
->> +       struct ex_regs *regs;
->> +       struct insn insn;
->> +       struct es_fault_info fi;
->> +};
 >>
->>  /*
->>   * AMD Programmer's Manual Volume 3
->> @@ -59,6 +102,69 @@ void handle_sev_es_vc(struct ex_regs *regs);
->>  unsigned long long get_amd_sev_c_bit_mask(void);
->>  unsigned long long get_amd_sev_addr_upperbound(void);
+>>  extern phys_addr_t ghcb_addr;
 >>
->> +static int _test_bit(int nr, const volatile unsigned long *addr)
+>> +static void vc_ghcb_invalidate(struct ghcb *ghcb)
 >> +{
->> +       const volatile unsigned long *word = addr + BIT_WORD(nr);
->> +       unsigned long mask = BIT_MASK(nr);
->> +
->> +       return (*word & mask) != 0;
+>> +       ghcb->save.sw_exit_code = 0;
+>> +       memset(ghcb->save.valid_bitmap, 0, sizeof(ghcb->save.valid_bitmap));
 >> +}
-> 
-> This looks like it's copy/pasted from lib/arm/bitops.c? Maybe it's
-> worth moving this helper into a platform independent bitops library.
-> 
-> Alternatively, we could add an x86-specific test_bit implementation to
-> lib/x86/processor.h, where `set_bit()` is defined.
-> 
-
-lib/x86/processor.h sounds like a decent place for both test_bit() and
-lower_bits() later.
-
 >> +
->> +/* GHCB Accessor functions from Linux's include/asm/svm.h */
+>> +static bool vc_decoding_needed(unsigned long exit_code)
+>> +{
+>> +       /* Exceptions don't require to decode the instruction */
+>> +       return !(exit_code >= SVM_EXIT_EXCP_BASE &&
+>> +                exit_code <= SVM_EXIT_LAST_EXCP);
+>> +}
 >> +
->> +#define GHCB_BITMAP_IDX(field)                                                 \
->> +       (offsetof(struct vmcb_save_area, field) / sizeof(u64))
+>> +static enum es_result vc_decode_insn(struct es_em_ctxt *ctxt)
+>> +{
+>> +       unsigned char buffer[MAX_INSN_SIZE];
+>> +       int ret;
 >> +
->> +#define DEFINE_GHCB_ACCESSORS(field)                                           \
->> +       static inline bool ghcb_##field##_is_valid(const struct ghcb *ghcb)     \
->> +       {                                                                       \
->> +               return _test_bit(GHCB_BITMAP_IDX(field),                                \
->> +                               (unsigned long *)&ghcb->save.valid_bitmap);     \
->> +       }                                                                       \
->> +                                                                               \
->> +       static inline u64 ghcb_get_##field(struct ghcb *ghcb)                   \
->> +       {                                                                       \
->> +               return ghcb->save.field;                                        \
->> +       }                                                                       \
->> +                                                                               \
->> +       static inline u64 ghcb_get_##field##_if_valid(struct ghcb *ghcb)        \
->> +       {                                                                       \
->> +               return ghcb_##field##_is_valid(ghcb) ? ghcb->save.field : 0;    \
->> +       }                                                                       \
->> +                                                                               \
->> +       static inline void ghcb_set_##field(struct ghcb *ghcb, u64 value)       \
->> +       {                                                                       \
->> +               set_bit(GHCB_BITMAP_IDX(field),                         \
->> +                         (u8 *)&ghcb->save.valid_bitmap);              \
->> +               ghcb->save.field = value;                                       \
+>> +       memcpy(buffer, (unsigned char *)ctxt->regs->rip, MAX_INSN_SIZE);
+>> +
+>> +       ret = insn_decode(&ctxt->insn, buffer, MAX_INSN_SIZE, INSN_MODE_64);
+>> +       if (ret < 0)
+>> +               return ES_DECODE_FAILED;
+>> +       else
+>> +               return ES_OK;
+>> +}
+>> +
+>> +static enum es_result vc_init_em_ctxt(struct es_em_ctxt *ctxt,
+>> +                                     struct ex_regs *regs,
+>> +                                     unsigned long exit_code)
+>> +{
+>> +       enum es_result ret = ES_OK;
+>> +
+>> +       memset(ctxt, 0, sizeof(*ctxt));
+>> +       ctxt->regs = regs;
+>> +
+>> +       if (vc_decoding_needed(exit_code))
+>> +               ret = vc_decode_insn(ctxt);
+>> +
+>> +       return ret;
+>> +}
+>> +
+>> +static void vc_finish_insn(struct es_em_ctxt *ctxt)
+>> +{
+>> +       ctxt->regs->rip += ctxt->insn.length;
+>> +}
+>> +
+>> +static enum es_result vc_handle_exitcode(struct es_em_ctxt *ctxt,
+>> +                                        struct ghcb *ghcb,
+>> +                                        unsigned long exit_code)
+>> +{
+>> +       enum es_result result;
+>> +
+>> +       switch (exit_code) {
+>> +       default:
+>> +               /*
+>> +                * Unexpected #VC exception
+>> +                */
+>> +               result = ES_UNSUPPORTED;
 >> +       }
 >> +
->> +DEFINE_GHCB_ACCESSORS(cpl)
->> +DEFINE_GHCB_ACCESSORS(rip)
->> +DEFINE_GHCB_ACCESSORS(rsp)
->> +DEFINE_GHCB_ACCESSORS(rax)
->> +DEFINE_GHCB_ACCESSORS(rcx)
->> +DEFINE_GHCB_ACCESSORS(rdx)
->> +DEFINE_GHCB_ACCESSORS(rbx)
->> +DEFINE_GHCB_ACCESSORS(rbp)
->> +DEFINE_GHCB_ACCESSORS(rsi)
->> +DEFINE_GHCB_ACCESSORS(rdi)
->> +DEFINE_GHCB_ACCESSORS(r8)
->> +DEFINE_GHCB_ACCESSORS(r9)
->> +DEFINE_GHCB_ACCESSORS(r10)
->> +DEFINE_GHCB_ACCESSORS(r11)
->> +DEFINE_GHCB_ACCESSORS(r12)
->> +DEFINE_GHCB_ACCESSORS(r13)
->> +DEFINE_GHCB_ACCESSORS(r14)
->> +DEFINE_GHCB_ACCESSORS(r15)
->> +DEFINE_GHCB_ACCESSORS(sw_exit_code)
->> +DEFINE_GHCB_ACCESSORS(sw_exit_info_1)
->> +DEFINE_GHCB_ACCESSORS(sw_exit_info_2)
->> +DEFINE_GHCB_ACCESSORS(sw_scratch)
->> +DEFINE_GHCB_ACCESSORS(xcr0)
+>> +       return result;
+>> +}
 >> +
->> +#define MSR_AMD64_SEV_ES_GHCB          0xc0010130
-> 
-> Should this go in lib/x86/msr.h?
-> 
+>>  void handle_sev_es_vc(struct ex_regs *regs)
+>>  {
+>>         struct ghcb *ghcb = (struct ghcb *) ghcb_addr;
+>> +       unsigned long exit_code = regs->error_code;
+>> +       struct es_em_ctxt ctxt;
+>> +       enum es_result result;
 >> +
->>  #endif /* TARGET_EFI */
->>
->>  #endif /* _X86_AMD_SEV_H_ */
->> diff --git a/lib/x86/svm.h b/lib/x86/svm.h
->> index f74b13a..f046455 100644
->> --- a/lib/x86/svm.h
->> +++ b/lib/x86/svm.h
->> @@ -197,6 +197,42 @@ struct __attribute__ ((__packed__)) vmcb_save_area {
->>         u64 br_to;
->>         u64 last_excp_from;
->>         u64 last_excp_to;
-> 
-> In upstream Linux @ 64222515138e, above the save area, there was a
-> change made for ES. See below. Maybe we should go ahead pull this
-> change from Linux while we're here adding the VMSA.
-> 
-
-I'll update this in v3.
-
-> kvm-unit-tests, with this patch applied:
-> 
-> 172         u8 reserved_3[112];
-> 173         u64 cr4;
-> 
-> Linux @ 64222515138e:
-> 
-> 245         u8 reserved_3[104];
-> 246         u64 xss;                /* Valid for SEV-ES only */
-> 247         u64 cr4;
-> 
+>>         if (!ghcb) {
+>>                 /* TODO: kill guest */
+>>                 return;
+>>         }
 >> +
->> +       /*
->> +        * The following part of the save area is valid only for
->> +        * SEV-ES guests when referenced through the GHCB or for
->> +        * saving to the host save area.
->> +        */
->> +       u8 reserved_7[72];
->> +       u32 spec_ctrl;          /* Guest version of SPEC_CTRL at 0x2E0 */
->> +       u8 reserved_7b[4];
->> +       u32 pkru;
->> +       u8 reserved_7a[20];
->> +       u64 reserved_8;         /* rax already available at 0x01f8 */
->> +       u64 rcx;
->> +       u64 rdx;
->> +       u64 rbx;
->> +       u64 reserved_9;         /* rsp already available at 0x01d8 */
->> +       u64 rbp;
->> +       u64 rsi;
->> +       u64 rdi;
->> +       u64 r8;
->> +       u64 r9;
->> +       u64 r10;
->> +       u64 r11;
->> +       u64 r12;
->> +       u64 r13;
->> +       u64 r14;
->> +       u64 r15;
->> +       u8 reserved_10[16];
->> +       u64 sw_exit_code;
->> +       u64 sw_exit_info_1;
->> +       u64 sw_exit_info_2;
->> +       u64 sw_scratch;
->> +       u8 reserved_11[56];
->> +       u64 xcr0;
->> +       u8 valid_bitmap[16];
->> +       u64 x87_state_gpa;
->>  };
->>
->>  struct __attribute__ ((__packed__)) vmcb {
->> @@ -297,6 +333,7 @@ struct __attribute__ ((__packed__)) vmcb {
->>  #define        SVM_EXIT_WRITE_DR6      0x036
->>  #define        SVM_EXIT_WRITE_DR7      0x037
->>  #define SVM_EXIT_EXCP_BASE      0x040
->> +#define SVM_EXIT_LAST_EXCP     0x05f
+>> +       vc_ghcb_invalidate(ghcb);
+>> +       result = vc_init_em_ctxt(&ctxt, regs, exit_code);
+>> +       if (result == ES_OK)
+>> +               result = vc_handle_exitcode(&ctxt, ghcb, exit_code);
+>> +       if (result == ES_OK)
+>> +               vc_finish_insn(&ctxt);
 > 
-> nit: There is a spacing issue here. When this patch is applied, 0x05f
-> is not aligned with the constants above and below.
+> Should we print an error if the result is not `ES_OK`, like the
+> function `vc_raw_handle_exception()` does in Linux? Otherwise, this
+> silent failure is going to be very confusing to whoever runs into it.
 > 
 
-Ack.
+Changed in v3.
 
->>  #define SVM_EXIT_INTR          0x060
->>  #define SVM_EXIT_NMI           0x061
->>  #define SVM_EXIT_SMI           0x062
->> diff --git a/x86/Makefile.x86_64 b/x86/Makefile.x86_64
->> index a3cb75a..7d3eb53 100644
->> --- a/x86/Makefile.x86_64
->> +++ b/x86/Makefile.x86_64
->> @@ -13,6 +13,7 @@ endif
->>
->>  fcf_protection_full := $(call cc-option, -fcf-protection=full,)
->>  COMMON_CFLAGS += -mno-red-zone -mno-sse -mno-sse2 $(fcf_protection_full)
->> +COMMON_CFLAGS += -Wno-address-of-packed-member
->>
->>  cflatobjs += lib/x86/setjmp64.o
->>  cflatobjs += lib/x86/intel-iommu.o
+>> +
+>> +       return;
+>>  }
 >> --
 >> 2.32.0
 >>
