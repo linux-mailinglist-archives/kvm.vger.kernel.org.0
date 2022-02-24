@@ -2,72 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B793C4C35C4
+	by mail.lfdr.de (Postfix) with ESMTP id 6C38F4C35C3
 	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 20:22:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233762AbiBXTVw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Feb 2022 14:21:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53194 "EHLO
+        id S232408AbiBXTW3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Feb 2022 14:22:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232408AbiBXTVs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Feb 2022 14:21:48 -0500
-Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EB302556D7
-        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 11:21:11 -0800 (PST)
-Received: by mail-pg1-x532.google.com with SMTP id 12so2605868pgd.0
-        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 11:21:11 -0800 (PST)
+        with ESMTP id S232571AbiBXTW2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Feb 2022 14:22:28 -0500
+Received: from mail-il1-x129.google.com (mail-il1-x129.google.com [IPv6:2607:f8b0:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41DD4522E0
+        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 11:21:54 -0800 (PST)
+Received: by mail-il1-x129.google.com with SMTP id q4so2586913ilt.0
+        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 11:21:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=buZeMMVEZNxJ9jtUAqpS4JjRjBkU1+tY8v267yDAbwc=;
-        b=dKy4uqv5OzjCTEM0+zVRvI4NpI0iUo7MzB7YLGzlwAI4Lrt6/v+uA+3GMOek5aOmYA
-         EFsG3A0SpditdPp1qoNY+aAoTKLxVWCvKbbr9SwRVJRVhvlsEriUI653++aoCm0wa2mW
-         t0qz9ZAQIB8si3KfqE5/QpjVDD4x0fLbA+8XdLyPQBXhZJropKr6+BmaAZCMjlk4qWh/
-         Vp/g3n6xAhEk5ar2R3eyPROhWjCMlS0Mhz4G/DAN049AZUZEDp8qB803djgpnSYyWGIO
-         MRiqQNYm3ogxIQJxxBK2YZzzZLV70lj4VhRrNF9Mb7X1YCJkkc/Pcp79RM9kMVqdQZwt
-         kOLA==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=dlxbBhjVxgATP0KM5oNG0LzdCfA40MUHrDIe/INdi68=;
+        b=NYOdpm1bR56HSGohn/sRm5A66fRUWCpyofnOGctj1Y7ae7i9UeuP70P/+ILbsYGshn
+         g4CwQLakXJ7vlyBMwxLrvT6z/s1hnpRc/M+qijG4uaLuozRkQ7rglS5G25Lb7vEEW3fx
+         79iYlHvvkRS2gTK0O3vXFMqYmF1B8mjqRa9jETuLcu4PalAreDBoVpmPKOZ59Jb7VSWr
+         xyxFkKFJ3nUb/YTG8zk8spMQvhsp4Iiz3Sp6WdQoYEpuypYRa23kod5z0BrhLeH5pBG7
+         bYHrKwcQ6CwTqdOo19gGMZNyZeTd7zVuSXiIdG5lSR5k/TCUKojup/YE6KCIhw4tVyVR
+         4x3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=buZeMMVEZNxJ9jtUAqpS4JjRjBkU1+tY8v267yDAbwc=;
-        b=mUP/JqOTGs0oTlLQ+/RpCepKiMYdFEsq63CA/d/6+7M61vk7azP41AHcwUp1EIY+Z6
-         tShFh7QaOoeCx8GaX6Xsp5CbaY5Atwstd/yEV72N7nQnAuw6GsrRZYNxcGOzM9acIJ2h
-         f88lupVKQp80WDR+e+Mw6fHoZLqzd57rxvBwQekcWqRb3rAE5njHZD1xKJJ0tJD1oQfj
-         8EFQn2FMoPnTksEJ8T/xVqrXcSgzVTEUjAT6S+ywffZYNtLgzEHt7lBf12GAV9W0mjlo
-         h08rifKyEZdQCbnFdYarqfxn/2MUsC9MgkC5rk/ylm5Q4/mt1usFt/H+ALZeu8d7WBP6
-         0P5g==
-X-Gm-Message-State: AOAM533SCOg9zT+aJ51AW+lfaGzuiir5bp9WeIzG7X6igmlFo0Nemn3A
-        BmsXtqMwpAnD9k2S1N+aWIqtWv63rgMi99a6pgHhVg==
-X-Google-Smtp-Source: ABdhPJztyqj5MGLlL7KLRRbyHUJfurkoa20BcSTPWiYpjxXeB7YyxXdCtCmdHdJvPZQnORUYi5UG8svMKjtdQ5rqcOE=
-X-Received: by 2002:a62:1c47:0:b0:4f1:2735:3219 with SMTP id
- c68-20020a621c47000000b004f127353219mr4248806pfc.70.1645730470591; Thu, 24
- Feb 2022 11:21:10 -0800 (PST)
-MIME-Version: 1.0
-References: <20220203010051.2813563-1-dmatlack@google.com> <20220203010051.2813563-20-dmatlack@google.com>
- <8735k84i6f.wl-maz@kernel.org>
-In-Reply-To: <8735k84i6f.wl-maz@kernel.org>
-From:   David Matlack <dmatlack@google.com>
-Date:   Thu, 24 Feb 2022 11:20:44 -0800
-Message-ID: <CALzav=d9dRWCV=R8Ypvy4KzgzPQvd-7qhGTbxso5r9eTh9kkqw@mail.gmail.com>
-Subject: Re: [PATCH 19/23] KVM: Allow for different capacities in
- kvm_mmu_memory_cache structs
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=dlxbBhjVxgATP0KM5oNG0LzdCfA40MUHrDIe/INdi68=;
+        b=EyX7KygGO9UKN75ZNNKb/9sX+B/A73Do/4iIv6gAoE2uwV4V2fGAVG7Sh8x5KRIqAb
+         x641TaE+Sxo7mRTKR6lQc9K1xzNP75c9a4geLjil2nBovcjfbFG7HL7u8oecqN//KnxD
+         P6KysBnF1v5fwetaUHYGu/R89gMDATnb5AMsGxJgi2+zNMpZgdjdKHYEYTYoz3bm545/
+         rs1UlW4P55zKwpA5cNTNUQXHuLWmsF2OXwR0i6HYlQA2+3zfoK0snF7z9R0+kAEDCgmf
+         EfUXNqhEalCox47/yp6KrjuEyNGO13wANYKsIPBF6mwGze/B6q9Nf8aoiAxcCLewJwnn
+         b68w==
+X-Gm-Message-State: AOAM533E59hRvYs1gCipp+38a5J7QyrNa3iVJlSRTstNSEUVPYtyR6yE
+        bv85pnyz2fqDE0PBFuhQYllCaw==
+X-Google-Smtp-Source: ABdhPJwn7IgJZMEfgRQOCW+UbgVEsAFzikAr2Dh30XA4U2P9oW3FIDdVTPHHiCobPFdhZhWNF/zmHg==
+X-Received: by 2002:a05:6e02:1bc5:b0:2c2:7bc9:8e8f with SMTP id x5-20020a056e021bc500b002c27bc98e8fmr3548686ilv.5.1645730514046;
+        Thu, 24 Feb 2022 11:21:54 -0800 (PST)
+Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
+        by smtp.gmail.com with ESMTPSA id k10-20020a6b7e4a000000b00640a8142cbdsm289173ioq.49.2022.02.24.11.21.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Feb 2022 11:21:53 -0800 (PST)
+Date:   Thu, 24 Feb 2022 19:21:50 +0000
+From:   Oliver Upton <oupton@google.com>
 To:     Marc Zyngier <maz@kernel.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        leksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+Cc:     kvmarm@lists.cs.columbia.edu, Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
         Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Peter Feiner <pfeiner@google.com>,
-        Andrew Jones <drjones@redhat.com>,
-        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
-        kvm list <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, Peter Shier <pshier@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>,
+        Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH v3 03/19] KVM: arm64: Reject invalid addresses for CPU_ON
+ PSCI call
+Message-ID: <YhfaztgV0GHzyh24@google.com>
+References: <20220223041844.3984439-1-oupton@google.com>
+ <20220223041844.3984439-4-oupton@google.com>
+ <87zgmg30qu.wl-maz@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87zgmg30qu.wl-maz@kernel.org>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -79,147 +87,94 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 24, 2022 at 3:29 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> On Thu, 03 Feb 2022 01:00:47 +0000,
-> David Matlack <dmatlack@google.com> wrote:
-> >
-> > Allow the capacity of the kvm_mmu_memory_cache struct to be chosen at
-> > declaration time rather than being fixed for all declarations. This will
-> > be used in a follow-up commit to declare an cache in x86 with a capacity
-> > of 512+ objects without having to increase the capacity of all caches in
-> > KVM.
-> >
-> > No functional change intended.
-> >
-> > Signed-off-by: David Matlack <dmatlack@google.com>
+Hi Marc,
+
+On Thu, Feb 24, 2022 at 12:30:49PM +0000, Marc Zyngier wrote:
+> On Wed, 23 Feb 2022 04:18:28 +0000,
+> Oliver Upton <oupton@google.com> wrote:
+> > 
+> > DEN0022D.b 5.6.2 "Caller responsibilities" states that a PSCI
+> > implementation may return INVALID_ADDRESS for the CPU_ON call if the
+> > provided entry address is known to be invalid. There is an additional
+> > caveat to this rule. Prior to PSCI v1.0, the INVALID_PARAMETERS error
+> > is returned instead. Check the guest's PSCI version and return the
+> > appropriate error if the IPA is invalid.
+> > 
+> > Reported-by: Reiji Watanabe <reijiw@google.com>
+> > Signed-off-by: Oliver Upton <oupton@google.com>
 > > ---
-> >  arch/arm64/include/asm/kvm_host.h |  2 +-
-> >  arch/arm64/kvm/mmu.c              | 12 ++++++------
-> >  arch/mips/include/asm/kvm_host.h  |  2 +-
-> >  arch/x86/include/asm/kvm_host.h   |  8 ++++----
-> >  include/linux/kvm_types.h         | 24 ++++++++++++++++++++++--
-> >  virt/kvm/kvm_main.c               |  8 +++++++-
-> >  6 files changed, 41 insertions(+), 15 deletions(-)
-> >
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index 3b44ea17af88..a450b91cc2d9 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -357,7 +357,7 @@ struct kvm_vcpu_arch {
-> >       bool pause;
-> >
-> >       /* Cache some mmu pages needed inside spinlock regions */
-> > -     struct kvm_mmu_memory_cache mmu_page_cache;
-> > +     DEFINE_KVM_MMU_MEMORY_CACHE(mmu_page_cache);
+> >  arch/arm64/kvm/psci.c | 24 ++++++++++++++++++++++--
+> >  1 file changed, 22 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
+> > index a0c10c11f40e..de1cf554929d 100644
+> > --- a/arch/arm64/kvm/psci.c
+> > +++ b/arch/arm64/kvm/psci.c
+> > @@ -12,6 +12,7 @@
+> >  
+> >  #include <asm/cputype.h>
+> >  #include <asm/kvm_emulate.h>
+> > +#include <asm/kvm_mmu.h>
+> >  
+> >  #include <kvm/arm_psci.h>
+> >  #include <kvm/arm_hypercalls.h>
+> > @@ -70,12 +71,31 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+> >  	struct vcpu_reset_state *reset_state;
+> >  	struct kvm *kvm = source_vcpu->kvm;
+> >  	struct kvm_vcpu *vcpu = NULL;
+> > -	unsigned long cpu_id;
+> > +	unsigned long cpu_id, entry_addr;
+> >  
+> >  	cpu_id = smccc_get_arg1(source_vcpu);
+> >  	if (!kvm_psci_valid_affinity(source_vcpu, cpu_id))
+> >  		return PSCI_RET_INVALID_PARAMS;
+> >  
+> > +	/*
+> > +	 * Basic sanity check: ensure the requested entry address actually
+> > +	 * exists within the guest's address space.
+> > +	 */
+> > +	entry_addr = smccc_get_arg2(source_vcpu);
+> > +	if (!kvm_ipa_valid(kvm, entry_addr)) {
+> > +
+> > +		/*
+> > +		 * Before PSCI v1.0, the INVALID_PARAMETERS error is returned
+> > +		 * instead of INVALID_ADDRESS.
+> > +		 *
+> > +		 * For more details, see ARM DEN0022D.b 5.6 "CPU_ON".
+> > +		 */
+> > +		if (kvm_psci_version(source_vcpu) < KVM_ARM_PSCI_1_0)
+> > +			return PSCI_RET_INVALID_PARAMS;
+> > +		else
+> > +			return PSCI_RET_INVALID_ADDRESS;
+> > +	}
+> > +
+> 
+> If you're concerned with this, should you also check for the PC
+> alignment, or the presence of a memslot covering the address you are
+> branching to?  Le latter is particularly hard to implement reliably.
+
+Andrew, Reiji and I had a conversation regarding exactly this on the
+last run of this series, and concluded that checking against the IPA is
+probably the best KVM can do [1]. That said, alignment is also an easy
+thing to check.
+
+> So far, my position has been that the guest is free to shoot itself in
+> the foot if that's what it wants to do, and that babysitting it was a
+> waste of useful bits! ;-)
 >
-> I must say I'm really not a fan of the anonymous structure trick. I
-> can see why you are doing it that way, but it feels pretty brittle.
 
-Yeah I don't love it. It's really optimizing for minimizing the patch diff.
+Agreed -- there are plenty of spectacular/hilarious ways in which the
+guest can mess up :-)
 
-The alternative I considered was to dynamically allocate the
-kvm_mmu_memory_cache structs. This would get rid of the anonymous
-struct and the objects array, and also eliminate the rather gross
-capacity hack in kvm_mmu_topup_memory_cache().
+> Or have you identified something that makes it a requirement to handle
+> this case (and possibly others)  in the hypervisor?
 
-The downsides of this approach is more code and more failure paths if
-the allocation fails.
-
->
-> >
-> >       /* Target CPU and feature flags */
-> >       int target;
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index bc2aba953299..9c853c529b49 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -765,7 +765,8 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
-> >  {
-> >       phys_addr_t addr;
-> >       int ret = 0;
-> > -     struct kvm_mmu_memory_cache cache = { 0, __GFP_ZERO, NULL, };
-> > +     DEFINE_KVM_MMU_MEMORY_CACHE(cache) page_cache = {};
-> > +     struct kvm_mmu_memory_cache *cache = &page_cache.cache;
-> >       struct kvm_pgtable *pgt = kvm->arch.mmu.pgt;
-> >       enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_DEVICE |
-> >                                    KVM_PGTABLE_PROT_R |
-> > @@ -774,18 +775,17 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
-> >       if (is_protected_kvm_enabled())
-> >               return -EPERM;
-> >
-> > +     cache->gfp_zero = __GFP_ZERO;
->
-> nit: consider this instead, which preserves the existing flow:
-
-Will do.
-
->
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 26d6c53be083..86a7ebd03a44 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -764,7 +764,9 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
->  {
->         phys_addr_t addr;
->         int ret = 0;
-> -       DEFINE_KVM_MMU_MEMORY_CACHE(cache) page_cache = {};
-> +       DEFINE_KVM_MMU_MEMORY_CACHE(cache) page_cache = {
-> +               .cache = { .gfp_zero = __GFP_ZERO},
-> +       };
->         struct kvm_mmu_memory_cache *cache = &page_cache.cache;
->         struct kvm_pgtable *pgt = kvm->arch.mmu.pgt;
->         enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_DEVICE |
-> @@ -774,7 +776,6 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
->         if (is_protected_kvm_enabled())
->                 return -EPERM;
->
-> -       cache->gfp_zero = __GFP_ZERO;
->         size += offset_in_page(guest_ipa);
->         guest_ipa &= PAGE_MASK;
->
-> but whole "declare the outer structure and just use the inner one"
-> hack is... huh... :-/
-
-Yeah it's not great. Unfortunately (or maybe fortunately?) anonymous
-structs cannot be defined in functions. So naming the outer struct is
-necessary even though we only need to use the inner one.
-
->
-> This hunk also conflicts with what currently sits in -next. Not a big
-> deal, but just so you know.
-
-Ack.
-
->
-> > diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
-> > index dceac12c1ce5..9575fb8d333f 100644
-> > --- a/include/linux/kvm_types.h
-> > +++ b/include/linux/kvm_types.h
-> > @@ -78,14 +78,34 @@ struct gfn_to_pfn_cache {
-> >   * MMU flows is problematic, as is triggering reclaim, I/O, etc... while
-> >   * holding MMU locks.  Note, these caches act more like prefetch buffers than
-> >   * classical caches, i.e. objects are not returned to the cache on being freed.
-> > + *
-> > + * The storage for the cache objects is laid out after the struct to allow
-> > + * different declarations to choose different capacities. If the capacity field
-> > + * is 0, the capacity is assumed to be KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE.
-> >   */
-> >  struct kvm_mmu_memory_cache {
-> >       int nobjs;
-> > +     int capacity;
-> >       gfp_t gfp_zero;
-> >       struct kmem_cache *kmem_cache;
-> > -     void *objects[KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE];
-> > +     void *objects[0];
->
-> The VLA police is going to track you down ([0] vs []).
-
-Thanks!
+It is a lot easier to tell a guest that their software is broken if they
+get an error back from the hypercall, whereas a vCPU off in the weeds
+might need to be looked at before concluding there's a guest issue.
 
 
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+[1]: http://lore.kernel.org/r/20211005190153.dc2befzcisvznxq5@gator.home
+
+--
+Oliver
