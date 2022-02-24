@@ -2,94 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 34E4E4C2083
-	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 01:14:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9BF7D4C20CE
+	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 01:50:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245221AbiBXAOt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Feb 2022 19:14:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40412 "EHLO
+        id S229953AbiBXAuO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Feb 2022 19:50:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239973AbiBXAOj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Feb 2022 19:14:39 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AC295F4D1;
-        Wed, 23 Feb 2022 16:14:11 -0800 (PST)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21NLhq6Q026619;
-        Thu, 24 Feb 2022 00:14:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=GhboOXHgk3Su1hpuvZIuOcREjqdoASGy2DRZzIEOD0w=;
- b=KJWWyU8pdsTZTerTRF+VDBiE6eldBoftdcYkhgHSznKlEdfaAEKEhMa3K5HBsbOEPeAM
- zojoNE2KUVnIUKn/Omj0FUWJFj5dM342GeaW4fWcyxKFrc1gG/quZ1zdze6Gi83fC3NE
- EIOshF5D1spwwfoMZj3AsUkYyugbZi7MjX0SwGsZ8qNUfoqKAVnq9B5vUPsdilX1nBry
- yv5gHowtYfnG2lbkNFFz3ffTF4oP9IeAoUTevH/drOq69WXOUWX11K16FicEArni/CSk
- 9xRcXr4G83aTeWCQabCtv6k+IFsm9a4nRfKG4NHAtZXh4VIFrzZhdgGE0jNMGJDjpQDA Rw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3edw3bjja4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 24 Feb 2022 00:14:10 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21O0CHVh005761;
-        Thu, 24 Feb 2022 00:14:10 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3edw3bjj97-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 24 Feb 2022 00:14:10 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21O07m9r026156;
-        Thu, 24 Feb 2022 00:14:07 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma04ams.nl.ibm.com with ESMTP id 3ear69de68-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 24 Feb 2022 00:14:07 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21O0E3Rv47186394
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 24 Feb 2022 00:14:03 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0595E4203F;
-        Thu, 24 Feb 2022 00:14:03 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7C93142041;
-        Thu, 24 Feb 2022 00:14:02 +0000 (GMT)
-Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.69.173])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with SMTP;
-        Thu, 24 Feb 2022 00:14:02 +0000 (GMT)
-Date:   Thu, 24 Feb 2022 01:13:59 +0100
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Nico Boehr <nrb@linux.ibm.com>
-Cc:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
-        Pierre Morel <pmorel@linux.ibm.com>, thuth@redhat.com,
-        david@redhat.com, Halil Pasic <pasic@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v3 6/8] s390x: Add more tests for STSCH
-Message-ID: <20220224011359.59572002.pasic@linux.ibm.com>
-In-Reply-To: <99ec1cf03d17b3de2d47c497882f091f922713bf.camel@linux.ibm.com>
-References: <20220223132940.2765217-1-nrb@linux.ibm.com>
-        <20220223132940.2765217-7-nrb@linux.ibm.com>
-        <04daca6a-5863-d205-ea98-096163a2296a@linux.ibm.com>
-        <99ec1cf03d17b3de2d47c497882f091f922713bf.camel@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        with ESMTP id S229761AbiBXAuK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Feb 2022 19:50:10 -0500
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2062c.outbound.protection.outlook.com [IPv6:2a01:111:f400:fe5a::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06EA4113AF9;
+        Wed, 23 Feb 2022 16:49:33 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=dqHlz6PXR968fbaBoPKD1OgyZymIhNT41t/+EL6jai1weJ9y7V5mEvbzGCuNjrm8IdscJrBEttau/1lyYGcm6zGAg1alLo7PrOLX4ZgQuQ6Fhxt3smsppXYkIx/AVfqkUqrFxlSYJPV7QfbkGPpCmKlPaJoL2xT7GBpiRLBO0LHdn1wh2Lumzn4K3Ohwz93+iGWFXDmJAGNLRvvOFHb31GVbgqEYmFx3rNZblmE+wG5YaeY3cY9vA92UalfWKuvm3/2fI1p55qsInby+dW9G1JO8+zB0jhhV2VZZWbkZl/C8i4iUjFUElTenruEUd1InKZKTXGc/ItCfFB/DGUTfqA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=OrNMhVlCot70uziRI6pRt7xe4vKuYpkifY1Gf9t3f90=;
+ b=ajn5mL/qFpQErEle+6AOw/vmxKlLZiH0WP09mV4FzgypekF5/UBeOMbWRL9lq7keprk5DEVCFC8xZqYfHtqP8EXH5dEQYwZ266gsFxjPyCYPoch5suYDgg+L5CtnSSsqCKg8iRDALeM8/gbxVlQNRzfwKZJpPDrQ2lQHBen6HxN/5wueMiQgN+cqvaoX7ffuikC3w2i7RB3tV9lgpfbF8Qoz6wQpcSCve5G9rV4tcBI+yA0+VimQBskchjv+QYmXzqEHS6uqbjb3KAAQPXjP25IDGFxNxhc1RxPePmYxEan+3GDCIhHvlz/sRLjdSykKECA0nsKfpHy0VWRlbJ/ptA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=OrNMhVlCot70uziRI6pRt7xe4vKuYpkifY1Gf9t3f90=;
+ b=hBI7YXXXWtbp2PP025zuR5Hd/1sclyYQHp4OL3OhpuyP4KAoGEhRx9+rcc0undLMv5iCeavLCDQ5pxjVJXL8iKv8sXiq93byieFvwx6MfKP3LAaVTcmAWyaN0Mung51r0Hk7qC8c0QNXk5edIYXo0eJWQK8wc5VNoZjUGd/gBk0kGfO5b5ePF/Ik8m4M02cTbpnHE+r/v9JawgbOOwoSHmzX/RhnbX0T+Kb2gAmalwFF3J+WYJDrhAT6ZQHxP80aYuU7HwMF+b01lSr8EIr2lZ95hxBxEe26B8/UVYejqXUc+J2A+K1QX/tanD4DgycsJBTYJ9J0JFQMgRmJrVMQ6Q==
+Received: from MWHPR12MB1519.namprd12.prod.outlook.com (2603:10b6:301:d::22)
+ by DM5PR1201MB0235.namprd12.prod.outlook.com (2603:10b6:4:4f::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4995.24; Thu, 24 Feb
+ 2022 00:47:26 +0000
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by MWHPR12MB1519.namprd12.prod.outlook.com (2603:10b6:301:d::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4995.17; Thu, 24 Feb
+ 2022 00:47:19 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::e8f4:9793:da37:1bd3]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::e8f4:9793:da37:1bd3%4]) with mapi id 15.20.5017.022; Thu, 24 Feb 2022
+ 00:47:19 +0000
+Date:   Wed, 23 Feb 2022 20:47:18 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
+        saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
+        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com,
+        cohuck@redhat.com, ashok.raj@intel.com, kevin.tian@intel.com,
+        shameerali.kolothum.thodi@huawei.com
+Subject: Re: [PATCH V8 mlx5-next 10/15] vfio: Extend the device migration
+ protocol with RUNNING_P2P
+Message-ID: <20220224004718.GE409228@nvidia.com>
+References: <20220220095716.153757-1-yishaih@nvidia.com>
+ <20220220095716.153757-11-yishaih@nvidia.com>
+ <20220223104248.62b7ad12.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220223104248.62b7ad12.alex.williamson@redhat.com>
+X-ClientProxiedBy: MN2PR14CA0026.namprd14.prod.outlook.com
+ (2603:10b6:208:23e::31) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: SzAWcnfsc4IWYZEIta4IGSW8Bbe8kO86
-X-Proofpoint-GUID: EgVMsl5ni9KDHOE2Zx649PwF8lEkAMMS
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-02-23_09,2022-02-23_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 clxscore=1015
- priorityscore=1501 lowpriorityscore=0 malwarescore=0 adultscore=0
- phishscore=0 impostorscore=0 spamscore=0 mlxscore=0 bulkscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2202230136
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: a6909408-d17c-44b2-26f5-08d9f72f3639
+X-MS-TrafficTypeDiagnostic: MWHPR12MB1519:EE_|DM5PR1201MB0235:EE_
+X-Microsoft-Antispam-PRVS: <MWHPR12MB151941209C072CF8C5CA7BEDC23D9@MWHPR12MB1519.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: hXx5MhQVWAOvM28X1jfJr1vzXHdaaQaXqyl9JmpnzXDff0FQnC/9P3wgbYZutXOX7wOihK5ClFi3y6zNaI0vEl95BofsQDU11TPGOy51RLL8jAyoUiDVD4bc4K5WOaYo9e9+MmKwFqVr6rETI2sMunaKBwlmGytJDORWQUgeJ8jVCXIQ9nUWxnDORzfzVIM4Shh03GQ3uw0bBXR6HOhboz/91qaN6APt/++sUxf+P1MPUNGClhGQMz94xIHW/pbsE4GakjQniflei/YuO9Jg+HjttiuZxj5g7VY7NWXDIE/rHDXjM/CKuAWGaCV3yo44L5w377H/cLdgR/i6wpSYiCmCWamcqWStmjv+WYxKx95U0DvzdUFv+wnX+8ZQoAikj1X74jRy8Bm6VpI72uSvFEEEK89/g2RN4EjpTZJFweaVgYw3QfPUFXnY5tAuGozBDwcQd+1apgk9Q2BwftGI4wOS/Jjd4ytgMqfO0NtPGq352qWYJgSPNtEswpeWQ2a7X2hnPhzWMeNPpexGcmXDQN4GNhNUXwJeDitNWI7E0TfO0L8ssZDIasNP8WbAf/Dbearkska1R1kE2cMqLCV0MbGiJPNDfY7Ww9SfSnxC9c5Cat/aZPsxDiJ/G+Bztyz9Z5ZgN3UIIxxSBhrEKRdXnDpf1yKIojCAxbLTM+kQTUU+KOWjiRVMs3btBH4uUnoOPOUeOFMZjwKEY79HpQlrPQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR12MB1519.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(8936002)(38100700002)(86362001)(7416002)(6916009)(6512007)(66556008)(316002)(66946007)(4326008)(66476007)(5660300002)(8676002)(6506007)(6486002)(33656002)(186003)(36756003)(4744005)(2616005)(1076003)(2906002)(508600001)(26005)(27376004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?4TJaDNvLp0mM96fGRh98uyblpjKR0ND9tERCquNT5TO6DjU3/vB2uRwDZtDb?=
+ =?us-ascii?Q?WIPanQWkXliXa13qBFVkoBJdOt/zshqD3f1Z64eIta2VZYA30wzoDiLokBly?=
+ =?us-ascii?Q?/2FCajQGtTmZHLI0YYtEXt+m6grfPV4spfb+4bEwf7FFAEb2XqOwFu/wwvpQ?=
+ =?us-ascii?Q?jJvhOotD/pYrdoR9qPfTtHvosUDbAilWfKJYXxTP5pl5GSfTWkTxDSs7JCpn?=
+ =?us-ascii?Q?qWMgsaTfMwYkDh0DVeZ4Ro2DKZOa4vam1TbHWV7uGtLsKr0xmJVFXaVZo/G8?=
+ =?us-ascii?Q?ZgPI56ghwBEtVnHKDxRdtIB62eX0i4yfSIxuFH11G4CG86N2JRNKXxaaqbE4?=
+ =?us-ascii?Q?rwrWW3163I2ROUtDsUCon0grLI8xoUnEll+pY+LF79MmIg36DX4FfUO7aIoc?=
+ =?us-ascii?Q?ys42PNe8LjP3rF9Tn3gdokaGV+ezQt7nIN/oTtMJLYeZhLHepJ/iMLnMh995?=
+ =?us-ascii?Q?Aw/CoK5j2PCQrNxbTtYccWTUNaif0FEMWYERrSn67usXhh63XWyIaUGy/YFd?=
+ =?us-ascii?Q?Rm1Cy/JXM0H6Gp8oGJfJ6KUL2SJGAECCYx7vbNeqdu9jT14oPiFDnelQDhT+?=
+ =?us-ascii?Q?Kbmh+AuCu4+q3qM+t4+tytaIeBs354h88qhI+cFg2Z5TdQUKxgZGBoRPBV/M?=
+ =?us-ascii?Q?LFBJnF0IT9cDEtLAgoQpeoqRSIo9p9fMTLGA9dHJCA/lyMAjg7hgta5kqwXw?=
+ =?us-ascii?Q?5xPr1a/Jkm2B4A9GSH0YBlaNYtA6IFkZrbhLF/J3mVQ2Ni08aEW5Purha+Hf?=
+ =?us-ascii?Q?obGY7d6CQ+2K9sziySqVG/xiXFjLwCd4duSP43goSGRtKSUj97WxkbTLCgwK?=
+ =?us-ascii?Q?ezDshsppJLwmL1E9mDMUvkD4pT9nzgJqQwdFtyTnmmbnia0lPsGR3UbEySED?=
+ =?us-ascii?Q?QX9MIREIe+49oaFRs+LYUyc5h1iEoP5dbPi48aV8WWpGBbrCy6aFLIm1F03z?=
+ =?us-ascii?Q?kRYP3rTiE8vOFke3pqEV33Nw0o7iPngIF+aR0NF0uXcbkHmopItE0WffTKkB?=
+ =?us-ascii?Q?n8T8qGdQoGXo+iA7xJbYCHYUTTlH7DZbO0359609Olj20u/B2NIZi3qNvOWw?=
+ =?us-ascii?Q?CxwIyKrzfk6zjB1gX/C+zRKUm98cNThzlpO40OYfldWs5s5BYQWkwZUDYGsN?=
+ =?us-ascii?Q?/QlbdF5f43uxAOWD2sy4nuyyl0PtjeJyY6A+qTWDBA/DKpiQ/WlR/WiU/omU?=
+ =?us-ascii?Q?+J44WWXMgaXbl6d+ExB5mnDUyjZXEz8PeHYxMt6mJhQybW//+5V+6ekv4VBy?=
+ =?us-ascii?Q?f28UIeqMaBbq+EYz4yl5p0u5XXBWCLoJ/1f1WRsf8NkqRx8wU+GwGSXpZJvb?=
+ =?us-ascii?Q?U8SeoAi4OrJqj7tlcLvG7j7Dyc8WFlEZsFVL32lctf2w06FZc49yS8Ig7nal?=
+ =?us-ascii?Q?LE7eKgWORgBeUJblUkQuHVR6UUNQL8rhDJ0gI3w9nJzROUeTOmtG/OM7+Hzn?=
+ =?us-ascii?Q?9GR2K8tTIEhD/SwGRp3WvyXF1IJ86VMqRHsnOo6rsWsaFBW56IxDRB/+2fDS?=
+ =?us-ascii?Q?wZb7AB87nh25ejOXenalws3W/GghBigzw1aTEmfzZUf/g2GFUYJRfVSWCcZz?=
+ =?us-ascii?Q?6aT3U1vj5nyP8XwL9GE=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a6909408-d17c-44b2-26f5-08d9f72f3639
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Feb 2022 00:47:19.6280
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: uSCHc3DjK51Uft/LtjHKWYM576Zetz5Gf0lVrKTWZc1T1IshHkYnE/eaEE5ijpBR
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR1201MB0235
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=no
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -97,67 +125,22 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 23 Feb 2022 18:33:17 +0100
-Nico Boehr <nrb@linux.ibm.com> wrote:
-
-> On Wed, 2022-02-23 at 16:39 +0100, Janosch Frank wrote:
-> > On 2/23/22 14:29, Nico Boehr wrote:  
-> > >   
-> [...]
-> > >   
-> > > +static void test_stsch(void)
-> > > +{
-> > >   
-> [...]
-> > > +       report_prefix_push("Bit 47 in SID is zero");
-> > > +       expect_pgm_int();
-> > > +       stsch(0x0000ffff, &schib);
-> > > +       check_pgm_int_code(PGM_INT_CODE_OPERAND);
-> > > +       report_prefix_pop();  
-> > 
-> > Add a comment:
-> > No matter if the multiple-subchannel-set facility is installed or
-> > not, 
-> > bit 47 always needs to be 1.  
+On Wed, Feb 23, 2022 at 10:42:48AM -0700, Alex Williamson wrote:
+> On Sun, 20 Feb 2022 11:57:11 +0200
+> Yishai Hadas <yishaih@nvidia.com> wrote:
+> > diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+> > index 3bbadcdbc9c8..3176cb5d4464 100644
+> > +++ b/include/linux/vfio.h
+> > @@ -33,6 +33,7 @@ struct vfio_device {
+> >  	struct vfio_group *group;
+> >  	struct vfio_device_set *dev_set;
+> >  	struct list_head dev_set_list;
+> > +	unsigned int migration_flags;
 > 
-> Will do.
-> 
-> > Do we have the MSS facility?  
-> 
-> Not an IO expert, but it seems like it's enabled by QEMU in pc-
-> bios/s390-ccw/main.c, css_setup(). The comment suggests it's always
-> there.
-> 
+> Maybe paranoia, but should we sanity test this in __vfio_register_dev()
+> to reinforce to driver authors that not all bit combinations are valid?
+> Thanks,
 
-AFAIR. The MSS facility is unconditionally implemented by QEMU thus
-it is always indicated as installed, but lies dormant per default
-and needs to be enabled.
+I don't like sanity testing things that are easy to audit for..
 
-The idea is that a non-enlightened OS would not enable the facility,
-and thus effectively end up specifying zeros and using the
-subchannel-set 0, and would observe no changes whatsoever compared
-to running on a machine that does not have MSS facility installed.
-
-Whether MSS is installed in some configuration or not can be detected
-via the facility bit 47 of Store Channel-Subsystem Characteristics.
-
-> > If yes, could we disable it to test the 32-47 == 0x0001 case?  
-> 
-> I see ioinst_handle_chsc_sda() in QEMU to enable it. Disabling only
-> works with a full reset of the CSS (see css_reset()) which can be
-> triggered from a subsystem_reset(), which basically means we need to
-> IPL. I think that's not really viable or do you see any other way?
-> 
-> Halil, Pierre, can you confirm?
-
-I don't think there is an other way, and there is usually no good reason
-to attempt that. If your OS enables it is enlightened, and it won't
-become non-enlightened. It is basically an opt-in. Eventually you may
-want to IPL something different, and you are covered by the subsystem
-reset.
-
-The best way to test this would be to not enable the facility. I have
-no idea if there is a way for a kvm-unit-test to accomplish that.
-
-Regards,
-Halil
+Jason
