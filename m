@@ -2,106 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C03C04C33BE
-	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 18:29:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B64B84C33C0
+	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 18:29:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229909AbiBXR3v (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Feb 2022 12:29:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41190 "EHLO
+        id S231882AbiBXRa2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Feb 2022 12:30:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54980 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231388AbiBXR1P (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Feb 2022 12:27:15 -0500
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C79012AF3
-        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 09:26:38 -0800 (PST)
-Received: by mail-pj1-x1049.google.com with SMTP id f2-20020a17090a4a8200b001b7dac53bd6so1616147pjh.4
-        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 09:26:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=qK1DQfY/agZG+Ude+bPzbHAaaA6lFwTTxSo+9IjwCXY=;
-        b=TPsbqKhxmc0T+PxetBwAhdG6CCG7ROWrKmUGN3BsssTeSIgoXUOQnngTK58e76sGaV
-         3u/siqCCo3eM5DO0OYSsT4wYCrRT+O8kY+a4+AnYqBHGb0Rj5B7cI0Hp7dOYnMvbxAD8
-         RoAw7AYWgYK31cWIx7Yp8Ht4bfU+zuvlAoRR0OqLqR3iivh7tqnsNUSy8KpcavPHrnPn
-         cHFxdJp1nmX7PTiWQDXtuL0nBeCqePhweoxs03ebVOn+oECM3dk8KZwiP6X63bDShGe/
-         UcGW8KmUCjDJRi9tzyMH1ow70Y2j+cGCEuvyTbgcVe9mx5/NjKgrxZVEBbSazCAcGvGj
-         1GHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=qK1DQfY/agZG+Ude+bPzbHAaaA6lFwTTxSo+9IjwCXY=;
-        b=658Gu7pdjUDkLsl/+wmCEQuu2kHXm0hHPnXl09rxZIcRek5ynElyLUJUTZjBZyHzEs
-         Zhy1NqFW70WCZz3i+1qsoVI6t/pSrpmpjTPrXp4PHndDXnamSnHF8Xr6xsKmIQUDivqJ
-         SzyqzlRXvC0E7i4D921ZE2s8rFSF2qsXlGgU2XFmi1G+aB0i4xrVL5gIqj++HpBKn1Xn
-         1KCCMAJ5mtDcniJ1wkzsCsHafL5tQs87HUEcfJqQpCoQhi04DNumIpvwNz+FSajVkOaG
-         AKNTbA3rignedr6nAIGh2zW5VRNIhmMzwFxYducNKxT2IzwDyeb78g5Xev5psYEwOcJ4
-         r2TA==
-X-Gm-Message-State: AOAM531SLrjFGYY/1xoXVyx4OniEn1dXNVsEOONjgOf+AEGvwyD6lpss
-        1Z/6o+ntPc9+EC4hRtqXBdZmgGmAJp1I
-X-Google-Smtp-Source: ABdhPJwU+prJ7BpJEtXxJA5crkhbYqb6Kqs4m4pINVmy8BqVqC8ntCResa6F6puuaRPR78ifpJ3Lzgoe5HTq
-X-Received: from rananta-virt.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1bcc])
- (user=rananta job=sendgmr) by 2002:a05:6a00:248c:b0:4ce:1932:80dd with SMTP
- id c12-20020a056a00248c00b004ce193280ddmr3851504pfv.48.1645723597604; Thu, 24
- Feb 2022 09:26:37 -0800 (PST)
-Date:   Thu, 24 Feb 2022 17:25:59 +0000
-In-Reply-To: <20220224172559.4170192-1-rananta@google.com>
-Message-Id: <20220224172559.4170192-14-rananta@google.com>
-Mime-Version: 1.0
-References: <20220224172559.4170192-1-rananta@google.com>
-X-Mailer: git-send-email 2.35.1.574.g5d30c73bfb-goog
-Subject: [PATCH v4 13/13] selftests: KVM: aarch64: Add the bitmap firmware
- registers to get-reg-list
-From:   Raghavendra Rao Ananta <rananta@google.com>
-To:     Marc Zyngier <maz@kernel.org>, Andrew Jones <drjones@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        with ESMTP id S230347AbiBXRa0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Feb 2022 12:30:26 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A44B2186BAE
+        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 09:29:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645723766;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=zOV5EV1UzXliH9U/EzhEDJEFZZoLbZzEL9tR71RF+1A=;
+        b=ghaSrUSfFRdcIwofNKVmMdXEQ6pS8N7rBFNlGVjzL0OgIOvf3Wo/hHfA4NJ0jLBnwtSetH
+        GJCtyh8Be2u+bKqgde/lJGrIxCEDfTCRKVBH7vfOW8ntLezL9MWvwXQKBXfIdQ9t2vO0Ke
+        CNIcEdtYxgp+YPaVtcZLvEHmbDxorO8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-508-Cq01rZ-aOKORCANWokIZVQ-1; Thu, 24 Feb 2022 12:29:21 -0500
+X-MC-Unique: Cq01rZ-aOKORCANWokIZVQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 74E2018766D0;
+        Thu, 24 Feb 2022 17:29:19 +0000 (UTC)
+Received: from starship (unknown [10.40.195.190])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E91AF866DD;
+        Thu, 24 Feb 2022 17:29:16 +0000 (UTC)
+Message-ID: <334aadda53c7837d71e7c9d11b772a4a66b58df3.camel@redhat.com>
+Subject: Re: [RFC PATCH 06/13] KVM: SVM: Add logic to determine x2APIC mode
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, seanjc@google.com, joro@8bytes.org,
+        jon.grimm@amd.com, wei.huang2@amd.com, terry.bowman@amd.com
+Date:   Thu, 24 Feb 2022 19:29:15 +0200
+In-Reply-To: <20220221021922.733373-7-suravee.suthikulpanit@amd.com>
+References: <20220221021922.733373-1-suravee.suthikulpanit@amd.com>
+         <20220221021922.733373-7-suravee.suthikulpanit@amd.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add the psuedo-firmware registers KVM_REG_ARM_STD_BMAP,
-KVM_REG_ARM_STD_HYP_BMAP, and KVM_REG_ARM_VENDOR_HYP_BMAP to
-the base_regs[] list.
+On Sun, 2022-02-20 at 20:19 -0600, Suravee Suthikulpanit wrote:
+> Introduce avic_update_vapic_bar(), which checks the x2APIC enable bit
+> of the APIC Base register and update the new struct vcpu_svm.x2apic_enabled
+> to keep track of current APIC mode of each vCPU,
+> 
+> Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+> ---
+>  arch/x86/kvm/svm/avic.c | 13 +++++++++++++
+>  arch/x86/kvm/svm/svm.c  |  4 ++++
+>  arch/x86/kvm/svm/svm.h  |  2 ++
+>  3 files changed, 19 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> index 1999076966fd..60f30e48d816 100644
+> --- a/arch/x86/kvm/svm/avic.c
+> +++ b/arch/x86/kvm/svm/avic.c
+> @@ -609,6 +609,19 @@ void avic_post_state_restore(struct kvm_vcpu *vcpu)
+>  	avic_handle_ldr_update(vcpu);
+>  }
+>  
+> +void avic_update_vapic_bar(struct vcpu_svm *svm, u64 data)
+> +{
+> +	svm->vmcb->control.avic_vapic_bar = data & VMCB_AVIC_APIC_BAR_MASK;
+> +
+> +	/* Set x2APIC mode bit if guest enable x2apic mode. */
+> +	svm->x2apic_enabled = (avic_mode == AVIC_MODE_X2 &&
+> +			       kvm_apic_mode(data) == LAPIC_MODE_X2APIC);
+> +	pr_debug("vcpu_id:%d switch to %s\n", svm->vcpu.vcpu_id,
+> +		 svm->x2apic_enabled ? "x2APIC" : "xAPIC");
+> +	vmcb_mark_dirty(svm->vmcb, VMCB_AVIC);
+> +	kvm_vcpu_update_apicv(&svm->vcpu);
+> +}
+> +
+>  void svm_set_virtual_apic_mode(struct kvm_vcpu *vcpu)
+>  {
+>  	return;
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 3687026f2859..4e6dc1feeac7 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -2867,6 +2867,10 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
+>  		svm->msr_decfg = data;
+>  		break;
+>  	}
+> +	case MSR_IA32_APICBASE:
+> +		if (kvm_vcpu_apicv_active(vcpu))
+> +			avic_update_vapic_bar(to_svm(vcpu), data);
+> +		fallthrough;
+>  	default:
+>  		return kvm_set_msr_common(vcpu, msr);
+>  	}
+> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> index 1a0bf6b853df..bfbebb933da2 100644
+> --- a/arch/x86/kvm/svm/svm.h
+> +++ b/arch/x86/kvm/svm/svm.h
+> @@ -225,6 +225,7 @@ struct vcpu_svm {
+>  	u32 dfr_reg;
+>  	struct page *avic_backing_page;
+>  	u64 *avic_physical_id_cache;
+> +	bool x2apic_enabled;
+>  
+>  	/*
+>  	 * Per-vcpu list of struct amd_svm_iommu_ir:
+> @@ -566,6 +567,7 @@ void avic_init_vmcb(struct vcpu_svm *svm);
+>  int avic_incomplete_ipi_interception(struct kvm_vcpu *vcpu);
+>  int avic_unaccelerated_access_interception(struct kvm_vcpu *vcpu);
+>  int avic_init_vcpu(struct vcpu_svm *svm);
+> +void avic_update_vapic_bar(struct vcpu_svm *svm, u64 data);
+>  void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu);
+>  void avic_vcpu_put(struct kvm_vcpu *vcpu);
+>  void avic_post_state_restore(struct kvm_vcpu *vcpu);
 
-Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
----
- tools/testing/selftests/kvm/aarch64/get-reg-list.c | 3 +++
- 1 file changed, 3 insertions(+)
 
-diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-index f769fc6cd927..42e613a7bb6a 100644
---- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-+++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-@@ -686,6 +686,9 @@ static __u64 base_regs[] = {
- 	KVM_REG_ARM_FW_REG(0),
- 	KVM_REG_ARM_FW_REG(1),
- 	KVM_REG_ARM_FW_REG(2),
-+	KVM_REG_ARM_FW_BMAP_REG(0),	/* KVM_REG_ARM_STD_BMAP */
-+	KVM_REG_ARM_FW_BMAP_REG(1),	/* KVM_REG_ARM_STD_HYP_BMAP */
-+	KVM_REG_ARM_FW_BMAP_REG(2),	/* KVM_REG_ARM_VENDOR_HYP_BMAP */
- 	ARM64_SYS_REG(3, 3, 14, 3, 1),	/* CNTV_CTL_EL0 */
- 	ARM64_SYS_REG(3, 3, 14, 3, 2),	/* CNTV_CVAL_EL0 */
- 	ARM64_SYS_REG(3, 3, 14, 0, 2),
--- 
-2.35.1.473.g83b2b277ed-goog
+Have you looked at how this is done on Intel's APICv side?
+You need to implement .set_virtual_apic_mode instead.
+(look at vmx_set_virtual_apic_mode)
+
+I also don't think you need x2apic_enabled boolean.
+You can already know if a vCPU uses apic or x2apic via
+
+kvm_get_apic_mode(vcpu);
+
+in fact I don't think avic code should have any bookeeping in regard to x2apic/x2avic mode,
+but rather kvm's apic mode  (which is read directly from apic base msr (vcpu->arch.apic_base),
+should enable avic, or x2avic if possible, or inhibit avic if not possible.
+
+e.g it should drive the bits in vmcb and such.
+
+Best regards,
+	Maxim Levitsky
 
