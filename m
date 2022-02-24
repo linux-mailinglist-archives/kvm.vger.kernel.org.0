@@ -2,60 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E43324C29F2
-	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 11:57:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C2C24C29F7
+	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 11:57:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233477AbiBXK4x (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Feb 2022 05:56:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51490 "EHLO
+        id S233659AbiBXK4m (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Feb 2022 05:56:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51160 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233669AbiBXK4q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Feb 2022 05:56:46 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BC9427DF0C
-        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 02:56:13 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        with ESMTP id S233641AbiBXK4i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Feb 2022 05:56:38 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AA16E27B9B7
+        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 02:56:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645700166;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:in-reply-to:in-reply-to:  references:references;
+        bh=YaoPgRiiMFZyEiFbgVOYNnx9/MH1T+le09fTeysDAhE=;
+        b=EQ76mn3gvwDJb5keZFJInzqkaPNxUWQ/0Hjy71jV+ajO0Irf2QB7Mvg8E8BSmRUVfJxas5
+        ZAs7M6fDyzo0S4TW6Q5vm+EomNA0iUNZpK3n9R8KBvHORapkFNN3opTWONUjaxOIN/Hqt0
+        Zxqr9Bm6QG40XDDOkeWT9Q0iWmp9IaQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-463-8ALh40HuPAmZXiOGTne0Rw-1; Thu, 24 Feb 2022 05:56:03 -0500
+X-MC-Unique: 8ALh40HuPAmZXiOGTne0Rw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id D34501F782;
-        Thu, 24 Feb 2022 10:56:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1645700171; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=T+pcxd1I35fTizHaQoLnZggk826ZhVJQh5WPTZSsj7o=;
-        b=QVxaOS/SYCJLvJ59/D7sU6SHL3WhO1W1+f5kXKu9cYX08gfZtLVtNaKP1/M3epjWPrhetq
-        cD9rH4+cLrXGcmqBVzj5G+3Psb/SdPt16KrBZGHTR56wx5YYC8gQowjFOk7jjV+70z4oTo
-        sU5w+H3h8WxgSPbZZOXZ07wRUC5fxZE=
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 4B77B13A79;
-        Thu, 24 Feb 2022 10:56:11 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id WL1/EEtkF2KYSgAAMHmgww
-        (envelope-from <varad.gautam@suse.com>); Thu, 24 Feb 2022 10:56:11 +0000
-From:   Varad Gautam <varad.gautam@suse.com>
-To:     kvm@vger.kernel.org, pbonzini@redhat.com, drjones@redhat.com
-Cc:     marcorr@google.com, zxwang42@gmail.com, erdemaktas@google.com,
-        rientjes@google.com, seanjc@google.com, brijesh.singh@amd.com,
-        Thomas.Lendacky@amd.com, jroedel@suse.de, bp@suse.de,
-        varad.gautam@suse.com
-Subject: [kvm-unit-tests PATCH v3 11/11] x86: AMD SEV-ES: Handle string IO for IOIO #VC
-Date:   Thu, 24 Feb 2022 11:54:51 +0100
-Message-Id: <20220224105451.5035-12-varad.gautam@suse.com>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20220224105451.5035-1-varad.gautam@suse.com>
-References: <20220224105451.5035-1-varad.gautam@suse.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B05CB51DF;
+        Thu, 24 Feb 2022 10:56:00 +0000 (UTC)
+Received: from redhat.com (unknown [10.33.36.97])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3A15123769;
+        Thu, 24 Feb 2022 10:55:13 +0000 (UTC)
+Date:   Thu, 24 Feb 2022 10:55:11 +0000
+From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To:     Laszlo Ersek <lersek@redhat.com>
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        QEMU Developers <qemu-devel@nongnu.org>,
+        KVM list <kvm@vger.kernel.org>, linux-s390@vger.kernel.org,
+        adrian@parity.io, "Woodhouse, David" <dwmw@amazon.co.uk>,
+        "Catangiu, Adrian Costin" <acatan@amazon.com>, graf@amazon.com,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        "Singh, Balbir" <sblbir@amazon.com>,
+        "Weiss, Radu" <raduweis@amazon.com>, Jann Horn <jannh@google.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Igor Mammedov <imammedo@redhat.com>, ehabkost@redhat.com,
+        ben@skyportsystems.com, "Michael S. Tsirkin" <mst@redhat.com>,
+        "Richard W.M. Jones" <rjones@redhat.com>
+Subject: Re: [PATCH RFC v1 0/2] VM fork detection for RNG
+Message-ID: <YhdkD4S7Erzl98So@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20220223131231.403386-1-Jason@zx2c4.com>
+ <CAHmME9ogH_mx724n_deFfva7-xPCmma1-=2Mv0JdnZ-fC4JCjg@mail.gmail.com>
+ <2653b6c7-a851-7a48-f1f8-3bde742a0c9f@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <2653b6c7-a851-7a48-f1f8-3bde742a0c9f@redhat.com>
+User-Agent: Mutt/2.1.5 (2021-12-30)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -63,144 +77,46 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Using Linux's IOIO #VC processing logic.
+On Thu, Feb 24, 2022 at 09:22:50AM +0100, Laszlo Ersek wrote:
+> (+Daniel, +Rich)
+> 
+> On 02/23/22 17:08, Jason A. Donenfeld wrote:
+> > On Wed, Feb 23, 2022 at 2:12 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+> >> second patch is the reason this is just an RFC: it's a cleanup of the
+> >> ACPI driver from last year, and I don't really have much experience
+> >> writing, testing, debugging, or maintaining these types of drivers.
+> >> Ideally this thread would yield somebody saying, "I see the intent of
+> >> this; I'm happy to take over ownership of this part." That way, I can
+> >> focus on the RNG part, and whoever steps up for the paravirt ACPI part
+> >> can focus on that.
+> 
+> > (It appears there's a bug in QEMU which prevents
+> > the GUID from being reinitialized when running `loadvm` without
+> > quitting first; I suppose this should be discussed with QEMU
+> > upstream.)
+> 
+> That's not (necessarily) a bug; see the end of the above-linked QEMU
+> document:
+> 
+> "There are no known use cases for changing the GUID once QEMU is
+> running, and adding this capability would greatly increase the complexity."
 
-Signed-off-by: Varad Gautam <varad.gautam@suse.com>
-Reviewed-by: Marc Orr <marcorr@google.com>
-Tested-by: Marc Orr <marcorr@google.com>
----
- lib/x86/amd_sev_vc.c | 108 ++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 106 insertions(+), 2 deletions(-)
+IIRC this part of the QEMU doc was making an implicit assumption
+about the way QEMU is to be used by mgmt apps doing snapshots.
 
-diff --git a/lib/x86/amd_sev_vc.c b/lib/x86/amd_sev_vc.c
-index e8285f2..4fdf596 100644
---- a/lib/x86/amd_sev_vc.c
-+++ b/lib/x86/amd_sev_vc.c
-@@ -300,10 +300,46 @@ static enum es_result vc_ioio_exitinfo(struct es_em_ctxt *ctxt, u64 *exitinfo)
- 	return ES_OK;
- }
- 
-+static enum es_result vc_insn_string_read(struct es_em_ctxt *ctxt,
-+					  void *src, unsigned char *buf,
-+					  unsigned int data_size,
-+					  unsigned int count,
-+					  bool backwards)
-+{
-+	int i, b = backwards ? -1 : 1;
-+
-+	for (i = 0; i < count; i++) {
-+		void *s = src + (i * data_size * b);
-+		unsigned char *d = buf + (i * data_size);
-+
-+		memcpy(d, s, data_size);
-+	}
-+
-+	return ES_OK;
-+}
-+
-+static enum es_result vc_insn_string_write(struct es_em_ctxt *ctxt,
-+					   void *dst, unsigned char *buf,
-+					   unsigned int data_size,
-+					   unsigned int count,
-+					   bool backwards)
-+{
-+	int i, s = backwards ? -1 : 1;
-+
-+	for (i = 0; i < count; i++) {
-+		void *d = dst + (i * data_size * s);
-+		unsigned char *b = buf + (i * data_size);
-+
-+		memcpy(d, b, data_size);
-+	}
-+
-+	return ES_OK;
-+}
-+
- static enum es_result vc_handle_ioio(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
- {
- 	struct ex_regs *regs = ctxt->regs;
--	u64 exit_info_1;
-+	u64 exit_info_1, exit_info_2;
- 	enum es_result ret;
- 
- 	ret = vc_ioio_exitinfo(ctxt, &exit_info_1);
-@@ -311,7 +347,75 @@ static enum es_result vc_handle_ioio(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
- 		return ret;
- 
- 	if (exit_info_1 & IOIO_TYPE_STR) {
--		ret = ES_VMM_ERROR;
-+		/* (REP) INS/OUTS */
-+
-+		bool df = ((regs->rflags & X86_EFLAGS_DF) == X86_EFLAGS_DF);
-+		unsigned int io_bytes, exit_bytes;
-+		unsigned int ghcb_count, op_count;
-+		unsigned long es_base;
-+		u64 sw_scratch;
-+
-+		/*
-+		 * For the string variants with rep prefix the amount of in/out
-+		 * operations per #VC exception is limited so that the kernel
-+		 * has a chance to take interrupts and re-schedule while the
-+		 * instruction is emulated.
-+		 */
-+		io_bytes   = (exit_info_1 >> 4) & 0x7;
-+		ghcb_count = sizeof(ghcb->shared_buffer) / io_bytes;
-+
-+		op_count    = (exit_info_1 & IOIO_REP) ? regs->rcx : 1;
-+		exit_info_2 = op_count < ghcb_count ? op_count : ghcb_count;
-+		exit_bytes  = exit_info_2 * io_bytes;
-+
-+		es_base = 0;
-+
-+		/* Read bytes of OUTS into the shared buffer */
-+		if (!(exit_info_1 & IOIO_TYPE_IN)) {
-+			ret = vc_insn_string_read(ctxt,
-+					       (void *)(es_base + regs->rsi),
-+					       ghcb->shared_buffer, io_bytes,
-+					       exit_info_2, df);
-+			if (ret)
-+				return ret;
-+		}
-+
-+		/*
-+		 * Issue an VMGEXIT to the HV to consume the bytes from the
-+		 * shared buffer or to have it write them into the shared buffer
-+		 * depending on the instruction: OUTS or INS.
-+		 */
-+		sw_scratch = __pa(ghcb) + offsetof(struct ghcb, shared_buffer);
-+		ghcb_set_sw_scratch(ghcb, sw_scratch);
-+		ret = sev_es_ghcb_hv_call(ghcb, ctxt, SVM_EXIT_IOIO,
-+					  exit_info_1, exit_info_2);
-+		if (ret != ES_OK)
-+			return ret;
-+
-+		/* Read bytes from shared buffer into the guest's destination. */
-+		if (exit_info_1 & IOIO_TYPE_IN) {
-+			ret = vc_insn_string_write(ctxt,
-+						   (void *)(es_base + regs->rdi),
-+						   ghcb->shared_buffer, io_bytes,
-+						   exit_info_2, df);
-+			if (ret)
-+				return ret;
-+
-+			if (df)
-+				regs->rdi -= exit_bytes;
-+			else
-+				regs->rdi += exit_bytes;
-+		} else {
-+			if (df)
-+				regs->rsi -= exit_bytes;
-+			else
-+				regs->rsi += exit_bytes;
-+		}
-+
-+		if (exit_info_1 & IOIO_REP)
-+			regs->rcx -= exit_info_2;
-+
-+		ret = regs->rcx ? ES_RETRY : ES_OK;
- 	} else {
- 		/* IN/OUT into/from rAX */
- 
+Instead of using the 'loadvm' command on the existing running QEMU
+process, the doc seems to tacitly expect the management app will
+throwaway the existing QEMU process and spawn a brand new QEMU
+process to load the snapshot into, thus getting the new GUID on
+the QEMU command line. There are some downsides with doing this
+as compared  to running 'loadvm' in the existing QEMU, most
+notably the user's VNC/SPICE console session gets interrupted.
+I guess the ease of impl for QEMU was more compelling though.
+
+With regards,
+Daniel
 -- 
-2.32.0
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
