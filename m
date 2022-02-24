@@ -2,67 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C1544C2E23
-	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 15:23:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D0024C2E52
+	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 15:23:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235143AbiBXOXU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Feb 2022 09:23:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38076 "EHLO
+        id S235495AbiBXOYB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Feb 2022 09:24:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230136AbiBXOXT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Feb 2022 09:23:19 -0500
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EBE010075C;
-        Thu, 24 Feb 2022 06:22:45 -0800 (PST)
-Received: by mail-ej1-x631.google.com with SMTP id qx21so4634149ejb.13;
-        Thu, 24 Feb 2022 06:22:45 -0800 (PST)
+        with ESMTP id S235465AbiBXOXr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Feb 2022 09:23:47 -0500
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E54F41637CE;
+        Thu, 24 Feb 2022 06:23:16 -0800 (PST)
+Received: by mail-ed1-x52c.google.com with SMTP id q17so3086142edd.4;
+        Thu, 24 Feb 2022 06:23:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=sender:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=zYTHUsVVhBwj0g4Gze0zy2RUZ5LyrxDkA+fp8E1dT/8=;
-        b=bUSWfnuHV6MsxDaAFBe/JODFU0yALi+lxDfaUl/fPb5TY2Nnf45hMpyf2aEVrRz6kh
-         8rCFA+jEIeielP42fOHvWQPq2OSgUZWG/SBNXBcgzKAxr5Loh2yVBatjbNGvFP8KRkFR
-         2lIBNm+P8achvv7DW8oxjPteqR1o7x/sxIKKypSF1AgtMxeemjaGQWIsOUSb2M/XnNcV
-         UNC9y4V4dZBF6oCEn0CpSFEHfazHkkHMaBuGNY0WVTdkVYuCvQBGwKigu4wUOuugBBZp
-         U+Wc32NEDol3lGb0vh8AT7ijboa+HvlM8/D7mBtBKd4bw05mBD0yuvJf6mXTE51236kF
-         HBYQ==
+        bh=7auIWEJM6MC8ScpEmtv1C4E/fqB/KIkHM2nvPFKd6is=;
+        b=fLGvRvN1ISGysrGJQmdl7pQ/3vIpgylLRYVvIU9WbfeP/Z/gaAwPvmRzTuh3bDBcYs
+         9Qn4cwkSl5uja3X0Zde9CNJVlhtmBxUh67zsrKpaWMhTkv/rJjjvbvfbOPt1SgIHabMO
+         Aq9HDezf7wGyCUlS72Vm4beMvbbqvminJi7/xzTQwmA+MG3PmepPEw8Uo2s3vUOhVci0
+         QAhSIhTH8rE7cb0T18qhmu1Q7t+P0FHgiy1R+un+HB9TzdbWFJ3uwkyq4Y8d/6eyxHwg
+         FHoCIIanhpJhucybHC0iIPniWnyQk8jOhwwUGNuv49V72vsTmJcrXkuoJ3OCkxODxYCi
+         J7sQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
          :subject:content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=zYTHUsVVhBwj0g4Gze0zy2RUZ5LyrxDkA+fp8E1dT/8=;
-        b=NmlYBZN/MZKsFsDTdjNcB6ts/S9E4QfInlHigTwBfvw8hG92lqhgOGlNGXfzThFOQv
-         OcjYnm8+ze2WB3X6klbjbuhJ9HjK+Rrlrda/B9MYhvLx1fzsaCAWgdUAW+y2ZqCZAREl
-         a6EaqJ6Y7VGU389ueP96ZZXKRNNk61WnmWI/Z59LQN2+XUhjuRASOZMxwKaI1UjV72+Q
-         aiyvLi8q5JOT6nXgefRLxty6S/SV7MQ9NT0hMQSdR2lM/TLx0wNzJGM08E00nlQyC99j
-         csKhRDAShFy28OlbS9uVQS5AbX29u9Zk0STFhFsHoKoZsSB8/kGp9nizwsU+mak7Il50
-         nrYA==
-X-Gm-Message-State: AOAM531jnhA7AZN1DSCGyCi6ucTk/u6Ph19ksoWuWv76TpU/ad4NdWXn
-        pODjCdC0PyQBNu8owD9cS4A=
-X-Google-Smtp-Source: ABdhPJzpx4N3xp1lLjkagnxhXCabnGndX91MAsGN9ExhB14AG7jRfTUCqS6EGeMdSNZnv+DNnPGwEA==
-X-Received: by 2002:a17:907:90c7:b0:6d1:c55:86a4 with SMTP id gk7-20020a17090790c700b006d10c5586a4mr2478924ejb.484.1645712564078;
-        Thu, 24 Feb 2022 06:22:44 -0800 (PST)
+        bh=7auIWEJM6MC8ScpEmtv1C4E/fqB/KIkHM2nvPFKd6is=;
+        b=yHom/00BsQxmyFSo/m3DGD6YRa1hMvkXbGBzJPIyS3nTWWEJMkJ/vwZDwvcJY1/C8t
+         PG1NEa7D9ykMuH+jMcSmIYRjRLQREIkeNBGwqm29JSbVWHQUBYB9hrC2HT/NEhPjODu+
+         XTt5Z3Nzt3lkUp4AtTYhChqm9mViR5pYLlp5eHH+CZuhy2VuQnmv9edlM1EgLr7Z/hgT
+         vlCBwGrcbgtIeuxJQ31OHhcDJWZ1ZSUYYcBVmahcPBfcXIUWmS3nUELd91Mogh2whM5h
+         BVR6CgLM3A54MEl7ILwJ52L4DNHoXTVNt0PVYl9CUGIuj4wc8r2RmKOYzVY91LaOLl7J
+         2UWw==
+X-Gm-Message-State: AOAM531ztBHCYY6r+TeHed+JjRvdaIr1m8mx7CcKBgghQ+33++l/UO4u
+        KVcdORYPb0knnquLEoABrF4=
+X-Google-Smtp-Source: ABdhPJzDqdEuS1bbYLjr5rMNEoHcI3kLnIyJYrCsWsHZa4hdnXcj+uoj5Z+K9ploCv9Nlqc9oDWDOw==
+X-Received: by 2002:aa7:c3d5:0:b0:40f:b885:8051 with SMTP id l21-20020aa7c3d5000000b0040fb8858051mr2569264edr.395.1645712595524;
+        Thu, 24 Feb 2022 06:23:15 -0800 (PST)
 Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id r1sm1433162ejh.52.2022.02.24.06.22.43
+        by smtp.googlemail.com with ESMTPSA id jz17sm1402326ejb.195.2022.02.24.06.23.14
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Feb 2022 06:22:43 -0800 (PST)
+        Thu, 24 Feb 2022 06:23:14 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <e459dbcc-3a43-bd20-6f78-1a9d712ae020@redhat.com>
-Date:   Thu, 24 Feb 2022 15:22:41 +0100
+Message-ID: <4ce5ed1c-78e5-8150-65cd-288f1023c7a0@redhat.com>
+Date:   Thu, 24 Feb 2022 15:23:12 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.5.0
-Subject: Re: [PATCH] KVM: x86: nSVM: disallow userspace setting of
- MSR_AMD64_TSC_RATIO to non default value when tsc scaling disabled
+Subject: Re: [PATCH] KVM: x86: Fix pointer mistmatch warning when patching
+ RET0 static calls
 Content-Language: en-US
-To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-References: <20220223115649.319134-1-mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        llvm@lists.linux.dev, linux-kernel@vger.kernel.org,
+        Like Xu <like.xu.linux@gmail.com>
+References: <20220223162355.3174907-1-seanjc@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220223115649.319134-1-mlevitsk@redhat.com>
+In-Reply-To: <20220223162355.3174907-1-seanjc@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -76,55 +83,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/23/22 12:56, Maxim Levitsky wrote:
-> If nested tsc scaling is disabled, MSR_AMD64_TSC_RATIO should
-> never have non default value.
+On 2/23/22 17:23, Sean Christopherson wrote:
+> Cast kvm_x86_ops.func to 'void *' when updating KVM static calls that are
+> conditionally patched to __static_call_return0().  clang complains about
+> using mismatching pointers in the ternary operator, which breaks the
+> build when compiling with CONFIG_KVM_WERROR=y.
 > 
-> Due to way nested tsc scaling support was implmented in qemu,
-> it would set this msr to 0 when nested tsc scaling was disabled.
-> Ignore that value for now, as it causes no harm.
+>    >> arch/x86/include/asm/kvm-x86-ops.h:82:1: warning: pointer type mismatch
+>    ('bool (*)(struct kvm_vcpu *)' and 'void *') [-Wpointer-type-mismatch]
 > 
-> 
-> Fixes: 5228eb96a487 ("KVM: x86: nSVM: implement nested TSC scaling")
-> Cc: stable@vger.kernel.org
-> 
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> Fixes: 5be2226f417d ("KVM: x86: allow defining return-0 static calls")
+> Reported-by: Like Xu <like.xu.linux@gmail.com>
+> Reported-by: kernel test robot <lkp@intel.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->   arch/x86/kvm/svm/svm.c | 19 +++++++++++++++++--
->   1 file changed, 17 insertions(+), 2 deletions(-)
+>   arch/x86/include/asm/kvm_host.h | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 713e08f62385..f285ddb8b66b 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1547,8 +1547,8 @@ static inline void kvm_ops_static_call_update(void)
+>   	WARN_ON(!kvm_x86_ops.func); __KVM_X86_OP(func)
+>   #define KVM_X86_OP_OPTIONAL __KVM_X86_OP
+>   #define KVM_X86_OP_OPTIONAL_RET0(func) \
+> -	static_call_update(kvm_x86_##func, kvm_x86_ops.func ? : \
+> -			   (void *) __static_call_return0);
+> +	static_call_update(kvm_x86_##func, (void *)kvm_x86_ops.func ? : \
+> +					   (void *)__static_call_return0);
+>   #include <asm/kvm-x86-ops.h>
+>   #undef __KVM_X86_OP
+>   }
+> 
+> base-commit: f4bc051fc91ab9f1d5225d94e52d369ef58bec58
 
 Queued, thanks.
 
 Paolo
-
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 7038c76fa841..b80ad471776f 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -2705,8 +2705,23 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
->   	u64 data = msr->data;
->   	switch (ecx) {
->   	case MSR_AMD64_TSC_RATIO:
-> -		if (!msr->host_initiated && !svm->tsc_scaling_enabled)
-> -			return 1;
-> +
-> +		if (!svm->tsc_scaling_enabled) {
-> +
-> +			if (!msr->host_initiated)
-> +				return 1;
-> +			/*
-> +			 * In case TSC scaling is not enabled, always
-> +			 * leave this MSR at the default value.
-> +			 *
-> +			 * Due to bug in qemu 6.2.0, it would try to set
-> +			 * this msr to 0 if tsc scaling is not enabled.
-> +			 * Ignore this value as well.
-> +			 */
-> +			if (data != 0 && data != svm->tsc_ratio_msr)
-> +				return 1;
-> +			break;
-> +		}
->   
->   		if (data & TSC_RATIO_RSVD)
->   			return 1;
-
