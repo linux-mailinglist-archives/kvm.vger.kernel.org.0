@@ -2,243 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 667224C35FF
-	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 20:39:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8AAA54C3617
+	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 20:46:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231497AbiBXTjM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Feb 2022 14:39:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50054 "EHLO
+        id S233995AbiBXTrH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Feb 2022 14:47:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37358 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232408AbiBXTjK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Feb 2022 14:39:10 -0500
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1anam02on2065.outbound.protection.outlook.com [40.107.96.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07A8B1D6839;
-        Thu, 24 Feb 2022 11:38:40 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TPkfA/pH6/3BlXc0qiPle44eYjpEXOzi3g7xcVbzZkyRV+69Z/q6VHjxOxtH3GNV9mNru3kOXSZiNuHGKonC4UNIFHi3Pk2zAjD7JHT89z3XSGR0kyNr1sH4HX5HeZH2TWmB1bBwd+g99RJMjmUZFFvd11Wr7eAgfbF7smhGPVo0Q6KlFyL+knMMA5j+ckJD9uSDjMNl3ijESXAJYM7cBLOGxXqqppwHE/LZ4BXzqz4OkceFGQ509ZnjCt3ChZZf0FFKykL9RDcSnkwVwBgeCdyRw5WWUul/G0WCKsZHRFGBDH//2nxiWuaP49/ih8U/O000/8lCh4IANYWwxTuIXA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rRdrowPuPlJM8WroD+RtmGgyU/lVCHztNflgZuhsH1o=;
- b=Q5EaljyAnHLyvS5gudqWokJW8yJkEqzw+uv/Y64T61MBEvm9Nai3RxbESksaeGWm6SIe/k7Izc6pWdAnR/OCkd3hzA5HJPQXaMwe+WqT1k6ib8WWg3u3AYc43chVxw3TYiq9surksanohye4DndeJ+DIXAZ7Wr0Or8EX741ETmatkMGHM/4VBdACJ4ZYF5qN9pczUYGTr8jCqQcMXipIPnaOboNqW51OJhgExDaWh84SuyAlp+lLo32d6wT45xkyatqAJ6jR71U/Z3a2nHdOKuv7gKbBawB2Fu+kbgKSkgHympmmKp3xHRDQD0kB7t0O1D8FGVgVIn0dNTiAlNV48g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rRdrowPuPlJM8WroD+RtmGgyU/lVCHztNflgZuhsH1o=;
- b=NqCRyCIo9h84jsw+HW0qBx1qwzAVDE2JAOevCFk2VliM50g+viZWb1pP4uNK61VnvXqlPo7X0wYSo/1aTiwUV9qiF/mj7Yq/4CDSwVIWbIzeVuRV8QVkKbcGWm9xyMLniySa9Wp2h46735HAXEMKsUp/DnNiY4B56r5yMieQzrE=
-Received: from BN6PR16CA0047.namprd16.prod.outlook.com (2603:10b6:405:14::33)
- by DM5PR12MB2358.namprd12.prod.outlook.com (2603:10b6:4:b3::34) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4995.25; Thu, 24 Feb
- 2022 19:38:33 +0000
-Received: from BN8NAM11FT009.eop-nam11.prod.protection.outlook.com
- (2603:10b6:405:14:cafe::d7) by BN6PR16CA0047.outlook.office365.com
- (2603:10b6:405:14::33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4995.26 via Frontend
- Transport; Thu, 24 Feb 2022 19:38:33 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com;
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BN8NAM11FT009.mail.protection.outlook.com (10.13.176.65) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5017.22 via Frontend Transport; Thu, 24 Feb 2022 19:38:32 +0000
-Received: from sbrijesh-desktop.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.18; Thu, 24 Feb
- 2022 13:38:30 -0600
-From:   Brijesh Singh <brijesh.singh@amd.com>
-To:     <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kvm@vger.kernel.org>, <linux-efi@vger.kernel.org>,
-        <platform-driver-x86@vger.kernel.org>,
-        <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>
-CC:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        "Vitaly Kuznetsov" <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        "Andy Lutomirski" <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        "Peter Zijlstra" <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        <brijesh.ksingh@gmail.com>, <tony.luck@intel.com>,
-        <marcorr@google.com>, <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Venu Busireddy <venu.busireddy@oracle.com>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Subject: [PATCH v11 3.1/45] KVM: SVM: Create a separate mapping for the GHCB save area
-Date:   Thu, 24 Feb 2022 13:38:17 -0600
-Message-ID: <20220224193818.2187605-1-brijesh.singh@amd.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220224165625.2175020-4-brijesh.singh@amd.com>
-References: <20220224165625.2175020-4-brijesh.singh@amd.com>
+        with ESMTP id S233076AbiBXTrG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Feb 2022 14:47:06 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6EF2923BD7
+        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 11:46:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645731994;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=8kWJStgI26fJzHahRd8G5nMqVgDcx3iTiiJFmPiN1rg=;
+        b=AcrHOigRDmgbc2QN4djY2343PX+yGbXpOI082eq+RnkzWIL11E4z5Ng8Pv3+wpB7i4SVZ1
+        87Pwrp5EMzxlaHS77KFcGV98V53o74/TPLQkK5+3RybNIahQibEEyRw/LPwmlYuIdRDe40
+        8rHtqpGopkBYvfL5FQue6gQaYidUzqM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-601-tfovFoayPWWggN-T_l88EA-1; Thu, 24 Feb 2022 14:46:30 -0500
+X-MC-Unique: tfovFoayPWWggN-T_l88EA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0E98C1091DA0;
+        Thu, 24 Feb 2022 19:46:29 +0000 (UTC)
+Received: from starship (unknown [10.40.195.190])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 562A619711;
+        Thu, 24 Feb 2022 19:46:23 +0000 (UTC)
+Message-ID: <59208dd7a83e1369851a2d0c2fe08e3e7639fa59.camel@redhat.com>
+Subject: Re: [RFC PATCH 09/13] KVM: SVM: Introduce helper function
+ avic_get_apic_id
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, seanjc@google.com, joro@8bytes.org,
+        jon.grimm@amd.com, wei.huang2@amd.com, terry.bowman@amd.com
+Date:   Thu, 24 Feb 2022 21:46:22 +0200
+In-Reply-To: <20220221021922.733373-10-suravee.suthikulpanit@amd.com>
+References: <20220221021922.733373-1-suravee.suthikulpanit@amd.com>
+         <20220221021922.733373-10-suravee.suthikulpanit@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: fe46b429-7e57-48dc-3576-08d9f7cd3df2
-X-MS-TrafficTypeDiagnostic: DM5PR12MB2358:EE_
-X-Microsoft-Antispam-PRVS: <DM5PR12MB2358451DF8B7F78871537727E53D9@DM5PR12MB2358.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: y4vKBslPHUuYp+IVwpQifuuK2z9OhTTOYG7KEkTz7Vmv3A0PE+TKtrBZPzT7AXnnGkcGkirrM9aMgKO+FTH73NlixB1PGCSc2JxFrkW3uVag8s2hpbd29jL19F1PVMSF4/biigw+Kc2pOS5IIXuGCD4P+fQlSpNIGHjVvYiLgo1jEz3PgHc/DGufE8oBboi3FaJwwDOS9dLtyFvc5mZiu680VHl/yITrhCYlLTOu50HjQMdR4kOTT/D5KyvnTDpNSM/A1R1F4DOtWzBkM83yE1I+7E20hWCDpfbSIWdDXCU/ZlABYuvqNiQvTuK+euQ8G5+j/AmiDE8LRmPIrq57FArSfXC9QU/nNkvzQ6FDCd8IxztKgxmaU7Fti/WhqSwf8te8/QJu5uBrLN5awgtxdugHxX/zXVooqT7MxO0yvo7Y2BA6j7Tu4erbSSMsuOteBb5C/Uxl4td9hRZ/1VJYJs9z2G9jbjL8mPUPeq8+F40NcDDw/WrDCVzvRg14VCM1F/T9qQYBRT7yKLWyOtN9J2QJJyQ/gR1SR8NNafYEzbtgrVlxvzxnGokJ1AGKX4rbFDzLgnalqeddOuDI0R4GUZgvDFzWPByQ13eiK6waJ8obFkr+A5l0892ucZOMierJ69HBDeZU07VBNITwQcAkb30JqK45LOK6naWBvmPgIDoDh4Wj1XaOqmC7hABdAPWMqbCtgTuHNQEQUGfMTnO/NZYCX7s/zBFa7/DTHYC5/9E=
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230001)(4636009)(36840700001)(40470700004)(46966006)(2906002)(7416002)(7406005)(82310400004)(7696005)(8936002)(6666004)(81166007)(44832011)(356005)(86362001)(83380400001)(54906003)(110136005)(426003)(508600001)(5660300002)(40460700003)(26005)(186003)(47076005)(2616005)(36756003)(336012)(8676002)(70206006)(70586007)(4326008)(316002)(36860700001)(1076003)(16526019)(2101003)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Feb 2022 19:38:32.8494
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: fe46b429-7e57-48dc-3576-08d9f7cd3df2
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT009.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB2358
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Tom Lendacky <thomas.lendacky@amd.com>
+On Sun, 2022-02-20 at 20:19 -0600, Suravee Suthikulpanit wrote:
+> This function returns the currently programmed guest physical
+> APIC ID of a vCPU in both xAPIC and x2APIC modes.
+> In case of invalid APIC ID based on the current mode,
+> the function returns X2APIC_BROADCAST.
+> 
+> Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+> ---
+>  arch/x86/kvm/svm/avic.c | 29 ++++++++++++++++++++++++++---
+>  1 file changed, 26 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> index 55b3b703b93b..3543b7a4514a 100644
+> --- a/arch/x86/kvm/svm/avic.c
+> +++ b/arch/x86/kvm/svm/avic.c
+> @@ -450,16 +450,35 @@ static void avic_invalidate_logical_id_entry(struct kvm_vcpu *vcpu)
+>  		clear_bit(AVIC_LOGICAL_ID_ENTRY_VALID_BIT, (unsigned long *)entry);
+>  }
+>  
+> +static inline u32 avic_get_apic_id(struct kvm_vcpu *vcpu)
+> +{
+> +	u32 apic_id = kvm_lapic_get_reg(vcpu->arch.apic, APIC_ID);
+> +
+> +	if (!apic_x2apic_mode(vcpu->arch.apic)) {
+> +		/*
+> +		 * In case of xAPIC, we do not support
+> +		 * APIC ID larger than 254.
+> +		 */
+> +		if (vcpu->vcpu_id >= APIC_BROADCAST)
+> +			return X2APIC_BROADCAST;
+This is not a good way to return a error value like that IMHO.
 
-The initial implementation of the GHCB spec was based on trying to keep
-the register state offsets the same relative to the VM save area. However,
-the save area for SEV-ES has changed within the hardware causing the
-relation between the SEV-ES save area to change relative to the GHCB save
-area.
+> +		return apic_id >> 24;
+> +	} else
+> +		return apic_id;
+> +}
 
-This is the second step in defining the multiple save areas to keep them
-separate and ensuring proper operation amongst the different types of
-guests. Create a GHCB save area that matches the GHCB specification.
+I don't fully like this to be honest - this should be at least function in lapic.c
+and use kvm_xapic_id and kvm_x2apic_id.
 
-Reviewed-by: Venu Busireddy <venu.busireddy@oracle.com>
-Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
-Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
----
+And hopefully if I manage to make apic id always read only then we be able
+to never use APIC_ID register and always use vcpu->vcpu_id.
 
-Changes since v11:
- * Add missing GHCB xss accessor
+Best regards,
+	Maxim Levitsky
 
- arch/x86/include/asm/svm.h | 49 +++++++++++++++++++++++++++++++++++---
- 1 file changed, 46 insertions(+), 3 deletions(-)
+> +
+>  static int avic_handle_ldr_update(struct kvm_vcpu *vcpu)
+>  {
+>  	int ret = 0;
+>  	struct vcpu_svm *svm = to_svm(vcpu);
+>  	u32 ldr = kvm_lapic_get_reg(vcpu->arch.apic, APIC_LDR);
+> -	u32 id = kvm_xapic_id(vcpu->arch.apic);
+> +	u32 id = avic_get_apic_id(vcpu);
+>  
+>  	if (ldr == svm->ldr_reg)
+>  		return 0;
+>  
+> +	if (id == X2APIC_BROADCAST)
+> +		return -EINVAL;
+> +
+This is what I mean. It is better to check here that we 
+vcpu->vcpu_id >= APIC_BROADCAST and fail.
 
-diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
-index e748aa33c355..138db4e1b07d 100644
---- a/arch/x86/include/asm/svm.h
-+++ b/arch/x86/include/asm/svm.h
-@@ -390,11 +390,51 @@ struct sev_es_save_area {
- 	u64 x87_state_gpa;
- } __packed;
- 
-+struct ghcb_save_area {
-+	u8 reserved_1[203];
-+	u8 cpl;
-+	u8 reserved_2[116];
-+	u64 xss;
-+	u8 reserved_3[24];
-+	u64 dr7;
-+	u8 reserved_4[16];
-+	u64 rip;
-+	u8 reserved_5[88];
-+	u64 rsp;
-+	u8 reserved_6[24];
-+	u64 rax;
-+	u8 reserved_7[264];
-+	u64 rcx;
-+	u64 rdx;
-+	u64 rbx;
-+	u8 reserved_8[8];
-+	u64 rbp;
-+	u64 rsi;
-+	u64 rdi;
-+	u64 r8;
-+	u64 r9;
-+	u64 r10;
-+	u64 r11;
-+	u64 r12;
-+	u64 r13;
-+	u64 r14;
-+	u64 r15;
-+	u8 reserved_9[16];
-+	u64 sw_exit_code;
-+	u64 sw_exit_info_1;
-+	u64 sw_exit_info_2;
-+	u64 sw_scratch;
-+	u8 reserved_10[56];
-+	u64 xcr0;
-+	u8 valid_bitmap[16];
-+	u64 x87_state_gpa;
-+} __packed;
-+
- #define GHCB_SHARED_BUF_SIZE	2032
- 
- struct ghcb {
--	struct sev_es_save_area save;
--	u8 reserved_save[2048 - sizeof(struct sev_es_save_area)];
-+	struct ghcb_save_area save;
-+	u8 reserved_save[2048 - sizeof(struct ghcb_save_area)];
- 
- 	u8 shared_buffer[GHCB_SHARED_BUF_SIZE];
- 
-@@ -405,6 +445,7 @@ struct ghcb {
- 
- 
- #define EXPECTED_VMCB_SAVE_AREA_SIZE		740
-+#define EXPECTED_GHCB_SAVE_AREA_SIZE		1032
- #define EXPECTED_SEV_ES_SAVE_AREA_SIZE		1032
- #define EXPECTED_VMCB_CONTROL_AREA_SIZE		1024
- #define EXPECTED_GHCB_SIZE			PAGE_SIZE
-@@ -412,6 +453,7 @@ struct ghcb {
- static inline void __unused_size_checks(void)
- {
- 	BUILD_BUG_ON(sizeof(struct vmcb_save_area)	!= EXPECTED_VMCB_SAVE_AREA_SIZE);
-+	BUILD_BUG_ON(sizeof(struct ghcb_save_area)	!= EXPECTED_GHCB_SAVE_AREA_SIZE);
- 	BUILD_BUG_ON(sizeof(struct sev_es_save_area)	!= EXPECTED_SEV_ES_SAVE_AREA_SIZE);
- 	BUILD_BUG_ON(sizeof(struct vmcb_control_area)	!= EXPECTED_VMCB_CONTROL_AREA_SIZE);
- 	BUILD_BUG_ON(sizeof(struct ghcb)		!= EXPECTED_GHCB_SIZE);
-@@ -482,7 +524,7 @@ struct vmcb {
- /* GHCB Accessor functions */
- 
- #define GHCB_BITMAP_IDX(field)							\
--	(offsetof(struct sev_es_save_area, field) / sizeof(u64))
-+	(offsetof(struct ghcb_save_area, field) / sizeof(u64))
- 
- #define DEFINE_GHCB_ACCESSORS(field)						\
- 	static inline bool ghcb_##field##_is_valid(const struct ghcb *ghcb)	\
-@@ -531,5 +573,6 @@ DEFINE_GHCB_ACCESSORS(sw_exit_info_1)
- DEFINE_GHCB_ACCESSORS(sw_exit_info_2)
- DEFINE_GHCB_ACCESSORS(sw_scratch)
- DEFINE_GHCB_ACCESSORS(xcr0)
-+DEFINE_GHCB_ACCESSORS(xss)
- 
- #endif
--- 
-2.25.1
+
+
+>  	avic_invalidate_logical_id_entry(vcpu);
+>  
+>  	if (ldr)
+> @@ -475,7 +494,10 @@ static int avic_handle_apic_id_update(struct kvm_vcpu *vcpu)
+>  {
+>  	u64 *old, *new;
+>  	struct vcpu_svm *svm = to_svm(vcpu);
+> -	u32 id = kvm_xapic_id(vcpu->arch.apic);
+> +	u32 id = avic_get_apic_id(vcpu);
+> +
+> +	if (id == X2APIC_BROADCAST)
+> +		return 1;
+
+Same here.
+>  
+>  	if (vcpu->vcpu_id == id)
+>  		return 0;
+> @@ -497,7 +519,8 @@ static int avic_handle_apic_id_update(struct kvm_vcpu *vcpu)
+>  	 * APIC ID table entry if already setup the LDR.
+>  	 */
+>  	if (svm->ldr_reg)
+> -		avic_handle_ldr_update(vcpu);
+> +		if (avic_handle_ldr_update(vcpu))
+> +			return 1;
+>  
+>  	return 0;
+
+
+Best regards,
+	Maxim Levitsky
+
+>  }
+
 
