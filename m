@@ -2,142 +2,295 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6E8324C2E81
-	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 15:34:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 130B84C2E85
+	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 15:37:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235564AbiBXOei (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Feb 2022 09:34:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50590 "EHLO
+        id S235543AbiBXOhz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Feb 2022 09:37:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54552 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229478AbiBXOeh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Feb 2022 09:34:37 -0500
-Received: from sender4-of-o53.zoho.com (sender4-of-o53.zoho.com [136.143.188.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F4FC17C42D;
-        Thu, 24 Feb 2022 06:34:07 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1645713241; cv=none; 
-        d=zohomail.com; s=zohoarc; 
-        b=a2yP1eGWHJyFYuvvR0QzdSal/MWDJJaJuTeqB4usNG8KbWwSK3Ct+FrnBqOYyycZpd9AtYjEa9e7CGf4xS1Y8sUHgpCi2bA/RVBOy5y+ZsqbqpzXztCW40eA8s45jpAkeomqbCfYiwWdogNqVUtFHUcic/zjJ79wpU6ouzmw1b0=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-        t=1645713241; h=Content-Transfer-Encoding:Cc:Date:From:MIME-Version:Message-ID:Subject:To; 
-        bh=IDDq3qUkg76DaAOYUNIA+BRPtQ+rE1rKtDNhQGp2Sho=; 
-        b=TlT6rVhNaBCWNuFc5frijsLy8KJpXUsjD+flFfekqShtQkTDZm4vFvilUjpcjtZ1QS6Twux2SB13xrvP2WOKmPU2rhxRkv9ZElOgnstfBvwaDe44UGqIXxfT0hauwAiuUWl52yvj0NlUmBpfW2fviPAgfVDmj+WRVH147hFwkIg=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-        dkim=pass  header.i=anirudhrb.com;
-        spf=pass  smtp.mailfrom=mail@anirudhrb.com;
-        dmarc=pass header.from=<mail@anirudhrb.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1645713241;
-        s=zoho; d=anirudhrb.com; i=mail@anirudhrb.com;
-        h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Transfer-Encoding;
-        bh=IDDq3qUkg76DaAOYUNIA+BRPtQ+rE1rKtDNhQGp2Sho=;
-        b=g0XUBmmFZAMBq42bbuQ7x6iIJcsDynd5M2tIbn0bXfQtMyw+9FltNYuejiEP1R7b
-        lWd1MC44to+x2CTPmuNs4pYFMAucmdpSesGYCsBO3B/rG9ElRyqUe/JYV6xeWn28vz4
-        lrWux5nhh3OPAcnNnQTryzkOarTdjprLeL/eTvgw=
-Received: from localhost.localdomain (49.207.201.56 [49.207.201.56]) by mx.zohomail.com
-        with SMTPS id 1645713237614465.3614118955155; Thu, 24 Feb 2022 06:33:57 -0800 (PST)
-From:   Anirudh Rayabharam <mail@anirudhrb.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>
-Cc:     mail@anirudhrb.com,
-        syzbot+0abd373e2e50d704db87@syzkaller.appspotmail.com,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2] vhost: fix hung thread due to erroneous iotlb entries
-Date:   Thu, 24 Feb 2022 20:03:20 +0530
-Message-Id: <20220224143320.3751-1-mail@anirudhrb.com>
-X-Mailer: git-send-email 2.35.1
+        with ESMTP id S233389AbiBXOhy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Feb 2022 09:37:54 -0500
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B82CD52E4D
+        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 06:37:23 -0800 (PST)
+Received: by mail-pl1-x62d.google.com with SMTP id q1so1878685plx.4
+        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 06:37:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=poAZtHyLvs6wdh05wh10xP5cMccFcvYZDzxd4P/umwQ=;
+        b=WgyQRQSotkNEBJy5EQiuCugh7EDBW4AbeheFmDhVdLtcQfD5mPwihE9UC5tFco02+k
+         mH3TbfNW1Ubw0aOjmESks4XumAprgpK8iS5wleJqzHltXQHgMd9SMxL53Wx7PsWyTx4r
+         ppsvk1ecMWkjhZ7EX82pPuTuYdJJAm0k/OIDJVeOY+KzP/oSeQT0IqCodf+o9YWZ0ODU
+         Ao++JVYXWx4hkpXXTYbld4FWhT9FSZFVr1MFCqHJdadt9244qoguqwAf7tO0NXa5zgnN
+         6K5PWXW0uuXRfmQNOLki1e5OoIactRToLslEjkARwJI3WNNlaENTBuO/ucs5uKSo7I2H
+         NCag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=poAZtHyLvs6wdh05wh10xP5cMccFcvYZDzxd4P/umwQ=;
+        b=lATIYyKovW7XjCLZdgqnwyIsFB8VuGepMZ6Wg0AnWS2Q5mTVytc5YwjTolfyHFSAjp
+         +iMwf4rPhmHlWmgwlm92I8+rvsVTYFM/X8bNfacbdY9oYe76b/HOULssWAMkJx58HYEL
+         rFrqP56GnagxKh19QSVcCiUx91kDxLW9t1/ma/8KjVuNM9FbUbUD7hIEXtmPZ1QRmeMk
+         9J7OEH0n/4deK2i/k93YQ87LSRYPH7YV/Hvp5NyGYgdKmxLLo+dZO/eJWUCxREGxXcrA
+         CfvMXNVU/9LraTJ41oiLKph+VnHJFTW8rFyAhd7eU/zVUS954EiJmVTNQerO5wJ2ydiW
+         wbbg==
+X-Gm-Message-State: AOAM533/+P2+FEQYF/wQQzsNIhWezyarIjldYGsMGqw9s5B1e5iQDbgn
+        5mIHO+iR3ILQLonrdlPgWG4=
+X-Google-Smtp-Source: ABdhPJyTLwBuPSewGO61RWbN1hDGtQKEEgPeoLjdg+nedQwMkbrkpse98FbseRVOIi9YUgPHOGjrVQ==
+X-Received: by 2002:a17:902:ea86:b0:14f:b4be:6f83 with SMTP id x6-20020a170902ea8600b0014fb4be6f83mr2772830plb.99.1645713443203;
+        Thu, 24 Feb 2022 06:37:23 -0800 (PST)
+Received: from localhost.localdomain ([2400:4050:c360:8200:4544:3648:f893:1e45])
+        by smtp.gmail.com with ESMTPSA id 19sm3721882pfz.153.2022.02.24.06.37.21
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Thu, 24 Feb 2022 06:37:22 -0800 (PST)
+From:   Akihiko Odaki <akihiko.odaki@gmail.com>
+Cc:     qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvm@vger.kernel.org,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Alexander Graf <agraf@csgraf.de>,
+        Akihiko Odaki <akihiko.odaki@gmail.com>
+Subject: [PATCH v2] target/arm: Support PSCI 1.1 and SMCCC 1.0
+Date:   Thu, 24 Feb 2022 23:37:16 +0900
+Message-Id: <20220224143716.14576-1-akihiko.odaki@gmail.com>
+X-Mailer: git-send-email 2.32.0 (Apple Git-132)
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-ZohoMailClient: External
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In vhost_iotlb_add_range_ctx(), range size can overflow to 0 when
-start is 0 and last is ULONG_MAX. One instance where it can happen
-is when userspace sends an IOTLB message with iova=size=uaddr=0
-(vhost_process_iotlb_msg). So, an entry with size = 0, start = 0,
-last = ULONG_MAX ends up in the iotlb. Next time a packet is sent,
-iotlb_access_ok() loops indefinitely due to that erroneous entry.
+Support the latest PSCI on TCG and HVF. A 64-bit function called from
+AArch32 now returns NOT_SUPPORTED, which is necessary to adhere to SMC
+Calling Convention 1.0. It is still not compliant with SMCCC 1.3 since
+they do not implement mandatory functions.
 
-	Call Trace:
-	 <TASK>
-	 iotlb_access_ok+0x21b/0x3e0 drivers/vhost/vhost.c:1340
-	 vq_meta_prefetch+0xbc/0x280 drivers/vhost/vhost.c:1366
-	 vhost_transport_do_send_pkt+0xe0/0xfd0 drivers/vhost/vsock.c:104
-	 vhost_worker+0x23d/0x3d0 drivers/vhost/vhost.c:372
-	 kthread+0x2e9/0x3a0 kernel/kthread.c:377
-	 ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
-	 </TASK>
-
-Reported by syzbot at:
-	https://syzkaller.appspot.com/bug?extid=0abd373e2e50d704db87
-
-To fix this, do two things:
-
-1. Return -EINVAL in vhost_chr_write_iter() when userspace asks to map
-   a range with size 0.
-2. Fix vhost_iotlb_add_range_ctx() to handle the range [0, ULONG_MAX]
-   by splitting it into two entries.
-
-Reported-by: syzbot+0abd373e2e50d704db87@syzkaller.appspotmail.com
-Tested-by: syzbot+0abd373e2e50d704db87@syzkaller.appspotmail.com
-Signed-off-by: Anirudh Rayabharam <mail@anirudhrb.com>
+Signed-off-by: Akihiko Odaki <akihiko.odaki@gmail.com>
 ---
+ hw/arm/boot.c           | 12 +++++++++---
+ target/arm/cpu.c        |  5 +++--
+ target/arm/hvf/hvf.c    | 27 ++++++++++++++++++++++++++-
+ target/arm/kvm-consts.h | 13 +++++++++----
+ target/arm/kvm64.c      |  2 +-
+ target/arm/psci.c       | 35 ++++++++++++++++++++++++++++++++---
+ 6 files changed, 80 insertions(+), 14 deletions(-)
 
-Changes in v2:
-1. Don't reject range [0, ULONG_MAX], split it instead.
-2. Validate msg.size in vhost_chr_write_iter().
-
-v1: https://lore.kernel.org/lkml/20220221195303.13560-1-mail@anirudhrb.com/
-
----
- drivers/vhost/iotlb.c | 10 ++++++++++
- drivers/vhost/vhost.c |  5 +++++
- 2 files changed, 15 insertions(+)
-
-diff --git a/drivers/vhost/iotlb.c b/drivers/vhost/iotlb.c
-index 670d56c879e5..a7e126db34d9 100644
---- a/drivers/vhost/iotlb.c
-+++ b/drivers/vhost/iotlb.c
-@@ -57,6 +57,16 @@ int vhost_iotlb_add_range_ctx(struct vhost_iotlb *iotlb,
- 	if (last < start)
- 		return -EFAULT;
+diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+index b1e95978f26..0eeef94ceb5 100644
+--- a/hw/arm/boot.c
++++ b/hw/arm/boot.c
+@@ -488,9 +488,15 @@ static void fdt_add_psci_node(void *fdt)
+     }
  
-+	/* If the range being mapped is [0, ULONG_MAX], split it into two entries
-+	 * otherwise its size would overflow u64.
-+	 */
-+	if (start == 0 && last == ULONG_MAX) {
-+		u64 mid = last / 2;
-+		vhost_iotlb_add_range_ctx(iotlb, start, mid, addr, perm, opaque);
-+		addr += mid - start + 1;
-+		start = mid + 1;
-+	}
-+
- 	if (iotlb->limit &&
- 	    iotlb->nmaps == iotlb->limit &&
- 	    iotlb->flags & VHOST_IOTLB_FLAG_RETIRE) {
-diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-index 59edb5a1ffe2..55475fd59fb7 100644
---- a/drivers/vhost/vhost.c
-+++ b/drivers/vhost/vhost.c
-@@ -1170,6 +1170,11 @@ ssize_t vhost_chr_write_iter(struct vhost_dev *dev,
- 		goto done;
- 	}
+     qemu_fdt_add_subnode(fdt, "/psci");
+-    if (armcpu->psci_version == 2) {
+-        const char comp[] = "arm,psci-0.2\0arm,psci";
+-        qemu_fdt_setprop(fdt, "/psci", "compatible", comp, sizeof(comp));
++    if (armcpu->psci_version == QEMU_PSCI_VERSION_0_2 ||
++        armcpu->psci_version == QEMU_PSCI_VERSION_1_1) {
++        if (armcpu->psci_version == QEMU_PSCI_VERSION_0_2) {
++            const char comp[] = "arm,psci-0.2\0arm,psci";
++            qemu_fdt_setprop(fdt, "/psci", "compatible", comp, sizeof(comp));
++        } else {
++            const char comp[] = "arm,psci-1.0\0arm,psci-0.2\0arm,psci";
++            qemu_fdt_setprop(fdt, "/psci", "compatible", comp, sizeof(comp));
++        }
  
-+	if (msg.size == 0) {
-+		ret = -EINVAL;
-+		goto done;
-+	}
+         cpu_off_fn = QEMU_PSCI_0_2_FN_CPU_OFF;
+         if (arm_feature(&armcpu->env, ARM_FEATURE_AARCH64)) {
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 5a9c02a2561..307a83a7bb6 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -1110,11 +1110,12 @@ static void arm_cpu_initfn(Object *obj)
+      * picky DTB consumer will also provide a helpful error message.
+      */
+     cpu->dtb_compatible = "qemu,unknown";
+-    cpu->psci_version = 1; /* By default assume PSCI v0.1 */
++    cpu->psci_version = QEMU_PSCI_VERSION_0_1; /* By default assume PSCI v0.1 */
+     cpu->kvm_target = QEMU_KVM_ARM_TARGET_NONE;
+ 
+     if (tcg_enabled() || hvf_enabled()) {
+-        cpu->psci_version = 2; /* TCG and HVF implement PSCI 0.2 */
++        /* TCG and HVF implement PSCI 1.1 */
++        cpu->psci_version = QEMU_PSCI_VERSION_1_1;
+     }
+ }
+ 
+diff --git a/target/arm/hvf/hvf.c b/target/arm/hvf/hvf.c
+index 0dc96560d34..1701fb8bbdb 100644
+--- a/target/arm/hvf/hvf.c
++++ b/target/arm/hvf/hvf.c
+@@ -653,7 +653,7 @@ static bool hvf_handle_psci_call(CPUState *cpu)
+ 
+     switch (param[0]) {
+     case QEMU_PSCI_0_2_FN_PSCI_VERSION:
+-        ret = QEMU_PSCI_0_2_RET_VERSION_0_2;
++        ret = QEMU_PSCI_VERSION_1_1;
+         break;
+     case QEMU_PSCI_0_2_FN_MIGRATE_INFO_TYPE:
+         ret = QEMU_PSCI_0_2_RET_TOS_MIGRATION_NOT_REQUIRED; /* No trusted OS */
+@@ -721,6 +721,31 @@ static bool hvf_handle_psci_call(CPUState *cpu)
+     case QEMU_PSCI_0_2_FN_MIGRATE:
+         ret = QEMU_PSCI_RET_NOT_SUPPORTED;
+         break;
++    case QEMU_PSCI_1_0_FN_PSCI_FEATURES:
++        switch (param[1]) {
++        case QEMU_PSCI_0_2_FN_PSCI_VERSION:
++        case QEMU_PSCI_0_2_FN_MIGRATE_INFO_TYPE:
++        case QEMU_PSCI_0_2_FN_AFFINITY_INFO:
++        case QEMU_PSCI_0_2_FN64_AFFINITY_INFO:
++        case QEMU_PSCI_0_2_FN_SYSTEM_RESET:
++        case QEMU_PSCI_0_2_FN_SYSTEM_OFF:
++        case QEMU_PSCI_0_1_FN_CPU_ON:
++        case QEMU_PSCI_0_2_FN_CPU_ON:
++        case QEMU_PSCI_0_2_FN64_CPU_ON:
++        case QEMU_PSCI_0_1_FN_CPU_OFF:
++        case QEMU_PSCI_0_2_FN_CPU_OFF:
++        case QEMU_PSCI_0_1_FN_CPU_SUSPEND:
++        case QEMU_PSCI_0_2_FN_CPU_SUSPEND:
++        case QEMU_PSCI_0_2_FN64_CPU_SUSPEND:
++        case QEMU_PSCI_1_0_FN_PSCI_FEATURES:
++            ret = 0;
++            break;
++        case QEMU_PSCI_0_1_FN_MIGRATE:
++        case QEMU_PSCI_0_2_FN_MIGRATE:
++        default:
++            ret = QEMU_PSCI_RET_NOT_SUPPORTED;
++        }
++        break;
+     default:
+         return false;
+     }
+diff --git a/target/arm/kvm-consts.h b/target/arm/kvm-consts.h
+index 580f1c1fee0..241e02562e1 100644
+--- a/target/arm/kvm-consts.h
++++ b/target/arm/kvm-consts.h
+@@ -77,6 +77,8 @@ MISMATCH_CHECK(QEMU_PSCI_0_1_FN_MIGRATE, KVM_PSCI_FN_MIGRATE);
+ #define QEMU_PSCI_0_2_FN64_AFFINITY_INFO QEMU_PSCI_0_2_FN64(4)
+ #define QEMU_PSCI_0_2_FN64_MIGRATE QEMU_PSCI_0_2_FN64(5)
+ 
++#define QEMU_PSCI_1_0_FN_PSCI_FEATURES QEMU_PSCI_0_2_FN(10)
 +
- 	if (dev->msg_handler)
- 		ret = dev->msg_handler(dev, &msg);
- 	else
+ MISMATCH_CHECK(QEMU_PSCI_0_2_FN_CPU_SUSPEND, PSCI_0_2_FN_CPU_SUSPEND);
+ MISMATCH_CHECK(QEMU_PSCI_0_2_FN_CPU_OFF, PSCI_0_2_FN_CPU_OFF);
+ MISMATCH_CHECK(QEMU_PSCI_0_2_FN_CPU_ON, PSCI_0_2_FN_CPU_ON);
+@@ -84,18 +86,21 @@ MISMATCH_CHECK(QEMU_PSCI_0_2_FN_MIGRATE, PSCI_0_2_FN_MIGRATE);
+ MISMATCH_CHECK(QEMU_PSCI_0_2_FN64_CPU_SUSPEND, PSCI_0_2_FN64_CPU_SUSPEND);
+ MISMATCH_CHECK(QEMU_PSCI_0_2_FN64_CPU_ON, PSCI_0_2_FN64_CPU_ON);
+ MISMATCH_CHECK(QEMU_PSCI_0_2_FN64_MIGRATE, PSCI_0_2_FN64_MIGRATE);
++MISMATCH_CHECK(QEMU_PSCI_1_0_FN_PSCI_FEATURES, PSCI_1_0_FN_PSCI_FEATURES);
+ 
+ /* PSCI v0.2 return values used by TCG emulation of PSCI */
+ 
+ /* No Trusted OS migration to worry about when offlining CPUs */
+ #define QEMU_PSCI_0_2_RET_TOS_MIGRATION_NOT_REQUIRED        2
+ 
+-/* We implement version 0.2 only */
+-#define QEMU_PSCI_0_2_RET_VERSION_0_2                       2
++#define QEMU_PSCI_VERSION_0_1                     0x00001
++#define QEMU_PSCI_VERSION_0_2                     0x00002
++#define QEMU_PSCI_VERSION_1_1                     0x10001
+ 
+ MISMATCH_CHECK(QEMU_PSCI_0_2_RET_TOS_MIGRATION_NOT_REQUIRED, PSCI_0_2_TOS_MP);
+-MISMATCH_CHECK(QEMU_PSCI_0_2_RET_VERSION_0_2,
+-               (PSCI_VERSION_MAJOR(0) | PSCI_VERSION_MINOR(2)));
++MISMATCH_CHECK(QEMU_PSCI_VERSION_0_1, PSCI_VERSION(0, 1));
++MISMATCH_CHECK(QEMU_PSCI_VERSION_0_2, PSCI_VERSION(0, 2));
++MISMATCH_CHECK(QEMU_PSCI_VERSION_1_1, PSCI_VERSION(1, 1));
+ 
+ /* PSCI return values (inclusive of all PSCI versions) */
+ #define QEMU_PSCI_RET_SUCCESS                     0
+diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+index 71c3ca69717..64d48bfb19d 100644
+--- a/target/arm/kvm64.c
++++ b/target/arm/kvm64.c
+@@ -864,7 +864,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+         cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_POWER_OFF;
+     }
+     if (kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_PSCI_0_2)) {
+-        cpu->psci_version = 2;
++        cpu->psci_version = QEMU_PSCI_VERSION_0_2;
+         cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_PSCI_0_2;
+     }
+     if (!arm_feature(&cpu->env, ARM_FEATURE_AARCH64)) {
+diff --git a/target/arm/psci.c b/target/arm/psci.c
+index b279c0b9a45..6c1239bb968 100644
+--- a/target/arm/psci.c
++++ b/target/arm/psci.c
+@@ -57,7 +57,7 @@ void arm_handle_psci_call(ARMCPU *cpu)
+ {
+     /*
+      * This function partially implements the logic for dispatching Power State
+-     * Coordination Interface (PSCI) calls (as described in ARM DEN 0022B.b),
++     * Coordination Interface (PSCI) calls (as described in ARM DEN 0022D.b),
+      * to the extent required for bringing up and taking down secondary cores,
+      * and for handling reset and poweroff requests.
+      * Additional information about the calling convention used is available in
+@@ -80,7 +80,7 @@ void arm_handle_psci_call(ARMCPU *cpu)
+     }
+ 
+     if ((param[0] & QEMU_PSCI_0_2_64BIT) && !is_a64(env)) {
+-        ret = QEMU_PSCI_RET_INVALID_PARAMS;
++        ret = QEMU_PSCI_RET_NOT_SUPPORTED;
+         goto err;
+     }
+ 
+@@ -89,7 +89,7 @@ void arm_handle_psci_call(ARMCPU *cpu)
+         ARMCPU *target_cpu;
+ 
+     case QEMU_PSCI_0_2_FN_PSCI_VERSION:
+-        ret = QEMU_PSCI_0_2_RET_VERSION_0_2;
++        ret = QEMU_PSCI_VERSION_1_1;
+         break;
+     case QEMU_PSCI_0_2_FN_MIGRATE_INFO_TYPE:
+         ret = QEMU_PSCI_0_2_RET_TOS_MIGRATION_NOT_REQUIRED; /* No trusted OS */
+@@ -170,6 +170,35 @@ void arm_handle_psci_call(ARMCPU *cpu)
+         }
+         helper_wfi(env, 4);
+         break;
++    case QEMU_PSCI_1_0_FN_PSCI_FEATURES:
++        switch (param[1]) {
++        case QEMU_PSCI_0_2_FN_PSCI_VERSION:
++        case QEMU_PSCI_0_2_FN_MIGRATE_INFO_TYPE:
++        case QEMU_PSCI_0_2_FN_AFFINITY_INFO:
++        case QEMU_PSCI_0_2_FN64_AFFINITY_INFO:
++        case QEMU_PSCI_0_2_FN_SYSTEM_RESET:
++        case QEMU_PSCI_0_2_FN_SYSTEM_OFF:
++        case QEMU_PSCI_0_1_FN_CPU_ON:
++        case QEMU_PSCI_0_2_FN_CPU_ON:
++        case QEMU_PSCI_0_2_FN64_CPU_ON:
++        case QEMU_PSCI_0_1_FN_CPU_OFF:
++        case QEMU_PSCI_0_2_FN_CPU_OFF:
++        case QEMU_PSCI_0_1_FN_CPU_SUSPEND:
++        case QEMU_PSCI_0_2_FN_CPU_SUSPEND:
++        case QEMU_PSCI_0_2_FN64_CPU_SUSPEND:
++        case QEMU_PSCI_1_0_FN_PSCI_FEATURES:
++            if (!(param[1] & QEMU_PSCI_0_2_64BIT) || is_a64(env)) {
++                ret = 0;
++                break;
++            }
++            /* fallthrough */
++        case QEMU_PSCI_0_1_FN_MIGRATE:
++        case QEMU_PSCI_0_2_FN_MIGRATE:
++        default:
++            ret = QEMU_PSCI_RET_NOT_SUPPORTED;
++            break;
++        }
++        break;
+     case QEMU_PSCI_0_1_FN_MIGRATE:
+     case QEMU_PSCI_0_2_FN_MIGRATE:
+     default:
 -- 
-2.35.1
+2.32.0 (Apple Git-132)
 
