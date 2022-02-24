@@ -2,83 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D58884C35F7
-	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 20:35:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 667224C35FF
+	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 20:39:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232991AbiBXTgJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Feb 2022 14:36:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42100 "EHLO
+        id S231497AbiBXTjM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Feb 2022 14:39:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229811AbiBXTgI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Feb 2022 14:36:08 -0500
-Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3070827579C
-        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 11:35:38 -0800 (PST)
-Received: by mail-il1-x135.google.com with SMTP id e11so2585628ils.3
-        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 11:35:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=nhX3bsgpSDyttb54655oQihTzzAj4GP6gmlwB+g2+XU=;
-        b=npt5FKr2XpSxwA7sZmT2ddB61OwNxFOyr3+/FXeYQNRnR1oW8Y1dFHHWbz1/Ppa5C6
-         GyylKF/3cCFL2kNt8zNbFRz7zfMn/9+bkcKjXEXjyf3ZdUTE6t0Wh2FZ6aipgmbwwl6G
-         BJUooKVDLML2H/Y1q3mzCarwNOqIFe0Ju7FaYiNQFQ2w5/xx1PKBFkQWcGHlBncWODIn
-         8uHuupKUAm522TKMXZwSuX4d9zvJH0cRrvvBsMaaUJ089uRfxVwoucU7KF+7ApTQoTpC
-         BOqBjO9N9vIQgjlGr+GCG5l5rNyzYMZIFEWWkUJDPdlh4yKu0ylQWGq10JdVnVd4PObE
-         Otjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=nhX3bsgpSDyttb54655oQihTzzAj4GP6gmlwB+g2+XU=;
-        b=1+Y+FXIhJYct+YRgkjpcFQ9C91bRT2xJudr/JmlIo/91ISIc85TN8LHD3cSnW96wh5
-         kaTofhSnuqLUo/RWT+yGqsvhvQ05dUxCwL1LHnNcQApSV0E7q5UgeKKYMh8LlXUE7QQE
-         8Tshx3TaSr1dywM26ZxbW5y75xCjnxxOmGMh8Pp7QTcVk92YIBJUkwTQL9QJTcv8wmCM
-         38EfYB9bvU3dt242fhm1m7g14LziVoJ/6vCiUBNEqXZ6cToCivv7GMKFpzvKHJAmrSFR
-         +I/g0gJ9WeYaesb8bGf7x+RYksrd0Z67f4aMu54BFYnnG9TQlbrRAg8r8YCvqoffFYq5
-         OzQw==
-X-Gm-Message-State: AOAM530j7bBu1vVDjs8THq6h0U29OqLXrsV3Rh0EYddb5pRMYhLngMtf
-        KJt9asLAc88kBjz77GghfmVpCA==
-X-Google-Smtp-Source: ABdhPJycwpD6mXs4gDPbvHxlvan4Cix0pIzqdjhyt1BYJVKfcy2+h/UY61uiRrBXWobwtcCTXb8Z9w==
-X-Received: by 2002:a05:6e02:1c28:b0:2bf:4c8a:6207 with SMTP id m8-20020a056e021c2800b002bf4c8a6207mr3328664ilh.249.1645731337242;
-        Thu, 24 Feb 2022 11:35:37 -0800 (PST)
-Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
-        by smtp.gmail.com with ESMTPSA id v3-20020a5d9483000000b00640d3d4acabsm281032ioj.44.2022.02.24.11.35.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Feb 2022 11:35:36 -0800 (PST)
-Date:   Thu, 24 Feb 2022 19:35:33 +0000
-From:   Oliver Upton <oupton@google.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.cs.columbia.edu, Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
+        with ESMTP id S232408AbiBXTjK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Feb 2022 14:39:10 -0500
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1anam02on2065.outbound.protection.outlook.com [40.107.96.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07A8B1D6839;
+        Thu, 24 Feb 2022 11:38:40 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=TPkfA/pH6/3BlXc0qiPle44eYjpEXOzi3g7xcVbzZkyRV+69Z/q6VHjxOxtH3GNV9mNru3kOXSZiNuHGKonC4UNIFHi3Pk2zAjD7JHT89z3XSGR0kyNr1sH4HX5HeZH2TWmB1bBwd+g99RJMjmUZFFvd11Wr7eAgfbF7smhGPVo0Q6KlFyL+knMMA5j+ckJD9uSDjMNl3ijESXAJYM7cBLOGxXqqppwHE/LZ4BXzqz4OkceFGQ509ZnjCt3ChZZf0FFKykL9RDcSnkwVwBgeCdyRw5WWUul/G0WCKsZHRFGBDH//2nxiWuaP49/ih8U/O000/8lCh4IANYWwxTuIXA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=rRdrowPuPlJM8WroD+RtmGgyU/lVCHztNflgZuhsH1o=;
+ b=Q5EaljyAnHLyvS5gudqWokJW8yJkEqzw+uv/Y64T61MBEvm9Nai3RxbESksaeGWm6SIe/k7Izc6pWdAnR/OCkd3hzA5HJPQXaMwe+WqT1k6ib8WWg3u3AYc43chVxw3TYiq9surksanohye4DndeJ+DIXAZ7Wr0Or8EX741ETmatkMGHM/4VBdACJ4ZYF5qN9pczUYGTr8jCqQcMXipIPnaOboNqW51OJhgExDaWh84SuyAlp+lLo32d6wT45xkyatqAJ6jR71U/Z3a2nHdOKuv7gKbBawB2Fu+kbgKSkgHympmmKp3xHRDQD0kB7t0O1D8FGVgVIn0dNTiAlNV48g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rRdrowPuPlJM8WroD+RtmGgyU/lVCHztNflgZuhsH1o=;
+ b=NqCRyCIo9h84jsw+HW0qBx1qwzAVDE2JAOevCFk2VliM50g+viZWb1pP4uNK61VnvXqlPo7X0wYSo/1aTiwUV9qiF/mj7Yq/4CDSwVIWbIzeVuRV8QVkKbcGWm9xyMLniySa9Wp2h46735HAXEMKsUp/DnNiY4B56r5yMieQzrE=
+Received: from BN6PR16CA0047.namprd16.prod.outlook.com (2603:10b6:405:14::33)
+ by DM5PR12MB2358.namprd12.prod.outlook.com (2603:10b6:4:b3::34) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4995.25; Thu, 24 Feb
+ 2022 19:38:33 +0000
+Received: from BN8NAM11FT009.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:405:14:cafe::d7) by BN6PR16CA0047.outlook.office365.com
+ (2603:10b6:405:14::33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4995.26 via Frontend
+ Transport; Thu, 24 Feb 2022 19:38:33 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com;
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BN8NAM11FT009.mail.protection.outlook.com (10.13.176.65) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.5017.22 via Frontend Transport; Thu, 24 Feb 2022 19:38:32 +0000
+Received: from sbrijesh-desktop.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.18; Thu, 24 Feb
+ 2022 13:38:30 -0600
+From:   Brijesh Singh <brijesh.singh@amd.com>
+To:     <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kvm@vger.kernel.org>, <linux-efi@vger.kernel.org>,
+        <platform-driver-x86@vger.kernel.org>,
+        <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>
+CC:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+        "Vitaly Kuznetsov" <vkuznets@redhat.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, Peter Shier <pshier@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Raghavendra Rao Ananta <rananta@google.com>,
-        Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH v3 09/19] KVM: arm64: Implement PSCI SYSTEM_SUSPEND
-Message-ID: <YhfeBfgbDA8IGc9f@google.com>
-References: <20220223041844.3984439-1-oupton@google.com>
- <20220223041844.3984439-10-oupton@google.com>
- <87wnhk2whx.wl-maz@kernel.org>
+        "Andy Lutomirski" <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        "Peter Zijlstra" <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        <brijesh.ksingh@gmail.com>, <tony.luck@intel.com>,
+        <marcorr@google.com>, <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Venu Busireddy <venu.busireddy@oracle.com>,
+        Brijesh Singh <brijesh.singh@amd.com>
+Subject: [PATCH v11 3.1/45] KVM: SVM: Create a separate mapping for the GHCB save area
+Date:   Thu, 24 Feb 2022 13:38:17 -0600
+Message-ID: <20220224193818.2187605-1-brijesh.singh@amd.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20220224165625.2175020-4-brijesh.singh@amd.com>
+References: <20220224165625.2175020-4-brijesh.singh@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87wnhk2whx.wl-maz@kernel.org>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: fe46b429-7e57-48dc-3576-08d9f7cd3df2
+X-MS-TrafficTypeDiagnostic: DM5PR12MB2358:EE_
+X-Microsoft-Antispam-PRVS: <DM5PR12MB2358451DF8B7F78871537727E53D9@DM5PR12MB2358.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: y4vKBslPHUuYp+IVwpQifuuK2z9OhTTOYG7KEkTz7Vmv3A0PE+TKtrBZPzT7AXnnGkcGkirrM9aMgKO+FTH73NlixB1PGCSc2JxFrkW3uVag8s2hpbd29jL19F1PVMSF4/biigw+Kc2pOS5IIXuGCD4P+fQlSpNIGHjVvYiLgo1jEz3PgHc/DGufE8oBboi3FaJwwDOS9dLtyFvc5mZiu680VHl/yITrhCYlLTOu50HjQMdR4kOTT/D5KyvnTDpNSM/A1R1F4DOtWzBkM83yE1I+7E20hWCDpfbSIWdDXCU/ZlABYuvqNiQvTuK+euQ8G5+j/AmiDE8LRmPIrq57FArSfXC9QU/nNkvzQ6FDCd8IxztKgxmaU7Fti/WhqSwf8te8/QJu5uBrLN5awgtxdugHxX/zXVooqT7MxO0yvo7Y2BA6j7Tu4erbSSMsuOteBb5C/Uxl4td9hRZ/1VJYJs9z2G9jbjL8mPUPeq8+F40NcDDw/WrDCVzvRg14VCM1F/T9qQYBRT7yKLWyOtN9J2QJJyQ/gR1SR8NNafYEzbtgrVlxvzxnGokJ1AGKX4rbFDzLgnalqeddOuDI0R4GUZgvDFzWPByQ13eiK6waJ8obFkr+A5l0892ucZOMierJ69HBDeZU07VBNITwQcAkb30JqK45LOK6naWBvmPgIDoDh4Wj1XaOqmC7hABdAPWMqbCtgTuHNQEQUGfMTnO/NZYCX7s/zBFa7/DTHYC5/9E=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230001)(4636009)(36840700001)(40470700004)(46966006)(2906002)(7416002)(7406005)(82310400004)(7696005)(8936002)(6666004)(81166007)(44832011)(356005)(86362001)(83380400001)(54906003)(110136005)(426003)(508600001)(5660300002)(40460700003)(26005)(186003)(47076005)(2616005)(36756003)(336012)(8676002)(70206006)(70586007)(4326008)(316002)(36860700001)(1076003)(16526019)(2101003)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Feb 2022 19:38:32.8494
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: fe46b429-7e57-48dc-3576-08d9f7cd3df2
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT009.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB2358
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -86,127 +126,119 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+From: Tom Lendacky <thomas.lendacky@amd.com>
 
-Thanks for reviewing the series. ACK to the nits and smaller comments
-you've made, I'll incorporate that feedback in the next series.
+The initial implementation of the GHCB spec was based on trying to keep
+the register state offsets the same relative to the VM save area. However,
+the save area for SEV-ES has changed within the hardware causing the
+relation between the SEV-ES save area to change relative to the GHCB save
+area.
 
-On Thu, Feb 24, 2022 at 02:02:34PM +0000, Marc Zyngier wrote:
-> On Wed, 23 Feb 2022 04:18:34 +0000,
-> Oliver Upton <oupton@google.com> wrote:
-> > 
-> > ARM DEN0022D.b 5.19 "SYSTEM_SUSPEND" describes a PSCI call that allows
-> > software to request that a system be placed in the deepest possible
-> > low-power state. Effectively, software can use this to suspend itself to
-> > RAM. Note that the semantics of this PSCI call are very similar to
-> > CPU_SUSPEND, which is already implemented in KVM.
-> > 
-> > Implement the SYSTEM_SUSPEND in KVM. Similar to CPU_SUSPEND, the
-> > low-power state is implemented as a guest WFI. Synchronously reset the
-> > calling CPU before entering the WFI, such that the vCPU may immediately
-> > resume execution when a wakeup event is recognized.
-> > 
-> > Signed-off-by: Oliver Upton <oupton@google.com>
-> > ---
-> >  arch/arm64/kvm/psci.c  | 51 ++++++++++++++++++++++++++++++++++++++++++
-> >  arch/arm64/kvm/reset.c |  3 ++-
-> >  2 files changed, 53 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
-> > index 77a00913cdfd..41adaaf2234a 100644
-> > --- a/arch/arm64/kvm/psci.c
-> > +++ b/arch/arm64/kvm/psci.c
-> > @@ -208,6 +208,50 @@ static void kvm_psci_system_reset(struct kvm_vcpu *vcpu)
-> >  	kvm_prepare_system_event(vcpu, KVM_SYSTEM_EVENT_RESET);
-> >  }
-> >  
-> > +static int kvm_psci_system_suspend(struct kvm_vcpu *vcpu)
-> > +{
-> > +	struct vcpu_reset_state reset_state;
-> > +	struct kvm *kvm = vcpu->kvm;
-> > +	struct kvm_vcpu *tmp;
-> > +	bool denied = false;
-> > +	unsigned long i;
-> > +
-> > +	reset_state.pc = smccc_get_arg1(vcpu);
-> > +	if (!kvm_ipa_valid(kvm, reset_state.pc)) {
-> > +		smccc_set_retval(vcpu, PSCI_RET_INVALID_ADDRESS, 0, 0, 0);
-> > +		return 1;
-> > +	}
-> > +
-> > +	reset_state.r0 = smccc_get_arg2(vcpu);
-> > +	reset_state.be = kvm_vcpu_is_be(vcpu);
-> > +	reset_state.reset = true;
-> > +
-> > +	/*
-> > +	 * The SYSTEM_SUSPEND PSCI call requires that all vCPUs (except the
-> > +	 * calling vCPU) be in an OFF state, as determined by the
-> > +	 * implementation.
-> > +	 *
-> > +	 * See ARM DEN0022D, 5.19 "SYSTEM_SUSPEND" for more details.
-> > +	 */
-> > +	mutex_lock(&kvm->lock);
-> > +	kvm_for_each_vcpu(i, tmp, kvm) {
-> > +		if (tmp != vcpu && !kvm_arm_vcpu_powered_off(tmp)) {
-> > +			denied = true;
-> > +			break;
-> > +		}
-> > +	}
-> > +	mutex_unlock(&kvm->lock);
-> 
-> This looks dodgy. Nothing seems to prevent userspace from setting the
-> mp_state to RUNNING in parallel with this, as only the vcpu mutex is
-> held when this ioctl is issued.
-> 
-> It looks to me that what you want is what lock_all_vcpus() does
-> (Alexandru has a patch moving it out of the vgic code as part of his
-> SPE series).
-> 
-> It is also pretty unclear what the interaction with userspace is once
-> you have released the lock. If the VMM starts a vcpu other than the
-> suspending one, what is its state? The spec doesn't see to help
-> here. I can see two options:
-> 
-> - either all the vcpus have the same reset state applied to them as
->   they come up, unless they are started with CPU_ON by a vcpu that has
->   already booted (but there is a single 'context_id' provided, and I
->   fear this is going to confuse the OS)...
-> 
-> - or only the suspending vcpu can resume the system, and we must fail
->   a change of mp_state for the other vcpus.
-> 
-> What do you think?
+This is the second step in defining the multiple save areas to keep them
+separate and ensuring proper operation amongst the different types of
+guests. Create a GHCB save area that matches the GHCB specification.
 
-Definitely the latter. The documentation of SYSTEM_SUSPEND is quite
-shaky on this, but it would appear that the intention is for the caller
-to be the first CPU to wake up.
+Reviewed-by: Venu Busireddy <venu.busireddy@oracle.com>
+Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+---
 
-> > +
-> > +	if (denied) {
-> > +		smccc_set_retval(vcpu, PSCI_RET_DENIED, 0, 0, 0);
-> > +		return 1;
-> > +	}
-> > +
-> > +	__kvm_reset_vcpu(vcpu, &reset_state);
-> > +	kvm_vcpu_wfi(vcpu);
-> 
-> I have mixed feelings about this. The vcpu has reset before being in
-> WFI, while it really should be the other way around and userspace
-> could rely on observing the transition.
-> 
-> What breaks if you change this?
+Changes since v11:
+ * Add missing GHCB xss accessor
 
-I don't think that userspace would be able to observe the transition
-even if we WFI before the reset. I imagine that would take the form
-of setting KVM_REQ_VCPU_RESET, which we explicitly handle before
-letting userspace access the vCPU's state as of commit
-6826c6849b46 ("KVM: arm64: Handle PSCI resets before userspace
-touches vCPU state").
+ arch/x86/include/asm/svm.h | 49 +++++++++++++++++++++++++++++++++++---
+ 1 file changed, 46 insertions(+), 3 deletions(-)
 
-Given this, I felt it was probably best to avoid all the indirection and
-just do the vCPU reset in the handling of SYSTEM_SUSPEND. It does,
-however, imply that we have slightly different behavior when userspace
-exits are enabled, as that will happen pre-reset and pre-WFI.
+diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
+index e748aa33c355..138db4e1b07d 100644
+--- a/arch/x86/include/asm/svm.h
++++ b/arch/x86/include/asm/svm.h
+@@ -390,11 +390,51 @@ struct sev_es_save_area {
+ 	u64 x87_state_gpa;
+ } __packed;
+ 
++struct ghcb_save_area {
++	u8 reserved_1[203];
++	u8 cpl;
++	u8 reserved_2[116];
++	u64 xss;
++	u8 reserved_3[24];
++	u64 dr7;
++	u8 reserved_4[16];
++	u64 rip;
++	u8 reserved_5[88];
++	u64 rsp;
++	u8 reserved_6[24];
++	u64 rax;
++	u8 reserved_7[264];
++	u64 rcx;
++	u64 rdx;
++	u64 rbx;
++	u8 reserved_8[8];
++	u64 rbp;
++	u64 rsi;
++	u64 rdi;
++	u64 r8;
++	u64 r9;
++	u64 r10;
++	u64 r11;
++	u64 r12;
++	u64 r13;
++	u64 r14;
++	u64 r15;
++	u8 reserved_9[16];
++	u64 sw_exit_code;
++	u64 sw_exit_info_1;
++	u64 sw_exit_info_2;
++	u64 sw_scratch;
++	u8 reserved_10[56];
++	u64 xcr0;
++	u8 valid_bitmap[16];
++	u64 x87_state_gpa;
++} __packed;
++
+ #define GHCB_SHARED_BUF_SIZE	2032
+ 
+ struct ghcb {
+-	struct sev_es_save_area save;
+-	u8 reserved_save[2048 - sizeof(struct sev_es_save_area)];
++	struct ghcb_save_area save;
++	u8 reserved_save[2048 - sizeof(struct ghcb_save_area)];
+ 
+ 	u8 shared_buffer[GHCB_SHARED_BUF_SIZE];
+ 
+@@ -405,6 +445,7 @@ struct ghcb {
+ 
+ 
+ #define EXPECTED_VMCB_SAVE_AREA_SIZE		740
++#define EXPECTED_GHCB_SAVE_AREA_SIZE		1032
+ #define EXPECTED_SEV_ES_SAVE_AREA_SIZE		1032
+ #define EXPECTED_VMCB_CONTROL_AREA_SIZE		1024
+ #define EXPECTED_GHCB_SIZE			PAGE_SIZE
+@@ -412,6 +453,7 @@ struct ghcb {
+ static inline void __unused_size_checks(void)
+ {
+ 	BUILD_BUG_ON(sizeof(struct vmcb_save_area)	!= EXPECTED_VMCB_SAVE_AREA_SIZE);
++	BUILD_BUG_ON(sizeof(struct ghcb_save_area)	!= EXPECTED_GHCB_SAVE_AREA_SIZE);
+ 	BUILD_BUG_ON(sizeof(struct sev_es_save_area)	!= EXPECTED_SEV_ES_SAVE_AREA_SIZE);
+ 	BUILD_BUG_ON(sizeof(struct vmcb_control_area)	!= EXPECTED_VMCB_CONTROL_AREA_SIZE);
+ 	BUILD_BUG_ON(sizeof(struct ghcb)		!= EXPECTED_GHCB_SIZE);
+@@ -482,7 +524,7 @@ struct vmcb {
+ /* GHCB Accessor functions */
+ 
+ #define GHCB_BITMAP_IDX(field)							\
+-	(offsetof(struct sev_es_save_area, field) / sizeof(u64))
++	(offsetof(struct ghcb_save_area, field) / sizeof(u64))
+ 
+ #define DEFINE_GHCB_ACCESSORS(field)						\
+ 	static inline bool ghcb_##field##_is_valid(const struct ghcb *ghcb)	\
+@@ -531,5 +573,6 @@ DEFINE_GHCB_ACCESSORS(sw_exit_info_1)
+ DEFINE_GHCB_ACCESSORS(sw_exit_info_2)
+ DEFINE_GHCB_ACCESSORS(sw_scratch)
+ DEFINE_GHCB_ACCESSORS(xcr0)
++DEFINE_GHCB_ACCESSORS(xss)
+ 
+ #endif
+-- 
+2.25.1
 
---
-Oliver
