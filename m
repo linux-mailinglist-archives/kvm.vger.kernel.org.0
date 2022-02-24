@@ -2,158 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E1B9A4C2BF0
-	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 13:41:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C9D14C2C01
+	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 13:45:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234460AbiBXMkE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Feb 2022 07:40:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43936 "EHLO
+        id S234461AbiBXMo4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Feb 2022 07:44:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231701AbiBXMkD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Feb 2022 07:40:03 -0500
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2084.outbound.protection.outlook.com [40.107.94.84])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A41A2804DB;
-        Thu, 24 Feb 2022 04:39:33 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=evoj1SPU9Thg/8RZdYMyITwscmc1IUryXuM+xhQYO0Cpk6/q7UyMUDW1p9DXSpRHQJb1CT12e0IT5f4I9pFXqnMiVerpNcp8ivkFb2FFN/AZYT01TBjc0+UeYMDp/lrTBddK6glquz2vHDyRuLpGAqhBhWqv0Ig0AsKGCdOi9qiuJ86kbEh+aSgqYPK53ZmtLCLkzsDK5CkM5xmnLezv/K/NiDGZ10/HEUIR94irgxqYqD+gbvL6MJm5HTTOWkC55tqVjriZbWYlJJdH+HiHdp+sO2q0YOESEz/ZHYR2Il+v9Zt4k5xgishUXbo6BKcsfR8E+ZNiaCBNR/XY2ESHbw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JTVYVZzb7GCK2H1yH77k4JRkKr/NAylGUXB/wvw1LJI=;
- b=XDdr0FNQdn0tc/0Rhc9dYIz/nufXlCRnf4oZc5Y/m3oOS4C5RRSYb809aeyZwGZgpOGPnWnmvT4T106Tc7qdmmO7v8Jhaeibq+eWKth4a9UJWc4fNTRn3AMZOpVBZWCTm1htqwZe5Lh3TGlF3HSOobqqxH4bAX/Sq4i+0i1TgAsWbCij1yHrS6gugmoEzUAceLzifrMrWgJpuAjrioTRtqYpvXdkbCENENh2LDtfjUFPdwI8e05VXYqXg2sVkj/zFxPrYBHZdjF2xkxB9zbK5WD8bNhDTKSLWFvNH6fz1JkjfBLhy8w1HCQ+3Y+Hu7DsOBJRSYEspusnxgz8EKi+yg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JTVYVZzb7GCK2H1yH77k4JRkKr/NAylGUXB/wvw1LJI=;
- b=YC5G/9tRLCzdH9JZpE0CZyYIX13dYhbqm6O7WNuiKZdLB/hZEcFnFSTY5V5cPi3eYbxiHalU4yJVk19/YrKGjnCM4LkKCeYIcgzSuobtFoKotRGLM/MwFl9zxz4PKLlu9jnXHgwIrMB81X6/Q1UUIecPnLvdgCl52IB+Om9DOyxlI8sMKWHP7rmdMHYmfA/VskOC+dpNe5SXJO08qEAJBuTtlJBCSHYhm6+eWlj/7Tn5gQhPxY5ihILASiFN7rielk/NGfLmsHjIOQnYcwRkUe0PUnkwSbz96BMRICtkWJWmqFrln/1SfjNVE1Oeachc1TGT4TF2rVtuE8vbgVXnwQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by MN2PR12MB3104.namprd12.prod.outlook.com (2603:10b6:208:cc::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5017.21; Thu, 24 Feb
- 2022 12:39:31 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::e8f4:9793:da37:1bd3]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::e8f4:9793:da37:1bd3%4]) with mapi id 15.20.5017.022; Thu, 24 Feb 2022
- 12:39:31 +0000
-Date:   Thu, 24 Feb 2022 08:39:29 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Yishai Hadas <yishaih@nvidia.com>, alex.williamson@redhat.com,
-        bhelgaas@google.com, saeedm@nvidia.com, linux-pci@vger.kernel.org,
-        kvm@vger.kernel.org, netdev@vger.kernel.org, kuba@kernel.org,
-        leonro@nvidia.com, kwankhede@nvidia.com, mgurtovoy@nvidia.com,
-        maorg@nvidia.com, ashok.raj@intel.com, kevin.tian@intel.com,
-        shameerali.kolothum.thodi@huawei.com
-Subject: Re: [PATCH V8 mlx5-next 09/15] vfio: Define device migration
- protocol v2
-Message-ID: <20220224123929.GA6413@nvidia.com>
-References: <20220220095716.153757-1-yishaih@nvidia.com>
- <20220220095716.153757-10-yishaih@nvidia.com>
- <87ley17bsq.fsf@redhat.com>
- <20220224004622.GD409228@nvidia.com>
- <87ilt47dhz.fsf@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87ilt47dhz.fsf@redhat.com>
-X-ClientProxiedBy: MN2PR05CA0051.namprd05.prod.outlook.com
- (2603:10b6:208:236::20) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
+        with ESMTP id S232520AbiBXMoy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Feb 2022 07:44:54 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E178328F949
+        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 04:44:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645706664;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=VrG54HxKHxMJeYdAyusQxEhgBHEKy7uOHJGiwvZe/NI=;
+        b=fhvfDYEX3rdXosqddzQ64yk6PzNCm+8ov3L1EMTTcdBf6CEgHoMuQnItIcN1agALd3swRI
+        Gs+8ybhSejjFfdr0cL5VK+CXhc3neuEssDhQ7dIyCTVThPDL7mUoEFWFxW4sMJMTQNPiEM
+        LG7JeV2mKaqRrgA4SAuykBoVXHNc+dw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-637-92w0yqHhMMecDuUxuXeo5g-1; Thu, 24 Feb 2022 07:44:22 -0500
+X-MC-Unique: 92w0yqHhMMecDuUxuXeo5g-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 579F91006AA5;
+        Thu, 24 Feb 2022 12:44:21 +0000 (UTC)
+Received: from starship (unknown [10.40.195.190])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6C9E07B8D5;
+        Thu, 24 Feb 2022 12:44:20 +0000 (UTC)
+Message-ID: <fe30474f8f601aeaf9a3ad6082f2ff27e5f64c16.camel@redhat.com>
+Subject: Re: [PATCH 0/7] My set of KVM unit tests + fixes
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     kvm@vger.kernel.org
+Date:   Thu, 24 Feb 2022 14:44:19 +0200
+In-Reply-To: <YhdnOjTFqka9zAFq@monolith.localdoman>
+References: <20220208122148.912913-1-mlevitsk@redhat.com>
+         <38346acd4f7b9cb5a38c3a1e2fba0ee01a82dc5b.camel@redhat.com>
+         <Yhdb+ptbDLNR4+xk@monolith.localdoman>
+         <5331482d6079448544d01e6745907e66d0402705.camel@redhat.com>
+         <YhdnOjTFqka9zAFq@monolith.localdoman>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: e3476490-1896-43b4-294c-08d9f792b439
-X-MS-TrafficTypeDiagnostic: MN2PR12MB3104:EE_
-X-Microsoft-Antispam-PRVS: <MN2PR12MB3104D9370F98B4AABD3661D3C23D9@MN2PR12MB3104.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ojKRmEPamFifB2ZYz8pvIxrNXEI5GLNU1nUQvuBa1V4rDBwzK9MCwR/ztB1iDThoDypZTNaJZCSnbm55hihcoVa5X5CWUHxacaOTQ6XXUiva+gbN9odw6xrapYQwCJlSkfCnSkSwHhAyf8ibWnYOC4RSb6lNzdsdz/nBZzWKEUGscHBzSUVoVydyJJ+Ik0Tyd5hLtDBlFX9vCU9K8gIymzzUJ9hbnnv02mKDFiXYOnVlrHWbz6Pyf+rQL5UOzrddmEr1cXfNgzcvpYviFowogd6W3hVfM2lqGpB076yYMIBTIy7/Mh6bC1MWd7ECBuGJDzYxFXj2IBPeSkluQqmSxIyOzWszTLZEnLyxMQZ4hyU55hAD+Kg4PcWyFPeABl3s5P68T87MDUv6LBDP0AtBoMIsAEavUlJ/QTQmJAGCvlX29OLfywTv2+UGzaPdHLIQeHQaWd5r8etYJeNHCzn2E6XjMrP4nINGMNll8/spsi8HnzgFp1vUI3X2e6cMkP330//D50SPPYS9DxGD7FeMmi9ltWbAFXMc5J4Q7mrmYUtq7FC5ECndmovCUn6L8JYEvoFWKhJCrVo5Xi2cwh3GTkbiqBG9ri9ghW1u/ZtHIGLa7CrLa2wTrRm624gtuX0WpeiY7NoQOtz0cDZ0Fjde3w==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(6486002)(36756003)(8936002)(7416002)(5660300002)(186003)(26005)(2906002)(1076003)(2616005)(508600001)(6512007)(6506007)(33656002)(86362001)(66946007)(66556008)(66476007)(316002)(6916009)(38100700002)(4326008)(8676002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?KPFCXDxT26RKTd1NrvZwmxqz6/sLjqyFJQxeD5EQSZlbTedJYMDm0NUEilTQ?=
- =?us-ascii?Q?JgHA4cEyjdJC4NWtSH2ME1+W49yHotg6x16A7QVdXgC8zTXzmp2aVHAwwCzd?=
- =?us-ascii?Q?BVJJi27xAeJj3jBoS8FKM3LZ2kqrdmCKUp/+ockSKRr6LJ3P34tuU/vLKKV1?=
- =?us-ascii?Q?+OKTFMBHtlQrg6GBkg8YQ8QnMb+XKLM/4EruwO8UmbzTSsMlHwYXYQd+AHPJ?=
- =?us-ascii?Q?jePVpInS4Xn4Ag+El9b1aAI11p6yk+RXfzhIqfaAfRsUXJK/TKzCeQ//Pjgy?=
- =?us-ascii?Q?YDlxwz1qDoOInAMSuiP+izpCsuCCN1E/u/Fbe9nf1VmiVLZDk7BU189QMUS+?=
- =?us-ascii?Q?MW2JfdYRDMEQgUVq5YgIV1CMQ6asodNrI14v/40mns7OZ6EN7cMfR+ItLmZM?=
- =?us-ascii?Q?aVDSx6C6p6UTm8KlYQkv7rCSA2w2Vom0XT8iJKFEMlyVkVRZowjCE0brHwCn?=
- =?us-ascii?Q?3B0MVsU0OcSoSmEuaM+Mj0g3FBXkIY9eQZ1gb1xjBUcfZZcLLAcUiw5HwHGw?=
- =?us-ascii?Q?AMY1e/JPnhpcJC8m2epTEq8eBODkKGeHoeG7T7OI+5P+0fY/6zeDA14Mx++N?=
- =?us-ascii?Q?yfcYoLJjQ4ZI5igqxBnMNyLfaF7K3RMBaCDXTO23kt1o3/9YlvN/E/dbS4dV?=
- =?us-ascii?Q?4+2uw3sgW2Zbura/s5dR3Lc+U0HjwLb8IJALidFhlQgbm1epNbOk1c7UFe2m?=
- =?us-ascii?Q?rekFwl2C/Tu/YZA6awfx5EiMae1jFTiWY8JyiE+p6Sop1Igs69jrx15cl/Ar?=
- =?us-ascii?Q?ezmrSLbMWcDjQNJ+a1gb4XmikjwMvlcQBQkcjXhiQHR7db8EvbWm42V5i3Bn?=
- =?us-ascii?Q?E9jA0XTPJpj8o0U99Y5WsdQjqzBl+pkZsn52nroqMIt6iw7nHZYtuzzp2qU+?=
- =?us-ascii?Q?g5my/2y+Sm+u0ezX9Mn8ZXhpuN6lt7QKrUTXTbxJDYardfSv0FHU21GovadX?=
- =?us-ascii?Q?qOKjlKYJIe9nZeh+796OzTTmMeWCrMhMG5T29M4KFFFjrMClmS2OAruH+j5N?=
- =?us-ascii?Q?PpB+uMO6tmXe9VyP4k+ARkdYJAo+/Rg2H4Aql7nLSTz/+dWcxkCK8TxxwZM3?=
- =?us-ascii?Q?fCqydDRKv5GCYI6m1X6jBLoutx+yu0V+YxbiV9SWIERqi4OdG7Lp6EkbfdAE?=
- =?us-ascii?Q?cRyFYq64Motcwwm5gn9kTyI4dXB+5RS9X4r7xAT6tKKSy+rss/uZnc2Eu+k5?=
- =?us-ascii?Q?iZox7zZPI/ktLxPLyksi8n/ISrgbqpdOJ741YSY4CNl9BiEnMYQB83G3Pr/t?=
- =?us-ascii?Q?n1fyCwrh4xjmmU2OPDmQnbjVeo96uJfmHyNgsZkJbV/4C7ZA0hHiGAiTwnUR?=
- =?us-ascii?Q?fptBmdCj7zGTzyd2Jul8S4xXgjc+Ced1ezzca9UnwgDCSxlaOHAn+kpSAB9G?=
- =?us-ascii?Q?4H1lxpGYbkiED/pLcZ2udGtcnMc0SqGXKzHtBBSE6VK5Oa0DBPCIVaHgkk8U?=
- =?us-ascii?Q?T5IP4YwWzGEJ3EUZlXZ1EoAuOU8GacdPPqr9Ho+MWU+zVVMRmDmOooLci3f6?=
- =?us-ascii?Q?tPQnRLCggo57yFvOsnG1j3azdMKaN5b5rseL5zGDw3QtL3y/I99Wh5nDm1eW?=
- =?us-ascii?Q?wWcPQnAN+gmKYkV1rD4=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e3476490-1896-43b4-294c-08d9f792b439
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Feb 2022 12:39:31.2128
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 6tg+f+OWLVLvoKi8Ld5909B/Q11rkm86+InxMZEKS5bqZI8J+lcRON9x16WgA8J5
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB3104
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 24, 2022 at 11:41:44AM +0100, Cornelia Huck wrote:
-> On Wed, Feb 23 2022, Jason Gunthorpe <jgg@nvidia.com> wrote:
+On Thu, 2022-02-24 at 11:08 +0000, Alexandru Elisei wrote:
+> Hi,
 > 
-> > On Wed, Feb 23, 2022 at 06:06:13PM +0100, Cornelia Huck wrote:
-> >> On Sun, Feb 20 2022, Yishai Hadas <yishaih@nvidia.com> wrote:
+> On Thu, Feb 24, 2022 at 01:00:28PM +0200, Maxim Levitsky wrote:
+> > On Thu, 2022-02-24 at 10:20 +0000, Alexandru Elisei wrote:
+> > > Hi,
+> > > 
+> > > On Wed, Feb 23, 2022 at 02:03:54PM +0200, Maxim Levitsky wrote:
+> > > > On Tue, 2022-02-08 at 14:21 +0200, Maxim Levitsky wrote:
+> > > > > Those are few kvm unit tests tha I developed.
+> > > > > 
+> > > > > Best regards,
+> > > > >     Maxim Levitsky
+> > > > > 
+> > > > > Maxim Levitsky (7):
+> > > > >   pmu_lbr: few fixes
+> > > > >   svm: Fix reg_corruption test, to avoid timer interrupt firing in later
+> > > > >     tests.
+> > > > >   svm: NMI is an "exception" and not interrupt in x86 land
+> > > > >   svm: intercept shutdown in all svm tests by default
+> > > > >   svm: add SVM_BARE_VMRUN
+> > > > >   svm: add tests for LBR virtualization
+> > > > >   svm: add tests for case when L1 intercepts various hardware interrupts
+> > > > >     (an interrupt, SMI, NMI), but lets L2 control either EFLAG.IF or GIF
+> > > > > 
+> > > > >  lib/x86/processor.h |   1 +
+> > > > >  x86/pmu_lbr.c       |   6 +
+> > > > >  x86/svm.c           |  41 +---
+> > > > >  x86/svm.h           |  63 ++++++-
+> > > > >  x86/svm_tests.c     | 447 +++++++++++++++++++++++++++++++++++++++++++-
+> > > > >  x86/unittests.cfg   |   3 +-
+> > > > >  6 files changed, 521 insertions(+), 40 deletions(-)
+> > > > > 
+> > > > > -- 
+> > > > > 2.26.3
+> > > > > 
+> > > > > 
+> > > > Any update on these patches?
+> > > 
+> > > It is possible that because you haven't sent the patches to the x86
+> > > maintainer (as per the MAINTAINERS file), this series has gone unnoticed.
+> > > Also, each patch should start with "kvm-unit-tests PATCH" (have a look at
+> > > the README file), so people can easily tell them apart from KVM patches,
+> > > which go to the same mailing list.
+> > Do kvm-unit tests have MAINTAINERS file? Those patches are not for the kernel
+> > but for the kvm-unit test project.
 > 
-> >> > +/*
-> >> > + * Indicates the device can support the migration API through
-> >> > + * VFIO_DEVICE_FEATURE_MIG_DEVICE_STATE. If present flags must be non-zero and
-> >> > + * VFIO_DEVICE_FEATURE_MIG_DEVICE_STATE is supported. The RUNNING and
-> >> 
-> >> I'm having trouble parsing this. I think what it tries to say is that at
-> >> least one of the flags defined below must be set?
-> >> 
-> >> > + * ERROR states are always supported if this GET succeeds.
-> >> 
-> >> What about the following instead:
-> >> 
-> >> "Indicates device support for the migration API through
-> >> VFIO_DEVICE_FEATURE_MIG_DEVICE_STATE. If present, the RUNNING and ERROR
-> >> states are always supported. Support for additional states is indicated
-> >> via the flags field; at least one of the flags defined below must be
-> >> set."
-> >
-> > Almost, 'at least VFIO_MIGRATION_STOP_COPY must be set'
+> A simple ls should be sufficient [1] to answer that question.
 > 
-> It feels a bit odd to split the mandatory states between a base layer
-> (RUNNING/ERROR) and the ones governed by VFIO_MIGRATION_STOP_COPY. Do we
-> want to keep the possibility of a future implementation that does not
-> use the semantics indicated by VFIO_MIGRATION_STOP_COPY? 
+> [1] https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/blob/master/MAINTAINERS
 
-Yes we do, and when we do that the documentation can reflect that
-world. Today, as is, it is mandatory.
+I am blind. just that. I checked it and haven't seen the file. Now I see it of course.
 
-Jason
+Best regards,
+	Maixm Levitsky
+
+> 
+> Thanks,
+> Alex
+> 
+> > > You could try resending the entire series to the x86 mailing list and to
+> > > the relevant maintainers. To resend them, the convention is to modify the
+> > > subject prefix to "kvm-unit-tests PATCH RESEND" and send them without any
+> > > changes (though you can mention in the cover letter why you resent the
+> > > series).
+> > Thank you, I missed the prefix to be used!
+> > 
+> > > Hope this helps!
+> > > 
+> > > Thanks,
+> > > Alex
+> > 
+> > Thanks!
+> > Best regards,
+> > 	Maxim Levitsky
+> > 
+> > > > Best regards,
+> > > > 	Maxim Levitsky
+> > > > 
+
+
