@@ -2,146 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C9D14C2C01
-	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 13:45:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E53574C2C0A
+	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 13:49:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234461AbiBXMo4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Feb 2022 07:44:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57578 "EHLO
+        id S234491AbiBXMtM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Feb 2022 07:49:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232520AbiBXMoy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Feb 2022 07:44:54 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E178328F949
-        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 04:44:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645706664;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=VrG54HxKHxMJeYdAyusQxEhgBHEKy7uOHJGiwvZe/NI=;
-        b=fhvfDYEX3rdXosqddzQ64yk6PzNCm+8ov3L1EMTTcdBf6CEgHoMuQnItIcN1agALd3swRI
-        Gs+8ybhSejjFfdr0cL5VK+CXhc3neuEssDhQ7dIyCTVThPDL7mUoEFWFxW4sMJMTQNPiEM
-        LG7JeV2mKaqRrgA4SAuykBoVXHNc+dw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-637-92w0yqHhMMecDuUxuXeo5g-1; Thu, 24 Feb 2022 07:44:22 -0500
-X-MC-Unique: 92w0yqHhMMecDuUxuXeo5g-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 579F91006AA5;
-        Thu, 24 Feb 2022 12:44:21 +0000 (UTC)
-Received: from starship (unknown [10.40.195.190])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6C9E07B8D5;
-        Thu, 24 Feb 2022 12:44:20 +0000 (UTC)
-Message-ID: <fe30474f8f601aeaf9a3ad6082f2ff27e5f64c16.camel@redhat.com>
-Subject: Re: [PATCH 0/7] My set of KVM unit tests + fixes
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     kvm@vger.kernel.org
-Date:   Thu, 24 Feb 2022 14:44:19 +0200
-In-Reply-To: <YhdnOjTFqka9zAFq@monolith.localdoman>
-References: <20220208122148.912913-1-mlevitsk@redhat.com>
-         <38346acd4f7b9cb5a38c3a1e2fba0ee01a82dc5b.camel@redhat.com>
-         <Yhdb+ptbDLNR4+xk@monolith.localdoman>
-         <5331482d6079448544d01e6745907e66d0402705.camel@redhat.com>
-         <YhdnOjTFqka9zAFq@monolith.localdoman>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        with ESMTP id S232184AbiBXMtK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Feb 2022 07:49:10 -0500
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0FF41D8AA1
+        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 04:48:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=Sender:Content-Transfer-Encoding:
+        Content-Type:MIME-Version:Message-Id:Date:Subject:Cc:To:From:Reply-To:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=FKZviunFbFF99AL1erQXB92t53XqZFsK0IHWzyOGzzU=; b=nxZCKlRJIS/NQ0jhM6CpNJzpXA
+        eX72U8SubS/ToCrOQUpLjDshBFHSKJGGooAxmQpNvF+hkqyeGtOJh7muKE39AFsBqRfNMBSwY4WbR
+        xgtsbPQuQILUK8veSyLAwWYP8/FFC+eQ/m02CgJtXVhg0V4ceKXQ8VrvRx/e8np/jAzTTdwR7dzic
+        PWsW5M3tdCmlmeHKbb5JSHhqo0l3Ea4Gz3WPn9CBs3oWYlumQfow4CaeKBLXQS/44iyFzmYdSaq+v
+        KCp7H3rnMvY9PqY22wF+AeSmZHhGZwE4uZuKnvPBLypUFWyV+q7FM2y4Skeu9WWAL27NPQU6/y+7i
+        2ynvOBww==;
+Received: from [2001:8b0:10b:1:85c4:81a:fb42:714d] (helo=i7.infradead.org)
+        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nNDXk-00CcPo-Hl; Thu, 24 Feb 2022 12:48:24 +0000
+Received: from dwoodhou by i7.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nNDXj-0000tt-CG; Thu, 24 Feb 2022 12:48:23 +0000
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Metin Kaya <metikaya@amazon.co.uk>,
+        Paul Durrant <pdurrant@amazon.co.uk>
+Subject: [PATCH v1 00/16] KVM: Add Xen event channel acceleration
+Date:   Thu, 24 Feb 2022 12:48:03 +0000
+Message-Id: <20220224124819.3315-1-dwmw2@infradead.org>
+X-Mailer: git-send-email 2.33.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Sender: David Woodhouse <dwmw2@infradead.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2022-02-24 at 11:08 +0000, Alexandru Elisei wrote:
-> Hi,
-> 
-> On Thu, Feb 24, 2022 at 01:00:28PM +0200, Maxim Levitsky wrote:
-> > On Thu, 2022-02-24 at 10:20 +0000, Alexandru Elisei wrote:
-> > > Hi,
-> > > 
-> > > On Wed, Feb 23, 2022 at 02:03:54PM +0200, Maxim Levitsky wrote:
-> > > > On Tue, 2022-02-08 at 14:21 +0200, Maxim Levitsky wrote:
-> > > > > Those are few kvm unit tests tha I developed.
-> > > > > 
-> > > > > Best regards,
-> > > > >     Maxim Levitsky
-> > > > > 
-> > > > > Maxim Levitsky (7):
-> > > > >   pmu_lbr: few fixes
-> > > > >   svm: Fix reg_corruption test, to avoid timer interrupt firing in later
-> > > > >     tests.
-> > > > >   svm: NMI is an "exception" and not interrupt in x86 land
-> > > > >   svm: intercept shutdown in all svm tests by default
-> > > > >   svm: add SVM_BARE_VMRUN
-> > > > >   svm: add tests for LBR virtualization
-> > > > >   svm: add tests for case when L1 intercepts various hardware interrupts
-> > > > >     (an interrupt, SMI, NMI), but lets L2 control either EFLAG.IF or GIF
-> > > > > 
-> > > > >  lib/x86/processor.h |   1 +
-> > > > >  x86/pmu_lbr.c       |   6 +
-> > > > >  x86/svm.c           |  41 +---
-> > > > >  x86/svm.h           |  63 ++++++-
-> > > > >  x86/svm_tests.c     | 447 +++++++++++++++++++++++++++++++++++++++++++-
-> > > > >  x86/unittests.cfg   |   3 +-
-> > > > >  6 files changed, 521 insertions(+), 40 deletions(-)
-> > > > > 
-> > > > > -- 
-> > > > > 2.26.3
-> > > > > 
-> > > > > 
-> > > > Any update on these patches?
-> > > 
-> > > It is possible that because you haven't sent the patches to the x86
-> > > maintainer (as per the MAINTAINERS file), this series has gone unnoticed.
-> > > Also, each patch should start with "kvm-unit-tests PATCH" (have a look at
-> > > the README file), so people can easily tell them apart from KVM patches,
-> > > which go to the same mailing list.
-> > Do kvm-unit tests have MAINTAINERS file? Those patches are not for the kernel
-> > but for the kvm-unit test project.
-> 
-> A simple ls should be sufficient [1] to answer that question.
-> 
-> [1] https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/blob/master/MAINTAINERS
 
-I am blind. just that. I checked it and haven't seen the file. Now I see it of course.
+This series adds event channel acceleration for Xen guests. In particular
+it allows guest vCPUs to send each other IPIs without having to bounce
+all the way out to the userspace VMM in order to do so. Likewise, the
+Xen singleshot timer is added, and a version of SCHEDOP_poll. Those
+major features are based on Joao and Boris' patches from 2019.
 
-Best regards,
-	Maixm Levitsky
+Cleaning up the event delivery into the vcpu_info involved using the new
+gfn_to_pfn_cache for that, and that means I ended up doing so for *all*
+the places the guest can have a pvclock. There's a slight wart there,
+in that we now need to explicitly *clear* the dirty flag in the cache
+in kvm_xen_destroy_vcpu() to prevent the page being marked dirty from
+that context when there's no active vCPU — otherwise it would trigger
+the warning I added in commit 2efd61a608. That's actually OK for the
+Xen case since the VMM will always know where the regions are and it's
+reasonable to declare that they should be considered 'always dirty'.
 
-> 
-> Thanks,
-> Alex
-> 
-> > > You could try resending the entire series to the x86 mailing list and to
-> > > the relevant maintainers. To resend them, the convention is to modify the
-> > > subject prefix to "kvm-unit-tests PATCH RESEND" and send them without any
-> > > changes (though you can mention in the cover letter why you resent the
-> > > series).
-> > Thank you, I missed the prefix to be used!
-> > 
-> > > Hope this helps!
-> > > 
-> > > Thanks,
-> > > Alex
-> > 
-> > Thanks!
-> > Best regards,
-> > 	Maxim Levitsky
-> > 
-> > > > Best regards,
-> > > > 	Maxim Levitsky
-> > > > 
+I want to give that deferred dirty marking a little more thought for
+the general case of the gfn_to_pfn_cache though.
+
+Changes since my 'v0' proof-of-concept series to invite early heckling:
+ • Drop the runstate fix which is merged now.
+ • Add Sean's gfn_to_pfn_cache API change at the start of the series.
+ • Add KVM self tests
+ • Minor bug fixes
+
+Boris Ostrovsky (1):
+      KVM: x86/xen: handle PV spinlocks slowpath
+
+David Woodhouse (11):
+      KVM: x86/xen: Use gfn_to_pfn_cache for runstate area
+      KVM: x86: Use gfn_to_pfn_cache for pv_time
+      KVM: x86/xen: Use gfn_to_pfn_cache for vcpu_info
+      KVM: x86/xen: Use gfn_to_pfn_cache for vcpu_time_info
+      KVM: x86/xen: Make kvm_xen_set_evtchn() reusable from other places
+      KVM: x86/xen: Support direct injection of event channel events
+      KVM: x86/xen: Add KVM_XEN_VCPU_ATTR_TYPE_VCPU_ID
+      KVM: x86/xen: Kernel acceleration for XENVER_version
+      KVM: x86/xen: Support per-vCPU event channel upcall via local APIC
+      KVM: x86/xen: Advertise and document KVM_XEN_HVM_CONFIG_EVTCHN_SEND
+      KVM: x86/xen: Add self tests for KVM_XEN_HVM_CONFIG_EVTCHN_SEND
+
+Joao Martins (3):
+      KVM: x86/xen: intercept EVTCHNOP_send from guests
+      KVM: x86/xen: handle PV IPI vcpu yield
+      KVM: x86/xen: handle PV timers oneshot mode
+
+Sean Christopherson (1):
+      KVM: Use enum to track if cached PFN will be used in guest and/or host
+
+ Documentation/virt/kvm/api.rst                     |  129 +-
+ arch/x86/include/asm/kvm_host.h                    |   23 +-
+ arch/x86/kvm/irq.c                                 |   11 +-
+ arch/x86/kvm/irq_comm.c                            |    2 +-
+ arch/x86/kvm/x86.c                                 |  123 +-
+ arch/x86/kvm/xen.c                                 | 1257 ++++++++++++++++----
+ arch/x86/kvm/xen.h                                 |   69 +-
+ include/linux/kvm_host.h                           |   14 +-
+ include/linux/kvm_types.h                          |   10 +-
+ include/uapi/linux/kvm.h                           |   43 +
+ .../testing/selftests/kvm/x86_64/xen_shinfo_test.c |  340 +++++-
+ virt/kvm/pfncache.c                                |   14 +-
+ 12 files changed, 1700 insertions(+), 335 deletions(-)
+
 
 
