@@ -2,129 +2,767 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EEDFE4C2FB6
-	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 16:31:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 230E54C3001
+	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 16:39:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236317AbiBXPbV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Feb 2022 10:31:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56008 "EHLO
+        id S236451AbiBXPjb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Feb 2022 10:39:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43380 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236083AbiBXPbS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Feb 2022 10:31:18 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D58981BE4DB
-        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 07:30:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645716648;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=RJzT5R2+qTnMTOL3dSUfnZD5h7THBicjns5fjqjW5sY=;
-        b=el7pADM6wfcCeabf06jAwhivGwNAp64iadaZ9vy3e27zoaxbDlxp/YJEBjrSPRDYd8JDnW
-        XcUbQEdALagDldl7axsjoAQp5B3iiAHsYKdBEDdO77LYN+oH5IqMSCaMKD/HWTxyIrihcY
-        gvkfM3KlLvp2HOyt7wM4m1MLVDR9GlY=
-Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com
- [209.85.161.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-614-XsmRXhM0PAa-YR5ShumdJA-1; Thu, 24 Feb 2022 10:30:46 -0500
-X-MC-Unique: XsmRXhM0PAa-YR5ShumdJA-1
-Received: by mail-oo1-f72.google.com with SMTP id t26-20020a4ac89a000000b0031c5daeddb4so1554735ooq.3
-        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 07:30:46 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=RJzT5R2+qTnMTOL3dSUfnZD5h7THBicjns5fjqjW5sY=;
-        b=1D2dNk9fOC7l9UJB/U5+7wh8Ma/7z22fGvq9DBfBSPuyyA3MI7Sh5aGAedUFQ4hmGG
-         mMV6Kjp3VGJuYyfXaS1vSzc44EHctVlsF5YfvkMaKoMiPS9CeJrIHVjs2/85m4f8uSgh
-         OSAYJkuk4VJJK4kCYIWkSBOfaKBsY9sKSZ7rMwcpI/yXrriKo07RkgjGFWE3/uGogIrw
-         GqZ5rtFEOiWSlE+cVH5FldG66qkO4zUR9dVo95euCqcco2pUKLyr85JUp3Uc3rcjp78l
-         emhkQPt8nUbreocoN5hthJgXAw2aa5ucSD+KrlZHtRQjIqUHe6KTacsIGvpd1VN6RamA
-         NbSA==
-X-Gm-Message-State: AOAM530gpkmHl6EvIOAMBy+vSU3rUELQHM7tHHtnnVwDE2XTfmaeOkrN
-        0dYPO3LE5kt/R5zovBhJvorzO5Tma3jb/wEVDJiKC/RCcvTHIhaDldDckKCaFddMT5xhP7lDMVx
-        RENcaqjQR6V6p
-X-Received: by 2002:a05:6870:b003:b0:d1:3804:aee2 with SMTP id y3-20020a056870b00300b000d13804aee2mr1344443oae.155.1645716646039;
-        Thu, 24 Feb 2022 07:30:46 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxBicBa9cJ+9uSgbNGbZumW0vECl9F0er2MvXCpgRtdNzkLfhNS/BI1vN3rWb41+5hRT9N5dw==
-X-Received: by 2002:a05:6870:b003:b0:d1:3804:aee2 with SMTP id y3-20020a056870b00300b000d13804aee2mr1344428oae.155.1645716645727;
-        Thu, 24 Feb 2022 07:30:45 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id f14sm1341562otq.11.2022.02.24.07.30.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Feb 2022 07:30:45 -0800 (PST)
-Date:   Thu, 24 Feb 2022 08:30:42 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
-        jgg@nvidia.com, saeedm@nvidia.com, linux-pci@vger.kernel.org,
-        kvm@vger.kernel.org, netdev@vger.kernel.org, kuba@kernel.org,
-        leonro@nvidia.com, kwankhede@nvidia.com, mgurtovoy@nvidia.com,
-        maorg@nvidia.com, ashok.raj@intel.com, kevin.tian@intel.com,
-        shameerali.kolothum.thodi@huawei.com
-Subject: Re: [PATCH V9 mlx5-next 10/15] vfio: Extend the device migration
- protocol with RUNNING_P2P
-Message-ID: <20220224083042.3f5ad059.alex.williamson@redhat.com>
-In-Reply-To: <87fso870k8.fsf@redhat.com>
-References: <20220224142024.147653-1-yishaih@nvidia.com>
-        <20220224142024.147653-11-yishaih@nvidia.com>
-        <87fso870k8.fsf@redhat.com>
-Organization: Red Hat
+        with ESMTP id S231948AbiBXPja (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Feb 2022 10:39:30 -0500
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E5FFE230E40
+        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 07:38:58 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AC9B4ED1;
+        Thu, 24 Feb 2022 07:38:58 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3251D3F66F;
+        Thu, 24 Feb 2022 07:38:55 -0800 (PST)
+Date:   Thu, 24 Feb 2022 15:39:16 +0000
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Haibo Xu <haibo.xu@linaro.org>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        "Russell King (Oracle)" <linux@armlinux.org.uk>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        karl.heubaum@oracle.com, mihai.carabas@oracle.com,
+        miguel.luis@oracle.com, kernel-team@android.com
+Subject: Re: [PATCH v6 40/64] KVM: arm64: nv: Trap and emulate AT
+ instructions from virtual EL2
+Message-ID: <YhempGMELe7Zi2kC@monolith.localdoman>
+References: <20220128121912.509006-1-maz@kernel.org>
+ <20220128121912.509006-41-maz@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220128121912.509006-41-maz@kernel.org>
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 24 Feb 2022 16:21:11 +0100
-Cornelia Huck <cohuck@redhat.com> wrote:
+Hi,
 
-> On Thu, Feb 24 2022, Yishai Hadas <yishaih@nvidia.com> wrote:
+On Fri, Jan 28, 2022 at 12:18:48PM +0000, Marc Zyngier wrote:
+> From: Jintack Lim <jintack.lim@linaro.org>
 > 
-> > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> > index 22ed358c04c5..26a66f68371d 100644
-> > --- a/include/uapi/linux/vfio.h
-> > +++ b/include/uapi/linux/vfio.h
-> > @@ -1011,10 +1011,16 @@ struct vfio_device_feature {
-> >   *
-> >   * VFIO_MIGRATION_STOP_COPY means that STOP, STOP_COPY and
-> >   * RESUMING are supported.
-> > + *
-> > + * VFIO_MIGRATION_STOP_COPY | VFIO_MIGRATION_P2P means that RUNNING_P2P
-> > + * is supported in addition to the STOP_COPY states.
-> > + *
-> > + * Other combinations of flags have behavior to be defined in the future.
-> >   */
-> >  struct vfio_device_feature_migration {
-> >  	__aligned_u64 flags;
-> >  #define VFIO_MIGRATION_STOP_COPY	(1 << 0)
-> > +#define VFIO_MIGRATION_P2P		(1 << 1)
-> >  };  
+> When supporting nested virtualization a guest hypervisor executing AT
+> instructions must be trapped and emulated by the host hypervisor,
+> because untrapped AT instructions operating on S1E1 will use the wrong
+> translation regieme (the one used to emulate virtual EL2 in EL1 instead
+
+s/regieme/regime/
+
+> of virtual EL1) and AT instructions operating on S12 will not work from
+> EL1.
 > 
-> Coming back to my argument (for the previous series) that this should
-> rather be "at least one of the flags below must be set". If we operate
-> under the general assumption that each flag indicates that a certain
-> functionality (including some states) is supported, and that flags may
-> depend on other flags, we might have a future flag that defines a
-> different behaviour, but does not depend on STOP_COPY, but rather
-> conflicts with it. We should not create the impression that STOP_COPY
-> will neccessarily be mandatory for all time.
+> This patch does several things.
 
-This sounds more like an enum than a bitfield.  What happens when
-VFIO_MIGRATION_FOO is defined that can be combined with either
-STOP_COPY or P2P, do we then add two new enum values, one with, one
-without?  Using a bitfield seems cleaner here.  Reporting P2P alone is
-invalid because it doesn't provide a sufficient FSM, but we might also
-later define STOP_COPYv2 and possibly it might be compatible with the
-existing P2P definition.  Thanks,
+I think this is a good hint that the patch can be split into several
+patches. The size of the patch plus the emulation logic  make this
+patch rather tedious to review.
 
+> 
+> 1. List and define all AT system instructions to emulate and document
+> the emulation design.
+> 
+> 2. Implement AT instruction handling logic in EL2. This will be used to
+> emulate AT instructions executed in the virtual EL2.
+> 
+> AT instruction emulation works by loading the proper processor
+> context, which depends on the trapped instruction and the virtual
+> HCR_EL2, to the EL1 virtual memory control registers and executing AT
+> instructions. Note that ctxt->hw_sys_regs is expected to have the
+> proper processor context before calling the handling
+> function(__kvm_at_insn) implemented in this patch.
+> 
+> 4. Emulate AT S1E[01] instructions by issuing the same instructions in
+
+Hmm... where's point number 3?
+
+> EL2. We set the physical EL1 registers, NV and NV1 bits as described in
+> the AT instruction emulation overview.
+> 
+> 5. Emulate AT A12E[01] instructions in two steps: First, do the stage-1
+                ^
+I'm guessing that's AT S12E[01].
+
+> translation by reusing the existing AT emulation functions.  Second, do
+> the stage-2 translation by walking the guest hypervisor's stage-2 page
+> table in software. Record the translation result to PAR_EL1.
+> 
+> 6. Emulate AT S1E2 instructions by issuing the corresponding S1E1
+> instructions in EL2. We set the physical EL1 registers and the HCR_EL2
+> register as described in the AT instruction emulation overview.
+> 
+> 7. Forward system instruction traps to the virtual EL2 if the corresponding
+> virtual AT bit is set in the virtual HCR_EL2.
+
+Looks like points 4-7 make good canditates for individual patches.
+
+> 
+>   [ Much logic above has been reworked by Marc Zyngier ]
+> 
+> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+> ---
+>  arch/arm64/include/asm/kvm_arm.h |   2 +
+>  arch/arm64/include/asm/kvm_asm.h |   2 +
+>  arch/arm64/include/asm/sysreg.h  |  17 +++
+>  arch/arm64/kvm/Makefile          |   2 +-
+>  arch/arm64/kvm/at.c              | 219 +++++++++++++++++++++++++++++
+>  arch/arm64/kvm/hyp/vhe/switch.c  |  13 +-
+>  arch/arm64/kvm/sys_regs.c        | 229 ++++++++++++++++++++++++++++++-
+>  7 files changed, 478 insertions(+), 6 deletions(-)
+>  create mode 100644 arch/arm64/kvm/at.c
+> 
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> index 3675879b53c6..aa3bdce1b166 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -20,6 +20,7 @@
+>  #define HCR_AMVOFFEN	(UL(1) << 51)
+>  #define HCR_FIEN	(UL(1) << 47)
+>  #define HCR_FWB		(UL(1) << 46)
+> +#define HCR_AT		(UL(1) << 44)
+>  #define HCR_NV1		(UL(1) << 43)
+>  #define HCR_NV		(UL(1) << 42)
+>  #define HCR_API		(UL(1) << 41)
+> @@ -118,6 +119,7 @@
+>  #define VTCR_EL2_TG0_16K	TCR_TG0_16K
+>  #define VTCR_EL2_TG0_64K	TCR_TG0_64K
+>  #define VTCR_EL2_SH0_MASK	TCR_SH0_MASK
+> +#define VTCR_EL2_SH0_SHIFT	TCR_SH0_SHIFT
+>  #define VTCR_EL2_SH0_INNER	TCR_SH0_INNER
+>  #define VTCR_EL2_ORGN0_MASK	TCR_ORGN0_MASK
+>  #define VTCR_EL2_ORGN0_WBWA	TCR_ORGN0_WBWA
+> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> index d5b0386ef765..e22861ece3c3 100644
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> @@ -208,6 +208,8 @@ extern void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa,
+>  extern void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu);
+>  
+>  extern void __kvm_timer_set_cntvoff(u64 cntvoff);
+> +extern void __kvm_at_s1e01(struct kvm_vcpu *vcpu, u32 op, u64 vaddr);
+> +extern void __kvm_at_s1e2(struct kvm_vcpu *vcpu, u32 op, u64 vaddr);
+>  
+>  extern int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
+>  
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index 61c990e5591a..ea17d1eabfc5 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -658,6 +658,23 @@
+>  
+>  #define SYS_SP_EL2			sys_reg(3, 6,  4, 1, 0)
+>  
+> +/* AT instructions */
+> +#define AT_Op0 1
+> +#define AT_CRn 7
+> +
+> +#define OP_AT_S1E1R	sys_insn(AT_Op0, 0, AT_CRn, 8, 0)
+> +#define OP_AT_S1E1W	sys_insn(AT_Op0, 0, AT_CRn, 8, 1)
+> +#define OP_AT_S1E0R	sys_insn(AT_Op0, 0, AT_CRn, 8, 2)
+> +#define OP_AT_S1E0W	sys_insn(AT_Op0, 0, AT_CRn, 8, 3)
+> +#define OP_AT_S1E1RP	sys_insn(AT_Op0, 0, AT_CRn, 9, 0)
+> +#define OP_AT_S1E1WP	sys_insn(AT_Op0, 0, AT_CRn, 9, 1)
+> +#define OP_AT_S1E2R	sys_insn(AT_Op0, 4, AT_CRn, 8, 0)
+> +#define OP_AT_S1E2W	sys_insn(AT_Op0, 4, AT_CRn, 8, 1)
+> +#define OP_AT_S12E1R	sys_insn(AT_Op0, 4, AT_CRn, 8, 4)
+> +#define OP_AT_S12E1W	sys_insn(AT_Op0, 4, AT_CRn, 8, 5)
+> +#define OP_AT_S12E0R	sys_insn(AT_Op0, 4, AT_CRn, 8, 6)
+> +#define OP_AT_S12E0W	sys_insn(AT_Op0, 4, AT_CRn, 8, 7)
+> +
+>  /* Common SCTLR_ELx flags. */
+>  #define SCTLR_ELx_DSSBS	(BIT(44))
+>  #define SCTLR_ELx_ATA	(BIT(43))
+> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> index dbaf42ff65f1..b800dcbd157f 100644
+> --- a/arch/arm64/kvm/Makefile
+> +++ b/arch/arm64/kvm/Makefile
+> @@ -14,7 +14,7 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
+>  	 inject_fault.o va_layout.o handle_exit.o \
+>  	 guest.o debug.o reset.o sys_regs.o \
+>  	 vgic-sys-reg-v3.o fpsimd.o pmu.o pkvm.o \
+> -	 arch_timer.o trng.o emulate-nested.o nested.o \
+> +	 arch_timer.o trng.o emulate-nested.o nested.o at.o \
+>  	 vgic/vgic.o vgic/vgic-init.o \
+>  	 vgic/vgic-irqfd.o vgic/vgic-v2.o \
+>  	 vgic/vgic-v3.o vgic/vgic-v4.o \
+> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+> new file mode 100644
+> index 000000000000..574c664e984b
+> --- /dev/null
+> +++ b/arch/arm64/kvm/at.c
+> @@ -0,0 +1,219 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (C) 2017 - Linaro Ltd
+> + * Author: Jintack Lim <jintack.lim@linaro.org>
+> + */
+> +
+> +#include <asm/kvm_hyp.h>
+> +#include <asm/kvm_mmu.h>
+> +
+> +struct mmu_config {
+> +	u64	ttbr0;
+> +	u64	ttbr1;
+> +	u64	tcr;
+> +	u64	sctlr;
+> +	u64	vttbr;
+> +	u64	vtcr;
+> +	u64	hcr;
+> +};
+> +
+> +static void __mmu_config_save(struct mmu_config *config)
+> +{
+> +	config->ttbr0	= read_sysreg_el1(SYS_TTBR0);
+> +	config->ttbr1	= read_sysreg_el1(SYS_TTBR1);
+> +	config->tcr	= read_sysreg_el1(SYS_TCR);
+> +	config->sctlr	= read_sysreg_el1(SYS_SCTLR);
+> +	config->vttbr	= read_sysreg(vttbr_el2);
+> +	config->vtcr	= read_sysreg(vtcr_el2);
+
+KVM saves VTCR_EL2, but the register is never changed between
+__mmu_config_{save,restore} sequences. Another comment about this below.
+
+> +	config->hcr	= read_sysreg(hcr_el2);
+> +}
+> +
+> +static void __mmu_config_restore(struct mmu_config *config)
+> +{
+> +	write_sysreg_el1(config->ttbr0,	SYS_TTBR0);
+> +	write_sysreg_el1(config->ttbr1,	SYS_TTBR1);
+> +	write_sysreg_el1(config->tcr,	SYS_TCR);
+> +	write_sysreg_el1(config->sctlr,	SYS_SCTLR);
+> +	write_sysreg(config->vttbr,	vttbr_el2);
+> +	write_sysreg(config->vtcr,	vtcr_el2);
+> +	write_sysreg(config->hcr,	hcr_el2);
+> +
+> +	isb();
+> +}
+> +
+> +void __kvm_at_s1e01(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+> +{
+> +	struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
+> +	struct mmu_config config;
+> +	struct kvm_s2_mmu *mmu;
+> +
+> +	spin_lock(&vcpu->kvm->mmu_lock);
+> +
+> +	/*
+> +	 * If HCR_EL2.{E2H,TGE} == {1,1}, the MMU context is already
+> +	 * the right one (as we trapped from vEL2).
+> +	 */
+> +	if (vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu))
+> +		goto skip_mmu_switch;
+> +
+> +	/*
+> +	 * FIXME: Obtaining the S2 MMU for a guest guest is horribly
+> +	 * racy, and we may not find it (evicted by another vcpu, for
+> +	 * example).
+> +	 */
+
+I think the "horribly racy" part deserves some elaboration. As far as I can tell
+get_s2_mmu_nested() and lookup_s2_mmu() is always called with kvm->mmu_lock
+held.
+
+I suppose "evicted by another vcpu" means that get_s2_mmu_nested() decided
+to reuse the MMU that KVM needs, in which case it's impossible to execute
+the AT instruction, as there is no shadow stage 2 for the context.
+
+I wonder if that's something that KVM should try to avoid, One obvious
+solution would be never to reuse MMUs, but that comes at the cost of
+allowing a L1 guest to eat up the L0 host's memory with kvm_s2_mmu structs
+by creating many L2 guests.
+
+Another solution would be to have a software stage 1 translation table
+walker which populates the shadow S2 during the walk, if and only if the
+IPA is present in the virtual stage 2 with the right permissions.
+
+What do you think?
+
+> +	mmu = lookup_s2_mmu(vcpu->kvm,
+> +			    vcpu_read_sys_reg(vcpu, VTTBR_EL2),
+> +			    vcpu_read_sys_reg(vcpu, HCR_EL2));
+> +
+> +	if (WARN_ON(!mmu))
+> +		goto out;
+
+If I'm not mistaken, in this case, guest PAR_EL1 is left untouched by KVM.
+Shouldn't KVM set PAR_EL1 to SYS_PAR_EL1_F so the L1 guest doesn't treat
+the stale PAR_EL1 value as valid?
+
+> +
+> +	/* We've trapped, so everything is live on the CPU. */
+> +	__mmu_config_save(&config);
+> +
+> +	write_sysreg_el1(ctxt_sys_reg(ctxt, TTBR0_EL1),	SYS_TTBR0);
+> +	write_sysreg_el1(ctxt_sys_reg(ctxt, TTBR1_EL1),	SYS_TTBR1);
+> +	write_sysreg_el1(ctxt_sys_reg(ctxt, TCR_EL1),	SYS_TCR);
+> +	write_sysreg_el1(ctxt_sys_reg(ctxt, SCTLR_EL1),	SYS_SCTLR);
+> +	write_sysreg(kvm_get_vttbr(mmu),		vttbr_el2);
+> +	/*
+> +	 * REVISIT: do we need anything from the guest's VTCR_EL2? If
+> +	 * looks like keeping the hosts configuration is the right
+> +	 * thing to do at this stage (and we could avoid save/restore
+> +	 * it. Keep the host's version for now.
+> +	 */
+
+I also don't think it's necessary to load the L1 guest's VTCR_EL2 register.
+The register controls virtual stage 2, which is never used because KVM will
+always use the shadow stage 2.
+
+> +	write_sysreg((config.hcr & ~HCR_TGE) | HCR_VM,	hcr_el2);
+> +
+> +	isb();
+> +
+> +skip_mmu_switch:
+> +
+> +	switch (op) {
+> +	case OP_AT_S1E1R:
+> +	case OP_AT_S1E1RP:
+> +		asm volatile("at s1e1r, %0" : : "r" (vaddr));
+> +		break;
+> +	case OP_AT_S1E1W:
+> +	case OP_AT_S1E1WP:
+> +		asm volatile("at s1e1w, %0" : : "r" (vaddr));
+> +		break;
+> +	case OP_AT_S1E0R:
+> +		asm volatile("at s1e0r, %0" : : "r" (vaddr));
+> +		break;
+> +	case OP_AT_S1E0W:
+> +		asm volatile("at s1e0w, %0" : : "r" (vaddr));
+> +		break;
+> +	default:
+> +		WARN_ON_ONCE(1);
+> +		break;
+> +	}
+> +
+> +	isb();
+> +
+> +	ctxt_sys_reg(ctxt, PAR_EL1) = read_sysreg(par_el1);
+> +
+> +	/*
+> +	 * Failed? let's leave the building now.
+> +	 *
+> +	 * FIXME: how about a failed translation because the shadow S2
+> +	 * wasn't populated? We may need to perform a SW PTW,
+> +	 * populating our shadow S2 and retry the instruction.
+> +	 */
+> +	if (ctxt_sys_reg(ctxt, PAR_EL1) & 1)
+> +		goto nopan;
+> +
+> +	/* No PAN? No problem. */
+> +	if (!(*vcpu_cpsr(vcpu) & PSR_PAN_BIT))
+> +		goto nopan;
+> +
+> +	/*
+> +	 * For PAN-involved AT operations, perform the same
+> +	 * translation, using EL0 this time.
+> +	 */
+
+The description for FEAT_PAN is:
+
+"When the value of this PAN state bit is 1, any privileged data access from
+EL1, or EL2 when HCR_EL2.E2H is 1, to a virtual memory address that is
+accessible to data accesses at EL0, generates a Permission fault."
+
+I assume KVM executes the AT to make sure there is a valid translation
+translation for the guest virtual address, right?
+
+> +	switch (op) {
+> +	case OP_AT_S1E1RP:
+> +		asm volatile("at s1e0r, %0" : : "r" (vaddr));
+> +		break;
+> +	case OP_AT_S1E1WP:
+> +		asm volatile("at s1e0w, %0" : : "r" (vaddr));
+> +		break;
+> +	default:
+> +		goto nopan;
+> +	}
+> +
+> +	/*
+> +	 * If the EL0 translation has succeeded, we need to pretend
+> +	 * the AT operation has failed, as the PAN setting forbids
+> +	 * such a translation.
+
+Hmm.. according to the description of FEAT_PAN, the AT translation fails
+because of PAN=1 when CurrentEL=EL2 && HCR_EL2.E2H=1. So if the VCPU is at
+virtual EL2 and virtual HCR_EL2.E2H=0, then it is allowed to succeed.
+
+Thanks,
 Alex
 
+> +	 *
+> +	 * FIXME: we hardcode a Level-3 permission fault. We really
+> +	 * should return the real fault level.
+> +	 */
+> +	if (!(read_sysreg(par_el1) & 1))
+> +		ctxt_sys_reg(ctxt, PAR_EL1) = 0x1f;
+> +
+> +nopan:
+> +	if (!(vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu)))
+> +		__mmu_config_restore(&config);
+> +
+> +out:
+> +	spin_unlock(&vcpu->kvm->mmu_lock);
+> +}
+> +
+> +void __kvm_at_s1e2(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+> +{
+> +	struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
+> +	struct mmu_config config;
+> +	struct kvm_s2_mmu *mmu;
+> +	u64 val;
+> +
+> +	spin_lock(&vcpu->kvm->mmu_lock);
+> +
+> +	mmu = &vcpu->kvm->arch.mmu;
+> +
+> +	/* We've trapped, so everything is live on the CPU. */
+> +	__mmu_config_save(&config);
+> +
+> +	if (vcpu_el2_e2h_is_set(vcpu)) {
+> +		write_sysreg_el1(ctxt_sys_reg(ctxt, TTBR0_EL2),	SYS_TTBR0);
+> +		write_sysreg_el1(ctxt_sys_reg(ctxt, TTBR1_EL2),	SYS_TTBR1);
+> +		write_sysreg_el1(ctxt_sys_reg(ctxt, TCR_EL2),	SYS_TCR);
+> +		write_sysreg_el1(ctxt_sys_reg(ctxt, SCTLR_EL2),	SYS_SCTLR);
+> +
+> +		val = config.hcr;
+> +	} else {
+> +		write_sysreg_el1(ctxt_sys_reg(ctxt, TTBR0_EL2),	SYS_TTBR0);
+> +		val = translate_tcr_el2_to_tcr_el1(ctxt_sys_reg(ctxt, TCR_EL2));
+> +		write_sysreg_el1(val, SYS_TCR);
+> +		val = translate_sctlr_el2_to_sctlr_el1(ctxt_sys_reg(ctxt, SCTLR_EL2));
+> +		write_sysreg_el1(val, SYS_SCTLR);
+> +
+> +		val = config.hcr | HCR_NV | HCR_NV1;
+> +	}
+> +
+> +	write_sysreg(kvm_get_vttbr(mmu),		vttbr_el2);
+> +	/* FIXME: write S2 MMU VTCR_EL2? */
+> +	write_sysreg((val & ~HCR_TGE) | HCR_VM,		hcr_el2);
+> +
+> +	isb();
+> +
+> +	switch (op) {
+> +	case OP_AT_S1E2R:
+> +		asm volatile("at s1e1r, %0" : : "r" (vaddr));
+> +		break;
+> +	case OP_AT_S1E2W:
+> +		asm volatile("at s1e1w, %0" : : "r" (vaddr));
+> +		break;
+> +	default:
+> +		WARN_ON_ONCE(1);
+> +		break;
+> +	}
+> +
+> +	isb();
+> +
+> +	/* FIXME: handle failed translation due to shadow S2 */
+> +	ctxt_sys_reg(ctxt, PAR_EL1) = read_sysreg(par_el1);
+> +
+> +	__mmu_config_restore(&config);
+> +	spin_unlock(&vcpu->kvm->mmu_lock);
+> +}
+> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> index 28845f907cfc..b7790d3c4122 100644
+> --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> @@ -41,9 +41,10 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+>  		if (!vcpu_el2_e2h_is_set(vcpu)) {
+>  			/*
+>  			 * For a guest hypervisor on v8.0, trap and emulate
+> -			 * the EL1 virtual memory control register accesses.
+> +			 * the EL1 virtual memory control register accesses
+> +			 * as well as the AT S1 operations.
+>  			 */
+> -			hcr |= HCR_TVM | HCR_TRVM | HCR_NV1;
+> +			hcr |= HCR_TVM | HCR_TRVM | HCR_AT | HCR_NV1;
+>  		} else {
+>  			/*
+>  			 * For a guest hypervisor on v8.1 (VHE), allow to
+> @@ -68,6 +69,14 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+>  			hcr &= ~HCR_TVM;
+>  
+>  			hcr |= vhcr_el2 & (HCR_TVM | HCR_TRVM);
+> +
+> +			/*
+> +			 * If we're using the EL1 translation regime
+> +			 * (TGE clear), then ensure that AT S1 ops are
+> +			 * trapped too.
+> +			 */
+> +			if (!vcpu_el2_tge_is_set(vcpu))
+> +				hcr |= HCR_AT;
+>  		}
+>  	}
+>  
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index f669618f966b..7be57e1b7019 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1704,7 +1704,6 @@ static bool access_sp_el1(struct kvm_vcpu *vcpu,
+>  	return true;
+>  }
+>  
+> -
+>  static bool access_elr(struct kvm_vcpu *vcpu,
+>  		       struct sys_reg_params *p,
+>  		       const struct sys_reg_desc *r)
+> @@ -2236,12 +2235,236 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	EL2_REG(SP_EL2, NULL, reset_unknown, 0),
+>  };
+>  
+> -#define SYS_INSN_TO_DESC(insn, access_fn, forward_fn)	\
+> -	{ SYS_DESC((insn)), (access_fn), NULL, 0, 0, NULL, NULL, (forward_fn) }
+> +static bool handle_s1e01(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+> +			 const struct sys_reg_desc *r)
+> +{
+> +	int sys_encoding = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
+> +
+> +	if (vcpu_has_nv(vcpu) && forward_traps(vcpu, HCR_AT))
+> +		return false;
+> +
+> +	__kvm_at_s1e01(vcpu, sys_encoding, p->regval);
+> +
+> +	return true;
+> +}
+> +
+> +static bool handle_s1e2(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+> +			const struct sys_reg_desc *r)
+> +{
+> +	int sys_encoding = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
+> +
+> +	if (vcpu_has_nv(vcpu) && forward_nv_traps(vcpu))
+> +		return false;
+> +
+> +	__kvm_at_s1e2(vcpu, sys_encoding, p->regval);
+> +
+> +	return true;
+> +}
+> +
+> +static u64 setup_par_aborted(u32 esr)
+> +{
+> +	u64 par = 0;
+> +
+> +	/* S [9]: fault in the stage 2 translation */
+> +	par |= (1 << 9);
+> +	/* FST [6:1]: Fault status code  */
+> +	par |= (esr << 1);
+> +	/* F [0]: translation is aborted */
+> +	par |= 1;
+> +
+> +	return par;
+> +}
+> +
+> +static u64 setup_par_completed(struct kvm_vcpu *vcpu, struct kvm_s2_trans *out)
+> +{
+> +	u64 par, vtcr_sh0;
+> +
+> +	/* F [0]: Translation is completed successfully */
+> +	par = 0;
+> +	/* ATTR [63:56] */
+> +	par |= out->upper_attr;
+> +	/* PA [47:12] */
+> +	par |= out->output & GENMASK_ULL(11, 0);
+> +	/* RES1 [11] */
+> +	par |= (1UL << 11);
+> +	/* SH [8:7]: Shareability attribute */
+> +	vtcr_sh0 = vcpu_read_sys_reg(vcpu, VTCR_EL2) & VTCR_EL2_SH0_MASK;
+> +	par |= (vtcr_sh0 >> VTCR_EL2_SH0_SHIFT) << 7;
+> +
+> +	return par;
+> +}
+> +
+> +static bool handle_s12(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+> +		       const struct sys_reg_desc *r, bool write)
+> +{
+> +	u64 par, va;
+> +	u32 esr, op;
+> +	phys_addr_t ipa;
+> +	struct kvm_s2_trans out;
+> +	int ret;
+> +
+> +	if (vcpu_has_nv(vcpu) && forward_nv_traps(vcpu))
+> +		return false;
+> +
+> +	/* Do the stage-1 translation */
+> +	va = p->regval;
+> +	op = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
+> +	switch (op) {
+> +	case OP_AT_S12E1R:
+> +		op = OP_AT_S1E1R;
+> +		break;
+> +	case OP_AT_S12E1W:
+> +		op = OP_AT_S1E1W;
+> +		break;
+> +	case OP_AT_S12E0R:
+> +		op = OP_AT_S1E0R;
+> +		break;
+> +	case OP_AT_S12E0W:
+> +		op = OP_AT_S1E0W;
+> +		break;
+> +	default:
+> +		WARN_ON_ONCE(1);
+> +		return true;
+> +	}
+> +
+> +	__kvm_at_s1e01(vcpu, op, va);
+> +	par = vcpu_read_sys_reg(vcpu, PAR_EL1);
+> +	if (par & 1) {
+> +		/* The stage-1 translation aborted */
+> +		return true;
+> +	}
+> +
+> +	/* Do the stage-2 translation */
+> +	ipa = (par & GENMASK_ULL(47, 12)) | (va & GENMASK_ULL(11, 0));
+> +	out.esr = 0;
+> +	ret = kvm_walk_nested_s2(vcpu, ipa, &out);
+> +	if (ret < 0)
+> +		return false;
+> +
+> +	/* Check if the stage-2 PTW is aborted */
+> +	if (out.esr) {
+> +		esr = out.esr;
+> +		goto s2_trans_abort;
+> +	}
+> +
+> +	/* Check the access permission */
+> +	if ((!write && !out.readable) || (write && !out.writable)) {
+> +		esr = ESR_ELx_FSC_PERM;
+> +		esr |= out.level & 0x3;
+> +		goto s2_trans_abort;
+> +	}
+> +
+> +	vcpu_write_sys_reg(vcpu, setup_par_completed(vcpu, &out), PAR_EL1);
+> +	return true;
+> +
+> +s2_trans_abort:
+> +	vcpu_write_sys_reg(vcpu, setup_par_aborted(esr), PAR_EL1);
+> +	return true;
+> +}
+> +
+> +static bool handle_s12r(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+> +			const struct sys_reg_desc *r)
+> +{
+> +	return handle_s12(vcpu, p, r, false);
+> +}
+> +
+> +static bool handle_s12w(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+> +			const struct sys_reg_desc *r)
+> +{
+> +	return handle_s12(vcpu, p, r, true);
+> +}
+> +
+> +/*
+> + * AT instruction emulation
+> + *
+> + * We emulate AT instructions executed in the virtual EL2.
+> + * Basic strategy for the stage-1 translation emulation is to load proper
+> + * context, which depends on the trapped instruction and the virtual HCR_EL2,
+> + * to the EL1 virtual memory control registers and execute S1E[01] instructions
+> + * in EL2. See below for more detail.
+> + *
+> + * For the stage-2 translation, which is necessary for S12E[01] emulation,
+> + * we walk the guest hypervisor's stage-2 page table in software.
+> + *
+> + * The stage-1 translation emulations can be divided into two groups depending
+> + * on the translation regime.
+> + *
+> + * 1. EL2 AT instructions: S1E2x
+> + * +-----------------------------------------------------------------------+
+> + * |                             |         Setting for the emulation       |
+> + * | Virtual HCR_EL2.E2H on trap |-----------------------------------------+
+> + * |                             | Phys EL1 regs | Phys NV, NV1 | Phys TGE |
+> + * |-----------------------------------------------------------------------|
+> + * |             0               |     vEL2      |    (1, 1)    |    0     |
+> + * |             1               |     vEL2      |    (0, 0)    |    0     |
+> + * +-----------------------------------------------------------------------+
+> + *
+> + * We emulate the EL2 AT instructions by loading virtual EL2 context
+> + * to the EL1 virtual memory control registers and executing corresponding
+> + * EL1 AT instructions.
+> + *
+> + * We set physical NV and NV1 bits to use EL2 page table format for non-VHE
+> + * guest hypervisor (i.e. HCR_EL2.E2H == 0). As a VHE guest hypervisor uses the
+> + * EL1 page table format, we don't set those bits.
+> + *
+> + * We should clear physical TGE bit not to use the EL2 translation regime when
+> + * the host uses the VHE feature.
+> + *
+> + *
+> + * 2. EL0/EL1 AT instructions: S1E[01]x, S12E1x
+> + * +----------------------------------------------------------------------+
+> + * |   Virtual HCR_EL2 on trap  |        Setting for the emulation        |
+> + * |----------------------------------------------------------------------+
+> + * | (vE2H, vTGE) | (vNV, vNV1) | Phys EL1 regs | Phys NV, NV1 | Phys TGE |
+> + * |----------------------------------------------------------------------|
+> + * |    (0, 0)*   |   (0, 0)    |      vEL1     |    (0, 0)    |    0     |
+> + * |    (0, 0)    |   (1, 1)    |      vEL1     |    (1, 1)    |    0     |
+> + * |    (1, 1)    |   (0, 0)    |      vEL2     |    (0, 0)    |    0     |
+> + * |    (1, 1)    |   (1, 1)    |      vEL2     |    (1, 1)    |    0     |
+> + * +----------------------------------------------------------------------+
+> + *
+> + * *For (0, 0) in the 'Virtual HCR_EL2 on trap' column, it actually means
+> + *  (1, 1). Keep them (0, 0) just for the readability.
+> + *
+> + * We set physical EL1 virtual memory control registers depending on
+> + * (vE2H, vTGE) pair. When the pair is (0, 0) where AT instructions are
+> + * supposed to use EL0/EL1 translation regime, we load the EL1 registers with
+> + * the virtual EL1 registers (i.e. EL1 registers from the guest hypervisor's
+> + * point of view). When the pair is (1, 1), however, AT instructions are defined
+> + * to apply EL2 translation regime. To emulate this behavior, we load the EL1
+> + * registers with the virtual EL2 context. (i.e the shadow registers)
+> + *
+> + * We respect the virtual NV and NV1 bit for the emulation. When those bits are
+> + * set, it means that a guest hypervisor would like to use EL2 page table format
+> + * for the EL1 translation regime. We emulate this by setting the physical
+> + * NV and NV1 bits.
+> + */
+> +
+> +#define SYS_INSN(insn, access_fn)					\
+> +	{								\
+> +		SYS_DESC(OP_##insn),					\
+> +		.access = (access_fn),					\
+> +	}
+> +
+>  static struct sys_reg_desc sys_insn_descs[] = {
+>  	{ SYS_DESC(SYS_DC_ISW), access_dcsw },
+> +
+> +	SYS_INSN(AT_S1E1R, handle_s1e01),
+> +	SYS_INSN(AT_S1E1W, handle_s1e01),
+> +	SYS_INSN(AT_S1E0R, handle_s1e01),
+> +	SYS_INSN(AT_S1E0W, handle_s1e01),
+> +	SYS_INSN(AT_S1E1RP, handle_s1e01),
+> +	SYS_INSN(AT_S1E1WP, handle_s1e01),
+> +
+>  	{ SYS_DESC(SYS_DC_CSW), access_dcsw },
+>  	{ SYS_DESC(SYS_DC_CISW), access_dcsw },
+> +
+> +	SYS_INSN(AT_S1E2R, handle_s1e2),
+> +	SYS_INSN(AT_S1E2W, handle_s1e2),
+> +	SYS_INSN(AT_S12E1R, handle_s12r),
+> +	SYS_INSN(AT_S12E1W, handle_s12w),
+> +	SYS_INSN(AT_S12E0R, handle_s12r),
+> +	SYS_INSN(AT_S12E0W, handle_s12w),
+>  };
+>  
+>  static bool trap_dbgdidr(struct kvm_vcpu *vcpu,
+> -- 
+> 2.30.2
+> 
