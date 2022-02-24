@@ -2,86 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7CDC04C38C5
-	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 23:29:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 459B04C38E6
+	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 23:42:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235499AbiBXW2w (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Feb 2022 17:28:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36398 "EHLO
+        id S235642AbiBXWlx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Feb 2022 17:41:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235484AbiBXW2v (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Feb 2022 17:28:51 -0500
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E2A618FAC8
-        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 14:28:20 -0800 (PST)
-Received: by mail-pf1-x42d.google.com with SMTP id y5so3093118pfe.4
-        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 14:28:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=NF/iGcyMODxJd9hqjYLYxLcN2czTwBn1UOj2IoRGcP8=;
-        b=GhGK4UmLpNzx2+ohKdGzYdnehJPpnDtc4ZPCSQSF+XN9W52Va2beVoCqg+ww9MVBea
-         8C79LKwYirUw2PQKTDZa+obsIlomXleHgnOh0XzF/QA5ZYKkdNU55iW3alKJPn6KRNag
-         yP9DEyDvc8lVh2fp/InUTbYsKtgDXmBS+WLbDSXCj5f3hCo67bbnEb7Q+K6GbjkfSj1T
-         4lr80FFJgmYzfnWHp7VuDbodJcb6WVQiAKLLkXlm5YU1MeY3DuBSOrvkBLTOiuuVB+bt
-         0dUbvWyWGspw7LodJylb2ObAVXtY4+lP0lf3EqykK0OqMFZ0EqGq53n59njJQj3WsNuw
-         6E9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=NF/iGcyMODxJd9hqjYLYxLcN2czTwBn1UOj2IoRGcP8=;
-        b=XIx9UWboUk4reJcYtIr6+FHBPMAOdJpPY/GA8Ir8RlPv5WjAUhdsQg+LlpBX3dp/+T
-         XERnGWrGClViCxH0gdHY30+yrWSWP2spAmZzybIrUMSXkPRK2uSFBK8nRK1/CwtSpG5v
-         JGS74BWut+XMj6mONXgcC3yDj7PJHHTXJXfCKHXXvls96bmV1myGV1cksSEhmR5wlbzc
-         Rhi7/Ba9sKkLAd00fRdzxNcHxqmwE/I+R9bGK7VFwLGXrMQoVVNtnsNYEmbgZX3Jx8gg
-         RFg3gnVYfY0YDs8rB4i/tRb72g0VQ+7guAb/y0Tq6BiXpzZwdhQXnN+bv8Q5k9fdLFc1
-         ukIg==
-X-Gm-Message-State: AOAM530Qrz5+Zf0SOtZmYZFmcs9CjKliukk6q+7L2QW0+h5lnSiWREH4
-        dpmqRUL+telsF0ueGtEl25tUog==
-X-Google-Smtp-Source: ABdhPJyMIBiMPrAbg0mqyTV/P3U7UaWOv6ucsXvGaR9sjG5VuieOYn9UTIG2lHyZkX7jAqO7lSC9ng==
-X-Received: by 2002:a63:4412:0:b0:372:f29e:3108 with SMTP id r18-20020a634412000000b00372f29e3108mr3814834pga.354.1645741699770;
-        Thu, 24 Feb 2022 14:28:19 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id 16-20020a056a00073000b004dfe2217090sm455511pfm.200.2022.02.24.14.28.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Feb 2022 14:28:19 -0800 (PST)
-Date:   Thu, 24 Feb 2022 22:28:15 +0000
-From:   Sean Christopherson <seanjc@google.com>
+        with ESMTP id S235622AbiBXWlw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Feb 2022 17:41:52 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38EEE20C1B6;
+        Thu, 24 Feb 2022 14:41:21 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C68AA61B48;
+        Thu, 24 Feb 2022 22:41:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 98D1BC340F4;
+        Thu, 24 Feb 2022 22:41:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1645742480;
+        bh=EoJD4A54UC1BEv33pTg+hb7XnzOqDewO3QajY/x6iPM=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=ZL3uixyJTZ7O0Je5PqnsXl0o0BMgOyO2vHboVA4y4jkgy2xMnANqLRXdexkAQdi2l
+         ZNtR0YFlEufAAmjoObaFC2/cD/VgYUxD64YXliq5TZiM9vz0Fe5WAjoQrfUimlNLCB
+         sbam9VM08plFS0IYB5w1OBqLzBTKuxPnlqLvkzotcR40nb+h9EbPn9nSpqtCKObnU0
+         7cLxUG27a2/BbqLoxtHhsA+quQoIgvM+i4MgJn78x+eJHTdQNfDZGI3ednF913SCF7
+         c1KsTwpaePTROCX1hD9Yjz748y0SXUxMPX4DVtv9kVQgbuWJ+DLdQ14N+OzutfAQo5
+         v44enBWS9sSAg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 83109E6D453;
+        Thu, 24 Feb 2022 22:41:20 +0000 (UTC)
+Subject: Re: [GIT PULL] KVM changes for 5.17-rc6
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <20220224200833.2287352-1-pbonzini@redhat.com>
+References: <20220224200833.2287352-1-pbonzini@redhat.com>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20220224200833.2287352-1-pbonzini@redhat.com>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+X-PR-Tracked-Commit-Id: e910a53fb4f20aa012e46371ffb4c32c8da259b4
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 1f840c0ef44b7304d6a58499e0e5668084c0864d
+Message-Id: <164574248053.13100.8169995214464494614.pr-tracker-bot@kernel.org>
+Date:   Thu, 24 Feb 2022 22:41:20 +0000
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
-        "Kernel Mailing List, Linux" <linux-kernel@vger.kernel.org>,
-        Like Xu <like.xu.linux@gmail.com>
-Subject: Re: [PATCH] KVM: x86: Temporarily drop kvm->srcu when uninitialized
- vCPU is blocking
-Message-ID: <YhgGfyqRZp4S2/gn@google.com>
-References: <20220224212646.3544811-1-seanjc@google.com>
- <CABgObfZnW=7v6agYYK6ENgiNOwFCbCZo_8t95LoFrt3sg5srcg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CABgObfZnW=7v6agYYK6ENgiNOwFCbCZo_8t95LoFrt3sg5srcg@mail.gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Cc:     torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 24, 2022, Paolo Bonzini wrote:
-> I had just found the same issue and dropped the patch. If it's okay, I will
-> squash this and also include your reverts in the next pull request.
+The pull request you sent on Thu, 24 Feb 2022 15:08:33 -0500:
 
-That's fine, I got a giggle out of seeing kvm/master force updated :-)
+> https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
 
-In case you haven't seen it, this needs to be squashed too:
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/1f840c0ef44b7304d6a58499e0e5668084c0864d
 
-https://lore.kernel.org/all/20220224190609.3464071-1-seanjc@google.com
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
