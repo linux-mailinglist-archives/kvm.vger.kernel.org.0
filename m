@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 71BB64C3631
-	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 20:52:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BC1154C3679
+	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 21:03:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234063AbiBXTwf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Feb 2022 14:52:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49274 "EHLO
+        id S234189AbiBXUEK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Feb 2022 15:04:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233922AbiBXTwd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Feb 2022 14:52:33 -0500
+        with ESMTP id S233490AbiBXUEJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Feb 2022 15:04:09 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id CB8DE1B71A3
-        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 11:52:02 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 50CA424FB8D
+        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 12:03:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645732322;
+        s=mimecast20190719; t=1645733017;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Q2zY9nW3JSGkVakGPdaOHjkL7gRWAKVqi4jlLr2HJiI=;
-        b=QOoq4jIVkAR3FIZciVhzhtahE8Jyr4dbmJ/185iyX+0ZvqOFqMl754yx+4NjcKDioT6aNS
-        3S9YxMEKwkDO+zTJUxn7Ady1kqDiYBzaGW1sCdGtJF/sQb2kZ0YCNU3nRWyiLmISu5CKjc
-        ohSTQTXvxmyvPZzhOiiJjUSZ5GD2AFY=
+        bh=sQa/uvpWaod5PD+5NklPqPuqdCj3sRZ+2D3R2Zuhz/g=;
+        b=a0hUMp0tOiCXTLhSkjd0tLBons5NjHUo2SB+cXwGbe1M+laCMIv9egHQHWq3EbyADSq7j8
+        2LpEQQWZcURfLvwbN3OwiTwd/sy2d6d2eKDBSV75m7TnHcMb81HCGnTWMewWN6JC/Ep00j
+        0BjKlzYWHnpgFt7oABB/QZuQoBBaAXA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-490-iw_z2fXGOiefATfcu2U8zw-1; Thu, 24 Feb 2022 14:51:56 -0500
-X-MC-Unique: iw_z2fXGOiefATfcu2U8zw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-330-3N9VIQhzN7y3XyV3ajUAIw-1; Thu, 24 Feb 2022 15:03:34 -0500
+X-MC-Unique: 3N9VIQhzN7y3XyV3ajUAIw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5B60D1091DA0;
-        Thu, 24 Feb 2022 19:51:55 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9D77C1091DA1;
+        Thu, 24 Feb 2022 20:03:32 +0000 (UTC)
 Received: from starship (unknown [10.40.195.190])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CD5E01971F;
-        Thu, 24 Feb 2022 19:51:52 +0000 (UTC)
-Message-ID: <70922149247cfe2bfd59d27d45bbf5d0966c2dcd.camel@redhat.com>
-Subject: Re: [RFC PATCH 10/13] KVM: SVM: Adding support for configuring
- x2APIC MSRs interception
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1BD8AADDF;
+        Thu, 24 Feb 2022 20:03:29 +0000 (UTC)
+Message-ID: <5f3b7d10e63126073fa4c17ba4e095b0fa0795e8.camel@redhat.com>
+Subject: Re: [RFC PATCH 11/13] KVM: SVM: Add logic to switch between APIC
+ and x2APIC virtualization mode
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     pbonzini@redhat.com, seanjc@google.com, joro@8bytes.org,
         jon.grimm@amd.com, wei.huang2@amd.com, terry.bowman@amd.com
-Date:   Thu, 24 Feb 2022 21:51:51 +0200
-In-Reply-To: <20220221021922.733373-11-suravee.suthikulpanit@amd.com>
+Date:   Thu, 24 Feb 2022 22:03:28 +0200
+In-Reply-To: <20220221021922.733373-12-suravee.suthikulpanit@amd.com>
 References: <20220221021922.733373-1-suravee.suthikulpanit@amd.com>
-         <20220221021922.733373-11-suravee.suthikulpanit@amd.com>
+         <20220221021922.733373-12-suravee.suthikulpanit@amd.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
@@ -66,193 +66,154 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Sun, 2022-02-20 at 20:19 -0600, Suravee Suthikulpanit wrote:
-> When enabling x2APIC virtualization (x2AVIC), the interception of
-> x2APIC MSRs must be disabled to let the hardware virtualize guest
-> MSR accesses.
+> When an AVIC-enabled guest switch from APIC to x2APIC mode during runtime,
+> the SVM driver needs to
 > 
-> Current implementation keeps track of MSR interception state
-> for generic MSRs in the svm_direct_access_msrs array.
-> For x2APIC MSRs, introduce direct_access_x2apic_msrs array.
+> 1. Set the x2APIC mode bit for AVIC in VMCB along with the maximum
+> APIC ID support for each mode accodingly.
+> 
+> 2. Disable x2APIC MSRs interception in order to allow the hardware
+> to virtualize x2APIC MSRs accesses.
+> 
+> This is currently handled in the svm_refresh_apicv_exec_ctrl().
+> 
+> Note that guest kerenel does not need to disable APIC before swtiching
+> to x2APIC. Therefore the WARN_ON in vcpu_load() to check if the vCPU is
+> currently running is no longer appropriate.
 > 
 > Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
 > ---
->  arch/x86/kvm/svm/svm.c | 67 +++++++++++++++++++++++++++++++-----------
->  arch/x86/kvm/svm/svm.h |  7 +++++
->  2 files changed, 57 insertions(+), 17 deletions(-)
+>  arch/x86/kvm/svm/avic.c | 61 +++++++++++++++++++++++++++++++++++++----
+>  1 file changed, 55 insertions(+), 6 deletions(-)
 > 
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 4e6dc1feeac7..afca26aa1f40 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -89,7 +89,7 @@ static uint64_t osvw_len = 4, osvw_status;
->  static DEFINE_PER_CPU(u64, current_tsc_ratio);
->  #define TSC_RATIO_DEFAULT	0x0100000000ULL
->  
-> -static const struct svm_direct_access_msrs {
-> +static struct svm_direct_access_msrs {
->  	u32 index;   /* Index of the MSR */
->  	bool always; /* True if intercept is initially cleared */
->  } direct_access_msrs[MAX_DIRECT_ACCESS_MSRS] = {
-> @@ -117,6 +117,9 @@ static const struct svm_direct_access_msrs {
->  	{ .index = MSR_INVALID,				.always = false },
->  };
->  
-> +static struct svm_direct_access_msrs
-> +direct_access_x2apic_msrs[NUM_DIRECT_ACCESS_X2APIC_MSRS + 1];
-> +
->  /*
->   * These 2 parameters are used to config the controls for Pause-Loop Exiting:
->   * pause_filter_count: On processors that support Pause filtering(indicated
-> @@ -609,41 +612,42 @@ static int svm_cpu_init(int cpu)
->  
+> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> index 3543b7a4514a..3306b74f1d8b 100644
+> --- a/arch/x86/kvm/svm/avic.c
+> +++ b/arch/x86/kvm/svm/avic.c
+> @@ -79,6 +79,50 @@ static inline enum avic_modes avic_get_vcpu_apic_mode(struct vcpu_svm *svm)
+>  		return AVIC_MODE_NONE;
 >  }
 >  
-> -static int direct_access_msr_slot(u32 msr)
-> +static int direct_access_msr_slot(u32 msr, struct svm_direct_access_msrs *msrs)
->  {
->  	u32 i;
->  
-> -	for (i = 0; direct_access_msrs[i].index != MSR_INVALID; i++)
-> -		if (direct_access_msrs[i].index == msr)
-> +	for (i = 0; msrs[i].index != MSR_INVALID; i++)
-> +		if (msrs[i].index == msr)
->  			return i;
->  
->  	return -ENOENT;
->  }
->  
-> -static void set_shadow_msr_intercept(struct kvm_vcpu *vcpu, u32 msr, int read,
-> -				     int write)
-> +static void set_shadow_msr_intercept(struct kvm_vcpu *vcpu,
-> +				     struct svm_direct_access_msrs *msrs, u32 msr,
-> +				     int read, void *read_bits,
-> +				     int write, void *write_bits)
->  {
-> -	struct vcpu_svm *svm = to_svm(vcpu);
-> -	int slot = direct_access_msr_slot(msr);
-> +	int slot = direct_access_msr_slot(msr, msrs);
->  
->  	if (slot == -ENOENT)
->  		return;
->  
->  	/* Set the shadow bitmaps to the desired intercept states */
->  	if (read)
-> -		set_bit(slot, svm->shadow_msr_intercept.read);
-> +		set_bit(slot, read_bits);
->  	else
-> -		clear_bit(slot, svm->shadow_msr_intercept.read);
-> +		clear_bit(slot, read_bits);
->  
->  	if (write)
-> -		set_bit(slot, svm->shadow_msr_intercept.write);
-> +		set_bit(slot, write_bits);
->  	else
-> -		clear_bit(slot, svm->shadow_msr_intercept.write);
-> +		clear_bit(slot, write_bits);
->  }
->  
-> -static bool valid_msr_intercept(u32 index)
-> +static bool valid_msr_intercept(u32 index, struct svm_direct_access_msrs *msrs)
->  {
-> -	return direct_access_msr_slot(index) != -ENOENT;
-> +	return direct_access_msr_slot(index, msrs) != -ENOENT;
->  }
->  
->  static bool msr_write_intercepted(struct kvm_vcpu *vcpu, u32 msr)
-> @@ -674,9 +678,12 @@ static void set_msr_interception_bitmap(struct kvm_vcpu *vcpu, u32 *msrpm,
->  
->  	/*
->  	 * If this warning triggers extend the direct_access_msrs list at the
-> -	 * beginning of the file
-> +	 * beginning of the file. The direct_access_x2apic_msrs is only for
-> +	 * x2apic MSRs.
->  	 */
-> -	WARN_ON(!valid_msr_intercept(msr));
-> +	WARN_ON(!valid_msr_intercept(msr, direct_access_msrs) &&
-> +		(boot_cpu_has(X86_FEATURE_X2AVIC) &&
-> +		 !valid_msr_intercept(msr, direct_access_x2apic_msrs)));
->  
->  	/* Enforce non allowed MSRs to trap */
->  	if (read && !kvm_msr_allowed(vcpu, msr, KVM_MSR_FILTER_READ))
-> @@ -704,7 +711,16 @@ static void set_msr_interception_bitmap(struct kvm_vcpu *vcpu, u32 *msrpm,
->  void set_msr_interception(struct kvm_vcpu *vcpu, u32 *msrpm, u32 msr,
->  			  int read, int write)
->  {
-> -	set_shadow_msr_intercept(vcpu, msr, read, write);
-> +	struct vcpu_svm *svm = to_svm(vcpu);
-> +
-> +	if (msr < 0x800 || msr > 0x8ff)
-> +		set_shadow_msr_intercept(vcpu, direct_access_msrs, msr,
-> +					 read, svm->shadow_msr_intercept.read,
-> +					 write, svm->shadow_msr_intercept.write);
-> +	else
-> +		set_shadow_msr_intercept(vcpu, direct_access_x2apic_msrs, msr,
-> +					 read, svm->shadow_x2apic_msr_intercept.read,
-> +					 write, svm->shadow_x2apic_msr_intercept.write);
->  	set_msr_interception_bitmap(vcpu, msrpm, msr, read, write);
->  }
->  
-> @@ -786,6 +802,22 @@ static void add_msr_offset(u32 offset)
->  	BUG();
->  }
->  
-> +static void init_direct_access_x2apic_msrs(void)
+> +static inline void avic_set_x2apic_msr_interception(struct vcpu_svm *svm, bool disable)
 > +{
 > +	int i;
 > +
-> +	/* Initialize x2APIC direct_access_x2apic_msrs entries */
-> +	for (i = 0; i < NUM_DIRECT_ACCESS_X2APIC_MSRS; i++) {
-> +		direct_access_x2apic_msrs[i].index = boot_cpu_has(X86_FEATURE_X2AVIC) ?
-> +						  (0x800 + i) : MSR_INVALID;
-> +		direct_access_x2apic_msrs[i].always = false;
-> +	}
-> +
-> +	/* Initialize last entry */
-> +	direct_access_x2apic_msrs[i].index = MSR_INVALID;
-> +	direct_access_x2apic_msrs[i].always = false;
+> +	for (i = 0x800; i <= 0x8ff; i++)
+> +		set_msr_interception(&svm->vcpu, svm->msrpm, i,
+> +				     !disable, !disable);
 > +}
 > +
->  static void init_msrpm_offsets(void)
->  {
->  	int i;
-> @@ -4752,6 +4784,7 @@ static __init int svm_hardware_setup(void)
->  	memset(iopm_va, 0xff, PAGE_SIZE * (1 << order));
->  	iopm_base = page_to_pfn(iopm_pages) << PAGE_SHIFT;
->  
-> +	init_direct_access_x2apic_msrs();
->  	init_msrpm_offsets();
->  
->  	supported_xcr0 &= ~(XFEATURE_MASK_BNDREGS | XFEATURE_MASK_BNDCSR);
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index bfbebb933da2..41514df5107e 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -29,6 +29,8 @@
->  
->  #define MAX_DIRECT_ACCESS_MSRS	20
->  #define MSRPM_OFFSETS	16
-> +#define NUM_DIRECT_ACCESS_X2APIC_MSRS	0x100
+> +void avic_activate_vmcb(struct vcpu_svm *svm)
+> +{
+> +	struct vmcb *vmcb = svm->vmcb01.ptr;
 > +
->  extern u32 msrpm_offsets[MSRPM_OFFSETS] __read_mostly;
->  extern bool npt_enabled;
->  extern bool intercept_smi;
-> @@ -242,6 +244,11 @@ struct vcpu_svm {
->  		DECLARE_BITMAP(write, MAX_DIRECT_ACCESS_MSRS);
->  	} shadow_msr_intercept;
->  
-> +	struct {
-> +		DECLARE_BITMAP(read, NUM_DIRECT_ACCESS_X2APIC_MSRS);
-> +		DECLARE_BITMAP(write, NUM_DIRECT_ACCESS_X2APIC_MSRS);
-> +	} shadow_x2apic_msr_intercept;
+> +	vmcb->control.int_ctl |= AVIC_ENABLE_MASK;
 > +
->  	struct vcpu_sev_es_state sev_es;
+> +	if (svm->x2apic_enabled) {
+Use apic_x2apic_mode here as well
+
+> +		vmcb->control.int_ctl |= X2APIC_MODE_MASK;
+> +		vmcb->control.avic_physical_id &= ~X2AVIC_MAX_PHYSICAL_ID;
+> +		vmcb->control.avic_physical_id |= X2AVIC_MAX_PHYSICAL_ID;
+Why not just use 
+
+phys_addr_t ppa = __sme_set(page_to_phys(kvm_svm->avic_physical_id_table_page));;
+vmcb->control.avic_physical_id = ppa | X2AVIC_MAX_PHYSICAL_ID;
+
+> +		/* Disabling MSR intercept for x2APIC registers */
+> +		avic_set_x2apic_msr_interception(svm, false);
+> +	} else {
+> +		vmcb->control.avic_physical_id &= ~AVIC_MAX_PHYSICAL_ID;
+> +		vmcb->control.avic_physical_id |= AVIC_MAX_PHYSICAL_ID;
+Same here....
+> +		/* Enabling MSR intercept for x2APIC registers */
+> +		avic_set_x2apic_msr_interception(svm, true);
+> +	}
+> +}
+> +
+> +void avic_deactivate_vmcb(struct vcpu_svm *svm)
+> +{
+> +	struct vmcb *vmcb = svm->vmcb01.ptr;
+> +
+> +	vmcb->control.int_ctl &= ~(AVIC_ENABLE_MASK | X2APIC_MODE_MASK);
+> +
+> +	if (svm->x2apic_enabled)
+> +		vmcb->control.avic_physical_id &= ~X2AVIC_MAX_PHYSICAL_ID;
+> +	else
+> +		vmcb->control.avic_physical_id &= ~AVIC_MAX_PHYSICAL_ID;
+> +
+> +	/* Enabling MSR intercept for x2APIC registers */
+> +	avic_set_x2apic_msr_interception(svm, true);
+> +}
+> +
+>  /* Note:
+>   * This function is called from IOMMU driver to notify
+>   * SVM to schedule in a particular vCPU of a particular VM.
+> @@ -195,13 +239,12 @@ void avic_init_vmcb(struct vcpu_svm *svm)
+>  	vmcb->control.avic_backing_page = bpa & AVIC_HPA_MASK;
+>  	vmcb->control.avic_logical_id = lpa & AVIC_HPA_MASK;
+>  	vmcb->control.avic_physical_id = ppa & AVIC_HPA_MASK;
+> -	vmcb->control.avic_physical_id |= AVIC_MAX_PHYSICAL_ID;
+>  	vmcb->control.avic_vapic_bar = APIC_DEFAULT_PHYS_BASE & VMCB_AVIC_APIC_BAR_MASK;
 >  
->  	bool guest_state_loaded;
+>  	if (kvm_apicv_activated(svm->vcpu.kvm))
+> -		vmcb->control.int_ctl |= AVIC_ENABLE_MASK;
+> +		avic_activate_vmcb(svm);
+Why not set AVIC_ENABLE_MASK in avic_activate_vmcb ?
 
-I only gave this a cursory look, the whole thing is a bit ugly (not your fault),
-I feel like it should be refactored a bit.
+>  	else
+> -		vmcb->control.int_ctl &= ~AVIC_ENABLE_MASK;
+> +		avic_deactivate_vmcb(svm);
+>  }
+>  
+>  static u64 *avic_get_physical_id_entry(struct kvm_vcpu *vcpu,
+> @@ -657,6 +700,13 @@ void avic_update_vapic_bar(struct vcpu_svm *svm, u64 data)
+>  		 svm->x2apic_enabled ? "x2APIC" : "xAPIC");
+>  	vmcb_mark_dirty(svm->vmcb, VMCB_AVIC);
+>  	kvm_vcpu_update_apicv(&svm->vcpu);
+> +
+> +	/*
+> +	 * The VM could be running w/ AVIC activated switching from APIC
+> +	 * to x2APIC mode. We need to all refresh to make sure that all
+> +	 * x2AVIC configuration are being done.
+> +	 */
+> +	svm_refresh_apicv_exec_ctrl(&svm->vcpu);
 
+
+That also should be done in avic_set_virtual_apic_mode  instead, but otherwise should be fine.
+
+Also it seems that .avic_set_virtual_apic_mode will cover you on the case when x2apic is disabled
+in the guest cpuid - kvm_set_apic_base checks if the guest cpuid has x2apic support and refuses
+to enable it if it is not set.
+
+But still a WARN_ON_ONCE won't hurt to see that you are not enabling x2avic when not supported.
+
+>  }
+>  
+>  void svm_set_virtual_apic_mode(struct kvm_vcpu *vcpu)
+> @@ -722,9 +772,9 @@ void svm_refresh_apicv_exec_ctrl(struct kvm_vcpu *vcpu)
+>  		 * accordingly before re-activating.
+>  		 */
+>  		avic_post_state_restore(vcpu);
+> -		vmcb->control.int_ctl |= AVIC_ENABLE_MASK;
+> +		avic_activate_vmcb(svm);
+>  	} else {
+> -		vmcb->control.int_ctl &= ~AVIC_ENABLE_MASK;
+> +		avic_deactivate_vmcb(svm);
+>  	}
+>  	vmcb_mark_dirty(vmcb, VMCB_AVIC);
+>  
+> @@ -1019,7 +1069,6 @@ void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>  		return;
+>  
+>  	entry = READ_ONCE(*(svm->avic_physical_id_cache));
+> -	WARN_ON(entry & AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK);
+Why?
+>  
+>  	entry &= ~AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK;
+>  	entry |= (h_physical_id & AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK);
 
 Best regards,
 	Maxim Levitsky
+
 
