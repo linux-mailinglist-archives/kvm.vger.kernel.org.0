@@ -2,130 +2,192 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F16BA4C2A9F
-	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 12:17:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7354B4C2AE4
+	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 12:29:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233945AbiBXLQW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Feb 2022 06:16:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54730 "EHLO
+        id S229678AbiBXL3b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Feb 2022 06:29:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34172 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233812AbiBXLQU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Feb 2022 06:16:20 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBAAF294552;
-        Thu, 24 Feb 2022 03:15:50 -0800 (PST)
+        with ESMTP id S229525AbiBXL3a (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Feb 2022 06:29:30 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 964741B0C42
+        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 03:29:00 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4D5696177F;
-        Thu, 24 Feb 2022 11:15:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23E0CC340F0;
-        Thu, 24 Feb 2022 11:15:49 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="K0Ba/2BM"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1645701345;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=tSMJNlgM3iQSZttf3O5yP1K/Zb4cUmNelvTABLfdcOs=;
-        b=K0Ba/2BM/9pExBbaS5Oj8SCJvlvp0LQGyiNAiXDyooG/U9BeyX+5o7RLqsETF26O3Q8oLJ
-        fCsXilmRI7pxc/CYm3kU+fXPDMl1Uchh4ynDmuSO5MbVs6Ufz3QiiawdfSIvm5FepEXDsh
-        cYBAB6wdHUlLLl0Wob5vRSfu6n86I28=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 954041ba (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Thu, 24 Feb 2022 11:15:45 +0000 (UTC)
-Received: by mail-yb1-f182.google.com with SMTP id g6so3016428ybe.12;
-        Thu, 24 Feb 2022 03:15:43 -0800 (PST)
-X-Gm-Message-State: AOAM5315RL/lzYI/NtRNh7x5Px9BdD0ydiHXo8b3FpyEVFwamOhtB+0p
-        gx0/jUlkmeQ1PWrF6jia5iAIhGQNRHDmWJyyjDU=
-X-Google-Smtp-Source: ABdhPJwcyLWv29eKkR/4qn6wxUASneof9Mw7kmR85HjE16vurz2uO8LCL0/vq/6Jg597pXgN7D3peAt9nzCkEAyuvVw=
-X-Received: by 2002:a25:d116:0:b0:61d:e8c9:531e with SMTP id
- i22-20020a25d116000000b0061de8c9531emr1860406ybg.637.1645701342951; Thu, 24
- Feb 2022 03:15:42 -0800 (PST)
-MIME-Version: 1.0
-References: <20220223131231.403386-1-Jason@zx2c4.com> <20220223131231.403386-2-Jason@zx2c4.com>
- <YhbAOW/KbFW1CFkQ@sol.localdomain> <CAHmME9oa_wE8_n8e5b=iM5v-s5dgyibm4vXMhwzc8zGd6VWZMQ@mail.gmail.com>
- <YhbfDQ2ernjrRNRX@sol.localdomain>
-In-Reply-To: <YhbfDQ2ernjrRNRX@sol.localdomain>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Thu, 24 Feb 2022 12:15:32 +0100
-X-Gmail-Original-Message-ID: <CAHmME9rUD5QrgQMpoOCjv3crWFwn+BXXx9Dm0e2Kv4cJCYS+AQ@mail.gmail.com>
-Message-ID: <CAHmME9rUD5QrgQMpoOCjv3crWFwn+BXXx9Dm0e2Kv4cJCYS+AQ@mail.gmail.com>
-Subject: Re: [PATCH RFC v1 1/2] random: add mechanism for VM forks to
- reinitialize crng
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        QEMU Developers <qemu-devel@nongnu.org>,
-        KVM list <kvm@vger.kernel.org>, linux-s390@vger.kernel.org,
-        adrian@parity.io, "Woodhouse, David" <dwmw@amazon.co.uk>,
-        "Catangiu, Adrian Costin" <acatan@amazon.com>, graf@amazon.com,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        "Singh, Balbir" <sblbir@amazon.com>,
-        "Weiss, Radu" <raduweis@amazon.com>, Jann Horn <jannh@google.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Theodore Ts'o" <tytso@mit.edu>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-6.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        by dfw.source.kernel.org (Postfix) with ESMTPS id B3F5F61803
+        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 11:28:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BD90C340E9;
+        Thu, 24 Feb 2022 11:28:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1645702139;
+        bh=4w/rU91i3NqYRulfQYLvhcZ6uWsYzAIIFxwZLwXmFcI=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=jEJjR2pHAJMb8BxCm35tVc1uVoOOBZgjMBko8N2u0bHY4MdMdpI19o2RkNDjzWILw
+         2xQDCdo1j8G3ZrTlP4O6tGFMtpcmWdPvrZ9sBhhxLlJCOUgdwT2F4997KII2LJxPQ9
+         BxSydgndvVQkGFkJxu8S5OqjSB27fLQyD1PHMYbe/tQf4+bogFFai31qoNO2iR91uO
+         pcThaUsETTYzii3VKaPcfPpoZgJ3Y+XUNL3/Qp1sXHCyLgkCTNp56sZ+G24OOlEFH2
+         C3U+H4Yu6GmzLJ3x//wrkXTgkbhKV63O8x4uhsarcrrEXCAkYaOa2QPuS7byQRTJwb
+         kJhZVZq+oCDVw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nNCIq-00AAJR-RO; Thu, 24 Feb 2022 11:28:56 +0000
+Date:   Thu, 24 Feb 2022 11:28:56 +0000
+Message-ID: <8735k84i6f.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        leksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Peter Feiner <pfeiner@google.com>,
+        Andrew Jones <drjones@redhat.com>, maciej.szmigiero@oracle.com,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH 19/23] KVM: Allow for different capacities in kvm_mmu_memory_cache structs
+In-Reply-To: <20220203010051.2813563-20-dmatlack@google.com>
+References: <20220203010051.2813563-1-dmatlack@google.com>
+        <20220203010051.2813563-20-dmatlack@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: dmatlack@google.com, pbonzini@redhat.com, chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, seanjc@google.com, vkuznets@redhat.com, peterx@redhat.com, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org, pfeiner@google.com, drjones@redhat.com, maciej.szmigiero@oracle.com, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hey Eric,
+On Thu, 03 Feb 2022 01:00:47 +0000,
+David Matlack <dmatlack@google.com> wrote:
+> 
+> Allow the capacity of the kvm_mmu_memory_cache struct to be chosen at
+> declaration time rather than being fixed for all declarations. This will
+> be used in a follow-up commit to declare an cache in x86 with a capacity
+> of 512+ objects without having to increase the capacity of all caches in
+> KVM.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: David Matlack <dmatlack@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h |  2 +-
+>  arch/arm64/kvm/mmu.c              | 12 ++++++------
+>  arch/mips/include/asm/kvm_host.h  |  2 +-
+>  arch/x86/include/asm/kvm_host.h   |  8 ++++----
+>  include/linux/kvm_types.h         | 24 ++++++++++++++++++++++--
+>  virt/kvm/kvm_main.c               |  8 +++++++-
+>  6 files changed, 41 insertions(+), 15 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 3b44ea17af88..a450b91cc2d9 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -357,7 +357,7 @@ struct kvm_vcpu_arch {
+>  	bool pause;
+>  
+>  	/* Cache some mmu pages needed inside spinlock regions */
+> -	struct kvm_mmu_memory_cache mmu_page_cache;
+> +	DEFINE_KVM_MMU_MEMORY_CACHE(mmu_page_cache);
 
-On Thu, Feb 24, 2022 at 2:27 AM Eric Biggers <ebiggers@kernel.org> wrote:
->
-> On Thu, Feb 24, 2022 at 01:54:54AM +0100, Jason A. Donenfeld wrote:
-> > On 2/24/22, Eric Biggers <ebiggers@kernel.org> wrote:
-> > > I think we should be removing cases where the base_crng key is changed
-> > > directly
-> > > besides extraction from the input_pool, not adding new ones.  Why not
-> > > implement
-> > > this as add_device_randomness() followed by crng_reseed(force=true), where
-> > > the
-> > > 'force' argument forces a reseed to occur even if the entropy_count is too
-> > > low?
-> >
-> > Because that induces a "premature next" condition which can let that
-> > entropy, potentially newly acquired by a storm of IRQs at power-on, be
-> > bruteforced by unprivileged userspace. I actually had it exactly the
-> > way you describe at first, but decided that this here is the lesser of
-> > evils and doesn't really complicate things the way an intentional
-> > premature next would. The only thing we care about here is branching
-> > the crng stream, and so this does explicitly that, without having to
-> > interfere with how we collect entropy. Of course we *also* add it as
-> > non-credited "device randomness" so that it's part of the next
-> > reseeding, whenever that might occur.
->
-> Can you make sure to properly explain this in the code?
+I must say I'm really not a fan of the anonymous structure trick. I
+can see why you are doing it that way, but it feels pretty brittle.
 
-The carousel keeps turning, and after I wrote to you last night I kept
-thinking about the matter. Here's how it breaks down:
+>  
+>  	/* Target CPU and feature flags */
+>  	int target;
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index bc2aba953299..9c853c529b49 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -765,7 +765,8 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+>  {
+>  	phys_addr_t addr;
+>  	int ret = 0;
+> -	struct kvm_mmu_memory_cache cache = { 0, __GFP_ZERO, NULL, };
+> +	DEFINE_KVM_MMU_MEMORY_CACHE(cache) page_cache = {};
+> +	struct kvm_mmu_memory_cache *cache = &page_cache.cache;
+>  	struct kvm_pgtable *pgt = kvm->arch.mmu.pgt;
+>  	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_DEVICE |
+>  				     KVM_PGTABLE_PROT_R |
+> @@ -774,18 +775,17 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+>  	if (is_protected_kvm_enabled())
+>  		return -EPERM;
+>  
+> +	cache->gfp_zero = __GFP_ZERO;
 
-Injection method:
-- Assumes existing pool of entropy is still sacred.
-- Assumes base_crng timestamp is representative of pool age.
-- Result: Mixes directly into base_crng to avoid premature-next of pool.
+nit: consider this instead, which preserves the existing flow:
 
-Input pool method:
-- Assumes existing pool of entropy is old / out of date / used by a
-different fork, so not sacred.
-- Assumes base_crng timestamp is tied to irrelevant entropy pool.
-- Result: Force-drains input pool, causing intentional premature-next.
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 26d6c53be083..86a7ebd03a44 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -764,7 +764,9 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+ {
+ 	phys_addr_t addr;
+ 	int ret = 0;
+-	DEFINE_KVM_MMU_MEMORY_CACHE(cache) page_cache = {};
++	DEFINE_KVM_MMU_MEMORY_CACHE(cache) page_cache = {
++		.cache = { .gfp_zero = __GFP_ZERO},
++	};
+ 	struct kvm_mmu_memory_cache *cache = &page_cache.cache;
+ 	struct kvm_pgtable *pgt = kvm->arch.mmu.pgt;
+ 	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_DEVICE |
+@@ -774,7 +776,6 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+ 	if (is_protected_kvm_enabled())
+ 		return -EPERM;
+ 
+-	cache->gfp_zero = __GFP_ZERO;
+ 	size += offset_in_page(guest_ipa);
+ 	guest_ipa &= PAGE_MASK;
+ 
+but whole "declare the outer structure and just use the inner one"
+hack is... huh... :-/
 
-Which of these assumptions better models the situation? I started in
-the input pool method camp, then by the time I posted v1, was
-concerned about power-on IRQs, but now I think relying at all on
-snapshotted entropy represents the biggest issue. And judging from
-your email, it appears that you do too. So v3 of this patchset will
-switch back to the input pool method, per your suggestion.
+This hunk also conflicts with what currently sits in -next. Not a big
+deal, but just so you know.
 
-As a plus, it means we go through the RDSEED'd extraction algorithm
-too, which always helps.
+> diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
+> index dceac12c1ce5..9575fb8d333f 100644
+> --- a/include/linux/kvm_types.h
+> +++ b/include/linux/kvm_types.h
+> @@ -78,14 +78,34 @@ struct gfn_to_pfn_cache {
+>   * MMU flows is problematic, as is triggering reclaim, I/O, etc... while
+>   * holding MMU locks.  Note, these caches act more like prefetch buffers than
+>   * classical caches, i.e. objects are not returned to the cache on being freed.
+> + *
+> + * The storage for the cache objects is laid out after the struct to allow
+> + * different declarations to choose different capacities. If the capacity field
+> + * is 0, the capacity is assumed to be KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE.
+>   */
+>  struct kvm_mmu_memory_cache {
+>  	int nobjs;
+> +	int capacity;
+>  	gfp_t gfp_zero;
+>  	struct kmem_cache *kmem_cache;
+> -	void *objects[KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE];
+> +	void *objects[0];
 
-Jason
+The VLA police is going to track you down ([0] vs []).
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
