@@ -2,139 +2,295 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D7CA44C2EF1
-	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 16:05:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 81CE34C2F0E
+	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 16:12:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235806AbiBXPFC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Feb 2022 10:05:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59226 "EHLO
+        id S235753AbiBXPNB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Feb 2022 10:13:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235793AbiBXPFA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Feb 2022 10:05:00 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7F931B755F;
-        Thu, 24 Feb 2022 07:04:29 -0800 (PST)
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21OF3YHH032064;
-        Thu, 24 Feb 2022 15:04:29 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=RMG3ehRk1VSDQYv/JtuOSXHUXBu9+l6KQXiz8RdBsr0=;
- b=cRtfbcL0G4QfaUgHdXWK5QgIOJaXk/W+ltLgdv22r+e6SJCFKn3J0Dwxoi50xW+9wmxc
- e8X9/Uy1az9odGCJctDgZM9YvYWGZzn4Nldvj36LtnHh/IMJCaZlMrVu/K8DnubVJsMJ
- fXdXasHhCB58u6MLeFy2nP/QjPLmziCtFoCpM/ubW92rFQan0huhP6X0xs7XMlzVDLOQ
- qFCJXN+Qe2Cxloq8DYr43QTBR6PbQ2R2yntT++1bpFyDzQqoha9RyL5k1uL+1t8qAeP2
- rh5RBA3dhYnZvUvPH9Ku+AKrR58HuC+7LAnn1JqWX5vGDdPgYrvblCeC+9v878uytbKx yQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3edxf71ty5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 24 Feb 2022 15:04:29 +0000
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21OF44uo002211;
-        Thu, 24 Feb 2022 15:04:28 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3edxf71tx0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 24 Feb 2022 15:04:28 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21OEscfq004533;
-        Thu, 24 Feb 2022 15:04:26 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma06ams.nl.ibm.com with ESMTP id 3eaqtjjnvh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 24 Feb 2022 15:04:26 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21OErdbg47186284
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 24 Feb 2022 14:53:39 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 957CA42041;
-        Thu, 24 Feb 2022 15:04:21 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 46ADD42042;
-        Thu, 24 Feb 2022 15:04:21 +0000 (GMT)
-Received: from [9.145.90.75] (unknown [9.145.90.75])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 24 Feb 2022 15:04:21 +0000 (GMT)
-Message-ID: <f0dfd041-8be4-8569-27ac-63f5a7635823@linux.ibm.com>
-Date:   Thu, 24 Feb 2022 16:04:20 +0100
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.6.1
-Subject: Re: [PATCH v4 0/2] KVM: s390: make use of ultravisor AIV support
-Content-Language: en-US
-To:     kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
-        david@redhat.com, borntraeger@linux.ibm.com, pasic@linux.ibm.com,
-        Janosch Frank <frankja@linux.ibm.com>
-References: <20220223102000.3733712-1-mimu@linux.ibm.com>
-From:   Michael Mueller <mimu@linux.ibm.com>
-In-Reply-To: <20220223102000.3733712-1-mimu@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: XMfAxPb63U1WjY67QeNjNPWiyL3Ip21_
-X-Proofpoint-ORIG-GUID: 4OJ6CoXeFF4VIim0GVP63HJs-n-69JTL
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
-MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-02-24_03,2022-02-24_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
- spamscore=0 impostorscore=0 phishscore=0 clxscore=1015 mlxlogscore=575
- lowpriorityscore=0 bulkscore=0 suspectscore=0 priorityscore=1501
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2202240087
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S235768AbiBXPMv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Feb 2022 10:12:51 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37C04194155
+        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 07:12:20 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 7D15A60F45
+        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 15:12:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9F02C340F0;
+        Thu, 24 Feb 2022 15:12:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1645715539;
+        bh=OmSwrYZRsikX01bqlOxU8TwfB5ZKWPZtHkq3x9TDp7A=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=a5Ku5zKcdo5jBWzA4y0WtH7iBa8JpYU8mzs8xtePEPrZBOtgkU9TEPXNrpE1c2vKH
+         Qa1bka3aW7t2sSlLQvO/0W4wouDE7HaT0c2IlNDMeaHAVd1xLPKiCRX67pJPt2Kk1J
+         3wVLu3kPjNwWbw6XvPDZLdKAZBa9extywyb6t3phqVj4EQ8iP1axv/ZyhUEda3Ypeo
+         fqg89noJ5rNf2nc4xhF+L6R8Y5mwoipdkIValS/WaJrLYUO7ZvtmVTTlmUDNdWTPpb
+         s6r9YG/Rm/BAcrpApoHrqoe10onqGINaqkLzpqli+VoVdiw2546AoQ7ti0USN/lnhE
+         9moBX/r4EE3QA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nNFmz-00ADFu-Ez; Thu, 24 Feb 2022 15:12:17 +0000
+Date:   Thu, 24 Feb 2022 15:12:17 +0000
+Message-ID: <87tuco2t9q.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oupton@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, Peter Shier <pshier@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>,
+        Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH v3 12/19] KVM: arm64: Add support for userspace to suspend a vCPU
+In-Reply-To: <20220223041844.3984439-13-oupton@google.com>
+References: <20220223041844.3984439-1-oupton@google.com>
+        <20220223041844.3984439-13-oupton@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@google.com, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, anup@brainfault.org, atishp@atishpatra.org, seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, pshier@google.com, reijiw@google.com, ricarkol@google.com, rananta@google.com, jingzhangos@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, 23 Feb 2022 04:18:37 +0000,
+Oliver Upton <oupton@google.com> wrote:
+> 
+> Introduce a new MP state, KVM_MP_STATE_SUSPENDED, which indicates a vCPU
+> is in a suspended state. In the suspended state the vCPU will block
+> until a wakeup event (pending interrupt) is recognized.
+> 
+> Add a new system event type, KVM_SYSTEM_EVENT_WAKEUP, to indicate to
+> userspace that KVM has recognized one such wakeup event. It is the
+> responsibility of userspace to then make the vCPU runnable, or leave it
+> suspended until the next wakeup event.
+> 
+> Signed-off-by: Oliver Upton <oupton@google.com>
+> ---
+>  Documentation/virt/kvm/api.rst    | 23 ++++++++++++++++++--
+>  arch/arm64/include/asm/kvm_host.h |  1 +
+>  arch/arm64/kvm/arm.c              | 35 +++++++++++++++++++++++++++++++
+>  include/uapi/linux/kvm.h          |  2 ++
+>  4 files changed, 59 insertions(+), 2 deletions(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index a4267104db50..2b4bdbc2dcc0 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -1482,14 +1482,29 @@ Possible values are:
+>                                   [s390]
+>     KVM_MP_STATE_LOAD             the vcpu is in a special load/startup state
+>                                   [s390]
+> +   KVM_MP_STATE_SUSPENDED        the vcpu is in a suspend state and is waiting
+> +                                 for a wakeup event [arm/arm64]
 
+nit: arm64 only (these are host architectures, not guest). Eventually,
+someone needs to do a bit of cleanup in the docs to remove any trace
+of ye olde 32bit stuff.
 
-On 23.02.22 11:19, Michael Mueller wrote:
-> This patch enables the ultravisor adapter interruption vitualization
-> support.
-> 
-> Changes in v4:
-> - All vcpus are pulled out of SIE and disbled before the control
->    blocks are changed to disable/enable the gisa and re-enabled
->    afterwards instead of taking the vcpu specific lock.
+>     ==========================    ===============================================
+>  
+>  On x86, this ioctl is only useful after KVM_CREATE_IRQCHIP. Without an
+>  in-kernel irqchip, the multiprocessing state must be maintained by userspace on
+>  these architectures.
+>  
+> -For arm/arm64/riscv:
+> -^^^^^^^^^^^^^^^^^^^^
+> +For arm/arm64:
+> +^^^^^^^^^^^^^^
+> +
+> +If a vCPU is in the KVM_MP_STATE_SUSPENDED state, KVM will block the vCPU
+> +thread and wait for a wakeup event. A wakeup event is defined as a pending
+> +interrupt for the guest.
 
+nit: a pending interrupt that the guest can actually handle (a masked
+interrupt can be pending). It'd be more accurate to describe this
+state as the architectural execution of a WFI instruction.
 
-Christian,
+> +
+> +If a wakeup event is recognized, KVM will exit to userspace with a
+> +KVM_SYSTEM_EVENT exit, where the event type is KVM_SYSTEM_EVENT_WAKEUP. If
+> +userspace wants to honor the wakeup, it must set the vCPU's MP state to
+> +KVM_MP_STATE_RUNNABLE. If it does not, KVM will continue to await a wakeup
+> +event in subsequent calls to KVM_RUN.
 
-I'm pulling back this v4 and ask for v3 to be re-applied as it turned
-out that the described issue is related to kvm_s390_set_tod_clock()
-being called in SIE intercepted context.
+I can see a potential 'gotcha' here. If the VMM doesn't want to set
+the vcpu as runnable, but doesn't take action on the source of the
+wake-up (masking the interrupt), you'll get an immediate wake-up event
+again. The VMM is now eating 100% of the CPU and not making forward
+progress. Luser error, but you may want to capture the failure mode
+and make it crystal clear in the doc.
 
-> 
-> Changes in v3:
-> - cache and test GISA descriptor only once in kvm_s390_gisa_enable()
-> - modified some comments
-> - removed some whitespace issues
-> 
-> Changes in v2:
-> - moved GISA disable into "put CPUs in PV mode" routine
-> - moved GISA enable into "pull CPUs out of PV mode" routine
-> 
-> [1] https://lore.kernel.org/lkml/ae7c65d8-f632-a7f4-926a-50b9660673a1@linux.ibm.com/T/#mcb67699bf458ba7482f6b7529afe589d1dbb5930
-> [2] https://lore.kernel.org/all/20220208165310.3905815-1-mimu@linux.ibm.com/
-> [3] https://lore.kernel.org/all/20220209152217.1793281-2-mimu@linux.ibm.com/
-> 
-> Michael Mueller (2):
->    KVM: s390: pv: pull all vcpus out of SIE before converting to/from pv
->      vcpu
->    KVM: s390: pv: make use of ultravisor AIV support
-> 
->   arch/s390/include/asm/uv.h |  1 +
->   arch/s390/kvm/interrupt.c  | 54 +++++++++++++++++++++++++++++++++-----
->   arch/s390/kvm/kvm-s390.c   | 19 +++++++++-----
->   arch/s390/kvm/kvm-s390.h   | 11 ++++++++
->   4 files changed, 72 insertions(+), 13 deletions(-)
-> 
+It also mean that at the point where it decides to restart the guest
+for real, it must restore the interrupt state as it initially found
+it.
+
+> +
+> +For riscv:
+> +^^^^^^^^^^
+>  
+>  The only states that are valid are KVM_MP_STATE_STOPPED and
+>  KVM_MP_STATE_RUNNABLE which reflect if the vcpu is paused or not.
+> @@ -5914,6 +5929,7 @@ should put the acknowledged interrupt vector into the 'epr' field.
+>    #define KVM_SYSTEM_EVENT_SHUTDOWN       1
+>    #define KVM_SYSTEM_EVENT_RESET          2
+>    #define KVM_SYSTEM_EVENT_CRASH          3
+> +  #define KVM_SYSTEM_EVENT_WAKEUP         4
+>  			__u32 type;
+>  			__u64 flags;
+>  		} system_event;
+> @@ -5938,6 +5954,9 @@ Valid values for 'type' are:
+>     has requested a crash condition maintenance. Userspace can choose
+>     to ignore the request, or to gather VM memory core dump and/or
+>     reset/shutdown of the VM.
+> + - KVM_SYSTEM_EVENT_WAKEUP -- the guest is in a suspended state and KVM
+> +   has recognized a wakeup event. Userspace may honor this event by marking
+> +   the exiting vCPU as runnable, or deny it and call KVM_RUN again.
+>  
+>  ::
+>  
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 33ecec755310..d32cab0c9752 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -46,6 +46,7 @@
+>  #define KVM_REQ_RECORD_STEAL	KVM_ARCH_REQ(3)
+>  #define KVM_REQ_RELOAD_GICv4	KVM_ARCH_REQ(4)
+>  #define KVM_REQ_RELOAD_PMU	KVM_ARCH_REQ(5)
+> +#define KVM_REQ_SUSPEND		KVM_ARCH_REQ(6)
+>  
+>  #define KVM_DIRTY_LOG_MANUAL_CAPS   (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE | \
+>  				     KVM_DIRTY_LOG_INITIALLY_SET)
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index f6ce97c0069c..d2b190f32651 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -438,6 +438,18 @@ bool kvm_arm_vcpu_powered_off(struct kvm_vcpu *vcpu)
+>  	return vcpu->arch.mp_state == KVM_MP_STATE_STOPPED;
+>  }
+>  
+> +static void kvm_arm_vcpu_suspend(struct kvm_vcpu *vcpu)
+> +{
+> +	vcpu->arch.mp_state = KVM_MP_STATE_SUSPENDED;
+> +	kvm_make_request(KVM_REQ_SUSPEND, vcpu);
+> +	kvm_vcpu_kick(vcpu);
+
+I wonder whether this kvm_vcpu_kick() is simply cargo-culted. The
+mp_state calls can only be done from the vcpu fd, and thus the vcpu
+cannot be running, so there is nothing to kick. Not a big deal, but
+something we may want to look at later on.
+
+> +}
+> +
+> +bool kvm_arm_vcpu_suspended(struct kvm_vcpu *vcpu)
+
+static?
+
+> +{
+> +	return vcpu->arch.mp_state == KVM_MP_STATE_SUSPENDED;
+> +}
+> +
+>  int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
+>  				    struct kvm_mp_state *mp_state)
+>  {
+> @@ -458,6 +470,9 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+>  	case KVM_MP_STATE_STOPPED:
+>  		kvm_arm_vcpu_power_off(vcpu);
+>  		break;
+> +	case KVM_MP_STATE_SUSPENDED:
+> +		kvm_arm_vcpu_suspend(vcpu);
+> +		break;
+>  	default:
+>  		ret = -EINVAL;
+>  	}
+> @@ -719,6 +734,23 @@ void kvm_vcpu_wfi(struct kvm_vcpu *vcpu)
+>  	preempt_enable();
+>  }
+>  
+> +static int kvm_vcpu_suspend(struct kvm_vcpu *vcpu)
+> +{
+> +	if (!kvm_arm_vcpu_suspended(vcpu))
+> +		return 1;
+> +
+> +	kvm_vcpu_wfi(vcpu);
+> +
+> +	/*
+> +	 * The suspend state is sticky; we do not leave it until userspace
+> +	 * explicitly marks the vCPU as runnable. Request that we suspend again
+> +	 * later.
+> +	 */
+> +	kvm_make_request(KVM_REQ_SUSPEND, vcpu);
+> +	kvm_vcpu_set_system_event_exit(vcpu, KVM_SYSTEM_EVENT_WAKEUP);
+> +	return 0;
+> +}
+> +
+>  /**
+>   * check_vcpu_requests - check and handle pending vCPU requests
+>   * @vcpu:	the VCPU pointer
+> @@ -757,6 +789,9 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
+>  		if (kvm_check_request(KVM_REQ_RELOAD_PMU, vcpu))
+>  			kvm_pmu_handle_pmcr(vcpu,
+>  					    __vcpu_sys_reg(vcpu, PMCR_EL0));
+> +
+> +		if (kvm_check_request(KVM_REQ_SUSPEND, vcpu))
+> +			return kvm_vcpu_suspend(vcpu);
+>  	}
+>  
+>  	return 1;
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 5191b57e1562..babb16c2abe5 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -444,6 +444,7 @@ struct kvm_run {
+>  #define KVM_SYSTEM_EVENT_SHUTDOWN       1
+>  #define KVM_SYSTEM_EVENT_RESET          2
+>  #define KVM_SYSTEM_EVENT_CRASH          3
+> +#define KVM_SYSTEM_EVENT_WAKEUP         4
+>  			__u32 type;
+>  			__u64 flags;
+>  		} system_event;
+> @@ -634,6 +635,7 @@ struct kvm_vapic_addr {
+>  #define KVM_MP_STATE_OPERATING         7
+>  #define KVM_MP_STATE_LOAD              8
+>  #define KVM_MP_STATE_AP_RESET_HOLD     9
+> +#define KVM_MP_STATE_SUSPENDED         10
+>  
+>  struct kvm_mp_state {
+>  	__u32 mp_state;
+
+This patch looks OK as is, but it is the interactions with PSCI that
+concern me. What we have here is per-CPU suspend triggered by
+userspace. PSCI OTOH offers two variants of suspend triggered by the
+guest. All of them get different implementations, and I have a hard
+time figuring out how they all interact...
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
