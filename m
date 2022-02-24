@@ -2,97 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 44A664C2A08
-	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 11:58:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C27C4C2A12
+	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 12:01:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233674AbiBXK6Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Feb 2022 05:58:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57000 "EHLO
+        id S233640AbiBXLBF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Feb 2022 06:01:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231864AbiBXK6X (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Feb 2022 05:58:23 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26FC815FCA3;
-        Thu, 24 Feb 2022 02:57:54 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 95309616A3;
-        Thu, 24 Feb 2022 10:57:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94B6CC340E9;
-        Thu, 24 Feb 2022 10:57:52 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Aev4oP76"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1645700268;
+        with ESMTP id S229794AbiBXLBE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Feb 2022 06:01:04 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id CA4B627AA31
+        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 03:00:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645700433;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=l9uFhoNHD0ubvFpgP+CfgQfLWDk0rbzVcNs9eAAzOOE=;
-        b=Aev4oP76SM7Ky5tVHBurpSFk24ePStDVbpz4sUcYrWj/NVQsvMbzkZERrzKlvWiREIkUjg
-        pns/T3HQBI1W+E7V4L0ZxLhtdwhTycvyPky5RJ4kmyYS40PqhCMFfq2I7AWj1l2AbnW3gZ
-        2IoA6U4VwICTXSzBigeWX4GouwiGKE4=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 4fcbc003 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Thu, 24 Feb 2022 10:57:48 +0000 (UTC)
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-2d79394434dso20276797b3.5;
-        Thu, 24 Feb 2022 02:57:46 -0800 (PST)
-X-Gm-Message-State: AOAM530cAMgmcgZdTTGMm6D/VzoaOJA3qcwRN458+R+czbfdmZ8cDRfH
-        gokMg0kKECaG4Otet9xnByjVuwDwZePzfDHPetY=
-X-Google-Smtp-Source: ABdhPJwN40erEHMdIbnTWhaEGW2JI+hoWIa30mje4icqtRKOBfnV+2qG9wPZOdlYssF87EiAylHOO7YqwwX1PQC4yTE=
-X-Received: by 2002:a81:5a83:0:b0:2ca:287c:6b5d with SMTP id
- o125-20020a815a83000000b002ca287c6b5dmr1747645ywb.2.1645700265594; Thu, 24
- Feb 2022 02:57:45 -0800 (PST)
-MIME-Version: 1.0
-References: <20220223131231.403386-1-Jason@zx2c4.com> <CAHmME9ogH_mx724n_deFfva7-xPCmma1-=2Mv0JdnZ-fC4JCjg@mail.gmail.com>
- <2653b6c7-a851-7a48-f1f8-3bde742a0c9f@redhat.com> <YhdkD4S7Erzl98So@redhat.com>
-In-Reply-To: <YhdkD4S7Erzl98So@redhat.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Thu, 24 Feb 2022 11:57:34 +0100
-X-Gmail-Original-Message-ID: <CAHmME9qRrLHwOjD+_xkGC7-BMVdzO95=DzhCo8KvDNa0JXVybA@mail.gmail.com>
-Message-ID: <CAHmME9qRrLHwOjD+_xkGC7-BMVdzO95=DzhCo8KvDNa0JXVybA@mail.gmail.com>
-Subject: Re: [PATCH RFC v1 0/2] VM fork detection for RNG
-To:     =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc:     Laszlo Ersek <lersek@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        QEMU Developers <qemu-devel@nongnu.org>,
-        KVM list <kvm@vger.kernel.org>, linux-s390@vger.kernel.org,
-        adrian@parity.io, "Woodhouse, David" <dwmw@amazon.co.uk>,
-        "Catangiu, Adrian Costin" <acatan@amazon.com>, graf@amazon.com,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        "Singh, Balbir" <sblbir@amazon.com>,
-        "Weiss, Radu" <raduweis@amazon.com>, Jann Horn <jannh@google.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Theodore Ts'o" <tytso@mit.edu>,
-        Igor Mammedov <imammedo@redhat.com>, ehabkost@redhat.com,
-        ben@skyportsystems.com, "Michael S. Tsirkin" <mst@redhat.com>,
-        "Richard W.M. Jones" <rjones@redhat.com>
+        bh=Tf3Ufm1JBRLk4zxiPi9fBQ0Vt/sfouw/zzWCu1p5nJw=;
+        b=gBMPMRcQkSMXsLsoow7VQTXYikZakA/8lJxZxfxBA5zlNYVdc0hpNQ+n7/BQmA7WhpBy1b
+        uJ7iF/UHmdcvqUGCdFtfF3liA+Fg/o3R0FvLcVaZszamT+d0f77a2QuYwpnLLDODeINyF1
+        RKzXT8eU6sunA9vqhp9ZG4ifGcsjMBE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-491-EkHgk4EPPgOQq_ZMe48jJA-1; Thu, 24 Feb 2022 06:00:31 -0500
+X-MC-Unique: EkHgk4EPPgOQq_ZMe48jJA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B0B221006AA6;
+        Thu, 24 Feb 2022 11:00:30 +0000 (UTC)
+Received: from starship (unknown [10.40.195.190])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C63D28319A;
+        Thu, 24 Feb 2022 11:00:29 +0000 (UTC)
+Message-ID: <5331482d6079448544d01e6745907e66d0402705.camel@redhat.com>
+Subject: Re: [PATCH 0/7] My set of KVM unit tests + fixes
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     kvm@vger.kernel.org
+Date:   Thu, 24 Feb 2022 13:00:28 +0200
+In-Reply-To: <Yhdb+ptbDLNR4+xk@monolith.localdoman>
+References: <20220208122148.912913-1-mlevitsk@redhat.com>
+         <38346acd4f7b9cb5a38c3a1e2fba0ee01a82dc5b.camel@redhat.com>
+         <Yhdb+ptbDLNR4+xk@monolith.localdoman>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-6.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 24, 2022 at 11:56 AM Daniel P. Berrang=C3=A9 <berrange@redhat.c=
-om> wrote:
-> IIRC this part of the QEMU doc was making an implicit assumption
-> about the way QEMU is to be used by mgmt apps doing snapshots.
->
-> Instead of using the 'loadvm' command on the existing running QEMU
-> process, the doc seems to tacitly expect the management app will
-> throwaway the existing QEMU process and spawn a brand new QEMU
-> process to load the snapshot into, thus getting the new GUID on
-> the QEMU command line.
+On Thu, 2022-02-24 at 10:20 +0000, Alexandru Elisei wrote:
+> Hi,
+> 
+> On Wed, Feb 23, 2022 at 02:03:54PM +0200, Maxim Levitsky wrote:
+> > On Tue, 2022-02-08 at 14:21 +0200, Maxim Levitsky wrote:
+> > > Those are few kvm unit tests tha I developed.
+> > > 
+> > > Best regards,
+> > >     Maxim Levitsky
+> > > 
+> > > Maxim Levitsky (7):
+> > >   pmu_lbr: few fixes
+> > >   svm: Fix reg_corruption test, to avoid timer interrupt firing in later
+> > >     tests.
+> > >   svm: NMI is an "exception" and not interrupt in x86 land
+> > >   svm: intercept shutdown in all svm tests by default
+> > >   svm: add SVM_BARE_VMRUN
+> > >   svm: add tests for LBR virtualization
+> > >   svm: add tests for case when L1 intercepts various hardware interrupts
+> > >     (an interrupt, SMI, NMI), but lets L2 control either EFLAG.IF or GIF
+> > > 
+> > >  lib/x86/processor.h |   1 +
+> > >  x86/pmu_lbr.c       |   6 +
+> > >  x86/svm.c           |  41 +---
+> > >  x86/svm.h           |  63 ++++++-
+> > >  x86/svm_tests.c     | 447 +++++++++++++++++++++++++++++++++++++++++++-
+> > >  x86/unittests.cfg   |   3 +-
+> > >  6 files changed, 521 insertions(+), 40 deletions(-)
+> > > 
+> > > -- 
+> > > 2.26.3
+> > > 
+> > > 
+> > Any update on these patches?
+> 
+> It is possible that because you haven't sent the patches to the x86
+> maintainer (as per the MAINTAINERS file), this series has gone unnoticed.
+> Also, each patch should start with "kvm-unit-tests PATCH" (have a look at
+> the README file), so people can easily tell them apart from KVM patches,
+> which go to the same mailing list.
+Do kvm-unit tests have MAINTAINERS file? Those patches are not for the kernel
+but for the kvm-unit test project.
 
-Right, exactly. The "there are no known use cases" bit I think just
-forgot about one very common use case that perhaps just wasn't in use
-by the original author. So I'm pretty sure this remains a QEMU bug.
+> 
+> You could try resending the entire series to the x86 mailing list and to
+> the relevant maintainers. To resend them, the convention is to modify the
+> subject prefix to "kvm-unit-tests PATCH RESEND" and send them without any
+> changes (though you can mention in the cover letter why you resent the
+> series).
+Thank you, I missed the prefix to be used!
 
-Jason
+> 
+> Hope this helps!
+> 
+> Thanks,
+> Alex
+
+Thanks!
+Best regards,
+	Maxim Levitsky
+
+> 
+> > Best regards,
+> > 	Maxim Levitsky
+> > 
+
+
