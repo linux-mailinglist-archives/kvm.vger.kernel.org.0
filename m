@@ -2,266 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7DC3E4C2955
-	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 11:28:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B52974C29C0
+	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 11:42:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233401AbiBXK0y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Feb 2022 05:26:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34330 "EHLO
+        id S233549AbiBXKml (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Feb 2022 05:42:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56314 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233368AbiBXK0v (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Feb 2022 05:26:51 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83BC528D386;
-        Thu, 24 Feb 2022 02:26:20 -0800 (PST)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21OA6OKu023279;
-        Thu, 24 Feb 2022 10:26:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : from : to : cc : references : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=V62/Vhb8JDNGuKGbmXIp9CI5BjLEXmRe5rqRdKEc8RY=;
- b=SWTng3I34oGbUtRXqo9uHXQbA+jUT7PBqUwYrty6U1G31RAiJPQwOJBnCuKm6lD41dcx
- Fk3uiRTWyRYu6am6Vep5Nbza9Of7zAdjdXkLcObJZk9DNz2WMJlGBa4cqz0sWIJT8Ngm
- g37kkCR8j1M5OoX6nRznGfZpkRV+Qx4rDfk1pvkRReuL6CC6P0g5JI/EmCSjIfCsp2qC
- HJN9oAxk+RPXMnX+jhUVpl2fh7rtXvpDTZohw5aKAbozz5XV5mjtrMfiLx1V7ppgZ9zJ
- FPmswituxJ99qGI4/ZcV/GiV9FWp6cejx7lNdURUI4xSz9DF4axhaX+GgBKz1VjObicr Xw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3edx1wuwyj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 24 Feb 2022 10:26:20 +0000
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21OABuIY026193;
-        Thu, 24 Feb 2022 10:26:19 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3edx1wuwxv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 24 Feb 2022 10:26:19 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21OAJ0II026848;
-        Thu, 24 Feb 2022 10:26:17 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma03fra.de.ibm.com with ESMTP id 3ear69ejdj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 24 Feb 2022 10:26:17 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21OAQCQ654460712
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 24 Feb 2022 10:26:12 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 86195AE053;
-        Thu, 24 Feb 2022 10:26:12 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1D987AE059;
-        Thu, 24 Feb 2022 10:26:12 +0000 (GMT)
-Received: from [9.171.25.98] (unknown [9.171.25.98])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 24 Feb 2022 10:26:12 +0000 (GMT)
-Message-ID: <c46e6bf1-66dd-401c-ec3e-5749263c087c@linux.ibm.com>
-Date:   Thu, 24 Feb 2022 11:28:32 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [kvm-unit-tests PATCH v3 6/8] s390x: Add more tests for STSCH
-Content-Language: en-US
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>,
-        Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Cc:     imbrenda@linux.ibm.com, Halil Pasic <pasic@linux.ibm.com>,
-        thuth@redhat.com, david@redhat.com
-References: <20220223132940.2765217-1-nrb@linux.ibm.com>
- <20220223132940.2765217-7-nrb@linux.ibm.com>
- <04daca6a-5863-d205-ea98-096163a2296a@linux.ibm.com>
- <06404959-0357-e33d-6114-0484d81578c9@linux.ibm.com>
-In-Reply-To: <06404959-0357-e33d-6114-0484d81578c9@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: Kn7QxomSdNCVcZkQZbTPeLEiyOPTea9C
-X-Proofpoint-GUID: JjyKVP7o0-EqE2GzGKJ1xsKyjUAEA930
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        with ESMTP id S233521AbiBXKmk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Feb 2022 05:42:40 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8D07C16A58D
+        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 02:42:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645699329;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Ae5cFQNdc0p3hFbpsaaNC1IeyCU41i7xtv/27lyslL4=;
+        b=S0ZDBZ+TeitTlk7NKdw/EP/iCv8achLn3fuHQCvTNINQlIWSy+0nf/RuA+ZILYJ9coEKbh
+        EoLaJE+vIfbJ0xbOkH2FWml2mK3QclZTanDLrftkE2/hQ1p0nRujNGthdUX6z0uwB3HQ+c
+        TLKT0RI8L7k1pVZH61vioWZi651ieAU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-385-WRuhcsptOwCvRstI-Qbm7Q-1; Thu, 24 Feb 2022 05:42:04 -0500
+X-MC-Unique: WRuhcsptOwCvRstI-Qbm7Q-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3A3C25126;
+        Thu, 24 Feb 2022 10:42:02 +0000 (UTC)
+Received: from localhost (unknown [10.39.195.9])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9F9BF83197;
+        Thu, 24 Feb 2022 10:41:46 +0000 (UTC)
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Yishai Hadas <yishaih@nvidia.com>, alex.williamson@redhat.com,
+        bhelgaas@google.com, saeedm@nvidia.com, linux-pci@vger.kernel.org,
+        kvm@vger.kernel.org, netdev@vger.kernel.org, kuba@kernel.org,
+        leonro@nvidia.com, kwankhede@nvidia.com, mgurtovoy@nvidia.com,
+        maorg@nvidia.com, ashok.raj@intel.com, kevin.tian@intel.com,
+        shameerali.kolothum.thodi@huawei.com
+Subject: Re: [PATCH V8 mlx5-next 09/15] vfio: Define device migration
+ protocol v2
+In-Reply-To: <20220224004622.GD409228@nvidia.com>
+Organization: Red Hat GmbH
+References: <20220220095716.153757-1-yishaih@nvidia.com>
+ <20220220095716.153757-10-yishaih@nvidia.com> <87ley17bsq.fsf@redhat.com>
+ <20220224004622.GD409228@nvidia.com>
+User-Agent: Notmuch/0.34 (https://notmuchmail.org)
+Date:   Thu, 24 Feb 2022 11:41:44 +0100
+Message-ID: <87ilt47dhz.fsf@redhat.com>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-02-24_01,2022-02-24_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- phishscore=0 adultscore=0 mlxscore=0 suspectscore=0 spamscore=0
- lowpriorityscore=0 impostorscore=0 clxscore=1015 mlxlogscore=999
- bulkscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2202240060
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Feb 23 2022, Jason Gunthorpe <jgg@nvidia.com> wrote:
 
+> On Wed, Feb 23, 2022 at 06:06:13PM +0100, Cornelia Huck wrote:
+>> On Sun, Feb 20 2022, Yishai Hadas <yishaih@nvidia.com> wrote:
 
-On 2/24/22 11:27, Pierre Morel wrote:
-> 
-> 
-> On 2/23/22 16:39, Janosch Frank wrote:
->> On 2/23/22 14:29, Nico Boehr wrote:
->>> css_lib extensively uses STSCH, but two more cases deserve their own
->>> tests:
->>>
->>> - unaligned address for SCHIB. We check for misalignment by 1 and 2
->>>    bytes.
->>> - channel not operational
->>> - bit 47 in SID not set
->>> - bit 5 of PMCW flags.
->>>    As per the principles of operation, bit 5 of the PMCW flags shall be
->>>    ignored by msch and always stored as zero by stsch.
->>>
->>>    Older QEMU versions require this bit to always be zero on msch,
->>>    which is why this test may fail. A fix is available in QEMU master
->>>    commit 2df59b73e086 ("s390x/css: fix PMCW invalid mask"). >
->>> Here's the QEMU PMCW invalid mask fix: 
->>> https://lists.nongnu.org/archive/html/qemu-s390x/2021-12/msg00100.html
->>>
->>> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
->>> ---
->>>   s390x/css.c | 74 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->>>   1 file changed, 74 insertions(+)
->>>
->>> diff --git a/s390x/css.c b/s390x/css.c
->>> index a90a0cd64e2b..021eb12573c0 100644
->>> --- a/s390x/css.c
->>> +++ b/s390x/css.c
->>> @@ -496,6 +496,78 @@ static void test_ssch(void)
->>>       report_prefix_pop();
->>>   }
->>> +static void test_stsch(void)
->>> +{
->>> +    const int align_to = 4;
->>> +    struct schib schib;
->>> +    int cc;
->>> +
->>> +    if (!test_device_sid) {
->>> +        report_skip("No device");
->>> +        return;
->>> +    }
->>> +
->>> +    report_prefix_push("Unaligned");
->>> +    for (int i = 1; i < align_to; i *= 2) {
->>> +        report_prefix_pushf("%d", i);
->>> +
->>> +        expect_pgm_int();
->>> +        stsch(test_device_sid, (struct schib *)(alignment_test_page 
->>> + i));
->>> +        check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
->>> +
->>> +        report_prefix_pop();
->>> +    }
->>> +    report_prefix_pop();
->>> +
->>> +    report_prefix_push("Invalid subchannel number");
->>> +    cc = stsch(0x0001ffff, &schib);
->>> +    report(cc == 3, "Channel not operational");
->>> +    report_prefix_pop();
->>> +
->>> +    report_prefix_push("Bit 47 in SID is zero");
->>> +    expect_pgm_int();
->>> +    stsch(0x0000ffff, &schib);
->>> +    check_pgm_int_code(PGM_INT_CODE_OPERAND);
->>> +    report_prefix_pop();
->>
->> Add a comment:
->> No matter if the multiple-subchannel-set facility is installed or not, 
->> bit 47 always needs to be 1.
->>
->> Do we have the MSS facility?
-> 
-> yes
-> 
->> If yes, could we disable it to test the 32-47 == 0x0001 case?
-> 
-> AFAIK it is not enabled in the KVM unit tests
-> We are able to enable it, it could be done with CHSC tests.
+>> > +/*
+>> > + * Indicates the device can support the migration API through
+>> > + * VFIO_DEVICE_FEATURE_MIG_DEVICE_STATE. If present flags must be non-zero and
+>> > + * VFIO_DEVICE_FEATURE_MIG_DEVICE_STATE is supported. The RUNNING and
+>> 
+>> I'm having trouble parsing this. I think what it tries to say is that at
+>> least one of the flags defined below must be set?
+>> 
+>> > + * ERROR states are always supported if this GET succeeds.
+>> 
+>> What about the following instead:
+>> 
+>> "Indicates device support for the migration API through
+>> VFIO_DEVICE_FEATURE_MIG_DEVICE_STATE. If present, the RUNNING and ERROR
+>> states are always supported. Support for additional states is indicated
+>> via the flags field; at least one of the flags defined below must be
+>> set."
+>
+> Almost, 'at least VFIO_MIGRATION_STOP_COPY must be set'
 
-I mean to check if it is enabled.
+It feels a bit odd to split the mandatory states between a base layer
+(RUNNING/ERROR) and the ones governed by VFIO_MIGRATION_STOP_COPY. Do we
+want to keep the possibility of a future implementation that does not
+use the semantics indicated by VFIO_MIGRATION_STOP_COPY? If yes, it
+should be "one of the flags" and the flags that require
+VFIO_MIGRATION_STOP_COPY to be set as well need to note that
+dependency. If not, we should explicitly tag VFIO_MIGRATION_STOP_COPY as
+mandatory (so that the flag's special status is obvious.)
 
-> 
->>
->>> +}
->>> +
->>> +static void test_pmcw_bit5(void)
->>> +{
->>> +    int cc;
->>> +    uint16_t old_pmcw_flags;
->>
->> I need a comment here for further reference since that behavior is 
->> documented at the description of the schib and not where STSCH is 
->> described:
->> According to architecture MSCH does ignore bit 5 of the second word 
->> but STSCH will store bit 5 as zero.
->>
->>
->> We could check if bits 0,1 and 6,7 are also zero but I'm not sure if 
->> that's interesting since MSCH does not ignore those bits and should 
->> result in an operand exception when trying to set them.
->>
->> @Halil, @Pierre: Any opinions?
-> 
-> 
-> Yes we should check this.
-> We often do STSCH/MSCH in a row so I think it is interesting to check it.
-> 
->>
->>> +
->>> +    cc = stsch(test_device_sid, &schib);
->>> +    if (cc) {
->>> +        report_fail("stsch: sch %08x failed with cc=%d", 
->>> test_device_sid, cc);
->>> +        return;
->>> +    }
->>> +    old_pmcw_flags = schib.pmcw.flags;
->>> +
->>> +    report_prefix_push("Bit 5 set");
->>> +
->>> +    schib.pmcw.flags = old_pmcw_flags | BIT(15 - 5);
->>> +    cc = msch(test_device_sid, &schib);
->>> +    report(!cc, "MSCH cc == 0");
->>> +
->>> +    cc = stsch(test_device_sid, &schib);
->>> +    report(!cc, "STSCH cc == 0");
->>> +    report(!(schib.pmcw.flags & BIT(15 - 5)), "STSCH PMCW Bit 5 is 
->>> clear");
->>> +
->>> +    report_prefix_pop();
->>> +
->>> +    report_prefix_push("Bit 5 clear");
->>> +
->>> +    schib.pmcw.flags = old_pmcw_flags & ~BIT(15 - 5);
->>> +    cc = msch(test_device_sid, &schib);
->>> +    report(!cc, "MSCH cc == 0");
->>> +
->>> +    cc = stsch(test_device_sid, &schib);
->>> +    report(!cc, "STSCH cc == 0");
->>> +    report(!(schib.pmcw.flags & BIT(15 - 5)), "STSCH PMCW Bit 5 is 
->>> clear");
->>> +
->>> +    report_prefix_pop();
->>> +}
->>> +
->>>   static struct {
->>>       const char *name;
->>>       void (*func)(void);
->>> @@ -511,6 +583,8 @@ static struct {
->>>       { "msch", test_msch },
->>>       { "stcrw", test_stcrw },
->>>       { "ssch", test_ssch },
->>> +    { "stsch", test_stsch },
->>> +    { "pmcw bit 5 ignored", test_pmcw_bit5 },
->>>       { NULL, NULL }
->>>   };
->>
-> 
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
