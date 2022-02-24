@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F2A24C2DC2
-	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 15:02:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A640F4C2DDF
+	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 15:07:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235275AbiBXODL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Feb 2022 09:03:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42742 "EHLO
+        id S235274AbiBXOHk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Feb 2022 09:07:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52882 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235232AbiBXODI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Feb 2022 09:03:08 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1DAD20D838
-        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 06:02:38 -0800 (PST)
+        with ESMTP id S232103AbiBXOHj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Feb 2022 09:07:39 -0500
+Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CD553EBA8
+        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 06:07:08 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2228361B4A
-        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 14:02:38 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69DD8C340E9;
-        Thu, 24 Feb 2022 14:02:37 +0000 (UTC)
+        by sin.source.kernel.org (Postfix) with ESMTPS id A580ACE1DE4
+        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 14:07:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEABCC340E9;
+        Thu, 24 Feb 2022 14:07:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1645711357;
-        bh=Uu4hPx7FLwDAOG6pOtRm9yq1V8Rv43iZR9djicM5fJk=;
+        s=k20201202; t=1645711624;
+        bh=iNe/Xdsad40FDFPmtJ5EvAYSNSCE4WkT2G91LScinbE=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=t6wOwimUMXu7YTHZorBLpGypQo0xAWpe+raFiQPpmk7pXmCDPT4T4GA9RsvZNZ0c2
-         KqLKlBIL7hkiCBvGdur83b/Ae4z3WozC6TBFq0GmdqeeniraDsfv+1KpZtrREWcYH/
-         RFkIPbce9SGE0LF/ATglJSXFHbJLOLYze0F3rV84msVFleNfVB1jXqP6r7coeTSLBS
-         ks4KV4aayuS63xPmEQLL8koc8pOu5iSaNjRJXvvm1q2VQENTbXbN93pfHb76/3qSKJ
-         61NwnfYKkCGBepF79tg/u4pFbfFvxFFgMpR2MWNOVKtGzISt3ihX7YtZKMiCni/U+m
-         kcTbeM53jmYUw==
+        b=MIaJLRU/t2DRlFeFSN4T8OiDHq/ETmj9y6wEIwqHQt35cbB/x0O1j2qlYo6MXtjBn
+         kQTSK4jTvvayN4DJO6LedOTu8WIdj1dGXQr9kdfkCpc6EDkYZ0U6h/VRLVIfvE6yAh
+         UTSbBre4ua+06XcgkgA2j8Ath2SaP2dLYm7XvZJYDqvn73+ziyZdlrJ1YokRkXFuR+
+         qyx0K8iJOLffGUap8qyjEsIvJQOmuyTYb7ky41mPBEq9ndJ17tne849MX4Z6I0j+Pk
+         fx0Mkjq9jGhRwzqgHCJ7B5jVlNK+JEzA42LUYotRvaYy8R2TC2RDjld5XF87Y3ONdO
+         id4u124syG25g==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1nNEhW-00ACPA-V4; Thu, 24 Feb 2022 14:02:35 +0000
-Date:   Thu, 24 Feb 2022 14:02:34 +0000
-Message-ID: <87wnhk2whx.wl-maz@kernel.org>
+        id 1nNElq-00ACSB-HZ; Thu, 24 Feb 2022 14:07:02 +0000
+Date:   Thu, 24 Feb 2022 14:07:02 +0000
+Message-ID: <87v8x42wah.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Oliver Upton <oupton@google.com>
 Cc:     kvmarm@lists.cs.columbia.edu, Paolo Bonzini <pbonzini@redhat.com>,
@@ -56,10 +56,10 @@ Cc:     kvmarm@lists.cs.columbia.edu, Paolo Bonzini <pbonzini@redhat.com>,
         Ricardo Koller <ricarkol@google.com>,
         Raghavendra Rao Ananta <rananta@google.com>,
         Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH v3 09/19] KVM: arm64: Implement PSCI SYSTEM_SUSPEND
-In-Reply-To: <20220223041844.3984439-10-oupton@google.com>
+Subject: Re: [PATCH v3 10/19] KVM: Create helper for setting a system event exit
+In-Reply-To: <20220223041844.3984439-11-oupton@google.com>
 References: <20220223041844.3984439-1-oupton@google.com>
-        <20220223041844.3984439-10-oupton@google.com>
+        <20220223041844.3984439-11-oupton@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -79,107 +79,28 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 23 Feb 2022 04:18:34 +0000,
+On Wed, 23 Feb 2022 04:18:35 +0000,
 Oliver Upton <oupton@google.com> wrote:
-> 
-> ARM DEN0022D.b 5.19 "SYSTEM_SUSPEND" describes a PSCI call that allows
-> software to request that a system be placed in the deepest possible
-> low-power state. Effectively, software can use this to suspend itself to
-> RAM. Note that the semantics of this PSCI call are very similar to
-> CPU_SUSPEND, which is already implemented in KVM.
-> 
-> Implement the SYSTEM_SUSPEND in KVM. Similar to CPU_SUSPEND, the
-> low-power state is implemented as a guest WFI. Synchronously reset the
-> calling CPU before entering the WFI, such that the vCPU may immediately
-> resume execution when a wakeup event is recognized.
-> 
-> Signed-off-by: Oliver Upton <oupton@google.com>
-> ---
->  arch/arm64/kvm/psci.c  | 51 ++++++++++++++++++++++++++++++++++++++++++
->  arch/arm64/kvm/reset.c |  3 ++-
->  2 files changed, 53 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
-> index 77a00913cdfd..41adaaf2234a 100644
-> --- a/arch/arm64/kvm/psci.c
-> +++ b/arch/arm64/kvm/psci.c
-> @@ -208,6 +208,50 @@ static void kvm_psci_system_reset(struct kvm_vcpu *vcpu)
->  	kvm_prepare_system_event(vcpu, KVM_SYSTEM_EVENT_RESET);
+
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index f11039944c08..9085a1b1569a 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -2202,6 +2202,13 @@ static inline void kvm_handle_signal_exit(struct kvm_vcpu *vcpu)
 >  }
+>  #endif /* CONFIG_KVM_XFER_TO_GUEST_WORK */
 >  
-> +static int kvm_psci_system_suspend(struct kvm_vcpu *vcpu)
+> +static inline void kvm_vcpu_set_system_event_exit(struct kvm_vcpu *vcpu, u32 type)
 > +{
-> +	struct vcpu_reset_state reset_state;
-> +	struct kvm *kvm = vcpu->kvm;
-> +	struct kvm_vcpu *tmp;
-> +	bool denied = false;
-> +	unsigned long i;
+> +	memset(&vcpu->run->system_event, 0, sizeof(vcpu->run->system_event));
+> +	vcpu->run->system_event.type = type;
+> +	vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
+> +}
 > +
-> +	reset_state.pc = smccc_get_arg1(vcpu);
-> +	if (!kvm_ipa_valid(kvm, reset_state.pc)) {
-> +		smccc_set_retval(vcpu, PSCI_RET_INVALID_ADDRESS, 0, 0, 0);
-> +		return 1;
-> +	}
-> +
-> +	reset_state.r0 = smccc_get_arg2(vcpu);
-> +	reset_state.be = kvm_vcpu_is_be(vcpu);
-> +	reset_state.reset = true;
-> +
-> +	/*
-> +	 * The SYSTEM_SUSPEND PSCI call requires that all vCPUs (except the
-> +	 * calling vCPU) be in an OFF state, as determined by the
-> +	 * implementation.
-> +	 *
-> +	 * See ARM DEN0022D, 5.19 "SYSTEM_SUSPEND" for more details.
-> +	 */
-> +	mutex_lock(&kvm->lock);
-> +	kvm_for_each_vcpu(i, tmp, kvm) {
-> +		if (tmp != vcpu && !kvm_arm_vcpu_powered_off(tmp)) {
-> +			denied = true;
-> +			break;
-> +		}
-> +	}
-> +	mutex_unlock(&kvm->lock);
 
-This looks dodgy. Nothing seems to prevent userspace from setting the
-mp_state to RUNNING in parallel with this, as only the vcpu mutex is
-held when this ioctl is issued.
-
-It looks to me that what you want is what lock_all_vcpus() does
-(Alexandru has a patch moving it out of the vgic code as part of his
-SPE series).
-
-It is also pretty unclear what the interaction with userspace is once
-you have released the lock. If the VMM starts a vcpu other than the
-suspending one, what is its state? The spec doesn't see to help
-here. I can see two options:
-
-- either all the vcpus have the same reset state applied to them as
-  they come up, unless they are started with CPU_ON by a vcpu that has
-  already booted (but there is a single 'context_id' provided, and I
-  fear this is going to confuse the OS)...
-
-- or only the suspending vcpu can resume the system, and we must fail
-  a change of mp_state for the other vcpus.
-
-What do you think?
-
-> +
-> +	if (denied) {
-> +		smccc_set_retval(vcpu, PSCI_RET_DENIED, 0, 0, 0);
-> +		return 1;
-> +	}
-> +
-> +	__kvm_reset_vcpu(vcpu, &reset_state);
-> +	kvm_vcpu_wfi(vcpu);
-
-I have mixed feelings about this. The vcpu has reset before being in
-WFI, while it really should be the other way around and userspace
-could rely on observing the transition.
-
-What breaks if you change this?
-
-Thanks,
+nit: does this really deserve an inline function? I'd stick that in
+kvm_main.c, really. Or is that getting in the way of building KVM as a
+module on 'the other architecture'?
 
 	M.
 
