@@ -2,68 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AC4494C2B01
-	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 12:36:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E18D4C2B0B
+	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 12:36:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231176AbiBXLg4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Feb 2022 06:36:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51280 "EHLO
+        id S232775AbiBXLhJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Feb 2022 06:37:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51736 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229541AbiBXLgw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Feb 2022 06:36:52 -0500
-Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DA9829A542;
-        Thu, 24 Feb 2022 03:36:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1645702582; x=1677238582;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=C/p2KYGcxZmJ0eyN5UPnDwwVdVBiuLBc+EN/TQCHmIE=;
-  b=n0DeJS4L1QT6eIEEViY3Bx3Hs0UlTXghUdvCAHIbLCF2bMrwgtaNylmF
-   p1P0tUzTeI5L3uYBd1EXPF0+J6QAFR+cPbi6muD1xypvCn1ASMO1ya1KH
-   50bcUDwgiMNqQlVwS/kQslkCkWkULvv6xZ30aC6hvydR9ZoLi4Inn+tRX
-   o=;
-X-IronPort-AV: E=Sophos;i="5.88,393,1635206400"; 
-   d="scan'208";a="180859573"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1e-b69ea591.us-east-1.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-6001.iad6.amazon.com with ESMTP; 24 Feb 2022 11:36:09 +0000
-Received: from EX13MTAUWC002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
-        by email-inbound-relay-iad-1e-b69ea591.us-east-1.amazon.com (Postfix) with ESMTPS id 37E89C08FB;
-        Thu, 24 Feb 2022 11:36:05 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC002.ant.amazon.com (10.43.162.240) with Microsoft SMTP Server (TLS)
- id 15.0.1497.28; Thu, 24 Feb 2022 11:36:05 +0000
-Received: from [0.0.0.0] (10.43.162.144) by EX13D20UWC001.ant.amazon.com
- (10.43.162.244) with Microsoft SMTP Server (TLS) id 15.0.1497.28; Thu, 24 Feb
- 2022 11:36:01 +0000
-Message-ID: <f468b9b2-8c55-5ca6-de75-9ec421fda557@amazon.com>
-Date:   Thu, 24 Feb 2022 12:35:59 +0100
+        with ESMTP id S231439AbiBXLhG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Feb 2022 06:37:06 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 562CBD45;
+        Thu, 24 Feb 2022 03:36:31 -0800 (PST)
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21OB0fWU003069;
+        Thu, 24 Feb 2022 11:36:29 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=cB80VAUguu4gmaxIRXNj5TbmhB8/7iienHoEkqSOq2U=;
+ b=pG+rtL1d4+tM1yGhcrJeLXsCns8I79g5zfgfrQZ+UJchUdzIiPZtyo6LQwefncE9okl7
+ naIcyKfgcBXh45DZm1mkvw68WCop3anKGciG9rBd8z169L+D1jLN5TUCu6PVBKNKMUOM
+ cpGfbsr4cqSESILWv0nJ/NquWAjIkNxIGFNyF2kMqar5pg0bfF8e5OahtLOmIXh8F++i
+ IbyoxjgAWYXSt4RUblGWsvdicZOjFBz+Zvp5iIlwz1Qnb8UW9uI+3aNKTiFuMWrGf2qQ
+ h41I3mOd1YVKjplnJc11ER7cwxMz6+ZpYXk2nfdwve6YaFOCgCoVo/e2hGuPSfknLfdt IA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3edw51eegp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 24 Feb 2022 11:36:28 +0000
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21OBZaqu014531;
+        Thu, 24 Feb 2022 11:36:28 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3edw51eefy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 24 Feb 2022 11:36:28 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21OBWlTD013135;
+        Thu, 24 Feb 2022 11:36:26 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma03ams.nl.ibm.com with ESMTP id 3ear69h401-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 24 Feb 2022 11:36:26 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21OBaNae56164782
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 24 Feb 2022 11:36:23 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2147C11C05C;
+        Thu, 24 Feb 2022 11:36:23 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8F42A11C054;
+        Thu, 24 Feb 2022 11:36:22 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.2.54])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 24 Feb 2022 11:36:22 +0000 (GMT)
+Date:   Thu, 24 Feb 2022 12:36:20 +0100
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>
+Subject: Re: [PATCH v1 1/1] KVM: s390: Don't cast parameter in bit
+ operations
+Message-ID: <20220224123620.57fd6c8b@p-imbrenda>
+In-Reply-To: <20220223164420.45344-1-andriy.shevchenko@linux.intel.com>
+References: <20220223164420.45344-1-andriy.shevchenko@linux.intel.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.6.1
-Subject: Re: [PATCH RFC v1 0/2] VM fork detection for RNG
-To:     =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-CC:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>,
-        <linux-s390@vger.kernel.org>, <adrian@parity.io>,
-        <dwmw@amazon.co.uk>, <acatan@amazon.com>, <colmmacc@amazon.com>,
-        <sblbir@amazon.com>, <raduweis@amazon.com>, <jannh@google.com>,
-        <gregkh@linuxfoundation.org>, <tytso@mit.edu>
-References: <20220223131231.403386-1-Jason@zx2c4.com>
- <234d7952-0379-e3d9-5e02-5eba171024a0@amazon.com>
- <YhdhTlhnj46gqhk+@redhat.com>
-From:   Alexander Graf <graf@amazon.com>
-In-Reply-To: <YhdhTlhnj46gqhk+@redhat.com>
-X-Originating-IP: [10.43.162.144]
-X-ClientProxiedBy: EX13P01UWB004.ant.amazon.com (10.43.161.213) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
-X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-        NICE_REPLY_A,RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: KMYavoUxHNIVE3KTDhbCQfvUYOvE7o2Q
+X-Proofpoint-ORIG-GUID: 1-JncAn_mRQ-bcwR4-n6DEWr-MLIJuut
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-02-24_02,2022-02-24_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ suspectscore=0 priorityscore=1501 lowpriorityscore=0 spamscore=0
+ mlxscore=0 adultscore=0 bulkscore=0 malwarescore=0 phishscore=0
+ impostorscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2201110000 definitions=main-2202240068
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -72,124 +100,69 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Ck9uIDI0LjAyLjIyIDExOjQzLCBEYW5pZWwgUC4gQmVycmFuZ8OpIHdyb3RlOgo+IE9uIFRodSwg
-RmViIDI0LCAyMDIyIGF0IDA5OjUzOjU5QU0gKzAxMDAsIEFsZXhhbmRlciBHcmFmIHdyb3RlOgo+
-PiBIZXkgSmFzb24sCj4+Cj4+IE9uIDIzLjAyLjIyIDE0OjEyLCBKYXNvbiBBLiBEb25lbmZlbGQg
-d3JvdGU6Cj4+PiBUaGlzIHNtYWxsIHNlcmllcyBwaWNrcyB1cCB3b3JrIGZyb20gQW1hem9uIHRo
-YXQgc2VlbXMgdG8gaGF2ZSBzdGFsbGVkCj4+PiBvdXQgbGF0ZXIgeWVhciBhcm91bmQgdGhpcyB0
-aW1lOiBsaXN0ZW5pbmcgZm9yIHRoZSB2bWdlbmlkIEFDUEkKPj4+IG5vdGlmaWNhdGlvbiwgYW5k
-IHVzaW5nIGl0IHRvICJkbyBzb21ldGhpbmcuIiBMYXN0IHllYXIsIHRoYXQgc29tZXRoaW5nCj4+
-PiBpbnZvbHZlZCBhIGNvbXBsaWNhdGVkIHVzZXJzcGFjZSBtbWFwIGNoYXJkZXYsIHdoaWNoIHNl
-ZW1zIGZyb3VnaHQgd2l0aAo+Pj4gZGlmZmljdWx0eS4gVGhpcyB5ZWFyLCBJIGhhdmUgc29tZXRo
-aW5nIG11Y2ggc2ltcGxlciBpbiBtaW5kOiBzaW1wbHkKPj4+IHVzaW5nIHRob3NlIEFDUEkgbm90
-aWZpY2F0aW9ucyB0byB0ZWxsIHRoZSBSTkcgdG8gcmVpbml0aWFsaXplIHNhZmVseSwKPj4+IHNv
-IHdlIGRvbid0IHJlcGVhdCByYW5kb20gbnVtYmVycyBpbiBjbG9uZWQsIGZvcmtlZCwgb3Igcm9s
-bGVkLWJhY2sgVk0KPj4+IGluc3RhbmNlcy4KPj4+Cj4+PiBUaGlzIHNlcmllcyBjb25zaXN0cyBv
-ZiB0d28gcGF0Y2hlcy4gVGhlIGZpcnN0IGlzIGEgcmF0aGVyCj4+PiBzdHJhaWdodGZvcndhcmQg
-YWRkaXRpb24gdG8gcmFuZG9tLmMsIHdoaWNoIEkgZmVlbCBmaW5lIGFib3V0LiBUaGUKPj4+IHNl
-Y29uZCBwYXRjaCBpcyB0aGUgcmVhc29uIHRoaXMgaXMganVzdCBhbiBSRkM6IGl0J3MgYSBjbGVh
-bnVwIG9mIHRoZQo+Pj4gQUNQSSBkcml2ZXIgZnJvbSBsYXN0IHllYXIsIGFuZCBJIGRvbid0IHJl
-YWxseSBoYXZlIG11Y2ggZXhwZXJpZW5jZQo+Pj4gd3JpdGluZywgdGVzdGluZywgZGVidWdnaW5n
-LCBvciBtYWludGFpbmluZyB0aGVzZSB0eXBlcyBvZiBkcml2ZXJzLgo+Pj4gSWRlYWxseSB0aGlz
-IHRocmVhZCB3b3VsZCB5aWVsZCBzb21lYm9keSBzYXlpbmcsICJJIHNlZSB0aGUgaW50ZW50IG9m
-Cj4+PiB0aGlzOyBJJ20gaGFwcHkgdG8gdGFrZSBvdmVyIG93bmVyc2hpcCBvZiB0aGlzIHBhcnQu
-IiBUaGF0IHdheSwgSSBjYW4KPj4+IGZvY3VzIG9uIHRoZSBSTkcgcGFydCwgYW5kIHdob2V2ZXIg
-c3RlcHMgdXAgZm9yIHRoZSBwYXJhdmlydCBBQ1BJIHBhcnQKPj4+IGNhbiBmb2N1cyBvbiB0aGF0
-Lgo+Pj4KPj4+IEFzIGEgZmluYWwgbm90ZSwgdGhpcyBzZXJpZXMgaW50ZW50aW9uYWxseSBkb2Vz
-IF9ub3RfIGZvY3VzIG9uCj4+PiBub3RpZmljYXRpb24gb2YgdGhlc2UgZXZlbnRzIHRvIHVzZXJz
-cGFjZSBvciB0byBvdGhlciBrZXJuZWwgY29uc3VtZXJzLgo+Pj4gU2luY2UgdGhlc2UgVk0gZm9y
-ayBkZXRlY3Rpb24gZXZlbnRzIGZpcnN0IG5lZWQgdG8gaGl0IHRoZSBSTkcsIHdlIGNhbgo+Pj4g
-bGF0ZXIgdGFsayBhYm91dCB3aGF0IHNvcnRzIG9mIG5vdGlmaWNhdGlvbnMgb3IgbW1hcCdkIGNv
-dW50ZXJzIHRoZSBSTkcKPj4+IHNob3VsZCBiZSBtYWtpbmcgYWNjZXNzaWJsZSB0byBlbHNld2hl
-cmUuIEJ1dCB0aGF0J3MgYSBkaWZmZXJlbnQgc29ydCBvZgo+Pj4gcHJvamVjdCBhbmQgdGllcyBp
-bnRvIGEgbG90IG9mIG1vcmUgY29tcGxpY2F0ZWQgY29uY2VybnMgYmV5b25kIHRoaXMKPj4+IG1v
-cmUgYmFzaWMgcGF0Y2hzZXQuIFNvIGhvcGVmdWxseSB3ZSBjYW4ga2VlcCB0aGUgZGlzY3Vzc2lv
-biByYXRoZXIKPj4+IGZvY3VzZWQgaGVyZSB0byB0aGlzIEFDUEkgYnVzaW5lc3MuCj4+Cj4+IFRo
-ZSBtYWluIHByb2JsZW0gd2l0aCBWTUdlbklEIGlzIHRoYXQgaXQgaXMgaW5oZXJlbnRseSByYWN5
-LiBUaGVyZSB3aWxsCj4+IGFsd2F5cyBiZSBhIChzaG9ydCkgYW1vdW50IG9mIHRpbWUgd2hlcmUg
-dGhlIEFDUEkgbm90aWZpY2F0aW9uIGlzIG5vdAo+PiBwcm9jZXNzZWQsIGJ1dCB0aGUgVk0gY291
-bGQgdXNlIGl0cyBSTkcgdG8gZm9yIGV4YW1wbGUgZXN0YWJsaXNoIFRMUwo+PiBjb25uZWN0aW9u
-cy4KPj4KPj4gSGVuY2Ugd2UgYXMgdGhlIG5leHQgc3RlcCBwcm9wb3NlZCBhIG11bHRpLXN0YWdl
-IHF1aWVzY2UvcmVzdW1lIG1lY2hhbmlzbQo+PiB3aGVyZSB0aGUgc3lzdGVtIGlzIGF3YXJlIHRo
-YXQgaXQgaXMgZ29pbmcgaW50byBzdXNwZW5kIC0gY2FuIGJsb2NrIG5ldHdvcmsKPj4gY29ubmVj
-dGlvbnMgZm9yIGV4YW1wbGUgLSBhbmQgb25seSByZXR1cm5zIHRvIGEgZnVsbHkgZnVuY3Rpb25h
-bCBzdGF0ZSBhZnRlcgo+PiBhbiB1bnF1aWVzY2UgcGhhc2U6Cj4+Cj4+ICAgIGh0dHBzOi8vZ2l0
-aHViLmNvbS9zeXN0ZW1kL3N5c3RlbWQvaXNzdWVzLzIwMjIyCj4gVGhlIGRvd25zaWRlIG9mIGNv
-dXJzZSBpcyBwcmVjaXNlbHkgdGhhdCB0aGUgZ3Vlc3Qgbm93IG5lZWRzIHRvIGJlIGF3YXJlCj4g
-YW5kIGludm9sdmVkIGV2ZXJ5IHNpbmdsZSB0aW1lIGEgc25hcHNob3QgaXMgdGFrZW4uCj4KPiBD
-dXJyZW50bHkgd2l0aCB2aXJ0IHRoZSBhY3Qgb2YgdGFraW5nIGEgc25hcHNob3QgY2FuIG9mdGVu
-IHJlbWFpbiBpbnZpc2libGUKPiB0byB0aGUgVk0gd2l0aCBubyBmdW5jdGlvbmFsIGVmZmVjdCBv
-biB0aGUgZ3Vlc3QgT1Mgb3IgaXRzIHdvcmtsb2FkLCBhbmQKPiB0aGUgaG9zdCBPUyBrbm93cyBp
-dCBjYW4gY29tcGxldGUgYSBzbmFwc2hvdCBpbiBhIHNwZWNpZmljIHRpbWVmcmFtZS4gVGhhdAo+
-IHNhaWQsIHRoaXMgdHJhbnNwYXJlbmN5IHRvIHRoZSBWTSBpcyBwcmVjaXNlbHkgdGhlIGNhdXNl
-IG9mIHRoZSByYWNlCj4gY29uZGl0aW9uIGRlc2NyaWJlZC4KPgo+IFdpdGggZ3Vlc3QgaW52b2x2
-ZW1lbnQgdG8gcXVpZXNjZSB0aGUgYnVsayBvZiBhY3Rpdml0eSBmb3IgdGltZSBwZXJpb2QsCj4g
-dGhlcmUgaXMgbW9yZSBsaWtlbHkgdG8gYmUgYSBuZWdhdGl2ZSBpbXBhY3Qgb24gdGhlIGd1ZXN0
-IHdvcmtsb2FkLiBUaGUKPiBndWVzdCBhZG1pbiBsaWtlbHkgbmVlZHMgdG8gYmUgbW9yZSBleHBs
-aWNpdCBhYm91dCBleGFjdGx5IHdoZW4gaW4gdGltZQo+IGl0IGlzIHJlYXNvbmFibGUgdG8gdGFr
-ZSBhIHNuYXBzaG90IHRvIG1pdGlnYXRlIHRoZSBpbXBhY3QuCj4KPiBUaGUgaG9zdCBPUyBzbmFw
-c2hvdCBvcGVyYXRpb25zIGFyZSBhbHNvIG5vdyBkZXBlbmRhbnQgb24gY28tb3BlcmF0aW9uCj4g
-b2YgYSBndWVzdCBPUyB0aGF0IGhhcyB0byBiZSBjb25zaWRlcmVkIHRvIGJlIHBvdGVudGlhbGx5
-IG1hbGljaW91cywgb3IKPiBhdCBsZWFzdCBjcmFzaGVkL25vbi1yZXNwb25zaXZlLiBUaGUgZ3Vl
-c3QgT1MgYWxzbyBuZWVkcyBhIHdheSB0byByZWNlaXZlCj4gdGhlIHRyaWdnZXJzIGZvciBzbmFw
-c2hvdCBjYXB0dXJlIGFuZCByZXN0b3JlLCBtb3N0IGxpa2VseSB2aWEgYW4gZXh0ZW5zaW9uCj4g
-dG8gc29tZXRoaW5nIGxpa2UgdGhlIFFFTVUgZ3Vlc3QgYWdlbnQgb3IgYW4gZXF1aXZhbGVudCBm
-b3Igb3RodWVyCj4gaHlwZXJ2aXNvcnMuCgoKV2hhdCB5b3UgZGVzY3JpYmUgc291bmRzIGFsbW9z
-dCBleGFjdGx5IGxpa2UgcHJlc3NpbmcgYSBwb3dlciBidXR0b24gb24gCm1vZGVybiBzeXN0ZW1z
-LiBZb3UgZG9uJ3QganVzdCBraWxsIHRoZSBwb3dlciBsaW5lLCB5b3UgcHJlc3MgYSBidXR0b24g
-CmFuZCB3YWl0IGZvciB0aGUgZ3Vlc3QgdG8gYWNrbm93bGVkZ2UgdGhhdCBpdCdzIHJlYWR5LgoK
-TWF5YmUgdGhlIHJlYWwgYW5zd2VyIHRvIGFsbCBvZiB0aGlzIGlzIFMzOiBTdXNwZW5kIHRvIFJB
-TS4gWW91IHByZXNzIAp0aGUgc3VzcGVuZCBidXR0b24sIHRoZSBndWVzdCBjYW4gcHJlcGFyZSBm
-b3Igc2xlZXAgKHF1aWVzY2UhKSBhbmQgdGhlIApuZXh0IHRpbWUgeW91IHJ1biwgaXQgY2FuIGNo
-ZWNrIHdoZXRoZXIgVk1HZW5JRCBjaGFuZ2VkIGFuZCBhY3QgYWNjb3JkaW5nbHkuCgoKPiBEZXNw
-aXRlIHRoZSBhYm92ZSwgSSdtIG5vdCBhZ2FpbnN0IHRoZSBpZGVhIG9mIGNvLW9wZXJhdGl2ZSBp
-bnZvbHZlbWVudAo+IG9mIHRoZSBndWVzdCBPUyBpbiB0aGUgYWN0cyBvZiB0YWtpbmcgJiByZXN0
-b3Jpbmcgc25hcHNob3RzLiBJIGNhbid0Cj4gc2VlIGFueSBvdGhlciBwcm9wb3NhbHMgc28gZmFy
-IHRoYXQgY2FuIHJlbGlhYmx5IGVsaW1pbmF0ZSB0aGUgcmFjZXMKPiBpbiB0aGUgZ2VuZXJhbCBj
-YXNlLCBmcm9tIHRoZSBrZXJuZWwgcmlnaHQgdXB0byB1c2VyIGFwcGxpY2F0aW9ucy4KPiBTbyBJ
-IHRoaW5rIGl0IGlzIG5lY2Nlc3NhcnkgdG8gaGF2ZSBndWVzdCBjb29wZXJhdGl2ZSBzbmFwc2hv
-dHRpbmcuCj4KPj4gV2hhdCBleGFjdCB1c2UgY2FzZSBkbyB5b3UgaGF2ZSBpbiBtaW5kIGZvciB0
-aGUgUk5HL1ZNR2VuSUQgdXBkYXRlPyBDYW4geW91Cj4+IHRoaW5rIG9mIHNpdHVhdGlvbnMgd2hl
-cmUgdGhlIHJhY2UgaXMgbm90IGFuIGFjdHVhbCBjb25jZXJuPwo+IExldHMgYXNzdW1lIHdlIGRv
-IHRha2UgdGhlIGFwcHJvYWNoIGRlc2NyaWJlZCBpbiB0aGF0IHN5c3RlbWQgYnVnIGFuZAo+IGhh
-dmUgYSBjby1vcGVyYXRpdmUgc25hcHNob3QgcHJvY2Vzcy4gSWYgdGhlIGh5cGVydmlzb3IgZG9l
-cyB0aGUgcmlnaHQKPiB0aGluZyBhbmQgZ3Vlc3Qgb3duZXJzIGluc3RhbGwgdGhlIHJpZ2h0IHRo
-aW5ncywgdGhleSdsbCBoYXZlIGEgcmFjZQo+IGZyZWUgc29sdXRpb24gdGhhdCB3b3JrcyB3ZWxs
-IGluIG5vcm1hbCBvcGVyYXRpb24uIFRoYXQncyBnb29kLgo+Cj4KPiBSZWFsaXN0aWNhbGx5IHRo
-b3VnaCwgaXQgaXMgbmV2ZXIgZ29pbmcgdG8gYmUgdW5pdmVyc2FsbHkgYW5kIHJlbGlhYmx5Cj4g
-cHV0IGludG8gcHJhY3RpY2UuIFNvIHdoYXQgaXMgb3VyIGF0dGl0dWRlIHRvIGNhc2VzIHdoZXJl
-IHRoZSBwcmVmZXJyZWQKPiBzb2x1dGlvbiBpc24ndCBhdmFpbGJsZSBhbmQvb3Igb3BlcmF0aXZl
-ID8KPgo+Cj4gVGhlcmUgYXJlIGdvaW5nIHRvIGJlIHVzZXJzIHdobyBjb250aW51ZSB0byBidWls
-ZCB0aGVpciBndWVzdCBkaXNrIGltYWdlcwo+IHdpdGhvdXQgdGhlIFFFTVUgZ3Vlc3QgYWdlbnQg
-KG9yIGVxdWl2YWxlbnQgZm9yIHdoYXRldmVyIGh5cGVydmlzb3IgdGhleQo+IHJ1biBvbikgaW5z
-dGFsbGVkIGJlY2F1c2UgdGhleSBkb24ndCBrbm93IGFueSBiZXR0ZXIuIE9yIHdoZXJlIHRoZSBn
-dWVzdAo+IGFnZW50IGlzIG1pcy1jb25maWd1cmVkIG9yIGZhaWxzIHRvIHN0YXJ0cyBvciBzb21l
-IG90aGVyIHNjZW5hcmlvIHRoYXQKPiBwcmV2ZW50cyB0aGUgcXVpZXNjZSB3b3JraW5nIGFzIGRl
-c2lyZWQuIFRoZSBob3N0IG1nbXQgY291bGQgcmVmdXNlIHRvCj4gdGFrZSBhIHNuYXBzaG90IGlu
-IHRoZXNlIGNhc2VzLiBNb3JlIGxpa2VseSBpcyB0aGF0IHRoZXkgYXJlIGp1c3QKPiBnb2luZyB0
-byBnbyBhaGVhZCBhbmQgZG8gYSBzbmFwc2hvdCBhbnl3YXkgYmVjYXVzZSBsYWNrIG9mIGd1ZXN0
-IGFnZW50Cj4gaXMgYSB2ZXJ5IGNvbW1vbiBzY2VuYXJpbyB0b2RheSBhbmQgdXNlcnMgd2FudCB0
-aGVpciBzbmFwc2hvdHMuCj4KPgo+IFRoZXJlIGFyZSBnb2luZyB0byBiZSB2aXJ0IG1hbmFnZW1l
-bnQgYXBwcyAvIGh5cGVydmlzb3JzIHRoYXQgZG9uJ3QKPiBzdXBwb3J0IHRhbGtpbmcgdG8gYW55
-IGd1ZXN0IGFnZW50IGFjcm9zcyB0aGVpciBzbmFwc2hvdCBvcGVyYXRpb24KPiBpbiB0aGUgZmly
-c3QgcGxhY2UsIHNvIHN5c3RlbWQgZ2V0cyBubyB3YXkgdG8gdHJpZ2dlciB0aGUgcmVxdWlyZWQK
-PiBxdWllc2NlIGRhbmNlIG9uIHNuYXBzaG90LCBidXQgdGhleSBsaWtlbHkgaGF2ZSBWTUdlbklE
-IHN1cHBvcnQKPiBpbXBsZW1lbnRlZCBhbHJlYWR5Lgo+Cj4KPiBJT1csIEkgY291bGQgdmlldyBW
-TUdlbklEIHRyaWdnZXJlZCBmb3JrIGRldGVjdGlvbiBpbnRlZ3JhdGVkIHdpdGgKPiB0aGUga2Vy
-bmVsIFJORyBhcyBwcm92aWRpbmcgYSBiYWNrdXAgbGluZSBvZiBkZWZlbmNlIHRoYXQgaXMgZ29p
-bmcKPiB0byAianVzdCB3b3JrIiwgYWxiZWl0IHdpdGggdGhlIGtub3duIHJhY2UuIEl0IGlzbid0
-IGFzIGdvb2QgYXMgdGhlCj4gZ3Vlc3QgY28tb3BlcmF0aXZlIHNuYXBzaG90IGFwcHJvYWNoLCBi
-ZWNhdXNlIGl0IG9ubHkgdHJpZXMgdG8gc29sdmUKPiB0aGUgb25lIHNwZWNpZmljIHRhcmdldHRl
-ZCBwcm9ibGVtIG9mIHVwZGF0aW5nIHRoZSBrZXJuZWwgUk5HLgo+Cj4gSXMgaXQgc3RpbGwgYmV0
-dGVyIHRoYW4gZG9pbmcgbm90aGluZyBhdCBhbGwgdGhvdWdoLCBmb3IgdGhlIHNjZW5hcmlvCj4g
-d2hlcmUgZ3Vlc3QgY28tb3BlcmF0aXZlIHNuYXBzaG90IGlzIHVuYXZhaWxhYmxlID8KPgo+IElm
-IGl0IGlzIGJldHRlciB0aGFuIG5vdGhpbmcsIGlzIGl0IHRoZW4gY29tcGVsbGluZyBlbm91Z2gg
-dG8ganVzdGlmeQo+IHRoZSBtYWludCBjb3N0IG9mIHRoZSBjb2RlIGFkZGVkIHRvIHRoZSBrZXJu
-ZWwgPwoKCkknbSB0ZW1wdGVkIHRvIHNheSAiSWYgaXQgYWxzbyBleHBvc2VzIHRoZSBWTUdlbklE
-IHZpYSBzeXNmcyBzbyB0aGF0IHlvdSAKY2FuIGFjdHVhbGx5IGNoZWNrIHdoZXRoZXIgeW91IHdl
-cmUgY2xvbmVkLCBwcm9iYWJseSB5ZXMuIgoKCkFsZXgKCgoKCgpBbWF6b24gRGV2ZWxvcG1lbnQg
-Q2VudGVyIEdlcm1hbnkgR21iSApLcmF1c2Vuc3RyLiAzOAoxMDExNyBCZXJsaW4KR2VzY2hhZWZ0
-c2Z1ZWhydW5nOiBDaHJpc3RpYW4gU2NobGFlZ2VyLCBKb25hdGhhbiBXZWlzcwpFaW5nZXRyYWdl
-biBhbSBBbXRzZ2VyaWNodCBDaGFybG90dGVuYnVyZyB1bnRlciBIUkIgMTQ5MTczIEIKU2l0ejog
-QmVybGluClVzdC1JRDogREUgMjg5IDIzNyA4NzkKCgo=
+On Wed, 23 Feb 2022 18:44:20 +0200
+Andy Shevchenko <andriy.shevchenko@linux.intel.com> wrote:
+
+> While in this particular case it would not be a (critical) issue,
+> the pattern itself is bad and error prone in case somebody blindly
+> copies to their code.
+> 
+> Don't cast parameter to unsigned long pointer in the bit operations.
+> Instead copy to a local variable on stack of a proper type and use.
+> 
+> Fixes: d77e64141e32 ("KVM: s390: implement GISA IPM related primitives")
+> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> ---
+>  arch/s390/include/asm/kvm_host.h | 5 ++++-
+>  arch/s390/kvm/interrupt.c        | 6 +++---
+>  2 files changed, 7 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+> index a22c9266ea05..f1c4a1b9b360 100644
+> --- a/arch/s390/include/asm/kvm_host.h
+> +++ b/arch/s390/include/asm/kvm_host.h
+> @@ -867,7 +867,10 @@ struct kvm_s390_gisa {
+>  			u8  reserved03[11];
+>  			u32 airq_count;
+>  		} g1;
+> -		struct {
+> +		struct { /* as a 256-bit bitmap */
+> +			DECLARE_BITMAP(b, 256);
+> +		} bitmap;
+> +		struct { /* as a set of 64-bit words */
+>  			u64 word[4];
+>  		} u64;
+>  	};
+> diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
+> index db933c252dbc..04e055cbd080 100644
+> --- a/arch/s390/kvm/interrupt.c
+> +++ b/arch/s390/kvm/interrupt.c
+> @@ -304,7 +304,7 @@ static inline int gisa_in_alert_list(struct kvm_s390_gisa *gisa)
+>  
+>  static inline void gisa_set_ipm_gisc(struct kvm_s390_gisa *gisa, u32 gisc)
+>  {
+> -	set_bit_inv(IPM_BIT_OFFSET + gisc, (unsigned long *) gisa);
+> +	set_bit_inv(IPM_BIT_OFFSET + gisc, gisa->bitmap.b);
+
+wouldn't it be enough to pass gisa->u64.word here?
+then no cast would be necessary
+
+>  }
+>  
+>  static inline u8 gisa_get_ipm(struct kvm_s390_gisa *gisa)
+> @@ -314,12 +314,12 @@ static inline u8 gisa_get_ipm(struct kvm_s390_gisa *gisa)
+>  
+>  static inline void gisa_clear_ipm_gisc(struct kvm_s390_gisa *gisa, u32 gisc)
+>  {
+> -	clear_bit_inv(IPM_BIT_OFFSET + gisc, (unsigned long *) gisa);
+> +	clear_bit_inv(IPM_BIT_OFFSET + gisc, gisa->bitmap.b);
+>  }
+>  
+>  static inline int gisa_tac_ipm_gisc(struct kvm_s390_gisa *gisa, u32 gisc)
+>  {
+> -	return test_and_clear_bit_inv(IPM_BIT_OFFSET + gisc, (unsigned long *) gisa);
+> +	return test_and_clear_bit_inv(IPM_BIT_OFFSET + gisc, gisa->bitmap.b);
+>  }
+>  
+>  static inline unsigned long pending_irqs_no_gisa(struct kvm_vcpu *vcpu)
 
