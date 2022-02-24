@@ -2,224 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 019694C304D
-	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 16:50:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0CAA34C3056
+	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 16:51:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233693AbiBXPtC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Feb 2022 10:49:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58588 "EHLO
+        id S236383AbiBXPu7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Feb 2022 10:50:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236358AbiBXPtB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Feb 2022 10:49:01 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6620AC928;
-        Thu, 24 Feb 2022 07:48:29 -0800 (PST)
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21OFFD4Y026694;
-        Thu, 24 Feb 2022 15:48:29 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=ak6kzVLRijs1NCZTrB/w1Ze6LOVyT+/IRFvmr8QeKHk=;
- b=SbqKEYf5Rk1OMDpY+8m6CaCABFsdY+J756RKumL6ptNQ8bG9ZDXkUhOJWMYUoV3VfvT4
- aTo3ju2jHODXVBT2matjtqvIMn/G7p+02oaFap/yfKEk+XDAwPpjhefEoSz9V5BvO9UT
- O8wQBt+f5uo356yT9dMG1BSmVrDor6xczPBPB06N0rywQ2J0/P38Uufp+lArGDM2w+n7
- paQFqGxBMupowvPnzLXLrLwgJE5ZofGNsEgULcBZIgs/hrR3LFdNNBLDfr6asfY6b3GK
- MwEH/21Yb1RRJeRiEMbDRtJXy9Pe9xSh6hkIdEgIOBuW2K5XXdJXd6I9yrvl/DCZU5R3 qw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3edwkekssm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 24 Feb 2022 15:48:29 +0000
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21OFGD4E030231;
-        Thu, 24 Feb 2022 15:48:28 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3edwkeksrx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 24 Feb 2022 15:48:28 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21OFkfVH017120;
-        Thu, 24 Feb 2022 15:48:26 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma06ams.nl.ibm.com with ESMTP id 3eaqtjjycu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 24 Feb 2022 15:48:26 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21OFmN9i55771506
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 24 Feb 2022 15:48:23 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4A44E11C05B;
-        Thu, 24 Feb 2022 15:48:23 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 03C2311C04A;
-        Thu, 24 Feb 2022 15:48:23 +0000 (GMT)
-Received: from [9.145.52.67] (unknown [9.145.52.67])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 24 Feb 2022 15:48:22 +0000 (GMT)
-Message-ID: <ef69aa78-9e63-39e3-d662-e46e58d1a5af@linux.ibm.com>
-Date:   Thu, 24 Feb 2022 16:48:22 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [kvm-unit-tests PATCH v4 6/8] s390x: Add more tests for STSCH
-Content-Language: en-US
-To:     Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Cc:     imbrenda@linux.ibm.com, thuth@redhat.com, david@redhat.com
-References: <20220224154336.3459839-1-nrb@linux.ibm.com>
- <20220224154336.3459839-7-nrb@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <20220224154336.3459839-7-nrb@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: NFhqTYEWvawD1Fd-Y1eqNqowjjE7XCbK
-X-Proofpoint-ORIG-GUID: 26rbP4JnjpGxa7HKkGTEh6HfT4FADHHO
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        with ESMTP id S233510AbiBXPu6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Feb 2022 10:50:58 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B2461D95D0
+        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 07:50:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645717827;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=jp/yMSlTvn3D/56VwEvq7WNBshS3m5GAHPXYoUU32sE=;
+        b=NJUfQnIax2LcnOX7qb9D8IVIfgj7jIfV9mTqe10YKUeMFtTyjuzeVwreMFDayZ73Clf0UW
+        20Xz9+k++6UK4h6emiUSrnlbLwLk9eX5Bdmqfsfke08dcpqxGEjlz5jXYK3aFU5FgcCYcM
+        t43Fp7L1E3UHzx+qpL+wttvaJNV27dY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-392-6d4sK7tmOqqUhq6WKZ0tsA-1; Thu, 24 Feb 2022 10:50:26 -0500
+X-MC-Unique: 6d4sK7tmOqqUhq6WKZ0tsA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3B2D5801AB2;
+        Thu, 24 Feb 2022 15:50:24 +0000 (UTC)
+Received: from starship (unknown [10.40.195.190])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CEBD98379C;
+        Thu, 24 Feb 2022 15:50:22 +0000 (UTC)
+Message-ID: <0c006613de3f809049dd021a84f50d76b4c9c73e.camel@redhat.com>
+Subject: Re: [PATCH v2 16/18] KVM: x86: introduce KVM_REQ_MMU_UPDATE_ROOT
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Date:   Thu, 24 Feb 2022 17:50:21 +0200
+In-Reply-To: <7741eeb1-183c-b465-e0f1-852b47a98780@redhat.com>
+References: <20220217210340.312449-1-pbonzini@redhat.com>
+         <20220217210340.312449-17-pbonzini@redhat.com>
+         <YhATewkkO/l4P9UN@google.com>
+         <7741eeb1-183c-b465-e0f1-852b47a98780@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-02-24_03,2022-02-24_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1015
- mlxscore=0 lowpriorityscore=0 phishscore=0 adultscore=0 suspectscore=0
- bulkscore=0 mlxlogscore=999 priorityscore=1501 impostorscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2202240092
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/24/22 16:43, Nico Boehr wrote:
-> css_lib extensively uses STSCH, but two more cases deserve their own
-> tests:
+On Sat, 2022-02-19 at 08:54 +0100, Paolo Bonzini wrote:
+> On 2/18/22 22:45, Sean Christopherson wrote:
+> > On Thu, Feb 17, 2022, Paolo Bonzini wrote:
+> > > Whenever KVM knows the page role flags have changed, it needs to drop
+> > > the current MMU root and possibly load one from the prev_roots cache.
+> > > Currently it is papering over some overly simplistic code by just
+> > > dropping _all_ roots, so that the root will be reloaded by
+> > > kvm_mmu_reload, but this has bad performance for the TDP MMU
+> > > (which drops the whole of the page tables when freeing a root,
+> > > without the performance safety net of a hash table).
+> > > 
+> > > To do this, KVM needs to do a more kvm_mmu_update_root call from
+> > > kvm_mmu_reset_context.  Introduce a new request bit so that the call
+> > > can be delayed until after a possible KVM_REQ_MMU_RELOAD, which would
+> > > kill all hopes of finding a cached PGD.
+> > > 
+> > > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> > > ---
+> > 
+> > Please no.
+> > 
+> > I really, really do not want to add yet another deferred-load in the nested
+> > virtualization paths.
 > 
-> - unaligned address for SCHIB. We check for misalignment by 1 and 2
->    bytes.
-> - channel not operational
-> - bit 47 in SID not set
-> - bit 5 of PMCW flags.
->    As per the principles of operation, bit 5 of the PMCW flags shall be
->    ignored by msch and always stored as zero by stsch.
+> This is not a deferred load, is it?  It's only kvm_mmu_new_pgd that is 
+> deferred, but the PDPTR load is not.
 > 
->    Older QEMU versions require this bit to always be zero on msch,
->    which is why this test may fail. A fix is available in QEMU master
->    commit 2df59b73e086 ("s390x/css: fix PMCW invalid mask").
+> I think I should first merge patches 1-13, then revisit the root_role 
+> series (which only depends on the fast_pgd_switch and caching changes), 
+> and then finally get back to this final part.  The reason is that 
+> root_role is what enables the stale-root check that you wanted; and it's 
+> easier to think about loading the guest PGD post-kvm_init_mmu if I can 
+> show you the direction I'd like to have in general, and not leave things 
+> half-done.
 > 
-> Here's the QEMU PMCW invalid mask fix: https://lists.nongnu.org/archive/html/qemu-s390x/2021-12/msg00100.html
+> (Patch 17 is also independent and perhaps fixing a case of premature 
+> optimization, so I'm inclined to merge it as well).
 > 
-> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> > As Jim pointed out[1], KVM_REQ_GET_NESTED_STATE_PAGES should
+> > never have been merged. And on that point, I've no idea how this new request will
+> > interact with KVM_REQ_GET_NESTED_STATE_PAGE.  It may be a complete non-issue, but
+> > I'd honestly rather not have to spend the brain power.
+> 
+> Fair enough on the interaction, but I still think 
+> KVM_REQ_GET_NESTED_STATE_PAGES is a good idea.  I don't think KVM should 
+> access guest memory outside KVM_RUN, though there may be cases (possibly 
+> some PV MSRs, if I had to guess) where it does.
 
-Acked-by: Janosch Frank <frankja@linux.ibm.com>
+KVM_REQ_GET_NESTED_STATE_PAGES is a real source of bugs, and a burden to maintain,
+I fixed too many bugs in it, and it will only get worse with time, not to mention,
+that without any proper tests, we are bound to access guest memory on
+setting the nested state without anybody noticing.
 
-> ---
->   s390x/css.c | 82 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 82 insertions(+)
+
+Best regards,
+	Maxim Levitsky
+
 > 
-> diff --git a/s390x/css.c b/s390x/css.c
-> index 7fe5283c41d0..dd84e670ce99 100644
-> --- a/s390x/css.c
-> +++ b/s390x/css.c
-> @@ -501,6 +501,86 @@ static void test_ssch(void)
->   	report_prefix_pop();
->   }
->   
-> +static void test_stsch(void)
-> +{
-> +	const int align_to = 4;
-> +	struct schib schib;
-> +	int cc;
-> +
-> +	if (!test_device_sid) {
-> +		report_skip("No device");
-> +		return;
-> +	}
-> +
-> +	report_prefix_push("Unaligned");
-> +	for (int i = 1; i < align_to; i *= 2) {
-> +		report_prefix_pushf("%d", i);
-> +
-> +		expect_pgm_int();
-> +		stsch(test_device_sid, (struct schib *)(alignment_test_page + i));
-> +		check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
-> +
-> +		report_prefix_pop();
-> +	}
-> +	report_prefix_pop();
-> +
-> +	report_prefix_push("Invalid subchannel number");
-> +	cc = stsch(0x0001ffff, &schib);
-> +	report(cc == 3, "Channel not operational");
-> +	report_prefix_pop();
-> +
-> +	/*
-> +	 * No matter if multiple-subchannel-set facility is installed, bit 47
-> +	 * always needs to be 1.
-> +	 */
-> +	report_prefix_push("Bit 47 in SID is zero");
-> +	expect_pgm_int();
-> +	stsch(0x0000ffff, &schib);
-> +	check_pgm_int_code(PGM_INT_CODE_OPERAND);
-> +	report_prefix_pop();
-> +}
-> +
-> +/*
-> + * According to architecture MSCH does ignore bit 5 of the second word
-> + * but STSCH will store bit 5 as zero.
-> + */
-> +static void test_pmcw_bit5(void)
-> +{
-> +	int cc;
-> +	uint16_t old_pmcw_flags;
-> +
-> +	cc = stsch(test_device_sid, &schib);
-> +	if (cc) {
-> +		report_fail("stsch: sch %08x failed with cc=%d", test_device_sid, cc);
-> +		return;
-> +	}
-> +	old_pmcw_flags = schib.pmcw.flags;
-> +
-> +	report_prefix_push("Bit 5 set");
-> +
-> +	schib.pmcw.flags = old_pmcw_flags | BIT(15 - 5);
-> +	cc = msch(test_device_sid, &schib);
-> +	report(!cc, "MSCH cc == 0");
-> +
-> +	cc = stsch(test_device_sid, &schib);
-> +	report(!cc, "STSCH cc == 0");
-> +	report(!(schib.pmcw.flags & BIT(15 - 5)), "STSCH PMCW Bit 5 is clear");
-> +
-> +	report_prefix_pop();
-> +
-> +	report_prefix_push("Bit 5 clear");
-> +
-> +	schib.pmcw.flags = old_pmcw_flags & ~BIT(15 - 5);
-> +	cc = msch(test_device_sid, &schib);
-> +	report(!cc, "MSCH cc == 0");
-> +
-> +	cc = stsch(test_device_sid, &schib);
-> +	report(!cc, "STSCH cc == 0");
-> +	report(!(schib.pmcw.flags & BIT(15 - 5)), "STSCH PMCW Bit 5 is clear");
-> +
-> +	report_prefix_pop();
-> +}
-> +
->   static struct {
->   	const char *name;
->   	void (*func)(void);
-> @@ -516,6 +596,8 @@ static struct {
->   	{ "msch", test_msch },
->   	{ "stcrw", test_stcrw },
->   	{ "ssch", test_ssch },
-> +	{ "stsch", test_stsch },
-> +	{ "pmcw bit 5 ignored", test_pmcw_bit5 },
->   	{ NULL, NULL }
->   };
->   
+> > And I still do not like the approach of converting kvm_mmu_reset_context() wholesale
+> > to not doing kvm_mmu_unload().  There are currently eight kvm_mmu_reset_context() calls:
+> > 
+> >    1.   nested_vmx_restore_host_state() - Only for a missed VM-Entry => VM-Fail
+> >         consistency check, not at all a performance concern.
+> > 
+> >    2.   kvm_mmu_after_set_cpuid() - Still needs to unload.  Not a perf concern.
+> > 
+> >    3.   kvm_vcpu_reset() - Relevant only to INIT.  Not a perf concern, but could be
+> >         converted manually to a different path without too much fuss.
+> > 
+> >    4+5. enter_smm() / kvm_smm_changed() - IMO, not a perf concern, but again could
+> >         be converted manually if anyone cares.
+> > 
+> >    6.   set_efer() - Silly corner case that basically requires host userspace abuse
+> >         of KVM APIs.  Not a perf concern.
+> > 
+> >    7+8. kvm_post_set_cr0/4() - These are the ones we really care about, and they
+> >         can be handled quite trivially, and can even share much of the logic with
+> >         kvm_set_cr3().
+> > 
+> > I strongly prefer that we take a more conservative approach and fix 7+8, and then
+> > tackle 1, 3, and 4+5 separately if someone cares enough about those flows to avoid
+> > dropping roots.
+> 
+> The thing is, I want to get rid of kvm_mmu_reset_context() altogether. 
+> I dislike the fact that it kills the roots but still keeps them in the 
+> hash table, thus relying on separate syncing to avoid future bugs.  It's 
+> very unintuitive what is "reset" and what isn't.
+> 
+> > Regarding KVM_REQ_MMU_RELOAD, that mess mostly goes away with my series to replace
+> > that with KVM_REQ_MMU_FREE_OBSOLETE_ROOTS.  Obsolete TDP MMU roots will never get
+> > a cache hit because the obsolete root will have an "invalid" role.  And if we care
+> > about optimizing this with respect to a memslot (highly unlikely), then we could
+> > add an MMU generation check in the cache lookup.  I was planning on posting that
+> > series as soon as this one is queued, but I'm more than happy to speculatively send
+> > a refreshed version that applies on top of this series.
+> 
+> Yes, please send a version on top of patches 1-13.  That can be reviewed 
+> and committed in parallel with the root_role changes.
+> 
+> Paolo
+> 
+> > [1] https://lore.kernel.org/all/CALMp9eT2cP7kdptoP3=acJX+5_Wg6MXNwoDh42pfb21-wdXvJg@mail.gmail.com
+> > [2] https://lore.kernel.org/all/20211209060552.2956723-1-seanjc@google.com
+
 
