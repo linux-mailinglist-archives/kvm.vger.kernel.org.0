@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 223A24C29FE
-	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 11:57:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E43324C29F2
+	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 11:57:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233671AbiBXK4y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Feb 2022 05:56:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51486 "EHLO
+        id S233477AbiBXK4x (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Feb 2022 05:56:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51490 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233670AbiBXK4q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S233669AbiBXK4q (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 24 Feb 2022 05:56:46 -0500
 Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8126627C231
-        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 02:56:12 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BC9427DF0C
+        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 02:56:13 -0800 (PST)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 3FE2F1F44C;
+        by smtp-out2.suse.de (Postfix) with ESMTPS id D34501F782;
         Thu, 24 Feb 2022 10:56:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
         t=1645700171; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=yZxPWSNYBPDDPk8YSGwgCmzyyqtgVlMFcsy3AuFB1/I=;
-        b=tTZOFsJTjqcdgfRbpDxIaoZR27T8br/Sda3hYHJ9Rbo2e3fCnOIxfyn+6QGefqSCQ5W4Pk
-        YGbXvYSXnG5+qKYohzbTCVLw4FiYOgdpMEYmiOoRcV5k/3ZV/EGBmqbjJ7ndzs36fInWEJ
-        jhj4kJZfGABIXT4htJZGqIKzXFAwP6o=
+        bh=T+pcxd1I35fTizHaQoLnZggk826ZhVJQh5WPTZSsj7o=;
+        b=QVxaOS/SYCJLvJ59/D7sU6SHL3WhO1W1+f5kXKu9cYX08gfZtLVtNaKP1/M3epjWPrhetq
+        cD9rH4+cLrXGcmqBVzj5G+3Psb/SdPt16KrBZGHTR56wx5YYC8gQowjFOk7jjV+70z4oTo
+        sU5w+H3h8WxgSPbZZOXZ07wRUC5fxZE=
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id AC16413A79;
-        Thu, 24 Feb 2022 10:56:10 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 4B77B13A79;
+        Thu, 24 Feb 2022 10:56:11 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id SJoYKEpkF2KYSgAAMHmgww
-        (envelope-from <varad.gautam@suse.com>); Thu, 24 Feb 2022 10:56:10 +0000
+        id WL1/EEtkF2KYSgAAMHmgww
+        (envelope-from <varad.gautam@suse.com>); Thu, 24 Feb 2022 10:56:11 +0000
 From:   Varad Gautam <varad.gautam@suse.com>
 To:     kvm@vger.kernel.org, pbonzini@redhat.com, drjones@redhat.com
 Cc:     marcorr@google.com, zxwang42@gmail.com, erdemaktas@google.com,
         rientjes@google.com, seanjc@google.com, brijesh.singh@amd.com,
         Thomas.Lendacky@amd.com, jroedel@suse.de, bp@suse.de,
         varad.gautam@suse.com
-Subject: [kvm-unit-tests PATCH v3 10/11] x86: AMD SEV-ES: Handle IOIO #VC
-Date:   Thu, 24 Feb 2022 11:54:50 +0100
-Message-Id: <20220224105451.5035-11-varad.gautam@suse.com>
+Subject: [kvm-unit-tests PATCH v3 11/11] x86: AMD SEV-ES: Handle string IO for IOIO #VC
+Date:   Thu, 24 Feb 2022 11:54:51 +0100
+Message-Id: <20220224105451.5035-12-varad.gautam@suse.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20220224105451.5035-1-varad.gautam@suse.com>
 References: <20220224105451.5035-1-varad.gautam@suse.com>
@@ -67,216 +67,140 @@ Using Linux's IOIO #VC processing logic.
 
 Signed-off-by: Varad Gautam <varad.gautam@suse.com>
 Reviewed-by: Marc Orr <marcorr@google.com>
+Tested-by: Marc Orr <marcorr@google.com>
 ---
- lib/x86/amd_sev_vc.c | 169 +++++++++++++++++++++++++++++++++++++++++++
- lib/x86/processor.h  |   7 ++
- 2 files changed, 176 insertions(+)
+ lib/x86/amd_sev_vc.c | 108 ++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 106 insertions(+), 2 deletions(-)
 
 diff --git a/lib/x86/amd_sev_vc.c b/lib/x86/amd_sev_vc.c
-index 8efc6db..e8285f2 100644
+index e8285f2..4fdf596 100644
 --- a/lib/x86/amd_sev_vc.c
 +++ b/lib/x86/amd_sev_vc.c
-@@ -171,6 +171,172 @@ static enum es_result vc_handle_msr(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
- 	return ret;
+@@ -300,10 +300,46 @@ static enum es_result vc_ioio_exitinfo(struct es_em_ctxt *ctxt, u64 *exitinfo)
+ 	return ES_OK;
  }
  
-+#define IOIO_TYPE_STR  BIT(2)
-+#define IOIO_TYPE_IN   1
-+#define IOIO_TYPE_INS  (IOIO_TYPE_IN | IOIO_TYPE_STR)
-+#define IOIO_TYPE_OUT  0
-+#define IOIO_TYPE_OUTS (IOIO_TYPE_OUT | IOIO_TYPE_STR)
-+
-+#define IOIO_REP       BIT(3)
-+
-+#define IOIO_ADDR_64   BIT(9)
-+#define IOIO_ADDR_32   BIT(8)
-+#define IOIO_ADDR_16   BIT(7)
-+
-+#define IOIO_DATA_32   BIT(6)
-+#define IOIO_DATA_16   BIT(5)
-+#define IOIO_DATA_8    BIT(4)
-+
-+#define IOIO_SEG_ES    (0 << 10)
-+#define IOIO_SEG_DS    (3 << 10)
-+
-+/**
-+ * insn_has_rep_prefix() - Determine if instruction has a REP prefix
-+ * @insn:       Instruction containing the prefix to inspect
-+ *
-+ * Returns:
-+ *
-+ * 1 if the instruction has a REP prefix, 0 if not.
-+ */
-+static int insn_has_rep_prefix(struct insn *insn)
++static enum es_result vc_insn_string_read(struct es_em_ctxt *ctxt,
++					  void *src, unsigned char *buf,
++					  unsigned int data_size,
++					  unsigned int count,
++					  bool backwards)
 +{
-+        insn_byte_t p;
-+        int i;
++	int i, b = backwards ? -1 : 1;
 +
-+        insn_get_prefixes(insn);
++	for (i = 0; i < count; i++) {
++		void *s = src + (i * data_size * b);
++		unsigned char *d = buf + (i * data_size);
 +
-+        for_each_insn_prefix(insn, i, p) {
-+                if (p == 0xf2 || p == 0xf3)
-+                        return 1;
-+        }
-+
-+        return 0;
-+}
-+
-+static enum es_result vc_ioio_exitinfo(struct es_em_ctxt *ctxt, u64 *exitinfo)
-+{
-+	struct insn *insn = &ctxt->insn;
-+	*exitinfo = 0;
-+
-+	switch (insn->opcode.bytes[0]) {
-+	/* INS opcodes */
-+	case 0x6c:
-+	case 0x6d:
-+		*exitinfo |= IOIO_TYPE_INS;
-+		*exitinfo |= IOIO_SEG_ES;
-+		*exitinfo |= (ctxt->regs->rdx & 0xffff) << 16;
-+		break;
-+
-+	/* OUTS opcodes */
-+	case 0x6e:
-+	case 0x6f:
-+		*exitinfo |= IOIO_TYPE_OUTS;
-+		*exitinfo |= IOIO_SEG_DS;
-+		*exitinfo |= (ctxt->regs->rdx & 0xffff) << 16;
-+		break;
-+
-+	/* IN immediate opcodes */
-+	case 0xe4:
-+	case 0xe5:
-+		*exitinfo |= IOIO_TYPE_IN;
-+		*exitinfo |= (u8)insn->immediate.value << 16;
-+		break;
-+
-+	/* OUT immediate opcodes */
-+	case 0xe6:
-+	case 0xe7:
-+		*exitinfo |= IOIO_TYPE_OUT;
-+		*exitinfo |= (u8)insn->immediate.value << 16;
-+		break;
-+
-+	/* IN register opcodes */
-+	case 0xec:
-+	case 0xed:
-+		*exitinfo |= IOIO_TYPE_IN;
-+		*exitinfo |= (ctxt->regs->rdx & 0xffff) << 16;
-+		break;
-+
-+	/* OUT register opcodes */
-+	case 0xee:
-+	case 0xef:
-+		*exitinfo |= IOIO_TYPE_OUT;
-+		*exitinfo |= (ctxt->regs->rdx & 0xffff) << 16;
-+		break;
-+
-+	default:
-+		return ES_DECODE_FAILED;
++		memcpy(d, s, data_size);
 +	}
-+
-+	switch (insn->opcode.bytes[0]) {
-+	case 0x6c:
-+	case 0x6e:
-+	case 0xe4:
-+	case 0xe6:
-+	case 0xec:
-+	case 0xee:
-+		/* Single byte opcodes */
-+		*exitinfo |= IOIO_DATA_8;
-+		break;
-+	default:
-+		/* Length determined by instruction parsing */
-+		*exitinfo |= (insn->opnd_bytes == 2) ? IOIO_DATA_16
-+						     : IOIO_DATA_32;
-+	}
-+	switch (insn->addr_bytes) {
-+	case 2:
-+		*exitinfo |= IOIO_ADDR_16;
-+		break;
-+	case 4:
-+		*exitinfo |= IOIO_ADDR_32;
-+		break;
-+	case 8:
-+		*exitinfo |= IOIO_ADDR_64;
-+		break;
-+	}
-+
-+	if (insn_has_rep_prefix(insn))
-+		*exitinfo |= IOIO_REP;
 +
 +	return ES_OK;
 +}
 +
-+static enum es_result vc_handle_ioio(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
++static enum es_result vc_insn_string_write(struct es_em_ctxt *ctxt,
++					   void *dst, unsigned char *buf,
++					   unsigned int data_size,
++					   unsigned int count,
++					   bool backwards)
 +{
-+	struct ex_regs *regs = ctxt->regs;
-+	u64 exit_info_1;
-+	enum es_result ret;
++	int i, s = backwards ? -1 : 1;
 +
-+	ret = vc_ioio_exitinfo(ctxt, &exit_info_1);
-+	if (ret != ES_OK)
-+		return ret;
++	for (i = 0; i < count; i++) {
++		void *d = dst + (i * data_size * s);
++		unsigned char *b = buf + (i * data_size);
 +
-+	if (exit_info_1 & IOIO_TYPE_STR) {
-+		ret = ES_VMM_ERROR;
-+	} else {
-+		/* IN/OUT into/from rAX */
++		memcpy(d, b, data_size);
++	}
 +
-+		int bits = (exit_info_1 & 0x70) >> 1;
-+		u64 rax = 0;
++	return ES_OK;
++}
 +
-+		if (!(exit_info_1 & IOIO_TYPE_IN))
-+			rax = lower_bits(regs->rax, bits);
+ static enum es_result vc_handle_ioio(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
+ {
+ 	struct ex_regs *regs = ctxt->regs;
+-	u64 exit_info_1;
++	u64 exit_info_1, exit_info_2;
+ 	enum es_result ret;
+ 
+ 	ret = vc_ioio_exitinfo(ctxt, &exit_info_1);
+@@ -311,7 +347,75 @@ static enum es_result vc_handle_ioio(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
+ 		return ret;
+ 
+ 	if (exit_info_1 & IOIO_TYPE_STR) {
+-		ret = ES_VMM_ERROR;
++		/* (REP) INS/OUTS */
 +
-+		ghcb_set_rax(ghcb, rax);
++		bool df = ((regs->rflags & X86_EFLAGS_DF) == X86_EFLAGS_DF);
++		unsigned int io_bytes, exit_bytes;
++		unsigned int ghcb_count, op_count;
++		unsigned long es_base;
++		u64 sw_scratch;
 +
-+		ret = sev_es_ghcb_hv_call(ghcb, ctxt, SVM_EXIT_IOIO, exit_info_1, 0);
++		/*
++		 * For the string variants with rep prefix the amount of in/out
++		 * operations per #VC exception is limited so that the kernel
++		 * has a chance to take interrupts and re-schedule while the
++		 * instruction is emulated.
++		 */
++		io_bytes   = (exit_info_1 >> 4) & 0x7;
++		ghcb_count = sizeof(ghcb->shared_buffer) / io_bytes;
++
++		op_count    = (exit_info_1 & IOIO_REP) ? regs->rcx : 1;
++		exit_info_2 = op_count < ghcb_count ? op_count : ghcb_count;
++		exit_bytes  = exit_info_2 * io_bytes;
++
++		es_base = 0;
++
++		/* Read bytes of OUTS into the shared buffer */
++		if (!(exit_info_1 & IOIO_TYPE_IN)) {
++			ret = vc_insn_string_read(ctxt,
++					       (void *)(es_base + regs->rsi),
++					       ghcb->shared_buffer, io_bytes,
++					       exit_info_2, df);
++			if (ret)
++				return ret;
++		}
++
++		/*
++		 * Issue an VMGEXIT to the HV to consume the bytes from the
++		 * shared buffer or to have it write them into the shared buffer
++		 * depending on the instruction: OUTS or INS.
++		 */
++		sw_scratch = __pa(ghcb) + offsetof(struct ghcb, shared_buffer);
++		ghcb_set_sw_scratch(ghcb, sw_scratch);
++		ret = sev_es_ghcb_hv_call(ghcb, ctxt, SVM_EXIT_IOIO,
++					  exit_info_1, exit_info_2);
 +		if (ret != ES_OK)
 +			return ret;
 +
++		/* Read bytes from shared buffer into the guest's destination. */
 +		if (exit_info_1 & IOIO_TYPE_IN) {
-+			if (!ghcb_rax_is_valid(ghcb))
-+				return ES_VMM_ERROR;
-+			regs->rax = lower_bits(ghcb->save.rax, bits);
++			ret = vc_insn_string_write(ctxt,
++						   (void *)(es_base + regs->rdi),
++						   ghcb->shared_buffer, io_bytes,
++						   exit_info_2, df);
++			if (ret)
++				return ret;
++
++			if (df)
++				regs->rdi -= exit_bytes;
++			else
++				regs->rdi += exit_bytes;
++		} else {
++			if (df)
++				regs->rsi -= exit_bytes;
++			else
++				regs->rsi += exit_bytes;
 +		}
-+	}
 +
-+	return ret;
-+}
++		if (exit_info_1 & IOIO_REP)
++			regs->rcx -= exit_info_2;
 +
- static enum es_result vc_handle_exitcode(struct es_em_ctxt *ctxt,
- 					 struct ghcb *ghcb,
- 					 unsigned long exit_code)
-@@ -184,6 +350,9 @@ static enum es_result vc_handle_exitcode(struct es_em_ctxt *ctxt,
- 	case SVM_EXIT_MSR:
- 		result = vc_handle_msr(ghcb, ctxt);
- 		break;
-+	case SVM_EXIT_IOIO:
-+		result = vc_handle_ioio(ghcb, ctxt);
-+		break;
- 	default:
- 		/*
- 		 * Unexpected #VC exception
-diff --git a/lib/x86/processor.h b/lib/x86/processor.h
-index a4fa227..7284061 100644
---- a/lib/x86/processor.h
-+++ b/lib/x86/processor.h
-@@ -671,6 +671,13 @@ static inline int test_bit(int nr, const volatile unsigned long *addr)
- 	return (*word & mask) != 0;
- }
++		ret = regs->rcx ? ES_RETRY : ES_OK;
+ 	} else {
+ 		/* IN/OUT into/from rAX */
  
-+static inline u64 lower_bits(u64 val, unsigned int bits)
-+{
-+	u64 mask = (1ULL << bits) - 1;
-+
-+	return (val & mask);
-+}
-+
- static inline void flush_tlb(void)
- {
- 	ulong cr4;
 -- 
 2.32.0
 
