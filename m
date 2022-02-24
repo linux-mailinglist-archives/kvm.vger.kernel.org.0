@@ -2,85 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A8EE4C2FA9
-	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 16:29:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EEDFE4C2FB6
+	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 16:31:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235935AbiBXP3d (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Feb 2022 10:29:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54372 "EHLO
+        id S236317AbiBXPbV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Feb 2022 10:31:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56008 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232894AbiBXP3b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Feb 2022 10:29:31 -0500
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CB081BA14C
-        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 07:28:59 -0800 (PST)
-Received: by mail-pj1-x1031.google.com with SMTP id g7-20020a17090a708700b001bb78857ccdso6022134pjk.1
-        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 07:28:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=VWJVSEVc6yu+iQURcrOYouYc/suTELYQuIE1nRPdups=;
-        b=LQv74hMCwXu94WMaXezc8wryMNsIKIf1H7cEAt1VPvotbA2hrWh2680FFW95tg4va4
-         cO4gm48NkL8MpPRcbx+nYhKE629OfnCo7mpZAK4qSan7nD7NUymd3nW0uFK/hh3WbcJo
-         W0ONMtnowaLMNL6arpS3MFaJFQtLVZTkXpTe2VUoE851SlS+Py5pc4MolDlUZbFLmorW
-         C0M887Wo/sJIiaNEHjLoGA9E6h0PYpVEBJ9/hwFQlyMFT5mA2qm5NwN7SvFBxyKoeC5G
-         0UYL5NsZ9kkg1a1OYOd+zatB0s055UzRXIKWA05ZaW5TFfWrwKnd5f4RRF19Snb3N0yv
-         NK0A==
+        with ESMTP id S236083AbiBXPbS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Feb 2022 10:31:18 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D58981BE4DB
+        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 07:30:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645716648;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=RJzT5R2+qTnMTOL3dSUfnZD5h7THBicjns5fjqjW5sY=;
+        b=el7pADM6wfcCeabf06jAwhivGwNAp64iadaZ9vy3e27zoaxbDlxp/YJEBjrSPRDYd8JDnW
+        XcUbQEdALagDldl7axsjoAQp5B3iiAHsYKdBEDdO77LYN+oH5IqMSCaMKD/HWTxyIrihcY
+        gvkfM3KlLvp2HOyt7wM4m1MLVDR9GlY=
+Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com
+ [209.85.161.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-614-XsmRXhM0PAa-YR5ShumdJA-1; Thu, 24 Feb 2022 10:30:46 -0500
+X-MC-Unique: XsmRXhM0PAa-YR5ShumdJA-1
+Received: by mail-oo1-f72.google.com with SMTP id t26-20020a4ac89a000000b0031c5daeddb4so1554735ooq.3
+        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 07:30:46 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=VWJVSEVc6yu+iQURcrOYouYc/suTELYQuIE1nRPdups=;
-        b=Eb4ayJyT/XX313xIqWcjLRwQTRcvLTHi0EXRIGBft6agvi/6SkxzYMDDt8cW6PkBZe
-         hwCxp3QSI52IGwWQnbBzlpxivz3vSxIT0hrir4vper1a5sCqugQGQFgAkbM0H+hf2o0P
-         CS5RFjJgeRiH4PQXTyqP/8svoCU6zfHR1F3PfhMCKr2JLYvrlz3rndIeiZSUOBeBbVvf
-         /41ujJsTzICp3rXcIF7k6wnW/N6KFdY0pY1zm6WzqYFvI1FDJFxgM6Ug2+eu7hx5QuD0
-         RZozKlxE3zkfhg0ZVuu0FJukmJswJuo0HGa8EDAouSzM3LNcZrZirr01XKiJ2qLNNdif
-         Zttg==
-X-Gm-Message-State: AOAM5336wMUOp3KNNiGFqyo/kUL36BPNrqo18TfJQIwPmoQj99S0zAD1
-        b1T2eJPCUqRwYPjRvM3jt1rLmA==
-X-Google-Smtp-Source: ABdhPJyKPNnW5mH8giEzV28DtABwB4Or+80/28YosK2mpIOjA1XHrdktFRYzj48oABrn6I2WjUdqEw==
-X-Received: by 2002:a17:902:7403:b0:14f:9f55:f9e6 with SMTP id g3-20020a170902740300b0014f9f55f9e6mr3327796pll.21.1645716538706;
-        Thu, 24 Feb 2022 07:28:58 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id p10sm3869680pfo.209.2022.02.24.07.28.57
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=RJzT5R2+qTnMTOL3dSUfnZD5h7THBicjns5fjqjW5sY=;
+        b=1D2dNk9fOC7l9UJB/U5+7wh8Ma/7z22fGvq9DBfBSPuyyA3MI7Sh5aGAedUFQ4hmGG
+         mMV6Kjp3VGJuYyfXaS1vSzc44EHctVlsF5YfvkMaKoMiPS9CeJrIHVjs2/85m4f8uSgh
+         OSAYJkuk4VJJK4kCYIWkSBOfaKBsY9sKSZ7rMwcpI/yXrriKo07RkgjGFWE3/uGogIrw
+         GqZ5rtFEOiWSlE+cVH5FldG66qkO4zUR9dVo95euCqcco2pUKLyr85JUp3Uc3rcjp78l
+         emhkQPt8nUbreocoN5hthJgXAw2aa5ucSD+KrlZHtRQjIqUHe6KTacsIGvpd1VN6RamA
+         NbSA==
+X-Gm-Message-State: AOAM530gpkmHl6EvIOAMBy+vSU3rUELQHM7tHHtnnVwDE2XTfmaeOkrN
+        0dYPO3LE5kt/R5zovBhJvorzO5Tma3jb/wEVDJiKC/RCcvTHIhaDldDckKCaFddMT5xhP7lDMVx
+        RENcaqjQR6V6p
+X-Received: by 2002:a05:6870:b003:b0:d1:3804:aee2 with SMTP id y3-20020a056870b00300b000d13804aee2mr1344443oae.155.1645716646039;
+        Thu, 24 Feb 2022 07:30:46 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxBicBa9cJ+9uSgbNGbZumW0vECl9F0er2MvXCpgRtdNzkLfhNS/BI1vN3rWb41+5hRT9N5dw==
+X-Received: by 2002:a05:6870:b003:b0:d1:3804:aee2 with SMTP id y3-20020a056870b00300b000d13804aee2mr1344428oae.155.1645716645727;
+        Thu, 24 Feb 2022 07:30:45 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id f14sm1341562otq.11.2022.02.24.07.30.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Feb 2022 07:28:58 -0800 (PST)
-Date:   Thu, 24 Feb 2022 15:28:54 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Chao Gao <chao.gao@intel.com>
-Subject: Re: [PATCH] KVM: x86: Do not change ICR on write to APIC_SELF_IPI
-Message-ID: <YhekNhrK7VKW1jDV@google.com>
-References: <20220224145403.2254840-1-pbonzini@redhat.com>
+        Thu, 24 Feb 2022 07:30:45 -0800 (PST)
+Date:   Thu, 24 Feb 2022 08:30:42 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
+        jgg@nvidia.com, saeedm@nvidia.com, linux-pci@vger.kernel.org,
+        kvm@vger.kernel.org, netdev@vger.kernel.org, kuba@kernel.org,
+        leonro@nvidia.com, kwankhede@nvidia.com, mgurtovoy@nvidia.com,
+        maorg@nvidia.com, ashok.raj@intel.com, kevin.tian@intel.com,
+        shameerali.kolothum.thodi@huawei.com
+Subject: Re: [PATCH V9 mlx5-next 10/15] vfio: Extend the device migration
+ protocol with RUNNING_P2P
+Message-ID: <20220224083042.3f5ad059.alex.williamson@redhat.com>
+In-Reply-To: <87fso870k8.fsf@redhat.com>
+References: <20220224142024.147653-1-yishaih@nvidia.com>
+        <20220224142024.147653-11-yishaih@nvidia.com>
+        <87fso870k8.fsf@redhat.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220224145403.2254840-1-pbonzini@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 24, 2022, Paolo Bonzini wrote:
-> Emulating writes to SELF_IPI with a write to ICR has an unwanted side effect:
-> the value of ICR in vAPIC page gets changed.  The lists SELF_IPI as write-only,
-                                                   ^
-						   |- SDM
+On Thu, 24 Feb 2022 16:21:11 +0100
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-> with no associated MMIO offset, so any write should have no visible side
-> effect in the vAPIC page.
+> On Thu, Feb 24 2022, Yishai Hadas <yishaih@nvidia.com> wrote:
 > 
-> Reported-by: Chao Gao <chao.gao@intel.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
+> > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> > index 22ed358c04c5..26a66f68371d 100644
+> > --- a/include/uapi/linux/vfio.h
+> > +++ b/include/uapi/linux/vfio.h
+> > @@ -1011,10 +1011,16 @@ struct vfio_device_feature {
+> >   *
+> >   * VFIO_MIGRATION_STOP_COPY means that STOP, STOP_COPY and
+> >   * RESUMING are supported.
+> > + *
+> > + * VFIO_MIGRATION_STOP_COPY | VFIO_MIGRATION_P2P means that RUNNING_P2P
+> > + * is supported in addition to the STOP_COPY states.
+> > + *
+> > + * Other combinations of flags have behavior to be defined in the future.
+> >   */
+> >  struct vfio_device_feature_migration {
+> >  	__aligned_u64 flags;
+> >  #define VFIO_MIGRATION_STOP_COPY	(1 << 0)
+> > +#define VFIO_MIGRATION_P2P		(1 << 1)
+> >  };  
+> 
+> Coming back to my argument (for the previous series) that this should
+> rather be "at least one of the flags below must be set". If we operate
+> under the general assumption that each flag indicates that a certain
+> functionality (including some states) is supported, and that flags may
+> depend on other flags, we might have a future flag that defines a
+> different behaviour, but does not depend on STOP_COPY, but rather
+> conflicts with it. We should not create the impression that STOP_COPY
+> will neccessarily be mandatory for all time.
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+This sounds more like an enum than a bitfield.  What happens when
+VFIO_MIGRATION_FOO is defined that can be combined with either
+STOP_COPY or P2P, do we then add two new enum values, one with, one
+without?  Using a bitfield seems cleaner here.  Reporting P2P alone is
+invalid because it doesn't provide a sufficient FSM, but we might also
+later define STOP_COPYv2 and possibly it might be compatible with the
+existing P2P definition.  Thanks,
+
+Alex
+
