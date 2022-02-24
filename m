@@ -2,56 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 09FF74C2441
-	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 07:55:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B6EBD4C245D
+	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 08:08:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231419AbiBXG4B (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Feb 2022 01:56:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51514 "EHLO
+        id S231488AbiBXHIl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Feb 2022 02:08:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230425AbiBXG4A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Feb 2022 01:56:00 -0500
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A43C026A3B5
-        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 22:55:28 -0800 (PST)
-Received: by mail-pl1-x62c.google.com with SMTP id z2so897000plg.8
-        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 22:55:28 -0800 (PST)
+        with ESMTP id S231478AbiBXHIj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Feb 2022 02:08:39 -0500
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D1FF22F976
+        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 23:08:10 -0800 (PST)
+Received: by mail-pj1-x1030.google.com with SMTP id m22so1257825pja.0
+        for <kvm@vger.kernel.org>; Wed, 23 Feb 2022 23:08:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=Ip1yGFvWnzVPcI5baHpTJEAS2apjxgastb+/8JG8p0o=;
-        b=gnp1J6ZgOgKZkzPE/TLGYw6HgkT6WfdFs7W1DkbrdWUaQfxzzNtyA/uUNoWDzz7DvO
-         Wtciz8zSIQ0ArEcg/cbzNutpNRWBvamMYiBoBUkTxpVuS7Cj75p9hEnA0h0qs084b03N
-         qZQTC21C6/jYINQh85CgJ8w79TX1lzzx4HvOmf2g32jf8m59KZM99CggJPCBdqbUjlF0
-         xhinssQtZVuZ9Z5tLZ9cj+F+lFgwU4VXOAqyWVRK0E/kMW7x77oAl5oLaE6eDHB67huO
-         4kQPEcgY6o7kdSzhybeLdqxZ3V/mKX5gYzX3pYEpyUOyx9qzuVdnQ6J7DoR+5y4pGVlg
-         D+nQ==
+        bh=VUMb4AVvanmWYO4fyDpaR3WwHIHA1HS4iYPCky/2b1o=;
+        b=I+dKm1uFEn6jTF3g1+sBeTHv80CIAU+f5gP02ph3FvVTKEsRvFmof4QoJwAyL1o7C3
+         ZIsceVtOYhoHp+yHDRw/MDpXKXvPl3qWou8WfMMqg2ezb0/D6uJWjoD18ZmlsPmgJ8Os
+         01vq6oH4j1YXTxA17rUnvFcFg48eg/u6kRH+m9Qrs8PigDYl5OqHhLoNpcg0YidG5WOH
+         9Tt3KxXesVMKnalH5MneSmpRjGdF9p8XfT8YEbt1PSCX4nC9J1qHBEVb00qHBqLS9xf8
+         KbxdqUgcnullT092qTKFB8NMWBE5nKZLc+DcAA9jFCfi395SBHKAwlNMX7qiw5NHzy/8
+         JKQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=Ip1yGFvWnzVPcI5baHpTJEAS2apjxgastb+/8JG8p0o=;
-        b=UZVJBQmKrZ1SabE27AYFLEXUWc6wsAjA4Pgh9UJCwJWmPalmxpGLZT4qtLdWs5XVz1
-         5T6Kz9AmLKETrUwlv6FPCsgWUq419OaBaYAUpFxJxU8eBBr1hUzC6Y8q4Zwxh5mdAvWR
-         i76q4b0j5U88z2Re1yeYpoUPskUZwsE/9p8QGjDkFoRhXBbaB4fOjKHWu1tRzMjuGypS
-         /T2jUKFJxIGmXOZPXS7Ign987myU7fbr1HdU+TCE6RlwflNjsyxdTqrzxTF2Zbh24j8g
-         f4v9OV6GO58BtTZVR05JY82mc+bc+Lh1qTAf4wHaGIvK3SfxEQctgrZ3W1QIuRNyK//X
-         ECEQ==
-X-Gm-Message-State: AOAM53074kKS79a/CrFGnk5pGp3as8xDAZml4ciN1UGy3wdBq2sdV5rD
-        5mCC84/rKpamUI8ZAEfSaSKsCGjPLPwdIo7u/qZluA==
-X-Google-Smtp-Source: ABdhPJyRnrb1Nqkq289GPPagDgdXvd0ne4RNNibt9f6cIdLsgHeqzPUNBEyIJbLu8mrs1KnYUl4Uorcr2LHYBB7UWHY=
-X-Received: by 2002:a17:90a:9288:b0:1bc:568b:55bc with SMTP id
- n8-20020a17090a928800b001bc568b55bcmr1389089pjo.9.1645685728059; Wed, 23 Feb
- 2022 22:55:28 -0800 (PST)
+        bh=VUMb4AVvanmWYO4fyDpaR3WwHIHA1HS4iYPCky/2b1o=;
+        b=GVcvTLqczjGRY7i48UWOle1eZ65Um1SEnKy3H0Zns4S9pGO/VGBrgpDA49Mn6CP//W
+         tuRHczNOncKdwBaaV26TfiMEfT6XbGFJjDBlIYDy4qSOZfG5aaS9xMADSYi/E8WwO4Uk
+         vMgDf5iTeRLP1nj5SIrYW3T7PvPgXrSBMcsX5lcJUDHNIttElxb/uQXZAu5BRo6WPE3A
+         EHgex0O8/P3faWxhyRgv9bSq1VX0JrDewcXv6EnbzBNXjXrhHg9oN3C0oBzOQcJTITY4
+         fBLyN6A4jSdL5fgqS00SOD30CNdtFfzOeVDgWshrCPI30fnCrzVdrLLKTeubA588zawf
+         qX5w==
+X-Gm-Message-State: AOAM533cFj79PPmmkw9iMe4oPjdTVEbcq/KHTidZoLvp6Fld0hz8yuox
+        jASW5bVfDU2RjYQYOt5LTrCZI2ftND5JqSTld+r6kCo/gU/2bg==
+X-Google-Smtp-Source: ABdhPJzNt3mHF18BypBkAErSy6XHq7Iq3acinzWGyGToaKTSih4h37R44XGrA+hPk5btrU4dXQ13JKrnJampKnvU2e0=
+X-Received: by 2002:a17:902:7296:b0:14f:2a67:b400 with SMTP id
+ d22-20020a170902729600b0014f2a67b400mr1572795pll.172.1645686489919; Wed, 23
+ Feb 2022 23:08:09 -0800 (PST)
 MIME-Version: 1.0
-References: <20220223041844.3984439-1-oupton@google.com> <20220223041844.3984439-4-oupton@google.com>
-In-Reply-To: <20220223041844.3984439-4-oupton@google.com>
+References: <20220223041844.3984439-1-oupton@google.com> <20220223041844.3984439-6-oupton@google.com>
+In-Reply-To: <20220223041844.3984439-6-oupton@google.com>
 From:   Reiji Watanabe <reijiw@google.com>
-Date:   Wed, 23 Feb 2022 22:55:12 -0800
-Message-ID: <CAAeT=FyP36QL1Dsjx-7rOJ-bwUtXJD89YxndMo8hvyBjM_z6cA@mail.gmail.com>
-Subject: Re: [PATCH v3 03/19] KVM: arm64: Reject invalid addresses for CPU_ON
- PSCI call
+Date:   Wed, 23 Feb 2022 23:07:54 -0800
+Message-ID: <CAAeT=Fz7jCBGS6UkMJRjgRfOo-8Bs5S0kkJfpmyq9Q+bwGD=+A@mail.gmail.com>
+Subject: Re: [PATCH v3 05/19] KVM: arm64: Dedupe vCPU power off helpers
 To:     Oliver Upton <oupton@google.com>
 Cc:     kvmarm@lists.cs.columbia.edu, Paolo Bonzini <pbonzini@redhat.com>,
         Marc Zyngier <maz@kernel.org>,
@@ -83,14 +82,11 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On Tue, Feb 22, 2022 at 8:19 PM Oliver Upton <oupton@google.com> wrote:
 >
-> DEN0022D.b 5.6.2 "Caller responsibilities" states that a PSCI
-> implementation may return INVALID_ADDRESS for the CPU_ON call if the
-> provided entry address is known to be invalid. There is an additional
-> caveat to this rule. Prior to PSCI v1.0, the INVALID_PARAMETERS error
-> is returned instead. Check the guest's PSCI version and return the
-> appropriate error if the IPA is invalid.
+> vcpu_power_off() and kvm_psci_vcpu_off() are equivalent; rename the
+> former and replace all callsites to the latter.
 >
-> Reported-by: Reiji Watanabe <reijiw@google.com>
+> No functional change intended.
+>
 > Signed-off-by: Oliver Upton <oupton@google.com>
 
 Reviewed-by: Reiji Watanabe <reijiw@google.com>
