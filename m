@@ -2,281 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CD3E94C2D59
-	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 14:40:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F2A24C2DC2
+	for <lists+kvm@lfdr.de>; Thu, 24 Feb 2022 15:02:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235165AbiBXNkO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Feb 2022 08:40:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34576 "EHLO
+        id S235275AbiBXODL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Feb 2022 09:03:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42742 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235164AbiBXNkM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Feb 2022 08:40:12 -0500
+        with ESMTP id S235232AbiBXODI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Feb 2022 09:03:08 -0500
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECF6537B597;
-        Thu, 24 Feb 2022 05:39:35 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1DAD20D838
+        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 06:02:38 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 8534861A97;
-        Thu, 24 Feb 2022 13:39:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 719BFC340E9;
-        Thu, 24 Feb 2022 13:39:32 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="F16u3hqk"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1645709971;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=lYbQlfYwy3SS5X0HOdFFYvoNBz5G3sVCk/xavGBSEMs=;
-        b=F16u3hqk6rgXMYjXwJovbqFW0rcAe8BXY7ibheND+y5a4f7/AF4I7irMImUvxyjZqPC0IN
-        GR1vGcuyrut6eAtUpPu1USrzJkmRdM3C1fvKGp4uILAXOuEgOTO2ZLig7mWvztBV6P+e0s
-        RSp5TuonuY11VJe8LCEC49BtAbpOszA=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 09e92e51 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Thu, 24 Feb 2022 13:39:31 +0000 (UTC)
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     linux-hyperv@vger.kernel.org, kvm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, qemu-devel@nongnu.org,
-        linux-kernel@vger.kernel.org
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>, adrian@parity.io,
-        dwmw@amazon.co.uk, graf@amazon.com, colmmacc@amazon.com,
-        raduweis@amazon.com, berrange@redhat.com, lersek@redhat.com,
-        imammedo@redhat.com, ehabkost@redhat.com, ben@skyportsystems.com,
-        mst@redhat.com, kys@microsoft.com, haiyangz@microsoft.com,
-        sthemmin@microsoft.com, wei.liu@kernel.org, decui@microsoft.com,
-        linux@dominikbrodowski.net, ebiggers@kernel.org, ardb@kernel.org,
-        jannh@google.com, gregkh@linuxfoundation.org, tytso@mit.edu
-Subject: [PATCH v3 2/2] virt: vmgenid: introduce driver for reinitializing RNG on VM fork
-Date:   Thu, 24 Feb 2022 14:39:06 +0100
-Message-Id: <20220224133906.751587-3-Jason@zx2c4.com>
-In-Reply-To: <20220224133906.751587-1-Jason@zx2c4.com>
-References: <20220224133906.751587-1-Jason@zx2c4.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-6.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2228361B4A
+        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 14:02:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69DD8C340E9;
+        Thu, 24 Feb 2022 14:02:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1645711357;
+        bh=Uu4hPx7FLwDAOG6pOtRm9yq1V8Rv43iZR9djicM5fJk=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=t6wOwimUMXu7YTHZorBLpGypQo0xAWpe+raFiQPpmk7pXmCDPT4T4GA9RsvZNZ0c2
+         KqLKlBIL7hkiCBvGdur83b/Ae4z3WozC6TBFq0GmdqeeniraDsfv+1KpZtrREWcYH/
+         RFkIPbce9SGE0LF/ATglJSXFHbJLOLYze0F3rV84msVFleNfVB1jXqP6r7coeTSLBS
+         ks4KV4aayuS63xPmEQLL8koc8pOu5iSaNjRJXvvm1q2VQENTbXbN93pfHb76/3qSKJ
+         61NwnfYKkCGBepF79tg/u4pFbfFvxFFgMpR2MWNOVKtGzISt3ihX7YtZKMiCni/U+m
+         kcTbeM53jmYUw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nNEhW-00ACPA-V4; Thu, 24 Feb 2022 14:02:35 +0000
+Date:   Thu, 24 Feb 2022 14:02:34 +0000
+Message-ID: <87wnhk2whx.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oupton@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, Peter Shier <pshier@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>,
+        Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH v3 09/19] KVM: arm64: Implement PSCI SYSTEM_SUSPEND
+In-Reply-To: <20220223041844.3984439-10-oupton@google.com>
+References: <20220223041844.3984439-1-oupton@google.com>
+        <20220223041844.3984439-10-oupton@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@google.com, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, anup@brainfault.org, atishp@atishpatra.org, seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, pshier@google.com, reijiw@google.com, ricarkol@google.com, rananta@google.com, jingzhangos@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-VM Generation ID is a feature from Microsoft, described at
-<https://go.microsoft.com/fwlink/?LinkId=260709>, and supported by
-Hyper-V and QEMU. Its usage is described in Microsoft's RNG whitepaper,
-<https://aka.ms/win10rng>, as:
+On Wed, 23 Feb 2022 04:18:34 +0000,
+Oliver Upton <oupton@google.com> wrote:
+> 
+> ARM DEN0022D.b 5.19 "SYSTEM_SUSPEND" describes a PSCI call that allows
+> software to request that a system be placed in the deepest possible
+> low-power state. Effectively, software can use this to suspend itself to
+> RAM. Note that the semantics of this PSCI call are very similar to
+> CPU_SUSPEND, which is already implemented in KVM.
+> 
+> Implement the SYSTEM_SUSPEND in KVM. Similar to CPU_SUSPEND, the
+> low-power state is implemented as a guest WFI. Synchronously reset the
+> calling CPU before entering the WFI, such that the vCPU may immediately
+> resume execution when a wakeup event is recognized.
+> 
+> Signed-off-by: Oliver Upton <oupton@google.com>
+> ---
+>  arch/arm64/kvm/psci.c  | 51 ++++++++++++++++++++++++++++++++++++++++++
+>  arch/arm64/kvm/reset.c |  3 ++-
+>  2 files changed, 53 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
+> index 77a00913cdfd..41adaaf2234a 100644
+> --- a/arch/arm64/kvm/psci.c
+> +++ b/arch/arm64/kvm/psci.c
+> @@ -208,6 +208,50 @@ static void kvm_psci_system_reset(struct kvm_vcpu *vcpu)
+>  	kvm_prepare_system_event(vcpu, KVM_SYSTEM_EVENT_RESET);
+>  }
+>  
+> +static int kvm_psci_system_suspend(struct kvm_vcpu *vcpu)
+> +{
+> +	struct vcpu_reset_state reset_state;
+> +	struct kvm *kvm = vcpu->kvm;
+> +	struct kvm_vcpu *tmp;
+> +	bool denied = false;
+> +	unsigned long i;
+> +
+> +	reset_state.pc = smccc_get_arg1(vcpu);
+> +	if (!kvm_ipa_valid(kvm, reset_state.pc)) {
+> +		smccc_set_retval(vcpu, PSCI_RET_INVALID_ADDRESS, 0, 0, 0);
+> +		return 1;
+> +	}
+> +
+> +	reset_state.r0 = smccc_get_arg2(vcpu);
+> +	reset_state.be = kvm_vcpu_is_be(vcpu);
+> +	reset_state.reset = true;
+> +
+> +	/*
+> +	 * The SYSTEM_SUSPEND PSCI call requires that all vCPUs (except the
+> +	 * calling vCPU) be in an OFF state, as determined by the
+> +	 * implementation.
+> +	 *
+> +	 * See ARM DEN0022D, 5.19 "SYSTEM_SUSPEND" for more details.
+> +	 */
+> +	mutex_lock(&kvm->lock);
+> +	kvm_for_each_vcpu(i, tmp, kvm) {
+> +		if (tmp != vcpu && !kvm_arm_vcpu_powered_off(tmp)) {
+> +			denied = true;
+> +			break;
+> +		}
+> +	}
+> +	mutex_unlock(&kvm->lock);
 
-    If the OS is running in a VM, there is a problem that most
-    hypervisors can snapshot the state of the machine and later rewind
-    the VM state to the saved state. This results in the machine running
-    a second time with the exact same RNG state, which leads to serious
-    security problems.  To reduce the window of vulnerability, Windows
-    10 on a Hyper-V VM will detect when the VM state is reset, retrieve
-    a unique (not random) value from the hypervisor, and reseed the root
-    RNG with that unique value.  This does not eliminate the
-    vulnerability, but it greatly reduces the time during which the RNG
-    system will produce the same outputs as it did during a previous
-    instantiation of the same VM state.
+This looks dodgy. Nothing seems to prevent userspace from setting the
+mp_state to RUNNING in parallel with this, as only the vcpu mutex is
+held when this ioctl is issued.
 
-Linux has the same issue, and given that vmgenid is supported already by
-multiple hypervisors, we can implement more or less the same solution.
-So this commit wires up the vmgenid ACPI notification to the RNG's newly
-added add_vmfork_randomness() function.
+It looks to me that what you want is what lock_all_vcpus() does
+(Alexandru has a patch moving it out of the vgic code as part of his
+SPE series).
 
-It can be used from qemu via the `-device vmgenid,guid=auto` parameter.
-After setting that, use `savevm` in the monitor to save the VM state,
-then quit QEMU, start it again, and use `loadvm`. That will trigger this
-driver's notify function, which hands the new UUID to the RNG. This is
-described in <https://git.qemu.org/?p=qemu.git;a=blob;f=docs/specs/vmgenid.txt>.
-And there are hooks for this in libvirt as well, described in
-<https://libvirt.org/formatdomain.html#general-metadata>.
+It is also pretty unclear what the interaction with userspace is once
+you have released the lock. If the VMM starts a vcpu other than the
+suspending one, what is its state? The spec doesn't see to help
+here. I can see two options:
 
-Note, however, that the treatment of this as a UUID is considered to be
-an accidental QEMU nuance, per
-<https://github.com/libguestfs/virt-v2v/blob/master/docs/vm-generation-id-across-hypervisors.txt>,
-so this driver simply treats these bytes as an opaque 128-bit binary
-blob, as per the spec. This doesn't really make a difference anyway,
-considering that's how it ends up when handed to the RNG in the end.
+- either all the vcpus have the same reset state applied to them as
+  they come up, unless they are started with CPU_ON by a vcpu that has
+  already booted (but there is a single 'context_id' provided, and I
+  fear this is going to confuse the OS)...
 
-This driver builds on prior work from Adrian Catangiu at Amazon, and it
-is my hope that that team can resume maintenance of this driver.
+- or only the suspending vcpu can resume the system, and we must fail
+  a change of mp_state for the other vcpus.
 
-Cc: Adrian Catangiu <adrian@parity.io>
-Cc: Laszlo Ersek <lersek@redhat.com>
-Cc: Daniel P. Berrangé <berrange@redhat.com>
-Cc: Dominik Brodowski <linux@dominikbrodowski.net>
-Cc: Ard Biesheuvel <ardb@kernel.org>
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
----
- drivers/virt/Kconfig   |   9 +++
- drivers/virt/Makefile  |   1 +
- drivers/virt/vmgenid.c | 121 +++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 131 insertions(+)
- create mode 100644 drivers/virt/vmgenid.c
+What do you think?
 
-diff --git a/drivers/virt/Kconfig b/drivers/virt/Kconfig
-index 8061e8ef449f..d3276dc2095c 100644
---- a/drivers/virt/Kconfig
-+++ b/drivers/virt/Kconfig
-@@ -13,6 +13,15 @@ menuconfig VIRT_DRIVERS
- 
- if VIRT_DRIVERS
- 
-+config VMGENID
-+	tristate "Virtual Machine Generation ID driver"
-+	default y
-+	depends on ACPI
-+	help
-+	  Say Y here to use the hypervisor-provided Virtual Machine Generation ID
-+	  to reseed the RNG when the VM is cloned. This is highly recommended if
-+	  you intend to do any rollback / cloning / snapshotting of VMs.
-+
- config FSL_HV_MANAGER
- 	tristate "Freescale hypervisor management driver"
- 	depends on FSL_SOC
-diff --git a/drivers/virt/Makefile b/drivers/virt/Makefile
-index 3e272ea60cd9..108d0ffcc9aa 100644
---- a/drivers/virt/Makefile
-+++ b/drivers/virt/Makefile
-@@ -4,6 +4,7 @@
- #
- 
- obj-$(CONFIG_FSL_HV_MANAGER)	+= fsl_hypervisor.o
-+obj-$(CONFIG_VMGENID)		+= vmgenid.o
- obj-y				+= vboxguest/
- 
- obj-$(CONFIG_NITRO_ENCLAVES)	+= nitro_enclaves/
-diff --git a/drivers/virt/vmgenid.c b/drivers/virt/vmgenid.c
-new file mode 100644
-index 000000000000..5da4dc8f25e3
---- /dev/null
-+++ b/drivers/virt/vmgenid.c
-@@ -0,0 +1,121 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Virtual Machine Generation ID driver
-+ *
-+ * Copyright (C) 2022 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
-+ * Copyright (C) 2020 Amazon. All rights reserved.
-+ * Copyright (C) 2018 Red Hat Inc. All rights reserved.
-+ */
-+
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/acpi.h>
-+#include <linux/random.h>
-+
-+ACPI_MODULE_NAME("vmgenid");
-+
-+enum { VMGENID_SIZE = 16 };
-+
-+static struct {
-+	u8 this_id[VMGENID_SIZE];
-+	u8 *next_id;
-+} state;
-+
-+static int vmgenid_acpi_add(struct acpi_device *device)
-+{
-+	struct acpi_buffer buffer = { ACPI_ALLOCATE_BUFFER };
-+	union acpi_object *pss;
-+	phys_addr_t phys_addr;
-+	acpi_status status;
-+	int ret = 0;
-+
-+	if (!device)
-+		return -EINVAL;
-+
-+	status = acpi_evaluate_object(device->handle, "ADDR", NULL, &buffer);
-+	if (ACPI_FAILURE(status)) {
-+		ACPI_EXCEPTION((AE_INFO, status, "Evaluating ADDR"));
-+		return -ENODEV;
-+	}
-+	pss = buffer.pointer;
-+	if (!pss || pss->type != ACPI_TYPE_PACKAGE || pss->package.count != 2 ||
-+	    pss->package.elements[0].type != ACPI_TYPE_INTEGER ||
-+	    pss->package.elements[1].type != ACPI_TYPE_INTEGER) {
-+		ret = -EINVAL;
-+		goto out;
-+	}
-+
-+	phys_addr = (pss->package.elements[0].integer.value << 0) |
-+		    (pss->package.elements[1].integer.value << 32);
-+	state.next_id = acpi_os_map_memory(phys_addr, VMGENID_SIZE);
-+	if (!state.next_id) {
-+		ret = -ENOMEM;
-+		goto out;
-+	}
-+	device->driver_data = &state;
-+
-+	memcpy(state.this_id, state.next_id, sizeof(state.this_id));
-+	add_device_randomness(state.this_id, sizeof(state.this_id));
-+
-+out:
-+	ACPI_FREE(buffer.pointer);
-+	return ret;
-+}
-+
-+static int vmgenid_acpi_remove(struct acpi_device *device)
-+{
-+	if (!device || acpi_driver_data(device) != &state)
-+		return -EINVAL;
-+	device->driver_data = NULL;
-+	if (state.next_id)
-+		acpi_os_unmap_memory(state.next_id, VMGENID_SIZE);
-+	state.next_id = NULL;
-+	return 0;
-+}
-+
-+static void vmgenid_acpi_notify(struct acpi_device *device, u32 event)
-+{
-+	u8 old_id[VMGENID_SIZE];
-+
-+	if (!device || acpi_driver_data(device) != &state)
-+		return;
-+	memcpy(old_id, state.this_id, sizeof(old_id));
-+	memcpy(state.this_id, state.next_id, sizeof(state.this_id));
-+	if (!memcmp(old_id, state.this_id, sizeof(old_id)))
-+		return;
-+	add_vmfork_randomness(state.this_id, sizeof(state.this_id));
-+}
-+
-+static const struct acpi_device_id vmgenid_ids[] = {
-+	{"VMGENID", 0},
-+	{"QEMUVGID", 0},
-+	{ },
-+};
-+
-+static struct acpi_driver acpi_driver = {
-+	.name = "vm_generation_id",
-+	.ids = vmgenid_ids,
-+	.owner = THIS_MODULE,
-+	.ops = {
-+		.add = vmgenid_acpi_add,
-+		.remove = vmgenid_acpi_remove,
-+		.notify = vmgenid_acpi_notify,
-+	}
-+};
-+
-+static int __init vmgenid_init(void)
-+{
-+	return acpi_bus_register_driver(&acpi_driver);
-+}
-+
-+static void __exit vmgenid_exit(void)
-+{
-+	acpi_bus_unregister_driver(&acpi_driver);
-+}
-+
-+module_init(vmgenid_init);
-+module_exit(vmgenid_exit);
-+
-+MODULE_DEVICE_TABLE(acpi, vmgenid_ids);
-+MODULE_DESCRIPTION("Virtual Machine Generation ID");
-+MODULE_LICENSE("GPL v2");
+> +
+> +	if (denied) {
+> +		smccc_set_retval(vcpu, PSCI_RET_DENIED, 0, 0, 0);
+> +		return 1;
+> +	}
+> +
+> +	__kvm_reset_vcpu(vcpu, &reset_state);
+> +	kvm_vcpu_wfi(vcpu);
+
+I have mixed feelings about this. The vcpu has reset before being in
+WFI, while it really should be the other way around and userspace
+could rely on observing the transition.
+
+What breaks if you change this?
+
+Thanks,
+
+	M.
+
 -- 
-2.35.1
-
+Without deviation from the norm, progress is not possible.
