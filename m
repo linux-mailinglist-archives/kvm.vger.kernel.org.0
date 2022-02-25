@@ -2,75 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D87C04C4897
-	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 16:19:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4BD4F4C48F8
+	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 16:31:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241944AbiBYPTc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 10:19:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55006 "EHLO
+        id S242111AbiBYPbx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 10:31:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37058 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231529AbiBYPT3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Feb 2022 10:19:29 -0500
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87A2882D01;
-        Fri, 25 Feb 2022 07:18:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1645802337; x=1677338337;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=84fOjGeLn2tSLSYuKr7MpfZDNr7NR6Oa5z6KoGnpcbo=;
-  b=ArGdlHT1GipZMDK6110kc166RG0/6Gruzqixw0opkg9RAj2QJkrkKt0A
-   nSMiJggkphhjvabbbPvbs6yMoQDcEWs4y6fnHChVjesZ5zMPb/T45M6Wp
-   L3znTCJT124elISSj97/YfC5vlDoyI2pXhDnEEIqyMrlAcUMFTW20OwZ1
-   P9FGA3rZ0V+quo4adkzEs9gSitFCtkcT2by1uiOfjCSZl0mJeJXZSqcR2
-   2HaZfzv/ZLWVWhK1kapibqbr0YyjsQlpR1SReU69L84hFoqhMq+sassJn
-   rReB/3NrWgQhsCPs2mjPYWT4hd+kvfRDzqfCGezCONIeIFPWIeS9IwNCI
-   w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10268"; a="252708656"
-X-IronPort-AV: E=Sophos;i="5.90,136,1643702400"; 
-   d="scan'208";a="252708656"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2022 07:18:57 -0800
-X-IronPort-AV: E=Sophos;i="5.90,136,1643702400"; 
-   d="scan'208";a="533603388"
-Received: from gao-cwp.sh.intel.com (HELO gao-cwp) ([10.239.159.105])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2022 07:18:51 -0800
-Date:   Fri, 25 Feb 2022 23:29:48 +0800
-From:   Chao Gao <chao.gao@intel.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Zeng Guang <guang.zeng@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jethro Beekman <jethro@fortanix.com>,
-        Kai Huang <kai.huang@intel.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, Robert Hu <robert.hu@intel.com>
-Subject: Re: [PATCH v6 5/9] KVM: x86: Add support for vICR APIC-write
- VM-Exits in x2APIC mode
-Message-ID: <20220225152946.GA26414@gao-cwp>
-References: <20220225082223.18288-1-guang.zeng@intel.com>
- <20220225082223.18288-6-guang.zeng@intel.com>
- <91235d07cad41a75282df7fc222514dc1e991118.camel@redhat.com>
+        with ESMTP id S233758AbiBYPbw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Feb 2022 10:31:52 -0500
+Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 545A1218CD9;
+        Fri, 25 Feb 2022 07:31:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1645803080; x=1677339080;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=eN9+O0QeW+Uix9xoRJt85GwthBkk74Jy4BjJPjZhA8Y=;
+  b=YhMRBxvfJGZT7Us4IsuVS6CHmYqUnzXnc1QjozOJHEcgbUJ4p/AOCm2t
+   oBRsQy8HKOdEfaDSrXj6EwZRklpGin8UEiBdiW0PcmuoUru4Ky+/F6DDd
+   rOCIEo+XNZ5CtWLjcWvuEPMMM6mOq/eYfI18EtV6AEtJp7RyHmQrzKj5r
+   A=;
+X-IronPort-AV: E=Sophos;i="5.90,136,1643673600"; 
+   d="scan'208";a="66229061"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1box-d-74e80b3c.us-east-1.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP; 25 Feb 2022 15:31:18 +0000
+Received: from EX13MTAUWC002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
+        by email-inbound-relay-iad-1box-d-74e80b3c.us-east-1.amazon.com (Postfix) with ESMTPS id E9E1387A16;
+        Fri, 25 Feb 2022 15:31:11 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC002.ant.amazon.com (10.43.162.240) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.28; Fri, 25 Feb 2022 15:31:10 +0000
+Received: from [0.0.0.0] (10.43.162.216) by EX13D20UWC001.ant.amazon.com
+ (10.43.162.244) with Microsoft SMTP Server (TLS) id 15.0.1497.28; Fri, 25 Feb
+ 2022 15:31:04 +0000
+Message-ID: <0b8a2c25-df48-143d-7fac-dc9b4ef68d3c@amazon.com>
+Date:   Fri, 25 Feb 2022 16:31:02 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <91235d07cad41a75282df7fc222514dc1e991118.camel@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.6.1
+Subject: Re: [PATCH v4] virt: vmgenid: introduce driver for reinitializing RNG
+ on VM fork
+To:     Greg KH <gregkh@linuxfoundation.org>
+CC:     "Jason A. Donenfeld" <Jason@zx2c4.com>, <kvm@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>, <linux-hyperv@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <adrian@parity.io>,
+        <ardb@kernel.org>, <ben@skyportsystems.com>, <berrange@redhat.com>,
+        <colmmacc@amazon.com>, <decui@microsoft.com>, <dwmw@amazon.co.uk>,
+        <ebiggers@kernel.org>, <ehabkost@redhat.com>,
+        <haiyangz@microsoft.com>, <imammedo@redhat.com>,
+        <jannh@google.com>, <kys@microsoft.com>, <lersek@redhat.com>,
+        <linux@dominikbrodowski.net>, <mst@redhat.com>,
+        <qemu-devel@nongnu.org>, <raduweis@amazon.com>,
+        <sthemmin@microsoft.com>, <tytso@mit.edu>, <wei.liu@kernel.org>
+References: <CAHmME9pJ3wb=EbUErJrCRC=VYGhFZqj2ar_AkVPsUvAnqGtwwg@mail.gmail.com>
+ <20220225124848.909093-1-Jason@zx2c4.com>
+ <05c9f2a9-accb-e0de-aac7-b212adac7eb2@amazon.com>
+ <YhjphtYyXoYZ9lXY@kroah.com>
+From:   Alexander Graf <graf@amazon.com>
+In-Reply-To: <YhjphtYyXoYZ9lXY@kroah.com>
+X-Originating-IP: [10.43.162.216]
+X-ClientProxiedBy: EX13D41UWC004.ant.amazon.com (10.43.162.31) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
+X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+        NICE_REPLY_A,RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,75 +78,34 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 25, 2022 at 04:44:05PM +0200, Maxim Levitsky wrote:
->On Fri, 2022-02-25 at 16:22 +0800, Zeng Guang wrote:
->> Upcoming Intel CPUs will support virtual x2APIC MSR writes to the vICR,
->> i.e. will trap and generate an APIC-write VM-Exit instead of intercepting
->> the WRMSR.  Add support for handling "nodecode" x2APIC writes, which
->> were previously impossible.
->> 
->> Note, x2APIC MSR writes are 64 bits wide.
->> 
->> Signed-off-by: Zeng Guang <guang.zeng@intel.com>
->> ---
->>  arch/x86/kvm/lapic.c | 25 ++++++++++++++++++++++---
->>  1 file changed, 22 insertions(+), 3 deletions(-)
->> 
->> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
->> index 629c116b0d3e..e4bcdab1fac0 100644
->> --- a/arch/x86/kvm/lapic.c
->> +++ b/arch/x86/kvm/lapic.c
->> @@ -67,6 +67,7 @@ static bool lapic_timer_advance_dynamic __read_mostly;
->>  #define LAPIC_TIMER_ADVANCE_NS_MAX     5000
->>  /* step-by-step approximation to mitigate fluctuation */
->>  #define LAPIC_TIMER_ADVANCE_ADJUST_STEP 8
->> +static int kvm_lapic_msr_read(struct kvm_lapic *apic, u32 reg, u64 *data);
->>  
->>  static inline void __kvm_lapic_set_reg(char *regs, int reg_off, u32 val)
->>  {
->> @@ -2227,10 +2228,28 @@ EXPORT_SYMBOL_GPL(kvm_lapic_set_eoi);
->>  /* emulate APIC access in a trap manner */
->>  void kvm_apic_write_nodecode(struct kvm_vcpu *vcpu, u32 offset)
->>  {
->> -	u32 val = kvm_lapic_get_reg(vcpu->arch.apic, offset);
->> +	struct kvm_lapic *apic = vcpu->arch.apic;
->> +	u64 val;
->> +
->> +	if (apic_x2apic_mode(apic)) {
->> +		/*
->> +		 * When guest APIC is in x2APIC mode and IPI virtualization
->> +		 * is enabled, accessing APIC_ICR may cause trap-like VM-exit
->> +		 * on Intel hardware. Other offsets are not possible.
->> +		 */
->> +		if (WARN_ON_ONCE(offset != APIC_ICR))
->> +			return;
->>  
->> -	/* TODO: optimize to just emulate side effect w/o one more write */
->> -	kvm_lapic_reg_write(vcpu->arch.apic, offset, val);
->> +		kvm_lapic_msr_read(apic, offset, &val);
->> +		if (val & APIC_ICR_BUSY)
->> +			kvm_x2apic_icr_write(apic, val);
->> +		else
->> +			kvm_apic_send_ipi(apic, (u32)val, (u32)(val >> 32));
->I don't fully understand the above code.
->
->First of where kvm_x2apic_icr_write is defined?
+Ck9uIDI1LjAyLjIyIDE1OjM2LCBHcmVnIEtIIHdyb3RlOgo+IE9uIEZyaSwgRmViIDI1LCAyMDIy
+IGF0IDAyOjU3OjM4UE0gKzAxMDAsIEFsZXhhbmRlciBHcmFmIHdyb3RlOgo+Pj4gKwo+Pj4gKyAg
+ICAgICBwaHlzX2FkZHIgPSAob2JqLT5wYWNrYWdlLmVsZW1lbnRzWzBdLmludGVnZXIudmFsdWUg
+PDwgMCkgfAo+Pj4gKyAgICAgICAgICAgICAgICAgICAob2JqLT5wYWNrYWdlLmVsZW1lbnRzWzFd
+LmludGVnZXIudmFsdWUgPDwgMzIpOwo+Pj4gKyAgICAgICBzdGF0ZS0+bmV4dF9pZCA9IGRldm1f
+bWVtcmVtYXAoJmRldmljZS0+ZGV2LCBwaHlzX2FkZHIsIFZNR0VOSURfU0laRSwgTUVNUkVNQVBf
+V0IpOwo+Pj4gKyAgICAgICBpZiAoIXN0YXRlLT5uZXh0X2lkKSB7Cj4+PiArICAgICAgICAgICAg
+ICAgcmV0ID0gLUVOT01FTTsKPj4+ICsgICAgICAgICAgICAgICBnb3RvIG91dDsKPj4+ICsgICAg
+ICAgfQo+Pj4gKwo+Pj4gKyAgICAgICBtZW1jcHkoc3RhdGUtPnRoaXNfaWQsIHN0YXRlLT5uZXh0
+X2lkLCBzaXplb2Yoc3RhdGUtPnRoaXNfaWQpKTsKPj4+ICsgICAgICAgYWRkX2RldmljZV9yYW5k
+b21uZXNzKHN0YXRlLT50aGlzX2lkLCBzaXplb2Yoc3RhdGUtPnRoaXNfaWQpKTsKPj4KPj4gUGxl
+YXNlIGV4cG9zZSB0aGUgdm1nZW5pZCB2aWEgL3N5c2ZzIHNvIHRoYXQgdXNlciBzcGFjZSBldmVu
+IHJlbW90ZWx5IGhhcyBhCj4+IGNoYW5jZSB0byBjaGVjayBpZiBpdCdzIGJlZW4gY2xvbmVkLgo+
+IEV4cG9ydCBpdCBob3c/ICBBbmQgd2h5LCB3aG8gd291bGQgY2FyZT8KCgpZb3UgY2FuIGp1c3Qg
+Y3JlYXRlIGEgc3lzZnMgZmlsZSB0aGF0IGNvbnRhaW5zIGl0LiBUaGUgc2FtZSB3YXkgd2UgaGF2
+ZSAKc3lzZnMgZmlsZXMgZm9yIFVFRkkgY29uZmlnIHRhYmxlcy4gT3Igc3lzZnMgZmlsZXMgZm9y
+IHRoZSBhY3BpIGRldmljZSAKbm9kZXMgdGhlbXNlbHZlcy4KCkkgcGVyc29uYWxseSBkb24ndCBj
+YXJlIGlmIHdlIHB1dCB0aGlzIGludG8gYSBnZW5lcmljIGxvY2F0aW9uIAooL3N5cy9oeXBlcnZp
+c29yIGZvciBleGFtcGxlKSBvciBpbnRvIHRoZSBleGlzdGluZyBhY3BpIGRldmljZSBub2RlIGFz
+IAphZGRpdGlvbmFsIGZpbGUgeW91IGNhbiBqdXN0IHJlYWQuCgpXaG8gd291bGQgY2FyZT8gV2Vs
+bCwgZm9yIHN0YXJ0ZXJzIEkgd291bGQgY2FyZSBmb3IgZGVidWdnaW5nIHB1cnBvc2VzIAo6KS4g
+RXh0cmFjdGluZyB0aGUgSUQgYW5kIHZhbGlkYXRpbmcgdGhhdCBpdCdzIGRpZmZlcmVudCB0aGFu
+IGJlZm9yZSBpcyAKcXVpdGUgdXNlZnVsIHdoZW4geW91IHdhbnQgdG8gY2hlY2sgaWYgdGhlIGNs
+b25lIHJuZyBhZGp1c3RtZW50IGFjdHVhbGx5IAp3b3JrZWQuCgpJIGRvbid0IGhhdmUgdmVyeSBz
+dHJvbmcgZmVlbGluZ3Mgb24gaXQgdGhvdWdoIC0gdW5saWtlIHRoZSBfQ0lEIApjb252ZXJzYXRp
+b24uCgoKQWxleAoKCgoKCkFtYXpvbiBEZXZlbG9wbWVudCBDZW50ZXIgR2VybWFueSBHbWJICkty
+YXVzZW5zdHIuIDM4CjEwMTE3IEJlcmxpbgpHZXNjaGFlZnRzZnVlaHJ1bmc6IENocmlzdGlhbiBT
+Y2hsYWVnZXIsIEpvbmF0aGFuIFdlaXNzCkVpbmdldHJhZ2VuIGFtIEFtdHNnZXJpY2h0IENoYXJs
+b3R0ZW5idXJnIHVudGVyIEhSQiAxNDkxNzMgQgpTaXR6OiBCZXJsaW4KVXN0LUlEOiBERSAyODkg
+MjM3IDg3OQoKCg==
 
-Sean introduces it in his "prep work for VMX IPI virtualization" series, which
-is merged into kvm/queue branch.
-
-https://git.kernel.org/pub/scm/virt/kvm/kvm.git/commit/?h=queue&id=7a641ca0c219e4bbe102f2634dbc7e06072fcd3c
-
->
->Second, I thought that busy bit is not used in x2apic mode?
->At least in intel's SDM, section 10.12.9 'ICR Operation in x2APIC Mode'
->this bit is not defined.
-
-You are right. We will remove the pointless check against APIC_ICR_BUSY and
-just invoke kvm_apic_send_ipi().
-
-In that section, SDM also says:
-With the removal of the Delivery Status bit, system software no longer has a
-reason to read the ICR. It remains readable only to aid in debugging; however,
-***software should not assume the value returned by reading the ICR is the last
-written value***.
