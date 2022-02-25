@@ -2,136 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 81D114C4750
-	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 15:19:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 931D64C475D
+	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 15:24:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241728AbiBYOTw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 09:19:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51392 "EHLO
+        id S231965AbiBYOZO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 09:25:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36746 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230039AbiBYOTu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Feb 2022 09:19:50 -0500
-Received: from smtp-fw-9103.amazon.com (smtp-fw-9103.amazon.com [207.171.188.200])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94FBB22A243;
-        Fri, 25 Feb 2022 06:19:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1645798756; x=1677334756;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=JS5wUTydEragTkrDUV+gfvs0YlNNXnR6VSN786T+J8s=;
-  b=sg4KCzbg3GXX5A4iNFDd1rpZCfbh4fxlGj5pzP97ibP/nS51XyRpGVE4
-   M8nQn7zSg6eRzNY6rvNG3pe2+oy6ldae/r46WMtkIbCAOsXuYevvO23O/
-   qr62O+j3i5knphIhIvdwVKI6Aa/5gzPyuvcZYjZDzlzqGS2CGhVeZD9PM
-   E=;
-X-IronPort-AV: E=Sophos;i="5.90,136,1643673600"; 
-   d="scan'208";a="994982949"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1a-b27d4a00.us-east-1.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-9103.sea19.amazon.com with ESMTP; 25 Feb 2022 14:18:59 +0000
-Received: from EX13MTAUWC002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
-        by email-inbound-relay-iad-1a-b27d4a00.us-east-1.amazon.com (Postfix) with ESMTPS id 503638152A;
-        Fri, 25 Feb 2022 14:18:53 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC002.ant.amazon.com (10.43.162.240) with Microsoft SMTP Server (TLS)
- id 15.0.1497.28; Fri, 25 Feb 2022 14:18:51 +0000
-Received: from [0.0.0.0] (10.43.162.43) by EX13D20UWC001.ant.amazon.com
- (10.43.162.244) with Microsoft SMTP Server (TLS) id 15.0.1497.28; Fri, 25 Feb
- 2022 14:18:45 +0000
-Message-ID: <88ebdc32-2e94-ef28-37ed-1c927c12af43@amazon.com>
-Date:   Fri, 25 Feb 2022 15:18:43 +0100
+        with ESMTP id S229484AbiBYOZN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Feb 2022 09:25:13 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6E6E71F685A
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 06:24:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645799079;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=KYPopQnM/N6BqfW8YvCaa4lKNgzUK+lwFuTwoLgolIc=;
+        b=hph/dKdlXWNjKWZHOmkx+9AsAjDOpRUXVlpWIteX7qsQZR4nnQBWOgoMXUFREpoTukhUbm
+        tP2+U/tW3CxjJXINqGCr6q+Z3/8WXh0+5E+LHj0QEjTBkldUFnS6obe7Oonq8wH5mLvn+7
+        /lPZYXbcPIPcDpotlfoEIyWDInoxYCQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-59-ZFBQn_M_PcuHHElDtKleVw-1; Fri, 25 Feb 2022 09:24:35 -0500
+X-MC-Unique: ZFBQn_M_PcuHHElDtKleVw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 586D4FC80;
+        Fri, 25 Feb 2022 14:24:30 +0000 (UTC)
+Received: from starship (unknown [10.40.195.190])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6DAEA83569;
+        Fri, 25 Feb 2022 14:24:20 +0000 (UTC)
+Message-ID: <9da5d168b8327396c91047f0b7b1c0235a67f27f.camel@redhat.com>
+Subject: Re: [PATCH v6 2/9] KVM: VMX: Extend BUILD_CONTROLS_SHADOW macro to
+ support 64-bit variation
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Zeng Guang <guang.zeng@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jethro Beekman <jethro@fortanix.com>,
+        Kai Huang <kai.huang@intel.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
+        Robert Hu <robert.hu@intel.com>, Gao Chao <chao.gao@intel.com>,
+        Robert Hoo <robert.hu@linux.intel.com>
+Date:   Fri, 25 Feb 2022 16:24:19 +0200
+In-Reply-To: <20220225082223.18288-3-guang.zeng@intel.com>
+References: <20220225082223.18288-1-guang.zeng@intel.com>
+         <20220225082223.18288-3-guang.zeng@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.6.1
-Subject: Re: [PATCH v4] virt: vmgenid: introduce driver for reinitializing RNG
- on VM fork
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-CC:     <kvm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <linux-hyperv@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <adrian@parity.io>, <ardb@kernel.org>, <ben@skyportsystems.com>,
-        <berrange@redhat.com>, <colmmacc@amazon.com>,
-        <decui@microsoft.com>, <dwmw@amazon.co.uk>, <ebiggers@kernel.org>,
-        <ehabkost@redhat.com>, <gregkh@linuxfoundation.org>,
-        <haiyangz@microsoft.com>, <imammedo@redhat.com>,
-        <jannh@google.com>, <kys@microsoft.com>, <lersek@redhat.com>,
-        <linux@dominikbrodowski.net>, <mst@redhat.com>,
-        <qemu-devel@nongnu.org>, <raduweis@amazon.com>,
-        <sthemmin@microsoft.com>, <tytso@mit.edu>, <wei.liu@kernel.org>
-References: <CAHmME9pJ3wb=EbUErJrCRC=VYGhFZqj2ar_AkVPsUvAnqGtwwg@mail.gmail.com>
- <20220225124848.909093-1-Jason@zx2c4.com>
- <05c9f2a9-accb-e0de-aac7-b212adac7eb2@amazon.com>
- <YhjjuMOeV7+T7thS@zx2c4.com>
-From:   Alexander Graf <graf@amazon.com>
-In-Reply-To: <YhjjuMOeV7+T7thS@zx2c4.com>
-X-Originating-IP: [10.43.162.43]
-X-ClientProxiedBy: EX13d09UWA001.ant.amazon.com (10.43.160.247) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
-X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-        NICE_REPLY_A,RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Ck9uIDI1LjAyLjIyIDE1OjEyLCBKYXNvbiBBLiBEb25lbmZlbGQgd3JvdGU6Cj4gSGkgQWxleCwK
-Pgo+IE9uIEZyaSwgRmViIDI1LCAyMDIyIGF0IDAyOjU3OjM4UE0gKzAxMDAsIEFsZXhhbmRlciBH
-cmFmIHdyb3RlOgo+Pj4gK3N0YXRpYyBjb25zdCBzdHJ1Y3QgYWNwaV9kZXZpY2VfaWQgdm1nZW5p
-ZF9pZHNbXSA9IHsKPj4+ICsgICAgICAgeyAiVk1HRU5JRCIsIDAgfSwKPj4+ICsgICAgICAgeyAi
-UUVNVVZHSUQiLCAwIH0sCj4+Cj4+IEFjY29yZGluZyB0byB0aGUgVk1HZW5JRCBzcGVjWzFdLCB5
-b3UgY2FuIG9ubHkgcmVseSBvbiBfQ0lEIGFuZCBfREROIGZvcgo+PiBtYXRjaGluZy4gVGhleSBi
-b3RoIGNvbnRhaW4gIlZNX0dlbl9Db3VudGVyIi4gVGhlIGxpc3QgYWJvdmUgY29udGFpbnMKPj4g
-X0hJRCB2YWx1ZXMgd2hpY2ggYXJlIG5vdCBhbiBvZmZpY2lhbCBpZGVudGlmaWVyIGZvciB0aGUg
-Vk1HZW5JRCBkZXZpY2UuCj4+Cj4+IElJUkMgdGhlIEFDUEkgZGV2aWNlIG1hdGNoIGxvZ2ljIGRv
-ZXMgbWF0Y2ggX0NJRCBpbiBhZGRpdGlvbiB0byBfSElELgo+PiBIb3dldmVyLCBpdCBpcyBsaW1p
-dGVkIHRvIDggY2hhcmFjdGVycy4gTGV0IG1lIHBhc3RlIGFuIGV4cGVyaW1lbnRhbAo+PiBoYWNr
-IEkgZGlkIGJhY2sgdGhlbiB0byBkbyB0aGUgX0NJRCBtYXRjaGluZyBpbnN0ZWFkLgo+Pgo+PiBb
-MV0KPj4gaHR0cHM6Ly9kb3dubG9hZC5taWNyb3NvZnQuY29tL2Rvd25sb2FkLzMvMS9DLzMxQ0ZD
-MzA3LTk4Q0EtNENBNS05MTRDLUQ5NzcyNjkxRTIxNC9WaXJ0dWFsTWFjaGluZUdlbmVyYXRpb25J
-RC5kb2N4Cj4+Cj4+Cj4+IEFsZXgKPj4KPj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvYWNwaS9idXMu
-YyBiL2RyaXZlcnMvYWNwaS9idXMuYwo+PiBpbmRleCAxNjgyZjhiNDU0YTIuLjQ1MjQ0M2Q3OWQ4
-NyAxMDA2NDQKPj4gLS0tIGEvZHJpdmVycy9hY3BpL2J1cy5jCj4+ICsrKyBiL2RyaXZlcnMvYWNw
-aS9idXMuYwo+PiBAQCAtNzQ4LDcgKzc0OCw3IEBAIHN0YXRpYyBib29sIF9fYWNwaV9tYXRjaF9k
-ZXZpY2Uoc3RydWN0IGFjcGlfZGV2aWNlCj4+ICpkZXZpY2UsCj4+ICAgICAgICAgICAgLyogRmly
-c3QsIGNoZWNrIHRoZSBBQ1BJL1BOUCBJRHMgcHJvdmlkZWQgYnkgdGhlIGNhbGxlci4gKi8KPj4g
-ICAgICAgICAgICBpZiAoYWNwaV9pZHMpIHsKPj4gICAgICAgICAgICAgICAgZm9yIChpZCA9IGFj
-cGlfaWRzOyBpZC0+aWRbMF0gfHwgaWQtPmNsczsgaWQrKykgewo+PiAtICAgICAgICAgICAgICAg
-IGlmIChpZC0+aWRbMF0gJiYgIXN0cmNtcCgoY2hhciAqKWlkLT5pZCwgaHdpZC0+aWQpKQo+PiAr
-ICAgICAgICAgICAgICAgIGlmIChpZC0+aWRbMF0gJiYgIXN0cm5jbXAoKGNoYXIgKilpZC0+aWQs
-IGh3aWQtPmlkLAo+PiBBQ1BJX0lEX0xFTiAtIDEpKQo+PiAgICAgICAgICAgICAgICAgICAgICAg
-IGdvdG8gb3V0X2FjcGlfbWF0Y2g7Cj4+ICAgICAgICAgICAgICAgICAgICBpZiAoaWQtPmNscyAm
-JiBfX2FjcGlfbWF0Y2hfZGV2aWNlX2NscyhpZCwgaHdpZCkpCj4+ICAgICAgICAgICAgICAgICAg
-ICAgICAgZ290byBvdXRfYWNwaV9tYXRjaDsKPj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvdmlydC92
-bWdlbmlkLmMgYi9kcml2ZXJzL3ZpcnQvdm1nZW5pZC5jCj4+IGluZGV4IDc1YTc4N2RhOGFhZC4u
-MGJmYTQyMmNmMDk0IDEwMDY0NAo+PiAtLS0gYS9kcml2ZXJzL3ZpcnQvdm1nZW5pZC5jCj4+ICsr
-KyBiL2RyaXZlcnMvdmlydC92bWdlbmlkLmMKPj4gQEAgLTM1Niw3ICszNTYsOCBAQCBzdGF0aWMg
-dm9pZCB2bWdlbmlkX2FjcGlfbm90aWZ5KHN0cnVjdCBhY3BpX2RldmljZQo+PiAqZGV2aWNlLCB1
-MzIgZXZlbnQpCj4+ICAgIH0KPj4KPj4gICAgc3RhdGljIGNvbnN0IHN0cnVjdCBhY3BpX2Rldmlj
-ZV9pZCB2bWdlbmlkX2lkc1tdID0gewo+PiAtICAgIHsiUUVNVVZHSUQiLCAwfSwKPj4gKyAgICAv
-KiBUaGlzIHJlYWxseSBpcyBWTV9HZW5fQ291bnRlciwgYnV0IHdlIGNhbiBvbmx5IG1hdGNoIDgg
-Y2hhcmFjdGVycyAqLwo+PiArICAgIHsiVk1fR0VOX0MiLCAwfSwKPj4gICAgICAgIHsiIiwgMH0s
-Cj4+ICAgIH07Cj4gSSByZWNhbGwgdGhpcyBwYXJ0IG9mIHRoZSBvbGQgdGhyZWFkLiBGcm9tIHdo
-YXQgSSB1bmRlcnN0b29kLCB1c2luZwo+ICJWTUdFTklEIiArICJRRU1VVkdJRCIgd29ya2VkIC93
-ZWxsIGVub3VnaC8sIGV2ZW4gaWYgdGhhdCB3YXNuJ3QKPiB0ZWNobmljYWxseSBpbi1zcGVjLiBB
-cmQgbm90ZWQgdGhhdCByZWx5aW5nIG9uIF9DSUQgbGlrZSB0aGF0IGlzCj4gdGVjaG5pY2FsbHkg
-YW4gQUNQSSBzcGVjIG5vdGlmaWNhdGlvbi4gU28gd2UncmUgYmV0d2VlbiBvbmUgc3BlYyBhbmQK
-PiBhbm90aGVyLCBiYXNpY2FsbHksIGFuZCBkb2luZyAiVk1HRU5JRCIgKyAiUUVNVVZHSUQiIHJl
-cXVpcmVzIGZld2VyCj4gY2hhbmdlcywgYXMgbWVudGlvbmVkLCBhcHBlYXJzIHRvIHdvcmsgZmlu
-ZSBpbiBteSB0ZXN0aW5nLgo+Cj4gSG93ZXZlciwgd2l0aCB0aGF0IHNhaWQsIEkgdGhpbmsgc3Vw
-cG9ydGluZyB0aGlzIHZpYSAiVk1fR2VuX0NvdW50ZXIiCj4gd291bGQgYmUgYSBiZXR0ZXIgZXZl
-bnR1YWwgdGhpbmcgdG8gZG8sIGJ1dCB3aWxsIHJlcXVpcmUgYWNrcyBhbmQKPiBjaGFuZ2VzIGZy
-b20gdGhlIEFDUEkgbWFpbnRhaW5lcnMuIERvIHlvdSB0aGluayB5b3UgY291bGQgcHJlcGFyZSB5
-b3VyCj4gcGF0Y2ggcHJvcG9zYWwgYWJvdmUgYXMgc29tZXRoaW5nIG9uLXRvcCBvZiBteSB0cmVl
-IFsxXT8gQW5kIGlmIHlvdSBjYW4KPiBjb252aW5jZSB0aGUgQUNQSSBtYWludGFpbmVycyB0aGF0
-IHRoYXQncyBva2F5LCB0aGVuIEknbGwgaGFwcGlseSB0YWtlCj4gdGhlIHBhdGNoLgoKClN1cmUs
-IGxldCBtZSBzZW5kIHRoZSBBQ1BJIHBhdGNoIHN0YW5kIGFsb25lLiBObyBuZWVkIHRvIGluY2x1
-ZGUgdGhlIApWTUdlbklEIGNoYW5nZSBpbiB0aGVyZS4KCgpBbGV4CgoKCgoKQW1hem9uIERldmVs
-b3BtZW50IENlbnRlciBHZXJtYW55IEdtYkgKS3JhdXNlbnN0ci4gMzgKMTAxMTcgQmVybGluCkdl
-c2NoYWVmdHNmdWVocnVuZzogQ2hyaXN0aWFuIFNjaGxhZWdlciwgSm9uYXRoYW4gV2Vpc3MKRWlu
-Z2V0cmFnZW4gYW0gQW10c2dlcmljaHQgQ2hhcmxvdHRlbmJ1cmcgdW50ZXIgSFJCIDE0OTE3MyBC
-ClNpdHo6IEJlcmxpbgpVc3QtSUQ6IERFIDI4OSAyMzcgODc5CgoK
+On Fri, 2022-02-25 at 16:22 +0800, Zeng Guang wrote:
+> From: Robert Hoo <robert.hu@linux.intel.com>
+> 
+> The Tertiary VM-Exec Control, different from previous control fields, is 64
+> bit. So extend BUILD_CONTROLS_SHADOW() by adding a 'bit' parameter, to
+> support both 32 bit and 64 bit fields' auxiliary functions building.
+> 
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
+> Signed-off-by: Zeng Guang <guang.zeng@intel.com>
+> ---
+>  arch/x86/kvm/vmx/vmx.h | 59 ++++++++++++++++++++++--------------------
+>  1 file changed, 31 insertions(+), 28 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+> index 7f2c82e7f38f..e07c76974fb0 100644
+> --- a/arch/x86/kvm/vmx/vmx.h
+> +++ b/arch/x86/kvm/vmx/vmx.h
+> @@ -456,35 +456,38 @@ static inline u8 vmx_get_rvi(void)
+>  	return vmcs_read16(GUEST_INTR_STATUS) & 0xff;
+>  }
+>  
+> -#define BUILD_CONTROLS_SHADOW(lname, uname)				    \
+> -static inline void lname##_controls_set(struct vcpu_vmx *vmx, u32 val)	    \
+> -{									    \
+> -	if (vmx->loaded_vmcs->controls_shadow.lname != val) {		    \
+> -		vmcs_write32(uname, val);				    \
+> -		vmx->loaded_vmcs->controls_shadow.lname = val;		    \
+> -	}								    \
+> -}									    \
+> -static inline u32 __##lname##_controls_get(struct loaded_vmcs *vmcs)	    \
+> -{									    \
+> -	return vmcs->controls_shadow.lname;				    \
+> -}									    \
+> -static inline u32 lname##_controls_get(struct vcpu_vmx *vmx)		    \
+> -{									    \
+> -	return __##lname##_controls_get(vmx->loaded_vmcs);		    \
+> -}									    \
+> -static inline void lname##_controls_setbit(struct vcpu_vmx *vmx, u32 val)   \
+> -{									    \
+> -	lname##_controls_set(vmx, lname##_controls_get(vmx) | val);	    \
+> -}									    \
+> -static inline void lname##_controls_clearbit(struct vcpu_vmx *vmx, u32 val) \
+> -{									    \
+> -	lname##_controls_set(vmx, lname##_controls_get(vmx) & ~val);	    \
+> +#define BUILD_CONTROLS_SHADOW(lname, uname, bits)			\
+> +static inline								\
+> +void lname##_controls_set(struct vcpu_vmx *vmx, u##bits val)		\
+> +{									\
+> +	if (vmx->loaded_vmcs->controls_shadow.lname != val) {		\
+> +		vmcs_write##bits(uname, val);				\
+> +		vmx->loaded_vmcs->controls_shadow.lname = val;		\
+> +	}								\
+> +}									\
+> +static inline u##bits __##lname##_controls_get(struct loaded_vmcs *vmcs)\
+> +{									\
+> +	return vmcs->controls_shadow.lname;				\
+> +}									\
+> +static inline u##bits lname##_controls_get(struct vcpu_vmx *vmx)	\
+> +{									\
+> +	return __##lname##_controls_get(vmx->loaded_vmcs);		\
+> +}									\
+> +static inline								\
+> +void lname##_controls_setbit(struct vcpu_vmx *vmx, u##bits val)		\
+> +{									\
+> +	lname##_controls_set(vmx, lname##_controls_get(vmx) | val);	\
+> +}									\
+> +static inline								\
+> +void lname##_controls_clearbit(struct vcpu_vmx *vmx, u##bits val)	\
+> +{									\
+> +	lname##_controls_set(vmx, lname##_controls_get(vmx) & ~val);	\
+>  }
+> -BUILD_CONTROLS_SHADOW(vm_entry, VM_ENTRY_CONTROLS)
+> -BUILD_CONTROLS_SHADOW(vm_exit, VM_EXIT_CONTROLS)
+> -BUILD_CONTROLS_SHADOW(pin, PIN_BASED_VM_EXEC_CONTROL)
+> -BUILD_CONTROLS_SHADOW(exec, CPU_BASED_VM_EXEC_CONTROL)
+> -BUILD_CONTROLS_SHADOW(secondary_exec, SECONDARY_VM_EXEC_CONTROL)
+> +BUILD_CONTROLS_SHADOW(vm_entry, VM_ENTRY_CONTROLS, 32)
+> +BUILD_CONTROLS_SHADOW(vm_exit, VM_EXIT_CONTROLS, 32)
+> +BUILD_CONTROLS_SHADOW(pin, PIN_BASED_VM_EXEC_CONTROL, 32)
+> +BUILD_CONTROLS_SHADOW(exec, CPU_BASED_VM_EXEC_CONTROL, 32)
+> +BUILD_CONTROLS_SHADOW(secondary_exec, SECONDARY_VM_EXEC_CONTROL, 32)
+>  
+>  /*
+>   * VMX_REGS_LAZY_LOAD_SET - The set of registers that will be updated in the
+
+I must admit that this will make it a bit harder to find references in the code.
+I personally would just use pair of 32 bit capabilities, but I don't have strong opinion
+on this.
+
+Thus:
+
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+
+Best regards,
+	Maxim Levitsky
+
 
