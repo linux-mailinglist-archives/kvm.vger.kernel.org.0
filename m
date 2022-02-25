@@ -2,41 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F4A24C46F1
-	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 14:54:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D4224C4701
+	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 14:59:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238418AbiBYNyQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 08:54:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57634 "EHLO
+        id S241202AbiBYN6j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 08:58:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230078AbiBYNyO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Feb 2022 08:54:14 -0500
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1E0D61A8C91
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 05:53:40 -0800 (PST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E23DC106F;
-        Fri, 25 Feb 2022 05:53:39 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 271CA3F5A1;
-        Fri, 25 Feb 2022 05:53:38 -0800 (PST)
-Date:   Fri, 25 Feb 2022 13:54:03 +0000
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Sebastian Ene <sebastianene@google.com>
-Cc:     kvm@vger.kernel.org, qperret@google.com, maz@kernel.org,
-        kvmarm@lists.cs.columbia.edu, will@kernel.org,
-        julien.thierry.kdev@gmail.com
-Subject: Re: [PATCH kvmtool v4 1/3] aarch64: Add stolen time support
-Message-ID: <Yhjfe7yuIW8WGot6@monolith.localdoman>
-References: <20220224165103.1157358-1-sebastianene@google.com>
- <20220224165103.1157358-2-sebastianene@google.com>
- <YhjDl/1BvaMu3d/9@monolith.localdoman>
- <YhjX1kHqDuVaGH/l@google.com>
+        with ESMTP id S231598AbiBYN6h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Feb 2022 08:58:37 -0500
+Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DC0C2BDA;
+        Fri, 25 Feb 2022 05:58:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1645797485; x=1677333485;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=8kGZS1WN7G6CFiOLfo0q+xlIMR7pw0Iyc1llFmruEA4=;
+  b=tufwJqmVMdYn2o0OGJjHXAGEUt4jdUd1F/lCAn4LwaAf0lRRAF1NQWgC
+   wawcqFJQJjTFj+OMhOTFeN05Op4R200X3lo7qRq3aGfAObbObORnOGIAU
+   b9Q/tco8T5au6YSbFEDdI9NmsAJCNujrC4wyIsURRWLJ9lXl6lc2uc/m4
+   w=;
+X-IronPort-AV: E=Sophos;i="5.90,136,1643673600"; 
+   d="scan'208";a="181239800"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2b-05e8af15.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-6001.iad6.amazon.com with ESMTP; 25 Feb 2022 13:57:49 +0000
+Received: from EX13MTAUWC002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
+        by email-inbound-relay-pdx-2b-05e8af15.us-west-2.amazon.com (Postfix) with ESMTPS id A5E6FA28F4;
+        Fri, 25 Feb 2022 13:57:47 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC002.ant.amazon.com (10.43.162.240) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.28; Fri, 25 Feb 2022 13:57:46 +0000
+Received: from [0.0.0.0] (10.43.161.219) by EX13D20UWC001.ant.amazon.com
+ (10.43.162.244) with Microsoft SMTP Server (TLS) id 15.0.1497.28; Fri, 25 Feb
+ 2022 13:57:40 +0000
+Message-ID: <05c9f2a9-accb-e0de-aac7-b212adac7eb2@amazon.com>
+Date:   Fri, 25 Feb 2022 14:57:38 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YhjX1kHqDuVaGH/l@google.com>
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.6.1
+Subject: Re: [PATCH v4] virt: vmgenid: introduce driver for reinitializing RNG
+ on VM fork
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>, <kvm@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>, <linux-hyperv@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC:     <adrian@parity.io>, <ardb@kernel.org>, <ben@skyportsystems.com>,
+        <berrange@redhat.com>, <colmmacc@amazon.com>,
+        <decui@microsoft.com>, <dwmw@amazon.co.uk>, <ebiggers@kernel.org>,
+        <ehabkost@redhat.com>, <gregkh@linuxfoundation.org>,
+        <haiyangz@microsoft.com>, <imammedo@redhat.com>,
+        <jannh@google.com>, <kys@microsoft.com>, <lersek@redhat.com>,
+        <linux@dominikbrodowski.net>, <mst@redhat.com>,
+        <qemu-devel@nongnu.org>, <raduweis@amazon.com>,
+        <sthemmin@microsoft.com>, <tytso@mit.edu>, <wei.liu@kernel.org>
+References: <CAHmME9pJ3wb=EbUErJrCRC=VYGhFZqj2ar_AkVPsUvAnqGtwwg@mail.gmail.com>
+ <20220225124848.909093-1-Jason@zx2c4.com>
+From:   Alexander Graf <graf@amazon.com>
+In-Reply-To: <20220225124848.909093-1-Jason@zx2c4.com>
+X-Originating-IP: [10.43.161.219]
+X-ClientProxiedBy: EX13D19UWA001.ant.amazon.com (10.43.160.169) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
+X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+        NICE_REPLY_A,RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -45,291 +76,185 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+Ck9uIDI1LjAyLjIyIDEzOjQ4LCBKYXNvbiBBLiBEb25lbmZlbGQgd3JvdGU6Cj4KPiBWTSBHZW5l
+cmF0aW9uIElEIGlzIGEgZmVhdHVyZSBmcm9tIE1pY3Jvc29mdCwgZGVzY3JpYmVkIGF0Cj4gPGh0
+dHBzOi8vZ28ubWljcm9zb2Z0LmNvbS9md2xpbmsvP0xpbmtJZD0yNjA3MDk+LCBhbmQgc3VwcG9y
+dGVkIGJ5Cj4gSHlwZXItViBhbmQgUUVNVS4gSXRzIHVzYWdlIGlzIGRlc2NyaWJlZCBpbiBNaWNy
+b3NvZnQncyBSTkcgd2hpdGVwYXBlciwKPiA8aHR0cHM6Ly9ha2EubXMvd2luMTBybmc+LCBhczoK
+Pgo+ICAgICAgSWYgdGhlIE9TIGlzIHJ1bm5pbmcgaW4gYSBWTSwgdGhlcmUgaXMgYSBwcm9ibGVt
+IHRoYXQgbW9zdAo+ICAgICAgaHlwZXJ2aXNvcnMgY2FuIHNuYXBzaG90IHRoZSBzdGF0ZSBvZiB0
+aGUgbWFjaGluZSBhbmQgbGF0ZXIgcmV3aW5kCj4gICAgICB0aGUgVk0gc3RhdGUgdG8gdGhlIHNh
+dmVkIHN0YXRlLiBUaGlzIHJlc3VsdHMgaW4gdGhlIG1hY2hpbmUgcnVubmluZwo+ICAgICAgYSBz
+ZWNvbmQgdGltZSB3aXRoIHRoZSBleGFjdCBzYW1lIFJORyBzdGF0ZSwgd2hpY2ggbGVhZHMgdG8g
+c2VyaW91cwo+ICAgICAgc2VjdXJpdHkgcHJvYmxlbXMuICBUbyByZWR1Y2UgdGhlIHdpbmRvdyBv
+ZiB2dWxuZXJhYmlsaXR5LCBXaW5kb3dzCj4gICAgICAxMCBvbiBhIEh5cGVyLVYgVk0gd2lsbCBk
+ZXRlY3Qgd2hlbiB0aGUgVk0gc3RhdGUgaXMgcmVzZXQsIHJldHJpZXZlCj4gICAgICBhIHVuaXF1
+ZSAobm90IHJhbmRvbSkgdmFsdWUgZnJvbSB0aGUgaHlwZXJ2aXNvciwgYW5kIHJlc2VlZCB0aGUg
+cm9vdAo+ICAgICAgUk5HIHdpdGggdGhhdCB1bmlxdWUgdmFsdWUuICBUaGlzIGRvZXMgbm90IGVs
+aW1pbmF0ZSB0aGUKPiAgICAgIHZ1bG5lcmFiaWxpdHksIGJ1dCBpdCBncmVhdGx5IHJlZHVjZXMg
+dGhlIHRpbWUgZHVyaW5nIHdoaWNoIHRoZSBSTkcKPiAgICAgIHN5c3RlbSB3aWxsIHByb2R1Y2Ug
+dGhlIHNhbWUgb3V0cHV0cyBhcyBpdCBkaWQgZHVyaW5nIGEgcHJldmlvdXMKPiAgICAgIGluc3Rh
+bnRpYXRpb24gb2YgdGhlIHNhbWUgVk0gc3RhdGUuCj4KPiBMaW51eCBoYXMgdGhlIHNhbWUgaXNz
+dWUsIGFuZCBnaXZlbiB0aGF0IHZtZ2VuaWQgaXMgc3VwcG9ydGVkIGFscmVhZHkgYnkKPiBtdWx0
+aXBsZSBoeXBlcnZpc29ycywgd2UgY2FuIGltcGxlbWVudCBtb3JlIG9yIGxlc3MgdGhlIHNhbWUg
+c29sdXRpb24uCj4gU28gdGhpcyBjb21taXQgd2lyZXMgdXAgdGhlIHZtZ2VuaWQgQUNQSSBub3Rp
+ZmljYXRpb24gdG8gdGhlIFJORydzIG5ld2x5Cj4gYWRkZWQgYWRkX3ZtZm9ya19yYW5kb21uZXNz
+KCkgZnVuY3Rpb24uCj4KPiBJdCBjYW4gYmUgdXNlZCBmcm9tIHFlbXUgdmlhIHRoZSBgLWRldmlj
+ZSB2bWdlbmlkLGd1aWQ9YXV0b2AgcGFyYW1ldGVyLgo+IEFmdGVyIHNldHRpbmcgdGhhdCwgdXNl
+IGBzYXZldm1gIGluIHRoZSBtb25pdG9yIHRvIHNhdmUgdGhlIFZNIHN0YXRlLAo+IHRoZW4gcXVp
+dCBRRU1VLCBzdGFydCBpdCBhZ2FpbiwgYW5kIHVzZSBgbG9hZHZtYC4gVGhhdCB3aWxsIHRyaWdn
+ZXIgdGhpcwo+IGRyaXZlcidzIG5vdGlmeSBmdW5jdGlvbiwgd2hpY2ggaGFuZHMgdGhlIG5ldyBV
+VUlEIHRvIHRoZSBSTkcuIFRoaXMgaXMKPiBkZXNjcmliZWQgaW4gPGh0dHBzOi8vZ2l0LnFlbXUu
+b3JnLz9wPXFlbXUuZ2l0O2E9YmxvYjtmPWRvY3Mvc3BlY3Mvdm1nZW5pZC50eHQ+Lgo+IEFuZCB0
+aGVyZSBhcmUgaG9va3MgZm9yIHRoaXMgaW4gbGlidmlydCBhcyB3ZWxsLCBkZXNjcmliZWQgaW4K
+PiA8aHR0cHM6Ly9saWJ2aXJ0Lm9yZy9mb3JtYXRkb21haW4uaHRtbCNnZW5lcmFsLW1ldGFkYXRh
+Pi4KPgo+IE5vdGUsIGhvd2V2ZXIsIHRoYXQgdGhlIHRyZWF0bWVudCBvZiB0aGlzIGFzIGEgVVVJ
+RCBpcyBjb25zaWRlcmVkIHRvIGJlCj4gYW4gYWNjaWRlbnRhbCBRRU1VIG51YW5jZSwgcGVyCj4g
+PGh0dHBzOi8vZ2l0aHViLmNvbS9saWJndWVzdGZzL3ZpcnQtdjJ2L2Jsb2IvbWFzdGVyL2RvY3Mv
+dm0tZ2VuZXJhdGlvbi1pZC1hY3Jvc3MtaHlwZXJ2aXNvcnMudHh0PiwKPiBzbyB0aGlzIGRyaXZl
+ciBzaW1wbHkgdHJlYXRzIHRoZXNlIGJ5dGVzIGFzIGFuIG9wYXF1ZSAxMjgtYml0IGJpbmFyeQo+
+IGJsb2IsIGFzIHBlciB0aGUgc3BlYy4gVGhpcyBkb2Vzbid0IHJlYWxseSBtYWtlIGEgZGlmZmVy
+ZW5jZSBhbnl3YXksCj4gY29uc2lkZXJpbmcgdGhhdCdzIGhvdyBpdCBlbmRzIHVwIHdoZW4gaGFu
+ZGVkIHRvIHRoZSBSTkcgaW4gdGhlIGVuZC4KPgo+IENjOiBBZHJpYW4gQ2F0YW5naXUgPGFkcmlh
+bkBwYXJpdHkuaW8+Cj4gQ2M6IERhbmllbCBQLiBCZXJyYW5nw6kgPGJlcnJhbmdlQHJlZGhhdC5j
+b20+Cj4gQ2M6IERvbWluaWsgQnJvZG93c2tpIDxsaW51eEBkb21pbmlrYnJvZG93c2tpLm5ldD4K
+PiBDYzogQXJkIEJpZXNoZXV2ZWwgPGFyZGJAa2VybmVsLm9yZz4KPiBDYzogR3JlZyBLcm9haC1I
+YXJ0bWFuIDxncmVna2hAbGludXhmb3VuZGF0aW9uLm9yZz4KPiBSZXZpZXdlZC1ieTogTGFzemxv
+IEVyc2VrIDxsZXJzZWtAcmVkaGF0LmNvbT4KPiBTaWduZWQtb2ZmLWJ5OiBKYXNvbiBBLiBEb25l
+bmZlbGQgPEphc29uQHp4MmM0LmNvbT4KPiAtLS0KPiBDaGFuZ2VzIHYzLT52NDoKPiAtIEFkZCB0
+aGlzIGRyaXZlciB0byBNQUlOVEFJTkVSUywgcGVyIEFyZCdzIHJlcXVlc3QuCj4gICAgTm90ZTog
+SSBkaWRuJ3QgcmVhbGx5IHdhbnQgdG8gZG8gdGhpcyBhdCBmaXJzdCwgYmVjYXVzZSBJIHdhcyBo
+b3BpbmcgdGhlCj4gICAgb3JpZ2luYWwgQW1hem9uIHRlYW0gbG9va2luZyBpbnRvIHRoaXMgbGFz
+dCB5ZWFyIHdvdWxkIHN0ZXAgdXAuIEJ1dCBpdCBzZWVtcwo+ICAgIGxpa2UgdGhhdCB0ZWFtIGhh
+cyBtb3ZlZCBvbiwgYW5kIGFueXdheSBJJ3ZlIGJhc2ljYWxseSByZXdyaXR0ZW4gdGhlIGRyaXZl
+cgo+ICAgIGZyb20gc2NyYXRjaCBhdCB0aGlzIHBvaW50IC0tIG5vdCBhIHNpbmdsZSBsaW5lIG9m
+IHRoZSBvcmlnaW5hbCBleGlzdHMgLS0KPiAgICBhbmQgc28gSSBndWVzcyBJJ2xsIG1haW50YWlu
+IGl0IG15c2VsZi4gQWRkaW5nIEdyZWcgdG8gdGhlIENDIGZvciBoaXMgYWNrIG9uCj4gICAgdGhp
+cy4KPiAtIERvbid0IHVzZSBhIHN0YXRpYyBnbG9iYWwgc3RhdGUgaW4gY2FzZSB0aGVyZSBhcmUg
+bXVsdGlwbGUgaW5zdGFuY2VzLgo+IC0gVXNlIGRldm1fbWVtcmVtYXAgaW5zdGVhZCBvZiB0aGUg
+YWNwaSBpbnRlcm5hbCBmdW5jdGlvbnMuCj4gLSBEZWZhdWx0IHRvIGJlaW5nIG1vZHVsYXIgaW5z
+dGVhZCBvZiBhIGJ1aWx0LWluLCBhcyBhcHBhcmVudGx5IHRoaXMgaXMKPiAgICB1ZGV2LWFibGUu
+Cj4KPiAgIE1BSU5UQUlORVJTICAgICAgICAgICAgfCAgIDEgKwo+ICAgZHJpdmVycy92aXJ0L0tj
+b25maWcgICB8ICAgOSArKysrCj4gICBkcml2ZXJzL3ZpcnQvTWFrZWZpbGUgIHwgICAxICsKPiAg
+IGRyaXZlcnMvdmlydC92bWdlbmlkLmMgfCAxMTIgKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysKPiAgIDQgZmlsZXMgY2hhbmdlZCwgMTIzIGluc2VydGlvbnMoKykKPiAg
+IGNyZWF0ZSBtb2RlIDEwMDY0NCBkcml2ZXJzL3ZpcnQvdm1nZW5pZC5jCj4KPiBkaWZmIC0tZ2l0
+IGEvTUFJTlRBSU5FUlMgYi9NQUlOVEFJTkVSUwo+IGluZGV4IDc3N2NkNmZhMmIzZC4uYTEwOTk3
+ZTE1MTQ2IDEwMDY0NAo+IC0tLSBhL01BSU5UQUlORVJTCj4gKysrIGIvTUFJTlRBSU5FUlMKPiBA
+QCAtMTYyMTEsNiArMTYyMTEsNyBAQCBNOiAgICAgIEphc29uIEEuIERvbmVuZmVsZCA8SmFzb25A
+engyYzQuY29tPgo+ICAgVDogICAgIGdpdCBodHRwczovL2dpdC5rZXJuZWwub3JnL3B1Yi9zY20v
+bGludXgva2VybmVsL2dpdC9jcm5nL3JhbmRvbS5naXQKPiAgIFM6ICAgICBNYWludGFpbmVkCj4g
+ICBGOiAgICAgZHJpdmVycy9jaGFyL3JhbmRvbS5jCj4gK0Y6ICAgICBkcml2ZXJzL3ZpcnQvdm1n
+ZW5pZC5jCj4KPiAgIFJBUElESU8gU1VCU1lTVEVNCj4gICBNOiAgICAgTWF0dCBQb3J0ZXIgPG1w
+b3J0ZXJAa2VybmVsLmNyYXNoaW5nLm9yZz4KPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy92aXJ0L0tj
+b25maWcgYi9kcml2ZXJzL3ZpcnQvS2NvbmZpZwo+IGluZGV4IDgwNjFlOGVmNDQ5Zi4uNTU5NmM3
+MzEzZjU5IDEwMDY0NAo+IC0tLSBhL2RyaXZlcnMvdmlydC9LY29uZmlnCj4gKysrIGIvZHJpdmVy
+cy92aXJ0L0tjb25maWcKPiBAQCAtMTMsNiArMTMsMTUgQEAgbWVudWNvbmZpZyBWSVJUX0RSSVZF
+UlMKPgo+ICAgaWYgVklSVF9EUklWRVJTCj4KPiArY29uZmlnIFZNR0VOSUQKPiArICAgICAgIHRy
+aXN0YXRlICJWaXJ0dWFsIE1hY2hpbmUgR2VuZXJhdGlvbiBJRCBkcml2ZXIiCj4gKyAgICAgICBk
+ZWZhdWx0IG0KPiArICAgICAgIGRlcGVuZHMgb24gQUNQSQo+ICsgICAgICAgaGVscAo+ICsgICAg
+ICAgICBTYXkgWSBoZXJlIHRvIHVzZSB0aGUgaHlwZXJ2aXNvci1wcm92aWRlZCBWaXJ0dWFsIE1h
+Y2hpbmUgR2VuZXJhdGlvbiBJRAo+ICsgICAgICAgICB0byByZXNlZWQgdGhlIFJORyB3aGVuIHRo
+ZSBWTSBpcyBjbG9uZWQuIFRoaXMgaXMgaGlnaGx5IHJlY29tbWVuZGVkIGlmCj4gKyAgICAgICAg
+IHlvdSBpbnRlbmQgdG8gZG8gYW55IHJvbGxiYWNrIC8gY2xvbmluZyAvIHNuYXBzaG90dGluZyBv
+ZiBWTXMuCj4gKwo+ICAgY29uZmlnIEZTTF9IVl9NQU5BR0VSCj4gICAgICAgICAgdHJpc3RhdGUg
+IkZyZWVzY2FsZSBoeXBlcnZpc29yIG1hbmFnZW1lbnQgZHJpdmVyIgo+ICAgICAgICAgIGRlcGVu
+ZHMgb24gRlNMX1NPQwo+IGRpZmYgLS1naXQgYS9kcml2ZXJzL3ZpcnQvTWFrZWZpbGUgYi9kcml2
+ZXJzL3ZpcnQvTWFrZWZpbGUKPiBpbmRleCAzZTI3MmVhNjBjZDkuLjEwOGQwZmZjYzlhYSAxMDA2
+NDQKPiAtLS0gYS9kcml2ZXJzL3ZpcnQvTWFrZWZpbGUKPiArKysgYi9kcml2ZXJzL3ZpcnQvTWFr
+ZWZpbGUKPiBAQCAtNCw2ICs0LDcgQEAKPiAgICMKPgo+ICAgb2JqLSQoQ09ORklHX0ZTTF9IVl9N
+QU5BR0VSKSAgICs9IGZzbF9oeXBlcnZpc29yLm8KPiArb2JqLSQoQ09ORklHX1ZNR0VOSUQpICAg
+ICAgICAgICs9IHZtZ2VuaWQubwo+ICAgb2JqLXkgICAgICAgICAgICAgICAgICAgICAgICAgICs9
+IHZib3hndWVzdC8KPgo+ICAgb2JqLSQoQ09ORklHX05JVFJPX0VOQ0xBVkVTKSAgICs9IG5pdHJv
+X2VuY2xhdmVzLwo+IGRpZmYgLS1naXQgYS9kcml2ZXJzL3ZpcnQvdm1nZW5pZC5jIGIvZHJpdmVy
+cy92aXJ0L3ZtZ2VuaWQuYwo+IG5ldyBmaWxlIG1vZGUgMTAwNjQ0Cj4gaW5kZXggMDAwMDAwMDAw
+MDAwLi5lM2RkNGFmYjMzYzYKPiAtLS0gL2Rldi9udWxsCj4gKysrIGIvZHJpdmVycy92aXJ0L3Zt
+Z2VuaWQuYwo+IEBAIC0wLDAgKzEsMTEyIEBACj4gKy8vIFNQRFgtTGljZW5zZS1JZGVudGlmaWVy
+OiBHUEwtMi4wCj4gKy8qCj4gKyAqIENvcHlyaWdodCAoQykgMjAyMiBKYXNvbiBBLiBEb25lbmZl
+bGQgPEphc29uQHp4MmM0LmNvbT4uIEFsbCBSaWdodHMgUmVzZXJ2ZWQuCj4gKyAqCj4gKyAqIFRo
+ZSAiVmlydHVhbCBNYWNoaW5lIEdlbmVyYXRpb24gSUQiIGlzIGV4cG9zZWQgdmlhIEFDUEkgYW5k
+IGNoYW5nZXMgd2hlbiBhCj4gKyAqIHZpcnR1YWwgbWFjaGluZSBmb3JrcyBvciBpcyBjbG9uZWQu
+IFRoaXMgZHJpdmVyIGV4aXN0cyBmb3Igc2hlcGhlcmRpbmcgdGhhdAo+ICsgKiBpbmZvcm1hdGlv
+biB0byByYW5kb20uYy4KPiArICovCj4gKwo+ICsjaW5jbHVkZSA8bGludXgva2VybmVsLmg+Cj4g
+KyNpbmNsdWRlIDxsaW51eC9tb2R1bGUuaD4KPiArI2luY2x1ZGUgPGxpbnV4L2FjcGkuaD4KPiAr
+I2luY2x1ZGUgPGxpbnV4L3JhbmRvbS5oPgo+ICsKPiArQUNQSV9NT0RVTEVfTkFNRSgidm1nZW5p
+ZCIpOwo+ICsKPiArZW51bSB7IFZNR0VOSURfU0laRSA9IDE2IH07Cj4gKwo+ICtzdHJ1Y3Qgdm1n
+ZW5pZF9zdGF0ZSB7Cj4gKyAgICAgICB1OCAqbmV4dF9pZDsKPiArICAgICAgIHU4IHRoaXNfaWRb
+Vk1HRU5JRF9TSVpFXTsKPiArfTsKPiArCj4gK3N0YXRpYyBpbnQgdm1nZW5pZF9hY3BpX2FkZChz
+dHJ1Y3QgYWNwaV9kZXZpY2UgKmRldmljZSkKPiArewo+ICsgICAgICAgc3RydWN0IGFjcGlfYnVm
+ZmVyIHBhcnNlZCA9IHsgQUNQSV9BTExPQ0FURV9CVUZGRVIgfTsKPiArICAgICAgIHN0cnVjdCB2
+bWdlbmlkX3N0YXRlICpzdGF0ZTsKPiArICAgICAgIHVuaW9uIGFjcGlfb2JqZWN0ICpvYmo7Cj4g
+KyAgICAgICBwaHlzX2FkZHJfdCBwaHlzX2FkZHI7Cj4gKyAgICAgICBhY3BpX3N0YXR1cyBzdGF0
+dXM7Cj4gKyAgICAgICBpbnQgcmV0ID0gMDsKPiArCj4gKyAgICAgICBzdGF0ZSA9IGRldm1fa21h
+bGxvYygmZGV2aWNlLT5kZXYsIHNpemVvZigqc3RhdGUpLCBHRlBfS0VSTkVMKTsKPiArICAgICAg
+IGlmICghc3RhdGUpCj4gKyAgICAgICAgICAgICAgIHJldHVybiAtRU5PTUVNOwo+ICsKPiArICAg
+ICAgIHN0YXR1cyA9IGFjcGlfZXZhbHVhdGVfb2JqZWN0KGRldmljZS0+aGFuZGxlLCAiQUREUiIs
+IE5VTEwsICZwYXJzZWQpOwo+ICsgICAgICAgaWYgKEFDUElfRkFJTFVSRShzdGF0dXMpKSB7Cj4g
+KyAgICAgICAgICAgICAgIEFDUElfRVhDRVBUSU9OKChBRV9JTkZPLCBzdGF0dXMsICJFdmFsdWF0
+aW5nIEFERFIiKSk7Cj4gKyAgICAgICAgICAgICAgIHJldHVybiAtRU5PREVWOwo+ICsgICAgICAg
+fQo+ICsgICAgICAgb2JqID0gcGFyc2VkLnBvaW50ZXI7Cj4gKyAgICAgICBpZiAoIW9iaiB8fCBv
+YmotPnR5cGUgIT0gQUNQSV9UWVBFX1BBQ0tBR0UgfHwgb2JqLT5wYWNrYWdlLmNvdW50ICE9IDIg
+fHwKPiArICAgICAgICAgICBvYmotPnBhY2thZ2UuZWxlbWVudHNbMF0udHlwZSAhPSBBQ1BJX1RZ
+UEVfSU5URUdFUiB8fAo+ICsgICAgICAgICAgIG9iai0+cGFja2FnZS5lbGVtZW50c1sxXS50eXBl
+ICE9IEFDUElfVFlQRV9JTlRFR0VSKSB7Cj4gKyAgICAgICAgICAgICAgIHJldCA9IC1FSU5WQUw7
+Cj4gKyAgICAgICAgICAgICAgIGdvdG8gb3V0Owo+ICsgICAgICAgfQo+ICsKPiArICAgICAgIHBo
+eXNfYWRkciA9IChvYmotPnBhY2thZ2UuZWxlbWVudHNbMF0uaW50ZWdlci52YWx1ZSA8PCAwKSB8
+Cj4gKyAgICAgICAgICAgICAgICAgICAob2JqLT5wYWNrYWdlLmVsZW1lbnRzWzFdLmludGVnZXIu
+dmFsdWUgPDwgMzIpOwo+ICsgICAgICAgc3RhdGUtPm5leHRfaWQgPSBkZXZtX21lbXJlbWFwKCZk
+ZXZpY2UtPmRldiwgcGh5c19hZGRyLCBWTUdFTklEX1NJWkUsIE1FTVJFTUFQX1dCKTsKPiArICAg
+ICAgIGlmICghc3RhdGUtPm5leHRfaWQpIHsKPiArICAgICAgICAgICAgICAgcmV0ID0gLUVOT01F
+TTsKPiArICAgICAgICAgICAgICAgZ290byBvdXQ7Cj4gKyAgICAgICB9Cj4gKwo+ICsgICAgICAg
+bWVtY3B5KHN0YXRlLT50aGlzX2lkLCBzdGF0ZS0+bmV4dF9pZCwgc2l6ZW9mKHN0YXRlLT50aGlz
+X2lkKSk7Cj4gKyAgICAgICBhZGRfZGV2aWNlX3JhbmRvbW5lc3Moc3RhdGUtPnRoaXNfaWQsIHNp
+emVvZihzdGF0ZS0+dGhpc19pZCkpOwoKClBsZWFzZSBleHBvc2UgdGhlIHZtZ2VuaWQgdmlhIC9z
+eXNmcyBzbyB0aGF0IHVzZXIgc3BhY2UgZXZlbiByZW1vdGVseSAKaGFzIGEgY2hhbmNlIHRvIGNo
+ZWNrIGlmIGl0J3MgYmVlbiBjbG9uZWQuCgoKPiArCj4gKyAgICAgICBkZXZpY2UtPmRyaXZlcl9k
+YXRhID0gc3RhdGU7Cj4gKwo+ICtvdXQ6Cj4gKyAgICAgICBBQ1BJX0ZSRUUocGFyc2VkLnBvaW50
+ZXIpOwo+ICsgICAgICAgcmV0dXJuIHJldDsKPiArfQo+ICsKPiArc3RhdGljIHZvaWQgdm1nZW5p
+ZF9hY3BpX25vdGlmeShzdHJ1Y3QgYWNwaV9kZXZpY2UgKmRldmljZSwgdTMyIGV2ZW50KQo+ICt7
+Cj4gKyAgICAgICBzdHJ1Y3Qgdm1nZW5pZF9zdGF0ZSAqc3RhdGUgPSBhY3BpX2RyaXZlcl9kYXRh
+KGRldmljZSk7Cj4gKyAgICAgICB1OCBvbGRfaWRbVk1HRU5JRF9TSVpFXTsKPiArCj4gKyAgICAg
+ICBtZW1jcHkob2xkX2lkLCBzdGF0ZS0+dGhpc19pZCwgc2l6ZW9mKG9sZF9pZCkpOwo+ICsgICAg
+ICAgbWVtY3B5KHN0YXRlLT50aGlzX2lkLCBzdGF0ZS0+bmV4dF9pZCwgc2l6ZW9mKHN0YXRlLT50
+aGlzX2lkKSk7Cj4gKyAgICAgICBpZiAoIW1lbWNtcChvbGRfaWQsIHN0YXRlLT50aGlzX2lkLCBz
+aXplb2Yob2xkX2lkKSkpCj4gKyAgICAgICAgICAgICAgIHJldHVybjsKPiArICAgICAgIGFkZF92
+bWZvcmtfcmFuZG9tbmVzcyhzdGF0ZS0+dGhpc19pZCwgc2l6ZW9mKHN0YXRlLT50aGlzX2lkKSk7
+Cj4gK30KPiArCj4gK3N0YXRpYyBjb25zdCBzdHJ1Y3QgYWNwaV9kZXZpY2VfaWQgdm1nZW5pZF9p
+ZHNbXSA9IHsKPiArICAgICAgIHsgIlZNR0VOSUQiLCAwIH0sCj4gKyAgICAgICB7ICJRRU1VVkdJ
+RCIsIDAgfSwKCgpBY2NvcmRpbmcgdG8gdGhlIFZNR2VuSUQgc3BlY1sxXSwgeW91IGNhbiBvbmx5
+IHJlbHkgb24gX0NJRCBhbmQgX0RETiBmb3IgCm1hdGNoaW5nLiBUaGV5IGJvdGggY29udGFpbiAi
+Vk1fR2VuX0NvdW50ZXIiLiBUaGUgbGlzdCBhYm92ZSBjb250YWlucyAKX0hJRCB2YWx1ZXMgd2hp
+Y2ggYXJlIG5vdCBhbiBvZmZpY2lhbCBpZGVudGlmaWVyIGZvciB0aGUgVk1HZW5JRCBkZXZpY2Uu
+CgpJSVJDIHRoZSBBQ1BJIGRldmljZSBtYXRjaCBsb2dpYyBkb2VzIG1hdGNoIF9DSUQgaW4gYWRk
+aXRpb24gdG8gX0hJRC4gCkhvd2V2ZXIsIGl0IGlzIGxpbWl0ZWQgdG8gOCBjaGFyYWN0ZXJzLiBM
+ZXQgbWUgcGFzdGUgYW4gZXhwZXJpbWVudGFsIApoYWNrIEkgZGlkIGJhY2sgdGhlbiB0byBkbyB0
+aGUgX0NJRCBtYXRjaGluZyBpbnN0ZWFkLgoKWzFdIApodHRwczovL2Rvd25sb2FkLm1pY3Jvc29m
+dC5jb20vZG93bmxvYWQvMy8xL0MvMzFDRkMzMDctOThDQS00Q0E1LTkxNEMtRDk3NzI2OTFFMjE0
+L1ZpcnR1YWxNYWNoaW5lR2VuZXJhdGlvbklELmRvY3gKCgpBbGV4CgpkaWZmIC0tZ2l0IGEvZHJp
+dmVycy9hY3BpL2J1cy5jIGIvZHJpdmVycy9hY3BpL2J1cy5jCmluZGV4IDE2ODJmOGI0NTRhMi4u
+NDUyNDQzZDc5ZDg3IDEwMDY0NAotLS0gYS9kcml2ZXJzL2FjcGkvYnVzLmMKKysrIGIvZHJpdmVy
+cy9hY3BpL2J1cy5jCkBAIC03NDgsNyArNzQ4LDcgQEAgc3RhdGljIGJvb2wgX19hY3BpX21hdGNo
+X2RldmljZShzdHJ1Y3QgYWNwaV9kZXZpY2UgCipkZXZpY2UsCiDCoMKgwqDCoCDCoMKgwqAgLyog
+Rmlyc3QsIGNoZWNrIHRoZSBBQ1BJL1BOUCBJRHMgcHJvdmlkZWQgYnkgdGhlIGNhbGxlci4gKi8K
+IMKgwqDCoMKgIMKgwqDCoCBpZiAoYWNwaV9pZHMpIHsKIMKgwqDCoMKgIMKgwqDCoCDCoMKgwqAg
+Zm9yIChpZCA9IGFjcGlfaWRzOyBpZC0+aWRbMF0gfHwgaWQtPmNsczsgaWQrKykgewotwqDCoMKg
+IMKgwqDCoCDCoMKgwqAgwqDCoMKgIGlmIChpZC0+aWRbMF0gJiYgIXN0cmNtcCgoY2hhciAqKWlk
+LT5pZCwgaHdpZC0+aWQpKQorwqDCoMKgIMKgwqDCoCDCoMKgwqAgwqDCoMKgIGlmIChpZC0+aWRb
+MF0gJiYgIXN0cm5jbXAoKGNoYXIgKilpZC0+aWQsIGh3aWQtPmlkLCAKQUNQSV9JRF9MRU4gLSAx
+KSkKIMKgwqDCoMKgIMKgwqDCoCDCoMKgwqAgwqDCoMKgIMKgwqDCoCBnb3RvIG91dF9hY3BpX21h
+dGNoOwogwqDCoMKgwqAgwqDCoMKgIMKgwqDCoCDCoMKgwqAgaWYgKGlkLT5jbHMgJiYgX19hY3Bp
+X21hdGNoX2RldmljZV9jbHMoaWQsIGh3aWQpKQogwqDCoMKgwqAgwqDCoMKgIMKgwqDCoCDCoMKg
+wqAgwqDCoMKgIGdvdG8gb3V0X2FjcGlfbWF0Y2g7CmRpZmYgLS1naXQgYS9kcml2ZXJzL3ZpcnQv
+dm1nZW5pZC5jIGIvZHJpdmVycy92aXJ0L3ZtZ2VuaWQuYwppbmRleCA3NWE3ODdkYThhYWQuLjBi
+ZmE0MjJjZjA5NCAxMDA2NDQKLS0tIGEvZHJpdmVycy92aXJ0L3ZtZ2VuaWQuYworKysgYi9kcml2
+ZXJzL3ZpcnQvdm1nZW5pZC5jCkBAIC0zNTYsNyArMzU2LDggQEAgc3RhdGljIHZvaWQgdm1nZW5p
+ZF9hY3BpX25vdGlmeShzdHJ1Y3QgYWNwaV9kZXZpY2UgCipkZXZpY2UsIHUzMiBldmVudCkKIMKg
+fQoKIMKgc3RhdGljIGNvbnN0IHN0cnVjdCBhY3BpX2RldmljZV9pZCB2bWdlbmlkX2lkc1tdID0g
+ewotwqDCoMKgIHsiUUVNVVZHSUQiLCAwfSwKK8KgwqDCoCAvKiBUaGlzIHJlYWxseSBpcyBWTV9H
+ZW5fQ291bnRlciwgYnV0IHdlIGNhbiBvbmx5IG1hdGNoIDggY2hhcmFjdGVycyAqLworwqDCoMKg
+IHsiVk1fR0VOX0MiLCAwfSwKIMKgwqDCoMKgIHsiIiwgMH0sCiDCoH07CgoKCgpBbWF6b24gRGV2
+ZWxvcG1lbnQgQ2VudGVyIEdlcm1hbnkgR21iSApLcmF1c2Vuc3RyLiAzOAoxMDExNyBCZXJsaW4K
+R2VzY2hhZWZ0c2Z1ZWhydW5nOiBDaHJpc3RpYW4gU2NobGFlZ2VyLCBKb25hdGhhbiBXZWlzcwpF
+aW5nZXRyYWdlbiBhbSBBbXRzZ2VyaWNodCBDaGFybG90dGVuYnVyZyB1bnRlciBIUkIgMTQ5MTcz
+IEIKU2l0ejogQmVybGluClVzdC1JRDogREUgMjg5IDIzNyA4NzkKCgo=
 
-On Fri, Feb 25, 2022 at 01:21:26PM +0000, Sebastian Ene wrote:
-> On Fri, Feb 25, 2022 at 11:55:03AM +0000, Alexandru Elisei wrote:
-> > Hi,
-> > 
-> 
-> Hi,
-> 
-> > On Thu, Feb 24, 2022 at 04:51:03PM +0000, Sebastian Ene wrote:
-> > > This patch adds support for stolen time by sharing a memory region
-> > > with the guest which will be used by the hypervisor to store the stolen
-> > > time information. Reserve a 64kb MMIO memory region after the RTC peripheral
-> > > to be used by pvtime. The exact format of the structure stored by the
-> > > hypervisor is described in the ARM DEN0057A document.
-> > > 
-> > > Signed-off-by: Sebastian Ene <sebastianene@google.com>
-> > > ---
-> > >  Makefile                               |  1 +
-> > >  arm/aarch64/arm-cpu.c                  |  1 +
-> > >  arm/aarch64/include/kvm/kvm-cpu-arch.h |  1 +
-> > >  arm/aarch64/pvtime.c                   | 94 ++++++++++++++++++++++++++
-> > >  arm/include/arm-common/kvm-arch.h      |  6 +-
-> > >  include/kvm/kvm-config.h               |  1 +
-> > >  6 files changed, 103 insertions(+), 1 deletion(-)
-> > >  create mode 100644 arm/aarch64/pvtime.c
-> > > 
-> > > diff --git a/Makefile b/Makefile
-> > > index f251147..e9121dc 100644
-> > > --- a/Makefile
-> > > +++ b/Makefile
-> > > @@ -182,6 +182,7 @@ ifeq ($(ARCH), arm64)
-> > >  	OBJS		+= arm/aarch64/arm-cpu.o
-> > >  	OBJS		+= arm/aarch64/kvm-cpu.o
-> > >  	OBJS		+= arm/aarch64/kvm.o
-> > > +	OBJS		+= arm/aarch64/pvtime.o
-> > >  	ARCH_INCLUDE	:= $(HDRS_ARM_COMMON)
-> > >  	ARCH_INCLUDE	+= -Iarm/aarch64/include
-> > >  
-> > > diff --git a/arm/aarch64/arm-cpu.c b/arm/aarch64/arm-cpu.c
-> > > index d7572b7..326fb20 100644
-> > > --- a/arm/aarch64/arm-cpu.c
-> > > +++ b/arm/aarch64/arm-cpu.c
-> > > @@ -22,6 +22,7 @@ static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
-> > >  static int arm_cpu__vcpu_init(struct kvm_cpu *vcpu)
-> > >  {
-> > >  	vcpu->generate_fdt_nodes = generate_fdt_nodes;
-> > > +	kvm_cpu__setup_pvtime(vcpu);
-> > >  	return 0;
-> > >  }
-> > >  
-> > > diff --git a/arm/aarch64/include/kvm/kvm-cpu-arch.h b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-> > > index 8dfb82e..b57d6e6 100644
-> > > --- a/arm/aarch64/include/kvm/kvm-cpu-arch.h
-> > > +++ b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-> > > @@ -19,5 +19,6 @@
-> > >  
-> > >  void kvm_cpu__select_features(struct kvm *kvm, struct kvm_vcpu_init *init);
-> > >  int kvm_cpu__configure_features(struct kvm_cpu *vcpu);
-> > > +void kvm_cpu__setup_pvtime(struct kvm_cpu *vcpu);
-> > >  
-> > >  #endif /* KVM__KVM_CPU_ARCH_H */
-> > > diff --git a/arm/aarch64/pvtime.c b/arm/aarch64/pvtime.c
-> > > new file mode 100644
-> > > index 0000000..8251f6a
-> > > --- /dev/null
-> > > +++ b/arm/aarch64/pvtime.c
-> > > @@ -0,0 +1,94 @@
-> > > +#include "kvm/kvm.h"
-> > > +#include "kvm/kvm-cpu.h"
-> > > +#include "kvm/util.h"
-> > > +
-> > > +#include <linux/byteorder.h>
-> > > +#include <linux/types.h>
-> > > +
-> > > +#define ARM_PVTIME_STRUCT_SIZE		(64)
-> > > +
-> > > +struct pvtime_data_priv {
-> > > +	bool	is_supported;
-> > > +	char	*usr_mem;
-> > > +};
-> > > +
-> > > +static struct pvtime_data_priv pvtime_data = {
-> > > +	.is_supported	= true,
-> > > +	.usr_mem	= NULL
-> > > +};
-> > > +
-> > > +static int pvtime__alloc_region(struct kvm *kvm)
-> > > +{
-> > > +	char *mem;
-> > > +	int ret = 0;
-> > > +
-> > > +	mem = mmap(NULL, ARM_PVTIME_MMIO_SIZE, PROT_RW,
-> > > +		   MAP_ANON_NORESERVE, -1, 0);
-> > > +	if (mem == MAP_FAILED)
-> > > +		return -ENOMEM;
-> > 
-> > Hm... man 2 mmap lists a few dozen error codes, why use -ENOMEM here instead of
-> > -errno? This just makes debugging harder.
-> > 
-> 
-> I will return the -errno error code here.
-> 
-> > > +
-> > > +	ret = kvm__register_dev_mem(kvm, ARM_PVTIME_MMIO_BASE,
-> > > +				    ARM_PVTIME_MMIO_SIZE, mem);
-> > > +	if (ret) {
-> > > +		munmap(mem, ARM_PVTIME_MMIO_SIZE);
-> > > +		return ret;
-> > > +	}
-> > > +
-> > > +	pvtime_data.usr_mem = mem;
-> > > +	return ret;
-> > > +}
-> > > +
-> > > +static int pvtime__teardown_region(struct kvm *kvm)
-> > > +{
-> > > +	if (pvtime_data.usr_mem == NULL)
-> > > +		return 0;
-> > > +
-> > > +	kvm__destroy_mem(kvm, ARM_PVTIME_MMIO_BASE,
-> > > +			 ARM_PVTIME_MMIO_SIZE, pvtime_data.usr_mem);
-> > > +	munmap(pvtime_data.usr_mem, ARM_PVTIME_MMIO_SIZE);
-> > > +	pvtime_data.usr_mem = NULL;
-> > > +	return 0;
-> > > +}
-> > > +
-> > > +void kvm_cpu__setup_pvtime(struct kvm_cpu *vcpu)
-> > > +{
-> > > +	int ret;
-> > > +	u64 pvtime_guest_addr = ARM_PVTIME_MMIO_BASE + vcpu->cpu_id *
-> > 
-> > That's trange, cpu_id is not initialized here because target->init() is called
-> > before setting up the cpu_id. The following patch in the series, "aarch64:
-> > Populate the vCPU struct before target->init()" should come before this one.
-> > 
-> > > +		ARM_PVTIME_STRUCT_SIZE;
-> > > +	struct kvm_config *kvm_cfg = NULL;
-> > > +	struct kvm_device_attr pvtime_attr = (struct kvm_device_attr) {
-> > > +		.group	= KVM_ARM_VCPU_PVTIME_CTRL,
-> > > +		.addr	= KVM_ARM_VCPU_PVTIME_IPA
-> > > +	};
-> > > +
-> > > +	BUG_ON(!vcpu);
-> > > +	BUG_ON(!vcpu->kvm);
-> > > +
-> > > +	kvm_cfg = &vcpu->kvm->cfg;
-> > > +	if (kvm_cfg && kvm_cfg->no_pvtime)
-> > 
-> > If you move the next patch in the series before this one, all the above checks
-> > will not be needed and should be removed.
-> > 
-> > In general, each patch in a series should be able to build properly and run a VM
-> > without errors. This is to help users when bisecting [1]. If I build kvmtool
-> > from this patch and I try to run a VM I get the error:
-> > 
-> > Error: BUG at arm/aarch64/pvtime.c:65
-> > 
-> > [1] https://github.com/torvalds/linux/blob/master/Documentation/process/submitting-patches.rst#separate-your-changes
-> > 
-> 
-> I will move the patch that handles the structure initialisation before
-> this one and I will remove those checks. Thanks for the suggestion !
-> 
-> > > +		return;
-> > > +
-> > > +	if (!pvtime_data.is_supported)
-> > > +		return;
-> > > +
-> > > +	ret = ioctl(vcpu->vcpu_fd, KVM_HAS_DEVICE_ATTR, &pvtime_attr);
-> > > +	if (ret)
-> > > +		goto out_err;
-> > 
-> > You should check that pvtime is supported by checking the KVM_CAP_STEAL_TIME on
-> > the VM fd, as that's how capabilities are advertised by KVM.
-> > 
-> 
-> I thought that it is sufficient to verify that it has the device
-> attributes for *PVTIME. I will add this check too, thanks for the
-> suggestion !
-> 
-> > > +
-> > > +	if (!pvtime_data.usr_mem) {
-> > > +		ret = pvtime__alloc_region(vcpu->kvm);
-> > 
-> > pvtime__alloc_region() can fail pretty catastrophically, is it ok to ignore it
-> > and go on? I would have expected kvm_cpu__setup_pvtime() to return an error
-> > which is then propagated to target->init().
-> >
-> 
-> Hmm, I didn't propagate the error code from kvm_cpu__setup_pvtime()
-> because if this feature is not supported it will hit:"Unable to
-> initialise vcpu".
-
-That's totally fine. If the feature is not supported by KVM, then return 0
-from kvm_cpu__setup_pvtime(). But if the capability is supported by KVM and
-kvmtool encounters and error when it tries to configure it, then kvmtool
-should abort and complain loudly about it.
-
-For example, kvmtool already unconditionally tries to enable SVE if KVM
-supports it (look at kvm_cpu__arch_init() ->
-kvm_cpu__configure_features()), and it dies if it cannot finalize the VCPU
-(which is the final stage in SVE configuration).
-
-> 
-> But I guess that now we can propagate the error code as we have '--no-pvtime'
-> command argument. What do you think ?
-
-Yes, please propagate the error.
-
-Thanks,
-Alex
-
-> 
-> > > +		if (ret)
-> > > +			goto out_err;
-> > > +	}
-> > > +
-> > > +	pvtime_attr.addr = (u64)&pvtime_guest_addr;
-> > > +	ret = ioctl(vcpu->vcpu_fd, KVM_SET_DEVICE_ATTR, &pvtime_attr);
-> > > +	if (!ret)
-> > > +		return;
-> > > +
-> > > +	pvtime__teardown_region(vcpu->kvm);
-> > > +out_err:
-> > > +	pvtime_data.is_supported = false;
-> > > +}
-> > > +
-> > > +dev_exit(pvtime__teardown_region);
-> > 
-> > It is customary to put the dev_exit() exactly after the function it refers to.
-> > 
-> 
-> I will move this.
-> 
-> > > diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
-> > > index c645ac0..3f82663 100644
-> > > --- a/arm/include/arm-common/kvm-arch.h
-> > > +++ b/arm/include/arm-common/kvm-arch.h
-> > > @@ -15,7 +15,8 @@
-> > >   * |  PCI  |////| plat  |       |        |     |         |
-> > >   * |  I/O  |////| MMIO: | Flash | virtio | GIC |   PCI   |  DRAM
-> > >   * | space |////| UART, |       |  MMIO  |     |  (AXI)  |
-> > > - * |       |////| RTC   |       |        |     |         |
-> > > + * |       |////| RTC,  |       |        |     |         |
-> > > + * |       |////| PVTIME|       |        |     |         |
-> > >   * +-------+----+-------+-------+--------+-----+---------+---......
-> > >   */
-> > >  
-> > > @@ -34,6 +35,9 @@
-> > >  #define ARM_RTC_MMIO_BASE	(ARM_UART_MMIO_BASE + ARM_UART_MMIO_SIZE)
-> > >  #define ARM_RTC_MMIO_SIZE	0x10000
-> > >  
-> > > +#define ARM_PVTIME_MMIO_BASE	(ARM_RTC_MMIO_BASE + ARM_RTC_MMIO_SIZE)
-> > > +#define ARM_PVTIME_MMIO_SIZE	SZ_64K
-> > 
-> > This looks good.
-> > 
-> > Thanks,
-> > Alex
-> >
-> 
-> Thanks for the review,
-> Sebastian
-> 
-> > > +
-> > >  #define KVM_FLASH_MMIO_BASE	(ARM_MMIO_AREA + 0x1000000)
-> > >  #define KVM_FLASH_MAX_SIZE	0x1000000
-> > >  
-> > > diff --git a/include/kvm/kvm-config.h b/include/kvm/kvm-config.h
-> > > index 6a5720c..48adf27 100644
-> > > --- a/include/kvm/kvm-config.h
-> > > +++ b/include/kvm/kvm-config.h
-> > > @@ -62,6 +62,7 @@ struct kvm_config {
-> > >  	bool no_dhcp;
-> > >  	bool ioport_debug;
-> > >  	bool mmio_debug;
-> > > +	bool no_pvtime;
-> > >  };
-> > >  
-> > >  #endif
-> > > -- 
-> > > 2.35.1.473.g83b2b277ed-goog
-> > > 
-> > > _______________________________________________
-> > > kvmarm mailing list
-> > > kvmarm@lists.cs.columbia.edu
-> > > https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
