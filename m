@@ -2,194 +2,258 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0E16F4C4DC7
-	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 19:34:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 82B344C4DF5
+	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 19:41:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233226AbiBYSef (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 13:34:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43794 "EHLO
+        id S232125AbiBYSls (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 13:41:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35960 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231935AbiBYSee (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Feb 2022 13:34:34 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A2C13190B4F
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 10:34:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645814040;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=MeVbMsvqeKcfRpUCeZE0zT6P3QtSSS2eFOANTWB92Lg=;
-        b=bc24pSb8LIzfiDfrbImqVLPGJckxn9A+TAp5Pik+eZV6DROLB89HSn4HAqX0aXVYGgKjPy
-        sg2BGIYovhm6zAb/wnnm/9kxvesa7an8UTmvhQaFixMqbNdI+Cy/7jR6Qk7QhBETnE1NnX
-        b03WwxA5HImKFq95CSNatvetLODFxLg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-189-ExnxXd68PXSu9dwL9DMSig-1; Fri, 25 Feb 2022 13:33:57 -0500
-X-MC-Unique: ExnxXd68PXSu9dwL9DMSig-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C5B94180FCD9;
-        Fri, 25 Feb 2022 18:33:55 +0000 (UTC)
-Received: from starship (unknown [10.40.195.190])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 46A7D105C883;
-        Fri, 25 Feb 2022 18:33:53 +0000 (UTC)
-Message-ID: <6d01c59eab7f31eef1b4249a85869600410336b7.camel@redhat.com>
-Subject: Re: [PATCH 4/4] KVM: x86: hyper-v: HVCALL_SEND_IPI_EX is an XMM
- fast hypercall
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Siddharth Chandrasekaran <sidcha@amazon.de>,
-        linux-kernel@vger.kernel.org
-Date:   Fri, 25 Feb 2022 20:33:52 +0200
-In-Reply-To: <20220222154642.684285-5-vkuznets@redhat.com>
-References: <20220222154642.684285-1-vkuznets@redhat.com>
-         <20220222154642.684285-5-vkuznets@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        with ESMTP id S229536AbiBYSlq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Feb 2022 13:41:46 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FFBE5EBF9;
+        Fri, 25 Feb 2022 10:41:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=c/YY4yN3UTkJjmKXwK3RIcV2vNuPqNNLppwFwBAUH/4=; b=CfQnII6DFOqm3PagaSAg1EWqk/
+        8bNvAWpiPJ3jh5LH46Xwyoh/kbT19dJV+NVVYZKLSx+N34KEfU01zoMjcxhL+p5zYnoW1ZZSmFn3S
+        ngHwEb7QW6sWaM50h+gMdQYrPRz/li8wSwpoiL2dn2sQ2GTTXSMVLazsPLS1gJm92LYuEF4splmAr
+        ipl7jlsesKLbDzrvD6NAOkaXA214jIh2MzyqAreJIKYqigkVBbfiR+1bScIdWOw+ePORqsuDiY/gs
+        vyLw+qaSLn/zZNnhnz7eqodoPLwr4n8hGzSAmCSJHZx+cqgNRspxEWKrV92BxZsxFdxvoemA4ohIM
+        q0QgMl9g==;
+Received: from [2001:8b0:10b:1::3ae] (helo=u3832b3a9db3152.ant.amazon.com)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nNfWe-00627n-PK; Fri, 25 Feb 2022 18:41:08 +0000
+Message-ID: <550e1d7ef2b2f7f666e5b60e9bb855a8ccc0fb14.camel@infradead.org>
+Subject: Re: [EXTERNAL] [PATCH v2] KVM: Don't actually set a request when
+ evicting vCPUs for GFN cache invd
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "frankja@linux.ibm.com" <frankja@linux.ibm.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "imbrenda@linux.ibm.com" <imbrenda@linux.ibm.com>,
+        "david@redhat.com" <david@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Date:   Fri, 25 Feb 2022 18:41:07 +0000
+In-Reply-To: <YhkRcK64Jya6YpA9@google.com>
+References: <20220223165302.3205276-1-seanjc@google.com>
+         <2547e9675d855449bc5cc7efb97251d6286a377c.camel@amazon.co.uk>
+         <YhkAJ+nw2lCzRxsg@google.com>
+         <915ddc7327585bbe8587b91b8cd208520d684db1.camel@infradead.org>
+         <YhkRcK64Jya6YpA9@google.com>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-v0cHwgkioa52DW9eVuwE"
+User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-02-22 at 16:46 +0100, Vitaly Kuznetsov wrote:
-> It has been proven on practice that at least Windows Server 2019 tries
-> using HVCALL_SEND_IPI_EX in 'XMM fast' mode when it has more than 64 vCPUs
-> and it needs to send an IPI to a vCPU > 63. Similarly to other XMM Fast
-> hypercalls (HVCALL_FLUSH_VIRTUAL_ADDRESS_{LIST,SPACE}{,_EX}), this
-> information is missing in TLFS as of 6.0b. Currently, KVM returns an error
-> (HV_STATUS_INVALID_HYPERCALL_INPUT) and Windows crashes.
-> 
-> Note, HVCALL_SEND_IPI is a 'standard' fast hypercall (not 'XMM fast') as
-> all its parameters fit into RDX:R8 and this is handled by KVM correctly.
-> 
-> Fixes: d8f5537a8816 ("KVM: hyper-v: Advertise support for fast XMM hypercalls")
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
->  arch/x86/kvm/hyperv.c | 52 ++++++++++++++++++++++++++++---------------
->  1 file changed, 34 insertions(+), 18 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-> index 6dda93bf98ae..3060057bdfd4 100644
-> --- a/arch/x86/kvm/hyperv.c
-> +++ b/arch/x86/kvm/hyperv.c
-> @@ -1890,6 +1890,7 @@ static u64 kvm_hv_send_ipi(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
->  	int sparse_banks_len;
->  	u32 vector;
->  	bool all_cpus;
-> +	int i;
->  
->  	if (hc->code == HVCALL_SEND_IPI) {
->  		if (!hc->fast) {
-> @@ -1910,9 +1911,15 @@ static u64 kvm_hv_send_ipi(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
->  
->  		trace_kvm_hv_send_ipi(vector, sparse_banks[0]);
->  	} else {
-> -		if (unlikely(kvm_read_guest(kvm, hc->ingpa, &send_ipi_ex,
-> -					    sizeof(send_ipi_ex))))
-> -			return HV_STATUS_INVALID_HYPERCALL_INPUT;
-> +		if (!hc->fast) {
-> +			if (unlikely(kvm_read_guest(kvm, hc->ingpa, &send_ipi_ex,
-> +						    sizeof(send_ipi_ex))))
-> +				return HV_STATUS_INVALID_HYPERCALL_INPUT;
-> +		} else {
-> +			send_ipi_ex.vector = (u32)hc->ingpa;
-> +			send_ipi_ex.vp_set.format = hc->outgpa;
-> +			send_ipi_ex.vp_set.valid_bank_mask = sse128_lo(hc->xmm[0]);
-> +		}
->  
->  		trace_kvm_hv_send_ipi_ex(send_ipi_ex.vector,
->  					 send_ipi_ex.vp_set.format,
-> @@ -1920,8 +1927,7 @@ static u64 kvm_hv_send_ipi(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
->  
->  		vector = send_ipi_ex.vector;
->  		valid_bank_mask = send_ipi_ex.vp_set.valid_bank_mask;
-> -		sparse_banks_len = bitmap_weight(&valid_bank_mask, 64) *
-> -			sizeof(sparse_banks[0]);
-> +		sparse_banks_len = bitmap_weight(&valid_bank_mask, 64);
-Is this change intentional? 
 
-I haven't fully reviewed this, because kvm/queue seem to have a bit different
-version of this, and I didn't fully follow on all of this.
+--=-v0cHwgkioa52DW9eVuwE
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Best regards,
-	Maxim Levitsky
+On Fri, 2022-02-25 at 17:27 +0000, Sean Christopherson wrote:
+> On Fri, Feb 25, 2022, David Woodhouse wrote:
+> > On Fri, 2022-02-25 at 16:13 +0000, Sean Christopherson wrote:
+> > > On Fri, Feb 25, 2022, Woodhouse, David wrote:
+> > > > Since we need an active vCPU context to do dirty logging (thanks, d=
+irty
+> > > > ring)... and since any time vcpu_run exits to userspace for any rea=
+son
+> > > > might be the last time we ever get an active vCPU context... I thin=
+k
+> > > > that kind of fundamentally means that we must flush dirty state to =
+the
+> > > > log on *every* return to userspace, doesn't it?
+> > >=20
+> > > I would rather add a variant of mark_page_dirty_in_slot() that takes =
+a vCPU, which
+> > > we whould have in all cases.  I see no reason to require use of kvm_g=
+et_running_vcpu().
+> >=20
+> > We already have kvm_vcpu_mark_page_dirty(), but it can't use just 'some
+> > vcpu' because the dirty ring is lockless. So if you're ever going to
+> > use anything other than kvm_get_running_vcpu() we need to add locks.
+>=20
+> Heh, actually, scratch my previous comment.  I was going to respond that
+> kvm_get_running_vcpu() is mutually exclusive with all other ioctls() on t=
+he same
+> vCPU by virtue of vcpu->mutex, but I had forgotten that kvm_get_running_v=
+cpu()
+> really should be "kvm_get_loaded_vcpu()".  I.e. as long as KVM is in a vC=
+PU-ioctl
+> path, kvm_get_running_vcpu() will be non-null.
+>=20
+> > And while we *could* do that, I don't think it would negate the
+> > fundamental observation that *any* time we return from vcpu_run to
+> > userspace, that could be the last time. Userspace might read the dirty
+> > log for the *last* time, and any internally-cached "oh, at some point
+> > we need to mark <this> page dirty" is lost because by the time the vCPU
+> > is finally destroyed, it's too late.
+>=20
+> Hmm, isn't that an existing bug?  I think the correct fix would be to flu=
+sh all
+> dirty vmcs12 pages to the memslot in vmx_get_nested_state().  Userspace _=
+must_
+> invoke that if it wants to migrated a nested vCPU.
 
->  
->  		all_cpus = send_ipi_ex.vp_set.format == HV_GENERIC_SET_ALL;
->  
-> @@ -1931,12 +1937,27 @@ static u64 kvm_hv_send_ipi(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
->  		if (!sparse_banks_len)
->  			goto ret_success;
->  
-> -		if (kvm_read_guest(kvm,
-> -				   hc->ingpa + offsetof(struct hv_send_ipi_ex,
-> -							vp_set.bank_contents),
-> -				   sparse_banks,
-> -				   sparse_banks_len))
-> -			return HV_STATUS_INVALID_HYPERCALL_INPUT;
-> +		if (!hc->fast) {
-> +			if (kvm_read_guest(kvm,
-> +					   hc->ingpa + offsetof(struct hv_send_ipi_ex,
-> +								vp_set.bank_contents),
-> +					   sparse_banks,
-> +					   sparse_banks_len * sizeof(sparse_banks[0])))
-> +				return HV_STATUS_INVALID_HYPERCALL_INPUT;
-> +		} else {
-> +			/*
-> +			 * The lower half of XMM0 is already consumed, each XMM holds
-> +			 * two sparse banks.
-> +			 */
-> +			if (sparse_banks_len > (2 * HV_HYPERCALL_MAX_XMM_REGISTERS - 1))
-> +				return HV_STATUS_INVALID_HYPERCALL_INPUT;
-> +			for (i = 0; i < sparse_banks_len; i++) {
-> +				if (i % 2)
-> +					sparse_banks[i] = sse128_lo(hc->xmm[(i + 1) / 2]);
-> +				else
-> +					sparse_banks[i] = sse128_hi(hc->xmm[i / 2]);
-> +			}
-> +		}
->  	}
->  
->  check_and_send_ipi:
-> @@ -2098,6 +2119,7 @@ static bool is_xmm_fast_hypercall(struct kvm_hv_hcall *hc)
->  	case HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE:
->  	case HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST_EX:
->  	case HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE_EX:
-> +	case HVCALL_SEND_IPI_EX:
->  		return true;
->  	}
->  
-> @@ -2265,14 +2287,8 @@ int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
->  		ret = kvm_hv_flush_tlb(vcpu, &hc);
->  		break;
->  	case HVCALL_SEND_IPI:
-> -		if (unlikely(hc.rep)) {
-> -			ret = HV_STATUS_INVALID_HYPERCALL_INPUT;
-> -			break;
-> -		}
-> -		ret = kvm_hv_send_ipi(vcpu, &hc);
-> -		break;
->  	case HVCALL_SEND_IPI_EX:
-> -		if (unlikely(hc.fast || hc.rep)) {
-> +		if (unlikely(hc.rep)) {
->  			ret = HV_STATUS_INVALID_HYPERCALL_INPUT;
->  			break;
->  		}
+Yes, AFAICT it's an existing bug in the way the kvm_host_map code works
+today. Your suggestion makes sense as *long* as we consider it OK to
+retrospectively document that userspace must extract the nested state
+*before* doing the final read of the dirty log.
 
+I am not aware that we have a clearly documented "the dirty log may
+keep changing until XXX" anyway. But you're proposing that we change
+it, I think. There may well be VMMs which assume that no pages will be
+dirtied unless they are actually *running* a vCPU.
+
+Which is why I was proposing that we flush the dirty status to the log
+*every* time we leave vcpu_run back to userspace. But I'll not die on
+that hill, if you make a good case for your proposal being OK.
+
+> > I think I'm going to rip out the 'dirty' flag from the gfn_to_pfn_cache
+> > completely and add a function (to be called with an active vCPU
+> > context) which marks the page dirty *now*.
+>=20
+> Hrm, something like?
+>=20
+>   1. Drop @dirty from kvm_gfn_to_pfn_cache_init()
+>   2. Rename @dirty =3D> @old_dirty in kvm_gfn_to_pfn_cache_refresh()
+>   3. Add an API to mark the associated slot dirty without unmapping
+>=20
+> I think that makes sense.
+
+Except I'll drop 'dirty' from kvm_gfn_to_pfn_cache_refresh() too.
+There's no scope for a deferred "oh, I meant to tell you that was
+dirty" even in that case, is there? Use the API we add in your #3.
+
+
+
+--=-v0cHwgkioa52DW9eVuwE
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIwMjI1MTg0MTA3WjAvBgkqhkiG9w0BCQQxIgQgExTStxPI
+KLSKEdalH4bGhjnNaYBEcbwu4vlaYW7O+v8wgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBsbb9/W9SgE9NGrz9g0zvKrDDkNjB4uB0a
+SaRLRJN5f9UE8P7DFD3SdwGDYBiviypw+Kzcyxp4skWgvb15rc8AWksg+aG9hfgOCywYupdHX/SK
+sCdfx+RCaRwXM/LURFKVMQYVKoRYnq0SSkO9HEikqVQDNIrUNSKR5EQsnrWKVnJeplCmcZ38OQVb
+MoifSJdOhVRFORQiigkJAOMq3j9ZN0khojuwjgcMVMPlEq13DgTMV6O5Dfe+19W7mLVu1q/lSNLQ
+4QIKc4CUT3syJouYr81Fp+DPxtAhM95b/ztPYLlx1577b+01zQmjdDvCB7+0DyZosMTVfwZsro3Q
+SHXYgPI1TVDIxCc2lSxzx5ScNiNu4m1UL1HEOirA9PPDUi0SrKp3fzD+ApXyX1brukqVIbjHI0hO
+IyEuKFDGYxmoTN1PeWaiZMMOvS0obRJ78o8p5uzCw25W9/CrPlOlCjHBIh5z20RJCaztgnwAr+ui
+rrZx//PqyMHKqMmGeu/HLM6JJydVlGZ462BqtIC6RuriYM/MLqze7DEAUuLO/qjwlV8WjRlO86G8
+vYDHBuhAQ8c4KONQeGLUlxam5/QxP8e8QjgPh5JGmHgAO5GvThG0fQezAaIrGdZEi8Y2nJaNOy5L
+NxIJJN6yaApFjmtER2BFFygNXmumFevRKwFGB+sV1wAAAAAAAA==
+
+
+--=-v0cHwgkioa52DW9eVuwE--
 
