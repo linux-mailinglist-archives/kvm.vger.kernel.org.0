@@ -2,145 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A67324C3B14
-	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 02:39:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 139F24C3BBC
+	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 03:28:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235205AbiBYBkD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Feb 2022 20:40:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60272 "EHLO
+        id S231713AbiBYC2O (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Feb 2022 21:28:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57052 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231451AbiBYBkC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Feb 2022 20:40:02 -0500
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2807F28B61D
-        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 17:39:32 -0800 (PST)
-Received: by mail-pg1-x549.google.com with SMTP id d9-20020a630e09000000b00374105253b2so1884725pgl.0
-        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 17:39:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
-        bh=lsIVxLdUn9+kqKlthczBNmMV4Jfo8iVsWw07MsiBzFo=;
-        b=S1KhSS0YRiaedP0dpkuo9CSOauVYjzsqSwrDB7U8+wO9GIVphEwKYGjbx4XBYymstD
-         e0Q9KgXKyhZyhkAyN6VqAFzFD7Mb34VbZAF+GDrvLpwpvXzyr5d9KyrvU6bIIwkUriHN
-         s/5HWFK1Ui8qJr/+eTC8OfLBVChIHwmRQAB5S8JAdfzAeC0rMhAXkBMRTVKgmCPq/pYm
-         nxys78/POUfQ9ThDbgsaMyjINh4xQu62bSuPcsl8elaL0CG1EAfNiazDHAaE2UBp2nnM
-         nr8HywrRNUmOm0lYa021CQd6WBjeGL3sDpnIPSVp+PjnZ85vBm/8IEoUgKDiQXsb4jbG
-         luxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
-         :from:to:cc;
-        bh=lsIVxLdUn9+kqKlthczBNmMV4Jfo8iVsWw07MsiBzFo=;
-        b=0563i0di+eeEOAQxe38Wkhou/OIpTBr6XW209ghUGMyy0vIKS6CTiWVLgMLft0mnAC
-         LASj5o8HVke0wV7RVNkXfpoc9w8WTJdfupwl0DV+pj5uq2trjCaUkzKhXn4DscgfPIaX
-         8uMNVmlRIwlSG25blRfitU4ptykfCF9c7uHVvx1JJ7/lJCx5x/ck9ntBSSpSG5fRg8WQ
-         oaUO2ORVMvR8Hcgr0IfzN/rk75EkEg5D97pQMb7Q4tsAYGKdsb0Zi5AKNhSuOVBANYnU
-         1agw7sitd32OVc9vKP0BZk/5oNlUAeZowSG0mzwaMPMsamwbzHsTWTgPcRRMJqvxGW/r
-         NqFQ==
-X-Gm-Message-State: AOAM531vcqqhzzV/A4IQ6u/+vcnR/k8Jf3JhbGpMYM9qh5K4+Am9d3PV
-        l/S0unyfzUqjjiFXXAhqE0eiUkCQuGg=
-X-Google-Smtp-Source: ABdhPJxthNBm8xeMjBejGNjZhtAPusW151AX+qp4ccNqPhw0xRMdnSW1ZqJrQRd4Lv/wPI98qL9BTJjlf0M=
-X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:90a:f505:b0:1bc:d47e:8b19 with SMTP id
- cs5-20020a17090af50500b001bcd47e8b19mr856714pjb.102.1645753171649; Thu, 24
- Feb 2022 17:39:31 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 25 Feb 2022 01:39:29 +0000
-Message-Id: <20220225013929.3577699-1-seanjc@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.35.1.574.g5d30c73bfb-goog
-Subject: [PATCH] KVM: x86: Don't snapshot "max" TSC if host TSC is constant
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Suleiman Souhlal <suleiman@google.com>,
-        Anton Romanov <romanton@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        with ESMTP id S231263AbiBYC2N (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Feb 2022 21:28:13 -0500
+Received: from baidu.com (mx24.baidu.com [111.206.215.185])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A81871045AD
+        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 18:27:41 -0800 (PST)
+Received: from BJHW-MAIL-EX04.internal.baidu.com (unknown [10.127.64.14])
+        by Forcepoint Email with ESMTPS id 02C51943DD9D64290285;
+        Fri, 25 Feb 2022 10:27:40 +0800 (CST)
+Received: from bjkjy-mail-ex28.internal.baidu.com (172.31.50.44) by
+ BJHW-MAIL-EX04.internal.baidu.com (10.127.64.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2308.20; Fri, 25 Feb 2022 10:27:39 +0800
+Received: from BJHW-Mail-Ex15.internal.baidu.com (10.127.64.38) by
+ bjkjy-mail-ex28.internal.baidu.com (172.31.50.44) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2375.18; Fri, 25 Feb 2022 10:27:39 +0800
+Received: from BJHW-Mail-Ex15.internal.baidu.com ([100.100.100.38]) by
+ BJHW-Mail-Ex15.internal.baidu.com ([100.100.100.38]) with mapi id
+ 15.01.2308.020; Fri, 25 Feb 2022 10:27:39 +0800
+From:   "Li,Rongqing" <lirongqing@baidu.com>
+To:     "Yuan,Zhaoxiong" <yuanzhaoxiong@baidu.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "hpa@zytor.com" <hpa@zytor.com>
+CC:     "x86@kernel.org" <x86@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: =?gb2312?B?tPC4tDogW1BBVENIIHYyXSBLVk06IFg4NjogSW50cm9kdWNlIHZmaW9faW50?=
+ =?gb2312?Q?r=5Fstat_per-vm_debugfs_file?=
+Thread-Topic: [PATCH v2] KVM: X86: Introduce vfio_intr_stat per-vm debugfs
+ file
+Thread-Index: AQHYHOkI+uIUeNYELkivTLhX/eeXu6yjpHMw
+Date:   Fri, 25 Feb 2022 02:27:39 +0000
+Message-ID: <dd872a587e874576900bec770d244ad7@baidu.com>
+References: <1644324020-17639-1-git-send-email-yuanzhaoxiong@baidu.com>
+In-Reply-To: <1644324020-17639-1-git-send-email-yuanzhaoxiong@baidu.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [172.22.205.248]
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Don't snapshot tsc_khz into max_tsc_khz during KVM initialization if the
-host TSC is constant, in which case the actual TSC frequency will never
-change and thus capturing the "max" TSC during initialization is
-unnecessary, KVM can simply use tsc_khz during VM creation.
-
-On CPUs with constant TSC, but not a hardware-specified TSC frequency,
-snapshotting max_tsc_khz and using that to set a VM's default TSC
-frequency can lead to KVM thinking it needs to manually scale the guest's
-TSC if refining the TSC completes after KVM snapshots tsc_khz.  The
-actual frequency never changes, only the kernel's calculation of what
-that frequency is changes.  On systems without hardware TSC scaling, this
-either puts KVM into "always catchup" mode (extremely inefficient), or
-prevents creating VMs altogether.
-
-Ideally, KVM would not be able to race with TSC refinement, or would have
-a hook into tsc_refine_calibration_work() to get an alert when refinement
-is complete.  Avoiding the race altogether isn't practical as refinement
-takes a relative eternity; it's deliberately put on a work queue outside
-of the normal boot sequence to avoid unnecessarily delaying boot.
-
-Adding a hook is doable, but somewhat gross due to KVM's ability to be
-built as a module.  And if the TSC is constant, which is likely the case
-for every VMX/SVM-capable CPU produced in the last decade, the race can
-be hit if and only if userspace is able to create a VM before TSC
-refinement completes; refinement is slow, but not that slow.
-
-For now, punt on a proper fix, as not taking a snapshot can help some
-uses cases and not taking a snapshot is arguably correct irrespective of
-the race with refinement.
-
-Cc: Suleiman Souhlal <suleiman@google.com>
-Cc: Anton Romanov <romanton@google.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/x86.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 6552360d8888..81d9d84dc59f 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -8727,13 +8727,15 @@ static int kvmclock_cpu_online(unsigned int cpu)
- 
- static void kvm_timer_init(void)
- {
--	max_tsc_khz = tsc_khz;
--
- 	if (!boot_cpu_has(X86_FEATURE_CONSTANT_TSC)) {
- #ifdef CONFIG_CPU_FREQ
- 		struct cpufreq_policy *policy;
- 		int cpu;
-+#endif
- 
-+		max_tsc_khz = tsc_khz;
-+
-+#ifdef CONFIG_CPU_FREQ
- 		cpu = get_cpu();
- 		policy = cpufreq_cpu_get(cpu);
- 		if (policy) {
-@@ -11160,7 +11162,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- 	vcpu->arch.msr_platform_info = MSR_PLATFORM_INFO_CPUID_FAULT;
- 	kvm_vcpu_mtrr_init(vcpu);
- 	vcpu_load(vcpu);
--	kvm_set_tsc_khz(vcpu, max_tsc_khz);
-+	kvm_set_tsc_khz(vcpu, max_tsc_khz ? : tsc_khz);
- 	kvm_vcpu_reset(vcpu, false);
- 	kvm_init_mmu(vcpu);
- 	vcpu_put(vcpu);
-
-base-commit: f4bc051fc91ab9f1d5225d94e52d369ef58bec58
--- 
-2.35.1.574.g5d30c73bfb-goog
-
+PiDW98ziOiBbUEFUQ0ggdjJdIEtWTTogWDg2OiBJbnRyb2R1Y2UgdmZpb19pbnRyX3N0YXQgcGVy
+LXZtIGRlYnVnZnMgZmlsZQ0KPiANCj4gVXNlIHRoaXMgZmlsZSB0byBleHBvcnQgY29ycmVzcG9u
+ZGVuY2UgYmV0d2VlbiBndWVzdF9pcnEsIGhvc3RfaXJxLCB2ZWN0b3IgYW5kDQo+IHZjcHUgYmVs
+b25naW5nIHRvIFZGSU8gcGFzc3Rocm91Z2ggZGV2aWNlcy4NCj4gDQo+IEFuIGV4YW1wbGUgb3V0
+cHV0IG9mIHRoaXMgbG9va3MgbGlrZSAoYSB2bSB3aXRoIFZGSU8gcGFzc3Rocm91Z2gNCj4gZGV2
+aWNlcyk6DQo+ICAgIGd1ZXN0X2lycSAgICAgaG9zdF9pcnEgICAgICAgdmVjdG9yICAgICAgICAg
+dmNwdQ0KPiAgICAgICAgICAgMjQgICAgICAgICAgMjAxICAgICAgICAgICAzNyAgICAgICAgICAg
+IDgNCj4gICAgICAgICAgIDI1ICAgICAgICAgIDIwMiAgICAgICAgICAgMzUgICAgICAgICAgIDI1
+DQo+ICAgICAgICAgICAyNiAgICAgICAgICAyMDMgICAgICAgICAgIDM1ICAgICAgICAgICAyMA0K
+PiAgICAuLi4uLi4NCj4gDQo+IFdoZW4gYSBWTSBoYXMgVkZJTyBwYXNzdGhyb3VnaCBkZXZpY2Vz
+LCB0aGUgY29ycmVzcG9uZGVuY2UgYmV0d2Vlbg0KPiBndWVzdF9pcnEsIGhvc3RfaXJxLCB2ZWN0
+b3IgYW5kIHZjcHUgbWF5IG5lZWQgdG8gYmUga25vd24gZXNwZWNpYWxseSBpbiBBTUQNCj4gcGxh
+dGZvcm0gd2l0aCBhdmljIGRpc2FibGVkLiBUaGUgQU1EIGF2aWMgaXMgZGlzYWJsZWQsIGFuZCB0
+aGUgcGFzc3Rocm91Z2gNCj4gZGV2aWNlcyBtYXkgY2F1c2UgdmNwdSB2bSBleGl0IHR3aWNlIGZv
+ciBhIGludGVycnVwdC4NCj4gT25lIGV4dHJlcm5hbCBpbnRlcnJ1cHQgY2F1c2VkIGJ5IHZmaW8g
+aG9zdCBpcnEsIG90aGVyIGlwaSB0byBpbmplY3QgYSBpbnRlcnJ1cHQgdG8NCj4gdm0uDQo+IA0K
+PiBJZiB0aGUgc3lzdGVtIGFkbWluaXN0cmF0b3Iga25vd24gdGhlc2UgaW5mb3JtYXRpb24sIHNl
+dCB2ZmlvIGhvc3QgaXJxIGFmZmluaXR5IHRvDQo+IFBjcHUgd2hpY2ggdGhlIGNvcnJlc3BvbmRl
+Y2UgZ3Vlc3QgaXJxIGFmZmluaXRlZCB2Y3B1LCB0byBhdm9pZCBleHRyYSB2bSBleGl0Lg0KPiAN
+Cj4gQ28tZGV2ZWxvcGVkLWJ5OiBMaSBSb25nUWluZyA8bGlyb25ncWluZ0BiYWlkdS5jb20+DQo+
+IFNpZ25lZC1vZmYtYnk6IExpIFJvbmdRaW5nIDxsaXJvbmdxaW5nQGJhaWR1LmNvbT4NCj4gU2ln
+bmVkLW9mZi1ieTogWXVhbiBaaGFvWGlvbmcgPHl1YW56aGFveGlvbmdAYmFpZHUuY29tPg0KPiAt
+LS0NCg0KUGluZw0KDQpUaGFua3MNCg0KLUxpDQo=
