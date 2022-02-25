@@ -2,116 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F0D3C4C5181
-	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 23:27:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C04E4C5257
+	for <lists+kvm@lfdr.de>; Sat, 26 Feb 2022 01:00:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238213AbiBYW1o (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 17:27:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60316 "EHLO
+        id S239777AbiBZAAh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 19:00:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49562 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235814AbiBYW1n (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Feb 2022 17:27:43 -0500
-Received: from mail-oo1-xc36.google.com (mail-oo1-xc36.google.com [IPv6:2607:f8b0:4864:20::c36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FA191F635E
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 14:27:10 -0800 (PST)
-Received: by mail-oo1-xc36.google.com with SMTP id j7-20020a4ad6c7000000b0031c690e4123so8411369oot.11
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 14:27:10 -0800 (PST)
+        with ESMTP id S239693AbiBZAAf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Feb 2022 19:00:35 -0500
+Received: from mail-il1-x129.google.com (mail-il1-x129.google.com [IPv6:2607:f8b0:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A84741D6C8D
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 16:00:00 -0800 (PST)
+Received: by mail-il1-x129.google.com with SMTP id y5so5536011ill.13
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 16:00:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=b/s03k0JRj2Hv4j2AKAsYfs0BBDQNjuiLF4Fr8g0nRc=;
-        b=BffcmKIbgoGIed35TW+fYLtAriHV/47WBC4+PB0zdqSOUZ6KPBKGLlrgOjGwR9iEHF
-         ekSUJQNRf97bM0ESf6ZR6i6mVK/E47Lpa6x2lC5lfIONTr8VVTV0DyMqtE52eiRAi8Vd
-         lHe4GBN4kZglA2s3egGPjVPnAx878+7tVhYilzobXN+2oD8yFCbO66i6Am3AX+9rOA4n
-         dkTeghAi4j1sGiZd3VkmS6TcsWnDt93dChUJuIBrhQKasPfyMyNYRlTGsoVzFlqV5Rou
-         7FMxmGWUP+TzZSdDX+XtntiH70oCEvK+6kzqdOMY3tAo1Elf26a7eTv/HlX8xJp6E8XD
-         2Mrg==
+        d=linuxfoundation.org; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=ugujCcskb2T7bOFA5bnbVN0NBcapcRUHyZhHhBqvqXY=;
+        b=b8P3ld0PDgHf4i3aCMJxbvtuNOGN48qXnOALgF9KRQwQ3sY6D5OfjLKAHQYg0NrVEG
+         fGBI01HZZJYXimvvwWThe1L3nn05OUOYooFHUwtqMDpJEYDyc2cROIlKSUFEIZ8k4wxK
+         asLWK3aDOse3uuGcbbj6k+mrt3quhhZoiUsKA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=b/s03k0JRj2Hv4j2AKAsYfs0BBDQNjuiLF4Fr8g0nRc=;
-        b=uD260Xi37R/LYW30f3Y2n0+Wa7/bj9JA88//WCQiwetpNrzUoOouUuPFGk8/3df8tU
-         5Yk0KAqUKb4krg603TxWSK7sf83uVdyxdTlXqwoqLWLoLPIQj0t8SNBAhgI1FqS0/5Zq
-         oksqo6rXda8jTRbPRLvnOFpngbddAEyvqFgy1t5YSwZQdBtKtUJaqTPLQo+VMgYLaMhW
-         SfecvV+bZaVkHWY5LKsxNVfw+xKgYAXtfxyDwUZp6iFki9okt3H3DjkAArv0nREp2HtV
-         HEpRJY9IvPzGJbAcLTVdv5y73PBFKNYUNADhkVyXA/IgupDa1f/erGw2Y6Cw03qPM/SA
-         VNnw==
-X-Gm-Message-State: AOAM531ih4l0sY2qIAJqIob8fy4HqhVkwnKnVY2dR4Z85I3jrAZecsJJ
-        LIe+d5LaTwod2VVraRxPkiNwW9lmt5L+VGaT5QiXyQ==
-X-Google-Smtp-Source: ABdhPJyzEggs0p/6UpO52Lt4Qb/IvgvjdkOygSTvusYNKlp7hN+yataDsQD4LcDnomXSpOXH/IX8bi2laDooHffeLGg=
-X-Received: by 2002:a05:6870:6490:b0:d6:d161:6dbb with SMTP id
- cz16-20020a056870649000b000d6d1616dbbmr2311289oab.129.1645828029587; Fri, 25
- Feb 2022 14:27:09 -0800 (PST)
-MIME-Version: 1.0
-References: <20211118130320.95997-1-likexu@tencent.com> <CALMp9eTONaviuz-NnPUP2=MEOb8ZBkZ7u_ZQBWBUne-i6cRUkA@mail.gmail.com>
- <dc14c98c-e35a-95c0-83dd-13b5f7cffc03@gmail.com>
-In-Reply-To: <dc14c98c-e35a-95c0-83dd-13b5f7cffc03@gmail.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 25 Feb 2022 14:26:58 -0800
-Message-ID: <CALMp9eSWJevnn3vs5==9ay5vRL_djfq28bawUEP3KzBft3FOrg@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86/pmu: Fix reserved bits for AMD PerfEvtSeln register
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     David Dunn <daviddunn@google.com>,
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ugujCcskb2T7bOFA5bnbVN0NBcapcRUHyZhHhBqvqXY=;
+        b=qdeXxngoRGshrC+MfbRAZI4QCMOSYm1oOGoTMvHW0cjKz+1Kd6Y2PxFlBucvdROlYg
+         J86wzAriOS4cnDAhRjr2YC6k4ImkyTudxxZZJyeaLvCYotA5rA2pE1cf+wWd28/8ELt3
+         WGXhyNBli/bgaf1xm4e9WEHyhQJxKSZOQhegIMldd/Xbz8ZkwzbUc4Ev30u9pl8UIR0B
+         Pbtz9rJF17QRyrm3tzB3HbJlgj7Tx1My24nYpUJAtn/Iyl//OPTXArKCtkRgl700jftU
+         WNbCKxgvDULzw6RW0Ev0G7WQGtc+yvJDydQNCvjHHU9KHJj7M3sp4doJHv5rdaUC5G26
+         hmVg==
+X-Gm-Message-State: AOAM531hpq/tcaTJIbBDF2zB+dNG1R1mQ3cQH0mxyCltfkQRvewhp9Kq
+        CjhQIiG+z/4itnmbn2S+8z37JYqAh/00xQ==
+X-Google-Smtp-Source: ABdhPJwmWforBC8vtISK/So9rB+mq563DEdqr+aghfqU/fGd7aPhTtWQedUnhWCcfoMqpwxBTqBs4Q==
+X-Received: by 2002:a05:6e02:214a:b0:2be:752a:1c24 with SMTP id d10-20020a056e02214a00b002be752a1c24mr8166149ilv.274.1645833599929;
+        Fri, 25 Feb 2022 15:59:59 -0800 (PST)
+Received: from [192.168.1.128] ([71.205.29.0])
+        by smtp.gmail.com with ESMTPSA id g24-20020a056602073800b006405890451fsm2190605iox.34.2022.02.25.15.59.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 25 Feb 2022 15:59:59 -0800 (PST)
+Subject: Re: [PATCH] kselftest: add generated objects to .gitignore
+To:     Muhammad Usama Anjum <usama.anjum@collabora.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Eric Biederman <ebiederm@xmission.com>,
+        Kees Cook <keescook@chromium.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Lotus Fenn <lotusf@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>
+Cc:     kernel@collabora.com, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, Shuah Khan <skhan@linuxfoundation.org>
+References: <20220225102726.3231228-1-usama.anjum@collabora.com>
+From:   Shuah Khan <skhan@linuxfoundation.org>
+Message-ID: <f3757ff8-0078-4cf9-c0c6-95c780b90ae2@linuxfoundation.org>
+Date:   Fri, 25 Feb 2022 16:59:58 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
+MIME-Version: 1.0
+In-Reply-To: <20220225102726.3231228-1-usama.anjum@collabora.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 15, 2022 at 11:47 PM Like Xu <like.xu.linux@gmail.com> wrote:
->
-> On 12/2/2022 4:39 pm, Jim Mattson wrote:
-> >> -       pmu->reserved_bits = 0xffffffff00200000ull;
-> >> +       pmu->reserved_bits = 0xfffffff000280000ull;
-> > Bits 40 and 41 are guest mode and host mode. They cannot be reserved
-> > if the guest supports nested SVM.
-> >
->
-> Indeed, we need (some hands) to do more pmu tests on nested SVM.
+On 2/25/22 3:27 AM, Muhammad Usama Anjum wrote:
+> Add kselftests_install directory and some other files to the
+> .gitignore.
+> 
+> Signed-off-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
+> ---
+>   tools/testing/selftests/.gitignore      | 1 +
+>   tools/testing/selftests/exec/.gitignore | 2 ++
+>   tools/testing/selftests/kvm/.gitignore  | 1 +
+>   tools/testing/selftests/net/.gitignore  | 1 +
+>   4 files changed, 5 insertions(+)
+> 
 
-Actually, it's not just nested SVM.
+It is better to split these patches per test - makes it easier
+to apply. Please send separate patches for each test. This patch
+doesn't apply as is.
 
-When we enable vPMU for an Ubuntu guest that is incapable of nested
-SVM, we see errors like the following:
-
-root@Ubuntu1804:~# perf stat -e r26 -a sleep 1
-
- Performance counter stats for 'system wide':
-
-                 0      r26
-
-
-       1.001070977 seconds time elapsed
-
-Feb 23 03:59:58 Ubuntu1804 kernel: [  405.379957] unchecked MSR access
-error: WRMSR to 0xc0010200 (tried to write 0x0000020000130026) at rIP:
-0xffffffff9b276a28 (native_write_msr+0x8/0x30)
-Feb 23 03:59:58 Ubuntu1804 kernel: [  405.379958] Call Trace:
-Feb 23 03:59:58 Ubuntu1804 kernel: [  405.379963]
-amd_pmu_disable_event+0x27/0x90
-
-If the standard Linux perf tool sets "exclude_guest" by default, even
-when EFER.SVME is clear, then amd_core_hw_config() in the guest kernel
-will set bit 41 (again, without checking EFER.SVME). This WRMSR should
-not raise #GP.
-
-Current AMD hardware doesn't raise #GP for any value written to a
-PerfEvtSeln MSR. I don't think KVM should ever synthesize a #GP
-either. Perhaps we should just mask off the bits that you have
-indicated as reserved, above.
+thanks,
+-- Shuah
