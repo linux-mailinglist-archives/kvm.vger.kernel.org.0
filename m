@@ -2,104 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B274D4C3990
-	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 00:15:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C31C4C3AF0
+	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 02:30:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233185AbiBXXPj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Feb 2022 18:15:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55646 "EHLO
+        id S236374AbiBYBaj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Feb 2022 20:30:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35122 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231869AbiBXXPi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Feb 2022 18:15:38 -0500
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3B745275797
-        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 15:15:05 -0800 (PST)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-281-foIGsKlaMWyYIUBl_oNJDQ-1; Thu, 24 Feb 2022 23:15:02 +0000
-X-MC-Unique: foIGsKlaMWyYIUBl_oNJDQ-1
-Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) by
- AcuMS.aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) with Microsoft SMTP
- Server (TLS) id 15.0.1497.28; Thu, 24 Feb 2022 23:15:01 +0000
-Received: from AcuMS.Aculab.com ([fe80::994c:f5c2:35d6:9b65]) by
- AcuMS.aculab.com ([fe80::994c:f5c2:35d6:9b65%12]) with mapi id
- 15.00.1497.028; Thu, 24 Feb 2022 23:15:01 +0000
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Andy Shevchenko' <andy.shevchenko@gmail.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-CC:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        "open list:VFIO DRIVER" <kvm@vger.kernel.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "Linux Kernel Mailing List" <linux-kernel@vger.kernel.org>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>
-Subject: RE: [PATCH v1 1/1] KVM: s390: Don't cast parameter in bit operations
-Thread-Topic: [PATCH v1 1/1] KVM: s390: Don't cast parameter in bit operations
-Thread-Index: AQHYKbf4PreGRJIIQ0mXQjRI10uskKyjVBFg
-Date:   Thu, 24 Feb 2022 23:15:01 +0000
-Message-ID: <2a9391a3546d487ca937c4e523690ea9@AcuMS.aculab.com>
-References: <20220223164420.45344-1-andriy.shevchenko@linux.intel.com>
- <20220224123620.57fd6c8b@p-imbrenda>
- <CAHp75Vfm-zmzoO0AZTv-3eBjXf0FzHh7tbHRn3DoO7EjukFVig@mail.gmail.com>
-In-Reply-To: <CAHp75Vfm-zmzoO0AZTv-3eBjXf0FzHh7tbHRn3DoO7EjukFVig@mail.gmail.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
-MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        with ESMTP id S234976AbiBYBah (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Feb 2022 20:30:37 -0500
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D98B2692F3
+        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 17:30:06 -0800 (PST)
+Received: by mail-pg1-x54a.google.com with SMTP id bm16-20020a656e90000000b00372932b1d83so1844535pgb.10
+        for <kvm@vger.kernel.org>; Thu, 24 Feb 2022 17:30:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=Yk0Ykv429Uqar81C4Yj/Co2HxQgqkeiHZrfzsPPDNOY=;
+        b=gFXdJqBme9IGxFgKGpMJZq+5C+U5PSw8ghd/D5bVyLj9lFK64pT1tcmjrvlJNAgO6j
+         uTNindJF+R09YEhVwbXUhw95Vr9zLgCADz+T6vM+Pxv9KoJVAqlXEDNdyW8UFUDvdnYj
+         2mio8XVnjyB77jzVBXvbM6uP6+cNU2yMsMhstfHNHyizy+8zFOBf6oN9KIkruB10fjP9
+         cUt1F6xooOMni3w4hEyG+dPXbUa6SCeRLTjOOPh3l/ln+WbkFM9kVojFXnMQDTut3zrz
+         cFCVXompiIQgr1KAsLyx3FzeY+irE+EzPZTo4AI5FrUd8hbCD+Vka71TYy3vTPDwYhHr
+         0Y/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=Yk0Ykv429Uqar81C4Yj/Co2HxQgqkeiHZrfzsPPDNOY=;
+        b=j6oUXDjLDZkkBrw54i8sPx4Dl8NSrNnu2/r1aq4XaiDXy5HMuOBYUnUkcaNPWCaLzy
+         qCNacoFwmgUOMVDPuw2Yw5+LqLHSA2vaiTTuGTLIIRAhGEEvCRYac0BAcMRxLiJrLHDg
+         u+m3E3gvbqGeU50iD6bRESQZX71kajQjKmWZ71JA17ySOTZQA5rNUcAf6cFzuoXqiwWZ
+         Idb9zIp1+nMc0jteuswsYYcmjZ6TUy2OsaU/cmGn0NMUbTUzHz6cevtvgLqGvxDpe+u3
+         DARdOzNUNA1WStJKwNW+Pk+UB2xUcBCqdPsc/tdNcUfrMZkKKVStNnurE1XmHvNt2BkQ
+         giQA==
+X-Gm-Message-State: AOAM533qc5ziyLCL+2JrbQ35Sd1AMxb2meSQmgH/5LKADEfz+H1+0WMU
+        o/OTjeRDmLlecYyG/PUODrwCd9aHDkwawg+ntrZUU52scLMULnR2i46B0v8x2uJESrtk5spGuta
+        ah/ErivETBYxWI52pKxzfwFzPN1GDpemyWwCaR5Ks/Uc4W4HUuYLhlEyzhveEQH8=
+X-Google-Smtp-Source: ABdhPJygCgwxhb6t9yRtbDcksEn7sdVqny8CClMMK697EDl2aVeEDIm1FkHsv5Hy+NIxykNJ05XCNIlydgLmRw==
+X-Received: from tortoise.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1a0d])
+ (user=jmattson job=sendgmr) by 2002:a17:90b:4f43:b0:1bc:7e5c:e024 with SMTP
+ id pj3-20020a17090b4f4300b001bc7e5ce024mr103179pjb.0.1645752604982; Thu, 24
+ Feb 2022 17:30:04 -0800 (PST)
+Date:   Thu, 24 Feb 2022 17:29:59 -0800
+Message-Id: <20220225012959.1554168-1-jmattson@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.1.574.g5d30c73bfb-goog
+Subject: [PATCH] KVM: VMX: Fix header file dependency of asm/vmx.h
+From:   Jim Mattson <jmattson@google.com>
+To:     kvm@vger.kernel.org, pbonzini@redhat.com
+Cc:     Jacob Xu <jacobhxu@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-RnJvbTogQW5keSBTaGV2Y2hlbmtvDQo+IFNlbnQ6IDI0IEZlYnJ1YXJ5IDIwMjIgMTk6NTENCj4g
-DQo+IE9uIFRodSwgRmViIDI0LCAyMDIyIGF0IDI6NTEgUE0gQ2xhdWRpbyBJbWJyZW5kYSA8aW1i
-cmVuZGFAbGludXguaWJtLmNvbT4gd3JvdGU6DQo+ID4NCj4gPiBPbiBXZWQsIDIzIEZlYiAyMDIy
-IDE4OjQ0OjIwICswMjAwDQo+ID4gQW5keSBTaGV2Y2hlbmtvIDxhbmRyaXkuc2hldmNoZW5rb0Bs
-aW51eC5pbnRlbC5jb20+IHdyb3RlOg0KPiA+DQo+ID4gPiBXaGlsZSBpbiB0aGlzIHBhcnRpY3Vs
-YXIgY2FzZSBpdCB3b3VsZCBub3QgYmUgYSAoY3JpdGljYWwpIGlzc3VlLA0KPiA+ID4gdGhlIHBh
-dHRlcm4gaXRzZWxmIGlzIGJhZCBhbmQgZXJyb3IgcHJvbmUgaW4gY2FzZSBzb21lYm9keSBibGlu
-ZGx5DQo+ID4gPiBjb3BpZXMgdG8gdGhlaXIgY29kZS4NCj4gPiA+DQo+ID4gPiBEb24ndCBjYXN0
-IHBhcmFtZXRlciB0byB1bnNpZ25lZCBsb25nIHBvaW50ZXIgaW4gdGhlIGJpdCBvcGVyYXRpb25z
-Lg0KPiA+ID4gSW5zdGVhZCBjb3B5IHRvIGEgbG9jYWwgdmFyaWFibGUgb24gc3RhY2sgb2YgYSBw
-cm9wZXIgdHlwZSBhbmQgdXNlLg0KPiANCj4gLi4uDQo+IA0KPiA+ID4gKyAgICAgICAgICAgICBz
-dHJ1Y3QgeyAvKiBhcyBhIDI1Ni1iaXQgYml0bWFwICovDQo+ID4gPiArICAgICAgICAgICAgICAg
-ICAgICAgREVDTEFSRV9CSVRNQVAoYiwgMjU2KTsNCj4gPiA+ICsgICAgICAgICAgICAgfSBiaXRt
-YXA7DQo+ID4gPiArICAgICAgICAgICAgIHN0cnVjdCB7IC8qIGFzIGEgc2V0IG9mIDY0LWJpdCB3
-b3JkcyAqLw0KPiA+ID4gICAgICAgICAgICAgICAgICAgICAgIHU2NCB3b3JkWzRdOw0KPiA+ID4g
-ICAgICAgICAgICAgICB9IHU2NDsNCj4gDQo+ID4gPiAtICAgICBzZXRfYml0X2ludihJUE1fQklU
-X09GRlNFVCArIGdpc2MsICh1bnNpZ25lZCBsb25nICopIGdpc2EpOw0KPiA+ID4gKyAgICAgc2V0
-X2JpdF9pbnYoSVBNX0JJVF9PRkZTRVQgKyBnaXNjLCBnaXNhLT5iaXRtYXAuYik7DQo+ID4NCj4g
-PiB3b3VsZG4ndCBpdCBiZSBlbm91Z2ggdG8gcGFzcyBnaXNhLT51NjQud29yZCBoZXJlPw0KPiA+
-IHRoZW4gbm8gY2FzdCB3b3VsZCBiZSBuZWNlc3NhcnkNCj4gDQo+IE5vLCBpdCB3aWxsIGhhdmUg
-dGhlIHNhbWUgaGlkZGVuIGJ1Z3MuIEFzIEkgc3RhdGVkIGluIHRoZSBjb21taXQNCj4gbWVzc2Fn
-ZSwgdGhlIHBhdHRlcm4gaXMgcXVpdGUgYmFkIGV2ZW4gaWYgaW4gcGFydGljdWxhciBjb2RlIGl0
-IHdvdWxkDQo+IHdvcmsuDQo+IA0KPiBUaGFua3MsIE1pY2hhZWwsIGZvciBwb2ludGluZyBvdXQg
-b3RoZXIgcGxhY2VzLiBUaGV5IGFsbCBuZWVkIHRvIGJlIGZpeGVkLg0KDQpJdCBtYXkgZXZlbiBi
-ZSB3b3J0aCB3cml0aW5nIHNvbWUgYWx0ZXJuYXRlIGJpdG1hcCBmdW5jdGlvbnMNCnRoYXQgdXNl
-IHU2NFtdIGFuZCB1bmxvY2tlZCBvcGVyYXRpb25zPw0KDQpBbHRob3VnaCBJIHRoaW5rIEknZCBz
-dGlsbCB3YW50IHRvIGVuY2Fwc3VsYXRlIHRoZSBhY3R1YWwgYXJyYXkNCihzb21laG93KSBzbyB0
-aGF0IHdoYXQgaXMgZGVmaW5lZCBoYXMgdG8gYmUgdGhlIGJpdG1hcCB0eXBlLg0KDQoJRGF2aWQN
-Cg0KLQ0KUmVnaXN0ZXJlZCBBZGRyZXNzIExha2VzaWRlLCBCcmFtbGV5IFJvYWQsIE1vdW50IEZh
-cm0sIE1pbHRvbiBLZXluZXMsIE1LMSAxUFQsIFVLDQpSZWdpc3RyYXRpb24gTm86IDEzOTczODYg
-KFdhbGVzKQ0K
+From: Jacob Xu <jacobhxu@google.com>
+
+Include a definition of WARN_ON_ONCE() before using it.
+
+Fixes: bb1fcc70d98f ("KVM: nVMX: Allow L1 to use 5-level page walks for nested EPT")
+Cc: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Jacob Xu <jacobhxu@google.com>
+[reworded commit message; changed <asm/bug.h> to <linux/bug.h>]
+Signed-off-by: Jim Mattson <jmattson@google.com>
+---
+ arch/x86/include/asm/vmx.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
+index 0ffaa3156a4e..447b97296400 100644
+--- a/arch/x86/include/asm/vmx.h
++++ b/arch/x86/include/asm/vmx.h
+@@ -14,6 +14,7 @@
+ 
+ #include <linux/bitops.h>
+ #include <linux/types.h>
++#include <linux/bug.h>
+ #include <uapi/asm/vmx.h>
+ #include <asm/vmxfeatures.h>
+ 
+-- 
+2.35.1.574.g5d30c73bfb-goog
 
