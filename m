@@ -2,57 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DA6164C4F4B
-	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 21:08:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EDD9C4C4F48
+	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 21:08:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235866AbiBYUJL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 15:09:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35332 "EHLO
+        id S235870AbiBYUJM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 15:09:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235855AbiBYUJK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Feb 2022 15:09:10 -0500
-Received: from mail-io1-xd49.google.com (mail-io1-xd49.google.com [IPv6:2607:f8b0:4864:20::d49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92B041F082D
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 12:08:37 -0800 (PST)
-Received: by mail-io1-xd49.google.com with SMTP id x16-20020a6bfe10000000b006409f03e39eso4506222ioh.7
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 12:08:37 -0800 (PST)
+        with ESMTP id S235861AbiBYUJL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Feb 2022 15:09:11 -0500
+Received: from mail-io1-xd4a.google.com (mail-io1-xd4a.google.com [IPv6:2607:f8b0:4864:20::d4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC72F1F03AD
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 12:08:38 -0800 (PST)
+Received: by mail-io1-xd4a.google.com with SMTP id k9-20020a0566022d8900b0064165576298so4478256iow.15
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 12:08:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=2FhdPG8SrYidEnmQD4gAlAl2q1sa7hOe/tXOOTUJkcQ=;
-        b=LBRj7Po1ICNiFJyRUn+8q5qkr3AK7KE6iznbuUR9IeVurWUvmxRjDwHqedtoNF9dFM
-         7V/3+SAVwJBPIYIcE5vdUwyNFshTGnGtvwXr1eAV5DmiIndw7mXnj6+q/qrjYX19cF2S
-         3ozvj2RKr54QQUYGUfOfnU0lKzTqrWDYolrgOeRVQHWbUbDolc5GvfejIR4Mc+CG3WmR
-         8qMTMDiNWKhL6+jZVvIMkMgClyQicmimXijWCkqlXuLkoOq/UDfJ6zZZSAf4EfLD0ixR
-         MxSyvuj23trF1FnqHeILoC3AB54uOnJ8ee80HUQm1kUT3ak63XxobjKljqFbQRQeqGZ4
-         ZRaw==
+        bh=Wgqi2KPCKBH/bMb5m85+vN32dj3dX5av+lDesCp799s=;
+        b=tP/KWvEp6pObSe1aZomRtu4dt3spd3WFqOmIAa1Xo7Ho6Qq+/BMjMfqHAyKTpdMrpj
+         ftlH2XaSOqfnIlNtRWDPhWE5PL6vlwjwN+BiX89SnCyr/RJ4AG4QjIyTrfMlaR5cUqO5
+         1kTzReramW1gH8g8IYbOmjOgmXe9WThy0UAwkK6Ez7YaWDs+Up2iYgm1SSZ4LvjB2hhW
+         l6Kkc3JIDQzCqO5LKcBpiGK7stGNZbB8Fwf09+qHBIVCn5+blI8EQRL2i3pRG3ze98IP
+         C5MqMhlyUs8QVrIhbFZVHCnVrs50sQuA2HDZrL7GnlZvS8dhJ24I9gvrgO7HFUWBvoBU
+         LXDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=2FhdPG8SrYidEnmQD4gAlAl2q1sa7hOe/tXOOTUJkcQ=;
-        b=AhwT7eHkWdQiZzUFS1GvDl3o1wZjW0LkRmJ3bflsybbpbfJPp7gKaxPT5U8NJkeVfW
-         5FSRKRt4hIYsSgrY+JLvFTtAitIz7mrzZqNyGZzPsgx/ioQtEPxvxc2//wT1VTd2j2QP
-         NsW7ECtFoIqU9iwgt5UwlSdzz+TFqasCi/oIvhVzHctEP63tu1SdPmiuxMOL3AWLYG31
-         DICHN9hM214lxxdmN4d8lLc99HCHM2EVq/ygYUocFPmoAl1DpeAPPHn/c04UKvKz9MMf
-         L9sMTZzcRequlj4gIC1lucu7mxpC7pR0pQm9MCSfVEdrSVYL3okCEiDfmyOAEB6xNb0g
-         ohAw==
-X-Gm-Message-State: AOAM533CEy5t8QeVkONelnflFZqcICMpET5ICKK7YsMmzMhSf2UdAe+I
-        MfpPxNZGAgUvgWekLA0q36krZEb9Mp4NyFNzOWsINGj6a2Y1QrJtWDTBIAGgGgng+0RvRIAN2xb
-        Yqeh+uB9eIQO4SsIWcgxrvEs4JWaUdHIx5bc3XibVDBTdJjJd1XBV34zWqQ==
-X-Google-Smtp-Source: ABdhPJxjhN0iRjZ6XggJ6eByqcH+1NGx6/bFt4hzhLNwjXhXYSVubftcTwVqiKX7iobHqwwuyBRZ7H838cA=
+        bh=Wgqi2KPCKBH/bMb5m85+vN32dj3dX5av+lDesCp799s=;
+        b=DvVG6y2BhEBoNDVGPqeVD0gfPxJbamhfmlYt02YEtPectDOj1IKvBjr15xzMbD0CSC
+         5APKWl1roQb7hKXCWLVA1tNqfD/KfHATaaBb2jNawXqCo/tcfTxSLOMF+708ebY8M+lP
+         EKWZiSE02XMUCAmV5OIUoNeHQuYVGvD+b25Mel5o+luqvzKRY6UE7fxfdJpnII7RH26M
+         46H8x0hKWsterYNuvm/EtNeVCqOfLGkk77BzbF+VgZDEG+HFZfXxcW4t6Xfxxffv2Ain
+         +4jWT9l6JaRgP3jg/u9zlVoLEVZf0n3bGmsU8O9JHdC8NKfXZlCr4A56YfM9B5ZMA7dy
+         aoEw==
+X-Gm-Message-State: AOAM531JWdR1OuiqnSPDGFyTRXiNZgNlnUzqnYWj8cUeSeWtnt/YtXEk
+        gF9hf2SBA2SKyM/U0ZOrFlqg200jdk7y18TxEELlkHGZ9qU6ClPJXhjGt6EqLhiUnUhj5qn9Exu
+        SQtWS89WNomZ0pL8RnLcKsJViK7l2UJK2JSRMUHAfiOulhpMcIW5BhKY4bw==
+X-Google-Smtp-Source: ABdhPJyZV1c7GMZ7YjRYAhht0IkMeAoVgBKaI/bKyKVbxF0iTRTDhZPSeaD2Mg0J42S+iS1ZRLAFtKUj5XI=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a92:c24a:0:b0:2c2:8100:11ec with SMTP id
- k10-20020a92c24a000000b002c2810011ecmr7528133ilo.69.1645819716951; Fri, 25
- Feb 2022 12:08:36 -0800 (PST)
-Date:   Fri, 25 Feb 2022 20:08:20 +0000
+ (user=oupton job=sendgmr) by 2002:a05:6638:964:b0:314:5c66:e9c1 with SMTP id
+ o4-20020a056638096400b003145c66e9c1mr7580125jaj.250.1645819718093; Fri, 25
+ Feb 2022 12:08:38 -0800 (PST)
+Date:   Fri, 25 Feb 2022 20:08:21 +0000
 In-Reply-To: <20220225200823.2522321-1-oupton@google.com>
-Message-Id: <20220225200823.2522321-4-oupton@google.com>
+Message-Id: <20220225200823.2522321-5-oupton@google.com>
 Mime-Version: 1.0
 References: <20220225200823.2522321-1-oupton@google.com>
 X-Mailer: git-send-email 2.35.1.574.g5d30c73bfb-goog
-Subject: [PATCH v3 3/6] KVM: nVMX: Add a quirk for KVM tweaks to VMX control MSRs
+Subject: [PATCH v3 4/6] selftests: KVM: Separate static alloc from
+ KVM_GET_SUPPORTED_CPUID call
 From:   Oliver Upton <oupton@google.com>
 To:     kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -74,73 +75,90 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM really has no business messing with the vCPU state. Nonetheless, it
-has become ABI for KVM to adjust certain bits of the VMX entry/exit
-control MSRs depending on the guest CPUID. Namely, the bits associated
-with the IA32_PERF_GLOBAL_CTRL and IA32_BNDCFGS MSRs were conditionally
-enabled if the guest CPUID allows for it.
+The library code allows for a single allocation of CPUID to store the
+value returned by KVM_GET_SUPPORTED_CPUID. Subsequent calls to the
+helper simply return a pointer to the aforementioned allocation. A
+subsequent change introduces a selftest that contains test cases which
+adjust the CPUID value before calling KVM_SET_CPUID2. Using a single
+definition of CPUID is problematic, as the changes are not isolated to a
+single test case.
 
-Allow userspace to opt-out of changes to VMX control MSRs by adding a
-new KVM quirk.
+Create a helper that allocates memory for CPUID on a per-call basis.
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Oliver Upton <oupton@google.com>
 ---
- arch/x86/include/uapi/asm/kvm.h | 11 ++++++-----
- arch/x86/kvm/vmx/nested.c       |  3 +++
- arch/x86/kvm/vmx/vmx.c          |  3 +++
- 3 files changed, 12 insertions(+), 5 deletions(-)
+ .../selftests/kvm/include/x86_64/processor.h  |  1 +
+ .../selftests/kvm/lib/x86_64/processor.c      | 33 +++++++++++++++----
+ 2 files changed, 28 insertions(+), 6 deletions(-)
 
-diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-index bf6e96011dfe..acbab6a97fae 100644
---- a/arch/x86/include/uapi/asm/kvm.h
-+++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -428,11 +428,12 @@ struct kvm_sync_regs {
- 	struct kvm_vcpu_events events;
- };
+diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+index 8a470da7b71a..e36ab7de7717 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/processor.h
++++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+@@ -390,6 +390,7 @@ void kvm_x86_state_cleanup(struct kvm_x86_state *state);
  
--#define KVM_X86_QUIRK_LINT0_REENABLED	   (1 << 0)
--#define KVM_X86_QUIRK_CD_NW_CLEARED	   (1 << 1)
--#define KVM_X86_QUIRK_LAPIC_MMIO_HOLE	   (1 << 2)
--#define KVM_X86_QUIRK_OUT_7E_INC_RIP	   (1 << 3)
--#define KVM_X86_QUIRK_MISC_ENABLE_NO_MWAIT (1 << 4)
-+#define KVM_X86_QUIRK_LINT0_REENABLED		(1 << 0)
-+#define KVM_X86_QUIRK_CD_NW_CLEARED		(1 << 1)
-+#define KVM_X86_QUIRK_LAPIC_MMIO_HOLE		(1 << 2)
-+#define KVM_X86_QUIRK_OUT_7E_INC_RIP		(1 << 3)
-+#define KVM_X86_QUIRK_MISC_ENABLE_NO_MWAIT	(1 << 4)
-+#define KVM_X86_QUIRK_TWEAK_VMX_CTRL_MSRS	(1 << 5)
+ struct kvm_msr_list *kvm_get_msr_index_list(void);
+ uint64_t kvm_get_feature_msr(uint64_t msr_index);
++struct kvm_cpuid2 *_kvm_get_supported_cpuid(void);
+ struct kvm_cpuid2 *kvm_get_supported_cpuid(void);
  
- #define KVM_STATE_NESTED_FORMAT_VMX	0
- #define KVM_STATE_NESTED_FORMAT_SVM	1
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 59164394569f..3b22b1072eff 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -4813,6 +4813,9 @@ void nested_vmx_pmu_entry_exit_ctls_update(struct kvm_vcpu *vcpu)
- 	if (!nested_vmx_allowed(vcpu))
- 		return;
- 
-+	if (!kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_TWEAK_VMX_CTRL_MSRS))
-+		return;
-+
- 	vmx = to_vmx(vcpu);
- 	if (kvm_x86_ops.pmu_ops->is_valid_msr(vcpu, MSR_CORE_PERF_GLOBAL_CTRL)) {
- 		vmx->nested.msrs.entry_ctls_high |=
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 77d74cbc2709..050820d931fe 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7246,6 +7246,9 @@ void nested_vmx_entry_exit_ctls_update(struct kvm_vcpu *vcpu)
+ struct kvm_cpuid2 *vcpu_get_cpuid(struct kvm_vm *vm, uint32_t vcpuid);
+diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+index 9f000dfb5594..b8921cd09ede 100644
+--- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
++++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+@@ -772,17 +772,14 @@ static struct kvm_cpuid2 *allocate_kvm_cpuid2(void)
+  *
+  * Return: The supported KVM CPUID
+  *
+- * Get the guest CPUID supported by KVM.
++ * Gets the supported guest CPUID with the KVM_GET_SUPPORTED_CPUID ioctl.
+  */
+-struct kvm_cpuid2 *kvm_get_supported_cpuid(void)
++struct kvm_cpuid2 *_kvm_get_supported_cpuid(void)
  {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+-	static struct kvm_cpuid2 *cpuid;
++	struct kvm_cpuid2 *cpuid;
+ 	int ret;
+ 	int kvm_fd;
  
-+	if (!kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_TWEAK_VMX_CTRL_MSRS))
-+		return;
+-	if (cpuid)
+-		return cpuid;
+-
+ 	cpuid = allocate_kvm_cpuid2();
+ 	kvm_fd = open_kvm_dev_path_or_exit();
+ 
+@@ -794,6 +791,30 @@ struct kvm_cpuid2 *kvm_get_supported_cpuid(void)
+ 	return cpuid;
+ }
+ 
++/*
++ * KVM Supported CPUID Get
++ *
++ * Input Args: None
++ *
++ * Output Args: None
++ *
++ * Return: The supported KVM CPUID
++ *
++ * Gets the supported guest CPUID with the KVM_GET_SUPPORTED_CPUID ioctl.
++ * The first call creates a static allocation of CPUID for the process.
++ * Subsequent calls will return a pointer to the previously allocated CPUID.
++ */
++struct kvm_cpuid2 *kvm_get_supported_cpuid(void)
++{
++	static struct kvm_cpuid2 *cpuid;
 +
- 	if (kvm_mpx_supported()) {
- 		bool mpx_enabled = guest_cpuid_has(vcpu, X86_FEATURE_MPX);
- 
++	if (cpuid)
++		return cpuid;
++
++	cpuid = _kvm_get_supported_cpuid();
++	return cpuid;
++}
++
+ /*
+  * KVM Get MSR
+  *
 -- 
 2.35.1.574.g5d30c73bfb-goog
 
