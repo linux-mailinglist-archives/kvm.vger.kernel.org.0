@@ -2,138 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B8A94C4920
-	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 16:35:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 74D0C4C491C
+	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 16:35:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242082AbiBYPe5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 10:34:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46422 "EHLO
+        id S242145AbiBYPfv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 10:35:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238920AbiBYPez (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Feb 2022 10:34:55 -0500
+        with ESMTP id S238920AbiBYPfu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Feb 2022 10:35:50 -0500
 Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6223190B76;
-        Fri, 25 Feb 2022 07:34:22 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 801BB1F981C
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 07:35:17 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 616CBB83253;
-        Fri, 25 Feb 2022 15:34:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D2B8C340E7;
-        Fri, 25 Feb 2022 15:34:17 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="EWUvxbsv"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1645803256;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=aWLmVQxQDsQDY8xA+iWmKjooufWe/5wC2imqu/MRZlY=;
-        b=EWUvxbsv0f37oRy8gRLWgC2f9N5nllIJZsgvlWWTgwSXhwcn1SAw9ahMy2L+erFJzM3Cok
-        2LgLhaVSk7Y3z5WXitc4qbOO4HNlQEIOEgKhSZKCqlv5kIMeSZSSbrRloP3h+xPoexoTbJ
-        roWa02VZ8DoxU22UyCjoRq3cY9oiQgA=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id ca8076dc (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Fri, 25 Feb 2022 15:34:15 +0000 (UTC)
-Date:   Fri, 25 Feb 2022 16:34:11 +0100
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Ard Biesheuvel <ardb@kernel.org>, adrian@parity.io
-Cc:     Alexander Graf <graf@amazon.com>, KVM list <kvm@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-hyperv@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        adrian@parity.io, ben@skyportsystems.com,
-        Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        Dexuan Cui <decui@microsoft.com>,
-        "Woodhouse, David" <dwmw@amazon.co.uk>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Jann Horn <jannh@google.com>,
-        KY Srinivasan <kys@microsoft.com>,
-        Laszlo Ersek <lersek@redhat.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        QEMU Developers <qemu-devel@nongnu.org>,
-        "Weiss, Radu" <raduweis@amazon.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>, Wei Liu <wei.liu@kernel.org>
-Subject: Re: [PATCH v4] virt: vmgenid: introduce driver for reinitializing
- RNG on VM fork
-Message-ID: <Yhj288aE5rW15Qpj@zx2c4.com>
-References: <CAHmME9pJ3wb=EbUErJrCRC=VYGhFZqj2ar_AkVPsUvAnqGtwwg@mail.gmail.com>
- <20220225124848.909093-1-Jason@zx2c4.com>
- <05c9f2a9-accb-e0de-aac7-b212adac7eb2@amazon.com>
- <YhjjuMOeV7+T7thS@zx2c4.com>
- <88ebdc32-2e94-ef28-37ed-1c927c12af43@amazon.com>
- <YhjoyIUv2+18BwiR@zx2c4.com>
- <9ac68552-c1fc-22c8-13e6-4f344f85a4fb@amazon.com>
- <CAMj1kXEue6cDCSG0N7WGTVF=JYZx3jwE7EK4tCdhO-HzMtWwVw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAMj1kXEue6cDCSG0N7WGTVF=JYZx3jwE7EK4tCdhO-HzMtWwVw@mail.gmail.com>
-X-Spam-Status: No, score=-6.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        by ams.source.kernel.org (Postfix) with ESMTPS id 38D8AB83250
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 15:35:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDE38C340E7;
+        Fri, 25 Feb 2022 15:35:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1645803314;
+        bh=XWLirn2GNbTjE51zo7iPv6tgFO5o53opK4mG6ZCkM5Y=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=JSvAOfyVc3on3y3Y+/Uleua1zaLcfP/tAFHpc7b82oUv0rfYpXGxMVI0eK8FjSHPA
+         euIJu1y3rnCmPFrT1VrZMxKO/zIWmXI5Zak9bBYWSq5vtLMEINdeNgZFcpugG5SQdM
+         Rp1Gukf8xWHy632Gm/dsqYUxLQ1Ri0i0e+X9Gv8qWvAu8zFakNK4hJb12pVQW8uMUL
+         XPLRx6PjzLnN89TmzrVLiVJxncne5xpTsv7nZ3SaQTsUXHk9QGjnmUlrFyk/XO/P8E
+         xYNkr0X38TJQ50+FUIOzWNY0S2ec5S5IzyUiN4i19MJE9KeDmkO/ueMgmI5j7kt7U6
+         iLNHyTmIBZxcg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nNcci-00AYyb-LA; Fri, 25 Feb 2022 15:35:12 +0000
+Date:   Fri, 25 Feb 2022 15:35:12 +0000
+Message-ID: <87ilt32c3z.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oupton@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, Peter Shier <pshier@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>,
+        Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH v3 03/19] KVM: arm64: Reject invalid addresses for CPU_ON PSCI call
+In-Reply-To: <YhfaztgV0GHzyh24@google.com>
+References: <20220223041844.3984439-1-oupton@google.com>
+        <20220223041844.3984439-4-oupton@google.com>
+        <87zgmg30qu.wl-maz@kernel.org>
+        <YhfaztgV0GHzyh24@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@google.com, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, anup@brainfault.org, atishp@atishpatra.org, seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, pshier@google.com, reijiw@google.com, ricarkol@google.com, rananta@google.com, jingzhangos@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 25, 2022 at 04:16:27PM +0100, Ard Biesheuvel wrote:
-> > > I just booted up a Windows VM, and it looks like Hyper-V uses
-> > > "Hyper_V_Gen_Counter_V1", which is also quite long, so we can't really
-> > > HID match on that either.
+On Thu, 24 Feb 2022 19:21:50 +0000,
+Oliver Upton <oupton@google.com> wrote:
+> 
+> Hi Marc,
+> 
+> On Thu, Feb 24, 2022 at 12:30:49PM +0000, Marc Zyngier wrote:
+> > On Wed, 23 Feb 2022 04:18:28 +0000,
+> > Oliver Upton <oupton@google.com> wrote:
+> > > 
+> > > DEN0022D.b 5.6.2 "Caller responsibilities" states that a PSCI
+> > > implementation may return INVALID_ADDRESS for the CPU_ON call if the
+> > > provided entry address is known to be invalid. There is an additional
+> > > caveat to this rule. Prior to PSCI v1.0, the INVALID_PARAMETERS error
+> > > is returned instead. Check the guest's PSCI version and return the
+> > > appropriate error if the IPA is invalid.
+> > > 
+> > > Reported-by: Reiji Watanabe <reijiw@google.com>
+> > > Signed-off-by: Oliver Upton <oupton@google.com>
+> > > ---
+> > >  arch/arm64/kvm/psci.c | 24 ++++++++++++++++++++++--
+> > >  1 file changed, 22 insertions(+), 2 deletions(-)
+> > > 
+> > > diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
+> > > index a0c10c11f40e..de1cf554929d 100644
+> > > --- a/arch/arm64/kvm/psci.c
+> > > +++ b/arch/arm64/kvm/psci.c
+> > > @@ -12,6 +12,7 @@
+> > >  
+> > >  #include <asm/cputype.h>
+> > >  #include <asm/kvm_emulate.h>
+> > > +#include <asm/kvm_mmu.h>
+> > >  
+> > >  #include <kvm/arm_psci.h>
+> > >  #include <kvm/arm_hypercalls.h>
+> > > @@ -70,12 +71,31 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+> > >  	struct vcpu_reset_state *reset_state;
+> > >  	struct kvm *kvm = source_vcpu->kvm;
+> > >  	struct kvm_vcpu *vcpu = NULL;
+> > > -	unsigned long cpu_id;
+> > > +	unsigned long cpu_id, entry_addr;
+> > >  
+> > >  	cpu_id = smccc_get_arg1(source_vcpu);
+> > >  	if (!kvm_psci_valid_affinity(source_vcpu, cpu_id))
+> > >  		return PSCI_RET_INVALID_PARAMS;
+> > >  
+> > > +	/*
+> > > +	 * Basic sanity check: ensure the requested entry address actually
+> > > +	 * exists within the guest's address space.
+> > > +	 */
+> > > +	entry_addr = smccc_get_arg2(source_vcpu);
+> > > +	if (!kvm_ipa_valid(kvm, entry_addr)) {
+> > > +
+> > > +		/*
+> > > +		 * Before PSCI v1.0, the INVALID_PARAMETERS error is returned
+> > > +		 * instead of INVALID_ADDRESS.
+> > > +		 *
+> > > +		 * For more details, see ARM DEN0022D.b 5.6 "CPU_ON".
+> > > +		 */
+> > > +		if (kvm_psci_version(source_vcpu) < KVM_ARM_PSCI_1_0)
+> > > +			return PSCI_RET_INVALID_PARAMS;
+> > > +		else
+> > > +			return PSCI_RET_INVALID_ADDRESS;
+> > > +	}
+> > > +
+> > 
+> > If you're concerned with this, should you also check for the PC
+> > alignment, or the presence of a memslot covering the address you are
+> > branching to?  Le latter is particularly hard to implement reliably.
+> 
+> Andrew, Reiji and I had a conversation regarding exactly this on the
+> last run of this series, and concluded that checking against the IPA is
+> probably the best KVM can do [1]. That said, alignment is also an easy
+> thing to check.
+
+Until you look at Thumb-2 ;-)
+
+> 
+> > So far, my position has been that the guest is free to shoot itself in
+> > the foot if that's what it wants to do, and that babysitting it was a
+> > waste of useful bits! ;-)
 > >
-> >
-> > Yes, due to the same problem. I'd really prefer we sort out the ACPI
-> > matching before this goes mainline. Matching on _HID is explicitly
-> > discouraged in the VMGenID spec.
-> >
 > 
-> OK, this really sucks. Quoting the ACPI spec:
+> Agreed -- there are plenty of spectacular/hilarious ways in which the
+> guest can mess up :-)
 > 
-> """
-> A _HID object evaluates to either a numeric 32-bit compressed EISA
-> type ID or a string. If a string, the format must be an alphanumeric
-> PNP or ACPI ID with no asterisk or other leading characters.
-> A valid PNP ID must be of the form "AAA####" where A is an uppercase
-> letter and # is a hex digit.
-> A valid ACPI ID must be of the form "NNNN####" where N is an uppercase
-> letter or a digit ('0'-'9') and # is a hex digit. This specification
-> reserves the string "ACPI" for use only with devices defined herein.
-> It further reserves all strings representing 4 HEX digits for
-> exclusive use with PCI-assigned Vendor IDs.
-> """
+> > Or have you identified something that makes it a requirement to handle
+> > this case (and possibly others)  in the hypervisor?
 > 
-> So now we have to implement Microsoft's fork of ACPI to be able to use
-> this device, even if we expose it from QEMU instead of Hyper-V? I
-> strongly object to that.
-> 
-> Instead, we can match on _HID exposed by QEMU, and cordially invite
-> Microsoft to align their spec with the ACPI spec.
+> It is a lot easier to tell a guest that their software is broken if they
+> get an error back from the hypercall, whereas a vCPU off in the weeds
+> might need to be looked at before concluding there's a guest issue.
 
-I don't know about that... Seems a bit extreme. Hopefully Alex will be
-able to sort something out with the ACPI people, and this driver will
-work inside of Hyper-V.
+Fair enough. I'm not fundamentally against this patch. It is just a
+bit out of context in this series.
 
-Here's what we currently have:
+	M.
 
-  static const struct acpi_device_id vmgenid_ids[] = {
-    { "VMGENID", 0 },  <------------------------------------ ???
-    { "QEMUVGID", 0 }, <------------------------------------ QEMU
-    { },
-  };
-
-Adrian added "VMGENID" in last year's v4, so I copied that for this new
-driver here. But does anybody know which hypervisor it is for? Some
-internal Amazon thing? Firecracker? VMware? In case Alex does not
-succeed with the ACPI changes, it'd be nice to know which HIDs for
-which hypervisors we do and do not support.
-
-Jason
+-- 
+Without deviation from the norm, progress is not possible.
