@@ -2,120 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B2924C4515
-	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 13:57:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BB31A4C459B
+	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 14:14:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240817AbiBYM5d (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 07:57:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37010 "EHLO
+        id S241029AbiBYNNo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 08:13:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235676AbiBYM53 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Feb 2022 07:57:29 -0500
+        with ESMTP id S239043AbiBYNNm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Feb 2022 08:13:42 -0500
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A9B7286EE;
-        Fri, 25 Feb 2022 04:56:52 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A91461B7605
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 05:13:10 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 062BF61BF8;
-        Fri, 25 Feb 2022 12:56:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5C3AC340E8;
-        Fri, 25 Feb 2022 12:56:50 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="enMYkBkI"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1645793808;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=XssgunSt6iK78jyshO3hMq9+wDKO/OCGHO1mFFLrZQQ=;
-        b=enMYkBkIudB/0krPIVVLhzRClwGqp92bzymz3GlaPY/CynpKIXYX03wKBGZ52ZVCe9Eujn
-        kgPdqeLrCuQURxB1lO3tnKlABuuou7tz8M7L/27vzfUSx9/E+GZStDwJkrdcK/PldDBDFn
-        5MO5bLzFBsxUJCj89tpuB1ncnSfIF98=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 7f77180f (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Fri, 25 Feb 2022 12:56:48 +0000 (UTC)
-Received: by mail-yb1-f180.google.com with SMTP id e140so5677751ybh.9;
-        Fri, 25 Feb 2022 04:56:46 -0800 (PST)
-X-Gm-Message-State: AOAM53285l4JXrzMYBbOkJo7n7JLpOeJRdxReNaxjVuAUerwEvl8CXL2
-        IcW9eAQxCQ2kHgsFCpzMDGf4f8pw0AeFvhKWKGw=
-X-Google-Smtp-Source: ABdhPJy+bf9nC/iTENWy4XIXFN5EQ0KO9hqlk22myA/sDhwpstQSK4hOUUQQu7RToXFr7rymY6Q0NMRfSY8co9VWFh4=
-X-Received: by 2002:a25:d116:0:b0:61d:e8c9:531e with SMTP id
- i22-20020a25d116000000b0061de8c9531emr7032586ybg.637.1645793805904; Fri, 25
- Feb 2022 04:56:45 -0800 (PST)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1145B61C54
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 13:13:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E594C340E7;
+        Fri, 25 Feb 2022 13:13:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1645794789;
+        bh=4OBpMBBHbqfE56ZBzZuNT14cSYoLBRUNEKj3d9XwRKg=;
+        h=From:To:Cc:Subject:Date:From;
+        b=axHqA1NTSELIxujgopmdO7bncVhWMLiNBuyj43f35EQ8KGzPa/h0POOZjeTqrBUcy
+         fPdHZHZU3+yzm58hkNeCRL1yq3mK5KqV6/1CK7jyxRu6L9Tl6kcvOIvNkASr8gV+6U
+         t/IYR+ADu8JunosPGA7HzbCUOu+7YR1nq6vPZtJkMoPVRHMO5ZabYw0D6YwsHA7tvx
+         zkdm2HSnjSu6xEq6a4/rDPIKlKBO1tbMA119S5b4djhcLxP9ljGvvt1g2ztXUUP3vQ
+         7S0CJstba87RQIY8sJbxpih4Kq6tkBnS4VjBSCylvXN2RBQU9kAaWTLVYn1tN87vA/
+         HpRVzbh3/wvWA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nNaPC-00AWbe-Tx; Fri, 25 Feb 2022 13:13:07 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Mark Brown <broonie@kernel.org>,
+        Oliver Upton <oupton@google.com>,
+        Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+        kernel-team@android.com
+Subject: [GIT PULL] KVM/arm64 fixes for 5.17, take #4
+Date:   Fri, 25 Feb 2022 13:13:02 +0000
+Message-Id: <20220225131302.107215-1-maz@kernel.org>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-References: <CAHmME9pJ3wb=EbUErJrCRC=VYGhFZqj2ar_AkVPsUvAnqGtwwg@mail.gmail.com>
- <20220225124848.909093-1-Jason@zx2c4.com> <YhjRVz2184xhkZK3@kroah.com>
-In-Reply-To: <YhjRVz2184xhkZK3@kroah.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Fri, 25 Feb 2022 13:56:35 +0100
-X-Gmail-Original-Message-ID: <CAHmME9pGuPEWjr+RLFQi-kKcRuPxmCYyzAJOJtgx+5phwmkZ6Q@mail.gmail.com>
-Message-ID: <CAHmME9pGuPEWjr+RLFQi-kKcRuPxmCYyzAJOJtgx+5phwmkZ6Q@mail.gmail.com>
-Subject: Re: [PATCH v4] virt: vmgenid: introduce driver for reinitializing RNG
- on VM fork
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     KVM list <kvm@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-hyperv@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        adrian@parity.io, Ard Biesheuvel <ardb@kernel.org>,
-        ben@skyportsystems.com,
-        =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        Dexuan Cui <decui@microsoft.com>,
-        "Woodhouse, David" <dwmw@amazon.co.uk>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Alexander Graf <graf@amazon.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Jann Horn <jannh@google.com>,
-        "K . Y . Srinivasan" <kys@microsoft.com>,
-        Laszlo Ersek <lersek@redhat.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        QEMU Developers <qemu-devel@nongnu.org>,
-        "Weiss, Radu" <raduweis@amazon.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        "Theodore Ts'o" <tytso@mit.edu>, Wei Liu <wei.liu@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-6.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, drjones@redhat.com, broonie@kernel.org, oupton@google.com, ricarkol@google.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 25, 2022 at 1:53 PM Greg KH <gregkh@linuxfoundation.org> wrote:
->
-> On Fri, Feb 25, 2022 at 01:48:48PM +0100, Jason A. Donenfeld wrote:
-> > +static struct acpi_driver acpi_driver = {
-> > +     .name = "vmgenid",
-> > +     .ids = vmgenid_ids,
-> > +     .owner = THIS_MODULE,
-> > +     .ops = {
-> > +             .add = vmgenid_acpi_add,
-> > +             .notify = vmgenid_acpi_notify,
-> > +     }
-> > +};
-> > +
-> > +static int __init vmgenid_init(void)
-> > +{
-> > +     return acpi_bus_register_driver(&acpi_driver);
-> > +}
-> > +
-> > +static void __exit vmgenid_exit(void)
-> > +{
-> > +     acpi_bus_unregister_driver(&acpi_driver);
-> > +}
-> > +
-> > +module_init(vmgenid_init);
-> > +module_exit(vmgenid_exit);
->
-> Nit, you could use module_acpi_driver() to make this even smaller if you
-> want to.
+Hi Paolo,
 
-Nice! Will do.
+Only a couple of fixes this time around: one for the long standing
+PSCI CPU_SUSPEND issue, and a selftest fix for systems that don't have
+a GICv3.
 
-Jason
+Please pull,
+
+	M.
+
+The following changes since commit 5bfa685e62e9ba93c303a9a8db646c7228b9b570:
+
+  KVM: arm64: vgic: Read HW interrupt pending state from the HW (2022-02-11 11:01:12 +0000)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.17-4
+
+for you to fetch changes up to 456f89e0928ab938122a40e9f094a6524cc158b4:
+
+  KVM: selftests: aarch64: Skip tests if we can't create a vgic-v3 (2022-02-25 13:02:28 +0000)
+
+----------------------------------------------------------------
+KVM/arm64 fixes for 5.17, take #4
+
+- Correctly synchronise PMR and co on PSCI CPU_SUSPEND
+
+- Skip tests that depend on GICv3 when the HW isn't available
+
+----------------------------------------------------------------
+Mark Brown (1):
+      KVM: selftests: aarch64: Skip tests if we can't create a vgic-v3
+
+Oliver Upton (1):
+      KVM: arm64: Don't miss pending interrupts for suspended vCPU
+
+ arch/arm64/kvm/psci.c                            | 3 +--
+ tools/testing/selftests/kvm/aarch64/arch_timer.c | 7 ++++++-
+ tools/testing/selftests/kvm/aarch64/vgic_irq.c   | 4 ++++
+ tools/testing/selftests/kvm/lib/aarch64/vgic.c   | 4 +++-
+ 4 files changed, 14 insertions(+), 4 deletions(-)
