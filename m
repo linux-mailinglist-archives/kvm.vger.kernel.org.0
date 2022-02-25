@@ -2,123 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E50D4C49D3
-	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 16:58:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A17B24C4A3C
+	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 17:13:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242505AbiBYP6k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 10:58:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44854 "EHLO
+        id S242679AbiBYQOD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 11:14:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235252AbiBYP6i (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Feb 2022 10:58:38 -0500
-Received: from smtp-fw-9103.amazon.com (smtp-fw-9103.amazon.com [207.171.188.200])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D06FE1385B0;
-        Fri, 25 Feb 2022 07:58:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1645804685; x=1677340685;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=/4HhS3bKDhHBG81XwvT+lvk6Ix/QvcITcjjX0JZqCZA=;
-  b=m3oABs3zZO2cWd4S+n3gOpT0Hyu69d7JZEzGS9cD8C7bAqfk/CijUZ86
-   E0XBj0W3djrAuzSXmvchyxSEsa/+V/mX3wCKNT9xj7esy7o8QHEpR+B/Y
-   TzdZu+K36G6u2LgFJtPr0ZzaquXI1zUyyF1MI97IIAXJ0TPsAVjItD0yJ
-   s=;
-X-IronPort-AV: E=Sophos;i="5.90,136,1643673600"; 
-   d="scan'208";a="995010317"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2a-2dbf0206.us-west-2.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-9103.sea19.amazon.com with ESMTP; 25 Feb 2022 15:57:50 +0000
-Received: from EX13MTAUWC001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-        by email-inbound-relay-pdx-2a-2dbf0206.us-west-2.amazon.com (Postfix) with ESMTPS id 06FB2A29C8;
-        Fri, 25 Feb 2022 15:57:50 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1497.28; Fri, 25 Feb 2022 15:57:49 +0000
-Received: from [0.0.0.0] (10.43.160.203) by EX13D20UWC001.ant.amazon.com
- (10.43.162.244) with Microsoft SMTP Server (TLS) id 15.0.1497.28; Fri, 25 Feb
- 2022 15:57:43 +0000
-Message-ID: <5a196de5-d7cb-d462-2292-af05907d3544@amazon.com>
-Date:   Fri, 25 Feb 2022 16:57:41 +0100
+        with ESMTP id S237566AbiBYQOB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Feb 2022 11:14:01 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6FF8513859E
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 08:13:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645805608;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=xxNAibxsiiU2bHsBXx2buGz12V3hEqmNOWKO5gCjbww=;
+        b=JsPye5wzxW+aq/a6E+lErGOhRLaXAOxasLor6/cN3fNJN2aj+LPMJLAzaYawT1cCtZ2xdP
+        20o8G40e7cI2oACzB8oJ+AjsRNmEZIzFxOBiAYtEz4JFpPUBHbNlV4jYlzjJtOHiYncXIh
+        XE+SRar7D9KiMNk8n52T/yheAd/70VY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-178-439FHvLDMqa5-AmaKbS38A-1; Fri, 25 Feb 2022 11:13:25 -0500
+X-MC-Unique: 439FHvLDMqa5-AmaKbS38A-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8B4EB1006AA5;
+        Fri, 25 Feb 2022 16:13:21 +0000 (UTC)
+Received: from starship (unknown [10.40.195.190])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3565C8379F;
+        Fri, 25 Feb 2022 16:12:41 +0000 (UTC)
+Message-ID: <57e91d8f75d6e39432a2fef5d899e3238154863f.camel@redhat.com>
+Subject: Re: [PATCH v6 6/9] KVM: x86: lapic: don't allow to change APIC ID
+ unconditionally
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     David Woodhouse <dwmw2@infradead.org>,
+        Zeng Guang <guang.zeng@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jethro Beekman <jethro@fortanix.com>,
+        Kai Huang <kai.huang@intel.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
+        Robert Hu <robert.hu@intel.com>, Gao Chao <chao.gao@intel.com>
+Date:   Fri, 25 Feb 2022 18:12:41 +0200
+In-Reply-To: <38b6a762bea2cdbe5e761daf5dbc351b18f28de3.camel@infradead.org>
+References: <20220225082223.18288-1-guang.zeng@intel.com>
+         <20220225082223.18288-7-guang.zeng@intel.com>
+         <79f5ce60c65280f4fb7cba0ceedaca0ff5595c48.camel@redhat.com>
+         <eb849245c98ea7f5d5e9320ee6ee6b0d1851b439.camel@infradead.org>
+         <b9638fe3383d7b36846255e1d05afa9c1bfc7a0f.camel@redhat.com>
+         <38b6a762bea2cdbe5e761daf5dbc351b18f28de3.camel@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.6.1
-Subject: Re: [PATCH v4] virt: vmgenid: introduce driver for reinitializing RNG
- on VM fork
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-CC:     Ard Biesheuvel <ardb@kernel.org>, KVM list <kvm@vger.kernel.org>,
-        "Linux Crypto Mailing List" <linux-crypto@vger.kernel.org>,
-        <linux-hyperv@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        <adrian@parity.io>, <ben@skyportsystems.com>,
-        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-        "Colm MacCarthaigh" <colmmacc@amazon.com>,
-        Dexuan Cui <decui@microsoft.com>,
-        "Woodhouse, David" <dwmw@amazon.co.uk>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        "Igor Mammedov" <imammedo@redhat.com>,
-        Jann Horn <jannh@google.com>,
-        KY Srinivasan <kys@microsoft.com>,
-        Laszlo Ersek <lersek@redhat.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "QEMU Developers" <qemu-devel@nongnu.org>,
-        "Weiss, Radu" <raduweis@amazon.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>, Wei Liu <wei.liu@kernel.org>
-References: <CAHmME9pJ3wb=EbUErJrCRC=VYGhFZqj2ar_AkVPsUvAnqGtwwg@mail.gmail.com>
- <20220225124848.909093-1-Jason@zx2c4.com>
- <05c9f2a9-accb-e0de-aac7-b212adac7eb2@amazon.com>
- <YhjjuMOeV7+T7thS@zx2c4.com>
- <88ebdc32-2e94-ef28-37ed-1c927c12af43@amazon.com>
- <YhjoyIUv2+18BwiR@zx2c4.com>
- <9ac68552-c1fc-22c8-13e6-4f344f85a4fb@amazon.com>
- <CAMj1kXEue6cDCSG0N7WGTVF=JYZx3jwE7EK4tCdhO-HzMtWwVw@mail.gmail.com>
- <c8066caf-8bbb-b148-57e6-98d8449a64c3@amazon.com>
- <Yhj5Dyd6+oC/R1H5@zx2c4.com>
-From:   Alexander Graf <graf@amazon.com>
-In-Reply-To: <Yhj5Dyd6+oC/R1H5@zx2c4.com>
-X-Originating-IP: [10.43.160.203]
-X-ClientProxiedBy: EX13D43UWC004.ant.amazon.com (10.43.162.42) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
-X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-        NICE_REPLY_A,RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Ck9uIDI1LjAyLjIyIDE2OjQzLCBKYXNvbiBBLiBEb25lbmZlbGQgd3JvdGU6Cj4KPiBIaSBBbGV4
-LAo+Cj4gT24gRnJpLCBGZWIgMjUsIDIwMjIgYXQgMDQ6MjI6NTRQTSArMDEwMCwgQWxleGFuZGVy
-IEdyYWYgd3JvdGU6Cj4+IEkgZG9uJ3QgdW5kZXJzdGFuZCB0aGUgcnVzaCBoZXJlLiBUaGlzIGhh
-ZCBiZWVuIHNpdHRpbmcgb24gdGhlIE1MIGZvciAxCj4+IHllYXIgLSBhbmQgbm93IHN1ZGRlbmx5
-IHRhbGtpbmcgdGhlIG1hdGNoIHRocm91Z2ggcHJvcGVybHkgYW5kIGdldHRpbmcKPj4gVk1HZW5J
-RCBzcGVjIGNvbXBhdGlibGUgbWF0Y2hpbmcgc3VwcG9ydCBpbnRvIHRoZSBBQ1BJIGNvcmUgaXMg
-YQo+PiBwcm9ibGVtPyBXaGF0IGRpZCBJIG1pc3M/IDopCj4gSSBkb24ndCB0aGluayB0aGlzIGlz
-IGEgcXVlc3Rpb24gYWJvdXQgc3BlZWQuIEFyZCBkb2Vzbid0IGxpa2UgdGhlIHNwZWMuCj4gWW91
-IGxpa2UgdGhlIGZlYXR1cmUgbW9yZSB0aGFuIHlvdSBkaXNsaWtlIHRoZSBzcGVjLiBBcHBhcmVu
-dGx5IHRoYXQKPiBtZWFucyB0aGVyZSdzIGEgZGlzYWdyZWVtZW50Lgo+Cj4gQXMgSSBtZW50aW9u
-ZWQgZWFybGllciwgSSdkIGVuY291cmFnZSB5b3UgdG8gc2VuZCBhIHBhdGNoIHRvIHRoZSBBQ1BJ
-Cj4gcGVvcGxlIGFuZCBsZXQgdGhlbSBkZWNpZGUuIElmIHRoYXQgZ2V0cyBpbiwgdGhlbiBJJ20g
-ZmluZSB3aXRoCj4gbW9kaWZ5aW5nIHZtZ2VuaWQgdG8gbWVldCB0aGUgc3BlYyBhbmQgdGFrZSBh
-ZHZhbnRhZ2Ugb2YgdGhlIGNoYW5nZQo+IHlvdSdsbCBiZSBtYWtpbmcgdG8gdGhlIEFDUEkgY29k
-ZS4gSWYgaXQgaXMgcmVqZWN0ZWQgYnkgdGhlIEFDUEkgcGVvcGxlLAo+IGFuZCBjb25zZXF1ZW50
-bHkgTGludXggaXNuJ3QgYWJsZSB0byBtYXRjaCBvbiBfQ0lELCB0aGVuIEkgZ3Vlc3Mgd2UnbGwK
-PiBoYXZlIHRoZSBuZXh0IGJlc3QgdGhpbmcsIHdoaWNoIGlzICJ3ZWxsLCBpdCBzdGlsbCB3b3Jr
-cyBvbiBRRU1VLiIKPiBIb3BlZnVsbHkgeW91J2xsIGNvbnZpbmNlIHRoZW0uIEZlZWwgZnJlZSB0
-byBDQyBtZSBvbiB0aGF0IHBhdGNoLgoKCkkgYWdyZWUgd2l0aCB0aGF0IGFwcHJvYWNoIGFuZCBD
-QydlZCB5b3Ugb24gdGhlIEFDUEkgcGF0Y2ggOikuIExldCdzIApleHBsb3JlIGFsbCBvcHRpb25z
-IHRvIG1hdGNoIGFnYWluc3QgX0NJRCBiZWZvcmUgd2UgZ2l2ZSB1cC4KCgpBbGV4CgoKCgoKQW1h
-em9uIERldmVsb3BtZW50IENlbnRlciBHZXJtYW55IEdtYkgKS3JhdXNlbnN0ci4gMzgKMTAxMTcg
-QmVybGluCkdlc2NoYWVmdHNmdWVocnVuZzogQ2hyaXN0aWFuIFNjaGxhZWdlciwgSm9uYXRoYW4g
-V2Vpc3MKRWluZ2V0cmFnZW4gYW0gQW10c2dlcmljaHQgQ2hhcmxvdHRlbmJ1cmcgdW50ZXIgSFJC
-IDE0OTE3MyBCClNpdHo6IEJlcmxpbgpVc3QtSUQ6IERFIDI4OSAyMzcgODc5CgoK
+On Fri, 2022-02-25 at 15:42 +0000, David Woodhouse wrote:
+> On Fri, 2022-02-25 at 17:11 +0200, Maxim Levitsky wrote:
+> > On Fri, 2022-02-25 at 14:56 +0000, David Woodhouse wrote:
+> > > On Fri, 2022-02-25 at 16:46 +0200, Maxim Levitsky wrote:
+> > > > Assuming that this is approved and accepted upstream,
+> > > > that is even better that my proposal of doing this
+> > > > when APICv is enabled.
+> > > > 
+> > > > Since now apic id is always read only, now we should not 
+> > > > forget to clean up some parts of kvm like kvm_recalculate_apic_map,
+> > > > which are not needed anymore
+> > > 
+> > > Can we also now optimise kvm_get_vcpu_by_id() so it doesn't have to do
+> > > a linear search over all the vCPUs when there isn't a 1:1
+> > > correspondence with the vCPU index?
+> > 
+> > I don't think so since vcpu id can still be set by userspace to anything,
+> > and this is even used to encode topology in it.
+> 
+> Yes, but it can only be set at vCPU creation time and it has to be
+> unique.
+> 
+> > However a hash table can still be used there to speed it up regardless of
+> > read-only apic id IMHO.
+> > 
+> > Or, even better than a hash table, I see that KVM already 
+> > limits vcpu_id to KVM_MAX_VCPUS * 4 with a comment that only two extra
+> > bits of topology are used:
+> 
+> We already have the kvm_apic_map which provides a fast lookup. The key
+> point here is that the APIC ID can't *change* from vcpu->vcpu_id any
+> more, so we can actually use the kvm_apic_map for kvm_get_vcpu_by_id()
+> now, can't we?
+> 
+Right! I wrote my response partially when I still assumed that vcpu_id
+can be any 32 bit number (thus hash table), 
+and later checked that it is capped by KVM_MAX_VCPUS * 4 which isn't a big number, 
+plus as I now see in the kvm_recalculate_apic_map
+the map is dynamically allocated up to the max apic id.
+
+(technically speaking an array is a hash table).
+
+Now the map would only be needed to be rebuit few times when new vCPUs are added,
+and can be used to locate vcpu by its apic id.
+
+I so hope that this patch is accepted so all of this could be done.
+
+Best regards,
+	Maxim Levitsky
 
