@@ -2,135 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A17B24C4A3C
-	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 17:13:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 44C074C4A3E
+	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 17:13:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242679AbiBYQOD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 11:14:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58526 "EHLO
+        id S242689AbiBYQOG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 11:14:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58834 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237566AbiBYQOB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Feb 2022 11:14:01 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6FF8513859E
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 08:13:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645805608;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=xxNAibxsiiU2bHsBXx2buGz12V3hEqmNOWKO5gCjbww=;
-        b=JsPye5wzxW+aq/a6E+lErGOhRLaXAOxasLor6/cN3fNJN2aj+LPMJLAzaYawT1cCtZ2xdP
-        20o8G40e7cI2oACzB8oJ+AjsRNmEZIzFxOBiAYtEz4JFpPUBHbNlV4jYlzjJtOHiYncXIh
-        XE+SRar7D9KiMNk8n52T/yheAd/70VY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-178-439FHvLDMqa5-AmaKbS38A-1; Fri, 25 Feb 2022 11:13:25 -0500
-X-MC-Unique: 439FHvLDMqa5-AmaKbS38A-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8B4EB1006AA5;
-        Fri, 25 Feb 2022 16:13:21 +0000 (UTC)
-Received: from starship (unknown [10.40.195.190])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3565C8379F;
-        Fri, 25 Feb 2022 16:12:41 +0000 (UTC)
-Message-ID: <57e91d8f75d6e39432a2fef5d899e3238154863f.camel@redhat.com>
-Subject: Re: [PATCH v6 6/9] KVM: x86: lapic: don't allow to change APIC ID
- unconditionally
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     David Woodhouse <dwmw2@infradead.org>,
-        Zeng Guang <guang.zeng@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jethro Beekman <jethro@fortanix.com>,
-        Kai Huang <kai.huang@intel.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
-        Robert Hu <robert.hu@intel.com>, Gao Chao <chao.gao@intel.com>
-Date:   Fri, 25 Feb 2022 18:12:41 +0200
-In-Reply-To: <38b6a762bea2cdbe5e761daf5dbc351b18f28de3.camel@infradead.org>
-References: <20220225082223.18288-1-guang.zeng@intel.com>
-         <20220225082223.18288-7-guang.zeng@intel.com>
-         <79f5ce60c65280f4fb7cba0ceedaca0ff5595c48.camel@redhat.com>
-         <eb849245c98ea7f5d5e9320ee6ee6b0d1851b439.camel@infradead.org>
-         <b9638fe3383d7b36846255e1d05afa9c1bfc7a0f.camel@redhat.com>
-         <38b6a762bea2cdbe5e761daf5dbc351b18f28de3.camel@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        with ESMTP id S237566AbiBYQOF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Feb 2022 11:14:05 -0500
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 231CF14FFCB
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 08:13:33 -0800 (PST)
+Received: by mail-pl1-x62c.google.com with SMTP id i1so5218921plr.2
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 08:13:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=AOmvrkfJdSOt4B+8w91ON8dJooZf1Q4JMpVsgKimWBM=;
+        b=QeIbOEbY69mEiBFOWAa2Phv4vkerSxfhOVuOtHUkjrfC8BMToPkvFr51DnundDP9MC
+         iRbXt3eg274Iu2IZqiAbt0CSRKIwYzESdeh8wNFmXu05RzX9deKg0KT1H/yLdfBtKQAp
+         Z2HJ+eVFW4itd6aGWCkrKqisO0ASv19B/i6j8x0S/bhkJ0y9N7QIaHhhIfnsE16rZVYT
+         SPjLad6jbFW1P0q3EDPurkvkK2cwkM3SEvx97U5QF/7twCxY+JPnuYaKtbyHZiawQFHN
+         FVNIUH0iUqwbk35WGVu12/qRHOgJXTKp1eDRf5Vl/6LYG/9JBxPLMGEHHTFJi6KStjHs
+         PAYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=AOmvrkfJdSOt4B+8w91ON8dJooZf1Q4JMpVsgKimWBM=;
+        b=UUNvAi9EqrOhli4nBm1aoNxc+3bIidlFDfT2FEgfPYCUJDc+pDLYNImpW470+uUTyw
+         bN2wEljSnBYC64Z7dVQL3ckbpQ5ew7ABS5JlOH+f/kaXmR199S/gldWEHsMLtI2Uhrof
+         YJCGhgZZ36DlX7D2lwL0WCdy4pp5s3rN4FIgfCaBWaceh+gfT677gSI5X8nDHFFolNYu
+         cmIHMN5Oxp08OmDNFQlMX+4WgGuR32yYPQJACwjS83ZStC2NcB6sKemUGLCv3wlDYvoc
+         ylb9W1Vrg8f8M4RCJCM7t/nNL+onCcx/uPMQ7JYoWQcA5cy0sr2adYpfpywDnkLEeAGW
+         hKEg==
+X-Gm-Message-State: AOAM530+WXMgOuCn5SOTmPlVbmeKYUpxqsSPa7uzk5Vmk27RHArfFAKE
+        Pk6rEuQko6OfOSyUneS1ZU3dwQ==
+X-Google-Smtp-Source: ABdhPJyBxq/6L6qxqJiCyuw83piyxlv2doR7gLQDeYgclfDunUEzXHwr6mQZafrkPMIM2MNjUtzxhQ==
+X-Received: by 2002:a17:902:ab4c:b0:14f:bb61:ef0a with SMTP id ij12-20020a170902ab4c00b0014fbb61ef0amr8079545plb.84.1645805612386;
+        Fri, 25 Feb 2022 08:13:32 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id n22-20020a056a0007d600b004f3ba7c23e2sm3841458pfu.37.2022.02.25.08.13.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Feb 2022 08:13:31 -0800 (PST)
+Date:   Fri, 25 Feb 2022 16:13:27 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     "Woodhouse, David" <dwmw@amazon.co.uk>
+Cc:     "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "frankja@linux.ibm.com" <frankja@linux.ibm.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "imbrenda@linux.ibm.com" <imbrenda@linux.ibm.com>,
+        "david@redhat.com" <david@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2] KVM: Don't actually set a request when evicting vCPUs
+ for GFN cache invd
+Message-ID: <YhkAJ+nw2lCzRxsg@google.com>
+References: <20220223165302.3205276-1-seanjc@google.com>
+ <2547e9675d855449bc5cc7efb97251d6286a377c.camel@amazon.co.uk>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <2547e9675d855449bc5cc7efb97251d6286a377c.camel@amazon.co.uk>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2022-02-25 at 15:42 +0000, David Woodhouse wrote:
-> On Fri, 2022-02-25 at 17:11 +0200, Maxim Levitsky wrote:
-> > On Fri, 2022-02-25 at 14:56 +0000, David Woodhouse wrote:
-> > > On Fri, 2022-02-25 at 16:46 +0200, Maxim Levitsky wrote:
-> > > > Assuming that this is approved and accepted upstream,
-> > > > that is even better that my proposal of doing this
-> > > > when APICv is enabled.
-> > > > 
-> > > > Since now apic id is always read only, now we should not 
-> > > > forget to clean up some parts of kvm like kvm_recalculate_apic_map,
-> > > > which are not needed anymore
-> > > 
-> > > Can we also now optimise kvm_get_vcpu_by_id() so it doesn't have to do
-> > > a linear search over all the vCPUs when there isn't a 1:1
-> > > correspondence with the vCPU index?
-> > 
-> > I don't think so since vcpu id can still be set by userspace to anything,
-> > and this is even used to encode topology in it.
+On Fri, Feb 25, 2022, Woodhouse, David wrote:
+> On Wed, 2022-02-23 at 16:53 +0000, Sean Christopherson wrote:
+> > Don't actually set a request bit in vcpu->requests when making a request
+> > purely to force a vCPU to exit the guest.  Logging a request but not
+> > actually consuming it would cause the vCPU to get stuck in an infinite
+> > loop during KVM_RUN because KVM would see the pending request and bail
+> > from VM-Enter to service the request.
 > 
-> Yes, but it can only be set at vCPU creation time and it has to be
-> unique.
+> Hm, it might be that we *do* want to do some work.
 > 
-> > However a hash table can still be used there to speed it up regardless of
-> > read-only apic id IMHO.
-> > 
-> > Or, even better than a hash table, I see that KVM already 
-> > limits vcpu_id to KVM_MAX_VCPUS * 4 with a comment that only two extra
-> > bits of topology are used:
+> I think there's a problem with the existing kvm_host_map that we
+> haven't yet resolved with the new gfn_to_pfn_cache.
 > 
-> We already have the kvm_apic_map which provides a fast lookup. The key
-> point here is that the APIC ID can't *change* from vcpu->vcpu_id any
-> more, so we can actually use the kvm_apic_map for kvm_get_vcpu_by_id()
-> now, can't we?
+> Look for the calls to 'kvm_vcpu_unmap(…, true)' in e.g. vmx/nested.c
 > 
-Right! I wrote my response partially when I still assumed that vcpu_id
-can be any 32 bit number (thus hash table), 
-and later checked that it is capped by KVM_MAX_VCPUS * 4 which isn't a big number, 
-plus as I now see in the kvm_recalculate_apic_map
-the map is dynamically allocated up to the max apic id.
+> Now, what if a vCPU is in guest mode, doesn't vmexit back to the L1,
+> its userspace thread takes a signal and returns to userspace.
+> 
+> The pages referenced by those maps may have been written, but because
+> the cache is still valid, they haven't been marked as dirty in the KVM
+> dirty logs yet.
+> 
+> So, a traditional live migration workflow once it reaches convergence
+> would pause the vCPUs, copy the final batch of dirty pages to the
+> destination, then destroy the VM on the source.
+> 
+> And AFAICT those mapped pages don't actually get marked dirty until
+> nested_vmx_free_cpu() calls vmx_leave_nested(). Which will probably
+> trigger the dirty log WARN now, since there's no active vCPU context
+> for logging, right?
+> 
+> And the latest copy of those pages never does get copied to the
+> destination.
+> 
+> Since I didn't spot that problem until today, the pfn_to_gfn_cache
+> design inherited it too. The 'dirty' flag remains set in the GPC until
+> a subsequent revalidate or explicit unmap.
+> 
+> Since we need an active vCPU context to do dirty logging (thanks, dirty
+> ring)... and since any time vcpu_run exits to userspace for any reason
+> might be the last time we ever get an active vCPU context... I think
+> that kind of fundamentally means that we must flush dirty state to the
+> log on *every* return to userspace, doesn't it?
 
-(technically speaking an array is a hash table).
-
-Now the map would only be needed to be rebuit few times when new vCPUs are added,
-and can be used to locate vcpu by its apic id.
-
-I so hope that this patch is accepted so all of this could be done.
-
-Best regards,
-	Maxim Levitsky
-
+I would rather add a variant of mark_page_dirty_in_slot() that takes a vCPU, which
+we whould have in all cases.  I see no reason to require use of kvm_get_running_vcpu().
