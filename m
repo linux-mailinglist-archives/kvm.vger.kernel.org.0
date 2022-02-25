@@ -2,143 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 433694C4785
-	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 15:32:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6CF384C4796
+	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 15:34:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241789AbiBYOcP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 09:32:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50346 "EHLO
+        id S239470AbiBYOe3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 09:34:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57528 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241802AbiBYOcK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Feb 2022 09:32:10 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D48981402E
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 06:31:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645799496;
+        with ESMTP id S231965AbiBYOe2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Feb 2022 09:34:28 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E8942763E2;
+        Fri, 25 Feb 2022 06:33:56 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 286CDB831F9;
+        Fri, 25 Feb 2022 14:33:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 251F1C340E7;
+        Fri, 25 Feb 2022 14:33:51 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="GS3fWtqB"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1645799629;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=cxivWoSNWd6p4/vl38jC6Wxn49Np4iZFofyVxWKJ0dU=;
-        b=Ms4cFjB41ecv1LupWa9zzStnp7i17AdpcDeZjZczo7K3KCiFvWvDCqMpKtLfpnCGyZZgjQ
-        HIH0dlKE/baHHeH57GBzrKztAmWgsecPq92At/RDnFNDB9BxuZtYfQrrbeXFA7eTskEsO0
-        G3YVBj+KHHmcE7ZWct5NxCJHI1l11ek=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-427-NFLnV_4gPg2CXTIeu2gkRA-1; Fri, 25 Feb 2022 09:31:33 -0500
-X-MC-Unique: NFLnV_4gPg2CXTIeu2gkRA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9D3E618049CB;
-        Fri, 25 Feb 2022 14:31:30 +0000 (UTC)
-Received: from starship (unknown [10.40.195.190])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 357E27C694;
-        Fri, 25 Feb 2022 14:31:23 +0000 (UTC)
-Message-ID: <9fa1258080c4d5b21a9d56448c02cff1438def90.camel@redhat.com>
-Subject: Re: [PATCH v6 4/9] KVM: VMX: dump_vmcs() reports
- tertiary_exec_control field as well
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Zeng Guang <guang.zeng@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jethro Beekman <jethro@fortanix.com>,
-        Kai Huang <kai.huang@intel.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
-        Robert Hu <robert.hu@intel.com>, Gao Chao <chao.gao@intel.com>,
-        Robert Hoo <robert.hu@linux.intel.com>
-Date:   Fri, 25 Feb 2022 16:31:22 +0200
-In-Reply-To: <20220225082223.18288-5-guang.zeng@intel.com>
-References: <20220225082223.18288-1-guang.zeng@intel.com>
-         <20220225082223.18288-5-guang.zeng@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        bh=f7l+1znU0C3mGGUO232V1hcf63PeBIQ9HzasOLJsYSs=;
+        b=GS3fWtqB1bIfgIGI51lS8j8ppgTmfWTnL/BLepHrXEWwGTqQkEnfaG0h2EEPE85kqfIYBc
+        VEyZFu5mJGLEAB/T3OffmgHyhyZjZy5IC048I+OZLJ6gDvbCfB/dSktTa0JfsIgqEOxi7a
+        P/XMxf5+izlbzRbSgUBu4cryEdBDZHk=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id ffcd5017 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Fri, 25 Feb 2022 14:33:49 +0000 (UTC)
+Date:   Fri, 25 Feb 2022 15:33:44 +0100
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Alexander Graf <graf@amazon.com>
+Cc:     kvm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
+        adrian@parity.io, ardb@kernel.org, ben@skyportsystems.com,
+        berrange@redhat.com, colmmacc@amazon.com, decui@microsoft.com,
+        dwmw@amazon.co.uk, ebiggers@kernel.org, ehabkost@redhat.com,
+        gregkh@linuxfoundation.org, haiyangz@microsoft.com,
+        imammedo@redhat.com, jannh@google.com, kys@microsoft.com,
+        lersek@redhat.com, linux@dominikbrodowski.net, mst@redhat.com,
+        qemu-devel@nongnu.org, raduweis@amazon.com, sthemmin@microsoft.com,
+        tytso@mit.edu, wei.liu@kernel.org
+Subject: Re: [PATCH v4] virt: vmgenid: introduce driver for reinitializing
+ RNG on VM fork
+Message-ID: <YhjoyIUv2+18BwiR@zx2c4.com>
+References: <CAHmME9pJ3wb=EbUErJrCRC=VYGhFZqj2ar_AkVPsUvAnqGtwwg@mail.gmail.com>
+ <20220225124848.909093-1-Jason@zx2c4.com>
+ <05c9f2a9-accb-e0de-aac7-b212adac7eb2@amazon.com>
+ <YhjjuMOeV7+T7thS@zx2c4.com>
+ <88ebdc32-2e94-ef28-37ed-1c927c12af43@amazon.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <88ebdc32-2e94-ef28-37ed-1c927c12af43@amazon.com>
+X-Spam-Status: No, score=-6.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2022-02-25 at 16:22 +0800, Zeng Guang wrote:
-> From: Robert Hoo <robert.hu@linux.intel.com>
+On Fri, Feb 25, 2022 at 03:18:43PM +0100, Alexander Graf wrote:
+> > I recall this part of the old thread. From what I understood, using
+> > "VMGENID" + "QEMUVGID" worked /well enough/, even if that wasn't
+> > technically in-spec. Ard noted that relying on _CID like that is
+> > technically an ACPI spec notification. So we're between one spec and
+> > another, basically, and doing "VMGENID" + "QEMUVGID" requires fewer
+> > changes, as mentioned, appears to work fine in my testing.
+> >
+> > However, with that said, I think supporting this via "VM_Gen_Counter"
+> > would be a better eventual thing to do, but will require acks and
+> > changes from the ACPI maintainers. Do you think you could prepare your
+> > patch proposal above as something on-top of my tree [1]? And if you can
+> > convince the ACPI maintainers that that's okay, then I'll happily take
+> > the patch.
 > 
-> Add tertiary_exec_control field report in dump_vmcs()
 > 
-> Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
-> Signed-off-by: Zeng Guang <guang.zeng@intel.com>
-> ---
->  arch/x86/kvm/vmx/vmx.c | 17 +++++++++++++----
->  1 file changed, 13 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 8a5713d49635..7beba7a9f247 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -5891,6 +5891,7 @@ void dump_vmcs(struct kvm_vcpu *vcpu)
->  	struct vcpu_vmx *vmx = to_vmx(vcpu);
->  	u32 vmentry_ctl, vmexit_ctl;
->  	u32 cpu_based_exec_ctrl, pin_based_exec_ctrl, secondary_exec_control;
-> +	u64 tertiary_exec_control;
->  	unsigned long cr4;
->  	int efer_slot;
->  
-> @@ -5904,9 +5905,16 @@ void dump_vmcs(struct kvm_vcpu *vcpu)
->  	cpu_based_exec_ctrl = vmcs_read32(CPU_BASED_VM_EXEC_CONTROL);
->  	pin_based_exec_ctrl = vmcs_read32(PIN_BASED_VM_EXEC_CONTROL);
->  	cr4 = vmcs_readl(GUEST_CR4);
-> -	secondary_exec_control = 0;
-> +
->  	if (cpu_has_secondary_exec_ctrls())
->  		secondary_exec_control = vmcs_read32(SECONDARY_VM_EXEC_CONTROL);
-> +	else
-> +		secondary_exec_control = 0;
-> +
-> +	if (cpu_has_tertiary_exec_ctrls())
-> +		tertiary_exec_control = vmcs_read64(TERTIARY_VM_EXEC_CONTROL);
-> +	else
-> +		tertiary_exec_control = 0;
->  
->  	pr_err("VMCS %p, last attempted VM-entry on CPU %d\n",
->  	       vmx->loaded_vmcs->vmcs, vcpu->arch.last_vmentry_cpu);
-> @@ -6006,9 +6014,10 @@ void dump_vmcs(struct kvm_vcpu *vcpu)
->  		vmx_dump_msrs("host autoload", &vmx->msr_autoload.host);
->  
->  	pr_err("*** Control State ***\n");
-> -	pr_err("PinBased=%08x CPUBased=%08x SecondaryExec=%08x\n",
-> -	       pin_based_exec_ctrl, cpu_based_exec_ctrl, secondary_exec_control);
-> -	pr_err("EntryControls=%08x ExitControls=%08x\n", vmentry_ctl, vmexit_ctl);
-> +	pr_err("CPUBased=0x%08x SecondaryExec=0x%08x TertiaryExec=0x%016llx\n",
-> +	       cpu_based_exec_ctrl, secondary_exec_control, tertiary_exec_control);
-> +	pr_err("PinBased=0x%08x EntryControls=%08x ExitControls=%08x\n",
-> +	       pin_based_exec_ctrl, vmentry_ctl, vmexit_ctl);
->  	pr_err("ExceptionBitmap=%08x PFECmask=%08x PFECmatch=%08x\n",
->  	       vmcs_read32(EXCEPTION_BITMAP),
->  	       vmcs_read32(PAGE_FAULT_ERROR_CODE_MASK),
+> Sure, let me send the ACPI patch stand alone. No need to include the 
+> VMGenID change in there.
 
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+That's fine. If the ACPI people take it for 5.18, then we can count on
+it being there and adjust the vmgenid driver accordingly also for 5.18.
 
-Best regards,
-	Maxim Levitsky
+I just booted up a Windows VM, and it looks like Hyper-V uses
+"Hyper_V_Gen_Counter_V1", which is also quite long, so we can't really
+HID match on that either.
 
+Jason
