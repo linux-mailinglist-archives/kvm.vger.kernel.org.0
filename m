@@ -2,75 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9B0134C4505
-	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 13:55:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8B2924C4515
+	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 13:57:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240748AbiBYMzp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 07:55:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35334 "EHLO
+        id S240817AbiBYM5d (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 07:57:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235676AbiBYMzo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Feb 2022 07:55:44 -0500
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8543021D0A0
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 04:55:12 -0800 (PST)
-Received: by mail-pg1-x52a.google.com with SMTP id e6so3187788pgn.2
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 04:55:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=gIPLQIBAtfhj/PZ2de8eGc+4Cx/G/kGBx8Jr9LqiBb0=;
-        b=fDAP+Nwn9ciayx9KZfqwqui1pYhSQpGSJlSxvgT1Yzb3tLAl4sMb9trsQ6OqwCUnFx
-         RrDmtLtj4uvzuqE01e7MEXa/2kD0tObOPHSzpE5z89pDd9DDypKUCny+9/LJi9g+kTHr
-         vcBIw/hN7hbgrRhtG+vacrPzeGn9racfx6pgy0RLowrgQq+jgzMp9P3sywd4KTaA7XY2
-         dWQzDkfvVvRnBB2jwWg87y/9dYTJ3+WUQzhmuThLT/YyDNK1qWqI1bE3vDaJInCdG+8c
-         5d1yGzMKqMl8FNaJdls3hBivGrbIf8mBxsfzq/0cGFK8WUWTO6ueKZ8kLKREupt2YRiK
-         TO5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=gIPLQIBAtfhj/PZ2de8eGc+4Cx/G/kGBx8Jr9LqiBb0=;
-        b=aPONQ6vYxqFt7Vkvehxady8aRWAy8HI4jsLJarN2zhwi0SSyh6mmRUS8Ymebxc3LhX
-         1ZWn1uIh5NY2jKBRrad1KDSHtMvZymzh3ymoCRjSE2+7i66YR4LSNBAh7ePl/PxmFxK3
-         kSlR1d9inP0jTw6Kxxtp/k97CwhExv219/DDiDUVMhPjl11ThuvyqBzEWSlKkfWt3vGO
-         uWNn/qPp0P54g/vX5R19JYHSj9iDO35GmYhufZhyPlZYk91CUv3kflVBlolRSpL9enEA
-         5qctGUtjHKWrnMINa9iqwSAPFPdxaeezkc3ZU9ubEd8HdzDtqPJzWyahisS5Ng1R/Zi2
-         5nCA==
-X-Gm-Message-State: AOAM530YZao4+jg3lnhNZNwhULifSt6g1RegU/p24JvtTBNKZe0bA7Ql
-        we3lZLuMx5VXXgPKxThN6Tt55jeiL1IQ/2LYU7I=
-X-Google-Smtp-Source: ABdhPJytViQsMNRFajL/A67mJyN7GKsWPE3xuJF8dakK0vzIBlv9S1hHUNGamdEqiOi+6exCZoyGDLhLZyy9qUVz4yA=
-X-Received: by 2002:a63:a84f:0:b0:374:3bb7:6d7d with SMTP id
- i15-20020a63a84f000000b003743bb76d7dmr6145096pgp.608.1645793712110; Fri, 25
- Feb 2022 04:55:12 -0800 (PST)
+        with ESMTP id S235676AbiBYM53 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Feb 2022 07:57:29 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A9B7286EE;
+        Fri, 25 Feb 2022 04:56:52 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 062BF61BF8;
+        Fri, 25 Feb 2022 12:56:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5C3AC340E8;
+        Fri, 25 Feb 2022 12:56:50 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="enMYkBkI"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1645793808;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=XssgunSt6iK78jyshO3hMq9+wDKO/OCGHO1mFFLrZQQ=;
+        b=enMYkBkIudB/0krPIVVLhzRClwGqp92bzymz3GlaPY/CynpKIXYX03wKBGZ52ZVCe9Eujn
+        kgPdqeLrCuQURxB1lO3tnKlABuuou7tz8M7L/27vzfUSx9/E+GZStDwJkrdcK/PldDBDFn
+        5MO5bLzFBsxUJCj89tpuB1ncnSfIF98=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 7f77180f (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Fri, 25 Feb 2022 12:56:48 +0000 (UTC)
+Received: by mail-yb1-f180.google.com with SMTP id e140so5677751ybh.9;
+        Fri, 25 Feb 2022 04:56:46 -0800 (PST)
+X-Gm-Message-State: AOAM53285l4JXrzMYBbOkJo7n7JLpOeJRdxReNaxjVuAUerwEvl8CXL2
+        IcW9eAQxCQ2kHgsFCpzMDGf4f8pw0AeFvhKWKGw=
+X-Google-Smtp-Source: ABdhPJy+bf9nC/iTENWy4XIXFN5EQ0KO9hqlk22myA/sDhwpstQSK4hOUUQQu7RToXFr7rymY6Q0NMRfSY8co9VWFh4=
+X-Received: by 2002:a25:d116:0:b0:61d:e8c9:531e with SMTP id
+ i22-20020a25d116000000b0061de8c9531emr7032586ybg.637.1645793805904; Fri, 25
+ Feb 2022 04:56:45 -0800 (PST)
 MIME-Version: 1.0
-References: <CAJSP0QX7O_auRgTKFjHkBbkBK=B3Z-59S6ZZi10tzFTv1_1hkQ@mail.gmail.com>
- <54dddcf5-85d7-5170-899e-589dd79a34fb@amazon.com>
-In-Reply-To: <54dddcf5-85d7-5170-899e-589dd79a34fb@amazon.com>
-From:   Stefan Hajnoczi <stefanha@gmail.com>
-Date:   Fri, 25 Feb 2022 12:55:01 +0000
-Message-ID: <CAJSP0QXknCnbF-NmPM-dqKfs7M15L8S+ejTrWfe+9c4pVznaSA@mail.gmail.com>
-Subject: Re: Call for GSoC and Outreachy project ideas for summer 2022
-To:     Andreea Florescu <fandree@amazon.com>
-Cc:     qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>,
-        Rust-VMM Mailing List <rust-vmm@lists.opendev.org>,
-        =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
-        John Snow <jsnow@redhat.com>, Sergio Lopez <slp@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Alex Agache <aagch@amazon.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Dmitry Fomichev <Dmitry.Fomichev@wdc.com>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
-        Hanna Reitz <hreitz@redhat.com>, gsserge@amazon.com
+References: <CAHmME9pJ3wb=EbUErJrCRC=VYGhFZqj2ar_AkVPsUvAnqGtwwg@mail.gmail.com>
+ <20220225124848.909093-1-Jason@zx2c4.com> <YhjRVz2184xhkZK3@kroah.com>
+In-Reply-To: <YhjRVz2184xhkZK3@kroah.com>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Fri, 25 Feb 2022 13:56:35 +0100
+X-Gmail-Original-Message-ID: <CAHmME9pGuPEWjr+RLFQi-kKcRuPxmCYyzAJOJtgx+5phwmkZ6Q@mail.gmail.com>
+Message-ID: <CAHmME9pGuPEWjr+RLFQi-kKcRuPxmCYyzAJOJtgx+5phwmkZ6Q@mail.gmail.com>
+Subject: Re: [PATCH v4] virt: vmgenid: introduce driver for reinitializing RNG
+ on VM fork
+To:     Greg KH <gregkh@linuxfoundation.org>
+Cc:     KVM list <kvm@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-hyperv@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        adrian@parity.io, Ard Biesheuvel <ardb@kernel.org>,
+        ben@skyportsystems.com,
+        =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        Dexuan Cui <decui@microsoft.com>,
+        "Woodhouse, David" <dwmw@amazon.co.uk>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Alexander Graf <graf@amazon.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Jann Horn <jannh@google.com>,
+        "K . Y . Srinivasan" <kys@microsoft.com>,
+        Laszlo Ersek <lersek@redhat.com>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        QEMU Developers <qemu-devel@nongnu.org>,
+        "Weiss, Radu" <raduweis@amazon.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        "Theodore Ts'o" <tytso@mit.edu>, Wei Liu <wei.liu@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+X-Spam-Status: No, score=-6.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,31 +87,35 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 23 Feb 2022 at 08:48, Andreea Florescu <fandree@amazon.com> wrote:
-> On 1/28/22 17:47, Stefan Hajnoczi wrote:
-> > CAUTION: This email originated from outside of the organization. Do not click links or open attachments unless you can confirm the sender and know the content is safe.
-> >
-> >
-> >
-> > Dear QEMU, KVM, and rust-vmm communities,
-> > QEMU will apply for Google Summer of Code 2022
-> > (https://summerofcode.withgoogle.com/) and has been accepted into
-> > Outreachy May-August 2022 (https://www.outreachy.org/). You can now
-> > submit internship project ideas for QEMU, KVM, and rust-vmm!
-> >
-> > If you have experience contributing to QEMU, KVM, or rust-vmm you can
-> > be a mentor. It's a great way to give back and you get to work with
-> > people who are just starting out in open source.
-> >
-> > Please reply to this email by February 21st with your project ideas.
-> Hey, I am a bit late here, but in case it is still possible, I would
-> like to also propose a project.
+On Fri, Feb 25, 2022 at 1:53 PM Greg KH <gregkh@linuxfoundation.org> wrote:
 >
-> Title: Extend the aarch64 support for rust-vmm/vmm-reference
+> On Fri, Feb 25, 2022 at 01:48:48PM +0100, Jason A. Donenfeld wrote:
+> > +static struct acpi_driver acpi_driver = {
+> > +     .name = "vmgenid",
+> > +     .ids = vmgenid_ids,
+> > +     .owner = THIS_MODULE,
+> > +     .ops = {
+> > +             .add = vmgenid_acpi_add,
+> > +             .notify = vmgenid_acpi_notify,
+> > +     }
+> > +};
+> > +
+> > +static int __init vmgenid_init(void)
+> > +{
+> > +     return acpi_bus_register_driver(&acpi_driver);
+> > +}
+> > +
+> > +static void __exit vmgenid_exit(void)
+> > +{
+> > +     acpi_bus_unregister_driver(&acpi_driver);
+> > +}
+> > +
+> > +module_init(vmgenid_init);
+> > +module_exit(vmgenid_exit);
+>
+> Nit, you could use module_acpi_driver() to make this even smaller if you
+> want to.
 
-Great project idea. I have added it to the list!
+Nice! Will do.
 
-Please take a look and let me know if you want to change anything:
-https://wiki.qemu.org/Google_Summer_of_Code_2022#Extend_aarch64_support_in_rust-vmm.2Fvmm-reference
-
-Stefan
+Jason
