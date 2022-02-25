@@ -2,95 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E298A4C46C0
-	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 14:39:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 15B8A4C46D5
+	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 14:45:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241541AbiBYNjj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 08:39:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46410 "EHLO
+        id S240150AbiBYNp6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 08:45:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33338 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239525AbiBYNjj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Feb 2022 08:39:39 -0500
-Received: from mail-wm1-x34a.google.com (mail-wm1-x34a.google.com [IPv6:2a00:1450:4864:20::34a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8A132028B0
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 05:39:06 -0800 (PST)
-Received: by mail-wm1-x34a.google.com with SMTP id r206-20020a1c44d7000000b00380e36c6d34so1571196wma.4
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 05:39:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=98qRkgzqUA4uIyFb6DyG2/PM4ohLc28A3d+n2FMoR2g=;
-        b=SaLP7VFxlAAUSia04NKVwItE0Qp3jy3z06hhaS2eREtAb5mr5fQwCWzyDOA+oFvIBq
-         XJp4dqQy2yi0jDI37+KerSkKj7sPmC3shqY8Iwuh1MHl4P3C+iE2LPtsgSiU1qkdLguN
-         HUN/kz1uWommFn626N//gt0SF1rLHQshWsq6gWgSQAsU/slveGGwzko8mZKIgTRE2BZo
-         CJD7z2E7BRkWBU2zy/es714usPf9lZLeaFP5Y/Xcn/Dj+xAVokOQsCCOHAk+KXcBaPva
-         MuLd/l1BdWGbW1ozOaN4mHRlolXEmygO/tHvospbu3b/tg6GkAjYAu2PLqrdp+j8LVzH
-         tEQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=98qRkgzqUA4uIyFb6DyG2/PM4ohLc28A3d+n2FMoR2g=;
-        b=ZTbvOw/Ud5eP+SIXxsWB93LimDCpISAm6/jfg/XvwZY7xA3Ksj/R5JXngRO0tAptVr
-         ZwL0pemTf3d+96od7Fkobqy90iXhVUSvv4lfTb7cRwQrCNJy8pSNeiVU/wh+OChgdXXc
-         XdVZi7IyIjadSTHpWH3GGAorOLDCGfMC+A9NJicfjZ5kxvuHUXICc7fwz2qWA9AfGocG
-         pYU71G5SIn+/zwRm9SSmTiH+p1U1cb3JzNIHzt1RsIMRKjJS2L+iQ89sU2R64tMrSZMw
-         0b9WvedQhXCVGTbEaPooCHUzj1vJrJYkulcG6wxMB/DM0Fhs0eNj5GRvqTuEMJxHvTsC
-         N0YQ==
-X-Gm-Message-State: AOAM5313j6gB4GWMAEwpkVw1KMyOHVG/eBqGR+w0fyLUmFLjBtDs69kl
-        Lp+Xhz8w11JYZ5Tu9LYdeuX7P8bpG2fzV+G/7zuOjVPg5Tigia13G5Fdt7yAVPNkj0pxT03Ao58
-        8ztC6AZJ+cXGYG1qpx41vHrat1rnCytGH3xEeKWAvmyd+qWqCU022ozdtWFxrJzSaGYUfyLDk5g
-        ==
-X-Google-Smtp-Source: ABdhPJy2oC2R+v03jw69Q2wfAhlKqs4s0XFmL1++/WHIYOv2lwosSEHRypfQAewDVOInZXLXHe3u1i2DFny47DUwwBU=
-X-Received: from sene.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:27c4])
- (user=sebastianene job=sendgmr) by 2002:a05:600c:19c9:b0:352:d507:9e89 with
- SMTP id u9-20020a05600c19c900b00352d5079e89mr2736990wmq.92.1645796345279;
- Fri, 25 Feb 2022 05:39:05 -0800 (PST)
-Date:   Fri, 25 Feb 2022 13:37:47 +0000
-In-Reply-To: <20220225133743.41207-1-sebastianene@google.com>
-Message-Id: <20220225133743.41207-4-sebastianene@google.com>
-Mime-Version: 1.0
-References: <20220225133743.41207-1-sebastianene@google.com>
-X-Mailer: git-send-email 2.35.1.574.g5d30c73bfb-goog
-Subject: [PATCH kvmtool v5 3/3] Add --no-pvtime command line argument
-From:   Sebastian Ene <sebastianene@google.com>
-To:     kvm@vger.kernel.org
-Cc:     qperret@google.com, maz@kernel.org, kvmarm@lists.cs.columbia.edu,
-        will@kernel.org, julien.thierry.kdev@gmail.com,
-        Sebastian Ene <sebastianene@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S234303AbiBYNp4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Feb 2022 08:45:56 -0500
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 96FF0210D74
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 05:45:24 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5B8D6106F;
+        Fri, 25 Feb 2022 05:45:24 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0EBA73F5A1;
+        Fri, 25 Feb 2022 05:45:20 -0800 (PST)
+Date:   Fri, 25 Feb 2022 13:45:45 +0000
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Haibo Xu <haibo.xu@linaro.org>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        "Russell King (Oracle)" <linux@armlinux.org.uk>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        karl.heubaum@oracle.com, mihai.carabas@oracle.com,
+        miguel.luis@oracle.com, kernel-team@android.com
+Subject: Re: [PATCH v6 42/64] KVM: arm64: nv: Fold guest's HCR_EL2
+ configuration into the host's
+Message-ID: <YhjdiTiHNApGkRuc@monolith.localdoman>
+References: <20220128121912.509006-1-maz@kernel.org>
+ <20220128121912.509006-43-maz@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220128121912.509006-43-maz@kernel.org>
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The command line argument disables the stolen time functionality when is
-specified.
+Hi,
 
-Signed-off-by: Sebastian Ene <sebastianene@google.com>
----
- builtin-run.c | 2 ++
- 1 file changed, 2 insertions(+)
+On Fri, Jan 28, 2022 at 12:18:50PM +0000, Marc Zyngier wrote:
+> When entering a L2 guest (nested virt enabled, but not in hypervisor
+> context), we need to honor the traps the L1 guest has asked enabled.
+> 
+> For now, just OR the guest's HCR_EL2 into the host's. We may have to do
+> some filtering in the future though.
 
-diff --git a/builtin-run.c b/builtin-run.c
-index 9a1a0c1..7c8be9d 100644
---- a/builtin-run.c
-+++ b/builtin-run.c
-@@ -128,6 +128,8 @@ void kvm_run_set_wrapper_sandbox(void)
- 			" rootfs"),					\
- 	OPT_STRING('\0', "hugetlbfs", &(cfg)->hugetlbfs_path, "path",	\
- 			"Hugetlbfs path"),				\
-+	OPT_BOOLEAN('\0', "no-pvtime", &(cfg)->no_pvtime, "Disable"	\
-+			" stolen time"),				\
- 									\
- 	OPT_GROUP("Kernel options:"),					\
- 	OPT_STRING('k', "kernel", &(cfg)->kernel_filename, "kernel",	\
--- 
-2.35.1.574.g5d30c73bfb-goog
+Hmm... looks to me like the filtering is already implemented via the
+HCR_GUEST_NV_FILTER_FLAGS. Or am I misunderstanding something?
 
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/hyp/vhe/switch.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> index 0e164cc8e913..5e8eafac27c6 100644
+> --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> @@ -78,6 +78,11 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+>  			if (!vcpu_el2_tge_is_set(vcpu))
+>  				hcr |= HCR_AT | HCR_TTLB;
+>  		}
+> +	} else if (vcpu_has_nv(vcpu)) {
+> +		u64 vhcr_el2 = __vcpu_sys_reg(vcpu, HCR_EL2);
+> +
+> +		vhcr_el2 &= ~HCR_GUEST_NV_FILTER_FLAGS;
+
+
+> +		hcr |= vhcr_el2;
+
+This makes sense, we only the guest to add extra traps on top of what KVM
+already traps, not remove traps from what KVM has configured.
+
+However, HCR_EL2.FIEN (bit 47) disables traps when the bit is 1. Shouldn't
+it be part of the HCR_GUEST_NV_FILTER_FLAGS?
+
+Thanks,
+Alex
+
+>  	}
+>  
+>  	___activate_traps(vcpu, hcr);
+> -- 
+> 2.30.2
+> 
