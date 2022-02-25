@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 025F64C426C
-	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 11:35:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D7B344C4276
+	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 11:38:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239580AbiBYKgX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 05:36:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36320 "EHLO
+        id S239587AbiBYKgf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 05:36:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239556AbiBYKgW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Feb 2022 05:36:22 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3A481235854
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 02:35:51 -0800 (PST)
+        with ESMTP id S239590AbiBYKgd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Feb 2022 05:36:33 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 08C4323A19F
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 02:36:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645785350;
+        s=mimecast20190719; t=1645785361;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
         bh=cyh9GNwkSeiWX8VVWJet6cmrStrv1Y1BhHYKMAKCy08=;
-        b=HA8OWD7fvU9UmTydmvRUUxwKVZ1bKB0yyE0ZeY9+GqnxnJWcDmX1o4+cr+u3dydYsZHyf6
-        b96cUqs643zzPXk/Y0b+1IILqyXJUhAxj+fjE9ps0RJpbttjkAHs9q9VlJdGwRI+AwqR0L
-        6OdFJ/7CvUvIOwxcRtvlAN+hCFoS3ic=
+        b=cSM+OVi/Kj5elSZKcaSJttwI3Xig0m64OEoxs+MsJMRXzdIe5e0DtIIEyX4VJ2y7PWhDxX
+        7/tQUUYbhDr0HwLfGw8gRjEFWcZH6bJ9Jn5/BM8mJYiATRNHU3lX/WkaUkllzlShZp3tJm
+        Fp7WxtME6Bl6QJBjL5Pdm3tnkRsRdZM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-622-Sfr8kc4iPYqzhIEGiHj-Aw-1; Fri, 25 Feb 2022 05:35:46 -0500
-X-MC-Unique: Sfr8kc4iPYqzhIEGiHj-Aw-1
+ us-mta-649-Zq3ovRx0MUK5sTON3_zAJQ-1; Fri, 25 Feb 2022 05:35:55 -0500
+X-MC-Unique: Zq3ovRx0MUK5sTON3_zAJQ-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4C2012E62;
-        Fri, 25 Feb 2022 10:35:45 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EA3EE1091DA0;
+        Fri, 25 Feb 2022 10:35:52 +0000 (UTC)
 Received: from avogadro.lan (unknown [10.39.193.11])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3B24B23797;
-        Fri, 25 Feb 2022 10:35:43 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 153DB2619D;
+        Fri, 25 Feb 2022 10:35:50 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     Like Xu <like.xu.linux@gmail.com>
+To:     Sean Christopherson <seanjc@google.com>
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH] selftests: kvm: add hyperv_svm_test to .gitignore
-Date:   Fri, 25 Feb 2022 11:35:04 +0100
-Message-Id: <20220225103507.483695-2-pbonzini@redhat.com>
-In-Reply-To: 20220225070558.73195-1-likexu@tencent.com
+        Joerg Roedel <joro@8bytes.org>,
+        Like Xu <like.xu.linux@gmail.com>
+Subject: Re: [PATCH] KVM: x86: Temporarily drop kvm->srcu when uninitialized vCPU is blocking
+Date:   Fri, 25 Feb 2022 11:35:05 +0100
+Message-Id: <20220225103507.483695-3-pbonzini@redhat.com>
+In-Reply-To: 20220224212646.3544811-1-seanjc@google.com
 References: 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
