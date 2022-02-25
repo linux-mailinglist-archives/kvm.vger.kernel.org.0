@@ -2,155 +2,232 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A82FA4C4E10
-	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 19:52:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 552AC4C4E2E
+	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 19:58:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233471AbiBYSxK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 13:53:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37400 "EHLO
+        id S233889AbiBYS6v (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 13:58:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233437AbiBYSxH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Feb 2022 13:53:07 -0500
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FA3328984
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 10:52:33 -0800 (PST)
-Received: by mail-pl1-x62c.google.com with SMTP id e13so5567510plh.3
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 10:52:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=7dNTJr5q++G+HEI8xxfjALjTub5ZXLo8DVC3Ljh+kyE=;
-        b=NSDOuFp2RoBhAYqmgYPIBl/sqN0WzIMaNQnUJ/j912ElTGwDdxn+ONMwQRoT4jGjm7
-         ANyokD8T1yBD7YZtI2i/sI7mKNs1OQEAWtHRGO5NfawcfXeW+9B5N2dzioGeh/6zq7Z2
-         ANDM0HjWo/bHKifNrA/bySKjQ/lAWQ9v+JAYIJVhFc8DcMuAxh7nKQPjnwO0XckwAkJx
-         pPx+D+GBgvy11kuxiVF/O88tQQWzCaeqRt6hJUPJn2GEwlPVBHMCuuSDbtZorJD+y0py
-         O6QhpxhBDOJlV9ImAOzYEkh9tfSQhfNPiYgo2EWZFRYIJa8M+Qo2Zpk8Rqdp5pLLfyJ8
-         7tcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=7dNTJr5q++G+HEI8xxfjALjTub5ZXLo8DVC3Ljh+kyE=;
-        b=6yMNYTuIfXWwxBS5oPCr5e6tT0LR/VGozdVUq+pKD6Opl7H/+qheU+z768TvWrTNVD
-         N+wK0nGUXlc/1+3rAPk4KVtEjQ/GBTtJgIDuSHRMsIuKKsSphv3YZizdsrriEU+VyKsO
-         Tk4oDnP+jNa5W+9+BLHCm+Z7a2619nai8Tv3UcYESfxV7HML/VqzrTR46U/71gMXgK/U
-         4esoq1jXOKNYV5bEX6UjrKQB7u4FN78hn/5NPQxf6c5QCHeqwIk5tJxiRHrMA1T4OCUN
-         0w/Q2rWeRbX/G0KWFlfNuU+8kFu4ib8xYg49ReqfmT6Sx21v8dFFI+kWd7YN24hjVseX
-         95fA==
-X-Gm-Message-State: AOAM532qQ5r2yK7NtnNEoj8dg0jqKViBe+Up5xKnH8z3zsf9IPFV0mBc
-        0B1jskzVEhad94u6nBv5T0+o5g==
-X-Google-Smtp-Source: ABdhPJwTfmdcyRiooN9YFNYHZwz54lNVcDJAqspFOY1cX7PJohuNNKI7950leqwKyvZvysW9mb124Q==
-X-Received: by 2002:a17:90b:1104:b0:1b8:b90b:22c7 with SMTP id gi4-20020a17090b110400b001b8b90b22c7mr4522553pjb.45.1645815152764;
-        Fri, 25 Feb 2022 10:52:32 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id u19-20020a056a00159300b004e1590f88c1sm4319237pfk.220.2022.02.25.10.52.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Feb 2022 10:52:32 -0800 (PST)
-Date:   Fri, 25 Feb 2022 18:52:28 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "frankja@linux.ibm.com" <frankja@linux.ibm.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "imbrenda@linux.ibm.com" <imbrenda@linux.ibm.com>,
-        "david@redhat.com" <david@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [EXTERNAL] [PATCH v2] KVM: Don't actually set a request when
- evicting vCPUs for GFN cache invd
-Message-ID: <YhklbH6ZyYrZmmGw@google.com>
-References: <20220223165302.3205276-1-seanjc@google.com>
- <2547e9675d855449bc5cc7efb97251d6286a377c.camel@amazon.co.uk>
- <YhkAJ+nw2lCzRxsg@google.com>
- <915ddc7327585bbe8587b91b8cd208520d684db1.camel@infradead.org>
- <YhkRcK64Jya6YpA9@google.com>
- <550e1d7ef2b2f7f666e5b60e9bb855a8ccc0fb14.camel@infradead.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <550e1d7ef2b2f7f666e5b60e9bb855a8ccc0fb14.camel@infradead.org>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        with ESMTP id S233868AbiBYS6t (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Feb 2022 13:58:49 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 024911EBA83
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 10:58:16 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8FBBE60B57
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 18:58:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0DC1C340E7;
+        Fri, 25 Feb 2022 18:58:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1645815496;
+        bh=Q0F0Vr2oAKsTHDX197nsDi4YWEXysGYrQy8OtS9Ofo4=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=dUPxGeW5yIMDL3458nshLukjBg6ZV+UEyQsdf3TeGvvLOZ2N8OkSRYdZmseDWMrrb
+         /Pg9EYJt5mbGKydHd0Tt0zvwCtl6mJYQtVTQPKA/nJmwEH8H5DwLLNKfuqqN4Sux0+
+         B72QPdWPMU8xyX3oqdc8G8KdcIhD/9sP8qmBV8opTH2ZKb9FRwMAPYoaRjI6S99yQd
+         0nWoVnS7nxTfaNryQPHPSmdYcbl0p5w+O/IaUnTcm+uvjqOJEip/LiVM0R71HnLH+F
+         2eljEKGimj1YWn0r3a3w/JwKrjxQe+as9I7QTYMHYcgGYVsUO28f9E9vAntFc8FwJB
+         Awk59wMNokw8g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nNfnB-00AcUf-KF; Fri, 25 Feb 2022 18:58:13 +0000
+Date:   Fri, 25 Feb 2022 18:58:13 +0000
+Message-ID: <87fso63ha2.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oupton@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, Peter Shier <pshier@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>,
+        Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH v3 09/19] KVM: arm64: Implement PSCI SYSTEM_SUSPEND
+In-Reply-To: <YhfeBfgbDA8IGc9f@google.com>
+References: <20220223041844.3984439-1-oupton@google.com>
+        <20220223041844.3984439-10-oupton@google.com>
+        <87wnhk2whx.wl-maz@kernel.org>
+        <YhfeBfgbDA8IGc9f@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@google.com, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, anup@brainfault.org, atishp@atishpatra.org, seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, pshier@google.com, reijiw@google.com, ricarkol@google.com, rananta@google.com, jingzhangos@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 25, 2022, David Woodhouse wrote:
-> On Fri, 2022-02-25 at 17:27 +0000, Sean Christopherson wrote:
-> > On Fri, Feb 25, 2022, David Woodhouse wrote:
-> > > On Fri, 2022-02-25 at 16:13 +0000, Sean Christopherson wrote:
-> > > > On Fri, Feb 25, 2022, Woodhouse, David wrote:
-> > > > > Since we need an active vCPU context to do dirty logging (thanks, dirty
-> > > > > ring)... and since any time vcpu_run exits to userspace for any reason
-> > > > > might be the last time we ever get an active vCPU context... I think
-> > > > > that kind of fundamentally means that we must flush dirty state to the
-> > > > > log on *every* return to userspace, doesn't it?
-> > > > 
-> > > > I would rather add a variant of mark_page_dirty_in_slot() that takes a vCPU, which
-> > > > we whould have in all cases.  I see no reason to require use of kvm_get_running_vcpu().
+On Thu, 24 Feb 2022 19:35:33 +0000,
+Oliver Upton <oupton@google.com> wrote:
+> 
+> Hi Marc,
+> 
+> Thanks for reviewing the series. ACK to the nits and smaller comments
+> you've made, I'll incorporate that feedback in the next series.
+> 
+> On Thu, Feb 24, 2022 at 02:02:34PM +0000, Marc Zyngier wrote:
+> > On Wed, 23 Feb 2022 04:18:34 +0000,
+> > Oliver Upton <oupton@google.com> wrote:
 > > > 
-> > > We already have kvm_vcpu_mark_page_dirty(), but it can't use just 'some
-> > > vcpu' because the dirty ring is lockless. So if you're ever going to
-> > > use anything other than kvm_get_running_vcpu() we need to add locks.
+> > > ARM DEN0022D.b 5.19 "SYSTEM_SUSPEND" describes a PSCI call that allows
+> > > software to request that a system be placed in the deepest possible
+> > > low-power state. Effectively, software can use this to suspend itself to
+> > > RAM. Note that the semantics of this PSCI call are very similar to
+> > > CPU_SUSPEND, which is already implemented in KVM.
+> > > 
+> > > Implement the SYSTEM_SUSPEND in KVM. Similar to CPU_SUSPEND, the
+> > > low-power state is implemented as a guest WFI. Synchronously reset the
+> > > calling CPU before entering the WFI, such that the vCPU may immediately
+> > > resume execution when a wakeup event is recognized.
+> > > 
+> > > Signed-off-by: Oliver Upton <oupton@google.com>
+> > > ---
+> > >  arch/arm64/kvm/psci.c  | 51 ++++++++++++++++++++++++++++++++++++++++++
+> > >  arch/arm64/kvm/reset.c |  3 ++-
+> > >  2 files changed, 53 insertions(+), 1 deletion(-)
+> > > 
+> > > diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
+> > > index 77a00913cdfd..41adaaf2234a 100644
+> > > --- a/arch/arm64/kvm/psci.c
+> > > +++ b/arch/arm64/kvm/psci.c
+> > > @@ -208,6 +208,50 @@ static void kvm_psci_system_reset(struct kvm_vcpu *vcpu)
+> > >  	kvm_prepare_system_event(vcpu, KVM_SYSTEM_EVENT_RESET);
+> > >  }
+> > >  
+> > > +static int kvm_psci_system_suspend(struct kvm_vcpu *vcpu)
+> > > +{
+> > > +	struct vcpu_reset_state reset_state;
+> > > +	struct kvm *kvm = vcpu->kvm;
+> > > +	struct kvm_vcpu *tmp;
+> > > +	bool denied = false;
+> > > +	unsigned long i;
+> > > +
+> > > +	reset_state.pc = smccc_get_arg1(vcpu);
+> > > +	if (!kvm_ipa_valid(kvm, reset_state.pc)) {
+> > > +		smccc_set_retval(vcpu, PSCI_RET_INVALID_ADDRESS, 0, 0, 0);
+> > > +		return 1;
+> > > +	}
+> > > +
+> > > +	reset_state.r0 = smccc_get_arg2(vcpu);
+> > > +	reset_state.be = kvm_vcpu_is_be(vcpu);
+> > > +	reset_state.reset = true;
+> > > +
+> > > +	/*
+> > > +	 * The SYSTEM_SUSPEND PSCI call requires that all vCPUs (except the
+> > > +	 * calling vCPU) be in an OFF state, as determined by the
+> > > +	 * implementation.
+> > > +	 *
+> > > +	 * See ARM DEN0022D, 5.19 "SYSTEM_SUSPEND" for more details.
+> > > +	 */
+> > > +	mutex_lock(&kvm->lock);
+> > > +	kvm_for_each_vcpu(i, tmp, kvm) {
+> > > +		if (tmp != vcpu && !kvm_arm_vcpu_powered_off(tmp)) {
+> > > +			denied = true;
+> > > +			break;
+> > > +		}
+> > > +	}
+> > > +	mutex_unlock(&kvm->lock);
 > > 
-> > Heh, actually, scratch my previous comment.  I was going to respond that
-> > kvm_get_running_vcpu() is mutually exclusive with all other ioctls() on the same
-> > vCPU by virtue of vcpu->mutex, but I had forgotten that kvm_get_running_vcpu()
-> > really should be "kvm_get_loaded_vcpu()".  I.e. as long as KVM is in a vCPU-ioctl
-> > path, kvm_get_running_vcpu() will be non-null.
+> > This looks dodgy. Nothing seems to prevent userspace from setting the
+> > mp_state to RUNNING in parallel with this, as only the vcpu mutex is
+> > held when this ioctl is issued.
 > > 
-> > > And while we *could* do that, I don't think it would negate the
-> > > fundamental observation that *any* time we return from vcpu_run to
-> > > userspace, that could be the last time. Userspace might read the dirty
-> > > log for the *last* time, and any internally-cached "oh, at some point
-> > > we need to mark <this> page dirty" is lost because by the time the vCPU
-> > > is finally destroyed, it's too late.
+> > It looks to me that what you want is what lock_all_vcpus() does
+> > (Alexandru has a patch moving it out of the vgic code as part of his
+> > SPE series).
 > > 
-> > Hmm, isn't that an existing bug?  I think the correct fix would be to flush all
-> > dirty vmcs12 pages to the memslot in vmx_get_nested_state().  Userspace _must_
-> > invoke that if it wants to migrated a nested vCPU.
+> > It is also pretty unclear what the interaction with userspace is once
+> > you have released the lock. If the VMM starts a vcpu other than the
+> > suspending one, what is its state? The spec doesn't see to help
+> > here. I can see two options:
+> > 
+> > - either all the vcpus have the same reset state applied to them as
+> >   they come up, unless they are started with CPU_ON by a vcpu that has
+> >   already booted (but there is a single 'context_id' provided, and I
+> >   fear this is going to confuse the OS)...
+> > 
+> > - or only the suspending vcpu can resume the system, and we must fail
+> >   a change of mp_state for the other vcpus.
+> > 
+> > What do you think?
 > 
-> Yes, AFAICT it's an existing bug in the way the kvm_host_map code works
-> today. Your suggestion makes sense as *long* as we consider it OK to
-> retrospectively document that userspace must extract the nested state
-> *before* doing the final read of the dirty log.
-> 
-> I am not aware that we have a clearly documented "the dirty log may
-> keep changing until XXX" anyway. But you're proposing that we change
-> it, I think. There may well be VMMs which assume that no pages will be
-> dirtied unless they are actually *running* a vCPU.
-> 
-> Which is why I was proposing that we flush the dirty status to the log
-> *every* time we leave vcpu_run back to userspace. But I'll not die on
-> that hill, if you make a good case for your proposal being OK.
+> Definitely the latter. The documentation of SYSTEM_SUSPEND is quite
+> shaky on this, but it would appear that the intention is for the caller
+> to be the first CPU to wake up.
 
-Drat, I didn't consider the ABI aspect.  Flushing on every exit to userspace would
-indeed be more robust.
+Yup. We now have clarification on the intent of the spec (only the
+caller CPU can resume the system), and this needs to be tightened.
 
-> > > I think I'm going to rip out the 'dirty' flag from the gfn_to_pfn_cache
-> > > completely and add a function (to be called with an active vCPU
-> > > context) which marks the page dirty *now*.
-> > 
-> > Hrm, something like?
-> > 
-> >   1. Drop @dirty from kvm_gfn_to_pfn_cache_init()
-> >   2. Rename @dirty => @old_dirty in kvm_gfn_to_pfn_cache_refresh()
-> >   3. Add an API to mark the associated slot dirty without unmapping
-> > 
-> > I think that makes sense.
 > 
-> Except I'll drop 'dirty' from kvm_gfn_to_pfn_cache_refresh() too.
-> There's no scope for a deferred "oh, I meant to tell you that was
-> dirty" even in that case, is there? Use the API we add in your #3.
+> > > +
+> > > +	if (denied) {
+> > > +		smccc_set_retval(vcpu, PSCI_RET_DENIED, 0, 0, 0);
+> > > +		return 1;
+> > > +	}
+> > > +
+> > > +	__kvm_reset_vcpu(vcpu, &reset_state);
+> > > +	kvm_vcpu_wfi(vcpu);
+> > 
+> > I have mixed feelings about this. The vcpu has reset before being in
+> > WFI, while it really should be the other way around and userspace
+> > could rely on observing the transition.
+> > 
+> > What breaks if you change this?
+> 
+> I don't think that userspace would be able to observe the transition
+> even if we WFI before the reset.
 
-But won't we end up with a bunch of call sites that attempt to determine whether
-not the dirty status needs to be flushed?  I'm specifically thinking of scenarios
-where the status needs to be conditionally flushed, e.g. if the backing pfn doesn't
-change, then it's ok to not mark the page dirty.  Not handling that in the refresh
-helper will either lead to unnecessary dirtying or duplicate code/work.
+I disagree. At any point can userspace issue a signal which would
+trigger a return from WFI and an exit to userspace, and I don't think
+this should result in a reset being observed.
+
+This also means that SYSTEM_SUSPEND must be robust wrt signal
+delivery, which it doesn't seem to be.
+
+> I imagine that would take the form
+> of setting KVM_REQ_VCPU_RESET, which we explicitly handle before
+> letting userspace access the vCPU's state as of commit
+> 6826c6849b46 ("KVM: arm64: Handle PSCI resets before userspace
+> touches vCPU state").
+
+In that case, the vcpu is ready to run, and is not blocked by
+anything, so this is quite different.
+
+>
+> Given this, I felt it was probably best to avoid all the indirection and
+> just do the vCPU reset in the handling of SYSTEM_SUSPEND. It does,
+> however, imply that we have slightly different behavior when userspace
+> exits are enabled, as that will happen pre-reset and pre-WFI.
+
+And that's exactly the sort of behaviour I'd like to avoid if at all
+possible. But maybe we don't need to support the standalone version
+that doesn't involve userspace?
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
