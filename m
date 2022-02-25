@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BFAD64C40B6
+	by mail.lfdr.de (Postfix) with ESMTP id 1E9914C40B4
 	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 09:54:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238735AbiBYIyL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 03:54:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54640 "EHLO
+        id S238796AbiBYIyc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 03:54:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238770AbiBYIyI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Feb 2022 03:54:08 -0500
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D2922255BC;
-        Fri, 25 Feb 2022 00:53:36 -0800 (PST)
+        with ESMTP id S238812AbiBYIy1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Feb 2022 03:54:27 -0500
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2191B22B97C;
+        Fri, 25 Feb 2022 00:53:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1645779216; x=1677315216;
+  t=1645779230; x=1677315230;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references;
-  bh=aAScniTQ6hnuqdjEfXh/mJB2BVkSgcocqcMrF3sJiqY=;
-  b=bdJGMu/u+y48mUpyesbwHsvLx9TKoFTD9YdKkET/bhixqsbzYlVZDhZu
-   rY6vF+M0fxrx78Xd3FwJsucwOvDdyhTLwm1Nd3lfH/k30Vt5LS+OdMoYP
-   RHjvkPFxUoZOiScR/I37AhMyrVIAa9Wil6hpMj1PSbX+BCLere7MCoRLc
-   SHLdu+TXyarKYHmc2w4E6v+4bj6O+vveX/RU7nfVEmtj8yhWnXJ/7jzdH
-   SotZDypo1fPH7GkFLpRNKfv0tvkugzF9hLWKN/RzstSP7zeTdu+VmIaAE
-   qQ0X1JkN7Ng2RbMN+IKurfLlNIpUbuSrwF/mOjVV3YxJ6j5Mh35b3GA8M
-   Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10268"; a="277090079"
+  bh=QMLp8NmC2YlCPDw6nrDcudbrHfqDQnsY4QCUiVPXsdQ=;
+  b=jxLNK1mqIAusMlApkJx+D5IzvA/x1afkU2BgmN0oIyZYqNcFoVh1o5m9
+   vOpXErfhT9I2z027slixYRYTXLvRPJWLs7WFdNRVrmGILMJouD3VK7Qk9
+   GC1NJ9Ath6G+4U9E7OJrCr+Jrovd2hcBqiPM+1XeGwtMoK4U9Pz14Cgkb
+   t6dMNIlpK/hdh35Hsxi4YwaSV2WyuJdOEuANzfl6YPcvcpsrVwCb4cKPp
+   d4AK4wSI0/CW5LzhoWQbS/91Jwo09kt812qIApnj0npsqLaIjQEA4ybNH
+   r300gLUDhTLjAVGgtNpPfXPdXCRE26zlgvHmARLUZKmdRVQcTtQ2ZiudX
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10268"; a="232429507"
 X-IronPort-AV: E=Sophos;i="5.90,136,1643702400"; 
-   d="scan'208";a="277090079"
+   d="scan'208";a="232429507"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2022 00:53:36 -0800
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2022 00:53:42 -0800
 X-IronPort-AV: E=Sophos;i="5.90,136,1643702400"; 
-   d="scan'208";a="549186527"
+   d="scan'208";a="549186556"
 Received: from arthur-vostro-3668.sh.intel.com ([10.239.13.120])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2022 00:53:30 -0800
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2022 00:53:36 -0800
 From:   Zeng Guang <guang.zeng@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
@@ -55,79 +55,89 @@ To:     Paolo Bonzini <pbonzini@redhat.com>,
         Kai Huang <kai.huang@intel.com>
 Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
         Robert Hu <robert.hu@intel.com>, Gao Chao <chao.gao@intel.com>,
-        Zeng Guang <guang.zeng@intel.com>
-Subject: [PATCH v6 5/9] KVM: x86: Add support for vICR APIC-write VM-Exits in x2APIC mode
-Date:   Fri, 25 Feb 2022 16:22:19 +0800
-Message-Id: <20220225082223.18288-6-guang.zeng@intel.com>
+        Zeng Guang <guang.zeng@intel.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Subject: [PATCH v6 6/9] KVM: x86: lapic: don't allow to change APIC ID unconditionally
+Date:   Fri, 25 Feb 2022 16:22:20 +0800
+Message-Id: <20220225082223.18288-7-guang.zeng@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20220225082223.18288-1-guang.zeng@intel.com>
 References: <20220225082223.18288-1-guang.zeng@intel.com>
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Upcoming Intel CPUs will support virtual x2APIC MSR writes to the vICR,
-i.e. will trap and generate an APIC-write VM-Exit instead of intercepting
-the WRMSR.  Add support for handling "nodecode" x2APIC writes, which
-were previously impossible.
+From: Maxim Levitsky <mlevitsk@redhat.com>
 
-Note, x2APIC MSR writes are 64 bits wide.
+No normal guest has any reason to change physical APIC IDs, and
+allowing this introduces bugs into APIC acceleration code.
 
+And Intel recent hardware just ignores writes to APIC_ID in
+xAPIC mode. More background can be found at:
+https://lore.kernel.org/lkml/Yfw5ddGNOnDqxMLs@google.com/
+
+Looks there is no much value to support writable xAPIC ID in
+guest except supporting some old and crazy use cases which
+probably would fail on real hardware. So, make xAPIC ID
+read-only for KVM guests.
+
+Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 Signed-off-by: Zeng Guang <guang.zeng@intel.com>
 ---
- arch/x86/kvm/lapic.c | 25 ++++++++++++++++++++++---
- 1 file changed, 22 insertions(+), 3 deletions(-)
+ arch/x86/kvm/lapic.c | 25 ++++++++++++++++++-------
+ 1 file changed, 18 insertions(+), 7 deletions(-)
 
 diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 629c116b0d3e..e4bcdab1fac0 100644
+index e4bcdab1fac0..b38288c8a94f 100644
 --- a/arch/x86/kvm/lapic.c
 +++ b/arch/x86/kvm/lapic.c
-@@ -67,6 +67,7 @@ static bool lapic_timer_advance_dynamic __read_mostly;
- #define LAPIC_TIMER_ADVANCE_NS_MAX     5000
- /* step-by-step approximation to mitigate fluctuation */
- #define LAPIC_TIMER_ADVANCE_ADJUST_STEP 8
-+static int kvm_lapic_msr_read(struct kvm_lapic *apic, u32 reg, u64 *data);
+@@ -2044,10 +2044,17 @@ static int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
  
- static inline void __kvm_lapic_set_reg(char *regs, int reg_off, u32 val)
- {
-@@ -2227,10 +2228,28 @@ EXPORT_SYMBOL_GPL(kvm_lapic_set_eoi);
- /* emulate APIC access in a trap manner */
- void kvm_apic_write_nodecode(struct kvm_vcpu *vcpu, u32 offset)
- {
--	u32 val = kvm_lapic_get_reg(vcpu->arch.apic, offset);
-+	struct kvm_lapic *apic = vcpu->arch.apic;
-+	u64 val;
+ 	switch (reg) {
+ 	case APIC_ID:		/* Local APIC ID */
+-		if (!apic_x2apic_mode(apic))
+-			kvm_apic_set_xapic_id(apic, val >> 24);
+-		else
++		if (apic_x2apic_mode(apic)) {
+ 			ret = 1;
++			break;
++		}
++		/* Don't allow changing APIC ID to avoid unexpected issues */
++		if ((val >> 24) != apic->vcpu->vcpu_id) {
++			kvm_vm_bugged(apic->vcpu->kvm);
++			break;
++		}
 +
-+	if (apic_x2apic_mode(apic)) {
-+		/*
-+		 * When guest APIC is in x2APIC mode and IPI virtualization
-+		 * is enabled, accessing APIC_ICR may cause trap-like VM-exit
-+		 * on Intel hardware. Other offsets are not possible.
-+		 */
-+		if (WARN_ON_ONCE(offset != APIC_ICR))
-+			return;
++		kvm_apic_set_xapic_id(apic, val >> 24);
+ 		break;
  
--	/* TODO: optimize to just emulate side effect w/o one more write */
--	kvm_lapic_reg_write(vcpu->arch.apic, offset, val);
-+		kvm_lapic_msr_read(apic, offset, &val);
-+		if (val & APIC_ICR_BUSY)
-+			kvm_x2apic_icr_write(apic, val);
-+		else
-+			kvm_apic_send_ipi(apic, (u32)val, (u32)(val >> 32));
+ 	case APIC_TASKPRI:
+@@ -2631,11 +2638,15 @@ int kvm_get_apic_interrupt(struct kvm_vcpu *vcpu)
+ static int kvm_apic_state_fixup(struct kvm_vcpu *vcpu,
+ 		struct kvm_lapic_state *s, bool set)
+ {
+-	if (apic_x2apic_mode(vcpu->arch.apic)) {
+-		u32 *id = (u32 *)(s->regs + APIC_ID);
+-		u32 *ldr = (u32 *)(s->regs + APIC_LDR);
+-		u64 icr;
++	u32 *id = (u32 *)(s->regs + APIC_ID);
++	u32 *ldr = (u32 *)(s->regs + APIC_LDR);
++	u64 icr;
+ 
++	if (!apic_x2apic_mode(vcpu->arch.apic)) {
++		/* Don't allow changing APIC ID to avoid unexpected issues */
++		if ((*id >> 24) != vcpu->vcpu_id)
++			return -EINVAL;
 +	} else {
-+		val = kvm_lapic_get_reg(apic, offset);
-+		/* TODO: optimize to just emulate side effect w/o one more write */
-+		kvm_lapic_reg_write(apic, offset, (u32)val);
-+	}
- }
- EXPORT_SYMBOL_GPL(kvm_apic_write_nodecode);
- 
+ 		if (vcpu->kvm->arch.x2apic_format) {
+ 			if (*id != vcpu->vcpu_id)
+ 				return -EINVAL;
 -- 
 2.27.0
 
