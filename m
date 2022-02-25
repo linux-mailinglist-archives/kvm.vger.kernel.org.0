@@ -2,72 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1733E4C4A85
-	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 17:21:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BAD724C4AA4
+	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 17:25:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242914AbiBYQWE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 11:22:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56566 "EHLO
+        id S242953AbiBYQZY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 11:25:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242906AbiBYQWB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Feb 2022 11:22:01 -0500
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50F3877ABD
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 08:21:29 -0800 (PST)
-Received: by mail-pj1-x1030.google.com with SMTP id j10-20020a17090a94ca00b001bc2a9596f6so5215376pjw.5
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 08:21:29 -0800 (PST)
+        with ESMTP id S238176AbiBYQZX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Feb 2022 11:25:23 -0500
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CBCE1B84FC
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 08:24:50 -0800 (PST)
+Received: by mail-pj1-x102f.google.com with SMTP id m22so5233473pja.0
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 08:24:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=dCkOofuT+eKplJpKUyxcU7JCwWPLhe5vZbRj/rqU7Ek=;
-        b=CiXw6wJ/i76/Cqk2SEPO6Cr+eb1PpfDFsRw3P1RxPdQbc28gtVEPA6ayCEW8VwXr/7
-         pEWf6Vm9WSDlkfazp/KdPafVywfXQotF7wVnCX46tMiSAfpZaCb5pWk8gn3fv4Hvj5bw
-         yO8yUxO/H7Jatt2uh3HilCq12Ek1TXGRAZ6SXI8p5bh2EpuxoUH8vm2855cqiG1IfWf0
-         yFx8ObVlHVRzDwFSPzt7a2Wd7GeXtf8ITf+j1bA3wrjgCwGi4fdbbVEHFxdqz2HVz/Fr
-         /VJA86nEqwgTZab7UWS1IFrWSJDxyVFSd7t7YQSnCH7RE434PHReO618rqpxw1FVVUJy
-         mllQ==
+        bh=D79+RdzU+L/GtA2XOSZQN4AqmEuYIPOmKq3WAPF3SkI=;
+        b=A4jeRnzgoZ9Dq38F72sRWI8seS6HDLcmRGZFZqN+MGCtNDG4EGqNaH7+SXtUbaFEDX
+         TM3PQ6hvrfAkrLJRlZvOXVYtllkTYLKTLWeq5Gum1pMSUe4Zbexrw/qgEkfAuDHshXL7
+         5hRyoOVL2L4F1gjSV3bTGzA21N7VZvUS5FJX+V4ycY6Fd5S/x+CQzjaj3mG7qz+xCMLM
+         awklnyckvlCyIsqeA8sNaS1HAWsf4NVe1Isme6YgUxduGBT8IoRKkmOXsmBeTXyMLLXl
+         qdJzntyw7CuiJr6y6vj/bSiyxyLnJdxBYWr5QQ698QFc7yhDN9SxilT+A4iHn+y7HQD/
+         nLyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=dCkOofuT+eKplJpKUyxcU7JCwWPLhe5vZbRj/rqU7Ek=;
-        b=6rNfpOXW0BQ7cCprSIT1KGAStRignvTR1Z8oNwK8kwM4v8e5eIYuiWqC8nQ4oQcvqt
-         UV6dLIOmorWIsB52GMW923bKuf1GDA7gJyyYm3cFgUP1YuurquHAR39R1C4VYRJio+ms
-         0KDbJu3bRDeTeAUekybXIiCuyQTx8P945LLYuuwtR4se1R+B1FO1eap8NKRdDaaPl9Hb
-         ojY5uc4Sc2CVfyYSrZydF+4ePD3ZLMIzVD5780UOeldA/ESvk7CdEdSxTzcOayL6uJMA
-         G040soUBYFqtyqB+ECwVlswXQuvOffLQVwto6Cd89dDUj3ch4hKXwazgRBnpQlck5tpF
-         sKCw==
-X-Gm-Message-State: AOAM532yd1oEB2QKP6yAuN7isds/i4A39VJOif2f97JPJ36Cqmgxheiw
-        L5MoxvbztNDFgeHzPE3cBIxEAA==
-X-Google-Smtp-Source: ABdhPJx6OzZS+uLCUucPfcMPVbrXAeG1bsgoQvkUHxAV2WgwiZRVRbwww1JV+0eel38i6XP0m75ELQ==
-X-Received: by 2002:a17:902:e8d7:b0:149:3b5d:2b8b with SMTP id v23-20020a170902e8d700b001493b5d2b8bmr7990890plg.162.1645806088619;
-        Fri, 25 Feb 2022 08:21:28 -0800 (PST)
+        bh=D79+RdzU+L/GtA2XOSZQN4AqmEuYIPOmKq3WAPF3SkI=;
+        b=ltMCLxmYIXqk2AiQPOMFBEKKx/CHzvGA4WFs4+YEmteoegL51Y0CplGnnPSo/3MalM
+         eYmwNnNLMiJZmvCsJSSqueqXqhk6x1WdsyEm6OifHdLn48t47UpQF+vNWpC9Pr2kIVpj
+         FyRTMek7CQ6aPMViB3S21nvHnnHZPpWA7HRVJ0jniTDLYLGhfJgMquNOLTsH6DE5SM6c
+         jfycrkZIKS58stQ3k0t9T0io+UQ35V9JwhW7P2Mj8bCIejirb2aO0w7hD+nFcgzv1U7m
+         dgOgN4CyKL/8wsvhkOmoFZEw4o2x7tUFG/JLNvPPRXMPTzJI5R5xeFnRKCwyOhswfy89
+         Hrvw==
+X-Gm-Message-State: AOAM530zQW0+iheYP3NnzgaCsNw0JnNUUGb4qWyo1iEp8BsiDMRT8XW9
+        wuExWf3ODNHHsogkLVIHO5dRug==
+X-Google-Smtp-Source: ABdhPJy3mnowp10UYMf1jIacWzg32LTrZuK+Y7C4SXIyABt4ooaZumINqjOGL6uQFxBgmXptpFoOPg==
+X-Received: by 2002:a17:90a:f48f:b0:1bc:2521:fb0a with SMTP id bx15-20020a17090af48f00b001bc2521fb0amr3948419pjb.48.1645806289910;
+        Fri, 25 Feb 2022 08:24:49 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id q13-20020aa7982d000000b004cb98a2ca35sm4097321pfl.211.2022.02.25.08.21.27
+        by smtp.gmail.com with ESMTPSA id b1-20020a17090aa58100b001bcb7bad374sm6430552pjq.17.2022.02.25.08.24.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Feb 2022 08:21:27 -0800 (PST)
-Date:   Fri, 25 Feb 2022 16:21:24 +0000
+        Fri, 25 Feb 2022 08:24:49 -0800 (PST)
+Date:   Fri, 25 Feb 2022 16:24:45 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Suleiman Souhlal <suleiman@google.com>,
-        Anton Romanov <romanton@google.com>
-Subject: Re: [PATCH] KVM: x86: Don't snapshot "max" TSC if host TSC is
- constant
-Message-ID: <YhkCBH9fsqrJYMca@google.com>
-References: <20220225013929.3577699-1-seanjc@google.com>
- <609de7ff-92e2-f96e-e6f5-127251f6e16d@redhat.com>
- <7086443d5e1e21d72a3d5c386c16f0c07d37a0a8.camel@infradead.org>
+To:     kernel test robot <oliver.sang@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, 0day robot <lkp@intel.com>,
+        Like Xu <likexu@tencent.com>,
+        LKML <linux-kernel@vger.kernel.org>, lkp@lists.01.org,
+        kvm@vger.kernel.org
+Subject: Re: [KVM]  9daee8ca83: kvm-unit-tests.apic.fail
+Message-ID: <YhkCzS1rGYyJ0mKP@google.com>
+References: <20220219093404.367207-1-pbonzini@redhat.com>
+ <20220225014911.GA30182@xsang-OptiPlex-9020>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <7086443d5e1e21d72a3d5c386c16f0c07d37a0a8.camel@infradead.org>
+In-Reply-To: <20220225014911.GA30182@xsang-OptiPlex-9020>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -79,24 +73,22 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 25, 2022, David Woodhouse wrote:
-> On Fri, 2022-02-25 at 13:10 +0100, Paolo Bonzini wrote:
-> > 
-> > Queued, but I'd rather have a subject that calls out that max_tsc_khz 
-> > needs a replacement at vCPU creation time.  In fact, the real change 
-> > (and bug, and fix) is in kvm_arch_vcpu_create(), while the subject 
-> > mentions only the change in kvm_timer_init().
+On Fri, Feb 25, 2022, kernel test robot wrote:
+> commit: 9daee8ca835bf3ba264414c6f3a3924e23455449 ("[PATCH v2] KVM: x86: pull kvm->srcu read-side to kvm_arch_vcpu_ioctl_run")
+> url: https://github.com/0day-ci/linux/commits/Paolo-Bonzini/KVM-x86-pull-kvm-srcu-read-side-to-kvm_arch_vcpu_ioctl_run/20220220-190039
+> base: https://git.kernel.org/cgit/virt/kvm/kvm.git master
+> patch link: https://lore.kernel.org/lkml/20220219093404.367207-1-pbonzini@redhat.com
 > 
-> In
-> https://lore.kernel.org/kvm/e7be32b06676c7ebf415d9deea5faf50aa8c0785.camel@infradead.org/T/
-> last night I was coming round to the idea that we might want a KVM-wide 
-> default frequency which is settable from userspace and is used instead
-> of max_tsc_khz anyway.
+> in testcase: kvm-unit-tests
+> version: kvm-unit-tests-x86_64-882825e-1_20220215
+> with following parameters:
 > 
-> I also have questions about the use case for the above patch.... if
-> this is a clean boot and you're just starting to host guests, surely we
-> can wait for the time it takes for the TSC synchronization to complete?
+> 	ucode: 0x28
 
-KVM is built into the kernel in their case, the vmx_init() => kvm_init() gets
-automatically called during boot.  The VMs aren't started until well after
-synchronization has completed, but KVM has already snapshotted the "bad" value.
+> please be noted, besides kvm-unit-tests.apic.fail in title, we also found below
+> cases fail upon this commit while pass on parent:
+
+Same thing I hit[*].  Paolo temporarily dropped the buggy patch, a new one will
+presumably show up soonish.
+
+[*] https://lore.kernel.org/all/20220224212646.3544811-1-seanjc@google.com
