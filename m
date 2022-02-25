@@ -2,259 +2,184 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D4224C4701
-	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 14:59:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F3C1C4C471B
+	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 15:10:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241202AbiBYN6j (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 08:58:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40006 "EHLO
+        id S241452AbiBYOKu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 09:10:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49924 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231598AbiBYN6h (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Feb 2022 08:58:37 -0500
-Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DC0C2BDA;
-        Fri, 25 Feb 2022 05:58:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1645797485; x=1677333485;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=8kGZS1WN7G6CFiOLfo0q+xlIMR7pw0Iyc1llFmruEA4=;
-  b=tufwJqmVMdYn2o0OGJjHXAGEUt4jdUd1F/lCAn4LwaAf0lRRAF1NQWgC
-   wawcqFJQJjTFj+OMhOTFeN05Op4R200X3lo7qRq3aGfAObbObORnOGIAU
-   b9Q/tco8T5au6YSbFEDdI9NmsAJCNujrC4wyIsURRWLJ9lXl6lc2uc/m4
-   w=;
-X-IronPort-AV: E=Sophos;i="5.90,136,1643673600"; 
-   d="scan'208";a="181239800"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2b-05e8af15.us-west-2.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-6001.iad6.amazon.com with ESMTP; 25 Feb 2022 13:57:49 +0000
-Received: from EX13MTAUWC002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-        by email-inbound-relay-pdx-2b-05e8af15.us-west-2.amazon.com (Postfix) with ESMTPS id A5E6FA28F4;
-        Fri, 25 Feb 2022 13:57:47 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC002.ant.amazon.com (10.43.162.240) with Microsoft SMTP Server (TLS)
- id 15.0.1497.28; Fri, 25 Feb 2022 13:57:46 +0000
-Received: from [0.0.0.0] (10.43.161.219) by EX13D20UWC001.ant.amazon.com
- (10.43.162.244) with Microsoft SMTP Server (TLS) id 15.0.1497.28; Fri, 25 Feb
- 2022 13:57:40 +0000
-Message-ID: <05c9f2a9-accb-e0de-aac7-b212adac7eb2@amazon.com>
-Date:   Fri, 25 Feb 2022 14:57:38 +0100
+        with ESMTP id S234318AbiBYOKq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Feb 2022 09:10:46 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 332791E017C
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 06:10:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645798213;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=vwakpxRLg/AhOfH71656ilXCCJJzZRDG88pVONxw8BY=;
+        b=Xv2LHHcocKK5a23SQ/+jhWhb9e+rvr6TOliFvjybfdX4qFeZvXitF40uOecWZgPi5rY2K/
+        ivZdJejt1PVyHg5MEWD4lNAsQEqkyDI7QBhFOXBX+YErFE3qjmja8jgM5zogqPolcZ5dDq
+        S9sTO0zGbidvgSNskwTL9KGytFyiZ2Q=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-212-_YbHCZv_PDaKBVATjmSlHw-1; Fri, 25 Feb 2022 09:10:08 -0500
+X-MC-Unique: _YbHCZv_PDaKBVATjmSlHw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4608080D6AD;
+        Fri, 25 Feb 2022 14:10:05 +0000 (UTC)
+Received: from starship (unknown [10.40.195.190])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B660A7A55D;
+        Fri, 25 Feb 2022 14:09:58 +0000 (UTC)
+Message-ID: <66b51c39db37c5e5b9d922ecb8275f8cda369d3e.camel@redhat.com>
+Subject: Re: [PATCH v6 1/9] x86/cpu: Add new VMX feature, Tertiary
+ VM-Execution control
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Zeng Guang <guang.zeng@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jethro Beekman <jethro@fortanix.com>,
+        Kai Huang <kai.huang@intel.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
+        Robert Hu <robert.hu@intel.com>, Gao Chao <chao.gao@intel.com>,
+        Robert Hoo <robert.hu@linux.intel.com>
+Date:   Fri, 25 Feb 2022 16:09:57 +0200
+In-Reply-To: <20220225082223.18288-2-guang.zeng@intel.com>
+References: <20220225082223.18288-1-guang.zeng@intel.com>
+         <20220225082223.18288-2-guang.zeng@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.6.1
-Subject: Re: [PATCH v4] virt: vmgenid: introduce driver for reinitializing RNG
- on VM fork
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>, <kvm@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>, <linux-hyperv@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC:     <adrian@parity.io>, <ardb@kernel.org>, <ben@skyportsystems.com>,
-        <berrange@redhat.com>, <colmmacc@amazon.com>,
-        <decui@microsoft.com>, <dwmw@amazon.co.uk>, <ebiggers@kernel.org>,
-        <ehabkost@redhat.com>, <gregkh@linuxfoundation.org>,
-        <haiyangz@microsoft.com>, <imammedo@redhat.com>,
-        <jannh@google.com>, <kys@microsoft.com>, <lersek@redhat.com>,
-        <linux@dominikbrodowski.net>, <mst@redhat.com>,
-        <qemu-devel@nongnu.org>, <raduweis@amazon.com>,
-        <sthemmin@microsoft.com>, <tytso@mit.edu>, <wei.liu@kernel.org>
-References: <CAHmME9pJ3wb=EbUErJrCRC=VYGhFZqj2ar_AkVPsUvAnqGtwwg@mail.gmail.com>
- <20220225124848.909093-1-Jason@zx2c4.com>
-From:   Alexander Graf <graf@amazon.com>
-In-Reply-To: <20220225124848.909093-1-Jason@zx2c4.com>
-X-Originating-IP: [10.43.161.219]
-X-ClientProxiedBy: EX13D19UWA001.ant.amazon.com (10.43.160.169) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
-X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-        NICE_REPLY_A,RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Ck9uIDI1LjAyLjIyIDEzOjQ4LCBKYXNvbiBBLiBEb25lbmZlbGQgd3JvdGU6Cj4KPiBWTSBHZW5l
-cmF0aW9uIElEIGlzIGEgZmVhdHVyZSBmcm9tIE1pY3Jvc29mdCwgZGVzY3JpYmVkIGF0Cj4gPGh0
-dHBzOi8vZ28ubWljcm9zb2Z0LmNvbS9md2xpbmsvP0xpbmtJZD0yNjA3MDk+LCBhbmQgc3VwcG9y
-dGVkIGJ5Cj4gSHlwZXItViBhbmQgUUVNVS4gSXRzIHVzYWdlIGlzIGRlc2NyaWJlZCBpbiBNaWNy
-b3NvZnQncyBSTkcgd2hpdGVwYXBlciwKPiA8aHR0cHM6Ly9ha2EubXMvd2luMTBybmc+LCBhczoK
-Pgo+ICAgICAgSWYgdGhlIE9TIGlzIHJ1bm5pbmcgaW4gYSBWTSwgdGhlcmUgaXMgYSBwcm9ibGVt
-IHRoYXQgbW9zdAo+ICAgICAgaHlwZXJ2aXNvcnMgY2FuIHNuYXBzaG90IHRoZSBzdGF0ZSBvZiB0
-aGUgbWFjaGluZSBhbmQgbGF0ZXIgcmV3aW5kCj4gICAgICB0aGUgVk0gc3RhdGUgdG8gdGhlIHNh
-dmVkIHN0YXRlLiBUaGlzIHJlc3VsdHMgaW4gdGhlIG1hY2hpbmUgcnVubmluZwo+ICAgICAgYSBz
-ZWNvbmQgdGltZSB3aXRoIHRoZSBleGFjdCBzYW1lIFJORyBzdGF0ZSwgd2hpY2ggbGVhZHMgdG8g
-c2VyaW91cwo+ICAgICAgc2VjdXJpdHkgcHJvYmxlbXMuICBUbyByZWR1Y2UgdGhlIHdpbmRvdyBv
-ZiB2dWxuZXJhYmlsaXR5LCBXaW5kb3dzCj4gICAgICAxMCBvbiBhIEh5cGVyLVYgVk0gd2lsbCBk
-ZXRlY3Qgd2hlbiB0aGUgVk0gc3RhdGUgaXMgcmVzZXQsIHJldHJpZXZlCj4gICAgICBhIHVuaXF1
-ZSAobm90IHJhbmRvbSkgdmFsdWUgZnJvbSB0aGUgaHlwZXJ2aXNvciwgYW5kIHJlc2VlZCB0aGUg
-cm9vdAo+ICAgICAgUk5HIHdpdGggdGhhdCB1bmlxdWUgdmFsdWUuICBUaGlzIGRvZXMgbm90IGVs
-aW1pbmF0ZSB0aGUKPiAgICAgIHZ1bG5lcmFiaWxpdHksIGJ1dCBpdCBncmVhdGx5IHJlZHVjZXMg
-dGhlIHRpbWUgZHVyaW5nIHdoaWNoIHRoZSBSTkcKPiAgICAgIHN5c3RlbSB3aWxsIHByb2R1Y2Ug
-dGhlIHNhbWUgb3V0cHV0cyBhcyBpdCBkaWQgZHVyaW5nIGEgcHJldmlvdXMKPiAgICAgIGluc3Rh
-bnRpYXRpb24gb2YgdGhlIHNhbWUgVk0gc3RhdGUuCj4KPiBMaW51eCBoYXMgdGhlIHNhbWUgaXNz
-dWUsIGFuZCBnaXZlbiB0aGF0IHZtZ2VuaWQgaXMgc3VwcG9ydGVkIGFscmVhZHkgYnkKPiBtdWx0
-aXBsZSBoeXBlcnZpc29ycywgd2UgY2FuIGltcGxlbWVudCBtb3JlIG9yIGxlc3MgdGhlIHNhbWUg
-c29sdXRpb24uCj4gU28gdGhpcyBjb21taXQgd2lyZXMgdXAgdGhlIHZtZ2VuaWQgQUNQSSBub3Rp
-ZmljYXRpb24gdG8gdGhlIFJORydzIG5ld2x5Cj4gYWRkZWQgYWRkX3ZtZm9ya19yYW5kb21uZXNz
-KCkgZnVuY3Rpb24uCj4KPiBJdCBjYW4gYmUgdXNlZCBmcm9tIHFlbXUgdmlhIHRoZSBgLWRldmlj
-ZSB2bWdlbmlkLGd1aWQ9YXV0b2AgcGFyYW1ldGVyLgo+IEFmdGVyIHNldHRpbmcgdGhhdCwgdXNl
-IGBzYXZldm1gIGluIHRoZSBtb25pdG9yIHRvIHNhdmUgdGhlIFZNIHN0YXRlLAo+IHRoZW4gcXVp
-dCBRRU1VLCBzdGFydCBpdCBhZ2FpbiwgYW5kIHVzZSBgbG9hZHZtYC4gVGhhdCB3aWxsIHRyaWdn
-ZXIgdGhpcwo+IGRyaXZlcidzIG5vdGlmeSBmdW5jdGlvbiwgd2hpY2ggaGFuZHMgdGhlIG5ldyBV
-VUlEIHRvIHRoZSBSTkcuIFRoaXMgaXMKPiBkZXNjcmliZWQgaW4gPGh0dHBzOi8vZ2l0LnFlbXUu
-b3JnLz9wPXFlbXUuZ2l0O2E9YmxvYjtmPWRvY3Mvc3BlY3Mvdm1nZW5pZC50eHQ+Lgo+IEFuZCB0
-aGVyZSBhcmUgaG9va3MgZm9yIHRoaXMgaW4gbGlidmlydCBhcyB3ZWxsLCBkZXNjcmliZWQgaW4K
-PiA8aHR0cHM6Ly9saWJ2aXJ0Lm9yZy9mb3JtYXRkb21haW4uaHRtbCNnZW5lcmFsLW1ldGFkYXRh
-Pi4KPgo+IE5vdGUsIGhvd2V2ZXIsIHRoYXQgdGhlIHRyZWF0bWVudCBvZiB0aGlzIGFzIGEgVVVJ
-RCBpcyBjb25zaWRlcmVkIHRvIGJlCj4gYW4gYWNjaWRlbnRhbCBRRU1VIG51YW5jZSwgcGVyCj4g
-PGh0dHBzOi8vZ2l0aHViLmNvbS9saWJndWVzdGZzL3ZpcnQtdjJ2L2Jsb2IvbWFzdGVyL2RvY3Mv
-dm0tZ2VuZXJhdGlvbi1pZC1hY3Jvc3MtaHlwZXJ2aXNvcnMudHh0PiwKPiBzbyB0aGlzIGRyaXZl
-ciBzaW1wbHkgdHJlYXRzIHRoZXNlIGJ5dGVzIGFzIGFuIG9wYXF1ZSAxMjgtYml0IGJpbmFyeQo+
-IGJsb2IsIGFzIHBlciB0aGUgc3BlYy4gVGhpcyBkb2Vzbid0IHJlYWxseSBtYWtlIGEgZGlmZmVy
-ZW5jZSBhbnl3YXksCj4gY29uc2lkZXJpbmcgdGhhdCdzIGhvdyBpdCBlbmRzIHVwIHdoZW4gaGFu
-ZGVkIHRvIHRoZSBSTkcgaW4gdGhlIGVuZC4KPgo+IENjOiBBZHJpYW4gQ2F0YW5naXUgPGFkcmlh
-bkBwYXJpdHkuaW8+Cj4gQ2M6IERhbmllbCBQLiBCZXJyYW5nw6kgPGJlcnJhbmdlQHJlZGhhdC5j
-b20+Cj4gQ2M6IERvbWluaWsgQnJvZG93c2tpIDxsaW51eEBkb21pbmlrYnJvZG93c2tpLm5ldD4K
-PiBDYzogQXJkIEJpZXNoZXV2ZWwgPGFyZGJAa2VybmVsLm9yZz4KPiBDYzogR3JlZyBLcm9haC1I
-YXJ0bWFuIDxncmVna2hAbGludXhmb3VuZGF0aW9uLm9yZz4KPiBSZXZpZXdlZC1ieTogTGFzemxv
-IEVyc2VrIDxsZXJzZWtAcmVkaGF0LmNvbT4KPiBTaWduZWQtb2ZmLWJ5OiBKYXNvbiBBLiBEb25l
-bmZlbGQgPEphc29uQHp4MmM0LmNvbT4KPiAtLS0KPiBDaGFuZ2VzIHYzLT52NDoKPiAtIEFkZCB0
-aGlzIGRyaXZlciB0byBNQUlOVEFJTkVSUywgcGVyIEFyZCdzIHJlcXVlc3QuCj4gICAgTm90ZTog
-SSBkaWRuJ3QgcmVhbGx5IHdhbnQgdG8gZG8gdGhpcyBhdCBmaXJzdCwgYmVjYXVzZSBJIHdhcyBo
-b3BpbmcgdGhlCj4gICAgb3JpZ2luYWwgQW1hem9uIHRlYW0gbG9va2luZyBpbnRvIHRoaXMgbGFz
-dCB5ZWFyIHdvdWxkIHN0ZXAgdXAuIEJ1dCBpdCBzZWVtcwo+ICAgIGxpa2UgdGhhdCB0ZWFtIGhh
-cyBtb3ZlZCBvbiwgYW5kIGFueXdheSBJJ3ZlIGJhc2ljYWxseSByZXdyaXR0ZW4gdGhlIGRyaXZl
-cgo+ICAgIGZyb20gc2NyYXRjaCBhdCB0aGlzIHBvaW50IC0tIG5vdCBhIHNpbmdsZSBsaW5lIG9m
-IHRoZSBvcmlnaW5hbCBleGlzdHMgLS0KPiAgICBhbmQgc28gSSBndWVzcyBJJ2xsIG1haW50YWlu
-IGl0IG15c2VsZi4gQWRkaW5nIEdyZWcgdG8gdGhlIENDIGZvciBoaXMgYWNrIG9uCj4gICAgdGhp
-cy4KPiAtIERvbid0IHVzZSBhIHN0YXRpYyBnbG9iYWwgc3RhdGUgaW4gY2FzZSB0aGVyZSBhcmUg
-bXVsdGlwbGUgaW5zdGFuY2VzLgo+IC0gVXNlIGRldm1fbWVtcmVtYXAgaW5zdGVhZCBvZiB0aGUg
-YWNwaSBpbnRlcm5hbCBmdW5jdGlvbnMuCj4gLSBEZWZhdWx0IHRvIGJlaW5nIG1vZHVsYXIgaW5z
-dGVhZCBvZiBhIGJ1aWx0LWluLCBhcyBhcHBhcmVudGx5IHRoaXMgaXMKPiAgICB1ZGV2LWFibGUu
-Cj4KPiAgIE1BSU5UQUlORVJTICAgICAgICAgICAgfCAgIDEgKwo+ICAgZHJpdmVycy92aXJ0L0tj
-b25maWcgICB8ICAgOSArKysrCj4gICBkcml2ZXJzL3ZpcnQvTWFrZWZpbGUgIHwgICAxICsKPiAg
-IGRyaXZlcnMvdmlydC92bWdlbmlkLmMgfCAxMTIgKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysKPiAgIDQgZmlsZXMgY2hhbmdlZCwgMTIzIGluc2VydGlvbnMoKykKPiAg
-IGNyZWF0ZSBtb2RlIDEwMDY0NCBkcml2ZXJzL3ZpcnQvdm1nZW5pZC5jCj4KPiBkaWZmIC0tZ2l0
-IGEvTUFJTlRBSU5FUlMgYi9NQUlOVEFJTkVSUwo+IGluZGV4IDc3N2NkNmZhMmIzZC4uYTEwOTk3
-ZTE1MTQ2IDEwMDY0NAo+IC0tLSBhL01BSU5UQUlORVJTCj4gKysrIGIvTUFJTlRBSU5FUlMKPiBA
-QCAtMTYyMTEsNiArMTYyMTEsNyBAQCBNOiAgICAgIEphc29uIEEuIERvbmVuZmVsZCA8SmFzb25A
-engyYzQuY29tPgo+ICAgVDogICAgIGdpdCBodHRwczovL2dpdC5rZXJuZWwub3JnL3B1Yi9zY20v
-bGludXgva2VybmVsL2dpdC9jcm5nL3JhbmRvbS5naXQKPiAgIFM6ICAgICBNYWludGFpbmVkCj4g
-ICBGOiAgICAgZHJpdmVycy9jaGFyL3JhbmRvbS5jCj4gK0Y6ICAgICBkcml2ZXJzL3ZpcnQvdm1n
-ZW5pZC5jCj4KPiAgIFJBUElESU8gU1VCU1lTVEVNCj4gICBNOiAgICAgTWF0dCBQb3J0ZXIgPG1w
-b3J0ZXJAa2VybmVsLmNyYXNoaW5nLm9yZz4KPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy92aXJ0L0tj
-b25maWcgYi9kcml2ZXJzL3ZpcnQvS2NvbmZpZwo+IGluZGV4IDgwNjFlOGVmNDQ5Zi4uNTU5NmM3
-MzEzZjU5IDEwMDY0NAo+IC0tLSBhL2RyaXZlcnMvdmlydC9LY29uZmlnCj4gKysrIGIvZHJpdmVy
-cy92aXJ0L0tjb25maWcKPiBAQCAtMTMsNiArMTMsMTUgQEAgbWVudWNvbmZpZyBWSVJUX0RSSVZF
-UlMKPgo+ICAgaWYgVklSVF9EUklWRVJTCj4KPiArY29uZmlnIFZNR0VOSUQKPiArICAgICAgIHRy
-aXN0YXRlICJWaXJ0dWFsIE1hY2hpbmUgR2VuZXJhdGlvbiBJRCBkcml2ZXIiCj4gKyAgICAgICBk
-ZWZhdWx0IG0KPiArICAgICAgIGRlcGVuZHMgb24gQUNQSQo+ICsgICAgICAgaGVscAo+ICsgICAg
-ICAgICBTYXkgWSBoZXJlIHRvIHVzZSB0aGUgaHlwZXJ2aXNvci1wcm92aWRlZCBWaXJ0dWFsIE1h
-Y2hpbmUgR2VuZXJhdGlvbiBJRAo+ICsgICAgICAgICB0byByZXNlZWQgdGhlIFJORyB3aGVuIHRo
-ZSBWTSBpcyBjbG9uZWQuIFRoaXMgaXMgaGlnaGx5IHJlY29tbWVuZGVkIGlmCj4gKyAgICAgICAg
-IHlvdSBpbnRlbmQgdG8gZG8gYW55IHJvbGxiYWNrIC8gY2xvbmluZyAvIHNuYXBzaG90dGluZyBv
-ZiBWTXMuCj4gKwo+ICAgY29uZmlnIEZTTF9IVl9NQU5BR0VSCj4gICAgICAgICAgdHJpc3RhdGUg
-IkZyZWVzY2FsZSBoeXBlcnZpc29yIG1hbmFnZW1lbnQgZHJpdmVyIgo+ICAgICAgICAgIGRlcGVu
-ZHMgb24gRlNMX1NPQwo+IGRpZmYgLS1naXQgYS9kcml2ZXJzL3ZpcnQvTWFrZWZpbGUgYi9kcml2
-ZXJzL3ZpcnQvTWFrZWZpbGUKPiBpbmRleCAzZTI3MmVhNjBjZDkuLjEwOGQwZmZjYzlhYSAxMDA2
-NDQKPiAtLS0gYS9kcml2ZXJzL3ZpcnQvTWFrZWZpbGUKPiArKysgYi9kcml2ZXJzL3ZpcnQvTWFr
-ZWZpbGUKPiBAQCAtNCw2ICs0LDcgQEAKPiAgICMKPgo+ICAgb2JqLSQoQ09ORklHX0ZTTF9IVl9N
-QU5BR0VSKSAgICs9IGZzbF9oeXBlcnZpc29yLm8KPiArb2JqLSQoQ09ORklHX1ZNR0VOSUQpICAg
-ICAgICAgICs9IHZtZ2VuaWQubwo+ICAgb2JqLXkgICAgICAgICAgICAgICAgICAgICAgICAgICs9
-IHZib3hndWVzdC8KPgo+ICAgb2JqLSQoQ09ORklHX05JVFJPX0VOQ0xBVkVTKSAgICs9IG5pdHJv
-X2VuY2xhdmVzLwo+IGRpZmYgLS1naXQgYS9kcml2ZXJzL3ZpcnQvdm1nZW5pZC5jIGIvZHJpdmVy
-cy92aXJ0L3ZtZ2VuaWQuYwo+IG5ldyBmaWxlIG1vZGUgMTAwNjQ0Cj4gaW5kZXggMDAwMDAwMDAw
-MDAwLi5lM2RkNGFmYjMzYzYKPiAtLS0gL2Rldi9udWxsCj4gKysrIGIvZHJpdmVycy92aXJ0L3Zt
-Z2VuaWQuYwo+IEBAIC0wLDAgKzEsMTEyIEBACj4gKy8vIFNQRFgtTGljZW5zZS1JZGVudGlmaWVy
-OiBHUEwtMi4wCj4gKy8qCj4gKyAqIENvcHlyaWdodCAoQykgMjAyMiBKYXNvbiBBLiBEb25lbmZl
-bGQgPEphc29uQHp4MmM0LmNvbT4uIEFsbCBSaWdodHMgUmVzZXJ2ZWQuCj4gKyAqCj4gKyAqIFRo
-ZSAiVmlydHVhbCBNYWNoaW5lIEdlbmVyYXRpb24gSUQiIGlzIGV4cG9zZWQgdmlhIEFDUEkgYW5k
-IGNoYW5nZXMgd2hlbiBhCj4gKyAqIHZpcnR1YWwgbWFjaGluZSBmb3JrcyBvciBpcyBjbG9uZWQu
-IFRoaXMgZHJpdmVyIGV4aXN0cyBmb3Igc2hlcGhlcmRpbmcgdGhhdAo+ICsgKiBpbmZvcm1hdGlv
-biB0byByYW5kb20uYy4KPiArICovCj4gKwo+ICsjaW5jbHVkZSA8bGludXgva2VybmVsLmg+Cj4g
-KyNpbmNsdWRlIDxsaW51eC9tb2R1bGUuaD4KPiArI2luY2x1ZGUgPGxpbnV4L2FjcGkuaD4KPiAr
-I2luY2x1ZGUgPGxpbnV4L3JhbmRvbS5oPgo+ICsKPiArQUNQSV9NT0RVTEVfTkFNRSgidm1nZW5p
-ZCIpOwo+ICsKPiArZW51bSB7IFZNR0VOSURfU0laRSA9IDE2IH07Cj4gKwo+ICtzdHJ1Y3Qgdm1n
-ZW5pZF9zdGF0ZSB7Cj4gKyAgICAgICB1OCAqbmV4dF9pZDsKPiArICAgICAgIHU4IHRoaXNfaWRb
-Vk1HRU5JRF9TSVpFXTsKPiArfTsKPiArCj4gK3N0YXRpYyBpbnQgdm1nZW5pZF9hY3BpX2FkZChz
-dHJ1Y3QgYWNwaV9kZXZpY2UgKmRldmljZSkKPiArewo+ICsgICAgICAgc3RydWN0IGFjcGlfYnVm
-ZmVyIHBhcnNlZCA9IHsgQUNQSV9BTExPQ0FURV9CVUZGRVIgfTsKPiArICAgICAgIHN0cnVjdCB2
-bWdlbmlkX3N0YXRlICpzdGF0ZTsKPiArICAgICAgIHVuaW9uIGFjcGlfb2JqZWN0ICpvYmo7Cj4g
-KyAgICAgICBwaHlzX2FkZHJfdCBwaHlzX2FkZHI7Cj4gKyAgICAgICBhY3BpX3N0YXR1cyBzdGF0
-dXM7Cj4gKyAgICAgICBpbnQgcmV0ID0gMDsKPiArCj4gKyAgICAgICBzdGF0ZSA9IGRldm1fa21h
-bGxvYygmZGV2aWNlLT5kZXYsIHNpemVvZigqc3RhdGUpLCBHRlBfS0VSTkVMKTsKPiArICAgICAg
-IGlmICghc3RhdGUpCj4gKyAgICAgICAgICAgICAgIHJldHVybiAtRU5PTUVNOwo+ICsKPiArICAg
-ICAgIHN0YXR1cyA9IGFjcGlfZXZhbHVhdGVfb2JqZWN0KGRldmljZS0+aGFuZGxlLCAiQUREUiIs
-IE5VTEwsICZwYXJzZWQpOwo+ICsgICAgICAgaWYgKEFDUElfRkFJTFVSRShzdGF0dXMpKSB7Cj4g
-KyAgICAgICAgICAgICAgIEFDUElfRVhDRVBUSU9OKChBRV9JTkZPLCBzdGF0dXMsICJFdmFsdWF0
-aW5nIEFERFIiKSk7Cj4gKyAgICAgICAgICAgICAgIHJldHVybiAtRU5PREVWOwo+ICsgICAgICAg
-fQo+ICsgICAgICAgb2JqID0gcGFyc2VkLnBvaW50ZXI7Cj4gKyAgICAgICBpZiAoIW9iaiB8fCBv
-YmotPnR5cGUgIT0gQUNQSV9UWVBFX1BBQ0tBR0UgfHwgb2JqLT5wYWNrYWdlLmNvdW50ICE9IDIg
-fHwKPiArICAgICAgICAgICBvYmotPnBhY2thZ2UuZWxlbWVudHNbMF0udHlwZSAhPSBBQ1BJX1RZ
-UEVfSU5URUdFUiB8fAo+ICsgICAgICAgICAgIG9iai0+cGFja2FnZS5lbGVtZW50c1sxXS50eXBl
-ICE9IEFDUElfVFlQRV9JTlRFR0VSKSB7Cj4gKyAgICAgICAgICAgICAgIHJldCA9IC1FSU5WQUw7
-Cj4gKyAgICAgICAgICAgICAgIGdvdG8gb3V0Owo+ICsgICAgICAgfQo+ICsKPiArICAgICAgIHBo
-eXNfYWRkciA9IChvYmotPnBhY2thZ2UuZWxlbWVudHNbMF0uaW50ZWdlci52YWx1ZSA8PCAwKSB8
-Cj4gKyAgICAgICAgICAgICAgICAgICAob2JqLT5wYWNrYWdlLmVsZW1lbnRzWzFdLmludGVnZXIu
-dmFsdWUgPDwgMzIpOwo+ICsgICAgICAgc3RhdGUtPm5leHRfaWQgPSBkZXZtX21lbXJlbWFwKCZk
-ZXZpY2UtPmRldiwgcGh5c19hZGRyLCBWTUdFTklEX1NJWkUsIE1FTVJFTUFQX1dCKTsKPiArICAg
-ICAgIGlmICghc3RhdGUtPm5leHRfaWQpIHsKPiArICAgICAgICAgICAgICAgcmV0ID0gLUVOT01F
-TTsKPiArICAgICAgICAgICAgICAgZ290byBvdXQ7Cj4gKyAgICAgICB9Cj4gKwo+ICsgICAgICAg
-bWVtY3B5KHN0YXRlLT50aGlzX2lkLCBzdGF0ZS0+bmV4dF9pZCwgc2l6ZW9mKHN0YXRlLT50aGlz
-X2lkKSk7Cj4gKyAgICAgICBhZGRfZGV2aWNlX3JhbmRvbW5lc3Moc3RhdGUtPnRoaXNfaWQsIHNp
-emVvZihzdGF0ZS0+dGhpc19pZCkpOwoKClBsZWFzZSBleHBvc2UgdGhlIHZtZ2VuaWQgdmlhIC9z
-eXNmcyBzbyB0aGF0IHVzZXIgc3BhY2UgZXZlbiByZW1vdGVseSAKaGFzIGEgY2hhbmNlIHRvIGNo
-ZWNrIGlmIGl0J3MgYmVlbiBjbG9uZWQuCgoKPiArCj4gKyAgICAgICBkZXZpY2UtPmRyaXZlcl9k
-YXRhID0gc3RhdGU7Cj4gKwo+ICtvdXQ6Cj4gKyAgICAgICBBQ1BJX0ZSRUUocGFyc2VkLnBvaW50
-ZXIpOwo+ICsgICAgICAgcmV0dXJuIHJldDsKPiArfQo+ICsKPiArc3RhdGljIHZvaWQgdm1nZW5p
-ZF9hY3BpX25vdGlmeShzdHJ1Y3QgYWNwaV9kZXZpY2UgKmRldmljZSwgdTMyIGV2ZW50KQo+ICt7
-Cj4gKyAgICAgICBzdHJ1Y3Qgdm1nZW5pZF9zdGF0ZSAqc3RhdGUgPSBhY3BpX2RyaXZlcl9kYXRh
-KGRldmljZSk7Cj4gKyAgICAgICB1OCBvbGRfaWRbVk1HRU5JRF9TSVpFXTsKPiArCj4gKyAgICAg
-ICBtZW1jcHkob2xkX2lkLCBzdGF0ZS0+dGhpc19pZCwgc2l6ZW9mKG9sZF9pZCkpOwo+ICsgICAg
-ICAgbWVtY3B5KHN0YXRlLT50aGlzX2lkLCBzdGF0ZS0+bmV4dF9pZCwgc2l6ZW9mKHN0YXRlLT50
-aGlzX2lkKSk7Cj4gKyAgICAgICBpZiAoIW1lbWNtcChvbGRfaWQsIHN0YXRlLT50aGlzX2lkLCBz
-aXplb2Yob2xkX2lkKSkpCj4gKyAgICAgICAgICAgICAgIHJldHVybjsKPiArICAgICAgIGFkZF92
-bWZvcmtfcmFuZG9tbmVzcyhzdGF0ZS0+dGhpc19pZCwgc2l6ZW9mKHN0YXRlLT50aGlzX2lkKSk7
-Cj4gK30KPiArCj4gK3N0YXRpYyBjb25zdCBzdHJ1Y3QgYWNwaV9kZXZpY2VfaWQgdm1nZW5pZF9p
-ZHNbXSA9IHsKPiArICAgICAgIHsgIlZNR0VOSUQiLCAwIH0sCj4gKyAgICAgICB7ICJRRU1VVkdJ
-RCIsIDAgfSwKCgpBY2NvcmRpbmcgdG8gdGhlIFZNR2VuSUQgc3BlY1sxXSwgeW91IGNhbiBvbmx5
-IHJlbHkgb24gX0NJRCBhbmQgX0RETiBmb3IgCm1hdGNoaW5nLiBUaGV5IGJvdGggY29udGFpbiAi
-Vk1fR2VuX0NvdW50ZXIiLiBUaGUgbGlzdCBhYm92ZSBjb250YWlucyAKX0hJRCB2YWx1ZXMgd2hp
-Y2ggYXJlIG5vdCBhbiBvZmZpY2lhbCBpZGVudGlmaWVyIGZvciB0aGUgVk1HZW5JRCBkZXZpY2Uu
-CgpJSVJDIHRoZSBBQ1BJIGRldmljZSBtYXRjaCBsb2dpYyBkb2VzIG1hdGNoIF9DSUQgaW4gYWRk
-aXRpb24gdG8gX0hJRC4gCkhvd2V2ZXIsIGl0IGlzIGxpbWl0ZWQgdG8gOCBjaGFyYWN0ZXJzLiBM
-ZXQgbWUgcGFzdGUgYW4gZXhwZXJpbWVudGFsIApoYWNrIEkgZGlkIGJhY2sgdGhlbiB0byBkbyB0
-aGUgX0NJRCBtYXRjaGluZyBpbnN0ZWFkLgoKWzFdIApodHRwczovL2Rvd25sb2FkLm1pY3Jvc29m
-dC5jb20vZG93bmxvYWQvMy8xL0MvMzFDRkMzMDctOThDQS00Q0E1LTkxNEMtRDk3NzI2OTFFMjE0
-L1ZpcnR1YWxNYWNoaW5lR2VuZXJhdGlvbklELmRvY3gKCgpBbGV4CgpkaWZmIC0tZ2l0IGEvZHJp
-dmVycy9hY3BpL2J1cy5jIGIvZHJpdmVycy9hY3BpL2J1cy5jCmluZGV4IDE2ODJmOGI0NTRhMi4u
-NDUyNDQzZDc5ZDg3IDEwMDY0NAotLS0gYS9kcml2ZXJzL2FjcGkvYnVzLmMKKysrIGIvZHJpdmVy
-cy9hY3BpL2J1cy5jCkBAIC03NDgsNyArNzQ4LDcgQEAgc3RhdGljIGJvb2wgX19hY3BpX21hdGNo
-X2RldmljZShzdHJ1Y3QgYWNwaV9kZXZpY2UgCipkZXZpY2UsCiDCoMKgwqDCoCDCoMKgwqAgLyog
-Rmlyc3QsIGNoZWNrIHRoZSBBQ1BJL1BOUCBJRHMgcHJvdmlkZWQgYnkgdGhlIGNhbGxlci4gKi8K
-IMKgwqDCoMKgIMKgwqDCoCBpZiAoYWNwaV9pZHMpIHsKIMKgwqDCoMKgIMKgwqDCoCDCoMKgwqAg
-Zm9yIChpZCA9IGFjcGlfaWRzOyBpZC0+aWRbMF0gfHwgaWQtPmNsczsgaWQrKykgewotwqDCoMKg
-IMKgwqDCoCDCoMKgwqAgwqDCoMKgIGlmIChpZC0+aWRbMF0gJiYgIXN0cmNtcCgoY2hhciAqKWlk
-LT5pZCwgaHdpZC0+aWQpKQorwqDCoMKgIMKgwqDCoCDCoMKgwqAgwqDCoMKgIGlmIChpZC0+aWRb
-MF0gJiYgIXN0cm5jbXAoKGNoYXIgKilpZC0+aWQsIGh3aWQtPmlkLCAKQUNQSV9JRF9MRU4gLSAx
-KSkKIMKgwqDCoMKgIMKgwqDCoCDCoMKgwqAgwqDCoMKgIMKgwqDCoCBnb3RvIG91dF9hY3BpX21h
-dGNoOwogwqDCoMKgwqAgwqDCoMKgIMKgwqDCoCDCoMKgwqAgaWYgKGlkLT5jbHMgJiYgX19hY3Bp
-X21hdGNoX2RldmljZV9jbHMoaWQsIGh3aWQpKQogwqDCoMKgwqAgwqDCoMKgIMKgwqDCoCDCoMKg
-wqAgwqDCoMKgIGdvdG8gb3V0X2FjcGlfbWF0Y2g7CmRpZmYgLS1naXQgYS9kcml2ZXJzL3ZpcnQv
-dm1nZW5pZC5jIGIvZHJpdmVycy92aXJ0L3ZtZ2VuaWQuYwppbmRleCA3NWE3ODdkYThhYWQuLjBi
-ZmE0MjJjZjA5NCAxMDA2NDQKLS0tIGEvZHJpdmVycy92aXJ0L3ZtZ2VuaWQuYworKysgYi9kcml2
-ZXJzL3ZpcnQvdm1nZW5pZC5jCkBAIC0zNTYsNyArMzU2LDggQEAgc3RhdGljIHZvaWQgdm1nZW5p
-ZF9hY3BpX25vdGlmeShzdHJ1Y3QgYWNwaV9kZXZpY2UgCipkZXZpY2UsIHUzMiBldmVudCkKIMKg
-fQoKIMKgc3RhdGljIGNvbnN0IHN0cnVjdCBhY3BpX2RldmljZV9pZCB2bWdlbmlkX2lkc1tdID0g
-ewotwqDCoMKgIHsiUUVNVVZHSUQiLCAwfSwKK8KgwqDCoCAvKiBUaGlzIHJlYWxseSBpcyBWTV9H
-ZW5fQ291bnRlciwgYnV0IHdlIGNhbiBvbmx5IG1hdGNoIDggY2hhcmFjdGVycyAqLworwqDCoMKg
-IHsiVk1fR0VOX0MiLCAwfSwKIMKgwqDCoMKgIHsiIiwgMH0sCiDCoH07CgoKCgpBbWF6b24gRGV2
-ZWxvcG1lbnQgQ2VudGVyIEdlcm1hbnkgR21iSApLcmF1c2Vuc3RyLiAzOAoxMDExNyBCZXJsaW4K
-R2VzY2hhZWZ0c2Z1ZWhydW5nOiBDaHJpc3RpYW4gU2NobGFlZ2VyLCBKb25hdGhhbiBXZWlzcwpF
-aW5nZXRyYWdlbiBhbSBBbXRzZ2VyaWNodCBDaGFybG90dGVuYnVyZyB1bnRlciBIUkIgMTQ5MTcz
-IEIKU2l0ejogQmVybGluClVzdC1JRDogREUgMjg5IDIzNyA4NzkKCgo=
+On Fri, 2022-02-25 at 16:22 +0800, Zeng Guang wrote:
+> From: Robert Hoo <robert.hu@linux.intel.com>
+> 
+> A new 64-bit control field "tertiary processor-based VM-execution
+> controls", is defined [1]. It's controlled by bit 17 of the primary
+> processor-based VM-execution controls.
+> 
+> Different from its brother VM-execution fields, this tertiary VM-
+> execution controls field is 64 bit. So it occupies 2 vmx_feature_leafs,
+> TERTIARY_CTLS_LOW and TERTIARY_CTLS_HIGH.
+> 
+> Its companion VMX capability reporting MSR,MSR_IA32_VMX_PROCBASED_CTLS3
+> (0x492), is also semantically different from its brothers, whose 64 bits
+> consist of all allow-1, rather than 32-bit allow-0 and 32-bit allow-1 [1][2].
+> Therefore, its init_vmx_capabilities() is a little different from others.
+> 
+> [1] ISE 6.2 "VMCS Changes"
+> https://www.intel.com/content/www/us/en/develop/download/intel-architecture-instruction-set-extensions-programming-reference.html
+> 
+> [2] SDM Vol3. Appendix A.3
+> 
+> Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
+> Signed-off-by: Zeng Guang <guang.zeng@intel.com>
+> Reviewed-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/include/asm/msr-index.h   | 1 +
+>  arch/x86/include/asm/vmxfeatures.h | 3 ++-
+>  arch/x86/kernel/cpu/feat_ctl.c     | 9 ++++++++-
+>  3 files changed, 11 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
+> index 3faf0f97edb1..1d180f883c32 100644
+> --- a/arch/x86/include/asm/msr-index.h
+> +++ b/arch/x86/include/asm/msr-index.h
+> @@ -938,6 +938,7 @@
+>  #define MSR_IA32_VMX_TRUE_EXIT_CTLS      0x0000048f
+>  #define MSR_IA32_VMX_TRUE_ENTRY_CTLS     0x00000490
+>  #define MSR_IA32_VMX_VMFUNC             0x00000491
+> +#define MSR_IA32_VMX_PROCBASED_CTLS3	0x00000492
+>  
+>  /* VMX_BASIC bits and bitmasks */
+>  #define VMX_BASIC_VMCS_SIZE_SHIFT	32
+> diff --git a/arch/x86/include/asm/vmxfeatures.h b/arch/x86/include/asm/vmxfeatures.h
+> index d9a74681a77d..ff20776dc83b 100644
+> --- a/arch/x86/include/asm/vmxfeatures.h
+> +++ b/arch/x86/include/asm/vmxfeatures.h
+> @@ -5,7 +5,7 @@
+>  /*
+>   * Defines VMX CPU feature bits
+>   */
+> -#define NVMXINTS			3 /* N 32-bit words worth of info */
+> +#define NVMXINTS			5 /* N 32-bit words worth of info */
+>  
+>  /*
+>   * Note: If the comment begins with a quoted string, that string is used
+> @@ -43,6 +43,7 @@
+>  #define VMX_FEATURE_RDTSC_EXITING	( 1*32+ 12) /* "" VM-Exit on RDTSC */
+>  #define VMX_FEATURE_CR3_LOAD_EXITING	( 1*32+ 15) /* "" VM-Exit on writes to CR3 */
+>  #define VMX_FEATURE_CR3_STORE_EXITING	( 1*32+ 16) /* "" VM-Exit on reads from CR3 */
+> +#define VMX_FEATURE_TERTIARY_CONTROLS	( 1*32+ 17) /* "" Enable Tertiary VM-Execution Controls */
+>  #define VMX_FEATURE_CR8_LOAD_EXITING	( 1*32+ 19) /* "" VM-Exit on writes to CR8 */
+>  #define VMX_FEATURE_CR8_STORE_EXITING	( 1*32+ 20) /* "" VM-Exit on reads from CR8 */
+>  #define VMX_FEATURE_VIRTUAL_TPR		( 1*32+ 21) /* "vtpr" TPR virtualization, a.k.a. TPR shadow */
+> diff --git a/arch/x86/kernel/cpu/feat_ctl.c b/arch/x86/kernel/cpu/feat_ctl.c
+> index da696eb4821a..993697e71854 100644
+> --- a/arch/x86/kernel/cpu/feat_ctl.c
+> +++ b/arch/x86/kernel/cpu/feat_ctl.c
+> @@ -15,6 +15,8 @@ enum vmx_feature_leafs {
+>  	MISC_FEATURES = 0,
+>  	PRIMARY_CTLS,
+>  	SECONDARY_CTLS,
+> +	TERTIARY_CTLS_LOW,
+> +	TERTIARY_CTLS_HIGH,
+>  	NR_VMX_FEATURE_WORDS,
+>  };
+>  
+> @@ -22,7 +24,7 @@ enum vmx_feature_leafs {
+>  
+>  static void init_vmx_capabilities(struct cpuinfo_x86 *c)
+>  {
+> -	u32 supported, funcs, ept, vpid, ign;
+> +	u32 supported, funcs, ept, vpid, ign, low, high;
+>  
+>  	BUILD_BUG_ON(NVMXINTS != NR_VMX_FEATURE_WORDS);
+>  
+> @@ -42,6 +44,11 @@ static void init_vmx_capabilities(struct cpuinfo_x86 *c)
+>  	rdmsr_safe(MSR_IA32_VMX_PROCBASED_CTLS2, &ign, &supported);
+>  	c->vmx_capability[SECONDARY_CTLS] = supported;
+>  
+> +	/* All 64 bits of tertiary controls MSR are allowed-1 settings. */
+> +	rdmsr_safe(MSR_IA32_VMX_PROCBASED_CTLS3, &low, &high);
+> +	c->vmx_capability[TERTIARY_CTLS_LOW] = low;
+> +	c->vmx_capability[TERTIARY_CTLS_HIGH] = high;
+> +
+>  	rdmsr(MSR_IA32_VMX_PINBASED_CTLS, ign, supported);
+>  	rdmsr_safe(MSR_IA32_VMX_VMFUNC, &ign, &funcs);
+>  
+
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+
+Best regards,
+	Maxim Levitsky
 
