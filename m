@@ -2,54 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 075B84C4D91
-	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 19:22:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5836A4C4D98
+	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 19:23:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232256AbiBYSX0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 13:23:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38326 "EHLO
+        id S232409AbiBYSXa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 13:23:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38390 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231836AbiBYSXX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Feb 2022 13:23:23 -0500
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18FFC6E78C
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 10:22:51 -0800 (PST)
-Received: by mail-pg1-x54a.google.com with SMTP id k13-20020a65434d000000b00342d8eb46b4so3029892pgq.23
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 10:22:51 -0800 (PST)
+        with ESMTP id S232183AbiBYSXZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Feb 2022 13:23:25 -0500
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76BCF6E8CE
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 10:22:52 -0800 (PST)
+Received: by mail-pf1-x44a.google.com with SMTP id j204-20020a6280d5000000b004e107ad3488so3484187pfd.15
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 10:22:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
-        bh=x4Ku6YsMCKcusqhh1KEW7b8ua9qMmgZkvtpofAGbtVk=;
-        b=RCy+rU96VujgIkYwHn+eJ5lO3hg6B5rvgAVjzyr0MvZ1ZAAaC6UXB+cPjHj469kxNY
-         Dw/RtxHGBJYxtWSp0N+MA+FQg+U8eFE+C4uFNuV2LgxD+q84FNZsyaJANm2VwbaQlVFy
-         gqjB10qjYVDsTOnCB+tre7f3ppLBqcZQMoQOO77NG0G9ZEAKYrAZsvPopKEjUHud6Eji
-         j/4KlnmP+APgnEEeVFGEXmR+Jcxr3wj5lkdTlcY5lHXhtB4cvoq6WeNbwbMDKQRf7sFj
-         AleA+MFbDA9x+F044WEpWtsjE+yir3y5MtRaHwORbGb+qEIqd3DdTJltzhXYaAsN6Yog
-         hQAw==
+        h=reply-to:date:in-reply-to:message-id:mime-version:references
+         :subject:from:to:cc;
+        bh=tEpUVd4jPoK9N2ecaXKtLW2f0KgIvioRCgiZkrx72eI=;
+        b=OWOv2+M6YRuwOcezy+sXd6L23PlvZMFz0Dr8BW1S+7jDP5EiWUOkGH/ETk1JZyA7um
+         qWXPDYWwxfky114NKGB3NXrOuVafjRsJ4REWEfm1SmqED4mNeo9TQbCr+PMnVm/LIB6M
+         spWJ2y/b0Zj4/vMcD1BpCka8UERO/EGcTZT78DxcIuBAyZKjxc/NwCgUU65BEYDGFJUv
+         lGlYYG5/tZZzwWoMXF9XWalPdoHPTZhqkb557RJl/vaHBT23v5q4IYfBebf86Llmos7q
+         BAiIFGIjV/Q7Ev9uiF/tWhjt/okkT8Fg9jbhysn5iGxXLfjALWqOxeqSgBZCsXIfHvqz
+         T0sg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
-         :from:to:cc;
-        bh=x4Ku6YsMCKcusqhh1KEW7b8ua9qMmgZkvtpofAGbtVk=;
-        b=GnmFnqFeU1kYyE2ry5dJK3SiEo3EWvbT5sCL5iP2KjoYMCAtycAxkAHugz7rNpBKcL
-         TwkQZry1WAzaQ6Py3If6MBQ5sOJCK1bVWQ0rPxYhmBbTCZAu+M4yp01xUhJp19O6Szgr
-         gES+Rd+s9/FgsWOtpOIAuOmrdRM11Xwn4anm+AlxNIr+EfnEohlLZHrq7DQv9o3z1XYA
-         VBNLAtFJzYHKam8+7SGAMetOa6XNPUc4fqaqRcuopTmgqpElFTtRkXaRUKH45VcA7S+s
-         /1njzjj90uT2M/alY4P+NOvVl/2laEaDDrTOpLAqQYjBxYJiu8O3vbCrngWdw1Zkvgha
-         HqbA==
-X-Gm-Message-State: AOAM531DsMplQP1GJdXzp8D7cHBX7Of3mIyNdYsdiRjx0zbVKaRiXmLd
-        4vSsJ0dhIyDS/N/YjYjgSxmxBOh+rEE=
-X-Google-Smtp-Source: ABdhPJzTwrVJB5RstZ5uRrPjtjrFdFuxWajJeU/80rhuK+/Xbgr9+0EWknI0rOF0W7DBGk7e5DIi5QEDmPQ=
+        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
+         :mime-version:references:subject:from:to:cc;
+        bh=tEpUVd4jPoK9N2ecaXKtLW2f0KgIvioRCgiZkrx72eI=;
+        b=NWA30gZKt2JYBW2xn+0I5vfjLHeU8S2wMzHfRGNrwsKIOmHeiNuaj1L+6wpA8q7jlp
+         xXqrfNrsfW/J6qQnsTVP8UXyHwrRpZTivGc6OZqMKo50c0Uga1SfashlcRNuXC7uVPI1
+         NoxPOWIScHgS0ax4ka0m3rdDjQF0rymk+V74Lv7hnyffRhlrOrcDYcgNG5QhsT+u0xpJ
+         ZXN3GCIrskpFD6d+NYyZrwE1u7UIIdwt29OrjOrZBmKbwZpAO0u6vd+LcrajlkUcuEyS
+         ZeZepmfosS5i1lXHo+H1WXzW4QU+I7Q2bZV0t6zVE4UL3OtoF7w37r//LMsNeDROL69r
+         Isyg==
+X-Gm-Message-State: AOAM531JHKK91PS8Lga1D6lOxRcgF3PbGyjuM6iA52PP3XyAhPHghzb0
+        olHAifdZbmC7hgLb0nxeZ09Ickq69fc=
+X-Google-Smtp-Source: ABdhPJzPC25kc1BUDo4Eqxg1mvuOtgWUpXZtFNWPs1qsLhYYWgU6hsM2J1mzu+ugmnwlNkFsi0Yuc/ZEMjc=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:90b:4f43:b0:1bc:7e5c:e024 with SMTP id
- pj3-20020a17090b4f4300b001bc7e5ce024mr26588pjb.0.1645813370236; Fri, 25 Feb
- 2022 10:22:50 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:aa7:9382:0:b0:4e0:cf48:e564 with SMTP id
+ t2-20020aa79382000000b004e0cf48e564mr632110pfe.15.1645813371930; Fri, 25 Feb
+ 2022 10:22:51 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 25 Feb 2022 18:22:41 +0000
-Message-Id: <20220225182248.3812651-1-seanjc@google.com>
+Date:   Fri, 25 Feb 2022 18:22:42 +0000
+In-Reply-To: <20220225182248.3812651-1-seanjc@google.com>
+Message-Id: <20220225182248.3812651-2-seanjc@google.com>
 Mime-Version: 1.0
+References: <20220225182248.3812651-1-seanjc@google.com>
 X-Mailer: git-send-email 2.35.1.574.g5d30c73bfb-goog
-Subject: [PATCH v2 0/7] KVM: x86/mmu: Zap only obsolete roots on "reload"
+Subject: [PATCH v2 1/7] KVM: x86: Remove spurious whitespaces from kvm_post_set_cr4()
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Christian Borntraeger <borntraeger@linux.ibm.com>,
@@ -74,55 +77,38 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-For all intents and purposes, this is an x86/mmu series, but it touches
-s390 and common KVM code because KVM_REQ_MMU_RELOAD is currently a generic
-request despite its use being encapsulated entirely within arch code.
+Remove leading spaces that snuck into kvm_post_set_cr4(), fixing the
+KVM_REQ_TLB_FLUSH_CURRENT request in particular is helpful as it unaligns
+the body of the if-statement from the condition check.
 
-The meat of the series is to zap only obsolete (a.k.a. invalid) roots in
-response to KVM marking a root obsolete/invalid due to it being zapped.
-KVM currently drops/zaps all roots, which, aside from being a performance
-hit if the guest is using multiple roots, complicates x86 KVM paths that
-load a new root because it raises the question of what should be done if
-there's a pending KVM_REQ_MMU_RELOAD, i.e. if the path _knows_ that any
-root it loads will be obliterated.
+Fixes: f4bc051fc91a ("KVM: x86: flush TLB separately from MMU reset")
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/x86.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Paolo, I'm hoping you can squash patch 01 with your patch it "fixes".
-
-I'm also speculating that this will be applied after my patch to remove
-KVM_REQ_GPC_INVALIDATE, otherwise the changelog in patch 06 will be
-wrong.
-
-v2:
- - Collect reviews. [Claudio, Janosch]
- - Rebase to latest kvm/queue.
-
-v1: https://lore.kernel.org/all/20211209060552.2956723-1-seanjc@google.com
-
-Sean Christopherson (7):
-  KVM: x86: Remove spurious whitespaces from kvm_post_set_cr4()
-  KVM: x86: Invoke kvm_mmu_unload() directly on CR4.PCIDE change
-  KVM: Drop kvm_reload_remote_mmus(), open code request in x86 users
-  KVM: x86/mmu: Zap only obsolete roots if a root shadow page is zapped
-  KVM: s390: Replace KVM_REQ_MMU_RELOAD usage with arch specific request
-  KVM: Drop KVM_REQ_MMU_RELOAD and update vcpu-requests.rst
-    documentation
-  KVM: WARN if is_unsync_root() is called on a root without a shadow
-    page
-
- Documentation/virt/kvm/vcpu-requests.rst |  7 +-
- arch/s390/include/asm/kvm_host.h         |  2 +
- arch/s390/kvm/kvm-s390.c                 |  8 +--
- arch/s390/kvm/kvm-s390.h                 |  2 +-
- arch/x86/include/asm/kvm_host.h          |  2 +
- arch/x86/kvm/mmu.h                       |  1 +
- arch/x86/kvm/mmu/mmu.c                   | 83 ++++++++++++++++++++----
- arch/x86/kvm/x86.c                       | 10 +--
- include/linux/kvm_host.h                 |  4 +-
- virt/kvm/kvm_main.c                      |  5 --
- 10 files changed, 90 insertions(+), 34 deletions(-)
-
-
-base-commit: f4bc051fc91ab9f1d5225d94e52d369ef58bec58
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 6552360d8888..2157284d05b0 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1089,7 +1089,7 @@ void kvm_post_set_cr4(struct kvm_vcpu *vcpu, unsigned long old_cr4, unsigned lon
+ 	 */
+ 	if (((cr4 ^ old_cr4) & X86_CR4_PGE) ||
+ 	    (!(cr4 & X86_CR4_PCIDE) && (old_cr4 & X86_CR4_PCIDE)))
+-		 kvm_make_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu);
++		kvm_make_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu);
+ 
+ 	/*
+ 	 * The TLB has to be flushed for the current PCID if any of the
+@@ -1099,7 +1099,7 @@ void kvm_post_set_cr4(struct kvm_vcpu *vcpu, unsigned long old_cr4, unsigned lon
+ 	 */
+ 	else if (((cr4 ^ old_cr4) & X86_CR4_PAE) ||
+ 		 ((cr4 & X86_CR4_SMEP) && !(old_cr4 & X86_CR4_SMEP)))
+-		 kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
++		kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
+ 
+ }
+ EXPORT_SYMBOL_GPL(kvm_post_set_cr4);
 -- 
 2.35.1.574.g5d30c73bfb-goog
 
