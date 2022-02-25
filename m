@@ -2,51 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D3274C4B5C
-	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 17:52:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C1A94C4B91
+	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 18:01:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239607AbiBYQxR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 11:53:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37364 "EHLO
+        id S243424AbiBYRAk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 12:00:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58746 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239892AbiBYQww (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Feb 2022 11:52:52 -0500
+        with ESMTP id S243225AbiBYRAi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Feb 2022 12:00:38 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DF676431;
-        Fri, 25 Feb 2022 08:52:19 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B81591D529C;
+        Fri, 25 Feb 2022 09:00:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=ERnS6dWoHSK4o9E6IHl/mz8maLZlK5Tg+x00AaGU8R0=; b=IJI7BsLy+eaSr2yVVCmsDX49VV
-        iJ1i4/QrHg7SB5lF3dHhnDxN5BpfudPqV4/1kMiholFxXaRlsZChttIhpDptV04QFRG7lmlqEUkS+
-        IO1JFDn8ivoDyEpNP3f3MPPweo8c1YraMI492lYIeqL2oTHWI67HeWTtgNLHXbBZ3MOh/+kCdtYkw
-        Dm7QTUBCGW+Z7y+LafxEgSA1hWPrgn3OL62vwij4FRrfl/cbWgShLZu23mTGNhTwCGqh9jB5ysJB7
-        bp+UZs/K5eVyB/n0B1KLswzHX05Tuxa3a+ntyoj/hyc7bNYZuWIHPbNYt4h9FOC6G52Z91YAnx5bE
-        iYHvDeLg==;
+        bh=GShWhJaDIDVMvbVdUPdxNafriM5wV3Zj7hmmN6XO+3Y=; b=UO0lWylllnOnJjQMlCj/cyNww3
+        jO+9WZsHmUEx74Z7f7tj/fMmCPgA+wmT8shE9QZEaGrRbntRlVbN60eO7Tr6y66aPE06jPgoLKPwZ
+        kufOusN8EyzmzYenIHmZ/7kOLycBszfVCpEqeOAZqyivpDAYQ1jIHEA1OE/mmWo5ur+lqhe4dc1D2
+        QQBu4DKHyTFjFb+YAXIovynrK/d1+e8VN6hhWcf8dj4tlrCbf6VvHS++EUEfDfJD8G9BnyfR2CtpD
+        +dZrGBLmRy5DzfR7ZtBcfz7XM1rcJA48a0AYYQDfP9QPNW620qe0X7tFUKTx4aNa1hOo9QqtI6lDY
+        r7dwAjtg==;
 Received: from [2001:8b0:10b:1::3ae] (helo=u3832b3a9db3152.ant.amazon.com)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nNdp0-005xCk-R7; Fri, 25 Feb 2022 16:52:01 +0000
-Message-ID: <95aecbfae5ecad47cf06b30bb415f273b67ed3a3.camel@infradead.org>
-Subject: Re: [PATCH] KVM: x86: Don't snapshot "max" TSC if host TSC is
- constant
+        id 1nNdwm-005xah-7s; Fri, 25 Feb 2022 17:00:00 +0000
+Message-ID: <915ddc7327585bbe8587b91b8cd208520d684db1.camel@infradead.org>
+Subject: Re: [EXTERNAL] [PATCH v2] KVM: Don't actually set a request when
+ evicting vCPUs for GFN cache invd
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Suleiman Souhlal <suleiman@google.com>,
-        Anton Romanov <romanton@google.com>
-Date:   Fri, 25 Feb 2022 16:51:57 +0000
-In-Reply-To: <YhkGkAJtMu0epKiT@google.com>
-References: <20220225013929.3577699-1-seanjc@google.com>
-         <5b9e5a3f3d3c40afea0bc953e3967505251f3143.camel@infradead.org>
-         <YhkGkAJtMu0epKiT@google.com>
+Cc:     "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "frankja@linux.ibm.com" <frankja@linux.ibm.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "imbrenda@linux.ibm.com" <imbrenda@linux.ibm.com>,
+        "david@redhat.com" <david@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Date:   Fri, 25 Feb 2022 16:59:59 +0000
+In-Reply-To: <YhkAJ+nw2lCzRxsg@google.com>
+References: <20220223165302.3205276-1-seanjc@google.com>
+         <2547e9675d855449bc5cc7efb97251d6286a377c.camel@amazon.co.uk>
+         <YhkAJ+nw2lCzRxsg@google.com>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-+pjGCueqYU1tMzmjquc0"
+        boundary="=-dD9wpp1DUw6iChWn27LV"
 User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
@@ -61,62 +60,42 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-+pjGCueqYU1tMzmjquc0
+--=-dD9wpp1DUw6iChWn27LV
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, 2022-02-25 at 16:40 +0000, Sean Christopherson wrote:
-> On Fri, Feb 25, 2022, David Woodhouse wrote:
-> > On Fri, 2022-02-25 at 01:39 +0000, Sean Christopherson wrote:
-> > > @@ -11160,7 +11162,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcp=
-u)
-> > >         vcpu->arch.msr_platform_info =3D MSR_PLATFORM_INFO_CPUID_FAUL=
-T;
-> > >         kvm_vcpu_mtrr_init(vcpu);
-> > >         vcpu_load(vcpu);
-> > > -       kvm_set_tsc_khz(vcpu, max_tsc_khz);
-> > > +       kvm_set_tsc_khz(vcpu, max_tsc_khz ? : tsc_khz);
-> > >         kvm_vcpu_reset(vcpu, false);
-> > >         kvm_init_mmu(vcpu);
-> > >         vcpu_put(vcpu);
-> > >=20
-> >=20
-> > Hm, now if you hit that race you end up potentially giving *different*
-> > frequencies to different vCPUs in a single guest, depending on when
-> > they were created.
+On Fri, 2022-02-25 at 16:13 +0000, Sean Christopherson wrote:
+> On Fri, Feb 25, 2022, Woodhouse, David wrote:
+> > Since we need an active vCPU context to do dirty logging (thanks, dirty
+> > ring)... and since any time vcpu_run exits to userspace for any reason
+> > might be the last time we ever get an active vCPU context... I think
+> > that kind of fundamentally means that we must flush dirty state to the
+> > log on *every* return to userspace, doesn't it?
 >=20
-> Yep.  Though the race is much harder to hit (userspace vs TSC refinement)=
-.  The
-> existing race being hit is essentially do_initcalls() vs. TSC refinement.=
- =20
->=20
-> > How about this... (and as noted, I think I want to add an explicit KVM
-> > ioctl to set kvm->arch.default_tsc_khz for subsequently created vCPUs).
->=20
-> This wouldn't necessarily help.  E.g. assuming userspace knows the actual=
- TSC
-> frequency, creating a vCPU before refinement completes might put the vCPU=
- in
-> "always catchup" purgatory.
+> I would rather add a variant of mark_page_dirty_in_slot() that takes a vC=
+PU, which
+> we whould have in all cases.  I see no reason to require use of kvm_get_r=
+unning_vcpu().
 
-Right.  But at least they'd be *consistent*.
+We already have kvm_vcpu_mark_page_dirty(), but it can't use just 'some
+vcpu' because the dirty ring is lockless. So if you're ever going to
+use anything other than kvm_get_running_vcpu() we need to add locks.
 
-I was actually making that change anyway, for the benefit of VMs where
-we are intentionally scaling to a known, different, TSC frequency =E2=80=94
-which is currently completely hosed when all the vCPUs set it for
-themselves because the TSC sync then fails.
+And while we *could* do that, I don't think it would negate the
+fundamental observation that *any* time we return from vcpu_run to
+userspace, that could be the last time. Userspace might read the dirty
+log for the *last* time, and any internally-cached "oh, at some point
+we need to mark <this> page dirty" is lost because by the time the vCPU
+is finally destroyed, it's too late.
 
-> To really fix the race, KVM needs a notification that refinement complete=
-d (or
-> failed).  KVM could simply refuse to create vCPUs until it got the notifi=
-cation.
-> In the non-constant case, KVM would also need to refresh max_tsc_khz.
+I think I'm going to rip out the 'dirty' flag from the gfn_to_pfn_cache
+completely and add a function (to be called with an active vCPU
+context) which marks the page dirty *now*.
 
-Hm, would the world be a better place if we knew that the delta between
-the unrefined and refined TSC values was always within the tolerance of
-tsc_tolerance_ppm for which we wouldn't bother scaling anyway?
+KVM_GUEST_USES_PFN users like nested VMX will be expected to do this
+before returning from vcpu_run anytime it's in L2 guest mode.=20
 
---=-+pjGCueqYU1tMzmjquc0
+--=-dD9wpp1DUw6iChWn27LV
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -208,25 +187,25 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIwMjI1MTY1MTU3WjAvBgkqhkiG9w0BCQQxIgQghSQsC5fB
-kUfoh10EbTVpUBKvjvwuk313PEbNd7O2eq4wgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIwMjI1MTY1OTU5WjAvBgkqhkiG9w0BCQQxIgQg7IN0v+/o
+v9DM644IuzXWqCWzKw6ghGMaLzPGcspi2yYwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBC7dSSjVGQYVEueEO5hKaA3vJm3zOg6RMe
-LrgRXTDw8AI9Clf7H4lzqsDfkJrEqWhcptq6aDC3X1UvUtk0E6wtj8xNoSoztBpeOXmli+LicGmz
-w9ukpjCTwv3D/wRJGlwicy/R60fh+KOqdDYqnp0hO9ZgnyElOGl9LYDZsxC1xmnEL3xzej965zlL
-Tg63B96VW5/6lWjO6d1wCajQBAN1xaRlkkCsAn0c/FCAo55+hNiENX+OqONjSEmOD8gjAox9FYaW
-k+L9Gm5xi6vnryIi2eLjhVEM2EI24UjZtH5UOf0HjrzYRk/XIigYjt3BAdlbfakEoONcokwgYGog
-gkDfCT0peyswVqR/BeJYIt6QZLVXmRMn59vsrQBrHd2+QOk8kapVkejB7oSYTyHHmOiDnntjvRD+
-Fc1+xJjb/uVavp7SpfY488x7Plx3D4RMXYxivS85OosO/BAM80BgI7Kd+v7zRgjPbtVaQDrESicA
-4FGCtNEXPbbZh11n2aQfQ84Rzt36ZeW+jm/GFvMFm7FOwm5PQn21LgGB1M826WNYEce45axpk5SL
-yU/s/5UkEa7Mvn8zY3ETfgcyjNFayLGjDz0aLJaLgHThBnmpEDltjOEyND9vM/1NHbPvX4gacie+
-cR9PFZzdZszeWcKZWDOU015l93Xm67VUqMd8WjwnFAAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgB7kidNU4+XnCJKWSTq4ADzU/OhXXiX+Uh3
+qtodZMZJjlqYggHA94E58Ms5FLsgW8zXQLHQKWD/lbg2cPcTi0HJbPD7mPfSyS/Zb9wM4cTl8bLK
+VC1pL+hC+S+yxM7C3wXWh2cpqvDHybGmBEFkH3uZXPaMMOezqhjgpvZSFBj3mnsEQHc7MSkGzi30
+bmJy5TlOvl8CcbxGNb0bntbDLfb5zX9KdqWPj75SWp4LZRrqkgES8KjVwCyaRG8K6vHMgnTJeOr6
+ySobLW/3n90FC6l/PFWYgStPWk+wAjK1Qf8F0qsBQkk9SDZHha0UO6VerKNsRFCO4JgpMQIV1EG7
+kn9j8MDmShdKOl1hexc+hLBQ1A/tKQMLZaQpA5q/6I9GhhfZMLnYiQgTYgD51Tmh6mHojzLlrZ1m
+9Eyo39/Y88v5nqkJaXYdH5VdWgLXoraGKpRA4W9j098AJNKuTVZXtCwmkPHtHz0IF4T0WM+bvbcA
+vACBcft1C7MJV5Dfm60jOBhXxj7T4mV9hIdJbY2cfHbMSFqUfMYtU1qyvfuLNWYcHrlEbcxmD5AC
+XlR1WaL/mUKXlMfFI310kouigPzVGi97Nu1Qx1YjUiUrOvTM8XI7UR0s4QzWan13iebp8GzBxrxi
+V7rbxLsrZtzNeD6xD+Q5itBamun8V2APtRvCc4aoswAAAAAAAA==
 
 
---=-+pjGCueqYU1tMzmjquc0--
+--=-dD9wpp1DUw6iChWn27LV--
 
