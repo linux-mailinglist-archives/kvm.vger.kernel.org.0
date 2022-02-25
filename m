@@ -2,98 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AAF6B4C4D50
-	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 19:07:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DA2834C4D8C
+	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 19:21:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232760AbiBYSHe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 13:07:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35474 "EHLO
+        id S231935AbiBYSWA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 13:22:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35338 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231470AbiBYSHd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Feb 2022 13:07:33 -0500
-Received: from mail-oo1-xc35.google.com (mail-oo1-xc35.google.com [IPv6:2607:f8b0:4864:20::c35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E6E11E6EA8
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 10:07:00 -0800 (PST)
-Received: by mail-oo1-xc35.google.com with SMTP id w10-20020a4ae08a000000b0031bdf7a6d76so7194091oos.10
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 10:07:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=NN5kUdin7citIfmsQk9dU1OmhSvd2Lzcs2UPLOuI96I=;
-        b=mZgUDHNQER4VN5jp1nQ+UOooKupVC14mE+ybXlq0GFuOTKAKgCScsKJvcQGhwYht6g
-         ADtrQysZaUbKJJ19rzSH/wl68dYebZWMjQTOFut1JcRerkMYl2ihS4ByNHAaHjex7h4v
-         +IhzLX/hd9wmJHdvKqey5LNtKgCQoF4vaz6XAk7nhicCmbXxzgZ2ZbbLl8MG59+1pfVs
-         6gpsx9/RUKSpG+C5CCV9SXXLkZhsXy1EgDOSuy8QxQNoHl0v9hoL0oaoJdlEQCzTYmhy
-         LUw0C5WFNUJDoSMnPZ74J9aVuDcw8GwlubVOHrsohk+dOgGnfsDvQdyFWdNvzCbUbPX8
-         Ce2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=NN5kUdin7citIfmsQk9dU1OmhSvd2Lzcs2UPLOuI96I=;
-        b=fDIgBBUdUD7yKp3SqAR1y7hbuc/ReL1qUzOYOhgby0aGnDi9lCZ2RxgZbVul+lrkyZ
-         ACHCV14L8HVTOF9rs75tj/oscjlHYNmZIMmB9akMaWXrGWEsoxH/UQEtzH1erG4I3Myo
-         gl0VzTufX1vGc9vFcumxSS5u11UZLoGXE9EVxeGu+i5jXoBDdJl1RO1/ZVzYFWhIJ5XY
-         l+n05Z3smzywZBDX9PTro/+X4k++n4Z9V2eDBu0jAfimiLOoMPCEXsU0ss6JzzUuYG9w
-         H8QOhikMm237Qne4NKlLOs9vWbV4aaloEfaekocVT3cUa4xMWHave3obl/FRRFCD5CMK
-         siWw==
-X-Gm-Message-State: AOAM533+TO85xIj/TWGdSeL6NsuOgHRvKBiYA9dz/5s5YqLvAAjHb7aM
-        bboiOWtfqhAMbWvguRpZRb+oVI/q7NQG87Tt0VYfcQ==
-X-Google-Smtp-Source: ABdhPJwpr/Ifbo68q2+J4j/DBvPxK7bgpP1DW9yuyBh1wSi+UvI2AhGyYgCTxCmjYyEQl3QZtsML4iCA3H8W1zG2M3M=
-X-Received: by 2002:a05:6870:6490:b0:d6:d161:6dbb with SMTP id
- cz16-20020a056870649000b000d6d1616dbbmr1808297oab.129.1645812419250; Fri, 25
- Feb 2022 10:06:59 -0800 (PST)
-MIME-Version: 1.0
-References: <20220223062412.22334-1-chenyi.qiang@intel.com>
- <CALMp9eT50LjXYSwfWENjmfg=XxT4Bx3RzOYubKty8kr_APXCEw@mail.gmail.com>
- <88eb9a9a-fbe3-8e2c-02bd-4bdfc855b67f@intel.com> <6a839b88-392d-886d-836d-ca04cf700dce@intel.com>
- <7859e03f-10fa-dbc2-ed3c-5c09e62f9016@redhat.com>
-In-Reply-To: <7859e03f-10fa-dbc2-ed3c-5c09e62f9016@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 25 Feb 2022 10:06:48 -0800
-Message-ID: <CALMp9eQHKn=ApthER084vKGiQCMdVX7ztB5iLupBPdUY59WV_A@mail.gmail.com>
-Subject: Re: [PATCH v3] KVM: VMX: Enable Notify VM exit
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Xiaoyao Li <xiaoyao.li@intel.com>,
-        Chenyi Qiang <chenyi.qiang@intel.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        with ESMTP id S231986AbiBYSV5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Feb 2022 13:21:57 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DF37E1FEF8D
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 10:21:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645813281;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=g1SxaQgp/6WOc0KKmfEav99FpX07fm1Map4Q3PyyPfo=;
+        b=OBwiCqd4uKtHxtKEkpVlrInSWxuD6hAXyBJRYtGa+S6mxr+qkavMMn2yyFBOLzyH4KI7++
+        n0HpAGNVKkm79HJyAdQ7nFkUD75h6djM346RaDAtNMN0X59kszFvb634Y8MTbLEgr3vyOb
+        4N7VsjUL/BDq84u72/TnHjI7uM0fVLA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-266-NNPaVFfsPo-tmx-Z6-K_Tg-1; Fri, 25 Feb 2022 13:21:18 -0500
+X-MC-Unique: NNPaVFfsPo-tmx-Z6-K_Tg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 502311854E21;
+        Fri, 25 Feb 2022 18:21:17 +0000 (UTC)
+Received: from starship (unknown [10.40.195.190])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B6B892BCD0;
+        Fri, 25 Feb 2022 18:21:14 +0000 (UTC)
+Message-ID: <506c34bc80d1bb740ddf38e6476ad0e16c097282.camel@redhat.com>
+Subject: Re: [PATCH 1/4] KVM: x86: hyper-v: Drop redundant 'ex' parameter
+ from kvm_hv_send_ipi()
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        Jim Mattson <jmattson@google.com>,
+        Siddharth Chandrasekaran <sidcha@amazon.de>,
         linux-kernel@vger.kernel.org
+Date:   Fri, 25 Feb 2022 20:21:13 +0200
+In-Reply-To: <20220222154642.684285-2-vkuznets@redhat.com>
+References: <20220222154642.684285-1-vkuznets@redhat.com>
+         <20220222154642.684285-2-vkuznets@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 25, 2022 at 7:13 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 2/25/22 16:12, Xiaoyao Li wrote:
-> >>>>
-> >>>
-> >>> I don't like the idea of making things up without notifying userspace
-> >>> that this is fictional. How is my customer running nested VMs supposed
-> >>> to know that L2 didn't actually shutdown, but L0 killed it because the
-> >>> notify window was exceeded? If this information isn't reported to
-> >>> userspace, I have no way of getting the information to the customer.
-> >>
-> >> Then, maybe a dedicated software define VM exit for it instead of
-> >> reusing triple fault?
-> >>
-> >
-> > Second thought, we can even just return Notify VM exit to L1 to tell L2
-> > causes Notify VM exit, even thought Notify VM exit is not exposed to L1.
->
-> That might cause NULL pointer dereferences or other nasty occurrences.
+On Tue, 2022-02-22 at 16:46 +0100, Vitaly Kuznetsov wrote:
+> 'struct kvm_hv_hcall' has all the required information already,
+> there's no need to pass 'ex' additionally.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+>  arch/x86/kvm/hyperv.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+> index 6e38a7d22e97..15b6a7bd2346 100644
+> --- a/arch/x86/kvm/hyperv.c
+> +++ b/arch/x86/kvm/hyperv.c
+> @@ -1875,7 +1875,7 @@ static void kvm_send_ipi_to_many(struct kvm *kvm, u32 vector,
+>  	}
+>  }
+>  
+> -static u64 kvm_hv_send_ipi(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc, bool ex)
+> +static u64 kvm_hv_send_ipi(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
+>  {
+>  	struct kvm *kvm = vcpu->kvm;
+>  	struct hv_send_ipi_ex send_ipi_ex;
+> @@ -1889,7 +1889,7 @@ static u64 kvm_hv_send_ipi(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc, bool
+>  	u32 vector;
+>  	bool all_cpus;
+>  
+> -	if (!ex) {
+> +	if (hc->code == HVCALL_SEND_IPI) {
 
-Could we synthesize a machine check? I haven't looked in detail at the
-MCE MSRs, but surely there must be room in there for Intel to reserve
-some encodings for synthesized machine checks.
+I am thinking, if we already touch this code,
+why not to use switch here instead on the hc->code,
+so that we can catch this function being called with something else than
+HVCALL_SEND_IPI_EX
+
+>  		if (!hc->fast) {
+>  			if (unlikely(kvm_read_guest(kvm, hc->ingpa, &send_ipi,
+>  						    sizeof(send_ipi))))
+> @@ -2279,14 +2279,14 @@ int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
+>  			ret = HV_STATUS_INVALID_HYPERCALL_INPUT;
+>  			break;
+>  		}
+> -		ret = kvm_hv_send_ipi(vcpu, &hc, false);
+> +		ret = kvm_hv_send_ipi(vcpu, &hc);
+>  		break;
+>  	case HVCALL_SEND_IPI_EX:
+>  		if (unlikely(hc.fast || hc.rep)) {
+>  			ret = HV_STATUS_INVALID_HYPERCALL_INPUT;
+>  			break;
+>  		}
+> -		ret = kvm_hv_send_ipi(vcpu, &hc, true);
+> +		ret = kvm_hv_send_ipi(vcpu, &hc);
+>  		break;
+>  	case HVCALL_POST_DEBUG_DATA:
+>  	case HVCALL_RETRIEVE_DEBUG_DATA:
+
+
+
+Other than this minor nitpick:
+
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+
+
+Best regards,
+	Maxim Levitsky
+
