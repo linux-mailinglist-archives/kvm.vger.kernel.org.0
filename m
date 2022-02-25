@@ -2,91 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5478F4C48DA
-	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 16:28:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D87C04C4897
+	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 16:19:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242077AbiBYP3O (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 10:29:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57544 "EHLO
+        id S241944AbiBYPTc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 10:19:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231340AbiBYP3M (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Feb 2022 10:29:12 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87E4D51E44;
-        Fri, 25 Feb 2022 07:28:39 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 33D27B83250;
-        Fri, 25 Feb 2022 15:28:38 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77BC2C340F0;
-        Fri, 25 Feb 2022 15:28:34 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="WRm6cOGF"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1645802913;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=AGc3HtA6A4VpWTuoF56TukEqyXDHbzPy+Zb56qBmVE4=;
-        b=WRm6cOGFOImn/aW/r2uMGAAnP99kIhA6KQkGrSddTUVxAkWVY9oezzK7F6YN6oeSPEX00v
-        XVn/gXm/ZD0Khupal1wI4/zPDplhrs4umww7//LN2a9PB1DjWjGzF4rwRukBQLnbj5EMHE
-        FRzEd8Ep4ZckCmimiThiqkYgmQENeqQ=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 8a164ef4 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Fri, 25 Feb 2022 15:28:32 +0000 (UTC)
-Date:   Fri, 25 Feb 2022 16:28:29 +0100
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Alexander Graf <graf@amazon.com>
-Cc:     kvm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
-        adrian@parity.io, ardb@kernel.org, ben@skyportsystems.com,
-        berrange@redhat.com, colmmacc@amazon.com, decui@microsoft.com,
-        dwmw@amazon.co.uk, ebiggers@kernel.org, ehabkost@redhat.com,
-        gregkh@linuxfoundation.org, haiyangz@microsoft.com,
-        imammedo@redhat.com, jannh@google.com, kys@microsoft.com,
-        lersek@redhat.com, linux@dominikbrodowski.net, mst@redhat.com,
-        qemu-devel@nongnu.org, raduweis@amazon.com, sthemmin@microsoft.com,
-        tytso@mit.edu, wei.liu@kernel.org
-Subject: Re: [PATCH v4] virt: vmgenid: introduce driver for reinitializing
- RNG on VM fork
-Message-ID: <Yhj1nYHXmimPsqFd@zx2c4.com>
-References: <CAHmME9pJ3wb=EbUErJrCRC=VYGhFZqj2ar_AkVPsUvAnqGtwwg@mail.gmail.com>
- <20220225124848.909093-1-Jason@zx2c4.com>
- <05c9f2a9-accb-e0de-aac7-b212adac7eb2@amazon.com>
- <YhjttNadaaJzVa5X@zx2c4.com>
- <b3b9dd9b-c42c-f057-f546-3e390b50479f@amazon.com>
+        with ESMTP id S231529AbiBYPT3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Feb 2022 10:19:29 -0500
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87A2882D01;
+        Fri, 25 Feb 2022 07:18:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1645802337; x=1677338337;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=84fOjGeLn2tSLSYuKr7MpfZDNr7NR6Oa5z6KoGnpcbo=;
+  b=ArGdlHT1GipZMDK6110kc166RG0/6Gruzqixw0opkg9RAj2QJkrkKt0A
+   nSMiJggkphhjvabbbPvbs6yMoQDcEWs4y6fnHChVjesZ5zMPb/T45M6Wp
+   L3znTCJT124elISSj97/YfC5vlDoyI2pXhDnEEIqyMrlAcUMFTW20OwZ1
+   P9FGA3rZ0V+quo4adkzEs9gSitFCtkcT2by1uiOfjCSZl0mJeJXZSqcR2
+   2HaZfzv/ZLWVWhK1kapibqbr0YyjsQlpR1SReU69L84hFoqhMq+sassJn
+   rReB/3NrWgQhsCPs2mjPYWT4hd+kvfRDzqfCGezCONIeIFPWIeS9IwNCI
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10268"; a="252708656"
+X-IronPort-AV: E=Sophos;i="5.90,136,1643702400"; 
+   d="scan'208";a="252708656"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2022 07:18:57 -0800
+X-IronPort-AV: E=Sophos;i="5.90,136,1643702400"; 
+   d="scan'208";a="533603388"
+Received: from gao-cwp.sh.intel.com (HELO gao-cwp) ([10.239.159.105])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2022 07:18:51 -0800
+Date:   Fri, 25 Feb 2022 23:29:48 +0800
+From:   Chao Gao <chao.gao@intel.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Zeng Guang <guang.zeng@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jethro Beekman <jethro@fortanix.com>,
+        Kai Huang <kai.huang@intel.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, Robert Hu <robert.hu@intel.com>
+Subject: Re: [PATCH v6 5/9] KVM: x86: Add support for vICR APIC-write
+ VM-Exits in x2APIC mode
+Message-ID: <20220225152946.GA26414@gao-cwp>
+References: <20220225082223.18288-1-guang.zeng@intel.com>
+ <20220225082223.18288-6-guang.zeng@intel.com>
+ <91235d07cad41a75282df7fc222514dc1e991118.camel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b3b9dd9b-c42c-f057-f546-3e390b50479f@amazon.com>
-X-Spam-Status: No, score=-6.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <91235d07cad41a75282df7fc222514dc1e991118.camel@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Alex,
+On Fri, Feb 25, 2022 at 04:44:05PM +0200, Maxim Levitsky wrote:
+>On Fri, 2022-02-25 at 16:22 +0800, Zeng Guang wrote:
+>> Upcoming Intel CPUs will support virtual x2APIC MSR writes to the vICR,
+>> i.e. will trap and generate an APIC-write VM-Exit instead of intercepting
+>> the WRMSR.  Add support for handling "nodecode" x2APIC writes, which
+>> were previously impossible.
+>> 
+>> Note, x2APIC MSR writes are 64 bits wide.
+>> 
+>> Signed-off-by: Zeng Guang <guang.zeng@intel.com>
+>> ---
+>>  arch/x86/kvm/lapic.c | 25 ++++++++++++++++++++++---
+>>  1 file changed, 22 insertions(+), 3 deletions(-)
+>> 
+>> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+>> index 629c116b0d3e..e4bcdab1fac0 100644
+>> --- a/arch/x86/kvm/lapic.c
+>> +++ b/arch/x86/kvm/lapic.c
+>> @@ -67,6 +67,7 @@ static bool lapic_timer_advance_dynamic __read_mostly;
+>>  #define LAPIC_TIMER_ADVANCE_NS_MAX     5000
+>>  /* step-by-step approximation to mitigate fluctuation */
+>>  #define LAPIC_TIMER_ADVANCE_ADJUST_STEP 8
+>> +static int kvm_lapic_msr_read(struct kvm_lapic *apic, u32 reg, u64 *data);
+>>  
+>>  static inline void __kvm_lapic_set_reg(char *regs, int reg_off, u32 val)
+>>  {
+>> @@ -2227,10 +2228,28 @@ EXPORT_SYMBOL_GPL(kvm_lapic_set_eoi);
+>>  /* emulate APIC access in a trap manner */
+>>  void kvm_apic_write_nodecode(struct kvm_vcpu *vcpu, u32 offset)
+>>  {
+>> -	u32 val = kvm_lapic_get_reg(vcpu->arch.apic, offset);
+>> +	struct kvm_lapic *apic = vcpu->arch.apic;
+>> +	u64 val;
+>> +
+>> +	if (apic_x2apic_mode(apic)) {
+>> +		/*
+>> +		 * When guest APIC is in x2APIC mode and IPI virtualization
+>> +		 * is enabled, accessing APIC_ICR may cause trap-like VM-exit
+>> +		 * on Intel hardware. Other offsets are not possible.
+>> +		 */
+>> +		if (WARN_ON_ONCE(offset != APIC_ICR))
+>> +			return;
+>>  
+>> -	/* TODO: optimize to just emulate side effect w/o one more write */
+>> -	kvm_lapic_reg_write(vcpu->arch.apic, offset, val);
+>> +		kvm_lapic_msr_read(apic, offset, &val);
+>> +		if (val & APIC_ICR_BUSY)
+>> +			kvm_x2apic_icr_write(apic, val);
+>> +		else
+>> +			kvm_apic_send_ipi(apic, (u32)val, (u32)(val >> 32));
+>I don't fully understand the above code.
+>
+>First of where kvm_x2apic_icr_write is defined?
 
-On Fri, Feb 25, 2022 at 04:15:59PM +0100, Alexander Graf wrote:
-> I'm not talking about a notification interface - we've gone through 
-> great length on that one in the previous submission. What I'm more 
-> interested in is *any* way for user space to read the current VM Gen ID. 
-> The same way I'm interested to see other device attributes of my system 
-> through sysfs.
+Sean introduces it in his "prep work for VMX IPI virtualization" series, which
+is merged into kvm/queue branch.
 
-Again, no. Same basic objection: we can do this later and design it
-coherently with the rest. For example, maybe it's better to expose a
-generation counter rather than 16 byte blob, and expect userspace to
-call getrandom() subsequently to get something fresh. Or not! But maybe
-it should be hashed with a fixed prefix string before being exposed to
-userspace. Or not! I don't know, but that's not going to happen on this
-patchset. There is no reason at all why that needs to be done here and
-now. Trying to do too much at the same time is likely why the previous
-efforts from your team stalled out last year. Propose something later,
-in a new thread, and we can discuss then. One step at a time...
+https://git.kernel.org/pub/scm/virt/kvm/kvm.git/commit/?h=queue&id=7a641ca0c219e4bbe102f2634dbc7e06072fcd3c
 
-Jason
+>
+>Second, I thought that busy bit is not used in x2apic mode?
+>At least in intel's SDM, section 10.12.9 'ICR Operation in x2APIC Mode'
+>this bit is not defined.
+
+You are right. We will remove the pointless check against APIC_ICR_BUSY and
+just invoke kvm_apic_send_ipi().
+
+In that section, SDM also says:
+With the removal of the Delivery Status bit, system software no longer has a
+reason to read the ICR. It remains readable only to aid in debugging; however,
+***software should not assume the value returned by reading the ICR is the last
+written value***.
