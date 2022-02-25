@@ -2,130 +2,196 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2BDCF4C4C1A
-	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 18:27:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9EF7B4C4C28
+	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 18:30:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243707AbiBYR2O (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 12:28:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37454 "EHLO
+        id S243721AbiBYRak (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 12:30:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242345AbiBYR1z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Feb 2022 12:27:55 -0500
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 542EC282
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 09:27:21 -0800 (PST)
-Received: by mail-pg1-x534.google.com with SMTP id t14so2286338pgr.3
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 09:27:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=TgKDtZ0bO8Y1fwYCzfXljiMJckMItSBZo7l3LM6GcOc=;
-        b=a9Yn4qGa/0rCSNK1Vp7W+un1EJY8IPeLKL8wa4ZD4UES6xu5vLuBnU2FdJ8hR5SAd6
-         GxywGakYCPIygiwGZpIPzNirfPASu6kHFUfptB542rAxCn7SH6CaB/YEXuAfGg82jjyH
-         SUdkncrtGQvzP0xv3obSTxUVv5zxB+tzd0ZClAPzF53mxBkCFFo2G10o6TgAK+KE8VP/
-         oxjBHWRRkBQ60MqBf5pbQ6DhGmwPvoVFvIGf7sugJuW95Tude7DTNDVt89hz4vP6InIW
-         cyNHoMTN80adW1FwX0ADQprH4Z6AGA+SkqHmuyGFQgwfYgh+ODCVRig7mOfMHaxadCLF
-         lXdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=TgKDtZ0bO8Y1fwYCzfXljiMJckMItSBZo7l3LM6GcOc=;
-        b=mpIWl/39nnOa6FW8d750YE2EZuZW6mJLOXGSxcjAOSCdyP7qtCN1bcX/ZoM9NM6r5G
-         eN8YqdOUwf8WggeZHQW6sNMZpU041G0YRLjp7MHQucuwKlQSGdO3eZm7/8wjChYPzmDK
-         ywOhRwZEyxc9odZQDoyDt/thOzXJSCX+KonkG+lgwOQP2vsM4B2qSo0j3g7uLl//gBOE
-         Vd2kJfZVC3ODOrt8qo4As5u+GUDTPcG6kxV0sOnO17tskgOR+IPnfQHU71cml3DhW48P
-         DSvkX7pwkas8k8ZRgLy8kShvMS5RC3BjaVETVLAgQ4TSom7X5eIIT0P4ESc3HrzEqYuj
-         bNsA==
-X-Gm-Message-State: AOAM533hjMUmONvxVHUC7soO1qUifvf2Ty3Oy1KFvkAD+eFJSG8pzB/o
-        suHN4S5OYrFU6VeCohtDJhybLw==
-X-Google-Smtp-Source: ABdhPJzDfKJptQd+IAjDEBgwX6SRfOPtxKZt935GDSKZl73taXkwubv64+BclmzHVuYstHfvSuglFg==
-X-Received: by 2002:a63:5911:0:b0:36c:4394:5bfa with SMTP id n17-20020a635911000000b0036c43945bfamr6815295pgb.519.1645810040554;
-        Fri, 25 Feb 2022 09:27:20 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id 25-20020a631859000000b00373df766e76sm3145302pgy.16.2022.02.25.09.27.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Feb 2022 09:27:19 -0800 (PST)
-Date:   Fri, 25 Feb 2022 17:27:12 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "frankja@linux.ibm.com" <frankja@linux.ibm.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "imbrenda@linux.ibm.com" <imbrenda@linux.ibm.com>,
-        "david@redhat.com" <david@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [EXTERNAL] [PATCH v2] KVM: Don't actually set a request when
- evicting vCPUs for GFN cache invd
-Message-ID: <YhkRcK64Jya6YpA9@google.com>
-References: <20220223165302.3205276-1-seanjc@google.com>
- <2547e9675d855449bc5cc7efb97251d6286a377c.camel@amazon.co.uk>
- <YhkAJ+nw2lCzRxsg@google.com>
- <915ddc7327585bbe8587b91b8cd208520d684db1.camel@infradead.org>
+        with ESMTP id S237679AbiBYRai (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Feb 2022 12:30:38 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7E42860D8B
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 09:30:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645810205;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ojV+v8nU5UgxoBRpf2GOrPq7WAn6iAeXjWuAfgZUBsE=;
+        b=hN7bkBro/+b4uBjH6ZRhS76L1IaEdAWrGGmdy92337t3akVERIyAgUzA6LUTMHN9qdyB62
+        KX8Z6aehpBfF9LzafMV6YDlf026Une4jFuxhR+hCpL9gOUHrkNwEVflk7MFbr814fl6aYR
+        g7p3IGAzi/mbYYJX8WuhXL3FeMxhHTQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-54-OnJVrDTmMeWgqctbBlz31w-1; Fri, 25 Feb 2022 12:30:00 -0500
+X-MC-Unique: OnJVrDTmMeWgqctbBlz31w-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A0C7E1006AA6;
+        Fri, 25 Feb 2022 17:29:57 +0000 (UTC)
+Received: from starship (unknown [10.40.195.190])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7EF3380009;
+        Fri, 25 Feb 2022 17:29:45 +0000 (UTC)
+Message-ID: <113db01c73b8fe061b8226e75849317bac7873a5.camel@redhat.com>
+Subject: Re: [PATCH v6 9/9] KVM: VMX: Optimize memory allocation for
+ PID-pointer table
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Zeng Guang <guang.zeng@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jethro Beekman <jethro@fortanix.com>,
+        Kai Huang <kai.huang@intel.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
+        Robert Hu <robert.hu@intel.com>, Gao Chao <chao.gao@intel.com>
+Date:   Fri, 25 Feb 2022 19:29:39 +0200
+In-Reply-To: <20220225082223.18288-10-guang.zeng@intel.com>
+References: <20220225082223.18288-1-guang.zeng@intel.com>
+         <20220225082223.18288-10-guang.zeng@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <915ddc7327585bbe8587b91b8cd208520d684db1.camel@infradead.org>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 25, 2022, David Woodhouse wrote:
-> On Fri, 2022-02-25 at 16:13 +0000, Sean Christopherson wrote:
-> > On Fri, Feb 25, 2022, Woodhouse, David wrote:
-> > > Since we need an active vCPU context to do dirty logging (thanks, dirty
-> > > ring)... and since any time vcpu_run exits to userspace for any reason
-> > > might be the last time we ever get an active vCPU context... I think
-> > > that kind of fundamentally means that we must flush dirty state to the
-> > > log on *every* return to userspace, doesn't it?
-> > 
-> > I would rather add a variant of mark_page_dirty_in_slot() that takes a vCPU, which
-> > we whould have in all cases.  I see no reason to require use of kvm_get_running_vcpu().
+On Fri, 2022-02-25 at 16:22 +0800, Zeng Guang wrote:
+> Current kvm allocates 8 pages in advance for Posted Interrupt Descriptor
+> pointer (PID-pointer) table to accommodate vCPUs with APIC ID up to
+> KVM_MAX_VCPU_IDS - 1. This policy wastes some memory because most of
+> VMs have less than 512 vCPUs and then just need one page.
 > 
-> We already have kvm_vcpu_mark_page_dirty(), but it can't use just 'some
-> vcpu' because the dirty ring is lockless. So if you're ever going to
-> use anything other than kvm_get_running_vcpu() we need to add locks.
+> If user hypervisor specify max practical vcpu id prior to vCPU creation,
+> IPIv can allocate only essential memory for PID-pointer table and reduce
+> the memory footprint of VMs.
+> 
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Zeng Guang <guang.zeng@intel.com>
+> ---
+>  arch/x86/kvm/vmx/vmx.c | 45 ++++++++++++++++++++++++++++--------------
+>  1 file changed, 30 insertions(+), 15 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 0cb141c277ef..22bfb4953289 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -230,9 +230,6 @@ static const struct {
+>  };
+>  
+>  #define L1D_CACHE_ORDER 4
+> -
+> -/* PID(Posted-Interrupt Descriptor)-pointer table entry is 64-bit long */
+> -#define MAX_PID_TABLE_ORDER get_order(KVM_MAX_VCPU_IDS * sizeof(u64))
+>  #define PID_TABLE_ENTRY_VALID 1
+>  
+>  static void *vmx_l1d_flush_pages;
+> @@ -4434,6 +4431,24 @@ static u32 vmx_secondary_exec_control(struct vcpu_vmx *vmx)
+>  	return exec_control;
+>  }
+>  
+> +static int vmx_alloc_pid_table(struct kvm_vmx *kvm_vmx)
+> +{
+> +	struct page *pages;
+> +
+> +	if(kvm_vmx->pid_table)
+> +		return 0;
+> +
+> +	pages = alloc_pages(GFP_KERNEL | __GFP_ZERO,
+> +			get_order(kvm_vmx->kvm.arch.max_vcpu_id * sizeof(u64)));
+> +
+> +	if (!pages)
+> +		return -ENOMEM;
+> +
+> +	kvm_vmx->pid_table = (void *)page_address(pages);
+> +	kvm_vmx->pid_last_index = kvm_vmx->kvm.arch.max_vcpu_id - 1;
+> +	return 0;
+> +}
+> +
+>  #define VMX_XSS_EXIT_BITMAP 0
+>  
+>  static void init_vmcs(struct vcpu_vmx *vmx)
+> @@ -7159,6 +7174,16 @@ static int vmx_create_vcpu(struct kvm_vcpu *vcpu)
+>  			goto free_vmcs;
+>  	}
+>  
+> +	if (enable_ipiv && kvm_vcpu_apicv_active(vcpu)) {
+> +		struct kvm_vmx *kvm_vmx = to_kvm_vmx(vcpu->kvm);
+> +
+> +		mutex_lock(&vcpu->kvm->lock);
+> +		err = vmx_alloc_pid_table(kvm_vmx);
+> +		mutex_unlock(&vcpu->kvm->lock);
+> +		if (err)
+> +			goto free_vmcs;
+> +	}
 
-Heh, actually, scratch my previous comment.  I was going to respond that
-kvm_get_running_vcpu() is mutually exclusive with all other ioctls() on the same
-vCPU by virtue of vcpu->mutex, but I had forgotten that kvm_get_running_vcpu()
-really should be "kvm_get_loaded_vcpu()".  I.e. as long as KVM is in a vCPU-ioctl
-path, kvm_get_running_vcpu() will be non-null.
+This could be dangerous. If APICv is temporary inhibited,
+this code won't run and we will end up without PID table.
 
-> And while we *could* do that, I don't think it would negate the
-> fundamental observation that *any* time we return from vcpu_run to
-> userspace, that could be the last time. Userspace might read the dirty
-> log for the *last* time, and any internally-cached "oh, at some point
-> we need to mark <this> page dirty" is lost because by the time the vCPU
-> is finally destroyed, it's too late.
+I think that kvm_vcpu_apicv_active should be just dropped
+from this condition.
 
-Hmm, isn't that an existing bug?  I think the correct fix would be to flush all
-dirty vmcs12 pages to the memslot in vmx_get_nested_state().  Userspace _must_
-invoke that if it wants to migrated a nested vCPU.
+Best regards,
+	Maxim Levitsky
 
-> I think I'm going to rip out the 'dirty' flag from the gfn_to_pfn_cache
-> completely and add a function (to be called with an active vCPU
-> context) which marks the page dirty *now*.
 
-Hrm, something like?
+> +
+>  	return 0;
+>  
+>  free_vmcs:
+> @@ -7202,17 +7227,6 @@ static int vmx_vm_init(struct kvm *kvm)
+>  		}
+>  	}
+>  
+> -	if (enable_ipiv) {
+> -		struct page *pages;
+> -
+> -		pages = alloc_pages(GFP_KERNEL | __GFP_ZERO, MAX_PID_TABLE_ORDER);
+> -		if (!pages)
+> -			return -ENOMEM;
+> -
+> -		to_kvm_vmx(kvm)->pid_table = (void *)page_address(pages);
+> -		to_kvm_vmx(kvm)->pid_last_index = KVM_MAX_VCPU_IDS - 1;
+> -	}
+> -
+>  	return 0;
+>  }
+>  
+> @@ -7809,7 +7823,8 @@ static void vmx_vm_destroy(struct kvm *kvm)
+>  	struct kvm_vmx *kvm_vmx = to_kvm_vmx(kvm);
+>  
+>  	if (kvm_vmx->pid_table)
+> -		free_pages((unsigned long)kvm_vmx->pid_table, MAX_PID_TABLE_ORDER);
+> +		free_pages((unsigned long)kvm_vmx->pid_table,
+> +			get_order((kvm_vmx->pid_last_index + 1) * sizeof(u64)));
+>  }
+>  
+>  static struct kvm_x86_ops vmx_x86_ops __initdata = {
 
-  1. Drop @dirty from kvm_gfn_to_pfn_cache_init()
-  2. Rename @dirty => @old_dirty in kvm_gfn_to_pfn_cache_refresh()
-  3. Add an API to mark the associated slot dirty without unmapping
 
-I think that makes sense.
 
-> KVM_GUEST_USES_PFN users like nested VMX will be expected to do this
-> before returning from vcpu_run anytime it's in L2 guest mode. 
 
-As above, I think the correct thing to do is enlightent the flows that retrieve
-the state being cached.
