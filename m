@@ -2,84 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 749684C4930
-	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 16:38:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 853F54C492D
+	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 16:38:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242165AbiBYPh2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 10:37:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52810 "EHLO
+        id S242178AbiBYPhk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 10:37:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53028 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240337AbiBYPh1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Feb 2022 10:37:27 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F069821EB8C;
-        Fri, 25 Feb 2022 07:36:54 -0800 (PST)
+        with ESMTP id S242174AbiBYPhj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Feb 2022 10:37:39 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B258B21EBAA
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 07:37:07 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 8CFA4618E3;
-        Fri, 25 Feb 2022 15:36:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 674ECC340E7;
-        Fri, 25 Feb 2022 15:36:51 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="GI8DmJn5"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1645803410;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=iwp10sT7peKmlW9+/6iPiAzMvnsfb0aFjjMWYlFu/qY=;
-        b=GI8DmJn5Hxh7L7PT1bruHnDbI+diCBzWolvVWhiHRhm9kvqyhDSEUyZBWH3DcI7YaqP/Xi
-        q5vllj7ypWF2vqNN2CPJcmOw3jJ7ERFKYffFupSgURYWDWHVdyxSbFkJpCCTlMUwXPNz6j
-        YfGs236u28Z04UbkO7Hl0QC8Y0EWsN8=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id a5decf67 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Fri, 25 Feb 2022 15:36:49 +0000 (UTC)
-Date:   Fri, 25 Feb 2022 16:36:42 +0100
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Alexander Graf <graf@amazon.com>
-Cc:     Greg KH <gregkh@linuxfoundation.org>, kvm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        linux-kernel@vger.kernel.org, adrian@parity.io, ardb@kernel.org,
-        ben@skyportsystems.com, berrange@redhat.com, colmmacc@amazon.com,
-        decui@microsoft.com, dwmw@amazon.co.uk, ebiggers@kernel.org,
-        ehabkost@redhat.com, haiyangz@microsoft.com, imammedo@redhat.com,
-        jannh@google.com, kys@microsoft.com, lersek@redhat.com,
-        linux@dominikbrodowski.net, mst@redhat.com, qemu-devel@nongnu.org,
-        raduweis@amazon.com, sthemmin@microsoft.com, tytso@mit.edu,
-        wei.liu@kernel.org
-Subject: Re: [PATCH v4] virt: vmgenid: introduce driver for reinitializing
- RNG on VM fork
-Message-ID: <Yhj3iqBxxzDeFhyd@zx2c4.com>
-References: <CAHmME9pJ3wb=EbUErJrCRC=VYGhFZqj2ar_AkVPsUvAnqGtwwg@mail.gmail.com>
- <20220225124848.909093-1-Jason@zx2c4.com>
- <05c9f2a9-accb-e0de-aac7-b212adac7eb2@amazon.com>
- <YhjphtYyXoYZ9lXY@kroah.com>
- <0b8a2c25-df48-143d-7fac-dc9b4ef68d3c@amazon.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <0b8a2c25-df48-143d-7fac-dc9b4ef68d3c@amazon.com>
-X-Spam-Status: No, score=-6.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4A3B461890
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 15:37:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACED8C340E7;
+        Fri, 25 Feb 2022 15:37:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1645803426;
+        bh=SiyBeYhls8/kz1YvQqn0t9gFcAOpmUd7OBXO0BWM8ck=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=iW215UkmDi1NpBBJ6pJstgL/K6ct++CQLRyzZeGOKAQBTK41VGm2L/z+tik6wrGzB
+         HdGq5l7wbeDjeO5uiqfubRKbjmH25YDruQMNkFzgwCHUruZz2B5mGPlzJyEdzl1rEi
+         rPpxaZDpsSsRcbQPEjfHdjc7pAZKENlBBzRhD+dvblbwhY/yGuk3pt7yai5/l8ViV+
+         lJZA4poUGjdLOX1z4w3k+URBaRKv2X8R7HbHkyfSXK2TsRCYzNGB08N+J51RIbMWcb
+         o9QXwBdGHYNDMeTCQ/iR64NYdZ68KvUTk7dCIwB+AnZYXe1QO03cfkQFnXwbZETsC4
+         kfWq5MvmEqAyQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nNceW-00AZ0Q-C0; Fri, 25 Feb 2022 15:37:04 +0000
+Date:   Fri, 25 Feb 2022 15:37:03 +0000
+Message-ID: <87h78n2c0w.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oupton@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, Peter Shier <pshier@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>,
+        Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH v3 06/19] KVM: arm64: Track vCPU power state using MP state values
+In-Reply-To: <YhgBz1/cgpoS3HuD@google.com>
+References: <20220223041844.3984439-1-oupton@google.com>
+        <20220223041844.3984439-7-oupton@google.com>
+        <87y2202y8f.wl-maz@kernel.org>
+        <YhgBz1/cgpoS3HuD@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@google.com, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, anup@brainfault.org, atishp@atishpatra.org, seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, pshier@google.com, reijiw@google.com, ricarkol@google.com, rananta@google.com, jingzhangos@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi again,
+On Thu, 24 Feb 2022 22:08:15 +0000,
+Oliver Upton <oupton@google.com> wrote:
+> 
+> Hi Marc,
+> 
+> On Thu, Feb 24, 2022 at 01:25:04PM +0000, Marc Zyngier wrote:
+> 
+> [...]
+> 
+> > > @@ -190,7 +190,7 @@ static void kvm_prepare_system_event(struct kvm_vcpu *vcpu, u32 type)
+> > >  	 * re-initialized.
+> > >  	 */
+> > >  	kvm_for_each_vcpu(i, tmp, vcpu->kvm)
+> > > -		tmp->arch.power_off = true;
+> > > +		tmp->arch.mp_state = KVM_MP_STATE_STOPPED;
+> > >  	kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_SLEEP);
+> > >  
+> > >  	memset(&vcpu->run->system_event, 0, sizeof(vcpu->run->system_event));
+> > 
+> > You also may want to initialise the mp_state to RUNNABLE by default in
+> > kvm_arch_vcpu_create(). We are currently relying on power_off to be
+> > false thanks to the vcpu struct being zeroed, but we may as well make
+> > it clearer (RUNNABLE is also 0, so there is no actual bug here).
+> 
+> We unconditionally initialize power_off in
+> kvm_arch_vcpu_ioctl_vcpu_init(), and do the same in this patch for mp_state,
+> depending on if KVM_ARM_VCPU_POWER_OFF is set.
 
-On Fri, Feb 25, 2022 at 04:31:02PM +0100, Alexander Graf wrote:
-> >> Please expose the vmgenid via /sysfs so that user space even remotely has a
-> >> chance to check if it's been cloned.
-> > Export it how?  And why, who would care?
-> You can just
+Ah, I missed that. Thanks for the heads up.
 
-As mentioned in <https://lore.kernel.org/lkml/Yhj1nYHXmimPsqFd@zx2c4.com/>,
-propose something later for all of this. It doesn't need to happen all
-at once *now*.
+> Any objections to leaving that as-is? I can move the RUNNABLE case into
+> kvm_arch_vcpu_create() as you've suggested, too.
+
+No, that's just a brain fart on my part. Leave it as is.
 
 Thanks,
-Jason
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
