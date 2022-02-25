@@ -2,167 +2,280 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D23F24C4BFA
-	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 18:23:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5FBC74C4C14
+	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 18:25:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243622AbiBYRXl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 12:23:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51962 "EHLO
+        id S243646AbiBYRYk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 12:24:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56796 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238554AbiBYRXk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Feb 2022 12:23:40 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 97240B0E86
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 09:23:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645809787;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=o6+p4N/r5BZgyxyBk99ql5qndbC6qsnKcpY4R84Y2C8=;
-        b=HhRP2zKVFlBoogIQbmLo8sfZVPdvcaD9HAl7e5oO2OtTX1l9v5S6TKppAPzHpD1kagSvbv
-        12ZDiB60lAwo2s4vADFi9IuZAbRLwbfGaPE91wwnDZvq6yI/VhmuW7P00MZl4LC2WkZjBT
-        w7AbUYjBULnN3lowpmtgRaMoWuT8fQk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-132-t_3oUhy-NCKAHGse6EVuyQ-1; Fri, 25 Feb 2022 12:23:04 -0500
-X-MC-Unique: t_3oUhy-NCKAHGse6EVuyQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EBE94FC81;
-        Fri, 25 Feb 2022 17:23:01 +0000 (UTC)
-Received: from starship (unknown [10.40.195.190])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 91D4A2B450;
-        Fri, 25 Feb 2022 17:22:42 +0000 (UTC)
-Message-ID: <552134618737fec8c06afc878dc81b740d70930e.camel@redhat.com>
-Subject: Re: [PATCH v6 8/9] KVM: x86: Allow userspace set maximum VCPU id
- for VM
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Zeng Guang <guang.zeng@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jethro Beekman <jethro@fortanix.com>,
-        Kai Huang <kai.huang@intel.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
-        Robert Hu <robert.hu@intel.com>, Gao Chao <chao.gao@intel.com>
-Date:   Fri, 25 Feb 2022 19:22:41 +0200
-In-Reply-To: <20220225082223.18288-9-guang.zeng@intel.com>
-References: <20220225082223.18288-1-guang.zeng@intel.com>
-         <20220225082223.18288-9-guang.zeng@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        with ESMTP id S237449AbiBYRYj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Feb 2022 12:24:39 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 289DD19D743;
+        Fri, 25 Feb 2022 09:24:07 -0800 (PST)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21PHGPvY006507;
+        Fri, 25 Feb 2022 17:24:06 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=VtqGJjyvYkgfNdvmFGFNVRXmE2DVqgFN7yPq5Xbs6Zw=;
+ b=IG9m/Kn8w9ztA8e7mV7bInN26f7oNlHs800PgK5iEjzzRDMEK+u311G/tnnFLKLoMBYj
+ ihxNiNRKw9d3d/Ywc2QV8rLGXeZcQs6372bJWaQBDNqK9Sf9rbjSgj5nIj9FGTquXcwD
+ G4+5w6EtMgTdppDgakFdaC+M1qlWR0TXw1mnvRAG3E/TpFwTdhPeLQQyCsscFMGrSVr0
+ DYAHayeXW3bn4YxLJKkZn47NQG8hbIWZFnwHiBZ5+ej04vuZkkDmirLF0+GQV5q9DOuE
+ VW+zdACzgkt1E7scPpQVo/xfsDeV8sD/d/uE6YZ1ee6zhPqaFoUFHewvP+cGEI9K8vHm 8A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3eew872b8c-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 25 Feb 2022 17:24:06 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21PGeBW2015606;
+        Fri, 25 Feb 2022 17:24:06 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3eew872b7b-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 25 Feb 2022 17:24:05 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21PHNqW9000769;
+        Fri, 25 Feb 2022 17:24:03 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma02fra.de.ibm.com with ESMTP id 3ear69qvfw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 25 Feb 2022 17:24:02 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21PHNww734734548
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 25 Feb 2022 17:23:58 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 493EE52051;
+        Fri, 25 Feb 2022 17:23:58 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 0FB6652050;
+        Fri, 25 Feb 2022 17:23:58 +0000 (GMT)
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+To:     Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: [kvm-unit-tests PATCH] s390x: Add strict mode to specification exception interpretation test
+Date:   Fri, 25 Feb 2022 18:23:55 +0100
+Message-Id: <20220225172355.3564546-1-scgl@linux.ibm.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: hPJ1KN4z-GitkAa125J6ptyipC4ydtrG
+X-Proofpoint-GUID: Xg1Z2N4RtSLezmFYktjUY1E08l_AkBry
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-02-25_09,2022-02-25_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ priorityscore=1501 mlxlogscore=999 lowpriorityscore=0 bulkscore=0
+ phishscore=0 suspectscore=0 mlxscore=0 adultscore=0 impostorscore=0
+ spamscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2201110000 definitions=main-2202250098
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2022-02-25 at 16:22 +0800, Zeng Guang wrote:
-> Introduce new max_vcpu_id in KVM for x86 architecture. Userspace
-> can assign maximum possible vcpu id for current VM session using
-> KVM_CAP_MAX_VCPU_ID of KVM_ENABLE_CAP ioctl().
-> 
-> This is done for x86 only because the sole use case is to guide
-> memory allocation for PID-pointer table, a structure needed to
-> enable VMX IPI.
-> 
-> By default, max_vcpu_id set as KVM_MAX_VCPU_IDS.
-> 
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Zeng Guang <guang.zeng@intel.com>
-> ---
-> No new KVM capability is added to advertise the support of
-> configurable maximum vCPU ID to user space because max_vcpu_id is
-> just a hint/commitment to allow KVM to reduce the size of PID-pointer
-> table. But I am not 100% sure if it is proper to do so.
-> 
->  arch/x86/include/asm/kvm_host.h |  6 ++++++
->  arch/x86/kvm/x86.c              | 11 +++++++++++
->  2 files changed, 17 insertions(+)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 6dcccb304775..db16aebd946c 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1233,6 +1233,12 @@ struct kvm_arch {
->  	hpa_t	hv_root_tdp;
->  	spinlock_t hv_root_tdp_lock;
->  #endif
-> +	/*
-> +	 * VM-scope maximum vCPU ID. Used to determine the size of structures
-> +	 * that increase along with the maximum vCPU ID, in which case, using
-> +	 * the global KVM_MAX_VCPU_IDS may lead to significant memory waste.
-> +	 */
-> +	u32 max_vcpu_id;
->  };
->  
->  struct kvm_vm_stat {
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 4f6fe9974cb5..ca17cc452bd3 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -5994,6 +5994,13 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
->  		kvm->arch.exit_on_emulation_error = cap->args[0];
->  		r = 0;
->  		break;
-> +	case KVM_CAP_MAX_VCPU_ID:
-> +		if (cap->args[0] <= KVM_MAX_VCPU_IDS) {
-> +			kvm->arch.max_vcpu_id = cap->args[0];
-> +			r = 0;
-> +		} else
-> +			r = -E2BIG;
-> +		break;
->  	default:
->  		r = -EINVAL;
->  		break;
-> @@ -11067,6 +11074,9 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->  	struct page *page;
->  	int r;
->  
-> +	if (vcpu->vcpu_id >= vcpu->kvm->arch.max_vcpu_id)
-> +		return -E2BIG;
-> +
->  	vcpu->arch.last_vmentry_cpu = -1;
->  	vcpu->arch.regs_avail = ~0;
->  	vcpu->arch.regs_dirty = ~0;
-> @@ -11589,6 +11599,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->  	spin_lock_init(&kvm->arch.hv_root_tdp_lock);
->  	kvm->arch.hv_root_tdp = INVALID_PAGE;
->  #endif
-> +	kvm->arch.max_vcpu_id = KVM_MAX_VCPU_IDS;
->  
->  	INIT_DELAYED_WORK(&kvm->arch.kvmclock_update_work, kvmclock_update_fn);
->  	INIT_DELAYED_WORK(&kvm->arch.kvmclock_sync_work, kvmclock_sync_fn);
+While specification exception interpretation is not required to occur,
+it can be useful for automatic regression testing to fail the test if it
+does not occur.
+Add a `--strict` argument to enable this.
+`--strict` takes a list of machine types (as reported by STIDP)
+for which to enable strict mode, for example
+`--strict 8562,8561,3907,3906,2965,2964`
+will enable it for models z15 - z13.
+Alternatively, strict mode can be enabled for all but the listed machine
+types by prefixing the list with a `!`, for example
+`--strict !1090,1091,2064,2066,2084,2086,2094,2096,2097,2098,2817,2818,2827,2828`
+will enable it for z/Architecture models except those older than z13.
 
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+---
+Range-diff:
+1:  5d91f693 < -:  -------- s390x: Add specification exception interception test
+2:  950eafd7 ! 1:  e9c36970 s390x: Add strict mode to specification exception interpretation test
+    @@ s390x/spec_ex-sie.c: static void reset_guest(void)
+     -static void test_spec_ex_sie(void)
+     +static void test_spec_ex_sie(bool strict)
+      {
+    ++	const char *msg;
+    ++
+      	setup_guest();
+      
+    + 	report_prefix_push("SIE spec ex interpretation");
+     @@ s390x/spec_ex-sie.c: static void test_spec_ex_sie(void)
+      	report(vm.sblk->icptcode == ICPT_PROGI
+      	       && vm.sblk->iprcc == PGM_INT_CODE_SPECIFICATION,
+      	       "Received specification exception intercept");
+     -	if (vm.sblk->gpsw.addr == 0xdeadbeee)
+     -		report_info("Interpreted initial exception, intercepted invalid program new PSW exception");
+    --	else
+    --		report_info("Did not interpret initial exception");
+    -+	{
+    -+		const char *msg;
+    -+
+    -+		msg = "Interpreted initial exception, intercepted invalid program new PSW exception";
+    -+		if (strict)
+    -+			report(vm.sblk->gpsw.addr == 0xdeadbeee, msg);
+    -+		else if (vm.sblk->gpsw.addr == 0xdeadbeee)
+    -+			report_info(msg);
+    -+		else
+    -+			report_info("Did not interpret initial exception");
+    -+	}
+    ++	msg = "Interpreted initial exception, intercepted invalid program new PSW exception";
+    ++	if (strict)
+    ++		report(vm.sblk->gpsw.addr == 0xdeadbeee, msg);
+    ++	else if (vm.sblk->gpsw.addr == 0xdeadbeee)
+    ++		report_info(msg);
+    + 	else
+    + 		report_info("Did not interpret initial exception");
+      	report_prefix_pop();
+      	report_prefix_pop();
+      }
+      
+    -+static bool parse_strict(char **argv)
+    ++static bool parse_strict(int argc, char **argv)
+     +{
+     +	uint16_t machine_id;
+     +	char *list;
+     +	bool ret;
+     +
+    -+	if (!*argv)
+    ++	if (argc < 1)
+     +		return false;
+    -+	if (strcmp("--strict", *argv))
+    ++	if (strcmp("--strict", argv[0]))
+     +		return false;
+     +
+     +	machine_id = get_machine_id();
+    -+	list = argv[1];
+    -+	if (!list) {
+    ++	if (argc < 2) {
+     +		printf("No argument to --strict, ignoring\n");
+     +		return false;
+     +	}
+    ++	list = argv[1];
+     +	if (list[0] == '!') {
+     +		ret = true;
+     +		list++;
+    @@ s390x/spec_ex-sie.c: int main(int argc, char **argv)
+      	}
+      
+     -	test_spec_ex_sie();
+    -+	test_spec_ex_sie(parse_strict(argv + 1));
+    ++	test_spec_ex_sie(parse_strict(argc - 1, argv + 1));
+      out:
+      	return report_summary();
+      }
 
-+ Reminder for myself to use this in AVIC code to as well to limit the size of the physid table.
-(The max size of the table (for now...) is 1 page (or 1/2 of page for non x2avic), 
-but still no doubt it takes some effort  for microcode to scan all the unused entries in it for nothing
-(and soon my nested avic code will have to scan it as well).
+ s390x/spec_ex-sie.c | 53 +++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 49 insertions(+), 4 deletions(-)
 
-Best regards,
-	Maxim Levitsky
+diff --git a/s390x/spec_ex-sie.c b/s390x/spec_ex-sie.c
+index 5dea4115..071110e3 100644
+--- a/s390x/spec_ex-sie.c
++++ b/s390x/spec_ex-sie.c
+@@ -7,6 +7,7 @@
+  * specification exception interpretation is off/on.
+  */
+ #include <libcflat.h>
++#include <stdlib.h>
+ #include <sclp.h>
+ #include <asm/page.h>
+ #include <asm/arch_def.h>
+@@ -36,8 +37,10 @@ static void reset_guest(void)
+ 	vm.sblk->icptcode = 0;
+ }
+ 
+-static void test_spec_ex_sie(void)
++static void test_spec_ex_sie(bool strict)
+ {
++	const char *msg;
++
+ 	setup_guest();
+ 
+ 	report_prefix_push("SIE spec ex interpretation");
+@@ -61,14 +64,56 @@ static void test_spec_ex_sie(void)
+ 	report(vm.sblk->icptcode == ICPT_PROGI
+ 	       && vm.sblk->iprcc == PGM_INT_CODE_SPECIFICATION,
+ 	       "Received specification exception intercept");
+-	if (vm.sblk->gpsw.addr == 0xdeadbeee)
+-		report_info("Interpreted initial exception, intercepted invalid program new PSW exception");
++	msg = "Interpreted initial exception, intercepted invalid program new PSW exception";
++	if (strict)
++		report(vm.sblk->gpsw.addr == 0xdeadbeee, msg);
++	else if (vm.sblk->gpsw.addr == 0xdeadbeee)
++		report_info(msg);
+ 	else
+ 		report_info("Did not interpret initial exception");
+ 	report_prefix_pop();
+ 	report_prefix_pop();
+ }
+ 
++static bool parse_strict(int argc, char **argv)
++{
++	uint16_t machine_id;
++	char *list;
++	bool ret;
++
++	if (argc < 1)
++		return false;
++	if (strcmp("--strict", argv[0]))
++		return false;
++
++	machine_id = get_machine_id();
++	if (argc < 2) {
++		printf("No argument to --strict, ignoring\n");
++		return false;
++	}
++	list = argv[1];
++	if (list[0] == '!') {
++		ret = true;
++		list++;
++	} else
++		ret = false;
++	while (true) {
++		long input = 0;
++
++		if (strlen(list) == 0)
++			return ret;
++		input = strtol(list, &list, 16);
++		if (*list == ',')
++			list++;
++		else if (*list != '\0')
++			break;
++		if (input == machine_id)
++			return !ret;
++	}
++	printf("Invalid --strict argument \"%s\", ignoring\n", list);
++	return ret;
++}
++
+ int main(int argc, char **argv)
+ {
+ 	if (!sclp_facilities.has_sief2) {
+@@ -76,7 +121,7 @@ int main(int argc, char **argv)
+ 		goto out;
+ 	}
+ 
+-	test_spec_ex_sie();
++	test_spec_ex_sie(parse_strict(argc - 1, argv + 1));
+ out:
+ 	return report_summary();
+ }
+
+base-commit: 257c962f3d1b2d0534af59de4ad18764d734903a
+-- 
+2.33.1
 
