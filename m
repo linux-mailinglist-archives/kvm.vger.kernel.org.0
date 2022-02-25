@@ -2,116 +2,225 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D3A44C480A
-	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 15:55:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 98FA04C481D
+	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 15:56:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242063AbiBYO4G (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 09:56:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45280 "EHLO
+        id S236839AbiBYO5H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 09:57:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47296 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242050AbiBYOzq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Feb 2022 09:55:46 -0500
-Received: from mail-oi1-x22c.google.com (mail-oi1-x22c.google.com [IPv6:2607:f8b0:4864:20::22c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7B755BE75
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 06:55:02 -0800 (PST)
-Received: by mail-oi1-x22c.google.com with SMTP id ay7so7676557oib.8
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 06:55:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=fT9I2+VK56i3wPL86YtJ9oujG8H0O8fU0cHW61eJ+nI=;
-        b=ocDI0bpFAlfLlz07Ms9K+Es333B3xLcQsKts2hKdJZcyNuG3hdXqwFx9uzp6xJx/OJ
-         VFtkctoftImw0HiMt6IABpjV9KFsNuRi2IMqlb/L+zOrBJB6+X4dfnGQVSt2ji7qzpVT
-         twWwoDZbKmWF0Y/UJWgNgp1mIty0Vee1wKPGbg9SYDIS38MO+4e6FUC4kkiFPiRaBOO9
-         A/kyypO6Xa0o9Hu7Xnqr7z7e+EEiETdYvryFdK1l/kAFrxq6cCKRERuY2NBRA/mRg8Ov
-         s/X0nsQejkjtXdm0XCUKrLjZdoOc2qZfqFvW7Voj+fX2rrr9k1X4RvRWrra3Zo8c0WBd
-         DtSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=fT9I2+VK56i3wPL86YtJ9oujG8H0O8fU0cHW61eJ+nI=;
-        b=zmeZIOexuTXu4ocPVI5u2FPdwHmTGPkDxmlg7ggF017X0C/8DzCCM3KEYRkAWedUsI
-         rApciVRFtEm8FEwO1zHGLC9320m5u0epGXKL/4c91bPHAz5WlN0iJbUeIXhCzv48LR7Q
-         6u4vCiJ2IC7K3+qNR/RPdDWtj62AFx9KKo7Ez5EJRMr3sIxpdjgHeAv3bclpOXjMGy9M
-         TfUNYKBz/6yS/E1BxV2FHt//KF1eQ32x72TjXfKsuF+vkORuGJKVUqkVRw012ThQRL8a
-         Tb8lPPHlxShrnEc3yov1RZfkZBNiRe5t4+LX1D5D4Ubzzq9J6OuGET5OJ7WDrbOwU9Um
-         swAg==
-X-Gm-Message-State: AOAM532Ru43NPK3ZzSfq/PjFumZK+EWCNDHQd9QAzGSjPqgi4NXle4eG
-        rO2Ard4NT7UuQ80VQwiaHcoKrYnUdMcRJRBCjhxp3w==
-X-Google-Smtp-Source: ABdhPJyM/iJYLsnWoSrKflbZP2N/fNnclFQmE8TzasWzLZmG6Q5uy9uh18fJ4PKpZNI4faItAjnGa6ceCrKGO94B7ug=
-X-Received: by 2002:a05:6808:23d0:b0:2d6:bca2:c70 with SMTP id
- bq16-20020a05680823d000b002d6bca20c70mr1755978oib.339.1645800901850; Fri, 25
- Feb 2022 06:55:01 -0800 (PST)
-MIME-Version: 1.0
-References: <20220223062412.22334-1-chenyi.qiang@intel.com>
-In-Reply-To: <20220223062412.22334-1-chenyi.qiang@intel.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 25 Feb 2022 06:54:50 -0800
-Message-ID: <CALMp9eT50LjXYSwfWENjmfg=XxT4Bx3RzOYubKty8kr_APXCEw@mail.gmail.com>
-Subject: Re: [PATCH v3] KVM: VMX: Enable Notify VM exit
-To:     Chenyi Qiang <chenyi.qiang@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        with ESMTP id S239305AbiBYO5E (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Feb 2022 09:57:04 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70B614B1E5;
+        Fri, 25 Feb 2022 06:56:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=AnMpDgPnSiVdrsxnRtSBVc9UyknLXwSyrywUyFHyUd4=; b=sxYfhvQi1hgpjQECHjumfhdUu8
+        Wz7Jd6YrkOLus/m2UjDVUAEF+zWxBjj7ZJYqSS4fCeyTNAbe2bmWTW1b+6hrP+Fx4cEgvCGM9jWl1
+        2dDpJJazts8fbO55Z9aum5d8y7kxEipeSJGR2qoS4Iw54PduBrPqP3OtXZ801lylNZpV7ML14tH59
+        m8sv1LIFPmHqX0tEY0b2hXI1GLsRHir3Sq1HtVv+PY9joYlzP8TjiVf1Nf2HYun7Za+ulvbQ3zlbw
+        M3lTqPJiFsPO4Ra8XGWcwDHlHljERV7pbZ91Dad4MvnIayaeCT4yJzbrcqlWTpYqk/z2gV6DSxjRZ
+        tydVYJvw==;
+Received: from [2001:8b0:10b:1::3ae] (helo=u3832b3a9db3152.ant.amazon.com)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nNc0p-005s1h-Vj; Fri, 25 Feb 2022 14:56:04 +0000
+Message-ID: <eb849245c98ea7f5d5e9320ee6ee6b0d1851b439.camel@infradead.org>
+Subject: Re: [PATCH v6 6/9] KVM: x86: lapic: don't allow to change APIC ID
+ unconditionally
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Maxim Levitsky <mlevitsk@redhat.com>,
+        Zeng Guang <guang.zeng@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Xiaoyao Li <xiaoyao.li@intel.com>, Tao Xu <tao3.xu@intel.com>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jethro Beekman <jethro@fortanix.com>,
+        Kai Huang <kai.huang@intel.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
+        Robert Hu <robert.hu@intel.com>, Gao Chao <chao.gao@intel.com>
+Date:   Fri, 25 Feb 2022 14:56:02 +0000
+In-Reply-To: <79f5ce60c65280f4fb7cba0ceedaca0ff5595c48.camel@redhat.com>
+References: <20220225082223.18288-1-guang.zeng@intel.com>
+         <20220225082223.18288-7-guang.zeng@intel.com>
+         <79f5ce60c65280f4fb7cba0ceedaca0ff5595c48.camel@redhat.com>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-VMF1atd0j0JN0irQarZ1"
+User-Agent: Evolution 3.36.5-0ubuntu1 
+MIME-Version: 1.0
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 22, 2022 at 10:19 PM Chenyi Qiang <chenyi.qiang@intel.com> wrote:
->
-> From: Tao Xu <tao3.xu@intel.com>
->
-> There are cases that malicious virtual machines can cause CPU stuck (due
-> to event windows don't open up), e.g., infinite loop in microcode when
-> nested #AC (CVE-2015-5307). No event window means no event (NMI, SMI and
-> IRQ) can be delivered. It leads the CPU to be unavailable to host or
-> other VMs.
->
-> VMM can enable notify VM exit that a VM exit generated if no event
-> window occurs in VM non-root mode for a specified amount of time (notify
-> window).
->
-> Feature enabling:
-> - The new vmcs field SECONDARY_EXEC_NOTIFY_VM_EXITING is introduced to
->   enable this feature. VMM can set NOTIFY_WINDOW vmcs field to adjust
->   the expected notify window.
-> - Expose a module param to configure notify window by admin, which is in
->   unit of crystal clock.
->   - if notify_window < 0, feature disabled;
->   - if notify_window >= 0, feature enabled;
-> - There's a possibility, however small, that a notify VM exit happens
->   with VM_CONTEXT_INVALID set in exit qualification. In this case, the
->   vcpu can no longer run. To avoid killing a well-behaved guest, set
->   notify window as -1 to disable this feature by default.
-> - It's safe to even set notify window to zero since an internal
->   hardware threshold is added to vmcs.notifiy_window.
 
-What causes a VM_CONTEXT_INVALID VM-exit? How small is this possibility?
+--=-VMF1atd0j0JN0irQarZ1
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> Nested handling
-> - Nested notify VM exits are not supported yet. Keep the same notify
->   window control in vmcs02 as vmcs01, so that L1 can't escape the
->   restriction of notify VM exits through launching L2 VM.
-> - When L2 VM is context invalid, synthesize a nested
->   EXIT_REASON_TRIPLE_FAULT to L1 so that L1 won't be killed due to L2's
->   VM_CONTEXT_INVALID happens.
+On Fri, 2022-02-25 at 16:46 +0200, Maxim Levitsky wrote:
+> On Fri, 2022-02-25 at 16:22 +0800, Zeng Guang wrote:
+> > From: Maxim Levitsky <
+> > mlevitsk@redhat.com
+> > >
+> >=20
+> > No normal guest has any reason to change physical APIC IDs, and
+> > allowing this introduces bugs into APIC acceleration code.
+> >=20
+> > And Intel recent hardware just ignores writes to APIC_ID in
+> > xAPIC mode. More background can be found at:
+> > https://lore.kernel.org/lkml/Yfw5ddGNOnDqxMLs@google.com/
+> >=20
+> >=20
+> > Looks there is no much value to support writable xAPIC ID in
+> > guest except supporting some old and crazy use cases which
+> > probably would fail on real hardware. So, make xAPIC ID
+> > read-only for KVM guests.
+> >=20
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > Signed-off-by: Zeng Guang <guang.zeng@intel.com>
+>=20
+> Assuming that this is approved and accepted upstream,
+> that is even better that my proposal of doing this
+> when APICv is enabled.
+>=20
+> Since now apic id is always read only, now we should not=20
+> forget to clean up some parts of kvm like kvm_recalculate_apic_map,
+> which are not needed anymore
 
-I don't like the idea of making things up without notifying userspace
-that this is fictional. How is my customer running nested VMs supposed
-to know that L2 didn't actually shutdown, but L0 killed it because the
-notify window was exceeded? If this information isn't reported to
-userspace, I have no way of getting the information to the customer.
+Can we also now optimise kvm_get_vcpu_by_id() so it doesn't have to do
+a linear search over all the vCPUs when there isn't a 1:1
+correspondence with the vCPU index?
+
+--=-VMF1atd0j0JN0irQarZ1
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIwMjI1MTQ1NjAyWjAvBgkqhkiG9w0BCQQxIgQgaVL0nxjd
+ld4RDKE9BQ3w+sClH19KPJalXA8KPSlKMj0wgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCrKybn2/E0gvaet5GCnBs9C3kfUmAlt3Bj
+e0orryDUkiKAbDWpgGH0LLXqsicp+KZBF3BO4e+vezY0NPEmRRW7kfICGgZ2/GRopNtv8AH7DiwF
+t5dBtxKj2yTB04/GxXtljyFKEsr0Lwx4UY9Ek1tplEJaHsgTP02iu39eVq7/YMTQ8TmIFQftmVXC
+eWZcrIS4ERyl1xdfM5eAWi5jA5cS2CcfZxUojxeUwhJL1dJJMunAGTnfV7S3J4ZCYh6Ro9srn+lB
+tmCLXT34Uc3DqW9sxWNpzs7BpJzsjfMfosUmJOPkDQ28aZ1dgPrfNKo3JC9CaS4glbn9SarGU7AX
+35iuSvvEA6ZCHSd40Au1GeAoB8tuGFuY4IPtvOfgG5Rt8NdGzljHvY73RA3FuPJxFHG0FM+VZtQB
+4deDHV3tSSTKaPDoH5Pb9CIxs1iQC289VRDdov+1plPN5DAXznn7MeYVL7VSUuVIpNUWxNx5Ceei
+V9E/kVxa+AT101pSeyz7DisvkHxJQTw1smdtoUMf2lWNo+j2NJdubFiKUdAMqbtXPbAqfj38otuB
+SbywAzBwVOOX5ea/nCSVHIqraQXdSnEqxsXKB6KMU8jEJ83pSEEzlieOpKVaPUw58G5wVZyPe/+c
+FsKrSaInHu8EEC6xr0s7YldlgHy6rPcgMWECmFOyEAAAAAAAAA==
+
+
+--=-VMF1atd0j0JN0irQarZ1--
+
