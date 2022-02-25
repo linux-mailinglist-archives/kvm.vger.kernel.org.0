@@ -2,135 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DA2834C4D8C
-	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 19:21:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 075B84C4D91
+	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 19:22:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231935AbiBYSWA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 13:22:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35338 "EHLO
+        id S232256AbiBYSX0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 13:23:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38326 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231986AbiBYSV5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Feb 2022 13:21:57 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DF37E1FEF8D
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 10:21:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645813281;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=g1SxaQgp/6WOc0KKmfEav99FpX07fm1Map4Q3PyyPfo=;
-        b=OBwiCqd4uKtHxtKEkpVlrInSWxuD6hAXyBJRYtGa+S6mxr+qkavMMn2yyFBOLzyH4KI7++
-        n0HpAGNVKkm79HJyAdQ7nFkUD75h6djM346RaDAtNMN0X59kszFvb634Y8MTbLEgr3vyOb
-        4N7VsjUL/BDq84u72/TnHjI7uM0fVLA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-266-NNPaVFfsPo-tmx-Z6-K_Tg-1; Fri, 25 Feb 2022 13:21:18 -0500
-X-MC-Unique: NNPaVFfsPo-tmx-Z6-K_Tg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 502311854E21;
-        Fri, 25 Feb 2022 18:21:17 +0000 (UTC)
-Received: from starship (unknown [10.40.195.190])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B6B892BCD0;
-        Fri, 25 Feb 2022 18:21:14 +0000 (UTC)
-Message-ID: <506c34bc80d1bb740ddf38e6476ad0e16c097282.camel@redhat.com>
-Subject: Re: [PATCH 1/4] KVM: x86: hyper-v: Drop redundant 'ex' parameter
- from kvm_hv_send_ipi()
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
+        with ESMTP id S231836AbiBYSXX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Feb 2022 13:23:23 -0500
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18FFC6E78C
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 10:22:51 -0800 (PST)
+Received: by mail-pg1-x54a.google.com with SMTP id k13-20020a65434d000000b00342d8eb46b4so3029892pgq.23
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 10:22:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=x4Ku6YsMCKcusqhh1KEW7b8ua9qMmgZkvtpofAGbtVk=;
+        b=RCy+rU96VujgIkYwHn+eJ5lO3hg6B5rvgAVjzyr0MvZ1ZAAaC6UXB+cPjHj469kxNY
+         Dw/RtxHGBJYxtWSp0N+MA+FQg+U8eFE+C4uFNuV2LgxD+q84FNZsyaJANm2VwbaQlVFy
+         gqjB10qjYVDsTOnCB+tre7f3ppLBqcZQMoQOO77NG0G9ZEAKYrAZsvPopKEjUHud6Eji
+         j/4KlnmP+APgnEEeVFGEXmR+Jcxr3wj5lkdTlcY5lHXhtB4cvoq6WeNbwbMDKQRf7sFj
+         AleA+MFbDA9x+F044WEpWtsjE+yir3y5MtRaHwORbGb+qEIqd3DdTJltzhXYaAsN6Yog
+         hQAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=x4Ku6YsMCKcusqhh1KEW7b8ua9qMmgZkvtpofAGbtVk=;
+        b=GnmFnqFeU1kYyE2ry5dJK3SiEo3EWvbT5sCL5iP2KjoYMCAtycAxkAHugz7rNpBKcL
+         TwkQZry1WAzaQ6Py3If6MBQ5sOJCK1bVWQ0rPxYhmBbTCZAu+M4yp01xUhJp19O6Szgr
+         gES+Rd+s9/FgsWOtpOIAuOmrdRM11Xwn4anm+AlxNIr+EfnEohlLZHrq7DQv9o3z1XYA
+         VBNLAtFJzYHKam8+7SGAMetOa6XNPUc4fqaqRcuopTmgqpElFTtRkXaRUKH45VcA7S+s
+         /1njzjj90uT2M/alY4P+NOvVl/2laEaDDrTOpLAqQYjBxYJiu8O3vbCrngWdw1Zkvgha
+         HqbA==
+X-Gm-Message-State: AOAM531DsMplQP1GJdXzp8D7cHBX7Of3mIyNdYsdiRjx0zbVKaRiXmLd
+        4vSsJ0dhIyDS/N/YjYjgSxmxBOh+rEE=
+X-Google-Smtp-Source: ABdhPJzTwrVJB5RstZ5uRrPjtjrFdFuxWajJeU/80rhuK+/Xbgr9+0EWknI0rOF0W7DBGk7e5DIi5QEDmPQ=
+X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
+ (user=seanjc job=sendgmr) by 2002:a17:90b:4f43:b0:1bc:7e5c:e024 with SMTP id
+ pj3-20020a17090b4f4300b001bc7e5ce024mr26588pjb.0.1645813370236; Fri, 25 Feb
+ 2022 10:22:50 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Fri, 25 Feb 2022 18:22:41 +0000
+Message-Id: <20220225182248.3812651-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.1.574.g5d30c73bfb-goog
+Subject: [PATCH v2 0/7] KVM: x86/mmu: Zap only obsolete roots on "reload"
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Siddharth Chandrasekaran <sidcha@amazon.de>,
-        linux-kernel@vger.kernel.org
-Date:   Fri, 25 Feb 2022 20:21:13 +0200
-In-Reply-To: <20220222154642.684285-2-vkuznets@redhat.com>
-References: <20220222154642.684285-1-vkuznets@redhat.com>
-         <20220222154642.684285-2-vkuznets@redhat.com>
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-02-22 at 16:46 +0100, Vitaly Kuznetsov wrote:
-> 'struct kvm_hv_hcall' has all the required information already,
-> there's no need to pass 'ex' additionally.
-> 
-> No functional change intended.
-> 
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
->  arch/x86/kvm/hyperv.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-> index 6e38a7d22e97..15b6a7bd2346 100644
-> --- a/arch/x86/kvm/hyperv.c
-> +++ b/arch/x86/kvm/hyperv.c
-> @@ -1875,7 +1875,7 @@ static void kvm_send_ipi_to_many(struct kvm *kvm, u32 vector,
->  	}
->  }
->  
-> -static u64 kvm_hv_send_ipi(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc, bool ex)
-> +static u64 kvm_hv_send_ipi(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
->  {
->  	struct kvm *kvm = vcpu->kvm;
->  	struct hv_send_ipi_ex send_ipi_ex;
-> @@ -1889,7 +1889,7 @@ static u64 kvm_hv_send_ipi(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc, bool
->  	u32 vector;
->  	bool all_cpus;
->  
-> -	if (!ex) {
-> +	if (hc->code == HVCALL_SEND_IPI) {
+For all intents and purposes, this is an x86/mmu series, but it touches
+s390 and common KVM code because KVM_REQ_MMU_RELOAD is currently a generic
+request despite its use being encapsulated entirely within arch code.
 
-I am thinking, if we already touch this code,
-why not to use switch here instead on the hc->code,
-so that we can catch this function being called with something else than
-HVCALL_SEND_IPI_EX
+The meat of the series is to zap only obsolete (a.k.a. invalid) roots in
+response to KVM marking a root obsolete/invalid due to it being zapped.
+KVM currently drops/zaps all roots, which, aside from being a performance
+hit if the guest is using multiple roots, complicates x86 KVM paths that
+load a new root because it raises the question of what should be done if
+there's a pending KVM_REQ_MMU_RELOAD, i.e. if the path _knows_ that any
+root it loads will be obliterated.
 
->  		if (!hc->fast) {
->  			if (unlikely(kvm_read_guest(kvm, hc->ingpa, &send_ipi,
->  						    sizeof(send_ipi))))
-> @@ -2279,14 +2279,14 @@ int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
->  			ret = HV_STATUS_INVALID_HYPERCALL_INPUT;
->  			break;
->  		}
-> -		ret = kvm_hv_send_ipi(vcpu, &hc, false);
-> +		ret = kvm_hv_send_ipi(vcpu, &hc);
->  		break;
->  	case HVCALL_SEND_IPI_EX:
->  		if (unlikely(hc.fast || hc.rep)) {
->  			ret = HV_STATUS_INVALID_HYPERCALL_INPUT;
->  			break;
->  		}
-> -		ret = kvm_hv_send_ipi(vcpu, &hc, true);
-> +		ret = kvm_hv_send_ipi(vcpu, &hc);
->  		break;
->  	case HVCALL_POST_DEBUG_DATA:
->  	case HVCALL_RETRIEVE_DEBUG_DATA:
+Paolo, I'm hoping you can squash patch 01 with your patch it "fixes".
+
+I'm also speculating that this will be applied after my patch to remove
+KVM_REQ_GPC_INVALIDATE, otherwise the changelog in patch 06 will be
+wrong.
+
+v2:
+ - Collect reviews. [Claudio, Janosch]
+ - Rebase to latest kvm/queue.
+
+v1: https://lore.kernel.org/all/20211209060552.2956723-1-seanjc@google.com
+
+Sean Christopherson (7):
+  KVM: x86: Remove spurious whitespaces from kvm_post_set_cr4()
+  KVM: x86: Invoke kvm_mmu_unload() directly on CR4.PCIDE change
+  KVM: Drop kvm_reload_remote_mmus(), open code request in x86 users
+  KVM: x86/mmu: Zap only obsolete roots if a root shadow page is zapped
+  KVM: s390: Replace KVM_REQ_MMU_RELOAD usage with arch specific request
+  KVM: Drop KVM_REQ_MMU_RELOAD and update vcpu-requests.rst
+    documentation
+  KVM: WARN if is_unsync_root() is called on a root without a shadow
+    page
+
+ Documentation/virt/kvm/vcpu-requests.rst |  7 +-
+ arch/s390/include/asm/kvm_host.h         |  2 +
+ arch/s390/kvm/kvm-s390.c                 |  8 +--
+ arch/s390/kvm/kvm-s390.h                 |  2 +-
+ arch/x86/include/asm/kvm_host.h          |  2 +
+ arch/x86/kvm/mmu.h                       |  1 +
+ arch/x86/kvm/mmu/mmu.c                   | 83 ++++++++++++++++++++----
+ arch/x86/kvm/x86.c                       | 10 +--
+ include/linux/kvm_host.h                 |  4 +-
+ virt/kvm/kvm_main.c                      |  5 --
+ 10 files changed, 90 insertions(+), 34 deletions(-)
 
 
-
-Other than this minor nitpick:
-
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-
-
-Best regards,
-	Maxim Levitsky
+base-commit: f4bc051fc91ab9f1d5225d94e52d369ef58bec58
+-- 
+2.35.1.574.g5d30c73bfb-goog
 
