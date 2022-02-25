@@ -2,342 +2,208 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CD5A24C45FC
-	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 14:21:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F2D134C465B
+	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 14:30:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241130AbiBYNWK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 08:22:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58278 "EHLO
+        id S241234AbiBYNaM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 08:30:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51958 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234665AbiBYNWI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Feb 2022 08:22:08 -0500
-Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E55B1FED84
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 05:21:30 -0800 (PST)
-Received: by mail-wm1-x333.google.com with SMTP id n13-20020a05600c3b8d00b0037bff8a24ebso1667234wms.4
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 05:21:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=8odr+j5C0A3ib7LzuuIhcU/6+CAYsVE62idfXAGlWfI=;
-        b=donM3/QXoEcPJzPzN8IAbC8SnOUJW8felVzZHfsgO8S0vkId6rGyK4HnaRd0WBjOEI
-         5H3JBfZxOLyVIFnencawjDrmxK4whr5WbApfuG6nTFvKNURwC5h97pdoWLzfZkwN5r+m
-         YHvUXLm9m56oX+aPNJbR5WqFy3u82tuWfDBwiJdD0EsmWH4PVWyxhwHAWYwd1zNNpdaE
-         vITd4bfyLKx2jKHYzyYMw2XuT8a2UfDucxl5hYapYrm3VR64DS8xd8McCIxCzV/jY1nP
-         Ac5Tm98VdKf/pkgTZxK9MJe9bV9FadfM8clHdqqTIC7KhkKdeF/+LsxCfs/w8rA421oW
-         B2rQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=8odr+j5C0A3ib7LzuuIhcU/6+CAYsVE62idfXAGlWfI=;
-        b=j2ctR7ffBfjQBUCMLlaxwyoojRiDVGNV6t8jLcPTml4AWWHWpZv2UVqiXUJsRvnLDC
-         QAIKGgQcVVU5TgZU3XYhXObgop+pQChyGVRY0pFvyrCHKgnpkPdQPRcY8WNIIX/f7m8w
-         EIrHsRaGomHOHryUCGMsczVckCMHXJSz5ECZo6orb9jHglfV0cjl8zH2u7p2OOC5mvVU
-         L/PgS6iIAsTNZI22zXuYXIAc1JieVmYD47Jf2Ytn5OfV2sS3EUP5fbI8mNHOSG3GEaS4
-         fJdIpi7Jzs2tO2GnIBG44OIEIrDhxi1Hw1wfOKoQGV3EZxN2zH4s63FqII++veLZOOfJ
-         53Ww==
-X-Gm-Message-State: AOAM533K/5a+DT7BBbD24i5FhEzMheAodq98bP+EPkoUnrvJ7vo1q6Xg
-        H+Ary/XwfrEhQKkkrcTN1qLtNw==
-X-Google-Smtp-Source: ABdhPJxVAVV4cPGA60dClORTOVx0ViqF+Q6QZCLlT+CCKEkE9B6HHfH50zi0TgiFiOmR7RHO5ZN9eQ==
-X-Received: by 2002:a1c:6a18:0:b0:380:dec5:7f05 with SMTP id f24-20020a1c6a18000000b00380dec57f05mr2790555wmc.129.1645795288965;
-        Fri, 25 Feb 2022 05:21:28 -0800 (PST)
-Received: from google.com (203.75.199.104.bc.googleusercontent.com. [104.199.75.203])
-        by smtp.gmail.com with ESMTPSA id m21-20020a05600c4f5500b0037d342db78asm6096410wmq.35.2022.02.25.05.21.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Feb 2022 05:21:27 -0800 (PST)
-Date:   Fri, 25 Feb 2022 13:21:26 +0000
-From:   Sebastian Ene <sebastianene@google.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     kvm@vger.kernel.org, qperret@google.com, maz@kernel.org,
-        kvmarm@lists.cs.columbia.edu, will@kernel.org,
-        julien.thierry.kdev@gmail.com
-Subject: Re: [PATCH kvmtool v4 1/3] aarch64: Add stolen time support
-Message-ID: <YhjX1kHqDuVaGH/l@google.com>
-References: <20220224165103.1157358-1-sebastianene@google.com>
- <20220224165103.1157358-2-sebastianene@google.com>
- <YhjDl/1BvaMu3d/9@monolith.localdoman>
+        with ESMTP id S230508AbiBYNaL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Feb 2022 08:30:11 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 880B22028AB;
+        Fri, 25 Feb 2022 05:29:39 -0800 (PST)
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21PBMjBr012240;
+        Fri, 25 Feb 2022 13:29:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Vn90irpMkq00xDd5Ps246VaLOSORd2MB7UfmWYtLgDY=;
+ b=shJRun8UpwV0xolVsawwfTahqO4L9+yQMO8GLTv9XS0PXoAJnD5OIQakTzg4bfro1uYa
+ lHQO8A/eEfAcUAdZFcrbfY0LO6pHszXOFVD+Gv2y6/ZQ6Pg4UnPlS+JDG9/My96PQao0
+ Lm6NC9yjZaoFHoC602oIXiTpz4ipwWCLVyTYFrDwGHMzsUPPwkKzel8D8BxImGk0Czdv
+ M02BFpZ7+Ifnq0g5wA2+x+Cq8LmQzju4Hl1NAt0pOiW7zNxex+REkcSfkt3cohHmIoFD
+ x/f2/T2WzylKkDJ/D/QaCTFRx99hSEiTc5zLYkAIdPtdLmHba2+xTGiruEs2hydZsSmW 5g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3edtv98rt0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 25 Feb 2022 13:29:38 +0000
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21PDTbPF015924;
+        Fri, 25 Feb 2022 13:29:37 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3edtv98rsh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 25 Feb 2022 13:29:37 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21PDOpIL012123;
+        Fri, 25 Feb 2022 13:29:35 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma06ams.nl.ibm.com with ESMTP id 3eaqtjrwmc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 25 Feb 2022 13:29:35 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21PDImsF44433800
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 25 Feb 2022 13:18:48 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9952811C05C;
+        Fri, 25 Feb 2022 13:29:32 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BEC3811C04A;
+        Fri, 25 Feb 2022 13:29:31 +0000 (GMT)
+Received: from [9.171.85.161] (unknown [9.171.85.161])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 25 Feb 2022 13:29:31 +0000 (GMT)
+Message-ID: <9869257e-d257-da83-edd6-0c167f915829@de.ibm.com>
+Date:   Fri, 25 Feb 2022 14:29:31 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YhjDl/1BvaMu3d/9@monolith.localdoman>
-X-Spam-Status: No, score=-15.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,URI_DOTEDU,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH v3 1/1] KVM: s390: pv: make use of ultravisor AIV support
+Content-Language: en-US
+To:     Michael Mueller <mimu@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     cohuck@redhat.com, frankja@linux.ibm.com, thuth@redhat.com,
+        pasic@linux.ibm.com, david@redhat.com, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20220209152217.1793281-1-mimu@linux.ibm.com>
+ <20220209152217.1793281-2-mimu@linux.ibm.com>
+ <803275d5-58f4-21d9-8020-e56f05737450@de.ibm.com>
+ <d58a6a64-a6b6-3238-00d7-573e4177f38c@linux.ibm.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+In-Reply-To: <d58a6a64-a6b6-3238-00d7-573e4177f38c@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: DPAlZUnDsQXp0G3lMS7BeJ8GZ0UyHu0k
+X-Proofpoint-GUID: LNeVDkjWMcUVakMx_AjGSCG8Wmrywwhe
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-02-25_07,2022-02-25_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 malwarescore=0
+ phishscore=0 priorityscore=1501 impostorscore=0 mlxscore=0 adultscore=0
+ mlxlogscore=999 bulkscore=0 lowpriorityscore=0 spamscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2201110000
+ definitions=main-2202250074
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 25, 2022 at 11:55:03AM +0000, Alexandru Elisei wrote:
-> Hi,
-> 
 
-Hi,
 
-> On Thu, Feb 24, 2022 at 04:51:03PM +0000, Sebastian Ene wrote:
-> > This patch adds support for stolen time by sharing a memory region
-> > with the guest which will be used by the hypervisor to store the stolen
-> > time information. Reserve a 64kb MMIO memory region after the RTC peripheral
-> > to be used by pvtime. The exact format of the structure stored by the
-> > hypervisor is described in the ARM DEN0057A document.
-> > 
-> > Signed-off-by: Sebastian Ene <sebastianene@google.com>
-> > ---
-> >  Makefile                               |  1 +
-> >  arm/aarch64/arm-cpu.c                  |  1 +
-> >  arm/aarch64/include/kvm/kvm-cpu-arch.h |  1 +
-> >  arm/aarch64/pvtime.c                   | 94 ++++++++++++++++++++++++++
-> >  arm/include/arm-common/kvm-arch.h      |  6 +-
-> >  include/kvm/kvm-config.h               |  1 +
-> >  6 files changed, 103 insertions(+), 1 deletion(-)
-> >  create mode 100644 arm/aarch64/pvtime.c
-> > 
-> > diff --git a/Makefile b/Makefile
-> > index f251147..e9121dc 100644
-> > --- a/Makefile
-> > +++ b/Makefile
-> > @@ -182,6 +182,7 @@ ifeq ($(ARCH), arm64)
-> >  	OBJS		+= arm/aarch64/arm-cpu.o
-> >  	OBJS		+= arm/aarch64/kvm-cpu.o
-> >  	OBJS		+= arm/aarch64/kvm.o
-> > +	OBJS		+= arm/aarch64/pvtime.o
-> >  	ARCH_INCLUDE	:= $(HDRS_ARM_COMMON)
-> >  	ARCH_INCLUDE	+= -Iarm/aarch64/include
-> >  
-> > diff --git a/arm/aarch64/arm-cpu.c b/arm/aarch64/arm-cpu.c
-> > index d7572b7..326fb20 100644
-> > --- a/arm/aarch64/arm-cpu.c
-> > +++ b/arm/aarch64/arm-cpu.c
-> > @@ -22,6 +22,7 @@ static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
-> >  static int arm_cpu__vcpu_init(struct kvm_cpu *vcpu)
-> >  {
-> >  	vcpu->generate_fdt_nodes = generate_fdt_nodes;
-> > +	kvm_cpu__setup_pvtime(vcpu);
-> >  	return 0;
-> >  }
-> >  
-> > diff --git a/arm/aarch64/include/kvm/kvm-cpu-arch.h b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-> > index 8dfb82e..b57d6e6 100644
-> > --- a/arm/aarch64/include/kvm/kvm-cpu-arch.h
-> > +++ b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-> > @@ -19,5 +19,6 @@
-> >  
-> >  void kvm_cpu__select_features(struct kvm *kvm, struct kvm_vcpu_init *init);
-> >  int kvm_cpu__configure_features(struct kvm_cpu *vcpu);
-> > +void kvm_cpu__setup_pvtime(struct kvm_cpu *vcpu);
-> >  
-> >  #endif /* KVM__KVM_CPU_ARCH_H */
-> > diff --git a/arm/aarch64/pvtime.c b/arm/aarch64/pvtime.c
-> > new file mode 100644
-> > index 0000000..8251f6a
-> > --- /dev/null
-> > +++ b/arm/aarch64/pvtime.c
-> > @@ -0,0 +1,94 @@
-> > +#include "kvm/kvm.h"
-> > +#include "kvm/kvm-cpu.h"
-> > +#include "kvm/util.h"
-> > +
-> > +#include <linux/byteorder.h>
-> > +#include <linux/types.h>
-> > +
-> > +#define ARM_PVTIME_STRUCT_SIZE		(64)
-> > +
-> > +struct pvtime_data_priv {
-> > +	bool	is_supported;
-> > +	char	*usr_mem;
-> > +};
-> > +
-> > +static struct pvtime_data_priv pvtime_data = {
-> > +	.is_supported	= true,
-> > +	.usr_mem	= NULL
-> > +};
-> > +
-> > +static int pvtime__alloc_region(struct kvm *kvm)
-> > +{
-> > +	char *mem;
-> > +	int ret = 0;
-> > +
-> > +	mem = mmap(NULL, ARM_PVTIME_MMIO_SIZE, PROT_RW,
-> > +		   MAP_ANON_NORESERVE, -1, 0);
-> > +	if (mem == MAP_FAILED)
-> > +		return -ENOMEM;
+Am 24.02.22 um 16:47 schrieb Michael Mueller:
 > 
-> Hm... man 2 mmap lists a few dozen error codes, why use -ENOMEM here instead of
-> -errno? This just makes debugging harder.
 > 
+> On 22.02.22 09:13, Christian Borntraeger wrote:
+>> Am 09.02.22 um 16:22 schrieb Michael Mueller:
+>>> This patch enables the ultravisor adapter interruption vitualization
+>>> support indicated by UV feature BIT_UV_FEAT_AIV. This allows ISC
+>>> interruption injection directly into the GISA IPM for PV kvm guests.
+>>>
+>>> Hardware that does not support this feature will continue to use the
+>>> UV interruption interception method to deliver ISC interruptions to
+>>> PV kvm guests. For this purpose, the ECA_AIV bit for all guest cpus
+>>> will be cleared and the GISA will be disabled during PV CPU setup.
+>>>
+>>> In addition a check in __inject_io() has been removed. That reduces the
+>>> required instructions for interruption handling for PV and traditional
+>>> kvm guests.
+>>>
+>>> Signed-off-by: Michael Mueller <mimu@linux.ibm.com>
+>>
+>> The CI said the following with gisa_disable in the calltrace.
+>> Will drop from next for now.
+> 
+> It turns out this is related to kvm_s390_set_tod_clock() which
+> is triggered by a kvm-unit-test (sac_PV) and not related directly
+> to this patch. Please re-apply.
 
-I will return the -errno error code here.
+Done. We need to fix the sck handler instead.
 
-> > +
-> > +	ret = kvm__register_dev_mem(kvm, ARM_PVTIME_MMIO_BASE,
-> > +				    ARM_PVTIME_MMIO_SIZE, mem);
-> > +	if (ret) {
-> > +		munmap(mem, ARM_PVTIME_MMIO_SIZE);
-> > +		return ret;
-> > +	}
-> > +
-> > +	pvtime_data.usr_mem = mem;
-> > +	return ret;
-> > +}
-> > +
-> > +static int pvtime__teardown_region(struct kvm *kvm)
-> > +{
-> > +	if (pvtime_data.usr_mem == NULL)
-> > +		return 0;
-> > +
-> > +	kvm__destroy_mem(kvm, ARM_PVTIME_MMIO_BASE,
-> > +			 ARM_PVTIME_MMIO_SIZE, pvtime_data.usr_mem);
-> > +	munmap(pvtime_data.usr_mem, ARM_PVTIME_MMIO_SIZE);
-> > +	pvtime_data.usr_mem = NULL;
-> > +	return 0;
-> > +}
-> > +
-> > +void kvm_cpu__setup_pvtime(struct kvm_cpu *vcpu)
-> > +{
-> > +	int ret;
-> > +	u64 pvtime_guest_addr = ARM_PVTIME_MMIO_BASE + vcpu->cpu_id *
 > 
-> That's trange, cpu_id is not initialized here because target->init() is called
-> before setting up the cpu_id. The following patch in the series, "aarch64:
-> Populate the vCPU struct before target->init()" should come before this one.
-> 
-> > +		ARM_PVTIME_STRUCT_SIZE;
-> > +	struct kvm_config *kvm_cfg = NULL;
-> > +	struct kvm_device_attr pvtime_attr = (struct kvm_device_attr) {
-> > +		.group	= KVM_ARM_VCPU_PVTIME_CTRL,
-> > +		.addr	= KVM_ARM_VCPU_PVTIME_IPA
-> > +	};
-> > +
-> > +	BUG_ON(!vcpu);
-> > +	BUG_ON(!vcpu->kvm);
-> > +
-> > +	kvm_cfg = &vcpu->kvm->cfg;
-> > +	if (kvm_cfg && kvm_cfg->no_pvtime)
-> 
-> If you move the next patch in the series before this one, all the above checks
-> will not be needed and should be removed.
-> 
-> In general, each patch in a series should be able to build properly and run a VM
-> without errors. This is to help users when bisecting [1]. If I build kvmtool
-> from this patch and I try to run a VM I get the error:
-> 
-> Error: BUG at arm/aarch64/pvtime.c:65
-> 
-> [1] https://github.com/torvalds/linux/blob/master/Documentation/process/submitting-patches.rst#separate-your-changes
-> 
-
-I will move the patch that handles the structure initialisation before
-this one and I will remove those checks. Thanks for the suggestion !
-
-> > +		return;
-> > +
-> > +	if (!pvtime_data.is_supported)
-> > +		return;
-> > +
-> > +	ret = ioctl(vcpu->vcpu_fd, KVM_HAS_DEVICE_ATTR, &pvtime_attr);
-> > +	if (ret)
-> > +		goto out_err;
-> 
-> You should check that pvtime is supported by checking the KVM_CAP_STEAL_TIME on
-> the VM fd, as that's how capabilities are advertised by KVM.
-> 
-
-I thought that it is sufficient to verify that it has the device
-attributes for *PVTIME. I will add this check too, thanks for the
-suggestion !
-
-> > +
-> > +	if (!pvtime_data.usr_mem) {
-> > +		ret = pvtime__alloc_region(vcpu->kvm);
-> 
-> pvtime__alloc_region() can fail pretty catastrophically, is it ok to ignore it
-> and go on? I would have expected kvm_cpu__setup_pvtime() to return an error
-> which is then propagated to target->init().
->
-
-Hmm, I didn't propagate the error code from kvm_cpu__setup_pvtime()
-because if this feature is not supported it will hit:"Unable to
-initialise vcpu".
-
-But I guess that now we can propagate the error code as we have '--no-pvtime'
-command argument. What do you think ?
-
-> > +		if (ret)
-> > +			goto out_err;
-> > +	}
-> > +
-> > +	pvtime_attr.addr = (u64)&pvtime_guest_addr;
-> > +	ret = ioctl(vcpu->vcpu_fd, KVM_SET_DEVICE_ATTR, &pvtime_attr);
-> > +	if (!ret)
-> > +		return;
-> > +
-> > +	pvtime__teardown_region(vcpu->kvm);
-> > +out_err:
-> > +	pvtime_data.is_supported = false;
-> > +}
-> > +
-> > +dev_exit(pvtime__teardown_region);
-> 
-> It is customary to put the dev_exit() exactly after the function it refers to.
-> 
-
-I will move this.
-
-> > diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
-> > index c645ac0..3f82663 100644
-> > --- a/arm/include/arm-common/kvm-arch.h
-> > +++ b/arm/include/arm-common/kvm-arch.h
-> > @@ -15,7 +15,8 @@
-> >   * |  PCI  |////| plat  |       |        |     |         |
-> >   * |  I/O  |////| MMIO: | Flash | virtio | GIC |   PCI   |  DRAM
-> >   * | space |////| UART, |       |  MMIO  |     |  (AXI)  |
-> > - * |       |////| RTC   |       |        |     |         |
-> > + * |       |////| RTC,  |       |        |     |         |
-> > + * |       |////| PVTIME|       |        |     |         |
-> >   * +-------+----+-------+-------+--------+-----+---------+---......
-> >   */
-> >  
-> > @@ -34,6 +35,9 @@
-> >  #define ARM_RTC_MMIO_BASE	(ARM_UART_MMIO_BASE + ARM_UART_MMIO_SIZE)
-> >  #define ARM_RTC_MMIO_SIZE	0x10000
-> >  
-> > +#define ARM_PVTIME_MMIO_BASE	(ARM_RTC_MMIO_BASE + ARM_RTC_MMIO_SIZE)
-> > +#define ARM_PVTIME_MMIO_SIZE	SZ_64K
-> 
-> This looks good.
-> 
-> Thanks,
-> Alex
->
-
-Thanks for the review,
-Sebastian
-
-> > +
-> >  #define KVM_FLASH_MMIO_BASE	(ARM_MMIO_AREA + 0x1000000)
-> >  #define KVM_FLASH_MAX_SIZE	0x1000000
-> >  
-> > diff --git a/include/kvm/kvm-config.h b/include/kvm/kvm-config.h
-> > index 6a5720c..48adf27 100644
-> > --- a/include/kvm/kvm-config.h
-> > +++ b/include/kvm/kvm-config.h
-> > @@ -62,6 +62,7 @@ struct kvm_config {
-> >  	bool no_dhcp;
-> >  	bool ioport_debug;
-> >  	bool mmio_debug;
-> > +	bool no_pvtime;
-> >  };
-> >  
-> >  #endif
-> > -- 
-> > 2.35.1.473.g83b2b277ed-goog
-> > 
-> > _______________________________________________
-> > kvmarm mailing list
-> > kvmarm@lists.cs.columbia.edu
-> > https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+>>
+>>     LOCKDEP_CIRCULAR (suite: kvm-unit-tests-kvm, case: -)
+>>                  WARNING: possible circular locking dependency detected
+>> 5.17.0-20220221.rc5.git1.b8f0356a093a.300.fc35.s390x+debug #1 Not tainted
+>>                  ------------------------------------------------------
+>>                  qemu-system-s39/161139 is trying to acquire lock:
+>>                  0000000280dc0b98 (&kvm->lock){+.+.}-{3:3}, at: kvm_s390_set_tod_clock+0x36/0x220 [kvm]
+>>                  but task is already holding lock:
+>>                  0000000280f4e4b8 (&vcpu->mutex){+.+.}-{3:3}, at: kvm_vcpu_ioctl+0x9a/0xa40 [kvm]
+>>                  which lock already depends on the new lock.
+>>                  the existing dependency chain (in reverse order) is:
+>>                  -> #1 (&vcpu->mutex){+.+.}-{3:3}:
+>>                         __lock_acquire+0x604/0xbd8
+>>                         lock_acquire.part.0+0xe2/0x250
+>>                         lock_acquire+0xb0/0x200
+>>                         __mutex_lock+0x9e/0x8a0
+>>                         mutex_lock_nested+0x32/0x40
+>>                         kvm_s390_gisa_disable+0xa4/0x130 [kvm]
+>>                         kvm_s390_handle_pv+0x718/0x778 [kvm]
+>>                         kvm_arch_vm_ioctl+0x4ac/0x5f8 [kvm]
+>>                         kvm_vm_ioctl+0x336/0x530 [kvm]
+>>                         __s390x_sys_ioctl+0xbe/0x100
+>>                         __do_syscall+0x1da/0x208
+>>                         system_call+0x82/0xb0
+>>                  -> #0 (&kvm->lock){+.+.}-{3:3}:
+>>                         check_prev_add+0xe0/0xed8
+>>                         validate_chain+0x736/0xb20
+>>                         __lock_acquire+0x604/0xbd8
+>>                         lock_acquire.part.0+0xe2/0x250
+>>                         lock_acquire+0xb0/0x200
+>>                         __mutex_lock+0x9e/0x8a0
+>>                         mutex_lock_nested+0x32/0x40
+>>                         kvm_s390_set_tod_clock+0x36/0x220 [kvm]
+>>                         kvm_s390_handle_b2+0x378/0x728 [kvm]
+>>                         kvm_handle_sie_intercept+0x13a/0x448 [kvm]
+>>                         vcpu_post_run+0x28e/0x560 [kvm]
+>>                         __vcpu_run+0x266/0x388 [kvm]
+>>                         kvm_arch_vcpu_ioctl_run+0x10a/0x270 [kvm]
+>>                         kvm_vcpu_ioctl+0x27c/0xa40 [kvm]
+>>                         __s390x_sys_ioctl+0xbe/0x100
+>>                         __do_syscall+0x1da/0x208
+>>                         system_call+0x82/0xb0
+>>                  other info that might help us debug this:
+>>                   Possible unsafe locking scenario:
+>>                         CPU0                    CPU1
+>>                         ----                    ----
+>>                    lock(&vcpu->mutex);
+>>                                                 lock(&kvm->lock);
+>>                                                 lock(&vcpu->mutex);
+>>                    lock(&kvm->lock);
+>>                   *** DEADLOCK ***
+>>                  2 locks held by qemu-system-s39/161139:
+>>                   #0: 0000000280f4e4b8 (&vcpu->mutex){+.+.}-{3:3}, at: kvm_vcpu_ioctl+0x9a/0xa40 [kvm]
+>>                   #1: 0000000280dc47c8 (&kvm->srcu){....}-{0:0}, at: __vcpu_run+0x1d4/0x388 [kvm]
+>>                  stack backtrace:
+>>                  CPU: 10 PID: 161139 Comm: qemu-system-s39 Not tainted 5.17.0-20220221.rc5.git1.b8f0356a093a.300.fc35.s390x+debug #1
+>>                  Hardware name: IBM 8561 T01 701 (LPAR)
+>>                  Call Trace:
+>>                   [<00000001da4e89de>] dump_stack_lvl+0x8e/0xc8
+>>                   [<00000001d9876c56>] check_noncircular+0x136/0x158
+>>                   [<00000001d9877c70>] check_prev_add+0xe0/0xed8
+>>                   [<00000001d987919e>] validate_chain+0x736/0xb20
+>>                   [<00000001d987b23c>] __lock_acquire+0x604/0xbd8
+>>                   [<00000001d987c432>] lock_acquire.part.0+0xe2/0x250
+>>                   [<00000001d987c650>] lock_acquire+0xb0/0x200
+>>                   [<00000001da4f72ae>] __mutex_lock+0x9e/0x8a0
+>>                   [<00000001da4f7ae2>] mutex_lock_nested+0x32/0x40
+>>                   [<000003ff8070cd6e>] kvm_s390_set_tod_clock+0x36/0x220 [kvm]
+>>                   [<000003ff8071dd68>] kvm_s390_handle_b2+0x378/0x728 [kvm]
+>>                   [<000003ff8071146a>] kvm_handle_sie_intercept+0x13a/0x448 [kvm]
+>>                   [<000003ff8070dd46>] vcpu_post_run+0x28e/0x560 [kvm]
+>>                   [<000003ff8070e27e>] __vcpu_run+0x266/0x388 [kvm]
+>>                   [<000003ff8070eba2>] kvm_arch_vcpu_ioctl_run+0x10a/0x270 [kvm]
+>>                   [<000003ff806f4044>] kvm_vcpu_ioctl+0x27c/0xa40 [kvm]
+>>                   [<00000001d9b47ac6>] __s390x_sys_ioctl+0xbe/0x100
+>>                   [<00000001da4ec152>] __do_syscall+0x1da/0x208
+>>                   [<00000001da4fec42>] system_call+0x82/0xb0
+>>                  INFO: lockdep is turned off.
