@@ -2,160 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D5B2B4C47DC
-	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 15:46:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 487394C47E3
+	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 15:50:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241853AbiBYOrZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 09:47:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51314 "EHLO
+        id S241663AbiBYOua (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 09:50:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58892 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241849AbiBYOrY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Feb 2022 09:47:24 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 69C593465B
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 06:46:50 -0800 (PST)
+        with ESMTP id S232351AbiBYOu1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Feb 2022 09:50:27 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0F69B2028BE
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 06:49:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645800409;
+        s=mimecast20190719; t=1645800594;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=/G2knps6pP6nDHsHgQtsmWXR7eCwuWR+Id4H5oECinA=;
-        b=Cg539A0VOlSlT/XTF5IQE8gtv3ZwYnEQDqeRSkq5l+YEsgH3m+WFzjxFSo2LD+kDN0/EcW
-        AokSbcFSmosjCe6xeRnWoUEfHKInYuHabCV/Iw9jP6mkSx6xKsw7PSpObFRYSbwHlT9cck
-        HYQf0CeN+cR9wmGHDoGUT0RQq2VGpZU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=oG46p9ApnGlILl1ZLvkfxhnD10O2+FDP9Z7Tm2fwr+c=;
+        b=Q4FannQMidh+cKStF5mM7UjA0ru81slTT9xfeYeW91GYut47wLCpMAoLj1KSUWLCoYuGui
+        imRHQWoFvv7g+bmt7ILnLHzqu4jYU0bKIepF7D45Kto85la9TYHHjLcwhdb+pfOuK3UEqb
+        L5wERKOD7za39oi4iIMz1OTdRcD95vY=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-526-HWh4DxhzPqmmq-gT1KWONw-1; Fri, 25 Feb 2022 09:46:46 -0500
-X-MC-Unique: HWh4DxhzPqmmq-gT1KWONw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CC05B800425;
-        Fri, 25 Feb 2022 14:46:43 +0000 (UTC)
-Received: from starship (unknown [10.40.195.190])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E3B841037F2B;
-        Fri, 25 Feb 2022 14:46:32 +0000 (UTC)
-Message-ID: <79f5ce60c65280f4fb7cba0ceedaca0ff5595c48.camel@redhat.com>
-Subject: Re: [PATCH v6 6/9] KVM: x86: lapic: don't allow to change APIC ID
- unconditionally
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Zeng Guang <guang.zeng@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jethro Beekman <jethro@fortanix.com>,
-        Kai Huang <kai.huang@intel.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
-        Robert Hu <robert.hu@intel.com>, Gao Chao <chao.gao@intel.com>
-Date:   Fri, 25 Feb 2022 16:46:31 +0200
-In-Reply-To: <20220225082223.18288-7-guang.zeng@intel.com>
-References: <20220225082223.18288-1-guang.zeng@intel.com>
-         <20220225082223.18288-7-guang.zeng@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+ us-mta-411-n77N9v51N0e1eqqG2AgQFA-1; Fri, 25 Feb 2022 09:49:53 -0500
+X-MC-Unique: n77N9v51N0e1eqqG2AgQFA-1
+Received: by mail-wm1-f70.google.com with SMTP id i20-20020a05600c051400b00380d5eb51a7so1423520wmc.3
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 06:49:52 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=oG46p9ApnGlILl1ZLvkfxhnD10O2+FDP9Z7Tm2fwr+c=;
+        b=uduve2VOUSKonYYV221aTz9L1sB1x9ULdJO94aGag/hXl4ptfBsjkF5giEA7V92/fc
+         6JNyjhphnrh1z4VipnLMC9/xD6vdI4J+rUrlSx8lE7tFdWtEsVGqK2Tjb0sHVR+QniuI
+         cvroHQRECHzUXUOtdzYt0KhmM8W8QamVY0iFgcD1Q1FSMa0z4sf8mH9Z7EJNCoAK/8Xe
+         q0+LpBeTOuXRam4obl/MhdTUJOhmuDam2FSZFCvJVXoYoLonRmRunh3ZNfLGeCBGtMC4
+         zC8ngto1tlG002dZXX8JD5mabeHqCYTCj2PwNHDQRO/TIz85bGglz0HVAqhYcScOegYb
+         UKMQ==
+X-Gm-Message-State: AOAM530Z9DZKGFfmd84DbSiWE5SAPmvKzmCmBvhjWSiIoD2jRsVXdSsJ
+        J8IjBLxj1UF/u0tNv5n8BAuQBY1NFJJSL3Ju8YijW4FVCkAj0t1ZzyqBltLs7RxMAESwcVv8Hpk
+        4059QqRv8hUuh
+X-Received: by 2002:a05:6000:3c6:b0:1e4:a380:bb53 with SMTP id b6-20020a05600003c600b001e4a380bb53mr6213162wrg.559.1645800591921;
+        Fri, 25 Feb 2022 06:49:51 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyPvZpYeV1cMChykbmMIlrqZ62jXUzNXFVvdiNhkV7FTQ/vQZtP351aVYLRANF8AJomAWs86Q==
+X-Received: by 2002:a05:6000:3c6:b0:1e4:a380:bb53 with SMTP id b6-20020a05600003c600b001e4a380bb53mr6213154wrg.559.1645800591650;
+        Fri, 25 Feb 2022 06:49:51 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id l26-20020a05600c1d1a00b00380def7d3desm2672667wms.17.2022.02.25.06.49.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 25 Feb 2022 06:49:51 -0800 (PST)
+Message-ID: <b03f6e27-bd55-e06b-af8d-a4e6bdf5d778@redhat.com>
+Date:   Fri, 25 Feb 2022 15:49:49 +0100
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 5.17, take #4
+Content-Language: en-US
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Mark Brown <broonie@kernel.org>,
+        Oliver Upton <oupton@google.com>,
+        Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+        kernel-team@android.com
+References: <20220225131302.107215-1-maz@kernel.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20220225131302.107215-1-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2022-02-25 at 16:22 +0800, Zeng Guang wrote:
-> From: Maxim Levitsky <mlevitsk@redhat.com>
+On 2/25/22 14:13, Marc Zyngier wrote:
+> Hi Paolo,
 > 
-> No normal guest has any reason to change physical APIC IDs, and
-> allowing this introduces bugs into APIC acceleration code.
+> Only a couple of fixes this time around: one for the long standing
+> PSCI CPU_SUSPEND issue, and a selftest fix for systems that don't have
+> a GICv3.
 > 
-> And Intel recent hardware just ignores writes to APIC_ID in
-> xAPIC mode. More background can be found at:
-> https://lore.kernel.org/lkml/Yfw5ddGNOnDqxMLs@google.com/
+> Please pull,
 > 
-> Looks there is no much value to support writable xAPIC ID in
-> guest except supporting some old and crazy use cases which
-> probably would fail on real hardware. So, make xAPIC ID
-> read-only for KVM guests.
+> 	M.
 > 
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> Signed-off-by: Zeng Guang <guang.zeng@intel.com>
-
-Assuming that this is approved and accepted upstream,
-that is even better that my proposal of doing this
-when APICv is enabled.
-
-Since now apic id is always read only, now we should not 
-forget to clean up some parts of kvm like kvm_recalculate_apic_map,
-which are not needed anymore.
-
-Best regards,
-	Maxim Levitsky
-
-> ---
->  arch/x86/kvm/lapic.c | 25 ++++++++++++++++++-------
->  1 file changed, 18 insertions(+), 7 deletions(-)
+> The following changes since commit 5bfa685e62e9ba93c303a9a8db646c7228b9b570:
 > 
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index e4bcdab1fac0..b38288c8a94f 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -2044,10 +2044,17 @@ static int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
->  
->  	switch (reg) {
->  	case APIC_ID:		/* Local APIC ID */
-> -		if (!apic_x2apic_mode(apic))
-> -			kvm_apic_set_xapic_id(apic, val >> 24);
-> -		else
-> +		if (apic_x2apic_mode(apic)) {
->  			ret = 1;
-> +			break;
-> +		}
-> +		/* Don't allow changing APIC ID to avoid unexpected issues */
-> +		if ((val >> 24) != apic->vcpu->vcpu_id) {
-> +			kvm_vm_bugged(apic->vcpu->kvm);
-> +			break;
-> +		}
-> +
-> +		kvm_apic_set_xapic_id(apic, val >> 24);
->  		break;
->  
->  	case APIC_TASKPRI:
-> @@ -2631,11 +2638,15 @@ int kvm_get_apic_interrupt(struct kvm_vcpu *vcpu)
->  static int kvm_apic_state_fixup(struct kvm_vcpu *vcpu,
->  		struct kvm_lapic_state *s, bool set)
->  {
-> -	if (apic_x2apic_mode(vcpu->arch.apic)) {
-> -		u32 *id = (u32 *)(s->regs + APIC_ID);
-> -		u32 *ldr = (u32 *)(s->regs + APIC_LDR);
-> -		u64 icr;
-> +	u32 *id = (u32 *)(s->regs + APIC_ID);
-> +	u32 *ldr = (u32 *)(s->regs + APIC_LDR);
-> +	u64 icr;
->  
-> +	if (!apic_x2apic_mode(vcpu->arch.apic)) {
-> +		/* Don't allow changing APIC ID to avoid unexpected issues */
-> +		if ((*id >> 24) != vcpu->vcpu_id)
-> +			return -EINVAL;
-> +	} else {
->  		if (vcpu->kvm->arch.x2apic_format) {
->  			if (*id != vcpu->vcpu_id)
->  				return -EINVAL;
+>    KVM: arm64: vgic: Read HW interrupt pending state from the HW (2022-02-11 11:01:12 +0000)
+> 
+> are available in the Git repository at:
+> 
+>    git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.17-4
+> 
+> for you to fetch changes up to 456f89e0928ab938122a40e9f094a6524cc158b4:
+> 
+>    KVM: selftests: aarch64: Skip tests if we can't create a vgic-v3 (2022-02-25 13:02:28 +0000)
+> 
+> ----------------------------------------------------------------
+> KVM/arm64 fixes for 5.17, take #4
+> 
+> - Correctly synchronise PMR and co on PSCI CPU_SUSPEND
+> 
+> - Skip tests that depend on GICv3 when the HW isn't available
+> 
+> ----------------------------------------------------------------
+> Mark Brown (1):
+>        KVM: selftests: aarch64: Skip tests if we can't create a vgic-v3
+> 
+> Oliver Upton (1):
+>        KVM: arm64: Don't miss pending interrupts for suspended vCPU
+> 
+>   arch/arm64/kvm/psci.c                            | 3 +--
+>   tools/testing/selftests/kvm/aarch64/arch_timer.c | 7 ++++++-
+>   tools/testing/selftests/kvm/aarch64/vgic_irq.c   | 4 ++++
+>   tools/testing/selftests/kvm/lib/aarch64/vgic.c   | 4 +++-
+>   4 files changed, 14 insertions(+), 4 deletions(-)
+> 
 
+Pulled, thanks.
+
+Paolo
 
