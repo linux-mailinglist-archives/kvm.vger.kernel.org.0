@@ -2,54 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ECBAA4C46BC
-	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 14:39:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1529A4C46B3
+	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 14:38:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241229AbiBYNib (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 08:38:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43240 "EHLO
+        id S241533AbiBYNim (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 08:38:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44364 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241534AbiBYNib (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Feb 2022 08:38:31 -0500
-Received: from mail-wr1-x449.google.com (mail-wr1-x449.google.com [IPv6:2a00:1450:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 370991E7A45
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 05:37:58 -0800 (PST)
-Received: by mail-wr1-x449.google.com with SMTP id p18-20020adfba92000000b001e8f7697cc7so894105wrg.20
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 05:37:57 -0800 (PST)
+        with ESMTP id S241531AbiBYNim (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Feb 2022 08:38:42 -0500
+Received: from mail-wm1-x34a.google.com (mail-wm1-x34a.google.com [IPv6:2a00:1450:4864:20::34a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B572A1D8AB9
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 05:38:09 -0800 (PST)
+Received: by mail-wm1-x34a.google.com with SMTP id i20-20020a05600c051400b00380d5eb51a7so1334152wmc.3
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 05:38:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=lRlQkk/1FSOqAzIUi1czdjgNvITE2xn5+VNcHfuDD5Y=;
-        b=jlI2EM7HSlyX4dSYqNmsyrFd9+NFAD4FVNu1xxOXa3WHMWckhd4lnGBA2GsI1YGkza
-         EzZBMbpMFm36wcuDn0mw+CeEypUG8gH7ZKYko/ahL2cqaMWg71YIHpN2VUBDDXzyH0zn
-         97Ch9EU7TgYImdQWAtqxrm+hn5Q9PQcc7MyPZgJyElFBCHVNRT2j+uq27ycs9eJgY7S+
-         of2NHcJ+ZjG0FCPODgoosiJoM1kF9VNQUIEAzZM6LK6rlLRaOznUfrrh/dmToA+TvhET
-         LvujdBM5wREjhh9kR4vSYUSUo9ZC2IATQ8FK5sy/PgzbJ2UoOJetuX2nOnYarbejNhrR
-         hc+Q==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=gRdzjUKFCpuFZPsm9KFd7MbCyuJUNKRJi1HCnRctsnI=;
+        b=RuDcsnt0uDnCOh8so476d0bhJurV/3dHZ5KFaJ1hIMbrrIATRHzrzKZxeVHSbTv/vq
+         t+agQU3Mli8ws6rwqEQ96jpewsAYn2uUwyv22c+lxe8k0+3Mu/xzTn8T4l/f5/d7iqPo
+         EbdBUI0q3xtxYQ//nRYgONAmsL8l19EhIif/cnK/fPwVnpm9G538XZFalCf1MlkVOt3m
+         x+ruq27O45lfgu0sPDZf1OeehkhK7OpY+/BeYRPu7Ln8xqdJtds/S/+zu3SUfwRqhzdV
+         yH/WCE2Qn/PYF0ukj/pmuL3oB1adE6Y3+auPbgwanJ5WtGRV8wUpv/s2Zsz0SbgfOabb
+         HcPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=lRlQkk/1FSOqAzIUi1czdjgNvITE2xn5+VNcHfuDD5Y=;
-        b=KuP83O9qwzPemXT0jCX+EYaNPqwarRa6BODkm3btULnrrybUwamqpHsnUZvwS3Omvb
-         9ASiDRRYAagoU+DXs11JNqglnmij9mgvw9uZRxSA8/gZEugjb29b50oXbHXBFMztY02f
-         oBQb3PzDIb40eG49Ao9K5+io+lgqhm1c4nf8FEyTm/FXi9RoJdk6pCt9VY2DWC/e+lYA
-         694t6mrHUKSHE49SgpQBArSCpIbP7r17E3dWgFUQHj6OZBFkj5UJGADOjcR137d9m50Z
-         Uq9DyJbl9CSQqAJvb+Ug1Z7SnX7s3iqcATRFvHHBowaue8dm2CrUDPUv+NnxFlUhlmRY
-         7zUg==
-X-Gm-Message-State: AOAM532ct2nhnoDBdQ0FYjxzEHrdei4Ejb9EaJEUi0RZaKRmET4+EnTp
-        bgOiJwS9tZPhqhJNq14V7tYex287zQYHVWTy6N/U0/VfpMfBQQ5xvfRBgoW2bsQJYV1j7jyp0bO
-        bMnTKN2yhA5sNRlBZWuyq7Fw36xrNPfdC2Twdr2gFT7VKawVy/rvO+GymR+H8QINb1HH3IOw7+Q
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=gRdzjUKFCpuFZPsm9KFd7MbCyuJUNKRJi1HCnRctsnI=;
+        b=3Qh0hL5gJt35hyihupDYNt3XVj2pBp2Pi4kJMSrx2RfKhQKutS3LyGdblClASkZLo5
+         FQVkgpHuvuXtjl0S9IINdlTItPVxIDSe01Bh4i6xhcYCsWU5z/9hCdS7ity2YRa2Z1Tj
+         V/b1JcDnX+4X4fBWGZbPQs9oluA/LLFK4FEye7+P5U+kpwP8WKqQQAwDfUw+AOmYRIWX
+         jlNXGBOFw23BZDvZ8FCo1nxeCbcPlNNnJYefkIAjgUqbYL+iqN5dS0WzwOm+u3JOyoie
+         X2Zpna1AKP8Yy65Xsa+rlNVkWwhgU1/HuKijweB+aeKDJfdvjoigfpkC6FWuZlcfgC34
+         trvQ==
+X-Gm-Message-State: AOAM531w/iLy9UHtzYHmNeb5nVyqIHi+t1uUP+uRVoK0JyUOtLzo29UN
+        G4h9lZQV53zS8DCdseQrFZkNQokBGjfgcxljwabYr/O+Wvs7JVmVuIMItRrhg6agI0GOnNUiC/R
+        /YkCWWaltZoGbOZ6RnWiHTW3mTRlzgZebRk6SfwGvdXdBrGJKRl0qQhmiPGAzxAN7bFJITrAkmg
         ==
-X-Google-Smtp-Source: ABdhPJwfwchkdTKFsc11KLrjn8H+lwQn8CWI0f5dbYvQx5QSMn7mF8EoUBRhpLgnEozNKNffOPpBzSzHScSBxPC0OU0=
+X-Google-Smtp-Source: ABdhPJw/i+j9Y9lT4oP3rSx/EBeqAbXyVKnNIqSLOXDR7vSaDHI/+31HbErczIS6hHQ79O9YPY4Ur0JqAAxCdDnZCVg=
 X-Received: from sene.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:27c4])
- (user=sebastianene job=sendgmr) by 2002:a7b:cb44:0:b0:37c:4e2d:3bb2 with SMTP
- id v4-20020a7bcb44000000b0037c4e2d3bb2mr2810750wmj.96.1645796276423; Fri, 25
- Feb 2022 05:37:56 -0800 (PST)
-Date:   Fri, 25 Feb 2022 13:37:41 +0000
-Message-Id: <20220225133743.41207-1-sebastianene@google.com>
+ (user=sebastianene job=sendgmr) by 2002:a05:600c:3c98:b0:37f:2f14:7be7 with
+ SMTP id bg24-20020a05600c3c9800b0037f2f147be7mr2834952wmb.180.1645796288177;
+ Fri, 25 Feb 2022 05:38:08 -0800 (PST)
+Date:   Fri, 25 Feb 2022 13:37:43 +0000
+In-Reply-To: <20220225133743.41207-1-sebastianene@google.com>
+Message-Id: <20220225133743.41207-2-sebastianene@google.com>
 Mime-Version: 1.0
+References: <20220225133743.41207-1-sebastianene@google.com>
 X-Mailer: git-send-email 2.35.1.574.g5d30c73bfb-goog
-Subject: [PATCH kvmtool v5 0/3] aarch64: Add stolen time support
+Subject: [PATCH kvmtool v5 1/3] aarch64: Populate the vCPU struct before target->init()
 From:   Sebastian Ene <sebastianene@google.com>
 To:     kvm@vger.kernel.org
 Cc:     qperret@google.com, maz@kernel.org, kvmarm@lists.cs.columbia.edu,
@@ -66,43 +70,48 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-These patches add support for stolen time functionality.
+Move the vCPU structure initialisation before the target->init() call to
+ keep a reference to the kvm structure during init().
+This is required by the pvtime peripheral to reserve a memory region
+while the vCPU is beeing initialised.
 
-Patch #1 moves the vCPU structure initialisation before the target->init()
-call to allow early access to the kvm structure from the vCPU
-during target->init().
+Signed-off-by: Sebastian Ene <sebastianene@google.com>
+---
+ arm/kvm-cpu.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-Patch #2 modifies the memory layout in arm-common/kvm-arch.h and adds a
-new MMIO device PVTIME after the RTC region. A new flag is added in
-kvm-config.h that will be used to control [enable/disable] the pvtime
-functionality.
-
-Patch #3 adds a new command line argument to disable the stolen time
-functionality(by default is enabled).
-
-Changelog since v4:
- - Propagate a return code from kvm_cpu__setup_pvtime to target->init(vcpu)
- - Change the order of the patches as the vCPU structure initialisation
-   needs to be done before the PVTIME setup
- - Return -errno from pvtime__alloc_region(..)
- - Verify if the system supports KVM_CAP_STEAL_TIME
-
-Sebastian Ene (3):
-  aarch64: Populate the vCPU struct before target->init()
-  aarch64: Add stolen time support
-  Add --no-pvtime command line argument
-
- Makefile                               |  1 +
- arm/aarch64/arm-cpu.c                  |  2 +-
- arm/aarch64/include/kvm/kvm-cpu-arch.h |  1 +
- arm/aarch64/pvtime.c                   | 98 ++++++++++++++++++++++++++
- arm/include/arm-common/kvm-arch.h      |  6 +-
- arm/kvm-cpu.c                          | 14 ++--
- builtin-run.c                          |  2 +
- include/kvm/kvm-config.h               |  1 +
- 8 files changed, 116 insertions(+), 9 deletions(-)
- create mode 100644 arm/aarch64/pvtime.c
-
+diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
+index 6a2408c..84ac1e9 100644
+--- a/arm/kvm-cpu.c
++++ b/arm/kvm-cpu.c
+@@ -116,6 +116,13 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
+ 			die("Unable to find matching target");
+ 	}
+ 
++	/* Populate the vcpu structure. */
++	vcpu->kvm		= kvm;
++	vcpu->cpu_id		= cpu_id;
++	vcpu->cpu_type		= vcpu_init.target;
++	vcpu->cpu_compatible	= target->compatible;
++	vcpu->is_running	= true;
++
+ 	if (err || target->init(vcpu))
+ 		die("Unable to initialise vcpu");
+ 
+@@ -125,13 +132,6 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
+ 		vcpu->ring = (void *)vcpu->kvm_run +
+ 			     (coalesced_offset * PAGE_SIZE);
+ 
+-	/* Populate the vcpu structure. */
+-	vcpu->kvm		= kvm;
+-	vcpu->cpu_id		= cpu_id;
+-	vcpu->cpu_type		= vcpu_init.target;
+-	vcpu->cpu_compatible	= target->compatible;
+-	vcpu->is_running	= true;
+-
+ 	if (kvm_cpu__configure_features(vcpu))
+ 		die("Unable to configure requested vcpu features");
+ 
 -- 
 2.35.1.574.g5d30c73bfb-goog
 
