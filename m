@@ -2,281 +2,263 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 36A734C4FE0
-	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 21:44:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 931E04C5024
+	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 21:52:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236988AbiBYUpE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 15:45:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56594 "EHLO
+        id S237866AbiBYUwq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 15:52:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49630 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236918AbiBYUpD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Feb 2022 15:45:03 -0500
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2040.outbound.protection.outlook.com [40.107.243.40])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F15D1B45DE;
-        Fri, 25 Feb 2022 12:44:29 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TXGFN2lOeMItwOFdsY+xGfonhilIaqtAAsgTDCCOvabNgYWCaaYZm3ZAYMV5nV+t2gMeda633BnryZAocf0voieA7SNWt2BdSJ/8SMTZmlo3DhfcHCSBwBLbq+6HoOUbkInwejJ99hQMQSZlvpd65TbsE2GkbNtA20HIDZ2ToPeaRPu8pkgQ4KPrYJm1fa4j1SZhtv7SmADc/bScmCbvnry9toCWL3WMKi6pMhEZZ/gW69Ft9uakTo8PWhaW0CAbvg3sJiQr51VmqiLV+ofggGILHD4FjtqoM5jltKvFV/LpS5lnIFXSJUPEgyIhgp9I6B0YZBpuP4N6o9BsFzpV/A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4WE+x4qMgDuXIeaIuXMpE/8i1pIMcdBvUbU0XIPy/Oc=;
- b=jl0D5/5gCo7aBqI4h5/mVd3FMuwEZMgd5DgQqWrFiSe+NejmsjTKTMLn3JBXmCEXIpus9Y5W1ELU3Z39NEdt3ZSC5XPepip49UeIfrA+wLogQNp5WwCWOWaDjomrej4am7KpJJC9NeSKo8jRTAFcwtKFQ3ThOf0wwX1DN2Qx2Ggd2aIbJx3QzXQUzpyJz2v2c9EWMqsG+q+I+88jpSy3Y8PHXpOmc7nT34b1bRvE0Ni5O3x0Ec3wXpmNucpUbpORp2+JFESdNvepRpp/km9AyLUTHVgXBKq4H40VaEKAfQPVkjR6kNYroR7O7xhED8vtBYGmARdkeSQUdYHDX9tuBA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4WE+x4qMgDuXIeaIuXMpE/8i1pIMcdBvUbU0XIPy/Oc=;
- b=mLMBRy9VjrTsKn1LBBgmm8z/e5ypGJdFw5M8hrrLYwmu/cA0HyEA245N+xPi0dNPuxOFchm+X14y012tTNbU4YfoQSjupbqvBOIdA1MMVJUf1yfsqEbj84MPTUdh7/IbPE28OZz/xGZvpYZLHpZbCtiON/6omyGfqkmjCfA3NRRN1uOYURiQLQefFhsHxT52x/mS3JqMvIim8Ubn47gycXdtYa3Ki9+3Bc3B+4OlLmQ/fygm/YqE49pjum83E/9cX3pgm8WBJM1lX3NFF0BCWwdnR46m/eO3XrzdJFinYh090mlkH9qY2RZzW6LWiuqrUKEEIKnJ76+k7/jRRYEF0Q==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by DM6PR12MB4026.namprd12.prod.outlook.com (2603:10b6:5:1cc::33) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5017.25; Fri, 25 Feb
- 2022 20:44:25 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::e8f4:9793:da37:1bd3]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::e8f4:9793:da37:1bd3%4]) with mapi id 15.20.5017.026; Fri, 25 Feb 2022
- 20:44:25 +0000
-Date:   Fri, 25 Feb 2022 16:44:24 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Joao Martins <joao.m.martins@oracle.com>
-Cc:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
-        Linuxarm <linuxarm@huawei.com>,
-        liulongfang <liulongfang@huawei.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        yuzenghui <yuzenghui@huawei.com>,
-        Jonathan Cameron <jonathan.cameron@huawei.com>,
-        "Wangzhou (B)" <wangzhou1@hisilicon.com>
-Subject: Re: [RFC v2 0/4] vfio/hisilicon: add acc live migration driver
-Message-ID: <20220225204424.GA219866@nvidia.com>
-References: <20220211174933.GQ4160@nvidia.com>
- <34ac016b-000f-d6d6-acf1-f39ca1ca9c54@oracle.com>
- <20220212000117.GS4160@nvidia.com>
- <8338fe24-04ab-130a-1324-ab8f8e14816d@oracle.com>
- <20220214140649.GC4160@nvidia.com>
- <6198d35c-f810-cab1-8b43-2f817de2c1ea@oracle.com>
- <20220215162133.GV4160@nvidia.com>
- <7db79281-e72a-29f8-7192-07b739a63897@oracle.com>
- <20220223010303.GK10061@nvidia.com>
- <e4dba6f8-7f5b-e0d5-8ea8-5588459816f7@oracle.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e4dba6f8-7f5b-e0d5-8ea8-5588459816f7@oracle.com>
-X-ClientProxiedBy: BL0PR02CA0120.namprd02.prod.outlook.com
- (2603:10b6:208:35::25) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: a970486b-195b-4a0a-0913-08d9f89f9c38
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4026:EE_
-X-Microsoft-Antispam-PRVS: <DM6PR12MB40260A7231BD7E9D83AEEDAFC23E9@DM6PR12MB4026.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: XGs10FAas4UZYzN0rVxkXg8J5pYkTRJR2uf9n6yuPHeM4rtGRRC0dyJGh/ENDtUybDsTo27+cFtHccQxqkeTWpc7osfzHWGaj/rE6caWcSnhaT/M1UWVi04g+p4PRZkh5nbCON9TNVir8iv9oZaPXvI/gZvGs2vJJrthNsGg/Kf9KTQDS5ftvPfhcGyPsMRQUGZtfu4hFYWK7ge6uMuDOknQchVwgTzKcaDH3IGTcbDAk1v2a7dgAZ24dqO1cJDAnmF5stJRyIIaPwrFfLARX+sMMQNTcOP/oPvxmny+mrYCI6pl7kiVY8uGnbqCNONK9BOD3noEiE2gTc3yMXP/iN2Ju6cygbioCjcqat/d67kLjzWnMMwR0yuclgDnG4ObUdYb74gU67Ayo3haHhPcSsZiWfgHjFxUohYOE9+D3D+PknxqsHbxdPoGxScz4CBvDlfy/DjA7ZmNFE5+kvD84hZashstxSkCDMKtS4bf//XCcPbanvEgQZXM8ZtUHBC/95zErcvueTKVZ1Lyn8q/h5j+vlQFZutK8xVmXb/xtgjcn16CTtOaMzNAuZI1Jaoq3pJWIFreeHgki5EfXFBQMaAvZFYbjen4wbXfCAesIKnB1iEItOR7bpmu7ixssxXONKVlswdNo6b9KzGA94+d6J2DfzXdJN3NgYcQR8hZWIMDckDQIxSatJyunK7cN2qM
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(66946007)(66476007)(86362001)(66556008)(8676002)(36756003)(4326008)(2906002)(316002)(83380400001)(2616005)(38100700002)(6916009)(33656002)(54906003)(1076003)(186003)(26005)(6512007)(8936002)(7416002)(5660300002)(53546011)(6506007)(6486002)(508600001)(27376004);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?POiM7fIwavhfqNESiES5gEt+PQmHtQbbsnzO8PXjfEXe5/R+ALHKXWoPH6Kk?=
- =?us-ascii?Q?HP1pR4KTyB9kASY6/7JvUKEEMnLNycNESzFMhNnRI+xteueKweHL94utpOvj?=
- =?us-ascii?Q?JJAxsM4yMXQbjQY2zhpKbDbexPwBvuby4wUep//JZPkH72E24EhL6zVCn+sC?=
- =?us-ascii?Q?fq3vyR4iLaoJ9bm1GeCkAKjUJ93VqaIIk1EIGgxxYUqYcXd1jA41B2KApUck?=
- =?us-ascii?Q?lfuo+78ASDkAjj19LWMJ4XEHxXJOat51dwKMmJUGhrzafW2SW0ZsuH4ZOHEE?=
- =?us-ascii?Q?16pROBmyn7GWIdH3rJOX4aEEGCJ25YM+aCl5LGqi29x6RHu1DODx/eUgjv/u?=
- =?us-ascii?Q?Vwqt0hyNyW+sW1C5JQ2Rk2FfoG57LSgRFj/todvR8A6zrFysLOkafZ9m4x/g?=
- =?us-ascii?Q?fs6WB0yD/NRkpGZDyJ/ysrMCMb3AGeoK6+VohREUSueaxzdeds8aNjUZQIMH?=
- =?us-ascii?Q?AyimlGVucu7A5LSDZBxc76bc69OhK2n4QimS5iZbp3HZY0vB2S3Vem0UHyZa?=
- =?us-ascii?Q?Tbs/m+zEw8eddIa6pqecSKZ1DidJib5qB1vO3ih/QBJ4Pgju/YWRLUlxJaVP?=
- =?us-ascii?Q?cmcmjiW2j1ZcVR29PTJR1WKsCeE5OQRaS/nt4PmoRJKXFtT597h8kIiBso59?=
- =?us-ascii?Q?81mpZcTaFu4PcZKYCRJHw6wxCi9jo7BFkXXiUIm+2MkWOnhsa7dhtC5DtgpN?=
- =?us-ascii?Q?uBhHSlcPkDdWM06KOuo9v5OOkyfYQHq1wsbnsEkg1RPVaiyXZUqqO54HFboh?=
- =?us-ascii?Q?xcEIk1oiv2ADf83d4kbhRqiMy3U5TmhjdNGMJRg6l1R276MjsI1Cq6VRim0q?=
- =?us-ascii?Q?p6qxrbP4aUQOR6jxSuYO4dXFQSCvNoyt8w2Ew0FKlGncQq9rsBOai4AUDKuO?=
- =?us-ascii?Q?VxiyG93+PTqcsLE/YiswU4+vUNEmJTU7Jn96BsEhKr8LYVEWrgai9ehO+2ig?=
- =?us-ascii?Q?IF4BBSbFNOoT4cSqSTv6Ajob5z2kT0jevZqJL62wKm8GwWaXxEMc3tPJwcqr?=
- =?us-ascii?Q?jcgR+qmy5P2or1ufLVVMghOyWOSLIKx+FFbKiI9FD9pVFCyu7EfoSyBQJSff?=
- =?us-ascii?Q?Wsz+C6K/g9q36KIPIrBRefOLoCmSRSSX11tWTihzlKNqMDCEvd0KX/vJS282?=
- =?us-ascii?Q?x5JBKBUdmJBvfN/+GSOMrKaL/PODukgHrqSQ3NchGgmCAnywxMmZf8D0Laq7?=
- =?us-ascii?Q?Yq9OFYcn4resNytWE/NAA1V75H3I7fVAgDkD7y/dth46x0bloNzyON37Qwyp?=
- =?us-ascii?Q?j+MNjg0vWVu4IYm5LJqaeMASRMPmZ+MiarvJCEVKksvNK4TGefVh2+lTlrHF?=
- =?us-ascii?Q?jnRCZBNiX4+n14eTrRLJLaUcD6hiFp7lQ1QhHSEVMwiZDQSimcPftSIAxaUn?=
- =?us-ascii?Q?MlAkUJtV/G7SY/hzly/ecWaz3oSK89QSDDLkm7tIcf0XqJaHK6ME9DcNiFBR?=
- =?us-ascii?Q?4mxQxZSRngJYg+emHeXk7zV106zCf2kZHdXDWKmxmQzDVV8ZwGTOv/wZh6q3?=
- =?us-ascii?Q?JF2SqKJYDtL/IbDVJTWkIrBovK6lBhsUZBmZd8O/EqpgtXZgb0S5kWNAEWkn?=
- =?us-ascii?Q?eU8BjHHUu3CJHzfCHi4=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a970486b-195b-4a0a-0913-08d9f89f9c38
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2022 20:44:25.5604
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 1y3Mj9xSOKlXhFJgMFzfrydBX/KCzUQap6MlxDlnnAfEiohE5J6HgqfBgwlUjauw
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4026
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+        with ESMTP id S237718AbiBYUwp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Feb 2022 15:52:45 -0500
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20ABE223202
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 12:52:12 -0800 (PST)
+Received: by mail-pg1-x54a.google.com with SMTP id x25-20020a63b219000000b0037425262baeso1090913pge.13
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 12:52:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=NrKSXSX0Ejbdt8Wd9QgUP4pP5j8LyGhFsIy8SA/+5XM=;
+        b=Pu2BcAX6cGgskeOtQrxvdXFfweiJZCrYIIB6EECZjjrqNkVsu3hHzVB+1Ac7tPIFME
+         yCHyVnwWaiBbBKMtVy9IeNley7jmwwtNnBA27mqCxK8zYo3meVHV9WV5Jm5Hi6YHMgYx
+         v9N4gGBwh3dG0+Z8EK/D5Q/DPLUVUqDbfel+5PZF+GeUcYBk0InYlWPAi3WWoX6A0j1J
+         i4TNmsxKSaLCTEtoGER4SpPT+f+owTkiNUj98olnZK5GQ+u9Ml8IF/d4vZaAdg0+o+c+
+         t4UZ6zRQQhs9xFKzDbBzGMkisI05ofGYOfWNAIuPnVE+mB5D//YDX0pWIOBrRH55FNID
+         qWNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=NrKSXSX0Ejbdt8Wd9QgUP4pP5j8LyGhFsIy8SA/+5XM=;
+        b=jqDyQvD9u84ETswtlYsEWbXZXdScaxDh2MUwLdbRrVlFLtmopdMvW7TrwVI4nOvA1B
+         1ThAXHwfjeUrwaqa9vtFfl55FBDLjXOEmxYGb9dt4mj/drDjC0YpM24tPAEMvBDig8ph
+         eWaIK24wVuqvwhYB+osb3uv4C37dqw682qTO/b3y96f+Z3XHc83SzA2eYU3RQu21MP9H
+         IQdQJDIpiZ+AQgqxrJu6mfyhIYNz0Jq1sXmSeM2GcqIo+3Mt+IzuhTESlFt8F1ZxCBWe
+         BShtW5aHXXqalFJ+7mGknWX+/U4OZwR+4eOLpm3sDphVdwArdjM8iqZcvOuiTXu2dPrN
+         5ahA==
+X-Gm-Message-State: AOAM533bgS3CN5YMX3JB8ZZ+P+WXb2d1Nyg7MCLjTWRo+ZobSd2NlTEI
+        n0XxsaXa9yP6V54TMV/NjO0fAwA2Nic=
+X-Google-Smtp-Source: ABdhPJwfoRUZoJ+hDw1N8Cvy3Kw/BmQ8vhMH1ng3RzEoTtbyh/OZpSVtSD9LwNYyACW1jfK4AV7TuoL80dU=
+X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
+ (user=seanjc job=sendgmr) by 2002:a17:90b:364f:b0:1bc:7337:d7df with SMTP id
+ nh15-20020a17090b364f00b001bc7337d7dfmr4923152pjb.61.1645822331502; Fri, 25
+ Feb 2022 12:52:11 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Fri, 25 Feb 2022 20:52:09 +0000
+Message-Id: <20220225205209.3881130-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.1.574.g5d30c73bfb-goog
+Subject: [PATCH] KVM: SVM: Exit to userspace on ENOMEM/EFAULT GHCB errors
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Alper Gun <alpergun@google.com>,
+        Peter Gonda <pgonda@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 25, 2022 at 07:18:37PM +0000, Joao Martins wrote:
-> On 2/23/22 01:03, Jason Gunthorpe wrote:
-> > On Tue, Feb 22, 2022 at 11:55:55AM +0000, Joao Martins wrote:
-> >>>> If by conclusion you mean the whole thing to be merged, how can the work be
-> >>>> broken up to pieces if we busy-waiting on the new subsystem? Or maybe you meant
-> >>>> in terms of direction...
-> >>>
-> >>> I think go ahead and build it on top of iommufd, start working out the
-> >>> API details, etc. I think once the direction is concluded the new APIs
-> >>> will go forward.
-> >>>
-> >> /me nods, will do. Looking at your repository it is looking good.
-> > 
-> > I would like to come with some plan for dirty tracking on iommufd and
-> > combine that with a plan for dirty tracking inside the new migration
-> > drivers.
-> > 
-> I had a few things going on my end over the past weeks, albeit it is
-> getting a bit better now and I will be coming back to this topic. I hope/want
-> to give you a more concrete update/feedback over the coming week or two wrt
-> to dirty-tracking+iommufd+amd.
-> 
-> So far, I am not particularly concerned that this will affect overall iommufd
-> design. The main thing is really lookups to get vendor iopte, upon on what might
-> be a iommu_sync_dirty_bitmap(domain, iova, size) API. For toggling
-> the tracking,
+Exit to userspace if setup_vmgexit_scratch() fails due to OOM or because
+copying data from guest (userspace) memory failed/faulted.  The OOM
+scenario is clearcut, it's userspace's decision as to whether it should
+terminate the guest, free memory, etc...
 
-I'm not very keen on these multiplexer interfaces. I think you should
-just add a new ops to the new iommu_domain_ops 'set_dirty_tracking'
-'read_dirty_bits'
+As for -EFAULT, arguably, any guest issue is a violation of the guest's
+contract with userspace, and thus userspace needs to decide how to
+proceed.  E.g. userspace defines what is RAM vs. MMIO and communicates
+that directly to the guest, KVM is not involved in deciding what is/isn't
+RAM nor in communicating that information to the guest.  If the scratch
+GPA doesn't resolve to a memslot, then the guest is not honoring the
+memory configuration as defined by userspace.
 
-NULL op means not supported.
+And if userspace unmaps an hva for whatever reason, then exiting to
+userspace with -EFAULT is absolutely the right thing to do.  KVM's ABI
+currently sucks and doesn't provide enough information to act on the
+-EFAULT, but that will hopefully be remedied in the future as there are
+multiple use cases, e.g. uffd and virtiofs truncation, that shouldn't
+require any work in KVM beyond returning -EFAULT with a small amount of
+metadata.
 
-IMHO we don't need a kapi wrapper if only iommufd is going to call the
-op.
+KVM could define its ABI such that failure to access the scratch area is
+reflected into the guest, i.e. establish a contract with userspace, but
+that's undesirable as it limits KVM's options in the future, e.g. in the
+potential uffd case any failure on a uaccess needs to kick out to
+userspace.  KVM does have several cases where it reflects these errors
+into the guest, e.g. kvm_pv_clock_pairing() and Hyper-V emulation, but
+KVM would preferably "fix" those instead of propagating the falsehood
+that any memory failure is the guest's fault.
 
-> I'll be simplifying the interface in the other type1 series I had and making it
-> a simple iommu_set_feature(domain, flag, value) behind an ioctl for iommufd that can
-> enable/disable over a domain. Perhaps same trick could be expanded to other
-> features to have a bit more control on what userspace is allowed to use. I think
-> this just needs to set/clear a feature bit in the domain, for VFIO or userspace
-> to have full control during the different stages of migration of dirty tracking.
-> In all of the IOMMU implementations/manuals I read it means setting a protection
-> domain descriptor flag: AMD is a 2-bit field in the DTE, on Intel likewise but on
-> the PASID table only for scalable-mode PTEs, on SMMUv3.2 there's an equivalent
-> (albeit past work had also it always-on).
-> 
-> Provided the iommufd does /separately/ more finer granularity on what we can
-> do with page tables. Thus the VMM can demote/promote the ioptes to a lower page size
-> at will as separate operations, before and after migration respectivally. That logic
-> would probably be better to be in separate iommufd ioctls(), as that it's going to be
-> expensive.
+Lastly, returning a boolean as an "error" for that a helper that isn't
+named accordingly never works out well.
 
-This all sounds right to me
+Fixes: ad5b353240c8 ("KVM: SVM: Do not terminate SEV-ES guests on GHCB validation failure")
+Cc: Alper Gun <alpergun@google.com>
+Cc: Peter Gonda <pgonda@google.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
 
-Questions I have:
- - Do we need ranges for some reason? You mentioned ARM SMMU wants
-   ranges? how/what/why?
+This is feedback for the "fixed" commit that got lost[*].  I felt quite
+strongly about not returning booleans then, and I feel even more strongly
+now as Alper got burned by this when backporting SEV-ES support.  Even if
+we don't want to exit to userspace, we should at least avoid using bools
+as error codes.
 
- - What about the unmap and read dirty without races operation that
-   vfio has?
+As before, compile tested only.
 
-> >> I, too, have been wondering what that is going to look like -- and how do we
-> >> convey the setup of dirty tracking versus the steering of it.
-> > 
-> > What I suggested was to just split them.
-> > 
-> > Some ioctl toward IOMMUFD will turn on the system iommu tracker - this
-> > would be on a per-domain basis, not on the ioas.
-> > 
-> > Some ioctl toward the vfio device will turn on the device's tracker.
-> > 
-> In the activation/fetching-data of either trackers I see some things in common in
-> terms of UAPI with the difference that whether a device or a list of devices are passed on
-> as an argument of exiting dirty-track vfio ioctls(). (At least that's how I am reading
-> your suggestion)
+[*] https://lore.kernel.org/all/YapIMYiJ+iIfHI+c@google.com
 
-I was thinking a VFIO_DEVICE ioctl located on the device FD
-implemented in the end VFIO driver (like mlx5_vfio). No lists..
+ arch/x86/kvm/svm/sev.c | 36 +++++++++++++++++++++---------------
+ 1 file changed, 21 insertions(+), 15 deletions(-)
 
-As you say the driver should just take in the request to set dirty
-tracking and take core of it somehow. There is no value the core VFIO
-code can add here.
-
-> Albeit perhaps the main difference is going to be that one needs to
-> setup with hardware interface with the device tracker and how we
-> carry the regions of memory that want to be tracked i.e. GPA/IOVA
-> ranges that the device should track. The tracking-GPA space is not
-> linear GPA space sadly. But at the same point perhaps the internal
-> VFIO API between core-VFIO and vendor-VFIO is just reading the @dma
-> ranges we mapped.
-
-Yes, this is a point that needs some answering. One option is to pass
-in the tracking range list from userspace. Another is to query it in
-the driver from the currently mapped areas in IOAS.
-
-I know devices have limitations here in terms of how many/how big the
-ranges can be, and devices probably can't track dynamic changes.
-
-> In IOMMU this is sort of cheap and 'stateless', but on the setup of the
-> device tracker might mean giving all the IOVA ranges to the PF (once?).
-> Perhaps leaving to the vendor driver to pick when to register the IOVA space to
-> be tracked, or perhaps when you turn on the device's tracker. But on all cases,
-> the driver needs some form of awareness of and convey that to the PF for
-> tracking purposes.
-
-Yes, this is right
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 789b69294d28..75fa6dd268f0 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -2377,7 +2377,7 @@ static void sev_es_sync_from_ghcb(struct vcpu_svm *svm)
+ 	memset(ghcb->save.valid_bitmap, 0, sizeof(ghcb->save.valid_bitmap));
+ }
  
-> Yeap. The high cost is scanning vendor-iommu ioptes and marshaling to a bitmap,
-> following by a smaller cost copying back to userspace (which KVM does too, when it's using
-> a bitmap, same as VFIO today). Maybe could be optimized to either avoid the copy
-> (gup as you mentioned earlier in the thread), or just copying based on the input bitmap
-> (from PF) number of leading zeroes within some threshold.
-
-What I would probably strive for is an API that deliberately OR's in
-the dirty bits. So GUP and kmap a 4k page then call the driver to 'or
-in your dirty data', then do the next page. etc. That is 134M of IOVA
-per chunk which seems OK.
-
-> > This makes qemu more complicated because it has to decide what
-> > trackers to turn on, but that is also the point because we do want
-> > userspace to be able to decide.
-> > 
-> If the interface wants extending to pass a device or an array of devices (if I understood
-> you correctly), it would free/simplify VFIO from having to concatenate potentially
-> different devices bitmaps into one. Albeit would require optimizing the marshalling a bit
-> more to avoid performing too much copying.
-
-Yes. Currently VFIO maintains its own bitmap so it also saves that
-memory by keeping the dirty bits stored in the IOPTEs until read out.
+-static bool sev_es_validate_vmgexit(struct vcpu_svm *svm)
++static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
+ {
+ 	struct kvm_vcpu *vcpu;
+ 	struct ghcb *ghcb;
+@@ -2482,7 +2482,7 @@ static bool sev_es_validate_vmgexit(struct vcpu_svm *svm)
+ 		goto vmgexit_err;
+ 	}
  
-> > The other idea that has some possible interest is to allow the
-> > trackers to dump their dirty bits into the existing kvm tracker, then
-> > userspace just does a single kvm centric dirty pass.
-> 
-> That would probably limit certain more modern options of ring based dirty tracking,
-> as that kvm dirty bitmap is mutually exclusive with kvm dirty ring. Or at least,
-> would require KVM to always use a bitmap during migration/dirty-rate-estimation with
-> the presence of vfio/vdpa devices. It's a nice idea, though. It would require making
-> core-iommu aware of bitmap as external storage for tracking (that is not iommufd as
-> it's a module).
+-	return true;
++	return 0;
+ 
+ vmgexit_err:
+ 	vcpu = &svm->vcpu;
+@@ -2505,7 +2505,8 @@ static bool sev_es_validate_vmgexit(struct vcpu_svm *svm)
+ 	ghcb_set_sw_exit_info_1(ghcb, 2);
+ 	ghcb_set_sw_exit_info_2(ghcb, reason);
+ 
+-	return false;
++	/* Resume the guest to "return" the error code. */
++	return 1;
+ }
+ 
+ void sev_es_unmap_ghcb(struct vcpu_svm *svm)
+@@ -2564,7 +2565,7 @@ void pre_sev_run(struct vcpu_svm *svm, int cpu)
+ }
+ 
+ #define GHCB_SCRATCH_AREA_LIMIT		(16ULL * PAGE_SIZE)
+-static bool setup_vmgexit_scratch(struct vcpu_svm *svm, bool sync, u64 len)
++static int setup_vmgexit_scratch(struct vcpu_svm *svm, bool sync, u64 len)
+ {
+ 	struct vmcb_control_area *control = &svm->vmcb->control;
+ 	struct ghcb *ghcb = svm->sev_es.ghcb;
+@@ -2617,14 +2618,14 @@ static bool setup_vmgexit_scratch(struct vcpu_svm *svm, bool sync, u64 len)
+ 		}
+ 		scratch_va = kvzalloc(len, GFP_KERNEL_ACCOUNT);
+ 		if (!scratch_va)
+-			goto e_scratch;
++			return -ENOMEM;
+ 
+ 		if (kvm_read_guest(svm->vcpu.kvm, scratch_gpa_beg, scratch_va, len)) {
+ 			/* Unable to copy scratch area from guest */
+ 			pr_err("vmgexit: kvm_read_guest for scratch area failed\n");
+ 
+ 			kvfree(scratch_va);
+-			goto e_scratch;
++			return -EFAULT;
+ 		}
+ 
+ 		/*
+@@ -2640,13 +2641,13 @@ static bool setup_vmgexit_scratch(struct vcpu_svm *svm, bool sync, u64 len)
+ 	svm->sev_es.ghcb_sa = scratch_va;
+ 	svm->sev_es.ghcb_sa_len = len;
+ 
+-	return true;
++	return 0;
+ 
+ e_scratch:
+ 	ghcb_set_sw_exit_info_1(ghcb, 2);
+ 	ghcb_set_sw_exit_info_2(ghcb, GHCB_ERR_INVALID_SCRATCH_AREA);
+ 
+-	return false;
++	return 1;
+ }
+ 
+ static void set_ghcb_msr_bits(struct vcpu_svm *svm, u64 value, u64 mask,
+@@ -2784,17 +2785,18 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
+ 
+ 	exit_code = ghcb_get_sw_exit_code(ghcb);
+ 
+-	if (!sev_es_validate_vmgexit(svm))
+-		return 1;
++	ret = sev_es_validate_vmgexit(svm);
++	if (ret)
++		return ret;
+ 
+ 	sev_es_sync_from_ghcb(svm);
+ 	ghcb_set_sw_exit_info_1(ghcb, 0);
+ 	ghcb_set_sw_exit_info_2(ghcb, 0);
+ 
+-	ret = 1;
+ 	switch (exit_code) {
+ 	case SVM_VMGEXIT_MMIO_READ:
+-		if (!setup_vmgexit_scratch(svm, true, control->exit_info_2))
++		ret = setup_vmgexit_scratch(svm, true, control->exit_info_2);
++		if (ret)
+ 			break;
+ 
+ 		ret = kvm_sev_es_mmio_read(vcpu,
+@@ -2803,7 +2805,8 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
+ 					   svm->sev_es.ghcb_sa);
+ 		break;
+ 	case SVM_VMGEXIT_MMIO_WRITE:
+-		if (!setup_vmgexit_scratch(svm, false, control->exit_info_2))
++		ret = setup_vmgexit_scratch(svm, false, control->exit_info_2);
++		if (ret)
+ 			break;
+ 
+ 		ret = kvm_sev_es_mmio_write(vcpu,
+@@ -2836,6 +2839,7 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
+ 			ghcb_set_sw_exit_info_2(ghcb, GHCB_ERR_INVALID_INPUT);
+ 		}
+ 
++		ret = 1;
+ 		break;
+ 	}
+ 	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
+@@ -2855,6 +2859,7 @@ int sev_es_string_io(struct vcpu_svm *svm, int size, unsigned int port, int in)
+ {
+ 	int count;
+ 	int bytes;
++	int r;
+ 
+ 	if (svm->vmcb->control.exit_info_2 > INT_MAX)
+ 		return -EINVAL;
+@@ -2863,8 +2868,9 @@ int sev_es_string_io(struct vcpu_svm *svm, int size, unsigned int port, int in)
+ 	if (unlikely(check_mul_overflow(count, size, &bytes)))
+ 		return -EINVAL;
+ 
+-	if (!setup_vmgexit_scratch(svm, in, bytes))
+-		return 1;
++	r = setup_vmgexit_scratch(svm, in, bytes);
++	if (r)
++		return r;
+ 
+ 	return kvm_sev_es_string_io(&svm->vcpu, size, port, svm->sev_es.ghcb_sa,
+ 				    count, in);
 
-Yes, I don't know enough about kvm to say if that is a great idea or
-not. The fact the CPUs seem to be going to logging instead of bitmaps
-suggests it isn't. I don't think DMA devices can work effectively with
-logging..
+base-commit: 625e7ef7da1a4addd8db41c2504fe8a25b93acd5
+-- 
+2.35.1.574.g5d30c73bfb-goog
 
-Jason
