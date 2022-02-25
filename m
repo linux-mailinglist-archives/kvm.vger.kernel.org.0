@@ -2,74 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 41FB24C487D
-	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 16:16:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EF1DE4C4892
+	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 16:17:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238101AbiBYPQz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 10:16:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48152 "EHLO
+        id S241853AbiBYPRQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 10:17:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48602 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231529AbiBYPQy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Feb 2022 10:16:54 -0500
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 813A4190B7B;
-        Fri, 25 Feb 2022 07:16:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1645802182; x=1677338182;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=0PWWQRRW37Y5DwUGjnUw/eZVXUeKiUeIEpdoKzm1SBw=;
-  b=pHd/oS/XXA1nLBhOBXcgqJ+e65HLf3EHi1e/4VYoDCVAzLQ/qyt9HnQ1
-   dfTkH5LoROTF2QYHLJ1oQI3WSf+QUR/DJr8XsWPfOel9JRM2V3Yg9zT0f
-   TegnbQiNuGvYTVME1Am1REpBXhf9NpVqfuGHNm3SBN0uTrCQmKSsL1iak
-   E=;
-X-IronPort-AV: E=Sophos;i="5.90,136,1643673600"; 
-   d="scan'208";a="66224508"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1a-c92fe759.us-east-1.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP; 25 Feb 2022 15:16:10 +0000
-Received: from EX13MTAUWC001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
-        by email-inbound-relay-iad-1a-c92fe759.us-east-1.amazon.com (Postfix) with ESMTPS id 6D47CC0326;
-        Fri, 25 Feb 2022 15:16:08 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1497.28; Fri, 25 Feb 2022 15:16:08 +0000
-Received: from [0.0.0.0] (10.43.160.150) by EX13D20UWC001.ant.amazon.com
- (10.43.162.244) with Microsoft SMTP Server (TLS) id 15.0.1497.28; Fri, 25 Feb
- 2022 15:16:02 +0000
-Message-ID: <b3b9dd9b-c42c-f057-f546-3e390b50479f@amazon.com>
-Date:   Fri, 25 Feb 2022 16:15:59 +0100
+        with ESMTP id S231529AbiBYPRP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Feb 2022 10:17:15 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C77101D86D7;
+        Fri, 25 Feb 2022 07:16:42 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 76807B83250;
+        Fri, 25 Feb 2022 15:16:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BAD4C340F4;
+        Fri, 25 Feb 2022 15:16:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1645802200;
+        bh=1YQNkQHMUBbNKAA0f8LEOAgGI8CQhzGcPzlC986yOhc=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=tbHJ0Z7vCb3cizuQ+2dUc2HkRr7mrIvcDE/uLyZptZ47dxE++tQGLqOjYhNNxzjub
+         zH65Ezg04zvsuAUTDazs6wlN1zoTITR8ctKgDkW1r45/0413RL8Jln7xNNRELm+8ke
+         UUdHy3tQu2Hd4YvK/I95CsuQx5X7DxYOLXe6VmcPLU61Dvlv1pXcI8IiILsMRlOe55
+         lEkGrrWnIpRUAuiP2TZ+IY7NIAHRUzqQ0ldsP45PQF+Asdp0iNjT8vsDO+4RJyFhMc
+         x7ivfMGT3aSWfmIlRjKuHYPx4+BEHaKVT76/nl9y0GrQWLcN5w6cS1ZFZ/ePlKIUQR
+         WKbfYynoRvmaA==
+Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-2d66f95f1d1so37315927b3.0;
+        Fri, 25 Feb 2022 07:16:40 -0800 (PST)
+X-Gm-Message-State: AOAM531Z3myOg/XdE7h8e8IGm8y5QWS0FjZKr5RRS9dQ8EG4FPPDMsU6
+        imgRU67uRJgdkjso0c7Vxc7L4fZl6Lzh8JIxzE4=
+X-Google-Smtp-Source: ABdhPJy24j/XlMc4iMq9F1iPQkI+P8/SeG/oYlZqoLCoQ3g6Pbs6pk5D7Xk0ab1JaS6DRZ7G96N4rg6RmaiLoYr4VK0=
+X-Received: by 2002:a81:84d5:0:b0:2d1:e85:bf04 with SMTP id
+ u204-20020a8184d5000000b002d10e85bf04mr8081642ywf.465.1645802199166; Fri, 25
+ Feb 2022 07:16:39 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.6.1
+References: <CAHmME9pJ3wb=EbUErJrCRC=VYGhFZqj2ar_AkVPsUvAnqGtwwg@mail.gmail.com>
+ <20220225124848.909093-1-Jason@zx2c4.com> <05c9f2a9-accb-e0de-aac7-b212adac7eb2@amazon.com>
+ <YhjjuMOeV7+T7thS@zx2c4.com> <88ebdc32-2e94-ef28-37ed-1c927c12af43@amazon.com>
+ <YhjoyIUv2+18BwiR@zx2c4.com> <9ac68552-c1fc-22c8-13e6-4f344f85a4fb@amazon.com>
+In-Reply-To: <9ac68552-c1fc-22c8-13e6-4f344f85a4fb@amazon.com>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Fri, 25 Feb 2022 16:16:27 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXEue6cDCSG0N7WGTVF=JYZx3jwE7EK4tCdhO-HzMtWwVw@mail.gmail.com>
+Message-ID: <CAMj1kXEue6cDCSG0N7WGTVF=JYZx3jwE7EK4tCdhO-HzMtWwVw@mail.gmail.com>
 Subject: Re: [PATCH v4] virt: vmgenid: introduce driver for reinitializing RNG
  on VM fork
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-CC:     <kvm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <linux-hyperv@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <adrian@parity.io>, <ardb@kernel.org>, <ben@skyportsystems.com>,
-        <berrange@redhat.com>, <colmmacc@amazon.com>,
-        <decui@microsoft.com>, <dwmw@amazon.co.uk>, <ebiggers@kernel.org>,
-        <ehabkost@redhat.com>, <gregkh@linuxfoundation.org>,
-        <haiyangz@microsoft.com>, <imammedo@redhat.com>,
-        <jannh@google.com>, <kys@microsoft.com>, <lersek@redhat.com>,
-        <linux@dominikbrodowski.net>, <mst@redhat.com>,
-        <qemu-devel@nongnu.org>, <raduweis@amazon.com>,
-        <sthemmin@microsoft.com>, <tytso@mit.edu>, <wei.liu@kernel.org>
-References: <CAHmME9pJ3wb=EbUErJrCRC=VYGhFZqj2ar_AkVPsUvAnqGtwwg@mail.gmail.com>
- <20220225124848.909093-1-Jason@zx2c4.com>
- <05c9f2a9-accb-e0de-aac7-b212adac7eb2@amazon.com>
- <YhjttNadaaJzVa5X@zx2c4.com>
-From:   Alexander Graf <graf@amazon.com>
-In-Reply-To: <YhjttNadaaJzVa5X@zx2c4.com>
-X-Originating-IP: [10.43.160.150]
-X-ClientProxiedBy: EX13D10UWA002.ant.amazon.com (10.43.160.228) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
-X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-        NICE_REPLY_A,RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+To:     Alexander Graf <graf@amazon.com>
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        KVM list <kvm@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-hyperv@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        adrian@parity.io, ben@skyportsystems.com,
+        =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        Dexuan Cui <decui@microsoft.com>,
+        "Woodhouse, David" <dwmw@amazon.co.uk>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Jann Horn <jannh@google.com>,
+        KY Srinivasan <kys@microsoft.com>,
+        Laszlo Ersek <lersek@redhat.com>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        QEMU Developers <qemu-devel@nongnu.org>,
+        "Weiss, Radu" <raduweis@amazon.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>, Wei Liu <wei.liu@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -78,37 +87,58 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Ck9uIDI1LjAyLjIyIDE1OjU0LCBKYXNvbiBBLiBEb25lbmZlbGQgd3JvdGU6Cj4gSGkgQWxleCwK
-Pgo+IE1pc3NlZCB0aGlzIHJlbWFyayBiZWZvcmU6Cj4KPiBPbiBGcmksIEZlYiAyNSwgMjAyMiBh
-dCAwMjo1NzozOFBNICswMTAwLCBBbGV4YW5kZXIgR3JhZiB3cm90ZToKPj4gUGxlYXNlIGV4cG9z
-ZSB0aGUgdm1nZW5pZCB2aWEgL3N5c2ZzIHNvIHRoYXQgdXNlciBzcGFjZSBldmVuIHJlbW90ZWx5
-Cj4+IGhhcyBhIGNoYW5jZSB0byBjaGVjayBpZiBpdCdzIGJlZW4gY2xvbmVkLgo+IE5vLiBEaWQg
-eW91IHJlYWQgdGhlIDAvMiBjb3ZlciBsZXR0ZXI/IEknbGwgcXVvdGUgaXQgZm9yIHlvdSBoZXJl
-Ogo+Cj4+IEFzIGEgc2lkZSBub3RlLCB0aGlzIHNlcmllcyBpbnRlbnRpb25hbGx5IGRvZXMgX25v
-dF8gZm9jdXMgb24KPj4gbm90aWZpY2F0aW9uIG9mIHRoZXNlIGV2ZW50cyB0byB1c2Vyc3BhY2Ug
-b3IgdG8gb3RoZXIga2VybmVsIGNvbnN1bWVycy4KPj4gU2luY2UgdGhlc2UgVk0gZm9yayBkZXRl
-Y3Rpb24gZXZlbnRzIGZpcnN0IG5lZWQgdG8gaGl0IHRoZSBSTkcsIHdlIGNhbgo+PiBsYXRlciB0
-YWxrIGFib3V0IHdoYXQgc29ydHMgb2Ygbm90aWZpY2F0aW9ucyBvciBtbWFwJ2QgY291bnRlcnMg
-dGhlIFJORwo+PiBzaG91bGQgYmUgbWFraW5nIGFjY2Vzc2libGUgdG8gZWxzZXdoZXJlLiBCdXQg
-dGhhdCdzIGEgZGlmZmVyZW50IHNvcnQgb2YKPj4gcHJvamVjdCBhbmQgdGllcyBpbnRvIGEgbG90
-IG9mIG1vcmUgY29tcGxpY2F0ZWQgY29uY2VybnMgYmV5b25kIHRoaXMKPj4gbW9yZSBiYXNpYyBw
-YXRjaHNldC4gU28gaG9wZWZ1bGx5IHdlIGNhbiBrZWVwIHRoZSBkaXNjdXNzaW9uIHJhdGhlcgo+
-PiBmb2N1c2VkIGhlcmUgdG8gdGhpcyBBQ1BJIGJ1c2luZXNzLgo+IFdoYXQgYWJvdXQgdGhhdCB3
-YXMgdW5jbGVhciB0byB5b3U/Cj4KPiBBbnl3YXksIGl0J3MgYSBkaWZmZXJlbnQgdGhpbmcgdGhh
-dCB3aWxsIGhhdmUgdG8gYmUgZGVzaWduZWQgYW5kCj4gY29uc2lkZXJlZCBjYXJlZnVsbHksIGFu
-ZCB0aGF0IGRlc2lnbiBkb2Vzbid0IGhhdmUgYSB3aG9sZSBsb3QgdG8gZG8KPiB3aXRoIHRoaXMg
-bGl0dGxlIGRyaXZlciBoZXJlLCBleGNlcHQgaW5zb2ZhciBhcyBpdCBjb3VsZCBidWlsZCBvbiB0
-b3Agb2YKPiBpdCBpbiBvbmUgd2F5IG9yIGFub3RoZXIuIFllcywgaXQncyBhbiBpbXBvcnRhbnQg
-dGhpbmcgdG8gZG8uIE5vLCBJJ20KPiBub3QgZ29pbmcgdG8gZG8gaXQgaW4gdGhpcyBwYXRjaCBo
-ZXJlLiBJZiB5b3Ugd2FudCB0byBoYXZlIGEgZGlzY3Vzc2lvbgo+IGFib3V0IHRoYXQsIHN0YXJ0
-IGEgZGlmZmVyZW50IHRocmVhZC4KCgpJJ20gbm90IHRhbGtpbmcgYWJvdXQgYSBub3RpZmljYXRp
-b24gaW50ZXJmYWNlIC0gd2UndmUgZ29uZSB0aHJvdWdoIApncmVhdCBsZW5ndGggb24gdGhhdCBv
-bmUgaW4gdGhlIHByZXZpb3VzIHN1Ym1pc3Npb24uIFdoYXQgSSdtIG1vcmUgCmludGVyZXN0ZWQg
-aW4gaXMgKmFueSogd2F5IGZvciB1c2VyIHNwYWNlIHRvIHJlYWQgdGhlIGN1cnJlbnQgVk0gR2Vu
-IElELiAKVGhlIHNhbWUgd2F5IEknbSBpbnRlcmVzdGVkIHRvIHNlZSBvdGhlciBkZXZpY2UgYXR0
-cmlidXRlcyBvZiBteSBzeXN0ZW0gCnRocm91Z2ggc3lzZnMuCgoKQWxleAoKCgoKCkFtYXpvbiBE
-ZXZlbG9wbWVudCBDZW50ZXIgR2VybWFueSBHbWJICktyYXVzZW5zdHIuIDM4CjEwMTE3IEJlcmxp
-bgpHZXNjaGFlZnRzZnVlaHJ1bmc6IENocmlzdGlhbiBTY2hsYWVnZXIsIEpvbmF0aGFuIFdlaXNz
-CkVpbmdldHJhZ2VuIGFtIEFtdHNnZXJpY2h0IENoYXJsb3R0ZW5idXJnIHVudGVyIEhSQiAxNDkx
-NzMgQgpTaXR6OiBCZXJsaW4KVXN0LUlEOiBERSAyODkgMjM3IDg3OQoKCg==
+On Fri, 25 Feb 2022 at 16:12, Alexander Graf <graf@amazon.com> wrote:
+>
+>
+> On 25.02.22 15:33, Jason A. Donenfeld wrote:
+> > On Fri, Feb 25, 2022 at 03:18:43PM +0100, Alexander Graf wrote:
+> >>> I recall this part of the old thread. From what I understood, using
+> >>> "VMGENID" + "QEMUVGID" worked /well enough/, even if that wasn't
+> >>> technically in-spec. Ard noted that relying on _CID like that is
+> >>> technically an ACPI spec notification. So we're between one spec and
+> >>> another, basically, and doing "VMGENID" + "QEMUVGID" requires fewer
+> >>> changes, as mentioned, appears to work fine in my testing.
+> >>>
+> >>> However, with that said, I think supporting this via "VM_Gen_Counter"
+> >>> would be a better eventual thing to do, but will require acks and
+> >>> changes from the ACPI maintainers. Do you think you could prepare your
+> >>> patch proposal above as something on-top of my tree [1]? And if you can
+> >>> convince the ACPI maintainers that that's okay, then I'll happily take
+> >>> the patch.
+> >>
+> >> Sure, let me send the ACPI patch stand alone. No need to include the
+> >> VMGenID change in there.
+> > That's fine. If the ACPI people take it for 5.18, then we can count on
+> > it being there and adjust the vmgenid driver accordingly also for 5.18.
+> >
+> > I just booted up a Windows VM, and it looks like Hyper-V uses
+> > "Hyper_V_Gen_Counter_V1", which is also quite long, so we can't really
+> > HID match on that either.
+>
+>
+> Yes, due to the same problem. I'd really prefer we sort out the ACPI
+> matching before this goes mainline. Matching on _HID is explicitly
+> discouraged in the VMGenID spec.
+>
 
+OK, this really sucks. Quoting the ACPI spec:
+
+"""
+A _HID object evaluates to either a numeric 32-bit compressed EISA
+type ID or a string. If a string, the format must be an alphanumeric
+PNP or ACPI ID with no asterisk or other leading characters.
+A valid PNP ID must be of the form "AAA####" where A is an uppercase
+letter and # is a hex digit.
+A valid ACPI ID must be of the form "NNNN####" where N is an uppercase
+letter or a digit ('0'-'9') and # is a hex digit. This specification
+reserves the string "ACPI" for use only with devices defined herein.
+It further reserves all strings representing 4 HEX digits for
+exclusive use with PCI-assigned Vendor IDs.
+"""
+
+So now we have to implement Microsoft's fork of ACPI to be able to use
+this device, even if we expose it from QEMU instead of Hyper-V? I
+strongly object to that.
+
+Instead, we can match on _HID exposed by QEMU, and cordially invite
+Microsoft to align their spec with the ACPI spec.
