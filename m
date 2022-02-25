@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3112F4C4F4C
-	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 21:08:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8FDDA4C4F4A
+	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 21:08:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235848AbiBYUJJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 15:09:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35136 "EHLO
+        id S235860AbiBYUJK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 15:09:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235835AbiBYUJI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S235830AbiBYUJI (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 25 Feb 2022 15:09:08 -0500
-Received: from mail-il1-x149.google.com (mail-il1-x149.google.com [IPv6:2607:f8b0:4864:20::149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60D1C1F03AD
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 12:08:35 -0800 (PST)
-Received: by mail-il1-x149.google.com with SMTP id r4-20020a92d444000000b002c26d0c9354so4182117ilm.15
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 12:08:35 -0800 (PST)
+Received: from mail-io1-xd49.google.com (mail-io1-xd49.google.com [IPv6:2607:f8b0:4864:20::d49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89FBF1F03AD
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 12:08:36 -0800 (PST)
+Received: by mail-io1-xd49.google.com with SMTP id d194-20020a6bcdcb000000b0063a4e3b9da6so4496604iog.6
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 12:08:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=fYriT5sTbSgfVO4QQDGpq5qecvrAi6oVy79bePg6sX4=;
-        b=Vcb7aYtUOA5chCsJa1T4h0PoJBp4GvbQqFJfS4NA0xSOOHYLIuayNrNwgpgZJDy2XZ
-         Rn1nd85nukRjjzYmj+HhBpusJ6iLssFpNlbINQfbxy3QcS3F3NJZpsY03KZlfX7vQfG6
-         yDWOA0FRNdxEcaBMY8lDl94YkBN2mHnhKk3uxg481x2fW8HsbZtd2Vbabz3WjLlrykeh
-         9vlAHFf3QoElDmvqtgtgTxaZfx+xRjXXW4VPqdf75R30JZyCW4A+ShjJvdT8bQbNwfH+
-         ltl76sFvBrqZfNZbAfowISys8awaYqHxHvOxKahWyoES8gB1p1jjvTIwy+xhSoHSe6Bd
-         PSiw==
+        bh=ai/+la0RYgtOBot3jbPAV3BwqgO07uDC5MnkveDrMNw=;
+        b=G7ebjf3UAJPl9sr2mNokIOUbwM7QrxshwWQ2V5xpI9kIso0wwceO2dk3T/pinM7w7B
+         gnL3qOQeGyEUt5xTUjq7zNLY0VTqZmA/VB3FkfX2rtiKL4vXAX1oYIu+OFzNuyDWxbum
+         JciDgpvkwuyChRN+SaWrh0kOWYMsmh1XK/i5xuKiAK3fjVANarnczpUOre3G5aLrihL0
+         JjHUX8+FaMgCve6QxeCiS7d/KGHE0l57wEopXweZR/NsJKX0kxWVGErSt6kz8BHd7y61
+         XNo2f8Mm8DTbhRC0B7Z5oGFTx8X9zFATYWycpc0qYDaZxTWBeucHRG3IIXv5+RtqZaTr
+         XGWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=fYriT5sTbSgfVO4QQDGpq5qecvrAi6oVy79bePg6sX4=;
-        b=rgja17UDmMWZpIUpEmQggO9hFnPOgvXfYnuNdFKOfA3rljidaXktnHrFUVZFiouTx5
-         fXLhJLu1TMa7fCxmI8F2618DnQGUAq7ZY0AxgMFKiCcmxfdlzxdmsY9HwDFW3W0MDEJx
-         f/uhhl5m1UVhiqqNtfv6O8COEaxtHOmX+LnTTVZ41S4qKmflksTILE7ucVJgqY7fnvIp
-         uQiKZ0SispP0xbUM2SKoJqLg8Q6mfmZzbj1UwJXxQ5t2Aig8euclCIC0itedeFTqcn+n
-         +vvnq7PQH6hYYVq0RcvCm4FuMPXK088CyqJboIQeA1GQM5lZ5vB4iSvFX0tu0gpK2q7Y
-         7bqQ==
-X-Gm-Message-State: AOAM533n7YER5RGPfaDZ4Nj4Q4S+H2noCDdaJCqHlZmvfjWo2XcK4JdU
-        O5VO6N5Iqe/guSpdLqa8KXcfS3Ep70bqy13qPJavUc9FCiJdECa6+/c1uP47qtk2fOuTw5jJREh
-        Vw7/PQyor/ZlXGwF2GkfERe0oJ4RAzMCSUpfF6nJepMLk6BSH+9dCW1Bg1w==
-X-Google-Smtp-Source: ABdhPJwKVsN8lyBfOpRTXxOeLVy4aPRQqE6sJNOZ6G8mUsyQIXjhQG3AHbCrwBBIXjfJgdQBWL3QrWrLfpI=
+        bh=ai/+la0RYgtOBot3jbPAV3BwqgO07uDC5MnkveDrMNw=;
+        b=QZQQuQ+Ke5r+FR1o4XnaFhQIu7lVSs9/FRgzWiwGy3CQBifu7R5mDF3CuC9E5dTaww
+         j55DFjawHZbsFYRE1Ws1TihO/cprprH76XT2yLC1sjhP03WXwCteri9zyDqohvlEeX9n
+         CXO8e6LSP1ySPXMkj3mMEWNuQMVAArfnLAvjYchWotsPz9ePi7XmsUbGZ9jDPs1bxbqB
+         Ns+HlRq1Qtle6igEvbo8BTLC3Tu4JntWeNYE+znH6ZFFygWvDQJfcWL5Yge8BN/MnCKg
+         6BCaFyDMHvOttB4ozPSCc5dkTjgx6quYh/us65rpYdg1DjJQNP5OQ8kT59HhTfBf0CzW
+         9ppA==
+X-Gm-Message-State: AOAM533sqXgAi0iJxlybYibdmpSTUaGRxu3Gh4q0mBHgRkHAQRJ5qgeF
+        ev0rW0quP4+3ZzAPQWU5DUPGvRWX373oDx2SsD6qd7VSRrg9XzB1dwdczTtB4W/L3IIxoSTLZxN
+        em9Syyg6fhzvBnCnDFRvMcyZpnIrDBCvmcvSOC72Sh6wcGBzn7rJXUU5eWQ==
+X-Google-Smtp-Source: ABdhPJzZA/TXlWpmhaAI0COzAB6RXVLG3zTICUmR+ZnFV7OvwEKog+mLTE7g2t3QcforkAVfE8eVBDEHoc0=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a6b:d10c:0:b0:641:63b2:9ef8 with SMTP id
- l12-20020a6bd10c000000b0064163b29ef8mr6616997iob.135.1645819714747; Fri, 25
- Feb 2022 12:08:34 -0800 (PST)
-Date:   Fri, 25 Feb 2022 20:08:18 +0000
+ (user=oupton job=sendgmr) by 2002:a5e:9b06:0:b0:641:808b:4240 with SMTP id
+ j6-20020a5e9b06000000b00641808b4240mr6555500iok.209.1645819715835; Fri, 25
+ Feb 2022 12:08:35 -0800 (PST)
+Date:   Fri, 25 Feb 2022 20:08:19 +0000
 In-Reply-To: <20220225200823.2522321-1-oupton@google.com>
-Message-Id: <20220225200823.2522321-2-oupton@google.com>
+Message-Id: <20220225200823.2522321-3-oupton@google.com>
 Mime-Version: 1.0
 References: <20220225200823.2522321-1-oupton@google.com>
 X-Mailer: git-send-email 2.35.1.574.g5d30c73bfb-goog
-Subject: [PATCH v3 1/6] KVM: nVMX: Keep KVM updates to BNDCFGS ctrl bits
- across MSR write
+Subject: [PATCH v3 2/6] KVM: nVMX: Keep KVM updates to PERF_GLOBAL_CTRL ctrl
+ bits across MSR write
 From:   Oliver Upton <oupton@google.com>
 To:     kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -75,77 +75,48 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Since commit 5f76f6f5ff96 ("KVM: nVMX: Do not expose MPX VMX controls
-when guest MPX disabled"), KVM has taken ownership of the "load
-IA32_BNDCFGS" and "clear IA32_BNDCFGS" VMX entry/exit controls. The ABI
-is that these bits must be set in the IA32_VMX_TRUE_{ENTRY,EXIT}_CTLS
-MSRs if the guest's CPUID supports MPX, and clear otherwise.
+Since commit 03a8871add95 ("KVM: nVMX: Expose load IA32_PERF_GLOBAL_CTRL
+VM-{Entry,Exit} control"), KVM has taken ownership of the "load
+IA32_PERF_GLOBAL_CTRL" VMX entry/exit control bits. The ABI is that
+these bits will be set in the IA32_VMX_TRUE_{ENTRY,EXIT}_CTLS MSRs if
+the guest's CPUID exposes a vPMU that supports the IA32_PERF_GLOBAL_CTRL
+MSR (CPUID.0AH:EAX[7:0] > 1), and clear otherwise.
 
-However, commit aedbaf4f6afd ("KVM: x86: Extract
-kvm_update_cpuid_runtime() from kvm_update_cpuid()") partially broke KVM
-ownership of the aforementioned bits. Before, kvm_update_cpuid() was
-exercised frequently when running a guest and constantly applied its own
-changes to the BNDCFGS bits. Now, the BNDCFGS bits are only ever
-updated after a KVM_SET_CPUID/KVM_SET_CPUID2 ioctl, meaning that a
-subsequent MSR write from userspace will clobber these values.
+However, KVM will only do so if userspace sets the CPUID before writing
+to the corresponding MSRs. Of course, there are no ordering requirements
+between these ioctls. Uphold the ABI regardless of ordering by
+reapplying KVMs tweaks to the VMX control MSRs after userspace has
+written to them.
+
+Note that older kernels without commit c44d9b34701d ("KVM: x86: Invoke
+vendor's vcpu_after_set_cpuid() after all common updates") still require
+that the entry/exit controls be updated from kvm_pmu_refresh(). Leave
+the benign call in place to allow for cleaner backporting and punt the
+cleanup to a later change.
 
 Uphold the old ABI by reapplying KVM's tweaks to the BNDCFGS bits after
 an MSR write from userspace.
 
-Fixes: aedbaf4f6afd ("KVM: x86: Extract kvm_update_cpuid_runtime() from kvm_update_cpuid()")
+Fixes: c44d9b34701d ("KVM: x86: Invoke vendor's vcpu_after_set_cpuid() after all common updates")
+Reported-by: Jim Mattson <jmattson@google.com>
 Signed-off-by: Oliver Upton <oupton@google.com>
 ---
- arch/x86/kvm/vmx/nested.c | 9 +++++++++
- arch/x86/kvm/vmx/vmx.c    | 2 +-
- arch/x86/kvm/vmx/vmx.h    | 2 ++
- 3 files changed, 12 insertions(+), 1 deletion(-)
+ arch/x86/kvm/vmx/vmx.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index ba34e94049c7..59164394569f 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -1291,6 +1291,15 @@ vmx_restore_control_msr(struct vcpu_vmx *vmx, u32 msr_index, u64 data)
- 
- 	*lowp = data;
- 	*highp = data >> 32;
-+
-+	/*
-+	 * Ensure KVM fiddling with these MSRs is preserved after userspace
-+	 * write.
-+	 */
-+	if (msr_index == MSR_IA32_VMX_TRUE_ENTRY_CTLS ||
-+	    msr_index == MSR_IA32_VMX_TRUE_EXIT_CTLS)
-+		nested_vmx_entry_exit_ctls_update(&vmx->vcpu);
-+
- 	return 0;
- }
- 
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index efda5e4d6247..9617479fd68a 100644
+index 9617479fd68a..77d74cbc2709 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7242,7 +7242,7 @@ static void nested_vmx_cr_fixed1_bits_update(struct kvm_vcpu *vcpu)
- #undef cr4_fixed1_update
+@@ -7257,6 +7257,8 @@ void nested_vmx_entry_exit_ctls_update(struct kvm_vcpu *vcpu)
+ 			vmx->nested.msrs.exit_ctls_high &= ~VM_EXIT_CLEAR_BNDCFGS;
+ 		}
+ 	}
++
++	nested_vmx_pmu_entry_exit_ctls_update(vcpu);
  }
  
--static void nested_vmx_entry_exit_ctls_update(struct kvm_vcpu *vcpu)
-+void nested_vmx_entry_exit_ctls_update(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 7f2c82e7f38f..e134e2763502 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -423,6 +423,8 @@ static inline void vmx_set_intercept_for_msr(struct kvm_vcpu *vcpu, u32 msr,
- 
- void vmx_update_cpu_dirty_logging(struct kvm_vcpu *vcpu);
- 
-+void nested_vmx_entry_exit_ctls_update(struct kvm_vcpu *vcpu);
-+
- /*
-  * Note, early Intel manuals have the write-low and read-high bitmap offsets
-  * the wrong way round.  The bitmaps control MSRs 0x00000000-0x00001fff and
+ static void update_intel_pt_cfg(struct kvm_vcpu *vcpu)
 -- 
 2.35.1.574.g5d30c73bfb-goog
 
