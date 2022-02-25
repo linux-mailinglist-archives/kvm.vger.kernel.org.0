@@ -2,121 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 98D394C4AE2
-	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 17:35:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E8024C4B0B
+	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 17:41:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243059AbiBYQfu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 11:35:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46220 "EHLO
+        id S243152AbiBYQl0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 11:41:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35936 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242689AbiBYQft (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Feb 2022 11:35:49 -0500
-Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72ED21C60D9
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 08:35:17 -0800 (PST)
-Received: by mail-io1-xd34.google.com with SMTP id s1so7073903iob.9
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 08:35:17 -0800 (PST)
+        with ESMTP id S237044AbiBYQlZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Feb 2022 11:41:25 -0500
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63B1C218CE0
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 08:40:53 -0800 (PST)
+Received: by mail-pf1-x42f.google.com with SMTP id y5so5151314pfe.4
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 08:40:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:sender:from:date:message-id:subject:to;
-        bh=xDo30qH2kcx1DuoIpmyriC2k6+L7XJnWdKleRcHl+ZM=;
-        b=U3d3PLNTRjQFPp9/SakQuiq06Lpz39RRVfFVOdQSe/XGD178FvDeeDD7VJ2QQjg8ng
-         U1dyJN/bz8CLY5sF60Fs1qiByokZT7txIws5w9GjOWt6J5nGcaQ5wLm9fX5fGywI5XJA
-         ijH/DpziKcswJQO6dHG2T+/n0HESzYYq7VSjTQ/dVqxYQvMVF0Ayb1uN0kXC8RL0v60Z
-         hoxMA8vGfZd0bX2PzItq9fMiDl8Dv2turSW9MDxDwGvztwxLGBF6OUx5rRsOdWCgq5Gs
-         zzeBI98Cax7+TclrCBKhkP/MpIngiC8eAq4+RGsH3nNWaHXsMy3tcIHA2co+LJAgsQ/g
-         6Ukw==
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=LOzx1/1N7j/VHBirbjJ/dukmD8Mv3Gu9xYCoow9KxH0=;
+        b=sP6/wWn5Rt+NzeQShD4TUqG0VMxxRrtUpSglEEhW3zYXUGZgBE6gT8tHBL5pWZwyUJ
+         CLznrRYdUNQILkg1MCJaayNAW3w/OD30r5frhrGrfpyFL+65kNtUwRdnFtYaRjRkDA36
+         aZtASawYrpXcEzcCm6pl3Elcfh9xp5RK+e7LkB1OWSFb2B7O65OnWvr3gHZlp6MD8OkR
+         llt4uxaQ+EsjeE8SZ9yfDsofx+WPgh8saaQkRAlz7gK0i2YeQ7FwMIU3rg5uf7klvgIj
+         rOmVc09LquQLQhyeYOYbYtqEX/PeOcXqCQLmAmc+WyDq+9XLXh83xL1srhXY1NeH5uvP
+         LcvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:sender:from:date:message-id:subject
-         :to;
-        bh=xDo30qH2kcx1DuoIpmyriC2k6+L7XJnWdKleRcHl+ZM=;
-        b=MjYNcoNXgN5WLMo/bvqYQ4pepq4VYTbRMh3r4GgwpbKWr2mobKQhHL3KwufaIXpq2d
-         tMlqUhtzFh6VQ1DCRpmqaQGGw+hUbav1ipApgcgxRMoRuk3HOmg1sip2RsSzpPk03iAQ
-         1LzPlOrHqcJmRVja2mu6+ACA9sPq3sRB2iuCksbW9Skww3EAUe5MrXKchuTkYFR6P4qP
-         WLVwJzL4Wsr87KP9ePNBY0a1/Yt/3CtVGeeR5ZqHio98xCFFvcdqzL0ur12b8tSkibNh
-         3+50415GKQ6fJe4JgKGDP15UNPQmSyBdc4shrMMsDUHpTTUT0FHgAsUQbByzsxWyHbqT
-         lgAQ==
-X-Gm-Message-State: AOAM5319aWrm7HlV1RUc//TPf0tjEu4xO9ElkZWEjPvBjemsWujVm1dn
-        U6W7ylaBRPHXGlgnKe4AzcqB69SFT5nv770SdaU=
-X-Google-Smtp-Source: ABdhPJxpBk3gUrrKYwrHV9QrmQ8aVxYxoKgVkAq3oSMdNiA7hPCfiXHbVt+KEMu6V2oQhgyVtmhcvjkuI0nTOkBnaOE=
-X-Received: by 2002:a05:6638:1490:b0:314:d35c:e1b3 with SMTP id
- j16-20020a056638149000b00314d35ce1b3mr6487261jak.165.1645806916557; Fri, 25
- Feb 2022 08:35:16 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=LOzx1/1N7j/VHBirbjJ/dukmD8Mv3Gu9xYCoow9KxH0=;
+        b=X+LTLJK21PGNBn9reqEld5ULLnqVTeVcfZMO2aj4stl6uxuVab6PDDLTK8F6qsC7kG
+         py76JMMD+lIkmiEN83nD1Yf6/is/8FKMgH0WjlBVFTYfpCpAVK/nB0A0OxHiREH1ErI6
+         hIoWthqlTnexUJQMjl2XP1efrL+Bo9R+krD/Q6u8Buq8tRhvfFNW1PpqjPu+qtlFCYU2
+         82a6S4NVCDvS0Oreg9xgos5eqB+3FR9NLqIMLEK3DsDaQByroU8ZSjlFeYJEKGZNFmCN
+         i1vf3vnq7YN8ni6+JTtJ/Om91cziF/En2soiJPLTAgBC+1Dz2BzwsxiJ/Q1Gc9ORzLK2
+         Gh4Q==
+X-Gm-Message-State: AOAM531VIp5SZY3k+xrl80nlMN6qvSMoDyWP1nZQFTTUkGnJW+xyBpZG
+        moB/gCleJyDIR2x3cLcov7le4g==
+X-Google-Smtp-Source: ABdhPJwIBGXNdggpuheOxLyfH7NwjiL6DzLmuNUj1w/+Y5ijV18kW3kXAA9KfhXeWTceTocEUSXaLg==
+X-Received: by 2002:a63:1651:0:b0:342:b566:57c4 with SMTP id 17-20020a631651000000b00342b56657c4mr6605303pgw.258.1645807252698;
+        Fri, 25 Feb 2022 08:40:52 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id pj12-20020a17090b4f4c00b001bc97c5b255sm3060349pjb.44.2022.02.25.08.40.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Feb 2022 08:40:52 -0800 (PST)
+Date:   Fri, 25 Feb 2022 16:40:48 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Woodhouse <dwmw2@infradead.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Suleiman Souhlal <suleiman@google.com>,
+        Anton Romanov <romanton@google.com>
+Subject: Re: [PATCH] KVM: x86: Don't snapshot "max" TSC if host TSC is
+ constant
+Message-ID: <YhkGkAJtMu0epKiT@google.com>
+References: <20220225013929.3577699-1-seanjc@google.com>
+ <5b9e5a3f3d3c40afea0bc953e3967505251f3143.camel@infradead.org>
 MIME-Version: 1.0
-Sender: jesusdaivd38@gmail.com
-Received: by 2002:a02:cd3c:0:0:0:0:0 with HTTP; Fri, 25 Feb 2022 08:35:15
- -0800 (PST)
-From:   Ann Willima <annwillima@gmail.com>
-Date:   Fri, 25 Feb 2022 08:35:15 -0800
-X-Google-Sender-Auth: IFGLfpVnL2gIOq3fBY92cj3bgqc
-Message-ID: <CAA0k9VdheKo17pgJAJt4TbH+jsf_EPxRGPaRKkwhRGTMRpjH-g@mail.gmail.com>
-Subject: Re: Greetings My Dear,
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: Yes, score=7.3 required=5.0 tests=ADVANCE_FEE_5_NEW_MONEY,
-        BAYES_50,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        FREEMAIL_ENVFROM_END_DIGIT,FREEMAIL_FROM,LOTS_OF_MONEY,MONEY_FRAUD_8,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        UNDISC_MONEY autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Report: * -0.0 RCVD_IN_DNSWL_NONE RBL: Sender listed at
-        *      https://www.dnswl.org/, no trust
-        *      [2607:f8b0:4864:20:0:0:0:d34 listed in]
-        [list.dnswl.org]
-        *  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
-        *      [score: 0.5041]
-        *  0.2 FREEMAIL_ENVFROM_END_DIGIT Envelope-from freemail username ends
-        *       in digit
-        *      [jesusdaivd38[at]gmail.com]
-        *  0.0 FREEMAIL_FROM Sender email is commonly abused enduser mail
-        *      provider
-        *      [annwillima[at]gmail.com]
-        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
-        * -0.0 SPF_PASS SPF: sender matches SPF record
-        *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
-        *       valid
-        * -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
-        *      author's domain
-        * -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
-        *      envelope-from domain
-        * -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
-        *  0.0 LOTS_OF_MONEY Huge... sums of money
-        * -0.0 T_SCC_BODY_TEXT_LINE No description available.
-        *  0.0 MONEY_FRAUD_8 Lots of money and very many fraud phrases
-        *  3.0 ADVANCE_FEE_5_NEW_MONEY Advance Fee fraud and lots of money
-        *  3.5 UNDISC_MONEY Undisclosed recipients + money/fraud signs
-X-Spam-Level: *******
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5b9e5a3f3d3c40afea0bc953e3967505251f3143.camel@infradead.org>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Greetings,
+On Fri, Feb 25, 2022, David Woodhouse wrote:
+> On Fri, 2022-02-25 at 01:39 +0000, Sean Christopherson wrote:
+> > @@ -11160,7 +11162,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+> >         vcpu->arch.msr_platform_info = MSR_PLATFORM_INFO_CPUID_FAULT;
+> >         kvm_vcpu_mtrr_init(vcpu);
+> >         vcpu_load(vcpu);
+> > -       kvm_set_tsc_khz(vcpu, max_tsc_khz);
+> > +       kvm_set_tsc_khz(vcpu, max_tsc_khz ? : tsc_khz);
+> >         kvm_vcpu_reset(vcpu, false);
+> >         kvm_init_mmu(vcpu);
+> >         vcpu_put(vcpu);
+> > 
+> 
+> Hm, now if you hit that race you end up potentially giving *different*
+> frequencies to different vCPUs in a single guest, depending on when
+> they were created.
 
-I sent this mail praying it will find you in a good condition, since I
-myself am in a very critical health condition in which I sleep every
-night  without knowing if I may be alive to see the next day. I am
-Mrs.william ann, a widow suffering from a long time illness. I have
-some funds I  inherited from my late husband, the sum of
-($11,000,000.00, Eleven Million Dollars) my Doctor told me recently
-that I have serious sickness which is a cancer problem. What disturbs
-me most is my stroke sickness. Having known my condition, I decided to
-donate this fund to a good person that will utilize it the way I am
-going to instruct herein. I need a very honest God.
+Yep.  Though the race is much harder to hit (userspace vs TSC refinement).  The
+existing race being hit is essentially do_initcalls() vs. TSC refinement.  
 
-fearing a person who can claim this money and use it for Charity
-works, for orphanages, widows and also build schools for less
-privileges that will be named after my late husband if possible and to
-promote the word of God and the effort that the house of God is
-maintained. I do not want a situation where this money will be used in
-an ungodly manner. That's why I' making this decision. I'm not afraid
-of death so I know where I'm going. I accept this decision because I
-do not have any child who will inherit this money after I die. Please
-I want your sincere and urgent answer to know if you will be able to
-execute this project, and I will give you more information on how the
-fund will be transferred to your bank account. I am waiting for your
-reply.
+> How about this... (and as noted, I think I want to add an explicit KVM
+> ioctl to set kvm->arch.default_tsc_khz for subsequently created vCPUs).
 
-May God Bless you,
-Mrs.william ann,
+This wouldn't necessarily help.  E.g. assuming userspace knows the actual TSC
+frequency, creating a vCPU before refinement completes might put the vCPU in
+"always catchup" purgatory.
+
+To really fix the race, KVM needs a notification that refinement completed (or
+failed).  KVM could simply refuse to create vCPUs until it got the notification.
+In the non-constant case, KVM would also need to refresh max_tsc_khz.
