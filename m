@@ -2,232 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 552AC4C4E2E
-	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 19:58:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 43D854C4E76
+	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 20:15:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233889AbiBYS6v (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 13:58:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56966 "EHLO
+        id S234476AbiBYTQA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 14:16:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42656 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233868AbiBYS6t (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Feb 2022 13:58:49 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 024911EBA83
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 10:58:16 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 8FBBE60B57
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 18:58:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0DC1C340E7;
-        Fri, 25 Feb 2022 18:58:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1645815496;
-        bh=Q0F0Vr2oAKsTHDX197nsDi4YWEXysGYrQy8OtS9Ofo4=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=dUPxGeW5yIMDL3458nshLukjBg6ZV+UEyQsdf3TeGvvLOZ2N8OkSRYdZmseDWMrrb
-         /Pg9EYJt5mbGKydHd0Tt0zvwCtl6mJYQtVTQPKA/nJmwEH8H5DwLLNKfuqqN4Sux0+
-         B72QPdWPMU8xyX3oqdc8G8KdcIhD/9sP8qmBV8opTH2ZKb9FRwMAPYoaRjI6S99yQd
-         0nWoVnS7nxTfaNryQPHPSmdYcbl0p5w+O/IaUnTcm+uvjqOJEip/LiVM0R71HnLH+F
-         2eljEKGimj1YWn0r3a3w/JwKrjxQe+as9I7QTYMHYcgGYVsUO28f9E9vAntFc8FwJB
-         Awk59wMNokw8g==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1nNfnB-00AcUf-KF; Fri, 25 Feb 2022 18:58:13 +0000
-Date:   Fri, 25 Feb 2022 18:58:13 +0000
-Message-ID: <87fso63ha2.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     Oliver Upton <oupton@google.com>
-Cc:     kvmarm@lists.cs.columbia.edu, Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Sean Christopherson <seanjc@google.com>,
+        with ESMTP id S233514AbiBYTP6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Feb 2022 14:15:58 -0500
+Received: from mail-ot1-x32a.google.com (mail-ot1-x32a.google.com [IPv6:2607:f8b0:4864:20::32a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 925E221BC6C
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 11:15:25 -0800 (PST)
+Received: by mail-ot1-x32a.google.com with SMTP id u17-20020a056830231100b005ad13358af9so4271664ote.11
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 11:15:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=yHENS+Ovpeo1eaUhBdH1C0+VesNPCtOkEQBYOIU9JA0=;
+        b=VEyJOE71f22U9Xy7lZCJfgCL//TQQSz0k5aUfPh4NzPFURCzua+2n6snOJAHMsPx1O
+         WR6Wk9PleJXpJRob72UJulypveBh4fo1qE12aEpltMBREwQo5ctmt8RJLQVS4KOTFX52
+         TrqpEUmzL9TFg/dNp1Xo9vKj9eYIt0gmim4oXfUmksOfvFGYN4dBBCLywaTKC0AJCNLC
+         HfE8RVxC/BMlGHO/WvXPeyB7uCzbKDfNsT9GvthDUiq6pDXfW3vxMu1QWVJUURpM7bo5
+         McLGIydsNONSnavoAyr5P76b9+MMaO7rT0mvvTt/8ELJvzaqxDSVseXMlQinbd8lPZUI
+         PHBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=yHENS+Ovpeo1eaUhBdH1C0+VesNPCtOkEQBYOIU9JA0=;
+        b=4FfC+htsmmYkDnJCSPwen7ELgtL1C48/kTrPxPGg38QCyXynZhcYnKZ7STKNeksRPA
+         bPlzGjDum/nqJGTahYda1l8Y2UBa71lgfmMTFT15PkTSnbs6CeN9ORSFxCQYO51mzO5a
+         NcblHYxZqLgwXVQArrun1URWDoFLDfGS5Tli51baKiwupxjZ8z9noafQGIOCzaJBcG3L
+         EsPfGOF0REug3LZAm4nmjm6ypDJ6v/zOFXy8O6uwglRN53+uIWz4oufXJMPeufksdZFc
+         Lx6Zk0P+IYtsWPB7BHUGr733iXJ73idWaChtgrN/forsRnw3tcp0wpfUX1RYcVZeSpL7
+         0cog==
+X-Gm-Message-State: AOAM530fMTayNqT4AfVwiLYWAp1FV4+86Wf07IOpBjYCcjPJYNxnLgW7
+        RCJEM/0rvqvRM0P9yVs8mw4lHY1FPfY6dgynWcj+SA==
+X-Google-Smtp-Source: ABdhPJxANXKGE/Y8oyJTKQRCNn611DCucdk0b1RMwNdrqUnynfMrMAydeff8twAuQ8raoQnl65/aYBa0Ol96UFxvjhw=
+X-Received: by 2002:a9d:6e04:0:b0:5af:6426:6d39 with SMTP id
+ e4-20020a9d6e04000000b005af64266d39mr3467118otr.75.1645816524707; Fri, 25 Feb
+ 2022 11:15:24 -0800 (PST)
+MIME-Version: 1.0
+References: <20220223062412.22334-1-chenyi.qiang@intel.com>
+ <CALMp9eT50LjXYSwfWENjmfg=XxT4Bx3RzOYubKty8kr_APXCEw@mail.gmail.com>
+ <88eb9a9a-fbe3-8e2c-02bd-4bdfc855b67f@intel.com> <6a839b88-392d-886d-836d-ca04cf700dce@intel.com>
+ <7859e03f-10fa-dbc2-ed3c-5c09e62f9016@redhat.com> <CALMp9eQHKn=ApthER084vKGiQCMdVX7ztB5iLupBPdUY59WV_A@mail.gmail.com>
+ <Yhkf/qJ1wpfbA3Fc@google.com>
+In-Reply-To: <Yhkf/qJ1wpfbA3Fc@google.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Fri, 25 Feb 2022 11:15:13 -0800
+Message-ID: <CALMp9eQyQkRc8goGL2eJNftKROxLcTouiEt81Qqin4fHphoN1w@mail.gmail.com>
+Subject: Re: [PATCH v3] KVM: VMX: Enable Notify VM exit
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Xiaoyao Li <xiaoyao.li@intel.com>,
+        Chenyi Qiang <chenyi.qiang@intel.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, Peter Shier <pshier@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Raghavendra Rao Ananta <rananta@google.com>,
-        Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH v3 09/19] KVM: arm64: Implement PSCI SYSTEM_SUSPEND
-In-Reply-To: <YhfeBfgbDA8IGc9f@google.com>
-References: <20220223041844.3984439-1-oupton@google.com>
-        <20220223041844.3984439-10-oupton@google.com>
-        <87wnhk2whx.wl-maz@kernel.org>
-        <YhfeBfgbDA8IGc9f@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oupton@google.com, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, anup@brainfault.org, atishp@atishpatra.org, seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, pshier@google.com, reijiw@google.com, ricarkol@google.com, rananta@google.com, jingzhangos@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 24 Feb 2022 19:35:33 +0000,
-Oliver Upton <oupton@google.com> wrote:
-> 
-> Hi Marc,
-> 
-> Thanks for reviewing the series. ACK to the nits and smaller comments
-> you've made, I'll incorporate that feedback in the next series.
-> 
-> On Thu, Feb 24, 2022 at 02:02:34PM +0000, Marc Zyngier wrote:
-> > On Wed, 23 Feb 2022 04:18:34 +0000,
-> > Oliver Upton <oupton@google.com> wrote:
-> > > 
-> > > ARM DEN0022D.b 5.19 "SYSTEM_SUSPEND" describes a PSCI call that allows
-> > > software to request that a system be placed in the deepest possible
-> > > low-power state. Effectively, software can use this to suspend itself to
-> > > RAM. Note that the semantics of this PSCI call are very similar to
-> > > CPU_SUSPEND, which is already implemented in KVM.
-> > > 
-> > > Implement the SYSTEM_SUSPEND in KVM. Similar to CPU_SUSPEND, the
-> > > low-power state is implemented as a guest WFI. Synchronously reset the
-> > > calling CPU before entering the WFI, such that the vCPU may immediately
-> > > resume execution when a wakeup event is recognized.
-> > > 
-> > > Signed-off-by: Oliver Upton <oupton@google.com>
-> > > ---
-> > >  arch/arm64/kvm/psci.c  | 51 ++++++++++++++++++++++++++++++++++++++++++
-> > >  arch/arm64/kvm/reset.c |  3 ++-
-> > >  2 files changed, 53 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
-> > > index 77a00913cdfd..41adaaf2234a 100644
-> > > --- a/arch/arm64/kvm/psci.c
-> > > +++ b/arch/arm64/kvm/psci.c
-> > > @@ -208,6 +208,50 @@ static void kvm_psci_system_reset(struct kvm_vcpu *vcpu)
-> > >  	kvm_prepare_system_event(vcpu, KVM_SYSTEM_EVENT_RESET);
-> > >  }
-> > >  
-> > > +static int kvm_psci_system_suspend(struct kvm_vcpu *vcpu)
-> > > +{
-> > > +	struct vcpu_reset_state reset_state;
-> > > +	struct kvm *kvm = vcpu->kvm;
-> > > +	struct kvm_vcpu *tmp;
-> > > +	bool denied = false;
-> > > +	unsigned long i;
-> > > +
-> > > +	reset_state.pc = smccc_get_arg1(vcpu);
-> > > +	if (!kvm_ipa_valid(kvm, reset_state.pc)) {
-> > > +		smccc_set_retval(vcpu, PSCI_RET_INVALID_ADDRESS, 0, 0, 0);
-> > > +		return 1;
-> > > +	}
-> > > +
-> > > +	reset_state.r0 = smccc_get_arg2(vcpu);
-> > > +	reset_state.be = kvm_vcpu_is_be(vcpu);
-> > > +	reset_state.reset = true;
-> > > +
-> > > +	/*
-> > > +	 * The SYSTEM_SUSPEND PSCI call requires that all vCPUs (except the
-> > > +	 * calling vCPU) be in an OFF state, as determined by the
-> > > +	 * implementation.
-> > > +	 *
-> > > +	 * See ARM DEN0022D, 5.19 "SYSTEM_SUSPEND" for more details.
-> > > +	 */
-> > > +	mutex_lock(&kvm->lock);
-> > > +	kvm_for_each_vcpu(i, tmp, kvm) {
-> > > +		if (tmp != vcpu && !kvm_arm_vcpu_powered_off(tmp)) {
-> > > +			denied = true;
-> > > +			break;
-> > > +		}
-> > > +	}
-> > > +	mutex_unlock(&kvm->lock);
-> > 
-> > This looks dodgy. Nothing seems to prevent userspace from setting the
-> > mp_state to RUNNING in parallel with this, as only the vcpu mutex is
-> > held when this ioctl is issued.
-> > 
-> > It looks to me that what you want is what lock_all_vcpus() does
-> > (Alexandru has a patch moving it out of the vgic code as part of his
-> > SPE series).
-> > 
-> > It is also pretty unclear what the interaction with userspace is once
-> > you have released the lock. If the VMM starts a vcpu other than the
-> > suspending one, what is its state? The spec doesn't see to help
-> > here. I can see two options:
-> > 
-> > - either all the vcpus have the same reset state applied to them as
-> >   they come up, unless they are started with CPU_ON by a vcpu that has
-> >   already booted (but there is a single 'context_id' provided, and I
-> >   fear this is going to confuse the OS)...
-> > 
-> > - or only the suspending vcpu can resume the system, and we must fail
-> >   a change of mp_state for the other vcpus.
-> > 
-> > What do you think?
-> 
-> Definitely the latter. The documentation of SYSTEM_SUSPEND is quite
-> shaky on this, but it would appear that the intention is for the caller
-> to be the first CPU to wake up.
-
-Yup. We now have clarification on the intent of the spec (only the
-caller CPU can resume the system), and this needs to be tightened.
-
-> 
-> > > +
-> > > +	if (denied) {
-> > > +		smccc_set_retval(vcpu, PSCI_RET_DENIED, 0, 0, 0);
-> > > +		return 1;
-> > > +	}
-> > > +
-> > > +	__kvm_reset_vcpu(vcpu, &reset_state);
-> > > +	kvm_vcpu_wfi(vcpu);
-> > 
-> > I have mixed feelings about this. The vcpu has reset before being in
-> > WFI, while it really should be the other way around and userspace
-> > could rely on observing the transition.
-> > 
-> > What breaks if you change this?
-> 
-> I don't think that userspace would be able to observe the transition
-> even if we WFI before the reset.
-
-I disagree. At any point can userspace issue a signal which would
-trigger a return from WFI and an exit to userspace, and I don't think
-this should result in a reset being observed.
-
-This also means that SYSTEM_SUSPEND must be robust wrt signal
-delivery, which it doesn't seem to be.
-
-> I imagine that would take the form
-> of setting KVM_REQ_VCPU_RESET, which we explicitly handle before
-> letting userspace access the vCPU's state as of commit
-> 6826c6849b46 ("KVM: arm64: Handle PSCI resets before userspace
-> touches vCPU state").
-
-In that case, the vcpu is ready to run, and is not blocked by
-anything, so this is quite different.
-
+On Fri, Feb 25, 2022 at 10:29 AM Sean Christopherson <seanjc@google.com> wrote:
 >
-> Given this, I felt it was probably best to avoid all the indirection and
-> just do the vCPU reset in the handling of SYSTEM_SUSPEND. It does,
-> however, imply that we have slightly different behavior when userspace
-> exits are enabled, as that will happen pre-reset and pre-WFI.
+> On Fri, Feb 25, 2022, Jim Mattson wrote:
+> > On Fri, Feb 25, 2022 at 7:13 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+> > >
+> > > On 2/25/22 16:12, Xiaoyao Li wrote:
+> > > >>>>
+> > > >>>
+> > > >>> I don't like the idea of making things up without notifying userspace
+> > > >>> that this is fictional. How is my customer running nested VMs supposed
+> > > >>> to know that L2 didn't actually shutdown, but L0 killed it because the
+> > > >>> notify window was exceeded? If this information isn't reported to
+> > > >>> userspace, I have no way of getting the information to the customer.
+> > > >>
+> > > >> Then, maybe a dedicated software define VM exit for it instead of
+> > > >> reusing triple fault?
+> > > >>
+> > > >
+> > > > Second thought, we can even just return Notify VM exit to L1 to tell L2
+> > > > causes Notify VM exit, even thought Notify VM exit is not exposed to L1.
+> > >
+> > > That might cause NULL pointer dereferences or other nasty occurrences.
+> >
+> > Could we synthesize a machine check? I haven't looked in detail at the
+> > MCE MSRs, but surely there must be room in there for Intel to reserve
+> > some encodings for synthesized machine checks.
+>
+> I don't think we have any choice but to synthesize SHUTDOWN until we get more
+> details on the exact semantics of VM_CONTEXT_INVALID.  E.g. if GUEST_EFER or any
+> other critical guest field is corrupted, attempting to re-enter the guest, even
+> to (attempt to) inject a machine check, is risking undefined behavior in the guest.
 
-And that's exactly the sort of behaviour I'd like to avoid if at all
-possible. But maybe we don't need to support the standalone version
-that doesn't involve userspace?
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Synthesizing shutdown is fine, as long as userspace is notified.
