@@ -2,113 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 318434C4860
-	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 16:12:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E92DF4C4862
+	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 16:13:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241357AbiBYPMq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 10:12:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34454 "EHLO
+        id S241663AbiBYPNx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 10:13:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37702 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241014AbiBYPMn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Feb 2022 10:12:43 -0500
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE25566AE0;
-        Fri, 25 Feb 2022 07:12:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1645801931; x=1677337931;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=WYYeEdy3fDIESQeCBUqRGoMnf0dz653qSX0d2zXrlBE=;
-  b=i9YnsMLZx6bAY5IGDEMiVBBs5ZeQ9hlYj7KRFqPjWG/RPD9PnzLnLVAh
-   kHmr4ywQGQ1ZM8tBvlU6x8wjebtYCwMynVHIrhw3tSUv9oZsml8/LpqvU
-   JUIlu3H6OFpCdBrHtBEsybZ6vEgl7gKAPsE/a9BeY5urkzSHoJ+4+NdHd
-   E=;
-X-IronPort-AV: E=Sophos;i="5.90,136,1643673600"; 
-   d="scan'208";a="66223167"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1e-fc41acad.us-east-1.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP; 25 Feb 2022 15:11:53 +0000
-Received: from EX13MTAUWC001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
-        by email-inbound-relay-iad-1e-fc41acad.us-east-1.amazon.com (Postfix) with ESMTPS id 06BB4C0911;
-        Fri, 25 Feb 2022 15:11:45 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1497.28; Fri, 25 Feb 2022 15:11:43 +0000
-Received: from [0.0.0.0] (10.43.161.126) by EX13D20UWC001.ant.amazon.com
- (10.43.162.244) with Microsoft SMTP Server (TLS) id 15.0.1497.28; Fri, 25 Feb
- 2022 15:11:36 +0000
-Message-ID: <9ac68552-c1fc-22c8-13e6-4f344f85a4fb@amazon.com>
-Date:   Fri, 25 Feb 2022 16:11:34 +0100
+        with ESMTP id S240090AbiBYPNw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Feb 2022 10:13:52 -0500
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4266FB8B71;
+        Fri, 25 Feb 2022 07:13:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1645801998; x=1677337998;
+  h=message-id:date:mime-version:subject:from:to:cc:
+   references:in-reply-to:content-transfer-encoding;
+  bh=vZg6tbM7+9XOW7hnxWAfKkhfxkNsoS8BNELj0PMEy1Q=;
+  b=hhX7Zx0aFTzVzGSuqDOKj/qHqBRlmFN8MNZ9pZ/uI8sqZJIXw92khLqS
+   X5R7wx1K8YBKGySUFHMDR5pXf4mMH8EyWzeNxCcYN5H6t9qu2zkfU2JsQ
+   kO5Uf/lkbX75Gr6qqlJRwSN4vJb+u5eUEtX/jJUjqMcw+p82LP7SpG3R4
+   wy9DLLTK9xErJrZXhWJdlBTuSVe330VKy9ytEap6gI/SmJSnK2Y0Njqjr
+   eTHB2UulMzpip1UlDm9eGTPy+rFGEFz8U/k+vfIxfrTmOUUntpB1/M890
+   roL3Wxd/CR1MCQ8l87yU5ik9HTPJD3cZ8EzqCVbb4NR55xXBYEbz8ddl+
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10268"; a="252241388"
+X-IronPort-AV: E=Sophos;i="5.90,136,1643702400"; 
+   d="scan'208";a="252241388"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2022 07:12:17 -0800
+X-IronPort-AV: E=Sophos;i="5.90,136,1643702400"; 
+   d="scan'208";a="533601428"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.255.30.203]) ([10.255.30.203])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2022 07:12:15 -0800
+Message-ID: <6a839b88-392d-886d-836d-ca04cf700dce@intel.com>
+Date:   Fri, 25 Feb 2022 23:12:12 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.6.1
-Subject: Re: [PATCH v4] virt: vmgenid: introduce driver for reinitializing RNG
- on VM fork
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-CC:     <kvm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <linux-hyperv@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <adrian@parity.io>, <ardb@kernel.org>, <ben@skyportsystems.com>,
-        <berrange@redhat.com>, <colmmacc@amazon.com>,
-        <decui@microsoft.com>, <dwmw@amazon.co.uk>, <ebiggers@kernel.org>,
-        <ehabkost@redhat.com>, <gregkh@linuxfoundation.org>,
-        <haiyangz@microsoft.com>, <imammedo@redhat.com>,
-        <jannh@google.com>, <kys@microsoft.com>, <lersek@redhat.com>,
-        <linux@dominikbrodowski.net>, <mst@redhat.com>,
-        <qemu-devel@nongnu.org>, <raduweis@amazon.com>,
-        <sthemmin@microsoft.com>, <tytso@mit.edu>, <wei.liu@kernel.org>
-References: <CAHmME9pJ3wb=EbUErJrCRC=VYGhFZqj2ar_AkVPsUvAnqGtwwg@mail.gmail.com>
- <20220225124848.909093-1-Jason@zx2c4.com>
- <05c9f2a9-accb-e0de-aac7-b212adac7eb2@amazon.com>
- <YhjjuMOeV7+T7thS@zx2c4.com>
- <88ebdc32-2e94-ef28-37ed-1c927c12af43@amazon.com>
- <YhjoyIUv2+18BwiR@zx2c4.com>
-From:   Alexander Graf <graf@amazon.com>
-In-Reply-To: <YhjoyIUv2+18BwiR@zx2c4.com>
-X-Originating-IP: [10.43.161.126]
-X-ClientProxiedBy: EX13D15UWA002.ant.amazon.com (10.43.160.218) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
-X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-        NICE_REPLY_A,RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Firefox/91.0 Thunderbird/91.6.1
+Subject: Re: [PATCH v3] KVM: VMX: Enable Notify VM exit
+Content-Language: en-US
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+To:     Jim Mattson <jmattson@google.com>,
+        Chenyi Qiang <chenyi.qiang@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20220223062412.22334-1-chenyi.qiang@intel.com>
+ <CALMp9eT50LjXYSwfWENjmfg=XxT4Bx3RzOYubKty8kr_APXCEw@mail.gmail.com>
+ <88eb9a9a-fbe3-8e2c-02bd-4bdfc855b67f@intel.com>
+In-Reply-To: <88eb9a9a-fbe3-8e2c-02bd-4bdfc855b67f@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
+        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Ck9uIDI1LjAyLjIyIDE1OjMzLCBKYXNvbiBBLiBEb25lbmZlbGQgd3JvdGU6Cj4gT24gRnJpLCBG
-ZWIgMjUsIDIwMjIgYXQgMDM6MTg6NDNQTSArMDEwMCwgQWxleGFuZGVyIEdyYWYgd3JvdGU6Cj4+
-PiBJIHJlY2FsbCB0aGlzIHBhcnQgb2YgdGhlIG9sZCB0aHJlYWQuIEZyb20gd2hhdCBJIHVuZGVy
-c3Rvb2QsIHVzaW5nCj4+PiAiVk1HRU5JRCIgKyAiUUVNVVZHSUQiIHdvcmtlZCAvd2VsbCBlbm91
-Z2gvLCBldmVuIGlmIHRoYXQgd2Fzbid0Cj4+PiB0ZWNobmljYWxseSBpbi1zcGVjLiBBcmQgbm90
-ZWQgdGhhdCByZWx5aW5nIG9uIF9DSUQgbGlrZSB0aGF0IGlzCj4+PiB0ZWNobmljYWxseSBhbiBB
-Q1BJIHNwZWMgbm90aWZpY2F0aW9uLiBTbyB3ZSdyZSBiZXR3ZWVuIG9uZSBzcGVjIGFuZAo+Pj4g
-YW5vdGhlciwgYmFzaWNhbGx5LCBhbmQgZG9pbmcgIlZNR0VOSUQiICsgIlFFTVVWR0lEIiByZXF1
-aXJlcyBmZXdlcgo+Pj4gY2hhbmdlcywgYXMgbWVudGlvbmVkLCBhcHBlYXJzIHRvIHdvcmsgZmlu
-ZSBpbiBteSB0ZXN0aW5nLgo+Pj4KPj4+IEhvd2V2ZXIsIHdpdGggdGhhdCBzYWlkLCBJIHRoaW5r
-IHN1cHBvcnRpbmcgdGhpcyB2aWEgIlZNX0dlbl9Db3VudGVyIgo+Pj4gd291bGQgYmUgYSBiZXR0
-ZXIgZXZlbnR1YWwgdGhpbmcgdG8gZG8sIGJ1dCB3aWxsIHJlcXVpcmUgYWNrcyBhbmQKPj4+IGNo
-YW5nZXMgZnJvbSB0aGUgQUNQSSBtYWludGFpbmVycy4gRG8geW91IHRoaW5rIHlvdSBjb3VsZCBw
-cmVwYXJlIHlvdXIKPj4+IHBhdGNoIHByb3Bvc2FsIGFib3ZlIGFzIHNvbWV0aGluZyBvbi10b3Ag
-b2YgbXkgdHJlZSBbMV0/IEFuZCBpZiB5b3UgY2FuCj4+PiBjb252aW5jZSB0aGUgQUNQSSBtYWlu
-dGFpbmVycyB0aGF0IHRoYXQncyBva2F5LCB0aGVuIEknbGwgaGFwcGlseSB0YWtlCj4+PiB0aGUg
-cGF0Y2guCj4+Cj4+IFN1cmUsIGxldCBtZSBzZW5kIHRoZSBBQ1BJIHBhdGNoIHN0YW5kIGFsb25l
-LiBObyBuZWVkIHRvIGluY2x1ZGUgdGhlCj4+IFZNR2VuSUQgY2hhbmdlIGluIHRoZXJlLgo+IFRo
-YXQncyBmaW5lLiBJZiB0aGUgQUNQSSBwZW9wbGUgdGFrZSBpdCBmb3IgNS4xOCwgdGhlbiB3ZSBj
-YW4gY291bnQgb24KPiBpdCBiZWluZyB0aGVyZSBhbmQgYWRqdXN0IHRoZSB2bWdlbmlkIGRyaXZl
-ciBhY2NvcmRpbmdseSBhbHNvIGZvciA1LjE4Lgo+Cj4gSSBqdXN0IGJvb3RlZCB1cCBhIFdpbmRv
-d3MgVk0sIGFuZCBpdCBsb29rcyBsaWtlIEh5cGVyLVYgdXNlcwo+ICJIeXBlcl9WX0dlbl9Db3Vu
-dGVyX1YxIiwgd2hpY2ggaXMgYWxzbyBxdWl0ZSBsb25nLCBzbyB3ZSBjYW4ndCByZWFsbHkKPiBI
-SUQgbWF0Y2ggb24gdGhhdCBlaXRoZXIuCgoKWWVzLCBkdWUgdG8gdGhlIHNhbWUgcHJvYmxlbS4g
-SSdkIHJlYWxseSBwcmVmZXIgd2Ugc29ydCBvdXQgdGhlIEFDUEkgCm1hdGNoaW5nIGJlZm9yZSB0
-aGlzIGdvZXMgbWFpbmxpbmUuIE1hdGNoaW5nIG9uIF9ISUQgaXMgZXhwbGljaXRseSAKZGlzY291
-cmFnZWQgaW4gdGhlIFZNR2VuSUQgc3BlYy4KCgpBbGV4CgoKCgoKQW1hem9uIERldmVsb3BtZW50
-IENlbnRlciBHZXJtYW55IEdtYkgKS3JhdXNlbnN0ci4gMzgKMTAxMTcgQmVybGluCkdlc2NoYWVm
-dHNmdWVocnVuZzogQ2hyaXN0aWFuIFNjaGxhZWdlciwgSm9uYXRoYW4gV2Vpc3MKRWluZ2V0cmFn
-ZW4gYW0gQW10c2dlcmljaHQgQ2hhcmxvdHRlbmJ1cmcgdW50ZXIgSFJCIDE0OTE3MyBCClNpdHo6
-IEJlcmxpbgpVc3QtSUQ6IERFIDI4OSAyMzcgODc5CgoK
+On 2/25/2022 11:04 PM, Xiaoyao Li wrote:
+> On 2/25/2022 10:54 PM, Jim Mattson wrote:
+>> On Tue, Feb 22, 2022 at 10:19 PM Chenyi Qiang <chenyi.qiang@intel.com> 
+>> wrote:
+>>> Nested handling
+>>> - Nested notify VM exits are not supported yet. Keep the same notify
+>>>    window control in vmcs02 as vmcs01, so that L1 can't escape the
+>>>    restriction of notify VM exits through launching L2 VM.
+>>> - When L2 VM is context invalid, synthesize a nested
+>>>    EXIT_REASON_TRIPLE_FAULT to L1 so that L1 won't be killed due to L2's
+>>>    VM_CONTEXT_INVALID happens.
+>>
+>> I don't like the idea of making things up without notifying userspace
+>> that this is fictional. How is my customer running nested VMs supposed
+>> to know that L2 didn't actually shutdown, but L0 killed it because the
+>> notify window was exceeded? If this information isn't reported to
+>> userspace, I have no way of getting the information to the customer.
+> 
+> Then, maybe a dedicated software define VM exit for it instead of 
+> reusing triple fault?
+> 
+
+Second thought, we can even just return Notify VM exit to L1 to tell L2 
+causes Notify VM exit, even thought Notify VM exit is not exposed to L1.
 
