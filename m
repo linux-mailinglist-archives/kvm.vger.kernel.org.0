@@ -2,80 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 247E04C44B4
-	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 13:39:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F9B34C44D7
+	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 13:47:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233524AbiBYMju (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 07:39:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44608 "EHLO
+        id S240709AbiBYMqn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 07:46:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60384 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232637AbiBYMju (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Feb 2022 07:39:50 -0500
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AF1F1D97FA
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 04:39:18 -0800 (PST)
-Received: by mail-pl1-x632.google.com with SMTP id ay5so1886443plb.1
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 04:39:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=nn4VPSsQYQOMEMMN7BFTuP31EPiRMpkNtye61ZMxpro=;
-        b=QdhreaU4spdu6fpoE4k1DOvYqxJH8++Fr9y2h824A1G7AnjHrU1MkJ9MQQnGqys6UE
-         unZg9z+l3v8CAvhMj745rcPCcUnhW0ur26U0i61cLr025QA5qcO052OCwX8IEV0iXHjL
-         O0EQT2ZqHCpR/kmLj6XSEGitTbHTW8kiHL1upF5CQ5b9n59CZ4gFbvNNO6iGj+tm67jT
-         nbE+QexwSV1oKDqXjAAT2NaxcmfKqglf7B5VfcJqQUEaLf7IYvo/RK6tHMNXeA7DVfJn
-         0zSS2hc/soMV87iM4pfjvKHtN7PTld10awXV3riLIsKdMxqQNm8b7L/pR4vJ00HTazk3
-         3l3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=nn4VPSsQYQOMEMMN7BFTuP31EPiRMpkNtye61ZMxpro=;
-        b=io4kCw83Cnna+ryYqe5GcB6+7EFlNuX4m7nBqzFjmxtgiyB6O/xK+MAvYTd3HfJkFe
-         YhpZM53WEYJlq1UXm1u6lXXdsstu09Ie+kdDHRecZFczIOjyYPWGkMQDcPytSbQJ8FI1
-         fm85o0iAUD2BerUXb7W/OY8bOuhplHu40NVJXjK0djZC9ZL5omvRWAe7MFOc4xHWI7MW
-         P541VZTcY1PL01bw1isthDcE8T47NPb0pkkNi2w06zKqvWHePxo8PUYbKA2dztiXbWeh
-         RdzoNYEVrGbhQ2J9abINdSEH81spZDJDyPwZ1hcRWOEZp7jbejuYHqYBcRKGGW4ym8tA
-         GUTA==
-X-Gm-Message-State: AOAM5323Ap0jmLydK1XgP74BItsqERyXR4txPiaN0Xa4C0o88DtlSuDl
-        2v3NBaxpm5gpLgXAh4B3+gvf27FFYpoNJ8ehTRI=
-X-Google-Smtp-Source: ABdhPJySf8E24Qj66QVY/C18YHKkZ7fEJPmGgNBgO4s0OgZDn6WUB397GsP1VBOw3zrgS4XMEaqJc1c6cuNOhVMISyg=
-X-Received: by 2002:a17:90a:d3d0:b0:1bb:f5b3:2fbf with SMTP id
- d16-20020a17090ad3d000b001bbf5b32fbfmr3009006pjw.87.1645792757974; Fri, 25
- Feb 2022 04:39:17 -0800 (PST)
+        with ESMTP id S240706AbiBYMql (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Feb 2022 07:46:41 -0500
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D98BD21CD21;
+        Fri, 25 Feb 2022 04:46:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1645793169; x=1677329169;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=hxjx1k1dTQ1X3VcpcvhZpVGbKp3swFMdHJk9USMfQsI=;
+  b=nmUrBzBnIkNutN0FXJ1lbgAXJxqlwEX+JPafMJ+JXCz2I27yXG1zmGaN
+   dbxjxslpP2xvO+ZVtHC8sklDwJHi7mOaAu9ePKNYPDAlgT1NDXaMILNfa
+   SMYgGEDk0IiYcqDOyPGjD7j91RiWQU/TFHGKzeusiY/uvfz3ZpTSS+ihW
+   GPOjnzD9mt4WQRb375fZmi5sQDZRxvTiJppRLjv7y7aOcOo61WudDkeO3
+   VMj9C3D8frtrz3R8Nr7BgBk4lCiHhHT5G+3HxoR5zjC6zI743YimbUdVZ
+   Ko4EfoSdYZF4BNhxUxp6ycY2+YKbiVIuEYNtpaE5z4qjFhdhcGBE1X7Lv
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10268"; a="277121994"
+X-IronPort-AV: E=Sophos;i="5.90,136,1643702400"; 
+   d="scan'208";a="277121994"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2022 04:46:09 -0800
+X-IronPort-AV: E=Sophos;i="5.90,136,1643702400"; 
+   d="scan'208";a="628832414"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.255.30.203]) ([10.255.30.203])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2022 04:46:07 -0800
+Message-ID: <2809f506-a3ed-d2ec-dbeb-d7f2b3edbd37@intel.com>
+Date:   Fri, 25 Feb 2022 20:46:05 +0800
 MIME-Version: 1.0
-References: <CAJSP0QX7O_auRgTKFjHkBbkBK=B3Z-59S6ZZi10tzFTv1_1hkQ@mail.gmail.com>
- <YhMtxWcFMjdQTioe@apples> <CAJSP0QVNRYTOGDsjCJJLOT=7yo1EB6D9LBwgQ4-CE539HdgHNQ@mail.gmail.com>
- <YhN+5wz3MXVm3vXU@apples> <CAJSP0QXz6kuwx6mycYz_xzxiVjdVR_AqHnpygwV4Ht-7B9pYmw@mail.gmail.com>
- <20220222150335.GA1497257@dhcp-10-100-145-180.wdc.com>
-In-Reply-To: <20220222150335.GA1497257@dhcp-10-100-145-180.wdc.com>
-From:   Stefan Hajnoczi <stefanha@gmail.com>
-Date:   Fri, 25 Feb 2022 12:39:06 +0000
-Message-ID: <CAJSP0QXQr1UBX9S_0QzwO89wLcTyBe+rofTY6+dyUNHvvDyPzA@mail.gmail.com>
-Subject: Re: Call for GSoC and Outreachy project ideas for summer 2022
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     Klaus Jensen <its@irrelevant.dk>,
-        qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>,
-        Rust-VMM Mailing List <rust-vmm@lists.opendev.org>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Sergio Lopez <slp@redhat.com>,
-        Dmitry Fomichev <Dmitry.Fomichev@wdc.com>,
-        =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
-        Hannes Reinecke <hare@suse.de>,
-        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
-        "Florescu, Andreea" <fandree@amazon.com>,
-        Hanna Reitz <hreitz@redhat.com>,
-        Alex Agache <aagch@amazon.com>,
-        =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        John Snow <jsnow@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Firefox/91.0 Thunderbird/91.6.1
+Subject: Re: [PATCH v3] KVM: VMX: Enable Notify VM exit
+Content-Language: en-US
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Chenyi Qiang <chenyi.qiang@intel.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Cc:     Tao Xu <tao3.xu@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20220223062412.22334-1-chenyi.qiang@intel.com>
+ <c7681cf8-7b99-eb43-0195-d35adb011f21@redhat.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <c7681cf8-7b99-eb43-0195-d35adb011f21@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-5.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
+        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_HI,RCVD_IN_MSPIKE_H3,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -83,18 +69,91 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 22 Feb 2022 at 15:03, Keith Busch <kbusch@kernel.org> wrote:
->
-> On Tue, Feb 22, 2022 at 09:48:06AM +0000, Stefan Hajnoczi wrote:
-> > On Mon, 21 Feb 2022 at 12:00, Klaus Jensen <its@irrelevant.dk> wrote:
-> > >
-> > > Yes, I'll go ahead as mentor for this.
-> > >
-> > > @Keith, if you want to join in, let us know :)
->
-> Thank you for setting this up, I would be happy assist with the cause!
+On 2/25/2022 7:54 PM, Paolo Bonzini wrote:
+> On 2/23/22 07:24, Chenyi Qiang wrote:
+>> Nested handling
+>> - Nested notify VM exits are not supported yet. Keep the same notify
+>>    window control in vmcs02 as vmcs01, so that L1 can't escape the
+>>    restriction of notify VM exits through launching L2 VM.
+>> - When L2 VM is context invalid, synthesize a nested
+>>    EXIT_REASON_TRIPLE_FAULT to L1 so that L1 won't be killed due to L2's
+>>    VM_CONTEXT_INVALID happens.
+>>
+>> Notify VM exit is defined in latest Intel Architecture Instruction Set
+>> Extensions Programming Reference, chapter 9.2.
+>>
+>> TODO: Allow to change the window size (to enable the feature) at runtime,
+>> which can make it more flexible to do management.
+> 
+> I only have a couple questions, any changes in response to the question
+> I can do myself.
+> 
+>> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+>> index 1dfe23963a9e..f306b642c3e1 100644
+>> --- a/arch/x86/kvm/vmx/nested.c
+>> +++ b/arch/x86/kvm/vmx/nested.c
+>> @@ -2177,6 +2177,9 @@ static void prepare_vmcs02_constant_state(struct 
+>> vcpu_vmx *vmx)
+>>       if (cpu_has_vmx_encls_vmexit())
+>>           vmcs_write64(ENCLS_EXITING_BITMAP, INVALID_GPA);
+>> +    if (notify_window >= 0)
+>> +        vmcs_write32(NOTIFY_WINDOW, notify_window);
+> 
+> Is a value of 0 valid?  
 
-Hi Keith,
-I have added you as co-mentor. Thank you for participating!
+Yes, 0 is valid. That's why there is an internal value to ensure even 0 
+won't cause false positive
 
-Stefan
+> Should it be changed to the recommended value of
+> 128000 in hardware_setup()?
+> 
+>> +    case EXIT_REASON_NOTIFY:
+>> +        return nested_cpu_has2(vmcs12,
+>> +            SECONDARY_EXEC_NOTIFY_VM_EXITING);
+> 
+> This should be "return false" since you don't expose the secondary
+> control to L1 (meaning, it will never be set).
+
+Fine with either.
+
+>> +         * L0 will synthensize a nested TRIPLE_FAULT to kill L2 when
+>> +         * notify VM exit occurred in L2 and 
+>> NOTIFY_VM_CONTEXT_INVALID is
+>> +         * set in exit qualification. In this case, if notify VM exit
+>> +         * occurred incident to delivery of a vectored event, the IDT
+>> +         * vectoring info are recorded in VMCS. Drop the pending event
+>> +         * in vmcs12, otherwise L1 VMM will exit to userspace with
+>> +         * internal error due to delivery event.
+>>           */
+>> -        vmcs12_save_pending_event(vcpu, vmcs12);
+>> +        if (to_vmx(vcpu)->exit_reason.basic != EXIT_REASON_NOTIFY)
+>> +            vmcs12_save_pending_event(vcpu, vmcs12);
+> 
+> I would prefer to call out the triple fault here:
+> 
+>                  /*
+>                   * Transfer the event that L0 or L1 may have wanted to 
+> inject into
+>                   * L2 to IDT_VECTORING_INFO_FIELD.
+>                   *
+>                   * Skip this if the exit is due to a 
+> NOTIFY_VM_CONTEXT_INVALID
+>                   * exit; in that case, L0 will synthesize a nested 
+> TRIPLE_FAULT
+>                   * vmexit to kill L2.  No IDT vectoring info is 
+> recorded for
+>                   * triple faults, and __vmx_handle_exit does not expect 
+> it.
+>                   */
+>                  if (!(to_vmx(vcpu)->exit_reason.basic == 
+> EXIT_REASON_NOTIFY)
+>                        && kvm_test_request(KVM_REQ_TRIPLE_FAULT, vcpu))
+>                          vmcs12_save_pending_event(vcpu, vmcs12);
+
+looks good to me.
+
+> What do you think?
+> 
+> Paolo
+> 
+
