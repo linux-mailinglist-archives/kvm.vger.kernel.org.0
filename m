@@ -2,63 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 354FC4C445D
-	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 13:10:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 777764C4484
+	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 13:21:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240550AbiBYMKw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 07:10:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38172 "EHLO
+        id S240590AbiBYMVw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 07:21:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58946 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240541AbiBYMKs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Feb 2022 07:10:48 -0500
-Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 642FA20B16F;
-        Fri, 25 Feb 2022 04:10:15 -0800 (PST)
-Received: by mail-wr1-x42b.google.com with SMTP id s13so4175623wrb.6;
-        Fri, 25 Feb 2022 04:10:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=8Y/NiUMDT4o9WesyCiv4t4HIqqx9u2movM8AhOuROWs=;
-        b=bw5zm9xJiLlxYM4Y0HyPeGLJ8VQtO4R1BlfQHug0KoiSeLnyfrdxJMZnZNhF1FfgFD
-         WzdI+ZwOM794EATAySdnzGKWRaXZWGPIxWis1qbXEqknG65YlATpWw12vu4gvLihpVhb
-         zQwYTOW3BOVqY/Qr/LdU3dpGtsvehWM3hoHEfPbJtTH8gA87dlxttwyDJATRhXWzbXrX
-         YlXPuIfhoEgX/do7F6K2S+hnUIudUAuZ8HxCxdcQD5FrCl5Z3jjy1LCN9UEjs8cJwuRL
-         F2yVFoJwm4zK72vbsCVS0aEY+qHciAtAbtDmjeoeKb62ES2QPmCR+uaiiuhNPrpCyw11
-         Eckw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=8Y/NiUMDT4o9WesyCiv4t4HIqqx9u2movM8AhOuROWs=;
-        b=nrtPOZHkFfPFGhMDidIWahBUvR1BFTBDySvplxfpPhjIsah0vuizmk2+k2CQH4LixI
-         qQfRjoHcThv/KKrdgcnVHgjPVk1M1XLHJnnetJu+2AHo+Kyaj4b8UQKUkxpZVnR0CY5/
-         E97AVV/qYqPCSNo3LUkDnI26wEYix/55cCHeCusHFICcJqlEZt2GyAzNif3o64LgiadZ
-         3yhatbFJOHhpwJlmQLug4tcsC8hJOvkzVVkZC3F4FYqFH4aOyw/bFMnd4CDiyJ3B92lk
-         mno3YcS+dKwWhcN6wNvRCGF1DXdiHwmMhhz95TuqzsU15MQaAamC6nlJb4AUTvhx8s/i
-         W/9w==
-X-Gm-Message-State: AOAM533bkMhD6+YS7f+vy8BtFzHH+OPhR1HSG4eSibgKzHQ+n0w+GePn
-        slFZ4bqd5vRbAl1Qq3cCtRw=
-X-Google-Smtp-Source: ABdhPJy5W+FR+p+CNgIV3LW8a7Od3pp/DnDWnDDBXPp4BDrxfuoWUu4rO+7AE2F7IOmJaFkBWKRi5A==
-X-Received: by 2002:a5d:6389:0:b0:1ed:bc35:cda4 with SMTP id p9-20020a5d6389000000b001edbc35cda4mr6111841wru.350.1645791013841;
-        Fri, 25 Feb 2022 04:10:13 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id r2-20020a05600c35c200b00352cdcdd7b2sm16549826wmq.0.2022.02.25.04.10.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 25 Feb 2022 04:10:13 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <609de7ff-92e2-f96e-e6f5-127251f6e16d@redhat.com>
-Date:   Fri, 25 Feb 2022 13:10:12 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
+        with ESMTP id S231874AbiBYMVv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Feb 2022 07:21:51 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA1211C3D1A;
+        Fri, 25 Feb 2022 04:21:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Ftx1kSV4r3CUam/PHrvq9MjpPGBO7Q54mOdwu4QBLTk=; b=Pt1Tl/cBk6LZvFhL7qLcOBjF2z
+        pLX8hb1sWe06k+WAkjB3j3xntEJiVm8SERy1D3ph1bs73k0bHwEyKGHIxfZaTYnzlKu2sSIv9CU25
+        0YVEXiaxxEYq5YAt5y8nvqhB59FICgk+Wc8isP174DhxBiL9/HIhlc3Qxw4RJSN0hfkfDbYmmbSBS
+        L58hCJC5JVAUiumUBYiQqzb7G9AjD51CLdhx0MbU0VggOGCOScR3dKslRH8SsctrsAiJJhYabBJsO
+        w7WnZnrTWYHU3PZOCRKWfnwRJulk9phFvPSrJZUICwxrx02dNB84G2OYKE49zZoOUmnOrqzSoth7w
+        N1cs+Svg==;
+Received: from [2001:8b0:10b:1::3ae] (helo=u3832b3a9db3152.infradead.org)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nNZaj-005laW-6q; Fri, 25 Feb 2022 12:20:57 +0000
+Message-ID: <7086443d5e1e21d72a3d5c386c16f0c07d37a0a8.camel@infradead.org>
 Subject: Re: [PATCH] KVM: x86: Don't snapshot "max" TSC if host TSC is
  constant
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
 Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
@@ -66,63 +40,164 @@ Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         linux-kernel@vger.kernel.org,
         Suleiman Souhlal <suleiman@google.com>,
         Anton Romanov <romanton@google.com>
+Date:   Fri, 25 Feb 2022 12:20:56 +0000
+In-Reply-To: <609de7ff-92e2-f96e-e6f5-127251f6e16d@redhat.com>
 References: <20220225013929.3577699-1-seanjc@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220225013929.3577699-1-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
-        autolearn_force=no version=3.4.6
+         <609de7ff-92e2-f96e-e6f5-127251f6e16d@redhat.com>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-r+/xco7jnKFAhWbGj0EQ"
+User-Agent: Evolution 3.36.5-0ubuntu1 
+MIME-Version: 1.0
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/25/22 02:39, Sean Christopherson wrote:
-> Don't snapshot tsc_khz into max_tsc_khz during KVM initialization if the
-> host TSC is constant, in which case the actual TSC frequency will never
-> change and thus capturing the "max" TSC during initialization is
-> unnecessary, KVM can simply use tsc_khz during VM creation.
-> 
-> On CPUs with constant TSC, but not a hardware-specified TSC frequency,
-> snapshotting max_tsc_khz and using that to set a VM's default TSC
-> frequency can lead to KVM thinking it needs to manually scale the guest's
-> TSC if refining the TSC completes after KVM snapshots tsc_khz.  The
-> actual frequency never changes, only the kernel's calculation of what
-> that frequency is changes.  On systems without hardware TSC scaling, this
-> either puts KVM into "always catchup" mode (extremely inefficient), or
-> prevents creating VMs altogether.
-> 
-> Ideally, KVM would not be able to race with TSC refinement, or would have
-> a hook into tsc_refine_calibration_work() to get an alert when refinement
-> is complete.  Avoiding the race altogether isn't practical as refinement
-> takes a relative eternity; it's deliberately put on a work queue outside
-> of the normal boot sequence to avoid unnecessarily delaying boot.
-> 
-> Adding a hook is doable, but somewhat gross due to KVM's ability to be
-> built as a module.  And if the TSC is constant, which is likely the case
-> for every VMX/SVM-capable CPU produced in the last decade, the race can
-> be hit if and only if userspace is able to create a VM before TSC
-> refinement completes; refinement is slow, but not that slow.
-> 
-> For now, punt on a proper fix, as not taking a snapshot can help some
-> uses cases and not taking a snapshot is arguably correct irrespective of
-> the race with refinement.
-> 
-> Cc: Suleiman Souhlal <suleiman@google.com>
-> Cc: Anton Romanov <romanton@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-Queued, but I'd rather have a subject that calls out that max_tsc_khz 
-needs a replacement at vCPU creation time.  In fact, the real change 
-(and bug, and fix) is in kvm_arch_vcpu_create(), while the subject 
-mentions only the change in kvm_timer_init().
+--=-r+/xco7jnKFAhWbGj0EQ
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-What do you think of "KVM: x86: Use current rather than max TSC 
-frequency if it is constant"?
+On Fri, 2022-02-25 at 13:10 +0100, Paolo Bonzini wrote:
+>=20
+> Queued, but I'd rather have a subject that calls out that max_tsc_khz=20
+> needs a replacement at vCPU creation time.  In fact, the real change=20
+> (and bug, and fix) is in kvm_arch_vcpu_create(), while the subject=20
+> mentions only the change in kvm_timer_init().
 
-Pao
+In
+https://lore.kernel.org/kvm/e7be32b06676c7ebf415d9deea5faf50aa8c0785.camel@=
+infradead.org/T/
+last night I was coming round to the idea that we might want a KVM-wide=20
+default frequency which is settable from userspace and is used instead
+of max_tsc_khz anyway.
+
+I also have questions about the use case for the above patch.... if
+this is a clean boot and you're just starting to host guests, surely we
+can wait for the time it takes for the TSC synchronization to complete?
+
+And if this is a live update scenario, where we pause the guests, kexec
+into a new kernel, then resume the "migrated" guests again... why in
+$DEITY's name isn't the precise TSC frequency being handed over from
+kernel#1 to kernel#2 over the kexec so that it's known from the start?
+
+--=-r+/xco7jnKFAhWbGj0EQ
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIwMjI1MTIyMDU2WjAvBgkqhkiG9w0BCQQxIgQgjlIS6gxF
+teAfRYeOND/6oToh+kYyoSPVcTa5TIM9Ldkwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCV0721AAWmfBtc4+/UNnSVdO/jUS9aB4mO
+KL+ii1eiau1mclRtlgYqsQuoyNOXVymZFRosiXJsU1CId/qs1J99nCa8287MXhRczBAZaiwA80Km
+fy+ISE6ZtJEl8qIYG6qd55PHNaUoi+REEOvZ+xIbBF/R4JjbVSj41SaKCJLdc/PE+fKkRmrcsAWk
+XkkHHGijHMaiQnaz1mMFEgIYjxN4u0GTZOTF9iuQlVUWJ5iqWxaWFmvE30cD0qYbm8sr4wQmsN89
+OwxFUzo7ETZJElANhwR2ypBrZQa41RfOP2aQQPAv1kiN9FXTRxgN4O2dzPJ4S48k2/Y4pqvsCkZo
++kX0TYQ5M0EtrgwYXOmt/aRjsCi6srxKpTh+pGyyAH8q5ZAYB5B2iJC9Ob8Gg0YLthCulxkT2B1v
+9mossIyA0p9VSeAMmi5GE8AuPDB397vf79dqzFtEVzWkwdr0dXG0Ns/EwanIwqxj0slxKGT6srr+
+p8YUuQabXyL5npghmqOhJEXBvbpREju6DZTx6gs4m9+1ItPwHTRbtZzBqqJkeCiRfjh4wu5fzqrD
+tUZfGnS1Q8I+RftrPFO+DtFuaDQprS+pj9b84GMQPGqdCwNk4BfqSpzvz8z17iUjJE9HPCNDTqK6
+NPdBQ+UfpaozbrAMHHmQ1hns9wIgU6NU47g5goSXwQAAAAAAAA==
+
+
+--=-r+/xco7jnKFAhWbGj0EQ--
+
