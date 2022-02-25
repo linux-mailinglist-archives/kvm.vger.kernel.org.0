@@ -2,210 +2,476 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C1A94C4B91
-	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 18:01:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 518E94C4BE6
+	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 18:20:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243424AbiBYRAk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 12:00:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58746 "EHLO
+        id S243570AbiBYRU2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 12:20:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243225AbiBYRAi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Feb 2022 12:00:38 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B81591D529C;
-        Fri, 25 Feb 2022 09:00:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=GShWhJaDIDVMvbVdUPdxNafriM5wV3Zj7hmmN6XO+3Y=; b=UO0lWylllnOnJjQMlCj/cyNww3
-        jO+9WZsHmUEx74Z7f7tj/fMmCPgA+wmT8shE9QZEaGrRbntRlVbN60eO7Tr6y66aPE06jPgoLKPwZ
-        kufOusN8EyzmzYenIHmZ/7kOLycBszfVCpEqeOAZqyivpDAYQ1jIHEA1OE/mmWo5ur+lqhe4dc1D2
-        QQBu4DKHyTFjFb+YAXIovynrK/d1+e8VN6hhWcf8dj4tlrCbf6VvHS++EUEfDfJD8G9BnyfR2CtpD
-        +dZrGBLmRy5DzfR7ZtBcfz7XM1rcJA48a0AYYQDfP9QPNW620qe0X7tFUKTx4aNa1hOo9QqtI6lDY
-        r7dwAjtg==;
-Received: from [2001:8b0:10b:1::3ae] (helo=u3832b3a9db3152.ant.amazon.com)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nNdwm-005xah-7s; Fri, 25 Feb 2022 17:00:00 +0000
-Message-ID: <915ddc7327585bbe8587b91b8cd208520d684db1.camel@infradead.org>
-Subject: Re: [EXTERNAL] [PATCH v2] KVM: Don't actually set a request when
- evicting vCPUs for GFN cache invd
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "frankja@linux.ibm.com" <frankja@linux.ibm.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "imbrenda@linux.ibm.com" <imbrenda@linux.ibm.com>,
-        "david@redhat.com" <david@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Date:   Fri, 25 Feb 2022 16:59:59 +0000
-In-Reply-To: <YhkAJ+nw2lCzRxsg@google.com>
-References: <20220223165302.3205276-1-seanjc@google.com>
-         <2547e9675d855449bc5cc7efb97251d6286a377c.camel@amazon.co.uk>
-         <YhkAJ+nw2lCzRxsg@google.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-dD9wpp1DUw6iChWn27LV"
-User-Agent: Evolution 3.36.5-0ubuntu1 
+        with ESMTP id S238650AbiBYRU0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Feb 2022 12:20:26 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 95AAF1C2305
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 09:19:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645809592;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=0bdBwNSnrD7yysUHd564/dKTLnPvhau29Bt+Q9jstDU=;
+        b=V85Id0z+sUzDjl3Uqk8Q/uCgjKTMRDu6xWJq1IrIAfCSDOdbP/gwmBFTLkd29MDS1rAeij
+        MZ5AgeIszlOMSxeQRTeaxtkN+xpJtm+/jMP+amv83iNPRfkk8xSVw+ZPBhEyyJDH4hlmYc
+        p+2AtHxm7mRm50pBwjqGvgj6Fa1N14c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-538-I5C8UVqENE6b8OLJbAh-2A-1; Fri, 25 Feb 2022 12:19:49 -0500
+X-MC-Unique: I5C8UVqENE6b8OLJbAh-2A-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 02B27800425;
+        Fri, 25 Feb 2022 17:19:42 +0000 (UTC)
+Received: from starship (unknown [10.40.195.190])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9983F1073025;
+        Fri, 25 Feb 2022 17:19:33 +0000 (UTC)
+Message-ID: <0e9a22e90256ed289d90956f720f36d870c92d2a.camel@redhat.com>
+Subject: Re: [PATCH v6 7/9] KVM: VMX: enable IPI virtualization
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Zeng Guang <guang.zeng@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jethro Beekman <jethro@fortanix.com>,
+        Kai Huang <kai.huang@intel.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
+        Robert Hu <robert.hu@intel.com>, Gao Chao <chao.gao@intel.com>
+Date:   Fri, 25 Feb 2022 19:19:32 +0200
+In-Reply-To: <20220225082223.18288-8-guang.zeng@intel.com>
+References: <20220225082223.18288-1-guang.zeng@intel.com>
+         <20220225082223.18288-8-guang.zeng@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, 2022-02-25 at 16:22 +0800, Zeng Guang wrote:
+> From: Gao Chao <chao.gao@intel.com>
+> 
+> With IPI virtualization enabled, the processor emulates writes to
+> APIC registers that would send IPIs. The processor sets the bit
+> corresponding to the vector in target vCPU's PIR and may send a
+> notification (IPI) specified by NDST and NV fields in target vCPU's
+> Posted-Interrupt Descriptor (PID). It is similar to what IOMMU
+> engine does when dealing with posted interrupt from devices.
+> 
+> A PID-pointer table is used by the processor to locate the PID of a
+> vCPU with the vCPU's APIC ID.
+> 
+> Like VT-d PI, if a vCPU goes to blocked state, VMM needs to switch its
+> notification vector to wakeup vector. This can ensure that when an IPI
+> for blocked vCPUs arrives, VMM can get control and wake up blocked
+> vCPUs. And if a VCPU is preempted, its posted interrupt notification
+> is suppressed.
+> 
+> Note that IPI virtualization can only virualize physical-addressing,
+> flat mode, unicast IPIs. Sending other IPIs would still cause a
+> trap-like APIC-write VM-exit and need to be handled by VMM.
+> 
+> Signed-off-by: Gao Chao <chao.gao@intel.com>
+> Signed-off-by: Zeng Guang <guang.zeng@intel.com>
+> ---
+>  arch/x86/include/asm/vmx.h         |  8 ++++
+>  arch/x86/include/asm/vmxfeatures.h |  2 +
+>  arch/x86/kvm/vmx/capabilities.h    |  6 +++
+>  arch/x86/kvm/vmx/posted_intr.c     | 12 ++++-
+>  arch/x86/kvm/vmx/vmx.c             | 74 +++++++++++++++++++++++++++---
+>  arch/x86/kvm/vmx/vmx.h             |  3 ++
+>  6 files changed, 97 insertions(+), 8 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
+> index 8c929596a299..b79b6438acaa 100644
+> --- a/arch/x86/include/asm/vmx.h
+> +++ b/arch/x86/include/asm/vmx.h
+> @@ -76,6 +76,11 @@
+>  #define SECONDARY_EXEC_ENABLE_USR_WAIT_PAUSE	VMCS_CONTROL_BIT(USR_WAIT_PAUSE)
+>  #define SECONDARY_EXEC_BUS_LOCK_DETECTION	VMCS_CONTROL_BIT(BUS_LOCK_DETECTION)
+>  
+> +/*
+> + * Definitions of Tertiary Processor-Based VM-Execution Controls.
+> + */
+> +#define TERTIARY_EXEC_IPI_VIRT			VMCS_CONTROL_BIT(IPI_VIRT)
+> +
+>  #define PIN_BASED_EXT_INTR_MASK                 VMCS_CONTROL_BIT(INTR_EXITING)
+>  #define PIN_BASED_NMI_EXITING                   VMCS_CONTROL_BIT(NMI_EXITING)
+>  #define PIN_BASED_VIRTUAL_NMIS                  VMCS_CONTROL_BIT(VIRTUAL_NMIS)
+> @@ -159,6 +164,7 @@ static inline int vmx_misc_mseg_revid(u64 vmx_misc)
+>  enum vmcs_field {
+>  	VIRTUAL_PROCESSOR_ID            = 0x00000000,
+>  	POSTED_INTR_NV                  = 0x00000002,
+> +	LAST_PID_POINTER_INDEX		= 0x00000008,
+>  	GUEST_ES_SELECTOR               = 0x00000800,
+>  	GUEST_CS_SELECTOR               = 0x00000802,
+>  	GUEST_SS_SELECTOR               = 0x00000804,
+> @@ -224,6 +230,8 @@ enum vmcs_field {
+>  	TSC_MULTIPLIER_HIGH             = 0x00002033,
+>  	TERTIARY_VM_EXEC_CONTROL	= 0x00002034,
+>  	TERTIARY_VM_EXEC_CONTROL_HIGH	= 0x00002035,
+> +	PID_POINTER_TABLE		= 0x00002042,
+> +	PID_POINTER_TABLE_HIGH		= 0x00002043,
+>  	GUEST_PHYSICAL_ADDRESS          = 0x00002400,
+>  	GUEST_PHYSICAL_ADDRESS_HIGH     = 0x00002401,
+>  	VMCS_LINK_POINTER               = 0x00002800,
+> diff --git a/arch/x86/include/asm/vmxfeatures.h b/arch/x86/include/asm/vmxfeatures.h
+> index ff20776dc83b..7ce616af2db2 100644
+> --- a/arch/x86/include/asm/vmxfeatures.h
+> +++ b/arch/x86/include/asm/vmxfeatures.h
+> @@ -86,4 +86,6 @@
+>  #define VMX_FEATURE_ENCLV_EXITING	( 2*32+ 28) /* "" VM-Exit on ENCLV (leaf dependent) */
+>  #define VMX_FEATURE_BUS_LOCK_DETECTION	( 2*32+ 30) /* "" VM-Exit when bus lock caused */
+>  
+> +/* Tertiary Processor-Based VM-Execution Controls, word 3 */
+> +#define VMX_FEATURE_IPI_VIRT		(3*32 +  4) /* "" Enable IPI virtualization */
+>  #endif /* _ASM_X86_VMXFEATURES_H */
+> diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
+> index 31f3d88b3e4d..5f656c9e33be 100644
+> --- a/arch/x86/kvm/vmx/capabilities.h
+> +++ b/arch/x86/kvm/vmx/capabilities.h
+> @@ -13,6 +13,7 @@ extern bool __read_mostly enable_ept;
+>  extern bool __read_mostly enable_unrestricted_guest;
+>  extern bool __read_mostly enable_ept_ad_bits;
+>  extern bool __read_mostly enable_pml;
+> +extern bool __read_mostly enable_ipiv;
+>  extern int __read_mostly pt_mode;
+>  
+>  #define PT_MODE_SYSTEM		0
+> @@ -283,6 +284,11 @@ static inline bool cpu_has_vmx_apicv(void)
+>  		cpu_has_vmx_posted_intr();
+>  }
+>  
+> +static inline bool cpu_has_vmx_ipiv(void)
+> +{
+> +	return vmcs_config.cpu_based_3rd_exec_ctrl & TERTIARY_EXEC_IPI_VIRT;
+> +}
+> +
+>  static inline bool cpu_has_vmx_flexpriority(void)
+>  {
+>  	return cpu_has_vmx_tpr_shadow() &&
+> diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
+> index aa1fe9085d77..90124a30c074 100644
+> --- a/arch/x86/kvm/vmx/posted_intr.c
+> +++ b/arch/x86/kvm/vmx/posted_intr.c
+> @@ -177,11 +177,21 @@ static void pi_enable_wakeup_handler(struct kvm_vcpu *vcpu)
+>  	local_irq_restore(flags);
+>  }
+>  
+> +static bool vmx_can_use_ipiv_pi(struct kvm *kvm)
+> +{
+> +	return irqchip_in_kernel(kvm) && enable_ipiv;
+> +}
+> +
+> +static bool vmx_can_use_posted_interrupts(struct kvm *kvm)
+> +{
+> +	return vmx_can_use_ipiv_pi(kvm) || vmx_can_use_vtd_pi(kvm);
 
---=-dD9wpp1DUw6iChWn27LV
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, 2022-02-25 at 16:13 +0000, Sean Christopherson wrote:
-> On Fri, Feb 25, 2022, Woodhouse, David wrote:
-> > Since we need an active vCPU context to do dirty logging (thanks, dirty
-> > ring)... and since any time vcpu_run exits to userspace for any reason
-> > might be the last time we ever get an active vCPU context... I think
-> > that kind of fundamentally means that we must flush dirty state to the
-> > log on *every* return to userspace, doesn't it?
->=20
-> I would rather add a variant of mark_page_dirty_in_slot() that takes a vC=
-PU, which
-> we whould have in all cases.  I see no reason to require use of kvm_get_r=
-unning_vcpu().
-
-We already have kvm_vcpu_mark_page_dirty(), but it can't use just 'some
-vcpu' because the dirty ring is lockless. So if you're ever going to
-use anything other than kvm_get_running_vcpu() we need to add locks.
-
-And while we *could* do that, I don't think it would negate the
-fundamental observation that *any* time we return from vcpu_run to
-userspace, that could be the last time. Userspace might read the dirty
-log for the *last* time, and any internally-cached "oh, at some point
-we need to mark <this> page dirty" is lost because by the time the vCPU
-is finally destroyed, it's too late.
-
-I think I'm going to rip out the 'dirty' flag from the gfn_to_pfn_cache
-completely and add a function (to be called with an active vCPU
-context) which marks the page dirty *now*.
-
-KVM_GUEST_USES_PFN users like nested VMX will be expected to do this
-before returning from vcpu_run anytime it's in L2 guest mode.=20
-
---=-dD9wpp1DUw6iChWn27LV
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIwMjI1MTY1OTU5WjAvBgkqhkiG9w0BCQQxIgQg7IN0v+/o
-v9DM644IuzXWqCWzKw6ghGMaLzPGcspi2yYwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgB7kidNU4+XnCJKWSTq4ADzU/OhXXiX+Uh3
-qtodZMZJjlqYggHA94E58Ms5FLsgW8zXQLHQKWD/lbg2cPcTi0HJbPD7mPfSyS/Zb9wM4cTl8bLK
-VC1pL+hC+S+yxM7C3wXWh2cpqvDHybGmBEFkH3uZXPaMMOezqhjgpvZSFBj3mnsEQHc7MSkGzi30
-bmJy5TlOvl8CcbxGNb0bntbDLfb5zX9KdqWPj75SWp4LZRrqkgES8KjVwCyaRG8K6vHMgnTJeOr6
-ySobLW/3n90FC6l/PFWYgStPWk+wAjK1Qf8F0qsBQkk9SDZHha0UO6VerKNsRFCO4JgpMQIV1EG7
-kn9j8MDmShdKOl1hexc+hLBQ1A/tKQMLZaQpA5q/6I9GhhfZMLnYiQgTYgD51Tmh6mHojzLlrZ1m
-9Eyo39/Y88v5nqkJaXYdH5VdWgLXoraGKpRA4W9j098AJNKuTVZXtCwmkPHtHz0IF4T0WM+bvbcA
-vACBcft1C7MJV5Dfm60jOBhXxj7T4mV9hIdJbY2cfHbMSFqUfMYtU1qyvfuLNWYcHrlEbcxmD5AC
-XlR1WaL/mUKXlMfFI310kouigPzVGi97Nu1Qx1YjUiUrOvTM8XI7UR0s4QzWan13iebp8GzBxrxi
-V7rbxLsrZtzNeD6xD+Q5itBamun8V2APtRvCc4aoswAAAAAAAA==
+It took me a while to figure that out.
+ 
+vmx_can_use_vtd_pi returns true when the VM can be targeted by posted
+interrupts from the IOMMU, which leads to
+ 
+1. update of the NV vector and SN bit on vcpu_load/vcpu_put to let
+IOMMU knows where the vCPU really runs.
+ 
+2. in vmx_pi_update_irte to configure the posted interrupts.
+ 
+ 
+Now IPIv will also use the same NV vector and SN bit for IPI virtualization,
+thus they have to be kept up to date on vcpu load/put.
+ 
+I would appreciate a comment about this in vmx_can_use_posted_interrupts
+because posted interrupts can mean too many things, like a host->guest
+posted interrupt which is sent by just interrupt.
+ 
+Maybe also rename the function to something like
+ 
+vmx_need_up_to_date_nv_sn(). Sounds silly to me so
+maybe something else.
 
 
---=-dD9wpp1DUw6iChWn27LV--
+> +}
+> +
+>  void vmx_vcpu_pi_put(struct kvm_vcpu *vcpu)
+>  {
+>  	struct pi_desc *pi_desc = vcpu_to_pi_desc(vcpu);
+>  
+> -	if (!vmx_can_use_vtd_pi(vcpu->kvm))
+> +	if (!vmx_can_use_posted_interrupts(vcpu->kvm))
+I see here it is used.
+>  		return;
+>  
+>  	if (kvm_vcpu_is_blocking(vcpu) && !vmx_interrupt_blocked(vcpu))
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 7beba7a9f247..0cb141c277ef 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -105,6 +105,9 @@ module_param(fasteoi, bool, S_IRUGO);
+>  
+>  module_param(enable_apicv, bool, S_IRUGO);
+>  
+> +bool __read_mostly enable_ipiv = true;
+> +module_param(enable_ipiv, bool, 0444);
+> +
+>  /*
+>   * If nested=1, nested virtualization is supported, i.e., guests may use
+>   * VMX and be a hypervisor for its own guests. If nested=0, guests may not
+> @@ -227,6 +230,11 @@ static const struct {
+>  };
+>  
+>  #define L1D_CACHE_ORDER 4
+> +
+> +/* PID(Posted-Interrupt Descriptor)-pointer table entry is 64-bit long */
+> +#define MAX_PID_TABLE_ORDER get_order(KVM_MAX_VCPU_IDS * sizeof(u64))
+> +#define PID_TABLE_ENTRY_VALID 1
+> +
+>  static void *vmx_l1d_flush_pages;
+>  
+>  static int vmx_setup_l1d_flush(enum vmx_l1d_flush_state l1tf)
+> @@ -2543,7 +2551,7 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+>  	}
+>  
+>  	if (_cpu_based_exec_control & CPU_BASED_ACTIVATE_TERTIARY_CONTROLS) {
+> -		u64 opt3 = 0;
+> +		u64 opt3 = TERTIARY_EXEC_IPI_VIRT;
+>  		u64 min3 = 0;
+>  
+>  		if (adjust_vmx_controls_64(min3, opt3,
+> @@ -3898,6 +3906,8 @@ static void vmx_update_msr_bitmap_x2apic(struct kvm_vcpu *vcpu)
+>  		vmx_enable_intercept_for_msr(vcpu, X2APIC_MSR(APIC_TMCCT), MSR_TYPE_RW);
+>  		vmx_disable_intercept_for_msr(vcpu, X2APIC_MSR(APIC_EOI), MSR_TYPE_W);
+>  		vmx_disable_intercept_for_msr(vcpu, X2APIC_MSR(APIC_SELF_IPI), MSR_TYPE_W);
+> +		if (enable_ipiv)
+> +			vmx_disable_intercept_for_msr(vcpu, X2APIC_MSR(APIC_ICR),MSR_TYPE_RW);
+>  	}
+>  }
+>  
+> @@ -4219,14 +4229,21 @@ static void vmx_refresh_apicv_exec_ctrl(struct kvm_vcpu *vcpu)
+>  
+>  	pin_controls_set(vmx, vmx_pin_based_exec_ctrl(vmx));
+>  	if (cpu_has_secondary_exec_ctrls()) {
+> -		if (kvm_vcpu_apicv_active(vcpu))
+> +		if (kvm_vcpu_apicv_active(vcpu)) {
+>  			secondary_exec_controls_setbit(vmx,
+>  				      SECONDARY_EXEC_APIC_REGISTER_VIRT |
+>  				      SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY);
+> -		else
+> +			if (cpu_has_tertiary_exec_ctrls() && enable_ipiv)
+> +				tertiary_exec_controls_setbit(vmx,
+> +						TERTIARY_EXEC_IPI_VIRT);
+> +		} else {
+>  			secondary_exec_controls_clearbit(vmx,
+>  					SECONDARY_EXEC_APIC_REGISTER_VIRT |
+>  					SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY);
+> +			if (cpu_has_tertiary_exec_ctrls())
+> +				tertiary_exec_controls_clearbit(vmx,
+> +						TERTIARY_EXEC_IPI_VIRT);
+> +		}
+
+Why check for cpu_has_tertiary_exec_ctrls()? wouldn't it be always true
+(enable_ipiv has to be turned to false if CPU doesn't support IPIv,
+and if it does it will support tertiary exec controls).
+
+I don't mind this as a precaution + consistency with other code.
+
+
+>  	}
+>  
+>  	vmx_update_msr_bitmap_x2apic(vcpu);
+> @@ -4260,7 +4277,16 @@ static u32 vmx_exec_control(struct vcpu_vmx *vmx)
+>  
+>  static u64 vmx_tertiary_exec_control(struct vcpu_vmx *vmx)
+>  {
+> -	return vmcs_config.cpu_based_3rd_exec_ctrl;
+> +	u64 exec_control = vmcs_config.cpu_based_3rd_exec_ctrl;
+> +
+> +	/*
+> +	 * IPI virtualization relies on APICv. Disable IPI
+> +	 * virtualization if APICv is inhibited.
+> +	 */
+> +	if (!enable_ipiv || !kvm_vcpu_apicv_active(&vmx->vcpu))
+> +		exec_control &= ~TERTIARY_EXEC_IPI_VIRT;
+
+I am not 100% sure, but kvm_vcpu_apicv_active might not be the
+best thing to check here, as it reflects per-cpu dynamic APICv inhibit.
+
+It probably works, but it might be better to use enable_apicv
+here and rely on normal APICv inhibit, and there inibit IPIv  as well
+as you do in vmx_refresh_apicv_exec_ctrl/
+
+
+
+> +
+> +	return exec_control;
+>  }
+>  
+>  /*
+> @@ -4412,6 +4438,9 @@ static u32 vmx_secondary_exec_control(struct vcpu_vmx *vmx)
+>  
+>  static void init_vmcs(struct vcpu_vmx *vmx)
+>  {
+> +	struct kvm_vcpu *vcpu = &vmx->vcpu;
+> +	struct kvm_vmx *kvm_vmx = to_kvm_vmx(vcpu->kvm);
+> +
+>  	if (nested)
+>  		nested_vmx_set_vmcs_shadowing_bitmap();
+>  
+> @@ -4431,7 +4460,7 @@ static void init_vmcs(struct vcpu_vmx *vmx)
+>  	if (cpu_has_tertiary_exec_ctrls())
+>  		tertiary_exec_controls_set(vmx, vmx_tertiary_exec_control(vmx));
+>  
+> -	if (kvm_vcpu_apicv_active(&vmx->vcpu)) {
+> +	if (kvm_vcpu_apicv_active(vcpu)) {
+
+here too (pre-existing), I also not 100% sure that kvm_vcpu_apicv_active
+should be used. I haven't studied APICv code that much to be 100% sure.
+
+
+>  		vmcs_write64(EOI_EXIT_BITMAP0, 0);
+>  		vmcs_write64(EOI_EXIT_BITMAP1, 0);
+>  		vmcs_write64(EOI_EXIT_BITMAP2, 0);
+> @@ -4441,6 +4470,13 @@ static void init_vmcs(struct vcpu_vmx *vmx)
+>  
+>  		vmcs_write16(POSTED_INTR_NV, POSTED_INTR_VECTOR);
+>  		vmcs_write64(POSTED_INTR_DESC_ADDR, __pa((&vmx->pi_desc)));
+> +
+> +		if (enable_ipiv) {
+> +			WRITE_ONCE(kvm_vmx->pid_table[vcpu->vcpu_id],
+> +				__pa(&vmx->pi_desc) | PID_TABLE_ENTRY_VALID);
+> +			vmcs_write64(PID_POINTER_TABLE, __pa(kvm_vmx->pid_table));
+> +			vmcs_write16(LAST_PID_POINTER_INDEX, kvm_vmx->pid_last_index);
+> +		}
+>  	}
+>  
+>  	if (!kvm_pause_in_guest(vmx->vcpu.kvm)) {
+> @@ -4492,7 +4528,7 @@ static void init_vmcs(struct vcpu_vmx *vmx)
+>  		vmcs_write16(GUEST_PML_INDEX, PML_ENTITY_NUM - 1);
+>  	}
+>  
+> -	vmx_write_encls_bitmap(&vmx->vcpu, NULL);
+> +	vmx_write_encls_bitmap(vcpu, NULL);
+
+I might have separated the refactoring of using vcpu instead of &vmx->vcpu
+in a separate patch, but I don't mind that that much.
+
+>  
+>  	if (vmx_pt_mode_is_host_guest()) {
+>  		memset(&vmx->pt_desc, 0, sizeof(vmx->pt_desc));
+> @@ -4508,7 +4544,7 @@ static void init_vmcs(struct vcpu_vmx *vmx)
+>  
+>  	if (cpu_has_vmx_tpr_shadow()) {
+>  		vmcs_write64(VIRTUAL_APIC_PAGE_ADDR, 0);
+> -		if (cpu_need_tpr_shadow(&vmx->vcpu))
+> +		if (cpu_need_tpr_shadow(vcpu))
+>  			vmcs_write64(VIRTUAL_APIC_PAGE_ADDR,
+>  				     __pa(vmx->vcpu.arch.apic->regs));
+>  		vmcs_write32(TPR_THRESHOLD, 0);
+> @@ -7165,6 +7201,18 @@ static int vmx_vm_init(struct kvm *kvm)
+>  			break;
+>  		}
+>  	}
+> +
+> +	if (enable_ipiv) {
+> +		struct page *pages;
+> +
+> +		pages = alloc_pages(GFP_KERNEL | __GFP_ZERO, MAX_PID_TABLE_ORDER);
+> +		if (!pages)
+> +			return -ENOMEM;
+> +
+> +		to_kvm_vmx(kvm)->pid_table = (void *)page_address(pages);
+> +		to_kvm_vmx(kvm)->pid_last_index = KVM_MAX_VCPU_IDS - 1;
+> +	}
+> +
+>  	return 0;
+>  }
+>  
+> @@ -7756,6 +7804,14 @@ static bool vmx_check_apicv_inhibit_reasons(ulong bit)
+>  	return supported & BIT(bit);
+>  }
+>  
+> +static void vmx_vm_destroy(struct kvm *kvm)
+> +{
+> +	struct kvm_vmx *kvm_vmx = to_kvm_vmx(kvm);
+> +
+> +	if (kvm_vmx->pid_table)
+> +		free_pages((unsigned long)kvm_vmx->pid_table, MAX_PID_TABLE_ORDER);
+
+Maybe add a warning checking that ipiv was actually enabled.
+Maybe this is overkill.
+
+
+> +}
+> +
+>  static struct kvm_x86_ops vmx_x86_ops __initdata = {
+>  	.name = "kvm_intel",
+>  
+> @@ -7768,6 +7824,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
+>  
+>  	.vm_size = sizeof(struct kvm_vmx),
+>  	.vm_init = vmx_vm_init,
+> +	.vm_destroy = vmx_vm_destroy,
+>  
+>  	.vcpu_create = vmx_create_vcpu,
+>  	.vcpu_free = vmx_free_vcpu,
+> @@ -8022,6 +8079,9 @@ static __init int hardware_setup(void)
+>  	if (!enable_apicv)
+>  		vmx_x86_ops.sync_pir_to_irr = NULL;
+>  
+> +	if (!enable_apicv || !cpu_has_vmx_ipiv())
+> +		enable_ipiv = false;
+> +
+>  	if (cpu_has_vmx_tsc_scaling()) {
+>  		kvm_has_tsc_control = true;
+>  		kvm_max_tsc_scaling_ratio = KVM_VMX_TSC_MULTIPLIER_MAX;
+> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+> index d4a647d3ed4a..e7b0c00c9d43 100644
+> --- a/arch/x86/kvm/vmx/vmx.h
+> +++ b/arch/x86/kvm/vmx/vmx.h
+> @@ -365,6 +365,9 @@ struct kvm_vmx {
+>  	unsigned int tss_addr;
+>  	bool ept_identity_pagetable_done;
+>  	gpa_t ept_identity_map_addr;
+> +	/* PID table for IPI virtualization */
+> +	u64 *pid_table;
+> +	u16 pid_last_index;
+>  };
+>  
+>  bool nested_vmx_allowed(struct kvm_vcpu *vcpu);
+
+
+I might have missed something, but overall looks good.
+
+Best regards,
+	Maxim Levitsky
 
