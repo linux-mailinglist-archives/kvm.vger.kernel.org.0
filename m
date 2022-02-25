@@ -2,69 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2CD854C41E3
-	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 11:00:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A25674C424B
+	for <lists+kvm@lfdr.de>; Fri, 25 Feb 2022 11:28:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239084AbiBYKAA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 05:00:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58730 "EHLO
+        id S239506AbiBYK2i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 05:28:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38628 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239288AbiBYJ76 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Feb 2022 04:59:58 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6226E195323
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 01:59:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645783166;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cyh9GNwkSeiWX8VVWJet6cmrStrv1Y1BhHYKMAKCy08=;
-        b=WGq8M13NbjCpWC6Op/MaW4uiFq+u225fpBJ8hYFCkkXcyfrC9bnxjoBGkuJf1J+Wy2X/W0
-        /XWtdhodiPX8mtz9jE20PGvraOy35Z64JwffkV66EEnYy94fWl1syXXk4YRrJ9AeXouGWT
-        hE0a5xagsK1+Ki8bkJijCRVglYH3QA8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-516-0ZyelL3mM5-L5JHtWGBSmQ-1; Fri, 25 Feb 2022 04:59:25 -0500
-X-MC-Unique: 0ZyelL3mM5-L5JHtWGBSmQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BD899FC81;
-        Fri, 25 Feb 2022 09:59:23 +0000 (UTC)
-Received: from avogadro.lan (unknown [10.39.193.11])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3D2F27B6C5;
-        Fri, 25 Feb 2022 09:59:20 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Like Xu <like.xu.linux@gmail.com>
-Subject: Re: [PATCH] KVM: x86: Reacquire kvm->srcu in vcpu_run() if exiting on pending signal
-Date:   Fri, 25 Feb 2022 10:59:07 +0100
-Message-Id: <20220225095907.478995-4-pbonzini@redhat.com>
-In-Reply-To: 20220224190609.3464071-1-seanjc@google.com
-References: 
+        with ESMTP id S239492AbiBYK2g (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Feb 2022 05:28:36 -0500
+Received: from bhuna.collabora.co.uk (bhuna.collabora.co.uk [IPv6:2a00:1098:0:82:1000:25:2eeb:e3e3])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B11CB673F7;
+        Fri, 25 Feb 2022 02:27:43 -0800 (PST)
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+        (Authenticated sender: usama.anjum)
+        with ESMTPSA id 26B9E1F45BB1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+        s=mail; t=1645784862;
+        bh=wzxS9IYpPZYXwEBTYdvdnNqibFpihz4xflY5zMogAxw=;
+        h=From:To:Cc:Subject:Date:From;
+        b=VKWuyAqhuFnGiCvci1gV4hdzLXUNYnEG29UDYAHHmMJUGf/VplyVlC6hio64RgXVh
+         c2vi5rRzT/sNiMmNbJ034SbUkSMbPuEOnTGfQjiOIrZ6bEMjWFPHyeVb68a8KAgqY1
+         6sTseP/esTX73pONhiZ598BQM+oOpeBQhQUBslcCnDapx5P0ZCxzanByG3F4yKZ3No
+         o+aGuGXtQGthl8O9IbGliDLuIvtmuUgFs4sY04n45g853JvuqO6U5I3unNGVN9HaJA
+         zy9xWkWx3Js2KymGJvDXPGwGqUGio+a2jPy4qdhqmZGGeACNiS90wdd7Z5H4hu/gn+
+         77OEgtfUlcILQ==
+From:   Muhammad Usama Anjum <usama.anjum@collabora.com>
+To:     Shuah Khan <shuah@kernel.org>,
+        Eric Biederman <ebiederm@xmission.com>,
+        Kees Cook <keescook@chromium.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>
+Cc:     Muhammad Usama Anjum <usama.anjum@collabora.com>,
+        kernel@collabora.com, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org
+Subject: [PATCH] kselftest: add generated objects to .gitignore
+Date:   Fri, 25 Feb 2022 15:27:25 +0500
+Message-Id: <20220225102726.3231228-1-usama.anjum@collabora.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Queued, thanks.
+Add kselftests_install directory and some other files to the
+.gitignore.
 
-Paolo
+Signed-off-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
+---
+ tools/testing/selftests/.gitignore      | 1 +
+ tools/testing/selftests/exec/.gitignore | 2 ++
+ tools/testing/selftests/kvm/.gitignore  | 1 +
+ tools/testing/selftests/net/.gitignore  | 1 +
+ 4 files changed, 5 insertions(+)
 
+diff --git a/tools/testing/selftests/.gitignore b/tools/testing/selftests/.gitignore
+index 055a5019b13c..cb24124ac5b9 100644
+--- a/tools/testing/selftests/.gitignore
++++ b/tools/testing/selftests/.gitignore
+@@ -3,6 +3,7 @@ gpiogpio-event-mon
+ gpiogpio-hammer
+ gpioinclude/
+ gpiolsgpio
++kselftest_install/
+ tpm2/SpaceTest.log
+ 
+ # Python bytecode and cache
+diff --git a/tools/testing/selftests/exec/.gitignore b/tools/testing/selftests/exec/.gitignore
+index 9e2f00343f15..2f715782b076 100644
+--- a/tools/testing/selftests/exec/.gitignore
++++ b/tools/testing/selftests/exec/.gitignore
+@@ -12,3 +12,5 @@ execveat.denatured
+ xxxxxxxx*
+ pipe
+ S_I*.test
++non-regular
++null-argv
+diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+index 7903580a48ac..4d11adeac214 100644
+--- a/tools/testing/selftests/kvm/.gitignore
++++ b/tools/testing/selftests/kvm/.gitignore
+@@ -21,6 +21,7 @@
+ /x86_64/hyperv_clock
+ /x86_64/hyperv_cpuid
+ /x86_64/hyperv_features
++/x86_64/hyperv_svm_test
+ /x86_64/mmio_warning_test
+ /x86_64/mmu_role_test
+ /x86_64/platform_info_test
+diff --git a/tools/testing/selftests/net/.gitignore b/tools/testing/selftests/net/.gitignore
+index 21a411b04890..c3a6dc45eff4 100644
+--- a/tools/testing/selftests/net/.gitignore
++++ b/tools/testing/selftests/net/.gitignore
+@@ -36,3 +36,4 @@ gro
+ ioam6_parser
+ toeplitz
+ cmsg_sender
++cmsg_so_mark
+-- 
+2.30.2
 
