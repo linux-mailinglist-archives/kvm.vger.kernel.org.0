@@ -2,58 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 63EE34C52A9
-	for <lists+kvm@lfdr.de>; Sat, 26 Feb 2022 01:19:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8EF1E4C52A5
+	for <lists+kvm@lfdr.de>; Sat, 26 Feb 2022 01:19:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240488AbiBZATt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 19:19:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50470 "EHLO
+        id S241023AbiBZASc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 19:18:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50488 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241200AbiBZARw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S241261AbiBZARw (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 25 Feb 2022 19:17:52 -0500
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E03322D663
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 16:16:45 -0800 (PST)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-2d7b96d74f8so46356667b3.16
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 16:16:45 -0800 (PST)
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AB9322D66E
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 16:16:47 -0800 (PST)
+Received: by mail-pj1-x1049.google.com with SMTP id j10-20020a17090a7e8a00b001bbef243093so6486396pjl.1
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 16:16:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=8vGylyelB/7s2Iu/cezFfDz4H+G0SXAJDoFtwhKJJ28=;
-        b=dlXNILOL0RcgYaj/SOWVb/B+cFvaL+/RGu/bd2ecjAYaKJn1zHuPEJbHsfwU502SK2
-         +FPPiaiOVMxsUIrbOJ+sFuFZQplYzNHew/+TexiqluBvFAtJm5BOdpx6Dyf6PLamreU+
-         hNU6CzIJO6mRakhEXLnBbgxZvH297CHWiYPQxLFgrjRHVwdn3KMGXQbJE9fY5v2rlaPS
-         xCQ3NSaXqx4Lj0B3QRVeXDEfNXLnUlDVvWk7kzFqOVIAbjhdCXNeMCJrNwKFT6My9RFG
-         v+b9azLwXSHba017DB8cTjbwtzh12saWyoLZoBJXmekNmr6CKoNAi8Z/xXgdovpR015D
-         alzw==
+        bh=MilK8zUZX7tWJl2GgjJY8oNeKvoyoiy4aBCti+o2Dno=;
+        b=azOeWuW+lWy8w8HIL49LW9KhszQbW+YNWD8IHPgIc79FX9F9n3TXODYKi2HAmjESdo
+         HOXPis4YQybgWPgSa31snGdX4dlIAVkB9Yva2qwEEiqK/z6DI1r5iw8PVKGyV8sZFp26
+         NKY9hJKEKL7NHbwOIm4FOe+6io3nDecTa17lwWjUGSyRR08BEvTKr9V1c2u071oaOFZD
+         bC+F2p0SAaU18Xfrju7A1ThpQzKfyc7V0pHszBilaXsXz+TjfNJ1ZPCi7/KX24B4qLX4
+         v6o/Zqfmx6jE5Ve7LSoUfC4V2CUgRoY05MqIfyWwuNZzJn1fAx39O7gmmUpXmE+sUR+h
+         8GNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=8vGylyelB/7s2Iu/cezFfDz4H+G0SXAJDoFtwhKJJ28=;
-        b=dm8sNCxKpwdSFgLhZekXhdNW/jT/JpT57FMMRTjUM1hQnkMqUFPrM8WywBk7kFBTYh
-         fIiki/vESDKl0VSDTVJMnbP6c5r5EFLTdq0NBLznJde+xiozlyGVrlFiiMw7mYyxnwBz
-         +VsX8g0GlF8tI6w5DxHbx7CR4NJA8cQaYOIBd3/IH5u7FBq3624IeMzLhvBpIbDTQSWV
-         AAQlffOHB60s+RHn75t3s4hKKqTIgjGvnAnysK94fV6Orbwftbh8/Y4Elz32O9cmmxN5
-         De00UOGsWbitiZI5W4di3L0aXXZN4+BBFK4CtMM3hTpR7BfUA0O3drjg51t/zKGPZRyb
-         Gs6Q==
-X-Gm-Message-State: AOAM5310J17cXWEUrDGBaH1TwZh/IiGIRr6Wd64bVNzZ1GtMFlse11P+
-        rn6Tp3mGHSOkVOP/zl5v0c4BPfxw26U=
-X-Google-Smtp-Source: ABdhPJwwopT5Z1DLLtP8f3p7Bz63Hhro6EnAkKtt/I4Q68E+irs1imu/xJTXCCS7diEoreI04+8r4bs7KM4=
+        bh=MilK8zUZX7tWJl2GgjJY8oNeKvoyoiy4aBCti+o2Dno=;
+        b=3RmpNa23gjcp3Gn0EedVTg5irltowhTFHfbteSIoUsW+vfEI64FZrk+awqq5/SF6k8
+         K1dORsboOHk0wer9X7jhNe4PwJcF3M4JC73FRMS6Hq2ZffT8JE13CGYTEpGNnB2SfZj9
+         PuqOJHE8k/voN9cO6ZX/xRsmTtGC9Ek3pTDrG6LDegzYVCdtWLjIqy8Tbp59REPFiozT
+         186TnSuAulUJxm6YXmumQFAMBZFUKJgunrGJB0JTrwqC4deerRuco8Vwz6GeYj7KpCqJ
+         m1uRwJlZwYHGZdc3dn/Qulxy+oWrTnezYOuB68/UrUOVjZwA8X9w1VRZxgZOnPNBGPhr
+         KTuw==
+X-Gm-Message-State: AOAM530q50Z6abKKOxOJWGC0geQJM73uQwcjOKQ9VEbw3ibjst36+f6p
+        wDxJA8R81YPIK7gzREKeGQP0u3aLFfU=
+X-Google-Smtp-Source: ABdhPJwQC0seS+f5AjDyQB4suBW4N+vPljL91EEY6uoAI/tRdabfBdxDkAHZXw+1PFBpgG1HwP5YTKG451I=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a25:e014:0:b0:619:a368:c3b5 with SMTP id
- x20-20020a25e014000000b00619a368c3b5mr9542866ybg.383.1645834596968; Fri, 25
- Feb 2022 16:16:36 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a65:5bcc:0:b0:378:4b73:4fe9 with SMTP id
+ o12-20020a655bcc000000b003784b734fe9mr2939194pgr.533.1645834598449; Fri, 25
+ Feb 2022 16:16:38 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Sat, 26 Feb 2022 00:15:39 +0000
+Date:   Sat, 26 Feb 2022 00:15:40 +0000
 In-Reply-To: <20220226001546.360188-1-seanjc@google.com>
-Message-Id: <20220226001546.360188-22-seanjc@google.com>
+Message-Id: <20220226001546.360188-23-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220226001546.360188-1-seanjc@google.com>
 X-Mailer: git-send-email 2.35.1.574.g5d30c73bfb-goog
-Subject: [PATCH v3 21/28] KVM: x86/mmu: Zap roots in two passes to avoid
- inducing RCU stalls
+Subject: [PATCH v3 22/28] KVM: x86/mmu: Zap defunct roots via asynchronous worker
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Christian Borntraeger <borntraeger@linux.ibm.com>,
@@ -72,149 +71,144 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When zapping a TDP MMU root, perform the zap in two passes to avoid
-zapping an entire top-level SPTE while holding RCU, which can induce RCU
-stalls.  In the first pass, zap SPTEs at PG_LEVEL_1G, and then
-zap top-level entries in the second pass.
+Zap defunct roots, a.k.a. roots that have been invalidated after their
+last reference was initially dropped, asynchronously via the system work
+queue instead of forcing the work upon the unfortunate task that happened
+to drop the last reference.
 
-With 4-level paging, zapping a PGD that is fully populated with 4kb leaf
-SPTEs take up to ~7 or so seconds (time varies based on kernel config,
-number of (v)CPUs, etc...).  With 5-level paging, that time can balloon
-well into hundreds of seconds.
+If a vCPU task drops the last reference, the vCPU is effectively blocked
+by the host for the entire duration of the zap.  If the root being zapped
+happens be fully populated with 4kb leaf SPTEs, e.g. due to dirty logging
+being active, the zap can take several hundred seconds.  Unsurprisingly,
+most guests are unhappy if a vCPU disappears for hundreds of seconds.
 
-Before remote TLB flushes were omitted, the problem was even worse as
-waiting for all active vCPUs to respond to the IPI introduced significant
-overhead for VMs with large numbers of vCPUs.
+E.g. running a synthetic selftest that triggers a vCPU root zap with
+~64tb of guest memory and 4kb SPTEs blocks the vCPU for 900+ seconds.
+Offloading the zap to a worker drops the block time to <100ms.
 
-By zapping 1gb SPTEs (both shadow pages and hugepages) in the first pass,
-the amount of work that is done without dropping RCU protection is
-strictly bounded, with the worst case latency for a single operation
-being less than 100ms.
-
-Zapping at 1gb in the first pass is not arbitrary.  First and foremost,
-KVM relies on being able to zap 1gb shadow pages in a single shot when
-when repacing a shadow page with a hugepage.  Zapping a 1gb shadow page
-that is fully populated with 4kb dirty SPTEs also triggers the worst case
-latency due writing back the struct page accessed/dirty bits for each 4kb
-page, i.e. the two-pass approach is guaranteed to work so long as KVM can
-cleany zap a 1gb shadow page.
-
-  rcu: INFO: rcu_sched self-detected stall on CPU
-  rcu:     52-....: (20999 ticks this GP) idle=7be/1/0x4000000000000000
-                                          softirq=15759/15759 fqs=5058
-   (t=21016 jiffies g=66453 q=238577)
-  NMI backtrace for cpu 52
-  Call Trace:
-   ...
-   mark_page_accessed+0x266/0x2f0
-   kvm_set_pfn_accessed+0x31/0x40
-   handle_removed_tdp_mmu_page+0x259/0x2e0
-   __handle_changed_spte+0x223/0x2c0
-   handle_removed_tdp_mmu_page+0x1c1/0x2e0
-   __handle_changed_spte+0x223/0x2c0
-   handle_removed_tdp_mmu_page+0x1c1/0x2e0
-   __handle_changed_spte+0x223/0x2c0
-   zap_gfn_range+0x141/0x3b0
-   kvm_tdp_mmu_zap_invalidated_roots+0xc8/0x130
-   kvm_mmu_zap_all_fast+0x121/0x190
-   kvm_mmu_invalidate_zap_pages_in_memslot+0xe/0x10
-   kvm_page_track_flush_slot+0x5c/0x80
-   kvm_arch_flush_shadow_memslot+0xe/0x10
-   kvm_set_memslot+0x172/0x4e0
-   __kvm_set_memory_region+0x337/0x590
-   kvm_vm_ioctl+0x49c/0xf80
-
-Reported-by: David Matlack <dmatlack@google.com>
-Cc: Ben Gardon <bgardon@google.com>
-Cc: Mingwei Zhang <mizhang@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/mmu/tdp_mmu.c | 51 +++++++++++++++++++++++++-------------
- 1 file changed, 34 insertions(+), 17 deletions(-)
+ arch/x86/kvm/mmu/mmu_internal.h |  8 +++-
+ arch/x86/kvm/mmu/tdp_mmu.c      | 65 ++++++++++++++++++++++++++++-----
+ 2 files changed, 63 insertions(+), 10 deletions(-)
 
+diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+index be063b6c91b7..1bff453f7cbe 100644
+--- a/arch/x86/kvm/mmu/mmu_internal.h
++++ b/arch/x86/kvm/mmu/mmu_internal.h
+@@ -65,7 +65,13 @@ struct kvm_mmu_page {
+ 		struct kvm_rmap_head parent_ptes; /* rmap pointers to parent sptes */
+ 		tdp_ptep_t ptep;
+ 	};
+-	DECLARE_BITMAP(unsync_child_bitmap, 512);
++	union {
++		DECLARE_BITMAP(unsync_child_bitmap, 512);
++		struct {
++			struct work_struct tdp_mmu_async_work;
++			void *tdp_mmu_async_data;
++		};
++	};
+ 
+ 	struct list_head lpage_disallowed_link;
+ #ifdef CONFIG_X86_32
 diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index b838cfa984ad..ec28a88c6376 100644
+index ec28a88c6376..4151e61245a7 100644
 --- a/arch/x86/kvm/mmu/tdp_mmu.c
 +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -802,14 +802,36 @@ static inline gfn_t tdp_mmu_max_gfn_host(void)
- 	return 1ULL << (shadow_phys_bits - PAGE_SHIFT);
- }
+@@ -81,6 +81,38 @@ static void tdp_mmu_free_sp_rcu_callback(struct rcu_head *head)
+ static void tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
+ 			     bool shared);
  
--static void tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
--			     bool shared)
-+static void __tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
-+			       bool shared, int zap_level)
- {
- 	struct tdp_iter iter;
- 
- 	gfn_t end = tdp_mmu_max_gfn_host();
- 	gfn_t start = 0;
- 
-+	for_each_tdp_pte_min_level(iter, root, zap_level, start, end) {
-+retry:
-+		if (tdp_mmu_iter_cond_resched(kvm, &iter, false, shared))
-+			continue;
++static void tdp_mmu_zap_root_async(struct work_struct *work)
++{
++	struct kvm_mmu_page *root = container_of(work, struct kvm_mmu_page,
++						 tdp_mmu_async_work);
++	struct kvm *kvm = root->tdp_mmu_async_data;
 +
-+		if (!is_shadow_present_pte(iter.old_spte))
-+			continue;
++	read_lock(&kvm->mmu_lock);
 +
-+		if (iter.level > zap_level)
-+			continue;
++	/*
++	 * A TLB flush is not necessary as KVM performs a local TLB flush when
++	 * allocating a new root (see kvm_mmu_load()), and when migrating vCPU
++	 * to a different pCPU.  Note, the local TLB flush on reuse also
++	 * invalidates any paging-structure-cache entries, i.e. TLB entries for
++	 * intermediate paging structures, that may be zapped, as such entries
++	 * are associated with the ASID on both VMX and SVM.
++	 */
++	tdp_mmu_zap_root(kvm, root, true);
 +
-+		if (!shared)
-+			tdp_mmu_set_spte(kvm, &iter, 0);
-+		else if (tdp_mmu_set_spte_atomic(kvm, &iter, 0))
-+			goto retry;
-+	}
++	/*
++	 * Drop the refcount using kvm_tdp_mmu_put_root() to test its logic for
++	 * avoiding an infinite loop.  By design, the root is reachable while
++	 * it's being asynchronously zapped, thus a different task can put its
++	 * last reference, i.e. flowing through kvm_tdp_mmu_put_root() for an
++	 * asynchronously zapped root is unavoidable.
++	 */
++	kvm_tdp_mmu_put_root(kvm, root, true);
++
++	read_unlock(&kvm->mmu_lock);
++
++	kvm_put_kvm(kvm);
 +}
 +
-+static void tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
-+			     bool shared)
-+{
-+
- 	/*
- 	 * The root must have an elevated refcount so that it's reachable via
- 	 * mmu_notifier callbacks, which allows this path to yield and drop
-@@ -827,22 +849,17 @@ static void tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
- 	rcu_read_lock();
+ void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
+ 			  bool shared)
+ {
+@@ -142,15 +174,26 @@ void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
+ 	refcount_set(&root->tdp_mmu_root_count, 1);
  
  	/*
--	 * No need to try to step down in the iterator when zapping an entire
--	 * root, zapping an upper-level SPTE will recurse on its children.
-+	 * To avoid RCU stalls due to recursively removing huge swaths of SPs,
-+	 * split the zap into two passes.  On the first pass, zap at the 1gb
-+	 * level, and then zap top-level SPs on the second pass.  "1gb" is not
-+	 * arbitrary, as KVM must be able to zap a 1gb shadow page without
-+	 * inducing a stall to allow in-place replacement with a 1gb hugepage.
+-	 * Zap the root, then put the refcount "acquired" above.   Recursively
+-	 * call kvm_tdp_mmu_put_root() to test the above logic for avoiding an
+-	 * infinite loop by freeing invalid roots.  By design, the root is
+-	 * reachable while it's being zapped, thus a different task can put its
+-	 * last reference, i.e. flowing through kvm_tdp_mmu_put_root() for a
+-	 * defunct root is unavoidable.
++	 * Attempt to acquire a reference to KVM itself.  If KVM is alive, then
++	 * zap the root asynchronously in a worker, otherwise it must be zapped
++	 * directly here.  Wait to do this check until after the refcount is
++	 * reset so that tdp_mmu_zap_root() can safely yield.
 +	 *
-+	 * Because zapping a SP recurses on its children, stepping down to
-+	 * PG_LEVEL_4K in the iterator itself is unnecessary.
++	 * In both flows, zap the root, then put the refcount "acquired" above.
++	 * When putting the reference, use kvm_tdp_mmu_put_root() to test the
++	 * above logic for avoiding an infinite loop by freeing invalid roots.
++	 * By design, the root is reachable while it's being zapped, thus a
++	 * different task can put its last reference, i.e. flowing through
++	 * kvm_tdp_mmu_put_root() for a defunct root is unavoidable.
  	 */
--	for_each_tdp_pte_min_level(iter, root, root->role.level, start, end) {
--retry:
--		if (tdp_mmu_iter_cond_resched(kvm, &iter, false, shared))
--			continue;
--
--		if (!is_shadow_present_pte(iter.old_spte))
--			continue;
--
--		if (!shared)
--			tdp_mmu_set_spte(kvm, &iter, 0);
--		else if (tdp_mmu_set_spte_atomic(kvm, &iter, 0))
--			goto retry;
--	}
-+	__tdp_mmu_zap_root(kvm, root, shared, PG_LEVEL_1G);
-+	__tdp_mmu_zap_root(kvm, root, shared, root->role.level);
- 
- 	rcu_read_unlock();
+-	tdp_mmu_zap_root(kvm, root, shared);
+-	kvm_tdp_mmu_put_root(kvm, root, shared);
++	if (kvm_get_kvm_safe(kvm)) {
++		root->tdp_mmu_async_data = kvm;
++		INIT_WORK(&root->tdp_mmu_async_work, tdp_mmu_zap_root_async);
++		schedule_work(&root->tdp_mmu_async_work);
++	} else {
++		tdp_mmu_zap_root(kvm, root, shared);
++		kvm_tdp_mmu_put_root(kvm, root, shared);
++	}
  }
+ 
+ enum tdp_mmu_roots_iter_type {
+@@ -954,7 +997,11 @@ void kvm_tdp_mmu_zap_all(struct kvm *kvm)
+ 
+ 	/*
+ 	 * Zap all roots, including invalid roots, as all SPTEs must be dropped
+-	 * before returning to the caller.
++	 * before returning to the caller.  Zap directly even if the root is
++	 * also being zapped by a worker.  Walking zapped top-level SPTEs isn't
++	 * all that expensive and mmu_lock is already held, which means the
++	 * worker has yielded, i.e. flushing the work instead of zapping here
++	 * isn't guaranteed to be any faster.
+ 	 *
+ 	 * A TLB flush is unnecessary, KVM zaps everything if and only the VM
+ 	 * is being destroyed or the userspace VMM has exited.  In both cases,
 -- 
 2.35.1.574.g5d30c73bfb-goog
 
