@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D153C4C527A
+	by mail.lfdr.de (Postfix) with ESMTP id 3A65C4C5278
 	for <lists+kvm@lfdr.de>; Sat, 26 Feb 2022 01:16:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240250AbiBZAQq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 19:16:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49760 "EHLO
+        id S240418AbiBZAQy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 19:16:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50254 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240131AbiBZAQm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Feb 2022 19:16:42 -0500
+        with ESMTP id S240295AbiBZAQv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Feb 2022 19:16:51 -0500
 Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD5EE223217
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 16:16:08 -0800 (PST)
-Received: by mail-pf1-x44a.google.com with SMTP id v127-20020a622f85000000b004f3dfd386e8so974690pfv.16
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 16:16:08 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DCD921BC56
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 16:16:10 -0800 (PST)
+Received: by mail-pf1-x44a.google.com with SMTP id x194-20020a627ccb000000b004e103c5f726so3963750pfc.8
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 16:16:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=1LwlOnokaTZ070XNVC9qwt/b9mpGNAxjLSfPQpUGhzg=;
-        b=QsEqpFIthDCOl+CW8X6crKs61Os+2aEmwyiqRUlI/TlvRi59OYvHUqW1xn12sx6TVB
-         737oQCm+hfLDVRTd2EOV0rFDNcHYhX9QzNSaO/IBh/uazLWPCWVojkHoxp05AVNZ1OTT
-         n2uwJVBotnOsITVbELerw/16BFamFz+QmMJZEgoW0f/Y95Aoofqfm4hvmSsp8CH3grGC
-         7LV2OMHiPwHrnKaPuEUdsjLKK9EIPHTQvcbQ85epOW+obRncKRQToDjsCF6h/+pLc5Wh
-         AMV+VJsmzBWE6J9f4CgntUBYnQKp8iCBRWEZ+O8kd8IsYbLfbqLilQfTCOrVQVvQxffz
-         /x5Q==
+        bh=zez4Gs30dxckwmE+XcZFyy9DVdQB//tN93t4s3+TKo8=;
+        b=GqRA+N2Xdwf0MftL4IZRlc9dGRi5XcOybgeQMHWIYaYTTz6Hx8v2f47ehCxN/l/R9M
+         kotSaU4HDuDWT5tALQFjZhRpfwcjnlxxivgLf2wCd5sEECtGOVrWWSu0r2rWXsyrNp3u
+         4kjtaVXDixoCG8jke13IHkMA8j4gSxD7ioBSj8yGRVaQXp9sIJmzq8yGgy50q+0UOQib
+         5sW88eKK0j2TDfwRPwjzzV8XJSA7IUyWpebMlxF9WIRudTDECqhWPwkEdpDoOzUcPL3f
+         /KXhHnJJUBVsiuk67rQp7rnPQFUqSJpSR242fcjiM7/lQm8dGASJE6QUaGjD2KMzjQeW
+         QomQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=1LwlOnokaTZ070XNVC9qwt/b9mpGNAxjLSfPQpUGhzg=;
-        b=oGcI0ZhAwDCCSAaSapT88xpGrruj9vpuSw4hCcPb7TTlQQKlR5qeDKJjuL8rec/kw8
-         orL4w50c8FRjIQI4AtpG8NHtTMJcKEd2TXIywy5CSiaUEyEq3bfo/lLf1KyEK49ugAbX
-         y8zKrHg85tGZ+/tt/Jo/F+f0hAlLesz6nUwro+yY+B65J0GfUiRVlnL0tb2YwjHz03Wq
-         g8e8fRd7UK1JrGjjlf8Xeg3KFWciNMUR9XPTF+Fg2UABPejXhXItaZe2MWOh1T27limm
-         vfWP/lO8L2vluPO+NYdttk6NC7ET1u2bNnkevMMKA4CXcFQIJPoBX+F9WY+XRN6/c7Cg
-         JgeA==
-X-Gm-Message-State: AOAM530H4WNRdjE9VWHAIHagRpMnkp9adikiNhCSnkK5+vJeh4A9fj3E
-        DXFTIebhQD54qB7hCY9QvtYUWnrnVRo=
-X-Google-Smtp-Source: ABdhPJzVf+Iyo3hR1ZTnjDaOKvm9FKY4DHDhSBKkXQndAg3+GsOOkeZ67NqLYNm7sq1hJeioUCFCZeKk2z8=
+        bh=zez4Gs30dxckwmE+XcZFyy9DVdQB//tN93t4s3+TKo8=;
+        b=SiIuJP6czscp5mpoUMfHBqesNppX9XBRhh/lsRSJNqW0sqNBTNyRgCJaRRBD4u3TuU
+         ofkm5S+Apgz6qbEcIxVSkTkHgxkI6cfF4f2VFBO54iyhmD45dtAJ5DyWVNi2L/AQvYz+
+         C3ayP4mplq6IDFZo0/RKhMDGTWjLAfNsGdbZrkA5EsMLlRV8+u1/IUGtyLHrgWC1+YN2
+         lyi5YuPZ1+mUmDouFVYRri8DDGVGBNMeOVsedChWHbxE5c1U3UGyz6uxXEMgkxK+i7pm
+         0HcPRAQPONljGrU3ZZpo5NY8XQlRfMpnFqytUqAKiS+1ovB6jLsJYZEncMeWdxWxX1ii
+         Dk/g==
+X-Gm-Message-State: AOAM53376uF1Ua7NqEeZVuw3PP6n1U1KdC7v4C+A9/50ACq3dBigRh3R
+        cRlnkI04RX/9PqcqkhQ9c1IWOVd/Rbw=
+X-Google-Smtp-Source: ABdhPJyMKt5K1hday9KJX2febmO2RNxhZGslMxjGB3MrHRn5iFHo+/U2JORNEGrCHZPM5iVC7xM4YIWEgGI=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:148f:b0:4bc:fb2d:4b6f with SMTP id
- v15-20020a056a00148f00b004bcfb2d4b6fmr10113984pfu.62.1645834568211; Fri, 25
- Feb 2022 16:16:08 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a17:902:f68b:b0:14f:c84c:ad6d with SMTP id
+ l11-20020a170902f68b00b0014fc84cad6dmr9734294plg.155.1645834569885; Fri, 25
+ Feb 2022 16:16:09 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Sat, 26 Feb 2022 00:15:22 +0000
+Date:   Sat, 26 Feb 2022 00:15:23 +0000
 In-Reply-To: <20220226001546.360188-1-seanjc@google.com>
-Message-Id: <20220226001546.360188-5-seanjc@google.com>
+Message-Id: <20220226001546.360188-6-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220226001546.360188-1-seanjc@google.com>
 X-Mailer: git-send-email 2.35.1.574.g5d30c73bfb-goog
-Subject: [PATCH v3 04/28] KVM: x86/mmu: Formalize TDP MMU's (unintended?)
- deferred TLB flush logic
+Subject: [PATCH v3 05/28] KVM: x86/mmu: Document that zapping invalidated
+ roots doesn't need to flush
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Christian Borntraeger <borntraeger@linux.ibm.com>,
@@ -72,71 +72,86 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Explicitly ignore the result of zap_gfn_range() when putting the last
-reference to a TDP MMU root, and add a pile of comments to formalize the
-TDP MMU's behavior of deferring TLB flushes to alloc/reuse.  Note, this
-only affects the !shared case, as zap_gfn_range() subtly never returns
-true for "flush" as the flush is handled by tdp_mmu_zap_spte_atomic().
+Remove the misleading flush "handling" when zapping invalidated TDP MMU
+roots, and document that flushing is unnecessary for all flavors of MMUs
+when zapping invalid/obsolete roots/pages.  The "handling" in the TDP MMU
+is dead code, as zap_gfn_range() is called with shared=true, in which
+case it will never return true due to the flushing being handled by
+tdp_mmu_zap_spte_atomic().
 
-Putting the root without a flush is ok because even if there are stale
-references to the root in the TLB, they are unreachable because KVM will
-not run the guest with the same ASID without first flushing (where ASID
-in this context refers to both SVM's explicit ASID and Intel's implicit
-ASID that is constructed from VPID+PCID+EPT4A+etc...).
+No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c     |  8 ++++++++
- arch/x86/kvm/mmu/tdp_mmu.c | 10 +++++++++-
- 2 files changed, 17 insertions(+), 1 deletion(-)
+ arch/x86/kvm/mmu/mmu.c     | 10 +++++++---
+ arch/x86/kvm/mmu/tdp_mmu.c | 15 ++++++++++-----
+ 2 files changed, 17 insertions(+), 8 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 80607513a1f2..5a931c89d27b 100644
+index 5a931c89d27b..1c4b84e80841 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -5069,6 +5069,14 @@ int kvm_mmu_load(struct kvm_vcpu *vcpu)
- 	kvm_mmu_sync_roots(vcpu);
+@@ -5615,9 +5615,13 @@ static void kvm_zap_obsolete_pages(struct kvm *kvm)
+ 	}
  
- 	kvm_mmu_load_pgd(vcpu);
-+
-+	/*
-+	 * Flush any TLB entries for the new root, the provenance of the root
-+	 * is unknown.  In theory, even if KVM ensures there are no stale TLB
-+	 * entries for a freed root, in theory, an out-of-tree hypervisor could
-+	 * have left stale entries.  Flushing on alloc also allows KVM to skip
-+	 * the TLB flush when freeing a root (see kvm_tdp_mmu_put_root()).
-+	 */
- 	static_call(kvm_x86_flush_tlb_current)(vcpu);
- out:
- 	return r;
+ 	/*
+-	 * Trigger a remote TLB flush before freeing the page tables to ensure
+-	 * KVM is not in the middle of a lockless shadow page table walk, which
+-	 * may reference the pages.
++	 * Kick all vCPUs (via remote TLB flush) before freeing the page tables
++	 * to ensure KVM is not in the middle of a lockless shadow page table
++	 * walk, which may reference the pages.  The remote TLB flush itself is
++	 * not required and is simply a convenient way to kick vCPUs as needed.
++	 * KVM performs a local TLB flush when allocating a new root (see
++	 * kvm_mmu_load()), and the reload in the caller ensure no vCPUs are
++	 * running with an obsolete MMU.
+ 	 */
+ 	kvm_mmu_commit_zap_page(kvm, &kvm->arch.zapped_obsolete_pages);
+ }
 diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 12866113fb4f..e35bd88d92fd 100644
+index e35bd88d92fd..5994db5d5226 100644
 --- a/arch/x86/kvm/mmu/tdp_mmu.c
 +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -93,7 +93,15 @@ void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
- 	list_del_rcu(&root->link);
- 	spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
+@@ -843,12 +843,20 @@ void kvm_tdp_mmu_zap_all(struct kvm *kvm)
+ void kvm_tdp_mmu_zap_invalidated_roots(struct kvm *kvm)
+ {
+ 	struct kvm_mmu_page *root;
+-	bool flush = false;
  
--	zap_gfn_range(kvm, root, 0, -1ull, false, false, shared);
-+	/*
-+	 * A TLB flush is not necessary as KVM performs a local TLB flush when
-+	 * allocating a new root (see kvm_mmu_load()), and when migrating vCPU
-+	 * to a different pCPU.  Note, the local TLB flush on reuse also
-+	 * invalidates any paging-structure-cache entries, i.e. TLB entries for
-+	 * intermediate paging structures, that may be zapped, as such entries
-+	 * are associated with the ASID on both VMX and SVM.
-+	 */
-+	(void)zap_gfn_range(kvm, root, 0, -1ull, false, false, shared);
+ 	lockdep_assert_held_read(&kvm->mmu_lock);
  
- 	call_rcu(&root->rcu_head, tdp_mmu_free_sp_rcu_callback);
+ 	for_each_invalid_tdp_mmu_root_yield_safe(kvm, root) {
+-		flush = zap_gfn_range(kvm, root, 0, -1ull, true, flush, true);
++		/*
++		 * A TLB flush is unnecessary, invalidated roots are guaranteed
++		 * to be unreachable by the guest (see kvm_tdp_mmu_put_root()
++		 * for more details), and unlike the legacy MMU, no vCPU kick
++		 * is needed to play nice with lockless shadow walks as the TDP
++		 * MMU protects its paging structures via RCU.  Note, zapping
++		 * will still flush on yield, but that's a minor performance
++		 * blip and not a functional issue.
++		 */
++		(void)zap_gfn_range(kvm, root, 0, -1ull, true, false, true);
+ 
+ 		/*
+ 		 * Put the reference acquired in kvm_tdp_mmu_invalidate_roots().
+@@ -856,9 +864,6 @@ void kvm_tdp_mmu_zap_invalidated_roots(struct kvm *kvm)
+ 		 */
+ 		kvm_tdp_mmu_put_root(kvm, root, true);
+ 	}
+-
+-	if (flush)
+-		kvm_flush_remote_tlbs(kvm);
  }
+ 
+ /*
 -- 
 2.35.1.574.g5d30c73bfb-goog
 
