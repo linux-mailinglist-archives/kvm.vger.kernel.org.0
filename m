@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2769F4C5275
-	for <lists+kvm@lfdr.de>; Sat, 26 Feb 2022 01:16:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F08A54C5283
+	for <lists+kvm@lfdr.de>; Sat, 26 Feb 2022 01:16:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240424AbiBZARM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Feb 2022 19:17:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50292 "EHLO
+        id S240368AbiBZARR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Feb 2022 19:17:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50260 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240350AbiBZARA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Feb 2022 19:17:00 -0500
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93A882255B1
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 16:16:20 -0800 (PST)
-Received: by mail-pj1-x104a.google.com with SMTP id w3-20020a17090ac98300b001b8b914e91aso4136753pjt.0
-        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 16:16:20 -0800 (PST)
+        with ESMTP id S240662AbiBZARC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Feb 2022 19:17:02 -0500
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5676225597
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 16:16:21 -0800 (PST)
+Received: by mail-pj1-x1049.google.com with SMTP id f4-20020a17090ac28400b001bc40aa09fbso6462187pjt.6
+        for <kvm@vger.kernel.org>; Fri, 25 Feb 2022 16:16:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=mkmQ6MFrlZy4eKd/Q3wbeOobNp7CN8W6giifpouEK3Q=;
-        b=HNIMRDG1beTnwyz26v1dtXmdSZhkkNIT50ZAUvd6nR9l9tMgyyLfGhzlV+OqJCPEHw
-         TiL7s2zfof/Z0d7TYvcEljJ0Z5/Rlzqge6Cu2y6WB6ZEdqWGgH9Del7NJBRv9vdYGZlG
-         ROSoidAZmK6YDct2cNe23Qz5WbKtSXyHAPHDu4a1VCAgcib73hMUvWeBlkIljaSMzrGe
-         kePNhRjQ0u4Z+bNIpQUXw5KynJ8w7BCfpUeXOeq6brTm1zXLiRPEgsDhf4QiDt7kx+So
-         cJyGEZ46LlQfjFZ+eUlOlAveINLeZxzBEKSBRJlkE06aDrtbOo5uGcxLK97/LpUa6ped
-         0dlA==
+        bh=ENO0x4uKs4rqsjN1xB0qFJMoRAxQ1GMRSi+kdo7qAvw=;
+        b=lhfMZMr/HcUZRGRAalYnJGHqVZsOjXMz94FZ2392zvT3nXG8ZEgYlnAfpVuqMVoG4s
+         vQnfMTJMlL4JHX/+6hN/2my3McSMWbIfCGT6gZ8CcdMU2jt55aPfoOq+mJ537gXev2b/
+         VzD9jYFmAZzINuPpAeNPRZTzzRu2CyVxgpdgd29mOXSqrGSYjtxI21NR5V1R1UsOcg++
+         L8W60IWSB0jZ/uevf/LPKOAKmxPlXBOWyTJ8JdcedPlKLPqlnjMs3IXhYm/wKnASI0P0
+         ML2/OiOmwfAyxlR4JPds616MmFjqFn7uhffuWzWSo0pMZRWbtdME4x5w/8KPEc16P4vE
+         hNdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=mkmQ6MFrlZy4eKd/Q3wbeOobNp7CN8W6giifpouEK3Q=;
-        b=MK8Uw9IbkDg8P9vzv3K4fTl7aUSa7ngi0RC/zj6vaCc2/v7BiBisqc8Aed2P7VMGkF
-         A2BguUxFUibs7BAMjP49VhF/6AfPBxxUO6Q0XujoYdo/9zA6XNWRZSYL8ZgFnpBL8TtU
-         rFWL+CBYyAvPeW0J6RVv7bQFwlKpftjanFq239/HoCFWT3dynQUn6PWPQY7D1VJ+evCa
-         UC8sFPsKjJOBRoShHYphsRvBCR5prGfUbmYh0h2nrZ/vyLqvidL+F/7R5oNSE9HKKESr
-         DoISAYuRIlnQRekQ8z+O8/4lYEwQtClAmkCGmvoZ02zqDWhTpQ6W4lBNvHmf7fsm7Du6
-         Or/A==
-X-Gm-Message-State: AOAM531ASYX9Hnb5Bs/wBrIullkc4ROxTUn5pObW2pxESiX7wKqlqfH9
-        HLFqbMAt7A9ozuO6qQFGcyuf5P4NJ34=
-X-Google-Smtp-Source: ABdhPJyWCyvm2sgSjm0RwiuidMtkOSbJaGbyT+NiwBP55uKTx1afDWW6MyIdn7+BA//anx1BPN3Dk9lol4Y=
+        bh=ENO0x4uKs4rqsjN1xB0qFJMoRAxQ1GMRSi+kdo7qAvw=;
+        b=JQTTmjPKpM9u7Bof9NihZ/jGBZgh2QnD6VjjIqeyc7A7Js5IWpTKA/aKyUfS4QAfQU
+         eo+a10r02GqRejvpJHaDKCh3q+68wxi3E+OMfQqScB6Le+Q38LVRGXbZhZlPrUJ3Lsiq
+         n3zPOE+e8Y3YCztLNxDtrKVdm6kdFTMkfjkrFACVYkSuWGKrXxEYTv9WmEBJ6sQlxSk6
+         UlqJxmwLqJmhObQXxuj4ee1LFO98qwDUCcTjqVSA7cXX7QAFQbTjl4DRNLdP4/VtEmae
+         Eh7VDnYA6IOctGIQB8FSa4cZycAhZfRoHGkVNtIu9I4AAXh4sgTauYyERKeurivoA0No
+         RRbg==
+X-Gm-Message-State: AOAM530bAqMZGP95Fj+LURRzXKlrj+MSaVSrIurKZATACwTyPMSNORyK
+        hx6XpNJX2sFrCU4xquL86aj1Hb++Y10=
+X-Google-Smtp-Source: ABdhPJzrbxQn7NgpNV/g9aLZwydofMo3rhOO2xpfsf/UPmMpU4CrBDA6znpW6k2RNcYcQVgoM9BmqlkXkHA=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:124f:b0:4c0:6242:c14e with SMTP id
- u15-20020a056a00124f00b004c06242c14emr10089164pfi.83.1645834580082; Fri, 25
- Feb 2022 16:16:20 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a17:90a:f02:b0:1bd:ab6:42ec with SMTP id
+ 2-20020a17090a0f0200b001bd0ab642ecmr2190693pjy.18.1645834581467; Fri, 25 Feb
+ 2022 16:16:21 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Sat, 26 Feb 2022 00:15:29 +0000
+Date:   Sat, 26 Feb 2022 00:15:30 +0000
 In-Reply-To: <20220226001546.360188-1-seanjc@google.com>
-Message-Id: <20220226001546.360188-12-seanjc@google.com>
+Message-Id: <20220226001546.360188-13-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220226001546.360188-1-seanjc@google.com>
 X-Mailer: git-send-email 2.35.1.574.g5d30c73bfb-goog
-Subject: [PATCH v3 11/28] KVM: x86/mmu: WARN if old _or_ new SPTE is REMOVED
- in non-atomic path
+Subject: [PATCH v3 12/28] KVM: x86/mmu: Refactor low-level TDP MMU set SPTE
+ helper to take raw vals
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Christian Borntraeger <borntraeger@linux.ibm.com>,
@@ -79,40 +79,116 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-WARN if the new_spte being set by __tdp_mmu_set_spte() is a REMOVED_SPTE,
-which is called out by the comment as being disallowed but not actually
-checked.  Keep the WARN on the old_spte as well, because overwriting a
-REMOVED_SPTE in the non-atomic path is also disallowed (as evidence by
-lack of splats with the existing WARN).
+Refactor __tdp_mmu_set_spte() to work with raw values instead of a
+tdp_iter objects so that a future patch can modify SPTEs without doing a
+walk, and without having to synthesize a tdp_iter.
 
-Fixes: 08f07c800e9d ("KVM: x86/mmu: Flush TLBs after zap in TDP MMU PF handler")
-Cc: Ben Gardon <bgardon@google.com>
+No functional change intended.
+
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 Reviewed-by: Ben Gardon <bgardon@google.com>
 ---
- arch/x86/kvm/mmu/tdp_mmu.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ arch/x86/kvm/mmu/tdp_mmu.c | 51 +++++++++++++++++++++++---------------
+ 1 file changed, 31 insertions(+), 20 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 8fbf3364f116..1dcdf1a4fcc1 100644
+index 1dcdf1a4fcc1..9e8ba6f12ebf 100644
 --- a/arch/x86/kvm/mmu/tdp_mmu.c
 +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -640,13 +640,13 @@ static inline void __tdp_mmu_set_spte(struct kvm *kvm, struct tdp_iter *iter,
+@@ -617,9 +617,13 @@ static inline int tdp_mmu_zap_spte_atomic(struct kvm *kvm,
+ 
+ /*
+  * __tdp_mmu_set_spte - Set a TDP MMU SPTE and handle the associated bookkeeping
+- * @kvm: kvm instance
+- * @iter: a tdp_iter instance currently on the SPTE that should be set
+- * @new_spte: The value the SPTE should be set to
++ * @kvm:	      KVM instance
++ * @as_id:	      Address space ID, i.e. regular vs. SMM
++ * @sptep:	      Pointer to the SPTE
++ * @old_spte:	      The current value of the SPTE
++ * @new_spte:	      The new value that will be set for the SPTE
++ * @gfn:	      The base GFN that was (or will be) mapped by the SPTE
++ * @level:	      The level _containing_ the SPTE (its parent PT's level)
+  * @record_acc_track: Notify the MM subsystem of changes to the accessed state
+  *		      of the page. Should be set unless handling an MMU
+  *		      notifier for access tracking. Leaving record_acc_track
+@@ -631,12 +635,10 @@ static inline int tdp_mmu_zap_spte_atomic(struct kvm *kvm,
+  *		      Leaving record_dirty_log unset in that case prevents page
+  *		      writes from being double counted.
+  */
+-static inline void __tdp_mmu_set_spte(struct kvm *kvm, struct tdp_iter *iter,
+-				      u64 new_spte, bool record_acc_track,
+-				      bool record_dirty_log)
++static void __tdp_mmu_set_spte(struct kvm *kvm, int as_id, tdp_ptep_t sptep,
++			       u64 old_spte, u64 new_spte, gfn_t gfn, int level,
++			       bool record_acc_track, bool record_dirty_log)
+ {
+-	WARN_ON_ONCE(iter->yielded);
+-
  	lockdep_assert_held_write(&kvm->mmu_lock);
  
  	/*
--	 * No thread should be using this function to set SPTEs to the
-+	 * No thread should be using this function to set SPTEs to or from the
- 	 * temporary removed SPTE value.
- 	 * If operating under the MMU lock in read mode, tdp_mmu_set_spte_atomic
+@@ -646,39 +648,48 @@ static inline void __tdp_mmu_set_spte(struct kvm *kvm, struct tdp_iter *iter,
  	 * should be used. If operating under the MMU lock in write mode, the
  	 * use of the removed SPTE should not be necessary.
  	 */
--	WARN_ON(is_removed_spte(iter->old_spte));
-+	WARN_ON(is_removed_spte(iter->old_spte) || is_removed_spte(new_spte));
+-	WARN_ON(is_removed_spte(iter->old_spte) || is_removed_spte(new_spte));
++	WARN_ON(is_removed_spte(old_spte) || is_removed_spte(new_spte));
  
- 	kvm_tdp_mmu_write_spte(iter->sptep, new_spte);
+-	kvm_tdp_mmu_write_spte(iter->sptep, new_spte);
++	kvm_tdp_mmu_write_spte(sptep, new_spte);
++
++	__handle_changed_spte(kvm, as_id, gfn, old_spte, new_spte, level, false);
  
+-	__handle_changed_spte(kvm, iter->as_id, iter->gfn, iter->old_spte,
+-			      new_spte, iter->level, false);
+ 	if (record_acc_track)
+-		handle_changed_spte_acc_track(iter->old_spte, new_spte,
+-					      iter->level);
++		handle_changed_spte_acc_track(old_spte, new_spte, level);
+ 	if (record_dirty_log)
+-		handle_changed_spte_dirty_log(kvm, iter->as_id, iter->gfn,
+-					      iter->old_spte, new_spte,
+-					      iter->level);
++		handle_changed_spte_dirty_log(kvm, as_id, gfn, old_spte,
++					      new_spte, level);
++}
++
++static inline void _tdp_mmu_set_spte(struct kvm *kvm, struct tdp_iter *iter,
++				     u64 new_spte, bool record_acc_track,
++				     bool record_dirty_log)
++{
++	WARN_ON_ONCE(iter->yielded);
++
++	__tdp_mmu_set_spte(kvm, iter->as_id, iter->sptep, iter->old_spte,
++			   new_spte, iter->gfn, iter->level,
++			   record_acc_track, record_dirty_log);
+ }
+ 
+ static inline void tdp_mmu_set_spte(struct kvm *kvm, struct tdp_iter *iter,
+ 				    u64 new_spte)
+ {
+-	__tdp_mmu_set_spte(kvm, iter, new_spte, true, true);
++	_tdp_mmu_set_spte(kvm, iter, new_spte, true, true);
+ }
+ 
+ static inline void tdp_mmu_set_spte_no_acc_track(struct kvm *kvm,
+ 						 struct tdp_iter *iter,
+ 						 u64 new_spte)
+ {
+-	__tdp_mmu_set_spte(kvm, iter, new_spte, false, true);
++	_tdp_mmu_set_spte(kvm, iter, new_spte, false, true);
+ }
+ 
+ static inline void tdp_mmu_set_spte_no_dirty_log(struct kvm *kvm,
+ 						 struct tdp_iter *iter,
+ 						 u64 new_spte)
+ {
+-	__tdp_mmu_set_spte(kvm, iter, new_spte, true, false);
++	_tdp_mmu_set_spte(kvm, iter, new_spte, true, false);
+ }
+ 
+ #define tdp_root_for_each_pte(_iter, _root, _start, _end) \
 -- 
 2.35.1.574.g5d30c73bfb-goog
 
