@@ -2,174 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D5AD4C5679
-	for <lists+kvm@lfdr.de>; Sat, 26 Feb 2022 15:25:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A47A44C577D
+	for <lists+kvm@lfdr.de>; Sat, 26 Feb 2022 19:28:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231795AbiBZOZm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 26 Feb 2022 09:25:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38734 "EHLO
+        id S232676AbiBZS3K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 26 Feb 2022 13:29:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46254 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231497AbiBZOZl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 26 Feb 2022 09:25:41 -0500
-Received: from mail-oi1-x22e.google.com (mail-oi1-x22e.google.com [IPv6:2607:f8b0:4864:20::22e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCCC395A08
-        for <kvm@vger.kernel.org>; Sat, 26 Feb 2022 06:25:06 -0800 (PST)
-Received: by mail-oi1-x22e.google.com with SMTP id z7so9848204oid.4
-        for <kvm@vger.kernel.org>; Sat, 26 Feb 2022 06:25:06 -0800 (PST)
+        with ESMTP id S232666AbiBZS3J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 26 Feb 2022 13:29:09 -0500
+Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7891915FC9A
+        for <kvm@vger.kernel.org>; Sat, 26 Feb 2022 10:28:34 -0800 (PST)
+Received: by mail-lj1-x22a.google.com with SMTP id v28so11744953ljv.9
+        for <kvm@vger.kernel.org>; Sat, 26 Feb 2022 10:28:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=mGLbYD/2nvuQU3bxrB+PQon9DhwpNEkOfLPBNbbaSA0=;
-        b=HPfZ0tqpALJXNjZRE/OiJQXvraZ4XX1qn47Ai61jqZ+uDRD+fG7NlDQqXTJ6OVNcKz
-         bJNpXfslK4+NbxihXj5QNa1gvtBJmojDBo2AyyB0Xq0pLRzQA9RtTZ4WQox08Uv+8acF
-         4MICtEZqy1BW7jpMFsSj6RulzASIVNN1i2H8Cz62QCzPoVm+SpOR0XAqVE+1/Ti8Vu/5
-         e3K5gUV+W3SG6ZQ1uqOxni9DNaoDBpNwwTgSeHZdR+48WclYDBEIBi+KE9+PSFvHXRBe
-         URhYZPJJ7J6/luMixnOBUBbRlj3E/nfmiICUGk6eV+4ZYMgmGVlVhSoxdvw/fw0EG2Yp
-         sVVA==
+        bh=YhAgqiWLbIhprpB4PTDWt6I/fMa4rCNESBFaVBRMGDk=;
+        b=eF7sTfy8PRdrb5HHtbrH1LzmyvW0DK91TGdIQim+9sPGZkTcokk57lq6AU2sC6XCtN
+         KZQHn4B6exdIG2xwONt7g+IsZk613AAMSVFbZpCl1fn9dhihWlm5FkWBSWT3xyxGbrkl
+         GyrDbBJIT0oSJE/NnurO9H4rgeRRdlj84EfMdP/FVKZ0hYY+YMYJ9+RA93KZUIje4RAe
+         jnhJOfj0CvGUuV0OaqwQe//20t/Kn5uEC5YtjdfhCuxXqM8YoihpoFCYD1wUpRl5unmf
+         d4tbH0RXyyr93hd0k50r41p8V/7Qpe7r85LPvkCUpCBLKAx6TgeqQzYs/RMw4Vns5+bc
+         Tzng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=mGLbYD/2nvuQU3bxrB+PQon9DhwpNEkOfLPBNbbaSA0=;
-        b=8MZIxm3tz4klPHsWjELEDpoaH6+u85A+NrETUkj2SwWFietGLMl1ROtANsoTHOi8h4
-         sQRV7tKFSDJWkKyD2kOGQCuDi1XZwV8my7NJeWDDucb56RIfJGkhGPblnWV/fhPRd7u0
-         VcQgtSvsEWIAsd+vuqOWpV6smZGPeEQ1hNxr1PMVxTucIeH/jl4qFoVYazcr3J/YC0GR
-         2O2SVvD1I7jx6MtWZcxfGabWGk+FO8yBPvlk6G2mG/RhtUB8NYr00pKCWZo723N2rhhi
-         EN0yVt08+fLbPUl3p04WXaDSvkwL6eyc2Oh9dA6yzdScsTJBvMjpwR0uRyHv+r6SH/1q
-         NKlQ==
-X-Gm-Message-State: AOAM530dFPfQMci85SiwjhERrIYe+SQyDd4nGlwZzYCBy3rPz3Vm2ojV
-        AFggW+lLqNvTmdFNab4QHCX3cXonzSUzRaZsT8s13w==
-X-Google-Smtp-Source: ABdhPJwXGABl8/8OLYQ/t3omf3P0lDrz48yCsuYm3SM1WC+ZOwTezPsrmuq4EI8Vaw9MLPlyTCEccwyDuMZJ1TAkqOc=
-X-Received: by 2002:a05:6808:1999:b0:2d6:7fe3:10bd with SMTP id
- bj25-20020a056808199900b002d67fe310bdmr4820885oib.68.1645885505692; Sat, 26
- Feb 2022 06:25:05 -0800 (PST)
+        bh=YhAgqiWLbIhprpB4PTDWt6I/fMa4rCNESBFaVBRMGDk=;
+        b=7YAaqcloLXk8SC/kHrnzx730ER0HZ6THg4vapaae+j+qAxs/wIVCnfrUBZ6kFCmvWM
+         Dbl6DJKqgbRli7/2Ded5YACx7fjDu9imHnd8+5O53yy32AVA0/ptGTDLnMBqFKBGZyyK
+         0DipNJkEvwLxe0eIvHDtC4lGpkwFAWkWEdp1y9/9wh4tFz8a24/mvWGl34BDyC3M+gXf
+         J6NurBq/AywEsgDLq/ydDtpcsuHRWYFS6DU8ILHIuNYNIwngeKUji22EEObYGBYvgm8D
+         cYCwvPHJoXn56+K5PlFVUSpdxjyhwZYSnKBSspcZqlXwR5F2zOxcpMi7RqnKNjmALLqL
+         7rUg==
+X-Gm-Message-State: AOAM530I7MVJ578OOD416GMt3HCrNKcJJmBQmQFwyzo6JZYzVq0gDl9w
+        tDckYOeN8Ro4+EA8AyGgqf8DCBZ0EJeCRabOFPL0GQ==
+X-Google-Smtp-Source: ABdhPJxKzfIa2r2T8l8vr9vzs4enUHCu5WQWCNzEzy+VRL15+oBvPXtlpfEul4sVs5zWWtJh4YRYFC3zKqUfZsh2EIs=
+X-Received: by 2002:a05:651c:160c:b0:244:c704:8315 with SMTP id
+ f12-20020a05651c160c00b00244c7048315mr9079489ljq.170.1645900112391; Sat, 26
+ Feb 2022 10:28:32 -0800 (PST)
 MIME-Version: 1.0
-References: <20220223062412.22334-1-chenyi.qiang@intel.com>
- <CALMp9eT50LjXYSwfWENjmfg=XxT4Bx3RzOYubKty8kr_APXCEw@mail.gmail.com>
- <88eb9a9a-fbe3-8e2c-02bd-4bdfc855b67f@intel.com> <6a839b88-392d-886d-836d-ca04cf700dce@intel.com>
- <7859e03f-10fa-dbc2-ed3c-5c09e62f9016@redhat.com> <bcc83b3d-31fe-949a-6bbf-4615bb982f0c@intel.com>
- <CALMp9eT1NRudtVqPuHU8Y8LpFYWZsAB_MnE2BAbg5NY0jR823w@mail.gmail.com>
- <CALMp9eS6cBDuax8O=woSdkNH2e2Y2EodE-7EfUTFfzBvCWCmcg@mail.gmail.com> <71736b9d-9ed4-ea02-e702-74cae0340d66@intel.com>
-In-Reply-To: <71736b9d-9ed4-ea02-e702-74cae0340d66@intel.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Sat, 26 Feb 2022 06:24:54 -0800
-Message-ID: <CALMp9eRwKHa0zdUFtSEBVCwV=MHJ-FmvW1uERxCt+_+Zz4z8fg@mail.gmail.com>
-Subject: Re: [PATCH v3] KVM: VMX: Enable Notify VM exit
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Chenyi Qiang <chenyi.qiang@intel.com>,
+References: <20220223041844.3984439-1-oupton@google.com> <20220223041844.3984439-14-oupton@google.com>
+ <87sfs82rz4.wl-maz@kernel.org> <YhflJ74nF2N+u1i4@google.com> <8735k57tnx.wl-maz@kernel.org>
+In-Reply-To: <8735k57tnx.wl-maz@kernel.org>
+From:   Oliver Upton <oupton@google.com>
+Date:   Sat, 26 Feb 2022 10:28:21 -0800
+Message-ID: <CAOQ_Qsi1n2PTGe3F5BAhy3yHS4ar_0n0tru7smAfwAFWGY3Jug@mail.gmail.com>
+Subject: Re: [PATCH v3 13/19] KVM: arm64: Add support KVM_SYSTEM_EVENT_SUSPEND
+ to PSCI SYSTEM_SUSPEND
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.cs.columbia.edu, Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <Alexandru.Elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
         Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
+        kvm-riscv@lists.infradead.org, Peter Shier <pshier@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>,
+        Jing Zhang <jingzhangos@google.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 25, 2022 at 10:24 PM Xiaoyao Li <xiaoyao.li@intel.com> wrote:
+On Sat, Feb 26, 2022 at 3:29 AM Marc Zyngier <maz@kernel.org> wrote:
 >
-> On 2/26/2022 12:53 PM, Jim Mattson wrote:
-> > On Fri, Feb 25, 2022 at 8:25 PM Jim Mattson <jmattson@google.com> wrote:
-> >>
-> >> On Fri, Feb 25, 2022 at 8:07 PM Xiaoyao Li <xiaoyao.li@intel.com> wrote:
-> >>>
-> >>> On 2/25/2022 11:13 PM, Paolo Bonzini wrote:
-> >>>> On 2/25/22 16:12, Xiaoyao Li wrote:
-> >>>>>>>>
-> >>>>>>>
-> >>>>>>> I don't like the idea of making things up without notifying userspace
-> >>>>>>> that this is fictional. How is my customer running nested VMs supposed
-> >>>>>>> to know that L2 didn't actually shutdown, but L0 killed it because the
-> >>>>>>> notify window was exceeded? If this information isn't reported to
-> >>>>>>> userspace, I have no way of getting the information to the customer.
-> >>>>>>
-> >>>>>> Then, maybe a dedicated software define VM exit for it instead of
-> >>>>>> reusing triple fault?
-> >>>>>>
-> >>>>>
-> >>>>> Second thought, we can even just return Notify VM exit to L1 to tell
-> >>>>> L2 causes Notify VM exit, even thought Notify VM exit is not exposed
-> >>>>> to L1.
-> >>>>
-> >>>> That might cause NULL pointer dereferences or other nasty occurrences.
-> >>>
-> >>> IMO, a well written VMM (in L1) should handle it correctly.
-> >>>
-> >>> L0 KVM reports no Notify VM Exit support to L1, so L1 runs without
-> >>> setting Notify VM exit. If a L2 causes notify_vm_exit with
-> >>> invalid_vm_context, L0 just reflects it to L1. In L1's view, there is no
-> >>> support of Notify VM Exit from VMX MSR capability. Following L1 handler
-> >>> is possible:
-> >>>
-> >>> a)      if (notify_vm_exit available & notify_vm_exit enabled) {
-> >>>                  handle in b)
-> >>>          } else {
-> >>>                  report unexpected vm exit reason to userspace;
-> >>>          }
-> >>>
-> >>> b)      similar handler like we implement in KVM:
-> >>>          if (!vm_context_invalid)
-> >>>                  re-enter guest;
-> >>>          else
-> >>>                  report to userspace;
-> >>>
-> >>> c)      no Notify VM Exit related code (e.g. old KVM), it's treated as
-> >>> unsupported exit reason
-> >>>
-> >>> As long as it belongs to any case above, I think L1 can handle it
-> >>> correctly. Any nasty occurrence should be caused by incorrect handler in
-> >>> L1 VMM, in my opinion.
-> >>
-> >> Please test some common hypervisors (e.g. ESXi and Hyper-V).
+> On Thu, 24 Feb 2022 20:05:59 +0000,
+> Oliver Upton <oupton@google.com> wrote:
 > >
-> > I took a look at KVM in Linux v4.9 (one of our more popular guests),
-> > and it will not handle this case well:
+> > On Thu, Feb 24, 2022 at 03:40:15PM +0000, Marc Zyngier wrote:
+> > > > diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
+> > > > index 2bb8d047cde4..a7de84cec2e4 100644
+> > > > --- a/arch/arm64/kvm/psci.c
+> > > > +++ b/arch/arm64/kvm/psci.c
+> > > > @@ -245,6 +245,11 @@ static int kvm_psci_system_suspend(struct kvm_vcpu *vcpu)
+> > > >           return 1;
+> > > >   }
+> > > >
+> > > > + if (kvm->arch.system_suspend_exits) {
+> > > > +         kvm_vcpu_set_system_event_exit(vcpu, KVM_SYSTEM_EVENT_SUSPEND);
+> > > > +         return 0;
+> > > > + }
+> > > > +
+> > >
+> > > So there really is a difference in behaviour here. Userspace sees the
+> > > WFI behaviour before reset (it implements it), while when not using
+> > > the SUSPEND event, reset occurs before anything else.
+> > >
+> > > They really should behave in a similar way (WFI first, reset next).
 > >
-> >          if (exit_reason < kvm_vmx_max_exit_handlers
-> >              && kvm_vmx_exit_handlers[exit_reason])
-> >                  return kvm_vmx_exit_handlers[exit_reason](vcpu);
-> >          else {
-> >                  WARN_ONCE(1, "vmx: unexpected exit reason 0x%x\n", exit_reason);
-> >                  kvm_queue_exception(vcpu, UD_VECTOR);
-> >                  return 1;
-> >          }
+> > I mentioned this on the other patch, but I think the conversation should
+> > continue here as UAPI context is in this one.
 > >
-> > At least there's an L1 kernel log message for the first unexpected
-> > NOTIFY VM-exit, but after that, there is silence. Just a completely
-> > inexplicable #UD in L2, assuming that L2 is resumable at this point.
+> > If SUSPEND exits are disabled and SYSTEM_SUSPEND is implemented in the
+> > kernel, userspace cannot observe any intermediate state. I think it is
+> > necessary for migration, otherwise if userspace were to save the vCPU
+> > post-WFI, pre-reset the pending reset would get lost along the way.
+> >
+> > As far as userspace is concerned, I think the WFI+reset operation is
+> > atomic. SUSPEND exits just allow userspace to intervene before said
+> > atomic operation.
+> >
+> > Perhaps I'm missing something: assuming SUSPEND exits are disabled, what
+> > value is provided to userspace if it can see WFI behavior before the
+> > reset?
 >
-> At least there is a message to tell L1 a notify VM exit is triggered in
-> L2. Yes, the inexplicable #UD won't be hit unless L2 triggers Notify VM
-> exit with invalid_context, which is malicious to L0 and L1.
-
-There is only an L1 kernel log message *the first time*. That's not
-good enough. And this is just one of the myriad of possible L1
-hypervisors.
-
-> If we use triple_fault (i.e., shutdown), then no info to tell L1 that
-> it's caused by Notify VM exit with invalid context. Triple fault needs
-> to be extended and L1 kernel needs to be enlightened. It doesn't help
-> old guest kernel.
+> Signals get in the way, and break the notion of atomicity. Userspace
+> *will* observe this.
 >
-> If we use Machine Check, it's somewhat same inexplicable to L2 unless
-> it's enlightened. But it doesn't help old guest kernel.
+> I agree that save/restore is an important point, and that snapshoting
+> the guest at this stage should capture the reset value. But it is the
+> asymmetry of the behaviours that I find jarring:
 >
-> Anyway, for Notify VM exit with invalid context from L2, I don't see a
-> good solution to tell L1 VMM it's a "Notify VM exit with invalid context
-> from L2" and keep all kinds of L1 VMM happy, especially for those with
-> old kernel versions.
+> - if you ask for userspace exit, no reset value is applied and you
+>   need to implement the reset in userspace
+>
+> - if you *don't* ask for a userspace exit, the reset values are
+>   applied, and a signal while in WFI will result in this reset being
+>   observed
+>
+> Why can't the userspace exit path also apply the reset values *before*
+> exiting? After all, you can model this exit to userspace as
+> reset+WFI+'spurious exit from WFI'. This would at least unify the two
+> behaviours.
 
-I agree that there is no way to make every conceivable L1 happy.
-That's why the information needs to be surfaced to the L0 userspace. I
-contend that any time L0 kvm violates the architectural specification
-in its emulation of L1 or L2, the L0 userspace *must* be informed.
+I hesitated applying the reset context to the CPU before the userspace
+exit because that would be wildly different from the other system
+events. Userspace wouldn't have much choice but to comply with the
+guest request at that point.
+
+What about adopting the following:
+
+ - Drop the in-kernel SYSTEM_SUSPEND emulation. I think you were
+getting at this point in [1], and I'd certainly be open to it. Without
+a userspace exit, I don't think there is anything meaningfully
+different between this call and a WFI instruction.
+
+ - Add data to the kvm_run structure to convey the reset state for a
+SYSTEM_SUSPEND exit. There's plenty of room left in the structure for
+more, and can be done generically (just an array of data) for future
+expansion. We already are going to need a code change in userspace to
+do this right, so may as well update its view of kvm_run along the
+way.
+
+ - Exit to userspace with PSCI_RET_INTERNAL_FAILURE queued up for the
+guest. Doing so keeps the exits consistent with the other system
+exits, and affords userspace the ability to deny the call when it
+wants to.
+
+[1]: http://lore.kernel.org/r/87fso63ha2.wl-maz@kernel.org
+
+> I still dislike the reset state being applied early, but consistency
+> (and save/restore) trumps taste here. I know I'm being pedantic here,
+> but we've been burned with loosely defined semantics in the past, and
+> I want to get this right. Or less wrong.
+
+I completely agree with you. The semantics are a bit funky, and I
+really do wonder if the easiest way around that is to just make the
+implementation a userspace problem.
+
+--
+Oliver
