@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0D7AD4C7E30
-	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 00:18:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1BA894C7E44
+	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 00:26:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229699AbiB1XSt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Feb 2022 18:18:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39274 "EHLO
+        id S229840AbiB1X1C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Feb 2022 18:27:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44562 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229516AbiB1XSr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Feb 2022 18:18:47 -0500
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94BDD3FDA1
-        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 15:18:06 -0800 (PST)
-Received: by mail-ed1-x530.google.com with SMTP id p4so4644388edi.1
-        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 15:18:06 -0800 (PST)
+        with ESMTP id S229842AbiB1X04 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Feb 2022 18:26:56 -0500
+Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A791C7E8E
+        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 15:26:17 -0800 (PST)
+Received: by mail-ej1-x632.google.com with SMTP id qk11so28039526ejb.2
+        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 15:26:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=ng4LgEMIm2ZmUALh0wWhtFzvLwEBPi1PEXH7f99he44=;
-        b=UcalAtgGjlIwzx3+xqpfMMaSA+UIKPp2JQD8fF1yqEpiQ0kzSf8wbW2lrxYMICigY4
-         z7efQTSrHexP+Bzvzqj67TrfRKFsg0fUVpU7jfvKpls13Fqv1r3kyWDfCalgrvr1eLpJ
-         UUo8EAT+TW/ArMaAS0LL1FvVCIqzlz8IpdZKEpEXBOWPp755E0V8cOYTXvrMp2+AkQpt
-         m/THDPcHTWk+O2FqsxBmN5J2a2clKFu0QtdfgkMWrfV5GjaD/bo+PItPiY8u/tIqk+mi
-         PBnIKZKkDVz5lTuuCNuBgvtYwY/uYWD8PFKw6B9uVFzQJSYFIUxsfkI68Qtd5j2ZVR1q
-         twaw==
+        bh=IYj0iyPbAPJYK0pqqrQFmSosxig3GLvPltNcBRpBH2o=;
+        b=iilCwxcJirrROzQlokAzirElITvzz8NVS309xa9R+fmGw9330A74LwBK3eZYQ3xy9n
+         rkHxmIEDL09h+td2iWT3rJUObUBT6IN+zk9ezdTBBr1ySUm5aMgocqlq5Wp11cPe8ZNl
+         ZqlyQsCZVSY7B2Z7kItx9x1BlIxIyzmf9rGVSmevoYvCMc3XR0zO/d7FJyGzHSdIaYoR
+         NwJ1EOZz7pG4uMAOsjdUKz0MokxuetIYWe7DB7CFqDZL1LmrOI5am0cFISjMCncJLpJt
+         9nkQE3cm2ATdP4rNDTAiLca6Hhh6myJYWOWRrKwlIg4wT3BPqIwz9IMq9iEl3Q3pbG7c
+         WfZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=ng4LgEMIm2ZmUALh0wWhtFzvLwEBPi1PEXH7f99he44=;
-        b=ELCuR1GSE1hjphbFlQMXcoWJ4WiqYpYLBMCKrhb4PYPnnClNzCkqBuuxc2PYHtpQZ9
-         u2D1X/tGzVVemSdAYXfEf83PzD4wFwK7jTpmIKWKzL4sVYE1YLrzt3UX3k/Qv4XbDVBr
-         Jbfkc/DyRd36NsSSb+YVhBrsoXymXEXIGmtk4GHpW0pJbVsKBui/Il5uu+QeqlBAwHz+
-         kn9wFOYOgs6UUhjYgre0/9waAGWPUBxiCFy4YZKVR4fWRxynxsBIBIzNyOeBS1MX6vRB
-         dvFT1Bvsfrqhtk+NJAW9OoewGFwv/+tkRBDcrfMuoKLwnXGas7dZEZTExI3JH9VgYQEW
-         BZDQ==
-X-Gm-Message-State: AOAM5324zphh4d7RkMR+UmWWqElsx2Tc6njcRD6UM5kRGl+QomQsJeU8
-        9KnntvioP/LBCCfLSBAiisxK4vTal29xmGk5ur3dCw==
-X-Google-Smtp-Source: ABdhPJxwokUiklXKZIjrW6pYM3G4wNkwPkn+R0wZeLRCT52J8+Qv6rRQzZQyE2NIfqAVvBsu1Q/jKr2DWPW1vJBSyLI=
-X-Received: by 2002:aa7:c982:0:b0:406:3862:a717 with SMTP id
- c2-20020aa7c982000000b004063862a717mr21982583edt.358.1646090285006; Mon, 28
- Feb 2022 15:18:05 -0800 (PST)
+        bh=IYj0iyPbAPJYK0pqqrQFmSosxig3GLvPltNcBRpBH2o=;
+        b=HSZRZfNQ9nEAkc8Rxe5Bq3M6QQmgBUrOqxRnKVshVMEiA4GJdiNlJTe2oa6bQCk4V+
+         1o8T5L2rqBX/NawDHdBSN2LR7/ejVUpfP1lpuaZaJ4ch8aMksYzk31dN+NpOuaNr4qr+
+         AYZ/+nf4J+f1WyG7Wn3Uu81iGx44XgJd/H0FFzRU4ZmYEQB0AEwIysnpVBkwzuUW6M+Z
+         1icDuqbxMm8S8oMhSBrtcNCEWvyTtulXYN7m57hFR7wjrdI4TlvbVa9OGNSiMDepcwMF
+         ii2EKfACyoOWlJiTxKmN4CuphOqd09sJITMgM1kuby92DqVqRJwcJJWFD/0zmpvAal0b
+         gmjg==
+X-Gm-Message-State: AOAM533DGJUOeE+jomD5VueZNKShEHlBPbZ7GkfdwVqHN9j2w5sKXkaH
+        Sn2DXUHSUvPNCDl6naczcDEfsrwVqTPR6HXhroTioP4x+/M=
+X-Google-Smtp-Source: ABdhPJxpETjZNwVKbXGVCTkT2JrkFz4ve5APlqWONORpQL2mt2RgqVbwmsnHQ8548VmwQRXdL5XR+y0muIp0FqJC3kM=
+X-Received: by 2002:a17:906:2486:b0:6cf:ced9:e4cc with SMTP id
+ e6-20020a170906248600b006cfced9e4ccmr16841097ejb.201.1646090775588; Mon, 28
+ Feb 2022 15:26:15 -0800 (PST)
 MIME-Version: 1.0
-References: <20220226001546.360188-1-seanjc@google.com> <20220226001546.360188-6-seanjc@google.com>
-In-Reply-To: <20220226001546.360188-6-seanjc@google.com>
+References: <20220226001546.360188-1-seanjc@google.com> <20220226001546.360188-7-seanjc@google.com>
+In-Reply-To: <20220226001546.360188-7-seanjc@google.com>
 From:   Ben Gardon <bgardon@google.com>
-Date:   Mon, 28 Feb 2022 15:17:53 -0800
-Message-ID: <CANgfPd_G7yiByHfrJDvmQq8b--P7a9BqcLs8SHyxPM2pfrMJAg@mail.gmail.com>
-Subject: Re: [PATCH v3 05/28] KVM: x86/mmu: Document that zapping invalidated
- roots doesn't need to flush
+Date:   Mon, 28 Feb 2022 15:26:04 -0800
+Message-ID: <CANgfPd-Y6Z=icq4ajhesu23AOZPNRVq+KNQ-2kyFHyVA6sx5Xg@mail.gmail.com>
+Subject: Re: [PATCH v3 06/28] KVM: x86/mmu: Require mmu_lock be held for write
+ in unyielding root iter
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Christian Borntraeger <borntraeger@linux.ibm.com>,
@@ -79,82 +79,67 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On Fri, Feb 25, 2022 at 4:16 PM Sean Christopherson <seanjc@google.com> wrote:
 >
-> Remove the misleading flush "handling" when zapping invalidated TDP MMU
-> roots, and document that flushing is unnecessary for all flavors of MMUs
-> when zapping invalid/obsolete roots/pages.  The "handling" in the TDP MMU
-> is dead code, as zap_gfn_range() is called with shared=true, in which
-> case it will never return true due to the flushing being handled by
-> tdp_mmu_zap_spte_atomic().
->
-> No functional change intended.
+> Assert that mmu_lock is held for write by users of the yield-unfriendly
+> TDP iterator.  The nature of a shared walk means that the caller needs to
+> play nice with other tasks modifying the page tables, which is more or
+> less the same thing as playing nice with yielding.  Theoretically, KVM
+> could gain a flow where it could legitimately take mmu_lock for read in
+> a non-preemptible context, but that's highly unlikely and any such case
+> should be viewed with a fair amount of scrutiny.
 >
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 
 Reviewed-by: Ben Gardon <bgardon@google.com>
 
 > ---
->  arch/x86/kvm/mmu/mmu.c     | 10 +++++++---
->  arch/x86/kvm/mmu/tdp_mmu.c | 15 ++++++++++-----
->  2 files changed, 17 insertions(+), 8 deletions(-)
+>  arch/x86/kvm/mmu/tdp_mmu.c | 21 +++++++++++++++------
+>  1 file changed, 15 insertions(+), 6 deletions(-)
 >
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 5a931c89d27b..1c4b84e80841 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -5615,9 +5615,13 @@ static void kvm_zap_obsolete_pages(struct kvm *kvm)
->         }
->
->         /*
-> -        * Trigger a remote TLB flush before freeing the page tables to ensure
-> -        * KVM is not in the middle of a lockless shadow page table walk, which
-> -        * may reference the pages.
-> +        * Kick all vCPUs (via remote TLB flush) before freeing the page tables
-> +        * to ensure KVM is not in the middle of a lockless shadow page table
-> +        * walk, which may reference the pages.  The remote TLB flush itself is
-> +        * not required and is simply a convenient way to kick vCPUs as needed.
-> +        * KVM performs a local TLB flush when allocating a new root (see
-> +        * kvm_mmu_load()), and the reload in the caller ensure no vCPUs are
-> +        * running with an obsolete MMU.
->          */
->         kvm_mmu_commit_zap_page(kvm, &kvm->arch.zapped_obsolete_pages);
->  }
 > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index e35bd88d92fd..5994db5d5226 100644
+> index 5994db5d5226..189f21e71c36 100644
 > --- a/arch/x86/kvm/mmu/tdp_mmu.c
 > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -843,12 +843,20 @@ void kvm_tdp_mmu_zap_all(struct kvm *kvm)
->  void kvm_tdp_mmu_zap_invalidated_roots(struct kvm *kvm)
->  {
->         struct kvm_mmu_page *root;
-> -       bool flush = false;
->
->         lockdep_assert_held_read(&kvm->mmu_lock);
->
->         for_each_invalid_tdp_mmu_root_yield_safe(kvm, root) {
-> -               flush = zap_gfn_range(kvm, root, 0, -1ull, true, flush, true);
-> +               /*
-> +                * A TLB flush is unnecessary, invalidated roots are guaranteed
-> +                * to be unreachable by the guest (see kvm_tdp_mmu_put_root()
-> +                * for more details), and unlike the legacy MMU, no vCPU kick
-> +                * is needed to play nice with lockless shadow walks as the TDP
-> +                * MMU protects its paging structures via RCU.  Note, zapping
-> +                * will still flush on yield, but that's a minor performance
-> +                * blip and not a functional issue.
-> +                */
-> +               (void)zap_gfn_range(kvm, root, 0, -1ull, true, false, true);
->
->                 /*
->                  * Put the reference acquired in kvm_tdp_mmu_invalidate_roots().
-> @@ -856,9 +864,6 @@ void kvm_tdp_mmu_zap_invalidated_roots(struct kvm *kvm)
->                  */
->                 kvm_tdp_mmu_put_root(kvm, root, true);
->         }
-> -
-> -       if (flush)
-> -               kvm_flush_remote_tlbs(kvm);
+> @@ -29,13 +29,16 @@ bool kvm_mmu_init_tdp_mmu(struct kvm *kvm)
+>         return true;
 >  }
 >
->  /*
+> -static __always_inline void kvm_lockdep_assert_mmu_lock_held(struct kvm *kvm,
+> +/* Arbitrarily returns true so that this may be used in if statements. */
+> +static __always_inline bool kvm_lockdep_assert_mmu_lock_held(struct kvm *kvm,
+>                                                              bool shared)
+>  {
+>         if (shared)
+>                 lockdep_assert_held_read(&kvm->mmu_lock);
+>         else
+>                 lockdep_assert_held_write(&kvm->mmu_lock);
+> +
+> +       return true;
+>  }
+>
+>  void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm)
+> @@ -187,11 +190,17 @@ static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
+>  #define for_each_tdp_mmu_root_yield_safe(_kvm, _root, _as_id, _shared)         \
+>         __for_each_tdp_mmu_root_yield_safe(_kvm, _root, _as_id, _shared, ALL_ROOTS)
+>
+> -#define for_each_tdp_mmu_root(_kvm, _root, _as_id)                             \
+> -       list_for_each_entry_rcu(_root, &_kvm->arch.tdp_mmu_roots, link,         \
+> -                               lockdep_is_held_type(&kvm->mmu_lock, 0) ||      \
+> -                               lockdep_is_held(&kvm->arch.tdp_mmu_pages_lock)) \
+> -               if (kvm_mmu_page_as_id(_root) != _as_id) {              \
+> +/*
+> + * Iterate over all TDP MMU roots.  Requires that mmu_lock be held for write,
+> + * the implication being that any flow that holds mmu_lock for read is
+> + * inherently yield-friendly and should use the yielf-safe variant above.
+> + * Holding mmu_lock for write obviates the need for RCU protection as the list
+> + * is guaranteed to be stable.
+> + */
+> +#define for_each_tdp_mmu_root(_kvm, _root, _as_id)                     \
+> +       list_for_each_entry(_root, &_kvm->arch.tdp_mmu_roots, link)     \
+> +               if (kvm_lockdep_assert_mmu_lock_held(_kvm, false) &&    \
+> +                   kvm_mmu_page_as_id(_root) != _as_id) {              \
+>                 } else
+>
+>  static struct kvm_mmu_page *tdp_mmu_alloc_sp(struct kvm_vcpu *vcpu)
 > --
 > 2.35.1.574.g5d30c73bfb-goog
 >
