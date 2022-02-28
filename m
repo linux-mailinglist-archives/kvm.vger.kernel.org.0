@@ -2,197 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E4ED84C7CA8
-	for <lists+kvm@lfdr.de>; Mon, 28 Feb 2022 23:01:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 95C3F4C7CD6
+	for <lists+kvm@lfdr.de>; Mon, 28 Feb 2022 23:06:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231283AbiB1WCN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Feb 2022 17:02:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40080 "EHLO
+        id S231196AbiB1WGW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Feb 2022 17:06:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230464AbiB1WCL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Feb 2022 17:02:11 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98CAF9EBB6;
-        Mon, 28 Feb 2022 14:01:20 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 29AD1B81698;
-        Mon, 28 Feb 2022 22:01:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 677EEC340F1;
-        Mon, 28 Feb 2022 22:01:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1646085677;
-        bh=bmzYeqH+wd1Y/i05gxZoeqc9TywPR9wpt0imv9Fx7Nw=;
-        h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-        b=lb9MoeFhEeGqaET4WoooJnliR/Aftbuf2qgeJWcsJRMUD7lxaPDCkpbBw1fltPmKc
-         jIEBu8SnVjgO3Aaf+8FYuXvVgG5MgAciJgva3R/8WVNn/ktDFk3hANDz2GKUoZWtxI
-         SvipV/Wo2m8Yu0T44/FsB9ncJWS6zqb8Cis19xBBpG1gsQAhwdKCM2xymmzy1B6vAh
-         NLgpj3CkfoCj7XXB9+t8bZHUSaMtCcXi/0/BYE3ppk5zRyoiwaHoQXmDsDHRdh2g9L
-         BKDOg0IEHzQ+qInzyklcGdLSrMWPhR+ZxEuCQewyXU3mL+4cdRVVpWMroWAhmtcL3w
-         /5xJdekiDQkIw==
-Date:   Mon, 28 Feb 2022 23:59:07 +0200
-From:   Mike Rapoport <rppt@kernel.org>
-To:     James Bottomley <James.Bottomley@HansenPartnership.com>,
-        =?ISO-8859-1?Q?Christian_K=F6nig?= <christian.koenig@amd.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>
-CC:     Jakob Koschel <jakobkoschel@gmail.com>,
-        alsa-devel@alsa-project.org, linux-aspeed@lists.ozlabs.org,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        linux-iio@vger.kernel.org, nouveau@lists.freedesktop.org,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        dri-devel <dri-devel@lists.freedesktop.org>,
-        Cristiano Giuffrida <c.giuffrida@vu.nl>,
-        amd-gfx list <amd-gfx@lists.freedesktop.org>,
-        samba-technical@lists.samba.org,
-        linux1394-devel@lists.sourceforge.net, drbd-dev@lists.linbit.com,
-        linux-arch <linux-arch@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>,
-        linux-scsi <linux-scsi@vger.kernel.org>,
-        linux-rdma <linux-rdma@vger.kernel.org>,
-        linux-staging@lists.linux.dev, "Bos, H.J." <h.j.bos@vu.nl>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        intel-wired-lan@lists.osuosl.org,
-        kgdb-bugreport@lists.sourceforge.net,
-        bcm-kernel-feedback-list@broadcom.com,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Linux Media Mailing List <linux-media@vger.kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Arnd Bergman <arnd@arndb.de>,
-        Linux PM <linux-pm@vger.kernel.org>,
-        intel-gfx <intel-gfx@lists.freedesktop.org>,
-        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        v9fs-developer@lists.sourceforge.net,
-        linux-tegra <linux-tegra@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-sgx@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>, linux-usb@vger.kernel.org,
-        linux-wireless <linux-wireless@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux F2FS Dev Mailing List 
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        tipc-discussion@lists.sourceforge.net,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        dma <dmaengine@vger.kernel.org>,
-        linux-mediatek@lists.infradead.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_2/6=5D_treewide=3A_remove_using?= =?US-ASCII?Q?_list_iterator_after_loop_body_as_a_ptr?=
-User-Agent: K-9 Mail for Android
-In-Reply-To: <b2d20961dbb7533f380827a7fcc313ff849875c1.camel@HansenPartnership.com>
-References: <20220228110822.491923-1-jakobkoschel@gmail.com> <20220228110822.491923-3-jakobkoschel@gmail.com> <2e4e95d6-f6c9-a188-e1cd-b1eae465562a@amd.com> <CAHk-=wgQps58DPEOe4y5cTh5oE9EdNTWRLXzgMiETc+mFX7jzw@mail.gmail.com> <282f0f8d-f491-26fc-6ae0-604b367a5a1a@amd.com> <b2d20961dbb7533f380827a7fcc313ff849875c1.camel@HansenPartnership.com>
-Message-ID: <7D0C2A5D-500E-4F38-AD0C-A76E132A390E@kernel.org>
+        with ESMTP id S231274AbiB1WGR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Feb 2022 17:06:17 -0500
+Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 836D3C4E0B
+        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 14:05:37 -0800 (PST)
+Received: by mail-ej1-x634.google.com with SMTP id a8so27659804ejc.8
+        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 14:05:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=JvcF/uCui9GejoorR8kzc/i0AUGjtyXAWJIZdvZ03NQ=;
+        b=cSeWu9QLPxDY4T3cjtJyzxfFc2K1Ozx68VyjxgERiihlulc7eVq/5SblXRpR/nvCw6
+         tXE0HgjcCsUowDAj2oeNw+E+Qq+Wy2qrjCHpKVu+gzi4+1pJHnNqzf+IsjSX1g4q1NAf
+         kTWfcOGfMFG8nUWsdKEKIKE9+0k2s247ZsfsMCIYPdVKniRsbxs+lgaJJiU9ySveyNGy
+         rBrbgGCnny0NIcJb9dfeUGs5Gl5kxLLYJRHLU+oj2gXvhWOJVoW6yuNGWa4KXzPs9Z8E
+         9l5BIMEj9AKjteiFx5OIqPPaLHkZp6c9Ey+JU7UVVCvNsOoZzY6RK8V2WELW6fGEPk0/
+         wjnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=JvcF/uCui9GejoorR8kzc/i0AUGjtyXAWJIZdvZ03NQ=;
+        b=Pnh47ccLuK9EC4rUys4r4qDtPK9fL23al2kFHNT9tdrs/bX7O4gWBoWfVJai2AKzsM
+         JL6g1+jFfEC/k84zaWFbROIre0APPRH4V4jY0VSFlsQkrtnbjMbyY2m+I+nxZVca26yh
+         YOv4M4JoKojti1i2vCE3TdSjsxXkV0brLeAgASMh4VRW5YygsDXgW6uASpoLnZEssyhZ
+         jUSTb/Z5Den/CoEj6E0ai3D60C8L8x2qeGUeSYEOif4vTgtRmLmcy/9zNBRkAlVzgNe0
+         Ci+Wjh/jJlim6+Xy2wuOU5CyJVcCDpaYOX61rZ6hz620Jw1Z2NpSIeQyf5stSDYVjA2E
+         wNlg==
+X-Gm-Message-State: AOAM5313/Q70n137bW/5K4PIVCQkLhjrihLa7KxBfi78dPCsGYjvlw8J
+        u1WaBk1qcL2Ilte9aPep4MrLYRhQYxjFQn5ZG5S7qw==
+X-Google-Smtp-Source: ABdhPJwpkgVdZCj65iCTvwkPVrG3pCwzeMtzGd+dQTnVXHD2RKASDg/uq8cVcFevBFQRY7nJ1J8BcX2gApQC7gUftqA=
+X-Received: by 2002:a17:906:eda9:b0:6ce:e24e:7b95 with SMTP id
+ sa9-20020a170906eda900b006cee24e7b95mr16927248ejb.314.1646085935827; Mon, 28
+ Feb 2022 14:05:35 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-7.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <20220225182248.3812651-1-seanjc@google.com> <20220225182248.3812651-4-seanjc@google.com>
+In-Reply-To: <20220225182248.3812651-4-seanjc@google.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Mon, 28 Feb 2022 14:05:24 -0800
+Message-ID: <CANgfPd_yjt7AL0aC++=QHkTnnbwi+qsnihc0S2dEZryytoyMGg@mail.gmail.com>
+Subject: Re: [PATCH v2 3/7] KVM: Drop kvm_reload_remote_mmus(), open code
+ request in x86 users
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Lai Jiangshan <jiangshanlai@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-18.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On February 28, 2022 10:42:53 PM GMT+02:00, James Bottomley <James=2EBotto=
-mley@HansenPartnership=2Ecom> wrote:
->On Mon, 2022-02-28 at 21:07 +0100, Christian K=C3=B6nig wrote:
->> Am 28=2E02=2E22 um 20:56 schrieb Linus Torvalds:
->> > On Mon, Feb 28, 2022 at 4:19 AM Christian K=C3=B6nig
->> > <christian=2Ekoenig@amd=2Ecom> wrote:
->> > > I don't think that using the extra variable makes the code in any
->> > > way
->> > > more reliable or easier to read=2E
->> > So I think the next step is to do the attached patch (which
->> > requires
->> > that "-std=3Dgnu11" that was discussed in the original thread)=2E
->> >=20
->> > That will guarantee that the 'pos' parameter of
->> > list_for_each_entry()
->> > is only updated INSIDE the for_each_list_entry() loop, and can
->> > never
->> > point to the (wrongly typed) head entry=2E
->> >=20
->> > And I would actually hope that it should actually cause compiler
->> > warnings about possibly uninitialized variables if people then use
->> > the
->> > 'pos' pointer outside the loop=2E Except
->> >=20
->> >   (a) that code in sgx/encl=2Ec currently initializes 'tmp' to NULL
->> > for
->> > inexplicable reasons - possibly because it already expected this
->> > behavior
->> >=20
->> >   (b) when I remove that NULL initializer, I still don't get a
->> > warning,
->> > because we've disabled -Wno-maybe-uninitialized since it results in
->> > so
->> > many false positives=2E
->> >=20
->> > Oh well=2E
->> >=20
->> > Anyway, give this patch a look, and at least if it's expanded to do
->> > "(pos) =3D NULL" in the entry statement for the for-loop, it will
->> > avoid the HEAD type confusion that Jakob is working on=2E And I think
->> > in a cleaner way than the horrid games he plays=2E
->> >=20
->> > (But it won't avoid possible CPU speculation of such type
->> > confusion=2E That, in my opinion, is a completely different issue)
->>=20
->> Yes, completely agree=2E
->>=20
->> > I do wish we could actually poison the 'pos' value after the loop
->> > somehow - but clearly the "might be uninitialized" I was hoping for
->> > isn't the way to do it=2E
->> >=20
->> > Anybody have any ideas?
->>=20
->> I think we should look at the use cases why code is touching (pos)
->> after the loop=2E
->>=20
->> Just from skimming over the patches to change this and experience
->> with the drivers/subsystems I help to maintain I think the primary
->> pattern looks something like this:
->>=20
->> list_for_each_entry(entry, head, member) {
->>      if (some_condition_checking(entry))
->>          break;
->> }
->> do_something_with(entry);
+On Fri, Feb 25, 2022 at 10:22 AM Sean Christopherson <seanjc@google.com> wrote:
 >
+> Remove the generic kvm_reload_remote_mmus() and open code its
+> functionality into the two x86 callers.  x86 is (obviously) the only
+> architecture that uses the hook, and is also the only architecture that
+> uses KVM_REQ_MMU_RELOAD in a way that's consistent with the name.  That
+> will change in a future patch, as x86's usage when zapping a single
+> shadow page x86 doesn't actually _need_ to reload all vCPUs' MMUs, only
+> MMUs whose root is being zapped actually need to be reloaded.
 >
->Actually, we usually have a check to see if the loop found anything,
->but in that case it should something like
+> s390 also uses KVM_REQ_MMU_RELOAD, but for a slightly different purpose.
 >
->if (list_entry_is_head(entry, head, member)) {
->    return with error;
->}
->do_somethin_with(entry);
+> Drop the generic code in anticipation of implementing s390 and x86 arch
+> specific requests, which will allow dropping KVM_REQ_MMU_RELOAD entirely.
 >
->Suffice?  The list_entry_is_head() macro is designed to cope with the
->bogus entry on head problem=2E
+> Opportunistically reword the x86 TDP MMU comment to avoid making
+> references to functions (and requests!) when possible, and to remove the
+> rather ambiguous "this".
+>
+> No functional change intended.
+>
+> Cc: Ben Gardon <bgardon@google.com>
 
-Won't suffice because the end goal of this work is to limit scope of entry=
- only to loop=2E Hence the need for additional variable=2E
+Reviewed-by: Ben Gardon <bgardon@google.com>
 
-Besides, there are no guarantees that people won't do_something_with(entry=
-) without the check or won't compare entry to NULL to check if the loop fin=
-ished with break or not=2E
-
->James
-
-
---=20
-Sincerely yours,
-Mike
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c   | 14 +++++++-------
+>  include/linux/kvm_host.h |  1 -
+>  virt/kvm/kvm_main.c      |  5 -----
+>  3 files changed, 7 insertions(+), 13 deletions(-)
+>
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index b2c1c4eb6007..32c6d4b33d03 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -2353,7 +2353,7 @@ static bool __kvm_mmu_prepare_zap_page(struct kvm *kvm,
+>                  * treats invalid shadow pages as being obsolete.
+>                  */
+>                 if (!is_obsolete_sp(kvm, sp))
+> -                       kvm_reload_remote_mmus(kvm);
+> +                       kvm_make_all_cpus_request(kvm, KVM_REQ_MMU_RELOAD);
+>         }
+>
+>         if (sp->lpage_disallowed)
+> @@ -5639,11 +5639,11 @@ static void kvm_mmu_zap_all_fast(struct kvm *kvm)
+>          */
+>         kvm->arch.mmu_valid_gen = kvm->arch.mmu_valid_gen ? 0 : 1;
+>
+> -       /* In order to ensure all threads see this change when
+> -        * handling the MMU reload signal, this must happen in the
+> -        * same critical section as kvm_reload_remote_mmus, and
+> -        * before kvm_zap_obsolete_pages as kvm_zap_obsolete_pages
+> -        * could drop the MMU lock and yield.
+> +       /*
+> +        * In order to ensure all vCPUs drop their soon-to-be invalid roots,
+> +        * invalidating TDP MMU roots must be done while holding mmu_lock for
+> +        * write and in the same critical section as making the reload request,
+> +        * e.g. before kvm_zap_obsolete_pages() could drop mmu_lock and yield.
+>          */
+>         if (is_tdp_mmu_enabled(kvm))
+>                 kvm_tdp_mmu_invalidate_all_roots(kvm);
+> @@ -5656,7 +5656,7 @@ static void kvm_mmu_zap_all_fast(struct kvm *kvm)
+>          * Note: we need to do this under the protection of mmu_lock,
+>          * otherwise, vcpu would purge shadow page but miss tlb flush.
+>          */
+> -       kvm_reload_remote_mmus(kvm);
+> +       kvm_make_all_cpus_request(kvm, KVM_REQ_MMU_RELOAD);
+>
+>         kvm_zap_obsolete_pages(kvm);
+>
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index f11039944c08..0aeb47cffd43 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -1325,7 +1325,6 @@ int kvm_vcpu_yield_to(struct kvm_vcpu *target);
+>  void kvm_vcpu_on_spin(struct kvm_vcpu *vcpu, bool usermode_vcpu_not_eligible);
+>
+>  void kvm_flush_remote_tlbs(struct kvm *kvm);
+> -void kvm_reload_remote_mmus(struct kvm *kvm);
+>
+>  #ifdef KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE
+>  int kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min);
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 83c57bcc6eb6..66bb1631cb89 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -354,11 +354,6 @@ void kvm_flush_remote_tlbs(struct kvm *kvm)
+>  EXPORT_SYMBOL_GPL(kvm_flush_remote_tlbs);
+>  #endif
+>
+> -void kvm_reload_remote_mmus(struct kvm *kvm)
+> -{
+> -       kvm_make_all_cpus_request(kvm, KVM_REQ_MMU_RELOAD);
+> -}
+> -
+>  #ifdef KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE
+>  static inline void *mmu_memory_cache_alloc_obj(struct kvm_mmu_memory_cache *mc,
+>                                                gfp_t gfp_flags)
+> --
+> 2.35.1.574.g5d30c73bfb-goog
+>
