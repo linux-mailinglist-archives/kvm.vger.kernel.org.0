@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 09A154C604A
-	for <lists+kvm@lfdr.de>; Mon, 28 Feb 2022 01:53:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CAD0B4C604F
+	for <lists+kvm@lfdr.de>; Mon, 28 Feb 2022 01:53:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232244AbiB1Axh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 27 Feb 2022 19:53:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60262 "EHLO
+        id S232241AbiB1Axs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 27 Feb 2022 19:53:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232220AbiB1Axc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 27 Feb 2022 19:53:32 -0500
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F038243AE8;
-        Sun, 27 Feb 2022 16:52:54 -0800 (PST)
+        with ESMTP id S232263AbiB1Axn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 27 Feb 2022 19:53:43 -0500
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C65E44740;
+        Sun, 27 Feb 2022 16:53:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1646009574; x=1677545574;
+  t=1646009582; x=1677545582;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=TTb5uTpvyMenyURqmVAtinXx9YdD8xnnaNld1DpmwaY=;
-  b=XZPTQM9agWj+stgmgpoQ2W8Dt/PCXWWU3fspbLJF4KCiqPgABJkQD7BT
-   U6ZjOWpzc2ATH0+POrbMY7ML5ZsB0DzQXbnauV4IVfLsxtsMGQLN0IoTU
-   gKLDtIwWp9ltxZfQ7jY+oBY4gmWoR0KwZnlfp/Gn4HtY37kA8zIhp4BrV
-   a8rxeVVYbfdr2meXbb4XnYFmcrOT1ky3fSZ33yNZEofwJu3f4qKviwA+p
-   M15RZyoG3w7WWtQAuqWaQkl6IwX/g59Q5agwe9wJm5xwi26tYMzHAp52r
-   qI+oduZbDdYgedmiHny0xHBBe3wxeht4Yk9zNK/ffTcujAauHjjhnBphI
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10271"; a="233394893"
+  bh=s2HXqS6jI07PkyQ1hBdhEcxNDCppyg0kFB1er61FyPs=;
+  b=jdSsoq8dYkpPg71iEkGqER7eI0U8HPcBWPygOQOyxCYGMoFB/hb18kE+
+   K0m9e5RyCegRRMV7fH+efSEjC/fhRTNVBwJc2WqfRXNA67ew82q/Hjs7U
+   u9pQJpbB+8xKLGrxxAfvsPCsB4srTypZUKyBxxsJWPxluPlFZQ1NZddJC
+   e6LoBQMpYU4nOz+irEj+pVE6fsqUa9I2li7VNnl4gMEjSR/6bMhRngMk8
+   EXxlwPaxOfeXMEnDFUW7UgmchfEZ+We86sUDXtBVZW0s0U6DF1gH6rRPk
+   EmmI91DUgtN9I3uqL7ELa6sFJoAHaTZNTKZHXgqBvPXpv3CzhTZKYPlh3
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10271"; a="339211027"
 X-IronPort-AV: E=Sophos;i="5.90,142,1643702400"; 
-   d="scan'208";a="233394893"
+   d="scan'208";a="339211027"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2022 16:52:54 -0800
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2022 16:53:02 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.90,142,1643702400"; 
-   d="scan'208";a="550020162"
+   d="scan'208";a="550020189"
 Received: from allen-box.sh.intel.com ([10.239.159.118])
-  by orsmga008.jf.intel.com with ESMTP; 27 Feb 2022 16:52:47 -0800
+  by orsmga008.jf.intel.com with ESMTP; 27 Feb 2022 16:52:54 -0800
 From:   Lu Baolu <baolu.lu@linux.intel.com>
 To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Joerg Roedel <joro@8bytes.org>,
@@ -65,9 +65,9 @@ Cc:     Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
         iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Lu Baolu <baolu.lu@linux.intel.com>
-Subject: [PATCH v7 02/11] driver core: Add dma_cleanup callback in bus_type
-Date:   Mon, 28 Feb 2022 08:50:47 +0800
-Message-Id: <20220228005056.599595-3-baolu.lu@linux.intel.com>
+Subject: [PATCH v7 03/11] amba: Stop sharing platform_dma_configure()
+Date:   Mon, 28 Feb 2022 08:50:48 +0800
+Message-Id: <20220228005056.599595-4-baolu.lu@linux.intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220228005056.599595-1-baolu.lu@linux.intel.com>
 References: <20220228005056.599595-1-baolu.lu@linux.intel.com>
@@ -83,79 +83,88 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The bus_type structure defines dma_configure() callback for bus drivers
-to configure DMA on the devices. This adds the paired dma_cleanup()
-callback and calls it during driver unbinding so that bus drivers can do
-some cleanup work.
-
-One use case for this paired DMA callbacks is for the bus driver to check
-for DMA ownership conflicts during driver binding, where multiple devices
-belonging to a same IOMMU group (the minimum granularity of isolation and
-protection) may be assigned to kernel drivers or user space respectively.
-
-Without this change, for example, the vfio driver has to listen to a bus
-BOUND_DRIVER event and then BUG_ON() in case of dma ownership conflict.
-This leads to bad user experience since careless driver binding operation
-may crash the system if the admin overlooks the group restriction. Aside
-from bad design, this leads to a security problem as a root user, even with
-lockdown=integrity, can force the kernel to BUG.
-
-With this change, the bus driver could check and set the DMA ownership in
-driver binding process and fail on ownership conflicts. The DMA ownership
-should be released during driver unbinding.
+Stop sharing platform_dma_configure() helper as they are about to have
+their own bus dma_configure callbacks.
 
 Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
-Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 ---
- include/linux/device/bus.h | 3 +++
- drivers/base/dd.c          | 5 +++++
- 2 files changed, 8 insertions(+)
+ include/linux/platform_device.h |  2 --
+ drivers/amba/bus.c              | 19 ++++++++++++++++++-
+ drivers/base/platform.c         |  3 +--
+ 3 files changed, 19 insertions(+), 5 deletions(-)
 
-diff --git a/include/linux/device/bus.h b/include/linux/device/bus.h
-index a039ab809753..d8b29ccd07e5 100644
---- a/include/linux/device/bus.h
-+++ b/include/linux/device/bus.h
-@@ -59,6 +59,8 @@ struct fwnode_handle;
-  *		bus supports.
-  * @dma_configure:	Called to setup DMA configuration on a device on
-  *			this bus.
-+ * @dma_cleanup:	Called to cleanup DMA configuration on a device on
-+ *			this bus.
-  * @pm:		Power management operations of this bus, callback the specific
-  *		device driver's pm-ops.
-  * @iommu_ops:  IOMMU specific operations for this bus, used to attach IOMMU
-@@ -103,6 +105,7 @@ struct bus_type {
- 	int (*num_vf)(struct device *dev);
+diff --git a/include/linux/platform_device.h b/include/linux/platform_device.h
+index 7c96f169d274..17fde717df68 100644
+--- a/include/linux/platform_device.h
++++ b/include/linux/platform_device.h
+@@ -328,8 +328,6 @@ extern int platform_pm_restore(struct device *dev);
+ #define platform_pm_restore		NULL
+ #endif
  
- 	int (*dma_configure)(struct device *dev);
-+	void (*dma_cleanup)(struct device *dev);
+-extern int platform_dma_configure(struct device *dev);
+-
+ #ifdef CONFIG_PM_SLEEP
+ #define USE_PLATFORM_PM_SLEEP_OPS \
+ 	.suspend = platform_pm_suspend, \
+diff --git a/drivers/amba/bus.c b/drivers/amba/bus.c
+index e1a5eca3ae3c..8392f4aa251b 100644
+--- a/drivers/amba/bus.c
++++ b/drivers/amba/bus.c
+@@ -20,6 +20,8 @@
+ #include <linux/platform_device.h>
+ #include <linux/reset.h>
+ #include <linux/of_irq.h>
++#include <linux/of_device.h>
++#include <linux/acpi.h>
  
- 	const struct dev_pm_ops *pm;
+ #define to_amba_driver(d)	container_of(d, struct amba_driver, drv)
  
-diff --git a/drivers/base/dd.c b/drivers/base/dd.c
-index 9eaaff2f556c..de05c5c60c6b 100644
---- a/drivers/base/dd.c
-+++ b/drivers/base/dd.c
-@@ -662,6 +662,8 @@ static int really_probe(struct device *dev, struct device_driver *drv)
- 	if (dev->bus)
- 		blocking_notifier_call_chain(&dev->bus->p->bus_notifier,
- 					     BUS_NOTIFY_DRIVER_NOT_BOUND, dev);
-+	if (dev->bus && dev->bus->dma_cleanup)
-+		dev->bus->dma_cleanup(dev);
- pinctrl_bind_failed:
- 	device_links_no_driver(dev);
- 	devres_release_all(dev);
-@@ -1205,6 +1207,9 @@ static void __device_release_driver(struct device *dev, struct device *parent)
- 		else if (drv->remove)
- 			drv->remove(dev);
+@@ -273,6 +275,21 @@ static void amba_shutdown(struct device *dev)
+ 		drv->shutdown(to_amba_device(dev));
+ }
  
-+		if (dev->bus && dev->bus->dma_cleanup)
-+			dev->bus->dma_cleanup(dev);
++static int amba_dma_configure(struct device *dev)
++{
++	enum dev_dma_attr attr;
++	int ret = 0;
 +
- 		device_links_driver_cleanup(dev);
++	if (dev->of_node) {
++		ret = of_dma_configure(dev, dev->of_node, true);
++	} else if (has_acpi_companion(dev)) {
++		attr = acpi_get_dma_attr(to_acpi_device_node(dev->fwnode));
++		ret = acpi_dma_configure(dev, attr);
++	}
++
++	return ret;
++}
++
+ #ifdef CONFIG_PM
+ /*
+  * Hooks to provide runtime PM of the pclk (bus clock).  It is safe to
+@@ -341,7 +358,7 @@ struct bus_type amba_bustype = {
+ 	.probe		= amba_probe,
+ 	.remove		= amba_remove,
+ 	.shutdown	= amba_shutdown,
+-	.dma_configure	= platform_dma_configure,
++	.dma_configure	= amba_dma_configure,
+ 	.pm		= &amba_pm,
+ };
+ EXPORT_SYMBOL_GPL(amba_bustype);
+diff --git a/drivers/base/platform.c b/drivers/base/platform.c
+index 6cb04ac48bf0..acbc6eae37b8 100644
+--- a/drivers/base/platform.c
++++ b/drivers/base/platform.c
+@@ -1454,8 +1454,7 @@ static void platform_shutdown(struct device *_dev)
+ 		drv->shutdown(dev);
+ }
  
- 		devres_release_all(dev);
+-
+-int platform_dma_configure(struct device *dev)
++static int platform_dma_configure(struct device *dev)
+ {
+ 	enum dev_dma_attr attr;
+ 	int ret = 0;
 -- 
 2.25.1
 
