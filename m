@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A4AC04C60DA
-	for <lists+kvm@lfdr.de>; Mon, 28 Feb 2022 03:14:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6FC984C60DE
+	for <lists+kvm@lfdr.de>; Mon, 28 Feb 2022 03:14:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232404AbiB1COg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 27 Feb 2022 21:14:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55438 "EHLO
+        id S232448AbiB1COs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 27 Feb 2022 21:14:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232140AbiB1COe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 27 Feb 2022 21:14:34 -0500
+        with ESMTP id S232447AbiB1COr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 27 Feb 2022 21:14:47 -0500
 Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B19151314;
-        Sun, 27 Feb 2022 18:13:55 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D29EE51314;
+        Sun, 27 Feb 2022 18:13:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1646014435; x=1677550435;
+  t=1646014439; x=1677550439;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=BnYSZkDEfNq6qs3O72hE3RitoTLCTuZUmKqrNKDUKzg=;
-  b=mMCRaForP8SN4WrfVmnhPnwjDDrsUBEGZg4sr9lMU0o7TFMnlDls7Scv
-   mHD6YuPPc89TPTpUddSSVHXdJxlPe0Sqtn/tj+8++FWWMksbXm8TVCtzA
-   IMpn6R19AyVuzfA1W4kMXDVn3LUbKi33R0RN4KACIfx8K1EZIuckGud3U
-   5eaVPy9xTYFhQSwaydN/WE2K6hs7wT2dc838CVHant50sZxzE5cQFiW7t
-   duJFViyNbjL3QdnUp0LfHegihmS2GSevYyvVgteihIo+vC5SHgTOvsrr8
-   zjStib/IJnd2w5AEKGZCAUmULrLNB24XnZ1fXLtYGWYgRJI159LC/3tUA
-   Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10271"; a="240191880"
+  bh=jhP2MPNXG6NQHoTiDclh8J5yavVfUqusf6K/JkKdprM=;
+  b=aE8b4RkWqyVyR4I6SVAEmNRdMJH8fRcCvyV3a56/ZZknieGi9kCVL/wq
+   Hfmxlm1huvSFgiYABXfLmQK6sVUunqX84VxCUcutY04aZwBzezR5J/6aN
+   YT4ssgvTS8GcfbIBB8lbFoKjSpaJiMiiEQaHV4bgDy6Qxml+CZAM0Aj/M
+   XlC70IvzzPdIw7XcpG+jJufqLJ89//qxGoDFnjtc90Gn/yJ7tzNcCWyAx
+   f3ZFgHrXd4iFF1ixFnvIaS1v69bAaWblPWTBkhZW0E9JH3KlaPFL/D8RA
+   Z/zhIbJrdKB0vor7TVW6BHGCAGpG9R8Ce/b6WxsF4LklqDv5b11XKG4XU
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10271"; a="240191884"
 X-IronPort-AV: E=Sophos;i="5.90,142,1643702400"; 
-   d="scan'208";a="240191880"
+   d="scan'208";a="240191884"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2022 18:13:55 -0800
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2022 18:13:59 -0800
 X-IronPort-AV: E=Sophos;i="5.90,142,1643702400"; 
-   d="scan'208";a="777936834"
+   d="scan'208";a="777936845"
 Received: from jdpanhor-mobl2.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.49.36])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2022 18:13:51 -0800
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2022 18:13:55 -0800
 From:   Kai Huang <kai.huang@intel.com>
 To:     x86@kernel.org
 Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
@@ -47,9 +47,9 @@ Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         chang.seok.bae@intel.com, keescook@chromium.org,
         hengqi.arch@bytedance.com, laijs@linux.alibaba.com,
         metze@samba.org, linux-kernel@vger.kernel.org, kai.huang@intel.com
-Subject: [RFC PATCH 03/21] x86/virt/tdx: Implement the SEAMCALL base function
-Date:   Mon, 28 Feb 2022 15:12:51 +1300
-Message-Id: <67e0161abb0d0363b810d8539ac8aba139ca7403.1646007267.git.kai.huang@intel.com>
+Subject: [RFC PATCH 04/21] x86/virt/tdx: Add skeleton for detecting and initializing TDX on demand
+Date:   Mon, 28 Feb 2022 15:12:52 +1300
+Message-Id: <dd31a1f0c9bf5df56c09c58ead0663a5bb53919a.1646007267.git.kai.huang@intel.com>
 X-Mailer: git-send-email 2.33.1
 In-Reply-To: <cover.1646007267.git.kai.huang@intel.com>
 References: <cover.1646007267.git.kai.huang@intel.com>
@@ -65,134 +65,329 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Secure Arbitration Mode (SEAM) is an extension of VMX architecture.  It
-defines a new VMX root operation (SEAM VMX root) and a new VMX non-root
-operation (SEAM VMX non-root) which isolate from legacy VMX root and VMX
-non-root mode.
+The TDX module is essentially a CPU-attested software module running
+in the new SEAM mode to protect VMs from malicious host and certain
+physical attacks.  The TDX module implements the functions to build,
+tear down and start execution of protected VMs called Trusted Domains
+(TD).  Before the TDX module can be used to create and run TD guests,
+it must be loaded into the SEAMRR and properly initialized.  The TDX
+module is expected to be loaded by BIOS before booting to the kernel,
+and the kernel is expected to detect and initialize it, using the
+SEAMCALLs defined by TDX architecture.
 
-A CPU-attested software module (called 'TDX module') runs in SEAM VMX
-root to manage the protected VMs running in SEAM VMX non-root.  SEAM VMX
-root is also used to host another CPU-attested software module (called
-'P-SEAMLDR') to load and update the TDX module.
+The TDX module can be initialized only once in its lifetime.  Instead
+of always initializing it at boot time, this implementation chooses an
+on-demand approach to initialize TDX until there is a real need (e.g
+when requested by KVM).  This avoids consuming the memory that must be
+allocated by kernel and given to the TDX module as metadata (~1/256th of
+the TDX-usable memory), and also saves the time of initializing the TDX
+module (and the metadata) when TDX is not used at all.
 
-Host kernel transits to either P-SEAMLDR or TDX module via the new
-SEAMCALL instruction.  SEAMCALLs are host-side interface functions
-defined by P-SEAMLDR and TDX module around the new SEAMCALL instruction.
-They are similar to a hypercall, except they are made by host kernel to
-the SEAM software.
+Introduce two placeholders tdx_detect() and tdx_init() to detect and
+initialize the TDX module on demand, with a state machine introduced to
+orchestrate the entire process (in case of multiple callers).
 
-SEAMCALLs use an ABI different from the x86-64 system-v ABI.  Instead,
-it shares the same ABI with the TDCALL.  %rax is used to carry both the
-SEAMCALL leaf function number (input) and the completion status code
-(output).  Additional GPRs (%rcx, %rdx, %r8->%r11) may be further used
-as both input and output operands in individual leaf SEAMCALLs.
+To start with, tdx_detect() checks SEAMRR and TDX private KeyIDs.  The
+TDX module is reported as not-loaded if either SEAMRR is not enabled, or
+there is no enough TDX private KeyIDs to create any TD guest.  The TDX
+module itself requires one global TDX private KeyID to crypto protect
+its metadata.
 
-Implement a C function __seamcall() to do SEAMCALL using the assembly
-macro used by __tdx_module_call() (the implementation of TDCALL).  The
-only exception not covered here is TDENTER leaf function which takes
-all GPRs and XMM0-XMM15 as both input and output.  The caller of TDENTER
-should implement its own logic to call TDENTER directly instead of using
-this function.
+And tdx_init() is currently empty.  The TDX module will be initialized
+in multi-steps defined by the TDX architecture:
 
-SEAMCALL instruction is essentially a VMExit from VMX root to SEAM VMX
-root.  It fails with VMfailInvalid when the SEAM software is not loaded.
-The C function __seamcall() returns TDX_SEAMCALL_VMFAILINVALID, which
-doesn't conflict with any actual error code of SEAMCALLs, to uniquely
-represent this case.
+  1) Global initialization;
+  2) Logical-CPU scope initialization;
+  3) Enumerate the TDX module capabilities and platform configuration;
+  4) Configure the TDX module about usable memory ranges and global
+     KeyID information;
+  5) Package-scope configuration for the global KeyID;
+  6) Initialize usable memory ranges based on 4).
+
+The TDX module can also be shut down at any time during module's
+lifetime.  In case of any error during the initialization process,
+shut down the module.  It's pointless to leave the module in some
+intermediate state during the initialization.
+
+SEAMCALLs used in the above steps (including shutting down TDX module)
+require SEAMRR being enabled and CPU being already in VMX operation
+(VMXON has been done).  So far KVM is the only user of TDX, and KVM
+already puts all online cpus into VMX operation.  Handling VMXON isn't
+something trivial, so this implementation doesn't handle VMXON in both
+tdx_detect() and tdx_init(), but requires the user of TDX to put all
+cpus into VMX operation before calling them.
 
 Signed-off-by: Kai Huang <kai.huang@intel.com>
 ---
- arch/x86/virt/vmx/Makefile   |  2 +-
- arch/x86/virt/vmx/seamcall.S | 53 ++++++++++++++++++++++++++++++++++++
- arch/x86/virt/vmx/tdx.h      | 11 ++++++++
- 3 files changed, 65 insertions(+), 1 deletion(-)
- create mode 100644 arch/x86/virt/vmx/seamcall.S
- create mode 100644 arch/x86/virt/vmx/tdx.h
+ arch/x86/include/asm/tdx.h |   4 +
+ arch/x86/virt/vmx/tdx.c    | 220 +++++++++++++++++++++++++++++++++++++
+ 2 files changed, 224 insertions(+)
 
-diff --git a/arch/x86/virt/vmx/Makefile b/arch/x86/virt/vmx/Makefile
-index 1bd688684716..fd577619620e 100644
---- a/arch/x86/virt/vmx/Makefile
-+++ b/arch/x86/virt/vmx/Makefile
-@@ -1,2 +1,2 @@
- # SPDX-License-Identifier: GPL-2.0-only
--obj-$(CONFIG_INTEL_TDX_HOST)	+= tdx.o
-+obj-$(CONFIG_INTEL_TDX_HOST)	+= tdx.o seamcall.o
-diff --git a/arch/x86/virt/vmx/seamcall.S b/arch/x86/virt/vmx/seamcall.S
-new file mode 100644
-index 000000000000..65edec23b5f4
---- /dev/null
-+++ b/arch/x86/virt/vmx/seamcall.S
-@@ -0,0 +1,53 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#include <linux/linkage.h>
-+#include <asm/frame.h>
-+
-+#include "../tdxcall.S"
-+
+diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
+index 605d87ab580e..b526d41c4bbf 100644
+--- a/arch/x86/include/asm/tdx.h
++++ b/arch/x86/include/asm/tdx.h
+@@ -83,8 +83,12 @@ static inline long tdx_kvm_hypercall(unsigned int nr, unsigned long p1,
+ 
+ #ifdef CONFIG_INTEL_TDX_HOST
+ void tdx_detect_cpu(struct cpuinfo_x86 *c);
++int tdx_detect(void);
++int tdx_init(void);
+ #else
+ static inline void tdx_detect_cpu(struct cpuinfo_x86 *c) { }
++static inline int tdx_detect(void) { return -ENODEV; }
++static inline int tdx_init(void) { return -ENODEV; }
+ #endif /* CONFIG_INTEL_TDX_HOST */
+ 
+ #endif /* !__ASSEMBLY__ */
+diff --git a/arch/x86/virt/vmx/tdx.c b/arch/x86/virt/vmx/tdx.c
+index ba2210001ea8..a85bc52c4690 100644
+--- a/arch/x86/virt/vmx/tdx.c
++++ b/arch/x86/virt/vmx/tdx.c
+@@ -9,6 +9,8 @@
+ 
+ #include <linux/types.h>
+ #include <linux/cpumask.h>
++#include <linux/mutex.h>
++#include <linux/cpu.h>
+ #include <asm/msr-index.h>
+ #include <asm/msr.h>
+ #include <asm/cpufeature.h>
+@@ -45,12 +47,33 @@
+ 		((u32)(((_keyid_part) & 0xffffffffull) + 1))
+ #define TDX_KEYID_NUM(_keyid_part)	((u32)((_keyid_part) >> 32))
+ 
 +/*
-+ * __seamcall()  - Host-side interface functions to SEAM software
-+ *		   (P-SEAMLDR or TDX module)
-+ *
-+ * Transform function call register arguments into the SEAMCALL register
-+ * ABI.  Return TDX_SEAMCALL_VMFAILINVALID (when SEAM software is not
-+ * loaded or SEAMCALLs are made into P-SEAMLDR concurrently), or the
-+ * completion status of the SEAMCALL.  Additional output operands are
-+ * saved in @out (if it is provided by the user).
-+ *
-+ *-------------------------------------------------------------------------
-+ * SEAMCALL ABI:
-+ *-------------------------------------------------------------------------
-+ * Input Registers:
-+ *
-+ * RAX                 - SEAMCALL Leaf number.
-+ * RCX,RDX,R8-R9       - SEAMCALL Leaf specific input registers.
-+ *
-+ * Output Registers:
-+ *
-+ * RAX                 - SEAMCALL completion status code.
-+ * RCX,RDX,R8-R11      - SEAMCALL Leaf specific output registers.
-+ *
-+ *-------------------------------------------------------------------------
-+ *
-+ * __seamcall() function ABI:
-+ *
-+ * @fn  (RDI)          - SEAMCALL Leaf number, moved to RAX
-+ * @rcx (RSI)          - Input parameter 1, moved to RCX
-+ * @rdx (RDX)          - Input parameter 2, moved to RDX
-+ * @r8  (RCX)          - Input parameter 3, moved to R8
-+ * @r9  (R8)           - Input parameter 4, moved to R9
-+ *
-+ * @out (R9)           - struct tdx_module_output pointer
-+ *                       stored temporarily in R12 (not
-+ *                       shared with the TDX module). It
-+ *                       can be NULL.
-+ *
-+ * Return (via RAX) the completion status of the SEAMCALL, or
-+ * TDX_SEAMCALL_VMFAILINVALID.
++ * TDX module status during initialization
 + */
-+SYM_FUNC_START(__seamcall)
-+	FRAME_BEGIN
-+	TDX_MODULE_CALL host=1
-+	FRAME_END
-+	ret
-+SYM_FUNC_END(__seamcall)
-diff --git a/arch/x86/virt/vmx/tdx.h b/arch/x86/virt/vmx/tdx.h
-new file mode 100644
-index 000000000000..9d5b6f554c20
---- /dev/null
-+++ b/arch/x86/virt/vmx/tdx.h
-@@ -0,0 +1,11 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef _X86_VIRT_TDX_H
-+#define _X86_VIRT_TDX_H
++enum tdx_module_status_t {
++	/* TDX module status is unknown */
++	TDX_MODULE_UNKNOWN,
++	/* TDX module is not loaded */
++	TDX_MODULE_NONE,
++	/* TDX module is loaded, but not initialized */
++	TDX_MODULE_LOADED,
++	/* TDX module is fully initialized */
++	TDX_MODULE_INITIALIZED,
++	/* TDX module is shutdown due to error during initialization */
++	TDX_MODULE_SHUTDOWN,
++};
 +
-+#include <linux/types.h>
+ /* BIOS must configure SEAMRR registers for all cores consistently */
+ static u64 seamrr_base, seamrr_mask;
+ 
+ static u32 tdx_keyid_start;
+ static u32 tdx_keyid_num;
+ 
++static enum tdx_module_status_t tdx_module_status;
 +
-+struct tdx_module_output;
-+u64 __seamcall(u64 fn, u64 rcx, u64 rdx, u64 r8, u64 r9,
-+	       struct tdx_module_output *out);
++/* Prevent concurrent attempts on TDX detection and initialization */
++static DEFINE_MUTEX(tdx_module_lock);
 +
-+#endif
+ static bool __seamrr_enabled(void)
+ {
+ 	return (seamrr_mask & SEAMRR_ENABLED_BITS) == SEAMRR_ENABLED_BITS;
+@@ -172,3 +195,200 @@ void tdx_detect_cpu(struct cpuinfo_x86 *c)
+ 	detect_seam(c);
+ 	detect_tdx_keyids(c);
+ }
++
++static bool seamrr_enabled(void)
++{
++	/*
++	 * To detect any BIOS misconfiguration among cores, all logical
++	 * cpus must have been brought up at least once.  This is true
++	 * unless 'maxcpus' kernel command line is used to limit the
++	 * number of cpus to be brought up during boot time.  However
++	 * 'maxcpus' is basically an invalid operation mode due to the
++	 * MCE broadcast problem, and it should not be used on a TDX
++	 * capable machine.  Just do paranoid check here and WARN()
++	 * if not the case.
++	 */
++	if (WARN_ON_ONCE(!cpumask_equal(&cpus_booted_once_mask,
++					cpu_present_mask)))
++		return false;
++
++	return __seamrr_enabled();
++}
++
++static bool tdx_keyid_sufficient(void)
++{
++	if (WARN_ON_ONCE(!cpumask_equal(&cpus_booted_once_mask,
++					cpu_present_mask)))
++		return false;
++
++	/*
++	 * TDX requires at least two KeyIDs: one global KeyID to
++	 * protect the metadata of the TDX module and one or more
++	 * KeyIDs to run TD guests.
++	 */
++	return tdx_keyid_num >= 2;
++}
++
++static int __tdx_detect(void)
++{
++	/*
++	 * TDX module cannot be possibly loaded if SEAMRR is disabled.
++	 * Also do not report TDX module as loaded if there's no enough
++	 * TDX private KeyIDs to run any TD guests.
++	 */
++	if (!seamrr_enabled()) {
++		pr_info("SEAMRR not enabled.\n");
++		goto no_tdx_module;
++	}
++
++	if (!tdx_keyid_sufficient()) {
++		pr_info("Number of TDX private KeyIDs too small: %u.\n",
++				tdx_keyid_num);
++		goto no_tdx_module;
++	}
++
++	/* Return -ENODEV until TDX module is detected */
++no_tdx_module:
++	tdx_module_status = TDX_MODULE_NONE;
++	return -ENODEV;
++}
++
++static int init_tdx_module(void)
++{
++	/*
++	 * Return -EFAULT until all steps of TDX module
++	 * initialization are done.
++	 */
++	return -EFAULT;
++}
++
++static void shutdown_tdx_module(void)
++{
++	/* TODO: Shut down the TDX module */
++	tdx_module_status = TDX_MODULE_SHUTDOWN;
++}
++
++static int __tdx_init(void)
++{
++	int ret;
++
++	/*
++	 * Logical-cpu scope initialization requires calling one SEAMCALL
++	 * on all logical cpus enabled by BIOS.  Shutting down TDX module
++	 * also has such requirement.  Further more, configuring the key
++	 * of the global KeyID requires calling one SEAMCALL for each
++	 * package.  For simplicity, disable CPU hotplug in the whole
++	 * initialization process.
++	 *
++	 * It's perhaps better to check whether all BIOS-enabled cpus are
++	 * online before starting initializing, and return early if not.
++	 * But none of 'possible', 'present' and 'online' CPU masks
++	 * represents BIOS-enabled cpus.  For example, 'possible' mask is
++	 * impacted by 'nr_cpus' or 'possible_cpus' kernel command line.
++	 * Just let the SEAMCALL to fail if not all BIOS-enabled cpus are
++	 * online.
++	 */
++	cpus_read_lock();
++
++	ret = init_tdx_module();
++	/*
++	 * Put TDX module to shutdown mode in case of any error during
++	 * the initialization process.  It's meaningless to leave the TDX
++	 * module in any middle state of the initialization process.
++	 */
++	if (ret)
++		shutdown_tdx_module();
++
++	cpus_read_unlock();
++
++	return ret;
++}
++
++/**
++ * tdx_detect - Detect whether the TDX module has been loaded
++ *
++ * Detect whether the TDX module has been loaded and ready for
++ * initialization.  Only call this function when CPU is already
++ * in VMX operation.
++ *
++ * This function can be called in parallel by multiple callers.
++ *
++ * Return:
++ *
++ * * -0:	TDX module has been loaded and ready for initialization.
++ * * -ENODEV:	TDX module is not loaded.
++ * * -EPERM:	CPU is not in VMX operation.
++ * * -EFAULT:	Other internal fatal errors.
++ */
++int tdx_detect(void)
++{
++	int ret;
++
++	mutex_lock(&tdx_module_lock);
++
++	switch (tdx_module_status) {
++	case TDX_MODULE_UNKNOWN:
++		ret = __tdx_detect();
++		break;
++	case TDX_MODULE_NONE:
++		ret = -ENODEV;
++		break;
++	case TDX_MODULE_LOADED:
++	case TDX_MODULE_INITIALIZED:
++		ret = 0;
++		break;
++	case TDX_MODULE_SHUTDOWN:
++		ret = -EFAULT;
++		break;
++	default:
++		WARN_ON(1);
++		ret = -EFAULT;
++	}
++
++	mutex_unlock(&tdx_module_lock);
++	return ret;
++}
++EXPORT_SYMBOL_GPL(tdx_detect);
++
++/**
++ * tdx_init - Initialize the TDX module
++ *
++ * Initialize the TDX module to make it ready to run TD guests.  This
++ * function should be called after tdx_detect() returns successful.
++ * Only call this function when all cpus are online and are in VMX
++ * operation.  CPU hotplug is temporarily disabled internally.
++ *
++ * This function can be called in parallel by multiple callers.
++ *
++ * Return:
++ *
++ * * -0:	The TDX module has been successfully initialized.
++ * * -ENODEV:	The TDX module is not loaded.
++ * * -EPERM:	The CPU which does SEAMCALL is not in VMX operation.
++ * * -EFAULT:	Other internal fatal errors.
++ */
++int tdx_init(void)
++{
++	int ret;
++
++	mutex_lock(&tdx_module_lock);
++
++	switch (tdx_module_status) {
++	case TDX_MODULE_NONE:
++		ret = -ENODEV;
++		break;
++	case TDX_MODULE_LOADED:
++		ret = __tdx_init();
++		break;
++	case TDX_MODULE_INITIALIZED:
++		ret = 0;
++		break;
++	default:
++		ret = -EFAULT;
++		break;
++	}
++	mutex_unlock(&tdx_module_lock);
++
++	return ret;
++}
++EXPORT_SYMBOL_GPL(tdx_init);
 -- 
 2.33.1
 
