@@ -2,61 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A44DD4C6761
-	for <lists+kvm@lfdr.de>; Mon, 28 Feb 2022 11:48:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 432174C68A5
+	for <lists+kvm@lfdr.de>; Mon, 28 Feb 2022 11:54:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234916AbiB1Kt1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Feb 2022 05:49:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43328 "EHLO
+        id S235337AbiB1Ky7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Feb 2022 05:54:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234907AbiB1KtY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Feb 2022 05:49:24 -0500
-Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52B894DF7B;
-        Mon, 28 Feb 2022 02:48:46 -0800 (PST)
+        with ESMTP id S235211AbiB1Kyk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Feb 2022 05:54:40 -0500
+Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F24D46E79C;
+        Mon, 28 Feb 2022 02:52:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1646045327; x=1677581327;
+  t=1646045529; x=1677581529;
   h=date:from:to:cc:message-id:references:mime-version:
    in-reply-to:subject;
-  bh=wtlDx4jEE4jGyIxehaIcjYydOOp8V9gGqhKFY2pAxek=;
-  b=lmL4Ao9d38OqN10++Ib0UXf3kdMmNoqbjsuluw2oVu3tHXIvYLaUfibB
-   IN4HN4RzlUON9BAsTufdAkmAydE4rjHJ/7D3bXWQ9qqqWsJLD3XhNq/uo
-   v9EweWB5T07szzF4GFFgGyveMxUMRbdb0SklTouSGDor41wh9xdsBB09X
-   U=;
+  bh=GYZ36Tn4ZR/Fb48Zxcj7jLlzc/ynK1FlIUH6hyDN1O0=;
+  b=DfHzcu1cS7XzLWzhivBznGNo6hS/okLs7cI5N57EgBhGxex5Zw9nMjf3
+   tHoteIHy6Jy7fvfE2mAdwaW+WQj6ng1Ad5vi18qpe47w7GaT8sAsmiDLV
+   A3GeMIiSV9C1x00ngWCTzrIFx0CMxcCsGjHTura+U4qCUI/jqIu4g5LOf
+   M=;
 X-IronPort-AV: E=Sophos;i="5.90,142,1643673600"; 
-   d="scan'208";a="181712404"
-Subject: Re: [PATCH 4/4] KVM: x86: hyper-v: HVCALL_SEND_IPI_EX is an XMM fast
- hypercall
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1box-d-74e80b3c.us-east-1.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-6001.iad6.amazon.com with ESMTP; 28 Feb 2022 10:48:36 +0000
+   d="scan'208";a="66672745"
+Subject: Re: [PATCH 0/4] KVM: x86: hyper-v: XMM fast hypercalls fixes
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1box-d-74e80b3c.us-east-1.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP; 28 Feb 2022 10:52:08 +0000
 Received: from EX13D28EUC003.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
-        by email-inbound-relay-iad-1box-d-74e80b3c.us-east-1.amazon.com (Postfix) with ESMTPS id 0220F829DD;
-        Mon, 28 Feb 2022 10:48:34 +0000 (UTC)
-Received: from 147dda3edfb6.ant.amazon.com (10.43.160.103) by
+        by email-inbound-relay-iad-1box-d-74e80b3c.us-east-1.amazon.com (Postfix) with ESMTPS id 8C9B38728E;
+        Mon, 28 Feb 2022 10:52:07 +0000 (UTC)
+Received: from 147dda3edfb6.ant.amazon.com (10.43.160.6) by
  EX13D28EUC003.ant.amazon.com (10.43.164.43) with Microsoft SMTP Server (TLS)
- id 15.0.1497.28; Mon, 28 Feb 2022 10:48:30 +0000
-Date:   Mon, 28 Feb 2022 11:48:26 +0100
+ id 15.0.1497.28; Mon, 28 Feb 2022 10:52:04 +0000
+Date:   Mon, 28 Feb 2022 11:52:00 +0100
 From:   Siddharth Chandrasekaran <sidcha@amazon.de>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-CC:     <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+To:     Paolo Bonzini <pbonzini@redhat.com>
+CC:     Vitaly Kuznetsov <vkuznets@redhat.com>, <kvm@vger.kernel.org>,
         Sean Christopherson <seanjc@google.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         <linux-kernel@vger.kernel.org>
-Message-ID: <YhyoevsjEhNfcwWY@147dda3edfb6.ant.amazon.com>
+Message-ID: <YhypT9pGu600wRLf@147dda3edfb6.ant.amazon.com>
 References: <20220222154642.684285-1-vkuznets@redhat.com>
- <20220222154642.684285-5-vkuznets@redhat.com>
+ <b466b80c-21d1-f298-b4cd-a4b58988f767@redhat.com>
+ <871qzrdr6x.fsf@redhat.com>
+ <f398b5de-c867-98a4-a716-b18939cfd0ef@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20220222154642.684285-5-vkuznets@redhat.com>
-X-Originating-IP: [10.43.160.103]
-X-ClientProxiedBy: EX13D34UWA003.ant.amazon.com (10.43.160.69) To
+In-Reply-To: <f398b5de-c867-98a4-a716-b18939cfd0ef@redhat.com>
+X-Originating-IP: [10.43.160.6]
+X-ClientProxiedBy: EX13D46UWC004.ant.amazon.com (10.43.162.173) To
  EX13D28EUC003.ant.amazon.com (10.43.164.43)
 X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -64,25 +65,28 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 22, 2022 at 04:46:42PM +0100, Vitaly Kuznetsov wrote:
-> CAUTION: This email originated from outside of the organization. Do not click links or open attachments unless you can confirm the sender and know the content is safe.
-> 
-> 
-> 
-> It has been proven on practice that at least Windows Server 2019 tries
-> using HVCALL_SEND_IPI_EX in 'XMM fast' mode when it has more than 64 vCPUs
-> and it needs to send an IPI to a vCPU > 63. Similarly to other XMM Fast
-> hypercalls (HVCALL_FLUSH_VIRTUAL_ADDRESS_{LIST,SPACE}{,_EX}), this
-> information is missing in TLFS as of 6.0b. Currently, KVM returns an error
-> (HV_STATUS_INVALID_HYPERCALL_INPUT) and Windows crashes.
-> 
-> Note, HVCALL_SEND_IPI is a 'standard' fast hypercall (not 'XMM fast') as
-> all its parameters fit into RDX:R8 and this is handled by KVM correctly.
-> 
-> Fixes: d8f5537a8816 ("KVM: hyper-v: Advertise support for fast XMM hypercalls")
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+On Fri, Feb 25, 2022 at 02:17:04PM +0100, Paolo Bonzini wrote:
+> On 2/25/22 14:13, Vitaly Kuznetsov wrote:
+> > Let's say we have 1 half of XMM0 consumed. Now:
+> > 
+> >   i = 0;
+> >   j = 1;
+> >   if (1)
+> >       sparse_banks[0] = sse128_lo(hc->xmm[0]);
+> > 
+> >   This doesn't look right as we need to get the upper half of XMM0.
+> > 
+> >   I guess it should be reversed,
+> > 
+> >       if (j % 2)
+> >           sparse_banks[i] = sse128_hi(hc->xmm[j / 2]);
+> >       else
+> >           sparse_banks[i] = sse128_lo(hc->xmm[j / 2]);
 
-Reviewed-by: Siddharth Chandrasekaran <sidcha@amazon.de>
+Maybe I am missing parts of this series.. I dont see this change in any
+of the 4 patches Vitaly sent. Yes, they look swapped to me too.
+
+~ Sid.
 
 
 
