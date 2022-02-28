@@ -2,164 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 345AB4C7AC0
-	for <lists+kvm@lfdr.de>; Mon, 28 Feb 2022 21:44:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 85DE24C7AA7
+	for <lists+kvm@lfdr.de>; Mon, 28 Feb 2022 21:40:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229558AbiB1Unf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Feb 2022 15:43:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39844 "EHLO
+        id S229783AbiB1Ukp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Feb 2022 15:40:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229453AbiB1Une (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Feb 2022 15:43:34 -0500
-Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6992412AE3
-        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 12:42:54 -0800 (PST)
-Received: by mail-lj1-x233.google.com with SMTP id bn33so19121462ljb.6
-        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 12:42:54 -0800 (PST)
+        with ESMTP id S229617AbiB1Ukn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Feb 2022 15:40:43 -0500
+Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29CFF1BE9B
+        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 12:40:02 -0800 (PST)
+Received: by mail-ed1-x531.google.com with SMTP id s14so19348816edw.0
+        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 12:40:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
+        d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=S/LNP14iVGpJY7HEU3KoWC3rGBeIOldyeXi/18P4YEg=;
-        b=JCfpf2EkV0u8p2DIwI3SoZoRhHthQMEAy9/7LEkowc8JnTmPgsFXHlzh4U3t+Q6SEk
-         Lc7ftzGO2kIrejoWkV3dzzd0jpx1zu67BigJ1Dmt6MH2aSREOTU5VOooJKZjMGKU+kco
-         F0IyOo2hDxkf3WtcbllN4ffR7kqC0AZqO0I4w=
+        bh=QHWRIsgExEW/r8rEtARZBdUV8xqvMrT0E0q1tM9lfYo=;
+        b=NRvy8X8wInnCA+8LdqedLQG8Ir8G2R8ThdqidPIodSY2ccQsoG3SHWcZUOweRCuWQo
+         eU+JihbmhJXDv60FaICZoOxBd/bsZmtag9GVo03Znw/tYTXYyCKgnDsSOEduZHSnKJ+W
+         2LSLgE7Csp8wOCLnBbzEWFOIKSteiyJOKoU+nr+oOS/mzI3BjTU85Lf5CU1WMPerJ9kr
+         C/FBlgSUVM2knMxG7RJrtEpK3z4rCguHGU0Y7rg2r/kCnLVo2cZaj+KXgbos38qLg4n5
+         NGjTtnQyymkrlSB3dDaSi3mwCY1Tm0s2MD0Ytsmu37+YCNuGzlf0Vwhvg5jhWcftGapq
+         NACA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=S/LNP14iVGpJY7HEU3KoWC3rGBeIOldyeXi/18P4YEg=;
-        b=Cu9TMsHMkAL9nhXH69xecVnpM0UzHMziAGkhMBDpEI/FI6wLsaxRBGufrNW4mZPVsw
-         TJNN1bZcGhno4MXxeqInyD1Au8lGqfm3jLFVZRR9nkW4m0BCper6sfveptKTF0NO6wMn
-         ZRnkpRnn2bkShKR9mlPOnL/f0dg1EN1pHl6ahXssNc1GenrGu4oBPzCOAW6aWki8COoo
-         l+qVcLqopOutrkYFqUBDUJY1ot/Sw4Xxk7VBCOgD5vfL0PRKlIrLa3bHU83d2Yi4Gnqh
-         gDKbWGSA5C9p3rCBUE+jquNjFPvrp/mm2ZmwK4cLMagUOkfI5ryNs7o3IxL5lPh1mRg0
-         p0Eg==
-X-Gm-Message-State: AOAM531rFEXJmI4puSd+c1dFdawPB5vSlyRu8IWNI7dX+YRhzysFP8AY
-        JLsYADrk0SlEWXghunWb27ghwFZoIx7rHI4kAvI=
-X-Google-Smtp-Source: ABdhPJx4u5X8ZOvKXCxbKnt9j+kMTZ+foN6xt2fGgEVMUag/IYirAoEeG65B6VLfggqnQJRMVlyNWw==
-X-Received: by 2002:a2e:3004:0:b0:223:c126:5d1a with SMTP id w4-20020a2e3004000000b00223c1265d1amr15847969ljw.408.1646080972545;
-        Mon, 28 Feb 2022 12:42:52 -0800 (PST)
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com. [209.85.167.50])
-        by smtp.gmail.com with ESMTPSA id r3-20020a2e80c3000000b0024491de7b1fsm1515031ljg.22.2022.02.28.12.42.52
-        for <kvm@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 28 Feb 2022 12:42:52 -0800 (PST)
-Received: by mail-lf1-f50.google.com with SMTP id w27so23452769lfa.5
-        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 12:42:52 -0800 (PST)
-X-Received: by 2002:a2e:924d:0:b0:246:370c:5618 with SMTP id
- v13-20020a2e924d000000b00246370c5618mr15158756ljg.358.1646080652034; Mon, 28
- Feb 2022 12:37:32 -0800 (PST)
+        bh=QHWRIsgExEW/r8rEtARZBdUV8xqvMrT0E0q1tM9lfYo=;
+        b=kuipGOMN3SIN7hPUEYCfT1Gs0GvxdZsTHr19n35tQl+8YKklopeg3hQr3DQeRtWsPA
+         WiUS0u/4agUKU9MhNjXZyEjpv7IUGTgLbUgThkX+ea+lOWQkQ99pzxl3FtkWmxKBIZJ6
+         DgyxZIk2IeS3IEdHtYz1H956v07RPvMrOZ+s9cVtlRg+9cL1bWwHrH+XkaLNsIbA2TMg
+         lHNWcyRnfyvrLXCYAZ7LKLUfJJjxDIlrvjomHaiE67Pxm5khgn3FGH1u+pYuJmwjNNIU
+         RKA0/91UWxhcSu3wAMAuihzbonrUuLYl6ZquIQi3nk0sD9Q44SLZWfVinVeuWU1JiPSO
+         AYog==
+X-Gm-Message-State: AOAM530jjtrTZJG9YEw5c/0K2dDrfV0Jq+nd4b5WEGhvB6Ef/4hzUwko
+        MZ6sznsNLb+rl5WsDQRkyWDE8LVne4tVVgY6LWWE/g==
+X-Google-Smtp-Source: ABdhPJxp3HmlKQ/fUicuR/voY9gTGCCUcqm4OCOzY7/yu3PXx8BFrSu6sNU+xacP2yC/q1oOqQbNxsuv0Tp8gQ793EA=
+X-Received: by 2002:a05:6402:1cc1:b0:413:2b12:fc49 with SMTP id
+ ds1-20020a0564021cc100b004132b12fc49mr21495413edb.118.1646080800470; Mon, 28
+ Feb 2022 12:40:00 -0800 (PST)
 MIME-Version: 1.0
-References: <20220228110822.491923-1-jakobkoschel@gmail.com>
- <20220228110822.491923-3-jakobkoschel@gmail.com> <2e4e95d6-f6c9-a188-e1cd-b1eae465562a@amd.com>
- <CAHk-=wgQps58DPEOe4y5cTh5oE9EdNTWRLXzgMiETc+mFX7jzw@mail.gmail.com>
- <CAHk-=wj8fkosQ7=bps5K+DDazBXk=ypfn49A0sEq+7-nZnyfXA@mail.gmail.com>
- <CAHk-=wiTCvLQkHcJ3y0hpqH7FEk9D28LDvZZogC6OVLk7naBww@mail.gmail.com> <Yh0tl3Lni4weIMkl@casper.infradead.org>
-In-Reply-To: <Yh0tl3Lni4weIMkl@casper.infradead.org>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Mon, 28 Feb 2022 12:37:15 -0800
-X-Gmail-Original-Message-ID: <CAHk-=wgBfJ1-cPA2LTvFyyy8owpfmtCuyiZi4+um8DhFNe+CyA@mail.gmail.com>
-Message-ID: <CAHk-=wgBfJ1-cPA2LTvFyyy8owpfmtCuyiZi4+um8DhFNe+CyA@mail.gmail.com>
-Subject: Re: [PATCH 2/6] treewide: remove using list iterator after loop body
- as a ptr
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
-        Jakob Koschel <jakobkoschel@gmail.com>,
-        alsa-devel@alsa-project.org, linux-aspeed@lists.ozlabs.org,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        linux-iio@vger.kernel.org, nouveau@lists.freedesktop.org,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        dri-devel <dri-devel@lists.freedesktop.org>,
-        Cristiano Giuffrida <c.giuffrida@vu.nl>,
-        amd-gfx list <amd-gfx@lists.freedesktop.org>,
-        samba-technical@lists.samba.org,
-        linux1394-devel@lists.sourceforge.net, drbd-dev@lists.linbit.com,
-        linux-arch <linux-arch@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>,
-        linux-scsi <linux-scsi@vger.kernel.org>,
-        linux-rdma <linux-rdma@vger.kernel.org>,
-        linux-staging@lists.linux.dev, "Bos, H.J." <h.j.bos@vu.nl>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        intel-wired-lan@lists.osuosl.org,
-        kgdb-bugreport@lists.sourceforge.net,
-        bcm-kernel-feedback-list@broadcom.com,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Linux Media Mailing List <linux-media@vger.kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Arnd Bergman <arnd@arndb.de>,
-        Linux PM <linux-pm@vger.kernel.org>,
-        intel-gfx <intel-gfx@lists.freedesktop.org>,
-        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        v9fs-developer@lists.sourceforge.net,
-        linux-tegra <linux-tegra@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-sgx@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>, linux-usb@vger.kernel.org,
-        linux-wireless <linux-wireless@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux F2FS Dev Mailing List 
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        tipc-discussion@lists.sourceforge.net,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        dma <dmaengine@vger.kernel.org>,
-        linux-mediatek@lists.infradead.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        Mike Rapoport <rppt@kernel.org>
+References: <20220203010051.2813563-1-dmatlack@google.com> <20220203010051.2813563-17-dmatlack@google.com>
+In-Reply-To: <20220203010051.2813563-17-dmatlack@google.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Mon, 28 Feb 2022 12:39:49 -0800
+Message-ID: <CANgfPd_bfxT0n3sH+D9mBTrtFkE722u7Rts1EbRm-ERpGF+X-g@mail.gmail.com>
+Subject: Re: [PATCH 16/23] KVM: x86/mmu: Zap collapsible SPTEs at all levels
+ in the shadow MMU
+To:     David Matlack <dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        leksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Peter Feiner <pfeiner@google.com>,
+        Andrew Jones <drjones@redhat.com>,
+        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
+        kvm <kvm@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-18.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 28, 2022 at 12:16 PM Matthew Wilcox <willy@infradead.org> wrote:
+On Wed, Feb 2, 2022 at 5:02 PM David Matlack <dmatlack@google.com> wrote:
 >
-> Then we can never use -Wshadow ;-(  I'd love to be able to turn it on;
-> it catches real bugs.
+> Currently KVM only zaps collapsible 4KiB SPTEs in the shadow MMU (i.e.
+> in the rmap). This leads to correct behavior because KVM never creates
+> intermediate huge pages during dirty logging. For example, a 1GiB page
+> is never partially split to a 2MiB page.
+>
+> However this behavior will stop being correct once the shadow MMU
+> participates in eager page splitting, which can in fact leave behind
+> partially split huge pages. In preparation for that change, change the
+> shadow MMU to iterate over all levels when zapping collapsible SPTEs.
+>
+> No functional change intended.
+>
 
-Oh, we already can never use -Wshadow regardless of things like this.
-That bridge hasn't just been burned, it never existed in the first
-place.
+Reviewed-by: Ben Gardon <bgardon@google.com>
 
-The whole '-Wshadow' thing simply cannot work with local variables in
-macros - something that we've used since day 1.
+> Signed-off-by: David Matlack <dmatlack@google.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 21 ++++++++++++++-------
+>  1 file changed, 14 insertions(+), 7 deletions(-)
+>
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index e2306a39526a..99ad7cc8683f 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -6038,18 +6038,25 @@ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
+>         return need_tlb_flush;
+>  }
+>
+> +static void kvm_rmap_zap_collapsible_sptes(struct kvm *kvm,
+> +                                          const struct kvm_memory_slot *slot)
+> +{
+> +       bool flush;
+> +
+> +       flush = slot_handle_level(kvm, slot, kvm_mmu_zap_collapsible_spte,
+> +                                 PG_LEVEL_4K, KVM_MAX_HUGEPAGE_LEVEL, true);
 
-Try this (as a "p.c" file):
+The max level here only needs to be 2M since 1G page wouldn't be
+split. I think the upper limit can be lowered to
+KVM_MAX_HUGEPAGE_LEVEL - 1.
+Not a significant performance difference though.
 
-        #define min(a,b) ({                     \
-                typeof(a) __a = (a);            \
-                typeof(b) __b = (b);            \
-                __a < __b ? __a : __b; })
-
-        int min3(int a, int b, int c)
-        {
-                return min(a,min(b,c));
-        }
-
-and now do "gcc -O2 -S t.c".
-
-Then try it with -Wshadow.
-
-In other words, -Wshadow is simply not acceptable. Never has been,
-never will be, and that has nothing to do with the
-
-        typeof(pos) pos
-
-kind of thing.
-
-Your argument just isn't an argument.
-
-              Linus
+> +
+> +       if (flush)
+> +               kvm_arch_flush_remote_tlbs_memslot(kvm, slot);
+> +
+> +}
+> +
+>  void kvm_mmu_zap_collapsible_sptes(struct kvm *kvm,
+>                                    const struct kvm_memory_slot *slot)
+>  {
+>         if (kvm_memslots_have_rmaps(kvm)) {
+>                 write_lock(&kvm->mmu_lock);
+> -               /*
+> -                * Zap only 4k SPTEs since the legacy MMU only supports dirty
+> -                * logging at a 4k granularity and never creates collapsible
+> -                * 2m SPTEs during dirty logging.
+> -                */
+> -               if (slot_handle_level_4k(kvm, slot, kvm_mmu_zap_collapsible_spte, true))
+> -                       kvm_arch_flush_remote_tlbs_memslot(kvm, slot);
+> +               kvm_rmap_zap_collapsible_sptes(kvm, slot);
+>                 write_unlock(&kvm->mmu_lock);
+>         }
+>
+> --
+> 2.35.0.rc2.247.g8bbb082509-goog
+>
