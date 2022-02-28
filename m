@@ -2,65 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D22A34C645B
-	for <lists+kvm@lfdr.de>; Mon, 28 Feb 2022 09:07:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 026574C64B6
+	for <lists+kvm@lfdr.de>; Mon, 28 Feb 2022 09:18:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233839AbiB1IIX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Feb 2022 03:08:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56374 "EHLO
+        id S233946AbiB1ISg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Feb 2022 03:18:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33320 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233833AbiB1IIV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Feb 2022 03:08:21 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E1F4934B87
-        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 00:07:41 -0800 (PST)
+        with ESMTP id S233870AbiB1ISc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Feb 2022 03:18:32 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2F13B3204C
+        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 00:17:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646035661;
+        s=mimecast20190719; t=1646036272;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ZEg+1lw95oVgyFcFAqtClQVp7snHOaZZ37kJvcE2J+E=;
-        b=b+ZVHA36LH3T0Rh69upPhoZr4ergZ+XrZR1ngsIWOBuBv7dWnnc5HtkNna3vYJR3VQa+8O
-        Ryj9wdW1DXWcMpr3yXt4NnnfzBtgrjcntPH+ZzJgnJgdBhgnbJne94WJ6EHR2GOoi63mjA
-        Pm46NFxlRGQ8tJTB2BEJsdZvLsfG0Lg=
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
- [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=kcQX81TKsBPgI6ZQdBTCH95O8eyfaOBAupOXuKZxV+I=;
+        b=KeglD0/apnE2LjyYpvZlEysuhEEkczF5WZM3CP45pGzrhi+sFNGofiKQGcHAi7vCp9EmR8
+        yl8WDX6zlm5a9Iow0Nt5WKpHrMr4kFC78pDS9+GyitF81/Nh0RTnW9xd64knBj2dRDTDow
+        FfwiCI3/tw026SGa5LvL5XKc9BM/YYQ=
+Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
+ [209.85.210.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-451-_alA9XnVNP6IVuR2rg4Djw-1; Mon, 28 Feb 2022 03:07:37 -0500
-X-MC-Unique: _alA9XnVNP6IVuR2rg4Djw-1
-Received: by mail-pj1-f69.google.com with SMTP id e7-20020a17090a4a0700b001bc5a8c533eso8360605pjh.4
-        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 00:07:37 -0800 (PST)
+ us-mta-94-sZhpQ7gHOMiOlGb-FAHffA-1; Mon, 28 Feb 2022 03:17:50 -0500
+X-MC-Unique: sZhpQ7gHOMiOlGb-FAHffA-1
+Received: by mail-pf1-f200.google.com with SMTP id t134-20020a62788c000000b004e1367caccaso7381830pfc.14
+        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 00:17:50 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=ZEg+1lw95oVgyFcFAqtClQVp7snHOaZZ37kJvcE2J+E=;
-        b=wtQShyNiQLDdJA+J2F844zTZDIE75xKILX0hZxavaMy65F1VQGN3kvVy8Qe6rCMIKD
-         HV+y6g2PO34oyDq0n56gUdKbHUcTDLSPjDoE9xgqq7zOiYrZp9FCZMLL/2EK8sNeEg79
-         tlYljlST3TTXnzP8A4+3oAII5Z/rtxk0E4wNT3V35saBi/PcrZvE0sH5ghuXO1JOFI6u
-         tvN+CV89k0pRYT57T+KVrJZZeE03oZVYQ+xWfm+5wImNisyY4SEYOYHd0MXPDcroQojv
-         WJ0ZGZIsbsk8OZ0zpwfhShuJAo/6NJSVo3HjA0lJKr+2gVmksQn1PT4AWGMnQqrmR+kZ
-         MDhQ==
-X-Gm-Message-State: AOAM530ROtoQvxOVKzF08/4e67cKX2yPq0ZLWBdy94Jkp+nqqj8lCfj6
-        NREH795dYI32/++J0yujNb/ABqN6D2vC/lu6vptaQxIJ1w5CoIdaZr0HgoFQ7Sb1fNfKjREWjgU
-        W/+LLRY/WJlgK
-X-Received: by 2002:a17:902:b692:b0:151:5474:d3ee with SMTP id c18-20020a170902b69200b001515474d3eemr8260952pls.139.1646035655194;
-        Mon, 28 Feb 2022 00:07:35 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJznHT+nxWUnKGWZ5hcEVi75Ogi5dSqPiYgaue8FxDbPTCecmBni8Dqz6AEQvbkaw/HCAc7kRA==
-X-Received: by 2002:a17:902:b692:b0:151:5474:d3ee with SMTP id c18-20020a170902b69200b001515474d3eemr8260925pls.139.1646035654918;
-        Mon, 28 Feb 2022 00:07:34 -0800 (PST)
+        bh=kcQX81TKsBPgI6ZQdBTCH95O8eyfaOBAupOXuKZxV+I=;
+        b=KwULgFKyctA6zGZKuJa97sI9j1et1LVlxHhlC/7nFeVJFsjI9o2PBluR6vy8ODKatJ
+         btHxqDhFTV9wNZw5NEcxG7nXXt37uuJH5bMjTg0nKB3Z/niYykgMqB+JaAWugL+abucv
+         QAQfbawrutfuRCIoMR+1uYq4R5cgjLM7e7+3AcQkcHx7u8CVtCOLW4GFHyfMv49uj1n4
+         IzbDnq6XLP+9rENSRYwyJA6GuOb+aRhpZzWeFnhKXqJL2YZYa6YMjJRYtdBhrT+uK4hl
+         w+6yzwqNqHtX67zOjri1AWIjwr7L5rUk/n9pB0zZiM0lKPe8yGtTozrTo2msTXAmpVKU
+         FKYg==
+X-Gm-Message-State: AOAM533PyDW9zhOtaeS+bvN5dBdfiCk0lYf3l8LfvYbwgH9b/6vwFb+c
+        CXCwqJnzHJGYMCKzqEVYwNoUSijLrM6WGCspvDsdyy1n/6pPKcZSuc/qBEmvMfJuGVg+3qkCfJK
+        5AMnqhcG65jQ0
+X-Received: by 2002:a17:90b:34e:b0:1bd:16db:980e with SMTP id fh14-20020a17090b034e00b001bd16db980emr9907424pjb.132.1646036269279;
+        Mon, 28 Feb 2022 00:17:49 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJySJlNX76ptc/rztyRChRUymNl0t+JDOxQTq6TMo3C0MeY0mFWzNbxlCiWBmIMbFPUWWLxVIw==
+X-Received: by 2002:a17:90b:34e:b0:1bd:16db:980e with SMTP id fh14-20020a17090b034e00b001bd16db980emr9907392pjb.132.1646036268999;
+        Mon, 28 Feb 2022 00:17:48 -0800 (PST)
 Received: from [10.72.13.215] ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id lr2-20020a17090b4b8200b001bd6b5cce1dsm206968pjb.36.2022.02.28.00.07.29
+        by smtp.gmail.com with ESMTPSA id nn10-20020a17090b38ca00b001bc3a60b324sm9451560pjb.46.2022.02.28.00.17.43
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 28 Feb 2022 00:07:34 -0800 (PST)
-Message-ID: <efaa9bf0-5b5a-a33e-ce38-44473159d44a@redhat.com>
-Date:   Mon, 28 Feb 2022 16:07:27 +0800
+        Mon, 28 Feb 2022 00:17:48 -0800 (PST)
+Message-ID: <19843d2b-dfe9-5e2d-4d3d-ca55456947dc@redhat.com>
+Date:   Mon, 28 Feb 2022 16:17:41 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
  Gecko/20100101 Thunderbird/91.6.1
-Subject: Re: [RFC PATCH v2 05/19] vdpa: introduce virtqueue groups
+Subject: Re: [RFC PATCH v2 00/19] Control VQ support in vDPA
 Content-Language: en-US
 To:     Gautam Dawar <gautam.dawar@xilinx.com>
 Cc:     gdawar@xilinx.com, martinh@xilinx.com, hanand@xilinx.com,
@@ -78,15 +78,14 @@ Cc:     gdawar@xilinx.com, martinh@xilinx.com, hanand@xilinx.com,
         netdev@vger.kernel.org
 References: <20201216064818.48239-1-jasowang@redhat.com>
  <20220224212314.1326-1-gdawar@xilinx.com>
- <20220224212314.1326-6-gdawar@xilinx.com>
 From:   Jason Wang <jasowang@redhat.com>
-In-Reply-To: <20220224212314.1326-6-gdawar@xilinx.com>
+In-Reply-To: <20220224212314.1326-1-gdawar@xilinx.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
         RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -96,238 +95,155 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 在 2022/2/25 上午5:22, Gautam Dawar 写道:
-> This patch introduces virtqueue groups to vDPA device. The virtqueue
-> group is the minimal set of virtqueues that must share an address
-> space. And the address space identifier could only be attached to
-> a specific virtqueue group.
+> Hi All:
 >
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
-> Signed-off-by: Gautam Dawar <gdawar@xilinx.com>
-> ---
->   drivers/vdpa/ifcvf/ifcvf_main.c   |  8 +++++++-
->   drivers/vdpa/mlx5/net/mlx5_vnet.c |  8 +++++++-
->   drivers/vdpa/vdpa.c               |  3 +++
->   drivers/vdpa/vdpa_sim/vdpa_sim.c  |  9 ++++++++-
->   drivers/vdpa/vdpa_sim/vdpa_sim.h  |  1 +
->   include/linux/vdpa.h              | 16 ++++++++++++----
->   6 files changed, 38 insertions(+), 7 deletions(-)
+> This series tries to add the support for control virtqueue in vDPA.
+>
+> Control virtqueue is used by networking device for accepting various
+> commands from the driver. It's a must to support multiqueue and other
+> configurations.
+>
+> When used by vhost-vDPA bus driver for VM, the control virtqueue
+> should be shadowed via userspace VMM (Qemu) instead of being assigned
+> directly to Guest. This is because Qemu needs to know the device state
+> in order to start and stop device correctly (e.g for Live Migration).
+>
+> This requies to isolate the memory mapping for control virtqueue
+> presented by vhost-vDPA to prevent guest from accessing it directly.
+>
+> To achieve this, vDPA introduce two new abstractions:
+>
+> - address space: identified through address space id (ASID) and a set
+>                   of memory mapping in maintained
+> - virtqueue group: the minimal set of virtqueues that must share an
+>                   address space
+>
+> Device needs to advertise the following attributes to vDPA:
+>
+> - the number of address spaces supported in the device
+> - the number of virtqueue groups supported in the device
+> - the mappings from a specific virtqueue to its virtqueue groups
+>
+> The mappings from virtqueue to virtqueue groups is fixed and defined
+> by vDPA device driver. E.g:
+>
+> - For the device that has hardware ASID support, it can simply
+>    advertise a per virtqueue virtqueue group.
+> - For the device that does not have hardware ASID support, it can
+>    simply advertise a single virtqueue group that contains all
+>    virtqueues. Or if it wants a software emulated control virtqueue, it
+>    can advertise two virtqueue groups, one is for cvq, another is for
+>    the rest virtqueues.
+>
+> vDPA also allow to change the association between virtqueue group and
+> address space. So in the case of control virtqueue, userspace
+> VMM(Qemu) may use a dedicated address space for the control virtqueue
+> group to isolate the memory mapping.
+>
+> The vhost/vhost-vDPA is also extend for the userspace to:
+>
+> - query the number of virtqueue groups and address spaces supported by
+>    the device
+> - query the virtqueue group for a specific virtqueue
+> - assocaite a virtqueue group with an address space
+> - send ASID based IOTLB commands
+>
+> This will help userspace VMM(Qemu) to detect whether the control vq
+> could be supported and isolate memory mappings of control virtqueue
+> from the others.
+>
+> To demonstrate the usage, vDPA simulator is extended to support
+> setting MAC address via a emulated control virtqueue.
+>
+> Please review.
+>
+> Changes since v1:
+>
+> - Rebased the v1 patch series on vhost branch of MST vhost git repo
+>    git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git/log/?h=vhost
+> - Updates to accommodate vdpa_sim changes from monolithic module in
+>    kernel used v1 patch series to current modularized class (net, block)
+>    based approach.
+> - Added new attributes (ngroups and nas) to "vdpasim_dev_attr" and
+>    propagated them from vdpa_sim_net to vdpa_sim
+> - Widened the data-type for "asid" member of vhost_msg_v2 to __u32
+>    to accommodate PASID
 
 
-We had three more parents now, so we should convert them as well:
+This is great. Then the semantic matches exactly the PASID proposal here[1].
 
-vp_vdpa, VDUSE and eni_vdpa.
+
+> - Fixed the buildbot warnings
+> - Resolved all checkpatch.pl errors and warnings
+> - Tested both control and datapath with Xilinx Smartnic SN1000 series
+>    device using QEMU implementing the Shadow virtqueue and support for
+>    VQ groups and ASID available at:
+>    github.com/eugpermar/qemu/releases/tag/vdpa_sw_live_migration.d%2F
+>    asid_groups-v1.d%2F00
+
+
+On top, we may extend the netlink protocol to report the mapping between 
+virtqueue to its groups.
+
 
 Thanks
 
+[1] 
+https://www.mail-archive.com/virtio-dev@lists.oasis-open.org/msg08077.html
+
 
 >
-> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
-> index d1a6b5ab543c..c815a2e62440 100644
-> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
-> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
-> @@ -378,6 +378,11 @@ static size_t ifcvf_vdpa_get_config_size(struct vdpa_device *vdpa_dev)
->   	return  vf->config_size;
->   }
->   
-> +static u32 ifcvf_vdpa_get_vq_group(struct vdpa_device *vdpa, u16 idx)
-> +{
-> +	return 0;
-> +}
-> +
->   static void ifcvf_vdpa_get_config(struct vdpa_device *vdpa_dev,
->   				  unsigned int offset,
->   				  void *buf, unsigned int len)
-> @@ -453,6 +458,7 @@ static const struct vdpa_config_ops ifc_vdpa_ops = {
->   	.get_device_id	= ifcvf_vdpa_get_device_id,
->   	.get_vendor_id	= ifcvf_vdpa_get_vendor_id,
->   	.get_vq_align	= ifcvf_vdpa_get_vq_align,
-> +	.get_vq_group	= ifcvf_vdpa_get_vq_group,
->   	.get_config_size	= ifcvf_vdpa_get_config_size,
->   	.get_config	= ifcvf_vdpa_get_config,
->   	.set_config	= ifcvf_vdpa_set_config,
-> @@ -507,7 +513,7 @@ static int ifcvf_vdpa_dev_add(struct vdpa_mgmt_dev *mdev, const char *name,
->   	pdev = ifcvf_mgmt_dev->pdev;
->   	dev = &pdev->dev;
->   	adapter = vdpa_alloc_device(struct ifcvf_adapter, vdpa,
-> -				    dev, &ifc_vdpa_ops, name, false);
-> +				    dev, &ifc_vdpa_ops, 1, name, false);
->   	if (IS_ERR(adapter)) {
->   		IFCVF_ERR(pdev, "Failed to allocate vDPA structure");
->   		return PTR_ERR(adapter);
-> diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> index b53603d94082..fcfc28460b72 100644
-> --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> @@ -1847,6 +1847,11 @@ static u32 mlx5_vdpa_get_vq_align(struct vdpa_device *vdev)
->   	return PAGE_SIZE;
->   }
->   
-> +static u32 mlx5_vdpa_get_vq_group(struct vdpa_device *vdpa, u16 idx)
-> +{
-> +	return 0;
-> +}
-> +
->   enum { MLX5_VIRTIO_NET_F_GUEST_CSUM = 1 << 9,
->   	MLX5_VIRTIO_NET_F_CSUM = 1 << 10,
->   	MLX5_VIRTIO_NET_F_HOST_TSO6 = 1 << 11,
-> @@ -2363,6 +2368,7 @@ static const struct vdpa_config_ops mlx5_vdpa_ops = {
->   	.get_vq_notification = mlx5_get_vq_notification,
->   	.get_vq_irq = mlx5_get_vq_irq,
->   	.get_vq_align = mlx5_vdpa_get_vq_align,
-> +	.get_vq_group = mlx5_vdpa_get_vq_group,
->   	.get_device_features = mlx5_vdpa_get_device_features,
->   	.set_driver_features = mlx5_vdpa_set_driver_features,
->   	.get_driver_features = mlx5_vdpa_get_driver_features,
-> @@ -2575,7 +2581,7 @@ static int mlx5_vdpa_dev_add(struct vdpa_mgmt_dev *v_mdev, const char *name,
->   	}
->   
->   	ndev = vdpa_alloc_device(struct mlx5_vdpa_net, mvdev.vdev, mdev->device, &mlx5_vdpa_ops,
-> -				 name, false);
-> +				 1, name, false);
->   	if (IS_ERR(ndev))
->   		return PTR_ERR(ndev);
->   
-> diff --git a/drivers/vdpa/vdpa.c b/drivers/vdpa/vdpa.c
-> index 9846c9de4bfa..a07bf0130559 100644
-> --- a/drivers/vdpa/vdpa.c
-> +++ b/drivers/vdpa/vdpa.c
-> @@ -159,6 +159,7 @@ static void vdpa_release_dev(struct device *d)
->    * initialized but before registered.
->    * @parent: the parent device
->    * @config: the bus operations that is supported by this device
-> + * @ngroups: number of groups supported by this device
->    * @size: size of the parent structure that contains private data
->    * @name: name of the vdpa device; optional.
->    * @use_va: indicate whether virtual address must be used by this device
-> @@ -171,6 +172,7 @@ static void vdpa_release_dev(struct device *d)
->    */
->   struct vdpa_device *__vdpa_alloc_device(struct device *parent,
->   					const struct vdpa_config_ops *config,
-> +					unsigned int ngroups,
->   					size_t size, const char *name,
->   					bool use_va)
->   {
-> @@ -203,6 +205,7 @@ struct vdpa_device *__vdpa_alloc_device(struct device *parent,
->   	vdev->config = config;
->   	vdev->features_valid = false;
->   	vdev->use_va = use_va;
-> +	vdev->ngroups = ngroups;
->   
->   	if (name)
->   		err = dev_set_name(&vdev->dev, "%s", name);
-> diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.c b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-> index ddbe142af09a..c98cb1f869fa 100644
-> --- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
-> +++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-> @@ -250,7 +250,7 @@ struct vdpasim *vdpasim_create(struct vdpasim_dev_attr *dev_attr)
->   	else
->   		ops = &vdpasim_config_ops;
->   
-> -	vdpasim = vdpa_alloc_device(struct vdpasim, vdpa, NULL, ops,
-> +	vdpasim = vdpa_alloc_device(struct vdpasim, vdpa, NULL, ops, 1,
->   				    dev_attr->name, false);
->   	if (IS_ERR(vdpasim)) {
->   		ret = PTR_ERR(vdpasim);
-> @@ -399,6 +399,11 @@ static u32 vdpasim_get_vq_align(struct vdpa_device *vdpa)
->   	return VDPASIM_QUEUE_ALIGN;
->   }
->   
-> +static u32 vdpasim_get_vq_group(struct vdpa_device *vdpa, u16 idx)
-> +{
-> +	return 0;
-> +}
-> +
->   static u64 vdpasim_get_device_features(struct vdpa_device *vdpa)
->   {
->   	struct vdpasim *vdpasim = vdpa_to_sim(vdpa);
-> @@ -620,6 +625,7 @@ static const struct vdpa_config_ops vdpasim_config_ops = {
->   	.set_vq_state           = vdpasim_set_vq_state,
->   	.get_vq_state           = vdpasim_get_vq_state,
->   	.get_vq_align           = vdpasim_get_vq_align,
-> +	.get_vq_group           = vdpasim_get_vq_group,
->   	.get_device_features    = vdpasim_get_device_features,
->   	.set_driver_features    = vdpasim_set_driver_features,
->   	.get_driver_features    = vdpasim_get_driver_features,
-> @@ -650,6 +656,7 @@ static const struct vdpa_config_ops vdpasim_batch_config_ops = {
->   	.set_vq_state           = vdpasim_set_vq_state,
->   	.get_vq_state           = vdpasim_get_vq_state,
->   	.get_vq_align           = vdpasim_get_vq_align,
-> +	.get_vq_group           = vdpasim_get_vq_group,
->   	.get_device_features    = vdpasim_get_device_features,
->   	.set_driver_features    = vdpasim_set_driver_features,
->   	.get_driver_features    = vdpasim_get_driver_features,
-> diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.h b/drivers/vdpa/vdpa_sim/vdpa_sim.h
-> index cd58e888bcf3..0be7c1e7ef80 100644
-> --- a/drivers/vdpa/vdpa_sim/vdpa_sim.h
-> +++ b/drivers/vdpa/vdpa_sim/vdpa_sim.h
-> @@ -63,6 +63,7 @@ struct vdpasim {
->   	u32 status;
->   	u32 generation;
->   	u64 features;
-> +	u32 groups;
->   	/* spinlock to synchronize iommu table */
->   	spinlock_t iommu_lock;
->   };
-> diff --git a/include/linux/vdpa.h b/include/linux/vdpa.h
-> index 2de442ececae..026b7ad72ed7 100644
-> --- a/include/linux/vdpa.h
-> +++ b/include/linux/vdpa.h
-> @@ -85,6 +85,7 @@ struct vdpa_device {
->   	bool use_va;
->   	int nvqs;
->   	struct vdpa_mgmt_dev *mdev;
-> +	unsigned int ngroups;
->   };
->   
->   /**
-> @@ -172,6 +173,10 @@ struct vdpa_map_file {
->    *				for the device
->    *				@vdev: vdpa device
->    *				Returns virtqueue algin requirement
-> + * @get_vq_group:		Get the group id for a specific virtqueue
-> + *				@vdev: vdpa device
-> + *				@idx: virtqueue index
-> + *				Returns u32: group id for this virtqueue
->    * @get_device_features:	Get virtio features supported by the device
->    *				@vdev: vdpa device
->    *				Returns the virtio features support by the
-> @@ -282,6 +287,7 @@ struct vdpa_config_ops {
->   
->   	/* Device ops */
->   	u32 (*get_vq_align)(struct vdpa_device *vdev);
-> +	u32 (*get_vq_group)(struct vdpa_device *vdev, u16 idx);
->   	u64 (*get_device_features)(struct vdpa_device *vdev);
->   	int (*set_driver_features)(struct vdpa_device *vdev, u64 features);
->   	u64 (*get_driver_features)(struct vdpa_device *vdev);
-> @@ -314,6 +320,7 @@ struct vdpa_config_ops {
->   
->   struct vdpa_device *__vdpa_alloc_device(struct device *parent,
->   					const struct vdpa_config_ops *config,
-> +					unsigned int ngroups,
->   					size_t size, const char *name,
->   					bool use_va);
->   
-> @@ -324,17 +331,18 @@ struct vdpa_device *__vdpa_alloc_device(struct device *parent,
->    * @member: the name of struct vdpa_device within the @dev_struct
->    * @parent: the parent device
->    * @config: the bus operations that is supported by this device
-> + * @ngroups: the number of virtqueue groups supported by this device
->    * @name: name of the vdpa device
->    * @use_va: indicate whether virtual address must be used by this device
->    *
->    * Return allocated data structure or ERR_PTR upon error
->    */
-> -#define vdpa_alloc_device(dev_struct, member, parent, config, name, use_va)   \
-> -			  container_of(__vdpa_alloc_device( \
-> -				       parent, config, \
-> +#define vdpa_alloc_device(dev_struct, member, parent, config, ngroups, name, use_va)   \
-> +			  container_of((__vdpa_alloc_device( \
-> +				       parent, config, ngroups, \
->   				       sizeof(dev_struct) + \
->   				       BUILD_BUG_ON_ZERO(offsetof( \
-> -				       dev_struct, member)), name, use_va), \
-> +				       dev_struct, member)), name, use_va)), \
->   				       dev_struct, member)
->   
->   int vdpa_register_device(struct vdpa_device *vdev, int nvqs);
+> Changes since RFC:
+>
+> - tweak vhost uAPI documentation
+> - switch to use device specific IOTLB really in patch 4
+> - tweak the commit log
+> - fix that ASID in vhost is claimed to be 32 actually but 16bit
+>    actually
+> - fix use after free when using ASID with IOTLB batching requests
+> - switch to use Stefano's patch for having separated iov
+> - remove unused "used_as" variable
+> - fix the iotlb/asid checking in vhost_vdpa_unmap()
+>
+> Thanks
+>
+> Gautam Dawar (19):
+>    vhost: move the backend feature bits to vhost_types.h
+>    virtio-vdpa: don't set callback if virtio doesn't need it
+>    vhost-vdpa: passing iotlb to IOMMU mapping helpers
+>    vhost-vdpa: switch to use vhost-vdpa specific IOTLB
+>    vdpa: introduce virtqueue groups
+>    vdpa: multiple address spaces support
+>    vdpa: introduce config operations for associating ASID to a virtqueue
+>      group
+>    vhost_iotlb: split out IOTLB initialization
+>    vhost: support ASID in IOTLB API
+>    vhost-vdpa: introduce asid based IOTLB
+>    vhost-vdpa: introduce uAPI to get the number of virtqueue groups
+>    vhost-vdpa: introduce uAPI to get the number of address spaces
+>    vhost-vdpa: uAPI to get virtqueue group id
+>    vhost-vdpa: introduce uAPI to set group ASID
+>    vhost-vdpa: support ASID based IOTLB API
+>    vdpa_sim: advertise VIRTIO_NET_F_MTU
+>    vdpa_sim: factor out buffer completion logic
+>    vdpa_sim: filter destination mac address
+>    vdpasim: control virtqueue support
+>
+>   drivers/vdpa/ifcvf/ifcvf_main.c      |   8 +-
+>   drivers/vdpa/mlx5/net/mlx5_vnet.c    |  11 +-
+>   drivers/vdpa/vdpa.c                  |   5 +
+>   drivers/vdpa/vdpa_sim/vdpa_sim.c     | 100 ++++++++--
+>   drivers/vdpa/vdpa_sim/vdpa_sim.h     |   3 +
+>   drivers/vdpa/vdpa_sim/vdpa_sim_net.c | 169 +++++++++++++----
+>   drivers/vhost/iotlb.c                |  23 ++-
+>   drivers/vhost/vdpa.c                 | 272 +++++++++++++++++++++------
+>   drivers/vhost/vhost.c                |  23 ++-
+>   drivers/vhost/vhost.h                |   4 +-
+>   drivers/virtio/virtio_vdpa.c         |   2 +-
+>   include/linux/vdpa.h                 |  46 ++++-
+>   include/linux/vhost_iotlb.h          |   2 +
+>   include/uapi/linux/vhost.h           |  25 ++-
+>   include/uapi/linux/vhost_types.h     |  11 +-
+>   15 files changed, 566 insertions(+), 138 deletions(-)
+>
 
