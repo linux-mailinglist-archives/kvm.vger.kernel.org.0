@@ -2,144 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1BA894C7E44
-	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 00:26:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AB5774C7E49
+	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 00:27:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229840AbiB1X1C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Feb 2022 18:27:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44562 "EHLO
+        id S230051AbiB1X1r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Feb 2022 18:27:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48356 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229842AbiB1X04 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Feb 2022 18:26:56 -0500
-Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A791C7E8E
-        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 15:26:17 -0800 (PST)
-Received: by mail-ej1-x632.google.com with SMTP id qk11so28039526ejb.2
-        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 15:26:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=IYj0iyPbAPJYK0pqqrQFmSosxig3GLvPltNcBRpBH2o=;
-        b=iilCwxcJirrROzQlokAzirElITvzz8NVS309xa9R+fmGw9330A74LwBK3eZYQ3xy9n
-         rkHxmIEDL09h+td2iWT3rJUObUBT6IN+zk9ezdTBBr1ySUm5aMgocqlq5Wp11cPe8ZNl
-         ZqlyQsCZVSY7B2Z7kItx9x1BlIxIyzmf9rGVSmevoYvCMc3XR0zO/d7FJyGzHSdIaYoR
-         NwJ1EOZz7pG4uMAOsjdUKz0MokxuetIYWe7DB7CFqDZL1LmrOI5am0cFISjMCncJLpJt
-         9nkQE3cm2ATdP4rNDTAiLca6Hhh6myJYWOWRrKwlIg4wT3BPqIwz9IMq9iEl3Q3pbG7c
-         WfZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=IYj0iyPbAPJYK0pqqrQFmSosxig3GLvPltNcBRpBH2o=;
-        b=HSZRZfNQ9nEAkc8Rxe5Bq3M6QQmgBUrOqxRnKVshVMEiA4GJdiNlJTe2oa6bQCk4V+
-         1o8T5L2rqBX/NawDHdBSN2LR7/ejVUpfP1lpuaZaJ4ch8aMksYzk31dN+NpOuaNr4qr+
-         AYZ/+nf4J+f1WyG7Wn3Uu81iGx44XgJd/H0FFzRU4ZmYEQB0AEwIysnpVBkwzuUW6M+Z
-         1icDuqbxMm8S8oMhSBrtcNCEWvyTtulXYN7m57hFR7wjrdI4TlvbVa9OGNSiMDepcwMF
-         ii2EKfACyoOWlJiTxKmN4CuphOqd09sJITMgM1kuby92DqVqRJwcJJWFD/0zmpvAal0b
-         gmjg==
-X-Gm-Message-State: AOAM533DGJUOeE+jomD5VueZNKShEHlBPbZ7GkfdwVqHN9j2w5sKXkaH
-        Sn2DXUHSUvPNCDl6naczcDEfsrwVqTPR6HXhroTioP4x+/M=
-X-Google-Smtp-Source: ABdhPJxpETjZNwVKbXGVCTkT2JrkFz4ve5APlqWONORpQL2mt2RgqVbwmsnHQ8548VmwQRXdL5XR+y0muIp0FqJC3kM=
-X-Received: by 2002:a17:906:2486:b0:6cf:ced9:e4cc with SMTP id
- e6-20020a170906248600b006cfced9e4ccmr16841097ejb.201.1646090775588; Mon, 28
- Feb 2022 15:26:15 -0800 (PST)
+        with ESMTP id S229961AbiB1X1p (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Feb 2022 18:27:45 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB8CADE2C1;
+        Mon, 28 Feb 2022 15:27:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=kySnWHttTi8Odl1WzgGLjQ1pb3b/AWH5qnYZSwnte50=; b=nt03mWtTaEB9qwsFMTflxzDbvW
+        aPSsVBeLr8i8UFwA1l3fNavsuYE231uUwb0yDTUi43cd3zIwbEaMZqro2u+rXbOt0KZriPQpyGi5J
+        +pW6oqM84XOoVppIQh3QNnM4ANpt9aIP3ShEwC0IGa2NKI/m2xxapQAyHhJG42Bevn7SuMSAnyA27
+        7+3DFdmFFllbJzk1MHudhAJj7GPo/5RsA7npxrePVRbtGBQKbJeOUSye2chevgvDMrFkod2y0FmL7
+        JW29U+rs2LR5a0WX3s04bvbvXotX/UjRCpaaxaXPYROyoDfpDk5Wuy418QovroPX+qbpGelik5Tc/
+        I0FC9RZw==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nOpPe-0090gL-Ex; Mon, 28 Feb 2022 23:26:42 +0000
+Date:   Mon, 28 Feb 2022 23:26:42 +0000
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+        Jakob Koschel <jakobkoschel@gmail.com>,
+        alsa-devel@alsa-project.org, linux-aspeed@lists.ozlabs.org,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        linux-iio@vger.kernel.org, nouveau@lists.freedesktop.org,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        dri-devel <dri-devel@lists.freedesktop.org>,
+        Cristiano Giuffrida <c.giuffrida@vu.nl>,
+        amd-gfx list <amd-gfx@lists.freedesktop.org>,
+        samba-technical@lists.samba.org,
+        linux1394-devel@lists.sourceforge.net, drbd-dev@lists.linbit.com,
+        linux-arch <linux-arch@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        linux-rdma <linux-rdma@vger.kernel.org>,
+        linux-staging@lists.linux.dev, "Bos, H.J." <h.j.bos@vu.nl>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        intel-wired-lan@lists.osuosl.org,
+        kgdb-bugreport@lists.sourceforge.net,
+        bcm-kernel-feedback-list@broadcom.com,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Linux Media Mailing List <linux-media@vger.kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Arnd Bergman <arnd@arndb.de>,
+        Linux PM <linux-pm@vger.kernel.org>,
+        intel-gfx <intel-gfx@lists.freedesktop.org>,
+        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        v9fs-developer@lists.sourceforge.net,
+        linux-tegra <linux-tegra@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-sgx@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>, linux-usb@vger.kernel.org,
+        linux-wireless <linux-wireless@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux F2FS Dev Mailing List 
+        <linux-f2fs-devel@lists.sourceforge.net>,
+        tipc-discussion@lists.sourceforge.net,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        dma <dmaengine@vger.kernel.org>,
+        linux-mediatek@lists.infradead.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        Mike Rapoport <rppt@kernel.org>
+Subject: Re: [PATCH 2/6] treewide: remove using list iterator after loop body
+ as a ptr
+Message-ID: <Yh1aMm3hFe/j9ZbI@casper.infradead.org>
+References: <20220228110822.491923-1-jakobkoschel@gmail.com>
+ <20220228110822.491923-3-jakobkoschel@gmail.com>
+ <2e4e95d6-f6c9-a188-e1cd-b1eae465562a@amd.com>
+ <CAHk-=wgQps58DPEOe4y5cTh5oE9EdNTWRLXzgMiETc+mFX7jzw@mail.gmail.com>
+ <CAHk-=wj8fkosQ7=bps5K+DDazBXk=ypfn49A0sEq+7-nZnyfXA@mail.gmail.com>
+ <CAHk-=wiTCvLQkHcJ3y0hpqH7FEk9D28LDvZZogC6OVLk7naBww@mail.gmail.com>
+ <Yh0tl3Lni4weIMkl@casper.infradead.org>
+ <CAHk-=wgBfJ1-cPA2LTvFyyy8owpfmtCuyiZi4+um8DhFNe+CyA@mail.gmail.com>
 MIME-Version: 1.0
-References: <20220226001546.360188-1-seanjc@google.com> <20220226001546.360188-7-seanjc@google.com>
-In-Reply-To: <20220226001546.360188-7-seanjc@google.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Mon, 28 Feb 2022 15:26:04 -0800
-Message-ID: <CANgfPd-Y6Z=icq4ajhesu23AOZPNRVq+KNQ-2kyFHyVA6sx5Xg@mail.gmail.com>
-Subject: Re: [PATCH v3 06/28] KVM: x86/mmu: Require mmu_lock be held for write
- in unyielding root iter
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        David Hildenbrand <david@redhat.com>,
-        kvm <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
-        David Matlack <dmatlack@google.com>,
-        Mingwei Zhang <mizhang@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-18.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wgBfJ1-cPA2LTvFyyy8owpfmtCuyiZi4+um8DhFNe+CyA@mail.gmail.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 25, 2022 at 4:16 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> Assert that mmu_lock is held for write by users of the yield-unfriendly
-> TDP iterator.  The nature of a shared walk means that the caller needs to
-> play nice with other tasks modifying the page tables, which is more or
-> less the same thing as playing nice with yielding.  Theoretically, KVM
-> could gain a flow where it could legitimately take mmu_lock for read in
-> a non-preemptible context, but that's highly unlikely and any such case
-> should be viewed with a fair amount of scrutiny.
->
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+On Mon, Feb 28, 2022 at 12:37:15PM -0800, Linus Torvalds wrote:
+> On Mon, Feb 28, 2022 at 12:16 PM Matthew Wilcox <willy@infradead.org> wrote:
+> >
+> > Then we can never use -Wshadow ;-(  I'd love to be able to turn it on;
+> > it catches real bugs.
+> 
+> Oh, we already can never use -Wshadow regardless of things like this.
+> That bridge hasn't just been burned, it never existed in the first
+> place.
+> 
+> The whole '-Wshadow' thing simply cannot work with local variables in
+> macros - something that we've used since day 1.
+> 
+> Try this (as a "p.c" file):
+> 
+>         #define min(a,b) ({                     \
+>                 typeof(a) __a = (a);            \
+>                 typeof(b) __b = (b);            \
+>                 __a < __b ? __a : __b; })
+> 
+>         int min3(int a, int b, int c)
+>         {
+>                 return min(a,min(b,c));
+>         }
+> 
+> and now do "gcc -O2 -S t.c".
+> 
+> Then try it with -Wshadow.
 
-Reviewed-by: Ben Gardon <bgardon@google.com>
+#define ___PASTE(a, b)	a##b
+#define __PASTE(a, b) ___PASTE(a, b)
+#define _min(a, b, u) ({         \
+        typeof(a) __PASTE(__a,u) = (a);            \
+        typeof(b) __PASTE(__b,u) = (b);            \
+        __PASTE(__a,u) < __PASTE(__b,u) ? __PASTE(__a,u) : __PASTE(__b,u); })
 
-> ---
->  arch/x86/kvm/mmu/tdp_mmu.c | 21 +++++++++++++++------
->  1 file changed, 15 insertions(+), 6 deletions(-)
->
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 5994db5d5226..189f21e71c36 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -29,13 +29,16 @@ bool kvm_mmu_init_tdp_mmu(struct kvm *kvm)
->         return true;
->  }
->
-> -static __always_inline void kvm_lockdep_assert_mmu_lock_held(struct kvm *kvm,
-> +/* Arbitrarily returns true so that this may be used in if statements. */
-> +static __always_inline bool kvm_lockdep_assert_mmu_lock_held(struct kvm *kvm,
->                                                              bool shared)
->  {
->         if (shared)
->                 lockdep_assert_held_read(&kvm->mmu_lock);
->         else
->                 lockdep_assert_held_write(&kvm->mmu_lock);
-> +
-> +       return true;
->  }
->
->  void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm)
-> @@ -187,11 +190,17 @@ static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
->  #define for_each_tdp_mmu_root_yield_safe(_kvm, _root, _as_id, _shared)         \
->         __for_each_tdp_mmu_root_yield_safe(_kvm, _root, _as_id, _shared, ALL_ROOTS)
->
-> -#define for_each_tdp_mmu_root(_kvm, _root, _as_id)                             \
-> -       list_for_each_entry_rcu(_root, &_kvm->arch.tdp_mmu_roots, link,         \
-> -                               lockdep_is_held_type(&kvm->mmu_lock, 0) ||      \
-> -                               lockdep_is_held(&kvm->arch.tdp_mmu_pages_lock)) \
-> -               if (kvm_mmu_page_as_id(_root) != _as_id) {              \
-> +/*
-> + * Iterate over all TDP MMU roots.  Requires that mmu_lock be held for write,
-> + * the implication being that any flow that holds mmu_lock for read is
-> + * inherently yield-friendly and should use the yielf-safe variant above.
-> + * Holding mmu_lock for write obviates the need for RCU protection as the list
-> + * is guaranteed to be stable.
-> + */
-> +#define for_each_tdp_mmu_root(_kvm, _root, _as_id)                     \
-> +       list_for_each_entry(_root, &_kvm->arch.tdp_mmu_roots, link)     \
-> +               if (kvm_lockdep_assert_mmu_lock_held(_kvm, false) &&    \
-> +                   kvm_mmu_page_as_id(_root) != _as_id) {              \
->                 } else
->
->  static struct kvm_mmu_page *tdp_mmu_alloc_sp(struct kvm_vcpu *vcpu)
-> --
-> 2.35.1.574.g5d30c73bfb-goog
->
+#define min(a, b) _min(a, b, __COUNTER__)
+
+int min3(int a, int b, int c)
+{
+        return min(a,min(b,c));
+}
+
+(probably there's a more elegant way to do this)
