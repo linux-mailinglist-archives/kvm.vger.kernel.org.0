@@ -2,154 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 58AE14C79A0
-	for <lists+kvm@lfdr.de>; Mon, 28 Feb 2022 21:09:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A3D94C79A8
+	for <lists+kvm@lfdr.de>; Mon, 28 Feb 2022 21:09:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229967AbiB1UEe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Feb 2022 15:04:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53178 "EHLO
+        id S230003AbiB1UHE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Feb 2022 15:07:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33330 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229930AbiB1UEd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Feb 2022 15:04:33 -0500
-Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BC1340911
-        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 12:03:53 -0800 (PST)
-Received: by mail-lj1-x233.google.com with SMTP id l12so7090787ljh.12
-        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 12:03:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=uod9R4vPcpqIjzHofeC96qXcIXUlGW+U5alvKq7K0ZA=;
-        b=Y+K+LAchMzIcesbCiqrzhisJgvbUIKYh3oFG/AlZJTKul1K9rRfHylHsN/EgM8hdwz
-         P3hABFpC0Wcw+/0V4cKR5X0P787Wy9QwMeL5ORY50P9+oNZqmMp6NkFq4yV6NAIkP79C
-         0bvk8ZnwfFSPqzKfD7Qqea+fs2YLRTaNcLanw=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=uod9R4vPcpqIjzHofeC96qXcIXUlGW+U5alvKq7K0ZA=;
-        b=azL9VKvSG6QlZeL0q+oHhpzksk7E92h+j9OK9koPMkNPs2YvYBIz0bFULaScOsHJzu
-         wXoMxQ4JRlXq+NUlfB+iz2l2j8+EDOfiUha9xwbB+XDFJ3GrAsIkRLJ/IEhaLnWdnn/0
-         ZM52LyFL6UduFRU3L3F2ttwN8NYoGWDd0HhyWGW8w0Snn/Fm1BBolJyT8UJFw4NhBAcx
-         JrI0lZxQ+XWwTHg5GQ0LRh2wmHBJwSXrSxtQ6liVwl1umTRwP10daTgQpS1vHffgr/6d
-         FwyN1Y5+7ZZ1H16NzqK1xkfaYiTbRyU02O+vTzYRdoiIfBXIB13/98mHuLAC/69h7mIR
-         d4/A==
-X-Gm-Message-State: AOAM533KfWwj3oWRlbRDVMRv76EyEL9htY6RZNGu5bQ0m7ogqSUIBRiA
-        xK58Z+l9k/6f/aa+hSBntRw6SrkA/wGhDMND4QQ=
-X-Google-Smtp-Source: ABdhPJy2fMdr2idWGBIf7VzKruSOZb9FZDPZmBEKJXURVlQ67FNCI3tcippjQKZRKtZOjdLD0Ol6bA==
-X-Received: by 2002:a2e:a4b8:0:b0:244:4551:6837 with SMTP id g24-20020a2ea4b8000000b0024445516837mr15460794ljm.378.1646078631460;
-        Mon, 28 Feb 2022 12:03:51 -0800 (PST)
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com. [209.85.167.47])
-        by smtp.gmail.com with ESMTPSA id v17-20020a197411000000b0044340299230sm1110701lfe.195.2022.02.28.12.03.51
-        for <kvm@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 28 Feb 2022 12:03:51 -0800 (PST)
-Received: by mail-lf1-f47.google.com with SMTP id d23so23227498lfv.13
-        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 12:03:51 -0800 (PST)
-X-Received: by 2002:ac2:44a4:0:b0:445:8fc5:a12a with SMTP id
- c4-20020ac244a4000000b004458fc5a12amr7653619lfm.27.1646078630855; Mon, 28 Feb
- 2022 12:03:50 -0800 (PST)
+        with ESMTP id S229954AbiB1UGx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Feb 2022 15:06:53 -0500
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1C2C2A700
+        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 12:06:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=Sender:Content-Transfer-Encoding:
+        Content-Type:MIME-Version:Message-Id:Date:Subject:Cc:To:From:Reply-To:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=cQkupUrSOc0Qq6rGoP/aDqt1niKcvcjlfkFQFx43N4k=; b=Bp2+66UWlNH9VPRKfm6top+cWr
+        c+NMCTcAmSmNqDlrHBXM4ZRdAMwB1m3WP6OC9z735N8nSyQIEG4wI5fcE7k1Y3Eut8Sx/yzovTBrD
+        JwWgTPkRv3/Y7iI0zqEJUjZxjR+lC6O9w9FW/aWwndN33imonnXhdGd+0/GnAWRbTYq+lwPfxYelK
+        m2NpoVBfLYYAl6yBbrWbQbB3/Z9okshCJBgph2O2r/GoGk/ihLobyne7AV3OrN+y3Ryx+xHmdXeS0
+        cb2O2FY4nKrPaDt+Ii8T3T9C7kKxQQqemFvpq2y9tz8/RU3JRopUVZ26dSeN3bPQpjTHOOiEUQ2EW
+        YF+QjVCg==;
+Received: from [2001:8b0:10b:1:85c4:81a:fb42:714d] (helo=i7.infradead.org)
+        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nOmHK-00DzoA-Bt; Mon, 28 Feb 2022 20:05:54 +0000
+Received: from dwoodhou by i7.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nOmHJ-000d9D-Qz; Mon, 28 Feb 2022 20:05:53 +0000
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Metin Kaya <metikaya@amazon.co.uk>,
+        Paul Durrant <pdurrant@amazon.co.uk>
+Subject: [PATCH v2 00/17] KVM: Add Xen event channel acceleration
+Date:   Mon, 28 Feb 2022 20:05:35 +0000
+Message-Id: <20220228200552.150406-1-dwmw2@infradead.org>
+X-Mailer: git-send-email 2.33.1
 MIME-Version: 1.0
-References: <20220228110822.491923-1-jakobkoschel@gmail.com>
- <20220228110822.491923-3-jakobkoschel@gmail.com> <2e4e95d6-f6c9-a188-e1cd-b1eae465562a@amd.com>
- <CAHk-=wgQps58DPEOe4y5cTh5oE9EdNTWRLXzgMiETc+mFX7jzw@mail.gmail.com>
-In-Reply-To: <CAHk-=wgQps58DPEOe4y5cTh5oE9EdNTWRLXzgMiETc+mFX7jzw@mail.gmail.com>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Mon, 28 Feb 2022 12:03:34 -0800
-X-Gmail-Original-Message-ID: <CAHk-=wj8fkosQ7=bps5K+DDazBXk=ypfn49A0sEq+7-nZnyfXA@mail.gmail.com>
-Message-ID: <CAHk-=wj8fkosQ7=bps5K+DDazBXk=ypfn49A0sEq+7-nZnyfXA@mail.gmail.com>
-Subject: Re: [PATCH 2/6] treewide: remove using list iterator after loop body
- as a ptr
-To:     =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>
-Cc:     Jakob Koschel <jakobkoschel@gmail.com>,
-        alsa-devel@alsa-project.org, linux-aspeed@lists.ozlabs.org,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        linux-iio@vger.kernel.org, nouveau@lists.freedesktop.org,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        dri-devel <dri-devel@lists.freedesktop.org>,
-        Cristiano Giuffrida <c.giuffrida@vu.nl>,
-        amd-gfx list <amd-gfx@lists.freedesktop.org>,
-        samba-technical@lists.samba.org,
-        linux1394-devel@lists.sourceforge.net, drbd-dev@lists.linbit.com,
-        linux-arch <linux-arch@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>,
-        linux-scsi <linux-scsi@vger.kernel.org>,
-        linux-rdma <linux-rdma@vger.kernel.org>,
-        linux-staging@lists.linux.dev, "Bos, H.J." <h.j.bos@vu.nl>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        intel-wired-lan@lists.osuosl.org,
-        kgdb-bugreport@lists.sourceforge.net,
-        bcm-kernel-feedback-list@broadcom.com,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Linux Media Mailing List <linux-media@vger.kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Arnd Bergman <arnd@arndb.de>,
-        Linux PM <linux-pm@vger.kernel.org>,
-        intel-gfx <intel-gfx@lists.freedesktop.org>,
-        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        v9fs-developer@lists.sourceforge.net,
-        linux-tegra <linux-tegra@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-sgx@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>, linux-usb@vger.kernel.org,
-        linux-wireless <linux-wireless@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux F2FS Dev Mailing List 
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        tipc-discussion@lists.sourceforge.net,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        dma <dmaengine@vger.kernel.org>,
-        linux-mediatek@lists.infradead.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        Mike Rapoport <rppt@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Sender: David Woodhouse <dwmw2@infradead.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 28, 2022 at 11:56 AM Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
->
-> I do wish we could actually poison the 'pos' value after the loop
-> somehow - but clearly the "might be uninitialized" I was hoping for
-> isn't the way to do it.
+This series adds event channel acceleration for Xen guests. In particular
+it allows guest vCPUs to send each other IPIs without having to bounce
+all the way out to the userspace VMM in order to do so. Likewise, the
+Xen singleshot timer is added, and a version of SCHEDOP_poll. Those
+major features are based on Joao and Boris' patches from 2019.
 
-Side note: we do need *some* way to do it.
+Cleaning up the event delivery into the vcpu_info involved using the new
+gfn_to_pfn_cache for that, and that means I ended up doing so for *all*
+the places the guest can have a pvclock.
 
-Because if we make that change, and only set it to another pointer
-when not the head, then we very much change the semantics of
-"list_for_each_head()". The "list was empty" case would now exit with
-'pos' not set at all (or set to NULL if we add that). Or it would be
-set to the last entry.
+v0: Proof-of-concept RFC 
 
-And regardless, that means that all the
+v1:
+ • Drop the runstate fix which is merged now.
+ • Add Sean's gfn_to_pfn_cache API change at the start of the series.
+ • Add KVM self tests
+ • Minor bug fixes
 
-        if (pos == head)
+v2:
+ • Drop dirty handling from gfn_to_pfn_cache
+ • Fix !CONFIG_KVM_XEN build and duplicate call to kvm_xen_init_vcpu()
 
-kinds of checks after the loop would be fundamentally broken.
+Boris Ostrovsky (1):
+      KVM: x86/xen: handle PV spinlocks slowpath
 
-Darn. I really hoped for (and naively expected) that we could actually
-have the compiler warn about the use-after-loop case. That whole
-"compiler will now complain about bad use" was integral to my clever
-plan to use the C99 feature of declaring the iterator inside the loop.
+David Woodhouse (12):
+      KVM: Remove dirty handling from gfn_to_pfn_cache completely
+      KVM: x86/xen: Use gfn_to_pfn_cache for runstate area
+      KVM: x86: Use gfn_to_pfn_cache for pv_time
+      KVM: x86/xen: Use gfn_to_pfn_cache for vcpu_info
+      KVM: x86/xen: Use gfn_to_pfn_cache for vcpu_time_info
+      KVM: x86/xen: Make kvm_xen_set_evtchn() reusable from other places
+      KVM: x86/xen: Support direct injection of event channel events
+      KVM: x86/xen: Add KVM_XEN_VCPU_ATTR_TYPE_VCPU_ID
+      KVM: x86/xen: Kernel acceleration for XENVER_version
+      KVM: x86/xen: Support per-vCPU event channel upcall via local APIC
+      KVM: x86/xen: Advertise and document KVM_XEN_HVM_CONFIG_EVTCHN_SEND
+      KVM: x86/xen: Add self tests for KVM_XEN_HVM_CONFIG_EVTCHN_SEND
 
-But my "clever plan" was apparently some ACME-level Wile E. Coyote sh*t.
+Joao Martins (3):
+      KVM: x86/xen: intercept EVTCHNOP_send from guests
+      KVM: x86/xen: handle PV IPI vcpu yield
+      KVM: x86/xen: handle PV timers oneshot mode
 
-Darn.
+Sean Christopherson (1):
+      KVM: Use enum to track if cached PFN will be used in guest and/or host
 
-                   Linus
+ Documentation/virt/kvm/api.rst                       |  133 ++++++++++++++++++--
+ arch/x86/include/asm/kvm_host.h                      |   23 ++--
+ arch/x86/kvm/irq.c                                   |   11 +-
+ arch/x86/kvm/irq_comm.c                              |    2 +-
+ arch/x86/kvm/x86.c                                   |  119 ++++++++++--------
+ arch/x86/kvm/xen.c                                   | 1249 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++---------------------------------
+ arch/x86/kvm/xen.h                                   |   67 +++++++++-
+ include/linux/kvm_host.h                             |   26 ++--
+ include/linux/kvm_types.h                            |   11 +-
+ include/uapi/linux/kvm.h                             |   43 +++++++
+ tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c |  340 +++++++++++++++++++++++++++++++++++++++++++++++--
+ virt/kvm/pfncache.c                                  |   53 +++-----
+ 12 files changed, 1702 insertions(+), 375 deletions(-)
+
+
