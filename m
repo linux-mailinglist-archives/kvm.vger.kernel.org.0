@@ -2,81 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 539F34C7A3A
-	for <lists+kvm@lfdr.de>; Mon, 28 Feb 2022 21:24:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E28F04C7A60
+	for <lists+kvm@lfdr.de>; Mon, 28 Feb 2022 21:29:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229546AbiB1UYe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Feb 2022 15:24:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34834 "EHLO
+        id S229669AbiB1U3r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Feb 2022 15:29:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229510AbiB1UYb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Feb 2022 15:24:31 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 258825621C
-        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 12:23:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646079831;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=90VxHOyFuo2ODBqrQg2kpbHyzlakM2kYCuGAJwvAK6A=;
-        b=aTIWLXGeh2miDuNwMlFDCMyqHJgsCo1jhmOe3n7q4T9Qr5rObMx0sIaX1W9RnoS8GHSqxe
-        jpJupPj9DdmnfwFiY30paF78su8ZUMD5zZnHGE1InXgNmfLKI2Tf3jQWy4YuRiwALEZDYU
-        eGxcB8YM4iOtDTqQM594P7QOYQRS0+A=
-Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com
- [209.85.161.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-586-5I5S_cekMxmYfMv9GghJ1g-1; Mon, 28 Feb 2022 15:23:49 -0500
-X-MC-Unique: 5I5S_cekMxmYfMv9GghJ1g-1
-Received: by mail-oo1-f70.google.com with SMTP id x130-20020a4a4188000000b0031b2e31acc7so9200008ooa.21
-        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 12:23:49 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=90VxHOyFuo2ODBqrQg2kpbHyzlakM2kYCuGAJwvAK6A=;
-        b=RSJJKoyPnf5agDwZU3NjzJDmlfY5hdczdiERsv3Chksinh0JH+Wa3Uk/cM9PVxHz1p
-         LmbeKWluY6uCOfAYMvvCCSpmsgN+BU9sAG5fW2oriim5sC12HpMmitq3+kQBg8HDxtbf
-         8Dt1vkzh1Z/vqCBR4TTQDn9GYsJDe9KrlIgLI8MKc3csKWKGx7XYto8ujyEYeZaRFZyW
-         MsLMzNeC6TMLXZ+Y7O1TAntGwTFYwtnciUv+vTtNwfpp/3xeHuJSLY8mti/rAUoC8LkI
-         P0dLu/n8JuuED/HAZTL1dNWoyWRK54yTLv+kfLmREZF7V8QFoA38ub2S2kuoV4fPK+OA
-         VZAw==
-X-Gm-Message-State: AOAM5337furhrqWlt8yHSlGlnLlJkKqMlg/52xkOfXOkbBi/oMVTJis1
-        oubOvZ1NwU4uT5Md8BSGSy1tNAicVTGEdZ4Qzrzagvcmw1lLhlFjy0xvBhqgMqnHcl0lclS9wpF
-        0UsIwBlJJIbiY
-X-Received: by 2002:a05:6870:678c:b0:d6:e495:e9e2 with SMTP id gc12-20020a056870678c00b000d6e495e9e2mr1729695oab.154.1646079829027;
-        Mon, 28 Feb 2022 12:23:49 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxCoTJvK0Zs83kxVjGLCSp366fI2fadM1e3pMs0iu/tKtBzyVo7yn+bdexHYiCmEVEg2PXmsQ==
-X-Received: by 2002:a05:6870:678c:b0:d6:e495:e9e2 with SMTP id gc12-20020a056870678c00b000d6e495e9e2mr1729684oab.154.1646079828768;
-        Mon, 28 Feb 2022 12:23:48 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id v5-20020a544d05000000b002d7652b3c52sm4653982oix.25.2022.02.28.12.23.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Feb 2022 12:23:48 -0800 (PST)
-Date:   Mon, 28 Feb 2022 13:23:46 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Bjorn Helgaas <helgaas@kernel.org>
-Cc:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, jgg@nvidia.com, cohuck@redhat.com,
-        mgurtovoy@nvidia.com, yishaih@nvidia.com, linuxarm@huawei.com,
-        liulongfang@huawei.com, prime.zeng@hisilicon.com,
-        jonathan.cameron@huawei.com, wangzhou1@hisilicon.com,
-        bhelgaas@google.com, linux-pci@vger.kernel.org
-Subject: Re: [PATCH v6 03/10] hisi_acc_qm: Move PCI device IDs to common
- header
-Message-ID: <20220228132346.77624e5b.alex.williamson@redhat.com>
-In-Reply-To: <20220228201259.GA516607@bhelgaas>
-References: <20220228103338.76da0b3b.alex.williamson@redhat.com>
-        <20220228201259.GA516607@bhelgaas>
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        with ESMTP id S229489AbiB1U3q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Feb 2022 15:29:46 -0500
+Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:191:4433::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A60D046B14;
+        Mon, 28 Feb 2022 12:29:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
+        Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+        Resent-Cc:Resent-Message-ID; bh=uTSgVBk5w89AJnv82I9bqMWvwbVIn7Apzl6uMNeIbWY=;
+        t=1646080146; x=1647289746; b=OkHUiLVznHOGWDQgva9o/U8+hdeMUTOf+IyChue2hmp5Fll
+        ehN379UgJObU84VnUri6HU2CJVMFCfloUG7hAL3mEL6+GyOJ8BoW3Ztxf0QjDucExPzRhtDHGA3sn
+        pFob6kzHYzdNYQbK17GeixiYC/29eL01WuIKAP9nzf5Rrj16Kw2WLK8pdotdsfNO/iUozlBq52fyt
+        XoISW2UfhPtOix8uc7dvq7d6ueMBQhFqQfOJjlH6tyjcXzAZSZh5pTL/BTZI6ozwW24iSqB3LrEw5
+        mWgsr7dP1wyl/pxa0vKCyWULkX9Q8iNjl2i7O0VZM8H8UmdnyB/dZgp74mcvgvAw==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+        (Exim 4.95)
+        (envelope-from <johannes@sipsolutions.net>)
+        id 1nOmc1-00716Q-Dh;
+        Mon, 28 Feb 2022 21:27:17 +0100
+Message-ID: <e3bb7d0632f8ef60f18c19976d57330e1ef00584.camel@sipsolutions.net>
+Subject: Re: [PATCH 2/6] treewide: remove using list iterator after loop
+ body as a ptr
+From:   Johannes Berg <johannes@sipsolutions.net>
+To:     Matthew Wilcox <willy@infradead.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Christian =?ISO-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+        Jakob Koschel <jakobkoschel@gmail.com>,
+        alsa-devel@alsa-project.org, linux-aspeed@lists.ozlabs.org,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        linux-iio@vger.kernel.org, nouveau@lists.freedesktop.org,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        dri-devel <dri-devel@lists.freedesktop.org>,
+        Cristiano Giuffrida <c.giuffrida@vu.nl>,
+        amd-gfx list <amd-gfx@lists.freedesktop.org>,
+        samba-technical@lists.samba.org,
+        linux1394-devel@lists.sourceforge.net, drbd-dev@lists.linbit.com,
+        linux-arch <linux-arch@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        linux-rdma <linux-rdma@vger.kernel.org>,
+        linux-staging@lists.linux.dev, "Bos, H.J." <h.j.bos@vu.nl>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        intel-wired-lan@lists.osuosl.org,
+        kgdb-bugreport@lists.sourceforge.net,
+        bcm-kernel-feedback-list@broadcom.com,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Linux Media Mailing List <linux-media@vger.kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Arnd Bergman <arnd@arndb.de>,
+        Linux PM <linux-pm@vger.kernel.org>,
+        intel-gfx <intel-gfx@lists.freedesktop.org>,
+        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        v9fs-developer@lists.sourceforge.net,
+        linux-tegra <linux-tegra@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-sgx@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>, linux-usb@vger.kernel.org,
+        linux-wireless <linux-wireless@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux F2FS Dev Mailing List 
+        <linux-f2fs-devel@lists.sourceforge.net>,
+        tipc-discussion@lists.sourceforge.net,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        dma <dmaengine@vger.kernel.org>,
+        linux-mediatek@lists.infradead.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        Mike Rapoport <rppt@kernel.org>
+Date:   Mon, 28 Feb 2022 21:27:13 +0100
+In-Reply-To: <Yh0tl3Lni4weIMkl@casper.infradead.org>
+References: <20220228110822.491923-1-jakobkoschel@gmail.com>
+         <20220228110822.491923-3-jakobkoschel@gmail.com>
+         <2e4e95d6-f6c9-a188-e1cd-b1eae465562a@amd.com>
+         <CAHk-=wgQps58DPEOe4y5cTh5oE9EdNTWRLXzgMiETc+mFX7jzw@mail.gmail.com>
+         <CAHk-=wj8fkosQ7=bps5K+DDazBXk=ypfn49A0sEq+7-nZnyfXA@mail.gmail.com>
+         <CAHk-=wiTCvLQkHcJ3y0hpqH7FEk9D28LDvZZogC6OVLk7naBww@mail.gmail.com>
+         <Yh0tl3Lni4weIMkl@casper.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+X-malware-bazaar: not-scanned
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -84,56 +108,26 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 28 Feb 2022 14:12:59 -0600
-Bjorn Helgaas <helgaas@kernel.org> wrote:
-
-> On Mon, Feb 28, 2022 at 10:33:38AM -0700, Alex Williamson wrote:
-> > [Cc+ Bjorn, linux-pci]
+On Mon, 2022-02-28 at 20:16 +0000, Matthew Wilcox wrote:
+> On Mon, Feb 28, 2022 at 12:10:24PM -0800, Linus Torvalds wrote:
+> > We can do
 > > 
-> > On Mon, 28 Feb 2022 09:01:14 +0000
-> > Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
-> >   
-> > > Move the PCI Device IDs of HiSilicon ACC devices to
-> > > a common header and use a uniform naming convention.  
+> >         typeof(pos) pos
+> > 
+> > in the 'for ()' loop, and never use __iter at all.
+> > 
+> > That means that inside the for-loop, we use a _different_ 'pos' than outside.
 > 
-> > > --- a/include/linux/pci_ids.h
-> > > +++ b/include/linux/pci_ids.h
-> > > @@ -2529,6 +2529,12 @@
-> > >  #define PCI_DEVICE_ID_KORENIX_JETCARDF3	0x17ff
-> > >  
-> > >  #define PCI_VENDOR_ID_HUAWEI		0x19e5
-> > > +#define PCI_DEVICE_ID_HUAWEI_ZIP_PF	0xa250
-> > > +#define PCI_DEVICE_ID_HUAWEI_ZIP_VF	0xa251
-> > > +#define PCI_DEVICE_ID_HUAWEI_SEC_PF	0xa255
-> > > +#define PCI_DEVICE_ID_HUAWEI_SEC_VF	0xa256
-> > > +#define PCI_DEVICE_ID_HUAWEI_HPRE_PF	0xa258
-> > > +#define PCI_DEVICE_ID_HUAWEI_HPRE_VF	0xa259  
+> Then we can never use -Wshadow ;-(  I'd love to be able to turn it on;
+> it catches real bugs.
 > 
-> We usually don't add things to pci_ids.h unless they're used in more
-> than one place (see the comment at the top of the file).  AFAICT,
-> these device IDs are only used in one file, so you can leave the
-> #defines in the file that uses them or use bare hex values.
 
-Later in this series the VF IDs are added to a vendor variant of the
-vfio-pci driver:
+I was just going to say the same thing...
 
-https://lore.kernel.org/all/20220228090121.1903-5-shameerali.kolothum.thodi@huawei.com/
+If we're willing to change the API for the macro, we could do
 
-diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-new file mode 100644
-index 000000000000..8129c3457b3b
---- /dev/null
-+++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-...
-+static const struct pci_device_id hisi_acc_vfio_pci_table[] = {
-+	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_HUAWEI_SEC_VF) },
-+	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_HUAWEI_HPRE_VF) },
-+	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_HUAWEI_ZIP_VF) },
-+	{ }
-+};
+  list_for_each_entry(type, pos, head, member)
 
-So I think the VFs IDs meet the requirements, but perhaps not the PF
-IDs.  Would it be ok if the PFs were dropped?  Thanks,
+and then actually take advantage of -Wshadow?
 
-Alex
-
+johannes
