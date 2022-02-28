@@ -2,248 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 026574C64B6
-	for <lists+kvm@lfdr.de>; Mon, 28 Feb 2022 09:18:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 13E094C64D6
+	for <lists+kvm@lfdr.de>; Mon, 28 Feb 2022 09:27:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233946AbiB1ISg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Feb 2022 03:18:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33320 "EHLO
+        id S233946AbiB1I1k (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Feb 2022 03:27:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233870AbiB1ISc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Feb 2022 03:18:32 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2F13B3204C
-        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 00:17:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646036272;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=kcQX81TKsBPgI6ZQdBTCH95O8eyfaOBAupOXuKZxV+I=;
-        b=KeglD0/apnE2LjyYpvZlEysuhEEkczF5WZM3CP45pGzrhi+sFNGofiKQGcHAi7vCp9EmR8
-        yl8WDX6zlm5a9Iow0Nt5WKpHrMr4kFC78pDS9+GyitF81/Nh0RTnW9xd64knBj2dRDTDow
-        FfwiCI3/tw026SGa5LvL5XKc9BM/YYQ=
-Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
- [209.85.210.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-94-sZhpQ7gHOMiOlGb-FAHffA-1; Mon, 28 Feb 2022 03:17:50 -0500
-X-MC-Unique: sZhpQ7gHOMiOlGb-FAHffA-1
-Received: by mail-pf1-f200.google.com with SMTP id t134-20020a62788c000000b004e1367caccaso7381830pfc.14
-        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 00:17:50 -0800 (PST)
+        with ESMTP id S229751AbiB1I1j (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Feb 2022 03:27:39 -0500
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD81F5BE48
+        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 00:27:00 -0800 (PST)
+Received: by mail-pj1-x1030.google.com with SMTP id q8-20020a17090a178800b001bc299b8de1so10717245pja.1
+        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 00:27:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:organization:in-reply-to
+         :content-transfer-encoding;
+        bh=84kTi9FPdY2UlbNHAvY3OJ8kcjhSpXBxCEwtIaRVe9c=;
+        b=LlVepMb/nEoRQydPcQ2gD5Oezj0eIMVNRKG+vfyslpJs4tWwuo72/kw1WV3d6ATaPF
+         pU+KoAq+69+qa6k4trY18aCSIHFd1gKP/bv1nUzAsuvoxHMhLoplq7aiWJAbsqfNKsaQ
+         HzHfSrzfhEybw+uFMwtzGb6KfO2syDnyleyzYDDX3zAgqpK82qDVe6PQp2yLUVZY17gX
+         MfvUYcaklPK2yXLKml4lG0n4EshvgiOilLlUo74fAcPxLJ0H0xvoPj39rs2LZPz3ToLr
+         nHTYKySdswAes9aVbQ+wU90YsZMVLe2P/7xPYpJZ9Gjm4ae96r5LYZvUE+GUuT0YDLuz
+         UpIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
+         :content-language:to:cc:references:from:organization:in-reply-to
          :content-transfer-encoding;
-        bh=kcQX81TKsBPgI6ZQdBTCH95O8eyfaOBAupOXuKZxV+I=;
-        b=KwULgFKyctA6zGZKuJa97sI9j1et1LVlxHhlC/7nFeVJFsjI9o2PBluR6vy8ODKatJ
-         btHxqDhFTV9wNZw5NEcxG7nXXt37uuJH5bMjTg0nKB3Z/niYykgMqB+JaAWugL+abucv
-         QAQfbawrutfuRCIoMR+1uYq4R5cgjLM7e7+3AcQkcHx7u8CVtCOLW4GFHyfMv49uj1n4
-         IzbDnq6XLP+9rENSRYwyJA6GuOb+aRhpZzWeFnhKXqJL2YZYa6YMjJRYtdBhrT+uK4hl
-         w+6yzwqNqHtX67zOjri1AWIjwr7L5rUk/n9pB0zZiM0lKPe8yGtTozrTo2msTXAmpVKU
-         FKYg==
-X-Gm-Message-State: AOAM533PyDW9zhOtaeS+bvN5dBdfiCk0lYf3l8LfvYbwgH9b/6vwFb+c
-        CXCwqJnzHJGYMCKzqEVYwNoUSijLrM6WGCspvDsdyy1n/6pPKcZSuc/qBEmvMfJuGVg+3qkCfJK
-        5AMnqhcG65jQ0
-X-Received: by 2002:a17:90b:34e:b0:1bd:16db:980e with SMTP id fh14-20020a17090b034e00b001bd16db980emr9907424pjb.132.1646036269279;
-        Mon, 28 Feb 2022 00:17:49 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJySJlNX76ptc/rztyRChRUymNl0t+JDOxQTq6TMo3C0MeY0mFWzNbxlCiWBmIMbFPUWWLxVIw==
-X-Received: by 2002:a17:90b:34e:b0:1bd:16db:980e with SMTP id fh14-20020a17090b034e00b001bd16db980emr9907392pjb.132.1646036268999;
-        Mon, 28 Feb 2022 00:17:48 -0800 (PST)
-Received: from [10.72.13.215] ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id nn10-20020a17090b38ca00b001bc3a60b324sm9451560pjb.46.2022.02.28.00.17.43
+        bh=84kTi9FPdY2UlbNHAvY3OJ8kcjhSpXBxCEwtIaRVe9c=;
+        b=fQLQiAbfyWGgYWJs9ewT8xwxHSZcosMhgtS9R5pmko5l8Kv9EMRHoER+2JWvvRyj5L
+         fFYk88LJNepm7z7byKzuRK6Wz+CE2wKG1YlvUJMyCZZu7EqZT6MRW9M2aWlmqntXGiJM
+         MwbEqCA8vMybs6k3eI6agY6f5waYRbdtFQUT31FcDJVLzj2odhqkGx5NTiCCfGaEpfy9
+         Me7PD6tdmIlJXpoIt0YYNVdEJHbTRA69IMYEuZ6111SYUb+CKzT8nwV8LGlwAfiQf8UQ
+         4XEbT6FAZuoUTTMqeHZtfZH2bXJAMpb1ZX++RLZu7SG1wW+sy9KizQ5EhRIQTjDgVBkc
+         vBzg==
+X-Gm-Message-State: AOAM5329BsLFryrbxaJA5pooOQY1XR88cfhTa/3bDr6XN0q8VWtljTds
+        vkqNhZ/oMjmK+cNeAGCoVAo=
+X-Google-Smtp-Source: ABdhPJzrrZCuBCfjbN2aST9UvQ0GWCZ6V4XSAh5nMo+crPX11SXeQ1Ivv9XPmUus3KHIiVm2MMSZng==
+X-Received: by 2002:a17:902:b490:b0:151:6ee1:8034 with SMTP id y16-20020a170902b49000b001516ee18034mr1898117plr.28.1646036820258;
+        Mon, 28 Feb 2022 00:27:00 -0800 (PST)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id f17-20020a056a001ad100b004f0ec1cbc4fsm12428374pfv.109.2022.02.28.00.26.58
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 28 Feb 2022 00:17:48 -0800 (PST)
-Message-ID: <19843d2b-dfe9-5e2d-4d3d-ca55456947dc@redhat.com>
-Date:   Mon, 28 Feb 2022 16:17:41 +0800
+        Mon, 28 Feb 2022 00:27:00 -0800 (PST)
+Message-ID: <53954c03-49ff-c84e-e062-142e103f735c@gmail.com>
+Date:   Mon, 28 Feb 2022 16:26:51 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
  Gecko/20100101 Thunderbird/91.6.1
-Subject: Re: [RFC PATCH v2 00/19] Control VQ support in vDPA
+Subject: Re: [PATCH] KVM: x86/svm: Clear reserved bits written to PerfEvtSeln
+ MSRs
 Content-Language: en-US
-To:     Gautam Dawar <gautam.dawar@xilinx.com>
-Cc:     gdawar@xilinx.com, martinh@xilinx.com, hanand@xilinx.com,
-        tanujk@xilinx.com, eperezma@redhat.com,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Zhu Lingshan <lingshan.zhu@intel.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Xie Yongji <xieyongji@bytedance.com>,
-        Eli Cohen <elic@nvidia.com>,
-        Si-Wei Liu <si-wei.liu@oracle.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Longpeng <longpeng2@huawei.com>,
-        virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org
-References: <20201216064818.48239-1-jasowang@redhat.com>
- <20220224212314.1326-1-gdawar@xilinx.com>
-From:   Jason Wang <jasowang@redhat.com>
-In-Reply-To: <20220224212314.1326-1-gdawar@xilinx.com>
+To:     Jim Mattson <jmattson@google.com>, pbonzini@redhat.com
+Cc:     Lotus Fenn <lotusf@google.com>, kvm list <kvm@vger.kernel.org>,
+        "Bangoria, Ravikumar" <ravi.bangoria@amd.com>
+References: <20220226234131.2167175-1-jmattson@google.com>
+From:   Like Xu <like.xu.linux@gmail.com>
+Organization: Tencent
+In-Reply-To: <20220226234131.2167175-1-jmattson@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 27/2/2022 7:41 am, Jim Mattson wrote:
+> AMD EPYC CPUs never raise a #GP for a WRMSR to a PerfEvtSeln MSR. Some
+> reserved bits are cleared, and some are not. Specifically, on
+> Zen3/Milan, bits 19 and 42 are not cleared.
 
-在 2022/2/25 上午5:22, Gautam Dawar 写道:
-> Hi All:
->
-> This series tries to add the support for control virtqueue in vDPA.
->
-> Control virtqueue is used by networking device for accepting various
-> commands from the driver. It's a must to support multiqueue and other
-> configurations.
->
-> When used by vhost-vDPA bus driver for VM, the control virtqueue
-> should be shadowed via userspace VMM (Qemu) instead of being assigned
-> directly to Guest. This is because Qemu needs to know the device state
-> in order to start and stop device correctly (e.g for Live Migration).
->
-> This requies to isolate the memory mapping for control virtqueue
-> presented by vhost-vDPA to prevent guest from accessing it directly.
->
-> To achieve this, vDPA introduce two new abstractions:
->
-> - address space: identified through address space id (ASID) and a set
->                   of memory mapping in maintained
-> - virtqueue group: the minimal set of virtqueues that must share an
->                   address space
->
-> Device needs to advertise the following attributes to vDPA:
->
-> - the number of address spaces supported in the device
-> - the number of virtqueue groups supported in the device
-> - the mappings from a specific virtqueue to its virtqueue groups
->
-> The mappings from virtqueue to virtqueue groups is fixed and defined
-> by vDPA device driver. E.g:
->
-> - For the device that has hardware ASID support, it can simply
->    advertise a per virtqueue virtqueue group.
-> - For the device that does not have hardware ASID support, it can
->    simply advertise a single virtqueue group that contains all
->    virtqueues. Or if it wants a software emulated control virtqueue, it
->    can advertise two virtqueue groups, one is for cvq, another is for
->    the rest virtqueues.
->
-> vDPA also allow to change the association between virtqueue group and
-> address space. So in the case of control virtqueue, userspace
-> VMM(Qemu) may use a dedicated address space for the control virtqueue
-> group to isolate the memory mapping.
->
-> The vhost/vhost-vDPA is also extend for the userspace to:
->
-> - query the number of virtqueue groups and address spaces supported by
->    the device
-> - query the virtqueue group for a specific virtqueue
-> - assocaite a virtqueue group with an address space
-> - send ASID based IOTLB commands
->
-> This will help userspace VMM(Qemu) to detect whether the control vq
-> could be supported and isolate memory mappings of control virtqueue
-> from the others.
->
-> To demonstrate the usage, vDPA simulator is extended to support
-> setting MAC address via a emulated control virtqueue.
->
-> Please review.
->
-> Changes since v1:
->
-> - Rebased the v1 patch series on vhost branch of MST vhost git repo
->    git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git/log/?h=vhost
-> - Updates to accommodate vdpa_sim changes from monolithic module in
->    kernel used v1 patch series to current modularized class (net, block)
->    based approach.
-> - Added new attributes (ngroups and nas) to "vdpasim_dev_attr" and
->    propagated them from vdpa_sim_net to vdpa_sim
-> - Widened the data-type for "asid" member of vhost_msg_v2 to __u32
->    to accommodate PASID
+Curiously, is there any additional documentation on what bits 19 and 42 are for?
+And we only need this part of logic specifically for at least (guest cpu model) 
+Zen3.
 
+> 
+> When emulating such a WRMSR, KVM should not synthesize a #GP, > regardless of which bits are set. However, undocumented bits should
 
-This is great. Then the semantic matches exactly the PASID proposal here[1].
+If KVM chooses to emulate different #GP behavior on AMD and Intel for
+"reserved bits without qualification"[0], there should be more code for almost
+all MSRs to be checked one by one.
 
+[0] "If a field is marked reserved without qualification, software must not
+change the state of that field; it must reload that field with the same value
+returned from a prior read."
 
-> - Fixed the buildbot warnings
-> - Resolved all checkpatch.pl errors and warnings
-> - Tested both control and datapath with Xilinx Smartnic SN1000 series
->    device using QEMU implementing the Shadow virtqueue and support for
->    VQ groups and ASID available at:
->    github.com/eugpermar/qemu/releases/tag/vdpa_sw_live_migration.d%2F
->    asid_groups-v1.d%2F00
+> not be passed through to the hardware MSR. So, rather than checking
+> for reserved bits and synthesizing a #GP, just clear the reserved
+> bits.
 
+wrmsr -a 0xc0010200 0xfffffcf000280000
+rdmsr -a 0xc0010200 | sort | uniq
+# 0x40000080000 (expected)
 
-On top, we may extend the netlink protocol to report the mapping between 
-virtqueue to its groups.
+According to the test, there will be memory bits somewhere on the host
+recording the bit status of bits 19 and 42.
 
+Shouldn't KVM emulate this bit-memory behavior as well ?
 
-Thanks
+> 
+> This may seem pedantic, but since KVM currently does not support the
+> "Host/Guest Only" bits (41:40), it is necessary to clear these bits
 
-[1] 
-https://www.mail-archive.com/virtio-dev@lists.oasis-open.org/msg08077.html
+I would have thought you had code to emulate the "Host/Guest Only"
+bits for nested SVM PMU to fix this issue fundamentally.
 
+> rather than synthesizing #GP, because some popular guests (e.g Linux)
+> will set the "Host Only" bit even on CPUs that don't support
+> EFER.SVME, and they don't expect a #GP.
 
->
-> Changes since RFC:
->
-> - tweak vhost uAPI documentation
-> - switch to use device specific IOTLB really in patch 4
-> - tweak the commit log
-> - fix that ASID in vhost is claimed to be 32 actually but 16bit
->    actually
-> - fix use after free when using ASID with IOTLB batching requests
-> - switch to use Stefano's patch for having separated iov
-> - remove unused "used_as" variable
-> - fix the iotlb/asid checking in vhost_vdpa_unmap()
->
-> Thanks
->
-> Gautam Dawar (19):
->    vhost: move the backend feature bits to vhost_types.h
->    virtio-vdpa: don't set callback if virtio doesn't need it
->    vhost-vdpa: passing iotlb to IOMMU mapping helpers
->    vhost-vdpa: switch to use vhost-vdpa specific IOTLB
->    vdpa: introduce virtqueue groups
->    vdpa: multiple address spaces support
->    vdpa: introduce config operations for associating ASID to a virtqueue
->      group
->    vhost_iotlb: split out IOTLB initialization
->    vhost: support ASID in IOTLB API
->    vhost-vdpa: introduce asid based IOTLB
->    vhost-vdpa: introduce uAPI to get the number of virtqueue groups
->    vhost-vdpa: introduce uAPI to get the number of address spaces
->    vhost-vdpa: uAPI to get virtqueue group id
->    vhost-vdpa: introduce uAPI to set group ASID
->    vhost-vdpa: support ASID based IOTLB API
->    vdpa_sim: advertise VIRTIO_NET_F_MTU
->    vdpa_sim: factor out buffer completion logic
->    vdpa_sim: filter destination mac address
->    vdpasim: control virtqueue support
->
->   drivers/vdpa/ifcvf/ifcvf_main.c      |   8 +-
->   drivers/vdpa/mlx5/net/mlx5_vnet.c    |  11 +-
->   drivers/vdpa/vdpa.c                  |   5 +
->   drivers/vdpa/vdpa_sim/vdpa_sim.c     | 100 ++++++++--
->   drivers/vdpa/vdpa_sim/vdpa_sim.h     |   3 +
->   drivers/vdpa/vdpa_sim/vdpa_sim_net.c | 169 +++++++++++++----
->   drivers/vhost/iotlb.c                |  23 ++-
->   drivers/vhost/vdpa.c                 | 272 +++++++++++++++++++++------
->   drivers/vhost/vhost.c                |  23 ++-
->   drivers/vhost/vhost.h                |   4 +-
->   drivers/virtio/virtio_vdpa.c         |   2 +-
->   include/linux/vdpa.h                 |  46 ++++-
->   include/linux/vhost_iotlb.h          |   2 +
->   include/uapi/linux/vhost.h           |  25 ++-
->   include/uapi/linux/vhost_types.h     |  11 +-
->   15 files changed, 566 insertions(+), 138 deletions(-)
->
+IMO, this fix is just a reprieve.
 
+The logic of special handling of #GP only for AMD PMU MSR's
+"reserved without qualification" bits is asymmetric in the KVM/svm
+context and will confuse users even more.
+
+> 
+> For example,
+> 
+> root@Ubuntu1804:~# perf stat -e r26 -a sleep 1
+> 
+>   Performance counter stats for 'system wide':
+> 
+>                   0      r26
+> 
+>         1.001070977 seconds time elapsed
+> 
+> Feb 23 03:59:58 Ubuntu1804 kernel: [  405.379957] unchecked MSR access error: WRMSR to 0xc0010200 (tried to write 0x0000020000130026) at rIP: 0xffffffff9b276a28 (native_write_msr+0x8/0x30)
+> Feb 23 03:59:58 Ubuntu1804 kernel: [  405.379958] Call Trace:
+> Feb 23 03:59:58 Ubuntu1804 kernel: [  405.379963]  amd_pmu_disable_event+0x27/0x90
+> 
+> Fixes: ca724305a2b0 ("KVM: x86/vPMU: Implement AMD vPMU code for KVM")
+> Reported-by: Lotus Fenn <lotusf@google.com>
+> Signed-off-by: Jim Mattson <jmattson@google.com>
+> ---
+>   arch/x86/kvm/svm/pmu.c | 8 +++-----
+>   1 file changed, 3 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
+> index d4de52409335..886e8ac5cfaa 100644
+> --- a/arch/x86/kvm/svm/pmu.c
+> +++ b/arch/x86/kvm/svm/pmu.c
+> @@ -262,12 +262,10 @@ static int amd_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   	/* MSR_EVNTSELn */
+>   	pmc = get_gp_pmc_amd(pmu, msr, PMU_TYPE_EVNTSEL);
+>   	if (pmc) {
+> -		if (data == pmc->eventsel)
+> -			return 0;
+> -		if (!(data & pmu->reserved_bits)) {
+> +		data &= ~pmu->reserved_bits;
+> +		if (data != pmc->eventsel)
+>   			reprogram_gp_counter(pmc, data);
+> -			return 0;
+> -		}
+> +		return 0;
+>   	}
+>   
+>   	return 1;
