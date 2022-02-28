@@ -2,169 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 13E094C64D6
-	for <lists+kvm@lfdr.de>; Mon, 28 Feb 2022 09:27:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 926094C652A
+	for <lists+kvm@lfdr.de>; Mon, 28 Feb 2022 10:01:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233946AbiB1I1k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Feb 2022 03:27:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58680 "EHLO
+        id S234135AbiB1JCY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Feb 2022 04:02:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39524 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229751AbiB1I1j (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Feb 2022 03:27:39 -0500
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD81F5BE48
-        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 00:27:00 -0800 (PST)
-Received: by mail-pj1-x1030.google.com with SMTP id q8-20020a17090a178800b001bc299b8de1so10717245pja.1
-        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 00:27:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=84kTi9FPdY2UlbNHAvY3OJ8kcjhSpXBxCEwtIaRVe9c=;
-        b=LlVepMb/nEoRQydPcQ2gD5Oezj0eIMVNRKG+vfyslpJs4tWwuo72/kw1WV3d6ATaPF
-         pU+KoAq+69+qa6k4trY18aCSIHFd1gKP/bv1nUzAsuvoxHMhLoplq7aiWJAbsqfNKsaQ
-         HzHfSrzfhEybw+uFMwtzGb6KfO2syDnyleyzYDDX3zAgqpK82qDVe6PQp2yLUVZY17gX
-         MfvUYcaklPK2yXLKml4lG0n4EshvgiOilLlUo74fAcPxLJ0H0xvoPj39rs2LZPz3ToLr
-         nHTYKySdswAes9aVbQ+wU90YsZMVLe2P/7xPYpJZ9Gjm4ae96r5LYZvUE+GUuT0YDLuz
-         UpIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=84kTi9FPdY2UlbNHAvY3OJ8kcjhSpXBxCEwtIaRVe9c=;
-        b=fQLQiAbfyWGgYWJs9ewT8xwxHSZcosMhgtS9R5pmko5l8Kv9EMRHoER+2JWvvRyj5L
-         fFYk88LJNepm7z7byKzuRK6Wz+CE2wKG1YlvUJMyCZZu7EqZT6MRW9M2aWlmqntXGiJM
-         MwbEqCA8vMybs6k3eI6agY6f5waYRbdtFQUT31FcDJVLzj2odhqkGx5NTiCCfGaEpfy9
-         Me7PD6tdmIlJXpoIt0YYNVdEJHbTRA69IMYEuZ6111SYUb+CKzT8nwV8LGlwAfiQf8UQ
-         4XEbT6FAZuoUTTMqeHZtfZH2bXJAMpb1ZX++RLZu7SG1wW+sy9KizQ5EhRIQTjDgVBkc
-         vBzg==
-X-Gm-Message-State: AOAM5329BsLFryrbxaJA5pooOQY1XR88cfhTa/3bDr6XN0q8VWtljTds
-        vkqNhZ/oMjmK+cNeAGCoVAo=
-X-Google-Smtp-Source: ABdhPJzrrZCuBCfjbN2aST9UvQ0GWCZ6V4XSAh5nMo+crPX11SXeQ1Ivv9XPmUus3KHIiVm2MMSZng==
-X-Received: by 2002:a17:902:b490:b0:151:6ee1:8034 with SMTP id y16-20020a170902b49000b001516ee18034mr1898117plr.28.1646036820258;
-        Mon, 28 Feb 2022 00:27:00 -0800 (PST)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id f17-20020a056a001ad100b004f0ec1cbc4fsm12428374pfv.109.2022.02.28.00.26.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 28 Feb 2022 00:27:00 -0800 (PST)
-Message-ID: <53954c03-49ff-c84e-e062-142e103f735c@gmail.com>
-Date:   Mon, 28 Feb 2022 16:26:51 +0800
+        with ESMTP id S229579AbiB1JCX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Feb 2022 04:02:23 -0500
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0DFB66625;
+        Mon, 28 Feb 2022 01:01:43 -0800 (PST)
+Received: from fraeml744-chm.china.huawei.com (unknown [172.18.147.200])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4K6ZBC33Kyz67xMg;
+        Mon, 28 Feb 2022 17:01:39 +0800 (CST)
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ fraeml744-chm.china.huawei.com (10.206.15.225) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Mon, 28 Feb 2022 10:01:41 +0100
+Received: from A2006125610.china.huawei.com (10.47.94.1) by
+ lhreml710-chm.china.huawei.com (10.201.108.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Mon, 28 Feb 2022 09:01:33 +0000
+From:   Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+To:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>
+CC:     <alex.williamson@redhat.com>, <jgg@nvidia.com>,
+        <cohuck@redhat.com>, <mgurtovoy@nvidia.com>, <yishaih@nvidia.com>,
+        <linuxarm@huawei.com>, <liulongfang@huawei.com>,
+        <prime.zeng@hisilicon.com>, <jonathan.cameron@huawei.com>,
+        <wangzhou1@hisilicon.com>
+Subject: [PATCH v6 00/10] vfio/hisilicon: add ACC live migration driver
+Date:   Mon, 28 Feb 2022 09:01:11 +0000
+Message-ID: <20220228090121.1903-1-shameerali.kolothum.thodi@huawei.com>
+X-Mailer: git-send-email 2.12.0.windows.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.6.1
-Subject: Re: [PATCH] KVM: x86/svm: Clear reserved bits written to PerfEvtSeln
- MSRs
-Content-Language: en-US
-To:     Jim Mattson <jmattson@google.com>, pbonzini@redhat.com
-Cc:     Lotus Fenn <lotusf@google.com>, kvm list <kvm@vger.kernel.org>,
-        "Bangoria, Ravikumar" <ravi.bangoria@amd.com>
-References: <20220226234131.2167175-1-jmattson@google.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-Organization: Tencent
-In-Reply-To: <20220226234131.2167175-1-jmattson@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.47.94.1]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ lhreml710-chm.china.huawei.com (10.201.108.61)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-1.2 required=5.0 tests=AC_FROM_MANY_DOTS,BAYES_00,
+        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/2/2022 7:41 am, Jim Mattson wrote:
-> AMD EPYC CPUs never raise a #GP for a WRMSR to a PerfEvtSeln MSR. Some
-> reserved bits are cleared, and some are not. Specifically, on
-> Zen3/Milan, bits 19 and 42 are not cleared.
+Hi,
 
-Curiously, is there any additional documentation on what bits 19 and 42 are for?
-And we only need this part of logic specifically for at least (guest cpu model) 
-Zen3.
+This series attempts to add vfio live migration support for HiSilicon
+ACC VF devices based on the new v2 migration protocol definition and
+mlx5 v9 series discussed here[0].
 
-> 
-> When emulating such a WRMSR, KVM should not synthesize a #GP, > regardless of which bits are set. However, undocumented bits should
+v5 --> v6
+ -Report PRE_COPY support and use that for early compatibility check
+  between src and dst devices.
+ -For generic PRE_COPY support, included patch #7 from Jason(Thanks!).
+ -Addressed comments from Alex(Thanks!).
+ -Added the QM state register update to QM driver(patch #8) since that
+  is being used in migration driver to decide whether the device is
+  ready to save the state,
 
-If KVM chooses to emulate different #GP behavior on AMD and Intel for
-"reserved bits without qualification"[0], there should be more code for almost
-all MSRs to be checked one by one.
+This is sanity tested on a HiSilicon platform using the Qemu branch
+provided here[1].
 
-[0] "If a field is marked reserved without qualification, software must not
-change the state of that field; it must reload that field with the same value
-returned from a prior read."
+Please take a look and let me know your feedback.
 
-> not be passed through to the hardware MSR. So, rather than checking
-> for reserved bits and synthesizing a #GP, just clear the reserved
-> bits.
+Thanks,
+Shameer
+[0] https://lore.kernel.org/kvm/20220224142024.147653-1-yishaih@nvidia.com/
+[1] https://github.com/jgunthorpe/qemu/commits/vfio_migration_v2
 
-wrmsr -a 0xc0010200 0xfffffcf000280000
-rdmsr -a 0xc0010200 | sort | uniq
-# 0x40000080000 (expected)
+RFCv4 --> v5
+  - Dropped RFC tag as v2 migration APIs are more stable now.
+  - Addressed review comments from Jason and Alex (Thanks!).
 
-According to the test, there will be memory bits somewhere on the host
-recording the bit status of bits 19 and 42.
+v3 --> RFCv4
+-Based on migration v2 protocol and mlx5 v7 series.
+-Added RFC tag again as migration v2 protocol is still under discussion.
+-Added new patch #6 to retrieve the PF QM data.
+-PRE_COPY compatibility check is now done after the migration data
+ transfer. This is not ideal and needs discussion.
 
-Shouldn't KVM emulate this bit-memory behavior as well ?
+RFC v2 --> v3
+ -Dropped RFC tag as the vfio_pci_core subsystem framework is now
+  part of 5.15-rc1.
+ -Added override methods for vfio_device_ops read/write/mmap calls
+  to limit the access within the functional register space.
+ -Patches 1 to 3 are code refactoring to move the common ACC QM
+  definitions and header around.
 
-> 
-> This may seem pedantic, but since KVM currently does not support the
-> "Host/Guest Only" bits (41:40), it is necessary to clear these bits
+RFCv1 --> RFCv2
 
-I would have thought you had code to emulate the "Host/Guest Only"
-bits for nested SVM PMU to fix this issue fundamentally.
+ -Adds a new vendor-specific vfio_pci driver(hisi-acc-vfio-pci)
+  for HiSilicon ACC VF devices based on the new vfio-pci-core
+  framework proposal.
 
-> rather than synthesizing #GP, because some popular guests (e.g Linux)
-> will set the "Host Only" bit even on CPUs that don't support
-> EFER.SVME, and they don't expect a #GP.
+ -Since HiSilicon ACC VF device MMIO space contains both the
+  functional register space and migration control register space,
+  override the vfio_device_ops ioctl method to report only the
+  functional space to VMs.
 
-IMO, this fix is just a reprieve.
+ -For a successful migration, we still need access to VF dev
+  functional register space mainly to read the status registers.
+  But accessing these while the Guest vCPUs are running may leave
+  a security hole. To avoid any potential security issues, we
+  map/unmap the MMIO regions on a need basis and is safe to do so.
+  (Please see hisi_acc_vf_ioremap/unmap() fns in patch #4).
+ 
+ -Dropped debugfs support for now.
+ -Uses common QM functions for mailbox access(patch #3).
 
-The logic of special handling of #GP only for AMD PMU MSR's
-"reserved without qualification" bits is asymmetric in the KVM/svm
-context and will confuse users even more.
+Jason Gunthorpe (1):
+  vfio: Extend the device migration protocol with PRE_COPY
 
-> 
-> For example,
-> 
-> root@Ubuntu1804:~# perf stat -e r26 -a sleep 1
-> 
->   Performance counter stats for 'system wide':
-> 
->                   0      r26
-> 
->         1.001070977 seconds time elapsed
-> 
-> Feb 23 03:59:58 Ubuntu1804 kernel: [  405.379957] unchecked MSR access error: WRMSR to 0xc0010200 (tried to write 0x0000020000130026) at rIP: 0xffffffff9b276a28 (native_write_msr+0x8/0x30)
-> Feb 23 03:59:58 Ubuntu1804 kernel: [  405.379958] Call Trace:
-> Feb 23 03:59:58 Ubuntu1804 kernel: [  405.379963]  amd_pmu_disable_event+0x27/0x90
-> 
-> Fixes: ca724305a2b0 ("KVM: x86/vPMU: Implement AMD vPMU code for KVM")
-> Reported-by: Lotus Fenn <lotusf@google.com>
-> Signed-off-by: Jim Mattson <jmattson@google.com>
-> ---
->   arch/x86/kvm/svm/pmu.c | 8 +++-----
->   1 file changed, 3 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
-> index d4de52409335..886e8ac5cfaa 100644
-> --- a/arch/x86/kvm/svm/pmu.c
-> +++ b/arch/x86/kvm/svm/pmu.c
-> @@ -262,12 +262,10 @@ static int amd_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->   	/* MSR_EVNTSELn */
->   	pmc = get_gp_pmc_amd(pmu, msr, PMU_TYPE_EVNTSEL);
->   	if (pmc) {
-> -		if (data == pmc->eventsel)
-> -			return 0;
-> -		if (!(data & pmu->reserved_bits)) {
-> +		data &= ~pmu->reserved_bits;
-> +		if (data != pmc->eventsel)
->   			reprogram_gp_counter(pmc, data);
-> -			return 0;
-> -		}
-> +		return 0;
->   	}
->   
->   	return 1;
+Longfang Liu (3):
+  crypto: hisilicon/qm: Move few definitions to common header
+  crypto: hisilicon/qm: Set the VF QM state register
+  hisi_acc_vfio_pci: Add support for VFIO live migration
+
+Shameer Kolothum (6):
+  crypto: hisilicon/qm: Move the QM header to include/linux
+  hisi_acc_qm: Move PCI device IDs to common header
+  hisi_acc_vfio_pci: add new vfio_pci driver for HiSilicon ACC devices
+  hisi_acc_vfio_pci: Restrict access to VF dev BAR2 migration region
+  hisi_acc_vfio_pci: Add helper to retrieve the struct pci_driver
+  hisi_acc_vfio_pci: Use its own PCI reset_done error handler
+
+ drivers/crypto/hisilicon/hpre/hpre.h          |    2 +-
+ drivers/crypto/hisilicon/hpre/hpre_main.c     |   18 +-
+ drivers/crypto/hisilicon/qm.c                 |   42 +-
+ drivers/crypto/hisilicon/sec2/sec.h           |    2 +-
+ drivers/crypto/hisilicon/sec2/sec_main.c      |   20 +-
+ drivers/crypto/hisilicon/sgl.c                |    2 +-
+ drivers/crypto/hisilicon/zip/zip.h            |    2 +-
+ drivers/crypto/hisilicon/zip/zip_main.c       |   17 +-
+ drivers/vfio/pci/Kconfig                      |    2 +
+ drivers/vfio/pci/Makefile                     |    2 +
+ drivers/vfio/pci/hisilicon/Kconfig            |   16 +
+ drivers/vfio/pci/hisilicon/Makefile           |    4 +
+ .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 1323 +++++++++++++++++
+ .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |  114 ++
+ drivers/vfio/vfio.c                           |   71 +-
+ .../qm.h => include/linux/hisi_acc_qm.h       |   49 +
+ include/linux/pci_ids.h                       |    6 +
+ include/uapi/linux/vfio.h                     |  110 +-
+ 18 files changed, 1743 insertions(+), 59 deletions(-)
+ create mode 100644 drivers/vfio/pci/hisilicon/Kconfig
+ create mode 100644 drivers/vfio/pci/hisilicon/Makefile
+ create mode 100644 drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+ create mode 100644 drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+ rename drivers/crypto/hisilicon/qm.h => include/linux/hisi_acc_qm.h (87%)
+
+-- 
+2.25.1
+
