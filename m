@@ -2,180 +2,232 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F0634C6E24
-	for <lists+kvm@lfdr.de>; Mon, 28 Feb 2022 14:27:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DA93C4C6F82
+	for <lists+kvm@lfdr.de>; Mon, 28 Feb 2022 15:30:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235969AbiB1N2R (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Feb 2022 08:28:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48262 "EHLO
+        id S237185AbiB1ObI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Feb 2022 09:31:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43668 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231598AbiB1N2P (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Feb 2022 08:28:15 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2740D23BDC;
-        Mon, 28 Feb 2022 05:27:37 -0800 (PST)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21SCQH9U025635;
-        Mon, 28 Feb 2022 13:27:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=/He3bN6E9kDr8bKzYNahF/LLEQrdHBPWQroZed5tbCY=;
- b=tjJE85zpygpauzReEhEGD6B6H94bmI4SGlV6b6RYp9RZijcTY/W8j/1uB3agGtvhi92H
- wei8eOSbwgkpHIHk58QZEpaDJwCtCxb7RjZEL2JJ18idW5H/4+yuDRb7sJfUCnIay4zt
- ndc4fLdGP1pr3puphCjXgCDQ2r7lxZzihh/5wDVKBKlnyX+jwarnhJsZTUJqkZ7BzD8l
- f5R1DPtw7n7qj8MEvYquHbDYf4djJpxxy5Ym+ATM8gAUhU+8fj8d7dQBDO+CiJ6b/2Nb
- 0qcHRxLA+s8KMFknhXLbgd8YvWuuvSzQqCjCk9JNBDMgrTYBfA5HGYrCbEfjqBWjGbQB QA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3egxd9hej8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 28 Feb 2022 13:27:36 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21SDQcCq000410;
-        Mon, 28 Feb 2022 13:27:36 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3egxd9hehj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 28 Feb 2022 13:27:36 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21SDHP64026198;
-        Mon, 28 Feb 2022 13:27:33 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma03ams.nl.ibm.com with ESMTP id 3efbu985j7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 28 Feb 2022 13:27:33 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21SDRUvY45678978
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 28 Feb 2022 13:27:30 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 945AAAE045;
-        Mon, 28 Feb 2022 13:27:30 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 391CAAE051;
-        Mon, 28 Feb 2022 13:27:30 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.5.37])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 28 Feb 2022 13:27:30 +0000 (GMT)
-Date:   Mon, 28 Feb 2022 14:27:27 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-Cc:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH] s390x: Add strict mode to specification
- exception interpretation test
-Message-ID: <20220228142727.3542b767@p-imbrenda>
-In-Reply-To: <20220225172355.3564546-1-scgl@linux.ibm.com>
-References: <20220225172355.3564546-1-scgl@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        with ESMTP id S232476AbiB1ObG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Feb 2022 09:31:06 -0500
+Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7ADF77EB3A
+        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 06:30:27 -0800 (PST)
+Received: by mail-oi1-x22d.google.com with SMTP id z7so13338128oid.4
+        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 06:30:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=FRLe3AnC5pgmPAqdinsXHEKECzNJf8GOWiq9+hi8EA0=;
+        b=O6D5YigaeV9BY25z8CJpwRAv0C2AKw5rbsNPY68LMHf19POHkcqi8mqIg0L5XVgCvn
+         Ff89gUNxifobG2fV1RDPUskHLpXQHXgOexocbpm1GyqM2EALbtVkQElWlKrXsBTS9TjU
+         XYdpXvjFPQXQ2kdb30tQhCaZ6jTzMfG6uZswisN8wCS0sWSJ3Qxe6vTgy+zPqX4vLRdn
+         vtqM7GQu1SaPK7HO0yidE3WbIqtCSMGUWcvo7ZmgQs+p5DW7Ssk8VaiyhlNP1DPNdtY+
+         VnECCWTwwtJZq/bPywWnc1f6nQoLZM7lGOmkMgpWWgmpSHYQxK/isnSvjw/lrJv34XqZ
+         0Vsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=FRLe3AnC5pgmPAqdinsXHEKECzNJf8GOWiq9+hi8EA0=;
+        b=pZlbbiDWzECnexgcjwy/XipXYl6ofwL0T/thrDDGKCcx/gSrVdVofc0ViSoUp1oywW
+         1sVPDGBf/G3p/4AYMwYc9ZBm3ya0cZupuHYK0CjUJqeCXu6fkB5ipG4d8iLPqY2avms4
+         fU0sFgpXyQOXyl3bKhELVk8wu9Qv8djjhCceQzWWZYSvYn3vtwVpmYFeMyjDa0b31JN/
+         mC9jH5hhuStcXjbj8Lk42uzQh/myZTt8smwhfjmYB/9PFWpVmsSQKZrJH6TDCZsRDK4g
+         JgYUGL9iEDws5ZMKiKrFaTCbEQ6+iOgpN/d+G62FXfpkxcnsBG9G/6gSEp+AdahyQEvD
+         KdEg==
+X-Gm-Message-State: AOAM532L5FIJ8dt7pMzFb8WPbbiTpvmGzPZ8PTREXTJ7MWBJuh7GNyYY
+        0gjNeYCAlR7n5vap1tMw1ASOG6xwVZKPkXQ4K9vhJg==
+X-Google-Smtp-Source: ABdhPJyE1Bo4A6f0RU7lZ+Mwlo5pbLsjN6HBPgLuRnOq795Tp7+xm/lq2BC9S/szFYWPn1VKoattLvYoKlO70i+4/98=
+X-Received: by 2002:a05:6808:1999:b0:2d6:7fe3:10bd with SMTP id
+ bj25-20020a056808199900b002d67fe310bdmr10721866oib.68.1646058626511; Mon, 28
+ Feb 2022 06:30:26 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: eSovgeLlqCHIaFkvSuHtcBxRiKzhiAAI
-X-Proofpoint-ORIG-GUID: 9NlXIyShuUcKc-Dc0iZdXgOHgGX5xW7j
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-02-28_05,2022-02-26_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 phishscore=0
- spamscore=0 suspectscore=0 bulkscore=0 priorityscore=1501 mlxlogscore=999
- malwarescore=0 adultscore=0 lowpriorityscore=0 mlxscore=0 impostorscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2201110000
- definitions=main-2202280070
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <20220223062412.22334-1-chenyi.qiang@intel.com>
+ <CALMp9eT50LjXYSwfWENjmfg=XxT4Bx3RzOYubKty8kr_APXCEw@mail.gmail.com>
+ <88eb9a9a-fbe3-8e2c-02bd-4bdfc855b67f@intel.com> <6a839b88-392d-886d-836d-ca04cf700dce@intel.com>
+ <7859e03f-10fa-dbc2-ed3c-5c09e62f9016@redhat.com> <bcc83b3d-31fe-949a-6bbf-4615bb982f0c@intel.com>
+ <CALMp9eT1NRudtVqPuHU8Y8LpFYWZsAB_MnE2BAbg5NY0jR823w@mail.gmail.com>
+ <CALMp9eS6cBDuax8O=woSdkNH2e2Y2EodE-7EfUTFfzBvCWCmcg@mail.gmail.com>
+ <71736b9d-9ed4-ea02-e702-74cae0340d66@intel.com> <CALMp9eRwKHa0zdUFtSEBVCwV=MHJ-FmvW1uERxCt+_+Zz4z8fg@mail.gmail.com>
+ <4b2ddc09-f68d-1cc3-3d10-f7651d811fc3@intel.com>
+In-Reply-To: <4b2ddc09-f68d-1cc3-3d10-f7651d811fc3@intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Mon, 28 Feb 2022 06:30:15 -0800
+Message-ID: <CALMp9eQj4Xr9VAdHw4BfPEskQYptEYYHRrpmFfVU1TCQJmHwug@mail.gmail.com>
+Subject: Re: [PATCH v3] KVM: VMX: Enable Notify VM exit
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Chenyi Qiang <chenyi.qiang@intel.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-18.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 25 Feb 2022 18:23:55 +0100
-Janis Schoetterl-Glausch <scgl@linux.ibm.com> wrote:
+On Sun, Feb 27, 2022 at 11:10 PM Xiaoyao Li <xiaoyao.li@intel.com> wrote:
+>
+> On 2/26/2022 10:24 PM, Jim Mattson wrote:
+> > On Fri, Feb 25, 2022 at 10:24 PM Xiaoyao Li <xiaoyao.li@intel.com> wrote:
+> >>
+> >> On 2/26/2022 12:53 PM, Jim Mattson wrote:
+> >>> On Fri, Feb 25, 2022 at 8:25 PM Jim Mattson <jmattson@google.com> wrote:
+> >>>>
+> >>>> On Fri, Feb 25, 2022 at 8:07 PM Xiaoyao Li <xiaoyao.li@intel.com> wrote:
+> >>>>>
+> >>>>> On 2/25/2022 11:13 PM, Paolo Bonzini wrote:
+> >>>>>> On 2/25/22 16:12, Xiaoyao Li wrote:
+> >>>>>>>>>>
+> >>>>>>>>>
+> >>>>>>>>> I don't like the idea of making things up without notifying userspace
+> >>>>>>>>> that this is fictional. How is my customer running nested VMs supposed
+> >>>>>>>>> to know that L2 didn't actually shutdown, but L0 killed it because the
+> >>>>>>>>> notify window was exceeded? If this information isn't reported to
+> >>>>>>>>> userspace, I have no way of getting the information to the customer.
+> >>>>>>>>
+> >>>>>>>> Then, maybe a dedicated software define VM exit for it instead of
+> >>>>>>>> reusing triple fault?
+> >>>>>>>>
+> >>>>>>>
+> >>>>>>> Second thought, we can even just return Notify VM exit to L1 to tell
+> >>>>>>> L2 causes Notify VM exit, even thought Notify VM exit is not exposed
+> >>>>>>> to L1.
+> >>>>>>
+> >>>>>> That might cause NULL pointer dereferences or other nasty occurrences.
+> >>>>>
+> >>>>> IMO, a well written VMM (in L1) should handle it correctly.
+> >>>>>
+> >>>>> L0 KVM reports no Notify VM Exit support to L1, so L1 runs without
+> >>>>> setting Notify VM exit. If a L2 causes notify_vm_exit with
+> >>>>> invalid_vm_context, L0 just reflects it to L1. In L1's view, there is no
+> >>>>> support of Notify VM Exit from VMX MSR capability. Following L1 handler
+> >>>>> is possible:
+> >>>>>
+> >>>>> a)      if (notify_vm_exit available & notify_vm_exit enabled) {
+> >>>>>                   handle in b)
+> >>>>>           } else {
+> >>>>>                   report unexpected vm exit reason to userspace;
+> >>>>>           }
+> >>>>>
+> >>>>> b)      similar handler like we implement in KVM:
+> >>>>>           if (!vm_context_invalid)
+> >>>>>                   re-enter guest;
+> >>>>>           else
+> >>>>>                   report to userspace;
+> >>>>>
+> >>>>> c)      no Notify VM Exit related code (e.g. old KVM), it's treated as
+> >>>>> unsupported exit reason
+> >>>>>
+> >>>>> As long as it belongs to any case above, I think L1 can handle it
+> >>>>> correctly. Any nasty occurrence should be caused by incorrect handler in
+> >>>>> L1 VMM, in my opinion.
+> >>>>
+> >>>> Please test some common hypervisors (e.g. ESXi and Hyper-V).
+> >>>
+> >>> I took a look at KVM in Linux v4.9 (one of our more popular guests),
+> >>> and it will not handle this case well:
+> >>>
+> >>>           if (exit_reason < kvm_vmx_max_exit_handlers
+> >>>               && kvm_vmx_exit_handlers[exit_reason])
+> >>>                   return kvm_vmx_exit_handlers[exit_reason](vcpu);
+> >>>           else {
+> >>>                   WARN_ONCE(1, "vmx: unexpected exit reason 0x%x\n", exit_reason);
+> >>>                   kvm_queue_exception(vcpu, UD_VECTOR);
+> >>>                   return 1;
+> >>>           }
+> >>>
+> >>> At least there's an L1 kernel log message for the first unexpected
+> >>> NOTIFY VM-exit, but after that, there is silence. Just a completely
+> >>> inexplicable #UD in L2, assuming that L2 is resumable at this point.
+> >>
+> >> At least there is a message to tell L1 a notify VM exit is triggered in
+> >> L2. Yes, the inexplicable #UD won't be hit unless L2 triggers Notify VM
+> >> exit with invalid_context, which is malicious to L0 and L1.
+> >
+> > There is only an L1 kernel log message *the first time*. That's not
+> > good enough. And this is just one of the myriad of possible L1
+> > hypervisors.
+> >
+> >> If we use triple_fault (i.e., shutdown), then no info to tell L1 that
+> >> it's caused by Notify VM exit with invalid context. Triple fault needs
+> >> to be extended and L1 kernel needs to be enlightened. It doesn't help
+> >> old guest kernel.
+> >>
+> >> If we use Machine Check, it's somewhat same inexplicable to L2 unless
+> >> it's enlightened. But it doesn't help old guest kernel.
+> >>
+> >> Anyway, for Notify VM exit with invalid context from L2, I don't see a
+> >> good solution to tell L1 VMM it's a "Notify VM exit with invalid context
+> >> from L2" and keep all kinds of L1 VMM happy, especially for those with
+> >> old kernel versions.
+> >
+> > I agree that there is no way to make every conceivable L1 happy.
+> > That's why the information needs to be surfaced to the L0 userspace. I
+> > contend that any time L0 kvm violates the architectural specification
+> > in its emulation of L1 or L2, the L0 userspace *must* be informed.
+>
+> We can make the design to exit to userspace on notify vm exit
+> unconditionally with exit_qualification passed, then userspace can take
+> the same action like what this patch does in KVM that
+>
+>   - re-enter guest when context_invalid is false;
+>   - stop running the guest if context_invalid is true; (userspace can
+> definitely re-enter the guest in this case, but it needs to take the
+> fall on this)
+>
+> Then, for nested case, L0 needs to enable it transparently for L2 if
+> this feature is enabled for L1 guest (the reason as we all agreed that
+> cannot allow L1 to escape just by creating a L2). Then what should KVM
+> do when notify vm exit from L2?
+>
+>   - Exit to L0 userspace on L2's notify vm exit. L0 userspace takes the
+> same action:
+>         - re-enter if context-invalid is false;
+>         - kill L1 if context-invalid is true; (I don't know if there is any
+> interface for L0 userspace to kill L2). Then it opens the potential door
+> for malicious user to kill L1 by creating a L2 to trigger fatal notify
+> vm exit. If you guys accept it, we can implement in this way.
+>
+>
+> in conclusion, we have below solution:
+>
+> 1. Take this patch as is. The drawback is L1 VMM receives a triple_fault
+> from L2 when L2 triggers notify vm exit with invalid context. Neither of
+> L1 VMM, L1 userspace, nor L2 kernel know it's caused due to notify vm
+> exit. There is only kernel log in L0, which seems not accessible for L1
+> user or L2 guest.
 
-> While specification exception interpretation is not required to occur,
-> it can be useful for automatic regression testing to fail the test if it
-> does not occur.
-> Add a `--strict` argument to enable this.
-> `--strict` takes a list of machine types (as reported by STIDP)
-> for which to enable strict mode, for example
-> `--strict 8562,8561,3907,3906,2965,2964`
-> will enable it for models z15 - z13.
-> Alternatively, strict mode can be enabled for all but the listed machine
-> types by prefixing the list with a `!`, for example
-> `--strict !1090,1091,2064,2066,2084,2086,2094,2096,2097,2098,2817,2818,2827,2828`
-> will enable it for z/Architecture models except those older than z13.
-> 
-> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-> ---
+You are correct on that last point, and I feel that I cannot stress it
+enough. In a typical environment, the L0 kernel log is only available
+to the administrator of the L0 host.
 
-[...]
+> 2. a) Inject notify vm exit back to L1 if L2 triggers notify vm exit
+> with invalid context. The drawback is, old L1 hypervisor is not
+> enlightened of it and maybe misbehave on it.
+>
+>     b) Inject a synthesized SHUTDOWN exit to L1, with additional info to
+> tell it's caused by fatal notify vm exit from L2. It has the same
+> drawback that old hypervisor has no idea of it and maybe misbehave on it.
+>
+> 3. Exit to L0 usersapce unconditionally no matter it's caused from L1 or
+> L2. Then it may open the door for L1 user to kill L1.
+>
+> Do you have any better solution other than above? If no, we need to pick
+> one from above though it cannot make everyone happy.
 
-> +static bool parse_strict(int argc, char **argv)
-> +{
-> +	uint16_t machine_id;
-> +	char *list;
-> +	bool ret;
-> +
-> +	if (argc < 1)
-> +		return false;
-> +	if (strcmp("--strict", argv[0]))
-> +		return false;
-> +
-> +	machine_id = get_machine_id();
-> +	if (argc < 2) {
-> +		printf("No argument to --strict, ignoring\n");
-> +		return false;
-> +	}
-> +	list = argv[1];
-> +	if (list[0] == '!') {
-> +		ret = true;
-> +		list++;
-> +	} else
-> +		ret = false;
-> +	while (true) {
-> +		long input = 0;
-> +
-> +		if (strlen(list) == 0)
-> +			return ret;
-> +		input = strtol(list, &list, 16);
-> +		if (*list == ',')
-> +			list++;
-> +		else if (*list != '\0')
-> +			break;
-> +		if (input == machine_id)
-> +			return !ret;
-> +	}
-> +	printf("Invalid --strict argument \"%s\", ignoring\n", list);
-> +	return ret;
-> +}
-
-probably I should write a few parsing functions for command line
-arguments, so we don't have to re-invent the wheel every time
-
-> +
->  int main(int argc, char **argv)
->  {
->  	if (!sclp_facilities.has_sief2) {
-> @@ -76,7 +121,7 @@ int main(int argc, char **argv)
->  		goto out;
->  	}
->  
-> -	test_spec_ex_sie();
-> +	test_spec_ex_sie(parse_strict(argc - 1, argv + 1));
-
-hmmm... maybe it would be more readable and more uniform with the other
-tests to parse the command line during initialization of the unit test,
-and set a global flag.
-
->  out:
->  	return report_summary();
->  }
-> 
-> base-commit: 257c962f3d1b2d0534af59de4ad18764d734903a
-
+Yes, I believe I have a better solution. We obviously need an API for
+userspace to synthesize a SHUTDOWN event for a vCPU. In addition, to
+avoid breaking legacy userspace, the NOTIFY VM-exit should be opt-in.
