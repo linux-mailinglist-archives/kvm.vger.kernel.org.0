@@ -2,159 +2,216 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B2F0A4C949B
-	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 20:42:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DA71D4C94A6
+	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 20:43:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237233AbiCATnh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Mar 2022 14:43:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42358 "EHLO
+        id S236103AbiCAToH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Mar 2022 14:44:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237220AbiCATne (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Mar 2022 14:43:34 -0500
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E4DE340FF
-        for <kvm@vger.kernel.org>; Tue,  1 Mar 2022 11:42:52 -0800 (PST)
-Received: by mail-lf1-x136.google.com with SMTP id i11so28696456lfu.3
-        for <kvm@vger.kernel.org>; Tue, 01 Mar 2022 11:42:52 -0800 (PST)
+        with ESMTP id S233526AbiCAToG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Mar 2022 14:44:06 -0500
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCF4136B72
+        for <kvm@vger.kernel.org>; Tue,  1 Mar 2022 11:43:24 -0800 (PST)
+Received: by mail-pl1-x62b.google.com with SMTP id h17so8739241plc.5
+        for <kvm@vger.kernel.org>; Tue, 01 Mar 2022 11:43:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=PzY8tILS7/J5BzJfiKLdBDXy8/s4RAHqODI+UdY57jc=;
-        b=MSgmT6lRet0jPev3NhT8poLSNE2IuVKHhTmnMdindDPsxNrbDdzPrkBSaT4BauMeD+
-         LWq3ALR2NImH9IAbyg/9Mpz0DLX1H3V94a1gLKACC1HvSqM9EwtH2Km4ZUYlkqLoZgsQ
-         ZV7jqWBOB7cCGsim0JopuTtvt6tgng/ReKRwg=
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=ExyEERu3AkDFampoHdGKmwAuWIWkw1zHgxCYaeTfSN0=;
+        b=iC7WOxSIu8qRR6xAcrTg7odgwEG5EAsNJ70vuhK1/2ktCqiGK6Q5fecfEbHPCbL1vU
+         s0coRLTxAE8Y/sAtU58Hf34ruf7TUg9YYnjbRtVH7Kvtd2L+yFM0fF84YP/YgXnH8VmT
+         Cvo5CS+v41uk/YyT9L5w85Ip8v3KGWnXSM2u45NimENXcCV2PBzUWpaoH6/bFIG201De
+         JIdnfF8EKtfdNvHjsQtg/B5NjcNQZnhsKDHK1KaezZrf7j08xmMIV8MKCH7j+hWnOdl4
+         OypLFbXtevRXdI9CiLe79n3mG0v8ZwRAWtvciUO8T6f7tXZKu8x53p74NHuGUV3G9WQ6
+         FsEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=PzY8tILS7/J5BzJfiKLdBDXy8/s4RAHqODI+UdY57jc=;
-        b=2TQLkC9q1Odu1tmLj7h2s4bnG8ykMR2tUmjtUjRQot4uCR5SuJsViwoi4Me+i/6kMm
-         cl5G8XGDwDG+P/Q9zuSYeXLk7ao4p0cLFMhVpq5QoTEn+deo3F+UcxmpQaTpHzeb9c5r
-         z8jVh+Vehqp/1CBJJF1gd/wN9LxzNKEvSUnqBr5cQg7C/Ozkg4FIvy42QGXPV9IzPRLY
-         EDaYQZ2Yi5G6WfqNqNF1AgBi7CraMjIkmd0mZW4X8Xk0FW0dg1y7TzbuV4PDW2VlzaRu
-         0hoqJRZfCMrglu7xXxuanx9i26kjoyFcD2Tpxwezdar0iqku7tE/zgPvPgdJCKchD3wF
-         bSjQ==
-X-Gm-Message-State: AOAM532BjYzJzEFE1iOm0PTjp7OnArWb4IoTNYYRvv4ws/0rfsf2fEbX
-        8YdX3v3I2g893BkWmSA6miZ96gZxUjj2XEIDPz0=
-X-Google-Smtp-Source: ABdhPJwk0ynPLVYg2L0n80AW0OtFq6AAh372zSB8/meHX0tLhQvaDAvHf8mdrKP2JlH2hIiyRJL/xg==
-X-Received: by 2002:a19:7b04:0:b0:443:add9:fdf5 with SMTP id w4-20020a197b04000000b00443add9fdf5mr16303396lfc.265.1646163768829;
-        Tue, 01 Mar 2022 11:42:48 -0800 (PST)
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com. [209.85.208.182])
-        by smtp.gmail.com with ESMTPSA id g1-20020a19e041000000b00443131b3efcsm1641346lfj.284.2022.03.01.11.42.43
-        for <kvm@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 01 Mar 2022 11:42:44 -0800 (PST)
-Received: by mail-lj1-f182.google.com with SMTP id s25so23281003lji.5
-        for <kvm@vger.kernel.org>; Tue, 01 Mar 2022 11:42:43 -0800 (PST)
-X-Received: by 2002:a2e:3013:0:b0:246:2ca9:365e with SMTP id
- w19-20020a2e3013000000b002462ca9365emr17983151ljw.291.1646163763108; Tue, 01
- Mar 2022 11:42:43 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=ExyEERu3AkDFampoHdGKmwAuWIWkw1zHgxCYaeTfSN0=;
+        b=UdwWvYw0pC7S11xgiN5HQryYZdbqfvR7bL/vP6LALq1MupbflXJMdkmPLLCxh6x6ah
+         BqgKB5YvJH0XdsGgXtgLGXozN3DlbuqRGN8Z6U9rzpjXfGACKZk6NeaT/UQfXNCHpXiL
+         K/6mqc1y6lTHMnvCCm7j+k9KAwQrHfPA6BTE5R5tAYHsFJ20eLsHguDtn4Z7Rr1AcPD+
+         jBXnAeg5tdfm4KYjB1vw+D4rOA4Wja6K8RIx4K+6VChYMkpr9N4cTMcQGTU74QQkjJRK
+         0O/4p23MGLIxrQhA3rpSVu1BaYvSw4Bv//K8IJ1Yf9qEd/o/m09aXkAmJmocdB9Iv2va
+         JbmQ==
+X-Gm-Message-State: AOAM533F8Pf9g1uQD2YJZx61eRR6k9KWU7nhZnvPBHUJtwGqp2ETGeAz
+        QKmR3m5llCWdxOmXoIguitEA8Q==
+X-Google-Smtp-Source: ABdhPJw666GK2ejmaGUqjIlBqKH6rwDnAltZH5Hn5HVEPhH/e3a3ftZx+jwZ75PDbxamFeFfcqfZ7w==
+X-Received: by 2002:a17:902:ea81:b0:14f:a4ce:ef79 with SMTP id x1-20020a170902ea8100b0014fa4ceef79mr26855032plb.136.1646163804034;
+        Tue, 01 Mar 2022 11:43:24 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id v189-20020a6389c6000000b00372e3b6fe90sm13856320pgd.55.2022.03.01.11.43.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Mar 2022 11:43:23 -0800 (PST)
+Date:   Tue, 1 Mar 2022 19:43:19 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        Mingwei Zhang <mizhang@google.com>
+Subject: Re: [PATCH v3 20/28] KVM: x86/mmu: Allow yielding when zapping GFNs
+ for defunct TDP MMU root
+Message-ID: <Yh53V23gSJ6jphnS@google.com>
+References: <20220226001546.360188-1-seanjc@google.com>
+ <20220226001546.360188-21-seanjc@google.com>
+ <28276890-c90c-e9a9-3cab-15264617ef5a@redhat.com>
 MIME-Version: 1.0
-References: <20220228110822.491923-1-jakobkoschel@gmail.com>
- <20220228110822.491923-3-jakobkoschel@gmail.com> <2e4e95d6-f6c9-a188-e1cd-b1eae465562a@amd.com>
- <CAHk-=wgQps58DPEOe4y5cTh5oE9EdNTWRLXzgMiETc+mFX7jzw@mail.gmail.com>
- <282f0f8d-f491-26fc-6ae0-604b367a5a1a@amd.com> <b2d20961dbb7533f380827a7fcc313ff849875c1.camel@HansenPartnership.com>
- <7D0C2A5D-500E-4F38-AD0C-A76E132A390E@kernel.org> <73fa82a20910c06784be2352a655acc59e9942ea.camel@HansenPartnership.com>
- <CAHk-=wiT5HX6Kp0Qv4ZYK_rkq9t5fZ5zZ7vzvi6pub9kgp=72g@mail.gmail.com>
-In-Reply-To: <CAHk-=wiT5HX6Kp0Qv4ZYK_rkq9t5fZ5zZ7vzvi6pub9kgp=72g@mail.gmail.com>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Tue, 1 Mar 2022 11:42:26 -0800
-X-Gmail-Original-Message-ID: <CAHk-=wghQygmASNUWj=LZn5FR5wsce2osyR6EXcfEB_FaX_6Og@mail.gmail.com>
-Message-ID: <CAHk-=wghQygmASNUWj=LZn5FR5wsce2osyR6EXcfEB_FaX_6Og@mail.gmail.com>
-Subject: Re: [PATCH 2/6] treewide: remove using list iterator after loop body
- as a ptr
-To:     James Bottomley <James.Bottomley@hansenpartnership.com>
-Cc:     Mike Rapoport <rppt@kernel.org>,
-        =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
-        Jakob Koschel <jakobkoschel@gmail.com>,
-        alsa-devel@alsa-project.org, linux-aspeed@lists.ozlabs.org,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        linux-iio@vger.kernel.org, nouveau@lists.freedesktop.org,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        dri-devel <dri-devel@lists.freedesktop.org>,
-        Cristiano Giuffrida <c.giuffrida@vu.nl>,
-        amd-gfx list <amd-gfx@lists.freedesktop.org>,
-        samba-technical@lists.samba.org,
-        linux1394-devel@lists.sourceforge.net, drbd-dev@lists.linbit.com,
-        linux-arch <linux-arch@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>,
-        linux-scsi <linux-scsi@vger.kernel.org>,
-        linux-rdma <linux-rdma@vger.kernel.org>,
-        linux-staging@lists.linux.dev, "Bos, H.J." <h.j.bos@vu.nl>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        intel-wired-lan@lists.osuosl.org,
-        kgdb-bugreport@lists.sourceforge.net,
-        bcm-kernel-feedback-list@broadcom.com,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Linux Media Mailing List <linux-media@vger.kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Arnd Bergman <arnd@arndb.de>,
-        Linux PM <linux-pm@vger.kernel.org>,
-        intel-gfx <intel-gfx@lists.freedesktop.org>,
-        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        v9fs-developer@lists.sourceforge.net,
-        linux-tegra <linux-tegra@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-sgx@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>, linux-usb@vger.kernel.org,
-        linux-wireless <linux-wireless@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux F2FS Dev Mailing List 
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        tipc-discussion@lists.sourceforge.net,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        dma <dmaengine@vger.kernel.org>,
-        linux-mediatek@lists.infradead.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <28276890-c90c-e9a9-3cab-15264617ef5a@redhat.com>
+X-Spam-Status: No, score=-18.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 1, 2022 at 11:06 AM Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
->
-> So instead of that simple "if (!entry)", we'd effectively have to
-> continue to use something that still works with the old world order
-> (ie that "if (list_entry_is_head())" model).
+On Tue, Mar 01, 2022, Paolo Bonzini wrote:
+> On 2/26/22 01:15, Sean Christopherson wrote:
+> > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> > index 3031b42c27a6..b838cfa984ad 100644
+> > --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> > @@ -91,21 +91,66 @@ void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
+> >   	WARN_ON(!root->tdp_mmu_page);
+> > -	spin_lock(&kvm->arch.tdp_mmu_pages_lock);
+> > -	list_del_rcu(&root->link);
+> > -	spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
+> > +	/*
+> > +	 * Ensure root->role.invalid is read after the refcount reaches zero to
+> > +	 * avoid zapping the root multiple times, e.g. if a different task
+> > +	 * acquires a reference (after the root was marked invalid) and puts
+> > +	 * the last reference, all while holding mmu_lock for read.  Pairs
+> > +	 * with the smp_mb__before_atomic() below.
+> > +	 */
+> > +	smp_mb__after_atomic();
+> > +
+> > +	/*
+> > +	 * Free the root if it's already invalid.  Invalid roots must be zapped
+> > +	 * before their last reference is put, i.e. there's no work to be done,
+> > +	 * and all roots must be invalidated (see below) before they're freed.
+> > +	 * Re-zapping invalid roots would put KVM into an infinite loop (again,
+> > +	 * see below).
+> > +	 */
+> > +	if (root->role.invalid) {
+> > +		spin_lock(&kvm->arch.tdp_mmu_pages_lock);
+> > +		list_del_rcu(&root->link);
+> > +		spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
+> > +
+> > +		call_rcu(&root->rcu_head, tdp_mmu_free_sp_rcu_callback);
+> > +		return;
+> > +	}
+> > +
+> > +	/*
+> > +	 * Invalidate the root to prevent it from being reused by a vCPU, and
+> > +	 * so that KVM doesn't re-zap the root when its last reference is put
+> > +	 * again (see above).
+> > +	 */
+> > +	root->role.invalid = true;
+> > +
+> > +	/*
+> > +	 * Ensure role.invalid is visible if a concurrent reader acquires a
+> > +	 * reference after the root's refcount is reset.  Pairs with the
+> > +	 * smp_mb__after_atomic() above.
+> > +	 */
+> > +	smp_mb__before_atomic();
+> 
+> I have reviewed the series and I only have very minor comments... but this
+> part is beyond me.  The lavish comments don't explain what is an
+> optimization and what is a requirement, 
 
-Just to prove my point about how this is painful, that doesn't work at all.
+Ah, they're all requirements, but the invalid part also optimizes the case where
+a root was marked invalid before its last reference was was ever put.
 
-If the loop iterator at the end is NULL (good, in theory), we can't
-use "list_entry_is_head()" to check whether we ended. We'd have to use
-a new thing entirely, to handle the "list_for_each_entry() has the
-old/new semantics" cases.
+What I really meant to refer to by "zapping" was the entire sequence of restoring
+the refcount to '1', zapping the root, and recursively re-dropping that ref.  Avoiding
+that "zap" is a requirement, otherwise KVM would get stuck in an infinite loop.
 
-That's largely why I was pushing for the "let's make it impossible to
-use the loop iterator at all outside the loop". It avoids the
-confusing case, and the patches to move to that stricter semantic can
-be merged independently (and before) doing the actual semantic change.
+> and after spending quite some time I wonder if all this should just be
+> 
+>         if (refcount_dec_not_one(&root->tdp_mmu_root_count))
+>                 return;
+> 
+> 	if (!xchg(&root->role.invalid, true) {
 
-I'm not saying my suggested approach is wonderful either. Honestly,
-it's painful that we have so nasty semantics for the end-of-loop case
-for list_for_each_entry().
+The refcount being '1' means there's another task currently using root, marking
+the root invalid will mean checks on the root's validity are non-deterministic
+for the other task.  
 
-The minimal patch would clearly be to keep those broken semantics, and
-just force everybody to use the list_entry_is_head() case. That's the
-"we know we messed up, we are too lazy to fix it, we'll just work
-around it and people need to be careful" approach.
+> 	 	tdp_mmu_zap_root(kvm, root, shared);
+> 
+> 		/*
+> 		 * Do not assume the refcount is still 1: because
+> 		 * tdp_mmu_zap_root can yield, a different task
+> 		 * might have grabbed a reference to this root.
+> 		 *
+> 	        if (refcount_dec_not_one(&root->tdp_mmu_root_count))
 
-And laziness is a virtue. But bad semantics are bad semantics. So it's
-a question of balancing those two issues.
+This is wrong, _this_ task can't drop a reference taken by the other task.
 
-               Linus
+>         	        return;
+> 	}
+> 
+> 	/*
+> 	 * The root is invalid, and its reference count has reached
+> 	 * zero.  It must have been zapped either in the "if" above or
+> 	 * by someone else, and we're definitely the last thread to see
+> 	 * it apart from RCU-protected page table walks.
+> 	 */
+> 	refcount_set(&root->tdp_mmu_root_count, 0);
+
+Not sure what you intended here, KVM should never force a refcount to '0'.
+
+> 	spin_lock(&kvm->arch.tdp_mmu_pages_lock);
+> 	list_del_rcu(&root->link);
+> 	spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
+> 
+> 	call_rcu(&root->rcu_head, tdp_mmu_free_sp_rcu_callback);
+> 
+> (Yay for xchg's implicit memory barriers)
+
+xchg() is a very good idea.  The smp_mb_*() stuff was carried over from the previous
+version where this sequence set another flag in addition to role.invalid.
+
+Is this less funky (untested)?
+
+	/*
+	 * Invalidate the root to prevent it from being reused by a vCPU while
+	 * the root is being zapped, i.e. to allow yielding while zapping the
+	 * root (see below).
+	 *
+	 * Free the root if it's already invalid.  Invalid roots must be zapped
+	 * before their last reference is put, i.e. there's no work to be done,
+	 * and all roots must be invalidated before they're freed (this code).
+	 * Re-zapping invalid roots would put KVM into an infinite loop.
+	 *
+	 * Note, xchg() provides an implicit barrier to ensure role.invalid is
+	 * visible if a concurrent reader acquires a reference after the root's
+	 * refcount is reset.
+	 */
+	if (xchg(root->role.invalid, true))
+		spin_lock(&kvm->arch.tdp_mmu_pages_lock);
+		list_del_rcu(&root->link);
+		spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
+
+		call_rcu(&root->rcu_head, tdp_mmu_free_sp_rcu_callback);
+		return;
+	}
+
+
