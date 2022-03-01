@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D8CB94C8593
-	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 08:53:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CE35B4C8770
+	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 10:10:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233171AbiCAHxk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Mar 2022 02:53:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58866 "EHLO
+        id S232744AbiCAJLh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Mar 2022 04:11:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233146AbiCAHxg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Mar 2022 02:53:36 -0500
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8120B4993A;
-        Mon, 28 Feb 2022 23:52:56 -0800 (PST)
+        with ESMTP id S229781AbiCAJLh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Mar 2022 04:11:37 -0500
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BFC842A08;
+        Tue,  1 Mar 2022 01:10:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1646121176; x=1677657176;
+  t=1646125856; x=1677661856;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=+Vw5wNB9mnCSXJ5OZ/ACGbxYZxQnrMA3CaBRMyS6k+k=;
-  b=bkc231YKkPE4fHIp1hYMnFLL0KjsxHkS4ZBIrhkcSHUAt8qYxdI5p9kR
-   LDBKBMsDQgeQP/7DW2qNxJmFU863v9eDFfMQC43eqm8aByQc/T09Amvai
-   aSGsvWUahsUAaf9PWCHEb4Nc8fz/Y1tCVaR33kFgEtRNkcRAh5Q38wun/
-   ZNTKyj8CICjKN7dfUWBKmka4dihjvqbM1xHUlQKlvfrUZWa2LAgkxBdB0
-   qN63WWMVJLG2gNKeCou75/wtZny1oH9P/9W8h9YEUtdSacY6FlCciOMzP
-   me3AGvrL8TeDPMDFVzpirAkIKAmmFjzrJmmEvhIm6jM73Wqagkp0QLYIB
-   w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10272"; a="233050339"
+  bh=gOJiA9z7fHS2Yo0M8c+wiWR9d2su9qM5cyve0xvlK2w=;
+  b=mAsJkdIE3MOWTYWqQmVN0h9oL7QDHap/3d97TTK8KYIS7fWM2kxsqi0x
+   Sx6EFqFMh3Bt3o1x3RdZtTtatgjhWeLXD2GcNKtWNgKbpaURPJWQKq3Lb
+   iiNVNmhlt4UiqRLvq+ZFrhHzY8mzrktNx07ZcmDzt6TYttBxdhRI5po+S
+   Rd2yp6iVdQoacuy46EnJVz13OG6CG1R1Jq6bvnNI9PTKZHjDQjGv9lDsN
+   oT1xhZliHIfO6qSeNRrlT2xoUZMbkrztqNwK6g53HHuz3pllvt18s2AZz
+   HmaANdUhCeBV3nSYRi/Xi0qsR4dgl4JyUUi1EpsWERVlMM7JX/3pW6zlU
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10272"; a="339526804"
 X-IronPort-AV: E=Sophos;i="5.90,145,1643702400"; 
-   d="scan'208";a="233050339"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2022 23:52:56 -0800
+   d="scan'208";a="339526804"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2022 01:10:56 -0800
 X-IronPort-AV: E=Sophos;i="5.90,145,1643702400"; 
-   d="scan'208";a="550609480"
+   d="scan'208";a="534818793"
 Received: from gao-cwp.sh.intel.com (HELO gao-cwp) ([10.239.159.105])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2022 23:52:50 -0800
-Date:   Tue, 1 Mar 2022 16:03:46 +0800
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2022 01:10:50 -0800
+Date:   Tue, 1 Mar 2022 17:21:46 +0800
 From:   Chao Gao <chao.gao@intel.com>
 To:     Maxim Levitsky <mlevitsk@redhat.com>
 Cc:     Zeng Guang <guang.zeng@intel.com>,
@@ -57,20 +57,19 @@ Cc:     Zeng Guang <guang.zeng@intel.com>,
         Jethro Beekman <jethro@fortanix.com>,
         Kai Huang <kai.huang@intel.com>, x86@kernel.org,
         linux-kernel@vger.kernel.org, Robert Hu <robert.hu@intel.com>
-Subject: Re: [PATCH v6 6/9] KVM: x86: lapic: don't allow to change APIC ID
- unconditionally
-Message-ID: <20220301080345.GA31557@gao-cwp>
+Subject: Re: [PATCH v6 7/9] KVM: VMX: enable IPI virtualization
+Message-ID: <20220301092144.GA32619@gao-cwp>
 References: <20220225082223.18288-1-guang.zeng@intel.com>
- <20220225082223.18288-7-guang.zeng@intel.com>
- <79f5ce60c65280f4fb7cba0ceedaca0ff5595c48.camel@redhat.com>
+ <20220225082223.18288-8-guang.zeng@intel.com>
+ <0e9a22e90256ed289d90956f720f36d870c92d2a.camel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <79f5ce60c65280f4fb7cba0ceedaca0ff5595c48.camel@redhat.com>
+In-Reply-To: <0e9a22e90256ed289d90956f720f36d870c92d2a.camel@redhat.com>
 User-Agent: Mutt/1.9.4 (2018-02-28)
 X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,92 +77,259 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 25, 2022 at 04:46:31PM +0200, Maxim Levitsky wrote:
->On Fri, 2022-02-25 at 16:22 +0800, Zeng Guang wrote:
->> From: Maxim Levitsky <mlevitsk@redhat.com>
->> 
->> No normal guest has any reason to change physical APIC IDs, and
->> allowing this introduces bugs into APIC acceleration code.
->> 
->> And Intel recent hardware just ignores writes to APIC_ID in
->> xAPIC mode. More background can be found at:
->> https://lore.kernel.org/lkml/Yfw5ddGNOnDqxMLs@google.com/
->> 
->> Looks there is no much value to support writable xAPIC ID in
->> guest except supporting some old and crazy use cases which
->> probably would fail on real hardware. So, make xAPIC ID
->> read-only for KVM guests.
->> 
->> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
->> Signed-off-by: Zeng Guang <guang.zeng@intel.com>
->
->Assuming that this is approved and accepted upstream,
->that is even better that my proposal of doing this
->when APICv is enabled.
-
-Sean & Paolo
-
-what's your opinion? Shall we make xAPIC ID read-only unconditionally
-or just when enable_apicv is enabled or use a parameter to control
-it as Sean suggested at
-
-https://lore.kernel.org/lkml/Yfw5ddGNOnDqxMLs@google.com/
-
-Intel SDM Vol3 10.4.6 Local APID ID says:
-
-	In MP systems, the local APIC ID is also used as a processor ID by the
-	BIOS and the operating system. Some processors permit software to
-	modify the APIC ID. However, the ability of software to modify the APIC
-	ID is processor model specific. Because of this, operating system
-	software should avoid writing to the local APIC ID register.
-
-So, we think it is fine to make xAPIC ID always read-only. Instead of
-supporting writable xAPIC ID in KVM guest, it may be better to fix software
-that modify local APIC ID.
-
-Intel IPI virtualization and AVIC are two cases that requires special
-handling if xAPIC ID is writable. But it doesn't worth the effort and
-is error-prone (e.g., AVIC is broken if guest changed its APIC ID).
-
->
->Since now apic id is always read only, now we should not 
->forget to clean up some parts of kvm like kvm_recalculate_apic_map,
->which are not needed anymore.
-
-Do you mean marking apic_map as DIRTY isn't needed in some cases?
-Or some cleanup should be done inside kvm_recalculate_apic_map()?
-
-For the former, I think we can ...
-
->
->Best regards,
->	Maxim Levitsky
->
->> ---
->>  arch/x86/kvm/lapic.c | 25 ++++++++++++++++++-------
->>  1 file changed, 18 insertions(+), 7 deletions(-)
->> 
->> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
->> index e4bcdab1fac0..b38288c8a94f 100644
->> --- a/arch/x86/kvm/lapic.c
->> +++ b/arch/x86/kvm/lapic.c
->> @@ -2044,10 +2044,17 @@ static int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
->>  
->>  	switch (reg) {
->>  	case APIC_ID:		/* Local APIC ID */
->> -		if (!apic_x2apic_mode(apic))
->> -			kvm_apic_set_xapic_id(apic, val >> 24);
->> -		else
->> +		if (apic_x2apic_mode(apic)) {
->>  			ret = 1;
->> +			break;
->> +		}
->> +		/* Don't allow changing APIC ID to avoid unexpected issues */
->> +		if ((val >> 24) != apic->vcpu->vcpu_id) {
->> +			kvm_vm_bugged(apic->vcpu->kvm);
->> +			break;
->> +		}
+>> +static bool vmx_can_use_ipiv_pi(struct kvm *kvm)
+>> +{
+>> +	return irqchip_in_kernel(kvm) && enable_ipiv;
+>> +}
 >> +
->> +		kvm_apic_set_xapic_id(apic, val >> 24);
+>> +static bool vmx_can_use_posted_interrupts(struct kvm *kvm)
+>> +{
+>> +	return vmx_can_use_ipiv_pi(kvm) || vmx_can_use_vtd_pi(kvm);
+>
+>It took me a while to figure that out.
+> 
+>vmx_can_use_vtd_pi returns true when the VM can be targeted by posted
+>interrupts from the IOMMU, which leads to
+> 
+>1. update of the NV vector and SN bit on vcpu_load/vcpu_put to let
+>IOMMU knows where the vCPU really runs.
+> 
+>2. in vmx_pi_update_irte to configure the posted interrupts.
+> 
+> 
+>Now IPIv will also use the same NV vector and SN bit for IPI virtualization,
+>thus they have to be kept up to date on vcpu load/put.
+> 
+>I would appreciate a comment about this in vmx_can_use_posted_interrupts
+>because posted interrupts can mean too many things, like a host->guest
+>posted interrupt which is sent by just interrupt.
+> 
+>Maybe also rename the function to something like
+> 
+>vmx_need_up_to_date_nv_sn(). Sounds silly to me so
+>maybe something else.
 
-... drop the kvm_apic_set_xapic_id().
+It makes sense.
+
+Will add a comment and rename the function.
+
+>
+>> @@ -4219,14 +4229,21 @@ static void vmx_refresh_apicv_exec_ctrl(struct kvm_vcpu *vcpu)
+>>  
+>>  	pin_controls_set(vmx, vmx_pin_based_exec_ctrl(vmx));
+>>  	if (cpu_has_secondary_exec_ctrls()) {
+>> -		if (kvm_vcpu_apicv_active(vcpu))
+>> +		if (kvm_vcpu_apicv_active(vcpu)) {
+>>  			secondary_exec_controls_setbit(vmx,
+>>  				      SECONDARY_EXEC_APIC_REGISTER_VIRT |
+>>  				      SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY);
+>> -		else
+>> +			if (cpu_has_tertiary_exec_ctrls() && enable_ipiv)
+>> +				tertiary_exec_controls_setbit(vmx,
+>> +						TERTIARY_EXEC_IPI_VIRT);
+>> +		} else {
+>>  			secondary_exec_controls_clearbit(vmx,
+>>  					SECONDARY_EXEC_APIC_REGISTER_VIRT |
+>>  					SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY);
+>> +			if (cpu_has_tertiary_exec_ctrls())
+>> +				tertiary_exec_controls_clearbit(vmx,
+>> +						TERTIARY_EXEC_IPI_VIRT);
+>> +		}
+>
+>Why check for cpu_has_tertiary_exec_ctrls()? wouldn't it be always true
+>(enable_ipiv has to be turned to false if CPU doesn't support IPIv,
+>and if it does it will support tertiary exec controls).
+
+yes. Checking enable_ipiv in two if()s above is enough.
+
+>
+>I don't mind this as a precaution + consistency with other code.
+>
+>
+>>  	}
+>>  
+>>  	vmx_update_msr_bitmap_x2apic(vcpu);
+>> @@ -4260,7 +4277,16 @@ static u32 vmx_exec_control(struct vcpu_vmx *vmx)
+>>  
+>>  static u64 vmx_tertiary_exec_control(struct vcpu_vmx *vmx)
+>>  {
+>> -	return vmcs_config.cpu_based_3rd_exec_ctrl;
+>> +	u64 exec_control = vmcs_config.cpu_based_3rd_exec_ctrl;
+>> +
+>> +	/*
+>> +	 * IPI virtualization relies on APICv. Disable IPI
+>> +	 * virtualization if APICv is inhibited.
+>> +	 */
+>> +	if (!enable_ipiv || !kvm_vcpu_apicv_active(&vmx->vcpu))
+>> +		exec_control &= ~TERTIARY_EXEC_IPI_VIRT;
+>
+>I am not 100% sure, but kvm_vcpu_apicv_active might not be the
+>best thing to check here, as it reflects per-cpu dynamic APICv inhibit.
+>
+>It probably works, but it might be better to use enable_apicv
+>here and rely on normal APICv inhibit, and there inibit IPIv  as well
+>as you do in vmx_refresh_apicv_exec_ctrl/
+>
+
+What's the difference between normal and per-cpu dynamic APICv inhibit?
+
+>
+>
+>> +
+>> +	return exec_control;
+>>  }
+>>  
+>>  /*
+>> @@ -4412,6 +4438,9 @@ static u32 vmx_secondary_exec_control(struct vcpu_vmx *vmx)
+>>  
+>>  static void init_vmcs(struct vcpu_vmx *vmx)
+>>  {
+>> +	struct kvm_vcpu *vcpu = &vmx->vcpu;
+>> +	struct kvm_vmx *kvm_vmx = to_kvm_vmx(vcpu->kvm);
+>> +
+>>  	if (nested)
+>>  		nested_vmx_set_vmcs_shadowing_bitmap();
+>>  
+>> @@ -4431,7 +4460,7 @@ static void init_vmcs(struct vcpu_vmx *vmx)
+>>  	if (cpu_has_tertiary_exec_ctrls())
+>>  		tertiary_exec_controls_set(vmx, vmx_tertiary_exec_control(vmx));
+>>  
+>> -	if (kvm_vcpu_apicv_active(&vmx->vcpu)) {
+>> +	if (kvm_vcpu_apicv_active(vcpu)) {
+>
+>here too (pre-existing), I also not 100% sure that kvm_vcpu_apicv_active
+>should be used. I haven't studied APICv code that much to be 100% sure.
+
+I think kvm_vcpu_apicv_active is better.
+
+The question is: If CPU supports a VMX feature (APICv), but it isn't enabled
+now, is it allowed to configure VMCS fields defined by the feature?  Would CPU
+ignore the values written to the fields or retain them after enabling the
+feature later?
+
+Personally, KVM shouldn't rely on CPU's behavior in this case. So, It is better
+for KVM to write below VMCS fields only if APICv is enabled.
+
+>
+>
+>>  		vmcs_write64(EOI_EXIT_BITMAP0, 0);
+>>  		vmcs_write64(EOI_EXIT_BITMAP1, 0);
+>>  		vmcs_write64(EOI_EXIT_BITMAP2, 0);
+>> @@ -4441,6 +4470,13 @@ static void init_vmcs(struct vcpu_vmx *vmx)
+>>  
+>>  		vmcs_write16(POSTED_INTR_NV, POSTED_INTR_VECTOR);
+>>  		vmcs_write64(POSTED_INTR_DESC_ADDR, __pa((&vmx->pi_desc)));
+>> +
+>> +		if (enable_ipiv) {
+>> +			WRITE_ONCE(kvm_vmx->pid_table[vcpu->vcpu_id],
+>> +				__pa(&vmx->pi_desc) | PID_TABLE_ENTRY_VALID);
+>> +			vmcs_write64(PID_POINTER_TABLE, __pa(kvm_vmx->pid_table));
+>> +			vmcs_write16(LAST_PID_POINTER_INDEX, kvm_vmx->pid_last_index);
+>> +		}
+>>  	}
+>>  
+>>  	if (!kvm_pause_in_guest(vmx->vcpu.kvm)) {
+>> @@ -4492,7 +4528,7 @@ static void init_vmcs(struct vcpu_vmx *vmx)
+>>  		vmcs_write16(GUEST_PML_INDEX, PML_ENTITY_NUM - 1);
+>>  	}
+>>  
+>> -	vmx_write_encls_bitmap(&vmx->vcpu, NULL);
+>> +	vmx_write_encls_bitmap(vcpu, NULL);
+>
+>I might have separated the refactoring of using vcpu instead of &vmx->vcpu
+>in a separate patch, but I don't mind that that much.
+>
+>>  
+>>  	if (vmx_pt_mode_is_host_guest()) {
+>>  		memset(&vmx->pt_desc, 0, sizeof(vmx->pt_desc));
+>> @@ -4508,7 +4544,7 @@ static void init_vmcs(struct vcpu_vmx *vmx)
+>>  
+>>  	if (cpu_has_vmx_tpr_shadow()) {
+>>  		vmcs_write64(VIRTUAL_APIC_PAGE_ADDR, 0);
+>> -		if (cpu_need_tpr_shadow(&vmx->vcpu))
+>> +		if (cpu_need_tpr_shadow(vcpu))
+>>  			vmcs_write64(VIRTUAL_APIC_PAGE_ADDR,
+>>  				     __pa(vmx->vcpu.arch.apic->regs));
+>>  		vmcs_write32(TPR_THRESHOLD, 0);
+>> @@ -7165,6 +7201,18 @@ static int vmx_vm_init(struct kvm *kvm)
+>>  			break;
+>>  		}
+>>  	}
+>> +
+>> +	if (enable_ipiv) {
+>> +		struct page *pages;
+>> +
+>> +		pages = alloc_pages(GFP_KERNEL | __GFP_ZERO, MAX_PID_TABLE_ORDER);
+>> +		if (!pages)
+>> +			return -ENOMEM;
+>> +
+>> +		to_kvm_vmx(kvm)->pid_table = (void *)page_address(pages);
+>> +		to_kvm_vmx(kvm)->pid_last_index = KVM_MAX_VCPU_IDS - 1;
+>> +	}
+>> +
+>>  	return 0;
+>>  }
+>>  
+>> @@ -7756,6 +7804,14 @@ static bool vmx_check_apicv_inhibit_reasons(ulong bit)
+>>  	return supported & BIT(bit);
+>>  }
+>>  
+>> +static void vmx_vm_destroy(struct kvm *kvm)
+>> +{
+>> +	struct kvm_vmx *kvm_vmx = to_kvm_vmx(kvm);
+>> +
+>> +	if (kvm_vmx->pid_table)
+>> +		free_pages((unsigned long)kvm_vmx->pid_table, MAX_PID_TABLE_ORDER);
+>
+>Maybe add a warning checking that ipiv was actually enabled.
+
+Do you mean ipiv was enabled on one of vCPU or just enable_ipiv is true?
+
+The former will lead to false positives if qemu creates a VM and destroys the
+vm without creating any vCPUs.
+
+>Maybe this is overkill.
+>
+>
+>> +}
+>> +
+>>  static struct kvm_x86_ops vmx_x86_ops __initdata = {
+>>  	.name = "kvm_intel",
+>>  
+>> @@ -7768,6 +7824,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
+>>  
+>>  	.vm_size = sizeof(struct kvm_vmx),
+>>  	.vm_init = vmx_vm_init,
+>> +	.vm_destroy = vmx_vm_destroy,
+>>  
+>>  	.vcpu_create = vmx_create_vcpu,
+>>  	.vcpu_free = vmx_free_vcpu,
+>> @@ -8022,6 +8079,9 @@ static __init int hardware_setup(void)
+>>  	if (!enable_apicv)
+>>  		vmx_x86_ops.sync_pir_to_irr = NULL;
+>>  
+>> +	if (!enable_apicv || !cpu_has_vmx_ipiv())
+>> +		enable_ipiv = false;
+>> +
+>>  	if (cpu_has_vmx_tsc_scaling()) {
+>>  		kvm_has_tsc_control = true;
+>>  		kvm_max_tsc_scaling_ratio = KVM_VMX_TSC_MULTIPLIER_MAX;
+>> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+>> index d4a647d3ed4a..e7b0c00c9d43 100644
+>> --- a/arch/x86/kvm/vmx/vmx.h
+>> +++ b/arch/x86/kvm/vmx/vmx.h
+>> @@ -365,6 +365,9 @@ struct kvm_vmx {
+>>  	unsigned int tss_addr;
+>>  	bool ept_identity_pagetable_done;
+>>  	gpa_t ept_identity_map_addr;
+>> +	/* PID table for IPI virtualization */
+>> +	u64 *pid_table;
+>> +	u16 pid_last_index;
+>>  };
+>>  
+>>  bool nested_vmx_allowed(struct kvm_vcpu *vcpu);
+>
+>
+>I might have missed something, but overall looks good.
+
+Thanks.
