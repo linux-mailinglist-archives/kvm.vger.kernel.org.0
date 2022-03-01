@@ -2,471 +2,219 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 321934C888C
-	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 10:52:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F3FC4C88A8
+	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 10:59:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234021AbiCAJwy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Mar 2022 04:52:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42936 "EHLO
+        id S234050AbiCAKAW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Mar 2022 05:00:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33078 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234054AbiCAJwv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Mar 2022 04:52:51 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E426434BD;
-        Tue,  1 Mar 2022 01:52:10 -0800 (PST)
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 2219iemL019238;
-        Tue, 1 Mar 2022 09:52:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=HP79HfM6SpKs5peopv952F7cMnQsAwUNeWEF7bIJFd8=;
- b=gA4GtJJdv983ZWt1+L8mvHKSLSyOM7NMoSYb06Mh6Ssk/vN91HKj2QeoTu2oIVYw/dVb
- Qp1kAzKOhbAP2ulGfHz37oKDCJAmAt3H9nczYZKEO+0woKA4mKUQsbqCZcNxnC2hFlRL
- DhOvlKAslMkxNKKT42TPHd7Aqy8BdxvdHJJ6DfLVhIT7/Nu9F0Nfp0hkPzXVL05LunqB
- 4aDE0oWLQIRNGkUiuW48QvXZhsbKzAw13Qw0UaDJBAZ1jJEc5hObgX2gQPdHPJjc8lLe
- x2W96ces0T7tIOBdK1riGkMf2Yy1XD6XsWzrFxKsTDnf+OeTmL4R5jMadkCTbYA7obJN vQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3ehh4h03vp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 01 Mar 2022 09:52:10 +0000
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 2219mO66030532;
-        Tue, 1 Mar 2022 09:52:09 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3ehh4h03uj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 01 Mar 2022 09:52:09 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2219lWEn022004;
-        Tue, 1 Mar 2022 09:51:11 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma03ams.nl.ibm.com with ESMTP id 3efbu9b7wx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 01 Mar 2022 09:51:10 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2219p2T539387502
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 1 Mar 2022 09:51:02 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7E6754C040;
-        Tue,  1 Mar 2022 09:51:02 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 38A204C04A;
-        Tue,  1 Mar 2022 09:51:02 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  1 Mar 2022 09:51:02 +0000 (GMT)
-From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-To:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v2] s390x: Test effect of storage keys on some instructions
-Date:   Tue,  1 Mar 2022 10:50:59 +0100
-Message-Id: <20220301095059.3026178-1-scgl@linux.ibm.com>
-X-Mailer: git-send-email 2.32.0
+        with ESMTP id S233169AbiCAKAR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Mar 2022 05:00:17 -0500
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2084.outbound.protection.outlook.com [40.107.236.84])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD45A888D8;
+        Tue,  1 Mar 2022 01:59:36 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kTBpTYifT2NeyCDqTsfLDW26wm95I7/lpIlwFBHj20kGFKozvtMZlohLkikUYIxIkH1pxGNbMJjW1n1MvmtbZmf6OaPUjGVcOmDg3zqlLWJvNWmV8OFXMKh+WX0wkPUIL5j3XWcujdR4ji2DM4FmbjKab8kpDuPhRpa0Ie3bF59MTvYGstgyCKsMu6KhlC4czgZylceup7rMnPT6zw3EkTQXGCp0StNa8UAdRdO79yrfOrXpCakc7D5vPXkI5mZtS82/gxT0NfGfLeJLZI/CMk1FPUEpW+ichqFN1/jmJbB/g4dBZKUT+Zcxu9Y5u/v+9XrUQ0+wQWHuu1/jFyp2Ug==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=sJCaXKrhVV6xNCCmzcXr5IO0K9NGdJMdYDy+VWbDQls=;
+ b=BqnQGJSRxlaJoZiDENL+C3W+Bvi/NYUYmfamAnkc88u6SYBzsfmVQK8obk7hmTt4/P8g/SyqEViZcUdfF4SdR6vIEpiUkVKWn8Apui8yvgNV8zSURrtFVvt9EojEBV6TUBgLFMQOhYs46zTJ0h66E2m9PoJINglUnUId4wQtVtr8MfsXboqjGkYZVj3xRNgFINYAKppPzn99BTvGXAtHwlnTXe7+pD/udJQqIui4QLFn1QyYrOqQKrAZ4j2XGaQQOtRtj/+kc7lJOJUsLKMQr10trnjONnrKK3TRegeg74EeW/G8OpRIr1VqtIVf8hVXkcs9BvqR1/gdHSQlKdPU0Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sJCaXKrhVV6xNCCmzcXr5IO0K9NGdJMdYDy+VWbDQls=;
+ b=HfFicAJvFn3CizLXhDBdPX17E/RBPwVLjHlZ+s817FnO27YDaRXBt8uZR6/MT41Q0DixPJjwcrJD5EmZGKgaJ941UZeqhhlFs0IV7IqcCi2nXjCGTl+bl3E/0WTRZFgt3c5okphu86w9kM1aj5HAywoWRzmPVfl/B5GXmLd1bws=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM8PR12MB5445.namprd12.prod.outlook.com (2603:10b6:8:24::7) by
+ CH2PR12MB3719.namprd12.prod.outlook.com (2603:10b6:610:2c::16) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5017.26; Tue, 1 Mar 2022 09:59:34 +0000
+Received: from DM8PR12MB5445.namprd12.prod.outlook.com
+ ([fe80::6807:3c6c:a619:3527]) by DM8PR12MB5445.namprd12.prod.outlook.com
+ ([fe80::6807:3c6c:a619:3527%5]) with mapi id 15.20.5017.027; Tue, 1 Mar 2022
+ 09:59:34 +0000
+Message-ID: <214b5d5e-f936-f50c-b26c-334ecbbdface@amd.com>
+Date:   Tue, 1 Mar 2022 16:59:23 +0700
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.6.1
+Subject: Re: [RFC PATCH 04/13] KVM: SVM: Only call vcpu_(un)blocking when AVIC
+ is enabled.
+Content-Language: en-US
+To:     Maxim Levitsky <mlevitsk@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, seanjc@google.com
+Cc:     pbonzini@redhat.com, joro@8bytes.org, jon.grimm@amd.com,
+        wei.huang2@amd.com, terry.bowman@amd.com
+References: <20220221021922.733373-1-suravee.suthikulpanit@amd.com>
+ <20220221021922.733373-5-suravee.suthikulpanit@amd.com>
+ <dc820a37ef302ed7c11315c01c6f434d5506c543.camel@redhat.com>
+From:   Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+In-Reply-To: <dc820a37ef302ed7c11315c01c6f434d5506c543.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: HK2PR06CA0010.apcprd06.prod.outlook.com
+ (2603:1096:202:2e::22) To DM8PR12MB5445.namprd12.prod.outlook.com
+ (2603:10b6:8:24::7)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: OkAdEyfyH5Y7fEZjt1yz_Ud-Hp83pY8K
-X-Proofpoint-ORIG-GUID: ldOIcD1TqUlGmz0m6RLvLxl7OYHvIuk0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-02-28_10,2022-02-26_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
- adultscore=0 clxscore=1015 spamscore=0 bulkscore=0 lowpriorityscore=0
- mlxlogscore=999 suspectscore=0 impostorscore=0 malwarescore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2201110000
- definitions=main-2203010048
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 905f5749-3654-48e6-c93d-08d9fb6a303d
+X-MS-TrafficTypeDiagnostic: CH2PR12MB3719:EE_
+X-Microsoft-Antispam-PRVS: <CH2PR12MB3719664F674AF2C5D66BC153F3029@CH2PR12MB3719.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: OlYR/e2/fmuh8oqfluuDRMynsc/XB3Xlvo2V5ULzTB75/wKiQA6dINaUHBATDLNREFJyY5PQeAD4UkqVrarxHcKXTYMzYCcjwaxy0N6+gVzGFxRsa4V/PMcGn/3LYey6Tu7FMDjNgx423YqYZ4p42uFGxyu+a5zo0GfE8ApHzVYagXXGF0v78KApKyY5m7FpAf//ed7/Ce09s94u43qWp7B4IbrAXz+7n01rk7TIO90tTiaFR/8Iz3EtAFpzI1b8FHoqfsAtx5gjMUc6BFQxNB9Ws61ul3FU73qGWNxX5XSNXawWw2f0QT0YUu/C/T+e/MHmaTSVZonRIlbsS38XoWusRmOil1k9xWFfXzqcUb55M7VEPXzOuZV5CKJrHJFXN+kh7zWnIx9qjmQlhEP6/z+KevZakp2xJENI0sIgi6ZfBxMTP1VPg2QnGbeW8wtQYUwZSX87Tkn57avClmBFnZUmAIPKddcnXYElyP7JQenWGo9WcwTypBY/flo/KLNb4Eh0pWlM3OKlnxo32WNtOe1gJkEW5AsaKP/+9MpLLA2c1xrwjBX/ijt5IEi5XWfZKZokEjMeSPrfWDQaq4aAB/JBre0M8MG/xDz7HzMtkChZeXDiJpTnDXiatfI4AWlE80bxOSJcs+z2JB0V70VlI9MnzoNt/psE+xMDwCztsDAyhSWvcK8hAujAXCn2GxFHEVz8S8NYMoydHCeRH/AbMKRa8FjB8VrdazQuJM1aBB+8yEWO90crRtp5UbSKVHL+bpcyriowRBIRBsl0r/hB7mYO6DrWT6ijXtfeEZr6WK+htwjzDatr6eqKq7I9U8vHgsBbMZTvZQ/bffW1lw+9FSwkyPj9eqgf0KyRDcomRII=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR12MB5445.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(186003)(26005)(2616005)(31686004)(4326008)(66946007)(66476007)(8676002)(66556008)(36756003)(83380400001)(53546011)(6506007)(2906002)(31696002)(6512007)(38100700002)(966005)(6486002)(8936002)(508600001)(5660300002)(6666004)(316002)(86362001)(44832011)(45980500001)(43740500002)(309714004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Y1dGL08wZEVEWnMySlIzM3QyVUdISzJ1d0xuQlB3aitUSnpSZnpCVE85ZDJN?=
+ =?utf-8?B?eGM5OGxzVDJjMnM4S1h3aUV1Q3BFUVdVMkxsM3RWYk5UN3gwZFh4TzFMbmRM?=
+ =?utf-8?B?TG11VEFWSWtMMVhna0pKcVJOcGkzQmFjTy9lQ05GU0psZXl4R2hndFd2UDhs?=
+ =?utf-8?B?K01NNnArU2RnN2NEZnV3Z0RkSnZSZXVIbFJsNDN1VHlOZXNBN2FlUFpWUHBa?=
+ =?utf-8?B?QVJDQlUwclE2R0tCbjRzZWp4Uk9ySHNubWdrMkUrZjFxdWRyeXJTMGRkK0RC?=
+ =?utf-8?B?MFFzWVo3OTdoMmw0U1VZTkhoNXJrM1VZc1NsZXRqS2ZBL0h6WXQ2VWJjWnVz?=
+ =?utf-8?B?b3l0UFdaa1lDYzFmSVhWZzhUTmZzTzlSVHRIeFZsRGxva1c3YVluZDhaYVU0?=
+ =?utf-8?B?MEFDTGl6RDl4bnJZblVTUnhHWStUTFpQUGNBK1lKR1BYNE85aDRwRUo0WkRD?=
+ =?utf-8?B?bjhoV0M2K1VDc2FNeXZGeHYyS0dPd3hqRk9KUlFBenJSMHoxeTFpc3ZxOHBh?=
+ =?utf-8?B?TXVzZmJCWjE0LzcwdjNOZFdJSk9ORytocjdiTDllRW9CdWYvN1JvNytOSWxx?=
+ =?utf-8?B?cGF1Z0x1a2EzUU5wRE0rVjlweVg0N1R1T1NUK3ZJMkx6RXJSdFMyZmZWQWVr?=
+ =?utf-8?B?ekFUZlc3QkRXUXVhbytyay8xZ2x2YW9IbHlUaTlXV3dUWEMyK3htY0dEOXhv?=
+ =?utf-8?B?Wmw5TDhHYzlvTzBzdmRldkJsZ09NS0hidGZMWGg5eGRyT2pRRTltVnJEU3Zk?=
+ =?utf-8?B?STVyUDc5MDd2cmkwaThYMDFyWlZFaGVrMVlZNmdOZEZYM1BROFFMMHo4N0d4?=
+ =?utf-8?B?QWp2K3gzcFNFcXlJV3cwWm03c0dJY29DRlNwOEFKTmNUd2FGMlNabVFXcUNn?=
+ =?utf-8?B?TlY1NkNYT2F5QUxTODB6SExSbjJtbit2U29lREZZZHZIRjV5Z1FZei8rRjh0?=
+ =?utf-8?B?ZGw3UTRVVTlNdklHaUhmcDJ1OWN1SXQ0dERWeGlRMmtQRDlXQnFDQVRFMUsz?=
+ =?utf-8?B?Y25CM0p0d3p2aGM5ejI3b2J4Y1c2K3lQWmRzOUxpbnZjVmtNUXJ2WmRJV3kv?=
+ =?utf-8?B?bFAvWFU2RDB2My96d0F0ZUpWT1h0dW1jaXRHSFpzc0VxVVVYbGhzdkMycWpH?=
+ =?utf-8?B?cXhFMDFKTVY0RXM3YzdaaTNEN3NzdjZRY1F3OWVubUVjSUxuYWpHNlI0eE1E?=
+ =?utf-8?B?TnJYcEtRNmIwWElkVHIwcFo2U0IrUEt3ZUw1WGlIWGo4ZUJuY0o1cThJaTIz?=
+ =?utf-8?B?QUJMSzhGN3htZytsYzRMRGVDdFZTWGJOYnFTcUJEMFFybFdRZHR5N1hLVjhO?=
+ =?utf-8?B?cVRCKzI5U2NSRXRUbkNhZ2Q3dG5EQ01rKzY4TmxmVVZYMlVhSGRzM1lMeDNM?=
+ =?utf-8?B?OEpWZHBsUUhkaklIaXhlcjFmY2JWWC96MlBWcTBML3lxMXZCR3NUYWlKWWJL?=
+ =?utf-8?B?SVhLUFBqRTJCcStGUFY4bi81SHhCczdaaUVEUTl1NTdRNFQ1Ty9GMStGd1FO?=
+ =?utf-8?B?akV3UnpSaUxob3gvU0NiYU0rTkRncUJTUWNIYjYzNnh4TGdTc21pMjRxNGlk?=
+ =?utf-8?B?Q1JteFR5MHBjaE92cDVTQk1WVHcrU3JENVNtRDFKdVZRTW9GdGFxZUxpTXhD?=
+ =?utf-8?B?YW91K1lWK25YOFppWVhsa2FtZEhFM2kvK2hxWHBYU3ZFQlJOZUhZSE9rc1hy?=
+ =?utf-8?B?M3hGL3pXUUM1YkNpckh3RDE1Wm13VzVSa1JMM1BBNnJKbnpNTnlvN2xZNmFY?=
+ =?utf-8?B?V21xSnp1WFlPdUJiLzdVNFYzbDZUUUlMS1dOZktaSHluL21PK0EzNDN3T0Yv?=
+ =?utf-8?B?Q3U4N3pPWXpRZndMeGxhZTJycGpBWk5aYVl0cWltQk9TMDVUaFFRTHlTNUFr?=
+ =?utf-8?B?QWpzb3ROK0gxNmdVdG5FaSt4RlJ1a2NRYUpmZUVKeGdaNnBEaUIrc0ZKL3J6?=
+ =?utf-8?B?L0MvczZNeFZCOE12UXl2eUxXU2RYSE5YUjVsWHlqYXVlWDdmRUxMbHh4NGNE?=
+ =?utf-8?B?SlZSSHV6L0RENEQvUEg4bEJWcnc1ZlNtTmkycWU0NUZmRUtyQ2cvcXlhaFMr?=
+ =?utf-8?B?K283dDhsWWFqQ0JzdDZLdVZNOHdBTmR2b2lKb1pPMzdORGlLTUZ5Ynh2eUdk?=
+ =?utf-8?B?ZHh5NzZ2djBpZFE2cjMxVldpUThWZEdSM1ZkWlJldWROcTR5T2JRb3B1ZnVD?=
+ =?utf-8?Q?il/JG7JAeIxr+8s9vgf3GZk=3D?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 905f5749-3654-48e6-c93d-08d9fb6a303d
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR12MB5445.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Mar 2022 09:59:34.5033
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: WQb9pg0XE/RYBrvNHoLJ8rL910joX4kQhWke2INuhctfxEjL0HK1brVLm2fjUXPOHLDQmEsP5AGDY6i5gnyQmw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB3719
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Some instructions are emulated by KVM. Test that KVM correctly emulates
-storage key checking for two of those instructions (STORE CPU ADDRESS,
-SET PREFIX).
-Test success and error conditions, including coverage of storage and
-fetch protection override.
-Also add test for TEST PROTECTION, even if that instruction will not be
-emulated by KVM under normal conditions.
+Hi Maxim,
 
-Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
----
+On 2/24/22 11:54 PM, Maxim Levitsky wrote:
+> On Sun, 2022-02-20 at 20:19 -0600, Suravee Suthikulpanit wrote:
+>> The kvm_x86_ops.vcpu_(un)blocking are needed by AVIC only.
+>> Therefore, set the ops only when AVIC is enabled.
+>>
+>> Suggested-by: Sean Christopherson<seanjc@google.com>
+>> Signed-off-by: Suravee Suthikulpanit<suravee.suthikulpanit@amd.com>
+>> ---
+>>   arch/x86/kvm/svm/avic.c | 12 ++++++++++--
+>>   arch/x86/kvm/svm/svm.c  |  7 -------
+>>   arch/x86/kvm/svm/svm.h  |  2 --
+>>   3 files changed, 10 insertions(+), 11 deletions(-)
+>>
+>> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+>> index abde08ca23ab..0040824e4376 100644
+>> --- a/arch/x86/kvm/svm/avic.c
+>> +++ b/arch/x86/kvm/svm/avic.c
+>> @@ -996,7 +996,7 @@ void avic_vcpu_put(struct kvm_vcpu *vcpu)
+>>   	WRITE_ONCE(*(svm->avic_physical_id_cache), entry);
+>>   }
+>>   
+>> -void avic_vcpu_blocking(struct kvm_vcpu *vcpu)
+>> +static void avic_vcpu_blocking(struct kvm_vcpu *vcpu)
+>>   {
+>>   	if (!kvm_vcpu_apicv_active(vcpu))
+>>   		return;
+>> @@ -1021,7 +1021,7 @@ void avic_vcpu_blocking(struct kvm_vcpu *vcpu)
+>>   	preempt_enable();
+>>   }
+>>   
+>> -void avic_vcpu_unblocking(struct kvm_vcpu *vcpu)
+>> +static void avic_vcpu_unblocking(struct kvm_vcpu *vcpu)
+>>   {
+>>   	int cpu;
+>>   
+>> @@ -1057,6 +1057,14 @@ bool avic_hardware_setup(struct kvm_x86_ops *x86_ops)
+>>   		pr_info("x2AVIC enabled\n");
+>>   	}
+>>   
+>> +	if (avic_mode) {
+>> +		x86_ops->vcpu_blocking = avic_vcpu_blocking;
+>> +		x86_ops->vcpu_unblocking = avic_vcpu_unblocking;
+>> +	} else {
+>> +		x86_ops->vcpu_blocking = NULL;
+>> +		x86_ops->vcpu_unblocking = NULL;
+>> +	}
+>> +
+>>   	amd_iommu_register_ga_log_notifier(&avic_ga_log_notifier);
+>>   	return !!avic_mode;
+>>   }
+>> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+>> index 3048f4b758d6..3687026f2859 100644
+>> --- a/arch/x86/kvm/svm/svm.c
+>> +++ b/arch/x86/kvm/svm/svm.c
+>> @@ -4531,8 +4531,6 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+>>   	.prepare_guest_switch = svm_prepare_guest_switch,
+>>   	.vcpu_load = svm_vcpu_load,
+>>   	.vcpu_put = svm_vcpu_put,
+>> -	.vcpu_blocking = avic_vcpu_blocking,
+>> -	.vcpu_unblocking = avic_vcpu_unblocking,
+>>   
+>>   	.update_exception_bitmap = svm_update_exception_bitmap,
+>>   	.get_msr_feature = svm_get_msr_feature,
+>> @@ -4819,11 +4817,6 @@ static __init int svm_hardware_setup(void)
+>>   
+>>   	enable_apicv = avic = avic && avic_hardware_setup(&svm_x86_ops);
+>>   
+>> -	if (!enable_apicv) {
+>> -		svm_x86_ops.vcpu_blocking = NULL;
+>> -		svm_x86_ops.vcpu_unblocking = NULL;
+>> -	}
+> Isn't this code already zeros these callbacks when avic is not enabled?
 
-v1 -> v2:
- * use install_page instead of manual page table entry manipulation
- * check that no store occurred if none is expected
- * try to check that no fetch occured if not expected, although in
-   practice a fetch would probably cause the test to crash
- * reset storage key to 0 after test
+Ah, right. I'll remove the setting to NULL.
 
-Range-diff against v1:
-1:  a1069f68 ! 1:  a2e076d3 s390x: Test effect of storage keys on some instructions
-    @@ s390x/skey.c
-      #include <asm/asm-offsets.h>
-      #include <asm/interrupt.h>
-     +#include <vmalloc.h>
-    -+#include <mmu.h>
-      #include <asm/page.h>
-    -+#include <asm/pgtable.h>
-      #include <asm/facility.h>
-      #include <asm/mem.h>
-    - 
-     @@ s390x/skey.c: static void test_invalid_address(void)
-      	report_prefix_pop();
-      }
-    @@ s390x/skey.c: static void test_invalid_address(void)
-     +		"spka 0x10(0)\n\t"
-     +		"stap %0\n\t"
-     +		"spka 0(0)\n"
-    -+	     : "=Q" (*out)
-    ++	     : "+Q" (*out) /* exception: old value remains in out -> + constraint*/
-     +	);
-     +}
-     +
-    @@ s390x/skey.c: static void test_invalid_address(void)
-     +	report_prefix_push("STORE CPU ADDRESS, mismatching key");
-     +	set_storage_key(pagebuf, 0x20, 0);
-     +	expect_pgm_int();
-    ++	*out = 0xbeef;
-     +	store_cpu_address_key_1(out);
-     +	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
-    ++	report(*out == 0xbeef, "no store occurred");
-     +	report_prefix_pop();
-     +
-     +	ctl_set_bit(0, CTL0_STORAGE_PROTECTION_OVERRIDE);
-    @@ s390x/skey.c: static void test_invalid_address(void)
-     +	report_prefix_push("STORE CPU ADDRESS, storage-protection override, invalid key");
-     +	set_storage_key(pagebuf, 0x20, 0);
-     +	expect_pgm_int();
-    ++	*out = 0xbeef;
-     +	store_cpu_address_key_1(out);
-     +	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
-    ++	report(*out == 0xbeef, "no store occurred");
-     +	report_prefix_pop();
-     +
-     +	report_prefix_push("STORE CPU ADDRESS, storage-protection override, override key");
-    @@ s390x/skey.c: static void test_invalid_address(void)
-     +	report_prefix_pop();
-     +
-     +	ctl_clear_bit(0, CTL0_STORAGE_PROTECTION_OVERRIDE);
-    ++	set_storage_key(pagebuf, 0x00, 0);
-     +}
-     +
-     +static void set_prefix_key_1(uint32_t *out)
-    @@ s390x/skey.c: static void test_invalid_address(void)
-     +		"spka 0x10(0)\n\t"
-     +		"spx	%0\n\t"
-     +		"spka 0(0)\n"
-    -+	     : "=Q" (*out)
-    ++	     :: "Q" (*out)
-     +	);
-     +}
-     +
-    @@ s390x/skey.c: static void test_invalid_address(void)
-     +{
-     +	uint32_t *out = (uint32_t *)pagebuf;
-     +	pgd_t *root;
-    -+	pte_t *entry_0_p;
-    -+	pte_t entry_lowcore, entry_pagebuf;
-     +
-     +	root = (pgd_t *)(stctg(1) & PAGE_MASK);
-    -+	entry_0_p = get_dat_entry(root, 0, pgtable_level_pte);
-    -+	entry_lowcore = *entry_0_p;
-    -+	entry_pagebuf = __pte((virt_to_pte_phys(root, out) & PAGE_MASK));
-     +
-     +	asm volatile("stpx	%0" : "=Q"(*out));
-     +
-    @@ s390x/skey.c: static void test_invalid_address(void)
-     +	report_prefix_push("SET PREFIX, mismatching key, fetch protection");
-     +	set_storage_key(pagebuf, 0x28, 0);
-     +	expect_pgm_int();
-    ++	*out = 0xdeadbeef;
-     +	set_prefix_key_1(out);
-     +	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
-    ++	asm volatile("stpx	%0" : "=Q"(*out));
-    ++	report(*out != 0xdeadbeef, "no fetch occurred");
-     +	report_prefix_pop();
-     +
-     +	register_pgm_cleanup_func(dat_fixup_pgm_int);
-    @@ s390x/skey.c: static void test_invalid_address(void)
-     +
-     +	report_prefix_push("SET PREFIX, mismatching key, fetch protection override applies");
-     +	set_storage_key(pagebuf, 0x28, 0);
-    -+	ipte(0, &pte_val(*entry_0_p));
-    -+	*entry_0_p = entry_pagebuf;
-    ++	install_page(root, virt_to_pte_phys(root, pagebuf), 0);
-     +	set_prefix_key_1(0);
-    -+	ipte(0, &pte_val(*entry_0_p));
-    -+	*entry_0_p = entry_lowcore;
-    ++	install_page(root, 0, 0);
-     +	report_pass("no exception");
-     +	report_prefix_pop();
-     +
-     +	report_prefix_push("SET PREFIX, mismatching key, fetch protection override does not apply");
-    ++	out = (uint32_t *)(pagebuf + 2048);
-     +	set_storage_key(pagebuf, 0x28, 0);
-     +	expect_pgm_int();
-    -+	ipte(0, &pte_val(*entry_0_p));
-    -+	*entry_0_p = entry_pagebuf;
-    ++	install_page(root, virt_to_pte_phys(root, pagebuf), 0);
-    ++	WRITE_ONCE(*out, 0xdeadbeef);
-     +	set_prefix_key_1((uint32_t *)2048);
-    -+	ipte(0, &pte_val(*entry_0_p));
-    -+	*entry_0_p = entry_lowcore;
-    ++	install_page(root, 0, 0);
-     +	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
-    ++	asm volatile("stpx	%0" : "=Q"(*out));
-    ++	report(*out != 0xdeadbeef, "no fetch occurred");
-     +	report_prefix_pop();
-     +
-     +	ctl_clear_bit(0, CTL0_FETCH_PROTECTION_OVERRIDE);
-    ++	set_storage_key(pagebuf, 0x00, 0);
-     +	register_pgm_cleanup_func(NULL);
-     +}
-     +
+> I am not sure why this patch is needed to be honest.
 
- lib/s390x/asm/arch_def.h |  20 ++---
- s390x/skey.c             | 171 +++++++++++++++++++++++++++++++++++++++
- 2 files changed, 182 insertions(+), 9 deletions(-)
+It's not related to x2AVIC. It was recommended by Sean earlier
+in another patch series:
 
-diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
-index 40626d72..e443a9cd 100644
---- a/lib/s390x/asm/arch_def.h
-+++ b/lib/s390x/asm/arch_def.h
-@@ -55,15 +55,17 @@ struct psw {
- #define PSW_MASK_BA			0x0000000080000000UL
- #define PSW_MASK_64			(PSW_MASK_BA | PSW_MASK_EA)
- 
--#define CTL0_LOW_ADDR_PROT		(63 - 35)
--#define CTL0_EDAT			(63 - 40)
--#define CTL0_IEP			(63 - 43)
--#define CTL0_AFP			(63 - 45)
--#define CTL0_VECTOR			(63 - 46)
--#define CTL0_EMERGENCY_SIGNAL		(63 - 49)
--#define CTL0_EXTERNAL_CALL		(63 - 50)
--#define CTL0_CLOCK_COMPARATOR		(63 - 52)
--#define CTL0_SERVICE_SIGNAL		(63 - 54)
-+#define CTL0_LOW_ADDR_PROT			(63 - 35)
-+#define CTL0_EDAT				(63 - 40)
-+#define CTL0_FETCH_PROTECTION_OVERRIDE		(63 - 38)
-+#define CTL0_STORAGE_PROTECTION_OVERRIDE	(63 - 39)
-+#define CTL0_IEP				(63 - 43)
-+#define CTL0_AFP				(63 - 45)
-+#define CTL0_VECTOR				(63 - 46)
-+#define CTL0_EMERGENCY_SIGNAL			(63 - 49)
-+#define CTL0_EXTERNAL_CALL			(63 - 50)
-+#define CTL0_CLOCK_COMPARATOR			(63 - 52)
-+#define CTL0_SERVICE_SIGNAL			(63 - 54)
- #define CR0_EXTM_MASK			0x0000000000006200UL /* Combined external masks */
- 
- #define CTL2_GUARDED_STORAGE		(63 - 59)
-diff --git a/s390x/skey.c b/s390x/skey.c
-index 58a55436..0ab3172e 100644
---- a/s390x/skey.c
-+++ b/s390x/skey.c
-@@ -10,6 +10,7 @@
- #include <libcflat.h>
- #include <asm/asm-offsets.h>
- #include <asm/interrupt.h>
-+#include <vmalloc.h>
- #include <asm/page.h>
- #include <asm/facility.h>
- #include <asm/mem.h>
-@@ -147,6 +148,171 @@ static void test_invalid_address(void)
- 	report_prefix_pop();
- }
- 
-+static void test_test_protection(void)
-+{
-+	unsigned long addr = (unsigned long)pagebuf;
-+
-+	report_prefix_push("TPROT");
-+	set_storage_key(pagebuf, 0x10, 0);
-+	report(tprot(addr, 0) == 0, "access key 0 -> no protection");
-+	report(tprot(addr, 1) == 0, "access key matches -> no protection");
-+	report(tprot(addr, 2) == 1, "access key mismatches, no fetch protection -> store protection");
-+	set_storage_key(pagebuf, 0x18, 0);
-+	report(tprot(addr, 2) == 2, "access key mismatches, fetch protection -> fetch & store protection");
-+	report_prefix_pop();
-+}
-+
-+static void store_cpu_address_key_1(uint16_t *out)
-+{
-+	asm volatile (
-+		"spka 0x10(0)\n\t"
-+		"stap %0\n\t"
-+		"spka 0(0)\n"
-+	     : "+Q" (*out) /* exception: old value remains in out -> + constraint*/
-+	);
-+}
-+
-+static void test_store_cpu_address(void)
-+{
-+	uint16_t *out = (uint16_t *)pagebuf;
-+	uint16_t cpu_addr;
-+
-+	asm ("stap %0" : "=Q" (cpu_addr));
-+
-+	report_prefix_push("STORE CPU ADDRESS, zero key");
-+	set_storage_key(pagebuf, 0x20, 0);
-+	*out = 0xbeef;
-+	asm ("stap %0" : "=Q" (*out));
-+	report(*out == cpu_addr, "store occurred");
-+	report_prefix_pop();
-+
-+	report_prefix_push("STORE CPU ADDRESS, matching key");
-+	set_storage_key(pagebuf, 0x10, 0);
-+	*out = 0xbeef;
-+	store_cpu_address_key_1(out);
-+	report(*out == cpu_addr, "store occurred");
-+	report_prefix_pop();
-+
-+	report_prefix_push("STORE CPU ADDRESS, mismatching key");
-+	set_storage_key(pagebuf, 0x20, 0);
-+	expect_pgm_int();
-+	*out = 0xbeef;
-+	store_cpu_address_key_1(out);
-+	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
-+	report(*out == 0xbeef, "no store occurred");
-+	report_prefix_pop();
-+
-+	ctl_set_bit(0, CTL0_STORAGE_PROTECTION_OVERRIDE);
-+
-+	report_prefix_push("STORE CPU ADDRESS, storage-protection override, invalid key");
-+	set_storage_key(pagebuf, 0x20, 0);
-+	expect_pgm_int();
-+	*out = 0xbeef;
-+	store_cpu_address_key_1(out);
-+	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
-+	report(*out == 0xbeef, "no store occurred");
-+	report_prefix_pop();
-+
-+	report_prefix_push("STORE CPU ADDRESS, storage-protection override, override key");
-+	set_storage_key(pagebuf, 0x90, 0);
-+	*out = 0xbeef;
-+	store_cpu_address_key_1(out);
-+	report(*out == cpu_addr, "override occurred");
-+	report_prefix_pop();
-+
-+	ctl_clear_bit(0, CTL0_STORAGE_PROTECTION_OVERRIDE);
-+	set_storage_key(pagebuf, 0x00, 0);
-+}
-+
-+static void set_prefix_key_1(uint32_t *out)
-+{
-+	asm volatile (
-+		"spka 0x10(0)\n\t"
-+		"spx	%0\n\t"
-+		"spka 0(0)\n"
-+	     :: "Q" (*out)
-+	);
-+}
-+
-+/*
-+ * We remapped page 0, making the lowcore inaccessible, which breaks the normal
-+ * hanlder and breaks skipping the faulting instruction.
-+ * Just disable dynamic address translation to make things work.
-+ */
-+static void dat_fixup_pgm_int(void)
-+{
-+	uint64_t psw_mask = extract_psw_mask();
-+
-+	psw_mask &= ~PSW_MASK_DAT;
-+	load_psw_mask(psw_mask);
-+}
-+
-+static void test_set_prefix(void)
-+{
-+	uint32_t *out = (uint32_t *)pagebuf;
-+	pgd_t *root;
-+
-+	root = (pgd_t *)(stctg(1) & PAGE_MASK);
-+
-+	asm volatile("stpx	%0" : "=Q"(*out));
-+
-+	report_prefix_push("SET PREFIX, zero key");
-+	set_storage_key(pagebuf, 0x20, 0);
-+	asm volatile("spx	%0" : "=Q" (*out));
-+	report_pass("no exception");
-+	report_prefix_pop();
-+
-+	report_prefix_push("SET PREFIX, matching key");
-+	set_storage_key(pagebuf, 0x10, 0);
-+	set_prefix_key_1(out);
-+	report_pass("no exception");
-+	report_prefix_pop();
-+
-+	report_prefix_push("SET PREFIX, mismatching key, no fetch protection");
-+	set_storage_key(pagebuf, 0x20, 0);
-+	set_prefix_key_1(out);
-+	report_pass("no exception");
-+	report_prefix_pop();
-+
-+	report_prefix_push("SET PREFIX, mismatching key, fetch protection");
-+	set_storage_key(pagebuf, 0x28, 0);
-+	expect_pgm_int();
-+	*out = 0xdeadbeef;
-+	set_prefix_key_1(out);
-+	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
-+	asm volatile("stpx	%0" : "=Q"(*out));
-+	report(*out != 0xdeadbeef, "no fetch occurred");
-+	report_prefix_pop();
-+
-+	register_pgm_cleanup_func(dat_fixup_pgm_int);
-+	ctl_set_bit(0, CTL0_FETCH_PROTECTION_OVERRIDE);
-+
-+	report_prefix_push("SET PREFIX, mismatching key, fetch protection override applies");
-+	set_storage_key(pagebuf, 0x28, 0);
-+	install_page(root, virt_to_pte_phys(root, pagebuf), 0);
-+	set_prefix_key_1(0);
-+	install_page(root, 0, 0);
-+	report_pass("no exception");
-+	report_prefix_pop();
-+
-+	report_prefix_push("SET PREFIX, mismatching key, fetch protection override does not apply");
-+	out = (uint32_t *)(pagebuf + 2048);
-+	set_storage_key(pagebuf, 0x28, 0);
-+	expect_pgm_int();
-+	install_page(root, virt_to_pte_phys(root, pagebuf), 0);
-+	WRITE_ONCE(*out, 0xdeadbeef);
-+	set_prefix_key_1((uint32_t *)2048);
-+	install_page(root, 0, 0);
-+	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
-+	asm volatile("stpx	%0" : "=Q"(*out));
-+	report(*out != 0xdeadbeef, "no fetch occurred");
-+	report_prefix_pop();
-+
-+	ctl_clear_bit(0, CTL0_FETCH_PROTECTION_OVERRIDE);
-+	set_storage_key(pagebuf, 0x00, 0);
-+	register_pgm_cleanup_func(NULL);
-+}
-+
- int main(void)
- {
- 	report_prefix_push("skey");
-@@ -159,6 +325,11 @@ int main(void)
- 	test_set();
- 	test_set_mb();
- 	test_chg();
-+	test_test_protection();
-+	test_store_cpu_address();
-+
-+	setup_vm();
-+	test_set_prefix();
- done:
- 	report_prefix_pop();
- 	return report_summary();
+   https://lore.kernel.org/lkml/Yc3r1U6WFVDtJCZn@google.com/
 
-base-commit: 257c962f3d1b2d0534af59de4ad18764d734903a
--- 
-2.33.1
+Since this series introduces the helper function avic_hardware_setup(),
+and re-factor the AVIC setup code into the function. So, I am including
+his recommendation in this series instead..
 
+Regards,
+Suravee
