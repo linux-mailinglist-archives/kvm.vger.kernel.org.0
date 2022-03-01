@@ -2,115 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D2C524C928D
-	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 19:06:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9B6F64C92B7
+	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 19:14:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236786AbiCASHY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Mar 2022 13:07:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52874 "EHLO
+        id S236875AbiCASO7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Mar 2022 13:14:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42382 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230148AbiCASHX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Mar 2022 13:07:23 -0500
-Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30F305DE4E
-        for <kvm@vger.kernel.org>; Tue,  1 Mar 2022 10:06:42 -0800 (PST)
-Received: by mail-ej1-x62f.google.com with SMTP id gb39so33151445ejc.1
-        for <kvm@vger.kernel.org>; Tue, 01 Mar 2022 10:06:42 -0800 (PST)
+        with ESMTP id S236872AbiCASOw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Mar 2022 13:14:52 -0500
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A8BB63BDA
+        for <kvm@vger.kernel.org>; Tue,  1 Mar 2022 10:14:09 -0800 (PST)
+Received: by mail-pf1-x42a.google.com with SMTP id g1so15021216pfv.1
+        for <kvm@vger.kernel.org>; Tue, 01 Mar 2022 10:14:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=hc+la0U9z5sF1wjuzpoAsI8bZOypHdVZX1vD0aADe74=;
-        b=qKpw9l26wiRybylQJZiYYTneChfm1HgNCnDKaEpsBSDFGb6rKM/cmHEFJ208nnRnwp
-         xQfa1UWshwsZL5m5CtpsnVwLGMpQ/OGX35605LcC2XqstLRT4n3v1wKI+OLrYbqxVaPC
-         MgUaCwJk5wuauXVDWcc/4N7NWDZcn8ldsfrPtzbXRwVD47MOXSeNihZ+9CusBpfPeR0N
-         ZiLnwialy6z4jd32aXsc1SjMyL3eXgSFE7netwfjP388Twl8GBoCTT8iKN7kfacRjQqP
-         oEZEXc2R6nsLB7jwrghgfpQqlLwikO2yrDOStfV69i/T1ZeHT9cfCnYl+fv0sQkMUDup
-         qx5g==
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=N36sF4HUer+rUuc5VxWx2NxZT2Mje9G1bKhkVtQFmow=;
+        b=O9Pc4FRhQaHO8JwtvKmEa7P/p93QhIWPziYnJxBP3SmXkKfXwbS/+UXcAcizlZe2qE
+         5++D1AzgFSiNA6GVcHz58RghXwcZj0T+stAg2S8I6BdGwjnEpqEP1SHJlTJIwhdk7I/A
+         Km+JuAoSqO/aabb7J1BxN3aslickTdbOZI2Hw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=hc+la0U9z5sF1wjuzpoAsI8bZOypHdVZX1vD0aADe74=;
-        b=T8mDBs8budh/TQq2pqp9njDZ89/4X/zcvGR2LoH6cVAt33iNGGURyL50axkkbWHoKE
-         wxNZB4ZtFbrx7cuVhizZk5aTRe3C/NjwkOvIfj0GqGIF8qaIzjBRNHFtFmvsHxInn1jj
-         jbjImFAGi7Ecr7wHHZnk+9Axf29tepQ7sA5cZFZE4ZzazXbsBVNT6yH5rzhwrASRYlQd
-         X8baVex+WJeN1xPy2S3x5rkybT6i1senSWlDyCnyYTK+CqZnHbxHelPDmzyigqw3Yr8W
-         3R93jS6XnsLEDcrhVTcv9lo8bn6NXnW4qYCEt3DjUSPZSY97IXFpozCEwLGioDntzvgA
-         LWkw==
-X-Gm-Message-State: AOAM532DJnSiMqJ+UqLNSizShvdp5xo1ySoCWUE805L58ubqRiepm0Fy
-        iiolnt8+w5OZ/R3YEhVqoyYzAc1z3v5x98GNNZecIA==
-X-Google-Smtp-Source: ABdhPJy4LDHHSE+zUliqU4kzYZ+GgNq6vdP3ndMDVZDwLY6n8X23fU4ClJ3EPBJ1VR8nKdMWj/Yd7ROpFo9sygYVoi4=
-X-Received: by 2002:a17:906:2486:b0:6cf:ced9:e4cc with SMTP id
- e6-20020a170906248600b006cfced9e4ccmr19870864ejb.201.1646158000527; Tue, 01
- Mar 2022 10:06:40 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=N36sF4HUer+rUuc5VxWx2NxZT2Mje9G1bKhkVtQFmow=;
+        b=wkiCNXFDB0GvUqHGt+nKIPko83wiYi19TbKuGNP5K6w5roFIcExtlLd4E/Cm+SlqPT
+         rmi2DZXIX2UJhxSTOCeeQvZQW2U1ZI1Fj8lf1IcjtvmZvOAIeA7agOUuGWvmrQy8Hx7e
+         becUzwP9/m7+5t+jqgDyx/Fd2wrFtyd/JvGHtuH+J2d7L3Ni8I23tZbsFYQrsLx8+3ba
+         j47rYMcCiDzDy0qa/MPocOxyEgTIRJMwnYeuVRz0doTiFth/6IoX0C2PpmlJ7Owsa77J
+         doVvjYRez8c+lTAPGHA8c0U0shblw3mYrwO5MMEnFNmarqcM1eAVZ4198sJwEC+z22qF
+         GZ2g==
+X-Gm-Message-State: AOAM531zc2x7cFhsNbVwxCVZHgCKcJfzDGdOWxEu1DK+qV4FzbLCCX6d
+        F7+Sv+ZKvyZrEgSo5moIgiPD5w==
+X-Google-Smtp-Source: ABdhPJwl/oZl7jTR8Xbiy0diMdVywUoBtjuUV8iCsVjT5dJdX8x+nPRIiFjmEv3Xm0s1V2wXWPjOfA==
+X-Received: by 2002:a62:d156:0:b0:4cd:fd21:e406 with SMTP id t22-20020a62d156000000b004cdfd21e406mr28741951pfl.44.1646158448831;
+        Tue, 01 Mar 2022 10:14:08 -0800 (PST)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id nn10-20020a17090b38ca00b001bc3a60b324sm2540095pjb.46.2022.03.01.10.14.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Mar 2022 10:14:08 -0800 (PST)
+Date:   Tue, 1 Mar 2022 10:14:07 -0800
+From:   Kees Cook <keescook@chromium.org>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Matthew Wilcox <willy@infradead.org>,
+        Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+        Jakob Koschel <jakobkoschel@gmail.com>,
+        alsa-devel@alsa-project.org, linux-aspeed@lists.ozlabs.org,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        linux-iio@vger.kernel.org, nouveau@lists.freedesktop.org,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        dri-devel <dri-devel@lists.freedesktop.org>,
+        Cristiano Giuffrida <c.giuffrida@vu.nl>,
+        amd-gfx list <amd-gfx@lists.freedesktop.org>,
+        samba-technical@lists.samba.org,
+        linux1394-devel@lists.sourceforge.net, drbd-dev@lists.linbit.com,
+        linux-arch <linux-arch@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        linux-rdma <linux-rdma@vger.kernel.org>,
+        linux-staging@lists.linux.dev, "Bos, H.J." <h.j.bos@vu.nl>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        intel-wired-lan@lists.osuosl.org,
+        kgdb-bugreport@lists.sourceforge.net,
+        bcm-kernel-feedback-list@broadcom.com,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Linux Media Mailing List <linux-media@vger.kernel.org>,
+        Arnd Bergman <arnd@arndb.de>,
+        Linux PM <linux-pm@vger.kernel.org>,
+        intel-gfx <intel-gfx@lists.freedesktop.org>,
+        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        v9fs-developer@lists.sourceforge.net,
+        linux-tegra <linux-tegra@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-sgx@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>, linux-usb@vger.kernel.org,
+        linux-wireless <linux-wireless@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux F2FS Dev Mailing List 
+        <linux-f2fs-devel@lists.sourceforge.net>,
+        tipc-discussion@lists.sourceforge.net,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        dma <dmaengine@vger.kernel.org>,
+        linux-mediatek@lists.infradead.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        Mike Rapoport <rppt@kernel.org>
+Subject: Re: [PATCH 2/6] treewide: remove using list iterator after loop body
+ as a ptr
+Message-ID: <202203011008.AA0B5A2D@keescook>
+References: <20220228110822.491923-1-jakobkoschel@gmail.com>
+ <20220228110822.491923-3-jakobkoschel@gmail.com>
+ <2e4e95d6-f6c9-a188-e1cd-b1eae465562a@amd.com>
+ <CAHk-=wgQps58DPEOe4y5cTh5oE9EdNTWRLXzgMiETc+mFX7jzw@mail.gmail.com>
+ <CAHk-=wj8fkosQ7=bps5K+DDazBXk=ypfn49A0sEq+7-nZnyfXA@mail.gmail.com>
+ <CAHk-=wiTCvLQkHcJ3y0hpqH7FEk9D28LDvZZogC6OVLk7naBww@mail.gmail.com>
+ <Yh0tl3Lni4weIMkl@casper.infradead.org>
+ <CAHk-=wgBfJ1-cPA2LTvFyyy8owpfmtCuyiZi4+um8DhFNe+CyA@mail.gmail.com>
+ <Yh1aMm3hFe/j9ZbI@casper.infradead.org>
+ <CAHk-=wi0gSUMBr2SVF01Gy1xC1w1iGtJT5ztju9BPWYKjdh+NA@mail.gmail.com>
 MIME-Version: 1.0
-References: <20220226001546.360188-1-seanjc@google.com> <20220226001546.360188-24-seanjc@google.com>
-In-Reply-To: <20220226001546.360188-24-seanjc@google.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Tue, 1 Mar 2022 10:06:29 -0800
-Message-ID: <CANgfPd-hZ0Epib2ZoQULhZkY1x4TFn6_wENnbGsiN9sHsHu2+Q@mail.gmail.com>
-Subject: Re: [PATCH v3 23/28] KVM: x86/mmu: Check for a REMOVED leaf SPTE
- before making the SPTE
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        David Hildenbrand <david@redhat.com>,
-        kvm <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
-        David Matlack <dmatlack@google.com>,
-        Mingwei Zhang <mizhang@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-18.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wi0gSUMBr2SVF01Gy1xC1w1iGtJT5ztju9BPWYKjdh+NA@mail.gmail.com>
+X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 25, 2022 at 4:16 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> Explicitly check for a REMOVED leaf SPTE prior to attempting to map
-> the final SPTE when handling a TDP MMU fault.  Functionally, this is a
-> nop as tdp_mmu_set_spte_atomic() will eventually detect the frozen SPTE.
-> Pre-checking for a REMOVED SPTE is a minor optmization, but the real goal
-> is to allow tdp_mmu_set_spte_atomic() to have an invariant that the "old"
-> SPTE is never a REMOVED SPTE.
->
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+On Mon, Feb 28, 2022 at 04:45:11PM -0800, Linus Torvalds wrote:
+> Really. The "-Wshadow doesn't work on the kernel" is not some new
+> issue, because you have to do completely insane things to the source
+> code to enable it.
 
-Reviewed-by: Ben Gardon <bgardon@google.com>
+The first big glitch with -Wshadow was with shadowed global variables.
+GCC 4.8 fixed that, but it still yells about shadowed functions. What
+_almost_ works is -Wshadow=local. At first glace, all the warnings
+look solvable, but then one will eventually discover __wait_event()
+and associated macros that mix when and how deeply it intentionally
+shadows variables. :)
 
-> ---
->  arch/x86/kvm/mmu/tdp_mmu.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 4151e61245a7..1acd12bf309f 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -1250,7 +1250,11 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
->                 }
->         }
->
-> -       if (iter.level != fault->goal_level) {
-> +       /*
-> +        * Force the guest to retry the access if the upper level SPTEs aren't
-> +        * in place, or if the target leaf SPTE is frozen by another CPU.
-> +        */
-> +       if (iter.level != fault->goal_level || is_removed_spte(iter.old_spte)) {
->                 rcu_read_unlock();
->                 return RET_PF_RETRY;
->         }
-> --
-> 2.35.1.574.g5d30c73bfb-goog
->
+Another way to try to catch misused shadow variables is
+-Wunused-but-set-varible, but it, too, has tons of false positives.
+
+I tried to capture some of the rationale and research here:
+https://github.com/KSPP/linux/issues/152
+
+-- 
+Kees Cook
