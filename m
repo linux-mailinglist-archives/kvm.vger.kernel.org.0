@@ -2,74 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3EFEB4C9225
-	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 18:46:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A82194C923B
+	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 18:55:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236430AbiCARqx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Mar 2022 12:46:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40742 "EHLO
+        id S236493AbiCARzk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Mar 2022 12:55:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59774 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232674AbiCARqw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Mar 2022 12:46:52 -0500
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E44661A15
-        for <kvm@vger.kernel.org>; Tue,  1 Mar 2022 09:46:10 -0800 (PST)
-Received: by mail-pf1-x42f.google.com with SMTP id t5so5862433pfg.4
-        for <kvm@vger.kernel.org>; Tue, 01 Mar 2022 09:46:10 -0800 (PST)
+        with ESMTP id S233838AbiCARzj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Mar 2022 12:55:39 -0500
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5091419A5
+        for <kvm@vger.kernel.org>; Tue,  1 Mar 2022 09:54:58 -0800 (PST)
+Received: by mail-pf1-x42c.google.com with SMTP id p8so14947751pfh.8
+        for <kvm@vger.kernel.org>; Tue, 01 Mar 2022 09:54:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=hW/YZmS7wpJS7lNeC9TLZr2YM2tyw8ZN9mG1toRHUEY=;
-        b=n6SeFINnZOt1ieREkJkw7GKfq+9aKjZo1/dOXyhxGUtAm9PLy7rNDfN85E/cKEVcOh
-         1qJbKM2d4+FwBYEsjudLw2YwA+/gaRuopRoOzGC961IREwjWo7DHJRxCIsyFq/9/zH7H
-         iU06/1PIlDpoPUhu44O1GYUzn+Y1ERDQ4hvLMa8CVD8XXRAWhAa7nOeC1uOqy5nNdhCd
-         FD5hiuSRYZ1mVsECmjuoXAVG3jFIHx4DbO40wuuKWwgoHAs/be87O5alVV+56QkHQMpz
-         OjgGz+fh4+boeUTAXspKSs83GBug9vmVjaPPs4RG7dkVdCRZj3Bw7CAqFUFf5IWOfJ6v
-         uzLQ==
+        bh=IrlX1EuXuhvZFO5dyfwsKkbcsiZCA12sMewuJW1ZcQg=;
+        b=VaCU/amEuSGHsWyLjWVzhe4lT4UoHiib+D1qJwuxcT0I0vyV/0YaAhz5h0ndF6eg8c
+         Cit87v2fsFLtpZ965a6BJbXSLH1dL2gZsxv9ZYp5SlLL3Yf4b52bk00PMi4SLUgddVDD
+         E1Nf01htX0Ejx69EUqV/ZWhuP16S1Ub8joiSbL2DtYbay7LGYmo9oigmnDhNWytR56xr
+         zHGG9Rla0TY0wMTspHpdcNjFUB/t2V6l7vXKjXlTXp65Ae+G7S5hSszJU6TAe7uhOrIW
+         x8vicH6kLZUq0hqfNFxXd9egOibFCmoFZDhWw+BijO+9X8sid1SgUKaXvwj/SULQRGLe
+         wIcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=hW/YZmS7wpJS7lNeC9TLZr2YM2tyw8ZN9mG1toRHUEY=;
-        b=QwJGfreApe2Yzb78iAJjgQ1y4UY5pR7XETnihMaBqDXgZFp92uDz4RA2qaDp0jWqQa
-         Mz3ih5JSjgUEUM/6DQI6N98nu6uUBTKLMcwXsHcH4Rk2zZ1mOEkCSFLufwhdOhHVMU/r
-         /aeUHWBuNee/j2cwWEuGlDqzY/qwjTCCc5G++58Em+r2wBeLyOHC6F1TBURFQVzx6+Dy
-         p9z9hpITt5Xsm8Y3OGDrAdGOZMOS6jR71GRKes7JP30+7I8QomumeiqNAY/1RKI/0zzk
-         78rwJnbLNchAZbJxfny3ixHoqeb9DTEXI85kQ65p31syck5TJv9VFqzoR1SQ6+CEVIsa
-         fvIw==
-X-Gm-Message-State: AOAM532y1sa15GWYO41HXXLJ/nLGnShxRRvzJcNS4423gb4bibUmsqxv
-        lDlg5qdT7NSqk4EeBA9DxGVwAA==
-X-Google-Smtp-Source: ABdhPJy29O9ruXlkZmz1FBD3hlywTLo4gG7yfSObUN32u+vZmDmQg1WYvsMi+/Is29GgqniD50TNfw==
-X-Received: by 2002:a05:6a00:a92:b0:4e0:57a7:2d5d with SMTP id b18-20020a056a000a9200b004e057a72d5dmr28694355pfl.81.1646156769845;
-        Tue, 01 Mar 2022 09:46:09 -0800 (PST)
+        bh=IrlX1EuXuhvZFO5dyfwsKkbcsiZCA12sMewuJW1ZcQg=;
+        b=3emFGAyhWAk+WRP/ivQ6xIU65enTyeAG/Np/ZhDPjVewhMkHrUIR4Y+AyrJv+A6fRK
+         wP8HW9DWG+w/Ti0x1w7EeVc5pAde1sT/3dCf1rtQizEY0lLEMMnsI9/aoAqPSFbE5YZh
+         7xC6jc5zILMsEX6yqJVmN/YlMutCP1mnvouHaY/kWCti9j19n8e8ikaaQ0fBXJbVy2EU
+         /XRhon/POQTMUnrNVQunPESoBC28Tz2lMMMH6QYKC/m37pVk8Op0eWWymDY4dJ6Etg5/
+         Sj+9HzjiGQbR7PifKPAUh5ash6N91bEkCwlh9blg5BhRblDmmlkGmICRXr8nVbuqkidH
+         mGag==
+X-Gm-Message-State: AOAM533+roVmrdJ9Ms3NceuUFzv/qqfn5GY5VbqU2V/B9ycgyPWbGoPK
+        0RXn+j8T7rSosq+cV/Njp3JHEQ==
+X-Google-Smtp-Source: ABdhPJzQ+0ITtmk7Ryr/RS5lmTXIldDRcloM8HHgtST1nO90BTbDSEp+Dxflytdbw/6uQN1KOq5Ugg==
+X-Received: by 2002:a63:e60:0:b0:374:6620:f372 with SMTP id 32-20020a630e60000000b003746620f372mr22253197pgo.557.1646157298000;
+        Tue, 01 Mar 2022 09:54:58 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id me10-20020a17090b17ca00b001b9e6f62045sm2700322pjb.41.2022.03.01.09.46.09
+        by smtp.gmail.com with ESMTPSA id k130-20020a633d88000000b00378c359ea29sm4384360pga.12.2022.03.01.09.54.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Mar 2022 09:46:09 -0800 (PST)
-Date:   Tue, 1 Mar 2022 17:46:05 +0000
+        Tue, 01 Mar 2022 09:54:57 -0800 (PST)
+Date:   Tue, 1 Mar 2022 17:54:53 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     kvm@vger.kernel.org, Jim Mattson <jmattson@google.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Borislav Petkov <bp@alien8.de>, x86@kernel.org
-Subject: Re: [PATCH 4/4] KVM: x86: lapic: don't allow to set non default apic
- id when not using x2apic api
-Message-ID: <Yh5b3eBYK/rGzFfj@google.com>
-References: <20220301135526.136554-1-mlevitsk@redhat.com>
- <20220301135526.136554-5-mlevitsk@redhat.com>
- <Yh5QJ4dJm63fC42n@google.com>
- <6f4819b4169bd4e2ca9ab710388ebd44b7918eed.camel@redhat.com>
+To:     Peng Hao <flyingpenghao@gmail.com>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH]  kvm: x86: Improve virtual machine startup performance
+Message-ID: <Yh5d7XBD9D4FhEe3@google.com>
+References: <20220301063756.16817-1-flyingpeng@tencent.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6f4819b4169bd4e2ca9ab710388ebd44b7918eed.camel@redhat.com>
+In-Reply-To: <20220301063756.16817-1-flyingpeng@tencent.com>
 X-Spam-Status: No, score=-18.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -81,58 +70,35 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 01, 2022, Maxim Levitsky wrote:
-> > > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > > index 80a2020c4db40..8d35f56c64020 100644
-> > > --- a/arch/x86/kvm/lapic.c
-> > > +++ b/arch/x86/kvm/lapic.c
-> > > @@ -2618,15 +2618,14 @@ static int kvm_apic_state_fixup(struct kvm_vcpu *vcpu,
-> > >  		u32 *ldr = (u32 *)(s->regs + APIC_LDR);
-> > >  		u64 icr;
-> > >  
-> > > -		if (vcpu->kvm->arch.x2apic_format) {
-> > > -			if (*id != vcpu->vcpu_id)
-> > > -				return -EINVAL;
-> > > -		} else {
-> > > -			if (set)
-> > > -				*id >>= 24;
-> > > -			else
-> > > -				*id <<= 24;
-> > > -		}
-> > > +		if (!vcpu->kvm->arch.x2apic_format && set)
-> > > +			*id >>= 24;
-> > > +
-> > > +		if (*id != vcpu->vcpu_id)
-> > > +			return -EINVAL;
-> > 
-> > This breaks backwards compability, userspace will start failing where it previously
-> > succeeded.  It doesn't even require a malicious userspace, e.g. if userspace creates
-> > a vCPU with a vcpu_id > 255 vCPUs, the shift will truncate and cause failure.  It'll
-> > obviously do weird things, but this code is 5.5 years old, I don't think it's worth
-> > trying to close a loophole that doesn't harm KVM.
-> > 
-> > If we provide a way for userspace to opt into disallowiong APICID != vcpu_id, we
-> > can address this further upstream, e.g. reject vcpu_id > 255 without x2apic_format.
+On Tue, Mar 01, 2022, Peng Hao wrote:
+>  From: Peng Hao <flyingpeng@tencent.com>
 > 
-> This check is only when CPU is in x2apic mode. In this mode the X86 specs demands that
-> apic_id == vcpu_id.
+> vcpu 0 will repeatedly enter/exit the smm state during the startup
+> phase, and kvm_init_mmu will be called repeatedly during this process.
+> There are parts of the mmu initialization code that do not need to be
+> modified after the first initialization.
+> 
+> Statistics on my server, vcpu0 when starting the virtual machine
+> Calling kvm_init_mmu more than 600 times (due to smm state switching).
+> The patch can save about 36 microseconds in total.
+> 
+> Signed-off-by: Peng Hao <flyingpeng@tencent.com>
+> ---
+> @@ -5054,7 +5059,7 @@ void kvm_mmu_after_set_cpuid(struct kvm_vcpu *vcpu)
+>  void kvm_mmu_reset_context(struct kvm_vcpu *vcpu)
+>  {
+>  	kvm_mmu_unload(vcpu);
+> -	kvm_init_mmu(vcpu);
+> +	kvm_init_mmu(vcpu, false);
 
-AMD's APM explicitly allows changing the x2APIC ID by writing the xAPIC ID and then
-switching to x2APIC mode.
+This is wrong, kvm_mmu_reset_context() is the "big hammer" and is expected to
+unconditionally get the MMU to a known good state.  E.g. failure to initialize
+means this code:
 
-> When old API is used, APIC IDs are encoded in xapic format, even when vCPU is in x2apic
-> mode, meaning that apic id can't be more  that 255 even in x2apic mode.
+	context->shadow_root_level = kvm_mmu_get_tdp_level(vcpu);
 
-Even on Intel CPUs, if userspace creates a vCPU with vcpu_id = 256, then the xAPIC ID
-will be (256 << 24) == 0.  If userspace does get+set, then KVM will see 0 != 256 and
-reject the set with return -EINVAL.
+will not update the shadow_root_level as expected in response to userspace changing
+guest.MAXPHYADDR in such a way that KVM enables/disables 5-level paging.
 
-And as above, userspace that hasn't opted into the x2apic_format could also legitimately
-change the x2APIC ID.
-
-I 100% agree this is a mess and probably can't work without major shenanigans, but on
-the other hand this isn't harming anything, so why risk breaking userspace, even if the
-risk is infinitesimally small?
-
-I'm all for locking down the APIC ID with a userspace opt-in control, I just don't
-think it's worth trying to retroactively plug the various holes in KVM.
+The SMM transitions definitely need to be fixed, and we're slowly getting there,
+but sadly there's no quick fix.
