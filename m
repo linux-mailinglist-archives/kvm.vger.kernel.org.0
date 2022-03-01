@@ -2,132 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C1F74C8F34
-	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 16:36:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F2C1B4C8F53
+	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 16:43:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235811AbiCAPgo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Mar 2022 10:36:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33720 "EHLO
+        id S235860AbiCAPnm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Mar 2022 10:43:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46420 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235671AbiCAPgn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Mar 2022 10:36:43 -0500
-Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 133C8A997C
-        for <kvm@vger.kernel.org>; Tue,  1 Mar 2022 07:36:02 -0800 (PST)
-Received: by mail-pg1-x530.google.com with SMTP id z4so14649736pgh.12
-        for <kvm@vger.kernel.org>; Tue, 01 Mar 2022 07:36:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=jUOsJO0Kh4op4ysiBpAZaJEjcEJRjoValu/KGpdNufI=;
-        b=Xx/fToonpb0BLFsiJYajJg5bmf9rg6IkQTVt3S2dztqjE74NoV3y6ZAu+8QUwe57Ho
-         yBtU7cxUQs7WbULkkg3MVcP0Qnp3G2k6WD1bawRHA4NPXirp8TmOyJ83BWCufpPvN2xK
-         Mmms2hWOAEhgr7ZUjf9RBd0Id20pNThct9EWADODJyPTT5bdvzYsPzi6iGXuH9EZlnod
-         Q1R0puyPWOa58YzCjkwHWv+5gHc8UkwjenIRpQoj7w6lqOkAgqc39lO574Y7ffpOlJ2+
-         fxOT3SHB/pyJdoNnTf+vg4CGc2X5TfZllqNC1d/HiHhIo963WD5kx4UX/iG16dGunXoF
-         p4GQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=jUOsJO0Kh4op4ysiBpAZaJEjcEJRjoValu/KGpdNufI=;
-        b=54uodGg1Y9/0cGNrJaiDnvZF72eCkqECiYbXvHBanU2AYH4WwXDT23dgi+r/5tuk6t
-         rLSNhHbyCV17PsT17LV+LAL6DlfRhXqlsQlzYTF5lIfAaZExI+cvAr31FckeG39Nf5yj
-         SEwNtugGhfGcgKStse0nF6ydNvTBBAftvG5r+OZSJWxASHZfk5CCrx3W1YHkNYvB+Yp+
-         SQizYr7w7kvxml0PYJogmFwb5ZIR0Z5szn0AQSuXzsf7hyPbK3p9yFJNaja3yAQx4V1H
-         TS789xbMEGQ0Qh+qGnbNgR0RqBHwpduMBAq0/8/UTHbVYpYFHhAnkZ0ZlsnTZKdtsnZA
-         8WJg==
-X-Gm-Message-State: AOAM530yL8lChBBTrMO06599rfgaRrxyneG+8JCZG3pYlpS1AxjrxYpW
-        7THvapTLc2tobH7nJk6PV56Wyw==
-X-Google-Smtp-Source: ABdhPJwfTxSMRJIEVSZW5P0MeCJh888AvLZ+3mjfn41HW4RdLcUjEGXvFimCPbn2krTT5qZhI1Curw==
-X-Received: by 2002:a63:f912:0:b0:372:bac6:b92d with SMTP id h18-20020a63f912000000b00372bac6b92dmr21836548pgi.265.1646148961137;
-        Tue, 01 Mar 2022 07:36:01 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id k20-20020a056a00135400b004ecc81067b8sm19037987pfu.144.2022.03.01.07.36.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Mar 2022 07:36:00 -0800 (PST)
-Date:   Tue, 1 Mar 2022 15:35:57 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Lai Jiangshan <jiangshanlai@gmail.com>
-Subject: Re: [PATCH v2 7/7] KVM: WARN if is_unsync_root() is called on a root
- without a shadow page
-Message-ID: <Yh49XaSR88HZCmQa@google.com>
-References: <20220225182248.3812651-1-seanjc@google.com>
- <20220225182248.3812651-8-seanjc@google.com>
- <CANgfPd_zdQAu7m1M_g0wy0wsUpyHDtbE+tUZOKQN59y0ABpvPw@mail.gmail.com>
+        with ESMTP id S233234AbiCAPnk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Mar 2022 10:43:40 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DCF34BFF6;
+        Tue,  1 Mar 2022 07:42:58 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 039F46166E;
+        Tue,  1 Mar 2022 15:42:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29085C340EE;
+        Tue,  1 Mar 2022 15:42:55 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Kac+Ghbs"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1646149373;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type;
+        bh=JLiE20ERfAkQFV80+EpmUJ32l4pWt7u7GFd3/Smjljc=;
+        b=Kac+Ghbs0J+S7FgJnGjfLHTzX3vnHgJEAB0OxfoQbxx04yySDohXAMM2HRfEeyUEK2OqK/
+        pmZCqrjaD2690aWP1GxnDzgjg7GPEdvD3QdFZ3AFITYG1z3LFxNjADK6jlyoY+y3i54pu0
+        CjjzcBGVb2Fze1SPHfZMLuDTnBcZhtc=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id bf755614 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Tue, 1 Mar 2022 15:42:53 +0000 (UTC)
+Date:   Tue, 1 Mar 2022 16:42:47 +0100
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        qemu-devel@nongnu.org, linux-hyperv@vger.kernel.org,
+        linux-crypto@vger.kernel.org, graf@amazon.com,
+        mikelley@microsoft.com, gregkh@linuxfoundation.org,
+        adrian@parity.io, lersek@redhat.com, berrange@redhat.com,
+        linux@dominikbrodowski.net, jannh@google.com, mst@redhat.com,
+        rafael@kernel.org, len.brown@intel.com, pavel@ucw.cz,
+        linux-pm@vger.kernel.org, colmmacc@amazon.com, tytso@mit.edu,
+        arnd@arndb.de
+Subject: propagating vmgenid outward and upward
+Message-ID: <Yh4+9+UpanJWAIyZ@zx2c4.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CANgfPd_zdQAu7m1M_g0wy0wsUpyHDtbE+tUZOKQN59y0ABpvPw@mail.gmail.com>
-X-Spam-Status: No, score=-18.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-6.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 28, 2022, Ben Gardon wrote:
-> On Fri, Feb 25, 2022 at 10:23 AM Sean Christopherson <seanjc@google.com> wrote:
-> >
-> > WARN and bail if is_unsync_root() is passed a root for which there is no
-> > shadow page, i.e. is passed the physical address of one of the special
-> > roots, which do not have an associated shadow page.  The current usage
-> > squeaks by without bug reports because neither kvm_mmu_sync_roots() nor
-> > kvm_mmu_sync_prev_roots() calls the helper with pae_root or pml4_root,
-> > and 5-level AMD CPUs are not generally available, i.e. no one can coerce
-> > KVM into calling is_unsync_root() on pml5_root.
-> >
-> > Note, this doesn't fix the mess with 5-level nNPT, it just (hopefully)
-> > prevents KVM from crashing.
-> >
-> > Cc: Lai Jiangshan <jiangshanlai@gmail.com>
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >  arch/x86/kvm/mmu/mmu.c | 8 ++++++++
-> >  1 file changed, 8 insertions(+)
-> >
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index 825996408465..3e7c8ad5bed9 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -3634,6 +3634,14 @@ static bool is_unsync_root(hpa_t root)
-> >          */
-> >         smp_rmb();
-> >         sp = to_shadow_page(root);
-> > +
-> > +       /*
-> > +        * PAE roots (somewhat arbitrarily) aren't backed by shadow pages, the
-> > +        * PDPTEs for a given PAE root need to be synchronized individually.
-> > +        */
-> > +       if (WARN_ON_ONCE(!sp))
-> > +               return false;
-> > +
-> 
-> I was trying to figure out if this should be returning true or false,
-> but neither really seems correct. Since we never expect this to fire,
-> perhaps it doesn't matter and it's easier to just return false so the
-> callers don't need to be changed.
+Hey folks,
 
-Yep, neither is correct.
+Having finally wrapped up development of the initial vmgenid driver, I
+thought I'd pull together some thoughts on vmgenid, notification, and
+propagating, from disjointed conversations I've had with a few of you
+over the last several weeks.
 
-> If this did fire in a production scenario, I'd want it to terminate the VM
-> too.
+The basic problem is: VMs can be cloned, forked, rewound, or
+snapshotted, and when this happens, a) the RNG needs to reseed itself,
+and b) cryptographic algorithms that are not reuse resistant need to
+reinitialize in one way or another. For 5.18, we're handling (a) via the
+new vmgenid driver, which implements a spec from Microsoft, whereby the
+driver receives ACPI notifications when a 16 byte unique value changes.
 
-Me too, but practically speaking this should never get anywhere near production.
-IMO, it's not worth plumbing in @kvm just to be able to do KVM_BUG_ON.
+The vmgenid driver basically works, though it is racy, because that ACPI
+notification can arrive after the system is already running again. This
+race is even worse on Windows, where they kick the notification into a
+worker thread, which then publishes it upward elsewhere to another async
+mechanism, and eventually it hits the RNG and various userspace apps.
+On Linux it's not that bad -- we reseed immediately upon receiving the
+notification -- but it still inherits this same "push"-model deficiency,
+which a "pull"-model would not have.
+
+If we had a "pull" model, rather than just expose a 16-byte unique
+identifier, the vmgenid virtual hardware would _also_ expose a
+word-sized generation counter, which would be incremented every time the
+unique ID changed. Then, every time we would touch the RNG, we'd simply
+do an inexpensive check of this memremap()'d integer, and reinitialize
+with the unique ID if the integer changed. In this way, the race would
+be entirely eliminated. We would then be able to propagate this outwards
+to other drivers, by just exporting an extern symbol, in the manner of
+`jiffies`, and propagate it upwards to userspace, by putting it in the
+vDSO, in the manner of gettimeofday. And like that, there'd be no
+terrible async thing and things would work pretty easily.
+
+But that's not what we have, because Microsoft didn't collaborate with
+anybody on this, and now it's implemented in several hypervisors. Given
+that I'm already spending considerable time working on the RNG, entirely
+without funding, somehow I'm not super motivated to lead a
+cross-industry political effort to change Microsoft's vmgenid spec.
+Maybe somebody else has an appetite for this, but either way, those
+changes would be several years off at best.
+
+So given we have a "push"-model mechanism, there are two problems to
+tackle, perhaps in the same way, perhaps in a different way:
+
+A) Outwards propagation toward other kernel drivers: in this case, I
+   have in mind WireGuard, naturally, which very much needs to clear its
+   existing sessions when VMs are forked.
+
+B) Upwards propagation to userspace: in this case, we handle the
+   concerns of the Amazon engineers on this thread who broached this
+   topic a few years ago, in which s2n, their TLS library, wants to
+   reinitialize its userspace RNG (a silly thing, but I digress) and
+   probably clear session keys too, for the same good reason as
+   WireGuard.
+
+For (A), at least wearing my WireGuard-maintainer hat, there is an easy
+way and there is a "race-free" way. I use scare quotes there because
+we're still in a "push"-model, which means it's still racy no matter
+what.
+
+The faux "race-free" way involves having `extern u32 rng_vm_generation;`
+or similar in random.h, and then everything that generates a session key
+would snapshot this value, and every time a session key is used, a
+comparison would be made. This works, but given that we're going to be
+racy no matter what, I think I'd prefer avoiding the extra code in the
+hot path and extra per-session storage. It seems like that'd involve a
+lot of fiddly engineering for no real world benefit.
+
+The easy way, and the way that I think I prefer, would be to just have a
+sync notifier_block for this, just like we have with
+register_pm_notifier(). From my perspective, it'd be simplest to just
+piggy back on the already existing PM notifier with an extra event,
+PM_POST_VMFORK, which would join the existing set of 7, following
+PM_POST_RESTORE. I think that'd be coherent. However, if the PM people
+don't want to play ball, we could always come up with our own
+notifier_block. But I don't see the need. Plus, WireGuard *already*
+uses the PM notifier for clearing keys, so code-wise for my use case,
+that'd amount adding another case for PM_POST_VMFORK, in addition to the
+currently existing PM_HIBERNATION_PREPARE and PM_SUSPEND_PREPARE cases,
+which all would be treated the same way. Ezpz. So if that sounds like an
+interesting thing to the PM people, I think I'd like to propose a patch
+for that, possibly even for 5.18, given that it'd be very straight-
+forward.
+
+For (B), it's a little bit trickier. But I think our options follow the
+same rubric. We can expose a generation counter in the vDSO, with
+semantics akin to the extern integer I described above. Or we could
+expose that counter in a file that userspace could poll() on and receive
+notifications that way. Or perhaps a third way. I'm all ears here.
+Alex's team from Amazon last year proposed something similar to the vDSO
+idea, except using mmap on a sysfs file, though from what I can tell,
+that wound up being kind of complicated. Due to the fact that we're
+_already_ racy, I think I'm most inclined at this point toward the
+poll() approach for the same reasons as I prefer a notifier_block. But
+on userspace I could be convinced otherwise, and I'd be interested in
+totally different ideas here too.
+
+Another thing I should note is that, while I'm not currently leaning
+toward it, the vDSO approach also ties into interesting discussions
+about userspace RNGs (generally a silly idea), and their need for things
+like fork detection and also learning when the kernel RNG was last
+reseeded. So cracking open the vDSO book might invite all sorts of other
+interesting questions and discussions, which may be productive or may be
+a humongous distraction. (Also, again, I'm not super enthusiastic about
+userspace RNGs.)
+
+Also, there is an interesting question to decide with regards to
+userspace, which is whether the vmgenid driver should expose its unique
+ID to userspace, as Alex requested on an earlier thread. I am actually
+sort of opposed to this. That unique ID may or may not be secret and
+entropic; if it isn't, the crypto is designed to not be impacted
+negatively, but if it is, we should keep it secret. So, rather, I think
+the correct flow is that userspace simply calls getrandom() upon
+learning that the VM forked, which is guaranteed to have been
+reinitialized already by add_vmfork_randomness(), and that will
+guarantee a value that is unique to the VM, without having to actually
+expose that value.
+
+So, anyway, this is more or less where my thinking on this matter is.
+Would be happy to hear some fresh ideas here too.
+
+Regards,
+Jason
