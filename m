@@ -2,125 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D62DA4C9203
-	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 18:40:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3EFEB4C9225
+	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 18:46:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236696AbiCARla (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Mar 2022 12:41:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52384 "EHLO
+        id S236430AbiCARqx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Mar 2022 12:46:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40742 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236689AbiCARlS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Mar 2022 12:41:18 -0500
-Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A557A3FD9A;
-        Tue,  1 Mar 2022 09:40:08 -0800 (PST)
-Received: by mail-ej1-x62f.google.com with SMTP id qk11so33047112ejb.2;
-        Tue, 01 Mar 2022 09:40:08 -0800 (PST)
+        with ESMTP id S232674AbiCARqw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Mar 2022 12:46:52 -0500
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E44661A15
+        for <kvm@vger.kernel.org>; Tue,  1 Mar 2022 09:46:10 -0800 (PST)
+Received: by mail-pf1-x42f.google.com with SMTP id t5so5862433pfg.4
+        for <kvm@vger.kernel.org>; Tue, 01 Mar 2022 09:46:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=pFdYiycpncfTymiwtZowrsS5EyWiXpYxNs42/BHAfYg=;
-        b=jNa8kCMtl/UUGI9n6DMpRCjqu31f4wAijdvFFxZnjTmTKVAPvZHGvGIS5mEbyeVH7U
-         2x/09r6Vjc5jlvMmGEJ/il9wQB7v0QaDJcbwnO54cttgXGRrRpdgplSbMXJLSVGPucZZ
-         9N0BbQ67CEO0Sz9E19ATZ7SkTLFNHyfaTEafdxDnprAieU2S7WSxP1eMUqDcJyOgT3om
-         KiVwLoBVmeYUr/3jVH1Ywgf3KLmBchJpZXF9NW4w0E+aOTUpi5SfsW8FSQSkfcXvzSp5
-         ZeMWPQFNXAG0u+f0IIKFL+VZxclmrwVLcWvb/ml3Qc/gpz+jEOgbpY53v+25m0fIUJKc
-         BDYA==
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=hW/YZmS7wpJS7lNeC9TLZr2YM2tyw8ZN9mG1toRHUEY=;
+        b=n6SeFINnZOt1ieREkJkw7GKfq+9aKjZo1/dOXyhxGUtAm9PLy7rNDfN85E/cKEVcOh
+         1qJbKM2d4+FwBYEsjudLw2YwA+/gaRuopRoOzGC961IREwjWo7DHJRxCIsyFq/9/zH7H
+         iU06/1PIlDpoPUhu44O1GYUzn+Y1ERDQ4hvLMa8CVD8XXRAWhAa7nOeC1uOqy5nNdhCd
+         FD5hiuSRYZ1mVsECmjuoXAVG3jFIHx4DbO40wuuKWwgoHAs/be87O5alVV+56QkHQMpz
+         OjgGz+fh4+boeUTAXspKSs83GBug9vmVjaPPs4RG7dkVdCRZj3Bw7CAqFUFf5IWOfJ6v
+         uzLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=pFdYiycpncfTymiwtZowrsS5EyWiXpYxNs42/BHAfYg=;
-        b=7BjOqnZ5sU9qNZ+ZbtSmgnT5ugUg93W5EXL23Z5fe91YD2NAMRFaHW96/iox28ODCe
-         zqAFwD48zzIEd81R9GJv5UK+KG9scXt7NvQtyP+Tf5kF63AzEx5N9z8DCwxFBhh7olol
-         j+i7AEIN6OT5RB2ty/uoXl9LTeWga37qhGhumANM9x1vRakL08DEGpxWyxOzWbkagvl5
-         hx2G33gWBsH3/S06EqJo0yi12GOrr5OLeiJxLIPeZrW7pPUk4+hc//wyXdd6sazAO3nv
-         Dav3+r8ijXUxQvrfHbHDAATDTCs2mESdLmjJW2dmuOW4FcQVPcuapDoh+166AMkBBZwv
-         oVhA==
-X-Gm-Message-State: AOAM530VelPFZGzmt8PzE4qZ+PeqHB0a4Jg3ubfAK0hD+zaASk4je+GF
-        jsmkzHlrJhshQu1Koj+2bw0=
-X-Google-Smtp-Source: ABdhPJwzanGhehpmLWEMTTJkMBhYufoyhmHURG9yND716ZZIbM/kd8Ex5thBnsVmcSvoj9ZPyJ3fsw==
-X-Received: by 2002:a17:906:948:b0:6d6:e479:1fe4 with SMTP id j8-20020a170906094800b006d6e4791fe4mr3312230ejd.240.1646156406993;
-        Tue, 01 Mar 2022 09:40:06 -0800 (PST)
-Received: from smtpclient.apple ([2a02:8109:9d80:3f6c:6db3:8d4c:747e:98ad])
-        by smtp.gmail.com with ESMTPSA id a25-20020a50ff19000000b0040f84cd806csm7398100edu.59.2022.03.01.09.40.04
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 01 Mar 2022 09:40:06 -0800 (PST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.60.0.1.1\))
-Subject: Re: [PATCH 2/6] treewide: remove using list iterator after loop body
- as a ptr
-From:   Jakob Koschel <jakobkoschel@gmail.com>
-In-Reply-To: <Yh5ZmwiH5AxtQ69K@kroah.com>
-Date:   Tue, 1 Mar 2022 18:40:04 +0100
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        =?utf-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
-        alsa-devel@alsa-project.org, linux-aspeed@lists.ozlabs.org,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        linux-iio@vger.kernel.org, nouveau@lists.freedesktop.org,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        dri-devel <dri-devel@lists.freedesktop.org>,
-        Cristiano Giuffrida <c.giuffrida@vu.nl>,
-        amd-gfx list <amd-gfx@lists.freedesktop.org>,
-        samba-technical@lists.samba.org,
-        linux1394-devel@lists.sourceforge.net, drbd-dev@lists.linbit.com,
-        linux-arch <linux-arch@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>,
-        linux-scsi <linux-scsi@vger.kernel.org>,
-        linux-rdma <linux-rdma@vger.kernel.org>,
-        linux-staging@lists.linux.dev, "Bos, H.J." <h.j.bos@vu.nl>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        intel-wired-lan@lists.osuosl.org,
-        kgdb-bugreport@lists.sourceforge.net,
-        bcm-kernel-feedback-list@broadcom.com,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Linux Media Mailing List <linux-media@vger.kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Arnd Bergman <arnd@arndb.de>,
-        Linux PM <linux-pm@vger.kernel.org>,
-        intel-gfx <intel-gfx@lists.freedesktop.org>,
-        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        v9fs-developer@lists.sourceforge.net,
-        linux-tegra <linux-tegra@vger.kernel.org>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=hW/YZmS7wpJS7lNeC9TLZr2YM2tyw8ZN9mG1toRHUEY=;
+        b=QwJGfreApe2Yzb78iAJjgQ1y4UY5pR7XETnihMaBqDXgZFp92uDz4RA2qaDp0jWqQa
+         Mz3ih5JSjgUEUM/6DQI6N98nu6uUBTKLMcwXsHcH4Rk2zZ1mOEkCSFLufwhdOhHVMU/r
+         /aeUHWBuNee/j2cwWEuGlDqzY/qwjTCCc5G++58Em+r2wBeLyOHC6F1TBURFQVzx6+Dy
+         p9z9hpITt5Xsm8Y3OGDrAdGOZMOS6jR71GRKes7JP30+7I8QomumeiqNAY/1RKI/0zzk
+         78rwJnbLNchAZbJxfny3ixHoqeb9DTEXI85kQ65p31syck5TJv9VFqzoR1SQ6+CEVIsa
+         fvIw==
+X-Gm-Message-State: AOAM532y1sa15GWYO41HXXLJ/nLGnShxRRvzJcNS4423gb4bibUmsqxv
+        lDlg5qdT7NSqk4EeBA9DxGVwAA==
+X-Google-Smtp-Source: ABdhPJy29O9ruXlkZmz1FBD3hlywTLo4gG7yfSObUN32u+vZmDmQg1WYvsMi+/Is29GgqniD50TNfw==
+X-Received: by 2002:a05:6a00:a92:b0:4e0:57a7:2d5d with SMTP id b18-20020a056a000a9200b004e057a72d5dmr28694355pfl.81.1646156769845;
+        Tue, 01 Mar 2022 09:46:09 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id me10-20020a17090b17ca00b001b9e6f62045sm2700322pjb.41.2022.03.01.09.46.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Mar 2022 09:46:09 -0800 (PST)
+Date:   Tue, 1 Mar 2022 17:46:05 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org, Jim Mattson <jmattson@google.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-sgx@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>, linux-usb@vger.kernel.org,
-        linux-wireless <linux-wireless@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux F2FS Dev Mailing List 
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        tipc-discussion@lists.sourceforge.net,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        dma <dmaengine@vger.kernel.org>,
-        linux-mediatek@lists.infradead.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        Mike Rapoport <rppt@kernel.org>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <4B1AFAD9-C1B3-499C-945A-C259361ABA8C@gmail.com>
-References: <20220228110822.491923-1-jakobkoschel@gmail.com>
- <20220228110822.491923-3-jakobkoschel@gmail.com>
- <2e4e95d6-f6c9-a188-e1cd-b1eae465562a@amd.com>
- <CAHk-=wgQps58DPEOe4y5cTh5oE9EdNTWRLXzgMiETc+mFX7jzw@mail.gmail.com>
- <CAHk-=wj8fkosQ7=bps5K+DDazBXk=ypfn49A0sEq+7-nZnyfXA@mail.gmail.com>
- <CAHk-=wiTCvLQkHcJ3y0hpqH7FEk9D28LDvZZogC6OVLk7naBww@mail.gmail.com>
- <FC710A1A-524E-481B-A668-FC258F529A2E@gmail.com>
- <CAHk-=whLK11HyvpUtEftOjc3Gup2V77KpAQ2fycj3uai=qceHw@mail.gmail.com>
- <CEDAD0D9-56EE-4105-9107-72C2EAD940B0@gmail.com> <Yh5ZmwiH5AxtQ69K@kroah.com>
-To:     Greg KH <greg@kroah.com>
-X-Mailer: Apple Mail (2.3693.60.0.1.1)
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Borislav Petkov <bp@alien8.de>, x86@kernel.org
+Subject: Re: [PATCH 4/4] KVM: x86: lapic: don't allow to set non default apic
+ id when not using x2apic api
+Message-ID: <Yh5b3eBYK/rGzFfj@google.com>
+References: <20220301135526.136554-1-mlevitsk@redhat.com>
+ <20220301135526.136554-5-mlevitsk@redhat.com>
+ <Yh5QJ4dJm63fC42n@google.com>
+ <6f4819b4169bd4e2ca9ab710388ebd44b7918eed.camel@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6f4819b4169bd4e2ca9ab710388ebd44b7918eed.camel@redhat.com>
+X-Spam-Status: No, score=-18.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -128,76 +81,58 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Mar 01, 2022, Maxim Levitsky wrote:
+> > > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> > > index 80a2020c4db40..8d35f56c64020 100644
+> > > --- a/arch/x86/kvm/lapic.c
+> > > +++ b/arch/x86/kvm/lapic.c
+> > > @@ -2618,15 +2618,14 @@ static int kvm_apic_state_fixup(struct kvm_vcpu *vcpu,
+> > >  		u32 *ldr = (u32 *)(s->regs + APIC_LDR);
+> > >  		u64 icr;
+> > >  
+> > > -		if (vcpu->kvm->arch.x2apic_format) {
+> > > -			if (*id != vcpu->vcpu_id)
+> > > -				return -EINVAL;
+> > > -		} else {
+> > > -			if (set)
+> > > -				*id >>= 24;
+> > > -			else
+> > > -				*id <<= 24;
+> > > -		}
+> > > +		if (!vcpu->kvm->arch.x2apic_format && set)
+> > > +			*id >>= 24;
+> > > +
+> > > +		if (*id != vcpu->vcpu_id)
+> > > +			return -EINVAL;
+> > 
+> > This breaks backwards compability, userspace will start failing where it previously
+> > succeeded.  It doesn't even require a malicious userspace, e.g. if userspace creates
+> > a vCPU with a vcpu_id > 255 vCPUs, the shift will truncate and cause failure.  It'll
+> > obviously do weird things, but this code is 5.5 years old, I don't think it's worth
+> > trying to close a loophole that doesn't harm KVM.
+> > 
+> > If we provide a way for userspace to opt into disallowiong APICID != vcpu_id, we
+> > can address this further upstream, e.g. reject vcpu_id > 255 without x2apic_format.
+> 
+> This check is only when CPU is in x2apic mode. In this mode the X86 specs demands that
+> apic_id == vcpu_id.
 
+AMD's APM explicitly allows changing the x2APIC ID by writing the xAPIC ID and then
+switching to x2APIC mode.
 
-> On 1. Mar 2022, at 18:36, Greg KH <greg@kroah.com> wrote:
->=20
-> On Tue, Mar 01, 2022 at 12:28:15PM +0100, Jakob Koschel wrote:
->>=20
->>=20
->>> On 1. Mar 2022, at 01:41, Linus Torvalds =
-<torvalds@linux-foundation.org> wrote:
->>>=20
->>> On Mon, Feb 28, 2022 at 1:47 PM Jakob Koschel =
-<jakobkoschel@gmail.com> wrote:
->>>>=20
->>>> The goal of this is to get compiler warnings right? This would =
-indeed be great.
->>>=20
->>> Yes, so I don't mind having a one-time patch that has been gathered
->>> using some automated checker tool, but I don't think that works from =
-a
->>> long-term maintenance perspective.
->>>=20
->>> So if we have the basic rule being "don't use the loop iterator =
-after
->>> the loop has finished, because it can cause all kinds of subtle
->>> issues", then in _addition_ to fixing the existing code paths that
->>> have this issue, I really would want to (a) get a compiler warning =
-for
->>> future cases and (b) make it not actually _work_ for future cases.
->>>=20
->>> Because otherwise it will just happen again.
->>>=20
->>>> Changing the list_for_each_entry() macro first will break all of =
-those cases
->>>> (e.g. the ones using 'list_entry_is_head()).
->>>=20
->>> So I have no problems with breaking cases that we basically already
->>> have a patch for due to  your automated tool. There were certainly
->>> more than a handful, but it didn't look _too_ bad to just make the
->>> rule be "don't use the iterator after the loop".
->>>=20
->>> Of course, that's just based on that patch of yours. Maybe there are =
-a
->>> ton of other cases that your patch didn't change, because they =
-didn't
->>> match your trigger case, so I may just be overly optimistic here.
->>=20
->> Based on the coccinelle script there are ~480 cases that need fixing
->> in total. I'll now finish all of them and then split them by
->> submodules as Greg suggested and repost a patch set per submodule.
->> Sounds good?
->=20
-> Sounds good to me!
->=20
-> If you need help carving these up and maintaining them over time as
-> different subsystem maintainers accept/ignore them, just let me know.
-> Doing large patchsets like this can be tough without a lot of
-> experience.
+> When old API is used, APIC IDs are encoded in xapic format, even when vCPU is in x2apic
+> mode, meaning that apic id can't be more  that 255 even in x2apic mode.
 
-Very much appreciated!
+Even on Intel CPUs, if userspace creates a vCPU with vcpu_id = 256, then the xAPIC ID
+will be (256 << 24) == 0.  If userspace does get+set, then KVM will see 0 != 256 and
+reject the set with return -EINVAL.
 
-There will probably be some cases that do not match one of the pattern
-we already discussed and need separate attention.
+And as above, userspace that hasn't opted into the x2apic_format could also legitimately
+change the x2APIC ID.
 
-I was planning to start with one subsystem and adjust the coming ones
-according to the feedback gather there instead of posting all of them
-in one go.
+I 100% agree this is a mess and probably can't work without major shenanigans, but on
+the other hand this isn't harming anything, so why risk breaking userspace, even if the
+risk is infinitesimally small?
 
->=20
-> thanks,
->=20
-> greg k-h
-
-- Jakob=
+I'm all for locking down the APIC ID with a userspace opt-in control, I just don't
+think it's worth trying to retroactively plug the various holes in KVM.
