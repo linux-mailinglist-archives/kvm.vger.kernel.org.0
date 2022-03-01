@@ -2,122 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F3FC4C88A8
-	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 10:59:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0605D4C89A0
+	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 11:48:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234050AbiCAKAW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Mar 2022 05:00:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33078 "EHLO
+        id S234367AbiCAKsv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Mar 2022 05:48:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52774 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233169AbiCAKAR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Mar 2022 05:00:17 -0500
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2084.outbound.protection.outlook.com [40.107.236.84])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD45A888D8;
-        Tue,  1 Mar 2022 01:59:36 -0800 (PST)
+        with ESMTP id S231644AbiCAKst (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Mar 2022 05:48:49 -0500
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2083.outbound.protection.outlook.com [40.107.223.83])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0870017055;
+        Tue,  1 Mar 2022 02:48:07 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kTBpTYifT2NeyCDqTsfLDW26wm95I7/lpIlwFBHj20kGFKozvtMZlohLkikUYIxIkH1pxGNbMJjW1n1MvmtbZmf6OaPUjGVcOmDg3zqlLWJvNWmV8OFXMKh+WX0wkPUIL5j3XWcujdR4ji2DM4FmbjKab8kpDuPhRpa0Ie3bF59MTvYGstgyCKsMu6KhlC4czgZylceup7rMnPT6zw3EkTQXGCp0StNa8UAdRdO79yrfOrXpCakc7D5vPXkI5mZtS82/gxT0NfGfLeJLZI/CMk1FPUEpW+ichqFN1/jmJbB/g4dBZKUT+Zcxu9Y5u/v+9XrUQ0+wQWHuu1/jFyp2Ug==
+ b=mptmojddBjrLY4EooL86t8lu89BknBNHmNoL9/gBM6a26U+KKw9bQciU5nFRCNZEmMyQOEewDY4lp06bYqgP+RGPwgtY1u1fN4eE/lQyh0fIzPcS4dt/vbtuu+RthUZYGc9nzgOfwifGCl1vkSMXpCyVqccu+8KcUZWOgPIKOLfa+iYUgXTkQY6k0Z8sVquUjkFvpuFz7LeaXG0jJuP8susMS9ol8Bpn/hDBqI+uJfA75TggcftyTGz4jOWkB2T0gHb4wa7RfgmpET1JcvLVKY5oOMN9GY6q0IREWt3SZh8jJ09kmdFl5tKNmnVCPs2zZvvILWiABBZ4offbIW5Fwg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=sJCaXKrhVV6xNCCmzcXr5IO0K9NGdJMdYDy+VWbDQls=;
- b=BqnQGJSRxlaJoZiDENL+C3W+Bvi/NYUYmfamAnkc88u6SYBzsfmVQK8obk7hmTt4/P8g/SyqEViZcUdfF4SdR6vIEpiUkVKWn8Apui8yvgNV8zSURrtFVvt9EojEBV6TUBgLFMQOhYs46zTJ0h66E2m9PoJINglUnUId4wQtVtr8MfsXboqjGkYZVj3xRNgFINYAKppPzn99BTvGXAtHwlnTXe7+pD/udJQqIui4QLFn1QyYrOqQKrAZ4j2XGaQQOtRtj/+kc7lJOJUsLKMQr10trnjONnrKK3TRegeg74EeW/G8OpRIr1VqtIVf8hVXkcs9BvqR1/gdHSQlKdPU0Q==
+ bh=GmA8K7fRWYmaDHfsbiIQXijLE/riZgq1FqHOBEYWyMQ=;
+ b=Lnzn+rr2ukEZj5S/EPEkVy7m8YGHsTaCP4cmBoSpaKcnxm+tE/KX6MRNy1AntpGHIBjaDPYvnOEHjXFP+AByTPxCI+KBUDv7afgkKX09wBQz+05fSxyvovmEI8fvD4yTiQppC8kFlxA3ykpm1ruStG4fgos1RtBNuyAS+yidTupbZDQiKNSwgQDo1OOL37/O7hTPTM3bxtnezUIkiBbLAOVfTYiVsLBmSl9LnJ0HxdoGOydCwaFEEDij6aIX4GKjuyMRZhf33LbxaM09F8NZ0z7CPArfYoMuFIOi0SqDzfqsQE2uiPhwHR3E4W73EW9mAFVJbe6aknEAGQmk1soi9w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sJCaXKrhVV6xNCCmzcXr5IO0K9NGdJMdYDy+VWbDQls=;
- b=HfFicAJvFn3CizLXhDBdPX17E/RBPwVLjHlZ+s817FnO27YDaRXBt8uZR6/MT41Q0DixPJjwcrJD5EmZGKgaJ941UZeqhhlFs0IV7IqcCi2nXjCGTl+bl3E/0WTRZFgt3c5okphu86w9kM1aj5HAywoWRzmPVfl/B5GXmLd1bws=
+ bh=GmA8K7fRWYmaDHfsbiIQXijLE/riZgq1FqHOBEYWyMQ=;
+ b=wlvd2DCO9glPDMq0SGnWwEdD3v5ff2TmHM7x3pZbcPRRlMJHF5rubTXK820W3p0Z1gAQrSVms/3oJ6JMhSZBgUxH6yiOo6vP3+h2x0VtsCuSH9jBIqFi6bgYTHURiuISysvseMXAtxiCvKr+cc/sQPWc0wWoLNAzIYymIiE7A/s=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amd.com;
 Received: from DM8PR12MB5445.namprd12.prod.outlook.com (2603:10b6:8:24::7) by
- CH2PR12MB3719.namprd12.prod.outlook.com (2603:10b6:610:2c::16) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5017.26; Tue, 1 Mar 2022 09:59:34 +0000
+ BL0PR12MB4994.namprd12.prod.outlook.com (2603:10b6:208:1ca::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5038.13; Tue, 1 Mar
+ 2022 10:48:05 +0000
 Received: from DM8PR12MB5445.namprd12.prod.outlook.com
  ([fe80::6807:3c6c:a619:3527]) by DM8PR12MB5445.namprd12.prod.outlook.com
  ([fe80::6807:3c6c:a619:3527%5]) with mapi id 15.20.5017.027; Tue, 1 Mar 2022
- 09:59:34 +0000
-Message-ID: <214b5d5e-f936-f50c-b26c-334ecbbdface@amd.com>
-Date:   Tue, 1 Mar 2022 16:59:23 +0700
+ 10:48:05 +0000
+Message-ID: <c17e954b-0f62-e0ad-77f0-1429dcc94f6d@amd.com>
+Date:   Tue, 1 Mar 2022 17:47:52 +0700
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
  Gecko/20100101 Thunderbird/91.6.1
-Subject: Re: [RFC PATCH 04/13] KVM: SVM: Only call vcpu_(un)blocking when AVIC
- is enabled.
+Subject: Re: [RFC PATCH 05/13] KVM: SVM: Update max number of vCPUs supported
+ for x2AVIC mode
 Content-Language: en-US
 To:     Maxim Levitsky <mlevitsk@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, seanjc@google.com
-Cc:     pbonzini@redhat.com, joro@8bytes.org, jon.grimm@amd.com,
-        wei.huang2@amd.com, terry.bowman@amd.com
+        kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, seanjc@google.com, joro@8bytes.org,
+        jon.grimm@amd.com, wei.huang2@amd.com, terry.bowman@amd.com
 References: <20220221021922.733373-1-suravee.suthikulpanit@amd.com>
- <20220221021922.733373-5-suravee.suthikulpanit@amd.com>
- <dc820a37ef302ed7c11315c01c6f434d5506c543.camel@redhat.com>
+ <20220221021922.733373-6-suravee.suthikulpanit@amd.com>
+ <9143d9d24d1b169668062a18a5f49bb8cf8e877b.camel@redhat.com>
 From:   Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-In-Reply-To: <dc820a37ef302ed7c11315c01c6f434d5506c543.camel@redhat.com>
+In-Reply-To: <9143d9d24d1b169668062a18a5f49bb8cf8e877b.camel@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: HK2PR06CA0010.apcprd06.prod.outlook.com
- (2603:1096:202:2e::22) To DM8PR12MB5445.namprd12.prod.outlook.com
+X-ClientProxiedBy: SG2PR0401CA0024.apcprd04.prod.outlook.com
+ (2603:1096:3:1::34) To DM8PR12MB5445.namprd12.prod.outlook.com
  (2603:10b6:8:24::7)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 905f5749-3654-48e6-c93d-08d9fb6a303d
-X-MS-TrafficTypeDiagnostic: CH2PR12MB3719:EE_
-X-Microsoft-Antispam-PRVS: <CH2PR12MB3719664F674AF2C5D66BC153F3029@CH2PR12MB3719.namprd12.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: 7f891b75-b069-43bd-6f80-08d9fb70f744
+X-MS-TrafficTypeDiagnostic: BL0PR12MB4994:EE_
+X-Microsoft-Antispam-PRVS: <BL0PR12MB499422A8BE663107D32EB7E5F3029@BL0PR12MB4994.namprd12.prod.outlook.com>
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: OlYR/e2/fmuh8oqfluuDRMynsc/XB3Xlvo2V5ULzTB75/wKiQA6dINaUHBATDLNREFJyY5PQeAD4UkqVrarxHcKXTYMzYCcjwaxy0N6+gVzGFxRsa4V/PMcGn/3LYey6Tu7FMDjNgx423YqYZ4p42uFGxyu+a5zo0GfE8ApHzVYagXXGF0v78KApKyY5m7FpAf//ed7/Ce09s94u43qWp7B4IbrAXz+7n01rk7TIO90tTiaFR/8Iz3EtAFpzI1b8FHoqfsAtx5gjMUc6BFQxNB9Ws61ul3FU73qGWNxX5XSNXawWw2f0QT0YUu/C/T+e/MHmaTSVZonRIlbsS38XoWusRmOil1k9xWFfXzqcUb55M7VEPXzOuZV5CKJrHJFXN+kh7zWnIx9qjmQlhEP6/z+KevZakp2xJENI0sIgi6ZfBxMTP1VPg2QnGbeW8wtQYUwZSX87Tkn57avClmBFnZUmAIPKddcnXYElyP7JQenWGo9WcwTypBY/flo/KLNb4Eh0pWlM3OKlnxo32WNtOe1gJkEW5AsaKP/+9MpLLA2c1xrwjBX/ijt5IEi5XWfZKZokEjMeSPrfWDQaq4aAB/JBre0M8MG/xDz7HzMtkChZeXDiJpTnDXiatfI4AWlE80bxOSJcs+z2JB0V70VlI9MnzoNt/psE+xMDwCztsDAyhSWvcK8hAujAXCn2GxFHEVz8S8NYMoydHCeRH/AbMKRa8FjB8VrdazQuJM1aBB+8yEWO90crRtp5UbSKVHL+bpcyriowRBIRBsl0r/hB7mYO6DrWT6ijXtfeEZr6WK+htwjzDatr6eqKq7I9U8vHgsBbMZTvZQ/bffW1lw+9FSwkyPj9eqgf0KyRDcomRII=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR12MB5445.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(186003)(26005)(2616005)(31686004)(4326008)(66946007)(66476007)(8676002)(66556008)(36756003)(83380400001)(53546011)(6506007)(2906002)(31696002)(6512007)(38100700002)(966005)(6486002)(8936002)(508600001)(5660300002)(6666004)(316002)(86362001)(44832011)(45980500001)(43740500002)(309714004);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: jeEU1xqCI2aw5lHRxmKdtVl/j/bjinG2dekSnkHYgXFg9HJiPv8YvCZyfhZ4++8xWHWRyjc3/Gf4Kf74nS/y0dQWGg+sbPNwqRFtcIs2DyswTlaetqjhTbVXAoUKqJ0vvkZJ+tHJT9C1TobxbBomEMCNrV8N3z0DDHibuRYspYh6gH+40zzw1pYnLARTWFR3kd8Pn/cdI4ov0T0CDcckHA33JsI+5DWKSChExhl5ipBupC0CHgrrRTEq203oL1/LptynzswUH+CS2Z9+us1c7ac7QQFBUQpT7qAjnJ2GHrhnj6jvCz/JfyjepD2seX+kB37U+f6n9t4DrpHp40TwNWTML4vUJPaCCN+iPjdgvPFXUvshK4oETcVbYpcnLOOGjtEjv2qrRsUi2vCakfUqFKeDgkpmK6AeLeYdAxjRa5ETlbUwmPNx5GRYBk8CF5bfiRkgs4wxQo0Eyv3p0gQGM7xz4DJZGeifmKFjwftwo/MYZPJ3Vil2sj/6HaSvMRO4kjgH4b5ls0xCIrKwSk7NSlG1hRy3uR2hC+Od56EV9QLfBn8nM8iE7Vy6xdq5X6bIv6uBNBCnLSpWwaJh9/QhWss0oQ95D4pMtZAArBD1LnkxtcnMkjGMInYcbus187lucvhgUEKTiPEsHuRiXT1J7n0yZEUfnAZHxEcuhQ1dO2fyQ6JSf01cojmw9cQdqbwoCtKgI2+XYZW2AiMPHjOoy6XWD8p05f9rUY35YhNa1p9D7CKgxp8Nsj7cVMi8sbBm
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR12MB5445.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(38100700002)(6506007)(5660300002)(6512007)(15650500001)(53546011)(2906002)(186003)(83380400001)(2616005)(26005)(316002)(8936002)(6486002)(4326008)(8676002)(31686004)(66476007)(66556008)(36756003)(508600001)(66946007)(6666004)(44832011)(31696002)(86362001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Y1dGL08wZEVEWnMySlIzM3QyVUdISzJ1d0xuQlB3aitUSnpSZnpCVE85ZDJN?=
- =?utf-8?B?eGM5OGxzVDJjMnM4S1h3aUV1Q3BFUVdVMkxsM3RWYk5UN3gwZFh4TzFMbmRM?=
- =?utf-8?B?TG11VEFWSWtMMVhna0pKcVJOcGkzQmFjTy9lQ05GU0psZXl4R2hndFd2UDhs?=
- =?utf-8?B?K01NNnArU2RnN2NEZnV3Z0RkSnZSZXVIbFJsNDN1VHlOZXNBN2FlUFpWUHBa?=
- =?utf-8?B?QVJDQlUwclE2R0tCbjRzZWp4Uk9ySHNubWdrMkUrZjFxdWRyeXJTMGRkK0RC?=
- =?utf-8?B?MFFzWVo3OTdoMmw0U1VZTkhoNXJrM1VZc1NsZXRqS2ZBL0h6WXQ2VWJjWnVz?=
- =?utf-8?B?b3l0UFdaa1lDYzFmSVhWZzhUTmZzTzlSVHRIeFZsRGxva1c3YVluZDhaYVU0?=
- =?utf-8?B?MEFDTGl6RDl4bnJZblVTUnhHWStUTFpQUGNBK1lKR1BYNE85aDRwRUo0WkRD?=
- =?utf-8?B?bjhoV0M2K1VDc2FNeXZGeHYyS0dPd3hqRk9KUlFBenJSMHoxeTFpc3ZxOHBh?=
- =?utf-8?B?TXVzZmJCWjE0LzcwdjNOZFdJSk9ORytocjdiTDllRW9CdWYvN1JvNytOSWxx?=
- =?utf-8?B?cGF1Z0x1a2EzUU5wRE0rVjlweVg0N1R1T1NUK3ZJMkx6RXJSdFMyZmZWQWVr?=
- =?utf-8?B?ekFUZlc3QkRXUXVhbytyay8xZ2x2YW9IbHlUaTlXV3dUWEMyK3htY0dEOXhv?=
- =?utf-8?B?Wmw5TDhHYzlvTzBzdmRldkJsZ09NS0hidGZMWGg5eGRyT2pRRTltVnJEU3Zk?=
- =?utf-8?B?STVyUDc5MDd2cmkwaThYMDFyWlZFaGVrMVlZNmdOZEZYM1BROFFMMHo4N0d4?=
- =?utf-8?B?QWp2K3gzcFNFcXlJV3cwWm03c0dJY29DRlNwOEFKTmNUd2FGMlNabVFXcUNn?=
- =?utf-8?B?TlY1NkNYT2F5QUxTODB6SExSbjJtbit2U29lREZZZHZIRjV5Z1FZei8rRjh0?=
- =?utf-8?B?ZGw3UTRVVTlNdklHaUhmcDJ1OWN1SXQ0dERWeGlRMmtQRDlXQnFDQVRFMUsz?=
- =?utf-8?B?Y25CM0p0d3p2aGM5ejI3b2J4Y1c2K3lQWmRzOUxpbnZjVmtNUXJ2WmRJV3kv?=
- =?utf-8?B?bFAvWFU2RDB2My96d0F0ZUpWT1h0dW1jaXRHSFpzc0VxVVVYbGhzdkMycWpH?=
- =?utf-8?B?cXhFMDFKTVY0RXM3YzdaaTNEN3NzdjZRY1F3OWVubUVjSUxuYWpHNlI0eE1E?=
- =?utf-8?B?TnJYcEtRNmIwWElkVHIwcFo2U0IrUEt3ZUw1WGlIWGo4ZUJuY0o1cThJaTIz?=
- =?utf-8?B?QUJMSzhGN3htZytsYzRMRGVDdFZTWGJOYnFTcUJEMFFybFdRZHR5N1hLVjhO?=
- =?utf-8?B?cVRCKzI5U2NSRXRUbkNhZ2Q3dG5EQ01rKzY4TmxmVVZYMlVhSGRzM1lMeDNM?=
- =?utf-8?B?OEpWZHBsUUhkaklIaXhlcjFmY2JWWC96MlBWcTBML3lxMXZCR3NUYWlKWWJL?=
- =?utf-8?B?SVhLUFBqRTJCcStGUFY4bi81SHhCczdaaUVEUTl1NTdRNFQ1Ty9GMStGd1FO?=
- =?utf-8?B?akV3UnpSaUxob3gvU0NiYU0rTkRncUJTUWNIYjYzNnh4TGdTc21pMjRxNGlk?=
- =?utf-8?B?Q1JteFR5MHBjaE92cDVTQk1WVHcrU3JENVNtRDFKdVZRTW9GdGFxZUxpTXhD?=
- =?utf-8?B?YW91K1lWK25YOFppWVhsa2FtZEhFM2kvK2hxWHBYU3ZFQlJOZUhZSE9rc1hy?=
- =?utf-8?B?M3hGL3pXUUM1YkNpckh3RDE1Wm13VzVSa1JMM1BBNnJKbnpNTnlvN2xZNmFY?=
- =?utf-8?B?V21xSnp1WFlPdUJiLzdVNFYzbDZUUUlMS1dOZktaSHluL21PK0EzNDN3T0Yv?=
- =?utf-8?B?Q3U4N3pPWXpRZndMeGxhZTJycGpBWk5aYVl0cWltQk9TMDVUaFFRTHlTNUFr?=
- =?utf-8?B?QWpzb3ROK0gxNmdVdG5FaSt4RlJ1a2NRYUpmZUVKeGdaNnBEaUIrc0ZKL3J6?=
- =?utf-8?B?L0MvczZNeFZCOE12UXl2eUxXU2RYSE5YUjVsWHlqYXVlWDdmRUxMbHh4NGNE?=
- =?utf-8?B?SlZSSHV6L0RENEQvUEg4bEJWcnc1ZlNtTmkycWU0NUZmRUtyQ2cvcXlhaFMr?=
- =?utf-8?B?K283dDhsWWFqQ0JzdDZLdVZNOHdBTmR2b2lKb1pPMzdORGlLTUZ5Ynh2eUdk?=
- =?utf-8?B?ZHh5NzZ2djBpZFE2cjMxVldpUThWZEdSM1ZkWlJldWROcTR5T2JRb3B1ZnVD?=
- =?utf-8?Q?il/JG7JAeIxr+8s9vgf3GZk=3D?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dGE3R1hmVlZoOUZ4U0ZVUzlOYU5jc2pzQk9uVmh5ZForenU1bXNXRDhNc0hu?=
+ =?utf-8?B?T00xKzlJZkFxd3FPT0h0RnBDT1dJZFF0UGU2aWtYNUliajVuTTloL3lmYU9Z?=
+ =?utf-8?B?V2dSRGxyTWEwQ25CdjZUa0tTbkJtSFB3VTdsNndGcXVaaTdNMFVnYTBVYVhz?=
+ =?utf-8?B?MStBYndaWnVBUWl6ZXNvVWtEcGRSK0VvY1dIOFovZWxmMzBUZzJVOVpDTHBh?=
+ =?utf-8?B?b1BuK0szMkpDczhCNGRtTW5hcHJiM2ZTR2dPZVdvdXBQRUZudGQrSzNhbTM5?=
+ =?utf-8?B?WGV5eGovdkttKy9PZGZDaGcrYXlhcEFQZDQ4ZS9qSmdSSUlyYnFWd1VINEV4?=
+ =?utf-8?B?RlhuUnJZWDdZWkd4dTRZcWxDcUlnc09ha2dYZHQwTTh2RmN1NFpOS09MbFk1?=
+ =?utf-8?B?L0doRTNZRTRXTGdYT2pFTlU2TlVWc0hDTnF2VnJEUFB1Q1hWRmFFbUxUeGNJ?=
+ =?utf-8?B?SjNDeXg3Vmc0QkJKRDNUY3ZFaXFhMXhTR2VpcDFRRERXOXA2TThTcytyYkd4?=
+ =?utf-8?B?YlQwNUcvVUdWWnFvOVJRa0kzdmJxbXMvWndRMTZZZjEvYWRmYW53aHdoS2kz?=
+ =?utf-8?B?ZnI1Q2hqSW03amljckZ1c0U4TE9ONGk2dFpwU1RnY2Nlc05iYUZuQVoxbmcr?=
+ =?utf-8?B?RkhYQ2djS3N5WHN5TTdHNlY1eHdkSXRIaHdqSVVRWjFBc1lSdjNTWUpreVAw?=
+ =?utf-8?B?YjhvY3dZR2QxRG12d0haVkkzWm5aYmUxcTFsZlppcGlnUEt6My9wb1djemJX?=
+ =?utf-8?B?MUVzNjZsZ2N5TDRWVHJDT21rdUVBWE91WElzUkNLaHVQRVlFak5VRTZuTnE2?=
+ =?utf-8?B?cUVMYmJrYmppejN6bXZvS04waU82cU9GcnBCaW1GVlJWVEZwUHdjek42ZEZq?=
+ =?utf-8?B?dGpwN1NWWVBIWS9hcWNneTFJeVhZWWoxR3J6ZEZrYmFCalJnUUtpZjBCbDBJ?=
+ =?utf-8?B?d1hXZDZvTU5YZDlpVjQwL2wvUGFmUGdoSnJ5WXc5eGc0dGFqTEwveDkrM04x?=
+ =?utf-8?B?OXRxS2xiUFNyL2srNEFKYXlvenhrTmV2YVV2dGQ0dDdiUlVka2gzalcwRnI2?=
+ =?utf-8?B?aElML0t6Rk5uc0IvRENvbWYzL3JHU2d5ZWJlaklaSVI0QVc1QkNOQW45ZThq?=
+ =?utf-8?B?SUhPWVJiUDFuaUFQcDRlMGExRG5JbGVzYkRPWXJjZExzUlkzZXJSSm5OL3g4?=
+ =?utf-8?B?R1dGYkNNM3RIQWl5eGd3OWoyZFNDa1k3ZUFtTUN6WlQ3MUtIcWFBQTR2aGla?=
+ =?utf-8?B?WVluNGIvT2NUdU9idWVxcUpHdDRxelB2WkM3U0EyMVRBR3R1TXFIS1hrYllR?=
+ =?utf-8?B?UWYwc1N5VlJpM1dJWnE0V1JrOEtpb01kKzF1VWV0WFBHZFhDTWVtWW41RkFD?=
+ =?utf-8?B?azlsYk83bU5YU3ZZWkpkRHk5QkF0akk1bkFQblArV1p2N292SGFSaUx6Z1Jz?=
+ =?utf-8?B?Rmd6dUxZWUtPd3IvWXNocjFaNzFMVDdSNWh4eXNFYXpFaTJBcW9CbkpIZ2Nq?=
+ =?utf-8?B?L2ZoT1cvZzB1ZFNzUUpldjFIcUlicVVZa1czMERvNk9jSnZIYndQMEpsUWRq?=
+ =?utf-8?B?dC9NSDBpMitBZ25Ja2c3YVQ1cTErOGpSNEVmUFdRWXVWeDdVYmxKbTJPcTFQ?=
+ =?utf-8?B?TVZOcC9IRDBpOWdUQTZQZjNLU3hDcnd5TTJ5TGlZcnBqQkllRzNadFBud3la?=
+ =?utf-8?B?ODl4Si9ZOXJlY3gzTzY5a3g4NGN3cmQ3SkloRHQreXlvVThsVGJMV1B1Z3lT?=
+ =?utf-8?B?RUVZTG5rNXB0eU8xQXUzbmdySWN3VXdCeEJkQUtCdEtCcHVKZWJHNWdyMGQw?=
+ =?utf-8?B?MjNUTm5RdmdiVVlzTjBFa3VuQzJWaTFSNjl4bkpqTDlkTDRSSk4rZEZhUWpm?=
+ =?utf-8?B?WDZpZkxtU2pGNWxzMjMxcVowMXA5bDVzSmhFQm90N1ZxbTYxOUJEVHA3TXFn?=
+ =?utf-8?B?aHA0YlkzUjROUEp0SVNqckNDRFJUNndmN3pHR29GVFBzSTdDZ010WjFpZGp2?=
+ =?utf-8?B?V25FYzBvRmx2N2R2cUpMQVFvUkFzQmh5bndxOGlFSndXVTJIUEZrUGdRQkpQ?=
+ =?utf-8?B?Sjd1WWtibzZZbHk1S0VrUjhudGcrRVZmOFY3NHU2bjhYTW1ndFRyMjBnNFlx?=
+ =?utf-8?B?WEZoaEIveVJvaWhKK3RUOFJOQXBlUlVnbUNNN1kxekZUemcyZXB3Y0RDUmw5?=
+ =?utf-8?Q?ZcOBmLytckKH8OFjg/WyPKI=3D?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 905f5749-3654-48e6-c93d-08d9fb6a303d
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7f891b75-b069-43bd-6f80-08d9fb70f744
 X-MS-Exchange-CrossTenant-AuthSource: DM8PR12MB5445.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Mar 2022 09:59:34.5033
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Mar 2022 10:48:05.5657
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: WQb9pg0XE/RYBrvNHoLJ8rL910joX4kQhWke2INuhctfxEjL0HK1brVLm2fjUXPOHLDQmEsP5AGDY6i5gnyQmw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB3719
+X-MS-Exchange-CrossTenant-UserPrincipalName: 0mZF24R/qBQbEyauR0AbFs41SzrMWgliyvvcmKoBBPGgQj5FZ7js40/FogLykrXgTTQfbPZY/ytL2rxkrFY7AA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR12MB4994
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
@@ -130,91 +131,64 @@ X-Mailing-List: kvm@vger.kernel.org
 
 Hi Maxim,
 
-On 2/24/22 11:54 PM, Maxim Levitsky wrote:
+On 2/25/22 12:18 AM, Maxim Levitsky wrote:
 > On Sun, 2022-02-20 at 20:19 -0600, Suravee Suthikulpanit wrote:
->> The kvm_x86_ops.vcpu_(un)blocking are needed by AVIC only.
->> Therefore, set the ops only when AVIC is enabled.
+>> xAVIC and x2AVIC modes can support diffferent number of vcpus.
+>> Update existing logics to support each mode accordingly.
 >>
->> Suggested-by: Sean Christopherson<seanjc@google.com>
+>> Also, modify the maximum physical APIC ID for AVIC to 255 to reflect
+>> the actual value supported by the architecture.
+>>
 >> Signed-off-by: Suravee Suthikulpanit<suravee.suthikulpanit@amd.com>
 >> ---
->>   arch/x86/kvm/svm/avic.c | 12 ++++++++++--
->>   arch/x86/kvm/svm/svm.c  |  7 -------
->>   arch/x86/kvm/svm/svm.h  |  2 --
->>   3 files changed, 10 insertions(+), 11 deletions(-)
+>>   arch/x86/include/asm/svm.h | 12 +++++++++---
+>>   arch/x86/kvm/svm/avic.c    |  8 +++++---
+>>   2 files changed, 14 insertions(+), 6 deletions(-)
 >>
->> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
->> index abde08ca23ab..0040824e4376 100644
->> --- a/arch/x86/kvm/svm/avic.c
->> +++ b/arch/x86/kvm/svm/avic.c
->> @@ -996,7 +996,7 @@ void avic_vcpu_put(struct kvm_vcpu *vcpu)
->>   	WRITE_ONCE(*(svm->avic_physical_id_cache), entry);
->>   }
+>> diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
+>> index 7a7a2297165b..681a348a9365 100644
+>> --- a/arch/x86/include/asm/svm.h
+>> +++ b/arch/x86/include/asm/svm.h
+>> @@ -250,10 +250,16 @@ enum avic_ipi_failure_cause {
 >>   
->> -void avic_vcpu_blocking(struct kvm_vcpu *vcpu)
->> +static void avic_vcpu_blocking(struct kvm_vcpu *vcpu)
->>   {
->>   	if (!kvm_vcpu_apicv_active(vcpu))
->>   		return;
->> @@ -1021,7 +1021,7 @@ void avic_vcpu_blocking(struct kvm_vcpu *vcpu)
->>   	preempt_enable();
->>   }
 >>   
->> -void avic_vcpu_unblocking(struct kvm_vcpu *vcpu)
->> +static void avic_vcpu_unblocking(struct kvm_vcpu *vcpu)
->>   {
->>   	int cpu;
->>   
->> @@ -1057,6 +1057,14 @@ bool avic_hardware_setup(struct kvm_x86_ops *x86_ops)
->>   		pr_info("x2AVIC enabled\n");
->>   	}
->>   
->> +	if (avic_mode) {
->> +		x86_ops->vcpu_blocking = avic_vcpu_blocking;
->> +		x86_ops->vcpu_unblocking = avic_vcpu_unblocking;
->> +	} else {
->> +		x86_ops->vcpu_blocking = NULL;
->> +		x86_ops->vcpu_unblocking = NULL;
->> +	}
+>>   /*
+>> - * 0xff is broadcast, so the max index allowed for physical APIC ID
+>> - * table is 0xfe.  APIC IDs above 0xff are reserved.
+>> + * For AVIC, the max index allowed for physical APIC ID
+>> + * table is 0xff (255).
+>>    */
+>> -#define AVIC_MAX_PHYSICAL_ID_COUNT	0xff
+>> +#define AVIC_MAX_PHYSICAL_ID		0XFFULL
 >> +
->>   	amd_iommu_register_ga_log_notifier(&avic_ga_log_notifier);
->>   	return !!avic_mode;
->>   }
->> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
->> index 3048f4b758d6..3687026f2859 100644
->> --- a/arch/x86/kvm/svm/svm.c
->> +++ b/arch/x86/kvm/svm/svm.c
->> @@ -4531,8 +4531,6 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
->>   	.prepare_guest_switch = svm_prepare_guest_switch,
->>   	.vcpu_load = svm_vcpu_load,
->>   	.vcpu_put = svm_vcpu_put,
->> -	.vcpu_blocking = avic_vcpu_blocking,
->> -	.vcpu_unblocking = avic_vcpu_unblocking,
->>   
->>   	.update_exception_bitmap = svm_update_exception_bitmap,
->>   	.get_msr_feature = svm_get_msr_feature,
->> @@ -4819,11 +4817,6 @@ static __init int svm_hardware_setup(void)
->>   
->>   	enable_apicv = avic = avic && avic_hardware_setup(&svm_x86_ops);
->>   
->> -	if (!enable_apicv) {
->> -		svm_x86_ops.vcpu_blocking = NULL;
->> -		svm_x86_ops.vcpu_unblocking = NULL;
->> -	}
-> Isn't this code already zeros these callbacks when avic is not enabled?
+>> +/*
+>> + * For x2AVIC, the max index allowed for physical APIC ID
+>> + * table is 0x1ff (511).
+>> + */
+>> +#define X2AVIC_MAX_PHYSICAL_ID		0x1FFUL
+> Yep, physid page can't hold more entries...
+> 
+> This brings the inventible question of what to do when a VM has more
+> that 512 vCPUs...
+> 
+> With AVIC, since it is xapic, it would be easy - xapic supports up to
+> 254 CPUs.
 
-Ah, right. I'll remove the setting to NULL.
+Actually, 255 vCPUs.
 
-> I am not sure why this patch is needed to be honest.
+> But with x2apic, there is no such restriction on max 512 CPUs,
+> thus it is legal to create a VM with x2apic and more that 512 CPUs,
+> and x2AVIC won't work well in this case.
+> 
+> I guess AVIC_IPI_FAILURE_INVALID_TARGET, has to be extened to support those
+> cases, even with loss of performance, or we need to inhibit x2AVIC.
 
-It's not related to x2AVIC. It was recommended by Sean earlier
-in another patch series:
-
-   https://lore.kernel.org/lkml/Yc3r1U6WFVDtJCZn@google.com/
-
-Since this series introduces the helper function avic_hardware_setup(),
-and re-factor the AVIC setup code into the function. So, I am including
-his recommendation in this series instead..
+In case of x2APIC-enabled guest w/ vCPU exceeding the max APIC ID (512) limit,
+the ioctl operation for KVM_CREATE_VCPU will fail. For QEMU, this would
+exit with error code. Would this be sufficient?
 
 Regards,
 Suravee
+
+
+
