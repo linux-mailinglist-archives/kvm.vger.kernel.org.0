@@ -2,383 +2,222 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1199E4C7F5B
-	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 01:37:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 847A24C7F67
+	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 01:41:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229816AbiCAAiA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Feb 2022 19:38:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36056 "EHLO
+        id S231263AbiCAAmM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Feb 2022 19:42:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51416 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231861AbiCAAh4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Feb 2022 19:37:56 -0500
-Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52DEA65F5
-        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 16:37:16 -0800 (PST)
-Received: by mail-ed1-x52b.google.com with SMTP id x5so19884860edd.11
-        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 16:37:16 -0800 (PST)
+        with ESMTP id S229943AbiCAAmI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Feb 2022 19:42:08 -0500
+Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CF3B27FD1
+        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 16:41:28 -0800 (PST)
+Received: by mail-lj1-x231.google.com with SMTP id u7so19705250ljk.13
+        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 16:41:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
+        d=linux-foundation.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=ziO9yly6Qqoc9UXWVoa5+VQEQnn6k2BwQIGPyJsQSqI=;
-        b=ajSD2CCxiYvbvLGeR8ZPusTyFUU3SsLkWHo+x/1mM+3PDYEtm+MMJdaoiC19aRP6XN
-         faMca8Q/EIs8JUee378TpD+bz6kbg4muHcMYnptKTuXsGnzhlOtfWdBtjVOYTdxaVDjd
-         loky+uakvjA9V/eBbDqy8gik+LE8/QKxusZyBOII/w4vbbYBOGuVf6MET4p4sUUb8YFO
-         Yu1MN7fMEAa7oeGUJPa0GGxLS9d4l/wzlaiG+lMTg1MB+Vxv+yYIugdI9rs1jaKSHzNY
-         l/pcyNOysD2LHJwm55klNDJHsOFh3juhAi/K+jidggtglJqEWQ95wnS+o818w/mEnihF
-         Kuag==
+        bh=cUh7YOptqnvj33mIS3WykOaibv0ctq8lQu0USbAcExo=;
+        b=gduPBw6Te4zeyjZyaNuQQxqABiMq6fHp34ckrObT/FmzNLnDhHL/6KerjIgP5i0R8H
+         Vm0a8HwZ8W8PnRRZRxnIsSc7yENLFtSGfKUqeeqvjpp8888PKIgF8NBwqM5k9ZzIrQCZ
+         iYuicfiGesL4zlgkSDywOQeUUhyrP2kMozUBc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=ziO9yly6Qqoc9UXWVoa5+VQEQnn6k2BwQIGPyJsQSqI=;
-        b=o5yUbb2c7ODknHNHJddvd/kXZoV0gHNHgfYHW//bzWyIFyYAxHmcMGxsZCm/i0+N8K
-         Zq7JvluroLoIOTp94N9lzkCBpqLgDSDUwnNMllgOFXmvLOOnJCP7z7gmZrtDCeI2pbZe
-         BN8paOHVg0Lq5/Pe9wqZyptfUpzO+/kD7njqXBY0fMdNoyiHmiZBaO+5tI7fxeWkm3y3
-         AcO83jOWVlQ28XW2wnlWd2vg/D+/D3jRAO0wQp62a9T1HLBF8AWLv2eXm534Z3so57Zo
-         eLZc5tNNe3SQQ3ryMteKdOjkXrY56WK7XRv9rtY7psrTods3RTMMPbsNlL6QLTGlHRGn
-         868w==
-X-Gm-Message-State: AOAM5332ZzLOb7X3kj+s6w2z7e419MHitRcpEqFnS9ciyyDkeGfsUclL
-        O5XlemmUjMLHtrDy1X+Gf7n1jp4Jw/tXfGhjwUGhUA==
-X-Google-Smtp-Source: ABdhPJy3i2jXBn7uYEk86nqWgCXymtqvbgG8hBlbGJYPFpbFrN/hvpZeFSlvQuWA0CNif+qQPz3H7mn+W2gQqVpWe0Y=
-X-Received: by 2002:a05:6402:3507:b0:413:523:5d24 with SMTP id
- b7-20020a056402350700b0041305235d24mr21892523edd.85.1646095034493; Mon, 28
- Feb 2022 16:37:14 -0800 (PST)
+        bh=cUh7YOptqnvj33mIS3WykOaibv0ctq8lQu0USbAcExo=;
+        b=dsTLsJKKEFQB5CmysA2BMXqR9zUc+gvx9voWbMyCflAnNLf4NWGzp4VtDYn74Qv847
+         ObINxQHdCR6MuHo2LCM5wtj+rvNIgmEB/ozEfTd6BhL1YWSAbTxlJ8mCOx9UkYhD7Hfg
+         3xxAphLXcSgi7UCpuMxeGeHeCZ9vw8aczFExSeBtqESmdZiw4CIG2Q7lCn6RVDH90zNR
+         /jxSG1HkJOfIgo2voNrkBsBw3FeZF4/TAxWvIkJjakMtQIvWgEXNfa6RcHhlvV7VTKbi
+         jwCX5UZsmHZfLE+K53A+0hzPXb7A0Tfs5ahl44jAzdhQvkU3eFHiLkQbwifYXHLsoKLY
+         LqxQ==
+X-Gm-Message-State: AOAM530d5vEoiwigX3cu80/GRFzkDhfaiTDeA9ETlcVbTz416GbBzNk5
+        bY35ixh9Wyuwcz6vFT9N4pbGZ1JD0XX11VMvuWI=
+X-Google-Smtp-Source: ABdhPJx+fzWiElTryGl08Aj0mnIBYeGYBfAJW+5EWliIPnTj4I8V8TVNgVgvVqyZepsLonxJy5hF5A==
+X-Received: by 2002:a2e:9c89:0:b0:246:2c42:91a3 with SMTP id x9-20020a2e9c89000000b002462c4291a3mr15565145lji.94.1646095286654;
+        Mon, 28 Feb 2022 16:41:26 -0800 (PST)
+Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com. [209.85.167.51])
+        by smtp.gmail.com with ESMTPSA id x3-20020a2e7c03000000b00246173f84adsm1635227ljc.40.2022.02.28.16.41.21
+        for <kvm@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 28 Feb 2022 16:41:23 -0800 (PST)
+Received: by mail-lf1-f51.google.com with SMTP id b11so24222260lfb.12
+        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 16:41:21 -0800 (PST)
+X-Received: by 2002:ac2:4d91:0:b0:443:127b:558a with SMTP id
+ g17-20020ac24d91000000b00443127b558amr14552706lfe.542.1646095280878; Mon, 28
+ Feb 2022 16:41:20 -0800 (PST)
 MIME-Version: 1.0
-References: <20220203010051.2813563-1-dmatlack@google.com> <20220203010051.2813563-22-dmatlack@google.com>
- <CANgfPd8uR6AHYvckAvmjNMvFsPLm7aLmYXW62nbtqKMijqQQ_A@mail.gmail.com> <CALzav=f8mSoFA5mMKCfguUGrkF0R5=pWEBaHVwXRg-9hQiy==g@mail.gmail.com>
-In-Reply-To: <CALzav=f8mSoFA5mMKCfguUGrkF0R5=pWEBaHVwXRg-9hQiy==g@mail.gmail.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Mon, 28 Feb 2022 16:37:03 -0800
-Message-ID: <CANgfPd8Zrp+0vjhRbrycty2mhrv6VT1hCAA7ZRMhyOmHGskPfQ@mail.gmail.com>
-Subject: Re: [PATCH 21/23] KVM: x86/mmu: Fully split huge pages that require
- extra pte_list_desc structs
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        leksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Peter Feiner <pfeiner@google.com>,
-        Andrew Jones <drjones@redhat.com>,
-        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
-        kvm <kvm@vger.kernel.org>
+References: <20220228110822.491923-1-jakobkoschel@gmail.com>
+ <20220228110822.491923-3-jakobkoschel@gmail.com> <2e4e95d6-f6c9-a188-e1cd-b1eae465562a@amd.com>
+ <CAHk-=wgQps58DPEOe4y5cTh5oE9EdNTWRLXzgMiETc+mFX7jzw@mail.gmail.com>
+ <CAHk-=wj8fkosQ7=bps5K+DDazBXk=ypfn49A0sEq+7-nZnyfXA@mail.gmail.com>
+ <CAHk-=wiTCvLQkHcJ3y0hpqH7FEk9D28LDvZZogC6OVLk7naBww@mail.gmail.com> <FC710A1A-524E-481B-A668-FC258F529A2E@gmail.com>
+In-Reply-To: <FC710A1A-524E-481B-A668-FC258F529A2E@gmail.com>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Mon, 28 Feb 2022 16:41:04 -0800
+X-Gmail-Original-Message-ID: <CAHk-=whLK11HyvpUtEftOjc3Gup2V77KpAQ2fycj3uai=qceHw@mail.gmail.com>
+Message-ID: <CAHk-=whLK11HyvpUtEftOjc3Gup2V77KpAQ2fycj3uai=qceHw@mail.gmail.com>
+Subject: Re: [PATCH 2/6] treewide: remove using list iterator after loop body
+ as a ptr
+To:     Jakob Koschel <jakobkoschel@gmail.com>
+Cc:     =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+        alsa-devel@alsa-project.org, linux-aspeed@lists.ozlabs.org,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        linux-iio@vger.kernel.org, nouveau@lists.freedesktop.org,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        dri-devel <dri-devel@lists.freedesktop.org>,
+        Cristiano Giuffrida <c.giuffrida@vu.nl>,
+        amd-gfx list <amd-gfx@lists.freedesktop.org>,
+        samba-technical@lists.samba.org,
+        linux1394-devel@lists.sourceforge.net, drbd-dev@lists.linbit.com,
+        linux-arch <linux-arch@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        linux-rdma <linux-rdma@vger.kernel.org>,
+        linux-staging@lists.linux.dev, "Bos, H.J." <h.j.bos@vu.nl>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        intel-wired-lan@lists.osuosl.org,
+        kgdb-bugreport@lists.sourceforge.net,
+        bcm-kernel-feedback-list@broadcom.com,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Linux Media Mailing List <linux-media@vger.kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Arnd Bergman <arnd@arndb.de>,
+        Linux PM <linux-pm@vger.kernel.org>,
+        intel-gfx <intel-gfx@lists.freedesktop.org>,
+        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        v9fs-developer@lists.sourceforge.net,
+        linux-tegra <linux-tegra@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-sgx@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>, linux-usb@vger.kernel.org,
+        linux-wireless <linux-wireless@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux F2FS Dev Mailing List 
+        <linux-f2fs-devel@lists.sourceforge.net>,
+        tipc-discussion@lists.sourceforge.net,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        dma <dmaengine@vger.kernel.org>,
+        linux-mediatek@lists.infradead.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        Mike Rapoport <rppt@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-18.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 28, 2022 at 3:41 PM David Matlack <dmatlack@google.com> wrote:
+On Mon, Feb 28, 2022 at 1:47 PM Jakob Koschel <jakobkoschel@gmail.com> wrote:
 >
-> On Mon, Feb 28, 2022 at 1:22 PM Ben Gardon <bgardon@google.com> wrote:
-> >
-> > On Wed, Feb 2, 2022 at 5:03 PM David Matlack <dmatlack@google.com> wrote:
-> > >
-> > > When splitting a huge page we need to add all of the lower level SPTEs
-> > > to the memslot rmap. The current implementation of eager page splitting
-> > > bails if adding an SPTE would require allocating an extra pte_list_desc
-> > > struct. Fix this limitation by allocating enough pte_list_desc structs
-> > > before splitting the huge page.
-> > >
-> > > This eliminates the need for TLB flushing under the MMU lock because the
-> > > huge page is always entirely split (no subregion of the huge page is
-> > > unmapped).
-> > >
-> > > Signed-off-by: David Matlack <dmatlack@google.com>
-> > > ---
-> > >  arch/x86/include/asm/kvm_host.h |  10 ++++
-> > >  arch/x86/kvm/mmu/mmu.c          | 101 ++++++++++++++++++--------------
-> > >  2 files changed, 67 insertions(+), 44 deletions(-)
-> > >
-> > > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> > > index d0b12bfe5818..a0f7578f7a26 100644
-> > > --- a/arch/x86/include/asm/kvm_host.h
-> > > +++ b/arch/x86/include/asm/kvm_host.h
-> > > @@ -1232,6 +1232,16 @@ struct kvm_arch {
-> > >         hpa_t   hv_root_tdp;
-> > >         spinlock_t hv_root_tdp_lock;
-> > >  #endif
-> > > +
-> > > +       /*
-> > > +        * Memory cache used to allocate pte_list_desc structs while splitting
-> > > +        * huge pages. In the worst case, to split one huge page we need 512
-> > > +        * pte_list_desc structs to add each new lower level leaf sptep to the
-> > > +        * memslot rmap.
-> > > +        */
-> > > +#define HUGE_PAGE_SPLIT_DESC_CACHE_CAPACITY 512
-> > > +       __DEFINE_KVM_MMU_MEMORY_CACHE(huge_page_split_desc_cache,
-> > > +                                     HUGE_PAGE_SPLIT_DESC_CACHE_CAPACITY);
-> > >  };
-> > >
-> > >  struct kvm_vm_stat {
-> > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > > index 825cfdec589b..c7981a934237 100644
-> > > --- a/arch/x86/kvm/mmu/mmu.c
-> > > +++ b/arch/x86/kvm/mmu/mmu.c
-> > > @@ -5905,6 +5905,11 @@ void kvm_mmu_init_vm(struct kvm *kvm)
-> > >         node->track_write = kvm_mmu_pte_write;
-> > >         node->track_flush_slot = kvm_mmu_invalidate_zap_pages_in_memslot;
-> > >         kvm_page_track_register_notifier(kvm, node);
-> > > +
-> > > +       kvm->arch.huge_page_split_desc_cache.capacity =
-> > > +               HUGE_PAGE_SPLIT_DESC_CACHE_CAPACITY;
-> > > +       kvm->arch.huge_page_split_desc_cache.kmem_cache = pte_list_desc_cache;
-> > > +       kvm->arch.huge_page_split_desc_cache.gfp_zero = __GFP_ZERO;
-> > >  }
-> > >
-> > >  void kvm_mmu_uninit_vm(struct kvm *kvm)
-> > > @@ -6035,9 +6040,42 @@ void kvm_mmu_slot_remove_write_access(struct kvm *kvm,
-> > >                 kvm_arch_flush_remote_tlbs_memslot(kvm, memslot);
-> > >  }
-> > >
-> > > +static int min_descs_for_split(const struct kvm_memory_slot *slot, u64 *huge_sptep)
-> > > +{
-> > > +       struct kvm_mmu_page *huge_sp = sptep_to_sp(huge_sptep);
-> > > +       int split_level = huge_sp->role.level - 1;
-> > > +       int i, min = 0;
-> > > +       gfn_t gfn;
-> > > +
-> > > +       gfn = kvm_mmu_page_get_gfn(huge_sp, huge_sptep - huge_sp->spt);
-> > >
-> > > -static int alloc_memory_for_split(struct kvm *kvm, struct kvm_mmu_page **spp, gfp_t gfp)
-> > > +       for (i = 0; i < PT64_ENT_PER_PAGE; i++) {
-> > > +               if (rmap_need_new_pte_list_desc(slot, gfn, split_level))
-> > > +                       min++;
-> > > +
-> > > +               gfn += KVM_PAGES_PER_HPAGE(split_level);
-> > > +       }
-> > > +
-> > > +       return min;
-> > > +}
-> >
-> > Is this calculation worth doing? It seems like we're doing a lot of
-> > work here to calculate exactly how many pages we need to allocate, but
-> > if eager splitting we'll be doing this over and over again. It seems
-> > like it would be more efficient to just always fill the cache since
-> > any extra pages allocated to split one page can be used to split the
-> > next one.
->
-> topup_huge_page_split_desc_cache() does fill the cache. This
-> calculation is just to determine the minimum number of objects needed
-> to split the next huge page, so that we can skip refilling the cache
-> when its unnecessary.
->
-> I think you are suggesting we unconditionally topup the cache and
-> hard-code the min to 513 (the capacity of the cache)? That would
-> certainly allow us to drop this function (less code complexity) but
-> would result in extra unnecessary allocations. If the cost of those
-> allocations is negligible then I can see an argument for going with
-> your approach.
+> The goal of this is to get compiler warnings right? This would indeed be great.
 
-Right, exactly.
-If you're eagerly splitting the entire EPT for a VM, then the number
-of extra allocations is bounded at 513 because memory allocated for
-one page can be used for the next one if not needed right?
-If you check how many you need on each pass, you'll be doing
-potentially O(pages split) extra work, so I suspect that
-unconditionally filling the cache will scale better.
+Yes, so I don't mind having a one-time patch that has been gathered
+using some automated checker tool, but I don't think that works from a
+long-term maintenance perspective.
 
->
-> >
-> > > +
-> > > +static int topup_huge_page_split_desc_cache(struct kvm *kvm, int min, gfp_t gfp)
-> > > +{
-> > > +       struct kvm_mmu_memory_cache *cache =
-> > > +               &kvm->arch.huge_page_split_desc_cache;
-> > > +
-> > > +       return __kvm_mmu_topup_memory_cache(cache, min, gfp);
-> > > +}
-> > > +
-> > > +static int alloc_memory_for_split(struct kvm *kvm, struct kvm_mmu_page **spp,
-> > > +                                 int min_descs, gfp_t gfp)
-> > >  {
-> > > +       int r;
-> > > +
-> > > +       r = topup_huge_page_split_desc_cache(kvm, min_descs, gfp);
-> > > +       if (r)
-> > > +               return r;
-> > > +
-> > >         if (*spp)
-> > >                 return 0;
-> > >
-> > > @@ -6050,9 +6088,9 @@ static int prepare_to_split_huge_page(struct kvm *kvm,
-> > >                                       const struct kvm_memory_slot *slot,
-> > >                                       u64 *huge_sptep,
-> > >                                       struct kvm_mmu_page **spp,
-> > > -                                     bool *flush,
-> > >                                       bool *dropped_lock)
-> > >  {
-> > > +       int min_descs = min_descs_for_split(slot, huge_sptep);
-> > >         int r = 0;
-> > >
-> > >         *dropped_lock = false;
-> > > @@ -6063,22 +6101,18 @@ static int prepare_to_split_huge_page(struct kvm *kvm,
-> > >         if (need_resched() || rwlock_needbreak(&kvm->mmu_lock))
-> > >                 goto drop_lock;
-> > >
-> > > -       r = alloc_memory_for_split(kvm, spp, GFP_NOWAIT | __GFP_ACCOUNT);
-> > > +       r = alloc_memory_for_split(kvm, spp, min_descs, GFP_NOWAIT | __GFP_ACCOUNT);
-> > >         if (r)
-> > >                 goto drop_lock;
-> > >
-> > >         return 0;
-> > >
-> > >  drop_lock:
-> > > -       if (*flush)
-> > > -               kvm_arch_flush_remote_tlbs_memslot(kvm, slot);
-> > > -
-> > > -       *flush = false;
-> > >         *dropped_lock = true;
-> > >
-> > >         write_unlock(&kvm->mmu_lock);
-> > >         cond_resched();
-> > > -       r = alloc_memory_for_split(kvm, spp, GFP_KERNEL_ACCOUNT);
-> > > +       r = alloc_memory_for_split(kvm, spp, min_descs, GFP_KERNEL_ACCOUNT);
-> > >         write_lock(&kvm->mmu_lock);
-> > >
-> > >         return r;
-> > > @@ -6122,10 +6156,10 @@ static struct kvm_mmu_page *kvm_mmu_get_sp_for_split(struct kvm *kvm,
-> > >
-> > >  static int kvm_mmu_split_huge_page(struct kvm *kvm,
-> > >                                    const struct kvm_memory_slot *slot,
-> > > -                                  u64 *huge_sptep, struct kvm_mmu_page **spp,
-> > > -                                  bool *flush)
-> > > +                                  u64 *huge_sptep, struct kvm_mmu_page **spp)
-> > >
-> > >  {
-> > > +       struct kvm_mmu_memory_cache *cache;
-> > >         struct kvm_mmu_page *split_sp;
-> > >         u64 huge_spte, split_spte;
-> > >         int split_level, index;
-> > > @@ -6138,9 +6172,9 @@ static int kvm_mmu_split_huge_page(struct kvm *kvm,
-> > >                 return -EOPNOTSUPP;
-> > >
-> > >         /*
-> > > -        * Since we did not allocate pte_list_desc_structs for the split, we
-> > > -        * cannot add a new parent SPTE to parent_ptes. This should never happen
-> > > -        * in practice though since this is a fresh SP.
-> > > +        * We did not allocate an extra pte_list_desc struct to add huge_sptep
-> > > +        * to split_sp->parent_ptes. An extra pte_list_desc struct should never
-> > > +        * be necessary in practice though since split_sp is brand new.
-> > >          *
-> > >          * Note, this makes it safe to pass NULL to __link_shadow_page() below.
-> > >          */
-> > > @@ -6151,6 +6185,7 @@ static int kvm_mmu_split_huge_page(struct kvm *kvm,
-> > >
-> > >         split_level = split_sp->role.level;
-> > >         access = split_sp->role.access;
-> > > +       cache = &kvm->arch.huge_page_split_desc_cache;
-> > >
-> > >         for (index = 0; index < PT64_ENT_PER_PAGE; index++) {
-> > >                 split_sptep = &split_sp->spt[index];
-> > > @@ -6158,25 +6193,11 @@ static int kvm_mmu_split_huge_page(struct kvm *kvm,
-> > >
-> > >                 BUG_ON(is_shadow_present_pte(*split_sptep));
-> > >
-> > > -               /*
-> > > -                * Since we did not allocate pte_list_desc structs for the
-> > > -                * split, we can't add a new SPTE that maps this GFN.
-> > > -                * Skipping this SPTE means we're only partially mapping the
-> > > -                * huge page, which means we'll need to flush TLBs before
-> > > -                * dropping the MMU lock.
-> > > -                *
-> > > -                * Note, this make it safe to pass NULL to __rmap_add() below.
-> > > -                */
-> > > -               if (rmap_need_new_pte_list_desc(slot, split_gfn, split_level)) {
-> > > -                       *flush = true;
-> > > -                       continue;
-> > > -               }
-> > > -
-> > >                 split_spte = make_huge_page_split_spte(
-> > >                                 huge_spte, split_level + 1, index, access);
-> > >
-> > >                 mmu_spte_set(split_sptep, split_spte);
-> > > -               __rmap_add(kvm, NULL, slot, split_sptep, split_gfn, access);
-> > > +               __rmap_add(kvm, cache, slot, split_sptep, split_gfn, access);
-> > >         }
-> > >
-> > >         /*
-> > > @@ -6222,7 +6243,6 @@ static bool rmap_try_split_huge_pages(struct kvm *kvm,
-> > >         struct kvm_mmu_page *sp = NULL;
-> > >         struct rmap_iterator iter;
-> > >         u64 *huge_sptep, spte;
-> > > -       bool flush = false;
-> > >         bool dropped_lock;
-> > >         int level;
-> > >         gfn_t gfn;
-> > > @@ -6237,7 +6257,7 @@ static bool rmap_try_split_huge_pages(struct kvm *kvm,
-> > >                 level = sptep_to_sp(huge_sptep)->role.level;
-> > >                 gfn = sptep_to_gfn(huge_sptep);
-> > >
-> > > -               r = prepare_to_split_huge_page(kvm, slot, huge_sptep, &sp, &flush, &dropped_lock);
-> > > +               r = prepare_to_split_huge_page(kvm, slot, huge_sptep, &sp, &dropped_lock);
-> > >                 if (r) {
-> > >                         trace_kvm_mmu_split_huge_page(gfn, spte, level, r);
-> > >                         break;
-> > > @@ -6246,7 +6266,7 @@ static bool rmap_try_split_huge_pages(struct kvm *kvm,
-> > >                 if (dropped_lock)
-> > >                         goto restart;
-> > >
-> > > -               r = kvm_mmu_split_huge_page(kvm, slot, huge_sptep, &sp, &flush);
-> > > +               r = kvm_mmu_split_huge_page(kvm, slot, huge_sptep, &sp);
-> > >
-> > >                 trace_kvm_mmu_split_huge_page(gfn, spte, level, r);
-> > >
-> > > @@ -6261,7 +6281,7 @@ static bool rmap_try_split_huge_pages(struct kvm *kvm,
-> > >         if (sp)
-> > >                 kvm_mmu_free_sp(sp);
-> > >
-> > > -       return flush;
-> > > +       return false;
-> > >  }
-> > >
-> > >  static void kvm_rmap_try_split_huge_pages(struct kvm *kvm,
-> > > @@ -6269,7 +6289,6 @@ static void kvm_rmap_try_split_huge_pages(struct kvm *kvm,
-> > >                                           gfn_t start, gfn_t end,
-> > >                                           int target_level)
-> > >  {
-> > > -       bool flush;
-> > >         int level;
-> > >
-> > >         /*
-> > > @@ -6277,21 +6296,15 @@ static void kvm_rmap_try_split_huge_pages(struct kvm *kvm,
-> > >          * down to the target level. This ensures pages are recursively split
-> > >          * all the way to the target level. There's no need to split pages
-> > >          * already at the target level.
-> > > -        *
-> > > -        * Note that TLB flushes must be done before dropping the MMU lock since
-> > > -        * rmap_try_split_huge_pages() may partially split any given huge page,
-> > > -        * i.e. it may effectively unmap (make non-present) a portion of the
-> > > -        * huge page.
-> > >          */
-> > >         for (level = KVM_MAX_HUGEPAGE_LEVEL; level > target_level; level--) {
-> > > -               flush = slot_handle_level_range(kvm, slot,
-> > > -                                               rmap_try_split_huge_pages,
-> > > -                                               level, level, start, end - 1,
-> > > -                                               true, flush);
-> > > +               slot_handle_level_range(kvm, slot,
-> > > +                                       rmap_try_split_huge_pages,
-> > > +                                       level, level, start, end - 1,
-> > > +                                       true, false);
-> > >         }
-> > >
-> > > -       if (flush)
-> > > -               kvm_arch_flush_remote_tlbs_memslot(kvm, slot);
-> > > +       kvm_mmu_free_memory_cache(&kvm->arch.huge_page_split_desc_cache);
-> > >  }
-> > >
-> > >  /* Must be called with the mmu_lock held in write-mode. */
-> > > --
-> > > 2.35.0.rc2.247.g8bbb082509-goog
-> > >
+So if we have the basic rule being "don't use the loop iterator after
+the loop has finished, because it can cause all kinds of subtle
+issues", then in _addition_ to fixing the existing code paths that
+have this issue, I really would want to (a) get a compiler warning for
+future cases and (b) make it not actually _work_ for future cases.
+
+Because otherwise it will just happen again.
+
+> Changing the list_for_each_entry() macro first will break all of those cases
+> (e.g. the ones using 'list_entry_is_head()).
+
+So I have no problems with breaking cases that we basically already
+have a patch for due to  your automated tool. There were certainly
+more than a handful, but it didn't look _too_ bad to just make the
+rule be "don't use the iterator after the loop".
+
+Of course, that's just based on that patch of yours. Maybe there are a
+ton of other cases that your patch didn't change, because they didn't
+match your trigger case, so I may just be overly optimistic here.
+
+But basically to _me_, the important part is that the end result is
+maintainable longer-term. I'm more than happy to have a one-time patch
+to fix a lot of dubious cases if we can then have clean rules going
+forward.
+
+> I assumed it is better to fix those cases first and then have a simple
+> coccinelle script changing the macro + moving the iterator into the scope
+> of the macro.
+
+So that had been another plan of mine, until I actually looked at
+changing the macro. In the one case I looked at, it was ugly beyond
+belief.
+
+It turns out that just syntactically, it's really nice to give the
+type of the iterator from outside the way we do now. Yeah, it may be a
+bit odd, and maybe it's partly because I'm so used to the
+"list_for_each_list_entry()" syntax, but moving the type into the loop
+construct really made it nasty - either one very complex line, or
+having to split it over two lines which was even worse.
+
+Maybe the place I looked at just happened to have a long typename, but
+it's basically always going to be a struct, so it's never a _simple_
+type. And it just looked very odd adn unnatural to have the type as
+one of the "arguments" to that list_for_each_entry() macro.
+
+So yes, initially my idea had been to just move the iterator entirely
+inside the macro. But specifying the type got so ugly that I think
+that
+
+        typeof (pos) pos
+
+trick inside the macro really ends up giving us the best of all worlds:
+
+ (a) let's us keep the existing syntax and code for all the nice cases
+that did everything inside the loop anyway
+
+ (b) gives us a nice warning for any normal use-after-loop case
+(unless you explicitly initialized it like that
+sgx_mmu_notifier_release() function did for no good reason
+
+ (c) also guarantees that even if you don't get a warning,
+non-converted (or newly written) bad code won't actually _work_
+
+so you end up getting the new rules without any ambiguity or mistaken
+
+> With this you are no longer able to set the 'outer' pos within the list
+> iterator loop body or am I missing something?
+
+Correct. Any assignment inside the loop will be entirely just to the
+local loop case. So any "break;" out of the loop will have to set
+another variable - like your updated patch did.
+
+> I fail to see how this will make most of the changes in this
+> patch obsolete (if that was the intention).
+
+I hope my explanation above clarifies my thinking: I do not dislike
+your patch, and in fact your patch is indeed required to make the new
+semantics work.
+
+What I disliked was always the maintainability of your patch - making
+the rules be something that isn't actually visible in the source code,
+and letting the old semantics still work as well as they ever did, and
+having to basically run some verification pass to find bad users.
+
+(I also disliked your original patch that mixed up the "CPU
+speculation type safety" with the actual non-speculative problems, but
+that was another issue).
+
+                Linus
