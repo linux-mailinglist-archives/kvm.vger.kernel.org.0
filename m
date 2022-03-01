@@ -2,78 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 850A64C935C
-	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 19:37:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F4034C937A
+	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 19:44:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233902AbiCASiQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Mar 2022 13:38:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37806 "EHLO
+        id S237086AbiCASpF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Mar 2022 13:45:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55094 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237095AbiCASiI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Mar 2022 13:38:08 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEEFB25EB0;
-        Tue,  1 Mar 2022 10:37:26 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 91235B81BFB;
-        Tue,  1 Mar 2022 18:37:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D9E0C340EE;
-        Tue,  1 Mar 2022 18:37:23 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="aQfeTqt3"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1646159840;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=VSlbgJdpoP+AY+bV5mfkN+zErWZpSrp0RJgkPDVSc0A=;
-        b=aQfeTqt3Blqmd7xwmnnemPOkABs2OSRQfD3vrWDfSpclMht5sVb5NhIpVgxjRlEiCLkj7u
-        TWiA9VszkWjvxE0Yx8q/qb/9de6ZpRvFOxGB1JCkF6eZfpa4GxXxMZ/IWhlVmVPlgRK2e5
-        TKYSF2+nWIzlxjGcVXAAqFsV6gVdKi4=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 61d2a11b (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Tue, 1 Mar 2022 18:37:20 +0000 (UTC)
-Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-2dc0364d2ceso5938327b3.7;
-        Tue, 01 Mar 2022 10:37:18 -0800 (PST)
-X-Gm-Message-State: AOAM533aWgITWalmDDlDTyk01ub1VY3yAnLIG9sIfSRQ0gWxD6mJQdbF
-        LnsLkRs33jUjOwpRvgltivZHmvFIxVgMa1kgT8I=
-X-Google-Smtp-Source: ABdhPJxjsymwg5XYl+9GOoc41diKHCjvuVitOGfsmWq8BKG7jLc7Bwscjb/8sbN68Rx5awXeXGZ28M5wy+3vS8Wf7hE=
-X-Received: by 2002:a81:8984:0:b0:2db:6b04:be0c with SMTP id
- z126-20020a818984000000b002db6b04be0cmr13093941ywf.2.1646159837032; Tue, 01
- Mar 2022 10:37:17 -0800 (PST)
+        with ESMTP id S237082AbiCASoy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Mar 2022 13:44:54 -0500
+Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E53C165421
+        for <kvm@vger.kernel.org>; Tue,  1 Mar 2022 10:43:50 -0800 (PST)
+Received: by mail-il1-x135.google.com with SMTP id f2so13274779ilq.1
+        for <kvm@vger.kernel.org>; Tue, 01 Mar 2022 10:43:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=avXnrLPk6C8Certs+81qMNb1A1PqBwld4hDSDYykLfM=;
+        b=SpEqjG3fvbdOmyqRY1V7g4oG6S+0uwnJ2D/5lyz+7cGf54HPRwdI/AFvO2a5JOYTQ1
+         0VYlSJYD0DgTCraxRbWtGz2dc2U91atI4GP2YthQeJJ7bJImyc1uZSvjPmDE0+l58t7y
+         XTTcYHPKUHp+T2LcAoU9RnddvyfXnKER5+vycrChCPuYzN3fGIhe4hVsH08ge1BsF2dr
+         z2cXo+2yl5GCfLthdyKQFNhGGPh5zmrYU1wm+BaUPWN+lF+K018OqjrIXKL+/DF1D2AL
+         1+GFlk7R+EOQaC0Ib+tfGDOIimxR79c2wO/RN7YdVtKKVXrK5ByuegfuuOhlkwyQcVyC
+         mdXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=avXnrLPk6C8Certs+81qMNb1A1PqBwld4hDSDYykLfM=;
+        b=DKejvnP7FlQHMPiLKBtqjgdzIlpOyN9jdGQE4gKzq9Z2yv20oBG16HtSELhYV1gww9
+         mp4Y4pKjxoUuioOx+GXMP4EXvCoKxanPX5eo7ov2P0PZO5wxce671KweYKfSM5j/ni0U
+         2lOlsb7rnnbeRNeL7wC8btran7L5BV4yvL0PvXTxkSigcDZ4ml58XYx5zB5Ay5B/Nnx2
+         zFnvBLa6N9Mh5i3RQ6fmxGFxi53RYPavEt+/WaywAf4S1ipSbaVc7O8oNHwUDPOADZNd
+         BvZB+Nm/3+9yRIW6EzIekhT5ejND1H9VfLwlJAUG6MoeGcaVuVqlFUonS5+6rcQBziJU
+         IWhg==
+X-Gm-Message-State: AOAM532As6WdbbtB24fb0SxXkD0zxqBwCqgL1sK2bK2mc3tfEYGp4Lvi
+        Hs8OCKKd8b+Vrd1b9ZOyAtjPZQ==
+X-Google-Smtp-Source: ABdhPJy6VtsrAxBvGfjz/9EnSnr6NWil+PV/J0P9JEHe9HSAoq0a5WnWU5wmnEQLMnUt3dx1b16fWw==
+X-Received: by 2002:a05:6e02:1645:b0:2c2:c11c:92a3 with SMTP id v5-20020a056e02164500b002c2c11c92a3mr17780208ilu.15.1646160230028;
+        Tue, 01 Mar 2022 10:43:50 -0800 (PST)
+Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
+        by smtp.gmail.com with ESMTPSA id b2-20020a923402000000b002c25b16552fsm8407601ila.14.2022.03.01.10.43.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Mar 2022 10:43:49 -0800 (PST)
+Date:   Tue, 1 Mar 2022 18:43:46 +0000
+From:   Oliver Upton <oupton@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        David Dunn <daviddunn@google.com>
+Subject: Re: [PATCH v4 1/8] KVM: nVMX: Keep KVM updates to BNDCFGS ctrl bits
+ across MSR write
+Message-ID: <Yh5pYhDQbzWQOdIx@google.com>
+References: <20220301060351.442881-1-oupton@google.com>
+ <20220301060351.442881-2-oupton@google.com>
+ <4e678b4f-4093-fa67-2c4e-e25ec2ced6d5@redhat.com>
 MIME-Version: 1.0
-References: <Yh4+9+UpanJWAIyZ@zx2c4.com> <223f858c-34c5-3ccd-b9e8-7585a976364d@redhat.com>
- <Yh5JwK6toc/zBNL7@zx2c4.com> <20220301121419-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20220301121419-mutt-send-email-mst@kernel.org>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Tue, 1 Mar 2022 19:37:06 +0100
-X-Gmail-Original-Message-ID: <CAHmME9qieLUDVoPYZPo=N8NCL1T-RzQ4p7kCFv3PKFUkhWZPsw@mail.gmail.com>
-Message-ID: <CAHmME9qieLUDVoPYZPo=N8NCL1T-RzQ4p7kCFv3PKFUkhWZPsw@mail.gmail.com>
-Subject: Re: propagating vmgenid outward and upward
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Laszlo Ersek <lersek@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>,
-        QEMU Developers <qemu-devel@nongnu.org>,
-        linux-hyperv@vger.kernel.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Alexander Graf <graf@amazon.com>,
-        "Michael Kelley (LINUX)" <mikelley@microsoft.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        adrian@parity.io,
-        =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Jann Horn <jannh@google.com>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        "Brown, Len" <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
-        Linux PM <linux-pm@vger.kernel.org>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        "Theodore Ts'o" <tytso@mit.edu>, Arnd Bergmann <arnd@arndb.de>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-6.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4e678b4f-4093-fa67-2c4e-e25ec2ced6d5@redhat.com>
+X-Spam-Status: No, score=-18.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -81,30 +77,49 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Michael,
+Hi Paolo,
 
-On Tue, Mar 1, 2022 at 6:17 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> Hmm okay, so it's a performance optimization... some batching then? Do
-> you really need to worry about every packet? Every 64 packets not
-> enough?  Packets are after all queued at NICs etc, and VM fork can
-> happen after they leave wireguard ...
+On Tue, Mar 01, 2022 at 07:00:57PM +0100, Paolo Bonzini wrote:
+> On 3/1/22 07:03, Oliver Upton wrote:
+> > +
+> > +	/*
+> > +	 * Ensure KVM fiddling with these MSRs is preserved after userspace
+> > +	 * write.
+> > +	 */
+> > +	if (msr_index == MSR_IA32_VMX_TRUE_ENTRY_CTLS ||
+> > +	    msr_index == MSR_IA32_VMX_TRUE_EXIT_CTLS)
+> > +		nested_vmx_entry_exit_ctls_update(&vmx->vcpu);
+> > +
+> 
+> I still don't understand this patch.  You say:
+> 
+> > Now, the BNDCFGS bits are only ever
+> > updated after a KVM_SET_CPUID/KVM_SET_CPUID2 ioctl, meaning that a
+> > subsequent MSR write from userspace will clobber these values.
+> 
+> but I don't understand what's wrong with that.  If you can (if so inclined)
+> define a VM without LOAD_BNDCFGS or CLEAR_BNDCFGS even if MPX enabled,
+> commit aedbaf4f6afd counts as a bugfix.
 
-Unfortunately, yes, this is an "every packet" sort of thing -- if the
-race is to be avoided in a meaningful way. It's really extra bad:
-ChaCha20 and AES-CTR work by xoring a secret stream of bytes with
-plaintext to produce a ciphertext. If you use that same secret stream
-and xor it with a second plaintext and transmit that too, an attacker
-can combine the two different ciphertexts to learn things about the
-original plaintext.
+Right, a 1-setting of '{load,clear} IA32_BNDCFGS' should really be the
+responsibility of userspace. My issue is that the commit message in
+commit 5f76f6f5ff96 ("KVM: nVMX: Do not expose MPX VMX controls when
+guest MPX disabled") suggests that userspace can expect these bits to be
+configured based on guest CPUID. Furthermore, before commit aedbaf4f6afd
+("KVM: x86: Extract kvm_update_cpuid_runtime() from
+kvm_update_cpuid()"), if userspace clears these bits, KVM will continue
+to set them based on CPUID.
 
-But, anyway, it seems like the race is here to stay given what we have
-_currently_ available with the virtual hardware. That's why I'm
-focused on trying to get something going that's the least bad with
-what we've currently got, which is racy by design. How vitally
-important is it to have something that doesn't race in the far future?
-I don't know, really. It seems plausible that that ACPI notifier
-triggers so early that nothing else really even has a chance, so the
-race concern is purely theoretical. But I haven't tried to measure
-that so I'm not sure.
+What is the userspace expectation here? If we are saying that changes to
+IA32_VMX_TRUE_{ENTRY,EXIT}_CTLS after userspace writes these MSRs is a
+bug, then I agree aedbaf4f6afd is in fact a bugfix. But, the commit
+message in 5f76f6f5ff96 seems to indicate that userspace wants KVM to
+configure these bits based on guest CPUID.
 
-Jason
+Given that there were previous userspace expectations, I attempted to
+restore the old behavior of KVM (ignore userspace writes) and add a
+quirk to fully back out of the mess. All this logic also applies to
+Patch 2 as well.
+
+--
+Oliver
