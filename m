@@ -2,329 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E1F614C915A
-	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 18:20:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 42B694C9361
+	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 19:38:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236444AbiCARVh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Mar 2022 12:21:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54420 "EHLO
+        id S236985AbiCASi4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Mar 2022 13:38:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233187AbiCARVf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Mar 2022 12:21:35 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 375CC5FFC
-        for <kvm@vger.kernel.org>; Tue,  1 Mar 2022 09:20:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646155253;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=TpCCGyVJGVfXxS3k6UJyCHnd6jf7rUXCZW6tbaMUeEk=;
-        b=dnYzfJNHYr7acHYuiergyyJxffuNfVWdhZ4RfppKy4I8hkgu7CJkLlW9isYfuwSsb33bRx
-        R5gDKbEizFXoCZQazYxnYf79cKG8SteX3q5fy659WgATd1O9fIDe7yYREDsgkaNTvy7UsC
-        uJK7QhSvjmkcv48U7C+DA34A+M14sCo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-112-tMwbKlSdPgyZJ1BT7SvuqA-1; Tue, 01 Mar 2022 12:20:50 -0500
-X-MC-Unique: tMwbKlSdPgyZJ1BT7SvuqA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 13D7B824FA8;
-        Tue,  1 Mar 2022 17:20:48 +0000 (UTC)
-Received: from starship (unknown [10.40.195.190])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A43772ED79;
-        Tue,  1 Mar 2022 17:20:43 +0000 (UTC)
-Message-ID: <c9e99c37e9d6c666ac790ee2166418eb9e54e3fd.camel@redhat.com>
-Subject: Re: [PATCH 2/4] KVM: x86: SVM: disable preemption in
- avic_refresh_apicv_exec_ctrl
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Jim Mattson <jmattson@google.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Borislav Petkov <bp@alien8.de>, x86@kernel.org
-Date:   Tue, 01 Mar 2022 19:20:42 +0200
-In-Reply-To: <Yh5UqJ0De0dk6uxD@google.com>
-References: <20220301135526.136554-1-mlevitsk@redhat.com>
-         <20220301135526.136554-3-mlevitsk@redhat.com> <Yh5UqJ0De0dk6uxD@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        with ESMTP id S235652AbiCASiz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Mar 2022 13:38:55 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E7CA36E07;
+        Tue,  1 Mar 2022 10:38:14 -0800 (PST)
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 221IDaoF032078;
+        Tue, 1 Mar 2022 18:38:14 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=5Z2rrVnuxaOz3qT8BxmyfNFjABtM0f2TCtxs4nFec0E=;
+ b=J+PJ/9ePSerHMTbPle4VLtFXHG0msQj56s4sEtqlLavvynfU/4Bi51ieh59sLXvUN32N
+ NhDvpYBbFPLYLvRb9p3rNSKuc39Fj5N4jQVvLTrVHd4LPDsuvH0yOnrMNNIEuVkdQGcg
+ Yi8nwbupGvTgDuTRhYCMIQGPry/2elD3gXBWtH3ecqVzDk2iS8TBLAcXMIDAYLzgdeXG
+ Ld8PYqgvmmV2f8qhATy90VfJuv0WpnhGP00A7wLhcZSux7PaUIMqrcSwFS55tW3F1oc8
+ 2Lve82G5tkg5VpS5fCwfIe1UQW/X7VpRdN1BsMaX9ocMJCpXcNbneWzzfGzrPlsp7Q9n VQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ehrk38gqx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 01 Mar 2022 18:38:13 +0000
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 221Iaw1d005262;
+        Tue, 1 Mar 2022 18:38:13 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ehrk38gpw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 01 Mar 2022 18:38:13 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 221IRTql000992;
+        Tue, 1 Mar 2022 18:38:11 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma04ams.nl.ibm.com with ESMTP id 3egbj17kr3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 01 Mar 2022 18:38:11 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 221Ic2xi51184054
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 1 Mar 2022 18:38:02 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 989894C050;
+        Tue,  1 Mar 2022 18:38:02 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4EDB34C044;
+        Tue,  1 Mar 2022 18:38:02 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.5.37])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue,  1 Mar 2022 18:38:02 +0000 (GMT)
+Date:   Tue, 1 Mar 2022 18:22:05 +0100
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com,
+        borntraeger@linux.ibm.com
+Subject: Re: [PATCH 1/9] s390x: Add SE hdr query information
+Message-ID: <20220301182205.345e001a@p-imbrenda>
+In-Reply-To: <20220223092007.3163-2-frankja@linux.ibm.com>
+References: <20220223092007.3163-1-frankja@linux.ibm.com>
+        <20220223092007.3163-2-frankja@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: sxzzM-kYxYDdA0CtV1w8TRjGdmb1wIqW
+X-Proofpoint-GUID: wFI3_G6_EPkRvbdqV3TsQ2065Oc9FCiF
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-03-01_07,2022-02-26_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ impostorscore=0 malwarescore=0 phishscore=0 lowpriorityscore=0 bulkscore=0
+ clxscore=1015 suspectscore=0 mlxlogscore=999 mlxscore=0 spamscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2201110000 definitions=main-2203010093
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-03-01 at 17:15 +0000, Sean Christopherson wrote:
-> On Tue, Mar 01, 2022, Maxim Levitsky wrote:
-> > avic_refresh_apicv_exec_ctrl is called from vcpu_enter_guest,
-> > without preemption disabled, however avic_vcpu_load, and
-> > avic_vcpu_put expect preemption to be disabled.
-> > 
-> > This issue was found by lockdep.
-> > 
-> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > ---
-> >  arch/x86/kvm/svm/avic.c | 4 ++++
-> >  1 file changed, 4 insertions(+)
-> > 
-> > diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> > index aea0b13773fd3..e23159f3a62ba 100644
-> > --- a/arch/x86/kvm/svm/avic.c
-> > +++ b/arch/x86/kvm/svm/avic.c
-> > @@ -640,12 +640,16 @@ void avic_refresh_apicv_exec_ctrl(struct kvm_vcpu *vcpu)
-> >  	}
-> >  	vmcb_mark_dirty(vmcb, VMCB_AVIC);
-> >  
-> > +	preempt_disable();
-> > +
-> >  	if (activated)
-> >  		avic_vcpu_load(vcpu, vcpu->cpu);
-> >  	else
-> >  		avic_vcpu_put(vcpu);
-> >  
-> >  	avic_set_pi_irte_mode(vcpu, activated);
-> > +
-> > +	preempt_enable();
+On Wed, 23 Feb 2022 09:19:59 +0000
+Janosch Frank <frankja@linux.ibm.com> wrote:
+
+> We have information about the supported se header version and pcf bits
+> so let's expose it via the sysfs files.
 > 
-> Assuming avic_set_pi_irte_mode() doesn't need to be protected, I'd prefer the
-> below patch.  This is the second time we done messed this up.
-> 
-> From: Sean Christopherson <seanjc@google.com>
-> Date: Tue, 1 Mar 2022 09:05:09 -0800
-> Subject: [PATCH] KVM: SVM: Disable preemption across AVIC load/put during
->  APICv refresh
-> 
-> Disable preemption when loading/putting the AVIC during an APICv refresh.
-> If the vCPU task is preempted and migrated ot a different pCPU, the
-> unprotected avic_vcpu_load() could set the wrong pCPU in the physical ID
-> cache/table.
-> 
-> Pull the necessary code out of avic_vcpu_{,un}blocking() and into a new
-> helper to reduce the probability of introducing this exact bug a third
-> time.
-> 
-> Fixes: df7e4827c549 ("KVM: SVM: call avic_vcpu_load/avic_vcpu_put when enabling/disabling AVIC")
-> Cc: stable@vger.kernel.org
-> Reported-by: Maxim Levitsky <mlevitsk@redhat.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+
 > ---
->  arch/x86/kvm/svm/avic.c | 103 ++++++++++++++++++++++------------------
->  arch/x86/kvm/svm/svm.c  |   4 +-
->  arch/x86/kvm/svm/svm.h  |   4 +-
->  3 files changed, 60 insertions(+), 51 deletions(-)
+>  arch/s390/boot/uv.c        |  2 ++
+>  arch/s390/include/asm/uv.h |  7 ++++++-
+>  arch/s390/kernel/uv.c      | 20 ++++++++++++++++++++
+>  3 files changed, 28 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> index aea0b13773fd..1afde44b1252 100644
-> --- a/arch/x86/kvm/svm/avic.c
-> +++ b/arch/x86/kvm/svm/avic.c
-> @@ -616,38 +616,6 @@ static int avic_set_pi_irte_mode(struct kvm_vcpu *vcpu, bool activate)
->  	return ret;
->  }
->  
-> -void avic_refresh_apicv_exec_ctrl(struct kvm_vcpu *vcpu)
-> -{
-> -	struct vcpu_svm *svm = to_svm(vcpu);
-> -	struct vmcb *vmcb = svm->vmcb01.ptr;
-> -	bool activated = kvm_vcpu_apicv_active(vcpu);
-> -
-> -	if (!enable_apicv)
-> -		return;
-> -
-> -	if (activated) {
-> -		/**
-> -		 * During AVIC temporary deactivation, guest could update
-> -		 * APIC ID, DFR and LDR registers, which would not be trapped
-> -		 * by avic_unaccelerated_access_interception(). In this case,
-> -		 * we need to check and update the AVIC logical APIC ID table
-> -		 * accordingly before re-activating.
-> -		 */
-> -		avic_apicv_post_state_restore(vcpu);
-> -		vmcb->control.int_ctl |= AVIC_ENABLE_MASK;
-> -	} else {
-> -		vmcb->control.int_ctl &= ~AVIC_ENABLE_MASK;
-> -	}
-> -	vmcb_mark_dirty(vmcb, VMCB_AVIC);
-> -
-> -	if (activated)
-> -		avic_vcpu_load(vcpu, vcpu->cpu);
-> -	else
-> -		avic_vcpu_put(vcpu);
-> -
-> -	avic_set_pi_irte_mode(vcpu, activated);
-> -}
-> -
->  static void svm_ir_list_del(struct vcpu_svm *svm, struct amd_iommu_pi_data *pi)
->  {
->  	unsigned long flags;
-> @@ -899,7 +867,7 @@ avic_update_iommu_vcpu_affinity(struct kvm_vcpu *vcpu, int cpu, bool r)
->  	return ret;
->  }
->  
-> -void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
-> +void __avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->  {
->  	u64 entry;
->  	/* ID = 0xff (broadcast), ID > 0xff (reserved) */
-> @@ -936,7 +904,7 @@ void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->  	avic_update_iommu_vcpu_affinity(vcpu, h_physical_id, true);
->  }
->  
-> -void avic_vcpu_put(struct kvm_vcpu *vcpu)
-> +void __avic_vcpu_put(struct kvm_vcpu *vcpu)
->  {
->  	u64 entry;
->  	struct vcpu_svm *svm = to_svm(vcpu);
-> @@ -955,13 +923,63 @@ void avic_vcpu_put(struct kvm_vcpu *vcpu)
->  	WRITE_ONCE(*(svm->avic_physical_id_cache), entry);
->  }
->  
-> -void avic_vcpu_blocking(struct kvm_vcpu *vcpu)
-> +static void avic_vcpu_load(struct kvm_vcpu *vcpu)
->  {
-> -	if (!kvm_vcpu_apicv_active(vcpu))
-> -		return;
-> +	int cpu = get_cpu();
->  
-> +	WARN_ON(cpu != vcpu->cpu);
-> +
-> +	__avic_vcpu_load(vcpu, cpu);
-> +
-> +	put_cpu();
-> +}
-> +
-> +static void avic_vcpu_put(struct kvm_vcpu *vcpu)
-> +{
->  	preempt_disable();
->  
-> +	__avic_vcpu_put(vcpu);
-> +
-> +	preempt_enable();
-> +}
-> +
-> +void avic_refresh_apicv_exec_ctrl(struct kvm_vcpu *vcpu)
-> +{
-> +	struct vcpu_svm *svm = to_svm(vcpu);
-> +	struct vmcb *vmcb = svm->vmcb01.ptr;
-> +	bool activated = kvm_vcpu_apicv_active(vcpu);
-> +
-> +	if (!enable_apicv)
-> +		return;
-> +
-> +	if (activated) {
-> +		/**
-> +		 * During AVIC temporary deactivation, guest could update
-> +		 * APIC ID, DFR and LDR registers, which would not be trapped
-> +		 * by avic_unaccelerated_access_interception(). In this case,
-> +		 * we need to check and update the AVIC logical APIC ID table
-> +		 * accordingly before re-activating.
-> +		 */
-> +		avic_apicv_post_state_restore(vcpu);
-> +		vmcb->control.int_ctl |= AVIC_ENABLE_MASK;
-> +	} else {
-> +		vmcb->control.int_ctl &= ~AVIC_ENABLE_MASK;
-> +	}
-> +	vmcb_mark_dirty(vmcb, VMCB_AVIC);
-> +
-> +	if (activated)
-> +		avic_vcpu_load(vcpu);
-> +	else
-> +		avic_vcpu_put(vcpu);
-> +
-> +	avic_set_pi_irte_mode(vcpu, activated);
-> +}
-> +
-> +void avic_vcpu_blocking(struct kvm_vcpu *vcpu)
-> +{
-> +	if (!kvm_vcpu_apicv_active(vcpu))
-> +		return;
-> +
->         /*
->          * Unload the AVIC when the vCPU is about to block, _before_
->          * the vCPU actually blocks.
-> @@ -976,21 +994,12 @@ void avic_vcpu_blocking(struct kvm_vcpu *vcpu)
->          * the cause of errata #1235).
->          */
->  	avic_vcpu_put(vcpu);
-> -
-> -	preempt_enable();
->  }
->  
->  void avic_vcpu_unblocking(struct kvm_vcpu *vcpu)
->  {
-> -	int cpu;
-> -
->  	if (!kvm_vcpu_apicv_active(vcpu))
->  		return;
->  
-> -	cpu = get_cpu();
-> -	WARN_ON(cpu != vcpu->cpu);
-> -
-> -	avic_vcpu_load(vcpu, cpu);
-> -
-> -	put_cpu();
-> +	avic_vcpu_load(vcpu);
->  }
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 7038c76fa841..c5e3f219803e 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -1318,13 +1318,13 @@ static void svm_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->  		indirect_branch_prediction_barrier();
+> diff --git a/arch/s390/boot/uv.c b/arch/s390/boot/uv.c
+> index e6be155ab2e5..b100b57cf15d 100644
+> --- a/arch/s390/boot/uv.c
+> +++ b/arch/s390/boot/uv.c
+> @@ -41,6 +41,8 @@ void uv_query_info(void)
+>  		uv_info.max_num_sec_conf = uvcb.max_num_sec_conf;
+>  		uv_info.max_guest_cpu_id = uvcb.max_guest_cpu_id;
+>  		uv_info.uv_feature_indications = uvcb.uv_feature_indications;
+> +		uv_info.supp_se_hdr_ver = uvcb.supp_se_hdr_versions;
+> +		uv_info.supp_se_hdr_pcf = uvcb.supp_se_hdr_pcf;
 >  	}
->  	if (kvm_vcpu_apicv_active(vcpu))
-> -		avic_vcpu_load(vcpu, cpu);
-> +		__avic_vcpu_load(vcpu, cpu);
->  }
 >  
->  static void svm_vcpu_put(struct kvm_vcpu *vcpu)
+>  #ifdef CONFIG_PROTECTED_VIRTUALIZATION_GUEST
+> diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
+> index 86218382d29c..7d6c78b61bf2 100644
+> --- a/arch/s390/include/asm/uv.h
+> +++ b/arch/s390/include/asm/uv.h
+> @@ -107,7 +107,10 @@ struct uv_cb_qui {
+>  	u8  reserved88[158 - 136];		/* 0x0088 */
+>  	u16 max_guest_cpu_id;			/* 0x009e */
+>  	u64 uv_feature_indications;		/* 0x00a0 */
+> -	u8  reserveda8[200 - 168];		/* 0x00a8 */
+> +	u64 reserveda8;				/* 0x00a8 */
+> +	u64 supp_se_hdr_versions;		/* 0x00b0 */
+> +	u64 supp_se_hdr_pcf;			/* 0x00b8 */
+> +	u64 reservedc0;				/* 0x00c0 */
+>  } __packed __aligned(8);
+>  
+>  /* Initialize Ultravisor */
+> @@ -285,6 +288,8 @@ struct uv_info {
+>  	unsigned int max_num_sec_conf;
+>  	unsigned short max_guest_cpu_id;
+>  	unsigned long uv_feature_indications;
+> +	unsigned long supp_se_hdr_ver;
+> +	unsigned long supp_se_hdr_pcf;
+>  };
+>  
+>  extern struct uv_info uv_info;
+> diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
+> index a5425075dd25..852840384e75 100644
+> --- a/arch/s390/kernel/uv.c
+> +++ b/arch/s390/kernel/uv.c
+> @@ -392,6 +392,24 @@ static ssize_t uv_query_facilities(struct kobject *kobj,
+>  static struct kobj_attribute uv_query_facilities_attr =
+>  	__ATTR(facilities, 0444, uv_query_facilities, NULL);
+>  
+> +static ssize_t uv_query_supp_se_hdr_ver(struct kobject *kobj,
+> +					struct kobj_attribute *attr, char *buf)
+> +{
+> +	return sysfs_emit(buf, "%lx\n", uv_info.supp_se_hdr_ver);
+> +}
+> +
+> +static struct kobj_attribute uv_query_supp_se_hdr_ver_attr =
+> +	__ATTR(supp_se_hdr_ver, 0444, uv_query_supp_se_hdr_ver, NULL);
+> +
+> +static ssize_t uv_query_supp_se_hdr_pcf(struct kobject *kobj,
+> +					struct kobj_attribute *attr, char *buf)
+> +{
+> +	return sysfs_emit(buf, "%lx\n", uv_info.supp_se_hdr_pcf);
+> +}
+> +
+> +static struct kobj_attribute uv_query_supp_se_hdr_pcf_attr =
+> +	__ATTR(supp_se_hdr_pcf, 0444, uv_query_supp_se_hdr_pcf, NULL);
+> +
+>  static ssize_t uv_query_feature_indications(struct kobject *kobj,
+>  					    struct kobj_attribute *attr, char *buf)
 >  {
->  	if (kvm_vcpu_apicv_active(vcpu))
-> -		avic_vcpu_put(vcpu);
-> +		__avic_vcpu_put(vcpu);
+> @@ -437,6 +455,8 @@ static struct attribute *uv_query_attrs[] = {
+>  	&uv_query_max_guest_cpus_attr.attr,
+>  	&uv_query_max_guest_vms_attr.attr,
+>  	&uv_query_max_guest_addr_attr.attr,
+> +	&uv_query_supp_se_hdr_ver_attr.attr,
+> +	&uv_query_supp_se_hdr_pcf_attr.attr,
+>  	NULL,
+>  };
 >  
->  	svm_prepare_host_switch(vcpu);
->  
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index 70850cbe5bcb..e45b5645d5e0 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -576,8 +576,8 @@ void avic_init_vmcb(struct vcpu_svm *svm);
->  int avic_incomplete_ipi_interception(struct kvm_vcpu *vcpu);
->  int avic_unaccelerated_access_interception(struct kvm_vcpu *vcpu);
->  int avic_init_vcpu(struct vcpu_svm *svm);
-> -void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu);
-> -void avic_vcpu_put(struct kvm_vcpu *vcpu);
-> +void __avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu);
-> +void __avic_vcpu_put(struct kvm_vcpu *vcpu);
->  void avic_apicv_post_state_restore(struct kvm_vcpu *vcpu);
->  void avic_set_virtual_apic_mode(struct kvm_vcpu *vcpu);
->  void avic_refresh_apicv_exec_ctrl(struct kvm_vcpu *vcpu);
-> 
-> base-commit: 44af02b939d6a6a166c9cd2d86d4c2a6959f0875
-
-
-I don't see that this patch is much different that what I proposed,
-especially since disable of preemption can be nested.
-
-But I won't be arguing with you about this.
-
-Best regards,
-	Maxim levitsky
-
 
