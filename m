@@ -2,275 +2,383 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C3B884C7F4B
-	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 01:33:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1199E4C7F5B
+	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 01:37:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231591AbiCAAdq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Feb 2022 19:33:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47380 "EHLO
+        id S229816AbiCAAiA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Feb 2022 19:38:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36056 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229735AbiCAAdp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Feb 2022 19:33:45 -0500
-Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DE32A9952
-        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 16:33:05 -0800 (PST)
-Received: by mail-ej1-x62b.google.com with SMTP id a23so28211014eju.3
-        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 16:33:04 -0800 (PST)
+        with ESMTP id S231861AbiCAAh4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Feb 2022 19:37:56 -0500
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52DEA65F5
+        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 16:37:16 -0800 (PST)
+Received: by mail-ed1-x52b.google.com with SMTP id x5so19884860edd.11
+        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 16:37:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=vcdfbWH6K4PLETg9Ox6HxAoQBntpf1VO+zdcMv9hYs4=;
-        b=EBvGtmafFg83T3Kd5ReZCotWRctmRQze6IVulBgy7fg1+j5GaJ0OQTkUasKXblTaBu
-         PzcjWJVRheBvTqEadwA/s1TAI5KrxUB9nuREAaq/CMUZe+TqXtHgKWi4chMDBz+o01T3
-         7ZRJFNtGyHYEyaLo0r7tO5UF33ma3JcA171uS1pkM473A+Tb0xF1RYzN8s8WWtEWzUya
-         8Czpmd3XvBR6XBVuvghcGKYizUtN2p2fHkWAtMpVLx0tsW14JqFdpw5h7eVaMAi/Gs8o
-         3EOowA/YhK7iH1odSJjkngAJbSknMQRzqHns3O8T73DJFkoe2qEkacuxh1hgfbPmHDhb
-         1nCA==
+        bh=ziO9yly6Qqoc9UXWVoa5+VQEQnn6k2BwQIGPyJsQSqI=;
+        b=ajSD2CCxiYvbvLGeR8ZPusTyFUU3SsLkWHo+x/1mM+3PDYEtm+MMJdaoiC19aRP6XN
+         faMca8Q/EIs8JUee378TpD+bz6kbg4muHcMYnptKTuXsGnzhlOtfWdBtjVOYTdxaVDjd
+         loky+uakvjA9V/eBbDqy8gik+LE8/QKxusZyBOII/w4vbbYBOGuVf6MET4p4sUUb8YFO
+         Yu1MN7fMEAa7oeGUJPa0GGxLS9d4l/wzlaiG+lMTg1MB+Vxv+yYIugdI9rs1jaKSHzNY
+         l/pcyNOysD2LHJwm55klNDJHsOFh3juhAi/K+jidggtglJqEWQ95wnS+o818w/mEnihF
+         Kuag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=vcdfbWH6K4PLETg9Ox6HxAoQBntpf1VO+zdcMv9hYs4=;
-        b=ebLhg7PH5psCxBRW9KJviDujUQUvghu71q9dSOHZ0TuHZOfPTg4eyEO6/xBqq78bgq
-         +1UcD+rTuViq/8N028WcPFNA3LzH+XSgJ/D/pEpRcFrLjYBZoLd+uqqq0bHR3LRCUI6Q
-         5OqG2eGnZphknM3RAfOrO+cr271XSStZF0T2s2sRRux7+dZtmJXwPnbTiBZomOhS6e+U
-         1oPDAQgWtNY1Ob1siPR1+JRPwSp3xkt2W1e4yTThtlN9FFiJp2aR9vLEqmjxKdW1kwGf
-         4MG+DlDoarsuWxtOMcjUk5VHEcfDX8z4f6NsyLzjK93omoPoqjvfFCE++Mg1Hm5fZ1Ii
-         DaNA==
-X-Gm-Message-State: AOAM533QPu71jp8O9c1tVXMrpQVIDRTLIDGrseyWXc2TnNhjjCaIWbI4
-        R0DE67CYe9rMVQC8FIdrW2VhnCpz02KGYc9S3j5oYQ==
-X-Google-Smtp-Source: ABdhPJyrWLl/aGXA1kaWaqOmD/Ot0ugq3mL/mZnSvd9Hzep5h/1hyGWz3kUuPRMHtd6nOZYUyW8+XyEBmaCzSTXz63k=
-X-Received: by 2002:a17:907:7618:b0:6cf:5756:26c4 with SMTP id
- jx24-20020a170907761800b006cf575626c4mr16993270ejc.492.1646094783390; Mon, 28
- Feb 2022 16:33:03 -0800 (PST)
+        bh=ziO9yly6Qqoc9UXWVoa5+VQEQnn6k2BwQIGPyJsQSqI=;
+        b=o5yUbb2c7ODknHNHJddvd/kXZoV0gHNHgfYHW//bzWyIFyYAxHmcMGxsZCm/i0+N8K
+         Zq7JvluroLoIOTp94N9lzkCBpqLgDSDUwnNMllgOFXmvLOOnJCP7z7gmZrtDCeI2pbZe
+         BN8paOHVg0Lq5/Pe9wqZyptfUpzO+/kD7njqXBY0fMdNoyiHmiZBaO+5tI7fxeWkm3y3
+         AcO83jOWVlQ28XW2wnlWd2vg/D+/D3jRAO0wQp62a9T1HLBF8AWLv2eXm534Z3so57Zo
+         eLZc5tNNe3SQQ3ryMteKdOjkXrY56WK7XRv9rtY7psrTods3RTMMPbsNlL6QLTGlHRGn
+         868w==
+X-Gm-Message-State: AOAM5332ZzLOb7X3kj+s6w2z7e419MHitRcpEqFnS9ciyyDkeGfsUclL
+        O5XlemmUjMLHtrDy1X+Gf7n1jp4Jw/tXfGhjwUGhUA==
+X-Google-Smtp-Source: ABdhPJy3i2jXBn7uYEk86nqWgCXymtqvbgG8hBlbGJYPFpbFrN/hvpZeFSlvQuWA0CNif+qQPz3H7mn+W2gQqVpWe0Y=
+X-Received: by 2002:a05:6402:3507:b0:413:523:5d24 with SMTP id
+ b7-20020a056402350700b0041305235d24mr21892523edd.85.1646095034493; Mon, 28
+ Feb 2022 16:37:14 -0800 (PST)
 MIME-Version: 1.0
-References: <20220226001546.360188-1-seanjc@google.com> <20220226001546.360188-16-seanjc@google.com>
-In-Reply-To: <20220226001546.360188-16-seanjc@google.com>
+References: <20220203010051.2813563-1-dmatlack@google.com> <20220203010051.2813563-22-dmatlack@google.com>
+ <CANgfPd8uR6AHYvckAvmjNMvFsPLm7aLmYXW62nbtqKMijqQQ_A@mail.gmail.com> <CALzav=f8mSoFA5mMKCfguUGrkF0R5=pWEBaHVwXRg-9hQiy==g@mail.gmail.com>
+In-Reply-To: <CALzav=f8mSoFA5mMKCfguUGrkF0R5=pWEBaHVwXRg-9hQiy==g@mail.gmail.com>
 From:   Ben Gardon <bgardon@google.com>
-Date:   Mon, 28 Feb 2022 16:32:52 -0800
-Message-ID: <CANgfPd8FhHC+7Bgc=718hU5uSEK3EStSaAdHxeEu3kxwGsySLQ@mail.gmail.com>
-Subject: Re: [PATCH v3 15/28] KVM: x86/mmu: Add dedicated helper to zap TDP
- MMU root shadow page
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+Date:   Mon, 28 Feb 2022 16:37:03 -0800
+Message-ID: <CANgfPd8Zrp+0vjhRbrycty2mhrv6VT1hCAA7ZRMhyOmHGskPfQ@mail.gmail.com>
+Subject: Re: [PATCH 21/23] KVM: x86/mmu: Fully split huge pages that require
+ extra pte_list_desc structs
+To:     David Matlack <dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        leksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
-        David Hildenbrand <david@redhat.com>,
-        kvm <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
-        David Matlack <dmatlack@google.com>,
-        Mingwei Zhang <mizhang@google.com>
+        Peter Feiner <pfeiner@google.com>,
+        Andrew Jones <drjones@redhat.com>,
+        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
+        kvm <kvm@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-18.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 25, 2022 at 4:16 PM Sean Christopherson <seanjc@google.com> wrote:
+On Mon, Feb 28, 2022 at 3:41 PM David Matlack <dmatlack@google.com> wrote:
 >
-> Add a dedicated helper for zapping a TDP MMU root, and use it in the three
-> flows that do "zap_all" and intentionally do not do a TLB flush if SPTEs
-> are zapped (zapping an entire root is safe if and only if it cannot be in
-> use by any vCPU).  Because a TLB flush is never required, unconditionally
-> pass "false" to tdp_mmu_iter_cond_resched() when potentially yielding.
+> On Mon, Feb 28, 2022 at 1:22 PM Ben Gardon <bgardon@google.com> wrote:
+> >
+> > On Wed, Feb 2, 2022 at 5:03 PM David Matlack <dmatlack@google.com> wrote:
+> > >
+> > > When splitting a huge page we need to add all of the lower level SPTEs
+> > > to the memslot rmap. The current implementation of eager page splitting
+> > > bails if adding an SPTE would require allocating an extra pte_list_desc
+> > > struct. Fix this limitation by allocating enough pte_list_desc structs
+> > > before splitting the huge page.
+> > >
+> > > This eliminates the need for TLB flushing under the MMU lock because the
+> > > huge page is always entirely split (no subregion of the huge page is
+> > > unmapped).
+> > >
+> > > Signed-off-by: David Matlack <dmatlack@google.com>
+> > > ---
+> > >  arch/x86/include/asm/kvm_host.h |  10 ++++
+> > >  arch/x86/kvm/mmu/mmu.c          | 101 ++++++++++++++++++--------------
+> > >  2 files changed, 67 insertions(+), 44 deletions(-)
+> > >
+> > > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > > index d0b12bfe5818..a0f7578f7a26 100644
+> > > --- a/arch/x86/include/asm/kvm_host.h
+> > > +++ b/arch/x86/include/asm/kvm_host.h
+> > > @@ -1232,6 +1232,16 @@ struct kvm_arch {
+> > >         hpa_t   hv_root_tdp;
+> > >         spinlock_t hv_root_tdp_lock;
+> > >  #endif
+> > > +
+> > > +       /*
+> > > +        * Memory cache used to allocate pte_list_desc structs while splitting
+> > > +        * huge pages. In the worst case, to split one huge page we need 512
+> > > +        * pte_list_desc structs to add each new lower level leaf sptep to the
+> > > +        * memslot rmap.
+> > > +        */
+> > > +#define HUGE_PAGE_SPLIT_DESC_CACHE_CAPACITY 512
+> > > +       __DEFINE_KVM_MMU_MEMORY_CACHE(huge_page_split_desc_cache,
+> > > +                                     HUGE_PAGE_SPLIT_DESC_CACHE_CAPACITY);
+> > >  };
+> > >
+> > >  struct kvm_vm_stat {
+> > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > > index 825cfdec589b..c7981a934237 100644
+> > > --- a/arch/x86/kvm/mmu/mmu.c
+> > > +++ b/arch/x86/kvm/mmu/mmu.c
+> > > @@ -5905,6 +5905,11 @@ void kvm_mmu_init_vm(struct kvm *kvm)
+> > >         node->track_write = kvm_mmu_pte_write;
+> > >         node->track_flush_slot = kvm_mmu_invalidate_zap_pages_in_memslot;
+> > >         kvm_page_track_register_notifier(kvm, node);
+> > > +
+> > > +       kvm->arch.huge_page_split_desc_cache.capacity =
+> > > +               HUGE_PAGE_SPLIT_DESC_CACHE_CAPACITY;
+> > > +       kvm->arch.huge_page_split_desc_cache.kmem_cache = pte_list_desc_cache;
+> > > +       kvm->arch.huge_page_split_desc_cache.gfp_zero = __GFP_ZERO;
+> > >  }
+> > >
+> > >  void kvm_mmu_uninit_vm(struct kvm *kvm)
+> > > @@ -6035,9 +6040,42 @@ void kvm_mmu_slot_remove_write_access(struct kvm *kvm,
+> > >                 kvm_arch_flush_remote_tlbs_memslot(kvm, memslot);
+> > >  }
+> > >
+> > > +static int min_descs_for_split(const struct kvm_memory_slot *slot, u64 *huge_sptep)
+> > > +{
+> > > +       struct kvm_mmu_page *huge_sp = sptep_to_sp(huge_sptep);
+> > > +       int split_level = huge_sp->role.level - 1;
+> > > +       int i, min = 0;
+> > > +       gfn_t gfn;
+> > > +
+> > > +       gfn = kvm_mmu_page_get_gfn(huge_sp, huge_sptep - huge_sp->spt);
+> > >
+> > > -static int alloc_memory_for_split(struct kvm *kvm, struct kvm_mmu_page **spp, gfp_t gfp)
+> > > +       for (i = 0; i < PT64_ENT_PER_PAGE; i++) {
+> > > +               if (rmap_need_new_pte_list_desc(slot, gfn, split_level))
+> > > +                       min++;
+> > > +
+> > > +               gfn += KVM_PAGES_PER_HPAGE(split_level);
+> > > +       }
+> > > +
+> > > +       return min;
+> > > +}
+> >
+> > Is this calculation worth doing? It seems like we're doing a lot of
+> > work here to calculate exactly how many pages we need to allocate, but
+> > if eager splitting we'll be doing this over and over again. It seems
+> > like it would be more efficient to just always fill the cache since
+> > any extra pages allocated to split one page can be used to split the
+> > next one.
 >
-> Opportunistically document why KVM must not yield when zapping roots that
-> are being zapped by kvm_tdp_mmu_put_root(), i.e. roots whose refcount has
-> reached zero, and further harden the flow to detect improper KVM behavior
-> with respect to roots that are supposed to be unreachable.
+> topup_huge_page_split_desc_cache() does fill the cache. This
+> calculation is just to determine the minimum number of objects needed
+> to split the next huge page, so that we can skip refilling the cache
+> when its unnecessary.
 >
-> In addition to hardening zapping of roots, isolating zapping of roots
-> will allow future simplification of zap_gfn_range() by having it zap only
-> leaf SPTEs, and by removing its tricky "zap all" heuristic.  By having
-> all paths that truly need to free _all_ SPs flow through the dedicated
-> root zapper, the generic zapper can be freed of those concerns.
->
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> I think you are suggesting we unconditionally topup the cache and
+> hard-code the min to 513 (the capacity of the cache)? That would
+> certainly allow us to drop this function (less code complexity) but
+> would result in extra unnecessary allocations. If the cost of those
+> allocations is negligible then I can see an argument for going with
+> your approach.
 
-Reviewed-by: Ben Gardon <bgardon@google.com>
+Right, exactly.
+If you're eagerly splitting the entire EPT for a VM, then the number
+of extra allocations is bounded at 513 because memory allocated for
+one page can be used for the next one if not needed right?
+If you check how many you need on each pass, you'll be doing
+potentially O(pages split) extra work, so I suspect that
+unconditionally filling the cache will scale better.
 
-Nice!
-
-> ---
->  arch/x86/kvm/mmu/tdp_mmu.c | 98 +++++++++++++++++++++++++++++++-------
->  1 file changed, 82 insertions(+), 16 deletions(-)
 >
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 87706e9cc6f3..c5df9a552470 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -56,10 +56,6 @@ void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm)
->         rcu_barrier();
->  }
->
-> -static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
-> -                         gfn_t start, gfn_t end, bool can_yield, bool flush,
-> -                         bool shared);
-> -
->  static void tdp_mmu_free_sp(struct kvm_mmu_page *sp)
->  {
->         free_page((unsigned long)sp->spt);
-> @@ -82,6 +78,9 @@ static void tdp_mmu_free_sp_rcu_callback(struct rcu_head *head)
->         tdp_mmu_free_sp(sp);
->  }
->
-> +static void tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
-> +                            bool shared);
-> +
->  void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
->                           bool shared)
->  {
-> @@ -104,7 +103,7 @@ void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
->          * intermediate paging structures, that may be zapped, as such entries
->          * are associated with the ASID on both VMX and SVM.
->          */
-> -       (void)zap_gfn_range(kvm, root, 0, -1ull, false, false, shared);
-> +       tdp_mmu_zap_root(kvm, root, shared);
->
->         call_rcu(&root->rcu_head, tdp_mmu_free_sp_rcu_callback);
->  }
-> @@ -751,6 +750,76 @@ static inline bool __must_check tdp_mmu_iter_cond_resched(struct kvm *kvm,
->         return iter->yielded;
->  }
->
-> +static inline gfn_t tdp_mmu_max_gfn_host(void)
-> +{
-> +       /*
-> +        * Bound TDP MMU walks at host.MAXPHYADDR, guest accesses beyond that
-> +        * will hit a #PF(RSVD) and never hit an EPT Violation/Misconfig / #NPF,
-> +        * and so KVM will never install a SPTE for such addresses.
-> +        */
-> +       return 1ULL << (shadow_phys_bits - PAGE_SHIFT);
-> +}
-> +
-> +static void tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
-> +                            bool shared)
-> +{
-> +       bool root_is_unreachable = !refcount_read(&root->tdp_mmu_root_count);
-> +       struct tdp_iter iter;
-> +
-> +       gfn_t end = tdp_mmu_max_gfn_host();
-> +       gfn_t start = 0;
-> +
-> +       kvm_lockdep_assert_mmu_lock_held(kvm, shared);
-> +
-> +       rcu_read_lock();
-> +
-> +       /*
-> +        * No need to try to step down in the iterator when zapping an entire
-> +        * root, zapping an upper-level SPTE will recurse on its children.
-> +        */
-> +       for_each_tdp_pte_min_level(iter, root, root->role.level, start, end) {
-> +retry:
-> +               /*
-> +                * Yielding isn't allowed when zapping an unreachable root as
-> +                * the root won't be processed by mmu_notifier callbacks.  When
-> +                * handling an unmap/release mmu_notifier command, KVM must
-> +                * drop all references to relevant pages prior to completing
-> +                * the callback.  Dropping mmu_lock can result in zapping SPTEs
-> +                * for an unreachable root after a relevant callback completes,
-> +                * which leads to use-after-free as zapping a SPTE triggers
-> +                * "writeback" of dirty/accessed bits to the SPTE's associated
-> +                * struct page.
-> +                */
-> +               if (!root_is_unreachable &&
-> +                   tdp_mmu_iter_cond_resched(kvm, &iter, false, shared))
-> +                       continue;
-> +
-> +               if (!is_shadow_present_pte(iter.old_spte))
-> +                       continue;
-> +
-> +               if (!shared) {
-> +                       tdp_mmu_set_spte(kvm, &iter, 0);
-> +               } else if (tdp_mmu_set_spte_atomic(kvm, &iter, 0)) {
-> +                       /*
-> +                        * cmpxchg() shouldn't fail if the root is unreachable.
-> +                        * Retry so as not to leak the page and its children.
-> +                        */
-> +                       WARN_ONCE(root_is_unreachable,
-> +                                 "Contended TDP MMU SPTE in unreachable root.");
-> +                       goto retry;
-> +               }
-> +
-> +               /*
-> +                * WARN if the root is invalid and is unreachable, all SPTEs
-> +                * should've been zapped by kvm_tdp_mmu_zap_invalidated_roots(),
-> +                * and inserting new SPTEs under an invalid root is a KVM bug.
-> +                */
-> +               WARN_ON_ONCE(root_is_unreachable && root->role.invalid);
-> +       }
-> +
-> +       rcu_read_unlock();
-> +}
-> +
->  bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
->  {
->         u64 old_spte;
-> @@ -799,8 +868,7 @@ static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
->                           gfn_t start, gfn_t end, bool can_yield, bool flush,
->                           bool shared)
->  {
-> -       gfn_t max_gfn_host = 1ULL << (shadow_phys_bits - PAGE_SHIFT);
-> -       bool zap_all = (start == 0 && end >= max_gfn_host);
-> +       bool zap_all = (start == 0 && end >= tdp_mmu_max_gfn_host());
->         struct tdp_iter iter;
->
->         /*
-> @@ -809,12 +877,7 @@ static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
->          */
->         int min_level = zap_all ? root->role.level : PG_LEVEL_4K;
->
-> -       /*
-> -        * Bound the walk at host.MAXPHYADDR, guest accesses beyond that will
-> -        * hit a #PF(RSVD) and never get to an EPT Violation/Misconfig / #NPF,
-> -        * and so KVM will never install a SPTE for such addresses.
-> -        */
-> -       end = min(end, max_gfn_host);
-> +       end = min(end, tdp_mmu_max_gfn_host());
->
->         kvm_lockdep_assert_mmu_lock_held(kvm, shared);
->
-> @@ -874,6 +937,7 @@ bool __kvm_tdp_mmu_zap_gfn_range(struct kvm *kvm, int as_id, gfn_t start,
->
->  void kvm_tdp_mmu_zap_all(struct kvm *kvm)
->  {
-> +       struct kvm_mmu_page *root;
->         int i;
->
->         /*
-> @@ -881,8 +945,10 @@ void kvm_tdp_mmu_zap_all(struct kvm *kvm)
->          * is being destroyed or the userspace VMM has exited.  In both cases,
->          * KVM_RUN is unreachable, i.e. no vCPUs will ever service the request.
->          */
-> -       for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++)
-> -               (void)kvm_tdp_mmu_zap_gfn_range(kvm, i, 0, -1ull, false);
-> +       for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
-> +               for_each_tdp_mmu_root_yield_safe(kvm, root, i, false)
-> +                       tdp_mmu_zap_root(kvm, root, false);
-> +       }
->  }
->
->  /*
-> @@ -908,7 +974,7 @@ void kvm_tdp_mmu_zap_invalidated_roots(struct kvm *kvm)
->                  * will still flush on yield, but that's a minor performance
->                  * blip and not a functional issue.
->                  */
-> -               (void)zap_gfn_range(kvm, root, 0, -1ull, true, false, true);
-> +               tdp_mmu_zap_root(kvm, root, true);
->
->                 /*
->                  * Put the reference acquired in kvm_tdp_mmu_invalidate_roots().
-> --
-> 2.35.1.574.g5d30c73bfb-goog
->
+> >
+> > > +
+> > > +static int topup_huge_page_split_desc_cache(struct kvm *kvm, int min, gfp_t gfp)
+> > > +{
+> > > +       struct kvm_mmu_memory_cache *cache =
+> > > +               &kvm->arch.huge_page_split_desc_cache;
+> > > +
+> > > +       return __kvm_mmu_topup_memory_cache(cache, min, gfp);
+> > > +}
+> > > +
+> > > +static int alloc_memory_for_split(struct kvm *kvm, struct kvm_mmu_page **spp,
+> > > +                                 int min_descs, gfp_t gfp)
+> > >  {
+> > > +       int r;
+> > > +
+> > > +       r = topup_huge_page_split_desc_cache(kvm, min_descs, gfp);
+> > > +       if (r)
+> > > +               return r;
+> > > +
+> > >         if (*spp)
+> > >                 return 0;
+> > >
+> > > @@ -6050,9 +6088,9 @@ static int prepare_to_split_huge_page(struct kvm *kvm,
+> > >                                       const struct kvm_memory_slot *slot,
+> > >                                       u64 *huge_sptep,
+> > >                                       struct kvm_mmu_page **spp,
+> > > -                                     bool *flush,
+> > >                                       bool *dropped_lock)
+> > >  {
+> > > +       int min_descs = min_descs_for_split(slot, huge_sptep);
+> > >         int r = 0;
+> > >
+> > >         *dropped_lock = false;
+> > > @@ -6063,22 +6101,18 @@ static int prepare_to_split_huge_page(struct kvm *kvm,
+> > >         if (need_resched() || rwlock_needbreak(&kvm->mmu_lock))
+> > >                 goto drop_lock;
+> > >
+> > > -       r = alloc_memory_for_split(kvm, spp, GFP_NOWAIT | __GFP_ACCOUNT);
+> > > +       r = alloc_memory_for_split(kvm, spp, min_descs, GFP_NOWAIT | __GFP_ACCOUNT);
+> > >         if (r)
+> > >                 goto drop_lock;
+> > >
+> > >         return 0;
+> > >
+> > >  drop_lock:
+> > > -       if (*flush)
+> > > -               kvm_arch_flush_remote_tlbs_memslot(kvm, slot);
+> > > -
+> > > -       *flush = false;
+> > >         *dropped_lock = true;
+> > >
+> > >         write_unlock(&kvm->mmu_lock);
+> > >         cond_resched();
+> > > -       r = alloc_memory_for_split(kvm, spp, GFP_KERNEL_ACCOUNT);
+> > > +       r = alloc_memory_for_split(kvm, spp, min_descs, GFP_KERNEL_ACCOUNT);
+> > >         write_lock(&kvm->mmu_lock);
+> > >
+> > >         return r;
+> > > @@ -6122,10 +6156,10 @@ static struct kvm_mmu_page *kvm_mmu_get_sp_for_split(struct kvm *kvm,
+> > >
+> > >  static int kvm_mmu_split_huge_page(struct kvm *kvm,
+> > >                                    const struct kvm_memory_slot *slot,
+> > > -                                  u64 *huge_sptep, struct kvm_mmu_page **spp,
+> > > -                                  bool *flush)
+> > > +                                  u64 *huge_sptep, struct kvm_mmu_page **spp)
+> > >
+> > >  {
+> > > +       struct kvm_mmu_memory_cache *cache;
+> > >         struct kvm_mmu_page *split_sp;
+> > >         u64 huge_spte, split_spte;
+> > >         int split_level, index;
+> > > @@ -6138,9 +6172,9 @@ static int kvm_mmu_split_huge_page(struct kvm *kvm,
+> > >                 return -EOPNOTSUPP;
+> > >
+> > >         /*
+> > > -        * Since we did not allocate pte_list_desc_structs for the split, we
+> > > -        * cannot add a new parent SPTE to parent_ptes. This should never happen
+> > > -        * in practice though since this is a fresh SP.
+> > > +        * We did not allocate an extra pte_list_desc struct to add huge_sptep
+> > > +        * to split_sp->parent_ptes. An extra pte_list_desc struct should never
+> > > +        * be necessary in practice though since split_sp is brand new.
+> > >          *
+> > >          * Note, this makes it safe to pass NULL to __link_shadow_page() below.
+> > >          */
+> > > @@ -6151,6 +6185,7 @@ static int kvm_mmu_split_huge_page(struct kvm *kvm,
+> > >
+> > >         split_level = split_sp->role.level;
+> > >         access = split_sp->role.access;
+> > > +       cache = &kvm->arch.huge_page_split_desc_cache;
+> > >
+> > >         for (index = 0; index < PT64_ENT_PER_PAGE; index++) {
+> > >                 split_sptep = &split_sp->spt[index];
+> > > @@ -6158,25 +6193,11 @@ static int kvm_mmu_split_huge_page(struct kvm *kvm,
+> > >
+> > >                 BUG_ON(is_shadow_present_pte(*split_sptep));
+> > >
+> > > -               /*
+> > > -                * Since we did not allocate pte_list_desc structs for the
+> > > -                * split, we can't add a new SPTE that maps this GFN.
+> > > -                * Skipping this SPTE means we're only partially mapping the
+> > > -                * huge page, which means we'll need to flush TLBs before
+> > > -                * dropping the MMU lock.
+> > > -                *
+> > > -                * Note, this make it safe to pass NULL to __rmap_add() below.
+> > > -                */
+> > > -               if (rmap_need_new_pte_list_desc(slot, split_gfn, split_level)) {
+> > > -                       *flush = true;
+> > > -                       continue;
+> > > -               }
+> > > -
+> > >                 split_spte = make_huge_page_split_spte(
+> > >                                 huge_spte, split_level + 1, index, access);
+> > >
+> > >                 mmu_spte_set(split_sptep, split_spte);
+> > > -               __rmap_add(kvm, NULL, slot, split_sptep, split_gfn, access);
+> > > +               __rmap_add(kvm, cache, slot, split_sptep, split_gfn, access);
+> > >         }
+> > >
+> > >         /*
+> > > @@ -6222,7 +6243,6 @@ static bool rmap_try_split_huge_pages(struct kvm *kvm,
+> > >         struct kvm_mmu_page *sp = NULL;
+> > >         struct rmap_iterator iter;
+> > >         u64 *huge_sptep, spte;
+> > > -       bool flush = false;
+> > >         bool dropped_lock;
+> > >         int level;
+> > >         gfn_t gfn;
+> > > @@ -6237,7 +6257,7 @@ static bool rmap_try_split_huge_pages(struct kvm *kvm,
+> > >                 level = sptep_to_sp(huge_sptep)->role.level;
+> > >                 gfn = sptep_to_gfn(huge_sptep);
+> > >
+> > > -               r = prepare_to_split_huge_page(kvm, slot, huge_sptep, &sp, &flush, &dropped_lock);
+> > > +               r = prepare_to_split_huge_page(kvm, slot, huge_sptep, &sp, &dropped_lock);
+> > >                 if (r) {
+> > >                         trace_kvm_mmu_split_huge_page(gfn, spte, level, r);
+> > >                         break;
+> > > @@ -6246,7 +6266,7 @@ static bool rmap_try_split_huge_pages(struct kvm *kvm,
+> > >                 if (dropped_lock)
+> > >                         goto restart;
+> > >
+> > > -               r = kvm_mmu_split_huge_page(kvm, slot, huge_sptep, &sp, &flush);
+> > > +               r = kvm_mmu_split_huge_page(kvm, slot, huge_sptep, &sp);
+> > >
+> > >                 trace_kvm_mmu_split_huge_page(gfn, spte, level, r);
+> > >
+> > > @@ -6261,7 +6281,7 @@ static bool rmap_try_split_huge_pages(struct kvm *kvm,
+> > >         if (sp)
+> > >                 kvm_mmu_free_sp(sp);
+> > >
+> > > -       return flush;
+> > > +       return false;
+> > >  }
+> > >
+> > >  static void kvm_rmap_try_split_huge_pages(struct kvm *kvm,
+> > > @@ -6269,7 +6289,6 @@ static void kvm_rmap_try_split_huge_pages(struct kvm *kvm,
+> > >                                           gfn_t start, gfn_t end,
+> > >                                           int target_level)
+> > >  {
+> > > -       bool flush;
+> > >         int level;
+> > >
+> > >         /*
+> > > @@ -6277,21 +6296,15 @@ static void kvm_rmap_try_split_huge_pages(struct kvm *kvm,
+> > >          * down to the target level. This ensures pages are recursively split
+> > >          * all the way to the target level. There's no need to split pages
+> > >          * already at the target level.
+> > > -        *
+> > > -        * Note that TLB flushes must be done before dropping the MMU lock since
+> > > -        * rmap_try_split_huge_pages() may partially split any given huge page,
+> > > -        * i.e. it may effectively unmap (make non-present) a portion of the
+> > > -        * huge page.
+> > >          */
+> > >         for (level = KVM_MAX_HUGEPAGE_LEVEL; level > target_level; level--) {
+> > > -               flush = slot_handle_level_range(kvm, slot,
+> > > -                                               rmap_try_split_huge_pages,
+> > > -                                               level, level, start, end - 1,
+> > > -                                               true, flush);
+> > > +               slot_handle_level_range(kvm, slot,
+> > > +                                       rmap_try_split_huge_pages,
+> > > +                                       level, level, start, end - 1,
+> > > +                                       true, false);
+> > >         }
+> > >
+> > > -       if (flush)
+> > > -               kvm_arch_flush_remote_tlbs_memslot(kvm, slot);
+> > > +       kvm_mmu_free_memory_cache(&kvm->arch.huge_page_split_desc_cache);
+> > >  }
+> > >
+> > >  /* Must be called with the mmu_lock held in write-mode. */
+> > > --
+> > > 2.35.0.rc2.247.g8bbb082509-goog
+> > >
