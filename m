@@ -2,216 +2,214 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DA71D4C94A6
-	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 20:43:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B70CF4C954C
+	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 20:59:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236103AbiCAToH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Mar 2022 14:44:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45048 "EHLO
+        id S234714AbiCAT7s (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Mar 2022 14:59:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36082 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233526AbiCAToG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Mar 2022 14:44:06 -0500
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCF4136B72
-        for <kvm@vger.kernel.org>; Tue,  1 Mar 2022 11:43:24 -0800 (PST)
-Received: by mail-pl1-x62b.google.com with SMTP id h17so8739241plc.5
-        for <kvm@vger.kernel.org>; Tue, 01 Mar 2022 11:43:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=ExyEERu3AkDFampoHdGKmwAuWIWkw1zHgxCYaeTfSN0=;
-        b=iC7WOxSIu8qRR6xAcrTg7odgwEG5EAsNJ70vuhK1/2ktCqiGK6Q5fecfEbHPCbL1vU
-         s0coRLTxAE8Y/sAtU58Hf34ruf7TUg9YYnjbRtVH7Kvtd2L+yFM0fF84YP/YgXnH8VmT
-         Cvo5CS+v41uk/YyT9L5w85Ip8v3KGWnXSM2u45NimENXcCV2PBzUWpaoH6/bFIG201De
-         JIdnfF8EKtfdNvHjsQtg/B5NjcNQZnhsKDHK1KaezZrf7j08xmMIV8MKCH7j+hWnOdl4
-         OypLFbXtevRXdI9CiLe79n3mG0v8ZwRAWtvciUO8T6f7tXZKu8x53p74NHuGUV3G9WQ6
-         FsEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=ExyEERu3AkDFampoHdGKmwAuWIWkw1zHgxCYaeTfSN0=;
-        b=UdwWvYw0pC7S11xgiN5HQryYZdbqfvR7bL/vP6LALq1MupbflXJMdkmPLLCxh6x6ah
-         BqgKB5YvJH0XdsGgXtgLGXozN3DlbuqRGN8Z6U9rzpjXfGACKZk6NeaT/UQfXNCHpXiL
-         K/6mqc1y6lTHMnvCCm7j+k9KAwQrHfPA6BTE5R5tAYHsFJ20eLsHguDtn4Z7Rr1AcPD+
-         jBXnAeg5tdfm4KYjB1vw+D4rOA4Wja6K8RIx4K+6VChYMkpr9N4cTMcQGTU74QQkjJRK
-         0O/4p23MGLIxrQhA3rpSVu1BaYvSw4Bv//K8IJ1Yf9qEd/o/m09aXkAmJmocdB9Iv2va
-         JbmQ==
-X-Gm-Message-State: AOAM533F8Pf9g1uQD2YJZx61eRR6k9KWU7nhZnvPBHUJtwGqp2ETGeAz
-        QKmR3m5llCWdxOmXoIguitEA8Q==
-X-Google-Smtp-Source: ABdhPJw666GK2ejmaGUqjIlBqKH6rwDnAltZH5Hn5HVEPhH/e3a3ftZx+jwZ75PDbxamFeFfcqfZ7w==
-X-Received: by 2002:a17:902:ea81:b0:14f:a4ce:ef79 with SMTP id x1-20020a170902ea8100b0014fa4ceef79mr26855032plb.136.1646163804034;
-        Tue, 01 Mar 2022 11:43:24 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id v189-20020a6389c6000000b00372e3b6fe90sm13856320pgd.55.2022.03.01.11.43.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Mar 2022 11:43:23 -0800 (PST)
-Date:   Tue, 1 Mar 2022 19:43:19 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        Mingwei Zhang <mizhang@google.com>
-Subject: Re: [PATCH v3 20/28] KVM: x86/mmu: Allow yielding when zapping GFNs
- for defunct TDP MMU root
-Message-ID: <Yh53V23gSJ6jphnS@google.com>
-References: <20220226001546.360188-1-seanjc@google.com>
- <20220226001546.360188-21-seanjc@google.com>
- <28276890-c90c-e9a9-3cab-15264617ef5a@redhat.com>
+        with ESMTP id S232694AbiCAT7r (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Mar 2022 14:59:47 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22BA22E0BF;
+        Tue,  1 Mar 2022 11:59:05 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 9CBAE616DD;
+        Tue,  1 Mar 2022 19:59:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E93DC340EE;
+        Tue,  1 Mar 2022 19:59:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1646164744;
+        bh=SW1EEhO8KyY6dUT4IZ3KcW8rX7jwP+ZfdbnQkQgnreA=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=N8V6YraEtt/f+lcf+go1zap5KQX7uIxOHRNjf/nrdUa/LwI+KqJEgbixNSyZsAMOZ
+         YWnM9x8DCeDhgnRpS+67/6Qc3gs4hQHOmuwWyyfZHxLaeXRvl5HBMldELu3OUdmcLY
+         0xaU/djFBH6oySgSvUqXkqhydq2yM4IfhTq18AzEbH0UDxMWkwDk++jMbArqKCenJO
+         wiJa3LNJtkQ8ialnwsBzVAuIC42ThgOMNT6UNZvrc4IYLSWD4F/GMymN+zUPSiliXg
+         d3dnVz8aQ4HfjBx1+FMvspEvS738UZQyjwTnicaXh8EwE33b8MIMXvcymETFQxNwDD
+         8qNBg2+J3KGSw==
+Date:   Tue, 1 Mar 2022 21:58:59 +0200
+From:   Leon Romanovsky <leon@kernel.org>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     bhelgaas@google.com, jgg@nvidia.com, saeedm@nvidia.com,
+        Yishai Hadas <yishaih@nvidia.com>, linux-pci@vger.kernel.org,
+        kvm@vger.kernel.org, netdev@vger.kernel.org, kuba@kernel.org,
+        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com,
+        cohuck@redhat.com, ashok.raj@intel.com, kevin.tian@intel.com,
+        shameerali.kolothum.thodi@huawei.com
+Subject: Re: [GIT PULL] Add mlx5 live migration driver and v2 migration
+ protocol
+Message-ID: <Yh57A//Wi2QdCLW2@unreal>
+References: <20220228123934.812807-1-leon@kernel.org>
+ <20220301124112.477ab6fc.alex.williamson@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <28276890-c90c-e9a9-3cab-15264617ef5a@redhat.com>
-X-Spam-Status: No, score=-18.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20220301124112.477ab6fc.alex.williamson@redhat.com>
+X-Spam-Status: No, score=-7.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 01, 2022, Paolo Bonzini wrote:
-> On 2/26/22 01:15, Sean Christopherson wrote:
-> > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> > index 3031b42c27a6..b838cfa984ad 100644
-> > --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> > @@ -91,21 +91,66 @@ void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
-> >   	WARN_ON(!root->tdp_mmu_page);
-> > -	spin_lock(&kvm->arch.tdp_mmu_pages_lock);
-> > -	list_del_rcu(&root->link);
-> > -	spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
-> > +	/*
-> > +	 * Ensure root->role.invalid is read after the refcount reaches zero to
-> > +	 * avoid zapping the root multiple times, e.g. if a different task
-> > +	 * acquires a reference (after the root was marked invalid) and puts
-> > +	 * the last reference, all while holding mmu_lock for read.  Pairs
-> > +	 * with the smp_mb__before_atomic() below.
-> > +	 */
-> > +	smp_mb__after_atomic();
-> > +
-> > +	/*
-> > +	 * Free the root if it's already invalid.  Invalid roots must be zapped
-> > +	 * before their last reference is put, i.e. there's no work to be done,
-> > +	 * and all roots must be invalidated (see below) before they're freed.
-> > +	 * Re-zapping invalid roots would put KVM into an infinite loop (again,
-> > +	 * see below).
-> > +	 */
-> > +	if (root->role.invalid) {
-> > +		spin_lock(&kvm->arch.tdp_mmu_pages_lock);
-> > +		list_del_rcu(&root->link);
-> > +		spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
-> > +
-> > +		call_rcu(&root->rcu_head, tdp_mmu_free_sp_rcu_callback);
-> > +		return;
-> > +	}
-> > +
-> > +	/*
-> > +	 * Invalidate the root to prevent it from being reused by a vCPU, and
-> > +	 * so that KVM doesn't re-zap the root when its last reference is put
-> > +	 * again (see above).
-> > +	 */
-> > +	root->role.invalid = true;
-> > +
-> > +	/*
-> > +	 * Ensure role.invalid is visible if a concurrent reader acquires a
-> > +	 * reference after the root's refcount is reset.  Pairs with the
-> > +	 * smp_mb__after_atomic() above.
-> > +	 */
-> > +	smp_mb__before_atomic();
+On Tue, Mar 01, 2022 at 12:41:12PM -0700, Alex Williamson wrote:
+> On Mon, 28 Feb 2022 14:39:34 +0200
+> Leon Romanovsky <leon@kernel.org> wrote:
 > 
-> I have reviewed the series and I only have very minor comments... but this
-> part is beyond me.  The lavish comments don't explain what is an
-> optimization and what is a requirement, 
-
-Ah, they're all requirements, but the invalid part also optimizes the case where
-a root was marked invalid before its last reference was was ever put.
-
-What I really meant to refer to by "zapping" was the entire sequence of restoring
-the refcount to '1', zapping the root, and recursively re-dropping that ref.  Avoiding
-that "zap" is a requirement, otherwise KVM would get stuck in an infinite loop.
-
-> and after spending quite some time I wonder if all this should just be
+> > From: Leon Romanovsky <leonro@nvidia.com>
+> > 
+> > Hi Alex,
+> > 
+> > This pull request contains the v9 version of recently submitted mlx5 live migration
+> > driver from Yishai and Jason.
+> > 
+> > In addition to changes in VFIO, this series extended the ethernet part of mlx5 driver.
+> > Such changes have all chances to create merge conflicts between VFIO, netdev and RDMA
+> > subsystems, which are eliminated with this PR.
 > 
->         if (refcount_dec_not_one(&root->tdp_mmu_root_count))
->                 return;
+> I know that Connie and perhaps others have spent a good deal of time
+> reviewing this, so I'd at least like to give them an opportunity to
+> chime in with their Reviewed-by before merging a PR.  For me please add
+> my
 > 
-> 	if (!xchg(&root->role.invalid, true) {
-
-The refcount being '1' means there's another task currently using root, marking
-the root invalid will mean checks on the root's validity are non-deterministic
-for the other task.  
-
-> 	 	tdp_mmu_zap_root(kvm, root, shared);
+> Reviewed-by: Alex Williamson <alex.williamson@redhat.com>
 > 
-> 		/*
-> 		 * Do not assume the refcount is still 1: because
-> 		 * tdp_mmu_zap_root can yield, a different task
-> 		 * might have grabbed a reference to this root.
-> 		 *
-> 	        if (refcount_dec_not_one(&root->tdp_mmu_root_count))
+> to patches 8-15 in Yishai's v9 posting.  If it's easier, I can adjust
+> the commits from this PR manually, I see there are just a few minor
+> commit log differences versus the v9 post.  Let's give this one more
+> day to collect any further outstanding comments or reviews.  Thanks,
 
-This is wrong, _this_ task can't drop a reference taken by the other task.
+Sure, I'll wait till Thursday, collect Acks and repost.
 
->         	        return;
-> 	}
+I fixed spelling errors which were spotted by spellcheck when created PR,
+so this is probably the reason of commit log differences. The style,
+language and grammar are original.
+
+Thanks
+
 > 
-> 	/*
-> 	 * The root is invalid, and its reference count has reached
-> 	 * zero.  It must have been zapped either in the "if" above or
-> 	 * by someone else, and we're definitely the last thread to see
-> 	 * it apart from RCU-protected page table walks.
-> 	 */
-> 	refcount_set(&root->tdp_mmu_root_count, 0);
-
-Not sure what you intended here, KVM should never force a refcount to '0'.
-
-> 	spin_lock(&kvm->arch.tdp_mmu_pages_lock);
-> 	list_del_rcu(&root->link);
-> 	spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
+> Alex
 > 
-> 	call_rcu(&root->rcu_head, tdp_mmu_free_sp_rcu_callback);
+> > ------------------------------------------------------------------------------------
+> > 
+> > The following changes since commit cfb92440ee71adcc2105b0890bb01ac3cddb8507:
+> > 
+> >   Linux 5.17-rc5 (2022-02-20 13:07:20 -0800)
+> > 
+> > are available in the Git repository at:
+> > 
+> >   https://git.kernel.org/pub/scm/linux/kernel/git/mellanox/linux.git tags/mlx5-vfio-v9
+> > 
+> > for you to fetch changes up to d18f3ba69448b8f68caf8592a9abb39e75c76e8d:
+> > 
+> >   vfio/mlx5: Use its own PCI reset_done error handler (2022-02-27 11:44:00 +0200)
+> > 
+> > ----------------------------------------------------------------
+> > Add mlx5 live migration driver and v2 migration protocol
+> > 
+> > This series adds mlx5 live migration driver for VFs that are migration
+> > capable and includes the v2 migration protocol definition and mlx5
+> > implementation.
+> > 
+> > The mlx5 driver uses the vfio_pci_core split to create a specific VFIO
+> > PCI driver that matches the mlx5 virtual functions. The driver provides
+> > the same experience as normal vfio-pci with the addition of migration
+> > support.
+> > 
+> > In HW the migration is controlled by the PF function, using its
+> > mlx5_core driver, and the VFIO PCI VF driver co-ordinates with the PF to
+> > execute the migration actions.
+> > 
+> > The bulk of the v2 migration protocol is semantically the same v1,
+> > however it has been recast into a FSM for the device_state and the
+> > actual syscall interface uses normal ioctl(), read() and write() instead
+> > of building a syscall interface using the region.
+> > 
+> > Several bits of infrastructure work are included here:
+> >  - pci_iov_vf_id() to help drivers like mlx5 figure out the VF index from
+> >    a BDF
+> >  - pci_iov_get_pf_drvdata() to clarify the tricky locking protocol when a
+> >    VF reaches into its PF's driver
+> >  - mlx5_core uses the normal SRIOV lifecycle and disables SRIOV before
+> >    driver remove, to be compatible with pci_iov_get_pf_drvdata()
+> >  - Lifting VFIO_DEVICE_FEATURE into core VFIO code
+> > 
+> > This series comes after alot of discussion. Some major points:
+> > - v1 ABI compatible migration defined using the same FSM approach:
+> >    https://lore.kernel.org/all/0-v1-a4f7cab64938+3f-vfio_mig_states_jgg@nvidia.com/
+> > - Attempts to clarify how the v1 API works:
+> >    Alex's:
+> >      https://lore.kernel.org/kvm/163909282574.728533.7460416142511440919.stgit@omen/
+> >    Jason's:
+> >      https://lore.kernel.org/all/0-v3-184b374ad0a8+24c-vfio_mig_doc_jgg@nvidia.com/
+> > - Etherpad exploring the scope and questions of general VFIO migration:
+> >      https://lore.kernel.org/kvm/87mtm2loml.fsf@redhat.com/
+> > 
+> > NOTE: As this series touched mlx5_core parts we need to send this in a
+> > pull request format to VFIO to avoid conflicts.
+> > 
+> > Matching qemu changes can be previewed here:
+> >  https://github.com/jgunthorpe/qemu/commits/vfio_migration_v2
+> > 
+> > Link: https://lore.kernel.org/all/20220224142024.147653-1-yishaih@nvidia.com
+> > Signed-of-by: Leon Romanovsky <leonro@nvidia.com>
+> > 
+> > ----------------------------------------------------------------
+> > Jason Gunthorpe (6):
+> >       PCI/IOV: Add pci_iov_vf_id() to get VF index
+> >       PCI/IOV: Add pci_iov_get_pf_drvdata() to allow VF reaching the drvdata of a PF
+> >       vfio: Have the core code decode the VFIO_DEVICE_FEATURE ioctl
+> >       vfio: Define device migration protocol v2
+> >       vfio: Extend the device migration protocol with RUNNING_P2P
+> >       vfio: Remove migration protocol v1 documentation
+> > 
+> > Leon Romanovsky (1):
+> >       net/mlx5: Reuse exported virtfn index function call
+> > 
+> > Yishai Hadas (8):
+> >       net/mlx5: Disable SRIOV before PF removal
+> >       net/mlx5: Expose APIs to get/put the mlx5 core device
+> >       net/mlx5: Introduce migration bits and structures
+> >       net/mlx5: Add migration commands definitions
+> >       vfio/mlx5: Expose migration commands over mlx5 device
+> >       vfio/mlx5: Implement vfio_pci driver for mlx5 devices
+> >       vfio/pci: Expose vfio_pci_core_aer_err_detected()
+> >       vfio/mlx5: Use its own PCI reset_done error handler
+> > 
+> >  MAINTAINERS                                        |   6 +
+> >  drivers/net/ethernet/mellanox/mlx5/core/cmd.c      |  10 +
+> >  drivers/net/ethernet/mellanox/mlx5/core/main.c     |  45 ++
+> >  .../net/ethernet/mellanox/mlx5/core/mlx5_core.h    |   1 +
+> >  drivers/net/ethernet/mellanox/mlx5/core/sriov.c    |  17 +-
+> >  drivers/pci/iov.c                                  |  43 ++
+> >  drivers/vfio/pci/Kconfig                           |   3 +
+> >  drivers/vfio/pci/Makefile                          |   2 +
+> >  drivers/vfio/pci/mlx5/Kconfig                      |  10 +
+> >  drivers/vfio/pci/mlx5/Makefile                     |   4 +
+> >  drivers/vfio/pci/mlx5/cmd.c                        | 259 ++++++++
+> >  drivers/vfio/pci/mlx5/cmd.h                        |  36 ++
+> >  drivers/vfio/pci/mlx5/main.c                       | 676 +++++++++++++++++++++
+> >  drivers/vfio/pci/vfio_pci.c                        |   1 +
+> >  drivers/vfio/pci/vfio_pci_core.c                   | 101 ++-
+> >  drivers/vfio/vfio.c                                | 295 ++++++++-
+> >  include/linux/mlx5/driver.h                        |   3 +
+> >  include/linux/mlx5/mlx5_ifc.h                      | 147 ++++-
+> >  include/linux/pci.h                                |  15 +-
+> >  include/linux/vfio.h                               |  53 ++
+> >  include/linux/vfio_pci_core.h                      |   4 +
+> >  include/uapi/linux/vfio.h                          | 406 ++++++-------
+> >  22 files changed, 1846 insertions(+), 291 deletions(-)
+> >  create mode 100644 drivers/vfio/pci/mlx5/Kconfig
+> >  create mode 100644 drivers/vfio/pci/mlx5/Makefile
+> >  create mode 100644 drivers/vfio/pci/mlx5/cmd.c
+> >  create mode 100644 drivers/vfio/pci/mlx5/cmd.h
+> >  create mode 100644 drivers/vfio/pci/mlx5/main.c
+> > 
 > 
-> (Yay for xchg's implicit memory barriers)
-
-xchg() is a very good idea.  The smp_mb_*() stuff was carried over from the previous
-version where this sequence set another flag in addition to role.invalid.
-
-Is this less funky (untested)?
-
-	/*
-	 * Invalidate the root to prevent it from being reused by a vCPU while
-	 * the root is being zapped, i.e. to allow yielding while zapping the
-	 * root (see below).
-	 *
-	 * Free the root if it's already invalid.  Invalid roots must be zapped
-	 * before their last reference is put, i.e. there's no work to be done,
-	 * and all roots must be invalidated before they're freed (this code).
-	 * Re-zapping invalid roots would put KVM into an infinite loop.
-	 *
-	 * Note, xchg() provides an implicit barrier to ensure role.invalid is
-	 * visible if a concurrent reader acquires a reference after the root's
-	 * refcount is reset.
-	 */
-	if (xchg(root->role.invalid, true))
-		spin_lock(&kvm->arch.tdp_mmu_pages_lock);
-		list_del_rcu(&root->link);
-		spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
-
-		call_rcu(&root->rcu_head, tdp_mmu_free_sp_rcu_callback);
-		return;
-	}
-
-
