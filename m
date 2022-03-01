@@ -2,121 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 372474C7F16
-	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 01:20:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 59C3C4C7FA2
+	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 01:47:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231486AbiCAAUh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Feb 2022 19:20:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45222 "EHLO
+        id S231907AbiCAAsQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Feb 2022 19:48:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229964AbiCAAUh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Feb 2022 19:20:37 -0500
-Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BF3C24BC6
-        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 16:19:57 -0800 (PST)
-Received: by mail-ed1-x52a.google.com with SMTP id h15so19877937edv.7
-        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 16:19:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=dQJGpmwFtFwNXc5097mgkIYQwk2uZL35ska8T+NcJow=;
-        b=KGs+vZGMy5o9gCgPNjwPwkknTqUWH9d0S8bb/zRio2fK8Dv2rghQHeRb0KEjWTL766
-         2eIDXGI5icCSPszRCMqnEqI+Ha1KfrCWpoKB6bcg2eFOwWSpydNvr466GcYTP26Qg4/f
-         tARKJddn0pc3oXyPqf7e2kZhmrBDolzHBC6A3OZd+t+PvBtzkjeZK8qyG1jh7nHP3u1p
-         J9gr4HZL/3Kst9h2MP4Dg4o46b86zGUY/caqwKWf+zElIuBnRV0U2M9wprxl/qaPdjBo
-         IKyHzc3dSqsD21R/j6kvXuEL0gGMs20crzxMIkCYT/GjtIVhwUQsjzlX0uyoKc/veH4H
-         pcbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=dQJGpmwFtFwNXc5097mgkIYQwk2uZL35ska8T+NcJow=;
-        b=oUPodDstEmqwNz3h4I1fXvbln3qxJYK52w6/2dwCgBlNRgkLtLvc9UHLbQS3onQ+Uv
-         G1K61mlw9kaihLRGi8q+F/Gh9hzqZ2FXUS7mHx1vivoo58YMVasCnfVql9fUHwNcyf9/
-         go9voYlNCBMB1JADt9C1FPzphgHvp63GAhQJMomtvONp57D3wDE5Pzx6Hd75VTLwogqz
-         f5El41f5+VefeSMRexyHmGytMYFiKUXOrE1RLPRQoNL75T64DmqJ1pkk+ZQg76VuCBj7
-         xh7mGTldhJY90mAYVQKudpcJdxpEO5/Z0CWZg1HJ+T1eS0NPhv0N6NKYcQYKcP1GYl/J
-         +IWg==
-X-Gm-Message-State: AOAM530FEUfla7yBlLH5jZRoTx7xm6ANrI7Y6xtSabczIAUMhxU7kJMR
-        1L5Eas2lWngGCJZALtRlKQNvAjgCz8oDSq60z9BCgw==
-X-Google-Smtp-Source: ABdhPJwbRsNCxk51HWeaG7jiibestzZo1q5Nx/1XbkzzXZJfTLcI/499zyc44C5Nrb1RGZc9hjfxsYkftsWi47dzHb8=
-X-Received: by 2002:aa7:c982:0:b0:406:3862:a717 with SMTP id
- c2-20020aa7c982000000b004063862a717mr22163022edt.358.1646093995992; Mon, 28
- Feb 2022 16:19:55 -0800 (PST)
-MIME-Version: 1.0
-References: <20220226001546.360188-1-seanjc@google.com> <20220226001546.360188-15-seanjc@google.com>
-In-Reply-To: <20220226001546.360188-15-seanjc@google.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Mon, 28 Feb 2022 16:19:44 -0800
-Message-ID: <CANgfPd9yGgXxT_Mue9DKpmtsCSrUQHCME7GcqYScEwxFwetimQ@mail.gmail.com>
-Subject: Re: [PATCH v3 14/28] KVM: x86/mmu: Skip remote TLB flush when zapping
- all of TDP MMU
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        David Hildenbrand <david@redhat.com>,
-        kvm <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
-        David Matlack <dmatlack@google.com>,
-        Mingwei Zhang <mizhang@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-18.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S231397AbiCAAsP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Feb 2022 19:48:15 -0500
+Received: from gate.crashing.org (gate.crashing.org [63.228.1.57])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4EE5127CCE;
+        Mon, 28 Feb 2022 16:47:33 -0800 (PST)
+Received: from gate.crashing.org (localhost.localdomain [127.0.0.1])
+        by gate.crashing.org (8.14.1/8.14.1) with ESMTP id 2210V56x017328;
+        Mon, 28 Feb 2022 18:31:05 -0600
+Received: (from segher@localhost)
+        by gate.crashing.org (8.14.1/8.14.1/Submit) id 2210V0er017322;
+        Mon, 28 Feb 2022 18:31:00 -0600
+X-Authentication-Warning: gate.crashing.org: segher set sender to segher@kernel.crashing.org using -f
+Date:   Mon, 28 Feb 2022 18:30:59 -0600
+From:   Segher Boessenkool <segher@kernel.crashing.org>
+To:     James Bottomley <James.Bottomley@HansenPartnership.com>
+Cc:     Mike Rapoport <rppt@kernel.org>,
+        Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-wireless <linux-wireless@vger.kernel.org>,
+        alsa-devel@alsa-project.org, KVM list <kvm@vger.kernel.org>,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        linux-iio@vger.kernel.org, nouveau@lists.freedesktop.org,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        dri-devel <dri-devel@lists.freedesktop.org>,
+        Cristiano Giuffrida <c.giuffrida@vu.nl>,
+        "Bos, H.J." <h.j.bos@vu.nl>, linux1394-devel@lists.sourceforge.net,
+        drbd-dev@lists.linbit.com, linux-arch <linux-arch@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>, linux-aspeed@lists.ozlabs.org,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        linux-rdma <linux-rdma@vger.kernel.org>,
+        linux-staging@lists.linux.dev,
+        amd-gfx list <amd-gfx@lists.freedesktop.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        intel-wired-lan@lists.osuosl.org,
+        kgdb-bugreport@lists.sourceforge.net,
+        bcm-kernel-feedback-list@broadcom.com,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Linux Media Mailing List <linux-media@vger.kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Arnd Bergman <arnd@arndb.de>,
+        Linux PM <linux-pm@vger.kernel.org>,
+        intel-gfx <intel-gfx@lists.freedesktop.org>,
+        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        dma <dmaengine@vger.kernel.org>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        Jakob Koschel <jakobkoschel@gmail.com>,
+        v9fs-developer@lists.sourceforge.net,
+        linux-tegra <linux-tegra@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-sgx@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>, linux-usb@vger.kernel.org,
+        samba-technical@lists.samba.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux F2FS Dev Mailing List 
+        <linux-f2fs-devel@lists.sourceforge.net>,
+        tipc-discussion@lists.sourceforge.net,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-mediatek@lists.infradead.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
+Subject: Re: [PATCH 2/6] treewide: remove using list iterator after loop body as a ptr
+Message-ID: <20220301003059.GE614@gate.crashing.org>
+References: <20220228110822.491923-1-jakobkoschel@gmail.com> <20220228110822.491923-3-jakobkoschel@gmail.com> <2e4e95d6-f6c9-a188-e1cd-b1eae465562a@amd.com> <CAHk-=wgQps58DPEOe4y5cTh5oE9EdNTWRLXzgMiETc+mFX7jzw@mail.gmail.com> <282f0f8d-f491-26fc-6ae0-604b367a5a1a@amd.com> <b2d20961dbb7533f380827a7fcc313ff849875c1.camel@HansenPartnership.com> <7D0C2A5D-500E-4F38-AD0C-A76E132A390E@kernel.org> <73fa82a20910c06784be2352a655acc59e9942ea.camel@HansenPartnership.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <73fa82a20910c06784be2352a655acc59e9942ea.camel@HansenPartnership.com>
+User-Agent: Mutt/1.4.2.3i
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_PASS,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 25, 2022 at 4:16 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> Don't flush the TLBs when zapping all TDP MMU pages, as the only time KVM
-> uses the slow version of "zap everything" is when the VM is being
-> destroyed or the owning mm has exited.  In either case, KVM_RUN is
-> unreachable for the VM, i.e. the guest TLB entries cannot be consumed.
->
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+On Mon, Feb 28, 2022 at 05:28:58PM -0500, James Bottomley wrote:
+> On Mon, 2022-02-28 at 23:59 +0200, Mike Rapoport wrote:
+> > 
+> > On February 28, 2022 10:42:53 PM GMT+02:00, James Bottomley <
+> > James.Bottomley@HansenPartnership.com> wrote:
+> > > On Mon, 2022-02-28 at 21:07 +0100, Christian König wrote:
+> [...]
+> > > > > I do wish we could actually poison the 'pos' value after the
+> > > > > loop somehow - but clearly the "might be uninitialized" I was
+> > > > > hoping for isn't the way to do it.
+> > > > > 
+> > > > > Anybody have any ideas?
+> > > > 
+> > > > I think we should look at the use cases why code is touching
+> > > > (pos) after the loop.
+> > > > 
+> > > > Just from skimming over the patches to change this and experience
+> > > > with the drivers/subsystems I help to maintain I think the
+> > > > primary pattern looks something like this:
+> > > > 
+> > > > list_for_each_entry(entry, head, member) {
+> > > >      if (some_condition_checking(entry))
+> > > >          break;
+> > > > }
+> > > > do_something_with(entry);
+> > > 
+> > > Actually, we usually have a check to see if the loop found
+> > > anything, but in that case it should something like
+> > > 
+> > > if (list_entry_is_head(entry, head, member)) {
+> > >    return with error;
+> > > }
+> > > do_somethin_with(entry);
+> > > 
+> > > Suffice?  The list_entry_is_head() macro is designed to cope with
+> > > the bogus entry on head problem.
+> > 
+> > Won't suffice because the end goal of this work is to limit scope of
+> > entry only to loop. Hence the need for additional variable.
+> 
+> Well, yes, but my objection is more to the size of churn than the
+> desire to do loop local.  I'm not even sure loop local is possible,
+> because it's always annoyed me that for (int i = 0; ...  in C++ defines
+> i in the outer scope not the loop scope, which is why I never use it.
 
-Reviewed-by: Ben Gardon <bgardon@google.com>
+In C its scope is the rest of the declaration and the entire loop, not
+anything after it.  This was the same in C++98 already, btw (but in
+pre-standard versions of C++ things were like you remember, yes, and it
+was painful).
 
-> ---
->  arch/x86/kvm/mmu/tdp_mmu.c | 11 ++++++-----
->  1 file changed, 6 insertions(+), 5 deletions(-)
->
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index c231b60e1726..87706e9cc6f3 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -874,14 +874,15 @@ bool __kvm_tdp_mmu_zap_gfn_range(struct kvm *kvm, int as_id, gfn_t start,
->
->  void kvm_tdp_mmu_zap_all(struct kvm *kvm)
->  {
-> -       bool flush = false;
->         int i;
->
-> +       /*
-> +        * A TLB flush is unnecessary, KVM zaps everything if and only the VM
-> +        * is being destroyed or the userspace VMM has exited.  In both cases,
-> +        * KVM_RUN is unreachable, i.e. no vCPUs will ever service the request.
-> +        */
->         for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++)
-> -               flush = kvm_tdp_mmu_zap_gfn_range(kvm, i, 0, -1ull, flush);
-> -
-> -       if (flush)
-> -               kvm_flush_remote_tlbs(kvm);
-> +               (void)kvm_tdp_mmu_zap_gfn_range(kvm, i, 0, -1ull, false);
->  }
->
->  /*
-> --
-> 2.35.1.574.g5d30c73bfb-goog
->
+
+Segher
