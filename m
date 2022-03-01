@@ -2,135 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 472154C9258
-	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 18:58:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D6CC4C9270
+	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 19:01:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236726AbiCAR6v (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Mar 2022 12:58:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37960 "EHLO
+        id S236539AbiCASBp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Mar 2022 13:01:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43294 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231947AbiCAR6t (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Mar 2022 12:58:49 -0500
-Received: from new3-smtp.messagingengine.com (new3-smtp.messagingengine.com [66.111.4.229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D310F3CA7B;
-        Tue,  1 Mar 2022 09:58:06 -0800 (PST)
-Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
-        by mailnew.nyi.internal (Postfix) with ESMTP id 1F34E5801D0;
-        Tue,  1 Mar 2022 12:58:06 -0500 (EST)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute1.internal (MEProxy); Tue, 01 Mar 2022 12:58:06 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
-        :cc:content-type:date:date:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to; s=fm3; bh=1b8nHfrBOcjPGYcB+Q6wr00uk1GmKX3v3ZNCnj
-        2Fc4I=; b=ZBUT+xBEPIHuw8jHImLNH+x52gankwE7MJd8sDFwnEoy45z1BwbhNh
-        xKsOdQ1yD9u7q0d/6DIUtrg535wnOmT4Lvdd1apo2YuuhLLDVkYx1vSgNyoTE5fJ
-        ofsW7j8uCMJyXK6Loz8rrLOzHyzxWsYiemruNwAl4gNUMe4M/NVtyIVhNAgsOfjy
-        b/w/wzWa4VwoEUleGhkhNF3kRyKpQ3Usq/8Ca14buwUMr/k/0v+gPaqGXYzqUKuv
-        KllGIGlPN88CAydfwqCLzM8aK7V+EiOvYiI4kF7OI9OB3TO949n6Hy8EMtjF8IqZ
-        MBlpj07s0Rnbq4GNXj6M7/3IgLXdvpRA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:date:date:from:from
-        :in-reply-to:in-reply-to:message-id:mime-version:references
-        :reply-to:sender:subject:subject:to:to:x-me-proxy:x-me-proxy
-        :x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=1b8nHfrBOcjPGYcB+
-        Q6wr00uk1GmKX3v3ZNCnj2Fc4I=; b=EY31l7G2XfgL9rSC/gwvRf8zFgwtBT7xS
-        zGIS7YVvo/KA/v9LCSJOIARDHfRqiRvn2gTz078tIpwk3oIxG21buWNUxNQmSUyy
-        MyYKa/Xe0zh4/DCiQIRNMfBLOEXackhRaibWR2bFKht/sqIYkVYfZsf6JTqkc8aS
-        N/+KxLe8dnTTbLIJQe4lQN4jxuybvA2M70S25Fv9b7VdN/aPfJftqSYQ4WVfyPqY
-        0tbQrYevVZ6RBtubRdYtr3gnZBflyWFJSH5G+LkmECZ7pFmQ2xcqosvgp1dXRrwM
-        GXM5n5s+pyNtUs5gG+ueV8296EmUoxyY6tuEcr0WZBCuK4oOvJTLg==
-X-ME-Sender: <xms:rF4eYt_khXW9JUELKd3sbskivfb6p9VNYJ9HJTNdiVa20a5SzZwcHg>
-    <xme:rF4eYhvpLP3jG67Y92AJSSlOEm5MH8cOme-q_WmBEiKHi2-d33bdpDbAgKuSlQzhv
-    bEXTTYYFzUc5A>
-X-ME-Received: <xmr:rF4eYrDa0WtfQIncLyLiGZ2_QzeJH36bSCyCi0g3L7auz9QrwNL4PuRbLUYhHGofRJvw4tCnLgWVuPYzt-8dyqU>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvvddruddtvddguddtgecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpeffhffvuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepifhrvghg
-    ucfmjfcuoehgrhgvgheskhhrohgrhhdrtghomheqnecuggftrfgrthhtvghrnhepveeuhe
-    ejgfffgfeivddukedvkedtleelleeghfeljeeiueeggeevueduudekvdetnecuvehluhhs
-    thgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepghhrvghgsehkrhhorg
-    hhrdgtohhm
-X-ME-Proxy: <xmx:rF4eYhep9_FqzdGryzLUlkyDm8oB4NZlyIpp5U2aPsiBO5Uc_pu1KA>
-    <xmx:rF4eYiNt1Zd7p4zbskEHRd607PiISY-ihvHig6bYJF7awgzM4cA48A>
-    <xmx:rF4eYjmGF931qz2wbkLW14iXG2GvWL_-CIczc4jJ1wtvDsjYWSRagQ>
-    <xmx:rl4eYkl7_n3lofGsDcutmkSMBLsPYoIzfmJgc1TjOF9wAZv0ieQERQ>
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 1 Mar 2022 12:58:03 -0500 (EST)
-Date:   Tue, 1 Mar 2022 18:58:02 +0100
-From:   Greg KH <greg@kroah.com>
-To:     Jakob Koschel <jakobkoschel@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-        alsa-devel@alsa-project.org, linux-aspeed@lists.ozlabs.org,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        linux-iio@vger.kernel.org, nouveau@lists.freedesktop.org,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        dri-devel <dri-devel@lists.freedesktop.org>,
-        Cristiano Giuffrida <c.giuffrida@vu.nl>,
-        amd-gfx list <amd-gfx@lists.freedesktop.org>,
-        samba-technical@lists.samba.org,
-        linux1394-devel@lists.sourceforge.net, drbd-dev@lists.linbit.com,
-        linux-arch <linux-arch@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>,
-        linux-scsi <linux-scsi@vger.kernel.org>,
-        linux-rdma <linux-rdma@vger.kernel.org>,
-        linux-staging@lists.linux.dev, "Bos, H.J." <h.j.bos@vu.nl>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        intel-wired-lan@lists.osuosl.org,
-        kgdb-bugreport@lists.sourceforge.net,
-        bcm-kernel-feedback-list@broadcom.com,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Linux Media Mailing List <linux-media@vger.kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Arnd Bergman <arnd@arndb.de>,
-        Linux PM <linux-pm@vger.kernel.org>,
-        intel-gfx <intel-gfx@lists.freedesktop.org>,
-        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        v9fs-developer@lists.sourceforge.net,
-        linux-tegra <linux-tegra@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-sgx@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>, linux-usb@vger.kernel.org,
-        linux-wireless <linux-wireless@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux F2FS Dev Mailing List 
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        tipc-discussion@lists.sourceforge.net,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        dma <dmaengine@vger.kernel.org>,
-        linux-mediatek@lists.infradead.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        Mike Rapoport <rppt@kernel.org>
-Subject: Re: [PATCH 2/6] treewide: remove using list iterator after loop body
- as a ptr
-Message-ID: <Yh5eqmAv0P2nnSq0@kroah.com>
-References: <20220228110822.491923-3-jakobkoschel@gmail.com>
- <2e4e95d6-f6c9-a188-e1cd-b1eae465562a@amd.com>
- <CAHk-=wgQps58DPEOe4y5cTh5oE9EdNTWRLXzgMiETc+mFX7jzw@mail.gmail.com>
- <CAHk-=wj8fkosQ7=bps5K+DDazBXk=ypfn49A0sEq+7-nZnyfXA@mail.gmail.com>
- <CAHk-=wiTCvLQkHcJ3y0hpqH7FEk9D28LDvZZogC6OVLk7naBww@mail.gmail.com>
- <FC710A1A-524E-481B-A668-FC258F529A2E@gmail.com>
- <CAHk-=whLK11HyvpUtEftOjc3Gup2V77KpAQ2fycj3uai=qceHw@mail.gmail.com>
- <CEDAD0D9-56EE-4105-9107-72C2EAD940B0@gmail.com>
- <Yh5ZmwiH5AxtQ69K@kroah.com>
- <4B1AFAD9-C1B3-499C-945A-C259361ABA8C@gmail.com>
+        with ESMTP id S229583AbiCASBo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Mar 2022 13:01:44 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 244D83FD81
+        for <kvm@vger.kernel.org>; Tue,  1 Mar 2022 10:01:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646157662;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=aGuBN2sDkrG0QralsisRx+RjFPJcE9jpk8xjbOOsyfE=;
+        b=bLarlxWr5aOHnE2a3jcKF0QH32F9qjdPd2i7SNHzEFti2GcEIhfVUHVC3krUHQ1aeIHnrJ
+        2GytgmajvLon8UahXufV5R4lEGc12FggWF9t6G4uPV3s4Jf98Xf5uZwUOJve+bmFk67i8a
+        XLHTJNuL/737tIoRQiVZOf4/ph2iiJA=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-607-HqKPMXJcN8GRBv8q32qzoQ-1; Tue, 01 Mar 2022 13:01:01 -0500
+X-MC-Unique: HqKPMXJcN8GRBv8q32qzoQ-1
+Received: by mail-wr1-f70.google.com with SMTP id q12-20020adfbb8c000000b001ea938f79e9so3567588wrg.23
+        for <kvm@vger.kernel.org>; Tue, 01 Mar 2022 10:01:00 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=aGuBN2sDkrG0QralsisRx+RjFPJcE9jpk8xjbOOsyfE=;
+        b=E3uo8Z4Np4N/bQ+dy+aHaKRM0+y36Pgf9wMKx/YH5EzJCpzjkwGRWuSQ3L0C9Llvcq
+         Smqd4k6exm3y8BRBFWpHxv079m+9S15JVAWC4xdUxOQpJTHlYEGTRmDb0hJlfOZHWn67
+         OCXjJoWP/8COch9YStXgAXcx7o5eiY4jG7RjwHS2QS3zlO+iHZ2dZMs9gO3d4n1FQWyO
+         4EizkqbHgBhHco6OqFS2x+A7IDBReB99RUsuIF7HwSeAVgBRVFG1hbxFHmDNmDXJPiua
+         y1XgA/cBZF9dlkv0zXRUfThHJaCwiVb5PapVUygRiuZ6JZJvZDZmpWZMAXwT2Flp1004
+         GRcw==
+X-Gm-Message-State: AOAM533U49M4q49I5EKGaQOL5+JeC9yqCfmRlVUgbbQr+L3gEufLAl5y
+        zouvS9ZNd57OP3M3gWFrlnr6WthwGzCXXabSqIiKGjzLvRKrGnLTOAhljykw9gQl5+CMQClE6Na
+        vA5fxc3drv43F
+X-Received: by 2002:a5d:678a:0:b0:1ef:8e97:363c with SMTP id v10-20020a5d678a000000b001ef8e97363cmr12384849wru.617.1646157659717;
+        Tue, 01 Mar 2022 10:00:59 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwlwO1iYWlkXlaIZYC8c3tEFCMQx8nu55QbUYSzt5j2PfbQbJH6+QV1RLoIm/tJ9HvBQgLvPQ==
+X-Received: by 2002:a5d:678a:0:b0:1ef:8e97:363c with SMTP id v10-20020a5d678a000000b001ef8e97363cmr12384830wru.617.1646157659488;
+        Tue, 01 Mar 2022 10:00:59 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.googlemail.com with ESMTPSA id p4-20020a05600c430400b0037bf8409eccsm4044638wme.23.2022.03.01.10.00.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 01 Mar 2022 10:00:58 -0800 (PST)
+Message-ID: <4e678b4f-4093-fa67-2c4e-e25ec2ced6d5@redhat.com>
+Date:   Tue, 1 Mar 2022 19:00:57 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4B1AFAD9-C1B3-499C-945A-C259361ABA8C@gmail.com>
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH v4 1/8] KVM: nVMX: Keep KVM updates to BNDCFGS ctrl bits
+ across MSR write
+Content-Language: en-US
+To:     Oliver Upton <oupton@google.com>, kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        David Dunn <daviddunn@google.com>
+References: <20220301060351.442881-1-oupton@google.com>
+ <20220301060351.442881-2-oupton@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20220301060351.442881-2-oupton@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -138,68 +87,26 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 01, 2022 at 06:40:04PM +0100, Jakob Koschel wrote:
-> 
-> 
-> > On 1. Mar 2022, at 18:36, Greg KH <greg@kroah.com> wrote:
-> > 
-> > On Tue, Mar 01, 2022 at 12:28:15PM +0100, Jakob Koschel wrote:
-> >> 
-> >> 
-> >>> On 1. Mar 2022, at 01:41, Linus Torvalds <torvalds@linux-foundation.org> wrote:
-> >>> 
-> >>> On Mon, Feb 28, 2022 at 1:47 PM Jakob Koschel <jakobkoschel@gmail.com> wrote:
-> >>>> 
-> >>>> The goal of this is to get compiler warnings right? This would indeed be great.
-> >>> 
-> >>> Yes, so I don't mind having a one-time patch that has been gathered
-> >>> using some automated checker tool, but I don't think that works from a
-> >>> long-term maintenance perspective.
-> >>> 
-> >>> So if we have the basic rule being "don't use the loop iterator after
-> >>> the loop has finished, because it can cause all kinds of subtle
-> >>> issues", then in _addition_ to fixing the existing code paths that
-> >>> have this issue, I really would want to (a) get a compiler warning for
-> >>> future cases and (b) make it not actually _work_ for future cases.
-> >>> 
-> >>> Because otherwise it will just happen again.
-> >>> 
-> >>>> Changing the list_for_each_entry() macro first will break all of those cases
-> >>>> (e.g. the ones using 'list_entry_is_head()).
-> >>> 
-> >>> So I have no problems with breaking cases that we basically already
-> >>> have a patch for due to  your automated tool. There were certainly
-> >>> more than a handful, but it didn't look _too_ bad to just make the
-> >>> rule be "don't use the iterator after the loop".
-> >>> 
-> >>> Of course, that's just based on that patch of yours. Maybe there are a
-> >>> ton of other cases that your patch didn't change, because they didn't
-> >>> match your trigger case, so I may just be overly optimistic here.
-> >> 
-> >> Based on the coccinelle script there are ~480 cases that need fixing
-> >> in total. I'll now finish all of them and then split them by
-> >> submodules as Greg suggested and repost a patch set per submodule.
-> >> Sounds good?
-> > 
-> > Sounds good to me!
-> > 
-> > If you need help carving these up and maintaining them over time as
-> > different subsystem maintainers accept/ignore them, just let me know.
-> > Doing large patchsets like this can be tough without a lot of
-> > experience.
-> 
-> Very much appreciated!
-> 
-> There will probably be some cases that do not match one of the pattern
-> we already discussed and need separate attention.
-> 
-> I was planning to start with one subsystem and adjust the coming ones
-> according to the feedback gather there instead of posting all of them
-> in one go.
+On 3/1/22 07:03, Oliver Upton wrote:
+> +
+> +	/*
+> +	 * Ensure KVM fiddling with these MSRs is preserved after userspace
+> +	 * write.
+> +	 */
+> +	if (msr_index == MSR_IA32_VMX_TRUE_ENTRY_CTLS ||
+> +	    msr_index == MSR_IA32_VMX_TRUE_EXIT_CTLS)
+> +		nested_vmx_entry_exit_ctls_update(&vmx->vcpu);
+> +
 
-That seems wise.  Feel free to use USB as a testing ground for this if
-you want to :)
+I still don't understand this patch.  You say:
 
-thanks,
+> Now, the BNDCFGS bits are only ever
+> updated after a KVM_SET_CPUID/KVM_SET_CPUID2 ioctl, meaning that a
+> subsequent MSR write from userspace will clobber these values.
 
-greg k-h
+but I don't understand what's wrong with that.  If you can (if so 
+inclined) define a VM without LOAD_BNDCFGS or CLEAR_BNDCFGS even if MPX 
+enabled, commit aedbaf4f6afd counts as a bugfix.
+
+Paolo
+
