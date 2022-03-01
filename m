@@ -2,110 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D3394C965B
-	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 21:21:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D763D4C969A
+	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 21:25:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238125AbiCAUWF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Mar 2022 15:22:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33890 "EHLO
+        id S238270AbiCAUZJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Mar 2022 15:25:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59540 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237521AbiCAUVn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Mar 2022 15:21:43 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9CFE8E1A8;
-        Tue,  1 Mar 2022 12:18:59 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5126661660;
-        Tue,  1 Mar 2022 20:18:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C2D6C340F6;
-        Tue,  1 Mar 2022 20:18:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1646165925;
-        bh=phYclIuu2+t3jpCD9N91naAXyfW9XBKmnlJRgv7QZEk=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ElQaZoMiCsgqtlA8btfShDlp8KQWz68I1Sa0jZg0S1zhmg4tnvnJ73J+OV0ug0GNK
-         MF8ftZr6PNOdHTAEXJx3xr6nZHbUKQUtu3Qj++It6NCIb3JU00v8iJaV3jrDET11CU
-         v7GmB5KGKQC0XqN/SKYlUDDAKv9MgAk+K79uOJ5FJJZkhOvyRDRm2Ae2lJNiqdZRmD
-         vzhS4kVzeB6kNMXYgg8v1KeNSzFBSVN+/Siei36WFkJ/xioFXfwF8xa0epfGhnnfzk
-         z41tmiysdPuU3//X/fINmXSc0Gage+YtWEjhsKjtDmWMmyCX2g9mjU7FjoR57aOA9w
-         pXNhev1Ezx7Ug==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 02/14] KVM: Fix lockdep false negative during host resume
-Date:   Tue,  1 Mar 2022 15:18:14 -0500
-Message-Id: <20220301201833.18841-2-sashal@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220301201833.18841-1-sashal@kernel.org>
-References: <20220301201833.18841-1-sashal@kernel.org>
+        with ESMTP id S238646AbiCAUXn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Mar 2022 15:23:43 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1163FA2F2C
+        for <kvm@vger.kernel.org>; Tue,  1 Mar 2022 12:20:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646165953;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=3FMkSD7aKPC9JzNCskfAuhPbmqVixaqKWqBwlf8S+9I=;
+        b=HoNkIjNXg/YlD3H5jB/q4tPTmwsJJIqtgWPH6hFBIYVgXQ03DHUHEwyG2r+Hs90ZcwC3Qc
+        253Dp+Y1eWpK0EHtlXfiv0ShAd963+f1HJoZ22hWwm645bu65jLIvB2q71A+o298ef6T24
+        Ed1za74uTpSGB+2HqKUjkbSa7ID+4xg=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-575-mQwq4ohEOwexaeDvv5Pp1Q-1; Tue, 01 Mar 2022 15:19:12 -0500
+X-MC-Unique: mQwq4ohEOwexaeDvv5Pp1Q-1
+Received: by mail-wr1-f69.google.com with SMTP id x15-20020a5d6b4f000000b001ee6c0aa287so3755835wrw.9
+        for <kvm@vger.kernel.org>; Tue, 01 Mar 2022 12:19:12 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=3FMkSD7aKPC9JzNCskfAuhPbmqVixaqKWqBwlf8S+9I=;
+        b=tN9H6ttY5PEOjRTOKhKws1H7t2A/SdawaDGW6UQ1opGkpf3PiOcrUr/RoIFGTSJ2fW
+         cK7KWJ9EFdoJHlUU+HtKsAxCgpc2hWKZKQmrt2upxJWxK71X+MijhkQ9w2E80QgYM+jM
+         e+6cRezhqgy3CS1WW1dyL2QIFihWoufKBnHkMD9WPmy5cYug4PnB4SjKiLgicmWAOi+2
+         vj1f4aa4Mwbfzf0VkQp+0srlqz2w+BBv/ZEnOECAg46NsKcmBAIqtNzgEkLy3eLhrtAI
+         ysFgUUEsINkSWc6ZjeMe4PikozJ0pLWA2kBGT7RfBefFUe53r6Ky8IgO+jBvT2HStaDf
+         YMMA==
+X-Gm-Message-State: AOAM533vkAS9s+JFZyl/ImJ36ahFAwGqMbGI0EX9Kg2ZcYalJOPXuzcv
+        K2ripTcNaUHm1qyalW9HN4hZeSCRRq7LHwJq6u3DwIQdS7NEJv8rPda/BpOlNHIc/fJ2YODMks3
+        VZQ19kR6JUbDU
+X-Received: by 2002:a05:600c:34d2:b0:381:7817:f5f2 with SMTP id d18-20020a05600c34d200b003817817f5f2mr6933014wmq.23.1646165951070;
+        Tue, 01 Mar 2022 12:19:11 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzBntNzfgavWPnhM1XNJk6gt7pEibOFJYJrpIhZSS48oHJVOgFdHq+mIBx2l9FoRFPmA0lk9w==
+X-Received: by 2002:a05:600c:34d2:b0:381:7817:f5f2 with SMTP id d18-20020a05600c34d200b003817817f5f2mr6932996wmq.23.1646165950789;
+        Tue, 01 Mar 2022 12:19:10 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.googlemail.com with ESMTPSA id r17-20020a056000015100b001ea7db074cdsm20011822wrx.117.2022.03.01.12.19.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 01 Mar 2022 12:19:10 -0800 (PST)
+Message-ID: <d09b9c37-07fe-fdbb-9647-4f27dd1c400d@redhat.com>
+Date:   Tue, 1 Mar 2022 21:19:09 +0100
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-7.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH AUTOSEL 5.10 02/14] KVM: Fix lockdep false negative during
+ host resume
+Content-Language: en-US
+To:     Sasha Levin <sashal@kernel.org>, linux-kernel@vger.kernel.org,
+        stable@vger.kernel.org
+Cc:     Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org
+References: <20220301201833.18841-1-sashal@kernel.org>
+ <20220301201833.18841-2-sashal@kernel.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20220301201833.18841-2-sashal@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+On 3/1/22 21:18, Sasha Levin wrote:
+> From: Wanpeng Li <wanpengli@tencent.com>
+> 
+> [ Upstream commit 4cb9a998b1ce25fad74a82f5a5c45a4ef40de337 ]
+> 
+> I saw the below splatting after the host suspended and resumed.
+> 
+>     WARNING: CPU: 0 PID: 2943 at kvm/arch/x86/kvm/../../../virt/kvm/kvm_main.c:5531 kvm_resume+0x2c/0x30 [kvm]
+>     CPU: 0 PID: 2943 Comm: step_after_susp Tainted: G        W IOE     5.17.0-rc3+ #4
+>     RIP: 0010:kvm_resume+0x2c/0x30 [kvm]
+>     Call Trace:
+>      <TASK>
+>      syscore_resume+0x90/0x340
+>      suspend_devices_and_enter+0xaee/0xe90
+>      pm_suspend.cold+0x36b/0x3c2
+>      state_store+0x82/0xf0
+>      kernfs_fop_write_iter+0x1b6/0x260
+>      new_sync_write+0x258/0x370
+>      vfs_write+0x33f/0x510
+>      ksys_write+0xc9/0x160
+>      do_syscall_64+0x3b/0xc0
+>      entry_SYSCALL_64_after_hwframe+0x44/0xae
+> 
+> lockdep_is_held() can return -1 when lockdep is disabled which triggers
+> this warning. Let's use lockdep_assert_not_held() which can detect
+> incorrect calls while holding a lock and it also avoids false negatives
+> when lockdep is disabled.
+> 
+> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> Message-Id: <1644920142-81249-1-git-send-email-wanpengli@tencent.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Sasha Levin <sashal@kernel.org>
+> ---
+>   virt/kvm/kvm_main.c | 4 +---
+>   1 file changed, 1 insertion(+), 3 deletions(-)
+> 
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index d22de43925076..06367f2d55000 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -4758,9 +4758,7 @@ static int kvm_suspend(void)
+>   static void kvm_resume(void)
+>   {
+>   	if (kvm_usage_count) {
+> -#ifdef CONFIG_LOCKDEP
+> -		WARN_ON(lockdep_is_held(&kvm_count_lock));
+> -#endif
+> +		lockdep_assert_not_held(&kvm_count_lock);
+>   		hardware_enable_nolock(NULL);
+>   	}
+>   }
 
-[ Upstream commit 4cb9a998b1ce25fad74a82f5a5c45a4ef40de337 ]
-
-I saw the below splatting after the host suspended and resumed.
-
-   WARNING: CPU: 0 PID: 2943 at kvm/arch/x86/kvm/../../../virt/kvm/kvm_main.c:5531 kvm_resume+0x2c/0x30 [kvm]
-   CPU: 0 PID: 2943 Comm: step_after_susp Tainted: G        W IOE     5.17.0-rc3+ #4
-   RIP: 0010:kvm_resume+0x2c/0x30 [kvm]
-   Call Trace:
-    <TASK>
-    syscore_resume+0x90/0x340
-    suspend_devices_and_enter+0xaee/0xe90
-    pm_suspend.cold+0x36b/0x3c2
-    state_store+0x82/0xf0
-    kernfs_fop_write_iter+0x1b6/0x260
-    new_sync_write+0x258/0x370
-    vfs_write+0x33f/0x510
-    ksys_write+0xc9/0x160
-    do_syscall_64+0x3b/0xc0
-    entry_SYSCALL_64_after_hwframe+0x44/0xae
-
-lockdep_is_held() can return -1 when lockdep is disabled which triggers
-this warning. Let's use lockdep_assert_not_held() which can detect
-incorrect calls while holding a lock and it also avoids false negatives
-when lockdep is disabled.
-
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-Message-Id: <1644920142-81249-1-git-send-email-wanpengli@tencent.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- virt/kvm/kvm_main.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
-
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index d22de43925076..06367f2d55000 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -4758,9 +4758,7 @@ static int kvm_suspend(void)
- static void kvm_resume(void)
- {
- 	if (kvm_usage_count) {
--#ifdef CONFIG_LOCKDEP
--		WARN_ON(lockdep_is_held(&kvm_count_lock));
--#endif
-+		lockdep_assert_not_held(&kvm_count_lock);
- 		hardware_enable_nolock(NULL);
- 	}
- }
--- 
-2.34.1
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
