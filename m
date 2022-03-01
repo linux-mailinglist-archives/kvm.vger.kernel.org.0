@@ -2,138 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 61DA54C96BE
-	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 21:25:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C18AD4C9727
+	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 21:42:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238207AbiCAUZA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Mar 2022 15:25:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34302 "EHLO
+        id S237356AbiCAUnD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Mar 2022 15:43:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36258 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239227AbiCAUYg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Mar 2022 15:24:36 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4EB04C3F
-        for <kvm@vger.kernel.org>; Tue,  1 Mar 2022 12:22:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646166143;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=afO6tVXgk/44QRrigzeqCyc7zYs4NKCHyGdl1A3TxuE=;
-        b=TYgyyjucxqu/EJ9gmqCLnKXR46mSgxB4wrHITaWTmLpYXjyHaitgv7TXh4LqC0Xp+fjzO4
-        1Ak0p50rJBpds/lUE4LIwXoM9DqSQt39IWPFJNW/c+qpqxVZ8ll00wYb2YMyY44Ksfi/hg
-        1zZitXEG9MeD+WG5RYPahlMVJ/niATg=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-372-56FEfme4PKKAuQt0WP40yw-1; Tue, 01 Mar 2022 15:22:22 -0500
-X-MC-Unique: 56FEfme4PKKAuQt0WP40yw-1
-Received: by mail-wm1-f70.google.com with SMTP id 10-20020a1c020a000000b0037fae68fcc2so1162727wmc.8
-        for <kvm@vger.kernel.org>; Tue, 01 Mar 2022 12:22:21 -0800 (PST)
+        with ESMTP id S231341AbiCAUnB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Mar 2022 15:43:01 -0500
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FBAA50B01
+        for <kvm@vger.kernel.org>; Tue,  1 Mar 2022 12:42:19 -0800 (PST)
+Received: by mail-lf1-x133.google.com with SMTP id i11so28941499lfu.3
+        for <kvm@vger.kernel.org>; Tue, 01 Mar 2022 12:42:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=rAZcpGOFnijhfBt719P+IqprCBqe8sD9TF0Sez9IwiQ=;
+        b=F+7BPGYsO9QeRc6BTbvPUJxguXCTYika7fzNVLbSEfMjTVK29FjvhOtCtbBO2oalkB
+         9cweHARFFeQAeiDWhTrtcdfTzbCEOfTOrVCN9rTTV3Ek5jpvIVUt3aua8OA61CgDhA1w
+         zQABsshAfnGl6gFdFI9HcnnKU8AOre3uWnEew=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=afO6tVXgk/44QRrigzeqCyc7zYs4NKCHyGdl1A3TxuE=;
-        b=m/H0+8Y3aOl3gwnzin5Q62srFJrUsNWjUxbSLFBdlPpRmOH1vVggE4s4totyMFueTW
-         Aa9tXJ/ZVW7fAW4BCwJTdgZv30SyaID16dg2XpxKeNLfojJv8FjeN3rv4dmnLIZQjjDw
-         AWNUoAn2WoVT3kXpSfI6ycm47DAaYhcMvbt81yAqPTr4ylqE5+6lzLqZkZcOXZwL00lS
-         z6jzOpCb1ONYML+KgWC5M+UfUv9gnP1kh18m3/EVO6544Aw2bpa0SkLmVQdHdcaP+SfY
-         KhH8difeVwffEIuqebqfHvlWUOtwqkbgr3iN/uTEAQWjI9v/4Umq6DXQAk66yd2MYYNa
-         DIgQ==
-X-Gm-Message-State: AOAM533gWO3MJHZ/jLDO9TaaX4EAGNz3mqG2w950rEbp8eFLpB3GIME9
-        QHGCGYqMJZIB4ewK/CalmPpQsKIuDzdhYgsQJ8JpU2EmSntBE6SnWiOiWy2paVb9DamuBiGqBgq
-        AXwWj78WyStuG
-X-Received: by 2002:a1c:f617:0:b0:383:5aab:9c51 with SMTP id w23-20020a1cf617000000b003835aab9c51mr291666wmc.79.1646166140526;
-        Tue, 01 Mar 2022 12:22:20 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzwr13telToZtSzN/w7BmWg66Pm80pZ7pLJeriiz+zVQ61Xnj+4nQJLimirDLghYYkM+Wu+6g==
-X-Received: by 2002:a1c:f617:0:b0:383:5aab:9c51 with SMTP id w23-20020a1cf617000000b003835aab9c51mr291656wmc.79.1646166140324;
-        Tue, 01 Mar 2022 12:22:20 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.googlemail.com with ESMTPSA id r17-20020a056000015100b001ea7db074cdsm20019421wrx.117.2022.03.01.12.22.19
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=rAZcpGOFnijhfBt719P+IqprCBqe8sD9TF0Sez9IwiQ=;
+        b=PYq0hRYC1TrX0/wdT3hG0XEYciXxhsqrlIy9yVIN0ezG5GH5ovlA9oJYj/sn2mFPpx
+         tPG0pVUpkearjAs5ZHkKCugaMlDhOFCRZQiXb+suldSQLb1IbosG8eRboGMuo7Zk94qv
+         IEl1P6K/YQNKIXmB4JzrQkN2h4EJ80xdaz4x8I9FZyBis1WpSTMjqN22h7zHlUFF+yQ9
+         qRAlSd5e7cvRgs1jT6T0BfQUK3Ydno6fH2oKTiTOCqxuohE4Nhdshsp19/dlRyfI9gGu
+         2xeudlViEM32hpH+ZWrs84vGSpQILrbaCGixL5OrMzMNpNxzr2201pvfojUWQMLjbEu3
+         4iFA==
+X-Gm-Message-State: AOAM532BgEbj0c92XX8C1c5tg5tlBLNf4LNkSeQ+dlb03OuOOp6SreG9
+        LaypXJt2L7byhjDP55M43/mr36QLyT8GbM/jcDc=
+X-Google-Smtp-Source: ABdhPJxBtpjUcyrBBBdNMgMWD0w2xI+2hFxka/TPc6eE4E5ndT49zwJyJR1QBQK/h45AMyqPJMAZrQ==
+X-Received: by 2002:a05:6512:2094:b0:443:751a:493c with SMTP id t20-20020a056512209400b00443751a493cmr17702602lfr.374.1646167337552;
+        Tue, 01 Mar 2022 12:42:17 -0800 (PST)
+Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com. [209.85.167.51])
+        by smtp.gmail.com with ESMTPSA id h6-20020ac25d66000000b0044315401373sm1665390lft.29.2022.03.01.12.42.16
+        for <kvm@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 01 Mar 2022 12:22:19 -0800 (PST)
-Message-ID: <3fee5315-e55d-278c-e522-d0e6fb2cadd0@redhat.com>
-Date:   Tue, 1 Mar 2022 21:22:18 +0100
+        Tue, 01 Mar 2022 12:42:16 -0800 (PST)
+Received: by mail-lf1-f51.google.com with SMTP id b11so28867096lfb.12
+        for <kvm@vger.kernel.org>; Tue, 01 Mar 2022 12:42:16 -0800 (PST)
+X-Received: by 2002:ac2:44a4:0:b0:445:8fc5:a12a with SMTP id
+ c4-20020ac244a4000000b004458fc5a12amr10608648lfm.27.1646166980002; Tue, 01
+ Mar 2022 12:36:20 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH AUTOSEL 5.4 02/11] KVM: Fix lockdep false negative during
- host resume
-Content-Language: en-US
-To:     Sasha Levin <sashal@kernel.org>, linux-kernel@vger.kernel.org,
-        stable@vger.kernel.org
-Cc:     Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org
-References: <20220301201951.19066-1-sashal@kernel.org>
- <20220301201951.19066-2-sashal@kernel.org>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220301201951.19066-2-sashal@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+References: <20220228110822.491923-1-jakobkoschel@gmail.com> <20220228110822.491923-7-jakobkoschel@gmail.com>
+In-Reply-To: <20220228110822.491923-7-jakobkoschel@gmail.com>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Tue, 1 Mar 2022 12:36:03 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wgLtKofBbn9kSXRU3MpdX7S2OxN1V5Mc679oJpFnp_VnQ@mail.gmail.com>
+Message-ID: <CAHk-=wgLtKofBbn9kSXRU3MpdX7S2OxN1V5Mc679oJpFnp_VnQ@mail.gmail.com>
+Subject: Re: [PATCH 6/6] treewide: remove check of list iterator against head
+ past the loop body
+To:     Jakob Koschel <jakobkoschel@gmail.com>
+Cc:     linux-arch <linux-arch@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Arnd Bergman <arnd@arndb.de>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Kees Cook <keescook@chromium.org>,
+        Mike Rapoport <rppt@kernel.org>,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
+        Cristiano Giuffrida <c.giuffrida@vu.nl>,
+        "Bos, H.J." <h.j.bos@vu.nl>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        linux-sgx@vger.kernel.org, drbd-dev@lists.linbit.com,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-iio@vger.kernel.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        dma <dmaengine@vger.kernel.org>,
+        linux1394-devel@lists.sourceforge.net,
+        amd-gfx list <amd-gfx@lists.freedesktop.org>,
+        dri-devel <dri-devel@lists.freedesktop.org>,
+        intel-gfx <intel-gfx@lists.freedesktop.org>,
+        nouveau@lists.freedesktop.org,
+        linux-rdma <linux-rdma@vger.kernel.org>,
+        Linux Media Mailing List <linux-media@vger.kernel.org>,
+        intel-wired-lan@lists.osuosl.org, Netdev <netdev@vger.kernel.org>,
+        linux-wireless <linux-wireless@vger.kernel.org>,
+        Linux PM <linux-pm@vger.kernel.org>,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        linux-staging@lists.linux.dev, linux-usb@vger.kernel.org,
+        linux-aspeed@lists.ozlabs.org,
+        bcm-kernel-feedback-list@broadcom.com,
+        linux-tegra <linux-tegra@vger.kernel.org>,
+        linux-mediatek@lists.infradead.org, KVM list <kvm@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical@lists.samba.org,
+        Linux F2FS Dev Mailing List 
+        <linux-f2fs-devel@lists.sourceforge.net>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        kgdb-bugreport@lists.sourceforge.net,
+        v9fs-developer@lists.sourceforge.net,
+        tipc-discussion@lists.sourceforge.net, alsa-devel@alsa-project.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/1/22 21:19, Sasha Levin wrote:
-> From: Wanpeng Li <wanpengli@tencent.com>
-> 
-> [ Upstream commit 4cb9a998b1ce25fad74a82f5a5c45a4ef40de337 ]
-> 
-> I saw the below splatting after the host suspended and resumed.
-> 
->     WARNING: CPU: 0 PID: 2943 at kvm/arch/x86/kvm/../../../virt/kvm/kvm_main.c:5531 kvm_resume+0x2c/0x30 [kvm]
->     CPU: 0 PID: 2943 Comm: step_after_susp Tainted: G        W IOE     5.17.0-rc3+ #4
->     RIP: 0010:kvm_resume+0x2c/0x30 [kvm]
->     Call Trace:
->      <TASK>
->      syscore_resume+0x90/0x340
->      suspend_devices_and_enter+0xaee/0xe90
->      pm_suspend.cold+0x36b/0x3c2
->      state_store+0x82/0xf0
->      kernfs_fop_write_iter+0x1b6/0x260
->      new_sync_write+0x258/0x370
->      vfs_write+0x33f/0x510
->      ksys_write+0xc9/0x160
->      do_syscall_64+0x3b/0xc0
->      entry_SYSCALL_64_after_hwframe+0x44/0xae
-> 
-> lockdep_is_held() can return -1 when lockdep is disabled which triggers
-> this warning. Let's use lockdep_assert_not_held() which can detect
-> incorrect calls while holding a lock and it also avoids false negatives
-> when lockdep is disabled.
-> 
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> Message-Id: <1644920142-81249-1-git-send-email-wanpengli@tencent.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Sasha Levin <sashal@kernel.org>
-> ---
->   virt/kvm/kvm_main.c | 4 +---
->   1 file changed, 1 insertion(+), 3 deletions(-)
-> 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index f31976010622f..adda0c6672b56 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -4427,9 +4427,7 @@ static int kvm_suspend(void)
->   static void kvm_resume(void)
->   {
->   	if (kvm_usage_count) {
-> -#ifdef CONFIG_LOCKDEP
-> -		WARN_ON(lockdep_is_held(&kvm_count_lock));
-> -#endif
-> +		lockdep_assert_not_held(&kvm_count_lock);
->   		hardware_enable_nolock(NULL);
->   	}
->   }
+So looking at this patch, I really reacted to the fact that quite
+often the "use outside the loop" case is all kinds of just plain
+unnecessary, but _used_ to be a convenience feature.
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+I'll just quote the first chunk in it's entirely as an example - not
+because I think this chunk is particularly important, but because it's
+a good example:
 
+On Mon, Feb 28, 2022 at 3:09 AM Jakob Koschel <jakobkoschel@gmail.com> wrote:
+>
+> diff --git a/arch/arm/mach-mmp/sram.c b/arch/arm/mach-mmp/sram.c
+> index 6794e2db1ad5..fc47c107059b 100644
+> --- a/arch/arm/mach-mmp/sram.c
+> +++ b/arch/arm/mach-mmp/sram.c
+> @@ -39,19 +39,22 @@ static LIST_HEAD(sram_bank_list);
+>  struct gen_pool *sram_get_gpool(char *pool_name)
+>  {
+>         struct sram_bank_info *info = NULL;
+> +       struct sram_bank_info *tmp;
+>
+>         if (!pool_name)
+>                 return NULL;
+>
+>         mutex_lock(&sram_lock);
+>
+> -       list_for_each_entry(info, &sram_bank_list, node)
+> -               if (!strcmp(pool_name, info->pool_name))
+> +       list_for_each_entry(tmp, &sram_bank_list, node)
+> +               if (!strcmp(pool_name, tmp->pool_name)) {
+> +                       info = tmp;
+>                         break;
+> +               }
+>
+>         mutex_unlock(&sram_lock);
+>
+> -       if (&info->node == &sram_bank_list)
+> +       if (!info)
+>                 return NULL;
+>
+>         return info->gpool;
+
+I realize this was probably at least auto-generated with coccinelle,
+but maybe that script could be taught to do avoid the "use after loop"
+by simply moving the code _into_ the loop.
+
+IOW, this all would be cleaner and clear written as
+
+        if (!pool_name)
+                return NULL;
+
+        mutex_lock(&sram_lock);
+        list_for_each_entry(info, &sram_bank_list, node) {
+                if (!strcmp(pool_name, info->pool_name)) {
+                        mutex_unlock(&sram_lock);
+                        return info;
+                }
+        }
+        mutex_unlock(&sram_lock);
+        return NULL;
+
+Ta-daa - no use outside the loop, no need for new variables, just a
+simple "just do it inside the loop". Yes, we end up having that lock
+thing twice, but it looks worth it from a "make the code obvious"
+standpoint.
+
+Would it be even cleaner if the locking was done in the caller, and
+the loop was some simple helper function? It probably would. But that
+would require a bit more smarts than probably a simple coccinelle
+script would do.
+
+                Linus
