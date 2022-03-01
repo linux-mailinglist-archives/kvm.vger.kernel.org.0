@@ -2,147 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D5C4D4C92DA
-	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 19:21:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 197CF4C92F5
+	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 19:24:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232601AbiCASWK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Mar 2022 13:22:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57130 "EHLO
+        id S235299AbiCASZO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Mar 2022 13:25:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37596 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235154AbiCASWH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Mar 2022 13:22:07 -0500
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A00B26515D
-        for <kvm@vger.kernel.org>; Tue,  1 Mar 2022 10:21:25 -0800 (PST)
-Received: by mail-pj1-x1032.google.com with SMTP id q8-20020a17090a178800b001bc299b8de1so2960245pja.1
-        for <kvm@vger.kernel.org>; Tue, 01 Mar 2022 10:21:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=fds8Vu27HO3VizdZYZX37G2L0kdPjlGJwjydpAC62lk=;
-        b=kbDptrdu0f26KgjbD0o2z38w3lkKGDPgX1iTHeFHCTnyp8GdCq5qMftyKUSBh6duUj
-         WfNj/A6u5i3SYTvNHtilrjGbJ7XPB9BN5cThiWBPQtUhCrDH1721OqL04qTC03fUauzy
-         3YHA9gzqSMuaks5H7GdDPribo7C8kJL0W2A2s=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=fds8Vu27HO3VizdZYZX37G2L0kdPjlGJwjydpAC62lk=;
-        b=iS0u3z4vlyFV+TIEUe59FvW46rk1/z9LFRGJr1EZw+UTctMUoEkZzL09Ba9AktJB5t
-         SMdKXVsLijY83gUOR1WN+9R+i+UmCANSqxc/16IrIC6vQhp61vZfjEHqkkXwwRVrArFa
-         4h5JqnHxh4klDKf+ZJDl66BmbMX9enJh+x7tldwQdlaeXKa+BDRbeI9w7CvH6b+4VyO0
-         DvxKIkZFMCYMyey1JgpHqDKJWX748YKgdSKfj92TC2eIQ1kOXw1UARDTT838byUFzbja
-         l2J3mcEK7sIwTnldpu/1IMy2Bq+uyxB8oyTc7fm/Qx43t1h0bTmLZqanzsKJVdht1UFN
-         1Z8g==
-X-Gm-Message-State: AOAM532ujv866jGNKUtRXOAbaYIZVjlGVreF771x6vC3Ld/o221cnBwH
-        pgJ90X9H2dqF2xxH11SFAF72tA==
-X-Google-Smtp-Source: ABdhPJxFvMPIFzTXAIIVPlg/eGuYakalp78L+LNg6VrEL06CzJLvdAz6UlqMRKRHGibjFN8E9JB6yg==
-X-Received: by 2002:a17:90b:4d86:b0:1bd:223f:6cb5 with SMTP id oj6-20020a17090b4d8600b001bd223f6cb5mr16669777pjb.151.1646158885116;
-        Tue, 01 Mar 2022 10:21:25 -0800 (PST)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id oa2-20020a17090b1bc200b001bcff056f09sm2678996pjb.13.2022.03.01.10.21.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Mar 2022 10:21:24 -0800 (PST)
-Date:   Tue, 1 Mar 2022 10:21:24 -0800
-From:   Kees Cook <keescook@chromium.org>
-To:     Jakob Koschel <jakobkoschel@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-        alsa-devel@alsa-project.org, linux-aspeed@lists.ozlabs.org,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        linux-iio@vger.kernel.org, nouveau@lists.freedesktop.org,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        dri-devel <dri-devel@lists.freedesktop.org>,
-        Cristiano Giuffrida <c.giuffrida@vu.nl>,
-        amd-gfx list <amd-gfx@lists.freedesktop.org>,
-        samba-technical@lists.samba.org,
-        linux1394-devel@lists.sourceforge.net, drbd-dev@lists.linbit.com,
-        linux-arch <linux-arch@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>,
-        linux-scsi <linux-scsi@vger.kernel.org>,
-        linux-rdma <linux-rdma@vger.kernel.org>,
-        linux-staging@lists.linux.dev, "Bos, H.J." <h.j.bos@vu.nl>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        intel-wired-lan@lists.osuosl.org,
-        kgdb-bugreport@lists.sourceforge.net,
-        bcm-kernel-feedback-list@broadcom.com,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Linux Media Mailing List <linux-media@vger.kernel.org>,
-        Arnd Bergman <arnd@arndb.de>,
-        Linux PM <linux-pm@vger.kernel.org>,
-        intel-gfx <intel-gfx@lists.freedesktop.org>,
-        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        v9fs-developer@lists.sourceforge.net,
-        linux-tegra <linux-tegra@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-sgx@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>, linux-usb@vger.kernel.org,
-        linux-wireless <linux-wireless@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux F2FS Dev Mailing List 
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        tipc-discussion@lists.sourceforge.net,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        dma <dmaengine@vger.kernel.org>,
-        linux-mediatek@lists.infradead.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        Mike Rapoport <rppt@kernel.org>
-Subject: Re: [PATCH 2/6] treewide: remove using list iterator after loop body
- as a ptr
-Message-ID: <202203011016.48A181EE50@keescook>
-References: <20220228110822.491923-1-jakobkoschel@gmail.com>
- <20220228110822.491923-3-jakobkoschel@gmail.com>
- <2e4e95d6-f6c9-a188-e1cd-b1eae465562a@amd.com>
- <CAHk-=wgQps58DPEOe4y5cTh5oE9EdNTWRLXzgMiETc+mFX7jzw@mail.gmail.com>
- <CAHk-=wj8fkosQ7=bps5K+DDazBXk=ypfn49A0sEq+7-nZnyfXA@mail.gmail.com>
- <CAHk-=wiTCvLQkHcJ3y0hpqH7FEk9D28LDvZZogC6OVLk7naBww@mail.gmail.com>
- <FC710A1A-524E-481B-A668-FC258F529A2E@gmail.com>
- <CAHk-=whLK11HyvpUtEftOjc3Gup2V77KpAQ2fycj3uai=qceHw@mail.gmail.com>
- <CEDAD0D9-56EE-4105-9107-72C2EAD940B0@gmail.com>
+        with ESMTP id S229944AbiCASZM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Mar 2022 13:25:12 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86D7C55BCF;
+        Tue,  1 Mar 2022 10:24:31 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 245A561480;
+        Tue,  1 Mar 2022 18:24:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D86A2C340F2;
+        Tue,  1 Mar 2022 18:24:29 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="cPsu+Pfp"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1646159066;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=UhSvaSxnuwVg8z+lYMrcVY0V6HOk087dwrWAJX+wvNg=;
+        b=cPsu+PfpQ1E+NfY2QM+mqL0MsGFB6uJQhrXq/ZPOpHqQ46Hg0jj++Y00wshljoHRmFIYXF
+        sqrIz3aaStaOBaArIsWgtnsz0z2qiM7Ia9Q+X4rzhx+BpZAoD3c//ILGPSnO780HScVlDv
+        ioajV2t4PXvamB22Q/Mq+I0CvJu0Avc=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id a7160bf9 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Tue, 1 Mar 2022 18:24:26 +0000 (UTC)
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-2d07ae0b1c4so154233807b3.11;
+        Tue, 01 Mar 2022 10:24:24 -0800 (PST)
+X-Gm-Message-State: AOAM530P0T9Bnw/rb6P2yIpZN5irUswLb5pofA2zR3FIiqoj6EjfoYca
+        TdnrBdNln/YiA6yosWBXTs8efjwmEFep3RU5xb8=
+X-Google-Smtp-Source: ABdhPJzIw8Ot6KvcnZ9E6xhmQNl/dygRLAw2fnVFuv34JvBJjjinbct/exl35nFBlEkP8cMk/Ry82yLphyC5sa7l+Vc=
+X-Received: by 2002:a81:1143:0:b0:2db:ccb4:b0a1 with SMTP id
+ 64-20020a811143000000b002dbccb4b0a1mr6755248ywr.499.1646159062762; Tue, 01
+ Mar 2022 10:24:22 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CEDAD0D9-56EE-4105-9107-72C2EAD940B0@gmail.com>
-X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+References: <Yh4+9+UpanJWAIyZ@zx2c4.com> <Yh5fbe71BTT6xc8h@kroah.com>
+In-Reply-To: <Yh5fbe71BTT6xc8h@kroah.com>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Tue, 1 Mar 2022 19:24:11 +0100
+X-Gmail-Original-Message-ID: <CAHmME9oGcp7HNLeieptMKztgg7Fq4MnOuAEsiFJxsLbmjSuFCw@mail.gmail.com>
+Message-ID: <CAHmME9oGcp7HNLeieptMKztgg7Fq4MnOuAEsiFJxsLbmjSuFCw@mail.gmail.com>
+Subject: Re: propagating vmgenid outward and upward
+To:     Greg KH <gregkh@linuxfoundation.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        QEMU Developers <qemu-devel@nongnu.org>,
+        linux-hyperv@vger.kernel.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Alexander Graf <graf@amazon.com>,
+        "Michael Kelley (LINUX)" <mikelley@microsoft.com>,
+        adrian@parity.io, Laszlo Ersek <lersek@redhat.com>,
+        =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Jann Horn <jannh@google.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        "Brown, Len" <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
+        Linux PM <linux-pm@vger.kernel.org>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        "Theodore Ts'o" <tytso@mit.edu>, Arnd Bergmann <arnd@arndb.de>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-6.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 01, 2022 at 12:28:15PM +0100, Jakob Koschel wrote:
-> Based on the coccinelle script there are ~480 cases that need fixing
-> in total. I'll now finish all of them and then split them by
-> submodules as Greg suggested and repost a patch set per submodule.
-> Sounds good?
+Hi Greg,
 
-To help with this splitting, see:
-https://github.com/kees/kernel-tools/blob/trunk/split-on-maintainer
+On Tue, Mar 1, 2022 at 7:01 PM Greg KH <gregkh@linuxfoundation.org> wrote:
+> A notifier block like this makes sense, but why tie onto the PM_ stuff?
+> This isn't power management issues, it's a system-wide change that I am
+> sure others will want to know about that doesn't reflect any power
+> changes.
+>
+> As much as I hate adding new notifiers in the kernel, that might be all
+> you need here.
 
-It's not perfect, but it'll get you really close. For example, if you
-had a single big tree-wide patch applied to your tree:
+You might indeed be right. I guess I was thinking that "resuming from
+suspend" and "resuming from a VM fork" are kind of the same thing.
+There _is_ a certain kind of similarity between the two. I was hoping
+if the similarity was a strong enough one, maybe it'd make sense to do
+them together rather than adding another notifier. But I suppose you
+disagree, and it sounds like Rafael might too --
+<https://lore.kernel.org/lkml/CAJZ5v0g+GihH_b9YvwuHzdrUVNGXOeabOznDC1vK6qLi8gtSTQ@mail.gmail.com/>.
+Code-wise for me with WireGuard it's of course appealing to treat them
+the same, since it's like a one line change, but if I need to add a
+new notifier call there, it's not the end of the world.
 
-$ rm 0*.patch
-$ git format-patch -1 HEAD
-$ mv 0*.patch treewide.patch
-$ split-on-maintainer treewide.patch
-$ ls 0*.patch
-
-If you have a build log before the patch that spits out warnings, the
---build-log argument can extract those warnings on a per-file basis, too
-(though this can be fragile).
-
--- 
-Kees Cook
+Jason
