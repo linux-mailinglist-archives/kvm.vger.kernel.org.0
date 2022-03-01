@@ -2,261 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A591B4C8AAB
-	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 12:28:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 68D0F4C8ACE
+	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 12:31:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234273AbiCAL3C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Mar 2022 06:29:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60344 "EHLO
+        id S233598AbiCALcZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Mar 2022 06:32:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41422 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229576AbiCAL3A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Mar 2022 06:29:00 -0500
-Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54B1A46652;
-        Tue,  1 Mar 2022 03:28:19 -0800 (PST)
-Received: by mail-ej1-x62a.google.com with SMTP id gb39so30861217ejc.1;
-        Tue, 01 Mar 2022 03:28:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=rLPvv7mVdDwWU3WqqHUc/M/t9o2wkfNNz2uUSA/i/Q0=;
-        b=ioxwEWwSec2mkWoQpVaP+m+cuqfrILVMZy97DsxGJQFNwUj5vt0t9wo5G7myUpC8Gn
-         ea9oHHWNkcI1g0+ETzPDSekL4muwhDYsG3jrD0dPjJWnH1vW4gUq2ufbL8yBIo9ax2rC
-         LCc4peu3G2+oC3D/CoxTwxe0jKznErkS9hGO2cQ4rpTAmgLJ5M6BCvPaoqQObgiQcr6n
-         RKDduahlScES6wicQqME3eGzY8GUno55Oqx2eUsC/sQVyrcKAkNt4/DW8JZWJd6l/Vwp
-         mTTzA+edxLDCldwyXcUf3Jn0ErW39L5ba+PqRXF7jiU95w3jgcW/Rs/bUGAwA8mWZWkw
-         L2Ig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=rLPvv7mVdDwWU3WqqHUc/M/t9o2wkfNNz2uUSA/i/Q0=;
-        b=giO4plcs+ABte//d8gwL+2pUDHZqwCPkblhelmffpXm7V53ATpHNorjmZ913XTgE1z
-         FqflQE315aEEKvoN0tFlsYijiUOy/DnmlpKWRDKWEfBOAoXEqD08HgbwPAszCPvNBAjd
-         zg5Pa6s8phaSWtCFkVz9Q0eIigW5ve0F0j4Py0dsWriP8rjA3UE8oEFTmpjoy22jC5sR
-         rJ8TqHMKfLTj0rkSBjkvZT5NOHYtUQ6nD1seea29RX4m9ege4KP3SoDbvLaXOZrEXyBv
-         9C7PQnNtTW6e9zXaD4JhioQRXRERrornvFJqcig7/3P6MlWHkL5GEEMVFM/GHWPIvDzd
-         EuRA==
-X-Gm-Message-State: AOAM531HJ68V5UhOdCNzhzSINJGxvNunr87sa97CIt/ht8s+pnGg68cW
-        1CRheCZkNYxUF70jAhMNRTg=
-X-Google-Smtp-Source: ABdhPJykJwlP+KqTh6zSzndCpDSZzE2bN4aLh28OSmyBBaWLei6TdHv4i/sMtFtkO4GxsNuXK9LBkw==
-X-Received: by 2002:a17:906:68c2:b0:6b4:9f26:c099 with SMTP id y2-20020a17090668c200b006b49f26c099mr18827008ejr.41.1646134097608;
-        Tue, 01 Mar 2022 03:28:17 -0800 (PST)
-Received: from smtpclient.apple ([2a02:8109:9d80:3f6c:6db3:8d4c:747e:98ad])
-        by smtp.gmail.com with ESMTPSA id a25-20020a50ff19000000b0040f84cd806csm7036870edu.59.2022.03.01.03.28.15
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 01 Mar 2022 03:28:17 -0800 (PST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.60.0.1.1\))
-Subject: Re: [PATCH 2/6] treewide: remove using list iterator after loop body
- as a ptr
-From:   Jakob Koschel <jakobkoschel@gmail.com>
-In-Reply-To: <CAHk-=whLK11HyvpUtEftOjc3Gup2V77KpAQ2fycj3uai=qceHw@mail.gmail.com>
-Date:   Tue, 1 Mar 2022 12:28:15 +0100
-Cc:     =?utf-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
-        alsa-devel@alsa-project.org, linux-aspeed@lists.ozlabs.org,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        linux-iio@vger.kernel.org, nouveau@lists.freedesktop.org,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        dri-devel <dri-devel@lists.freedesktop.org>,
-        Cristiano Giuffrida <c.giuffrida@vu.nl>,
-        amd-gfx list <amd-gfx@lists.freedesktop.org>,
-        samba-technical@lists.samba.org,
-        linux1394-devel@lists.sourceforge.net, drbd-dev@lists.linbit.com,
-        linux-arch <linux-arch@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>,
-        linux-scsi <linux-scsi@vger.kernel.org>,
-        linux-rdma <linux-rdma@vger.kernel.org>,
-        linux-staging@lists.linux.dev, "Bos, H.J." <h.j.bos@vu.nl>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        intel-wired-lan@lists.osuosl.org,
-        kgdb-bugreport@lists.sourceforge.net,
-        bcm-kernel-feedback-list@broadcom.com,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Linux Media Mailing List <linux-media@vger.kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Arnd Bergman <arnd@arndb.de>,
-        Linux PM <linux-pm@vger.kernel.org>,
-        intel-gfx <intel-gfx@lists.freedesktop.org>,
-        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        v9fs-developer@lists.sourceforge.net,
-        linux-tegra <linux-tegra@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-sgx@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>, linux-usb@vger.kernel.org,
-        linux-wireless <linux-wireless@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux F2FS Dev Mailing List 
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        tipc-discussion@lists.sourceforge.net,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        dma <dmaengine@vger.kernel.org>,
-        linux-mediatek@lists.infradead.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        Mike Rapoport <rppt@kernel.org>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <CEDAD0D9-56EE-4105-9107-72C2EAD940B0@gmail.com>
-References: <20220228110822.491923-1-jakobkoschel@gmail.com>
- <20220228110822.491923-3-jakobkoschel@gmail.com>
- <2e4e95d6-f6c9-a188-e1cd-b1eae465562a@amd.com>
- <CAHk-=wgQps58DPEOe4y5cTh5oE9EdNTWRLXzgMiETc+mFX7jzw@mail.gmail.com>
- <CAHk-=wj8fkosQ7=bps5K+DDazBXk=ypfn49A0sEq+7-nZnyfXA@mail.gmail.com>
- <CAHk-=wiTCvLQkHcJ3y0hpqH7FEk9D28LDvZZogC6OVLk7naBww@mail.gmail.com>
- <FC710A1A-524E-481B-A668-FC258F529A2E@gmail.com>
- <CAHk-=whLK11HyvpUtEftOjc3Gup2V77KpAQ2fycj3uai=qceHw@mail.gmail.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-X-Mailer: Apple Mail (2.3693.60.0.1.1)
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229776AbiCALcZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Mar 2022 06:32:25 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 284C348330
+        for <kvm@vger.kernel.org>; Tue,  1 Mar 2022 03:31:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646134301;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=00HQH/gJk4+FkSrUA5MwoQnd1kXjVciWiqxvQ3N3LN4=;
+        b=iYIAihlgDLIK6HlQ+qZFgpofsxmzbLSbluAu/sYGk+UQPiGIITkALy5TeKxbl7Io/VaE9S
+        EjJ552zg3lDZqzn4IVZUtCY5mE3itChSkHuOiBoA7et4FmUmvfWauBxNbcyK+1I0ebKriK
+        +t3DwDyVJJNAEsyiO1gvFcDhqUJOBeE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-355-TpH5T0knOb6iwZWOhY6vPg-1; Tue, 01 Mar 2022 06:31:38 -0500
+X-MC-Unique: TpH5T0knOb6iwZWOhY6vPg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A2BADFC80;
+        Tue,  1 Mar 2022 11:31:36 +0000 (UTC)
+Received: from starship (unknown [10.40.195.190])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 13E1576115;
+        Tue,  1 Mar 2022 11:31:33 +0000 (UTC)
+Message-ID: <264f1282c315dd66cd34cfb74f71f53fe3c84126.camel@redhat.com>
+Subject: Re: [RFC PATCH 05/13] KVM: SVM: Update max number of vCPUs
+ supported for x2AVIC mode
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, seanjc@google.com, joro@8bytes.org,
+        jon.grimm@amd.com, wei.huang2@amd.com, terry.bowman@amd.com
+Date:   Tue, 01 Mar 2022 13:31:32 +0200
+In-Reply-To: <c17e954b-0f62-e0ad-77f0-1429dcc94f6d@amd.com>
+References: <20220221021922.733373-1-suravee.suthikulpanit@amd.com>
+         <20220221021922.733373-6-suravee.suthikulpanit@amd.com>
+         <9143d9d24d1b169668062a18a5f49bb8cf8e877b.camel@redhat.com>
+         <c17e954b-0f62-e0ad-77f0-1429dcc94f6d@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, 2022-03-01 at 17:47 +0700, Suravee Suthikulpanit wrote:
+> Hi Maxim,
+> 
+> On 2/25/22 12:18 AM, Maxim Levitsky wrote:
+> > On Sun, 2022-02-20 at 20:19 -0600, Suravee Suthikulpanit wrote:
+> > > xAVIC and x2AVIC modes can support diffferent number of vcpus.
+> > > Update existing logics to support each mode accordingly.
+> > > 
+> > > Also, modify the maximum physical APIC ID for AVIC to 255 to reflect
+> > > the actual value supported by the architecture.
+> > > 
+> > > Signed-off-by: Suravee Suthikulpanit<suravee.suthikulpanit@amd.com>
+> > > ---
+> > >   arch/x86/include/asm/svm.h | 12 +++++++++---
+> > >   arch/x86/kvm/svm/avic.c    |  8 +++++---
+> > >   2 files changed, 14 insertions(+), 6 deletions(-)
+> > > 
+> > > diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
+> > > index 7a7a2297165b..681a348a9365 100644
+> > > --- a/arch/x86/include/asm/svm.h
+> > > +++ b/arch/x86/include/asm/svm.h
+> > > @@ -250,10 +250,16 @@ enum avic_ipi_failure_cause {
+> > >   
+> > >   
+> > >   /*
+> > > - * 0xff is broadcast, so the max index allowed for physical APIC ID
+> > > - * table is 0xfe.  APIC IDs above 0xff are reserved.
+> > > + * For AVIC, the max index allowed for physical APIC ID
+> > > + * table is 0xff (255).
+> > >    */
+> > > -#define AVIC_MAX_PHYSICAL_ID_COUNT	0xff
+> > > +#define AVIC_MAX_PHYSICAL_ID		0XFFULL
+> > > +
+> > > +/*
+> > > + * For x2AVIC, the max index allowed for physical APIC ID
+> > > + * table is 0x1ff (511).
+> > > + */
+> > > +#define X2AVIC_MAX_PHYSICAL_ID		0x1FFUL
+> > Yep, physid page can't hold more entries...
+> > 
+> > This brings the inventible question of what to do when a VM has more
+> > that 512 vCPUs...
+> > 
+> > With AVIC, since it is xapic, it would be easy - xapic supports up to
+> > 254 CPUs.
+> 
+> Actually, 255 vCPUs.
+
+Sorry for off-by-one mistake - just remembered that 0xFF is reserved,
+but then 255 is already 1 less that 256.
+
+> 
+> > But with x2apic, there is no such restriction on max 512 CPUs,
+> > thus it is legal to create a VM with x2apic and more that 512 CPUs,
+> > and x2AVIC won't work well in this case.
+> > 
+> > I guess AVIC_IPI_FAILURE_INVALID_TARGET, has to be extened to support those
+> > cases, even with loss of performance, or we need to inhibit x2AVIC.
+> 
+> In case of x2APIC-enabled guest w/ vCPU exceeding the max APIC ID (512) limit,
+> the ioctl operation for KVM_CREATE_VCPU will fail. For QEMU, this would
+> exit with error code. Would this be sufficient?
+Yes, this is the best.
 
 
-> On 1. Mar 2022, at 01:41, Linus Torvalds =
-<torvalds@linux-foundation.org> wrote:
->=20
-> On Mon, Feb 28, 2022 at 1:47 PM Jakob Koschel <jakobkoschel@gmail.com> =
-wrote:
->>=20
->> The goal of this is to get compiler warnings right? This would indeed =
-be great.
->=20
-> Yes, so I don't mind having a one-time patch that has been gathered
-> using some automated checker tool, but I don't think that works from a
-> long-term maintenance perspective.
->=20
-> So if we have the basic rule being "don't use the loop iterator after
-> the loop has finished, because it can cause all kinds of subtle
-> issues", then in _addition_ to fixing the existing code paths that
-> have this issue, I really would want to (a) get a compiler warning for
-> future cases and (b) make it not actually _work_ for future cases.
->=20
-> Because otherwise it will just happen again.
->=20
->> Changing the list_for_each_entry() macro first will break all of =
-those cases
->> (e.g. the ones using 'list_entry_is_head()).
->=20
-> So I have no problems with breaking cases that we basically already
-> have a patch for due to  your automated tool. There were certainly
-> more than a handful, but it didn't look _too_ bad to just make the
-> rule be "don't use the iterator after the loop".
->=20
-> Of course, that's just based on that patch of yours. Maybe there are a
-> ton of other cases that your patch didn't change, because they didn't
-> match your trigger case, so I may just be overly optimistic here.
+Best regards,
+	Maxim Levitsky
 
-Based on the coccinelle script there are ~480 cases that need fixing
-in total. I'll now finish all of them and then split them by
-submodules as Greg suggested and repost a patch set per submodule.
-Sounds good?
 
->=20
-> But basically to _me_, the important part is that the end result is
-> maintainable longer-term. I'm more than happy to have a one-time patch
-> to fix a lot of dubious cases if we can then have clean rules going
-> forward.
->=20
->> I assumed it is better to fix those cases first and then have a =
-simple
->> coccinelle script changing the macro + moving the iterator into the =
-scope
->> of the macro.
->=20
-> So that had been another plan of mine, until I actually looked at
-> changing the macro. In the one case I looked at, it was ugly beyond
-> belief.
->=20
-> It turns out that just syntactically, it's really nice to give the
-> type of the iterator from outside the way we do now. Yeah, it may be a
-> bit odd, and maybe it's partly because I'm so used to the
-> "list_for_each_list_entry()" syntax, but moving the type into the loop
-> construct really made it nasty - either one very complex line, or
-> having to split it over two lines which was even worse.
->=20
-> Maybe the place I looked at just happened to have a long typename, but
-> it's basically always going to be a struct, so it's never a _simple_
-> type. And it just looked very odd adn unnatural to have the type as
-> one of the "arguments" to that list_for_each_entry() macro.
->=20
-> So yes, initially my idea had been to just move the iterator entirely
-> inside the macro. But specifying the type got so ugly that I think
-> that
->=20
->        typeof (pos) pos
->=20
-> trick inside the macro really ends up giving us the best of all =
-worlds:
->=20
-> (a) let's us keep the existing syntax and code for all the nice cases
-> that did everything inside the loop anyway
->=20
-> (b) gives us a nice warning for any normal use-after-loop case
-> (unless you explicitly initialized it like that
-> sgx_mmu_notifier_release() function did for no good reason
->=20
-> (c) also guarantees that even if you don't get a warning,
-> non-converted (or newly written) bad code won't actually _work_
->=20
-> so you end up getting the new rules without any ambiguity or mistaken
->=20
->> With this you are no longer able to set the 'outer' pos within the =
-list
->> iterator loop body or am I missing something?
->=20
-> Correct. Any assignment inside the loop will be entirely just to the
-> local loop case. So any "break;" out of the loop will have to set
-> another variable - like your updated patch did.
->=20
->> I fail to see how this will make most of the changes in this
->> patch obsolete (if that was the intention).
->=20
-> I hope my explanation above clarifies my thinking: I do not dislike
-> your patch, and in fact your patch is indeed required to make the new
-> semantics work.
+> 
+> Regards,
+> Suravee
+> 
+> 
+> 
 
-ok it's all clear now, thanks for clarifying.
-I've defined all the 'tmp' iterator variables uninitialized so applying
-your patch on top of that later will just give the nice compiler warning=20=
-
-if they are used past the loop body.
-
->=20
-> What I disliked was always the maintainability of your patch - making
-> the rules be something that isn't actually visible in the source code,
-> and letting the old semantics still work as well as they ever did, and
-> having to basically run some verification pass to find bad users.
-
-Since this patch is not a complete list of cases that need fixing (30%)
-I haven't included the actual change of moving the iterator variable
-into the loop and thought that would be a second step coming after this
-is merged.
-
-With these changes alone, yes you still rely on manual verification =
-passes.
-
->=20
-> (I also disliked your original patch that mixed up the "CPU
-> speculation type safety" with the actual non-speculative problems, but
-> that was another issue).
->=20
->                Linus
-
-- Jakob
 
