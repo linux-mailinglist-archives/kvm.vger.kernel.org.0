@@ -2,145 +2,232 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C11604C9174
-	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 18:25:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E9244C9363
+	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 19:38:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236463AbiCARZ5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Mar 2022 12:25:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38194 "EHLO
+        id S236998AbiCASjB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Mar 2022 13:39:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231299AbiCARZ4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Mar 2022 12:25:56 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2BB5B56C25
-        for <kvm@vger.kernel.org>; Tue,  1 Mar 2022 09:25:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646155514;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=lAGFwZP7c6Ssd0556FX8EgEfFtnLFUHmrgYIYwA5APo=;
-        b=QVDLmpwpDX9ulTcXT/qjnRLojHT/ATcSB8bEl1UgAL+OpvCLHBiMAAzuEJB5SPs9dWcnsO
-        mosgGpoIzhzbc0AqV/s8cM/B1eh/NmtKf1GI0U5gjMEWd/Vp71el/EaN2DJ484vcaoYciX
-        P+zQoW2PF/4IPCAOqxbPa2hls595xoA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-436-kdgfzQowOyez9JiGPNW3KA-1; Tue, 01 Mar 2022 12:25:10 -0500
-X-MC-Unique: kdgfzQowOyez9JiGPNW3KA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1D6DB51E0;
-        Tue,  1 Mar 2022 17:25:09 +0000 (UTC)
-Received: from starship (unknown [10.40.195.190])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 483C87A55C;
-        Tue,  1 Mar 2022 17:25:05 +0000 (UTC)
-Message-ID: <603d78c516d10119c833ff54367b63b7a66f32b3.camel@redhat.com>
-Subject: Re: [PATCH 3/4] KVM: x86: SVM: use vmcb01 in avic_init_vmcb
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Jim Mattson <jmattson@google.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Borislav Petkov <bp@alien8.de>, x86@kernel.org
-Date:   Tue, 01 Mar 2022 19:25:04 +0200
-In-Reply-To: <Yh5H8qRhbefuD9YF@google.com>
-References: <20220301135526.136554-1-mlevitsk@redhat.com>
-         <20220301135526.136554-4-mlevitsk@redhat.com> <Yh5H8qRhbefuD9YF@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        with ESMTP id S237000AbiCASi6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Mar 2022 13:38:58 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49B8A36E07;
+        Tue,  1 Mar 2022 10:38:16 -0800 (PST)
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 221Hg2I0022688;
+        Tue, 1 Mar 2022 18:38:16 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=vv//N4II9hD10oM0jtbVJL3G0F/p5Xd+VTz9zzm9cJM=;
+ b=SRQzJvP6NLa7N1X0g5Rwgr1dOzkZ60HWi89YH1YspyqJqbrSoNDscn2jw2DtA7RzhUA7
+ NTrxXhaFXuYgbdxwsVxjEHeRvU/AUCQWNUIt0dGV66enivqQsCQnHH/GdGjfe0poC+Ji
+ d0lENnHYBuS4/CUuASydPrIVaZgjq/8VniFvxFs0A6cstCEoueuxKHp/BMghb7af8WUN
+ kATuZCF9ykqsQGr/HiCYdXbKE+VdQV0pcihiqQip5XeWHD2nFJ9M8c5ABxmaq8ijX6xO
+ x/T2c6JziUeQkfn+kZrggeJkk5ZbKqJ/4UAiiTliQqsHkALAszcdPEfRCCiMx2jcChs6 GQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ehr421ab5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 01 Mar 2022 18:38:15 +0000
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 221IRGjb018860;
+        Tue, 1 Mar 2022 18:38:15 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ehr421aae-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 01 Mar 2022 18:38:15 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 221IRkiA004362;
+        Tue, 1 Mar 2022 18:38:13 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma03ams.nl.ibm.com with ESMTP id 3efbu9cgfm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 01 Mar 2022 18:38:13 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 221Ic4Ao53805564
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 1 Mar 2022 18:38:04 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B05B64C040;
+        Tue,  1 Mar 2022 18:38:04 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5F2404C044;
+        Tue,  1 Mar 2022 18:38:04 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.5.37])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue,  1 Mar 2022 18:38:04 +0000 (GMT)
+Date:   Tue, 1 Mar 2022 18:32:36 +0100
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Thomas Huth <thuth@redhat.com>
+Cc:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, david@redhat.com,
+        borntraeger@linux.ibm.com
+Subject: Re: [PATCH 3/9] KVM: s390: pv: Add query interface
+Message-ID: <20220301183236.742e749b@p-imbrenda>
+In-Reply-To: <b2fd362a-eefa-8fa7-1016-55bedd3fa6ee@redhat.com>
+References: <20220223092007.3163-1-frankja@linux.ibm.com>
+        <20220223092007.3163-4-frankja@linux.ibm.com>
+        <b2fd362a-eefa-8fa7-1016-55bedd3fa6ee@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: C7NAi_3PHdS0D7PnWkce9ylhNr3ZzBfM
+X-Proofpoint-GUID: 7JjnqGIsTkbVlPMLhrAr-YJHdkCxrtDK
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-03-01_07,2022-02-26_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 bulkscore=0 spamscore=0 mlxlogscore=999
+ clxscore=1015 adultscore=0 phishscore=0 lowpriorityscore=0 mlxscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2201110000 definitions=main-2203010093
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-03-01 at 16:21 +0000, Sean Christopherson wrote:
-> Just "KVM: SVM:" for the shortlog, please.
-> 
-> On Tue, Mar 01, 2022, Maxim Levitsky wrote:
-> > Out of precation use vmcb01 when enabling host AVIC.
-> > No functional change intended.
+On Wed, 23 Feb 2022 12:30:36 +0100
+Thomas Huth <thuth@redhat.com> wrote:
+
+> On 23/02/2022 10.20, Janosch Frank wrote:
+> > Some of the query information is already available via sysfs but
+> > having a IOCTL makes the information easier to retrieve.
+
+why not exporting this via sysfs too?
+
+something like a sysfs file called "query_ultravisor_information_raw"
+
+that way you don't even have a problem with sizes
+
 > > 
-> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 > > ---
-> >  arch/x86/kvm/svm/avic.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >   arch/s390/kvm/kvm-s390.c | 47 ++++++++++++++++++++++++++++++++++++++++
+> >   include/uapi/linux/kvm.h | 23 ++++++++++++++++++++
+> >   2 files changed, 70 insertions(+)
 > > 
-> > diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> > index e23159f3a62ba..9656e192c646b 100644
-> > --- a/arch/x86/kvm/svm/avic.c
-> > +++ b/arch/x86/kvm/svm/avic.c
-> > @@ -167,7 +167,7 @@ int avic_vm_init(struct kvm *kvm)
-> >  
-> >  void avic_init_vmcb(struct vcpu_svm *svm)
-> >  {
-> > -	struct vmcb *vmcb = svm->vmcb;
-> > +	struct vmcb *vmcb = svm->vmcb01.ptr;
+> > diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> > index faa85397b6fb..837f898ad2ff 100644
+> > --- a/arch/s390/kvm/kvm-s390.c
+> > +++ b/arch/s390/kvm/kvm-s390.c
+> > @@ -2217,6 +2217,34 @@ static int kvm_s390_cpus_to_pv(struct kvm *kvm, u16 *rc, u16 *rrc)
+> >   	return r;
+> >   }
+> >   
+> > +static int kvm_s390_handle_pv_info(struct kvm_s390_pv_info *info)
+> > +{
+> > +	u32 len;
+> > +
+> > +	switch (info->header.id) {
+> > +	case KVM_PV_INFO_VM: {
+> > +		len =  sizeof(info->header) + sizeof(info->vm);
+> > +
+> > +		if (info->header.len < len)
+> > +			return -EINVAL;
+> > +
+> > +		memcpy(info->vm.inst_calls_list,
+> > +		       uv_info.inst_calls_list,
+> > +		       sizeof(uv_info.inst_calls_list));
+> > +
+> > +		/* It's max cpuidm not max cpus so it's off by one */
+> > +		info->vm.max_cpus = uv_info.max_guest_cpu_id + 1;
+> > +		info->vm.max_guests = uv_info.max_num_sec_conf;
+> > +		info->vm.max_guest_addr = uv_info.max_sec_stor_addr;
+> > +		info->vm.feature_indication = uv_info.uv_feature_indications;
+> > +
+> > +		return 0;
+> > +	}
+> > +	default:
+> > +		return -EINVAL;
+> > +	}
+> > +}
+> > +
+> >   static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
+> >   {
+> >   	int r = 0;
+> > @@ -2353,6 +2381,25 @@ static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
+> >   			     cmd->rc, cmd->rrc);
+> >   		break;
+> >   	}
+> > +	case KVM_PV_INFO: {
+> > +		struct kvm_s390_pv_info info = {};
+> > +
+> > +		if (copy_from_user(&info, argp, sizeof(info.header)))
+> > +			return -EFAULT;
+> > +
+> > +		if (info.header.len < sizeof(info.header))
+> > +			return -EINVAL;
+> > +
+> > +		r = kvm_s390_handle_pv_info(&info);
+> > +		if (r)
+> > +			return r;
+> > +
+> > +		r = copy_to_user(argp, &info, sizeof(info));  
 > 
-> I don't like this change.  It's not bad code, but it'll be confusing because it
-> implies that it's legal for svm->vmcb to be something other than svm->vmcb01.ptr
-> when this is called.
-
-Honestly I don't see how you had reached this conclusion.
- 
-I just think that code that always works on vmcb01
-should use it, even if it happens that vmcb == vmcb01.
- 
-If you insist I can drop this patch or add WARN_ON instead,
-I just think that this way is cleaner.
- 
-Best regards,
-	Maxim Levitsky
-
+> sizeof(info) is currently OK ... but this might break if somebody later 
+> extends the kvm_s390_pv_info struct, I guess? ==> Maybe also better use 
+> sizeof(info->header) + sizeof(info->vm) here, too? Or let 
+> kvm_s390_handle_pv_info() return the amount of bytes that should be copied here?
 > 
-> If we want to guard AVIC, I'd much rather we do something like:
-> 
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 7038c76fa841..dcc856bd628d 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -992,8 +992,12 @@ static inline void init_vmcb_after_set_cpuid(struct kvm_vcpu *vcpu)
->  static void init_vmcb(struct kvm_vcpu *vcpu)
->  {
->         struct vcpu_svm *svm = to_svm(vcpu);
-> -       struct vmcb_control_area *control = &svm->vmcb->control;
-> -       struct vmcb_save_area *save = &svm->vmcb->save;
-> +       struct vmcb *vmcb = svm->vmcb01.ptr;
-> +       struct vmcb_control_area *control = &vmcb->control;
-> +       struct vmcb_save_area *save = &vmcb->save;
-> +
-> +       if (WARN_ON_ONCE(vmcb != svm->vmcb))
-> +               svm_leave_nested(vcpu);
-> 
->         svm_set_intercept(svm, INTERCEPT_CR0_READ);
->         svm_set_intercept(svm, INTERCEPT_CR3_READ);
+>   Thomas
 > 
 > 
-> On a related topic, init_vmcb_after_set_cpuid() is broken for nested, it needs to
-> play nice with being called when svm->vmcb == &svm->nested.vmcb02, e.g. update
-> vmcb01 and re-merge (or just recalc?) vmcb02's intercepts.
+> > +		if (r)
+> > +			return -EFAULT;
+> > +		return 0;
+> > +	}
+> >   	default:
+> >   		r = -ENOTTY;
+> >   	}
+> > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> > index dbc550bbd9fa..96fceb204a92 100644
+> > --- a/include/uapi/linux/kvm.h
+> > +++ b/include/uapi/linux/kvm.h
+> > @@ -1642,6 +1642,28 @@ struct kvm_s390_pv_unp {
+> >   	__u64 tweak;
+> >   };
+> >   
+> > +enum pv_cmd_info_id {
+> > +	KVM_PV_INFO_VM,
+> > +};
+> > +
+> > +struct kvm_s390_pv_info_vm {
+> > +	__u64 inst_calls_list[4];
+> > +	__u64 max_cpus;
+> > +	__u64 max_guests;
+> > +	__u64 max_guest_addr;
+> > +	__u64 feature_indication;
+> > +};
+> > +
+> > +struct kvm_s390_pv_info_header {
+> > +	__u32 id;
+> > +	__u32 len;
+> > +};
+> > +
+> > +struct kvm_s390_pv_info {
+> > +	struct kvm_s390_pv_info_header header;
+> > +	struct kvm_s390_pv_info_vm vm;
+> > +};
+> > +
+> >   enum pv_cmd_id {
+> >   	KVM_PV_ENABLE,
+> >   	KVM_PV_DISABLE,
+> > @@ -1650,6 +1672,7 @@ enum pv_cmd_id {
+> >   	KVM_PV_VERIFY,
+> >   	KVM_PV_PREP_RESET,
+> >   	KVM_PV_UNSHARE_ALL,
+> > +	KVM_PV_INFO,
+> >   };
+> >   
+> >   struct kvm_pv_cmd {  
 > 
-> >  	struct kvm_svm *kvm_svm = to_kvm_svm(svm->vcpu.kvm);
-> >  	phys_addr_t bpa = __sme_set(page_to_phys(svm->avic_backing_page));
-> >  	phys_addr_t lpa = __sme_set(page_to_phys(kvm_svm->avic_logical_id_table_page));
-> > -- 
-> > 2.26.3
-> > 
-
 
