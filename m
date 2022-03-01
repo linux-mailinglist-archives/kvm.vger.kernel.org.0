@@ -2,124 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2F4034C937A
-	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 19:44:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 443CE4C9391
+	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 19:52:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237086AbiCASpF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Mar 2022 13:45:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55094 "EHLO
+        id S235532AbiCASxi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Mar 2022 13:53:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237082AbiCASoy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Mar 2022 13:44:54 -0500
-Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E53C165421
-        for <kvm@vger.kernel.org>; Tue,  1 Mar 2022 10:43:50 -0800 (PST)
-Received: by mail-il1-x135.google.com with SMTP id f2so13274779ilq.1
-        for <kvm@vger.kernel.org>; Tue, 01 Mar 2022 10:43:50 -0800 (PST)
+        with ESMTP id S232515AbiCASxf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Mar 2022 13:53:35 -0500
+Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6E891FA47
+        for <kvm@vger.kernel.org>; Tue,  1 Mar 2022 10:52:53 -0800 (PST)
+Received: by mail-ej1-x629.google.com with SMTP id r13so33374411ejd.5
+        for <kvm@vger.kernel.org>; Tue, 01 Mar 2022 10:52:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=avXnrLPk6C8Certs+81qMNb1A1PqBwld4hDSDYykLfM=;
-        b=SpEqjG3fvbdOmyqRY1V7g4oG6S+0uwnJ2D/5lyz+7cGf54HPRwdI/AFvO2a5JOYTQ1
-         0VYlSJYD0DgTCraxRbWtGz2dc2U91atI4GP2YthQeJJ7bJImyc1uZSvjPmDE0+l58t7y
-         XTTcYHPKUHp+T2LcAoU9RnddvyfXnKER5+vycrChCPuYzN3fGIhe4hVsH08ge1BsF2dr
-         z2cXo+2yl5GCfLthdyKQFNhGGPh5zmrYU1wm+BaUPWN+lF+K018OqjrIXKL+/DF1D2AL
-         1+GFlk7R+EOQaC0Ib+tfGDOIimxR79c2wO/RN7YdVtKKVXrK5ByuegfuuOhlkwyQcVyC
-         mdXw==
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=JZw99KMpsKBs3Ab/LBNeIPMebXALTITXobBfJpN/EsI=;
+        b=ZEWbFFu3eWrZxUgaaScwD4ZJ//Z7mV4SGMyACB20WwCKEMFGKIBMMEXVkM4kZXdOyd
+         EokMKBVyAcoYChV/SvtOh5q5h0Yafm3wlsC3jCGOeoM0h4pn550KTbE+/sUn3z3m8p0V
+         ZL0gG9ZTrYCOlyUURTCDAGrluijISoqXbB1wA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=avXnrLPk6C8Certs+81qMNb1A1PqBwld4hDSDYykLfM=;
-        b=DKejvnP7FlQHMPiLKBtqjgdzIlpOyN9jdGQE4gKzq9Z2yv20oBG16HtSELhYV1gww9
-         mp4Y4pKjxoUuioOx+GXMP4EXvCoKxanPX5eo7ov2P0PZO5wxce671KweYKfSM5j/ni0U
-         2lOlsb7rnnbeRNeL7wC8btran7L5BV4yvL0PvXTxkSigcDZ4ml58XYx5zB5Ay5B/Nnx2
-         zFnvBLa6N9Mh5i3RQ6fmxGFxi53RYPavEt+/WaywAf4S1ipSbaVc7O8oNHwUDPOADZNd
-         BvZB+Nm/3+9yRIW6EzIekhT5ejND1H9VfLwlJAUG6MoeGcaVuVqlFUonS5+6rcQBziJU
-         IWhg==
-X-Gm-Message-State: AOAM532As6WdbbtB24fb0SxXkD0zxqBwCqgL1sK2bK2mc3tfEYGp4Lvi
-        Hs8OCKKd8b+Vrd1b9ZOyAtjPZQ==
-X-Google-Smtp-Source: ABdhPJy6VtsrAxBvGfjz/9EnSnr6NWil+PV/J0P9JEHe9HSAoq0a5WnWU5wmnEQLMnUt3dx1b16fWw==
-X-Received: by 2002:a05:6e02:1645:b0:2c2:c11c:92a3 with SMTP id v5-20020a056e02164500b002c2c11c92a3mr17780208ilu.15.1646160230028;
-        Tue, 01 Mar 2022 10:43:50 -0800 (PST)
-Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
-        by smtp.gmail.com with ESMTPSA id b2-20020a923402000000b002c25b16552fsm8407601ila.14.2022.03.01.10.43.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Mar 2022 10:43:49 -0800 (PST)
-Date:   Tue, 1 Mar 2022 18:43:46 +0000
-From:   Oliver Upton <oupton@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        David Dunn <daviddunn@google.com>
-Subject: Re: [PATCH v4 1/8] KVM: nVMX: Keep KVM updates to BNDCFGS ctrl bits
- across MSR write
-Message-ID: <Yh5pYhDQbzWQOdIx@google.com>
-References: <20220301060351.442881-1-oupton@google.com>
- <20220301060351.442881-2-oupton@google.com>
- <4e678b4f-4093-fa67-2c4e-e25ec2ced6d5@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=JZw99KMpsKBs3Ab/LBNeIPMebXALTITXobBfJpN/EsI=;
+        b=G3m9fOVeiPDPRbB/IpyxObT7acuBkRmPqea0YMPxKYlY7m636emhFif4PKMC6wstiO
+         W6qUXNLa6y7x4GMzzn3vCSkP7bqNYwIBqTGwBhNXAscwwDMRlGpB2vFO6dzRv8Yk5/Df
+         8UCSP9mEhO4X2hAVirM7x14zmxx/Cj6GeFLCQcE6zYycPysau/OvEoOaFiYCmobbOtdg
+         KpaYYSIajMr9EVkAHOFO0exCcy/ieFGh4hlMiLXZ1INB3nfA8bxt4/7TsEmnnkjDPI+t
+         1hyYOrOonGlRiOx/KbRtznc7ipY0XEOTnpQLJEpEi1QIZRJ+OIRcLscoRr4+otZlPZgu
+         lyLg==
+X-Gm-Message-State: AOAM533cCGzGvEPbW6AowC+0jGuBStrKywOKyxcuDfJpp8N4UikGcKgw
+        yyBp0/hGBo11UifR9M1H0omJQpr3KwBKimu04Vw=
+X-Google-Smtp-Source: ABdhPJw/oZ0HxeZkuvbmGfD/Jk9tR6TbG2dmH5D5YVsNvz5RQm0YyX2jpfH21tIl4coy9Re0I2QgoQ==
+X-Received: by 2002:a17:906:fb8a:b0:6ce:c3e6:2ac4 with SMTP id lr10-20020a170906fb8a00b006cec3e62ac4mr19377059ejb.40.1646160772155;
+        Tue, 01 Mar 2022 10:52:52 -0800 (PST)
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com. [209.85.218.44])
+        by smtp.gmail.com with ESMTPSA id l13-20020a170907914d00b006ab49aedf48sm5511810ejs.157.2022.03.01.10.52.51
+        for <kvm@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 01 Mar 2022 10:52:51 -0800 (PST)
+Received: by mail-ej1-f44.google.com with SMTP id r13so33374358ejd.5
+        for <kvm@vger.kernel.org>; Tue, 01 Mar 2022 10:52:51 -0800 (PST)
+X-Received: by 2002:a05:6512:2033:b0:443:3d49:dac with SMTP id
+ s19-20020a056512203300b004433d490dacmr16440784lfs.52.1646160451271; Tue, 01
+ Mar 2022 10:47:31 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4e678b4f-4093-fa67-2c4e-e25ec2ced6d5@redhat.com>
-X-Spam-Status: No, score=-18.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <20220228110822.491923-1-jakobkoschel@gmail.com>
+ <20220228110822.491923-3-jakobkoschel@gmail.com> <2e4e95d6-f6c9-a188-e1cd-b1eae465562a@amd.com>
+ <CAHk-=wgQps58DPEOe4y5cTh5oE9EdNTWRLXzgMiETc+mFX7jzw@mail.gmail.com>
+ <CAHk-=wj8fkosQ7=bps5K+DDazBXk=ypfn49A0sEq+7-nZnyfXA@mail.gmail.com>
+ <CAHk-=wiTCvLQkHcJ3y0hpqH7FEk9D28LDvZZogC6OVLk7naBww@mail.gmail.com>
+ <Yh0tl3Lni4weIMkl@casper.infradead.org> <CAHk-=wgBfJ1-cPA2LTvFyyy8owpfmtCuyiZi4+um8DhFNe+CyA@mail.gmail.com>
+ <Yh1aMm3hFe/j9ZbI@casper.infradead.org> <CAHk-=wi0gSUMBr2SVF01Gy1xC1w1iGtJT5ztju9BPWYKjdh+NA@mail.gmail.com>
+ <202203011008.AA0B5A2D@keescook>
+In-Reply-To: <202203011008.AA0B5A2D@keescook>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Tue, 1 Mar 2022 10:47:14 -0800
+X-Gmail-Original-Message-ID: <CAHk-=whccSm8HKANQbomYrF8cqBa1wUi1dvUEUc3Nf=WoX3WHQ@mail.gmail.com>
+Message-ID: <CAHk-=whccSm8HKANQbomYrF8cqBa1wUi1dvUEUc3Nf=WoX3WHQ@mail.gmail.com>
+Subject: Re: [PATCH 2/6] treewide: remove using list iterator after loop body
+ as a ptr
+To:     Kees Cook <keescook@chromium.org>
+Cc:     Matthew Wilcox <willy@infradead.org>,
+        =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+        Jakob Koschel <jakobkoschel@gmail.com>,
+        alsa-devel@alsa-project.org, linux-aspeed@lists.ozlabs.org,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        linux-iio@vger.kernel.org, nouveau@lists.freedesktop.org,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        dri-devel <dri-devel@lists.freedesktop.org>,
+        Cristiano Giuffrida <c.giuffrida@vu.nl>,
+        amd-gfx list <amd-gfx@lists.freedesktop.org>,
+        samba-technical@lists.samba.org,
+        linux1394-devel@lists.sourceforge.net, drbd-dev@lists.linbit.com,
+        linux-arch <linux-arch@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        linux-rdma <linux-rdma@vger.kernel.org>,
+        linux-staging@lists.linux.dev, "Bos, H.J." <h.j.bos@vu.nl>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        intel-wired-lan@lists.osuosl.org,
+        kgdb-bugreport@lists.sourceforge.net,
+        bcm-kernel-feedback-list@broadcom.com,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Linux Media Mailing List <linux-media@vger.kernel.org>,
+        Arnd Bergman <arnd@arndb.de>,
+        Linux PM <linux-pm@vger.kernel.org>,
+        intel-gfx <intel-gfx@lists.freedesktop.org>,
+        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        v9fs-developer@lists.sourceforge.net,
+        linux-tegra <linux-tegra@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-sgx@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>, linux-usb@vger.kernel.org,
+        linux-wireless <linux-wireless@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux F2FS Dev Mailing List 
+        <linux-f2fs-devel@lists.sourceforge.net>,
+        tipc-discussion@lists.sourceforge.net,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        dma <dmaengine@vger.kernel.org>,
+        linux-mediatek@lists.infradead.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        Mike Rapoport <rppt@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
+On Tue, Mar 1, 2022 at 10:14 AM Kees Cook <keescook@chromium.org> wrote:
+>
+> The first big glitch with -Wshadow was with shadowed global variables.
+> GCC 4.8 fixed that, but it still yells about shadowed functions. What
+> _almost_ works is -Wshadow=local.
 
-On Tue, Mar 01, 2022 at 07:00:57PM +0100, Paolo Bonzini wrote:
-> On 3/1/22 07:03, Oliver Upton wrote:
-> > +
-> > +	/*
-> > +	 * Ensure KVM fiddling with these MSRs is preserved after userspace
-> > +	 * write.
-> > +	 */
-> > +	if (msr_index == MSR_IA32_VMX_TRUE_ENTRY_CTLS ||
-> > +	    msr_index == MSR_IA32_VMX_TRUE_EXIT_CTLS)
-> > +		nested_vmx_entry_exit_ctls_update(&vmx->vcpu);
-> > +
-> 
-> I still don't understand this patch.  You say:
-> 
-> > Now, the BNDCFGS bits are only ever
-> > updated after a KVM_SET_CPUID/KVM_SET_CPUID2 ioctl, meaning that a
-> > subsequent MSR write from userspace will clobber these values.
-> 
-> but I don't understand what's wrong with that.  If you can (if so inclined)
-> define a VM without LOAD_BNDCFGS or CLEAR_BNDCFGS even if MPX enabled,
-> commit aedbaf4f6afd counts as a bugfix.
+Heh. Yeah, I just have long memories of "-Wshadow was a disaster". You
+looked into the details.
 
-Right, a 1-setting of '{load,clear} IA32_BNDCFGS' should really be the
-responsibility of userspace. My issue is that the commit message in
-commit 5f76f6f5ff96 ("KVM: nVMX: Do not expose MPX VMX controls when
-guest MPX disabled") suggests that userspace can expect these bits to be
-configured based on guest CPUID. Furthermore, before commit aedbaf4f6afd
-("KVM: x86: Extract kvm_update_cpuid_runtime() from
-kvm_update_cpuid()"), if userspace clears these bits, KVM will continue
-to set them based on CPUID.
+> Another way to try to catch misused shadow variables is
+> -Wunused-but-set-varible, but it, too, has tons of false positives.
 
-What is the userspace expectation here? If we are saying that changes to
-IA32_VMX_TRUE_{ENTRY,EXIT}_CTLS after userspace writes these MSRs is a
-bug, then I agree aedbaf4f6afd is in fact a bugfix. But, the commit
-message in 5f76f6f5ff96 seems to indicate that userspace wants KVM to
-configure these bits based on guest CPUID.
+That on the face of it should be an easy warning to get technically
+right for a compiler.
 
-Given that there were previous userspace expectations, I attempted to
-restore the old behavior of KVM (ignore userspace writes) and add a
-quirk to fully back out of the mess. All this logic also applies to
-Patch 2 as well.
+So I assume the "false positives" are simply because we end up having
+various variables that really don't end up being used - and
+"intentionally" so).
 
---
-Oliver
+Or rather, they might only be used under some config option - perhaps
+the use is even syntactically there and parsed, but the compiler
+notices that it's turned off under some
+
+        if (IS_ENABLED(..))
+
+option? Because yeah, we have a lot of those.
+
+I think that's a common theme with a lot of compiler warnings: on the
+face of it they sound "obviously sane" and nobody should ever write
+code like that.
+
+A conditional that is always true? Sounds idiotic, and sounds like a
+reasonable thing for a compiler to warn about, since why would you
+have a conditional in the first place for that?
+
+But then you realize that maybe the conditional is a build config
+option, and "always true" suddenly makes sense. Or it's a test for
+something that is always true on _that_architecture_ but not in some
+general sense (ie testing "sizeof()"). Or it's a purely syntactic
+conditional, like "do { } while (0)".
+
+It's why I'm often so down on a lot of the odd warnings that are
+hiding under W=1 and friends. They all may make sense in the trivial
+case ("That is insane") but then in the end they happen for sane code.
+
+And yeah, -Wshadow has had tons of history with macro nesting, and
+just being badly done in the first place (eg "strlen" can be a
+perfectly fine local variable).
+
+That said, maybe people could ask the gcc and clan people for a way to
+_mark_ the places where we expect to validly see shadowing. For
+example, that "local variable in a macro expression statement" thing
+is absolutely horrendous to fix with preprocessor tricks to try to
+make for unique identifiers.
+
+But I think it would be much more syntactically reasonable to add (for
+example) a "shadow" attribute to such a variable exactly to tell the
+compiler "yeah, yeah, I know this identifier could shadow an outer
+one" and turn it off that way.
+
+               Linus
