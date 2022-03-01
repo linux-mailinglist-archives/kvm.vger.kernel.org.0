@@ -2,85 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 57BA44C9274
-	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 19:01:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E45E74C9280
+	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 19:01:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236725AbiCASCC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Mar 2022 13:02:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43464 "EHLO
+        id S235914AbiCASCd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Mar 2022 13:02:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44178 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229583AbiCASCB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Mar 2022 13:02:01 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C66C83FBF6;
-        Tue,  1 Mar 2022 10:01:20 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 63942613E2;
-        Tue,  1 Mar 2022 18:01:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 548CEC340EE;
-        Tue,  1 Mar 2022 18:01:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1646157679;
-        bh=BlXx4FNNlsIl9zw8EoTTYqALDbRkuyGZS0mdHI4RoMA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=iEFkSTkWwXpMp7vsR4QZ/EJ3Oib4ZpUNZYzzsAzhylm2ksEYMVzN2682Dqakg9wuh
-         5oD7D1L1KC35go81Ztkp8huNYQkMEDQlk348/XbQ5/vNFcVbnbq0T6c5zi6A5K0B/i
-         F5W/Q68bc/YoS97YzoNhuopdow5scGqyEfK7IKq0=
-Date:   Tue, 1 Mar 2022 19:01:17 +0100
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        qemu-devel@nongnu.org, linux-hyperv@vger.kernel.org,
-        linux-crypto@vger.kernel.org, graf@amazon.com,
-        mikelley@microsoft.com, adrian@parity.io, lersek@redhat.com,
-        berrange@redhat.com, linux@dominikbrodowski.net, jannh@google.com,
-        mst@redhat.com, rafael@kernel.org, len.brown@intel.com,
-        pavel@ucw.cz, linux-pm@vger.kernel.org, colmmacc@amazon.com,
-        tytso@mit.edu, arnd@arndb.de
-Subject: Re: propagating vmgenid outward and upward
-Message-ID: <Yh5fbe71BTT6xc8h@kroah.com>
-References: <Yh4+9+UpanJWAIyZ@zx2c4.com>
+        with ESMTP id S236786AbiCASCc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Mar 2022 13:02:32 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E737364BD2
+        for <kvm@vger.kernel.org>; Tue,  1 Mar 2022 10:01:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646157710;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=vC3jRvgjxiHHWCObfMQOTUeJWucpIxxqG1tIi+VkA4s=;
+        b=G70wyj/iVCr6hbdlC6OSvr6o4N+22wSY0LuICN1BoToaNKLotAmqc8OmsOCMn2MTqK6OPS
+        izobJpkxpX0IYRLUcQHn3X9nEiOyr887j6kFYBQCPs0jqWnsbPqYOxEACfbYIW15wBrwJX
+        fN7QCF57S/UY6uhsudtrKEqY4tswEow=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-556-cVI3Cm9CN1GE3MLourZSRQ-1; Tue, 01 Mar 2022 13:01:47 -0500
+X-MC-Unique: cVI3Cm9CN1GE3MLourZSRQ-1
+Received: by mail-wr1-f71.google.com with SMTP id p9-20020adf9589000000b001e333885ac1so3599917wrp.10
+        for <kvm@vger.kernel.org>; Tue, 01 Mar 2022 10:01:47 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=vC3jRvgjxiHHWCObfMQOTUeJWucpIxxqG1tIi+VkA4s=;
+        b=a4/BoBUT/8LHYZO3CQ2oY8xo2fYpC0Xw4H8OjMohOIo9tsdrwcBp26uoYMek6cZE+H
+         hxk2TzBFgu+AscyrkrCLMSxmAndHzkb2vjXUqTrOrKqU1UatPwWatjd4YR2F0JjgkDGf
+         /nMj8M/MydQuYyxx0fbXzcHDqQSL6Bk2L0LK6zea45dgpJAD241caATARBLgC5LL8UDW
+         mpOCCVXOTsRoYURPglgA/C9ShIfu+yStLr0dy3CAY4DzBlqkYyPRMNsbHfpJclf/h6U+
+         J5YuGnKem1cckKlBrhUwp1+DrkDY+VOnmJluoFjU1rHe9bPhrOoF7H5hyeHiGt5ST574
+         vm+A==
+X-Gm-Message-State: AOAM532XiVsErqmKI2sfH46saWftCXFvvDtCGY/PaIJLopgNfL839i73
+        /johDg9pwPGi1PPoNpFPx7gzm7N3TTYS25V5GjyUxdcTu7fLMcQMs1oJTH8mPzo7gKan5Gco/P/
+        Sk7kK4UobmPvr
+X-Received: by 2002:a5d:6211:0:b0:1ef:85dd:c96b with SMTP id y17-20020a5d6211000000b001ef85ddc96bmr12251075wru.456.1646157706390;
+        Tue, 01 Mar 2022 10:01:46 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzOCc8N/yzaGMbDUmMRscLuKpd1KFyw5zGQyUM1JpCBNL/kdDlQCwQWT9Ouxag0VgEwgDpIuQ==
+X-Received: by 2002:a5d:6211:0:b0:1ef:85dd:c96b with SMTP id y17-20020a5d6211000000b001ef85ddc96bmr12251063wru.456.1646157706179;
+        Tue, 01 Mar 2022 10:01:46 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.googlemail.com with ESMTPSA id z10-20020a056000110a00b001ea75c5c218sm14239404wrw.89.2022.03.01.10.01.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 01 Mar 2022 10:01:45 -0800 (PST)
+Message-ID: <c2919129-2e56-d3df-f439-8085430005d9@redhat.com>
+Date:   Tue, 1 Mar 2022 19:01:43 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Yh4+9+UpanJWAIyZ@zx2c4.com>
-X-Spam-Status: No, score=-7.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH v4 2/8] KVM: nVMX: Keep KVM updates to PERF_GLOBAL_CTRL
+ ctrl bits across MSR write
+Content-Language: en-US
+To:     Oliver Upton <oupton@google.com>, kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        David Dunn <daviddunn@google.com>
+References: <20220301060351.442881-1-oupton@google.com>
+ <20220301060351.442881-3-oupton@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20220301060351.442881-3-oupton@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 01, 2022 at 04:42:47PM +0100, Jason A. Donenfeld wrote:
-> The easy way, and the way that I think I prefer, would be to just have a
-> sync notifier_block for this, just like we have with
-> register_pm_notifier(). From my perspective, it'd be simplest to just
-> piggy back on the already existing PM notifier with an extra event,
-> PM_POST_VMFORK, which would join the existing set of 7, following
-> PM_POST_RESTORE. I think that'd be coherent. However, if the PM people
-> don't want to play ball, we could always come up with our own
-> notifier_block. But I don't see the need. Plus, WireGuard *already*
-> uses the PM notifier for clearing keys, so code-wise for my use case,
-> that'd amount adding another case for PM_POST_VMFORK, in addition to the
-> currently existing PM_HIBERNATION_PREPARE and PM_SUSPEND_PREPARE cases,
-> which all would be treated the same way. Ezpz. So if that sounds like an
-> interesting thing to the PM people, I think I'd like to propose a patch
-> for that, possibly even for 5.18, given that it'd be very straight-
-> forward.
+On 3/1/22 07:03, Oliver Upton wrote:
+> +
+> +	/*
+> +	 * KVM supports a 1-setting of the "load IA32_PERF_GLOBAL_CTRL"
+> +	 * VM-{Entry,Exit} controls if the vPMU supports IA32_PERF_GLOBAL_CTRL.
+> +	 */
+> +	if (kvm_pmu_version(vcpu) >= 2) {
+> +		vmx->nested.msrs.entry_ctls_high |= VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL;
+> +		vmx->nested.msrs.exit_ctls_high |= VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL;
+> +	} else {
+> +		vmx->nested.msrs.entry_ctls_high &= ~VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL;
+> +		vmx->nested.msrs.exit_ctls_high &= ~VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL;
+> +	}
 
-A notifier block like this makes sense, but why tie onto the PM_ stuff?
-This isn't power management issues, it's a system-wide change that I am
-sure others will want to know about that doesn't reflect any power
-changes.
+This one I understand, following what's done with MPX, but I cannot make 
+sense of the commit message just like in the case of patch 1.
 
-As much as I hate adding new notifiers in the kernel, that might be all
-you need here.
+Paolo
 
-thanks,
-
-greg k-h
