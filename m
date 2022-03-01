@@ -2,107 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E45E74C9280
-	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 19:01:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D2C524C928D
+	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 19:06:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235914AbiCASCd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Mar 2022 13:02:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44178 "EHLO
+        id S236786AbiCASHY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Mar 2022 13:07:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52874 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236786AbiCASCc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Mar 2022 13:02:32 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E737364BD2
-        for <kvm@vger.kernel.org>; Tue,  1 Mar 2022 10:01:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646157710;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=vC3jRvgjxiHHWCObfMQOTUeJWucpIxxqG1tIi+VkA4s=;
-        b=G70wyj/iVCr6hbdlC6OSvr6o4N+22wSY0LuICN1BoToaNKLotAmqc8OmsOCMn2MTqK6OPS
-        izobJpkxpX0IYRLUcQHn3X9nEiOyr887j6kFYBQCPs0jqWnsbPqYOxEACfbYIW15wBrwJX
-        fN7QCF57S/UY6uhsudtrKEqY4tswEow=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-556-cVI3Cm9CN1GE3MLourZSRQ-1; Tue, 01 Mar 2022 13:01:47 -0500
-X-MC-Unique: cVI3Cm9CN1GE3MLourZSRQ-1
-Received: by mail-wr1-f71.google.com with SMTP id p9-20020adf9589000000b001e333885ac1so3599917wrp.10
-        for <kvm@vger.kernel.org>; Tue, 01 Mar 2022 10:01:47 -0800 (PST)
+        with ESMTP id S230148AbiCASHX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Mar 2022 13:07:23 -0500
+Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30F305DE4E
+        for <kvm@vger.kernel.org>; Tue,  1 Mar 2022 10:06:42 -0800 (PST)
+Received: by mail-ej1-x62f.google.com with SMTP id gb39so33151445ejc.1
+        for <kvm@vger.kernel.org>; Tue, 01 Mar 2022 10:06:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=hc+la0U9z5sF1wjuzpoAsI8bZOypHdVZX1vD0aADe74=;
+        b=qKpw9l26wiRybylQJZiYYTneChfm1HgNCnDKaEpsBSDFGb6rKM/cmHEFJ208nnRnwp
+         xQfa1UWshwsZL5m5CtpsnVwLGMpQ/OGX35605LcC2XqstLRT4n3v1wKI+OLrYbqxVaPC
+         MgUaCwJk5wuauXVDWcc/4N7NWDZcn8ldsfrPtzbXRwVD47MOXSeNihZ+9CusBpfPeR0N
+         ZiLnwialy6z4jd32aXsc1SjMyL3eXgSFE7netwfjP388Twl8GBoCTT8iKN7kfacRjQqP
+         oEZEXc2R6nsLB7jwrghgfpQqlLwikO2yrDOStfV69i/T1ZeHT9cfCnYl+fv0sQkMUDup
+         qx5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=vC3jRvgjxiHHWCObfMQOTUeJWucpIxxqG1tIi+VkA4s=;
-        b=a4/BoBUT/8LHYZO3CQ2oY8xo2fYpC0Xw4H8OjMohOIo9tsdrwcBp26uoYMek6cZE+H
-         hxk2TzBFgu+AscyrkrCLMSxmAndHzkb2vjXUqTrOrKqU1UatPwWatjd4YR2F0JjgkDGf
-         /nMj8M/MydQuYyxx0fbXzcHDqQSL6Bk2L0LK6zea45dgpJAD241caATARBLgC5LL8UDW
-         mpOCCVXOTsRoYURPglgA/C9ShIfu+yStLr0dy3CAY4DzBlqkYyPRMNsbHfpJclf/h6U+
-         J5YuGnKem1cckKlBrhUwp1+DrkDY+VOnmJluoFjU1rHe9bPhrOoF7H5hyeHiGt5ST574
-         vm+A==
-X-Gm-Message-State: AOAM532XiVsErqmKI2sfH46saWftCXFvvDtCGY/PaIJLopgNfL839i73
-        /johDg9pwPGi1PPoNpFPx7gzm7N3TTYS25V5GjyUxdcTu7fLMcQMs1oJTH8mPzo7gKan5Gco/P/
-        Sk7kK4UobmPvr
-X-Received: by 2002:a5d:6211:0:b0:1ef:85dd:c96b with SMTP id y17-20020a5d6211000000b001ef85ddc96bmr12251075wru.456.1646157706390;
-        Tue, 01 Mar 2022 10:01:46 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzOCc8N/yzaGMbDUmMRscLuKpd1KFyw5zGQyUM1JpCBNL/kdDlQCwQWT9Ouxag0VgEwgDpIuQ==
-X-Received: by 2002:a5d:6211:0:b0:1ef:85dd:c96b with SMTP id y17-20020a5d6211000000b001ef85ddc96bmr12251063wru.456.1646157706179;
-        Tue, 01 Mar 2022 10:01:46 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.googlemail.com with ESMTPSA id z10-20020a056000110a00b001ea75c5c218sm14239404wrw.89.2022.03.01.10.01.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 01 Mar 2022 10:01:45 -0800 (PST)
-Message-ID: <c2919129-2e56-d3df-f439-8085430005d9@redhat.com>
-Date:   Tue, 1 Mar 2022 19:01:43 +0100
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=hc+la0U9z5sF1wjuzpoAsI8bZOypHdVZX1vD0aADe74=;
+        b=T8mDBs8budh/TQq2pqp9njDZ89/4X/zcvGR2LoH6cVAt33iNGGURyL50axkkbWHoKE
+         wxNZB4ZtFbrx7cuVhizZk5aTRe3C/NjwkOvIfj0GqGIF8qaIzjBRNHFtFmvsHxInn1jj
+         jbjImFAGi7Ecr7wHHZnk+9Axf29tepQ7sA5cZFZE4ZzazXbsBVNT6yH5rzhwrASRYlQd
+         X8baVex+WJeN1xPy2S3x5rkybT6i1senSWlDyCnyYTK+CqZnHbxHelPDmzyigqw3Yr8W
+         3R93jS6XnsLEDcrhVTcv9lo8bn6NXnW4qYCEt3DjUSPZSY97IXFpozCEwLGioDntzvgA
+         LWkw==
+X-Gm-Message-State: AOAM532DJnSiMqJ+UqLNSizShvdp5xo1ySoCWUE805L58ubqRiepm0Fy
+        iiolnt8+w5OZ/R3YEhVqoyYzAc1z3v5x98GNNZecIA==
+X-Google-Smtp-Source: ABdhPJy4LDHHSE+zUliqU4kzYZ+GgNq6vdP3ndMDVZDwLY6n8X23fU4ClJ3EPBJ1VR8nKdMWj/Yd7ROpFo9sygYVoi4=
+X-Received: by 2002:a17:906:2486:b0:6cf:ced9:e4cc with SMTP id
+ e6-20020a170906248600b006cfced9e4ccmr19870864ejb.201.1646158000527; Tue, 01
+ Mar 2022 10:06:40 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH v4 2/8] KVM: nVMX: Keep KVM updates to PERF_GLOBAL_CTRL
- ctrl bits across MSR write
-Content-Language: en-US
-To:     Oliver Upton <oupton@google.com>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
+References: <20220226001546.360188-1-seanjc@google.com> <20220226001546.360188-24-seanjc@google.com>
+In-Reply-To: <20220226001546.360188-24-seanjc@google.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Tue, 1 Mar 2022 10:06:29 -0800
+Message-ID: <CANgfPd-hZ0Epib2ZoQULhZkY1x4TFn6_wENnbGsiN9sHsHu2+Q@mail.gmail.com>
+Subject: Re: [PATCH v3 23/28] KVM: x86/mmu: Check for a REMOVED leaf SPTE
+ before making the SPTE
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
-        David Dunn <daviddunn@google.com>
-References: <20220301060351.442881-1-oupton@google.com>
- <20220301060351.442881-3-oupton@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220301060351.442881-3-oupton@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+        David Hildenbrand <david@redhat.com>,
+        kvm <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+        David Matlack <dmatlack@google.com>,
+        Mingwei Zhang <mizhang@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-18.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/1/22 07:03, Oliver Upton wrote:
-> +
-> +	/*
-> +	 * KVM supports a 1-setting of the "load IA32_PERF_GLOBAL_CTRL"
-> +	 * VM-{Entry,Exit} controls if the vPMU supports IA32_PERF_GLOBAL_CTRL.
-> +	 */
-> +	if (kvm_pmu_version(vcpu) >= 2) {
-> +		vmx->nested.msrs.entry_ctls_high |= VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL;
-> +		vmx->nested.msrs.exit_ctls_high |= VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL;
-> +	} else {
-> +		vmx->nested.msrs.entry_ctls_high &= ~VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL;
-> +		vmx->nested.msrs.exit_ctls_high &= ~VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL;
-> +	}
+On Fri, Feb 25, 2022 at 4:16 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> Explicitly check for a REMOVED leaf SPTE prior to attempting to map
+> the final SPTE when handling a TDP MMU fault.  Functionally, this is a
+> nop as tdp_mmu_set_spte_atomic() will eventually detect the frozen SPTE.
+> Pre-checking for a REMOVED SPTE is a minor optmization, but the real goal
+> is to allow tdp_mmu_set_spte_atomic() to have an invariant that the "old"
+> SPTE is never a REMOVED SPTE.
+>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-This one I understand, following what's done with MPX, but I cannot make 
-sense of the commit message just like in the case of patch 1.
+Reviewed-by: Ben Gardon <bgardon@google.com>
 
-Paolo
-
+> ---
+>  arch/x86/kvm/mmu/tdp_mmu.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index 4151e61245a7..1acd12bf309f 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -1250,7 +1250,11 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+>                 }
+>         }
+>
+> -       if (iter.level != fault->goal_level) {
+> +       /*
+> +        * Force the guest to retry the access if the upper level SPTEs aren't
+> +        * in place, or if the target leaf SPTE is frozen by another CPU.
+> +        */
+> +       if (iter.level != fault->goal_level || is_removed_spte(iter.old_spte)) {
+>                 rcu_read_unlock();
+>                 return RET_PF_RETRY;
+>         }
+> --
+> 2.35.1.574.g5d30c73bfb-goog
+>
