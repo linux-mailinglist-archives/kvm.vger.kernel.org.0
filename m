@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6D8654C83AF
-	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 07:04:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9634D4C83B1
+	for <lists+kvm@lfdr.de>; Tue,  1 Mar 2022 07:04:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232520AbiCAGEy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Mar 2022 01:04:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56226 "EHLO
+        id S232526AbiCAGE4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Mar 2022 01:04:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232048AbiCAGEs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Mar 2022 01:04:48 -0500
-Received: from mail-io1-xd49.google.com (mail-io1-xd49.google.com [IPv6:2607:f8b0:4864:20::d49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A62160D89
-        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 22:04:08 -0800 (PST)
-Received: by mail-io1-xd49.google.com with SMTP id e23-20020a6b6917000000b006406b9433d6so10023774ioc.14
-        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 22:04:08 -0800 (PST)
+        with ESMTP id S232383AbiCAGEw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Mar 2022 01:04:52 -0500
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C167C60CFB
+        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 22:04:09 -0800 (PST)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-2d6d36ec646so120355217b3.23
+        for <kvm@vger.kernel.org>; Mon, 28 Feb 2022 22:04:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=+fpfdzqr9xU6NfmbrsCOkjMW9hL4umQ1wJKtm6Q5JZs=;
-        b=no+Ibs3wsh0D+E70vs93/QjCl+k4DLHqPqYoFrhxs3xZhOG14n6XeWlDsS1ZUWeyie
-         uOB3RuY0uXv8RcGkB9QDDKgQ7qmzM8fhKCZYK4ol03bdPeoCKWTafhXrXx5PSmTvXhSQ
-         sLkK6g+mA+8CzffSrriaE/HhdOB3r4XZ3Qb4MDXsIhRQAZBm4jT2LYAuqg2yjbfKHbqH
-         GVJ61mBGfhv1evMdrAk8/LDher2oDSkL2UsxkAXQmt4Yxif6YkiXNRTvaQ587JvchF24
-         VVIh7wvi0+8ePz8Zf32z7sf5fb14HznrsYFdyjSSmWv2TcsMymMM6L8xMXhQ76S32BMU
-         JK+A==
+        bh=H7mi9apdEnxrzE+/TvNYFRdRST2jicY9ozMhi537JbY=;
+        b=hI002BoVgiodXwx/65LBkcjZv1ADrdTRFD0xLhKH/uFgduG6Ah1QTZJ9ErBKQZxa/L
+         FyT9dF2n58YJUnZ0WvPLIwxWSLmI/yNuMlEPvRxwBJws4eZ1ZO+LCC+t5CXYrw1hGCUZ
+         RLicMCqS8yKJ4KklrkyC6+cwaT0rionteofH2cipj2xfL0CE+uSF9sTmneMKn7Xovkqu
+         2U6NbpJWJWthhrz4G2BSpnsAM3DHezjXZEH7jy9Q4qp82wpJ3dDX0dHNZUxrYv5V7v9i
+         cSVuZ+miCpeqpBTSLq6lphjG+H8W6WSUZXPxHVrx9emhLfcDXHBji9QxeYHe0j/X2edF
+         HaWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=+fpfdzqr9xU6NfmbrsCOkjMW9hL4umQ1wJKtm6Q5JZs=;
-        b=rzpMHU4RM83lXiOps5eu5lrecTowjfk9cPP8lDFV6K0QcPWWViFqmPc3hMUeB8FQ1O
-         3w4NnpBgkkVa/ypPximoR74g9X38PEvzx1zijSNqak0UfmG0wflslyTEpe4C5hkQ6QP1
-         3C+NaXs8zim1cukWfLghaqMPYr+iJ2yz1z2BW/nExIiRLoifdRod2khLAxgjIgxxxF5b
-         9La6ckpFhre4NLkv09gFcWhxItW023KYUAccYMAD9NRP8wDmKmF9y1TvyOm9YYl7vwO7
-         nf+BiftAM8r1r0seBa9UE4h+x7xcwdsC9XDBXvKqYZ2IS2j/9xSOkGCFb1hhGfOZVfVe
-         bJpA==
-X-Gm-Message-State: AOAM530ylvJ6Mttq3ET/ALi1jEGjnfkx7DRnGMqJshZUUxFaiquUBHJF
-        LqNaWrk/5uCz6ne5TJahjiFyOLlt4N1EOM9aHWQGb5h7evoV4+XfDEy0XSkwzqO7qP6ToZZl6XH
-        gJYarvaXGsGU4XiFB2IIMaqOPTuM9Q7ehLEeDa78Nk2fhbNeWsATHPuznUA==
-X-Google-Smtp-Source: ABdhPJxvEf4u6yFjoA+HIY8bQ+rp8oxkHIsWac2zz+fAUHyxtA9ycZdNZuTuQGY65105CO04FHV2AEy+a3M=
+        bh=H7mi9apdEnxrzE+/TvNYFRdRST2jicY9ozMhi537JbY=;
+        b=k0au36kodY201ats+eEwgfedw2LbQYGZDe1Ub8l9G2Gyn9CdjqFZQvMofOLpOdGvg+
+         Ni+iWb9Gnb6DVaNo8mtN9VXgO6t95XDG9U4GabwzauvTUlb3wuoHlKHy5WjWG5wSVuIJ
+         ev/EH+ZMq0+xyDd5sk177Q88u21Kbf8Ph77CgkpTahi8PxC+uEPu5JdHpwObHqyiomtq
+         M31fpycnFA72xlxfB7Obmu8J29eS8yIyEn/ll7xsc89OFXIOPUVPH2YTauNL/PY95gtM
+         fu6zXK9/+IfRyOrjsIhwZ87lqWooQOA/+Sm8wJi8ChtDgN+8j3jIPge5U5nm3A7g4OIL
+         5QlA==
+X-Gm-Message-State: AOAM531ltM2+XVTr3iRP5jFfjPCkooXDAeBlECaZxDYtXojHWaMsO3aA
+        coeWCHymV8JZK6IeyCnJvZ6YT7yLkKYN83GQcfrrcv4gEMpSianVl5u5XQqGnLWSZBVJBGlA2TS
+        fTI5JkW03Qnk2uQA8xNdsCQFVxbx/iUzUsNPJg60LHMW3LPBjwXmtqfAsEQ==
+X-Google-Smtp-Source: ABdhPJwGj9YN7SV/EGBjvQBT2R9MW63u6mD5h/lVkWxZcAlfe8JkMTQhIKT2P+4mHi+Gn8dVMPIP0PlbplM=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a05:6e02:e0d:b0:2bf:5556:4c4a with SMTP id
- a13-20020a056e020e0d00b002bf55564c4amr21252743ilk.31.1646114647819; Mon, 28
- Feb 2022 22:04:07 -0800 (PST)
-Date:   Tue,  1 Mar 2022 06:03:46 +0000
+ (user=oupton job=sendgmr) by 2002:a05:6902:534:b0:61d:a782:81b6 with SMTP id
+ y20-20020a056902053400b0061da78281b6mr22155197ybs.253.1646114648862; Mon, 28
+ Feb 2022 22:04:08 -0800 (PST)
+Date:   Tue,  1 Mar 2022 06:03:47 +0000
 In-Reply-To: <20220301060351.442881-1-oupton@google.com>
-Message-Id: <20220301060351.442881-4-oupton@google.com>
+Message-Id: <20220301060351.442881-5-oupton@google.com>
 Mime-Version: 1.0
 References: <20220301060351.442881-1-oupton@google.com>
 X-Mailer: git-send-email 2.35.1.574.g5d30c73bfb-goog
-Subject: [PATCH v4 3/8] KVM: nVMX: Drop nested_vmx_pmu_refresh()
+Subject: [PATCH v4 4/8] KVM: x86: Introduce KVM_CAP_DISABLE_QUIRKS2
 From:   Oliver Upton <oupton@google.com>
 To:     kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -74,80 +74,143 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-nested_vmx_pmu_refresh() is now unneeded, as the call to
-nested_vmx_entry_exit_ctls_update() in vmx_vcpu_after_set_cpuid()
-guarantees that the VM-{Entry,Exit} control MSR changes are applied
-after setting CPUID. Drop all vestiges of nested_vmx_pmu_refresh().
+KVM_CAP_DISABLE_QUIRKS is irrevocably broken. The capability does not
+advertise the set of quirks which may be disabled to userspace, so it is
+impossible to predict the behavior of KVM. Worse yet,
+KVM_CAP_DISABLE_QUIRKS will tolerate any value for cap->args[0], meaning
+it fails to reject attempts to set invalid quirk bits.
 
-No functional change intended.
+The only valid workaround for the quirky quirks API is to add a new CAP.
+Actually advertise the set of quirks that can be disabled to userspace
+so it can predict KVM's behavior. Reject values for cap->args[0] that
+contain invalid bits.
+
+Finally, add documentation for the new capability and describe the
+existing quirks.
 
 Signed-off-by: Oliver Upton <oupton@google.com>
 ---
- arch/x86/kvm/vmx/nested.c    | 22 ----------------------
- arch/x86/kvm/vmx/nested.h    |  2 --
- arch/x86/kvm/vmx/pmu_intel.c |  3 ---
- 3 files changed, 27 deletions(-)
+ Documentation/virt/kvm/api.rst  | 50 +++++++++++++++++++++++++++++++++
+ arch/x86/include/asm/kvm_host.h |  7 +++++
+ arch/x86/kvm/x86.c              |  8 ++++++
+ include/uapi/linux/kvm.h        |  1 +
+ 4 files changed, 66 insertions(+)
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index a13f8f4e3d82..dec45606ce0c 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -4806,28 +4806,6 @@ int get_vmx_mem_address(struct kvm_vcpu *vcpu, unsigned long exit_qualification,
- 	return 0;
- }
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index f5d011351016..8f7240e79cc0 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -7079,6 +7079,56 @@ resource that is controlled with the H_SET_MODE hypercall.
+ This capability allows a guest kernel to use a better-performance mode for
+ handling interrupts and system calls.
  
--void nested_vmx_pmu_refresh(struct kvm_vcpu *vcpu,
--			    bool vcpu_has_perf_global_ctrl)
--{
--	struct vcpu_vmx *vmx;
--
--	if (!nested_vmx_allowed(vcpu))
--		return;
--
--	vmx = to_vmx(vcpu);
--	if (vcpu_has_perf_global_ctrl) {
--		vmx->nested.msrs.entry_ctls_high |=
--				VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL;
--		vmx->nested.msrs.exit_ctls_high |=
--				VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL;
--	} else {
--		vmx->nested.msrs.entry_ctls_high &=
--				~VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL;
--		vmx->nested.msrs.exit_ctls_high &=
--				~VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL;
--	}
--}
--
- static int nested_vmx_get_vmptr(struct kvm_vcpu *vcpu, gpa_t *vmpointer,
- 				int *ret)
- {
-diff --git a/arch/x86/kvm/vmx/nested.h b/arch/x86/kvm/vmx/nested.h
-index c92cea0b8ccc..14ad756aac46 100644
---- a/arch/x86/kvm/vmx/nested.h
-+++ b/arch/x86/kvm/vmx/nested.h
-@@ -32,8 +32,6 @@ int vmx_set_vmx_msr(struct kvm_vcpu *vcpu, u32 msr_index, u64 data);
- int vmx_get_vmx_msr(struct nested_vmx_msrs *msrs, u32 msr_index, u64 *pdata);
- int get_vmx_mem_address(struct kvm_vcpu *vcpu, unsigned long exit_qualification,
- 			u32 vmx_instruction_info, bool wr, int len, gva_t *ret);
--void nested_vmx_pmu_refresh(struct kvm_vcpu *vcpu,
--			    bool vcpu_has_perf_global_ctrl);
- void nested_mark_vmcs12_pages_dirty(struct kvm_vcpu *vcpu);
- bool nested_vmx_check_io_bitmaps(struct kvm_vcpu *vcpu, unsigned int port,
- 				 int size);
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 4e5b1eeeb77c..6433a1091333 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -541,9 +541,6 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
- 	bitmap_set(pmu->all_valid_pmc_idx,
- 		INTEL_PMC_MAX_GENERIC, pmu->nr_arch_fixed_counters);
++7.31 KVM_CAP_DISABLE_QUIRKS2
++----------------------------
++
++:Capability: KVM_CAP_DISABLE_QUIRKS2
++:Parameters: args[0] - set of KVM quirks to disable
++:Architectures: x86
++:Type: vm
++
++This capability, if enabled, will cause KVM to disable some behavior
++quirks.
++
++Calling KVM_CHECK_EXTENSION for this capability returns a bitmask of
++quirks that can be disabled in KVM.
++
++The argument to KVM_ENABLE_CAP for this capability is a bitmask of
++quirks to disable, and must be a subset of the bitmask returned by
++KVM_CHECK_EXTENSION.
++
++The valid bits in cap.args[0] are:
++
++=================================== ============================================
++ KVM_X86_QUIRK_LINT0_REENABLED      By default, the reset value for the LVT
++                                    LINT0 register is 0x700 (APIC_MODE_EXTINT).
++                                    When this quirk is disabled, the reset value
++                                    is 0x10000 (APIC_LVT_MASKED).
++
++ KVM_X86_QUIRK_CD_NW_CLEARED        By default, KVM clears CR0.CD and CR0.NW.
++                                    When this quirk is disabled, KVM does not
++                                    change the value of CR0.CD and CR0.NW.
++
++ KVM_X86_QUIRK_LAPIC_MMIO_HOLE      By default, the MMIO LAPIC interface is
++                                    available even when configured for x2APIC
++                                    mode. When this quirk is disabled, KVM
++                                    disables the MMIO LAPIC interface if the
++                                    LAPIC is in x2APIC mode.
++
++ KVM_X86_QUIRK_OUT_7E_INC_RIP       By default, KVM pre-increments %rip before
++                                    exiting to userspace for an OUT instruction
++                                    to port 0x7e. When this quirk is disabled,
++                                    KVM does not pre-increment %rip before
++                                    exiting to userspace.
++
++ KVM_X86_QUIRK_MISC_ENABLE_NO_MWAIT When this quirk is disabled, KVM sets
++                                    CPUID.01H:ECX[bit 3] (MONITOR/MWAIT) if
++                                    IA32_MISC_ENABLE[bit 18] (MWAIT) is set.
++                                    Additionally, when this quirk is disabled,
++                                    KVM clears CPUID.01H:ECX[bit 3] if
++                                    IA32_MISC_ENABLE[bit 18] is cleared.
++=================================== ============================================
++
+ 8. Other capabilities.
+ ======================
  
--	nested_vmx_pmu_refresh(vcpu,
--			       intel_is_valid_msr(vcpu, MSR_CORE_PERF_GLOBAL_CTRL));
--
- 	if (intel_pmu_lbr_is_compatible(vcpu))
- 		x86_perf_get_lbr(&lbr_desc->records);
- 	else
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index ccec837e520d..bc3405565967 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1963,4 +1963,11 @@ int memslot_rmap_alloc(struct kvm_memory_slot *slot, unsigned long npages);
+ #define KVM_CLOCK_VALID_FLAGS						\
+ 	(KVM_CLOCK_TSC_STABLE | KVM_CLOCK_REALTIME | KVM_CLOCK_HOST_TSC)
+ 
++#define KVM_X86_VALID_QUIRKS			\
++	(KVM_X86_QUIRK_LINT0_REENABLED |	\
++	 KVM_X86_QUIRK_CD_NW_CLEARED |		\
++	 KVM_X86_QUIRK_LAPIC_MMIO_HOLE |	\
++	 KVM_X86_QUIRK_OUT_7E_INC_RIP |		\
++	 KVM_X86_QUIRK_MISC_ENABLE_NO_MWAIT)
++
+ #endif /* _ASM_X86_KVM_HOST_H */
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index c712c33c1521..ec9b602be8da 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -4350,6 +4350,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 		r = enable_pmu ? KVM_CAP_PMU_VALID_MASK : 0;
+ 		break;
+ 	}
++	case KVM_CAP_DISABLE_QUIRKS2:
++		r = KVM_X86_VALID_QUIRKS;
++		break;
+ 	default:
+ 		break;
+ 	}
+@@ -5896,6 +5899,11 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 		return -EINVAL;
+ 
+ 	switch (cap->cap) {
++	case KVM_CAP_DISABLE_QUIRKS2:
++		r = -EINVAL;
++		if (cap->args[0] & ~KVM_X86_VALID_QUIRKS)
++			break;
++		fallthrough;
+ 	case KVM_CAP_DISABLE_QUIRKS:
+ 		kvm->arch.disabled_quirks = cap->args[0];
+ 		r = 0;
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index d2f1efc3aa35..91a6fe4e02c0 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1143,6 +1143,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_PPC_AIL_MODE_3 210
+ #define KVM_CAP_S390_MEM_OP_EXTENSION 211
+ #define KVM_CAP_PMU_CAPABILITY 212
++#define KVM_CAP_DISABLE_QUIRKS2 213
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
 -- 
 2.35.1.574.g5d30c73bfb-goog
 
