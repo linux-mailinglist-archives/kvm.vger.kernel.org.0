@@ -2,74 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9AE8F4CA9C9
-	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 17:06:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E56924CA9CC
+	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 17:07:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239124AbiCBQHf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Mar 2022 11:07:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45016 "EHLO
+        id S240236AbiCBQI0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 11:08:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46162 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230369AbiCBQHe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 11:07:34 -0500
+        with ESMTP id S240059AbiCBQIZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 11:08:25 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4B5D27004C
-        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 08:06:51 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6D1A82FFC6
+        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 08:07:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646237210;
+        s=mimecast20190719; t=1646237260;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=GrD0BGmgCrrsW/ZxtnaRp1GXNLCgNzTcWE7WkwLyYBQ=;
-        b=RJbwBEq5XYtY/m+mSIjJ6YgAnAoLmb1VoqCvbhm7DY6IYrwehwvYd7oWrwZhskl36k/4RL
-        rd5GIr6RRuMkaC79MbAM+ry57VbnRWma/wxi9GOOEAs+jzpql4dgoGuCgxWd8jic4aTQYC
-        rEB7pyMRzzdaah926A4hI63Q7+ckwoY=
+        bh=kijBMrzxo7OdLpiSqnAt9AQTzfbPdM8vboePrFXlyXA=;
+        b=FxtRp6EJC4xS3Rz/ztFBzPJJ3IKUYnKgnl2gU9FOr8zf201Grot33toq05jEc7gr7f13K4
+        E1JMKgS7Wlt5kZC6GloG7OU9nvVzF1Mq1YXtevrDhpaUVRwy9coDyz0xd4RcXV/Y43kp4K
+        DbpuFT1iJ06ALYbMD5Fz2J1auV5B9sQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-453-r_JR-YQUPYuwlJ8otLygLg-1; Wed, 02 Mar 2022 11:06:46 -0500
-X-MC-Unique: r_JR-YQUPYuwlJ8otLygLg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-639-uU2zv3bJOMWGdofAbFUdcQ-1; Wed, 02 Mar 2022 11:07:37 -0500
+X-MC-Unique: uU2zv3bJOMWGdofAbFUdcQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C6ACD1091DA1;
-        Wed,  2 Mar 2022 16:06:43 +0000 (UTC)
-Received: from localhost (unknown [10.39.195.47])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 103FD8395F;
-        Wed,  2 Mar 2022 16:06:42 +0000 (UTC)
-Date:   Wed, 2 Mar 2022 16:06:41 +0000
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Sergio Lopez <slp@redhat.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        qemu-devel@nongnu.org, vgoyal@redhat.com,
-        Fam Zheng <fam@euphon.net>, kvm@vger.kernel.org,
-        Jagannathan Raman <jag.raman@oracle.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>, qemu-block@nongnu.org,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Hanna Reitz <hreitz@redhat.com>,
-        Elena Ufimtseva <elena.ufimtseva@oracle.com>,
-        Kevin Wolf <kwolf@redhat.com>,
-        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        qemu-s390x@nongnu.org, Matthew Rosato <mjrosato@linux.ibm.com>,
-        John G Johnson <john.g.johnson@oracle.com>,
-        Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH 1/2] Allow returning EventNotifier's wfd
-Message-ID: <Yh+WESUBI9spkHvd@stefanha-x1.localdomain>
-References: <20220302113644.43717-1-slp@redhat.com>
- <20220302113644.43717-2-slp@redhat.com>
- <20220302081234.2378ef33.alex.williamson@redhat.com>
- <20220302152342.3hlzw3ih2agqqu6c@mhamilton>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 438A2801AFE;
+        Wed,  2 Mar 2022 16:07:35 +0000 (UTC)
+Received: from localhost (unknown [10.39.194.94])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D504A83C1D;
+        Wed,  2 Mar 2022 16:07:23 +0000 (UTC)
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
+        saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
+        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com,
+        ashok.raj@intel.com, kevin.tian@intel.com,
+        shameerali.kolothum.thodi@huawei.com
+Subject: Re: [PATCH V9 mlx5-next 09/15] vfio: Define device migration
+ protocol v2
+In-Reply-To: <20220302083440.539a1f33.alex.williamson@redhat.com>
+Organization: Red Hat GmbH
+References: <20220224142024.147653-1-yishaih@nvidia.com>
+ <20220224142024.147653-10-yishaih@nvidia.com> <87tucgiouf.fsf@redhat.com>
+ <20220302142732.GK219866@nvidia.com>
+ <20220302083440.539a1f33.alex.williamson@redhat.com>
+User-Agent: Notmuch/0.34 (https://notmuchmail.org)
+Date:   Wed, 02 Mar 2022 17:07:21 +0100
+Message-ID: <87mti8ibie.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="CckaM7tvrQIX+lck"
-Content-Disposition: inline
-In-Reply-To: <20220302152342.3hlzw3ih2agqqu6c@mhamilton>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
@@ -80,66 +69,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Mar 02 2022, Alex Williamson <alex.williamson@redhat.com> wrote:
 
---CckaM7tvrQIX+lck
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On Wed, 2 Mar 2022 10:27:32 -0400
+> Jason Gunthorpe <jgg@nvidia.com> wrote:
+>
+>> On Wed, Mar 02, 2022 at 12:19:20PM +0100, Cornelia Huck wrote:
+>> > > +/*
+>> > > + * vfio_mig_get_next_state - Compute the next step in the FSM
+>> > > + * @cur_fsm - The current state the device is in
+>> > > + * @new_fsm - The target state to reach
+>> > > + * @next_fsm - Pointer to the next step to get to new_fsm
+>> > > + *
+>> > > + * Return 0 upon success, otherwise -errno
+>> > > + * Upon success the next step in the state progression between cur_fsm and
+>> > > + * new_fsm will be set in next_fsm.  
+>> > 
+>> > What about non-success? Can the caller make any assumption about
+>> > next_fsm in that case? Because...  
+>> 
+>> I checked both mlx5 and acc, both properly ignore the next_fsm value
+>> on error. This oddness aros when Alex asked to return an errno instead
+>> of the state value.
+>
+> Right, my assertion was that only the driver itself should be able to
+> transition to the ERROR state.  vfio_mig_get_next_state() should never
+> advise the driver to go to the error state, it can only report that a
+> transition is invalid.  The driver may stay in the current state if an
+> error occurs here, which is why we added the ability to get the device
+> state.  Thanks,
+>
+> Alex
 
-On Wed, Mar 02, 2022 at 04:23:42PM +0100, Sergio Lopez wrote:
-> On Wed, Mar 02, 2022 at 08:12:34AM -0700, Alex Williamson wrote:
-> > On Wed,  2 Mar 2022 12:36:43 +0100
-> > Sergio Lopez <slp@redhat.com> wrote:
-> >=20
-> > > event_notifier_get_fd(const EventNotifier *e) always returns
-> > > EventNotifier's read file descriptor (rfd). This is not a problem when
-> > > the EventNotifier is backed by a an eventfd, as a single file
-> > > descriptor is used both for reading and triggering events (rfd =3D=3D
-> > > wfd).
-> > >=20
-> > > But, when EventNotifier is backed by a pipefd, we have two file
-> > > descriptors, one that can only be used for reads (rfd), and the other
-> > > only for writes (wfd).
-> > >=20
-> > > There's, at least, one known situation in which we need to obtain wfd
-> > > instead of rfd, which is when setting up the file that's going to be
-> > > sent to the peer in vhost's SET_VRING_CALL.
-> > >=20
-> > > Extend event_notifier_get_fd() to receive an argument which indicates
-> > > whether the caller wants to obtain rfd (false) or wfd (true).
-> >=20
-> > There are about 50 places where we add the false arg here and 1 where
-> > we use true.  Seems it would save a lot of churn to hide this
-> > internally, event_notifier_get_fd() returns an rfd, a new
-> > event_notifier_get_wfd() returns the wfd.  Thanks,
->=20
-> I agree. In fact, that's what I implemented in the first place. I
-> changed to this version in which event_notifier_get_fd() is extended
-> because it feels more "correct". But yes, the pragmatic option would
-> be adding a new event_notifier_get_wfd().
->=20
-> I'll wait for more reviews, and unless someone voices against it, I'll
-> respin the patches with that strategy (I already have it around here).
+So, should the function then write anything to next_fsm if it returns
+-errno? (Maybe I'm misunderstanding.) Or should the caller always expect
+that something may be written to new_fsm, and simply only look at it if
+the function returns success?
 
-I had the same thought looking through the patch before I read Alex's
-suggestion. A separate get_wfd() function makes sense to me.
-
-Stefan
-
---CckaM7tvrQIX+lck
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmIflhEACgkQnKSrs4Gr
-c8gUbwf+MaJ1cHSEuImrkqURTdFKqXovAS0lAPUlBsdIv36iSJWxNCfsWsP7nNQR
-ZnaIbqFNhCLC6YoZcEg/sezcGI/H3qfkG88Fv+wuEWBR5CWDoLnNhQGksC+A+jwD
-BnPvhEMXDWM/GAmjvQrNAfFZeVtvspRtVHg1xDvz1kfUrMup3Qpmz6VcdRZCEKHR
-HUkimVWmgOqRTDBA9Mcn32nFjqv1kWgaleItUOQXGq+gLXs4ri4CUuBDZcGRF/T7
-EgciAL062l4PjdATLM/Y42p1YMkROJhMEa30n4Ov/Ore/BjjFFAb+u+tcDJGo/DN
-wtItDgzVaRAoQ31EvfDE4kTgLyDjnw==
-=7Tst
------END PGP SIGNATURE-----
-
---CckaM7tvrQIX+lck--
+(I think that the code as-is is likely ok, I just want to make sure I'm
+not missing something. Apologies if that seems nitpicky.)
 
