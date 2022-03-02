@@ -2,101 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5409B4CAA46
-	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 17:32:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AC6A24CAA56
+	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 17:34:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242402AbiCBQdL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Mar 2022 11:33:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38426 "EHLO
+        id S233688AbiCBQe7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 11:34:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242543AbiCBQdC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 11:33:02 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E1B7C6255;
-        Wed,  2 Mar 2022 08:32:19 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 1A2F6617F7;
-        Wed,  2 Mar 2022 16:32:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FDCBC004E1;
-        Wed,  2 Mar 2022 16:32:16 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Jx2KF4SC"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1646238734;
+        with ESMTP id S235393AbiCBQe6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 11:34:58 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 568DC50054
+        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 08:34:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646238854;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=pn15odJ1axHr1tSHXKM6R6gy8OQYz+UX/tuJV8kTZOI=;
-        b=Jx2KF4SCMS6oQ81ruL+PmUOxb313LAgFJH4b+Nm/AbpnaHEQrJ93HFFJlkrZFljIclR1Ig
-        7MjMDAT88vIHvYQ5jVCXMswnqvnSTAn/DRep7zjTiB1RFfgW3eKlFxCp1420xGYalEM2Wc
-        ntxUnKyAuMw/wp27G1pbbLokW2Kvk8w=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 6b026337 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Wed, 2 Mar 2022 16:32:14 +0000 (UTC)
-Date:   Wed, 2 Mar 2022 17:32:07 +0100
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Laszlo Ersek <lersek@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>,
-        QEMU Developers <qemu-devel@nongnu.org>,
-        linux-hyperv@vger.kernel.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Alexander Graf <graf@amazon.com>,
-        "Michael Kelley (LINUX)" <mikelley@microsoft.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        adrian@parity.io,
-        Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Jann Horn <jannh@google.com>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        "Brown, Len" <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
-        Linux PM <linux-pm@vger.kernel.org>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        Theodore Ts'o <tytso@mit.edu>, Arnd Bergmann <arnd@arndb.de>
-Subject: Re: propagating vmgenid outward and upward
-Message-ID: <Yh+cB5bWarl8CFN1@zx2c4.com>
-References: <CAHmME9qieLUDVoPYZPo=N8NCL1T-RzQ4p7kCFv3PKFUkhWZPsw@mail.gmail.com>
- <20220302031738-mutt-send-email-mst@kernel.org>
- <CAHmME9pf-bjnZuweoLqoFEmPy1OK7ogEgGEAva1T8uVTufhCuw@mail.gmail.com>
- <20220302074503-mutt-send-email-mst@kernel.org>
- <Yh93UZMQSYCe2LQ7@zx2c4.com>
- <20220302092149-mutt-send-email-mst@kernel.org>
- <CAHmME9rf7hQP78kReP2diWNeX=obPem=f8R-dC7Wkpic2xmffg@mail.gmail.com>
- <20220302101602-mutt-send-email-mst@kernel.org>
- <Yh+PET49oHNpxn+H@zx2c4.com>
- <20220302111737-mutt-send-email-mst@kernel.org>
+        bh=PWSd2XUF2mosol4Wi2khE1roXr1zOMVG1AnKT6xRjqU=;
+        b=i2SA5x4nyrGHtzaNIQC6d7hvZJwSj/ihy08/ikH1YByKqJCni/E9F9zVeIvUNxlIXREmvc
+        CwokTuCQJnkryLF0rhnAszAXuutvAlP0XXf57GZ16HFUKZyls/rFQVJizFt+mqPoAVlh/t
+        c8LfIVodTxKsDOLakm6muLkpa2fIjHc=
+Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com
+ [209.85.161.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-562-eeRnQmr7MqG3qgqSOI3ZDg-1; Wed, 02 Mar 2022 11:34:13 -0500
+X-MC-Unique: eeRnQmr7MqG3qgqSOI3ZDg-1
+Received: by mail-oo1-f70.google.com with SMTP id z4-20020a4ad1a4000000b0031beb2043f7so1524417oor.20
+        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 08:34:13 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=PWSd2XUF2mosol4Wi2khE1roXr1zOMVG1AnKT6xRjqU=;
+        b=KjB+JvdCQIkQvytJOnVvmr4YwMCa1U9JtKL7Y95ATOBC5fgdNvpqDn0qaUq2P3q+YJ
+         WeCTS+053OYgLSoyllUz9osrt320BuTzXTRXwSF5eyXDcXPpKnJREvV8Y71jEJ8MBrZX
+         Fm6CIr7kPQB8qLNx6EgKtUr9jfvZ15x0HodN4uRsubOo0SSgwRjbp6kZdSYecOPSx0If
+         KcgSOp7ApA1lD4RWWkaMoPotFj6262WSZGYkJLkuMfXka0veDgypVOqElb3b95bF6vCm
+         8lDbkygH0wvxxBXjLJ7pq2eTzqfcGcFDyYk8qAvyxT9aisaplFW+3Cyu44LldQSQ/VSI
+         lQhg==
+X-Gm-Message-State: AOAM531yh1lJvBIi0x1hGGMBCgVOFug1c0mUJQZSmB8RYyYllvp+8IoB
+        ceYYZZWjmkrGhsz2pI+QLl9r4vJ7C5yeBGD7ivb9wvPoPIXRggvvoLDmhLleyrfNb1oMVyYONbq
+        VvEkd0yA53c5z
+X-Received: by 2002:a9d:715c:0:b0:5ad:3858:4d54 with SMTP id y28-20020a9d715c000000b005ad38584d54mr16223121otj.214.1646238852764;
+        Wed, 02 Mar 2022 08:34:12 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxBw2AqrPCsUU+HrPTnHR2yY44LF5FaN0crr7APTArZemj3pcA/s+JkRdkPJTlr0hwX4hI6Ng==
+X-Received: by 2002:a9d:715c:0:b0:5ad:3858:4d54 with SMTP id y28-20020a9d715c000000b005ad38584d54mr16223107otj.214.1646238852555;
+        Wed, 02 Mar 2022 08:34:12 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id n7-20020a4a6107000000b0031c402d8ec9sm8032303ooc.35.2022.03.02.08.34.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Mar 2022 08:34:12 -0800 (PST)
+Date:   Wed, 2 Mar 2022 09:34:09 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
+        saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
+        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com,
+        ashok.raj@intel.com, kevin.tian@intel.com,
+        shameerali.kolothum.thodi@huawei.com
+Subject: Re: [PATCH V9 mlx5-next 09/15] vfio: Define device migration
+ protocol v2
+Message-ID: <20220302093409.1aef2b6e.alex.williamson@redhat.com>
+In-Reply-To: <87mti8ibie.fsf@redhat.com>
+References: <20220224142024.147653-1-yishaih@nvidia.com>
+        <20220224142024.147653-10-yishaih@nvidia.com>
+        <87tucgiouf.fsf@redhat.com>
+        <20220302142732.GK219866@nvidia.com>
+        <20220302083440.539a1f33.alex.williamson@redhat.com>
+        <87mti8ibie.fsf@redhat.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20220302111737-mutt-send-email-mst@kernel.org>
-X-Spam-Status: No, score=-6.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Michael,
+On Wed, 02 Mar 2022 17:07:21 +0100
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-On Wed, Mar 02, 2022 at 11:22:46AM -0500, Michael S. Tsirkin wrote:
-> > Because that 16 byte read of vmgenid is not atomic. Let's say you read
-> > the first 8 bytes, and then the VM is forked.
+> On Wed, Mar 02 2022, Alex Williamson <alex.williamson@redhat.com> wrote:
 > 
-> But at this point when VM was forked plaintext key and nonce are all in
-> buffer, and you previously indicated a fork at this point is harmless.
-> You wrote "If it changes _after_ that point of check ... it doesn't
-> matter:"
+> > On Wed, 2 Mar 2022 10:27:32 -0400
+> > Jason Gunthorpe <jgg@nvidia.com> wrote:
+> >  
+> >> On Wed, Mar 02, 2022 at 12:19:20PM +0100, Cornelia Huck wrote:  
+> >> > > +/*
+> >> > > + * vfio_mig_get_next_state - Compute the next step in the FSM
+> >> > > + * @cur_fsm - The current state the device is in
+> >> > > + * @new_fsm - The target state to reach
+> >> > > + * @next_fsm - Pointer to the next step to get to new_fsm
+> >> > > + *
+> >> > > + * Return 0 upon success, otherwise -errno
+> >> > > + * Upon success the next step in the state progression between cur_fsm and
+> >> > > + * new_fsm will be set in next_fsm.    
+> >> > 
+> >> > What about non-success? Can the caller make any assumption about
+> >> > next_fsm in that case? Because...    
+> >> 
+> >> I checked both mlx5 and acc, both properly ignore the next_fsm value
+> >> on error. This oddness aros when Alex asked to return an errno instead
+> >> of the state value.  
+> >
+> > Right, my assertion was that only the driver itself should be able to
+> > transition to the ERROR state.  vfio_mig_get_next_state() should never
+> > advise the driver to go to the error state, it can only report that a
+> > transition is invalid.  The driver may stay in the current state if an
+> > error occurs here, which is why we added the ability to get the device
+> > state.  Thanks,
+> >
+> > Alex  
+> 
+> So, should the function then write anything to next_fsm if it returns
+> -errno? (Maybe I'm misunderstanding.) Or should the caller always expect
+> that something may be written to new_fsm, and simply only look at it if
+> the function returns success?
 
-Ahhh, fair point. I think you're right.
+Note that this function doesn't actually transition the device to
+next_fsm, it's only informing the driver what the next state is.
+Therefore I think it's reasonable to expect that the caller is never
+going to use it's actual internal device state for next_fsm.  So I
+don't really see a case where we need to worry about preserving
+next_fsm in the error condition.  Thanks,
 
-Alright, so all we're talking about here is an ordinary 16-byte read,
-and 16 bytes of storage per keypair, and a 16-byte comparison.
+Alex
 
-Still seems much worse than just having a single word...
-
-Jason
