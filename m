@@ -2,124 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D3A404CA6C5
-	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 14:56:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9B7504CA6F3
+	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 15:04:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233874AbiCBN51 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Mar 2022 08:57:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44484 "EHLO
+        id S242518AbiCBOEt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 09:04:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235735AbiCBN5X (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 08:57:23 -0500
-Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 693BBDF2F
-        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 05:56:39 -0800 (PST)
-Received: by mail-wr1-x42d.google.com with SMTP id ay10so2921279wrb.6
-        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 05:56:39 -0800 (PST)
+        with ESMTP id S242250AbiCBOEs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 09:04:48 -0500
+Received: from mail-wr1-x44a.google.com (mail-wr1-x44a.google.com [IPv6:2a00:1450:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D46617EA1B
+        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 06:04:04 -0800 (PST)
+Received: by mail-wr1-x44a.google.com with SMTP id o1-20020adfe801000000b001f023455317so683911wrm.3
+        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 06:04:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=W8D01UtJzG2MACA/9shiZ9rVVg2i2NMp5ocse6f4EOY=;
-        b=DSob74kIJdRyA0VbXhRgyMD02C0hMXBzKN/Fhe1vuNvwexgeHsxu1/6cQhFmdIekKj
-         NXZ6PvMUfl7oWv0bzCPKv+fo6fihSNCPXKIA76Z5C43Gpb7i2d3ecW8dLwk7pz2rln31
-         +wKtzYYIl/l5TqmkbNZ7CeOCoFYnbZV7qC2rDjZ3FWiRcWsVNeJH+THOnH7Ld4gWlSbX
-         n3dhyr7AckXvsUx3I5YwQhvskLgWfc8f39bKKB8mufkykzlyGGSAKtPmsQaMn7OldVcv
-         zPHVqUGG7osZzohrjoPERFRQTbXak8QgdGKXGl0wo03Oe7LhcET/FBK7t8dI7VKRWsIa
-         +DPw==
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=hPKuRtrZ7FciAHN0houkzwDHAjhc6VOJutEOMHbNfWA=;
+        b=jbv65BHk8GqJHm2EmtbEtTPoARICcpi/WQbKKS7FdWkuEKfUHNCM48Q0jsI78A8yES
+         4vRerRTJR0n75FIpBbWVkuk/iCG6UzT7EbwwcSveeIB9NRMBrZx/aDW4FQ+GptlpOzp5
+         IWo9O9SLj9jKlhLeW7vEVl+Eggj9RlwN+5BElRSd84yMsO2D3T1TUCxrs9QShQOj37fZ
+         Fxy7Jn5p3ZHFTXwIRDF5O25joN6L1FttWSE2bitSxTsUbxhjfRhc/BHdM6WVK++qXrq7
+         GElNl7Uvw/Dapkyo9GSKF8shRbFBBeYiy9q3uY2udVW8kvAuHnOl4xFwhSOP70f+dx/N
+         SoZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=W8D01UtJzG2MACA/9shiZ9rVVg2i2NMp5ocse6f4EOY=;
-        b=VNjRhqKTpY/BFpq/2+825X0lbdqk7anlj06gQF4SubZK5b2Q93iWWmCyZ5GAnypX/i
-         32vE/Rv4XVs3J3mtBS1s+ovtiGSMKTMvWfuhDzNVmBi9ObyLnbJvmTU+fNJmPFcN0Stm
-         /M5dzvalT0obxxwJI1SSoBPqO3l37raGhD0W2d0hajBwtrqaIByluKZqEvMFpxfpez3m
-         9Uhle0gfFz+nksFwb8bvZz5FpjbR/b/3L7S2WIGKWt3vp8N0Yi3II1Ve6QdmBabghWNt
-         LxvY/sVulcQA9BwccU5u9S1B/RpF2AcZ+VMjxGtSTDTJxr0nWZ42I48yoSnG7DDL9OjM
-         l+pQ==
-X-Gm-Message-State: AOAM5310DC7QXkWu8KCG8SaGa0+BdaAObtnepbkZe8rLTxtAh2rlX5pZ
-        nQ5g5JKyLBGRQYmOeBKn1VfadA==
-X-Google-Smtp-Source: ABdhPJxvTB4fYUTHq6Q8F0qC+lDtXJO6IvJq9fq5nJHg1+J4qLgqtVZgkoL1Is298lR5PX1g1c4yUQ==
-X-Received: by 2002:adf:a109:0:b0:1ed:c2bd:8a57 with SMTP id o9-20020adfa109000000b001edc2bd8a57mr22607510wro.612.1646229397976;
-        Wed, 02 Mar 2022 05:56:37 -0800 (PST)
-Received: from google.com (cpc155339-bagu17-2-0-cust87.1-3.cable.virginm.net. [86.27.177.88])
-        by smtp.gmail.com with ESMTPSA id t15-20020adfe44f000000b001edbea974cesm16473010wrm.53.2022.03.02.05.56.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Mar 2022 05:56:37 -0800 (PST)
-Date:   Wed, 2 Mar 2022 13:56:35 +0000
-From:   Lee Jones <lee.jones@linaro.org>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     jasowang@redhat.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, stable@vger.kernel.org,
-        syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
-Subject: Re: [PATCH 1/1] vhost: Protect the virtqueue from being cleared
- whilst still in use
-Message-ID: <Yh93k2ZKJBIYQJjp@google.com>
-References: <20220302075421.2131221-1-lee.jones@linaro.org>
- <20220302082021-mutt-send-email-mst@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220302082021-mutt-send-email-mst@kernel.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=hPKuRtrZ7FciAHN0houkzwDHAjhc6VOJutEOMHbNfWA=;
+        b=m0eorSD3KiGPwVV6X6EVN2m9yOvLJtx0NfFjPCN9GkhnoEK+1/AFF8urWDQ2WsS3z4
+         E6F4nSMGvPQPfcNyaRy1BKcVxkFFwWnCV25NeBwSdHS5m4KzvmUBrSXdyWSglVZ1Ndlg
+         U+8ThVKDsg4RbHbXMAyh4goHIZ+ibGPlMEVg2fgULazW7j1wSUCAsVuuy+UOpRFX55um
+         XtuALf9Y4cEYqPZGT3+/ed2j6ccReKGIe0wbOkDbkRzAugIGr7jnE/E+HjhRN4thKyWK
+         z8rghSoPno9xyA8FmhylOPfRcRM+wUrWlLCEHWh4hN6B0OlbcXo9Is7oFQyiKPauAlnC
+         L+Uw==
+X-Gm-Message-State: AOAM531vqu8LQ/M48QTqB1mLC5cBM9zk4pn6v1bW6Yf1IOy2d6ofQ1CQ
+        WqBivvgdr+WP2BNA3I6939PuFT2olHX4zwJUjj8mnGfMCWRwSCVgrhj1pFpTbAzvlaxwSkBkOPE
+        lnnaHJ0n4zWPLFiJ6j8Ba6D1JhztpYYThmV//DH0U/MkKZoZMNSpspM3Wv6m2PLQlneMPZhzdBg
+        ==
+X-Google-Smtp-Source: ABdhPJwCwe0Ivn4oxuYW85DCZt8LEkoCUulaqDf9S/0R2XreVsB1ACODvonVA/kCsqzYygLXLLlKNtB9xtvojYGmmqM=
+X-Received: from sene.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:27c4])
+ (user=sebastianene job=sendgmr) by 2002:a05:600c:3203:b0:381:b544:7970 with
+ SMTP id r3-20020a05600c320300b00381b5447970mr5936255wmp.144.1646229843153;
+ Wed, 02 Mar 2022 06:04:03 -0800 (PST)
+Date:   Wed,  2 Mar 2022 14:03:22 +0000
+Message-Id: <20220302140324.1010891-1-sebastianene@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.1.574.g5d30c73bfb-goog
+Subject: [PATCH kvmtool v6 0/3] aarch64: Add stolen time support
+From:   Sebastian Ene <sebastianene@google.com>
+To:     kvm@vger.kernel.org
+Cc:     qperret@google.com, maz@kernel.org, kvmarm@lists.cs.columbia.edu,
+        will@kernel.org, julien.thierry.kdev@gmail.com,
+        Sebastian Ene <sebastianene@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-10.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 02 Mar 2022, Michael S. Tsirkin wrote:
+These patches add support for stolen time functionality.
 
-> On Wed, Mar 02, 2022 at 07:54:21AM +0000, Lee Jones wrote:
-> > vhost_vsock_handle_tx_kick() already holds the mutex during its call
-> > to vhost_get_vq_desc().  All we have to do is take the same lock
-> > during virtqueue clean-up and we mitigate the reported issues.
-> > 
-> > Link: https://syzkaller.appspot.com/bug?extid=279432d30d825e63ba00
-> > 
-> > Cc: <stable@vger.kernel.org>
-> > Reported-by: syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
-> > Signed-off-by: Lee Jones <lee.jones@linaro.org>
-> > ---
-> >  drivers/vhost/vhost.c | 2 ++
-> >  1 file changed, 2 insertions(+)
-> > 
-> > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> > index 59edb5a1ffe28..bbaff6a5e21b8 100644
-> > --- a/drivers/vhost/vhost.c
-> > +++ b/drivers/vhost/vhost.c
-> > @@ -693,6 +693,7 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
-> >  	int i;
-> >  
-> >  	for (i = 0; i < dev->nvqs; ++i) {
-> > +		mutex_lock(&dev->vqs[i]->mutex);
-> >  		if (dev->vqs[i]->error_ctx)
-> >  			eventfd_ctx_put(dev->vqs[i]->error_ctx);
-> >  		if (dev->vqs[i]->kick)
-> > @@ -700,6 +701,7 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
-> >  		if (dev->vqs[i]->call_ctx.ctx)
-> >  			eventfd_ctx_put(dev->vqs[i]->call_ctx.ctx);
-> >  		vhost_vq_reset(dev, dev->vqs[i]);
-> > +		mutex_unlock(&dev->vqs[i]->mutex);
-> >  	}
-> 
-> So this is a mitigation plan but the bug is still there though
-> we don't know exactly what it is.  I would prefer adding something like
-> WARN_ON(mutex_is_locked(vqs[i]->mutex) here - does this make sense?
+Patch #1 moves the vCPU structure initialisation before the target->init()
+call to allow early access to the kvm structure from the vCPU
+during target->init().
 
-As a rework to this, or as a subsequent patch?
+Patch #2 modifies the memory layout in arm-common/kvm-arch.h and adds a
+new MMIO device PVTIME after the RTC region. A new flag is added in
+kvm-config.h that will be used to control [enable/disable] the pvtime
+functionality. Stolen time is enabled by default when the host
+supports KVM_CAP_STEAL_TIME.
 
-Just before the first lock I assume?
+Patch #3 adds a new command line argument to disable the stolen time
+functionality(by default is enabled).
+
+Changelog since v5:
+ - propagate the error code from the kvm_cpu__setup_pvtime() when the
+   host supports KVM_CAP_STEAL_TIME but if fails to configure it for
+   stolen time functionality.
+
+Sebastian Ene (3):
+  aarch64: Populate the vCPU struct before target->init()
+  aarch64: Add stolen time support
+  Add --no-pvtime command line argument
+
+ Makefile                               |   1 +
+ arm/aarch64/arm-cpu.c                  |   2 +-
+ arm/aarch64/include/kvm/kvm-cpu-arch.h |   1 +
+ arm/aarch64/pvtime.c                   | 103 +++++++++++++++++++++++++
+ arm/include/arm-common/kvm-arch.h      |   6 +-
+ arm/kvm-cpu.c                          |  14 ++--
+ builtin-run.c                          |   2 +
+ include/kvm/kvm-config.h               |   1 +
+ 8 files changed, 121 insertions(+), 9 deletions(-)
+ create mode 100644 arm/aarch64/pvtime.c
 
 -- 
-Lee Jones [李琼斯]
-Principal Technical Lead - Developer Services
-Linaro.org │ Open source software for Arm SoCs
-Follow Linaro: Facebook | Twitter | Blog
+2.35.1.574.g5d30c73bfb-goog
+
