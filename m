@@ -2,51 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B70F74CABF8
-	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 18:31:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BDA244CAC2D
+	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 18:34:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236549AbiCBRcc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Mar 2022 12:32:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42802 "EHLO
+        id S239169AbiCBRek (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 12:34:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240686AbiCBRcY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 12:32:24 -0500
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F349D3ACA;
-        Wed,  2 Mar 2022 09:31:16 -0800 (PST)
-Received: from fraeml736-chm.china.huawei.com (unknown [172.18.147.200])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4K81Mn2NY8z67tsp;
-        Thu,  3 Mar 2022 01:29:57 +0800 (CST)
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- fraeml736-chm.china.huawei.com (10.206.15.217) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Wed, 2 Mar 2022 18:31:10 +0100
-Received: from A2006125610.china.huawei.com (10.47.91.128) by
- lhreml710-chm.china.huawei.com (10.201.108.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Wed, 2 Mar 2022 17:31:03 +0000
-From:   Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-To:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>
-CC:     <linux-pci@vger.kernel.org>, <alex.williamson@redhat.com>,
-        <jgg@nvidia.com>, <cohuck@redhat.com>, <mgurtovoy@nvidia.com>,
-        <yishaih@nvidia.com>, <linuxarm@huawei.com>,
-        <liulongfang@huawei.com>, <prime.zeng@hisilicon.com>,
-        <jonathan.cameron@huawei.com>, <wangzhou1@hisilicon.com>
-Subject: [PATCH v7 10/10] hisi_acc_vfio_pci: Use its own PCI reset_done error handler
-Date:   Wed, 2 Mar 2022 17:29:03 +0000
-Message-ID: <20220302172903.1995-11-shameerali.kolothum.thodi@huawei.com>
-X-Mailer: git-send-email 2.12.0.windows.1
-In-Reply-To: <20220302172903.1995-1-shameerali.kolothum.thodi@huawei.com>
-References: <20220302172903.1995-1-shameerali.kolothum.thodi@huawei.com>
+        with ESMTP id S244081AbiCBReX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 12:34:23 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7ED99BD7
+        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 09:33:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646242361;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=1USmVjxTTYdc7rMUiqrUNWQcVO4SlzVz/zIrE4siUEI=;
+        b=DVngakkPpEwOM5xKsKhbC0Lcw4+tcZqcwOCFslNbCFykWpC7hGZz80tLfLp8B/kyNVBiqt
+        TETNXJv+JOhs8NmLGhvDmpivZb0H2Sq5I9TJ8yNV8J0dJvPFBpE6ZESB552Ivu91JRHQ/w
+        OSG+vRX5xx18leICeAQ4oGDDK2CuSQk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-380-n-ihYirbN3STB5InILhdVg-1; Wed, 02 Mar 2022 12:32:36 -0500
+X-MC-Unique: n-ihYirbN3STB5InILhdVg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BCF1C1006AA6;
+        Wed,  2 Mar 2022 17:32:33 +0000 (UTC)
+Received: from localhost (unknown [10.33.36.14])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E0D43838DD;
+        Wed,  2 Mar 2022 17:31:26 +0000 (UTC)
+Date:   Wed, 2 Mar 2022 18:31:46 +0100
+From:   Sergio Lopez <slp@redhat.com>
+To:     Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= 
+        <philippe.mathieu.daude@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
+        vgoyal@redhat.com, Fam Zheng <fam@euphon.net>, kvm@vger.kernel.org,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Jagannathan Raman <jag.raman@oracle.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>, qemu-block@nongnu.org,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Hanna Reitz <hreitz@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Elena Ufimtseva <elena.ufimtseva@oracle.com>,
+        Kevin Wolf <kwolf@redhat.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        qemu-s390x@nongnu.org, Matthew Rosato <mjrosato@linux.ibm.com>,
+        John G Johnson <john.g.johnson@oracle.com>,
+        Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH 2/2] Allow building vhost-user in BSD
+Message-ID: <20220302173009.26auqvy4t4rx74td@mhamilton>
+References: <20220302113644.43717-1-slp@redhat.com>
+ <20220302113644.43717-3-slp@redhat.com>
+ <66b68bcc-8d7e-a5f7-5e6c-b2d20c26ab01@redhat.com>
+ <8dfc9854-4d59-0759-88d0-d502ae7c552f@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.47.91.128]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- lhreml710-chm.china.huawei.com (10.201.108.61)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="j2z2ayxxgw7ingtg"
+Content-Disposition: inline
+In-Reply-To: <8dfc9854-4d59-0759-88d0-d502ae7c552f@gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -54,152 +81,55 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Register private handler for pci_error_handlers.reset_done and update
-state accordingly.
 
-Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
----
- .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 61 +++++++++++++++++--
- .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |  4 +-
- 2 files changed, 59 insertions(+), 6 deletions(-)
+--j2z2ayxxgw7ingtg
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-index f733aa0b1a5b..906690e57020 100644
---- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-+++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-@@ -515,6 +515,27 @@ static void hisi_acc_vf_disable_fds(struct hisi_acc_vf_core_device *hisi_acc_vde
- 	}
- }
- 
-+/*
-+ * This function is called in all state_mutex unlock cases to
-+ * handle a 'deferred_reset' if exists.
-+ */
-+static void
-+hisi_acc_vf_state_mutex_unlock(struct hisi_acc_vf_core_device *hisi_acc_vdev)
-+{
-+again:
-+	spin_lock(&hisi_acc_vdev->reset_lock);
-+	if (hisi_acc_vdev->deferred_reset) {
-+		hisi_acc_vdev->deferred_reset = false;
-+		spin_unlock(&hisi_acc_vdev->reset_lock);
-+		hisi_acc_vdev->vf_qm_state = QM_NOT_READY;
-+		hisi_acc_vdev->mig_state = VFIO_DEVICE_STATE_RUNNING;
-+		hisi_acc_vf_disable_fds(hisi_acc_vdev);
-+		goto again;
-+	}
-+	mutex_unlock(&hisi_acc_vdev->state_mutex);
-+	spin_unlock(&hisi_acc_vdev->reset_lock);
-+}
-+
- static int hisi_acc_vf_load_state(struct hisi_acc_vf_core_device *hisi_acc_vdev,
- 				  struct hisi_acc_vf_migration_file *migf)
- {
-@@ -750,7 +771,7 @@ static long hisi_acc_vf_save_unl_ioctl(struct file *filp,
- 
- 	mutex_lock(&hisi_acc_vdev->state_mutex);
- 	if (hisi_acc_vdev->mig_state != VFIO_DEVICE_STATE_PRE_COPY) {
--		mutex_unlock(&hisi_acc_vdev->state_mutex);
-+		hisi_acc_vf_state_mutex_unlock(hisi_acc_vdev);
- 		return -EINVAL;
- 	}
- 
-@@ -772,7 +793,7 @@ static long hisi_acc_vf_save_unl_ioctl(struct file *filp,
- 	ret = copy_to_user((void __user *)arg, &info, minsz) ? -EFAULT : 0;
- out:
- 	mutex_unlock(&migf->lock);
--	mutex_unlock(&hisi_acc_vdev->state_mutex);
-+	hisi_acc_vf_state_mutex_unlock(hisi_acc_vdev);
- 	return ret;
- }
- 
-@@ -967,7 +988,7 @@ hisi_acc_vfio_pci_set_device_state(struct vfio_device *vdev,
- 			break;
- 		}
- 	}
--	mutex_unlock(&hisi_acc_vdev->state_mutex);
-+	hisi_acc_vf_state_mutex_unlock(hisi_acc_vdev);
- 	return res;
- }
- 
-@@ -980,10 +1001,35 @@ hisi_acc_vfio_pci_get_device_state(struct vfio_device *vdev,
- 
- 	mutex_lock(&hisi_acc_vdev->state_mutex);
- 	*curr_state = hisi_acc_vdev->mig_state;
--	mutex_unlock(&hisi_acc_vdev->state_mutex);
-+	hisi_acc_vf_state_mutex_unlock(hisi_acc_vdev);
- 	return 0;
- }
- 
-+static void hisi_acc_vf_pci_aer_reset_done(struct pci_dev *pdev)
-+{
-+	struct hisi_acc_vf_core_device *hisi_acc_vdev = dev_get_drvdata(&pdev->dev);
-+
-+	if (hisi_acc_vdev->core_device.vdev.migration_flags !=
-+				VFIO_MIGRATION_STOP_COPY)
-+		return;
-+
-+	/*
-+	 * As the higher VFIO layers are holding locks across reset and using
-+	 * those same locks with the mm_lock we need to prevent ABBA deadlock
-+	 * with the state_mutex and mm_lock.
-+	 * In case the state_mutex was taken already we defer the cleanup work
-+	 * to the unlock flow of the other running context.
-+	 */
-+	spin_lock(&hisi_acc_vdev->reset_lock);
-+	hisi_acc_vdev->deferred_reset = true;
-+	if (!mutex_trylock(&hisi_acc_vdev->state_mutex)) {
-+		spin_unlock(&hisi_acc_vdev->reset_lock);
-+		return;
-+	}
-+	spin_unlock(&hisi_acc_vdev->reset_lock);
-+	hisi_acc_vf_state_mutex_unlock(hisi_acc_vdev);
-+}
-+
- static int hisi_acc_vf_qm_init(struct hisi_acc_vf_core_device *hisi_acc_vdev)
- {
- 	struct vfio_pci_core_device *vdev = &hisi_acc_vdev->core_device;
-@@ -1302,12 +1348,17 @@ static const struct pci_device_id hisi_acc_vfio_pci_table[] = {
- 
- MODULE_DEVICE_TABLE(pci, hisi_acc_vfio_pci_table);
- 
-+static const struct pci_error_handlers hisi_acc_vf_err_handlers = {
-+	.reset_done = hisi_acc_vf_pci_aer_reset_done,
-+	.error_detected = vfio_pci_core_aer_err_detected,
-+};
-+
- static struct pci_driver hisi_acc_vfio_pci_driver = {
- 	.name = KBUILD_MODNAME,
- 	.id_table = hisi_acc_vfio_pci_table,
- 	.probe = hisi_acc_vfio_pci_probe,
- 	.remove = hisi_acc_vfio_pci_remove,
--	.err_handler = &vfio_pci_core_err_handlers,
-+	.err_handler = &hisi_acc_vf_err_handlers,
- };
- 
- module_pci_driver(hisi_acc_vfio_pci_driver);
-diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-index 51bc7e92a776..6c18f7c74f34 100644
---- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-+++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-@@ -96,6 +96,7 @@ struct hisi_acc_vf_migration_file {
- struct hisi_acc_vf_core_device {
- 	struct vfio_pci_core_device core_device;
- 	u8 match_done:1;
-+	u8 deferred_reset:1;
- 	/* for migration state */
- 	struct mutex state_mutex;
- 	enum vfio_device_mig_state mig_state;
-@@ -105,7 +106,8 @@ struct hisi_acc_vf_core_device {
- 	struct hisi_qm vf_qm;
- 	u32 vf_qm_state;
- 	int vf_id;
--
-+	/* for reset handler */
-+	spinlock_t reset_lock;
- 	struct hisi_acc_vf_migration_file resuming_migf;
- 	struct hisi_acc_vf_migration_file saving_migf;
- };
--- 
-2.25.1
+On Wed, Mar 02, 2022 at 06:18:59PM +0100, Philippe Mathieu-Daud=E9 wrote:
+> On 2/3/22 18:10, Paolo Bonzini wrote:
+> > On 3/2/22 12:36, Sergio Lopez wrote:
+> > > With the possibility of using pipefd as a replacement on operating
+> > > systems that doesn't support eventfd, vhost-user can also work on BSD
+> > > systems.
+> > >=20
+> > > This change allows enabling vhost-user on BSD platforms too and
+> > > makes libvhost_user (which still depends on eventfd) a linux-only
+> > > feature.
+> > >=20
+> > > Signed-off-by: Sergio Lopez <slp@redhat.com>
+> >=20
+> > I would just check for !windows.
+>=20
+> What about Darwin / Haiku / Illumnos?
+
+It should work on every system providing pipe() or pipe2(), so I guess
+Paolo's right, every platform except Windows. FWIW, I already tested
+it with Darwin.
+
+Thanks,
+Sergio.
+
+--j2z2ayxxgw7ingtg
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAmIfqgEACgkQ9GknjS8M
+AjVb0Q/9Ht01R3I6wyyF8s7Xj1AMRR47qpVaBaP4gAuLPEHt/tesSX6bq5vtiN4K
+Yg/0QPlVRz/l/MBcqdqAVcH39OBnx7WfIF4Op/RGkLtI2v2vVFVUZbU+rpOvRLD3
+bq1ZNunvYibzTf0aWquIdzULJsCzQUNeNfgziievgeh/oCNlSSOkEbk8szCFVy4/
+LDvbd2qoSzcVxt9qRCeXyaugdlBsv6dp3qZBfTstU11uFg9OV6nBukMGnf4eTH/S
+8w/M+iNAsr2vzDaOlKtXG8KS1mvUo0bm1pExzSIVEbweK/cpLlJP12txswCoibwJ
+YOyY3vGsiQs5QM0eV8ShQkuv8TQrjaUjyOFR10kKwytdWnvL8N69yetSnwgaoQVB
+cTyhMqON5/wkHwnGOJVZrGyRvRDGbmkLnfbQlX583XyV1A+wYxlsPnhoJN2Nifwg
+0tJbj5EptgrZXfwz+qziwkrWLreDAN4R99QYL0Dp6XIeVwxQ1UXTY/cIDdFYehyb
+ZrItawbHFgkJ3lhCFJtIYX/QGv9lpZE5O8ylJ0BkSVUalImfTPNIoH8hzTXbKXIP
+BhUvnXI/Gu8+oj3WQaTxmaEsZyzh1TNnqGs6nVIhKhypqQLQ1Bb4hZCJ/0XhDTaP
+E49Qr/BL1BKZIOfyB5p3kud5vkF9gplF1L+Zmb71dK9ZUvp5iAc=
+=A4cA
+-----END PGP SIGNATURE-----
+
+--j2z2ayxxgw7ingtg--
 
