@@ -2,138 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 163044CA8A2
-	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 15:57:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 042E54CA8D3
+	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 16:12:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243292AbiCBO6U (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Mar 2022 09:58:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60106 "EHLO
+        id S243391AbiCBPNY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 10:13:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243299AbiCBO6S (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 09:58:18 -0500
-Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69CE213E2A
-        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 06:57:33 -0800 (PST)
-Received: by mail-wm1-x336.google.com with SMTP id v2-20020a7bcb42000000b0037b9d960079so3478613wmj.0
-        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 06:57:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=wGGyr8F/4yesRnDkleDkSeBi9/XbD7YGJTcIBLykmxo=;
-        b=YAWW5HKlB7Eey/hbn/tEyKoY+Ej9P8bjmKwFJpG4WIH2K/pus2hP+RvzIjDv6V3z5p
-         k6x5v3LHFzzK0yNYVc3/6rqsj7QQzSFP9PqTvboq8Gd2h2U5akBPL3gjR8Gis5rXW7a5
-         f5Wj0QWjydNWVbiao3cyHkss6w5fRltrK3+kbwT6yAe/CdOFs42vPOp9Mksavp1FhfDg
-         b+8kmdCZBXU7N1sbqbnIx9h7JeO+bMDEWXRboAhQXSO6FrQS9Y2kIONVMIQBVPZeWrO0
-         GsIgMsxoTCsl6Mtqj6TTCwunX0DqqFgLwCazwzkBeT0HF1oYRmofMt0ZOyXz8dF5vh/a
-         nxAQ==
+        with ESMTP id S234428AbiCBPNX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 10:13:23 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1EBB91D0F3
+        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 07:12:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646233959;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=6TNiLFlYcGF3ddTJpMJSNjgDj1FGfe5b4PLw2nW6z80=;
+        b=jQx5SxpT5TQyiQro4w3afKwvwxoZT1BFrI7cqo/iNgV73gnyCGtgFpTbb5OQpN6lYLQQJC
+        QwGxftEb5WTB4EyS2JteL24dJl1KtRe/JOHYMlwMDQpPucR0UQZ9oUDHR2I8JQcyAOazqU
+        FnJrs7jYgcREYpM3zS46esj5wlHHAUw=
+Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com
+ [209.85.161.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-149-5hmEITpANMee8r3_Nsi2rw-1; Wed, 02 Mar 2022 10:12:38 -0500
+X-MC-Unique: 5hmEITpANMee8r3_Nsi2rw-1
+Received: by mail-oo1-f70.google.com with SMTP id r4-20020a4abf04000000b0032030c12b39so1412233oop.8
+        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 07:12:38 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=wGGyr8F/4yesRnDkleDkSeBi9/XbD7YGJTcIBLykmxo=;
-        b=4u14l6KMXlJBVWgwK+YSokCxfQ5tO+gHSMQL+RLJlvsqfr8DsAEqYeLhn/4zMdCK2I
-         oPUsmQ4DwOCLQiw6pkNlRHxI7xDa8XzJiI86JThCIfLNbNXdCutjHdQiElRmyytRXcyz
-         romUNzMub8+eFWhzTsqRD1mwCxqy7S0spOQgv81r+3QYTRdGWmk3xPda/7edMeLRA3Ei
-         8I9ZFl7PvhYZijrz5ds6Rxuio7Z1YKVqORZai6kpXvLBKBN3cPxga/dvMAmkYqy5dS+7
-         SMuDSCrdp1PMaSQYlCRDk8adtfmQLFfuoMgDwtXB8GrZTmrzD9l6SgVVZ8LgMv4waWYo
-         1B3A==
-X-Gm-Message-State: AOAM532QPo8UTe3RD9Hbh5OFUyoWFCATe2vrIh2A0O9Jb3QHWH5uSM7p
-        rWuRk2DDevWr0I2n8XNNN+cTYw==
-X-Google-Smtp-Source: ABdhPJxDjgY35zlNFNM4bX0OTXrJd0JfiswPqCzf7heVkctOxPWyBqq7cmIrMgVAjnLfYiYdzW+RlQ==
-X-Received: by 2002:a05:600c:40cf:b0:381:1f87:84c4 with SMTP id m15-20020a05600c40cf00b003811f8784c4mr102404wmh.181.1646233051757;
-        Wed, 02 Mar 2022 06:57:31 -0800 (PST)
-Received: from google.com (cpc155339-bagu17-2-0-cust87.1-3.cable.virginm.net. [86.27.177.88])
-        by smtp.gmail.com with ESMTPSA id o204-20020a1ca5d5000000b0038331f2f951sm4751221wme.0.2022.03.02.06.57.27
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=6TNiLFlYcGF3ddTJpMJSNjgDj1FGfe5b4PLw2nW6z80=;
+        b=z2lKgAj43DSDuUxuPaKmO0kVqai48kLEriMjiAYHasa/QPkHJNKV/QgH8qNRRKEno6
+         1nTPLnH3OO97MhWrIr5WR42HseIWj2nOkjRlvK9nQZtlba8pw/ro7bM/8HM3ICoBo48y
+         2ke3ZGbjdfhs06ZyyLxulH+L6ZQQYiP6jMXYh6K/NMRf3VEfFzU97zKIzJmMYOvvfNOG
+         R1iCinR6OQoguGL7S9mFGnW/tBXILXG1M9HBFXqBaG7tepQ84sNCTM/eNRrkYKn4xpH/
+         EMU3u+w+mg4ass5OdMvbUCPztRBlqnReWo582o+RBI7qBqv3TkWwmlju01D8BxEayaxY
+         XeSg==
+X-Gm-Message-State: AOAM532Zbueti6Q/Ukej2D/n/xN6/dUCs8HEmliO/6DDc5bmZOGI2Szl
+        aSDXGujbkPSLVLH4rUrXnlQB43zmXo5+CSBOycj2q/KUqBCw0wCF30WI0vujrqOae2olVwrrKXx
+        ZYkNvhsjwo1AG
+X-Received: by 2002:a05:6830:23b8:b0:5a5:75fd:8f9 with SMTP id m24-20020a05683023b800b005a575fd08f9mr15666160ots.152.1646233957348;
+        Wed, 02 Mar 2022 07:12:37 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwUKXcvdMYSNpSDmRV4uh5gtX/gNvk81VHFgaMMwZYft8TCoicAQaumaccPdPuVeKcHQyh9kA==
+X-Received: by 2002:a05:6830:23b8:b0:5a5:75fd:8f9 with SMTP id m24-20020a05683023b800b005a575fd08f9mr15666135ots.152.1646233957112;
+        Wed, 02 Mar 2022 07:12:37 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id s3-20020a056808208300b002d38ef031d6sm9680263oiw.36.2022.03.02.07.12.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Mar 2022 06:57:31 -0800 (PST)
-Date:   Wed, 2 Mar 2022 14:57:26 +0000
-From:   Lee Jones <lee.jones@linaro.org>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     jasowang@redhat.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, stable@vger.kernel.org,
-        syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
-Subject: Re: [PATCH 1/1] vhost: Protect the virtqueue from being cleared
- whilst still in use
-Message-ID: <Yh+F1gkCGoYF2lMV@google.com>
-References: <20220302075421.2131221-1-lee.jones@linaro.org>
- <20220302082021-mutt-send-email-mst@kernel.org>
- <Yh93k2ZKJBIYQJjp@google.com>
- <20220302095045-mutt-send-email-mst@kernel.org>
+        Wed, 02 Mar 2022 07:12:36 -0800 (PST)
+Date:   Wed, 2 Mar 2022 08:12:34 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Sergio Lopez <slp@redhat.com>
+Cc:     qemu-devel@nongnu.org, vgoyal@redhat.com,
+        Fam Zheng <fam@euphon.net>, kvm@vger.kernel.org,
+        Jagannathan Raman <jag.raman@oracle.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>, qemu-block@nongnu.org,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Hanna Reitz <hreitz@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Elena Ufimtseva <elena.ufimtseva@oracle.com>,
+        Kevin Wolf <kwolf@redhat.com>,
+        Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        qemu-s390x@nongnu.org, Matthew Rosato <mjrosato@linux.ibm.com>,
+        John G Johnson <john.g.johnson@oracle.com>,
+        Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH 1/2] Allow returning EventNotifier's wfd
+Message-ID: <20220302081234.2378ef33.alex.williamson@redhat.com>
+In-Reply-To: <20220302113644.43717-2-slp@redhat.com>
+References: <20220302113644.43717-1-slp@redhat.com>
+        <20220302113644.43717-2-slp@redhat.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220302095045-mutt-send-email-mst@kernel.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 02 Mar 2022, Michael S. Tsirkin wrote:
+On Wed,  2 Mar 2022 12:36:43 +0100
+Sergio Lopez <slp@redhat.com> wrote:
 
-> On Wed, Mar 02, 2022 at 01:56:35PM +0000, Lee Jones wrote:
-> > On Wed, 02 Mar 2022, Michael S. Tsirkin wrote:
-> > 
-> > > On Wed, Mar 02, 2022 at 07:54:21AM +0000, Lee Jones wrote:
-> > > > vhost_vsock_handle_tx_kick() already holds the mutex during its call
-> > > > to vhost_get_vq_desc().  All we have to do is take the same lock
-> > > > during virtqueue clean-up and we mitigate the reported issues.
-> > > > 
-> > > > Link: https://syzkaller.appspot.com/bug?extid=279432d30d825e63ba00
-> > > > 
-> > > > Cc: <stable@vger.kernel.org>
-> > > > Reported-by: syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
-> > > > Signed-off-by: Lee Jones <lee.jones@linaro.org>
-> > > > ---
-> > > >  drivers/vhost/vhost.c | 2 ++
-> > > >  1 file changed, 2 insertions(+)
-> > > > 
-> > > > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> > > > index 59edb5a1ffe28..bbaff6a5e21b8 100644
-> > > > --- a/drivers/vhost/vhost.c
-> > > > +++ b/drivers/vhost/vhost.c
-> > > > @@ -693,6 +693,7 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
-> > > >  	int i;
-> > > >  
-> > > >  	for (i = 0; i < dev->nvqs; ++i) {
-> > > > +		mutex_lock(&dev->vqs[i]->mutex);
-> > > >  		if (dev->vqs[i]->error_ctx)
-> > > >  			eventfd_ctx_put(dev->vqs[i]->error_ctx);
-> > > >  		if (dev->vqs[i]->kick)
-> > > > @@ -700,6 +701,7 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
-> > > >  		if (dev->vqs[i]->call_ctx.ctx)
-> > > >  			eventfd_ctx_put(dev->vqs[i]->call_ctx.ctx);
-> > > >  		vhost_vq_reset(dev, dev->vqs[i]);
-> > > > +		mutex_unlock(&dev->vqs[i]->mutex);
-> > > >  	}
-> > > 
-> > > So this is a mitigation plan but the bug is still there though
-> > > we don't know exactly what it is.  I would prefer adding something like
-> > > WARN_ON(mutex_is_locked(vqs[i]->mutex) here - does this make sense?
-> > 
-> > As a rework to this, or as a subsequent patch?
+> event_notifier_get_fd(const EventNotifier *e) always returns
+> EventNotifier's read file descriptor (rfd). This is not a problem when
+> the EventNotifier is backed by a an eventfd, as a single file
+> descriptor is used both for reading and triggering events (rfd ==
+> wfd).
 > 
-> Can be a separate patch.
+> But, when EventNotifier is backed by a pipefd, we have two file
+> descriptors, one that can only be used for reads (rfd), and the other
+> only for writes (wfd).
 > 
-> > Just before the first lock I assume?
+> There's, at least, one known situation in which we need to obtain wfd
+> instead of rfd, which is when setting up the file that's going to be
+> sent to the peer in vhost's SET_VRING_CALL.
 > 
-> I guess so, yes.
+> Extend event_notifier_get_fd() to receive an argument which indicates
+> whether the caller wants to obtain rfd (false) or wfd (true).
 
-No problem.  Patch to follow.
+There are about 50 places where we add the false arg here and 1 where
+we use true.  Seems it would save a lot of churn to hide this
+internally, event_notifier_get_fd() returns an rfd, a new
+event_notifier_get_wfd() returns the wfd.  Thanks,
 
-I'm also going to attempt to debug the root cause, but I'm new to this
-subsystem to it might take a while for me to get my head around.
+Alex
 
--- 
-Lee Jones [李琼斯]
-Principal Technical Lead - Developer Services
-Linaro.org │ Open source software for Arm SoCs
-Follow Linaro: Facebook | Twitter | Blog
