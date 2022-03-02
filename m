@@ -2,138 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F118B4CA0EC
-	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 10:35:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E4FCF4CA12D
+	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 10:47:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236415AbiCBJfo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Mar 2022 04:35:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52882 "EHLO
+        id S240664AbiCBJsT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 04:48:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234448AbiCBJfl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 04:35:41 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 30D32B823B
-        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 01:34:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646213698;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=4AbAW59nDe9iXOUa0NZzg+mzBzM1DTimtc+hATy3tFU=;
-        b=W2jXBPy60sgnNOKWmSFqcEFRWt4SXLAzCxekHBkaPKpSdK7kB/0W/FVgwcCkeYa6xtZ062
-        LGvOcCJkSwaaZcPua/3mZx9hReA3d6uZ/iKQetFC/HKjZvaO6o1tq99JP2dpYrkXCiHqcZ
-        4rMaP0v33NM0Eo8wmquNj/+67sQrADI=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-633-fv-Yr2mVPIibXN7XwDjc4g-1; Wed, 02 Mar 2022 04:34:57 -0500
-X-MC-Unique: fv-Yr2mVPIibXN7XwDjc4g-1
-Received: by mail-qv1-f70.google.com with SMTP id kj16-20020a056214529000b00435218e0f0dso692130qvb.3
-        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 01:34:57 -0800 (PST)
+        with ESMTP id S240593AbiCBJsR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 04:48:17 -0500
+Received: from mail-qv1-xf33.google.com (mail-qv1-xf33.google.com [IPv6:2607:f8b0:4864:20::f33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E9EB2AC40
+        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 01:47:30 -0800 (PST)
+Received: by mail-qv1-xf33.google.com with SMTP id j5so1024869qvs.13
+        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 01:47:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:from:date:message-id:subject:to
+         :content-transfer-encoding;
+        bh=oVymzacBmHlfSEBN0NUcViscc1BlJREjJA6+b6RGOmg=;
+        b=QWdde23KNX46k7WkqryQHz1i3nNKX3hJ6bUw0DjcHiOt75WWu7w5auh04nLkT/xnOJ
+         R0VQHYTpPb3pK1dC5Q61RFQMwi4trskiEVa2TQn04UuisHYWibAazS7ATmu54TIBxXdA
+         5lK9Ys3nLH2M+OL5YbUWmBjXKkfNKuHDhT335FY7373hVh3ljtDU7hufDm+HoFdxRSC5
+         irTZ1zsjvdJCrCgb+ck2wdaojqCCFwevHlYpXu0UnAPPXOqgUXh+Q4uM4deQ12SqSBxO
+         anQ3SzaZnzqNuLNM3DIBa/tSUB0jwrQxi9OOPrEA2SXa6sqI0YSXgXVQjBwH2TaK1Eg7
+         1gOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=4AbAW59nDe9iXOUa0NZzg+mzBzM1DTimtc+hATy3tFU=;
-        b=LgiGeqoGqWQQBz3Gl2j82mSEFAtbgZdBQmuJQ6nw9vwCwq0vlNrQl1QqnZAqPRFAfQ
-         AO7Zo9pQZ6IhhyKfoTy0OYuEMZVNVrGs4tcjS3kG/5qUjkxjnyUb6byFyzmL21s/DUqx
-         3tC9ib8oCzrsQ66HEBYpf74P07VF2mgFq8ASeDsxeOKILfqeARq9O/z4NtY95N8LeTAB
-         RIaIkOSa1iFofLvTCMCbOyajJIWZPPy+THaEXdQ6xx5D14MvYhgwD41Gz8d+q5f51rkr
-         VahzxbbKosp6TRkyht3AEsAFdabdagX6cTLXQZ9AlK6mE+tO8aucjGDdAfQfji2XVeMu
-         QpYQ==
-X-Gm-Message-State: AOAM531lVnoJ9kmdcyHw7W6/AQhdFhhr1jnVv0b47uQKkQCZQotQs9ae
-        OiihKkxEN7JRwjlHdQ2RUK4ERGFm2CqVMMJlMmJdMEDzNeR6X7z75QcqlQIOXncvPlX3+Xivn2K
-        jaT1mIjDZom5i
-X-Received: by 2002:a05:622a:589:b0:2de:9437:a380 with SMTP id c9-20020a05622a058900b002de9437a380mr22719614qtb.593.1646213695544;
-        Wed, 02 Mar 2022 01:34:55 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyC7INR2ARPeT61tUoT3peU6aDKB65/ufMp14UgRUKuFsJtDC2iNl/gqIBFpEUP3M458d4Gpw==
-X-Received: by 2002:a05:622a:589:b0:2de:9437:a380 with SMTP id c9-20020a05622a058900b002de9437a380mr22719598qtb.593.1646213695279;
-        Wed, 02 Mar 2022 01:34:55 -0800 (PST)
-Received: from sgarzare-redhat (host-95-248-229-156.retail.telecomitalia.it. [95.248.229.156])
-        by smtp.gmail.com with ESMTPSA id h3-20020a05622a170300b002e008a93f8fsm6551504qtk.91.2022.03.02.01.34.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Mar 2022 01:34:54 -0800 (PST)
-Date:   Wed, 2 Mar 2022 10:34:46 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Lee Jones <lee.jones@linaro.org>
-Cc:     mst@redhat.com, jasowang@redhat.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, stable@vger.kernel.org,
-        syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
-Subject: Re: [PATCH 1/1] vhost: Protect the virtqueue from being cleared
- whilst still in use
-Message-ID: <20220302093446.pjq3djoqi434ehz4@sgarzare-redhat>
-References: <20220302075421.2131221-1-lee.jones@linaro.org>
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to
+         :content-transfer-encoding;
+        bh=oVymzacBmHlfSEBN0NUcViscc1BlJREjJA6+b6RGOmg=;
+        b=3+mZiIgNdWYFkPOlfFwsECP/E2qiyfgIMcZMrGc5/LRoAaHul0ysJ7+VQFtfM1VSno
+         39B046CBuXjYxpKqVfJvC5tPtKlCQQ7CZv0szOgIb5k89XKGzAjYaI7F7sREw6bay0gx
+         fa2efsxu+8Af8Fc43TuDC7iNPPONdyO97Sjinr8JQTWG64wMhKqqTDKF4zImaDLd07ji
+         Jf1JspD0TASWrRwlNwiF2sPkDWwAm42w7ctU9f47zXkqEmFq4+xaUxt866BHuIjrDPRv
+         kWJVxdMjCmFfUGirDLofsS9sPznMnDNclBXeURlXCucw2brTiyDfTWrSSshhlW3p7LuO
+         J6Bw==
+X-Gm-Message-State: AOAM532EesPFKaSov+ywlDxLJF1CKK2wCK6a8EMdDJb9ZhL7CVCFGA9e
+        S/bY3XNRqPWfiamL8tgHRK5JJy3x8Rtpuk2Gzmk=
+X-Google-Smtp-Source: ABdhPJwbpxn+o5lpNUFUhQmBWdx4hvUvkX98PANWZ50On8S1tPm3b2kQMdzMgrFsQtUtHu3RHExhB4D+i2WeoxrhN7I=
+X-Received: by 2002:a05:6214:f2d:b0:432:dc5f:ea15 with SMTP id
+ iw13-20020a0562140f2d00b00432dc5fea15mr14989081qvb.81.1646214448456; Wed, 02
+ Mar 2022 01:47:28 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20220302075421.2131221-1-lee.jones@linaro.org>
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Received: by 2002:ad4:5443:0:0:0:0:0 with HTTP; Wed, 2 Mar 2022 01:47:27 -0800 (PST)
+From:   Anna Zakharchenko <fpar.org@gmail.com>
+Date:   Wed, 2 Mar 2022 10:47:27 +0100
+Message-ID: <CALr0R0oEzU-WF+OhADUDAnG2qytOv4T7_0dX6YBZoqPbR=3=NA@mail.gmail.com>
+Subject: Re: Help me in Ukraine
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=4.8 required=5.0 tests=ADVANCE_FEE_4_NEW_MONEY,
+        BAYES_50,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        FREEMAIL_FROM,LOTS_OF_MONEY,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_MONEY_PERCENT,T_SCC_BODY_TEXT_LINE,UNDISC_MONEY,URG_BIZ autolearn=no
+        autolearn_force=no version=3.4.6
+X-Spam-Level: ****
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 02, 2022 at 07:54:21AM +0000, Lee Jones wrote:
->vhost_vsock_handle_tx_kick() already holds the mutex during its call
->to vhost_get_vq_desc().  All we have to do is take the same lock
->during virtqueue clean-up and we mitigate the reported issues.
->
->Link: https://syzkaller.appspot.com/bug?extid=279432d30d825e63ba00
+Hello,
 
-This issue is similar to [1] that should be already fixed upstream by 
-[2].
 
-However I think this patch would have prevented some issues, because 
-vhost_vq_reset() sets vq->private to NULL, preventing the worker from 
-running.
+I am a Russian widow trapped in Ukraine's Donbass region amid Vladimir
+Putin's senseless conflict. During the 2014 battle in the Donbass, I
+lost my husband, a prominent Ukrainian businessman, who died without
+having children with me. I am currently in an underground bunker in
+Donetsk Oblast, a separatist war zone recognized by Russian President
+Vladimir Putin. I urgently request your assistance in moving my family
+trust fund worth =C2=A33,500,000.00 from the UK to your country to prevent
+European Union sanctions from seizing my money because I am a Russian
+citizen.
 
-Anyway I think that when we enter in vhost_dev_cleanup() the worker 
-should be already stopped, so it shouldn't be necessary to take the 
-mutex. But in order to prevent future issues maybe it's better to take 
-them, so:
+Please help me save and protect this money. You will receive 30% of
+the total money as a reward for your efforts, while you must keep 70%
+for me until the conflict is over. For more information, you can
+contact me directly at (anna@sc2000.net).
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
-[1] 
-https://syzkaller.appspot.com/bug?id=993d8b5e64393ed9e6a70f9ae4de0119c605a822
-[2] 
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a58da53ffd70294ebea8ecd0eb45fd0d74add9f9
-
->
->Cc: <stable@vger.kernel.org>
->Reported-by: syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
->Signed-off-by: Lee Jones <lee.jones@linaro.org>
->---
-> drivers/vhost/vhost.c | 2 ++
-> 1 file changed, 2 insertions(+)
->
->diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
->index 59edb5a1ffe28..bbaff6a5e21b8 100644
->--- a/drivers/vhost/vhost.c
->+++ b/drivers/vhost/vhost.c
->@@ -693,6 +693,7 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
-> 	int i;
->
-> 	for (i = 0; i < dev->nvqs; ++i) {
->+		mutex_lock(&dev->vqs[i]->mutex);
-> 		if (dev->vqs[i]->error_ctx)
-> 			eventfd_ctx_put(dev->vqs[i]->error_ctx);
-> 		if (dev->vqs[i]->kick)
->@@ -700,6 +701,7 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
-> 		if (dev->vqs[i]->call_ctx.ctx)
-> 			eventfd_ctx_put(dev->vqs[i]->call_ctx.ctx);
-> 		vhost_vq_reset(dev, dev->vqs[i]);
->+		mutex_unlock(&dev->vqs[i]->mutex);
-> 	}
-> 	vhost_dev_free_iovecs(dev);
-> 	if (dev->log_ctx)
->-- 
->2.35.1.574.g5d30c73bfb-goog
->
-
+Cordially
+Anna Zakharchenko
+My email address is: anna@sc2000.net
