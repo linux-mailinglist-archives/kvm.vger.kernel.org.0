@@ -2,101 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 17B874CA39A
-	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 12:26:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A69CB4CA3E4
+	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 12:36:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241337AbiCBL1a (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Mar 2022 06:27:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58240 "EHLO
+        id S241538AbiCBLhW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 06:37:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46528 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241297AbiCBL11 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 06:27:27 -0500
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1950A606E0
-        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 03:26:45 -0800 (PST)
-Received: by mail-pj1-x102b.google.com with SMTP id cx5so1517298pjb.1
-        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 03:26:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=UyAauvBmSug4drW2djAafs3kx5pIR74OsbYQ7t+MiHk=;
-        b=G3vRR8G365996uOtex4UNfFbnEuDaVHAgWCrUpNyIM4K51NwbPFu88Ml+S6bQpgrpt
-         Dp8QCr0T5ND4gtwi49Uqy84n9pjftDRTFfx+3BOfaFWLXYl+xipo0YMN92HcFnIhIiOT
-         ZEAE2We8PA2ndeExMPYMK5gKkXVwwjklMBeh8MVM4iVd/AGnynGYVxTwYO5THy3Lw8w2
-         WXMUsByrIMayIRBeHy8cKq8c+Z5VaTYLTHZVVjLoD7ot5jFwwNpGcTEcX3emRnDtdQ7V
-         aIYWAEM9U90bqRfUI3qqaWmz2QxqOaoltrtqnQ/9eubsb/iTkyTxxOUktM4/dQJbFvLC
-         Gbjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=UyAauvBmSug4drW2djAafs3kx5pIR74OsbYQ7t+MiHk=;
-        b=yMySi5tDcBn2bJFvc3OWUGRz2R3ql/xTBQpy+Xgst+IkgdzF9Y9LPZPCf8FPugfIVg
-         1yg/W7llxmAzgNNAVeZUEfGzflcReufBzru/vDBnkKw5M6mvBM8peoT80GqSice8vDQt
-         qti/ue2e4PnUOl39fvk96ILck8uz4jKFFHiZyRGqu+ETVAOY+wEvsz0AnTTbgFDqSXSv
-         Mof0fj/8ElSx2z27hYYEaqkZ9f3BaexdiYbUziZI3CRYtD9xX5JIkM9/zdhmSVEceU1J
-         TYIZjeN5DaXBbCaol83YwW95tU8n+XMntXh+mCCN1fM4LhTuCvhj4JZlN2+iBI8R+v4W
-         764g==
-X-Gm-Message-State: AOAM531+C9WsH6ZMH4vxC7KQpRVOAgx9KrXB7ncCCL0jjwdgwr48rIPE
-        5xIx/HEkC50YtYTZgfE+63w=
-X-Google-Smtp-Source: ABdhPJzRxPR578U9VrO4mTXK05SGSrj85tZo/tsYiVS7CcggYY/KOOeGbRFGb3h5G6xpzMMwJPQXhQ==
-X-Received: by 2002:a17:903:11c7:b0:151:7290:ccc with SMTP id q7-20020a17090311c700b0015172900cccmr11479019plh.95.1646220404646;
-        Wed, 02 Mar 2022 03:26:44 -0800 (PST)
-Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id z18-20020aa78892000000b004e19bd62d8bsm21425155pfe.23.2022.03.02.03.26.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Mar 2022 03:26:44 -0800 (PST)
-From:   Like Xu <like.xu.linux@gmail.com>
-X-Google-Original-From: Like Xu <likexu@tencent.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Like Xu <like.xu@linux.intel.com>,
-        Jim Mattson <jmattson@google.com>
-Subject: [kvm-unit-tests PATCH RESEND 2/2] x86/pmu: Fix a comment about full-width counter writes support
-Date:   Wed,  2 Mar 2022 19:26:34 +0800
-Message-Id: <20220302112634.15024-2-likexu@tencent.com>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220302112634.15024-1-likexu@tencent.com>
-References: <20220302112634.15024-1-likexu@tencent.com>
+        with ESMTP id S232130AbiCBLhU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 06:37:20 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 72EEFA2F0A
+        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 03:36:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646220995;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=BUdvzXz8iGKsbnSpqy2Pkbfi1OdFt4mIGGx4XFIiu78=;
+        b=FLUkc7zpda71d1bzLtPEgaUzPJfmKf5vnnIBOKZFHjBWJUt+w8Z2vxTZiQeMGjt/SfMH5r
+        JkmZ3uREN3QPNRMNZp49ohRyAtAQefn7S3KAxdzv/jUcaDbatb4UCE3DvvLPga3j5kCyLr
+        Maukw9qp9abvp2G6ddYv/odQ8ozDyXA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-623-ZhDPsz3_PsqFxOZyebEWiA-1; Wed, 02 Mar 2022 06:36:32 -0500
+X-MC-Unique: ZhDPsz3_PsqFxOZyebEWiA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8D4451854E21;
+        Wed,  2 Mar 2022 11:36:30 +0000 (UTC)
+Received: from toolbox.redhat.com (unknown [10.33.36.22])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 45A2183095;
+        Wed,  2 Mar 2022 11:36:25 +0000 (UTC)
+From:   Sergio Lopez <slp@redhat.com>
+To:     qemu-devel@nongnu.org
+Cc:     vgoyal@redhat.com, Fam Zheng <fam@euphon.net>, kvm@vger.kernel.org,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Jagannathan Raman <jag.raman@oracle.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>, qemu-block@nongnu.org,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Hanna Reitz <hreitz@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Elena Ufimtseva <elena.ufimtseva@oracle.com>,
+        Kevin Wolf <kwolf@redhat.com>,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        qemu-s390x@nongnu.org, Matthew Rosato <mjrosato@linux.ibm.com>,
+        John G Johnson <john.g.johnson@oracle.com>,
+        Thomas Huth <thuth@redhat.com>, Sergio Lopez <slp@redhat.com>
+Subject: [PATCH 0/2] Enable vhost-user to be used on BSD systems
+Date:   Wed,  2 Mar 2022 12:36:42 +0100
+Message-Id: <20220302113644.43717-1-slp@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <like.xu@linux.intel.com>
-
-From: Like Xu <like.xu@linux.intel.com>
-
-Remove two Unicode characters 'ZERO WIDTH SPACE' (U+200B).
-
-Fixes: 22f2901a0e ("x86: pmu: Test full-width counter writes support")
-Reported-by: Jim Mattson <jmattson@google.com>
-Signed-off-by: Like Xu <like.xu@linux.intel.com>
----
- x86/pmu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/x86/pmu.c b/x86/pmu.c
-index 3d05384..052c2b7 100644
---- a/x86/pmu.c
-+++ b/x86/pmu.c
-@@ -587,7 +587,7 @@ static void  check_gp_counters_write_width(void)
- 	}
- 
- 	/*
--	 * MSR_IA32_PMCn supports writing values Ã¢â‚¬â€¹Ã¢â‚¬â€¹up to GP counter width,
-+        * MSR_IA32_PMCn supports writing values up to GP counter width,
- 	 * and only the lowest bits of GP counter width are valid.
- 	 */
- 	for (i = 0; i < num_counters; i++) {
--- 
-2.35.1
+Since QEMU is already able to emulate ioeventfd using pipefd, we're already=
+=0D
+pretty close to supporting vhost-user on non-Linux systems.=0D
+=0D
+This two patches bridge the gap by:=0D
+=0D
+1. Extending event_notifier_get_fd() to be able to return wfd when needed.=
+=0D
+=0D
+2. Modifying the build system to it allows enabling vhost-user on BSD.=0D
+=0D
+Sergio Lopez (2):=0D
+  Allow returning EventNotifier's wfd=0D
+  Allow building vhost-user in BSD=0D
+=0D
+ accel/kvm/kvm-all.c                     | 12 +++----=0D
+ block/linux-aio.c                       |  2 +-=0D
+ block/nvme.c                            |  2 +-=0D
+ configure                               |  5 +--=0D
+ contrib/ivshmem-server/ivshmem-server.c |  5 +--=0D
+ hw/hyperv/hyperv.c                      |  2 +-=0D
+ hw/misc/ivshmem.c                       |  2 +-=0D
+ hw/remote/iohub.c                       | 13 +++----=0D
+ hw/remote/proxy.c                       |  4 +--=0D
+ hw/vfio/ccw.c                           |  4 +--=0D
+ hw/vfio/pci-quirks.c                    |  6 ++--=0D
+ hw/vfio/pci.c                           | 48 +++++++++++++------------=0D
+ hw/vfio/platform.c                      | 16 ++++-----=0D
+ hw/virtio/vhost.c                       | 10 +++---=0D
+ include/qemu/event_notifier.h           |  2 +-=0D
+ meson.build                             |  2 +-=0D
+ target/s390x/kvm/kvm.c                  |  2 +-=0D
+ util/aio-posix.c                        |  4 +--=0D
+ util/event_notifier-posix.c             |  5 ++-=0D
+ util/vfio-helpers.c                     |  2 +-=0D
+ 20 files changed, 79 insertions(+), 69 deletions(-)=0D
+=0D
+-- =0D
+2.35.1=0D
+=0D
 
