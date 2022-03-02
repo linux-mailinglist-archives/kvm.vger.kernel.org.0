@@ -2,86 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 77D9E4CB245
-	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 23:26:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4BA8C4CB29E
+	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 23:57:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229514AbiCBW0m (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Mar 2022 17:26:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46090 "EHLO
+        id S229726AbiCBW54 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 17:57:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230419AbiCBW0j (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 17:26:39 -0500
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07A82E4D08
-        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 14:25:55 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id ev16-20020a17090aead000b001bc3835fea8so3165942pjb.0
-        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 14:25:54 -0800 (PST)
+        with ESMTP id S230058AbiCBW5x (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 17:57:53 -0500
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 760DD11594D
+        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 14:56:59 -0800 (PST)
+Received: by mail-pf1-x434.google.com with SMTP id t5so3204954pfg.4
+        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 14:56:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=g7EzPTbKYLqO23m3ywH5y06sJN6hD3WoKEJqYdmdBo8=;
-        b=a9yHIBRHVnkkbeJTPV3c7G5nXhO7+BJASkO0lFCAY8yXyU+/uaBydkqUomDxsuecPC
-         b+DLOTNSKvcGdpbIcWKyXEMs939C8QZvZ67peRNpPBbJc/tWDaIlBFvMn6C4H76PxOpI
-         Tb+o/c/TYtDJYPyfJE+K4jkP72YTPt28V5ipJSdnOI/iSDZI4oT4ENpdNOUkfpx8DarH
-         YkiPc2l4g/2iXH2u7O/wZyJ0SfrGr7PDkS6CL0VgM/O74V3NG8CSPZqdfc7QgsR0f639
-         vQTihqM4qujlCo0NR3ubWH0Jl2hh5WhNmm3wUj8OglcB0xe51c+ubeRXs7rJCEGTZ+GT
-         K8vw==
+        bh=x9wMKym9S9fXqEpB7R7eZDSTX7z54wGdD8KBKn9vuvI=;
+        b=EgHj1lPuwxxF7nT8U4wKaQR+RaYO9IipnSX48Gc/qLTii8qz4a6RlGCPMChRxH6QdR
+         MiGQ4u3fOj6GLOfPtYyUVGCIQWox9k2+UNT/zY2BzqTpiCsB8mIdQXe+Zo5ICbusEpna
+         YzJnp/92tZ23nkB/aufnwSe1JUu9dkb9ClKI867FycqPuhmDpC+W7Wis3c5Jy8Q59V/W
+         BCl7QPyx0YCdKs6jU9BT5ja1Icf7uA11O1lMBc4leN+MsVZ5XLDH8OVLrGFHmYerMfRX
+         84hbGQYB4qBseyAn/01vvvxpz2OOSANZJJhoLx5HsyjHYt7Sl3a/5NaThrjHlSnauAnx
+         PYmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=g7EzPTbKYLqO23m3ywH5y06sJN6hD3WoKEJqYdmdBo8=;
-        b=h+otWmRE6Vv+VpK2W3vjMs19OKxtWSI5VF0x/xsMr6hPnQi91Hz+P+RYUFdYUPzBvy
-         GUOnRQRUCUG9pXvc8fPp3VHAeAotRwVlJS99312P3/Ovpg0dLsBv0JafvZ3Fvw2AobqR
-         uzFrGhVH9PLBKZVPDB+fogfIVh3ZCQXmWOq64AAbSPiXF8sYWNNccttlUC5FeStnaCAg
-         m1o31nW/v9GnTJsFILQwnAfA0PF+j/PJhOU6MOmh1GKmM+kklzCjLu4w6A3nd66tah0O
-         QyJaM8kHdjcSWLMFOKPaL8ahjKf4YsXtOTV5gRqI8Ti8n/jvoLyI4GU6hw0/sDhB8PqQ
-         TNRw==
-X-Gm-Message-State: AOAM533rA+6clFBQhqd4wtK7a7uy5SXKjKB2T4EOT4Pa5gID5cvCUo8F
-        AEGlIFKU80SuO/bXaxBrSEHbsg==
-X-Google-Smtp-Source: ABdhPJxh60e2JCqYRzDosRtR/WPg4G8rMpZ4yODgVrKuRP5vrYsN/D9bp4drrWD5DdfQRADr/oEbjw==
-X-Received: by 2002:a17:902:7109:b0:151:8311:d3b5 with SMTP id a9-20020a170902710900b001518311d3b5mr10511752pll.13.1646259954286;
-        Wed, 02 Mar 2022 14:25:54 -0800 (PST)
+        bh=x9wMKym9S9fXqEpB7R7eZDSTX7z54wGdD8KBKn9vuvI=;
+        b=PtyUwioN3+mWXiBjVNJxZorYyIy+ZKIJQIuozE0g9dXf6bnXovWOEng/SsqwSjpX7I
+         005yEVfxIKzEu2TFjYO8ayEHj9m6Ab+2cEntREiSIx/k8qLiuTpDq+QVgMYHPu+YFU6r
+         PPIjqMs3hg1Bjcx5F0nqN3zJv4b3MMwdOUbLt7TVrmLpOsf5lGabv/wh4q10YD+BHzQf
+         KyYKJyCwrXN2k3gaLTspkiE/nlHn766YVMK+Si9tbt6qiq+6FBHrZb4fbxd47JWmjvyi
+         6A10oWSQkPCJB9xwbq6DLgugiC9vt6HiSmQjXqPB3ivH7l759ewwq2ICBbnDsT8IrsZe
+         9L1w==
+X-Gm-Message-State: AOAM533cgTg39YvPUy/lndVkFhDEfWm5G9MduOCYhnMhHqkX13terCq+
+        1J0nWAWVur7FO44eGT8ROKtmjQ==
+X-Google-Smtp-Source: ABdhPJxZJO0b6xynoVXwPfQ0Dg+QdrERgWdHdWjhBdS87LJkX73MUHodq13VvntY/QyAQPgmiXnHkg==
+X-Received: by 2002:a05:6a00:d4c:b0:4e0:27dd:37c1 with SMTP id n12-20020a056a000d4c00b004e027dd37c1mr35550899pfv.86.1646261640293;
+        Wed, 02 Mar 2022 14:54:00 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id g1-20020a056a000b8100b004f111c21535sm181713pfj.80.2022.03.02.14.25.53
+        by smtp.gmail.com with ESMTPSA id s2-20020a056a001c4200b004f41e1196fasm221880pfw.17.2022.03.02.14.53.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Mar 2022 14:25:53 -0800 (PST)
-Date:   Wed, 2 Mar 2022 22:25:50 +0000
+        Wed, 02 Mar 2022 14:53:59 -0800 (PST)
+Date:   Wed, 2 Mar 2022 22:53:56 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
         Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        Mingwei Zhang <mizhang@google.com>
-Subject: Re: [PATCH v3 22/28] KVM: x86/mmu: Zap defunct roots via
- asynchronous worker
-Message-ID: <Yh/u7l+q2xZRx/KR@google.com>
-References: <20220226001546.360188-1-seanjc@google.com>
- <20220226001546.360188-23-seanjc@google.com>
- <b9270432-4ee8-be8e-8aa1-4b09992f82b8@redhat.com>
- <Yh+xA31FrfGoxXLB@google.com>
- <f4189f26-eff9-9fd0-40a1-69ac7759dedf@redhat.com>
- <Yh/GoUPxMRyFqFc5@google.com>
- <442859af-6454-b15e-b2ad-0fc7c4e22909@redhat.com>
- <Yh/X3m1rjYaY2s0z@google.com>
- <94b5c78d-3878-1a6c-ab53-37daf3d6eb9c@redhat.com>
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>
+Subject: Re: [PATCH v2 4/7] KVM: x86/mmu: Zap only obsolete roots if a root
+ shadow page is zapped
+Message-ID: <Yh/1hPMhqeFKO0ih@google.com>
+References: <20220225182248.3812651-1-seanjc@google.com>
+ <20220225182248.3812651-5-seanjc@google.com>
+ <40a22c39-9da4-6c37-8ad0-b33970e35a2b@redhat.com>
+ <ee757515-4a0f-c5cb-cd57-04983f62f499@redhat.com>
+ <Yh/JdHphCLOm4evG@google.com>
+ <217cc048-8ca7-2b7b-141f-f44f0d95eec5@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <94b5c78d-3878-1a6c-ab53-37daf3d6eb9c@redhat.com>
+In-Reply-To: <217cc048-8ca7-2b7b-141f-f44f0d95eec5@redhat.com>
 X-Spam-Status: No, score=-18.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -89,46 +85,37 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Wed, Mar 02, 2022, Paolo Bonzini wrote:
-> On 3/2/22 21:47, Sean Christopherson wrote:
-> > On Wed, Mar 02, 2022, Paolo Bonzini wrote:
-> > > For now let's do it the simple but ugly way.  Keeping
-> > > next_invalidated_root() does not make things worse than the status quo, and
-> > > further work will be easier to review if it's kept separate from this
-> > > already-complex work.
-> > 
-> > Oof, that's not gonna work.  My approach here in v3 doesn't work either.  I finally
-> > remembered why I had the dedicated tdp_mmu_defunct_root flag and thus the smp_mb_*()
-> > dance.
-> > 
-> > kvm_tdp_mmu_zap_invalidated_roots() assumes that it was gifted a reference to
-> > _all_ invalid roots by kvm_tdp_mmu_invalidate_all_roots().  This works in the
-> > current code base only because kvm->slots_lock is held for the entire duration,
-> > i.e. roots can't become invalid between the end of kvm_tdp_mmu_invalidate_all_roots()
-> > and the end of kvm_tdp_mmu_zap_invalidated_roots().
+> On 3/2/22 20:45, Sean Christopherson wrote:
+> > AMD NPT is hosed because KVM's awful ASID scheme doesn't assign an ASID per root
+> > and doesn't force a new ASID.  IMO, this is an SVM mess and not a TDP MMU bug.
 > 
-> Yeah, of course that doesn't work if kvm_tdp_mmu_zap_invalidated_roots()
-> calls kvm_tdp_mmu_put_root() and the worker also does the same
-> kvm_tdp_mmu_put_root().
+> I agree.
 > 
-> But, it seems so me that we were so close to something that works and is
-> elegant with the worker idea.  It does avoid the possibility of two "puts",
-> because the work item is created on the valid->invalid transition.  What do
-> you think of having a separate workqueue for each struct kvm, so that
-> kvm_tdp_mmu_zap_invalidated_roots() can be replaced with a flush?
+> > In the short term, I think something like the following would suffice.  Long term,
+> > we really need to redo SVM ASID management so that ASIDs are tied to a KVM root.
+> 
+> 
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index c5e3f219803e..7899ca4748c7 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -3857,6 +3857,9 @@ static void svm_load_mmu_pgd(struct kvm_vcpu *vcpu,
+> hpa_t root_hpa,
+>         unsigned long cr3;
+> 
+>         if (npt_enabled) {
+> +               if (is_tdp_mmu_root(root_hpa))
+> +                       svm->current_vmcb->asid_generation = 0;
+> +
+>                 svm->vmcb->control.nested_cr3 = __sme_set(root_hpa);
+>                 vmcb_mark_dirty(svm->vmcb, VMCB_NPT);
+> 
+> Why not just new_asid
 
-I definitely like the idea, but I'm getting another feeling of deja vu.  Ah, I
-think the mess I created was zapping via async worker without a dedicated workqueue,
-and so the flush became very annoying/painful.
+My mental coin flip came up tails?  new_asid() is definitely more intuitive.
 
-I have the "dedicated list" idea coded up.  If testing looks good, I'll post it as
-a v3.5 (without your xchg() magic or other kvm_tdp_mmu_put_root() changes).  That
-way we have a less-awful backup (and/or an intermediate step) if the workqueue
-idea is delayed or doesn't work.  Assuming it works, it's much prettier than having
-a defunct flag.
+> (even unconditionally, who cares)?
 
-> I can probably do it next Friday.
-
-Early-ish warning, I'll be offline March 11th - March 23rd inclusive.  
-
-FWIW, other than saving me from another painful rebase, there's no urgent need to
-get this series into 5.18.
+Heh, I was going to say we do care to some extent for nested transitions, then
+I remembered we flush on every nested transition anyways, in no small part because
+the ASID handling is a mess.
