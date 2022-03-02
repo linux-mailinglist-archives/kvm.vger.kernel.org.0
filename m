@@ -2,116 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B35F74CADAF
-	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 19:37:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 580B94CADC6
+	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 19:44:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244657AbiCBSh3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Mar 2022 13:37:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35632 "EHLO
+        id S244683AbiCBSom (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 13:44:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52958 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242995AbiCBSh1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 13:37:27 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5A684D885B
-        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 10:36:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646246203;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=dkI26oH12rAI/rcHa+Bb6lkfS1t78b0pEHbqKtN0UIk=;
-        b=JG/AbnL4k5MurG3+LE2PiTDqH5L+zeER9Jm2tfIT76KmxBdHqBZPDDDE/D2TaMcBocLNAm
-        iVmuGIfJkiAmr79H9lhcTggU3EpqthySOUwIw3SXeo9hw/Yv0r3c21SjQnnO57kFjYXTsv
-        waUhITVtQFAaT8Kfd3i6jDtqwJsEPqQ=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-436-5wxYnD2pMJugiw7zOR4Zrg-1; Wed, 02 Mar 2022 13:36:42 -0500
-X-MC-Unique: 5wxYnD2pMJugiw7zOR4Zrg-1
-Received: by mail-wm1-f69.google.com with SMTP id j42-20020a05600c1c2a00b00381febe402eso1803360wms.0
-        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 10:36:42 -0800 (PST)
+        with ESMTP id S244671AbiCBSok (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 13:44:40 -0500
+Received: from mail-oo1-xc29.google.com (mail-oo1-xc29.google.com [IPv6:2607:f8b0:4864:20::c29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27ADBCA32D;
+        Wed,  2 Mar 2022 10:43:57 -0800 (PST)
+Received: by mail-oo1-xc29.google.com with SMTP id h16-20020a4a6f10000000b00320507b9ccfso2933907ooc.7;
+        Wed, 02 Mar 2022 10:43:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=j+vTUnqa/aRGGzxIeIJpG4vQ+aqSIVjVhl8/XU2n+jM=;
+        b=OexBrWql6KhyoHbRnx1JJYuKhZooJGTYyKVe9d05H5ttAdABxcVqk+FAhysK4OtxBQ
+         BorE52DogDAk892/I8uPzm7ZB9MZ+4hcvfieKqkIQAh9P1fbfg4y9dDoR0c+ZdOuR3l6
+         2YHEcUlUTNtIJj1x0Inplt63WqfK+Bqb5NdTAl8l8noyMnzolx3YhyjX0e5fcAUTeWka
+         S4hlMQl9qfS31CjHvtDJzFbDk3kn6NaPQodr5m+EAT3YlxhE/dPURFbUCBkx58NOgVXU
+         rdf/L//dY83bpmVw5UMaBtMYiS5qIu4Dxcq0nOqiAEatvQofbZsjtDxqUOZrcRzAwjxA
+         N0bg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=dkI26oH12rAI/rcHa+Bb6lkfS1t78b0pEHbqKtN0UIk=;
-        b=reAtTz1TvvQzvQYvPAJZVUmpsEUCuRwBa8B5MVxGbo3nNdVa7mpUCkXCVJ/Tb1A+ud
-         tqyfoE16Hi2nfdarUL+g3WxRDFlq5K3/PdbftnUEfdW0BNKC9pXuQmJkJ+QSSQiOwyLz
-         4p6b1mHloF9WssSyGfkgfhzVMGsvaAHU+dMQk5nVvQuS279MFeVHZ/K/quZ4z55jxxqR
-         oLYlZIf+epLVJVpl0wQ/WOaKndb21nCtkbfjMEuvrCnC9W2MHZ9woQt460+s5BAdjVVX
-         39DQgyMXIO5NC13VOoTRuU4McIW4CqPeARCzmyxrSyvVj7fbr/bRWhQhgcUW5EvvwdvP
-         riOg==
-X-Gm-Message-State: AOAM533By8vUYGDYeWG610ZyD48cQveGD6LxVmShdAQ0oyCa/KN02asc
-        r/LHtSfBD+tuG8xp1K8I4qmLIks68XTTBlkKVvhkSSYqBbL5KsB8Ad0Ki/MnPyHFNCkqtju8EAu
-        xTYKjrCYMnosA
-X-Received: by 2002:a7b:cb44:0:b0:381:4dd8:5ec4 with SMTP id v4-20020a7bcb44000000b003814dd85ec4mr931459wmj.12.1646246201232;
-        Wed, 02 Mar 2022 10:36:41 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJw0vLxk9UjI8UxS7wBOYxHK0l/sumk1InbU7uquyOLxzs3VdPsMO4Q7v+TvpQSfv85JSO/PCw==
-X-Received: by 2002:a7b:cb44:0:b0:381:4dd8:5ec4 with SMTP id v4-20020a7bcb44000000b003814dd85ec4mr931433wmj.12.1646246201019;
-        Wed, 02 Mar 2022 10:36:41 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.googlemail.com with ESMTPSA id g11-20020a5d554b000000b001f0326a23ddsm2875275wrw.70.2022.03.02.10.36.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 02 Mar 2022 10:36:40 -0800 (PST)
-Message-ID: <764356ef-dd0f-01bd-129c-a821136a4f6e@redhat.com>
-Date:   Wed, 2 Mar 2022 19:36:35 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH v3 26/28] KVM: selftests: Split out helper to allocate
- guest mem via memfd
-Content-Language: en-US
-To:     David Woodhouse <dwmw2@infradead.org>,
-        Sean Christopherson <seanjc@google.com>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=j+vTUnqa/aRGGzxIeIJpG4vQ+aqSIVjVhl8/XU2n+jM=;
+        b=RWoU4YKfatB+YHNnEVtqDuSLG7ip1mvCR1rWm/WEInaPG1lM/hk/WnuYrqt8rpsEK2
+         Qwp9jqtOmcBeqXb6CeH2hY58nTXg/gFaEd1DvGC5mVs9eTMdiD+HyBG99KWCS4Ma11Im
+         3+1XdwXrVras9TqSM9J8L25PyjEDfR/fsD3a1CGv+uKV28obm1pvDXtVd8MvgGYCPn0n
+         9cE7qMdelDQJeW2xxu61P0ZjxizgKuX71no+DtI0AdntVyEnKAfm2RIko0LWzlVUnZML
+         p5iVZShLKLN06BgQygAHItH5zHeQ598rutY6kZCdUARCibTZN9J64Vu05WN+n0oTMb9G
+         H9Ew==
+X-Gm-Message-State: AOAM533zXK2OatK93BxQmSjqf2rWEXaHEIS7cSPvNZI+AB6eJOxTpi98
+        XR8vzjGkBg67er294FNhBtbrd1Jhw+E=
+X-Google-Smtp-Source: ABdhPJxiCFyZpaoI0/WSk3IJBfoGPt4Z1fSH5s8EhHar/UtvfabhTR7cBRrQfqDn+Jqe0iOOwX6eQw==
+X-Received: by 2002:a05:6870:a919:b0:d5:7a09:1e88 with SMTP id eq25-20020a056870a91900b000d57a091e88mr948969oab.112.1646246636422;
+        Wed, 02 Mar 2022 10:43:56 -0800 (PST)
+Received: from localhost ([98.200.8.69])
+        by smtp.gmail.com with ESMTPSA id fo25-20020a0568709a1900b000d441d5fdc5sm7846884oab.9.2022.03.02.10.43.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Mar 2022 10:43:55 -0800 (PST)
+Date:   Wed, 2 Mar 2022 10:43:54 -0800
+From:   Yury Norov <yury.norov@gmail.com>
+To:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc:     Michael Mueller <mimu@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Christian Borntraeger <borntraeger@linux.ibm.com>,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
         Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        Mingwei Zhang <mizhang@google.com>
-References: <20220226001546.360188-1-seanjc@google.com>
- <20220226001546.360188-27-seanjc@google.com>
- <b41c303fc49e1b31d3e8ef92177a0de2458901bd.camel@infradead.org>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <b41c303fc49e1b31d3e8ef92177a0de2458901bd.camel@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+        David Hildenbrand <david@redhat.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>
+Subject: Re: [PATCH v1 1/1] KVM: s390: Don't cast parameter in bit operations
+Message-ID: <Yh+66v3OJZanfBLb@yury-laptop>
+References: <20220223164420.45344-1-andriy.shevchenko@linux.intel.com>
+ <20220224123620.57fd6c8b@p-imbrenda>
+ <3640a910-60fe-0935-4dfc-55bb65a75ce5@linux.ibm.com>
+ <Yh+Qw6Pb+Cd9JDNa@smile.fi.intel.com>
+ <Yh+m65BSfQgaDFwi@yury-laptop>
+ <Yh+qDhd6FL9nlQdD@smile.fi.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Yh+qDhd6FL9nlQdD@smile.fi.intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/1/22 00:36, David Woodhouse wrote:
-> On Sat, 2022-02-26 at 00:15 +0000, Sean Christopherson wrote:
->> Extract the code for allocating guest memory via memfd out of
->> vm_userspace_mem_region_add() and into a new helper, kvm_memfd_alloc().
->> A future selftest to populate a guest with the maximum amount of guest
->> memory will abuse KVM's memslots to alias guest memory regions to a
->> single memfd-backed host region, i.e. needs to back a guest with memfd
->> memory without a 1:1 association between a memslot and a memfd instance.
->>
->> No functional change intended.
->>
->> Signed-off-by: Sean Christopherson <seanjc@google.com>
+On Wed, Mar 02, 2022 at 07:31:58PM +0200, Andy Shevchenko wrote:
+> On Wed, Mar 02, 2022 at 09:18:35AM -0800, Yury Norov wrote:
+> > On Wed, Mar 02, 2022 at 05:44:03PM +0200, Andy Shevchenko wrote:
+> > > On Thu, Feb 24, 2022 at 01:10:34PM +0100, Michael Mueller wrote:
+> > > > On 24.02.22 12:36, Claudio Imbrenda wrote:
+> > > 
+> > > ...
+> > > 
+> > > > we do that at several places
+> > > 
+> > > Thanks for pointing out.
+> > > 
+> > > > arch/s390/kernel/processor.c:	for_each_set_bit_inv(bit, (long
+> > > > *)&stfle_fac_list, MAX_FACILITY_BIT)
+> > > 
+> > > This one requires a separate change, not related to this patch.
+> > > 
+> > > > arch/s390/kvm/interrupt.c:	set_bit_inv(IPM_BIT_OFFSET + gisc, (unsigned long
+> > > > *) gisa);
+> > > 
+> > > This is done in the patch. Not sure how it appears in your list.
+> > > 
+> > > > arch/s390/kvm/kvm-s390.c:		set_bit_inv(vcpu->vcpu_id, (unsigned long *)
+> > > > sca->mcn);
+> > > > arch/s390/kvm/kvm-s390.c:		set_bit_inv(vcpu->vcpu_id, (unsigned long *)
+> > > > &sca->mcn);
+> > > 
+> > > These two should be fixed in a separate change.
+> > > 
+> > > Also this kind of stuff:
+> > > 
+> > > 	bitmap_copy(kvm->arch.cpu_feat, (unsigned long *) data.feat,
+> > > 	            KVM_S390_VM_CPU_FEAT_NR_BITS);
+> > > 
+> > > might require a new API like
+> > > 
+> > > bitmap_from_u64_array()
+> > > bitmap_to_u64_array()
+> > > 
+> > > Yury?
+> > 
+> > If BE32 is still the case then yes.
 > 
-> While we're at it, please can we make the whole thing go away and just
-> return failure #ifndef MFD_CLOEXEC, instead of breaking the build on
-> older userspace?
+> The whole point is to get rid of the bad pattern, while it may still work
+> in the particular case.
 
-We can just use old school F_SETFD if that's helpful for you.
+Then yes unconditionally. Is it already on table of s390 folks? If no,
+I can do it myself.
 
-Paolo
-
+We have bitmap_from_arr32 and bitmap_to_arr32, so for 64-bit versions,
+we'd start from that.
