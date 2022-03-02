@@ -2,225 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BBBCF4CA1B9
-	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 11:04:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0AA674CA1D1
+	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 11:08:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240857AbiCBKFW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Mar 2022 05:05:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43576 "EHLO
+        id S240758AbiCBKIp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 05:08:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240837AbiCBKFT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 05:05:19 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AB018F61B;
-        Wed,  2 Mar 2022 02:04:36 -0800 (PST)
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 2229q9aj009476;
-        Wed, 2 Mar 2022 10:03:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=SSTo2zwutQqS8CLOb41niC3MNo6la48+xhRkN6n2NQA=;
- b=IHJb59jWV2n6AVqy4QJcw5fcIGW+c5muE1Rh09k7t0/yPSG/9BxWvDdpW/7713J3IXsl
- pDL27VWCV66aHpNOwod6yIDxXFd6EfUli7fJ/eLMNKEHoyMeRbWPezyUIPDPy0gFnD/s
- lsJ/T9owCVHFJviCyrNjPBU+Zr87a5CUOCcHbTMgADf60+Np0jhgDi5o6WIEJAgMxlEW
- K6m+58cVoMNH10Xmm+wgyI97ezc4eQhdFLmd3Xp9Glc3mdSu+qBsCirSJo0hnte+X+mj
- zILR+RHwrDKNEl0DQJ/erlzioCNgm1Cx891RJAla/kx1WJtFClkG+qP3u1XVR3fbjglk 8A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3ej425k2xj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 02 Mar 2022 10:03:51 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 2229s3tb015691;
-        Wed, 2 Mar 2022 10:03:50 GMT
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3ej425k2x2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 02 Mar 2022 10:03:50 +0000
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2229x5jP017232;
-        Wed, 2 Mar 2022 10:03:49 GMT
-Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
-        by ppma02wdc.us.ibm.com with ESMTP id 3efbua3h7m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 02 Mar 2022 10:03:49 +0000
-Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
-        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 222A3kKp43581704
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 2 Mar 2022 10:03:46 GMT
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 760462805A;
-        Wed,  2 Mar 2022 10:03:46 +0000 (GMT)
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BB56628072;
-        Wed,  2 Mar 2022 10:03:39 +0000 (GMT)
-Received: from [9.160.11.222] (unknown [9.160.11.222])
-        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
-        Wed,  2 Mar 2022 10:03:39 +0000 (GMT)
-Message-ID: <c197dc02-b63a-eb45-8e52-275934177d7e@linux.ibm.com>
-Date:   Wed, 2 Mar 2022 12:03:38 +0200
+        with ESMTP id S236246AbiCBKIn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 05:08:43 -0500
+Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D572E029
+        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 02:07:59 -0800 (PST)
+Received: by mail-wm1-x335.google.com with SMTP id n33-20020a05600c3ba100b003832caf7f3aso809985wms.0
+        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 02:07:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=zc2Kxkwq8yRJOIjT0AKi1HEEsJsOWY9kQ95eThh2v70=;
+        b=ecAKqbUejfhOR4GBhQMpQI50QgEqRyNg/QnFeZcpReex2f/aKqpIJhK5D5uM8fAKWF
+         mMf0G85D4XF9vE0xLxfF7IiVw6iAd7xy76WbrDFUoHm9U2roE5BFSjaD6rDbUu1nyLDs
+         TUSLnUg4xns+ak4kN47GRaBDCiJs28GqnYG0nqw5JNZUjyvWuY6qte9Dl5jC9gDq4POq
+         DWkEu69p7F7FmjVZ1US0DD/+mB5Qi8VwuedvAKxN2FVzxj5c0H3I9cSDR4Ftpmt/VfAS
+         RZWk1CVThRo0jiotRwXIm+yIw9Cz03uAGiiqgwmCgWlCK4jT6bdRalYJSElqXS5X/Rlm
+         UEwQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=zc2Kxkwq8yRJOIjT0AKi1HEEsJsOWY9kQ95eThh2v70=;
+        b=J1hsA1lEIpnLJRv/uVvosGVIlWd2ctu123GC/JdFordJnAPQLwYW0QzCPgZm7CNfnB
+         tbbzLXwSE2FmZ5FOA+1zgEcnyB8NecFf0dAlTozon8DofVzNiDzC4f4YjuWfxByKqYjF
+         N27a3R+ZtE+OFvytvtcOnf9VbfvzQryh3VYPqstm8tEn2ERbQjn2SEYltVNVicjiBVZN
+         DdyqlKBCShNjo4BXDb3/J32qyyAw3ygSrhrIlF1mjmg3EK1qvoqMeIKTaQHDU33L9WLd
+         WZF2/aDWQhHyhwHEttdZFDCEzX5iAZaoZosn098bpr+KH4B3EpPl0QAl0Gup8ZCvtslX
+         b4xg==
+X-Gm-Message-State: AOAM530DApcZNsQr72LGoD5M40kutOgaLgQfhZx82xZkq5qe+krxTntY
+        JtZUk8dm34iXvmPtsP0N+1Aieg==
+X-Google-Smtp-Source: ABdhPJz8M0JUlRrgQnR37WHwsfOfDjkWNajdAFWhrLUoxOp/RJdiuL9DzgCo0omQgu5pxB9pI/a4/w==
+X-Received: by 2002:a05:600c:378b:b0:381:67e7:e20c with SMTP id o11-20020a05600c378b00b0038167e7e20cmr10999452wmr.32.1646215677851;
+        Wed, 02 Mar 2022 02:07:57 -0800 (PST)
+Received: from google.com (cpc155339-bagu17-2-0-cust87.1-3.cable.virginm.net. [86.27.177.88])
+        by smtp.gmail.com with ESMTPSA id i5-20020a1c3b05000000b00382871cf734sm4075730wma.25.2022.03.02.02.07.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Mar 2022 02:07:57 -0800 (PST)
+Date:   Wed, 2 Mar 2022 10:07:55 +0000
+From:   Lee Jones <lee.jones@linaro.org>
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     mst@redhat.com, jasowang@redhat.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, stable@vger.kernel.org,
+        syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
+Subject: Re: [PATCH 1/1] vhost: Protect the virtqueue from being cleared
+ whilst still in use
+Message-ID: <Yh9B+wKDKXHZ6ly/@google.com>
+References: <20220302075421.2131221-1-lee.jones@linaro.org>
+ <20220302093446.pjq3djoqi434ehz4@sgarzare-redhat>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.1
-Subject: Re: [PATCH v11 42/45] virt: Add SEV-SNP guest driver
-Content-Language: en-US
-To:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        brijesh.ksingh@gmail.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com,
-        Dov Murik <dovmurik@linux.ibm.com>
-References: <20220224165625.2175020-1-brijesh.singh@amd.com>
- <20220224165625.2175020-43-brijesh.singh@amd.com>
-From:   Dov Murik <dovmurik@linux.ibm.com>
-In-Reply-To: <20220224165625.2175020-43-brijesh.singh@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: tPmFrfdvKtFIkwgePH8oT6yOpKKelnIg
-X-Proofpoint-ORIG-GUID: l_elf4VPUcaG_X9PErd5Ml7SuErEqAB7
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-03-02_01,2022-02-26_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1011
- priorityscore=1501 lowpriorityscore=0 suspectscore=0 impostorscore=0
- phishscore=0 mlxlogscore=999 bulkscore=0 mlxscore=0 malwarescore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2203020039
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220302093446.pjq3djoqi434ehz4@sgarzare-redhat>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Brijesh,
+On Wed, 02 Mar 2022, Stefano Garzarella wrote:
 
-On 24/02/2022 18:56, Brijesh Singh wrote:
-> The SEV-SNP specification provides the guest a mechanism to communicate
-> with the PSP without risk from a malicious hypervisor who wishes to
-> read, alter, drop or replay the messages sent. The driver uses
-> snp_issue_guest_request() to issue GHCB SNP_GUEST_REQUEST or
-> SNP_EXT_GUEST_REQUEST NAE events to submit the request to PSP.
+> On Wed, Mar 02, 2022 at 07:54:21AM +0000, Lee Jones wrote:
+> > vhost_vsock_handle_tx_kick() already holds the mutex during its call
+> > to vhost_get_vq_desc().  All we have to do is take the same lock
+> > during virtqueue clean-up and we mitigate the reported issues.
+> > 
+> > Link: https://syzkaller.appspot.com/bug?extid=279432d30d825e63ba00
 > 
-> The PSP requires that all communication should be encrypted using key
-> specified through the platform_data.
+> This issue is similar to [1] that should be already fixed upstream by [2].
 > 
-> Userspace can use SNP_GET_REPORT ioctl() to query the guest attestation
-> report.
+> However I think this patch would have prevented some issues, because
+> vhost_vq_reset() sets vq->private to NULL, preventing the worker from
+> running.
 > 
-> See SEV-SNP spec section Guest Messages for more details.
-> 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
-
-[...]
-
-> +
-> +static struct snp_guest_crypto *init_crypto(struct snp_guest_dev *snp_dev, u8 *key, size_t keylen)
-> +{
-> +	struct snp_guest_crypto *crypto;
-> +
-> +	crypto = kzalloc(sizeof(*crypto), GFP_KERNEL_ACCOUNT);
-> +	if (!crypto)
-> +		return NULL;
-> +
-> +	crypto->tfm = crypto_alloc_aead("gcm(aes)", 0, 0);
-> +	if (IS_ERR(crypto->tfm))
-> +		goto e_free;
+> Anyway I think that when we enter in vhost_dev_cleanup() the worker should
+> be already stopped, so it shouldn't be necessary to take the mutex. But in
+> order to prevent future issues maybe it's better to take them, so:
 
 
-When trying this series, the sevguest module didn't load (and printed no
-error message).  After adding some debug messages, I found that the
-crypto_alloc_read() call returned an error.  I found out that
-CONFIG_CRYPTO_GCM was disabled in my config.
+> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
-Consider modifying sevguest/Kconfig to force it in:
+Thanks for the analysis and the review Stefano.
 
-
-
-diff --git a/drivers/virt/coco/sevguest/Kconfig b/drivers/virt/coco/sevguest/Kconfig
-index 2be45820e86c..74ca1fe09437 100644
---- a/drivers/virt/coco/sevguest/Kconfig
-+++ b/drivers/virt/coco/sevguest/Kconfig
-@@ -1,7 +1,9 @@
- config SEV_GUEST
-        tristate "AMD SEV Guest driver"
-        default m
--       depends on AMD_MEM_ENCRYPT && CRYPTO_AEAD2
-+       depends on AMD_MEM_ENCRYPT
-+       select CRYPTO_AEAD2
-+       select CRYPTO_GCM
-        help
-          SEV-SNP firmware provides the guest a mechanism to communicate with
-          the PSP without risk from a malicious hypervisor who wishes to read,
-
-
-
-Another thing to consider is to add messages to the various error paths
-in snp_guest_probe().  Not sure what is the common practice in other modules.
-
--Dov
-
-
-> +
-> +	if (crypto_aead_setkey(crypto->tfm, key, keylen))
-> +		goto e_free_crypto;
-> +
-> +	crypto->iv_len = crypto_aead_ivsize(crypto->tfm);
-> +	crypto->iv = kmalloc(crypto->iv_len, GFP_KERNEL_ACCOUNT);
-> +	if (!crypto->iv)
-> +		goto e_free_crypto;
-> +
-> +	if (crypto_aead_authsize(crypto->tfm) > MAX_AUTHTAG_LEN) {
-> +		if (crypto_aead_setauthsize(crypto->tfm, MAX_AUTHTAG_LEN)) {
-> +			dev_err(snp_dev->dev, "failed to set authsize to %d\n", MAX_AUTHTAG_LEN);
-> +			goto e_free_iv;
-> +		}
-> +	}
-> +
-> +	crypto->a_len = crypto_aead_authsize(crypto->tfm);
-> +	crypto->authtag = kmalloc(crypto->a_len, GFP_KERNEL_ACCOUNT);
-> +	if (!crypto->authtag)
-> +		goto e_free_auth;
-> +
-> +	return crypto;
-> +
-> +e_free_auth:
-> +	kfree(crypto->authtag);
-> +e_free_iv:
-> +	kfree(crypto->iv);
-> +e_free_crypto:
-> +	crypto_free_aead(crypto->tfm);
-> +e_free:
-> +	kfree(crypto);
-> +
-> +	return NULL;
-> +}
-
-[...]
+-- 
+Lee Jones [李琼斯]
+Principal Technical Lead - Developer Services
+Linaro.org │ Open source software for Arm SoCs
+Follow Linaro: Facebook | Twitter | Blog
