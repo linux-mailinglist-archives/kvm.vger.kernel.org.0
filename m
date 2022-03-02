@@ -2,79 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 170D34CA39F
-	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 12:26:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E01F4CA399
+	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 12:26:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241395AbiCBL1b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Mar 2022 06:27:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58276 "EHLO
+        id S241329AbiCBL10 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 06:27:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58226 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241297AbiCBL1a (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 06:27:30 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86BA66622D;
-        Wed,  2 Mar 2022 03:26:47 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2419161804;
-        Wed,  2 Mar 2022 11:26:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D16F9C340F1;
-        Wed,  2 Mar 2022 11:26:45 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="FLziEXpf"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1646220402;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=fufxSPRIOrmbnPbDC6hJ7ttxshIW5aGS9pJhSWhnCM4=;
-        b=FLziEXpf2l0WTAhzSsctWfFPyoNczuf0yET5OvrmfeoHkbQdJJUnS5q+NI+vrChRlkMr3x
-        174jqFOO+Z3Pr5c79Gii5Ryw0Vd9q9Ey0Hlr2keq9mQvPlFbNmRp37DUVNhIihEZDWJZG5
-        HjPNCU02XchGOwdc6y1fEsx970Bts6c=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id a4166dc6 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Wed, 2 Mar 2022 11:26:41 +0000 (UTC)
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-2dbc48104beso13440867b3.5;
-        Wed, 02 Mar 2022 03:26:40 -0800 (PST)
-X-Gm-Message-State: AOAM531CCPFcEGKBbRNRGtYXkH9nqJ+pu4T+FHrfbpHSC9V4hrNo0nv0
-        rosp0lWDaH02FtNz1efiEeJ2262x3AcFLqhgPQc=
-X-Google-Smtp-Source: ABdhPJxbaslGOWNMYlqRkibxJ2ICArMnaBOXMWHprS75pC5WtpgRWsCTpsPEORMZE4FcmdBod69a3hNDLa7CXaxndsk=
-X-Received: by 2002:a81:1143:0:b0:2db:ccb4:b0a1 with SMTP id
- 64-20020a811143000000b002dbccb4b0a1mr9951120ywr.499.1646220398624; Wed, 02
- Mar 2022 03:26:38 -0800 (PST)
+        with ESMTP id S237232AbiCBL10 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 06:27:26 -0500
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2E786A021
+        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 03:26:43 -0800 (PST)
+Received: by mail-pf1-x429.google.com with SMTP id u16so1656485pfg.12
+        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 03:26:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=LQtgFO8L0rHL6Qc5taUM878H2bGp64It6/6uXRoylBc=;
+        b=Zr3fib6Jjq+kA8rd4LXKw/kgfkC35ZCvmUMOMU+GJbKjpt0wGkncDjaUhwqmjUxKTj
+         zOGAHlDvuqTJ6z1DoYJ6T6cY1H8i039fuUHWxHL7wtKGZ3MPB/LRDzfzlheZoStRMyL+
+         q6ViCTthyxf29pQvEpZxDc8GHwtqCiWcHKKpnxoKZVSCE4475FQ3ISU804Hknxsp+Ebm
+         aUOq1EL3mqP4YYysiYvUfa/Nq3eypq+nwK6cz5Q4stLz2LLvUQGinDaudGtmYO1IAgmX
+         drGOcrhqjjsbaWWAqaw0Jcvyi0ggr0mpIFE7hHFVWU1SCf0hiimV6oFI3Nw8CyIEddqx
+         4WmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=LQtgFO8L0rHL6Qc5taUM878H2bGp64It6/6uXRoylBc=;
+        b=JkYlKJPhUkNKheZcKGIf8GBdCXTOLNbzNWfcHH/MPxEgk5Jvgv/mvaLyHjpPiHt72G
+         oghQylzDVNAAfjeFRV+Nh5jmspKDS8dtBYaaATdLmr/lZ3BacbLJb0IoQUwW627+hUSn
+         NW/dj3lTMM0Dfk/C9J5Wi+JDr4p2RbpnRKrLZZd6LUZd0e0IGNt30wAqxoxlMFXTtXOp
+         L6QuBH0XsSRkmZma1WDFU7y7CDRi4JMBiakbe7+E22BA16DtdQp9ddZqzvMJst3P3tMt
+         RZnFzQzUZl66dncNNI5A60VUvdDj4uQ14qrLDEYSh/eXfzw46lxjIEnhOan9K8aeohGZ
+         1BoA==
+X-Gm-Message-State: AOAM531FODsf8AHb6H3VeY4OOkQjN7f284E8Ok9ipZK617MvBmvBVxLW
+        kWsK3sAnT7DHXsXiU2VoLgU=
+X-Google-Smtp-Source: ABdhPJw8WKNcUgTeANW7JDAgfJCwzN37ETaVlDB9nztW3Kiox2f2xnfrNUrs0HbTpKTbTunt6vzTMA==
+X-Received: by 2002:a63:1321:0:b0:376:333b:3ed with SMTP id i33-20020a631321000000b00376333b03edmr22647052pgl.283.1646220403028;
+        Wed, 02 Mar 2022 03:26:43 -0800 (PST)
+Received: from localhost.localdomain ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id z18-20020aa78892000000b004e19bd62d8bsm21425155pfe.23.2022.03.02.03.26.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Mar 2022 03:26:42 -0800 (PST)
+From:   Like Xu <like.xu.linux@gmail.com>
+X-Google-Original-From: Like Xu <likexu@tencent.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, Like Xu <likexu@tencent.com>
+Subject: [kvm-unit-tests PATCH RESEND 1/2] x86/pmu: Make "ref cycles" test to pass on the latest cpu
+Date:   Wed,  2 Mar 2022 19:26:33 +0800
+Message-Id: <20220302112634.15024-1-likexu@tencent.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-References: <Yh4+9+UpanJWAIyZ@zx2c4.com> <223f858c-34c5-3ccd-b9e8-7585a976364d@redhat.com>
- <Yh5JwK6toc/zBNL7@zx2c4.com> <20220301121419-mutt-send-email-mst@kernel.org>
- <CAHmME9qieLUDVoPYZPo=N8NCL1T-RzQ4p7kCFv3PKFUkhWZPsw@mail.gmail.com> <20220302031738-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20220302031738-mutt-send-email-mst@kernel.org>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Wed, 2 Mar 2022 12:26:27 +0100
-X-Gmail-Original-Message-ID: <CAHmME9pf-bjnZuweoLqoFEmPy1OK7ogEgGEAva1T8uVTufhCuw@mail.gmail.com>
-Message-ID: <CAHmME9pf-bjnZuweoLqoFEmPy1OK7ogEgGEAva1T8uVTufhCuw@mail.gmail.com>
-Subject: Re: propagating vmgenid outward and upward
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Laszlo Ersek <lersek@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>,
-        QEMU Developers <qemu-devel@nongnu.org>,
-        linux-hyperv@vger.kernel.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Alexander Graf <graf@amazon.com>,
-        "Michael Kelley (LINUX)" <mikelley@microsoft.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        adrian@parity.io,
-        =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Jann Horn <jannh@google.com>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        "Brown, Len" <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
-        Linux PM <linux-pm@vger.kernel.org>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        "Theodore Ts'o" <tytso@mit.edu>, Arnd Bergmann <arnd@arndb.de>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-6.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -82,65 +67,52 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hey Michael,
+From: Like Xu <likexu@tencent.com>
 
-Thanks for the benchmark.
+Expand the boundary for "ref cycles" event test as it has
+been observed that the results do not fit on some CPUs [1]:
 
-On Wed, Mar 2, 2022 at 9:30 AM Michael S. Tsirkin <mst@redhat.com> wrote:
-> So yes, the overhead is higher by 50% which seems a lot but it's from a
-> very small number, so I don't see why it's a show stopper, it's not by a
-> factor of 10 such that we should sacrifice safety by default. Maybe a
-> kernel flag that removes the read replacing it with an interrupt will
-> do.
->
-> In other words, premature optimization is the root of all evil.
+FAIL: full-width writes: ref cycles-N
+  100000 >= 87765 <= 30000000
+  100000 >= 87926 <= 30000000
+  100000 >= 87790 <= 30000000
+  100000 >= 87687 <= 30000000
+  100000 >= 87875 <= 30000000
+  100000 >= 88043 <= 30000000
+  100000 >= 88161 <= 30000000
+  100000 >= 88052 <= 30000000
 
-Unfortunately I don't think it's as simple as that for several reasons.
+[1] Intel(R) Xeon(R) Platinum 8374C CPU @ 2.70GHz
 
-First, I'm pretty confident a beefy Intel machine can mostly hide
-non-dependent comparisons in the memory access and have the problem
-mostly go away. But this is much less the case on, say, an in-order
-MIPS32r2, which isn't just "some crappy ISA I'm using for the sake of
-argument," but actually the platform on which a lot of networking and
-WireGuard stuff runs, so I do care about it. There, we have 4
-reads/comparisons which can't pipeline nearly as well.
+Opportunistically fix cc1 warnings for commented print statement.
 
-There's also the atomicity aspect, which I think makes your benchmark
-not quite accurate. Those 16 bytes could change between the first and
-second word (or between the Nth and N+1th word for N<=3 on 32-bit).
-What if in that case the word you read second doesn't change, but the
-word you read first did? So then you find yourself having to do a
-hi-lo-hi dance. And then consider the 32-bit case, where that's even
-more annoying. This is just one of those things that comes up when you
-compare the semantics of a "large unique ID" and "word-sized counter",
-as general topics. (My suggestion is that vmgenid provide both.)
+Signed-off-by: Like Xu <likexu@tencent.com>
+---
+ x86/pmu.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Finally, there's a slightly storage aspect, where adding 16 bytes to a
-per-key struct is a little bit heavier than adding 4 bytes and might
-bust a cache line without sufficient care, care which always has some
-cost in one way or another.
+diff --git a/x86/pmu.c b/x86/pmu.c
+index 92206ad..3d05384 100644
+--- a/x86/pmu.c
++++ b/x86/pmu.c
+@@ -86,7 +86,7 @@ struct pmu_event {
+ } gp_events[] = {
+ 	{"core cycles", 0x003c, 1*N, 50*N},
+ 	{"instructions", 0x00c0, 10*N, 10.2*N},
+-	{"ref cycles", 0x013c, 0.1*N, 30*N},
++       {"ref cycles", 0x013c, 0.08*N, 30*N},
+ 	{"llc refference", 0x4f2e, 1, 2*N},
+ 	{"llc misses", 0x412e, 1, 1*N},
+ 	{"branches", 0x00c4, 1*N, 1.1*N},
+@@ -223,7 +223,7 @@ static void measure(pmu_counter_t *evt, int count)
+ 
+ static bool verify_event(uint64_t count, struct pmu_event *e)
+ {
+-	// printf("%lld >= %lld <= %lld\n", e->min, count, e->max);
++	// printf("%d >= %ld <= %d\n", e->min, count, e->max);
+ 	return count >= e->min  && count <= e->max;
+ 
+ }
+-- 
+2.35.1
 
-So I just don't know if it's realistic to impose a 16-byte per-packet
-comparison all the time like that. I'm familiar with WireGuard
-obviously, but there's also cifs and maybe even wifi and bluetooth,
-and who knows what else, to care about too. Then there's the userspace
-discussion. I can't imagine a 16-byte hotpath comparison being
-accepted as implementable.
-
-> And I feel if linux
-> DTRT and reads the 16 bytes then hypervisor vendors will be motivated to
-> improve and add a 4 byte unique one. As long as linux is interrupt
-> driven there's no motivation for change.
-
-I reeeeeally don't want to get pulled into the politics of this on the
-hypervisor side. I assume an improved thing would begin with QEMU and
-Firecracker or something collaborating because they're both open
-source and Amazon people seem interested. And then pressure builds for
-Microsoft and VMware to do it on their side. And then we get this all
-nicely implemented in the kernel. In the meantime, though, I'm not
-going to refuse to address the problem entirely just because the
-virtual hardware is less than perfect; I'd rather make the most with
-what we've got while still being somewhat reasonable from an
-implementation perspective.
-
-Jason
