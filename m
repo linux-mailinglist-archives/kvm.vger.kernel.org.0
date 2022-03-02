@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 593E34CA2FB
-	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 12:14:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 864CC4CA2F8
+	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 12:14:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238306AbiCBLPC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Mar 2022 06:15:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52004 "EHLO
+        id S241283AbiCBLPB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 06:15:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52478 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241324AbiCBLOt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 06:14:49 -0500
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6756E60AA8;
-        Wed,  2 Mar 2022 03:14:05 -0800 (PST)
-Received: by mail-pl1-x632.google.com with SMTP id p17so1262004plo.9;
-        Wed, 02 Mar 2022 03:14:05 -0800 (PST)
+        with ESMTP id S241344AbiCBLOv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 06:14:51 -0500
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6EF660AAF;
+        Wed,  2 Mar 2022 03:14:07 -0800 (PST)
+Received: by mail-pf1-x429.google.com with SMTP id p8so1643110pfh.8;
+        Wed, 02 Mar 2022 03:14:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=epyCD5JOodngCk58+WB9SJFl/4h2CqzFfv4VxTsof4Q=;
-        b=Id+ayrUBZIZvkIK2+whn67yrEM7YOnZ2qplr4gf5gkGDWxJc5kVFkg6dqPvObxfEgu
-         UWEu2a3+nsUMg5kSsYjkNblt823TMb2lDglLmiBljRvHSlQtUqY+IgHZho6s4TeJD0gs
-         apFyrMdYsujCkoE0nu7R5ag0wYkfuAGlrqYeJizlDx08A8Z9fTS9gt5qpsRVSi2GRqSs
-         OsxeHeCzbcsESoy+jjkajBMj/W3MOs5S0tJ+s+fl5+Q9NTC7RLvCLt6r/fJSzwLzLtG/
-         PiLckC8gSNnZvG42LPC1cRsulGwfP0MMpHc+t4QEWZp8hyD6hEd4M9GkvXmG/e1s5Wax
-         viIw==
+        bh=nirOxkhTtOqrukVcFgpCOAp8FbBAO2shJfP6XS8Zkbg=;
+        b=crvxCU50UaIUgXmLL+2szMSRYsN12nUPfLrAxqiDX4Qq9npWOzUyriwRwPtRg3ay1A
+         r+OuHNTf58OnrXGDn5aZLm9vaRegL/ArbOmm0juVbIDSvLMvGHiEwvyrIX2qHjuyEz2X
+         b51MrjNjgBJl79KWvSu01tcznqb6eBLVlX6Ce53wsNQvU0IAuZgjLetmCvZNk+g4EIVq
+         xbcK/KWzDcAJVfgPjzqEUui92w9hXrdIhEnytmEjR0xNX8Im7i4EySI4j+HXsPfQf9sE
+         yew87eZnOcw2qbg1HjD2DyXgqLMByE2ecaQMaSJT2YpSF/H5sCb+I+OvlnWdbo2qByqn
+         Jigg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=epyCD5JOodngCk58+WB9SJFl/4h2CqzFfv4VxTsof4Q=;
-        b=UVCxhvn61u839kgq5FDJ5wOgICaeO29bOOOjHmnA30XFMnJnEaS1gt0lwlu+YGbFBv
-         hvvg46lINkkqJopMsJDE7UEZLAI6Qlr+LHjMBuAYeMjrPqkFdQCby91H4Se3/EfKR7zo
-         +gvFYJ942kghsI/7ZG1fbkBIb6IxwplLsEQRaL68ir/kB28KmNIR6OFF4D1ZCBmpyzvD
-         22Rf5alKMvCydmoL892hk7HWbheLsj4fdsAgtzkBmKlzWXHyX1DECn+qvbGZRES8Rs7b
-         yb0NDO5TyId61UuGTLeX4N3MkxUx4MqBSbGEgAIPEnV+gFuHNfsgKuiaa1GCZHJ2pltf
-         nN4A==
-X-Gm-Message-State: AOAM531/EAkARdjVCesj6cPdW9Ur0sUeax4r2IuySaYizHXHIwIJsWgD
-        8hEgwwrGsQKpqzCIVGCP+UQ=
-X-Google-Smtp-Source: ABdhPJxl0CXU3s/Y0tgUbnmO5/ega6Rd6cq8U0g4bQ4kd1qfnYOWdFEyAXaz0HX94G0LDbdi+17w7w==
-X-Received: by 2002:a17:90a:2e0e:b0:1bc:dbe:2d04 with SMTP id q14-20020a17090a2e0e00b001bc0dbe2d04mr26674143pjd.74.1646219644770;
-        Wed, 02 Mar 2022 03:14:04 -0800 (PST)
+        bh=nirOxkhTtOqrukVcFgpCOAp8FbBAO2shJfP6XS8Zkbg=;
+        b=V4d5nqFSENrxVq96oF8ZdR7iVCZfdZs/HXD3bUU0jObRa/F4FYah5wqb6Z9eZlP4l8
+         Wa/CHZHxMkU8Qqw8HFDw2e1Sn0znZZs4Hg3pzs8CQYe5dTxUvPboNVBAJrygVlOik7YU
+         OAAeTDDU3h1pEpZE7BYaGbnlnwxQST6nK15fk5jvbmAoBLIuXjY1rnIdPP8hIOV9d6RZ
+         guqdLvoJal5SdOnCOOu+J72R4jZpfRvGNIQffG1SIG8fupN9rIZKvG3X5OYCvXdwdFQj
+         O8EJKy1WGkKBNyZx1TzOjHQNgL0Fx3aWWBOeRrbpb17v2OUm3z5mRMZTAu3DlRx2TNAz
+         YLvg==
+X-Gm-Message-State: AOAM533GmKGQPUqO5qgnEU9Q7lx+23d8/HUmnl0WSgeYY5RDkIqmUdjX
+        iRTkNSEc0GJlaCVCNuWZZ8k=
+X-Google-Smtp-Source: ABdhPJzwy+v7a/GQS42AVYm3JF3eKqXGxQNqD/eGV8caSeX2uMW6wrCiwI2eoDLLjKp5oOyF66WALw==
+X-Received: by 2002:a63:5f14:0:b0:373:9e86:44d3 with SMTP id t20-20020a635f14000000b003739e8644d3mr25358045pgb.416.1646219647322;
+        Wed, 02 Mar 2022 03:14:07 -0800 (PST)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id v22-20020a17090ad59600b001b7deb42251sm4681847pju.15.2022.03.02.03.14.02
+        by smtp.gmail.com with ESMTPSA id v22-20020a17090ad59600b001b7deb42251sm4681847pju.15.2022.03.02.03.14.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Mar 2022 03:14:04 -0800 (PST)
+        Wed, 02 Mar 2022 03:14:07 -0800 (PST)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
@@ -55,11 +55,10 @@ Cc:     Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
         Wanpeng Li <wanpengli@tencent.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
-        Like Xu <likexu@tencent.com>,
-        Peter Zijlstra <peterz@infradead.org>
-Subject: [PATCH v2 08/12] perf: x86/core: Add interface to query perfmon_event_map[] directly
-Date:   Wed,  2 Mar 2022 19:13:30 +0800
-Message-Id: <20220302111334.12689-9-likexu@tencent.com>
+        Like Xu <likexu@tencent.com>
+Subject: [PATCH v2 09/12] KVM: x86/pmu: Replace pmc_perf_hw_id() with perf_get_hw_event_config()
+Date:   Wed,  2 Mar 2022 19:13:31 +0800
+Message-Id: <20220302111334.12689-10-likexu@tencent.com>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20220302111334.12689-1-likexu@tencent.com>
 References: <20220302111334.12689-1-likexu@tencent.com>
@@ -77,68 +76,39 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Like Xu <likexu@tencent.com>
 
-Currently, we have [intel|knc|p4|p6]_perfmon_event_map on the Intel
-platforms and amd_[f17h]_perfmon_event_map on the AMD platforms.
+With the help of perf_get_hw_event_config(), KVM could query the correct
+EVENTSEL_{EVENT, UMASK} pair of a kernel-generic hw event directly from
+the different *_perfmon_event_map[] by the kernel's pre-defined perf_hw_id.
 
-Early clumsy KVM code or other potential perf_event users may have
-hard-coded these perfmon_maps (e.g., arch/x86/kvm/svm/pmu.c), so
-it would not make sense to program a common hardware event based
-on the generic "enum perf_hw_id" once the two tables do not match.
+Also extend the bit range of the comparison field to
+AMD64_RAW_EVENT_MASK_NB to prevent AMD from
+defining EventSelect[11:8] into perfmon_event_map[] one day.
 
-Let's provide an interface for callers outside the perf subsystem to get
-the counter config based on the perfmon_event_map currently in use,
-and it also helps to save bytes.
-
-Cc: Peter Zijlstra <peterz@infradead.org>
 Signed-off-by: Like Xu <likexu@tencent.com>
 ---
- arch/x86/events/core.c            | 11 +++++++++++
- arch/x86/include/asm/perf_event.h |  6 ++++++
- 2 files changed, 17 insertions(+)
+ arch/x86/kvm/pmu.c | 9 ++-------
+ 1 file changed, 2 insertions(+), 7 deletions(-)
 
-diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
-index e686c5e0537b..e760a1348c62 100644
---- a/arch/x86/events/core.c
-+++ b/arch/x86/events/core.c
-@@ -2996,3 +2996,14 @@ void perf_get_x86_pmu_capability(struct x86_pmu_capability *cap)
- 	cap->events_mask_len	= x86_pmu.events_mask_len;
- }
- EXPORT_SYMBOL_GPL(perf_get_x86_pmu_capability);
-+
-+u64 perf_get_hw_event_config(int hw_event)
-+{
-+	int max = x86_pmu.max_events;
-+
-+	if (hw_event < max)
-+		return x86_pmu.event_map(array_index_nospec(hw_event, max));
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(perf_get_hw_event_config);
-diff --git a/arch/x86/include/asm/perf_event.h b/arch/x86/include/asm/perf_event.h
-index 8fc1b5003713..822927045406 100644
---- a/arch/x86/include/asm/perf_event.h
-+++ b/arch/x86/include/asm/perf_event.h
-@@ -477,6 +477,7 @@ struct x86_pmu_lbr {
- };
- 
- extern void perf_get_x86_pmu_capability(struct x86_pmu_capability *cap);
-+extern u64 perf_get_hw_event_config(int hw_event);
- extern void perf_check_microcode(void);
- extern void perf_clear_dirty_counters(void);
- extern int x86_perf_rdpmc_index(struct perf_event *event);
-@@ -486,6 +487,11 @@ static inline void perf_get_x86_pmu_capability(struct x86_pmu_capability *cap)
- 	memset(cap, 0, sizeof(*cap));
+diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+index 00e1660c10ca..9fb7d29e5fdd 100644
+--- a/arch/x86/kvm/pmu.c
++++ b/arch/x86/kvm/pmu.c
+@@ -472,13 +472,8 @@ static void kvm_pmu_incr_counter(struct kvm_pmc *pmc)
+ static inline bool eventsel_match_perf_hw_id(struct kvm_pmc *pmc,
+ 	unsigned int perf_hw_id)
+ {
+-	u64 old_eventsel = pmc->eventsel;
+-	unsigned int config;
+-
+-	pmc->eventsel &= (ARCH_PERFMON_EVENTSEL_EVENT | ARCH_PERFMON_EVENTSEL_UMASK);
+-	config = kvm_x86_ops.pmu_ops->pmc_perf_hw_id(pmc);
+-	pmc->eventsel = old_eventsel;
+-	return config == perf_hw_id;
++	return !((pmc->eventsel ^ perf_get_hw_event_config(perf_hw_id)) &
++		AMD64_RAW_EVENT_MASK_NB);
  }
  
-+static inline u64 perf_get_hw_event_config(int hw_event)
-+{
-+	return 0;
-+}
-+
- static inline void perf_events_lapic_init(void)	{ }
- static inline void perf_check_microcode(void) { }
- #endif
+ static inline bool cpl_is_matched(struct kvm_pmc *pmc)
 -- 
 2.35.1
 
