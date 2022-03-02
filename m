@@ -2,135 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 580B94CADC6
-	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 19:44:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A2AB4CADE3
+	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 19:48:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244683AbiCBSom (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Mar 2022 13:44:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52958 "EHLO
+        id S244733AbiCBStO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 13:49:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34206 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244671AbiCBSok (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 13:44:40 -0500
-Received: from mail-oo1-xc29.google.com (mail-oo1-xc29.google.com [IPv6:2607:f8b0:4864:20::c29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27ADBCA32D;
-        Wed,  2 Mar 2022 10:43:57 -0800 (PST)
-Received: by mail-oo1-xc29.google.com with SMTP id h16-20020a4a6f10000000b00320507b9ccfso2933907ooc.7;
-        Wed, 02 Mar 2022 10:43:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=j+vTUnqa/aRGGzxIeIJpG4vQ+aqSIVjVhl8/XU2n+jM=;
-        b=OexBrWql6KhyoHbRnx1JJYuKhZooJGTYyKVe9d05H5ttAdABxcVqk+FAhysK4OtxBQ
-         BorE52DogDAk892/I8uPzm7ZB9MZ+4hcvfieKqkIQAh9P1fbfg4y9dDoR0c+ZdOuR3l6
-         2YHEcUlUTNtIJj1x0Inplt63WqfK+Bqb5NdTAl8l8noyMnzolx3YhyjX0e5fcAUTeWka
-         S4hlMQl9qfS31CjHvtDJzFbDk3kn6NaPQodr5m+EAT3YlxhE/dPURFbUCBkx58NOgVXU
-         rdf/L//dY83bpmVw5UMaBtMYiS5qIu4Dxcq0nOqiAEatvQofbZsjtDxqUOZrcRzAwjxA
-         N0bg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=j+vTUnqa/aRGGzxIeIJpG4vQ+aqSIVjVhl8/XU2n+jM=;
-        b=RWoU4YKfatB+YHNnEVtqDuSLG7ip1mvCR1rWm/WEInaPG1lM/hk/WnuYrqt8rpsEK2
-         Qwp9jqtOmcBeqXb6CeH2hY58nTXg/gFaEd1DvGC5mVs9eTMdiD+HyBG99KWCS4Ma11Im
-         3+1XdwXrVras9TqSM9J8L25PyjEDfR/fsD3a1CGv+uKV28obm1pvDXtVd8MvgGYCPn0n
-         9cE7qMdelDQJeW2xxu61P0ZjxizgKuX71no+DtI0AdntVyEnKAfm2RIko0LWzlVUnZML
-         p5iVZShLKLN06BgQygAHItH5zHeQ598rutY6kZCdUARCibTZN9J64Vu05WN+n0oTMb9G
-         H9Ew==
-X-Gm-Message-State: AOAM533zXK2OatK93BxQmSjqf2rWEXaHEIS7cSPvNZI+AB6eJOxTpi98
-        XR8vzjGkBg67er294FNhBtbrd1Jhw+E=
-X-Google-Smtp-Source: ABdhPJxiCFyZpaoI0/WSk3IJBfoGPt4Z1fSH5s8EhHar/UtvfabhTR7cBRrQfqDn+Jqe0iOOwX6eQw==
-X-Received: by 2002:a05:6870:a919:b0:d5:7a09:1e88 with SMTP id eq25-20020a056870a91900b000d57a091e88mr948969oab.112.1646246636422;
-        Wed, 02 Mar 2022 10:43:56 -0800 (PST)
-Received: from localhost ([98.200.8.69])
-        by smtp.gmail.com with ESMTPSA id fo25-20020a0568709a1900b000d441d5fdc5sm7846884oab.9.2022.03.02.10.43.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Mar 2022 10:43:55 -0800 (PST)
-Date:   Wed, 2 Mar 2022 10:43:54 -0800
-From:   Yury Norov <yury.norov@gmail.com>
-To:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc:     Michael Mueller <mimu@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>
-Subject: Re: [PATCH v1 1/1] KVM: s390: Don't cast parameter in bit operations
-Message-ID: <Yh+66v3OJZanfBLb@yury-laptop>
-References: <20220223164420.45344-1-andriy.shevchenko@linux.intel.com>
- <20220224123620.57fd6c8b@p-imbrenda>
- <3640a910-60fe-0935-4dfc-55bb65a75ce5@linux.ibm.com>
- <Yh+Qw6Pb+Cd9JDNa@smile.fi.intel.com>
- <Yh+m65BSfQgaDFwi@yury-laptop>
- <Yh+qDhd6FL9nlQdD@smile.fi.intel.com>
+        with ESMTP id S237825AbiCBStN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 13:49:13 -0500
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AF2A2C1;
+        Wed,  2 Mar 2022 10:48:28 -0800 (PST)
+Received: from fraeml701-chm.china.huawei.com (unknown [172.18.147.206])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4K83695jbNz67Ywb;
+        Thu,  3 Mar 2022 02:48:17 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml701-chm.china.huawei.com (10.206.15.50) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2308.21; Wed, 2 Mar 2022 19:48:25 +0100
+Received: from [10.47.84.129] (10.47.84.129) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.21; Wed, 2 Mar
+ 2022 18:48:25 +0000
+Message-ID: <6e3bcece-1046-0c2f-78d8-21d5030a8d71@huawei.com>
+Date:   Wed, 2 Mar 2022 18:48:24 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Yh+qDhd6FL9nlQdD@smile.fi.intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.1
+Subject: Re: [PATCH v7 01/10] crypto: hisilicon/qm: Move the QM header to
+ include/linux
+To:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>
+CC:     <linux-pci@vger.kernel.org>, <alex.williamson@redhat.com>,
+        <jgg@nvidia.com>, <cohuck@redhat.com>, <mgurtovoy@nvidia.com>,
+        <yishaih@nvidia.com>, <linuxarm@huawei.com>,
+        <liulongfang@huawei.com>, <prime.zeng@hisilicon.com>,
+        <jonathan.cameron@huawei.com>, <wangzhou1@hisilicon.com>
+References: <20220302172903.1995-1-shameerali.kolothum.thodi@huawei.com>
+ <20220302172903.1995-2-shameerali.kolothum.thodi@huawei.com>
+From:   John Garry <john.garry@huawei.com>
+In-Reply-To: <20220302172903.1995-2-shameerali.kolothum.thodi@huawei.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.47.84.129]
+X-ClientProxiedBy: lhreml739-chm.china.huawei.com (10.201.108.189) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 02, 2022 at 07:31:58PM +0200, Andy Shevchenko wrote:
-> On Wed, Mar 02, 2022 at 09:18:35AM -0800, Yury Norov wrote:
-> > On Wed, Mar 02, 2022 at 05:44:03PM +0200, Andy Shevchenko wrote:
-> > > On Thu, Feb 24, 2022 at 01:10:34PM +0100, Michael Mueller wrote:
-> > > > On 24.02.22 12:36, Claudio Imbrenda wrote:
-> > > 
-> > > ...
-> > > 
-> > > > we do that at several places
-> > > 
-> > > Thanks for pointing out.
-> > > 
-> > > > arch/s390/kernel/processor.c:	for_each_set_bit_inv(bit, (long
-> > > > *)&stfle_fac_list, MAX_FACILITY_BIT)
-> > > 
-> > > This one requires a separate change, not related to this patch.
-> > > 
-> > > > arch/s390/kvm/interrupt.c:	set_bit_inv(IPM_BIT_OFFSET + gisc, (unsigned long
-> > > > *) gisa);
-> > > 
-> > > This is done in the patch. Not sure how it appears in your list.
-> > > 
-> > > > arch/s390/kvm/kvm-s390.c:		set_bit_inv(vcpu->vcpu_id, (unsigned long *)
-> > > > sca->mcn);
-> > > > arch/s390/kvm/kvm-s390.c:		set_bit_inv(vcpu->vcpu_id, (unsigned long *)
-> > > > &sca->mcn);
-> > > 
-> > > These two should be fixed in a separate change.
-> > > 
-> > > Also this kind of stuff:
-> > > 
-> > > 	bitmap_copy(kvm->arch.cpu_feat, (unsigned long *) data.feat,
-> > > 	            KVM_S390_VM_CPU_FEAT_NR_BITS);
-> > > 
-> > > might require a new API like
-> > > 
-> > > bitmap_from_u64_array()
-> > > bitmap_to_u64_array()
-> > > 
-> > > Yury?
-> > 
-> > If BE32 is still the case then yes.
+On 02/03/2022 17:28, Shameer Kolothum wrote:
+> Since we are going to introduce VFIO PCI HiSilicon ACC
+> driver for live migration in subsequent patches, move
+> the ACC QM header file to a common include dir.
 > 
-> The whole point is to get rid of the bad pattern, while it may still work
-> in the particular case.
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> ---
+>   drivers/crypto/hisilicon/hpre/hpre.h                         | 2 +-
+>   drivers/crypto/hisilicon/qm.c                                | 2 +-
+>   drivers/crypto/hisilicon/sec2/sec.h                          | 2 +-
+>   drivers/crypto/hisilicon/sgl.c                               | 2 +-
+>   drivers/crypto/hisilicon/zip/zip.h                           | 2 +-
+>   drivers/crypto/hisilicon/qm.h => include/linux/hisi_acc_qm.h | 0
 
-Then yes unconditionally. Is it already on table of s390 folks? If no,
-I can do it myself.
+include/linux/crypto seems a better location. I'm not sure if someone 
+suggested a location already, though.
 
-We have bitmap_from_arr32 and bitmap_to_arr32, so for 64-bit versions,
-we'd start from that.
+>   6 files changed, 5 insertions(+), 5 deletions(-)
+>   rename drivers/crypto/hisilicon/qm.h => include/linux/hisi_acc_qm.h (100%)
+> 
+> diff --git a/drivers/crypto/hisilicon/hpre/hpre.h b/drivers/crypto/hisilicon/hpre/hpre.h
+> index e0b4a1982ee9..9a0558ed82f9 100644
+> --- a/drivers/crypto/hisilicon/hpre/hpre.h
+> +++ b/drivers/crypto/hisilicon/hpre/hpre.h
+> @@ -4,7 +4,7 @@
+>   #define __HISI_HPRE_H
+>   
+>   #include <linux/list.h>
+> -#include "../qm.h"
+> +#include <linux/hisi_acc_qm.h>
+>   
+>   #define HPRE_SQE_SIZE			sizeof(struct hpre_sqe)
+>   #define HPRE_PF_DEF_Q_NUM		64
+> diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+> index c5b84a5ea350..ed23e1d3fa27 100644
+> --- a/drivers/crypto/hisilicon/qm.c
+> +++ b/drivers/crypto/hisilicon/qm.c
+> @@ -15,7 +15,7 @@
+>   #include <linux/uacce.h>
+>   #include <linux/uaccess.h>
+>   #include <uapi/misc/uacce/hisi_qm.h>
+> -#include "qm.h"
+> +#include <linux/hisi_acc_qm.h>
+>   
+>   /* eq/aeq irq enable */
+>   #define QM_VF_AEQ_INT_SOURCE		0x0
+> diff --git a/drivers/crypto/hisilicon/sec2/sec.h b/drivers/crypto/hisilicon/sec2/sec.h
+> index d97cf02b1df7..c2e9b01187a7 100644
+> --- a/drivers/crypto/hisilicon/sec2/sec.h
+> +++ b/drivers/crypto/hisilicon/sec2/sec.h
+> @@ -4,7 +4,7 @@
+>   #ifndef __HISI_SEC_V2_H
+>   #define __HISI_SEC_V2_H
+>   
+> -#include "../qm.h"
+> +#include <linux/hisi_acc_qm.h>
+>   #include "sec_crypto.h"
+>   
+>   /* Algorithm resource per hardware SEC queue */
+> diff --git a/drivers/crypto/hisilicon/sgl.c b/drivers/crypto/hisilicon/sgl.c
+> index 057273769f26..534687401135 100644
+> --- a/drivers/crypto/hisilicon/sgl.c
+> +++ b/drivers/crypto/hisilicon/sgl.c
+> @@ -3,7 +3,7 @@
+>   #include <linux/dma-mapping.h>
+>   #include <linux/module.h>
+>   #include <linux/slab.h>
+> -#include "qm.h"
+> +#include <linux/hisi_acc_qm.h>
+
+alphabetic ordering (ignoring previous point)?
+
+>   
+>   #define HISI_ACC_SGL_SGE_NR_MIN		1
+>   #define HISI_ACC_SGL_NR_MAX		256
+> diff --git a/drivers/crypto/hisilicon/zip/zip.h b/drivers/crypto/hisilicon/zip/zip.h
+> index 517fdbdff3ea..3dfd3bac5a33 100644
+> --- a/drivers/crypto/hisilicon/zip/zip.h
+> +++ b/drivers/crypto/hisilicon/zip/zip.h
+> @@ -7,7 +7,7 @@
+>   #define pr_fmt(fmt)	"hisi_zip: " fmt
+>   
+>   #include <linux/list.h>
+> -#include "../qm.h"
+> +#include <linux/hisi_acc_qm.h>
+>   
+>   enum hisi_zip_error_type {
+>   	/* negative compression */
+> diff --git a/drivers/crypto/hisilicon/qm.h b/include/linux/hisi_acc_qm.h
+> similarity index 100%
+> rename from drivers/crypto/hisilicon/qm.h
+> rename to include/linux/hisi_acc_qm.h
+
