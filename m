@@ -2,96 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A0B674CAC34
-	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 18:36:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AF0394CAC3F
+	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 18:38:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244090AbiCBRgZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Mar 2022 12:36:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60432 "EHLO
+        id S240436AbiCBRjC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 12:39:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36568 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243824AbiCBRgY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 12:36:24 -0500
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9401E50B1F
-        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 09:35:40 -0800 (PST)
-Received: by mail-pl1-x62b.google.com with SMTP id s1so2151460plg.12
-        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 09:35:40 -0800 (PST)
+        with ESMTP id S238287AbiCBRi7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 12:38:59 -0500
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 597B931235
+        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 09:38:15 -0800 (PST)
+Received: by mail-pl1-x635.google.com with SMTP id e13so2188420plh.3
+        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 09:38:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=g31Q1biXQsUkqLM6OlMOKrciBnbcEHw187r7e5y/1nE=;
-        b=nfPeMMpreLlCLk6pctgBoE+lV6HQ28hwlJaIsDBe4v3XPZCakjX7ckna8IQeJPstiG
-         TNS6rcflcJ26IeNA6LAh4tu8lV0Ul6TuEzVVv8MlvDdx96b+NV5i5UKvOOXNuRDGjBjN
-         1A+o9Hf62ogU0BZ13H0YcnbLC0+eTVoQNZ9LAsu5srYNbI4pbcOmE85pss28cZv16UUJ
-         Eby3tXZOI3TdMJpBA8/9IjcIsz/GU+06F8ucm4MR/wJ/YUoqfOtqGJHsMoPU5xIan0u2
-         8QTmFxOGY/cBacGUBWArzsPGTQfbP/ntehlonC6oGAGix1jwmBSk846SX5CdcX4t40Df
-         qaDQ==
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=WH0+qyWWHhV8of3aAofph+MQPHfJdu4kz/EMF0WIztU=;
+        b=PulbCMbgEH+38j2aU0QpcfPYU0SWGN7ngqaEhoEo5kxg50T0PSDoRmsQUgBOjOld/F
+         YxlyeRlpG7MJ0kEg2syixXQf9NfJuLU2Q1zOhr/jxtI85g0rTBu4qV6aXyKTbH2rhplI
+         9oM6yqy84EZ6z1KyX3vRQxUjhlvtEJVqSfkx0UdUCbn20Yc3mutuWNmErlWiEqBxhWDG
+         x7t/AzA4UbAo+SXThaaWMJXZeeFHs+Qqgp/9bQFgxk+VVWxhXzDphaBiSB7HoQ5l7NNs
+         VohhbA+vhlCRLrJ9SL5+8CJ9aSnFeu43IJdTbtqHqgwolYA1ZWDd07HuzzhOM9RFkP02
+         G/rQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=g31Q1biXQsUkqLM6OlMOKrciBnbcEHw187r7e5y/1nE=;
-        b=vcUKeK6w0v9m8UydCyn3H1C3vFkBVghoWOJrpFVf1F3XqikOLMoVmVCZcViiLVMZDa
-         oIEvCs9HZVvZFQ/RQtxbEKjBZUAxVS8c6edAJ+O9IJTG5wiPdgHmTkEW4rrRWpVsG8/v
-         JJgnZ3tz7MCR9vkjs7+2832JHuk7HGhehZ1S3ddRulQfrYnaSSBI78l5MTJpji0uV2Vs
-         dJqVtOvGUDqR8H397Ac36AOwEdJlvCh5qsi318VDuB8G3IU5NTk0PhNbqbUQ0i3Tarjl
-         dzTVLgpwJ5SOThe+DT24UUmIYruTjTxZYiAGXSVTJonbDBvNMVp6yMaPB0xGSMDjgyyG
-         TUVQ==
-X-Gm-Message-State: AOAM533jMrhZ8gj3elqiUHtq5qQ+p5HsgSsYNYWEaAEhG+WgtRg+GrLW
-        TDS06RWMtbFFjpMGr/6KZYOG5g==
-X-Google-Smtp-Source: ABdhPJzqVWJHtTMQXF6rGskQwQUZiWh6fplF5iBfjKig7T5aE4fZFMmORsWOVa1RKZKF8NgHKAQzXQ==
-X-Received: by 2002:a17:902:8f94:b0:14f:d9b3:52c2 with SMTP id z20-20020a1709028f9400b0014fd9b352c2mr31616997plo.103.1646242539911;
-        Wed, 02 Mar 2022 09:35:39 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id n22-20020a056a0007d600b004f3ba7c23e2sm21740956pfu.37.2022.03.02.09.35.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Mar 2022 09:35:39 -0800 (PST)
-Date:   Wed, 2 Mar 2022 17:35:35 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        Mingwei Zhang <mizhang@google.com>
-Subject: Re: [PATCH v3 22/28] KVM: x86/mmu: Zap defunct roots via
- asynchronous worker
-Message-ID: <Yh+q59WsjgCdMcP7@google.com>
-References: <20220226001546.360188-1-seanjc@google.com>
- <20220226001546.360188-23-seanjc@google.com>
- <b9270432-4ee8-be8e-8aa1-4b09992f82b8@redhat.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=WH0+qyWWHhV8of3aAofph+MQPHfJdu4kz/EMF0WIztU=;
+        b=tOJk/RrmTDPADx3ZTOx2d1VTHKOGyE7Afrzt/CgJukC4nG1vb1IAHloJ41MGzpGWQm
+         cmD0clcRfwjTWhzH2slNEgBmlrrMKKExxakHHrN8c7FAC7Lux9WmezaUyXWE+AXZ8D5z
+         j3cWBURaxiPdYhwfLkcf4XO1abFXgycV+tAOwwv1M5T0D1QTqCpIhaqvqVVuAUYpNI22
+         pWGhQLMbtJtzQnrnzWJELtapWIpLZPTZp3qjdvTOgonCvTy8RRtpzuMIrXJfgrrkUV++
+         hMfEYwg393S5EsPVV+oz2sjyrFbJ3MaMhiS3YfT4Kiq0ov3AF1A4DJ0AL75CHVEKXZR+
+         p5IQ==
+X-Gm-Message-State: AOAM532IfHSa/MWKpdC0/ZWcAI4Qcg6zwHEb7kOSbT6xR1eg3YmTRMSu
+        fAv47j5P2/eJHlLVkiFxjRY=
+X-Google-Smtp-Source: ABdhPJx8K6gIn+cvPLthAImu2ZgCGqli+P0GJq859CmenB64iJaGRgs6Pw6TtxmdQDtyQMKV41EZ1g==
+X-Received: by 2002:a17:90a:4e:b0:1bd:36ce:8150 with SMTP id 14-20020a17090a004e00b001bd36ce8150mr925058pjb.62.1646242694886;
+        Wed, 02 Mar 2022 09:38:14 -0800 (PST)
+Received: from [192.168.1.35] (71.red-83-50-68.dynamicip.rima-tde.net. [83.50.68.71])
+        by smtp.gmail.com with ESMTPSA id y16-20020a056a00191000b004e155b2623bsm22513286pfi.178.2022.03.02.09.38.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 02 Mar 2022 09:38:14 -0800 (PST)
+Message-ID: <85ed0856-308a-7774-a751-b20588f3d9cd@gmail.com>
+Date:   Wed, 2 Mar 2022 18:38:07 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b9270432-4ee8-be8e-8aa1-4b09992f82b8@redhat.com>
-X-Spam-Status: No, score=-18.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.6.1
+Subject: Re: [PATCH 2/2] Allow building vhost-user in BSD
+Content-Language: en-US
+To:     Sergio Lopez <slp@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
+        vgoyal@redhat.com, Fam Zheng <fam@euphon.net>, kvm@vger.kernel.org,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Jagannathan Raman <jag.raman@oracle.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>, qemu-block@nongnu.org,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Hanna Reitz <hreitz@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Elena Ufimtseva <elena.ufimtseva@oracle.com>,
+        Kevin Wolf <kwolf@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        qemu-s390x@nongnu.org, Matthew Rosato <mjrosato@linux.ibm.com>,
+        John G Johnson <john.g.johnson@oracle.com>,
+        Thomas Huth <thuth@redhat.com>
+References: <20220302113644.43717-1-slp@redhat.com>
+ <20220302113644.43717-3-slp@redhat.com>
+ <66b68bcc-8d7e-a5f7-5e6c-b2d20c26ab01@redhat.com>
+ <8dfc9854-4d59-0759-88d0-d502ae7c552f@gmail.com>
+ <20220302173009.26auqvy4t4rx74td@mhamilton>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= 
+        <philippe.mathieu.daude@gmail.com>
+In-Reply-To: <20220302173009.26auqvy4t4rx74td@mhamilton>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 02, 2022, Paolo Bonzini wrote:
-> However, I think we now need a module_get/module_put when creating/destroying
-> a VM; the workers can outlive kvm_vm_release and therefore any reference
-> automatically taken by VFS's fops_get/fops_put.
+On 2/3/22 18:31, Sergio Lopez wrote:
+> On Wed, Mar 02, 2022 at 06:18:59PM +0100, Philippe Mathieu-Daudé wrote:
+>> On 2/3/22 18:10, Paolo Bonzini wrote:
+>>> On 3/2/22 12:36, Sergio Lopez wrote:
+>>>> With the possibility of using pipefd as a replacement on operating
+>>>> systems that doesn't support eventfd, vhost-user can also work on BSD
+>>>> systems.
+>>>>
+>>>> This change allows enabling vhost-user on BSD platforms too and
+>>>> makes libvhost_user (which still depends on eventfd) a linux-only
+>>>> feature.
+>>>>
+>>>> Signed-off-by: Sergio Lopez <slp@redhat.com>
+>>>
+>>> I would just check for !windows.
+>>
+>> What about Darwin / Haiku / Illumnos?
+> 
+> It should work on every system providing pipe() or pipe2(), so I guess
+> Paolo's right, every platform except Windows. FWIW, I already tested
+> it with Darwin.
 
-Haven't read the rest of the patch, but this caught my eye.  We _already_ need
-to handle this scenario.  As you noted, any worker, i.e. anything that takes a
-reference via kvm_get_kvm() without any additional guarantee that the module can't
-be unloaded is suspect. x86 is mostly fine, though kvm_setup_async_pf() is likely
-affected, and other architectures seem to have bugs.
+Wow, nice.
 
-Google has an internal patch that addresses this.  I believe David is going to post
-the fix... David?
+So maybe simply check for pipe/pipe2 rather than !windows?
