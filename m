@@ -2,123 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CFF004CAD5D
-	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 19:20:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 185C64CAD86
+	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 19:27:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237919AbiCBSVC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Mar 2022 13:21:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34996 "EHLO
+        id S244505AbiCBS2V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 13:28:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48148 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231945AbiCBSVA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 13:21:00 -0500
-Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9DA223BCE;
-        Wed,  2 Mar 2022 10:20:16 -0800 (PST)
-Received: by mail-wm1-x330.google.com with SMTP id i66so1684131wma.5;
-        Wed, 02 Mar 2022 10:20:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=jCur8YrGp6z/NuQt4H+X/uS6Re1ZqnHb48KX+hfu53o=;
-        b=C4GUs40MfOQrW5sBrilqDYxQOs2FYm8f9QxL3hMm+zTP7aTJkzPLfOPhs1lzQD3CVV
-         m377cAUO0oZ53mdaNqMWRt8gPsuU0ovUZNlwnvn08ITFVdVy73fb7u4ZK3l7YEeD3ibj
-         Nr0sbRwJxI0AewRuDPljZiBP8Rs0uhhv5z2CHj3WgN20jslaIky90KJcGHpqmC59fdS2
-         Qa8nmDnuvVenMEGxLwDdlcdtqQpK9jfBGpuqs9iNzQwxXGLrJTfnLFdc9UOpYspXUFb1
-         YXTgzNtPfCqnJ+gr1HToZfiOJWVjSxoyE1x2VWPtIUfNECWYDubH4bGdqlIkT+Aovoja
-         wBHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=jCur8YrGp6z/NuQt4H+X/uS6Re1ZqnHb48KX+hfu53o=;
-        b=kiKMeovu8BWc1cFXOco+x2pGcgXzjrh3CGexFM9Oh2FW77WS2g7DePtT/+wo4++TLD
-         fKpK+2jKKLAZ1N5fL29wNX4jppccCFfZ4m3qcVaOh1DEfapPOoUd6ppPUWI7Sq4cGnYM
-         Igt9L0zo0hcTm53hmi0d0ndjvCmZ5TcQlA1+WOzcsSumu38a2+HAhAPd2M3ndGneWihg
-         ihleKMItHuvCJx8rYS0FHYoUwMmqHA/sdeDKsqrLA97Rr0NmHdWFNN9XqSyfZy9tfLjG
-         MQ9mBOdNQ9Z5K7zSzcAWbJ7INOSFTT9lsN5dUgCfyJNFHCp/FFfEVJR3fYZY+wd/bleI
-         5FKw==
-X-Gm-Message-State: AOAM533+R5aIanKciLGby/g2CeIC//xrCr9mTqJ6LBHhz3LxT6694Xdh
-        HqHvAL9R4Zy9xM7fa6dA5fqzE68SA7U=
-X-Google-Smtp-Source: ABdhPJxtYGh4kFJILKrTt8o6mKhCSuHsw4oW6NwL5OtdhqpgfcLuYtQySmgMW7m0aLTyZuA1mYoFpQ==
-X-Received: by 2002:a7b:c94e:0:b0:386:3694:3e78 with SMTP id i14-20020a7bc94e000000b0038636943e78mr935222wml.22.1646245215294;
-        Wed, 02 Mar 2022 10:20:15 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.googlemail.com with ESMTPSA id n21-20020a05600c3b9500b003830cbe90c3sm3808590wms.11.2022.03.02.10.20.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 02 Mar 2022 10:20:14 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <f4189f26-eff9-9fd0-40a1-69ac7759dedf@redhat.com>
-Date:   Wed, 2 Mar 2022 19:20:13 +0100
+        with ESMTP id S241703AbiCBS2T (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 13:28:19 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C645CFD06
+        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 10:27:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646245653;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=mCY+S+PoxaMOSTKIuJlTMs0umdpj+rKF0gwUYA/KOUc=;
+        b=TZbtoKVTMadjrxcgixAyfNnBG0RhBRbs0Kg2EY+mFavvRGMRYQmp2Y9sB+1ZENG6oY04Y9
+        QR0aOjIOnFVhNlWQgxeFNFA18H4+1NgMCgm/FZF0zjPd/hYj/k85/JFRIjYAZYylykcysu
+        8fODRDp2t7OLI4ASDhqfNwycKQDdmOw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-543-ToUOWU_mN1i4XTTHcKclOQ-1; Wed, 02 Mar 2022 13:27:30 -0500
+X-MC-Unique: ToUOWU_mN1i4XTTHcKclOQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C63E51091DA1;
+        Wed,  2 Mar 2022 18:27:27 +0000 (UTC)
+Received: from redhat.com (unknown [10.33.36.166])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 45DD66ABAF;
+        Wed,  2 Mar 2022 18:26:34 +0000 (UTC)
+Date:   Wed, 2 Mar 2022 18:26:31 +0000
+From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= 
+        <philippe.mathieu.daude@gmail.com>, Sergio Lopez <slp@redhat.com>,
+        Fam Zheng <fam@euphon.net>,
+        Elena Ufimtseva <elena.ufimtseva@oracle.com>,
+        kvm@vger.kernel.org, John G Johnson <john.g.johnson@oracle.com>,
+        David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+        Jagannathan Raman <jag.raman@oracle.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>, qemu-block@nongnu.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        vgoyal@redhat.com, Eric Farman <farman@linux.ibm.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        qemu-s390x@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
+        Kevin Wolf <kwolf@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Hanna Reitz <hreitz@redhat.com>
+Subject: Re: [PATCH 2/2] Allow building vhost-user in BSD
+Message-ID: <Yh+213GCS1J8nQkr@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20220302113644.43717-1-slp@redhat.com>
+ <20220302113644.43717-3-slp@redhat.com>
+ <66b68bcc-8d7e-a5f7-5e6c-b2d20c26ab01@redhat.com>
+ <8dfc9854-4d59-0759-88d0-d502ae7c552f@gmail.com>
+ <20220302173009.26auqvy4t4rx74td@mhamilton>
+ <85ed0856-308a-7774-a751-b20588f3d9cd@gmail.com>
+ <2976a926-9dbf-d955-166f-5677a06d9873@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH v3 22/28] KVM: x86/mmu: Zap defunct roots via asynchronous
- worker
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        Mingwei Zhang <mizhang@google.com>
-References: <20220226001546.360188-1-seanjc@google.com>
- <20220226001546.360188-23-seanjc@google.com>
- <b9270432-4ee8-be8e-8aa1-4b09992f82b8@redhat.com>
- <Yh+xA31FrfGoxXLB@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <Yh+xA31FrfGoxXLB@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <2976a926-9dbf-d955-166f-5677a06d9873@redhat.com>
+User-Agent: Mutt/2.1.5 (2021-12-30)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/2/22 19:01, Sean Christopherson wrote:
->> +	 */
->> +	if (!refcount_read(&kvm->users_count)) {
->> +		kvm_mmu_zap_all(kvm);
->> +		return;
->> +	}
+On Wed, Mar 02, 2022 at 07:05:32PM +0100, Paolo Bonzini wrote:
+> On 3/2/22 18:38, Philippe Mathieu-Daudé wrote:
+> > On 2/3/22 18:31, Sergio Lopez wrote:
+> > > On Wed, Mar 02, 2022 at 06:18:59PM +0100, Philippe Mathieu-Daudé wrote:
+> > > > On 2/3/22 18:10, Paolo Bonzini wrote:
+> > > > > On 3/2/22 12:36, Sergio Lopez wrote:
+> > > > > > With the possibility of using pipefd as a replacement on operating
+> > > > > > systems that doesn't support eventfd, vhost-user can also work on BSD
+> > > > > > systems.
+> > > > > > 
+> > > > > > This change allows enabling vhost-user on BSD platforms too and
+> > > > > > makes libvhost_user (which still depends on eventfd) a linux-only
+> > > > > > feature.
+> > > > > > 
+> > > > > > Signed-off-by: Sergio Lopez <slp@redhat.com>
+> > > > > 
+> > > > > I would just check for !windows.
+> > > > 
+> > > > What about Darwin / Haiku / Illumnos?
+> > > 
+> > > It should work on every system providing pipe() or pipe2(), so I guess
+> > > Paolo's right, every platform except Windows. FWIW, I already tested
+> > > it with Darwin.
+> > 
+> > Wow, nice.
+> > 
+> > So maybe simply check for pipe/pipe2 rather than !windows?
 > 
-> I'd prefer we make this an assertion and shove this logic to set_nx_huge_pages(),
-> because in that case there's no need to zap anything, the guest can never run
-> again.  E.g. (I'm trying to remember why I didn't do this before...)
+> What you really need is not pipes, but AF_UNIX.
 
-I did it this way because it seemed like a reasonable fallback for any 
-present or future caller.
+Recent Windows has AF_UNIX so don't check for that ! What you really
+need is AF_UNIX and FD passing and pipes and probably more POSIX
+only features ...
 
-> One thing that keeps tripping me up is the "readers" verbiage.  I get confused
-> because taking mmu_lock for read vs. write doesn't really have anything to do with
-> reading or writing state, e.g. "readers" still write SPTEs, and so I keep thinking
-> "readers" means anything iterating over the set of roots.  Not sure if there's a
-> shorthand that won't be confusing.
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
-Not that I know of.  You really need to know that the rwlock is been 
-used for its shared/exclusive locking behavior.  But even on ther OSes 
-use shared/exclusive instead of read/write, there are no analogous nouns 
-and people end up using readers/writers anyway.
-
->> It passes a smoke test, and also resolves the debate on the fate of patch 1.
-> +1000, I love this approach.  Do you want me to work on a v3, or shall I let you
-> have the honors?
-
-I'm already running the usual battery of tests, so I should be able to 
-post it either tomorrow (early in my evening) or Friday morning.
-
-Paolo
