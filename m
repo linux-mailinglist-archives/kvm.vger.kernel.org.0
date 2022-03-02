@@ -2,81 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F32E04C9B0C
-	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 03:13:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C5124C9B13
+	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 03:16:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236894AbiCBCOJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Mar 2022 21:14:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40808 "EHLO
+        id S239022AbiCBCQ5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Mar 2022 21:16:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233599AbiCBCOI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Mar 2022 21:14:08 -0500
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F86DA6458
-        for <kvm@vger.kernel.org>; Tue,  1 Mar 2022 18:13:26 -0800 (PST)
-Received: by mail-pl1-x630.google.com with SMTP id p17so307243plo.9
-        for <kvm@vger.kernel.org>; Tue, 01 Mar 2022 18:13:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=AEMZJRS8IqK9uNi4M2qX2/wELWJ9IFmUki7Kwk7iHP4=;
-        b=Ekob+DJE0CC3Gv3pJRHwdNbi6IBC6alr3hYiaUe1W4JGBFWY2EGgAPFCfwX2GosM+j
-         lpYwNhx8Idh5RR+v/yeda3ZHRiqYYH9gY1EpSF2dCq3h1ctDda9p2hvdnXODB6A0HhZx
-         Zk60ovO3b9aVaN2ktCz8dYImebxHPIMEApY3bGdCcrn36DOPg0zZcOxjgjD8jcxjOfpr
-         BI6/egavuDuaP6/NQV5oA1aRHM4UlXE5GOMeMA797hvlyaJ4CaAGcxlWYjF/D970rxS1
-         BpOxmiZgQhMXHUGiSfmsiMGljMwRg7xBRCCd6m0t1b222fAJj79dCC1MzKn150HoiB0X
-         vzFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=AEMZJRS8IqK9uNi4M2qX2/wELWJ9IFmUki7Kwk7iHP4=;
-        b=FQa0HT04/hxd2YJLwnnPstzIBmoA1RCbRii58/OuA1+YVIX3G8rfD9/MWpbL2t6XLQ
-         v3We4Q0xngLkzsx7PIF5sNyF11cHuRFgTV79Q94EmnZHHeLq+npq8NGMqcZrk7qU4YOg
-         BXA1jlHXId0rkQBk6t+221b126OLlBqmP5hLUVxotVAdLnhV6NntXQoT3Qe4TD7iND/P
-         HPqNw6779eVigH2QuWCVx21ST6S9ATLb5pI1GA/2r9OQYf5Tl0Wb6RTxS84+BSQQPBDg
-         GnDAGb3l3FJVZSIgiyiDqiXjqPNmtsLwKfFq8YvcTCFiGmh4hNGlm6Eze+fzgLJVd7xI
-         ZiYg==
-X-Gm-Message-State: AOAM531HUVgRm2CtYuUqmGOez49clIVVjZvODQ9GbfT43q7es3egNjCC
-        oIXI4KOUEdHuCJAxIcQQWiEYZQ==
-X-Google-Smtp-Source: ABdhPJwJrlt03GWVX9IYgUy6vuwXENTmjtTF9uAv8H842eEhRHR4T29Qu9+KEeH8ZepvUiJNXViaUA==
-X-Received: by 2002:a17:90b:94e:b0:1bc:c99f:ede1 with SMTP id dw14-20020a17090b094e00b001bcc99fede1mr24857938pjb.49.1646187205310;
-        Tue, 01 Mar 2022 18:13:25 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id oc3-20020a17090b1c0300b001bce36844c7sm3440320pjb.17.2022.03.01.18.13.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Mar 2022 18:13:24 -0800 (PST)
-Date:   Wed, 2 Mar 2022 02:13:20 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        with ESMTP id S234174AbiCBCQ4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Mar 2022 21:16:56 -0500
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 574AAA6538;
+        Tue,  1 Mar 2022 18:16:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1646187374; x=1677723374;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=4Hiyt5dZjcaCsevSHXidVkJd6JOIrtctfkgDLRVUoIE=;
+  b=Gkh5SFmI4BHZefo3RgZ/P3EseAuRE79B8dyB4DuRg/ebNnQPBIb2Y9pi
+   9ETC/uSXpV3E7CQGmMdjuut2Wycns/W/7eeAV3WkgpSsEu4V8rL9e1/m/
+   AHzY2kSrtcTzlOyr4mVSBHlrQe6+pv9DfN+iQUopQi0u9Sl8x2e9ewr1T
+   +12DSNwFYCl68htsDHveX9p5SyCFxq1rpGppwcd8iRguRMrNDKKui8o4z
+   uTpGSzDwVoBH6l6OETNaMyhJMee0JFR6d5g1EAwAp+f+wGEdFGgYFGD1A
+   w/DHjBhtH4K/LqwyrNbcg2lKQNspzNG8n3TNl9Kh+b06Rvvq/Xy3BYNk5
+   A==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10273"; a="316505579"
+X-IronPort-AV: E=Sophos;i="5.90,146,1643702400"; 
+   d="scan'208";a="316505579"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2022 18:16:13 -0800
+X-IronPort-AV: E=Sophos;i="5.90,146,1643702400"; 
+   d="scan'208";a="510811742"
+Received: from cqiang-mobl.ccr.corp.intel.com (HELO [10.238.1.149]) ([10.238.1.149])
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2022 18:16:11 -0800
+Message-ID: <4627ae0f-63f7-8b01-5018-56d42ed559b1@intel.com>
+Date:   Wed, 2 Mar 2022 10:15:49 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Firefox/91.0 Thunderbird/91.6.1
+Subject: Re: [PATCH v3] KVM: VMX: Enable Notify VM exit
+Content-Language: en-US
+To:     Jim Mattson <jmattson@google.com>,
+        Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        Mingwei Zhang <mizhang@google.com>
-Subject: Re: [PATCH v3 20/28] KVM: x86/mmu: Allow yielding when zapping GFNs
- for defunct TDP MMU root
-Message-ID: <Yh7SwAR/H5dPrqLN@google.com>
-References: <20220226001546.360188-1-seanjc@google.com>
- <20220226001546.360188-21-seanjc@google.com>
- <28276890-c90c-e9a9-3cab-15264617ef5a@redhat.com>
- <Yh53V23gSJ6jphnS@google.com>
- <f444790d-3bc7-9870-576e-29f30354a63b@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f444790d-3bc7-9870-576e-29f30354a63b@redhat.com>
-X-Spam-Status: No, score=-18.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20220223062412.22334-1-chenyi.qiang@intel.com>
+ <CALMp9eT50LjXYSwfWENjmfg=XxT4Bx3RzOYubKty8kr_APXCEw@mail.gmail.com>
+ <88eb9a9a-fbe3-8e2c-02bd-4bdfc855b67f@intel.com>
+ <6a839b88-392d-886d-836d-ca04cf700dce@intel.com>
+ <7859e03f-10fa-dbc2-ed3c-5c09e62f9016@redhat.com>
+ <bcc83b3d-31fe-949a-6bbf-4615bb982f0c@intel.com>
+ <CALMp9eT1NRudtVqPuHU8Y8LpFYWZsAB_MnE2BAbg5NY0jR823w@mail.gmail.com>
+ <CALMp9eS6cBDuax8O=woSdkNH2e2Y2EodE-7EfUTFfzBvCWCmcg@mail.gmail.com>
+ <71736b9d-9ed4-ea02-e702-74cae0340d66@intel.com>
+ <CALMp9eRwKHa0zdUFtSEBVCwV=MHJ-FmvW1uERxCt+_+Zz4z8fg@mail.gmail.com>
+ <4b2ddc09-f68d-1cc3-3d10-f7651d811fc3@intel.com>
+ <CALMp9eQj4Xr9VAdHw4BfPEskQYptEYYHRrpmFfVU1TCQJmHwug@mail.gmail.com>
+ <1cca344e-1c2d-8ebf-87ae-d9298a73306a@intel.com>
+ <CALMp9eR_gPSAkSHtgOjAqJDEXF-=8aaoV0nXP3GmZ_J9sTBJFg@mail.gmail.com>
+ <91859fc0-82e0-cb74-e519-68f08c9c796d@intel.com>
+ <CALMp9eSJgGJxSjej85yYvTav-n=KHNEPo4m2hEqsET+bHrXLew@mail.gmail.com>
+From:   Chenyi Qiang <chenyi.qiang@intel.com>
+In-Reply-To: <CALMp9eSJgGJxSjej85yYvTav-n=KHNEPo4m2hEqsET+bHrXLew@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -84,154 +81,211 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-/facepalm
-
-After typing up all of the below, I actually tried the novel idea of compiling
-the code... and we can't do xchg() on role.invalid because it occupies a single
-bit, it's not a standalone boolean.  I completely agree that the xchg() code is
-far, far cleaner, but we'd have to sacrifice using a full byte for "smm" _and_
-write some rather ugly code for retrieving a pointer to "invalid".
-
-TL;DR: this
-
-	smp_mb__after_atomic();
-
-	if (root->role.invalid) {
-		return;
-	}
-
-	root->role.invalid = true;
-
-	smp_mb__before_atomic();
-
-is just a weirdly open coded xchg() that operates on a single bit field.
 
 
-On Tue, Mar 01, 2022, Paolo Bonzini wrote:
-> On 3/1/22 20:43, Sean Christopherson wrote:
-> > > and after spending quite some time I wonder if all this should just be
-> > > 
-> > >          if (refcount_dec_not_one(&root->tdp_mmu_root_count))
-> > >                  return;
-> > > 
-> > > 	if (!xchg(&root->role.invalid, true) {
-> > 
-> > The refcount being '1' means there's another task currently using root, marking
-> > the root invalid will mean checks on the root's validity are non-deterministic
-> > for the other task.
+On 3/2/2022 5:57 AM, Jim Mattson wrote:
+> On Mon, Feb 28, 2022 at 9:30 PM Xiaoyao Li <xiaoyao.li@intel.com> wrote:
+>>
+>> On 3/1/2022 12:32 PM, Jim Mattson wrote:
+>>> On Mon, Feb 28, 2022 at 5:41 PM Xiaoyao Li <xiaoyao.li@intel.com> wrote:
+>>>>
+>>>> On 2/28/2022 10:30 PM, Jim Mattson wrote:
+>>>>> On Sun, Feb 27, 2022 at 11:10 PM Xiaoyao Li <xiaoyao.li@intel.com> wrote:
+>>>>>>
+>>>>>> On 2/26/2022 10:24 PM, Jim Mattson wrote:
+>>>>>>> On Fri, Feb 25, 2022 at 10:24 PM Xiaoyao Li <xiaoyao.li@intel.com> wrote:
+>>>>>>>>
+>>>>>>>> On 2/26/2022 12:53 PM, Jim Mattson wrote:
+>>>>>>>>> On Fri, Feb 25, 2022 at 8:25 PM Jim Mattson <jmattson@google.com> wrote:
+>>>>>>>>>>
+>>>>>>>>>> On Fri, Feb 25, 2022 at 8:07 PM Xiaoyao Li <xiaoyao.li@intel.com> wrote:
+>>>>>>>>>>>
+>>>>>>>>>>> On 2/25/2022 11:13 PM, Paolo Bonzini wrote:
+>>>>>>>>>>>> On 2/25/22 16:12, Xiaoyao Li wrote:
+>>>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>> I don't like the idea of making things up without notifying userspace
+>>>>>>>>>>>>>>> that this is fictional. How is my customer running nested VMs supposed
+>>>>>>>>>>>>>>> to know that L2 didn't actually shutdown, but L0 killed it because the
+>>>>>>>>>>>>>>> notify window was exceeded? If this information isn't reported to
+>>>>>>>>>>>>>>> userspace, I have no way of getting the information to the customer.
+>>>>>>>>>>>>>>
+>>>>>>>>>>>>>> Then, maybe a dedicated software define VM exit for it instead of
+>>>>>>>>>>>>>> reusing triple fault?
+>>>>>>>>>>>>>>
+>>>>>>>>>>>>>
+>>>>>>>>>>>>> Second thought, we can even just return Notify VM exit to L1 to tell
+>>>>>>>>>>>>> L2 causes Notify VM exit, even thought Notify VM exit is not exposed
+>>>>>>>>>>>>> to L1.
+>>>>>>>>>>>>
+>>>>>>>>>>>> That might cause NULL pointer dereferences or other nasty occurrences.
+>>>>>>>>>>>
+>>>>>>>>>>> IMO, a well written VMM (in L1) should handle it correctly.
+>>>>>>>>>>>
+>>>>>>>>>>> L0 KVM reports no Notify VM Exit support to L1, so L1 runs without
+>>>>>>>>>>> setting Notify VM exit. If a L2 causes notify_vm_exit with
+>>>>>>>>>>> invalid_vm_context, L0 just reflects it to L1. In L1's view, there is no
+>>>>>>>>>>> support of Notify VM Exit from VMX MSR capability. Following L1 handler
+>>>>>>>>>>> is possible:
+>>>>>>>>>>>
+>>>>>>>>>>> a)      if (notify_vm_exit available & notify_vm_exit enabled) {
+>>>>>>>>>>>                      handle in b)
+>>>>>>>>>>>              } else {
+>>>>>>>>>>>                      report unexpected vm exit reason to userspace;
+>>>>>>>>>>>              }
+>>>>>>>>>>>
+>>>>>>>>>>> b)      similar handler like we implement in KVM:
+>>>>>>>>>>>              if (!vm_context_invalid)
+>>>>>>>>>>>                      re-enter guest;
+>>>>>>>>>>>              else
+>>>>>>>>>>>                      report to userspace;
+>>>>>>>>>>>
+>>>>>>>>>>> c)      no Notify VM Exit related code (e.g. old KVM), it's treated as
+>>>>>>>>>>> unsupported exit reason
+>>>>>>>>>>>
+>>>>>>>>>>> As long as it belongs to any case above, I think L1 can handle it
+>>>>>>>>>>> correctly. Any nasty occurrence should be caused by incorrect handler in
+>>>>>>>>>>> L1 VMM, in my opinion.
+>>>>>>>>>>
+>>>>>>>>>> Please test some common hypervisors (e.g. ESXi and Hyper-V).
+>>>>>>>>>
+>>>>>>>>> I took a look at KVM in Linux v4.9 (one of our more popular guests),
+>>>>>>>>> and it will not handle this case well:
+>>>>>>>>>
+>>>>>>>>>              if (exit_reason < kvm_vmx_max_exit_handlers
+>>>>>>>>>                  && kvm_vmx_exit_handlers[exit_reason])
+>>>>>>>>>                      return kvm_vmx_exit_handlers[exit_reason](vcpu);
+>>>>>>>>>              else {
+>>>>>>>>>                      WARN_ONCE(1, "vmx: unexpected exit reason 0x%x\n", exit_reason);
+>>>>>>>>>                      kvm_queue_exception(vcpu, UD_VECTOR);
+>>>>>>>>>                      return 1;
+>>>>>>>>>              }
+>>>>>>>>>
+>>>>>>>>> At least there's an L1 kernel log message for the first unexpected
+>>>>>>>>> NOTIFY VM-exit, but after that, there is silence. Just a completely
+>>>>>>>>> inexplicable #UD in L2, assuming that L2 is resumable at this point.
+>>>>>>>>
+>>>>>>>> At least there is a message to tell L1 a notify VM exit is triggered in
+>>>>>>>> L2. Yes, the inexplicable #UD won't be hit unless L2 triggers Notify VM
+>>>>>>>> exit with invalid_context, which is malicious to L0 and L1.
+>>>>>>>
+>>>>>>> There is only an L1 kernel log message *the first time*. That's not
+>>>>>>> good enough. And this is just one of the myriad of possible L1
+>>>>>>> hypervisors.
+>>>>>>>
+>>>>>>>> If we use triple_fault (i.e., shutdown), then no info to tell L1 that
+>>>>>>>> it's caused by Notify VM exit with invalid context. Triple fault needs
+>>>>>>>> to be extended and L1 kernel needs to be enlightened. It doesn't help
+>>>>>>>> old guest kernel.
+>>>>>>>>
+>>>>>>>> If we use Machine Check, it's somewhat same inexplicable to L2 unless
+>>>>>>>> it's enlightened. But it doesn't help old guest kernel.
+>>>>>>>>
+>>>>>>>> Anyway, for Notify VM exit with invalid context from L2, I don't see a
+>>>>>>>> good solution to tell L1 VMM it's a "Notify VM exit with invalid context
+>>>>>>>> from L2" and keep all kinds of L1 VMM happy, especially for those with
+>>>>>>>> old kernel versions.
+>>>>>>>
+>>>>>>> I agree that there is no way to make every conceivable L1 happy.
+>>>>>>> That's why the information needs to be surfaced to the L0 userspace. I
+>>>>>>> contend that any time L0 kvm violates the architectural specification
+>>>>>>> in its emulation of L1 or L2, the L0 userspace *must* be informed.
+>>>>>>
+>>>>>> We can make the design to exit to userspace on notify vm exit
+>>>>>> unconditionally with exit_qualification passed, then userspace can take
+>>>>>> the same action like what this patch does in KVM that
+>>>>>>
+>>>>>>      - re-enter guest when context_invalid is false;
+>>>>>>      - stop running the guest if context_invalid is true; (userspace can
+>>>>>> definitely re-enter the guest in this case, but it needs to take the
+>>>>>> fall on this)
+>>>>>>
+>>>>>> Then, for nested case, L0 needs to enable it transparently for L2 if
+>>>>>> this feature is enabled for L1 guest (the reason as we all agreed that
+>>>>>> cannot allow L1 to escape just by creating a L2). Then what should KVM
+>>>>>> do when notify vm exit from L2?
+>>>>>>
+>>>>>>      - Exit to L0 userspace on L2's notify vm exit. L0 userspace takes the
+>>>>>> same action:
+>>>>>>            - re-enter if context-invalid is false;
+>>>>>>            - kill L1 if context-invalid is true; (I don't know if there is any
+>>>>>> interface for L0 userspace to kill L2). Then it opens the potential door
+>>>>>> for malicious user to kill L1 by creating a L2 to trigger fatal notify
+>>>>>> vm exit. If you guys accept it, we can implement in this way.
+>>>>>>
+>>>>>>
+>>>>>> in conclusion, we have below solution:
+>>>>>>
+>>>>>> 1. Take this patch as is. The drawback is L1 VMM receives a triple_fault
+>>>>>> from L2 when L2 triggers notify vm exit with invalid context. Neither of
+>>>>>> L1 VMM, L1 userspace, nor L2 kernel know it's caused due to notify vm
+>>>>>> exit. There is only kernel log in L0, which seems not accessible for L1
+>>>>>> user or L2 guest.
+>>>>>
+>>>>> You are correct on that last point, and I feel that I cannot stress it
+>>>>> enough. In a typical environment, the L0 kernel log is only available
+>>>>> to the administrator of the L0 host.
+>>>>>
+>>>>>> 2. a) Inject notify vm exit back to L1 if L2 triggers notify vm exit
+>>>>>> with invalid context. The drawback is, old L1 hypervisor is not
+>>>>>> enlightened of it and maybe misbehave on it.
+>>>>>>
+>>>>>>        b) Inject a synthesized SHUTDOWN exit to L1, with additional info to
+>>>>>> tell it's caused by fatal notify vm exit from L2. It has the same
+>>>>>> drawback that old hypervisor has no idea of it and maybe misbehave on it.
+>>>>>>
+>>>>>> 3. Exit to L0 usersapce unconditionally no matter it's caused from L1 or
+>>>>>> L2. Then it may open the door for L1 user to kill L1.
+>>>>>>
+>>>>>> Do you have any better solution other than above? If no, we need to pick> >> one from above though it cannot make everyone happy.
+>>>>>
+>>>>> Yes, I believe I have a better solution. We obviously need an API for
+>>>>> userspace to synthesize a SHUTDOWN event for a vCPU.
+>>>>
+>>>> Can you elaborate on it? Do you mean userspace to inject a synthesized
+>>>> SHUTDOWN to guest? If so, I have no idea how it will work.
+>>>
+>>> It can probably be implemented as an extension of KVM_SET_VCPU_EVENTS
+>>> that invokes kvm_make_request(KVM_REQ_TRIPLE_FAULT).
+>>
+>> Then, you mean
+>>
+>> 1. notify vm exit from guest;
+>> 2. exit to userspace on notify vm exit;
+>> 3. a. if context_invalid, inject SHUTDOWN to vcpu from userspace to
+>> request KVM_REQ_TRIPLE_FAULT; goto step 4;
+>>      b. if !context_invalid, re-run vcpu; no step 4 and 5;
+>> 4. exit to userspace again with KVM_EXIT_SHUTDOWN due to triple fault;
+>> 5. userspace stop running the vcpu/VM
+>>
+>> Then why not handle it as KVM_EXIT_SHUTDOWN directly in 3.a ? I don't
+>> get the point of userspace to inject TRIPLE_FAULT to KVM.
 > 
-> Do you mean it's not possible to use refcount_dec_not_one, otherwise
-> kvm_tdp_mmu_get_root is not guaranteed to reject the root?
-
-Scratch my objection, KVM already assumes concurrent readers may or may not see
-role.invalid as true.  I deliberately went that route so as to avoid having to
-require specific ordering between checking role.invalid and getting a reference.
-
-As my comment further down states, "allocating" a new root is the only flow that
-absolutely cannot consume a soon-to-be-invalid root, and it takes mmu_lock for
-write so it can't be running concurrently.
-
-So, we don't need to rely on xchg() for barriers, the only consumers of the barriers
-are kvm_tdp_mmu_put_root() and they'll obviously always do an atomic xchg().
-
-Invalidating the root while it's refcount is >=1 is also ok, but I thinks that's
-flawed for a different reason (see comments on refcount_set(..., 0)).
-
-> > > 	 	tdp_mmu_zap_root(kvm, root, shared);
-> > > 
-> > > 		/*
-> > > 		 * Do not assume the refcount is still 1: because
-> > > 		 * tdp_mmu_zap_root can yield, a different task
-> > > 		 * might have grabbed a reference to this root.
-> > > 		 *
-> > > 	        if (refcount_dec_not_one(&root->tdp_mmu_root_count))
-> > 
-> > This is wrong, _this_ task can't drop a reference taken by the other task.
+> Sure, that should work, as long as L0 userspace is notified of the
+> emulation error.
 > 
-> This is essentially the "kvm_tdp_mmu_put_root(kvm, root, shared);" (or "goto
-> beginning_of_function;") part of your patch.
+> Going back to something you said previously:
 
-Gah, I didn't read the code/comments for refcount_dec_not_one().  I assumed it
-was "decrement and return true if the result is not '1'", not "decrement unless
-the count is already '1', and return true if there was a decrement".  In hindsight,
-the former makes no sense at all...
+So, after adding the nested handling case, can we summarize the whole 
+working flow as:
 
-> > >          	        return;
-> > > 	}
-> > > 
-> > > 	/*
-> > > 	 * The root is invalid, and its reference count has reached
-> > > 	 * zero.  It must have been zapped either in the "if" above or
-> > > 	 * by someone else, and we're definitely the last thread to see
-> > > 	 * it apart from RCU-protected page table walks.
-> > > 	 */
-> > > 	refcount_set(&root->tdp_mmu_root_count, 0);
-> > 
-> > Not sure what you intended here, KVM should never force a refcount to '0'.
-> 
-> It's turning a refcount_dec_not_one into a refcount_dec_and_test.  It seems
-> legit to me, because the only refcount_inc_not_zero is in a write-side
-> critical section.  If the refcount goes to zero on the read-side, the root
-> is gone for good.
+1. notify VM exit from guest;
+2. a. if !context_invalid, resume vcpu, no further process;
+    b. if context_invalid, exit to userspace;
+3. userspace injects SHUTDOWN event by KVM_SET_VCPU_EVENTS to request 
+KVM_REQ_TRIPLE_FAULT;
+4. a. if !is_guest_mode(vcpu), exit to userspace again with 
+KVM_EXIT_SHUTDOWN due to triple fault. L1 shutdown;
+    b. if is_guest_mode(vcpu), synthesize a nested triple fault to L1. 
+L2 shutdown;
 
-The issue is that by using refcount_dec_not_one() above, there's no guarantee that
-this task is the last one to see it as kvm_tdp_mmu_get_root() can succeed and bump
-the refcount between refcount_dec_not_one() and here.  Freeing the root would lead
-to use-after-free because iterators (rightly) assuming that RCU protection isn't
-needed once they have a reference.  RCU protection is needed only if the user of the
-iterator wants to dereference page table memory.
- 
-> > xchg() is a very good idea.  The smp_mb_*() stuff was carried over from the previous
-> > version where this sequence set another flag in addition to role.invalid.
-> > 
-> > Is this less funky (untested)?
-> > 
-> > 	/*
-> > 	 * Invalidate the root to prevent it from being reused by a vCPU while
-> > 	 * the root is being zapped, i.e. to allow yielding while zapping the
-> > 	 * root (see below).
-> > 	 *
-> > 	 * Free the root if it's already invalid.  Invalid roots must be zapped
-> > 	 * before their last reference is put, i.e. there's no work to be done,
-> > 	 * and all roots must be invalidated before they're freed (this code).
-> > 	 * Re-zapping invalid roots would put KVM into an infinite loop.
-> > 	 *
-> > 	 * Note, xchg() provides an implicit barrier to ensure role.invalid is
-> > 	 * visible if a concurrent reader acquires a reference after the root's
-> > 	 * refcount is reset.
-> > 	 */
-> > 	if (xchg(root->role.invalid, true))
-> > 		spin_lock(&kvm->arch.tdp_mmu_pages_lock);
-> > 		list_del_rcu(&root->link);
-> > 		spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
-> > 
-> > 		call_rcu(&root->rcu_head, tdp_mmu_free_sp_rcu_callback);
-> > 		return;
-> > 	}
 > 
-> Based on my own version, I guess you mean (without comments due to family
-> NMI):
+>>> In addition, to avoid breaking legacy userspace, the NOTIFY VM-exit should be opt-in.
 > 
->         if (!refcount_dec_and_test(&root->tdp_mmu_root_count))
->                 return;
+>> Yes, it's designed as opt-in already that the feature is off by default.
 > 
-> 	if (!xchg(&root->role.invalid, true) {
-> 		refcount_set(&root->tdp_mmu_count, 1);
-> 	 	tdp_mmu_zap_root(kvm, root, shared);
-> 	        if (!refcount_dec_and_test(&root->tdp_mmu_root_count))
->         	        return;
-> 	}
-> 
->         spin_lock(&kvm->arch.tdp_mmu_pages_lock);
->         list_del_rcu(&root->link);
->         spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
->         call_rcu(&root->rcu_head, tdp_mmu_free_sp_rcu_callback);
+> I meant that userspace should opt-in, per VM. I believe your design is
+> opt-in by system administrator, host-wide.
 
-That would work, though I'd prefer to recurse on kvm_tdp_mmu_put_root() instead
-of open coding refcount_dec_and_test() so that we get coverage of the xchg()
-doing the right thing.
+OK, we will change to the per-VM control.
 
-I still slightly prefer having the "free" path be inside the xchg().  To me, even
-though the "free" path is the only one that's guaranteed to be reached for every root, 
-the fall-through to resetting the refcount and zapping the root is the "normal" path,
-and the "free" path is the exception.
