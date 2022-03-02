@@ -2,143 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D97824CA622
-	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 14:35:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CE4984CA6BE
+	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 14:56:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242287AbiCBNgE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Mar 2022 08:36:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57308 "EHLO
+        id S241771AbiCBN4j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 08:56:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43502 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242278AbiCBNgA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 08:36:00 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D9E86C12C4
-        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 05:35:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646228117;
+        with ESMTP id S234460AbiCBN4f (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 08:56:35 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 152DF2B18E;
+        Wed,  2 Mar 2022 05:55:44 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 9FEF560B13;
+        Wed,  2 Mar 2022 13:55:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB550C004E1;
+        Wed,  2 Mar 2022 13:55:40 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="kpzYHDtU"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1646229339;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=XGrF2OvOB13H8iRdKK89NaWHd3b3kdRWqVVkxfYHHl8=;
-        b=RI4mYJmT3Ag+hpmLwatUIFZMP/krm0s5jkdMmF5GUQ+ihxDrZKu2McM3XXt46OckgramN3
-        O8lHTaYz4IlabNfsw6H+BcBTPk3LcoAylGawdaQ8otEQrIQkpjyc3sS8eAHi+MIgvRh+J9
-        akhf8L9XbfW/O91mgiO2yXVw3zhGbEE=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-537-TWP3p2wENICKWf-B3GF92Q-1; Wed, 02 Mar 2022 08:35:13 -0500
-X-MC-Unique: TWP3p2wENICKWf-B3GF92Q-1
-Received: by mail-wm1-f71.google.com with SMTP id h206-20020a1c21d7000000b003552c13626cso1935799wmh.3
-        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 05:35:13 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=XGrF2OvOB13H8iRdKK89NaWHd3b3kdRWqVVkxfYHHl8=;
-        b=KdHohwTYBUFo5fGNuOyO4Ov2Ce3UZKgocan3qK1jLFojUiiv0V9C60mRN80jbTM4jU
-         2zs9Dpge8PwfT6P7MXfjJSIvtq37TYHG8XxzTPuX4TK5zE4fzPueaeUAcUJdxVv3PY/8
-         X8m+zIKOSFEaOI4kz+9KmPm6PTeT5IJh/v0fRPCX80IvHsaQg+4qSs+UHrbBpH7i4ENd
-         GH8AgqpyGPH4pc2ujgUSwhrhXvBgIBguH7IZQ/SZQquWXP5EkqWASkfdBXSB/9UZdl3Y
-         5wJt5MJMhdazfQPCAfOF4zOJ+/8ygJO/Wui2Fos3o2BRkTTsha1vjAC+1L6RoXZr7YL1
-         4Khg==
-X-Gm-Message-State: AOAM532BIAxC8D7Ara+5h/TUod/GrFdAVYJNJa+Hh6+LWnyVAEiVP72T
-        rKoLVaTPBhefOXlBmbK/7qJvB9DTXfEV3JwHEsMpdWfP/IakCNyDqVQ87JY/rqNwBFwuIgFSFH0
-        Fy7ZgIWaJgjTx
-X-Received: by 2002:a5d:6083:0:b0:1ef:761f:521f with SMTP id w3-20020a5d6083000000b001ef761f521fmr18980613wrt.238.1646228112084;
-        Wed, 02 Mar 2022 05:35:12 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJySCve85nsCTXlx9aNBZP55c5oLeOj2XJY2HKDkxKXgqQ95h2DjvN7W+40S5rrP1rYGTiozEA==
-X-Received: by 2002:a5d:6083:0:b0:1ef:761f:521f with SMTP id w3-20020a5d6083000000b001ef761f521fmr18980603wrt.238.1646228111870;
-        Wed, 02 Mar 2022 05:35:11 -0800 (PST)
-Received: from redhat.com ([2a10:8006:355c:0:48d6:b937:2fb9:b7de])
-        by smtp.gmail.com with ESMTPSA id u23-20020a7bcb17000000b0037bdfa1665asm7640945wmj.18.2022.03.02.05.35.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Mar 2022 05:35:11 -0800 (PST)
-Date:   Wed, 2 Mar 2022 08:35:08 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     Lee Jones <lee.jones@linaro.org>, jasowang@redhat.com,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        stable@vger.kernel.org,
-        syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
-Subject: Re: [PATCH 1/1] vhost: Protect the virtqueue from being cleared
- whilst still in use
-Message-ID: <20220302083413-mutt-send-email-mst@kernel.org>
-References: <20220302075421.2131221-1-lee.jones@linaro.org>
- <20220302093446.pjq3djoqi434ehz4@sgarzare-redhat>
+        bh=SpVcuA/WXuSF2VylmDTidLRP/fq6dnIG3IJK6i0yAko=;
+        b=kpzYHDtUAlCnEdVEte//Tt36NxH+/Ez0o+kl3YdWmtGk9TZCjSHm6oGL/AbSTrC8Y1PuRg
+        jZ3NV3d2m9tjm6vre8HArSM79be/kQc4jqSkH3qUrcSXgTDy8VV6MN3iqBxSC6PUytw5x2
+        eJFYg/LLjTsXb0gq+k1Xln0G4fDjTNE=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id fd2dbd60 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Wed, 2 Mar 2022 13:55:38 +0000 (UTC)
+Date:   Wed, 2 Mar 2022 14:55:29 +0100
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Laszlo Ersek <lersek@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        QEMU Developers <qemu-devel@nongnu.org>,
+        linux-hyperv@vger.kernel.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Alexander Graf <graf@amazon.com>,
+        "Michael Kelley (LINUX)" <mikelley@microsoft.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        adrian@parity.io,
+        Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Jann Horn <jannh@google.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        "Brown, Len" <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
+        Linux PM <linux-pm@vger.kernel.org>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        Theodore Ts'o <tytso@mit.edu>, Arnd Bergmann <arnd@arndb.de>
+Subject: Re: propagating vmgenid outward and upward
+Message-ID: <Yh93UZMQSYCe2LQ7@zx2c4.com>
+References: <Yh4+9+UpanJWAIyZ@zx2c4.com>
+ <223f858c-34c5-3ccd-b9e8-7585a976364d@redhat.com>
+ <Yh5JwK6toc/zBNL7@zx2c4.com>
+ <20220301121419-mutt-send-email-mst@kernel.org>
+ <CAHmME9qieLUDVoPYZPo=N8NCL1T-RzQ4p7kCFv3PKFUkhWZPsw@mail.gmail.com>
+ <20220302031738-mutt-send-email-mst@kernel.org>
+ <CAHmME9pf-bjnZuweoLqoFEmPy1OK7ogEgGEAva1T8uVTufhCuw@mail.gmail.com>
+ <20220302074503-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20220302093446.pjq3djoqi434ehz4@sgarzare-redhat>
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+In-Reply-To: <20220302074503-mutt-send-email-mst@kernel.org>
+X-Spam-Status: No, score=-6.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 02, 2022 at 10:34:46AM +0100, Stefano Garzarella wrote:
-> On Wed, Mar 02, 2022 at 07:54:21AM +0000, Lee Jones wrote:
-> > vhost_vsock_handle_tx_kick() already holds the mutex during its call
-> > to vhost_get_vq_desc().  All we have to do is take the same lock
-> > during virtqueue clean-up and we mitigate the reported issues.
-> > 
-> > Link: https://syzkaller.appspot.com/bug?extid=279432d30d825e63ba00
-> 
-> This issue is similar to [1] that should be already fixed upstream by [2].
-> 
-> However I think this patch would have prevented some issues, because
-> vhost_vq_reset() sets vq->private to NULL, preventing the worker from
-> running.
-> 
-> Anyway I think that when we enter in vhost_dev_cleanup() the worker should
-> be already stopped, so it shouldn't be necessary to take the mutex. But in
-> order to prevent future issues maybe it's better to take them, so:
-> 
-> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-> 
-> [1]
-> https://syzkaller.appspot.com/bug?id=993d8b5e64393ed9e6a70f9ae4de0119c605a822
-> [2] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a58da53ffd70294ebea8ecd0eb45fd0d74add9f9
+Hi Michael,
 
+On Wed, Mar 02, 2022 at 07:58:33AM -0500, Michael S. Tsirkin wrote:
+> > There's also the atomicity aspect, which I think makes your benchmark
+> > not quite accurate. Those 16 bytes could change between the first and
+> > second word (or between the Nth and N+1th word for N<=3 on 32-bit).
+> > What if in that case the word you read second doesn't change, but the
+> > word you read first did? So then you find yourself having to do a
+> > hi-lo-hi dance.
+> > And then consider the 32-bit case, where that's even
+> > more annoying. This is just one of those things that comes up when you
+> > compare the semantics of a "large unique ID" and "word-sized counter",
+> > as general topics. (My suggestion is that vmgenid provide both.)
+> 
+> I don't see how this matters for any applications at all. Feel free to
+> present a case that would be race free with a word but not a 16
+> byte value, I could not imagine one. It's human to err of course.
 
-Right. I want to queue this but I would like to get a warning
-so we can detect issues like [2] before they cause more issues.
+Word-size reads happen all at once on systems that Linux supports,
+whereas this is not the case for 16 bytes (with a few niche exceptions
+like cmpxchg16b and such). If you read the counter atomically, you can
+check to see whether it's changed just after encrypting but before
+transmitting and not transmit if it has changed, and voila, no race.
+With 16 bytes, synchronization of that read is pretty tricky (though
+maybe not all together impossible), because, as I mentioned, the first
+word might have changed by the time you read a matching second word. I'm
+sure you're familiar with the use of seqlocks in the kernel for solving
+a somewhat related problem.
 
-
-> > 
-> > Cc: <stable@vger.kernel.org>
-> > Reported-by: syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
-> > Signed-off-by: Lee Jones <lee.jones@linaro.org>
-> > ---
-> > drivers/vhost/vhost.c | 2 ++
-> > 1 file changed, 2 insertions(+)
-> > 
-> > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> > index 59edb5a1ffe28..bbaff6a5e21b8 100644
-> > --- a/drivers/vhost/vhost.c
-> > +++ b/drivers/vhost/vhost.c
-> > @@ -693,6 +693,7 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
-> > 	int i;
-> > 
-> > 	for (i = 0; i < dev->nvqs; ++i) {
-> > +		mutex_lock(&dev->vqs[i]->mutex);
-> > 		if (dev->vqs[i]->error_ctx)
-> > 			eventfd_ctx_put(dev->vqs[i]->error_ctx);
-> > 		if (dev->vqs[i]->kick)
-> > @@ -700,6 +701,7 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
-> > 		if (dev->vqs[i]->call_ctx.ctx)
-> > 			eventfd_ctx_put(dev->vqs[i]->call_ctx.ctx);
-> > 		vhost_vq_reset(dev, dev->vqs[i]);
-> > +		mutex_unlock(&dev->vqs[i]->mutex);
-> > 	}
-> > 	vhost_dev_free_iovecs(dev);
-> > 	if (dev->log_ctx)
-> > -- 
-> > 2.35.1.574.g5d30c73bfb-goog
-> > 
-
+Jason
