@@ -2,90 +2,300 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5BF934CA847
-	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 15:35:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 942534CA853
+	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 15:41:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243136AbiCBOge (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Mar 2022 09:36:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36052 "EHLO
+        id S243159AbiCBOly (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 09:41:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243105AbiCBOgd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 09:36:33 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85E67C4B67;
-        Wed,  2 Mar 2022 06:35:50 -0800 (PST)
+        with ESMTP id S239151AbiCBOly (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 09:41:54 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F159C4B65
+        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 06:41:11 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 1980F615ED;
-        Wed,  2 Mar 2022 14:35:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65885C340ED;
-        Wed,  2 Mar 2022 14:35:47 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="TYEG0cFg"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1646231746;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=XGuMnK4OOgPCMwUmyaWZFFbNaYrxtgoILBjeCR8rojk=;
-        b=TYEG0cFgyV9/JXbncaM4Z4+kmqmWkOAaZHoc8I/mCAGlDB9vYaT74K6vhubYquTDWAr+qk
-        v4va5LWGM9xSmKOFJQRJgMOXGQqwJBuBgQz3jKkYz4vmBqYRv7Uvd1SvjJO2p45ulW0WKc
-        B12ugOBKyN0QfjbUkssv2iT7UBk9rnE=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 6f2e4d35 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Wed, 2 Mar 2022 14:35:45 +0000 (UTC)
-Date:   Wed, 2 Mar 2022 15:35:40 +0100
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        qemu-devel@nongnu.org, linux-hyperv@vger.kernel.org,
-        linux-crypto@vger.kernel.org, graf@amazon.com,
-        mikelley@microsoft.com, gregkh@linuxfoundation.org,
-        adrian@parity.io, lersek@redhat.com, berrange@redhat.com,
-        linux@dominikbrodowski.net, jannh@google.com, mst@redhat.com,
-        rafael@kernel.org, len.brown@intel.com, pavel@ucw.cz,
-        linux-pm@vger.kernel.org, colmmacc@amazon.com, tytso@mit.edu,
-        arnd@arndb.de
-Subject: Re: propagating vmgenid outward and upward
-Message-ID: <Yh+AvDzzxGjt240m@zx2c4.com>
-References: <Yh4+9+UpanJWAIyZ@zx2c4.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Yh4+9+UpanJWAIyZ@zx2c4.com>
-X-Spam-Status: No, score=-6.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 91E19614DD
+        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 14:41:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBE97C004E1;
+        Wed,  2 Mar 2022 14:41:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1646232070;
+        bh=DxnODdk51AgHTpe4eGxu5RQUtbpXH6AstFf+hpM+yuk=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=tB3DM/Z+BpDTVqOobBSFi18y36FdeU3O9hZIyjCVokzkCT3MStFRPd3Icm8yJ4Mit
+         vH3CTyIi/7pjIz+36A+LIzGECkSHQn8/kS8TudVcDAxrlN36yzjj7G8MZOlJC09FjW
+         hZ8rd5QVIaRsXJ6zCpMitibBTjmbr4gV4DWTFZq5ZTCvqfZ0AgbV59pY8oDrfZcXxL
+         92tYEkslt50/9+0Yiha6ZT6IYxPyiPpAlJKZ7S2Fc9+vmokEceJo10MYsSpgXoKRx7
+         oOPP6GNDm9S4HV2MZMFV898IrBdoiwuqpgW2edanPjHsvnfGAeEEEqHKJ9reIQY/JR
+         Ypd62TfLwOYKw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nPQA7-00Bi1f-FF; Wed, 02 Mar 2022 14:41:07 +0000
+Date:   Wed, 02 Mar 2022 14:41:07 +0000
+Message-ID: <8735k02z98.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Sebastian Ene <sebastianene@google.com>
+Cc:     kvm@vger.kernel.org, qperret@google.com,
+        kvmarm@lists.cs.columbia.edu, will@kernel.org,
+        julien.thierry.kdev@gmail.com
+Subject: Re: [PATCH kvmtool v7 2/3] aarch64: Add stolen time support
+In-Reply-To: <20220302140734.1015958-3-sebastianene@google.com>
+References: <20220302140734.1015958-1-sebastianene@google.com>
+        <20220302140734.1015958-3-sebastianene@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: sebastianene@google.com, kvm@vger.kernel.org, qperret@google.com, kvmarm@lists.cs.columbia.edu, will@kernel.org, julien.thierry.kdev@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hey again,
+Hi Sebastian,
 
-On Tue, Mar 01, 2022 at 04:42:47PM +0100, Jason A. Donenfeld wrote:
-> For (B), it's a little bit trickier. But I think our options follow the
-> same rubric. We can expose a generation counter in the vDSO, with
-> semantics akin to the extern integer I described above. Or we could
-> expose that counter in a file that userspace could poll() on and receive
-> notifications that way. Or perhaps a third way. I'm all ears here.
-> Alex's team from Amazon last year proposed something similar to the vDSO
-> idea, except using mmap on a sysfs file, though from what I can tell,
-> that wound up being kind of complicated. Due to the fact that we're
-> _already_ racy, I think I'm most inclined at this point toward the
-> poll() approach for the same reasons as I prefer a notifier_block. But
-> on userspace I could be convinced otherwise, and I'd be interested in
-> totally different ideas here too.
+On Wed, 02 Mar 2022 14:07:35 +0000,
+Sebastian Ene <sebastianene@google.com> wrote:
+> 
+> This patch adds support for stolen time by sharing a memory region
+> with the guest which will be used by the hypervisor to store the stolen
+> time information. Reserve a 64kb MMIO memory region after the RTC peripheral
+> to be used by pvtime. The exact format of the structure stored by the
+> hypervisor is described in the ARM DEN0057A document.
+> 
+> Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> ---
+>  Makefile                               |   1 +
+>  arm/aarch64/arm-cpu.c                  |   2 +-
+>  arm/aarch64/include/kvm/kvm-cpu-arch.h |   1 +
+>  arm/aarch64/pvtime.c                   | 103 +++++++++++++++++++++++++
+>  arm/include/arm-common/kvm-arch.h      |   6 +-
+>  include/kvm/kvm-config.h               |   1 +
+>  6 files changed, 112 insertions(+), 2 deletions(-)
+>  create mode 100644 arm/aarch64/pvtime.c
+> 
+> diff --git a/Makefile b/Makefile
+> index f251147..e9121dc 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -182,6 +182,7 @@ ifeq ($(ARCH), arm64)
+>  	OBJS		+= arm/aarch64/arm-cpu.o
+>  	OBJS		+= arm/aarch64/kvm-cpu.o
+>  	OBJS		+= arm/aarch64/kvm.o
+> +	OBJS		+= arm/aarch64/pvtime.o
+>  	ARCH_INCLUDE	:= $(HDRS_ARM_COMMON)
+>  	ARCH_INCLUDE	+= -Iarm/aarch64/include
+>  
+> diff --git a/arm/aarch64/arm-cpu.c b/arm/aarch64/arm-cpu.c
+> index d7572b7..7e4a3c1 100644
+> --- a/arm/aarch64/arm-cpu.c
+> +++ b/arm/aarch64/arm-cpu.c
+> @@ -22,7 +22,7 @@ static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
+>  static int arm_cpu__vcpu_init(struct kvm_cpu *vcpu)
+>  {
+>  	vcpu->generate_fdt_nodes = generate_fdt_nodes;
+> -	return 0;
+> +	return kvm_cpu__setup_pvtime(vcpu);
+>  }
+>  
+>  static struct kvm_arm_target target_generic_v8 = {
+> diff --git a/arm/aarch64/include/kvm/kvm-cpu-arch.h b/arm/aarch64/include/kvm/kvm-cpu-arch.h
+> index 8dfb82e..2b2c1ff 100644
+> --- a/arm/aarch64/include/kvm/kvm-cpu-arch.h
+> +++ b/arm/aarch64/include/kvm/kvm-cpu-arch.h
+> @@ -19,5 +19,6 @@
+>  
+>  void kvm_cpu__select_features(struct kvm *kvm, struct kvm_vcpu_init *init);
+>  int kvm_cpu__configure_features(struct kvm_cpu *vcpu);
+> +int kvm_cpu__setup_pvtime(struct kvm_cpu *vcpu);
+>  
+>  #endif /* KVM__KVM_CPU_ARCH_H */
+> diff --git a/arm/aarch64/pvtime.c b/arm/aarch64/pvtime.c
+> new file mode 100644
+> index 0000000..fdde683
+> --- /dev/null
+> +++ b/arm/aarch64/pvtime.c
+> @@ -0,0 +1,103 @@
+> +#include "kvm/kvm.h"
+> +#include "kvm/kvm-cpu.h"
+> +#include "kvm/util.h"
+> +
+> +#include <linux/byteorder.h>
+> +#include <linux/types.h>
+> +
+> +#define ARM_PVTIME_STRUCT_SIZE		(64)
+> +
+> +struct pvtime_data_priv {
+> +	bool	is_supported;
+> +	char	*usr_mem;
 
-I implemented the poll() case here in 15 lines of code and found it
-remarkably simple to do:
+Consider using void * for pointers that do not have any particular
+semantics associated to them.
 
-https://lore.kernel.org/lkml/20220302143331.654426-1-Jason@zx2c4.com/
+> +};
+> +
+> +static struct pvtime_data_priv pvtime_data = {
+> +	.is_supported	= true,
+> +	.usr_mem	= NULL
+> +};
+> +
+> +static int pvtime__alloc_region(struct kvm *kvm)
+> +{
+> +	char *mem;
+> +	int ret = 0;
+> +
+> +	mem = mmap(NULL, ARM_PVTIME_MMIO_SIZE, PROT_RW,
 
-This is just a PoC/RFC for the sake of having something tangible to look
-at for this thread. It is notable to me, though, that implementing this
-was so minimal.
+I sort of object to the 'MMIO' part of the name. The spec is quite
+clear that this should be normal memory. That's purely cosmetic, but
+still a bit confusing.
 
-Regards,
-Jason
+> +		   MAP_ANON_NORESERVE, -1, 0);
+> +	if (mem == MAP_FAILED)
+> +		return -errno;
+> +
+> +	ret = kvm__register_dev_mem(kvm, ARM_PVTIME_MMIO_BASE,
+> +				    ARM_PVTIME_MMIO_SIZE, mem);
+
+This, on the other side, is wrong. Since the pvtime pages are memory,
+mapping them with device attributes will do the wrong thing (the
+hypervisor will write to a cacheable mapping, and the guest will
+bypass the cache due to the S2 override that you provide here).
+
+kvm__register_ram() is more likely to lead to the behaviour you'd
+expect.
+
+> +	if (ret) {
+> +		munmap(mem, ARM_PVTIME_MMIO_SIZE);
+> +		return ret;
+> +	}
+> +
+> +	pvtime_data.usr_mem = mem;
+> +	return ret;
+> +}
+> +
+> +static int pvtime__teardown_region(struct kvm *kvm)
+> +{
+> +	if (pvtime_data.usr_mem == NULL)
+> +		return 0;
+> +
+> +	kvm__destroy_mem(kvm, ARM_PVTIME_MMIO_BASE,
+> +			 ARM_PVTIME_MMIO_SIZE, pvtime_data.usr_mem);
+> +	munmap(pvtime_data.usr_mem, ARM_PVTIME_MMIO_SIZE);
+> +	pvtime_data.usr_mem = NULL;
+> +	return 0;
+> +}
+> +
+> +dev_exit(pvtime__teardown_region);
+> +
+> +int kvm_cpu__setup_pvtime(struct kvm_cpu *vcpu)
+> +{
+> +	int ret;
+> +	bool has_stolen_time;
+> +	u64 pvtime_guest_addr = ARM_PVTIME_MMIO_BASE + vcpu->cpu_id *
+> +		ARM_PVTIME_STRUCT_SIZE;
+> +	struct kvm_config *kvm_cfg = NULL;
+> +	struct kvm_device_attr pvtime_attr = (struct kvm_device_attr) {
+> +		.group	= KVM_ARM_VCPU_PVTIME_CTRL,
+> +		.addr	= KVM_ARM_VCPU_PVTIME_IPA
+> +	};
+> +
+> +	kvm_cfg = &vcpu->kvm->cfg;
+> +	if (kvm_cfg->no_pvtime)
+> +		return 0;
+> +
+> +	if (!pvtime_data.is_supported)
+> +		return -ENOTSUP;
+
+It is a bit odd to have this hard failure if running on a system that
+doesn't have pvtime. It forces the user to alter their command-line,
+which is a bit annoying. I'd rather have a soft-fail here.
+
+> +
+> +	has_stolen_time = kvm__supports_extension(vcpu->kvm,
+> +						  KVM_CAP_STEAL_TIME);
+> +	if (!has_stolen_time)
+> +		return 0;
+> +
+> +	ret = ioctl(vcpu->vcpu_fd, KVM_HAS_DEVICE_ATTR, &pvtime_attr);
+> +	if (ret) {
+> +		perror("KVM_HAS_DEVICE_ATTR failed\n");
+> +		goto out_err;
+> +	}
+> +
+> +	if (!pvtime_data.usr_mem) {
+> +		ret = pvtime__alloc_region(vcpu->kvm);
+> +		if (ret) {
+> +			perror("Failed allocating pvtime region\n");
+> +			goto out_err;
+> +		}
+> +	}
+> +
+> +	pvtime_attr.addr = (u64)&pvtime_guest_addr;
+> +	ret = ioctl(vcpu->vcpu_fd, KVM_SET_DEVICE_ATTR, &pvtime_attr);
+> +	if (!ret)
+> +		return 0;
+> +
+> +	perror("KVM_SET_DEVICE_ATTR failed\n");
+> +	pvtime__teardown_region(vcpu->kvm);
+> +out_err:
+> +	pvtime_data.is_supported = false;
+> +	return ret;
+> +}
+> diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
+> index c645ac0..3f82663 100644
+> --- a/arm/include/arm-common/kvm-arch.h
+> +++ b/arm/include/arm-common/kvm-arch.h
+> @@ -15,7 +15,8 @@
+>   * |  PCI  |////| plat  |       |        |     |         |
+>   * |  I/O  |////| MMIO: | Flash | virtio | GIC |   PCI   |  DRAM
+>   * | space |////| UART, |       |  MMIO  |     |  (AXI)  |
+> - * |       |////| RTC   |       |        |     |         |
+> + * |       |////| RTC,  |       |        |     |         |
+> + * |       |////| PVTIME|       |        |     |         |
+>   * +-------+----+-------+-------+--------+-----+---------+---......
+>   */
+>  
+> @@ -34,6 +35,9 @@
+>  #define ARM_RTC_MMIO_BASE	(ARM_UART_MMIO_BASE + ARM_UART_MMIO_SIZE)
+>  #define ARM_RTC_MMIO_SIZE	0x10000
+>  
+> +#define ARM_PVTIME_MMIO_BASE	(ARM_RTC_MMIO_BASE + ARM_RTC_MMIO_SIZE)
+> +#define ARM_PVTIME_MMIO_SIZE	SZ_64K
+> +
+>  #define KVM_FLASH_MMIO_BASE	(ARM_MMIO_AREA + 0x1000000)
+>  #define KVM_FLASH_MAX_SIZE	0x1000000
+>  
+> diff --git a/include/kvm/kvm-config.h b/include/kvm/kvm-config.h
+> index 6a5720c..48adf27 100644
+> --- a/include/kvm/kvm-config.h
+> +++ b/include/kvm/kvm-config.h
+> @@ -62,6 +62,7 @@ struct kvm_config {
+>  	bool no_dhcp;
+>  	bool ioport_debug;
+>  	bool mmio_debug;
+> +	bool no_pvtime;
+>  };
+>  
+>  #endif
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
