@@ -2,98 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 98F214CAC8A
-	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 18:53:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 66A6C4CAC9B
+	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 18:56:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244279AbiCBRxn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Mar 2022 12:53:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41768 "EHLO
+        id S244211AbiCBR4m (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 12:56:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50000 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232822AbiCBRxm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 12:53:42 -0500
-Received: from mail-oi1-x233.google.com (mail-oi1-x233.google.com [IPv6:2607:f8b0:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 623944993D
-        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 09:52:59 -0800 (PST)
-Received: by mail-oi1-x233.google.com with SMTP id p15so2433483oip.3
-        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 09:52:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=tlEoIVc7+NdNNNlbbRMkxDAku4T4vggQ1rCrcIbBpUo=;
-        b=ZpLYgEffyee+yG5VtiHuJn6Ea5HHN+Ow6ERaKYwN+xGjUVS9SK8tfQAYiNlMXuGJdO
-         tjLhNwCDfWWIxp9PMkwznQg2jT0X6qYvbZNTM+BuyeNOopntLHPjfmGxIokC9KdW52N9
-         sS8e/ooUreQj4Ng+b5urR40o5fTUbuT5TTCGQVn96+CVAgNx7mQLLuoVvqJdsJePAEYF
-         H/IAkPNSop/oyUtWvk6oy7AttWSHWiatbEBbRXE7wC+d1ZqVzhFYoICOczFWiJIm2Bdt
-         oqxlgseBqohrkuGuXvaKNLwEuesgmxpKXI1b1IKdk6CoRVJoOSCxrlCICy5XYnFytENS
-         rdmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=tlEoIVc7+NdNNNlbbRMkxDAku4T4vggQ1rCrcIbBpUo=;
-        b=v5VTIHsnYorhWibJ/OjkRsOgHEwKGQQPSzg7EBvGRrmS4CLyjIoXbRsmWUI7GTNZ2t
-         hQN3ssNmfWuMy7kSg2M6nd1sNddc6SCyGT7FRwqcJIpfF1HasW5H/sJpE1Hxlqkr8ZzK
-         wJKEvax497U/2lQC+dQ0iyOgdb0GfI+1qafJdnHGuWTEgEZ5n15e2kHvFwW4bKZtp/lM
-         HNCHUAIPr9xlNUREpNlft8wS/JK7R7kOLove3cBBORyvQQGf8UBPPrntW0k3kE5yCxoG
-         3EP+rPMiFDUXnv1PhykTwKirJc5eAsc5qVl6YtqcRWTBOCjQs9dQKC16NiPAqzY6r0h5
-         SM3Q==
-X-Gm-Message-State: AOAM531+x7f4BXPY913Zwhg7A/wUJ2BGYDhR6i0RKJXscdH2e/7GU5rI
-        hnVRTii4U1cJkS6+lAUfLf9IuaKCLyBsKvcZ9Xrm7g==
-X-Google-Smtp-Source: ABdhPJzq3p5uu9sVlEsb/MIquJMJtnsmWeB8BSeuGIc4dqYqNDjXA/hAoGgDUvk8Wtsxo9gRXHKHVfayfofUwkasTDk=
-X-Received: by 2002:a05:6808:1443:b0:2d7:306b:2943 with SMTP id
- x3-20020a056808144300b002d7306b2943mr933327oiv.66.1646243578556; Wed, 02 Mar
- 2022 09:52:58 -0800 (PST)
+        with ESMTP id S233784AbiCBR4l (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 12:56:41 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A7775D0496
+        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 09:55:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646243756;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=o+nBkQbgw8PwPPv2SFeP3n6nYROMRVLwtSKO9jqS6Kk=;
+        b=avU9iA0y223BFDoPpQqOuRlKYPAxjX/ugAK5kOQ9L1WjMVWt4W8XXRRkrQOO4mSciJgpIn
+        c+OYjwD6KxdZG2Z4tW3eGVlFFOMzFxGYzsDsQ6LUOmnLsbYBM9X/xkAKL8bQMXolEuOfoh
+        yZmngzfRVcIy7Et4i1mq+9a1ifRHkWc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-37-Vbhj1pRiOdKGIW1mPP7Ang-1; Wed, 02 Mar 2022 12:55:53 -0500
+X-MC-Unique: Vbhj1pRiOdKGIW1mPP7Ang-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 246CE824FA9;
+        Wed,  2 Mar 2022 17:55:51 +0000 (UTC)
+Received: from redhat.com (unknown [10.33.36.166])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 41F688659D;
+        Wed,  2 Mar 2022 17:55:45 +0000 (UTC)
+Date:   Wed, 2 Mar 2022 17:55:42 +0000
+From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To:     Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= 
+        <philippe.mathieu.daude@gmail.com>
+Cc:     Sergio Lopez <slp@redhat.com>, Fam Zheng <fam@euphon.net>,
+        Elena Ufimtseva <elena.ufimtseva@oracle.com>,
+        kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
+        qemu-devel@nongnu.org,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+        Jagannathan Raman <jag.raman@oracle.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>, qemu-block@nongnu.org,
+        David Hildenbrand <david@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        vgoyal@redhat.com, Eric Farman <farman@linux.ibm.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        qemu-s390x@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
+        Kevin Wolf <kwolf@redhat.com>,
+        John G Johnson <john.g.johnson@oracle.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Hanna Reitz <hreitz@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 2/2] Allow building vhost-user in BSD
+Message-ID: <Yh+vniMOTFt2npIJ@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20220302113644.43717-1-slp@redhat.com>
+ <20220302113644.43717-3-slp@redhat.com>
+ <66b68bcc-8d7e-a5f7-5e6c-b2d20c26ab01@redhat.com>
+ <8dfc9854-4d59-0759-88d0-d502ae7c552f@gmail.com>
+ <20220302173009.26auqvy4t4rx74td@mhamilton>
+ <85ed0856-308a-7774-a751-b20588f3d9cd@gmail.com>
 MIME-Version: 1.0
-References: <20220302111334.12689-1-likexu@tencent.com> <20220302111334.12689-13-likexu@tencent.com>
-In-Reply-To: <20220302111334.12689-13-likexu@tencent.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 2 Mar 2022 09:52:47 -0800
-Message-ID: <CALMp9eT1N_HeipXjpyqrXs_WmBEip2vchy4d1GffpwrEd+444w@mail.gmail.com>
-Subject: Re: [PATCH v2 12/12] KVM: x86/pmu: Clear reserved bit PERF_CTL2[43]
- for AMD erratum 1292
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
-        Like Xu <likexu@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-18.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <85ed0856-308a-7774-a751-b20588f3d9cd@gmail.com>
+User-Agent: Mutt/2.1.5 (2021-12-30)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 2, 2022 at 3:14 AM Like Xu <like.xu.linux@gmail.com> wrote:
->
-> From: Like Xu <likexu@tencent.com>
->
-> The AMD Family 19h Models 00h-0Fh Processors may experience sampling
-> inaccuracies that cause the following performance counters to overcount
-> retire-based events. To count the non-FP affected PMC events correctly,
-> a patched guest with a target vCPU model would:
->
->     - Use Core::X86::Msr::PERF_CTL2 to count the events, and
->     - Program Core::X86::Msr::PERF_CTL2[43] to 1b, and
->     - Program Core::X86::Msr::PERF_CTL2[20] to 0b.
->
-> To support this use of AMD guests, KVM should not reserve bit 43
-> only for counter #2. Treatment of other cases remains unchanged.
->
-> AMD hardware team clarified that the conditions under which the
-> overcounting can happen, is quite rare. This change may make those
-> PMU driver developers who have read errata #1292 less disappointed.
->
-> Reported-by: Jim Mattson <jmattson@google.com>
-> Signed-off-by: Like Xu <likexu@tencent.com>
+On Wed, Mar 02, 2022 at 06:38:07PM +0100, Philippe Mathieu-Daudé wrote:
+> On 2/3/22 18:31, Sergio Lopez wrote:
+> > On Wed, Mar 02, 2022 at 06:18:59PM +0100, Philippe Mathieu-Daudé wrote:
+> > > On 2/3/22 18:10, Paolo Bonzini wrote:
+> > > > On 3/2/22 12:36, Sergio Lopez wrote:
+> > > > > With the possibility of using pipefd as a replacement on operating
+> > > > > systems that doesn't support eventfd, vhost-user can also work on BSD
+> > > > > systems.
+> > > > > 
+> > > > > This change allows enabling vhost-user on BSD platforms too and
+> > > > > makes libvhost_user (which still depends on eventfd) a linux-only
+> > > > > feature.
+> > > > > 
+> > > > > Signed-off-by: Sergio Lopez <slp@redhat.com>
+> > > > 
+> > > > I would just check for !windows.
+> > > 
+> > > What about Darwin / Haiku / Illumnos?
+> > 
+> > It should work on every system providing pipe() or pipe2(), so I guess
+> > Paolo's right, every platform except Windows. FWIW, I already tested
+> > it with Darwin.
+> 
+> Wow, nice.
+> 
+> So maybe simply check for pipe/pipe2 rather than !windows?
 
-This seems unnecessarily convoluted. As I've said previously, KVM
-should not ever synthesize a #GP for any value written to a
-PerfEvtSeln MSR when emulating an AMD CPU.
+NB that would make the check more fragile.
+
+We already use pipe/pipe2 without checking for it, because its
+usage is confined to oslib-posix.c and we know all POSIX
+OS have it. There is no impl at all of qemu_pipe in oslib-win.c
+and the declaration is masked out too in the header file.
+
+Thus if we check for pipe2 and windows did ever implement it,
+then we would actually break the windows build due to qemu_pipe
+not existing. 
+
+IOW, checking !windows matches our logic for picking oslib-posix.c
+in builds and so is better than checking for pipe directly.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
