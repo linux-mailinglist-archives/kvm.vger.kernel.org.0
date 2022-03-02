@@ -2,166 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5358F4CAA59
-	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 17:34:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F82D4CAABD
+	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 17:49:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242513AbiCBQfR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Mar 2022 11:35:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47706 "EHLO
+        id S243332AbiCBQuG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 11:50:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55642 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242354AbiCBQfQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 11:35:16 -0500
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2054.outbound.protection.outlook.com [40.107.92.54])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A67E4D276;
-        Wed,  2 Mar 2022 08:34:33 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PafQ9DIuZhklW68GmKIl1cc9qhZzg8FbvOsqFSbsnigQ2/QHeHCWrew7/Tumj+i1YmsfBVzVqr5qoJ2MmWkPGGWFKjhtEIcli45/3Umd8PVYFWJvXM1wd0uMe4q4Di4VudAbgVMbOAEu7G5RFOwHF2LJlw9yXaeGpyblGn0w0IvMQLkhL1zJUr4+mC9hY490ytRDO6ObT3BjaYwe+d7aZrd1oTx+FZL1d3kQTTJINGn3kU6MQZLxVkTZteSetR/7CiAF7dOhll52pPt30TrcV2IvDP10HzDljOrGqIncKwx/JXFf1mmabfcImJPRGxmOAKQBV0BT7wGwqD65Z5wGXg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TssYAoAC3gfqZYRyMCWHPdgevA7I9Qo/9OPxd32Ywu0=;
- b=kAFp5Bokiyn1+QVm66YvxVHS2Bb49BFEuh/VcHm0+5srh6gXnCIS1KRb4ZcVtCs+d8YZ08kn0T+WhbuX7jztmyfaC9odD1PzgmD8DiZkTuS7iLpcBWRxkIvpjBPlnhfx5294WupSysVVtwoGgMzNohswUAWmRyvgWmshagUBUUpTuE6VIFEBmmTzFHFEo0qANwvxY6X838u+HpOgIZjt7e64OQkyPBspguEuUF+Z6yCe8jVk5dxkz+BuEt9Ix/NzeISvEckx/R75U+fFu1T4bJfg8tJAjXifOOu+8++UBqqNO9Iyf1zsJEKowOGJkBkWSltoKw9IST1YrKtDEzDuZw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TssYAoAC3gfqZYRyMCWHPdgevA7I9Qo/9OPxd32Ywu0=;
- b=MHMeLl1zdXXnlAC6nTWHBadPjQSp6WUsGMT4jjki9CqEuD1/u2U/EeWnlOoH6zwK1du7od9/UnC8dauaaxQ1ogrh5VQLFGuXrXZMB98zfOS9Tyfi0Ij0h6FPll06/hutEG52KjDu5wug+35BACLg7Yu48u272ZGnu0f2pXuqF3H1grmvk8+VpPENvx/rvAP/gi/g3M4eHoSm2rjNssYsGl80YVu6ZcPbCWsyk0tr/K0p+gpSHhMQGEkLEptDXw19uoY2aSHWwQGXhCAFkIErA45FLTgV4nkTyNXGpqgrmXXoF51xzh1JVMjiVx27H/u/7g2p+agK5e75CiNO3byZig==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by BL0PR12MB4866.namprd12.prod.outlook.com (2603:10b6:208:1cf::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5038.14; Wed, 2 Mar
- 2022 16:34:30 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::51a0:4aee:2b4c:ca28]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::51a0:4aee:2b4c:ca28%4]) with mapi id 15.20.5038.015; Wed, 2 Mar 2022
- 16:34:30 +0000
-Date:   Wed, 2 Mar 2022 12:34:29 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
-        saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
-        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com,
-        ashok.raj@intel.com, kevin.tian@intel.com,
-        shameerali.kolothum.thodi@huawei.com
-Subject: Re: [PATCH V9 mlx5-next 09/15] vfio: Define device migration
- protocol v2
-Message-ID: <20220302163429.GR219866@nvidia.com>
-References: <20220224142024.147653-1-yishaih@nvidia.com>
- <20220224142024.147653-10-yishaih@nvidia.com>
- <87tucgiouf.fsf@redhat.com>
- <20220302142732.GK219866@nvidia.com>
- <20220302083440.539a1f33.alex.williamson@redhat.com>
- <87mti8ibie.fsf@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87mti8ibie.fsf@redhat.com>
-X-ClientProxiedBy: MN2PR03CA0002.namprd03.prod.outlook.com
- (2603:10b6:208:23a::7) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
+        with ESMTP id S242864AbiCBQuF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 11:50:05 -0500
+Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11068CA73E
+        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 08:49:21 -0800 (PST)
+Received: by mail-wm1-x32d.google.com with SMTP id v2-20020a7bcb42000000b0037b9d960079so3718669wmj.0
+        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 08:49:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=IecOz5iKn2Rc7yD1b1vqfvTpVOYHa2wL2PoxDv2Qr/w=;
+        b=VIpMijEI/uc7QRXHd8OO4zobB3xGHjz4KThVMq514TNw8RwXRYNSQBSrVjnHjxY/O3
+         l2zH6Fnc4g7cXglDba8qa97Y60BjqOi/08Td2ssOClPjgo2nZjxZ5uM6JK9LNl67aDQX
+         gUSqG+T8ucekupVq7KheTANlEi90R6HHLHrmK6xVXJROxoYMuVMd51xKMMPnh2UJLPox
+         cVRcZ2YIOo3Y4OzB4SDJuF87jLQ7x42oV9w3qB/s1UXjEkj6bKqen/wgYWVukInOW5g2
+         NiTjge+zSAtBPJp5ddERJiqnrLi83eYLRdF2Miz0jbs/TDPeruRJXTDi23qQWPGymHYs
+         D9vg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=IecOz5iKn2Rc7yD1b1vqfvTpVOYHa2wL2PoxDv2Qr/w=;
+        b=b/K81HLiI0faZHTePjMrdm3Xo4g/n+gQekAWYh6LwpKATEeA56Xf11yOzyHmLBle9A
+         GY/76gusmcOsXc8c+SKCTNyB9fTIQ77f+VOb5rl5xTurh9VbKIIt1FkGNMzio0+bC65k
+         oYvEV8rjk/8NykL0O5lBrOGLBSenzenG3bhrOxnBE9DKvPZm3eB2vwsuS95y/+9ImCew
+         P/kdWiMdNopwqOABkQSTHPfTSgsk/IH9UdWCyOTmeNUsdyr0XECYIrOF6xdI+Y+k/lMN
+         24YMKAKu3TV75JP+lNYp/MFEoDFn/ZgbImMz+KfbzK7PeC7O/YWqcx0qDly1ZhcEs89V
+         ACkw==
+X-Gm-Message-State: AOAM531++V2hS9rjdhP1qJHDEvN1GuucdlVVtkRd9MqU0FhKixIgGYxH
+        8P7czRwfLk+7j9JqxeUw0J1AHA==
+X-Google-Smtp-Source: ABdhPJyfbodKVJwvZA9sMWbjL8XK8jIc29C/7YVF8TlsJ7M4ci3plCbQeVXpYLBlRnsDqwXOYk/BBw==
+X-Received: by 2002:a1c:4603:0:b0:381:19fe:280b with SMTP id t3-20020a1c4603000000b0038119fe280bmr524853wma.67.1646239759465;
+        Wed, 02 Mar 2022 08:49:19 -0800 (PST)
+Received: from google.com (cpc155339-bagu17-2-0-cust87.1-3.cable.virginm.net. [86.27.177.88])
+        by smtp.gmail.com with ESMTPSA id n15-20020a05600c4f8f00b003842f011bc5sm2707823wmq.2.2022.03.02.08.49.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Mar 2022 08:49:18 -0800 (PST)
+Date:   Wed, 2 Mar 2022 16:49:17 +0000
+From:   Lee Jones <lee.jones@linaro.org>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Stefano Garzarella <sgarzare@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        kernel list <linux-kernel@vger.kernel.org>,
+        kvm <kvm@vger.kernel.org>,
+        Linux Virtualization <virtualization@lists.linux-foundation.org>,
+        netdev <netdev@vger.kernel.org>, stable@vger.kernel.org,
+        syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
+Subject: Re: [PATCH 1/1] vhost: Protect the virtqueue from being cleared
+ whilst still in use
+Message-ID: <Yh+gDZUbgBRx/1ro@google.com>
+References: <20220302075421.2131221-1-lee.jones@linaro.org>
+ <20220302082021-mutt-send-email-mst@kernel.org>
+ <Yh93k2ZKJBIYQJjp@google.com>
+ <20220302095045-mutt-send-email-mst@kernel.org>
+ <Yh+F1gkCGoYF2lMV@google.com>
+ <CAGxU2F4cUDrMzoHH1NT5_ivxBPgEE8HOzP5s_Bt5JURRaSsLdQ@mail.gmail.com>
+ <20220302112945-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 25a731a0-2987-4166-8691-08d9fc6a8687
-X-MS-TrafficTypeDiagnostic: BL0PR12MB4866:EE_
-X-Microsoft-Antispam-PRVS: <BL0PR12MB4866BA6BEE3F51A99B88A109C2039@BL0PR12MB4866.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: jnCqhYQh94/Xf8Sx2DOfJ0yqtiio6Vlr3c9c1XBn65CLaHa/EOppolqHdFAVze46Gr80OGhCe6cUhOiwYul5cRIQfnCd7yXnt9Jv4y171ciX5oogVEfflWAXeVavvVbVxrMYcWkCC5Rwn8hTPybZOlItj3OfLAe2QXZNOfNNgQxVyetrHdjDKw1A1DOYmPEEYlkz+ZPL85JZ94w/3KvUYBUinY9v7lVI/OFxQArSyggTDvqrPnVb8yXZ3C+UsdezXmqIQ2GvGdbBSVb+JEcR726SXo+bugw6+8GI0YKBz64kNQDpUrLfzhXoZ+6TJMeMCECJHIqmYb8xgSRV0TELTSVy9KkqsuAqaYVJfXQp0/7G28OnrmUcL0OW20Mg+lUl1hUf14g8RLKG3v4UI586gA+mMlMewEBe2ewbhm217c2U0Nm60FIQ3ypIimGfM3mNG/ChjuyVsSDNooIyiTGym6ek0ONgH+ZElSLOhOmQOYrbVOGOi8YLvdZFa8mwtYNRPSWqF1Sk1KQ5+QXeBQjnysljWGzSGo3l27zE6AbHTkGDW4E5Qz+ejaMtI1pUC9Vc3VYB0RB6FgYKa0pUrgZcJ2BVtAJPwW7jYm4bKaQ9PII86SQC0ukgV/aUMp14zBIGm9gTtjBI0BE6i/l3I9FOgWI8HCXD2nhOfTXI8Nwqljae2pjlGsus3hqiz1NxVKa2
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(8676002)(6916009)(36756003)(6486002)(4326008)(316002)(66946007)(66556008)(66476007)(6512007)(6506007)(33656002)(26005)(186003)(2616005)(2906002)(1076003)(54906003)(508600001)(5660300002)(38100700002)(8936002)(7416002)(86362001)(27376004);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?IEBpUmKWipor+p73E4cQwgqkpWjWBthWHFn8DWBs3Y7CC+4T96TYIn6evlao?=
- =?us-ascii?Q?1GhuLlwAVtIuPcJ6wyH+o7fhoQgIqSIJEZdpxcWSlEvmIKLlsXBEYnhG66LV?=
- =?us-ascii?Q?p9QqZXmkZIGQ4xHDYXgtifHpQjUlGZ98CA6XMRgGpDtxVEjEDKdL9/ai4BXb?=
- =?us-ascii?Q?GGvYwGoPM923veyczU/gq5zCXlkqSF856CfJ0TsIHvTQDj943E4APP+yO12o?=
- =?us-ascii?Q?Q6bjjf8jWq2na0CuGCRA/X8eNwgjUuQDJRDVV3IVkSwX7M/09GpqhMHBnIEe?=
- =?us-ascii?Q?0CzK7DD/QxKojQAIzofnje/Ho2+jKzTvoZwUAyFHaLYxjG98/KYxgm9+i3Q2?=
- =?us-ascii?Q?1PKPRAMafQ8Dtq4pT8E6GWyZUMSJuNYB+vyjBJo4IHHnPcwlP2IWmosJz7Ac?=
- =?us-ascii?Q?qseRdziHj/LPEbeCofB4s3wdRD1KZwjh8fV9vWaeanUQuN2yEjQArDWa2wp4?=
- =?us-ascii?Q?ev4h5G3CZ1dSnSjN9gxEljlC3jEUuTG/lyl6x5x8yhlbRA3mzHhJYcEapeSc?=
- =?us-ascii?Q?jfQusa52CzpB7kw7cnIsF3NcF+Xcv1wF7IC6snCEvAJeUO+L8g7joTOXtnQp?=
- =?us-ascii?Q?dPz1foux56PE9gvT1VJYbU5LnPL1GY30gA+gJDWAxqZYkqfJB/Es4jSQAIfA?=
- =?us-ascii?Q?p6VQJLYmLFIjvWO/rKQxHMNOQa2oB66AvYaDSE6R9mxCTvAw9Z7Wvv5ua+W2?=
- =?us-ascii?Q?iW8EHdDFyZ4EQH32Qai8wTsR7tZQnmsnneQnzbkZ9d7MbUgcXqoYNXjpny8O?=
- =?us-ascii?Q?BfYuw2M8a5zidAxeXmaM2IYZLxfFhsANA8g9m1r8D7IpyxKX3aDO6nin1cFm?=
- =?us-ascii?Q?SDMHzQ98kWE7RLJo2RoL5GsGUqCHjJvXccBtBOPQ+BQLTDEAaEvF+itUfUhG?=
- =?us-ascii?Q?9Mzsz4SPyQ2A500asVRY+dtBkH+PjR4Sz5vFG4EEptdQaKyxD6NKAhn+WJ2g?=
- =?us-ascii?Q?keUt458lh3vaublUz/xUa9bJ+aoGRqY3mSBugxi9INqrC0V6ZRXILT/MShtV?=
- =?us-ascii?Q?aCCtHsCkS2GHUTW+ZUSOR4f0LshXV4eOJwQj9imrL8sryzk0+VAjRvtA6oPE?=
- =?us-ascii?Q?wlhjwh6W8F0A0XLuJN4eSfiXOfB/LVo0YvGxZtMp/wYqpSv2WlR311tb4vur?=
- =?us-ascii?Q?7VhU6IWp3/XBcCDyUaKTPKsogk7gkoow33a5Pm4QbtDg/gDjDIOYpGeR93Yr?=
- =?us-ascii?Q?/V5l/HlShG2/fRrNR65OeoAw+N9tvsDG2lG0waGMEbYByFZJu1VTnw2Ggn/M?=
- =?us-ascii?Q?kLkFF0IsplJgegvj/zJ5ncaMAkczxQNPhrsWGvyi8zZTnzC6WYSwrISpHVpt?=
- =?us-ascii?Q?OG9J2u+lwOSkp0v1MVITN9MU52RHkOmz1FwxGiqvSgnVWA/ibDSiNx8qjSL1?=
- =?us-ascii?Q?Je9bONfvQc50k0Tvfbn1DNUQ/DxlYyAOpZ6G83j75NdSlK6XMtbt+tx+BIxf?=
- =?us-ascii?Q?iRpfkCMe4hzGyV8jn5hMZ+X8f2ydHmHGwWNdkQaW7N8WqtEWfdtT9XDQXKvs?=
- =?us-ascii?Q?Hwyt2JJ43cCP+cFxl2StZqEUrLpkvIng1R9czy86bqTDUsFq73B0jLDDZJXM?=
- =?us-ascii?Q?nXntCwMKtpjcQ1O63JA=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 25a731a0-2987-4166-8691-08d9fc6a8687
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Mar 2022 16:34:30.5115
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: mspPIDe0g9RxVLozYZHMNAml4+H83dSMQ9lK+2bc08J2kmvxtETCb3HGtKkQ8ZdP
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR12MB4866
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220302112945-mutt-send-email-mst@kernel.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 02, 2022 at 05:07:21PM +0100, Cornelia Huck wrote:
-> On Wed, Mar 02 2022, Alex Williamson <alex.williamson@redhat.com> wrote:
-> 
-> > On Wed, 2 Mar 2022 10:27:32 -0400
-> > Jason Gunthorpe <jgg@nvidia.com> wrote:
-> >
-> >> On Wed, Mar 02, 2022 at 12:19:20PM +0100, Cornelia Huck wrote:
-> >> > > +/*
-> >> > > + * vfio_mig_get_next_state - Compute the next step in the FSM
-> >> > > + * @cur_fsm - The current state the device is in
-> >> > > + * @new_fsm - The target state to reach
-> >> > > + * @next_fsm - Pointer to the next step to get to new_fsm
-> >> > > + *
-> >> > > + * Return 0 upon success, otherwise -errno
-> >> > > + * Upon success the next step in the state progression between cur_fsm and
-> >> > > + * new_fsm will be set in next_fsm.  
-> >> > 
-> >> > What about non-success? Can the caller make any assumption about
-> >> > next_fsm in that case? Because...  
-> >> 
-> >> I checked both mlx5 and acc, both properly ignore the next_fsm value
-> >> on error. This oddness aros when Alex asked to return an errno instead
-> >> of the state value.
-> >
-> > Right, my assertion was that only the driver itself should be able to
-> > transition to the ERROR state.  vfio_mig_get_next_state() should never
-> > advise the driver to go to the error state, it can only report that a
-> > transition is invalid.  The driver may stay in the current state if an
-> > error occurs here, which is why we added the ability to get the device
-> > state.  Thanks,
-> >
-> > Alex
-> 
-> So, should the function then write anything to next_fsm if it returns
-> -errno? (Maybe I'm misunderstanding.) Or should the caller always expect
-> that something may be written to new_fsm, and simply only look at it if
-> the function returns success?
+On Wed, 02 Mar 2022, Michael S. Tsirkin wrote:
 
-The latter is the general expectation in Linux.
- 
-Jason
+> On Wed, Mar 02, 2022 at 05:28:31PM +0100, Stefano Garzarella wrote:
+> > On Wed, Mar 2, 2022 at 3:57 PM Lee Jones <lee.jones@linaro.org> wrote:
+> > >
+> > > On Wed, 02 Mar 2022, Michael S. Tsirkin wrote:
+> > >
+> > > > On Wed, Mar 02, 2022 at 01:56:35PM +0000, Lee Jones wrote:
+> > > > > On Wed, 02 Mar 2022, Michael S. Tsirkin wrote:
+> > > > >
+> > > > > > On Wed, Mar 02, 2022 at 07:54:21AM +0000, Lee Jones wrote:
+> > > > > > > vhost_vsock_handle_tx_kick() already holds the mutex during its call
+> > > > > > > to vhost_get_vq_desc().  All we have to do is take the same lock
+> > > > > > > during virtqueue clean-up and we mitigate the reported issues.
+> > > > > > >
+> > > > > > > Link: https://syzkaller.appspot.com/bug?extid=279432d30d825e63ba00
+> > > > > > >
+> > > > > > > Cc: <stable@vger.kernel.org>
+> > > > > > > Reported-by: syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
+> > > > > > > Signed-off-by: Lee Jones <lee.jones@linaro.org>
+> > > > > > > ---
+> > > > > > >  drivers/vhost/vhost.c | 2 ++
+> > > > > > >  1 file changed, 2 insertions(+)
+> > > > > > >
+> > > > > > > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> > > > > > > index 59edb5a1ffe28..bbaff6a5e21b8 100644
+> > > > > > > --- a/drivers/vhost/vhost.c
+> > > > > > > +++ b/drivers/vhost/vhost.c
+> > > > > > > @@ -693,6 +693,7 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
+> > > > > > >         int i;
+> > > > > > >
+> > > > > > >         for (i = 0; i < dev->nvqs; ++i) {
+> > > > > > > +               mutex_lock(&dev->vqs[i]->mutex);
+> > > > > > >                 if (dev->vqs[i]->error_ctx)
+> > > > > > >                         eventfd_ctx_put(dev->vqs[i]->error_ctx);
+> > > > > > >                 if (dev->vqs[i]->kick)
+> > > > > > > @@ -700,6 +701,7 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
+> > > > > > >                 if (dev->vqs[i]->call_ctx.ctx)
+> > > > > > >                         eventfd_ctx_put(dev->vqs[i]->call_ctx.ctx);
+> > > > > > >                 vhost_vq_reset(dev, dev->vqs[i]);
+> > > > > > > +               mutex_unlock(&dev->vqs[i]->mutex);
+> > > > > > >         }
+> > > > > >
+> > > > > > So this is a mitigation plan but the bug is still there though
+> > > > > > we don't know exactly what it is.  I would prefer adding something like
+> > > > > > WARN_ON(mutex_is_locked(vqs[i]->mutex) here - does this make sense?
+> > > > >
+> > > > > As a rework to this, or as a subsequent patch?
+> > > >
+> > > > Can be a separate patch.
+> > > >
+> > > > > Just before the first lock I assume?
+> > > >
+> > > > I guess so, yes.
+> > >
+> > > No problem.  Patch to follow.
+> > >
+> > > I'm also going to attempt to debug the root cause, but I'm new to this
+> > > subsystem to it might take a while for me to get my head around.
+> > 
+> > IIUC the root cause should be the same as the one we solved here:
+> > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a58da53ffd70294ebea8ecd0eb45fd0d74add9f9
+> > 
+> > The worker was not stopped before calling vhost_dev_cleanup(). So while 
+> > the worker was still running we were going to free memory or initialize 
+> > fields while it was still using virtqueue.
+> 
+> Right, and I agree but it's not the root though, we do attempt to stop all workers.
+
+Exactly.  This is what happens, but the question I'm going to attempt
+to answer is *why* does this happen.
+
+-- 
+Lee Jones [李琼斯]
+Principal Technical Lead - Developer Services
+Linaro.org │ Open source software for Arm SoCs
+Follow Linaro: Facebook | Twitter | Blog
