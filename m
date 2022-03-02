@@ -2,160 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A57B4CAA34
-	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 17:30:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5409B4CAA46
+	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 17:32:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233923AbiCBQbZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Mar 2022 11:31:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37214 "EHLO
+        id S242402AbiCBQdL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 11:33:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38426 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241726AbiCBQbX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 11:31:23 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0D379C6240
-        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 08:30:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646238639;
+        with ESMTP id S242543AbiCBQdC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 11:33:02 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E1B7C6255;
+        Wed,  2 Mar 2022 08:32:19 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1A2F6617F7;
+        Wed,  2 Mar 2022 16:32:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FDCBC004E1;
+        Wed,  2 Mar 2022 16:32:16 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Jx2KF4SC"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1646238734;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=kMa9v1xtxt05GLfYOo70TOSVE9rMZc+g01ANVJtihbg=;
-        b=ALcWlOWAQjUmwtMjy+Co956Cs0mvEhfeU9Dz3ol3wIS5GdoTa97aF7uoHF1w0LVfqQlEEW
-        LUv4cJWsqsHchY/V4IXxQJOddr+V+YBtf69QckILiFDcJwetNoasJfkIK1xYp8NWANWZap
-        DB7PbqdFeBAZ/c/SwAVI/VGrHYB/ZH4=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-269-brFLgBcFPkKaC_xuSad25w-1; Wed, 02 Mar 2022 11:30:36 -0500
-X-MC-Unique: brFLgBcFPkKaC_xuSad25w-1
-Received: by mail-wm1-f69.google.com with SMTP id c19-20020a05600c0ad300b00385bb3db625so479864wmr.4
-        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 08:30:35 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=kMa9v1xtxt05GLfYOo70TOSVE9rMZc+g01ANVJtihbg=;
-        b=nv8kZfW7zQY7JQrBqLzKkMKYEJcHb5VZezbQmTa2YVJ6IEkVkrVhJzg6/u1GOSPOmw
-         8EiHWYZPTRJhe6EJOXWLDECzLFXMwWBYnzeZ6MXslflsCSj2zPHSHJRIygFu8i2Smy1O
-         lCr8Q9xodHFjVV9hN2xWuqn7tX287L2lfBUrb07p7yHH2H1J7wsM53Xc157vzvPljJ64
-         DaAk725j30yBI/1XMXiICf+dFqPKnm6nke1mz7rOvZmDDbqmeHRdp4ANRysVFxXI6Gcn
-         7YNkH82xaNq5AytC0GsrtQP302d1wqp9Vz812kHcIWQ9+Ej8aOpM1KWXEFn1ixwb2CTy
-         TwZQ==
-X-Gm-Message-State: AOAM531UOs3MrS5O5TrHTzQclDU3rVvPcQu21BYQfHN9XqUYVuihXPBl
-        bRQ62uns0UsbuSp0l/RPea7soNL49Lhi2wDqSo5JzANuh4UbllmqZNOs+yxQ3RxP9GySkluFJct
-        jEMVHYeW3W7LB
-X-Received: by 2002:a7b:c14c:0:b0:381:32fb:a128 with SMTP id z12-20020a7bc14c000000b0038132fba128mr489123wmi.116.1646238634138;
-        Wed, 02 Mar 2022 08:30:34 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxPFSyJJ3cuBRpkY9KOm5MVNCqPvFnh7F/Ims38I9cMHs0dlB6ZbjMEGiiJX+VRcZzNYFLg0w==
-X-Received: by 2002:a7b:c14c:0:b0:381:32fb:a128 with SMTP id z12-20020a7bc14c000000b0038132fba128mr489104wmi.116.1646238633941;
-        Wed, 02 Mar 2022 08:30:33 -0800 (PST)
-Received: from redhat.com ([2a10:8006:355c:0:48d6:b937:2fb9:b7de])
-        by smtp.gmail.com with ESMTPSA id o11-20020adf9d4b000000b001f0077ea337sm5972902wre.22.2022.03.02.08.30.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Mar 2022 08:30:33 -0800 (PST)
-Date:   Wed, 2 Mar 2022 11:30:30 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     Lee Jones <lee.jones@linaro.org>, Jason Wang <jasowang@redhat.com>,
-        kernel list <linux-kernel@vger.kernel.org>,
-        kvm <kvm@vger.kernel.org>,
-        Linux Virtualization <virtualization@lists.linux-foundation.org>,
-        netdev <netdev@vger.kernel.org>, stable@vger.kernel.org,
-        syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
-Subject: Re: [PATCH 1/1] vhost: Protect the virtqueue from being cleared
- whilst still in use
-Message-ID: <20220302112945-mutt-send-email-mst@kernel.org>
-References: <20220302075421.2131221-1-lee.jones@linaro.org>
- <20220302082021-mutt-send-email-mst@kernel.org>
- <Yh93k2ZKJBIYQJjp@google.com>
- <20220302095045-mutt-send-email-mst@kernel.org>
- <Yh+F1gkCGoYF2lMV@google.com>
- <CAGxU2F4cUDrMzoHH1NT5_ivxBPgEE8HOzP5s_Bt5JURRaSsLdQ@mail.gmail.com>
+        bh=pn15odJ1axHr1tSHXKM6R6gy8OQYz+UX/tuJV8kTZOI=;
+        b=Jx2KF4SCMS6oQ81ruL+PmUOxb313LAgFJH4b+Nm/AbpnaHEQrJ93HFFJlkrZFljIclR1Ig
+        7MjMDAT88vIHvYQ5jVCXMswnqvnSTAn/DRep7zjTiB1RFfgW3eKlFxCp1420xGYalEM2Wc
+        ntxUnKyAuMw/wp27G1pbbLokW2Kvk8w=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 6b026337 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Wed, 2 Mar 2022 16:32:14 +0000 (UTC)
+Date:   Wed, 2 Mar 2022 17:32:07 +0100
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Laszlo Ersek <lersek@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        QEMU Developers <qemu-devel@nongnu.org>,
+        linux-hyperv@vger.kernel.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Alexander Graf <graf@amazon.com>,
+        "Michael Kelley (LINUX)" <mikelley@microsoft.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        adrian@parity.io,
+        Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Jann Horn <jannh@google.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        "Brown, Len" <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
+        Linux PM <linux-pm@vger.kernel.org>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        Theodore Ts'o <tytso@mit.edu>, Arnd Bergmann <arnd@arndb.de>
+Subject: Re: propagating vmgenid outward and upward
+Message-ID: <Yh+cB5bWarl8CFN1@zx2c4.com>
+References: <CAHmME9qieLUDVoPYZPo=N8NCL1T-RzQ4p7kCFv3PKFUkhWZPsw@mail.gmail.com>
+ <20220302031738-mutt-send-email-mst@kernel.org>
+ <CAHmME9pf-bjnZuweoLqoFEmPy1OK7ogEgGEAva1T8uVTufhCuw@mail.gmail.com>
+ <20220302074503-mutt-send-email-mst@kernel.org>
+ <Yh93UZMQSYCe2LQ7@zx2c4.com>
+ <20220302092149-mutt-send-email-mst@kernel.org>
+ <CAHmME9rf7hQP78kReP2diWNeX=obPem=f8R-dC7Wkpic2xmffg@mail.gmail.com>
+ <20220302101602-mutt-send-email-mst@kernel.org>
+ <Yh+PET49oHNpxn+H@zx2c4.com>
+ <20220302111737-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAGxU2F4cUDrMzoHH1NT5_ivxBPgEE8HOzP5s_Bt5JURRaSsLdQ@mail.gmail.com>
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+In-Reply-To: <20220302111737-mutt-send-email-mst@kernel.org>
+X-Spam-Status: No, score=-6.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 02, 2022 at 05:28:31PM +0100, Stefano Garzarella wrote:
-> On Wed, Mar 2, 2022 at 3:57 PM Lee Jones <lee.jones@linaro.org> wrote:
-> >
-> > On Wed, 02 Mar 2022, Michael S. Tsirkin wrote:
-> >
-> > > On Wed, Mar 02, 2022 at 01:56:35PM +0000, Lee Jones wrote:
-> > > > On Wed, 02 Mar 2022, Michael S. Tsirkin wrote:
-> > > >
-> > > > > On Wed, Mar 02, 2022 at 07:54:21AM +0000, Lee Jones wrote:
-> > > > > > vhost_vsock_handle_tx_kick() already holds the mutex during its call
-> > > > > > to vhost_get_vq_desc().  All we have to do is take the same lock
-> > > > > > during virtqueue clean-up and we mitigate the reported issues.
-> > > > > >
-> > > > > > Link: https://syzkaller.appspot.com/bug?extid=279432d30d825e63ba00
-> > > > > >
-> > > > > > Cc: <stable@vger.kernel.org>
-> > > > > > Reported-by: syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
-> > > > > > Signed-off-by: Lee Jones <lee.jones@linaro.org>
-> > > > > > ---
-> > > > > >  drivers/vhost/vhost.c | 2 ++
-> > > > > >  1 file changed, 2 insertions(+)
-> > > > > >
-> > > > > > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> > > > > > index 59edb5a1ffe28..bbaff6a5e21b8 100644
-> > > > > > --- a/drivers/vhost/vhost.c
-> > > > > > +++ b/drivers/vhost/vhost.c
-> > > > > > @@ -693,6 +693,7 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
-> > > > > >         int i;
-> > > > > >
-> > > > > >         for (i = 0; i < dev->nvqs; ++i) {
-> > > > > > +               mutex_lock(&dev->vqs[i]->mutex);
-> > > > > >                 if (dev->vqs[i]->error_ctx)
-> > > > > >                         eventfd_ctx_put(dev->vqs[i]->error_ctx);
-> > > > > >                 if (dev->vqs[i]->kick)
-> > > > > > @@ -700,6 +701,7 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
-> > > > > >                 if (dev->vqs[i]->call_ctx.ctx)
-> > > > > >                         eventfd_ctx_put(dev->vqs[i]->call_ctx.ctx);
-> > > > > >                 vhost_vq_reset(dev, dev->vqs[i]);
-> > > > > > +               mutex_unlock(&dev->vqs[i]->mutex);
-> > > > > >         }
-> > > > >
-> > > > > So this is a mitigation plan but the bug is still there though
-> > > > > we don't know exactly what it is.  I would prefer adding something like
-> > > > > WARN_ON(mutex_is_locked(vqs[i]->mutex) here - does this make sense?
-> > > >
-> > > > As a rework to this, or as a subsequent patch?
-> > >
-> > > Can be a separate patch.
-> > >
-> > > > Just before the first lock I assume?
-> > >
-> > > I guess so, yes.
-> >
-> > No problem.  Patch to follow.
-> >
-> > I'm also going to attempt to debug the root cause, but I'm new to this
-> > subsystem to it might take a while for me to get my head around.
-> 
-> IIUC the root cause should be the same as the one we solved here:
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a58da53ffd70294ebea8ecd0eb45fd0d74add9f9
-> 
-> The worker was not stopped before calling vhost_dev_cleanup(). So while 
-> the worker was still running we were going to free memory or initialize 
-> fields while it was still using virtqueue.
-> 
-> Cheers,
-> Stefano
+Hi Michael,
 
-Right, and I agree but it's not the root though, we do attempt to stop all workers.
+On Wed, Mar 02, 2022 at 11:22:46AM -0500, Michael S. Tsirkin wrote:
+> > Because that 16 byte read of vmgenid is not atomic. Let's say you read
+> > the first 8 bytes, and then the VM is forked.
+> 
+> But at this point when VM was forked plaintext key and nonce are all in
+> buffer, and you previously indicated a fork at this point is harmless.
+> You wrote "If it changes _after_ that point of check ... it doesn't
+> matter:"
 
--- 
-MST
+Ahhh, fair point. I think you're right.
 
+Alright, so all we're talking about here is an ordinary 16-byte read,
+and 16 bytes of storage per keypair, and a 16-byte comparison.
+
+Still seems much worse than just having a single word...
+
+Jason
