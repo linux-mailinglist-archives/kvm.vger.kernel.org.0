@@ -2,144 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C51F24CAB2F
-	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 18:10:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8873F4CAB32
+	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 18:11:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243653AbiCBRLM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Mar 2022 12:11:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55528 "EHLO
+        id S243719AbiCBRMA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 12:12:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57618 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243649AbiCBRLJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 12:11:09 -0500
-Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC5B440936
-        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 09:10:24 -0800 (PST)
-Received: by mail-wr1-x430.google.com with SMTP id j17so3897546wrc.0
-        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 09:10:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=/A/Wf1LVWnIFg005LIj0+B/3iT8p8+uVVjrl/CBEcyY=;
-        b=PAZI+7c7kmmiyT3XJwcRO3NMZ9oTNnehWyFoD6+Bt5H7Hl5i39z1hi5MYTDIDyI9wf
-         7946oKEnme1wJziXZzu3FqKQwkS+Q/+i/I/6uU0qL8QjT/E8UAZ5IvwGYUEeMWLqI2e0
-         SOxjKINJwdByr9Dz9p21rU1LCV0FFX5zbOnetWLk76T0lmEDUxpYtCDCdR75ScjlYK0P
-         /fXBLPa5EMXxXNG0z2NyVWioFIyl2KOs3P9hEUoj6nkunntc8+64BtVTh2PuvbOrO8ev
-         BH1Ds1wjVQmt4mFXZDlVum+D1Xu7CVSI8wjx75C0GxpFsKHxBnOvUjUXbLvTLeJlNiAf
-         sLHA==
+        with ESMTP id S243753AbiCBRLt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 12:11:49 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1AB93CD302
+        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 09:10:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646241055;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=OCk0IGN+JSNCGOmZy65+tm/Nx0eAS27c5ZIr+XIGJxc=;
+        b=ec047Mgd8dCtj7whfviaju5Bc7Xm2i+mqXiMsVCTE+6PGE51n613cc3B8TWhiGK4OAIxny
+        Fn4PsduDQSW59jprGQvhP4j1tILupWaaOjwX0nlFwEngiVzzIzWznOSDCA8wd40Hzwtbe3
+        lYyrQd3lfg5KrGY/Xy+ZfDI871v+2L4=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-317-RuCDw-CsOc61kFcI-kj3Pg-1; Wed, 02 Mar 2022 12:10:53 -0500
+X-MC-Unique: RuCDw-CsOc61kFcI-kj3Pg-1
+Received: by mail-wr1-f69.google.com with SMTP id e6-20020a5d4e86000000b001f045d4a962so678801wru.21
+        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 09:10:53 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=/A/Wf1LVWnIFg005LIj0+B/3iT8p8+uVVjrl/CBEcyY=;
-        b=Q6oA+5SVSFPlizzwBPCIaKDuL8GByO5kus7BqlOPZ5gBOv4eS3xQIFcPPLPWsTdeB1
-         LL8Iz1jMHvaCfjLgjC/bP3WylYAZS+NkdHGnPZNUIZ6RU2sZLWftiT3U2bN69d/pjQ62
-         vXn+iuBRFPlbe9pS0nD+/UoNtYBiNKVzmDUdsMUe5+Wed+sx5SCP+NEfqMjTu7MFVNTX
-         y9P3skdEcxE7suU4F16BDthTLwEud8WG/J4fFXmebKDcOJ5NwJxH+3JeVEFr7yHE//m0
-         /ZS/cpqZpOtjij4kWF0hMfnCOzzjOMe7GZIYGJ0fjr4d1t269wUgrMDa+0T1qW6egdyh
-         0y6A==
-X-Gm-Message-State: AOAM5300dWjd115cM6NHepp2Yfa9ztAL7Kt1FwA93owa+w/lNZML2u/N
-        B+WhadgIZYXrHi3mTRrfxmc=
-X-Google-Smtp-Source: ABdhPJxHOez8UfUFF74TDZKGJNkXgRw+DkD5pcjsvwTevsgqS4RaCkwcuDHtzDeNCIDqvvslZPYOpA==
-X-Received: by 2002:a05:6000:1548:b0:1f0:48bc:25de with SMTP id 8-20020a056000154800b001f048bc25demr1034142wry.17.1646241023334;
-        Wed, 02 Mar 2022 09:10:23 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.googlemail.com with ESMTPSA id g20-20020a05600c4ed400b003811fab7f3esm7666700wmq.30.2022.03.02.09.10.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 02 Mar 2022 09:10:22 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <66b68bcc-8d7e-a5f7-5e6c-b2d20c26ab01@redhat.com>
-Date:   Wed, 2 Mar 2022 18:10:17 +0100
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=OCk0IGN+JSNCGOmZy65+tm/Nx0eAS27c5ZIr+XIGJxc=;
+        b=n8Ubyf3cEPSyGFKAKyaZXj86eV76Tz4XTkRqgyH3us27re2gpjH60D/5Og55kMxXrA
+         5mt+GwwnjVsCHDFAaO0ZoLaYZHNbLCOhTQI5oyxHamEdowBIwGFQFnoguLAdfg2KNlSp
+         I7Ld8ZnJvSZ0wTrAVvmdFLNCY3yKQb/EStJmKhCSrJRDN06VvIIBxwE5PdIdfSu2qtkq
+         Jd8N5tZ8cT1V0Cg9LY7FwVdmCsRD3SfoX/ZWQ1Jai41gXhYbLTbbAGe0FBhBlGwIBq7H
+         RJ+cM00Fxkt93QTjeayKVd9z9HVw/F0ffM+tlovSDdNbgZZH9ZWGNEXxgQ5n84F1UMFM
+         qhxA==
+X-Gm-Message-State: AOAM533tdC1iC9/zdzRjeiv2KPBoUejC8hq7qs8ft1om+1IXcYT8FKmj
+        6DvBZxqaOtVpAzrkSUMBrc8BcXvb5d/BgPMnI5VRykc6Q7l3FQYKPhsefNd7WLyIFWJHa85uCDn
+        D+Rz83xPDkBDs
+X-Received: by 2002:a5d:6b0f:0:b0:1e7:9432:ee8c with SMTP id v15-20020a5d6b0f000000b001e79432ee8cmr22844996wrw.216.1646241052249;
+        Wed, 02 Mar 2022 09:10:52 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwdCmMTM9zLSI+LlHPZY7Qi9z6yOB/Nx9cLAFKLKH9IIrgIyZ3Z4qt7cBDrf7wigHlwXxKhVQ==
+X-Received: by 2002:a5d:6b0f:0:b0:1e7:9432:ee8c with SMTP id v15-20020a5d6b0f000000b001e79432ee8cmr22844983wrw.216.1646241051946;
+        Wed, 02 Mar 2022 09:10:51 -0800 (PST)
+Received: from sgarzare-redhat (host-95-248-229-156.retail.telecomitalia.it. [95.248.229.156])
+        by smtp.gmail.com with ESMTPSA id e20-20020adfa454000000b001f01a14dce8sm5579398wra.97.2022.03.02.09.10.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Mar 2022 09:10:51 -0800 (PST)
+Date:   Wed, 2 Mar 2022 18:10:48 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Lee Jones <lee.jones@linaro.org>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        kernel list <linux-kernel@vger.kernel.org>,
+        kvm <kvm@vger.kernel.org>,
+        Linux Virtualization <virtualization@lists.linux-foundation.org>,
+        netdev <netdev@vger.kernel.org>, stable@vger.kernel.org,
+        syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
+Subject: Re: [PATCH 1/1] vhost: Protect the virtqueue from being cleared
+ whilst still in use
+Message-ID: <20220302171048.aijkcrwcrgsu475z@sgarzare-redhat>
+References: <20220302075421.2131221-1-lee.jones@linaro.org>
+ <20220302082021-mutt-send-email-mst@kernel.org>
+ <Yh93k2ZKJBIYQJjp@google.com>
+ <20220302095045-mutt-send-email-mst@kernel.org>
+ <Yh+F1gkCGoYF2lMV@google.com>
+ <CAGxU2F4cUDrMzoHH1NT5_ivxBPgEE8HOzP5s_Bt5JURRaSsLdQ@mail.gmail.com>
+ <20220302112945-mutt-send-email-mst@kernel.org>
+ <Yh+gDZUbgBRx/1ro@google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH 2/2] Allow building vhost-user in BSD
-Content-Language: en-US
-To:     Sergio Lopez <slp@redhat.com>, qemu-devel@nongnu.org
-Cc:     vgoyal@redhat.com, Fam Zheng <fam@euphon.net>, kvm@vger.kernel.org,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Jagannathan Raman <jag.raman@oracle.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>, qemu-block@nongnu.org,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Hanna Reitz <hreitz@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Elena Ufimtseva <elena.ufimtseva@oracle.com>,
-        Kevin Wolf <kwolf@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        qemu-s390x@nongnu.org, Matthew Rosato <mjrosato@linux.ibm.com>,
-        John G Johnson <john.g.johnson@oracle.com>,
-        Thomas Huth <thuth@redhat.com>
-References: <20220302113644.43717-1-slp@redhat.com>
- <20220302113644.43717-3-slp@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220302113644.43717-3-slp@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <Yh+gDZUbgBRx/1ro@google.com>
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/2/22 12:36, Sergio Lopez wrote:
-> With the possibility of using pipefd as a replacement on operating
-> systems that doesn't support eventfd, vhost-user can also work on BSD
-> systems.
-> 
-> This change allows enabling vhost-user on BSD platforms too and
-> makes libvhost_user (which still depends on eventfd) a linux-only
-> feature.
-> 
-> Signed-off-by: Sergio Lopez <slp@redhat.com>
+On Wed, Mar 02, 2022 at 04:49:17PM +0000, Lee Jones wrote:
+>On Wed, 02 Mar 2022, Michael S. Tsirkin wrote:
+>
+>> On Wed, Mar 02, 2022 at 05:28:31PM +0100, Stefano Garzarella wrote:
+>> > On Wed, Mar 2, 2022 at 3:57 PM Lee Jones <lee.jones@linaro.org> wrote:
+>> > >
+>> > > On Wed, 02 Mar 2022, Michael S. Tsirkin wrote:
+>> > >
+>> > > > On Wed, Mar 02, 2022 at 01:56:35PM +0000, Lee Jones wrote:
+>> > > > > On Wed, 02 Mar 2022, Michael S. Tsirkin wrote:
+>> > > > >
+>> > > > > > On Wed, Mar 02, 2022 at 07:54:21AM +0000, Lee Jones wrote:
+>> > > > > > > vhost_vsock_handle_tx_kick() already holds the mutex during its call
+>> > > > > > > to vhost_get_vq_desc().  All we have to do is take the same lock
+>> > > > > > > during virtqueue clean-up and we mitigate the reported issues.
+>> > > > > > >
+>> > > > > > > Link: https://syzkaller.appspot.com/bug?extid=279432d30d825e63ba00
+>> > > > > > >
+>> > > > > > > Cc: <stable@vger.kernel.org>
+>> > > > > > > Reported-by: syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
+>> > > > > > > Signed-off-by: Lee Jones <lee.jones@linaro.org>
+>> > > > > > > ---
+>> > > > > > >  drivers/vhost/vhost.c | 2 ++
+>> > > > > > >  1 file changed, 2 insertions(+)
+>> > > > > > >
+>> > > > > > > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+>> > > > > > > index 59edb5a1ffe28..bbaff6a5e21b8 100644
+>> > > > > > > --- a/drivers/vhost/vhost.c
+>> > > > > > > +++ b/drivers/vhost/vhost.c
+>> > > > > > > @@ -693,6 +693,7 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
+>> > > > > > >         int i;
+>> > > > > > >
+>> > > > > > >         for (i = 0; i < dev->nvqs; ++i) {
+>> > > > > > > +               mutex_lock(&dev->vqs[i]->mutex);
+>> > > > > > >                 if (dev->vqs[i]->error_ctx)
+>> > > > > > >                         eventfd_ctx_put(dev->vqs[i]->error_ctx);
+>> > > > > > >                 if (dev->vqs[i]->kick)
+>> > > > > > > @@ -700,6 +701,7 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
+>> > > > > > >                 if (dev->vqs[i]->call_ctx.ctx)
+>> > > > > > >                         eventfd_ctx_put(dev->vqs[i]->call_ctx.ctx);
+>> > > > > > >                 vhost_vq_reset(dev, dev->vqs[i]);
+>> > > > > > > +               mutex_unlock(&dev->vqs[i]->mutex);
+>> > > > > > >         }
+>> > > > > >
+>> > > > > > So this is a mitigation plan but the bug is still there though
+>> > > > > > we don't know exactly what it is.  I would prefer adding something like
+>> > > > > > WARN_ON(mutex_is_locked(vqs[i]->mutex) here - does this make sense?
+>> > > > >
+>> > > > > As a rework to this, or as a subsequent patch?
+>> > > >
+>> > > > Can be a separate patch.
+>> > > >
+>> > > > > Just before the first lock I assume?
+>> > > >
+>> > > > I guess so, yes.
+>> > >
+>> > > No problem.  Patch to follow.
+>> > >
+>> > > I'm also going to attempt to debug the root cause, but I'm new to this
+>> > > subsystem to it might take a while for me to get my head around.
+>> >
+>> > IIUC the root cause should be the same as the one we solved here:
+>> > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a58da53ffd70294ebea8ecd0eb45fd0d74add9f9
+>> >
+>> > The worker was not stopped before calling vhost_dev_cleanup(). So while
+>> > the worker was still running we were going to free memory or initialize
+>> > fields while it was still using virtqueue.
+>>
+>> Right, and I agree but it's not the root though, we do attempt to stop all workers.
+>
+>Exactly.  This is what happens, but the question I'm going to attempt
+>to answer is *why* does this happen.
 
-I would just check for !windows.
+IIUC the worker was still running because the /dev/vhost-vsock file was 
+not explicitly closed, so vhost_vsock_dev_release() was called in the 
+do_exit() of the process.
 
-Paolo
+In that case there was the issue, because vhost_dev_check_owner() 
+returned false in vhost_vsock_stop() since current->mm was NULL.
+So it returned earlier, without calling vhost_vq_set_backend(vq, NULL).
 
-> ---
->   configure   | 5 +++--
->   meson.build | 2 +-
->   2 files changed, 4 insertions(+), 3 deletions(-)
-> 
-> diff --git a/configure b/configure
-> index c56ed53ee3..93aa22e345 100755
-> --- a/configure
-> +++ b/configure
-> @@ -1659,8 +1659,9 @@ fi
->   # vhost interdependencies and host support
->   
->   # vhost backends
-> -if test "$vhost_user" = "yes" && test "$linux" != "yes"; then
-> -  error_exit "vhost-user is only available on Linux"
-> +if test "$vhost_user" = "yes" && \
-> +    test "$linux" != "yes" && test "$bsd" != "yes" ; then
-> +  error_exit "vhost-user is only available on Linux and BSD"
->   fi
->   test "$vhost_vdpa" = "" && vhost_vdpa=$linux
->   if test "$vhost_vdpa" = "yes" && test "$linux" != "yes"; then
-> diff --git a/meson.build b/meson.build
-> index 8df40bfac4..f2bc439c30 100644
-> --- a/meson.build
-> +++ b/meson.build
-> @@ -2701,7 +2701,7 @@ if have_system or have_user
->   endif
->   
->   vhost_user = not_found
-> -if 'CONFIG_VHOST_USER' in config_host
-> +if targetos == 'linux' and 'CONFIG_VHOST_USER' in config_host
->     libvhost_user = subproject('libvhost-user')
->     vhost_user = libvhost_user.get_variable('vhost_user_dep')
->   endif
+This did not stop the worker from continuing to run, causing the 
+multiple issues we are seeing.
+
+current->mm was NULL, because in the do_exit() the address space is 
+cleaned in the exit_mm(), which is called before releasing the files 
+into the exit_task_work().
+
+This can be seen from the logs, where we see first the warnings printed 
+by vhost_dev_cleanup() and then the panic in the worker (e.g. here 
+https://syzkaller.appspot.com/text?tag=CrashLog&x=16a61fce700000)
+
+Mike also added a few more helpful details in this thread: 
+https://lore.kernel.org/virtualization/20220221100500.2x3s2sddqahgdfyt@sgarzare-redhat/T/#ree61316eac63245c9ba3050b44330e4034282cc2
+
+Thanks,
+Stefano
 
