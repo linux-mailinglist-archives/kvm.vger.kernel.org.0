@@ -2,92 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 042E54CA8D3
-	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 16:12:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 77B9E4CA8D6
+	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 16:13:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243391AbiCBPNY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Mar 2022 10:13:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58318 "EHLO
+        id S243396AbiCBPNw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 10:13:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59716 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234428AbiCBPNX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 10:13:23 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1EBB91D0F3
-        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 07:12:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646233959;
+        with ESMTP id S243393AbiCBPNv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 10:13:51 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D144779C52;
+        Wed,  2 Mar 2022 07:13:07 -0800 (PST)
+Received: from nazgul.tnic (nat0.nue.suse.com [IPv6:2001:67c:2178:4000::1111])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 60E0E1EC03AD;
+        Wed,  2 Mar 2022 16:13:02 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1646233982;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=6TNiLFlYcGF3ddTJpMJSNjgDj1FGfe5b4PLw2nW6z80=;
-        b=jQx5SxpT5TQyiQro4w3afKwvwxoZT1BFrI7cqo/iNgV73gnyCGtgFpTbb5OQpN6lYLQQJC
-        QwGxftEb5WTB4EyS2JteL24dJl1KtRe/JOHYMlwMDQpPucR0UQZ9oUDHR2I8JQcyAOazqU
-        FnJrs7jYgcREYpM3zS46esj5wlHHAUw=
-Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com
- [209.85.161.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-149-5hmEITpANMee8r3_Nsi2rw-1; Wed, 02 Mar 2022 10:12:38 -0500
-X-MC-Unique: 5hmEITpANMee8r3_Nsi2rw-1
-Received: by mail-oo1-f70.google.com with SMTP id r4-20020a4abf04000000b0032030c12b39so1412233oop.8
-        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 07:12:38 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=6TNiLFlYcGF3ddTJpMJSNjgDj1FGfe5b4PLw2nW6z80=;
-        b=z2lKgAj43DSDuUxuPaKmO0kVqai48kLEriMjiAYHasa/QPkHJNKV/QgH8qNRRKEno6
-         1nTPLnH3OO97MhWrIr5WR42HseIWj2nOkjRlvK9nQZtlba8pw/ro7bM/8HM3ICoBo48y
-         2ke3ZGbjdfhs06ZyyLxulH+L6ZQQYiP6jMXYh6K/NMRf3VEfFzU97zKIzJmMYOvvfNOG
-         R1iCinR6OQoguGL7S9mFGnW/tBXILXG1M9HBFXqBaG7tepQ84sNCTM/eNRrkYKn4xpH/
-         EMU3u+w+mg4ass5OdMvbUCPztRBlqnReWo582o+RBI7qBqv3TkWwmlju01D8BxEayaxY
-         XeSg==
-X-Gm-Message-State: AOAM532Zbueti6Q/Ukej2D/n/xN6/dUCs8HEmliO/6DDc5bmZOGI2Szl
-        aSDXGujbkPSLVLH4rUrXnlQB43zmXo5+CSBOycj2q/KUqBCw0wCF30WI0vujrqOae2olVwrrKXx
-        ZYkNvhsjwo1AG
-X-Received: by 2002:a05:6830:23b8:b0:5a5:75fd:8f9 with SMTP id m24-20020a05683023b800b005a575fd08f9mr15666160ots.152.1646233957348;
-        Wed, 02 Mar 2022 07:12:37 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwUKXcvdMYSNpSDmRV4uh5gtX/gNvk81VHFgaMMwZYft8TCoicAQaumaccPdPuVeKcHQyh9kA==
-X-Received: by 2002:a05:6830:23b8:b0:5a5:75fd:8f9 with SMTP id m24-20020a05683023b800b005a575fd08f9mr15666135ots.152.1646233957112;
-        Wed, 02 Mar 2022 07:12:37 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id s3-20020a056808208300b002d38ef031d6sm9680263oiw.36.2022.03.02.07.12.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Mar 2022 07:12:36 -0800 (PST)
-Date:   Wed, 2 Mar 2022 08:12:34 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Sergio Lopez <slp@redhat.com>
-Cc:     qemu-devel@nongnu.org, vgoyal@redhat.com,
-        Fam Zheng <fam@euphon.net>, kvm@vger.kernel.org,
-        Jagannathan Raman <jag.raman@oracle.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>, qemu-block@nongnu.org,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=Yxf1vQOo5EDfClBwLiZt1az7Yt5ajJKalO3BdVBp+QA=;
+        b=sb1egNkBKdDGxHdkyKtZQQ/7E0spw3yOHMWc6B0ThWQAj37VDZmE9PtkU5Mdcc8zF3E3+j
+        8frtxd7LkckpuX+1Iayb2eeuCfbS8eNFyS0c6mBY0Q1413SaI3I4S/RA9soOLaMPahX2wt
+        aU+3D+0rm8CFm023uxPWX54q1rOyDYs=
+Date:   Wed, 2 Mar 2022 16:13:07 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>,
+        Ard Biesheuvel <ardb@kernel.org>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Hanna Reitz <hreitz@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Elena Ufimtseva <elena.ufimtseva@oracle.com>,
-        Kevin Wolf <kwolf@redhat.com>,
-        Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        qemu-s390x@nongnu.org, Matthew Rosato <mjrosato@linux.ibm.com>,
-        John G Johnson <john.g.johnson@oracle.com>,
-        Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH 1/2] Allow returning EventNotifier's wfd
-Message-ID: <20220302081234.2378ef33.alex.williamson@redhat.com>
-In-Reply-To: <20220302113644.43717-2-slp@redhat.com>
-References: <20220302113644.43717-1-slp@redhat.com>
-        <20220302113644.43717-2-slp@redhat.com>
-Organization: Red Hat
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        brijesh.ksingh@gmail.com, tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH v11 29/45] x86/boot: Add Confidential Computing type to
+ setup_data
+Message-ID: <Yh+Jc20ed82Vyxge@nazgul.tnic>
+References: <20220224165625.2175020-1-brijesh.singh@amd.com>
+ <20220224165625.2175020-30-brijesh.singh@amd.com>
+ <Yh3r1PSx/fjqoBB3@nazgul.tnic>
+ <671a6137-0d45-3a8c-433a-32448019961f@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <671a6137-0d45-3a8c-433a-32448019961f@amd.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -95,30 +78,16 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed,  2 Mar 2022 12:36:43 +0100
-Sergio Lopez <slp@redhat.com> wrote:
+On Wed, Mar 02, 2022 at 08:25:45AM -0600, Brijesh Singh wrote:
+> Yep, I am waiting for Linux patches to finalize and then sync OVMF with it.
+> I will rename the field to magic in OVMF to keep both of them in sync.
 
-> event_notifier_get_fd(const EventNotifier *e) always returns
-> EventNotifier's read file descriptor (rfd). This is not a problem when
-> the EventNotifier is backed by a an eventfd, as a single file
-> descriptor is used both for reading and triggering events (rfd ==
-> wfd).
-> 
-> But, when EventNotifier is backed by a pipefd, we have two file
-> descriptors, one that can only be used for reads (rfd), and the other
-> only for writes (wfd).
-> 
-> There's, at least, one known situation in which we need to obtain wfd
-> instead of rfd, which is when setting up the file that's going to be
-> sent to the peer in vhost's SET_VRING_CALL.
-> 
-> Extend event_notifier_get_fd() to receive an argument which indicates
-> whether the caller wants to obtain rfd (false) or wfd (true).
+Ok, thx.
 
-There are about 50 places where we add the false arg here and 1 where
-we use true.  Seems it would save a lot of churn to hide this
-internally, event_notifier_get_fd() returns an rfd, a new
-event_notifier_get_wfd() returns the wfd.  Thanks,
+Btw, Ard, ACK for the EFI hunk?
 
-Alex
+-- 
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
