@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BFEEF4CA2EA
-	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 12:13:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 53CEA4CA2ED
+	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 12:13:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240958AbiCBLO3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Mar 2022 06:14:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50570 "EHLO
+        id S241264AbiCBLOb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 06:14:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50732 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229973AbiCBLO2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 06:14:28 -0500
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D17C54BB87;
-        Wed,  2 Mar 2022 03:13:44 -0800 (PST)
-Received: by mail-pj1-x102a.google.com with SMTP id z12-20020a17090ad78c00b001bf022b69d6so363504pju.2;
-        Wed, 02 Mar 2022 03:13:44 -0800 (PST)
+        with ESMTP id S241240AbiCBLOa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 06:14:30 -0500
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D86A4BB87;
+        Wed,  2 Mar 2022 03:13:47 -0800 (PST)
+Received: by mail-pj1-x102b.google.com with SMTP id v4so1484288pjh.2;
+        Wed, 02 Mar 2022 03:13:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=24rkf0ybzja72MMqLa1zp/S8buaWnl1mP/xdfxdfVF0=;
-        b=O1zgz2ddWY2bq4wVtAz52CefJ0HwcbiFgyZuepTllU9HgiF77dhA/7wK+ttZDOw5M6
-         ri8lZgo4G/kx1+8dqutyDQs7she7D4AU+GeVYGXcoA6K6pobc0mdPVWzD9kQ0rzLmXiY
-         9j9jWojuAc174INa3ZAozWJMoK81O8NkdDmmqQVPVaAkrJCCwlBqE718fQUPHNhiJES4
-         f5AELMQA30qIPfZJNDbBTGY6PSMfMWrVI5XKLUV8TEw6fHGaYn9Qut85JUr71/V3EsbI
-         6gkp71QEhWkZokV8V/Cm5HFVkKVqPTGTV7H8qTwVUFAozMd3Cwj2MEOmDoNjnwlsIzFN
-         H/VQ==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=3+cxr9PBA0y6OTGUTKyW/B0HETWf7xZdmsRbL9EBLSs=;
+        b=Js9++clihsvhkNBrmdJC1S5A8OK7lMfVxmGstEIEsYxazlDLkVHoRPZ2tMB1PDEK2u
+         m5pZNqxV2w4RMNxbHVGF4DzkW2aj5rgYN87sWwZSVG77YUMW+sKqz4rE9QnYluXrNBlD
+         km9EhE7KvQXEgkutvuAsieriqid5RDmKADhSBu+Z3aM06J+3/zC+4SpW+1Eh0sJtlYRk
+         WupcKaDH8rzbTxRUoY27/UvrJO/zyRLzWTt3L2XXx0yGnSkeOBa6CtTr6jIbBvuq6YYd
+         Ts9TZjsdjkrDTq9WKuZtAmICGba1N6yGVb2XDcGjX1JuQ8CdJsp9fwpjPP89AxrCWfa7
+         vFIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=24rkf0ybzja72MMqLa1zp/S8buaWnl1mP/xdfxdfVF0=;
-        b=I02xedIjO/CvJ1g4DsoFTZ8PgLY6Zu5jTj6IULa8l4GfvZ3LKKoBn8jDxCffnFKgXQ
-         8AJEnqrp9EznCRIinV98bjdFPrvAp9fQVcSkn6yIAFql68pN7kI1tMktl829WfTfw3zi
-         1eR2nuILvE1x4+0ifIBGpAurrwdexzH5+RtfN7U/f+mNWukvWoZlz2mFlcMwIpvaDVmp
-         ZUDtxliv9ZrAHgq+cRN13jvVcJPYnFbmzWqsNB8sYOP4knYOiqBwGBl24PC/APFiG3N2
-         WeQ9QxA9a93H4P4axih6tpE8Hkn+Eq6f2NQs7W/Ej57pwqxwvHBrcaJRqQUBrDrQYmc1
-         YYqQ==
-X-Gm-Message-State: AOAM533fBieGjNPhoIgm4HtSqhU4KFlHLGNhoiqRR+FLVQwSeszfXuGi
-        l4i3qE+sXmOiS19Vv7kOuOw=
-X-Google-Smtp-Source: ABdhPJwIYnFlQKTJF/TVkYneHZfeVoZVJvtyEE1BOzno43+MLDZY/z/jxEHEwcadFbb1BJwYVRrIqw==
-X-Received: by 2002:a17:902:7d81:b0:14f:e18b:2b9e with SMTP id a1-20020a1709027d8100b0014fe18b2b9emr29710059plm.160.1646219624340;
-        Wed, 02 Mar 2022 03:13:44 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=3+cxr9PBA0y6OTGUTKyW/B0HETWf7xZdmsRbL9EBLSs=;
+        b=AAtqYJpFCa6Do92qyQ8BLnEeWvYtKFHZlPF8xkj97d8IeRvooAb+n9zz8eMuTNOld7
+         YXylhIxtzRby0xTuBabPiYTq45ZZrX/scIIQEKdMKEKXiLb56elfh98fzZz4LMnEsHgJ
+         saFBlbs1PWpxrjVSD68O04bWoCQUJrh0Aq3A4g3ELuZrGx5OFleDBHEj9vKijFISHATB
+         Qt5DmraoVb2XsxcpU/mKtK56/7uWLs57xGBjqCdMWD/nPSajlCd4EG7KwGTtVLDni3tz
+         bf1j6KpyCuE4F5ShEPbFofr1K3i3XmEjb5WJhKRayi77Rzl784mw/b628P/RCy/nUui9
+         dbiw==
+X-Gm-Message-State: AOAM5335AtjlJgXDtuLIqgSMXPtEuYoblV/nWmWYwhR1ZW7t9ScGne0q
+        XakhsXb+c5gujpwalgZ+2BU=
+X-Google-Smtp-Source: ABdhPJzY/p1NcBfFzVLiPysuI/yRg6F4Vs6vG341aTbEKf0V2Gzo8sFF7I4TBZHo+DclH3qPYNuMZQ==
+X-Received: by 2002:a17:902:e5ce:b0:151:9c5a:3c87 with SMTP id u14-20020a170902e5ce00b001519c5a3c87mr1048645plf.59.1646219626926;
+        Wed, 02 Mar 2022 03:13:46 -0800 (PST)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id v22-20020a17090ad59600b001b7deb42251sm4681847pju.15.2022.03.02.03.13.41
+        by smtp.gmail.com with ESMTPSA id v22-20020a17090ad59600b001b7deb42251sm4681847pju.15.2022.03.02.03.13.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Mar 2022 03:13:43 -0800 (PST)
+        Wed, 02 Mar 2022 03:13:46 -0800 (PST)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
@@ -56,10 +56,12 @@ Cc:     Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
         Like Xu <likexu@tencent.com>
-Subject: [PATCH v2 00/12] KVM: x86/pmu: Get rid of PERF_TYPE_HARDWAR and other minor fixes
-Date:   Wed,  2 Mar 2022 19:13:22 +0800
-Message-Id: <20220302111334.12689-1-likexu@tencent.com>
+Subject: [PATCH v2 01/12] KVM: x86/pmu: Update comments for AMD gp counters
+Date:   Wed,  2 Mar 2022 19:13:23 +0800
+Message-Id: <20220302111334.12689-2-likexu@tencent.com>
 X-Mailer: git-send-email 2.35.1
+In-Reply-To: <20220302111334.12689-1-likexu@tencent.com>
+References: <20220302111334.12689-1-likexu@tencent.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -72,76 +74,42 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+From: Like Xu <likexu@tencent.com>
 
-This is a follow up to [0]. By keeping the same semantics of eventsel
-for gp and fixed counters, the reprogram code could be made more
-symmetrical, simpler and even faster [1], and it also fixes the
-obsolescence amd_event_mapping issue [2].
+The obsolete comment could more accurately state that AMD platforms
+have two base MSR addresses and two different maximum numbers
+for gp counters, depending on the X86_FEATURE_PERFCTR_CORE feature.
 
-One of the notable changes is that we ended up removing the
-reprogram_{gp, fixed}_counter() functions and replacing it with the
-merged reprogram_counter(), where KVM programs pmc->perf_event
-with only the PERF_TYPE_RAW type for any type of counter
-(suggested by Jim as well).  PeterZ confirmed the idea, "think so;
-the HARDWARE is just a convenience wrapper over RAW IIRC". 
+Signed-off-by: Like Xu <likexu@tencent.com>
+---
+ arch/x86/kvm/pmu.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-Practically, this change drops the guest pmu support on the hosts without
-X86_FEATURE_ARCH_PERFMON  (the oldest Pentium 4), where the
-PERF_TYPE_HARDWAR is intentionally introduced so that hosts can
-map the architectural guest PMU events to their own.
-
-Some code refactoring helps to review key changes more easily.
-Patches are based on top of kvm/master (ec756e40e271).
-
-The 11nd patch removes the call trace in the commit message while we still
-think that kvm->arch.pmu_event_filter requires SRCU protection in terms
-of pmu_event_filter functionality, similar to "kvm->arch.msr_filter".
-
-Patch 0012 is trying to expose some reserved bits for Milan use only, and
-the related discussion can be seen here [3], thanks to Jim and Ravikumar.
-
-Please check more details in each commit and feel free to comment.
-
-[0] https://lore.kernel.org/kvm/20211116122030.4698-1-likexu@tencent.com/
-[1] https://lore.kernel.org/kvm/ebfac3c7-fbc6-78a5-50c5-005ea11cc6ca@gmail.com/
-[2] https://lore.kernel.org/kvm/20220117085307.93030-1-likexu@tencent.com/
-[3] https://lore.kernel.org/kvm/c7b418f5-7014-d322-ea47-2d4ee9c2748c@gmail.com/
-
-Thanks,
-
-v1: https://lore.kernel.org/kvm/20220221115201.22208-1-likexu@tencent.com/
-v1 -> v2 Changelog:
-- Get all the vPMC tests I have on hand to pass;
-- Update obsolete AMD PMU comments; (Jim)
-- Fix my carelessness for [-Wconstant-logical-operand] in 0009; (0day)
-- Add "u64 new_config" to reuse perf_event for fixed CTRs; (0day)
-- Add patch 0012 to attract attention to review;
-
-Like Xu (12):
-  KVM: x86/pmu: Update comments for AMD gp counters
-  KVM: x86/pmu: Extract check_pmu_event_filter() from the same semantics
-  KVM: x86/pmu: Pass only "struct kvm_pmc *pmc" to reprogram_counter()
-  KVM: x86/pmu: Drop "u64 eventsel" for reprogram_gp_counter()
-  KVM: x86/pmu: Drop "u8 ctrl, int idx" for reprogram_fixed_counter()
-  KVM: x86/pmu: Use only the uniformly exported interface
-    reprogram_counter()
-  KVM: x86/pmu: Use PERF_TYPE_RAW to merge reprogram_{gp,
-    fixed}counter()
-  perf: x86/core: Add interface to query perfmon_event_map[] directly
-  KVM: x86/pmu: Replace pmc_perf_hw_id() with perf_get_hw_event_config()
-  KVM: x86/pmu: Drop amd_event_mapping[] in the KVM context
-  KVM: x86/pmu: Protect kvm->arch.pmu_event_filter with SRCU
-  KVM: x86/pmu: Clear reserved bit PERF_CTL2[43] for AMD erratum 1292
-
- arch/x86/events/core.c            |  11 ++
- arch/x86/include/asm/perf_event.h |   6 +
- arch/x86/kvm/pmu.c                | 182 ++++++++++++------------------
- arch/x86/kvm/pmu.h                |   6 +-
- arch/x86/kvm/svm/pmu.c            |  57 ++++------
- arch/x86/kvm/vmx/pmu_intel.c      |  64 ++++++-----
- 6 files changed, 149 insertions(+), 177 deletions(-)
-
+diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+index b1a02993782b..3f09af678b2c 100644
+--- a/arch/x86/kvm/pmu.c
++++ b/arch/x86/kvm/pmu.c
+@@ -34,7 +34,9 @@
+  *   However AMD doesn't support fixed-counters;
+  * - There are three types of index to access perf counters (PMC):
+  *     1. MSR (named msr): For example Intel has MSR_IA32_PERFCTRn and AMD
+- *        has MSR_K7_PERFCTRn.
++ *        has MSR_K7_PERFCTRn and, for families 15H and later,
++ *        MSR_F15H_PERF_CTRn, where MSR_F15H_PERF_CTR[0-3] are
++ *        aliased to MSR_K7_PERFCTRn.
+  *     2. MSR Index (named idx): This normally is used by RDPMC instruction.
+  *        For instance AMD RDPMC instruction uses 0000_0003h in ECX to access
+  *        C001_0007h (MSR_K7_PERCTR3). Intel has a similar mechanism, except
+@@ -46,7 +48,8 @@
+  *        between pmc and perf counters is as the following:
+  *        * Intel: [0 .. INTEL_PMC_MAX_GENERIC-1] <=> gp counters
+  *                 [INTEL_PMC_IDX_FIXED .. INTEL_PMC_IDX_FIXED + 2] <=> fixed
+- *        * AMD:   [0 .. AMD64_NUM_COUNTERS-1] <=> gp counters
++ *        * AMD:   [0 .. AMD64_NUM_COUNTERS-1] and, for families 15H
++ *          and later, [0 .. AMD64_NUM_COUNTERS_CORE-1] <=> gp counters
+  */
+ 
+ static void kvm_pmi_trigger_fn(struct irq_work *irq_work)
 -- 
 2.35.1
 
