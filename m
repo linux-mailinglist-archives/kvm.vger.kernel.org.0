@@ -2,158 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A2D474CA70A
-	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 15:04:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CB3734CA786
+	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 15:09:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242586AbiCBOFG convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Wed, 2 Mar 2022 09:05:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34348 "EHLO
+        id S242749AbiCBOJ5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 09:09:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242573AbiCBOFC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 09:05:02 -0500
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5963B8595C
-        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 06:04:13 -0800 (PST)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-196-4Li6Fux3PdyQ14Lo-DMf3A-1; Wed, 02 Mar 2022 14:04:10 +0000
-X-MC-Unique: 4Li6Fux3PdyQ14Lo-DMf3A-1
-Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) by
- AcuMS.aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) with Microsoft SMTP
- Server (TLS) id 15.0.1497.28; Wed, 2 Mar 2022 14:04:06 +0000
-Received: from AcuMS.Aculab.com ([fe80::994c:f5c2:35d6:9b65]) by
- AcuMS.aculab.com ([fe80::994c:f5c2:35d6:9b65%12]) with mapi id
- 15.00.1497.028; Wed, 2 Mar 2022 14:04:06 +0000
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Xiaomeng Tong' <xiam0nd.tong@gmail.com>,
-        "torvalds@linux-foundation.org" <torvalds@linux-foundation.org>
-CC:     "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-        "alsa-devel@alsa-project.org" <alsa-devel@alsa-project.org>,
-        "amd-gfx@lists.freedesktop.org" <amd-gfx@lists.freedesktop.org>,
-        "andriy.shevchenko@linux.intel.com" 
-        <andriy.shevchenko@linux.intel.com>,
-        "arnd@arndb.de" <arnd@arndb.de>,
-        "bcm-kernel-feedback-list@broadcom.com" 
-        <bcm-kernel-feedback-list@broadcom.com>,
-        "bjohannesmeyer@gmail.com" <bjohannesmeyer@gmail.com>,
-        "c.giuffrida@vu.nl" <c.giuffrida@vu.nl>,
-        "christian.koenig@amd.com" <christian.koenig@amd.com>,
-        "christophe.jaillet@wanadoo.fr" <christophe.jaillet@wanadoo.fr>,
-        "dan.carpenter@oracle.com" <dan.carpenter@oracle.com>,
-        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
-        "drbd-dev@lists.linbit.com" <drbd-dev@lists.linbit.com>,
-        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-        "gustavo@embeddedor.com" <gustavo@embeddedor.com>,
-        "h.j.bos@vu.nl" <h.j.bos@vu.nl>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-        "jakobkoschel@gmail.com" <jakobkoschel@gmail.com>,
-        "jgg@ziepe.ca" <jgg@ziepe.ca>,
-        "keescook@chromium.org" <keescook@chromium.org>,
-        "kgdb-bugreport@lists.sourceforge.net" 
-        <kgdb-bugreport@lists.sourceforge.net>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-aspeed@lists.ozlabs.org" <linux-aspeed@lists.ozlabs.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-f2fs-devel@lists.sourceforge.net" 
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-iio@vger.kernel.org" <linux-iio@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
-        "linux-mediatek@lists.infradead.org" 
-        <linux-mediatek@lists.infradead.org>,
-        "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-sgx@vger.kernel.org" <linux-sgx@vger.kernel.org>,
-        "linux-staging@lists.linux.dev" <linux-staging@lists.linux.dev>,
-        "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>,
-        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
-        "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
-        "linux1394-devel@lists.sourceforge.net" 
-        <linux1394-devel@lists.sourceforge.net>,
-        "linux@rasmusvillemoes.dk" <linux@rasmusvillemoes.dk>,
-        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-        "nathan@kernel.org" <nathan@kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "nouveau@lists.freedesktop.org" <nouveau@lists.freedesktop.org>,
-        "rppt@kernel.org" <rppt@kernel.org>,
-        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "tipc-discussion@lists.sourceforge.net" 
-        <tipc-discussion@lists.sourceforge.net>,
-        "v9fs-developer@lists.sourceforge.net" 
-        <v9fs-developer@lists.sourceforge.net>
-Subject: RE: [PATCH 2/6] treewide: remove using list iterator after loop body
- as a ptr
-Thread-Topic: [PATCH 2/6] treewide: remove using list iterator after loop body
- as a ptr
-Thread-Index: AQHYLhg9+DU/OogLf0+tiSFmjztyUKysHu+Q
-Date:   Wed, 2 Mar 2022 14:04:06 +0000
-Message-ID: <1077f17e50d34dc2bbfdf4e52a1cb2fd@AcuMS.aculab.com>
-References: <CAHk-=whLK11HyvpUtEftOjc3Gup2V77KpAQ2fycj3uai=qceHw@mail.gmail.com>
- <20220302093106.8402-1-xiam0nd.tong@gmail.com>
-In-Reply-To: <20220302093106.8402-1-xiam0nd.tong@gmail.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
-MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        with ESMTP id S242788AbiCBOJz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 09:09:55 -0500
+Received: from mail-wr1-x44a.google.com (mail-wr1-x44a.google.com [IPv6:2a00:1450:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35E89338BD
+        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 06:08:51 -0800 (PST)
+Received: by mail-wr1-x44a.google.com with SMTP id b7-20020a05600003c700b001efac398af7so678138wrg.22
+        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 06:08:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=lp9zEaIv1S7ZBdqtPNsd+5mYg9mGXB6Zu8tr2wXg9a4=;
+        b=DRaPF5fNY/BernAWTuDUoEGJ+DCvOQP/R6LOZXSoloKXxCxKNTf7P4DIAyXln1G4qT
+         fBtxpuEVmqlR74bOGGsqTH+1RellxjU4iM9z8GdjSw9ltdCbeSsCUTJ+tAilJJErt71/
+         jy73Nx7nXSIWhT4tbAfblXGAT7pULkeFFFQReA8HKM/9WQBlYlvsbuaMWy09nYmxzCM1
+         MtGFpfuAx9r6ACNG5FPKQft5s4ggMv2a284dJnT5Vm2wNo3zsTXFBt5zqLvUrDyJfSzN
+         ycGWqFCBCAwPIPpAfjGkcft8kvOva4eLWIxq8vcdHiIvzxxoFmlme9MRkqlx98ZXyQ33
+         LKjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=lp9zEaIv1S7ZBdqtPNsd+5mYg9mGXB6Zu8tr2wXg9a4=;
+        b=00+mtqRVuGnk1JM6/UUTD1txz+dClmyWQBoOmD6X2Wxq/Tf7VZaa6KW5Tvs8YdxHuH
+         KNqaxmdvaSy8AeQ6ZzDHa97jYUD/d69QZveRc/N/XGueUCqPPgW65o3K4jpdIek5ZLdK
+         OpwsTMbLo960X+4dfJss8dvHQPwIHy58WQPYcgRbrZI2JIDXfKmjjkoGSA6EnVjGarIu
+         U0NiDMvMYX75/HUGDEfk7RPp/LKBdLDM6iQH0FRi6/bcltQf9lzw1d48KaBOkIMW8kYg
+         NuKCLCujv28z/Yzsqmwa7nwxPJXh9ZQB9zGkF5gAtUdUhKZR746hu4i2jDMy8NvFMQ5u
+         BMAA==
+X-Gm-Message-State: AOAM533uC+akBXpadUysg/3W/JivHzdcUpp9ybNnffjJXDzvW19beZp9
+        MvK8JDfV3VmbBkqWHdBWcgCY7ZjD/U+gpmOUvLNn6cWAK9pIi6klGW+jmT/6kPBwYSueDi6p4WL
+        Hq5iIg+gTiv8IUwQFJuMFQlCRUSEvO6JY3Ty/noYG11hwwqeWJOVi7clIuob1cbDxEWU89cvUKQ
+        ==
+X-Google-Smtp-Source: ABdhPJw6N9e7jtLkHBc4dWy0BeHH2pQI2EHtLYbs8cEU56ynxaYFdF3wbWy63gxs9iGvZsPsey1G4jU0Bh98dAjfmMI=
+X-Received: from sene.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:27c4])
+ (user=sebastianene job=sendgmr) by 2002:a1c:4603:0:b0:381:19fe:280b with SMTP
+ id t3-20020a1c4603000000b0038119fe280bmr20695290wma.67.1646230126801; Wed, 02
+ Mar 2022 06:08:46 -0800 (PST)
+Date:   Wed,  2 Mar 2022 14:07:32 +0000
+Message-Id: <20220302140734.1015958-1-sebastianene@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.1.574.g5d30c73bfb-goog
+Subject: [PATCH kvmtool v7 0/3] aarch64: Add stolen time support
+From:   Sebastian Ene <sebastianene@google.com>
+To:     kvm@vger.kernel.org
+Cc:     qperret@google.com, maz@kernel.org, kvmarm@lists.cs.columbia.edu,
+        will@kernel.org, julien.thierry.kdev@gmail.com,
+        Sebastian Ene <sebastianene@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-10.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Xiaomeng Tong
-> Sent: 02 March 2022 09:31
-> 
-> On Mon, 28 Feb 2022 16:41:04 -0800, Linus Torvalds
-> <torvalds@linux-foundation.org> wrote:
-> >
-> > But basically to _me_, the important part is that the end result is
-> > maintainable longer-term.
-> 
-> I couldn't agree more. And because of that, I stick with the following
-> approach because it's maintainable longer-term than "type(pos) pos" one:
->  Implements a new macro for each list_for_each_entry* with _inside suffix.
->   #define list_for_each_entry_inside(pos, type, head, member)
+These patches add support for stolen time functionality.
 
-I think that it would be better to make any alternate loop macro
-just set the variable to NULL on the loop exit.
-That is easier to code for and the compiler might be persuaded to
-not redo the test.
+Patch #1 moves the vCPU structure initialisation before the target->init()
+call to allow early access to the kvm structure from the vCPU
+during target->init().
 
-It also doesn't need an extra variable defined in the for() statement
-so can be back-ported to older kernels without required declaration
-in the middle of blocks.
+Patch #2 modifies the memory layout in arm-common/kvm-arch.h and adds a
+new MMIO device PVTIME after the RTC region. A new flag is added in
+kvm-config.h that will be used to control [enable/disable] the pvtime
+functionality. Stolen time is enabled by default when the host
+supports KVM_CAP_STEAL_TIME.
 
-OTOH there may be alternative definitions that can be used to get
-the compiler (or other compiler-like tools) to detect broken code.
-Even if the definition can't possibly generate a working kerrnel.
+Patch #3 adds a new command line argument to disable the stolen time
+functionality(by default is enabled).
 
-	David
+Changelog since v6:
+ - fix perror number of arguments
 
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-Registration No: 1397386 (Wales)
+Changelog since v5:
+ - propagate the error code from the kvm_cpu__setup_pvtime() when the
+   host supports KVM_CAP_STEAL_TIME but if fails to configure it for
+   stolen time functionality.
+
+Sebastian Ene (3):
+  aarch64: Populate the vCPU struct before target->init()
+  aarch64: Add stolen time support
+  Add --no-pvtime command line argument
+
+ Makefile                               |   1 +
+ arm/aarch64/arm-cpu.c                  |   2 +-
+ arm/aarch64/include/kvm/kvm-cpu-arch.h |   1 +
+ arm/aarch64/pvtime.c                   | 103 +++++++++++++++++++++++++
+ arm/include/arm-common/kvm-arch.h      |   6 +-
+ arm/kvm-cpu.c                          |  14 ++--
+ builtin-run.c                          |   2 +
+ include/kvm/kvm-config.h               |   1 +
+ 8 files changed, 121 insertions(+), 9 deletions(-)
+ create mode 100644 arm/aarch64/pvtime.c
+
+-- 
+2.35.1.574.g5d30c73bfb-goog
 
