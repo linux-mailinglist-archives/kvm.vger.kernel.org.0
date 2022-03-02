@@ -2,101 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D72C04C9C34
-	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 04:37:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D3144C9DD4
+	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 07:35:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239368AbiCBDi1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Mar 2022 22:38:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45750 "EHLO
+        id S235042AbiCBGfx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 01:35:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229911AbiCBDi0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Mar 2022 22:38:26 -0500
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65FB321815;
-        Tue,  1 Mar 2022 19:37:44 -0800 (PST)
-Received: by mail-pj1-x1031.google.com with SMTP id p3-20020a17090a680300b001bbfb9d760eso3643827pjj.2;
-        Tue, 01 Mar 2022 19:37:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=PciJuOAlr8N3GqSNavEdG7YQccwdvrpqQWLs3HjQ+VA=;
-        b=PTrKRROTBIa4xEupzDIFrHPrHyenZvzWG12wzZoLZps2cuBcmiiusPNsfOHUIIhXY1
-         Dzaqn9aibxk9RctgxxOtEDHEWTp3Sx5miliKdiqss/S1J0EicS0fash1SGy1v9mPvfr7
-         T38SofsQMbg8X07nA6By9jVC+2Tz9jDdzuDjpqdBInKOA0ljX1TjvSOcpZjVtP61EznM
-         +MQTFBTgZ8VMToldXITtTwvHSIWnSfoU2zYEz5YHpxNW8GD7zvgtZ7FO3HaerB9nhzyO
-         xVjj4p3u8kb3Fo2eCDpluGcJlh/hyUHNARfmIpmcyD8f8C6pr0G5S+7Qxg4tswPptD3G
-         FDIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=PciJuOAlr8N3GqSNavEdG7YQccwdvrpqQWLs3HjQ+VA=;
-        b=gvDZLgHvRpznxGdkyCTrIXQHa106/TQZV99R2TzWfCFzyq2K0zkT5bZpdhmJLdLZvS
-         9l/UeqCUVHpa7i5DhvA9pg+5Ti8ng0DXUqubR4kqqN/hW2XOnPSbvXmH13xjl7RVpklO
-         uAev9uEhiaP4GQIeIV1n8J+Ba7DfE5w1sPKLeDIqcWj1mmfuFQHwcDF0IqPnl2C+cQdp
-         rjqIITB6XYNAwHCF8q3M7Md+5t1NgBPblK+QBFXbYIrSL583lEMazmCXtIBtY9HQa7hw
-         YkN3HWl2HIDxJrEGoHo/mXwbWiDA7gLvhtKsXwjbYRxWfbJsUNlkj/RivbvPqrQR4dQ9
-         qP+g==
-X-Gm-Message-State: AOAM533QTOElizu11nGdVnX+BFjApevuFIV6BsCPtDXfED/gWS8G9L8q
-        dhcTYJQutxImfSt1p3CsKXT1wFF3LNEOZ0lApOo=
-X-Google-Smtp-Source: ABdhPJx3DSL5oCKadQfLogOuMPj7/RztMmYXlngTeE6kQDqGd069vD88fNu+VHUk/rH2vprZMfwWvfhvn2DVYrJFk8A=
-X-Received: by 2002:a17:903:18d:b0:150:b6d:64cd with SMTP id
- z13-20020a170903018d00b001500b6d64cdmr28972607plg.123.1646192263949; Tue, 01
- Mar 2022 19:37:43 -0800 (PST)
+        with ESMTP id S231644AbiCBGfx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 01:35:53 -0500
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3940C5F8C4;
+        Tue,  1 Mar 2022 22:35:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1646202908; x=1677738908;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=ZgpAzsRRmmqaeIEgyxC5au07eT1Knh2iifyDRqim7xk=;
+  b=Z94En1SWgzIBVy5nvrxkPo+R8H0vx44PaWWuVM2iox0r0l6BV05W5dlI
+   3lG/gwlHHKLK00389UK7kW7xnk45B3r+LsSVBH8zanL5FWMM6QNPH/UiG
+   emVSr+8Cp6hV4RIXOWlIHJ1GdBzSu7byS7HSi3OayHU7g/V5oRIOVxfOh
+   PHKm2ELDk4mg9IGX+pYGyR1cMkEP4E32I/DSJyhyJi/toSPtfaR52VFxV
+   4KmfEEwplIuGS0l9r7h86OUbeXDpjULF0bBgfUqXXFLFBhuGWI1MK4ib7
+   29u4AH/HYN/HANJrvvyqGiQ2vHGg9rzrhGBZ3eqALO4rs/Yiq3lMFz6lt
+   A==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10273"; a="253517439"
+X-IronPort-AV: E=Sophos;i="5.90,148,1643702400"; 
+   d="scan'208";a="253517439"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2022 22:35:07 -0800
+X-IronPort-AV: E=Sophos;i="5.90,148,1643702400"; 
+   d="scan'208";a="508091341"
+Received: from gao-cwp.sh.intel.com (HELO gao-cwp) ([10.239.159.105])
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2022 22:35:01 -0800
+Date:   Wed, 2 Mar 2022 14:45:57 +0800
+From:   Chao Gao <chao.gao@intel.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Zeng Guang <guang.zeng@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jethro Beekman <jethro@fortanix.com>,
+        Kai Huang <kai.huang@intel.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, Robert Hu <robert.hu@intel.com>
+Subject: Re: [PATCH v6 7/9] KVM: VMX: enable IPI virtualization
+Message-ID: <20220302064556.GA18820@gao-cwp>
+References: <20220225082223.18288-1-guang.zeng@intel.com>
+ <20220225082223.18288-8-guang.zeng@intel.com>
+ <0e9a22e90256ed289d90956f720f36d870c92d2a.camel@redhat.com>
+ <20220301092144.GA32619@gao-cwp>
 MIME-Version: 1.0
-References: <20220301064314.2028737-1-baymaxhuang@gmail.com> <20220301180512.06f7f6dc@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
-In-Reply-To: <20220301180512.06f7f6dc@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
-From:   Harold Huang <baymaxhuang@gmail.com>
-Date:   Wed, 2 Mar 2022 11:37:32 +0800
-Message-ID: <CAHJXk3aA62C5s-MV-B6mCTuUJGCdc-pEJpEkxX7vBDwDdHaSrw@mail.gmail.com>
-Subject: Re: [PATCH net-next] tuntap: add sanity checks about msg_controllen
- in sendmsg
-To:     Jakub Kicinski <kuba@kernel.org>
-Cc:     netdev <netdev@vger.kernel.org>, Jason Wang <jasowang@redhat.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Eric Dumazet <eric.dumazet@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:VIRTIO HOST (VHOST)" <kvm@vger.kernel.org>,
-        "open list:VIRTIO HOST (VHOST)" 
-        <virtualization@lists.linux-foundation.org>,
-        "open list:XDP (eXpress Data Path)" <bpf@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220301092144.GA32619@gao-cwp>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Spam-Status: No, score=-7.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 2, 2022 at 10:05 AM Jakub Kicinski <kuba@kernel.org> wrote:
+>>>  static void init_vmcs(struct vcpu_vmx *vmx)
+>>>  {
+>>> +	struct kvm_vcpu *vcpu = &vmx->vcpu;
+>>> +	struct kvm_vmx *kvm_vmx = to_kvm_vmx(vcpu->kvm);
+>>> +
+>>>  	if (nested)
+>>>  		nested_vmx_set_vmcs_shadowing_bitmap();
+>>>  
+>>> @@ -4431,7 +4460,7 @@ static void init_vmcs(struct vcpu_vmx *vmx)
+>>>  	if (cpu_has_tertiary_exec_ctrls())
+>>>  		tertiary_exec_controls_set(vmx, vmx_tertiary_exec_control(vmx));
+>>>  
+>>> -	if (kvm_vcpu_apicv_active(&vmx->vcpu)) {
+>>> +	if (kvm_vcpu_apicv_active(vcpu)) {
+>>
+>>here too (pre-existing), I also not 100% sure that kvm_vcpu_apicv_active
+>>should be used. I haven't studied APICv code that much to be 100% sure.
 >
-> On Tue,  1 Mar 2022 14:43:14 +0800 Harold Huang wrote:
-> > In patch [1], tun_msg_ctl was added to allow pass batched xdp buffers to
-> > tun_sendmsg. Although we donot use msg_controllen in this path, we should
-> > check msg_controllen to make sure the caller pass a valid msg_ctl.
-> >
-> > [1]: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=fe8dd45bb7556246c6b76277b1ba4296c91c2505
-> >
-> > Reported-by: Eric Dumazet <eric.dumazet@gmail.com>
-> > Suggested-by: Jason Wang <jasowang@redhat.com>
-> > Signed-off-by: Harold Huang <baymaxhuang@gmail.com>
+
+On second thoughts, I think you are correct. Below VMCS fields 
+(i.e, EIO_EXIT_BITMAP0/1/2, POSTED_INTR_NV/DESC_ADDR) should be configured as
+long as the VM can enable APICv, particularly considering
+vmx_refresh_apicv_exec_ctrl() doesn't configure these VMCS fields when APICv
+gets activated.
+
+This is a latent bug in KVM. We will fix it with a separate patch.
+
+>I think kvm_vcpu_apicv_active is better.
 >
-> Would you mind resending the same patch? It looks like it depended on
-> your other change so the build bot was unable to apply and test it.
+>The question is: If CPU supports a VMX feature (APICv), but it isn't enabled
+>now, is it allowed to configure VMCS fields defined by the feature?  Would CPU
+>ignore the values written to the fields or retain them after enabling the
+>feature later?
 
-Yes, it depends on this patch [1] which has been applied to netdev.  I
-see this patch could be applied to netdev by git am. But if I use
-another patch that could be applied to linux master, it could not be
-applied to netdev anymore.
+This concern is invalid. SDM doesn't mention any ordering requirement about
+configuring a feature's vm-execution bit and other VMCS fields introduced for
+the feature. Please disregard my original remark.
 
-[1]: https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=fb3f903769e8
+>
+>Personally, KVM shouldn't rely on CPU's behavior in this case. So, It is better
+>for KVM to write below VMCS fields only if APICv is enabled.
+>
+>>
+>>
+>>>  		vmcs_write64(EOI_EXIT_BITMAP0, 0);
+>>>  		vmcs_write64(EOI_EXIT_BITMAP1, 0);
+>>>  		vmcs_write64(EOI_EXIT_BITMAP2, 0);
+>>> @@ -4441,6 +4470,13 @@ static void init_vmcs(struct vcpu_vmx *vmx)
+>>>  
+>>>  		vmcs_write16(POSTED_INTR_NV, POSTED_INTR_VECTOR);
+>>>  		vmcs_write64(POSTED_INTR_DESC_ADDR, __pa((&vmx->pi_desc)));
+>>> +
+>>> +		if (enable_ipiv) {
+>>> +			WRITE_ONCE(kvm_vmx->pid_table[vcpu->vcpu_id],
+>>> +				__pa(&vmx->pi_desc) | PID_TABLE_ENTRY_VALID);
+>>> +			vmcs_write64(PID_POINTER_TABLE, __pa(kvm_vmx->pid_table));
+>>> +			vmcs_write16(LAST_PID_POINTER_INDEX, kvm_vmx->pid_last_index);
+>>> +		}
+>>>  	}
