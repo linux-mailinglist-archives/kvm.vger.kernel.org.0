@@ -2,152 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E30DD4CAAF0
-	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 17:57:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D7074CAB2E
+	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 18:09:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243582AbiCBQ6e (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Mar 2022 11:58:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44782 "EHLO
+        id S243647AbiCBRKc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 12:10:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52804 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243580AbiCBQ63 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 11:58:29 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4626D5FFC
-        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 08:57:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646240264;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=tmS5o/o7TOxgF/ChRH9DIbCR+xpKRUvssVTS2w4RtUs=;
-        b=VXvnAz4PCFwCkaFILXH6iMP0atzjH4ES6Yec21mOJGbQYZzu10zU8xDcRISX0af2BkhxLW
-        qVAhSpjWi/kximsYijCLBavg+Uk2sgj7itChARzquaM20XrO6UKcVZgJwlmk2szsgTJUf1
-        ZDDBxx7ol0rVg8fAYgAXZdA6KH710gc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-37-dgeZSHUkP-W5PjRyWKQeow-1; Wed, 02 Mar 2022 11:57:41 -0500
-X-MC-Unique: dgeZSHUkP-W5PjRyWKQeow-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F3424824FA6;
-        Wed,  2 Mar 2022 16:57:38 +0000 (UTC)
-Received: from localhost (unknown [10.39.194.94])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 246F72DE6B;
-        Wed,  2 Mar 2022 16:57:26 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Yishai Hadas <yishaih@nvidia.com>, alex.williamson@redhat.com,
-        bhelgaas@google.com, jgg@nvidia.com, saeedm@nvidia.com
-Cc:     linux-pci@vger.kernel.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
-        kwankhede@nvidia.com, mgurtovoy@nvidia.com, yishaih@nvidia.com,
-        maorg@nvidia.com, ashok.raj@intel.com, kevin.tian@intel.com,
-        shameerali.kolothum.thodi@huawei.com
-Subject: Re: [PATCH V9 mlx5-next 09/15] vfio: Define device migration
- protocol v2
-In-Reply-To: <20220224142024.147653-10-yishaih@nvidia.com>
-Organization: Red Hat GmbH
-References: <20220224142024.147653-1-yishaih@nvidia.com>
- <20220224142024.147653-10-yishaih@nvidia.com>
-User-Agent: Notmuch/0.34 (https://notmuchmail.org)
-Date:   Wed, 02 Mar 2022 17:57:25 +0100
-Message-ID: <87h78gi96y.fsf@redhat.com>
+        with ESMTP id S231790AbiCBRKa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 12:10:30 -0500
+Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78F2D43ED2
+        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 09:09:46 -0800 (PST)
+Received: by mail-wr1-x434.google.com with SMTP id p9so3788222wra.12
+        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 09:09:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=QnhPHAEwKEep6fi2qjTPWjK7k2b0OUJeNp7TyqfWmlo=;
+        b=cv3rLCKOI9yrY9jCCytYCSnWHCqjS82TZRdZcBNToTvc8qHjAihsufWLmRX+5midRV
+         wYSIFsII/zB3kpii5CKY5ZgNApFNgtDsztw/TBDgUGOJe3ELIoEGNOJT5XDlVSEKp553
+         WPOufDUeQTX12If1BQSTfmN1B0SGP1ZZFtUBArjjWI3NTvkAPOKHcyGrmS4gPwGeHuXP
+         qSR4z+QDxdqLdiFeh87YGOk7Zj6L4eI9peSDSGqaX0qr4VIbFy20eycRjwmjdvRriRsS
+         1r6G9fWrXPFX6W/+BxI8Q1HiFjBjXoh6HW4fTM5CUk5JatD0egaDZnrDyxbgQ9LyT6OC
+         9c7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=QnhPHAEwKEep6fi2qjTPWjK7k2b0OUJeNp7TyqfWmlo=;
+        b=hdV98jfK3pZYtEIjKb/biUtyMmyU3OfKTvjyWQCwe0CnVzZPTuDk0uKgkCHswGo2d9
+         WchK9VJjZny1k7HTt6jlTOqRywGIxQz2WysubDEzkfMVt/gVOqE0QasQpF4VwDPmh4ZM
+         b/XzMPz2DugubRPmJxxB8+3DjGNAy9Y1Lt2zEjzm8L9rzl3Hdxt9pCrLABLijcLwfyI1
+         NjTK2z2TUQU6A0iYlIa05NSWWB/I/jHbZY+bVlBLHCucwXd2ZzlXytRvMWd4X6kb0AwU
+         RNcN0qmUcmPVYAWcag11Avrn9zUTGbNnRbUp7wfeg3EY0XV867hYRf/xy8laNK/UJPUF
+         jhEA==
+X-Gm-Message-State: AOAM531yxTH1YWb702xThn+IJODqLlBasq41yAQq/ZeroeZ0MXoYFboJ
+        w934F+lUq7w2ueHeMRgOwTk=
+X-Google-Smtp-Source: ABdhPJwwylKky8bpc1hAINxWZAxor2k/30WpWOvo+TxMMpNYaCQn0rmUzylWFa3jb9g7yAXjVEHgzw==
+X-Received: by 2002:a05:6000:2a5:b0:1f0:2e57:82ab with SMTP id l5-20020a05600002a500b001f02e5782abmr3142605wry.515.1646240984956;
+        Wed, 02 Mar 2022 09:09:44 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.googlemail.com with ESMTPSA id c4-20020adfef44000000b001ef93c7bbb8sm12830070wrp.30.2022.03.02.09.09.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 02 Mar 2022 09:09:44 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <d75f1eee-cf69-9783-1cde-14427e680360@redhat.com>
+Date:   Wed, 2 Mar 2022 18:09:41 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH 1/2] Allow returning EventNotifier's wfd
+Content-Language: en-US
+To:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Sergio Lopez <slp@redhat.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        qemu-devel@nongnu.org, vgoyal@redhat.com,
+        Fam Zheng <fam@euphon.net>, kvm@vger.kernel.org,
+        Jagannathan Raman <jag.raman@oracle.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>, qemu-block@nongnu.org,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Hanna Reitz <hreitz@redhat.com>,
+        Elena Ufimtseva <elena.ufimtseva@oracle.com>,
+        Kevin Wolf <kwolf@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        qemu-s390x@nongnu.org, Matthew Rosato <mjrosato@linux.ibm.com>,
+        John G Johnson <john.g.johnson@oracle.com>,
+        Thomas Huth <thuth@redhat.com>
+References: <20220302113644.43717-1-slp@redhat.com>
+ <20220302113644.43717-2-slp@redhat.com>
+ <20220302081234.2378ef33.alex.williamson@redhat.com>
+ <20220302152342.3hlzw3ih2agqqu6c@mhamilton>
+ <Yh+WESUBI9spkHvd@stefanha-x1.localdomain>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <Yh+WESUBI9spkHvd@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 24 2022, Yishai Hadas <yishaih@nvidia.com> wrote:
+On 3/2/22 17:06, Stefan Hajnoczi wrote:
+>> I agree. In fact, that's what I implemented in the first place. I
+>> changed to this version in which event_notifier_get_fd() is extended
+>> because it feels more "correct". But yes, the pragmatic option would
+>> be adding a new event_notifier_get_wfd().
+>>
+>> I'll wait for more reviews, and unless someone voices against it, I'll
+>> respin the patches with that strategy (I already have it around here).
+> I had the same thought looking through the patch before I read Alex's
+> suggestion. A separate get_wfd() function makes sense to me.
 
-> From: Jason Gunthorpe <jgg@nvidia.com>
->
-> Replace the existing region based migration protocol with an ioctl based
-> protocol. The two protocols have the same general semantic behaviors, but
-> the way the data is transported is changed.
->
-> This is the STOP_COPY portion of the new protocol, it defines the 5 states
-> for basic stop and copy migration and the protocol to move the migration
-> data in/out of the kernel.
->
-> Compared to the clarification of the v1 protocol Alex proposed:
->
-> https://lore.kernel.org/r/163909282574.728533.7460416142511440919.stgit@omen
->
-> This has a few deliberate functional differences:
->
->  - ERROR arcs allow the device function to remain unchanged.
->
->  - The protocol is not required to return to the original state on
->    transition failure. Instead userspace can execute an unwind back to
->    the original state, reset, or do something else without needing kernel
->    support. This simplifies the kernel design and should userspace choose
->    a policy like always reset, avoids doing useless work in the kernel
->    on error handling paths.
->
->  - PRE_COPY is made optional, userspace must discover it before using it.
->    This reflects the fact that the majority of drivers we are aware of
->    right now will not implement PRE_COPY.
->
->  - segmentation is not part of the data stream protocol, the receiver
->    does not have to reproduce the framing boundaries.
->
-> The hybrid FSM for the device_state is described as a Mealy machine by
-> documenting each of the arcs the driver is required to implement. Defining
-> the remaining set of old/new device_state transitions as 'combination
-> transitions' which are naturally defined as taking multiple FSM arcs along
-> the shortest path within the FSM's digraph allows a complete matrix of
-> transitions.
->
-> A new VFIO_DEVICE_FEATURE of VFIO_DEVICE_FEATURE_MIG_DEVICE_STATE is
-> defined to replace writing to the device_state field in the region. This
-> allows returning a brand new FD whenever the requested transition opens
-> a data transfer session.
->
-> The VFIO core code implements the new feature and provides a helper
-> function to the driver. Using the helper the driver only has to
-> implement 6 of the FSM arcs and the other combination transitions are
-> elaborated consistently from those arcs.
->
-> A new VFIO_DEVICE_FEATURE of VFIO_DEVICE_FEATURE_MIGRATION is defined to
-> report the capability for migration and indicate which set of states and
-> arcs are supported by the device. The FSM provides a lot of flexibility to
-> make backwards compatible extensions but the VFIO_DEVICE_FEATURE also
-> allows for future breaking extensions for scenarios that cannot support
-> even the basic STOP_COPY requirements.
->
-> The VFIO_DEVICE_FEATURE_MIG_DEVICE_STATE with the GET option (i.e.
-> VFIO_DEVICE_FEATURE_GET) can be used to read the current migration state
-> of the VFIO device.
->
-> Data transfer sessions are now carried over a file descriptor, instead of
-> the region. The FD functions for the lifetime of the data transfer
-> session. read() and write() transfer the data with normal Linux stream FD
-> semantics. This design allows future expansion to support poll(),
-> io_uring, and other performance optimizations.
->
-> The complicated mmap mode for data transfer is discarded as current qemu
-> doesn't take meaningful advantage of it, and the new qemu implementation
-> avoids substantially all the performance penalty of using a read() on the
-> region.
->
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> Tested-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
-> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
-> ---
->  drivers/vfio/vfio.c       | 199 ++++++++++++++++++++++++++++++++++++++
->  include/linux/vfio.h      |  20 ++++
->  include/uapi/linux/vfio.h | 174 ++++++++++++++++++++++++++++++---
->  3 files changed, 380 insertions(+), 13 deletions(-)
+And that's four with me. :)  It's not just pragmatic, I cannot imagine a 
+case where the caller doesn't know exactly which of the two file 
+descriptors they want.
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-
+Paolo
