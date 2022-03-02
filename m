@@ -2,147 +2,265 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 090954CA306
-	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 12:14:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 024B14CA374
+	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 12:20:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241391AbiCBLP1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Mar 2022 06:15:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54266 "EHLO
+        id S237919AbiCBLU4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 06:20:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241384AbiCBLPN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 06:15:13 -0500
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A80D60A8B;
-        Wed,  2 Mar 2022 03:14:15 -0800 (PST)
-Received: by mail-pl1-x62d.google.com with SMTP id z2so1264879plg.8;
-        Wed, 02 Mar 2022 03:14:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=LB2Rb6jDVG8ESI9lXPQQ7RDtAAcoqVgAAU8pFuQ40Os=;
-        b=mL0ZvY02MjrP36BHSwyl3J021AubY9TqUCofuH/2SptWX5ARfBr9gOASAsUnoI4UxB
-         l6VXN4dH5oVt8zdJdmtNvTP3fTJOJyOiGWfXZhAF8khtCWLMQ5RUq+EIeU1LyEPOZ6Lr
-         QNwDo2NgTGHhwEuoZKAHTO3FBh/KVPZ2FlG+yp+Bldb11+IRb8fAr5coRAMDHKdgBLHj
-         MHf2zvSl3qxvpthSnYxjul17y1yT2RMVV7wXlGx+cgB/9y27jHqtb/s3ob6CGs45ENxc
-         s86Yi57QikZgOXkfpsvEblpdiD25oPVJ4efasKccvp7UWVyZwFXWCQf+wmfQxBps/biw
-         LeDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=LB2Rb6jDVG8ESI9lXPQQ7RDtAAcoqVgAAU8pFuQ40Os=;
-        b=wjOWzQy7s724eKqp9QRehZwshPd8QUZLKPFIlYHm+KH5QbQRBLJYQW88exiVWDy8nc
-         HHqboFp4qz+t/KPYXXl0yt0kcIsSq+TAyg+1Un0f/yl547LwQ5RKLH3QkjH/a3kGYgOQ
-         J0+dvLzIPydXlJgMCCr3wRH2Ic5xbKAr30vVC349NtPVyEs1OnQOti/mdnpDw3g1S5Ih
-         AB1Zg9/aphfd8+HRLH0LsFcqUvdg7ZN9qMpY+xPe3sjJX+7ZdRD/oz8f+sVnKsr0ns2s
-         N58brGyQNcdHylhyiMOcIkZydYJFZzuoVc5qrewTQTCFlD2DYeAvQ5WmCXzCfATjeY3B
-         n7xQ==
-X-Gm-Message-State: AOAM530KdRTqjEiQX7OL7zab51/bM9MQp7O2tcBHJl0HHeYWkR1w2bbx
-        cP4xaJtwOq2bmdZd1gwjc/I=
-X-Google-Smtp-Source: ABdhPJzgFSeWc9NS1kv85YFdX7GTdFf0FkqSaD2vPuTuSTkry9Xu8BmSkbBg1IA8PfXMKxwH6aofww==
-X-Received: by 2002:a17:902:b582:b0:14c:a63d:3df6 with SMTP id a2-20020a170902b58200b0014ca63d3df6mr30212293pls.51.1646219654889;
-        Wed, 02 Mar 2022 03:14:14 -0800 (PST)
-Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id v22-20020a17090ad59600b001b7deb42251sm4681847pju.15.2022.03.02.03.14.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Mar 2022 03:14:14 -0800 (PST)
-From:   Like Xu <like.xu.linux@gmail.com>
-X-Google-Original-From: Like Xu <likexu@tencent.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
-        Like Xu <likexu@tencent.com>
-Subject: [PATCH v2 12/12] KVM: x86/pmu: Clear reserved bit PERF_CTL2[43] for AMD erratum 1292
-Date:   Wed,  2 Mar 2022 19:13:34 +0800
-Message-Id: <20220302111334.12689-13-likexu@tencent.com>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220302111334.12689-1-likexu@tencent.com>
-References: <20220302111334.12689-1-likexu@tencent.com>
+        with ESMTP id S233304AbiCBLUm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 06:20:42 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 76CB1BC05
+        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 03:19:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646219974;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=oU9xsUH3KYvT9qc7F2Zj/zrvWJj+uZjGFINcg4AMqQg=;
+        b=MOIwvKcGv0vajVatBRD7RRBET1k7HVtWfMKbIp+yYcpjOAQw987ODk85KD9u2uy33maL6T
+        KClDXLpOr0b+fCpd/POms+HwWaMITE4il7PH1Dq8PoOKK/Hv64h9YjXA5qg7M/yt1i6ghM
+        E28vqDmZmuj6L+2H+yHWsnM59h/4DFY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-36-qOQrJP2YOWal2iQgFKzSHw-1; Wed, 02 Mar 2022 06:19:31 -0500
+X-MC-Unique: qOQrJP2YOWal2iQgFKzSHw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 990E01006AA5;
+        Wed,  2 Mar 2022 11:19:29 +0000 (UTC)
+Received: from localhost (unknown [10.39.194.94])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E6E697554E;
+        Wed,  2 Mar 2022 11:19:21 +0000 (UTC)
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Yishai Hadas <yishaih@nvidia.com>, alex.williamson@redhat.com,
+        bhelgaas@google.com, jgg@nvidia.com, saeedm@nvidia.com
+Cc:     linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
+        kwankhede@nvidia.com, mgurtovoy@nvidia.com, yishaih@nvidia.com,
+        maorg@nvidia.com, ashok.raj@intel.com, kevin.tian@intel.com,
+        shameerali.kolothum.thodi@huawei.com
+Subject: Re: [PATCH V9 mlx5-next 09/15] vfio: Define device migration
+ protocol v2
+In-Reply-To: <20220224142024.147653-10-yishaih@nvidia.com>
+Organization: Red Hat GmbH
+References: <20220224142024.147653-1-yishaih@nvidia.com>
+ <20220224142024.147653-10-yishaih@nvidia.com>
+User-Agent: Notmuch/0.34 (https://notmuchmail.org)
+Date:   Wed, 02 Mar 2022 12:19:20 +0100
+Message-ID: <87tucgiouf.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <likexu@tencent.com>
+On Thu, Feb 24 2022, Yishai Hadas <yishaih@nvidia.com> wrote:
 
-The AMD Family 19h Models 00h-0Fh Processors may experience sampling
-inaccuracies that cause the following performance counters to overcount
-retire-based events. To count the non-FP affected PMC events correctly,
-a patched guest with a target vCPU model would:
+> From: Jason Gunthorpe <jgg@nvidia.com>
+>
+> Replace the existing region based migration protocol with an ioctl based
+> protocol. The two protocols have the same general semantic behaviors, but
+> the way the data is transported is changed.
+>
+> This is the STOP_COPY portion of the new protocol, it defines the 5 states
+> for basic stop and copy migration and the protocol to move the migration
+> data in/out of the kernel.
+>
+> Compared to the clarification of the v1 protocol Alex proposed:
+>
+> https://lore.kernel.org/r/163909282574.728533.7460416142511440919.stgit@omen
+>
+> This has a few deliberate functional differences:
+>
+>  - ERROR arcs allow the device function to remain unchanged.
+>
+>  - The protocol is not required to return to the original state on
+>    transition failure. Instead userspace can execute an unwind back to
+>    the original state, reset, or do something else without needing kernel
+>    support. This simplifies the kernel design and should userspace choose
+>    a policy like always reset, avoids doing useless work in the kernel
+>    on error handling paths.
+>
+>  - PRE_COPY is made optional, userspace must discover it before using it.
+>    This reflects the fact that the majority of drivers we are aware of
+>    right now will not implement PRE_COPY.
+>
+>  - segmentation is not part of the data stream protocol, the receiver
+>    does not have to reproduce the framing boundaries.
+>
+> The hybrid FSM for the device_state is described as a Mealy machine by
+> documenting each of the arcs the driver is required to implement. Defining
+> the remaining set of old/new device_state transitions as 'combination
+> transitions' which are naturally defined as taking multiple FSM arcs along
+> the shortest path within the FSM's digraph allows a complete matrix of
+> transitions.
+>
+> A new VFIO_DEVICE_FEATURE of VFIO_DEVICE_FEATURE_MIG_DEVICE_STATE is
+> defined to replace writing to the device_state field in the region. This
+> allows returning a brand new FD whenever the requested transition opens
+> a data transfer session.
+>
+> The VFIO core code implements the new feature and provides a helper
+> function to the driver. Using the helper the driver only has to
+> implement 6 of the FSM arcs and the other combination transitions are
+> elaborated consistently from those arcs.
+>
+> A new VFIO_DEVICE_FEATURE of VFIO_DEVICE_FEATURE_MIGRATION is defined to
+> report the capability for migration and indicate which set of states and
+> arcs are supported by the device. The FSM provides a lot of flexibility to
+> make backwards compatible extensions but the VFIO_DEVICE_FEATURE also
+> allows for future breaking extensions for scenarios that cannot support
+> even the basic STOP_COPY requirements.
+>
+> The VFIO_DEVICE_FEATURE_MIG_DEVICE_STATE with the GET option (i.e.
+> VFIO_DEVICE_FEATURE_GET) can be used to read the current migration state
+> of the VFIO device.
+>
+> Data transfer sessions are now carried over a file descriptor, instead of
+> the region. The FD functions for the lifetime of the data transfer
+> session. read() and write() transfer the data with normal Linux stream FD
+> semantics. This design allows future expansion to support poll(),
+> io_uring, and other performance optimizations.
+>
+> The complicated mmap mode for data transfer is discarded as current qemu
+> doesn't take meaningful advantage of it, and the new qemu implementation
+> avoids substantially all the performance penalty of using a read() on the
+> region.
+>
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> Tested-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
+> ---
+>  drivers/vfio/vfio.c       | 199 ++++++++++++++++++++++++++++++++++++++
+>  include/linux/vfio.h      |  20 ++++
+>  include/uapi/linux/vfio.h | 174 ++++++++++++++++++++++++++++++---
+>  3 files changed, 380 insertions(+), 13 deletions(-)
+>
+> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+> index 71763e2ac561..b37ab27b511f 100644
+> --- a/drivers/vfio/vfio.c
+> +++ b/drivers/vfio/vfio.c
+> @@ -1557,6 +1557,197 @@ static int vfio_device_fops_release(struct inode *inode, struct file *filep)
+>  	return 0;
+>  }
+>  
+> +/*
+> + * vfio_mig_get_next_state - Compute the next step in the FSM
+> + * @cur_fsm - The current state the device is in
+> + * @new_fsm - The target state to reach
+> + * @next_fsm - Pointer to the next step to get to new_fsm
+> + *
+> + * Return 0 upon success, otherwise -errno
+> + * Upon success the next step in the state progression between cur_fsm and
+> + * new_fsm will be set in next_fsm.
 
-    - Use Core::X86::Msr::PERF_CTL2 to count the events, and
-    - Program Core::X86::Msr::PERF_CTL2[43] to 1b, and
-    - Program Core::X86::Msr::PERF_CTL2[20] to 0b.
+What about non-success? Can the caller make any assumption about
+next_fsm in that case? Because...
 
-To support this use of AMD guests, KVM should not reserve bit 43
-only for counter #2. Treatment of other cases remains unchanged.
+> + *
+> + * This breaks down requests for combination transitions into smaller steps and
+> + * returns the next step to get to new_fsm. The function may need to be called
+> + * multiple times before reaching new_fsm.
+> + *
+> + */
+> +int vfio_mig_get_next_state(struct vfio_device *device,
+> +			    enum vfio_device_mig_state cur_fsm,
+> +			    enum vfio_device_mig_state new_fsm,
+> +			    enum vfio_device_mig_state *next_fsm)
+> +{
+> +	enum { VFIO_DEVICE_NUM_STATES = VFIO_DEVICE_STATE_RESUMING + 1 };
+> +	/*
+> +	 * The coding in this table requires the driver to implement 6
+> +	 * FSM arcs:
+> +	 *         RESUMING -> STOP
+> +	 *         RUNNING -> STOP
+> +	 *         STOP -> RESUMING
+> +	 *         STOP -> RUNNING
+> +	 *         STOP -> STOP_COPY
+> +	 *         STOP_COPY -> STOP
+> +	 *
+> +	 * The coding will step through multiple states for these combination
+> +	 * transitions:
+> +	 *         RESUMING -> STOP -> RUNNING
+> +	 *         RESUMING -> STOP -> STOP_COPY
+> +	 *         RUNNING -> STOP -> RESUMING
+> +	 *         RUNNING -> STOP -> STOP_COPY
+> +	 *         STOP_COPY -> STOP -> RESUMING
+> +	 *         STOP_COPY -> STOP -> RUNNING
+> +	 */
+> +	static const u8 vfio_from_fsm_table[VFIO_DEVICE_NUM_STATES][VFIO_DEVICE_NUM_STATES] = {
+> +		[VFIO_DEVICE_STATE_STOP] = {
+> +			[VFIO_DEVICE_STATE_STOP] = VFIO_DEVICE_STATE_STOP,
+> +			[VFIO_DEVICE_STATE_RUNNING] = VFIO_DEVICE_STATE_RUNNING,
+> +			[VFIO_DEVICE_STATE_STOP_COPY] = VFIO_DEVICE_STATE_STOP_COPY,
+> +			[VFIO_DEVICE_STATE_RESUMING] = VFIO_DEVICE_STATE_RESUMING,
+> +			[VFIO_DEVICE_STATE_ERROR] = VFIO_DEVICE_STATE_ERROR,
+> +		},
+> +		[VFIO_DEVICE_STATE_RUNNING] = {
+> +			[VFIO_DEVICE_STATE_STOP] = VFIO_DEVICE_STATE_STOP,
+> +			[VFIO_DEVICE_STATE_RUNNING] = VFIO_DEVICE_STATE_RUNNING,
+> +			[VFIO_DEVICE_STATE_STOP_COPY] = VFIO_DEVICE_STATE_STOP,
+> +			[VFIO_DEVICE_STATE_RESUMING] = VFIO_DEVICE_STATE_STOP,
+> +			[VFIO_DEVICE_STATE_ERROR] = VFIO_DEVICE_STATE_ERROR,
+> +		},
+> +		[VFIO_DEVICE_STATE_STOP_COPY] = {
+> +			[VFIO_DEVICE_STATE_STOP] = VFIO_DEVICE_STATE_STOP,
+> +			[VFIO_DEVICE_STATE_RUNNING] = VFIO_DEVICE_STATE_STOP,
+> +			[VFIO_DEVICE_STATE_STOP_COPY] = VFIO_DEVICE_STATE_STOP_COPY,
+> +			[VFIO_DEVICE_STATE_RESUMING] = VFIO_DEVICE_STATE_STOP,
+> +			[VFIO_DEVICE_STATE_ERROR] = VFIO_DEVICE_STATE_ERROR,
+> +		},
+> +		[VFIO_DEVICE_STATE_RESUMING] = {
+> +			[VFIO_DEVICE_STATE_STOP] = VFIO_DEVICE_STATE_STOP,
+> +			[VFIO_DEVICE_STATE_RUNNING] = VFIO_DEVICE_STATE_STOP,
+> +			[VFIO_DEVICE_STATE_STOP_COPY] = VFIO_DEVICE_STATE_STOP,
+> +			[VFIO_DEVICE_STATE_RESUMING] = VFIO_DEVICE_STATE_RESUMING,
+> +			[VFIO_DEVICE_STATE_ERROR] = VFIO_DEVICE_STATE_ERROR,
+> +		},
+> +		[VFIO_DEVICE_STATE_ERROR] = {
+> +			[VFIO_DEVICE_STATE_STOP] = VFIO_DEVICE_STATE_ERROR,
+> +			[VFIO_DEVICE_STATE_RUNNING] = VFIO_DEVICE_STATE_ERROR,
+> +			[VFIO_DEVICE_STATE_STOP_COPY] = VFIO_DEVICE_STATE_ERROR,
+> +			[VFIO_DEVICE_STATE_RESUMING] = VFIO_DEVICE_STATE_ERROR,
+> +			[VFIO_DEVICE_STATE_ERROR] = VFIO_DEVICE_STATE_ERROR,
+> +		},
+> +	};
+> +
+> +	if (WARN_ON(cur_fsm >= ARRAY_SIZE(vfio_from_fsm_table)))
+> +		return -EINVAL;
+> +
+> +	if (new_fsm >= ARRAY_SIZE(vfio_from_fsm_table))
+> +		return -EINVAL;
+> +
+> +	*next_fsm = vfio_from_fsm_table[cur_fsm][new_fsm];
+> +	return (*next_fsm != VFIO_DEVICE_STATE_ERROR) ? 0 : -EINVAL;
 
-AMD hardware team clarified that the conditions under which the
-overcounting can happen, is quite rare. This change may make those
-PMU driver developers who have read errata #1292 less disappointed.
+...next_fsm will contain STATE_ERROR if we try to transition from or to
+STATE_ERROR, but it remains unchanged if the input states are out of
+range, yet in both cases the return value is -EINVAL. Looking further, ...
 
-Reported-by: Jim Mattson <jmattson@google.com>
-Signed-off-by: Like Xu <likexu@tencent.com>
----
- arch/x86/kvm/svm/pmu.c | 20 +++++++++++++++++++-
- 1 file changed, 19 insertions(+), 1 deletion(-)
+> + * any -> ERROR
+> + *   ERROR cannot be specified as a device state, however any transition request
+> + *   can be failed with an errno return and may then move the device_state into
+> + *   ERROR. In this case the device was unable to execute the requested arc and
+> + *   was also unable to restore the device to any valid device_state.
+> + *   To recover from ERROR VFIO_DEVICE_RESET must be used to return the
+> + *   device_state back to RUNNING.
 
-diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
-index 41c9b9e2aec2..05b4e4f2bb66 100644
---- a/arch/x86/kvm/svm/pmu.c
-+++ b/arch/x86/kvm/svm/pmu.c
-@@ -18,6 +18,20 @@
- #include "pmu.h"
- #include "svm.h"
- 
-+/*
-+ * As a workaround of "Retire Based Events May Overcount" for erratum 1292,
-+ * some patched guests may set PERF_CTL2[43] to 1b and PERF_CTL2[20] to 0b
-+ * to count the non-FP affected PMC events correctly.
-+ *
-+ * Note, tests show that the counter difference before and after using the
-+ * workaround is not significant. Host will be scheduling CTR2 indiscriminately.
-+ */
-+static inline bool vcpu_overcount_retire_events(struct kvm_vcpu *vcpu)
-+{
-+	return guest_cpuid_family(vcpu) == 0x19 &&
-+		guest_cpuid_model(vcpu) < 0x10;
-+}
-+
- enum pmu_type {
- 	PMU_TYPE_COUNTER = 0,
- 	PMU_TYPE_EVNTSEL,
-@@ -224,6 +238,7 @@ static int amd_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 	struct kvm_pmc *pmc;
- 	u32 msr = msr_info->index;
- 	u64 data = msr_info->data;
-+	u64 reserved_bits;
- 
- 	/* MSR_PERFCTRn */
- 	pmc = get_gp_pmc_amd(pmu, msr, PMU_TYPE_COUNTER);
-@@ -236,7 +251,10 @@ static int amd_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 	if (pmc) {
- 		if (data == pmc->eventsel)
- 			return 0;
--		if (!(data & pmu->reserved_bits)) {
-+		reserved_bits = pmu->reserved_bits;
-+		if (pmc->idx == 2 && vcpu_overcount_retire_events(vcpu))
-+			reserved_bits &= ~BIT_ULL(43);
-+		if (!(data & reserved_bits)) {
- 			pmc->eventsel = data;
- 			reprogram_counter(pmc);
- 			return 0;
--- 
-2.35.1
+...this seems to indicate that not moving into STATE_ERROR is an
+option anyway. Do we need any extra guidance in the description for
+vfio_mig_get_next_state()?
 
