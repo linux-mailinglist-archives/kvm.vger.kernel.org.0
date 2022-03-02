@@ -2,128 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 04B8D4CAF1B
-	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 20:55:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 064A14CAF69
+	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 21:07:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242054AbiCBT4Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Mar 2022 14:56:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47576 "EHLO
+        id S242976AbiCBUID (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 15:08:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229490AbiCBT4P (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 14:56:15 -0500
-Received: from mail-io1-xd2b.google.com (mail-io1-xd2b.google.com [IPv6:2607:f8b0:4864:20::d2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF095D763A
-        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 11:55:31 -0800 (PST)
-Received: by mail-io1-xd2b.google.com with SMTP id r8so3217111ioj.9
-        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 11:55:31 -0800 (PST)
+        with ESMTP id S242470AbiCBUIA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 15:08:00 -0500
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41D22CB937
+        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 12:07:06 -0800 (PST)
+Received: by mail-pj1-x1034.google.com with SMTP id z12-20020a17090ad78c00b001bf022b69d6so1677200pju.2
+        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 12:07:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
+        d=chromium.org; s=google;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=t48F+updsV7T2pr/t57RE2xz11TJHa9Jd7tNCDUAq/8=;
-        b=TYAxFlG/fB4zbMIlTaqNBs1Z0P4LQ18nao+fVPmsTJPImo3mo3fWLx+eQ2JVc3lRWp
-         Tb4h+Ndoj+4HFpacdhGJtTp0wLbxe8NipiZ7IZmOr2FRL4hAw6vxRnDeNWYmmuKaiC4B
-         fsGU7gso+iwqoPr0ZAis8DW/PL60NyvTEksLGDB21VE3Mdy9WvPioubovzUAvoKRlNf/
-         WJQGgyJHWxgYWhrLyfT4xOZ5TnwkwgSzWj5oW1G0BCX0Mf6L57Qmsx+tqC0ylp6APHgH
-         a5QAzRIDAfqQfZbeRJonXbI9pJHAQqO4i4kSM3HAlZBnylq5JD0bk5vZMwcaf82o0EPi
-         E2Mg==
+        bh=9llME+iRL2iH9L07jwvbWbmbHLr47Rbz7WJ4fOgTlZc=;
+        b=IvpJRwG7ynxkReEE85KaN5rJUYtD4xKNHA+hy6TwBmoQ8B3uYeJI+QViQcnaGiWq86
+         F88M3HTERkoil1v4VBpPtCvYuei+/tfueI2kCXzM7ddvcotxLyWZwiewhTHLUCy28lRK
+         BraqPBOXvwYRthhpbxTgJWS9pGCc3zSZJBqHk=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=t48F+updsV7T2pr/t57RE2xz11TJHa9Jd7tNCDUAq/8=;
-        b=HjiUfo+gmHBxS9IJaQUrHQYkCLKpT67wHQy6d8k5STOYKz0NajpnV2xO1YSKEL3XYu
-         kx+6vms1QiR0pWwgegZDY0R2ahraqu/mHG8uxrNwU54KDMm0H3mGUR1S7ESf7uOCRk1X
-         t32IE/NluEUf7cS+PSmNP9brIN7Nhi31SmAnCSQY7yXIc4DDhMp1gvSf8iPipRGUrcQb
-         blcjzn21VkEl12fA7wmoXeTQJZlXYNbp32BVhc/EF+zNGT0iUpdyqjIb/PjHjLdQBpQu
-         2AnqGbyf+GIpUE2t6XgFC9dkv97WXyGD+EcCO/nDQluBdd+Y5xnWbkPM0jwPqCMpOh1e
-         zITQ==
-X-Gm-Message-State: AOAM533ggmqvdSkS82oI521ucCEaMTG5FRqhouDYSYCqBRuH3Mf9cJbu
-        eClZlATZUKOr83bthpqwfYGIkQ==
-X-Google-Smtp-Source: ABdhPJx7CPtEkHkG+44IZ4Lz4AGVrSAfzwK12Oo2APntBBtYATw0leJMlE93nhI9PHg/1e3LWJhz8w==
-X-Received: by 2002:a02:69cc:0:b0:314:3518:780b with SMTP id e195-20020a0269cc000000b003143518780bmr26021611jac.133.1646250930988;
-        Wed, 02 Mar 2022 11:55:30 -0800 (PST)
-Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
-        by smtp.gmail.com with ESMTPSA id r3-20020a92ac03000000b002c3dfcb9a6csm3664750ilh.77.2022.03.02.11.55.30
+        bh=9llME+iRL2iH9L07jwvbWbmbHLr47Rbz7WJ4fOgTlZc=;
+        b=x9jJt1G7e+jyRpiHJueGhpi94WIvUOUGCQXhUTB3Gh6fzhQ//HjZM7os+Bg4yQ1/e+
+         27P0OoEWJ2R+Y4+FqjKZhbinErdCI1RDx4u4a3M4L13w8A344+WT8D5UYJsppwbW80EL
+         5KuJFeBTcGXn+j4DUbmRR9r0+lI4yTlpWcCWKwfYn+Daj8tRyVOO7Ydnmr9HHwwPNxRt
+         Im1xo64CODyKqD6TFWx7/jMaA29c19enJX/zgoisJ+dST8Y7wWOYlXKJ1vq3QglcmYkN
+         3i9j04sXZeTcXrAQ5ngOExQaYaV0CxCuizzBelqLX022eyaMmvEc4X5n9bk+AmYPdfaw
+         wekA==
+X-Gm-Message-State: AOAM530FsmjsuIwC26GLTQB8Yf0u6HFQ7H2Mdy7TJDuvZof8H5Cpm6Cs
+        KLMXJfBRyFtDbpBefWKlo6YEyw==
+X-Google-Smtp-Source: ABdhPJyalZw/yElDAQSdRYusWOxjkvZUrvn+e5j/jboS/+hXUtUpvVb6mMnbBbqlv1j/a0ygzQBPkQ==
+X-Received: by 2002:a17:90b:94e:b0:1bc:c99f:ede1 with SMTP id dw14-20020a17090b094e00b001bcc99fede1mr1518926pjb.49.1646251625762;
+        Wed, 02 Mar 2022 12:07:05 -0800 (PST)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id d25-20020a637359000000b0037843afb785sm6664pgn.25.2022.03.02.12.07.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Mar 2022 11:55:30 -0800 (PST)
-Date:   Wed, 2 Mar 2022 19:55:26 +0000
-From:   Oliver Upton <oupton@google.com>
-To:     Ricardo Koller <ricarkol@google.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        drjones@redhat.com, pbonzini@redhat.com, maz@kernel.org,
-        alexandru.elisei@arm.com, eric.auger@redhat.com, reijiw@google.com,
-        rananta@google.com
-Subject: Re: [PATCH 1/3] KVM: arm64: selftests: add timer_get_tval() lib
- function
-Message-ID: <Yh/LrphX9no9FRzR@google.com>
-References: <20220302172144.2734258-1-ricarkol@google.com>
- <20220302172144.2734258-2-ricarkol@google.com>
+        Wed, 02 Mar 2022 12:07:05 -0800 (PST)
+Date:   Wed, 2 Mar 2022 12:07:04 -0800
+From:   Kees Cook <keescook@chromium.org>
+To:     Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        David Laight <David.Laight@aculab.com>,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        linux-wireless <linux-wireless@vger.kernel.org>,
+        "alsa-devel@alsa-project.org" <alsa-devel@alsa-project.org>,
+        KVM list <kvm@vger.kernel.org>,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        "linux-iio@vger.kernel.org" <linux-iio@vger.kernel.org>,
+        "nouveau@lists.freedesktop.org" <nouveau@lists.freedesktop.org>,
+        dri-devel <dri-devel@lists.freedesktop.org>,
+        Cristiano Giuffrida <c.giuffrida@vu.nl>,
+        "Bos, H.J." <h.j.bos@vu.nl>,
+        "linux1394-devel@lists.sourceforge.net" 
+        <linux1394-devel@lists.sourceforge.net>,
+        "drbd-dev@lists.linbit.com" <drbd-dev@lists.linbit.com>,
+        linux-arch <linux-arch@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        "linux-aspeed@lists.ozlabs.org" <linux-aspeed@lists.ozlabs.org>,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        linux-rdma <linux-rdma@vger.kernel.org>,
+        "linux-staging@lists.linux.dev" <linux-staging@lists.linux.dev>,
+        amd-gfx list <amd-gfx@lists.freedesktop.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+        "kgdb-bugreport@lists.sourceforge.net" 
+        <kgdb-bugreport@lists.sourceforge.net>,
+        "bcm-kernel-feedback-list@broadcom.com" 
+        <bcm-kernel-feedback-list@broadcom.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Linux Media Mailing List <linux-media@vger.kernel.org>,
+        Arnd Bergman <arnd@arndb.de>,
+        Linux PM <linux-pm@vger.kernel.org>,
+        intel-gfx <intel-gfx@lists.freedesktop.org>,
+        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        dma <dmaengine@vger.kernel.org>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        Jakob Koschel <jakobkoschel@gmail.com>,
+        "v9fs-developer@lists.sourceforge.net" 
+        <v9fs-developer@lists.sourceforge.net>,
+        linux-tegra <linux-tegra@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        "linux-sgx@vger.kernel.org" <linux-sgx@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>,
+        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux F2FS Dev Mailing List 
+        <linux-f2fs-devel@lists.sourceforge.net>,
+        "tipc-discussion@lists.sourceforge.net" 
+        <tipc-discussion@lists.sourceforge.net>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        "linux-mediatek@lists.infradead.org" 
+        <linux-mediatek@lists.infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+        Mike Rapoport <rppt@kernel.org>
+Subject: Re: [PATCH 2/6] treewide: remove using list iterator after loop body
+ as a ptr
+Message-ID: <202203021158.DB5204A0@keescook>
+References: <282f0f8d-f491-26fc-6ae0-604b367a5a1a@amd.com>
+ <b2d20961dbb7533f380827a7fcc313ff849875c1.camel@HansenPartnership.com>
+ <7D0C2A5D-500E-4F38-AD0C-A76E132A390E@kernel.org>
+ <73fa82a20910c06784be2352a655acc59e9942ea.camel@HansenPartnership.com>
+ <CAHk-=wiT5HX6Kp0Qv4ZYK_rkq9t5fZ5zZ7vzvi6pub9kgp=72g@mail.gmail.com>
+ <7dc860874d434d2288f36730d8ea3312@AcuMS.aculab.com>
+ <CAHk-=whKqg89zu4T95+ctY-hocR6kDArpo2qO14-kV40Ga7ufw@mail.gmail.com>
+ <0ced2b155b984882b39e895f0211037c@AcuMS.aculab.com>
+ <CAHk-=wix0HLCBs5sxAeW3uckg0YncXbTjMsE-Tv8WzmkOgLAXQ@mail.gmail.com>
+ <78ccb184-405e-da93-1e02-078f90d2b9bc@rasmusvillemoes.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220302172144.2734258-2-ricarkol@google.com>
-X-Spam-Status: No, score=-18.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <78ccb184-405e-da93-1e02-078f90d2b9bc@rasmusvillemoes.dk>
+X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 02, 2022 at 09:21:42AM -0800, Ricardo Koller wrote:
-> Add timer_get_tval() into the arch timer library functions in
-> selftests/kvm. Bonus: change the set_tval function to get an int32_t
-> (tval is signed).
+On Wed, Mar 02, 2022 at 10:29:31AM +0100, Rasmus Villemoes wrote:
+> This won't help the current issue (because it doesn't exist and might
+> never), but just in case some compiler people are listening, I'd like to
+> have some sort of way to tell the compiler "treat this variable as
+> uninitialized from here on". So one could do
 > 
-> Reviewed-by: Reiji Watanabe <reijiw@google.com>
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> #define kfree(p) do { __kfree(p); __magic_uninit(p); } while (0)
+> 
+> with __magic_uninit being a magic no-op that doesn't affect the
+> semantics of the code, but could be used by the compiler's "[is/may be]
+> used uninitialized" machinery to flag e.g. double frees on some odd
+> error path etc. It would probably only work for local automatic
+> variables, but it should be possible to just ignore the hint if p is
+> some expression like foo->bar or has side effects. If we had that, the
+> end-of-loop test could include that to "uninitialize" the iterator.
 
-Reviewed-by: Oliver Upton <oupton@google.com>
+I've long wanted to change kfree() to explicitly set pointers to NULL on
+free. https://github.com/KSPP/linux/issues/87
 
-> ---
->  .../selftests/kvm/include/aarch64/arch_timer.h | 18 +++++++++++++++++-
->  1 file changed, 17 insertions(+), 1 deletion(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/include/aarch64/arch_timer.h b/tools/testing/selftests/kvm/include/aarch64/arch_timer.h
-> index cb7c03de3a21..93f35a4fc1aa 100644
-> --- a/tools/testing/selftests/kvm/include/aarch64/arch_timer.h
-> +++ b/tools/testing/selftests/kvm/include/aarch64/arch_timer.h
-> @@ -79,7 +79,7 @@ static inline uint64_t timer_get_cval(enum arch_timer timer)
->  	return 0;
->  }
->  
-> -static inline void timer_set_tval(enum arch_timer timer, uint32_t tval)
-> +static inline void timer_set_tval(enum arch_timer timer, int32_t tval)
->  {
->  	switch (timer) {
->  	case VIRTUAL:
-> @@ -95,6 +95,22 @@ static inline void timer_set_tval(enum arch_timer timer, uint32_t tval)
->  	isb();
->  }
->  
-> +static inline int32_t timer_get_tval(enum arch_timer timer)
-> +{
-> +	isb();
-> +	switch (timer) {
-> +	case VIRTUAL:
-> +		return (int32_t)read_sysreg(cntv_tval_el0);
-> +	case PHYSICAL:
-> +		return (int32_t)read_sysreg(cntp_tval_el0);
-> +	default:
-> +		GUEST_ASSERT_1(0, timer);
-> +	}
-> +
-> +	/* We should not reach here */
-> +	return 0;
-> +}
-> +
->  static inline void timer_set_ctl(enum arch_timer timer, uint32_t ctl)
->  {
->  	switch (timer) {
-> -- 
-> 2.35.1.574.g5d30c73bfb-goog
-> 
+The thing stopping a trivial transformation of kfree() is:
+
+	kfree(get_some_pointer());
+
+I would argue, though, that the above is poor form: the thing holding
+the pointer should be the thing freeing it, so these cases should be
+refactored and kfree() could do the NULLing by default.
+
+Quoting myself in the above issue:
+
+
+Without doing massive tree-wide changes, I think we need compiler
+support. If we had something like __builtin_is_lvalue(), we could
+distinguish function returns from lvalues. For example, right now a
+common case are things like:
+
+	kfree(get_some_ptr());
+
+But if we could at least gain coverage of the lvalue cases, and detect
+them statically at compile-time, we could do:
+
+#define __kfree_and_null(x) do { __kfree(*x); *x = NULL; } while (0)
+#define kfree(x) __builtin_choose_expr(__builtin_is_lvalue(x),
+			__kfree_and_null(&(x)), __kfree(x))
+
+Alternatively, we could do a tree-wide change of the former case (findable
+with Coccinelle) and change them into something like kfree_no_null()
+and redefine kfree() itself:
+
+#define kfree_no_null(x) do { void *__ptr = (x); __kfree(__ptr); } while (0)
+#define kfree(x) do { __kfree(x); x = NULL; } while (0)
+
+-- 
+Kees Cook
