@@ -2,78 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F19F14CAE42
-	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 20:08:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 421B04CAE8C
+	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 20:22:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241547AbiCBTI7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Mar 2022 14:08:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50278 "EHLO
+        id S234644AbiCBTXD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 14:23:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58136 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229669AbiCBTI5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 14:08:57 -0500
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E84334993B
-        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 11:08:12 -0800 (PST)
-Received: by mail-pl1-x633.google.com with SMTP id z11so2393194pla.7
-        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 11:08:12 -0800 (PST)
+        with ESMTP id S237740AbiCBTWx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 14:22:53 -0500
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F18D86D970
+        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 11:22:09 -0800 (PST)
+Received: by mail-pj1-x1032.google.com with SMTP id m22so2699481pja.0
+        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 11:22:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=ikC7Wxp/jzr+tnNZpmEM/sGB+lmtBh1UpNvi+15LDck=;
-        b=qU4M+Z712jujMdXR5jH2f1PCoN8a/EMK3uEKMf8fbrbKbzYop+gQ0b5jhDhSKlfPNg
-         uqc6viy3rsO7PSbikjaW6Q0yVyKAoOqZaEM8vCoj03wd505NGOMN5lauAfiQoDB8FDy4
-         aly8qy9uoAM4s88ix5I5P/Ul7Dyl+lq0yKyt2oX9VeCxbJLfteMkzB8d2y9hNVoXJ8dv
-         UCmHXxWly2YPQwwrS7xh5hCNIA25FuPF48Npcch9e78sPZmBMVNPf6pmClVPqy2tCHnf
-         aveLuE/U5M3Dn6BVy60R8IppxpS9wIBWwXzhn9TMvKVNH25TrLwiCEJnIu8ph4S1YjbA
-         ETDw==
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=GowkojXAz1wkAT6+sYRVxmC+1jzWkyvWgoOaFe2GzAI=;
+        b=TrbuYO86toBF9+xXdvV9SuFJYOCKaEChA5oo5DUCZZRpbgdJSFdUg6HSnusoANKepT
+         YwAGDGoUZlK4MhOdjn4TW5IT/lFHPVqjfgxTXRKqIbYnYPJwF2Z0Nx2sbiy8/eZ29fSn
+         KmkBPJ6ZgZDvUx7FB0egK26lxKvQNV1/WEAt0ynYVx9QxmlwR1Ajw0rTTLFnHVjC0wmt
+         2tRk2SUClhg8oL2ZFsqJ6IOjs8ReGLyDWBzVk3KC0mYoXpXTCNkpqHEhbUUhn4ECrC8z
+         hHSEHspUfrWUdQnE+X0KYwT2N/x+vmuoyCW9LjPPgT0FIjSQcGRpjyvTWsYjkBBV05HR
+         7NoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=ikC7Wxp/jzr+tnNZpmEM/sGB+lmtBh1UpNvi+15LDck=;
-        b=79C1phSTKt7wAmzQra4hBgOSMeC0EZClgITwb07uRttMahzOZnIW2/sPezdXaViutv
-         JJ04hnB6KuwfqU9hkuvsCpf/glRpcTk26eKUj0r54fbHXsdMLIGHwUUMYoVlMmrKOLl0
-         JllpTWKW30ttlmkTffp/1xToYBdTxUx8VWgYT5u/P8sxEQdbM9TE71nngQvM4fe6hMFp
-         NDtCFLVtCq1XwNm0aKO2Gi13w1tH8hEgPAhxOt5qK2CSzl0rcgwmOVmXc0EqXnDoCu5r
-         1rb40tdst2XICU1V4NjOAS5ffFjMjWRwX0yVqI26JBaYA06E2jaM1UcNyBro532XDyee
-         GyOQ==
-X-Gm-Message-State: AOAM533ET0Zvq55SU26sbUYfBfMs4938MaHZ/6QexSWxhCzcofirHT3D
-        6j9YeK0bXUvQOo4RODE2h3lsRw==
-X-Google-Smtp-Source: ABdhPJy8CUCKikx/f0XhYoybR5nFYh8pJqzASQyRNVzKgG0Wb5idwm6ZkbkM0N3YowWyAUh9qz87zg==
-X-Received: by 2002:a17:902:d484:b0:151:6964:2bd with SMTP id c4-20020a170902d48400b00151696402bdmr16870438plg.108.1646248092136;
-        Wed, 02 Mar 2022 11:08:12 -0800 (PST)
-Received: from google.com (226.75.127.34.bc.googleusercontent.com. [34.127.75.226])
-        by smtp.gmail.com with ESMTPSA id 124-20020a620582000000b004dee0e77128sm20357580pff.166.2022.03.02.11.08.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Mar 2022 11:08:11 -0800 (PST)
-Date:   Wed, 2 Mar 2022 19:08:07 +0000
-From:   Mingwei Zhang <mizhang@google.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>
-Subject: Re: [PATCH v3 01/28] KVM: x86/mmu: Use common iterator for walking
- invalid TDP MMU roots
-Message-ID: <Yh/Al8wGUOEgRmih@google.com>
-References: <20220226001546.360188-1-seanjc@google.com>
- <20220226001546.360188-2-seanjc@google.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=GowkojXAz1wkAT6+sYRVxmC+1jzWkyvWgoOaFe2GzAI=;
+        b=fsWsACuD6i7BL3pxhv3dO1xQOQbsbl5d59zENB3m4g2MXsTJfCI9R6iFmumgGhTrJA
+         47MoMcPsYQXYJgbuhtPIhDOIRPTr/aBzJvX5Dght5NVkRX2csTZLfVaf7s6nNMvYF3X+
+         U4YN6HpJ9lYAoBThXzP2XfkYBl7PC5Wdj3ouDnOv/7JiUeOMdouOemM8ixZR728i6hkM
+         e7DHhY48rmhfy+n6IokbkkdXxXII075aAXzc+VaYdqdKDMA7ePa+pJTes+/0TWUzgn/A
+         iSynRTJEewz5aYhB0fmoKBawE7r3wVuGJAtKU6PrSJF5Rzf2WXY7tvra7+DpKdSkT4Rz
+         8LDw==
+X-Gm-Message-State: AOAM5321nR7mVGgnSJTLQfkTg2lMd9LKSXr4UYUlbTz6cw0CWIHAD6S6
+        4Qj8DbcAZKiUn5Ktj/WvDhY=
+X-Google-Smtp-Source: ABdhPJxpQMG1YVjUuU1HVDKoxItlkxdQTlC7TRrzQY4Skr4NFwEQxm3vqKHErao0vcxCxFiHoC1p+g==
+X-Received: by 2002:a17:90a:ba07:b0:1bc:a0fd:faf with SMTP id s7-20020a17090aba0700b001bca0fd0fafmr1357961pjr.194.1646248929362;
+        Wed, 02 Mar 2022 11:22:09 -0800 (PST)
+Received: from [192.168.1.35] (71.red-83-50-68.dynamicip.rima-tde.net. [83.50.68.71])
+        by smtp.gmail.com with ESMTPSA id t5-20020a17090ae50500b001bc4ec15949sm5828982pjy.2.2022.03.02.11.22.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 02 Mar 2022 11:22:08 -0800 (PST)
+Message-ID: <62af5861-15da-da1a-8546-cf3b33806c38@gmail.com>
+Date:   Wed, 2 Mar 2022 20:22:01 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220226001546.360188-2-seanjc@google.com>
-X-Spam-Status: No, score=-18.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.6.1
+Subject: Re: [PATCH 2/2] Allow building vhost-user in BSD
+Content-Language: en-US
+To:     =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+Cc:     Sergio Lopez <slp@redhat.com>, Fam Zheng <fam@euphon.net>,
+        Elena Ufimtseva <elena.ufimtseva@oracle.com>,
+        kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
+        qemu-devel@nongnu.org,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+        Jagannathan Raman <jag.raman@oracle.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>, qemu-block@nongnu.org,
+        David Hildenbrand <david@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        vgoyal@redhat.com, Eric Farman <farman@linux.ibm.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        qemu-s390x@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
+        Kevin Wolf <kwolf@redhat.com>,
+        John G Johnson <john.g.johnson@oracle.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Hanna Reitz <hreitz@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+References: <20220302113644.43717-1-slp@redhat.com>
+ <20220302113644.43717-3-slp@redhat.com>
+ <66b68bcc-8d7e-a5f7-5e6c-b2d20c26ab01@redhat.com>
+ <8dfc9854-4d59-0759-88d0-d502ae7c552f@gmail.com>
+ <20220302173009.26auqvy4t4rx74td@mhamilton>
+ <85ed0856-308a-7774-a751-b20588f3d9cd@gmail.com>
+ <Yh+vniMOTFt2npIJ@redhat.com>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= 
+        <philippe.mathieu.daude@gmail.com>
+In-Reply-To: <Yh+vniMOTFt2npIJ@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -81,163 +98,46 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Feb 26, 2022, Sean Christopherson wrote:
-> Now that tdp_mmu_next_root() can process both valid and invalid roots,
-> extend it to be able to process _only_ invalid roots, add yet another
-> iterator macro for walking invalid roots, and use the new macro in
-> kvm_tdp_mmu_zap_invalidated_roots().
+On 2/3/22 18:55, Daniel P. Berrangé wrote:
+> On Wed, Mar 02, 2022 at 06:38:07PM +0100, Philippe Mathieu-Daudé wrote:
+>> On 2/3/22 18:31, Sergio Lopez wrote:
+>>> On Wed, Mar 02, 2022 at 06:18:59PM +0100, Philippe Mathieu-Daudé wrote:
+>>>> On 2/3/22 18:10, Paolo Bonzini wrote:
+>>>>> On 3/2/22 12:36, Sergio Lopez wrote:
+>>>>>> With the possibility of using pipefd as a replacement on operating
+>>>>>> systems that doesn't support eventfd, vhost-user can also work on BSD
+>>>>>> systems.
+>>>>>>
+>>>>>> This change allows enabling vhost-user on BSD platforms too and
+>>>>>> makes libvhost_user (which still depends on eventfd) a linux-only
+>>>>>> feature.
+>>>>>>
+>>>>>> Signed-off-by: Sergio Lopez <slp@redhat.com>
+>>>>>
+>>>>> I would just check for !windows.
+>>>>
+>>>> What about Darwin / Haiku / Illumnos?
+>>>
+>>> It should work on every system providing pipe() or pipe2(), so I guess
+>>> Paolo's right, every platform except Windows. FWIW, I already tested
+>>> it with Darwin.
+>>
+>> Wow, nice.
+>>
+>> So maybe simply check for pipe/pipe2 rather than !windows?
 > 
-> No functional change intended.
+> NB that would make the check more fragile.
 > 
-> Reviewed-by: David Matlack <dmatlack@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/mmu/tdp_mmu.c | 74 ++++++++++++++------------------------
->  1 file changed, 26 insertions(+), 48 deletions(-)
+> We already use pipe/pipe2 without checking for it, because its
+> usage is confined to oslib-posix.c and we know all POSIX
+> OS have it. There is no impl at all of qemu_pipe in oslib-win.c
+> and the declaration is masked out too in the header file.
 > 
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index debf08212f12..25148e8b711d 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -98,6 +98,12 @@ void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
->  	call_rcu(&root->rcu_head, tdp_mmu_free_sp_rcu_callback);
->  }
->  
-> +enum tdp_mmu_roots_iter_type {
-> +	ALL_ROOTS = -1,
-> +	VALID_ROOTS = 0,
-> +	INVALID_ROOTS = 1,
-> +};
+> Thus if we check for pipe2 and windows did ever implement it,
+> then we would actually break the windows build due to qemu_pipe
+> not existing.
+> 
+> IOW, checking !windows matches our logic for picking oslib-posix.c
+> in builds and so is better than checking for pipe directly.
 
-I am wondering what the trick is to start from -1?
-> +
->  /*
->   * Returns the next root after @prev_root (or the first root if @prev_root is
->   * NULL).  A reference to the returned root is acquired, and the reference to
-> @@ -110,10 +116,16 @@ void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
->   */
->  static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
->  					      struct kvm_mmu_page *prev_root,
-> -					      bool shared, bool only_valid)
-> +					      bool shared,
-> +					      enum tdp_mmu_roots_iter_type type)
->  {
->  	struct kvm_mmu_page *next_root;
->  
-> +	kvm_lockdep_assert_mmu_lock_held(kvm, shared);
-> +
-> +	/* Ensure correctness for the below comparison against role.invalid. */
-> +	BUILD_BUG_ON(!!VALID_ROOTS || !INVALID_ROOTS);
-> +
->  	rcu_read_lock();
->  
->  	if (prev_root)
-> @@ -125,7 +137,7 @@ static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
->  						   typeof(*next_root), link);
->  
->  	while (next_root) {
-> -		if ((!only_valid || !next_root->role.invalid) &&
-> +		if ((type == ALL_ROOTS || (type == !!next_root->role.invalid)) &&
->  		    kvm_tdp_mmu_get_root(next_root))
->  			break;
->  
-> @@ -151,18 +163,21 @@ static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
->   * mode. In the unlikely event that this thread must free a root, the lock
->   * will be temporarily dropped and reacquired in write mode.
->   */
-> -#define __for_each_tdp_mmu_root_yield_safe(_kvm, _root, _as_id, _shared, _only_valid)\
-> -	for (_root = tdp_mmu_next_root(_kvm, NULL, _shared, _only_valid);	\
-> +#define __for_each_tdp_mmu_root_yield_safe(_kvm, _root, _as_id, _shared, _type) \
-> +	for (_root = tdp_mmu_next_root(_kvm, NULL, _shared, _type);		\
->  	     _root;								\
-> -	     _root = tdp_mmu_next_root(_kvm, _root, _shared, _only_valid))	\
-> -		if (kvm_mmu_page_as_id(_root) != _as_id) {			\
-> +	     _root = tdp_mmu_next_root(_kvm, _root, _shared, _type))		\
-> +		if (_as_id > 0 && kvm_mmu_page_as_id(_root) != _as_id) {	\
->  		} else
->  
-> +#define for_each_invalid_tdp_mmu_root_yield_safe(_kvm, _root)			\
-> +	__for_each_tdp_mmu_root_yield_safe(_kvm, _root, -1, true, INVALID_ROOTS)
-> +
->  #define for_each_valid_tdp_mmu_root_yield_safe(_kvm, _root, _as_id, _shared)	\
-> -	__for_each_tdp_mmu_root_yield_safe(_kvm, _root, _as_id, _shared, true)
-> +	__for_each_tdp_mmu_root_yield_safe(_kvm, _root, _as_id, _shared, VALID_ROOTS)
->  
->  #define for_each_tdp_mmu_root_yield_safe(_kvm, _root, _as_id, _shared)		\
-> -	__for_each_tdp_mmu_root_yield_safe(_kvm, _root, _as_id, _shared, false)
-> +	__for_each_tdp_mmu_root_yield_safe(_kvm, _root, _as_id, _shared, ALL_ROOTS)
->  
->  #define for_each_tdp_mmu_root(_kvm, _root, _as_id)				\
->  	list_for_each_entry_rcu(_root, &_kvm->arch.tdp_mmu_roots, link,		\
-> @@ -810,28 +825,6 @@ void kvm_tdp_mmu_zap_all(struct kvm *kvm)
->  		kvm_flush_remote_tlbs(kvm);
->  }
->  
-> -static struct kvm_mmu_page *next_invalidated_root(struct kvm *kvm,
-> -						  struct kvm_mmu_page *prev_root)
-> -{
-> -	struct kvm_mmu_page *next_root;
-> -
-> -	if (prev_root)
-> -		next_root = list_next_or_null_rcu(&kvm->arch.tdp_mmu_roots,
-> -						  &prev_root->link,
-> -						  typeof(*prev_root), link);
-> -	else
-> -		next_root = list_first_or_null_rcu(&kvm->arch.tdp_mmu_roots,
-> -						   typeof(*next_root), link);
-> -
-> -	while (next_root && !(next_root->role.invalid &&
-> -			      refcount_read(&next_root->tdp_mmu_root_count)))
-> -		next_root = list_next_or_null_rcu(&kvm->arch.tdp_mmu_roots,
-> -						  &next_root->link,
-> -						  typeof(*next_root), link);
-> -
-> -	return next_root;
-> -}
-> -
->  /*
->   * Since kvm_tdp_mmu_zap_all_fast has acquired a reference to each
->   * invalidated root, they will not be freed until this function drops the
-> @@ -842,36 +835,21 @@ static struct kvm_mmu_page *next_invalidated_root(struct kvm *kvm,
->   */
->  void kvm_tdp_mmu_zap_invalidated_roots(struct kvm *kvm)
->  {
-> -	struct kvm_mmu_page *next_root;
->  	struct kvm_mmu_page *root;
->  	bool flush = false;
->  
->  	lockdep_assert_held_read(&kvm->mmu_lock);
->  
-> -	rcu_read_lock();
-> -
-> -	root = next_invalidated_root(kvm, NULL);
-> -
-> -	while (root) {
-> -		next_root = next_invalidated_root(kvm, root);
-> -
-> -		rcu_read_unlock();
-> -
-> +	for_each_invalid_tdp_mmu_root_yield_safe(kvm, root) {
->  		flush = zap_gfn_range(kvm, root, 0, -1ull, true, flush, true);
->  
->  		/*
-> -		 * Put the reference acquired in
-> -		 * kvm_tdp_mmu_invalidate_roots
-> +		 * Put the reference acquired in kvm_tdp_mmu_invalidate_roots().
-> +		 * Note, the iterator holds its own reference.
->  		 */
->  		kvm_tdp_mmu_put_root(kvm, root, true);
-> -
-> -		root = next_root;
-> -
-> -		rcu_read_lock();
->  	}
->  
-> -	rcu_read_unlock();
-> -
->  	if (flush)
->  		kvm_flush_remote_tlbs(kvm);
->  }
-> -- 
-> 2.35.1.574.g5d30c73bfb-goog
-> 
+OK I see, thanks.
