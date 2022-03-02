@@ -2,149 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3FB4B4CA095
-	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 10:23:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ED3C44CA0B8
+	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 10:29:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240420AbiCBJYQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Mar 2022 04:24:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51874 "EHLO
+        id S240484AbiCBJaW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 04:30:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233429AbiCBJYO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 04:24:14 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7DEA2B02
-        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 01:23:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646213009;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=foExQQknn5+ykqqTjNflz4MN/o7z8a5WlPaDeSuniwY=;
-        b=gY+U/zbS5+BSbpai/wKQWnCSZ/Ts7KfaAmlZCnn0JEI5exDNHu7Yk6t9JHDywxcXR8vSLS
-        4PpISRc5cF7XScvZ6ZI8/UosJfmQAAx5IIzmzYpSGPcaFHSSQMkcazLdYofj+Qg0aYcjPE
-        2xeI2WT+LdSIquCyPu+iokgJkuF1IEw=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-620-J0h3KGgTPSCSmi3lhZ9_fQ-1; Wed, 02 Mar 2022 04:23:28 -0500
-X-MC-Unique: J0h3KGgTPSCSmi3lhZ9_fQ-1
-Received: by mail-qv1-f69.google.com with SMTP id g2-20020a0562141cc200b004123b0abe18so1143153qvd.2
-        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 01:23:28 -0800 (PST)
+        with ESMTP id S236980AbiCBJaV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 04:30:21 -0500
+Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FDCEB7153
+        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 01:29:36 -0800 (PST)
+Received: by mail-lj1-x229.google.com with SMTP id o6so1395763ljp.3
+        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 01:29:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rasmusvillemoes.dk; s=google;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=XH8CYV/Z50iBLZ27uSo3DlVY0KhJ8ZO+RiecWTcYel0=;
+        b=IQg4uBejV+wOE9gbvRPz3nvi4LkiiVw4YSIjC8NPteocLXX0uLpiZyGXJ60leACu72
+         E2mMgbaj2BDeYnhoOw0DKPRcT2bjIlB4yRTWQZ65OcYRTHhlWzgeq8LyFprIEpiij6N8
+         YNaymndxJaFKphqyYHlKdyPolm4uaJOX+WJuI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=foExQQknn5+ykqqTjNflz4MN/o7z8a5WlPaDeSuniwY=;
-        b=qEeqi6JD4NFpMf9fPZIAMs9vwftWvWcqcaQLJ7dC5q8361rGloJtP1EcPDDbOo1kch
-         A1aMb742Tp8gdSdEVvqhib0KCdeZP4vuPt4zB87G0Ecc3HQduYrFiedzHrlCZmpKEoGV
-         TU9JeF/GeoCCZrHZzKCAJdVzD7zW+DVYJwLwEMTCE42JJ71RgsHs6i/HXARHTTLUlgug
-         HFaMwfVBv6VbMqfooah0Y9+icx25CyqEAUYCVBcUgBM1OBoQ/kMpIH35lcMJYJn/haTd
-         ZnXdod+pTkGcfFC3cTFLyYQnfBeZHlclyO0sKs0gKcWWLt1tMmWeDZrMNrHJjIp5mkTz
-         CxGA==
-X-Gm-Message-State: AOAM533O9UtWcMs++R1Ygq+QJgoKXxsh/7upw5o4o0CIH/rXO5aedboS
-        Abb9SeimS5wPNZ57ijDjv1Ur0hi32O2jzW5XXG/K4YhyAAMWeJC4U0g+6OmKtiw1x1NRqhzuj4O
-        OSwKIK7OPPgJJ
-X-Received: by 2002:a05:622a:1714:b0:2de:755c:2c81 with SMTP id h20-20020a05622a171400b002de755c2c81mr22707087qtk.685.1646213008240;
-        Wed, 02 Mar 2022 01:23:28 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxqqlqDsysgnT4+ZcaC5E/HrMnr0i5bndO6omkJInksarmdfs77V4QCgirdVpSITO1M/a7bLA==
-X-Received: by 2002:a05:622a:1714:b0:2de:755c:2c81 with SMTP id h20-20020a05622a171400b002de755c2c81mr22707073qtk.685.1646213008009;
-        Wed, 02 Mar 2022 01:23:28 -0800 (PST)
-Received: from sgarzare-redhat (host-95-248-229-156.retail.telecomitalia.it. [95.248.229.156])
-        by smtp.gmail.com with ESMTPSA id b17-20020ae9eb11000000b0064917bda713sm7733701qkg.85.2022.03.02.01.23.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Mar 2022 01:23:27 -0800 (PST)
-Date:   Wed, 2 Mar 2022 10:23:21 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Lee Jones <lee.jones@linaro.org>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org,
-        syzbot <syzbot+3140b17cb44a7b174008@syzkaller.appspotmail.com>,
-        netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [syzbot] kernel BUG in vhost_get_vq_desc
-Message-ID: <20220302092321.rfyht3xhyybpohkw@sgarzare-redhat>
-References: <00000000000070ac6505d7d9f7a8@google.com>
- <0000000000003b07b305d840b30f@google.com>
- <20220218063352-mutt-send-email-mst@kernel.org>
- <Yh8q9fzCQHW2qtIG@google.com>
- <20220302091807.uyo7ycd6yw6cx7hd@sgarzare-redhat>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=XH8CYV/Z50iBLZ27uSo3DlVY0KhJ8ZO+RiecWTcYel0=;
+        b=XrV58EM8nrgE6J+pUGsq/YwframAmKCnxsULsjgnYoOg4rawJ+5QvKDK8sVy6xbXE8
+         sLfpTVzw1+DvR/VNLFxKMoWI/bDoANq+vG7bQCjH3wLzzSbwcUdP9nJhryjj7NycZZvH
+         m8UjLCZJyqefshrtQhh/Sid1MPM1oTFWpQqw9ri68U6sZ0Xdq5Rkyj1Df8nZQqgHFvBS
+         6/lPEjuJ1yxTFW1s+KpTfiZIBYe3JxnSfm/beqYa8+H9oc2/rZmFnWXlmZNLHTsPwuEK
+         c4JOXM6OpFkaJ9lCFTC3271Bjr3zXYVxtzKwwBWjR+/eBuDeBaGYkz9bfsD6jmTQ0Rzp
+         8uuw==
+X-Gm-Message-State: AOAM533gDch3CKaf+QmQZwDo92Sj4KpcgMf6JbJvodBAcRrY+Z67qLk4
+        LMaNPnFl3coiq50b06LAHUGaGw==
+X-Google-Smtp-Source: ABdhPJxPRWTwhfDKGEWi/HTZUmtnN6xoKL1T2KNwEAF9KgB2sMMXSt6lke7BfBVtPRIEaNMyntkyzw==
+X-Received: by 2002:a2e:3c0d:0:b0:246:3c52:7ada with SMTP id j13-20020a2e3c0d000000b002463c527adamr19885072lja.459.1646213374808;
+        Wed, 02 Mar 2022 01:29:34 -0800 (PST)
+Received: from [172.16.11.74] ([81.216.59.226])
+        by smtp.gmail.com with ESMTPSA id f36-20020a0565123b2400b0043795432e87sm1960430lfv.150.2022.03.02.01.29.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 02 Mar 2022 01:29:33 -0800 (PST)
+Message-ID: <78ccb184-405e-da93-1e02-078f90d2b9bc@rasmusvillemoes.dk>
+Date:   Wed, 2 Mar 2022 10:29:31 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20220302091807.uyo7ycd6yw6cx7hd@sgarzare-redhat>
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH 2/6] treewide: remove using list iterator after loop body
+ as a ptr
+Content-Language: en-US
+To:     Linus Torvalds <torvalds@linux-foundation.org>,
+        David Laight <David.Laight@aculab.com>
+Cc:     James Bottomley <James.Bottomley@hansenpartnership.com>,
+        linux-wireless <linux-wireless@vger.kernel.org>,
+        "alsa-devel@alsa-project.org" <alsa-devel@alsa-project.org>,
+        KVM list <kvm@vger.kernel.org>,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        "linux-iio@vger.kernel.org" <linux-iio@vger.kernel.org>,
+        "nouveau@lists.freedesktop.org" <nouveau@lists.freedesktop.org>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        dri-devel <dri-devel@lists.freedesktop.org>,
+        Cristiano Giuffrida <c.giuffrida@vu.nl>,
+        "Bos, H.J." <h.j.bos@vu.nl>,
+        "linux1394-devel@lists.sourceforge.net" 
+        <linux1394-devel@lists.sourceforge.net>,
+        "drbd-dev@lists.linbit.com" <drbd-dev@lists.linbit.com>,
+        linux-arch <linux-arch@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        "linux-aspeed@lists.ozlabs.org" <linux-aspeed@lists.ozlabs.org>,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        linux-rdma <linux-rdma@vger.kernel.org>,
+        "linux-staging@lists.linux.dev" <linux-staging@lists.linux.dev>,
+        amd-gfx list <amd-gfx@lists.freedesktop.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+        "kgdb-bugreport@lists.sourceforge.net" 
+        <kgdb-bugreport@lists.sourceforge.net>,
+        "bcm-kernel-feedback-list@broadcom.com" 
+        <bcm-kernel-feedback-list@broadcom.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Linux Media Mailing List <linux-media@vger.kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Arnd Bergman <arnd@arndb.de>,
+        Linux PM <linux-pm@vger.kernel.org>,
+        intel-gfx <intel-gfx@lists.freedesktop.org>,
+        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        dma <dmaengine@vger.kernel.org>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        Jakob Koschel <jakobkoschel@gmail.com>,
+        "v9fs-developer@lists.sourceforge.net" 
+        <v9fs-developer@lists.sourceforge.net>,
+        linux-tegra <linux-tegra@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        "linux-sgx@vger.kernel.org" <linux-sgx@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>,
+        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux F2FS Dev Mailing List 
+        <linux-f2fs-devel@lists.sourceforge.net>,
+        "tipc-discussion@lists.sourceforge.net" 
+        <tipc-discussion@lists.sourceforge.net>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        "linux-mediatek@lists.infradead.org" 
+        <linux-mediatek@lists.infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
+        Mike Rapoport <rppt@kernel.org>
+References: <20220228110822.491923-1-jakobkoschel@gmail.com>
+ <20220228110822.491923-3-jakobkoschel@gmail.com>
+ <2e4e95d6-f6c9-a188-e1cd-b1eae465562a@amd.com>
+ <CAHk-=wgQps58DPEOe4y5cTh5oE9EdNTWRLXzgMiETc+mFX7jzw@mail.gmail.com>
+ <282f0f8d-f491-26fc-6ae0-604b367a5a1a@amd.com>
+ <b2d20961dbb7533f380827a7fcc313ff849875c1.camel@HansenPartnership.com>
+ <7D0C2A5D-500E-4F38-AD0C-A76E132A390E@kernel.org>
+ <73fa82a20910c06784be2352a655acc59e9942ea.camel@HansenPartnership.com>
+ <CAHk-=wiT5HX6Kp0Qv4ZYK_rkq9t5fZ5zZ7vzvi6pub9kgp=72g@mail.gmail.com>
+ <7dc860874d434d2288f36730d8ea3312@AcuMS.aculab.com>
+ <CAHk-=whKqg89zu4T95+ctY-hocR6kDArpo2qO14-kV40Ga7ufw@mail.gmail.com>
+ <0ced2b155b984882b39e895f0211037c@AcuMS.aculab.com>
+ <CAHk-=wix0HLCBs5sxAeW3uckg0YncXbTjMsE-Tv8WzmkOgLAXQ@mail.gmail.com>
+From:   Rasmus Villemoes <linux@rasmusvillemoes.dk>
+In-Reply-To: <CAHk-=wix0HLCBs5sxAeW3uckg0YncXbTjMsE-Tv8WzmkOgLAXQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 02, 2022 at 10:18:07AM +0100, Stefano Garzarella wrote:
->On Wed, Mar 02, 2022 at 08:29:41AM +0000, Lee Jones wrote:
->>On Fri, 18 Feb 2022, Michael S. Tsirkin wrote:
+On 02/03/2022 00.55, Linus Torvalds wrote:
+> On Tue, Mar 1, 2022 at 3:19 PM David Laight <David.Laight@aculab.com> wrote:
 >>
->>>On Thu, Feb 17, 2022 at 05:21:20PM -0800, syzbot wrote:
->>>> syzbot has found a reproducer for the following issue on:
->>>>
->>>> HEAD commit:    f71077a4d84b Merge tag 'mmc-v5.17-rc1-2' of git://git.kern..
->>>> git tree:       upstream
->>>> console output: https://syzkaller.appspot.com/x/log.txt?x=104c04ca700000
->>>> kernel config:  https://syzkaller.appspot.com/x/.config?x=a78b064590b9f912
->>>> dashboard link: https://syzkaller.appspot.com/bug?extid=3140b17cb44a7b174008
->>>> compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
->>>> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1362e232700000
->>>> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11373a6c700000
->>>>
->>>> IMPORTANT: if you fix the issue, please add the following tag to the commit:
->>>> Reported-by: syzbot+3140b17cb44a7b174008@syzkaller.appspotmail.com
->>>>
->>>> ------------[ cut here ]------------
->>>> kernel BUG at drivers/vhost/vhost.c:2335!
->>>> invalid opcode: 0000 [#1] PREEMPT SMP KASAN
->>>> CPU: 1 PID: 3597 Comm: vhost-3596 Not tainted 5.17.0-rc4-syzkaller-00054-gf71077a4d84b #0
->>>> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
->>>> RIP: 0010:vhost_get_vq_desc+0x1d43/0x22c0 drivers/vhost/vhost.c:2335
->>>> Code: 00 00 00 48 c7 c6 20 2c 9d 8a 48 c7 c7 98 a6 8e 8d 48 89 ca 48 c1 e1 04 48 01 d9 e8 b7 59 28 fd e9 74 ff ff ff e8 5d c8 a1 fa <0f> 0b e8 56 c8 a1 fa 48 8b 54 24 18 48 b8 00 00 00 00 00 fc ff df
->>>> RSP: 0018:ffffc90001d1fb88 EFLAGS: 00010293
->>>> RAX: 0000000000000000 RBX: 0000000000000001 RCX: 0000000000000000
->>>> RDX: ffff8880234b0000 RSI: ffffffff86d715c3 RDI: 0000000000000003
->>>> RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000001
->>>> R10: ffffffff86d706bc R11: 0000000000000000 R12: ffff888072c24d68
->>>> R13: 0000000000000000 R14: dffffc0000000000 R15: ffff888072c24bb0
->>>> FS:  0000000000000000(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
->>>> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->>>> CR2: 0000000000000002 CR3: 000000007902c000 CR4: 00000000003506e0
->>>> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
->>>> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
->>>> Call Trace:
->>>>  <TASK>
->>>>  vhost_vsock_handle_tx_kick+0x277/0xa20 drivers/vhost/vsock.c:522
->>>>  vhost_worker+0x23d/0x3d0 drivers/vhost/vhost.c:372
->>>>  kthread+0x2e9/0x3a0 kernel/kthread.c:377
->>>>  ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
->>>
->>>I don't see how this can trigger normally so I'm assuming
->>>another case of use after free.
->>
->>Yes, exactly.
->
->I think this issue is related to the issue fixed by this patch merged 
->some days ago upstream: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a58da53ffd70294ebea8ecd0eb45fd0d74add9f9
->
->>
->>I patched it.  Please see:
->>
->>https://lore.kernel.org/all/20220302075421.2131221-1-lee.jones@linaro.org/T/#t
->>
->
->I'm not sure that patch is avoiding the issue. I'll reply to it.
 
-My bad, I think it should be fine, because vhost_vq_reset() set 
-vq->private_data to NULL and avoids the worker to run.
+> With the "don't use iterator outside the loop" approach, the exact
+> same code works in both the old world order and the new world order,
+> and you don't have the semantic confusion. And *if* you try to use the
+> iterator outside the loop, you'll _mostly_ (*) get a compiler warning
+> about it not being initialized.
+> 
+>              Linus
+> 
+> (*) Unless somebody initializes the iterator pointer pointlessly.
+> Which clearly does happen. Thus the "mostly". It's not perfect, and
+> that's most definitely not nice - but it should at least hopefully
+> make it that much harder to mess up.
 
-Thanks,
-Stefano
+This won't help the current issue (because it doesn't exist and might
+never), but just in case some compiler people are listening, I'd like to
+have some sort of way to tell the compiler "treat this variable as
+uninitialized from here on". So one could do
 
+#define kfree(p) do { __kfree(p); __magic_uninit(p); } while (0)
+
+with __magic_uninit being a magic no-op that doesn't affect the
+semantics of the code, but could be used by the compiler's "[is/may be]
+used uninitialized" machinery to flag e.g. double frees on some odd
+error path etc. It would probably only work for local automatic
+variables, but it should be possible to just ignore the hint if p is
+some expression like foo->bar or has side effects. If we had that, the
+end-of-loop test could include that to "uninitialize" the iterator.
+
+Maybe sparse/smatch or some other static analyzer could implement such a
+magic thing? Maybe it's better as a function attribute
+[__attribute__((uninitializes(1)))] to avoid having to macrofy all
+functions that release resources.
+
+Rasmus
