@@ -2,265 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 024B14CA374
-	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 12:20:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 170D34CA39F
+	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 12:26:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237919AbiCBLU4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Mar 2022 06:20:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42482 "EHLO
+        id S241395AbiCBL1b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 06:27:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58276 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233304AbiCBLUm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 06:20:42 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 76CB1BC05
-        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 03:19:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646219974;
+        with ESMTP id S241297AbiCBL1a (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 06:27:30 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86BA66622D;
+        Wed,  2 Mar 2022 03:26:47 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2419161804;
+        Wed,  2 Mar 2022 11:26:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D16F9C340F1;
+        Wed,  2 Mar 2022 11:26:45 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="FLziEXpf"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1646220402;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=oU9xsUH3KYvT9qc7F2Zj/zrvWJj+uZjGFINcg4AMqQg=;
-        b=MOIwvKcGv0vajVatBRD7RRBET1k7HVtWfMKbIp+yYcpjOAQw987ODk85KD9u2uy33maL6T
-        KClDXLpOr0b+fCpd/POms+HwWaMITE4il7PH1Dq8PoOKK/Hv64h9YjXA5qg7M/yt1i6ghM
-        E28vqDmZmuj6L+2H+yHWsnM59h/4DFY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-36-qOQrJP2YOWal2iQgFKzSHw-1; Wed, 02 Mar 2022 06:19:31 -0500
-X-MC-Unique: qOQrJP2YOWal2iQgFKzSHw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 990E01006AA5;
-        Wed,  2 Mar 2022 11:19:29 +0000 (UTC)
-Received: from localhost (unknown [10.39.194.94])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E6E697554E;
-        Wed,  2 Mar 2022 11:19:21 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Yishai Hadas <yishaih@nvidia.com>, alex.williamson@redhat.com,
-        bhelgaas@google.com, jgg@nvidia.com, saeedm@nvidia.com
-Cc:     linux-pci@vger.kernel.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
-        kwankhede@nvidia.com, mgurtovoy@nvidia.com, yishaih@nvidia.com,
-        maorg@nvidia.com, ashok.raj@intel.com, kevin.tian@intel.com,
-        shameerali.kolothum.thodi@huawei.com
-Subject: Re: [PATCH V9 mlx5-next 09/15] vfio: Define device migration
- protocol v2
-In-Reply-To: <20220224142024.147653-10-yishaih@nvidia.com>
-Organization: Red Hat GmbH
-References: <20220224142024.147653-1-yishaih@nvidia.com>
- <20220224142024.147653-10-yishaih@nvidia.com>
-User-Agent: Notmuch/0.34 (https://notmuchmail.org)
-Date:   Wed, 02 Mar 2022 12:19:20 +0100
-Message-ID: <87tucgiouf.fsf@redhat.com>
+        bh=fufxSPRIOrmbnPbDC6hJ7ttxshIW5aGS9pJhSWhnCM4=;
+        b=FLziEXpf2l0WTAhzSsctWfFPyoNczuf0yET5OvrmfeoHkbQdJJUnS5q+NI+vrChRlkMr3x
+        174jqFOO+Z3Pr5c79Gii5Ryw0Vd9q9Ey0Hlr2keq9mQvPlFbNmRp37DUVNhIihEZDWJZG5
+        HjPNCU02XchGOwdc6y1fEsx970Bts6c=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id a4166dc6 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Wed, 2 Mar 2022 11:26:41 +0000 (UTC)
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-2dbc48104beso13440867b3.5;
+        Wed, 02 Mar 2022 03:26:40 -0800 (PST)
+X-Gm-Message-State: AOAM531CCPFcEGKBbRNRGtYXkH9nqJ+pu4T+FHrfbpHSC9V4hrNo0nv0
+        rosp0lWDaH02FtNz1efiEeJ2262x3AcFLqhgPQc=
+X-Google-Smtp-Source: ABdhPJxbaslGOWNMYlqRkibxJ2ICArMnaBOXMWHprS75pC5WtpgRWsCTpsPEORMZE4FcmdBod69a3hNDLa7CXaxndsk=
+X-Received: by 2002:a81:1143:0:b0:2db:ccb4:b0a1 with SMTP id
+ 64-20020a811143000000b002dbccb4b0a1mr9951120ywr.499.1646220398624; Wed, 02
+ Mar 2022 03:26:38 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+References: <Yh4+9+UpanJWAIyZ@zx2c4.com> <223f858c-34c5-3ccd-b9e8-7585a976364d@redhat.com>
+ <Yh5JwK6toc/zBNL7@zx2c4.com> <20220301121419-mutt-send-email-mst@kernel.org>
+ <CAHmME9qieLUDVoPYZPo=N8NCL1T-RzQ4p7kCFv3PKFUkhWZPsw@mail.gmail.com> <20220302031738-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20220302031738-mutt-send-email-mst@kernel.org>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Wed, 2 Mar 2022 12:26:27 +0100
+X-Gmail-Original-Message-ID: <CAHmME9pf-bjnZuweoLqoFEmPy1OK7ogEgGEAva1T8uVTufhCuw@mail.gmail.com>
+Message-ID: <CAHmME9pf-bjnZuweoLqoFEmPy1OK7ogEgGEAva1T8uVTufhCuw@mail.gmail.com>
+Subject: Re: propagating vmgenid outward and upward
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Laszlo Ersek <lersek@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        QEMU Developers <qemu-devel@nongnu.org>,
+        linux-hyperv@vger.kernel.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Alexander Graf <graf@amazon.com>,
+        "Michael Kelley (LINUX)" <mikelley@microsoft.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        adrian@parity.io,
+        =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Jann Horn <jannh@google.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        "Brown, Len" <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
+        Linux PM <linux-pm@vger.kernel.org>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        "Theodore Ts'o" <tytso@mit.edu>, Arnd Bergmann <arnd@arndb.de>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-6.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 24 2022, Yishai Hadas <yishaih@nvidia.com> wrote:
+Hey Michael,
 
-> From: Jason Gunthorpe <jgg@nvidia.com>
->
-> Replace the existing region based migration protocol with an ioctl based
-> protocol. The two protocols have the same general semantic behaviors, but
-> the way the data is transported is changed.
->
-> This is the STOP_COPY portion of the new protocol, it defines the 5 states
-> for basic stop and copy migration and the protocol to move the migration
-> data in/out of the kernel.
->
-> Compared to the clarification of the v1 protocol Alex proposed:
->
-> https://lore.kernel.org/r/163909282574.728533.7460416142511440919.stgit@omen
->
-> This has a few deliberate functional differences:
->
->  - ERROR arcs allow the device function to remain unchanged.
->
->  - The protocol is not required to return to the original state on
->    transition failure. Instead userspace can execute an unwind back to
->    the original state, reset, or do something else without needing kernel
->    support. This simplifies the kernel design and should userspace choose
->    a policy like always reset, avoids doing useless work in the kernel
->    on error handling paths.
->
->  - PRE_COPY is made optional, userspace must discover it before using it.
->    This reflects the fact that the majority of drivers we are aware of
->    right now will not implement PRE_COPY.
->
->  - segmentation is not part of the data stream protocol, the receiver
->    does not have to reproduce the framing boundaries.
->
-> The hybrid FSM for the device_state is described as a Mealy machine by
-> documenting each of the arcs the driver is required to implement. Defining
-> the remaining set of old/new device_state transitions as 'combination
-> transitions' which are naturally defined as taking multiple FSM arcs along
-> the shortest path within the FSM's digraph allows a complete matrix of
-> transitions.
->
-> A new VFIO_DEVICE_FEATURE of VFIO_DEVICE_FEATURE_MIG_DEVICE_STATE is
-> defined to replace writing to the device_state field in the region. This
-> allows returning a brand new FD whenever the requested transition opens
-> a data transfer session.
->
-> The VFIO core code implements the new feature and provides a helper
-> function to the driver. Using the helper the driver only has to
-> implement 6 of the FSM arcs and the other combination transitions are
-> elaborated consistently from those arcs.
->
-> A new VFIO_DEVICE_FEATURE of VFIO_DEVICE_FEATURE_MIGRATION is defined to
-> report the capability for migration and indicate which set of states and
-> arcs are supported by the device. The FSM provides a lot of flexibility to
-> make backwards compatible extensions but the VFIO_DEVICE_FEATURE also
-> allows for future breaking extensions for scenarios that cannot support
-> even the basic STOP_COPY requirements.
->
-> The VFIO_DEVICE_FEATURE_MIG_DEVICE_STATE with the GET option (i.e.
-> VFIO_DEVICE_FEATURE_GET) can be used to read the current migration state
-> of the VFIO device.
->
-> Data transfer sessions are now carried over a file descriptor, instead of
-> the region. The FD functions for the lifetime of the data transfer
-> session. read() and write() transfer the data with normal Linux stream FD
-> semantics. This design allows future expansion to support poll(),
-> io_uring, and other performance optimizations.
->
-> The complicated mmap mode for data transfer is discarded as current qemu
-> doesn't take meaningful advantage of it, and the new qemu implementation
-> avoids substantially all the performance penalty of using a read() on the
-> region.
->
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> Tested-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
-> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
-> ---
->  drivers/vfio/vfio.c       | 199 ++++++++++++++++++++++++++++++++++++++
->  include/linux/vfio.h      |  20 ++++
->  include/uapi/linux/vfio.h | 174 ++++++++++++++++++++++++++++++---
->  3 files changed, 380 insertions(+), 13 deletions(-)
->
-> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-> index 71763e2ac561..b37ab27b511f 100644
-> --- a/drivers/vfio/vfio.c
-> +++ b/drivers/vfio/vfio.c
-> @@ -1557,6 +1557,197 @@ static int vfio_device_fops_release(struct inode *inode, struct file *filep)
->  	return 0;
->  }
->  
-> +/*
-> + * vfio_mig_get_next_state - Compute the next step in the FSM
-> + * @cur_fsm - The current state the device is in
-> + * @new_fsm - The target state to reach
-> + * @next_fsm - Pointer to the next step to get to new_fsm
-> + *
-> + * Return 0 upon success, otherwise -errno
-> + * Upon success the next step in the state progression between cur_fsm and
-> + * new_fsm will be set in next_fsm.
+Thanks for the benchmark.
 
-What about non-success? Can the caller make any assumption about
-next_fsm in that case? Because...
+On Wed, Mar 2, 2022 at 9:30 AM Michael S. Tsirkin <mst@redhat.com> wrote:
+> So yes, the overhead is higher by 50% which seems a lot but it's from a
+> very small number, so I don't see why it's a show stopper, it's not by a
+> factor of 10 such that we should sacrifice safety by default. Maybe a
+> kernel flag that removes the read replacing it with an interrupt will
+> do.
+>
+> In other words, premature optimization is the root of all evil.
 
-> + *
-> + * This breaks down requests for combination transitions into smaller steps and
-> + * returns the next step to get to new_fsm. The function may need to be called
-> + * multiple times before reaching new_fsm.
-> + *
-> + */
-> +int vfio_mig_get_next_state(struct vfio_device *device,
-> +			    enum vfio_device_mig_state cur_fsm,
-> +			    enum vfio_device_mig_state new_fsm,
-> +			    enum vfio_device_mig_state *next_fsm)
-> +{
-> +	enum { VFIO_DEVICE_NUM_STATES = VFIO_DEVICE_STATE_RESUMING + 1 };
-> +	/*
-> +	 * The coding in this table requires the driver to implement 6
-> +	 * FSM arcs:
-> +	 *         RESUMING -> STOP
-> +	 *         RUNNING -> STOP
-> +	 *         STOP -> RESUMING
-> +	 *         STOP -> RUNNING
-> +	 *         STOP -> STOP_COPY
-> +	 *         STOP_COPY -> STOP
-> +	 *
-> +	 * The coding will step through multiple states for these combination
-> +	 * transitions:
-> +	 *         RESUMING -> STOP -> RUNNING
-> +	 *         RESUMING -> STOP -> STOP_COPY
-> +	 *         RUNNING -> STOP -> RESUMING
-> +	 *         RUNNING -> STOP -> STOP_COPY
-> +	 *         STOP_COPY -> STOP -> RESUMING
-> +	 *         STOP_COPY -> STOP -> RUNNING
-> +	 */
-> +	static const u8 vfio_from_fsm_table[VFIO_DEVICE_NUM_STATES][VFIO_DEVICE_NUM_STATES] = {
-> +		[VFIO_DEVICE_STATE_STOP] = {
-> +			[VFIO_DEVICE_STATE_STOP] = VFIO_DEVICE_STATE_STOP,
-> +			[VFIO_DEVICE_STATE_RUNNING] = VFIO_DEVICE_STATE_RUNNING,
-> +			[VFIO_DEVICE_STATE_STOP_COPY] = VFIO_DEVICE_STATE_STOP_COPY,
-> +			[VFIO_DEVICE_STATE_RESUMING] = VFIO_DEVICE_STATE_RESUMING,
-> +			[VFIO_DEVICE_STATE_ERROR] = VFIO_DEVICE_STATE_ERROR,
-> +		},
-> +		[VFIO_DEVICE_STATE_RUNNING] = {
-> +			[VFIO_DEVICE_STATE_STOP] = VFIO_DEVICE_STATE_STOP,
-> +			[VFIO_DEVICE_STATE_RUNNING] = VFIO_DEVICE_STATE_RUNNING,
-> +			[VFIO_DEVICE_STATE_STOP_COPY] = VFIO_DEVICE_STATE_STOP,
-> +			[VFIO_DEVICE_STATE_RESUMING] = VFIO_DEVICE_STATE_STOP,
-> +			[VFIO_DEVICE_STATE_ERROR] = VFIO_DEVICE_STATE_ERROR,
-> +		},
-> +		[VFIO_DEVICE_STATE_STOP_COPY] = {
-> +			[VFIO_DEVICE_STATE_STOP] = VFIO_DEVICE_STATE_STOP,
-> +			[VFIO_DEVICE_STATE_RUNNING] = VFIO_DEVICE_STATE_STOP,
-> +			[VFIO_DEVICE_STATE_STOP_COPY] = VFIO_DEVICE_STATE_STOP_COPY,
-> +			[VFIO_DEVICE_STATE_RESUMING] = VFIO_DEVICE_STATE_STOP,
-> +			[VFIO_DEVICE_STATE_ERROR] = VFIO_DEVICE_STATE_ERROR,
-> +		},
-> +		[VFIO_DEVICE_STATE_RESUMING] = {
-> +			[VFIO_DEVICE_STATE_STOP] = VFIO_DEVICE_STATE_STOP,
-> +			[VFIO_DEVICE_STATE_RUNNING] = VFIO_DEVICE_STATE_STOP,
-> +			[VFIO_DEVICE_STATE_STOP_COPY] = VFIO_DEVICE_STATE_STOP,
-> +			[VFIO_DEVICE_STATE_RESUMING] = VFIO_DEVICE_STATE_RESUMING,
-> +			[VFIO_DEVICE_STATE_ERROR] = VFIO_DEVICE_STATE_ERROR,
-> +		},
-> +		[VFIO_DEVICE_STATE_ERROR] = {
-> +			[VFIO_DEVICE_STATE_STOP] = VFIO_DEVICE_STATE_ERROR,
-> +			[VFIO_DEVICE_STATE_RUNNING] = VFIO_DEVICE_STATE_ERROR,
-> +			[VFIO_DEVICE_STATE_STOP_COPY] = VFIO_DEVICE_STATE_ERROR,
-> +			[VFIO_DEVICE_STATE_RESUMING] = VFIO_DEVICE_STATE_ERROR,
-> +			[VFIO_DEVICE_STATE_ERROR] = VFIO_DEVICE_STATE_ERROR,
-> +		},
-> +	};
-> +
-> +	if (WARN_ON(cur_fsm >= ARRAY_SIZE(vfio_from_fsm_table)))
-> +		return -EINVAL;
-> +
-> +	if (new_fsm >= ARRAY_SIZE(vfio_from_fsm_table))
-> +		return -EINVAL;
-> +
-> +	*next_fsm = vfio_from_fsm_table[cur_fsm][new_fsm];
-> +	return (*next_fsm != VFIO_DEVICE_STATE_ERROR) ? 0 : -EINVAL;
+Unfortunately I don't think it's as simple as that for several reasons.
 
-...next_fsm will contain STATE_ERROR if we try to transition from or to
-STATE_ERROR, but it remains unchanged if the input states are out of
-range, yet in both cases the return value is -EINVAL. Looking further, ...
+First, I'm pretty confident a beefy Intel machine can mostly hide
+non-dependent comparisons in the memory access and have the problem
+mostly go away. But this is much less the case on, say, an in-order
+MIPS32r2, which isn't just "some crappy ISA I'm using for the sake of
+argument," but actually the platform on which a lot of networking and
+WireGuard stuff runs, so I do care about it. There, we have 4
+reads/comparisons which can't pipeline nearly as well.
 
-> + * any -> ERROR
-> + *   ERROR cannot be specified as a device state, however any transition request
-> + *   can be failed with an errno return and may then move the device_state into
-> + *   ERROR. In this case the device was unable to execute the requested arc and
-> + *   was also unable to restore the device to any valid device_state.
-> + *   To recover from ERROR VFIO_DEVICE_RESET must be used to return the
-> + *   device_state back to RUNNING.
+There's also the atomicity aspect, which I think makes your benchmark
+not quite accurate. Those 16 bytes could change between the first and
+second word (or between the Nth and N+1th word for N<=3 on 32-bit).
+What if in that case the word you read second doesn't change, but the
+word you read first did? So then you find yourself having to do a
+hi-lo-hi dance. And then consider the 32-bit case, where that's even
+more annoying. This is just one of those things that comes up when you
+compare the semantics of a "large unique ID" and "word-sized counter",
+as general topics. (My suggestion is that vmgenid provide both.)
 
-...this seems to indicate that not moving into STATE_ERROR is an
-option anyway. Do we need any extra guidance in the description for
-vfio_mig_get_next_state()?
+Finally, there's a slightly storage aspect, where adding 16 bytes to a
+per-key struct is a little bit heavier than adding 4 bytes and might
+bust a cache line without sufficient care, care which always has some
+cost in one way or another.
 
+So I just don't know if it's realistic to impose a 16-byte per-packet
+comparison all the time like that. I'm familiar with WireGuard
+obviously, but there's also cifs and maybe even wifi and bluetooth,
+and who knows what else, to care about too. Then there's the userspace
+discussion. I can't imagine a 16-byte hotpath comparison being
+accepted as implementable.
+
+> And I feel if linux
+> DTRT and reads the 16 bytes then hypervisor vendors will be motivated to
+> improve and add a 4 byte unique one. As long as linux is interrupt
+> driven there's no motivation for change.
+
+I reeeeeally don't want to get pulled into the politics of this on the
+hypervisor side. I assume an improved thing would begin with QEMU and
+Firecracker or something collaborating because they're both open
+source and Amazon people seem interested. And then pressure builds for
+Microsoft and VMware to do it on their side. And then we get this all
+nicely implemented in the kernel. In the meantime, though, I'm not
+going to refuse to address the problem entirely just because the
+virtual hardware is less than perfect; I'd rather make the most with
+what we've got while still being somewhat reasonable from an
+implementation perspective.
+
+Jason
