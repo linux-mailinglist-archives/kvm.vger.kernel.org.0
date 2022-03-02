@@ -2,80 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 972C74CA920
-	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 16:34:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 382674CA924
+	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 16:36:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233059AbiCBPfa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Mar 2022 10:35:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51466 "EHLO
+        id S236394AbiCBPhe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 10:37:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52200 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241366AbiCBPf3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 10:35:29 -0500
+        with ESMTP id S238025AbiCBPhd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 10:37:33 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1799CC6262
-        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 07:34:46 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C6CB5C625E
+        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 07:36:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646235285;
+        s=mimecast20190719; t=1646235409;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=QGFEqUfF08Ay8YfxfHzxFFjx43+q2fu6XbpJ32ujXXg=;
-        b=cRPbjuz4ayzbKtaJBVHhnbELJXTakdKrWzGEeMDvnEtJjobm4eoNebAK2RsAHNslfFaXrF
-        18U0alctB7l4umai6WaLo72rbN/JeddlBsePiD5jqd6D36Yh7EJhgnd0r6FY8ayCci8my9
-        Rb84OH50116VJEc3/G6I4Xn4IYQpkDQ=
-Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com
- [209.85.167.200]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=HiWuNUMDb+jMyibsjnWGqQsYAJ9IA+FOAlDaEyD0AQE=;
+        b=h9nVgsta46PTLxUXHwgpxror6zY7auE08UgC52vUBGTY+ozmAf9Uth5kxy/CGSCTsIsT4s
+        C+Z5iKQDND+8Xux3jDZyC7Q6btM3mo8+TbpuSJpOhJn9j/C0CzZIgIDUGJfA9dRAmaWz4l
+        VGmK5jXIq/uRjtNMBA5T57L/n7yPWpE=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-221--SuDklpHO0WPvYA14KXInA-1; Wed, 02 Mar 2022 10:34:44 -0500
-X-MC-Unique: -SuDklpHO0WPvYA14KXInA-1
-Received: by mail-oi1-f200.google.com with SMTP id bh17-20020a056808181100b002d4f3396ec3so1232512oib.9
-        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 07:34:43 -0800 (PST)
+ us-mta-287-O_oJcoJKNwq-HPvtDCAcDg-1; Wed, 02 Mar 2022 10:36:48 -0500
+X-MC-Unique: O_oJcoJKNwq-HPvtDCAcDg-1
+Received: by mail-wr1-f70.google.com with SMTP id b7-20020a05600003c700b001efac398af7so769923wrg.22
+        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 07:36:48 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=QGFEqUfF08Ay8YfxfHzxFFjx43+q2fu6XbpJ32ujXXg=;
-        b=iWHv3l9W76PlkP9murZwx/z70+Dg6qJqtR3UfZIsYXDkWl0cWY7hWUi9II2SCcnWtf
-         TL+6pynjIOXZX4chSowWiMbIG1pwBR8vWG/vnDMrd1Qx15YwJo6wD49R3pirklEviFj6
-         k6Vm1Ir3Hgydf0naFClFlvf9xtIloTpceTlKqyjiQKVsu3nK+wnptGbi3Zq5U3/jR5Jn
-         5elEoz6IBX6N9pLXUlJ7sQ1/Pe/RCIU+8JBkPZ9uW9ELNKQEVrCSIM96YfqJA+hWqo15
-         NETcEWsSgCTnAwz3Gl0l5rfe4XB3xyq1LmMEKI7QNdRCSSW476SCP2FBEPSeca5QakUO
-         wQoA==
-X-Gm-Message-State: AOAM530vfgdto4ajMvCWxD0u+bBOpMsMsQDNTnVhRF/2p+V484yin2v/
-        3RfLw2O8R6pnfB3q9TJx1ulrIjXeyYucCM7RJSAI9IgQU/WDQBQrwzJE2WWNBcKj4s2v4II4qg9
-        ht5XP75+LEIvd
-X-Received: by 2002:a9d:64d2:0:b0:5a4:44c:1e76 with SMTP id n18-20020a9d64d2000000b005a4044c1e76mr16173656otl.324.1646235283223;
-        Wed, 02 Mar 2022 07:34:43 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwFL7AIz+XMoO0pSy0ljQcZTQYiU1hM7aen/H7PCgOUAQayBKEf+UxF/GZqjnBMxmMJL8tbTw==
-X-Received: by 2002:a9d:64d2:0:b0:5a4:44c:1e76 with SMTP id n18-20020a9d64d2000000b005a4044c1e76mr16173643otl.324.1646235283005;
-        Wed, 02 Mar 2022 07:34:43 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id l34-20020a9d1ca2000000b005acea92e8absm8053452ota.42.2022.03.02.07.34.41
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=HiWuNUMDb+jMyibsjnWGqQsYAJ9IA+FOAlDaEyD0AQE=;
+        b=Uc8jQTntX/chHYMVgyDV0j5pc2Zq7+RRDARMbCuC5Dl4v6nSlJAiwap7ncgA2RFk+N
+         mCD/Q69L1N5AtYKk2RbVtdW+ZtCskTZXtCRjhSnKkFRVXYTmw5XLMXY2jjSNCPlQO4LR
+         zSwFJ74CcXL3Xp5PBe2JgzqpluacgX96tdScz8u0P4RqkQ3curIheHHRu5UZbApVqksG
+         lfSz7Yvr2I+71L1ypdmxPGfSu5CwMAi4Dr8U8MLRyBZ9/CojpEf3YCgPQoKguat477vG
+         cylMvxaqaFwlfzNSKlrVdFLO0AjU7axaTUtQaAzGJGu2QlHLVpmfPSGva/CBHvRt+cZS
+         A2SA==
+X-Gm-Message-State: AOAM532ichsi80dB0AJTZAR6vTe8R/bSm2uB2NrLEbsFkLdb/tE3RC17
+        H5Bp5gBoPZlAMSxWPhgN+intqIJQCqegT56aounqJLcoYKISgRxLvMUzCk4fNnGDpKQmVrG2FFL
+        HlyYDPFvXBKWd
+X-Received: by 2002:adf:914f:0:b0:1ed:bb92:d0cc with SMTP id j73-20020adf914f000000b001edbb92d0ccmr23760989wrj.297.1646235407396;
+        Wed, 02 Mar 2022 07:36:47 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyOXNVA6Ca35935P9zNNj3hLgvVWqdH+AVRnYEdYqNaoKk8H9E6ae22MHAewrFcGgr/Nliwkg==
+X-Received: by 2002:adf:914f:0:b0:1ed:bb92:d0cc with SMTP id j73-20020adf914f000000b001edbb92d0ccmr23760976wrj.297.1646235407162;
+        Wed, 02 Mar 2022 07:36:47 -0800 (PST)
+Received: from sgarzare-redhat (host-95-248-229-156.retail.telecomitalia.it. [95.248.229.156])
+        by smtp.gmail.com with ESMTPSA id m12-20020a7bcb8c000000b003811afe1d45sm5852294wmi.37.2022.03.02.07.36.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Mar 2022 07:34:42 -0800 (PST)
-Date:   Wed, 2 Mar 2022 08:34:40 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
-        saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
-        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com,
-        ashok.raj@intel.com, kevin.tian@intel.com,
-        shameerali.kolothum.thodi@huawei.com
-Subject: Re: [PATCH V9 mlx5-next 09/15] vfio: Define device migration
- protocol v2
-Message-ID: <20220302083440.539a1f33.alex.williamson@redhat.com>
-In-Reply-To: <20220302142732.GK219866@nvidia.com>
-References: <20220224142024.147653-1-yishaih@nvidia.com>
-        <20220224142024.147653-10-yishaih@nvidia.com>
-        <87tucgiouf.fsf@redhat.com>
-        <20220302142732.GK219866@nvidia.com>
-Organization: Red Hat
+        Wed, 02 Mar 2022 07:36:46 -0800 (PST)
+Date:   Wed, 2 Mar 2022 16:36:43 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Lee Jones <lee.jones@linaro.org>, jasowang@redhat.com,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        stable@vger.kernel.org,
+        syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
+Subject: Re: [PATCH 1/1] vhost: Protect the virtqueue from being cleared
+ whilst still in use
+Message-ID: <20220302153643.glkmvnn2czrgpoyl@sgarzare-redhat>
+References: <20220302075421.2131221-1-lee.jones@linaro.org>
+ <20220302093446.pjq3djoqi434ehz4@sgarzare-redhat>
+ <20220302083413-mutt-send-email-mst@kernel.org>
+ <20220302141121.sohhkhtiiaydlv47@sgarzare-redhat>
+ <20220302094946-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20220302094946-mutt-send-email-mst@kernel.org>
 X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
@@ -87,56 +84,73 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2 Mar 2022 10:27:32 -0400
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+On Wed, Mar 02, 2022 at 09:50:38AM -0500, Michael S. Tsirkin wrote:
+>On Wed, Mar 02, 2022 at 03:11:21PM +0100, Stefano Garzarella wrote:
+>> On Wed, Mar 02, 2022 at 08:35:08AM -0500, Michael S. Tsirkin wrote:
+>> > On Wed, Mar 02, 2022 at 10:34:46AM +0100, Stefano Garzarella wrote:
+>> > > On Wed, Mar 02, 2022 at 07:54:21AM +0000, Lee Jones wrote:
+>> > > > vhost_vsock_handle_tx_kick() already holds the mutex during its call
+>> > > > to vhost_get_vq_desc().  All we have to do is take the same lock
+>> > > > during virtqueue clean-up and we mitigate the reported issues.
+>> > > >
+>> > > > Link: https://syzkaller.appspot.com/bug?extid=279432d30d825e63ba00
+>> > >
+>> > > This issue is similar to [1] that should be already fixed upstream by [2].
+>> > >
+>> > > However I think this patch would have prevented some issues, because
+>> > > vhost_vq_reset() sets vq->private to NULL, preventing the worker from
+>> > > running.
+>> > >
+>> > > Anyway I think that when we enter in vhost_dev_cleanup() the worker should
+>> > > be already stopped, so it shouldn't be necessary to take the mutex. But in
+>> > > order to prevent future issues maybe it's better to take them, so:
+>> > >
+>> > > Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+>> > >
+>> > > [1]
+>> > > https://syzkaller.appspot.com/bug?id=993d8b5e64393ed9e6a70f9ae4de0119c605a822
+>> > > [2] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a58da53ffd70294ebea8ecd0eb45fd0d74add9f9
+>> >
+>> >
+>> > Right. I want to queue this but I would like to get a warning
+>> > so we can detect issues like [2] before they cause more issues.
+>>
+>> I agree, what about moving the warning that we already have higher up, right
+>> at the beginning of the function?
+>>
+>> I mean something like this:
+>>
+>> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+>> index 59edb5a1ffe2..1721ff3f18c0 100644
+>> --- a/drivers/vhost/vhost.c
+>> +++ b/drivers/vhost/vhost.c
+>> @@ -692,6 +692,8 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
+>>  {
+>>         int i;
+>> +       WARN_ON(!llist_empty(&dev->work_list));
+>> +
+>>         for (i = 0; i < dev->nvqs; ++i) {
+>>                 if (dev->vqs[i]->error_ctx)
+>>                         eventfd_ctx_put(dev->vqs[i]->error_ctx);
+>> @@ -712,7 +714,6 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
+>>         dev->iotlb = NULL;
+>>         vhost_clear_msg(dev);
+>>         wake_up_interruptible_poll(&dev->wait, EPOLLIN | EPOLLRDNORM);
+>> -       WARN_ON(!llist_empty(&dev->work_list));
+>>         if (dev->worker) {
+>>                 kthread_stop(dev->worker);
+>>                 dev->worker = NULL;
+>>
+>
+>Hmm I'm not sure why it matters.
 
-> On Wed, Mar 02, 2022 at 12:19:20PM +0100, Cornelia Huck wrote:
-> > > +/*
-> > > + * vfio_mig_get_next_state - Compute the next step in the FSM
-> > > + * @cur_fsm - The current state the device is in
-> > > + * @new_fsm - The target state to reach
-> > > + * @next_fsm - Pointer to the next step to get to new_fsm
-> > > + *
-> > > + * Return 0 upon success, otherwise -errno
-> > > + * Upon success the next step in the state progression between cur_fsm and
-> > > + * new_fsm will be set in next_fsm.  
-> > 
-> > What about non-success? Can the caller make any assumption about
-> > next_fsm in that case? Because...  
-> 
-> I checked both mlx5 and acc, both properly ignore the next_fsm value
-> on error. This oddness aros when Alex asked to return an errno instead
-> of the state value.
+Because after this new patch, putting locks in the while loop, when we 
+finish the loop the workers should be stopped, because vhost_vq_reset() 
+sets vq->private to NULL.
 
-Right, my assertion was that only the driver itself should be able to
-transition to the ERROR state.  vfio_mig_get_next_state() should never
-advise the driver to go to the error state, it can only report that a
-transition is invalid.  The driver may stay in the current state if an
-error occurs here, which is why we added the ability to get the device
-state.  Thanks,
+But the best thing IMHO is to check that there is no backend set for 
+each vq, so the workers have been stopped correctly at this point.
 
-Alex
-
-> > > + * any -> ERROR
-> > > + *   ERROR cannot be specified as a device state, however any transition request
-> > > + *   can be failed with an errno return and may then move the device_state into
-> > > + *   ERROR. In this case the device was unable to execute the requested arc and
-> > > + *   was also unable to restore the device to any valid device_state.
-> > > + *   To recover from ERROR VFIO_DEVICE_RESET must be used to return the
-> > > + *   device_state back to RUNNING.  
-> > 
-> > ...this seems to indicate that not moving into STATE_ERROR is an
-> > option anyway.   
-> 
-> Yes, but it is never done by vfio_mig_get_next_state() it is only
-> directly triggered inside the driver.
-> 
-> > Do we need any extra guidance in the description for
-> > vfio_mig_get_next_state()?  
-> 
-> I think no, it is typical in linux that function failure means output
-> arguments are not valid
-> 
-> Jason
-> 
+Thanks,
+Stefano
 
