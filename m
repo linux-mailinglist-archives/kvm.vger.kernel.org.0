@@ -2,105 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0AA674CA1D1
-	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 11:08:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8041E4CA1D9
+	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 11:10:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240758AbiCBKIp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Mar 2022 05:08:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48966 "EHLO
+        id S240886AbiCBKKy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 05:10:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236246AbiCBKIn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 05:08:43 -0500
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D572E029
-        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 02:07:59 -0800 (PST)
-Received: by mail-wm1-x335.google.com with SMTP id n33-20020a05600c3ba100b003832caf7f3aso809985wms.0
-        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 02:07:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=zc2Kxkwq8yRJOIjT0AKi1HEEsJsOWY9kQ95eThh2v70=;
-        b=ecAKqbUejfhOR4GBhQMpQI50QgEqRyNg/QnFeZcpReex2f/aKqpIJhK5D5uM8fAKWF
-         mMf0G85D4XF9vE0xLxfF7IiVw6iAd7xy76WbrDFUoHm9U2roE5BFSjaD6rDbUu1nyLDs
-         TUSLnUg4xns+ak4kN47GRaBDCiJs28GqnYG0nqw5JNZUjyvWuY6qte9Dl5jC9gDq4POq
-         DWkEu69p7F7FmjVZ1US0DD/+mB5Qi8VwuedvAKxN2FVzxj5c0H3I9cSDR4Ftpmt/VfAS
-         RZWk1CVThRo0jiotRwXIm+yIw9Cz03uAGiiqgwmCgWlCK4jT6bdRalYJSElqXS5X/Rlm
-         UEwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=zc2Kxkwq8yRJOIjT0AKi1HEEsJsOWY9kQ95eThh2v70=;
-        b=J1hsA1lEIpnLJRv/uVvosGVIlWd2ctu123GC/JdFordJnAPQLwYW0QzCPgZm7CNfnB
-         tbbzLXwSE2FmZ5FOA+1zgEcnyB8NecFf0dAlTozon8DofVzNiDzC4f4YjuWfxByKqYjF
-         N27a3R+ZtE+OFvytvtcOnf9VbfvzQryh3VYPqstm8tEn2ERbQjn2SEYltVNVicjiBVZN
-         DdyqlKBCShNjo4BXDb3/J32qyyAw3ygSrhrIlF1mjmg3EK1qvoqMeIKTaQHDU33L9WLd
-         WZF2/aDWQhHyhwHEttdZFDCEzX5iAZaoZosn098bpr+KH4B3EpPl0QAl0Gup8ZCvtslX
-         b4xg==
-X-Gm-Message-State: AOAM530DApcZNsQr72LGoD5M40kutOgaLgQfhZx82xZkq5qe+krxTntY
-        JtZUk8dm34iXvmPtsP0N+1Aieg==
-X-Google-Smtp-Source: ABdhPJz8M0JUlRrgQnR37WHwsfOfDjkWNajdAFWhrLUoxOp/RJdiuL9DzgCo0omQgu5pxB9pI/a4/w==
-X-Received: by 2002:a05:600c:378b:b0:381:67e7:e20c with SMTP id o11-20020a05600c378b00b0038167e7e20cmr10999452wmr.32.1646215677851;
-        Wed, 02 Mar 2022 02:07:57 -0800 (PST)
-Received: from google.com (cpc155339-bagu17-2-0-cust87.1-3.cable.virginm.net. [86.27.177.88])
-        by smtp.gmail.com with ESMTPSA id i5-20020a1c3b05000000b00382871cf734sm4075730wma.25.2022.03.02.02.07.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Mar 2022 02:07:57 -0800 (PST)
-Date:   Wed, 2 Mar 2022 10:07:55 +0000
-From:   Lee Jones <lee.jones@linaro.org>
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     mst@redhat.com, jasowang@redhat.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, stable@vger.kernel.org,
-        syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
-Subject: Re: [PATCH 1/1] vhost: Protect the virtqueue from being cleared
- whilst still in use
-Message-ID: <Yh9B+wKDKXHZ6ly/@google.com>
-References: <20220302075421.2131221-1-lee.jones@linaro.org>
- <20220302093446.pjq3djoqi434ehz4@sgarzare-redhat>
+        with ESMTP id S240890AbiCBKKw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 05:10:52 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 19CDEE029
+        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 02:10:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646215808;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=5oe0uhGT1oxcqFitX5hOxI+lyaZearD/CJbfdsAWIgE=;
+        b=DY7LipQQGTciJ0euolJBT5TSm3Eifti1Q+CZX1pz9ZwYrMhDIzbY4c5IP9BhHa1R0EMVFR
+        IirLCsvsjLYZmvepK3FOkageamke88n19oYVQy8rkHiTDgrEwgz3Vrd4BaGtV/Dk/fLs9v
+        oxm28u5vB4K9i1KXzrrXMtAFLWkM674=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-498--SYOi-OoN2yQzTplSsSyLg-1; Wed, 02 Mar 2022 05:10:03 -0500
+X-MC-Unique: -SYOi-OoN2yQzTplSsSyLg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BB489FC81;
+        Wed,  2 Mar 2022 10:10:00 +0000 (UTC)
+Received: from localhost (unknown [10.39.194.94])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4C3EE1042A56;
+        Wed,  2 Mar 2022 10:09:52 +0000 (UTC)
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Yishai Hadas <yishaih@nvidia.com>, alex.williamson@redhat.com,
+        bhelgaas@google.com, jgg@nvidia.com, saeedm@nvidia.com
+Cc:     linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
+        kwankhede@nvidia.com, mgurtovoy@nvidia.com, yishaih@nvidia.com,
+        maorg@nvidia.com, ashok.raj@intel.com, kevin.tian@intel.com,
+        shameerali.kolothum.thodi@huawei.com, qemu-devel@nongnu.org
+Subject: Re: [PATCH V9 mlx5-next 11/15] vfio: Remove migration protocol v1
+ documentation
+In-Reply-To: <20220224142024.147653-12-yishaih@nvidia.com>
+Organization: Red Hat GmbH
+References: <20220224142024.147653-1-yishaih@nvidia.com>
+ <20220224142024.147653-12-yishaih@nvidia.com>
+User-Agent: Notmuch/0.34 (https://notmuchmail.org)
+Date:   Wed, 02 Mar 2022 11:09:50 +0100
+Message-ID: <87wnhcis29.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220302093446.pjq3djoqi434ehz4@sgarzare-redhat>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 02 Mar 2022, Stefano Garzarella wrote:
+On Thu, Feb 24 2022, Yishai Hadas <yishaih@nvidia.com> wrote:
 
-> On Wed, Mar 02, 2022 at 07:54:21AM +0000, Lee Jones wrote:
-> > vhost_vsock_handle_tx_kick() already holds the mutex during its call
-> > to vhost_get_vq_desc().  All we have to do is take the same lock
-> > during virtqueue clean-up and we mitigate the reported issues.
-> > 
-> > Link: https://syzkaller.appspot.com/bug?extid=279432d30d825e63ba00
-> 
-> This issue is similar to [1] that should be already fixed upstream by [2].
-> 
-> However I think this patch would have prevented some issues, because
-> vhost_vq_reset() sets vq->private to NULL, preventing the worker from
-> running.
-> 
-> Anyway I think that when we enter in vhost_dev_cleanup() the worker should
-> be already stopped, so it shouldn't be necessary to take the mutex. But in
-> order to prevent future issues maybe it's better to take them, so:
+> From: Jason Gunthorpe <jgg@nvidia.com>
+>
+> v1 was never implemented and is replaced by v2.
+>
+> The old uAPI documentation is removed from the header file.
+>
+> The old uAPI definitions are still kept in the header file to ease
+> transition for userspace copying these headers. They will be fully
+> removed down the road.
+>
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> Tested-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
+> ---
+>  include/uapi/linux/vfio.h | 200 +-------------------------------------
+>  1 file changed, 2 insertions(+), 198 deletions(-)
+>
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index 26a66f68371d..fea86061b44e 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -323,7 +323,7 @@ struct vfio_region_info_cap_type {
+>  #define VFIO_REGION_TYPE_PCI_VENDOR_MASK	(0xffff)
+>  #define VFIO_REGION_TYPE_GFX                    (1)
+>  #define VFIO_REGION_TYPE_CCW			(2)
+> -#define VFIO_REGION_TYPE_MIGRATION              (3)
+> +#define VFIO_REGION_TYPE_MIGRATION_DEPRECATED   (3)
 
+This means that QEMU will need to do a (simple) rename when it updates
+the headers, but that seems easy enough. (cc: to give a heads up.)
 
-> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
-Thanks for the analysis and the review Stefano.
-
--- 
-Lee Jones [李琼斯]
-Principal Technical Lead - Developer Services
-Linaro.org │ Open source software for Arm SoCs
-Follow Linaro: Facebook | Twitter | Blog
