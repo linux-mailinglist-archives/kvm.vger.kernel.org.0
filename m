@@ -2,106 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AB9964CA7A6
-	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 15:11:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 500884CA7AD
+	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 15:11:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234056AbiCBOL4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Mar 2022 09:11:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56820 "EHLO
+        id S242810AbiCBOM0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 09:12:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241670AbiCBOLz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 09:11:55 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 464DC89CC2;
-        Wed,  2 Mar 2022 06:11:00 -0800 (PST)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 222CO7u4010978;
-        Wed, 2 Mar 2022 14:10:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : reply-to : subject : to : cc : references : from :
- in-reply-to : content-type : content-transfer-encoding; s=pp1;
- bh=8nwZjKbGsA01hndn3erwFvpVFCQkET2EruMAUiO8drk=;
- b=QoliAwyYG5VNgmPd98Ph8MjHIlKjsEbd+Tv0Y3FUdqRaQDLTEcSg6tmG5LBtB96na9lZ
- SkrNXh+GDGqYmj4amq3wpDIYTm7y30b3GTd0Z7byeKBB1xJWkpY7Kj6bDO/AVHxQvacN
- 7cLW0IktgXxy67EPYEutnVS/+xxY7WB2MY1YXrUQs+Wi8AR3YUO0zCUbkDVQNKHCIJ5m
- I8k1gRTlj5l0iCbfqNoJ37jPEf2sKZf309i+h0X/Hy580jMHQICgc0KJ1zI/y4QbaS2x
- 7eAZwl64I7Hxmj/Bx0810XsbTQTdBgC4B8hAs4D/uuWWUvUERG1MnOaXDq7lvLe9c9pz 1Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3ej8hxt7vx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 02 Mar 2022 14:10:34 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 222D0Gca005590;
-        Wed, 2 Mar 2022 14:10:34 GMT
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3ej8hxt7vb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 02 Mar 2022 14:10:33 +0000
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
-        by ppma01wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 222E2X8x003331;
-        Wed, 2 Mar 2022 14:10:32 GMT
-Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
-        by ppma01wdc.us.ibm.com with ESMTP id 3efbu9vy4y-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 02 Mar 2022 14:10:32 +0000
-Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com [9.57.199.107])
-        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 222EAVrJ52494808
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 2 Mar 2022 14:10:31 GMT
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 474F312405E;
-        Wed,  2 Mar 2022 14:10:31 +0000 (GMT)
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E946A124066;
-        Wed,  2 Mar 2022 14:10:29 +0000 (GMT)
-Received: from [9.65.246.177] (unknown [9.65.246.177])
-        by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
-        Wed,  2 Mar 2022 14:10:29 +0000 (GMT)
-Message-ID: <bc46e89f-c446-d4a5-e067-8b280d16d09a@linux.ibm.com>
-Date:   Wed, 2 Mar 2022 09:10:29 -0500
+        with ESMTP id S242599AbiCBOMY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 09:12:24 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4376334BB6
+        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 06:11:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646230289;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Zki/Dz8/SB2dieRvsIUHk7QNqNrRAue+WSnk+jKK4oo=;
+        b=XcIuOSkwt24EpGcbhp251hSlJIGPZ6t5zIL+lYZlcjAERtJiuZrzSxKiPPKhsbWGJdU2AU
+        HcAGbBfrOv/LkoRBdr+eU2MQVzO5Y/wFarMSjehIF5KkHtUkcjDW3E2pYfb6VZjPfBsbla
+        8LGa0HI1yebushYQtaHaz7nhalo85Z0=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-397-d6n_bU5_PnqeAscRVBty-g-1; Wed, 02 Mar 2022 09:11:28 -0500
+X-MC-Unique: d6n_bU5_PnqeAscRVBty-g-1
+Received: by mail-qt1-f199.google.com with SMTP id w15-20020a05622a190f00b002dda0988c11so1361970qtc.1
+        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 06:11:28 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Zki/Dz8/SB2dieRvsIUHk7QNqNrRAue+WSnk+jKK4oo=;
+        b=1CyxpWXGxTGdoOgiux0CSHKK45gb8+HAI30mQBwS5dLlVk/OkvqTUW/gjM99H3nyAT
+         /5qAp/D3YJsYecBzP2k4qBUch3KEcVoTXyf81GGwyj5tKd94Ukt7H+avlhmr8IIn9yn7
+         mJI2sgdbRhsXcDWuPpqzaDroscJ4DYaiy79LXmRSONtjvwHqbgrGlajk/2AQ/cIpEUnv
+         RqDuj/x0gSOBnLcpMpFiPYtpoIIpjMbwEw1WhyupttEHDEqotiiqGvbWHEK+Gqp/+r7F
+         MUkf6owvJdPOeEuI5wzsJkuI3SUGRO91ZS0QztYdwQwJv+25WRBwEP3DAJAVEMfeBx7p
+         vffw==
+X-Gm-Message-State: AOAM530GHHuDlIEVSKvNDw19xWuyy2mYYPKToScWBqOD7RnvckT82M+2
+        5Hc9VfF8BVb2i9egakowPRHt3Z5bAKoUQHsw9W+UqWHuBhuUkZNptCjrNhl/brHXtN0eBnUknKN
+        vucC6PpBBgJX0
+X-Received: by 2002:ac8:7fca:0:b0:2de:8f3d:89be with SMTP id b10-20020ac87fca000000b002de8f3d89bemr24147742qtk.34.1646230287707;
+        Wed, 02 Mar 2022 06:11:27 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxZ7kQbxyiazMoeLWG0fZ0hHibPi3bReSoEzb74TshqNyIXX6z6vntalQDbAmbzJRmBH10EiA==
+X-Received: by 2002:ac8:7fca:0:b0:2de:8f3d:89be with SMTP id b10-20020ac87fca000000b002de8f3d89bemr24147720qtk.34.1646230287418;
+        Wed, 02 Mar 2022 06:11:27 -0800 (PST)
+Received: from sgarzare-redhat (host-95-248-229-156.retail.telecomitalia.it. [95.248.229.156])
+        by smtp.gmail.com with ESMTPSA id c18-20020ac87dd2000000b002dd53a5563dsm11954035qte.25.2022.03.02.06.11.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Mar 2022 06:11:26 -0800 (PST)
+Date:   Wed, 2 Mar 2022 15:11:21 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Lee Jones <lee.jones@linaro.org>, jasowang@redhat.com,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        stable@vger.kernel.org,
+        syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
+Subject: Re: [PATCH 1/1] vhost: Protect the virtqueue from being cleared
+ whilst still in use
+Message-ID: <20220302141121.sohhkhtiiaydlv47@sgarzare-redhat>
+References: <20220302075421.2131221-1-lee.jones@linaro.org>
+ <20220302093446.pjq3djoqi434ehz4@sgarzare-redhat>
+ <20220302083413-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Reply-To: jjherne@linux.ibm.com
-Subject: Re: [PATCH v18 00/17] s390/vfio-ap: dynamic configuration support
-Content-Language: en-US
-To:     Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     freude@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
-        mjrosato@linux.ibm.com, pasic@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com
-References: <20220215005040.52697-1-akrowiak@linux.ibm.com>
- <97f95ab8-3613-1552-51fa-74f69a431bcc@linux.ibm.com>
-From:   "Jason J. Herne" <jjherne@linux.ibm.com>
-Organization: IBM
-In-Reply-To: <97f95ab8-3613-1552-51fa-74f69a431bcc@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: zVD4B5dxHADiv8INipgNUs4AiXkoP5i1
-X-Proofpoint-GUID: WbeNtJrKJqITS5L3jOiNEAZRHxCpq-WH
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-03-02_06,2022-02-26_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- adultscore=0 clxscore=1011 mlxscore=0 bulkscore=0 spamscore=0
- impostorscore=0 mlxlogscore=976 suspectscore=0 phishscore=0 malwarescore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2203020061
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20220302083413-mutt-send-email-mst@kernel.org>
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/28/22 10:53, Tony Krowiak wrote:
-> PING!! Any takers?
-I'm taking a look, starting where I left off on v17, patch #7.
+On Wed, Mar 02, 2022 at 08:35:08AM -0500, Michael S. Tsirkin wrote:
+>On Wed, Mar 02, 2022 at 10:34:46AM +0100, Stefano Garzarella wrote:
+>> On Wed, Mar 02, 2022 at 07:54:21AM +0000, Lee Jones wrote:
+>> > vhost_vsock_handle_tx_kick() already holds the mutex during its call
+>> > to vhost_get_vq_desc().  All we have to do is take the same lock
+>> > during virtqueue clean-up and we mitigate the reported issues.
+>> >
+>> > Link: https://syzkaller.appspot.com/bug?extid=279432d30d825e63ba00
+>>
+>> This issue is similar to [1] that should be already fixed upstream by [2].
+>>
+>> However I think this patch would have prevented some issues, because
+>> vhost_vq_reset() sets vq->private to NULL, preventing the worker from
+>> running.
+>>
+>> Anyway I think that when we enter in vhost_dev_cleanup() the worker should
+>> be already stopped, so it shouldn't be necessary to take the mutex. But in
+>> order to prevent future issues maybe it's better to take them, so:
+>>
+>> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+>>
+>> [1]
+>> https://syzkaller.appspot.com/bug?id=993d8b5e64393ed9e6a70f9ae4de0119c605a822
+>> [2] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a58da53ffd70294ebea8ecd0eb45fd0d74add9f9
+>
+>
+>Right. I want to queue this but I would like to get a warning
+>so we can detect issues like [2] before they cause more issues.
 
--- 
--- Jason J. Herne (jjherne@linux.ibm.com)
+I agree, what about moving the warning that we already have higher up, 
+right at the beginning of the function?
+
+I mean something like this:
+
+diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+index 59edb5a1ffe2..1721ff3f18c0 100644
+--- a/drivers/vhost/vhost.c
++++ b/drivers/vhost/vhost.c
+@@ -692,6 +692,8 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
+  {
+         int i;
+  
++       WARN_ON(!llist_empty(&dev->work_list));
++
+         for (i = 0; i < dev->nvqs; ++i) {
+                 if (dev->vqs[i]->error_ctx)
+                         eventfd_ctx_put(dev->vqs[i]->error_ctx);
+@@ -712,7 +714,6 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
+         dev->iotlb = NULL;
+         vhost_clear_msg(dev);
+         wake_up_interruptible_poll(&dev->wait, EPOLLIN | EPOLLRDNORM);
+-       WARN_ON(!llist_empty(&dev->work_list));
+         if (dev->worker) {
+                 kthread_stop(dev->worker);
+                 dev->worker = NULL;
+
+
+And maybe we can also check vq->private and warn in the loop, because 
+the work_list may be empty if the device is doing nothing.
+
+Thanks,
+Stefano
+
