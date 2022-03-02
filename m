@@ -2,96 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 281354CB2DD
-	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 00:51:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E670C4CB386
+	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 01:35:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229470AbiCBXps (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Mar 2022 18:45:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51566 "EHLO
+        id S229801AbiCCAAV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 19:00:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229450AbiCBXpr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 18:45:47 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD8A73E5C5;
-        Wed,  2 Mar 2022 15:43:33 -0800 (PST)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 222Mnb7N008466;
-        Wed, 2 Mar 2022 23:43:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=i5BWb3tqsZ4eoh82ODgmPwJgY+o4LlIyFrdu6rEg8Ak=;
- b=pJtwsLeTgC1Ub+ayC8j8aUk3FRTc3evGdqJgL6RzT6j8vs5Gk7vvIFTpli27VUngJ23w
- eZ5Qg/Z8wY5bRs0zhXtJ7PB8k3dSaByBOe6VYH/aMIWSyIZ4mzhljrZggZdiGnD08ksZ
- SHkJJXclmN4W9woqvwtNK4E0P+Ddpoe4PmysCr5475b+ziDDt/QiPP9SEHrQas7YqJk9
- AoK0lRQdVGPpgDHLzj+MWLB3uFIyoqWYjirNTi8pAdADBoNe8AzQjMmPNtsWfzQI0FDQ
- v5haQDeFLs8gv0fKVJqSr2lBaMQEEdpR885+NPUrEjHlDHJu6blQfvZtBHo+b+XRRaQv Ag== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3ejc03g1pr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 02 Mar 2022 23:43:08 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 222NWN4R024561;
-        Wed, 2 Mar 2022 23:43:08 GMT
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3ejc03g1ph-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 02 Mar 2022 23:43:08 +0000
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
-        by ppma05wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 222Nb81Y025228;
-        Wed, 2 Mar 2022 23:43:06 GMT
-Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
-        by ppma05wdc.us.ibm.com with ESMTP id 3ej75rmnmf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 02 Mar 2022 23:43:06 +0000
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
-        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 222Nh5tf34603432
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 2 Mar 2022 23:43:05 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 85205AE066;
-        Wed,  2 Mar 2022 23:43:05 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3AD3DAE05F;
-        Wed,  2 Mar 2022 23:43:04 +0000 (GMT)
-Received: from [9.160.116.147] (unknown [9.160.116.147])
-        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
-        Wed,  2 Mar 2022 23:43:04 +0000 (GMT)
-Message-ID: <11ab9dfa-494b-5103-5f26-aa6c29567f52@linux.ibm.com>
-Date:   Wed, 2 Mar 2022 18:43:03 -0500
+        with ESMTP id S229790AbiCCAAU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 19:00:20 -0500
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 054EF4969A
+        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 15:59:36 -0800 (PST)
+Received: by mail-pj1-x102f.google.com with SMTP id gb21so3201801pjb.5
+        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 15:59:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=ckCBduCU8rIC3xMm3IAzUST/V5HZeQGdJRo5tI2p308=;
+        b=KxhA+CG1r0bDnPfRKPRFC4gWUhhykeI8AD5VmSGys12v1gnCr1jqlAXuyRGCQEa5xu
+         MbxFpEqZObEdVp9jxGfe67+QSPDRS3eTe7Knh2vk8ZwqewwaTmNiZmbGTB/JCDGJrzt0
+         Kr7KUS9mo0vj05w/YDjQlaHpwIy5/BKQoglm9GVlHLe0e4jDc9EG8M1vN6BPd19TwktT
+         pHCwVpH0nat/DKrUdcH21H5XA8rHzH3vn0zpKjYPLfTLOEMlOaAZ0yu03RSIvjMik4iU
+         sFJFW8xyL7nOO3FV/nd6fHVCtBIXYCUvAn3UTVbbMXXgOaEBUf210V2B8LzHhtVXpqXm
+         CD6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=ckCBduCU8rIC3xMm3IAzUST/V5HZeQGdJRo5tI2p308=;
+        b=R5hftLossW2u8G1Px+fg1TfYO2kvcX0Y7gDUHezYxdHh2ZvlN5PJ1ju/u+7zVeG4xy
+         sC6jN3k99Px+VaTN2UOFgm3T7lzyHG6dxDMxNYzvpPYb1cdEsHAfemEjYjww/vfM5MXx
+         FTRP8OoTMC3MqX0dkumL2kJB5cPd2rH40tBqdD+mc7t2alhzuOe2ACZQVbfRVR2h91GZ
+         hiPn1xtD0L4Kp2yu0WAX3/7GIJ1va5mXlJWvFkga4EaFQWZMbcSh9G2my4nYTfNRXSTL
+         AT2exdNC6/+irNtr3lmrL1A0BsRJec7GfwkuYDfNvWwUVMIwcPdFmq6E+68UZEb9rcph
+         hrqg==
+X-Gm-Message-State: AOAM533tmYiJ3Esuh5Hd5uFtUvoX0+OnQE8C8Siv2pLREszd66d1ONks
+        Vi2TyfsftZnNaCMGxpMIaI5TjQ==
+X-Google-Smtp-Source: ABdhPJwnOxGOxT+j0GWCzApEGE5efrNfWQ84mPA2upSypv5fvtV9FoH1ielmix1ygb7LhabIpUzT8A==
+X-Received: by 2002:a17:902:8306:b0:14f:a386:6a44 with SMTP id bd6-20020a170902830600b0014fa3866a44mr33123916plb.140.1646265575211;
+        Wed, 02 Mar 2022 15:59:35 -0800 (PST)
+Received: from google.com (226.75.127.34.bc.googleusercontent.com. [34.127.75.226])
+        by smtp.gmail.com with ESMTPSA id c18-20020a056a000ad200b004cdccd3da08sm299171pfl.44.2022.03.02.15.59.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Mar 2022 15:59:34 -0800 (PST)
+Date:   Wed, 2 Mar 2022 23:59:30 +0000
+From:   Mingwei Zhang <mizhang@google.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>,
+        Ben Gardon <bgardon@google.com>
+Subject: Re: [PATCH v3 04/28] KVM: x86/mmu: Formalize TDP MMU's (unintended?)
+ deferred TLB flush logic
+Message-ID: <YiAE4ju0a3MWXr31@google.com>
+References: <20220226001546.360188-1-seanjc@google.com>
+ <20220226001546.360188-5-seanjc@google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH v18 07/18] s390/vfio-ap: refresh guest's APCB by filtering
- APQNs assigned to mdev
-Content-Language: en-US
-To:     jjherne@linux.ibm.com, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     freude@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
-        mjrosato@linux.ibm.com, pasic@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com
-References: <20220215005040.52697-1-akrowiak@linux.ibm.com>
- <20220215005040.52697-8-akrowiak@linux.ibm.com>
- <2b1f788b-5197-f5e8-52cf-58995d758ef7@linux.ibm.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-In-Reply-To: <2b1f788b-5197-f5e8-52cf-58995d758ef7@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: qwP7h1CS1yQLyuuEgo_Weg01A1yRzyDt
-X-Proofpoint-ORIG-GUID: zPYtVih04kZnTT8H_SA9_2e3W9lyBqk4
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-03-02_12,2022-02-26_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- mlxlogscore=999 phishscore=0 adultscore=0 malwarescore=0 mlxscore=0
- suspectscore=0 impostorscore=0 spamscore=0 clxscore=1011 bulkscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2203020098
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220226001546.360188-5-seanjc@google.com>
+X-Spam-Status: No, score=-18.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -99,98 +81,69 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Sat, Feb 26, 2022, Sean Christopherson wrote:
+> Explicitly ignore the result of zap_gfn_range() when putting the last
+> reference to a TDP MMU root, and add a pile of comments to formalize the
+> TDP MMU's behavior of deferring TLB flushes to alloc/reuse.  Note, this
+> only affects the !shared case, as zap_gfn_range() subtly never returns
+> true for "flush" as the flush is handled by tdp_mmu_zap_spte_atomic().
+> 
+> Putting the root without a flush is ok because even if there are stale
+> references to the root in the TLB, they are unreachable because KVM will
+> not run the guest with the same ASID without first flushing (where ASID
+> in this context refers to both SVM's explicit ASID and Intel's implicit
+> ASID that is constructed from VPID+PCID+EPT4A+etc...).
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+Reviewed-by: Mingwei Zhang <mizhang@google.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c     |  8 ++++++++
+>  arch/x86/kvm/mmu/tdp_mmu.c | 10 +++++++++-
+>  2 files changed, 17 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 80607513a1f2..5a931c89d27b 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -5069,6 +5069,14 @@ int kvm_mmu_load(struct kvm_vcpu *vcpu)
+>  	kvm_mmu_sync_roots(vcpu);
+>  
+>  	kvm_mmu_load_pgd(vcpu);
+> +
+> +	/*
+> +	 * Flush any TLB entries for the new root, the provenance of the root
+> +	 * is unknown.  In theory, even if KVM ensures there are no stale TLB
+> +	 * entries for a freed root, in theory, an out-of-tree hypervisor could
+> +	 * have left stale entries.  Flushing on alloc also allows KVM to skip
+> +	 * the TLB flush when freeing a root (see kvm_tdp_mmu_put_root()).
+> +	 */
+>  	static_call(kvm_x86_flush_tlb_current)(vcpu);
+>  out:
+>  	return r;
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index 12866113fb4f..e35bd88d92fd 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -93,7 +93,15 @@ void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
+>  	list_del_rcu(&root->link);
+>  	spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
+>  
+> -	zap_gfn_range(kvm, root, 0, -1ull, false, false, shared);
+> +	/*
+> +	 * A TLB flush is not necessary as KVM performs a local TLB flush when
+> +	 * allocating a new root (see kvm_mmu_load()), and when migrating vCPU
+> +	 * to a different pCPU.  Note, the local TLB flush on reuse also
+> +	 * invalidates any paging-structure-cache entries, i.e. TLB entries for
+> +	 * intermediate paging structures, that may be zapped, as such entries
+> +	 * are associated with the ASID on both VMX and SVM.
+> +	 */
+> +	(void)zap_gfn_range(kvm, root, 0, -1ull, false, false, shared);
 
-
-On 3/2/22 14:35, Jason J. Herne wrote:
-> On 2/14/22 19:50, Tony Krowiak wrote:
->> Refresh the guest's APCB by filtering the APQNs assigned to the 
->> matrix mdev
->> that do not reference an AP queue device bound to the vfio_ap device
->> driver. The mdev's APQNs will be filtered according to the following 
->> rules:
->>
->> * The APID of each adapter and the APQI of each domain that is not in 
->> the
->> host's AP configuration is filtered out.
->>
->> * The APID of each adapter comprising an APQN that does not reference a
->> queue device bound to the vfio_ap device driver is filtered. The APQNs
->> are derived from the Cartesian product of the APID of each adapter and
->> APQI of each domain assigned to the mdev.
->>
->> The control domains that are not assigned to the host's AP configuration
->> will also be filtered before assigning them to the guest's APCB.
->>
->> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
->> ---
->>   drivers/s390/crypto/vfio_ap_ops.c | 96 ++++++++++++++++++++++++++++++-
->>   1 file changed, 93 insertions(+), 3 deletions(-)
->>
->> diff --git a/drivers/s390/crypto/vfio_ap_ops.c 
->> b/drivers/s390/crypto/vfio_ap_ops.c
->> index 4b676a55f203..b67b2f0faeea 100644
->> --- a/drivers/s390/crypto/vfio_ap_ops.c
->> +++ b/drivers/s390/crypto/vfio_ap_ops.c
->> @@ -317,6 +317,63 @@ static void vfio_ap_matrix_init(struct 
->> ap_config_info *info,
->>       matrix->adm_max = info->apxa ? info->Nd : 15;
->>   }
->>   +static void vfio_ap_mdev_filter_cdoms(struct ap_matrix_mdev 
->> *matrix_mdev)
->> +{
->> +    bitmap_and(matrix_mdev->shadow_apcb.adm, matrix_mdev->matrix.adm,
->> +           (unsigned long *)matrix_dev->info.adm, AP_DOMAINS);
->> +}
->> +
->> +/*
->> + * vfio_ap_mdev_filter_matrix - copy the mdev's AP configuration to 
->> the KVM
->> + *                guest's APCB then filter the APIDs that do not
->> + *                comprise at least one APQN that references a
->> + *                queue device bound to the vfio_ap device driver.
->> + *
->> + * @matrix_mdev: the mdev whose AP configuration is to be filtered.
->> + */
->> +static void vfio_ap_mdev_filter_matrix(unsigned long *apm, unsigned 
->> long *aqm,
->> +                       struct ap_matrix_mdev *matrix_mdev)
->> +{
->> +    int ret;
->> +    unsigned long apid, apqi, apqn;
->> +
->> +    ret = ap_qci(&matrix_dev->info);
->> +    if (ret)
->> +        return;
->> +
->> +    vfio_ap_matrix_init(&matrix_dev->info, &matrix_mdev->shadow_apcb);
->
-> Do you need to call vfio_ap_matrix_init here? It seems to me like this 
-> would
-> only be necesarry if apxa could be dynamically added or removed. Here 
-> is a
-> copy of vfio_ap_matrix_init, for reference:
->
-> static void vfio_ap_matrix_init(struct ap_config_info *info,
->                 struct ap_matrix *matrix)
-> {
->     matrix->apm_max = info->apxa ? info->Na : 63;
->     matrix->aqm_max = info->apxa ? info->Nd : 15;
->     matrix->adm_max = info->apxa ? info->Nd : 15;
-> }
->
-> It seems like this should be figured out once and stored when the
-> ap_matrix_mdev struct is first created. Unless I'm wrong, and the 
-> status of
-> apxa can change dynamically, in which case the maximums would need to be
-> updated somewhere.
-
-It's an interesting question to which I don't have a definitive answer. 
-I'll run it
-by our architects. On the other hand, making this call here is not entirely
-unreasonable and merely superfluous at worst, but I'll look into it.
-
-Tony K
-
->
->
-
+Understood that we could avoid the TLB flush here. Just curious why the
+"(void)" is needed here? Is it for compile time reason?
+>  
+>  	call_rcu(&root->rcu_head, tdp_mmu_free_sp_rcu_callback);
+>  }
+> -- 
+> 2.35.1.574.g5d30c73bfb-goog
+> 
