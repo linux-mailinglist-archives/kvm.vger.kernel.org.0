@@ -2,218 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 02F594CA466
-	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 13:04:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7CC644CA4B9
+	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 13:21:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241664AbiCBMFT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Mar 2022 07:05:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51246 "EHLO
+        id S241760AbiCBMWL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 07:22:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34828 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241654AbiCBMFS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 07:05:18 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CAA2C0859;
-        Wed,  2 Mar 2022 04:04:35 -0800 (PST)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 222AmZ1P030482;
-        Wed, 2 Mar 2022 12:04:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=z9fe190s1qkXAGsfrW5hd2J4IOPs4KGtV6W8Vk+Z2Ko=;
- b=Zno2vR0UoobysUIDz9V1Do7pRCiWqFa6itQOQenOiPuKQPOxvgjg7StUapp0bf6KwGnG
- SePzX+TaJT+t3ejBjre18hMwRzAo8CU9qJeQ3ttIaAO16OWS85vS16fgJhIemKxb3hJY
- n9KPsrCzaXxWMsnxRn5xAWywyaKeIWcaA2hrIrJKjbeON3jfZ8QFozKrjG/K/MJZUMuv
- iX8pSkhN+I0rgjS1tY1KlFKZagye7w4VM9lZmb8HYdnRAMbiwzDMAXbGCk5REmKTOJxl
- HWFPspCbl2RmnoXKMxpjL2wU0WJSvkr/AQuBaBwmyT5lG/rDl9y2UJwwCXgzEpD+bQBl rw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3ej75etmch-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 02 Mar 2022 12:04:34 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 222AwfSV031328;
-        Wed, 2 Mar 2022 12:04:34 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3ej75etmbv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 02 Mar 2022 12:04:34 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 222C0hQS012230;
-        Wed, 2 Mar 2022 12:04:32 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma03ams.nl.ibm.com with ESMTP id 3efbu9em9n-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 02 Mar 2022 12:04:32 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 222C4SxI39125470
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 2 Mar 2022 12:04:28 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 25E50A4051;
-        Wed,  2 Mar 2022 12:04:28 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CB926A405B;
-        Wed,  2 Mar 2022 12:04:27 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.5.37])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed,  2 Mar 2022 12:04:27 +0000 (GMT)
-Date:   Wed, 2 Mar 2022 13:04:25 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com,
-        borntraeger@linux.ibm.com
-Subject: Re: [PATCH 3/9] KVM: s390: pv: Add query interface
-Message-ID: <20220302130425.0bfa0c2e@p-imbrenda>
-In-Reply-To: <20220223092007.3163-4-frankja@linux.ibm.com>
-References: <20220223092007.3163-1-frankja@linux.ibm.com>
-        <20220223092007.3163-4-frankja@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        with ESMTP id S241096AbiCBMWL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 07:22:11 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 63B125BE7E
+        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 04:21:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646223687;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=WNKkxBchI/c25YADkWlXBfwk9i6taCQEJEVHv51XNSs=;
+        b=XsojAqYT27lwbn4pDizlaLojzW90ewG26t+/W6xqoN3zeDopP9FUyQjWvBeUG+4WGJ7neM
+        lR1qRxQEZt5s6NBXoGZW8C92Vud/pkeqs77Cc371rc9PIppD68KT8igQWTfFOXi0wpcTae
+        dZ2QH3yjL5PRVyf2cz1Do4hKC0Df2Tg=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-617-6S-2ozeJPlGxZgC5HIe0pw-1; Wed, 02 Mar 2022 07:21:26 -0500
+X-MC-Unique: 6S-2ozeJPlGxZgC5HIe0pw-1
+Received: by mail-wr1-f71.google.com with SMTP id k20-20020adfc714000000b001e305cd1597so574382wrg.19
+        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 04:21:25 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=WNKkxBchI/c25YADkWlXBfwk9i6taCQEJEVHv51XNSs=;
+        b=z0WUDiwyIGqb4qJDzp//eBZVNaR/5NFfDi9+pB/tRnF4OmdTk4HjeQaut6emSuruYl
+         sHbuQEUr3q3wIvUssz/dKypMI6aT1qgX8S1PM7PMq0af9skQSPioaGhFkIkUVjKptxWG
+         5Hh3u7dWVVe+Q5jKhD1d7E3tHUqiXH19uErYPQQBSdvqRa72juRYFTGf8OGbYsX25gxm
+         ZQfUXK8Fwd7PNm6mfGkQKtEge2NKy+nZhG8EJRHmTrzXmEiB8BqFn9DTzUkT3HZHX7/Z
+         NbdBQvHZ5zkzdSirZgbjiz7ERaTX7ZyJ3v2gXSH3Nswff+OpEm9NWcjM9po9bFaoxGTK
+         kyRQ==
+X-Gm-Message-State: AOAM532JfNprjFizwd5OxjlQAOpXnJxfe+IJcls/GmCItqg9gR656UiO
+        1c+nu9tgDAs7DmyZAw8oFLB62WTF9z1G4DS3FqbjTCZjGxJiXY9Z7YtCqoA2rT168RQ/Q+rMg3J
+        xL+/sgNktiUCt
+X-Received: by 2002:a05:6000:23c:b0:1f0:2413:c860 with SMTP id l28-20020a056000023c00b001f02413c860mr3497187wrz.693.1646223684973;
+        Wed, 02 Mar 2022 04:21:24 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzuyfoi3FfJLlnHIjrh7ysE0NfjYpokz9Gq1WyY6xrtwGNI1X4vM6L2qrohfqs4gOwQRds7zA==
+X-Received: by 2002:a05:6000:23c:b0:1f0:2413:c860 with SMTP id l28-20020a056000023c00b001f02413c860mr3497169wrz.693.1646223684711;
+        Wed, 02 Mar 2022 04:21:24 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.googlemail.com with ESMTPSA id q7-20020adfcd87000000b001e8a4f58a8csm15969078wrj.66.2022.03.02.04.21.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 02 Mar 2022 04:21:24 -0800 (PST)
+Message-ID: <b839fa78-c8ec-7996-dba7-685ea48ca33d@redhat.com>
+Date:   Wed, 2 Mar 2022 13:21:23 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH v4 1/8] KVM: nVMX: Keep KVM updates to BNDCFGS ctrl bits
+ across MSR write
+Content-Language: en-US
+To:     Oliver Upton <oupton@google.com>
+Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        David Dunn <daviddunn@google.com>
+References: <20220301060351.442881-1-oupton@google.com>
+ <20220301060351.442881-2-oupton@google.com>
+ <4e678b4f-4093-fa67-2c4e-e25ec2ced6d5@redhat.com>
+ <Yh5pYhDQbzWQOdIx@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <Yh5pYhDQbzWQOdIx@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: hQYdcWAfJyly36UsBAbUrpt27Eqvm096
-X-Proofpoint-GUID: 1tNg1ZjNwcqCdPW77qx9rfvpYr1A3q6D
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-03-02_06,2022-02-26_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 phishscore=0
- lowpriorityscore=0 suspectscore=0 impostorscore=0 spamscore=0
- priorityscore=1501 bulkscore=0 adultscore=0 malwarescore=0 mlxlogscore=999
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2203020052
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 23 Feb 2022 09:20:01 +0000
-Janosch Frank <frankja@linux.ibm.com> wrote:
-
-> Some of the query information is already available via sysfs but
-> having a IOCTL makes the information easier to retrieve.
+On 3/1/22 19:43, Oliver Upton wrote:
+> Right, a 1-setting of '{load,clear} IA32_BNDCFGS' should really be the
+> responsibility of userspace. My issue is that the commit message in
+> commit 5f76f6f5ff96 ("KVM: nVMX: Do not expose MPX VMX controls when
+> guest MPX disabled") suggests that userspace can expect these bits to be
+> configured based on guest CPUID. Furthermore, before commit aedbaf4f6afd
+> ("KVM: x86: Extract kvm_update_cpuid_runtime() from
+> kvm_update_cpuid()"), if userspace clears these bits, KVM will continue
+> to set them based on CPUID.
 > 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  arch/s390/kvm/kvm-s390.c | 47 ++++++++++++++++++++++++++++++++++++++++
->  include/uapi/linux/kvm.h | 23 ++++++++++++++++++++
->  2 files changed, 70 insertions(+)
-> 
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index faa85397b6fb..837f898ad2ff 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -2217,6 +2217,34 @@ static int kvm_s390_cpus_to_pv(struct kvm *kvm, u16 *rc, u16 *rrc)
->  	return r;
->  }
->  
-> +static int kvm_s390_handle_pv_info(struct kvm_s390_pv_info *info)
-> +{
-> +	u32 len;
-> +
-> +	switch (info->header.id) {
-> +	case KVM_PV_INFO_VM: {
-> +		len =  sizeof(info->header) + sizeof(info->vm);
-> +
-> +		if (info->header.len < len)
-> +			return -EINVAL;
+> What is the userspace expectation here? If we are saying that changes to
+> IA32_VMX_TRUE_{ENTRY,EXIT}_CTLS after userspace writes these MSRs is a
+> bug, then I agree aedbaf4f6afd is in fact a bugfix. But, the commit
+> message in 5f76f6f5ff96 seems to indicate that userspace wants KVM to
+> configure these bits based on guest CPUID.
 
-so if userspace gives a smaller buffer, we fail?
-this means that if the struct grows in the future, existing software
-will break?
+Yes, but I think it's reasonable that userspace wants to override them. 
+  It has to do that after KVM_SET_CPUID2, but that's okay too.
 
-> +
-> +		memcpy(info->vm.inst_calls_list,
-> +		       uv_info.inst_calls_list,
-> +		       sizeof(uv_info.inst_calls_list));
-> +
-> +		/* It's max cpuidm not max cpus so it's off by one */
-> +		info->vm.max_cpus = uv_info.max_guest_cpu_id + 1;
-> +		info->vm.max_guests = uv_info.max_num_sec_conf;
-> +		info->vm.max_guest_addr = uv_info.max_sec_stor_addr;
-> +		info->vm.feature_indication = uv_info.uv_feature_indications;
-> +
-> +		return 0;
-> +	}
-> +	default:
-> +		return -EINVAL;
-> +	}
-> +}
-> +
->  static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
->  {
->  	int r = 0;
-> @@ -2353,6 +2381,25 @@ static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
->  			     cmd->rc, cmd->rrc);
->  		break;
->  	}
-> +	case KVM_PV_INFO: {
-> +		struct kvm_s390_pv_info info = {};
-> +
-> +		if (copy_from_user(&info, argp, sizeof(info.header)))
-> +			return -EFAULT;
-> +
-> +		if (info.header.len < sizeof(info.header))
-> +			return -EINVAL;
-> +
-> +		r = kvm_s390_handle_pv_info(&info);
-> +		if (r)
-> +			return r;
-> +
-> +		r = copy_to_user(argp, &info, sizeof(info));
-> +
-> +		if (r)
-> +			return -EFAULT;
-> +		return 0;
-> +	}
->  	default:
->  		r = -ENOTTY;
->  	}
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index dbc550bbd9fa..96fceb204a92 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1642,6 +1642,28 @@ struct kvm_s390_pv_unp {
->  	__u64 tweak;
->  };
->  
-> +enum pv_cmd_info_id {
-> +	KVM_PV_INFO_VM,
-> +};
-> +
-> +struct kvm_s390_pv_info_vm {
-> +	__u64 inst_calls_list[4];
-> +	__u64 max_cpus;
-> +	__u64 max_guests;
-> +	__u64 max_guest_addr;
-> +	__u64 feature_indication;
-> +};
-> +
-> +struct kvm_s390_pv_info_header {
-> +	__u32 id;
-> +	__u32 len;
-> +};
-> +
-> +struct kvm_s390_pv_info {
-> +	struct kvm_s390_pv_info_header header;
-> +	struct kvm_s390_pv_info_vm vm;
-> +};
-> +
->  enum pv_cmd_id {
->  	KVM_PV_ENABLE,
->  	KVM_PV_DISABLE,
-> @@ -1650,6 +1672,7 @@ enum pv_cmd_id {
->  	KVM_PV_VERIFY,
->  	KVM_PV_PREP_RESET,
->  	KVM_PV_UNSHARE_ALL,
-> +	KVM_PV_INFO,
->  };
->  
->  struct kvm_pv_cmd {
+Paolo
 
