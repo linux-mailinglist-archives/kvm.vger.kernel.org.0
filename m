@@ -2,78 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BDA244CAC2D
-	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 18:34:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B3524CAC39
+	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 18:36:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239169AbiCBRek (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Mar 2022 12:34:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49054 "EHLO
+        id S238287AbiCBRfY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 12:35:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56554 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244081AbiCBReX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 12:34:23 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7ED99BD7
-        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 09:33:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646242361;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=1USmVjxTTYdc7rMUiqrUNWQcVO4SlzVz/zIrE4siUEI=;
-        b=DVngakkPpEwOM5xKsKhbC0Lcw4+tcZqcwOCFslNbCFykWpC7hGZz80tLfLp8B/kyNVBiqt
-        TETNXJv+JOhs8NmLGhvDmpivZb0H2Sq5I9TJ8yNV8J0dJvPFBpE6ZESB552Ivu91JRHQ/w
-        OSG+vRX5xx18leICeAQ4oGDDK2CuSQk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-380-n-ihYirbN3STB5InILhdVg-1; Wed, 02 Mar 2022 12:32:36 -0500
-X-MC-Unique: n-ihYirbN3STB5InILhdVg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BCF1C1006AA6;
-        Wed,  2 Mar 2022 17:32:33 +0000 (UTC)
-Received: from localhost (unknown [10.33.36.14])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E0D43838DD;
-        Wed,  2 Mar 2022 17:31:26 +0000 (UTC)
-Date:   Wed, 2 Mar 2022 18:31:46 +0100
-From:   Sergio Lopez <slp@redhat.com>
-To:     Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= 
-        <philippe.mathieu.daude@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
-        vgoyal@redhat.com, Fam Zheng <fam@euphon.net>, kvm@vger.kernel.org,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Jagannathan Raman <jag.raman@oracle.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>, qemu-block@nongnu.org,
+        with ESMTP id S244127AbiCBRfW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 12:35:22 -0500
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4C42D5F47;
+        Wed,  2 Mar 2022 09:34:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1646242460; x=1677778460;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=jzifREd1E6S6cVQq/lLaPIGktR6DrXmG+S0OSbMPecs=;
+  b=ccDYS6FGM+MtYZN/YZYxXCDyJlu0Pl7mX1g2wXBsfH1+kzA7wtX7rfhB
+   kHkj1J9Xr+L95XtZNWy5tkl6DkSLTV08ydcz5pYjToNwLJ18xV61eJjxq
+   UI9WLLJM7eDADUy5S29ZhIMrj+Fi6zmHMsdSRxlyggJJIdLZHig/olWB5
+   8pvExRoDnIgM9JbMWGfEWCGE+c444XZB7iQ8aMkg3gJ5phyDwFpizKCcv
+   0YLB/Lboiryjccs69ebhLiSz30O2XqYOVmP9BUTWHm8fdT0MSQkeBOb0A
+   nzzxSGp8Nkn1H3g4mWXVzgJwMj4VE/JSOmhrKQwIZgymulJTkidxxT+TV
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10274"; a="240876017"
+X-IronPort-AV: E=Sophos;i="5.90,149,1643702400"; 
+   d="scan'208";a="240876017"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2022 09:32:49 -0800
+X-IronPort-AV: E=Sophos;i="5.90,149,1643702400"; 
+   d="scan'208";a="493617661"
+Received: from smile.fi.intel.com ([10.237.72.59])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2022 09:32:46 -0800
+Received: from andy by smile.fi.intel.com with local (Exim 4.95)
+        (envelope-from <andriy.shevchenko@linux.intel.com>)
+        id 1nPSpT-00AQ2N-1D;
+        Wed, 02 Mar 2022 19:31:59 +0200
+Date:   Wed, 2 Mar 2022 19:31:58 +0200
+From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To:     Yury Norov <yury.norov@gmail.com>
+Cc:     Michael Mueller <mimu@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Christian Borntraeger <borntraeger@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Janosch Frank <frankja@linux.ibm.com>,
         David Hildenbrand <david@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Hanna Reitz <hreitz@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Elena Ufimtseva <elena.ufimtseva@oracle.com>,
-        Kevin Wolf <kwolf@redhat.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        qemu-s390x@nongnu.org, Matthew Rosato <mjrosato@linux.ibm.com>,
-        John G Johnson <john.g.johnson@oracle.com>,
-        Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH 2/2] Allow building vhost-user in BSD
-Message-ID: <20220302173009.26auqvy4t4rx74td@mhamilton>
-References: <20220302113644.43717-1-slp@redhat.com>
- <20220302113644.43717-3-slp@redhat.com>
- <66b68bcc-8d7e-a5f7-5e6c-b2d20c26ab01@redhat.com>
- <8dfc9854-4d59-0759-88d0-d502ae7c552f@gmail.com>
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>
+Subject: Re: [PATCH v1 1/1] KVM: s390: Don't cast parameter in bit operations
+Message-ID: <Yh+qDhd6FL9nlQdD@smile.fi.intel.com>
+References: <20220223164420.45344-1-andriy.shevchenko@linux.intel.com>
+ <20220224123620.57fd6c8b@p-imbrenda>
+ <3640a910-60fe-0935-4dfc-55bb65a75ce5@linux.ibm.com>
+ <Yh+Qw6Pb+Cd9JDNa@smile.fi.intel.com>
+ <Yh+m65BSfQgaDFwi@yury-laptop>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="j2z2ayxxgw7ingtg"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <8dfc9854-4d59-0759-88d0-d502ae7c552f@gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+In-Reply-To: <Yh+m65BSfQgaDFwi@yury-laptop>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+X-Spam-Status: No, score=-4.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -81,55 +76,53 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Mar 02, 2022 at 09:18:35AM -0800, Yury Norov wrote:
+> On Wed, Mar 02, 2022 at 05:44:03PM +0200, Andy Shevchenko wrote:
+> > On Thu, Feb 24, 2022 at 01:10:34PM +0100, Michael Mueller wrote:
+> > > On 24.02.22 12:36, Claudio Imbrenda wrote:
+> > 
+> > ...
+> > 
+> > > we do that at several places
+> > 
+> > Thanks for pointing out.
+> > 
+> > > arch/s390/kernel/processor.c:	for_each_set_bit_inv(bit, (long
+> > > *)&stfle_fac_list, MAX_FACILITY_BIT)
+> > 
+> > This one requires a separate change, not related to this patch.
+> > 
+> > > arch/s390/kvm/interrupt.c:	set_bit_inv(IPM_BIT_OFFSET + gisc, (unsigned long
+> > > *) gisa);
+> > 
+> > This is done in the patch. Not sure how it appears in your list.
+> > 
+> > > arch/s390/kvm/kvm-s390.c:		set_bit_inv(vcpu->vcpu_id, (unsigned long *)
+> > > sca->mcn);
+> > > arch/s390/kvm/kvm-s390.c:		set_bit_inv(vcpu->vcpu_id, (unsigned long *)
+> > > &sca->mcn);
+> > 
+> > These two should be fixed in a separate change.
+> > 
+> > Also this kind of stuff:
+> > 
+> > 	bitmap_copy(kvm->arch.cpu_feat, (unsigned long *) data.feat,
+> > 	            KVM_S390_VM_CPU_FEAT_NR_BITS);
+> > 
+> > might require a new API like
+> > 
+> > bitmap_from_u64_array()
+> > bitmap_to_u64_array()
+> > 
+> > Yury?
+> 
+> If BE32 is still the case then yes.
 
---j2z2ayxxgw7ingtg
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The whole point is to get rid of the bad pattern, while it may still work
+in the particular case.
 
-On Wed, Mar 02, 2022 at 06:18:59PM +0100, Philippe Mathieu-Daud=E9 wrote:
-> On 2/3/22 18:10, Paolo Bonzini wrote:
-> > On 3/2/22 12:36, Sergio Lopez wrote:
-> > > With the possibility of using pipefd as a replacement on operating
-> > > systems that doesn't support eventfd, vhost-user can also work on BSD
-> > > systems.
-> > >=20
-> > > This change allows enabling vhost-user on BSD platforms too and
-> > > makes libvhost_user (which still depends on eventfd) a linux-only
-> > > feature.
-> > >=20
-> > > Signed-off-by: Sergio Lopez <slp@redhat.com>
-> >=20
-> > I would just check for !windows.
->=20
-> What about Darwin / Haiku / Illumnos?
+-- 
+With Best Regards,
+Andy Shevchenko
 
-It should work on every system providing pipe() or pipe2(), so I guess
-Paolo's right, every platform except Windows. FWIW, I already tested
-it with Darwin.
-
-Thanks,
-Sergio.
-
---j2z2ayxxgw7ingtg
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAmIfqgEACgkQ9GknjS8M
-AjVb0Q/9Ht01R3I6wyyF8s7Xj1AMRR47qpVaBaP4gAuLPEHt/tesSX6bq5vtiN4K
-Yg/0QPlVRz/l/MBcqdqAVcH39OBnx7WfIF4Op/RGkLtI2v2vVFVUZbU+rpOvRLD3
-bq1ZNunvYibzTf0aWquIdzULJsCzQUNeNfgziievgeh/oCNlSSOkEbk8szCFVy4/
-LDvbd2qoSzcVxt9qRCeXyaugdlBsv6dp3qZBfTstU11uFg9OV6nBukMGnf4eTH/S
-8w/M+iNAsr2vzDaOlKtXG8KS1mvUo0bm1pExzSIVEbweK/cpLlJP12txswCoibwJ
-YOyY3vGsiQs5QM0eV8ShQkuv8TQrjaUjyOFR10kKwytdWnvL8N69yetSnwgaoQVB
-cTyhMqON5/wkHwnGOJVZrGyRvRDGbmkLnfbQlX583XyV1A+wYxlsPnhoJN2Nifwg
-0tJbj5EptgrZXfwz+qziwkrWLreDAN4R99QYL0Dp6XIeVwxQ1UXTY/cIDdFYehyb
-ZrItawbHFgkJ3lhCFJtIYX/QGv9lpZE5O8ylJ0BkSVUalImfTPNIoH8hzTXbKXIP
-BhUvnXI/Gu8+oj3WQaTxmaEsZyzh1TNnqGs6nVIhKhypqQLQ1Bb4hZCJ/0XhDTaP
-E49Qr/BL1BKZIOfyB5p3kud5vkF9gplF1L+Zmb71dK9ZUvp5iAc=
-=A4cA
------END PGP SIGNATURE-----
-
---j2z2ayxxgw7ingtg--
 
