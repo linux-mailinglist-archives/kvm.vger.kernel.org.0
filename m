@@ -2,133 +2,226 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1FF0B4C9F3E
-	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 09:30:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E6FA4C9F44
+	for <lists+kvm@lfdr.de>; Wed,  2 Mar 2022 09:30:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240183AbiCBIah (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Mar 2022 03:30:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47128 "EHLO
+        id S240227AbiCBIbN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 03:31:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240164AbiCBIab (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 03:30:31 -0500
-Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7CFFB8B58
-        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 00:29:45 -0800 (PST)
-Received: by mail-wm1-x329.google.com with SMTP id v2-20020a7bcb42000000b0037b9d960079so2760633wmj.0
-        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 00:29:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=anfYM1xs0NBMLGEeqezGOYJl+MN+3QcGgOkQ0d7W1KU=;
-        b=T250LPSLKUXQUaclMSeK0mZPrWImkaAZdf7+pxpZvYBVIjiMfRgaCAywrd9G1ZgB/0
-         RPeRZER9ugo42HQs7vOFLBMSQPAOYqXg/oajPZgQ5ONy0UZDqxelCW0yWfe1ksHhPrcL
-         P/a98j6H0buLuTut7KDXTAftRVTqbi5jMarQoWo0xKWi9Z3HP4a7XxZrRZ0rOP/uX4Az
-         LLIvmIk/579eXMZTSFWGq2fEQFgW+uDPuDijzIupYzselXw2nRaSOd5AugqhhPqSZ3gc
-         FEmfiAKLSrRBVcbA2KYP4MfAaSSA9cu4RGT+7dOnfaFc9d8vJLURer8fML3X+2CR2b/7
-         ze5w==
+        with ESMTP id S240276AbiCBIa7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 03:30:59 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BD777BABAA
+        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 00:30:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646209812;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=4ju3TXslkK4ikbzwJYtvQpU2DB+d0S/w2MnovYNUeUk=;
+        b=LSDk0QzDGFTMZo8ie3l84Q8M5k37KeUt7+akkIqbjXt+JAaP9BAXHH5SbpOvlI01PrH+mX
+        uUo4HY55LRvCq05WZZmjm7DFQesBwmZG+2Xo+OFTFjXSDjH5DEGLfcgJINxEPZof9KDhRk
+        2aiEzMKzYzseINDxBJTLyA6LS6DJEgA=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-665-zinzY1gLMaOqlYZa9K-tbg-1; Wed, 02 Mar 2022 03:30:11 -0500
+X-MC-Unique: zinzY1gLMaOqlYZa9K-tbg-1
+Received: by mail-wr1-f72.google.com with SMTP id b7-20020a05600003c700b001efac398af7so345506wrg.22
+        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 00:30:11 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=anfYM1xs0NBMLGEeqezGOYJl+MN+3QcGgOkQ0d7W1KU=;
-        b=BXX42xYR04dcHbdh4FtJ2lmn6L1bNsvO0tewB15Tde/SGN3nfN8h9gQ3gcdzBEgxs4
-         t9Gh4HcBhQi+QuR4IefjlqTpR3nHPTxUUNIfmBG6zOh61008tX2fXvh1IJVstt0jT+HN
-         WcgEX/6hJayBrMQngMJWYL+tL6fSZvpT7WFezf0TUJIUj4SkEQaMTmF2Pw+dpRGhkK6B
-         ++FJa9Xbnlvrhpfr+Hrqv9SODJHSQgvVwqTZv5lhR4RA80NK5SSbJOONylFr0n6ePj+L
-         1BM3fS1POxfhdfcrvo3Kkf6WehasPaJ8DKbVyD16jKzDdCtZ28Am1NPkN5S9APPlqWy7
-         zn7Q==
-X-Gm-Message-State: AOAM532ETLWdKJSicXlQFK6nKUVzvRHaP7glg/1hTTeY1AqHuhv7jgYi
-        TLCsWGAlDB97qvb9HyfP3tr43Q==
-X-Google-Smtp-Source: ABdhPJyejoqO4Ua2lw3doPCMFKI7AoknOX/n2Hq9a7QihlNIy2VB0jsIjJbRKAzoK9Beq8n1Bceu5Q==
-X-Received: by 2002:a1c:a915:0:b0:380:e3de:b78f with SMTP id s21-20020a1ca915000000b00380e3deb78fmr20356178wme.19.1646209784264;
-        Wed, 02 Mar 2022 00:29:44 -0800 (PST)
-Received: from google.com (cpc155339-bagu17-2-0-cust87.1-3.cable.virginm.net. [86.27.177.88])
-        by smtp.gmail.com with ESMTPSA id z16-20020a7bc7d0000000b00381004c643asm4689971wmk.30.2022.03.02.00.29.43
+         :mime-version:content-disposition:in-reply-to;
+        bh=4ju3TXslkK4ikbzwJYtvQpU2DB+d0S/w2MnovYNUeUk=;
+        b=zfK8iBzK7bUWs6AHJVdykTGaHvc3cTlhi5bF3G2J3haf2CMN4eLvH4c6pMFOStvcI3
+         AaD0xxCy0kyy5COaui9IYivqviypFFMQvSYap87UY+GPMB4AICj9oJc/97L82oab1iFz
+         ueUj7YLG0xRDccLJvewb9WY3jHOwLgFRW4mA9vVAXczhmL2jgHxWLjBq7yMHA89b2Qu+
+         ATnpdfTl3C3OfLPcn/huZ+5uKJN3qecdtMGHQ/xCN9V0C7++G3aHzTG1TP/Uv4FNQ1Qa
+         I+zpSVFixffN5/0w6PLFdLJMx8IvWvOpA+Rr0p7SapIq8unKEjiy9l9Hvf25OlgYOIoA
+         w12w==
+X-Gm-Message-State: AOAM533TA3eYkK/MVeqod4WIKiKr6ni+7bX7SwvrAhzH7H/qbycO9+iM
+        YSpAETiZfSQhBQJ8E/25aBCdCQ1yLrv1QWTNaprifGy2hMZdw4hgg+GHbvtuvqAkd9sUdbh+k86
+        H96YfQ/Kfx7uJ
+X-Received: by 2002:a05:600c:587:b0:381:b2:89b0 with SMTP id o7-20020a05600c058700b0038100b289b0mr20467139wmd.114.1646209810408;
+        Wed, 02 Mar 2022 00:30:10 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyUFCa8ddS38oq9IT6e/yWdwiarFYl14hc8Iyy/vjPTuHZpDyCAzWiVC6dCDT5EWZ3tUieAJg==
+X-Received: by 2002:a05:600c:587:b0:381:b2:89b0 with SMTP id o7-20020a05600c058700b0038100b289b0mr20467105wmd.114.1646209810176;
+        Wed, 02 Mar 2022 00:30:10 -0800 (PST)
+Received: from redhat.com ([2a10:8006:355c:0:48d6:b937:2fb9:b7de])
+        by smtp.gmail.com with ESMTPSA id f4-20020a5d4dc4000000b001d8e67e5214sm16454314wru.48.2022.03.02.00.30.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Mar 2022 00:29:43 -0800 (PST)
-Date:   Wed, 2 Mar 2022 08:29:41 +0000
-From:   Lee Jones <lee.jones@linaro.org>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     syzbot <syzbot+3140b17cb44a7b174008@syzkaller.appspotmail.com>,
-        jasowang@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [syzbot] kernel BUG in vhost_get_vq_desc
-Message-ID: <Yh8q9fzCQHW2qtIG@google.com>
-References: <00000000000070ac6505d7d9f7a8@google.com>
- <0000000000003b07b305d840b30f@google.com>
- <20220218063352-mutt-send-email-mst@kernel.org>
+        Wed, 02 Mar 2022 00:30:09 -0800 (PST)
+Date:   Wed, 2 Mar 2022 03:30:06 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     Laszlo Ersek <lersek@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        QEMU Developers <qemu-devel@nongnu.org>,
+        linux-hyperv@vger.kernel.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Alexander Graf <graf@amazon.com>,
+        "Michael Kelley (LINUX)" <mikelley@microsoft.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        adrian@parity.io,
+        Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Jann Horn <jannh@google.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        "Brown, Len" <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
+        Linux PM <linux-pm@vger.kernel.org>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        Theodore Ts'o <tytso@mit.edu>, Arnd Bergmann <arnd@arndb.de>
+Subject: Re: propagating vmgenid outward and upward
+Message-ID: <20220302031738-mutt-send-email-mst@kernel.org>
+References: <Yh4+9+UpanJWAIyZ@zx2c4.com>
+ <223f858c-34c5-3ccd-b9e8-7585a976364d@redhat.com>
+ <Yh5JwK6toc/zBNL7@zx2c4.com>
+ <20220301121419-mutt-send-email-mst@kernel.org>
+ <CAHmME9qieLUDVoPYZPo=N8NCL1T-RzQ4p7kCFv3PKFUkhWZPsw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220218063352-mutt-send-email-mst@kernel.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+In-Reply-To: <CAHmME9qieLUDVoPYZPo=N8NCL1T-RzQ4p7kCFv3PKFUkhWZPsw@mail.gmail.com>
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 18 Feb 2022, Michael S. Tsirkin wrote:
-
-> On Thu, Feb 17, 2022 at 05:21:20PM -0800, syzbot wrote:
-> > syzbot has found a reproducer for the following issue on:
-> > 
-> > HEAD commit:    f71077a4d84b Merge tag 'mmc-v5.17-rc1-2' of git://git.kern..
-> > git tree:       upstream
-> > console output: https://syzkaller.appspot.com/x/log.txt?x=104c04ca700000
-> > kernel config:  https://syzkaller.appspot.com/x/.config?x=a78b064590b9f912
-> > dashboard link: https://syzkaller.appspot.com/bug?extid=3140b17cb44a7b174008
-> > compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-> > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1362e232700000
-> > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11373a6c700000
-> > 
-> > IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> > Reported-by: syzbot+3140b17cb44a7b174008@syzkaller.appspotmail.com
-> > 
-> > ------------[ cut here ]------------
-> > kernel BUG at drivers/vhost/vhost.c:2335!
-> > invalid opcode: 0000 [#1] PREEMPT SMP KASAN
-> > CPU: 1 PID: 3597 Comm: vhost-3596 Not tainted 5.17.0-rc4-syzkaller-00054-gf71077a4d84b #0
-> > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-> > RIP: 0010:vhost_get_vq_desc+0x1d43/0x22c0 drivers/vhost/vhost.c:2335
-> > Code: 00 00 00 48 c7 c6 20 2c 9d 8a 48 c7 c7 98 a6 8e 8d 48 89 ca 48 c1 e1 04 48 01 d9 e8 b7 59 28 fd e9 74 ff ff ff e8 5d c8 a1 fa <0f> 0b e8 56 c8 a1 fa 48 8b 54 24 18 48 b8 00 00 00 00 00 fc ff df
-> > RSP: 0018:ffffc90001d1fb88 EFLAGS: 00010293
-> > RAX: 0000000000000000 RBX: 0000000000000001 RCX: 0000000000000000
-> > RDX: ffff8880234b0000 RSI: ffffffff86d715c3 RDI: 0000000000000003
-> > RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000001
-> > R10: ffffffff86d706bc R11: 0000000000000000 R12: ffff888072c24d68
-> > R13: 0000000000000000 R14: dffffc0000000000 R15: ffff888072c24bb0
-> > FS:  0000000000000000(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
-> > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > CR2: 0000000000000002 CR3: 000000007902c000 CR4: 00000000003506e0
-> > DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> > DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> > Call Trace:
-> >  <TASK>
-> >  vhost_vsock_handle_tx_kick+0x277/0xa20 drivers/vhost/vsock.c:522
-> >  vhost_worker+0x23d/0x3d0 drivers/vhost/vhost.c:372
-> >  kthread+0x2e9/0x3a0 kernel/kthread.c:377
-> >  ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
+On Tue, Mar 01, 2022 at 07:37:06PM +0100, Jason A. Donenfeld wrote:
+> Hi Michael,
 > 
-> I don't see how this can trigger normally so I'm assuming
-> another case of use after free.
+> On Tue, Mar 1, 2022 at 6:17 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > Hmm okay, so it's a performance optimization... some batching then? Do
+> > you really need to worry about every packet? Every 64 packets not
+> > enough?  Packets are after all queued at NICs etc, and VM fork can
+> > happen after they leave wireguard ...
+> 
+> Unfortunately, yes, this is an "every packet" sort of thing -- if the
+> race is to be avoided in a meaningful way. It's really extra bad:
+> ChaCha20 and AES-CTR work by xoring a secret stream of bytes with
+> plaintext to produce a ciphertext. If you use that same secret stream
+> and xor it with a second plaintext and transmit that too, an attacker
+> can combine the two different ciphertexts to learn things about the
+> original plaintext.
+> 
+> But, anyway, it seems like the race is here to stay given what we have
+> _currently_ available with the virtual hardware. That's why I'm
+> focused on trying to get something going that's the least bad with
+> what we've currently got, which is racy by design. How vitally
+> important is it to have something that doesn't race in the far future?
+> I don't know, really. It seems plausible that that ACPI notifier
+> triggers so early that nothing else really even has a chance, so the
+> race concern is purely theoretical. But I haven't tried to measure
+> that so I'm not sure.
+> 
+> Jason
 
-Yes, exactly.
 
-I patched it.  Please see:
+I got curious, and wrote a dumb benchmark:
 
-https://lore.kernel.org/all/20220302075421.2131221-1-lee.jones@linaro.org/T/#t
+
+#include <stdio.h>
+#include <assert.h>
+#include <limits.h>
+#include <string.h>
+
+struct lng {
+	unsigned long long l1;
+	unsigned long long l2;
+};
+
+struct shrt {
+	unsigned long s;
+};
+
+
+struct lng l = { 1, 2 };
+struct shrt s = { 3 };
+
+static void test1(volatile struct shrt *sp)
+{
+	if (sp->s != s.s) {
+		printf("short mismatch!\n");
+		s.s = sp->s;
+	}
+}
+static void test2(volatile struct lng *lp)
+{
+	if (lp->l1 != l.l1 || lp->l2 != l.l2) {
+		printf("long mismatch!\n");
+		l.l1 = lp->l1;
+		l.l2 = lp->l2;
+	}
+}
+
+int main(int argc, char **argv)
+{
+	volatile struct shrt sv = { 4 };
+	volatile struct lng lv = { 5, 6 };
+
+	if (argc > 1) {
+		printf("test 1\n");
+		for (int i = 0; i < 10000000; ++i) 
+			test1(&sv);
+	} else {
+		printf("test 2\n");
+		for (int i = 0; i < 10000000; ++i)
+			test2(&lv);
+	}
+	return 0;
+}
+
+
+Results (built with -O2, nothing fancy):
+
+[mst@tuck ~]$ perf stat -r 1000 ./a.out 1 > /dev/null
+
+ Performance counter stats for './a.out 1' (1000 runs):
+
+              5.12 msec task-clock:u              #    0.945 CPUs utilized            ( +-  0.07% )
+                 0      context-switches:u        #    0.000 /sec                   
+                 0      cpu-migrations:u          #    0.000 /sec                   
+                52      page-faults:u             #   10.016 K/sec                    ( +-  0.07% )
+        20,190,800      cycles:u                  #    3.889 GHz                      ( +-  0.01% )
+        50,147,371      instructions:u            #    2.48  insn per cycle           ( +-  0.00% )
+        20,032,224      branches:u                #    3.858 G/sec                    ( +-  0.00% )
+             1,604      branch-misses:u           #    0.01% of all branches          ( +-  0.26% )
+
+        0.00541882 +- 0.00000847 seconds time elapsed  ( +-  0.16% )
+
+[mst@tuck ~]$ perf stat -r 1000 ./a.out > /dev/null
+
+ Performance counter stats for './a.out' (1000 runs):
+
+              7.75 msec task-clock:u              #    0.947 CPUs utilized            ( +-  0.12% )
+                 0      context-switches:u        #    0.000 /sec                   
+                 0      cpu-migrations:u          #    0.000 /sec                   
+                52      page-faults:u             #    6.539 K/sec                    ( +-  0.07% )
+        30,205,916      cycles:u                  #    3.798 GHz                      ( +-  0.01% )
+        80,147,373      instructions:u            #    2.65  insn per cycle           ( +-  0.00% )
+        30,032,227      branches:u                #    3.776 G/sec                    ( +-  0.00% )
+             1,621      branch-misses:u           #    0.01% of all branches          ( +-  0.23% )
+
+        0.00817982 +- 0.00000965 seconds time elapsed  ( +-  0.12% )
+
+
+So yes, the overhead is higher by 50% which seems a lot but it's from a
+very small number, so I don't see why it's a show stopper, it's not by a
+factor of 10 such that we should sacrifice safety by default. Maybe a
+kernel flag that removes the read replacing it with an interrupt will
+do.
+
+In other words, premature optimization is the root of all evil.
 
 -- 
-Lee Jones [李琼斯]
-Principal Technical Lead - Developer Services
-Linaro.org │ Open source software for Arm SoCs
-Follow Linaro: Facebook | Twitter | Blog
+MST
+
