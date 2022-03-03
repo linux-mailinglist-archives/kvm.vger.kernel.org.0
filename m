@@ -2,199 +2,213 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 652304CC698
-	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 20:53:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6FB434CC6B0
+	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 20:59:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232078AbiCCTyC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Mar 2022 14:54:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38606 "EHLO
+        id S235954AbiCCUAZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Mar 2022 15:00:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56688 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229981AbiCCTyB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Mar 2022 14:54:01 -0500
-Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56F66181E63
-        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 11:53:15 -0800 (PST)
-Received: by mail-lf1-x12f.google.com with SMTP id j15so10334099lfe.11
-        for <kvm@vger.kernel.org>; Thu, 03 Mar 2022 11:53:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=XoEAYDx446fXkmQuWKwwNKiNKBljBToUr9mPvWD2olQ=;
-        b=E3cRT6Y5KHhW/Cza9qMruREtgdGi+aygUVIr/vS3H8uR6KlKAmfd/GicCkvDrm111M
-         /82YJoTtE7ZwblLXpd+9bymcMnfbulRgTJn1rbHa5pXPIGgxh+Y4PVJsRCasrsNU0y0i
-         jVNQQKl7Ed8GG99DgFj7FjxM7CNR7R3bPmDv8kXaENb2gyPnop3U+jpT5xAz2HLvbs4k
-         yxPPq4jayMdACosJNvoRbHe5VCWX7qyPovArzaTjU9Jw/ON10GzcvBohOvE8PhRknZuI
-         pOFO7EqZ1lYxrO/woNF1hbhN8U/Gn51kSCYfTLjCQwXwr9Z5DkN9/Y1TAH/fHXu/mGpp
-         6hbw==
+        with ESMTP id S235919AbiCCUAX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Mar 2022 15:00:23 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 072A81A39F5
+        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 11:59:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646337575;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=KII+3wpRDYxBkpQXpVqXMzOFERtKv6nriOIaVlE+FgA=;
+        b=e4la4o4F/CjnnmOTc5nyzmdjBuqpUZ+5F6CatK2llCme4+kY09mVePKVS0/q8PWZpL9l/V
+        b6zCIwEduD9TJBD4JVuxJ/1/LCG4Ad5wrvy8t5o5JDSk0KBVxTcthzwcG/k2vNwqO2aFbk
+        UYqCcfjzhW7FZ9PWV2kzyPwvploMVlA=
+Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
+ [209.85.210.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-201-3jn-xQl9Pam4hHI-pqJIcw-1; Thu, 03 Mar 2022 14:59:34 -0500
+X-MC-Unique: 3jn-xQl9Pam4hHI-pqJIcw-1
+Received: by mail-ot1-f70.google.com with SMTP id m24-20020a9d4c98000000b005af3b88a817so4257718otf.14
+        for <kvm@vger.kernel.org>; Thu, 03 Mar 2022 11:59:33 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=XoEAYDx446fXkmQuWKwwNKiNKBljBToUr9mPvWD2olQ=;
-        b=4IhU2i6p27tI2Sr7QQjGnGJodLyR38aCG5AsrATo+XBjZxljouGGJzCeFeEvLtIVO4
-         pAaoq+eomEcL49+aaVljLJ4dyKYVPJpxsI4GW0pd8vo4dCcilo6N9ILkiimmRzGWnJmq
-         FxWHu534iwrEdHMEKHuFGN1UCTXdcL2hbl1RXA+ky1FArkr8i0UY4SOS/Y1AcHMSdvIZ
-         0Orq6qFq8P0wPvqmaoWOnKINnb+d/J5cyVXXhIC5g51095hk5Hk22OZWJMGc186s7Hmn
-         0/RcFzzJlEy8CPuEXlXA7mx0hiPmKawNJnGs6aLspIB3ZW1ef9db7KMOaeueM+aCpyLU
-         4L1Q==
-X-Gm-Message-State: AOAM5327+xS1TDLajiwNCinkqRBmwC7pAHs9jIH/zj74jsj8V7z6ZFCj
-        T2444f0NdqhEAk1WIbPEfq2TE3DT2+P4DvCyjGBJ8g==
-X-Google-Smtp-Source: ABdhPJwbKab4uPBxWjkPewLzFfGD27do6suW8zprL0EkIZ2+N+uIOuPVKnP13+hvvRIEZuh/Ghvb1SZiXBuoZfOeOSg=
-X-Received: by 2002:a19:7503:0:b0:443:3d52:fde6 with SMTP id
- y3-20020a197503000000b004433d52fde6mr22360133lfe.250.1646337193350; Thu, 03
- Mar 2022 11:53:13 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=KII+3wpRDYxBkpQXpVqXMzOFERtKv6nriOIaVlE+FgA=;
+        b=TZ/SdZzE++nL9cLhpWbagTxcWXrbPmJjacbBowqTccyTtVhB73UToWGGi2dB6OOGwQ
+         SgeRJJ4VbDo7ug198Sg5JKx/nnp54f2vwnD4j6xQCZWbveBrOfEzjbeqXiv82W1pcdab
+         1RJbUzcCdxVBgQCca/buQHlDJiiujdbVWrhL6tkm+49QAA8gnTaqFNmpLEzWvCtMMSK8
+         rmrd12KU1eTdaVKovajoTDd6oQkQLpfVTxQ0jFrD7HGD7Myh2iyPBKNItaG6NFo9nm/F
+         4/+k2ylp7hLbMxuadOsScLcfJQ3wCJzsMMAFZ7hSbrEQGSgGBMgvi/YpvcCSgxMS5Jet
+         EpQw==
+X-Gm-Message-State: AOAM530nw65/Ir8grmobQxDMadU08BJk3sPckOtkIYzo6Am5VJ2aSn9w
+        tVdx/ukSBj/7C8EIXX9smMshZkPV40LxDpCfhFejA2s/v0+jGphl5uldaqjBJ6mDMDmbdbJkdU8
+        hUq2nXZE4/tN7
+X-Received: by 2002:a4a:c719:0:b0:2eb:c34a:2ba7 with SMTP id n25-20020a4ac719000000b002ebc34a2ba7mr19498050ooq.98.1646337573200;
+        Thu, 03 Mar 2022 11:59:33 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJz6XTO+OhibXSv5NZahUVm0cq34tr89yXWaoMFB6Fqiab+SUFF3Phx50x9lVSIdc9AfUbbmhg==
+X-Received: by 2002:a4a:c719:0:b0:2eb:c34a:2ba7 with SMTP id n25-20020a4ac719000000b002ebc34a2ba7mr19498041ooq.98.1646337572985;
+        Thu, 03 Mar 2022 11:59:32 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id u21-20020a056870951500b000d9b9ac69cdsm901630oal.1.2022.03.03.11.59.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Mar 2022 11:59:32 -0800 (PST)
+Date:   Thu, 3 Mar 2022 12:59:30 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
+        "yishaih@nvidia.com" <yishaih@nvidia.com>,
+        Linuxarm <linuxarm@huawei.com>,
+        liulongfang <liulongfang@huawei.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        Jonathan Cameron <jonathan.cameron@huawei.com>,
+        "Wangzhou (B)" <wangzhou1@hisilicon.com>
+Subject: Re: [PATCH v7 07/10] vfio: Extend the device migration protocol
+ with PRE_COPY
+Message-ID: <20220303125930.43d9940b.alex.williamson@redhat.com>
+In-Reply-To: <0cee64d555624e669028ba17d04b8737@huawei.com>
+References: <20220302172903.1995-1-shameerali.kolothum.thodi@huawei.com>
+        <20220302172903.1995-8-shameerali.kolothum.thodi@huawei.com>
+        <20220302133159.3c803f56.alex.williamson@redhat.com>
+        <20220303000528.GW219866@nvidia.com>
+        <20220302204752.71ea8b32.alex.williamson@redhat.com>
+        <20220303130124.GX219866@nvidia.com>
+        <20220303082040.1f88e24c.alex.williamson@redhat.com>
+        <0cee64d555624e669028ba17d04b8737@huawei.com>
+Organization: Red Hat
 MIME-Version: 1.0
-References: <20220203010051.2813563-1-dmatlack@google.com> <20220203010051.2813563-18-dmatlack@google.com>
- <CANgfPd90UA2_RRRWzwE6D_FtKiExSkbqktKiPpcYV0MmJxagWQ@mail.gmail.com>
-In-Reply-To: <CANgfPd90UA2_RRRWzwE6D_FtKiExSkbqktKiPpcYV0MmJxagWQ@mail.gmail.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Thu, 3 Mar 2022 11:52:46 -0800
-Message-ID: <CALzav=fuLgXJ3Krr8JYXA0Bd1KdPeh+thJnLyvMMZtqsNeSu3w@mail.gmail.com>
-Subject: Re: [PATCH 17/23] KVM: x86/mmu: Pass bool flush parameter to drop_large_spte()
-To:     Ben Gardon <bgardon@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        leksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Peter Feiner <pfeiner@google.com>,
-        Andrew Jones <drjones@redhat.com>,
-        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
-        kvm <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-18.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 28, 2022 at 12:47 PM Ben Gardon <bgardon@google.com> wrote:
->
-> On Wed, Feb 2, 2022 at 5:02 PM David Matlack <dmatlack@google.com> wrote:
-> >
-> > drop_large_spte() drops a large SPTE if it exists and then flushes TLBs.
-> > Its helper function, __drop_large_spte(), does the drop without the
-> > flush. This difference is not obvious from the name.
-> >
-> > To make the code more readable, pass an explicit flush parameter. Also
-> > replace the vCPU pointer with a KVM pointer so we can get rid of the
-> > double-underscore helper function.
-> >
-> > This is also in preparation for a future commit that will conditionally
-> > flush after dropping a large SPTE.
-> >
-> > No functional change intended.
-> >
-> > Signed-off-by: David Matlack <dmatlack@google.com>
-> > ---
-> >  arch/x86/kvm/mmu/mmu.c         | 25 +++++++++++--------------
-> >  arch/x86/kvm/mmu/paging_tmpl.h |  4 ++--
-> >  2 files changed, 13 insertions(+), 16 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index 99ad7cc8683f..2d47a54e62a5 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -1162,23 +1162,20 @@ static void drop_spte(struct kvm *kvm, u64 *sptep)
-> >  }
-> >
-> >
-> > -static bool __drop_large_spte(struct kvm *kvm, u64 *sptep)
-> > +static void drop_large_spte(struct kvm *kvm, u64 *sptep, bool flush)
->
-> Since there are no callers of __drop_large_spte, I'd be inclined to
-> hold off on adding the flush parameter in this commit and just add it
-> when it's needed,
+On Thu, 3 Mar 2022 18:05:53 +0000
+Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
 
-The same argument about waiting until there's a user could be said
-about "KVM: x86/mmu: Pass access information to
-make_huge_page_split_spte()". I agree with this advice when the future
-user is entirely theoretical or some future series. But when the
-future user is literally the next commit in the series, I think it's
-ok to do things this way since it distributes the net diff more evenly
-among patches, which eases reviewing.
+> > -----Original Message-----
+> > From: Alex Williamson [mailto:alex.williamson@redhat.com]
+> > Sent: 03 March 2022 15:21
+> > To: Jason Gunthorpe <jgg@nvidia.com>
+> > Cc: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
+> > kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
+> > linux-crypto@vger.kernel.org; linux-pci@vger.kernel.org; cohuck@redhat.com;
+> > mgurtovoy@nvidia.com; yishaih@nvidia.com; Linuxarm
+> > <linuxarm@huawei.com>; liulongfang <liulongfang@huawei.com>; Zengtao (B)
+> > <prime.zeng@hisilicon.com>; Jonathan Cameron
+> > <jonathan.cameron@huawei.com>; Wangzhou (B) <wangzhou1@hisilicon.com>
+> > Subject: Re: [PATCH v7 07/10] vfio: Extend the device migration protocol with
+> > PRE_COPY
+> > 
+> > On Thu, 3 Mar 2022 09:01:24 -0400
+> > Jason Gunthorpe <jgg@nvidia.com> wrote:
+> >   
+> > > On Wed, Mar 02, 2022 at 08:47:52PM -0700, Alex Williamson wrote:  
+> > > > On Wed, 2 Mar 2022 20:05:28 -0400
+> > > > Jason Gunthorpe <jgg@nvidia.com> wrote:
+> > > >  
+> > > > > On Wed, Mar 02, 2022 at 01:31:59PM -0700, Alex Williamson wrote:  
+> > > > > > > + * initial_bytes reflects the estimated remaining size of any
+> > > > > > > + initial mandatory
+> > > > > > > + * precopy data transfer. When initial_bytes returns as zero
+> > > > > > > + then the initial
+> > > > > > > + * phase of the precopy data is completed. Generally initial_bytes  
+> > should start  
+> > > > > > > + * out as approximately the entire device state.  
+> > > > > >
+> > > > > > What is "mandatory" intended to mean here?  The user isn't required  
+> > to  
+> > > > > > collect any data from the device in the PRE_COPY states.  
+> > > > >
+> > > > > If the data is split into initial,dirty,trailer then mandatory
+> > > > > means that first chunk.  
+> > > >
+> > > > But there's no requirement to read anything in PRE_COPY, so initial
+> > > > becomes indistinguishable from trailer and dirty doesn't exist.  
+> > >
+> > > It is still mandatory to read that data out, it doesn't matter if it
+> > > is read during PRE_COPY or STOP_COPY.  
+> > 
+> > Not really, PRE_COPY -> RUNNING is a valid arc.
+> >   
+> > > > > > "The vfio_precopy_info data structure returned by this ioctl
+> > > > > > provides  estimates of data available from the device during the  
+> > PRE_COPY states.  
+> > > > > >  This estimate is split into two categories, initial_bytes and
+> > > > > > dirty_bytes.
+> > > > > >
+> > > > > >  The initial_bytes field indicates the amount of static data
+> > > > > > available  from the device.  This field should have a non-zero initial  
+> > value and  
+> > > > > >  decrease as migration data is read from the device.  
+> > > > >
+> > > > > static isn't great either, how about just say 'minimum data available'  
+> > > >
+> > > > 'initial precopy data-set'?  
+> > >
+> > > Sure
+> > >  
+> > > > We have no basis to make that assertion.  We've agreed that precopy
+> > > > can be used for nothing more than a compatibility test, so we could
+> > > > have a vGPU with a massive framebuffer and no ability to provide
+> > > > dirty tracking implement precopy only to include the entire
+> > > > framebuffer in the trailing STOP_COPY data set.  Per my
+> > > > understanding and the fact that we cannot enforce any heuristics
+> > > > regarding the size of the tailer relative to the pre-copy data set,
+> > > > I think the above strongly phrased sentence is necessary to
+> > > > understand the limitations of what this ioctl is meant to convey.
+> > > > Thanks,  
+> > >
+> > > This is why abusing precopy for compatability is not a great idea. It
+> > > is OK for acc because its total state is tiny, but I would not agree
+> > > to a vGPU driver being merged working like you describe. It distorts
+> > > the entire purpose of PRE_COPY and this whole estimation mechanism.
+> > >
+> > > The ioctl is intended to convey when to switch to STOP_COPY, and the
+> > > driver should provide a semantic where the closer the reported length
+> > > is to 0 then the faster the STOP_COPY will go.  
+> > 
+> > If it's an abuse, then let's not do it.  It was never my impression or intention
+> > that this was ok for acc only due to the minimal trailing data size.  My
+> > statement was that use of PRE_COPY for compatibility testing only had been a
+> > previously agreed valid use case of the original migration interface.
+> > 
+> > Furthermore the acc driver was explicitly directed not to indicate any degree
+> > of trailing data size in dirty_bytes, so while trailing data may be small for acc,
+> > this interface is explicitly not intended to provide any indication of trailing
+> > data size.  Thanks,  
+> 
+> Just to clarify, so the suggestion here is not to use PRE_COPY for compatibility
+> check at all and have a different proper infrastructure for that later as Jason
+> suggested?
+> 
+> If so, I will remove this patch from this series and go back to the old revision
+> where we only have STOP_COPY and do the compatibility check during the final
+> load data operation.
 
-But, you've got me thinking and I think I want to change this commit
-slightly: I'll keep __drop_larg_spte() but push all the implementation
-into it and add a bool flush parameter there. That way we don't have
-to change all the call sites of drop_large_spte() in this commit. The
-implementation of drop_large_spte() will just be
-__drop_large_spte(..., true). And the next commit can call
-__drop_large_spte(..., false) with a comment.
+Hi Shameer,
 
-> or better yet after you add the new user with the
-> conditional flush so that there's a commit explaining why it's safe to
-> not always flush in that case.
->
-> >  {
-> > -       if (is_large_pte(*sptep)) {
-> > -               WARN_ON(sptep_to_sp(sptep)->role.level == PG_LEVEL_4K);
-> > -               drop_spte(kvm, sptep);
-> > -               return true;
-> > -       }
-> > +       struct kvm_mmu_page *sp;
-> >
-> > -       return false;
-> > -}
-> > +       if (!is_large_pte(*sptep))
-> > +               return;
-> >
-> > -static void drop_large_spte(struct kvm_vcpu *vcpu, u64 *sptep)
-> > -{
-> > -       if (__drop_large_spte(vcpu->kvm, sptep)) {
-> > -               struct kvm_mmu_page *sp = sptep_to_sp(sptep);
-> > +       sp = sptep_to_sp(sptep);
-> > +       WARN_ON(sp->role.level == PG_LEVEL_4K);
-> > +
-> > +       drop_spte(kvm, sptep);
-> >
-> > -               kvm_flush_remote_tlbs_with_address(vcpu->kvm, sp->gfn,
-> > +       if (flush) {
-> > +               kvm_flush_remote_tlbs_with_address(kvm, sp->gfn,
-> >                         KVM_PAGES_PER_HPAGE(sp->role.level));
-> >         }
-> >  }
-> > @@ -3051,7 +3048,7 @@ static int __direct_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
-> >                 if (it.level == fault->goal_level)
-> >                         break;
-> >
-> > -               drop_large_spte(vcpu, it.sptep);
-> > +               drop_large_spte(vcpu->kvm, it.sptep, true);
-> >                 if (is_shadow_present_pte(*it.sptep))
-> >                         continue;
-> >
-> > diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-> > index 703dfb062bf0..ba61de29f2e5 100644
-> > --- a/arch/x86/kvm/mmu/paging_tmpl.h
-> > +++ b/arch/x86/kvm/mmu/paging_tmpl.h
-> > @@ -677,7 +677,7 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
-> >                 gfn_t table_gfn;
-> >
-> >                 clear_sp_write_flooding_count(it.sptep);
-> > -               drop_large_spte(vcpu, it.sptep);
-> > +               drop_large_spte(vcpu->kvm, it.sptep, true);
-> >
-> >                 sp = NULL;
-> >                 if (!is_shadow_present_pte(*it.sptep)) {
-> > @@ -739,7 +739,7 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
-> >
-> >                 validate_direct_spte(vcpu, it.sptep, direct_access);
-> >
-> > -               drop_large_spte(vcpu, it.sptep);
-> > +               drop_large_spte(vcpu->kvm, it.sptep, true);
-> >
-> >                 if (!is_shadow_present_pte(*it.sptep)) {
-> >                         sp = kvm_mmu_get_child_sp(vcpu, it.sptep, base_gfn,
-> > --
-> > 2.35.0.rc2.247.g8bbb082509-goog
-> >
+I think NVIDIA has a company long weekend, so I'm not sure how quickly
+we'll hear a rebuttal from Jason, but at this point I'd rather not move
+forward with using PRE_COPY exclusively for compatibility testing if
+that is seen as an abuse of the interface, regardless of the size of
+the remaining STOP_COPY data.  It might be most expedient to respin
+without PRE_COPY and we'll revisit methods to perform early
+compatibility testing in the future.  Thanks,
+
+Alex
+
