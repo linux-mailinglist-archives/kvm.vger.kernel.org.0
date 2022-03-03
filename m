@@ -2,48 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1972C4CB7B2
-	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 08:27:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B29564CB7BA
+	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 08:27:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230225AbiCCH2N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Mar 2022 02:28:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36542 "EHLO
+        id S230220AbiCCH2Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Mar 2022 02:28:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36628 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230187AbiCCH2L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Mar 2022 02:28:11 -0500
-Received: from mga06.intel.com (mga06.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32F533A70A
-        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 23:27:25 -0800 (PST)
+        with ESMTP id S230226AbiCCH2N (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Mar 2022 02:28:13 -0500
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C20410DC
+        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 23:27:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1646292445; x=1677828445;
+  t=1646292448; x=1677828448;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=C7MaZPwrtSUd56gxI3d1JMTZIsW8wktBIoCkdfZMe94=;
-  b=A23kT/96ztvHNT2pAw3zbhzvspBAD3ik8Q0SYqvwzSBta8K3c3j8yYm8
-   jZmg4TxAbL9kfvCyFG4xZ8/zAdc0gUfzBNf5Vrq3gLhyf1rex0uphK1sf
-   8g5/9ONYRwURFMyzqSEtjEqgHr4IfcrSMDtOwkuPxp04Yj9Yt+I81gCLU
-   +nVEmkArH47STnN7KjqjRWDbrutHT0eKwoYVi3otkedMz8Pac6p1lMDLO
-   QNyCP39b0OdR9LVdOtssK0CypRjOvUABYa/ccQ0TTpAnZ7efXXHwEw4WS
-   wEyHrXiawClKy7JdOge9nBcQ+4Gkf9go6BebvK21gHU8y49JMVfZZFHb8
-   Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10274"; a="314317841"
+  bh=q6Bijq9RqPmvXm9peANhjkv/SEQQ8PvTpgmj+xKkNM4=;
+  b=goreraHv35Sw0GHWgMxokH2dcG/75Q4/kRex1K0xlFE/TffAAuMIP9fF
+   /3wIbBoZY+6A+49YLYSkxHcHSRrd3S0HfWE6ynvLM8SU0Rl0V/IHlHT2m
+   FXJSsyp5hXQvzqOiQWH9kjDnIsu/08kF7Uot/dzFfrqxHN7Wd7DStcVcy
+   5ua77q93I2j9DMgjN4T3TzDbF14bF0Umi1/oakgr9TEqybZEsUKUcjyR3
+   9pOEFS2Ej7GSAFScP/n+y1IRjchuemazaRxcb23zbE6gZagIxHPAFY3ZU
+   dBg4Z7jQ9a5eMN0kiG4rhRG5Q5DwXp/iEeWgfqRLKkK3igx3re/3N7JC4
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10274"; a="234214653"
 X-IronPort-AV: E=Sophos;i="5.90,151,1643702400"; 
-   d="scan'208";a="314317841"
+   d="scan'208";a="234214653"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2022 23:27:24 -0800
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2022 23:27:27 -0800
 X-IronPort-AV: E=Sophos;i="5.90,151,1643702400"; 
-   d="scan'208";a="551631510"
+   d="scan'208";a="551631532"
 Received: from duan-server-s2600bt.bj.intel.com ([10.240.192.123])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2022 23:27:22 -0800
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2022 23:27:25 -0800
 From:   Zhenzhong Duan <zhenzhong.duan@intel.com>
 To:     kvm@vger.kernel.org
 Cc:     pbonzini@redhat.com, seanjc@google.com, yu.c.zhang@intel.com,
         zixuanwang@google.com, marcorr@google.com, jun.nakajima@intel.com,
         erdemaktas@google.com
-Subject: [kvm-unit-tests RFC PATCH 03/17] x86 TDX: Bypass APIC and enable x2APIC directly
-Date:   Thu,  3 Mar 2022 15:18:53 +0800
-Message-Id: <20220303071907.650203-4-zhenzhong.duan@intel.com>
+Subject: [kvm-unit-tests RFC PATCH 04/17] x86 TDX: Add exception table support
+Date:   Thu,  3 Mar 2022 15:18:54 +0800
+Message-Id: <20220303071907.650203-5-zhenzhong.duan@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220303071907.650203-1-zhenzhong.duan@intel.com>
 References: <20220303071907.650203-1-zhenzhong.duan@intel.com>
@@ -59,76 +59,112 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-According to TDX Architecture Specification, 9.8 Interrupt Handling
-and APIC Virtualization:
-1. Guest TDs must use virtualized x2APIC mode. xAPIC mode(using memory
-mapped APIC access) is not allowed.
-2. Guest TDs attempts to RDMSR or WRMSR the IA32_APIC_BASE MSR cause a
-VE to the guest TD. The guest TD cannot disable the APIC.
+Exception table is used to fixup from a faulty instruction
+execution.
 
-Bypass xAPIC initialization and enable x2APIC directly. Set software
-enable bit in x2APIC initializaion.
+In TDX scenario, some instructions trigger #VE and simulated
+through tdvmcall. If the simulation fail, the instruction is
+treated as faulty and should be checked with the exception
+table to fixup.
 
-Use uid/apicid mapping to get apicid in setup_tss(). Initially I enabled
-x2APIC early so apic_id() could be used. But that brings issue for
-multiprocessor support as reading APIC_ID in AP triggers #VE and require
-gdt/tss/idt to be initialized early, so setup_gdt_tss() early.
+Move struct ex_record, exception_table_[start|end] in lib/x86/desc.h
+as it's a general declaration and will be used in TDX.
 
 Signed-off-by: Zhenzhong Duan <zhenzhong.duan@intel.com>
 Reviewed-by: Yu Zhang <yu.c.zhang@intel.com>
 ---
- lib/x86/apic.c  |  4 ++++
- lib/x86/setup.c | 10 +++++++---
- 2 files changed, 11 insertions(+), 3 deletions(-)
+ lib/x86/desc.c |  7 -------
+ lib/x86/desc.h |  6 ++++++
+ lib/x86/tdx.c  | 23 +++++++++++++++++++++++
+ 3 files changed, 29 insertions(+), 7 deletions(-)
 
-diff --git a/lib/x86/apic.c b/lib/x86/apic.c
-index da8f30134b22..84bfe98c58ff 100644
---- a/lib/x86/apic.c
-+++ b/lib/x86/apic.c
-@@ -147,6 +147,10 @@ int enable_x2apic(void)
-         asm ("rdmsr" : "=a"(a), "=d"(d) : "c"(MSR_IA32_APICBASE));
-         a |= 1 << 10;
-         asm ("wrmsr" : : "a"(a), "d"(d), "c"(MSR_IA32_APICBASE));
-+
-+        /* software APIC enabled bit is cleared after reset in TD-guest */
-+        x2apic_write(APIC_SPIV, 0x1ff);
-+
-         apic_ops = &x2apic_ops;
-         return 1;
-     } else {
-diff --git a/lib/x86/setup.c b/lib/x86/setup.c
-index fbcd188ebb8f..e834fdfd290c 100644
---- a/lib/x86/setup.c
-+++ b/lib/x86/setup.c
-@@ -108,8 +108,9 @@ unsigned long setup_tss(u8 *stacktop)
+diff --git a/lib/x86/desc.c b/lib/x86/desc.c
+index b35274e44a8d..52eb4152385a 100644
+--- a/lib/x86/desc.c
++++ b/lib/x86/desc.c
+@@ -84,13 +84,6 @@ void set_idt_sel(int vec, u16 sel)
+     e->selector = sel;
+ }
+ 
+-struct ex_record {
+-    unsigned long rip;
+-    unsigned long handler;
+-};
+-
+-extern struct ex_record exception_table_start, exception_table_end;
+-
+ const char* exception_mnemonic(int vector)
  {
- 	u32 id;
- 	tss64_t *tss_entry;
-+	static u32 cpus = 0;
+ 	switch(vector) {
+diff --git a/lib/x86/desc.h b/lib/x86/desc.h
+index ad6277ba600a..068ec2394df9 100644
+--- a/lib/x86/desc.h
++++ b/lib/x86/desc.h
+@@ -212,6 +212,12 @@ extern tss64_t tss[];
+ #endif
+ extern gdt_entry_t gdt[];
  
--	id = apic_id();
-+	id = is_tdx_guest() ? id_map[cpus++] : apic_id();
++struct ex_record {
++	unsigned long rip;
++	unsigned long handler;
++};
++extern struct ex_record exception_table_start, exception_table_end;
++
+ unsigned exception_vector(void);
+ int write_cr4_checking(unsigned long val);
+ unsigned exception_error_code(void);
+diff --git a/lib/x86/tdx.c b/lib/x86/tdx.c
+index 42ab25f47e57..62e0e2842822 100644
+--- a/lib/x86/tdx.c
++++ b/lib/x86/tdx.c
+@@ -267,6 +267,22 @@ static bool tdx_handle_io(struct ex_regs *regs, u32 exit_qual)
+ 	return ret ? false : true;
+ }
  
- 	/* Runtime address of current TSS */
- 	tss_entry = &tss[id];
-@@ -327,12 +328,15 @@ efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo)
- 		return status;
- 	}
++static bool tdx_check_exception_table(struct ex_regs *regs)
++{
++	struct ex_record *ex;
++
++	for (ex = &exception_table_start; ex != &exception_table_end; ++ex) {
++		if (ex->rip == regs->rip) {
++			regs->rip = ex->handler;
++			return true;
++		}
++	}
++	unhandled_exception(regs, false);
++
++	/* never reached */
++	return false;
++}
++
+ static bool tdx_get_ve_info(struct ve_info *ve)
+ {
+ 	struct tdx_module_output out;
+@@ -298,10 +314,15 @@ static bool tdx_get_ve_info(struct ve_info *ve)
+ static bool tdx_handle_virtualization_exception(struct ex_regs *regs,
+ 		struct ve_info *ve)
+ {
++	unsigned int ex_val;
+ 	bool ret = true;
+ 	u64 val = ~0ULL;
+ 	bool do_sti;
  
--	reset_apic();
-+	/* xAPIC mode isn't allowed in TDX */
-+	if (!is_tdx_guest())
-+		reset_apic();
- 	setup_gdt_tss();
- 	setup_idt();
- 	load_idt();
- 	mask_pic_interrupts();
--	enable_apic();
-+	if (!is_tdx_guest())
-+		enable_apic();
- 	enable_x2apic();
- 	smp_init();
- 	setup_page_table();
++	/* #VE exit_reason in bit16-32 */
++	ex_val = regs->vector | (ve->exit_reason << 16);
++	asm("mov %0, %%gs:4" : : "r"(ex_val));
++
+ 	switch (ve->exit_reason) {
+ 	case EXIT_REASON_HLT:
+ 		do_sti = !!(regs->rflags & X86_EFLAGS_IF);
+@@ -333,6 +354,8 @@ static bool tdx_handle_virtualization_exception(struct ex_regs *regs,
+ 	/* After successful #VE handling, move the IP */
+ 	if (ret)
+ 		regs->rip += ve->instr_len;
++	else
++		ret = tdx_check_exception_table(regs);
+ 
+ 	return ret;
+ }
 -- 
 2.25.1
 
