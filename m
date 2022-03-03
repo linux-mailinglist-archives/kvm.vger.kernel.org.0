@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B622C4CC1C1
-	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 16:42:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AF0B84CC1B5
+	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 16:41:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234658AbiCCPmo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Mar 2022 10:42:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34460 "EHLO
+        id S234637AbiCCPmh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Mar 2022 10:42:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34412 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234620AbiCCPmd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Mar 2022 10:42:33 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E28719532E
-        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 07:41:44 -0800 (PST)
+        with ESMTP id S234602AbiCCPmb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Mar 2022 10:42:31 -0500
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0154919533E
+        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 07:41:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
+        d=infradead.org; s=desiato.20200630; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=ZgvWPsDu8uqnRDWHjZZun9SK4TIZXWHQXB6z7ulTsRM=; b=l44cE9dMhcUofvouDwStzjaPeh
-        p0SHc8DxSftGb43sMhlPP5avgFmlXaTdf27l6loDIxOJcTtkVx/dRAjtrOa+a+xq2zPAEWsgdINRA
-        O5PSRXbwmPaD6kfUbmnB1cQSJLhx73t+PLRG5pb7X1flmP7/pZWFd7vDSB4C2ATbcSC+ihGH7/9Ty
-        QFAO+Qv4mWtVxwKo+7xUfvhyz9orBUdHIN5a6vVxfwmRJbpXZi9DrnW4/JBUE4q9OOmtpVGuLbh4A
-        TCibuIzrj40r8Sfglpvc8Sn5DJyF61gfO9lldJzPPqMacXZTZc659mNvXUYmv2cA7v2ZvPLpDftXc
-        2MHyidfQ==;
+        bh=DHwX9+/sbafhXN9MRrq/DjlnUHPRrk6R5IeY96ZQ2OY=; b=rMSF7UMhV9xaHnSit3aawCYM3r
+        cDAqbJgA5w/TjbvSPb2bHsCw1laQin3w6gbhfGlWPzfw7W8SwZCtvxguarao6+EWXpcgbg2IedNNR
+        LIAnJcHn1Q65SnVbofnQnPHA+5UdNWXIRX/6KuLoPWsie2UswZGo9b8+kSl6BgAqlGMovjBJl4xdl
+        Z+eFvkV7EluotVFaY2VE+jSR9j1PxP+i29mSPbsARIR9X9j21oYDAfKUFgzLL33pGiBg0sYlPoG16
+        giSGTxZBOcrJpl1UTncXnP7Sj5vCSry05KrKP073fsZxD4e2tD2d92vzuGIrJaqYt/SV8PpDRSFDb
+        bYcSjzEg==;
 Received: from [2001:8b0:10b:1:85c4:81a:fb42:714d] (helo=i7.infradead.org)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nPna5-00BlVh-J4; Thu, 03 Mar 2022 15:41:29 +0000
+        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nPna5-00Ewk0-PM; Thu, 03 Mar 2022 15:41:29 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nPna4-000qmO-Oq; Thu, 03 Mar 2022 15:41:28 +0000
+        id 1nPna4-000qmR-Pg; Thu, 03 Mar 2022 15:41:28 +0000
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -40,16 +40,16 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Boris Ostrovsky <boris.ostrovsky@oracle.com>,
         Metin Kaya <metikaya@amazon.co.uk>,
         Paul Durrant <pdurrant@amazon.co.uk>
-Subject: [PATCH v3 01/17] KVM: Use enum to track if cached PFN will be used in guest and/or host
-Date:   Thu,  3 Mar 2022 15:41:11 +0000
-Message-Id: <20220303154127.202856-2-dwmw2@infradead.org>
+Subject: [PATCH v3 02/17] KVM: Remove dirty handling from gfn_to_pfn_cache completely
+Date:   Thu,  3 Mar 2022 15:41:12 +0000
+Message-Id: <20220303154127.202856-3-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.33.1
 In-Reply-To: <20220303154127.202856-1-dwmw2@infradead.org>
 References: <20220303154127.202856-1-dwmw2@infradead.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: David Woodhouse <dwmw2@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
         SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
@@ -60,150 +60,288 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Sean Christopherson <seanjc@google.com>
+From: David Woodhouse <dwmw@amazon.co.uk>
 
-Replace the guest_uses_pa and kernel_map booleans in the PFN cache code
-with a unified enum/bitmask. Using explicit names makes it easier to
-review and audit call sites.
+It isn't OK to cache the dirty status of a page in internal structures
+for an indefinite period of time.
 
-Opportunistically add a WARN to prevent passing garbage; instantating a
-cache without declaring its usage is either buggy or pointless.
+Any time a vCPU exits the run loop to userspace might be its last; the
+VMM might do its final check of the dirty log, flush the last remaining
+dirty pages to the destination and complete a live migration. If we
+have internal 'dirty' state which doesn't get flushed until the vCPU
+is finally destroyed on the source after migration is complete, then
+we have lost data because that will escape the final copy.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
+This problem already exists with the use of kvm_vcpu_unmap() to mark
+pages dirty in e.g. VMX nesting.
+
+Note that the actual Linux MM already considers the page to be dirty
+since we have a writeable mapping of it. This is just about the KVM
+dirty logging.
+
+For the nesting-style use cases (KVM_GUEST_USES_PFN) we will need to
+track which gfn_to_pfn_caches have been used and explicitly mark the
+corresponding pages dirty before returning to userspace. But we would
+have needed external tracking of that anyway, rather than walking the
+full list of GPCs to find those belonging to this vCPU which are dirty.
+
+So let's rely *solely* on that external tracking, and keep it simple
+rather than laying a tempting trap for callers to fall into.
+
 Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 ---
- arch/x86/kvm/xen.c        |  2 +-
- include/linux/kvm_host.h  | 11 +++++------
- include/linux/kvm_types.h | 10 ++++++++--
- virt/kvm/pfncache.c       | 14 +++++++-------
- 4 files changed, 21 insertions(+), 16 deletions(-)
+ Documentation/virt/kvm/api.rst |  4 ++++
+ arch/x86/kvm/xen.c             |  5 ++---
+ include/linux/kvm_host.h       | 14 +++++-------
+ include/linux/kvm_types.h      |  1 -
+ virt/kvm/pfncache.c            | 41 +++++++---------------------------
+ 5 files changed, 19 insertions(+), 46 deletions(-)
 
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index f5d011351016..f9b32efc8b4a 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -5293,6 +5293,10 @@ type values:
+ 
+ KVM_XEN_VCPU_ATTR_TYPE_VCPU_INFO
+   Sets the guest physical address of the vcpu_info for a given vCPU.
++  As with the shared_info page for the VM, the corresponding page may be
++  dirtied at any time if event channel interrupt delivery is enabled, so
++  userspace should always assume that the page is dirty without relying
++  on dirty logging.
+ 
+ KVM_XEN_VCPU_ATTR_TYPE_VCPU_TIME_INFO
+   Sets the guest physical address of an additional pvclock structure
 diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index 4aa0f2b31665..5be1c9227105 100644
+index 5be1c9227105..bf6cc25eee76 100644
 --- a/arch/x86/kvm/xen.c
 +++ b/arch/x86/kvm/xen.c
-@@ -39,7 +39,7 @@ static int kvm_xen_shared_info_init(struct kvm *kvm, gfn_t gfn)
- 	}
+@@ -40,7 +40,7 @@ static int kvm_xen_shared_info_init(struct kvm *kvm, gfn_t gfn)
  
  	do {
--		ret = kvm_gfn_to_pfn_cache_init(kvm, gpc, NULL, false, true,
-+		ret = kvm_gfn_to_pfn_cache_init(kvm, gpc, NULL, KVM_HOST_USES_PFN,
- 						gpa, PAGE_SIZE, false);
+ 		ret = kvm_gfn_to_pfn_cache_init(kvm, gpc, NULL, KVM_HOST_USES_PFN,
+-						gpa, PAGE_SIZE, false);
++						gpa, PAGE_SIZE);
  		if (ret)
  			goto out;
+ 
+@@ -1025,8 +1025,7 @@ static int evtchn_set_fn(struct kvm_kernel_irq_routing_entry *e, struct kvm *kvm
+ 			break;
+ 
+ 		idx = srcu_read_lock(&kvm->srcu);
+-		rc = kvm_gfn_to_pfn_cache_refresh(kvm, gpc, gpc->gpa,
+-						  PAGE_SIZE, false);
++		rc = kvm_gfn_to_pfn_cache_refresh(kvm, gpc, gpc->gpa, PAGE_SIZE);
+ 		srcu_read_unlock(&kvm->srcu, idx);
+ 	} while(!rc);
+ 
 diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 9536ffa0473b..907a3e036cf6 100644
+index 907a3e036cf6..f09ffa0eb884 100644
 --- a/include/linux/kvm_host.h
 +++ b/include/linux/kvm_host.h
-@@ -1221,9 +1221,9 @@ void kvm_vcpu_mark_page_dirty(struct kvm_vcpu *vcpu, gfn_t gfn);
-  * @gpc:	   struct gfn_to_pfn_cache object.
-  * @vcpu:	   vCPU to be used for marking pages dirty and to be woken on
-  *		   invalidation.
-- * @guest_uses_pa: indicates that the resulting host physical PFN is used while
-- *		   @vcpu is IN_GUEST_MODE so invalidations should wake it.
-- * @kernel_map:    requests a kernel virtual mapping (kmap / memremap).
-+ * @usage:	   indicates if the resulting host physical PFN is used while
-+ *		   the @vcpu is IN_GUEST_MODE and/or if the PFN used directly
-+ *		   by KVM (and thus needs a kernel virtual mapping).
+@@ -1226,7 +1226,6 @@ void kvm_vcpu_mark_page_dirty(struct kvm_vcpu *vcpu, gfn_t gfn);
+  *		   by KVM (and thus needs a kernel virtual mapping).
   * @gpa:	   guest physical address to map.
   * @len:	   sanity check; the range being access must fit a single page.
-  * @dirty:         mark the cache dirty immediately.
-@@ -1239,9 +1239,8 @@ void kvm_vcpu_mark_page_dirty(struct kvm_vcpu *vcpu, gfn_t gfn);
-  * to ensure that the cache is valid before accessing the target page.
+- * @dirty:         mark the cache dirty immediately.
+  *
+  * @return:	   0 for success.
+  *		   -EINVAL for a mapping which would cross a page boundary.
+@@ -1240,7 +1239,7 @@ void kvm_vcpu_mark_page_dirty(struct kvm_vcpu *vcpu, gfn_t gfn);
   */
  int kvm_gfn_to_pfn_cache_init(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
--			      struct kvm_vcpu *vcpu, bool guest_uses_pa,
--			      bool kernel_map, gpa_t gpa, unsigned long len,
--			      bool dirty);
-+			      struct kvm_vcpu *vcpu, enum pfn_cache_usage usage,
-+			      gpa_t gpa, unsigned long len, bool dirty);
+ 			      struct kvm_vcpu *vcpu, enum pfn_cache_usage usage,
+-			      gpa_t gpa, unsigned long len, bool dirty);
++			      gpa_t gpa, unsigned long len);
  
  /**
   * kvm_gfn_to_pfn_cache_check - check validity of a gfn_to_pfn_cache.
+@@ -1249,7 +1248,6 @@ int kvm_gfn_to_pfn_cache_init(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
+  * @gpc:	   struct gfn_to_pfn_cache object.
+  * @gpa:	   current guest physical address to map.
+  * @len:	   sanity check; the range being access must fit a single page.
+- * @dirty:         mark the cache dirty immediately.
+  *
+  * @return:	   %true if the cache is still valid and the address matches.
+  *		   %false if the cache is not valid.
+@@ -1271,7 +1269,6 @@ bool kvm_gfn_to_pfn_cache_check(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
+  * @gpc:	   struct gfn_to_pfn_cache object.
+  * @gpa:	   updated guest physical address to map.
+  * @len:	   sanity check; the range being access must fit a single page.
+- * @dirty:         mark the cache dirty immediately.
+  *
+  * @return:	   0 for success.
+  *		   -EINVAL for a mapping which would cross a page boundary.
+@@ -1284,7 +1281,7 @@ bool kvm_gfn_to_pfn_cache_check(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
+  * with the lock still held to permit access.
+  */
+ int kvm_gfn_to_pfn_cache_refresh(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
+-				 gpa_t gpa, unsigned long len, bool dirty);
++				 gpa_t gpa, unsigned long len);
+ 
+ /**
+  * kvm_gfn_to_pfn_cache_unmap - temporarily unmap a gfn_to_pfn_cache.
+@@ -1292,10 +1289,9 @@ int kvm_gfn_to_pfn_cache_refresh(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
+  * @kvm:	   pointer to kvm instance.
+  * @gpc:	   struct gfn_to_pfn_cache object.
+  *
+- * This unmaps the referenced page and marks it dirty, if appropriate. The
+- * cache is left in the invalid state but at least the mapping from GPA to
+- * userspace HVA will remain cached and can be reused on a subsequent
+- * refresh.
++ * This unmaps the referenced page. The cache is left in the invalid state
++ * but at least the mapping from GPA to userspace HVA will remain cached
++ * and can be reused on a subsequent refresh.
+  */
+ void kvm_gfn_to_pfn_cache_unmap(struct kvm *kvm, struct gfn_to_pfn_cache *gpc);
+ 
 diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
-index dceac12c1ce5..784f37cbf33e 100644
+index 784f37cbf33e..ac1ebb37a0ff 100644
 --- a/include/linux/kvm_types.h
 +++ b/include/linux/kvm_types.h
-@@ -18,6 +18,7 @@ struct kvm_memslots;
- 
- enum kvm_mr_change;
- 
-+#include <linux/bits.h>
- #include <linux/types.h>
- #include <linux/spinlock_types.h>
- 
-@@ -46,6 +47,12 @@ typedef u64            hfn_t;
- 
- typedef hfn_t kvm_pfn_t;
- 
-+enum pfn_cache_usage {
-+	KVM_GUEST_USES_PFN = BIT(0),
-+	KVM_HOST_USES_PFN  = BIT(1),
-+	KVM_GUEST_AND_HOST_USE_PFN = KVM_GUEST_USES_PFN | KVM_HOST_USES_PFN,
-+};
-+
- struct gfn_to_hva_cache {
- 	u64 generation;
- 	gpa_t gpa;
-@@ -64,11 +71,10 @@ struct gfn_to_pfn_cache {
- 	rwlock_t lock;
- 	void *khva;
- 	kvm_pfn_t pfn;
-+	enum pfn_cache_usage usage;
+@@ -74,7 +74,6 @@ struct gfn_to_pfn_cache {
+ 	enum pfn_cache_usage usage;
  	bool active;
  	bool valid;
- 	bool dirty;
--	bool kernel_map;
--	bool guest_uses_pa;
+-	bool dirty;
  };
  
  #ifdef KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE
 diff --git a/virt/kvm/pfncache.c b/virt/kvm/pfncache.c
-index ce878f4be4da..9b3a192cb18c 100644
+index 9b3a192cb18c..d789f2705e5e 100644
 --- a/virt/kvm/pfncache.c
 +++ b/virt/kvm/pfncache.c
-@@ -42,7 +42,7 @@ void gfn_to_pfn_cache_invalidate_start(struct kvm *kvm, unsigned long start,
- 			 * If a guest vCPU could be using the physical address,
- 			 * it needs to be woken.
- 			 */
--			if (gpc->guest_uses_pa) {
-+			if (gpc->usage & KVM_GUEST_USES_PFN) {
- 				if (!wake_vcpus) {
- 					wake_vcpus = true;
- 					bitmap_zero(vcpu_bitmap, KVM_MAX_VCPUS);
-@@ -219,7 +219,7 @@ int kvm_gfn_to_pfn_cache_refresh(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
- 			goto map_done;
+@@ -49,19 +49,6 @@ void gfn_to_pfn_cache_invalidate_start(struct kvm *kvm, unsigned long start,
+ 				}
+ 				__set_bit(gpc->vcpu->vcpu_idx, vcpu_bitmap);
+ 			}
+-
+-			/*
+-			 * We cannot call mark_page_dirty() from here because
+-			 * this physical CPU might not have an active vCPU
+-			 * with which to do the KVM dirty tracking.
+-			 *
+-			 * Neither is there any point in telling the kernel MM
+-			 * that the underlying page is dirty. A vCPU in guest
+-			 * mode might still be writing to it up to the point
+-			 * where we wake them a few lines further down anyway.
+-			 *
+-			 * So all the dirty marking happens on the unmap.
+-			 */
+ 		}
+ 		write_unlock_irq(&gpc->lock);
+ 	}
+@@ -104,8 +91,7 @@ bool kvm_gfn_to_pfn_cache_check(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
+ }
+ EXPORT_SYMBOL_GPL(kvm_gfn_to_pfn_cache_check);
+ 
+-static void __release_gpc(struct kvm *kvm, kvm_pfn_t pfn, void *khva,
+-			  gpa_t gpa, bool dirty)
++static void __release_gpc(struct kvm *kvm, kvm_pfn_t pfn, void *khva, gpa_t gpa)
+ {
+ 	/* Unmap the old page if it was mapped before, and release it */
+ 	if (!is_error_noslot_pfn(pfn)) {
+@@ -118,9 +104,7 @@ static void __release_gpc(struct kvm *kvm, kvm_pfn_t pfn, void *khva,
+ #endif
  		}
  
--		if (gpc->kernel_map) {
-+		if (gpc->usage & KVM_HOST_USES_PFN) {
- 			if (new_pfn == old_pfn) {
- 				new_khva = old_khva;
- 				old_pfn = KVM_PFN_ERR_FAULT;
-@@ -299,10 +299,11 @@ EXPORT_SYMBOL_GPL(kvm_gfn_to_pfn_cache_unmap);
+-		kvm_release_pfn(pfn, dirty);
+-		if (dirty)
+-			mark_page_dirty(kvm, gpa);
++		kvm_release_pfn(pfn, false);
+ 	}
+ }
+ 
+@@ -152,7 +136,7 @@ static kvm_pfn_t hva_to_pfn_retry(struct kvm *kvm, unsigned long uhva)
+ }
+ 
+ int kvm_gfn_to_pfn_cache_refresh(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
+-				 gpa_t gpa, unsigned long len, bool dirty)
++				 gpa_t gpa, unsigned long len)
+ {
+ 	struct kvm_memslots *slots = kvm_memslots(kvm);
+ 	unsigned long page_offset = gpa & ~PAGE_MASK;
+@@ -160,7 +144,7 @@ int kvm_gfn_to_pfn_cache_refresh(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
+ 	unsigned long old_uhva;
+ 	gpa_t old_gpa;
+ 	void *old_khva;
+-	bool old_valid, old_dirty;
++	bool old_valid;
+ 	int ret = 0;
+ 
+ 	/*
+@@ -177,14 +161,12 @@ int kvm_gfn_to_pfn_cache_refresh(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
+ 	old_khva = gpc->khva - offset_in_page(gpc->khva);
+ 	old_uhva = gpc->uhva;
+ 	old_valid = gpc->valid;
+-	old_dirty = gpc->dirty;
+ 
+ 	/* If the userspace HVA is invalid, refresh that first */
+ 	if (gpc->gpa != gpa || gpc->generation != slots->generation ||
+ 	    kvm_is_error_hva(gpc->uhva)) {
+ 		gfn_t gfn = gpa_to_gfn(gpa);
+ 
+-		gpc->dirty = false;
+ 		gpc->gpa = gpa;
+ 		gpc->generation = slots->generation;
+ 		gpc->memslot = __gfn_to_memslot(slots, gfn);
+@@ -255,14 +237,9 @@ int kvm_gfn_to_pfn_cache_refresh(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
+ 	}
+ 
+  out:
+-	if (ret)
+-		gpc->dirty = false;
+-	else
+-		gpc->dirty = dirty;
+-
+ 	write_unlock_irq(&gpc->lock);
+ 
+-	__release_gpc(kvm, old_pfn, old_khva, old_gpa, old_dirty);
++	__release_gpc(kvm, old_pfn, old_khva, old_gpa);
+ 
+ 	return ret;
+ }
+@@ -272,7 +249,6 @@ void kvm_gfn_to_pfn_cache_unmap(struct kvm *kvm, struct gfn_to_pfn_cache *gpc)
+ {
+ 	void *old_khva;
+ 	kvm_pfn_t old_pfn;
+-	bool old_dirty;
+ 	gpa_t old_gpa;
+ 
+ 	write_lock_irq(&gpc->lock);
+@@ -280,7 +256,6 @@ void kvm_gfn_to_pfn_cache_unmap(struct kvm *kvm, struct gfn_to_pfn_cache *gpc)
+ 	gpc->valid = false;
+ 
+ 	old_khva = gpc->khva - offset_in_page(gpc->khva);
+-	old_dirty = gpc->dirty;
+ 	old_gpa = gpc->gpa;
+ 	old_pfn = gpc->pfn;
+ 
+@@ -293,14 +268,14 @@ void kvm_gfn_to_pfn_cache_unmap(struct kvm *kvm, struct gfn_to_pfn_cache *gpc)
+ 
+ 	write_unlock_irq(&gpc->lock);
+ 
+-	__release_gpc(kvm, old_pfn, old_khva, old_gpa, old_dirty);
++	__release_gpc(kvm, old_pfn, old_khva, old_gpa);
+ }
+ EXPORT_SYMBOL_GPL(kvm_gfn_to_pfn_cache_unmap);
  
  
  int kvm_gfn_to_pfn_cache_init(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
--			      struct kvm_vcpu *vcpu, bool guest_uses_pa,
--			      bool kernel_map, gpa_t gpa, unsigned long len,
--			      bool dirty)
-+			      struct kvm_vcpu *vcpu, enum pfn_cache_usage usage,
-+			      gpa_t gpa, unsigned long len, bool dirty)
+ 			      struct kvm_vcpu *vcpu, enum pfn_cache_usage usage,
+-			      gpa_t gpa, unsigned long len, bool dirty)
++			      gpa_t gpa, unsigned long len)
  {
-+	WARN_ON_ONCE(!usage || (usage & KVM_GUEST_AND_HOST_USE_PFN) != usage);
-+
- 	if (!gpc->active) {
- 		rwlock_init(&gpc->lock);
+ 	WARN_ON_ONCE(!usage || (usage & KVM_GUEST_AND_HOST_USE_PFN) != usage);
  
-@@ -310,8 +311,7 @@ int kvm_gfn_to_pfn_cache_init(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
- 		gpc->pfn = KVM_PFN_ERR_FAULT;
- 		gpc->uhva = KVM_HVA_ERR_BAD;
- 		gpc->vcpu = vcpu;
--		gpc->kernel_map = kernel_map;
--		gpc->guest_uses_pa = guest_uses_pa;
-+		gpc->usage = usage;
- 		gpc->valid = false;
- 		gpc->active = true;
+@@ -319,7 +294,7 @@ int kvm_gfn_to_pfn_cache_init(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
+ 		list_add(&gpc->list, &kvm->gpc_list);
+ 		spin_unlock(&kvm->gpc_lock);
+ 	}
+-	return kvm_gfn_to_pfn_cache_refresh(kvm, gpc, gpa, len, dirty);
++	return kvm_gfn_to_pfn_cache_refresh(kvm, gpc, gpa, len);
+ }
+ EXPORT_SYMBOL_GPL(kvm_gfn_to_pfn_cache_init);
  
 -- 
 2.33.1
