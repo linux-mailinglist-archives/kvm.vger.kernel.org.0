@@ -2,75 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D6E894CB4D6
-	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 03:28:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3306D4CB4E3
+	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 03:28:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231735AbiCCCZz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Mar 2022 21:25:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58848 "EHLO
+        id S231778AbiCCC2l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 21:28:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231706AbiCCCZx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 21:25:53 -0500
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64E272B197;
-        Wed,  2 Mar 2022 18:25:09 -0800 (PST)
-Received: by mail-pl1-x636.google.com with SMTP id z2so3237605plg.8;
-        Wed, 02 Mar 2022 18:25:09 -0800 (PST)
+        with ESMTP id S231743AbiCCC2i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 21:28:38 -0500
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B340D10FC6;
+        Wed,  2 Mar 2022 18:27:53 -0800 (PST)
+Received: by mail-pj1-x102e.google.com with SMTP id p3-20020a17090a680300b001bbfb9d760eso6464723pjj.2;
+        Wed, 02 Mar 2022 18:27:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=+owYc1beiZNdVQWI5pfer3AMJMG+Sa0wwOUcL3jCg/M=;
-        b=N/ogtJZFKTRwAFlfhS0OuPvfRc3Mc2rkVgfcoUi3PHPuoQhst7CUfVAi1rLMJRPfDh
-         96ZAyKA0/PRpcSC+A/L0WsJS+9B4PMY9RlMTC/lR6byI+mc/U5FU6uP+jzWmjq5XdkH2
-         RJ96SYYuRYHp7ODGFJygl+vsFusH/OxSGBtC91Acn8g9oBIfLFFl5dcVgqsoTHmyEBXU
-         b2kOfJoBtlz2KDk8oxiM+W5DcU+99501t2Rzp39KYEoOgmF32rFvyefNyLdMZx2v/niZ
-         GXFAudoxSQO4KEvagjnsRSiyniFMk3cEptyjnwSOyzOf+whsnt5H9oFqUzLLQqpCusky
-         I50Q==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=C6016/38QKZUQAyk5HMPjenTvm42Pe8sPBzTcqL5vmY=;
+        b=qBGtve+IuFrAkJa+gsN1WQjHRs2fvQkSK1D44BenBKAqsyswWIPF49CjeAw6Lc/Xiz
+         7VY9uX10GWOeYOq3Roffx9lK59MGCnSnWmLkHD6Zz3XGADMqQbIXFAspvzlfyt7tl87F
+         C44YITS/y0gKUKqqxM42VKL4jH/Xx4KasojD++jZOWXtcwkx1m//DlSoFwhQEbp4i/NS
+         eGEaCL2abI9d2Qo/vgVE47lljuFHl9RIsYb9haWI9DYl1+oIMHXMK3O9uyeK26H4D1AX
+         Jy4saNgfSyFkb5FP8pbKE6ds3BSqIpGBCoZu+qijzq/vfSl1dGYXTnehjmH9/ySByi+z
+         BIOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=+owYc1beiZNdVQWI5pfer3AMJMG+Sa0wwOUcL3jCg/M=;
-        b=ls0b83qUXC3xJ2HZfRv32kpMEvjXS+v3Debw5y+qJJAoA9VdEbU5HQQdNTtV9vyCr3
-         qoI2nV93snilIuNGMlYmvUsfnQb/tYR6ousJ+Sat9U2f2Vwurc0MF0Lw+KMAy7Mr7enM
-         bwgW0bFrFBom13/+CvXeutsH7/k5nksIeWDdhrFSEKqJ+azagyvhUZCq1iSZuPxDUcdo
-         JR/7JaylR4IMI2d51ORLSLMSGYT4aL92pR6wU65AF/JlTFR3Qh+smQbvJTzCnDWve7Qh
-         ytcVUfHAIokfujeSlrfGCMt3OK99xeIZucBsi312BnG8IgaqOOdquy979EFVMi8S4ieq
-         +o1w==
-X-Gm-Message-State: AOAM530PNtWwwnB/+39GrQp8GzkXkxVdPAfoQFgZdY3yOvmSCwXEmwz0
-        /4eLkCuCOLcOfnoD1P5NjKneEmNOVNKDBloG
-X-Google-Smtp-Source: ABdhPJwNk7hy6g36u2v2wPwp/L7scAUbPYKRT4PM+N0nuOLZg5Ue5d7LQjdVp7ZLYxBbSMx6+xBXBQ==
-X-Received: by 2002:a17:902:7802:b0:150:baa:bc1a with SMTP id p2-20020a170902780200b001500baabc1amr33493067pll.110.1646274308811;
-        Wed, 02 Mar 2022 18:25:08 -0800 (PST)
-Received: from localhost.localdomain ([157.255.44.218])
-        by smtp.gmail.com with ESMTPSA id s9-20020a056a00194900b004e1583f88a2sm490687pfk.0.2022.03.02.18.25.05
+         :references;
+        bh=C6016/38QKZUQAyk5HMPjenTvm42Pe8sPBzTcqL5vmY=;
+        b=CzJtZPcuhcWcftaDgdBMfTH8+c9EoS3XmQ505LWS57kdN7/Y7hxiGiFhGCtkVhWR4n
+         9QiYMg9DgjK+2U+OgCUW8Ihc/Zsz1tArsI+VPvsbHeizYXBDN8PT/Evowom4DSVx5ZKW
+         SbKPrObrC5eMgExacIP+ZPEND4qx5Us+NJQ0WRDXPRpYk5m/o2sqMuwebEko7dN7/HEk
+         eAq5ky/UWz0+SWqk5EOcM1gkci5Yts4Pn4Ct+p/tQQvAT2EONElmTfre57WvwdfOJKPi
+         0JSo3Tr1FuDqKJWi6MM1A+v0Yqa4E2WoDAES5x9cgi/rm9pPbPuEvHVBoD12sn5e/d+j
+         6agg==
+X-Gm-Message-State: AOAM531YwoKciGKl5/xB3iguH9sB6KyY7W/Y8igN4n9GDfpUTuo8ZSvU
+        LuwF03lr62QEMLGgZKYD3hLDUsWYyg5BSQ==
+X-Google-Smtp-Source: ABdhPJwdGKGtPoJbq9KB0b78P8kOQOqlHazHAUCZQHvA6TzNHcldJErwW75BUHOqmaVxrll88UvLqQ==
+X-Received: by 2002:a17:902:ec90:b0:151:a632:7ebb with SMTP id x16-20020a170902ec9000b00151a6327ebbmr1936164plg.154.1646274473191;
+        Wed, 02 Mar 2022 18:27:53 -0800 (PST)
+Received: from ubuntu.huawei.com ([119.3.119.19])
+        by smtp.googlemail.com with ESMTPSA id d15-20020a17090ab30f00b001b8e65326b3sm359822pjr.9.2022.03.02.18.27.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Mar 2022 18:25:08 -0800 (PST)
-From:   Harold Huang <baymaxhuang@gmail.com>
-To:     netdev@vger.kernel.org
-Cc:     jasowang@redhat.com, edumazet@google.com,
-        Harold Huang <baymaxhuang@gmail.com>,
-        Eric Dumazet <eric.dumazet@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        linux-kernel@vger.kernel.org (open list),
-        kvm@vger.kernel.org (open list:VIRTIO HOST (VHOST)),
-        virtualization@lists.linux-foundation.org (open list:VIRTIO HOST
-        (VHOST)), bpf@vger.kernel.org (open list:XDP (eXpress Data Path))
-Subject: [PATCH net-next] tuntap: add sanity checks about msg_controllen in sendmsg
-Date:   Thu,  3 Mar 2022 10:24:40 +0800
-Message-Id: <20220303022441.383865-1-baymaxhuang@gmail.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20220301064314.2028737-1-baymaxhuang@gmail.com>
-References: <20220301064314.2028737-1-baymaxhuang@gmail.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Wed, 02 Mar 2022 18:27:52 -0800 (PST)
+From:   Xiaomeng Tong <xiam0nd.tong@gmail.com>
+To:     david.laight@aculab.com
+Cc:     akpm@linux-foundation.org, alsa-devel@alsa-project.org,
+        amd-gfx@lists.freedesktop.org, andriy.shevchenko@linux.intel.com,
+        arnd@arndb.de, bcm-kernel-feedback-list@broadcom.com,
+        bjohannesmeyer@gmail.com, c.giuffrida@vu.nl,
+        christian.koenig@amd.com, christophe.jaillet@wanadoo.fr,
+        dan.carpenter@oracle.com, dmaengine@vger.kernel.org,
+        drbd-dev@lists.linbit.com, dri-devel@lists.freedesktop.org,
+        gustavo@embeddedor.com, h.j.bos@vu.nl,
+        intel-gfx@lists.freedesktop.org, intel-wired-lan@lists.osuosl.org,
+        jakobkoschel@gmail.com, jgg@ziepe.ca, keescook@chromium.org,
+        kgdb-bugreport@lists.sourceforge.net, kvm@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-aspeed@lists.ozlabs.org, linux-block@vger.kernel.org,
+        linux-cifs@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org, linux-iio@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, linux-pm@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-sgx@vger.kernel.org, linux-staging@lists.linux.dev,
+        linux-tegra@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-wireless@vger.kernel.org,
+        linux1394-devel@lists.sourceforge.net, linux@rasmusvillemoes.dk,
+        linuxppc-dev@lists.ozlabs.org, nathan@kernel.org,
+        netdev@vger.kernel.org, nouveau@lists.freedesktop.org,
+        rppt@kernel.org, samba-technical@lists.samba.org,
+        tglx@linutronix.de, tipc-discussion@lists.sourceforge.net,
+        torvalds@linux-foundation.org,
+        v9fs-developer@lists.sourceforge.net, xiam0nd.tong@gmail.com
+Subject: RE: [PATCH 2/6] treewide: remove using list iterator after loop body as a ptr
+Date:   Thu,  3 Mar 2022 10:27:29 +0800
+Message-Id: <20220303022729.9321-1-xiam0nd.tong@gmail.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <1077f17e50d34dc2bbfdf4e52a1cb2fd@AcuMS.aculab.com>
+References: <1077f17e50d34dc2bbfdf4e52a1cb2fd@AcuMS.aculab.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
         RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
@@ -81,61 +93,34 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In patch [1], tun_msg_ctl was added to allow pass batched xdp buffers to
-tun_sendmsg. Although we donot use msg_controllen in this path, we should
-check msg_controllen to make sure the caller pass a valid msg_ctl.
+On Wed, 2 Mar 2022 14:04:06 +0000, David Laight
+<David.Laight@ACULAB.COM> wrote:
+> I think that it would be better to make any alternate loop macro
+> just set the variable to NULL on the loop exit.
+> That is easier to code for and the compiler might be persuaded to
+> not redo the test.
 
-[1]: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=fe8dd45bb7556246c6b76277b1ba4296c91c2505
+No, that would lead to a NULL dereference.
 
-Reported-by: Eric Dumazet <eric.dumazet@gmail.com>
-Suggested-by: Jason Wang <jasowang@redhat.com>
-Signed-off-by: Harold Huang <baymaxhuang@gmail.com>
----
- drivers/net/tap.c   | 3 ++-
- drivers/net/tun.c   | 3 ++-
- drivers/vhost/net.c | 1 +
- 3 files changed, 5 insertions(+), 2 deletions(-)
+The problem is the mis-use of iterator outside the loop on exit, and
+the iterator will be the HEAD's container_of pointer which pointers
+to a type-confused struct. Sidenote: The *mis-use* here refers to
+mistakely access to other members of the struct, instead of the
+list_head member which acutally is the valid HEAD.
 
-diff --git a/drivers/net/tap.c b/drivers/net/tap.c
-index 8e3a28ba6b28..ba2ef5437e16 100644
---- a/drivers/net/tap.c
-+++ b/drivers/net/tap.c
-@@ -1198,7 +1198,8 @@ static int tap_sendmsg(struct socket *sock, struct msghdr *m,
- 	struct xdp_buff *xdp;
- 	int i;
- 
--	if (ctl && (ctl->type == TUN_MSG_PTR)) {
-+	if (m->msg_controllen == sizeof(struct tun_msg_ctl) &&
-+	    ctl && ctl->type == TUN_MSG_PTR) {
- 		for (i = 0; i < ctl->num; i++) {
- 			xdp = &((struct xdp_buff *)ctl->ptr)[i];
- 			tap_get_user_xdp(q, xdp);
-diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-index 969ea69fd29d..2a0d8a5d7aec 100644
---- a/drivers/net/tun.c
-+++ b/drivers/net/tun.c
-@@ -2501,7 +2501,8 @@ static int tun_sendmsg(struct socket *sock, struct msghdr *m, size_t total_len)
- 	if (!tun)
- 		return -EBADFD;
- 
--	if (ctl && (ctl->type == TUN_MSG_PTR)) {
-+	if (m->msg_controllen == sizeof(struct tun_msg_ctl) &&
-+	    ctl && ctl->type == TUN_MSG_PTR) {
- 		struct tun_page tpage;
- 		int n = ctl->num;
- 		int flush = 0, queued = 0;
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index 28ef323882fb..792ab5f23647 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -473,6 +473,7 @@ static void vhost_tx_batch(struct vhost_net *net,
- 		goto signal_used;
- 
- 	msghdr->msg_control = &ctl;
-+	msghdr->msg_controllen = sizeof(ctl);
- 	err = sock->ops->sendmsg(sock, msghdr, 0);
- 	if (unlikely(err < 0)) {
- 		vq_err(&nvq->vq, "Fail to batch sending packets\n");
--- 
-2.27.0
+IOW, you would dereference a (NULL + offset_of_member) address here.
 
+Please remind me if i missed something, thanks.
+
+> OTOH there may be alternative definitions that can be used to get
+> the compiler (or other compiler-like tools) to detect broken code.
+> Even if the definition can't possibly generate a working kerrnel.
+
+The "list_for_each_entry_inside(pos, type, head, member)" way makes
+the iterator invisiable outside the loop, and would be catched by
+compiler if use-after-loop things happened.
+
+Can you share your "alternative definitions" details? thanks!
+
+--
+Xiaomeng Tong
