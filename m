@@ -2,87 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3306D4CB4E3
-	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 03:28:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AFC174CB53B
+	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 04:07:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231778AbiCCC2l (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Mar 2022 21:28:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41870 "EHLO
+        id S231915AbiCCC7S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 21:59:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60638 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231743AbiCCC2i (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 21:28:38 -0500
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B340D10FC6;
-        Wed,  2 Mar 2022 18:27:53 -0800 (PST)
-Received: by mail-pj1-x102e.google.com with SMTP id p3-20020a17090a680300b001bbfb9d760eso6464723pjj.2;
-        Wed, 02 Mar 2022 18:27:53 -0800 (PST)
+        with ESMTP id S231910AbiCCC7R (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 21:59:17 -0500
+Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC195DCE36;
+        Wed,  2 Mar 2022 18:58:31 -0800 (PST)
+Received: by mail-io1-xd33.google.com with SMTP id q8so4293198iod.2;
+        Wed, 02 Mar 2022 18:58:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=C6016/38QKZUQAyk5HMPjenTvm42Pe8sPBzTcqL5vmY=;
-        b=qBGtve+IuFrAkJa+gsN1WQjHRs2fvQkSK1D44BenBKAqsyswWIPF49CjeAw6Lc/Xiz
-         7VY9uX10GWOeYOq3Roffx9lK59MGCnSnWmLkHD6Zz3XGADMqQbIXFAspvzlfyt7tl87F
-         C44YITS/y0gKUKqqxM42VKL4jH/Xx4KasojD++jZOWXtcwkx1m//DlSoFwhQEbp4i/NS
-         eGEaCL2abI9d2Qo/vgVE47lljuFHl9RIsYb9haWI9DYl1+oIMHXMK3O9uyeK26H4D1AX
-         Jy4saNgfSyFkb5FP8pbKE6ds3BSqIpGBCoZu+qijzq/vfSl1dGYXTnehjmH9/ySByi+z
-         BIOg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=1H4fbbodFL+rmUux9zr3IzveyrIH4qejmueZOopSFSg=;
+        b=Kn+3avd5LqetsWkpBJPiPKBACwyOVorChnB4+tsXtro6mJbJwxoOae6JK/+rNostCe
+         uRhMqiHPo6muvKqG8tnESlPH+sSQ/mPAx+RbLdL3ghK/rZ7LrzIDKmfbysWgesD2BVIg
+         1HfpkwiZzz2L/0zkG0QiJp68z7HD7QneSTYYGUv121SuQmYtCS1QpRFuTCHG8/ilZx1r
+         neFmOCkEQtcOi3diu1HXk/OapCAsP00TDyPU6ZxqdgLXHzZng1RbhQqCwzQXVNhRlESQ
+         5TN+43LGAAvIQihac/wibSwGwMMGgMMSdbhdK7mzlEmnrAAG4WAubdPun3XQiXoMJB8u
+         Ufqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=C6016/38QKZUQAyk5HMPjenTvm42Pe8sPBzTcqL5vmY=;
-        b=CzJtZPcuhcWcftaDgdBMfTH8+c9EoS3XmQ505LWS57kdN7/Y7hxiGiFhGCtkVhWR4n
-         9QiYMg9DgjK+2U+OgCUW8Ihc/Zsz1tArsI+VPvsbHeizYXBDN8PT/Evowom4DSVx5ZKW
-         SbKPrObrC5eMgExacIP+ZPEND4qx5Us+NJQ0WRDXPRpYk5m/o2sqMuwebEko7dN7/HEk
-         eAq5ky/UWz0+SWqk5EOcM1gkci5Yts4Pn4Ct+p/tQQvAT2EONElmTfre57WvwdfOJKPi
-         0JSo3Tr1FuDqKJWi6MM1A+v0Yqa4E2WoDAES5x9cgi/rm9pPbPuEvHVBoD12sn5e/d+j
-         6agg==
-X-Gm-Message-State: AOAM531YwoKciGKl5/xB3iguH9sB6KyY7W/Y8igN4n9GDfpUTuo8ZSvU
-        LuwF03lr62QEMLGgZKYD3hLDUsWYyg5BSQ==
-X-Google-Smtp-Source: ABdhPJwdGKGtPoJbq9KB0b78P8kOQOqlHazHAUCZQHvA6TzNHcldJErwW75BUHOqmaVxrll88UvLqQ==
-X-Received: by 2002:a17:902:ec90:b0:151:a632:7ebb with SMTP id x16-20020a170902ec9000b00151a6327ebbmr1936164plg.154.1646274473191;
-        Wed, 02 Mar 2022 18:27:53 -0800 (PST)
-Received: from ubuntu.huawei.com ([119.3.119.19])
-        by smtp.googlemail.com with ESMTPSA id d15-20020a17090ab30f00b001b8e65326b3sm359822pjr.9.2022.03.02.18.27.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Mar 2022 18:27:52 -0800 (PST)
-From:   Xiaomeng Tong <xiam0nd.tong@gmail.com>
-To:     david.laight@aculab.com
-Cc:     akpm@linux-foundation.org, alsa-devel@alsa-project.org,
-        amd-gfx@lists.freedesktop.org, andriy.shevchenko@linux.intel.com,
-        arnd@arndb.de, bcm-kernel-feedback-list@broadcom.com,
-        bjohannesmeyer@gmail.com, c.giuffrida@vu.nl,
-        christian.koenig@amd.com, christophe.jaillet@wanadoo.fr,
-        dan.carpenter@oracle.com, dmaengine@vger.kernel.org,
-        drbd-dev@lists.linbit.com, dri-devel@lists.freedesktop.org,
-        gustavo@embeddedor.com, h.j.bos@vu.nl,
-        intel-gfx@lists.freedesktop.org, intel-wired-lan@lists.osuosl.org,
-        jakobkoschel@gmail.com, jgg@ziepe.ca, keescook@chromium.org,
-        kgdb-bugreport@lists.sourceforge.net, kvm@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-aspeed@lists.ozlabs.org, linux-block@vger.kernel.org,
-        linux-cifs@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net,
-        linux-fsdevel@vger.kernel.org, linux-iio@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-mediatek@lists.infradead.org, linux-pm@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-sgx@vger.kernel.org, linux-staging@lists.linux.dev,
-        linux-tegra@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-wireless@vger.kernel.org,
-        linux1394-devel@lists.sourceforge.net, linux@rasmusvillemoes.dk,
-        linuxppc-dev@lists.ozlabs.org, nathan@kernel.org,
-        netdev@vger.kernel.org, nouveau@lists.freedesktop.org,
-        rppt@kernel.org, samba-technical@lists.samba.org,
-        tglx@linutronix.de, tipc-discussion@lists.sourceforge.net,
-        torvalds@linux-foundation.org,
-        v9fs-developer@lists.sourceforge.net, xiam0nd.tong@gmail.com
-Subject: RE: [PATCH 2/6] treewide: remove using list iterator after loop body as a ptr
-Date:   Thu,  3 Mar 2022 10:27:29 +0800
-Message-Id: <20220303022729.9321-1-xiam0nd.tong@gmail.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <1077f17e50d34dc2bbfdf4e52a1cb2fd@AcuMS.aculab.com>
-References: <1077f17e50d34dc2bbfdf4e52a1cb2fd@AcuMS.aculab.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=1H4fbbodFL+rmUux9zr3IzveyrIH4qejmueZOopSFSg=;
+        b=eFtj1vDvx4CDVaXQC9KySuO7bO+3IryH0e5rQQ/iuQ680a2Vlsw/tYp+Xs950tf4aG
+         MWtS1ejsq9C24mPSDMjEjkz3YjnwKKvWE7eglF2GICmI28UxFeRCxErDuXz85qyvpe46
+         puO4tCRK2BuvgjclFhpKBKbS5YkQo+r6pl09wJf+sjuzlqWxoOi4wOllIY8n5ajPEnv9
+         e02VjMQ0RZuZ3125jAyWrp0mSmtJB9acZBmkhLN906wvZTjFVdLbFZxshfIPMOgkyrGZ
+         6VC8HZ1YbxT8RkSO0CJNdtxrk6q9hYeBBr3/pEyjh+GoArLp/mEvrCtekJW6E99oTiTA
+         8nug==
+X-Gm-Message-State: AOAM530SAjHhUyv0b9khqR7FeFTpfw57yWTdXrAHjVbywPV+uG6yCzCw
+        cPU7RCUkzogc5HTYNF96nzeLiCBQNZYi1bnaYlQ=
+X-Google-Smtp-Source: ABdhPJxM6u0ZGEggPTQ7pSChdE1EmALRR0gWb+iKx5lq+RjU2pcSXVpp3RaJkXEUJoBpFdnEytRHi9oB99BOzhOGQZM=
+X-Received: by 2002:a02:a984:0:b0:317:36c9:b572 with SMTP id
+ q4-20020a02a984000000b0031736c9b572mr14083601jam.252.1646276311176; Wed, 02
+ Mar 2022 18:58:31 -0800 (PST)
+MIME-Version: 1.0
+References: <20220301063756.16817-1-flyingpeng@tencent.com>
+ <Yh5d7XBD9D4FhEe3@google.com> <CAPm50a+p2pSjExDwPmGpZ_aTuxs=x6RZ4-AAD19RDQx2o-=NCw@mail.gmail.com>
+ <YiAZ3wTICeLTVnJz@google.com>
+In-Reply-To: <YiAZ3wTICeLTVnJz@google.com>
+From:   Hao Peng <flyingpenghao@gmail.com>
+Date:   Thu, 3 Mar 2022 10:56:59 +0800
+Message-ID: <CAPm50aLJ51mm9JVpTMQCkNENX_9-Do5UeH5zxu-5byOcOFsJBg@mail.gmail.com>
+Subject: Re: [PATCH] kvm: x86: Improve virtual machine startup performance
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
         RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
@@ -93,34 +67,67 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2 Mar 2022 14:04:06 +0000, David Laight
-<David.Laight@ACULAB.COM> wrote:
-> I think that it would be better to make any alternate loop macro
-> just set the variable to NULL on the loop exit.
-> That is easier to code for and the compiler might be persuaded to
-> not redo the test.
+On Thu, Mar 3, 2022 at 9:29 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Wed, Mar 02, 2022, Hao Peng wrote:
+> > On Wed, Mar 2, 2022 at 1:54 AM Sean Christopherson <seanjc@google.com> wrote:
+> > >
+> > > On Tue, Mar 01, 2022, Peng Hao wrote:
+> > > >  From: Peng Hao <flyingpeng@tencent.com>
+> > > >
+> > > > vcpu 0 will repeatedly enter/exit the smm state during the startup
+> > > > phase, and kvm_init_mmu will be called repeatedly during this process.
+> > > > There are parts of the mmu initialization code that do not need to be
+> > > > modified after the first initialization.
+> > > >
+> > > > Statistics on my server, vcpu0 when starting the virtual machine
+> > > > Calling kvm_init_mmu more than 600 times (due to smm state switching).
+> > > > The patch can save about 36 microseconds in total.
+> > > >
+> > > > Signed-off-by: Peng Hao <flyingpeng@tencent.com>
+> > > > ---
+> > > > @@ -5054,7 +5059,7 @@ void kvm_mmu_after_set_cpuid(struct kvm_vcpu *vcpu)
+> > > >  void kvm_mmu_reset_context(struct kvm_vcpu *vcpu)
+> > > >  {
+> > > >       kvm_mmu_unload(vcpu);
+> > > > -     kvm_init_mmu(vcpu);
+> > > > +     kvm_init_mmu(vcpu, false);
+> > >
+> > > This is wrong, kvm_mmu_reset_context() is the "big hammer" and is expected to
+> > > unconditionally get the MMU to a known good state.  E.g. failure to initialize
+> > > means this code:
+> > >
+> > >         context->shadow_root_level = kvm_mmu_get_tdp_level(vcpu);
+> > >
+> > > will not update the shadow_root_level as expected in response to userspace changing
+> > > guest.MAXPHYADDR in such a way that KVM enables/disables 5-level paging.
+> > >
+> > Thanks for pointing this out. However, other than shadow_root_level,
+> > other fields of context will not
+> > change during the entire operation, such as
+> > page_fault/sync_page/direct_map and so on under
+> > the condition of tdp_mmu.
+> > Is this patch still viable after careful confirmation of the fields
+> > that won't be modified?
+>
+> No, passing around the "init" flag is a hack.
+>
+> But, we can achieve what you want simply by initializing the constant data once
+> per vCPU.  There's a _lot_ of state that is constant for a given MMU now that KVM
+> uses separate MMUs for L1 vs. L2 when TDP is enabled.  I should get patches posted
+> tomorrow, just need to test (famous last words).
+>
+> Also, based on the number of SMM transitions, I'm guessing you're using SeaBIOS.
+> Have you tried disabling CONFIG_CALL32_SMM, or CONFIG_USE_SMM altogether?  That
+> might be an even better way to improve performance in your environment.
+>
 
-No, that would lead to a NULL dereference.
+Both options are disabled in guest.
+> Last question, do you happen to know why eliminating this code shaves 36us?  The
+> raw writes don't seem like they'd take that long.  Maybe the writes to function
+> pointers trigger stalls or mispredicts or something?  If you don't have an easy
+> answer, don't bother investigating, I'm just curious.
 
-The problem is the mis-use of iterator outside the loop on exit, and
-the iterator will be the HEAD's container_of pointer which pointers
-to a type-confused struct. Sidenote: The *mis-use* here refers to
-mistakely access to other members of the struct, instead of the
-list_head member which acutally is the valid HEAD.
-
-IOW, you would dereference a (NULL + offset_of_member) address here.
-
-Please remind me if i missed something, thanks.
-
-> OTOH there may be alternative definitions that can be used to get
-> the compiler (or other compiler-like tools) to detect broken code.
-> Even if the definition can't possibly generate a working kerrnel.
-
-The "list_for_each_entry_inside(pos, type, head, member)" way makes
-the iterator invisiable outside the loop, and would be catched by
-compiler if use-after-loop things happened.
-
-Can you share your "alternative definitions" details? thanks!
-
---
-Xiaomeng Tong
+I'm guessing it's because of the cache. At first, I wanted to replace
+it with memcpy, if the modified fields are continuous enough, I can
+use instructions such as erms/fsrm.
