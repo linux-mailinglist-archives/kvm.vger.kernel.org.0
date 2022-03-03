@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C1BA04CBD3F
-	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 13:00:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7042A4CBD43
+	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 13:00:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232021AbiCCMBE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Mar 2022 07:01:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46936 "EHLO
+        id S232903AbiCCMBO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Mar 2022 07:01:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47586 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231488AbiCCMBC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Mar 2022 07:01:02 -0500
+        with ESMTP id S232691AbiCCMBJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Mar 2022 07:01:09 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B920316EAB8
-        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 04:00:16 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6A03316FDE9
+        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 04:00:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646308815;
+        s=mimecast20190719; t=1646308823;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=efzJa6/W9diGcwuLPP5Fb7/4uwCddpKtVjz83/Ys+RU=;
-        b=U485DyfOOO0Lw6lKypm8oyImjySGyeiPwMFGKp1aslTn8Yl8X0eD1fukHZYFZqNJc7AOqn
-        ZdMrgYSb4+pRysODuz4rGaEt4vgVHOa1a1IYWvVW8uPofWMOa6ArbdXCdAzEiNyiVF/M5N
-        H18i0Chy9Ay0ubIu9Qr8nO4j6UQ179M=
+        bh=GU2PkYv/oO0WBN6akEtPQqLOjiJQ79hZYXxHxM/rB9g=;
+        b=Z3vDCWnv18peahKMKJz4D7qb+Yazko2rBabvod6L2EzDE9FuwiYyMaoxdQswnWl0RQEK6g
+        UpjyfAFC+MZ3xa9MqAQFcEvU1oDe+XBSrWqJLxHvv4UN3CwErfXyfve5d9MuNhwT/XgQwA
+        yh48wGFGgqdNjSGdvYfL+pJRyiGvUIU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-211-3W1kVpZMPwuJ_4tjpoIfAA-1; Thu, 03 Mar 2022 07:00:14 -0500
-X-MC-Unique: 3W1kVpZMPwuJ_4tjpoIfAA-1
+ us-mta-601-ws9u5eVDPgS5WbHEubGu6g-1; Thu, 03 Mar 2022 07:00:19 -0500
+X-MC-Unique: ws9u5eVDPgS5WbHEubGu6g-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9D791180FD72;
-        Thu,  3 Mar 2022 12:00:12 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C917F824FA6;
+        Thu,  3 Mar 2022 12:00:17 +0000 (UTC)
 Received: from toolbox.redhat.com (unknown [10.33.37.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C2A4C842CC;
-        Thu,  3 Mar 2022 12:00:07 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 00CBE842CC;
+        Thu,  3 Mar 2022 12:00:12 +0000 (UTC)
 From:   Sergio Lopez <slp@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
@@ -60,9 +60,9 @@ Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
         Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
         Eric Farman <farman@linux.ibm.com>,
         Sergio Lopez <slp@redhat.com>
-Subject: [PATCH v3 2/4] vhost: use wfd on functions setting vring call fd
-Date:   Thu,  3 Mar 2022 12:59:09 +0100
-Message-Id: <20220303115911.20962-3-slp@redhat.com>
+Subject: [PATCH v3 3/4] configure, meson: allow enabling vhost-user on all POSIX systems
+Date:   Thu,  3 Mar 2022 12:59:10 +0100
+Message-Id: <20220303115911.20962-4-slp@redhat.com>
 In-Reply-To: <20220303115911.20962-1-slp@redhat.com>
 References: <20220303115911.20962-1-slp@redhat.com>
 MIME-Version: 1.0
@@ -78,42 +78,48 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When ioeventfd is emulated using qemu_pipe(), only EventNotifier's wfd
-can be used for writing.
+With the possibility of using a pipe pair via qemu_pipe() as a
+replacement on operating systems that doesn't support eventfd,
+vhost-user can also work on all POSIX systems.
 
-Use the recently introduced event_notifier_get_wfd() function to
-obtain the fd that our peer must use to signal the vring.
+This change allows enabling vhost-user on all non-Windows platforms
+and makes libvhost_user (which still depends on eventfd) a linux-only
+feature.
 
 Signed-off-by: Sergio Lopez <slp@redhat.com>
 ---
- hw/virtio/vhost.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ configure   | 4 ++--
+ meson.build | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index 7b03efccec..b643f42ea4 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -1287,7 +1287,7 @@ static int vhost_virtqueue_init(struct vhost_dev *dev,
-         return r;
-     }
+diff --git a/configure b/configure
+index c56ed53ee3..daccf4be7c 100755
+--- a/configure
++++ b/configure
+@@ -1659,8 +1659,8 @@ fi
+ # vhost interdependencies and host support
  
--    file.fd = event_notifier_get_fd(&vq->masked_notifier);
-+    file.fd = event_notifier_get_wfd(&vq->masked_notifier);
-     r = dev->vhost_ops->vhost_set_vring_call(dev, &file);
-     if (r) {
-         VHOST_OPS_DEBUG(r, "vhost_set_vring_call failed");
-@@ -1542,9 +1542,9 @@ void vhost_virtqueue_mask(struct vhost_dev *hdev, VirtIODevice *vdev, int n,
+ # vhost backends
+-if test "$vhost_user" = "yes" && test "$linux" != "yes"; then
+-  error_exit "vhost-user is only available on Linux"
++if test "$vhost_user" = "yes" && test "$mingw32" = "yes"; then
++  error_exit "vhost-user is not available on Windows"
+ fi
+ test "$vhost_vdpa" = "" && vhost_vdpa=$linux
+ if test "$vhost_vdpa" = "yes" && test "$linux" != "yes"; then
+diff --git a/meson.build b/meson.build
+index 8df40bfac4..f2bc439c30 100644
+--- a/meson.build
++++ b/meson.build
+@@ -2701,7 +2701,7 @@ if have_system or have_user
+ endif
  
-     if (mask) {
-         assert(vdev->use_guest_notifier_mask);
--        file.fd = event_notifier_get_fd(&hdev->vqs[index].masked_notifier);
-+        file.fd = event_notifier_get_wfd(&hdev->vqs[index].masked_notifier);
-     } else {
--        file.fd = event_notifier_get_fd(virtio_queue_get_guest_notifier(vvq));
-+        file.fd = event_notifier_get_wfd(virtio_queue_get_guest_notifier(vvq));
-     }
- 
-     file.index = hdev->vhost_ops->vhost_get_vq_index(hdev, n);
+ vhost_user = not_found
+-if 'CONFIG_VHOST_USER' in config_host
++if targetos == 'linux' and 'CONFIG_VHOST_USER' in config_host
+   libvhost_user = subproject('libvhost-user')
+   vhost_user = libvhost_user.get_variable('vhost_user_dep')
+ endif
 -- 
 2.35.1
 
