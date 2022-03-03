@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5F7374CC1C3
-	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 16:42:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CA7214CC1BA
+	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 16:41:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233923AbiCCPnN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Mar 2022 10:43:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34662 "EHLO
+        id S234630AbiCCPme (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Mar 2022 10:42:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34406 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233536AbiCCPmi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Mar 2022 10:42:38 -0500
+        with ESMTP id S234600AbiCCPmb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Mar 2022 10:42:31 -0500
 Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1FEF1959CE
-        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 07:41:52 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B0FB1959CE
+        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 07:41:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=desiato.20200630; h=Sender:Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
-        Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=t/t4vi32xyAB8sLIX5XXV6CjhaOVeCGNYqhNLORlvw0=; b=Mie/wLUys5Jp+iRy70LqBzekD2
-        SMeE9C86hTMjpeZCS5wVhCxq7our94Ec5TRlOh/HK0QSlhbK46YjQ4K7cnWvS3Nu1Rm5mIBNRHtac
-        faKqUCPb+z1cJVHGT5FEI3nPU/fWL6gcAZhCFUk1j2wrQqr6GDvLl1I4hxVpEeIIV6jks3xLEQIj7
-        bnX9NSe2IGAgA3hJ3KRUQ37PK8CncxUt4ifhUgyN7FPOj4Fn0N1Kh2cIKOnsIhj2B9eEDfMYKucwb
-        6iOvnY4sTtuLdIp5hnIlyRQ805jTzlYNA0GDqwag55JlwRHs108Cablc5IfCHXM2jlTXPXQ0W8XDR
-        a4TLi3Jw==;
+        Content-Type:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:
+        To:From:Reply-To:Content-ID:Content-Description;
+        bh=E1lGyPCOqj8/Thz5SpSAHDcozrf0l5x+4l/zK0edMLA=; b=CvKmZRjvrAQEOUbbGkj3Uo2Df/
+        9EQ2TBNMP357n/zT1+pD5QnupHhyJpRoAU7HwHaQDKsFQ0+7cvRLqOK55Wznl8icLQq+6rlTNIqEj
+        J6WomAmA+z/FsgYoBQC/pkXNc1LV8XzxEUwN7MbwXz7gzopZGyeKOfVjlV5ZR9f+gNPw40eMFYvZE
+        TqNqVTMKjZWg9PZBZYAE60nyh1oMoXVvS8FS9P1qVZA82LtlqFGhOalptQtLENwS0vpidajhf8/AP
+        aNX0n+EkNhDYnbA0A4fYctNyOmccry5+5tPF40M890kIr9hjm6ycAWbWInvKwqkx6t9oLbt2adLl3
+        cE/XQ7Ow==;
 Received: from [2001:8b0:10b:1:85c4:81a:fb42:714d] (helo=i7.infradead.org)
         by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nPna6-00EwkC-Q3; Thu, 03 Mar 2022 15:41:30 +0000
+        id 1nPna6-00Ewk9-K2; Thu, 03 Mar 2022 15:41:30 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nPna5-000qnH-3n; Thu, 03 Mar 2022 15:41:29 +0000
+        id 1nPna5-000qnK-4X; Thu, 03 Mar 2022 15:41:29 +0000
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -40,13 +40,14 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Boris Ostrovsky <boris.ostrovsky@oracle.com>,
         Metin Kaya <metikaya@amazon.co.uk>,
         Paul Durrant <pdurrant@amazon.co.uk>
-Subject: [PATCH v3 14/17] KVM: x86/xen: Support per-vCPU event channel upcall via local APIC
-Date:   Thu,  3 Mar 2022 15:41:24 +0000
-Message-Id: <20220303154127.202856-15-dwmw2@infradead.org>
+Subject: [PATCH v3 15/17] KVM: x86/xen: Advertise and document KVM_XEN_HVM_CONFIG_EVTCHN_SEND
+Date:   Thu,  3 Mar 2022 15:41:25 +0000
+Message-Id: <20220303154127.202856-16-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.33.1
 In-Reply-To: <20220303154127.202856-1-dwmw2@infradead.org>
 References: <20220303154127.202856-1-dwmw2@infradead.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: David Woodhouse <dwmw2@infradead.org>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
@@ -62,132 +63,266 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: David Woodhouse <dwmw@amazon.co.uk>
 
-Windows uses a per-vCPU vector, and it's delivered via the local APIC
-basically like an MSI (with associated EOI) unlike the traditional
-guest-wide vector which is just magically asserted by Xen (and in the
-KVM case by kvm_xen_has_interrupt() / kvm_cpu_get_extint()).
+At the end of the patch series adding this batch of event channel
+acceleration features, finally add the feature bit which advertises
+them and document it all.
 
-Now that the kernel is able to raise event channel events for itself,
-being able to do so for Windows guests is also going to be useful.
+For SCHEDOP_poll we need to wake a polling vCPU when a given port
+is triggered, even when it's masked — and we want to implement that
+in the kernel, for efficiency. So we want the kernel to know that it
+has sole ownership of event channel delivery. Thus, we allow
+userspace to make the 'promise' by setting the corresponding feature
+bit in its KVM_XEN_HVM_CONFIG call. As we implement SCHEDOP_poll
+bypass later, we will do so only if that promise has been made by
+userspace.
 
 Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 ---
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/kvm/xen.c              | 40 +++++++++++++++++++++++++++++++++
- include/uapi/linux/kvm.h        |  2 ++
- 3 files changed, 43 insertions(+)
+ Documentation/virt/kvm/api.rst | 129 ++++++++++++++++++++++++++++++---
+ arch/x86/kvm/x86.c             |   3 +-
+ arch/x86/kvm/xen.c             |   6 +-
+ include/uapi/linux/kvm.h       |   1 +
+ 4 files changed, 127 insertions(+), 12 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 74b10c5859aa..30f6fc549235 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -602,6 +602,7 @@ struct kvm_vcpu_hv {
- struct kvm_vcpu_xen {
- 	u64 hypercall_rip;
- 	u32 current_runstate;
-+	u8 upcall_vector;
- 	struct gfn_to_pfn_cache vcpu_info_cache;
- 	struct gfn_to_pfn_cache vcpu_time_info_cache;
- 	struct gfn_to_pfn_cache runstate_cache;
-diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index 747a11ee0950..fe8661545db3 100644
---- a/arch/x86/kvm/xen.c
-+++ b/arch/x86/kvm/xen.c
-@@ -332,6 +332,22 @@ void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, int state)
- 	mark_page_dirty_in_slot(v->kvm, gpc->memslot, gpc->gpa >> PAGE_SHIFT);
- }
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index f9b32efc8b4a..14616aa36833 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -988,12 +988,22 @@ memory.
+ 	__u8 pad2[30];
+   };
  
-+static void kvm_xen_inject_vcpu_vector(struct kvm_vcpu *v)
-+{
-+	struct kvm_lapic_irq irq = { };
-+	int r;
+-If the KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL flag is returned from the
+-KVM_CAP_XEN_HVM check, it may be set in the flags field of this ioctl.
+-This requests KVM to generate the contents of the hypercall page
+-automatically; hypercalls will be intercepted and passed to userspace
+-through KVM_EXIT_XEN.  In this case, all of the blob size and address
+-fields must be zero.
++If certain flags are returned from the KVM_CAP_XEN_HVM check, they may
++be set in the flags field of this ioctl:
 +
-+	irq.dest_id = v->vcpu_id;
-+	irq.vector = v->arch.xen.upcall_vector;
-+	irq.dest_mode = APIC_DEST_PHYSICAL;
-+	irq.shorthand = APIC_DEST_NOSHORT;
-+	irq.delivery_mode = APIC_DM_FIXED;
-+	irq.level = 1;
++The KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL flag requests KVM to generate
++the contents of the hypercall page automatically; hypercalls will be
++intercepted and passed to userspace through KVM_EXIT_XEN.  In this
++ase, all of the blob size and address fields must be zero.
 +
-+	/* The fast version will always work for physical unicast */
-+	WARN_ON_ONCE(!kvm_irq_delivery_to_apic_fast(v->kvm, NULL, &irq, &r, NULL));
-+}
-+
- /*
-  * On event channel delivery, the vcpu_info may not have been accessible.
-  * In that case, there are bits in vcpu->arch.xen.evtchn_pending_sel which
-@@ -392,6 +408,10 @@ void kvm_xen_inject_pending_events(struct kvm_vcpu *v)
- 	}
- 	read_unlock_irqrestore(&gpc->lock, flags);
++The KVM_XEN_HVM_CONFIG_EVTCHN_SEND flag indicates to KVM that userspace
++will always use the KVM_XEN_HVM_EVTCHN_SEND ioctl to deliver event
++channel interrupts rather than manipulating the guest's shared_info
++structures directly. This, in turn, may allow KVM to enable features
++such as intercepting the SCHEDOP_poll hypercall to accelerate PV
++spinlock operation for the guest. Userspace may still use the ioctl
++to deliver events if it was advertised, even if userspace does not
++send this indication that it will always do so
  
-+	/* For the per-vCPU lapic vector, deliver it as MSI. */
-+	if (v->arch.xen.upcall_vector)
-+		kvm_xen_inject_vcpu_vector(v);
-+
- 	mark_page_dirty_in_slot(v->kvm, gpc->memslot, gpc->gpa >> PAGE_SHIFT);
- }
+ No other flags are currently valid in the struct kvm_xen_hvm_config.
  
-@@ -726,6 +746,15 @@ int kvm_xen_vcpu_set_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
- 		r = 0;
- 		break;
+@@ -5217,7 +5227,25 @@ have deterministic behavior.
+ 		struct {
+ 			__u64 gfn;
+ 		} shared_info;
+-		__u64 pad[4];
++		struct {
++			__u32 send_port;
++			__u32 type; /* EVTCHNSTAT_ipi / EVTCHNSTAT_interdomain */
++			__u32 flags;
++			union {
++				struct {
++					__u32 port;
++					__u32 vcpu;
++					__u32 priority;
++				} port;
++				struct {
++					__u32 port; /* Zero for eventfd */
++					__s32 fd;
++				} eventfd;
++				__u32 padding[4];
++			} deliver;
++		} evtchn;
++		__u32 xen_version;
++		__u64 pad[8];
+ 	} u;
+   };
  
-+	case KVM_XEN_VCPU_ATTR_TYPE_UPCALL_VECTOR:
-+		if (data->u.vector && data->u.vector < 0x10)
-+			r = -EINVAL;
-+		else {
-+			vcpu->arch.xen.upcall_vector = data->u.vector;
-+			r = 0;
-+		}
-+		break;
-+
- 	default:
- 		break;
- 	}
-@@ -813,6 +842,11 @@ int kvm_xen_vcpu_get_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
- 		r = 0;
- 		break;
+@@ -5248,6 +5276,30 @@ KVM_XEN_ATTR_TYPE_SHARED_INFO
  
-+	case KVM_XEN_VCPU_ATTR_TYPE_UPCALL_VECTOR:
-+		data->u.vector = vcpu->arch.xen.upcall_vector;
-+		r = 0;
-+		break;
+ KVM_XEN_ATTR_TYPE_UPCALL_VECTOR
+   Sets the exception vector used to deliver Xen event channel upcalls.
++  This is the HVM-wide vector injected directly by the hypervisor
++  (not through the local APIC), typically configured by a guest via
++  HVM_PARAM_CALLBACK_IRQ.
 +
- 	default:
- 		break;
- 	}
-@@ -1246,6 +1280,12 @@ int kvm_xen_set_evtchn_fast(struct kvm_xen_evtchn *xe, struct kvm *kvm)
- 				kick_vcpu = true;
- 			}
- 		}
++KVM_XEN_ATTR_TYPE_EVTCHN
++  This attribute is available when the KVM_CAP_XEN_HVM ioctl indicates
++  support for KVM_XEN_HVM_CONFIG_EVTCHN_SEND features. It configures
++  an outbound port number for interception of EVTCHNOP_send requests
++  from the guest. A given sending port number may be directed back
++  to a specified vCPU (by APIC ID) / port / priority on the guest,
++  or to trigger events on an eventfd. The vCPU and priority can be
++  changed by setting KVM_XEN_EVTCHN_UPDATE in a subsequent call,
++  but other fields cannot change for a given sending port. A port
++  mapping is removed by using KVM_XEN_EVTCHN_DEASSIGN in the flags
++  field.
 +
-+		/* For the per-vCPU lapic vector, deliver it as MSI. */
-+		if (kick_vcpu && vcpu->arch.xen.upcall_vector) {
-+			kvm_xen_inject_vcpu_vector(vcpu);
-+			kick_vcpu = false;
-+		}
- 	}
++KVM_XEN_ATTR_TYPE_XEN_VERSION
++  This attribute is available when the KVM_CAP_XEN_HVM ioctl indicates
++  support for KVM_XEN_HVM_CONFIG_EVTCHN_SEND features. It configures
++  the 32-bit version code returned to the guest when it invokes the
++  XENVER_version call; typically (XEN_MAJOR << 16 | XEN_MINOR). PV
++  Xen guests will often use this to as a dummy hypercall to trigger
++  event channel delivery, so responding within the kernel without
++  exiting to userspace is beneficial.
  
-  out_rcu:
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index bffaae565550..a3cf8a4b8a50 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1753,6 +1753,7 @@ struct kvm_xen_vcpu_attr {
- 			__u32 priority;
- 			__u64 expires_ns;
- 		} timer;
+ 4.127 KVM_XEN_HVM_GET_ATTR
+ --------------------------
+@@ -5259,7 +5311,8 @@ KVM_XEN_ATTR_TYPE_UPCALL_VECTOR
+ :Returns: 0 on success, < 0 on error
+ 
+ Allows Xen VM attributes to be read. For the structure and types,
+-see KVM_XEN_HVM_SET_ATTR above.
++see KVM_XEN_HVM_SET_ATTR above. The KVM_XEN_ATTR_TYPE_EVTCHN
++attribute cannot be read.
+ 
+ 4.128 KVM_XEN_VCPU_SET_ATTR
+ ---------------------------
+@@ -5286,6 +5339,13 @@ see KVM_XEN_HVM_SET_ATTR above.
+ 			__u64 time_blocked;
+ 			__u64 time_offline;
+ 		} runstate;
++		__u32 vcpu_id;
++		struct {
++			__u32 port;
++			__u32 priority;
++			__u64 expires_ns;
++		} timer;
 +		__u8 vector;
  	} u;
- };
+   };
  
-@@ -1766,6 +1767,7 @@ struct kvm_xen_vcpu_attr {
- /* Available with KVM_CAP_XEN_HVM / KVM_XEN_HVM_CONFIG_EVTCHN_SEND */
- #define KVM_XEN_VCPU_ATTR_TYPE_VCPU_ID		0x6
- #define KVM_XEN_VCPU_ATTR_TYPE_TIMER		0x7
-+#define KVM_XEN_VCPU_ATTR_TYPE_UPCALL_VECTOR	0x8
+@@ -5327,6 +5387,27 @@ KVM_XEN_VCPU_ATTR_TYPE_RUNSTATE_ADJUST
+   or RUNSTATE_offline) to set the current accounted state as of the
+   adjusted state_entry_time.
  
- /* Secure Encrypted Virtualization command */
- enum sev_cmd_id {
++KVM_XEN_VCPU_ATTR_TYPE_VCPU_ID
++  This attribute is available when the KVM_CAP_XEN_HVM ioctl indicates
++  support for KVM_XEN_HVM_CONFIG_EVTCHN_SEND features. It sets the Xen
++  vCPU ID of the given vCPU, to allow timer-related VCPU operations to
++  be intercepted by KVM.
++
++KVM_XEN_VCPU_ATTR_TYPE_TIMER
++  This attribute is available when the KVM_CAP_XEN_HVM ioctl indicates
++  support for KVM_XEN_HVM_CONFIG_EVTCHN_SEND features. It sets the
++  event channel port/priority for the VIRQ_TIMER of the vCPU, as well
++  as allowing a pending timer to be saved/restored.
++
++KVM_XEN_VCPU_ATTR_TYPE_UPCALL_VECTOR
++  This attribute is available when the KVM_CAP_XEN_HVM ioctl indicates
++  support for KVM_XEN_HVM_CONFIG_EVTCHN_SEND features. It sets the
++  per-vCPU local APIC upcall vector, configured by a Xen guest with
++  the HVMOP_set_evtchn_upcall_vector hypercall. This is typically
++  used by Windows guests, and is distinct from the HVM-wide upcall
++  vector configured with HVM_PARAM_CALLBACK_IRQ.
++
++
+ 4.129 KVM_XEN_VCPU_GET_ATTR
+ ---------------------------
+ 
+@@ -5646,6 +5727,25 @@ enabled with ``arch_prctl()``, but this may change in the future.
+ The offsets of the state save areas in struct kvm_xsave follow the contents
+ of CPUID leaf 0xD on the host.
+ 
++4.135 KVM_XEN_HVM_EVTCHN_SEND
++-----------------------------
++
++:Capability: KVM_CAP_XEN_HVM / KVM_XEN_HVM_CONFIG_EVTCHN_SEND
++:Architectures: x86
++:Type: vm ioctl
++:Parameters: struct kvm_irq_routing_xen_evtchn
++:Returns: 0 on success, < 0 on error
++
++
++::
++
++   struct kvm_irq_routing_xen_evtchn {
++	__u32 port;
++	__u32 vcpu;
++	__u32 priority;
++   };
++
++This ioctl injects an event channel interrupt directly to the guest vCPU.
+ 
+ 5. The kvm_run structure
+ ========================
+@@ -7558,8 +7658,9 @@ PVHVM guests. Valid flags are::
+   #define KVM_XEN_HVM_CONFIG_HYPERCALL_MSR	(1 << 0)
+   #define KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL	(1 << 1)
+   #define KVM_XEN_HVM_CONFIG_SHARED_INFO	(1 << 2)
+-  #define KVM_XEN_HVM_CONFIG_RUNSTATE		(1 << 2)
+-  #define KVM_XEN_HVM_CONFIG_EVTCHN_2LEVEL	(1 << 3)
++  #define KVM_XEN_HVM_CONFIG_RUNSTATE		(1 << 3)
++  #define KVM_XEN_HVM_CONFIG_EVTCHN_2LEVEL	(1 << 4)
++  #define KVM_XEN_HVM_CONFIG_EVTCHN_SEND	(1 << 5)
+ 
+ The KVM_XEN_HVM_CONFIG_HYPERCALL_MSR flag indicates that the KVM_XEN_HVM_CONFIG
+ ioctl is available, for the guest to set its hypercall page.
+@@ -7583,6 +7684,14 @@ The KVM_XEN_HVM_CONFIG_EVTCHN_2LEVEL flag indicates that IRQ routing entries
+ of the type KVM_IRQ_ROUTING_XEN_EVTCHN are supported, with the priority
+ field set to indicate 2 level event channel delivery.
+ 
++The KVM_XEN_HVM_CONFIG_EVTCHN_SEND flag indicates that KVM supports
++injecting event channel events directly into the guest with the
++KVM_XEN_HVM_EVTCHN_SEND ioctl. It also indicates support for the
++KVM_XEN_ATTR_TYPE_EVTCHN/XEN_VERSION HVM attributes and the
++KVM_XEN_VCPU_ATTR_TYPE_VCPU_ID/TIMER/UPCALL_VECTOR vCPU attributes.
++related to event channel delivery, timers, and the XENVER_version
++interception.
++
+ 8.31 KVM_CAP_PPC_MULTITCE
+ -------------------------
+ 
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 2cfb5dbb87f1..28f50a247681 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -4255,7 +4255,8 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 		r = KVM_XEN_HVM_CONFIG_HYPERCALL_MSR |
+ 		    KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL |
+ 		    KVM_XEN_HVM_CONFIG_SHARED_INFO |
+-		    KVM_XEN_HVM_CONFIG_EVTCHN_2LEVEL;
++		    KVM_XEN_HVM_CONFIG_EVTCHN_2LEVEL |
++		    KVM_XEN_HVM_CONFIG_EVTCHN_SEND;
+ 		if (sched_info_on())
+ 			r |= KVM_XEN_HVM_CONFIG_RUNSTATE;
+ 		break;
+diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+index fe8661545db3..3980cafa0b68 100644
+--- a/arch/x86/kvm/xen.c
++++ b/arch/x86/kvm/xen.c
+@@ -927,7 +927,11 @@ int kvm_xen_write_hypercall_page(struct kvm_vcpu *vcpu, u64 data)
+ 
+ int kvm_xen_hvm_config(struct kvm *kvm, struct kvm_xen_hvm_config *xhc)
+ {
+-	if (xhc->flags & ~KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL)
++	/* Only some feature flags need to be *enabled* by userspace */
++	u32 permitted_flags = KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL |
++		KVM_XEN_HVM_CONFIG_EVTCHN_SEND;
++
++	if (xhc->flags & ~permitted_flags)
+ 		return -EINVAL;
+ 
+ 	/*
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index a3cf8a4b8a50..9aa8b9a73383 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1231,6 +1231,7 @@ struct kvm_x86_mce {
+ #define KVM_XEN_HVM_CONFIG_SHARED_INFO		(1 << 2)
+ #define KVM_XEN_HVM_CONFIG_RUNSTATE		(1 << 3)
+ #define KVM_XEN_HVM_CONFIG_EVTCHN_2LEVEL	(1 << 4)
++#define KVM_XEN_HVM_CONFIG_EVTCHN_SEND		(1 << 5)
+ 
+ struct kvm_xen_hvm_config {
+ 	__u32 flags;
 -- 
 2.33.1
 
