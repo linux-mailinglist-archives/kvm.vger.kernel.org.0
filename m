@@ -2,136 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F1B424CC53B
-	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 19:32:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 92B444CC53D
+	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 19:33:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231866AbiCCSdZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Mar 2022 13:33:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40856 "EHLO
+        id S233689AbiCCSeS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Mar 2022 13:34:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229483AbiCCSdY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Mar 2022 13:33:24 -0500
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9381F522DE
-        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 10:32:38 -0800 (PST)
-Received: by mail-pj1-x102c.google.com with SMTP id g7-20020a17090a708700b001bb78857ccdso8467838pjk.1
-        for <kvm@vger.kernel.org>; Thu, 03 Mar 2022 10:32:38 -0800 (PST)
+        with ESMTP id S230374AbiCCSeR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Mar 2022 13:34:17 -0500
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2F6310819B
+        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 10:33:31 -0800 (PST)
+Received: by mail-pg1-x549.google.com with SMTP id u10-20020a63df0a000000b0037886b8707bso3145037pgg.23
+        for <kvm@vger.kernel.org>; Thu, 03 Mar 2022 10:33:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=qlq96R215BtY25bFBdaZHI6jV8wr7yu7isAUDVtrQE0=;
-        b=qAfGtS76c92RQqU8Iu7Z5bVP+avIc0p+d2zENWbdn2G9bzL8wRAZa77fg3x4PC4SG8
-         nnhLA6bqf1frGFlJoe9B4ilFPtAwKxRWT+ViTNtEiTQ4rnoZ1zzV9kC5nHYCEchPRVfW
-         zFEzcSpmeeiA+j4AjC3h1FZ4W4hu51mKJT/YMdzohotDMndW6Fs4fD4uXssbYlFgdQ8i
-         HIsMeWytVwJrgQ8LgwKqigJRePl7S6bhW8OFJO9acXsGKWlpEG4sk6Jl4gy3Dzjjsakc
-         bB36HsveW28/R2iEtgxjhROweEiXlWXJLkCI6N9CyK1Ertupe2Rsb23JQLSpQgGPCkYZ
-         7Z/g==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=ByYgcJhQM+VKaA7st6465Fl4wdo//J4vr4WNBD1jK30=;
+        b=fdKP3NJ08v2Hrg5I8d0nw4qVBIrkdQJXkIb7djGhcTa9Q9Tz2xy3JDpfMpiu73bhOO
+         0OUQnFma3H+DCOuTUreU8ltZowSvetvt1homKnDhUFm6rlW5NunGpqIh38H01BhEQzXM
+         YUz020Wu9WQV2hlY4ucUYdT0cTOAemzBHpppNodYbgswWjZskQ/k76JRCE/YSq1cPNCo
+         c17+TDitioaBHY5NJcTntHHlR4ugtUfLAeMG0Dg3n/jCHCIay9B4EA/J4YC6nY4SVapp
+         qn6Bh6UaIr6SpLERvUUu98gFWW2Dqtao+Iv+6kwojPH59vQAHpBP38nFyV5R4aH6y1th
+         dJNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=qlq96R215BtY25bFBdaZHI6jV8wr7yu7isAUDVtrQE0=;
-        b=neKmYVQnf5t72Km0HxO4wo5HlJn1OAlE0ObRYqz+e4Yy+Io/Ta0haNVbbAhmd7b/OB
-         lXg2B9rV4AonwiPcHdEhC+1eLa2V/Pg5a6QWPUHMkWmQ0eQwwmAuagay6uhhsZ78zapm
-         I4RnN4SKcg29LjSokKKpwTfMnBgiiMpsBc5F61WufBp4lXyWqptWLdeafHZbO+TBpMMP
-         lCBoYQUiuLe1iF0DUiDQKvAxYVhULtNW4EMcmpTyBw9OD+7oN2/X5yHeLESCkRPuNnfU
-         kzKXf6wcvAuqzQ9jsbOrm/5SEnl1eIqMxss31xu4smayMu1tNPcuTr+9mM4wzAQOKSfK
-         PGFg==
-X-Gm-Message-State: AOAM531jNbkZx4UHRYT1OVN/btq5WwSuqvhoh+f+ZJBlT6ub7jT7onTK
-        rSAi5INLGHkFx342iS5503PHGg==
-X-Google-Smtp-Source: ABdhPJwyg/A9nYoWk0Ps+PUZ0B1bjHvXI3Xgmy5L95q6ZM17I2TvS4qW1peMROSqv+qmomJYnTLVYQ==
-X-Received: by 2002:a17:902:8b87:b0:14b:47b3:c0a2 with SMTP id ay7-20020a1709028b8700b0014b47b3c0a2mr37003074plb.51.1646332357832;
-        Thu, 03 Mar 2022 10:32:37 -0800 (PST)
-Received: from google.com (226.75.127.34.bc.googleusercontent.com. [34.127.75.226])
-        by smtp.gmail.com with ESMTPSA id il17-20020a17090b165100b001bcd92fd355sm2932280pjb.28.2022.03.03.10.32.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Mar 2022 10:32:37 -0800 (PST)
-Date:   Thu, 3 Mar 2022 18:32:33 +0000
-From:   Mingwei Zhang <mizhang@google.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>
-Subject: Re: [PATCH v3 09/28] KVM: x86/mmu: Drop RCU after processing each
- root in MMU notifier hooks
-Message-ID: <YiEJwT+o9DvPOu6H@google.com>
-References: <20220226001546.360188-1-seanjc@google.com>
- <20220226001546.360188-10-seanjc@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220226001546.360188-10-seanjc@google.com>
-X-Spam-Status: No, score=-18.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=ByYgcJhQM+VKaA7st6465Fl4wdo//J4vr4WNBD1jK30=;
+        b=idAGcgHWmpk6ZVCmzU+yb6sU94B6haD/2orFSyJGxCAXjY3sdYgaCfrO/U0lcC32ET
+         Cq9rFINgbNd/nfcb/l3bInxuT4epwd6njhkawRXGOFrmZ6b1zmgT4wSRaDMBZhOBb7Og
+         D1Iq1aQJ1x8pfOvXMFvFtloYgyWBLDDF2biTIqU+WKK3fgSSXijDFjkbJwsuFuKVD5aJ
+         dKW9/5cVlV7IwMEC4gh52sOnr3g0BsXghOjr/TMLXQEyShqMzR5ko98/pTYrWxuiL8Xa
+         eWKZWXz2Tdmd41rN9avRKXE5zwBqHXYnJA9qEGQ5z5cpeOPo2tt4saQyCaS8iJEiLnRK
+         jlrQ==
+X-Gm-Message-State: AOAM533ox0IEnY9tA7FtCHYMFVugRsTOpUij+Ma1OSnUZ3SxWuDbgpem
+        xSs0+d3SM1D4TTvot2JdFV520dtB+Lk36w==
+X-Google-Smtp-Source: ABdhPJzFhpkmnxzuJYA5elwXYSs1CFC68fG9b4V9ixncgnkrONbkxLln2oKhEFJVmY87JwWbFhfthYAFvYWahQ==
+X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
+ (user=dmatlack job=sendgmr) by 2002:a05:6a00:1a8b:b0:4e1:e24b:88a8 with SMTP
+ id e11-20020a056a001a8b00b004e1e24b88a8mr39212740pfv.80.1646332411135; Thu,
+ 03 Mar 2022 10:33:31 -0800 (PST)
+Date:   Thu,  3 Mar 2022 18:33:26 +0000
+Message-Id: <20220303183328.1499189-1-dmatlack@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.1.616.g0bdcbb4464-goog
+Subject: [PATCH RESEND 0/2] KVM: Prevent module exit until all VMs are freed
+From:   David Matlack <dmatlack@google.com>
+To:     pbonzini@redhat.com
+Cc:     David Matlack <dmatlack@google.com>, kvm@vger.kernel.org,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Gleb Natapov <gleb@redhat.com>, Rik van Riel <riel@redhat.com>,
+        seanjc@google.com, bgardon@google.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-10.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Feb 26, 2022, Sean Christopherson wrote:
-> Drop RCU protection after processing each root when handling MMU notifier
-> hooks that aren't the "unmap" path, i.e. aren't zapping.  Temporarily
-> drop RCU to let RCU do its thing between roots, and to make it clear that
-> there's no special behavior that relies on holding RCU across all roots.
-> 
-> Currently, the RCU protection is completely superficial, it's necessary
-> only to make rcu_dereference() of SPTE pointers happy.  A future patch
-> will rely on holding RCU as a proxy for vCPUs in the guest, e.g. to
-> ensure shadow pages aren't freed before all vCPUs do a TLB flush (or
-> rather, acknowledge the need for a flush), but in that case RCU needs to
-> be held until the flush is complete if and only if the flush is needed
-> because a shadow page may have been removed.  And except for the "unmap"
-> path, MMU notifier events cannot remove SPs (don't toggle PRESENT bit,
-> and can't change the PFN for a SP).
-> 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> Reviewed-by: Ben Gardon <bgardon@google.com>
+[Resending with --cc-cover to fix CCs.]
 
-Reviewed-by: Mingwei Zhang <mizhang@google.com>
-> ---
->  arch/x86/kvm/mmu/tdp_mmu.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 634a2838e117..4f460782a848 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -1100,18 +1100,18 @@ static __always_inline bool kvm_tdp_mmu_handle_gfn(struct kvm *kvm,
->  	struct tdp_iter iter;
->  	bool ret = false;
->  
-> -	rcu_read_lock();
-> -
->  	/*
->  	 * Don't support rescheduling, none of the MMU notifiers that funnel
->  	 * into this helper allow blocking; it'd be dead, wasteful code.
->  	 */
->  	for_each_tdp_mmu_root(kvm, root, range->slot->as_id) {
-> +		rcu_read_lock();
-> +
->  		tdp_root_for_each_leaf_pte(iter, root, range->start, range->end)
->  			ret |= handler(kvm, &iter, range);
-> -	}
->  
-> -	rcu_read_unlock();
-> +		rcu_read_unlock();
-> +	}
->  
->  	return ret;
->  }
-> -- 
-> 2.35.1.574.g5d30c73bfb-goog
-> 
+This series fixes a long-standing theoretical bug where the KVM module
+can be unloaded while there are still references to a struct kvm. This
+can be reproduced with a simple patch [1] to run some delayed work 10
+seconds after a VM file descriptor is released.
+
+This bug was originally fixed by Ben Gardon <bgardon@google.com> in
+Google's kernel due to a race with an internal kernel daemon.
+
+KVM's async_pf code looks susceptible to this race since its inception,
+but clearly no one has noticed. Upcoming changes to the TDP MMU will
+move zapping to asynchronous workers which is much more likely to hit
+this issue. Fix it now to close the gap in async_pf and prepare for the
+TDP MMU zapping changes.
+
+While here I noticed some further cleanups that could be done in the
+async_pf code. It seems unnecessary for the async_pf code to grab a
+reference via kvm_get_kvm() because there's code to synchronously drain
+its queue of work in kvm_destroy_vm() -> ... ->
+kvm_clear_async_pf_completion_queue() (at least on x86). This is
+actually dead code because kvm_destroy_vm() will never be called while
+there are references to kvm.users_count (which the async_pf callbacks
+themselves hold). It seems we could either drop the reference grabbing
+in async_pf.c or drop the call to kvm_clear_async_pf_completion_queue().
+
+These patches apply on the latest kvm/queue commit b13a3befc815 ("KVM:
+selftests: Add test to populate a VM with the max possible guest mem")
+after reverting commit c9bdd0aa6800 ("KVM: allow struct kvm to outlive
+the file descriptors").
+
+Cc: kvm@vger.kernel.org (open list:KERNEL VIRTUAL MACHINE (KVM))
+Cc: Marcelo Tosatti <mtosatti@redhat.com> (blamed_fixes:1/1=100%)
+Cc: Gleb Natapov <gleb@redhat.com> (blamed_fixes:1/1=100%)
+Cc: Rik van Riel <riel@redhat.com> (blamed_fixes:1/1=100%)
+Cc: seanjc@google.com
+Cc: bgardon@google.com
+
+[1] To repro: Apply the following patch, run a KVM selftest, and then
+unload the KVM module within 10 seconds of the selftest finishing. The
+kernel will panic. With the fix applied, module unloading will fail
+until the final struct kvm reference is put.
+
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 9536ffa0473b..db827cf6a7a7 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -771,6 +771,8 @@ struct kvm {
+        struct notifier_block pm_notifier;
+ #endif
+        char stats_id[KVM_STATS_NAME_SIZE];
++
++       struct delayed_work run_after_vm_release_work;
+ };
+
+ #define kvm_err(fmt, ...) \
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 64eb99444688..35ae6d32dae5 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1258,12 +1258,25 @@ void kvm_put_kvm_no_destroy(struct kvm *kvm)
+ }
+ EXPORT_SYMBOL_GPL(kvm_put_kvm_no_destroy);
+
++static void run_after_vm_release(struct work_struct *work)
++{
++       struct delayed_work *dwork = to_delayed_work(work);
++       struct kvm *kvm = container_of(dwork, struct kvm, run_after_vm_release_work);
++
++       pr_info("I'm still alive!\n");
++       kvm_put_kvm(kvm);
++}
++
+ static int kvm_vm_release(struct inode *inode, struct file *filp)
+ {
+        struct kvm *kvm = filp->private_data;
+
+        kvm_irqfd_release(kvm);
+
++       kvm_get_kvm(kvm);
++       INIT_DELAYED_WORK(&kvm->run_after_vm_release_work, run_after_vm_release);
++       schedule_delayed_work(&kvm->run_after_vm_release_work, 10 * HZ);
++
+        kvm_put_kvm(kvm);
+        return 0;
+ }
+
+
+David Matlack (2):
+  KVM: Prevent module exit until all VMs are freed
+  Revert "KVM: set owner of cpu and vm file operations"
+
+ virt/kvm/kvm_main.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
+
+
+base-commit: b13a3befc815eae574d87e6249f973dfbb6ad6cd
+prerequisite-patch-id: 38f66d60319bf0bc9bf49f91f0f9119e5441629b
+prerequisite-patch-id: 51aa921d68ea649d436ea68e1b8f4aabc3805156
+-- 
+2.35.1.574.g5d30c73bfb-goog
+
