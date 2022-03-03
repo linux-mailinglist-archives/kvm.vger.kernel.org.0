@@ -2,76 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 403AB4CB42C
-	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 02:09:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B71A4CB427
+	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 02:09:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231164AbiCCA6M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Mar 2022 19:58:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51552 "EHLO
+        id S231167AbiCCBCa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 20:02:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40262 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231143AbiCCA6K (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 19:58:10 -0500
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1D8B149B85
-        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 16:57:25 -0800 (PST)
-Received: by mail-pl1-x636.google.com with SMTP id s1so3074500plg.12
-        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 16:57:25 -0800 (PST)
+        with ESMTP id S231139AbiCCBCa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 20:02:30 -0500
+Received: from mail-il1-x12a.google.com (mail-il1-x12a.google.com [IPv6:2607:f8b0:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 750907EA0A
+        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 17:01:45 -0800 (PST)
+Received: by mail-il1-x12a.google.com with SMTP id i1so2826765ilu.6
+        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 17:01:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=OmYtFMYIIuo00w0TMQnbKGUMCOkErANWVneGk7JdVo8=;
-        b=q3QYfl97wM6M9Con2LWthCJR9PN9C1lOfVZrxM/k03pqlgEyqX2KuKnwefx3570qiU
-         tNTt9apzqQUXWtqhO8uNcnCF2sb+1WZBuwb60Ere0Xj0bXHMirc1P0Vgq3qtz4xkE7c2
-         TiD56Y/UEn5dOi+wbVMMt5V4G4dpqD3mw7hf+61hb3S5o06anr1UJgY/R15JzHOLaHoh
-         mL0E7yagjAnBG/QfAOFYyZgYB38PMClPfbg/0dAIVGn//JMTcUO8/pnfb/swtUhmsBJw
-         CntV5IfSgS6Jht3l6WeeTO/lCtZtIJ1DvVC3U4xCO7kK0c0Wo5P1Ed47r+VDxRs0rk6Z
-         5hOw==
+        bh=bw/3FwLAZ/97IOiQ/OlX0pek7atqWiYa92rf2xXeE3c=;
+        b=bnX45XwZIe5Igz+UbKzuLRzvCiCmdc1JYid8Mwhq3QcQ8mg70E0i8I2yftkscMZ1ew
+         OUkFL8KWuyDQ+KlDoyqz+TWopkATcRwge/wWFy9kAwniBFa3bQRZeRG4Uqsho0A4iPK9
+         n9XmBZIy3U33YXbSUxRFud8UcfH0IrLXLSqD5VkBPPG+2gQ4xH33t9M3fDMPzD07E+ej
+         Ke0k2wN01Tqqzi8sAjCj9aGc3dEKRr/i5IoJ67c8f4Ef/qu4+f6OCvOVVW5XJriV9bFy
+         z0MaVqmEQTv4DFcotPWY188pmlJGUJoxGTginjYvZwYoD75u1lD6kFJ368nX+eD96iKj
+         +Z7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=OmYtFMYIIuo00w0TMQnbKGUMCOkErANWVneGk7JdVo8=;
-        b=CGwf+9F+hgRuaLPhhHZtuOK6hD19ZX6Rgbe4D3cOmbpdVaHdAPQjKqvwcu9Azadqwh
-         9mH2iOABqTkcqZaXVsWlWh8e2N/gUeb6d6dMWbUXsgYGiARJMQ/gUrzNsgg9OlugtK5H
-         AXWYEEMBzSK6Mcx5F+RffF3S2gaO+Dp+c/O09muVgD7gRRZ4tZodTiyAFec5/QO5MYmC
-         sYeaDifOSom1fTXfCHXh5dvOoIK5sh29dwh1Y4n2tXlDrYLAfFPTAQlmi9sdKuQj3RZW
-         xoaoGuGbO0xlWmF9MPGNC8KoUboHsprEasCdLsJrWGDKXNegG2WLtdqiGCONNDoFhMVP
-         R8og==
-X-Gm-Message-State: AOAM530NnAhG7pIF2bpkprCHqYGbArWl/0ejGQ9dMeE5kX42vEIoIgzu
-        /9mk8rbyzCG27oxo79U2nWDzkQ==
-X-Google-Smtp-Source: ABdhPJxAZ7vBeqcealHPEdBlM6OXyXVIwPyvoNL7V4bJypgEmLxPx4UEa3yopNc3PFMRlQP1MFzkqg==
-X-Received: by 2002:a17:902:7204:b0:14f:b325:7658 with SMTP id ba4-20020a170902720400b0014fb3257658mr33335598plb.110.1646269044882;
-        Wed, 02 Mar 2022 16:57:24 -0800 (PST)
-Received: from google.com (226.75.127.34.bc.googleusercontent.com. [34.127.75.226])
-        by smtp.gmail.com with ESMTPSA id on18-20020a17090b1d1200b001b9cfbfbf00sm230589pjb.40.2022.03.02.16.57.23
+        bh=bw/3FwLAZ/97IOiQ/OlX0pek7atqWiYa92rf2xXeE3c=;
+        b=seZfY0dbSFizcFi/8/eqP5Hmxysq3fDXWPuSEDdArKxcQC5EbnylWc1RHaCzbgrrBX
+         ECgrhtWQuz25dgUqMj0jwRSL4/8DSIkPforpbQf1opozhcJM6bMG3pijNPydphiUx/vA
+         WgXUlEKSt9UF1p4sWLY8WGuZ6phHLTmgCKjumX0xeMgOTqoo7h8bbnk5k9T4kxaiPxV7
+         g4+Yiqyjwns8THgoUwXQsRPDtEMmVH65UPENMvT1hpjUrk1L2hp67UYYlKi75LCfBqMN
+         h7DsTTqNKogRp/9Cw8avsKCqDfCplyNZ+y7LejkDEYnVT/zey5Th3kVS5ZQdLy3sDlui
+         L6ug==
+X-Gm-Message-State: AOAM531y5wju0JsVt7XKoiJxfAaWNAQwsQXtoP0YTA8EHHJ3IR0UR2U5
+        fMLkeDlu1JivkDyFJJwJG2xpXA==
+X-Google-Smtp-Source: ABdhPJwcOV1qGqUMFYUQMeUuJBpzh80qLtx6g2iKgk6nHuDgUKpkvy8bueiDtmQN2/wdeS2qAaWYCQ==
+X-Received: by 2002:a05:6e02:1445:b0:2c2:ea36:dcab with SMTP id p5-20020a056e02144500b002c2ea36dcabmr15849971ilo.200.1646269304472;
+        Wed, 02 Mar 2022 17:01:44 -0800 (PST)
+Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
+        by smtp.gmail.com with ESMTPSA id d5-20020a056e021c4500b002c569b47329sm389404ilg.60.2022.03.02.17.01.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Mar 2022 16:57:24 -0800 (PST)
-Date:   Thu, 3 Mar 2022 00:57:20 +0000
-From:   Mingwei Zhang <mizhang@google.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Wed, 02 Mar 2022 17:01:43 -0800 (PST)
+Date:   Thu, 3 Mar 2022 01:01:40 +0000
+From:   Oliver Upton <oupton@google.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.cs.columbia.edu, Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>
-Subject: Re: [PATCH v3 01/28] KVM: x86/mmu: Use common iterator for walking
- invalid TDP MMU roots
-Message-ID: <YiAScLpCt/6O2BjI@google.com>
-References: <20220226001546.360188-1-seanjc@google.com>
- <20220226001546.360188-2-seanjc@google.com>
- <Yh/Al8wGUOEgRmih@google.com>
- <Yh/KzDqsQSGm1CvK@google.com>
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, Peter Shier <pshier@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>,
+        Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH v3 09/19] KVM: arm64: Implement PSCI SYSTEM_SUSPEND
+Message-ID: <YiATdBvHOvlTzhIF@google.com>
+References: <20220223041844.3984439-1-oupton@google.com>
+ <20220223041844.3984439-10-oupton@google.com>
+ <87wnhk2whx.wl-maz@kernel.org>
+ <YhfeBfgbDA8IGc9f@google.com>
+ <87fso63ha2.wl-maz@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Yh/KzDqsQSGm1CvK@google.com>
+In-Reply-To: <87fso63ha2.wl-maz@kernel.org>
 X-Spam-Status: No, score=-18.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -83,78 +88,150 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 02, 2022, Sean Christopherson wrote:
-> On Wed, Mar 02, 2022, Mingwei Zhang wrote:
-> > On Sat, Feb 26, 2022, Sean Christopherson wrote:
-> > > Now that tdp_mmu_next_root() can process both valid and invalid roots,
-> > > extend it to be able to process _only_ invalid roots, add yet another
-> > > iterator macro for walking invalid roots, and use the new macro in
-> > > kvm_tdp_mmu_zap_invalidated_roots().
-> > > 
-> > > No functional change intended.
-> > > 
-> > > Reviewed-by: David Matlack <dmatlack@google.com>
-> > > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > > ---
-> > >  arch/x86/kvm/mmu/tdp_mmu.c | 74 ++++++++++++++------------------------
-> > >  1 file changed, 26 insertions(+), 48 deletions(-)
-> > > 
-> > > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> > > index debf08212f12..25148e8b711d 100644
-> > > --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> > > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> > > @@ -98,6 +98,12 @@ void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
-> > >  	call_rcu(&root->rcu_head, tdp_mmu_free_sp_rcu_callback);
-> > >  }
-> > >  
-> > > +enum tdp_mmu_roots_iter_type {
-> > > +	ALL_ROOTS = -1,
-> > > +	VALID_ROOTS = 0,
-> > > +	INVALID_ROOTS = 1,
-> > > +};
+On Fri, Feb 25, 2022 at 06:58:13PM +0000, Marc Zyngier wrote:
+> On Thu, 24 Feb 2022 19:35:33 +0000,
+> Oliver Upton <oupton@google.com> wrote:
 > > 
-> > I am wondering what the trick is to start from -1?
+> > Hi Marc,
+> > 
+> > Thanks for reviewing the series. ACK to the nits and smaller comments
+> > you've made, I'll incorporate that feedback in the next series.
+> > 
+> > On Thu, Feb 24, 2022 at 02:02:34PM +0000, Marc Zyngier wrote:
+> > > On Wed, 23 Feb 2022 04:18:34 +0000,
+> > > Oliver Upton <oupton@google.com> wrote:
+> > > > 
+> > > > ARM DEN0022D.b 5.19 "SYSTEM_SUSPEND" describes a PSCI call that allows
+> > > > software to request that a system be placed in the deepest possible
+> > > > low-power state. Effectively, software can use this to suspend itself to
+> > > > RAM. Note that the semantics of this PSCI call are very similar to
+> > > > CPU_SUSPEND, which is already implemented in KVM.
+> > > > 
+> > > > Implement the SYSTEM_SUSPEND in KVM. Similar to CPU_SUSPEND, the
+> > > > low-power state is implemented as a guest WFI. Synchronously reset the
+> > > > calling CPU before entering the WFI, such that the vCPU may immediately
+> > > > resume execution when a wakeup event is recognized.
+> > > > 
+> > > > Signed-off-by: Oliver Upton <oupton@google.com>
+> > > > ---
+> > > >  arch/arm64/kvm/psci.c  | 51 ++++++++++++++++++++++++++++++++++++++++++
+> > > >  arch/arm64/kvm/reset.c |  3 ++-
+> > > >  2 files changed, 53 insertions(+), 1 deletion(-)
+> > > > 
+> > > > diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
+> > > > index 77a00913cdfd..41adaaf2234a 100644
+> > > > --- a/arch/arm64/kvm/psci.c
+> > > > +++ b/arch/arm64/kvm/psci.c
+> > > > @@ -208,6 +208,50 @@ static void kvm_psci_system_reset(struct kvm_vcpu *vcpu)
+> > > >  	kvm_prepare_system_event(vcpu, KVM_SYSTEM_EVENT_RESET);
+> > > >  }
+> > > >  
+> > > > +static int kvm_psci_system_suspend(struct kvm_vcpu *vcpu)
+> > > > +{
+> > > > +	struct vcpu_reset_state reset_state;
+> > > > +	struct kvm *kvm = vcpu->kvm;
+> > > > +	struct kvm_vcpu *tmp;
+> > > > +	bool denied = false;
+> > > > +	unsigned long i;
+> > > > +
+> > > > +	reset_state.pc = smccc_get_arg1(vcpu);
+> > > > +	if (!kvm_ipa_valid(kvm, reset_state.pc)) {
+> > > > +		smccc_set_retval(vcpu, PSCI_RET_INVALID_ADDRESS, 0, 0, 0);
+> > > > +		return 1;
+> > > > +	}
+> > > > +
+> > > > +	reset_state.r0 = smccc_get_arg2(vcpu);
+> > > > +	reset_state.be = kvm_vcpu_is_be(vcpu);
+> > > > +	reset_state.reset = true;
+> > > > +
+> > > > +	/*
+> > > > +	 * The SYSTEM_SUSPEND PSCI call requires that all vCPUs (except the
+> > > > +	 * calling vCPU) be in an OFF state, as determined by the
+> > > > +	 * implementation.
+> > > > +	 *
+> > > > +	 * See ARM DEN0022D, 5.19 "SYSTEM_SUSPEND" for more details.
+> > > > +	 */
+> > > > +	mutex_lock(&kvm->lock);
+> > > > +	kvm_for_each_vcpu(i, tmp, kvm) {
+> > > > +		if (tmp != vcpu && !kvm_arm_vcpu_powered_off(tmp)) {
+> > > > +			denied = true;
+> > > > +			break;
+> > > > +		}
+> > > > +	}
+> > > > +	mutex_unlock(&kvm->lock);
+> > > 
+> > > This looks dodgy. Nothing seems to prevent userspace from setting the
+> > > mp_state to RUNNING in parallel with this, as only the vcpu mutex is
+> > > held when this ioctl is issued.
+> > > 
+> > > It looks to me that what you want is what lock_all_vcpus() does
+> > > (Alexandru has a patch moving it out of the vgic code as part of his
+> > > SPE series).
+> > > 
+> > > It is also pretty unclear what the interaction with userspace is once
+> > > you have released the lock. If the VMM starts a vcpu other than the
+> > > suspending one, what is its state? The spec doesn't see to help
+> > > here. I can see two options:
+> > > 
+> > > - either all the vcpus have the same reset state applied to them as
+> > >   they come up, unless they are started with CPU_ON by a vcpu that has
+> > >   already booted (but there is a single 'context_id' provided, and I
+> > >   fear this is going to confuse the OS)...
+> > > 
+> > > - or only the suspending vcpu can resume the system, and we must fail
+> > >   a change of mp_state for the other vcpus.
+> > > 
+> > > What do you think?
+> > 
+> > Definitely the latter. The documentation of SYSTEM_SUSPEND is quite
+> > shaky on this, but it would appear that the intention is for the caller
+> > to be the first CPU to wake up.
 > 
-> -1 is arbitrary, any non-zero value would work.  More below.
+> Yup. We now have clarification on the intent of the spec (only the
+> caller CPU can resume the system), and this needs to be tightened.
 > 
-> > >  /*
-> > >   * Returns the next root after @prev_root (or the first root if @prev_root is
-> > >   * NULL).  A reference to the returned root is acquired, and the reference to
-> > > @@ -110,10 +116,16 @@ void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
-> > >   */
-> > >  static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
-> > >  					      struct kvm_mmu_page *prev_root,
-> > > -					      bool shared, bool only_valid)
-> > > +					      bool shared,
-> > > +					      enum tdp_mmu_roots_iter_type type)
-> > >  {
-> > >  	struct kvm_mmu_page *next_root;
-> > >  
-> > > +	kvm_lockdep_assert_mmu_lock_held(kvm, shared);
-> > > +
-> > > +	/* Ensure correctness for the below comparison against role.invalid. */
-> > > +	BUILD_BUG_ON(!!VALID_ROOTS || !INVALID_ROOTS);
-> > > +
-> > >  	rcu_read_lock();
-> > >  
-> > >  	if (prev_root)
-> > > @@ -125,7 +137,7 @@ static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
-> > >  						   typeof(*next_root), link);
-> > >  
-> > >  	while (next_root) {
-> > > -		if ((!only_valid || !next_root->role.invalid) &&
-> > > +		if ((type == ALL_ROOTS || (type == !!next_root->role.invalid)) &&
-> 
-> This is the code that deals with the enums.  It's making the type a tri-state,
-> where the values of VALID_ROOTS and INVALID_ROOTS align with converting role.invalid
-> to a boolean (always '0' or '1') so that they can be directly compared as above.
-> 
-> Any value for ALL_ROOTS (other than '0' or '1' obviously) would work since the
-> above logic requires ALL_ROOTS to be explicitly checked first.
-> 
-yeah, I see that. The other thing I feel strange is the that VALID_ROOTS
-is _0_ while INVALID_ROOTS is _1_. But when I see !!next_root->role.invalid,
-that solves my concerns.
-> > >  		    kvm_tdp_mmu_get_root(next_root))
-> > >  			break;
-> > >  
+
+I'm beginning to wonder if the VMM/KVM split implementation of
+system-scoped PSCI calls can ever be right. There exists a critical
+section in all system-wide PSCI calls that currently spans an exit to
+userspace. I cannot devise a sane way to guard such a critical section
+when we are returning control to userspace.
+
+For example, KVM offlines all of the CPUs except for the exiting CPU
+when handling SYSTEM_RESET or SYSTEM_OFF, but nothing prevents an
+interleaving KVM_ARM_VCPU_INIT or KVM_SET_MP_STATE from disturbing the
+state of the VM. Couldn't even say its a userspace bug, either, because
+a different vCPU could do something before the caller has exited. Even
+if we grab all the vCPU mutexes, we'd need to drop them before exiting
+to userspace.
+
+If userspace decides to reject the PSCI call, we're giving control
+back to the guest in a wildly different state than it had making the
+PSCI call. Again, the PSCI spec is vague on this matter, but I believe
+the intuitive answer is that we should not change the VM state if the call
+is rejected. This could upset an otherwise well-behaved KVM guest.
+
+Doing SYSTEM_SUSPEND in userspace is better, as KVM avoids mucking with
+the VM state before the PSCI call is actually accepted. However, any of
+the consistency checks in the kernel for SYSTEM_SUSPEND are entirely
+moot. Anything can happen between the exit to userspace and the moment
+userspace actually recognizes the SYSTEM_SUSPEND call on the exiting
+CPU.
+
+KVM rejecting attempts to resume vCPUs besides the caller will break
+a correct userspace, given the inherent race that crops up when exiting.
+Blocking attempts to resume other vCPUs could have unintented
+consequences as well. It seems that we'd need to prevent
+KVM_ARM_VCPU_INIT calls as well as KVM_SET_MP_STATE, even though the
+former could be used in a valid SYSTEM_SUSPEND implementation.
+
+I really do hate to go back to the drawing board on the PSCI stuff
+again, but there seems to be a fundamental issue in how system-scoped
+calls are handled. Userspace is probably the only place where we could
+quiesce the VM state, assess if the PSCI call should be accepted, and
+change the VM state.
+
+Do you think all of this is an issue as well?
+
+--
+Oliver
