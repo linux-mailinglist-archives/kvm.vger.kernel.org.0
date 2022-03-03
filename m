@@ -2,70 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F7E74CC353
-	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 17:59:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8FB014CC375
+	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 18:11:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235212AbiCCRA1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Mar 2022 12:00:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40194 "EHLO
+        id S235248AbiCCRMC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Mar 2022 12:12:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42060 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230252AbiCCRA0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Mar 2022 12:00:26 -0500
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F74E16203A
-        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 08:59:40 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id m11-20020a17090a7f8b00b001beef6143a8so5388861pjl.4
-        for <kvm@vger.kernel.org>; Thu, 03 Mar 2022 08:59:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=TRe594s70/BSgqAig7s+8kVsNXAhB41CkpW4XEV91Hg=;
-        b=Sw0dfYxFJ4mEKPvVublWYLsl673lFfJ18wDifxKlKiovIH089C/9DXqx76iw+U9Wy1
-         c1QZEs/MqMiWOaevM2WlLHTh9kxnCfRnHseHHrArIGj5zCh7NuIA5+mLEPKfM1HDYAjj
-         KeX4REFSgSXsCkIJugPgRW8jOLuV4i4C5vJLDAdw+ygAHwbKFm3tIwOGzm9ZIJ3zLAbi
-         iRov0EnBkeoxOiMZf/W1aSyhlXQPw1zq+pnjcpFm4RjNTAeMRtd3mAomXCp+mhkAANRY
-         SMQDUSV9wuO4oWfxGQwK/UkFWNnnRFDeQSayvqvTNKh9rNu3RdkAwy+P1OtFzm6n7reI
-         wOnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=TRe594s70/BSgqAig7s+8kVsNXAhB41CkpW4XEV91Hg=;
-        b=AUQhFGGVj8QLOQb+FzoTa44FVjPU24pu+gKxi+4CPY3nXrI7Z8gB2xu367N3/4D782
-         ngB4HpDmzvf8hoCrNRarw5+WJbgQTYOg9hoa6V3SFEX/JpvNlBNVKFcBCI3WXs14H50H
-         2bGF4dhPAtEoGZQxUzPZ3NUXFJZF4e3AQH8CHYbg922JnTh+qRR4x1vlbZig50BGi84Y
-         viHuwDgRbBIfwT9fzT/q5xTVdWc3pesvbfJCaL9c9pqEyHCmYFHw503orF5OdcMJ6hDh
-         IAnrdTWXdvyG9IlFz8/A9nr1cn/wEcft8fts2m3U/tdbyOszEgzp5EGtH9KlklnPosqd
-         M+yw==
-X-Gm-Message-State: AOAM531XX4cwpedkS2vhlcSJp7duPkyTWly90x6+dv94MfOkfp8ubTBe
-        +ftgHvzYXKZpdZajmwM+r3ef7LpYw+bhSw==
-X-Google-Smtp-Source: ABdhPJxb4kj47xxaByYvUO4XtKKnHahIGOZu3XEgeG5BAzJeSsGKxMgaQOn+rxpNIox3oVhLlWIOmw==
-X-Received: by 2002:a17:903:244d:b0:150:18f3:8e98 with SMTP id l13-20020a170903244d00b0015018f38e98mr37058822pls.28.1646326779923;
-        Thu, 03 Mar 2022 08:59:39 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id a19-20020a17090ad81300b001bc447c2c91sm8558375pjv.31.2022.03.03.08.59.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Mar 2022 08:59:39 -0800 (PST)
-Date:   Thu, 3 Mar 2022 16:59:35 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Peter Gonda <pgonda@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] KVM: SVM: Fix missing kvm_cache_regs.h include in svm.h
-Message-ID: <YiDz9w7W6+LTRtVz@google.com>
-References: <20220303160442.1815411-1-pgonda@google.com>
- <YiDsEgxUDZL+XY9R@google.com>
- <CAMkAt6rwiL_G1w66_rseKSFOTSV4zX8gnb1EOoQNv5TH=ToHGw@mail.gmail.com>
+        with ESMTP id S230229AbiCCRMB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Mar 2022 12:12:01 -0500
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E997188A35;
+        Thu,  3 Mar 2022 09:11:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1646327475; x=1677863475;
+  h=message-id:date:mime-version:to:cc:references:from:
+   subject:in-reply-to:content-transfer-encoding;
+  bh=vaOGjw7VdBKeP6eHbl1iLmTW0NFWNNn5qWcGsk5ZbQE=;
+  b=IBsdkHHXV4wbifK/fQcmch4j2dCl+OIeR+9I3TJLZJbc+X/7oOpfuHrQ
+   hdqWWgZKCK/GlUACOQgFuuVbD0kKsFRoFPX0tZLLV0DZKF5Lief0biL/g
+   uJSJbwueN8QPoCzBPrzyqVHRWB26Lyd+6hL+oQ1UmpJAtO/Y9OtgKdJuP
+   fSkQOcrY2PA1x2FHWQULaGWNOneVdNkWhFJ+ViFama+IcUdAjTLHxJC+1
+   u4vGQ5U4RrxBvO/rfHAEqcp1ymommJHwYMuC3273UixpEI8nyE/ortQ+7
+   Utv5idK+y1GauVyHG025EgKtJwZraG+BGZQUwgdoDFfr2W9pbSunDNdCV
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10275"; a="253928899"
+X-IronPort-AV: E=Sophos;i="5.90,151,1643702400"; 
+   d="scan'208";a="253928899"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2022 09:09:44 -0800
+X-IronPort-AV: E=Sophos;i="5.90,151,1643702400"; 
+   d="scan'208";a="642184867"
+Received: from eabada-mobl2.amr.corp.intel.com (HELO [10.209.6.252]) ([10.209.6.252])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2022 09:09:43 -0800
+Message-ID: <5ca2583b-a873-fc5d-ece6-d4bdbd133a89@intel.com>
+Date:   Thu, 3 Mar 2022 09:09:37 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMkAt6rwiL_G1w66_rseKSFOTSV4zX8gnb1EOoQNv5TH=ToHGw@mail.gmail.com>
-X-Spam-Status: No, score=-18.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Content-Language: en-US
+To:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        brijesh.ksingh@gmail.com, tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+References: <20220224165625.2175020-1-brijesh.singh@amd.com>
+ <20220224165625.2175020-23-brijesh.singh@amd.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+Subject: Re: [PATCH v11 22/45] x86/sev: Use SEV-SNP AP creation to start
+ secondary CPUs
+In-Reply-To: <20220224165625.2175020-23-brijesh.singh@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-7.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -73,16 +88,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 03, 2022, Peter Gonda wrote:
-> On Thu, Mar 3, 2022 at 9:26 AM Sean Christopherson <seanjc@google.com> wrote:
-> > Ha, we've already got a lovely workaround for exactly this problem.  This patch
-> > should drop the include from svm_onhyperv.c, there's nothing in that file that
-> > needs kvm_cache_regs.h (I verified by deleting use of is_guest_mode()), it's
-> > included purely because of this bug in svm.h.
-> 
-> Ah good catch. I assume I should add kvm_cache_regs.h to
-> arch/x86/kvm/svm/nested.c too since it uses is_guest_mode().
+On 2/24/22 08:56, Brijesh Singh wrote:
+> +	/*
+> +	 * Allocate VMSA page to work around the SNP erratum where the CPU will
+> +	 * incorrectly signal an RMP violation #PF if a large page (2MB or 1GB)
+> +	 * collides with the RMP entry of VMSA page. The recommended workaround
+> +	 * is to not use a large page.
+> +	 *
+> +	 * Allocate one extra page, use a page which is not 2MB-aligned
+> +	 * and free the other.
+> +	 */
+> +	p = alloc_pages(GFP_KERNEL_ACCOUNT | __GFP_ZERO, 1);
+> +	if (!p)
+> +		return NULL;
+> +
+> +	split_page(p, 1);
+> +
+> +	pfn = page_to_pfn(p);
+> +	if (IS_ALIGNED(__pfn_to_phys(pfn), PMD_SIZE)) {
+> +		pfn++;
+> +		__free_page(p);
+> +	} else {
+> +		__free_page(pfn_to_page(pfn + 1));
+> +	}
+> +
+> +	return page_address(pfn_to_page(pfn));
+> +}
 
-Nah, picking it up from svm.h (and several other headers) is ok.  If we required
-every compilation unit to _directly_ include every header, we'd probably double
-the size of the kernel source :-)
+This can be simplified.  There's no need for all the sill pfn_to_page()
+conversions or even an alignment check.  The second page (page[1]) of an
+order-1 page is never 2M/1G aligned.  Just use that:
+
+	// Alloc an 8k page which is also 8k-aligned:
+	p = alloc_pages(GFP_KERNEL_ACCOUNT | __GFP_ZERO, 1);
+	if (!p)
+		return NULL;
+
+	split_page(p, 1);
+
+	// Free the first 4k.  This page _may_
+	// be 2M/1G aligned and can not be used:
+	__free_page(p);
+	
+	// Return the unaligned page:
+	return page_address(p+1);
