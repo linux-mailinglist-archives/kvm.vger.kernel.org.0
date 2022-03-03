@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DCEB94CC9DB
-	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 00:11:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A4904CC9DC
+	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 00:11:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235545AbiCCXMZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Mar 2022 18:12:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40570 "EHLO
+        id S235616AbiCCXM1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Mar 2022 18:12:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40590 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235453AbiCCXMX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S235368AbiCCXMX (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 3 Mar 2022 18:12:23 -0500
-Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62638F11A8
-        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 15:11:36 -0800 (PST)
-Received: by mail-lf1-x133.google.com with SMTP id m14so11131934lfu.4
-        for <kvm@vger.kernel.org>; Thu, 03 Mar 2022 15:11:36 -0800 (PST)
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 588D6673EE
+        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 15:11:37 -0800 (PST)
+Received: by mail-lf1-x132.google.com with SMTP id g39so11102636lfv.10
+        for <kvm@vger.kernel.org>; Thu, 03 Mar 2022 15:11:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=BO8DGk50dvSAvzrLSBUo0hZpL7BWwYBXvDey4YE+3/s=;
-        b=GWwmjBMjPtnt8nWjTyzJRa3UCDjY6kjqwK4xLsXwmj5IJvYYzjzQya58aue3ZaaJtv
-         0nZk+JLwoZaM3WjOIqMcC9WCU2FPKfNwpgoM+KOBnuTbz6wzRVVX+rg0tqp/tk7LaUcI
-         gDJ6C6BTxBzT4xm7yoABxIrbU4dpMqp4tK6f/AKPxxdZxF+qUYzlCCotyTUvxf84e7ZG
-         4guon/t05E+I8RO4NzS8Hqma7xDypyiUjj2J/PhHPHfVg8z900FcGmjy743XpfywIlMG
-         rXadsQfAKV0TJjbYlxId71kdRONMIccdYxwDQI9NA/b0mx6kXmtmGVj3SUc7UkZgOhcU
-         5XqA==
+        bh=oA6xyu3ogYw0nSByGA21Lw5hc/VmPkl/56Z5A2HJfbg=;
+        b=QoYXUkDz/AThGRUFf4cxtv2/+StUVjqbVOaSdUQ8/62gJgGhWC4HYSlkd8VsGXAsdO
+         HnP8vbdjdQtaq0cQKlgJpQzonABf/vimA2ds4jytvBA5FAJ2rMjVt5pkPYSQvh4L/e9P
+         QUdxybWnojNUIqHBKLsvoO4ZpGVidqe/j9ZueqrBgBqum3wisqVwlF6LI+IaPH6FOEzc
+         dPPScofZEM2SC3lDNZ+Sa/qI7Fpbe93SVt5g+34PVmh+QbLLtQ+GqRL0Z2oxhF56vHF8
+         bkny7dHm6XaScL9WT7IFQH2empdIyM4TPe5t0YzI+3Hh418d8368vlOlOWbd8s+1HHu6
+         febg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=BO8DGk50dvSAvzrLSBUo0hZpL7BWwYBXvDey4YE+3/s=;
-        b=N8E0oigMxyZ9up8thkmt6vNP1Koi8kuL0KnAt1FZsVlNKtjP8ZydAVWuAStjB5uC1U
-         nfvzvkw/jrwDUYwg/DO9j4Mgk1Jpd4/gJdNS9QbpsrVNO04CzR65TW0EcB8MUch13x3W
-         sUgaoVIw1O/0l4hJFxUJOgbNLlZEuxUl4G6571RQDOUGYanra/nBYZk5fIWuCMze+GJw
-         JbjHNWOdewElS9leNXxtplIHlAIiMQ3qefDwLXddSdwsTX5E0MqE2TmjIt6vXOHy3nMk
-         7Ld3LdNcuIF2xqaunUeJA6PiSwsXXJtQZpxDez6PBCHL2XgFGv28w7hOnFu3ghOcLyV0
-         sB1g==
-X-Gm-Message-State: AOAM531gGuPXPLw+ZC/LSTwRJxpfe4hBnO3qwzhU8cnyS0eFnoSV4QDb
-        6xprTnh7I8gXNPfdOIm65beCXgeXdJY=
-X-Google-Smtp-Source: ABdhPJzzNUWirKaG9BDzl22LFdQuQjqDB0UqXJ1PzkeISYDVIMPRlqa0ykjDpI663SzeEqP7yOty3w==
-X-Received: by 2002:a05:6512:2097:b0:443:eaaa:3ddb with SMTP id t23-20020a056512209700b00443eaaa3ddbmr22281387lfr.185.1646349094327;
-        Thu, 03 Mar 2022 15:11:34 -0800 (PST)
+        bh=oA6xyu3ogYw0nSByGA21Lw5hc/VmPkl/56Z5A2HJfbg=;
+        b=UGMpqCRMOydt5mDwoDIJXJR6NYoHgTPSatT557jpu5KBbQkyJKvVXuwVlE2mXyTcW0
+         XL2SndoAA1hHa3JogK/iI1ypXZ/urRjSLKX4uL/qwyUAE+1e8rdAq0pvyw3bsOz4J21z
+         tHUc/hqTD91ITYsRZ+jzDt6So7AngahEEd1vTAoQf+7m7t8TgLzI+qG25nHFiO7jnHEZ
+         EhoDvFCyC5PsW+jpi2kzecSBSxjIcz/f1/cX/w4JgbZRdGXQ9niwkurLWH58vprhGz3L
+         FHfjBoNRHILlE1N23PcZRV5qA+gcj0fA0s1G6WyPkgxGKtZbf816H8luOJpawqBEfhnX
+         kBng==
+X-Gm-Message-State: AOAM531oPSXCnyb/RPS2kNYL+drQKB09riDcSHJqzA2un4ISHr+8woet
+        RMCogkdEjBYImLY4RIXSF6R0M33UJd0=
+X-Google-Smtp-Source: ABdhPJz/5Oiar8wpwDQupnIme61O2C+2hyE+aHbmd7FZro4vFGYLWKyH7fPbvf64ks+S9DA9cQOKRA==
+X-Received: by 2002:a05:6512:1194:b0:43e:8e84:4eca with SMTP id g20-20020a056512119400b0043e8e844ecamr22566366lfr.611.1646349095539;
+        Thu, 03 Mar 2022 15:11:35 -0800 (PST)
 Received: from localhost.localdomain (88-115-234-153.elisa-laajakaista.fi. [88.115.234.153])
-        by smtp.gmail.com with ESMTPSA id g13-20020a2ea4ad000000b0023382d8819esm725264ljm.69.2022.03.03.15.11.33
+        by smtp.gmail.com with ESMTPSA id g13-20020a2ea4ad000000b0023382d8819esm725264ljm.69.2022.03.03.15.11.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Mar 2022 15:11:34 -0800 (PST)
+        Thu, 03 Mar 2022 15:11:35 -0800 (PST)
 From:   Martin Radev <martin.b.radev@gmail.com>
 To:     kvm@vger.kernel.org, will@kernel.org,
         julien.thierry.kdev@gmail.com, andre.przywara@arm.com,
         alexandru.elisei@arm.com
 Cc:     Martin Radev <martin.b.radev@gmail.com>
-Subject: [PATCH kvmtool 2/5] virtio: Sanitize config accesses
-Date:   Fri,  4 Mar 2022 01:10:47 +0200
-Message-Id: <20220303231050.2146621-3-martin.b.radev@gmail.com>
+Subject: [PATCH kvmtool 3/5] virtio: Check for overflows in QUEUE_NOTIFY and QUEUE_SEL
+Date:   Fri,  4 Mar 2022 01:10:48 +0200
+Message-Id: <20220303231050.2146621-4-martin.b.radev@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220303231050.2146621-1-martin.b.radev@gmail.com>
 References: <20220303231050.2146621-1-martin.b.radev@gmail.com>
@@ -70,408 +70,256 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The handling of VIRTIO_PCI_O_CONFIG is prone to buffer access overflows.
-This patch sanitizes this operation by using the newly added virtio op
-get_config_size. Any access which goes beyond the config structure's
-size is prevented and a failure is returned.
-
-Additionally, PCI accesses which span more than a single byte are prevented
-and a warning is printed because the implementation does not currently
-support the behavior correctly.
+This patch checks for overflows in QUEUE_NOTIFY and QUEUE_SEL in
+the PCI and MMIO operation handling paths. Further, the return
+value type of get_vq_count is changed from int to uint since negative
+doesn't carry any semantic meaning.
 
 Signed-off-by: Martin Radev <martin.b.radev@gmail.com>
 ---
- include/kvm/virtio-9p.h |  1 +
- include/kvm/virtio.h    |  1 +
- virtio/9p.c             | 25 ++++++++++++++++++++-----
- virtio/balloon.c        |  8 ++++++++
- virtio/blk.c            |  8 ++++++++
- virtio/console.c        |  8 ++++++++
- virtio/mmio.c           | 24 ++++++++++++++++++++----
- virtio/net.c            |  8 ++++++++
- virtio/pci.c            | 38 ++++++++++++++++++++++++++++++++++++++
- virtio/rng.c            |  6 ++++++
- virtio/scsi.c           |  8 ++++++++
- virtio/vsock.c          |  8 ++++++++
- 12 files changed, 134 insertions(+), 9 deletions(-)
+ include/kvm/virtio.h |  2 +-
+ virtio/9p.c          |  2 +-
+ virtio/balloon.c     |  2 +-
+ virtio/blk.c         |  2 +-
+ virtio/console.c     |  2 +-
+ virtio/mmio.c        | 20 ++++++++++++++++++--
+ virtio/net.c         |  4 ++--
+ virtio/pci.c         | 21 ++++++++++++++++++---
+ virtio/rng.c         |  2 +-
+ virtio/scsi.c        |  2 +-
+ virtio/vsock.c       |  2 +-
+ 11 files changed, 46 insertions(+), 15 deletions(-)
 
-diff --git a/include/kvm/virtio-9p.h b/include/kvm/virtio-9p.h
-index 3ea7698..77c5062 100644
---- a/include/kvm/virtio-9p.h
-+++ b/include/kvm/virtio-9p.h
-@@ -44,6 +44,7 @@ struct p9_dev {
- 	struct virtio_device	vdev;
- 	struct rb_root		fids;
- 
-+	size_t config_size;
- 	struct virtio_9p_config	*config;
- 	u32			features;
- 
 diff --git a/include/kvm/virtio.h b/include/kvm/virtio.h
-index 3a311f5..3880e74 100644
+index 3880e74..ad274ac 100644
 --- a/include/kvm/virtio.h
 +++ b/include/kvm/virtio.h
-@@ -184,6 +184,7 @@ struct virtio_device {
- 
- struct virtio_ops {
- 	u8 *(*get_config)(struct kvm *kvm, void *dev);
-+	size_t (*get_config_size)(struct kvm *kvm, void *dev);
+@@ -187,7 +187,7 @@ struct virtio_ops {
+ 	size_t (*get_config_size)(struct kvm *kvm, void *dev);
  	u32 (*get_host_features)(struct kvm *kvm, void *dev);
  	void (*set_guest_features)(struct kvm *kvm, void *dev, u32 features);
- 	int (*get_vq_count)(struct kvm *kvm, void *dev);
+-	int (*get_vq_count)(struct kvm *kvm, void *dev);
++	unsigned int (*get_vq_count)(struct kvm *kvm, void *dev);
+ 	int (*init_vq)(struct kvm *kvm, void *dev, u32 vq, u32 page_size,
+ 		       u32 align, u32 pfn);
+ 	void (*exit_vq)(struct kvm *kvm, void *dev, u32 vq);
 diff --git a/virtio/9p.c b/virtio/9p.c
-index b78f2b3..6074f3a 100644
+index 6074f3a..7374f1e 100644
 --- a/virtio/9p.c
 +++ b/virtio/9p.c
-@@ -1375,6 +1375,13 @@ static u8 *get_config(struct kvm *kvm, void *dev)
- 	return ((u8 *)(p9dev->config));
+@@ -1469,7 +1469,7 @@ static int set_size_vq(struct kvm *kvm, void *dev, u32 vq, int size)
+ 	return size;
  }
  
-+static size_t get_config_size(struct kvm *kvm, void *dev)
-+{
-+	struct p9_dev *p9dev = dev;
-+
-+	return p9dev->config_size;
-+}
-+
- static u32 get_host_features(struct kvm *kvm, void *dev)
+-static int get_vq_count(struct kvm *kvm, void *dev)
++static unsigned int get_vq_count(struct kvm *kvm, void *dev)
  {
- 	return 1 << VIRTIO_9P_MOUNT_TAG;
-@@ -1469,6 +1476,7 @@ static int get_vq_count(struct kvm *kvm, void *dev)
- 
- struct virtio_ops p9_dev_virtio_ops = {
- 	.get_config		= get_config,
-+	.get_config_size	= get_config_size,
- 	.get_host_features	= get_host_features,
- 	.set_guest_features	= set_guest_features,
- 	.init_vq		= init_vq,
-@@ -1568,7 +1576,9 @@ virtio_dev_init(virtio_9p__init);
- int virtio_9p__register(struct kvm *kvm, const char *root, const char *tag_name)
- {
- 	struct p9_dev *p9dev;
--	int err = 0;
-+	size_t tag_name_length;
-+	size_t config_size;
-+	int err;
- 
- 	p9dev = calloc(1, sizeof(*p9dev));
- 	if (!p9dev)
-@@ -1577,29 +1587,34 @@ int virtio_9p__register(struct kvm *kvm, const char *root, const char *tag_name)
- 	if (!tag_name)
- 		tag_name = VIRTIO_9P_DEFAULT_TAG;
- 
--	p9dev->config = calloc(1, sizeof(*p9dev->config) + strlen(tag_name) + 1);
-+	tag_name_length = strlen(tag_name);
-+	/* The tag_name zero byte is intentionally excluded */
-+	config_size = sizeof(*p9dev->config) + tag_name_length;
-+
-+	p9dev->config = calloc(1, config_size);
- 	if (p9dev->config == NULL) {
- 		err = -ENOMEM;
- 		goto free_p9dev;
- 	}
-+	p9dev->config_size = config_size;
- 
- 	strncpy(p9dev->root_dir, root, sizeof(p9dev->root_dir));
- 	p9dev->root_dir[sizeof(p9dev->root_dir)-1] = '\x00';
- 
--	p9dev->config->tag_len = strlen(tag_name);
-+	p9dev->config->tag_len = tag_name_length;
- 	if (p9dev->config->tag_len > MAX_TAG_LEN) {
- 		err = -EINVAL;
- 		goto free_p9dev_config;
- 	}
- 
--	memcpy(&p9dev->config->tag, tag_name, strlen(tag_name));
-+	memcpy(&p9dev->config->tag, tag_name, tag_name_length);
- 
- 	list_add(&p9dev->list, &devs);
- 
- 	if (compat_id == -1)
- 		compat_id = virtio_compat_add_message("virtio-9p", "CONFIG_NET_9P_VIRTIO");
- 
--	return err;
-+	return 0;
- 
- free_p9dev_config:
- 	free(p9dev->config);
+ 	return NUM_VIRT_QUEUES;
+ }
 diff --git a/virtio/balloon.c b/virtio/balloon.c
-index 8e8803f..5bcd6ab 100644
+index 5bcd6ab..450b36a 100644
 --- a/virtio/balloon.c
 +++ b/virtio/balloon.c
-@@ -181,6 +181,13 @@ static u8 *get_config(struct kvm *kvm, void *dev)
- 	return ((u8 *)(&bdev->config));
+@@ -251,7 +251,7 @@ static int set_size_vq(struct kvm *kvm, void *dev, u32 vq, int size)
+ 	return size;
  }
  
-+static size_t get_config_size(struct kvm *kvm, void *dev)
-+{
-+	struct bln_dev *bdev = dev;
-+
-+	return sizeof(bdev->config);
-+}
-+
- static u32 get_host_features(struct kvm *kvm, void *dev)
+-static int get_vq_count(struct kvm *kvm, void *dev)
++static unsigned int get_vq_count(struct kvm *kvm, void *dev)
  {
- 	return 1 << VIRTIO_BALLOON_F_STATS_VQ;
-@@ -251,6 +258,7 @@ static int get_vq_count(struct kvm *kvm, void *dev)
- 
- struct virtio_ops bln_dev_virtio_ops = {
- 	.get_config		= get_config,
-+	.get_config_size	= get_config_size,
- 	.get_host_features	= get_host_features,
- 	.set_guest_features	= set_guest_features,
- 	.init_vq		= init_vq,
+ 	return NUM_VIRT_QUEUES;
+ }
 diff --git a/virtio/blk.c b/virtio/blk.c
-index 4d02d10..af71c0c 100644
+index af71c0c..46ee028 100644
 --- a/virtio/blk.c
 +++ b/virtio/blk.c
-@@ -146,6 +146,13 @@ static u8 *get_config(struct kvm *kvm, void *dev)
- 	return ((u8 *)(&bdev->blk_config));
+@@ -291,7 +291,7 @@ static int set_size_vq(struct kvm *kvm, void *dev, u32 vq, int size)
+ 	return size;
  }
  
-+static size_t get_config_size(struct kvm *kvm, void *dev)
-+{
-+	struct blk_dev *bdev = dev;
-+
-+	return sizeof(bdev->blk_config);
-+}
-+
- static u32 get_host_features(struct kvm *kvm, void *dev)
+-static int get_vq_count(struct kvm *kvm, void *dev)
++static unsigned int get_vq_count(struct kvm *kvm, void *dev)
  {
- 	struct blk_dev *bdev = dev;
-@@ -291,6 +298,7 @@ static int get_vq_count(struct kvm *kvm, void *dev)
- 
- static struct virtio_ops blk_dev_virtio_ops = {
- 	.get_config		= get_config,
-+	.get_config_size	= get_config_size,
- 	.get_host_features	= get_host_features,
- 	.set_guest_features	= set_guest_features,
- 	.get_vq_count		= get_vq_count,
+ 	return NUM_VIRT_QUEUES;
+ }
 diff --git a/virtio/console.c b/virtio/console.c
-index e0b98df..dae6034 100644
+index dae6034..8315808 100644
 --- a/virtio/console.c
 +++ b/virtio/console.c
-@@ -121,6 +121,13 @@ static u8 *get_config(struct kvm *kvm, void *dev)
- 	return ((u8 *)(&cdev->config));
+@@ -216,7 +216,7 @@ static int set_size_vq(struct kvm *kvm, void *dev, u32 vq, int size)
+ 	return size;
  }
  
-+static size_t get_config_size(struct kvm *kvm, void *dev)
-+{
-+	struct con_dev *cdev = dev;
-+
-+	return sizeof(cdev->config);
-+}
-+
- static u32 get_host_features(struct kvm *kvm, void *dev)
+-static int get_vq_count(struct kvm *kvm, void *dev)
++static unsigned int get_vq_count(struct kvm *kvm, void *dev)
  {
- 	return 0;
-@@ -216,6 +223,7 @@ static int get_vq_count(struct kvm *kvm, void *dev)
- 
- static struct virtio_ops con_dev_virtio_ops = {
- 	.get_config		= get_config,
-+	.get_config_size	= get_config_size,
- 	.get_host_features	= get_host_features,
- 	.set_guest_features	= set_guest_features,
- 	.get_vq_count		= get_vq_count,
+ 	return VIRTIO_CONSOLE_NUM_QUEUES;
+ }
 diff --git a/virtio/mmio.c b/virtio/mmio.c
-index 875a288..0094856 100644
+index 0094856..d3555b4 100644
 --- a/virtio/mmio.c
 +++ b/virtio/mmio.c
-@@ -103,15 +103,31 @@ static void virtio_mmio_device_specific(struct kvm_cpu *vcpu,
- 					u8 is_write, struct virtio_device *vdev)
+@@ -175,13 +175,22 @@ static void virtio_mmio_config_out(struct kvm_cpu *vcpu,
  {
  	struct virtio_mmio *vmmio = vdev->virtio;
-+	u8 *config_aperture;
-+	size_t config_aperture_size;
- 	u32 i;
+ 	struct kvm *kvm = vmmio->kvm;
++	unsigned int vq_count = vdev->ops->get_vq_count(kvm, vmmio->dev);
+ 	u32 val = 0;
  
-+	/* Check for wrap-around. */
-+	if (addr + len < addr) {
-+		WARN_ONCE(1, "addr (%llu) + length (%u) wraps-around.\n", addr, len);
-+		return;
-+	}
-+
-+	config_aperture = vdev->ops->get_config(vmmio->kvm, vmmio->dev);
-+	config_aperture_size = vdev->ops->get_config_size(vmmio->kvm, vmmio->dev);
-+
-+	/* Prevent invalid accesses which go beyond the config */
-+	if (config_aperture_size < addr + len) {
-+		WARN_ONCE(1, "Offset (%llu) Length (%u) goes beyond config size (%zu).\n",
-+			addr, len, config_aperture_size);
-+		return;
-+	}
-+
- 	for (i = 0; i < len; i++) {
- 		if (is_write)
--			vdev->ops->get_config(vmmio->kvm, vmmio->dev)[addr + i] =
--					      *(u8 *)data + i;
-+			config_aperture[addr + i] = *(u8 *)data + i;
- 		else
--			data[i] = vdev->ops->get_config(vmmio->kvm,
--							vmmio->dev)[addr + i];
-+			data[i] = config_aperture[addr + i];
- 	}
- }
+ 	switch (addr) {
+ 	case VIRTIO_MMIO_HOST_FEATURES_SEL:
+ 	case VIRTIO_MMIO_GUEST_FEATURES_SEL:
++		val = ioport__read32(data);
++		*(u32 *)(((void *)&vmmio->hdr) + addr) = val;
++		break;
+ 	case VIRTIO_MMIO_QUEUE_SEL:
+ 		val = ioport__read32(data);
++		if (val >= vq_count) {
++			WARN_ONCE(1, "QUEUE_SEL value (%u) is larger than VQ count (%u)\n",
++				val, vq_count);
++			break;
++		}
+ 		*(u32 *)(((void *)&vmmio->hdr) + addr) = val;
+ 		break;
+ 	case VIRTIO_MMIO_STATUS:
+@@ -227,6 +236,11 @@ static void virtio_mmio_config_out(struct kvm_cpu *vcpu,
+ 		break;
+ 	case VIRTIO_MMIO_QUEUE_NOTIFY:
+ 		val = ioport__read32(data);
++		if (val >= vq_count) {
++			WARN_ONCE(1, "QUEUE_NOTIFY value (%u) is larger than VQ count (%u)\n",
++				val, vq_count);
++			break;
++		}
+ 		vdev->ops->notify_vq(vmmio->kvm, vmmio->dev, val);
+ 		break;
+ 	case VIRTIO_MMIO_INTERRUPT_ACK:
+@@ -346,10 +360,12 @@ int virtio_mmio_init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
  
+ int virtio_mmio_reset(struct kvm *kvm, struct virtio_device *vdev)
+ {
+-	int vq;
++	unsigned int vq;
+ 	struct virtio_mmio *vmmio = vdev->virtio;
++	unsigned int vq_count;
+ 
+-	for (vq = 0; vq < vdev->ops->get_vq_count(kvm, vmmio->dev); vq++)
++	vq_count = vdev->ops->get_vq_count(kvm, vmmio->dev);
++	for (vq = 0; vq < vq_count; vq++)
+ 		virtio_mmio_exit_vq(kvm, vdev, vq);
+ 
+ 	return 0;
 diff --git a/virtio/net.c b/virtio/net.c
-index 1ee3c19..ec5dc1f 100644
+index ec5dc1f..8dd523f 100644
 --- a/virtio/net.c
 +++ b/virtio/net.c
-@@ -480,6 +480,13 @@ static u8 *get_config(struct kvm *kvm, void *dev)
- 	return ((u8 *)(&ndev->config));
+@@ -755,11 +755,11 @@ static int set_size_vq(struct kvm *kvm, void *dev, u32 vq, int size)
+ 	return size;
  }
  
-+static size_t get_config_size(struct kvm *kvm, void *dev)
-+{
-+	struct net_dev *ndev = dev;
-+
-+	return sizeof(ndev->config);
-+}
-+
- static u32 get_host_features(struct kvm *kvm, void *dev)
+-static int get_vq_count(struct kvm *kvm, void *dev)
++static unsigned int get_vq_count(struct kvm *kvm, void *dev)
  {
- 	u32 features;
-@@ -757,6 +764,7 @@ static int get_vq_count(struct kvm *kvm, void *dev)
+ 	struct net_dev *ndev = dev;
+ 
+-	return ndev->queue_pairs * 2 + 1;
++	return ndev->queue_pairs * 2U + 1U;
+ }
  
  static struct virtio_ops net_dev_virtio_ops = {
- 	.get_config		= get_config,
-+	.get_config_size	= get_config_size,
- 	.get_host_features	= get_host_features,
- 	.set_guest_features	= set_guest_features,
- 	.get_vq_count		= get_vq_count,
 diff --git a/virtio/pci.c b/virtio/pci.c
-index 2777d1c..0b5cccd 100644
+index 0b5cccd..9a6cbf3 100644
 --- a/virtio/pci.c
 +++ b/virtio/pci.c
-@@ -136,7 +136,25 @@ static bool virtio_pci__specific_data_in(struct kvm *kvm, struct virtio_device *
- 		return true;
- 	} else if (type == VIRTIO_PCI_O_CONFIG) {
- 		u8 cfg;
-+		size_t config_size;
+@@ -329,9 +329,11 @@ static bool virtio_pci__data_out(struct kvm_cpu *vcpu, struct virtio_device *vde
+ 	struct virtio_pci *vpci;
+ 	struct kvm *kvm;
+ 	u32 val;
++	unsigned int vq_count;
  
-+		config_size = vdev->ops->get_config_size(kvm, vpci->dev);
-+		if (size <= 0) {
-+			WARN_ONCE(1, "Size (%d) is non-positive\n", size);
-+			return false;
-+		}
-+		if (config_offset + (u32)size > config_size) {
-+			/* Access goes beyond the config size, so return failure. */
-+			WARN_ONCE(1, "Config access offset (%u) is beyond config size (%zu)\n",
-+				config_offset, config_size);
-+			return false;
-+		}
-+
-+		/* TODO: Handle access lengths beyond one byte */
-+		if (size != 1) {
-+			WARN_ONCE(1, "Size (%d) not supported\n", size);
-+			return false;
-+		}
- 		cfg = vdev->ops->get_config(kvm, vpci->dev)[config_offset];
- 		ioport__write8(data, cfg);
- 		return true;
-@@ -276,6 +294,26 @@ static bool virtio_pci__specific_data_out(struct kvm *kvm, struct virtio_device
+ 	kvm = vcpu->kvm;
+ 	vpci = vdev->virtio;
++	vq_count = vdev->ops->get_vq_count(kvm, vpci->dev);
  
- 		return true;
- 	} else if (type == VIRTIO_PCI_O_CONFIG) {
-+		size_t config_size;
-+
-+		if (size <= 0) {
-+			WARN_ONCE(1, "Size (%d) is non-positive\n", size);
+ 	switch (offset) {
+ 	case VIRTIO_PCI_GUEST_FEATURES:
+@@ -351,10 +353,21 @@ static bool virtio_pci__data_out(struct kvm_cpu *vcpu, struct virtio_device *vde
+ 		}
+ 		break;
+ 	case VIRTIO_PCI_QUEUE_SEL:
+-		vpci->queue_selector = ioport__read16(data);
++		val = ioport__read16(data);
++		if (val >= vq_count) {
++			WARN_ONCE(1, "QUEUE_SEL value (%u) is larger than VQ count (%u)\n",
++				val, vq_count);
 +			return false;
 +		}
-+
-+		config_size = vdev->ops->get_config_size(kvm, vpci->dev);
-+		if (config_offset + (u32)size > config_size) {
-+			/* Access goes beyond the config size, so return failure. */
-+			WARN_ONCE(1, "Config access offset (%u) is beyond config size (%zu)\n",
-+				config_offset, config_size);
++		vpci->queue_selector = val;
+ 		break;
+ 	case VIRTIO_PCI_QUEUE_NOTIFY:
+ 		val = ioport__read16(data);
++		if (val >= vq_count) {
++			WARN_ONCE(1, "QUEUE_SEL value (%u) is larger than VQ count (%u)\n",
++				val, vq_count);
 +			return false;
 +		}
-+
-+		/* TODO: Handle access lengths beyond one byte */
-+		if (size != 1) {
-+			WARN_ONCE(1, "Size (%d) not supported\n", size);
-+			return false;
-+		}
- 		vdev->ops->get_config(kvm, vpci->dev)[config_offset] = *(u8 *)data;
+ 		vdev->ops->notify_vq(kvm, vpci->dev, val);
+ 		break;
+ 	case VIRTIO_PCI_STATUS:
+@@ -647,10 +660,12 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
  
- 		return true;
+ int virtio_pci__reset(struct kvm *kvm, struct virtio_device *vdev)
+ {
+-	int vq;
++	unsigned int vq;
++	unsigned int vq_count;
+ 	struct virtio_pci *vpci = vdev->virtio;
+ 
+-	for (vq = 0; vq < vdev->ops->get_vq_count(kvm, vpci->dev); vq++)
++	vq_count = vdev->ops->get_vq_count(kvm, vpci->dev);
++	for (vq = 0; vq < vq_count; vq++)
+ 		virtio_pci_exit_vq(kvm, vdev, vq);
+ 
+ 	return 0;
 diff --git a/virtio/rng.c b/virtio/rng.c
-index 78eaa64..c7835a0 100644
+index c7835a0..75b682e 100644
 --- a/virtio/rng.c
 +++ b/virtio/rng.c
-@@ -47,6 +47,11 @@ static u8 *get_config(struct kvm *kvm, void *dev)
- 	return 0;
+@@ -147,7 +147,7 @@ static int set_size_vq(struct kvm *kvm, void *dev, u32 vq, int size)
+ 	return size;
  }
  
-+static size_t get_config_size(struct kvm *kvm, void *dev)
-+{
-+	return 0;
-+}
-+
- static u32 get_host_features(struct kvm *kvm, void *dev)
+-static int get_vq_count(struct kvm *kvm, void *dev)
++static unsigned int get_vq_count(struct kvm *kvm, void *dev)
  {
- 	/* Unused */
-@@ -149,6 +154,7 @@ static int get_vq_count(struct kvm *kvm, void *dev)
- 
- static struct virtio_ops rng_dev_virtio_ops = {
- 	.get_config		= get_config,
-+	.get_config_size	= get_config_size,
- 	.get_host_features	= get_host_features,
- 	.set_guest_features	= set_guest_features,
- 	.init_vq		= init_vq,
+ 	return NUM_VIRT_QUEUES;
+ }
 diff --git a/virtio/scsi.c b/virtio/scsi.c
-index 16a86cb..8f1c348 100644
+index 8f1c348..60432cc 100644
 --- a/virtio/scsi.c
 +++ b/virtio/scsi.c
-@@ -38,6 +38,13 @@ static u8 *get_config(struct kvm *kvm, void *dev)
- 	return ((u8 *)(&sdev->config));
+@@ -176,7 +176,7 @@ static int set_size_vq(struct kvm *kvm, void *dev, u32 vq, int size)
+ 	return size;
  }
  
-+static size_t get_config_size(struct kvm *kvm, void *dev)
-+{
-+	struct scsi_dev *sdev = dev;
-+
-+	return sizeof(sdev->config);
-+}
-+
- static u32 get_host_features(struct kvm *kvm, void *dev)
+-static int get_vq_count(struct kvm *kvm, void *dev)
++static unsigned int get_vq_count(struct kvm *kvm, void *dev)
  {
- 	return	1UL << VIRTIO_RING_F_EVENT_IDX |
-@@ -176,6 +183,7 @@ static int get_vq_count(struct kvm *kvm, void *dev)
- 
- static struct virtio_ops scsi_dev_virtio_ops = {
- 	.get_config		= get_config,
-+	.get_config_size	= get_config_size,
- 	.get_host_features	= get_host_features,
- 	.set_guest_features	= set_guest_features,
- 	.init_vq		= init_vq,
+ 	return NUM_VIRT_QUEUES;
+ }
 diff --git a/virtio/vsock.c b/virtio/vsock.c
-index 5b99838..34397b6 100644
+index 34397b6..64b4e95 100644
 --- a/virtio/vsock.c
 +++ b/virtio/vsock.c
-@@ -41,6 +41,13 @@ static u8 *get_config(struct kvm *kvm, void *dev)
- 	return ((u8 *)(&vdev->config));
+@@ -204,7 +204,7 @@ static void notify_vq_gsi(struct kvm *kvm, void *dev, u32 vq, u32 gsi)
+ 		die_perror("VHOST_SET_VRING_CALL failed");
  }
  
-+static size_t get_config_size(struct kvm *kvm, void *dev)
-+{
-+	struct vsock_dev *vdev = dev;
-+
-+	return sizeof(vdev->config);
-+}
-+
- static u32 get_host_features(struct kvm *kvm, void *dev)
+-static int get_vq_count(struct kvm *kvm, void *dev)
++static unsigned int get_vq_count(struct kvm *kvm, void *dev)
  {
- 	return 1UL << VIRTIO_RING_F_EVENT_IDX
-@@ -204,6 +211,7 @@ static int get_vq_count(struct kvm *kvm, void *dev)
- 
- static struct virtio_ops vsock_dev_virtio_ops = {
- 	.get_config		= get_config,
-+	.get_config_size	= get_config_size,
- 	.get_host_features	= get_host_features,
- 	.set_guest_features	= set_guest_features,
- 	.init_vq		= init_vq,
+ 	return VSOCK_VQ_MAX;
+ }
 -- 
 2.25.1
 
