@@ -2,80 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 53D834CC674
-	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 20:49:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 652304CC698
+	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 20:53:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233981AbiCCTt5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Mar 2022 14:49:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58856 "EHLO
+        id S232078AbiCCTyC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Mar 2022 14:54:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38606 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234068AbiCCTt4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Mar 2022 14:49:56 -0500
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92D5E1A271A
-        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 11:49:10 -0800 (PST)
-Received: by mail-pj1-x1035.google.com with SMTP id z12-20020a17090ad78c00b001bf022b69d6so4856156pju.2
-        for <kvm@vger.kernel.org>; Thu, 03 Mar 2022 11:49:10 -0800 (PST)
+        with ESMTP id S229981AbiCCTyB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Mar 2022 14:54:01 -0500
+Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56F66181E63
+        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 11:53:15 -0800 (PST)
+Received: by mail-lf1-x12f.google.com with SMTP id j15so10334099lfe.11
+        for <kvm@vger.kernel.org>; Thu, 03 Mar 2022 11:53:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=KQ0wcOx2SQw4Qbd73iAm9amGlmLaItMj8NK3TTfF//Q=;
-        b=qBKStBez19at04+k4VefYMHHzVnCU3z3/Q/hQe6rJ7qGX9ZthBXd97aAoxK3IUKK9/
-         oj77rXjDHVz96ddFwzl6lC2b+D14B3WOhMp0o5yvGnP1bhSgEvPn7dVz7nn8MAV0fS+E
-         ShYcMp6e0G9fGRq8ZWbK6W+yFZ0I/q05DkoZt0mGF4YfzsaOBxUMkOPbYjGN7eCN8O7C
-         HoAnOKorBgPQvW8EDoyIr0ThXzdWRC2M1D78cfFfVwHaRUr6/lSrDVKtY2D9gpmNqbjY
-         IhPRvzjhQiB7tUAsP/OqbUh4rgrfp+xlZYvBYDzbLFx/naA+IaYmwx8STpK8szVFJMpc
-         TF1g==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=XoEAYDx446fXkmQuWKwwNKiNKBljBToUr9mPvWD2olQ=;
+        b=E3cRT6Y5KHhW/Cza9qMruREtgdGi+aygUVIr/vS3H8uR6KlKAmfd/GicCkvDrm111M
+         /82YJoTtE7ZwblLXpd+9bymcMnfbulRgTJn1rbHa5pXPIGgxh+Y4PVJsRCasrsNU0y0i
+         jVNQQKl7Ed8GG99DgFj7FjxM7CNR7R3bPmDv8kXaENb2gyPnop3U+jpT5xAz2HLvbs4k
+         yxPPq4jayMdACosJNvoRbHe5VCWX7qyPovArzaTjU9Jw/ON10GzcvBohOvE8PhRknZuI
+         pOFO7EqZ1lYxrO/woNF1hbhN8U/Gn51kSCYfTLjCQwXwr9Z5DkN9/Y1TAH/fHXu/mGpp
+         6hbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=KQ0wcOx2SQw4Qbd73iAm9amGlmLaItMj8NK3TTfF//Q=;
-        b=qMx6aq1/0m88rtXkbuZLgVOeterl34O8/noo57XISzXqJv2ZYs8akm8VDpNGwsJzhx
-         Ki9IFDPBOx61jgHIkf5ahnGr9iO5xAUCyauk8HIfEan8zeuqH1scyRiYfuHTRVH2JBhD
-         GXWqlgUo+PWhwnVmmUpDFm8qc+kr3GI+Y8PY7E88MtY4kgABI2IezUVgb0Rrav+aju4F
-         asP+iUs90qrHvjWmXDSiMOtb6BClfl+9FRqGSMVTJD0O3qQYIDuIEzOJHcgQ/f8Dw8lO
-         Q6eUvbJGpoFu3wAE8eizGCD+OTbe/kyhT3rRqD3bf/Y8KmPFGrw6DqrSV5CpQpkpuMHm
-         9Oxg==
-X-Gm-Message-State: AOAM531HXHo03HPWZoinI+twdcjCJJAGegGFgNZY/7cfXJfarl49zTh7
-        iPhh2vHsDt51e70pdxPiarsmEw==
-X-Google-Smtp-Source: ABdhPJz5ZRkQK/R8WKCjGF7iOXXXgBuxdefhJTebxHJgF29bDGBNIVOBhLZryFznFg9GkrtMH1Rkwg==
-X-Received: by 2002:a17:90a:b798:b0:1bd:652a:97b5 with SMTP id m24-20020a17090ab79800b001bd652a97b5mr7019460pjr.6.1646336949863;
-        Thu, 03 Mar 2022 11:49:09 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id o6-20020a17090ad20600b001b8d01566ccsm9046957pju.8.2022.03.03.11.49.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Mar 2022 11:49:09 -0800 (PST)
-Date:   Thu, 3 Mar 2022 19:49:05 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     kvm@vger.kernel.org, Jim Mattson <jmattson@google.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Borislav Petkov <bp@alien8.de>, x86@kernel.org
-Subject: Re: [PATCH 4/4] KVM: x86: lapic: don't allow to set non default apic
- id when not using x2apic api
-Message-ID: <YiEbsasKjrvKKyff@google.com>
-References: <20220301135526.136554-1-mlevitsk@redhat.com>
- <20220301135526.136554-5-mlevitsk@redhat.com>
- <Yh5QJ4dJm63fC42n@google.com>
- <6f4819b4169bd4e2ca9ab710388ebd44b7918eed.camel@redhat.com>
- <Yh5b3eBYK/rGzFfj@google.com>
- <297c8e41f512587230a54130a71ddfd9004c9507.camel@redhat.com>
- <eae0b69fb8f5c47457fac853cc55b41a30762994.camel@redhat.com>
- <YiDx/uYAMSZDvobO@google.com>
- <df1ed2b01c74310bd4918196ba632e906e4c78f1.camel@redhat.com>
- <YiEZJ6tg0+I+MdW5@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=XoEAYDx446fXkmQuWKwwNKiNKBljBToUr9mPvWD2olQ=;
+        b=4IhU2i6p27tI2Sr7QQjGnGJodLyR38aCG5AsrATo+XBjZxljouGGJzCeFeEvLtIVO4
+         pAaoq+eomEcL49+aaVljLJ4dyKYVPJpxsI4GW0pd8vo4dCcilo6N9ILkiimmRzGWnJmq
+         FxWHu534iwrEdHMEKHuFGN1UCTXdcL2hbl1RXA+ky1FArkr8i0UY4SOS/Y1AcHMSdvIZ
+         0Orq6qFq8P0wPvqmaoWOnKINnb+d/J5cyVXXhIC5g51095hk5Hk22OZWJMGc186s7Hmn
+         0/RcFzzJlEy8CPuEXlXA7mx0hiPmKawNJnGs6aLspIB3ZW1ef9db7KMOaeueM+aCpyLU
+         4L1Q==
+X-Gm-Message-State: AOAM5327+xS1TDLajiwNCinkqRBmwC7pAHs9jIH/zj74jsj8V7z6ZFCj
+        T2444f0NdqhEAk1WIbPEfq2TE3DT2+P4DvCyjGBJ8g==
+X-Google-Smtp-Source: ABdhPJwbKab4uPBxWjkPewLzFfGD27do6suW8zprL0EkIZ2+N+uIOuPVKnP13+hvvRIEZuh/Ghvb1SZiXBuoZfOeOSg=
+X-Received: by 2002:a19:7503:0:b0:443:3d52:fde6 with SMTP id
+ y3-20020a197503000000b004433d52fde6mr22360133lfe.250.1646337193350; Thu, 03
+ Mar 2022 11:53:13 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YiEZJ6tg0+I+MdW5@google.com>
+References: <20220203010051.2813563-1-dmatlack@google.com> <20220203010051.2813563-18-dmatlack@google.com>
+ <CANgfPd90UA2_RRRWzwE6D_FtKiExSkbqktKiPpcYV0MmJxagWQ@mail.gmail.com>
+In-Reply-To: <CANgfPd90UA2_RRRWzwE6D_FtKiExSkbqktKiPpcYV0MmJxagWQ@mail.gmail.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Thu, 3 Mar 2022 11:52:46 -0800
+Message-ID: <CALzav=fuLgXJ3Krr8JYXA0Bd1KdPeh+thJnLyvMMZtqsNeSu3w@mail.gmail.com>
+Subject: Re: [PATCH 17/23] KVM: x86/mmu: Pass bool flush parameter to drop_large_spte()
+To:     Ben Gardon <bgardon@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        leksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Peter Feiner <pfeiner@google.com>,
+        Andrew Jones <drjones@redhat.com>,
+        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
+        kvm <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-18.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -87,12 +78,123 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 03, 2022, Sean Christopherson wrote:
-> With your proposed change, KVM_SET_LAPIC will fail and we've broken a functional,
-> if sketchy, setup.  Is there likely to be such a real-world setup that doesn't
-> barf on the inconsistent x2APIC ID?  Probably not, but I don't see any reason to
-> find out.
+On Mon, Feb 28, 2022 at 12:47 PM Ben Gardon <bgardon@google.com> wrote:
+>
+> On Wed, Feb 2, 2022 at 5:02 PM David Matlack <dmatlack@google.com> wrote:
+> >
+> > drop_large_spte() drops a large SPTE if it exists and then flushes TLBs.
+> > Its helper function, __drop_large_spte(), does the drop without the
+> > flush. This difference is not obvious from the name.
+> >
+> > To make the code more readable, pass an explicit flush parameter. Also
+> > replace the vCPU pointer with a KVM pointer so we can get rid of the
+> > double-underscore helper function.
+> >
+> > This is also in preparation for a future commit that will conditionally
+> > flush after dropping a large SPTE.
+> >
+> > No functional change intended.
+> >
+> > Signed-off-by: David Matlack <dmatlack@google.com>
+> > ---
+> >  arch/x86/kvm/mmu/mmu.c         | 25 +++++++++++--------------
+> >  arch/x86/kvm/mmu/paging_tmpl.h |  4 ++--
+> >  2 files changed, 13 insertions(+), 16 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index 99ad7cc8683f..2d47a54e62a5 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -1162,23 +1162,20 @@ static void drop_spte(struct kvm *kvm, u64 *sptep)
+> >  }
+> >
+> >
+> > -static bool __drop_large_spte(struct kvm *kvm, u64 *sptep)
+> > +static void drop_large_spte(struct kvm *kvm, u64 *sptep, bool flush)
+>
+> Since there are no callers of __drop_large_spte, I'd be inclined to
+> hold off on adding the flush parameter in this commit and just add it
+> when it's needed,
 
-I take back the "probably not", this isn't even all that contrived.  Prior to the
-"migration", the guest will see a consistent x2APIC ID.  It's not hard to imagine
-a guest that snapshots the ID and never re-reads the value from "hardware".
+The same argument about waiting until there's a user could be said
+about "KVM: x86/mmu: Pass access information to
+make_huge_page_split_spte()". I agree with this advice when the future
+user is entirely theoretical or some future series. But when the
+future user is literally the next commit in the series, I think it's
+ok to do things this way since it distributes the net diff more evenly
+among patches, which eases reviewing.
+
+But, you've got me thinking and I think I want to change this commit
+slightly: I'll keep __drop_larg_spte() but push all the implementation
+into it and add a bool flush parameter there. That way we don't have
+to change all the call sites of drop_large_spte() in this commit. The
+implementation of drop_large_spte() will just be
+__drop_large_spte(..., true). And the next commit can call
+__drop_large_spte(..., false) with a comment.
+
+> or better yet after you add the new user with the
+> conditional flush so that there's a commit explaining why it's safe to
+> not always flush in that case.
+>
+> >  {
+> > -       if (is_large_pte(*sptep)) {
+> > -               WARN_ON(sptep_to_sp(sptep)->role.level == PG_LEVEL_4K);
+> > -               drop_spte(kvm, sptep);
+> > -               return true;
+> > -       }
+> > +       struct kvm_mmu_page *sp;
+> >
+> > -       return false;
+> > -}
+> > +       if (!is_large_pte(*sptep))
+> > +               return;
+> >
+> > -static void drop_large_spte(struct kvm_vcpu *vcpu, u64 *sptep)
+> > -{
+> > -       if (__drop_large_spte(vcpu->kvm, sptep)) {
+> > -               struct kvm_mmu_page *sp = sptep_to_sp(sptep);
+> > +       sp = sptep_to_sp(sptep);
+> > +       WARN_ON(sp->role.level == PG_LEVEL_4K);
+> > +
+> > +       drop_spte(kvm, sptep);
+> >
+> > -               kvm_flush_remote_tlbs_with_address(vcpu->kvm, sp->gfn,
+> > +       if (flush) {
+> > +               kvm_flush_remote_tlbs_with_address(kvm, sp->gfn,
+> >                         KVM_PAGES_PER_HPAGE(sp->role.level));
+> >         }
+> >  }
+> > @@ -3051,7 +3048,7 @@ static int __direct_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+> >                 if (it.level == fault->goal_level)
+> >                         break;
+> >
+> > -               drop_large_spte(vcpu, it.sptep);
+> > +               drop_large_spte(vcpu->kvm, it.sptep, true);
+> >                 if (is_shadow_present_pte(*it.sptep))
+> >                         continue;
+> >
+> > diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+> > index 703dfb062bf0..ba61de29f2e5 100644
+> > --- a/arch/x86/kvm/mmu/paging_tmpl.h
+> > +++ b/arch/x86/kvm/mmu/paging_tmpl.h
+> > @@ -677,7 +677,7 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+> >                 gfn_t table_gfn;
+> >
+> >                 clear_sp_write_flooding_count(it.sptep);
+> > -               drop_large_spte(vcpu, it.sptep);
+> > +               drop_large_spte(vcpu->kvm, it.sptep, true);
+> >
+> >                 sp = NULL;
+> >                 if (!is_shadow_present_pte(*it.sptep)) {
+> > @@ -739,7 +739,7 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+> >
+> >                 validate_direct_spte(vcpu, it.sptep, direct_access);
+> >
+> > -               drop_large_spte(vcpu, it.sptep);
+> > +               drop_large_spte(vcpu->kvm, it.sptep, true);
+> >
+> >                 if (!is_shadow_present_pte(*it.sptep)) {
+> >                         sp = kvm_mmu_get_child_sp(vcpu, it.sptep, base_gfn,
+> > --
+> > 2.35.0.rc2.247.g8bbb082509-goog
+> >
