@@ -2,536 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B3D74CC1C0
-	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 16:42:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C9284CC23F
+	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 17:06:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234650AbiCCPmr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Mar 2022 10:42:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34478 "EHLO
+        id S232840AbiCCQFv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Mar 2022 11:05:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38056 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234626AbiCCPme (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Mar 2022 10:42:34 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD9491959D7
-        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 07:41:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
-        Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=qth+CgYNxwJ8wH9NQA24oN6VTuCHzZtyV4sM6iDURqU=; b=WKrIhsZ32uwkxFiHjSjTZ+fvMC
-        RVqwWavCbJTISR/RkbXpG52k9Ar90sCZujgKK57kzJaHZ6zXRSaDSQJo5VUpSCIonOYGjdfkaKmcg
-        vImA3k6rnLPkaMKdeCpiopAEqj00DQr+SczeOAIGIG5HrrsFCyOzhbZyjPkgl19juDPa02UixgGqv
-        MCo8+LYOx1gyTHSB3nmhEpT+67VZHzxlwm/WE0wvaiLD402ku6qr1VuCrGOlR7pcpHItyROWFTixt
-        PWEyuZpeIRvAj7Mz+lVQi5IdUEjx/y5qCHgYtlyQV/zfqR4SDsaTnQE44vyTYabkDBmpnjTaWs5Q3
-        OJFde40w==;
-Received: from [2001:8b0:10b:1:85c4:81a:fb42:714d] (helo=i7.infradead.org)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nPna6-00BlVo-Ta; Thu, 03 Mar 2022 15:41:31 +0000
-Received: from dwoodhou by i7.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nPna5-000qnQ-6P; Thu, 03 Mar 2022 15:41:29 +0000
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Metin Kaya <metikaya@amazon.co.uk>,
-        Paul Durrant <pdurrant@amazon.co.uk>
-Subject: [PATCH v3 17/17] KVM: x86/xen: Add self tests for KVM_XEN_HVM_CONFIG_EVTCHN_SEND
-Date:   Thu,  3 Mar 2022 15:41:27 +0000
-Message-Id: <20220303154127.202856-18-dwmw2@infradead.org>
-X-Mailer: git-send-email 2.33.1
-In-Reply-To: <20220303154127.202856-1-dwmw2@infradead.org>
-References: <20220303154127.202856-1-dwmw2@infradead.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Sender: David Woodhouse <dwmw2@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+        with ESMTP id S229805AbiCCQFe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Mar 2022 11:05:34 -0500
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5349E1986DB
+        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 08:04:48 -0800 (PST)
+Received: by mail-pl1-x649.google.com with SMTP id c12-20020a170902848c00b0015025f53e9cso3152479plo.7
+        for <kvm@vger.kernel.org>; Thu, 03 Mar 2022 08:04:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=pFhtq4SarysYe9oxC111dJQSetUbDTizJsJuJ+RcfS4=;
+        b=KXnIJaKGcgH6Gk30m7FKapDGNiIvPKj5HIXovO2i0ceQJKz8HjFypEtR54muz/WN5e
+         r4JtZ55rtLLp557YuM6iXsZjiyAsVjBFq7u9f4VaF60vznYvJ0ugqUpLPUu1BUPkourA
+         Utzfj9V4h/LC+sbB7JisYPwz+EyGYe+uQ1/MYA9tex3jO5dONXzVMb3JSgzHSR7DWlrh
+         hzZuLrAH8RMrtT71dL+OiZbU4QS/cZVop6PfRv/88THDJF89mE+3SblObmmsS2eWoRhW
+         8fHZPdEDR+BCnlpQqmIRmR93Cmiq3HG8wpUDGLvjRB+JonQ28/0psZeI+l58jmVGrp04
+         Qfog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=pFhtq4SarysYe9oxC111dJQSetUbDTizJsJuJ+RcfS4=;
+        b=hS6CwAylHV5ZFU3BJevjkMmU7+HHcYvUWScOtbItA+bNTCYXY3PwJnuabNaJiIOLlT
+         wGNVNl7P9H13XlN6mVaA8cYyC9XZlHbqCM2zl2L+UaFntlVLqDTbI10Kd9BcSWFuP/AD
+         BOBO9DB/RRr+OrB9oNFaleVSWr2A8/EHb/8fcYHmVLluIKjiwqF55AUEDm5Colpt2Q94
+         gPN1ybgYHN7r1SS7jIM5ipH/FJfnb6dUkpfpx2eyIkXv+Kad6/t906O1ozINoc/0Z+k+
+         AjOegpUFunHzXm52q3dpnJDlUUUk77ux9ii5HT8Dpa6BDSBhg37rZSmwAQW4yoH+9Cfn
+         1GHw==
+X-Gm-Message-State: AOAM530VFlyG1pliRE/YR7Pz/yl4JCssuqqlaMNOdaSRwAn1ODP9mMfg
+        tiT0/53m3bdlKa62JFNX/gEZjNGw8zHiPOxL6NnC28w2FKuPa+3ddvQgc1iX00k4MHxtTkOW5tB
+        7izBKP5SpD+CpehXJrIvw7ySvaf3QyHMCL8jLcGT75I/u9i3xGllTXhfqYw==
+X-Google-Smtp-Source: ABdhPJynstxJuHD2FDfX+TswrMqE32RgCuGQqLqhvICbCOJSXNyRSOvTUX1x7iBOGh/qlkdzQDs/9y4oeGM=
+X-Received: from pgonda1.kir.corp.google.com ([2620:15c:29:203:9e02:fb61:c5eb:4183])
+ (user=pgonda job=sendgmr) by 2002:a05:6a00:240c:b0:4e1:2d98:d2c9 with SMTP id
+ z12-20020a056a00240c00b004e12d98d2c9mr39052757pfh.51.1646323487365; Thu, 03
+ Mar 2022 08:04:47 -0800 (PST)
+Date:   Thu,  3 Mar 2022 08:04:42 -0800
+Message-Id: <20220303160442.1815411-1-pgonda@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.1.574.g5d30c73bfb-goog
+Subject: [PATCH] KVM: SVM: Fix missing kvm_cache_regs.h include in svm.h
+From:   Peter Gonda <pgonda@google.com>
+To:     kvm@vger.kernel.org
+Cc:     Peter Gonda <pgonda@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-10.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: David Woodhouse <dwmw@amazon.co.uk>
+Adds include for is_guest_mode() in svm.h.
 
-Test a combination of event channel send, poll and timer operations.
+Just compile tested.
+
+Fixes: 883b0a91f41ab ("KVM: SVM: Move Nested SVM Implementation to nested.c")
+Signed-off-by: Peter Gonda <pgonda@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 ---
- .../selftests/kvm/x86_64/xen_shinfo_test.c    | 333 +++++++++++++++++-
- 1 file changed, 320 insertions(+), 13 deletions(-)
+ arch/x86/kvm/svm/svm.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c b/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
-index 376c611443cd..63b0ca7685b0 100644
---- a/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
-@@ -39,12 +39,36 @@
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index e45b5645d5e0..396d60e36b82 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -22,6 +22,8 @@
+ #include <asm/svm.h>
+ #include <asm/sev-common.h>
  
- #define EVTCHN_VECTOR	0x10
++#include "kvm_cache_regs.h"
++
+ #define __sme_page_pa(x) __sme_set(page_to_pfn(x) << PAGE_SHIFT)
  
-+#define EVTCHN_TEST1 15
-+#define EVTCHN_TEST2 66
-+#define EVTCHN_TIMER 13
-+
- static struct kvm_vm *vm;
- 
- #define XEN_HYPERCALL_MSR	0x40000000
- 
- #define MIN_STEAL_TIME		50000
- 
-+#define __HYPERVISOR_set_timer_op	15
-+#define __HYPERVISOR_sched_op		29
-+#define __HYPERVISOR_event_channel_op	32
-+
-+#define SCHEDOP_poll			3
-+
-+#define EVTCHNOP_send			4
-+
-+#define EVTCHNSTAT_interdomain		2
-+
-+struct evtchn_send {
-+	u32 port;
-+};
-+
-+struct sched_poll {
-+	u32 *ports;
-+	unsigned int nr_ports;
-+	u64 timeout;
-+};
-+
- struct pvclock_vcpu_time_info {
- 	u32   version;
- 	u32   pad0;
-@@ -107,15 +131,25 @@ struct {
- 	struct kvm_irq_routing_entry entries[2];
- } irq_routes;
- 
-+bool guest_saw_irq;
-+
- static void evtchn_handler(struct ex_regs *regs)
- {
- 	struct vcpu_info *vi = (void *)VCPU_INFO_VADDR;
- 	vi->evtchn_upcall_pending = 0;
- 	vi->evtchn_pending_sel = 0;
-+	guest_saw_irq = true;
- 
- 	GUEST_SYNC(0x20);
- }
- 
-+static void guest_wait_for_irq(void)
-+{
-+	while (!guest_saw_irq)
-+		__asm__ __volatile__ ("rep nop" : : : "memory");
-+	guest_saw_irq = false;
-+}
-+
- static void guest_code(void)
- {
- 	struct vcpu_runstate_info *rs = (void *)RUNSTATE_VADDR;
-@@ -128,6 +162,8 @@ static void guest_code(void)
- 	/* Trigger an interrupt injection */
- 	GUEST_SYNC(0);
- 
-+	guest_wait_for_irq();
-+
- 	/* Test having the host set runstates manually */
- 	GUEST_SYNC(RUNSTATE_runnable);
- 	GUEST_ASSERT(rs->time[RUNSTATE_runnable] != 0);
-@@ -168,14 +204,127 @@ static void guest_code(void)
- 	/* Now deliver an *unmasked* interrupt */
- 	GUEST_SYNC(8);
- 
--	while (!si->evtchn_pending[1])
--		__asm__ __volatile__ ("rep nop" : : : "memory");
-+	guest_wait_for_irq();
- 
- 	/* Change memslots and deliver an interrupt */
- 	GUEST_SYNC(9);
- 
--	for (;;)
--		__asm__ __volatile__ ("rep nop" : : : "memory");
-+	guest_wait_for_irq();
-+
-+	/* Deliver event channel with KVM_XEN_HVM_EVTCHN_SEND */
-+	GUEST_SYNC(10);
-+
-+	guest_wait_for_irq();
-+
-+	GUEST_SYNC(11);
-+
-+	/* Our turn. Deliver event channel (to ourselves) with
-+	 * EVTCHNOP_send hypercall. */
-+	unsigned long rax;
-+	struct evtchn_send s = { .port = 127 };
-+	__asm__ __volatile__ ("vmcall" :
-+			      "=a" (rax) :
-+			      "a" (__HYPERVISOR_event_channel_op),
-+			      "D" (EVTCHNOP_send),
-+			      "S" (&s));
-+
-+	GUEST_ASSERT(rax == 0);
-+
-+	guest_wait_for_irq();
-+
-+	GUEST_SYNC(12);
-+
-+	/* Deliver "outbound" event channel to an eventfd which
-+	 * happens to be one of our own irqfds. */
-+	s.port = 197;
-+	__asm__ __volatile__ ("vmcall" :
-+			      "=a" (rax) :
-+			      "a" (__HYPERVISOR_event_channel_op),
-+			      "D" (EVTCHNOP_send),
-+			      "S" (&s));
-+
-+	GUEST_ASSERT(rax == 0);
-+
-+	guest_wait_for_irq();
-+
-+	GUEST_SYNC(13);
-+
-+	/* Set a timer 100ms in the future. */
-+	__asm__ __volatile__ ("vmcall" :
-+			      "=a" (rax) :
-+			      "a" (__HYPERVISOR_set_timer_op),
-+			      "D" (rs->state_entry_time + 100000000));
-+	GUEST_ASSERT(rax == 0);
-+
-+	GUEST_SYNC(14);
-+
-+	/* Now wait for the timer */
-+	guest_wait_for_irq();
-+
-+	GUEST_SYNC(15);
-+
-+	/* The host has 'restored' the timer. Just wait for it. */
-+	guest_wait_for_irq();
-+
-+	GUEST_SYNC(16);
-+
-+	/* Poll for an event channel port which is already set */
-+	u32 ports[1] = { EVTCHN_TIMER };
-+	struct sched_poll p = {
-+		.ports = ports,
-+		.nr_ports = 1,
-+		.timeout = 0,
-+	};
-+
-+	__asm__ __volatile__ ("vmcall" :
-+			      "=a" (rax) :
-+			      "a" (__HYPERVISOR_sched_op),
-+			      "D" (SCHEDOP_poll),
-+			      "S" (&p));
-+
-+	GUEST_ASSERT(rax == 0);
-+
-+	GUEST_SYNC(17);
-+
-+	/* Poll for an unset port and wait for the timeout. */
-+	p.timeout = 100000000;
-+	__asm__ __volatile__ ("vmcall" :
-+			      "=a" (rax) :
-+			      "a" (__HYPERVISOR_sched_op),
-+			      "D" (SCHEDOP_poll),
-+			      "S" (&p));
-+
-+	GUEST_ASSERT(rax == 0);
-+
-+	GUEST_SYNC(18);
-+
-+	/* A timer will wake the masked port we're waiting on, while we poll */
-+	p.timeout = 0;
-+	__asm__ __volatile__ ("vmcall" :
-+			      "=a" (rax) :
-+			      "a" (__HYPERVISOR_sched_op),
-+			      "D" (SCHEDOP_poll),
-+			      "S" (&p));
-+
-+	GUEST_ASSERT(rax == 0);
-+
-+	GUEST_SYNC(19);
-+
-+	/* A timer wake an *unmasked* port which should wake us with an
-+	 * actual interrupt, while we're polling on a different port. */
-+	ports[0]++;
-+	p.timeout = 0;
-+	__asm__ __volatile__ ("vmcall" :
-+			      "=a" (rax) :
-+			      "a" (__HYPERVISOR_sched_op),
-+			      "D" (SCHEDOP_poll),
-+			      "S" (&p));
-+
-+	GUEST_ASSERT(rax == 0);
-+
-+	guest_wait_for_irq();
-+
-+	GUEST_SYNC(20);
- }
- 
- static int cmp_timespec(struct timespec *a, struct timespec *b)
-@@ -191,9 +340,13 @@ static int cmp_timespec(struct timespec *a, struct timespec *b)
- 	else
- 		return 0;
- }
-+struct vcpu_info *vinfo;
- 
- static void handle_alrm(int sig)
- {
-+	if (vinfo)
-+		printf("evtchn_upcall_pending 0x%x\n", vinfo->evtchn_upcall_pending);
-+	vcpu_dump(stdout, vm, VCPU_ID, 0);
- 	TEST_FAIL("IRQ delivery timed out");
- }
- 
-@@ -213,6 +366,7 @@ int main(int argc, char *argv[])
- 
- 	bool do_runstate_tests = !!(xen_caps & KVM_XEN_HVM_CONFIG_RUNSTATE);
- 	bool do_eventfd_tests = !!(xen_caps & KVM_XEN_HVM_CONFIG_EVTCHN_2LEVEL);
-+	bool do_evtchn_tests = do_eventfd_tests && !!(xen_caps & KVM_XEN_HVM_CONFIG_EVTCHN_SEND);
- 
- 	clock_gettime(CLOCK_REALTIME, &min_ts);
- 
-@@ -236,7 +390,7 @@ int main(int argc, char *argv[])
- 
- 	/* Let the kernel know that we *will* use it for sending all
- 	 * event channels, which lets it intercept SCHEDOP_poll */
--	if (xen_caps & KVM_XEN_HVM_CONFIG_EVTCHN_SEND)
-+	if (do_evtchn_tests)
- 		hvmc.flags |= KVM_XEN_HVM_CONFIG_EVTCHN_SEND;
- 
- 	vm_ioctl(vm, KVM_XEN_HVM_CONFIG, &hvmc);
-@@ -301,7 +455,7 @@ int main(int argc, char *argv[])
- 
- 		/* Unexpected, but not a KVM failure */
- 		if (irq_fd[0] == -1 || irq_fd[1] == -1)
--			do_eventfd_tests = false;
-+			do_evtchn_tests = do_eventfd_tests = false;
- 	}
- 
- 	if (do_eventfd_tests) {
-@@ -309,13 +463,13 @@ int main(int argc, char *argv[])
- 
- 		irq_routes.entries[0].gsi = 32;
- 		irq_routes.entries[0].type = KVM_IRQ_ROUTING_XEN_EVTCHN;
--		irq_routes.entries[0].u.xen_evtchn.port = 15;
-+		irq_routes.entries[0].u.xen_evtchn.port = EVTCHN_TEST1;
- 		irq_routes.entries[0].u.xen_evtchn.vcpu = VCPU_ID;
- 		irq_routes.entries[0].u.xen_evtchn.priority = KVM_IRQ_ROUTING_XEN_EVTCHN_PRIO_2LEVEL;
- 
- 		irq_routes.entries[1].gsi = 33;
- 		irq_routes.entries[1].type = KVM_IRQ_ROUTING_XEN_EVTCHN;
--		irq_routes.entries[1].u.xen_evtchn.port = 66;
-+		irq_routes.entries[1].u.xen_evtchn.port = EVTCHN_TEST2;
- 		irq_routes.entries[1].u.xen_evtchn.vcpu = VCPU_ID;
- 		irq_routes.entries[1].u.xen_evtchn.priority = KVM_IRQ_ROUTING_XEN_EVTCHN_PRIO_2LEVEL;
- 
-@@ -336,7 +490,39 @@ int main(int argc, char *argv[])
- 		sigaction(SIGALRM, &sa, NULL);
- 	}
- 
--	struct vcpu_info *vinfo = addr_gpa2hva(vm, VCPU_INFO_VADDR);
-+	struct kvm_xen_vcpu_attr tmr = {
-+		.type = KVM_XEN_VCPU_ATTR_TYPE_TIMER,
-+		.u.timer.port = EVTCHN_TIMER,
-+		.u.timer.priority = KVM_IRQ_ROUTING_XEN_EVTCHN_PRIO_2LEVEL,
-+		.u.timer.expires_ns = 0
-+	};
-+
-+	if (do_evtchn_tests) {
-+		struct kvm_xen_hvm_attr inj = {
-+			.type = KVM_XEN_ATTR_TYPE_EVTCHN,
-+			.u.evtchn.send_port = 127,
-+			.u.evtchn.type = EVTCHNSTAT_interdomain,
-+			.u.evtchn.flags = 0,
-+			.u.evtchn.deliver.port.port = EVTCHN_TEST1,
-+			.u.evtchn.deliver.port.vcpu = VCPU_ID + 1,
-+			.u.evtchn.deliver.port.priority = KVM_IRQ_ROUTING_XEN_EVTCHN_PRIO_2LEVEL,
-+		};
-+		vm_ioctl(vm, KVM_XEN_HVM_SET_ATTR, &inj);
-+
-+		/* Test migration to a different vCPU */
-+		inj.u.evtchn.flags = KVM_XEN_EVTCHN_UPDATE;
-+		inj.u.evtchn.deliver.port.vcpu = VCPU_ID;
-+		vm_ioctl(vm, KVM_XEN_HVM_SET_ATTR, &inj);
-+
-+		inj.u.evtchn.send_port = 197;
-+		inj.u.evtchn.deliver.eventfd.port = 0;
-+		inj.u.evtchn.deliver.eventfd.fd = irq_fd[1];
-+		inj.u.evtchn.flags = 0;
-+		vm_ioctl(vm, KVM_XEN_HVM_SET_ATTR, &inj);
-+
-+		vcpu_ioctl(vm, VCPU_ID, KVM_XEN_VCPU_SET_ATTR, &tmr);
-+	}
-+	vinfo = addr_gpa2hva(vm, VCPU_INFO_VADDR);
- 	vinfo->evtchn_upcall_pending = 0;
- 
- 	struct vcpu_runstate_info *rs = addr_gpa2hva(vm, RUNSTATE_ADDR);
-@@ -429,7 +615,7 @@ int main(int argc, char *argv[])
- 					goto done;
- 				if (verbose)
- 					printf("Testing masked event channel\n");
--				shinfo->evtchn_mask[0] = 0x8000;
-+				shinfo->evtchn_mask[0] = 1UL << EVTCHN_TEST1;
- 				eventfd_write(irq_fd[0], 1UL);
- 				alarm(1);
- 				break;
-@@ -446,6 +632,9 @@ int main(int argc, char *argv[])
- 				break;
- 
- 			case 9:
-+				TEST_ASSERT(!evtchn_irq_expected,
-+					    "Expected event channel IRQ but it didn't happen");
-+				shinfo->evtchn_pending[1] = 0;
- 				if (verbose)
- 					printf("Testing event channel after memslot change\n");
- 				vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
-@@ -455,12 +644,129 @@ int main(int argc, char *argv[])
- 				alarm(1);
- 				break;
- 
-+			case 10:
-+				TEST_ASSERT(!evtchn_irq_expected,
-+					    "Expected event channel IRQ but it didn't happen");
-+				if (!do_evtchn_tests)
-+					goto done;
-+
-+				shinfo->evtchn_pending[0] = 0;
-+				if (verbose)
-+					printf("Testing injection with KVM_XEN_HVM_EVTCHN_SEND\n");
-+
-+				struct kvm_irq_routing_xen_evtchn e;
-+				e.port = EVTCHN_TEST2;
-+				e.vcpu = VCPU_ID;
-+				e.priority = KVM_IRQ_ROUTING_XEN_EVTCHN_PRIO_2LEVEL;
-+
-+				vm_ioctl(vm, KVM_XEN_HVM_EVTCHN_SEND, &e);
-+				evtchn_irq_expected = true;
-+				alarm(1);
-+				break;
-+
-+			case 11:
-+				TEST_ASSERT(!evtchn_irq_expected,
-+					    "Expected event channel IRQ but it didn't happen");
-+				shinfo->evtchn_pending[1] = 0;
-+
-+				if (verbose)
-+					printf("Testing guest EVTCHNOP_send direct to evtchn\n");
-+				evtchn_irq_expected = true;
-+				alarm(1);
-+				break;
-+
-+			case 12:
-+				TEST_ASSERT(!evtchn_irq_expected,
-+					    "Expected event channel IRQ but it didn't happen");
-+				shinfo->evtchn_pending[0] = 0;
-+
-+				if (verbose)
-+					printf("Testing guest EVTCHNOP_send to eventfd\n");
-+				evtchn_irq_expected = true;
-+				alarm(1);
-+				break;
-+
-+			case 13:
-+				TEST_ASSERT(!evtchn_irq_expected,
-+					    "Expected event channel IRQ but it didn't happen");
-+				shinfo->evtchn_pending[1] = 0;
-+
-+				if (verbose)
-+					printf("Testing guest oneshot timer\n");
-+				break;
-+
-+			case 14:
-+				memset(&tmr, 0, sizeof(tmr));
-+				tmr.type = KVM_XEN_VCPU_ATTR_TYPE_TIMER,
-+				vcpu_ioctl(vm, VCPU_ID, KVM_XEN_VCPU_GET_ATTR, &tmr);
-+				TEST_ASSERT(tmr.u.timer.port == EVTCHN_TIMER,
-+					    "Timer port not returned");
-+				TEST_ASSERT(tmr.u.timer.priority == KVM_IRQ_ROUTING_XEN_EVTCHN_PRIO_2LEVEL,
-+					    "Timer priority not returned");
-+				TEST_ASSERT(tmr.u.timer.expires_ns > rs->state_entry_time,
-+					    "Timer expiry not returned");
-+				evtchn_irq_expected = true;
-+				alarm(1);
-+				break;
-+
-+			case 15:
-+				TEST_ASSERT(!evtchn_irq_expected,
-+					    "Expected event channel IRQ but it didn't happen");
-+				shinfo->evtchn_pending[0] = 0;
-+
-+				if (verbose)
-+					printf("Testing restored oneshot timer\n");
-+
-+				tmr.u.timer.expires_ns = rs->state_entry_time + 100000000,
-+				vcpu_ioctl(vm, VCPU_ID, KVM_XEN_VCPU_SET_ATTR, &tmr);
-+				evtchn_irq_expected = true;
-+				alarm(1);
-+				break;
-+
-+			case 16:
-+				TEST_ASSERT(!evtchn_irq_expected,
-+					    "Expected event channel IRQ but it didn't happen");
-+
-+				if (verbose)
-+					printf("Testing SCHEDOP_poll with already pending event\n");
-+				shinfo->evtchn_pending[0] = shinfo->evtchn_mask[0] = 1UL << EVTCHN_TIMER;
-+				alarm(1);
-+				break;
-+
-+			case 17:
-+				if (verbose)
-+					printf("Testing SCHEDOP_poll timeout\n");
-+				shinfo->evtchn_pending[0] = 0;
-+				alarm(1);
-+				break;
-+
-+			case 18:
-+				if (verbose)
-+					printf("Testing SCHEDOP_poll wake on masked event\n");
-+
-+				tmr.u.timer.expires_ns = rs->state_entry_time + 100000000,
-+				vcpu_ioctl(vm, VCPU_ID, KVM_XEN_VCPU_SET_ATTR, &tmr);
-+				break;
-+
-+			case 19:
-+				shinfo->evtchn_pending[0] = shinfo->evtchn_mask[0] = 0;
-+				if (verbose)
-+					printf("Testing SCHEDOP_poll wake on unmasked event\n");
-+
-+				tmr.u.timer.expires_ns = rs->state_entry_time + 100000000,
-+				vcpu_ioctl(vm, VCPU_ID, KVM_XEN_VCPU_SET_ATTR, &tmr);
-+				evtchn_irq_expected = true;
-+				break;
-+
-+			case 20:
-+				TEST_ASSERT(!evtchn_irq_expected,
-+					    "Expected event channel IRQ but it didn't happen");
-+				shinfo->evtchn_pending[1] = 0;
-+				goto done;
-+
- 			case 0x20:
- 				TEST_ASSERT(evtchn_irq_expected, "Unexpected event channel IRQ");
- 				evtchn_irq_expected = false;
--				if (shinfo->evtchn_pending[1] &&
--				    shinfo->evtchn_pending[0])
--					goto done;
- 				break;
- 			}
- 			break;
-@@ -473,6 +779,7 @@ int main(int argc, char *argv[])
- 	}
- 
-  done:
-+	alarm(0);
- 	clock_gettime(CLOCK_REALTIME, &max_ts);
- 
- 	/*
+ #define	IOPM_SIZE PAGE_SIZE * 3
 -- 
-2.33.1
+2.35.1.574.g5d30c73bfb-goog
 
