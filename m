@@ -2,132 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AFC174CB53B
-	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 04:07:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BBCDF4CB55A
+	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 04:19:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231915AbiCCC7S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Mar 2022 21:59:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60638 "EHLO
+        id S231965AbiCCDNc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 22:13:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38944 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231910AbiCCC7R (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 21:59:17 -0500
-Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC195DCE36;
-        Wed,  2 Mar 2022 18:58:31 -0800 (PST)
-Received: by mail-io1-xd33.google.com with SMTP id q8so4293198iod.2;
-        Wed, 02 Mar 2022 18:58:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=1H4fbbodFL+rmUux9zr3IzveyrIH4qejmueZOopSFSg=;
-        b=Kn+3avd5LqetsWkpBJPiPKBACwyOVorChnB4+tsXtro6mJbJwxoOae6JK/+rNostCe
-         uRhMqiHPo6muvKqG8tnESlPH+sSQ/mPAx+RbLdL3ghK/rZ7LrzIDKmfbysWgesD2BVIg
-         1HfpkwiZzz2L/0zkG0QiJp68z7HD7QneSTYYGUv121SuQmYtCS1QpRFuTCHG8/ilZx1r
-         neFmOCkEQtcOi3diu1HXk/OapCAsP00TDyPU6ZxqdgLXHzZng1RbhQqCwzQXVNhRlESQ
-         5TN+43LGAAvIQihac/wibSwGwMMGgMMSdbhdK7mzlEmnrAAG4WAubdPun3XQiXoMJB8u
-         Ufqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=1H4fbbodFL+rmUux9zr3IzveyrIH4qejmueZOopSFSg=;
-        b=eFtj1vDvx4CDVaXQC9KySuO7bO+3IryH0e5rQQ/iuQ680a2Vlsw/tYp+Xs950tf4aG
-         MWtS1ejsq9C24mPSDMjEjkz3YjnwKKvWE7eglF2GICmI28UxFeRCxErDuXz85qyvpe46
-         puO4tCRK2BuvgjclFhpKBKbS5YkQo+r6pl09wJf+sjuzlqWxoOi4wOllIY8n5ajPEnv9
-         e02VjMQ0RZuZ3125jAyWrp0mSmtJB9acZBmkhLN906wvZTjFVdLbFZxshfIPMOgkyrGZ
-         6VC8HZ1YbxT8RkSO0CJNdtxrk6q9hYeBBr3/pEyjh+GoArLp/mEvrCtekJW6E99oTiTA
-         8nug==
-X-Gm-Message-State: AOAM530SAjHhUyv0b9khqR7FeFTpfw57yWTdXrAHjVbywPV+uG6yCzCw
-        cPU7RCUkzogc5HTYNF96nzeLiCBQNZYi1bnaYlQ=
-X-Google-Smtp-Source: ABdhPJxM6u0ZGEggPTQ7pSChdE1EmALRR0gWb+iKx5lq+RjU2pcSXVpp3RaJkXEUJoBpFdnEytRHi9oB99BOzhOGQZM=
-X-Received: by 2002:a02:a984:0:b0:317:36c9:b572 with SMTP id
- q4-20020a02a984000000b0031736c9b572mr14083601jam.252.1646276311176; Wed, 02
- Mar 2022 18:58:31 -0800 (PST)
+        with ESMTP id S231956AbiCCDNb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 22:13:31 -0500
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4C32C5B;
+        Wed,  2 Mar 2022 19:12:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1646277166; x=1677813166;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=SgeVA5g+s36SRkRxOQRJ2ZD4+6IxWoQsjjXwIO8y/pA=;
+  b=HZp47U2Lf6qsgIU6srM1hyq0slgQM+H20+qGuPWEEgRRlPjvLQo/2q57
+   97qD2OrRdd9lf9pGf/aTHfDqrd4oqEWbpvlLSy9Ssy1YAhrhT4/Na5LB+
+   d1EUDynngX0MkNL4K21MOzipEIfd4wxNnM+EPuoOnejXqDsuAtvdxS9rW
+   6PyUZlZ/fyF2PxW4Fxgif3oIWwWPI2uSBm1qOl0XaGnhCcwrie/xqRvDS
+   XkF/QLqG3rhUxwVegy1tCGdJ9WS8DuHTuLPaecl/k9ZY5ZF7sT+R01aYc
+   UTNYHP49evHuiOpS8GMu0bLwcVBbTJvfbRXIYEXyl8ur7jFkiCK5V8ay0
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10274"; a="316782844"
+X-IronPort-AV: E=Sophos;i="5.90,150,1643702400"; 
+   d="scan'208";a="316782844"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2022 19:12:46 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.90,150,1643702400"; 
+   d="scan'208";a="535641926"
+Received: from lkp-server01.sh.intel.com (HELO ccb16ba0ecc3) ([10.239.97.150])
+  by orsmga007.jf.intel.com with ESMTP; 02 Mar 2022 19:12:42 -0800
+Received: from kbuild by ccb16ba0ecc3 with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1nPbtS-00004c-7j; Thu, 03 Mar 2022 03:12:42 +0000
+Date:   Thu, 3 Mar 2022 11:12:22 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     kbuild-all@lists.01.org, borntraeger@de.ibm.com,
+        frankja@linux.ibm.com, thuth@redhat.com, pasic@linux.ibm.com,
+        david@redhat.com, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, scgl@linux.ibm.com,
+        mimu@linux.ibm.com, nrb@linux.ibm.com
+Subject: Re: [PATCH v8 10/17] KVM: s390: pv: add mmu_notifier
+Message-ID: <202203031051.SV8THyiU-lkp@intel.com>
+References: <20220302181143.188283-11-imbrenda@linux.ibm.com>
 MIME-Version: 1.0
-References: <20220301063756.16817-1-flyingpeng@tencent.com>
- <Yh5d7XBD9D4FhEe3@google.com> <CAPm50a+p2pSjExDwPmGpZ_aTuxs=x6RZ4-AAD19RDQx2o-=NCw@mail.gmail.com>
- <YiAZ3wTICeLTVnJz@google.com>
-In-Reply-To: <YiAZ3wTICeLTVnJz@google.com>
-From:   Hao Peng <flyingpenghao@gmail.com>
-Date:   Thu, 3 Mar 2022 10:56:59 +0800
-Message-ID: <CAPm50aLJ51mm9JVpTMQCkNENX_9-Do5UeH5zxu-5byOcOFsJBg@mail.gmail.com>
-Subject: Re: [PATCH] kvm: x86: Improve virtual machine startup performance
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220302181143.188283-11-imbrenda@linux.ibm.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 3, 2022 at 9:29 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Wed, Mar 02, 2022, Hao Peng wrote:
-> > On Wed, Mar 2, 2022 at 1:54 AM Sean Christopherson <seanjc@google.com> wrote:
-> > >
-> > > On Tue, Mar 01, 2022, Peng Hao wrote:
-> > > >  From: Peng Hao <flyingpeng@tencent.com>
-> > > >
-> > > > vcpu 0 will repeatedly enter/exit the smm state during the startup
-> > > > phase, and kvm_init_mmu will be called repeatedly during this process.
-> > > > There are parts of the mmu initialization code that do not need to be
-> > > > modified after the first initialization.
-> > > >
-> > > > Statistics on my server, vcpu0 when starting the virtual machine
-> > > > Calling kvm_init_mmu more than 600 times (due to smm state switching).
-> > > > The patch can save about 36 microseconds in total.
-> > > >
-> > > > Signed-off-by: Peng Hao <flyingpeng@tencent.com>
-> > > > ---
-> > > > @@ -5054,7 +5059,7 @@ void kvm_mmu_after_set_cpuid(struct kvm_vcpu *vcpu)
-> > > >  void kvm_mmu_reset_context(struct kvm_vcpu *vcpu)
-> > > >  {
-> > > >       kvm_mmu_unload(vcpu);
-> > > > -     kvm_init_mmu(vcpu);
-> > > > +     kvm_init_mmu(vcpu, false);
-> > >
-> > > This is wrong, kvm_mmu_reset_context() is the "big hammer" and is expected to
-> > > unconditionally get the MMU to a known good state.  E.g. failure to initialize
-> > > means this code:
-> > >
-> > >         context->shadow_root_level = kvm_mmu_get_tdp_level(vcpu);
-> > >
-> > > will not update the shadow_root_level as expected in response to userspace changing
-> > > guest.MAXPHYADDR in such a way that KVM enables/disables 5-level paging.
-> > >
-> > Thanks for pointing this out. However, other than shadow_root_level,
-> > other fields of context will not
-> > change during the entire operation, such as
-> > page_fault/sync_page/direct_map and so on under
-> > the condition of tdp_mmu.
-> > Is this patch still viable after careful confirmation of the fields
-> > that won't be modified?
->
-> No, passing around the "init" flag is a hack.
->
-> But, we can achieve what you want simply by initializing the constant data once
-> per vCPU.  There's a _lot_ of state that is constant for a given MMU now that KVM
-> uses separate MMUs for L1 vs. L2 when TDP is enabled.  I should get patches posted
-> tomorrow, just need to test (famous last words).
->
-> Also, based on the number of SMM transitions, I'm guessing you're using SeaBIOS.
-> Have you tried disabling CONFIG_CALL32_SMM, or CONFIG_USE_SMM altogether?  That
-> might be an even better way to improve performance in your environment.
->
+Hi Claudio,
 
-Both options are disabled in guest.
-> Last question, do you happen to know why eliminating this code shaves 36us?  The
-> raw writes don't seem like they'd take that long.  Maybe the writes to function
-> pointers trigger stalls or mispredicts or something?  If you don't have an easy
-> answer, don't bother investigating, I'm just curious.
+I love your patch! Yet something to improve:
 
-I'm guessing it's because of the cache. At first, I wanted to replace
-it with memcpy, if the modified fields are continuous enough, I can
-use instructions such as erms/fsrm.
+[auto build test ERROR on kvm/master]
+[also build test ERROR on v5.17-rc6 next-20220302]
+[cannot apply to kvms390/next s390/features]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
+
+url:    https://github.com/0day-ci/linux/commits/Claudio-Imbrenda/KVM-s390-pv-implement-lazy-destroy-for-reboot/20220303-021407
+base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git master
+config: s390-buildonly-randconfig-r006-20220302 (https://download.01.org/0day-ci/archive/20220303/202203031051.SV8THyiU-lkp@intel.com/config)
+compiler: s390-linux-gcc (GCC) 11.2.0
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/0day-ci/linux/commit/bbf278ea47b7bdfb3c72e24faffedbb8a3a5b9f9
+        git remote add linux-review https://github.com/0day-ci/linux
+        git fetch --no-tags linux-review Claudio-Imbrenda/KVM-s390-pv-implement-lazy-destroy-for-reboot/20220303-021407
+        git checkout bbf278ea47b7bdfb3c72e24faffedbb8a3a5b9f9
+        # save the config file to linux build tree
+        mkdir build_dir
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.2.0 make.cross O=build_dir ARCH=s390 SHELL=/bin/bash arch/s390/kvm/
+
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
+
+All errors (new ones prefixed by >>):
+
+   arch/s390/kvm/kvm-s390.c: In function 'kvm_arch_destroy_vm':
+>> arch/s390/kvm/kvm-s390.c:2839:17: error: implicit declaration of function 'mmu_notifier_unregister'; did you mean 'preempt_notifier_unregister'? [-Werror=implicit-function-declaration]
+    2839 |                 mmu_notifier_unregister(&kvm->arch.pv.mmu_notifier, kvm->mm);
+         |                 ^~~~~~~~~~~~~~~~~~~~~~~
+         |                 preempt_notifier_unregister
+   cc1: some warnings being treated as errors
+--
+   arch/s390/kvm/pv.c: In function 'kvm_s390_pv_init_vm':
+>> arch/s390/kvm/pv.c:260:17: error: implicit declaration of function 'mmu_notifier_register'; did you mean 'mmu_notifier_release'? [-Werror=implicit-function-declaration]
+     260 |                 mmu_notifier_register(&kvm->arch.pv.mmu_notifier, kvm->mm);
+         |                 ^~~~~~~~~~~~~~~~~~~~~
+         |                 mmu_notifier_release
+   cc1: some warnings being treated as errors
+
+
+vim +2839 arch/s390/kvm/kvm-s390.c
+
+  2823	
+  2824	void kvm_arch_destroy_vm(struct kvm *kvm)
+  2825	{
+  2826		u16 rc, rrc;
+  2827	
+  2828		kvm_destroy_vcpus(kvm);
+  2829		sca_dispose(kvm);
+  2830		kvm_s390_gisa_destroy(kvm);
+  2831		/*
+  2832		 * We are already at the end of life and kvm->lock is not taken.
+  2833		 * This is ok as the file descriptor is closed by now and nobody
+  2834		 * can mess with the pv state. To avoid lockdep_assert_held from
+  2835		 * complaining we do not use kvm_s390_pv_is_protected.
+  2836		 */
+  2837		if (kvm_s390_pv_get_handle(kvm)) {
+  2838			kvm_s390_pv_deinit_vm(kvm, &rc, &rrc);
+> 2839			mmu_notifier_unregister(&kvm->arch.pv.mmu_notifier, kvm->mm);
+  2840		}
+  2841		debug_unregister(kvm->arch.dbf);
+  2842		free_page((unsigned long)kvm->arch.sie_page2);
+  2843		if (!kvm_is_ucontrol(kvm))
+  2844			gmap_remove(kvm->arch.gmap);
+  2845		kvm_s390_destroy_adapters(kvm);
+  2846		kvm_s390_clear_float_irqs(kvm);
+  2847		kvm_s390_vsie_destroy(kvm);
+  2848		KVM_EVENT(3, "vm 0x%pK destroyed", kvm);
+  2849	}
+  2850	
+
+---
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
