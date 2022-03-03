@@ -2,151 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DD8764CC017
-	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 15:36:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4CFDB4CC02C
+	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 15:40:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234087AbiCCOhn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Mar 2022 09:37:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42776 "EHLO
+        id S234131AbiCCOli (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Mar 2022 09:41:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230193AbiCCOhm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Mar 2022 09:37:42 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3457318E408
-        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 06:36:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646318216;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=AnN3CL0Yr+2KSSK8B7tjt5KtSlE+6Zqm6PpSEreuDss=;
-        b=VN1vWD8aRqqHxEmzqP+DAfuaUN7c9klG9Fk2Hhb6AH0lHv5nAFsPGhpEHe70kacwitOYkU
-        l2Ua9RW6Gb9N43Y2pq+yt0Gw41oZLj95Wf0FBch3mrubcXd+nrun7h+YuHO1uPSW2R+DDB
-        VOVU5zZeaXe9q77IJvsZZ4uCg7Qsq3I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-589-vboblWWDMB6H-XSC-7AU3Q-1; Thu, 03 Mar 2022 09:36:53 -0500
-X-MC-Unique: vboblWWDMB6H-XSC-7AU3Q-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 56AFA1006AA5;
-        Thu,  3 Mar 2022 14:36:51 +0000 (UTC)
-Received: from localhost (unknown [10.39.194.12])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id F2D5084974;
-        Thu,  3 Mar 2022 14:35:46 +0000 (UTC)
-Date:   Thu, 3 Mar 2022 14:35:09 +0000
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Sergio Lopez <slp@redhat.com>
-Cc:     qemu-devel@nongnu.org,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Elena Ufimtseva <elena.ufimtseva@oracle.com>,
-        kvm@vger.kernel.org, Halil Pasic <pasic@linux.ibm.com>,
-        Fam Zheng <fam@euphon.net>,
-        John G Johnson <john.g.johnson@oracle.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Hanna Reitz <hreitz@redhat.com>,
-        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
-        qemu-s390x@nongnu.org, vgoyal@redhat.com,
-        Jagannathan Raman <jag.raman@oracle.com>,
-        Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
-        Eric Farman <farman@linux.ibm.com>
-Subject: Re: [PATCH v3 0/4] Enable vhost-user to be used on BSD systems
-Message-ID: <YiDSHaJlGQSYBNbs@stefanha-x1.localdomain>
-References: <20220303115911.20962-1-slp@redhat.com>
+        with ESMTP id S232750AbiCCOlh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Mar 2022 09:41:37 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12DC518E411;
+        Thu,  3 Mar 2022 06:40:51 -0800 (PST)
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 223EQ6LN017263;
+        Thu, 3 Mar 2022 14:40:50 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=tWzvjHowkM9ZLalk3vU5BpCzhINWPPar8gHBBGkQiSY=;
+ b=bz5eCy69ILwayf5gsLna1mOmSTB3aVwZvrXsAP16Eai6q9XW/fZdLkXMnkALPS+imhlI
+ bVsXC2loQdM2somOUf/MVqNaUEBhE322umaNb+edSJFRC0P64hkNEymtv9w9tFC/QEBJ
+ 4R6jsNMJX/F2O3wUA4InC2aXCUGf8zIjbereBjWfCtN8f4bQzrHeiC+abNMEKXwCsXWh
+ S5gdSzod+oYcs1zOEu//CPxMwqXjYSmlRrvOyqQY/irRdBxQIs2MOt8nW6p7ZNrAMfSM
+ hEdwdiF9GFcxHRr6xVCQ5843STuIgqcdWC/B7UKrnFW6oOahdXZvfUEwy8fvIX0493cK rg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3ejyee89kt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 03 Mar 2022 14:40:49 +0000
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 223ETgHF028763;
+        Thu, 3 Mar 2022 14:40:48 GMT
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3ejyee89k8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 03 Mar 2022 14:40:48 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 223EbOSD012167;
+        Thu, 3 Mar 2022 14:40:47 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma05fra.de.ibm.com with ESMTP id 3efbu9gcmj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 03 Mar 2022 14:40:46 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 223EehjT32178534
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 3 Mar 2022 14:40:43 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A6476A404D;
+        Thu,  3 Mar 2022 14:40:43 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3328BA4055;
+        Thu,  3 Mar 2022 14:40:43 +0000 (GMT)
+Received: from [9.171.88.22] (unknown [9.171.88.22])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  3 Mar 2022 14:40:43 +0000 (GMT)
+Message-ID: <ff7291c0-e762-9fe9-4181-e62125bf2f59@linux.ibm.com>
+Date:   Thu, 3 Mar 2022 15:40:42 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="BJA7GgC+FrdGbkM/"
-Content-Disposition: inline
-In-Reply-To: <20220303115911.20962-1-slp@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH v8 01/17] KVM: s390: pv: leak the topmost page table when
+ destroy fails
+Content-Language: en-US
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     borntraeger@de.ibm.com, frankja@linux.ibm.com, thuth@redhat.com,
+        pasic@linux.ibm.com, david@redhat.com, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, mimu@linux.ibm.com, nrb@linux.ibm.com
+References: <20220302181143.188283-1-imbrenda@linux.ibm.com>
+ <20220302181143.188283-2-imbrenda@linux.ibm.com>
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+In-Reply-To: <20220302181143.188283-2-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: jjLJm-JJJzjaQphRJB-X2Tv_HlEpXB00
+X-Proofpoint-ORIG-GUID: _RZzT-NDxqHr4wj7P21quRCt1O7s5pFE
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-03-03_07,2022-02-26_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ priorityscore=1501 spamscore=0 impostorscore=0 malwarescore=0 mlxscore=0
+ clxscore=1015 mlxlogscore=999 lowpriorityscore=0 adultscore=0 phishscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2201110000 definitions=main-2203030069
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 3/2/22 19:11, Claudio Imbrenda wrote:
+> Each secure guest must have a unique ASCE (address space control
+> element); we must avoid that new guests use the same page for their
+> ASCE, to avoid errors.
+> 
+> Since the ASCE mostly consists of the address of the topmost page table
+> (plus some flags), we must not return that memory to the pool unless
+> the ASCE is no longer in use.
+> 
+> Only a successful Destroy Secure Configuration UVC will make the ASCE
+> reusable again.
+> 
+> If the Destroy Configuration UVC fails, the ASCE cannot be reused for a
+> secure guest (either for the ASCE or for other memory areas). To avoid
+> a collision, it must not be used again. This is a permanent error and
+> the page becomes in practice unusable, so we set it aside and leak it.
+> On failure we already leak other memory that belongs to the ultravisor
+> (i.e. the variable and base storage for a guest) and not leaking the
+> topmost page table was an oversight.
+> 
+> This error (and thus the leakage) should not happen unless the hardware
+> is broken or KVM has some unknown serious bug.
+> 
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> Fixes: 29b40f105ec8d55 ("KVM: s390: protvirt: Add initial vm and cpu lifecycle handling")
+> ---
+>  arch/s390/include/asm/gmap.h |  2 +
+>  arch/s390/kvm/pv.c           |  9 +++--
+>  arch/s390/mm/gmap.c          | 71 ++++++++++++++++++++++++++++++++++++
+>  3 files changed, 79 insertions(+), 3 deletions(-)
+> 
+[...]
 
---BJA7GgC+FrdGbkM/
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> +/**
+> + * s390_replace_asce - Try to replace the current ASCE of a gmap with
+> + * another equivalent one.
+> + * @gmap the gmap
+> + *
+> + * If the allocation of the new top level page table fails, the ASCE is not
+> + * replaced.
+> + * In any case, the old ASCE is always removed from the list. Therefore the
+> + * caller has to make sure to save a pointer to it beforehands, unless an
+> + * intentional leak is intended.
+> + */
+> +int s390_replace_asce(struct gmap *gmap)
+> +{
+> +	unsigned long asce;
+> +	struct page *page;
+> +	void *table;
+> +
+> +	s390_remove_old_asce(gmap);
+> +
+> +	page = alloc_pages(GFP_KERNEL_ACCOUNT, CRST_ALLOC_ORDER);
+> +	if (!page)
+> +		return -ENOMEM;
+> +	table = page_to_virt(page);
+> +	memcpy(table, gmap->table, 1UL << (CRST_ALLOC_ORDER + PAGE_SHIFT));
 
-On Thu, Mar 03, 2022 at 12:59:07PM +0100, Sergio Lopez wrote:
-> Since QEMU is already able to emulate ioeventfd using pipefd, we're alrea=
-dy
-> pretty close to supporting vhost-user on non-Linux systems.
->=20
-> This two patches bridge the gap by:
->=20
-> 1. Adding a new event_notifier_get_wfd() to return wfd on the places where
->    the peer is expected to write to the notifier.
->=20
-> 2. Modifying the build system to it allows enabling vhost-user on BSD.
->=20
-> v1->v2:
->   - Drop: "Allow returning EventNotifier's wfd" (Alex Williamson)
->   - Add: "event_notifier: add event_notifier_get_wfd()" (Alex Williamson)
->   - Add: "vhost: use wfd on functions setting vring call fd"
->   - Rename: "Allow building vhost-user in BSD" to "configure, meson: allow
->     enabling vhost-user on all POSIX systems"
->   - Instead of making possible enabling vhost-user on Linux and BSD syste=
-ms,
->     allow enabling it on all non-Windows platforms. (Paolo Bonzini)
->=20
-> v2->v3:
->   - Add a section to docs/interop/vhost-user.rst explaining how vhost-user
->     is supported on non-Linux platforms. (Stefan Hajnoczi)
->=20
-> Sergio Lopez (4):
->   event_notifier: add event_notifier_get_wfd()
->   vhost: use wfd on functions setting vring call fd
->   configure, meson: allow enabling vhost-user on all POSIX systems
->   docs: vhost-user: add subsection for non-Linux platforms
->=20
->  configure                     |  4 ++--
->  docs/interop/vhost-user.rst   | 18 ++++++++++++++++++
->  hw/virtio/vhost.c             |  6 +++---
->  include/qemu/event_notifier.h |  1 +
->  meson.build                   |  2 +-
->  util/event_notifier-posix.c   |  5 +++++
->  6 files changed, 30 insertions(+), 6 deletions(-)
->=20
-> --=20
-> 2.35.1
->=20
->=20
+Is concurrent modification of *gmap->table possible during the copy?
 
-I posted comments on the vhost-user.rst patch. Otherwise:
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---BJA7GgC+FrdGbkM/
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmIg0h0ACgkQnKSrs4Gr
-c8g9/gf/Xsx0QMCqyJ/eiPBnY6EH9Gq4v8FXdQp1992zu2QADuLvlaIqnulGQqyO
-aBrDNSerETPYHr57PMQH5S9Mv0XYwSkd2AhfVp5Gd32/uDNNRNmMhrCtSFkL5i52
-j24OU9zdqT+LFQBLxdkyFdHQSIvjZsu+FHRsN9iE4geVC57WF9YEUvN/OeIyt0Og
-fbn9hSnyK1VqY+dR0RdX1f6DGS7P0AI8PQjoYVvWStbEOzvc2N1Hpa5yKmEmwVv9
-AmRgcY8Gi6QaGoNCOTGDJQqXftedeOI7notUZS9ISgz4OkXezn2yyauHgesQ/ljT
-QVcAi1DZgTw06wz/JE3fr7vpR8/zYA==
-=yrC1
------END PGP SIGNATURE-----
-
---BJA7GgC+FrdGbkM/--
+> +
+> +	/*
+> +	 * The caller has to deal with the old ASCE, but here we make sure
+> +	 * the new one is properly added to the list of page tables, so that
+> +	 * it will be freed when the VM is torn down.
+> +	 */
+> +	spin_lock(&gmap->guest_table_lock);
+> +	list_add(&page->lru, &gmap->crst_list);
+> +	spin_unlock(&gmap->guest_table_lock);
+> +
+> +	/* Set new table origin while preserving existing ASCE control bits */
+> +	asce = (gmap->asce & _ASCE_ORIGIN) | __pa(table);
+> +	WRITE_ONCE(gmap->asce, asce);
+> +	WRITE_ONCE(gmap->mm->context.gmap_asce, asce);
+> +	WRITE_ONCE(gmap->table, table);
+> +
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL_GPL(s390_replace_asce);
 
