@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5BA6A4CC64F
-	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 20:41:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E6E54CC637
+	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 20:40:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234098AbiCCTlP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Mar 2022 14:41:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34652 "EHLO
+        id S236083AbiCCTkr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Mar 2022 14:40:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59636 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236213AbiCCTkl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Mar 2022 14:40:41 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B356D1A58E2
-        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 11:39:26 -0800 (PST)
+        with ESMTP id S236172AbiCCTkh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Mar 2022 14:40:37 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 110D41A271C
+        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 11:39:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646336360;
+        s=mimecast20190719; t=1646336357;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=1kT0bGQxraXhTkdJRdu0nvE9rqQyGeiDCm5hpgEWBNU=;
-        b=IeD/twoSJPIdBI/N6usBSr6jskJzFKirTUn9psls6vrM7gTClfoiKRuWvGAPH/F4ao+Rpy
-        6xEGSQDQzymnnLvp0ML3Aj6eK/Rmck5y2Fo3R/7UNz9vbRFqwDbqHffy4y7tGdjOEhwYkI
-        DnxEYVTeDjYxt38Z0+hCi57SkS00W68=
+        bh=Szv77DNh8Njb+g/24MZ9SNeefN0yh1SOeI/rBcaUhWc=;
+        b=RGuAu9of3JqjXZWRAj96GdZwgOFkjLbfkfhfFk9ugfTfGhwEnQGfWZY2VZ+YaPJFpjbhGh
+        3Gs2NBA47NbR/bfOPJU5U9h2b3Z5+7ydi9jax88OcaESeJshQ1WwoRAaa2HjjENpP0oUVK
+        lT/ESbLIArPpuCiUreaA+KPdmBe/ikE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-203-xZX_qMyrOQ2uSKaGQtlkEw-1; Thu, 03 Mar 2022 14:39:15 -0500
-X-MC-Unique: xZX_qMyrOQ2uSKaGQtlkEw-1
+ us-mta-292-8fC30IhNPrG7pzWaOESZpg-1; Thu, 03 Mar 2022 14:39:16 -0500
+X-MC-Unique: 8fC30IhNPrG7pzWaOESZpg-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8341B1091DAD;
-        Thu,  3 Mar 2022 19:39:13 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 71C531800D50;
+        Thu,  3 Mar 2022 19:39:14 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AF4BA5FC22;
-        Thu,  3 Mar 2022 19:39:12 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9DC275FC22;
+        Thu,  3 Mar 2022 19:39:13 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -48,9 +48,9 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         David Matlack <dmatlack@google.com>,
         Ben Gardon <bgardon@google.com>,
         Mingwei Zhang <mizhang@google.com>
-Subject: [PATCH v4 22/30] KVM: x86/mmu: Allow yielding when zapping GFNs for defunct TDP MMU root
-Date:   Thu,  3 Mar 2022 14:38:34 -0500
-Message-Id: <20220303193842.370645-23-pbonzini@redhat.com>
+Subject: [PATCH v4 23/30] KVM: x86/mmu: Zap roots in two passes to avoid inducing RCU stalls
+Date:   Thu,  3 Mar 2022 14:38:35 -0500
+Message-Id: <20220303193842.370645-24-pbonzini@redhat.com>
 In-Reply-To: <20220303193842.370645-1-pbonzini@redhat.com>
 References: <20220303193842.370645-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -66,193 +66,147 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Allow yielding when zapping SPTEs after the last reference to a valid
-root is put.  Because KVM must drop all SPTEs in response to relevant
-mmu_notifier events, mark defunct roots invalid and reset their refcount
-prior to zapping the root.  Keeping the refcount elevated while the zap
-is in-progress ensures the root is reachable via mmu_notifier until the
-zap completes and the last reference to the invalid, defunct root is put.
+From: Sean Christopherson <seanjc@google.com>
 
-Allowing kvm_tdp_mmu_put_root() to yield fixes soft lockup issues if the
-root in being put has a massive paging structure, e.g. zapping a root
-that is backed entirely by 4kb pages for a guest with 32tb of memory can
-take hundreds of seconds to complete.
+When zapping a TDP MMU root, perform the zap in two passes to avoid
+zapping an entire top-level SPTE while holding RCU, which can induce RCU
+stalls.  In the first pass, zap SPTEs at PG_LEVEL_1G, and then
+zap top-level entries in the second pass.
 
-  watchdog: BUG: soft lockup - CPU#49 stuck for 485s! [max_guest_memor:52368]
-  RIP: 0010:kvm_set_pfn_dirty+0x30/0x50 [kvm]
-   __handle_changed_spte+0x1b2/0x2f0 [kvm]
-   handle_removed_tdp_mmu_page+0x1a7/0x2b8 [kvm]
-   __handle_changed_spte+0x1f4/0x2f0 [kvm]
-   handle_removed_tdp_mmu_page+0x1a7/0x2b8 [kvm]
-   __handle_changed_spte+0x1f4/0x2f0 [kvm]
-   tdp_mmu_zap_root+0x307/0x4d0 [kvm]
-   kvm_tdp_mmu_put_root+0x7c/0xc0 [kvm]
-   kvm_mmu_free_roots+0x22d/0x350 [kvm]
-   kvm_mmu_reset_context+0x20/0x60 [kvm]
-   kvm_arch_vcpu_ioctl_set_sregs+0x5a/0xc0 [kvm]
-   kvm_vcpu_ioctl+0x5bd/0x710 [kvm]
-   __se_sys_ioctl+0x77/0xc0
-   __x64_sys_ioctl+0x1d/0x20
-   do_syscall_64+0x44/0xa0
-   entry_SYSCALL_64_after_hwframe+0x44/0xae
+With 4-level paging, zapping a PGD that is fully populated with 4kb leaf
+SPTEs take up to ~7 or so seconds (time varies based on kernel config,
+number of (v)CPUs, etc...).  With 5-level paging, that time can balloon
+well into hundreds of seconds.
 
-KVM currently doesn't put a root from a non-preemptible context, so other
-than the mmu_notifier wrinkle, yielding when putting a root is safe.
+Before remote TLB flushes were omitted, the problem was even worse as
+waiting for all active vCPUs to respond to the IPI introduced significant
+overhead for VMs with large numbers of vCPUs.
 
-Yield-unfriendly iteration uses for_each_tdp_mmu_root(), which doesn't
-take a reference to each root (it requires mmu_lock be held for the
-entire duration of the walk).
+By zapping 1gb SPTEs (both shadow pages and hugepages) in the first pass,
+the amount of work that is done without dropping RCU protection is
+strictly bounded, with the worst case latency for a single operation
+being less than 100ms.
 
-tdp_mmu_next_root() is used only by the yield-friendly iterator.
+Zapping at 1gb in the first pass is not arbitrary.  First and foremost,
+KVM relies on being able to zap 1gb shadow pages in a single shot when
+when repacing a shadow page with a hugepage.  Zapping a 1gb shadow page
+that is fully populated with 4kb dirty SPTEs also triggers the worst case
+latency due writing back the struct page accessed/dirty bits for each 4kb
+page, i.e. the two-pass approach is guaranteed to work so long as KVM can
+cleany zap a 1gb shadow page.
 
-tdp_mmu_zap_root_work() is explicitly yield friendly.
+  rcu: INFO: rcu_sched self-detected stall on CPU
+  rcu:     52-....: (20999 ticks this GP) idle=7be/1/0x4000000000000000
+                                          softirq=15759/15759 fqs=5058
+   (t=21016 jiffies g=66453 q=238577)
+  NMI backtrace for cpu 52
+  Call Trace:
+   ...
+   mark_page_accessed+0x266/0x2f0
+   kvm_set_pfn_accessed+0x31/0x40
+   handle_removed_tdp_mmu_page+0x259/0x2e0
+   __handle_changed_spte+0x223/0x2c0
+   handle_removed_tdp_mmu_page+0x1c1/0x2e0
+   __handle_changed_spte+0x223/0x2c0
+   handle_removed_tdp_mmu_page+0x1c1/0x2e0
+   __handle_changed_spte+0x223/0x2c0
+   zap_gfn_range+0x141/0x3b0
+   kvm_tdp_mmu_zap_invalidated_roots+0xc8/0x130
+   kvm_mmu_zap_all_fast+0x121/0x190
+   kvm_mmu_invalidate_zap_pages_in_memslot+0xe/0x10
+   kvm_page_track_flush_slot+0x5c/0x80
+   kvm_arch_flush_shadow_memslot+0xe/0x10
+   kvm_set_memslot+0x172/0x4e0
+   __kvm_set_memory_region+0x337/0x590
+   kvm_vm_ioctl+0x49c/0xf80
 
-kvm_mmu_free_roots() => mmu_free_root_page() is a much bigger fan-out,
-but is still yield-friendly in all call sites, as all callers can be
-traced back to some combination of vcpu_run(), kvm_destroy_vm(), and/or
-kvm_create_vm().
-
-Co-developed-by: Sean Christopherson <seanjc@google.com>
+Reported-by: David Matlack <dmatlack@google.com>
+Cc: Ben Gardon <bgardon@google.com>
+Cc: Mingwei Zhang <mizhang@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
-Message-Id: <20220226001546.360188-21-seanjc@google.com>
+Reviewed-by: Ben Gardon <bgardon@google.com>
+Message-Id: <20220226001546.360188-22-seanjc@google.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/mmu/tdp_mmu.c | 93 +++++++++++++++++++++-----------------
- 1 file changed, 52 insertions(+), 41 deletions(-)
+ arch/x86/kvm/mmu/tdp_mmu.c | 51 +++++++++++++++++++++++++-------------
+ 1 file changed, 34 insertions(+), 17 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index ed1bb63b342d..408e21e4009c 100644
+index 408e21e4009c..e24a1bff9218 100644
 --- a/arch/x86/kvm/mmu/tdp_mmu.c
 +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -144,20 +144,46 @@ void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
- 
- 	WARN_ON(!root->tdp_mmu_page);
- 
--	spin_lock(&kvm->arch.tdp_mmu_pages_lock);
--	list_del_rcu(&root->link);
--	spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
--
- 	/*
--	 * A TLB flush is not necessary as KVM performs a local TLB flush when
--	 * allocating a new root (see kvm_mmu_load()), and when migrating vCPU
--	 * to a different pCPU.  Note, the local TLB flush on reuse also
--	 * invalidates any paging-structure-cache entries, i.e. TLB entries for
--	 * intermediate paging structures, that may be zapped, as such entries
--	 * are associated with the ASID on both VMX and SVM.
-+	 * The root now has refcount=0.  It is valid, but readers already
-+	 * cannot acquire a reference to it because kvm_tdp_mmu_get_root()
-+	 * rejects it.  This remains true for the rest of the execution
-+	 * of this function, because readers visit valid roots only
-+	 * (except for tdp_mmu_zap_root_work(), which however
-+	 * does not acquire any reference itself).
-+	 *
-+	 * Even though there are flows that need to visit all roots for
-+	 * correctness, they all take mmu_lock for write, so they cannot yet
-+	 * run concurrently. The same is true after kvm_tdp_root_mark_invalid,
-+	 * since the root still has refcount=0.
-+	 *
-+	 * However, tdp_mmu_zap_root can yield, and writers do not expect to
-+	 * see refcount=0 (see for example kvm_tdp_mmu_invalidate_all_roots()).
-+	 * So the root temporarily gets an extra reference, going to refcount=1
-+	 * while staying invalid.  Readers still cannot acquire any reference;
-+	 * but writers are now allowed to run if tdp_mmu_zap_root yields and
-+	 * they might take an extra reference is they themselves yield.  Therefore,
-+	 * when the reference is given back after tdp_mmu_zap_root terminates,
-+	 * there is no guarantee that the refcount is still 1.  If not, whoever
-+	 * puts the last reference will free the page, but they will not have to
-+	 * zap the root because a root cannot go from invalid to valid.
- 	 */
--	tdp_mmu_zap_root(kvm, root, shared);
-+	if (!kvm_tdp_root_mark_invalid(root)) {
-+		refcount_set(&root->tdp_mmu_root_count, 1);
-+		tdp_mmu_zap_root(kvm, root, shared);
-+
-+		/*
-+		 * Give back the reference that was added back above.  We now
-+		 * know that the root is invalid, so go ahead and free it if
-+		 * no one has taken a reference in the meanwhile.
-+		 */
-+		if (!refcount_dec_and_test(&root->tdp_mmu_root_count))
-+			return;
-+	}
- 
-+	spin_lock(&kvm->arch.tdp_mmu_pages_lock);
-+	list_del_rcu(&root->link);
-+	spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
- 	call_rcu(&root->rcu_head, tdp_mmu_free_sp_rcu_callback);
+@@ -822,14 +822,36 @@ static inline gfn_t tdp_mmu_max_gfn_host(void)
+ 	return 1ULL << (shadow_phys_bits - PAGE_SHIFT);
  }
  
-@@ -799,12 +825,23 @@ static inline gfn_t tdp_mmu_max_gfn_host(void)
- static void tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
- 			     bool shared)
+-static void tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
+-			     bool shared)
++static void __tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
++			       bool shared, int zap_level)
  {
--	bool root_is_unreachable = !refcount_read(&root->tdp_mmu_root_count);
  	struct tdp_iter iter;
  
  	gfn_t end = tdp_mmu_max_gfn_host();
  	gfn_t start = 0;
  
-+	/*
-+	 * The root must have an elevated refcount so that it's reachable via
-+	 * mmu_notifier callbacks, which allows this path to yield and drop
-+	 * mmu_lock.  When handling an unmap/release mmu_notifier command, KVM
-+	 * must drop all references to relevant pages prior to completing the
-+	 * callback.  Dropping mmu_lock with an unreachable root would result
-+	 * in zapping SPTEs after a relevant mmu_notifier callback completes
-+	 * and lead to use-after-free as zapping a SPTE triggers "writeback" of
-+	 * dirty accessed bits to the SPTE's associated struct page.
-+	 */
-+	WARN_ON_ONCE(!refcount_read(&root->tdp_mmu_root_count));
-+
- 	kvm_lockdep_assert_mmu_lock_held(kvm, shared);
- 
- 	rcu_read_lock();
-@@ -815,42 +852,16 @@ static void tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
- 	 */
- 	for_each_tdp_pte_min_level(iter, root, root->role.level, start, end) {
- retry:
--		/*
--		 * Yielding isn't allowed when zapping an unreachable root as
--		 * the root won't be processed by mmu_notifier callbacks.  When
--		 * handling an unmap/release mmu_notifier command, KVM must
--		 * drop all references to relevant pages prior to completing
--		 * the callback.  Dropping mmu_lock can result in zapping SPTEs
--		 * for an unreachable root after a relevant callback completes,
--		 * which leads to use-after-free as zapping a SPTE triggers
--		 * "writeback" of dirty/accessed bits to the SPTE's associated
--		 * struct page.
--		 */
--		if (!root_is_unreachable &&
--		    tdp_mmu_iter_cond_resched(kvm, &iter, false, shared))
++	for_each_tdp_pte_min_level(iter, root, zap_level, start, end) {
++retry:
 +		if (tdp_mmu_iter_cond_resched(kvm, &iter, false, shared))
- 			continue;
- 
- 		if (!is_shadow_present_pte(iter.old_spte))
- 			continue;
- 
--		if (!shared) {
++			continue;
++
++		if (!is_shadow_present_pte(iter.old_spte))
++			continue;
++
++		if (iter.level > zap_level)
++			continue;
++
 +		if (!shared)
- 			tdp_mmu_set_spte(kvm, &iter, 0);
--		} else if (tdp_mmu_set_spte_atomic(kvm, &iter, 0)) {
--			/*
--			 * cmpxchg() shouldn't fail if the root is unreachable.
--			 * Retry so as not to leak the page and its children.
--			 */
--			WARN_ONCE(root_is_unreachable,
--				  "Contended TDP MMU SPTE in unreachable root.");
++			tdp_mmu_set_spte(kvm, &iter, 0);
 +		else if (tdp_mmu_set_spte_atomic(kvm, &iter, 0))
- 			goto retry;
--		}
++			goto retry;
++	}
++}
++
++static void tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
++			     bool shared)
++{
++
+ 	/*
+ 	 * The root must have an elevated refcount so that it's reachable via
+ 	 * mmu_notifier callbacks, which allows this path to yield and drop
+@@ -847,22 +869,17 @@ static void tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
+ 	rcu_read_lock();
+ 
+ 	/*
+-	 * No need to try to step down in the iterator when zapping an entire
+-	 * root, zapping an upper-level SPTE will recurse on its children.
++	 * To avoid RCU stalls due to recursively removing huge swaths of SPs,
++	 * split the zap into two passes.  On the first pass, zap at the 1gb
++	 * level, and then zap top-level SPs on the second pass.  "1gb" is not
++	 * arbitrary, as KVM must be able to zap a 1gb shadow page without
++	 * inducing a stall to allow in-place replacement with a 1gb hugepage.
++	 *
++	 * Because zapping a SP recurses on its children, stepping down to
++	 * PG_LEVEL_4K in the iterator itself is unnecessary.
+ 	 */
+-	for_each_tdp_pte_min_level(iter, root, root->role.level, start, end) {
+-retry:
+-		if (tdp_mmu_iter_cond_resched(kvm, &iter, false, shared))
+-			continue;
 -
--		/*
--		 * WARN if the root is invalid and is unreachable, all SPTEs
--		 * should've been zapped by kvm_tdp_mmu_zap_invalidated_roots(),
--		 * and inserting new SPTEs under an invalid root is a KVM bug.
--		 */
--		WARN_ON_ONCE(root_is_unreachable && root->role.invalid);
- 	}
+-		if (!is_shadow_present_pte(iter.old_spte))
+-			continue;
+-
+-		if (!shared)
+-			tdp_mmu_set_spte(kvm, &iter, 0);
+-		else if (tdp_mmu_set_spte_atomic(kvm, &iter, 0))
+-			goto retry;
+-	}
++	__tdp_mmu_zap_root(kvm, root, shared, PG_LEVEL_1G);
++	__tdp_mmu_zap_root(kvm, root, shared, root->role.level);
  
  	rcu_read_unlock();
+ }
 -- 
 2.31.1
 
