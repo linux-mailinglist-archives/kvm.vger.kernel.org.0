@@ -2,122 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A3E44CB788
-	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 08:14:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 453014CB7A2
+	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 08:27:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229588AbiCCHPh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Mar 2022 02:15:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39870 "EHLO
+        id S230168AbiCCH2D (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Mar 2022 02:28:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36382 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230115AbiCCHPg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Mar 2022 02:15:36 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 055361275D1
-        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 23:14:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646291689;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=WEqRPqaD5FWGRJv5e1sQSjcE5/2LakOMZH9spOXim5M=;
-        b=JRqxx7fWw6ZHMfNVkrcBhznv29SAZ/DT0b4w3Olvl+JQJAIYBuxpzvsgenTpnNlrFqFjJR
-        5b0EgoaA8B3855D9b3jLuU/PL20Ip+b2pzjzWfK5NZlp28iHInKYOfsLrgSpV1yhUV5Qqk
-        gVCJvbffcE8YSPJMSfIVSapEjzw2ymc=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-49-SsM5ngmAMZKKXff9MHvlKA-1; Thu, 03 Mar 2022 02:14:45 -0500
-X-MC-Unique: SsM5ngmAMZKKXff9MHvlKA-1
-Received: by mail-wm1-f69.google.com with SMTP id m34-20020a05600c3b2200b0038115c73361so1035084wms.5
-        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 23:14:45 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=WEqRPqaD5FWGRJv5e1sQSjcE5/2LakOMZH9spOXim5M=;
-        b=RkBOdvbLd80N99ej//QlMob7b3RK7HEHB+THBhmeMQB5Y4xbciplgQUG/+GnBV+xN+
-         Xtr9XsoSsSuus2TTIqAwohQrjAHHMVAekKIUlUVbG0yIEWClD83T5XbYemC41gcvBoy9
-         Couq1GHrzdiO3hIutBT+Wm0ZbziOguWP0zMa0ohFLEBOd3vMIA1U+BwLJ82o/FiqeMBm
-         f4Q7a6FXgEaOa4FY9nj1aUiWDYQoaRleExVZmiH0dAVCjberdnB30Wm4AhRpcKz0morE
-         ESiJ51joIlsGo0LYlZTPiXV9zQqaZ1r0jAN5ZfGcMmnLUWvbq/m315xwUSCPdT1FmFz1
-         aO4w==
-X-Gm-Message-State: AOAM533B2n5AsuZLgOmYg9MJFFTNn8sE7OE/n54gWSDXa45MC1k13uKt
-        Yy1lqgBW7j6TC4fTjahmlXvxFmPKwdU1q/q2xVTjaAFW9qbiH82F0z1Y0BgqzCv5E9NZUobaVAP
-        Zatebj3RR4EgU
-X-Received: by 2002:a05:6000:143:b0:1f0:25a1:874c with SMTP id r3-20020a056000014300b001f025a1874cmr5296254wrx.191.1646291684445;
-        Wed, 02 Mar 2022 23:14:44 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwmjuyMNNC6DR/Bl4cLZuPvdIEPk0k/BS2RIKyITE+TQM+Zj5AHfzvYai86xVZe0dQU+DiiAA==
-X-Received: by 2002:a05:6000:143:b0:1f0:25a1:874c with SMTP id r3-20020a056000014300b001f025a1874cmr5296233wrx.191.1646291684224;
-        Wed, 02 Mar 2022 23:14:44 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.googlemail.com with ESMTPSA id 11-20020a05600c22cb00b00382a960b17csm6127182wmg.7.2022.03.02.23.14.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 02 Mar 2022 23:14:43 -0800 (PST)
-Message-ID: <0c22b156-10c5-1988-7256-a9db7871989d@redhat.com>
-Date:   Thu, 3 Mar 2022 08:14:42 +0100
+        with ESMTP id S230170AbiCCH2D (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Mar 2022 02:28:03 -0500
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B43C716DAE4
+        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 23:27:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1646292436; x=1677828436;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=gavUP5woFNMy2UOPabLAQZ8b8cVnPO8XZxPEkJOlPIY=;
+  b=idRSr+1L+A/uw5D45w6equmKdprONs1uUW/IJqAgcsKnUfjTRowtfq+O
+   qI87pXuKWlJu1UzOLU3ttmvRrkizgEqTWUFQ6xTQGk7s0SNt8BBi9+LDO
+   nr30zqOITR+V0JsrkrLdHzFUX+TA65e34KIl3yR+7jOQGRQM621RGzzwl
+   9gcdm7VPmLARyicWnimcCnYXOcww5kLtcmEtUrtrdmdKKdNBLdgbRb0cK
+   6P1m8vsXw64CpQppVwDdCGcM/Tpi3aVF31VfAUFWs2pLprRq2PfQbGDjx
+   TS7efiBu/8axElvpFAfND+JdEYlRiol+M6uw1RgSRRdVWqg+ZZKkleDKV
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10274"; a="251176922"
+X-IronPort-AV: E=Sophos;i="5.90,151,1643702400"; 
+   d="scan'208";a="251176922"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2022 23:27:16 -0800
+X-IronPort-AV: E=Sophos;i="5.90,151,1643702400"; 
+   d="scan'208";a="551631461"
+Received: from duan-server-s2600bt.bj.intel.com ([10.240.192.123])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2022 23:27:13 -0800
+From:   Zhenzhong Duan <zhenzhong.duan@intel.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, seanjc@google.com, yu.c.zhang@intel.com,
+        zixuanwang@google.com, marcorr@google.com, jun.nakajima@intel.com,
+        erdemaktas@google.com
+Subject: [kvm-unit-tests RFC PATCH 00/17] X86: TDX framework support
+Date:   Thu,  3 Mar 2022 15:18:50 +0800
+Message-Id: <20220303071907.650203-1-zhenzhong.duan@intel.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH v2 4/7] KVM: x86/mmu: Zap only obsolete roots if a root
- shadow page is zapped
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>
-References: <20220225182248.3812651-1-seanjc@google.com>
- <20220225182248.3812651-5-seanjc@google.com>
- <40a22c39-9da4-6c37-8ad0-b33970e35a2b@redhat.com>
- <ee757515-4a0f-c5cb-cd57-04983f62f499@redhat.com>
- <Yh/JdHphCLOm4evG@google.com>
- <217cc048-8ca7-2b7b-141f-f44f0d95eec5@redhat.com>
- <Yh/1hPMhqeFKO0ih@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <Yh/1hPMhqeFKO0ih@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-7.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/2/22 23:53, Sean Christopherson wrote:
->>
->> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
->> index c5e3f219803e..7899ca4748c7 100644
->> --- a/arch/x86/kvm/svm/svm.c
->> +++ b/arch/x86/kvm/svm/svm.c
->> @@ -3857,6 +3857,9 @@ static void svm_load_mmu_pgd(struct kvm_vcpu *vcpu,
->> hpa_t root_hpa,
->>          unsigned long cr3;
->>
->>          if (npt_enabled) {
->> +               if (is_tdp_mmu_root(root_hpa))
->> +                       svm->current_vmcb->asid_generation = 0;
->> +
->>                  svm->vmcb->control.nested_cr3 = __sme_set(root_hpa);
->>                  vmcb_mark_dirty(svm->vmcb, VMCB_NPT);
->>
->> Why not just new_asid
-> My mental coin flip came up tails?  new_asid() is definitely more intuitive.
-> 
+* What's TDX?
+TDX stands for Trust Domain Extensions which isolates VMs from
+the virtual-machine manager (VMM)/hypervisor and any other software on
+the platform.
 
-Can you submit a patch (seems like 5.17+stable material)?
+To support TDX, multiple software components, not only KVM but also QEMU,
+guest kernel and virtual bios, need to be updated. For more details, please
+check link[1], there are TDX spec and public repository link at github for
+each software component.
 
-Paolo
+* What we add?
+This patchset adds a basic framework to support running exist and future
+test cases in TDX protected environment, so as to verify the function
+of the TDX software stack. Appreciate any comment and suggestion.
+
+This framework depends on UEFI support from Zixuan and Marc.
+
+The supported test cases are marked in a test group named "tdx". Most of
+the unsupported test cases are due to testing features not supported by
+TDX, a few are due to their special design not suitable for running in UEFI.
+
+To run a test case in TDX:
+    EFI_TDX=y [EFI_UEFI=/path/to/TDVF.fd] [QEMU=/path/to/qemu-tdx] ./x86/efi/run x86/msr.efi
+To run all the tdx supported test cases:
+    EFI_TDX=y [EFI_UEFI=/path/to/TDVF.fd] [QEMU=/path/to/qemu-tdx] ./run_tests.sh -g tdx
+
+[EFI_UEFI=/path/to/TDVF.fd] [QEMU=/path/to/qemu-tdx] customization can be
+removed after upstream OVMF and qemu have TDX support.
+
+* Patch organization
+patch  1-7: add initial support for TDX, some simple test cases could run with them.
+patch    8: TDVF support accepting part of the whole memory and this patch add
+            support for accepting remain memory.
+patch 9-11: add multiprocessor support
+patch12-13: enable lvl5 page table as TDVF use lvl5 page table
+patch   14: TDX specific test case, may add more sub-test in the future
+patch   15: bypass unsupported sub-test
+patch16-17: enable all the TDX supported test cases to run in a batch with run_tests.sh
+
+TODO:
+1. merge TDX multiprocessor code in UEFI MP code framework when it's ready
+2. add more TDX specific sub-test
+3. add mmio simuation in #VE handler
+
+[1] https://lwn.net/Articles/876997
+
+Zhenzhong Duan (17):
+  x86 TDX: Add support functions for TDX framework
+  x86 TDX: Add #VE handler
+  x86 TDX: Bypass APIC and enable x2APIC directly
+  x86 TDX: Add exception table support
+  x86 TDX: bypass wrmsr simulation on some specific MSRs
+  x86 TDX: Simulate single step on #VE handled instruction
+  x86 TDX: Extend EFI run script to support TDX
+  x86 TDX: Add support for memory accept
+  acpi: Add MADT table parse code
+  x86 TDX: Add multi processor support
+  x86 TDX: Add a formal IPI handler
+  x86 TDX: Enable lvl5 boot page table
+  x86 TDX: Add lvl5 page table support to virtual memory
+  x86 TDX: Add TDX specific test case
+  x86 TDX: bypass unsupported sub-test for TDX
+  x86 UEFI: Add support for parameter passing
+  x86 TDX: Make run_tests.sh work with TDX
+
+ README.md                 |   6 +
+ lib/argv.c                |   2 +-
+ lib/argv.h                |   1 +
+ lib/asm-generic/page.h    |   7 +-
+ lib/efi.c                 |  73 +++++
+ lib/linux/efi.h           |  41 ++-
+ lib/x86/acpi.c            | 171 +++++++++++
+ lib/x86/acpi.h            |  85 ++++++
+ lib/x86/apic.c            |   4 +
+ lib/x86/asm/setup.h       |   2 +
+ lib/x86/desc.c            |  15 +-
+ lib/x86/desc.h            |  10 +
+ lib/x86/processor.h       |   2 +
+ lib/x86/setup.c           |  82 +++++-
+ lib/x86/smp.c             |  18 +-
+ lib/x86/tdcall.S          | 303 ++++++++++++++++++++
+ lib/x86/tdx.c             | 576 ++++++++++++++++++++++++++++++++++++++
+ lib/x86/tdx.h             | 113 ++++++++
+ lib/x86/vm.c              |  14 +-
+ x86/Makefile.common       |   2 +
+ x86/Makefile.x86_64       |   1 +
+ x86/efi/README.md         |   6 +
+ x86/efi/crt0-efi-x86_64.S |  12 +-
+ x86/efi/efistart64.S      |  10 +
+ x86/efi/run               |  19 ++
+ x86/intel_tdx.c           |  94 +++++++
+ x86/msr.c                 |   6 +
+ x86/syscall.c             |   3 +-
+ x86/unittests.cfg         |  22 +-
+ 29 files changed, 1668 insertions(+), 32 deletions(-)
+ create mode 100644 lib/x86/tdcall.S
+ create mode 100644 lib/x86/tdx.c
+ create mode 100644 lib/x86/tdx.h
+ create mode 100644 x86/intel_tdx.c
+
+-- 
+2.25.1
 
