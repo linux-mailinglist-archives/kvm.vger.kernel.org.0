@@ -2,73 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5F6E94CC812
-	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 22:32:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EF3C64CC848
+	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 22:44:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236540AbiCCVdG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Mar 2022 16:33:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58050 "EHLO
+        id S236631AbiCCVpM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Mar 2022 16:45:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36316 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233017AbiCCVdD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Mar 2022 16:33:03 -0500
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A6F8167FB8
-        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 13:32:17 -0800 (PST)
-Received: by mail-pl1-x631.google.com with SMTP id 9so5936640pll.6
-        for <kvm@vger.kernel.org>; Thu, 03 Mar 2022 13:32:17 -0800 (PST)
+        with ESMTP id S236594AbiCCVpM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Mar 2022 16:45:12 -0500
+Received: from mail-oo1-xc30.google.com (mail-oo1-xc30.google.com [IPv6:2607:f8b0:4864:20::c30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA6F0ED978
+        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 13:44:25 -0800 (PST)
+Received: by mail-oo1-xc30.google.com with SMTP id s203-20020a4a3bd4000000b003191c2dcbe8so7300096oos.9
+        for <kvm@vger.kernel.org>; Thu, 03 Mar 2022 13:44:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=kudP5fV+oewEgx+1iJMm74xzhJH7jghnvNdgCXLF87M=;
-        b=WU0AOsFRliB/v4AOfuttxKeRS4+tgI1q1XYePYec6mV3RzgqmI/+fYoZHt3D64DlPL
-         bs8fWMhYQdkWnhY67xF7DeexmT1emRNMgh/cuv8l7P0GMsBe54G/bX51p5uyNG3BLWeV
-         inxEO0L4eMxKSxG/R1vRiBXoxs9OTtbnkrEQjIrsmxbr5Awf6aRUFU2krCFkmtHr2Vek
-         rjLunkCaOS8Wg2ZZAP3m2fCuvhMgLXW5x5Fx17DBgSh3opC/MnSXbzR7mVF0NvRoL0Gx
-         So5JZNnyvC5lmQt0G37tqTAZ9SA+6gLYaxYPsmJTXtHzqJswloCGKs2z1tyTFLG6L5x3
-         huXg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=OkdpHld9Mqej9LdERVUsOkeLZ84S2x7OZadvoehTTp0=;
+        b=lspq+5WDOLeV8ir3qCRvEOwM8qbE5DAjPdE2pyLwJelZgaQs+PE7MrK4pYHAfdYpe0
+         5u6TDpzHTCHTdPtWvnc5a8C1dSktEF7nuBDaSmDgBFuXdVTqE78Z3/zEy/4LdmV655gl
+         5d+Vf4lEdo+7NsfQt9XTZcBNhqWk7SFR7sRL3jb58LsZrNr1YieqSaY/uVjN0ok6iLH/
+         Gtzv+SJ/l4IsJV75bcgVS+Oj4c0NA5pwiuSmopfxnZh18Qf7FIHI3xRe0TQDqlK1bWGe
+         co6GDy5m+Eh6GnplCmivB3ajZ70pT67QFbCaW58uX59bwbLn2EGKoxFDr4GFhD3tJ1H6
+         PJig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=kudP5fV+oewEgx+1iJMm74xzhJH7jghnvNdgCXLF87M=;
-        b=YFT/JRY979nJSBSM3JlIQF3Jv4ixKu3hunIZu3dD4gHhNPxnMYQNHulkpt1307nqCT
-         7TNdYXMckGPy1upO+lxc3sOrAs5GXU2/UOofwZfFCIWtpvzOK8hnEHQdBSw+hugYNNOu
-         tcsRuauVuB3VUDvkXOmPaxTSF6CpGAD+Jn0tACLVx2tdu2Mi8qLbk3RPWfIqNfu0oAkH
-         0QBODEOqmcToPqphlwSadvkWshfVZTcQrV0wwOerpeMY9o7Il2UHbd6VCTo7LaxPvUJ2
-         XM/8/sD4i7L/GAyIeFiNW2ULsKPBxeyHlPkRcJU21yPWr6yYHP1XRJaVaW7yZX7x564R
-         f9KA==
-X-Gm-Message-State: AOAM531RkEG40SfbQWQKeqDqKO1bTa+hFg8tV/aw09SJrG5/jk2C38lU
-        rf46RuB+UYZ3enSD+HjVTiYcvw==
-X-Google-Smtp-Source: ABdhPJxyEFfBgCewybrpfbsPNeL3x+7VOL/nwKb+mYI+/8GSTOWTK5HmfFVEseCW25SixBD7Kqa58w==
-X-Received: by 2002:a17:902:c94e:b0:151:a988:f3dd with SMTP id i14-20020a170902c94e00b00151a988f3ddmr4508675pla.142.1646343136215;
-        Thu, 03 Mar 2022 13:32:16 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id rm8-20020a17090b3ec800b001bcd57956desm2861035pjb.51.2022.03.03.13.32.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Mar 2022 13:32:15 -0800 (PST)
-Date:   Thu, 3 Mar 2022 21:32:12 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=OkdpHld9Mqej9LdERVUsOkeLZ84S2x7OZadvoehTTp0=;
+        b=eufv8eK872jl+qtMONzJsdY4VhmUJ+AMxov1ROZP1+sE0EjzAZkEZ5McEHO/DOhRam
+         0uNPvCrIKTD6EVUGDm8WbMuob082cWLF5qNcg1VuprwZAaRz5IyT1gHG45vPqnLaEa94
+         DkNUb3E+TcIldoKuFT+1XDdnw4+RaJ9YjF4eqPzHWl5pwKdU0Ct6pXI1WmcePJ0r27EW
+         P2zz+MGGy6WbJOdm0mQQL9YczOzD0/2h8bC5YKEA4Fb8Hpl9l1G/LJTs5+ltoN4Q31cM
+         nNjaa911uxKFgoRMnYRwC8JZrJjUQ89l6hEkH/ZU2wE7dPczmqwkwd+20GkWtN/p8/r2
+         /dVg==
+X-Gm-Message-State: AOAM532J3shWFTcKHkIqZ6xkBXyRyAsVf34XxQhc276AqhQg5cmAD9n1
+        bttq84BrglID9Q9jWbYBuY88hQrtoMovei0yk5uxGbjVu3jqJQ==
+X-Google-Smtp-Source: ABdhPJzYAFnJHkyJBoAoljcVTl3u4ewjNHbPkYy5u5VI8zpUTJQqACiACUPn0z9Zq+25te5WzSrtcCt9hP6544hYM6k=
+X-Received: by 2002:a4a:8893:0:b0:31b:fd08:2735 with SMTP id
+ j19-20020a4a8893000000b0031bfd082735mr19659155ooa.96.1646343864933; Thu, 03
+ Mar 2022 13:44:24 -0800 (PST)
+MIME-Version: 1.0
+References: <20220301060351.442881-1-oupton@google.com> <20220301060351.442881-2-oupton@google.com>
+ <4e678b4f-4093-fa67-2c4e-e25ec2ced6d5@redhat.com> <Yh5pYhDQbzWQOdIx@google.com>
+ <b839fa78-c8ec-7996-dba7-685ea48ca33d@redhat.com> <Yh/Y3E4NTfSa4I/g@google.com>
+ <4d4606f4-dbc9-d3a4-929e-0ea07182054c@redhat.com> <Yh/nlOXzIhaMLzdk@google.com>
+ <YiAdU+pA/RNeyjRi@google.com> <78abcc19-0a79-4f8b-2eaf-c99b96efea42@redhat.com>
+ <YiDps0lOKITPn4gv@google.com>
+In-Reply-To: <YiDps0lOKITPn4gv@google.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 3 Mar 2022 13:44:13 -0800
+Message-ID: <CALMp9eRGNfF0Sb6MTt2ueSmxMmHoF2EgT-0XR=ovteBMy6B2+Q@mail.gmail.com>
+Subject: Re: [PATCH v4 1/8] KVM: nVMX: Keep KVM updates to BNDCFGS ctrl bits
+ across MSR write
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Oliver Upton <oupton@google.com>, kvm@vger.kernel.org,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
-        David Hildenbrand <david@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        Mingwei Zhang <mizhang@google.com>
-Subject: Re: [PATCH v4 21/30] KVM: x86/mmu: Zap invalidated roots via
- asynchronous worker
-Message-ID: <YiEz3D18wEn8lcEq@google.com>
-References: <20220303193842.370645-1-pbonzini@redhat.com>
- <20220303193842.370645-22-pbonzini@redhat.com>
- <YiExLB3O2byI4Xdu@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YiExLB3O2byI4Xdu@google.com>
+        David Dunn <daviddunn@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-18.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -80,38 +76,57 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 03, 2022, Sean Christopherson wrote:
+On Thu, Mar 3, 2022 at 8:15 AM Sean Christopherson <seanjc@google.com> wrote:
+>
 > On Thu, Mar 03, 2022, Paolo Bonzini wrote:
-> > The only issue is that kvm_tdp_mmu_invalidate_all_roots() now assumes that
-> > there is at least one reference in kvm->users_count; so if the VM is dying
-> > just go through the slow path, as there is nothing to gain by using the fast
-> > zapping.
-> 
-> This isn't actually implemented. :-)
+> > On 3/3/22 02:43, Sean Christopherson wrote:
+> > > > Maybe I can redirect you to a test case to highlight a possible
+> > > > regression in KVM, as seen by userspace;-)
+> > > Regressions aside, VMCS controls are not tied to CPUID, KVM should not be mucking
+> > > with unrelated things.  The original hack was to fix a userspace bug and should
+> > > never have been mreged.
+> >
+> > Note that it dates back to:
+> >
+> >     commit 5f76f6f5ff96587af5acd5930f7d9fea81e0d1a8
+> >     Author: Liran Alon <liran.alon@oracle.com>
+> >     Date:   Fri Sep 14 03:25:52 2018 +0300
+> >
+> >     KVM: nVMX: Do not expose MPX VMX controls when guest MPX disabled
+> >     Before this commit, KVM exposes MPX VMX controls to L1 guest only based
+> >     on if KVM and host processor supports MPX virtualization.
+> >     However, these controls should be exposed to guest only in case guest
+> >     vCPU supports MPX.
+> >
+> > It's not to fix a userspace bug, it's to support userspace that doesn't
+> > know about using KVM_SET_MSR for VMX features---which is okay since unlike
+> > KVM_SET_CPUID2 it's not a mandatory call.
+>
+> I disagree, IMO failure to properly configure the vCPU model is a userspace bug.
+> Maybe it was a userspace bug induced by a haphazard and/or poorly documented KVM
+> ABI, but it's still a userspace bug.  One could argue that KVM should disable/clear
+> VMX features if userspace clears a related CPUID feature, but _setting_ a VMX
+> feature based on CPUID is architecturally wrong.  Even if we consider one or both
+> cases to be desirable behavior in terms of creating a consistent vCPU model, forcing
+> a consistent vCPU model for this one case goes against every other ioctl in KVM's
+> ABI.
+>
+> If we consider it KVM's responsibility to propagate CPUID state to VMX MSRs, then
+> KVM has a bunch of "bugs".
+>
+>   X86_FEATURE_LM => VM_EXIT_HOST_ADDR_SPACE_SIZE, VM_ENTRY_IA32E_MODE, VMX_MISC_SAVE_EFER_LMA
+>
+>   X86_FEATURE_TSC => CPU_BASED_RDTSC_EXITING, CPU_BASED_USE_TSC_OFFSETTING,
+>                      SECONDARY_EXEC_TSC_SCALING
+>
+>   X86_FEATURE_INVPCID_SINGLE => SECONDARY_EXEC_ENABLE_INVPCID
+>
+>   X86_FEATURE_MWAIT => CPU_BASED_MONITOR_EXITING, CPU_BASED_MWAIT_EXITING
+>
+>   X86_FEATURE_INTEL_PT => SECONDARY_EXEC_PT_CONCEAL_VMX, SECONDARY_EXEC_PT_USE_GPA,
+>                           VM_EXIT_CLEAR_IA32_RTIT_CTL, VM_ENTRY_LOAD_IA32_RTIT_CTL
+>
+>   X86_FEATURE_XSAVES => SECONDARY_EXEC_XSAVES
 
-Oh, and when you implement it (or copy paste), can you also add a lockdep and a
-comment about the check being racy, but that the race is benign?  It took me a
-second to realize why it's safe to use a work queue without holding a reference
-to @kvm.
-
-static void kvm_mmu_zap_all_fast(struct kvm *kvm)
-{
-	lockdep_assert_held(&kvm->slots_lock);
-
-	/*
-	 * Zap using the "slow" path if the VM is being destroyed.  The "slow"
-	 * path isn't actually slower, it just just doesn't block vCPUs for an
-	 * extended duration, which is irrelevant if the VM is dying.
-	 *
-	 * Note, this doesn't guarantee users_count won't go to '0' immediately
-	 * after this check, but that race is benign as callers that don't hold
-	 * a reference to @kvm must hold kvm_lock to prevent use-after-free.
-	 */
-	if (unlikely(refcount_read(&kvm->users_count)) {
-		lockdep_assert_held(&kvm_lock);
-		kvm_mmu_zap_all(kvm);
-		return;
-	}
-
-	write_lock(&kvm->mmu_lock);
-	trace_kvm_mmu_zap_all_fast(kvm);
+I don't disagree with you, but this does beg the question, "What's
+going on with all of the invocations of cr4_fixed1_update()?"
