@@ -2,153 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 152004CC1A9
-	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 16:41:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DC4CE4CC1B1
+	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 16:41:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233219AbiCCPkw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Mar 2022 10:40:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58538 "EHLO
+        id S234608AbiCCPmc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Mar 2022 10:42:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229621AbiCCPku (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Mar 2022 10:40:50 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9862D195313;
-        Thu,  3 Mar 2022 07:40:04 -0800 (PST)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 223DXjUG016756;
-        Thu, 3 Mar 2022 15:40:02 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : reply-to : subject : to : cc : references : from :
- in-reply-to : content-type : content-transfer-encoding; s=pp1;
- bh=7MaOOpnZQEaMhi0BzwCt3BeviEZg6vV7D0hFaJSE9K8=;
- b=gj988ogzbAU3NxpQm+sRQW+WSVzzV4Qj2pF+RAckX0WAjHYAzk0fZ8ov0o3/yAVp0NFl
- LiJ+S7DfZ4H6mGZdJmG0YmK5fjSOJeTfgurFhYFPHcVeMON3uT0G3A1E/co1FCnVFIK+
- nHsugf4jvYJsoKSgTGFngGqgW5c2l/lmT5cmFl3EzkBlX+11vNUsj3n+kf5BdXps7iBq
- oh4WY6VT7bbUUDjmRzM/+SxA6rlVsjN2tgA1Kizrvk8nhTXCBfIHA1q0JB2jT9rKUdQQ
- vzE24dLRa1ufahkRb3YDJ4gMad7d6QEgY8BuTS36kIE7PWgaAucoM5PwVN1ERvUBbBNz 2g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3ejvbbwxmu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 03 Mar 2022 15:40:02 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 223Fcj9D008757;
-        Thu, 3 Mar 2022 15:40:02 GMT
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3ejvbbwxmb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 03 Mar 2022 15:40:02 +0000
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
-        by ppma04dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 223FcdP8001032;
-        Thu, 3 Mar 2022 15:40:01 GMT
-Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
-        by ppma04dal.us.ibm.com with ESMTP id 3efbuah7wy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 03 Mar 2022 15:40:01 +0000
-Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
-        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 223Fdxug15860010
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 3 Mar 2022 15:39:59 GMT
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A0EBC136059;
-        Thu,  3 Mar 2022 15:39:59 +0000 (GMT)
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 84FBB13604F;
-        Thu,  3 Mar 2022 15:39:58 +0000 (GMT)
-Received: from [9.160.181.120] (unknown [9.160.181.120])
-        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Thu,  3 Mar 2022 15:39:58 +0000 (GMT)
-Message-ID: <97681738-50a1-976d-9f0f-be326eab7202@linux.ibm.com>
-Date:   Thu, 3 Mar 2022 10:39:58 -0500
+        with ESMTP id S234569AbiCCPma (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Mar 2022 10:42:30 -0500
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 016691959C1
+        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 07:41:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=Sender:Content-Transfer-Encoding:
+        Content-Type:MIME-Version:Message-Id:Date:Subject:Cc:To:From:Reply-To:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=XWF5VMFkk6L4UE9diwBbalnWZxrWgn+B7Eu8T2VVPwc=; b=hTbBMS4rQLzOmZr1r4eOJoMD0u
+        W59ZAULPkY/Wzaj0UxV4WeycTD3Gee6viDyMxCuk2LBMFlhFEeBcY3jbMtDb1mASJzYvJgs3E7ZFX
+        SQyuMLK5NHCLyq8zoG813T1q9RD17b77URm34I9cdmZ1/DUIWusSjioNXkLj/9d185fCGqjqYTlKh
+        tKAWLO+UxBDcQKV/Cf4P2npTkrJjMfjbU/fpZik8E9/oYNIXzCvm3G0hm1pF0Rz6ksPgfvKfD/5lx
+        1H11hlc08buHjdIBPUWJiSaJdefv1vFgmGbwDYOgdCmn8qSdIyzxyRabOcIWNVut1bgdVnp/pL/96
+        hNo1nDQw==;
+Received: from [2001:8b0:10b:1:85c4:81a:fb42:714d] (helo=i7.infradead.org)
+        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nPna5-00Ewju-CE; Thu, 03 Mar 2022 15:41:29 +0000
+Received: from dwoodhou by i7.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nPna4-000qmL-O2; Thu, 03 Mar 2022 15:41:28 +0000
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Metin Kaya <metikaya@amazon.co.uk>,
+        Paul Durrant <pdurrant@amazon.co.uk>
+Subject: [PATCH v3 00/17] KVM: Add Xen event channel acceleration
+Date:   Thu,  3 Mar 2022 15:41:10 +0000
+Message-Id: <20220303154127.202856-1-dwmw2@infradead.org>
+X-Mailer: git-send-email 2.33.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Reply-To: jjherne@linux.ibm.com
-Subject: Re: [PATCH v18 08/18] s390/vfio-ap: allow assignment of unavailable
- AP queues to mdev device
-Content-Language: en-US
-To:     Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     freude@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
-        mjrosato@linux.ibm.com, pasic@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com
-References: <20220215005040.52697-1-akrowiak@linux.ibm.com>
- <20220215005040.52697-9-akrowiak@linux.ibm.com>
-From:   "Jason J. Herne" <jjherne@linux.ibm.com>
-Organization: IBM
-In-Reply-To: <20220215005040.52697-9-akrowiak@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: J5vuu5TCFkzHfujRo4s6-Lf7CLdK5UDM
-X-Proofpoint-ORIG-GUID: _UFSj0DwNP2H2JU_hmLEnh9wBbzgjhIT
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-03-03_07,2022-02-26_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 malwarescore=0
- impostorscore=0 lowpriorityscore=0 mlxlogscore=999 phishscore=0
- suspectscore=0 priorityscore=1501 mlxscore=0 adultscore=0 spamscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2203030074
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Sender: David Woodhouse <dwmw2@infradead.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/14/22 19:50, Tony Krowiak wrote:
->   /**
-> - * vfio_ap_mdev_verify_no_sharing - verifies that the AP matrix is not configured
-> + * vfio_ap_mdev_verify_no_sharing - verify APQNs are not shared by matrix mdevs
->    *
-> - * @matrix_mdev: the mediated matrix device
-> + * @mdev_apm: mask indicating the APIDs of the APQNs to be verified
-> + * @mdev_aqm: mask indicating the APQIs of the APQNs to be verified
->    *
-> - * Verifies that the APQNs derived from the cross product of the AP adapter IDs
-> - * and AP queue indexes comprising the AP matrix are not configured for another
-> + * Verifies that each APQN derived from the Cartesian product of a bitmap of
-> + * AP adapter IDs and AP queue indexes is not configured for any matrix
->    * mediated device. AP queue sharing is not allowed.
->    *
-> - * Return: 0 if the APQNs are not shared; otherwise returns -EADDRINUSE.
-> + * Return: 0 if the APQNs are not shared; otherwise return -EADDRINUSE.
->    */
-> -static int vfio_ap_mdev_verify_no_sharing(struct ap_matrix_mdev *matrix_mdev)
-> +static int vfio_ap_mdev_verify_no_sharing(unsigned long *mdev_apm,
-> +					  unsigned long *mdev_aqm)
->   {
-> -	struct ap_matrix_mdev *lstdev;
-> +	struct ap_matrix_mdev *matrix_mdev;
->   	DECLARE_BITMAP(apm, AP_DEVICES);
->   	DECLARE_BITMAP(aqm, AP_DOMAINS);
->   
-> -	list_for_each_entry(lstdev, &matrix_dev->mdev_list, node) {
-> -		if (matrix_mdev == lstdev)
-> +	list_for_each_entry(matrix_mdev, &matrix_dev->mdev_list, node) {
-> +		/*
-> +		 * If the input apm and aqm belong to the matrix_mdev's matrix,
-> +		 * then move on to the next.
-> +		 */
-> +		if (mdev_apm == matrix_mdev->matrix.apm &&
-> +		    mdev_aqm == matrix_mdev->matrix.aqm)
->   			continue;
+This series adds event channel acceleration for Xen guests. In particular
+it allows guest vCPUs to send each other IPIs without having to bounce
+all the way out to the userspace VMM in order to do so. Likewise, the
+Xen singleshot timer is added, and a version of SCHEDOP_poll. Those
+major features are based on Joao and Boris' patches from 2019.
 
-We may have a problem here. This check seems like it exists to stop you from
-comparing an mdev's apm/aqm with itself. Obviously comparing an mdev's newly
-updated apm/aqm with itself would cause a false positive sharing check, right?
-If this is the case, I think the comment should be changed to reflect that.
+Cleaning up the event delivery into the vcpu_info involved using the new
+gfn_to_pfn_cache for that, and that means I ended up doing so for *all*
+the places the guest can have a pvclock.
 
-Aside from the comment, what stops this particular series of if statements from
-allowing us to configure a second mdev with the exact same apm/aqm values as an
-existing mdev? If we do, then this check's continue will short circuit the rest
-of the function thereby allowing that 2nd mdev even though it should be a
-sharing violation.
+v0: Proof-of-concept RFC
+
+v1:
+ • Drop the runstate fix which is merged now.
+ • Add Sean's gfn_to_pfn_cache API change at the start of the series.
+ • Add KVM self tests
+ • Minor bug fixes
+
+v2:
+ • Drop dirty handling from gfn_to_pfn_cache
+ • Fix !CONFIG_KVM_XEN build and duplicate call to kvm_xen_init_vcpu()
+
+v3:
+ • Add KVM_XEN_EVTCHN_RESET to clear all outbound ports.
+ • Clean up a stray #if	1 in a part of the the test case that was once
+   being recalcitrant.
+ • Check kvm_xen_has_pending_events() in kvm_vcpu_has_events() and *not*
+   kvm_xen_has_pending_timer() which is checked from elsewhere.
+ • Fix warnings noted by the kernel test robot <lkp@intel.com>:
+    • Make kvm_xen_init_timer() static.
+    • Make timer delta calculation use an explicit s64 to fix 32-bit build.
+
+Boris Ostrovsky (1):
+      KVM: x86/xen: handle PV spinlocks slowpath
+
+David Woodhouse (12):
+      KVM: Remove dirty handling from gfn_to_pfn_cache completely
+      KVM: x86/xen: Use gfn_to_pfn_cache for runstate area
+      KVM: x86: Use gfn_to_pfn_cache for pv_time
+      KVM: x86/xen: Use gfn_to_pfn_cache for vcpu_info
+      KVM: x86/xen: Use gfn_to_pfn_cache for vcpu_time_info
+      KVM: x86/xen: Make kvm_xen_set_evtchn() reusable from other places
+      KVM: x86/xen: Support direct injection of event channel events
+      KVM: x86/xen: Add KVM_XEN_VCPU_ATTR_TYPE_VCPU_ID
+      KVM: x86/xen: Kernel acceleration for XENVER_version
+      KVM: x86/xen: Support per-vCPU event channel upcall via local APIC
+      KVM: x86/xen: Advertise and document KVM_XEN_HVM_CONFIG_EVTCHN_SEND
+      KVM: x86/xen: Add self tests for KVM_XEN_HVM_CONFIG_EVTCHN_SEND
+
+Joao Martins (3):
+      KVM: x86/xen: intercept EVTCHNOP_send from guests
+      KVM: x86/xen: handle PV IPI vcpu yield
+      KVM: x86/xen: handle PV timers oneshot mode
+
+Sean Christopherson (1):
+      KVM: Use enum to track if cached PFN will be used in guest and/or host
+
+ Documentation/virt/kvm/api.rst                     |  133 +-
+ arch/x86/include/asm/kvm_host.h                    |   23 +-
+ arch/x86/kvm/irq.c                                 |   11 +-
+ arch/x86/kvm/irq_comm.c                            |    2 +-
+ arch/x86/kvm/x86.c                                 |  119 +-
+ arch/x86/kvm/xen.c                                 | 1271 ++++++++++++++++----
+ arch/x86/kvm/xen.h                                 |   67 +-
+ include/linux/kvm_host.h                           |   26 +-
+ include/linux/kvm_types.h                          |   11 +-
+ include/uapi/linux/kvm.h                           |   44 +
+ .../testing/selftests/kvm/x86_64/xen_shinfo_test.c |  337 +++++-
+ virt/kvm/pfncache.c                                |   53 +-
+ 12 files changed, 1722 insertions(+), 375 deletions(-)
 
 
--- 
--- Jason J. Herne (jjherne@linux.ibm.com)
+
