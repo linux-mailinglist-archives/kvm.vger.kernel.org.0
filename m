@@ -2,190 +2,370 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 92C5D4CBFD2
-	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 15:17:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C1F574CBFD9
+	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 15:17:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233993AbiCCOSA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Mar 2022 09:18:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41032 "EHLO
+        id S234000AbiCCOSh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Mar 2022 09:18:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42408 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229717AbiCCOR6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Mar 2022 09:17:58 -0500
-Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49DEA18CC6F
-        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 06:17:12 -0800 (PST)
-Received: by mail-wr1-x431.google.com with SMTP id m6so8065544wrr.10
-        for <kvm@vger.kernel.org>; Thu, 03 Mar 2022 06:17:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=o87FE1s1Wm0goe8u+iMFz3QFDTGxpEfcNIHyIf4cYXc=;
-        b=qjtp5qx/MAS7oqOrzTmksFxlCuVhzhNjct9+cVdZJ0lL6LcvKJpYIbhjcbFQ5y9Sev
-         DocA3PoxsiNIlDGie3zqTL7+3cZqizI67vE9M6VfGzSXMuNeAvca61E1ggaYqv9zQFqL
-         fJODUuKt9vY9USIyyVUP20Kqq0V7c19LkZlvs7UwQ2NN5XFi/YawqJef+7uk3L9avGAN
-         U+tVGYNR/FGSTKHT61X9VJIZzSU+SKbQpPqMelLVGiYbB9c5AR28XhyRDVus0xBAcPmJ
-         6FreKTdHUZke8zDVjWjeeEE8ttpNaGeilOikSatq/h4i7sbml9cna2lWaV+MvgXYz04K
-         Bjfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=o87FE1s1Wm0goe8u+iMFz3QFDTGxpEfcNIHyIf4cYXc=;
-        b=BHv5Ot4VWbtSIHYC6zvpIdLFApNLw3GZ1HcH1gnmw2c4oAk3pzXc37lb3BPHRd8rlv
-         Qowv1oLI0LC39iRxwacff+tmqjwR6yn6FswChoswHHK+px9RCyD4/58IDVTj/y5Tex68
-         yS7JXjjnYkpos2BZqoo9ta3s6p746wZDTPuntMo98xLTH426I79tMr6hPDdMCzs4Fwkn
-         hqP75bF0pr5dt7ZK3FOBjIf0WF5WsPSF/0t8XdmD+sHV+BLteZWHzAkw1Ow5oiSN3unE
-         JeliBdG25EO2cBQHADVsvVh8xQDuwcUqm+HEuPeKwiwCssWpBqhCRde5Z+saULl8zK46
-         98ow==
-X-Gm-Message-State: AOAM531x72aPw3/BnfkuW46SNGcdNfdi2yndMXG1L0GTHfk3S4ceEniY
-        +YBX+kMNFkduDqspbBdKR4kO4w==
-X-Google-Smtp-Source: ABdhPJxGby9qFrKdJzMjz97SEhrdFbTgsA5JiONah34Fa2/z0rLBVsD2gF8PbtEBkulh+SvN06cb+A==
-X-Received: by 2002:adf:edc4:0:b0:1ee:27de:4b04 with SMTP id v4-20020adfedc4000000b001ee27de4b04mr25622352wro.117.1646317030825;
-        Thu, 03 Mar 2022 06:17:10 -0800 (PST)
-Received: from google.com (cpc155339-bagu17-2-0-cust87.1-3.cable.virginm.net. [86.27.177.88])
-        by smtp.gmail.com with ESMTPSA id z6-20020a1cf406000000b0037c4e2d3baesm9037338wma.19.2022.03.03.06.17.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Mar 2022 06:17:10 -0800 (PST)
-Date:   Thu, 3 Mar 2022 14:17:07 +0000
-From:   Lee Jones <lee.jones@linaro.org>
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        kernel list <linux-kernel@vger.kernel.org>,
-        kvm <kvm@vger.kernel.org>,
-        Linux Virtualization <virtualization@lists.linux-foundation.org>,
-        netdev <netdev@vger.kernel.org>, stable@vger.kernel.org,
-        syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
-Subject: Re: [PATCH 1/1] vhost: Protect the virtqueue from being cleared
- whilst still in use
-Message-ID: <YiDN4xpb1+8k5K5/@google.com>
-References: <20220302075421.2131221-1-lee.jones@linaro.org>
- <20220302082021-mutt-send-email-mst@kernel.org>
- <Yh93k2ZKJBIYQJjp@google.com>
- <20220302095045-mutt-send-email-mst@kernel.org>
- <Yh+F1gkCGoYF2lMV@google.com>
- <CAGxU2F4cUDrMzoHH1NT5_ivxBPgEE8HOzP5s_Bt5JURRaSsLdQ@mail.gmail.com>
- <20220302112945-mutt-send-email-mst@kernel.org>
- <Yh+gDZUbgBRx/1ro@google.com>
- <20220302171048.aijkcrwcrgsu475z@sgarzare-redhat>
+        with ESMTP id S233891AbiCCOSf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Mar 2022 09:18:35 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53C12BC39;
+        Thu,  3 Mar 2022 06:17:49 -0800 (PST)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 223E1SGw003886;
+        Thu, 3 Mar 2022 14:17:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : to : cc : references : from : subject : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=YTuFF+UBrk6PBDSO+jmdcZ3dwPjSOO76Bjsog+jX0WQ=;
+ b=dKPgh8uiQj1RRREqDHArapE5buM1+ZbC1vGFAT+N4qYs0v0WeJbhLM8+WVxZtY3vqcnK
+ ZebbIvgKGUMUf3zMkYRuNZD7QXto2WlfIUP2leiWPMR68gx1ggDgfeFN0Ijfu/pxNYzc
+ xhf8ZwTipzPXmKsbMFcGSnx88TZCahj9gkmgnpMpXRWqV37Pr/13Q8qzpPKZLw73/R4f
+ gvbnit8i9vGgL/Cc61z3iLXb7QaMx0hayl8Tp9/kShJ0jeHbsd+SRPBwEVXcZQtPF0+T
+ +Ddd4q4ZhIizgdj/yHhFSThoQ8iEDRA9pjv8+akvKYeJWiPwJsw7KVCwYaG1DuZAvvc5 UQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ejuc7nh6k-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 03 Mar 2022 14:17:41 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 223Dr231012197;
+        Thu, 3 Mar 2022 14:17:40 GMT
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ejuc7nh5r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 03 Mar 2022 14:17:40 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 223EHXTH023408;
+        Thu, 3 Mar 2022 14:17:38 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma05fra.de.ibm.com with ESMTP id 3efbu9gb2u-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 03 Mar 2022 14:17:38 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 223EHYeG21561726
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 3 Mar 2022 14:17:34 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D103852052;
+        Thu,  3 Mar 2022 14:17:34 +0000 (GMT)
+Received: from [9.145.163.13] (unknown [9.145.163.13])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 51EBA52054;
+        Thu,  3 Mar 2022 14:17:34 +0000 (GMT)
+Message-ID: <9fd2dde2-c080-855b-03ea-b24c5e18b181@linux.ibm.com>
+Date:   Thu, 3 Mar 2022 15:17:33 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220302171048.aijkcrwcrgsu475z@sgarzare-redhat>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Content-Language: en-US
+To:     Steffen Eiden <seiden@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20220223144830.44039-1-seiden@linux.ibm.com>
+ <20220223144830.44039-2-seiden@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH v2 1/3] drivers/s390/char: Add Ultravisor io device
+In-Reply-To: <20220223144830.44039-2-seiden@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: LesxFc463VVRvYMGGTz_QhtMxPqN4S6c
+X-Proofpoint-GUID: h21wSP3WrpmPH9c2h5jUgijHqyCZ8xE7
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-03-03_07,2022-02-26_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
+ priorityscore=1501 bulkscore=0 suspectscore=0 mlxlogscore=999
+ malwarescore=0 adultscore=0 lowpriorityscore=0 clxscore=1015 mlxscore=0
+ phishscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2201110000 definitions=main-2203030067
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 02 Mar 2022, Stefano Garzarella wrote:
+On 2/23/22 15:48, Steffen Eiden wrote:
+> This patch adds a new miscdevice to expose some Ultravisor functions
+> to userspace. Userspace can send IOCTLs to the uvdevice that will then
+> emit a corresponding Ultravisor Call and hands the result over to
+> userspace. The uvdevice is available if the Ultravisor Call facility is
+> present.
+> 
+> Userspace is now able to call the Query Ultravisor Information
+> Ultravisor Command through the uvdevice.
+> 
+> Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
+> ---
+>   MAINTAINERS                           |   2 +
+>   arch/s390/include/uapi/asm/uvdevice.h |  27 +++++
+>   drivers/s390/char/Kconfig             |  11 ++
+>   drivers/s390/char/Makefile            |   1 +
+>   drivers/s390/char/uvdevice.c          | 145 ++++++++++++++++++++++++++
+>   5 files changed, 186 insertions(+)
+>   create mode 100644 arch/s390/include/uapi/asm/uvdevice.h
+>   create mode 100644 drivers/s390/char/uvdevice.c
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 777cd6fa2b3d..f32e876f45c2 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -10577,9 +10577,11 @@ F:	Documentation/virt/kvm/s390*
+>   F:	arch/s390/include/asm/gmap.h
+>   F:	arch/s390/include/asm/kvm*
+>   F:	arch/s390/include/uapi/asm/kvm*
+> +F:	arch/s390/include/uapi/asm/uvdevice.h
+>   F:	arch/s390/kernel/uv.c
+>   F:	arch/s390/kvm/
+>   F:	arch/s390/mm/gmap.c
+> +F:	drivers/s390/char/uvdevice.c
+>   F:	tools/testing/selftests/kvm/*/s390x/
+>   F:	tools/testing/selftests/kvm/s390x/
+>   
+> diff --git a/arch/s390/include/uapi/asm/uvdevice.h b/arch/s390/include/uapi/asm/uvdevice.h
+> new file mode 100644
+> index 000000000000..60956f8d2dc0
+> --- /dev/null
+> +++ b/arch/s390/include/uapi/asm/uvdevice.h
+> @@ -0,0 +1,27 @@
+> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+> +/*
+> + *  Copyright IBM Corp. 2022
+> + *  Author(s): Steffen Eiden <seiden@linux.ibm.com>
+> + */
+> +#ifndef __S390X_ASM_UVDEVICE_H
+> +#define __S390X_ASM_UVDEVICE_H
+> +
+> +#include <linux/types.h>
+> +
+> +struct uvio_ioctl_cb {
+> +	__u32 flags;
+> +	__u16 uv_rc;			/* UV header rc value */
+> +	__u16 uv_rrc;			/* UV header rrc value */
+> +	__u64 argument_addr;		/* Userspace address of uvio argument */
+> +	__u32 argument_len;
+> +	__u8  reserved14[0x40 - 0x14];	/* must be zero */
+> +};
+> +
 
-> On Wed, Mar 02, 2022 at 04:49:17PM +0000, Lee Jones wrote:
-> > On Wed, 02 Mar 2022, Michael S. Tsirkin wrote:
-> > 
-> > > On Wed, Mar 02, 2022 at 05:28:31PM +0100, Stefano Garzarella wrote:
-> > > > On Wed, Mar 2, 2022 at 3:57 PM Lee Jones <lee.jones@linaro.org> wrote:
-> > > > >
-> > > > > On Wed, 02 Mar 2022, Michael S. Tsirkin wrote:
-> > > > >
-> > > > > > On Wed, Mar 02, 2022 at 01:56:35PM +0000, Lee Jones wrote:
-> > > > > > > On Wed, 02 Mar 2022, Michael S. Tsirkin wrote:
-> > > > > > >
-> > > > > > > > On Wed, Mar 02, 2022 at 07:54:21AM +0000, Lee Jones wrote:
-> > > > > > > > > vhost_vsock_handle_tx_kick() already holds the mutex during its call
-> > > > > > > > > to vhost_get_vq_desc().  All we have to do is take the same lock
-> > > > > > > > > during virtqueue clean-up and we mitigate the reported issues.
-> > > > > > > > >
-> > > > > > > > > Link: https://syzkaller.appspot.com/bug?extid=279432d30d825e63ba00
-> > > > > > > > >
-> > > > > > > > > Cc: <stable@vger.kernel.org>
-> > > > > > > > > Reported-by: syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
-> > > > > > > > > Signed-off-by: Lee Jones <lee.jones@linaro.org>
-> > > > > > > > > ---
-> > > > > > > > >  drivers/vhost/vhost.c | 2 ++
-> > > > > > > > >  1 file changed, 2 insertions(+)
-> > > > > > > > >
-> > > > > > > > > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> > > > > > > > > index 59edb5a1ffe28..bbaff6a5e21b8 100644
-> > > > > > > > > --- a/drivers/vhost/vhost.c
-> > > > > > > > > +++ b/drivers/vhost/vhost.c
-> > > > > > > > > @@ -693,6 +693,7 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
-> > > > > > > > >         int i;
-> > > > > > > > >
-> > > > > > > > >         for (i = 0; i < dev->nvqs; ++i) {
-> > > > > > > > > +               mutex_lock(&dev->vqs[i]->mutex);
-> > > > > > > > >                 if (dev->vqs[i]->error_ctx)
-> > > > > > > > >                         eventfd_ctx_put(dev->vqs[i]->error_ctx);
-> > > > > > > > >                 if (dev->vqs[i]->kick)
-> > > > > > > > > @@ -700,6 +701,7 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
-> > > > > > > > >                 if (dev->vqs[i]->call_ctx.ctx)
-> > > > > > > > >                         eventfd_ctx_put(dev->vqs[i]->call_ctx.ctx);
-> > > > > > > > >                 vhost_vq_reset(dev, dev->vqs[i]);
-> > > > > > > > > +               mutex_unlock(&dev->vqs[i]->mutex);
-> > > > > > > > >         }
-> > > > > > > >
-> > > > > > > > So this is a mitigation plan but the bug is still there though
-> > > > > > > > we don't know exactly what it is.  I would prefer adding something like
-> > > > > > > > WARN_ON(mutex_is_locked(vqs[i]->mutex) here - does this make sense?
-> > > > > > >
-> > > > > > > As a rework to this, or as a subsequent patch?
-> > > > > >
-> > > > > > Can be a separate patch.
-> > > > > >
-> > > > > > > Just before the first lock I assume?
-> > > > > >
-> > > > > > I guess so, yes.
-> > > > >
-> > > > > No problem.  Patch to follow.
-> > > > >
-> > > > > I'm also going to attempt to debug the root cause, but I'm new to this
-> > > > > subsystem to it might take a while for me to get my head around.
-> > > >
-> > > > IIUC the root cause should be the same as the one we solved here:
-> > > > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a58da53ffd70294ebea8ecd0eb45fd0d74add9f9
-> > > >
-> > > > The worker was not stopped before calling vhost_dev_cleanup(). So while
-> > > > the worker was still running we were going to free memory or initialize
-> > > > fields while it was still using virtqueue.
-> > > 
-> > > Right, and I agree but it's not the root though, we do attempt to stop all workers.
-> > 
-> > Exactly.  This is what happens, but the question I'm going to attempt
-> > to answer is *why* does this happen.
-> 
-> IIUC the worker was still running because the /dev/vhost-vsock file was not
-> explicitly closed, so vhost_vsock_dev_release() was called in the do_exit()
-> of the process.
-> 
-> In that case there was the issue, because vhost_dev_check_owner() returned
-> false in vhost_vsock_stop() since current->mm was NULL.
-> So it returned earlier, without calling vhost_vq_set_backend(vq, NULL).
-> 
-> This did not stop the worker from continuing to run, causing the multiple
-> issues we are seeing.
-> 
-> current->mm was NULL, because in the do_exit() the address space is cleaned
-> in the exit_mm(), which is called before releasing the files into the
-> exit_task_work().
-> 
-> This can be seen from the logs, where we see first the warnings printed by
-> vhost_dev_cleanup() and then the panic in the worker (e.g. here
-> https://syzkaller.appspot.com/text?tag=CrashLog&x=16a61fce700000)
-> 
-> Mike also added a few more helpful details in this thread:
-> https://lore.kernel.org/virtualization/20220221100500.2x3s2sddqahgdfyt@sgarzare-redhat/T/#ree61316eac63245c9ba3050b44330e4034282cc2
+Add comment like this:
+These max length constants define an upper length limit for UV control 
+blocks but they do not represent the actual maximum enforced by the 
+Ultravisor which is often way lower. By allowing these larger lengths we 
+hopefully won't need to update the code as often when a new machine 
+extends the control block length.
 
-I guess that about sums it up. :)
+Userspace can therefore request more data than the kernel is usually 
+requesting for its own purposes.
 
--- 
-Lee Jones [李琼斯]
-Principal Technical Lead - Developer Services
-Linaro.org │ Open source software for Arm SoCs
-Follow Linaro: Facebook | Twitter | Blog
+
+> +#define UVIO_QUI_MAX_LEN		0x8000
+> +
+> +#define UVIO_DEVICE_NAME "uv"
+> +#define UVIO_TYPE_UVC 'u'
+> +
+> +#define UVIO_IOCTL_QUI _IOWR(UVIO_TYPE_UVC, 0x01, struct uvio_ioctl_cb)
+> +
+> +#endif  /* __S390X_ASM_UVDEVICE_H */
+> diff --git a/drivers/s390/char/Kconfig b/drivers/s390/char/Kconfig
+> index 6cc4b19acf85..2a828274257a 100644
+> --- a/drivers/s390/char/Kconfig
+> +++ b/drivers/s390/char/Kconfig
+> @@ -184,3 +184,14 @@ config S390_VMUR
+>   	depends on S390
+>   	help
+>   	  Character device driver for z/VM reader, puncher and printer.
+> +
+> +config S390_UV_UAPI
+> +	def_tristate y
+> +	prompt "Ultravisor userspace API"
+> +	depends on PROTECTED_VIRTUALIZATION_GUEST
+> +	help
+> +	  Selecting exposes parts of the UV interface to userspace
+> +	  by providing a misc character device at /dev/uv.
+> +	  Using IOCTLs one can interact with the UV.
+> +	  The device is available if the Ultravisor
+> +	  Facility (158) is present.
+> diff --git a/drivers/s390/char/Makefile b/drivers/s390/char/Makefile
+> index c6fdb81a068a..ce32270082f5 100644
+> --- a/drivers/s390/char/Makefile
+> +++ b/drivers/s390/char/Makefile
+> @@ -48,6 +48,7 @@ obj-$(CONFIG_MONREADER) += monreader.o
+>   obj-$(CONFIG_MONWRITER) += monwriter.o
+>   obj-$(CONFIG_S390_VMUR) += vmur.o
+>   obj-$(CONFIG_CRASH_DUMP) += sclp_sdias.o zcore.o
+> +obj-$(CONFIG_S390_UV_UAPI) += uvdevice.o
+>   
+>   hmcdrv-objs := hmcdrv_mod.o hmcdrv_dev.o hmcdrv_ftp.o hmcdrv_cache.o diag_ftp.o sclp_ftp.o
+>   obj-$(CONFIG_HMC_DRV) += hmcdrv.o
+> diff --git a/drivers/s390/char/uvdevice.c b/drivers/s390/char/uvdevice.c
+> new file mode 100644
+> index 000000000000..1d90e129b570
+> --- /dev/null
+> +++ b/drivers/s390/char/uvdevice.c
+> @@ -0,0 +1,145 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + *  Copyright IBM Corp. 2022
+> + *  Author(s): Steffen Eiden <seiden@linux.ibm.com>
+> + */
+
+You'll need to add a few words here to explain what the device does and 
+why we only do cursory checks.
+
+Apart from these two comments and the line below I'm pretty happy with 
+the patch.
+
+> +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt ".\n"
+> +
+> +#include <linux/module.h>
+> +#include <linux/kernel.h>
+> +#include <linux/miscdevice.h>
+> +#include <linux/types.h>
+> +#include <linux/stddef.h>
+> +#include <linux/vmalloc.h>
+> +#include <linux/slab.h>
+> +
+> +#include <asm/uvdevice.h>
+> +#include <asm/uv.h>
+> +
+> +/**
+> + * uvio_qui() - Perform a Query Ultravisor Information UVC.
+> + *
+> + * uv_ioctl: ioctl control block
+> + *
+> + * uvio_qui() does a Query Ultravisor Information (QUI) Ultravisor Call.
+> + * It creates the uvc qui request and sends it to the Ultravisor. After that
+> + * it copies the response to userspace and fills the rc and rrc of uv_ioctl
+> + * uv_call with the response values of the Ultravisor.
+> + *
+> + * Create the UVC structure, send the UVC to UV and write the response in the ioctl struct.
+> + *
+> + * Return: 0 on success or a negative error code on error.
+> + */
+> +static int uvio_qui(struct uvio_ioctl_cb *uv_ioctl)
+> +{
+> +	u8 __user *user_buf_addr = (__user u8 *)uv_ioctl->argument_addr;
+> +	size_t user_buf_len = uv_ioctl->argument_len;
+> +	struct uv_cb_header *uvcb_qui = NULL;
+> +	int ret;
+> +
+> +	/*
+> +	 * Do not check for a too small buffer. If userspace provides a buffer
+> +	 * that is too small the Ultravisor will complain.
+> +	 */
+> +	ret = -EINVAL;
+> +	if (!user_buf_len || user_buf_len > UVIO_QUI_MAX_LEN)
+> +		goto out;
+> +	ret = -ENOMEM;
+> +	uvcb_qui = kvzalloc(user_buf_len, GFP_KERNEL);
+> +	if (!uvcb_qui)
+> +		goto out;
+> +	uvcb_qui->len = user_buf_len;
+> +	uvcb_qui->cmd = UVC_CMD_QUI;
+> +
+> +	uv_call(0, (u64)uvcb_qui);
+> +
+> +	ret = -EFAULT;
+> +	if (copy_to_user(user_buf_addr, uvcb_qui, uvcb_qui->len))
+> +		goto out;
+> +	uv_ioctl->uv_rc = uvcb_qui->rc;
+> +	uv_ioctl->uv_rrc = uvcb_qui->rrc;
+> +
+> +	ret = 0;
+> +out:
+> +	kvfree(uvcb_qui);
+> +	return ret;
+> +}
+> +
+> +static int uvio_copy_and_check_ioctl(struct uvio_ioctl_cb *ioctl, void __user *argp)
+> +{
+> +	if (copy_from_user(ioctl, argp, sizeof(*ioctl)))
+> +		return -EFAULT;
+> +	if (ioctl->flags != 0)
+> +		return -EINVAL;
+> +	if (memchr_inv(ioctl->reserved14, 0, sizeof(ioctl->reserved14)))
+> +		return -EINVAL;
+> +
+> +	return 0;
+> +}
+> +
+> +/*
+> + * IOCTL entry point for the Ultravisor device.
+> + */
+> +static long uvio_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
+> +{
+> +	void __user *argp = (void __user *)arg;
+> +	struct uvio_ioctl_cb *uv_ioctl;
+> +	long ret;
+> +
+> +	ret = -ENOMEM;
+> +	uv_ioctl = vzalloc(sizeof(*uv_ioctl));
+> +	if (!uv_ioctl)
+> +		goto out;
+> +
+> +	switch (cmd) {
+> +	case UVIO_IOCTL_QUI:
+> +		ret = uvio_copy_and_check_ioctl(uv_ioctl, argp);
+> +		if (ret)
+> +			goto out;
+> +		ret = uvio_qui(uv_ioctl);
+> +		break;
+> +	default:
+> +		ret = -ENOIOCTLCMD;
+> +		break;
+> +	}
+> +	if (ret)
+> +		goto out;
+> +
+> +	if (copy_to_user(argp, uv_ioctl, sizeof(*uv_ioctl)))
+> +		ret = -EFAULT;
+> +
+> + out:
+> +	vfree(uv_ioctl);
+> +	return ret;
+> +}
+> +
+> +static const struct file_operations uvio_dev_fops = {
+> +	.owner = THIS_MODULE,
+> +	.unlocked_ioctl = uvio_ioctl,
+> +	.llseek = no_llseek,
+> +};
+> +
+> +static struct miscdevice uvio_dev_miscdev = {
+> +	.minor = MISC_DYNAMIC_MINOR,
+> +	.name = UVIO_DEVICE_NAME,
+> +	.fops = &uvio_dev_fops,
+> +};
+> +
+> +static void __exit uvio_dev_exit(void)
+> +{
+> +	misc_deregister(&uvio_dev_miscdev);
+> +}
+> +
+> +static int __init uvio_dev_init(void)
+> +{
+> +	if (!test_facility(158))
+> +		return -ENXIO;
+> +	return misc_register(&uvio_dev_miscdev);
+> +}
+> +
+> +module_init(uvio_dev_init);
+> +module_exit(uvio_dev_exit);
+> +
+> +MODULE_AUTHOR("IBM Corporation");
+> +MODULE_LICENSE("GPL");
+> +MODULE_DESCRIPTION("Ultravisor UAPI driver");
+
