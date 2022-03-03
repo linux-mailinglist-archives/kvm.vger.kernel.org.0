@@ -2,163 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B51A84CBCDB
-	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 12:37:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 82C7F4CBD23
+	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 12:51:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231867AbiCCLi1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Mar 2022 06:38:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38374 "EHLO
+        id S232521AbiCCLwL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Mar 2022 06:52:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231847AbiCCLiZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Mar 2022 06:38:25 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1D6A13F4F
-        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 03:37:38 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        with ESMTP id S229848AbiCCLwK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Mar 2022 06:52:10 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5BA7F94FD;
+        Thu,  3 Mar 2022 03:51:22 -0800 (PST)
+Received: from nazgul.tnic (nat0.nue.suse.com [IPv6:2001:67c:2178:4000::1111])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 8DBF561744
-        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 11:37:38 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE44BC004E1;
-        Thu,  3 Mar 2022 11:37:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1646307458;
-        bh=uzXmWmKceqTl/fGFvfVUlVASA2xWumzzBXBCmQtA93I=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=VVDVsMhFipMzDW/9HCcCthpxzV0tyd4Q0IaKPnKFo7ooEf4n7Hc05o0OoBjUc/wEv
-         GUyRBMsFIR1eG6MriB6ElgEGH8Tt3LxfSue9L2ZNVXpdUOmUw/ZdHim4oyTfov/r/V
-         0i3or+Br+13C742fbA+k7HH696M4zOBsDJDr//Pab5VLbhUOYm7LLlpcXofLmpcKZs
-         jX1ddmrEhA1gduL5klNjCoNhGYF+VQuVVYEs0y8J+Hdwp/YkJs5bCZC80hSweKKv8Z
-         DQGXceF2Eo6VpPFdFH1mLTp336C6XIzYZSpRa7RWS9ZfdaG1a8Tj8r1efAo5knKUYR
-         Rmw0fVlR7w+sg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1nPjm3-00BwYA-LO; Thu, 03 Mar 2022 11:37:35 +0000
-Date:   Thu, 03 Mar 2022 11:37:35 +0000
-Message-ID: <87wnhb1d34.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     Oliver Upton <oupton@google.com>
-Cc:     kvmarm@lists.cs.columbia.edu, Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 237E61EC032C;
+        Thu,  3 Mar 2022 12:51:17 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1646308277;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=4etORIg2Q6KJ92tEY8v0D9IqX+zqC98LN3nMR0UBOqA=;
+        b=dWOeNnBF7RaxfscWLq+DFbNU8NUKF85I2GUUohS4muRNYSW163/4jCh3x+ITc+ckdPvo25
+        IE2nqZFAlPScH8tklRX9QRDxdTDsBSMRVehoLhn7MH62b6JEmH3JS66iXecq7agtZpVVFC
+        SWiu4T172cJ4CdTwu49FO/VBRl8WN1M=
+Date:   Thu, 3 Mar 2022 12:51:20 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, Peter Shier <pshier@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Raghavendra Rao Ananta <rananta@google.com>,
-        Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH v3 09/19] KVM: arm64: Implement PSCI SYSTEM_SUSPEND
-In-Reply-To: <YiATdBvHOvlTzhIF@google.com>
-References: <20220223041844.3984439-1-oupton@google.com>
-        <20220223041844.3984439-10-oupton@google.com>
-        <87wnhk2whx.wl-maz@kernel.org>
-        <YhfeBfgbDA8IGc9f@google.com>
-        <87fso63ha2.wl-maz@kernel.org>
-        <YiATdBvHOvlTzhIF@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oupton@google.com, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, anup@brainfault.org, atishp@atishpatra.org, seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, pshier@google.com, reijiw@google.com, ricarkol@google.com, rananta@google.com, jingzhangos@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        brijesh.ksingh@gmail.com, tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH v11 39/45] x86/sev: Use firmware-validated CPUID for
+ SEV-SNP guests
+Message-ID: <YiCrp61CoqJUXm5q@nazgul.tnic>
+References: <20220224165625.2175020-1-brijesh.singh@amd.com>
+ <20220224165625.2175020-40-brijesh.singh@amd.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20220224165625.2175020-40-brijesh.singh@amd.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 03 Mar 2022 01:01:40 +0000,
-Oliver Upton <oupton@google.com> wrote:
-> 
->
-> I'm beginning to wonder if the VMM/KVM split implementation of
-> system-scoped PSCI calls can ever be right. There exists a critical
-> section in all system-wide PSCI calls that currently spans an exit to
-> userspace. I cannot devise a sane way to guard such a critical section
-> when we are returning control to userspace.
-> 
-> For example, KVM offlines all of the CPUs except for the exiting CPU
-> when handling SYSTEM_RESET or SYSTEM_OFF, but nothing prevents an
-> interleaving KVM_ARM_VCPU_INIT or KVM_SET_MP_STATE from disturbing the
-> state of the VM. Couldn't even say its a userspace bug, either, because
-> a different vCPU could do something before the caller has exited. Even
-> if we grab all the vCPU mutexes, we'd need to drop them before exiting
-> to userspace.
-> 
-> If userspace decides to reject the PSCI call, we're giving control
-> back to the guest in a wildly different state than it had making the
-> PSCI call. Again, the PSCI spec is vague on this matter, but I believe
-> the intuitive answer is that we should not change the VM state if the call
-> is rejected. This could upset an otherwise well-behaved KVM guest.
+On Thu, Feb 24, 2022 at 10:56:19AM -0600, Brijesh Singh wrote:
+> Also add an "sev_debug" kernel command-line parameter that will be used
+> (initially) to dump the CPUID table for debugging/analysis.
 
-Sure. But this is the equivalent of a buggy firmware/hardware, and a
-failing PSCI reboot is likely to have had destructive effects. Is it
-nice? Absolutely not. Is it a problem in practice? It hasn't in the
-10+ years this API has been implemented.
+No, not "sev_debug" - "sev=debug".
 
-The alternative is to be able to forward all the PSCI events to
-userspace and let it deal with it. It has long been at the back of my
-mind to allow userspace to request ranges of hypercalls to be
-forwarded directly, without any in-kernel handling. I'm all for it,
-but this must be a buy-in from the VMM.
+I'm pretty sure there will be need for other SEV-specific cmdline
+options so this thing should be a set, i.e.,
+	"sev=(option1,option2?,option3?,...)"
 
-> Doing SYSTEM_SUSPEND in userspace is better, as KVM avoids mucking with
-> the VM state before the PSCI call is actually accepted. However, any of
-> the consistency checks in the kernel for SYSTEM_SUSPEND are entirely
-> moot. Anything can happen between the exit to userspace and the moment
-> userspace actually recognizes the SYSTEM_SUSPEND call on the exiting
-> CPU.
+etc.
 
-I agree. Maybe we just don't do any and only exit to userspace on the
-calling vcpu. It then becomes the responsibility of userspace to take
-the other vcpus out of the kernel and change their state if required.
-
-> 
-> KVM rejecting attempts to resume vCPUs besides the caller will break
-> a correct userspace, given the inherent race that crops up when exiting.
-> Blocking attempts to resume other vCPUs could have unintented
-> consequences as well. It seems that we'd need to prevent
-> KVM_ARM_VCPU_INIT calls as well as KVM_SET_MP_STATE, even though the
-> former could be used in a valid SYSTEM_SUSPEND implementation.
-
-I don't think we need to enforce this if we leave suspend entirely to
-userspace. At the end of the day, we rely on the VMM not to screw up
-the guest. If the VMM restarts the wrong vcpu, that's bad behaviour,
-but there are a million other ways for the VMM to mess the guess up.
-
-> I really do hate to go back to the drawing board on the PSCI stuff
-> again, but there seems to be a fundamental issue in how system-scoped
-> calls are handled. Userspace is probably the only place where we could
-> quiesce the VM state, assess if the PSCI call should be accepted, and
-> change the VM state.
->
-> Do you think all of this is an issue as well?
-
-I don't think we should worry too much about the other system events.
-They are now ABI, and changing them is tricky. For suspend, I think
-punting the whole thing to userspace is doable. Otherwise, the
-alternative is to implement full userspace PSCI support, which is
-going to be a lot of work (and a lot of ABI discussions...).
-
-Thanks,
-
-	M.
+See mcheck_enable() and the comment above it for an example.
 
 -- 
-Without deviation from the norm, progress is not possible.
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
