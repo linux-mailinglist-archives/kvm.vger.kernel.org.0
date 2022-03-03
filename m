@@ -2,215 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 00E6E4CB7CB
-	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 08:28:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 749A34CB795
+	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 08:22:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229932AbiCCH27 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Mar 2022 02:28:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39278 "EHLO
+        id S230081AbiCCHXA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Mar 2022 02:23:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230301AbiCCH2y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Mar 2022 02:28:54 -0500
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3B0E14A054
-        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 23:28:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1646292484; x=1677828484;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=LJEmkoDqllpFH5Iid50VThIb6goNurX+rp3Rv8fKx9k=;
-  b=dRa8RYVQCQcIS+ApoleFYwTh1gt+umAN4hl78zOTFu26N75xdtbI0j6O
-   SUcWQlg1LyAG6iGiZPBj0wcfDPmgGc+ndHGoDhKmYqSBWcEzgxRgwt8zK
-   Ol9zlwALdmy7U8FHbV9Mlc12CZEnYHOAQPxDK/30OJcp1I6fflzoa42bl
-   /lBmlyma9He4S9IWlPJMjKExhT70NhB4H+c+1FjuYwtULFLg4SYsqhq/q
-   xmrrtjrniY3ruP8Or3Uti1owjDRnUp8l1t4SaXwvyemJIxYhvdaR9ACNV
-   QZCgQmQMmziES+vYMZAq6nvMy0lhvv0yK1ZMPCrTjdi1+YY9lvOu6qI31
-   g==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10274"; a="251177053"
-X-IronPort-AV: E=Sophos;i="5.90,151,1643702400"; 
-   d="scan'208";a="251177053"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2022 23:28:04 -0800
-X-IronPort-AV: E=Sophos;i="5.90,151,1643702400"; 
-   d="scan'208";a="551631871"
-Received: from duan-server-s2600bt.bj.intel.com ([10.240.192.123])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2022 23:28:01 -0800
-From:   Zhenzhong Duan <zhenzhong.duan@intel.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, seanjc@google.com, yu.c.zhang@intel.com,
-        zixuanwang@google.com, marcorr@google.com, jun.nakajima@intel.com,
-        erdemaktas@google.com
-Subject: [kvm-unit-tests RFC PATCH 17/17] x86 TDX: Make run_tests.sh work with TDX
-Date:   Thu,  3 Mar 2022 15:19:07 +0800
-Message-Id: <20220303071907.650203-18-zhenzhong.duan@intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220303071907.650203-1-zhenzhong.duan@intel.com>
-References: <20220303071907.650203-1-zhenzhong.duan@intel.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        with ESMTP id S230150AbiCCHW4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Mar 2022 02:22:56 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77C4F16BF93
+        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 23:22:11 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id BEF17B81FEA
+        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 07:22:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47ECCC004E1;
+        Thu,  3 Mar 2022 07:22:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1646292128;
+        bh=MHIbLwgBAWMHdfUXELcmaCZb2HwLpKYYxXXvAGZ9g8U=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=tx85Tb8/8wjmNCZr/5woKYOrvIWfUwyr9FQdqVVEET1pCz3llX1ROF1z5B1AG0i9m
+         WlSZbQCTSRmt1WFBlQ6sS1rStpnlSBmOV0T6oK52ZbbgwVwsdFSqXvH2qGSnZF/8Rk
+         BI7Jv1yJVB7dCAU1utD0hSrR2aFHpjT3W7qNaMgEHF75j7vndZsJOaMPG06loggP48
+         ed5N/f0DTvDOORvPssajmE23+IqC9T+u+8l5UWvMGHihAg+/imavx4Cq2jzCtjOyZv
+         x9xBxUJjXFyljPbe2nr7Fi88c4hxUcvSGtdmdUbet4euTEBz107Fawv8PRE/8vGVMW
+         yvbmZtV16uq9A==
+Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=billy-the-mountain.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nPfmn-00BtGo-F8; Thu, 03 Mar 2022 07:22:05 +0000
+Date:   Thu, 03 Mar 2022 07:21:44 +0000
+Message-ID: <87r17j5wmv.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oupton@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 1/2] Documentation: KVM: Update documentation to indicate KVM is arm64-only
+In-Reply-To: <20220302194221.1774513-2-oupton@google.com>
+References: <20220302194221.1774513-1-oupton@google.com>
+        <20220302194221.1774513-2-oupton@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.104.136.29
+X-SA-Exim-Rcpt-To: oupton@google.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org, pshier@google.com, ricarkol@google.com, reijiw@google.com, pbonzini@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Spam-Status: No, score=-7.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Define a special group 'tdx' for those test cases supported
-by TDX. So that when group 'tdx' specified, these test cases
-run in TDX protected environment if EFI_TDX=y.
+Hi Oliver,
 
-For example:
-    EFI_TDX=y ./run_tests.sh -g tdx
+Thanks for taking the hint! :D A few remarks below.
 
-Signed-off-by: Zhenzhong Duan <zhenzhong.duan@intel.com>
-Reviewed-by: Yu Zhang <yu.c.zhang@intel.com>
----
- README.md         |  6 ++++++
- x86/unittests.cfg | 18 +++++++++++++++++-
- 2 files changed, 23 insertions(+), 1 deletion(-)
+On Wed, 02 Mar 2022 19:42:20 +0000,
+Oliver Upton <oupton@google.com> wrote:
+> 
+> KVM support for 32-bit ARM hosts (KVM/arm) has been removed from the
+> kernel since commit 541ad0150ca4 ("arm: Remove 32bit KVM host
+> support"). There still exists some remnants of the old architecture in
+> the KVM documentation.
+> 
+> Remove all traces of 32-bit host support from the documentation. Note
+> that AArch32 guests are still supported.
+> 
+> Fixes: 541ad0150ca4 ("arm: Remove 32bit KVM host support")
 
-diff --git a/README.md b/README.md
-index 6e82dc22570e..a84460e9f96b 100644
---- a/README.md
-+++ b/README.md
-@@ -137,6 +137,12 @@ when the user does not provide an environ, then an environ generated
- from the ./errata.txt file and the host's kernel version is provided to
- all unit tests.
- 
-+# Unit test in TDX environment
-+
-+    All the test cases supported by TDX belong to 'tdx' group, by this
-+    command: "EFI_TDX=y ./run_tests.sh -g tdx", all these test cases run
-+    in a TDX protected environment.
-+
- # Contributing
- 
- ## Directory structure
-diff --git a/x86/unittests.cfg b/x86/unittests.cfg
-index 840e2054d54d..8cb32e6e7bee 100644
---- a/x86/unittests.cfg
-+++ b/x86/unittests.cfg
-@@ -56,10 +56,12 @@ arch = i386
- [smptest]
- file = smptest.flat
- smp = 2
-+groups = tdx
- 
- [smptest3]
- file = smptest.flat
- smp = 3
-+groups = tdx
- 
- [vmexit_cpuid]
- file = vmexit.flat
-@@ -155,6 +157,7 @@ file = hypercall.flat
- [idt_test]
- file = idt_test.flat
- arch = x86_64
-+groups = tdx
- 
- #[init]
- #file = init.flat
-@@ -163,6 +166,7 @@ arch = x86_64
- file = memory.flat
- extra_params = -cpu max
- arch = x86_64
-+groups = tdx
- 
- [msr]
- # Use GenuineIntel to ensure SYSENTER MSRs are fully preserved, and to test
-@@ -171,6 +175,7 @@ arch = x86_64
- # will fail due to shortcomings in KVM.
- file = msr.flat
- extra_params = -cpu max,vendor=GenuineIntel
-+groups = tdx
- 
- [pmu]
- file = pmu.flat
-@@ -207,6 +212,7 @@ file = s3.flat
- 
- [setjmp]
- file = setjmp.flat
-+groups = tdx
- 
- [sieve]
- file = sieve.flat
-@@ -216,23 +222,28 @@ timeout = 180
- file = syscall.flat
- arch = x86_64
- extra_params = -cpu Opteron_G1,vendor=AuthenticAMD
-+groups = tdx
- 
- [tsc]
- file = tsc.flat
- extra_params = -cpu kvm64,+rdtscp
-+groups = tdx
- 
- [tsc_adjust]
- file = tsc_adjust.flat
- extra_params = -cpu max
-+groups = tdx
- 
- [xsave]
- file = xsave.flat
- arch = x86_64
- extra_params = -cpu max
-+groups = tdx
- 
- [rmap_chain]
- file = rmap_chain.flat
- arch = x86_64
-+groups = tdx
- 
- [svm]
- file = svm.flat
-@@ -259,7 +270,7 @@ extra_params = --append "10000000 `date +%s`"
- file = pcid.flat
- extra_params = -cpu qemu64,+pcid,+invpcid
- arch = x86_64
--groups = pcid
-+groups = pcid tdx
- 
- [pcid-disabled]
- file = pcid.flat
-@@ -277,10 +288,12 @@ groups = pcid
- file = rdpru.flat
- extra_params = -cpu max
- arch = x86_64
-+groups = tdx
- 
- [umip]
- file = umip.flat
- extra_params = -cpu qemu64,+umip
-+groups = tdx
- 
- [la57]
- file = la57.flat
-@@ -393,6 +406,7 @@ check = /sys/module/kvm_intel/parameters/allow_smaller_maxphyaddr=Y
- [debug]
- file = debug.flat
- arch = x86_64
-+groups = tdx
- 
- [hyperv_synic]
- file = hyperv_synic.flat
-@@ -431,6 +445,7 @@ extra_params = -M q35,kernel-irqchip=split -device intel-iommu,intremap=on,eim=o
- file = tsx-ctrl.flat
- extra_params = -cpu max
- groups = tsx-ctrl
-+groups = tdx
- 
- [intel_cet]
- file = cet.flat
-@@ -441,3 +456,4 @@ extra_params = -enable-kvm -m 2048 -cpu host
- [intel_tdx]
- file = intel_tdx.flat
- arch = x86_64
-+groups = tdx nodefault
+TBH, I'd drop the Fixes. Otherwise, it is going to be dragged into
+-stable versions, and generate a number of pointless conflicts.
+
+> Suggested-by: Marc Zyngier <maz@kernel.org>
+> Signed-off-by: Oliver Upton <oupton@google.com>
+> ---
+>  Documentation/virt/kvm/api.rst          | 83 ++++++++++++-------------
+>  Documentation/virt/kvm/arm/hyp-abi.rst  | 54 ++++++++--------
+>  Documentation/virt/kvm/arm/ptp_kvm.rst  |  4 +-
+>  Documentation/virt/kvm/devices/vcpu.rst |  2 +-
+>  4 files changed, 70 insertions(+), 73 deletions(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 9f3172376ec3..25423ee890e2 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+
+This part looks good.
+
+> diff --git a/Documentation/virt/kvm/arm/hyp-abi.rst b/Documentation/virt/kvm/arm/hyp-abi.rst
+> index 4d43fbc25195..516ea630d160 100644
+> --- a/Documentation/virt/kvm/arm/hyp-abi.rst
+> +++ b/Documentation/virt/kvm/arm/hyp-abi.rst
+
+The content of this file is, however, still valid. Despite KVM having
+been removed, the 32bit kernel still supports being entered at HYP
+(bootloaders such as u-boot will definitely do that), and still uses
+this internal API to switch back to HYP on kexec. Other hypervisors
+(such as jailhouse) also rely on this API to install themselves at
+runtime.
+
+> diff --git a/Documentation/virt/kvm/arm/ptp_kvm.rst b/Documentation/virt/kvm/arm/ptp_kvm.rst
+> index aecdc80ddcd8..5d47f7ecbf5a 100644
+> --- a/Documentation/virt/kvm/arm/ptp_kvm.rst
+> +++ b/Documentation/virt/kvm/arm/ptp_kvm.rst
+> @@ -1,7 +1,7 @@
+>  .. SPDX-License-Identifier: GPL-2.0
+>  
+> -PTP_KVM support for arm/arm64
+> -=============================
+> +PTP_KVM support for arm64
+
+This is a service that the arm64 hypervisor offers to guests,
+including 32bit guests. It was actually merged after 32bit port was
+removed. So this file should probably stay untouched, or be amended to
+clarify the nuance in terms of support.
+
+> +=========================
+>  
+>  PTP_KVM is used for high precision time sync between host and guests.
+>  It relies on transferring the wall clock and counter value from the
+> diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
+> index 60a29972d3f1..92942440a9e7 100644
+> --- a/Documentation/virt/kvm/devices/vcpu.rst
+> +++ b/Documentation/virt/kvm/devices/vcpu.rst
+
+This one is OK.
+
+Thanks,
+
+	M.
+
 -- 
-2.25.1
-
+Without deviation from the norm, progress is not possible.
