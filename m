@@ -2,69 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EF3C64CC848
-	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 22:44:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 802CC4CC897
+	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 23:08:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236631AbiCCVpM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Mar 2022 16:45:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36316 "EHLO
+        id S234523AbiCCWJB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Mar 2022 17:09:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55724 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236594AbiCCVpM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Mar 2022 16:45:12 -0500
-Received: from mail-oo1-xc30.google.com (mail-oo1-xc30.google.com [IPv6:2607:f8b0:4864:20::c30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA6F0ED978
-        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 13:44:25 -0800 (PST)
-Received: by mail-oo1-xc30.google.com with SMTP id s203-20020a4a3bd4000000b003191c2dcbe8so7300096oos.9
-        for <kvm@vger.kernel.org>; Thu, 03 Mar 2022 13:44:25 -0800 (PST)
+        with ESMTP id S233943AbiCCWJA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Mar 2022 17:09:00 -0500
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF9B63DA49
+        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 14:08:13 -0800 (PST)
+Received: by mail-pl1-x62c.google.com with SMTP id e13so6021002plh.3
+        for <kvm@vger.kernel.org>; Thu, 03 Mar 2022 14:08:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=OkdpHld9Mqej9LdERVUsOkeLZ84S2x7OZadvoehTTp0=;
-        b=lspq+5WDOLeV8ir3qCRvEOwM8qbE5DAjPdE2pyLwJelZgaQs+PE7MrK4pYHAfdYpe0
-         5u6TDpzHTCHTdPtWvnc5a8C1dSktEF7nuBDaSmDgBFuXdVTqE78Z3/zEy/4LdmV655gl
-         5d+Vf4lEdo+7NsfQt9XTZcBNhqWk7SFR7sRL3jb58LsZrNr1YieqSaY/uVjN0ok6iLH/
-         Gtzv+SJ/l4IsJV75bcgVS+Oj4c0NA5pwiuSmopfxnZh18Qf7FIHI3xRe0TQDqlK1bWGe
-         co6GDy5m+Eh6GnplCmivB3ajZ70pT67QFbCaW58uX59bwbLn2EGKoxFDr4GFhD3tJ1H6
-         PJig==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=W/TzNiPeigL0ybLFFuG1hFcpyfv81UUM7woffq6f+EE=;
+        b=MMHEBXueAzqDEsE5wiiM5H+gGRnExkrrDKWkUaSEsk8DUCsdP27CLVo1vaTeJagjSr
+         CiSEEsg3qJYJhHI+vrnS5A90omkj8FP4rq2zSR/D4ysjtAigzqxd7qwbyD4sPZ02KMNP
+         K1eiuAfmfwVG6l7GIMdKYvviXNx51N2HchR1qs5UwuIIDSFUegSoQvUBgRARyBt3uRwU
+         N8Ejvgj3Eg3iYS5s35YWhFr+571WFqfNXsmYNCP/gtaJI350Ui9f6V5AQrAz34Mtarl9
+         WLyBVNlYcqmvorwlbfpNrLd1eejIvs5IcScpPf/nleW6qvKLVUuwBtRKlAyYSME2X5Yi
+         8GEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=OkdpHld9Mqej9LdERVUsOkeLZ84S2x7OZadvoehTTp0=;
-        b=eufv8eK872jl+qtMONzJsdY4VhmUJ+AMxov1ROZP1+sE0EjzAZkEZ5McEHO/DOhRam
-         0uNPvCrIKTD6EVUGDm8WbMuob082cWLF5qNcg1VuprwZAaRz5IyT1gHG45vPqnLaEa94
-         DkNUb3E+TcIldoKuFT+1XDdnw4+RaJ9YjF4eqPzHWl5pwKdU0Ct6pXI1WmcePJ0r27EW
-         P2zz+MGGy6WbJOdm0mQQL9YczOzD0/2h8bC5YKEA4Fb8Hpl9l1G/LJTs5+ltoN4Q31cM
-         nNjaa911uxKFgoRMnYRwC8JZrJjUQ89l6hEkH/ZU2wE7dPczmqwkwd+20GkWtN/p8/r2
-         /dVg==
-X-Gm-Message-State: AOAM532J3shWFTcKHkIqZ6xkBXyRyAsVf34XxQhc276AqhQg5cmAD9n1
-        bttq84BrglID9Q9jWbYBuY88hQrtoMovei0yk5uxGbjVu3jqJQ==
-X-Google-Smtp-Source: ABdhPJzYAFnJHkyJBoAoljcVTl3u4ewjNHbPkYy5u5VI8zpUTJQqACiACUPn0z9Zq+25te5WzSrtcCt9hP6544hYM6k=
-X-Received: by 2002:a4a:8893:0:b0:31b:fd08:2735 with SMTP id
- j19-20020a4a8893000000b0031bfd082735mr19659155ooa.96.1646343864933; Thu, 03
- Mar 2022 13:44:24 -0800 (PST)
-MIME-Version: 1.0
-References: <20220301060351.442881-1-oupton@google.com> <20220301060351.442881-2-oupton@google.com>
- <4e678b4f-4093-fa67-2c4e-e25ec2ced6d5@redhat.com> <Yh5pYhDQbzWQOdIx@google.com>
- <b839fa78-c8ec-7996-dba7-685ea48ca33d@redhat.com> <Yh/Y3E4NTfSa4I/g@google.com>
- <4d4606f4-dbc9-d3a4-929e-0ea07182054c@redhat.com> <Yh/nlOXzIhaMLzdk@google.com>
- <YiAdU+pA/RNeyjRi@google.com> <78abcc19-0a79-4f8b-2eaf-c99b96efea42@redhat.com>
- <YiDps0lOKITPn4gv@google.com>
-In-Reply-To: <YiDps0lOKITPn4gv@google.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Thu, 3 Mar 2022 13:44:13 -0800
-Message-ID: <CALMp9eRGNfF0Sb6MTt2ueSmxMmHoF2EgT-0XR=ovteBMy6B2+Q@mail.gmail.com>
-Subject: Re: [PATCH v4 1/8] KVM: nVMX: Keep KVM updates to BNDCFGS ctrl bits
- across MSR write
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Oliver Upton <oupton@google.com>, kvm@vger.kernel.org,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=W/TzNiPeigL0ybLFFuG1hFcpyfv81UUM7woffq6f+EE=;
+        b=xvF4SMsHVBqiVWjmsbdLP9LgQ2D6DxRIkHnAqCw9yZsCnWOf62xIGbUSw2pFb6DP3O
+         QOQsMWb/OUM/ir+no3SHwbu2QTILoaSkFrfQrMHOFLPhr9MGg0abOAAZlPNbtI29WuKj
+         XPL6u4h5tje7IFGG8dl7TAosWFqpnW6e4W9kTqMLW7alIZpEWVOC9RGgBtzzpbjJ5swF
+         bepONPRyHxjqnE60tjXLE3k56rduoy5K6mU6opTrlkOohtvFTs891owsRkDzqsLam9EA
+         J323voCWkL2SDDg0xv6Z9LAeH8aLjxE1Yqe0otRExdn9stRs0PsvLtpH2uSTLwmqY1vl
+         GFfQ==
+X-Gm-Message-State: AOAM5306nyVfknhN72+sdx45Pv3GMmWLCqUqPPJTAHblNUyYSyrEDoUX
+        97pL0pRMnV8vNikxWxLAErZX6g==
+X-Google-Smtp-Source: ABdhPJy8b6qcW2LqSXVR4nuKQ0P9aVRPzmLSKf1goQOakMcT/YeEL9h873IMeVWnAPnqEkLCQTihJg==
+X-Received: by 2002:a17:90a:20a:b0:1be:e850:1a37 with SMTP id c10-20020a17090a020a00b001bee8501a37mr7569061pjc.28.1646345292897;
+        Thu, 03 Mar 2022 14:08:12 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id m20-20020a634c54000000b003739af127c9sm2889926pgl.70.2022.03.03.14.08.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Mar 2022 14:08:12 -0800 (PST)
+Date:   Thu, 3 Mar 2022 22:08:08 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
-        David Dunn <daviddunn@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        David Hildenbrand <david@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        Mingwei Zhang <mizhang@google.com>
+Subject: Re: [PATCH v4 24/30] KVM: x86/mmu: Zap defunct roots via
+ asynchronous worker
+Message-ID: <YiE8SH4Sn1zzRZwe@google.com>
+References: <20220303193842.370645-1-pbonzini@redhat.com>
+ <20220303193842.370645-25-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220303193842.370645-25-pbonzini@redhat.com>
 X-Spam-Status: No, score=-18.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -76,57 +79,112 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 3, 2022 at 8:15 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Thu, Mar 03, 2022, Paolo Bonzini wrote:
-> > On 3/3/22 02:43, Sean Christopherson wrote:
-> > > > Maybe I can redirect you to a test case to highlight a possible
-> > > > regression in KVM, as seen by userspace;-)
-> > > Regressions aside, VMCS controls are not tied to CPUID, KVM should not be mucking
-> > > with unrelated things.  The original hack was to fix a userspace bug and should
-> > > never have been mreged.
-> >
-> > Note that it dates back to:
-> >
-> >     commit 5f76f6f5ff96587af5acd5930f7d9fea81e0d1a8
-> >     Author: Liran Alon <liran.alon@oracle.com>
-> >     Date:   Fri Sep 14 03:25:52 2018 +0300
-> >
-> >     KVM: nVMX: Do not expose MPX VMX controls when guest MPX disabled
-> >     Before this commit, KVM exposes MPX VMX controls to L1 guest only based
-> >     on if KVM and host processor supports MPX virtualization.
-> >     However, these controls should be exposed to guest only in case guest
-> >     vCPU supports MPX.
-> >
-> > It's not to fix a userspace bug, it's to support userspace that doesn't
-> > know about using KVM_SET_MSR for VMX features---which is okay since unlike
-> > KVM_SET_CPUID2 it's not a mandatory call.
->
-> I disagree, IMO failure to properly configure the vCPU model is a userspace bug.
-> Maybe it was a userspace bug induced by a haphazard and/or poorly documented KVM
-> ABI, but it's still a userspace bug.  One could argue that KVM should disable/clear
-> VMX features if userspace clears a related CPUID feature, but _setting_ a VMX
-> feature based on CPUID is architecturally wrong.  Even if we consider one or both
-> cases to be desirable behavior in terms of creating a consistent vCPU model, forcing
-> a consistent vCPU model for this one case goes against every other ioctl in KVM's
-> ABI.
->
-> If we consider it KVM's responsibility to propagate CPUID state to VMX MSRs, then
-> KVM has a bunch of "bugs".
->
->   X86_FEATURE_LM => VM_EXIT_HOST_ADDR_SPACE_SIZE, VM_ENTRY_IA32E_MODE, VMX_MISC_SAVE_EFER_LMA
->
->   X86_FEATURE_TSC => CPU_BASED_RDTSC_EXITING, CPU_BASED_USE_TSC_OFFSETTING,
->                      SECONDARY_EXEC_TSC_SCALING
->
->   X86_FEATURE_INVPCID_SINGLE => SECONDARY_EXEC_ENABLE_INVPCID
->
->   X86_FEATURE_MWAIT => CPU_BASED_MONITOR_EXITING, CPU_BASED_MWAIT_EXITING
->
->   X86_FEATURE_INTEL_PT => SECONDARY_EXEC_PT_CONCEAL_VMX, SECONDARY_EXEC_PT_USE_GPA,
->                           VM_EXIT_CLEAR_IA32_RTIT_CTL, VM_ENTRY_LOAD_IA32_RTIT_CTL
->
->   X86_FEATURE_XSAVES => SECONDARY_EXEC_XSAVES
+On Thu, Mar 03, 2022, Paolo Bonzini wrote:
+> Zap defunct roots, a.k.a. roots that have been invalidated after their
+> last reference was initially dropped, asynchronously via the system work
+> queue instead of forcing the work upon the unfortunate task that happened
+> to drop the last reference.
+> 
+> If a vCPU task drops the last reference, the vCPU is effectively blocked
+> by the host for the entire duration of the zap.  If the root being zapped
+> happens be fully populated with 4kb leaf SPTEs, e.g. due to dirty logging
+> being active, the zap can take several hundred seconds.  Unsurprisingly,
+> most guests are unhappy if a vCPU disappears for hundreds of seconds.
+> 
+> E.g. running a synthetic selftest that triggers a vCPU root zap with
+> ~64tb of guest memory and 4kb SPTEs blocks the vCPU for 900+ seconds.
+> Offloading the zap to a worker drops the block time to <100ms.
+> 
+> Co-developed-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Reviewed-by: Ben Gardon <bgardon@google.com>
+> Message-Id: <20220226001546.360188-23-seanjc@google.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  arch/x86/kvm/mmu/tdp_mmu.c | 15 +++++++++++++--
+>  1 file changed, 13 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index e24a1bff9218..2456f880508d 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -170,13 +170,24 @@ void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
+>  	 */
+>  	if (!kvm_tdp_root_mark_invalid(root)) {
+>  		refcount_set(&root->tdp_mmu_root_count, 1);
+> -		tdp_mmu_zap_root(kvm, root, shared);
+>  
+>  		/*
+> -		 * Give back the reference that was added back above.  We now
+> +		 * If the struct kvm is alive, we might as well zap the root
+> +		 * in a worker.  The worker takes ownership of the reference we
+> +		 * just added to root and is flushed before the struct kvm dies.
 
-I don't disagree with you, but this does beg the question, "What's
-going on with all of the invocations of cr4_fixed1_update()?"
+Not a fan of the "we might as well zap the root in a worker", IMO we should require
+going forward that invalidated, reachable TDP MMU roots are always zapped in a worker
+
+> +		 */
+> +		if (likely(refcount_read(&kvm->users_count))) {
+> +			tdp_mmu_schedule_zap_root(kvm, root);
+
+Regarding the need for kvm_tdp_mmu_invalidate_all_roots() to guard against
+re-queueing a root for zapping, this is the point where it becomes functionally
+problematic.  When "fast zap" was the only user of tdp_mmu_schedule_zap_root(),
+re-queueing was benign as the work struct was guaranteed to not be currently
+queued.  But this code runs outside of slots_lock, and so a root that was "put"
+but hasn't finished zapping can be observed and re-queued by the "fast zap.
+
+I think it makes sense to create a rule/invariant that an invalidated TDP MMU root
+_must_ be zapped via the work queue.  Then 
+
+I.e. do this as fixup:
+
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 40bf861b622a..cff4f2102a63 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -1019,8 +1019,9 @@ void kvm_tdp_mmu_zap_invalidated_roots(struct kvm *kvm)
+  * of invalidated roots; the list is effectively the list of work items in
+  * the workqueue.
+  *
+- * Skip roots that are already queued for zapping, flushing the work queue will
+- * ensure invalidated roots are zapped regardless of when they were queued.
++ * Skip roots that are already invalid and thus queued for zapping, flushing
++ * the work queue will ensure invalid roots are zapped regardless of when they
++ * were queued.
+  *
+  * Because mmu_lock is held for write, it should be impossible to observe a
+  * root with zero refcount,* i.e. the list of roots cannot be stale.
+@@ -1034,13 +1035,12 @@ void kvm_tdp_mmu_invalidate_all_roots(struct kvm *kvm)
+
+        lockdep_assert_held_write(&kvm->mmu_lock);
+        list_for_each_entry(root, &kvm->arch.tdp_mmu_roots, link) {
+-               if (root->tdp_mmu_async_data)
++               if (kvm_tdp_root_mark_invalid(root))
+                        continue;
+
+                if (WARN_ON_ONCE(!kvm_tdp_mmu_get_root(root)))
+                        continue;
+
+-               root->role.invalid = true;
+                tdp_mmu_schedule_zap_root(kvm, root);
+        }
+ }
+
+> +			return;
+> +		}
+> +
+> +		/*
+> +		 * The struct kvm is being destroyed, zap synchronously and give
+> +		 * back immediately the reference that was added above.  We now
+>  		 * know that the root is invalid, so go ahead and free it if
+>  		 * no one has taken a reference in the meanwhile.
+>  		 */
+> +		tdp_mmu_zap_root(kvm, root, shared);
+>  		if (!refcount_dec_and_test(&root->tdp_mmu_root_count))
+>  			return;
+>  	}
+> -- 
+> 2.31.1
+> 
+>
