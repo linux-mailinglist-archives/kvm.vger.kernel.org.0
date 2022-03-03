@@ -2,136 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 22FDE4CC78E
-	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 22:04:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D96EF4CC797
+	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 22:06:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236428AbiCCVFW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Mar 2022 16:05:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45086 "EHLO
+        id S231766AbiCCVHG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Mar 2022 16:07:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50012 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236412AbiCCVFU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Mar 2022 16:05:20 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8F71986D7;
-        Thu,  3 Mar 2022 13:04:33 -0800 (PST)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 223KZU8t020313;
-        Thu, 3 Mar 2022 21:04:33 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=3ZH8MdghW/0bZQm9UWePe5VZGRdVrWK2R6PL6sAdecU=;
- b=sZpVKdlrbn11lDqG6xUG1Ac7jYqnBj+QuwrFAifrEsM4ExZ234LJ1XBtZwEDVi64bCNC
- valo4i7D9JyEHywoq4TPObw0lntq5lW/zfhA3AaStLkL//7k6Auy304tA8lKsvtvep8w
- kWOrmzx1UbnqwXQDrfSv1xyrIaVj8OX5dwfgn/NPbR74Jb64Fxy9ha4Jl8yP5PXX2xXz
- OzTzIq1v5PFvD4NVHb/6y6ayb4tXX3GTu/4iySCCrdDb0h1x4Aoz/Oob8S7DY7UeGyAP
- XELjLvy7Armhs4xTnkulv6f/UdkCqN+psmQk/tVq2mzsBjiqZKYv228MPUorxkU+JIcg cg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3ek4uk8fm9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 03 Mar 2022 21:04:32 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 223KgPrK020374;
-        Thu, 3 Mar 2022 21:04:32 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3ek4uk8fkp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 03 Mar 2022 21:04:32 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 223L2wVR007966;
-        Thu, 3 Mar 2022 21:04:30 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma03fra.de.ibm.com with ESMTP id 3ek4k40231-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 03 Mar 2022 21:04:30 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 223KrSgf50266610
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 3 Mar 2022 20:53:28 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2B20542049;
-        Thu,  3 Mar 2022 21:04:27 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1763142041;
-        Thu,  3 Mar 2022 21:04:27 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Thu,  3 Mar 2022 21:04:27 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
-        id 89BE4E048E; Thu,  3 Mar 2022 22:04:26 +0100 (CET)
-From:   Eric Farman <farman@linux.ibm.com>
-To:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, Eric Farman <farman@linux.ibm.com>
-Subject: [PATCH kvm-unit-tests v1 6/6] lib: s390x: smp: Convert remaining smp_sigp to _retry
-Date:   Thu,  3 Mar 2022 22:04:25 +0100
-Message-Id: <20220303210425.1693486-7-farman@linux.ibm.com>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20220303210425.1693486-1-farman@linux.ibm.com>
-References: <20220303210425.1693486-1-farman@linux.ibm.com>
+        with ESMTP id S230342AbiCCVHF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Mar 2022 16:07:05 -0500
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFC9656C31
+        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 13:06:18 -0800 (PST)
+Received: by mail-pf1-x433.google.com with SMTP id k1so5832083pfu.2
+        for <kvm@vger.kernel.org>; Thu, 03 Mar 2022 13:06:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=2YMrVvHSLKMUXF8Ea2QMnfFfSxJo6UWFNMRbgeXxqeE=;
+        b=iLh9Uof2STE41+Pazpe52q7YPYnjVuXTGIKG2qt7gZLHGjyaekOqGyJmUPTkGjlS8r
+         EJJfxLF4rNGL0QWrLHXsHvddL4TEef5lC3/WYctfvgDKnxG6XFTEojH6CIAfivPS9xRf
+         +nPoRfrdQSjBLLFu42qbswyg2XLvxkBk7vIfxuG2mHc7QeqxK3o4BnD5zazFVMzdKAGI
+         1VCbG2oVjx4iZYyDX2oP2ql6hcRvY3PX8Olk78oPlbOQZBBbjfIv4ZguX1Kqj8Rre9/8
+         iLT/GYp9cLlADOltBKYpKZ2ncJzw4CmI5SGvHiSV2e00nix38oDOvY1tLFA+hne3Ik/1
+         2g2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=2YMrVvHSLKMUXF8Ea2QMnfFfSxJo6UWFNMRbgeXxqeE=;
+        b=QqZ0fJm8GWvs0Ug8755brRGxvcGVwa8mULc0XouAGFANIdW9sTslU2Cvg/VJb9bomA
+         oVpi1bj6F3iII/U6RcsSV2SdbH/SaBcW34tP7jhPafP3NZBA/MBVtrxKCgaFRlsu4i4G
+         zhgNGC1cXD6nn/ZSKlzJeYZzrMLPimVOv7p8UEhT4oz7OnxDxQU2sjZMsy8idTOc7+Lv
+         GAnn9ZyAAz86A92wFbNgkdxt8xVPZBHC7g96csQB0QRVEtkyqp8Z4+h5fed0f8RjqNUa
+         7Vna9pEamnt0aPvMPn8U6av/eIR69zDnvg4HZwwZKM+aL6s2bej1FxoML9aQ72a/yYBO
+         hUEg==
+X-Gm-Message-State: AOAM531GDktaX3eTMXc+Z7wYDmpMJKCdUsrOK0dQs+x/Rl7lzHkKGL1j
+        sx2aPbkCTs0Q5vT8mnObKDxfbA==
+X-Google-Smtp-Source: ABdhPJyXLwATznnV51/fVrD0KmuL+No2Ds3ngqbWVyYstKSPQYxINhnVgp4v1ZDcB3OW/pvxawCUQA==
+X-Received: by 2002:a05:6a00:1954:b0:4e1:f25:ce41 with SMTP id s20-20020a056a00195400b004e10f25ce41mr40083511pfk.44.1646341578069;
+        Thu, 03 Mar 2022 13:06:18 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id u19-20020a056a00099300b004e16e381696sm3480827pfg.195.2022.03.03.13.06.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Mar 2022 13:06:17 -0800 (PST)
+Date:   Thu, 3 Mar 2022 21:06:14 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        David Hildenbrand <david@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        Mingwei Zhang <mizhang@google.com>
+Subject: Re: [PATCH v4 21/30] KVM: x86/mmu: Zap invalidated roots via
+ asynchronous worker
+Message-ID: <YiEtxt6pQHtemFkm@google.com>
+References: <20220303193842.370645-1-pbonzini@redhat.com>
+ <20220303193842.370645-22-pbonzini@redhat.com>
+ <YiErEoIMDZy94HIH@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: BoWTKvWYIczb_Vagb8cEPQc_c4Biz-oL
-X-Proofpoint-ORIG-GUID: fr8QLmWkab7E53jue4vTnF47G35AfNXH
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-03-03_09,2022-02-26_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- spamscore=0 adultscore=0 mlxlogscore=999 bulkscore=0 priorityscore=1501
- impostorscore=0 mlxscore=0 clxscore=1011 phishscore=0 suspectscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2203030095
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YiErEoIMDZy94HIH@google.com>
+X-Spam-Status: No, score=-18.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-A SIGP SENSE is used to determine if a CPU is stopped or operating,
-and thus has a vested interest in ensuring it received a CC0 or CC1,
-instead of a CC2 (BUSY). But, any order could receive a CC2 response,
-and is probably ill-equipped to respond to it.
+On Thu, Mar 03, 2022, Sean Christopherson wrote:
+> On Thu, Mar 03, 2022, Paolo Bonzini wrote:
+> > +	root->tdp_mmu_async_data = kvm;
+> > +	INIT_WORK(&root->tdp_mmu_async_work, tdp_mmu_zap_root_work);
+> > +	queue_work(kvm->arch.tdp_mmu_zap_wq, &root->tdp_mmu_async_work);
+> > +}
+> > +
+> > +static inline bool kvm_tdp_root_mark_invalid(struct kvm_mmu_page *page)
+> > +{
+> > +	union kvm_mmu_page_role role = page->role;
+> > +	role.invalid = true;
+> > +
+> > +	/* No need to use cmpxchg, only the invalid bit can change.  */
+> > +	role.word = xchg(&page->role.word, role.word);
+> > +	return role.invalid;
+> 
+> This helper is unused.  It _could_ be used here, but I think it belongs in the
+> next patch.  Critically, until zapping defunct roots creates the invariant that
+> invalid roots are _always_ zapped via worker, kvm_tdp_mmu_invalidate_all_roots()
+> must not assume that an invalid root is queued for zapping.  I.e. doing this
+> before the "Zap defunct roots" would be wrong:
+> 
+> 	list_for_each_entry(root, &kvm->arch.tdp_mmu_roots, link) {
+> 		if (kvm_tdp_root_mark_invalid(root))
+> 			continue;
+> 
+> 		if (WARN_ON_ONCE(!kvm_tdp_mmu_get_root(root)));
+> 			continue;
+> 
+> 		tdp_mmu_schedule_zap_root(kvm, root);
+> 	}
 
-In practice, the order is likely to only encounter this when racing
-with a SIGP STOP (AND STORE STATUS) or SIGP RESTART order, which are
-unlikely. But, since it's not impossible, let's convert the library
-calls that issue a SIGP to loop on CC2 so the callers do not need
-to react to that possible outcome.
+Gah, lost my train of thought and forgot that this _can_ re-queue a root even in
+this patch, it just can't it just can't re-queue a root that is _currently_ queued.
 
-Signed-off-by: Eric Farman <farman@linux.ibm.com>
----
- lib/s390x/smp.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+The re-queue scenario happens if a root is queued and zapped, but is kept alive
+by a vCPU that hasn't yet put its reference.  If another memslot comes along before
+the (sleeping) vCPU drops its reference, this will re-queue the root.
 
-diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
-index 85b046a5..2e476264 100644
---- a/lib/s390x/smp.c
-+++ b/lib/s390x/smp.c
-@@ -85,7 +85,7 @@ bool smp_cpu_stopped(uint16_t idx)
- 
- bool smp_sense_running_status(uint16_t idx)
- {
--	if (smp_sigp(idx, SIGP_SENSE_RUNNING, 0, NULL) != SIGP_CC_STATUS_STORED)
-+	if (smp_sigp_retry(idx, SIGP_SENSE_RUNNING, 0, NULL) != SIGP_CC_STATUS_STORED)
- 		return true;
- 	/* Status stored condition code is equivalent to cpu not running. */
- 	return false;
-@@ -169,7 +169,7 @@ static int smp_cpu_restart_nolock(uint16_t idx, struct psw *psw)
- 	 * running after the restart.
- 	 */
- 	smp_cpu_stop_nolock(idx, false);
--	rc = smp_sigp(idx, SIGP_RESTART, 0, NULL);
-+	rc = smp_sigp_retry(idx, SIGP_RESTART, 0, NULL);
- 	if (rc)
- 		return rc;
- 	/*
--- 
-2.32.0
+It's not a major problem in this patch as it's a small amount of wasted effort,
+but it will be an issue when the "put" path starts using the queue, as that will
+create a scenario where a memslot update (or NX toggle) can come along while a
+defunct root is in the zap queue.
 
+Checking for role.invalid is wrong (as above), so for this patch I think the
+easiest thing is to use tdp_mmu_async_data as a sentinel that the root was zapped
+in the past and doesn't need to be re-zapped.
+
+/*
+ * Mark each TDP MMU root as invalid to prevent vCPUs from reusing a root that
+ * is about to be zapped, e.g. in response to a memslots update.  The actual
+ * zapping is performed asynchronously, so a reference is taken on all roots.
+ * Using a separate workqueue makes it easy to ensure that the destruction is
+ * performed before the "fast zap" completes, without keeping a separate list
+ * of invalidated roots; the list is effectively the list of work items in
+ * the workqueue.
+ *
+ * Skip roots that were already queued for zapping, the "fast zap" path is the
+ * only user of the zap queue and always flushes the queue under slots_lock,
+ * i.e. the queued zap is guaranteed to have completed already.
+ *
+ * Because mmu_lock is held for write, it should be impossible to observe a
+ * root with zero refcount,* i.e. the list of roots cannot be stale.
+ *
+ * This has essentially the same effect for the TDP MMU
+ * as updating mmu_valid_gen does for the shadow MMU.
+ */
+void kvm_tdp_mmu_invalidate_all_roots(struct kvm *kvm)
+{
+	struct kvm_mmu_page *root;
+
+	lockdep_assert_held_write(&kvm->mmu_lock);
+	list_for_each_entry(root, &kvm->arch.tdp_mmu_roots, link) {
+		if (root->tdp_mmu_async_data)
+			continue;
+
+		if (WARN_ON_ONCE(!kvm_tdp_mmu_get_root(root)))
+			continue;
+
+		root->role.invalid = true;
+		tdp_mmu_schedule_zap_root(kvm, root);
+	}
+}
