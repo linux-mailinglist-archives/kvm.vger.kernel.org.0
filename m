@@ -2,194 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 23A5A4CB372
-	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 01:35:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 403AB4CB42C
+	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 02:09:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230239AbiCCAXF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Mar 2022 19:23:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38718 "EHLO
+        id S231164AbiCCA6M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Mar 2022 19:58:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51552 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230388AbiCCAWx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 19:22:53 -0500
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam07on2082.outbound.protection.outlook.com [40.107.95.82])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 204931029EF;
-        Wed,  2 Mar 2022 16:21:46 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hZyNOnct/VF/oB+D6Tl0DZPPRkdRa/ok9leqHishEd8oWzfedo8pTtCQ1KuotmZi824d+dszoV+zq67AYJddoKhjJs6yvcT3q/sTNesllL3os4LJJbGQk1dpjefQyr35YR1+ywfqKoJvA/IsxkJY5S6yLd/4oyjRhfiUjmKkgHVu7ZgtTjxjzFckLPbujHQ+r6OL4hBau0/R8t4nweqp04Z8dsMyngy/La4zAoxYs+XGdBabnz6HVwSJn4nLC4c5xtDzpFT+D3FnGhayoPYY3KPrvLRmYbumvyziH1hjO5Ji2+J72GPbKbTk/UDn7BHgyWL8HqX5CVzL5IifAzKN2A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YqaQITaTVdcnjb1jq3P8vdhtiJhahcMtBaR3iEavRV8=;
- b=LPf2+bL7H1+7vdd1vvzeLSICYSONUFLSCJUU+a18EVSpr6luEWh3hADBqWRVmocUNBgXplP353PZLq5j+XpHreGFcuaUmsPj/5pc8BDM9ExtpKjHYOdMbEX++Js5XXP5G5DUzyohqa1YygbrEGg1i5mzqn4i4n9PaCh5IYECq00tFs0MueleKhZcTS2cJoszCYWXh/6b89JKGBcKeTHrfTfcgAnXK/dex2zzbjuc4SRCDg6iW16I5EhMozR1sHJMlj64lqIh6dS82DhJGUmILNQMdHYSqA4FhbOoVj8LnXBlUi85pFyfkAwBzH1FQMbNAx47pTQbmsb3K8IxMgbgtQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YqaQITaTVdcnjb1jq3P8vdhtiJhahcMtBaR3iEavRV8=;
- b=c40/VJQlWn0uumPyHRt/OWfYVPIfDPgHZoQN4kjqwMrvHI4eo4ouWi2mkj37E5KXRdAk5T7WaSOT0bR6+VqoUBWfE26NkLdLNJUQSM4qt63uk3Qk3tSX1Hsq7asMAA5KEd2NmGAWP9QWAlLiXw12Cntc/yJlCqMILI4OK3+pK4vcZ26XQSEOkggafDgNWjhCd3Bsis3A8f2ObHKP3uIsDgyAzOd1DcBdc9FoslRsZvkEnRQ5innRVEaWeSuX9lNSoy1PmxAgGsvQv/pqDS/WAKjNDHXpqa+jO/NgAo1iLJKBj3GXzO26VvcQahm6mExb7LVBZgjrxj1sOxulwqiPdg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by BN8PR12MB3298.namprd12.prod.outlook.com (2603:10b6:408:69::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5017.26; Thu, 3 Mar
- 2022 00:21:44 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::51a0:4aee:2b4c:ca28]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::51a0:4aee:2b4c:ca28%4]) with mapi id 15.20.5038.015; Thu, 3 Mar 2022
- 00:21:43 +0000
-Date:   Wed, 2 Mar 2022 20:21:42 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-pci@vger.kernel.org,
-        alex.williamson@redhat.com, cohuck@redhat.com,
-        mgurtovoy@nvidia.com, yishaih@nvidia.com, linuxarm@huawei.com,
-        liulongfang@huawei.com, prime.zeng@hisilicon.com,
-        jonathan.cameron@huawei.com, wangzhou1@hisilicon.com
-Subject: Re: [PATCH v7 09/10] hisi_acc_vfio_pci: Add support for VFIO live
- migration
-Message-ID: <20220303002142.GE1026713@nvidia.com>
-References: <20220302172903.1995-1-shameerali.kolothum.thodi@huawei.com>
- <20220302172903.1995-10-shameerali.kolothum.thodi@huawei.com>
+        with ESMTP id S231143AbiCCA6K (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 19:58:10 -0500
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1D8B149B85
+        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 16:57:25 -0800 (PST)
+Received: by mail-pl1-x636.google.com with SMTP id s1so3074500plg.12
+        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 16:57:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=OmYtFMYIIuo00w0TMQnbKGUMCOkErANWVneGk7JdVo8=;
+        b=q3QYfl97wM6M9Con2LWthCJR9PN9C1lOfVZrxM/k03pqlgEyqX2KuKnwefx3570qiU
+         tNTt9apzqQUXWtqhO8uNcnCF2sb+1WZBuwb60Ere0Xj0bXHMirc1P0Vgq3qtz4xkE7c2
+         TiD56Y/UEn5dOi+wbVMMt5V4G4dpqD3mw7hf+61hb3S5o06anr1UJgY/R15JzHOLaHoh
+         mL0E7yagjAnBG/QfAOFYyZgYB38PMClPfbg/0dAIVGn//JMTcUO8/pnfb/swtUhmsBJw
+         CntV5IfSgS6Jht3l6WeeTO/lCtZtIJ1DvVC3U4xCO7kK0c0Wo5P1Ed47r+VDxRs0rk6Z
+         5hOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=OmYtFMYIIuo00w0TMQnbKGUMCOkErANWVneGk7JdVo8=;
+        b=CGwf+9F+hgRuaLPhhHZtuOK6hD19ZX6Rgbe4D3cOmbpdVaHdAPQjKqvwcu9Azadqwh
+         9mH2iOABqTkcqZaXVsWlWh8e2N/gUeb6d6dMWbUXsgYGiARJMQ/gUrzNsgg9OlugtK5H
+         AXWYEEMBzSK6Mcx5F+RffF3S2gaO+Dp+c/O09muVgD7gRRZ4tZodTiyAFec5/QO5MYmC
+         sYeaDifOSom1fTXfCHXh5dvOoIK5sh29dwh1Y4n2tXlDrYLAfFPTAQlmi9sdKuQj3RZW
+         xoaoGuGbO0xlWmF9MPGNC8KoUboHsprEasCdLsJrWGDKXNegG2WLtdqiGCONNDoFhMVP
+         R8og==
+X-Gm-Message-State: AOAM530NnAhG7pIF2bpkprCHqYGbArWl/0ejGQ9dMeE5kX42vEIoIgzu
+        /9mk8rbyzCG27oxo79U2nWDzkQ==
+X-Google-Smtp-Source: ABdhPJxAZ7vBeqcealHPEdBlM6OXyXVIwPyvoNL7V4bJypgEmLxPx4UEa3yopNc3PFMRlQP1MFzkqg==
+X-Received: by 2002:a17:902:7204:b0:14f:b325:7658 with SMTP id ba4-20020a170902720400b0014fb3257658mr33335598plb.110.1646269044882;
+        Wed, 02 Mar 2022 16:57:24 -0800 (PST)
+Received: from google.com (226.75.127.34.bc.googleusercontent.com. [34.127.75.226])
+        by smtp.gmail.com with ESMTPSA id on18-20020a17090b1d1200b001b9cfbfbf00sm230589pjb.40.2022.03.02.16.57.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Mar 2022 16:57:24 -0800 (PST)
+Date:   Thu, 3 Mar 2022 00:57:20 +0000
+From:   Mingwei Zhang <mizhang@google.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>,
+        Ben Gardon <bgardon@google.com>
+Subject: Re: [PATCH v3 01/28] KVM: x86/mmu: Use common iterator for walking
+ invalid TDP MMU roots
+Message-ID: <YiAScLpCt/6O2BjI@google.com>
+References: <20220226001546.360188-1-seanjc@google.com>
+ <20220226001546.360188-2-seanjc@google.com>
+ <Yh/Al8wGUOEgRmih@google.com>
+ <Yh/KzDqsQSGm1CvK@google.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220302172903.1995-10-shameerali.kolothum.thodi@huawei.com>
-X-ClientProxiedBy: YT1PR01CA0118.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:b01:2c::27) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 335b7694-9ced-47f5-5d49-08d9fcabcbc3
-X-MS-TrafficTypeDiagnostic: BN8PR12MB3298:EE_
-X-Microsoft-Antispam-PRVS: <BN8PR12MB3298E3C909430EA893F6B86BC2049@BN8PR12MB3298.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: rzXKSHUhrGre1qfqXopXAUukX22rGRP59Eaf7iI7J2ndr/DvFmruK7Dvz5yHdRzgRjju0ZRFYqXxQkTYdwFG45cv3IM9F1Ys4RaYhkIkSSS/VtXpsMriIJzXZRSbvPgQuVSMGe/UXlj+6B19JPABVV+Q+JSohxUKLJ2efoFxyrAmZRwexTBj9KQ4RSG4iEK75X6CYUhXLo7PZjzYEcq+jUMB5+/Qbzn4X04P1bUW8gsqgRz0mmDiR5uAXT/5N72piLPlvyKTqDtUWC9n68kMTgmTBY+2IwmNTHefkFrUxyU0XYJaYG/jgPFa1qiZDkGtLMY58kPY9ED6xeElRF+J91+me1qLpC5YhWbE4haK2YELjEXR+X0QbLZgQzHAmSkVIu234kgv0RlmD/XmR6AAsInywJ3Sr9yDELSTjF5l0yR3z6+sU6srtCZ00d7Z5qA4deSAPlvWX8U8jHqMNlQ/hS02ysFT30iHHprwaQ1ifMDt66ZAxUZXX7GxrZHYosgzcspEol5gBc87/Vt4PbKp/e8oe+eff7kJZ2GvHTnxzxRiEdh+SyrXd/3FgMpvHfPMbwgSWeWpIOyYtN/DpExlzBH/L6XM9FKJDyGwxBJvxuZvEQV85HJfmZE19+QYKZ1zM+RmYON7/hAmXQLkGtKHlw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(7416002)(1076003)(316002)(8936002)(26005)(6916009)(186003)(38100700002)(5660300002)(508600001)(6486002)(86362001)(6512007)(6506007)(66946007)(4326008)(66476007)(2616005)(8676002)(66556008)(36756003)(83380400001)(2906002)(33656002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?ER2Olk9VQ509wkG5ixhjMTRsVJfh7y94XuOz3yhlbnH1P9QerY3Nz/rUIeoi?=
- =?us-ascii?Q?SJzRZ7Uw9V/wjbo7dQiptY4xqR5Kvvdy3t9RCxsxQ6xZrxmCfgclFSf38FC9?=
- =?us-ascii?Q?R8Hs6HCeZbg/cnEflMv4DW9VP4VbzQSY+4XU4vtgNRncN4Ku/plH+Jd9Zldn?=
- =?us-ascii?Q?FfFlxpcexzLkyhMN4eQtm4MNosHIahEJNAdapicu2Jj35uLoE1IHzsD2xzGb?=
- =?us-ascii?Q?r2dcQo8yDlOvNdNiVN9RmriColCwQBKbU55TrY4YG3V3WtLa13lncvrcN8Cc?=
- =?us-ascii?Q?uIbXHBmJ7SkgLqONKhlqSejNnDnekg2uMD0HEfauq9x5th4Trt8cF7giA+YI?=
- =?us-ascii?Q?5inKrMAU6BPEk0ddGcEANMaRY9ojpTXqcYRe0uUUC2p+peseM7JEVB+2QS9E?=
- =?us-ascii?Q?+CimGl5oLVTTxGHCJ66WPJatWiUNtIPnAVYtc3QGLYsWfS+pdG8FYkRjNMCZ?=
- =?us-ascii?Q?35sPwgJYOUgDku3xkkm/1zr3MlXp34Jqw9rO7P2TOrYI+YJIF67Nca+U910C?=
- =?us-ascii?Q?IobiCWwjTa0AB6QZHIdNdyeYoEfm/H1huEOgQdQgm0r1Xu9vkrYHh1rMCYuN?=
- =?us-ascii?Q?DEmLtVEv9TiBDc3bl7bANutC30UmDCghNm85R/yHysAvH8BHhDd4FXRn3G/h?=
- =?us-ascii?Q?nAIfhYkSIBC62/55JlSbnH17id1CAf+NEjoRaiE1D6LAmtUR6m0Haap5KJSi?=
- =?us-ascii?Q?1PfjqfuDkJof/JA8kYKzGhoOcGn5Yvv2d9P9ZGwRSdX0kso9TMEwm54Z5Trc?=
- =?us-ascii?Q?f0T0J/qVmZ34uX5l37u7lltJfReE09HpBqRNTy5l0Hid2D+JM1+CKzsVTcWu?=
- =?us-ascii?Q?jZw1+aufgILWVxCCOnDGSlbqphMJeQ5pSyzqj75y3i+VJWXGRa+oZh/wyr51?=
- =?us-ascii?Q?dXQAjpap48t2jqwl7vvE6NtTnT/ZKw08ZmOEP/gzFUY3vggbhdQ/iYXa3lJz?=
- =?us-ascii?Q?jDxhj3pxEyzynZJBRVdtiu/kS3I333vNcaBbUPJ0Oh09bWYlAuSx6aYOwXlW?=
- =?us-ascii?Q?cQodMrUR7Urab4fESV3OI9OgWh4rvKYrzY4tX60rNZ7sCvDGfLEytyEhUzlZ?=
- =?us-ascii?Q?wVIW3+FMTxS0KBVWk6E80CHpdpCo0Dxbd5kO2/dK4cnNAAnEbt1DSSqHBCSF?=
- =?us-ascii?Q?8VnS7WwsJPhIZp+sLoGSS7M6AwFQ9kyk392PXSQJOiH7HahtVvn2HKjctWQt?=
- =?us-ascii?Q?OXLy58vvKRg84d5qIlwKMh/IVHcnHmD9D0dEESvJ/Af6au9abARVhv40jlc1?=
- =?us-ascii?Q?3xV7ReVSBQxpjdvElAAluL68QYonM2FThvVzBYVw5ciou9H/If4siBkilbWw?=
- =?us-ascii?Q?LflFl01KM5qBcD8rlDmn7K0AKB9ASo6NhQMxf49tbipL9P9ogJ9kFM8gR+Rs?=
- =?us-ascii?Q?tkDI0sTRTsjLzRAcisVAAlxdFbEHEvkFJfVmCVwmX3du1wTqWhBLvfyTRzC0?=
- =?us-ascii?Q?or3eKaSvmJtJOs/Pto67wcgeH0s5UYOX+0s+knIawRYLk344XUsO4lEOwlid?=
- =?us-ascii?Q?+xgjI9nIT8gZ16oc1nj8iwfLk6XQYXIua4JZlwBCVcx9UHsHhF411maiMEKG?=
- =?us-ascii?Q?5OpQuAOoTJDhetcNed8=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 335b7694-9ced-47f5-5d49-08d9fcabcbc3
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Mar 2022 00:21:43.8732
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: DWg6taomUxjq4OrA5V5befOCZRvaCHMeSfyDUoumgShs3ST3mN1+FhpRIKVf10l5
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN8PR12MB3298
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <Yh/KzDqsQSGm1CvK@google.com>
+X-Spam-Status: No, score=-18.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 02, 2022 at 05:29:02PM +0000, Shameer Kolothum wrote:
-> +static long hisi_acc_vf_save_unl_ioctl(struct file *filp,
-> +				       unsigned int cmd, unsigned long arg)
-> +{
-> +	struct hisi_acc_vf_migration_file *migf = filp->private_data;
-> +	struct hisi_acc_vf_core_device *hisi_acc_vdev = container_of(migf,
-> +			struct hisi_acc_vf_core_device, saving_migf);
-> +	loff_t *pos = &filp->f_pos;
-> +	struct vfio_precopy_info info;
-> +	unsigned long minsz;
-> +	int ret;
-> +
-> +	if (cmd != VFIO_MIG_GET_PRECOPY_INFO)
-> +		return -ENOTTY;
-> +
-> +	minsz = offsetofend(struct vfio_precopy_info, dirty_bytes);
-> +
-> +	if (copy_from_user(&info, (void __user *)arg, minsz))
-> +		return -EFAULT;
-> +	if (info.argsz < minsz)
-> +		return -EINVAL;
-> +
-> +	mutex_lock(&hisi_acc_vdev->state_mutex);
-> +	if (hisi_acc_vdev->mig_state != VFIO_DEVICE_STATE_PRE_COPY) {
-> +		mutex_unlock(&hisi_acc_vdev->state_mutex);
-> +		return -EINVAL;
-> +	}
-
-IMHO it is easier just to check the total_length and not grab this
-other lock
-
-> +struct acc_vf_data {
-> +#define QM_MATCH_SIZE 32L
-
-This should be
-
-#define QM_MATCH_SIZE offsetofend(struct acc_vf_data, qm_rsv_state)
-
-> +	/* QM match information */
-
-You should probably put an 8 byte random magic number here just to
-make the compatibility more unique.
-
-> +	u32 qp_num;
-> +	u32 dev_id;
-> +	u32 que_iso_cfg;
-> +	u32 qp_base;
-> +	/* QM reserved match information */
-> +	u32 qm_rsv_state[4];
-> +
-> +	/* QM RW regs */
-> +	u32 aeq_int_mask;
-> +	u32 eq_int_mask;
-> +	u32 ifc_int_source;
-> +	u32 ifc_int_mask;
-> +	u32 ifc_int_set;
-> +	u32 page_size;
-> +
-> +	/* QM_EQC_DW has 7 regs */
-> +	u32 qm_eqc_dw[7];
-> +
-> +	/* QM_AEQC_DW has 7 regs */
-> +	u32 qm_aeqc_dw[7];
-> +
-> +	/* QM reserved 5 regs */
-> +	u32 qm_rsv_regs[5];
-> +
-> +	/* qm memory init information */
-> +	u64 eqe_dma;
-
-Am I counting wrong or is there a padding before this? 7+7+5 is not a multiple
-of 2. Be explicit about padding in a structure like this.
-
-Jason
+On Wed, Mar 02, 2022, Sean Christopherson wrote:
+> On Wed, Mar 02, 2022, Mingwei Zhang wrote:
+> > On Sat, Feb 26, 2022, Sean Christopherson wrote:
+> > > Now that tdp_mmu_next_root() can process both valid and invalid roots,
+> > > extend it to be able to process _only_ invalid roots, add yet another
+> > > iterator macro for walking invalid roots, and use the new macro in
+> > > kvm_tdp_mmu_zap_invalidated_roots().
+> > > 
+> > > No functional change intended.
+> > > 
+> > > Reviewed-by: David Matlack <dmatlack@google.com>
+> > > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > > ---
+> > >  arch/x86/kvm/mmu/tdp_mmu.c | 74 ++++++++++++++------------------------
+> > >  1 file changed, 26 insertions(+), 48 deletions(-)
+> > > 
+> > > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> > > index debf08212f12..25148e8b711d 100644
+> > > --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> > > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> > > @@ -98,6 +98,12 @@ void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
+> > >  	call_rcu(&root->rcu_head, tdp_mmu_free_sp_rcu_callback);
+> > >  }
+> > >  
+> > > +enum tdp_mmu_roots_iter_type {
+> > > +	ALL_ROOTS = -1,
+> > > +	VALID_ROOTS = 0,
+> > > +	INVALID_ROOTS = 1,
+> > > +};
+> > 
+> > I am wondering what the trick is to start from -1?
+> 
+> -1 is arbitrary, any non-zero value would work.  More below.
+> 
+> > >  /*
+> > >   * Returns the next root after @prev_root (or the first root if @prev_root is
+> > >   * NULL).  A reference to the returned root is acquired, and the reference to
+> > > @@ -110,10 +116,16 @@ void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
+> > >   */
+> > >  static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
+> > >  					      struct kvm_mmu_page *prev_root,
+> > > -					      bool shared, bool only_valid)
+> > > +					      bool shared,
+> > > +					      enum tdp_mmu_roots_iter_type type)
+> > >  {
+> > >  	struct kvm_mmu_page *next_root;
+> > >  
+> > > +	kvm_lockdep_assert_mmu_lock_held(kvm, shared);
+> > > +
+> > > +	/* Ensure correctness for the below comparison against role.invalid. */
+> > > +	BUILD_BUG_ON(!!VALID_ROOTS || !INVALID_ROOTS);
+> > > +
+> > >  	rcu_read_lock();
+> > >  
+> > >  	if (prev_root)
+> > > @@ -125,7 +137,7 @@ static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
+> > >  						   typeof(*next_root), link);
+> > >  
+> > >  	while (next_root) {
+> > > -		if ((!only_valid || !next_root->role.invalid) &&
+> > > +		if ((type == ALL_ROOTS || (type == !!next_root->role.invalid)) &&
+> 
+> This is the code that deals with the enums.  It's making the type a tri-state,
+> where the values of VALID_ROOTS and INVALID_ROOTS align with converting role.invalid
+> to a boolean (always '0' or '1') so that they can be directly compared as above.
+> 
+> Any value for ALL_ROOTS (other than '0' or '1' obviously) would work since the
+> above logic requires ALL_ROOTS to be explicitly checked first.
+> 
+yeah, I see that. The other thing I feel strange is the that VALID_ROOTS
+is _0_ while INVALID_ROOTS is _1_. But when I see !!next_root->role.invalid,
+that solves my concerns.
+> > >  		    kvm_tdp_mmu_get_root(next_root))
+> > >  			break;
+> > >  
