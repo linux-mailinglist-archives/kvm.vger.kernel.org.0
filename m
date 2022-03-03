@@ -2,335 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6779F4CBD46
-	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 13:01:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 065AB4CBD87
+	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 13:18:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231488AbiCCMCB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Mar 2022 07:02:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49418 "EHLO
+        id S233151AbiCCMTS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Mar 2022 07:19:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37206 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230522AbiCCMCA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Mar 2022 07:02:00 -0500
-Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9644E16DAD8
-        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 04:01:14 -0800 (PST)
-Received: by mail-wr1-x42c.google.com with SMTP id m6so7459679wrr.10
-        for <kvm@vger.kernel.org>; Thu, 03 Mar 2022 04:01:14 -0800 (PST)
+        with ESMTP id S231621AbiCCMTQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Mar 2022 07:19:16 -0500
+Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 400D2DF4A5
+        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 04:18:30 -0800 (PST)
+Received: by mail-wr1-x42a.google.com with SMTP id m6so7535110wrr.10
+        for <kvm@vger.kernel.org>; Thu, 03 Mar 2022 04:18:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
+        d=linaro.org; s=google;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=cSB4F21TXn1MgqrWVsXRoOrexLcW+xGDf92u7Aq7Y5s=;
-        b=PYX2NuUAlj3uyyQx5TQPuukYzefwP+vkUl6piIdvtsdTdsL8eaG1Jj2gL+xwpIXLAe
-         P9U2XwhgvLRsZN8d5+zHnwMftoOh2rxcSHMYC9Nb5J8YLeYMW4q5gH6zDYdghdwjcQpd
-         ViBJHHnXJrVkQ1qeXcfZD5yJq8/UzXYHEJxIFcvYNM9bGw6E1sI/pgKNXd465Ft5UvLE
-         dqGlshDjNlvbs5/GljfSZL70+POGvGf134eR/GmzY+DwXwvRgfwWuRx+2Py/BnhaUjWr
-         HSvvH8TL8GtmJhf6L2oQV90t8tHrzwVRqnT64SzzG4myHcihafveU0SHfpecSsse1C3b
-         OHwg==
+        bh=W95klwG+EWnuJlXqfneyIPG4bMJIpYFCGfgCPBAo/s4=;
+        b=BVoUYAMy6igzOx7YCxgmD2obGVeA4FBbFy39UaDXpcyotfQj1WSs4cD2dBmZ3jehpH
+         Xv0H27JfD7LtNc3KTOYt5JsPQaESLbVZdrRIjVdCS/EqEN+LtHV3OI92ZhbhaxnOPsMB
+         zwIbvmQMtvcWtqQz/AOpNYfJzkMTFsv4hojr0PuJEFUbZHgxYNi3BKpDV1mgkUzm+fR0
+         4lMaaRE5yh5PGutSdpreHiYAqhMDl6KUHTvi2q6aV5S93rhbYz2wGWOzwPq3hB3YVbYG
+         uAhL64o8wkOM/gpLUr2Hb7oB/DraMZLkoBj2jGHmKGFPjyxdoWyrLbd/6WyXGtmMO48w
+         vp2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=cSB4F21TXn1MgqrWVsXRoOrexLcW+xGDf92u7Aq7Y5s=;
-        b=acgsNLhE15yzYHngvU5ru11aXcQ0VIX14q37OcDwnN9hr2r5neeSaI+ejUcccgxdNl
-         C7AtkvfNXsmQy+5qyedlef3+udxj6WqGDHIY5ukyBQPxrT3FwVLxya6MPuVjB3bV/vLH
-         HOWyOCiY39ITjQx7BbJofG4BXtNGYFzGO+EMw9BNvgyd1MXee+FQpVAFzSwiOpx0Pjr5
-         eLDx64S7JoaoriC4iMyRSfB+0oo2awbGDOei+xyQ+mdO75nTX1IclzIXoeJ5flFlfgxp
-         8KBIO6todTylCOzjuMYsA3GOXPzeSIapBEssxldXlg49foYzSqcaNW0nz1aTut76uHYk
-         CBkA==
-X-Gm-Message-State: AOAM530NACK0yB/Vxl2A7Et4Qj2aBfQko17Se8ZF32QeX6md5mRBwQnH
-        jPVWUwL39lx9ly0y+zF9sLe56/8bjM7J2T14
-X-Google-Smtp-Source: ABdhPJwg6+a2tiR6fwfIMKLJmYWdUBo6zkfudXv0rBNDVGV5R9Satvn0oNnIYjg6eiPW+azqel34yQ==
-X-Received: by 2002:a5d:608d:0:b0:1f0:4b94:4f54 with SMTP id w13-20020a5d608d000000b001f04b944f54mr2446166wrt.479.1646308872951;
-        Thu, 03 Mar 2022 04:01:12 -0800 (PST)
-Received: from google.com (203.75.199.104.bc.googleusercontent.com. [104.199.75.203])
-        by smtp.gmail.com with ESMTPSA id u14-20020adfed4e000000b001e3323611e5sm1790801wro.26.2022.03.03.04.01.11
+        bh=W95klwG+EWnuJlXqfneyIPG4bMJIpYFCGfgCPBAo/s4=;
+        b=r2nBEHkg1XYqieIubgFimCZk3C1edI67PwQuYV3SDaJhEHMSPX1SllRDNFvImggoIp
+         aBdL76UEPX8c4D0aTBmt9zA4JUndbmYIy7QqVfISRXhLITKctkRgrYxmkxRdY+42RNuq
+         fYqkEc4PcErQL8zAQ2JplN4FeEQgBMFYLWsnSNNNnNkjJBp1unVdcIa8buDUvvDISEWX
+         Ma0jr5PIp6npJ9o1RpJblPA0+IViyOt6IwIOtwkml9moG9GhxIRI8H0aUfxGfUNgKgOM
+         cfdEeeDNfFyhAkPVZ1tJ75zpdDuKM1rcgb7WJrGilF9oexVBKJRSwxwOaEKGrqBtQ0sa
+         cMeA==
+X-Gm-Message-State: AOAM531SnN77x789/mIISBGWJjIcqI/YWGAbLo+aSzCb4qivR8SbPTFj
+        cuS4zHMcm2j8boNi3B0ii1lunw==
+X-Google-Smtp-Source: ABdhPJwgYeUN7RS9hQRShRziePljKQd/1cMutSSEkk4MeQ2QRRtTjZSLz5QSndDd2pML49XlqkHAqw==
+X-Received: by 2002:a5d:6d0d:0:b0:1e8:7b6a:38e7 with SMTP id e13-20020a5d6d0d000000b001e87b6a38e7mr26568054wrq.625.1646309908722;
+        Thu, 03 Mar 2022 04:18:28 -0800 (PST)
+Received: from maple.lan (cpc141216-aztw34-2-0-cust174.18-1.cable.virginm.net. [80.7.220.175])
+        by smtp.gmail.com with ESMTPSA id p6-20020a5d4586000000b001f0436cb325sm1774600wrq.52.2022.03.03.04.18.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Mar 2022 04:01:12 -0800 (PST)
-Date:   Thu, 3 Mar 2022 12:01:10 +0000
-From:   Sebastian Ene <sebastianene@google.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvm@vger.kernel.org, qperret@google.com, will@kernel.org,
-        julien.thierry.kdev@gmail.com
-Subject: Re: [PATCH kvmtool v7 2/3] aarch64: Add stolen time support
-Message-ID: <YiCuBsKsh4TAZqTs@google.com>
-References: <20220302140734.1015958-1-sebastianene@google.com>
- <20220302140734.1015958-3-sebastianene@google.com>
- <8735k02z98.wl-maz@kernel.org>
+        Thu, 03 Mar 2022 04:18:28 -0800 (PST)
+Date:   Thu, 3 Mar 2022 12:18:24 +0000
+From:   Daniel Thompson <daniel.thompson@linaro.org>
+To:     Xiaomeng Tong <xiam0nd.tong@gmail.com>
+Cc:     david.laight@aculab.com, alsa-devel@alsa-project.org,
+        kvm@vger.kernel.org, gustavo@embeddedor.com,
+        linux-iio@vger.kernel.org, kgdb-bugreport@lists.sourceforge.net,
+        linux@rasmusvillemoes.dk, dri-devel@lists.freedesktop.org,
+        c.giuffrida@vu.nl, amd-gfx@lists.freedesktop.org,
+        torvalds@linux-foundation.org, samba-technical@lists.samba.org,
+        linux1394-devel@lists.sourceforge.net, drbd-dev@lists.linbit.com,
+        linux-arch@vger.kernel.org, linux-cifs@vger.kernel.org,
+        linux-aspeed@lists.ozlabs.org, linux-scsi@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-staging@lists.linux.dev,
+        h.j.bos@vu.nl, jgg@ziepe.ca, intel-wired-lan@lists.osuosl.org,
+        nouveau@lists.freedesktop.org,
+        bcm-kernel-feedback-list@broadcom.com, dan.carpenter@oracle.com,
+        linux-media@vger.kernel.org, keescook@chromium.org, arnd@arndb.de,
+        linux-pm@vger.kernel.org, intel-gfx@lists.freedesktop.org,
+        bjohannesmeyer@gmail.com, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, christophe.jaillet@wanadoo.fr,
+        jakobkoschel@gmail.com, v9fs-developer@lists.sourceforge.net,
+        linux-tegra@vger.kernel.org, tglx@linutronix.de,
+        andriy.shevchenko@linux.intel.com,
+        linux-arm-kernel@lists.infradead.org, linux-sgx@vger.kernel.org,
+        nathan@kernel.org, netdev@vger.kernel.org,
+        linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net,
+        tipc-discussion@lists.sourceforge.net,
+        linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, akpm@linux-foundation.org,
+        linuxppc-dev@lists.ozlabs.org, christian.koenig@amd.com,
+        rppt@kernel.org
+Subject: Re: [Kgdb-bugreport] [PATCH 2/6] treewide: remove using list
+ iterator after loop body as a ptr
+Message-ID: <20220303121824.qdyrognluik74iph@maple.lan>
+References: <39404befad5b44b385698ff65465abe5@AcuMS.aculab.com>
+ <20220303072657.11124-1-xiam0nd.tong@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <8735k02z98.wl-maz@kernel.org>
-X-Spam-Status: No, score=-18.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20220303072657.11124-1-xiam0nd.tong@gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 02, 2022 at 02:41:07PM +0000, Marc Zyngier wrote:
-> Hi Sebastian,
+On Thu, Mar 03, 2022 at 03:26:57PM +0800, Xiaomeng Tong wrote:
+> On Thu, 3 Mar 2022 04:58:23 +0000, David Laight wrote:
+> > on 3 Mar 2022 10:27:29 +0800, Xiaomeng Tong wrote:
+> > > The problem is the mis-use of iterator outside the loop on exit, and
+> > > the iterator will be the HEAD's container_of pointer which pointers
+> > > to a type-confused struct. Sidenote: The *mis-use* here refers to
+> > > mistakely access to other members of the struct, instead of the
+> > > list_head member which acutally is the valid HEAD.
+> >
+> > The problem is that the HEAD's container_of pointer should never
+> > be calculated at all.
+> > This is what is fundamentally broken about the current definition.
 > 
+> Yes, the rule is "the HEAD's container_of pointer should never be
+> calculated at all outside the loop", but how do you make sure everyone
+> follows this rule?
 
-Hello Marc,
+Your formulation of the rule is correct: never run container_of() on HEAD
+pointer.
 
-> On Wed, 02 Mar 2022 14:07:35 +0000,
-> Sebastian Ene <sebastianene@google.com> wrote:
-> > 
-> > This patch adds support for stolen time by sharing a memory region
-> > with the guest which will be used by the hypervisor to store the stolen
-> > time information. Reserve a 64kb MMIO memory region after the RTC peripheral
-> > to be used by pvtime. The exact format of the structure stored by the
-> > hypervisor is described in the ARM DEN0057A document.
-> > 
-> > Signed-off-by: Sebastian Ene <sebastianene@google.com>
-> > ---
-> >  Makefile                               |   1 +
-> >  arm/aarch64/arm-cpu.c                  |   2 +-
-> >  arm/aarch64/include/kvm/kvm-cpu-arch.h |   1 +
-> >  arm/aarch64/pvtime.c                   | 103 +++++++++++++++++++++++++
-> >  arm/include/arm-common/kvm-arch.h      |   6 +-
-> >  include/kvm/kvm-config.h               |   1 +
-> >  6 files changed, 112 insertions(+), 2 deletions(-)
-> >  create mode 100644 arm/aarch64/pvtime.c
-> > 
-> > diff --git a/Makefile b/Makefile
-> > index f251147..e9121dc 100644
-> > --- a/Makefile
-> > +++ b/Makefile
-> > @@ -182,6 +182,7 @@ ifeq ($(ARCH), arm64)
-> >  	OBJS		+= arm/aarch64/arm-cpu.o
-> >  	OBJS		+= arm/aarch64/kvm-cpu.o
-> >  	OBJS		+= arm/aarch64/kvm.o
-> > +	OBJS		+= arm/aarch64/pvtime.o
-> >  	ARCH_INCLUDE	:= $(HDRS_ARM_COMMON)
-> >  	ARCH_INCLUDE	+= -Iarm/aarch64/include
-> >  
-> > diff --git a/arm/aarch64/arm-cpu.c b/arm/aarch64/arm-cpu.c
-> > index d7572b7..7e4a3c1 100644
-> > --- a/arm/aarch64/arm-cpu.c
-> > +++ b/arm/aarch64/arm-cpu.c
-> > @@ -22,7 +22,7 @@ static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
-> >  static int arm_cpu__vcpu_init(struct kvm_cpu *vcpu)
-> >  {
-> >  	vcpu->generate_fdt_nodes = generate_fdt_nodes;
-> > -	return 0;
-> > +	return kvm_cpu__setup_pvtime(vcpu);
-> >  }
-> >  
-> >  static struct kvm_arm_target target_generic_v8 = {
-> > diff --git a/arm/aarch64/include/kvm/kvm-cpu-arch.h b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-> > index 8dfb82e..2b2c1ff 100644
-> > --- a/arm/aarch64/include/kvm/kvm-cpu-arch.h
-> > +++ b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-> > @@ -19,5 +19,6 @@
-> >  
-> >  void kvm_cpu__select_features(struct kvm *kvm, struct kvm_vcpu_init *init);
-> >  int kvm_cpu__configure_features(struct kvm_cpu *vcpu);
-> > +int kvm_cpu__setup_pvtime(struct kvm_cpu *vcpu);
-> >  
-> >  #endif /* KVM__KVM_CPU_ARCH_H */
-> > diff --git a/arm/aarch64/pvtime.c b/arm/aarch64/pvtime.c
-> > new file mode 100644
-> > index 0000000..fdde683
-> > --- /dev/null
-> > +++ b/arm/aarch64/pvtime.c
-> > @@ -0,0 +1,103 @@
-> > +#include "kvm/kvm.h"
-> > +#include "kvm/kvm-cpu.h"
-> > +#include "kvm/util.h"
-> > +
-> > +#include <linux/byteorder.h>
-> > +#include <linux/types.h>
-> > +
-> > +#define ARM_PVTIME_STRUCT_SIZE		(64)
-> > +
-> > +struct pvtime_data_priv {
-> > +	bool	is_supported;
-> > +	char	*usr_mem;
-> 
-> Consider using void * for pointers that do not have any particular
-> semantics associated to them.
-> 
+However the rule that is introduced by list_for_each_entry_inside() is
+*not* this rule. The rule it introduces is: never access the iterator
+variable outside the loop.
 
-I will update the pointer to void * type.
+Making the iterator NULL on loop exit does follow the rule you proposed
+but using a different technique: do not allow HEAD to be stored in the
+iterator variable after loop exit. This also makes it impossible to run
+container_of() on the HEAD pointer.
 
-> > +};
-> > +
-> > +static struct pvtime_data_priv pvtime_data = {
-> > +	.is_supported	= true,
-> > +	.usr_mem	= NULL
-> > +};
-> > +
-> > +static int pvtime__alloc_region(struct kvm *kvm)
-> > +{
-> > +	char *mem;
-> > +	int ret = 0;
-> > +
-> > +	mem = mmap(NULL, ARM_PVTIME_MMIO_SIZE, PROT_RW,
-> 
-> I sort of object to the 'MMIO' part of the name. The spec is quite
-> clear that this should be normal memory. That's purely cosmetic, but
-> still a bit confusing.
-> 
 
-I will remove the 'MMIO' part of the name: ARM_PVTIME_SIZE and
-ARM_PVTIME_BASE will be the new definitions. Initially I thought to keep
-the 'MMIO' name as this ram portion is placed after RTC_MMIO region but I
-agree that it's a bit confusing.
+> Everyone makes mistakes, but we can eliminate them all from the beginning
+> with the help of compiler which can catch such use-after-loop things.
 
-> > +		   MAP_ANON_NORESERVE, -1, 0);
-> > +	if (mem == MAP_FAILED)
-> > +		return -errno;
-> > +
-> > +	ret = kvm__register_dev_mem(kvm, ARM_PVTIME_MMIO_BASE,
-> > +				    ARM_PVTIME_MMIO_SIZE, mem);
-> 
-> This, on the other side, is wrong. Since the pvtime pages are memory,
-> mapping them with device attributes will do the wrong thing (the
-> hypervisor will write to a cacheable mapping, and the guest will
-> bypass the cache due to the S2 override that you provide here).
-> 
-> kvm__register_ram() is more likely to lead to the behaviour you'd
-> expect.
-> 
+Indeed but if we introduce new interfaces then we don't have to worry
+about existing usages and silent regressions. Code will have been
+written knowing the loop can exit with the iterator set to NULL.
 
-Thanks for the explanation ! Nice catch. I will update the call and use
-kvm__register_ram().
+Sure it is still possible for programmers to make mistakes and
+dereference the NULL pointer but C programmers are well training w.r.t.
+NULL pointer checking so such mistakes are much less likely than with
+the current list_for_each_entry() macro. This risk must be offset
+against the way a NULLify approach can lead to more elegant code when we
+are doing a list search.
 
-> > +	if (ret) {
-> > +		munmap(mem, ARM_PVTIME_MMIO_SIZE);
-> > +		return ret;
-> > +	}
-> > +
-> > +	pvtime_data.usr_mem = mem;
-> > +	return ret;
-> > +}
-> > +
-> > +static int pvtime__teardown_region(struct kvm *kvm)
-> > +{
-> > +	if (pvtime_data.usr_mem == NULL)
-> > +		return 0;
-> > +
-> > +	kvm__destroy_mem(kvm, ARM_PVTIME_MMIO_BASE,
-> > +			 ARM_PVTIME_MMIO_SIZE, pvtime_data.usr_mem);
-> > +	munmap(pvtime_data.usr_mem, ARM_PVTIME_MMIO_SIZE);
-> > +	pvtime_data.usr_mem = NULL;
-> > +	return 0;
-> > +}
-> > +
-> > +dev_exit(pvtime__teardown_region);
-> > +
-> > +int kvm_cpu__setup_pvtime(struct kvm_cpu *vcpu)
-> > +{
-> > +	int ret;
-> > +	bool has_stolen_time;
-> > +	u64 pvtime_guest_addr = ARM_PVTIME_MMIO_BASE + vcpu->cpu_id *
-> > +		ARM_PVTIME_STRUCT_SIZE;
-> > +	struct kvm_config *kvm_cfg = NULL;
-> > +	struct kvm_device_attr pvtime_attr = (struct kvm_device_attr) {
-> > +		.group	= KVM_ARM_VCPU_PVTIME_CTRL,
-> > +		.addr	= KVM_ARM_VCPU_PVTIME_IPA
-> > +	};
-> > +
-> > +	kvm_cfg = &vcpu->kvm->cfg;
-> > +	if (kvm_cfg->no_pvtime)
-> > +		return 0;
-> > +
-> > +	if (!pvtime_data.is_supported)
-> > +		return -ENOTSUP;
-> 
-> It is a bit odd to have this hard failure if running on a system that
-> doesn't have pvtime. It forces the user to alter their command-line,
-> which is a bit annoying. I'd rather have a soft-fail here.
-> 
 
-The flag 'is_supported' is set to false when we support pvtime but we
-fail to configure it. We verify that we support pvtime by calling the check
-extension KVM_CAP_STEAL_TIME. I think the naming is odd here for the
-flag name. It should be : 'is_failed_cfg'.
-
-> > +
-> > +	has_stolen_time = kvm__supports_extension(vcpu->kvm,
-> > +						  KVM_CAP_STEAL_TIME);
-> > +	if (!has_stolen_time)
-> > +		return 0;
-> > +
-> > +	ret = ioctl(vcpu->vcpu_fd, KVM_HAS_DEVICE_ATTR, &pvtime_attr);
-> > +	if (ret) {
-> > +		perror("KVM_HAS_DEVICE_ATTR failed\n");
-> > +		goto out_err;
-> > +	}
-> > +
-> > +	if (!pvtime_data.usr_mem) {
-> > +		ret = pvtime__alloc_region(vcpu->kvm);
-> > +		if (ret) {
-> > +			perror("Failed allocating pvtime region\n");
-> > +			goto out_err;
-> > +		}
-> > +	}
-> > +
-> > +	pvtime_attr.addr = (u64)&pvtime_guest_addr;
-> > +	ret = ioctl(vcpu->vcpu_fd, KVM_SET_DEVICE_ATTR, &pvtime_attr);
-> > +	if (!ret)
-> > +		return 0;
-> > +
-> > +	perror("KVM_SET_DEVICE_ATTR failed\n");
-> > +	pvtime__teardown_region(vcpu->kvm);
-> > +out_err:
-> > +	pvtime_data.is_supported = false;
-> > +	return ret;
-> > +}
-> > diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
-> > index c645ac0..3f82663 100644
-> > --- a/arm/include/arm-common/kvm-arch.h
-> > +++ b/arm/include/arm-common/kvm-arch.h
-> > @@ -15,7 +15,8 @@
-> >   * |  PCI  |////| plat  |       |        |     |         |
-> >   * |  I/O  |////| MMIO: | Flash | virtio | GIC |   PCI   |  DRAM
-> >   * | space |////| UART, |       |  MMIO  |     |  (AXI)  |
-> > - * |       |////| RTC   |       |        |     |         |
-> > + * |       |////| RTC,  |       |        |     |         |
-> > + * |       |////| PVTIME|       |        |     |         |
-> >   * +-------+----+-------+-------+--------+-----+---------+---......
-> >   */
-> >  
-> > @@ -34,6 +35,9 @@
-> >  #define ARM_RTC_MMIO_BASE	(ARM_UART_MMIO_BASE + ARM_UART_MMIO_SIZE)
-> >  #define ARM_RTC_MMIO_SIZE	0x10000
-> >  
-> > +#define ARM_PVTIME_MMIO_BASE	(ARM_RTC_MMIO_BASE + ARM_RTC_MMIO_SIZE)
-> > +#define ARM_PVTIME_MMIO_SIZE	SZ_64K
-> > +
-> >  #define KVM_FLASH_MMIO_BASE	(ARM_MMIO_AREA + 0x1000000)
-> >  #define KVM_FLASH_MAX_SIZE	0x1000000
-> >  
-> > diff --git a/include/kvm/kvm-config.h b/include/kvm/kvm-config.h
-> > index 6a5720c..48adf27 100644
-> > --- a/include/kvm/kvm-config.h
-> > +++ b/include/kvm/kvm-config.h
-> > @@ -62,6 +62,7 @@ struct kvm_config {
-> >  	bool no_dhcp;
-> >  	bool ioport_debug;
-> >  	bool mmio_debug;
-> > +	bool no_pvtime;
-> >  };
-> >  
-> >  #endif
-> 
-> Thanks,
-> 
-
-Thanks for the review,
-
-> 	M.
-> 
-
-Sebastian
-
-> -- 
-> Without deviation from the norm, progress is not possible.
+Daniel.
