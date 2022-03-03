@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DC4CE4CC1B1
-	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 16:41:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B622C4CC1C1
+	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 16:42:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234608AbiCCPmc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Mar 2022 10:42:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34370 "EHLO
+        id S234658AbiCCPmo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Mar 2022 10:42:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34460 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234569AbiCCPma (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Mar 2022 10:42:30 -0500
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 016691959C1
-        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 07:41:43 -0800 (PST)
+        with ESMTP id S234620AbiCCPmd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Mar 2022 10:42:33 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E28719532E
+        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 07:41:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=Sender:Content-Transfer-Encoding:
-        Content-Type:MIME-Version:Message-Id:Date:Subject:Cc:To:From:Reply-To:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=XWF5VMFkk6L4UE9diwBbalnWZxrWgn+B7Eu8T2VVPwc=; b=hTbBMS4rQLzOmZr1r4eOJoMD0u
-        W59ZAULPkY/Wzaj0UxV4WeycTD3Gee6viDyMxCuk2LBMFlhFEeBcY3jbMtDb1mASJzYvJgs3E7ZFX
-        SQyuMLK5NHCLyq8zoG813T1q9RD17b77URm34I9cdmZ1/DUIWusSjioNXkLj/9d185fCGqjqYTlKh
-        tKAWLO+UxBDcQKV/Cf4P2npTkrJjMfjbU/fpZik8E9/oYNIXzCvm3G0hm1pF0Rz6ksPgfvKfD/5lx
-        1H11hlc08buHjdIBPUWJiSaJdefv1vFgmGbwDYOgdCmn8qSdIyzxyRabOcIWNVut1bgdVnp/pL/96
-        hNo1nDQw==;
+        d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
+        Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=ZgvWPsDu8uqnRDWHjZZun9SK4TIZXWHQXB6z7ulTsRM=; b=l44cE9dMhcUofvouDwStzjaPeh
+        p0SHc8DxSftGb43sMhlPP5avgFmlXaTdf27l6loDIxOJcTtkVx/dRAjtrOa+a+xq2zPAEWsgdINRA
+        O5PSRXbwmPaD6kfUbmnB1cQSJLhx73t+PLRG5pb7X1flmP7/pZWFd7vDSB4C2ATbcSC+ihGH7/9Ty
+        QFAO+Qv4mWtVxwKo+7xUfvhyz9orBUdHIN5a6vVxfwmRJbpXZi9DrnW4/JBUE4q9OOmtpVGuLbh4A
+        TCibuIzrj40r8Sfglpvc8Sn5DJyF61gfO9lldJzPPqMacXZTZc659mNvXUYmv2cA7v2ZvPLpDftXc
+        2MHyidfQ==;
 Received: from [2001:8b0:10b:1:85c4:81a:fb42:714d] (helo=i7.infradead.org)
-        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nPna5-00Ewju-CE; Thu, 03 Mar 2022 15:41:29 +0000
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nPna5-00BlVh-J4; Thu, 03 Mar 2022 15:41:29 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nPna4-000qmL-O2; Thu, 03 Mar 2022 15:41:28 +0000
+        id 1nPna4-000qmO-Oq; Thu, 03 Mar 2022 15:41:28 +0000
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -40,15 +40,16 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Boris Ostrovsky <boris.ostrovsky@oracle.com>,
         Metin Kaya <metikaya@amazon.co.uk>,
         Paul Durrant <pdurrant@amazon.co.uk>
-Subject: [PATCH v3 00/17] KVM: Add Xen event channel acceleration
-Date:   Thu,  3 Mar 2022 15:41:10 +0000
-Message-Id: <20220303154127.202856-1-dwmw2@infradead.org>
+Subject: [PATCH v3 01/17] KVM: Use enum to track if cached PFN will be used in guest and/or host
+Date:   Thu,  3 Mar 2022 15:41:11 +0000
+Message-Id: <20220303154127.202856-2-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.33.1
+In-Reply-To: <20220303154127.202856-1-dwmw2@infradead.org>
+References: <20220303154127.202856-1-dwmw2@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: David Woodhouse <dwmw2@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
         SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
@@ -59,76 +60,151 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This series adds event channel acceleration for Xen guests. In particular
-it allows guest vCPUs to send each other IPIs without having to bounce
-all the way out to the userspace VMM in order to do so. Likewise, the
-Xen singleshot timer is added, and a version of SCHEDOP_poll. Those
-major features are based on Joao and Boris' patches from 2019.
+From: Sean Christopherson <seanjc@google.com>
 
-Cleaning up the event delivery into the vcpu_info involved using the new
-gfn_to_pfn_cache for that, and that means I ended up doing so for *all*
-the places the guest can have a pvclock.
+Replace the guest_uses_pa and kernel_map booleans in the PFN cache code
+with a unified enum/bitmask. Using explicit names makes it easier to
+review and audit call sites.
 
-v0: Proof-of-concept RFC
+Opportunistically add a WARN to prevent passing garbage; instantating a
+cache without declaring its usage is either buggy or pointless.
 
-v1:
- • Drop the runstate fix which is merged now.
- • Add Sean's gfn_to_pfn_cache API change at the start of the series.
- • Add KVM self tests
- • Minor bug fixes
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+---
+ arch/x86/kvm/xen.c        |  2 +-
+ include/linux/kvm_host.h  | 11 +++++------
+ include/linux/kvm_types.h | 10 ++++++++--
+ virt/kvm/pfncache.c       | 14 +++++++-------
+ 4 files changed, 21 insertions(+), 16 deletions(-)
 
-v2:
- • Drop dirty handling from gfn_to_pfn_cache
- • Fix !CONFIG_KVM_XEN build and duplicate call to kvm_xen_init_vcpu()
-
-v3:
- • Add KVM_XEN_EVTCHN_RESET to clear all outbound ports.
- • Clean up a stray #if	1 in a part of the the test case that was once
-   being recalcitrant.
- • Check kvm_xen_has_pending_events() in kvm_vcpu_has_events() and *not*
-   kvm_xen_has_pending_timer() which is checked from elsewhere.
- • Fix warnings noted by the kernel test robot <lkp@intel.com>:
-    • Make kvm_xen_init_timer() static.
-    • Make timer delta calculation use an explicit s64 to fix 32-bit build.
-
-Boris Ostrovsky (1):
-      KVM: x86/xen: handle PV spinlocks slowpath
-
-David Woodhouse (12):
-      KVM: Remove dirty handling from gfn_to_pfn_cache completely
-      KVM: x86/xen: Use gfn_to_pfn_cache for runstate area
-      KVM: x86: Use gfn_to_pfn_cache for pv_time
-      KVM: x86/xen: Use gfn_to_pfn_cache for vcpu_info
-      KVM: x86/xen: Use gfn_to_pfn_cache for vcpu_time_info
-      KVM: x86/xen: Make kvm_xen_set_evtchn() reusable from other places
-      KVM: x86/xen: Support direct injection of event channel events
-      KVM: x86/xen: Add KVM_XEN_VCPU_ATTR_TYPE_VCPU_ID
-      KVM: x86/xen: Kernel acceleration for XENVER_version
-      KVM: x86/xen: Support per-vCPU event channel upcall via local APIC
-      KVM: x86/xen: Advertise and document KVM_XEN_HVM_CONFIG_EVTCHN_SEND
-      KVM: x86/xen: Add self tests for KVM_XEN_HVM_CONFIG_EVTCHN_SEND
-
-Joao Martins (3):
-      KVM: x86/xen: intercept EVTCHNOP_send from guests
-      KVM: x86/xen: handle PV IPI vcpu yield
-      KVM: x86/xen: handle PV timers oneshot mode
-
-Sean Christopherson (1):
-      KVM: Use enum to track if cached PFN will be used in guest and/or host
-
- Documentation/virt/kvm/api.rst                     |  133 +-
- arch/x86/include/asm/kvm_host.h                    |   23 +-
- arch/x86/kvm/irq.c                                 |   11 +-
- arch/x86/kvm/irq_comm.c                            |    2 +-
- arch/x86/kvm/x86.c                                 |  119 +-
- arch/x86/kvm/xen.c                                 | 1271 ++++++++++++++++----
- arch/x86/kvm/xen.h                                 |   67 +-
- include/linux/kvm_host.h                           |   26 +-
- include/linux/kvm_types.h                          |   11 +-
- include/uapi/linux/kvm.h                           |   44 +
- .../testing/selftests/kvm/x86_64/xen_shinfo_test.c |  337 +++++-
- virt/kvm/pfncache.c                                |   53 +-
- 12 files changed, 1722 insertions(+), 375 deletions(-)
-
-
+diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+index 4aa0f2b31665..5be1c9227105 100644
+--- a/arch/x86/kvm/xen.c
++++ b/arch/x86/kvm/xen.c
+@@ -39,7 +39,7 @@ static int kvm_xen_shared_info_init(struct kvm *kvm, gfn_t gfn)
+ 	}
+ 
+ 	do {
+-		ret = kvm_gfn_to_pfn_cache_init(kvm, gpc, NULL, false, true,
++		ret = kvm_gfn_to_pfn_cache_init(kvm, gpc, NULL, KVM_HOST_USES_PFN,
+ 						gpa, PAGE_SIZE, false);
+ 		if (ret)
+ 			goto out;
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 9536ffa0473b..907a3e036cf6 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1221,9 +1221,9 @@ void kvm_vcpu_mark_page_dirty(struct kvm_vcpu *vcpu, gfn_t gfn);
+  * @gpc:	   struct gfn_to_pfn_cache object.
+  * @vcpu:	   vCPU to be used for marking pages dirty and to be woken on
+  *		   invalidation.
+- * @guest_uses_pa: indicates that the resulting host physical PFN is used while
+- *		   @vcpu is IN_GUEST_MODE so invalidations should wake it.
+- * @kernel_map:    requests a kernel virtual mapping (kmap / memremap).
++ * @usage:	   indicates if the resulting host physical PFN is used while
++ *		   the @vcpu is IN_GUEST_MODE and/or if the PFN used directly
++ *		   by KVM (and thus needs a kernel virtual mapping).
+  * @gpa:	   guest physical address to map.
+  * @len:	   sanity check; the range being access must fit a single page.
+  * @dirty:         mark the cache dirty immediately.
+@@ -1239,9 +1239,8 @@ void kvm_vcpu_mark_page_dirty(struct kvm_vcpu *vcpu, gfn_t gfn);
+  * to ensure that the cache is valid before accessing the target page.
+  */
+ int kvm_gfn_to_pfn_cache_init(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
+-			      struct kvm_vcpu *vcpu, bool guest_uses_pa,
+-			      bool kernel_map, gpa_t gpa, unsigned long len,
+-			      bool dirty);
++			      struct kvm_vcpu *vcpu, enum pfn_cache_usage usage,
++			      gpa_t gpa, unsigned long len, bool dirty);
+ 
+ /**
+  * kvm_gfn_to_pfn_cache_check - check validity of a gfn_to_pfn_cache.
+diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
+index dceac12c1ce5..784f37cbf33e 100644
+--- a/include/linux/kvm_types.h
++++ b/include/linux/kvm_types.h
+@@ -18,6 +18,7 @@ struct kvm_memslots;
+ 
+ enum kvm_mr_change;
+ 
++#include <linux/bits.h>
+ #include <linux/types.h>
+ #include <linux/spinlock_types.h>
+ 
+@@ -46,6 +47,12 @@ typedef u64            hfn_t;
+ 
+ typedef hfn_t kvm_pfn_t;
+ 
++enum pfn_cache_usage {
++	KVM_GUEST_USES_PFN = BIT(0),
++	KVM_HOST_USES_PFN  = BIT(1),
++	KVM_GUEST_AND_HOST_USE_PFN = KVM_GUEST_USES_PFN | KVM_HOST_USES_PFN,
++};
++
+ struct gfn_to_hva_cache {
+ 	u64 generation;
+ 	gpa_t gpa;
+@@ -64,11 +71,10 @@ struct gfn_to_pfn_cache {
+ 	rwlock_t lock;
+ 	void *khva;
+ 	kvm_pfn_t pfn;
++	enum pfn_cache_usage usage;
+ 	bool active;
+ 	bool valid;
+ 	bool dirty;
+-	bool kernel_map;
+-	bool guest_uses_pa;
+ };
+ 
+ #ifdef KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE
+diff --git a/virt/kvm/pfncache.c b/virt/kvm/pfncache.c
+index ce878f4be4da..9b3a192cb18c 100644
+--- a/virt/kvm/pfncache.c
++++ b/virt/kvm/pfncache.c
+@@ -42,7 +42,7 @@ void gfn_to_pfn_cache_invalidate_start(struct kvm *kvm, unsigned long start,
+ 			 * If a guest vCPU could be using the physical address,
+ 			 * it needs to be woken.
+ 			 */
+-			if (gpc->guest_uses_pa) {
++			if (gpc->usage & KVM_GUEST_USES_PFN) {
+ 				if (!wake_vcpus) {
+ 					wake_vcpus = true;
+ 					bitmap_zero(vcpu_bitmap, KVM_MAX_VCPUS);
+@@ -219,7 +219,7 @@ int kvm_gfn_to_pfn_cache_refresh(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
+ 			goto map_done;
+ 		}
+ 
+-		if (gpc->kernel_map) {
++		if (gpc->usage & KVM_HOST_USES_PFN) {
+ 			if (new_pfn == old_pfn) {
+ 				new_khva = old_khva;
+ 				old_pfn = KVM_PFN_ERR_FAULT;
+@@ -299,10 +299,11 @@ EXPORT_SYMBOL_GPL(kvm_gfn_to_pfn_cache_unmap);
+ 
+ 
+ int kvm_gfn_to_pfn_cache_init(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
+-			      struct kvm_vcpu *vcpu, bool guest_uses_pa,
+-			      bool kernel_map, gpa_t gpa, unsigned long len,
+-			      bool dirty)
++			      struct kvm_vcpu *vcpu, enum pfn_cache_usage usage,
++			      gpa_t gpa, unsigned long len, bool dirty)
+ {
++	WARN_ON_ONCE(!usage || (usage & KVM_GUEST_AND_HOST_USE_PFN) != usage);
++
+ 	if (!gpc->active) {
+ 		rwlock_init(&gpc->lock);
+ 
+@@ -310,8 +311,7 @@ int kvm_gfn_to_pfn_cache_init(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
+ 		gpc->pfn = KVM_PFN_ERR_FAULT;
+ 		gpc->uhva = KVM_HVA_ERR_BAD;
+ 		gpc->vcpu = vcpu;
+-		gpc->kernel_map = kernel_map;
+-		gpc->guest_uses_pa = guest_uses_pa;
++		gpc->usage = usage;
+ 		gpc->valid = false;
+ 		gpc->active = true;
+ 
+-- 
+2.33.1
 
