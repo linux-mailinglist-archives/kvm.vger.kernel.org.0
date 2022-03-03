@@ -2,161 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BD45C4CC3FF
-	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 18:34:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A38A4CC465
+	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 18:51:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229805AbiCCReq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Mar 2022 12:34:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57598 "EHLO
+        id S231147AbiCCRw3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Mar 2022 12:52:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230505AbiCCReh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Mar 2022 12:34:37 -0500
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 776E3BAF;
-        Thu,  3 Mar 2022 09:33:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1646328828; x=1677864828;
-  h=message-id:date:mime-version:to:cc:references:from:
-   subject:in-reply-to:content-transfer-encoding;
-  bh=/6BWrWtvMDgxG3GRtmu6+t9kH9b6E5eZZRPbC6t9AzU=;
-  b=JYMrLkv7yKJlhiGS77Uea0+2fxGDbjwVhHefPfZTIVtDrzGhl3GQM1nZ
-   e3yefVeALKeERJmIGHCTzIIKll7h5U7Q34YDfs21st4PGmEZrebUyeW50
-   osOf5Q2i55SULRrp89FSqBFzBaX+pWsmno4s0P2LeoMrrfPoYrgXt1PDi
-   l7+nSh31R0cpjVEpoKBt2kVUQtir8WL7+DtIBRKnSZZMTHG0AtOiXaDZE
-   JIkrydtquFJedlU/nDQHXGsK8NU5rLpaNmgAQQdgwG7J6Y+4j6n1v/uR6
-   hfHlVT0LcBGbvv2L6lBISbg3qAlJ8jbf9Dog3IZZ1Jtzf4qMhXOkPsGMF
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10275"; a="253477473"
-X-IronPort-AV: E=Sophos;i="5.90,151,1643702400"; 
-   d="scan'208";a="253477473"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2022 09:33:48 -0800
-X-IronPort-AV: E=Sophos;i="5.90,151,1643702400"; 
-   d="scan'208";a="642197252"
-Received: from eabada-mobl2.amr.corp.intel.com (HELO [10.209.6.252]) ([10.209.6.252])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2022 09:33:45 -0800
-Message-ID: <c85259c5-996c-902b-42b6-6b812282ee25@intel.com>
-Date:   Thu, 3 Mar 2022 09:33:40 -0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Content-Language: en-US
-To:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        brijesh.ksingh@gmail.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-References: <20220224165625.2175020-1-brijesh.singh@amd.com>
- <20220224165625.2175020-43-brijesh.singh@amd.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-Subject: Re: [PATCH v11 42/45] virt: Add SEV-SNP guest driver
-In-Reply-To: <20220224165625.2175020-43-brijesh.singh@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+        with ESMTP id S229496AbiCCRw2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Mar 2022 12:52:28 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B149C1A1C6B
+        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 09:51:42 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id F268AB82667
+        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 17:51:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A14C9C004E1;
+        Thu,  3 Mar 2022 17:51:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1646329899;
+        bh=dS8pMhjLnWoEzsoILwriRJWHNTv/UK4gumZtJEsJZdQ=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=izdKrdS6Tg7paJZCLlUxDtzHw81gnt4v+yXNck2imlQpz1tY136Ij2xRnQ5Sxs8JD
+         HQ7BlG0NDPa7n7nsddR4OCwe+PzdMgJelHwL0BtCXOblnMsdKcx4m/10KOCrqBaSBF
+         ylscHBZiyjr176HxKoMO4KylAbcxwzryYDhvNUqoGn8WjQWvWYChDMHkvtKR+vw2gS
+         Yb0ngOMwDmVGP28HIa+NKWEzUwyqlo7XfZywHcThWELLK9EFs5vB5TILkZRbZ0iVWF
+         tfS7opsXfnuWDnwmKec8ziwQjU7IokVnw3zDgYN4oSw4s2ZWYiaNhMuahWHAIZ30vt
+         wNFQlKdbtf4eQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nPpc1-00C1Wj-7A; Thu, 03 Mar 2022 17:51:37 +0000
+Date:   Thu, 03 Mar 2022 17:51:36 +0000
+Message-ID: <87pmn22ac7.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Sebastian Ene <sebastianene@google.com>
+Cc:     kvm@vger.kernel.org, qperret@google.com, will@kernel.org,
+        julien.thierry.kdev@gmail.com
+Subject: Re: [PATCH kvmtool v7 2/3] aarch64: Add stolen time support
+In-Reply-To: <YiCuBsKsh4TAZqTs@google.com>
+References: <20220302140734.1015958-1-sebastianene@google.com>
+        <20220302140734.1015958-3-sebastianene@google.com>
+        <8735k02z98.wl-maz@kernel.org>
+        <YiCuBsKsh4TAZqTs@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: sebastianene@google.com, kvm@vger.kernel.org, qperret@google.com, will@kernel.org, julien.thierry.kdev@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> +++ b/drivers/virt/coco/sevguest/Kconfig
-> @@ -0,0 +1,12 @@
-> +config SEV_GUEST
-> +	tristate "AMD SEV Guest driver"
-> +	default m
-> +	depends on AMD_MEM_ENCRYPT && CRYPTO_AEAD2
-> +	help
-> +	  SEV-SNP firmware provides the guest a mechanism to communicate with
-> +	  the PSP without risk from a malicious hypervisor who wishes to read,
-> +	  alter, drop or replay the messages sent. The driver provides
-> +	  userspace interface to communicate with the PSP to request the
-> +	  attestation report and more.
-> +
-> +	  If you choose 'M' here, this module will be called sevguest.
-...
-> +/* Return a non-zero on success */
-> +static u64 snp_get_msg_seqno(struct snp_guest_dev *snp_dev)
-> +{
-> +	u64 count = __snp_get_msg_seqno(snp_dev);
-> +
-> +	/*
-> +	 * The message sequence counter for the SNP guest request is a  64-bit
-> +	 * value but the version 2 of GHCB specification defines a 32-bit storage
-> +	 * for it. If the counter exceeds the 32-bit value then return zero.
-> +	 * The caller should check the return value, but if the caller happens to
-> +	 * not check the value and use it, then the firmware treats zero as an
-> +	 * invalid number and will fail the  message request.
-> +	 */
-> +	if (count >= UINT_MAX) {
-> +		pr_err_ratelimited("request message sequence counter overflow\n");
-> +		return 0;
-> +	}
-> +
-> +	return count;
-> +}
+On Thu, 03 Mar 2022 12:01:10 +0000,
+Sebastian Ene <sebastianene@google.com> wrote:
+> 
+> > > +int kvm_cpu__setup_pvtime(struct kvm_cpu *vcpu)
+> > > +{
+> > > +	int ret;
+> > > +	bool has_stolen_time;
+> > > +	u64 pvtime_guest_addr = ARM_PVTIME_MMIO_BASE + vcpu->cpu_id *
+> > > +		ARM_PVTIME_STRUCT_SIZE;
+> > > +	struct kvm_config *kvm_cfg = NULL;
+> > > +	struct kvm_device_attr pvtime_attr = (struct kvm_device_attr) {
+> > > +		.group	= KVM_ARM_VCPU_PVTIME_CTRL,
+> > > +		.addr	= KVM_ARM_VCPU_PVTIME_IPA
+> > > +	};
+> > > +
+> > > +	kvm_cfg = &vcpu->kvm->cfg;
+> > > +	if (kvm_cfg->no_pvtime)
+> > > +		return 0;
+> > > +
+> > > +	if (!pvtime_data.is_supported)
+> > > +		return -ENOTSUP;
+> > 
+> > It is a bit odd to have this hard failure if running on a system that
+> > doesn't have pvtime. It forces the user to alter their command-line,
+> > which is a bit annoying. I'd rather have a soft-fail here.
+> > 
+> 
+> The flag 'is_supported' is set to false when we support pvtime but we
+> fail to configure it. We verify that we support pvtime by calling the check
+> extension KVM_CAP_STEAL_TIME. I think the naming is odd here for the
+> flag name. It should be : 'is_failed_cfg'.
 
-I didn't see a pr_fmt defined anywhere.  But, for a "driver", should
-this be a dev_err()?
+Ah, I see. Yes, the name is misleading.
 
-...
-> +static void free_shared_pages(void *buf, size_t sz)
-> +{
-> +	unsigned int npages = PAGE_ALIGN(sz) >> PAGE_SHIFT;
-> +
-> +	if (!buf)
-> +		return;
-> +
-> +	if (WARN_ONCE(set_memory_encrypted((unsigned long)buf, npages),
-> +		      "failed to restore encryption mask (leak it)\n"))
-> +		return;
-> +
-> +	__free_pages(virt_to_page(buf), get_order(sz));
-> +}
+>
+> > > +
+> > > +	has_stolen_time = kvm__supports_extension(vcpu->kvm,
+> > > +						  KVM_CAP_STEAL_TIME);
+> > > +	if (!has_stolen_time)
+> > > +		return 0;
 
-Nit: It's a bad practice to do important things inside a WARN_ON() _or_
-and if().  This should be:
+Here, you could force no_pvtime to 1, and avoid checking for each vcpu
+once you detected that the host is not equipped to deal with it.
 
-	int ret;
+Thanks,
 
-	...
+	M.
 
-	ret = set_memory_encrypted((unsigned long)buf, npages));
-
-	if (ret) {
-		WARN_ONCE(...);
-		return;
-	}
-	
-BTW, this look like a generic allocator thingy.  But it's only ever used
-to allocate a 'struct snp_guest_msg'.  Why all the trouble to allocate
-and free one fixed-size structure?  The changelog and comments don't
-shed any light.
+-- 
+Without deviation from the norm, progress is not possible.
