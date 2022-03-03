@@ -2,48 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A9C864CB7CA
+	by mail.lfdr.de (Postfix) with ESMTP id 5EFB64CB7C9
 	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 08:28:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230224AbiCCH3A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Mar 2022 02:29:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38362 "EHLO
+        id S230251AbiCCH26 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Mar 2022 02:28:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230296AbiCCH2m (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S230266AbiCCH2m (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 3 Mar 2022 02:28:42 -0500
 Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E196DFAC
-        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 23:27:40 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32AEB1B7A9
+        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 23:27:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1646292461; x=1677828461;
+  t=1646292463; x=1677828463;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=KcBiSiPAAMPxH979tDl3bCMRDnlV7SSRwfe7lwKEt24=;
-  b=X6dzEqFMJELJEkcuTvkp2inytkSG8NGBRzr3EhH7Q9K5QMBaLElv5gbq
-   oJjvGYWWwogRK9/3uO28JycOWC+g0ZlgM6vR7iIx3dm/56++H1YJ9Aj3h
-   pct2ufiXACz0Sem6zb0lR9RbR6/G0FCfWth5A20RlG2Xr0AdGALr/NVpt
-   RSqZknroG4EixEFAJ8yKQAgfMfRQHJHAdSvglPVSl+1HQXvYj+4Hwmnwc
-   u0Ewm1Q+bUmA4+q/mQe199oKLb+L82Q1MqC+vx7KeYDkrY23CsVuGZBM6
-   SNnGiZ5bQezeflPLtaKpqy7JeNYcxl2mY7FVBmR/0qzuKwVEvOb+etTvP
-   Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10274"; a="251176977"
+  bh=aUWllZgcNcb3+4EQxRve/ekcY65dBqxxATMgqK0CxdU=;
+  b=aXFJl4GROAczQdPmdUPEVWQm2fHgmKkpg/H+KQWocw0qn03qE0dnHQDv
+   vqQXcDQxMvRaj82Xp8kJmjjO7fQGEd4aVZ4c+qF/SFuVFOYMSgZ7PKmrQ
+   gkoHvv/1D39DbaND4fHnWMqq76fuUu63Nva6z7rMki5g5Qb132bwIHVIC
+   BmwmMAxQKzW6BDB105zn1iLWkjtyfwxHJPz1BRDB9sCPWkFPI5412MmH1
+   rSKaxp/BMx25yLeTWYLcH3Zs02EuiRVt5cGBpr1h+FlDdes9yGDXPdifp
+   PQrTFNE7NReOocP3Z+FsKf6woyx6eXcj8VRSuBWCzsBT+w/vtYtjn+mTP
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10274"; a="251176987"
 X-IronPort-AV: E=Sophos;i="5.90,151,1643702400"; 
-   d="scan'208";a="251176977"
+   d="scan'208";a="251176987"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2022 23:27:38 -0800
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2022 23:27:41 -0800
 X-IronPort-AV: E=Sophos;i="5.90,151,1643702400"; 
-   d="scan'208";a="551631636"
+   d="scan'208";a="551631676"
 Received: from duan-server-s2600bt.bj.intel.com ([10.240.192.123])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2022 23:27:36 -0800
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2022 23:27:39 -0800
 From:   Zhenzhong Duan <zhenzhong.duan@intel.com>
 To:     kvm@vger.kernel.org
 Cc:     pbonzini@redhat.com, seanjc@google.com, yu.c.zhang@intel.com,
         zixuanwang@google.com, marcorr@google.com, jun.nakajima@intel.com,
         erdemaktas@google.com
-Subject: [kvm-unit-tests RFC PATCH 08/17] x86 TDX: Add support for memory accept
-Date:   Thu,  3 Mar 2022 15:18:58 +0800
-Message-Id: <20220303071907.650203-9-zhenzhong.duan@intel.com>
+Subject: [kvm-unit-tests RFC PATCH 09/17] acpi: Add MADT table parse code
+Date:   Thu,  3 Mar 2022 15:18:59 +0800
+Message-Id: <20220303071907.650203-10-zhenzhong.duan@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220303071907.650203-1-zhenzhong.duan@intel.com>
 References: <20220303071907.650203-1-zhenzhong.duan@intel.com>
@@ -59,313 +59,333 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-TDVF supports partial memory accept to optimize boot time and
-leaves remaining memory accept to OS.
+Support LAPIC, X2APIC and WAKEUP sub-table, other sub-table are ignored
+for now. Also add a wakeup wrapping function which is used by TDX.
 
-Accept remaining memory of EFI_UNACCEPTED_MEMORY type at bootup.
-Try 2M page accept first even though hugepage memory isn't used
-in qemu command line currently.
-
-Export below functions so they can be used by TDX specific
-sub-test in the future.
-
-	tdx_shared_mask()
-	tdx_hcall_gpa_intent()
-	tdx_accept_memory()
+The parsed result is stored in id_map[] and acpi_mp_wake_mailbox.
 
 Signed-off-by: Zhenzhong Duan <zhenzhong.duan@intel.com>
 Reviewed-by: Yu Zhang <yu.c.zhang@intel.com>
 ---
- lib/asm-generic/page.h |   7 ++-
- lib/linux/efi.h        |  23 ++++++-
- lib/x86/setup.c        |   2 +-
- lib/x86/tdx.c          | 139 ++++++++++++++++++++++++++++++++++++++++-
- lib/x86/tdx.h          |  20 +++++-
- 5 files changed, 185 insertions(+), 6 deletions(-)
+ lib/x86/acpi.c  | 171 ++++++++++++++++++++++++++++++++++++++++++++++++
+ lib/x86/acpi.h  |  85 ++++++++++++++++++++++++
+ lib/x86/setup.c |   4 ++
+ 3 files changed, 260 insertions(+)
 
-diff --git a/lib/asm-generic/page.h b/lib/asm-generic/page.h
-index 5ed086129657..56f539ac45eb 100644
---- a/lib/asm-generic/page.h
-+++ b/lib/asm-generic/page.h
-@@ -12,8 +12,11 @@
- #include <linux/const.h>
- 
- #define PAGE_SHIFT		12
--#define PAGE_SIZE		(_AC(1,UL) << PAGE_SHIFT)
--#define PAGE_MASK		(~(PAGE_SIZE-1))
-+#define PAGE_SIZE		(_AC(1, UL) << PAGE_SHIFT)
-+#define PAGE_MASK		(~(PAGE_SIZE - 1))
-+#define PMD_SHIFT		21
-+#define PMD_SIZE		(_AC(1, UL) << PMD_SHIFT)
-+#define PMD_MASK		(~(PMD_SIZE - 1))
- 
- #ifndef __ASSEMBLY__
- 
-diff --git a/lib/linux/efi.h b/lib/linux/efi.h
-index 455625aa155d..df9fa7974d87 100644
---- a/lib/linux/efi.h
-+++ b/lib/linux/efi.h
-@@ -96,7 +96,8 @@ typedef	struct {
- #define EFI_MEMORY_MAPPED_IO_PORT_SPACE	12
- #define EFI_PAL_CODE			13
- #define EFI_PERSISTENT_MEMORY		14
--#define EFI_MAX_MEMORY_TYPE		15
-+#define EFI_UNACCEPTED_MEMORY		15
-+#define EFI_MAX_MEMORY_TYPE		16
- 
- /* Attribute values: */
- #define EFI_MEMORY_UC		((u64)0x0000000000000001ULL)	/* uncached */
-@@ -416,6 +417,26 @@ struct efi_boot_memmap {
- 	unsigned long           *buff_size;
- };
- 
-+/*
-+ * efi_memdesc_ptr - get the n-th EFI memmap descriptor
-+ * @map: the start of efi memmap
-+ * @desc_size: the size of space for each EFI memmap descriptor
-+ * @n: the index of efi memmap descriptor
-+ *
-+ * EFI boot service provides the GetMemoryMap() function to get a copy of the
-+ * current memory map which is an array of memory descriptors, each of
-+ * which describes a contiguous block of memory. It also gets the size of the
-+ * map, and the size of each descriptor, etc.
-+ *
-+ * Note that per section 6.2 of UEFI Spec 2.6 Errata A, the returned size of
-+ * each descriptor might not be equal to sizeof(efi_memory_memdesc_t),
-+ * since efi_memory_memdesc_t may be extended in the future. Thus the OS
-+ * MUST use the returned size of the descriptor to find the start of each
-+ * efi_memory_memdesc_t in the memory map array.
-+ */
-+#define efi_memdesc_ptr(map, desc_size, n)			\
-+	((efi_memory_desc_t *)((void *)(map) + ((n) * (desc_size))))
-+
- #define efi_bs_call(func, ...) efi_system_table->boottime->func(__VA_ARGS__)
- #define efi_rs_call(func, ...) efi_system_table->runtime->func(__VA_ARGS__)
- 
-diff --git a/lib/x86/setup.c b/lib/x86/setup.c
-index e834fdfd290c..29202478ae0d 100644
---- a/lib/x86/setup.c
-+++ b/lib/x86/setup.c
-@@ -288,7 +288,7 @@ efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo)
- 	 * TDVF support partial memory accept, accept remaining memory
- 	 * early so memory allocator can use it.
- 	 */
--	status = setup_tdx();
-+	status = setup_tdx(efi_bootinfo);
- 	if (status != EFI_SUCCESS && status != EFI_UNSUPPORTED) {
- 		printf("INTEL TDX setup failed, error = 0x%lx\n", status);
- 		return status;
-diff --git a/lib/x86/tdx.c b/lib/x86/tdx.c
-index 2b2e3164be33..b74c697353d9 100644
---- a/lib/x86/tdx.c
-+++ b/lib/x86/tdx.c
-@@ -10,9 +10,11 @@
-  */
- 
- #include "tdx.h"
+diff --git a/lib/x86/acpi.c b/lib/x86/acpi.c
+index 1a82ced0b90f..6fb8ece7eabe 100644
+--- a/lib/x86/acpi.c
++++ b/lib/x86/acpi.c
+@@ -1,7 +1,12 @@
+ #include "libcflat.h"
 +#include "errno.h"
- #include "bitops.h"
- #include "x86/processor.h"
- #include "x86/smp.h"
-+#include "asm/page.h"
+ #include "acpi.h"
++#include "apic.h"
++#include "asm/barrier.h"
++#include "processor.h"
  
- #define VE_IS_IO_OUT(exit_qual)		(((exit_qual) & 8) ? 0 : 1)
- #define VE_GET_IO_SIZE(exit_qual)	(((exit_qual) & 7) + 1)
-@@ -124,6 +126,42 @@ done:
- 	return !!tdx_guest;
+ #ifdef TARGET_EFI
++unsigned char online_cpus[(MAX_TEST_CPUS + 7) / 8];
+ struct rsdp_descriptor *efi_rsdp = NULL;
+ 
+ void set_efi_rsdp(struct rsdp_descriptor *rsdp)
+@@ -16,6 +21,172 @@ static struct rsdp_descriptor *get_rsdp(void)
+ 	}
+ 	return efi_rsdp;
  }
- 
-+static struct {
-+	unsigned int gpa_width;
-+	unsigned long attributes;
-+} td_info;
 +
-+/* The highest bit of a guest physical address is the "sharing" bit */
-+phys_addr_t tdx_shared_mask(void)
++struct acpi_madt_multiproc_wakeup_mailbox *acpi_mp_wake_mailbox;
++
++#define smp_store_release(p, val)					\
++do {									\
++	barrier();							\
++	WRITE_ONCE(*p, val);						\
++} while (0)
++
++static inline bool test_bit(int nr, const void *addr)
 +{
-+	return 1ULL << (td_info.gpa_width - 1);
++	const u32 *p = (const u32 *)addr;
++	return ((1UL << (nr & 31)) & (p[nr >> 5])) != 0;
 +}
 +
-+static void tdx_get_info(void)
++int acpi_wakeup_cpu(int apicid, unsigned long start_ip)
 +{
-+	struct tdx_module_output out;
-+	u64 ret;
++	u8 timeout = 0xFF;
 +
 +	/*
-+	 * TDINFO TDX Module call is used to get the TD
-+	 * execution environment information like GPA
-+	 * width, number of available vcpus, debug mode
-+	 * information, etc. More details about the ABI
-+	 * can be found in TDX Guest-Host-Communication
-+	 * Interface (GHCI), sec 2.4.2 TDCALL [TDG.VP.INFO].
++	 * According to the ACPI specification r6.4, sec 5.2.12.19, the
++	 * mailbox-based wakeup mechanism cannot be used more than once
++	 * for the same CPU, so skip sending wake commands to already
++	 * awake CPU.
 +	 */
-+	ret = __tdx_module_call(TDX_GET_INFO, 0, 0, 0, 0, &out);
-+
-+	/*
-+	 * Non zero return means buggy TDX module (which is
-+	 * fatal). So raise a BUG().
-+	 */
-+	BUG_ON(ret);
-+
-+	td_info.gpa_width = out.rcx & GENMASK(5, 0);
-+	td_info.attributes = out.rdx;
-+}
-+
- /*
-  * Wrapper for standard use of __tdx_hypercall with BUG_ON() check
-  * for TDCALL error.
-@@ -393,11 +431,110 @@ static void tdx_handle_ve(struct ex_regs *regs)
- 	tdx_handle_virtualization_exception(regs, &ve);
- }
- 
--efi_status_t setup_tdx(void)
-+static u64 tdx_accept_page(phys_addr_t gpa, bool page_2mb)
-+{
-+	/*
-+	 * Pass the page physical address and size (4KB|2MB) to the
-+	 * TDX module to accept the pending, private page. More info
-+	 * about ABI can be found in TDX Guest-Host-Communication
-+	 * Interface (GHCI), sec 2.4.7.
-+	 */
-+
-+	if (page_2mb)
-+		gpa |= 1;
-+
-+	return __tdx_module_call(TDX_ACCEPT_PAGE, gpa, 0, 0, 0, NULL);
-+}
-+
-+/*
-+ * Inform the VMM of the guest's intent for this physical page:
-+ * shared with the VMM or private to the guest.  The VMM is
-+ * expected to change its mapping of the page in response.
-+ */
-+int tdx_hcall_gpa_intent(phys_addr_t start, phys_addr_t end,
-+			 enum tdx_map_type map_type)
-+{
-+	u64 ret = 0;
-+
-+	if (map_type == TDX_MAP_SHARED) {
-+		start |= tdx_shared_mask();
-+		end |= tdx_shared_mask();
++	if (test_bit(apicid, online_cpus)) {
++		printf("CPU already awake (APIC ID %x), skipping wakeup\n",
++		       apicid);
++		return -EINVAL;
 +	}
 +
 +	/*
-+	 * Notify VMM about page mapping conversion. More info
-+	 * about ABI can be found in TDX Guest-Host-Communication
-+	 * Interface (GHCI), sec 3.2.
++	 * Mailbox memory is shared between firmware and OS. Firmware will
++	 * listen on mailbox command address, and once it receives the wakeup
++	 * command, CPU associated with the given apicid will be booted. So,
++	 * the value of apic_id and wakeup_vector has to be set before updating
++	 * the wakeup command. So use smp_store_release to let the compiler know
++	 * about it and preserve the order of writes.
 +	 */
-+	ret = _tdx_hypercall(TDVMCALL_MAP_GPA, start, end - start, 0, 0,
-+			     NULL);
-+	if (ret)
-+		ret = -EIO;
++	smp_store_release(&acpi_mp_wake_mailbox->apic_id, apicid);
++	smp_store_release(&acpi_mp_wake_mailbox->wakeup_vector, start_ip);
++	smp_store_release(&acpi_mp_wake_mailbox->command,
++			  ACPI_MP_WAKE_COMMAND_WAKEUP);
 +
-+	if (ret || map_type == TDX_MAP_SHARED)
-+		return ret;
 +	/*
-+	 * For shared->private conversion, accept the page using
-+	 * TDX_ACCEPT_PAGE TDX module call.
++	 * After writing wakeup command, wait for maximum timeout of 0xFF
++	 * for firmware to reset the command address back zero to indicate
++	 * the successful reception of command.
++	 * NOTE: 255 as timeout value is decided based on our experiments.
++	 *
++	 * XXX: Change the timeout once ACPI specification comes up with
++	 *      standard maximum timeout value.
 +	 */
-+	while (start < end) {
-+		/* Try 2M page accept first if possible */
-+		if (!(start & ~PMD_MASK) && end - start >= PMD_SIZE &&
-+				!tdx_accept_page(start, true)) {
-+			start += PMD_SIZE;
-+			continue;
-+		}
++	while (READ_ONCE(acpi_mp_wake_mailbox->command) && timeout--)
++		cpu_relax();
 +
-+		if (tdx_accept_page(start, false))
-+			return -EIO;
-+		start += PAGE_SIZE;
++	if (timeout) {
++		/*
++		 * If the CPU wakeup process is successful, store the
++		 * status in online_cpus to prevent re-wakeup
++		 * requests.
++		 */
++		set_bit(apicid, online_cpus);
++		return 0;
 +	}
 +
-+	return 0;
++	/* If timed out (timeout == 0), return error */
++	return -EIO;
 +}
 +
-+bool tdx_accept_memory(phys_addr_t start, phys_addr_t end)
++static bool parse_madt_table(struct acpi_table *madt)
 +{
-+	if (tdx_hcall_gpa_intent(start, end, TDX_MAP_PRIVATE)) {
-+		tdx_printf("Accepting memory failed\n");
-+		return false;
-+	}
-+	return true;
-+}
++	u64 table_start = (unsigned long)madt + sizeof(struct acpi_table_madt);
++	u64 table_end = (unsigned long)madt + madt->length;
++	struct acpi_subtable_header *sub_table;
++	bool failed = false;
++	u32 uid, apic_id;
++	u8 enabled;
 +
-+static bool tdx_accept_memory_regions(struct efi_boot_memmap *mem_map)
-+{
-+	unsigned long i, nr_desc = *mem_map->map_size / *mem_map->desc_size;
-+	efi_memory_desc_t *d;
++	while (table_start < table_end && !failed) {
++		struct acpi_madt_local_apic *processor;
++		struct acpi_madt_local_x2apic *processor2;
++		struct acpi_madt_multiproc_wakeup *mp_wake;
 +
-+	for (i = 0; i < nr_desc; i++) {
-+		d = efi_memdesc_ptr(*mem_map->map, *mem_map->desc_size, i);
++		sub_table = (struct acpi_subtable_header *)table_start;
 +
-+		if (d->type == EFI_UNACCEPTED_MEMORY) {
-+			if (d->phys_addr & ~PAGE_MASK) {
-+				tdx_printf("WARN: EFI: unaligned base %lx\n",
-+					   d->phys_addr);
-+				d->phys_addr &= PAGE_MASK;
++		switch (sub_table->type) {
++		case ACPI_MADT_TYPE_LOCAL_APIC:
++			processor = (struct acpi_madt_local_apic *)sub_table;
++
++			if (BAD_MADT_ENTRY(processor, table_end)) {
++				failed = true;
++				break;
 +			}
-+			if (!tdx_accept_memory(d->phys_addr, d->phys_addr +
-+					       PAGE_SIZE * d->num_pages))
-+				return false;
 +
-+			d->type = EFI_CONVENTIONAL_MEMORY;
++			uid = processor->processor_id;
++			apic_id = processor->id;
++			enabled = processor->lapic_flags & ACPI_MADT_ENABLED;
++
++			/* Ignore invalid ID */
++			if (apic_id == 0xff)
++				break;
++			if (enabled)
++				id_map[uid] = apic_id;
++
++			printf("apicid %x uid %x %s\n", apic_id, uid,
++			       enabled ? "enabled" : "disabled");
++			break;
++
++		case ACPI_MADT_TYPE_LOCAL_X2APIC:
++			processor2 = (struct acpi_madt_local_x2apic *)sub_table;
++
++			if (BAD_MADT_ENTRY(processor2, table_end)) {
++				failed = true;
++				break;
++			}
++
++			uid = processor2->uid;
++			apic_id = processor2->local_apic_id;
++			enabled = processor2->lapic_flags & ACPI_MADT_ENABLED;
++
++			/* Ignore invalid ID */
++			if (apic_id == 0xffffffff)
++				break;
++			if (enabled)
++				id_map[uid] = apic_id;
++
++			printf("x2apicid %x uid %x %s\n", apic_id, uid,
++			       enabled ? "enabled" : "disabled");
++			break;
++		case ACPI_MADT_TYPE_MULTIPROC_WAKEUP:
++			mp_wake = (struct acpi_madt_multiproc_wakeup *)sub_table;
++
++			if (BAD_MADT_ENTRY(mp_wake, table_end)) {
++				failed = true;
++				break;
++			}
++
++			if (acpi_mp_wake_mailbox)
++				printf("WARN: duplicate mailbox %lx\n", (u64)acpi_mp_wake_mailbox);
++
++			acpi_mp_wake_mailbox = (void *)mp_wake->base_address;
++			printf("MP Wake (Mailbox version[%d] base_address[%lx])\n",
++					mp_wake->mailbox_version, mp_wake->base_address);
++			break;
++		default:
++			/* Ignored currently */
++			break;
 +		}
++		if (!failed)
++			table_start += sub_table->length;
 +	}
-+	return true;
++
++	return !failed;
 +}
 +
-+efi_status_t setup_tdx(efi_bootinfo_t *efi_bootinfo)
++bool parse_acpi_table(void)
++{
++	struct acpi_table *tb;
++
++	tb = find_acpi_table_addr(MADT_SIGNATURE);
++	if (tb)
++		return parse_madt_table(tb);
++
++	return false;
++}
+ #else
+ static struct rsdp_descriptor *get_rsdp(void)
  {
- 	if (!is_tdx_guest())
- 		return EFI_UNSUPPORTED;
+diff --git a/lib/x86/acpi.h b/lib/x86/acpi.h
+index 67ba3899b1d7..509d9b5bb0b4 100644
+--- a/lib/x86/acpi.h
++++ b/lib/x86/acpi.h
+@@ -10,6 +10,7 @@
+ #define RSDT_SIGNATURE ACPI_SIGNATURE('R','S','D','T')
+ #define FACP_SIGNATURE ACPI_SIGNATURE('F','A','C','P')
+ #define FACS_SIGNATURE ACPI_SIGNATURE('F','A','C','S')
++#define MADT_SIGNATURE ACPI_SIGNATURE('A','P','I','C')
  
-+	tdx_get_info();
-+	if (!tdx_accept_memory_regions(&efi_bootinfo->mem_map))
-+		return EFI_OUT_OF_RESOURCES;
-+
- 	handle_exception(20, tdx_handle_ve);
  
- 	printf("Initialized TDX.\n");
-diff --git a/lib/x86/tdx.h b/lib/x86/tdx.h
-index 68ddc136d1d9..2f938038dc45 100644
---- a/lib/x86/tdx.h
-+++ b/lib/x86/tdx.h
-@@ -30,7 +30,12 @@
- #define EXIT_REASON_MSR_WRITE           32
- 
- /* TDX Module call Leaf IDs */
-+#define TDX_GET_INFO			1
- #define TDX_GET_VEINFO			3
-+#define TDX_ACCEPT_PAGE			6
-+
-+/* TDX hypercall Leaf IDs */
-+#define TDVMCALL_MAP_GPA		0x10001
- 
- /*
-  * Used in __tdx_module_call() helper function to gather the
-@@ -76,8 +81,21 @@ struct ve_info {
- 	u32 instr_info;
+ #define ACPI_SIGNATURE_8BYTE(c1, c2, c3, c4, c5, c6, c7, c8) \
+@@ -46,6 +47,88 @@ struct acpi_table {
+     char data[0];
  };
  
-+/*
-+ * Page mapping type enum. This is software construct not
-+ * part of any hardware or VMM ABI.
-+ */
-+enum tdx_map_type {
-+	TDX_MAP_PRIVATE,
-+	TDX_MAP_SHARED,
++/*******************************************************************************
++ *
++ * MADT - Multiple APIC Description Table
++ *        Version 3
++ *
++ ******************************************************************************/
++
++struct acpi_table_madt {
++	ACPI_TABLE_HEADER_DEF
++	u32 address;            /* Physical address of local APIC */
++	u32 flags;
 +};
 +
- bool is_tdx_guest(void);
--efi_status_t setup_tdx(void);
-+phys_addr_t tdx_shared_mask(void);
-+int tdx_hcall_gpa_intent(phys_addr_t start, phys_addr_t end,
-+			 enum tdx_map_type map_type);
-+bool tdx_accept_memory(phys_addr_t start, phys_addr_t end);
-+efi_status_t setup_tdx(efi_bootinfo_t *efi_bootinfo);
++/* Generic subtable header (used in MADT, SRAT, etc.) */
++
++struct acpi_subtable_header {
++	u8 type;
++	u8 length;
++};
++
++#define ACPI_MADT_TYPE_LOCAL_APIC	0
++#define ACPI_MADT_TYPE_LOCAL_X2APIC	9
++#define ACPI_MADT_TYPE_MULTIPROC_WAKEUP	16
++
++#define BAD_MADT_ENTRY(entry, end) (                                        \
++		(!entry) || (unsigned long)entry + sizeof(*entry) > end ||  \
++		((struct acpi_subtable_header *)entry)->length < sizeof(*entry))
++
++/*
++ * MADT Subtables, correspond to Type in struct acpi_subtable_header
++ */
++
++/* 0: Processor Local APIC */
++
++struct acpi_madt_local_apic {
++	struct acpi_subtable_header header;
++	u8 processor_id;        /* ACPI processor id */
++	u8 id;                  /* Processor's local APIC id */
++	u32 lapic_flags;
++};
++
++/* 9: Processor Local X2APIC (ACPI 4.0) */
++
++struct acpi_madt_local_x2apic {
++	struct acpi_subtable_header header;
++	u16 reserved;           /* reserved - must be zero */
++	u32 local_apic_id;      /* Processor x2APIC ID  */
++	u32 lapic_flags;
++	u32 uid;                /* ACPI processor UID */
++};
++
++/* 16: Multiprocessor wakeup (ACPI 6.4) */
++
++struct acpi_madt_multiproc_wakeup {
++	struct acpi_subtable_header header;
++	u16 mailbox_version;
++	u32 reserved;		/* reserved - must be zero */
++	u64 base_address;
++};
++
++#define ACPI_MULTIPROC_WAKEUP_MB_OS_SIZE        2032
++#define ACPI_MULTIPROC_WAKEUP_MB_FIRMWARE_SIZE  2048
++
++struct acpi_madt_multiproc_wakeup_mailbox {
++	u16 command;
++	u16 reserved;		/* reserved - must be zero */
++	u32 apic_id;
++	u64 wakeup_vector;
++	u8 reserved_os[ACPI_MULTIPROC_WAKEUP_MB_OS_SIZE];	/* reserved for OS use */
++	u8 reserved_firmware[ACPI_MULTIPROC_WAKEUP_MB_FIRMWARE_SIZE];	/* reserved for firmware use */
++};
++
++#define ACPI_MP_WAKE_COMMAND_WAKEUP	1
++
++/*
++ * Common flags fields for MADT subtables
++ */
++
++/* MADT Local APIC flags */
++
++#define ACPI_MADT_ENABLED		(1) /* 00: Processor is usable if set */
++
+ struct rsdt_descriptor_rev1 {
+     ACPI_TABLE_HEADER_DEF
+     u32 table_offset_entry[0];
+@@ -108,5 +191,7 @@ struct facs_descriptor_rev1
  
- /* Helper function used to communicate with the TDX module */
- u64 __tdx_module_call(u64 fn, u64 rcx, u64 rdx, u64 r8, u64 r9,
+ void set_efi_rsdp(struct rsdp_descriptor *rsdp);
+ void* find_acpi_table_addr(u32 sig);
++int acpi_wakeup_cpu(int apicid, unsigned long start_ip);
++bool parse_acpi_table(void);
+ 
+ #endif
+diff --git a/lib/x86/setup.c b/lib/x86/setup.c
+index 29202478ae0d..63c4dbb25064 100644
+--- a/lib/x86/setup.c
++++ b/lib/x86/setup.c
+@@ -314,6 +314,10 @@ efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo)
+ 		return status;
+ 	}
+ 
++	/* Parse all acpi tables, currently only MADT table */
++	if (!parse_acpi_table())
++		return EFI_NOT_FOUND;
++
+ 	phase = "AMD SEV";
+ 	status = setup_amd_sev();
+ 
 -- 
 2.25.1
 
