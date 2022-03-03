@@ -2,72 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 82C7F4CBD23
-	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 12:51:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 828194CBD3D
+	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 13:00:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232521AbiCCLwL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Mar 2022 06:52:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47942 "EHLO
+        id S231440AbiCCMA5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Mar 2022 07:00:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46330 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229848AbiCCLwK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Mar 2022 06:52:10 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5BA7F94FD;
-        Thu,  3 Mar 2022 03:51:22 -0800 (PST)
-Received: from nazgul.tnic (nat0.nue.suse.com [IPv6:2001:67c:2178:4000::1111])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 237E61EC032C;
-        Thu,  3 Mar 2022 12:51:17 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1646308277;
+        with ESMTP id S229837AbiCCMAy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Mar 2022 07:00:54 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DA6D016C4F8
+        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 04:00:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646308807;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=4etORIg2Q6KJ92tEY8v0D9IqX+zqC98LN3nMR0UBOqA=;
-        b=dWOeNnBF7RaxfscWLq+DFbNU8NUKF85I2GUUohS4muRNYSW163/4jCh3x+ITc+ckdPvo25
-        IE2nqZFAlPScH8tklRX9QRDxdTDsBSMRVehoLhn7MH62b6JEmH3JS66iXecq7agtZpVVFC
-        SWiu4T172cJ4CdTwu49FO/VBRl8WN1M=
-Date:   Thu, 3 Mar 2022 12:51:20 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+         content-transfer-encoding:content-transfer-encoding;
+        bh=RkYx8BXwwh5aXXB4HkCwMQFLwcuxo1yn4UgLAsD1Dfs=;
+        b=CogcfqHap0LM1IBTOBRTHiUMyc6psVyvZ7HLiorQMJWPP4nBmOv1h34Q52kGF1CZU6YAhJ
+        asVmhzhq9N/ry+9p6Z4BlTY5T2M3vqJ9BjNnfWbbef7N0RxcTYIz6JuH5Q3GKNqAwmIlma
+        5wA724Ykddf/Y8UX4ClR53hz1I9QNZM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-584-UiBKztlxOvKZl7V-c7T0JQ-1; Thu, 03 Mar 2022 07:00:04 -0500
+X-MC-Unique: UiBKztlxOvKZl7V-c7T0JQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4045AFC81;
+        Thu,  3 Mar 2022 12:00:02 +0000 (UTC)
+Received: from toolbox.redhat.com (unknown [10.33.37.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DD960842DE;
+        Thu,  3 Mar 2022 11:58:51 +0000 (UTC)
+From:   Sergio Lopez <slp@redhat.com>
+To:     qemu-devel@nongnu.org
+Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        brijesh.ksingh@gmail.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH v11 39/45] x86/sev: Use firmware-validated CPUID for
- SEV-SNP guests
-Message-ID: <YiCrp61CoqJUXm5q@nazgul.tnic>
-References: <20220224165625.2175020-1-brijesh.singh@amd.com>
- <20220224165625.2175020-40-brijesh.singh@amd.com>
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Elena Ufimtseva <elena.ufimtseva@oracle.com>,
+        kvm@vger.kernel.org, Halil Pasic <pasic@linux.ibm.com>,
+        Fam Zheng <fam@euphon.net>,
+        John G Johnson <john.g.johnson@oracle.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Hanna Reitz <hreitz@redhat.com>,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+        qemu-s390x@nongnu.org, vgoyal@redhat.com,
+        Jagannathan Raman <jag.raman@oracle.com>,
+        Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+        Eric Farman <farman@linux.ibm.com>,
+        Sergio Lopez <slp@redhat.com>
+Subject: [PATCH v3 0/4] Enable vhost-user to be used on BSD systems
+Date:   Thu,  3 Mar 2022 12:59:07 +0100
+Message-Id: <20220303115911.20962-1-slp@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20220224165625.2175020-40-brijesh.singh@amd.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -75,22 +76,49 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 24, 2022 at 10:56:19AM -0600, Brijesh Singh wrote:
-> Also add an "sev_debug" kernel command-line parameter that will be used
-> (initially) to dump the CPUID table for debugging/analysis.
+Since QEMU is already able to emulate ioeventfd using pipefd, we're already=
+=0D
+pretty close to supporting vhost-user on non-Linux systems.=0D
+=0D
+This two patches bridge the gap by:=0D
+=0D
+1. Adding a new event_notifier_get_wfd() to return wfd on the places where=
+=0D
+   the peer is expected to write to the notifier.=0D
+=0D
+2. Modifying the build system to it allows enabling vhost-user on BSD.=0D
+=0D
+v1->v2:=0D
+  - Drop: "Allow returning EventNotifier's wfd" (Alex Williamson)=0D
+  - Add: "event_notifier: add event_notifier_get_wfd()" (Alex Williamson)=0D
+  - Add: "vhost: use wfd on functions setting vring call fd"=0D
+  - Rename: "Allow building vhost-user in BSD" to "configure, meson: allow=
+=0D
+    enabling vhost-user on all POSIX systems"=0D
+  - Instead of making possible enabling vhost-user on Linux and BSD systems=
+,=0D
+    allow enabling it on all non-Windows platforms. (Paolo Bonzini)=0D
+=0D
+v2->v3:=0D
+  - Add a section to docs/interop/vhost-user.rst explaining how vhost-user=
+=0D
+    is supported on non-Linux platforms. (Stefan Hajnoczi)=0D
+=0D
+Sergio Lopez (4):=0D
+  event_notifier: add event_notifier_get_wfd()=0D
+  vhost: use wfd on functions setting vring call fd=0D
+  configure, meson: allow enabling vhost-user on all POSIX systems=0D
+  docs: vhost-user: add subsection for non-Linux platforms=0D
+=0D
+ configure                     |  4 ++--=0D
+ docs/interop/vhost-user.rst   | 18 ++++++++++++++++++=0D
+ hw/virtio/vhost.c             |  6 +++---=0D
+ include/qemu/event_notifier.h |  1 +=0D
+ meson.build                   |  2 +-=0D
+ util/event_notifier-posix.c   |  5 +++++=0D
+ 6 files changed, 30 insertions(+), 6 deletions(-)=0D
+=0D
+-- =0D
+2.35.1=0D
+=0D
 
-No, not "sev_debug" - "sev=debug".
-
-I'm pretty sure there will be need for other SEV-specific cmdline
-options so this thing should be a set, i.e.,
-	"sev=(option1,option2?,option3?,...)"
-
-etc.
-
-See mcheck_enable() and the comment above it for an example.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
