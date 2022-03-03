@@ -2,163 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9FFC04CB5F2
-	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 05:50:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 65CEE4CB60D
+	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 05:58:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229620AbiCCEv1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Mar 2022 23:51:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46180 "EHLO
+        id S229694AbiCCE7U convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Wed, 2 Mar 2022 23:59:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229607AbiCCEv0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Mar 2022 23:51:26 -0500
-Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29B8F11C7D0
-        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 20:50:40 -0800 (PST)
-Received: by mail-pg1-x535.google.com with SMTP id e6so3529830pgn.2
-        for <kvm@vger.kernel.org>; Wed, 02 Mar 2022 20:50:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=gze3j/1d/iOM5LmLeKWf8llBUc0y0bOeU/xT4taGqMg=;
-        b=ZxCbPUL09Pt+l9ErS+6ngwAma8BpiET5p+DE0e1O4Xg3Y7dRLDoPMzn1gbjynvbZTA
-         BiAK2ftZoebIbw0nNt1ud5EtdnMDO9fV8U7FHpfsWdTlPm4EvvuApPJR8vxMiPvlhRIm
-         UqQ8TlSR1UHyZKX/z9k0rG/NKg7lW0ajDUP0VVWpRCfm88tV+TVcQnwA5B0ppU+UD95C
-         9BGFhSA8VwtZ/0X2/B+Ct4upbbBwcu05fHLmQCnInnk4kD6SVQ5CBwCGiHW3o+3U1dIM
-         6EhPwRGyEN22a1JKYqJAHhdGM4CZ3IDQwC1EXD/XGMPk9xzPpWGcW6zThLy6jfqfbYBK
-         esbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=gze3j/1d/iOM5LmLeKWf8llBUc0y0bOeU/xT4taGqMg=;
-        b=oW+Q8qo6o1cLGPCmOsigJ7J3lSRPAbA7f6t3ug3gF53btZ97E47BsIE3Tx9rC9kzFc
-         5wZF+E3x1qxQ+cj6qaM0QloujUfWmGm7Us7+iPG2Kpi4UUShq4vkJoYWoKwX3qdmMBSR
-         YMl9m7g6EsKiCbxHCY/iPjkyeA63r3QH6aYJktV0UIyXlSvtw8OX3JWIxnnj5lY4OGGa
-         3WFiXTgfnrnKcL51eiV1DeyC9Nj06YjdHWag4EMQ5QRB4ZSvnWSFbjgyWhv36ntyMmad
-         eixVsk34USrjyOu2XZVJWKjFnkbGS2PqQux4L8OoMMaekqPzWH6F/MK3yBNHzhNgEc5R
-         mfKA==
-X-Gm-Message-State: AOAM533hBGpoyTLKifO2Ki84AhsZQI3d4gqxi6s/xacCok/2/OhnOrmu
-        y88c35JJuuFR51pSnJ4aQscH+w==
-X-Google-Smtp-Source: ABdhPJwWodNuB4r9bSMlgvX/oD3qX+/xQpSRDHfLXivnw/0qFhxbmQR32lNLjrsMGKanWnHE4EnV3g==
-X-Received: by 2002:a05:6a00:1503:b0:4e1:d277:cca with SMTP id q3-20020a056a00150300b004e1d2770ccamr36394116pfu.4.1646283039264;
-        Wed, 02 Mar 2022 20:50:39 -0800 (PST)
-Received: from google.com (226.75.127.34.bc.googleusercontent.com. [34.127.75.226])
-        by smtp.gmail.com with ESMTPSA id ng11-20020a17090b1a8b00b001beefe9a1cbsm694005pjb.31.2022.03.02.20.50.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Mar 2022 20:50:38 -0800 (PST)
-Date:   Thu, 3 Mar 2022 04:50:34 +0000
-From:   Mingwei Zhang <mizhang@google.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>
-Subject: Re: [PATCH v3 04/28] KVM: x86/mmu: Formalize TDP MMU's (unintended?)
- deferred TLB flush logic
-Message-ID: <YiBJGmFCdSZwkiTw@google.com>
-References: <20220226001546.360188-1-seanjc@google.com>
- <20220226001546.360188-5-seanjc@google.com>
- <YiAE4ju0a3MWXr31@google.com>
- <YiAH6UfSDyHeMP+s@google.com>
- <YiAXy+I1GcyZ7iFJ@google.com>
- <YiAcvswAIrMi+iXS@google.com>
+        with ESMTP id S229536AbiCCE7P (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Mar 2022 23:59:15 -0500
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D931713D916
+        for <kvm@vger.kernel.org>; Wed,  2 Mar 2022 20:58:28 -0800 (PST)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mtapsc-5-c9saVIHFMHux_Sno3vxg6w-1; Thu, 03 Mar 2022 04:58:25 +0000
+X-MC-Unique: c9saVIHFMHux_Sno3vxg6w-1
+Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) by
+ AcuMS.aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) with Microsoft SMTP
+ Server (TLS) id 15.0.1497.28; Thu, 3 Mar 2022 04:58:23 +0000
+Received: from AcuMS.Aculab.com ([fe80::994c:f5c2:35d6:9b65]) by
+ AcuMS.aculab.com ([fe80::994c:f5c2:35d6:9b65%12]) with mapi id
+ 15.00.1497.028; Thu, 3 Mar 2022 04:58:23 +0000
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'Xiaomeng Tong' <xiam0nd.tong@gmail.com>
+CC:     "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+        "alsa-devel@alsa-project.org" <alsa-devel@alsa-project.org>,
+        "amd-gfx@lists.freedesktop.org" <amd-gfx@lists.freedesktop.org>,
+        "andriy.shevchenko@linux.intel.com" 
+        <andriy.shevchenko@linux.intel.com>,
+        "arnd@arndb.de" <arnd@arndb.de>,
+        "bcm-kernel-feedback-list@broadcom.com" 
+        <bcm-kernel-feedback-list@broadcom.com>,
+        "bjohannesmeyer@gmail.com" <bjohannesmeyer@gmail.com>,
+        "c.giuffrida@vu.nl" <c.giuffrida@vu.nl>,
+        "christian.koenig@amd.com" <christian.koenig@amd.com>,
+        "christophe.jaillet@wanadoo.fr" <christophe.jaillet@wanadoo.fr>,
+        "dan.carpenter@oracle.com" <dan.carpenter@oracle.com>,
+        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
+        "drbd-dev@lists.linbit.com" <drbd-dev@lists.linbit.com>,
+        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+        "gustavo@embeddedor.com" <gustavo@embeddedor.com>,
+        "h.j.bos@vu.nl" <h.j.bos@vu.nl>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+        "jakobkoschel@gmail.com" <jakobkoschel@gmail.com>,
+        "jgg@ziepe.ca" <jgg@ziepe.ca>,
+        "keescook@chromium.org" <keescook@chromium.org>,
+        "kgdb-bugreport@lists.sourceforge.net" 
+        <kgdb-bugreport@lists.sourceforge.net>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-aspeed@lists.ozlabs.org" <linux-aspeed@lists.ozlabs.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-f2fs-devel@lists.sourceforge.net" 
+        <linux-f2fs-devel@lists.sourceforge.net>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-iio@vger.kernel.org" <linux-iio@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
+        "linux-mediatek@lists.infradead.org" 
+        <linux-mediatek@lists.infradead.org>,
+        "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-sgx@vger.kernel.org" <linux-sgx@vger.kernel.org>,
+        "linux-staging@lists.linux.dev" <linux-staging@lists.linux.dev>,
+        "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>,
+        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
+        "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
+        "linux1394-devel@lists.sourceforge.net" 
+        <linux1394-devel@lists.sourceforge.net>,
+        "linux@rasmusvillemoes.dk" <linux@rasmusvillemoes.dk>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+        "nathan@kernel.org" <nathan@kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "nouveau@lists.freedesktop.org" <nouveau@lists.freedesktop.org>,
+        "rppt@kernel.org" <rppt@kernel.org>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "tipc-discussion@lists.sourceforge.net" 
+        <tipc-discussion@lists.sourceforge.net>,
+        "torvalds@linux-foundation.org" <torvalds@linux-foundation.org>,
+        "v9fs-developer@lists.sourceforge.net" 
+        <v9fs-developer@lists.sourceforge.net>
+Subject: RE: [PATCH 2/6] treewide: remove using list iterator after loop body
+ as a ptr
+Thread-Topic: [PATCH 2/6] treewide: remove using list iterator after loop body
+ as a ptr
+Thread-Index: AQHYLhg9+DU/OogLf0+tiSFmjztyUKysHu+QgADRVYCAACVtoA==
+Date:   Thu, 3 Mar 2022 04:58:23 +0000
+Message-ID: <39404befad5b44b385698ff65465abe5@AcuMS.aculab.com>
+References: <1077f17e50d34dc2bbfdf4e52a1cb2fd@AcuMS.aculab.com>
+ <20220303022729.9321-1-xiam0nd.tong@gmail.com>
+In-Reply-To: <20220303022729.9321-1-xiam0nd.tong@gmail.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YiAcvswAIrMi+iXS@google.com>
-X-Spam-Status: No, score=-18.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 03, 2022, Sean Christopherson wrote:
-> On Thu, Mar 03, 2022, Mingwei Zhang wrote:
-> > On Thu, Mar 03, 2022, Sean Christopherson wrote:
-> > > On Wed, Mar 02, 2022, Mingwei Zhang wrote:
-> > > > On Sat, Feb 26, 2022, Sean Christopherson wrote:
-> > > > > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> > > > > index 12866113fb4f..e35bd88d92fd 100644
-> > > > > --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> > > > > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> > > > > @@ -93,7 +93,15 @@ void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
-> > > > >  	list_del_rcu(&root->link);
-> > > > >  	spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
-> > > > >  
-> > > > > -	zap_gfn_range(kvm, root, 0, -1ull, false, false, shared);
-> > > > > +	/*
-> > > > > +	 * A TLB flush is not necessary as KVM performs a local TLB flush when
-> > > > > +	 * allocating a new root (see kvm_mmu_load()), and when migrating vCPU
-> > > > > +	 * to a different pCPU.  Note, the local TLB flush on reuse also
-> > > > > +	 * invalidates any paging-structure-cache entries, i.e. TLB entries for
-> > > > > +	 * intermediate paging structures, that may be zapped, as such entries
-> > > > > +	 * are associated with the ASID on both VMX and SVM.
-> > > > > +	 */
-> > > > > +	(void)zap_gfn_range(kvm, root, 0, -1ull, false, false, shared);
-> > > > 
-> > > > Understood that we could avoid the TLB flush here. Just curious why the
-> > > > "(void)" is needed here? Is it for compile time reason?
-> > > 
-> > > Nope, no functional purpose, though there might be some "advanced" warning or
-> > > static checkers that care.
-> > > 
-> > > The "(void)" is to communicate to human readers that the result is intentionally
-> > > ignored, e.g. to reduce the probability of someone "fixing" the code by acting on
-> > > the result of zap_gfn_range().  The comment should suffice, but it's nice to have
-> > > the code be self-documenting as much as possible.
-> > 
-> > Right, I got the point. Thanks.
-> > 
-> > Coming back. It seems that I pretended to understand that we should
-> > avoid the TLB flush without really knowing why.
-> > 
-> > I mean, leaving (part of the) stale TLB entries unflushed will still be
-> > dangerous right? Or am I missing something that guarantees to flush the
-> > local TLB before returning to the guest? For instance,
-> > kvm_mmu_{re,}load()?
+From: Xiaomeng Tong
+> Sent: 03 March 2022 02:27
 > 
-> Heh, if SVM's ASID management wasn't a mess[*], it'd be totally fine.  The idea,
-> and what EPT architectures mandates, is that each TDP root is associated with an
-> ASID.  So even though there may be stale entries in the TLB for a root, because
-> that root is no longer used those stale entries are unreachable.  And if KVM ever
-> happens to reallocate the same physical page for a root, that's ok because KVM must
-> be paranoid and flush that root (see code comment in this patch).
+> On Wed, 2 Mar 2022 14:04:06 +0000, David Laight
+> <David.Laight@ACULAB.COM> wrote:
+> > I think that it would be better to make any alternate loop macro
+> > just set the variable to NULL on the loop exit.
+> > That is easier to code for and the compiler might be persuaded to
+> > not redo the test.
 > 
-> What we're missing on SVM is proper ASID handling.  If KVM uses ASIDs the way AMD
-> intends them to be used, then this works as intended because each root is again
-> associated with a specific ASID, and KVM just needs to flush when (re)allocating
-> a root and when reusing an ASID (which it already handles).
+> No, that would lead to a NULL dereference.
+
+Why, it would make it b ethe same as the 'easy to use':
+	for (item = head; item; item = item->next) {
+		...
+		if (...)
+			break;
+		...
+	}
+	if (!item)
+		return;
+ 
+> The problem is the mis-use of iterator outside the loop on exit, and
+> the iterator will be the HEAD's container_of pointer which pointers
+> to a type-confused struct. Sidenote: The *mis-use* here refers to
+> mistakely access to other members of the struct, instead of the
+> list_head member which acutally is the valid HEAD.
+
+The problem is that the HEAD's container_of pointer should never
+be calculated at all.
+This is what is fundamentally broken about the current definition.
+
+> IOW, you would dereference a (NULL + offset_of_member) address here.
+
+Where?
+
+> Please remind me if i missed something, thanks.
+>
+> Can you share your "alternative definitions" details? thanks!
+
+The loop should probably use as extra variable that points
+to the 'list node' in the next structure.
+Something like:
+	for (xxx *iter = head->next;
+		iter == &head ? ((item = NULL),0) : ((item = list_item(iter),1));
+		iter = item->member->next) {
+	   ...
+With a bit of casting you can use 'item' to hold 'iter'.
+
 > 
-> [*] https://lore.kernel.org/all/Yh%2FJdHphCLOm4evG@google.com
+> > OTOH there may be alternative definitions that can be used to get
+> > the compiler (or other compiler-like tools) to detect broken code.
+> > Even if the definition can't possibly generate a working kerrnel.
+> 
+> The "list_for_each_entry_inside(pos, type, head, member)" way makes
+> the iterator invisiable outside the loop, and would be catched by
+> compiler if use-after-loop things happened.
 
-Oh, putting AMD issues aside for now.
+It is also a compete PITA for anything doing a search.
 
-I think I might be too narrow down to the zapping logic previously. So,
-I originally think anytime we want to zap, we have to do the following
-things in strict order:
+	David
 
-1) zap SPTEs.
-2) flush TLBs.
-3) flush cache (AMD SEV only).
-4) deallocate shadow pages.
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+Registration No: 1397386 (Wales)
 
-However, if you have already invalidated EPTP (pgd ptr), then step 2)
-becomes optional, since those stale TLBs are no longer useable by the
-guest due to the change of ASID.
-
-Am I understanding the point correctly? So, for all invalidated roots,
-the assumption is that we have already called "kvm_reload_rmote_mmus()",
-which basically update the ASID.
