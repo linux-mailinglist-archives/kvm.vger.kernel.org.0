@@ -2,71 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C04E04CC34C
-	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 17:57:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F7E74CC353
+	for <lists+kvm@lfdr.de>; Thu,  3 Mar 2022 17:59:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235085AbiCCQ5q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Mar 2022 11:57:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60100 "EHLO
+        id S235212AbiCCRA1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Mar 2022 12:00:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40194 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230385AbiCCQ5o (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Mar 2022 11:57:44 -0500
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 940E419DEAC
-        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 08:56:58 -0800 (PST)
-Received: by mail-pg1-x531.google.com with SMTP id o23so5013807pgk.13
-        for <kvm@vger.kernel.org>; Thu, 03 Mar 2022 08:56:58 -0800 (PST)
+        with ESMTP id S230252AbiCCRA0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Mar 2022 12:00:26 -0500
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F74E16203A
+        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 08:59:40 -0800 (PST)
+Received: by mail-pj1-x1033.google.com with SMTP id m11-20020a17090a7f8b00b001beef6143a8so5388861pjl.4
+        for <kvm@vger.kernel.org>; Thu, 03 Mar 2022 08:59:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=E0epGT0NyN75DMnyrgnvgf75tyJ75K4JPqaLbgb0ul8=;
-        b=mqgoW9O8l6XRyzNT9pkEkJDgLRqeD3PIedns7h5AvY0YdUN+TYOr1nOVrUEqq3yfVf
-         +SFgO5kMvjdVShDdb6IDxm6NYeo6pgsE7W5iOTMABofaoq3I5n3fmC5ajtDu7JDkMS1y
-         eAwy8F8DKLGrASZPUM27H02cWnvhYeo80c669EE7IJbFsYzve9THp6HEkY+ZmvF7PG6J
-         f7PYRJu1vuH0gRTmzRCdcMJmRsXhLn+5Vuit76F3rxYO46i2L91MTrIpyaEoJWrTaIF1
-         gcjErt52PJeJrd12JZ4rBGxw5CRtRON9O9OkxgebKS9Stw8wNfSFP35YAMVcSZT4ZKyO
-         Vrsw==
+        bh=TRe594s70/BSgqAig7s+8kVsNXAhB41CkpW4XEV91Hg=;
+        b=Sw0dfYxFJ4mEKPvVublWYLsl673lFfJ18wDifxKlKiovIH089C/9DXqx76iw+U9Wy1
+         c1QZEs/MqMiWOaevM2WlLHTh9kxnCfRnHseHHrArIGj5zCh7NuIA5+mLEPKfM1HDYAjj
+         KeX4REFSgSXsCkIJugPgRW8jOLuV4i4C5vJLDAdw+ygAHwbKFm3tIwOGzm9ZIJ3zLAbi
+         iRov0EnBkeoxOiMZf/W1aSyhlXQPw1zq+pnjcpFm4RjNTAeMRtd3mAomXCp+mhkAANRY
+         SMQDUSV9wuO4oWfxGQwK/UkFWNnnRFDeQSayvqvTNKh9rNu3RdkAwy+P1OtFzm6n7reI
+         wOnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=E0epGT0NyN75DMnyrgnvgf75tyJ75K4JPqaLbgb0ul8=;
-        b=DcChM8yH4dvM7vSMH+KwQgJH4fEfQ+AxS4OeC0nodrJoTTkf1dY2J/ePFL6k/yC2Bi
-         wV+mKMOMFgg3fKqfWsY+gScEhOCDzstOanAX/KFSOlvH+mm9chOECl+AfXgC8rV9Lapk
-         UNChGPs0iSx+KQ1YaTimnqwfZsdBlina/b8kD/iwdpCug+tdrP3Y6/JVydo86mLWS5Yv
-         fengFCOJj1YROT3u+tXbNxKuyCYwpav7iX6pA+bIyiGrHbrEKA2OYQNOCSU6ri6U8etW
-         slObuPNHW42n3EQUA187XyRnIb0tkyBMILOzM26BPeaNlVw1dRmmyCdl50dZDWx1WUJU
-         aAyw==
-X-Gm-Message-State: AOAM532UbWykyNPkvhakw+qbupjY5N/V3Q8h3FJ/75jx5vw50XuK2lme
-        8qa0IKTDPJ0pj2Pqn9eR1yOI5g==
-X-Google-Smtp-Source: ABdhPJyzD5wtRnsX77E3+CshxjS9x8p4UfMWvuB6NjRfZbIyL92Mjkd54E5GHJkWgp4bcYXUKNh46A==
-X-Received: by 2002:a63:ea53:0:b0:341:a28e:16b9 with SMTP id l19-20020a63ea53000000b00341a28e16b9mr30928837pgk.259.1646326617785;
-        Thu, 03 Mar 2022 08:56:57 -0800 (PST)
+        bh=TRe594s70/BSgqAig7s+8kVsNXAhB41CkpW4XEV91Hg=;
+        b=AUQhFGGVj8QLOQb+FzoTa44FVjPU24pu+gKxi+4CPY3nXrI7Z8gB2xu367N3/4D782
+         ngB4HpDmzvf8hoCrNRarw5+WJbgQTYOg9hoa6V3SFEX/JpvNlBNVKFcBCI3WXs14H50H
+         2bGF4dhPAtEoGZQxUzPZ3NUXFJZF4e3AQH8CHYbg922JnTh+qRR4x1vlbZig50BGi84Y
+         viHuwDgRbBIfwT9fzT/q5xTVdWc3pesvbfJCaL9c9pqEyHCmYFHw503orF5OdcMJ6hDh
+         IAnrdTWXdvyG9IlFz8/A9nr1cn/wEcft8fts2m3U/tdbyOszEgzp5EGtH9KlklnPosqd
+         M+yw==
+X-Gm-Message-State: AOAM531XX4cwpedkS2vhlcSJp7duPkyTWly90x6+dv94MfOkfp8ubTBe
+        +ftgHvzYXKZpdZajmwM+r3ef7LpYw+bhSw==
+X-Google-Smtp-Source: ABdhPJxb4kj47xxaByYvUO4XtKKnHahIGOZu3XEgeG5BAzJeSsGKxMgaQOn+rxpNIox3oVhLlWIOmw==
+X-Received: by 2002:a17:903:244d:b0:150:18f3:8e98 with SMTP id l13-20020a170903244d00b0015018f38e98mr37058822pls.28.1646326779923;
+        Thu, 03 Mar 2022 08:59:39 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id g14-20020a65594e000000b003759850ef17sm2583102pgu.31.2022.03.03.08.56.56
+        by smtp.gmail.com with ESMTPSA id a19-20020a17090ad81300b001bc447c2c91sm8558375pjv.31.2022.03.03.08.59.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Mar 2022 08:56:57 -0800 (PST)
-Date:   Thu, 3 Mar 2022 16:56:53 +0000
+        Thu, 03 Mar 2022 08:59:39 -0800 (PST)
+Date:   Thu, 3 Mar 2022 16:59:35 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     kvm@vger.kernel.org, Joerg Roedel <joro@8bytes.org>,
-        x86@kernel.org, Jim Mattson <jmattson@google.com>,
-        linux-kernel@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
+To:     Peter Gonda <pgonda@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "H. Peter Anvin" <hpa@zytor.com>
-Subject: Re: [PATCH] KVM: x86: mmu: trace kvm_mmu_set_spte after the new SPTE
- was set
-Message-ID: <YiDzVRG0VA3LXLrC@google.com>
-References: <20220302102457.588450-1-mlevitsk@redhat.com>
+        LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] KVM: SVM: Fix missing kvm_cache_regs.h include in svm.h
+Message-ID: <YiDz9w7W6+LTRtVz@google.com>
+References: <20220303160442.1815411-1-pgonda@google.com>
+ <YiDsEgxUDZL+XY9R@google.com>
+ <CAMkAt6rwiL_G1w66_rseKSFOTSV4zX8gnb1EOoQNv5TH=ToHGw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220302102457.588450-1-mlevitsk@redhat.com>
+In-Reply-To: <CAMkAt6rwiL_G1w66_rseKSFOTSV4zX8gnb1EOoQNv5TH=ToHGw@mail.gmail.com>
 X-Spam-Status: No, score=-18.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -78,36 +73,16 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 02, 2022, Maxim Levitsky wrote:
-> It makes more sense to print new SPTE value than the
-> old value.
+On Thu, Mar 03, 2022, Peter Gonda wrote:
+> On Thu, Mar 3, 2022 at 9:26 AM Sean Christopherson <seanjc@google.com> wrote:
+> > Ha, we've already got a lovely workaround for exactly this problem.  This patch
+> > should drop the include from svm_onhyperv.c, there's nothing in that file that
+> > needs kvm_cache_regs.h (I verified by deleting use of is_guest_mode()), it's
+> > included purely because of this bug in svm.h.
 > 
+> Ah good catch. I assume I should add kvm_cache_regs.h to
+> arch/x86/kvm/svm/nested.c too since it uses is_guest_mode().
 
-  Fixes: d786c7783b01 ("KVM: MMU: inline set_spte in mmu_set_spte")
-
-And arguably even Cc: stable@vger.kernel.org, though that's unnecessary if this
-gets into 5.17, which it should.
-
-Reviewed-by: Sean Christopherson <seanjc@google.com>
-
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> ---
->  arch/x86/kvm/mmu/mmu.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 94f077722b290..0e209f0b2e1d2 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -2690,8 +2690,8 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
->  	if (*sptep == spte) {
->  		ret = RET_PF_SPURIOUS;
->  	} else {
-> -		trace_kvm_mmu_set_spte(level, gfn, sptep);
->  		flush |= mmu_spte_update(sptep, spte);
-> +		trace_kvm_mmu_set_spte(level, gfn, sptep);
->  	}
->  
->  	if (wrprot) {
-> -- 
-> 2.26.3> 
+Nah, picking it up from svm.h (and several other headers) is ok.  If we required
+every compilation unit to _directly_ include every header, we'd probably double
+the size of the kernel source :-)
