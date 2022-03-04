@@ -2,189 +2,280 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 634964CCA45
-	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 00:50:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BFFF64CCA84
+	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 01:07:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237310AbiCCXun (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Mar 2022 18:50:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39920 "EHLO
+        id S233038AbiCDAIh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Mar 2022 19:08:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56382 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232005AbiCCXul (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Mar 2022 18:50:41 -0500
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2042.outbound.protection.outlook.com [40.107.243.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 455C2166A4D;
-        Thu,  3 Mar 2022 15:49:55 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GF8+yMwcaqaFFYq9drAdS/beo9u9syz9r63S+v2diHLfDXcJCZpylJQwrAHldqg2hXm3HkcVfLHR3WSC5bFVIy93M2tlQerjxUGLJAyCt/OfAY5nqAuLj166PPAuzxZpQZYyBHEimEFleVinpDkaB+PYbL29nypoihtf5nkI0I0iQjMSEdcbqBUwBa7alZ4VCBHLKD/ZcAhp4LOhiIKt/QHckof1ebV7sjMiZgRxbeTpKG2ys8KnKdmn7A3p7inPNjSnx55YS7xCiXYkUY+AXeVIyev70atdoTCQY6Fv9nRHt3iILI9J9D3/spaXMNcPH3LT/H3jpgPzsxPFmBtu5Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YqQe1MvJwX2HKZJo8D25feA67gkw2eZaWBbECMkKil4=;
- b=k88dlq5tVY6xR2iLH+yHxlN8OcPwgJcWfy/nbSZcDR5WvNCdbAtdP5C0GoJ1gHD0tpbO465KUzSFSjqP4Oi5BCzGloG4PNgI0Jq+jWRBZ1jcDBgj8Tsg8bocPZCiGkuK6u1ozt+xzEE3haU3NUcsq1Ff7SEHxwqggEjP2GtHMZGtmv4cd6VMMqeTZHBunp5Qh+K2J5nSsjeXGKaBRn5wsqYln4DKkhMbHbmGf8F5V9HkNblei46Zjn1AVcfMEPdfkh/FkJMk0EKTliAUsILQyUDswqEZ3LjMqmPZA3Leu6hTbUbUg+i/j1VbLdcWAOkXMULQvwnk1fBkD+TCLXkg2g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YqQe1MvJwX2HKZJo8D25feA67gkw2eZaWBbECMkKil4=;
- b=VmvNJugY0jvOdSwznfNzT5qxwAJRVCTCpuYztCLH6doE2kCKeuOIgEWGAzrKtE9fdAoYiMaap0NbinyFyxOTTRXxsbGfV9wh+imUQKKok+Hbj4ddY/hkQeNCNs6F3GYuVJ0zDKd8X3QzfXoLOY0zGZViS2xYD0vw/vA1wRYZuA0x3blh+XnDwBy4DD9A2pWVmDlN8d26BbXycP3rbDigL3a9QUu4AOOG2ObUG0NaVXvYORwTs0dJHbnbk6Fbv/6+1RcKo5vQI16gIs1ZuSJ+uP7zkx6SiVAbMP/5Heh4wqlx8NOriXmcUVYXxlhgllxSYLSEXIHi3QvtP/wOZYXJbQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by BN6PR12MB1281.namprd12.prod.outlook.com (2603:10b6:404:1b::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5038.13; Thu, 3 Mar
- 2022 23:49:52 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::51a0:4aee:2b4c:ca28]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::51a0:4aee:2b4c:ca28%4]) with mapi id 15.20.5038.015; Thu, 3 Mar 2022
- 23:49:52 +0000
-Date:   Thu, 3 Mar 2022 19:49:51 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
-        "yishaih@nvidia.com" <yishaih@nvidia.com>,
-        Linuxarm <linuxarm@huawei.com>,
-        liulongfang <liulongfang@huawei.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        Jonathan Cameron <jonathan.cameron@huawei.com>,
-        "Wangzhou (B)" <wangzhou1@hisilicon.com>
-Subject: Re: [PATCH v7 07/10] vfio: Extend the device migration protocol with
- PRE_COPY
-Message-ID: <20220303234951.GB219866@nvidia.com>
-References: <20220302172903.1995-1-shameerali.kolothum.thodi@huawei.com>
- <20220302172903.1995-8-shameerali.kolothum.thodi@huawei.com>
- <20220302133159.3c803f56.alex.williamson@redhat.com>
- <20220303000528.GW219866@nvidia.com>
- <20220302204752.71ea8b32.alex.williamson@redhat.com>
- <20220303130124.GX219866@nvidia.com>
- <20220303082040.1f88e24c.alex.williamson@redhat.com>
- <0cee64d555624e669028ba17d04b8737@huawei.com>
- <20220303125930.43d9940b.alex.williamson@redhat.com>
+        with ESMTP id S232353AbiCDAIf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Mar 2022 19:08:35 -0500
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5661B3EAB2
+        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 16:07:47 -0800 (PST)
+Received: by mail-pf1-x432.google.com with SMTP id z16so6155605pfh.3
+        for <kvm@vger.kernel.org>; Thu, 03 Mar 2022 16:07:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=f/WVYsNOPwQRpYpJR/QAbLMXPhxPxVMb49eUEPwW+Rw=;
+        b=J5n9kDnH3PSQTd+yFsW5oQydlin1Mea9FaYcGilD65p4NEI89VGcu1mFnj8npKwRhI
+         o//lI3JWkfKIi1xuj/QYlSrdfwGsG/3EtB3ZEuuaJTPt1QDO/U1CZiOfcRIVR2aOAKDe
+         E57+fbQPPu7TjdxC8s9r5OT0JuAUbnvQatGtfsGSI1iY0TK2LbWURl2iHIZy5OOBY5Jt
+         k3e/LRIVi5uRsZ381EL9Zv//IDb9Mm32u/XZ4/ly4RYcVOw2rxShZcm4eAeJUwrwvXK0
+         BMyH+/qzTwxs5CZnlWkXnsvhhOExamNh089XIVep8o3vz6+v08tf+NNOo+cW9ghSEiRn
+         nwoA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=f/WVYsNOPwQRpYpJR/QAbLMXPhxPxVMb49eUEPwW+Rw=;
+        b=QYJrFzFAqY5ZR05igCFIRcyaCxeEe5u54fGElGeDAnSXwAUvMQEvX57lzLKTrpMGEn
+         6Asz/lI09eR7Ne0awYP/hccHGytXU5XH8BPZIeJNdz9gcA8L0T7/qiuXZBYvUoAzke/U
+         7LQlcYivvnQ1gx6fzQCMFZT61WS1PN2Tplsh2OejUAoBqN3bK3mYSmD0W00pijGb82Me
+         NA7OEi73ZrhE95WQt31EuaV1POOttx59ruhnFctTiSiobI073ndstNFlPzX2Z8r18aDw
+         EADtbh9umLjrYsmZOjK7M158iVRDRjKx0vcBM953GyB83LgpylqSdXeMLBhwIKqjC5bA
+         Yu1g==
+X-Gm-Message-State: AOAM5310YeIIIlTIIIFayBPzEOEnqf8scHCqngdedJRg36XR38HJxM8h
+        M4Tr3/v4g8VcZx/cVYFPjyLmyQ==
+X-Google-Smtp-Source: ABdhPJz3NBvH52z9Lf3JtcVq37eO4pIhSXDRYPegdztqjJ89XwGDlRslFPE3yJxvvP59s1+1HvA/YA==
+X-Received: by 2002:a05:6a00:1646:b0:4f4:58f:b64 with SMTP id m6-20020a056a00164600b004f4058f0b64mr24965696pfc.47.1646352465993;
+        Thu, 03 Mar 2022 16:07:45 -0800 (PST)
+Received: from google.com (226.75.127.34.bc.googleusercontent.com. [34.127.75.226])
+        by smtp.gmail.com with ESMTPSA id p10-20020a637f4a000000b00373a2760775sm2813386pgn.2.2022.03.03.16.07.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Mar 2022 16:07:45 -0800 (PST)
+Date:   Fri, 4 Mar 2022 00:07:41 +0000
+From:   Mingwei Zhang <mizhang@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        David Hildenbrand <david@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Ben Gardon <bgardon@google.com>
+Subject: Re: [PATCH v4 16/30] KVM: x86/mmu: Add dedicated helper to zap TDP
+ MMU root shadow page
+Message-ID: <YiFYTcFk+NYCtuZR@google.com>
+References: <20220303193842.370645-1-pbonzini@redhat.com>
+ <20220303193842.370645-17-pbonzini@redhat.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220303125930.43d9940b.alex.williamson@redhat.com>
-X-ClientProxiedBy: MN2PR05CA0061.namprd05.prod.outlook.com
- (2603:10b6:208:236::30) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: affe49b5-5f24-42f8-6271-08d9fd7082f4
-X-MS-TrafficTypeDiagnostic: BN6PR12MB1281:EE_
-X-Microsoft-Antispam-PRVS: <BN6PR12MB1281F38EA42E2273BED5A934C2049@BN6PR12MB1281.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: /3w2wpIqqEd1E8M244Vx/DP6HSdV/h8pK3qFz95rIY7rGUNlcYsHmynEMwRviFJgPC0Wk76tvT/Fv2S8XlrqjB4b7YcDisT2bUowj6wdW6svIXCn8weJ10c5mrDUxEy45/PvbaJ1p4SRrG8TTt3xXUs4QPDIv2i0gs/cc/3NGg8g/i+3P1F6FPBrLcAU6ATk6rSt8sDbaOZmy9sWRV+matot9fQTv45IqtzJJzexcRhXvn2kobxpZDCwBSN1UN/mFwkUUHt0/68iTFxJls89CZNfjTKrAwWNBW9yuuxS/XRd8QB1eQlCR8TC/bcZ3Qh4Cz7UPl4QkZ5i5VTKUHW+6Vg5Vz9EeBJo1JDkB0i1gWMObFgoVYw7VYdrKb9+rSHw8ebIi+OyXB7Ud15DRFfzXxnXSQ+1hQQ8HrNFoo8VKS0SDaN9Bi+0TmgaAyisGg/QEAzSHVDAbfLYlojou02E0NWO76Rolk0hPR5RlDNePOGuNUW6Fjdh2J3pMzuJOVh/X1nLWySjSrUMGZu+Wy/fTOepDUknHw3rULm8wMkKBFLB7OtHf1+fGReOA8NY70bai1eS7ZOXEOSQTYq2DN4eXp6tAqJoyFqHjqtgyWKDtUh5SdL9LZ2AEkocPfWFGDZ9LLb5+Xwd8wma5IRYrJ/4lhRWtf+tQZFzbbFjvaj+75uhYq4bet62rDjHSLOTk9u4nebTEoSv8DvTCkJkyBpzMA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(2616005)(6512007)(6486002)(6506007)(508600001)(36756003)(1076003)(26005)(316002)(33656002)(54906003)(6916009)(8936002)(5660300002)(2906002)(8676002)(66556008)(66476007)(38100700002)(66946007)(4326008)(186003)(7416002)(86362001)(27376004);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Ht4A5JCzQdMSjxG6tCM/m2wH+Csa5IVXDP1OB9ILkUynybbn0klVoqc8XJMR?=
- =?us-ascii?Q?If035buBDK8go2IdXAsA3eOkXzN7dgt15OAXjYIH/ytzRN0lILtyyYUpQNzc?=
- =?us-ascii?Q?buCNDRXe3feP60AzJwyDmu6v3yKAvjqZ1X1/NYqYl3I+zujYDX0TcowxCqmP?=
- =?us-ascii?Q?hBIKXLVuQ51OaZ8H7k+E/Toi8sz6wNvqejebQUaOlcvt3hyqGgvEsLBnlSTC?=
- =?us-ascii?Q?jYDvO4ZiiGLQLL7vA6rIrP7Q+0eUVblpAiC0Qws5AWXg7fdOJcTB+fLJ2Tdx?=
- =?us-ascii?Q?rZmlGZErnIN3wsnJTVCGlzfVMTZxJKDNNpRIiZO5jPQHUjWN0fSsgYwiDAV9?=
- =?us-ascii?Q?oRCad1nl/v65y+W+neUiDV9965rhwXimOXCiI7XvYsK0+Mu8OLYSGOgkYmQl?=
- =?us-ascii?Q?XPmgKpOHMKEgKitWEVyYEBk9ePqqNPOpidCANQP9yOnqNtW8zgDZRsiNPqjy?=
- =?us-ascii?Q?9rYcX2w0+wUePjWhuf8bbLI2ZX4wOPPhJmB3GrvX1Ev7r3567LfWaw4ZneT9?=
- =?us-ascii?Q?rwNaVbJ/0mTEason8m/6BYwKsfYUB/HayVrskMeYzM03+pRIf+60x7Ez1j26?=
- =?us-ascii?Q?4hmWdvYPb4uOd7JUH+CXJlYBQ0ar9kD8rCiNvTWIBom4/1ohcL9E/w98Oocu?=
- =?us-ascii?Q?BjVn0gzkou+l8eR7CTr1jezyUAG8I/BYfIXS2ZxiuoT3Ava+XZtZJM1q27Jq?=
- =?us-ascii?Q?55XMSKvOSNjpr7OmuqPifTLx430TNls295fkb4yidA36/qiEudEVIzwPOqv/?=
- =?us-ascii?Q?Mw7OoxwYBdaZZIPd/Lhv+y7YanD3XN9nGkMgsWowLl4rrH9mQAXaTyLWU+aC?=
- =?us-ascii?Q?45wX0fToi56d6YPJWXBEDMuoIrsVOcQ7dIJ9iJIz5V5EN/Xcu43iFnh3Nsqa?=
- =?us-ascii?Q?u5vzHHZkVg09xL4BvMhdS7R14R0bnlgjyW27BxZN96exhR+zFHlDyHptl5RK?=
- =?us-ascii?Q?ywttl51GeFz69c6B08SQG01kwz2mZ50v7c9ZTSouyAFgLYeUu2EE42ysBF+2?=
- =?us-ascii?Q?2i0jC9/37aVFn/PpCe0dBCb785ydqMrRVpsqu9ycV8Dbe6p7GCF1EUgbjRCU?=
- =?us-ascii?Q?FuQz1dC7WM++txu3RSzGDf300fdPSX+R16E4mcrTCChkeDNkVBzkYzH7QmiJ?=
- =?us-ascii?Q?cSphWlJAp6EoQ8ORF3T0L9b7eyCYt4R0IHHniWZDMsOuBom2FUH6scyXYexL?=
- =?us-ascii?Q?TH3szuanypcRQ7ZtjIegIplSUOJ9Pv8z5KHvTPRigQTpDlL//RvOzFFKS/eA?=
- =?us-ascii?Q?Wqy4M1te6KmVCKmvNWi3g/N8aC5ciyromRNx56v0cFBz1JphEBHEDhwasuC1?=
- =?us-ascii?Q?KCllUeehefgq5yWIdmlhsD0IbQgRswXIALHwBQKkDusyocgvs6ulzPczLA5P?=
- =?us-ascii?Q?BbStvVeOCdRp2emoDdTU2zpPOSuLUKwSwWXm4l+rC2r8jQ1Kokaj0CvPyKIe?=
- =?us-ascii?Q?rdJzlWMWbuWH32iV+Ea7K3cEb0TRZwfz4WTOvhDMQ1dWxZ99KxN7myTshqUS?=
- =?us-ascii?Q?SutJMM7o6NOhYfjNaCXaa/Z2bO/8qQlkAMUPNdyhiH8VDRRSFB9hpGTL5cCK?=
- =?us-ascii?Q?/wgwmQ0obQhrQhJwBh8=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: affe49b5-5f24-42f8-6271-08d9fd7082f4
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Mar 2022 23:49:52.6416
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 1uJvXzCCamPMzY1eWWpLnU6QUseGuUCUiWFYLAfh9Bs4SrRYeO3dq3At4HSt4/QS
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR12MB1281
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <20220303193842.370645-17-pbonzini@redhat.com>
+X-Spam-Status: No, score=-18.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 03, 2022 at 12:59:30PM -0700, Alex Williamson wrote:
-
-> > > If it's an abuse, then let's not do it.  It was never my
-> > > impression or intention
-
-So maybe abuse is the wrong word, but I don't want to mess up this
-interface, which is intended to support real pre-copy devices, just
-because devices that don't actually implement true precopy might do
-silly things.
-
-The vGPU case you imagine will still work and qemu will switch to
-STOP_COPY with a huge trailer and be slow. That is unavoidable and I
-think it is fine.
-
-> > > Furthermore the acc driver was explicitly directed not to indicate any degree
-> > > of trailing data size in dirty_bytes, so while trailing data may be small for acc,
-> > > this interface is explicitly not intended to provide any indication of trailing
-> > > data size.  Thanks, 
-
-Yes, trailing data is not what this is for. This is only to help
-decide when to switch from PRE_COPY to STOP_COPY. If the device can
-execute STOP_COPY in the right time is a completely different
-discussion/interface.
-
-> > Just to clarify, so the suggestion here is not to use PRE_COPY for compatibility
-> > check at all and have a different proper infrastructure for that later as Jason
-> > suggested?
-> > 
-> > If so, I will remove this patch from this series and go back to the old revision
-> > where we only have STOP_COPY and do the compatibility check during the final
-> > load data operation.
+On Thu, Mar 03, 2022, Paolo Bonzini wrote:
+> From: Sean Christopherson <seanjc@google.com>
 > 
-> Hi Shameer,
+> Add a dedicated helper for zapping a TDP MMU root, and use it in the three
+> flows that do "zap_all" and intentionally do not do a TLB flush if SPTEs
+> are zapped (zapping an entire root is safe if and only if it cannot be in
+> use by any vCPU).  Because a TLB flush is never required, unconditionally
+> pass "false" to tdp_mmu_iter_cond_resched() when potentially yielding.
 > 
-> I think NVIDIA has a company long weekend, so I'm not sure how quickly
-> we'll hear a rebuttal from Jason, but at this point I'd rather not
-> move
+> Opportunistically document why KVM must not yield when zapping roots that
+> are being zapped by kvm_tdp_mmu_put_root(), i.e. roots whose refcount has
+> reached zero, and further harden the flow to detect improper KVM behavior
+> with respect to roots that are supposed to be unreachable.
+> 
+> In addition to hardening zapping of roots, isolating zapping of roots
+> will allow future simplification of zap_gfn_range() by having it zap only
+> leaf SPTEs, and by removing its tricky "zap all" heuristic.  By having
+> all paths that truly need to free _all_ SPs flow through the dedicated
+> root zapper, the generic zapper can be freed of those concerns.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Reviewed-by: Ben Gardon <bgardon@google.com>
+> Message-Id: <20220226001546.360188-16-seanjc@google.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-Yes, company long weekend.
+Reviewed-by: Mingwei Zhang <mizhang@google.com>
 
-> forward with using PRE_COPY exclusively for compatibility testing if
-> that is seen as an abuse of the interface, regardless of the size of
-> the remaining STOP_COPY data.  It might be most expedient to respin
-> without PRE_COPY and we'll revisit methods to perform early
-> compatibility testing in the future.  Thanks,
-
-Shameerali has talked about wanting this compat check early from the
-start, and done all the work to implement it. I think it is pretty
-extreme to blow up his series over trailing_data.
-
-To me acc is fine to use it this way until we get a better solution
-for compatability. We all need this, but I expect it to be complicated
-to define.
-
-Jason
+> ---
+>  arch/x86/kvm/mmu/tdp_mmu.c | 98 +++++++++++++++++++++++++++++++-------
+>  1 file changed, 82 insertions(+), 16 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index f59f3ff5cb75..970376297b30 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -56,10 +56,6 @@ void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm)
+>  	rcu_barrier();
+>  }
+>  
+> -static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
+> -			  gfn_t start, gfn_t end, bool can_yield, bool flush,
+> -			  bool shared);
+> -
+>  static void tdp_mmu_free_sp(struct kvm_mmu_page *sp)
+>  {
+>  	free_page((unsigned long)sp->spt);
+> @@ -82,6 +78,9 @@ static void tdp_mmu_free_sp_rcu_callback(struct rcu_head *head)
+>  	tdp_mmu_free_sp(sp);
+>  }
+>  
+> +static void tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
+> +			     bool shared);
+> +
+>  void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
+>  			  bool shared)
+>  {
+> @@ -104,7 +103,7 @@ void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
+>  	 * intermediate paging structures, that may be zapped, as such entries
+>  	 * are associated with the ASID on both VMX and SVM.
+>  	 */
+> -	(void)zap_gfn_range(kvm, root, 0, -1ull, false, false, shared);
+> +	tdp_mmu_zap_root(kvm, root, shared);
+>  
+>  	call_rcu(&root->rcu_head, tdp_mmu_free_sp_rcu_callback);
+>  }
+> @@ -737,6 +736,76 @@ static inline bool __must_check tdp_mmu_iter_cond_resched(struct kvm *kvm,
+>  	return iter->yielded;
+>  }
+>  
+> +static inline gfn_t tdp_mmu_max_gfn_host(void)
+> +{
+> +	/*
+> +	 * Bound TDP MMU walks at host.MAXPHYADDR, guest accesses beyond that
+> +	 * will hit a #PF(RSVD) and never hit an EPT Violation/Misconfig / #NPF,
+> +	 * and so KVM will never install a SPTE for such addresses.
+> +	 */
+> +	return 1ULL << (shadow_phys_bits - PAGE_SHIFT);
+> +}
+> +
+> +static void tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
+> +			     bool shared)
+> +{
+> +	bool root_is_unreachable = !refcount_read(&root->tdp_mmu_root_count);
+> +	struct tdp_iter iter;
+> +
+> +	gfn_t end = tdp_mmu_max_gfn_host();
+> +	gfn_t start = 0;
+> +
+> +	kvm_lockdep_assert_mmu_lock_held(kvm, shared);
+> +
+> +	rcu_read_lock();
+> +
+> +	/*
+> +	 * No need to try to step down in the iterator when zapping an entire
+> +	 * root, zapping an upper-level SPTE will recurse on its children.
+> +	 */
+> +	for_each_tdp_pte_min_level(iter, root, root->role.level, start, end) {
+> +retry:
+> +		/*
+> +		 * Yielding isn't allowed when zapping an unreachable root as
+> +		 * the root won't be processed by mmu_notifier callbacks.  When
+> +		 * handling an unmap/release mmu_notifier command, KVM must
+> +		 * drop all references to relevant pages prior to completing
+> +		 * the callback.  Dropping mmu_lock can result in zapping SPTEs
+> +		 * for an unreachable root after a relevant callback completes,
+> +		 * which leads to use-after-free as zapping a SPTE triggers
+> +		 * "writeback" of dirty/accessed bits to the SPTE's associated
+> +		 * struct page.
+> +		 */
+> +		if (!root_is_unreachable &&
+> +		    tdp_mmu_iter_cond_resched(kvm, &iter, false, shared))
+> +			continue;
+> +
+> +		if (!is_shadow_present_pte(iter.old_spte))
+> +			continue;
+> +
+> +		if (!shared) {
+> +			tdp_mmu_set_spte(kvm, &iter, 0);
+> +		} else if (tdp_mmu_set_spte_atomic(kvm, &iter, 0)) {
+> +			/*
+> +			 * cmpxchg() shouldn't fail if the root is unreachable.
+> +			 * Retry so as not to leak the page and its children.
+> +			 */
+> +			WARN_ONCE(root_is_unreachable,
+> +				  "Contended TDP MMU SPTE in unreachable root.");
+> +			goto retry;
+> +		}
+> +
+> +		/*
+> +		 * WARN if the root is invalid and is unreachable, all SPTEs
+> +		 * should've been zapped by kvm_tdp_mmu_zap_invalidated_roots(),
+> +		 * and inserting new SPTEs under an invalid root is a KVM bug.
+> +		 */
+> +		WARN_ON_ONCE(root_is_unreachable && root->role.invalid);
+> +	}
+> +
+> +	rcu_read_unlock();
+> +}
+> +
+>  bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
+>  {
+>  	u64 old_spte;
+> @@ -785,8 +854,7 @@ static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
+>  			  gfn_t start, gfn_t end, bool can_yield, bool flush,
+>  			  bool shared)
+>  {
+> -	gfn_t max_gfn_host = 1ULL << (shadow_phys_bits - PAGE_SHIFT);
+> -	bool zap_all = (start == 0 && end >= max_gfn_host);
+> +	bool zap_all = (start == 0 && end >= tdp_mmu_max_gfn_host());
+>  	struct tdp_iter iter;
+>  
+>  	/*
+> @@ -795,12 +863,7 @@ static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
+>  	 */
+>  	int min_level = zap_all ? root->role.level : PG_LEVEL_4K;
+>  
+> -	/*
+> -	 * Bound the walk at host.MAXPHYADDR, guest accesses beyond that will
+> -	 * hit a #PF(RSVD) and never get to an EPT Violation/Misconfig / #NPF,
+> -	 * and so KVM will never install a SPTE for such addresses.
+> -	 */
+> -	end = min(end, max_gfn_host);
+> +	end = min(end, tdp_mmu_max_gfn_host());
+>  
+>  	kvm_lockdep_assert_mmu_lock_held(kvm, shared);
+>  
+> @@ -860,6 +923,7 @@ bool __kvm_tdp_mmu_zap_gfn_range(struct kvm *kvm, int as_id, gfn_t start,
+>  
+>  void kvm_tdp_mmu_zap_all(struct kvm *kvm)
+>  {
+> +	struct kvm_mmu_page *root;
+>  	int i;
+>  
+>  	/*
+> @@ -867,8 +931,10 @@ void kvm_tdp_mmu_zap_all(struct kvm *kvm)
+>  	 * is being destroyed or the userspace VMM has exited.  In both cases,
+>  	 * KVM_RUN is unreachable, i.e. no vCPUs will ever service the request.
+>  	 */
+> -	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++)
+> -		(void)kvm_tdp_mmu_zap_gfn_range(kvm, i, 0, -1ull, false);
+> +	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
+> +		for_each_tdp_mmu_root_yield_safe(kvm, root, i)
+> +			tdp_mmu_zap_root(kvm, root, false);
+> +	}
+>  }
+>  
+>  static struct kvm_mmu_page *next_invalidated_root(struct kvm *kvm,
+> @@ -925,7 +991,7 @@ void kvm_tdp_mmu_zap_invalidated_roots(struct kvm *kvm)
+>  		 * will still flush on yield, but that's a minor performance
+>  		 * blip and not a functional issue.
+>  		 */
+> -		(void)zap_gfn_range(kvm, root, 0, -1ull, true, false, true);
+> +		tdp_mmu_zap_root(kvm, root, true);
+>  
+>  		/*
+>  		 * Put the reference acquired in
+> -- 
+> 2.31.1
+> 
+> 
