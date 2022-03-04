@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EA7474CDE5F
-	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 21:25:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A9ED04CDEB1
+	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 21:26:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230478AbiCDUJv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Mar 2022 15:09:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53190 "EHLO
+        id S231196AbiCDUKA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Mar 2022 15:10:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231210AbiCDUHz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S231207AbiCDUHz (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 4 Mar 2022 15:07:55 -0500
 Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2D171C9B57;
-        Fri,  4 Mar 2022 12:02:22 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D445248CF6;
+        Fri,  4 Mar 2022 12:02:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1646424142; x=1677960142;
+  t=1646424145; x=1677960145;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=gRL60Eh24dbvczWyyL0w5AiCqy8X0iQtaAcE9wJT7Ow=;
-  b=H9UKrRxbji5m1e6WhyjJpKIrodHIVicIgUHgMm6Y1aI4TBl51gEbw60E
-   s2qz+XN7VxT+zMbc1lNpbeS1bM3lVCKCxoH16QKudaIQqwNGg7vaqJpbI
-   yB5E6/PQwZ4dWF8UnwKvCyjowTDRgadcz9gzrKI3yICnAVpjDnYCwUF7b
-   3ZmxMX5B8ehadY+V9ED/MJKPJX04DIesb3+UDozaTv7LyZGzxZeSH5ql3
-   rhLgLTaf4z+bAle7Oo4eqQb0RHNiTMA6rlYoXEIAPoNOTMO/sZvOc1Bc9
-   8wBxcmEM8VZJgwiYvI4Hrknu06JgAUTIXyX+4b4kQEXWZsx40LnSjh4Nx
+  bh=+Me9R2iHIgVJGsU1ppIXYCXCq+0CEFXNAw3ub+Y9aAU=;
+  b=SW34J/pQ48eZR4Ou6PjqWjdRhTZQXNILdNaovDOrJfe0DPMku/5HpAxT
+   JPmSBFW47bWfB1nXZ843xu7JowMwI9e39fPvcgngknaw66m9/T46kXB5C
+   HqJi2QOIYTazx/w4Bi50MBPM2pRDmqs+5BkFMGQG7Z99KTcIqqOIBuTbi
+   9dZY51f3l4XJOF76LsxA5vNiU/d7OR9k2eAfRPbOanWz30qsjxdnE7iQe
+   FEs64vBIihvDqmzwRCBFEioPHGaPpsrFeMuC5vF1Kt5QYnvjXBYTxLxty
+   pMKJTYP7mDte9ISt1WeIKgpG5sSKZ4HNsyIUt8cHmqP0ahasQA48QuRKB
    w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10276"; a="253983499"
+X-IronPort-AV: E=McAfee;i="6200,9189,10276"; a="253983504"
 X-IronPort-AV: E=Sophos;i="5.90,156,1643702400"; 
-   d="scan'208";a="253983499"
+   d="scan'208";a="253983504"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
   by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2022 11:50:23 -0800
 X-IronPort-AV: E=Sophos;i="5.90,156,1643702400"; 
-   d="scan'208";a="552344348"
+   d="scan'208";a="552344353"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2022 11:50:23 -0800
 From:   isaku.yamahata@intel.com
@@ -43,9 +43,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Jim Mattson <jmattson@google.com>, erdemaktas@google.com,
         Connor Kuehl <ckuehl@redhat.com>,
         Sean Christopherson <seanjc@google.com>
-Subject: [RFC PATCH v5 045/104] KVM: x86/tdp_mmu: make REMOVED_SPTE include shadow_initial value
-Date:   Fri,  4 Mar 2022 11:49:01 -0800
-Message-Id: <6614d2a2bc34441ed598830392b425fdf8e5ca52.1646422845.git.isaku.yamahata@intel.com>
+Subject: [RFC PATCH v5 046/104] KVM: x86/tdp_mmu: refactor kvm_tdp_mmu_map()
+Date:   Fri,  4 Mar 2022 11:49:02 -0800
+Message-Id: <8ac26dfbe645aa3e9a9f39c844dfec9c0ac841ec.1646422845.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1646422845.git.isaku.yamahata@intel.com>
 References: <cover.1646422845.git.isaku.yamahata@intel.com>
@@ -63,127 +63,96 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-TDP MMU uses REMOVED_SPTE = 0x5a0ULL as special constant to indicate the
-intermediate value to indicate one thread is operating on it and the value
-should be semi-arbitrary value.  For TDX (more correctly to use #VE), the
-value should include suppress #VE value which is shadow_init_value.
-
-Define SHADOW_REMOVED_SPTE as shadow_init_value | REMOVED_SPTE, and replace
-REMOVED_SPTE with SHADOW_REMOVED_SPTE to use suppress #VE bit properly for
-TDX.
+Factor out non-leaf SPTE population logic from kvm_tdp_mmu_map().  MapGPA
+hypercall needs to populate non-leaf SPTE to record which GPA, private or
+shared, is allowed in the leaf EPT entry.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/mmu/spte.h    | 14 ++++++++++++--
- arch/x86/kvm/mmu/tdp_mmu.c | 23 ++++++++++++++++-------
- 2 files changed, 28 insertions(+), 9 deletions(-)
+ arch/x86/kvm/mmu/tdp_mmu.c | 48 ++++++++++++++++++++++++--------------
+ 1 file changed, 30 insertions(+), 18 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
-index bde843bce878..e88f796724b4 100644
---- a/arch/x86/kvm/mmu/spte.h
-+++ b/arch/x86/kvm/mmu/spte.h
-@@ -194,7 +194,9 @@ extern u64 __read_mostly shadow_nonpresent_or_rsvd_mask;
-  * If a thread running without exclusive control of the MMU lock must perform a
-  * multi-part operation on an SPTE, it can set the SPTE to REMOVED_SPTE as a
-  * non-present intermediate value. Other threads which encounter this value
-- * should not modify the SPTE.
-+ * should not modify the SPTE.  When TDX is enabled, shadow_init_value, which
-+ * is "suppress #VE" bit set, is also set to removed SPTE, because TDX module
-+ * always enables "EPT violation #VE".
-  *
-  * Use a semi-arbitrary value that doesn't set RWX bits, i.e. is not-present on
-  * bot AMD and Intel CPUs, and doesn't set PFN bits, i.e. doesn't create a L1TF
-@@ -207,9 +209,17 @@ extern u64 __read_mostly shadow_nonpresent_or_rsvd_mask;
- /* Removed SPTEs must not be misconstrued as shadow present PTEs. */
- static_assert(!(REMOVED_SPTE & SPTE_MMU_PRESENT_MASK));
- 
-+/*
-+ * See above comment around REMOVED_SPTE.  SHADOW_REMOVED_SPTE is the actual
-+ * intermediate value set to the removed SPET.  When TDX is enabled, it sets
-+ * the "suppress #VE" bit, otherwise it's REMOVED_SPTE.
-+ */
-+extern u64 __read_mostly shadow_init_value;
-+#define SHADOW_REMOVED_SPTE	(shadow_init_value | REMOVED_SPTE)
-+
- static inline bool is_removed_spte(u64 spte)
- {
--	return spte == REMOVED_SPTE;
-+	return spte == SHADOW_REMOVED_SPTE;
- }
- 
- /*
 diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index ebd0a02620e8..b6ec2f112c26 100644
+index b6ec2f112c26..8db262440d5c 100644
 --- a/arch/x86/kvm/mmu/tdp_mmu.c
 +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -338,7 +338,7 @@ static void handle_removed_tdp_mmu_page(struct kvm *kvm, tdp_ptep_t pt,
- 			 * value to the removed SPTE value.
- 			 */
- 			for (;;) {
--				old_child_spte = xchg(sptep, REMOVED_SPTE);
-+				old_child_spte = xchg(sptep, SHADOW_REMOVED_SPTE);
- 				if (!is_removed_spte(old_child_spte))
- 					break;
- 				cpu_relax();
-@@ -365,10 +365,10 @@ static void handle_removed_tdp_mmu_page(struct kvm *kvm, tdp_ptep_t pt,
- 			 * the two branches consistent and simplifies
- 			 * the function.
- 			 */
--			WRITE_ONCE(*sptep, REMOVED_SPTE);
-+			WRITE_ONCE(*sptep, SHADOW_REMOVED_SPTE);
+@@ -955,6 +955,31 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
+ 	return ret;
+ }
+ 
++static bool tdp_mmu_populate_nonleaf(
++	struct kvm_vcpu *vcpu, struct tdp_iter *iter, bool account_nx)
++{
++	struct kvm_mmu_page *sp;
++	u64 *child_pt;
++	u64 new_spte;
++
++	WARN_ON(is_shadow_present_pte(iter->old_spte));
++	WARN_ON(is_removed_spte(iter->old_spte));
++
++	sp = alloc_tdp_mmu_page(vcpu, iter->gfn, iter->level - 1);
++	child_pt = sp->spt;
++
++	new_spte = make_nonleaf_spte(child_pt, !shadow_accessed_mask);
++
++	if (!tdp_mmu_set_spte_atomic(vcpu->kvm, iter, new_spte)) {
++		tdp_mmu_free_sp(sp);
++		return false;
++	}
++
++	tdp_mmu_link_page(vcpu->kvm, sp, account_nx);
++	trace_kvm_mmu_get_page(sp, true);
++	return true;
++}
++
+ /*
+  * Handle a TDP page fault (NPT/EPT violation/misconfiguration) by installing
+  * page tables and SPTEs to translate the faulting guest physical address.
+@@ -963,9 +988,6 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ {
+ 	struct kvm_mmu *mmu = vcpu->arch.mmu;
+ 	struct tdp_iter iter;
+-	struct kvm_mmu_page *sp;
+-	u64 *child_pt;
+-	u64 new_spte;
+ 	int ret;
+ 
+ 	kvm_mmu_hugepage_adjust(vcpu, fault);
+@@ -1000,6 +1022,8 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
  		}
- 		handle_changed_spte(kvm, kvm_mmu_page_as_id(sp), gfn,
--				    old_child_spte, REMOVED_SPTE, level,
-+				    old_child_spte, SHADOW_REMOVED_SPTE, level,
- 				    shared);
+ 
+ 		if (!is_shadow_present_pte(iter.old_spte)) {
++			bool account_nx;
++
+ 			/*
+ 			 * If SPTE has been frozen by another thread, just
+ 			 * give up and retry, avoiding unnecessary page table
+@@ -1008,22 +1032,10 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ 			if (is_removed_spte(iter.old_spte))
+ 				break;
+ 
+-			sp = alloc_tdp_mmu_page(vcpu, iter.gfn, iter.level - 1);
+-			child_pt = sp->spt;
+-
+-			new_spte = make_nonleaf_spte(child_pt,
+-						     !shadow_accessed_mask);
+-
+-			if (tdp_mmu_set_spte_atomic(vcpu->kvm, &iter, new_spte)) {
+-				tdp_mmu_link_page(vcpu->kvm, sp,
+-						  fault->huge_page_disallowed &&
+-						  fault->req_level >= iter.level);
+-
+-				trace_kvm_mmu_get_page(sp, true);
+-			} else {
+-				tdp_mmu_free_sp(sp);
++			account_nx = fault->huge_page_disallowed &&
++				fault->req_level >= iter.level;
++			if (!tdp_mmu_populate_nonleaf(vcpu, &iter, account_nx))
+ 				break;
+-			}
+ 		}
  	}
  
-@@ -537,7 +537,7 @@ static inline bool tdp_mmu_zap_spte_atomic(struct kvm *kvm,
- 	 * immediately installing a present entry in its place
- 	 * before the TLBs are flushed.
- 	 */
--	if (!tdp_mmu_set_spte_atomic(kvm, iter, REMOVED_SPTE))
-+	if (!tdp_mmu_set_spte_atomic(kvm, iter, SHADOW_REMOVED_SPTE))
- 		return false;
- 
- 	kvm_flush_remote_tlbs_with_address(kvm, iter->gfn,
-@@ -550,8 +550,16 @@ static inline bool tdp_mmu_zap_spte_atomic(struct kvm *kvm,
- 	 * special removed SPTE value. No bookkeeping is needed
- 	 * here since the SPTE is going from non-present
- 	 * to non-present.
-+	 *
-+	 * Set non-present value to shadow_init_value, rather than 0.
-+	 * It is because when TDX is enabled, TDX module always
-+	 * enables "EPT-violation #VE", so KVM needs to set
-+	 * "suppress #VE" bit in EPT table entries, in order to get
-+	 * real EPT violation, rather than TDVMCALL.  KVM sets
-+	 * shadow_init_value (which sets "suppress #VE" bit) so it
-+	 * can be set when EPT table entries are zapped.
- 	 */
--	WRITE_ONCE(*rcu_dereference(iter->sptep), 0);
-+	WRITE_ONCE(*rcu_dereference(iter->sptep), shadow_init_value);
- 
- 	return true;
- }
-@@ -748,7 +756,8 @@ static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
- 			continue;
- 
- 		if (!shared) {
--			tdp_mmu_set_spte(kvm, &iter, 0);
-+			/* see comments in tdp_mmu_zap_spte_atomic() */
-+			tdp_mmu_set_spte(kvm, &iter, shadow_init_value);
- 			flush = true;
- 		} else if (!tdp_mmu_zap_spte_atomic(kvm, &iter)) {
- 			/*
-@@ -1135,7 +1144,7 @@ static bool set_spte_gfn(struct kvm *kvm, struct tdp_iter *iter,
- 	 * invariant that the PFN of a present * leaf SPTE can never change.
- 	 * See __handle_changed_spte().
- 	 */
--	tdp_mmu_set_spte(kvm, iter, 0);
-+	tdp_mmu_set_spte(kvm, iter, shadow_init_value);
- 
- 	if (!pte_write(range->pte)) {
- 		new_spte = kvm_mmu_changed_pte_notifier_make_spte(iter->old_spte,
 -- 
 2.25.1
 
