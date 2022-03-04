@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 351DE4CDD99
-	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 20:59:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E25A34CDDA9
+	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 20:59:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229482AbiCDT7R (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Mar 2022 14:59:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36820 "EHLO
+        id S229773AbiCDUAQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Mar 2022 15:00:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36856 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229474AbiCDT7K (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Mar 2022 14:59:10 -0500
+        with ESMTP id S229517AbiCDT7L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Mar 2022 14:59:11 -0500
 Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99DD115A17;
-        Fri,  4 Mar 2022 11:50:38 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7274A20E588;
+        Fri,  4 Mar 2022 11:50:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1646423438; x=1677959438;
+  t=1646423439; x=1677959439;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=YYPKNoJQCgXRw/mHCPaNlQiEwwMw0C671GpkOvOa2T4=;
-  b=mtd9HUTSC5ql5yrS5/kWic9mtWTJIXxgGPiEgJxARYnZbtWbNv9Otaeq
-   Rz/6ot2X4xbYfKK39Kqr79REI+5rIHOB6+57P7n2UEBZzmf39Wb4j0WkC
-   JB9+BoMFDazluMvB7/GXUyOvPBxZdomZWpmWfNTD50FslBCDHL6a2muMp
-   HC/oCt60VTNOCMsovjoCzWjxIV+k8LJbiHOy397B5sxkP61y0L6/7R5cu
-   zPVEGbwoZXrJninDl5UIOYAeZlJUj2HF6wm6XWMY6Mi1djzyMcEp2s/NE
-   37+egFtLvtazwo/HhZBq3c+UWzZHwOiCpsfmeihbpp4bsI1jgpb4SPGbp
-   g==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10276"; a="253779628"
+  bh=lypC3uUOGooQHeJmscl9pX6joEn90C93v0AgpuIlWgk=;
+  b=h5zbNQrbGjNJ9Jk/RwdvoEbSDdslszwyd349mGXJ8mP5GxrQDsF87Xyh
+   71QhcnKSVYA3Ft0irmFznmZLo7qozZt9m+TN8OcQqS5Pc0iamyVACYRGK
+   cHX9isJy4A6ZJayzIwKxMLhN4XoWVxAuM9m8CQb31PGqQzDxQQ24r7ESn
+   AYFUrghNB0gUT2wfo7HbGx5LU93BhWWzIbqsoLjorSsq2kJW6JZxzQAVn
+   uR6HkUkjYk2Rq0DbhKhBeocj7X63/nfedCvwdYPQV9FX+iW8FumnnrWR8
+   LT1V27rxTGKXlGw5Wl84Lbj5l3o3i0aOCo57Zew5XBFUkb6FIblfc6S4N
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10276"; a="253779629"
 X-IronPort-AV: E=Sophos;i="5.90,156,1643702400"; 
-   d="scan'208";a="253779628"
+   d="scan'208";a="253779629"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
   by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2022 11:50:37 -0800
 X-IronPort-AV: E=Sophos;i="5.90,156,1643702400"; 
-   d="scan'208";a="552344496"
+   d="scan'208";a="552344500"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2022 11:50:37 -0800
 From:   isaku.yamahata@intel.com
@@ -43,9 +43,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Jim Mattson <jmattson@google.com>, erdemaktas@google.com,
         Connor Kuehl <ckuehl@redhat.com>,
         Sean Christopherson <seanjc@google.com>
-Subject: [RFC PATCH v5 076/104] KVM: x86: Add option to force LAPIC expiration wait
-Date:   Fri,  4 Mar 2022 11:49:32 -0800
-Message-Id: <52b0451a4ffba54455acf710b443715ac16effd4.1646422845.git.isaku.yamahata@intel.com>
+Subject: [RFC PATCH v5 077/104] KVM: TDX: Use vcpu_to_pi_desc() uniformly in posted_intr.c
+Date:   Fri,  4 Mar 2022 11:49:33 -0800
+Message-Id: <ee7be7832bc424546fd4f05015a844a0205b5ba2.1646422845.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1646422845.git.isaku.yamahata@intel.com>
 References: <cover.1646422845.git.isaku.yamahata@intel.com>
@@ -61,82 +61,54 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Sean Christopherson <sean.j.christopherson@intel.com>
+From: Yuan Yao <yuan.yao@intel.com>
 
-Add an option to skip the IRR check-in kvm_wait_lapic_expire().  This
-will be used by TDX to wait if there is an outstanding notification for
-a TD, i.e. a virtual interrupt is being triggered via posted interrupt
-processing.  KVM TDX doesn't emulate PI processing, i.e. there will
-never be a bit set in IRR/ISR, so the default behavior for APICv of
-querying the IRR doesn't work as intended.
+The helper function, vcpu_to_pi_desc(), is defined to get the posted
+interrupt descriptor from vcpu.  There is one place that doesn't use it,
+but direct reference to vmx_vcpu->pi_desc.  It's inconsistent.
 
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+For TDX, TDX vcpu structure will be defined and the helper function,
+vcpu_to_pi_desc(), will return tdx_vcpu->pi_desc for TDX case instead of
+vmx_vcpu->pi_desc.  The direct reference to vmx_vcpu->pi_desc doesn't work
+for TDX.
+
+Replace vmx_vcpu->pi_desc with the helper function, vcpu_pi_desc() for
+consistency and TDX.
+
+Signed-off-by: Yuan Yao <yuan.yao@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/lapic.c   | 4 ++--
- arch/x86/kvm/lapic.h   | 2 +-
- arch/x86/kvm/svm/svm.c | 2 +-
- arch/x86/kvm/vmx/vmx.c | 2 +-
- 4 files changed, 5 insertions(+), 5 deletions(-)
+ arch/x86/kvm/vmx/posted_intr.c | 2 +-
+ arch/x86/kvm/vmx/x86_ops.h     | 3 +++
+ 2 files changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 9322e6340a74..d49f029ef0e3 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -1620,12 +1620,12 @@ static void __kvm_wait_lapic_expire(struct kvm_vcpu *vcpu)
- 		__wait_lapic_expire(vcpu, tsc_deadline - guest_tsc);
- }
+diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
+index aa1fe9085d77..c8a81c916eed 100644
+--- a/arch/x86/kvm/vmx/posted_intr.c
++++ b/arch/x86/kvm/vmx/posted_intr.c
+@@ -311,7 +311,7 @@ int pi_update_irte(struct kvm *kvm, unsigned int host_irq, uint32_t guest_irq,
+ 			continue;
+ 		}
  
--void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu)
-+void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu, bool force_wait)
- {
- 	if (lapic_in_kernel(vcpu) &&
- 	    vcpu->arch.apic->lapic_timer.expired_tscdeadline &&
- 	    vcpu->arch.apic->lapic_timer.timer_advance_ns &&
--	    lapic_timer_int_injected(vcpu))
-+	    (force_wait || lapic_timer_int_injected(vcpu)))
- 		__kvm_wait_lapic_expire(vcpu);
- }
- EXPORT_SYMBOL_GPL(kvm_wait_lapic_expire);
-diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
-index 2b44e533fc8d..2a0119ef9e96 100644
---- a/arch/x86/kvm/lapic.h
-+++ b/arch/x86/kvm/lapic.h
-@@ -233,7 +233,7 @@ static inline int kvm_lapic_latched_init(struct kvm_vcpu *vcpu)
+-		vcpu_info.pi_desc_addr = __pa(&to_vmx(vcpu)->pi_desc);
++		vcpu_info.pi_desc_addr = __pa(vcpu_to_pi_desc(vcpu));
+ 		vcpu_info.vector = irq.vector;
  
- bool kvm_apic_pending_eoi(struct kvm_vcpu *vcpu, int vector);
+ 		trace_kvm_pi_irte_update(host_irq, vcpu->vcpu_id, e->gsi,
+diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+index aae0f4449ec5..0f1a28f67e60 100644
+--- a/arch/x86/kvm/vmx/x86_ops.h
++++ b/arch/x86/kvm/vmx/x86_ops.h
+@@ -147,6 +147,9 @@ void tdx_prepare_switch_to_guest(struct kvm_vcpu *vcpu);
+ void tdx_vcpu_put(struct kvm_vcpu *vcpu);
+ void tdx_vcpu_load(struct kvm_vcpu *vcpu, int cpu);
  
--void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu);
-+void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu, bool force_wait);
++void tdx_apicv_post_state_restore(struct kvm_vcpu *vcpu);
++int tdx_deliver_posted_interrupt(struct kvm_vcpu *vcpu, int vector);
++
+ int tdx_vm_ioctl(struct kvm *kvm, void __user *argp);
+ int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp);
  
- void kvm_bitmap_or_dest_vcpus(struct kvm *kvm, struct kvm_lapic_irq *irq,
- 			      unsigned long *vcpu_bitmap);
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index c7eec23e9ebe..a46415845f48 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3766,7 +3766,7 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
- 	clgi();
- 	kvm_load_guest_xsave_state(vcpu);
- 
--	kvm_wait_lapic_expire(vcpu);
-+	kvm_wait_lapic_expire(vcpu, false);
- 
- 	/*
- 	 * If this vCPU has touched SPEC_CTRL, restore the guest's value if
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 00f88aa25047..9b7bd52d19a9 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6838,7 +6838,7 @@ fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
- 	if (enable_preemption_timer)
- 		vmx_update_hv_timer(vcpu);
- 
--	kvm_wait_lapic_expire(vcpu);
-+	kvm_wait_lapic_expire(vcpu, false);
- 
- 	/*
- 	 * If this vCPU has touched SPEC_CTRL, restore the guest's value if
 -- 
 2.25.1
 
