@@ -2,156 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 56A594CDBDA
-	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 19:12:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 288944CDC6B
+	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 19:28:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241472AbiCDSMs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Mar 2022 13:12:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55984 "EHLO
+        id S241653AbiCDS2m (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Mar 2022 13:28:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235887AbiCDSMr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Mar 2022 13:12:47 -0500
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C0701C666E;
-        Fri,  4 Mar 2022 10:11:59 -0800 (PST)
-Received: by mail-ed1-x529.google.com with SMTP id p4so11832903edi.1;
-        Fri, 04 Mar 2022 10:11:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=tIN13TWuIqVkdYdqAGwqsk2ezDcrMTPKsAwAdQHKKcE=;
-        b=hRj9oqN8hOctWayWpATxG/nIqDH10fnWP899wm8utzM3mCf6Fqcsd659YYKCgTrCi2
-         bdacqOg/pXaHec7TKEA4PoSJvutAwRNVFNLDT/uoyjrnIUAopz6BrSt5RcKXaaEsssnX
-         EAs3udeSFgirMjKk1Qamysb+AwTWYGDiGYgAoqQdF2vqztqI2zm6cfvVwKy7TxiXIjuU
-         i/681TXZpPDDLeS49EnpTgjcD0drM77sb6SfPikxzc4lNf+twPlXHl8uQtsrwqHV1obH
-         E10h7AIPzFEZCX3RyiIXyGdNw3pOyefwT0gKgg4aFOk467ZQQf87H17SCKTMdd5HbDQW
-         KbrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=tIN13TWuIqVkdYdqAGwqsk2ezDcrMTPKsAwAdQHKKcE=;
-        b=RoEPxECGBJUFEfaBaJc1gkNyHSUtQIB/1WQP2H0h5f3SXzxhRvmy1uLr+GFgzcqBih
-         t2mspp5uJej9GVWFVu+ANyZtIk/RFBOHifp8exPbGB2qHmZxdX8G2FW6d/BV10j37j8Z
-         WhyR0kYOMP2at1FwgPYBeFUrKvqrN2mBhCWteupqSe/PMGGDvb4ApbRatIzBMBJFi1ah
-         R266suldzekUnn4KO4qgseGC5xx5Z6dG6NAN3zvmDtEMSlRquHH4o5h5Yp94vkuloilK
-         tCF1i9n8OL1oW/7uB0PMMARdwSAM7WvKiTvQCCB+LGMUxfNIqo4ZPVyhANN3IvsXrW/4
-         qtVQ==
-X-Gm-Message-State: AOAM531qk3C1S9aM7ExqBMpWRjSW6lJ5Tj31nWVE24+DOMzGvwxJyFh8
-        Defb2idZQ71nFhgrXToCFrI=
-X-Google-Smtp-Source: ABdhPJyTwzLBayjlRop8xK9BoE2ZyRz1Cy6Kl+/tNQcC0TuDDerswyibHvSKORzTQK309VATWxg0cQ==
-X-Received: by 2002:a05:6402:34c5:b0:411:f082:d69 with SMTP id w5-20020a05640234c500b00411f0820d69mr40707510edc.65.1646417517569;
-        Fri, 04 Mar 2022 10:11:57 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id bx1-20020a0564020b4100b00410f01a91f0sm2450758edb.73.2022.03.04.10.11.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Mar 2022 10:11:56 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <8b8c28cf-cf54-f889-be7d-afc9f5430ecd@redhat.com>
-Date:   Fri, 4 Mar 2022 19:11:55 +0100
+        with ESMTP id S241639AbiCDS2j (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Mar 2022 13:28:39 -0500
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B36224DF46;
+        Fri,  4 Mar 2022 10:27:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1646418470; x=1677954470;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=DWG7yBjX/SsVDq1FNBzX1eDw1t6YL3NhhuMKSucJuqU=;
+  b=O4vH4eOHEJQ7lchSM0g0Gr3Fu9772Hi3MWYOc8quI/8yJRWiqvfRB7W0
+   nxk7/fl7yKWKa3S+WkqfQQqcOBUtOtibh2v5CrVUBFcmji2QCiSmWqllW
+   9wrlz1ue5RSQaPQr2hmY+ver7/ZOby0cydtIqLmVUaDY+68BCdJw63v8G
+   AnBtEbaF1ZXgk5t7zcKwMg031MtZbAs9SCrKyg2cvpTXdAPpadO+hXkX4
+   pLS0dtmjI3z3s/9RgSOKf+KXfWX/jbUJX/Pz6SO5QS91n5LenRVKjlrVw
+   PoiSIY8E2KS0CM6FkzfbFwkrfYNRXQZD/KMs9X5uUgfsOr5UfXLH9lDTf
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10276"; a="253969031"
+X-IronPort-AV: E=Sophos;i="5.90,155,1643702400"; 
+   d="scan'208";a="253969031"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2022 10:27:50 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.90,155,1643702400"; 
+   d="scan'208";a="552317837"
+Received: from ahunter-desktop.fi.intel.com (HELO [10.237.72.92]) ([10.237.72.92])
+  by orsmga008.jf.intel.com with ESMTP; 04 Mar 2022 10:27:46 -0800
+Message-ID: <853ce127-25f0-d0fe-1d8f-0b0dd4f3ce71@intel.com>
+Date:   Fri, 4 Mar 2022 20:27:45 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH v4 21/30] KVM: x86/mmu: Zap invalidated roots via
- asynchronous worker
+ Firefox/91.0 Thunderbird/91.5.0
+Subject: Re: [PATCH V2 03/11] perf/x86: Add support for TSC in nanoseconds as
+ a perf event clock
 Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        David Hildenbrand <david@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        Mingwei Zhang <mizhang@google.com>
-References: <20220303193842.370645-1-pbonzini@redhat.com>
- <20220303193842.370645-22-pbonzini@redhat.com> <YiExLB3O2byI4Xdu@google.com>
- <YiEz3D18wEn8lcEq@google.com>
- <eeac12f0-0a18-8c63-1987-494a2032fa9d@redhat.com>
- <YiI4AmYkm2oiuiio@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YiI4AmYkm2oiuiio@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Jiri Olsa <jolsa@redhat.com>, linux-kernel@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        kvm@vger.kernel.org, H Peter Anvin <hpa@zytor.com>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Leo Yan <leo.yan@linaro.org>
+References: <20220214110914.268126-1-adrian.hunter@intel.com>
+ <20220214110914.268126-4-adrian.hunter@intel.com>
+ <YiIXFmA4vpcTSk2L@hirez.programming.kicks-ass.net>
+From:   Adrian Hunter <adrian.hunter@intel.com>
+Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
+ Business Identity Code: 0357606 - 4, Domiciled in Helsinki
+In-Reply-To: <YiIXFmA4vpcTSk2L@hirez.programming.kicks-ass.net>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/4/22 17:02, Sean Christopherson wrote:
-> On Fri, Mar 04, 2022, Paolo Bonzini wrote:
->> On 3/3/22 22:32, Sean Christopherson wrote:
->> I didn't remove the paragraph from the commit message, but I think it's
->> unnecessary now.  The workqueue is flushed in kvm_mmu_zap_all_fast() and
->> kvm_mmu_uninit_tdp_mmu(), unlike the buggy patch, so it doesn't need to take
->> a reference to the VM.
->>
->> I think I don't even need to check kvm->users_count in the defunct root
->> case, as long as kvm_mmu_uninit_tdp_mmu() flushes and destroys the workqueue
->> before it checks that the lists are empty.
+On 04/03/2022 15:41, Peter Zijlstra wrote:
+> On Mon, Feb 14, 2022 at 01:09:06PM +0200, Adrian Hunter wrote:
+>> Currently, when Intel PT is used within a VM guest, it is not possible to
+>> make use of TSC because perf clock is subject to paravirtualization.
 > 
-> Yes, that should work.  IIRC, the WARN_ONs will tell us/you quite quickly if
-> we're wrong :-)  mmu_notifier_unregister() will call the "slow" kvm_mmu_zap_all()
-> and thus ensure all non-root pages zapped, but "leaking" a worker will trigger
-> the WARN_ON that there are no roots on the list.
+> Yeah, so how much of that still makes sense, or ever did? AFAIK the
+> whole pv_clock thing is utter crazy. Should we not fix that instead?
 
-Good, for the record these are the commit messages I have:
+Presumably pv_clock must work with different host operating systems.
+Similarly, KVM must work with different guest operating systems.
+Perhaps I'm wrong, but I imagine re-engineering time virtualization
+might be a pretty big deal,  far exceeding the scope of these patches.
 
-     KVM: x86/mmu: Zap invalidated roots via asynchronous worker
-     
-     Use the system worker threads to zap the roots invalidated
-     by the TDP MMU's "fast zap" mechanism, implemented by
-     kvm_tdp_mmu_invalidate_all_roots().
-     
-     At this point, apart from allowing some parallelism in the zapping of
-     roots, the workqueue is a glorified linked list: work items are added and
-     flushed entirely within a single kvm->slots_lock critical section.  However,
-     the workqueue fixes a latent issue where kvm_mmu_zap_all_invalidated_roots()
-     assumes that it owns a reference to all invalid roots; therefore, no
-     one can set the invalid bit outside kvm_mmu_zap_all_fast().  Putting the
-     invalidated roots on a linked list... erm, on a workqueue ensures that
-     tdp_mmu_zap_root_work() only puts back those extra references that
-     kvm_mmu_zap_all_invalidated_roots() had gifted to it.
+While it is not something that I really need, it is also not obvious
+that the virtualization people would see any benefit.
 
-and
-
-     KVM: x86/mmu: Zap defunct roots via asynchronous worker
-     
-     Zap defunct roots, a.k.a. roots that have been invalidated after their
-     last reference was initially dropped, asynchronously via the existing work
-     queue instead of forcing the work upon the unfortunate task that happened
-     to drop the last reference.
-     
-     If a vCPU task drops the last reference, the vCPU is effectively blocked
-     by the host for the entire duration of the zap.  If the root being zapped
-     happens be fully populated with 4kb leaf SPTEs, e.g. due to dirty logging
-     being active, the zap can take several hundred seconds.  Unsurprisingly,
-     most guests are unhappy if a vCPU disappears for hundreds of seconds.
-     
-     E.g. running a synthetic selftest that triggers a vCPU root zap with
-     ~64tb of guest memory and 4kb SPTEs blocks the vCPU for 900+ seconds.
-     Offloading the zap to a worker drops the block time to <100ms.
-     
-     There is an important nuance to this change.  If the same work item
-     was queued twice before the work function has run, it would only
-     execute once and one reference would be leaked.  Therefore, now that
-     queueing items is not anymore protected by write_lock(&kvm->mmu_lock),
-     kvm_tdp_mmu_invalidate_all_roots() has to check root->role.invalid and
-     skip already invalid roots.  On the other hand, kvm_mmu_zap_all_fast()
-     must return only after those skipped roots have been zapped as well.
-     These two requirements can be satisfied only if _all_ places that
-     change invalid to true now schedule the worker before releasing the
-     mmu_lock.  There are just two, kvm_tdp_mmu_put_root() and
-     kvm_tdp_mmu_invalidate_all_roots().
-
-Paolo
+My primary goal is to be able to make a trace covering the host and
+(Linux) guests.  Intel PT can do that.  It can trace straight through
+VM-Entries/Exits, politely noting them on the way past.  Perf tools
+already supports decoding that, but only for tracing the kernel because
+it needs more information (so-called side-band events) to decode guest
+user space.  The simplest way to get that is to run perf inside the
+guests to capture the side-band events, and then inject them into the
+host perf.data file during post processing.  That, however, requires a
+clock that works for both host and guests.  TSC is suitable because
+KVM largely leaves it alone, except for VMX TSC Offset and Scaling,
+but that has to be dealt with anyway because it also affects the
+Intel PT trace.
