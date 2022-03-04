@@ -2,181 +2,329 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D13C4CD0C6
-	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 10:08:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 11A7D4CD0D0
+	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 10:09:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236997AbiCDJHV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Mar 2022 04:07:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59566 "EHLO
+        id S236171AbiCDJJu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Mar 2022 04:09:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56410 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236800AbiCDJGe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Mar 2022 04:06:34 -0500
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AA6E1A3636;
-        Fri,  4 Mar 2022 01:05:37 -0800 (PST)
-Received: by mail-pf1-x430.google.com with SMTP id d17so7151865pfl.0;
-        Fri, 04 Mar 2022 01:05:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=+OTmcaqceN1v+Oh4qkfoovMiZHBs7YKc5pNVuTTFvLU=;
-        b=JaqT8eLwxXQtrA/e6teUBX6c4sMkgfD9NV25PN2QRAFZD8rSQi6CTDt21EF0siYJIH
-         AI9tXA3JYcx6uDTjIQD9Ux4KZo/9tVQ6EOZnPKiqlYx/SNDiKJYPRNhJi2JkseBi9aIY
-         xzbkD6ya97VhqC+njv0R9nnoGLPuTmsfYfmrVwUAgIW5/vS6aUFuQGOL2Py+JHULs6M/
-         nHZqAkBwh53qBdyb5GQ7ZiZdwfZnSU8S2ofgHQJhYablph/LOrqXMQIpdL010Gz2suxi
-         nvLaz1rBNEE6CazBcBdUNay2LEqvYCYC8bK13IUKUyVsh2Ke2KSrE5k2Qr/lLJbbaV6z
-         OaAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=+OTmcaqceN1v+Oh4qkfoovMiZHBs7YKc5pNVuTTFvLU=;
-        b=bq6HrTauu5AOtETgtM5a1l0BJi3Rw6+Bn707YyEn+dilVx5vgAeIFJCJfypgV0zV2O
-         Jy+gsDcA7SpyJLycl9RVoZlaXEgBKaJtwNa+PAMRVbA9NzHUDVF/tgld7uX9zIAVWCp6
-         BQCj7+XlCOCeBSkaFf+xMLruMovSpGDoKduXqnI4qQYyXuVRQjE1S0foB1wLlLOpzo8b
-         bzygwkzSQQWdvM/EAMElYLYc81lqjqMx0QKdSsK4hvVSWriYtGnhKxaNwUOU1vLGpnh+
-         0cz/XASaJKxnVOw3yKxZoEBE6iwUfWz93HaU0Eh/Moaq69p3wxLku4pPU9inTpe+tM5v
-         ls/A==
-X-Gm-Message-State: AOAM532FITcAAQIQA9AF4MtqucbjAwpHDOoPIvjinEtE7pLAszclHckY
-        +SFlDwhE/JYF7OjSXYeuhr0=
-X-Google-Smtp-Source: ABdhPJxQdUdRW57yF2sPo7pyDmfavFgrMQJyQTEISUdcsraHAf+W5NWIFQY9dyGBBR5KjIzVBCM+BA==
-X-Received: by 2002:a63:57:0:b0:37c:5bd8:e708 with SMTP id 84-20020a630057000000b0037c5bd8e708mr4956251pga.407.1646384737182;
-        Fri, 04 Mar 2022 01:05:37 -0800 (PST)
-Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id j2-20020a655582000000b00372b2b5467asm4192968pgs.10.2022.03.04.01.05.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Mar 2022 01:05:36 -0800 (PST)
-From:   Like Xu <like.xu.linux@gmail.com>
-X-Google-Original-From: Like Xu <likexu@tencent.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        x86@kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v12 17/17] KVM: x86/pmu: Expose CPUIDs feature bits PDCM, DS, DTES64
-Date:   Fri,  4 Mar 2022 17:04:27 +0800
-Message-Id: <20220304090427.90888-18-likexu@tencent.com>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220304090427.90888-1-likexu@tencent.com>
-References: <20220304090427.90888-1-likexu@tencent.com>
+        with ESMTP id S237368AbiCDJHp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Mar 2022 04:07:45 -0500
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 259A01A271C;
+        Fri,  4 Mar 2022 01:06:19 -0800 (PST)
+Received: from canpemm500005.china.huawei.com (unknown [172.30.72.57])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4K92466Vxczdb2s;
+        Fri,  4 Mar 2022 17:04:54 +0800 (CST)
+Received: from [10.67.103.22] (10.67.103.22) by canpemm500005.china.huawei.com
+ (7.192.104.229) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.21; Fri, 4 Mar
+ 2022 17:06:13 +0800
+Message-ID: <86cd1e47-9a4b-f340-1b0c-cf1d39584a47@hisilicon.com>
+Date:   Fri, 4 Mar 2022 17:06:12 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.1
+Subject: Re: [PATCH v8 2/9] crypto: hisilicon/qm: Move few definitions to
+ common header
+To:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>
+CC:     <linux-pci@vger.kernel.org>, <alex.williamson@redhat.com>,
+        <jgg@nvidia.com>, <cohuck@redhat.com>, <mgurtovoy@nvidia.com>,
+        <yishaih@nvidia.com>, <linuxarm@huawei.com>,
+        <liulongfang@huawei.com>, <prime.zeng@hisilicon.com>,
+        <jonathan.cameron@huawei.com>
+References: <20220303230131.2103-1-shameerali.kolothum.thodi@huawei.com>
+ <20220303230131.2103-3-shameerali.kolothum.thodi@huawei.com>
+From:   Zhou Wang <wangzhou1@hisilicon.com>
+In-Reply-To: <20220303230131.2103-3-shameerali.kolothum.thodi@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.103.22]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ canpemm500005.china.huawei.com (7.192.104.229)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <likexu@tencent.com>
+> From: Longfang Liu <liulongfang@huawei.com>>
+> Move Doorbell and Mailbox definitions to common header file.
+> Also export QM mailbox functions.
+> 
+> This will be useful when we introduce VFIO PCI HiSilicon ACC live
+> migration driver.
+> 
+> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 
-The CPUID features PDCM, DS and DTES64 are required for PEBS feature.
-KVM would expose CPUID feature PDCM, DS and DTES64 to guest when PEBS
-is supported in the KVM on the Ice Lake server platforms.
+Looks good to me, so:
 
-Originally-by: Andi Kleen <ak@linux.intel.com>
-Co-developed-by: Kan Liang <kan.liang@linux.intel.com>
-Signed-off-by: Kan Liang <kan.liang@linux.intel.com>
-Co-developed-by: Luwei Kang <luwei.kang@intel.com>
-Signed-off-by: Luwei Kang <luwei.kang@intel.com>
-Signed-off-by: Like Xu <likexu@tencent.com>
----
- arch/x86/kvm/vmx/capabilities.h | 28 +++++++++++++++++-----------
- arch/x86/kvm/vmx/vmx.c          | 15 +++++++++++++++
- 2 files changed, 32 insertions(+), 11 deletions(-)
+Acked-by: Zhou Wang <wangzhou1@hisilicon.com>
 
-diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
-index 3f430e218375..0e3929ddf9c8 100644
---- a/arch/x86/kvm/vmx/capabilities.h
-+++ b/arch/x86/kvm/vmx/capabilities.h
-@@ -6,6 +6,7 @@
- 
- #include "lapic.h"
- #include "x86.h"
-+#include "pmu.h"
- 
- extern bool __read_mostly enable_vpid;
- extern bool __read_mostly flexpriority_enabled;
-@@ -385,23 +386,28 @@ static inline bool vmx_pt_mode_is_host_guest(void)
- 	return pt_mode == PT_MODE_HOST_GUEST;
- }
- 
-+static inline bool vmx_pebs_supported(void)
-+{
-+	return boot_cpu_has(X86_FEATURE_PEBS) && kvm_pmu_cap.pebs_ept;
-+}
-+
- static inline u64 vmx_get_perf_capabilities(void)
- {
--	u64 perf_cap = 0;
--
--	if (!enable_pmu)
--		return perf_cap;
-+	u64 perf_cap = PMU_CAP_FW_WRITES;
-+	u64 host_perf_cap = 0;
- 
- 	if (boot_cpu_has(X86_FEATURE_PDCM))
--		rdmsrl(MSR_IA32_PERF_CAPABILITIES, perf_cap);
-+		rdmsrl(MSR_IA32_PERF_CAPABILITIES, host_perf_cap);
- 
--	perf_cap &= PMU_CAP_LBR_FMT;
-+	perf_cap |= host_perf_cap & PMU_CAP_LBR_FMT;
- 
--	/*
--	 * Since counters are virtualized, KVM would support full
--	 * width counting unconditionally, even if the host lacks it.
--	 */
--	return PMU_CAP_FW_WRITES | perf_cap;
-+	if (vmx_pebs_supported()) {
-+		perf_cap |= host_perf_cap & PERF_CAP_PEBS_MASK;
-+		if ((perf_cap & PERF_CAP_PEBS_FORMAT) < 4)
-+			perf_cap &= ~PERF_CAP_PEBS_BASELINE;
-+	}
-+
-+	return perf_cap;
- }
- 
- static inline u64 vmx_supported_debugctl(void)
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 7ae0a82a2a78..89899d1a865d 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -2247,6 +2247,17 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 			if (!cpuid_model_is_consistent(vcpu))
- 				return 1;
- 		}
-+		if (data & PERF_CAP_PEBS_FORMAT) {
-+			if ((data & PERF_CAP_PEBS_MASK) !=
-+			    (vmx_get_perf_capabilities() & PERF_CAP_PEBS_MASK))
-+				return 1;
-+			if (!guest_cpuid_has(vcpu, X86_FEATURE_DS))
-+				return 1;
-+			if (!guest_cpuid_has(vcpu, X86_FEATURE_DTES64))
-+				return 1;
-+			if (!cpuid_model_is_consistent(vcpu))
-+				return 1;
-+		}
- 		ret = kvm_set_msr_common(vcpu, msr_info);
- 		break;
- 
-@@ -7416,6 +7427,10 @@ static __init void vmx_set_cpu_caps(void)
- 		kvm_cpu_cap_clear(X86_FEATURE_INVPCID);
- 	if (vmx_pt_mode_is_host_guest())
- 		kvm_cpu_cap_check_and_set(X86_FEATURE_INTEL_PT);
-+	if (vmx_pebs_supported()) {
-+		kvm_cpu_cap_check_and_set(X86_FEATURE_DS);
-+		kvm_cpu_cap_check_and_set(X86_FEATURE_DTES64);
-+	}
- 
- 	if (!enable_sgx) {
- 		kvm_cpu_cap_clear(X86_FEATURE_SGX);
--- 
-2.35.1
+Thanks,
+Zhou
 
+> ---
+>  drivers/crypto/hisilicon/qm.c | 58 +++++++++++------------------------
+>  include/linux/hisi_acc_qm.h   | 38 +++++++++++++++++++++++
+>  2 files changed, 56 insertions(+), 40 deletions(-)
+> 
+> diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+> index ed23e1d3fa27..c88e013371af 100644
+> --- a/drivers/crypto/hisilicon/qm.c
+> +++ b/drivers/crypto/hisilicon/qm.c
+> @@ -33,23 +33,6 @@
+>  #define QM_ABNORMAL_EVENT_IRQ_VECTOR	3
+>  
+>  /* mailbox */
+> -#define QM_MB_CMD_SQC			0x0
+> -#define QM_MB_CMD_CQC			0x1
+> -#define QM_MB_CMD_EQC			0x2
+> -#define QM_MB_CMD_AEQC			0x3
+> -#define QM_MB_CMD_SQC_BT		0x4
+> -#define QM_MB_CMD_CQC_BT		0x5
+> -#define QM_MB_CMD_SQC_VFT_V2		0x6
+> -#define QM_MB_CMD_STOP_QP		0x8
+> -#define QM_MB_CMD_SRC			0xc
+> -#define QM_MB_CMD_DST			0xd
+> -
+> -#define QM_MB_CMD_SEND_BASE		0x300
+> -#define QM_MB_EVENT_SHIFT		8
+> -#define QM_MB_BUSY_SHIFT		13
+> -#define QM_MB_OP_SHIFT			14
+> -#define QM_MB_CMD_DATA_ADDR_L		0x304
+> -#define QM_MB_CMD_DATA_ADDR_H		0x308
+>  #define QM_MB_PING_ALL_VFS		0xffff
+>  #define QM_MB_CMD_DATA_SHIFT		32
+>  #define QM_MB_CMD_DATA_MASK		GENMASK(31, 0)
+> @@ -103,19 +86,12 @@
+>  #define QM_DB_CMD_SHIFT_V1		16
+>  #define QM_DB_INDEX_SHIFT_V1		32
+>  #define QM_DB_PRIORITY_SHIFT_V1		48
+> -#define QM_DOORBELL_SQ_CQ_BASE_V2	0x1000
+> -#define QM_DOORBELL_EQ_AEQ_BASE_V2	0x2000
+>  #define QM_QUE_ISO_CFG_V		0x0030
+>  #define QM_PAGE_SIZE			0x0034
+>  #define QM_QUE_ISO_EN			0x100154
+>  #define QM_CAPBILITY			0x100158
+>  #define QM_QP_NUN_MASK			GENMASK(10, 0)
+>  #define QM_QP_DB_INTERVAL		0x10000
+> -#define QM_QP_MAX_NUM_SHIFT		11
+> -#define QM_DB_CMD_SHIFT_V2		12
+> -#define QM_DB_RAND_SHIFT_V2		16
+> -#define QM_DB_INDEX_SHIFT_V2		32
+> -#define QM_DB_PRIORITY_SHIFT_V2		48
+>  
+>  #define QM_MEM_START_INIT		0x100040
+>  #define QM_MEM_INIT_DONE		0x100044
+> @@ -693,7 +669,7 @@ static void qm_mb_pre_init(struct qm_mailbox *mailbox, u8 cmd,
+>  }
+>  
+>  /* return 0 mailbox ready, -ETIMEDOUT hardware timeout */
+> -static int qm_wait_mb_ready(struct hisi_qm *qm)
+> +int hisi_qm_wait_mb_ready(struct hisi_qm *qm)
+>  {
+>  	u32 val;
+>  
+> @@ -701,6 +677,7 @@ static int qm_wait_mb_ready(struct hisi_qm *qm)
+>  					  val, !((val >> QM_MB_BUSY_SHIFT) &
+>  					  0x1), POLL_PERIOD, POLL_TIMEOUT);
+>  }
+> +EXPORT_SYMBOL_GPL(hisi_qm_wait_mb_ready);
+>  
+>  /* 128 bit should be written to hardware at one time to trigger a mailbox */
+>  static void qm_mb_write(struct hisi_qm *qm, const void *src)
+> @@ -726,14 +703,14 @@ static void qm_mb_write(struct hisi_qm *qm, const void *src)
+>  
+>  static int qm_mb_nolock(struct hisi_qm *qm, struct qm_mailbox *mailbox)
+>  {
+> -	if (unlikely(qm_wait_mb_ready(qm))) {
+> +	if (unlikely(hisi_qm_wait_mb_ready(qm))) {
+>  		dev_err(&qm->pdev->dev, "QM mailbox is busy to start!\n");
+>  		goto mb_busy;
+>  	}
+>  
+>  	qm_mb_write(qm, mailbox);
+>  
+> -	if (unlikely(qm_wait_mb_ready(qm))) {
+> +	if (unlikely(hisi_qm_wait_mb_ready(qm))) {
+>  		dev_err(&qm->pdev->dev, "QM mailbox operation timeout!\n");
+>  		goto mb_busy;
+>  	}
+> @@ -745,8 +722,8 @@ static int qm_mb_nolock(struct hisi_qm *qm, struct qm_mailbox *mailbox)
+>  	return -EBUSY;
+>  }
+>  
+> -static int qm_mb(struct hisi_qm *qm, u8 cmd, dma_addr_t dma_addr, u16 queue,
+> -		 bool op)
+> +int hisi_qm_mb(struct hisi_qm *qm, u8 cmd, dma_addr_t dma_addr, u16 queue,
+> +	       bool op)
+>  {
+>  	struct qm_mailbox mailbox;
+>  	int ret;
+> @@ -762,6 +739,7 @@ static int qm_mb(struct hisi_qm *qm, u8 cmd, dma_addr_t dma_addr, u16 queue,
+>  
+>  	return ret;
+>  }
+> +EXPORT_SYMBOL_GPL(hisi_qm_mb);
+>  
+>  static void qm_db_v1(struct hisi_qm *qm, u16 qn, u8 cmd, u16 index, u8 priority)
+>  {
+> @@ -1351,7 +1329,7 @@ static int qm_get_vft_v2(struct hisi_qm *qm, u32 *base, u32 *number)
+>  	u64 sqc_vft;
+>  	int ret;
+>  
+> -	ret = qm_mb(qm, QM_MB_CMD_SQC_VFT_V2, 0, 0, 1);
+> +	ret = hisi_qm_mb(qm, QM_MB_CMD_SQC_VFT_V2, 0, 0, 1);
+>  	if (ret)
+>  		return ret;
+>  
+> @@ -1725,12 +1703,12 @@ static int dump_show(struct hisi_qm *qm, void *info,
+>  
+>  static int qm_dump_sqc_raw(struct hisi_qm *qm, dma_addr_t dma_addr, u16 qp_id)
+>  {
+> -	return qm_mb(qm, QM_MB_CMD_SQC, dma_addr, qp_id, 1);
+> +	return hisi_qm_mb(qm, QM_MB_CMD_SQC, dma_addr, qp_id, 1);
+>  }
+>  
+>  static int qm_dump_cqc_raw(struct hisi_qm *qm, dma_addr_t dma_addr, u16 qp_id)
+>  {
+> -	return qm_mb(qm, QM_MB_CMD_CQC, dma_addr, qp_id, 1);
+> +	return hisi_qm_mb(qm, QM_MB_CMD_CQC, dma_addr, qp_id, 1);
+>  }
+>  
+>  static int qm_sqc_dump(struct hisi_qm *qm, const char *s)
+> @@ -1842,7 +1820,7 @@ static int qm_eqc_aeqc_dump(struct hisi_qm *qm, char *s, size_t size,
+>  	if (IS_ERR(xeqc))
+>  		return PTR_ERR(xeqc);
+>  
+> -	ret = qm_mb(qm, cmd, xeqc_dma, 0, 1);
+> +	ret = hisi_qm_mb(qm, cmd, xeqc_dma, 0, 1);
+>  	if (ret)
+>  		goto err_free_ctx;
+>  
+> @@ -2495,7 +2473,7 @@ static int qm_ping_pf(struct hisi_qm *qm, u64 cmd)
+>  
+>  static int qm_stop_qp(struct hisi_qp *qp)
+>  {
+> -	return qm_mb(qp->qm, QM_MB_CMD_STOP_QP, 0, qp->qp_id, 0);
+> +	return hisi_qm_mb(qp->qm, QM_MB_CMD_STOP_QP, 0, qp->qp_id, 0);
+>  }
+>  
+>  static int qm_set_msi(struct hisi_qm *qm, bool set)
+> @@ -2763,7 +2741,7 @@ static int qm_sq_ctx_cfg(struct hisi_qp *qp, int qp_id, u32 pasid)
+>  		return -ENOMEM;
+>  	}
+>  
+> -	ret = qm_mb(qm, QM_MB_CMD_SQC, sqc_dma, qp_id, 0);
+> +	ret = hisi_qm_mb(qm, QM_MB_CMD_SQC, sqc_dma, qp_id, 0);
+>  	dma_unmap_single(dev, sqc_dma, sizeof(struct qm_sqc), DMA_TO_DEVICE);
+>  	kfree(sqc);
+>  
+> @@ -2804,7 +2782,7 @@ static int qm_cq_ctx_cfg(struct hisi_qp *qp, int qp_id, u32 pasid)
+>  		return -ENOMEM;
+>  	}
+>  
+> -	ret = qm_mb(qm, QM_MB_CMD_CQC, cqc_dma, qp_id, 0);
+> +	ret = hisi_qm_mb(qm, QM_MB_CMD_CQC, cqc_dma, qp_id, 0);
+>  	dma_unmap_single(dev, cqc_dma, sizeof(struct qm_cqc), DMA_TO_DEVICE);
+>  	kfree(cqc);
+>  
+> @@ -3655,7 +3633,7 @@ static int qm_eq_ctx_cfg(struct hisi_qm *qm)
+>  		return -ENOMEM;
+>  	}
+>  
+> -	ret = qm_mb(qm, QM_MB_CMD_EQC, eqc_dma, 0, 0);
+> +	ret = hisi_qm_mb(qm, QM_MB_CMD_EQC, eqc_dma, 0, 0);
+>  	dma_unmap_single(dev, eqc_dma, sizeof(struct qm_eqc), DMA_TO_DEVICE);
+>  	kfree(eqc);
+>  
+> @@ -3684,7 +3662,7 @@ static int qm_aeq_ctx_cfg(struct hisi_qm *qm)
+>  		return -ENOMEM;
+>  	}
+>  
+> -	ret = qm_mb(qm, QM_MB_CMD_AEQC, aeqc_dma, 0, 0);
+> +	ret = hisi_qm_mb(qm, QM_MB_CMD_AEQC, aeqc_dma, 0, 0);
+>  	dma_unmap_single(dev, aeqc_dma, sizeof(struct qm_aeqc), DMA_TO_DEVICE);
+>  	kfree(aeqc);
+>  
+> @@ -3723,11 +3701,11 @@ static int __hisi_qm_start(struct hisi_qm *qm)
+>  	if (ret)
+>  		return ret;
+>  
+> -	ret = qm_mb(qm, QM_MB_CMD_SQC_BT, qm->sqc_dma, 0, 0);
+> +	ret = hisi_qm_mb(qm, QM_MB_CMD_SQC_BT, qm->sqc_dma, 0, 0);
+>  	if (ret)
+>  		return ret;
+>  
+> -	ret = qm_mb(qm, QM_MB_CMD_CQC_BT, qm->cqc_dma, 0, 0);
+> +	ret = hisi_qm_mb(qm, QM_MB_CMD_CQC_BT, qm->cqc_dma, 0, 0);
+>  	if (ret)
+>  		return ret;
+>  
+> diff --git a/include/linux/hisi_acc_qm.h b/include/linux/hisi_acc_qm.h
+> index 3068093229a5..6a6477c34666 100644
+> --- a/include/linux/hisi_acc_qm.h
+> +++ b/include/linux/hisi_acc_qm.h
+> @@ -34,6 +34,40 @@
+>  #define QM_WUSER_M_CFG_ENABLE		0x1000a8
+>  #define WUSER_M_CFG_ENABLE		0xffffffff
+>  
+> +/* mailbox */
+> +#define QM_MB_CMD_SQC                   0x0
+> +#define QM_MB_CMD_CQC                   0x1
+> +#define QM_MB_CMD_EQC                   0x2
+> +#define QM_MB_CMD_AEQC                  0x3
+> +#define QM_MB_CMD_SQC_BT                0x4
+> +#define QM_MB_CMD_CQC_BT                0x5
+> +#define QM_MB_CMD_SQC_VFT_V2            0x6
+> +#define QM_MB_CMD_STOP_QP               0x8
+> +#define QM_MB_CMD_SRC                   0xc
+> +#define QM_MB_CMD_DST                   0xd
+> +
+> +#define QM_MB_CMD_SEND_BASE		0x300
+> +#define QM_MB_EVENT_SHIFT               8
+> +#define QM_MB_BUSY_SHIFT		13
+> +#define QM_MB_OP_SHIFT			14
+> +#define QM_MB_CMD_DATA_ADDR_L		0x304
+> +#define QM_MB_CMD_DATA_ADDR_H		0x308
+> +#define QM_MB_MAX_WAIT_CNT		6000
+> +
+> +/* doorbell */
+> +#define QM_DOORBELL_CMD_SQ              0
+> +#define QM_DOORBELL_CMD_CQ              1
+> +#define QM_DOORBELL_CMD_EQ              2
+> +#define QM_DOORBELL_CMD_AEQ             3
+> +
+> +#define QM_DOORBELL_SQ_CQ_BASE_V2	0x1000
+> +#define QM_DOORBELL_EQ_AEQ_BASE_V2	0x2000
+> +#define QM_QP_MAX_NUM_SHIFT             11
+> +#define QM_DB_CMD_SHIFT_V2		12
+> +#define QM_DB_RAND_SHIFT_V2		16
+> +#define QM_DB_INDEX_SHIFT_V2		32
+> +#define QM_DB_PRIORITY_SHIFT_V2		48
+> +
+>  /* qm cache */
+>  #define QM_CACHE_CTL			0x100050
+>  #define SQC_CACHE_ENABLE		BIT(0)
+> @@ -414,6 +448,10 @@ pci_ers_result_t hisi_qm_dev_slot_reset(struct pci_dev *pdev);
+>  void hisi_qm_reset_prepare(struct pci_dev *pdev);
+>  void hisi_qm_reset_done(struct pci_dev *pdev);
+>  
+> +int hisi_qm_wait_mb_ready(struct hisi_qm *qm);
+> +int hisi_qm_mb(struct hisi_qm *qm, u8 cmd, dma_addr_t dma_addr, u16 queue,
+> +	       bool op);
+> +
+>  struct hisi_acc_sgl_pool;
+>  struct hisi_acc_hw_sgl *hisi_acc_sg_buf_map_to_hw_sgl(struct device *dev,
+>  	struct scatterlist *sgl, struct hisi_acc_sgl_pool *pool,
+> 
