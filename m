@@ -2,414 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D4A864CDBC2
-	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 19:05:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 56A594CDBDA
+	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 19:12:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239955AbiCDSGC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Mar 2022 13:06:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42622 "EHLO
+        id S241472AbiCDSMs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Mar 2022 13:12:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236709AbiCDSGB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Mar 2022 13:06:01 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E99931C4B07
-        for <kvm@vger.kernel.org>; Fri,  4 Mar 2022 10:05:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646417112;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=1LQCaFXHVFxd9eTB5EpGTf9HGKm8GO1n2hfxb2aYkKc=;
-        b=Z1WQcKDsfEU8ojtn92d+UBvLDSD4J8vAGXXGhrSVccO1Gy4She7GYqz0d0JOlSJXpqxT2+
-        Eadg0vsfkRNOlo9/es4fl/KaPaV4ZifHnYNbCIWAi00zjvNwPivkLjIT2w622lx6/HthdP
-        u0Em+G0hIVN2xw52Gda94aReB5J+Fc0=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-408-9MCqiXUZNA6FRG8itEuEyQ-1; Fri, 04 Mar 2022 13:05:11 -0500
-X-MC-Unique: 9MCqiXUZNA6FRG8itEuEyQ-1
-Received: by mail-qk1-f198.google.com with SMTP id l82-20020a37a255000000b0060dd39f5d87so6144261qke.4
-        for <kvm@vger.kernel.org>; Fri, 04 Mar 2022 10:05:11 -0800 (PST)
+        with ESMTP id S235887AbiCDSMr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Mar 2022 13:12:47 -0500
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C0701C666E;
+        Fri,  4 Mar 2022 10:11:59 -0800 (PST)
+Received: by mail-ed1-x529.google.com with SMTP id p4so11832903edi.1;
+        Fri, 04 Mar 2022 10:11:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=tIN13TWuIqVkdYdqAGwqsk2ezDcrMTPKsAwAdQHKKcE=;
+        b=hRj9oqN8hOctWayWpATxG/nIqDH10fnWP899wm8utzM3mCf6Fqcsd659YYKCgTrCi2
+         bdacqOg/pXaHec7TKEA4PoSJvutAwRNVFNLDT/uoyjrnIUAopz6BrSt5RcKXaaEsssnX
+         EAs3udeSFgirMjKk1Qamysb+AwTWYGDiGYgAoqQdF2vqztqI2zm6cfvVwKy7TxiXIjuU
+         i/681TXZpPDDLeS49EnpTgjcD0drM77sb6SfPikxzc4lNf+twPlXHl8uQtsrwqHV1obH
+         E10h7AIPzFEZCX3RyiIXyGdNw3pOyefwT0gKgg4aFOk467ZQQf87H17SCKTMdd5HbDQW
+         KbrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=1LQCaFXHVFxd9eTB5EpGTf9HGKm8GO1n2hfxb2aYkKc=;
-        b=n/tAeXBTIXumRmsWjEgahiOFz1pafm0SBtowwPW0tC+NdTkqgN3sB95684MQ/5c++P
-         7JbC1C4yHKPOk+mCpirujBS9uknXnfuvDJwSPA2kWf/DsrzAaMUzmkQdQZkNe62wersH
-         EqmNzdvNYucoOdavTTRQ529YMQA4QDK7sH0B7MPaL5zKtntjpAjCJ5+ChtsU2QeAtN09
-         T34WQYzhGWLAVxcXhnolNNhOs3oXgrRJT0BTSbRRFyaMPs9DEL5X0++kb+Fa4Yq+Y2zG
-         EVAUscNChJkEyhcUVylokGoQmu+FkGhBDpnKO2rncGpMykrkDdX7Bei+TiB3sz/iQwfu
-         xw7A==
-X-Gm-Message-State: AOAM533rfXV4MuAEjAzrZdadrE72Nupbc4qUrx0oDxSsOxxFKcVJvJLr
-        QoM7wPP9YMMbQKeVhMJ6iuiFJ1tynL2Q+dPTFwYjNy5Lkhn+P6lNSzJ0T3/cA/2CnlO2rB4mlVR
-        YUleciDOfqXByrjgJ6aCRj3KIe3Rq
-X-Received: by 2002:a05:620a:1a97:b0:663:8d24:8cac with SMTP id bl23-20020a05620a1a9700b006638d248cacmr3336464qkb.632.1646417110539;
-        Fri, 04 Mar 2022 10:05:10 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzxdJDiS+VCQGyEYcH1o6RcK4SfVP0dMzDWB8rgpswFGZgSkAo4tGCe1isg3UE4F8p5mxDoeswbU7YOx47iz0c=
-X-Received: by 2002:a05:620a:1a97:b0:663:8d24:8cac with SMTP id
- bl23-20020a05620a1a9700b006638d248cacmr3336441qkb.632.1646417110187; Fri, 04
- Mar 2022 10:05:10 -0800 (PST)
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=tIN13TWuIqVkdYdqAGwqsk2ezDcrMTPKsAwAdQHKKcE=;
+        b=RoEPxECGBJUFEfaBaJc1gkNyHSUtQIB/1WQP2H0h5f3SXzxhRvmy1uLr+GFgzcqBih
+         t2mspp5uJej9GVWFVu+ANyZtIk/RFBOHifp8exPbGB2qHmZxdX8G2FW6d/BV10j37j8Z
+         WhyR0kYOMP2at1FwgPYBeFUrKvqrN2mBhCWteupqSe/PMGGDvb4ApbRatIzBMBJFi1ah
+         R266suldzekUnn4KO4qgseGC5xx5Z6dG6NAN3zvmDtEMSlRquHH4o5h5Yp94vkuloilK
+         tCF1i9n8OL1oW/7uB0PMMARdwSAM7WvKiTvQCCB+LGMUxfNIqo4ZPVyhANN3IvsXrW/4
+         qtVQ==
+X-Gm-Message-State: AOAM531qk3C1S9aM7ExqBMpWRjSW6lJ5Tj31nWVE24+DOMzGvwxJyFh8
+        Defb2idZQ71nFhgrXToCFrI=
+X-Google-Smtp-Source: ABdhPJyTwzLBayjlRop8xK9BoE2ZyRz1Cy6Kl+/tNQcC0TuDDerswyibHvSKORzTQK309VATWxg0cQ==
+X-Received: by 2002:a05:6402:34c5:b0:411:f082:d69 with SMTP id w5-20020a05640234c500b00411f0820d69mr40707510edc.65.1646417517569;
+        Fri, 04 Mar 2022 10:11:57 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id bx1-20020a0564020b4100b00410f01a91f0sm2450758edb.73.2022.03.04.10.11.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 04 Mar 2022 10:11:56 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <8b8c28cf-cf54-f889-be7d-afc9f5430ecd@redhat.com>
+Date:   Fri, 4 Mar 2022 19:11:55 +0100
 MIME-Version: 1.0
-References: <20201216064818.48239-1-jasowang@redhat.com> <20220224212314.1326-1-gdawar@xilinx.com>
- <20220224212314.1326-16-gdawar@xilinx.com>
-In-Reply-To: <20220224212314.1326-16-gdawar@xilinx.com>
-From:   Eugenio Perez Martin <eperezma@redhat.com>
-Date:   Fri, 4 Mar 2022 19:04:34 +0100
-Message-ID: <CAJaqyWcesvA68ghx15y0eJgZvXr5MNqYy2X2S+PJ3U_K8Z+DdQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 15/19] vhost-vdpa: support ASID based IOTLB API
-To:     Gautam Dawar <gautam.dawar@xilinx.com>
-Cc:     Gautam Dawar <gdawar@xilinx.com>,
-        Martin Petrus Hubertus Habets <martinh@xilinx.com>,
-        Harpreet Singh Anand <hanand@xilinx.com>,
-        Tanuj Murlidhar Kamde <tanujk@xilinx.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Zhu Lingshan <lingshan.zhu@intel.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Xie Yongji <xieyongji@bytedance.com>,
-        Eli Cohen <elic@nvidia.com>,
-        Si-Wei Liu <si-wei.liu@oracle.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Longpeng <longpeng2@huawei.com>,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        linux-kernel@vger.kernel.org, kvm list <kvm@vger.kernel.org>,
-        netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH v4 21/30] KVM: x86/mmu: Zap invalidated roots via
+ asynchronous worker
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        David Hildenbrand <david@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        Mingwei Zhang <mizhang@google.com>
+References: <20220303193842.370645-1-pbonzini@redhat.com>
+ <20220303193842.370645-22-pbonzini@redhat.com> <YiExLB3O2byI4Xdu@google.com>
+ <YiEz3D18wEn8lcEq@google.com>
+ <eeac12f0-0a18-8c63-1987-494a2032fa9d@redhat.com>
+ <YiI4AmYkm2oiuiio@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <YiI4AmYkm2oiuiio@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 24, 2022 at 10:28 PM Gautam Dawar <gautam.dawar@xilinx.com> wrote:
->
-> This patch extends the vhost-vdpa to support ASID based IOTLB API. The
-> vhost-vdpa device will allocated multiple IOTLBs for vDPA device that
-> supports multiple address spaces. The IOTLBs and vDPA device memory
-> mappings is determined and maintained through ASID.
->
-> Note that we still don't support vDPA device with more than one
-> address spaces that depends on platform IOMMU. This work will be done
-> by moving the IOMMU logic from vhost-vDPA to vDPA device driver.
->
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
-> Signed-off-by: Gautam Dawar <gdawar@xilinx.com>
-> ---
->  drivers/vhost/vdpa.c  | 129 ++++++++++++++++++++++++++++++++----------
->  drivers/vhost/vhost.c |   2 +-
->  2 files changed, 100 insertions(+), 31 deletions(-)
->
-> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> index 47e6cf9d0881..4bcf824e3b12 100644
-> --- a/drivers/vhost/vdpa.c
-> +++ b/drivers/vhost/vdpa.c
-> @@ -28,7 +28,8 @@
->  enum {
->         VHOST_VDPA_BACKEND_FEATURES =
->         (1ULL << VHOST_BACKEND_F_IOTLB_MSG_V2) |
-> -       (1ULL << VHOST_BACKEND_F_IOTLB_BATCH),
-> +       (1ULL << VHOST_BACKEND_F_IOTLB_BATCH) |
-> +       (1ULL << VHOST_BACKEND_F_IOTLB_ASID),
->  };
->
->  #define VHOST_VDPA_DEV_MAX (1U << MINORBITS)
-> @@ -57,13 +58,20 @@ struct vhost_vdpa {
->         struct eventfd_ctx *config_ctx;
->         int in_batch;
->         struct vdpa_iova_range range;
-> -       int used_as;
-> +       u32 batch_asid;
->  };
->
->  static DEFINE_IDA(vhost_vdpa_ida);
->
->  static dev_t vhost_vdpa_major;
->
-> +static inline u32 iotlb_to_asid(struct vhost_iotlb *iotlb)
-> +{
-> +       struct vhost_vdpa_as *as = container_of(iotlb, struct
-> +                                               vhost_vdpa_as, iotlb);
-> +       return as->id;
-> +}
-> +
->  static struct vhost_vdpa_as *asid_to_as(struct vhost_vdpa *v, u32 asid)
->  {
->         struct hlist_head *head = &v->as[asid % VHOST_VDPA_IOTLB_BUCKETS];
-> @@ -76,6 +84,16 @@ static struct vhost_vdpa_as *asid_to_as(struct vhost_vdpa *v, u32 asid)
->         return NULL;
->  }
->
-> +static struct vhost_iotlb *asid_to_iotlb(struct vhost_vdpa *v, u32 asid)
-> +{
-> +       struct vhost_vdpa_as *as = asid_to_as(v, asid);
-> +
-> +       if (!as)
-> +               return NULL;
-> +
-> +       return &as->iotlb;
-> +}
-> +
->  static struct vhost_vdpa_as *vhost_vdpa_alloc_as(struct vhost_vdpa *v, u32 asid)
->  {
->         struct hlist_head *head = &v->as[asid % VHOST_VDPA_IOTLB_BUCKETS];
-> @@ -84,6 +102,9 @@ static struct vhost_vdpa_as *vhost_vdpa_alloc_as(struct vhost_vdpa *v, u32 asid)
->         if (asid_to_as(v, asid))
->                 return NULL;
->
-> +       if (asid >= v->vdpa->nas)
-> +               return NULL;
-> +
->         as = kmalloc(sizeof(*as), GFP_KERNEL);
->         if (!as)
->                 return NULL;
-> @@ -91,18 +112,24 @@ static struct vhost_vdpa_as *vhost_vdpa_alloc_as(struct vhost_vdpa *v, u32 asid)
->         vhost_iotlb_init(&as->iotlb, 0, 0);
->         as->id = asid;
->         hlist_add_head(&as->hash_link, head);
-> -       ++v->used_as;
->
->         return as;
->  }
->
-> -static int vhost_vdpa_remove_as(struct vhost_vdpa *v, u32 asid)
-> +static struct vhost_vdpa_as *vhost_vdpa_find_alloc_as(struct vhost_vdpa *v,
-> +                                                     u32 asid)
->  {
->         struct vhost_vdpa_as *as = asid_to_as(v, asid);
->
-> -       /* Remove default address space is not allowed */
-> -       if (asid == 0)
-> -               return -EINVAL;
-> +       if (as)
-> +               return as;
-> +
-> +       return vhost_vdpa_alloc_as(v, asid);
-> +}
-> +
-> +static int vhost_vdpa_remove_as(struct vhost_vdpa *v, u32 asid)
-> +{
-> +       struct vhost_vdpa_as *as = asid_to_as(v, asid);
->
->         if (!as)
->                 return -EINVAL;
-> @@ -110,7 +137,6 @@ static int vhost_vdpa_remove_as(struct vhost_vdpa *v, u32 asid)
->         hlist_del(&as->hash_link);
->         vhost_iotlb_reset(&as->iotlb);
->         kfree(as);
-> -       --v->used_as;
->
->         return 0;
->  }
-> @@ -665,6 +691,7 @@ static int vhost_vdpa_map(struct vhost_vdpa *v, struct vhost_iotlb *iotlb,
->         struct vhost_dev *dev = &v->vdev;
->         struct vdpa_device *vdpa = v->vdpa;
->         const struct vdpa_config_ops *ops = vdpa->config;
-> +       u32 asid = iotlb_to_asid(iotlb);
->         int r = 0;
->
->         r = vhost_iotlb_add_range_ctx(iotlb, iova, iova + size - 1,
-> @@ -673,10 +700,10 @@ static int vhost_vdpa_map(struct vhost_vdpa *v, struct vhost_iotlb *iotlb,
->                 return r;
->
->         if (ops->dma_map) {
-> -               r = ops->dma_map(vdpa, 0, iova, size, pa, perm, opaque);
-> +               r = ops->dma_map(vdpa, asid, iova, size, pa, perm, opaque);
->         } else if (ops->set_map) {
->                 if (!v->in_batch)
-> -                       r = ops->set_map(vdpa, 0, iotlb);
-> +                       r = ops->set_map(vdpa, asid, iotlb);
->         } else {
->                 r = iommu_map(v->domain, iova, pa, size,
->                               perm_to_iommu_flags(perm));
-> @@ -692,23 +719,35 @@ static int vhost_vdpa_map(struct vhost_vdpa *v, struct vhost_iotlb *iotlb,
->         return 0;
->  }
->
-> -static void vhost_vdpa_unmap(struct vhost_vdpa *v,
-> -                            struct vhost_iotlb *iotlb,
-> -                            u64 iova, u64 size)
-> +static int vhost_vdpa_unmap(struct vhost_vdpa *v,
-> +                           struct vhost_iotlb *iotlb,
-> +                           u64 iova, u64 size)
->  {
->         struct vdpa_device *vdpa = v->vdpa;
->         const struct vdpa_config_ops *ops = vdpa->config;
-> +       u32 asid = iotlb_to_asid(iotlb);
-> +
-> +       if (!iotlb)
-> +               return -EINVAL;
+On 3/4/22 17:02, Sean Christopherson wrote:
+> On Fri, Mar 04, 2022, Paolo Bonzini wrote:
+>> On 3/3/22 22:32, Sean Christopherson wrote:
+>> I didn't remove the paragraph from the commit message, but I think it's
+>> unnecessary now.  The workqueue is flushed in kvm_mmu_zap_all_fast() and
+>> kvm_mmu_uninit_tdp_mmu(), unlike the buggy patch, so it doesn't need to take
+>> a reference to the VM.
+>>
+>> I think I don't even need to check kvm->users_count in the defunct root
+>> case, as long as kvm_mmu_uninit_tdp_mmu() flushes and destroys the workqueue
+>> before it checks that the lists are empty.
+> 
+> Yes, that should work.  IIRC, the WARN_ONs will tell us/you quite quickly if
+> we're wrong :-)  mmu_notifier_unregister() will call the "slow" kvm_mmu_zap_all()
+> and thus ensure all non-root pages zapped, but "leaking" a worker will trigger
+> the WARN_ON that there are no roots on the list.
 
-I think there is no need of checking for this. Similar functions
-assume the caller will pass non-null arguments, and
-vhost_vdpa_process_iotlb_msg does it.
+Good, for the record these are the commit messages I have:
 
-With that into account, I think there is little point in making this
-function return something different than void.
+     KVM: x86/mmu: Zap invalidated roots via asynchronous worker
+     
+     Use the system worker threads to zap the roots invalidated
+     by the TDP MMU's "fast zap" mechanism, implemented by
+     kvm_tdp_mmu_invalidate_all_roots().
+     
+     At this point, apart from allowing some parallelism in the zapping of
+     roots, the workqueue is a glorified linked list: work items are added and
+     flushed entirely within a single kvm->slots_lock critical section.  However,
+     the workqueue fixes a latent issue where kvm_mmu_zap_all_invalidated_roots()
+     assumes that it owns a reference to all invalid roots; therefore, no
+     one can set the invalid bit outside kvm_mmu_zap_all_fast().  Putting the
+     invalidated roots on a linked list... erm, on a workqueue ensures that
+     tdp_mmu_zap_root_work() only puts back those extra references that
+     kvm_mmu_zap_all_invalidated_roots() had gifted to it.
 
-Apart from that, iotlb is already used before checking for NULL.
+and
 
->
->         vhost_vdpa_iotlb_unmap(v, iotlb, iova, iova + size - 1);
->
->         if (ops->dma_map) {
-> -               ops->dma_unmap(vdpa, 0, iova, size);
-> +               ops->dma_unmap(vdpa, asid, iova, size);
->         } else if (ops->set_map) {
->                 if (!v->in_batch)
-> -                       ops->set_map(vdpa, 0, iotlb);
-> +                       ops->set_map(vdpa, asid, iotlb);
->         } else {
->                 iommu_unmap(v->domain, iova, size);
->         }
-> +
-> +       /* If we are in the middle of batch processing, delay the free
-> +        * of AS until BATCH_END.
-> +        */
-> +       if (!v->in_batch && !iotlb->nmaps)
-> +               vhost_vdpa_remove_as(v, asid);
-> +
-> +       return 0;
->  }
->
->  static int vhost_vdpa_va_map(struct vhost_vdpa *v,
-> @@ -916,33 +955,55 @@ static int vhost_vdpa_process_iotlb_msg(struct vhost_dev *dev, u32 asid,
->         struct vhost_vdpa *v = container_of(dev, struct vhost_vdpa, vdev);
->         struct vdpa_device *vdpa = v->vdpa;
->         const struct vdpa_config_ops *ops = vdpa->config;
-> -       struct vhost_vdpa_as *as = asid_to_as(v, 0);
-> -       struct vhost_iotlb *iotlb = &as->iotlb;
-> +       struct vhost_iotlb *iotlb = NULL;
-> +       struct vhost_vdpa_as *as = NULL;
->         int r = 0;
->
->         mutex_lock(&dev->mutex);
->
-> -       if (asid != 0)
-> -               return -EINVAL;
-> -
->         r = vhost_dev_check_owner(dev);
->         if (r)
->                 goto unlock;
->
-> +       if (msg->type == VHOST_IOTLB_UPDATE ||
-> +           msg->type == VHOST_IOTLB_BATCH_BEGIN) {
-> +               as = vhost_vdpa_find_alloc_as(v, asid);
-> +               if (!as) {
-> +                       dev_err(&v->dev, "can't find and alloc asid %d\n",
-> +                               asid);
-> +                       return -EINVAL;
-> +               }
-> +               iotlb = &as->iotlb;
-> +       } else
-> +               iotlb = asid_to_iotlb(v, asid);
-> +
-> +       if ((v->in_batch && v->batch_asid != asid) || !iotlb) {
-> +               if (v->in_batch && v->batch_asid != asid) {
-> +                       dev_info(&v->dev, "batch id %d asid %d\n",
-> +                                v->batch_asid, asid);
-> +               }
-> +               if (!iotlb)
-> +                       dev_err(&v->dev, "no iotlb for asid %d\n", asid);
-> +               return -EINVAL;
-> +       }
-> +
->         switch (msg->type) {
->         case VHOST_IOTLB_UPDATE:
->                 r = vhost_vdpa_process_iotlb_update(v, iotlb, msg);
->                 break;
->         case VHOST_IOTLB_INVALIDATE:
-> -               vhost_vdpa_unmap(v, iotlb, msg->iova, msg->size);
-> +               r = vhost_vdpa_unmap(v, iotlb, msg->iova, msg->size);
->                 break;
->         case VHOST_IOTLB_BATCH_BEGIN:
-> +               v->batch_asid = asid;
->                 v->in_batch = true;
->                 break;
->         case VHOST_IOTLB_BATCH_END:
->                 if (v->in_batch && ops->set_map)
-> -                       ops->set_map(vdpa, 0, iotlb);
-> +                       ops->set_map(vdpa, asid, iotlb);
->                 v->in_batch = false;
-> +               if (!iotlb->nmaps)
-> +                       vhost_vdpa_remove_as(v, asid);
->                 break;
->         default:
->                 r = -EINVAL;
-> @@ -1030,9 +1091,17 @@ static void vhost_vdpa_set_iova_range(struct vhost_vdpa *v)
->
->  static void vhost_vdpa_cleanup(struct vhost_vdpa *v)
->  {
-> +       struct vhost_vdpa_as *as;
-> +       u32 asid;
-> +
->         vhost_dev_cleanup(&v->vdev);
->         kfree(v->vdev.vqs);
-> -       vhost_vdpa_remove_as(v, 0);
-> +
-> +       for (asid = 0; asid < v->vdpa->nas; asid++) {
-> +               as = asid_to_as(v, asid);
-> +               if (as)
-> +                       vhost_vdpa_remove_as(v, asid);
-> +       }
->  }
->
->  static int vhost_vdpa_open(struct inode *inode, struct file *filep)
-> @@ -1067,12 +1136,9 @@ static int vhost_vdpa_open(struct inode *inode, struct file *filep)
->         vhost_dev_init(dev, vqs, nvqs, 0, 0, 0, false,
->                        vhost_vdpa_process_iotlb_msg);
->
-> -       if (!vhost_vdpa_alloc_as(v, 0))
-> -               goto err_alloc_as;
-> -
->         r = vhost_vdpa_alloc_domain(v);
->         if (r)
-> -               goto err_alloc_as;
-> +               goto err_alloc_domain;
->
->         vhost_vdpa_set_iova_range(v);
->
-> @@ -1080,7 +1146,7 @@ static int vhost_vdpa_open(struct inode *inode, struct file *filep)
->
->         return 0;
->
-> -err_alloc_as:
-> +err_alloc_domain:
->         vhost_vdpa_cleanup(v);
->  err:
->         atomic_dec(&v->opened);
-> @@ -1205,8 +1271,11 @@ static int vhost_vdpa_probe(struct vdpa_device *vdpa)
->         int minor;
->         int i, r;
->
-> -       /* Only support 1 address space and 1 groups */
-> -       if (vdpa->ngroups != 1 || vdpa->nas != 1)
-> +       /* We can't support platform IOMMU device with more than 1
-> +        * group or as
-> +        */
-> +       if (!ops->set_map && !ops->dma_map &&
-> +           (vdpa->ngroups > 1 || vdpa->nas > 1))
->                 return -EOPNOTSUPP;
->
->         v = kzalloc(sizeof(*v), GFP_KERNEL | __GFP_RETRY_MAYFAIL);
-> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> index 1f514d98f0de..92eeb684c84d 100644
-> --- a/drivers/vhost/vhost.c
-> +++ b/drivers/vhost/vhost.c
-> @@ -1167,7 +1167,7 @@ ssize_t vhost_chr_write_iter(struct vhost_dev *dev,
->                                 ret = -EINVAL;
->                                 goto done;
->                         }
-> -                       offset = sizeof(__u16);
-> +                       offset = 0;
->                 } else
->                         offset = sizeof(__u32);
->                 break;
-> --
-> 2.25.0
->
+     KVM: x86/mmu: Zap defunct roots via asynchronous worker
+     
+     Zap defunct roots, a.k.a. roots that have been invalidated after their
+     last reference was initially dropped, asynchronously via the existing work
+     queue instead of forcing the work upon the unfortunate task that happened
+     to drop the last reference.
+     
+     If a vCPU task drops the last reference, the vCPU is effectively blocked
+     by the host for the entire duration of the zap.  If the root being zapped
+     happens be fully populated with 4kb leaf SPTEs, e.g. due to dirty logging
+     being active, the zap can take several hundred seconds.  Unsurprisingly,
+     most guests are unhappy if a vCPU disappears for hundreds of seconds.
+     
+     E.g. running a synthetic selftest that triggers a vCPU root zap with
+     ~64tb of guest memory and 4kb SPTEs blocks the vCPU for 900+ seconds.
+     Offloading the zap to a worker drops the block time to <100ms.
+     
+     There is an important nuance to this change.  If the same work item
+     was queued twice before the work function has run, it would only
+     execute once and one reference would be leaked.  Therefore, now that
+     queueing items is not anymore protected by write_lock(&kvm->mmu_lock),
+     kvm_tdp_mmu_invalidate_all_roots() has to check root->role.invalid and
+     skip already invalid roots.  On the other hand, kvm_mmu_zap_all_fast()
+     must return only after those skipped roots have been zapped as well.
+     These two requirements can be satisfied only if _all_ places that
+     change invalid to true now schedule the worker before releasing the
+     mmu_lock.  There are just two, kvm_tdp_mmu_put_root() and
+     kvm_tdp_mmu_invalidate_all_roots().
 
+Paolo
