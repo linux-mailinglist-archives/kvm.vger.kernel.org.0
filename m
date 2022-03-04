@@ -2,115 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 116FB4CCEE9
-	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 08:13:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B3BEB4CCF32
+	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 08:43:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235388AbiCDHOh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Mar 2022 02:14:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39280 "EHLO
+        id S238924AbiCDHoZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Mar 2022 02:44:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238804AbiCDHLJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Mar 2022 02:11:09 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB808190C14;
-        Thu,  3 Mar 2022 23:08:12 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        with ESMTP id S238876AbiCDHoW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Mar 2022 02:44:22 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32989192E08;
+        Thu,  3 Mar 2022 23:43:31 -0800 (PST)
+Received: from nazgul.tnic (dynamic-002-247-254-208.2.247.pool.telefonica.de [2.247.254.208])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 75862B8277B;
-        Fri,  4 Mar 2022 07:08:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE489C36AE2;
-        Fri,  4 Mar 2022 07:08:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1646377690;
-        bh=yQYBzWouNWOyD9zM5WtI9fIV8Tp/PcZjsK5VYT69gEM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=G2dtgef9seu1rfUTmGaIXrWAUcOn2Gy1WhrcXurBrEpz4hhDxdQg7EuNpftnUXTtq
-         JBjN5h0HVmLOkCA8JyqebsGSz1ffWON8GKhccz7Q5MuDxS0yeif3v1gVvhTo9iy6Z4
-         Yw6NZHCj6bSAU0PEYw//6qnMTd2WRw8pJiHKGe6JiSFkn463dtBONTLAz/3Kg2qOg6
-         AdlvY4hZkaePiNMTjfX3xpLCbwh6s4cGOiFALYCVSglUJl2L8ebgwYO1lzaPPco9Q0
-         Vz3MokG1wkJrp38nUB/wBYXbGjM1z0dCF6Rn3lWXwku46vZjTmVwOoV0nx1hn+/02I
-         9AGKhomxWLQYw==
-Date:   Fri, 4 Mar 2022 09:08:05 +0200
-From:   Leon Romanovsky <leon@kernel.org>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Lee Jones <lee.jones@linaro.org>, jasowang@redhat.com,
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 75F971EC01CE;
+        Fri,  4 Mar 2022 08:43:25 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1646379805;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=wa4qlj2kScoKOUQ36KYA3lgsrDq7guOB8fZmS8g/Qg8=;
+        b=IW0oc0svgti4hQijwpuUIret1pQsGi4VDbH4SBbOxVTSDeLfDBgYrDnLtxYouaWlH+vc4P
+        OVDvTnOraR9H80HGMhLDNW1vLwDMRLLK8EZQ4QImSQvm6Oe4coXv0qK8SyeGDBigoVmH7T
+        GL6AOJQC1jqI/1RfuGCkgL1TVy2JrRQ=
+Date:   Fri, 4 Mar 2022 08:43:30 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 1/1] vhost: Provide a kernel warning if mutex is held
- whilst clean-up in progress
-Message-ID: <YiG61RqXFvq/t0fB@unreal>
-References: <20220303151929.2505822-1-lee.jones@linaro.org>
- <YiETnIcfZCLb63oB@unreal>
- <20220303155645-mutt-send-email-mst@kernel.org>
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        brijesh.ksingh@gmail.com, tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH v11 39/45] x86/sev: Use firmware-validated CPUID for
+ SEV-SNP guests
+Message-ID: <YiHDFySCr1ZPK5f7@nazgul.tnic>
+References: <20220224165625.2175020-1-brijesh.singh@amd.com>
+ <20220224165625.2175020-40-brijesh.singh@amd.com>
+ <YiCrp61CoqJUXm5q@nazgul.tnic>
+ <20220304003157.diqytybw6gpwn5sa@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20220303155645-mutt-send-email-mst@kernel.org>
-X-Spam-Status: No, score=-7.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <20220304003157.diqytybw6gpwn5sa@amd.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 03, 2022 at 04:01:06PM -0500, Michael S. Tsirkin wrote:
-> On Thu, Mar 03, 2022 at 09:14:36PM +0200, Leon Romanovsky wrote:
-> > On Thu, Mar 03, 2022 at 03:19:29PM +0000, Lee Jones wrote:
-> > > All workers/users should be halted before any clean-up should take place.
-> > > 
-> > > Suggested-by:  Michael S. Tsirkin <mst@redhat.com>
-> > > Signed-off-by: Lee Jones <lee.jones@linaro.org>
-> > > ---
-> > >  drivers/vhost/vhost.c | 3 +++
-> > >  1 file changed, 3 insertions(+)
-> > > 
-> > > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> > > index bbaff6a5e21b8..d935d2506963f 100644
-> > > --- a/drivers/vhost/vhost.c
-> > > +++ b/drivers/vhost/vhost.c
-> > > @@ -693,6 +693,9 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
-> > >  	int i;
-> > >  
-> > >  	for (i = 0; i < dev->nvqs; ++i) {
-> > > +		/* Ideally all workers should be stopped prior to clean-up */
-> > > +		WARN_ON(mutex_is_locked(&dev->vqs[i]->mutex));
-> > > +
-> > >  		mutex_lock(&dev->vqs[i]->mutex);
-> > 
-> > I know nothing about vhost, but this construction and patch looks
-> > strange to me.
-> > 
-> > If all workers were stopped, you won't need mutex_lock(). The mutex_lock
-> > here suggests to me that workers can still run here.
-> > 
-> > Thanks
-> 
-> 
-> "Ideally" here is misleading, we need a bigger detailed comment
-> along the lines of:
-> 
-> /* 
->  * By design, no workers can run here. But if there's a bug and the
->  * driver did not flush all work properly then they might, and we
->  * encountered such bugs in the past.  With no proper flush guest won't
->  * work correctly but avoiding host memory corruption in this case
->  * sounds like a good idea.
->  */
+On Thu, Mar 03, 2022 at 06:31:57PM -0600, Michael Roth wrote:
+> In that case it seems to expect "mce=option1 mce=option2" etc. I could
+> open-code a parser to handle multiple options like sev=option1,option2
+> etc., but wanted to check with you first.
 
-This description looks better, but the check is inherently racy.
-Why don't you add a comment and mutex_lock()? The WARN_ON here is
-more distraction than actual help.
+Yap, that would make most sense - you want to be able to enable a couple
+of options without excessive typing.
 
-Thanks
+> Also, should I go ahead and introduce struct sev_options now, or
+> just use a regular bool until more options are added later?
 
-> 
-> > >  		if (dev->vqs[i]->error_ctx)
-> > >  			eventfd_ctx_put(dev->vqs[i]->error_ctx);
-> > > -- 
-> > > 2.35.1.574.g5d30c73bfb-goog
-> > > 
-> 
+struct sev_config {
+	__u64 debug	: 1,
+	     __reserved : 63;
+}
+
+just like struct mca_config.
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
