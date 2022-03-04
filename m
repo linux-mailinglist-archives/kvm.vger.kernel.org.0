@@ -2,227 +2,517 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 685554CD3C7
-	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 12:51:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C36464CD414
+	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 13:11:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237300AbiCDLwk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Mar 2022 06:52:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46816 "EHLO
+        id S231679AbiCDMMd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Mar 2022 07:12:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233210AbiCDLwi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Mar 2022 06:52:38 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 908461B2ADC
-        for <kvm@vger.kernel.org>; Fri,  4 Mar 2022 03:51:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646394709;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=vZKmcoKe00bB7xWiFgBqQRVmBmt+1lt3ei1GdFPkXBk=;
-        b=V3mhgDdgjQikZNJXSvBvxM99hoSXMDPT4D+i/Sv9pBY4qfeXwfHUofhudpMS9iiQQmHjub
-        C6wZHxlAyGHCorQLmm84WDqdYqwvEGlm3BCOwSqXUkge//DZLcjYxvVxzwGytXisqSGpKe
-        Q1yewJ/xOleONODODwYYUlhifSyvnu4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-614-Y5O1eiU8PguXlxZtp9UqWw-1; Fri, 04 Mar 2022 06:51:48 -0500
-X-MC-Unique: Y5O1eiU8PguXlxZtp9UqWw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EF1C58070FF;
-        Fri,  4 Mar 2022 11:51:46 +0000 (UTC)
-Received: from starship (unknown [10.40.192.8])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4986C10589AF;
-        Fri,  4 Mar 2022 11:51:44 +0000 (UTC)
-Message-ID: <1c838121e40b8b712fd56dc47675d77cb126121f.camel@redhat.com>
-Subject: Re: [RFC PATCH 11/13] KVM: SVM: Add logic to switch between APIC
- and x2APIC virtualization mode
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, seanjc@google.com, joro@8bytes.org,
-        jon.grimm@amd.com, wei.huang2@amd.com, terry.bowman@amd.com
-Date:   Fri, 04 Mar 2022 13:51:42 +0200
-In-Reply-To: <6ff5a6ce-780b-0234-aec5-ef5cff290feb@amd.com>
-References: <20220221021922.733373-1-suravee.suthikulpanit@amd.com>
-         <20220221021922.733373-12-suravee.suthikulpanit@amd.com>
-         <5f3b7d10e63126073fa4c17ba4e095b0fa0795e8.camel@redhat.com>
-         <6ff5a6ce-780b-0234-aec5-ef5cff290feb@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        with ESMTP id S229600AbiCDMMc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Mar 2022 07:12:32 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 178921A6F8B;
+        Fri,  4 Mar 2022 04:11:44 -0800 (PST)
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 224Ao7eI025179;
+        Fri, 4 Mar 2022 12:11:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Svs8cOqqOCVuUEzFE0BxtsHRyKxZzAuXoVSjh7TSQuQ=;
+ b=eP64G+zm9zhU9HmGpRmsCeIHBb9Zm0BeJpyrwIdFON4d/3qrfisPdVYGuDfoh+jBbEgn
+ oCxPAnvz0Woq6Zorx0QziiWg6VIq4WPz0ydr6gxbPRQowsrE9ZC5Dkp0EXPcNFCaMWge
+ 1f7p5tPFjgqsr8cQfoqLWM/nBScJ5BejRoF22PDB8MP6FisaM4XFHkdoBPH+XsUOXJ2h
+ Wuw+U0BSI4+bEaV7wVkiz0kg0GpDxvKgmFGAJJxOVE01Cu3OeW9ruShG6bA/4FVgSMiF
+ 3teKWYyRDYZQXtkTWIPc/1d7UuS0IzKOVOtmkIawjv19PazJn0uW5MSnY+qRHmTHMECh Jw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ekhbx1akn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 04 Mar 2022 12:11:40 +0000
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 224CBe6B015191;
+        Fri, 4 Mar 2022 12:11:40 GMT
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ekhbx1ak1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 04 Mar 2022 12:11:39 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 224C7GJf006112;
+        Fri, 4 Mar 2022 12:11:37 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma04fra.de.ibm.com with ESMTP id 3ek4k5hdys-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 04 Mar 2022 12:11:37 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 224CBYLg51446100
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 4 Mar 2022 12:11:34 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3239B4203F;
+        Fri,  4 Mar 2022 12:11:34 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A6A4042042;
+        Fri,  4 Mar 2022 12:11:33 +0000 (GMT)
+Received: from [9.145.58.173] (unknown [9.145.58.173])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri,  4 Mar 2022 12:11:33 +0000 (GMT)
+Message-ID: <e5567007-e710-fd13-f426-a458b93fa3f9@linux.ibm.com>
+Date:   Fri, 4 Mar 2022 13:11:33 +0100
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH v2 3/3] selftests: drivers/s390x: Add uvdevice tests
+Content-Language: en-US
+To:     Steffen Eiden <seiden@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20220223144830.44039-1-seiden@linux.ibm.com>
+ <20220223144830.44039-4-seiden@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <20220223144830.44039-4-seiden@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: i1Qt4S5-_U4IfDJGcySCKNyjFX5wsAJF
+X-Proofpoint-ORIG-GUID: 3mn-vxdKENRDAlT4ySE6MUZTS4wPm9Tf
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-03-04_02,2022-03-04_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ adultscore=0 clxscore=1015 mlxscore=0 mlxlogscore=999 spamscore=0
+ impostorscore=0 bulkscore=0 suspectscore=0 malwarescore=0 phishscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2203040065
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2022-03-04 at 18:22 +0700, Suravee Suthikulpanit wrote:
-> Maxim,
-> 
-> On 2/25/22 3:03 AM, Maxim Levitsky wrote:
-> > On Sun, 2022-02-20 at 20:19 -0600, Suravee Suthikulpanit wrote:
-> > > ....
-> > > 
-> > > diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> > > index 3543b7a4514a..3306b74f1d8b 100644
-> > > --- a/arch/x86/kvm/svm/avic.c
-> > > +++ b/arch/x86/kvm/svm/avic.c
-> > > @@ -79,6 +79,50 @@ static inline enum avic_modes avic_get_vcpu_apic_mode(struct vcpu_svm *svm)
-> > >   		return AVIC_MODE_NONE;
-> > >   }
-> > >   
-> > > +static inline void avic_set_x2apic_msr_interception(struct vcpu_svm *svm, bool disable)
-> > > +{
-> > > +	int i;
-> > > +
-> > > +	for (i = 0x800; i <= 0x8ff; i++)
-> > > +		set_msr_interception(&svm->vcpu, svm->msrpm, i,
-> > > +				     !disable, !disable);
-> > > +}
-> > > +
-> > > +void avic_activate_vmcb(struct vcpu_svm *svm)
-> > > +{
-> > > +	struct vmcb *vmcb = svm->vmcb01.ptr;
-> > > +
-> > > +	vmcb->control.int_ctl |= AVIC_ENABLE_MASK;
-> > > +
-> > > +	if (svm->x2apic_enabled) {
-> > Use apic_x2apic_mode here as well
-> 
-> Okay
-> 
-> > > +		vmcb->control.int_ctl |= X2APIC_MODE_MASK;
-> > > +		vmcb->control.avic_physical_id &= ~X2AVIC_MAX_PHYSICAL_ID;
-> > > +		vmcb->control.avic_physical_id |= X2AVIC_MAX_PHYSICAL_ID;
-> > Why not just use
-> > 
-> > phys_addr_t ppa = __sme_set(page_to_phys(kvm_svm->avic_physical_id_table_page));;
-> > vmcb->control.avic_physical_id = ppa | X2AVIC_MAX_PHYSICAL_ID;
-> > 
-> 
-> Sorry, I don't quiet understand this part. We just want to update certain bits in the VMCB register.
+On 2/23/22 15:48, Steffen Eiden wrote:
+> Adds some selftests to test ioctl error paths of the uv-uapi.
+> The Kconfig S390_UV_UAPI must be selected and the Ultravisor facility
+> must be available. The test can be executed by non-root, however, the
+> uvdevice special file /dev/uv must be accessible for reading and
+> writing which may imply root privileges.
 
-It seems a bit cleaner to me to create that field again instead of erasing bits like that.
-But honestly I don't mind it that much.
+Acked-by: Janosch Frank <frankja@linux.ibm.com>
 
 
 > 
-> > > ...
-> > > +void avic_deactivate_vmcb(struct vcpu_svm *svm)
-> > > +{
-> > > +	struct vmcb *vmcb = svm->vmcb01.ptr;
-> > > +
-> > > +	vmcb->control.int_ctl &= ~(AVIC_ENABLE_MASK | X2APIC_MODE_MASK);
-> > > +
-> > > +	if (svm->x2apic_enabled)
-> > > +		vmcb->control.avic_physical_id &= ~X2AVIC_MAX_PHYSICAL_ID;
-> > > +	else
-> > > +		vmcb->control.avic_physical_id &= ~AVIC_MAX_PHYSICAL_ID;
-> > > +
-> > > +	/* Enabling MSR intercept for x2APIC registers */
-> > > +	avic_set_x2apic_msr_interception(svm, true);
-> > > +}
-> > > +
-> > >   /* Note:
-> > >    * This function is called from IOMMU driver to notify
-> > >    * SVM to schedule in a particular vCPU of a particular VM.
-> > > @@ -195,13 +239,12 @@ void avic_init_vmcb(struct vcpu_svm *svm)
-> > >   	vmcb->control.avic_backing_page = bpa & AVIC_HPA_MASK;
-> > >   	vmcb->control.avic_logical_id = lpa & AVIC_HPA_MASK;
-> > >   	vmcb->control.avic_physical_id = ppa & AVIC_HPA_MASK;
-> > > -	vmcb->control.avic_physical_id |= AVIC_MAX_PHYSICAL_ID;
-> > >   	vmcb->control.avic_vapic_bar = APIC_DEFAULT_PHYS_BASE & VMCB_AVIC_APIC_BAR_MASK;
-> > >   
-> > >   	if (kvm_apicv_activated(svm->vcpu.kvm))
-> > > -		vmcb->control.int_ctl |= AVIC_ENABLE_MASK;
-> > > +		avic_activate_vmcb(svm);
-> > Why not set AVIC_ENABLE_MASK in avic_activate_vmcb ?
+>    ./test-uv-device
+>    TAP version 13
+>    1..10
+>    # Starting 10 tests from 4 test cases.
+>    #  RUN           uvio_fixture.qui.fault_ioctl_arg ...
+>    #            OK  uvio_fixture.qui.fault_ioctl_arg
+>    ok 1 uvio_fixture.qui.fault_ioctl_arg
+>    #  RUN           uvio_fixture.qui.fault_uvio_arg ...
+>    #            OK  uvio_fixture.qui.fault_uvio_arg
+>    ok 2 uvio_fixture.qui.fault_uvio_arg
+>    #  RUN           uvio_fixture.qui.inval_ioctl_cb ...
+>    #            OK  uvio_fixture.qui.inval_ioctl_cb
+>    ok 3 uvio_fixture.qui.inval_ioctl_cb
+>    #  RUN           uvio_fixture.qui.inval_ioctl_cmd ...
+>    #            OK  uvio_fixture.qui.inval_ioctl_cmd
+>    ok 4 uvio_fixture.qui.inval_ioctl_cmd
+>    #  RUN           uvio_fixture.att.fault_ioctl_arg ...
+>    #            OK  uvio_fixture.att.fault_ioctl_arg
+>    ok 5 uvio_fixture.att.fault_ioctl_arg
+>    #  RUN           uvio_fixture.att.fault_uvio_arg ...
+>    #            OK  uvio_fixture.att.fault_uvio_arg
+>    ok 6 uvio_fixture.att.fault_uvio_arg
+>    #  RUN           uvio_fixture.att.inval_ioctl_cb ...
+>    #            OK  uvio_fixture.att.inval_ioctl_cb
+>    ok 7 uvio_fixture.att.inval_ioctl_cb
+>    #  RUN           uvio_fixture.att.inval_ioctl_cmd ...
+>    #            OK  uvio_fixture.att.inval_ioctl_cmd
+>    ok 8 uvio_fixture.att.inval_ioctl_cmd
+>    #  RUN           attest_fixture.att_inval_request ...
+>    #            OK  attest_fixture.att_inval_request
+>    ok 9 attest_fixture.att_inval_request
+>    #  RUN           attest_fixture.att_inval_addr ...
+>    #            OK  attest_fixture.att_inval_addr
+>    ok 10 attest_fixture.att_inval_addr
+>    # PASSED: 10 / 10 tests passed.
+>    # Totals: pass:10 fail:0 xfail:0 xpass:0 skip:0 error:0
 > 
-> It's already doing "vmcb->control.int_ctl |= X2APIC_MODE_MASK;" in avic_activate_vmcb().
-Yes, but why not also to set/clear AVIC_ENABLE_MASK there as well?
-
+> Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
+> ---
+>   MAINTAINERS                                   |   1 +
+>   tools/testing/selftests/Makefile              |   1 +
+>   tools/testing/selftests/drivers/.gitignore    |   1 +
+>   .../selftests/drivers/s390x/uvdevice/Makefile |  22 ++
+>   .../selftests/drivers/s390x/uvdevice/config   |   1 +
+>   .../drivers/s390x/uvdevice/test_uvdevice.c    | 281 ++++++++++++++++++
+>   6 files changed, 307 insertions(+)
+>   create mode 100644 tools/testing/selftests/drivers/s390x/uvdevice/Makefile
+>   create mode 100644 tools/testing/selftests/drivers/s390x/uvdevice/config
+>   create mode 100644 tools/testing/selftests/drivers/s390x/uvdevice/test_uvdevice.c
 > 
-> > >   	else
-> > > -		vmcb->control.int_ctl &= ~AVIC_ENABLE_MASK;
-> > > +		avic_deactivate_vmcb(svm);
-> > >   }
-> > >   
-> > >   static u64 *avic_get_physical_id_entry(struct kvm_vcpu *vcpu,
-> > > @@ -657,6 +700,13 @@ void avic_update_vapic_bar(struct vcpu_svm *svm, u64 data)
-> > >   		 svm->x2apic_enabled ? "x2APIC" : "xAPIC");
-> > >   	vmcb_mark_dirty(svm->vmcb, VMCB_AVIC);
-> > >   	kvm_vcpu_update_apicv(&svm->vcpu);
-> > > +
-> > > +	/*
-> > > +	 * The VM could be running w/ AVIC activated switching from APIC
-> > > +	 * to x2APIC mode. We need to all refresh to make sure that all
-> > > +	 * x2AVIC configuration are being done.
-> > > +	 */
-> > > +	svm_refresh_apicv_exec_ctrl(&svm->vcpu);
-> > 
-> > That also should be done in avic_set_virtual_apic_mode  instead, but otherwise should be fine.
-> 
-> Agree, and will be updated to use svm_set_virtual_apic_mode() in v2.
-> 
-> > Also it seems that .avic_set_virtual_apic_mode will cover you on the case when x2apic is disabled
-> > in the guest cpuid - kvm_set_apic_base checks if the guest cpuid has x2apic support and refuses
-> > to enable it if it is not set.
-> > 
-> > But still a WARN_ON_ONCE won't hurt to see that you are not enabling x2avic when not supported.
-> 
-> Not sure if we need this. The logic for activating x2AVIC in VMCB already
-> check if the guest x2APIC mode is set, which can only happen if x2APIC CPUID
-> is set.
-I don't mind that much, just a suggestion.
-
-> 
-> > >   }
-> > >   
-> > >   void svm_set_virtual_apic_mode(struct kvm_vcpu *vcpu)
-> > > @@ -722,9 +772,9 @@ void svm_refresh_apicv_exec_ctrl(struct kvm_vcpu *vcpu)
-> > >   		 * accordingly before re-activating.
-> > >   		 */
-> > >   		avic_post_state_restore(vcpu);
-> > > -		vmcb->control.int_ctl |= AVIC_ENABLE_MASK;
-> > > +		avic_activate_vmcb(svm);
-> > >   	} else {
-> > > -		vmcb->control.int_ctl &= ~AVIC_ENABLE_MASK;
-> > > +		avic_deactivate_vmcb(svm);
-> > >   	}
-> > >   	vmcb_mark_dirty(vmcb, VMCB_AVIC);
-> > >   
-> > > @@ -1019,7 +1069,6 @@ void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
-> > >   		return;
-> > >   
-> > >   	entry = READ_ONCE(*(svm->avic_physical_id_cache));
-> > > -	WARN_ON(entry & AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK);
-> > Why?
-> 
-> For AVIC, this WARN_ON is designed to catch the scenario when the vCPU is calling
-> avic_vcpu_load() while it is already running. However, with x2AVIC support,
-> the vCPU can switch from xAPIC to x2APIC mode while in running state
-> (i.e. the AVIC is_running is set). This warning is currently observed due to
-> the call from svm_refresh_apicv_exec_ctrl().
-
-Ah, understand you now!
-
-Best regards,
-	Thanks,
-		Maxim Levitsky
-
-> 
-> Regards,
-> Suravee
-> 
-
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index f32e876f45c2..7fdf0fa006db 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -10582,6 +10582,7 @@ F:	arch/s390/kernel/uv.c
+>   F:	arch/s390/kvm/
+>   F:	arch/s390/mm/gmap.c
+>   F:	drivers/s390/char/uvdevice.c
+> +F:	tools/testing/selftests/drivers/s390x/uvdevice/
+>   F:	tools/testing/selftests/kvm/*/s390x/
+>   F:	tools/testing/selftests/kvm/s390x/
+>   
+> diff --git a/tools/testing/selftests/Makefile b/tools/testing/selftests/Makefile
+> index d08fe4cfe811..d454faf936c3 100644
+> --- a/tools/testing/selftests/Makefile
+> +++ b/tools/testing/selftests/Makefile
+> @@ -10,6 +10,7 @@ TARGETS += core
+>   TARGETS += cpufreq
+>   TARGETS += cpu-hotplug
+>   TARGETS += drivers/dma-buf
+> +TARGETS += drivers/s390x/uvdevice
+>   TARGETS += efivarfs
+>   TARGETS += exec
+>   TARGETS += filesystems
+> diff --git a/tools/testing/selftests/drivers/.gitignore b/tools/testing/selftests/drivers/.gitignore
+> index ca74f2e1c719..09e23b5afa96 100644
+> --- a/tools/testing/selftests/drivers/.gitignore
+> +++ b/tools/testing/selftests/drivers/.gitignore
+> @@ -1,2 +1,3 @@
+>   # SPDX-License-Identifier: GPL-2.0-only
+>   /dma-buf/udmabuf
+> +/s390x/uvdevice/test_uvdevice
+> diff --git a/tools/testing/selftests/drivers/s390x/uvdevice/Makefile b/tools/testing/selftests/drivers/s390x/uvdevice/Makefile
+> new file mode 100644
+> index 000000000000..5e701d2708d4
+> --- /dev/null
+> +++ b/tools/testing/selftests/drivers/s390x/uvdevice/Makefile
+> @@ -0,0 +1,22 @@
+> +include ../../../../../build/Build.include
+> +
+> +UNAME_M := $(shell uname -m)
+> +
+> +ifneq ($(UNAME_M),s390x)
+> +nothing:
+> +.PHONY: all clean run_tests install
+> +.SILENT:
+> +else
+> +
+> +TEST_GEN_PROGS := test_uvdevice
+> +
+> +top_srcdir ?= ../../../../../..
+> +KSFT_KHDR_INSTALL := 1
+> +khdr_dir = $(top_srcdir)/usr/include
+> +LINUX_TOOL_ARCH_INCLUDE = $(top_srcdir)/tools/arch/$(ARCH)/include
+> +
+> +CFLAGS += -Wall -Werror -static -I$(khdr_dir) -I$(LINUX_TOOL_ARCH_INCLUDE)
+> +
+> +include ../../../lib.mk
+> +
+> +endif
+> diff --git a/tools/testing/selftests/drivers/s390x/uvdevice/config b/tools/testing/selftests/drivers/s390x/uvdevice/config
+> new file mode 100644
+> index 000000000000..f28a04b99eff
+> --- /dev/null
+> +++ b/tools/testing/selftests/drivers/s390x/uvdevice/config
+> @@ -0,0 +1 @@
+> +CONFIG_S390_UV_UAPI=y
+> diff --git a/tools/testing/selftests/drivers/s390x/uvdevice/test_uvdevice.c b/tools/testing/selftests/drivers/s390x/uvdevice/test_uvdevice.c
+> new file mode 100644
+> index 000000000000..44a6fbefc156
+> --- /dev/null
+> +++ b/tools/testing/selftests/drivers/s390x/uvdevice/test_uvdevice.c
+> @@ -0,0 +1,281 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + *  selftest for the Ultravisor UAPI device
+> + *
+> + *  Copyright IBM Corp. 2022
+> + *  Author(s): Steffen Eiden <seiden@linux.ibm.com>
+> + */
+> +
+> +#include <stdint.h>
+> +#include <fcntl.h>
+> +#include <errno.h>
+> +#include <sys/ioctl.h>
+> +#include <sys/mman.h>
+> +
+> +#include <asm/uvdevice.h>
+> +
+> +#include "../../../kselftest_harness.h"
+> +
+> +#define UV_PATH  "/dev/uv"
+> +#define BUFFER_SIZE 0x200
+> +FIXTURE(uvio_fixture) {
+> +	int uv_fd;
+> +	struct uvio_ioctl_cb uvio_ioctl;
+> +	uint8_t buffer[BUFFER_SIZE];
+> +	__u64 fault_page;
+> +};
+> +
+> +FIXTURE_VARIANT(uvio_fixture) {
+> +	unsigned long ioctl_cmd;
+> +	uint32_t arg_size;
+> +};
+> +
+> +FIXTURE_VARIANT_ADD(uvio_fixture, qui) {
+> +	.ioctl_cmd = UVIO_IOCTL_QUI,
+> +	.arg_size = BUFFER_SIZE,
+> +};
+> +
+> +FIXTURE_VARIANT_ADD(uvio_fixture, att) {
+> +	.ioctl_cmd = UVIO_IOCTL_ATT,
+> +	.arg_size = sizeof(struct uvio_attest),
+> +};
+> +
+> +FIXTURE_SETUP(uvio_fixture)
+> +{
+> +	self->uv_fd = open(UV_PATH, O_ACCMODE);
+> +
+> +	self->uvio_ioctl.argument_addr = (__u64)self->buffer;
+> +	self->uvio_ioctl.argument_len = variant->arg_size;
+> +	self->fault_page =
+> +		(__u64)mmap(NULL, (size_t)getpagesize(), PROT_NONE, MAP_ANONYMOUS, -1, 0);
+> +}
+> +
+> +FIXTURE_TEARDOWN(uvio_fixture)
+> +{
+> +	if (self->uv_fd)
+> +		close(self->uv_fd);
+> +	munmap((void *)self->fault_page, (size_t)getpagesize());
+> +}
+> +
+> +TEST_F(uvio_fixture, fault_ioctl_arg)
+> +{
+> +	int rc, errno_cache;
+> +
+> +	rc = ioctl(self->uv_fd, variant->ioctl_cmd, NULL);
+> +	errno_cache = errno;
+> +	ASSERT_EQ(rc, -1);
+> +	ASSERT_EQ(errno_cache, EFAULT);
+> +
+> +	rc = ioctl(self->uv_fd, variant->ioctl_cmd, self->fault_page);
+> +	errno_cache = errno;
+> +	ASSERT_EQ(rc, -1);
+> +	ASSERT_EQ(errno_cache, EFAULT);
+> +}
+> +
+> +TEST_F(uvio_fixture, fault_uvio_arg)
+> +{
+> +	int rc, errno_cache;
+> +
+> +	self->uvio_ioctl.argument_addr = 0;
+> +	rc = ioctl(self->uv_fd, variant->ioctl_cmd, &self->uvio_ioctl);
+> +	errno_cache = errno;
+> +	ASSERT_EQ(rc, -1);
+> +	ASSERT_EQ(errno_cache, EFAULT);
+> +
+> +	self->uvio_ioctl.argument_addr = self->fault_page;
+> +	rc = ioctl(self->uv_fd, variant->ioctl_cmd, &self->uvio_ioctl);
+> +	errno_cache = errno;
+> +	ASSERT_EQ(rc, -1);
+> +	ASSERT_EQ(errno_cache, EFAULT);
+> +}
+> +
+> +/*
+> + * Test to verify that IOCTLs with invalid values in the ioctl_control block
+> + * are rejected.
+> + */
+> +TEST_F(uvio_fixture, inval_ioctl_cb)
+> +{
+> +	int rc, errno_cache;
+> +
+> +	self->uvio_ioctl.argument_len = 0;
+> +	rc = ioctl(self->uv_fd, variant->ioctl_cmd, &self->uvio_ioctl);
+> +	errno_cache = errno;
+> +	ASSERT_EQ(rc, -1);
+> +	ASSERT_EQ(errno_cache, EINVAL);
+> +
+> +	self->uvio_ioctl.argument_len = (uint32_t)-1;
+> +	rc = ioctl(self->uv_fd, variant->ioctl_cmd, &self->uvio_ioctl);
+> +	errno_cache = errno;
+> +	ASSERT_EQ(rc, -1);
+> +	ASSERT_EQ(errno_cache, EINVAL);
+> +	self->uvio_ioctl.argument_len = variant->arg_size;
+> +
+> +	self->uvio_ioctl.flags = (uint32_t)-1;
+> +	rc = ioctl(self->uv_fd, variant->ioctl_cmd, &self->uvio_ioctl);
+> +	errno_cache = errno;
+> +	ASSERT_EQ(rc, -1);
+> +	ASSERT_EQ(errno_cache, EINVAL);
+> +	self->uvio_ioctl.flags = 0;
+> +
+> +	memset(self->uvio_ioctl.reserved14, 0xff, sizeof(self->uvio_ioctl.reserved14));
+> +	rc = ioctl(self->uv_fd, variant->ioctl_cmd, &self->uvio_ioctl);
+> +	errno_cache = errno;
+> +	ASSERT_EQ(rc, -1);
+> +	ASSERT_EQ(errno_cache, EINVAL);
+> +
+> +	memset(&self->uvio_ioctl, 0x11, sizeof(self->uvio_ioctl));
+> +	rc = ioctl(self->uv_fd, variant->ioctl_cmd, &self->uvio_ioctl);
+> +	ASSERT_EQ(rc, -1);
+> +}
+> +
+> +TEST_F(uvio_fixture, inval_ioctl_cmd)
+> +{
+> +	int rc, errno_cache;
+> +	uint8_t nr = _IOC_NR(variant->ioctl_cmd);
+> +	unsigned long cmds[] = {
+> +		_IOWR('a', nr, struct uvio_ioctl_cb),
+> +		_IOWR(UVIO_TYPE_UVC, nr, int),
+> +		_IO(UVIO_TYPE_UVC, nr),
+> +		_IOR(UVIO_TYPE_UVC, nr, struct uvio_ioctl_cb),
+> +		_IOW(UVIO_TYPE_UVC, nr, struct uvio_ioctl_cb),
+> +	};
+> +
+> +	for (size_t i = 0; i < ARRAY_SIZE(cmds); i++) {
+> +		rc = ioctl(self->uv_fd, cmds[i], &self->uvio_ioctl);
+> +		errno_cache = errno;
+> +		ASSERT_EQ(rc, -1);
+> +		ASSERT_EQ(errno_cache, ENOTTY);
+> +	}
+> +}
+> +
+> +struct test_attest_buffer {
+> +	uint8_t arcb[0x180];
+> +	uint8_t meas[64];
+> +	uint8_t add[32];
+> +};
+> +
+> +FIXTURE(attest_fixture) {
+> +	int uv_fd;
+> +	struct uvio_ioctl_cb uvio_ioctl;
+> +	struct uvio_attest uvio_attest;
+> +	struct test_attest_buffer attest_buffer;
+> +	__u64 fault_page;
+> +};
+> +
+> +FIXTURE_SETUP(attest_fixture)
+> +{
+> +	self->uv_fd = open(UV_PATH, O_ACCMODE);
+> +
+> +	self->uvio_ioctl.argument_addr = (__u64)&self->uvio_attest;
+> +	self->uvio_ioctl.argument_len = sizeof(self->uvio_attest);
+> +
+> +	self->uvio_attest.arcb_addr = (__u64)&self->attest_buffer.arcb;
+> +	self->uvio_attest.arcb_len = sizeof(self->attest_buffer.arcb);
+> +
+> +	self->uvio_attest.meas_addr = (__u64)&self->attest_buffer.meas;
+> +	self->uvio_attest.meas_len = sizeof(self->attest_buffer.meas);
+> +
+> +	self->uvio_attest.add_data_addr = (__u64)&self->attest_buffer.add;
+> +	self->uvio_attest.add_data_len = sizeof(self->attest_buffer.add);
+> +	self->fault_page =
+> +		(__u64)mmap(NULL, (size_t)getpagesize(), PROT_NONE, MAP_ANONYMOUS, -1, 0);
+> +}
+> +
+> +FIXTURE_TEARDOWN(attest_fixture)
+> +{
+> +	if (self->uv_fd)
+> +		close(self->uv_fd);
+> +	munmap((void *)self->fault_page, (size_t)getpagesize());
+> +}
+> +
+> +static void att_inval_sizes_test(uint32_t *size, uint32_t max_size, bool test_zero,
+> +				 struct __test_metadata *_metadata,
+> +				 FIXTURE_DATA(attest_fixture) *self)
+> +{
+> +	int rc, errno_cache;
+> +	uint32_t tmp = *size;
+> +
+> +	if (test_zero) {
+> +		*size = 0;
+> +		rc = ioctl(self->uv_fd, UVIO_IOCTL_ATT, &self->uvio_ioctl);
+> +		errno_cache = errno;
+> +		ASSERT_EQ(rc, -1);
+> +		ASSERT_EQ(errno_cache, EINVAL);
+> +	}
+> +	*size = max_size + 1;
+> +	rc = ioctl(self->uv_fd, UVIO_IOCTL_ATT, &self->uvio_ioctl);
+> +	errno_cache = errno;
+> +	ASSERT_EQ(rc, -1);
+> +	ASSERT_EQ(errno_cache, EINVAL);
+> +	*size = tmp;
+> +}
+> +
+> +/*
+> + * Test to verify that attestation IOCTLs with invalid values in the UVIO
+> + * attestation control block are rejected.
+> + */
+> +TEST_F(attest_fixture, att_inval_request)
+> +{
+> +	int rc, errno_cache;
+> +
+> +	att_inval_sizes_test(&self->uvio_attest.add_data_len, UVIO_ATT_ADDITIONAL_MAX_LEN,
+> +			     false, _metadata, self);
+> +	att_inval_sizes_test(&self->uvio_attest.meas_len, UVIO_ATT_MEASUREMENT_MAX_LEN,
+> +			     true, _metadata, self);
+> +	att_inval_sizes_test(&self->uvio_attest.arcb_len, UVIO_ATT_ARCB_MAX_LEN,
+> +			     true, _metadata, self);
+> +
+> +	self->uvio_attest.reserved136 = (uint16_t)-1;
+> +	rc = ioctl(self->uv_fd, UVIO_IOCTL_ATT, &self->uvio_ioctl);
+> +	errno_cache = errno;
+> +	ASSERT_EQ(rc, -1);
+> +	ASSERT_EQ(errno_cache, EINVAL);
+> +
+> +	memset(&self->uvio_attest, 0x11, sizeof(self->uvio_attest));
+> +	rc = ioctl(self->uv_fd, UVIO_IOCTL_ATT, &self->uvio_ioctl);
+> +	ASSERT_EQ(rc, -1);
+> +}
+> +
+> +static void att_inval_addr_test(__u64 *addr, struct __test_metadata *_metadata,
+> +				FIXTURE_DATA(attest_fixture) *self)
+> +{
+> +	int rc, errno_cache;
+> +	__u64 tmp = *addr;
+> +
+> +	*addr = 0;
+> +	rc = ioctl(self->uv_fd, UVIO_IOCTL_ATT, &self->uvio_ioctl);
+> +	errno_cache = errno;
+> +	ASSERT_EQ(rc, -1);
+> +	ASSERT_EQ(errno_cache, EFAULT);
+> +	*addr = self->fault_page;
+> +	rc = ioctl(self->uv_fd, UVIO_IOCTL_ATT, &self->uvio_ioctl);
+> +	errno_cache = errno;
+> +	ASSERT_EQ(rc, -1);
+> +	ASSERT_EQ(errno_cache, EFAULT);
+> +	*addr = tmp;
+> +}
+> +
+> +TEST_F(attest_fixture, att_inval_addr)
+> +{
+> +	att_inval_addr_test(&self->uvio_attest.arcb_addr, _metadata, self);
+> +	att_inval_addr_test(&self->uvio_attest.add_data_addr, _metadata, self);
+> +	att_inval_addr_test(&self->uvio_attest.meas_addr, _metadata, self);
+> +}
+> +
+> +static void __attribute__((constructor)) __constructor_order_last(void)
+> +{
+> +	if (!__constructor_order)
+> +		__constructor_order = _CONSTRUCTOR_ORDER_BACKWARD;
+> +}
+> +
+> +int main(int argc, char **argv)
+> +{
+> +	int fd = open(UV_PATH, O_ACCMODE);
+> +
+> +	if (fd < 0)
+> +		ksft_exit_skip("No uv-device or cannot access " UV_PATH  "\n"
+> +			       "Enable CONFIG_S390_UV_UAPI and check the access rights on "
+> +			       UV_PATH ".\n");
+> +	close(fd);
+> +	return test_harness_run(argc, argv);
+> +}
 
