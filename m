@@ -2,148 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C1254CD2B0
-	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 11:44:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 70F614CD2C1
+	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 11:50:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237758AbiCDKov (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Mar 2022 05:44:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59140 "EHLO
+        id S238020AbiCDKvT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Mar 2022 05:51:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236219AbiCDKoo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Mar 2022 05:44:44 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 614A51AC283;
-        Fri,  4 Mar 2022 02:43:57 -0800 (PST)
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 224AIkgc030791;
-        Fri, 4 Mar 2022 10:43:57 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=FV0TR5RNGkV+7yDY3nJtq0Dfxl911E50swznrSKkj5E=;
- b=IYsr5pwB7+t+UsctdlmRmDej9QhunCNu1257g/F5LcGSrmZSow5mvMZ2FEcEa1uGOdyY
- jGDyvoXbQNEyalv6KHIFo6TFGOHlrgXEqQSXJFeRLizxqxQ7JrCqM17R3SBHDnAcb/5I
- 4kwCiC7LMb9XqMbCtmfzY7Q8ECTVFrhx0U0qTKz6o5Evw3Euq7PsrMap2DDRNvIGMnsL
- KrczOBE0gMF3miK6R6TwnqVbtL/cPF8BO2Ul6QGZWzgPKv15ODYJhqZDiA0QQsWxiLOg
- sAwk33qPqY0Di6WHsy9xKZaPHGDxAajkihfYnRZe0CZ/8qRFjE8PXXiF1O5p6AC6BEdZ 9g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3ekgwgrdge-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 04 Mar 2022 10:43:56 +0000
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 224AUOh4012366;
-        Fri, 4 Mar 2022 10:43:56 GMT
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3ekgwgrdg4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 04 Mar 2022 10:43:56 +0000
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 224AhPvA008294;
-        Fri, 4 Mar 2022 10:43:54 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma02fra.de.ibm.com with ESMTP id 3ek4k4h97s-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 04 Mar 2022 10:43:53 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 224Ahomv38535512
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 4 Mar 2022 10:43:50 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CD32B42042;
-        Fri,  4 Mar 2022 10:43:50 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 89F1D4203F;
-        Fri,  4 Mar 2022 10:43:50 +0000 (GMT)
-Received: from [9.145.58.173] (unknown [9.145.58.173])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri,  4 Mar 2022 10:43:50 +0000 (GMT)
-Message-ID: <6f8205e1-7a79-77dc-12b6-30294398d29b@linux.ibm.com>
-Date:   Fri, 4 Mar 2022 11:43:50 +0100
+        with ESMTP id S233928AbiCDKvS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Mar 2022 05:51:18 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E126C41F86
+        for <kvm@vger.kernel.org>; Fri,  4 Mar 2022 02:50:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646391030;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=BSTaLr+NvfDXVC5SCfeAPB5Wqc0CyU+6cZPlDm/2vsM=;
+        b=Za3pkpDxnC83OOyIRY3a/0LCaEFDlOEODa7eGO0OudC/Q60Y4BCi/wQU63w4fQti6ik1va
+        Lf43hMeuUyE3AzxSF6rXUxGfoZeU0K+RIXbI/M4GcsvwtjwpqjFtGP3r4/KcWmjNBWzNP2
+        yISXbwjpdwKxL911y8b+E5Tq8dvwZoM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-31-Jb7Oy0RFMKeBTBZYB3cCXA-1; Fri, 04 Mar 2022 05:50:26 -0500
+X-MC-Unique: Jb7Oy0RFMKeBTBZYB3cCXA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 605C61091DA1;
+        Fri,  4 Mar 2022 10:50:24 +0000 (UTC)
+Received: from localhost (unknown [10.33.36.250])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CA1442B3B7;
+        Fri,  4 Mar 2022 10:50:23 +0000 (UTC)
+Date:   Fri, 4 Mar 2022 11:50:43 +0100
+From:   Sergio Lopez <slp@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     qemu-devel@nongnu.org,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Elena Ufimtseva <elena.ufimtseva@oracle.com>,
+        kvm@vger.kernel.org, Halil Pasic <pasic@linux.ibm.com>,
+        Fam Zheng <fam@euphon.net>,
+        John G Johnson <john.g.johnson@oracle.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Hanna Reitz <hreitz@redhat.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+        qemu-s390x@nongnu.org, vgoyal@redhat.com,
+        Jagannathan Raman <jag.raman@oracle.com>,
+        Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+        Eric Farman <farman@linux.ibm.com>
+Subject: Re: [PATCH v3 4/4] docs: vhost-user: add subsection for non-Linux
+ platforms
+Message-ID: <20220304105043.agaor6txfgtd2zek@mhamilton>
+References: <20220303115911.20962-1-slp@redhat.com>
+ <20220303115911.20962-5-slp@redhat.com>
+ <20220304053326-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH kvm-unit-tests v1 2/6] s390x: smp: Test SIGP RESTART
- against stopped CPU
-Content-Language: en-US
-To:     Eric Farman <farman@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-References: <20220303210425.1693486-1-farman@linux.ibm.com>
- <20220303210425.1693486-3-farman@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <20220303210425.1693486-3-farman@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: q3IdIeM9KLlwAvBt5Uilm7LB5MBLhJ17
-X-Proofpoint-ORIG-GUID: FzaMb2bvwMCPh4UNihssYdxEknTdwIm4
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-03-04_02,2022-03-04_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
- mlxscore=0 impostorscore=0 malwarescore=0 lowpriorityscore=0 adultscore=0
- mlxlogscore=999 bulkscore=0 spamscore=0 priorityscore=1501 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
- definitions=main-2203040056
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="c7vjzt7v36rtj4td"
+Content-Disposition: inline
+In-Reply-To: <20220304053326-mutt-send-email-mst@kernel.org>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/3/22 22:04, Eric Farman wrote:
-> test_restart() makes two smp_cpu_restart() calls against CPU 1.
-> It claims to perform both of them against running (operating) CPUs,
-> but the first invocation tries to achieve this by calling
-> smp_cpu_stop() to CPU 0. This will be rejected by the library.
 
-I played myself there :)
+--c7vjzt7v36rtj4td
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> 
-> Let's fix this by making the first restart operate on a stopped CPU,
-> to ensure it gets test coverage instead of relying on other callers.
-> 
-> Fixes: 166da884d ("s390x: smp: Add restart when running test")
-> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+On Fri, Mar 04, 2022 at 05:35:01AM -0500, Michael S. Tsirkin wrote:
+> On Thu, Mar 03, 2022 at 12:59:11PM +0100, Sergio Lopez wrote:
+> > Add a section explaining how vhost-user is supported on platforms
+> > other than Linux.
+> >=20
+> > Signed-off-by: Sergio Lopez <slp@redhat.com>
+> > ---
+> >  docs/interop/vhost-user.rst | 18 ++++++++++++++++++
+> >  1 file changed, 18 insertions(+)
+> >=20
+> > diff --git a/docs/interop/vhost-user.rst b/docs/interop/vhost-user.rst
+> > index edc3ad84a3..590a626b92 100644
+> > --- a/docs/interop/vhost-user.rst
+> > +++ b/docs/interop/vhost-user.rst
+> > @@ -38,6 +38,24 @@ conventions <backend_conventions>`.
+> >  *Master* and *slave* can be either a client (i.e. connecting) or
+> >  server (listening) in the socket communication.
+> > =20
+> > +Support for platforms other than Linux
+>=20
+>=20
+> It's not just Linux - any platform without eventfd.
+>=20
+> So I think we should have a section explaining that whereever
+> spec says eventfd it can be a pipe if system does not
+> support creating eventfd.
 
+I'm confused. This is exactly what this subsection intends to do...
 
-If you want to you can add a report_pass() after the first wait flag.
+Thanks,
+Sergio.
 
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+> > +--------------------------------------
+> > +
+> > +While vhost-user was initially developed targeting Linux, nowadays is
+> > +supported on any platform that provides the following features:
+> > +
+> > +- The ability to share a mapping injected into the guest between
+> > +  multiple processes, so both QEMU and the vhost-user daemon servicing
+> > +  the device can access simultaneously the memory regions containing
+> > +  the virtqueues and the data associated with each request.
+> > +
+> > +- AF_UNIX sockets with SCM_RIGHTS, so QEMU can communicate with the
+> > +  vhost-user daemon and send it file descriptors when needed.
+> > +
+> > +- Either eventfd or pipe/pipe2. On platforms where eventfd is not
+> > +  available, QEMU will automatically fallback to pipe2 or, as a last
+> > +  resort, pipe.
+> > +
+> >  Message Specification
+> >  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > =20
+> > --=20
+> > 2.35.1
+>=20
 
-> ---
->   s390x/smp.c | 8 ++------
->   1 file changed, 2 insertions(+), 6 deletions(-)
-> 
-> diff --git a/s390x/smp.c b/s390x/smp.c
-> index 068ac74d..2f4af820 100644
-> --- a/s390x/smp.c
-> +++ b/s390x/smp.c
-> @@ -50,10 +50,6 @@ static void test_start(void)
->   	report_pass("start");
->   }
->   
-> -/*
-> - * Does only test restart when the target is running.
-> - * The other tests do restarts when stopped multiple times already.
-> - */
->   static void test_restart(void)
->   {
->   	struct cpu *cpu = smp_cpu_from_idx(1);
-> @@ -62,8 +58,8 @@ static void test_restart(void)
->   	lc->restart_new_psw.mask = extract_psw_mask();
->   	lc->restart_new_psw.addr = (unsigned long)test_func;
->   
-> -	/* Make sure cpu is running */
-> -	smp_cpu_stop(0);
-> +	/* Make sure cpu is stopped */
-> +	smp_cpu_stop(1);
->   	set_flag(0);
->   	smp_cpu_restart(1);
->   	wait_for_flag();
+--c7vjzt7v36rtj4td
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAmIh7wAACgkQ9GknjS8M
+AjWilxAAnNIS1WAe3sQyLr2mX/rC0JeslU2CIVCvEgfZ2kTACBdNG3bKmyWkA+xX
+8L0hYdVfomAilkkMa4TV9LJvS7/fSnpf13xGgX9mvG4SNF87vg/AAfk/gxFGboK7
+Mu7lO14ykgqhMV2jy4QclFkaHXtmbdPwfIzUfUg3KNKmHqxeGZxhx5VnQlJhtG4w
+OwQnZuXMDRfNLuFgfrKvk8K0RlHqStq58x1qcX7NgSmwYcgV1Rc5OVzmIMkRqEOU
+laut4PzBLXEtloSSKkpkIF+3UZzklL1UKBnv8LsFN9/qJb/pCytclle+f8PtQuIs
+Gn87SyJwouQ+lYlr7piRwFHjTgf9LA/MBEmyeOPAmKgAXPdZW4XAO0PdhUpTjjjs
+hY6GJNQv0kKZEONvooZcQsFxpsAbBahKAKZV+9DTPEq9C49YZG970cadUAwDSbw+
+sNdcWX1nR1UGsXVEE9DsLHNQUWkBnPmfzpWHHPhGGMxnlVLGcXchHL/P2lJEHgTb
+zSf05+kg0+AkxcYsOs1zoSpEWTzJ+7lP8qkstN4AbfCfKzmxCJGtTquHzKaJzI3+
+Xj5a6Rt7+NEnisq3UT/xyiGPxBFHkgEUSp1qZXgmANRQ/N7psY1UBEoxNwq/kSYv
+S3JMFzi6KwsUp9d9KnYfhmzpYSvJhZGuK/SearMcCxjzaUym8k0=
+=Yuan
+-----END PGP SIGNATURE-----
+
+--c7vjzt7v36rtj4td--
 
