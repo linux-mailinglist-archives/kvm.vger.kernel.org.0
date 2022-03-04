@@ -2,119 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BFCB94CCB3F
-	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 02:19:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A9ABD4CCCBB
+	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 06:00:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237536AbiCDBU1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Mar 2022 20:20:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47502 "EHLO
+        id S231724AbiCDFB1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Mar 2022 00:01:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33906 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236518AbiCDBU0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Mar 2022 20:20:26 -0500
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 000E817B0F6
-        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 17:19:39 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id ge19-20020a17090b0e1300b001bcca16e2e7so9334242pjb.3
-        for <kvm@vger.kernel.org>; Thu, 03 Mar 2022 17:19:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=zEb5gJN0p3jp2prcQ3AxOX7oDu5JWoQts+UVDKAduE4=;
-        b=W2B6Ck7YTcny7/5+zKdTiimZp2p9fdpezDQbNjt0oIfSoVxXTpdJGnk8L8e9MTUqwB
-         3gFzJjDJjyvW2GKsZLjwiGCrBbmfaPJzyEcPvhTDp7L4tTWEZc+Df7uC/yQtRkjyShLW
-         GdTEGLqtdP/Zf5dDDhAD0FueSuMAFNJgd/bOtzE8daeam60uok4eGAeMZmEjuB355hZQ
-         8zS94v/ZFNklD/gVc6M870bWsiv8VzGlsHoDBc/YhrwWUGj6g2/3JIzDx8qGt+UCGaW2
-         Zr7h3T0vDzCJyckeMysXYMQt8cSKIyGAE0zqVkRIjtJX6byDEsp1GdloqwxcEs8wT+j6
-         b4uQ==
+        with ESMTP id S229459AbiCDFBX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Mar 2022 00:01:23 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id CF30C118635
+        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 21:00:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646370034;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=C9LljTggMYdd47/c+/HB8RDqC/7m392I60YkhURxrMM=;
+        b=hHPI7M39yzAxEydMz78VDJPVJDyFFx4/fd7iwerMEC1zDS5J7Vo6BmvhF10Irgl9iHxK5a
+        duBWoh7fsQ6HsyM7Owxfttr4CA6RUV0VOWCIuyq0RucGJ/QBdbsHbmFP/2P1zphRKl6Uny
+        6JaE9iw76ais/8ta3VZ+vfi5Fe71stA=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-48-kWzPg4SONBWU3hjUmfBmBQ-1; Fri, 04 Mar 2022 00:00:32 -0500
+X-MC-Unique: kWzPg4SONBWU3hjUmfBmBQ-1
+Received: by mail-wm1-f70.google.com with SMTP id 187-20020a1c19c4000000b0037cc0d56524so3806563wmz.2
+        for <kvm@vger.kernel.org>; Thu, 03 Mar 2022 21:00:32 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=zEb5gJN0p3jp2prcQ3AxOX7oDu5JWoQts+UVDKAduE4=;
-        b=SfRvc5iHhJo1O6pty5pCiQ0Y7QUD54e0eczCi06t1mg3EqmEy0nH0Xirq3hW/j45dl
-         2IA0P094zAaMfDYwT+Avv5ANbpVviYDLxJ8M+YgOn3rrNGgqGXvs3d9uNbmqtow/WKeG
-         A2dV+vHOtnVvoHosCYH5Xboh+9FjfaPKkXsu6N9+My/73VmqfqSoNxfNdzki2KOaoQ19
-         i1OqmbphWO3E+tp30XiZx2jJEN/oX9IM2q9VK3sH97HFZeuKCy18ijpAxcWHVW9IOgQU
-         Sk6Zt9G5Uz6bWVyj5gIGbxBh8ATADiF/sVqPXFjeOeSRu/ufsFCYkMj6+YvuJxOjxEQX
-         E5Zw==
-X-Gm-Message-State: AOAM533v3nQamJLjAPZMNB1JAR90uY0L5SLyRVTKlIndUggyb6zMJsdA
-        Bu7DL2N3TzWv4by7kcZC1k/Hjg==
-X-Google-Smtp-Source: ABdhPJxzTz4pCEAh/l2V8XyzIwJXG5GRoE/ggM+ag3wUzlFXLIMu8qRnbVsUEia+MJuDOCYwqazwzg==
-X-Received: by 2002:a17:902:e889:b0:14f:c4bc:677b with SMTP id w9-20020a170902e88900b0014fc4bc677bmr39377392plg.68.1646356779252;
-        Thu, 03 Mar 2022 17:19:39 -0800 (PST)
-Received: from google.com (226.75.127.34.bc.googleusercontent.com. [34.127.75.226])
-        by smtp.gmail.com with ESMTPSA id k17-20020a056a00135100b004f3a9a477d0sm3709376pfu.110.2022.03.03.17.19.38
+        bh=C9LljTggMYdd47/c+/HB8RDqC/7m392I60YkhURxrMM=;
+        b=MKd4+QZCjw0uVyISZCXOb0koYajZoNkLAFMvPVVQamWOF+qj8w6enDXnBl87VOTy6G
+         sr+ghCem1jzHRdSpTlZ/wtoI3lMBI9XRkp1VwNni84UfrNO319yZm5nl3rocnFjflR4R
+         mhL2YHiUjPTjTTxh10uPx7MnxVmAHE2nyNcgrYf4lwpLtw56Dml+4OK2H4+amgVHgdy+
+         Ehaq5jaWaNH9jFIj9VHYC/Jg7XQbQ7TGrTei0a6BNAE/YewExmQXxwriPi12a/2vOffs
+         iUC4PUU87eLE2Qd2kvFAsSpZnfOS9AWGx4yQOYH/baCbDzAWh7bxhDXiYspVrdZimDsR
+         OD/Q==
+X-Gm-Message-State: AOAM531vkjuH2A7mqBtyq1KQF7pAgTKDKVTlQTOtz1NyznWUbMgXDO2i
+        xFNIa2ueyk8m3xIWkIeXRE+U22Do3yEGtivFDe7uELoH/3OTX/fcvFluV7u0KqnEVMd6BF8N9aC
+        NKQmF2lSIJzlE
+X-Received: by 2002:a5d:47c5:0:b0:1ef:f2e8:11fc with SMTP id o5-20020a5d47c5000000b001eff2e811fcmr14057948wrc.109.1646370030408;
+        Thu, 03 Mar 2022 21:00:30 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJw/9IpbklvBlJJPYjzIkhqrW9cqHaZPxp5pYripZTV4jzY3k3rJRGhRMUtTqLp99H9+2vfm0A==
+X-Received: by 2002:a5d:47c5:0:b0:1ef:f2e8:11fc with SMTP id o5-20020a5d47c5000000b001eff2e811fcmr14057937wrc.109.1646370030110;
+        Thu, 03 Mar 2022 21:00:30 -0800 (PST)
+Received: from redhat.com ([2.53.6.39])
+        by smtp.gmail.com with ESMTPSA id n4-20020a05600c4f8400b00380e45cd564sm4015646wmq.8.2022.03.03.21.00.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Mar 2022 17:19:38 -0800 (PST)
-Date:   Fri, 4 Mar 2022 01:19:35 +0000
-From:   Mingwei Zhang <mizhang@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        David Hildenbrand <david@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>
-Subject: Re: [PATCH v4 19/30] KVM: x86/mmu: Do remote TLB flush before
- dropping RCU in TDP MMU resched
-Message-ID: <YiFpJ8+fNtfEu3oO@google.com>
-References: <20220303193842.370645-1-pbonzini@redhat.com>
- <20220303193842.370645-20-pbonzini@redhat.com>
+        Thu, 03 Mar 2022 21:00:29 -0800 (PST)
+Date:   Fri, 4 Mar 2022 00:00:25 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Lee Jones <lee.jones@linaro.org>
+Cc:     jasowang@redhat.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, stable@vger.kernel.org,
+        syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
+Subject: Re: [PATCH 1/1] vhost: Protect the virtqueue from being cleared
+ whilst still in use
+Message-ID: <20220303235937-mutt-send-email-mst@kernel.org>
+References: <20220302075421.2131221-1-lee.jones@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220303193842.370645-20-pbonzini@redhat.com>
-X-Spam-Status: No, score=-18.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20220302075421.2131221-1-lee.jones@linaro.org>
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 03, 2022, Paolo Bonzini wrote:
-> From: Sean Christopherson <seanjc@google.com>
+On Wed, Mar 02, 2022 at 07:54:21AM +0000, Lee Jones wrote:
+> vhost_vsock_handle_tx_kick() already holds the mutex during its call
+> to vhost_get_vq_desc().  All we have to do is take the same lock
+> during virtqueue clean-up and we mitigate the reported issues.
 > 
-> When yielding in the TDP MMU iterator, service any pending TLB flush
-> before dropping RCU protections in anticipation of using the caller's RCU
-> "lock" as a proxy for vCPUs in the guest.
+> Link: https://syzkaller.appspot.com/bug?extid=279432d30d825e63ba00
 > 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> Reviewed-by: Ben Gardon <bgardon@google.com>
-> Message-Id: <20220226001546.360188-19-seanjc@google.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: <stable@vger.kernel.org>
+> Reported-by: syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
+> Signed-off-by: Lee Jones <lee.jones@linaro.org>
 
-Reviewed-by: Mingwei Zhang <mizhang@google.com>
+So combine with the warning patch and update description with
+the comment I posted, explaining it's more a just in case thing.
+
 > ---
->  arch/x86/kvm/mmu/tdp_mmu.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  drivers/vhost/vhost.c | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index c71debdbc732..3a866fcb5ea9 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -716,11 +716,11 @@ static inline bool __must_check tdp_mmu_iter_cond_resched(struct kvm *kvm,
->  		return false;
+> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> index 59edb5a1ffe28..bbaff6a5e21b8 100644
+> --- a/drivers/vhost/vhost.c
+> +++ b/drivers/vhost/vhost.c
+> @@ -693,6 +693,7 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
+>  	int i;
 >  
->  	if (need_resched() || rwlock_needbreak(&kvm->mmu_lock)) {
-> -		rcu_read_unlock();
-> -
->  		if (flush)
->  			kvm_flush_remote_tlbs(kvm);
->  
-> +		rcu_read_unlock();
-> +
->  		if (shared)
->  			cond_resched_rwlock_read(&kvm->mmu_lock);
->  		else
+>  	for (i = 0; i < dev->nvqs; ++i) {
+> +		mutex_lock(&dev->vqs[i]->mutex);
+>  		if (dev->vqs[i]->error_ctx)
+>  			eventfd_ctx_put(dev->vqs[i]->error_ctx);
+>  		if (dev->vqs[i]->kick)
+> @@ -700,6 +701,7 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
+>  		if (dev->vqs[i]->call_ctx.ctx)
+>  			eventfd_ctx_put(dev->vqs[i]->call_ctx.ctx);
+>  		vhost_vq_reset(dev, dev->vqs[i]);
+> +		mutex_unlock(&dev->vqs[i]->mutex);
+>  	}
+>  	vhost_dev_free_iovecs(dev);
+>  	if (dev->log_ctx)
 > -- 
-> 2.31.1
-> 
-> 
+> 2.35.1.574.g5d30c73bfb-goog
+
