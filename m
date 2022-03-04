@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1BBD34CD215
+	by mail.lfdr.de (Postfix) with ESMTP id 667054CD216
 	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 11:10:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239517AbiCDKLa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Mar 2022 05:11:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57448 "EHLO
+        id S239520AbiCDKLb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Mar 2022 05:11:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235665AbiCDKL2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Mar 2022 05:11:28 -0500
-Received: from mail-ot1-x32c.google.com (mail-ot1-x32c.google.com [IPv6:2607:f8b0:4864:20::32c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DD7A1A906E
-        for <kvm@vger.kernel.org>; Fri,  4 Mar 2022 02:10:40 -0800 (PST)
-Received: by mail-ot1-x32c.google.com with SMTP id k22-20020a9d4b96000000b005ad5211bd5aso7010714otf.8
-        for <kvm@vger.kernel.org>; Fri, 04 Mar 2022 02:10:40 -0800 (PST)
+        with ESMTP id S239508AbiCDKL3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Mar 2022 05:11:29 -0500
+Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 048DA1A906C
+        for <kvm@vger.kernel.org>; Fri,  4 Mar 2022 02:10:42 -0800 (PST)
+Received: by mail-oi1-x22f.google.com with SMTP id l25so7360191oic.13
+        for <kvm@vger.kernel.org>; Fri, 04 Mar 2022 02:10:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=rivosinc-com.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=jAp2jVsPECC5CukAgMyeSN7hFFqb5X1LnQN+Kkktlqo=;
-        b=pD++kqzRB0zUtstpkWHCebgX+WoT2BUX73QeUXWnW+dBIaVSilGHLtU7egvHwNDxiR
-         lrELYYMQ5yg/GEKFkPRTsPiaeCtMcAYGJ3tlckgJIduosevDUuAGHXWBC9echpvgbHBY
-         T2LfY77HduS818c2eDrBxONuY5O7s68ojvIJAq6WusZ02lnVDx21ZqQpG5qqXhoyVim/
-         +zmGekY/qRTN6PQ+gJXpaPmHRb0UiXIvZD40CNeVh8141Nf7MZmSxTnTQ79Y++nRSIwS
-         oUC1q4Fg9dxmC5fJ2j6cvFTT76GU9sg6oCyXJkGn5CTSv26laOw8YpLgRw2C+7TKS5Xx
-         xHwA==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=W88BFAMfIQPlzsE5Ded5mhnnTZPYQAXRUS4xOsxlGF8=;
+        b=Z7FrQFwP4mQzZlkB+t/MUGoPQiN5FpXuFBrVMEGTrFHdsP/Ku0wM0ctZfEwhJ/TcCo
+         YIgllBiFTU9Y5Bn64UNQNHSKbiXZfylJVAUjWeqlgG8Exo5pqex4c82ztKsGhkyX7ytW
+         qk4he5M4sfasojeIafs3e4J/sLJ97UOqm7Xv9KH6t3FwFSafBfAedwNNgML2e6ahZKRm
+         pGioqd6n1m1vQCCUgC0NAW4MQIlkV6EHbIqLbGgML5tUScx5zcLTxqSrGvx30Moe6IbC
+         IIHPSztNrFaiAQBeve2GA7B5JAg5aeqWZWoYATAvNVG7e0gYrw43NADwcyaklWTAa9FC
+         BmNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=jAp2jVsPECC5CukAgMyeSN7hFFqb5X1LnQN+Kkktlqo=;
-        b=pdbWTsfp5+ddyohBO1zsnyk4hhk/fEpQ7B5+4wL6n2S8UJNDMbLcq5d4x4KUezJceM
-         anT/y5x9OcLk4hQkImtxe/LBaKvifLcLgkhXZkJ3HgBSZS8l43G3l2Sh0USJvT5azW22
-         GPNR1eKmm9AiLOtJ/GDUawletmm4uy4agEkuKDFmk7YVIZZaGzFjpHwhu9KGI3X0+HUH
-         nfZAYBbqENrlb/ZoreHpLA6EE/wTI/2uZBpIKP5S/I7k4U2CdkccSw97axDNlxbi09+h
-         wMfT/X9XDExfx6u9IbXBrnXjQtDDiJt9MuZLniKZFoQgnSq9WzsLRla7ABJDWgLFQPY7
-         nI8Q==
-X-Gm-Message-State: AOAM532lbSvSpvqrJ0i/rUBMXS3r5ccfJ1GJQ6gKLcAFdzowQMvSNJGY
-        4E2sVqV9k5mjCHZ8oDBrNkNJjA==
-X-Google-Smtp-Source: ABdhPJz/1VD1ogYByCne7YXihgD15fCIfLlRPu2jSDBNKjSp3yE50No6u6ZVVb1UfIRiWzYnBTrADw==
-X-Received: by 2002:a9d:758a:0:b0:5ad:2fd2:d28f with SMTP id s10-20020a9d758a000000b005ad2fd2d28fmr21595690otk.125.1646388639900;
-        Fri, 04 Mar 2022 02:10:39 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=W88BFAMfIQPlzsE5Ded5mhnnTZPYQAXRUS4xOsxlGF8=;
+        b=ZFC1Oan6UOlFx1tuAvIzqHFK9DKUSifQD9pJgR0QlLpWQNVCafz0gApy6Bzk1i4Jx4
+         47qtlQsDPGVn76Deo5zmi67kBfEiWjQhBa4tzfsBQQPRZmr1gDjN1v+D9BwbYD3/cb5F
+         eKYKJa0nW+X0Hq1K2iJ2vsu13xodWW6S5E0wo+bS9+qFRmqxqpBX0pMyqZDYlcLL0cbk
+         dOLPGShS2hmr6jfXLcpIUTwUl+xOWqUSfAH3uSs7Ce0YcJzKHiUBJB5WF7i22XQhX6WQ
+         Pi51VFVmcrAWJii+ADyxkPMYbQsZhrtt4c8CdQcSCG4LxsfnHWDIq9Dm8D3pYpwFVnDL
+         0JvQ==
+X-Gm-Message-State: AOAM530UFIRsPkJRK4rntB7k7bkrRiiskK9OKMvwQWOMO7tNw/sgOquS
+        RnkSJZCkU3Xr1ozPTFj1OLJt0+C46FvIpw==
+X-Google-Smtp-Source: ABdhPJwV54ScY8i/ips2wTe5bsNNncZk9pf1ppUMD4kkWEfEnfp74WGt5mf9/Ln+wN4O+APOBBkIXQ==
+X-Received: by 2002:aca:2112:0:b0:2d4:653d:82b8 with SMTP id 18-20020aca2112000000b002d4653d82b8mr8838442oiz.126.1646388641364;
+        Fri, 04 Mar 2022 02:10:41 -0800 (PST)
 Received: from rivos-atish.. (adsl-70-228-75-190.dsl.akrnoh.ameritech.net. [70.228.75.190])
-        by smtp.gmail.com with ESMTPSA id m26-20020a05680806da00b002d797266870sm2358769oih.9.2022.03.04.02.10.38
+        by smtp.gmail.com with ESMTPSA id m26-20020a05680806da00b002d797266870sm2358769oih.9.2022.03.04.02.10.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Mar 2022 02:10:39 -0800 (PST)
+        Fri, 04 Mar 2022 02:10:40 -0800 (PST)
 From:   Atish Patra <atishp@rivosinc.com>
 To:     Will Deacon <will@kernel.org>, julien.thierry.kdev@gmail.com,
         maz@kernel.org
@@ -55,10 +55,12 @@ Cc:     Atish Patra <atishp@rivosinc.com>,
         Atish Patra <atishp@atishpatra.org>,
         Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
         kvm-riscv@lists.infradead.org
-Subject: [RFC PATCH kvmtool 0/3] Add Sstc extension support
-Date:   Fri,  4 Mar 2022 02:10:20 -0800
-Message-Id: <20220304101023.764631-1-atishp@rivosinc.com>
+Subject: [RFC PATCH kvmtool 1/3] riscv: Update the uapi header as per Linux kernel
+Date:   Fri,  4 Mar 2022 02:10:21 -0800
+Message-Id: <20220304101023.764631-2-atishp@rivosinc.com>
 X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20220304101023.764631-1-atishp@rivosinc.com>
+References: <20220304101023.764631-1-atishp@rivosinc.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -70,36 +72,60 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This series adds Sstc extension which was ratified recently.
+The one reg interface is extended for multi-letter ISA extensions
+in KVM. Update the uapi header file as per that.
 
-The first two patches adds the ISA extension framework which allows
-to define and update the DT for any multi-letter ISA extensions. 
+Signed-off-by: Atish Patra <atishp@rivosinc.com>
+---
+ riscv/include/asm/kvm.h | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-The last patch just enables Sstc extension specifically if the hardware
-supports it.
-
-The series can also be found at
-https://github.com/atishp04/kvmtool/tree/sstc_v1
-
-The kvm & Qemu patches can be found at
-
-KVM: https://github.com/atishp04/linux/tree/sstc_v2
-OpenSBI: https://github.com/atishp04/opensbi/tree/sstc_v1
-Qemu: https://github.com/atishp04/qemu/tree/sstc_v1 
-
-[1] https://drive.google.com/file/d/1m84Re2yK8m_vbW7TspvevCDR82MOBaSX/view
-
-Atish Patra (3):
-riscv: Update the uapi header as per Linux kernel
-riscv: Append ISA extensions to the device tree
-riscv: Add Sstc extension support
-
-riscv/fdt.c                      | 32 ++++++++++++++++++++++++++++++++
-riscv/include/asm/kvm.h          | 22 ++++++++++++++++++++++
-riscv/include/kvm/kvm-cpu-arch.h |  5 +++++
-riscv/kvm-cpu.c                  |  5 -----
-4 files changed, 59 insertions(+), 5 deletions(-)
-
---
+diff --git a/riscv/include/asm/kvm.h b/riscv/include/asm/kvm.h
+index f808ad1ce500..e01678aa2a55 100644
+--- a/riscv/include/asm/kvm.h
++++ b/riscv/include/asm/kvm.h
+@@ -47,6 +47,7 @@ struct kvm_sregs {
+ 
+ /* CONFIG registers for KVM_GET_ONE_REG and KVM_SET_ONE_REG */
+ struct kvm_riscv_config {
++	/* This is a bitmap of all the single letter base ISA extensions */
+ 	unsigned long isa;
+ };
+ 
+@@ -82,6 +83,23 @@ struct kvm_riscv_timer {
+ 	__u64 state;
+ };
+ 
++/**
++ * ISA extension IDs specific to KVM. This is not the same as the host ISA
++ * extension IDs as that is internal to the host and should not be exposed
++ * to the guest. This should always be contiguous to keep the mapping simple
++ * in KVM implementation.
++ */
++enum KVM_RISCV_ISA_EXT_ID {
++	KVM_RISCV_ISA_EXT_A = 0,
++	KVM_RISCV_ISA_EXT_C,
++	KVM_RISCV_ISA_EXT_D,
++	KVM_RISCV_ISA_EXT_F,
++	KVM_RISCV_ISA_EXT_H,
++	KVM_RISCV_ISA_EXT_I,
++	KVM_RISCV_ISA_EXT_M,
++	KVM_RISCV_ISA_EXT_MAX,
++};
++
+ /* Possible states for kvm_riscv_timer */
+ #define KVM_RISCV_TIMER_STATE_OFF	0
+ #define KVM_RISCV_TIMER_STATE_ON	1
+@@ -123,6 +141,9 @@ struct kvm_riscv_timer {
+ #define KVM_REG_RISCV_FP_D_REG(name)	\
+ 		(offsetof(struct __riscv_d_ext_state, name) / sizeof(__u64))
+ 
++/* ISA Extension registers are mapped as type 7 */
++#define KVM_REG_RISCV_ISA_EXT		(0x07 << KVM_REG_RISCV_TYPE_SHIFT)
++
+ #endif
+ 
+ #endif /* __LINUX_KVM_RISCV_H */
+-- 
 2.30.2
 
