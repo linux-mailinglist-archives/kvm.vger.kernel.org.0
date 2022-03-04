@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 58A094CD27A
-	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 11:35:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 77FE04CD282
+	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 11:38:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235655AbiCDKgA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Mar 2022 05:36:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36576 "EHLO
+        id S235831AbiCDKjX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Mar 2022 05:39:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42290 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235606AbiCDKf7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Mar 2022 05:35:59 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B2A361A6357
-        for <kvm@vger.kernel.org>; Fri,  4 Mar 2022 02:35:11 -0800 (PST)
+        with ESMTP id S234208AbiCDKjV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Mar 2022 05:39:21 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A7CC9150409
+        for <kvm@vger.kernel.org>; Fri,  4 Mar 2022 02:38:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646390110;
+        s=mimecast20190719; t=1646390311;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=aTP72OuXUGyN5QMTKund2mceL2rox5drVmYYqAWWAWE=;
-        b=JqxCLh+zSWqJK5SZR0vvFDTnMid4pRqfSB/PyWGG7rO0MfCnSTkRMQaWAZ1GglVrLlaXDD
-        Z66fJxNBKiij/HyhL5hfxmA4yx3ACMotttCbVvgpbmHaEeEF6H9GD5K5DFcungd9kN1123
-        w3w7aQpdhHlkrNFNcxf5mEjV27Q4A7U=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=lz5RITfbuxi7prNXljqL/BkcwaBGah78jbB9QQ7ar/o=;
+        b=W6qkFiHelSwniSLEctyUSRlCYovL71E46got5geGT+e7z05qIHcy1/fg5VX7zr/+6QUL+a
+        yAv5uHnmuTQvKF5yXCesc/q9yrn7X7UqxmR991uhnmyizhb/RMwRTn++1gj5dpLY+SbneF
+        FeELWYCs5A9Cbh2OVvH+lrh997VuqQY=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-27-IWJparflN3yoYwKZqq_DWA-1; Fri, 04 Mar 2022 05:35:09 -0500
-X-MC-Unique: IWJparflN3yoYwKZqq_DWA-1
-Received: by mail-wm1-f71.google.com with SMTP id f24-20020a1c6a18000000b00388874b17a8so859776wmc.3
-        for <kvm@vger.kernel.org>; Fri, 04 Mar 2022 02:35:09 -0800 (PST)
+ us-mta-396-4JIWhh2dMNWhKUNFNKEMjg-1; Fri, 04 Mar 2022 05:38:30 -0500
+X-MC-Unique: 4JIWhh2dMNWhKUNFNKEMjg-1
+Received: by mail-wm1-f70.google.com with SMTP id 7-20020a1c1907000000b003471d9bbe8dso2590323wmz.0
+        for <kvm@vger.kernel.org>; Fri, 04 Mar 2022 02:38:29 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=aTP72OuXUGyN5QMTKund2mceL2rox5drVmYYqAWWAWE=;
-        b=uX1CbxJKFXRhdtJapMyhWHywjGb5ZLj344GBrZeXj2QmrYfD1Xejl+uQtiWZlVts1q
-         5HNg0SZi0SOBtGPmdYz0SCWiaexR3tE9xUahoSobynpaHNh9aB3J7vzlq1Ae9vgMcyUH
-         4T2jDRbfNthbXrfPuaKx/NFkFPhdyUl1+x8Zn46ecnQln7ki/ScArbwaVyx2Ft1Ce+zD
-         4ADZGr8NQMxhgf0KqGHxTvTGi87uD4kO2hhUDWyu6VhdqzVXkfO+jakI5alEoPrzLqdd
-         i49xhxUIf8ULku3u6KO2wMZGTS84xs19Oi0DNhL69qG60+qmdWzW1Du32sV7Nrq6npzj
-         I9mA==
-X-Gm-Message-State: AOAM530xJk1Jkhax4sW0B/6vQsm1p5hqaA+yfqPt6+bXJb5ib71EVQd7
-        igDfn4056FSzDjhPmctr0u7jEm9S4YMygsAar6aTxAwTOu7DPpoWHgMIAK7idTimBzMGU831UhC
-        pGr1VYSel5ejd
-X-Received: by 2002:adf:d1c9:0:b0:1ea:830d:f1b0 with SMTP id b9-20020adfd1c9000000b001ea830df1b0mr30082454wrd.522.1646390108374;
-        Fri, 04 Mar 2022 02:35:08 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxBoEWnkTyY47uRej3nBN62Zla7j1qhOJQg1IbWcq42GoEOzdoGVLqDv4sEqS2Q9IErD+aglg==
-X-Received: by 2002:adf:d1c9:0:b0:1ea:830d:f1b0 with SMTP id b9-20020adfd1c9000000b001ea830df1b0mr30082440wrd.522.1646390108163;
-        Fri, 04 Mar 2022 02:35:08 -0800 (PST)
+        bh=lz5RITfbuxi7prNXljqL/BkcwaBGah78jbB9QQ7ar/o=;
+        b=yXWM9b2Jc+G0a+i1xiZQHpvmKWdzV4QyAuN/LCg32+K6PlN+JfsZtGe5hsjOhVnJ9n
+         +txT43Dei3z4+ANsRwQ9F9fduTqQuUDAoZeqjnrXMRtpS4V4VozgSWtjjDKlsbFA4Ict
+         Uvzk7JQQA3sBb4hu+ZfcqhdEYF7QvIAqU+gbu35mu6XaFOyC1+iqqJH/9Lme2DWHD3Hi
+         AYNq+9tm7gQKPwHAeLnxtUQum6p/TiXiIg90toUCRjUhcOwOpZ6lFkhS3sgkRLRAMWS8
+         7x5+DL340sWCvPvKMispc5O+y9ST8ZlR1U9fu5VeBZvgdGtAwIMe1uYGQ/OPoDWl9QE+
+         IHTg==
+X-Gm-Message-State: AOAM5331PPzp9TzwirB1Anyxuv2YidzstPI6oudjj4xtoRFeXkEPKTgz
+        l+CMh3NJ24FUyHl9ca34TnQ9NDwVdEr20hZzSG/Y7AWB7dALNuVddID0lKp+mPiV75E235xauty
+        Ib4D4LVQQjf+T
+X-Received: by 2002:a5d:6b06:0:b0:1e3:3e52:8a6 with SMTP id v6-20020a5d6b06000000b001e33e5208a6mr29170203wrw.148.1646390308821;
+        Fri, 04 Mar 2022 02:38:28 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwWSO2vMtR421emZNfVw1PPEBsPuI7pwJ1SnQREXhldYhaQLx8hgCPGjgLYLXwejapDNC0UGw==
+X-Received: by 2002:a5d:6b06:0:b0:1e3:3e52:8a6 with SMTP id v6-20020a5d6b06000000b001e33e5208a6mr29170192wrw.148.1646390308607;
+        Fri, 04 Mar 2022 02:38:28 -0800 (PST)
 Received: from redhat.com ([2.52.16.157])
-        by smtp.gmail.com with ESMTPSA id g6-20020a05600c4ec600b0037bf934bca3sm13576042wmq.17.2022.03.04.02.35.04
+        by smtp.gmail.com with ESMTPSA id e6-20020a5d5006000000b001e75916a7c2sm4242027wrt.84.2022.03.04.02.38.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Mar 2022 02:35:07 -0800 (PST)
-Date:   Fri, 4 Mar 2022 05:35:01 -0500
+        Fri, 04 Mar 2022 02:38:27 -0800 (PST)
+Date:   Fri, 4 Mar 2022 05:38:22 -0500
 From:   "Michael S. Tsirkin" <mst@redhat.com>
 To:     Sergio Lopez <slp@redhat.com>
 Cc:     qemu-devel@nongnu.org,
@@ -76,15 +76,13 @@ Cc:     qemu-devel@nongnu.org,
         Jagannathan Raman <jag.raman@oracle.com>,
         Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
         Eric Farman <farman@linux.ibm.com>
-Subject: Re: [PATCH v3 4/4] docs: vhost-user: add subsection for non-Linux
- platforms
-Message-ID: <20220304053326-mutt-send-email-mst@kernel.org>
+Subject: Re: [PATCH v3 0/4] Enable vhost-user to be used on BSD systems
+Message-ID: <20220304053759-mutt-send-email-mst@kernel.org>
 References: <20220303115911.20962-1-slp@redhat.com>
- <20220303115911.20962-5-slp@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220303115911.20962-5-slp@redhat.com>
+In-Reply-To: <20220303115911.20962-1-slp@redhat.com>
 X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
@@ -95,52 +93,49 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 03, 2022 at 12:59:11PM +0100, Sergio Lopez wrote:
-> Add a section explaining how vhost-user is supported on platforms
-> other than Linux.
+On Thu, Mar 03, 2022 at 12:59:07PM +0100, Sergio Lopez wrote:
+> Since QEMU is already able to emulate ioeventfd using pipefd, we're already
+> pretty close to supporting vhost-user on non-Linux systems.
 > 
-> Signed-off-by: Sergio Lopez <slp@redhat.com>
-> ---
->  docs/interop/vhost-user.rst | 18 ++++++++++++++++++
->  1 file changed, 18 insertions(+)
+> This two patches bridge the gap by:
 > 
-> diff --git a/docs/interop/vhost-user.rst b/docs/interop/vhost-user.rst
-> index edc3ad84a3..590a626b92 100644
-> --- a/docs/interop/vhost-user.rst
-> +++ b/docs/interop/vhost-user.rst
-> @@ -38,6 +38,24 @@ conventions <backend_conventions>`.
->  *Master* and *slave* can be either a client (i.e. connecting) or
->  server (listening) in the socket communication.
->  
-> +Support for platforms other than Linux
+> 1. Adding a new event_notifier_get_wfd() to return wfd on the places where
+>    the peer is expected to write to the notifier.
+> 
+> 2. Modifying the build system to it allows enabling vhost-user on BSD.
+> 
+> v1->v2:
+>   - Drop: "Allow returning EventNotifier's wfd" (Alex Williamson)
+>   - Add: "event_notifier: add event_notifier_get_wfd()" (Alex Williamson)
+>   - Add: "vhost: use wfd on functions setting vring call fd"
+>   - Rename: "Allow building vhost-user in BSD" to "configure, meson: allow
+>     enabling vhost-user on all POSIX systems"
+>   - Instead of making possible enabling vhost-user on Linux and BSD systems,
+>     allow enabling it on all non-Windows platforms. (Paolo Bonzini)
 
 
-It's not just Linux - any platform without eventfd.
+I picked 1,2.
+Waiting on updated doc patch to apply 3,4.
 
-So I think we should have a section explaining that whereever
-spec says eventfd it can be a pipe if system does not
-support creating eventfd.
-
-> +--------------------------------------
-> +
-> +While vhost-user was initially developed targeting Linux, nowadays is
-> +supported on any platform that provides the following features:
-> +
-> +- The ability to share a mapping injected into the guest between
-> +  multiple processes, so both QEMU and the vhost-user daemon servicing
-> +  the device can access simultaneously the memory regions containing
-> +  the virtqueues and the data associated with each request.
-> +
-> +- AF_UNIX sockets with SCM_RIGHTS, so QEMU can communicate with the
-> +  vhost-user daemon and send it file descriptors when needed.
-> +
-> +- Either eventfd or pipe/pipe2. On platforms where eventfd is not
-> +  available, QEMU will automatically fallback to pipe2 or, as a last
-> +  resort, pipe.
-> +
->  Message Specification
->  =====================
->  
+> v2->v3:
+>   - Add a section to docs/interop/vhost-user.rst explaining how vhost-user
+>     is supported on non-Linux platforms. (Stefan Hajnoczi)
+> 
+> Sergio Lopez (4):
+>   event_notifier: add event_notifier_get_wfd()
+>   vhost: use wfd on functions setting vring call fd
+>   configure, meson: allow enabling vhost-user on all POSIX systems
+>   docs: vhost-user: add subsection for non-Linux platforms
+> 
+>  configure                     |  4 ++--
+>  docs/interop/vhost-user.rst   | 18 ++++++++++++++++++
+>  hw/virtio/vhost.c             |  6 +++---
+>  include/qemu/event_notifier.h |  1 +
+>  meson.build                   |  2 +-
+>  util/event_notifier-posix.c   |  5 +++++
+>  6 files changed, 30 insertions(+), 6 deletions(-)
+> 
 > -- 
 > 2.35.1
+> 
 
