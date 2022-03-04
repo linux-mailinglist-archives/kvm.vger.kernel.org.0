@@ -2,180 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9BB194CD2AD
-	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 11:43:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C1254CD2B0
+	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 11:44:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237816AbiCDKoP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Mar 2022 05:44:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56294 "EHLO
+        id S237758AbiCDKov (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Mar 2022 05:44:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59140 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237800AbiCDKoM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Mar 2022 05:44:12 -0500
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2B971AC2A0;
-        Fri,  4 Mar 2022 02:43:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1646390604; x=1677926604;
-  h=message-id:date:mime-version:cc:subject:to:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=WgTGiC6INkrQSj9hdXkuWQiP89mzXyrTFpQnEljce20=;
-  b=JL1fwBeB/l/44gnNcwnUUooa8yfu7Iv+9Ve7HRrEcl1lsNDfRTM1DuDd
-   uW6VShIMnS1Cr3Su6HCID2MDjTr1Lomf7c8WEpr+PxjzEygNowMuSN+4u
-   5QhbM1MAJAp4mkv5jB/gxCMiERLtUXSQNCHJ4khjn7ED6td7GbCGySEtz
-   Kv5U2qZ2FnsggzTsClhsOexSxjrO8f8ceKZIQSPVjB8bab2BgTjyPS8GU
-   wDFRACEuJlSGfKx1QJuBn6Mi0hROozfsfY22yMoWVanxVPHG5KIyByk8H
-   xpvELoKRmL5cMXa3hqn7wp16rZyxH3Ifd31Q+av7pBMfZbW9Gsf2Uavo1
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10275"; a="340381192"
-X-IronPort-AV: E=Sophos;i="5.90,154,1643702400"; 
-   d="scan'208";a="340381192"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2022 02:43:23 -0800
-X-IronPort-AV: E=Sophos;i="5.90,154,1643702400"; 
-   d="scan'208";a="508948776"
-Received: from blu2-mobl3.ccr.corp.intel.com (HELO [10.254.209.31]) ([10.254.209.31])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2022 02:43:13 -0800
-Message-ID: <7a3dc977-0c5f-6d88-6d3a-8e49bc717690@linux.intel.com>
-Date:   Fri, 4 Mar 2022 18:43:11 +0800
+        with ESMTP id S236219AbiCDKoo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Mar 2022 05:44:44 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 614A51AC283;
+        Fri,  4 Mar 2022 02:43:57 -0800 (PST)
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 224AIkgc030791;
+        Fri, 4 Mar 2022 10:43:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=FV0TR5RNGkV+7yDY3nJtq0Dfxl911E50swznrSKkj5E=;
+ b=IYsr5pwB7+t+UsctdlmRmDej9QhunCNu1257g/F5LcGSrmZSow5mvMZ2FEcEa1uGOdyY
+ jGDyvoXbQNEyalv6KHIFo6TFGOHlrgXEqQSXJFeRLizxqxQ7JrCqM17R3SBHDnAcb/5I
+ 4kwCiC7LMb9XqMbCtmfzY7Q8ECTVFrhx0U0qTKz6o5Evw3Euq7PsrMap2DDRNvIGMnsL
+ KrczOBE0gMF3miK6R6TwnqVbtL/cPF8BO2Ul6QGZWzgPKv15ODYJhqZDiA0QQsWxiLOg
+ sAwk33qPqY0Di6WHsy9xKZaPHGDxAajkihfYnRZe0CZ/8qRFjE8PXXiF1O5p6AC6BEdZ 9g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ekgwgrdge-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 04 Mar 2022 10:43:56 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 224AUOh4012366;
+        Fri, 4 Mar 2022 10:43:56 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ekgwgrdg4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 04 Mar 2022 10:43:56 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 224AhPvA008294;
+        Fri, 4 Mar 2022 10:43:54 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma02fra.de.ibm.com with ESMTP id 3ek4k4h97s-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 04 Mar 2022 10:43:53 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 224Ahomv38535512
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 4 Mar 2022 10:43:50 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CD32B42042;
+        Fri,  4 Mar 2022 10:43:50 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 89F1D4203F;
+        Fri,  4 Mar 2022 10:43:50 +0000 (GMT)
+Received: from [9.145.58.173] (unknown [9.145.58.173])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri,  4 Mar 2022 10:43:50 +0000 (GMT)
+Message-ID: <6f8205e1-7a79-77dc-12b6-30294398d29b@linux.ibm.com>
+Date:   Fri, 4 Mar 2022 11:43:50 +0100
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.0
-Cc:     baolu.lu@linux.intel.com, Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Dan Williams <dan.j.williams@intel.com>, rafael@kernel.org,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Liu Yi L <yi.l.liu@intel.com>,
-        Jacob jun Pan <jacob.jun.pan@intel.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Stuart Yoder <stuyoder@gmail.com>,
-        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        Li Yang <leoyang.li@nxp.com>,
-        Dmitry Osipenko <digetx@gmail.com>,
-        iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v7 01/11] iommu: Add DMA ownership management interfaces
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH kvm-unit-tests v1 2/6] s390x: smp: Test SIGP RESTART
+ against stopped CPU
 Content-Language: en-US
-To:     eric.auger@redhat.com,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Joerg Roedel <joro@8bytes.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Ashok Raj <ashok.raj@intel.com>
-References: <20220228005056.599595-1-baolu.lu@linux.intel.com>
- <20220228005056.599595-2-baolu.lu@linux.intel.com>
- <c75b6e04-bc1b-b9f6-1a44-bf1567a8c19d@redhat.com>
-From:   Lu Baolu <baolu.lu@linux.intel.com>
-In-Reply-To: <c75b6e04-bc1b-b9f6-1a44-bf1567a8c19d@redhat.com>
+To:     Eric Farman <farman@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+References: <20220303210425.1693486-1-farman@linux.ibm.com>
+ <20220303210425.1693486-3-farman@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <20220303210425.1693486-3-farman@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: q3IdIeM9KLlwAvBt5Uilm7LB5MBLhJ17
+X-Proofpoint-ORIG-GUID: FzaMb2bvwMCPh4UNihssYdxEknTdwIm4
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-03-04_02,2022-03-04_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
+ mlxscore=0 impostorscore=0 malwarescore=0 lowpriorityscore=0 adultscore=0
+ mlxlogscore=999 bulkscore=0 spamscore=0 priorityscore=1501 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
+ definitions=main-2203040056
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Eric,
+On 3/3/22 22:04, Eric Farman wrote:
+> test_restart() makes two smp_cpu_restart() calls against CPU 1.
+> It claims to perform both of them against running (operating) CPUs,
+> but the first invocation tries to achieve this by calling
+> smp_cpu_stop() to CPU 0. This will be rejected by the library.
 
-On 2022/3/4 18:34, Eric Auger wrote:
-> I hit a WARN_ON() when unbinding an e1000e driver just after boot:
-> 
-> sudo modprobe -v vfio-pci
-> echo vfio-pci | sudo tee -a
-> /sys/bus/pci/devices/0004:01:00.0/driver_override
-> vfio-pci
-> echo 0004:01:00.0 | sudo tee -a  /sys/bus/pci/drivers/e1000e/unbind
-> 
-> 
-> [  390.042811] ------------[ cut here ]------------
-> [  390.046468] WARNING: CPU: 42 PID: 5589 at drivers/iommu/iommu.c:3123
-> iommu_device_unuse_default_domain+0x68/0x100
-> [  390.056710] Modules linked in: vfio_pci vfio_pci_core vfio_virqfd
-> vfio_iommu_type1 vfio xt_CHECKSUM xt_MASQUERADE xt_conntrack ipt_REJECT
-> nf_reject_ipv4 nft_compat nft_chain_nat nf_nat nf_conntrack
-> nf_defrag_ipv6 nf_defrag_ipv4 nf_tables nfnetlink bridge stp llc rfkill
-> sunrpc vfat fat mlx5_ib ib_uverbs ib_core acpi_ipmi ipmi_ssif
-> ipmi_devintf ipmi_msghandler cppc_cpufreq drm xfs libcrc32c mlx5_core sg
-> mlxfw crct10dif_ce tls ghash_ce sha2_ce sha256_arm64 sha1_ce sbsa_gwdt
-> e1000e psample sdhci_acpi ahci_platform sdhci libahci_platform qcom_emac
-> mmc_core hdma hdma_mgmt dm_mirror dm_region_hash dm_log dm_mod fuse
-> [  390.110618] CPU: 42 PID: 5589 Comm: tee Kdump: loaded Not tainted
-> 5.17.0-rc4-lu-v7-official+ #24
-> [  390.119384] Hardware name: WIWYNN QDF2400 Reference Evaluation
-> Platform CV90-LA115-P120/QDF2400 Customer Reference Board, BIOS 0ACJA570
-> 11/05/2018
-> [  390.132492] pstate: a0400005 (NzCv daif +PAN -UAO -TCO -DIT -SSBS
-> BTYPE=--)
-> [  390.139436] pc : iommu_device_unuse_default_domain+0x68/0x100
-> [  390.145165] lr : iommu_device_unuse_default_domain+0x38/0x100
-> [  390.150894] sp : ffff80000fbb3bc0
-> [  390.154193] x29: ffff80000fbb3bc0 x28: ffff03c0cf6b2400 x27:
-> 0000000000000000
-> [  390.161311] x26: 0000000000000000 x25: 0000000000000000 x24:
-> ffff03c0c7cc5720
-> [  390.168429] x23: ffff03c0c2b9d150 x22: ffffb4e61df223f8 x21:
-> ffffb4e61df223f8
-> [  390.175547] x20: ffff03c7c03c3758 x19: ffff03c7c03c3700 x18:
-> 0000000000000000
-> [  390.182665] x17: 0000000000000000 x16: 0000000000000000 x15:
-> 0000000000000000
-> [  390.189783] x14: 0000000000000000 x13: 0000000000000030 x12:
-> ffff03c0d519cd80
-> [  390.196901] x11: 7f7f7f7f7f7f7f7f x10: 0000000000000dc0 x9 :
-> ffffb4e620b54f8c
-> [  390.204019] x8 : ffff03c0cf6b3220 x7 : ffff4ef132bba000 x6 :
-> 00000000000000ff
-> [  390.211137] x5 : ffff03c0c2b9f108 x4 : ffff03c0d51f6438 x3 :
-> 0000000000000000
-> [  390.218255] x2 : ffff03c0cf6b2400 x1 : 0000000000000000 x0 :
-> 0000000000000000
-> [  390.225374] Call trace:
-> [  390.227804]  iommu_device_unuse_default_domain+0x68/0x100
-> [  390.233187]  pci_dma_cleanup+0x38/0x44
-> [  390.236919]  __device_release_driver+0x1a8/0x260
-> [  390.241519]  device_driver_detach+0x50/0xd0
-> [  390.245686]  unbind_store+0xf8/0x120
-> [  390.249245]  drv_attr_store+0x30/0x44
-> [  390.252891]  sysfs_kf_write+0x50/0x60
-> [  390.256537]  kernfs_fop_write_iter+0x134/0x1cc
-> [  390.260964]  new_sync_write+0xf0/0x18c
-> [  390.264696]  vfs_write+0x230/0x2d0
-> [  390.268082]  ksys_write+0x74/0x100
-> [  390.271467]  __arm64_sys_write+0x28/0x3c
-> [  390.275373]  invoke_syscall.constprop.0+0x58/0xf0
-> [  390.280061]  el0_svc_common.constprop.0+0x160/0x164
-> [  390.284922]  do_el0_svc+0x34/0xcc
-> [  390.288221]  el0_svc+0x30/0x140
-> [  390.291346]  el0t_64_sync_handler+0xa4/0x130
-> [  390.295599]  el0t_64_sync+0x1a0/0x1a4
-> [  390.299245] ---[ end trace 0000000000000000 ]---
-> 
-> 
-> I put some traces in the code and I can see that iommu_device_use_default_domain() effectively is called on 0004:01:00.0 e1000e device on pci_dma_configure() but at that time the iommu group is NULL:
-> [   10.569427] e1000e 0004:01:00.0: ------ ENTRY pci_dma_configure driver_managed_area=0
-> [   10.569431] e1000e 0004:01:00.0: **** iommu_device_use_default_domain ENTRY
-> [   10.569433] e1000e 0004:01:00.0: **** iommu_device_use_default_domain no group
-> [   10.569435] e1000e 0004:01:00.0: pci_dma_configure iommu_device_use_default_domain returned 0
-> [   10.569492] e1000e 0004:01:00.0: Adding to iommu group 3
-> 
-> ^^^the group is added after the
-> iommu_device_use_default_domain() call
-> So the group->owner_cnt is not incremented as expected.
+I played myself there :)
 
-Thank you for reporting this. Do you have any idea why the driver is
-loaded before iommu_probe_device()?
+> 
+> Let's fix this by making the first restart operate on a stopped CPU,
+> to ensure it gets test coverage instead of relying on other callers.
+> 
+> Fixes: 166da884d ("s390x: smp: Add restart when running test")
+> Signed-off-by: Eric Farman <farman@linux.ibm.com>
 
-Best regards,
-baolu
+
+If you want to you can add a report_pass() after the first wait flag.
+
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+
+> ---
+>   s390x/smp.c | 8 ++------
+>   1 file changed, 2 insertions(+), 6 deletions(-)
+> 
+> diff --git a/s390x/smp.c b/s390x/smp.c
+> index 068ac74d..2f4af820 100644
+> --- a/s390x/smp.c
+> +++ b/s390x/smp.c
+> @@ -50,10 +50,6 @@ static void test_start(void)
+>   	report_pass("start");
+>   }
+>   
+> -/*
+> - * Does only test restart when the target is running.
+> - * The other tests do restarts when stopped multiple times already.
+> - */
+>   static void test_restart(void)
+>   {
+>   	struct cpu *cpu = smp_cpu_from_idx(1);
+> @@ -62,8 +58,8 @@ static void test_restart(void)
+>   	lc->restart_new_psw.mask = extract_psw_mask();
+>   	lc->restart_new_psw.addr = (unsigned long)test_func;
+>   
+> -	/* Make sure cpu is running */
+> -	smp_cpu_stop(0);
+> +	/* Make sure cpu is stopped */
+> +	smp_cpu_stop(1);
+>   	set_flag(0);
+>   	smp_cpu_restart(1);
+>   	wait_for_flag();
+
