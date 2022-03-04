@@ -2,140 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 77FE04CD282
-	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 11:38:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6960E4CD296
+	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 11:40:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235831AbiCDKjX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Mar 2022 05:39:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42290 "EHLO
+        id S236960AbiCDKlR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Mar 2022 05:41:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50384 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234208AbiCDKjV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Mar 2022 05:39:21 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A7CC9150409
-        for <kvm@vger.kernel.org>; Fri,  4 Mar 2022 02:38:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646390311;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=lz5RITfbuxi7prNXljqL/BkcwaBGah78jbB9QQ7ar/o=;
-        b=W6qkFiHelSwniSLEctyUSRlCYovL71E46got5geGT+e7z05qIHcy1/fg5VX7zr/+6QUL+a
-        yAv5uHnmuTQvKF5yXCesc/q9yrn7X7UqxmR991uhnmyizhb/RMwRTn++1gj5dpLY+SbneF
-        FeELWYCs5A9Cbh2OVvH+lrh997VuqQY=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-396-4JIWhh2dMNWhKUNFNKEMjg-1; Fri, 04 Mar 2022 05:38:30 -0500
-X-MC-Unique: 4JIWhh2dMNWhKUNFNKEMjg-1
-Received: by mail-wm1-f70.google.com with SMTP id 7-20020a1c1907000000b003471d9bbe8dso2590323wmz.0
-        for <kvm@vger.kernel.org>; Fri, 04 Mar 2022 02:38:29 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=lz5RITfbuxi7prNXljqL/BkcwaBGah78jbB9QQ7ar/o=;
-        b=yXWM9b2Jc+G0a+i1xiZQHpvmKWdzV4QyAuN/LCg32+K6PlN+JfsZtGe5hsjOhVnJ9n
-         +txT43Dei3z4+ANsRwQ9F9fduTqQuUDAoZeqjnrXMRtpS4V4VozgSWtjjDKlsbFA4Ict
-         Uvzk7JQQA3sBb4hu+ZfcqhdEYF7QvIAqU+gbu35mu6XaFOyC1+iqqJH/9Lme2DWHD3Hi
-         AYNq+9tm7gQKPwHAeLnxtUQum6p/TiXiIg90toUCRjUhcOwOpZ6lFkhS3sgkRLRAMWS8
-         7x5+DL340sWCvPvKMispc5O+y9ST8ZlR1U9fu5VeBZvgdGtAwIMe1uYGQ/OPoDWl9QE+
-         IHTg==
-X-Gm-Message-State: AOAM5331PPzp9TzwirB1Anyxuv2YidzstPI6oudjj4xtoRFeXkEPKTgz
-        l+CMh3NJ24FUyHl9ca34TnQ9NDwVdEr20hZzSG/Y7AWB7dALNuVddID0lKp+mPiV75E235xauty
-        Ib4D4LVQQjf+T
-X-Received: by 2002:a5d:6b06:0:b0:1e3:3e52:8a6 with SMTP id v6-20020a5d6b06000000b001e33e5208a6mr29170203wrw.148.1646390308821;
-        Fri, 04 Mar 2022 02:38:28 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwWSO2vMtR421emZNfVw1PPEBsPuI7pwJ1SnQREXhldYhaQLx8hgCPGjgLYLXwejapDNC0UGw==
-X-Received: by 2002:a5d:6b06:0:b0:1e3:3e52:8a6 with SMTP id v6-20020a5d6b06000000b001e33e5208a6mr29170192wrw.148.1646390308607;
-        Fri, 04 Mar 2022 02:38:28 -0800 (PST)
-Received: from redhat.com ([2.52.16.157])
-        by smtp.gmail.com with ESMTPSA id e6-20020a5d5006000000b001e75916a7c2sm4242027wrt.84.2022.03.04.02.38.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Mar 2022 02:38:27 -0800 (PST)
-Date:   Fri, 4 Mar 2022 05:38:22 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Sergio Lopez <slp@redhat.com>
-Cc:     qemu-devel@nongnu.org,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Elena Ufimtseva <elena.ufimtseva@oracle.com>,
-        kvm@vger.kernel.org, Halil Pasic <pasic@linux.ibm.com>,
-        Fam Zheng <fam@euphon.net>,
-        John G Johnson <john.g.johnson@oracle.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Hanna Reitz <hreitz@redhat.com>,
-        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
-        qemu-s390x@nongnu.org, vgoyal@redhat.com,
-        Jagannathan Raman <jag.raman@oracle.com>,
-        Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
-        Eric Farman <farman@linux.ibm.com>
-Subject: Re: [PATCH v3 0/4] Enable vhost-user to be used on BSD systems
-Message-ID: <20220304053759-mutt-send-email-mst@kernel.org>
-References: <20220303115911.20962-1-slp@redhat.com>
+        with ESMTP id S236741AbiCDKlQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Mar 2022 05:41:16 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D2311AA07A;
+        Fri,  4 Mar 2022 02:40:29 -0800 (PST)
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 2249JgRG023520;
+        Fri, 4 Mar 2022 10:40:29 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : to : cc : references : from : subject : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=2ureneyGL/RxCUi5c/GReTp/E1qUMt1GFUmVsqghXxM=;
+ b=II8+pLFs7p1AoeJLBibfz+0GqDpUpd9G/c2QW2Qw79dHLcnKfEqlli61Y/OzLaZFrakP
+ eSEvpU7BFlB+IfYr9gwfJGDJ8reCtu1ZxipX8TNi9KLeR5fGQqzplGTTyFUJUjArAZpj
+ aZq/n7ZfcZvEwSQAH3YC1mfgolKNoNUA7gfNoxrUeYdwD4ucK87FeMYpvs25nkMJU8mM
+ HvGqhYU0+LB/a6DM6z4vpscS1OzNc22iopqXYzEEC+a3fGMrqKJs/yXSSgryXpRvQEvB
+ DUMEmsCgHr8/WvJwaLbDVpGdMyIg6O1WwzIH2C6YdIcm9AfCFPHLwIKsco/kyZI7lzPV KA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ekg1thaj3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 04 Mar 2022 10:40:28 +0000
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 224ANI0B025320;
+        Fri, 4 Mar 2022 10:40:28 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ekg1thahf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 04 Mar 2022 10:40:28 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 224AVvs1023672;
+        Fri, 4 Mar 2022 10:40:26 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma04ams.nl.ibm.com with ESMTP id 3ek4kg9fsp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 04 Mar 2022 10:40:26 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 224AeNwv44695972
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 4 Mar 2022 10:40:23 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0E9D342042;
+        Fri,  4 Mar 2022 10:40:23 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BB2DC4204B;
+        Fri,  4 Mar 2022 10:40:22 +0000 (GMT)
+Received: from [9.145.58.173] (unknown [9.145.58.173])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri,  4 Mar 2022 10:40:22 +0000 (GMT)
+Message-ID: <fcacf11f-6469-8c70-9db5-0bb55e77fcdf@linux.ibm.com>
+Date:   Fri, 4 Mar 2022 11:40:22 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220303115911.20962-1-slp@redhat.com>
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Content-Language: en-US
+To:     Eric Farman <farman@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+References: <20220303210425.1693486-1-farman@linux.ibm.com>
+ <20220303210425.1693486-4-farman@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH kvm-unit-tests v1 3/6] s390x: smp: Fix checks for SIGP
+ STOP STORE STATUS
+In-Reply-To: <20220303210425.1693486-4-farman@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 6L237NOQ29xfPm8LXbMXBCG0C18aOzL4
+X-Proofpoint-GUID: 81zQTtj3WCICXwr9IAbxbgqYFoTlipH5
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-03-04_02,2022-03-04_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ mlxlogscore=999 bulkscore=0 clxscore=1015 adultscore=0 phishscore=0
+ malwarescore=0 spamscore=0 lowpriorityscore=0 mlxscore=0 suspectscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2203040056
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 03, 2022 at 12:59:07PM +0100, Sergio Lopez wrote:
-> Since QEMU is already able to emulate ioeventfd using pipefd, we're already
-> pretty close to supporting vhost-user on non-Linux systems.
-> 
-> This two patches bridge the gap by:
-> 
-> 1. Adding a new event_notifier_get_wfd() to return wfd on the places where
->    the peer is expected to write to the notifier.
-> 
-> 2. Modifying the build system to it allows enabling vhost-user on BSD.
-> 
-> v1->v2:
->   - Drop: "Allow returning EventNotifier's wfd" (Alex Williamson)
->   - Add: "event_notifier: add event_notifier_get_wfd()" (Alex Williamson)
->   - Add: "vhost: use wfd on functions setting vring call fd"
->   - Rename: "Allow building vhost-user in BSD" to "configure, meson: allow
->     enabling vhost-user on all POSIX systems"
->   - Instead of making possible enabling vhost-user on Linux and BSD systems,
->     allow enabling it on all non-Windows platforms. (Paolo Bonzini)
-
-
-I picked 1,2.
-Waiting on updated doc patch to apply 3,4.
-
-> v2->v3:
->   - Add a section to docs/interop/vhost-user.rst explaining how vhost-user
->     is supported on non-Linux platforms. (Stefan Hajnoczi)
-> 
-> Sergio Lopez (4):
->   event_notifier: add event_notifier_get_wfd()
->   vhost: use wfd on functions setting vring call fd
->   configure, meson: allow enabling vhost-user on all POSIX systems
->   docs: vhost-user: add subsection for non-Linux platforms
-> 
->  configure                     |  4 ++--
->  docs/interop/vhost-user.rst   | 18 ++++++++++++++++++
->  hw/virtio/vhost.c             |  6 +++---
->  include/qemu/event_notifier.h |  1 +
->  meson.build                   |  2 +-
->  util/event_notifier-posix.c   |  5 +++++
->  6 files changed, 30 insertions(+), 6 deletions(-)
-> 
-> -- 
-> 2.35.1
-> 
-
+T24gMy8zLzIyIDIyOjA0LCBFcmljIEZhcm1hbiB3cm90ZToNCj4gSW4gdGhlIHJvdXRpbmUg
+dGVzdF9zdG9wX3N0b3JlX3N0YXR1cygpLCB0aGUgInJ1bm5pbmciIHBhcnQgb2YNCj4gdGhl
+IHRlc3QgY2hlY2tzIGEgZmV3IG9mIHRoZSBmaWVsZHMgaW4gbG93Y29yZSAodG8gdmVyaWZ5
+IHRoZQ0KPiAiU1RPUkUgU1RBVFVTIiBwYXJ0IG9mIHRoZSBTSUdQIG9yZGVyKSwgYW5kIHRo
+ZW4gZW5zdXJlcyB0aGF0DQo+IHRoZSBDUFUgaGFzIHN0b3BwZWQuIEJ1dCB0aGlzIGlzIGJh
+Y2t3YXJkcywgYW5kIGxlYWRzIHRvIGZhbHNlDQo+IGVycm9ycy4NCj4gDQo+IEFjY29yZGlu
+ZyB0byB0aGUgUHJpbmNpcGxlcyBvZiBPcGVyYXRpb246DQo+ICAgIFRoZSBhZGRyZXNzZWQg
+Q1BVIHBlcmZvcm1zIHRoZSBzdG9wIGZ1bmN0aW9uLCBmb2wtDQo+ICAgIGxvd2VkIGJ5IHRo
+ZSBzdG9yZS1zdGF0dXMgb3BlcmF0aW9uIChzZWUg4oCcU3RvcmUgU3RhLQ0KPiAgICB0dXPi
+gJ0gb24gcGFnZSA0LTgyKS4NCj4gDQo+IEJ5IGNoZWNraW5nIHRoZSByZXN1bHRzIGhvdyB0
+aGV5IGFyZSB0b2RheSwgdGhlIGNvbnRlbnRzIG9mDQo+IHRoZSBsb3djb3JlIGZpZWxkcyBh
+cmUgdW5yZWxpYWJsZSB1bnRpbCB0aGUgQ1BVIGlzIHN0b3BwZWQuDQo+IFRodXMsIGNoZWNr
+IHRoYXQgdGhlIENQVSBpcyBzdG9wcGVkIGZpcnN0LCBiZWZvcmUgZW5zdXJpbmcNCj4gdGhh
+dCB0aGUgU1RPUkUgU1RBVFVTIHdhcyBwZXJmb3JtZWQgY29ycmVjdGx5Lg0KDQpUaGUgcmVz
+dWx0cyBhcmUgdW5kZWZpbmVkIHVudGlsIHRoZSBjcHUgaXMgbm90IGJ1c3kgdmlhIFNJR1Ag
+c2Vuc2UsIG5vPw0KWW91IGNvdmVyIHRoYXQgdmlhIGRvaW5nIHRoZSBzbXBfY3B1X3N0b3Bw
+ZWQoKSBjaGVjayBzaW5jZSB0aGF0IGRvZXMgYSANCnNpZ3Agc2Vuc2UuDQoNCldoZXJlIHRo
+ZSBzdG9wIGNoZWNrIGlzIGxvY2F0ZWQgZG9lc24ndCByZWFsbHkgbWF0dGVyIHNpbmNlIHRo
+ZSBsaWJyYXJ5IA0Kd2FpdHMgdW50aWwgdGhlIGNwdSBpcyBzdG9wcGVkIGFuZCBpdCBkb2Vz
+IHRoYXQgdmlhIHNtcF9jcHVfc3RvcHBlZCgpDQoNCg0KU286DQpBcmUgd2UgcmVhbGx5IGZp
+eGluZyBzb21ldGhpbmcgaGVyZT8NCg0KUGxlYXNlIGltcHJvdmUgdGhlIGNvbW1pdCBkZXNj
+cmlwdGlvbi4NCkZvciBtZSB0aGlzIGxvb2tzIG1vcmUgbGlrZSBtYWtpbmcgY2hlY2tzIG1v
+cmUgZXhwbGljaXQgYW5kIHN5bW1ldHJpY2FsIA0Kd2hpY2ggSSdtIGdlbmVyYWxseSBvayB3
+aXRoLiBXZSBqdXN0IG5lZWQgdG8gc3BlY2lmeSBjb3JyZWN0bHkgd2h5IHdlJ3JlIA0KZG9p
+bmcgdGhhdC4NCg0KPiANCj4gV2hpbGUgaGVyZSwgYWRkIHRoZSBzYW1lIGNoZWNrIHRvIHRo
+ZSBzZWNvbmQgcGFydCBvZiB0aGUgdGVzdCwNCj4gZXZlbiB0aG91Z2ggdGhlIENQVSBpcyBl
+eHBsaWNpdGx5IHN0b3BwZWQgcHJpb3IgdG8gdGhlIFNJR1AuDQo+IA0KPiBGaXhlczogZmM2
+N2IwN2E0ICgiczM5MHg6IHNtcDogVGVzdCBzdG9wIGFuZCBzdG9yZSBzdGF0dXMgb24gYSBy
+dW5uaW5nIGFuZCBzdG9wcGVkIGNwdSIpDQo+IFNpZ25lZC1vZmYtYnk6IEVyaWMgRmFybWFu
+IDxmYXJtYW5AbGludXguaWJtLmNvbT4NCj4gLS0tDQo+ICAgczM5MHgvc21wLmMgfCAzICsr
+LQ0KPiAgIDEgZmlsZSBjaGFuZ2VkLCAyIGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkN
+Cj4gDQo+IGRpZmYgLS1naXQgYS9zMzkweC9zbXAuYyBiL3MzOTB4L3NtcC5jDQo+IGluZGV4
+IDJmNGFmODIwLi41MDgxMWJkMCAxMDA2NDQNCj4gLS0tIGEvczM5MHgvc21wLmMNCj4gKysr
+IGIvczM5MHgvc21wLmMNCj4gQEAgLTk4LDkgKzk4LDkgQEAgc3RhdGljIHZvaWQgdGVzdF9z
+dG9wX3N0b3JlX3N0YXR1cyh2b2lkKQ0KPiAgIAlsYy0+Z3JzX3NhWzE1XSA9IDA7DQo+ICAg
+CXNtcF9jcHVfc3RvcF9zdG9yZV9zdGF0dXMoMSk7DQo+ICAgCW1iKCk7DQo+ICsJcmVwb3J0
+KHNtcF9jcHVfc3RvcHBlZCgxKSwgImNwdSBzdG9wcGVkIik7DQo+ICAgCXJlcG9ydChsYy0+
+cHJlZml4X3NhID09ICh1aW50MzJfdCkodWludHB0cl90KWNwdS0+bG93Y29yZSwgInByZWZp
+eCIpOw0KPiAgIAlyZXBvcnQobGMtPmdyc19zYVsxNV0sICJzdGFjayIpOw0KPiAtCXJlcG9y
+dChzbXBfY3B1X3N0b3BwZWQoMSksICJjcHUgc3RvcHBlZCIpOw0KPiAgIAlyZXBvcnRfcHJl
+Zml4X3BvcCgpOw0KPiAgIA0KPiAgIAlyZXBvcnRfcHJlZml4X3B1c2goInN0b3BwZWQiKTsN
+Cj4gQEAgLTEwOCw2ICsxMDgsNyBAQCBzdGF0aWMgdm9pZCB0ZXN0X3N0b3Bfc3RvcmVfc3Rh
+dHVzKHZvaWQpDQo+ICAgCWxjLT5ncnNfc2FbMTVdID0gMDsNCj4gICAJc21wX2NwdV9zdG9w
+X3N0b3JlX3N0YXR1cygxKTsNCj4gICAJbWIoKTsNCj4gKwlyZXBvcnQoc21wX2NwdV9zdG9w
+cGVkKDEpLCAiY3B1IHN0b3BwZWQiKTsNCj4gICAJcmVwb3J0KGxjLT5wcmVmaXhfc2EgPT0g
+KHVpbnQzMl90KSh1aW50cHRyX3QpY3B1LT5sb3djb3JlLCAicHJlZml4Iik7DQo+ICAgCXJl
+cG9ydChsYy0+Z3JzX3NhWzE1XSwgInN0YWNrIik7DQo+ICAgCXJlcG9ydF9wcmVmaXhfcG9w
+KCk7DQoNCg==
