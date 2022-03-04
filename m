@@ -2,197 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 602C44CD5F7
-	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 15:11:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C51D4CD602
+	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 15:12:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236944AbiCDOLv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Mar 2022 09:11:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36474 "EHLO
+        id S239794AbiCDOMk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Mar 2022 09:12:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231820AbiCDOLu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Mar 2022 09:11:50 -0500
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0CCB51BA917;
-        Fri,  4 Mar 2022 06:11:01 -0800 (PST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AEB871424;
-        Fri,  4 Mar 2022 06:11:00 -0800 (PST)
-Received: from [10.57.39.47] (unknown [10.57.39.47])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AB4983F70D;
-        Fri,  4 Mar 2022 06:10:56 -0800 (PST)
-Message-ID: <e2698dbe-18e2-1a82-8a12-fe45bc9be534@arm.com>
-Date:   Fri, 4 Mar 2022 14:10:55 +0000
+        with ESMTP id S239493AbiCDOMj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Mar 2022 09:12:39 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CE661BA93D;
+        Fri,  4 Mar 2022 06:11:52 -0800 (PST)
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 224DnaGE031070;
+        Fri, 4 Mar 2022 14:11:50 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=LeeW8mmOAOKB4reeE5OJx+eR5eDYk2REbvrR7EQFt70=;
+ b=Wmqjxrmt515C8HdWYW7WCKNGAmRU/seA4c3unqLusxdu6JuLmG/gwyQim00PNpm5b2gA
+ s4oQHM4MVwZumPjvQ1XhoHEyE2F29hzMHc8fPjSCzinHB4JJuIrWUyEZ4YvsUCdLjiQK
+ ENVaz4jvJ8asUo0tNAbIUgQATo2pDA+GpQp6llsfIculTj/p6DvzG186lPfegvFjErnT
+ VjaVyB1RD+R9Os140nJBTGKE/QbA/d1ci37HFqQZYNcrDSFwN6EpgkGYKyhVegyk9o8j
+ +xEy4AeYpIBD17awetXP6McaAp17mBd6sjoy04Q2/45hcdrZwS+8ZNYB9SLaVen+OEGW 3Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ekgwgv6xm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 04 Mar 2022 14:11:50 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 224Dd7XR011099;
+        Fri, 4 Mar 2022 14:11:50 GMT
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ekgwgv6wr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 04 Mar 2022 14:11:50 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 224E7f2C029608;
+        Fri, 4 Mar 2022 14:11:47 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma05fra.de.ibm.com with ESMTP id 3ek4ka9n8h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 04 Mar 2022 14:11:47 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 224EBiXI20119904
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 4 Mar 2022 14:11:44 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 63D694203F;
+        Fri,  4 Mar 2022 14:11:44 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D4F5142049;
+        Fri,  4 Mar 2022 14:11:41 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.114.12.92])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri,  4 Mar 2022 14:11:41 +0000 (GMT)
+From:   Steffen Eiden <seiden@linux.ibm.com>
+To:     linux-s390@vger.kernel.org
+Cc:     Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Shuah Khan <shuah@kernel.org>, Nico Boehr <nrb@linux.ibm.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+Subject: [PATCH v3 0/4] s390: Ultravisor device
+Date:   Fri,  4 Mar 2022 09:11:37 -0500
+Message-Id: <20220304141141.32767-1-seiden@linux.ibm.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101
- Thunderbird/91.6.1
-Subject: Re: [PATCH v7 01/11] iommu: Add DMA ownership management interfaces
-Content-Language: en-GB
-To:     eric.auger@redhat.com, Lu Baolu <baolu.lu@linux.intel.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Joerg Roedel <joro@8bytes.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Ashok Raj <ashok.raj@intel.com>
-Cc:     Chaitanya Kulkarni <kch@nvidia.com>, kvm@vger.kernel.org,
-        Stuart Yoder <stuyoder@gmail.com>, rafael@kernel.org,
-        David Airlie <airlied@linux.ie>, linux-pci@vger.kernel.org,
-        Cornelia Huck <cohuck@redhat.com>,
-        linux-kernel@vger.kernel.org,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        iommu@lists.linux-foundation.org,
-        Thierry Reding <thierry.reding@gmail.com>,
-        Jacob jun Pan <jacob.jun.pan@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Li Yang <leoyang.li@nxp.com>, Will Deacon <will@kernel.org>,
-        Dmitry Osipenko <digetx@gmail.com>
-References: <20220228005056.599595-1-baolu.lu@linux.intel.com>
- <20220228005056.599595-2-baolu.lu@linux.intel.com>
- <c75b6e04-bc1b-b9f6-1a44-bf1567a8c19d@redhat.com>
- <7a3dc977-0c5f-6d88-6d3a-8e49bc717690@linux.intel.com>
- <1648bc97-a0d3-4051-58d0-e24fa9e9d183@arm.com>
- <350a8e09-08a9-082b-3ad1-b711c7d98d73@redhat.com>
-From:   Robin Murphy <robin.murphy@arm.com>
-In-Reply-To: <350a8e09-08a9-082b-3ad1-b711c7d98d73@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Q3VOevPhPlguO061mKAn7xX1GjNgOpwJ
+X-Proofpoint-ORIG-GUID: aVZCzT9JxECYqJsllcEcJ0_fvSO5feZ3
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-03-04_06,2022-03-04_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
+ mlxscore=0 impostorscore=0 malwarescore=0 lowpriorityscore=0 adultscore=0
+ mlxlogscore=999 bulkscore=0 spamscore=0 priorityscore=1501 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
+ definitions=main-2203040077
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2022-03-04 13:55, Eric Auger wrote:
-> Hi Robin,
-> 
-> On 3/4/22 1:22 PM, Robin Murphy wrote:
->> On 2022-03-04 10:43, Lu Baolu wrote:
->>> Hi Eric,
->>>
->>> On 2022/3/4 18:34, Eric Auger wrote:
->>>> I hit a WARN_ON() when unbinding an e1000e driver just after boot:
->>>>
->>>> sudo modprobe -v vfio-pci
->>>> echo vfio-pci | sudo tee -a
->>>> /sys/bus/pci/devices/0004:01:00.0/driver_override
->>>> vfio-pci
->>>> echo 0004:01:00.0 | sudo tee -a  /sys/bus/pci/drivers/e1000e/unbind
->>>>
->>>>
->>>> [  390.042811] ------------[ cut here ]------------
->>>> [  390.046468] WARNING: CPU: 42 PID: 5589 at drivers/iommu/iommu.c:3123
->>>> iommu_device_unuse_default_domain+0x68/0x100
->>>> [  390.056710] Modules linked in: vfio_pci vfio_pci_core vfio_virqfd
->>>> vfio_iommu_type1 vfio xt_CHECKSUM xt_MASQUERADE xt_conntrack ipt_REJECT
->>>> nf_reject_ipv4 nft_compat nft_chain_nat nf_nat nf_conntrack
->>>> nf_defrag_ipv6 nf_defrag_ipv4 nf_tables nfnetlink bridge stp llc rfkill
->>>> sunrpc vfat fat mlx5_ib ib_uverbs ib_core acpi_ipmi ipmi_ssif
->>>> ipmi_devintf ipmi_msghandler cppc_cpufreq drm xfs libcrc32c
->>>> mlx5_core sg
->>>> mlxfw crct10dif_ce tls ghash_ce sha2_ce sha256_arm64 sha1_ce sbsa_gwdt
->>>> e1000e psample sdhci_acpi ahci_platform sdhci libahci_platform
->>>> qcom_emac
->>>> mmc_core hdma hdma_mgmt dm_mirror dm_region_hash dm_log dm_mod fuse
->>>> [  390.110618] CPU: 42 PID: 5589 Comm: tee Kdump: loaded Not tainted
->>>> 5.17.0-rc4-lu-v7-official+ #24
->>>> [  390.119384] Hardware name: WIWYNN QDF2400 Reference Evaluation
->>>> Platform CV90-LA115-P120/QDF2400 Customer Reference Board, BIOS
->>>> 0ACJA570
->>>> 11/05/2018
->>>> [  390.132492] pstate: a0400005 (NzCv daif +PAN -UAO -TCO -DIT -SSBS
->>>> BTYPE=--)
->>>> [  390.139436] pc : iommu_device_unuse_default_domain+0x68/0x100
->>>> [  390.145165] lr : iommu_device_unuse_default_domain+0x38/0x100
->>>> [  390.150894] sp : ffff80000fbb3bc0
->>>> [  390.154193] x29: ffff80000fbb3bc0 x28: ffff03c0cf6b2400 x27:
->>>> 0000000000000000
->>>> [  390.161311] x26: 0000000000000000 x25: 0000000000000000 x24:
->>>> ffff03c0c7cc5720
->>>> [  390.168429] x23: ffff03c0c2b9d150 x22: ffffb4e61df223f8 x21:
->>>> ffffb4e61df223f8
->>>> [  390.175547] x20: ffff03c7c03c3758 x19: ffff03c7c03c3700 x18:
->>>> 0000000000000000
->>>> [  390.182665] x17: 0000000000000000 x16: 0000000000000000 x15:
->>>> 0000000000000000
->>>> [  390.189783] x14: 0000000000000000 x13: 0000000000000030 x12:
->>>> ffff03c0d519cd80
->>>> [  390.196901] x11: 7f7f7f7f7f7f7f7f x10: 0000000000000dc0 x9 :
->>>> ffffb4e620b54f8c
->>>> [  390.204019] x8 : ffff03c0cf6b3220 x7 : ffff4ef132bba000 x6 :
->>>> 00000000000000ff
->>>> [  390.211137] x5 : ffff03c0c2b9f108 x4 : ffff03c0d51f6438 x3 :
->>>> 0000000000000000
->>>> [  390.218255] x2 : ffff03c0cf6b2400 x1 : 0000000000000000 x0 :
->>>> 0000000000000000
->>>> [  390.225374] Call trace:
->>>> [  390.227804]  iommu_device_unuse_default_domain+0x68/0x100
->>>> [  390.233187]  pci_dma_cleanup+0x38/0x44
->>>> [  390.236919]  __device_release_driver+0x1a8/0x260
->>>> [  390.241519]  device_driver_detach+0x50/0xd0
->>>> [  390.245686]  unbind_store+0xf8/0x120
->>>> [  390.249245]  drv_attr_store+0x30/0x44
->>>> [  390.252891]  sysfs_kf_write+0x50/0x60
->>>> [  390.256537]  kernfs_fop_write_iter+0x134/0x1cc
->>>> [  390.260964]  new_sync_write+0xf0/0x18c
->>>> [  390.264696]  vfs_write+0x230/0x2d0
->>>> [  390.268082]  ksys_write+0x74/0x100
->>>> [  390.271467]  __arm64_sys_write+0x28/0x3c
->>>> [  390.275373]  invoke_syscall.constprop.0+0x58/0xf0
->>>> [  390.280061]  el0_svc_common.constprop.0+0x160/0x164
->>>> [  390.284922]  do_el0_svc+0x34/0xcc
->>>> [  390.288221]  el0_svc+0x30/0x140
->>>> [  390.291346]  el0t_64_sync_handler+0xa4/0x130
->>>> [  390.295599]  el0t_64_sync+0x1a0/0x1a4
->>>> [  390.299245] ---[ end trace 0000000000000000 ]---
->>>>
->>>>
->>>> I put some traces in the code and I can see that
->>>> iommu_device_use_default_domain() effectively is called on
->>>> 0004:01:00.0 e1000e device on pci_dma_configure() but at that time
->>>> the iommu group is NULL:
->>>> [   10.569427] e1000e 0004:01:00.0: ------ ENTRY pci_dma_configure
->>>> driver_managed_area=0
->>>> [   10.569431] e1000e 0004:01:00.0: ****
->>>> iommu_device_use_default_domain ENTRY
->>>> [   10.569433] e1000e 0004:01:00.0: ****
->>>> iommu_device_use_default_domain no group
->>>> [   10.569435] e1000e 0004:01:00.0: pci_dma_configure
->>>> iommu_device_use_default_domain returned 0
->>>> [   10.569492] e1000e 0004:01:00.0: Adding to iommu group 3
->>>>
->>>> ^^^the group is added after the
->>>> iommu_device_use_default_domain() call
->>>> So the group->owner_cnt is not incremented as expected.
->>>
->>> Thank you for reporting this. Do you have any idea why the driver is
->>> loaded before iommu_probe_device()?
->>
->> Urgh, this is the horrible firmware-data-ordering thing again. The
->> stuff I've been saying about having to rework the whole .dma_configure
->> mechanism in the near future is to fix this properly.
->>
->> The summary is that in patch #4, calling
->> iommu_device_use_default_domain() *before* {of,acpi}_dma_configure is
->> currently a problem. As things stand, the IOMMU driver ignored the
->> initial iommu_probe_device() call when the device was added, since at
->> that point it had no fwspec yet. In this situation,
->> {of,acpi}_iommu_configure() are retriggering iommu_probe_device()
->> after the IOMMU driver has seen the firmware data via .of_xlate to
->> learn that it it actually responsible for the given device.
-> 
-> thank you for providing the info. Hope this is something Lu can work around.
+This series adds an Ultravisor(UV) device letting the userspace send some
+Ultravisor calls to the UV. Currently two calls are supported.
+Query Ultravisor Information (QUI) and
+Receive Attestation Measurement (Attest[ation]).
 
-Hopefully it's just a case of flipping the calls around, so that 
-iommu_use_default_domain() goes at the end, and calls 
-arch_teardown_dma_ops() if it fails. From a quick skim I *think* that 
-should still work out to the desired behaviour (or at least close enough 
-that we can move forward without a circular dependency between fixes...)
+The UV device is implemented as a miscdevice accepting only IOCTLs.
+The IOCTL cmd specifies the UV call and the IOCTL arg the request
+and response data depending on the UV call.
+The device driver writes the UV response in the ioctl argument data.
 
-Robin.
+The 'uvdevice' does no checks on the request beside faulty userspace
+addresses, if sizes are in a sane range before allocating in kernel space,
+and other tests that prevent the system from corruption.
+Especially, no checks are made, that will be performed by the UV anyway
+(E.g. 'invalid command' in case of attestation on unsupported hardware).
+These errors are reported back to Userspace using the UV return code
+field.
+
+The first two patches introduce the new device as a module configured to be
+compiled directly into the kernel (y) similar to the s390 SCLP and CHSH
+miscdevice modules. Patch 3&4 introduce Kselftests which verify error
+paths of the ioctl.
+
+v2->v3:
+   The main change is that QUI is now introduced after Attestation as we
+   might not want pick it. Also the Kselftest patch is splitted into
+   Attestation and QUI so that they can be picked without requiring
+   QUI support of the uvdevice.
+
+  * dropped the Kconfig dependency
+  * reorganized the series:
+    - Patch 1 now covers the introduction of the uvdevice and Attestation
+    - Patch 2 adds QUI to uvdevice
+    - Patch 3/4 add Kselftests for Attestation and QUI
+  * fixed some nits
+  * added some comments
+
+v1->v2:
+  * ioctl returns -ENOIOCTLCMD in case of a invalid ioctl command
+  * streamlined reserved field test
+  * default Kconfig is y instead of m
+  * improved selftest documentation
+
+Steffen Eiden (4):
+  drivers/s390/char: Add Ultravisor io device
+  drivers/s390/char: Add Query Ultravisor Information to uvdevice
+  selftests: drivers/s390x: Add uvdevice tests
+  selftests: drivers/s390x: Add uvdevice  QUI tests
+
+ MAINTAINERS                                   |   3 +
+ arch/s390/include/asm/uv.h                    |  23 +-
+ arch/s390/include/uapi/asm/uvdevice.h         |  53 +++
+ drivers/s390/char/Kconfig                     |  10 +
+ drivers/s390/char/Makefile                    |   1 +
+ drivers/s390/char/uvdevice.c                  | 320 ++++++++++++++++++
+ tools/testing/selftests/Makefile              |   1 +
+ tools/testing/selftests/drivers/.gitignore    |   1 +
+ .../selftests/drivers/s390x/uvdevice/Makefile |  22 ++
+ .../selftests/drivers/s390x/uvdevice/config   |   1 +
+ .../drivers/s390x/uvdevice/test_uvdevice.c    | 281 +++++++++++++++
+ 11 files changed, 715 insertions(+), 1 deletion(-)
+ create mode 100644 arch/s390/include/uapi/asm/uvdevice.h
+ create mode 100644 drivers/s390/char/uvdevice.c
+ create mode 100644 tools/testing/selftests/drivers/s390x/uvdevice/Makefile
+ create mode 100644 tools/testing/selftests/drivers/s390x/uvdevice/config
+ create mode 100644 tools/testing/selftests/drivers/s390x/uvdevice/test_uvdevice.c
+
+-- 
+2.25.1
+
