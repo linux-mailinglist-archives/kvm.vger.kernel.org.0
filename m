@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 096C34CDF17
-	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 22:00:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6EC534CDF31
+	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 22:01:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230187AbiCDUce (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Mar 2022 15:32:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54960 "EHLO
+        id S230232AbiCDUcg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Mar 2022 15:32:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229956AbiCDUcV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S230022AbiCDUcV (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 4 Mar 2022 15:32:21 -0500
 Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE1571E6EA9;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B21E1E745C;
         Fri,  4 Mar 2022 12:31:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1646425891; x=1677961891;
+  t=1646425892; x=1677961892;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=ZjxKYa04oRaSCWshHf18f3TOhG+oryrLgSOPKMBRnso=;
-  b=TEiN4RMMd/VsbA6WTsYbexi6IrKL03LTQoODAuqiqBDZbkXUEymmX0kq
-   BQujUAx5p3rVCuEfXg2c8NX1o8crnSTwgwsHFDcbvLzg2u6N9qrIWaBq9
-   cQzwFHy+CsxDRa9NCMJEtZeVOtfM/5cAOfgcs2vEtKwVM3CbrIpdZRfbf
-   auCx7I4ZU2msOzhcmlQZOfZBhZj8BrirqZGAd4nysjFCvAMBbJhmQYFSv
-   eKhUnRCeZb50ab6lv3W4oOuo5UuIbv2HQCdDiAHyhcM2EZ2angZ4FlKi+
-   wb4MuORuP+4S3yXrg8i2HHSWF3wMAL1DohGqLT3kDznY+SLPGIhT0jK9T
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10276"; a="251624269"
+  bh=67RfWa608+UmKAYRSQ9bH1wt2NE7G+2gkMQMrYXcuuM=;
+  b=Xm8Ma1OlDXh56FgUQ5Ihm6Ln00omW4Dn6rSHmjrqWZq1GJ36CgZLY/ip
+   dT03RR3Ukt1fqRgVO7SlOVTXUkwr9Nuatc5RZ20zkugN7PBLdddvc1Pl+
+   EoPlUIROb1IsKm7lELWKhiUDwpH9ycRWiz9UWVGgOFO3PbRVety7z+fle
+   ptt1NWhO4B8ypbKYLhewHz0HZ+ogjSraNddCsN0Xf2IptYrpwy5aI6M/1
+   0/g1QJnOTOOi3BotGuwRSiKyKTjn3wef8JRgsyPeploqZSfW/ZNVvRbrT
+   iWr8ire2ZdcZqG9JoEEDY2UwWkQnX816dd1nutmNDEkSTaINbVPNwn9G7
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10276"; a="251624272"
 X-IronPort-AV: E=Sophos;i="5.90,156,1643702400"; 
-   d="scan'208";a="251624269"
+   d="scan'208";a="251624272"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2022 11:50:34 -0800
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2022 11:50:35 -0800
 X-IronPort-AV: E=Sophos;i="5.90,156,1643702400"; 
-   d="scan'208";a="552344473"
+   d="scan'208";a="552344476"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2022 11:50:34 -0800
 From:   isaku.yamahata@intel.com
@@ -43,9 +43,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Jim Mattson <jmattson@google.com>, erdemaktas@google.com,
         Connor Kuehl <ckuehl@redhat.com>,
         Sean Christopherson <seanjc@google.com>
-Subject: [RFC PATCH v5 070/104] KVM: TDX: complete interrupts after tdexit
-Date:   Fri,  4 Mar 2022 11:49:26 -0800
-Message-Id: <45507ecee0a0d23229e9e7f8bb74077034a40bcd.1646422845.git.isaku.yamahata@intel.com>
+Subject: [RFC PATCH v5 071/104] KVM: TDX: restore debug store when TD exit
+Date:   Fri,  4 Mar 2022 11:49:27 -0800
+Message-Id: <c7f81bd80af0f57ff2fabef24a218fb43c3d0e3c.1646422845.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1646422845.git.isaku.yamahata@intel.com>
 References: <cover.1646422845.git.isaku.yamahata@intel.com>
@@ -63,42 +63,35 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-This corresponds to VMX __vmx_complete_interrupts().  Because TDX
-virtualize vAPIC, KVM only needs to care NMI injection.
+Because debug store is clobbered, restore it on TD exit.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/vmx/tdx.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ arch/x86/events/intel/ds.c | 1 +
+ arch/x86/kvm/vmx/tdx.c     | 1 +
+ 2 files changed, 2 insertions(+)
 
+diff --git a/arch/x86/events/intel/ds.c b/arch/x86/events/intel/ds.c
+index 376cc3d66094..cdba4227ad3b 100644
+--- a/arch/x86/events/intel/ds.c
++++ b/arch/x86/events/intel/ds.c
+@@ -2256,3 +2256,4 @@ void perf_restore_debug_store(void)
+ 
+ 	wrmsrl(MSR_IA32_DS_AREA, (unsigned long)ds);
+ }
++EXPORT_SYMBOL_GPL(perf_restore_debug_store);
 diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index c1366aac7d96..3cb2fbd1c12c 100644
+index 3cb2fbd1c12c..37cf7d43435d 100644
 --- a/arch/x86/kvm/vmx/tdx.c
 +++ b/arch/x86/kvm/vmx/tdx.c
-@@ -550,6 +550,14 @@ void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
- 	vcpu->kvm->vm_bugged = true;
- }
+@@ -620,6 +620,7 @@ fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu)
+ 	tdx_vcpu_enter_exit(vcpu, tdx);
  
-+static void tdx_complete_interrupts(struct kvm_vcpu *vcpu)
-+{
-+	/* Avoid costly SEAMCALL if no nmi was injected */
-+	if (vcpu->arch.nmi_injected)
-+		vcpu->arch.nmi_injected = td_management_read8(to_tdx(vcpu),
-+							      TD_VCPU_PEND_NMI);
-+}
-+
- struct tdx_uret_msr {
- 	u32 msr;
- 	unsigned int slot;
-@@ -618,6 +626,8 @@ fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu)
- 	vcpu->arch.regs_avail &= ~VMX_REGS_LAZY_LOAD_SET;
- 	trace_kvm_exit(vcpu, KVM_ISA_VMX);
+ 	tdx_user_return_update_cache();
++	perf_restore_debug_store();
+ 	tdx_restore_host_xsave_state(vcpu);
+ 	tdx->host_state_need_restore = true;
  
-+	tdx_complete_interrupts(vcpu);
-+
- 	if (tdx->exit_reason.error || tdx->exit_reason.non_recoverable)
- 		return EXIT_FASTPATH_NONE;
- 	return EXIT_FASTPATH_NONE;
 -- 
 2.25.1
 
