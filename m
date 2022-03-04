@@ -2,163 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 32C7A4CDD19
-	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 20:01:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E034B4CDD1E
+	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 20:05:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231536AbiCDTCg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Mar 2022 14:02:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54846 "EHLO
+        id S229490AbiCDTGY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Mar 2022 14:06:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230115AbiCDTCf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Mar 2022 14:02:35 -0500
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C4F41DCCE9
-        for <kvm@vger.kernel.org>; Fri,  4 Mar 2022 11:01:45 -0800 (PST)
-Received: by mail-pj1-x102a.google.com with SMTP id 15-20020a17090a098f00b001bef0376d5cso8760807pjo.5
-        for <kvm@vger.kernel.org>; Fri, 04 Mar 2022 11:01:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=aWtPp9gHavbCe/72TWGgyPSN8olgIQaG6jqiqoJFlvo=;
-        b=T6cZTeQpCWywuAIUeZSbXRXspUMqzhtz/6tGTT/oMw4QxfOPTtToFpWO+keRiJvHqF
-         8JSl2KEqr7eM0ff447jt4in3NZLFaKYH+way7DVAbtyykbxIOezHLNgL/07Lq4W38S8x
-         7QJOvo7D+dtfY62vdxaeSa5832NDBy1wcRtoSpTKpMpnrvIGDHb4yEZa485WSraY1Mis
-         K9sDj747pso9N9WHul3YQ6TO3HWakI6UTzZIX/3EStFZOurxJzKWzOy9Mogkf/7RTzKA
-         CLgt0ljFTI8ZuzSSnwmhygmATrSeHYYPBA+6opn5ARig/FsZtyz9oAR2SZmJcDYjHsW8
-         1qiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=aWtPp9gHavbCe/72TWGgyPSN8olgIQaG6jqiqoJFlvo=;
-        b=dR6QNkfQWbKIDLGWWwnap50ShXEt/xYFisNNnpAs8deTzlcVU5zVaiCs5Q3aMgY4u4
-         NawFEON505vkz8OKZ87ATY1gKiOHE5Af4umL7kYrBInpe1Fl7ymP2mj8GyMZ2t54cwLL
-         xkjKwHIaCRO/YJRP3NLQbMhQthGpti3G9Db482GA1omhlJxYC4RvumJiixyOr+Cuj70+
-         gM1VIl08XOQaPn/h6bE6xdV3H2QyX1oWNiqp9p1uxvVGEgMen71DSF5mizpDBYCAv1e2
-         4CLAGGhG0L8gz5vfbRG6YrZKW3H3vA3A0RGkh9wL6+3BgO2m7W55tF3bra71hTCFcSlF
-         m2EA==
-X-Gm-Message-State: AOAM531iluuoJGe1+vZ7vZ7Xf+gcczN5PPxPo/iLugpSH2DaXELRKKWP
-        d0V4N+YnLhvoSnC4Drb5LECnOw==
-X-Google-Smtp-Source: ABdhPJwIYIZYgdYmZztlZdIGYIS82jCeVXSf1N3R2HJLRYsb6Fdyu/sqywudX8SMQNietyqX8pg5fQ==
-X-Received: by 2002:a17:90b:350c:b0:1bf:1dc5:1c3d with SMTP id ls12-20020a17090b350c00b001bf1dc51c3dmr7361081pjb.53.1646420504531;
-        Fri, 04 Mar 2022 11:01:44 -0800 (PST)
-Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
-        by smtp.gmail.com with ESMTPSA id z2-20020a17090a170200b001bf2d530d64sm2136862pjd.2.2022.03.04.11.01.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Mar 2022 11:01:43 -0800 (PST)
-Date:   Fri, 4 Mar 2022 11:01:40 -0800
-From:   Ricardo Koller <ricarkol@google.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Oliver Upton <oupton@google.com>, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, drjones@redhat.com,
-        pbonzini@redhat.com, alexandru.elisei@arm.com,
-        eric.auger@redhat.com, reijiw@google.com, rananta@google.com
-Subject: Re: [PATCH 2/3] KVM: arm64: selftests: add arch_timer_edge_cases
-Message-ID: <YiJiFD2ROBHnVSyU@google.com>
-References: <20220302172144.2734258-1-ricarkol@google.com>
- <20220302172144.2734258-3-ricarkol@google.com>
- <Yh/XgYAbqCYguegJ@google.com>
- <Yh/gyN7Xu54SpWBx@google.com>
- <87h78etasf.wl-maz@kernel.org>
+        with ESMTP id S229449AbiCDTGW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Mar 2022 14:06:22 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 145EA1DDFE0
+        for <kvm@vger.kernel.org>; Fri,  4 Mar 2022 11:05:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646420731;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:in-reply-to:in-reply-to:  references:references;
+        bh=QsEZdECL9CO/8Rbo/YAaICdmr+wHlhPaRNfeTYH5570=;
+        b=CXISUZwDlJLwhWACLb8Eyu4AsiF/DE9g0WUCYCzgDimA4ob4RKnEiVkMNfD4pTpQs4KrFw
+        B3EMk4PIpTDwgzxQ53R1QaMJCDn5/YBSJ+j/UkqBM6AQZuoEFUNOT9GrpYzhnRrAC/Kmao
+        V7gTbpOwhizhAHjDoqy9CH5iDJX3MZs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-648-OIWayi5wNH2UNMu7atr7PA-1; Fri, 04 Mar 2022 14:05:29 -0500
+X-MC-Unique: OIWayi5wNH2UNMu7atr7PA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1138A1006AA7;
+        Fri,  4 Mar 2022 19:05:29 +0000 (UTC)
+Received: from redhat.com (unknown [10.39.194.222])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 44F1110016F2;
+        Fri,  4 Mar 2022 19:05:27 +0000 (UTC)
+Date:   Fri, 4 Mar 2022 19:05:24 +0000
+From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To:     Tyler Fanelli <tfanelli@redhat.com>
+Cc:     qemu-devel@nongnu.org, pbonzini@redhat.com, mtosatti@redhat.com,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH] i386/sev: Ensure attestation report length is valid
+ before retrieving
+Message-ID: <YiJi9IYqtZvNQIRc@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20220304183930.502777-1-tfanelli@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87h78etasf.wl-maz@kernel.org>
-X-Spam-Status: No, score=-18.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20220304183930.502777-1-tfanelli@redhat.com>
+User-Agent: Mutt/2.1.5 (2021-12-30)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 04, 2022 at 07:52:00AM +0000, Marc Zyngier wrote:
-> On Wed, 02 Mar 2022 21:25:28 +0000,
-> Ricardo Koller <ricarkol@google.com> wrote:
-> > 
-> > Hi Oliver,
-> > 
-> > On Wed, Mar 02, 2022 at 08:45:53PM +0000, Oliver Upton wrote:
-> > > Hi Ricardo,
-> > > 
-> > > On Wed, Mar 02, 2022 at 09:21:43AM -0800, Ricardo Koller wrote:
-> > > > Add an arch_timer edge-cases selftest. For now, just add some basic
-> > > > sanity checks, and some stress conditions (like waiting for the timers
-> > > > while re-scheduling the vcpu). The next commit will add the actual edge
-> > > > case tests.
-> > > > 
-> > > > This test fails without a867e9d0cc1 "KVM: arm64: Don't miss pending
-> > > > interrupts for suspended vCPU".
-> > > > 
-> > > 
-> > > Testing timer correctness is extremely challenging to do without
-> > > inherent flakiness. I have some concerns about the expectations that a
-> > > timer IRQ should fire in a given amount of time, as it is possible to
-> > > flake for any number of benign reasons (such as high CPU load in the
-> > > host).
-> > > 
-> > > While the architecture may suggest that the timer should fire as soon as
-> > > CVAL is met:
-> > > 
-> > >   TimerConditionMet = (((Counter[63:0] – Offset[63:0])[63:0] - CompareValue[63:0]) >= 0)
-> > > 
-> > > However, the architecture is extremely imprecise as to when an interrupt
-> > > should be taken:
-> > > 
-> > >   In the absence of a specific requirement to take an interrupt, the
-> > >   architecture only requires that unmasked pending interrupts are taken
-> > >   in finite time. [DDI0487G.b D1.13.4 "Prioritization and recognition of
-> > >   interrupts"]
-> > > 
-> > > It seems to me that the only thing we can positively assert is that a
-> > > timer interrupt should never be taken early. Now -- I agree that there
-> > > is value in testing that the interrupt be taken in bounded time, but its
-> > > hard to pick a good value for it.
-> > 
-> > Yes, a timer that never fires passes the test, but it's not very useful.
-> > 
-> > I saw delay issues immediately after testing with QEMU. I've been played
-> > with values and found that 1ms is enough for all of my runs (QEMU
-> > included) to pass (10000 iterations concurrently on all my 64 cpus). I
-> > just checked in the fast model and 1ms seems to be enough as well
-> > (although I didn't check for so long).
-> > 
-> > 	/* 1ms sounds a bit excessive, but QEMU-TCG is slow. */
-> > 	#define TEST_MARGIN_US			1000ULL
-> 
-> I'm not sure that's even realistic. I can arbitrary delay those by
-> oversubscribing the system.
-> 
-> > 
-> > > 
-> > > Perhaps documenting the possibility of flakes in the test is warranted,
-> > > along with some knobs to adjust these values for any particularly bad
-> > > implementation.
-> > 
-> > What about having a cmdline arg to enable those tests?
-> 
-> How is that handled in kvm-unit-tests? I'd rather avoid special
-> arguments, as they will never be set. All tests should run by default.
+On Fri, Mar 04, 2022 at 01:39:32PM -0500, Tyler Fanelli wrote:
+> The length of the attestation report buffer is never checked to be
+> valid before allocation is made. If the length of the report is returned
+> to be 0, the buffer to retrieve the attestation report is allocated with
+> length 0 and passed to the kernel to fill with contents of the attestation
+> report. Leaving this unchecked is dangerous and could lead to undefined
+> behavior.
 
-There's this latency test that checks that the latency for a 10ms timer
-is not delayed by more than 10ms (after the first 10ms):
+I don't see the undefined behaviour risk here.
 
-	report(test_cval_10msec(info), "latency within 10 ms");
+The KVM_SEV_ATTESTATION_REPORT semantics indicate that the kernel
+will fill in a valid length if the buffer we provide is too small
+and we can re-call with that buffer.
 
-Just to be safe I will just remove the checks for timers firing before
-some margin (not even with a special argument).
+If the kernel tells us the buffer is 0 bytes, then it should be
+fine having a second call with length 0. If not, then the kernel
+is broken and we're doomed.
 
-Thanks,
-Ricardo
+The QEMU code looks like it would cope with a zero length, unless
+I'm mistaken, it'll  just return a zero length attestation report.
 
+> Signed-off-by: Tyler Fanelli <tfanelli@redhat.com>
+> ---
+>  target/i386/sev.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
 > 
-> 	M.
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
+> diff --git a/target/i386/sev.c b/target/i386/sev.c
+> index 025ff7a6f8..215acd7c6b 100644
+> --- a/target/i386/sev.c
+> +++ b/target/i386/sev.c
+> @@ -616,6 +616,8 @@ static SevAttestationReport *sev_get_attestation_report(const char *mnonce,
+>          return NULL;
+>      }
+>  
+> +    input.len = 0;
+
+The declaration of 'input' already zero initializes.
+
+>      /* Query the report length */
+>      ret = sev_ioctl(sev->sev_fd, KVM_SEV_GET_ATTESTATION_REPORT,
+>              &input, &err);
+> @@ -626,6 +628,11 @@ static SevAttestationReport *sev_get_attestation_report(const char *mnonce,
+>                         ret, err, fw_error_to_str(err));
+>              return NULL;
+>          }
+> +    } else if (input.len <= 0) {
+
+It can't be less than 0 because 'len' is an unsigned integer.
+
+> +        error_setg(errp, "SEV: Failed to query attestation report:"
+> +                         " length returned=%d",
+> +                   input.len);
+> +        return NULL;
+>      }
+
+
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
