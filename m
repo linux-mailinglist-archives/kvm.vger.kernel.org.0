@@ -2,81 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F8214CCAB0
-	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 01:22:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D8A894CCAD9
+	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 01:33:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233300AbiCDAXJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Mar 2022 19:23:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54952 "EHLO
+        id S237407AbiCDAdu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Mar 2022 19:33:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45918 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230224AbiCDAXI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Mar 2022 19:23:08 -0500
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFA7347386
-        for <kvm@vger.kernel.org>; Thu,  3 Mar 2022 16:22:21 -0800 (PST)
-Received: by mail-pf1-x430.google.com with SMTP id y11so6165379pfa.6
-        for <kvm@vger.kernel.org>; Thu, 03 Mar 2022 16:22:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=fWdYHu/uQ+3/IsRl+Qb5Q42VZLcmjEkYM8EgSLZQbL8=;
-        b=gIWiMRxYV8lZiYJ6z+wqazWJnZTxD683PzP8r2nrtry8qaKhKkjdloq0R2EO/Hn5wx
-         dZqtoWh513U7dm9IwUep8VgR1l37lmw70h6wE6Cl8W28jGs7tTAZ3dP/jJmG4xV2zzVg
-         yqgFIAjTQSPZ4a/lvxpklw0mK8bLmeyJJgXve0AvO+dTVyhJOkST8sHOwVN0taDZGGVK
-         xKrUaIVOfSS36ya2EyE/pfyGobn22KGqADzrLs8yxTQ8iPIg1EvRlQboYvjQ1g+Z/vge
-         R9lnB01QRSB/dZgkgu9BQmEn9xg6aRbhcISRa+zXxMgC8Jz6oeet5arsGhHfy+8QYokP
-         Wvbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=fWdYHu/uQ+3/IsRl+Qb5Q42VZLcmjEkYM8EgSLZQbL8=;
-        b=yLzE7Es368bc6IbNym4V4OeZcLotJ+V5ZP2XscBvUHPUESRzOLo/Hiqg1g2nLyr5xm
-         B9bzOwzqI8ts8xu5mM9agdpn4ljSI6msdaaG9Fg9GD8wIogPFRCJgLa/dFlsOHQAz7fc
-         Ofb7Xcws4FRu9y2EzxMNYKbAgt7ZdDCI+jbBS6kpeqrB6UDWDZxnHtVgl9zvn7BNhThb
-         6Z6gugknTarHihNVUGXJKOxYJGOO/H946OlgwJwXJB0FunfDcfYNiyaA8kiXZ52BHkll
-         eCt91SzmWC08XnSssssACPQWZt/3KDsIVUJYuXMvYF7zFgkN0SlQ4u4FdVWMaS+82vgH
-         ZPrw==
-X-Gm-Message-State: AOAM533RHUIXHltoCLcmT7jGcVU6QG7JEC8pTg1WXSeH2BojB9gaPaCb
-        FcGMsyuG4ruQj6lA0+Az0unmUw==
-X-Google-Smtp-Source: ABdhPJxCDEg9KbGCCf2d1ZLlQRKcgQ8PwWJB+zqg1nwiYeqRoI0/lTs85vB7zh5UwHBDqABz1sRRYA==
-X-Received: by 2002:a63:6883:0:b0:378:3582:c94f with SMTP id d125-20020a636883000000b003783582c94fmr27210595pgc.60.1646353340897;
-        Thu, 03 Mar 2022 16:22:20 -0800 (PST)
-Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
-        by smtp.gmail.com with ESMTPSA id u14-20020a17090adb4e00b001bee5dd39basm7973779pjx.1.2022.03.03.16.22.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Mar 2022 16:22:19 -0800 (PST)
-Date:   Fri, 4 Mar 2022 00:22:16 +0000
-From:   David Matlack <dmatlack@google.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        leksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+        with ESMTP id S232450AbiCDAdt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Mar 2022 19:33:49 -0500
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2078.outbound.protection.outlook.com [40.107.223.78])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D43B368FA8;
+        Thu,  3 Mar 2022 16:33:02 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=WDPfKEl9joMqJ+44OIauHVFoMp1Z2DNIaBO5T18+4xvIQ3NZr7TtjjUzUKHyLd9q8ZhMtEpV143R5Gad8IRWwjPhXxE/qVYmk7DOdaUYpqUeNxPOal3fcAoFSZercpldPOxLopBddd0T0KYTADbDkDekYPlRHpAU3qjXwrMjavS2mg5cRGMDzyT1W6n/EnV5HA+f8Ha09DCRMIRJ7pKlQTr0eXWPtQwwUzsBNKnEUXFv9ezg/G1SON6eBnQObDDmMhtRJ0/HUiQAf/CVoCXPoDI5DZqOKUiR81QNlceTcBqZJ1aJzVkXUce+Q3RJyC5807b0+V6F290eOFzW3X2d2A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=k9e3CjSPsjljHwMhVeL6p4Wd/jfExdRNZ3MiolS93so=;
+ b=i83ynOW/ZyPihRDeTCTScVe+YjAK2XENjLbq8+bbe1djWg9OuLStgYIOxkERNMKr2WjfzMQYjtFWqx+xxE+5eDK7lyHqxi/Z5cnrzpzfsLZVGQV2oVFtx73wmv5Jg7QUr03hLoCdFdp1X7xbQTQu7cMExDflQDauIaP4gWfaXVl3bjGvKeoWzWsB1I1Pt7nw2XWr/N0L2Yu0H3CtrVkYoGdj9TFhgHhiw5SHssO3iFomXN2yu9XqBrKsj1Yr5dLKOSz2QP/LZMWAlBJTpA2gUzRMMM+zRgP2jk2WQOvNnnJf5hNW3wcVl/kN3XYEwfaMRvvWnXrfJBVm2fDUXtOgsA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=alien8.de smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=k9e3CjSPsjljHwMhVeL6p4Wd/jfExdRNZ3MiolS93so=;
+ b=MKY6fVI2ZZiqFC6Q5dqOkpL8LaqUbg64+gKfLCDxLHu6gd3gmmjvRCWK8u+3OJ2zK4HF8bvwQltfh2BnWcYljkbpL/WdJpNJkjXkFA+ZrmJ3+2Oh6riVYOIv0tvG1jJ/52wUBiBISrs8YDqdqoXRPnWaQ3NV6S5v3BLJ3vhuAYs=
+Received: from MWHPR08CA0048.namprd08.prod.outlook.com (2603:10b6:300:c0::22)
+ by BL1PR12MB5802.namprd12.prod.outlook.com (2603:10b6:208:392::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5038.14; Fri, 4 Mar
+ 2022 00:33:00 +0000
+Received: from CO1NAM11FT027.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:300:c0:cafe::98) by MWHPR08CA0048.outlook.office365.com
+ (2603:10b6:300:c0::22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5038.13 via Frontend
+ Transport; Fri, 4 Mar 2022 00:32:59 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com;
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CO1NAM11FT027.mail.protection.outlook.com (10.13.174.224) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.5038.14 via Frontend Transport; Fri, 4 Mar 2022 00:32:58 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.18; Thu, 3 Mar
+ 2022 18:32:57 -0600
+Date:   Thu, 3 Mar 2022 18:31:57 -0600
+From:   Michael Roth <michael.roth@amd.com>
+To:     Borislav Petkov <bp@alien8.de>
+CC:     Brijesh Singh <brijesh.singh@amd.com>, <x86@kernel.org>,
+        <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <linux-efi@vger.kernel.org>, <platform-driver-x86@vger.kernel.org>,
+        <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        "Vitaly Kuznetsov" <vkuznets@redhat.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Peter Feiner <pfeiner@google.com>,
-        Andrew Jones <drjones@redhat.com>, maciej.szmigiero@oracle.com,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH 02/23] KVM: x86/mmu: Derive shadow MMU page role from
- parent
-Message-ID: <YiFbuDaMfNItGwLw@google.com>
-References: <20220203010051.2813563-1-dmatlack@google.com>
- <20220203010051.2813563-3-dmatlack@google.com>
- <YhBEaPWDoBiTpNV3@google.com>
+        "Andy Lutomirski" <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        "Peter Zijlstra" <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        <brijesh.ksingh@gmail.com>, <tony.luck@intel.com>,
+        <marcorr@google.com>, <sathyanarayanan.kuppuswamy@linux.intel.com>
+Subject: Re: [PATCH v11 39/45] x86/sev: Use firmware-validated CPUID for
+ SEV-SNP guests
+Message-ID: <20220304003157.diqytybw6gpwn5sa@amd.com>
+References: <20220224165625.2175020-1-brijesh.singh@amd.com>
+ <20220224165625.2175020-40-brijesh.singh@amd.com>
+ <YiCrp61CoqJUXm5q@nazgul.tnic>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <YhBEaPWDoBiTpNV3@google.com>
-X-Spam-Status: No, score=-18.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+In-Reply-To: <YiCrp61CoqJUXm5q@nazgul.tnic>
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 64e58e9c-e7f9-47ec-c3be-08d9fd76885a
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5802:EE_
+X-Microsoft-Antispam-PRVS: <BL1PR12MB5802045A9FA06C1647EC122595059@BL1PR12MB5802.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: yQWam58Y/S5/MezO09K+NssHmkvPi13+71K8gja4xwdYCYHWHL8w17x1uJZbwqs/OcrQofZYTCCqA/P9H6Lkbgo8i43kADgpcKR2OHtUAo0f5qQzbKsh6zwE3uvJHYWbYregXvVJWTe6V45HJB204UHeVlGB8FkQwEC7HyQjWrjYsP6XCMuVTVy19oGc7gfnjQXkqRZ5iCOj0llzJ0BqsyCUCAX2j/STY5uQRhcTV5T9IV0b9iucawivyQmbXdpvObRRynG/30eckzFO93yoXLc/adVoeiC91a8Ier7RDuFDS/e0J8gORf423629SQvrPNn51wW6BbWejuVoYCuXOaYJsk2bkWV8j3jVdxCLbNtoQJxh2Sj9OGFNl2yoONWUieISHvi23YJeoM1w7l1V+AMmRw5BaB5TdIpeKj4a5cjVRH24U41YDOop5VL+STlb6vOtDsC1pFr/njAfXvfP4+X4wE64VvLcDNjME3I+gru/ELWeUmcngzxd57RUa6JWWY512/E02jqNvNKjl0mqc+fNq3eZZwPhQe1lHyvPHKJ3ylZ0JaFt3fM9QHXIkJA8fnwK3F3QrQ37bZjj3224aHKxicgnHtBCILupj4m/vOh0yxArLqk4MHHcWpkKTOMufnWoYNSTcasKxp5DL5SiXXa187M74wQbkClA4JckLbm1H7ClW4eHXTD/Q5hi9qG2zKAgCXKQP8cTWlr8PfkzO+sD5UdCKcn/DaCLyKrgvGmHy8L3TNZXhvhy2DzhriOR/16RrPG8JVxrpV53PUONV+aJ8Ep107NjhXcPLY8J96k=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230001)(4636009)(36840700001)(40470700004)(46966006)(81166007)(356005)(4326008)(8676002)(508600001)(316002)(36860700001)(54906003)(6916009)(70586007)(70206006)(36756003)(2616005)(47076005)(8936002)(1076003)(82310400004)(7416002)(5660300002)(86362001)(7406005)(186003)(16526019)(26005)(45080400002)(2906002)(40460700003)(44832011)(426003)(336012)(966005)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Mar 2022 00:32:58.3066
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 64e58e9c-e7f9-47ec-c3be-08d9fd76885a
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT027.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5802
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -84,146 +125,68 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Feb 19, 2022 at 01:14:16AM +0000, Sean Christopherson wrote:
-> On Thu, Feb 03, 2022, David Matlack wrote:
-> > Instead of computing the shadow page role from scratch for every new
-> > page, we can derive most of the information from the parent shadow page.
-> > This avoids redundant calculations such as the quadrant, and reduces the
+On Thu, Mar 03, 2022 at 12:51:20PM +0100, Borislav Petkov wrote:
+> On Thu, Feb 24, 2022 at 10:56:19AM -0600, Brijesh Singh wrote:
+> > Also add an "sev_debug" kernel command-line parameter that will be used
+> > (initially) to dump the CPUID table for debugging/analysis.
 > 
-> Uh, calculating quadrant isn't redundant.  The quadrant forces KVM to use different
-> (multiple) shadow pages to shadow a single guest PTE when the guest is using 32-bit
-> paging (1024 PTEs per page table vs. 512 PTEs per page table).  The reason quadrant
-> is "quad" and not more or less is because 32-bit paging has two levels.  First-level
-> PTEs can have quadrant=0/1, and that gets doubled for second-level PTEs because we
-> need to use four PTEs (two to handle 2x guest PTEs, and each of those needs to be
-> unique for the first-level PTEs they point at).
+> No, not "sev_debug" - "sev=debug".
+> 
+> I'm pretty sure there will be need for other SEV-specific cmdline
+> options so this thing should be a set, i.e.,
+> 	"sev=(option1,option2?,option3?,...)"
+> 
+> etc.
+> 
+> See mcheck_enable() and the comment above it for an example.
 
-One solution is to keep the quadrant calculation in kvm_mmu_get_page().
-The obvious problem for eager page splitting is we need the faulting
-address to use the existing calculation to get the quadrant, and there
-is no faulting address when doing eager page splitting. This doesn't
-really matter though because we really don't care about eagerly
-splitting huge pages that are shadowing a 32-bit non-PAE guest, so we
-can just skip huge pages mapped on shadow pages with has_4_byte_gpte and
-hard-code the quadrant to 0.
+If I do it the mce_check() way it ends up looking something like the
+below, is that what you add in mind?
 
-Plumbing all that shouldn't be too hard. But it occurs to me it might
-not be necessary. The quadrant cannot be literally copied from the
-parent SP like this commit does, but I think it can still be derived
-from the parent. The upside is we don't need any special casing of
-has_4_byte_gpte or hard-coding the quadrant in the eager page splitting
-code, and we can still get rid of passing in the faulting address to
-kvm_mmu_get_page().
+In that case it seems to expect "mce=option1 mce=option2" etc. I could
+open-code a parser to handle multiple options like sev=option1,option2
+etc., but wanted to check with you first.
 
-Here's what it would (roughly) look like, applied on top of this commit:
+Also, should I go ahead and introduce struct sev_options now, or
+just use a regular bool until more options are added later?
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 6941b9b99a90..4184662b42bf 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -2110,9 +2110,9 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu, gfn_t gfn,
-        return sp;
- }
+Thanks!
 
--static union kvm_mmu_page_role kvm_mmu_child_role(struct kvm_mmu_page *parent_sp,
--                                                 bool direct, u32 access)
-+static union kvm_mmu_page_role kvm_mmu_child_role(u64 *sptep, bool direct, u32 access)
- {
-+       struct kvm_mmu_page *parent_sp = sptep_to_sp(sptep);
-        union kvm_mmu_page_role role;
+struct sev_options {
+       bool debug;
+};
 
-        role = parent_sp->role;
-@@ -2120,6 +2120,28 @@ static union kvm_mmu_page_role kvm_mmu_child_role(struct kvm_mmu_page *parent_sp
-        role.access = access;
-        role.direct = direct;
+static struct sev_options sev_cmdline_opts;
 
-+       /*
-+        * If the guest has 4-byte PTEs then that means it's using 32-bit,
-+        * 2-level, non-PAE paging. KVM shadows such guests using 4 PAE page
-+        * directories, each mapping 1/4 of the guest's linear address space
-+        * (1GiB). The shadow pages for those 4 page directories are
-+        * pre-allocated and assigned a separate quadrant in their role.
-+        *
-+        * Since we are allocating a child shadow page and there are only 2
-+        * levels, this must be a PG_LEVEL_4K shadow page. Here the quadrant
-+        * will either be 0 or 1 because it maps 1/2 of the address space mapped
-+        * by the guest's PG_LEVEL_4K page table (or 4MiB huge page) that it
-+        * is shadowing. In this case, the quadrant can be derived by the index
-+        * of the SPTE that points to the new child shadow page in the page
-+        * directory (parent_sp). Specifically, every 2 SPTEs in parent_sp
-+        * shadow one half of a guest's page table (or 4MiB huge page) so the
-+        * quadrant is just the parity of the index of the SPTE.
-+        */
-+       if (role.has_4_byte_gpte) {
-+               BUG_ON(role.level != PG_LEVEL_4K);
-+               role.quadrant = (sptep - parent_sp->spt) % 2;
-+       }
-+
-        return role;
- }
+...
 
-@@ -2127,11 +2149,9 @@ static struct kvm_mmu_page *kvm_mmu_get_child_sp(struct kvm_vcpu *vcpu,
-                                                 u64 *sptep, gfn_t gfn,
-                                                 bool direct, u32 access)
- {
--       struct kvm_mmu_page *parent_sp = sptep_to_sp(sptep);
-        union kvm_mmu_page_role role;
+static int __init process_sev_options(char *str)
+{
+       if ((*str) == '=')
+               str++;
 
--       role = kvm_mmu_child_role(parent_sp, direct, access);
--
-+       role = kvm_mmu_child_role(sptep, direct, access);
-        return kvm_mmu_get_page(vcpu, gfn, role);
- }
+       if (!strcmp(str, "debug")) {
+               sev_cmdline_opts.debug = true;
+       } else {
+               pr_info("SEV command-line option '%s' was not ecognized\n", str);
+               return 1;
+       }
+
+       return 0;
+}
+__setup("sev", process_sev_options);
+
+static int __init report_cpuid_table(void)
+{
+    ...
+    if (sev_cmdline_opts.debug)
+        dump_cpuid_table();
+}
+arch_initcall(report_cpuid_table)
 
 > 
-> Indeed, this fails spectacularly when attempting to boot a 32-bit non-PAE kernel
-> with shadow paging enabled.
+> -- 
+> Regards/Gruss,
+>     Boris.
 > 
->  \���	���\���	��\���
->  	P��\��`
->  BUG: unable to handle page fault for address: ff9fa81c
->  #PF: supervisor read access in kernel mode
->  #PF: error_code(0x0000) - not-present page
->  *pde = 00000000
->  ����
->  Oops: 0000 [#1]��<���� SMP��<������<������<����
->  ��<����CPU: 0 PID: 0 Comm: swapper ��<����G        W         5.12.0 #10
->  ��<����EIP: memblock_add_range.isra.18.constprop.23d�r
->  ��<����Code: <83> 79 04 00 75 2c 83 38 01 75 06 83 78 08 00 74 02 0f 0b 89 11 8b
->  ��<����EAX: c2af24bc EBX: fdffffff ECX: ff9fa818 EDX: 02000000
->  ��<����ESI: 02000000 EDI: 00000000 EBP: c2909f30 ESP: c2909f0c
->  ��<����DS: 007b ES: 007b FS: 00d8 GS: 0000 SS: 0068 EFLAGS: 00210006
->  ��<����CR0: 80050033 CR2: ff9fa81c CR3: 02b76000 CR4: 00040600
->  ��<����Call Trace:
->  ��<���� ? printkd�r
->  ��<���� ��<����memblock_reserved�r
->  ��<���� ? 0xc2000000
->  ��<���� ��<����setup_archd�r
->  ��<���� ? vprintk_defaultd�r
->  ��<���� ? vprintkd�r
->  ��<���� ��<����start_kerneld�r
->  ��<���� ��<����i386_start_kerneld�r
->  ��<���� ��<����startup_32_smpd�r
-> 
->  ����
->  CR2: 00000000ff9fa81c
-> 
->  ��<����EIP: memblock_add_range.isra.18.constprop.23d�r
->  ��<����Code: <83> 79 04 00 75 2c 83 38 01 75 06 83 78 08 00 74 02 0f 0b 89 11 8b
->  ��<����EAX: c2af24bc EBX: fdffffff ECX: ff9fa818 EDX: 02000000
->  ��<����ESI: 02000000 EDI: 00000000 EBP: c2909f30 ESP: c2909f0c
->  ��<����DS: 007b ES: 007b FS: 00d8 GS: 0000 SS: 0068 EFLAGS: 00210006
->  ��<����CR0: 80050033 CR2: ff9fa81c CR3: 02b76000 CR4: 00040600
-> 
-> > number of parameters to kvm_mmu_get_page().
-> > 
-> > Preemptivel split out the role calculation to a separate function for
-> 
-> Preemptively.
-> 
-> > use in a following commit.
-> > 
-> > No functional change intended.
-> > 
-> > Signed-off-by: David Matlack <dmatlack@google.com>
-> > ---
+> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fpeople.kernel.org%2Ftglx%2Fnotes-about-netiquette&amp;data=04%7C01%7CMichael.Roth%40amd.com%7C98ed7057691e4faf205e08d9fd0c2768%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637819050942268665%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000&amp;sdata=SxTMowEey9CFaqlUHfWKVuEqThTEGktHAO3JgQIttRE%3D&amp;reserved=0
