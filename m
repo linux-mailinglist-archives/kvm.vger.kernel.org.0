@@ -2,126 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B9C7F4CD8D4
-	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 17:15:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A1AD4CD960
+	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 17:46:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240720AbiCDQPs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Mar 2022 11:15:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53420 "EHLO
+        id S240802AbiCDQrk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Mar 2022 11:47:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42470 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234624AbiCDQPn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Mar 2022 11:15:43 -0500
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EEBF15B983;
-        Fri,  4 Mar 2022 08:14:52 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id C9CF521124;
-        Fri,  4 Mar 2022 16:14:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1646410490; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
+        with ESMTP id S231743AbiCDQrj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Mar 2022 11:47:39 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 82A9B1C46B0
+        for <kvm@vger.kernel.org>; Fri,  4 Mar 2022 08:46:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646412409;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=hVjR4hysznRwrUxtJgHAocuPgnjBEhcnFcR0O4FIRQ0=;
-        b=n/xdvL3/9MTXsecXD6MdYlE2rvjdGu7d4tOUWGfZazmXdY76ILCpn9XXCJ0GSP7v14QGQ8
-        emT4+sE+ikSgZfPwKQGui73oMbi/j/PBuNgZY5MkZlEHn7nKyMFlTtRXcimj6xj1CmuBbY
-        HSDmuF6h/1jiog23LplTS2SBQi+vhok=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1646410490;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=hVjR4hysznRwrUxtJgHAocuPgnjBEhcnFcR0O4FIRQ0=;
-        b=qdxVqY+Z/CaiL0j2x88N2NyADO/NmFC7DaNIH7Ni/khhCaLosW3DfIz1VHIRYuSB8zO17P
-        y6QacTszv+j3OmDw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 861C713B64;
-        Fri,  4 Mar 2022 16:14:50 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id LiO0Hfo6ImI5RQAAMHmgww
-        (envelope-from <bp@suse.de>); Fri, 04 Mar 2022 16:14:50 +0000
-Date:   Fri, 4 Mar 2022 17:14:54 +0100
-From:   Borislav Petkov <bp@suse.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     Borislav Petkov <bp@alien8.de>, x86@kernel.org,
+        bh=22jch4CQh+pTPL1FoGU31HpsJfvYTb0PvwQSeG+1PCc=;
+        b=aWtDV/Fwu+nNQzUARr76PKqS/43D5qYOQSQ6GiGPtOUiNR/VDBt/BANQ+/9fza1TCvs0qz
+        CZEbpsSMG7tej/YIc+Io0Isk/pBj7FNMHO5OZb5hwk+oZfWng/Bw3nftdu8VIetaJod42X
+        hlqyHWCYQOmSTX1JUv9OEUZ0c5uK+aU=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-631-xP4f50lfNmyWgs0Iv-415w-1; Fri, 04 Mar 2022 11:46:48 -0500
+X-MC-Unique: xP4f50lfNmyWgs0Iv-415w-1
+Received: by mail-wm1-f70.google.com with SMTP id 10-20020a1c020a000000b0037fae68fcc2so4318973wmc.8
+        for <kvm@vger.kernel.org>; Fri, 04 Mar 2022 08:46:48 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=22jch4CQh+pTPL1FoGU31HpsJfvYTb0PvwQSeG+1PCc=;
+        b=H1elgOiZ0oUJwIHaUkvCVgqlknxmFl3WIMV5IEFYbnqZas26ICEqaeBtkrkROtJShn
+         slQz+rt87kAYR7674pkaOVtRxudUWPntioX8LusTD7cf5zye2wKZOlW+8akmA2I3xvhv
+         6Lj/uyDp+WVJaNFNyqGVQlSpLreLJZDuAsTDR+wKiV89jCnIrI/SW2iKw0o/9QxRutLo
+         8+zJ0XswEyeOh8DolOxPfsayffLt7gyTdjdjT6o0aB9Dp6Agcr/CGGy0YzvuyG0Wjvws
+         sWey5/s7ggTE9KMthlt0hB8dtZpIrGbmOGLV/zNvaQt8xpt+TGAKx38PZ8JsSr0M9eVc
+         q64Q==
+X-Gm-Message-State: AOAM531qCNLm/O2Aa7IPDQUz/7sT7d5K724u+uUoc2oSH21wnASg99Lv
+        WkgfTpHOYafjLn1vnuUZ3/J3EMH2ziHHNaixIhnQPWKN/6J9zcZ1xIEgzpg7++SZgoVsqd3cjng
+        CEKB6wMAF+fmC
+X-Received: by 2002:a1c:2544:0:b0:381:18a:a46d with SMTP id l65-20020a1c2544000000b00381018aa46dmr8406741wml.26.1646412407382;
+        Fri, 04 Mar 2022 08:46:47 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzFF5fKg+gUWYVS+WLhpkqM4ArBwfkdD8eN2+pKg3LaCYfmdFOoWkfdheE2gdrSD+91b0K/VA==
+X-Received: by 2002:a1c:2544:0:b0:381:18a:a46d with SMTP id l65-20020a1c2544000000b00381018aa46dmr8406732wml.26.1646412407138;
+        Fri, 04 Mar 2022 08:46:47 -0800 (PST)
+Received: from redhat.com ([2.52.16.157])
+        by smtp.gmail.com with ESMTPSA id l26-20020a05600c1d1a00b00380def7d3desm5711411wms.17.2022.03.04.08.46.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Mar 2022 08:46:46 -0800 (PST)
+Date:   Fri, 4 Mar 2022 11:46:42 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     Lee Jones <lee.jones@linaro.org>, jasowang@redhat.com,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        brijesh.ksingh@gmail.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH v11 44/45] virt: sevguest: Add support to get extended
- report
-Message-ID: <YiI68iQ0K9n2eln2@nazgul.tnic>
-References: <20220224165625.2175020-1-brijesh.singh@amd.com>
- <20220224165625.2175020-45-brijesh.singh@amd.com>
- <YiDegxDviQ81VH0H@nazgul.tnic>
- <7c562d34-27cd-6e63-a0fb-35b13104d41f@amd.com>
- <YiIc7aliqChnWThP@nazgul.tnic>
- <c3918fcc-3132-23d0-b256-29afdda2d6d9@amd.com>
- <YiI1+Qk2KaWt+uPu@nazgul.tnic>
- <0241967f-b2e6-7db4-7e54-be665e12ebb6@amd.com>
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        stable@vger.kernel.org,
+        syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
+Subject: Re: [PATCH 1/1] vhost: Protect the virtqueue from being cleared
+ whilst still in use
+Message-ID: <20220304114606-mutt-send-email-mst@kernel.org>
+References: <20220302075421.2131221-1-lee.jones@linaro.org>
+ <20220302093446.pjq3djoqi434ehz4@sgarzare-redhat>
+ <20220302083413-mutt-send-email-mst@kernel.org>
+ <20220302141121.sohhkhtiiaydlv47@sgarzare-redhat>
+ <20220302094946-mutt-send-email-mst@kernel.org>
+ <20220302153643.glkmvnn2czrgpoyl@sgarzare-redhat>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <0241967f-b2e6-7db4-7e54-be665e12ebb6@amd.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+In-Reply-To: <20220302153643.glkmvnn2czrgpoyl@sgarzare-redhat>
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 04, 2022 at 10:03:52AM -0600, Brijesh Singh wrote:
-> I did added a text in Documentation/virt/coco/sevguest.rst (section 2.3)
-> that user need to look the GHCB spec for further detail.
+On Wed, Mar 02, 2022 at 04:36:43PM +0100, Stefano Garzarella wrote:
+> On Wed, Mar 02, 2022 at 09:50:38AM -0500, Michael S. Tsirkin wrote:
+> > On Wed, Mar 02, 2022 at 03:11:21PM +0100, Stefano Garzarella wrote:
+> > > On Wed, Mar 02, 2022 at 08:35:08AM -0500, Michael S. Tsirkin wrote:
+> > > > On Wed, Mar 02, 2022 at 10:34:46AM +0100, Stefano Garzarella wrote:
+> > > > > On Wed, Mar 02, 2022 at 07:54:21AM +0000, Lee Jones wrote:
+> > > > > > vhost_vsock_handle_tx_kick() already holds the mutex during its call
+> > > > > > to vhost_get_vq_desc().  All we have to do is take the same lock
+> > > > > > during virtqueue clean-up and we mitigate the reported issues.
+> > > > > >
+> > > > > > Link: https://syzkaller.appspot.com/bug?extid=279432d30d825e63ba00
+> > > > >
+> > > > > This issue is similar to [1] that should be already fixed upstream by [2].
+> > > > >
+> > > > > However I think this patch would have prevented some issues, because
+> > > > > vhost_vq_reset() sets vq->private to NULL, preventing the worker from
+> > > > > running.
+> > > > >
+> > > > > Anyway I think that when we enter in vhost_dev_cleanup() the worker should
+> > > > > be already stopped, so it shouldn't be necessary to take the mutex. But in
+> > > > > order to prevent future issues maybe it's better to take them, so:
+> > > > >
+> > > > > Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+> > > > >
+> > > > > [1]
+> > > > > https://syzkaller.appspot.com/bug?id=993d8b5e64393ed9e6a70f9ae4de0119c605a822
+> > > > > [2] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a58da53ffd70294ebea8ecd0eb45fd0d74add9f9
+> > > >
+> > > >
+> > > > Right. I want to queue this but I would like to get a warning
+> > > > so we can detect issues like [2] before they cause more issues.
+> > > 
+> > > I agree, what about moving the warning that we already have higher up, right
+> > > at the beginning of the function?
+> > > 
+> > > I mean something like this:
+> > > 
+> > > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> > > index 59edb5a1ffe2..1721ff3f18c0 100644
+> > > --- a/drivers/vhost/vhost.c
+> > > +++ b/drivers/vhost/vhost.c
+> > > @@ -692,6 +692,8 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
+> > >  {
+> > >         int i;
+> > > +       WARN_ON(!llist_empty(&dev->work_list));
+> > > +
+> > >         for (i = 0; i < dev->nvqs; ++i) {
+> > >                 if (dev->vqs[i]->error_ctx)
+> > >                         eventfd_ctx_put(dev->vqs[i]->error_ctx);
+> > > @@ -712,7 +714,6 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
+> > >         dev->iotlb = NULL;
+> > >         vhost_clear_msg(dev);
+> > >         wake_up_interruptible_poll(&dev->wait, EPOLLIN | EPOLLRDNORM);
+> > > -       WARN_ON(!llist_empty(&dev->work_list));
+> > >         if (dev->worker) {
+> > >                 kthread_stop(dev->worker);
+> > >                 dev->worker = NULL;
+> > > 
+> > 
+> > Hmm I'm not sure why it matters.
+> 
+> Because after this new patch, putting locks in the while loop, when we
+> finish the loop the workers should be stopped, because vhost_vq_reset() sets
+> vq->private to NULL.
+> 
+> But the best thing IMHO is to check that there is no backend set for each
+> vq, so the workers have been stopped correctly at this point.
+> 
+> Thanks,
+> Stefano
 
-If you mean this:
-
-"See GHCB specification for further detail on how to parse the certificate
-blob."
-
-that ain't even scratching the surface. You need to explain that magic
-"certs_len == 0" condition in that textm how it is handled and what that
-causes the HV to do.
-
-You need to realize that because it is clear to you, it ain't that clear
-to others.
+It's the list of workers waiting to run though. That is not affected by
+vq lock at all.
 
 -- 
-Regards/Gruss,
-    Boris.
+MST
 
-SUSE Software Solutions Germany GmbH, GF: Ivo Totev, HRB 36809, AG Nürnberg
