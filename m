@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F14B04CD0A5
-	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 10:05:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 75FC04CD0A8
+	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 10:05:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235725AbiCDJFp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Mar 2022 04:05:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55284 "EHLO
+        id S235805AbiCDJFs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Mar 2022 04:05:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231620AbiCDJFj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Mar 2022 04:05:39 -0500
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E9781A06C1;
-        Fri,  4 Mar 2022 01:04:51 -0800 (PST)
-Received: by mail-pl1-x635.google.com with SMTP id q11so7156958pln.11;
-        Fri, 04 Mar 2022 01:04:51 -0800 (PST)
+        with ESMTP id S235751AbiCDJFm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Mar 2022 04:05:42 -0500
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 294F0192E36;
+        Fri,  4 Mar 2022 01:04:55 -0800 (PST)
+Received: by mail-pj1-x102f.google.com with SMTP id m22so6892703pja.0;
+        Fri, 04 Mar 2022 01:04:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=Ltug4OiVK89L6kwQRotAn5EqybAI6kqhGBm3g+G26+Y=;
-        b=UG0wYmPnUlKLM2WLoBTCeIDe4a4yeRhJzeQ/B+Rfl1HTOKXSb86ymRSbwQn9+wwzGM
-         ri8qP5J9KETqZDHlXVwkHVerU5+f15SyDm0YyVKNXvfhAYAQidBbDYcfdIEpy9o17BlC
-         7xUdX/JDU628Wr2wWG4t7gJKpIerJLZv/ZSsVpwB3rdBBT98Sli9Z0fC1fmxYoDH+lMX
-         2D/YOgi6ikjUsGoiqtJHMUo4pALR/0Oxq79Za92prKWFoX6N1GvAzxTia61OoftkbyrA
-         I2jVNastkOOakJ1Iiid7arglmHQQ1xczlrFNWn07m+pASReuZmcG2K0YQpUScCs+CJtS
-         BXqw==
+        bh=t5IBLpV9CBp3Q9A9d6p3YjiEqXq27VVkPzFjiGgiBI8=;
+        b=lSTE4viCsh4WcIgB6p0ZFpIg4PuUmIXdiji4whKV+QsPQH3dmmbsmygclsaNlFrIQk
+         8Ah42j0lWg4zV21ch88RpJxFiw1qXf7O60LsIni3iuqm1Ur6xUBz5RpMgM0qds42uzS5
+         MYExyg6v1rN6oNX31uzuvGsF3lEJEZu0yxhbuSBrydaAOgL7luuSNjs0NuYKoNuUI908
+         oA7oOkG7Weo9ZzrT/+L7oF0anC9LI604WNlLevzk9u/Q7EVz2b319WZzQrDgOfPdkRwM
+         HHI/nA96QPNAZ+/KgtxAtmue/UmIM5Tg5bhloQpgK+/vQsvmJ1q4+Ho1ZTRCoQSLu4Xk
+         xlkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=Ltug4OiVK89L6kwQRotAn5EqybAI6kqhGBm3g+G26+Y=;
-        b=4E/+aAEEXyiT6Rnm0Wy9YKxrmU5JQguZO+xo/tSuNIPzICD7KMTnUShNI2Ua+omYED
-         wE/PwUFNk37uIxvb/sO2wukgchdkSdx7K6xkbtYQTyzLoN9yv22DcgL2a5MmMy0+i+fD
-         /H7TB59KLobcvHr5W9bwN48NSA2YaQHaXQ1EL2Czk/Z67ZXRscCLkpNQ93zhS35jm5uZ
-         J8QKeNBOiBcpSmAArADFxtVZhlSAL9fSj4+LYq6a8akxZdm42ONIiaCKuXTTuyHoZrDZ
-         TlDz2sN32F2uXkL8JmEAw0Uc8tuBtuohpDYFF47mf7D+JgCj34jACsOjaZBWsi+urJS/
-         3C5g==
-X-Gm-Message-State: AOAM533AYG/b2MDyJxusx67SXafC9/2f2WNnM+8zUDQF2Y/4nXK5lpn7
-        F/hJc/n6BWZ8cPOgynCmIw4=
-X-Google-Smtp-Source: ABdhPJzhtSO8JdhyFvSdRI9RUXClLP4CkAQbe+6DqQ7RFuDZkHvMvUSbuSgGqnOQlZCG4/+WpAPhxQ==
-X-Received: by 2002:a17:903:285:b0:14f:daea:e8d9 with SMTP id j5-20020a170903028500b0014fdaeae8d9mr39727542plr.128.1646384690716;
-        Fri, 04 Mar 2022 01:04:50 -0800 (PST)
+        bh=t5IBLpV9CBp3Q9A9d6p3YjiEqXq27VVkPzFjiGgiBI8=;
+        b=NWuNGvOIMhePYYpc0plH/ukQ3ywRjb2Pp1xt+QExJzHRIObslDEGZFDoD5tBUZPJ10
+         0vr8Cw6xRN392POStUzJe9mPRfaE17CxJrrcmVVUZQBzlOHnUUTkuuiPD4bUtBusHKaV
+         y2+RcevAL9HPykafdzE2+d8TltpTWl6LGUNYkDip0kE/l1QXUH9mzE1uPbKaZO4bNfPk
+         yANlfgvmlm/vKQb4W4bModlcmGODZIqkeMch/0vvc70eUy+gJyk+XtJ29AD1FqrNGRPW
+         2YYhasbw8OqKlQZ3OhmVKNvYE4i4NUme8FbWr60fXZnjc3Z2O29DA3KfRbIaUuKlmdtU
+         X5zQ==
+X-Gm-Message-State: AOAM533ah7McpzPTqqnM+nfJCB2nJdZrep1LpkxYQHWhudWeGkAplb4f
+        djkUDYZWz1E8GI2Q23qtbRU=
+X-Google-Smtp-Source: ABdhPJxerh5TMu9NOmmnxK1FSbkst9oJfDPpWgbiHUTPhqzj3gf5MgeGMGi+VNTZaoRQK+UiY9bYTg==
+X-Received: by 2002:a17:90a:20a:b0:1be:e850:1a37 with SMTP id c10-20020a17090a020a00b001bee8501a37mr9655446pjc.28.1646384694602;
+        Fri, 04 Mar 2022 01:04:54 -0800 (PST)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id j2-20020a655582000000b00372b2b5467asm4192968pgs.10.2022.03.04.01.04.47
+        by smtp.gmail.com with ESMTPSA id j2-20020a655582000000b00372b2b5467asm4192968pgs.10.2022.03.04.01.04.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Mar 2022 01:04:50 -0800 (PST)
+        Fri, 04 Mar 2022 01:04:54 -0800 (PST)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
@@ -57,9 +57,9 @@ Cc:     Peter Zijlstra <peterz@infradead.org>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         x86@kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v12 03/17] perf/x86/core: Pass "struct kvm_pmu *" to determine the guest values
-Date:   Fri,  4 Mar 2022 17:04:13 +0800
-Message-Id: <20220304090427.90888-4-likexu@tencent.com>
+Subject: [PATCH v12 04/17] KVM: x86/pmu: Set MSR_IA32_MISC_ENABLE_EMON bit when vPMU is enabled
+Date:   Fri,  4 Mar 2022 17:04:14 +0800
+Message-Id: <20220304090427.90888-5-likexu@tencent.com>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20220304090427.90888-1-likexu@tencent.com>
 References: <20220304090427.90888-1-likexu@tencent.com>
@@ -75,113 +75,67 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <like.xu@linux.intel.com>
+From: Like Xu <likexu@tencent.com>
 
-Splitting the logic for determining the guest values is unnecessarily
-confusing, and potentially fragile. Perf should have full knowledge and
-control of what values are loaded for the guest.
+On Intel platforms, the software can use the IA32_MISC_ENABLE[7] bit to
+detect whether the processor supports performance monitoring facility.
 
-If we change .guest_get_msrs() to take a struct kvm_pmu pointer, then it
-can generate the full set of guest values by grabbing guest ds_area and
-pebs_data_cfg. Alternatively, .guest_get_msrs() could take the desired
-guest MSR values directly (ds_area and pebs_data_cfg), but kvm_pmu is
-vendor agnostic, so we don't see any reason to not just pass the pointer.
+It depends on the PMU is enabled for the guest, and a software write
+operation to this available bit will be ignored. The proposal to ignore
+the toggle in KVM is the way to go and that behavior matches bare metal.
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Like Xu <like.xu@linux.intel.com>
-Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+Signed-off-by: Like Xu <likexu@tencent.com>
 ---
- arch/x86/events/core.c            | 4 ++--
- arch/x86/events/intel/core.c      | 4 ++--
- arch/x86/events/perf_event.h      | 2 +-
- arch/x86/include/asm/perf_event.h | 4 ++--
- arch/x86/kvm/vmx/vmx.c            | 3 ++-
- 5 files changed, 9 insertions(+), 8 deletions(-)
+ arch/x86/kvm/vmx/pmu_intel.c |  1 +
+ arch/x86/kvm/x86.c           | 15 +++++++++++++--
+ 2 files changed, 14 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
-index 7e3d0a019444..0ce9493cc110 100644
---- a/arch/x86/events/core.c
-+++ b/arch/x86/events/core.c
-@@ -693,9 +693,9 @@ void x86_pmu_disable_all(void)
- 	}
- }
- 
--struct perf_guest_switch_msr *perf_guest_get_msrs(int *nr)
-+struct perf_guest_switch_msr *perf_guest_get_msrs(int *nr, void *data)
- {
--	return static_call(x86_pmu_guest_get_msrs)(nr);
-+	return static_call(x86_pmu_guest_get_msrs)(nr, data);
- }
- EXPORT_SYMBOL_GPL(perf_guest_get_msrs);
- 
-diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
-index da4b77f6c6a4..820f9fb9339b 100644
---- a/arch/x86/events/intel/core.c
-+++ b/arch/x86/events/intel/core.c
-@@ -3951,7 +3951,7 @@ static int intel_pmu_hw_config(struct perf_event *event)
- 	return 0;
- }
- 
--static struct perf_guest_switch_msr *intel_guest_get_msrs(int *nr)
-+static struct perf_guest_switch_msr *intel_guest_get_msrs(int *nr, void *data)
- {
- 	struct cpu_hw_events *cpuc = this_cpu_ptr(&cpu_hw_events);
- 	struct perf_guest_switch_msr *arr = cpuc->guest_switch_msrs;
-@@ -3984,7 +3984,7 @@ static struct perf_guest_switch_msr *intel_guest_get_msrs(int *nr)
- 	return arr;
- }
- 
--static struct perf_guest_switch_msr *core_guest_get_msrs(int *nr)
-+static struct perf_guest_switch_msr *core_guest_get_msrs(int *nr, void *data)
- {
- 	struct cpu_hw_events *cpuc = this_cpu_ptr(&cpu_hw_events);
- 	struct perf_guest_switch_msr *arr = cpuc->guest_switch_msrs;
-diff --git a/arch/x86/events/perf_event.h b/arch/x86/events/perf_event.h
-index 0998742760c8..bf23cbe4f6cf 100644
---- a/arch/x86/events/perf_event.h
-+++ b/arch/x86/events/perf_event.h
-@@ -900,7 +900,7 @@ struct x86_pmu {
- 	/*
- 	 * Intel host/guest support (KVM)
- 	 */
--	struct perf_guest_switch_msr *(*guest_get_msrs)(int *nr);
-+	struct perf_guest_switch_msr *(*guest_get_msrs)(int *nr, void *data);
- 
- 	/*
- 	 * Check period value for PERF_EVENT_IOC_PERIOD ioctl.
-diff --git a/arch/x86/include/asm/perf_event.h b/arch/x86/include/asm/perf_event.h
-index 2c9dce37d095..729658f00ee6 100644
---- a/arch/x86/include/asm/perf_event.h
-+++ b/arch/x86/include/asm/perf_event.h
-@@ -492,10 +492,10 @@ static inline void perf_check_microcode(void) { }
- #endif
- 
- #if defined(CONFIG_PERF_EVENTS) && defined(CONFIG_CPU_SUP_INTEL)
--extern struct perf_guest_switch_msr *perf_guest_get_msrs(int *nr);
-+extern struct perf_guest_switch_msr *perf_guest_get_msrs(int *nr, void *data);
- extern int x86_perf_get_lbr(struct x86_pmu_lbr *lbr);
- #else
--struct perf_guest_switch_msr *perf_guest_get_msrs(int *nr);
-+struct perf_guest_switch_msr *perf_guest_get_msrs(int *nr, void *data);
- static inline int x86_perf_get_lbr(struct x86_pmu_lbr *lbr)
- {
- 	return -1;
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index b325f99b2177..8fb29bbfe875 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6710,9 +6710,10 @@ static void atomic_switch_perf_msrs(struct vcpu_vmx *vmx)
- {
- 	int i, nr_msrs;
- 	struct perf_guest_switch_msr *msrs;
-+	struct kvm_pmu *pmu = vcpu_to_pmu(&vmx->vcpu);
- 
- 	/* Note, nr_msrs may be garbage if perf_guest_get_msrs() returns NULL. */
--	msrs = perf_guest_get_msrs(&nr_msrs);
-+	msrs = perf_guest_get_msrs(&nr_msrs, (void *)pmu);
- 	if (!msrs)
+diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+index 4e5b1eeeb77c..61de7b07489c 100644
+--- a/arch/x86/kvm/vmx/pmu_intel.c
++++ b/arch/x86/kvm/vmx/pmu_intel.c
+@@ -496,6 +496,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+ 	if (!pmu->version)
  		return;
  
++	vcpu->arch.ia32_misc_enable_msr |= MSR_IA32_MISC_ENABLE_EMON;
+ 	perf_get_x86_pmu_capability(&x86_pmu);
+ 
+ 	pmu->nr_arch_gp_counters = min_t(int, eax.split.num_counters,
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index cf17af4d6904..3c7a51468216 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3515,9 +3515,19 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 			vcpu->arch.ia32_tsc_adjust_msr = data;
+ 		}
+ 		break;
+-	case MSR_IA32_MISC_ENABLE:
++	case MSR_IA32_MISC_ENABLE: {
++		u64 old_val = vcpu->arch.ia32_misc_enable_msr;
++		u64 pmu_mask = MSR_IA32_MISC_ENABLE_EMON;
++
++		/*
++		 * For a dummy user space, the order of setting vPMU capabilities and
++		 * initialising MSR_IA32_MISC_ENABLE is not strictly guaranteed, so to
++		 * avoid inconsistent functionality we keep the vPMU bits unchanged here.
++		 */
++		data &= ~pmu_mask;
++		data |= old_val & pmu_mask;
+ 		if (!kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_MISC_ENABLE_NO_MWAIT) &&
+-		    ((vcpu->arch.ia32_misc_enable_msr ^ data) & MSR_IA32_MISC_ENABLE_MWAIT)) {
++		    ((old_val ^ data)  & MSR_IA32_MISC_ENABLE_MWAIT)) {
+ 			if (!guest_cpuid_has(vcpu, X86_FEATURE_XMM3))
+ 				return 1;
+ 			vcpu->arch.ia32_misc_enable_msr = data;
+@@ -3526,6 +3536,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 			vcpu->arch.ia32_misc_enable_msr = data;
+ 		}
+ 		break;
++	}
+ 	case MSR_IA32_SMBASE:
+ 		if (!msr_info->host_initiated)
+ 			return 1;
 -- 
 2.35.1
 
