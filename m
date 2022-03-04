@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 70CC94CDD84
-	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 20:59:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 995AF4CDD8A
+	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 20:59:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229656AbiCDT7k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Mar 2022 14:59:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36806 "EHLO
+        id S229739AbiCDT7T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Mar 2022 14:59:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36820 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229491AbiCDT7L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S229456AbiCDT7L (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 4 Mar 2022 14:59:11 -0500
 Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB242240DCE;
-        Fri,  4 Mar 2022 11:50:44 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAAA8240DCF;
+        Fri,  4 Mar 2022 11:50:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1646423445; x=1677959445;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=qKx+rgcTFhpEcERIfgphya3th3nYVglGjlcgVoVagDo=;
-  b=SERP3ohGCtd88ukRyLcKW2ET0lLrU+7MVfKJaoYfwhVPNyfxq9XGKV/0
-   5V8l6CxhKp8zop9QSNlv38EvgJZt0nzaXntISfemlpob0C4Urv4NVjXow
-   C6D1cnbKlBXMon7HOvnA3192wOOavsmI6OfOx2xOhMCsEUMMXxSTR0wTv
-   6ZGZ4vjtFpRY8qJCx6TQARlSQ0NpkUbJdFfu0mEgZ9kWsbWGNOwCgPjzV
-   9IPojf/VM2/0kaYILdhmj7tVWIbvm6DmjkTtRkg3mYJotfo77/u/RVvCX
-   ITEP9tEvl93e5zV2SI5E5bpfKWQXqmGpt+4eSHjygOWInU1JD7k/XQZw9
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10276"; a="253779653"
+  bh=+nGQVrBe96XTUjrDdPql+9GcVxyKPhvOW6aWfhm10vM=;
+  b=JIOYX9fBvqLcVEI9SkR95tYsDp0MPMUlICNvS/WyPgWv/AypE2v8sEa3
+   tLUH9ezx4Hr2hQ8Vyz7pHzgEgyCXej7nV2y7o8Ozy7Mql1phbXBKoAAMl
+   EF4dIShw7m/8nE6tggKToX7cWegmTlSDI53Xx78sruNIaGYej9eRFu/8v
+   OuhkUHGNT0vFaB/ZUF4XGbdaWJLp+AjZSpxu3+oW51Eq6yajsxKQVGfka
+   NdLpEE/cxY05glAcytZLDJxHHFEK4NVl/3lfj55dtGvgMWLHzrDkOXgyE
+   lyL+eCAysbwt7Hmt/O2+8V71U2fcasCG62cbshHVUUaLorlScHD9h85BK
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10276"; a="253779655"
 X-IronPort-AV: E=Sophos;i="5.90,156,1643702400"; 
-   d="scan'208";a="253779653"
+   d="scan'208";a="253779655"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
   by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2022 11:50:44 -0800
 X-IronPort-AV: E=Sophos;i="5.90,156,1643702400"; 
-   d="scan'208";a="552344557"
+   d="scan'208";a="552344562"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2022 11:50:43 -0800
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2022 11:50:44 -0800
 From:   isaku.yamahata@intel.com
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
@@ -43,9 +43,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Jim Mattson <jmattson@google.com>, erdemaktas@google.com,
         Connor Kuehl <ckuehl@redhat.com>,
         Sean Christopherson <seanjc@google.com>
-Subject: [RFC PATCH v5 091/104] KVM: TDX: Handle TDX PV CPUID hypercall
-Date:   Fri,  4 Mar 2022 11:49:47 -0800
-Message-Id: <e3621e9893796d2bd8ea8b1f16c1616ae9df3f37.1646422845.git.isaku.yamahata@intel.com>
+Subject: [RFC PATCH v5 092/104] KVM: TDX: Handle TDX PV HLT hypercall
+Date:   Fri,  4 Mar 2022 11:49:48 -0800
+Message-Id: <6da55adb2ddb6f287ebd46aad02cfaaac2088415.1646422845.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1646422845.git.isaku.yamahata@intel.com>
 References: <cover.1646422845.git.isaku.yamahata@intel.com>
@@ -63,55 +63,80 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Wire up TDX PV CPUID hypercall to the KVM backend function.
+Wire up TDX PV HLT hypercall to the KVM backend function.
+
+When the guest issues HLT, the hypercall instruction can be the right after
+CLI instruction.  Atomically unmask virtual interrupt and issue HLT
+hypercall. The virtual interrupts can arrive right after CLI instruction
+before switching back to VMM.  In such a case, the VMM should return to the
+guest without losing the interrupt.  Check if interrupts arrived before the
+TDX module switching to VMM.  And return to the guest in such cases.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/vmx/tdx.c | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+ arch/x86/kvm/vmx/tdx.c | 45 +++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 44 insertions(+), 1 deletion(-)
 
 diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 53f59fb92dcf..f7c9170d596a 100644
+index f7c9170d596a..b0dcc2421649 100644
 --- a/arch/x86/kvm/vmx/tdx.c
 +++ b/arch/x86/kvm/vmx/tdx.c
-@@ -893,6 +893,30 @@ static int tdx_emulate_vmcall(struct kvm_vcpu *vcpu)
+@@ -917,6 +917,48 @@ static int tdx_emulate_cpuid(struct kvm_vcpu *vcpu)
  	return 1;
  }
  
-+static int tdx_emulate_cpuid(struct kvm_vcpu *vcpu)
++static int tdx_emulate_hlt(struct kvm_vcpu *vcpu)
 +{
-+	u32 eax, ebx, ecx, edx;
-+
-+	/* EAX and ECX for cpuid is stored in R12 and R13. */
-+	eax = tdvmcall_p1_read(vcpu);
-+	ecx = tdvmcall_p2_read(vcpu);
-+
-+	kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, true);
-+
-+	/*
-+	 * The returned value for CPUID (EAX, EBX, ECX, and EDX) is stored into
-+	 * R12, R13, R14, and R15.
-+	 */
-+	tdvmcall_p1_write(vcpu, eax);
-+	tdvmcall_p2_write(vcpu, ebx);
-+	tdvmcall_p3_write(vcpu, ecx);
-+	tdvmcall_p4_write(vcpu, edx);
++	bool interrupt_disabled = tdvmcall_p1_read(vcpu);
++	union tdx_vcpu_state_details details;
 +
 +	tdvmcall_set_return_code(vcpu, TDG_VP_VMCALL_SUCCESS);
 +
-+	return 1;
++	if (!interrupt_disabled) {
++		/*
++		 * Virtual interrupt can arrive after TDG.VM.VMCALL<HLT> during
++		 * the TDX module executing.  On the other hand, KVM doesn't
++		 * know if vcpu was executing in the guest TD or the TDX module.
++		 *
++		 * CPU mode transition:
++		 * TDG.VP.VMCALL<HLT> (SEAM VMX non-root mode) ->
++		 * the TDX module (SEAM VMX root mode) ->
++		 * KVM (Legacy VMX root mode)
++		 *
++		 * If virtual interrupt arrives to this vcpu
++		 * - In the guest TD executing:
++		 *   KVM can handle it in the same way to the VMX case.
++		 * - During the TDX module executing:
++		 *   The TDX modules switches to KVM with TDG.VM.VMCALL<HLT>
++		 *   exit reason.  KVM thinks the guest was running.  So KVM
++		 *   vcpu wake up logic doesn't kick in.  Check if virtual
++		 *   interrupt is pending and resume vcpu without blocking vcpu.
++		 * - KVM executing:
++		 *   The existing logic wakes up the target vcpu on injecting
++		 *   virtual interrupt in the same way to the VMX case.
++		 *
++		 * Check if the interrupt is already pending.  If yes, resume
++		 * vcpu from guest HLT without emulating hlt instruction.
++		 */
++		details.full = td_state_non_arch_read64(
++			to_tdx(vcpu), TD_VCPU_STATE_DETAILS_NON_ARCH);
++		if (details.vmxip)
++			return 1;
++	}
++
++	return kvm_emulate_halt_noskip(vcpu);
 +}
 +
  static int handle_tdvmcall(struct kvm_vcpu *vcpu)
  {
  	struct vcpu_tdx *tdx = to_tdx(vcpu);
-@@ -904,6 +928,9 @@ static int handle_tdvmcall(struct kvm_vcpu *vcpu)
- 		return tdx_emulate_vmcall(vcpu);
- 
+@@ -930,7 +972,8 @@ static int handle_tdvmcall(struct kvm_vcpu *vcpu)
  	switch (tdvmcall_exit_reason(vcpu)) {
-+	case EXIT_REASON_CPUID:
-+		return tdx_emulate_cpuid(vcpu);
-+
+ 	case EXIT_REASON_CPUID:
+ 		return tdx_emulate_cpuid(vcpu);
+-
++	case EXIT_REASON_HLT:
++		return tdx_emulate_hlt(vcpu);
  	default:
  		break;
  	}
