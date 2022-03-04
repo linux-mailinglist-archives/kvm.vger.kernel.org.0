@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3DB344CD21D
-	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 11:11:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A4F564CD21E
+	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 11:11:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239556AbiCDKMY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Mar 2022 05:12:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58432 "EHLO
+        id S239553AbiCDKM3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Mar 2022 05:12:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239535AbiCDKMX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Mar 2022 05:12:23 -0500
+        with ESMTP id S239546AbiCDKM2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Mar 2022 05:12:28 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 982121A9499
-        for <kvm@vger.kernel.org>; Fri,  4 Mar 2022 02:11:35 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 94EED1A9494
+        for <kvm@vger.kernel.org>; Fri,  4 Mar 2022 02:11:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646388694;
+        s=mimecast20190719; t=1646388699;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=XKvBT0IgzI7fojcpNLya1TNPvRgQkv3CgqP1MpKeJKE=;
-        b=RJgOJe7cyJrza5iwbefo8flZu/Nb0PZnrODGhnMscfacNgwtczeKzZFi5tYRGBB/srQaGz
-        ZzynjbEtF3AB/asEvA7hW9368qF7KS1AbCuzBFGj4+7EiIcX8vSlj2kDNc7roB+2Nmazo9
-        0O6CoZXbHvzqCuMWebKBzcCIbrbZ/Bs=
+        bh=sSLRnYb2QNIjWpP3fV5flR6BmyZe4IaIK5k4ivhzeY4=;
+        b=RD3nViRHiL1zp+YkMpUkjCtB8blIYADyGP+Qj5kUJH5DJjO8D/1OV1DubA8X0kslGHlCZS
+        P89Pr/ofSEAbB6cfILdphQOkVEkDs/3Y1zpVKkQZpAdAGOO4GZuFZYLFO/TXzPOqxpXjhU
+        M7ZlXHZhkFzb/CynPr53JVSgdPIFgI8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-83-PtLhnYhaO_iY1Dc7Xj4OcA-1; Fri, 04 Mar 2022 05:11:31 -0500
-X-MC-Unique: PtLhnYhaO_iY1Dc7Xj4OcA-1
+ us-mta-395-MMtLvB3SPmu79DVmnNaAaA-1; Fri, 04 Mar 2022 05:11:36 -0500
+X-MC-Unique: MMtLvB3SPmu79DVmnNaAaA-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7776C5234;
-        Fri,  4 Mar 2022 10:11:29 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 98BD31091DA1;
+        Fri,  4 Mar 2022 10:11:34 +0000 (UTC)
 Received: from toolbox.redhat.com (unknown [10.33.36.250])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7916D842CA;
-        Fri,  4 Mar 2022 10:11:12 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CA54C842BA;
+        Fri,  4 Mar 2022 10:11:29 +0000 (UTC)
 From:   Sergio Lopez <slp@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     Matthew Rosato <mjrosato@linux.ibm.com>,
@@ -58,9 +58,9 @@ Cc:     Matthew Rosato <mjrosato@linux.ibm.com>,
         Halil Pasic <pasic@linux.ibm.com>,
         Cornelia Huck <cohuck@redhat.com>,
         Hanna Reitz <hreitz@redhat.com>, Sergio Lopez <slp@redhat.com>
-Subject: [PATCH v4 3/4] configure, meson: allow enabling vhost-user on all POSIX systems
-Date:   Fri,  4 Mar 2022 11:08:53 +0100
-Message-Id: <20220304100854.14829-4-slp@redhat.com>
+Subject: [PATCH v4 4/4] docs: vhost-user: add subsection for non-Linux platforms
+Date:   Fri,  4 Mar 2022 11:08:54 +0100
+Message-Id: <20220304100854.14829-5-slp@redhat.com>
 In-Reply-To: <20220304100854.14829-1-slp@redhat.com>
 References: <20220304100854.14829-1-slp@redhat.com>
 MIME-Version: 1.0
@@ -76,49 +76,46 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-With the possibility of using a pipe pair via qemu_pipe() as a
-replacement on operating systems that doesn't support eventfd,
-vhost-user can also work on all POSIX systems.
-
-This change allows enabling vhost-user on all non-Windows platforms
-and makes libvhost_user (which still depends on eventfd) a linux-only
-feature.
+Add a section explaining how vhost-user is supported on platforms
+other than Linux.
 
 Signed-off-by: Sergio Lopez <slp@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- configure   | 4 ++--
- meson.build | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ docs/interop/vhost-user.rst | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-diff --git a/configure b/configure
-index c56ed53ee3..daccf4be7c 100755
---- a/configure
-+++ b/configure
-@@ -1659,8 +1659,8 @@ fi
- # vhost interdependencies and host support
+diff --git a/docs/interop/vhost-user.rst b/docs/interop/vhost-user.rst
+index edc3ad84a3..4dbc84fd00 100644
+--- a/docs/interop/vhost-user.rst
++++ b/docs/interop/vhost-user.rst
+@@ -38,6 +38,26 @@ conventions <backend_conventions>`.
+ *Master* and *slave* can be either a client (i.e. connecting) or
+ server (listening) in the socket communication.
  
- # vhost backends
--if test "$vhost_user" = "yes" && test "$linux" != "yes"; then
--  error_exit "vhost-user is only available on Linux"
-+if test "$vhost_user" = "yes" && test "$mingw32" = "yes"; then
-+  error_exit "vhost-user is not available on Windows"
- fi
- test "$vhost_vdpa" = "" && vhost_vdpa=$linux
- if test "$vhost_vdpa" = "yes" && test "$linux" != "yes"; then
-diff --git a/meson.build b/meson.build
-index 8df40bfac4..f2bc439c30 100644
---- a/meson.build
-+++ b/meson.build
-@@ -2701,7 +2701,7 @@ if have_system or have_user
- endif
++Support for platforms other than Linux
++--------------------------------------
++
++While vhost-user was initially developed targeting Linux, nowadays it
++is supported on any platform that provides the following features:
++
++- A way for requesting shared memory represented by a file descriptor
++  so it can be passed over a UNIX domain socket and then mapped by the
++  other process.
++
++- AF_UNIX sockets with SCM_RIGHTS, so QEMU and the other process can
++  exchange messages through it, including ancillary data when needed.
++
++- Either eventfd or pipe/pipe2. On platforms where eventfd is not
++  available, QEMU will automatically fall back to pipe2 or, as a last
++  resort, pipe. Each file descriptor will be used for receiving or
++  sending events by reading or writing (respectively) an 8-byte value
++  to the corresponding it. The 8-value itself has no meaning and
++  should not be interpreted.
++
+ Message Specification
+ =====================
  
- vhost_user = not_found
--if 'CONFIG_VHOST_USER' in config_host
-+if targetos == 'linux' and 'CONFIG_VHOST_USER' in config_host
-   libvhost_user = subproject('libvhost-user')
-   vhost_user = libvhost_user.get_variable('vhost_user_dep')
- endif
 -- 
 2.35.1
 
