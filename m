@@ -2,99 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DBCDC4CD7A1
-	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 16:23:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0077A4CD7AB
+	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 16:23:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240276AbiCDPXk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Mar 2022 10:23:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38022 "EHLO
+        id S240278AbiCDPYZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Mar 2022 10:24:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42176 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240258AbiCDPXY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Mar 2022 10:23:24 -0500
-Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EDD54132D
-        for <kvm@vger.kernel.org>; Fri,  4 Mar 2022 07:22:36 -0800 (PST)
-Received: by mail-wm1-x32c.google.com with SMTP id l2-20020a7bc342000000b0037fa585de26so5478547wmj.1
-        for <kvm@vger.kernel.org>; Fri, 04 Mar 2022 07:22:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=4W8I3tuoGx81FDxurpr4MQTsgqMFmG2Aaynw/Q1B6WQ=;
-        b=k+JiVAPhTAqF+YhhbFY6K4lLY0h6PsOG37nRSTtxjgjMYEjnkXYdM8ue2neMxbOUMd
-         glwEwfVtimdk+5VC7t8ggYeOnY3vFNqk37zudCmGNA4+TNvkYjDYVQfjCV/CAIs4sI1J
-         /RItdEOsUsK896yZv7ixVficdL48rnKo0v23B8y3bqasDUYTfBDPjodUEJZo6Kl1HVaW
-         oca1BIl3h2lxf5XDiEo0TxQNabbqWAne5cV6MTt5iEUN98Z4cS/ySDOn2UOyIMNL8ya6
-         vMWMoiSWViYt5GdRRB1HTkWWjm+3YfM+dp8FkzuUCx/WVBqB1GR5Uk7s0Qbv2E2XVoS8
-         Z+Mg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=4W8I3tuoGx81FDxurpr4MQTsgqMFmG2Aaynw/Q1B6WQ=;
-        b=ac7Vhat4J4bukc3BGFZ6bw+OiBkvaPWH9xBAASiRC8hxbxLWuddJbKHgz9qJ0EUwvf
-         KstAhgF98ep8y2gc+IkjmdBFmQEnvkJImG3FFZL1sBQ7X6Z7F1u+HU686NsqwneAA6b9
-         2Ry6bHFka/jTpbMuqCRZpQOnm56lbhA9HIF/8zWSFywK/1sY8zHm+XHYYXBnZMGFDpLl
-         8lUd8FLNCfnLB86gw3h3DgZGjgBoidl1G3M/eoKVfs8mGL4nlA6FGYucN6WrPF2UESfG
-         gFDiaGswWlXibVl86pPlmvdROzn/HFQTQz99VG/5B8vfCSeQwTW6a5jF6Kja0F/b/7BG
-         6zhg==
-X-Gm-Message-State: AOAM533lIeIf91d0nIlOWZKTngRjXjp5z9ROxE+XU4ezQfk3EoG/LIAU
-        eXZEubv1+EGB1MVk9zS1+HVfiw==
-X-Google-Smtp-Source: ABdhPJxyPmGIr1XY/Q8xeCKdKIUg6uvyxv3uFluaInb3jO0pRYMOkp8CabliJMJWznAUeyx6sVvC7g==
-X-Received: by 2002:a7b:c4c7:0:b0:381:874e:30a9 with SMTP id g7-20020a7bc4c7000000b00381874e30a9mr7932742wmk.53.1646407354614;
-        Fri, 04 Mar 2022 07:22:34 -0800 (PST)
-Received: from google.com (cpc155339-bagu17-2-0-cust87.1-3.cable.virginm.net. [86.27.177.88])
-        by smtp.gmail.com with ESMTPSA id z2-20020a056000110200b001e7140ddb44sm4809507wrw.49.2022.03.04.07.22.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Mar 2022 07:22:34 -0800 (PST)
-Date:   Fri, 4 Mar 2022 15:22:32 +0000
-From:   Lee Jones <lee.jones@linaro.org>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     jasowang@redhat.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, stable@vger.kernel.org,
-        syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
-Subject: Re: [PATCH 1/1] vhost: Protect the virtqueue from being cleared
- whilst still in use
-Message-ID: <YiIuuHwY194VlLPx@google.com>
-References: <20220302075421.2131221-1-lee.jones@linaro.org>
- <20220303235937-mutt-send-email-mst@kernel.org>
+        with ESMTP id S235995AbiCDPYY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Mar 2022 10:24:24 -0500
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D12FC13CEC8;
+        Fri,  4 Mar 2022 07:23:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1646407416; x=1677943416;
+  h=message-id:date:mime-version:to:cc:references:from:
+   subject:in-reply-to:content-transfer-encoding;
+  bh=8+CEXWwRwOMrbbF77tgElxSqFXtFdC2qH4kdmgKvO/8=;
+  b=Ku2PX1M7qTskpAJoDfaZfr44hYgwjmKLKSxPUiaMNC6RKTBTpgK1Ybbv
+   hjLNPXHdADnx24V3yH6fkiNiwLr36m723Q/khAKiOnaUuk+CyvbwFDdTD
+   FPwx5W3Bmw/9Q9RrJMkP/TfladthCf40q3UJ1/tAL5kyYWt4Qc40SEWBA
+   DBNxeIBj3fzZT+/w85PNIsfpGN1C1FEyW0XxEarqeFJpYFMiWjtX+VXqj
+   DJUnw2Na35dgNqhbVBX/WjubWXDXjezcy9i3yLLUfEIskSr2D2SXLuDww
+   LELWe4Js0Q2hrWLkQv/TSfW/KEi/byuJZBQVc5Ikm71v/0XkmUchFt2Bu
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10276"; a="241417941"
+X-IronPort-AV: E=Sophos;i="5.90,155,1643702400"; 
+   d="scan'208";a="241417941"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2022 07:23:36 -0800
+X-IronPort-AV: E=Sophos;i="5.90,155,1643702400"; 
+   d="scan'208";a="640610291"
+Received: from eabada-mobl2.amr.corp.intel.com (HELO [10.209.6.252]) ([10.209.6.252])
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2022 07:23:34 -0800
+Message-ID: <bd52a9ed-c44f-989f-60a0-f15dd4260e09@intel.com>
+Date:   Fri, 4 Mar 2022 07:23:28 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220303235937-mutt-send-email-mst@kernel.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Content-Language: en-US
+To:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        brijesh.ksingh@gmail.com, tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+References: <20220224165625.2175020-1-brijesh.singh@amd.com>
+ <20220224165625.2175020-43-brijesh.singh@amd.com>
+ <c85259c5-996c-902b-42b6-6b812282ee25@intel.com>
+ <9c075b36-e450-831b-0ae2-3b680686beb4@amd.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+Subject: Re: [PATCH v11 42/45] virt: Add SEV-SNP guest driver
+In-Reply-To: <9c075b36-e450-831b-0ae2-3b680686beb4@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 04 Mar 2022, Michael S. Tsirkin wrote:
+On 3/4/22 05:17, Brijesh Singh wrote:
+>> BTW, this look like a generic allocator thingy.  But it's only ever used
+>> to allocate a 'struct snp_guest_msg'.  Why all the trouble to allocate
+>> and free one fixed-size structure?  The changelog and comments don't
+>> shed any light.
+> The GHCB specification says that a guest must use shared memory for
+> request, response, and certificate blob. In this patch, you are seeing
+> that {alloc,free}_shared_pages() used only to alloc/free the request and
+> response page. In the last patch, we used the same generic function to
+> allocate the certificate blob with a different size (~16K) than 'struct
+> snp_guest_msg.'
 
-> On Wed, Mar 02, 2022 at 07:54:21AM +0000, Lee Jones wrote:
-> > vhost_vsock_handle_tx_kick() already holds the mutex during its call
-> > to vhost_get_vq_desc().  All we have to do is take the same lock
-> > during virtqueue clean-up and we mitigate the reported issues.
-> > 
-> > Link: https://syzkaller.appspot.com/bug?extid=279432d30d825e63ba00
-> > 
-> > Cc: <stable@vger.kernel.org>
-> > Reported-by: syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
-> > Signed-off-by: Lee Jones <lee.jones@linaro.org>
-> 
-> So combine with the warning patch and update description with
-> the comment I posted, explaining it's more a just in case thing.
-
-Will do.  Plan is to submit this on Monday.
-
--- 
-Lee Jones [李琼斯]
-Principal Technical Lead - Developer Services
-Linaro.org │ Open source software for Arm SoCs
-Follow Linaro: Facebook | Twitter | Blog
+It sounds like it's worth a sentence or two in the changelog to explain
+this new "allocator" and its future uses.
