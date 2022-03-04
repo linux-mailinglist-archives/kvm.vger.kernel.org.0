@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EA4644CDE59
-	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 21:25:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DAC2A4CDE17
+	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 21:25:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231240AbiCDUKa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Mar 2022 15:10:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52746 "EHLO
+        id S230383AbiCDUHg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Mar 2022 15:07:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230367AbiCDUG7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Mar 2022 15:06:59 -0500
+        with ESMTP id S230376AbiCDUHA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Mar 2022 15:07:00 -0500
 Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0BAF286725;
-        Fri,  4 Mar 2022 12:01:35 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2196CA76FD;
+        Fri,  4 Mar 2022 12:01:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1646424095; x=1677960095;
+  t=1646424097; x=1677960097;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=UyoP9096v0567fP9nt6p1GrCX9VudNbGz8KwkSeDON4=;
-  b=ntJx+mFcqTJw/tRvt8XfhBZtJ3eNzyW4eUGXUa58J2PTEhWmNoInSCOl
-   Ng6XiH6zJXGfj6ztKmlf/e22b3p7r/Mnw1dVaxk8i9dueSu/Fl4Klv1e+
-   a2foSVKNYnDQfkrIJWx911If1ey3Nf2QL9cNVjB4Umhc42zqCsuDweciq
-   MzLv+r9U2V0Hs/dPd5gTa+aYpvzaURNfb0pbCH2Rmdd8DCMTzPR089NLi
-   3FlNcHidALpKLY0C+5acpQKUy/8AjhXY1urrfu+DMemSKGRdhc1FmhFc4
-   qXS3pZy95I6+sKle/kqdSaodO6hxmQcjO9aN5yYO7wdbRiYrGpvLGhCzS
+  bh=Zhkd9vMW4IoFvLpPP2WdaDbfud+1lrbpgFdFlKEXWIw=;
+  b=Xtw+KfuQGKjvX5po7xEKUzAik6Ma++SegukFzj/Wr2Xun7Uj3fcU0izl
+   W6KRzJRStBzn+qCUEksHVtpzcC+4hM6TWNg1cY2aN2RjOGWoyjko5DjGu
+   /IuE2uzsFR3MahAczvgeZbQc5NaiubQqqpbikWAX9+cvAv/U3rIRjb8Ed
+   ZGby3iVYny1LS0jxVqcxikytz3HiAuSUG+6v7rUIkjMfn3q+fd9i7cm3a
+   N0InC3ueZTrvTKAht5e0M3t2G/j40N5VzE9F2z6ljv0VFIpb6ogCR/jUI
+   r1/5Eg0iLJ8rRdQeRPTVBk93iCUNKs/8uliE4UvLGf4x9Mkii6HYZUDa5
    w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10276"; a="253983372"
+X-IronPort-AV: E=McAfee;i="6200,9189,10276"; a="253983376"
 X-IronPort-AV: E=Sophos;i="5.90,156,1643702400"; 
-   d="scan'208";a="253983372"
+   d="scan'208";a="253983376"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
   by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2022 11:50:12 -0800
 X-IronPort-AV: E=Sophos;i="5.90,156,1643702400"; 
-   d="scan'208";a="552344208"
+   d="scan'208";a="552344222"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2022 11:50:11 -0800
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2022 11:50:12 -0800
 From:   isaku.yamahata@intel.com
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
@@ -43,9 +43,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Jim Mattson <jmattson@google.com>, erdemaktas@google.com,
         Connor Kuehl <ckuehl@redhat.com>,
         Sean Christopherson <seanjc@google.com>
-Subject: [RFC PATCH v5 019/104] KVM: TDX: Stub in tdx.h with structs, accessors, and VMCS helpers
-Date:   Fri,  4 Mar 2022 11:48:35 -0800
-Message-Id: <a65fbef6b002d030e43452010457f922dd33d468.1646422845.git.isaku.yamahata@intel.com>
+Subject: [RFC PATCH v5 020/104] KVM: TDX: allocate per-package mutex
+Date:   Fri,  4 Mar 2022 11:48:36 -0800
+Message-Id: <f7b44d1d5a61f788294c399b63b505b3ff4d301b.1646422845.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1646422845.git.isaku.yamahata@intel.com>
 References: <cover.1646422845.git.isaku.yamahata@intel.com>
@@ -61,145 +61,114 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Sean Christopherson <sean.j.christopherson@intel.com>
+From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Stub in kvm_tdx, vcpu_tdx, and their various accessors.  TDX defines
-SEAMCALL APIs to access TDX control structures corresponding to the VMX
-VMCS.  Introduce helper accessors to hide its SEAMCALL ABI details.
+Several TDX SEAMCALLs are per-package scope (concretely per memory
+controller) and they need to be serialized per-package.  Allocate mutex for
+it.
 
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/vmx/tdx.h | 101 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 101 insertions(+)
+ arch/x86/kvm/vmx/main.c    |  8 +++++++-
+ arch/x86/kvm/vmx/tdx.c     | 18 ++++++++++++++++++
+ arch/x86/kvm/vmx/x86_ops.h |  2 ++
+ 3 files changed, 27 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-index 616fbf79b129..e4bb8831764e 100644
---- a/arch/x86/kvm/vmx/tdx.h
-+++ b/arch/x86/kvm/vmx/tdx.h
-@@ -3,14 +3,29 @@
- #define __KVM_X86_TDX_H
- 
- #ifdef CONFIG_INTEL_TDX_HOST
-+
-+#include "tdx_ops.h"
-+
- int tdx_module_setup(void);
- 
-+struct tdx_td_page {
-+	unsigned long va;
-+	hpa_t pa;
-+	bool added;
-+};
-+
- struct kvm_tdx {
- 	struct kvm kvm;
-+
-+	struct tdx_td_page tdr;
-+	struct tdx_td_page *tdcs;
- };
- 
- struct vcpu_tdx {
- 	struct kvm_vcpu	vcpu;
-+
-+	struct tdx_td_page tdvpr;
-+	struct tdx_td_page *tdvpx;
- };
- 
- static inline bool is_td(struct kvm *kvm)
-@@ -32,6 +47,92 @@ static inline struct vcpu_tdx *to_tdx(struct kvm_vcpu *vcpu)
- {
- 	return container_of(vcpu, struct vcpu_tdx, vcpu);
+diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+index 8103d1c32cc9..6111c6485d8e 100644
+--- a/arch/x86/kvm/vmx/main.c
++++ b/arch/x86/kvm/vmx/main.c
+@@ -25,6 +25,12 @@ static __init int vt_hardware_setup(void)
+ 	return 0;
  }
-+
-+static __always_inline void tdvps_vmcs_check(u32 field, u8 bits)
-+{
-+	BUILD_BUG_ON_MSG(__builtin_constant_p(field) && (field) & 0x1,
-+			 "Read/Write to TD VMCS *_HIGH fields not supported");
-+
-+	BUILD_BUG_ON(bits != 16 && bits != 32 && bits != 64);
-+
-+	BUILD_BUG_ON_MSG(bits != 64 && __builtin_constant_p(field) &&
-+			 (((field) & 0x6000) == 0x2000 ||
-+			  ((field) & 0x6000) == 0x6000),
-+			 "Invalid TD VMCS access for 64-bit field");
-+	BUILD_BUG_ON_MSG(bits != 32 && __builtin_constant_p(field) &&
-+			 ((field) & 0x6000) == 0x4000,
-+			 "Invalid TD VMCS access for 32-bit field");
-+	BUILD_BUG_ON_MSG(bits != 16 && __builtin_constant_p(field) &&
-+			 ((field) & 0x6000) == 0x0000,
-+			 "Invalid TD VMCS access for 16-bit field");
-+}
-+
-+static __always_inline void tdvps_state_non_arch_check(u64 field, u8 bits) {}
-+static __always_inline void tdvps_management_check(u64 field, u8 bits) {}
-+
-+#define TDX_BUILD_TDVPS_ACCESSORS(bits, uclass, lclass)				\
-+static __always_inline u##bits td_##lclass##_read##bits(struct vcpu_tdx *tdx,	\
-+							u32 field)		\
-+{										\
-+	struct tdx_module_output out;						\
-+	u64 err;								\
-+										\
-+	tdvps_##lclass##_check(field, bits);					\
-+	err = tdh_vp_rd(tdx->tdvpr.pa, TDVPS_##uclass(field), &out);		\
-+	if (unlikely(err)) {							\
-+		pr_err("TDH_VP_RD["#uclass".0x%x] failed: 0x%llx\n",		\
-+		       field, err);						\
-+		return 0;							\
-+	}									\
-+	return (u##bits)out.r8;							\
-+}										\
-+static __always_inline void td_##lclass##_write##bits(struct vcpu_tdx *tdx,	\
-+						      u32 field, u##bits val)	\
-+{										\
-+	struct tdx_module_output out;						\
-+	u64 err;								\
-+										\
-+	tdvps_##lclass##_check(field, bits);					\
-+	err = tdh_vp_wr(tdx->tdvpr.pa, TDVPS_##uclass(field), val,		\
-+		      GENMASK_ULL(bits - 1, 0), &out);				\
-+	if (unlikely(err))							\
-+		pr_err("TDH_VP_WR["#uclass".0x%x] = 0x%llx failed: 0x%llx\n",	\
-+		       field, (u64)val, err);					\
-+}										\
-+static __always_inline void td_##lclass##_setbit##bits(struct vcpu_tdx *tdx,	\
-+						       u32 field, u64 bit)	\
-+{										\
-+	struct tdx_module_output out;						\
-+	u64 err;								\
-+										\
-+	tdvps_##lclass##_check(field, bits);					\
-+	err = tdh_vp_wr(tdx->tdvpr.pa, TDVPS_##uclass(field), bit, bit,		\
-+			&out);							\
-+	if (unlikely(err))							\
-+		pr_err("TDH_VP_WR["#uclass".0x%x] |= 0x%llx failed: 0x%llx\n",	\
-+		       field, bit, err);					\
-+}										\
-+static __always_inline void td_##lclass##_clearbit##bits(struct vcpu_tdx *tdx,	\
-+							 u32 field, u64 bit)	\
-+{										\
-+	struct tdx_module_output out;						\
-+	u64 err;								\
-+										\
-+	tdvps_##lclass##_check(field, bits);					\
-+	err = tdh_vp_wr(tdx->tdvpr.pa, TDVPS_##uclass(field), 0, bit,		\
-+			&out);							\
-+	if (unlikely(err))							\
-+		pr_err("TDH_VP_WR["#uclass".0x%x] &= ~0x%llx failed: 0x%llx\n",	\
-+		       field, bit,  err);					\
-+}
-+
-+TDX_BUILD_TDVPS_ACCESSORS(16, VMCS, vmcs);
-+TDX_BUILD_TDVPS_ACCESSORS(32, VMCS, vmcs);
-+TDX_BUILD_TDVPS_ACCESSORS(64, VMCS, vmcs);
-+
-+TDX_BUILD_TDVPS_ACCESSORS(64, STATE_NON_ARCH, state_non_arch);
-+TDX_BUILD_TDVPS_ACCESSORS(8, MANAGEMENT, management);
-+
- #else
- static inline int tdx_module_setup(void) { return -ENODEV; };
  
++static void vt_hardware_unsetup(void)
++{
++	tdx_hardware_unsetup();
++	vmx_hardware_unsetup();
++}
++
+ static int vt_vm_init(struct kvm *kvm)
+ {
+ 	int ret;
+@@ -42,7 +48,7 @@ static int vt_vm_init(struct kvm *kvm)
+ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	.name = "kvm_intel",
+ 
+-	.hardware_unsetup = vmx_hardware_unsetup,
++	.hardware_unsetup = vt_hardware_unsetup,
+ 
+ 	.hardware_enable = vmx_hardware_enable,
+ 	.hardware_disable = vmx_hardware_disable,
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index e8d293a3c11c..1c8222f54764 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -34,6 +34,8 @@ struct tdx_capabilities {
+ /* Capabilities of KVM + the TDX module. */
+ struct tdx_capabilities tdx_caps;
+ 
++static struct mutex *tdx_mng_key_config_lock;
++
+ static u64 hkid_mask __ro_after_init;
+ static u8 hkid_start_pos __ro_after_init;
+ 
+@@ -112,7 +114,9 @@ bool tdx_is_vm_type_supported(unsigned long type)
+ 
+ static int __init __tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
+ {
++	int max_pkgs;
+ 	u32 max_pa;
++	int i;
+ 
+ 	if (!enable_ept) {
+ 		pr_warn("Cannot enable TDX with EPT disabled\n");
+@@ -127,6 +131,14 @@ static int __init __tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
+ 	if (WARN_ON_ONCE(x86_ops->tlb_remote_flush))
+ 		return -EIO;
+ 
++	max_pkgs = topology_max_packages();
++	tdx_mng_key_config_lock = kcalloc(max_pkgs, sizeof(*tdx_mng_key_config_lock),
++				   GFP_KERNEL);
++	if (!tdx_mng_key_config_lock)
++		return -ENOMEM;
++	for (i = 0; i < max_pkgs; i++)
++		mutex_init(&tdx_mng_key_config_lock[i]);
++
+ 	max_pa = cpuid_eax(0x80000008) & 0xff;
+ 	hkid_start_pos = boot_cpu_data.x86_phys_bits;
+ 	hkid_mask = GENMASK_ULL(max_pa - 1, hkid_start_pos);
+@@ -147,6 +159,12 @@ void __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
+ 		enable_tdx = false;
+ }
+ 
++void tdx_hardware_unsetup(void)
++{
++	/* kfree accepts NULL. */
++	kfree(tdx_mng_key_config_lock);
++}
++
+ void __init tdx_pre_kvm_init(unsigned int *vcpu_size,
+ 			unsigned int *vcpu_align, unsigned int *vm_size)
+ {
+diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+index 78331dbc29f7..da32b4b86b19 100644
+--- a/arch/x86/kvm/vmx/x86_ops.h
++++ b/arch/x86/kvm/vmx/x86_ops.h
+@@ -131,11 +131,13 @@ void __init tdx_pre_kvm_init(unsigned int *vcpu_size,
+ 			unsigned int *vcpu_align, unsigned int *vm_size);
+ bool tdx_is_vm_type_supported(unsigned long type);
+ void __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops);
++void tdx_hardware_unsetup(void);
+ #else
+ static inline void tdx_pre_kvm_init(
+ 	unsigned int *vcpu_size, unsigned int *vcpu_align, unsigned int *vm_size) {}
+ static inline bool tdx_is_vm_type_supported(unsigned long type) { return false; }
+ static inline void tdx_hardware_setup(struct kvm_x86_ops *x86_ops) {}
++static inline void tdx_hardware_unsetup(void) {}
+ #endif
+ 
+ #endif /* __KVM_X86_VMX_X86_OPS_H */
 -- 
 2.25.1
 
