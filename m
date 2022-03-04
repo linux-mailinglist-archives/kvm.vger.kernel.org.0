@@ -2,156 +2,247 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 13FB84CD116
-	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 10:34:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EC5D04CD11A
+	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 10:34:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237128AbiCDJev (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Mar 2022 04:34:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49626 "EHLO
+        id S237189AbiCDJf1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Mar 2022 04:35:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237101AbiCDJes (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Mar 2022 04:34:48 -0500
-Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FA7C7307E;
-        Fri,  4 Mar 2022 01:34:00 -0800 (PST)
-Received: by mail-pg1-x532.google.com with SMTP id 195so7052047pgc.6;
-        Fri, 04 Mar 2022 01:34:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=7kG/4jNg30O3RBzSCq3xXYHo00QAqmedsNutACfp6hA=;
-        b=CcIHm4K4/7KEooDqN9Z59x66bZcRdW9yFagz6fG35MvcU3uIcQMHS2WqCuSPpR+tyH
-         yonLKU056gXGAP1bQBAh3nq5P88Na4x24Y1N9k8zOgl4/m1wro093TLIb/89rHt3oHNB
-         YTZ0c0fjFivHq5IyCYW0NLZP5vJUF84PMFWcSFvhepozjdL1e40dRkdrK5316JGZXW6W
-         5ReMM1FsYYcxyHRa4jf5m8jX/ajvnm8tNEFi1QVtyCCqZ5XvD675pFrNnNaxHzetQvMW
-         sOW4X0QepNKRoNs9UO4iYGZ2cZPX86ThcKm3iuUnYhAYa6gx85uZXFvC7WcG9ZRvTjfa
-         h7xQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=7kG/4jNg30O3RBzSCq3xXYHo00QAqmedsNutACfp6hA=;
-        b=3FgVW4Ry/13DgGp4g9n2cASXhKw/2kc2gjUQdG/3cUZPl+zZSqRjiySbr74OHCIn05
-         S5pzg4esbKWg95NEVBzWZVloDBDsEgWUADLVqi9xsL1RxdgOxpVlXX/MYvIpNDIv0ums
-         6TDQl078ik6o3aHl/9U9ryDEy79FZtDhb+o2pX2tHGDIL60BNc3pZcBrw7NfvMKL0LrH
-         YMop9uY85jHaXhu2iAxtP9o0UUOsPCEre2NZUn8sPhFw8NWZlRpKh98fnOpYWdtTyAkG
-         7QnYliVcThcvcW69vaw/W3C+vjKBgerKxGl1R2JfWsqOPq9AViwfM6Z/QOyP8j0bscfc
-         9dCg==
-X-Gm-Message-State: AOAM5333jB91oiCbq93MQ7/w2Ucg6bxZswdhIXtPnI7NLJqQM3hlhW3H
-        KekYYhkww8NLOoWbzy1Cnvk=
-X-Google-Smtp-Source: ABdhPJzbawIwb3kOA+tmlRwyGrpSUS7I14fMVPrdV7vkHpvdc/hE0DAELR6bAeFuA5vUS/Mx2l6s2g==
-X-Received: by 2002:a65:6941:0:b0:372:b6bc:4328 with SMTP id w1-20020a656941000000b00372b6bc4328mr33897838pgq.106.1646386439515;
-        Fri, 04 Mar 2022 01:33:59 -0800 (PST)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id g7-20020a056a000b8700b004e1bed5c3bfsm5179790pfj.68.2022.03.04.01.33.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Mar 2022 01:33:59 -0800 (PST)
-Message-ID: <e1dd4d82-b5d8-fdae-325b-75ba690eaf2e@gmail.com>
-Date:   Fri, 4 Mar 2022 17:33:47 +0800
+        with ESMTP id S235351AbiCDJf0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Mar 2022 04:35:26 -0500
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC46E8F9B6;
+        Fri,  4 Mar 2022 01:34:37 -0800 (PST)
+Received: from canpemm500005.china.huawei.com (unknown [172.30.72.53])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4K92cx6QR7z1GCNS;
+        Fri,  4 Mar 2022 17:29:53 +0800 (CST)
+Received: from [10.67.103.22] (10.67.103.22) by canpemm500005.china.huawei.com
+ (7.192.104.229) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.21; Fri, 4 Mar
+ 2022 17:34:36 +0800
+Message-ID: <e0ccebeb-b5ff-5bb7-87c9-c453eb71fa3f@hisilicon.com>
+Date:   Fri, 4 Mar 2022 17:34:35 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.6.1
-Subject: Re: [PATCH 3/3] KVM: x86/pmu: Segregate Intel and AMD specific logic
-Content-Language: en-US
-To:     Jim Mattson <jmattson@google.com>,
-        Ravi Bangoria <ravi.bangoria@amd.com>
-Cc:     seanjc@google.com, dave.hansen@linux.intel.com,
-        peterz@infradead.org, alexander.shishkin@linux.intel.com,
-        eranian@google.com, daviddunn@google.com, ak@linux.intel.com,
-        kan.liang@linux.intel.com, x86@kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kim.phillips@amd.com,
-        santosh.shukla@amd.com,
-        "Paolo Bonzini - Distinguished Engineer (kernel-recipes.org) (KVM HoF)" 
-        <pbonzini@redhat.com>
-References: <20220221073140.10618-1-ravi.bangoria@amd.com>
- <20220221073140.10618-4-ravi.bangoria@amd.com>
- <1e0fc70a-1135-1845-b534-79f409e0c29d@gmail.com>
- <80fce7df-d387-773d-ad7d-3540c2d411d1@amd.com>
- <CALMp9eQtW6SWG83rJa0jKt7ciHPiRbvEyCi2CDNkQ-FJC+ZLjA@mail.gmail.com>
- <54d94539-a14f-49d7-e4f3-092f76045b33@amd.com>
- <CALMp9eTTpdtsEek17-EnSZu53-+LmwcSTYmou1+u34LdT3TMmQ@mail.gmail.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-Organization: Tencent
-In-Reply-To: <CALMp9eTTpdtsEek17-EnSZu53-+LmwcSTYmou1+u34LdT3TMmQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.1
+Subject: Re: [PATCH v8 3/9] hisi_acc_qm: Move VF PCI device IDs to common
+ header
+To:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>
+CC:     <linux-pci@vger.kernel.org>, <alex.williamson@redhat.com>,
+        <jgg@nvidia.com>, <cohuck@redhat.com>, <mgurtovoy@nvidia.com>,
+        <yishaih@nvidia.com>, <linuxarm@huawei.com>,
+        <liulongfang@huawei.com>, <prime.zeng@hisilicon.com>,
+        <jonathan.cameron@huawei.com>
+References: <20220303230131.2103-1-shameerali.kolothum.thodi@huawei.com>
+ <20220303230131.2103-4-shameerali.kolothum.thodi@huawei.com>
+From:   Zhou Wang <wangzhou1@hisilicon.com>
+In-Reply-To: <20220303230131.2103-4-shameerali.kolothum.thodi@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Originating-IP: [10.67.103.22]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ canpemm500005.china.huawei.com (7.192.104.229)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/3/2022 2:05 am, Jim Mattson wrote:
-> On Thu, Mar 3, 2022 at 8:25 AM Ravi Bangoria <ravi.bangoria@amd.com> wrote:
->>
->>
->>
->> On 03-Mar-22 10:08 AM, Jim Mattson wrote:
->>> On Mon, Feb 21, 2022 at 2:02 AM Ravi Bangoria <ravi.bangoria@amd.com> wrote:
->>>>
->>>>
->>>>
->>>> On 21-Feb-22 1:27 PM, Like Xu wrote:
->>>>> On 21/2/2022 3:31 pm, Ravi Bangoria wrote:
->>>>>>    void reprogram_counter(struct kvm_pmu *pmu, int pmc_idx)
->>>>>>    {
->>>>>>        struct kvm_pmc *pmc = kvm_x86_ops.pmu_ops->pmc_idx_to_pmc(pmu, pmc_idx);
->>>>>> +    bool is_intel = !strncmp(kvm_x86_ops.name, "kvm_intel", 9);
->>>>>
->>>>> How about using guest_cpuid_is_intel(vcpu)
->>>>
->>>> Yeah, that's better then strncmp().
->>>>
->>>>> directly in the reprogram_gp_counter() ?
->>>>
->>>> We need this flag in reprogram_fixed_counter() as well.
->>>
->>> Explicit "is_intel" checks in any form seem clumsy,
->>
->> Indeed. However introducing arch specific callback for such tiny
->> logic seemed overkill to me. So thought to just do it this way.
+> Move the PCI Device IDs of HiSilicon ACC VF devices to a common heade> and also use a uniform naming convention.
 > 
-> I agree that arch-specific callbacks are ridiculous for these distinctions.
+> This will be useful when we introduce the vfio PCI HiSilicon ACC live
+> migration driver in subsequent patches.
 > 
->>> since we have
->>> already put some effort into abstracting away the implementation
->>> differences in struct kvm_pmu. It seems like these differences could
->>> be handled by adding three masks to that structure: the "raw event
->>> mask" (i.e. event selector and unit mask), the hsw_in_tx mask, and the
->>> hsw_in_tx_checkpointed mask.
->>
->> struct kvm_pmu is arch independent. You mean struct kvm_pmu_ops?
-> 
-> No; I meant exactly what I said. See, for example, how the
-> reserved_bits field is used. It is initialized in the vendor-specific
-> pmu_refresh functions, and from then on, it facilitates
-> vendor-specific behaviors without explicit checks or vendor-specific
-> callbacks. An eventsel_mask field would be a natural addition to this
-> structure, to deal with the vendor-specific event selector widths. The
-> hsw_in_tx_mask and hsw_in_tx_checkpointed_mask fields are less
-> natural, since they will be 0 on AMD, but they would make it simple to
-> write the corresponding code in a vendor-neutral fashion.
-> 
-> BTW, am I the only one who finds the HSW_ prefixes a bit absurd here,
-> since TSX was never functional on Haswell?
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 
-The TSX story has more twists and turns, but we may start with 3a632cb229bf.
+Acked-by: Zhou Wang <wangzhou1@hisilicon.com>
 
+Best,
+Zhou
+
+> ---
+>  drivers/crypto/hisilicon/hpre/hpre_main.c | 13 ++++++-------
+>  drivers/crypto/hisilicon/sec2/sec_main.c  | 15 +++++++--------
+>  drivers/crypto/hisilicon/zip/zip_main.c   | 11 +++++------
+>  include/linux/pci_ids.h                   |  3 +++
+>  4 files changed, 21 insertions(+), 21 deletions(-)
 > 
->>>
->>> These changes should also be coordinated with Like's series that
->>> eliminates all of the PERF_TYPE_HARDWARE nonsense.
->>
->> I'll rebase this on Like's patch series.
-
-I could take over 3nd patch w/ Co-developed-by and move on if Ravi agrees.
-
+> diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
+> index ebfab3e14499..3589d8879b5e 100644
+> --- a/drivers/crypto/hisilicon/hpre/hpre_main.c
+> +++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
+> @@ -68,8 +68,7 @@
+>  #define HPRE_REG_RD_INTVRL_US		10
+>  #define HPRE_REG_RD_TMOUT_US		1000
+>  #define HPRE_DBGFS_VAL_MAX_LEN		20
+> -#define HPRE_PCI_DEVICE_ID		0xa258
+> -#define HPRE_PCI_VF_DEVICE_ID		0xa259
+> +#define PCI_DEVICE_ID_HUAWEI_HPRE_PF	0xa258
+>  #define HPRE_QM_USR_CFG_MASK		GENMASK(31, 1)
+>  #define HPRE_QM_AXI_CFG_MASK		GENMASK(15, 0)
+>  #define HPRE_QM_VFG_AX_MASK		GENMASK(7, 0)
+> @@ -111,8 +110,8 @@
+>  static const char hpre_name[] = "hisi_hpre";
+>  static struct dentry *hpre_debugfs_root;
+>  static const struct pci_device_id hpre_dev_ids[] = {
+> -	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, HPRE_PCI_DEVICE_ID) },
+> -	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, HPRE_PCI_VF_DEVICE_ID) },
+> +	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_HUAWEI_HPRE_PF) },
+> +	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_HUAWEI_HPRE_VF) },
+>  	{ 0, }
+>  };
+>  
+> @@ -242,7 +241,7 @@ MODULE_PARM_DESC(uacce_mode, UACCE_MODE_DESC);
+>  
+>  static int pf_q_num_set(const char *val, const struct kernel_param *kp)
+>  {
+> -	return q_num_set(val, kp, HPRE_PCI_DEVICE_ID);
+> +	return q_num_set(val, kp, PCI_DEVICE_ID_HUAWEI_HPRE_PF);
+>  }
+>  
+>  static const struct kernel_param_ops hpre_pf_q_num_ops = {
+> @@ -921,7 +920,7 @@ static int hpre_debugfs_init(struct hisi_qm *qm)
+>  	qm->debug.sqe_mask_len = HPRE_SQE_MASK_LEN;
+>  	hisi_qm_debug_init(qm);
+>  
+> -	if (qm->pdev->device == HPRE_PCI_DEVICE_ID) {
+> +	if (qm->pdev->device == PCI_DEVICE_ID_HUAWEI_HPRE_PF) {
+>  		ret = hpre_ctrl_debug_init(qm);
+>  		if (ret)
+>  			goto failed_to_create;
+> @@ -958,7 +957,7 @@ static int hpre_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
+>  	qm->sqe_size = HPRE_SQE_SIZE;
+>  	qm->dev_name = hpre_name;
+>  
+> -	qm->fun_type = (pdev->device == HPRE_PCI_DEVICE_ID) ?
+> +	qm->fun_type = (pdev->device == PCI_DEVICE_ID_HUAWEI_HPRE_PF) ?
+>  			QM_HW_PF : QM_HW_VF;
+>  	if (qm->fun_type == QM_HW_PF) {
+>  		qm->qp_base = HPRE_PF_DEF_Q_BASE;
+> diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
+> index 26d3ab1d308b..311a8747b5bf 100644
+> --- a/drivers/crypto/hisilicon/sec2/sec_main.c
+> +++ b/drivers/crypto/hisilicon/sec2/sec_main.c
+> @@ -20,8 +20,7 @@
+>  
+>  #define SEC_VF_NUM			63
+>  #define SEC_QUEUE_NUM_V1		4096
+> -#define SEC_PF_PCI_DEVICE_ID		0xa255
+> -#define SEC_VF_PCI_DEVICE_ID		0xa256
+> +#define PCI_DEVICE_ID_HUAWEI_SEC_PF	0xa255
+>  
+>  #define SEC_BD_ERR_CHK_EN0		0xEFFFFFFF
+>  #define SEC_BD_ERR_CHK_EN1		0x7ffff7fd
+> @@ -225,7 +224,7 @@ static const struct debugfs_reg32 sec_dfx_regs[] = {
+>  
+>  static int sec_pf_q_num_set(const char *val, const struct kernel_param *kp)
+>  {
+> -	return q_num_set(val, kp, SEC_PF_PCI_DEVICE_ID);
+> +	return q_num_set(val, kp, PCI_DEVICE_ID_HUAWEI_SEC_PF);
+>  }
+>  
+>  static const struct kernel_param_ops sec_pf_q_num_ops = {
+> @@ -313,8 +312,8 @@ module_param_cb(uacce_mode, &sec_uacce_mode_ops, &uacce_mode, 0444);
+>  MODULE_PARM_DESC(uacce_mode, UACCE_MODE_DESC);
+>  
+>  static const struct pci_device_id sec_dev_ids[] = {
+> -	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, SEC_PF_PCI_DEVICE_ID) },
+> -	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, SEC_VF_PCI_DEVICE_ID) },
+> +	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_HUAWEI_SEC_PF) },
+> +	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_HUAWEI_SEC_VF) },
+>  	{ 0, }
+>  };
+>  MODULE_DEVICE_TABLE(pci, sec_dev_ids);
+> @@ -717,7 +716,7 @@ static int sec_core_debug_init(struct hisi_qm *qm)
+>  	regset->base = qm->io_base;
+>  	regset->dev = dev;
+>  
+> -	if (qm->pdev->device == SEC_PF_PCI_DEVICE_ID)
+> +	if (qm->pdev->device == PCI_DEVICE_ID_HUAWEI_SEC_PF)
+>  		debugfs_create_file("regs", 0444, tmp_d, regset, &sec_regs_fops);
+>  
+>  	for (i = 0; i < ARRAY_SIZE(sec_dfx_labels); i++) {
+> @@ -735,7 +734,7 @@ static int sec_debug_init(struct hisi_qm *qm)
+>  	struct sec_dev *sec = container_of(qm, struct sec_dev, qm);
+>  	int i;
+>  
+> -	if (qm->pdev->device == SEC_PF_PCI_DEVICE_ID) {
+> +	if (qm->pdev->device == PCI_DEVICE_ID_HUAWEI_SEC_PF) {
+>  		for (i = SEC_CLEAR_ENABLE; i < SEC_DEBUG_FILE_NUM; i++) {
+>  			spin_lock_init(&sec->debug.files[i].lock);
+>  			sec->debug.files[i].index = i;
+> @@ -877,7 +876,7 @@ static int sec_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
+>  	qm->sqe_size = SEC_SQE_SIZE;
+>  	qm->dev_name = sec_name;
+>  
+> -	qm->fun_type = (pdev->device == SEC_PF_PCI_DEVICE_ID) ?
+> +	qm->fun_type = (pdev->device == PCI_DEVICE_ID_HUAWEI_SEC_PF) ?
+>  			QM_HW_PF : QM_HW_VF;
+>  	if (qm->fun_type == QM_HW_PF) {
+>  		qm->qp_base = SEC_PF_DEF_Q_BASE;
+> diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
+> index 678f8b58ec42..66decfe07282 100644
+> --- a/drivers/crypto/hisilicon/zip/zip_main.c
+> +++ b/drivers/crypto/hisilicon/zip/zip_main.c
+> @@ -15,8 +15,7 @@
+>  #include <linux/uacce.h>
+>  #include "zip.h"
+>  
+> -#define PCI_DEVICE_ID_ZIP_PF		0xa250
+> -#define PCI_DEVICE_ID_ZIP_VF		0xa251
+> +#define PCI_DEVICE_ID_HUAWEI_ZIP_PF	0xa250
+>  
+>  #define HZIP_QUEUE_NUM_V1		4096
+>  
+> @@ -246,7 +245,7 @@ MODULE_PARM_DESC(uacce_mode, UACCE_MODE_DESC);
+>  
+>  static int pf_q_num_set(const char *val, const struct kernel_param *kp)
+>  {
+> -	return q_num_set(val, kp, PCI_DEVICE_ID_ZIP_PF);
+> +	return q_num_set(val, kp, PCI_DEVICE_ID_HUAWEI_ZIP_PF);
+>  }
+>  
+>  static const struct kernel_param_ops pf_q_num_ops = {
+> @@ -268,8 +267,8 @@ module_param_cb(vfs_num, &vfs_num_ops, &vfs_num, 0444);
+>  MODULE_PARM_DESC(vfs_num, "Number of VFs to enable(1-63), 0(default)");
+>  
+>  static const struct pci_device_id hisi_zip_dev_ids[] = {
+> -	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_ZIP_PF) },
+> -	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_ZIP_VF) },
+> +	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_HUAWEI_ZIP_PF) },
+> +	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_HUAWEI_ZIP_VF) },
+>  	{ 0, }
+>  };
+>  MODULE_DEVICE_TABLE(pci, hisi_zip_dev_ids);
+> @@ -838,7 +837,7 @@ static int hisi_zip_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
+>  	qm->sqe_size = HZIP_SQE_SIZE;
+>  	qm->dev_name = hisi_zip_name;
+>  
+> -	qm->fun_type = (pdev->device == PCI_DEVICE_ID_ZIP_PF) ?
+> +	qm->fun_type = (pdev->device == PCI_DEVICE_ID_HUAWEI_ZIP_PF) ?
+>  			QM_HW_PF : QM_HW_VF;
+>  	if (qm->fun_type == QM_HW_PF) {
+>  		qm->qp_base = HZIP_PF_DEF_Q_BASE;
+> diff --git a/include/linux/pci_ids.h b/include/linux/pci_ids.h
+> index aad54c666407..31dee2b65a62 100644
+> --- a/include/linux/pci_ids.h
+> +++ b/include/linux/pci_ids.h
+> @@ -2529,6 +2529,9 @@
+>  #define PCI_DEVICE_ID_KORENIX_JETCARDF3	0x17ff
+>  
+>  #define PCI_VENDOR_ID_HUAWEI		0x19e5
+> +#define PCI_DEVICE_ID_HUAWEI_ZIP_VF	0xa251
+> +#define PCI_DEVICE_ID_HUAWEI_SEC_VF	0xa256
+> +#define PCI_DEVICE_ID_HUAWEI_HPRE_VF	0xa259
+>  
+>  #define PCI_VENDOR_ID_NETRONOME		0x19ee
+>  #define PCI_DEVICE_ID_NETRONOME_NFP4000	0x4000
 > 
-> That's not exactly what I meant, but okay.
