@@ -2,117 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B00F94CD198
-	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 10:48:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 493584CD1B9
+	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 10:55:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239427AbiCDJs5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Mar 2022 04:48:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56074 "EHLO
+        id S239448AbiCDJ4F (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Mar 2022 04:56:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48110 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239390AbiCDJrz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Mar 2022 04:47:55 -0500
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF8861A6366;
-        Fri,  4 Mar 2022 01:47:07 -0800 (PST)
-Received: by mail-pj1-x1031.google.com with SMTP id mg21-20020a17090b371500b001bef9e4657cso6825769pjb.0;
-        Fri, 04 Mar 2022 01:47:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=JCaur61bPmGU642Xi+wX8g5Kkw4epev4yyqUyqMyUgo=;
-        b=iIP5DQIxcFkCC40dzVlvMR+bQcoEFoIZZEKMDIpPtw9DzueFwDpNqHq7nx5uOU2RKD
-         Kmbu9BWhhW6d/xlPbGgK27PsK9DEjorJymeRj9cVIhvtMbUPCKr7qOLcFJpuh6Z2IvlW
-         nTvlVsltppXhGf68h4Ge3KgnhytfPBErhgjmLBgcgtHllPglJipNR9I4EDz262I57ZOi
-         u2576Hb8VwwXX6FcmDjWqUqrCgcyIsOXcYVXoJXq4sn+yi0NFcAGxyBm+1mmpWd9vXT0
-         SiRTAyKWdxkO4as13PBq+ozS1S8VxLK2a5GTkC4fl/3L83BcAJBgA93TatetX8wfLAo5
-         ptCw==
+        with ESMTP id S239430AbiCDJ4B (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Mar 2022 04:56:01 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3784DA41AE
+        for <kvm@vger.kernel.org>; Fri,  4 Mar 2022 01:55:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646387712;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=m/28R4qLiomcMPqm8kqlF7h66zN6UfIf8KZF8W80+TY=;
+        b=ECYJTjII5tkGSnTyyKdn/t1kZFO/JiMzrBSNPEM/k4zyvME1bNYTNgSextzzNZ2B/cfiGn
+        goamefYS5KUGaLKddN5TkW01iRc1xFyqiSvsUkL1+aalfxOQLJzTd6PM3uMsPpIxBIGTp7
+        NxH7nGQR90kztw0biGduivednArKBSI=
+Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
+ [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-386-QqVpD2h1NQyAW9ATWzxLBw-1; Fri, 04 Mar 2022 04:55:11 -0500
+X-MC-Unique: QqVpD2h1NQyAW9ATWzxLBw-1
+Received: by mail-lf1-f71.google.com with SMTP id b25-20020a0565120b9900b00445bcbc7cc3so2534985lfv.6
+        for <kvm@vger.kernel.org>; Fri, 04 Mar 2022 01:55:11 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=JCaur61bPmGU642Xi+wX8g5Kkw4epev4yyqUyqMyUgo=;
-        b=5QK7QSOT6XqYStGR4VIcYzTKsU6iMo8gnVcfAGTv0+4Va1gOEUcqo4nslczKQs0Vag
-         ExM/8S7Ulr0zmo3d6IiPdSNBQ9hsFeEEDmURDZeYdodAfFW8VcC6pQYPf7RZTm9nrab0
-         FpAoEznE/v6KAxlvwsImQzAV5Wlh+C7bFhhy+cgu2SH0KH99kwPbRT6ghGQ8lR6F9SWG
-         yvVkQlU3iRcqvWFUh6xjVHm1mkf1QJSQPsy2b6cxad261NUUGlYYc10G6CEt54/CpI2p
-         sczXzNcOv8MU5WgHUSUG4NokmbLs5TCuUk7cA2kekAGq+xGObqPoxdPZBmm//pfDZU9/
-         gd+w==
-X-Gm-Message-State: AOAM533a6ngqVgzOxFDh+pp07aIenVhrejU+jgDXH1J6X9Ydr/bZTU1+
-        q+RrrtKJo08UEm6Z/BlWXgk=
-X-Google-Smtp-Source: ABdhPJyEw3XfasQbL/436tU6ks+U/nx8BEU7zmbXuhjGMA8iklsqeWN2LmpLXi2CimNSdbfLtlPyZA==
-X-Received: by 2002:a17:902:b697:b0:151:4c2e:48be with SMTP id c23-20020a170902b69700b001514c2e48bemr30634893pls.70.1646387227488;
-        Fri, 04 Mar 2022 01:47:07 -0800 (PST)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id 16-20020a056a00073000b004dfe2217090sm5249920pfm.200.2022.03.04.01.47.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Mar 2022 01:47:07 -0800 (PST)
-Message-ID: <273a7631-188b-a7a9-a551-4e577dcdd8d1@gmail.com>
-Date:   Fri, 4 Mar 2022 17:46:58 +0800
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=m/28R4qLiomcMPqm8kqlF7h66zN6UfIf8KZF8W80+TY=;
+        b=TFjNzEUWxq4nG9rhO7cNoTfNpf0nHm9+B2zzERPWXO6jFSxmJJENUsNiMzPrqe5Rw5
+         SxF97C0Lf8cGz/M924jNS68wYR9FL2oqng6EHvJcdNKeKKDeqbsNa5FSz97jr97iyzMD
+         QVi3j4O7VViZJfoTdv/nEGMXrTtkykliWYbWom7nACIb9Se0Qtkcv9JCxaC88kasBbU8
+         tY5JQ/xvWWnrNzN6PLZ5cHtAxcdHMnIO/cA9/pZLJEqAtjHRJF96E+eCXsQy8Cpet3oK
+         EC0Tfg3mW1mwDrePGieIOYgpgwTUmseemsUzncOLgofZDqV51LrtKEpLB1EoMi9fbNWo
+         mobg==
+X-Gm-Message-State: AOAM533VebOZWxRHb1B1BEblDBE3kXxiQS1ARdGINlb3DBBlB/+4HWTU
+        55D4IeAgrKYfl7MEBCWHoMTKUWH+nCBKLG5XBdOKY5NXM+EC4P1x37q7HABm0It6kpH+f8uboWN
+        4QiLCYMMLnI6EJkEfJIQiTm7nTAmN
+X-Received: by 2002:a2e:9dcf:0:b0:246:3ff1:d770 with SMTP id x15-20020a2e9dcf000000b002463ff1d770mr25533597ljj.330.1646387709938;
+        Fri, 04 Mar 2022 01:55:09 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzIVUvPTZQTrJF/DAKSScLnIn2uD7l2XJ7Qf89pRTkwDeCrip5XsA/bOwodD7WRlPRyWFKePlZrlUJRKdMeuwk=
+X-Received: by 2002:a2e:9dcf:0:b0:246:3ff1:d770 with SMTP id
+ x15-20020a2e9dcf000000b002463ff1d770mr25533577ljj.330.1646387709718; Fri, 04
+ Mar 2022 01:55:09 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.6.1
-Subject: Re: [PATCH v2 12/12] KVM: x86/pmu: Clear reserved bit PERF_CTL2[43]
- for AMD erratum 1292
-Content-Language: en-US
-To:     Jim Mattson <jmattson@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org
-References: <20220302111334.12689-1-likexu@tencent.com>
- <20220302111334.12689-13-likexu@tencent.com>
- <CALMp9eT1N_HeipXjpyqrXs_WmBEip2vchy4d1GffpwrEd+444w@mail.gmail.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-Organization: Tencent
-In-Reply-To: <CALMp9eT1N_HeipXjpyqrXs_WmBEip2vchy4d1GffpwrEd+444w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <20201216064818.48239-1-jasowang@redhat.com> <20220224212314.1326-1-gdawar@xilinx.com>
+ <20220224212314.1326-8-gdawar@xilinx.com>
+In-Reply-To: <20220224212314.1326-8-gdawar@xilinx.com>
+From:   Eugenio Perez Martin <eperezma@redhat.com>
+Date:   Fri, 4 Mar 2022 10:54:33 +0100
+Message-ID: <CAJaqyWcAT05-MtOZkyiyNezSzEEmyyDdps0aWm7PMuyS4jqNdA@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 07/19] vdpa: introduce config operations for
+ associating ASID to a virtqueue group
+To:     Gautam Dawar <gautam.dawar@xilinx.com>
+Cc:     Gautam Dawar <gdawar@xilinx.com>,
+        Martin Petrus Hubertus Habets <martinh@xilinx.com>,
+        Harpreet Singh Anand <hanand@xilinx.com>, tanujk@xilinx.com,
+        Jason Wang <jasowang@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Zhu Lingshan <lingshan.zhu@intel.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Xie Yongji <xieyongji@bytedance.com>,
+        Eli Cohen <elic@nvidia.com>,
+        Si-Wei Liu <si-wei.liu@oracle.com>,
+        Parav Pandit <parav@nvidia.com>,
+        Longpeng <longpeng2@huawei.com>,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        linux-kernel@vger.kernel.org, kvm list <kvm@vger.kernel.org>,
+        netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/3/2022 1:52 am, Jim Mattson wrote:
-> On Wed, Mar 2, 2022 at 3:14 AM Like Xu <like.xu.linux@gmail.com> wrote:
->>
->> From: Like Xu <likexu@tencent.com>
->>
->> The AMD Family 19h Models 00h-0Fh Processors may experience sampling
->> inaccuracies that cause the following performance counters to overcount
->> retire-based events. To count the non-FP affected PMC events correctly,
->> a patched guest with a target vCPU model would:
->>
->>      - Use Core::X86::Msr::PERF_CTL2 to count the events, and
->>      - Program Core::X86::Msr::PERF_CTL2[43] to 1b, and
->>      - Program Core::X86::Msr::PERF_CTL2[20] to 0b.
->>
->> To support this use of AMD guests, KVM should not reserve bit 43
->> only for counter #2. Treatment of other cases remains unchanged.
->>
->> AMD hardware team clarified that the conditions under which the
->> overcounting can happen, is quite rare. This change may make those
->> PMU driver developers who have read errata #1292 less disappointed.
->>
->> Reported-by: Jim Mattson <jmattson@google.com>
->> Signed-off-by: Like Xu <likexu@tencent.com>
-> 
-> This seems unnecessarily convoluted. As I've said previously, KVM
-> should not ever synthesize a #GP for any value written to a
-> PerfEvtSeln MSR when emulating an AMD CPU.
+On Thu, Feb 24, 2022 at 10:25 PM Gautam Dawar <gautam.dawar@xilinx.com> wrote:
+>
+> This patch introduces a new bus operation to allow the vDPA bus driver
+> to associate an ASID to a virtqueue group.
+>
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> Signed-off-by: Gautam Dawar <gdawar@xilinx.com>
+> ---
+>  include/linux/vdpa.h | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
+>
+> diff --git a/include/linux/vdpa.h b/include/linux/vdpa.h
+> index de22ca1a8ef3..7386860c3995 100644
+> --- a/include/linux/vdpa.h
+> +++ b/include/linux/vdpa.h
+> @@ -239,6 +239,12 @@ struct vdpa_map_file {
+>   *                             @vdev: vdpa device
+>   *                             Returns the iova range supported by
+>   *                             the device.
+> + * @set_group_asid:            Set address space identifier for a
+> + *                             virtqueue group
+> + *                             @vdev: vdpa device
+> + *                             @group: virtqueue group
+> + *                             @asid: address space id for this group
+> + *                             Returns integer: success (0) or error (< 0)
+>   * @set_map:                   Set device memory mapping (optional)
+>   *                             Needed for device that using device
+>   *                             specific DMA translation (on-chip IOMMU)
+> @@ -321,6 +327,10 @@ struct vdpa_config_ops {
+>                        u64 iova, u64 size, u64 pa, u32 perm, void *opaque);
+>         int (*dma_unmap)(struct vdpa_device *vdev, unsigned int asid,
+>                          u64 iova, u64 size);
+> +       int (*set_group_asid)(struct vdpa_device *vdev, unsigned int group,
+> +                             unsigned int asid);
+> +
+> +
 
-IMO, we should "never synthesize a #GP" for all AMD MSRs,
-not just for AMD PMU msrs, or keep the status quo.
+Nit again, and Jason's patch already contained these, but I think
+these two blank lines are introduced unintentionally.
 
-I agree with you on this AMD #GP transition, but we need at least one
-kernel cycle to make a more radical change and we don't know Paolo's
-attitude and more, we haven't received a tidal wave of user complaints.
+>
+>         /* Free device resources */
+>         void (*free)(struct vdpa_device *vdev);
+> --
+> 2.25.0
+>
 
