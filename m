@@ -2,154 +2,237 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 82DBA4CD09E
-	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 10:03:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 249984CD0A0
+	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 10:04:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235538AbiCDJEV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Mar 2022 04:04:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50262 "EHLO
+        id S235582AbiCDJF3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Mar 2022 04:05:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54668 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231620AbiCDJES (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Mar 2022 04:04:18 -0500
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4ABAECEA0D;
-        Fri,  4 Mar 2022 01:03:29 -0800 (PST)
-Received: from canpemm500005.china.huawei.com (unknown [172.30.72.53])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4K91x03kyvz1GCL3;
-        Fri,  4 Mar 2022 16:58:44 +0800 (CST)
-Received: from [10.67.103.22] (10.67.103.22) by canpemm500005.china.huawei.com
- (7.192.104.229) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.21; Fri, 4 Mar
- 2022 17:03:26 +0800
-Message-ID: <e819f99e-ddc6-018a-3a8a-53804b7f58f1@hisilicon.com>
-Date:   Fri, 4 Mar 2022 17:03:20 +0800
+        with ESMTP id S231620AbiCDJF1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Mar 2022 04:05:27 -0500
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86BF8186210;
+        Fri,  4 Mar 2022 01:04:40 -0800 (PST)
+Received: by mail-pf1-x42d.google.com with SMTP id s8so3026854pfk.12;
+        Fri, 04 Mar 2022 01:04:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Gu1lL47chNkRKW/0EX4maSVv1jcEluCSVHl9MyFMKlM=;
+        b=n1ZGP5HObBhuas2FMR7g+d4c7//HYYcTZABO7MigoyAuDzksC5x+LoeU5N7Igu2NpH
+         rq+RHhMMP6sI2F49e05N2eauCxu09QozRYzrIK3ruG8s6T94Eg4jmdcl/eftzBfuMFiL
+         mNBL6g3yLYp0gDAeCwzhLjQOxILTDhdbla/UX6rLxbhDiEH+i9HFlkKNEH4HVVUVreCl
+         f+GPmFQ6sdyk4rX2neG0lQxAExSVTj4ImIHHNuilhR5sLpUnMsgnjwuzE+8uEoicQz5T
+         Hs+a/nwNjPAbiJvOIGNWs0Hiz1n/14qet9EzYKrPIYkTT9e1cpiT+e+o0jcD6SRj8BrR
+         FUGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Gu1lL47chNkRKW/0EX4maSVv1jcEluCSVHl9MyFMKlM=;
+        b=gfLJwsrbu5nsAoXyYnZ6vd/OSs5obCm/9ln5uhRjyi36qxh/cX5ikdnSb7QRhMnvgO
+         r4qYveLnaptWIub+EvohgPkwhQ5xV7sJXUYuMn6GVra4ah5lVWnY7iYW992BKCFyIYta
+         RYoNb0+WiRsVWDPC59U5KXp6ZxI2kRKu73sgGoE98Ai+sw/zGiERrd6MXGl35NXSDpfc
+         sOe4vsPJ5b+SRcewmSc7FMiEDGFt4KjiKyK7OQva1nKPxI+W1vBYUS5StCAvzZfkBU+8
+         ZF5D30pnZ0rX/8m8dy2ivx2CCKD4N63EXI86MVcKuaK2WpWK/Ct/TQ2TzCo1ACfdegSQ
+         S7RA==
+X-Gm-Message-State: AOAM533+/KRnPWR7m/SYyp20VFaXNk9Tz9Skm1wgFuhcvUHmWKTD2PAb
+        Pvx2pnTBAIllrR0sCK1UZmDmdI6/8OTlpP0a
+X-Google-Smtp-Source: ABdhPJyKNnFCqS7JabQJXvm6t4tlSaDw4/1FgyRtfncnxiXebvW35NHeGSxeU4KghPHxWs3fiHarKg==
+X-Received: by 2002:a65:4c0f:0:b0:373:f389:b7e0 with SMTP id u15-20020a654c0f000000b00373f389b7e0mr33033103pgq.411.1646384679983;
+        Fri, 04 Mar 2022 01:04:39 -0800 (PST)
+Received: from localhost.localdomain ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id j2-20020a655582000000b00372b2b5467asm4192968pgs.10.2022.03.04.01.04.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Mar 2022 01:04:39 -0800 (PST)
+From:   Like Xu <like.xu.linux@gmail.com>
+X-Google-Original-From: Like Xu <likexu@tencent.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v12 00/17] KVM: x86/pmu: Add *basic* support to enable guest PEBS via DS
+Date:   Fri,  4 Mar 2022 17:04:10 +0800
+Message-Id: <20220304090427.90888-1-likexu@tencent.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.1
-Subject: Re: [PATCH v8 1/9] crypto: hisilicon/qm: Move the QM header to
- include/linux
-To:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>
-CC:     <linux-pci@vger.kernel.org>, <alex.williamson@redhat.com>,
-        <jgg@nvidia.com>, <cohuck@redhat.com>, <mgurtovoy@nvidia.com>,
-        <yishaih@nvidia.com>, <linuxarm@huawei.com>,
-        <liulongfang@huawei.com>, <prime.zeng@hisilicon.com>,
-        <jonathan.cameron@huawei.com>
-References: <20220303230131.2103-1-shameerali.kolothum.thodi@huawei.com>
- <20220303230131.2103-2-shameerali.kolothum.thodi@huawei.com>
-From:   Zhou Wang <wangzhou1@hisilicon.com>
-In-Reply-To: <20220303230131.2103-2-shameerali.kolothum.thodi@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.103.22]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- canpemm500005.china.huawei.com (7.192.104.229)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> Since we are going to introduce VFIO PCI HiSilicon ACC driver for live
-> migration in subsequent patches, move the ACC QM header file to a
-> common include dir.
-> 
-> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Hi,
 
-Hi Shameer,
+Out of more accurate profiling results, this feature still has loyal
+followers and another new rebased version is here. PeterZ had acked
+the V9 patchset [0] and Paolo had asked for a new version, so please
+check the changelog and feel free to review, test and comment.
 
-It looks good to me for this movement.
+[0] https://lore.kernel.org/kvm/YQF7lwM6qzYso0Gg@hirez.programming.kicks-ass.net/
+[1] https://lore.kernel.org/kvm/95bf3dca-c6d1-02c8-40b6-8bb29a3a7a36@redhat.com/
 
-Acked-by: Zhou Wang <wangzhou1@hisilicon.com>
+---
 
-Thanks,
-Zhou
+The guest Precise Event Based Sampling (PEBS) feature can provide an
+architectural state of the instruction executed after the guest instruction
+that exactly caused the event. It needs new hardware facility only available
+on Intel Ice Lake Server platforms. This patch set enables the basic PEBS
+feature for KVM guests on ICX.
 
-> ---
->  drivers/crypto/hisilicon/hpre/hpre.h                         | 2 +-
->  drivers/crypto/hisilicon/qm.c                                | 2 +-
->  drivers/crypto/hisilicon/sec2/sec.h                          | 2 +-
->  drivers/crypto/hisilicon/sgl.c                               | 2 +-
->  drivers/crypto/hisilicon/zip/zip.h                           | 2 +-
->  drivers/crypto/hisilicon/qm.h => include/linux/hisi_acc_qm.h | 0
->  6 files changed, 5 insertions(+), 5 deletions(-)
->  rename drivers/crypto/hisilicon/qm.h => include/linux/hisi_acc_qm.h (100%)
-> 
-> diff --git a/drivers/crypto/hisilicon/hpre/hpre.h b/drivers/crypto/hisilicon/hpre/hpre.h
-> index e0b4a1982ee9..9a0558ed82f9 100644
-> --- a/drivers/crypto/hisilicon/hpre/hpre.h
-> +++ b/drivers/crypto/hisilicon/hpre/hpre.h
-> @@ -4,7 +4,7 @@
->  #define __HISI_HPRE_H
->  
->  #include <linux/list.h>
-> -#include "../qm.h"
-> +#include <linux/hisi_acc_qm.h>
->  
->  #define HPRE_SQE_SIZE			sizeof(struct hpre_sqe)
->  #define HPRE_PF_DEF_Q_NUM		64
-> diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-> index c5b84a5ea350..ed23e1d3fa27 100644
-> --- a/drivers/crypto/hisilicon/qm.c
-> +++ b/drivers/crypto/hisilicon/qm.c
-> @@ -15,7 +15,7 @@
->  #include <linux/uacce.h>
->  #include <linux/uaccess.h>
->  #include <uapi/misc/uacce/hisi_qm.h>
-> -#include "qm.h"
-> +#include <linux/hisi_acc_qm.h>
->  
->  /* eq/aeq irq enable */
->  #define QM_VF_AEQ_INT_SOURCE		0x0
-> diff --git a/drivers/crypto/hisilicon/sec2/sec.h b/drivers/crypto/hisilicon/sec2/sec.h
-> index d97cf02b1df7..c2e9b01187a7 100644
-> --- a/drivers/crypto/hisilicon/sec2/sec.h
-> +++ b/drivers/crypto/hisilicon/sec2/sec.h
-> @@ -4,7 +4,7 @@
->  #ifndef __HISI_SEC_V2_H
->  #define __HISI_SEC_V2_H
->  
-> -#include "../qm.h"
-> +#include <linux/hisi_acc_qm.h>
->  #include "sec_crypto.h"
->  
->  /* Algorithm resource per hardware SEC queue */
-> diff --git a/drivers/crypto/hisilicon/sgl.c b/drivers/crypto/hisilicon/sgl.c
-> index 057273769f26..f7efc02b065f 100644
-> --- a/drivers/crypto/hisilicon/sgl.c
-> +++ b/drivers/crypto/hisilicon/sgl.c
-> @@ -1,9 +1,9 @@
->  // SPDX-License-Identifier: GPL-2.0
->  /* Copyright (c) 2019 HiSilicon Limited. */
->  #include <linux/dma-mapping.h>
-> +#include <linux/hisi_acc_qm.h>
->  #include <linux/module.h>
->  #include <linux/slab.h>
-> -#include "qm.h"
->  
->  #define HISI_ACC_SGL_SGE_NR_MIN		1
->  #define HISI_ACC_SGL_NR_MAX		256
-> diff --git a/drivers/crypto/hisilicon/zip/zip.h b/drivers/crypto/hisilicon/zip/zip.h
-> index 517fdbdff3ea..3dfd3bac5a33 100644
-> --- a/drivers/crypto/hisilicon/zip/zip.h
-> +++ b/drivers/crypto/hisilicon/zip/zip.h
-> @@ -7,7 +7,7 @@
->  #define pr_fmt(fmt)	"hisi_zip: " fmt
->  
->  #include <linux/list.h>
-> -#include "../qm.h"
-> +#include <linux/hisi_acc_qm.h>
->  
->  enum hisi_zip_error_type {
->  	/* negative compression */
-> diff --git a/drivers/crypto/hisilicon/qm.h b/include/linux/hisi_acc_qm.h
-> similarity index 100%
-> rename from drivers/crypto/hisilicon/qm.h
-> rename to include/linux/hisi_acc_qm.h
-> 
+We can use PEBS feature on the Linux guest like native:
+
+   # echo 0 > /proc/sys/kernel/watchdog (on the host)
+   # perf record -e instructions:ppp ./br_instr a
+   # perf record -c 100000 -e instructions:pp ./br_instr a
+
+To emulate guest PEBS facility for the above perf usages,
+we need to implement 2 code paths:
+
+1) Fast path
+
+This is when the host assigned physical PMC has an identical index as the
+virtual PMC (e.g. using physical PMC0 to emulate virtual PMC0).
+This path is used in most common use cases.
+
+2) Slow path
+
+This is when the host assigned physical PMC has a different index from the
+virtual PMC (e.g. using physical PMC1 to emulate virtual PMC0) In this case,
+KVM needs to rewrite the PEBS records to change the applicable counter indexes
+to the virtual PMC indexes, which would otherwise contain the physical counter
+index written by PEBS facility, and switch the counter reset values to the
+offset corresponding to the physical counter indexes in the DS data structure.
+
+The previous version [3] enables both fast path and slow path, which seems
+a bit more complex as the first step. In this patchset, we want to start with
+the fast path to get the basic guest PEBS enabled while keeping the slow path
+disabled. More focused discussion on the slow path [4] is planned to be put to
+another patchset in the next step.
+
+Compared to later versions in subsequent steps, the functionality to support
+host-guest PEBS both enabled and the functionality to emulate guest PEBS when
+the counter is cross-mapped are missing in this patch set
+(neither of these are typical scenarios).
+
+With the basic support, the guest can retrieve the correct PEBS information from
+its own PEBS records on the Ice Lake servers. And we expect it should work when
+migrating to another Ice Lake and no regression about host perf is expected.
+
+Here are the results of pebs test from guest/host for same workload:
+
+perf report on guest:
+# Samples: 2K of event 'instructions:ppp', # Event count (approx.): 1473377250 # Overhead  Command   Shared Object      Symbol
+   57.74%  br_instr  br_instr           [.] lfsr_cond
+   41.40%  br_instr  br_instr           [.] cmp_end
+    0.21%  br_instr  [kernel.kallsyms]  [k] __lock_acquire
+
+perf report on host:
+# Samples: 2K of event 'instructions:ppp', # Event count (approx.): 1462721386 # Overhead  Command   Shared Object     Symbol
+   57.90%  br_instr  br_instr          [.] lfsr_cond
+   41.95%  br_instr  br_instr          [.] cmp_end
+    0.05%  br_instr  [kernel.vmlinux]  [k] lock_acquire
+    Conclusion: the profiling results on the guest are similar tothat on the host.
+
+A minimum guest kernel version may be v5.4 or a backport version support
+Icelake server PEBS.
+
+Please check more details in each commit and feel free to comment.
+
+Previous:
+https://lore.kernel.org/kvm/20211210133525.46465-1-likexu@tencent.com/
+
+[3]
+https://lore.kernel.org/kvm/20210104131542.495413-1-like.xu@linux.intel.com/
+[4]
+https://lore.kernel.org/kvm/20210115191113.nktlnmivc3edstiv@two.firstfloor.org/
+
+V11->V12:
+- Apply the new perf interface from tip/perf/core and fix the merge conflict;
+- Rename "x86_pmu.pebs_ept" to "x86_pmu.pebs_ept"; (Sean)
+- Rebased on the top of kvm/queue (b13a3befc815); (Paolo)
+
+V10->V11:
+- Merge perf_guest_info_callbacks static_call to the tip/perf/core;
+- Keep use perf_guest_cbs in the kvm/queue context before merge window;
+- Fix MSR_IA32_MISC_ENABLE_EMON bit (Liu XiangDong);
+- Rebase "Reprogram PEBS event to emulate guest PEBS counter" patch;
+
+V9->V10:
+- improve readability in core.c(Peter Z)
+- reuse guest_pebs_idxs(Liu XiangDong)
+
+V8 -> V9 Changelog:
+-fix a brackets error in xen_guest_state()
+
+V7 -> V8 Changelog:
+- fix coding style, add {} for single statement of multiple lines(Peter Z)
+- fix coding style in xen_guest_state() (Boris Ostrovsky)
+- s/pmu/kvm_pmu/ in intel_guest_get_msrs() (Peter Z)
+- put lower cost branch in the first place for x86_pmu_handle_guest_pebs() (Peter Z)
+
+V6 -> V7 Changelog:
+- Fix conditions order and call x86_pmu_handle_guest_pebs() unconditionally; (PeterZ)
+- Add a new patch to make all that perf_guest_cbs stuff suck less; (PeterZ)
+- Document IA32_MISC_ENABLE[7] that that behavior matches bare metal; (Sean & Venkatesh)
+- Update commit message for fixed counter mask refactoring;(PeterZ)
+- Clarifying comments about {.host and .guest} for intel_guest_get_msrs(); (PeterZ)
+- Add pebs_capable to store valid PEBS_COUNTER_MASK value; (PeterZ)
+- Add more comments for perf's precise_ip field; (Andi & PeterZ)
+- Refactor perf_overflow_handler_t and make it more legible; (PeterZ)
+- Use "(unsigned long)cpuc->ds" instead of __this_cpu_read(cpu_hw_events.ds); (PeterZ)
+- Keep using "(struct kvm_pmu *)data" to follow K&R; (Andi)
+
+Like Xu (16):
+  perf/x86/intel: Add EPT-Friendly PEBS for Ice Lake Server
+  perf/x86/intel: Handle guest PEBS overflow PMI for KVM guest
+  perf/x86/core: Pass "struct kvm_pmu *" to determine the guest values
+  KVM: x86/pmu: Set MSR_IA32_MISC_ENABLE_EMON bit when vPMU is enabled
+  KVM: x86/pmu: Introduce the ctrl_mask value for fixed counter
+  KVM: x86/pmu: Add IA32_PEBS_ENABLE MSR emulation for extended PEBS
+  KVM: x86/pmu: Reprogram PEBS event to emulate guest PEBS counter
+  KVM: x86/pmu: Adjust precise_ip to emulate Ice Lake guest PDIR counter
+  KVM: x86/pmu: Add IA32_DS_AREA MSR emulation to support guest DS
+  KVM: x86/pmu: Add PEBS_DATA_CFG MSR emulation to support adaptive PEBS
+  KVM: x86: Set PEBS_UNAVAIL in IA32_MISC_ENABLE when PEBS is enabled
+  KVM: x86/pmu: Move pmc_speculative_in_use() to arch/x86/kvm/pmu.h
+  KVM: x86/pmu: Disable guest PEBS temporarily in two rare situations
+  KVM: x86/pmu: Add kvm_pmu_cap to optimize perf_get_x86_pmu_capability
+  KVM: x86/cpuid: Refactor host/guest CPU model consistency check
+  KVM: x86/pmu: Expose CPUIDs feature bits PDCM, DS, DTES64
+
+Peter Zijlstra (Intel) (1):
+  x86/perf/core: Add pebs_capable to store valid PEBS_COUNTER_MASK value
+
+ arch/x86/events/core.c            |   5 +-
+ arch/x86/events/intel/core.c      | 157 +++++++++++++++++++++++++-----
+ arch/x86/events/perf_event.h      |   6 +-
+ arch/x86/include/asm/kvm_host.h   |  16 +++
+ arch/x86/include/asm/msr-index.h  |   6 ++
+ arch/x86/include/asm/perf_event.h |   5 +-
+ arch/x86/kvm/cpuid.c              |  26 ++---
+ arch/x86/kvm/cpuid.h              |   5 +
+ arch/x86/kvm/pmu.c                |  52 +++++++---
+ arch/x86/kvm/pmu.h                |  37 +++++++
+ arch/x86/kvm/vmx/capabilities.h   |  28 +++---
+ arch/x86/kvm/vmx/pmu_intel.c      | 118 ++++++++++++++++++----
+ arch/x86/kvm/vmx/vmx.c            |  24 ++++-
+ arch/x86/kvm/vmx/vmx.h            |   2 +-
+ arch/x86/kvm/x86.c                |  30 ++++--
+ 15 files changed, 410 insertions(+), 107 deletions(-)
+
+-- 
+2.35.1
+
