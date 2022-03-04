@@ -2,121 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 79D5F4CDD21
-	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 20:06:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BEC784CDE99
+	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 21:26:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229904AbiCDTHN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Mar 2022 14:07:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45040 "EHLO
+        id S230075AbiCDUBU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Mar 2022 15:01:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229766AbiCDTHM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Mar 2022 14:07:12 -0500
-Received: from mail-ot1-x330.google.com (mail-ot1-x330.google.com [IPv6:2607:f8b0:4864:20::330])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA6691EC986
-        for <kvm@vger.kernel.org>; Fri,  4 Mar 2022 11:06:20 -0800 (PST)
-Received: by mail-ot1-x330.google.com with SMTP id l25-20020a9d7a99000000b005af173a2875so8183017otn.2
-        for <kvm@vger.kernel.org>; Fri, 04 Mar 2022 11:06:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ltKgi/b1r6yAxpmHxcCWTc/P1+26ye9tRdej8H8cXjs=;
-        b=Mxecmohhv0kmsf7C0gnjBHSBoFcTtvYhyc8u+H5KbPJ556QuypU/WtrZebNVmuBLFg
-         bg/RMTXk1ZY31givcLvvjNc9BZNwQPSUdLMlgw4PH6JfrgidQsZePqvdSCp0N/G04Jh+
-         hTcq7G4WTGqnygIk1C8U1Hc8qIcOlW3zlsZ1i6w9/WozmZ7M4NkW2ev7VpfoiDk+NuH+
-         hkHgTxIxJ7oG98BRDFvI0jQaCSQp3uhyUFabkQtPQa9YqnnXZwAovC0Nh+DdTGcwGOgj
-         tYBH3wOMWzMjCRevR6Nix1UVpl7+msKD2kFxyJRrJFe9vl66rui+LM9Dha47i8sWNTak
-         bFhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ltKgi/b1r6yAxpmHxcCWTc/P1+26ye9tRdej8H8cXjs=;
-        b=rorEn+lJqeILVNoDN+hNTvfoLRlwF5k9U+j4w4n8+gSqVHRuaPfr2LaHD1t4lCHUOP
-         yXK7dyH8Q2wXpt1HZeqt8T0vJ2qhy9Dpd/pArPC6kqgUoxrsSIeF9whhe2+Xk6auup8r
-         jnhkCwkvvI/5lBywp77EromGHGcXijeAfgfW2Pdo5UgVaRfrZ4kkuWz4lEnUwucf7KMP
-         F5ArARC5IBlprOUMwRDPPEBe/GMurS2psl6jqZVn8aU6btAfZNFExs9IpycE0OJ7itFJ
-         j75MsJDyZbYig14ARnwXcdhFgu/PuATVKB6mIwOwWn364TgIOwCaMsKIK+jua/Rm5J3o
-         BX0Q==
-X-Gm-Message-State: AOAM53320fxUP6wr8Ant7cx7KtdMCDTt5/YuqPsvW39uqavV+WubaNYN
-        mAhIFS2YVgex27NvFqB+6xavUYNkXIY6+ld8R2Zx6w==
-X-Google-Smtp-Source: ABdhPJw6oME2pndJPvk7aqHxPXdAoH7daK5Xu6tWA8SbgYsz5I4PKJSvh7obHOa/Cj+PxSur0Lm9EPp/P5EYQxjT3KM=
-X-Received: by 2002:a9d:8b5:0:b0:5a4:9db6:92b4 with SMTP id
- 50-20020a9d08b5000000b005a49db692b4mr97683otf.14.1646420779509; Fri, 04 Mar
- 2022 11:06:19 -0800 (PST)
+        with ESMTP id S229995AbiCDUA5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Mar 2022 15:00:57 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7770F23BF05;
+        Fri,  4 Mar 2022 11:52:33 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id ABE50B82B5E;
+        Fri,  4 Mar 2022 19:24:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E62EC340E9;
+        Fri,  4 Mar 2022 19:24:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1646421874;
+        bh=56U7h/PWatXCc+X0v4IbqX2HG9yyywUYaKIctbWn0sI=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=rcP1L14pFaadmjABQMFUr1EX7rWJpbYgqQlSedShGUvIRlZ8fa4jppJuK+5TIdI2g
+         wibl11/CJ6TjP8fu7MvwoRWIejhd4jB3LvIoeQkylIrREoRzQUkMIQRZTUbjldUszp
+         zCjaWrxHMHV6DfUWk453gSFhDX2+0ofcCUp7G5vUgvHTiBRluWdDHjOHRh/7lb60jq
+         jmoaWcRzOe35+r9+UystrpbhsHpwc/Jxy6rb2chN2Eq8yfmDf+A+JFjNFJ6WuZ/HCl
+         ztl8skrIds3LAyw2HgJ6Wd5mZP+fXAZuInXKeTd+HzMsdWuIL1nnbxfhwG5VK1axZP
+         Jr2SPQZffiFoA==
+Message-ID: <7cc65bbd-e323-eabb-c576-b5656a3355ac@kernel.org>
+Date:   Fri, 4 Mar 2022 11:24:30 -0800
 MIME-Version: 1.0
-References: <20220302111334.12689-1-likexu@tencent.com> <20220302111334.12689-13-likexu@tencent.com>
- <CALMp9eT1N_HeipXjpyqrXs_WmBEip2vchy4d1GffpwrEd+444w@mail.gmail.com> <273a7631-188b-a7a9-a551-4e577dcdd8d1@gmail.com>
-In-Reply-To: <273a7631-188b-a7a9-a551-4e577dcdd8d1@gmail.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 4 Mar 2022 11:06:08 -0800
-Message-ID: <CALMp9eRM9kTxmyHr2k1r=VSjFyDy=Dyvek5gdgZ8bHHrmPL5gQ@mail.gmail.com>
-Subject: Re: [PATCH v2 12/12] KVM: x86/pmu: Clear reserved bit PERF_CTL2[43]
- for AMD erratum 1292
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH v4 01/12] mm/shmem: Introduce F_SEAL_INACCESSIBLE
+Content-Language: en-US
+To:     Steven Price <steven.price@arm.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        qemu-devel@nongnu.org, Linux API <linux-api@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
         Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-18.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        "Nakajima, Jun" <jun.nakajima@intel.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Andi Kleen <ak@linux.intel.com>,
+        David Hildenbrand <david@redhat.com>
+References: <20220118132121.31388-1-chao.p.peng@linux.intel.com>
+ <20220118132121.31388-2-chao.p.peng@linux.intel.com>
+ <619547ad-de96-1be9-036b-a7b4e99b09a6@kernel.org>
+ <20220217130631.GB32679@chaop.bj.intel.com>
+ <2ca78dcb-61d9-4c9d-baa9-955b6f4298bb@www.fastmail.com>
+ <20220223114935.GA53733@chaop.bj.intel.com>
+ <71a06402-6743-bfd2-bbd4-997f8e256554@arm.com>
+From:   Andy Lutomirski <luto@kernel.org>
+In-Reply-To: <71a06402-6743-bfd2-bbd4-997f8e256554@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-7.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 4, 2022 at 1:47 AM Like Xu <like.xu.linux@gmail.com> wrote:
->
-> On 3/3/2022 1:52 am, Jim Mattson wrote:
-> > On Wed, Mar 2, 2022 at 3:14 AM Like Xu <like.xu.linux@gmail.com> wrote:
-> >>
-> >> From: Like Xu <likexu@tencent.com>
-> >>
-> >> The AMD Family 19h Models 00h-0Fh Processors may experience sampling
-> >> inaccuracies that cause the following performance counters to overcount
-> >> retire-based events. To count the non-FP affected PMC events correctly,
-> >> a patched guest with a target vCPU model would:
-> >>
-> >>      - Use Core::X86::Msr::PERF_CTL2 to count the events, and
-> >>      - Program Core::X86::Msr::PERF_CTL2[43] to 1b, and
-> >>      - Program Core::X86::Msr::PERF_CTL2[20] to 0b.
-> >>
-> >> To support this use of AMD guests, KVM should not reserve bit 43
-> >> only for counter #2. Treatment of other cases remains unchanged.
-> >>
-> >> AMD hardware team clarified that the conditions under which the
-> >> overcounting can happen, is quite rare. This change may make those
-> >> PMU driver developers who have read errata #1292 less disappointed.
-> >>
-> >> Reported-by: Jim Mattson <jmattson@google.com>
-> >> Signed-off-by: Like Xu <likexu@tencent.com>
-> >
-> > This seems unnecessarily convoluted. As I've said previously, KVM
-> > should not ever synthesize a #GP for any value written to a
-> > PerfEvtSeln MSR when emulating an AMD CPU.
->
-> IMO, we should "never synthesize a #GP" for all AMD MSRs,
-> not just for AMD PMU msrs, or keep the status quo.
+On 2/23/22 04:05, Steven Price wrote:
+> On 23/02/2022 11:49, Chao Peng wrote:
+>> On Thu, Feb 17, 2022 at 11:09:35AM -0800, Andy Lutomirski wrote:
+>>> On Thu, Feb 17, 2022, at 5:06 AM, Chao Peng wrote:
+>>>> On Fri, Feb 11, 2022 at 03:33:35PM -0800, Andy Lutomirski wrote:
+>>>>> On 1/18/22 05:21, Chao Peng wrote:
+>>>>>> From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+>>>>>>
+>>>>>> Introduce a new seal F_SEAL_INACCESSIBLE indicating the content of
+>>>>>> the file is inaccessible from userspace through ordinary MMU access
+>>>>>> (e.g., read/write/mmap). However, the file content can be accessed
+>>>>>> via a different mechanism (e.g. KVM MMU) indirectly.
+>>>>>>
+>>>>>> It provides semantics required for KVM guest private memory support
+>>>>>> that a file descriptor with this seal set is going to be used as the
+>>>>>> source of guest memory in confidential computing environments such
+>>>>>> as Intel TDX/AMD SEV but may not be accessible from host userspace.
+>>>>>>
+>>>>>> At this time only shmem implements this seal.
+>>>>>>
+>>>>>
+>>>>> I don't dislike this *that* much, but I do dislike this. F_SEAL_INACCESSIBLE
+>>>>> essentially transmutes a memfd into a different type of object.  While this
+>>>>> can apparently be done successfully and without races (as in this code),
+>>>>> it's at least awkward.  I think that either creating a special inaccessible
+>>>>> memfd should be a single operation that create the correct type of object or
+>>>>> there should be a clear justification for why it's a two-step process.
+>>>>
+>>>> Now one justification maybe from Stever's comment to patch-00: for ARM
+>>>> usage it can be used with creating a normal memfd, (partially)populate
+>>>> it with initial guest memory content (e.g. firmware), and then
+>>>> F_SEAL_INACCESSIBLE it just before the first time lunch of the guest in
+>>>> KVM (definitely the current code needs to be changed to support that).
+>>>
+>>> Except we don't allow F_SEAL_INACCESSIBLE on a non-empty file, right?  So this won't work.
+>>
+>> Hmm, right, if we set F_SEAL_INACCESSIBLE on a non-empty file, we will
+>> need to make sure access to existing mmap-ed area should be prevented,
+>> but that is hard.
+>>
+>>>
+>>> In any case, the whole confidential VM initialization story is a bit buddy.  From the earlier emails, it sounds like ARM expects the host to fill in guest memory and measure it.  From my recollection of Intel's scheme (which may well be wrong, and I could easily be confusing it with SGX), TDX instead measures what is essentially a transcript of the series of operations that initializes the VM.  These are fundamentally not the same thing even if they accomplish the same end goal.  For TDX, we unavoidably need an operation (ioctl or similar) that initializes things according to the VM's instructions, and ARM ought to be able to use roughly the same mechanism.
+>>
+>> Yes, TDX requires a ioctl. Steven may comment on the ARM part.
+> 
+> The Arm story is evolving so I can't give a definite answer yet. Our
+> current prototyping works by creating the initial VM content in a
+> memslot as with a normal VM and then calling an ioctl which throws the
+> big switch and converts all the (populated) pages to be protected. At
+> this point the RMM performs a measurement of the data that the VM is
+> being populated with.
+> 
+> The above (in our prototype) suffers from all the expected problems with
+> a malicious VMM being able to trick the host kernel into accessing those
+> pages after they have been protected (causing a fault detected by the
+> hardware).
+> 
+> The ideal (from our perspective) approach would be to follow the same
+> flow but where the VMM populates a memfd rather than normal anonymous
+> pages. The memfd could then be sealed and the pages converted to
+> protected ones (with the RMM measuring them in the process).
+> 
+> The question becomes how is that memfd populated? It would be nice if
+> that could be done using normal operations on a memfd (i.e. using
+> mmap()) and therefore this code could be (relatively) portable. This
+> would mean that any pages mapped from the memfd would either need to
+> block the sealing or be revoked at the time of sealing.
+> 
+> The other approach is we could of course implement a special ioctl which
+> effectively does a memcpy into the (created empty and sealed) memfd and
+> does the necessary dance with the RMM to measure the contents. This
+> would match the "transcript of the series of operations" described above
+> - but seems much less ideal from the viewpoint of the VMM.
 
-Then, why are you proposing this change? :-)
+A VMM that supports Other Vendors will need to understand this sort of 
+model regardless.
 
-We should continue to synthesize a #GP for an attempt to set "must be
-zero" bits or for rule violations, like "address must be canonical."
-However, we have absolutely no business making up our own hardware
-specification. This is a bug, and it should be fixed, like any other
-bug.
+I don't particularly mind the idea of having the kernel consume a normal 
+memfd and spit out a new object, but I find the concept of changing the 
+type of the object in place, even if it has other references, and trying 
+to control all the resulting races to be somewhat alarming.
 
-> I agree with you on this AMD #GP transition, but we need at least one
-> kernel cycle to make a more radical change and we don't know Paolo's
-> attitude and more, we haven't received a tidal wave of user complaints.
+In pseudo-Rust, this is the difference between:
 
-Again, if this is your stance, why are you proposing this change? :-)
+fn convert_to_private(in: &mut Memfd)
 
-If you wait until you have a tidal wave of user complaints, you have
-waited too long. It's much better to be proactive than reactive.
+and
+
+fn convert_to_private(in: Memfd) -> PrivateMemoryFd
+
+This doesn't map particularly nicely to the kernel, though.
+
+--Andy\
