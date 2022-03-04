@@ -2,183 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7EE224CD42A
-	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 13:23:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E8EA4CD449
+	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 13:31:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234968AbiCDMX6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Mar 2022 07:23:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52136 "EHLO
+        id S239717AbiCDMbv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Mar 2022 07:31:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234919AbiCDMX4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Mar 2022 07:23:56 -0500
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E1B9E1AE67E;
-        Fri,  4 Mar 2022 04:23:08 -0800 (PST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0EC58143D;
-        Fri,  4 Mar 2022 04:23:08 -0800 (PST)
-Received: from [10.57.39.47] (unknown [10.57.39.47])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5DA963F70D;
-        Fri,  4 Mar 2022 04:23:03 -0800 (PST)
-Message-ID: <1648bc97-a0d3-4051-58d0-e24fa9e9d183@arm.com>
-Date:   Fri, 4 Mar 2022 12:22:57 +0000
+        with ESMTP id S230370AbiCDMbu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Mar 2022 07:31:50 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 318891B309A;
+        Fri,  4 Mar 2022 04:31:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Udrf8X2s7m9wGFP9SouxiWxD1WDtWsSqid2Fk/v+Oz8=; b=avw+zgbkIFcAquu5wKjoMEJ9ea
+        ajeqXut3IljafzXbWzXnb5wcqajJDkYxsaiAmCr6eoTC8FltPC1P/+u9QwOsRUJir4fBDkEe1rlQT
+        Co2z5Wg6SEO2zOGW3E7i7GvoqfyDlzoW8OSkOozqBz6IctCm+0g2MK63vkoOwDFKZdhvhpxxx2qQ1
+        lEWJDf4Gk6WRGg5jOc+bduXF/5GuZtlsmjLWwQbCF5SjEsfFGHojPNvkyYXVGZzqyAp1O+w1lnfhL
+        TaTw5E6/TxPczryQXbDPDEhQijOpAVrFxPD3VR6OhbvB4B/7zM6flr3wZhT3FcG63uRFFdiBB3tkn
+        loQ/TN7g==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nQ74w-00Cck3-Tb; Fri, 04 Mar 2022 12:30:39 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 1F091300230;
+        Fri,  4 Mar 2022 13:30:37 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 07F9B2019A5EC; Fri,  4 Mar 2022 13:30:37 +0100 (CET)
+Date:   Fri, 4 Mar 2022 13:30:37 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Adrian Hunter <adrian.hunter@intel.com>
+Cc:     Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Jiri Olsa <jolsa@redhat.com>, linux-kernel@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        kvm@vger.kernel.org, H Peter Anvin <hpa@zytor.com>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Leo Yan <leo.yan@linaro.org>
+Subject: Re: [PATCH V2 02/11] perf/x86: Add support for TSC as a perf event
+ clock
+Message-ID: <YiIGbbyx0uimsGN4@hirez.programming.kicks-ass.net>
+References: <20220214110914.268126-1-adrian.hunter@intel.com>
+ <20220214110914.268126-3-adrian.hunter@intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101
- Thunderbird/91.6.1
-Subject: Re: [PATCH v7 01/11] iommu: Add DMA ownership management interfaces
-Content-Language: en-GB
-To:     Lu Baolu <baolu.lu@linux.intel.com>, eric.auger@redhat.com,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Joerg Roedel <joro@8bytes.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Ashok Raj <ashok.raj@intel.com>
-Cc:     Will Deacon <will@kernel.org>,
-        Dan Williams <dan.j.williams@intel.com>, rafael@kernel.org,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Liu Yi L <yi.l.liu@intel.com>,
-        Jacob jun Pan <jacob.jun.pan@intel.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Stuart Yoder <stuyoder@gmail.com>,
-        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        Li Yang <leoyang.li@nxp.com>,
-        Dmitry Osipenko <digetx@gmail.com>,
-        iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220228005056.599595-1-baolu.lu@linux.intel.com>
- <20220228005056.599595-2-baolu.lu@linux.intel.com>
- <c75b6e04-bc1b-b9f6-1a44-bf1567a8c19d@redhat.com>
- <7a3dc977-0c5f-6d88-6d3a-8e49bc717690@linux.intel.com>
-From:   Robin Murphy <robin.murphy@arm.com>
-In-Reply-To: <7a3dc977-0c5f-6d88-6d3a-8e49bc717690@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220214110914.268126-3-adrian.hunter@intel.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2022-03-04 10:43, Lu Baolu wrote:
-> Hi Eric,
+On Mon, Feb 14, 2022 at 01:09:05PM +0200, Adrian Hunter wrote:
+> Currently, using Intel PT to trace a VM guest is limited to kernel space
+> because decoding requires side band events such as MMAP and CONTEXT_SWITCH.
+> While these events can be collected for the host, there is not a way to do
+> that yet for a guest. One approach, would be to collect them inside the
+> guest, but that would require being able to synchronize with host
+> timestamps.
 > 
-> On 2022/3/4 18:34, Eric Auger wrote:
->> I hit a WARN_ON() when unbinding an e1000e driver just after boot:
->>
->> sudo modprobe -v vfio-pci
->> echo vfio-pci | sudo tee -a
->> /sys/bus/pci/devices/0004:01:00.0/driver_override
->> vfio-pci
->> echo 0004:01:00.0 | sudo tee -a  /sys/bus/pci/drivers/e1000e/unbind
->>
->>
->> [  390.042811] ------------[ cut here ]------------
->> [  390.046468] WARNING: CPU: 42 PID: 5589 at drivers/iommu/iommu.c:3123
->> iommu_device_unuse_default_domain+0x68/0x100
->> [  390.056710] Modules linked in: vfio_pci vfio_pci_core vfio_virqfd
->> vfio_iommu_type1 vfio xt_CHECKSUM xt_MASQUERADE xt_conntrack ipt_REJECT
->> nf_reject_ipv4 nft_compat nft_chain_nat nf_nat nf_conntrack
->> nf_defrag_ipv6 nf_defrag_ipv4 nf_tables nfnetlink bridge stp llc rfkill
->> sunrpc vfat fat mlx5_ib ib_uverbs ib_core acpi_ipmi ipmi_ssif
->> ipmi_devintf ipmi_msghandler cppc_cpufreq drm xfs libcrc32c mlx5_core sg
->> mlxfw crct10dif_ce tls ghash_ce sha2_ce sha256_arm64 sha1_ce sbsa_gwdt
->> e1000e psample sdhci_acpi ahci_platform sdhci libahci_platform qcom_emac
->> mmc_core hdma hdma_mgmt dm_mirror dm_region_hash dm_log dm_mod fuse
->> [  390.110618] CPU: 42 PID: 5589 Comm: tee Kdump: loaded Not tainted
->> 5.17.0-rc4-lu-v7-official+ #24
->> [  390.119384] Hardware name: WIWYNN QDF2400 Reference Evaluation
->> Platform CV90-LA115-P120/QDF2400 Customer Reference Board, BIOS 0ACJA570
->> 11/05/2018
->> [  390.132492] pstate: a0400005 (NzCv daif +PAN -UAO -TCO -DIT -SSBS
->> BTYPE=--)
->> [  390.139436] pc : iommu_device_unuse_default_domain+0x68/0x100
->> [  390.145165] lr : iommu_device_unuse_default_domain+0x38/0x100
->> [  390.150894] sp : ffff80000fbb3bc0
->> [  390.154193] x29: ffff80000fbb3bc0 x28: ffff03c0cf6b2400 x27:
->> 0000000000000000
->> [  390.161311] x26: 0000000000000000 x25: 0000000000000000 x24:
->> ffff03c0c7cc5720
->> [  390.168429] x23: ffff03c0c2b9d150 x22: ffffb4e61df223f8 x21:
->> ffffb4e61df223f8
->> [  390.175547] x20: ffff03c7c03c3758 x19: ffff03c7c03c3700 x18:
->> 0000000000000000
->> [  390.182665] x17: 0000000000000000 x16: 0000000000000000 x15:
->> 0000000000000000
->> [  390.189783] x14: 0000000000000000 x13: 0000000000000030 x12:
->> ffff03c0d519cd80
->> [  390.196901] x11: 7f7f7f7f7f7f7f7f x10: 0000000000000dc0 x9 :
->> ffffb4e620b54f8c
->> [  390.204019] x8 : ffff03c0cf6b3220 x7 : ffff4ef132bba000 x6 :
->> 00000000000000ff
->> [  390.211137] x5 : ffff03c0c2b9f108 x4 : ffff03c0d51f6438 x3 :
->> 0000000000000000
->> [  390.218255] x2 : ffff03c0cf6b2400 x1 : 0000000000000000 x0 :
->> 0000000000000000
->> [  390.225374] Call trace:
->> [  390.227804]  iommu_device_unuse_default_domain+0x68/0x100
->> [  390.233187]  pci_dma_cleanup+0x38/0x44
->> [  390.236919]  __device_release_driver+0x1a8/0x260
->> [  390.241519]  device_driver_detach+0x50/0xd0
->> [  390.245686]  unbind_store+0xf8/0x120
->> [  390.249245]  drv_attr_store+0x30/0x44
->> [  390.252891]  sysfs_kf_write+0x50/0x60
->> [  390.256537]  kernfs_fop_write_iter+0x134/0x1cc
->> [  390.260964]  new_sync_write+0xf0/0x18c
->> [  390.264696]  vfs_write+0x230/0x2d0
->> [  390.268082]  ksys_write+0x74/0x100
->> [  390.271467]  __arm64_sys_write+0x28/0x3c
->> [  390.275373]  invoke_syscall.constprop.0+0x58/0xf0
->> [  390.280061]  el0_svc_common.constprop.0+0x160/0x164
->> [  390.284922]  do_el0_svc+0x34/0xcc
->> [  390.288221]  el0_svc+0x30/0x140
->> [  390.291346]  el0t_64_sync_handler+0xa4/0x130
->> [  390.295599]  el0t_64_sync+0x1a0/0x1a4
->> [  390.299245] ---[ end trace 0000000000000000 ]---
->>
->>
->> I put some traces in the code and I can see that 
->> iommu_device_use_default_domain() effectively is called on 
->> 0004:01:00.0 e1000e device on pci_dma_configure() but at that time the 
->> iommu group is NULL:
->> [   10.569427] e1000e 0004:01:00.0: ------ ENTRY pci_dma_configure 
->> driver_managed_area=0
->> [   10.569431] e1000e 0004:01:00.0: **** 
->> iommu_device_use_default_domain ENTRY
->> [   10.569433] e1000e 0004:01:00.0: **** 
->> iommu_device_use_default_domain no group
->> [   10.569435] e1000e 0004:01:00.0: pci_dma_configure 
->> iommu_device_use_default_domain returned 0
->> [   10.569492] e1000e 0004:01:00.0: Adding to iommu group 3
->>
->> ^^^the group is added after the
->> iommu_device_use_default_domain() call
->> So the group->owner_cnt is not incremented as expected.
+> The motivation for this patch is to provide a clock that can be used within
+> a VM guest, and that correlates to a VM host clock. In the case of TSC, if
+> the hypervisor leaves rdtsc alone, the TSC value will be subject only to
+> the VMCS TSC Offset and Scaling. Adjusting for that would make it possible
+> to inject events from a guest perf.data file, into a host perf.data file.
 > 
-> Thank you for reporting this. Do you have any idea why the driver is
-> loaded before iommu_probe_device()?
+> Thus making possible the collection of VM guest side band for Intel PT
+> decoding.
+> 
+> There are other potential benefits of TSC as a perf event clock:
+> 	- ability to work directly with TSC
+> 	- ability to inject non-Intel-PT-related events from a guest
+> 
+> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+> ---
+>  arch/x86/events/core.c            | 16 +++++++++
+>  arch/x86/include/asm/perf_event.h |  3 ++
+>  include/uapi/linux/perf_event.h   | 12 ++++++-
+>  kernel/events/core.c              | 57 +++++++++++++++++++------------
+>  4 files changed, 65 insertions(+), 23 deletions(-)
+> 
+> diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
+> index e686c5e0537b..51d5345de30a 100644
+> --- a/arch/x86/events/core.c
+> +++ b/arch/x86/events/core.c
+> @@ -2728,6 +2728,17 @@ void arch_perf_update_userpage(struct perf_event *event,
+>  		!!(event->hw.flags & PERF_EVENT_FLAG_USER_READ_CNT);
+>  	userpg->pmc_width = x86_pmu.cntval_bits;
+>  
+> +	if (event->attr.use_clockid &&
+> +	    event->attr.ns_clockid &&
+> +	    event->attr.clockid == CLOCK_PERF_HW_CLOCK) {
+> +		userpg->cap_user_time_zero = 1;
+> +		userpg->time_mult = 1;
+> +		userpg->time_shift = 0;
+> +		userpg->time_offset = 0;
+> +		userpg->time_zero = 0;
+> +		return;
+> +	}
+> +
+>  	if (!using_native_sched_clock() || !sched_clock_stable())
+>  		return;
 
-Urgh, this is the horrible firmware-data-ordering thing again. The stuff 
-I've been saying about having to rework the whole .dma_configure 
-mechanism in the near future is to fix this properly.
+This looks the wrong way around. If TSC is found unstable, we should
+never expose it.
 
-The summary is that in patch #4, calling 
-iommu_device_use_default_domain() *before* {of,acpi}_dma_configure is 
-currently a problem. As things stand, the IOMMU driver ignored the 
-initial iommu_probe_device() call when the device was added, since at 
-that point it had no fwspec yet. In this situation, 
-{of,acpi}_iommu_configure() are retriggering iommu_probe_device() after 
-the IOMMU driver has seen the firmware data via .of_xlate to learn that 
-it it actually responsible for the given device.
-
-Robin.
+And I'm not at all sure about the whole virt thing. Last time I looked
+at pvclock it made no sense at all.
