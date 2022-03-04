@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 27F594CD0A7
-	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 10:05:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 42BE44CD0AB
+	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 10:05:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235920AbiCDJFt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Mar 2022 04:05:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55862 "EHLO
+        id S235827AbiCDJF6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Mar 2022 04:05:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56154 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235772AbiCDJFp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Mar 2022 04:05:45 -0500
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5C7118C7AE;
-        Fri,  4 Mar 2022 01:04:58 -0800 (PST)
-Received: by mail-pg1-x534.google.com with SMTP id w37so6989699pga.7;
-        Fri, 04 Mar 2022 01:04:58 -0800 (PST)
+        with ESMTP id S235881AbiCDJFt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Mar 2022 04:05:49 -0500
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E475B1A12BD;
+        Fri,  4 Mar 2022 01:05:01 -0800 (PST)
+Received: by mail-pf1-x429.google.com with SMTP id s11so7067300pfu.13;
+        Fri, 04 Mar 2022 01:05:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=wqAWqtHFfbVYNDLrbuE8MvbnnaQXA5m+KCEAEyf7i8g=;
-        b=ILJzeVk2e4smnpL/Uc8gyyQUb/BjmWa948vQm7i3F/fLX48pjRodhWJvBtgyPX8VWT
-         LCk9ZWageMhdE8HXJWJPWM+tJfJi83LUb74MVwc7ZnBe7zCyty35L9dnsjW65b1EpYg7
-         EUEIwVfhGZob6vqzNHJMBURkhIaGP6NA2hkPtpVPjfAyG5WBpnwciOOc8VUAP1blzpoQ
-         3O8/u62XiTKQmjM3beH+OjS4g5kXiD5lJw5D09EVp1pFTEesVitvNcs483eLfJ9w7/iO
-         wtACqtZN9ot1f93oN35K0uz3qGAEaD3Kq7ve0CtQQWFQGD/6y5yCfX+ZlhTnKHPRCviI
-         AtOQ==
+        bh=WrjUW5VLGNs/fY0Lc6IKYNBmqSUBL2TyqO/s8rY+hQQ=;
+        b=TUmoVF1v9iIXg7VSU3l1VKdHTPYOK7Zm1Pz/u7Ow2RFx7FwGT+brHeWiSncd9H7VPN
+         RPghFmIKE7keb3SEY+Uo2x+qxTlldF1JKumNcygWiGr8M2Y40k5KJgOQn6veeDYcWXBx
+         JMJUj2LI2ggj7k4f2nWWBx/90kiE7aoxctb6TfuVz/smfDhlWWB9lPh+EXZGZIaWOTAY
+         ySjaGj3OGX+Eifw3p0btfAtCyLn6CY2xwOn+OhcGkWEg6dkjayJ2x1T5PiSbAgU1mWYY
+         fJYMNWKajYyZ6/mYCOA8bn0iaBW2ZVJx/7SPsM83JHgCCd36QC8Mm3VP0UeYJ0LwAqzw
+         GO5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=wqAWqtHFfbVYNDLrbuE8MvbnnaQXA5m+KCEAEyf7i8g=;
-        b=csYVS8oUVxRMmdOnG8FHo/wOFJWKe44OWBOtMbQIkRaif3oS0lWxhIUOLxBv4jRXTi
-         T+VokfieFJc5R+7hMIC7nbT/quCxiqw/cT3BGiuIKE+QfEk5nw8eGZtNbl9mHCohFNml
-         fLk059ewNn1trW1p5Hhk43+6LSauSfloPT8jX7hGs9g91ZghgS2U2Lr8r8QIrLC3OI9z
-         AE3xTDW3FkX870Kd1WlaaJxuAVby7idYnuSUet+Z8hyg82AOJZtUEtjW3N1IrTftVbz5
-         GjNarnX1x+Qg4tQwii4spRTbJvKZT1I0jFIZ1/Qa7vRTXYQhitvAb+tMJdrcxPUXogKH
-         Umsw==
-X-Gm-Message-State: AOAM531qUzBNWYFzItpm3Ql86rl0jUinePPZlG+NaKq4yLxtRWuukSwi
-        CqRnrd9BPyiay9nTSmtKzbM=
-X-Google-Smtp-Source: ABdhPJzGP6ihfVDOPpJNSMhc2AjW/yI0zGwN7dbP9zOKD9OHsbfYRkopU2LiTSn44GaQaVGFFkQ7vA==
-X-Received: by 2002:a05:6a00:9a9:b0:4f3:f293:9ca5 with SMTP id u41-20020a056a0009a900b004f3f2939ca5mr30466217pfg.40.1646384698374;
-        Fri, 04 Mar 2022 01:04:58 -0800 (PST)
+        bh=WrjUW5VLGNs/fY0Lc6IKYNBmqSUBL2TyqO/s8rY+hQQ=;
+        b=BXQnpl5yBNAJAhGXugAt3vP9s4lZRrvLR9F58ZlkL/8eU1EuYMyOX7IKPVq6aOP9nr
+         hikz/fvvxir0nN8u/X+xTDF/+DCK9UaJQjZP/+H9wmRTEIlw2FQ87Foe7Krn85UXRpfa
+         WfIIpX0iSyYdAqUFYPqUIuTmKixubfFOjes6NOfcbal/v5fGrwL125eZJFgcaSPv9UK4
+         /2FBetXrdkJ/GA8tp6yN/tAVAWgKJJyK2m0RgBuGcG455r+GmUoet519SrX6dGn3GRdD
+         1EzTenH6903HXpwBaWjSS20X27lnfb1BG36FzZF0AE5029hRJSS3noFZF+DfABDzCZIU
+         weHw==
+X-Gm-Message-State: AOAM531SuVjxNjNMUvdXMek8gEiHJ9AsAE3LTTpUMbej9w2qsVcMG0wV
+        QDqsDuEfoamWpLeC5ZSMvNk=
+X-Google-Smtp-Source: ABdhPJzj3dKFJm8Rzu69Fmgkt13NAeIAatzVx+EFyIuRCWPzHan1QQVTpRHbMzJ0e9J/PALcoBVbtQ==
+X-Received: by 2002:a05:6a00:13a4:b0:4ce:118f:a822 with SMTP id t36-20020a056a0013a400b004ce118fa822mr42255390pfg.33.1646384701427;
+        Fri, 04 Mar 2022 01:05:01 -0800 (PST)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id j2-20020a655582000000b00372b2b5467asm4192968pgs.10.2022.03.04.01.04.54
+        by smtp.gmail.com with ESMTPSA id j2-20020a655582000000b00372b2b5467asm4192968pgs.10.2022.03.04.01.04.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Mar 2022 01:04:58 -0800 (PST)
+        Fri, 04 Mar 2022 01:05:01 -0800 (PST)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
@@ -57,9 +57,9 @@ Cc:     Peter Zijlstra <peterz@infradead.org>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         x86@kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v12 05/17] KVM: x86/pmu: Introduce the ctrl_mask value for fixed counter
-Date:   Fri,  4 Mar 2022 17:04:15 +0800
-Message-Id: <20220304090427.90888-6-likexu@tencent.com>
+Subject: [PATCH v12 06/17] x86/perf/core: Add pebs_capable to store valid PEBS_COUNTER_MASK value
+Date:   Fri,  4 Mar 2022 17:04:16 +0800
+Message-Id: <20220304090427.90888-7-likexu@tencent.com>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20220304090427.90888-1-likexu@tencent.com>
 References: <20220304090427.90888-1-likexu@tencent.com>
@@ -75,72 +75,90 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <like.xu@linux.intel.com>
+From: "Peter Zijlstra (Intel)" <peterz@infradead.org>
 
-The mask value of fixed counter control register should be dynamic
-adjusted with the number of fixed counters. This patch introduces a
-variable that includes the reserved bits of fixed counter control
-registers. This is a generic code refactoring.
+The value of pebs_counter_mask will be accessed frequently
+for repeated use in the intel_guest_get_msrs(). So it can be
+optimized instead of endlessly mucking about with branches.
 
-Co-developed-by: Luwei Kang <luwei.kang@intel.com>
-Signed-off-by: Luwei Kang <luwei.kang@intel.com>
-Signed-off-by: Like Xu <like.xu@linux.intel.com>
-Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 ---
- arch/x86/include/asm/kvm_host.h | 1 +
- arch/x86/kvm/vmx/pmu_intel.c    | 6 +++++-
- 2 files changed, 6 insertions(+), 1 deletion(-)
+ arch/x86/events/intel/core.c | 14 ++++++--------
+ arch/x86/events/perf_event.h |  1 +
+ 2 files changed, 7 insertions(+), 8 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index c45ab8b5c37f..cf5ce12557f2 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -504,6 +504,7 @@ struct kvm_pmu {
- 	unsigned nr_arch_fixed_counters;
- 	unsigned available_event_types;
- 	u64 fixed_ctr_ctrl;
-+	u64 fixed_ctr_ctrl_mask;
- 	u64 global_ctrl;
- 	u64 global_status;
- 	u64 counter_bitmask[2];
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 61de7b07489c..c5f885198c60 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -394,7 +394,7 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 	case MSR_CORE_PERF_FIXED_CTR_CTRL:
- 		if (pmu->fixed_ctr_ctrl == data)
- 			return 0;
--		if (!(data & 0xfffffffffffff444ull)) {
-+		if (!(data & pmu->fixed_ctr_ctrl_mask)) {
- 			reprogram_fixed_counters(pmu, data);
- 			return 0;
- 		}
-@@ -478,6 +478,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
- 	struct kvm_cpuid_entry2 *entry;
- 	union cpuid10_eax eax;
- 	union cpuid10_edx edx;
-+	int i;
+diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
+index 820f9fb9339b..7f0bab2f70fd 100644
+--- a/arch/x86/events/intel/core.c
++++ b/arch/x86/events/intel/core.c
+@@ -2911,10 +2911,7 @@ static int handle_pmi_common(struct pt_regs *regs, u64 status)
+ 	 * counters from the GLOBAL_STATUS mask and we always process PEBS
+ 	 * events via drain_pebs().
+ 	 */
+-	if (x86_pmu.flags & PMU_FL_PEBS_ALL)
+-		status &= ~cpuc->pebs_enabled;
+-	else
+-		status &= ~(cpuc->pebs_enabled & PEBS_COUNTER_MASK);
++	status &= ~(cpuc->pebs_enabled & x86_pmu.pebs_capable);
  
- 	pmu->nr_arch_gp_counters = 0;
- 	pmu->nr_arch_fixed_counters = 0;
-@@ -485,6 +486,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
- 	pmu->counter_bitmask[KVM_PMC_FIXED] = 0;
- 	pmu->version = 0;
- 	pmu->reserved_bits = 0xffffffff00200000ull;
-+	pmu->fixed_ctr_ctrl_mask = ~0ull;
+ 	/*
+ 	 * PEBS overflow sets bit 62 in the global status register
+@@ -3960,10 +3957,7 @@ static struct perf_guest_switch_msr *intel_guest_get_msrs(int *nr, void *data)
+ 	arr[0].msr = MSR_CORE_PERF_GLOBAL_CTRL;
+ 	arr[0].host = intel_ctrl & ~cpuc->intel_ctrl_guest_mask;
+ 	arr[0].guest = intel_ctrl & ~cpuc->intel_ctrl_host_mask;
+-	if (x86_pmu.flags & PMU_FL_PEBS_ALL)
+-		arr[0].guest &= ~cpuc->pebs_enabled;
+-	else
+-		arr[0].guest &= ~(cpuc->pebs_enabled & PEBS_COUNTER_MASK);
++	arr[0].guest &= ~(cpuc->pebs_enabled & x86_pmu.pebs_capable);
+ 	*nr = 1;
  
- 	entry = kvm_find_cpuid_entry(vcpu, 0xa, 0);
- 	if (!entry || !vcpu->kvm->arch.enable_pmu)
-@@ -521,6 +523,8 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
- 		setup_fixed_pmc_eventsel(pmu);
- 	}
+ 	if (x86_pmu.pebs && x86_pmu.pebs_no_isolation) {
+@@ -5667,6 +5661,7 @@ __init int intel_pmu_init(void)
+ 	x86_pmu.events_mask_len		= eax.split.mask_length;
  
-+	for (i = 0; i < pmu->nr_arch_fixed_counters; i++)
-+		pmu->fixed_ctr_ctrl_mask &= ~(0xbull << (i * 4));
- 	pmu->global_ctrl = ((1ull << pmu->nr_arch_gp_counters) - 1) |
- 		(((1ull << pmu->nr_arch_fixed_counters) - 1) << INTEL_PMC_IDX_FIXED);
- 	pmu->global_ctrl_mask = ~pmu->global_ctrl;
+ 	x86_pmu.max_pebs_events		= min_t(unsigned, MAX_PEBS_EVENTS, x86_pmu.num_counters);
++	x86_pmu.pebs_capable		= PEBS_COUNTER_MASK;
+ 
+ 	/*
+ 	 * Quirk: v2 perfmon does not report fixed-purpose events, so
+@@ -5851,6 +5846,7 @@ __init int intel_pmu_init(void)
+ 		x86_pmu.pebs_aliases = NULL;
+ 		x86_pmu.pebs_prec_dist = true;
+ 		x86_pmu.lbr_pt_coexist = true;
++		x86_pmu.pebs_capable = ~0ULL;
+ 		x86_pmu.flags |= PMU_FL_HAS_RSP_1;
+ 		x86_pmu.flags |= PMU_FL_PEBS_ALL;
+ 		x86_pmu.get_event_constraints = glp_get_event_constraints;
+@@ -6208,6 +6204,7 @@ __init int intel_pmu_init(void)
+ 		x86_pmu.pebs_aliases = NULL;
+ 		x86_pmu.pebs_prec_dist = true;
+ 		x86_pmu.pebs_block = true;
++		x86_pmu.pebs_capable = ~0ULL;
+ 		x86_pmu.flags |= PMU_FL_HAS_RSP_1;
+ 		x86_pmu.flags |= PMU_FL_NO_HT_SHARING;
+ 		x86_pmu.flags |= PMU_FL_PEBS_ALL;
+@@ -6250,6 +6247,7 @@ __init int intel_pmu_init(void)
+ 		x86_pmu.pebs_aliases = NULL;
+ 		x86_pmu.pebs_prec_dist = true;
+ 		x86_pmu.pebs_block = true;
++		x86_pmu.pebs_capable = ~0ULL;
+ 		x86_pmu.flags |= PMU_FL_HAS_RSP_1;
+ 		x86_pmu.flags |= PMU_FL_NO_HT_SHARING;
+ 		x86_pmu.flags |= PMU_FL_PEBS_ALL;
+diff --git a/arch/x86/events/perf_event.h b/arch/x86/events/perf_event.h
+index bf23cbe4f6cf..9e1bef9c2b0c 100644
+--- a/arch/x86/events/perf_event.h
++++ b/arch/x86/events/perf_event.h
+@@ -825,6 +825,7 @@ struct x86_pmu {
+ 	void		(*pebs_aliases)(struct perf_event *event);
+ 	unsigned long	large_pebs_flags;
+ 	u64		rtm_abort_event;
++	u64		pebs_capable;
+ 
+ 	/*
+ 	 * Intel LBR
 -- 
 2.35.1
 
