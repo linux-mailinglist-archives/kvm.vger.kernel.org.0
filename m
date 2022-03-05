@@ -2,236 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 18E184CE03A
-	for <lists+kvm@lfdr.de>; Fri,  4 Mar 2022 23:25:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E4EE4CE18C
+	for <lists+kvm@lfdr.de>; Sat,  5 Mar 2022 01:34:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229955AbiCDWZs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Mar 2022 17:25:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52528 "EHLO
+        id S230242AbiCEAfZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Mar 2022 19:35:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45092 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229520AbiCDWZr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Mar 2022 17:25:47 -0500
-Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F04211C8DAD
-        for <kvm@vger.kernel.org>; Fri,  4 Mar 2022 14:24:58 -0800 (PST)
-Received: by mail-lf1-x135.google.com with SMTP id g39so16461396lfv.10
-        for <kvm@vger.kernel.org>; Fri, 04 Mar 2022 14:24:58 -0800 (PST)
+        with ESMTP id S230232AbiCEAfY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Mar 2022 19:35:24 -0500
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F821A88BB
+        for <kvm@vger.kernel.org>; Fri,  4 Mar 2022 16:34:36 -0800 (PST)
+Received: by mail-pf1-x42e.google.com with SMTP id p8so8945299pfh.8
+        for <kvm@vger.kernel.org>; Fri, 04 Mar 2022 16:34:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=mIkKNNfP/8P8T0zwk9ZM4ql2lyg7JDaAbKMDiOj8/QE=;
-        b=eVkxf2BeBVQlMj+IBrkhWaSBzNuJV5bwtFNoPAuP9Z41jULq2YxZfbibh6XO8h2ZDo
-         pVjrDpn8Iby+f+Ly6VdikU6TMl2qfundmcN1rFL7S6AbAMF226rbuni1mk8xYeu2MzhF
-         OVzdiDRkXXfH7PcaxMQLWSI264lbGD1JhRz60QtDQL4z0kTf368wIGQ8fLoA0eNFI1pq
-         HNZcpmVVq/NpIxgYO6JqwIrtNofey7FzmrsmmF10K2QVN4FFI9TOpysz1QkNCQVaOjGC
-         lR2Tj8UJ0pBZ9vlwx+2cMaV80Jw3lcxfAcektuA5mcTDU2CDXpeSFaL1yzZoqo1NaXGr
-         SsRQ==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=9awKCCKzwQ2dqbJt0HhmYBsF/X0J7+H0Zf6OyrcVwwk=;
+        b=cIYwKZlXga7k55pJ6Hx6u3E1O0qMOeX9MtZ4QnhaaFbVj+Gwocpw7HAw2uXKckeyNg
+         N62ebYTAV747rJvVn2IYd5Aa4qEuDijsdldXC6LBdXSFG1gaEwhmXj5u+V4C9Uv7i05W
+         vcBM/WJyq/aqsH92E03REjyFnzq9/5xoOD2sk3jWlL74SFl7tJLknUpHVJFeHP9X8316
+         PamGMns78nhhhAN3MT6u+RF631p/F6vL32h7EAst1BR/MyuvxQSz082tcW8Jnr/Lu1Q0
+         vSLLAjS3b8zIRNMffiygjUSiKEZGO4qtL9X/CCbDprfU5GuKuBIq9KnMUoHzhyo5NDbv
+         JCiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=mIkKNNfP/8P8T0zwk9ZM4ql2lyg7JDaAbKMDiOj8/QE=;
-        b=ccx35IMysHG9CysdTMhT43cp1Sw7qxKQkWKMAj8Sfr0RkDEDRVjjlcB5lKGI93XYXm
-         bUqIj/6DAU4vyHZigjG/3uXCqjZnLmvwvFWRSCORPySC7CAyNx2YXvj8VQWIsbkmbemq
-         kw4lvY5T6y2DEf7LuEcDrUTTP3qE+gtY7jYcWKENZ1x4AGN/kMdDzsWMyH8Xn7laZnBi
-         1TyshrbZPecLd7B2jLnTUiqm0yO7YC7R5aQSHQetbKB0hVCWW4+/mljCn7pCI6ey9oDF
-         r0bywitKT6SxGxJRXIdaO1X5pdLQ+fKP5lydfl3L02P34QARpr+W4kLUutdEreQJO3PL
-         N1lA==
-X-Gm-Message-State: AOAM53287cSpCsEw3JUFUTOCA2G3uENgCQK8DvWsgahuudPlWoLEA+3z
-        9CsPWaRCfPHGmb8Zhju3lfxpJZOKI6HHzSF8v/FLcA==
-X-Google-Smtp-Source: ABdhPJzugFc00SylNfTD+xVCClVTQhvheYD4jWd0h1uHzT6UtnPUCwtWj6T3X0r3mBf2o7A4lJ7cvKdJ65x/19M0+eo=
-X-Received: by 2002:a19:7503:0:b0:443:3d52:fde6 with SMTP id
- y3-20020a197503000000b004433d52fde6mr552720lfe.250.1646432696996; Fri, 04 Mar
- 2022 14:24:56 -0800 (PST)
-MIME-Version: 1.0
-References: <20220203010051.2813563-1-dmatlack@google.com> <20220203010051.2813563-20-dmatlack@google.com>
- <8735k84i6f.wl-maz@kernel.org> <CALzav=d9dRWCV=R8Ypvy4KzgzPQvd-7qhGTbxso5r9eTh9kkqw@mail.gmail.com>
- <CALzav=ccRmvCB+FsN64JujOVpb7-ocdzkiBrYLFGFRQUa7DbWQ@mail.gmail.com>
-In-Reply-To: <CALzav=ccRmvCB+FsN64JujOVpb7-ocdzkiBrYLFGFRQUa7DbWQ@mail.gmail.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Fri, 4 Mar 2022 14:24:30 -0800
-Message-ID: <CALzav=cTELtHFoVCW5H5OQ9ZyUH_25msXAZTRG+ud4JN93J7Lg@mail.gmail.com>
-Subject: Re: [PATCH 19/23] KVM: Allow for different capacities in
- kvm_mmu_memory_cache structs
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        leksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Sean Christopherson <seanjc@google.com>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=9awKCCKzwQ2dqbJt0HhmYBsF/X0J7+H0Zf6OyrcVwwk=;
+        b=0fqWeCaKOKiXsk+f1KvbZ41O2CTAmTqUXuA1gW7c0/xvX6r/QT9BavfngAbvlLE/m4
+         om0lf+uvQR0/HlQY8wKxxZAIkGuVd1QrGbR+yV7dtmM2Xil+7ENmMLvNL69co3xwR4F8
+         hw0xCT6MJIcOt3HiP05rLrI6pifYssJUmIwkn4ADev3nzJE9NHny5zfyxsnrbdiUndHD
+         LQ53c/H9xzjh70jqH2to7EYlyzCL8erh3SexaTrQOftPpC4glNciQpCXIjhk6t77eo4U
+         vMhEXXTdbxleP6zIdZOiAo6LuYb13Mxw00eJRVCUjVZPx7wOMSwQsVKIMzHy495GYhdN
+         kb1w==
+X-Gm-Message-State: AOAM532aAGaPRpl8ZXadknD0JbvKxXTjLSeylKJRBrBdBoorRm2bXW4r
+        yLYCZMc6sNnGpK2CyxB6v1IZUw==
+X-Google-Smtp-Source: ABdhPJy8buS111AF6pUAsQWsQEoRwPURB2GdQ8KHQizCtZYGIDUkTVBDQTzXcgK+8pA8eE3GlkQrbg==
+X-Received: by 2002:a63:8349:0:b0:37d:5e5e:a535 with SMTP id h70-20020a638349000000b0037d5e5ea535mr799884pge.158.1646440475381;
+        Fri, 04 Mar 2022 16:34:35 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id s7-20020a056a00178700b004e1a15e7928sm7730995pfg.145.2022.03.04.16.34.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Mar 2022 16:34:34 -0800 (PST)
+Date:   Sat, 5 Mar 2022 00:34:31 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
-        Peter Feiner <pfeiner@google.com>,
-        Andrew Jones <drjones@redhat.com>,
-        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
-        kvm list <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        David Hildenbrand <david@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        Mingwei Zhang <mizhang@google.com>
+Subject: Re: [PATCH v4 21/30] KVM: x86/mmu: Zap invalidated roots via
+ asynchronous worker
+Message-ID: <YiKwFznqqiB9VRyn@google.com>
+References: <20220303193842.370645-1-pbonzini@redhat.com>
+ <20220303193842.370645-22-pbonzini@redhat.com>
+ <YiExLB3O2byI4Xdu@google.com>
+ <YiEz3D18wEn8lcEq@google.com>
+ <eeac12f0-0a18-8c63-1987-494a2032fa9d@redhat.com>
+ <YiI4AmYkm2oiuiio@google.com>
+ <8b8c28cf-cf54-f889-be7d-afc9f5430ecd@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8b8c28cf-cf54-f889-be7d-afc9f5430ecd@redhat.com>
 X-Spam-Status: No, score=-18.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 4, 2022 at 1:59 PM David Matlack <dmatlack@google.com> wrote:
->
-> On Thu, Feb 24, 2022 at 11:20 AM David Matlack <dmatlack@google.com> wrote:
-> >
-> > On Thu, Feb 24, 2022 at 3:29 AM Marc Zyngier <maz@kernel.org> wrote:
-> > >
-> > > On Thu, 03 Feb 2022 01:00:47 +0000,
-> > > David Matlack <dmatlack@google.com> wrote:
-> > > >
->
-> [...]
->
-> > > >
-> > > >       /* Cache some mmu pages needed inside spinlock regions */
-> > > > -     struct kvm_mmu_memory_cache mmu_page_cache;
-> > > > +     DEFINE_KVM_MMU_MEMORY_CACHE(mmu_page_cache);
-> > >
-> > > I must say I'm really not a fan of the anonymous structure trick. I
-> > > can see why you are doing it that way, but it feels pretty brittle.
-> >
-> > Yeah I don't love it. It's really optimizing for minimizing the patch diff.
-> >
-> > The alternative I considered was to dynamically allocate the
-> > kvm_mmu_memory_cache structs. This would get rid of the anonymous
-> > struct and the objects array, and also eliminate the rather gross
-> > capacity hack in kvm_mmu_topup_memory_cache().
-> >
-> > The downsides of this approach is more code and more failure paths if
-> > the allocation fails.
->
-> I tried changing all kvm_mmu_memory_cache structs to be dynamically
-> allocated, but it created a lot of complexity to the setup/teardown
-> code paths in x86, arm64, mips, and riscv (the arches that use the
-> caches). I don't think this route is worth it, especially since these
-> structs don't *need* to be dynamically allocated.
->
-> When you said the anonymous struct feels brittle, what did you have in
-> mind specifically?
->
-> >
-> > >
-> > > >
-> > > >       /* Target CPU and feature flags */
-> > > >       int target;
-> > > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > > > index bc2aba953299..9c853c529b49 100644
-> > > > --- a/arch/arm64/kvm/mmu.c
-> > > > +++ b/arch/arm64/kvm/mmu.c
-> > > > @@ -765,7 +765,8 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
-> > > >  {
-> > > >       phys_addr_t addr;
-> > > >       int ret = 0;
-> > > > -     struct kvm_mmu_memory_cache cache = { 0, __GFP_ZERO, NULL, };
-> > > > +     DEFINE_KVM_MMU_MEMORY_CACHE(cache) page_cache = {};
-> > > > +     struct kvm_mmu_memory_cache *cache = &page_cache.cache;
-> > > >       struct kvm_pgtable *pgt = kvm->arch.mmu.pgt;
-> > > >       enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_DEVICE |
-> > > >                                    KVM_PGTABLE_PROT_R |
-> > > > @@ -774,18 +775,17 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
-> > > >       if (is_protected_kvm_enabled())
-> > > >               return -EPERM;
-> > > >
-> > > > +     cache->gfp_zero = __GFP_ZERO;
-> > >
-> > > nit: consider this instead, which preserves the existing flow:
-> >
-> > Will do.
-> >
-> > >
-> > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > > index 26d6c53be083..86a7ebd03a44 100644
-> > > --- a/arch/arm64/kvm/mmu.c
-> > > +++ b/arch/arm64/kvm/mmu.c
-> > > @@ -764,7 +764,9 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
-> > >  {
-> > >         phys_addr_t addr;
-> > >         int ret = 0;
-> > > -       DEFINE_KVM_MMU_MEMORY_CACHE(cache) page_cache = {};
-> > > +       DEFINE_KVM_MMU_MEMORY_CACHE(cache) page_cache = {
-> > > +               .cache = { .gfp_zero = __GFP_ZERO},
-> > > +       };
-> > >         struct kvm_mmu_memory_cache *cache = &page_cache.cache;
-> > >         struct kvm_pgtable *pgt = kvm->arch.mmu.pgt;
-> > >         enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_DEVICE |
-> > > @@ -774,7 +776,6 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
-> > >         if (is_protected_kvm_enabled())
-> > >                 return -EPERM;
-> > >
-> > > -       cache->gfp_zero = __GFP_ZERO;
-> > >         size += offset_in_page(guest_ipa);
-> > >         guest_ipa &= PAGE_MASK;
-> > >
-> > > but whole "declare the outer structure and just use the inner one"
-> > > hack is... huh... :-/
-> >
-> > Yeah it's not great. Unfortunately (or maybe fortunately?) anonymous
-> > structs cannot be defined in functions. So naming the outer struct is
-> > necessary even though we only need to use the inner one.
->
-> I see two alternatives to make this cleaner:
->
-> 1. Dynamically allocate just this cache. The caches defined in
-> vcpu_arch will continue to use DEFINE_KVM_MMU_MEMORY_CACHE(). This
-> would get rid of the outer struct but require an extra memory
-> allocation.
-> 2. Move this cache to struct kvm_arch using
-> DEFINE_KVM_MMU_MEMORY_CACHE(). Then we don't need to stack allocate it
-> or dynamically allocate it.
->
-> Do either of these approaches appeal to you more than the current one?
+On Fri, Mar 04, 2022, Paolo Bonzini wrote:
+> On 3/4/22 17:02, Sean Christopherson wrote:
+> > On Fri, Mar 04, 2022, Paolo Bonzini wrote:
+> > > On 3/3/22 22:32, Sean Christopherson wrote:
+> > > I didn't remove the paragraph from the commit message, but I think it's
+> > > unnecessary now.  The workqueue is flushed in kvm_mmu_zap_all_fast() and
+> > > kvm_mmu_uninit_tdp_mmu(), unlike the buggy patch, so it doesn't need to take
+> > > a reference to the VM.
+> > > 
+> > > I think I don't even need to check kvm->users_count in the defunct root
+> > > case, as long as kvm_mmu_uninit_tdp_mmu() flushes and destroys the workqueue
+> > > before it checks that the lists are empty.
+> > 
+> > Yes, that should work.  IIRC, the WARN_ONs will tell us/you quite quickly if
+> > we're wrong :-)  mmu_notifier_unregister() will call the "slow" kvm_mmu_zap_all()
+> > and thus ensure all non-root pages zapped, but "leaking" a worker will trigger
+> > the WARN_ON that there are no roots on the list.
+> 
+> Good, for the record these are the commit messages I have:
+> 
+>     KVM: x86/mmu: Zap invalidated roots via asynchronous worker
+>     Use the system worker threads to zap the roots invalidated
+>     by the TDP MMU's "fast zap" mechanism, implemented by
+>     kvm_tdp_mmu_invalidate_all_roots().
+>     At this point, apart from allowing some parallelism in the zapping of
+>     roots, the workqueue is a glorified linked list: work items are added and
+>     flushed entirely within a single kvm->slots_lock critical section.  However,
+>     the workqueue fixes a latent issue where kvm_mmu_zap_all_invalidated_roots()
+>     assumes that it owns a reference to all invalid roots; therefore, no
+>     one can set the invalid bit outside kvm_mmu_zap_all_fast().  Putting the
+>     invalidated roots on a linked list... erm, on a workqueue ensures that
+>     tdp_mmu_zap_root_work() only puts back those extra references that
+>     kvm_mmu_zap_all_invalidated_roots() had gifted to it.
+> 
+> and
+> 
+>     KVM: x86/mmu: Zap defunct roots via asynchronous worker
+>     Zap defunct roots, a.k.a. roots that have been invalidated after their
+>     last reference was initially dropped, asynchronously via the existing work
+>     queue instead of forcing the work upon the unfortunate task that happened
+>     to drop the last reference.
+>     If a vCPU task drops the last reference, the vCPU is effectively blocked
+>     by the host for the entire duration of the zap.  If the root being zapped
+>     happens be fully populated with 4kb leaf SPTEs, e.g. due to dirty logging
+>     being active, the zap can take several hundred seconds.  Unsurprisingly,
+>     most guests are unhappy if a vCPU disappears for hundreds of seconds.
+>     E.g. running a synthetic selftest that triggers a vCPU root zap with
+>     ~64tb of guest memory and 4kb SPTEs blocks the vCPU for 900+ seconds.
+>     Offloading the zap to a worker drops the block time to <100ms.
+>     There is an important nuance to this change.  If the same work item
+>     was queued twice before the work function has run, it would only
+>     execute once and one reference would be leaked.  Therefore, now that
+>     queueing items is not anymore protected by write_lock(&kvm->mmu_lock),
+>     kvm_tdp_mmu_invalidate_all_roots() has to check root->role.invalid and
+>     skip already invalid roots.  On the other hand, kvm_mmu_zap_all_fast()
+>     must return only after those skipped roots have been zapped as well.
+>     These two requirements can be satisfied only if _all_ places that
+>     change invalid to true now schedule the worker before releasing the
+>     mmu_lock.  There are just two, kvm_tdp_mmu_put_root() and
+>     kvm_tdp_mmu_invalidate_all_roots().
 
-(There's obvious performance and memory overhead trade-offs with these
-different approaches, but I don't know enough about arm64 KVM to
-assess which option might be best.)
-
->
-> >
-> > >
-> > > This hunk also conflicts with what currently sits in -next. Not a big
-> > > deal, but just so you know.
-> >
-> > Ack.
-> >
-> > >
-> > > > diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
-> > > > index dceac12c1ce5..9575fb8d333f 100644
-> > > > --- a/include/linux/kvm_types.h
-> > > > +++ b/include/linux/kvm_types.h
-> > > > @@ -78,14 +78,34 @@ struct gfn_to_pfn_cache {
-> > > >   * MMU flows is problematic, as is triggering reclaim, I/O, etc... while
-> > > >   * holding MMU locks.  Note, these caches act more like prefetch buffers than
-> > > >   * classical caches, i.e. objects are not returned to the cache on being freed.
-> > > > + *
-> > > > + * The storage for the cache objects is laid out after the struct to allow
-> > > > + * different declarations to choose different capacities. If the capacity field
-> > > > + * is 0, the capacity is assumed to be KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE.
-> > > >   */
-> > > >  struct kvm_mmu_memory_cache {
-> > > >       int nobjs;
-> > > > +     int capacity;
-> > > >       gfp_t gfp_zero;
-> > > >       struct kmem_cache *kmem_cache;
-> > > > -     void *objects[KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE];
-> > > > +     void *objects[0];
-> > >
-> > > The VLA police is going to track you down ([0] vs []).
-> >
-> > Thanks!
-> >
-> >
-> > >
-> > >         M.
-> > >
-> > > --
-> > > Without deviation from the norm, progress is not possible.
+Very nice!
