@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7651D4CE718
-	for <lists+kvm@lfdr.de>; Sat,  5 Mar 2022 21:56:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B7D2D4CE713
+	for <lists+kvm@lfdr.de>; Sat,  5 Mar 2022 21:56:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232545AbiCEU4k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 5 Mar 2022 15:56:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48600 "EHLO
+        id S232556AbiCEU4m (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 5 Mar 2022 15:56:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48648 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232520AbiCEU4h (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 5 Mar 2022 15:56:37 -0500
-Received: from mail-qk1-x733.google.com (mail-qk1-x733.google.com [IPv6:2607:f8b0:4864:20::733])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDBB661A35;
-        Sat,  5 Mar 2022 12:55:46 -0800 (PST)
-Received: by mail-qk1-x733.google.com with SMTP id s16so836000qks.4;
-        Sat, 05 Mar 2022 12:55:46 -0800 (PST)
+        with ESMTP id S232536AbiCEU4i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 5 Mar 2022 15:56:38 -0500
+Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5D476210F;
+        Sat,  5 Mar 2022 12:55:47 -0800 (PST)
+Received: by mail-qk1-x736.google.com with SMTP id f21so9057868qke.13;
+        Sat, 05 Mar 2022 12:55:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=dgtynUkl2NInlVz9c5ix3B45LFvFB0LQ430PaZMW1II=;
-        b=poVjJKTCR4/cA/XiB8QNfBT6ZtNw++5QZKbi/6qZPkxUfiFPp0vRMzzAb/5voTaGWN
-         Q7OhoAn0v8nvdpxzxe+QTs35O/2C3wZ/Ssa5PpDWx83eRaNpPGdvfU+wElTtbwsjkc8p
-         cvcRDlbuHYk7qy/kpLmw1sfYMwpHHJGjNEGCF7ibNfLL0eT/Fyves0agTkvlsD6vi0Ym
-         +KSMVR9MO8tIv7YUrudxEN8sIC3qGWD49PR2u7nQ0tpw9T1C9c5yE1fxZfYORPBQVKGU
-         /razbVr44Ryo0bOwR89x56bPDjdy2Xxo9lSv3Wea83Sp8DCk1QbsQUeEb6MiF7Q/nz5c
-         bpZg==
+        bh=R8MoG4V6/qvajTZezIe9y4jfAXlOuicKSXlBnDiaTLs=;
+        b=ikeRqzIDcQ5A6KXHh00Hrqd9XQYEiZZTg+px37l4jUHXaZfQGVxdPw+neR8LpjR1hd
+         A4t4C5iVorYzo90KgMEjSaZPpmFkCS8cQsojrGOw9k8F2vuEyXw1P9HbkONLEvj5GVk5
+         hoUeeh7PjwKU1Uh8YE3BHpJ9xJXqftnQ/P1UymWA9Ou6Og20IjJ0MlqMdKEBjuRsud8X
+         sury6vZOX5zHMMAn3hGi0qwFlgVMrtAbql4Ms/PP7Z+6hTysnV3edj063nnRh6WkR1JK
+         IAlHXw5W3XG0h9gxi0y1H098IVMIC1//7TsKA5UFYVB4E5+hEbu3D83vgMcBCVLWDlYO
+         VUww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=dgtynUkl2NInlVz9c5ix3B45LFvFB0LQ430PaZMW1II=;
-        b=DNYJlHWOMG+fAWl5lVGVwPrExfbMFzdwspIyYzYYY1sCMsYAE2KgF09Xc+3EZ8k9df
-         M/fWEJKuUdzIGdxNqggSjWCwVaUmPptEQmk1De85SK2jA25ot3INLHVZwNjpydayYhHG
-         9Cs8+s1fEcFBVOK6rZKQvJ1nJ1ZKdybFUA8dvsDUCsP/WhGg5NopeY3iLGqSyJyBqW5H
-         125H3zz8il5gx0vvRgBrK7p5DBqknrtRAenW6nYVfAqlb0QywChgM7bpysV+9jOOtsR1
-         guG2DJTpQZUl2Y82qCNuRCw8DcIXuDlJWiAddMhUuNFSv4tlzQ8sJZ5w9ckMDrTL9f/M
-         9vng==
-X-Gm-Message-State: AOAM5308+k5nKB2vDr+bhso4JhS7HUzabF4V8KLUwi4oCT5EDffCT5aJ
-        YmuTbHKzxEWmYZwYQR3QlhmKuCWfEqaF7lbh
-X-Google-Smtp-Source: ABdhPJwIH2hIp5+b55+kWph/10nEL3GMY1jKO4ZKGeXyBVFrGWgyMeNpnv46LvMgTdHyireTEPRWFg==
-X-Received: by 2002:a37:af81:0:b0:502:7ea:34e7 with SMTP id y123-20020a37af81000000b0050207ea34e7mr2895675qke.737.1646513745973;
-        Sat, 05 Mar 2022 12:55:45 -0800 (PST)
+        bh=R8MoG4V6/qvajTZezIe9y4jfAXlOuicKSXlBnDiaTLs=;
+        b=EOWSUcalQQAcNtuRvS+xZWt5H0rstlPjLUW65OVa/xczwmauYloMTwQ/UXQcxm4LPw
+         aXsI4DR1P8P9gAYjggOHjf1i//QxYw+ihXVKwSu6ws1XSI380pepqVqzEwMT0xqh4z3Q
+         Z8xPa5xgV67zroFHsNcj8F2ofgKWpN0D+oBagMeLxlKaZvI32Nbr7jb4GZAHMC9R9fmY
+         Dsc0SSDhFAU3uTpuXXWYHWGtrZH0lPysYKndnrrKGmwRkDNtlp68b9cWaKlEfSRTUjk2
+         X0pcyJKH4jlDNb/O38uERZwC9CjDdv4vVKDBNW+eFp5n5YgZm0+/Q+gKZnper4Ok5Tg3
+         n9qg==
+X-Gm-Message-State: AOAM533X8TS11ivICVUxtE7X8UQdrfedxqMYTCeScxyoyu3zjf3xDYaS
+        XBoHjK6PfGg3Fl0xZl8tGgo=
+X-Google-Smtp-Source: ABdhPJxJFvKgeSdZT78GejgzfYS4YE3MXAzM16FaBJ2HYPUuiBzA09NdX8VtM0aWaxutZ145CA3P/Q==
+X-Received: by 2002:a37:414c:0:b0:662:cd75:5475 with SMTP id o73-20020a37414c000000b00662cd755475mr2781293qka.271.1646513747096;
+        Sat, 05 Mar 2022 12:55:47 -0800 (PST)
 Received: from henry-arch.studentwireless.binghamton.edu ([149.125.84.173])
-        by smtp.googlemail.com with ESMTPSA id l19-20020a05622a175300b002de935a94c9sm5877525qtk.8.2022.03.05.12.55.45
+        by smtp.googlemail.com with ESMTPSA id l19-20020a05622a175300b002de935a94c9sm5877525qtk.8.2022.03.05.12.55.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 05 Mar 2022 12:55:45 -0800 (PST)
+        Sat, 05 Mar 2022 12:55:46 -0800 (PST)
 From:   Henry Sloan <henryksloan@gmail.com>
 Cc:     pbonzini@redhat.com, Henry Sloan <henryksloan@gmail.com>,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 3/6] KVM: Replace '__attribute__((weak))' with '__weak'
-Date:   Sat,  5 Mar 2022 15:55:25 -0500
-Message-Id: <20220305205528.463894-4-henryksloan@gmail.com>
+Subject: [PATCH 4/6] KVM: Add blank lines after some declarations
+Date:   Sat,  5 Mar 2022 15:55:26 -0500
+Message-Id: <20220305205528.463894-5-henryksloan@gmail.com>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20220305205528.463894-1-henryksloan@gmail.com>
 References: <20220305205528.463894-1-henryksloan@gmail.com>
@@ -71,88 +71,79 @@ X-Mailing-List: kvm@vger.kernel.org
 
 Signed-off-by: Henry Sloan <henryksloan@gmail.com>
 ---
- virt/kvm/eventfd.c  | 12 ++++++------
- virt/kvm/irqchip.c  |  2 +-
- virt/kvm/kvm_main.c |  2 +-
- 3 files changed, 8 insertions(+), 8 deletions(-)
+ virt/kvm/eventfd.c  | 1 +
+ virt/kvm/irqchip.c  | 2 ++
+ virt/kvm/kvm_main.c | 4 ++++
+ 3 files changed, 7 insertions(+)
 
 diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
-index 1054ddb915b0..14aef85829ed 100644
+index 14aef85829ed..2e47bd13413e 100644
 --- a/virt/kvm/eventfd.c
 +++ b/virt/kvm/eventfd.c
-@@ -32,7 +32,7 @@
+@@ -195,6 +195,7 @@ irqfd_wakeup(wait_queue_entry_t *wait, unsigned int mode, int sync, void *key)
  
- static struct workqueue_struct *irqfd_cleanup_wq;
+ 	if (flags & EPOLLIN) {
+ 		u64 cnt;
++
+ 		eventfd_ctx_do_read(irqfd->eventfd, &cnt);
  
--bool __attribute__((weak))
-+bool __weak
- kvm_arch_irqfd_allowed(struct kvm *kvm, struct kvm_irqfd *args)
- {
- 	return true;
-@@ -169,7 +169,7 @@ irqfd_deactivate(struct kvm_kernel_irqfd *irqfd)
- 	queue_work(irqfd_cleanup_wq, &irqfd->shutdown);
- }
- 
--int __attribute__((weak)) kvm_arch_set_irq_inatomic(
-+int __weak kvm_arch_set_irq_inatomic(
- 				struct kvm_kernel_irq_routing_entry *irq,
- 				struct kvm *kvm, int irq_source_id,
- 				int level,
-@@ -265,24 +265,24 @@ static void irqfd_update(struct kvm *kvm, struct kvm_kernel_irqfd *irqfd)
- }
- 
- #ifdef CONFIG_HAVE_KVM_IRQ_BYPASS
--void __attribute__((weak)) kvm_arch_irq_bypass_stop(
-+void __weak kvm_arch_irq_bypass_stop(
- 				struct irq_bypass_consumer *cons)
- {
- }
- 
--void __attribute__((weak)) kvm_arch_irq_bypass_start(
-+void __weak kvm_arch_irq_bypass_start(
- 				struct irq_bypass_consumer *cons)
- {
- }
- 
--int  __attribute__((weak)) kvm_arch_update_irqfd_routing(
-+int  __weak kvm_arch_update_irqfd_routing(
- 				struct kvm *kvm, unsigned int host_irq,
- 				uint32_t guest_irq, bool set)
- {
- 	return 0;
- }
- 
--bool __attribute__((weak)) kvm_arch_irqfd_route_changed(
-+bool __weak kvm_arch_irqfd_route_changed(
- 				struct kvm_kernel_irq_routing_entry *old,
- 				struct kvm_kernel_irq_routing_entry *new)
- {
+ 		idx = srcu_read_lock(&kvm->irq_srcu);
 diff --git a/virt/kvm/irqchip.c b/virt/kvm/irqchip.c
-index dcd51e6efb8a..baa551aec010 100644
+index baa551aec010..69a327c043d7 100644
 --- a/virt/kvm/irqchip.c
 +++ b/virt/kvm/irqchip.c
-@@ -157,7 +157,7 @@ static int setup_routing_entry(struct kvm *kvm,
- 	return 0;
- }
+@@ -86,6 +86,7 @@ int kvm_set_irq(struct kvm *kvm, int irq_source_id, u32 irq, int level,
  
--void __attribute__((weak)) kvm_arch_irq_routing_update(struct kvm *kvm)
-+void __weak kvm_arch_irq_routing_update(struct kvm *kvm)
- {
+ 	while (i--) {
+ 		int r;
++
+ 		r = irq_set[i].set(&irq_set[i], kvm, irq_source_id, level,
+ 				   line_status);
+ 		if (r < 0)
+@@ -122,6 +123,7 @@ void kvm_free_irq_routing(struct kvm *kvm)
+ 	/* Called only during vm destruction. Nobody can use the pointer
+ 	   at this stage */
+ 	struct kvm_irq_routing_table *rt = rcu_access_pointer(kvm->irq_routing);
++
+ 	free_irq_routing_table(rt);
  }
  
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index c5fb79e64e75..af74cf3b6446 100644
+index af74cf3b6446..1988dd081606 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -4386,7 +4386,7 @@ static int kvm_vm_ioctl_reset_dirty_pages(struct kvm *kvm)
- 	return cleared;
- }
+@@ -2171,6 +2171,7 @@ static int kvm_clear_dirty_log_protect(struct kvm *kvm,
+ 	     i++, offset += BITS_PER_LONG) {
+ 		unsigned long mask = *dirty_bitmap_buffer++;
+ 		atomic_long_t *p = (atomic_long_t *) &dirty_bitmap[i];
++
+ 		if (!mask)
+ 			continue;
  
--int __attribute__((weak)) kvm_vm_ioctl_enable_cap(struct kvm *kvm,
-+int __weak kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 						  struct kvm_enable_cap *cap)
+@@ -2477,6 +2478,7 @@ static int hva_to_pfn_remapped(struct vm_area_struct *vma,
+ 		 * not call the fault handler, so do it here.
+ 		 */
+ 		bool unlocked = false;
++
+ 		r = fixup_user_fault(current->mm, addr,
+ 				     (write_fault ? FAULT_FLAG_WRITE : 0),
+ 				     &unlocked);
+@@ -3053,6 +3055,7 @@ int kvm_gfn_to_hva_cache_init(struct kvm *kvm, struct gfn_to_hva_cache *ghc,
+ 			      gpa_t gpa, unsigned long len)
  {
- 	return -EINVAL;
+ 	struct kvm_memslots *slots = kvm_memslots(kvm);
++
+ 	return __kvm_gfn_to_hva_cache_init(slots, ghc, gpa, len);
+ }
+ EXPORT_SYMBOL_GPL(kvm_gfn_to_hva_cache_init);
+@@ -3887,6 +3890,7 @@ static long kvm_vcpu_ioctl(struct file *filp,
+ 	switch (ioctl) {
+ 	case KVM_RUN: {
+ 		struct pid *oldpid;
++
+ 		r = -EINVAL;
+ 		if (arg)
+ 			goto out;
 -- 
 2.35.1
 
