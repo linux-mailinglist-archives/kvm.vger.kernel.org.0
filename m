@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3DB2A4CE714
-	for <lists+kvm@lfdr.de>; Sat,  5 Mar 2022 21:56:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7651D4CE718
+	for <lists+kvm@lfdr.de>; Sat,  5 Mar 2022 21:56:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232532AbiCEU4h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 5 Mar 2022 15:56:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48584 "EHLO
+        id S232545AbiCEU4k (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 5 Mar 2022 15:56:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232517AbiCEU4g (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 5 Mar 2022 15:56:36 -0500
-Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3DA260DAD;
-        Sat,  5 Mar 2022 12:55:45 -0800 (PST)
-Received: by mail-qk1-x730.google.com with SMTP id z66so9058354qke.10;
-        Sat, 05 Mar 2022 12:55:45 -0800 (PST)
+        with ESMTP id S232520AbiCEU4h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 5 Mar 2022 15:56:37 -0500
+Received: from mail-qk1-x733.google.com (mail-qk1-x733.google.com [IPv6:2607:f8b0:4864:20::733])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDBB661A35;
+        Sat,  5 Mar 2022 12:55:46 -0800 (PST)
+Received: by mail-qk1-x733.google.com with SMTP id s16so836000qks.4;
+        Sat, 05 Mar 2022 12:55:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=jtIXuKCcBJI/lwMJfayWLSewoOe6VlcxvOBTKyy+vtU=;
-        b=JNKyST3NjchNUczfg5MXqP7e7f8kswX9Lqp1eXSlsEEBMyaHrYp8OaUEbBovSvo3Qy
-         crVd9LJ9FVvnXYJvxNQ9sFRZC0o5n8G9vWR/qkQnDKIhyfnxPqC2ugnakU/1TeJuFE7B
-         dP3QoyMAtIbFtsJas1eWW3dVJqAYod2jhuYQhT4WQbTX+hhOliGbq/OfhYHsTZTOxVU8
-         EJXs3NHjoFH1DJ77FHfH23mxb9YcjepG03C6Ad1Lum53A/4gOdKbZY/2W0vObFVmH0c7
-         ppphm3YR2QSYAsCEbZMozboB5BonFR5whQDX4tdEHbwHzZSWphXJKCYyNW436RX16kWf
-         jY9g==
+        bh=dgtynUkl2NInlVz9c5ix3B45LFvFB0LQ430PaZMW1II=;
+        b=poVjJKTCR4/cA/XiB8QNfBT6ZtNw++5QZKbi/6qZPkxUfiFPp0vRMzzAb/5voTaGWN
+         Q7OhoAn0v8nvdpxzxe+QTs35O/2C3wZ/Ssa5PpDWx83eRaNpPGdvfU+wElTtbwsjkc8p
+         cvcRDlbuHYk7qy/kpLmw1sfYMwpHHJGjNEGCF7ibNfLL0eT/Fyves0agTkvlsD6vi0Ym
+         +KSMVR9MO8tIv7YUrudxEN8sIC3qGWD49PR2u7nQ0tpw9T1C9c5yE1fxZfYORPBQVKGU
+         /razbVr44Ryo0bOwR89x56bPDjdy2Xxo9lSv3Wea83Sp8DCk1QbsQUeEb6MiF7Q/nz5c
+         bpZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=jtIXuKCcBJI/lwMJfayWLSewoOe6VlcxvOBTKyy+vtU=;
-        b=BppFjwVRFdWJAG5fgFfTWh3eqZIP9KV1OwApzY5ERMseGzDAdIS1wTzQzlNvcLuZA4
-         SSoKcWf6YWHXErhTzYp3o5JvlHWbUcjHnRMA0dcrThZug8PNXYz7BqDesLM9uSb0mThp
-         DcIREQ71KLHPSfIaki3Ms3A504ck6w3T+6GmoswPmQXTBeOQUtVZA3Fp8zK5zwPzKDyK
-         qUMIQJW5uyK6QI1eCNtZoq+Zu+WwlguMmuZcLZU0zeIT7EfBSACf+th1l8GXJNzwz9L6
-         tUy48IFwn4MPDDPwVBHWTKJBfq0YaZqVjOZMSwhLGciRgpzmX6t8CDBwLiZbGTDyYoh7
-         dm5A==
-X-Gm-Message-State: AOAM532u01aY7wCMa1nmCWz0D2s//ASEZhH5PViTjn7GvAAoSyNw5dBV
-        46bUuy0fnN0sRyEn0rupXyY=
-X-Google-Smtp-Source: ABdhPJyb6KR1hNEjwX2eRAV2NEOp7e/mgTxRVEUmNUfIwBDCNpluaCz5dZU9/Wdo2+lMxtz+GrbQTA==
-X-Received: by 2002:a05:620a:2855:b0:662:f88d:d77 with SMTP id h21-20020a05620a285500b00662f88d0d77mr2816484qkp.241.1646513744979;
-        Sat, 05 Mar 2022 12:55:44 -0800 (PST)
+        bh=dgtynUkl2NInlVz9c5ix3B45LFvFB0LQ430PaZMW1II=;
+        b=DNYJlHWOMG+fAWl5lVGVwPrExfbMFzdwspIyYzYYY1sCMsYAE2KgF09Xc+3EZ8k9df
+         M/fWEJKuUdzIGdxNqggSjWCwVaUmPptEQmk1De85SK2jA25ot3INLHVZwNjpydayYhHG
+         9Cs8+s1fEcFBVOK6rZKQvJ1nJ1ZKdybFUA8dvsDUCsP/WhGg5NopeY3iLGqSyJyBqW5H
+         125H3zz8il5gx0vvRgBrK7p5DBqknrtRAenW6nYVfAqlb0QywChgM7bpysV+9jOOtsR1
+         guG2DJTpQZUl2Y82qCNuRCw8DcIXuDlJWiAddMhUuNFSv4tlzQ8sJZ5w9ckMDrTL9f/M
+         9vng==
+X-Gm-Message-State: AOAM5308+k5nKB2vDr+bhso4JhS7HUzabF4V8KLUwi4oCT5EDffCT5aJ
+        YmuTbHKzxEWmYZwYQR3QlhmKuCWfEqaF7lbh
+X-Google-Smtp-Source: ABdhPJwIH2hIp5+b55+kWph/10nEL3GMY1jKO4ZKGeXyBVFrGWgyMeNpnv46LvMgTdHyireTEPRWFg==
+X-Received: by 2002:a37:af81:0:b0:502:7ea:34e7 with SMTP id y123-20020a37af81000000b0050207ea34e7mr2895675qke.737.1646513745973;
+        Sat, 05 Mar 2022 12:55:45 -0800 (PST)
 Received: from henry-arch.studentwireless.binghamton.edu ([149.125.84.173])
-        by smtp.googlemail.com with ESMTPSA id l19-20020a05622a175300b002de935a94c9sm5877525qtk.8.2022.03.05.12.55.44
+        by smtp.googlemail.com with ESMTPSA id l19-20020a05622a175300b002de935a94c9sm5877525qtk.8.2022.03.05.12.55.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 05 Mar 2022 12:55:44 -0800 (PST)
+        Sat, 05 Mar 2022 12:55:45 -0800 (PST)
 From:   Henry Sloan <henryksloan@gmail.com>
 Cc:     pbonzini@redhat.com, Henry Sloan <henryksloan@gmail.com>,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 2/6] KVM: Replace bare 'unsigned' with 'unsigned int'
-Date:   Sat,  5 Mar 2022 15:55:24 -0500
-Message-Id: <20220305205528.463894-3-henryksloan@gmail.com>
+Subject: [PATCH 3/6] KVM: Replace '__attribute__((weak))' with '__weak'
+Date:   Sat,  5 Mar 2022 15:55:25 -0500
+Message-Id: <20220305205528.463894-4-henryksloan@gmail.com>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20220305205528.463894-1-henryksloan@gmail.com>
 References: <20220305205528.463894-1-henryksloan@gmail.com>
@@ -71,164 +71,88 @@ X-Mailing-List: kvm@vger.kernel.org
 
 Signed-off-by: Henry Sloan <henryksloan@gmail.com>
 ---
- virt/kvm/coalesced_mmio.c |  2 +-
- virt/kvm/eventfd.c        |  8 ++++----
- virt/kvm/irqchip.c        |  6 +++---
- virt/kvm/kvm_main.c       | 16 ++++++++--------
- 4 files changed, 16 insertions(+), 16 deletions(-)
+ virt/kvm/eventfd.c  | 12 ++++++------
+ virt/kvm/irqchip.c  |  2 +-
+ virt/kvm/kvm_main.c |  2 +-
+ 3 files changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/virt/kvm/coalesced_mmio.c b/virt/kvm/coalesced_mmio.c
-index 0be80c213f7f..1ff2bca6489c 100644
---- a/virt/kvm/coalesced_mmio.c
-+++ b/virt/kvm/coalesced_mmio.c
-@@ -43,7 +43,7 @@ static int coalesced_mmio_in_range(struct kvm_coalesced_mmio_dev *dev,
- static int coalesced_mmio_has_room(struct kvm_coalesced_mmio_dev *dev, u32 last)
- {
- 	struct kvm_coalesced_mmio_ring *ring;
--	unsigned avail;
-+	unsigned int avail;
- 
- 	/* Are we able to batch it ? */
- 
 diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
-index 59b1dd4a549e..1054ddb915b0 100644
+index 1054ddb915b0..14aef85829ed 100644
 --- a/virt/kvm/eventfd.c
 +++ b/virt/kvm/eventfd.c
-@@ -182,14 +182,14 @@ int __attribute__((weak)) kvm_arch_set_irq_inatomic(
-  * Called with wqh->lock held and interrupts disabled
-  */
- static int
--irqfd_wakeup(wait_queue_entry_t *wait, unsigned mode, int sync, void *key)
-+irqfd_wakeup(wait_queue_entry_t *wait, unsigned int mode, int sync, void *key)
- {
- 	struct kvm_kernel_irqfd *irqfd =
- 		container_of(wait, struct kvm_kernel_irqfd, wait);
- 	__poll_t flags = key_to_poll(key);
- 	struct kvm_kernel_irq_routing_entry irq;
- 	struct kvm *kvm = irqfd->kvm;
--	unsigned seq;
-+	unsigned int seq;
- 	int idx;
- 	int ret = 0;
+@@ -32,7 +32,7 @@
  
-@@ -455,7 +455,7 @@ kvm_irqfd_assign(struct kvm *kvm, struct kvm_irqfd *args)
- 	return ret;
+ static struct workqueue_struct *irqfd_cleanup_wq;
+ 
+-bool __attribute__((weak))
++bool __weak
+ kvm_arch_irqfd_allowed(struct kvm *kvm, struct kvm_irqfd *args)
+ {
+ 	return true;
+@@ -169,7 +169,7 @@ irqfd_deactivate(struct kvm_kernel_irqfd *irqfd)
+ 	queue_work(irqfd_cleanup_wq, &irqfd->shutdown);
  }
  
--bool kvm_irq_has_notifier(struct kvm *kvm, unsigned irqchip, unsigned pin)
-+bool kvm_irq_has_notifier(struct kvm *kvm, unsigned int irqchip, unsigned int pin)
- {
- 	struct kvm_irq_ack_notifier *kian;
- 	int gsi, idx;
-@@ -486,7 +486,7 @@ void kvm_notify_acked_gsi(struct kvm *kvm, int gsi)
- 			kian->irq_acked(kian);
+-int __attribute__((weak)) kvm_arch_set_irq_inatomic(
++int __weak kvm_arch_set_irq_inatomic(
+ 				struct kvm_kernel_irq_routing_entry *irq,
+ 				struct kvm *kvm, int irq_source_id,
+ 				int level,
+@@ -265,24 +265,24 @@ static void irqfd_update(struct kvm *kvm, struct kvm_kernel_irqfd *irqfd)
  }
  
--void kvm_notify_acked_irq(struct kvm *kvm, unsigned irqchip, unsigned pin)
-+void kvm_notify_acked_irq(struct kvm *kvm, unsigned int irqchip, unsigned int pin)
+ #ifdef CONFIG_HAVE_KVM_IRQ_BYPASS
+-void __attribute__((weak)) kvm_arch_irq_bypass_stop(
++void __weak kvm_arch_irq_bypass_stop(
+ 				struct irq_bypass_consumer *cons)
  {
- 	int gsi, idx;
+ }
  
+-void __attribute__((weak)) kvm_arch_irq_bypass_start(
++void __weak kvm_arch_irq_bypass_start(
+ 				struct irq_bypass_consumer *cons)
+ {
+ }
+ 
+-int  __attribute__((weak)) kvm_arch_update_irqfd_routing(
++int  __weak kvm_arch_update_irqfd_routing(
+ 				struct kvm *kvm, unsigned int host_irq,
+ 				uint32_t guest_irq, bool set)
+ {
+ 	return 0;
+ }
+ 
+-bool __attribute__((weak)) kvm_arch_irqfd_route_changed(
++bool __weak kvm_arch_irqfd_route_changed(
+ 				struct kvm_kernel_irq_routing_entry *old,
+ 				struct kvm_kernel_irq_routing_entry *new)
+ {
 diff --git a/virt/kvm/irqchip.c b/virt/kvm/irqchip.c
-index 58e4f88b2b9f..dcd51e6efb8a 100644
+index dcd51e6efb8a..baa551aec010 100644
 --- a/virt/kvm/irqchip.c
 +++ b/virt/kvm/irqchip.c
-@@ -38,7 +38,7 @@ int kvm_irq_map_gsi(struct kvm *kvm,
- 	return n;
+@@ -157,7 +157,7 @@ static int setup_routing_entry(struct kvm *kvm,
+ 	return 0;
  }
  
--int kvm_irq_map_chip_pin(struct kvm *kvm, unsigned irqchip, unsigned pin)
-+int kvm_irq_map_chip_pin(struct kvm *kvm, unsigned int irqchip, unsigned int pin)
+-void __attribute__((weak)) kvm_arch_irq_routing_update(struct kvm *kvm)
++void __weak kvm_arch_irq_routing_update(struct kvm *kvm)
  {
- 	struct kvm_irq_routing_table *irq_rt;
+ }
  
-@@ -168,8 +168,8 @@ bool __weak kvm_arch_can_set_irq_routing(struct kvm *kvm)
- 
- int kvm_set_irq_routing(struct kvm *kvm,
- 			const struct kvm_irq_routing_entry *ue,
--			unsigned nr,
--			unsigned flags)
-+			unsigned int nr,
-+			unsigned int flags)
- {
- 	struct kvm_irq_routing_table *new, *old;
- 	struct kvm_kernel_irq_routing_entry *e;
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 0afc016cc54d..c5fb79e64e75 100644
+index c5fb79e64e75..af74cf3b6446 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -216,7 +216,7 @@ void vcpu_put(struct kvm_vcpu *vcpu)
- EXPORT_SYMBOL_GPL(vcpu_put);
- 
- /* TODO: merge with kvm_arch_vcpu_should_kick */
--static bool kvm_request_needs_ipi(struct kvm_vcpu *vcpu, unsigned req)
-+static bool kvm_request_needs_ipi(struct kvm_vcpu *vcpu, unsigned int req)
- {
- 	int mode = kvm_vcpu_exiting_guest_mode(vcpu);
- 
-@@ -415,7 +415,7 @@ void *kvm_mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc)
- }
- #endif
- 
--static void kvm_vcpu_init(struct kvm_vcpu *vcpu, struct kvm *kvm, unsigned id)
-+static void kvm_vcpu_init(struct kvm_vcpu *vcpu, struct kvm *kvm, unsigned int id)
- {
- 	mutex_init(&vcpu->mutex);
- 	vcpu->cpu = -1;
-@@ -3454,7 +3454,7 @@ void kvm_vcpu_kick(struct kvm_vcpu *vcpu)
- 	 */
- 	if (kvm_arch_vcpu_should_kick(vcpu)) {
- 		cpu = READ_ONCE(vcpu->cpu);
--		if (cpu != me && (unsigned)cpu < nr_cpu_ids && cpu_online(cpu))
-+		if (cpu != me && (unsigned int)cpu < nr_cpu_ids && cpu_online(cpu))
- 			smp_send_reschedule(cpu);
- 	}
- out:
-@@ -5366,7 +5366,7 @@ static const struct file_operations stat_fops_per_vm = {
- 
- static int vm_stat_get(void *_offset, u64 *val)
- {
--	unsigned offset = (long)_offset;
-+	unsigned int offset = (long)_offset;
- 	struct kvm *kvm;
- 	u64 tmp_val;
- 
-@@ -5382,7 +5382,7 @@ static int vm_stat_get(void *_offset, u64 *val)
- 
- static int vm_stat_clear(void *_offset, u64 val)
- {
--	unsigned offset = (long)_offset;
-+	unsigned int offset = (long)_offset;
- 	struct kvm *kvm;
- 
- 	if (val)
-@@ -5402,7 +5402,7 @@ DEFINE_SIMPLE_ATTRIBUTE(vm_stat_readonly_fops, vm_stat_get, NULL, "%llu\n");
- 
- static int vcpu_stat_get(void *_offset, u64 *val)
- {
--	unsigned offset = (long)_offset;
-+	unsigned int offset = (long)_offset;
- 	struct kvm *kvm;
- 	u64 tmp_val;
- 
-@@ -5418,7 +5418,7 @@ static int vcpu_stat_get(void *_offset, u64 *val)
- 
- static int vcpu_stat_clear(void *_offset, u64 val)
- {
--	unsigned offset = (long)_offset;
-+	unsigned int offset = (long)_offset;
- 	struct kvm *kvm;
- 
- 	if (val)
-@@ -5654,7 +5654,7 @@ static void check_processor_compat(void *data)
- 	*c->ret = kvm_arch_check_processor_compat(c->opaque);
+@@ -4386,7 +4386,7 @@ static int kvm_vm_ioctl_reset_dirty_pages(struct kvm *kvm)
+ 	return cleared;
  }
  
--int kvm_init(void *opaque, unsigned vcpu_size, unsigned vcpu_align,
-+int kvm_init(void *opaque, unsigned int vcpu_size, unsigned int vcpu_align,
- 		  struct module *module)
+-int __attribute__((weak)) kvm_vm_ioctl_enable_cap(struct kvm *kvm,
++int __weak kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 						  struct kvm_enable_cap *cap)
  {
- 	struct kvm_cpu_compat_check c;
+ 	return -EINVAL;
 -- 
 2.35.1
 
