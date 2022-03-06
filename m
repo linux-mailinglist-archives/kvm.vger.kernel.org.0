@@ -2,137 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 583514CE86E
-	for <lists+kvm@lfdr.de>; Sun,  6 Mar 2022 04:20:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CEAFA4CE983
+	for <lists+kvm@lfdr.de>; Sun,  6 Mar 2022 07:44:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232835AbiCFDUY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 5 Mar 2022 22:20:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33894 "EHLO
+        id S232080AbiCFGpo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 6 Mar 2022 01:45:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48160 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232790AbiCFDUP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 5 Mar 2022 22:20:15 -0500
-Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60CDC3335A;
-        Sat,  5 Mar 2022 19:19:24 -0800 (PST)
-Received: by mail-qt1-x82d.google.com with SMTP id e2so10649961qte.12;
-        Sat, 05 Mar 2022 19:19:24 -0800 (PST)
+        with ESMTP id S231496AbiCFGpn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 6 Mar 2022 01:45:43 -0500
+Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5835F55756
+        for <kvm@vger.kernel.org>; Sat,  5 Mar 2022 22:44:51 -0800 (PST)
+Received: by mail-lj1-x236.google.com with SMTP id p20so16353677ljo.0
+        for <kvm@vger.kernel.org>; Sat, 05 Mar 2022 22:44:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=FH3A/E2W0O7IE23aSLKaPOzTxYbpDcfx+ImWb5Kh3ok=;
-        b=nf/tMJjStWFiBSHv+/JkLI595GOmYrGpkTMp1B4ugTfZ1plHH3nhkz0Q3o77tiVg8z
-         0f+z/JiCPv6bbBK6Z048Z/RO1k5hT3RmHzGr5JPSPErXJOPalWArYJPBJtoFgSfxxzQG
-         a5B6fg8E8thptzxgUI2yWwUYV61TT0IMWrgO6oKLDNO8Wq3Z1iv6BAfW3w0tgUIo/uGS
-         8JzXgoPO7PfPlO3EhSJhQhpQWChWRvpjW6Tw25ywa/DaTf0TXEmMcqaiTCYnfVpM3alv
-         FW8IK4SnrcVJEW+ZrEqARk6u2GD/pgBl7ljWZvqkJQ8Aflyq3vkdILl1hgKzMQqXzoGF
-         8Dnw==
+        h=mime-version:reply-to:sender:from:date:message-id:subject:to;
+        bh=VaaSLAJ+hgNGNq49WyPsh3ndDLo+mnrYcswrOHpJSv8=;
+        b=fF9/MpPqbVvmSz0UoAHHX8MI7/AquvwFGWpqjmPbm1gryd2clg8/l2aNkt+auZOqqp
+         PYQIm2TdNky1AwuRyyFCJAIs8oqzLIzM0POmgZRxYvzwEw7u8xrlNe6FMw8On4zNAvnG
+         sxIDIQfBJt4b/jyJqg7qsptARhpRmvDtnmyuxRdvZdR+A4z/Aybm5gMC4JVA0CJbt/Ym
+         nvausZOg3mkJgH6l7oN28m4xLfDQx20WaNA96/OjLfjqPXW+jSgb23TuCvXBVYHk2Prp
+         EkcshqFQcJ7zSJXV2rayAhjYmGMTbuDekyhl03FEN9GIEQQBQ68ZnwY0gNrHSsBwlK4w
+         IzEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=FH3A/E2W0O7IE23aSLKaPOzTxYbpDcfx+ImWb5Kh3ok=;
-        b=auwlhpbIVFEQCrTFmeTcP5b6xBVvGV9kO7yVxB95gLPXbHptWwmmwvLF75bhdkXAQk
-         sC/d46cdwXHXjQzUjBytb6NjgPzRShB7W7z4HqR3urJzNyzRoraPMdKMzCxSa0ICZIg+
-         CUg2FVkf2irfJF4xADTFkwXx7Q6v7EAdmklnL8TJhG0HPl7o8+zRl4CtKPDw6QYPVCaB
-         ZWs/1s0VaQ8KIwGA/oxK68mB5OJqxQ9B3aAPmVzwpbdjWQXv8ZDFEw/qs/y00yw5iC9F
-         KUP896mPff6jcBttshaHPA+Oe0FK06Ez9aP1bcs5vzMMHQm9iXgzwPvtbs3buW/ZNiGs
-         SCBQ==
-X-Gm-Message-State: AOAM532OEawInBMovBFev40As+JDH0nxCOJsK7VIhBdOej5f9cq5FFF5
-        CcqjK8lu31DLq0QxvSSWNp0=
-X-Google-Smtp-Source: ABdhPJzuSA+jebqZTqC0s9bkkwmBksTHakOaub3cfbRjLhGy3lh9ISTmcl6MnB2BdRIdUFazW4QK2w==
-X-Received: by 2002:a05:622a:1192:b0:2d1:e58e:7659 with SMTP id m18-20020a05622a119200b002d1e58e7659mr4880333qtk.41.1646536763568;
-        Sat, 05 Mar 2022 19:19:23 -0800 (PST)
-Received: from henry-arch.studentwireless.binghamton.edu ([149.125.84.173])
-        by smtp.googlemail.com with ESMTPSA id f1-20020a37ad01000000b0064919f4b37csm4463183qkm.75.2022.03.05.19.19.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 05 Mar 2022 19:19:23 -0800 (PST)
-From:   Henry Sloan <henryksloan@gmail.com>
-Cc:     pbonzini@redhat.com, Henry Sloan <henryksloan@gmail.com>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2 7/7] KVM: Modified two MMIO functions to return bool
-Date:   Sat,  5 Mar 2022 22:19:07 -0500
-Message-Id: <20220306031907.210499-9-henryksloan@gmail.com>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220306031907.210499-1-henryksloan@gmail.com>
-References: <20220306031907.210499-1-henryksloan@gmail.com>
+        h=x-gm-message-state:mime-version:reply-to:sender:from:date
+         :message-id:subject:to;
+        bh=VaaSLAJ+hgNGNq49WyPsh3ndDLo+mnrYcswrOHpJSv8=;
+        b=1+hxLN1lpURyQsCGiPXCiUG1FU3PfzYLJhNkzSf3ZtlLIV0N0t9t9oxnr+Jv8Kv4LM
+         Kwf3pvWFj8s33DVrO392yGw4QhgjirlynFaJezmvTNTBjix9sjqAxw7H+lgjyXy6pGT4
+         PrWSS06TA6emfTnxZ1J16paQA2bAvT+GFDhfntPph2pfWYqdaKqhsUe9f32BeiGaq5J0
+         J3VEAY54/2lrSX9OiMOWtN6hukaheK0q+sno4pbhRPiE/jDOOnto256IapPI9bIbeH8s
+         oZBew3PHtEgI44FGlApyXuO4sVHhixsUqzrQ2/zZmozeTXyr2FjYgrGeShxSB64GNJRm
+         pyRg==
+X-Gm-Message-State: AOAM532n4iRdvOQAf0bu5+1Br4KyqoTPERIF8m04kxhYNnt6ygahXxVJ
+        Y4oYHNmYm5Jh7peyrIzX0UiR2SdCt0RpIMDrhNw=
+X-Google-Smtp-Source: ABdhPJymuly2fh724C2eOwuH0ENeAezJVF3GIgZ1t29ePwWELUjyc72l7XXz+cXeMJ6hYTTgbHCcDxsRceiJq8NUKhA=
+X-Received: by 2002:a05:651c:2cb:b0:23e:9985:518 with SMTP id
+ f11-20020a05651c02cb00b0023e99850518mr3872667ljo.18.1646549089407; Sat, 05
+ Mar 2022 22:44:49 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+Reply-To: mrs.susanelwoodhara17@gmail.com
+Sender: mrs.arawyann@gmail.com
+Received: by 2002:ab3:7d89:0:0:0:0:0 with HTTP; Sat, 5 Mar 2022 22:44:47 -0800 (PST)
+From:   Mrs Susan Elwood Hara <mrs.susanelwoodhara17@gmail.com>
+Date:   Sun, 6 Mar 2022 06:44:47 +0000
+X-Google-Sender-Auth: ZuV5NHEpwJT41TCCw92BCTZJWrw
+Message-ID: <CACppo45F8rJ-zBUKjVuSP-ETESOeX59xaySbt7UPp+oQjSPbUg@mail.gmail.com>
+Subject: GOD BLESS YOU AS YOU REPLY URGENTLY
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=4.9 required=5.0 tests=BAYES_50,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        FREEMAIL_REPLYTO_END_DIGIT,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        SUBJ_ALL_CAPS,T_HK_NAME_FM_MR_MRS,T_SCC_BODY_TEXT_LINE,UNDISC_MONEY
+        autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Level: ****
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
-To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Adjusted the signatures and implementations of
-coalesced_mmio_in_range and coalesced_mmio_has_room to produce booleans.
+GOD BLESS YOU AS YOU REPLY URGENTLY
 
-Signed-off-by: Henry Sloan <henryksloan@gmail.com>
----
- virt/kvm/coalesced_mmio.c | 25 +++++++++----------------
- 1 file changed, 9 insertions(+), 16 deletions(-)
-
-diff --git a/virt/kvm/coalesced_mmio.c b/virt/kvm/coalesced_mmio.c
-index 1ff2bca6489c..e129d88a95c5 100644
---- a/virt/kvm/coalesced_mmio.c
-+++ b/virt/kvm/coalesced_mmio.c
-@@ -22,28 +22,27 @@ static inline struct kvm_coalesced_mmio_dev *to_mmio(struct kvm_io_device *dev)
- 	return container_of(dev, struct kvm_coalesced_mmio_dev, dev);
- }
- 
--static int coalesced_mmio_in_range(struct kvm_coalesced_mmio_dev *dev,
--				   gpa_t addr, int len)
-+static bool coalesced_mmio_in_range(struct kvm_coalesced_mmio_dev *dev,
-+				    gpa_t addr, int len)
- {
- 	/* is it in a batchable area ?
- 	 * (addr,len) is fully included in
- 	 * (zone->addr, zone->size)
- 	 */
- 	if (len < 0)
--		return 0;
-+		return false;
- 	if (addr + len < addr)
--		return 0;
-+		return false;
- 	if (addr < dev->zone.addr)
--		return 0;
-+		return false;
- 	if (addr + len > dev->zone.addr + dev->zone.size)
--		return 0;
--	return 1;
-+		return false;
-+	return true;
- }
- 
--static int coalesced_mmio_has_room(struct kvm_coalesced_mmio_dev *dev, u32 last)
-+static bool coalesced_mmio_has_room(struct kvm_coalesced_mmio_dev *dev, u32 last)
- {
- 	struct kvm_coalesced_mmio_ring *ring;
--	unsigned int avail;
- 
- 	/* Are we able to batch it ? */
- 
-@@ -52,13 +51,7 @@ static int coalesced_mmio_has_room(struct kvm_coalesced_mmio_dev *dev, u32 last)
- 	 * there is always one unused entry in the buffer
- 	 */
- 	ring = dev->kvm->coalesced_mmio_ring;
--	avail = (ring->first - last - 1) % KVM_COALESCED_MMIO_MAX;
--	if (avail == 0) {
--		/* full */
--		return 0;
--	}
--
--	return 1;
-+	return (ring->first - last - 1) % KVM_COALESCED_MMIO_MAX != 0;
- }
- 
- static int coalesced_mmio_write(struct kvm_vcpu *vcpu,
--- 
-2.35.1
-
+ Hello Dear,
+Greetings, I am contacting you regarding an important information i
+have for you please reply to confirm your email address and for more
+details Thanks
+Regards
+Mrs Susan Elwood Hara.
