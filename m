@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8EB424CE872
-	for <lists+kvm@lfdr.de>; Sun,  6 Mar 2022 04:20:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B727D4CE86C
+	for <lists+kvm@lfdr.de>; Sun,  6 Mar 2022 04:20:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232805AbiCFDUS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 5 Mar 2022 22:20:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33768 "EHLO
+        id S232828AbiCFDUW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 5 Mar 2022 22:20:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232784AbiCFDUN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 5 Mar 2022 22:20:13 -0500
-Received: from mail-qt1-x82e.google.com (mail-qt1-x82e.google.com [IPv6:2607:f8b0:4864:20::82e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E7D533365;
-        Sat,  5 Mar 2022 19:19:22 -0800 (PST)
-Received: by mail-qt1-x82e.google.com with SMTP id bc10so10681389qtb.5;
-        Sat, 05 Mar 2022 19:19:22 -0800 (PST)
+        with ESMTP id S232797AbiCFDUO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 5 Mar 2022 22:20:14 -0500
+Received: from mail-qt1-x831.google.com (mail-qt1-x831.google.com [IPv6:2607:f8b0:4864:20::831])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52CBFB877;
+        Sat,  5 Mar 2022 19:19:23 -0800 (PST)
+Received: by mail-qt1-x831.google.com with SMTP id t28so10666371qtc.7;
+        Sat, 05 Mar 2022 19:19:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=dGkLL1QQ2WoqaBJzjMOFNqMmNcr14rRZ+z4Dqgvsa0s=;
-        b=PGG60hxI5hJuHOH0RwSxbhXgl3bLOFlDGB2U4s0U2rB1JrUH/+9NM9tvM5CUxwcqti
-         ly87YFFXfl4Uu/zGq5Emc6Bzy4R9fvoyaJfUFOGL/PCaum957EQxcaS91NZlbmO8qoGn
-         teU6AlFVK8eP4hZshzn2LhShTNTkXcVlVwDqiCcZ+4C6XVLXINEJpaTBvp0KFFO5BUc+
-         lI3oguSH86e/tY2Aw39nMqv0zQbopJONZXHSiN73SUBRpzyY2J9warSecnD3z0061ReD
-         vkmuAjzWytl+LpkEIUMiux6z2PDAx7Ygxsw9rSlFIbEQBnXmdi82eT0Ojbkwtk1wbY5l
-         gBgA==
+        bh=KK/5dtZLMwDC/Q6GqDgOsyVMYXcmdYOpnyXaYTku6xI=;
+        b=POC7lJhv8VZft43mMczj8GdxnzPe2cntBF8QFmKT1QnlWNlz4+sA9Le7FIDQoemJKB
+         zMueGFHuRPxQjyFVU79rbYkEco/aKWce6b/OQkxpo/G/QeZS46BOb6q2noU3A3CbPKjm
+         ioHRxhLKzHAKOH97pdBdGwlJgHRbRm3kHiri5iRGGF9O16CeEExNt2XgP1Ao6ldcTKWd
+         ILFkHFo38tdzgHT15w9rykDYbDExjbQLR58aQ/E7fuTnXr8FsiGtlLLSbtpP8QlQWuDH
+         G5UpJfZZ+tXz1KHAfQp87J/BRi90wZxVcMX4kx1oP+/FSuGwezaGWXolaQgHjNv+kQbg
+         DoxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=dGkLL1QQ2WoqaBJzjMOFNqMmNcr14rRZ+z4Dqgvsa0s=;
-        b=ioZZn/WlqTUsyMswzrTbdC6Dxu9IWayFVRDL2RvtUsAA3NxulmIAqFtWsO4P7hUlsX
-         5rR87Uos8JrgTfYU/u/g0veYdu1QsCqlnw7mEpmCVsMfS/d6Q8Hun3l30npIqhJfSwLS
-         9bsMug2GJ+rAYnljmOBUxzYKJU8ZJi+GTvHdclGhH9bLzvZM+qqMvLAf7AHobSjqwC5v
-         kd6j5vIiTR7j9FA3S4YyiVyGrktqO83kW/cUjNwGtT+Hrkg1GnsnmYcquSYEqi0qKSpH
-         +c1YlVKv3yAmXBUFg0J3d4RVos94cHPbxVAx2Am9XOjw5vyWk2XWWSMLoLYZCz4OcQqS
-         wcUg==
-X-Gm-Message-State: AOAM533FCNZqeey4bTFLEbKWBKGJitL1FZqgWwuqz5LhhKCY1UVMWeOV
-        328Xby7dB+Z+MK86DQK5SyQ=
-X-Google-Smtp-Source: ABdhPJyqnCf5QOrI+lgXJsCrA+YYXDDYCA0Q1zYPDuh3696w5HfbicNk/HS6eZV17o8z+2mtEIQQJQ==
-X-Received: by 2002:ac8:7d8d:0:b0:2de:2c14:8c97 with SMTP id c13-20020ac87d8d000000b002de2c148c97mr4854528qtd.85.1646536761389;
-        Sat, 05 Mar 2022 19:19:21 -0800 (PST)
+        bh=KK/5dtZLMwDC/Q6GqDgOsyVMYXcmdYOpnyXaYTku6xI=;
+        b=7gKug1/IpnL6/HrFqrB2DXqP6mxW6Cw33XDppyI30MYial1Rr/PiwqZ7wJ4zI4VR6I
+         SKwO7n1JxUeUhjY86UrIUiGGPRJD8CXBr0LcTkcu/JqW/3UPQQiwHsC1EH4Vrz2fqAOV
+         P+444yDWoFici1sOlb3ft7LS4b7WA/0u4tOAJTY8MVgNpKCxeOoCdNDT+zmj66jnizft
+         dw2GiebxnTSKwTR1sKWLFx0GVIDQEMq+UHE92Rpab78uMG/k49yUlc8Otha7lizT5Ss7
+         nqH6eEuZbym4luLM6f21rVKZ2QbIIjSm8CdUazpF9aZ79v+TTZ8e5bXF4vXKI5HqkYWC
+         9Gzw==
+X-Gm-Message-State: AOAM5325yw48wvh+D1mFE5W62NaZGSF5aNDsj0/QSM17xYHT/yyLapfp
+        zSqBs0y1nIBjsJMZmVs9b80=
+X-Google-Smtp-Source: ABdhPJw0zO4KGe3iX1cP7NGHmG03+hyqJQZ56558ONRigX5I86BGlm8M/U/qis8vsaJ2IToEC2x0Eg==
+X-Received: by 2002:ac8:5795:0:b0:2dd:e018:98e8 with SMTP id v21-20020ac85795000000b002dde01898e8mr4881727qta.144.1646536762456;
+        Sat, 05 Mar 2022 19:19:22 -0800 (PST)
 Received: from henry-arch.studentwireless.binghamton.edu ([149.125.84.173])
-        by smtp.googlemail.com with ESMTPSA id f1-20020a37ad01000000b0064919f4b37csm4463183qkm.75.2022.03.05.19.19.20
+        by smtp.googlemail.com with ESMTPSA id f1-20020a37ad01000000b0064919f4b37csm4463183qkm.75.2022.03.05.19.19.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 05 Mar 2022 19:19:21 -0800 (PST)
+        Sat, 05 Mar 2022 19:19:22 -0800 (PST)
 From:   Henry Sloan <henryksloan@gmail.com>
 Cc:     pbonzini@redhat.com, Henry Sloan <henryksloan@gmail.com>,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2 5/7] KVM: Use typical style for block comments
-Date:   Sat,  5 Mar 2022 22:19:05 -0500
-Message-Id: <20220306031907.210499-7-henryksloan@gmail.com>
+Subject: [PATCH v2 6/7] KVM: Fix minor indentation and brace style issues
+Date:   Sat,  5 Mar 2022 22:19:06 -0500
+Message-Id: <20220306031907.210499-8-henryksloan@gmail.com>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20220306031907.210499-1-henryksloan@gmail.com>
 References: <20220306031907.210499-1-henryksloan@gmail.com>
@@ -69,56 +69,121 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Adjusted spacing and line breaks for some comments so that the
-asterisks align properly.
+Fixed some checkpatch warnings by properly lining up braces and
+parameter lists, as well as adjusting some indentations.
 
 Signed-off-by: Henry Sloan <henryksloan@gmail.com>
 ---
- virt/kvm/irqchip.c  | 6 ++++--
- virt/kvm/kvm_main.c | 6 +++---
- 2 files changed, 7 insertions(+), 5 deletions(-)
+ virt/kvm/kvm_main.c | 25 ++++++++++++++-----------
+ virt/kvm/pfncache.c |  2 +-
+ 2 files changed, 15 insertions(+), 12 deletions(-)
 
-diff --git a/virt/kvm/irqchip.c b/virt/kvm/irqchip.c
-index 69a327c043d7..80708f6ec9d9 100644
---- a/virt/kvm/irqchip.c
-+++ b/virt/kvm/irqchip.c
-@@ -120,8 +120,10 @@ static void free_irq_routing_table(struct kvm_irq_routing_table *rt)
- 
- void kvm_free_irq_routing(struct kvm *kvm)
- {
--	/* Called only during vm destruction. Nobody can use the pointer
--	   at this stage */
-+	/*
-+	 * Called only during vm destruction. Nobody can use the pointer
-+	 * at this stage
-+	 */
- 	struct kvm_irq_routing_table *rt = rcu_access_pointer(kvm->irq_routing);
- 
- 	free_irq_routing_table(rt);
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 1988dd081606..1a9f20e3fa2d 100644
+index 1a9f20e3fa2d..eea5b18b8efe 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -2182,7 +2182,7 @@ static int kvm_clear_dirty_log_protect(struct kvm *kvm,
- 		 * never includes any bits beyond the length of the memslot (if
- 		 * the length is not aligned to 64 pages), therefore it is not
- 		 * a problem if userspace sets them in log->dirty_bitmap.
--		*/
-+		 */
- 		if (mask) {
- 			flush = true;
- 			kvm_arch_mmu_enable_log_dirty_pt_masked(kvm, memslot,
-@@ -5245,8 +5245,8 @@ static int kvm_debugfs_open(struct inode *inode, struct file *file,
+@@ -132,7 +132,10 @@ static long kvm_vcpu_compat_ioctl(struct file *file, unsigned int ioctl,
+  *   passed to a compat task, let the ioctls fail.
+  */
+ static long kvm_no_compat_ioctl(struct file *file, unsigned int ioctl,
+-				unsigned long arg) { return -EINVAL; }
++				unsigned long arg)
++{
++	return -EINVAL;
++}
  
- 	/*
- 	 * The debugfs files are a reference to the kvm struct which
--        * is still valid when kvm_destroy_vm is called.  kvm_get_kvm_safe
--        * avoids the race between open and the removal of the debugfs directory.
-+	 * is still valid when kvm_destroy_vm is called.  kvm_get_kvm_safe
-+	 * avoids the race between open and the removal of the debugfs directory.
- 	 */
- 	if (!kvm_get_kvm_safe(stat_data->kvm))
- 		return -ENOENT;
+ static int kvm_no_compat_open(struct inode *inode, struct file *file)
+ {
+@@ -2155,8 +2158,9 @@ static int kvm_clear_dirty_log_protect(struct kvm *kvm,
+ 
+ 	if (log->first_page > memslot->npages ||
+ 	    log->num_pages > memslot->npages - log->first_page ||
+-	    (log->num_pages < memslot->npages - log->first_page && (log->num_pages & 63)))
+-	    return -EINVAL;
++	    (log->num_pages < memslot->npages - log->first_page &&
++	    (log->num_pages & 63)))
++		return -EINVAL;
+ 
+ 	kvm_arch_sync_dirty_log(kvm, memslot);
+ 
+@@ -2517,7 +2521,7 @@ static int hva_to_pfn_remapped(struct vm_area_struct *vma,
+ 	 * tail pages of non-compound higher order allocations, which
+ 	 * would then underflow the refcount when the caller does the
+ 	 * required put_page. Don't allow those pages here.
+-	 */ 
++	 */
+ 	if (!kvm_try_get_pfn(pfn))
+ 		r = -EFAULT;
+ 
+@@ -2906,7 +2910,7 @@ int kvm_vcpu_read_guest(struct kvm_vcpu *vcpu, gpa_t gpa, void *data, unsigned l
+ EXPORT_SYMBOL_GPL(kvm_vcpu_read_guest);
+ 
+ static int __kvm_read_guest_atomic(struct kvm_memory_slot *slot, gfn_t gfn,
+-			           void *data, int offset, unsigned long len)
++				   void *data, int offset, unsigned long len)
+ {
+ 	int r;
+ 	unsigned long addr;
+@@ -2935,7 +2939,7 @@ EXPORT_SYMBOL_GPL(kvm_vcpu_read_guest_atomic);
+ 
+ static int __kvm_write_guest_page(struct kvm *kvm,
+ 				  struct kvm_memory_slot *memslot, gfn_t gfn,
+-			          const void *data, int offset, int len)
++				  const void *data, int offset, int len)
+ {
+ 	int r;
+ 	unsigned long addr;
+@@ -2990,7 +2994,7 @@ int kvm_write_guest(struct kvm *kvm, gpa_t gpa, const void *data,
+ EXPORT_SYMBOL_GPL(kvm_write_guest);
+ 
+ int kvm_vcpu_write_guest(struct kvm_vcpu *vcpu, gpa_t gpa, const void *data,
+-		         unsigned long len)
++			 unsigned long len)
+ {
+ 	gfn_t gfn = gpa >> PAGE_SHIFT;
+ 	int seg;
+@@ -3157,7 +3161,7 @@ EXPORT_SYMBOL_GPL(kvm_clear_guest);
+ 
+ void mark_page_dirty_in_slot(struct kvm *kvm,
+ 			     const struct kvm_memory_slot *memslot,
+-		 	     gfn_t gfn)
++			     gfn_t gfn)
+ {
+ 	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
+ 
+@@ -5176,9 +5180,8 @@ int kvm_io_bus_unregister_dev(struct kvm *kvm, enum kvm_bus bus_idx,
+ 		return 0;
+ 
+ 	for (i = 0; i < bus->dev_count; i++) {
+-		if (bus->range[i].dev == dev) {
++		if (bus->range[i].dev == dev)
+ 			break;
+-		}
+ 	}
+ 
+ 	if (i == bus->dev_count)
+@@ -5599,7 +5602,7 @@ EXPORT_SYMBOL_GPL(kvm_get_running_vcpu);
+  */
+ struct kvm_vcpu * __percpu *kvm_get_running_vcpus(void)
+ {
+-        return &kvm_running_vcpu;
++	return &kvm_running_vcpu;
+ }
+ 
+ #ifdef CONFIG_GUEST_PERF_EVENTS
+diff --git a/virt/kvm/pfncache.c b/virt/kvm/pfncache.c
+index ce878f4be4da..072c9a9e44b1 100644
+--- a/virt/kvm/pfncache.c
++++ b/virt/kvm/pfncache.c
+@@ -237,7 +237,7 @@ int kvm_gfn_to_pfn_cache_refresh(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
+ 				ret = -EFAULT;
+ 		}
+ 
+-	map_done:
++ map_done:
+ 		write_lock_irq(&gpc->lock);
+ 		if (ret) {
+ 			gpc->valid = false;
 -- 
 2.35.1
 
