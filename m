@@ -2,105 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E5E14CEA9C
-	for <lists+kvm@lfdr.de>; Sun,  6 Mar 2022 11:54:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 124E34CEC25
+	for <lists+kvm@lfdr.de>; Sun,  6 Mar 2022 16:48:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233256AbiCFKzk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 6 Mar 2022 05:55:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43106 "EHLO
+        id S233036AbiCFPtK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 6 Mar 2022 10:49:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55152 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233242AbiCFKzj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 6 Mar 2022 05:55:39 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 495835131D
-        for <kvm@vger.kernel.org>; Sun,  6 Mar 2022 02:54:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646564086;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=6C+14RT/WBu/+yhSoFqCrDNXOq/wjuT0/qYJr4t18Zo=;
-        b=NtGEoeSWuWyC4w8LVSEho9ZdhEKlYyB+WyGwV3cWAm4jUrRf62KEtIKtnevOVERPo6Pctt
-        JtEEoqj+wLz8UJ+ebjev8FqBmWCddutipPOQ1s4PfOU/PwmXzjhxHnN7BcPCSMY/FUMQ9T
-        dZAanj+AS46O+X8tbxdZymmw3ECYxbk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-354-p2wh5w0zNHCENBnLgi_j4A-1; Sun, 06 Mar 2022 05:54:41 -0500
-X-MC-Unique: p2wh5w0zNHCENBnLgi_j4A-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C2F78659;
-        Sun,  6 Mar 2022 10:54:40 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 73B271F467;
-        Sun,  6 Mar 2022 10:54:40 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     torvalds@linux-foundation.org
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [GIT PULL] More KVM fixes for Linux 5.17-rc7
-Date:   Sun,  6 Mar 2022 05:54:39 -0500
-Message-Id: <20220306105439.141939-1-pbonzini@redhat.com>
+        with ESMTP id S230313AbiCFPtJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 6 Mar 2022 10:49:09 -0500
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [IPv6:2a01:488:42:1000:50ed:8234::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92C84E0D7;
+        Sun,  6 Mar 2022 07:48:16 -0800 (PST)
+Received: from ip4d144895.dynamic.kabel-deutschland.de ([77.20.72.149] helo=[192.168.66.200]); authenticated
+        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        id 1nQt7F-0006pL-Di; Sun, 06 Mar 2022 16:48:13 +0100
+Message-ID: <092b825a-10ff-e197-18a1-d3e3a097b0e3@leemhuis.info>
+Date:   Sun, 6 Mar 2022 16:48:12 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [REGRESSION] Too-low frequency limit for AMD GPU
+ PCI-passed-through to Windows VM
+Content-Language: en-US
+To:     Alex Deucher <alexdeucher@gmail.com>,
+        "James D. Turner" <linuxkernel.foss@dmarc-none.turner.link>
+Cc:     "Lazar, Lijo" <lijo.lazar@amd.com>,
+        "Deucher, Alexander" <Alexander.Deucher@amd.com>,
+        "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        "Pan, Xinhui" <Xinhui.Pan@amd.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "amd-gfx@lists.freedesktop.org" <amd-gfx@lists.freedesktop.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        "Koenig, Christian" <Christian.Koenig@amd.com>
+References: <87ee57c8fu.fsf@turner.link>
+ <acd2fd5e-d622-948c-82ef-629a8030c9d8@leemhuis.info>
+ <87a6ftk9qy.fsf@dmarc-none.turner.link> <87zgnp96a4.fsf@turner.link>
+ <fc2b7593-db8f-091c-67a0-ae5ffce71700@leemhuis.info>
+ <CADnq5_Nr5-FR2zP1ViVsD_ZMiW=UHC1wO8_HEGm26K_EG2KDoA@mail.gmail.com>
+ <87czkk1pmt.fsf@dmarc-none.turner.link>
+ <BYAPR12MB46140BE09E37244AE129C01A975C9@BYAPR12MB4614.namprd12.prod.outlook.com>
+ <87sftfqwlx.fsf@dmarc-none.turner.link>
+ <BYAPR12MB4614E2CFEDDDEAABBAB986A0975E9@BYAPR12MB4614.namprd12.prod.outlook.com>
+ <87ee4wprsx.fsf@turner.link> <4b3ed7f6-d2b6-443c-970e-d963066ebfe3@amd.com>
+ <87pmo8r6ob.fsf@turner.link>
+ <5a68afe4-1e9e-c683-e06d-30afc2156f14@leemhuis.info>
+ <CADnq5_MCKTLOfWKWvi94Q9-d5CGdWBoWVxEYL3YXOpMiPnLOyg@mail.gmail.com>
+ <87pmnnpmh5.fsf@dmarc-none.turner.link>
+ <CADnq5_NG_dQCYwqHM0umjTMg5Uud6zC4=MiscH91Y9v7mW9bJA@mail.gmail.com>
+From:   Thorsten Leemhuis <regressions@leemhuis.info>
+In-Reply-To: <CADnq5_NG_dQCYwqHM0umjTMg5Uud6zC4=MiscH91Y9v7mW9bJA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1646581696;ebba6b85;
+X-HE-SMSGID: 1nQt7F-0006pL-Di
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Linus,
+Hi, this is your Linux kernel regression tracker again. Top-posting once
+more, to make this easily accessible to everyone.
 
-The following changes since commit ece32a75f003464cad59c26305b4462305273d70:
+What's the status of this? It looks stuck, or did the discussion
+continue somewhere else? James, it sounded like you wanted to test
+something, did you give it a try? Or is there some reason why I should
+stop tracking this regression?
 
-  Merge tag 'kvmarm-fixes-5.17-4' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD (2022-02-25 09:49:30 -0500)
+Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
 
-are available in the Git repository at:
+P.S.: As the Linux kernel's regression tracker I'm getting a lot of
+reports on my table. I can only look briefly into most of them and lack
+knowledge about most of the areas they concern. I thus unfortunately
+will sometimes get things wrong or miss something important. I hope
+that's not the case here; if you think it is, don't hesitate to tell me
+in a public reply, it's in everyone's interest to set the public record
+straight.
 
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+#regzbot poke
 
-for you to fetch changes up to 8d25b7beca7ed6ca34f53f0f8abd009e2be15d94:
-
-  KVM: x86: pull kvm->srcu read-side to kvm_arch_vcpu_ioctl_run (2022-03-02 10:55:58 -0500)
-
-----------------------------------------------------------------
-x86 guest:
-
-* Tweaks to the paravirtualization code, to avoid using them
-when they're pointless or harmful
-
-x86 host:
-
-* Fix for SRCU lockdep splat
-
-* Brown paper bag fix for the propagation of errno
-
-----------------------------------------------------------------
-Dexuan Cui (1):
-      x86/kvmclock: Fix Hyper-V Isolated VM's boot issue when vCPUs > 64
-
-Li RongQing (1):
-      KVM: x86: Yield to IPI target vCPU only if it is busy
-
-Like Xu (1):
-      KVM: x86/mmu: Passing up the error state of mmu_alloc_shadow_roots()
-
-Paolo Bonzini (1):
-      KVM: x86: pull kvm->srcu read-side to kvm_arch_vcpu_ioctl_run
-
-Wanpeng Li (2):
-      x86/kvm: Don't use PV TLB/yield when mwait is advertised
-      x86/kvm: Don't waste memory if kvmclock is disabled
-
- arch/x86/kernel/kvm.c      |  4 +++-
- arch/x86/kernel/kvmclock.c |  3 +++
- arch/x86/kvm/mmu/mmu.c     |  2 +-
- arch/x86/kvm/x86.c         | 25 +++++++++++++------------
- 4 files changed, 20 insertions(+), 14 deletions(-)
-
+On 16.02.22 17:37, Alex Deucher wrote:
+> On Tue, Feb 15, 2022 at 9:35 PM James D. Turner
+> <linuxkernel.foss@dmarc-none.turner.link> wrote:
+>>
+>> Hi Alex,
+>>
+>>> I guess just querying the ATIF method does something that negatively
+>>> influences the windows driver in the guest. Perhaps the platform
+>>> thinks the driver has been loaded since the method has been called so
+>>> it enables certain behaviors that require ATIF interaction that never
+>>> happen because the ACPI methods are not available in the guest.
+>>
+>> Do you mean the `amdgpu_atif_pci_probe_handle` function? If it would be
+>> helpful, I could try disabling that function and testing again.
+> 
+> Correct.
+> 
+>>
+>>> I don't really have a good workaround other than blacklisting the
+>>> driver since on bare metal the driver needs to use this interface for
+>>> platform interactions.
+>>
+>> I'm not familiar with ATIF, but should `amdgpu_atif_pci_probe_handle`
+>> really be called for PCI devices which are bound to vfio-pci? I'd expect
+>> amdgpu to ignore such devices.
+>>
+>> As I understand it, starting with
+>> f9b7f3703ff9 ("drm/amdgpu/acpi: make ATPX/ATCS structures global (v2)"),
+>> the `amdgpu_acpi_detect` function loops over all PCI devices in the
+>> `PCI_CLASS_DISPLAY_VGA` and `PCI_CLASS_DISPLAY_OTHER` classes to find
+>> the ATIF and ATCS handles. Maybe skipping over any PCI devices bound to
+>> vfio-pci would fix the issue? On a related note, shouldn't it also skip
+>> over any PCI devices with non-AMD vendor IDs?
+> 
+> The ACPI methods are global.  There's only one instance of each per
+> system and they are relevant to add GPUs on the platform.  That's why
+> they are a global resource in the driver.  They can be hung off of the
+> dGPU or APU ACPI namespace, depending on the platform which is why we
+> check all of the display devices.  Skipping them would prevent them
+> from being available if you later bound the amdgpu driver to the GPU
+> device(s) I think.
+> 
+> Alex
+> 
+>>
+>> Regards,
+>> James
+> 
+> 
