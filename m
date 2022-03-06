@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B727D4CE86C
-	for <lists+kvm@lfdr.de>; Sun,  6 Mar 2022 04:20:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 583514CE86E
+	for <lists+kvm@lfdr.de>; Sun,  6 Mar 2022 04:20:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232828AbiCFDUW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 5 Mar 2022 22:20:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33778 "EHLO
+        id S232835AbiCFDUY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 5 Mar 2022 22:20:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232797AbiCFDUO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 5 Mar 2022 22:20:14 -0500
-Received: from mail-qt1-x831.google.com (mail-qt1-x831.google.com [IPv6:2607:f8b0:4864:20::831])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52CBFB877;
-        Sat,  5 Mar 2022 19:19:23 -0800 (PST)
-Received: by mail-qt1-x831.google.com with SMTP id t28so10666371qtc.7;
-        Sat, 05 Mar 2022 19:19:23 -0800 (PST)
+        with ESMTP id S232790AbiCFDUP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 5 Mar 2022 22:20:15 -0500
+Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60CDC3335A;
+        Sat,  5 Mar 2022 19:19:24 -0800 (PST)
+Received: by mail-qt1-x82d.google.com with SMTP id e2so10649961qte.12;
+        Sat, 05 Mar 2022 19:19:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=KK/5dtZLMwDC/Q6GqDgOsyVMYXcmdYOpnyXaYTku6xI=;
-        b=POC7lJhv8VZft43mMczj8GdxnzPe2cntBF8QFmKT1QnlWNlz4+sA9Le7FIDQoemJKB
-         zMueGFHuRPxQjyFVU79rbYkEco/aKWce6b/OQkxpo/G/QeZS46BOb6q2noU3A3CbPKjm
-         ioHRxhLKzHAKOH97pdBdGwlJgHRbRm3kHiri5iRGGF9O16CeEExNt2XgP1Ao6ldcTKWd
-         ILFkHFo38tdzgHT15w9rykDYbDExjbQLR58aQ/E7fuTnXr8FsiGtlLLSbtpP8QlQWuDH
-         G5UpJfZZ+tXz1KHAfQp87J/BRi90wZxVcMX4kx1oP+/FSuGwezaGWXolaQgHjNv+kQbg
-         DoxA==
+        bh=FH3A/E2W0O7IE23aSLKaPOzTxYbpDcfx+ImWb5Kh3ok=;
+        b=nf/tMJjStWFiBSHv+/JkLI595GOmYrGpkTMp1B4ugTfZ1plHH3nhkz0Q3o77tiVg8z
+         0f+z/JiCPv6bbBK6Z048Z/RO1k5hT3RmHzGr5JPSPErXJOPalWArYJPBJtoFgSfxxzQG
+         a5B6fg8E8thptzxgUI2yWwUYV61TT0IMWrgO6oKLDNO8Wq3Z1iv6BAfW3w0tgUIo/uGS
+         8JzXgoPO7PfPlO3EhSJhQhpQWChWRvpjW6Tw25ywa/DaTf0TXEmMcqaiTCYnfVpM3alv
+         FW8IK4SnrcVJEW+ZrEqARk6u2GD/pgBl7ljWZvqkJQ8Aflyq3vkdILl1hgKzMQqXzoGF
+         8Dnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=KK/5dtZLMwDC/Q6GqDgOsyVMYXcmdYOpnyXaYTku6xI=;
-        b=7gKug1/IpnL6/HrFqrB2DXqP6mxW6Cw33XDppyI30MYial1Rr/PiwqZ7wJ4zI4VR6I
-         SKwO7n1JxUeUhjY86UrIUiGGPRJD8CXBr0LcTkcu/JqW/3UPQQiwHsC1EH4Vrz2fqAOV
-         P+444yDWoFici1sOlb3ft7LS4b7WA/0u4tOAJTY8MVgNpKCxeOoCdNDT+zmj66jnizft
-         dw2GiebxnTSKwTR1sKWLFx0GVIDQEMq+UHE92Rpab78uMG/k49yUlc8Otha7lizT5Ss7
-         nqH6eEuZbym4luLM6f21rVKZ2QbIIjSm8CdUazpF9aZ79v+TTZ8e5bXF4vXKI5HqkYWC
-         9Gzw==
-X-Gm-Message-State: AOAM5325yw48wvh+D1mFE5W62NaZGSF5aNDsj0/QSM17xYHT/yyLapfp
-        zSqBs0y1nIBjsJMZmVs9b80=
-X-Google-Smtp-Source: ABdhPJw0zO4KGe3iX1cP7NGHmG03+hyqJQZ56558ONRigX5I86BGlm8M/U/qis8vsaJ2IToEC2x0Eg==
-X-Received: by 2002:ac8:5795:0:b0:2dd:e018:98e8 with SMTP id v21-20020ac85795000000b002dde01898e8mr4881727qta.144.1646536762456;
-        Sat, 05 Mar 2022 19:19:22 -0800 (PST)
+        bh=FH3A/E2W0O7IE23aSLKaPOzTxYbpDcfx+ImWb5Kh3ok=;
+        b=auwlhpbIVFEQCrTFmeTcP5b6xBVvGV9kO7yVxB95gLPXbHptWwmmwvLF75bhdkXAQk
+         sC/d46cdwXHXjQzUjBytb6NjgPzRShB7W7z4HqR3urJzNyzRoraPMdKMzCxSa0ICZIg+
+         CUg2FVkf2irfJF4xADTFkwXx7Q6v7EAdmklnL8TJhG0HPl7o8+zRl4CtKPDw6QYPVCaB
+         ZWs/1s0VaQ8KIwGA/oxK68mB5OJqxQ9B3aAPmVzwpbdjWQXv8ZDFEw/qs/y00yw5iC9F
+         KUP896mPff6jcBttshaHPA+Oe0FK06Ez9aP1bcs5vzMMHQm9iXgzwPvtbs3buW/ZNiGs
+         SCBQ==
+X-Gm-Message-State: AOAM532OEawInBMovBFev40As+JDH0nxCOJsK7VIhBdOej5f9cq5FFF5
+        CcqjK8lu31DLq0QxvSSWNp0=
+X-Google-Smtp-Source: ABdhPJzuSA+jebqZTqC0s9bkkwmBksTHakOaub3cfbRjLhGy3lh9ISTmcl6MnB2BdRIdUFazW4QK2w==
+X-Received: by 2002:a05:622a:1192:b0:2d1:e58e:7659 with SMTP id m18-20020a05622a119200b002d1e58e7659mr4880333qtk.41.1646536763568;
+        Sat, 05 Mar 2022 19:19:23 -0800 (PST)
 Received: from henry-arch.studentwireless.binghamton.edu ([149.125.84.173])
-        by smtp.googlemail.com with ESMTPSA id f1-20020a37ad01000000b0064919f4b37csm4463183qkm.75.2022.03.05.19.19.21
+        by smtp.googlemail.com with ESMTPSA id f1-20020a37ad01000000b0064919f4b37csm4463183qkm.75.2022.03.05.19.19.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 05 Mar 2022 19:19:22 -0800 (PST)
+        Sat, 05 Mar 2022 19:19:23 -0800 (PST)
 From:   Henry Sloan <henryksloan@gmail.com>
 Cc:     pbonzini@redhat.com, Henry Sloan <henryksloan@gmail.com>,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2 6/7] KVM: Fix minor indentation and brace style issues
-Date:   Sat,  5 Mar 2022 22:19:06 -0500
-Message-Id: <20220306031907.210499-8-henryksloan@gmail.com>
+Subject: [PATCH v2 7/7] KVM: Modified two MMIO functions to return bool
+Date:   Sat,  5 Mar 2022 22:19:07 -0500
+Message-Id: <20220306031907.210499-9-henryksloan@gmail.com>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20220306031907.210499-1-henryksloan@gmail.com>
 References: <20220306031907.210499-1-henryksloan@gmail.com>
@@ -69,121 +69,70 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Fixed some checkpatch warnings by properly lining up braces and
-parameter lists, as well as adjusting some indentations.
+Adjusted the signatures and implementations of
+coalesced_mmio_in_range and coalesced_mmio_has_room to produce booleans.
 
 Signed-off-by: Henry Sloan <henryksloan@gmail.com>
 ---
- virt/kvm/kvm_main.c | 25 ++++++++++++++-----------
- virt/kvm/pfncache.c |  2 +-
- 2 files changed, 15 insertions(+), 12 deletions(-)
+ virt/kvm/coalesced_mmio.c | 25 +++++++++----------------
+ 1 file changed, 9 insertions(+), 16 deletions(-)
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 1a9f20e3fa2d..eea5b18b8efe 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -132,7 +132,10 @@ static long kvm_vcpu_compat_ioctl(struct file *file, unsigned int ioctl,
-  *   passed to a compat task, let the ioctls fail.
-  */
- static long kvm_no_compat_ioctl(struct file *file, unsigned int ioctl,
--				unsigned long arg) { return -EINVAL; }
-+				unsigned long arg)
-+{
-+	return -EINVAL;
-+}
- 
- static int kvm_no_compat_open(struct inode *inode, struct file *file)
- {
-@@ -2155,8 +2158,9 @@ static int kvm_clear_dirty_log_protect(struct kvm *kvm,
- 
- 	if (log->first_page > memslot->npages ||
- 	    log->num_pages > memslot->npages - log->first_page ||
--	    (log->num_pages < memslot->npages - log->first_page && (log->num_pages & 63)))
--	    return -EINVAL;
-+	    (log->num_pages < memslot->npages - log->first_page &&
-+	    (log->num_pages & 63)))
-+		return -EINVAL;
- 
- 	kvm_arch_sync_dirty_log(kvm, memslot);
- 
-@@ -2517,7 +2521,7 @@ static int hva_to_pfn_remapped(struct vm_area_struct *vma,
- 	 * tail pages of non-compound higher order allocations, which
- 	 * would then underflow the refcount when the caller does the
- 	 * required put_page. Don't allow those pages here.
--	 */ 
-+	 */
- 	if (!kvm_try_get_pfn(pfn))
- 		r = -EFAULT;
- 
-@@ -2906,7 +2910,7 @@ int kvm_vcpu_read_guest(struct kvm_vcpu *vcpu, gpa_t gpa, void *data, unsigned l
- EXPORT_SYMBOL_GPL(kvm_vcpu_read_guest);
- 
- static int __kvm_read_guest_atomic(struct kvm_memory_slot *slot, gfn_t gfn,
--			           void *data, int offset, unsigned long len)
-+				   void *data, int offset, unsigned long len)
- {
- 	int r;
- 	unsigned long addr;
-@@ -2935,7 +2939,7 @@ EXPORT_SYMBOL_GPL(kvm_vcpu_read_guest_atomic);
- 
- static int __kvm_write_guest_page(struct kvm *kvm,
- 				  struct kvm_memory_slot *memslot, gfn_t gfn,
--			          const void *data, int offset, int len)
-+				  const void *data, int offset, int len)
- {
- 	int r;
- 	unsigned long addr;
-@@ -2990,7 +2994,7 @@ int kvm_write_guest(struct kvm *kvm, gpa_t gpa, const void *data,
- EXPORT_SYMBOL_GPL(kvm_write_guest);
- 
- int kvm_vcpu_write_guest(struct kvm_vcpu *vcpu, gpa_t gpa, const void *data,
--		         unsigned long len)
-+			 unsigned long len)
- {
- 	gfn_t gfn = gpa >> PAGE_SHIFT;
- 	int seg;
-@@ -3157,7 +3161,7 @@ EXPORT_SYMBOL_GPL(kvm_clear_guest);
- 
- void mark_page_dirty_in_slot(struct kvm *kvm,
- 			     const struct kvm_memory_slot *memslot,
--		 	     gfn_t gfn)
-+			     gfn_t gfn)
- {
- 	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
- 
-@@ -5176,9 +5180,8 @@ int kvm_io_bus_unregister_dev(struct kvm *kvm, enum kvm_bus bus_idx,
- 		return 0;
- 
- 	for (i = 0; i < bus->dev_count; i++) {
--		if (bus->range[i].dev == dev) {
-+		if (bus->range[i].dev == dev)
- 			break;
--		}
- 	}
- 
- 	if (i == bus->dev_count)
-@@ -5599,7 +5602,7 @@ EXPORT_SYMBOL_GPL(kvm_get_running_vcpu);
-  */
- struct kvm_vcpu * __percpu *kvm_get_running_vcpus(void)
- {
--        return &kvm_running_vcpu;
-+	return &kvm_running_vcpu;
+diff --git a/virt/kvm/coalesced_mmio.c b/virt/kvm/coalesced_mmio.c
+index 1ff2bca6489c..e129d88a95c5 100644
+--- a/virt/kvm/coalesced_mmio.c
++++ b/virt/kvm/coalesced_mmio.c
+@@ -22,28 +22,27 @@ static inline struct kvm_coalesced_mmio_dev *to_mmio(struct kvm_io_device *dev)
+ 	return container_of(dev, struct kvm_coalesced_mmio_dev, dev);
  }
  
- #ifdef CONFIG_GUEST_PERF_EVENTS
-diff --git a/virt/kvm/pfncache.c b/virt/kvm/pfncache.c
-index ce878f4be4da..072c9a9e44b1 100644
---- a/virt/kvm/pfncache.c
-+++ b/virt/kvm/pfncache.c
-@@ -237,7 +237,7 @@ int kvm_gfn_to_pfn_cache_refresh(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
- 				ret = -EFAULT;
- 		}
+-static int coalesced_mmio_in_range(struct kvm_coalesced_mmio_dev *dev,
+-				   gpa_t addr, int len)
++static bool coalesced_mmio_in_range(struct kvm_coalesced_mmio_dev *dev,
++				    gpa_t addr, int len)
+ {
+ 	/* is it in a batchable area ?
+ 	 * (addr,len) is fully included in
+ 	 * (zone->addr, zone->size)
+ 	 */
+ 	if (len < 0)
+-		return 0;
++		return false;
+ 	if (addr + len < addr)
+-		return 0;
++		return false;
+ 	if (addr < dev->zone.addr)
+-		return 0;
++		return false;
+ 	if (addr + len > dev->zone.addr + dev->zone.size)
+-		return 0;
+-	return 1;
++		return false;
++	return true;
+ }
  
--	map_done:
-+ map_done:
- 		write_lock_irq(&gpc->lock);
- 		if (ret) {
- 			gpc->valid = false;
+-static int coalesced_mmio_has_room(struct kvm_coalesced_mmio_dev *dev, u32 last)
++static bool coalesced_mmio_has_room(struct kvm_coalesced_mmio_dev *dev, u32 last)
+ {
+ 	struct kvm_coalesced_mmio_ring *ring;
+-	unsigned int avail;
+ 
+ 	/* Are we able to batch it ? */
+ 
+@@ -52,13 +51,7 @@ static int coalesced_mmio_has_room(struct kvm_coalesced_mmio_dev *dev, u32 last)
+ 	 * there is always one unused entry in the buffer
+ 	 */
+ 	ring = dev->kvm->coalesced_mmio_ring;
+-	avail = (ring->first - last - 1) % KVM_COALESCED_MMIO_MAX;
+-	if (avail == 0) {
+-		/* full */
+-		return 0;
+-	}
+-
+-	return 1;
++	return (ring->first - last - 1) % KVM_COALESCED_MMIO_MAX != 0;
+ }
+ 
+ static int coalesced_mmio_write(struct kvm_vcpu *vcpu,
 -- 
 2.35.1
 
