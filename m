@@ -2,75 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CEAFA4CE983
-	for <lists+kvm@lfdr.de>; Sun,  6 Mar 2022 07:44:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E5E14CEA9C
+	for <lists+kvm@lfdr.de>; Sun,  6 Mar 2022 11:54:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232080AbiCFGpo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 6 Mar 2022 01:45:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48160 "EHLO
+        id S233256AbiCFKzk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 6 Mar 2022 05:55:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43106 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231496AbiCFGpn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 6 Mar 2022 01:45:43 -0500
-Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5835F55756
-        for <kvm@vger.kernel.org>; Sat,  5 Mar 2022 22:44:51 -0800 (PST)
-Received: by mail-lj1-x236.google.com with SMTP id p20so16353677ljo.0
-        for <kvm@vger.kernel.org>; Sat, 05 Mar 2022 22:44:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:reply-to:sender:from:date:message-id:subject:to;
-        bh=VaaSLAJ+hgNGNq49WyPsh3ndDLo+mnrYcswrOHpJSv8=;
-        b=fF9/MpPqbVvmSz0UoAHHX8MI7/AquvwFGWpqjmPbm1gryd2clg8/l2aNkt+auZOqqp
-         PYQIm2TdNky1AwuRyyFCJAIs8oqzLIzM0POmgZRxYvzwEw7u8xrlNe6FMw8On4zNAvnG
-         sxIDIQfBJt4b/jyJqg7qsptARhpRmvDtnmyuxRdvZdR+A4z/Aybm5gMC4JVA0CJbt/Ym
-         nvausZOg3mkJgH6l7oN28m4xLfDQx20WaNA96/OjLfjqPXW+jSgb23TuCvXBVYHk2Prp
-         EkcshqFQcJ7zSJXV2rayAhjYmGMTbuDekyhl03FEN9GIEQQBQ68ZnwY0gNrHSsBwlK4w
-         IzEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:reply-to:sender:from:date
-         :message-id:subject:to;
-        bh=VaaSLAJ+hgNGNq49WyPsh3ndDLo+mnrYcswrOHpJSv8=;
-        b=1+hxLN1lpURyQsCGiPXCiUG1FU3PfzYLJhNkzSf3ZtlLIV0N0t9t9oxnr+Jv8Kv4LM
-         Kwf3pvWFj8s33DVrO392yGw4QhgjirlynFaJezmvTNTBjix9sjqAxw7H+lgjyXy6pGT4
-         PrWSS06TA6emfTnxZ1J16paQA2bAvT+GFDhfntPph2pfWYqdaKqhsUe9f32BeiGaq5J0
-         J3VEAY54/2lrSX9OiMOWtN6hukaheK0q+sno4pbhRPiE/jDOOnto256IapPI9bIbeH8s
-         oZBew3PHtEgI44FGlApyXuO4sVHhixsUqzrQ2/zZmozeTXyr2FjYgrGeShxSB64GNJRm
-         pyRg==
-X-Gm-Message-State: AOAM532n4iRdvOQAf0bu5+1Br4KyqoTPERIF8m04kxhYNnt6ygahXxVJ
-        Y4oYHNmYm5Jh7peyrIzX0UiR2SdCt0RpIMDrhNw=
-X-Google-Smtp-Source: ABdhPJymuly2fh724C2eOwuH0ENeAezJVF3GIgZ1t29ePwWELUjyc72l7XXz+cXeMJ6hYTTgbHCcDxsRceiJq8NUKhA=
-X-Received: by 2002:a05:651c:2cb:b0:23e:9985:518 with SMTP id
- f11-20020a05651c02cb00b0023e99850518mr3872667ljo.18.1646549089407; Sat, 05
- Mar 2022 22:44:49 -0800 (PST)
+        with ESMTP id S233242AbiCFKzj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 6 Mar 2022 05:55:39 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 495835131D
+        for <kvm@vger.kernel.org>; Sun,  6 Mar 2022 02:54:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646564086;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=6C+14RT/WBu/+yhSoFqCrDNXOq/wjuT0/qYJr4t18Zo=;
+        b=NtGEoeSWuWyC4w8LVSEho9ZdhEKlYyB+WyGwV3cWAm4jUrRf62KEtIKtnevOVERPo6Pctt
+        JtEEoqj+wLz8UJ+ebjev8FqBmWCddutipPOQ1s4PfOU/PwmXzjhxHnN7BcPCSMY/FUMQ9T
+        dZAanj+AS46O+X8tbxdZymmw3ECYxbk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-354-p2wh5w0zNHCENBnLgi_j4A-1; Sun, 06 Mar 2022 05:54:41 -0500
+X-MC-Unique: p2wh5w0zNHCENBnLgi_j4A-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C2F78659;
+        Sun,  6 Mar 2022 10:54:40 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 73B271F467;
+        Sun,  6 Mar 2022 10:54:40 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     torvalds@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: [GIT PULL] More KVM fixes for Linux 5.17-rc7
+Date:   Sun,  6 Mar 2022 05:54:39 -0500
+Message-Id: <20220306105439.141939-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Reply-To: mrs.susanelwoodhara17@gmail.com
-Sender: mrs.arawyann@gmail.com
-Received: by 2002:ab3:7d89:0:0:0:0:0 with HTTP; Sat, 5 Mar 2022 22:44:47 -0800 (PST)
-From:   Mrs Susan Elwood Hara <mrs.susanelwoodhara17@gmail.com>
-Date:   Sun, 6 Mar 2022 06:44:47 +0000
-X-Google-Sender-Auth: ZuV5NHEpwJT41TCCw92BCTZJWrw
-Message-ID: <CACppo45F8rJ-zBUKjVuSP-ETESOeX59xaySbt7UPp+oQjSPbUg@mail.gmail.com>
-Subject: GOD BLESS YOU AS YOU REPLY URGENTLY
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=4.9 required=5.0 tests=BAYES_50,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        FREEMAIL_REPLYTO_END_DIGIT,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        SUBJ_ALL_CAPS,T_HK_NAME_FM_MR_MRS,T_SCC_BODY_TEXT_LINE,UNDISC_MONEY
-        autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Level: ****
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-GOD BLESS YOU AS YOU REPLY URGENTLY
+Linus,
 
- Hello Dear,
-Greetings, I am contacting you regarding an important information i
-have for you please reply to confirm your email address and for more
-details Thanks
-Regards
-Mrs Susan Elwood Hara.
+The following changes since commit ece32a75f003464cad59c26305b4462305273d70:
+
+  Merge tag 'kvmarm-fixes-5.17-4' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD (2022-02-25 09:49:30 -0500)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+
+for you to fetch changes up to 8d25b7beca7ed6ca34f53f0f8abd009e2be15d94:
+
+  KVM: x86: pull kvm->srcu read-side to kvm_arch_vcpu_ioctl_run (2022-03-02 10:55:58 -0500)
+
+----------------------------------------------------------------
+x86 guest:
+
+* Tweaks to the paravirtualization code, to avoid using them
+when they're pointless or harmful
+
+x86 host:
+
+* Fix for SRCU lockdep splat
+
+* Brown paper bag fix for the propagation of errno
+
+----------------------------------------------------------------
+Dexuan Cui (1):
+      x86/kvmclock: Fix Hyper-V Isolated VM's boot issue when vCPUs > 64
+
+Li RongQing (1):
+      KVM: x86: Yield to IPI target vCPU only if it is busy
+
+Like Xu (1):
+      KVM: x86/mmu: Passing up the error state of mmu_alloc_shadow_roots()
+
+Paolo Bonzini (1):
+      KVM: x86: pull kvm->srcu read-side to kvm_arch_vcpu_ioctl_run
+
+Wanpeng Li (2):
+      x86/kvm: Don't use PV TLB/yield when mwait is advertised
+      x86/kvm: Don't waste memory if kvmclock is disabled
+
+ arch/x86/kernel/kvm.c      |  4 +++-
+ arch/x86/kernel/kvmclock.c |  3 +++
+ arch/x86/kvm/mmu/mmu.c     |  2 +-
+ arch/x86/kvm/x86.c         | 25 +++++++++++++------------
+ 4 files changed, 20 insertions(+), 14 deletions(-)
+
