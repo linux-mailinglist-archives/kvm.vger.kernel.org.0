@@ -2,173 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3220A4CFD42
-	for <lists+kvm@lfdr.de>; Mon,  7 Mar 2022 12:45:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5590C4CFD4D
+	for <lists+kvm@lfdr.de>; Mon,  7 Mar 2022 12:46:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233825AbiCGLqk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Mar 2022 06:46:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37898 "EHLO
+        id S239673AbiCGLrU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Mar 2022 06:47:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38494 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231160AbiCGLqj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Mar 2022 06:46:39 -0500
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2DD9665791
-        for <kvm@vger.kernel.org>; Mon,  7 Mar 2022 03:45:45 -0800 (PST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 97E3C1042;
-        Mon,  7 Mar 2022 03:45:44 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6AF7A3F73D;
-        Mon,  7 Mar 2022 03:45:43 -0800 (PST)
-Date:   Mon, 7 Mar 2022 11:46:09 +0000
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Sebastian Ene <sebastianene@google.com>
-Cc:     kvm@vger.kernel.org, maz@kernel.org, will@kernel.org,
-        kvmarm@lists.cs.columbia.edu
+        with ESMTP id S239233AbiCGLrS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Mar 2022 06:47:18 -0500
+Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05E7966221
+        for <kvm@vger.kernel.org>; Mon,  7 Mar 2022 03:46:24 -0800 (PST)
+Received: by mail-wr1-x42c.google.com with SMTP id u10so21162089wra.9
+        for <kvm@vger.kernel.org>; Mon, 07 Mar 2022 03:46:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=ktP7BnWwK23FI/t1E9zBBBCFDc5dTgq0QcDeYV/LjMs=;
+        b=kE+0uWbmYfdbxJWiaFqLD8Z6RBMgUw0mvNQb3F8xOKDV/7CJKoejFmUyIuPVnKDIJj
+         qWRjxdUapFNeSbt/fqvXRW3W4XKxSLB+RqbpKThmIyONg9dIL3HF2sHg+s7jORSHvwuc
+         0to1Gcm3ovjq42IBsX2H5TlxY+hphMLjzVCkceBeOpSo/YEAEcOS+TbI+vi4xbCvRHfr
+         ZNEWtg1s10nj5qzt7fcI/I37BrcUkYXJ6EzLrpgjp7EUYiG6GyQbtrqk6u7NcYK6JB+U
+         YYwdHxf6QRIM+BRz4LR2Aw497WXwBYaSjCN43pBExfX3QCDCLE0EZ1a0OTOglrNOzxCM
+         0UPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=ktP7BnWwK23FI/t1E9zBBBCFDc5dTgq0QcDeYV/LjMs=;
+        b=vFrcopmr83F1dow3tKpyKFYwjfdldQKTRte13em3l9qWciEAWDIa40yIuot4OkEn6/
+         e/SsrbSkDzRRdM/ZVSvCj9bVnk56c1PvB0739PbJaX10WOor0yu8w7fHNk3qOpgnkD3v
+         UwGLNwHUUl6N/0U9IL21fXXXQ/HKlz6sH4zHCHHXvDw/7gPukIRjP/JjPF0L32uEwwev
+         LvsBOTkBHyo1w2Uc2le3YyMmS4tU4pZdRSgtEOR77GnaShd9PdWA7UJ+DJmjVNGrohcc
+         VKIk6rv6G9qMtFQBVjrqLr7i2wZ0Ft+VO7EXiabAvO9iZtvROOYwb9JCG7gardoIbv7b
+         2c1g==
+X-Gm-Message-State: AOAM532UMXo+4wpijoGnsQgPBOXzx3nOFh+vPtjfqJQ6drjUM65oTHGE
+        kRLnQe5VZ/o2LcZTriL9sSdGAg==
+X-Google-Smtp-Source: ABdhPJzu2JTMxT5Ih3o+3PV6MprnxtJ8GPpbRDJb6yyFua7rCsDXpO2/KXSVydgeBOUCo+LIAt0KRQ==
+X-Received: by 2002:adf:f20e:0:b0:1f0:7673:be2f with SMTP id p14-20020adff20e000000b001f07673be2fmr8029786wro.19.1646653582447;
+        Mon, 07 Mar 2022 03:46:22 -0800 (PST)
+Received: from google.com (203.75.199.104.bc.googleusercontent.com. [104.199.75.203])
+        by smtp.gmail.com with ESMTPSA id h12-20020a5d548c000000b001f1f99e7792sm2026069wrv.111.2022.03.07.03.46.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Mar 2022 03:46:22 -0800 (PST)
+Date:   Mon, 7 Mar 2022 11:46:20 +0000
+From:   Sebastian Ene <sebastianene@google.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvm@vger.kernel.org, qperret@google.com, will@kernel.org,
+        julien.thierry.kdev@gmail.com
 Subject: Re: [PATCH kvmtool v7 2/3] aarch64: Add stolen time support
-Message-ID: <YiXwgY/n4Y3W4XAi@monolith.localdoman>
+Message-ID: <YiXwjCjcJbgaY10x@google.com>
 References: <20220302140734.1015958-1-sebastianene@google.com>
  <20220302140734.1015958-3-sebastianene@google.com>
+ <8735k02z98.wl-maz@kernel.org>
+ <YiCuBsKsh4TAZqTs@google.com>
+ <87pmn22ac7.wl-maz@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220302140734.1015958-3-sebastianene@google.com>
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <87pmn22ac7.wl-maz@kernel.org>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Mar 03, 2022 at 05:51:36PM +0000, Marc Zyngier wrote:
+> On Thu, 03 Mar 2022 12:01:10 +0000,
+> Sebastian Ene <sebastianene@google.com> wrote:
+
 Hi,
 
-On Wed, Mar 02, 2022 at 02:07:35PM +0000, Sebastian Ene wrote:
-> This patch adds support for stolen time by sharing a memory region
-> with the guest which will be used by the hypervisor to store the stolen
-> time information. Reserve a 64kb MMIO memory region after the RTC peripheral
-> to be used by pvtime. The exact format of the structure stored by the
-> hypervisor is described in the ARM DEN0057A document.
+> > 
+> > > > +int kvm_cpu__setup_pvtime(struct kvm_cpu *vcpu)
+> > > > +{
+> > > > +	int ret;
+> > > > +	bool has_stolen_time;
+> > > > +	u64 pvtime_guest_addr = ARM_PVTIME_MMIO_BASE + vcpu->cpu_id *
+> > > > +		ARM_PVTIME_STRUCT_SIZE;
+> > > > +	struct kvm_config *kvm_cfg = NULL;
+> > > > +	struct kvm_device_attr pvtime_attr = (struct kvm_device_attr) {
+> > > > +		.group	= KVM_ARM_VCPU_PVTIME_CTRL,
+> > > > +		.addr	= KVM_ARM_VCPU_PVTIME_IPA
+> > > > +	};
+> > > > +
+> > > > +	kvm_cfg = &vcpu->kvm->cfg;
+> > > > +	if (kvm_cfg->no_pvtime)
+> > > > +		return 0;
+> > > > +
+> > > > +	if (!pvtime_data.is_supported)
+> > > > +		return -ENOTSUP;
+> > > 
+> > > It is a bit odd to have this hard failure if running on a system that
+> > > doesn't have pvtime. It forces the user to alter their command-line,
+> > > which is a bit annoying. I'd rather have a soft-fail here.
+> > > 
+> > 
+> > The flag 'is_supported' is set to false when we support pvtime but we
+> > fail to configure it. We verify that we support pvtime by calling the check
+> > extension KVM_CAP_STEAL_TIME. I think the naming is odd here for the
+> > flag name. It should be : 'is_failed_cfg'.
 > 
-> Signed-off-by: Sebastian Ene <sebastianene@google.com>
-> ---
->  Makefile                               |   1 +
->  arm/aarch64/arm-cpu.c                  |   2 +-
->  arm/aarch64/include/kvm/kvm-cpu-arch.h |   1 +
->  arm/aarch64/pvtime.c                   | 103 +++++++++++++++++++++++++
->  arm/include/arm-common/kvm-arch.h      |   6 +-
->  include/kvm/kvm-config.h               |   1 +
->  6 files changed, 112 insertions(+), 2 deletions(-)
->  create mode 100644 arm/aarch64/pvtime.c
+> Ah, I see. Yes, the name is misleading.
 > 
-> diff --git a/Makefile b/Makefile
-> index f251147..e9121dc 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -182,6 +182,7 @@ ifeq ($(ARCH), arm64)
->  	OBJS		+= arm/aarch64/arm-cpu.o
->  	OBJS		+= arm/aarch64/kvm-cpu.o
->  	OBJS		+= arm/aarch64/kvm.o
-> +	OBJS		+= arm/aarch64/pvtime.o
->  	ARCH_INCLUDE	:= $(HDRS_ARM_COMMON)
->  	ARCH_INCLUDE	+= -Iarm/aarch64/include
->  
-> diff --git a/arm/aarch64/arm-cpu.c b/arm/aarch64/arm-cpu.c
-> index d7572b7..7e4a3c1 100644
-> --- a/arm/aarch64/arm-cpu.c
-> +++ b/arm/aarch64/arm-cpu.c
-> @@ -22,7 +22,7 @@ static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
->  static int arm_cpu__vcpu_init(struct kvm_cpu *vcpu)
->  {
->  	vcpu->generate_fdt_nodes = generate_fdt_nodes;
-> -	return 0;
-> +	return kvm_cpu__setup_pvtime(vcpu);
->  }
->  
->  static struct kvm_arm_target target_generic_v8 = {
-> diff --git a/arm/aarch64/include/kvm/kvm-cpu-arch.h b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-> index 8dfb82e..2b2c1ff 100644
-> --- a/arm/aarch64/include/kvm/kvm-cpu-arch.h
-> +++ b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-> @@ -19,5 +19,6 @@
->  
->  void kvm_cpu__select_features(struct kvm *kvm, struct kvm_vcpu_init *init);
->  int kvm_cpu__configure_features(struct kvm_cpu *vcpu);
-> +int kvm_cpu__setup_pvtime(struct kvm_cpu *vcpu);
->  
->  #endif /* KVM__KVM_CPU_ARCH_H */
-> diff --git a/arm/aarch64/pvtime.c b/arm/aarch64/pvtime.c
-> new file mode 100644
-> index 0000000..fdde683
-> --- /dev/null
-> +++ b/arm/aarch64/pvtime.c
-> @@ -0,0 +1,103 @@
-> +#include "kvm/kvm.h"
-> +#include "kvm/kvm-cpu.h"
-> +#include "kvm/util.h"
-> +
-> +#include <linux/byteorder.h>
-> +#include <linux/types.h>
-> +
-> +#define ARM_PVTIME_STRUCT_SIZE		(64)
-> +
-> +struct pvtime_data_priv {
-> +	bool	is_supported;
-> +	char	*usr_mem;
-> +};
-> +
-> +static struct pvtime_data_priv pvtime_data = {
-> +	.is_supported	= true,
-> +	.usr_mem	= NULL
-> +};
-> +
-> +static int pvtime__alloc_region(struct kvm *kvm)
-> +{
-> +	char *mem;
-> +	int ret = 0;
-> +
-> +	mem = mmap(NULL, ARM_PVTIME_MMIO_SIZE, PROT_RW,
-> +		   MAP_ANON_NORESERVE, -1, 0);
-> +	if (mem == MAP_FAILED)
-> +		return -errno;
-> +
-> +	ret = kvm__register_dev_mem(kvm, ARM_PVTIME_MMIO_BASE,
-> +				    ARM_PVTIME_MMIO_SIZE, mem);
-> +	if (ret) {
-> +		munmap(mem, ARM_PVTIME_MMIO_SIZE);
-> +		return ret;
-> +	}
-> +
-> +	pvtime_data.usr_mem = mem;
-> +	return ret;
-> +}
-> +
-> +static int pvtime__teardown_region(struct kvm *kvm)
-> +{
-> +	if (pvtime_data.usr_mem == NULL)
-> +		return 0;
-> +
-> +	kvm__destroy_mem(kvm, ARM_PVTIME_MMIO_BASE,
-> +			 ARM_PVTIME_MMIO_SIZE, pvtime_data.usr_mem);
-> +	munmap(pvtime_data.usr_mem, ARM_PVTIME_MMIO_SIZE);
-> +	pvtime_data.usr_mem = NULL;
-> +	return 0;
-> +}
-> +
-> +dev_exit(pvtime__teardown_region);
 
-This looks awkward: pvtime initialization is done in kvm_cpu__arch_init(), but
-teardown is done in the device exit stage.
+I will update the name for this to: 'is_failed_cfg'.
 
-I think it would be better to choose one approach and stick with it: (1) keep
-initialization in kvm_cpu__arch_init() and move teardown to kvm_cpu__delete();
-or (2) treat pvtime as a device, move the code to hw/pvtime.c, compile the file
-only for arm64 and move initialization to dev_init() (and keep teardown in
-dev_exit()).
+> >
+> > > > +
+> > > > +	has_stolen_time = kvm__supports_extension(vcpu->kvm,
+> > > > +						  KVM_CAP_STEAL_TIME);
+> > > > +	if (!has_stolen_time)
+> > > > +		return 0;
+> 
+> Here, you could force no_pvtime to 1, and avoid checking for each vcpu
+> once you detected that the host is not equipped to deal with it.
+> 
 
-I have no preference for either, but I think a consistent approach to enabling
-pvtime is desirable.
+Good point ! I will do this.
 
 Thanks,
-Alex
+Sebastian
+
+> Thanks,
+> 
+> 	M.
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
