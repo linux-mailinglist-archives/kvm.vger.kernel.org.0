@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 284A94CF411
-	for <lists+kvm@lfdr.de>; Mon,  7 Mar 2022 09:54:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D08184CF410
+	for <lists+kvm@lfdr.de>; Mon,  7 Mar 2022 09:54:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236245AbiCGIy6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Mar 2022 03:54:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40498 "EHLO
+        id S236263AbiCGIy7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Mar 2022 03:54:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41502 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236249AbiCGIyu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Mar 2022 03:54:50 -0500
+        with ESMTP id S236269AbiCGIyw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Mar 2022 03:54:52 -0500
 Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9BF917E3E;
-        Mon,  7 Mar 2022 00:53:46 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A23D31C124;
+        Mon,  7 Mar 2022 00:53:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1646643226; x=1678179226;
+  t=1646643231; x=1678179231;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=tK8YcYd3WE7o/03bsGHBPo57y7a9U/7AOoyubu+SryY=;
-  b=MxrprauOUedSCA40Mute6pgkDIUcz4urAo1ttjt3x4Q8ui+mLTwzNbWD
-   d+4XETTJ8PNSsdhnQ0WKkJxJCJsQL5Pj3eRvEuIb+fmashYjgzOlVt4yt
-   EcB8I0So3oMGtnb6+K61akK9OLVXNJqYiVZkEqpM6ADDq5NcKmRznhbU0
-   Hc+aQJuEkLHMQa/W34wmnpyHR6owfVC3Xc8mbWGnIE3uKuo3IfFNenljU
-   YKbczfP0c/B7/LkyzWUqOTupaylcMDBvW5btzS4dNTktzT/CMTVn8+L3U
-   fj3oIEUwwBc0GwwKrttOuXuIdNywoGj0l2CMIjy9mjlfPVek4DZMkngcJ
-   w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10278"; a="241771860"
+  bh=QpI2V/hfnUcmU3OAA7yk9HZ/2w/XcuWAii0cTKvKcMc=;
+  b=hljjfpqwH0TXveHzyK4PxkZKkGCoc8Vlz0yWGJOMIejshRSqL2KpV/Cv
+   91cXrJRqjaTaXrgi3ClxTss2U2FCznkCnixXvOYTzCgbscr/y9mFclZYN
+   6Z8rJMbyWB4ZUwZWpRmOYrSodhW99u9QMnbVvSbo6cwjSbqR3CRRLgdCe
+   yWw3TMS02Ej8JLTlDP4YEjIdFaQYPn2mCjpmYqTnLXHTCG2ClODPRZdcA
+   3+Yla5RwHvu6gYdG/k/bvnK/WhjOgcMOyFcPdumDBvTdZBBFQFJg3pgmY
+   xyevB7R/b3sRtjIgMFeqfo2Gm3EuAY+BVPGOXvHc7+xNzhEcrO2dh12o0
+   A==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10278"; a="241771870"
 X-IronPort-AV: E=Sophos;i="5.90,161,1643702400"; 
-   d="scan'208";a="241771860"
+   d="scan'208";a="241771870"
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2022 00:53:46 -0800
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2022 00:53:50 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.90,161,1643702400"; 
-   d="scan'208";a="537033595"
+   d="scan'208";a="537033604"
 Received: from ahunter-desktop.fi.intel.com ([10.237.72.92])
-  by orsmga007.jf.intel.com with ESMTP; 07 Mar 2022 00:53:42 -0800
+  by orsmga007.jf.intel.com with ESMTP; 07 Mar 2022 00:53:46 -0800
 From:   Adrian Hunter <adrian.hunter@intel.com>
 To:     Peter Zijlstra <peterz@infradead.org>
 Cc:     Alexander Shishkin <alexander.shishkin@linux.intel.com>,
@@ -49,9 +49,9 @@ Cc:     Alexander Shishkin <alexander.shishkin@linux.intel.com>,
         Mathieu Poirier <mathieu.poirier@linaro.org>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Leo Yan <leo.yan@linaro.org>
-Subject: [PATCH V3 07/10] perf tools: Add perf_read_tsc_conv_for_clockid()
-Date:   Mon,  7 Mar 2022 10:53:09 +0200
-Message-Id: <20220307085312.1814506-8-adrian.hunter@intel.com>
+Subject: [PATCH V3 08/10] perf intel-pt: Add support for new clock IDs
+Date:   Mon,  7 Mar 2022 10:53:10 +0200
+Message-Id: <20220307085312.1814506-9-adrian.hunter@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220307085312.1814506-1-adrian.hunter@intel.com>
 References: <20220307085312.1814506-1-adrian.hunter@intel.com>
@@ -68,108 +68,159 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a function to read TSC conversion information for a particular clock
-ID. It will be used in a subsequent patch.
+Add support for new clock IDs CLOCK_PERF_HW_CLOCK and
+CLOCK_PERF_HW_CLOCK_NS. Mainly this means also keeping TSC conversion
+information for CLOCK_PERF_HW_CLOCK_NS when CLOCK_PERF_HW_CLOCK is
+being used, so that conversions from nanoseconds can still be done when
+the perf event clock is TSC.
 
 Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 ---
- tools/perf/util/tsc.c | 56 +++++++++++++++++++++++++++++++++++++++++++
- tools/perf/util/tsc.h |  1 +
- 2 files changed, 57 insertions(+)
+ tools/perf/arch/x86/util/intel-pt.c | 37 ++++++++++++++++++++++++++---
+ tools/perf/util/intel-pt.c          | 24 +++++++++++++++----
+ tools/perf/util/intel-pt.h          |  2 +-
+ 3 files changed, 55 insertions(+), 8 deletions(-)
 
-diff --git a/tools/perf/util/tsc.c b/tools/perf/util/tsc.c
-index f19791d46e99..92ae0e75c749 100644
---- a/tools/perf/util/tsc.c
-+++ b/tools/perf/util/tsc.c
-@@ -3,6 +3,8 @@
- #include <inttypes.h>
- #include <string.h>
+diff --git a/tools/perf/arch/x86/util/intel-pt.c b/tools/perf/arch/x86/util/intel-pt.c
+index 8c31578d6f4a..5bc05b8dd7f0 100644
+--- a/tools/perf/arch/x86/util/intel-pt.c
++++ b/tools/perf/arch/x86/util/intel-pt.c
+@@ -31,6 +31,7 @@
+ #include "../../../util/tsc.h"
+ #include <internal/lib.h> // page_size
+ #include "../../../util/intel-pt.h"
++#include "../../../util/clockid.h"
  
-+#include <sys/mman.h>
+ #define KiB(x) ((x) * 1024)
+ #define MiB(x) ((x) * 1024 * 1024)
+@@ -290,6 +291,20 @@ static const char *intel_pt_find_filter(struct evlist *evlist,
+ 	return NULL;
+ }
+ 
++static bool intel_pt_clockid(struct evlist *evlist, struct perf_pmu *intel_pt_pmu, s32 clockid)
++{
++	struct evsel *evsel;
 +
- #include <linux/compiler.h>
- #include <linux/perf_event.h>
- #include <linux/stddef.h>
-@@ -14,6 +16,9 @@
- #include "synthetic-events.h"
- #include "debug.h"
- #include "tsc.h"
-+#include "cpumap.h"
-+#include "perf-sys.h"
-+#include <internal/lib.h> /* page_size */
- 
- u64 perf_time_to_tsc(u64 ns, struct perf_tsc_conversion *tc)
++	evlist__for_each_entry(evlist, evsel) {
++		if (evsel->core.attr.type == intel_pt_pmu->type &&
++		    evsel->core.attr.use_clockid &&
++		    evsel->core.attr.clockid == clockid)
++			return true;
++	}
++
++	return false;
++}
++
+ static size_t intel_pt_filter_bytes(const char *filter)
  {
-@@ -71,6 +76,57 @@ int perf_read_tsc_conversion(const struct perf_event_mmap_page *pc,
+ 	size_t len = filter ? strlen(filter) : 0;
+@@ -304,9 +319,11 @@ intel_pt_info_priv_size(struct auxtrace_record *itr, struct evlist *evlist)
+ 			container_of(itr, struct intel_pt_recording, itr);
+ 	const char *filter = intel_pt_find_filter(evlist, ptr->intel_pt_pmu);
+ 
+-	ptr->priv_size = (INTEL_PT_AUXTRACE_PRIV_MAX * sizeof(u64)) +
++	ptr->priv_size = (INTEL_PT_AUXTRACE_PRIV_FIXED * sizeof(u64)) +
+ 			 intel_pt_filter_bytes(filter);
+ 	ptr->priv_size += sizeof(u64); /* Cap Event Trace */
++	ptr->priv_size += sizeof(u64); /* ns Time Shift */
++	ptr->priv_size += sizeof(u64); /* ns Time Multiplier */
+ 
+ 	return ptr->priv_size;
+ }
+@@ -414,6 +431,18 @@ static int intel_pt_info_fill(struct auxtrace_record *itr,
+ 
+ 	*info++ = event_trace;
+ 
++	if (intel_pt_clockid(session->evlist, ptr->intel_pt_pmu, CLOCK_PERF_HW_CLOCK)) {
++		struct perf_tsc_conversion ns_tc;
++
++		if (perf_read_tsc_conv_for_clockid(CLOCK_PERF_HW_CLOCK_NS, &ns_tc))
++			return -EINVAL;
++		*info++ = ns_tc.time_shift;
++		*info++ = ns_tc.time_mult;
++	} else {
++		*info++ = tc.time_shift;
++		*info++ = tc.time_mult;
++	}
++
  	return 0;
  }
  
-+static int perf_read_tsc_conv_attr_cpu(struct perf_event_attr *attr,
-+				       struct perf_cpu cpu,
-+				       struct perf_tsc_conversion *tc)
-+{
-+	size_t len = 2 * page_size;
-+	int fd, err = -EINVAL;
-+	void *addr;
-+
-+	fd = sys_perf_event_open(attr, 0, cpu.cpu, -1, 0);
-+	if (fd == -1)
-+		return -EINVAL;
-+
-+	addr = mmap(NULL, len, PROT_READ, MAP_SHARED, fd, 0);
-+	if (addr == MAP_FAILED)
-+		goto out_close;
-+
-+	err = perf_read_tsc_conversion(addr, tc);
-+
-+	munmap(addr, len);
-+out_close:
-+	close(fd);
-+	return err;
-+}
-+
-+static struct perf_cpu find_a_cpu(void)
-+{
-+	struct perf_cpu_map *cpus;
-+	struct perf_cpu cpu = { .cpu = 0 };
-+
-+	cpus = perf_cpu_map__new(NULL);
-+	if (!cpus)
-+		return cpu;
-+	cpu = cpus->map[0];
-+	perf_cpu_map__put(cpus);
-+	return cpu;
-+}
-+
-+int perf_read_tsc_conv_for_clockid(s32 clockid, struct perf_tsc_conversion *tc)
-+{
-+	struct perf_event_attr attr = {
-+		.size		= sizeof(attr),
-+		.type		= PERF_TYPE_SOFTWARE,
-+		.config		= PERF_COUNT_SW_DUMMY,
-+		.exclude_kernel	= 1,
-+		.use_clockid	= 1,
-+		.clockid	= clockid,
-+	};
-+
-+	return perf_read_tsc_conv_attr_cpu(&attr, find_a_cpu(), tc);
-+}
-+
- int perf_event__synth_time_conv(const struct perf_event_mmap_page *pc,
- 				struct perf_tool *tool,
- 				perf_event__handler_t process,
-diff --git a/tools/perf/util/tsc.h b/tools/perf/util/tsc.h
-index 7d83a31732a7..ba9a52a9d70f 100644
---- a/tools/perf/util/tsc.h
-+++ b/tools/perf/util/tsc.h
-@@ -21,6 +21,7 @@ struct perf_event_mmap_page;
+@@ -664,8 +693,10 @@ static int intel_pt_recording_options(struct auxtrace_record *itr,
+ 		return -EINVAL;
+ 	}
  
- int perf_read_tsc_conversion(const struct perf_event_mmap_page *pc,
- 			     struct perf_tsc_conversion *tc);
-+int perf_read_tsc_conv_for_clockid(s32 clockid, struct perf_tsc_conversion *tc);
+-	if (opts->use_clockid) {
+-		pr_err("Cannot use clockid (-k option) with " INTEL_PT_PMU_NAME "\n");
++	if (opts->use_clockid && opts->clockid != CLOCK_PERF_HW_CLOCK_NS &&
++	    opts->clockid != CLOCK_PERF_HW_CLOCK) {
++		pr_err("Cannot use clockid (-k option) with " INTEL_PT_PMU_NAME
++		       " except CLOCK_PERF_HW_CLOCK_NS and CLOCK_PERF_HW_CLOCK\n");
+ 		return -EINVAL;
+ 	}
  
- u64 perf_time_to_tsc(u64 ns, struct perf_tsc_conversion *tc);
- u64 tsc_to_perf_time(u64 cyc, struct perf_tsc_conversion *tc);
+diff --git a/tools/perf/util/intel-pt.c b/tools/perf/util/intel-pt.c
+index ec43d364d0de..677ad0774464 100644
+--- a/tools/perf/util/intel-pt.c
++++ b/tools/perf/util/intel-pt.c
+@@ -89,6 +89,8 @@ struct intel_pt {
+ 
+ 	struct perf_tsc_conversion tc;
+ 	bool cap_user_time_zero;
++	u16 ns_time_shift;
++	u32 ns_time_mult;
+ 
+ 	struct itrace_synth_opts synth_opts;
+ 
+@@ -1100,10 +1102,10 @@ static u64 intel_pt_ns_to_ticks(const struct intel_pt *pt, u64 ns)
+ {
+ 	u64 quot, rem;
+ 
+-	quot = ns / pt->tc.time_mult;
+-	rem  = ns % pt->tc.time_mult;
+-	return (quot << pt->tc.time_shift) + (rem << pt->tc.time_shift) /
+-		pt->tc.time_mult;
++	quot = ns / pt->ns_time_mult;
++	rem  = ns % pt->ns_time_mult;
++	return (quot << pt->ns_time_shift) + (rem << pt->ns_time_shift) /
++		pt->ns_time_mult;
+ }
+ 
+ static struct ip_callchain *intel_pt_alloc_chain(struct intel_pt *pt)
+@@ -3987,6 +3989,20 @@ int intel_pt_process_auxtrace_info(union perf_event *event,
+ 				pt->cap_event_trace);
+ 	}
+ 
++	if ((void *)info < info_end) {
++		pt->ns_time_shift = *info++;
++		pt->ns_time_mult  = *info++;
++		if (dump_trace) {
++			fprintf(stdout, "  ns Time Shift       %d\n", pt->ns_time_shift);
++			fprintf(stdout, "  ns Time Multiplier  %d\n", pt->ns_time_mult);
++		}
++	} else {
++		pt->ns_time_shift = pt->tc.time_shift;
++		pt->ns_time_mult  = pt->tc.time_mult;
++	}
++	if (!pt->ns_time_mult)
++		pt->ns_time_mult = 1;
++
+ 	pt->timeless_decoding = intel_pt_timeless_decoding(pt);
+ 	if (pt->timeless_decoding && !pt->tc.time_mult)
+ 		pt->tc.time_mult = 1;
+diff --git a/tools/perf/util/intel-pt.h b/tools/perf/util/intel-pt.h
+index c7d6068e3a6b..a2c4474641c0 100644
+--- a/tools/perf/util/intel-pt.h
++++ b/tools/perf/util/intel-pt.h
+@@ -27,7 +27,7 @@ enum {
+ 	INTEL_PT_CYC_BIT,
+ 	INTEL_PT_MAX_NONTURBO_RATIO,
+ 	INTEL_PT_FILTER_STR_LEN,
+-	INTEL_PT_AUXTRACE_PRIV_MAX,
++	INTEL_PT_AUXTRACE_PRIV_FIXED,
+ };
+ 
+ struct auxtrace_record;
 -- 
 2.25.1
 
