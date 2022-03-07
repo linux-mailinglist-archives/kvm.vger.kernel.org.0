@@ -2,125 +2,319 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BA6D74D02F6
-	for <lists+kvm@lfdr.de>; Mon,  7 Mar 2022 16:32:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E588A4D0324
+	for <lists+kvm@lfdr.de>; Mon,  7 Mar 2022 16:42:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237594AbiCGPdi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Mar 2022 10:33:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45724 "EHLO
+        id S243861AbiCGPnJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Mar 2022 10:43:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42388 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234946AbiCGPdh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Mar 2022 10:33:37 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AC89831230
-        for <kvm@vger.kernel.org>; Mon,  7 Mar 2022 07:32:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646667161;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        with ESMTP id S243927AbiCGPnF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Mar 2022 10:43:05 -0500
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F33475E71;
+        Mon,  7 Mar 2022 07:42:10 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id D8550210E9;
+        Mon,  7 Mar 2022 15:42:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1646667728; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=XJ5wyum5+lKErwJ18QL2wfl4q0lDTXpz1S2MtX22oUg=;
-        b=aP0O47wZGeosX18UX/1F5U2OFrGg6MijU/ptdeA4PFSJtNEq2Qv8+RlhkLkjaIxysX4eDK
-        PgqNYGEFcj8ThWAKTTC5Q2pqSgIQb0nIHB5A7yD3Li6Wbh/KPansY0LXFNL/b7wS5q5BDC
-        4uoaf5UptsHVFip+AvYg5M5UILr3nx4=
-Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com
- [209.85.167.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-472-1iq2CEt1PKC2mE-N5D2bgw-1; Mon, 07 Mar 2022 10:32:40 -0500
-X-MC-Unique: 1iq2CEt1PKC2mE-N5D2bgw-1
-Received: by mail-oi1-f200.google.com with SMTP id u13-20020a056808150d00b002d73c61e0d7so9797724oiw.6
-        for <kvm@vger.kernel.org>; Mon, 07 Mar 2022 07:32:40 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=XJ5wyum5+lKErwJ18QL2wfl4q0lDTXpz1S2MtX22oUg=;
-        b=foMTv7/K0rphr15c3zdTy3CrIjhMqVAb+0EOHdRPbJGH8QW9HcqA1kfGRs77BxVEBa
-         YLvlTzN52pGIoA5NVQUpbAlpin4jXGfYR5NnzHWJV9gntEQ8a18zxgJgxYY8JvsvgC6c
-         SUHKdAS5vLRZKw7Uoi/ZIKes6rFyPHXBxBl7U0R8ryx6p/S21uu2xbM67qos6RFPBQHo
-         DtHr32xMcwXQD3mIh7Bvtoj1+/KZIT2FUhG0P3wPO8wpXQEBxIolDt+kbc9HROx+beEy
-         8N3YTlWIHZ1CTSm8g40mjiN1GI5VD2G+QvKskmc3TXRNa/fNa1m5cOU682jYmcTTpHE5
-         g3kg==
-X-Gm-Message-State: AOAM532QVN5UY47OKemRqQ/YEOmHkTiIUMhFn41Ci2TXLToS44bjOP8H
-        LhcZTfYclXNisIq2IPgerl5LTtPuQcv0t8nCNB/1ppYvW8mWJ4cTF7yk4lN+PbiXi/JxPsudZFR
-        SUcjKpNpS/Qwz
-X-Received: by 2002:a05:6808:198e:b0:2d9:c933:eeff with SMTP id bj14-20020a056808198e00b002d9c933eeffmr4160576oib.90.1646667160007;
-        Mon, 07 Mar 2022 07:32:40 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzArEYDtw0XYNdk8IKmtWZ4y68YHoSd9vQW/X+GiP8avk+j7IwlPa2BYMK31IGS99RNZUqh1w==
-X-Received: by 2002:a05:6808:198e:b0:2d9:c933:eeff with SMTP id bj14-20020a056808198e00b002d9c933eeffmr4160562oib.90.1646667159747;
-        Mon, 07 Mar 2022 07:32:39 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id q9-20020a4ae649000000b00320d35fc91dsm2451714oot.24.2022.03.07.07.32.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Mar 2022 07:32:39 -0800 (PST)
-Date:   Mon, 7 Mar 2022 08:32:38 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Leon Romanovsky <leon@kernel.org>,
-        Bjorn Helgaas <bhelgaas@google.com>
-Cc:     Leon Romanovsky <leonro@nvidia.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        linux-pci@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH vfio-next] PCI/IOV: Fix wrong kernel-doc identifier
-Message-ID: <20220307083238.5a52b478.alex.williamson@redhat.com>
-In-Reply-To: <8cecf7df45948a256dc56148cf9e87b2f2bb4198.1646652504.git.leonro@nvidia.com>
-References: <8cecf7df45948a256dc56148cf9e87b2f2bb4198.1646652504.git.leonro@nvidia.com>
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        bh=pZUTivFJePfyCz85okn550yujg3K57yIFElsl/vVWig=;
+        b=IZ2X4cEtBAxNFB6H08Ex+X60hrBCSVM4wolqLIm2L2EqydCfRCN7tzlMprpYmfD70fygGL
+        nN7hZnMMfuOwBlKfpmqSCj7zCNUWKA/CwZept5p8b2Xd1JQ0RJMMo5NAIMzuPv2hcMZ0jU
+        lnbZ+1+VErZHURmzu2MXgd6jv2YGpvI=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1646667728;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=pZUTivFJePfyCz85okn550yujg3K57yIFElsl/vVWig=;
+        b=NA4ARugU2jFvmNBk3+44mlkj1m3/UJDpBeSXPl1p02r6/bhVDBxaP2SiDQGGKWjJGCcJIB
+        UY25+RP21PA9Z7BQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 6D27513B5E;
+        Mon,  7 Mar 2022 15:42:08 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id rvTZGdAnJmKcLwAAMHmgww
+        (envelope-from <vbabka@suse.cz>); Mon, 07 Mar 2022 15:42:08 +0000
+Message-ID: <9ac9a88f-54b4-a49f-0857-c3094d3e0d2b@suse.cz>
+Date:   Mon, 7 Mar 2022 16:42:08 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.1
+Content-Language: en-US
+To:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, qemu-devel@nongnu.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com
+References: <20220118132121.31388-1-chao.p.peng@linux.intel.com>
+ <20220118132121.31388-4-chao.p.peng@linux.intel.com>
+From:   Vlastimil Babka <vbabka@suse.cz>
+Subject: Re: [PATCH v4 03/12] mm: Introduce memfile_notifier
+In-Reply-To: <20220118132121.31388-4-chao.p.peng@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon,  7 Mar 2022 13:33:25 +0200
-Leon Romanovsky <leon@kernel.org> wrote:
+On 1/18/22 14:21, Chao Peng wrote:
+> This patch introduces memfile_notifier facility so existing memory file
+> subsystems (e.g. tmpfs/hugetlbfs) can provide memory pages to allow a
+> third kernel component to make use of memory bookmarked in the memory
+> file and gets notified when the pages in the memory file become
+> allocated/invalidated.
+> 
+> It will be used for KVM to use a file descriptor as the guest memory
+> backing store and KVM will use this memfile_notifier interface to
+> interact with memory file subsystems. In the future there might be other
+> consumers (e.g. VFIO with encrypted device memory).
+> 
+> It consists two sets of callbacks:
+>   - memfile_notifier_ops: callbacks for memory backing store to notify
+>     KVM when memory gets allocated/invalidated.
+>   - memfile_pfn_ops: callbacks for KVM to call into memory backing store
+>     to request memory pages for guest private memory.
+> 
+> Userspace is in charge of guest memory lifecycle: it first allocates
+> pages in memory backing store and then passes the fd to KVM and lets KVM
+> register each memory slot to memory backing store via
+> memfile_register_notifier.
+> 
+> The supported memory backing store should maintain a memfile_notifier list
+> and provide routine for memfile_notifier to get the list head address and
+> memfile_pfn_ops callbacks for memfile_register_notifier. It also should call
+> memfile_notifier_fallocate/memfile_notifier_invalidate when the bookmarked
+> memory gets allocated/invalidated.
+> 
+> Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 
-> From: Leon Romanovsky <leonro@nvidia.com>
-> 
-> Replace "-" to be ":" in comment section to be aligned with
-> kernel-doc format.
-> 
-> drivers/pci/iov.c:67: warning: Function parameter or member 'dev' not described in 'pci_iov_get_pf_drvdata'
-> drivers/pci/iov.c:67: warning: Function parameter or member 'pf_driver' not described in 'pci_iov_get_pf_drvdata'
-> 
-> Fixes: a7e9f240c0da ("PCI/IOV: Add pci_iov_get_pf_drvdata() to allow VF reaching the drvdata of a PF")
-> Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
-> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+Process nitpick:
+Here and in patch 4/12 you have Kirill's S-o-b so there should probably be
+also "From: Kirill ..." as was in v3? Or in case you modified the original
+patches so much to become the primary author, you should add
+"Co-developed-by: Kirill ..." here before his S-o-b.
+
+> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
 > ---
->  drivers/pci/iov.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  include/linux/memfile_notifier.h | 53 +++++++++++++++++++
+>  mm/Kconfig                       |  4 ++
+>  mm/Makefile                      |  1 +
+>  mm/memfile_notifier.c            | 89 ++++++++++++++++++++++++++++++++
+>  4 files changed, 147 insertions(+)
+>  create mode 100644 include/linux/memfile_notifier.h
+>  create mode 100644 mm/memfile_notifier.c
 > 
-> diff --git a/drivers/pci/iov.c b/drivers/pci/iov.c
-> index 28ec952e1221..952217572113 100644
-> --- a/drivers/pci/iov.c
-> +++ b/drivers/pci/iov.c
-> @@ -49,8 +49,8 @@ EXPORT_SYMBOL_GPL(pci_iov_vf_id);
+> diff --git a/include/linux/memfile_notifier.h b/include/linux/memfile_notifier.h
+> new file mode 100644
+> index 000000000000..a03bebdd1322
+> --- /dev/null
+> +++ b/include/linux/memfile_notifier.h
+> @@ -0,0 +1,53 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +#ifndef _LINUX_MEMFILE_NOTIFIER_H
+> +#define _LINUX_MEMFILE_NOTIFIER_H
+> +
+> +#include <linux/rculist.h>
+> +#include <linux/spinlock.h>
+> +#include <linux/srcu.h>
+> +#include <linux/fs.h>
+> +
+> +struct memfile_notifier;
+> +
+> +struct memfile_notifier_ops {
+> +	void (*invalidate)(struct memfile_notifier *notifier,
+> +			   pgoff_t start, pgoff_t end);
+> +	void (*fallocate)(struct memfile_notifier *notifier,
+> +			  pgoff_t start, pgoff_t end);
+> +};
+> +
+> +struct memfile_pfn_ops {
+> +	long (*get_lock_pfn)(struct inode *inode, pgoff_t offset, int *order);
+> +	void (*put_unlock_pfn)(unsigned long pfn);
+> +};
+> +
+> +struct memfile_notifier {
+> +	struct list_head list;
+> +	struct memfile_notifier_ops *ops;
+> +};
+> +
+> +struct memfile_notifier_list {
+> +	struct list_head head;
+> +	spinlock_t lock;
+> +};
+> +
+> +#ifdef CONFIG_MEMFILE_NOTIFIER
+> +static inline void memfile_notifier_list_init(struct memfile_notifier_list *list)
+> +{
+> +	INIT_LIST_HEAD(&list->head);
+> +	spin_lock_init(&list->lock);
+> +}
+> +
+> +extern void memfile_notifier_invalidate(struct memfile_notifier_list *list,
+> +					pgoff_t start, pgoff_t end);
+> +extern void memfile_notifier_fallocate(struct memfile_notifier_list *list,
+> +				       pgoff_t start, pgoff_t end);
+> +extern int memfile_register_notifier(struct inode *inode,
+> +				     struct memfile_notifier *notifier,
+> +				     struct memfile_pfn_ops **pfn_ops);
+> +extern void memfile_unregister_notifier(struct inode *inode,
+> +					struct memfile_notifier *notifier);
+> +
+> +#endif /* CONFIG_MEMFILE_NOTIFIER */
+> +
+> +#endif /* _LINUX_MEMFILE_NOTIFIER_H */
+> diff --git a/mm/Kconfig b/mm/Kconfig
+> index 28edafc820ad..fa31eda3c895 100644
+> --- a/mm/Kconfig
+> +++ b/mm/Kconfig
+> @@ -900,6 +900,10 @@ config IO_MAPPING
+>  config SECRETMEM
+>  	def_bool ARCH_HAS_SET_DIRECT_MAP && !EMBEDDED
 >  
->  /**
->   * pci_iov_get_pf_drvdata - Return the drvdata of a PF
-> - * @dev - VF pci_dev
-> - * @pf_driver - Device driver required to own the PF
-> + * @dev: VF pci_dev
-> + * @pf_driver: Device driver required to own the PF
->   *
->   * This must be called from a context that ensures that a VF driver is attached.
->   * The value returned is invalid once the VF driver completes its remove()
-
-Bjorn,
-
-I'll be happy to grab this with your ack since the referenced commit is
-coming from my branch.  Thanks,
-
-Alex
+> +config MEMFILE_NOTIFIER
+> +	bool
+> +	select SRCU
+> +
+>  source "mm/damon/Kconfig"
+>  
+>  endmenu
+> diff --git a/mm/Makefile b/mm/Makefile
+> index d6c0042e3aa0..80588f7c3bc2 100644
+> --- a/mm/Makefile
+> +++ b/mm/Makefile
+> @@ -130,3 +130,4 @@ obj-$(CONFIG_PAGE_REPORTING) += page_reporting.o
+>  obj-$(CONFIG_IO_MAPPING) += io-mapping.o
+>  obj-$(CONFIG_HAVE_BOOTMEM_INFO_NODE) += bootmem_info.o
+>  obj-$(CONFIG_GENERIC_IOREMAP) += ioremap.o
+> +obj-$(CONFIG_MEMFILE_NOTIFIER) += memfile_notifier.o
+> diff --git a/mm/memfile_notifier.c b/mm/memfile_notifier.c
+> new file mode 100644
+> index 000000000000..8171d4601a04
+> --- /dev/null
+> +++ b/mm/memfile_notifier.c
+> @@ -0,0 +1,89 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + *  linux/mm/memfile_notifier.c
+> + *
+> + *  Copyright (C) 2022  Intel Corporation.
+> + *             Chao Peng <chao.p.peng@linux.intel.com>
+> + */
+> +
+> +#include <linux/memfile_notifier.h>
+> +#include <linux/srcu.h>
+> +
+> +DEFINE_STATIC_SRCU(srcu);
+> +
+> +void memfile_notifier_invalidate(struct memfile_notifier_list *list,
+> +				 pgoff_t start, pgoff_t end)
+> +{
+> +	struct memfile_notifier *notifier;
+> +	int id;
+> +
+> +	id = srcu_read_lock(&srcu);
+> +	list_for_each_entry_srcu(notifier, &list->head, list,
+> +				 srcu_read_lock_held(&srcu)) {
+> +		if (notifier->ops && notifier->ops->invalidate)
+> +			notifier->ops->invalidate(notifier, start, end);
+> +	}
+> +	srcu_read_unlock(&srcu, id);
+> +}
+> +
+> +void memfile_notifier_fallocate(struct memfile_notifier_list *list,
+> +				pgoff_t start, pgoff_t end)
+> +{
+> +	struct memfile_notifier *notifier;
+> +	int id;
+> +
+> +	id = srcu_read_lock(&srcu);
+> +	list_for_each_entry_srcu(notifier, &list->head, list,
+> +				 srcu_read_lock_held(&srcu)) {
+> +		if (notifier->ops && notifier->ops->fallocate)
+> +			notifier->ops->fallocate(notifier, start, end);
+> +	}
+> +	srcu_read_unlock(&srcu, id);
+> +}
+> +
+> +static int memfile_get_notifier_info(struct inode *inode,
+> +				     struct memfile_notifier_list **list,
+> +				     struct memfile_pfn_ops **ops)
+> +{
+> +	return -EOPNOTSUPP;
+> +}
+> +
+> +int memfile_register_notifier(struct inode *inode,
+> +			      struct memfile_notifier *notifier,
+> +			      struct memfile_pfn_ops **pfn_ops)
+> +{
+> +	struct memfile_notifier_list *list;
+> +	int ret;
+> +
+> +	if (!inode || !notifier | !pfn_ops)
+> +		return -EINVAL;
+> +
+> +	ret = memfile_get_notifier_info(inode, &list, pfn_ops);
+> +	if (ret)
+> +		return ret;
+> +
+> +	spin_lock(&list->lock);
+> +	list_add_rcu(&notifier->list, &list->head);
+> +	spin_unlock(&list->lock);
+> +
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL_GPL(memfile_register_notifier);
+> +
+> +void memfile_unregister_notifier(struct inode *inode,
+> +				 struct memfile_notifier *notifier)
+> +{
+> +	struct memfile_notifier_list *list;
+> +
+> +	if (!inode || !notifier)
+> +		return;
+> +
+> +	BUG_ON(memfile_get_notifier_info(inode, &list, NULL));
+> +
+> +	spin_lock(&list->lock);
+> +	list_del_rcu(&notifier->list);
+> +	spin_unlock(&list->lock);
+> +
+> +	synchronize_srcu(&srcu);
+> +}
+> +EXPORT_SYMBOL_GPL(memfile_unregister_notifier);
 
