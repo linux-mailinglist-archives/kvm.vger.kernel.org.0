@@ -2,193 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 63BF34CFFF9
-	for <lists+kvm@lfdr.de>; Mon,  7 Mar 2022 14:26:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 35E3C4D0005
+	for <lists+kvm@lfdr.de>; Mon,  7 Mar 2022 14:27:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242845AbiCGN1W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Mar 2022 08:27:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58332 "EHLO
+        id S242863AbiCGN2T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Mar 2022 08:28:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242830AbiCGN1V (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Mar 2022 08:27:21 -0500
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E1038A6C2;
-        Mon,  7 Mar 2022 05:26:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1646659587; x=1678195587;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   mime-version:in-reply-to;
-  bh=chZdczKRWiX0mygtvCioOFf/nQfwodUEadgTzmKZVhc=;
-  b=Q/xRd2Q7ANifNpgJYHw1g+F0MVM0jDeAU2v+0LFifGNuwdEg7b/+HStQ
-   WQk7VE6n5t491VTN7SmJC0cEOhSOm1A08q1N4RdGhjwylujOOmHDxGTXC
-   DwtBeA3WAJ/A4AP6GB9VGObdXFuLNYLbZEMX4d1n1mdiQoKVSwrpIVFNd
-   sxEVN+6g/FR9zqEGFN60gJilqz08eDGsrPpLATmIMtlzNuhhEFIggo0w+
-   Z1ywOfwxPzArWvgCe7i+5i9kFqaDxRFE4bDW5eiMNnnWyIVotinmsNHcg
-   JR+DqYIfkGKfQEea0Ga9AFDaZjwaAtEA7rN5DAVAPhRbBcu4haKdB96s0
-   g==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10278"; a="279090582"
-X-IronPort-AV: E=Sophos;i="5.90,162,1643702400"; 
-   d="scan'208";a="279090582"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2022 05:26:26 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.90,162,1643702400"; 
-   d="scan'208";a="711103618"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.101])
-  by orsmga005.jf.intel.com with ESMTP; 07 Mar 2022 05:26:19 -0800
-Date:   Mon, 7 Mar 2022 21:26:02 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     Andy Lutomirski <luto@kernel.org>
-Cc:     Steven Price <steven.price@arm.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        qemu-devel@nongnu.org, Linux API <linux-api@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        "Nakajima, Jun" <jun.nakajima@intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Andi Kleen <ak@linux.intel.com>,
-        David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH v4 01/12] mm/shmem: Introduce F_SEAL_INACCESSIBLE
-Message-ID: <20220307132602.GA58690@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <20220118132121.31388-1-chao.p.peng@linux.intel.com>
- <20220118132121.31388-2-chao.p.peng@linux.intel.com>
- <619547ad-de96-1be9-036b-a7b4e99b09a6@kernel.org>
- <20220217130631.GB32679@chaop.bj.intel.com>
- <2ca78dcb-61d9-4c9d-baa9-955b6f4298bb@www.fastmail.com>
- <20220223114935.GA53733@chaop.bj.intel.com>
- <71a06402-6743-bfd2-bbd4-997f8e256554@arm.com>
- <7cc65bbd-e323-eabb-c576-b5656a3355ac@kernel.org>
+        with ESMTP id S237420AbiCGN2R (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Mar 2022 08:28:17 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F89E8BF1B;
+        Mon,  7 Mar 2022 05:27:23 -0800 (PST)
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 227CovUk011559;
+        Mon, 7 Mar 2022 13:27:21 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=9Xs1+iRscnxalmm+QWUBm4v/2ipilHWpYzFSRmzQuE4=;
+ b=KgIxQj40lAFrL/mTjT90VfeGBQuJ5NxG7hzFZaDiiok/UxeI+fxP16MsJvT0va6mjaY5
+ J9zhx//B4X7ZBafeHnshjWA285GD0KahsJE+aDNYPQJPLJ7qJhc2pNyodnBXDBtY7ext
+ nLLgxGJABm/ZL2IzTcg7THxJmE9eXrhcYfOIakaf1mdcf+77zr0Z+2OAGf5BIPVVjYT2
+ Dpm8kMwoMmtyzlETP86U9Zv6J6j19kbfnLxVvttqfw7z/JdXBioag9yezzDc6gTaGWk9
+ XFhZiTAF00FElfw1u7SYriArGoqo8eXemSM8C43M/gTJiFkBCXI6V3J1UikNdvtvH1NW mQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3end6fyd2b-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 07 Mar 2022 13:27:20 +0000
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 227DRKbN006511;
+        Mon, 7 Mar 2022 13:27:20 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3end6fyd1g-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 07 Mar 2022 13:27:20 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 227DCw0U010197;
+        Mon, 7 Mar 2022 13:27:17 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma06ams.nl.ibm.com with ESMTP id 3eky4hvsyr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 07 Mar 2022 13:27:17 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 227DRE3l41812332
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 7 Mar 2022 13:27:14 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 667E34C04A;
+        Mon,  7 Mar 2022 13:27:14 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BF7C54C044;
+        Mon,  7 Mar 2022 13:27:13 +0000 (GMT)
+Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.73.209])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with SMTP;
+        Mon,  7 Mar 2022 13:27:13 +0000 (GMT)
+Date:   Mon, 7 Mar 2022 14:27:11 +0100
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Tony Krowiak <akrowiak@linux.ibm.com>
+Cc:     jjherne@linux.ibm.com, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        freude@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
+        mjrosato@linux.ibm.com, alex.williamson@redhat.com,
+        kwankhede@nvidia.com, fiuczy@linux.ibm.com,
+        Halil Pasic <pasic@linux.ibm.com>
+Subject: Re: [PATCH v18 08/18] s390/vfio-ap: allow assignment of unavailable
+ AP queues to mdev device
+Message-ID: <20220307142711.5af33ece.pasic@linux.ibm.com>
+In-Reply-To: <9ac3908e-06da-6276-d1df-94898918fc5b@linux.ibm.com>
+References: <20220215005040.52697-1-akrowiak@linux.ibm.com>
+        <20220215005040.52697-9-akrowiak@linux.ibm.com>
+        <97681738-50a1-976d-9f0f-be326eab7202@linux.ibm.com>
+        <9ac3908e-06da-6276-d1df-94898918fc5b@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7cc65bbd-e323-eabb-c576-b5656a3355ac@kernel.org>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Spam-Status: No, score=-7.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: vXZ-5ZoGv8gC9JSVNAOvIWNDczue8gZe
+X-Proofpoint-GUID: WCccG6fkHYA87iWWq4ky5tfjAr1HYwTd
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-03-07_05,2022-03-04_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 adultscore=0
+ priorityscore=1501 impostorscore=0 bulkscore=0 lowpriorityscore=0
+ spamscore=0 suspectscore=0 clxscore=1011 malwarescore=0 mlxscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2203070076
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 04, 2022 at 11:24:30AM -0800, Andy Lutomirski wrote:
-> On 2/23/22 04:05, Steven Price wrote:
-> > On 23/02/2022 11:49, Chao Peng wrote:
-> > > On Thu, Feb 17, 2022 at 11:09:35AM -0800, Andy Lutomirski wrote:
-> > > > On Thu, Feb 17, 2022, at 5:06 AM, Chao Peng wrote:
-> > > > > On Fri, Feb 11, 2022 at 03:33:35PM -0800, Andy Lutomirski wrote:
-> > > > > > On 1/18/22 05:21, Chao Peng wrote:
-> > > > > > > From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-> > > > > > > 
-> > > > > > > Introduce a new seal F_SEAL_INACCESSIBLE indicating the content of
-> > > > > > > the file is inaccessible from userspace through ordinary MMU access
-> > > > > > > (e.g., read/write/mmap). However, the file content can be accessed
-> > > > > > > via a different mechanism (e.g. KVM MMU) indirectly.
-> > > > > > > 
-> > > > > > > It provides semantics required for KVM guest private memory support
-> > > > > > > that a file descriptor with this seal set is going to be used as the
-> > > > > > > source of guest memory in confidential computing environments such
-> > > > > > > as Intel TDX/AMD SEV but may not be accessible from host userspace.
-> > > > > > > 
-> > > > > > > At this time only shmem implements this seal.
-> > > > > > > 
-> > > > > > 
-> > > > > > I don't dislike this *that* much, but I do dislike this. F_SEAL_INACCESSIBLE
-> > > > > > essentially transmutes a memfd into a different type of object.  While this
-> > > > > > can apparently be done successfully and without races (as in this code),
-> > > > > > it's at least awkward.  I think that either creating a special inaccessible
-> > > > > > memfd should be a single operation that create the correct type of object or
-> > > > > > there should be a clear justification for why it's a two-step process.
-> > > > > 
-> > > > > Now one justification maybe from Stever's comment to patch-00: for ARM
-> > > > > usage it can be used with creating a normal memfd, (partially)populate
-> > > > > it with initial guest memory content (e.g. firmware), and then
-> > > > > F_SEAL_INACCESSIBLE it just before the first time lunch of the guest in
-> > > > > KVM (definitely the current code needs to be changed to support that).
-> > > > 
-> > > > Except we don't allow F_SEAL_INACCESSIBLE on a non-empty file, right?  So this won't work.
-> > > 
-> > > Hmm, right, if we set F_SEAL_INACCESSIBLE on a non-empty file, we will
-> > > need to make sure access to existing mmap-ed area should be prevented,
-> > > but that is hard.
-> > > 
-> > > > 
-> > > > In any case, the whole confidential VM initialization story is a bit buddy.  From the earlier emails, it sounds like ARM expects the host to fill in guest memory and measure it.  From my recollection of Intel's scheme (which may well be wrong, and I could easily be confusing it with SGX), TDX instead measures what is essentially a transcript of the series of operations that initializes the VM.  These are fundamentally not the same thing even if they accomplish the same end goal.  For TDX, we unavoidably need an operation (ioctl or similar) that initializes things according to the VM's instructions, and ARM ought to be able to use roughly the same mechanism.
-> > > 
-> > > Yes, TDX requires a ioctl. Steven may comment on the ARM part.
-> > 
-> > The Arm story is evolving so I can't give a definite answer yet. Our
-> > current prototyping works by creating the initial VM content in a
-> > memslot as with a normal VM and then calling an ioctl which throws the
-> > big switch and converts all the (populated) pages to be protected. At
-> > this point the RMM performs a measurement of the data that the VM is
-> > being populated with.
-> > 
-> > The above (in our prototype) suffers from all the expected problems with
-> > a malicious VMM being able to trick the host kernel into accessing those
-> > pages after they have been protected (causing a fault detected by the
-> > hardware).
-> > 
-> > The ideal (from our perspective) approach would be to follow the same
-> > flow but where the VMM populates a memfd rather than normal anonymous
-> > pages. The memfd could then be sealed and the pages converted to
-> > protected ones (with the RMM measuring them in the process).
-> > 
-> > The question becomes how is that memfd populated? It would be nice if
-> > that could be done using normal operations on a memfd (i.e. using
-> > mmap()) and therefore this code could be (relatively) portable. This
-> > would mean that any pages mapped from the memfd would either need to
-> > block the sealing or be revoked at the time of sealing.
-> > 
-> > The other approach is we could of course implement a special ioctl which
-> > effectively does a memcpy into the (created empty and sealed) memfd and
-> > does the necessary dance with the RMM to measure the contents. This
-> > would match the "transcript of the series of operations" described above
-> > - but seems much less ideal from the viewpoint of the VMM.
-> 
-> A VMM that supports Other Vendors will need to understand this sort of model
-> regardless.
-> 
-> I don't particularly mind the idea of having the kernel consume a normal
-> memfd and spit out a new object, but I find the concept of changing the type
-> of the object in place, even if it has other references, and trying to
-> control all the resulting races to be somewhat alarming.
-> 
-> In pseudo-Rust, this is the difference between:
-> 
-> fn convert_to_private(in: &mut Memfd)
-> 
-> and
-> 
-> fn convert_to_private(in: Memfd) -> PrivateMemoryFd
-> 
-> This doesn't map particularly nicely to the kernel, though.
+On Mon, 7 Mar 2022 07:31:21 -0500
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 
-I understand this Rust semantics and the difficulty to handle races.
-Probably we should not expose F_SEAL_INACCESSIBLE to userspace, instead
-we can use a new in-kernel flag to indicate the same thing. That flag
-should be set only when the memfd is created with MFD_INACCESSIBLE.
+> On 3/3/22 10:39, Jason J. Herne wrote:
+> > On 2/14/22 19:50, Tony Krowiak wrote:  
+> >>   /**
+> >> - * vfio_ap_mdev_verify_no_sharing - verifies that the AP matrix is 
+> >> not configured
+> >> + * vfio_ap_mdev_verify_no_sharing - verify APQNs are not shared by 
+> >> matrix mdevs
+> >>    *
+> >> - * @matrix_mdev: the mediated matrix device
+> >> + * @mdev_apm: mask indicating the APIDs of the APQNs to be verified
+> >> + * @mdev_aqm: mask indicating the APQIs of the APQNs to be verified
+> >>    *
+> >> - * Verifies that the APQNs derived from the cross product of the AP 
+> >> adapter IDs
+> >> - * and AP queue indexes comprising the AP matrix are not configured 
+> >> for another
+> >> + * Verifies that each APQN derived from the Cartesian product of a 
+> >> bitmap of
+> >> + * AP adapter IDs and AP queue indexes is not configured for any matrix
+> >>    * mediated device. AP queue sharing is not allowed.
+> >>    *
+> >> - * Return: 0 if the APQNs are not shared; otherwise returns 
+> >> -EADDRINUSE.
+> >> + * Return: 0 if the APQNs are not shared; otherwise return -EADDRINUSE.
+> >>    */
+> >> -static int vfio_ap_mdev_verify_no_sharing(struct ap_matrix_mdev 
+> >> *matrix_mdev)
+> >> +static int vfio_ap_mdev_verify_no_sharing(unsigned long *mdev_apm,
+> >> +                      unsigned long *mdev_aqm)
+> >>   {
+> >> -    struct ap_matrix_mdev *lstdev;
+> >> +    struct ap_matrix_mdev *matrix_mdev;
+> >>       DECLARE_BITMAP(apm, AP_DEVICES);
+> >>       DECLARE_BITMAP(aqm, AP_DOMAINS);
+> >>   -    list_for_each_entry(lstdev, &matrix_dev->mdev_list, node) {
+> >> -        if (matrix_mdev == lstdev)
+> >> +    list_for_each_entry(matrix_mdev, &matrix_dev->mdev_list, node) {
+> >> +        /*
+> >> +         * If the input apm and aqm belong to the matrix_mdev's matrix,
 
-Chao
+How about:
+
+s/belong to the matrix_mdev's matrix/are fields of the matrix_mdev
+object/
+
+
+> >> +         * then move on to the next.
+> >> +         */
+> >> +        if (mdev_apm == matrix_mdev->matrix.apm &&
+> >> +            mdev_aqm == matrix_mdev->matrix.aqm)
+> >>               continue;  
+> >
+> > We may have a problem here. This check seems like it exists to stop 
+> > you from
+> > comparing an mdev's apm/aqm with itself. Obviously comparing an mdev's 
+> > newly
+> > updated apm/aqm with itself would cause a false positive sharing 
+> > check, right?
+> > If this is the case, I think the comment should be changed to reflect 
+> > that.  
 > 
-> --Andy\
+> You are correct, this check is performed to prevent comparing an mdev to
+> itself, I'll improve the comment.
+> 
+> >
+> > Aside from the comment, what stops this particular series of if 
+> > statements from
+> > allowing us to configure a second mdev with the exact same apm/aqm 
+> > values as an
+> > existing mdev? If we do, then this check's continue will short circuit 
+> > the rest
+> > of the function thereby allowing that 2nd mdev even though it should be a
+> > sharing violation.  
+> 
+> I don't see how this is possible.
+
+I agree with Tony and his explanation.
+
+Furthermore IMHO is relates to the class identity vs equality problem, in
+a sense that identity always implies equality.
+
+Regards,
+Halil
