@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AC65C4D044B
-	for <lists+kvm@lfdr.de>; Mon,  7 Mar 2022 17:40:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C0B584D0492
+	for <lists+kvm@lfdr.de>; Mon,  7 Mar 2022 17:52:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244262AbiCGQld (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Mar 2022 11:41:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46802 "EHLO
+        id S236881AbiCGQxR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Mar 2022 11:53:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51734 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240217AbiCGQlc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Mar 2022 11:41:32 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FFDD4D241
-        for <kvm@vger.kernel.org>; Mon,  7 Mar 2022 08:40:37 -0800 (PST)
+        with ESMTP id S230017AbiCGQxP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Mar 2022 11:53:15 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B7F46AA68
+        for <kvm@vger.kernel.org>; Mon,  7 Mar 2022 08:52:21 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 1E7AE61117
-        for <kvm@vger.kernel.org>; Mon,  7 Mar 2022 16:40:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E363C340EF;
-        Mon,  7 Mar 2022 16:40:36 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 09190B8164E
+        for <kvm@vger.kernel.org>; Mon,  7 Mar 2022 16:52:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9EE56C340E9;
+        Mon,  7 Mar 2022 16:52:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1646671236;
-        bh=ROJevZ3kJ0qBNBmewkcvUGqdlqCNKk70wRtXyWwUrNk=;
+        s=k20201202; t=1646671938;
+        bh=/JbDy1Wdxx5UrVmpwE8J1sNcP7rgJOTzMhZ4KOZT5eo=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=mVpQaMSv/0hGq2FGcqboYQFVz1XNUN30eDVSb4H7jFSUGNdcLbr68tM5DiG6++kVY
-         YGPDgdQtSs17AycJ5w7/hBkLj910xp6Cok8fP6yDP9OpOXF1u3tG9Vf3FojRJK5fT5
-         +iBy7pwf3reYVPbrjZGfo0U6zFyUzmSUiUUlRGyG06oDy58ZEy6n6nvne6AuiFyMN/
-         Gy6l23ZLQzKkO5p4IicwNrq+5T0xLaFE4TGNBLHIMthhWmKlFhmGNXcB+cadHA6uNk
-         FT9mVcold7aqaNyIUBqWqmfOynTssNmA6aXjoC79nJ+YdypOCYsuBl4wPeHaztlkd7
-         ERPhiMGWkqHYw==
+        b=WL4DuGw/pHMPftDa/BR7gw9a1uxWnilgWUrzuF5vtwBCjtr7KTUg/gEcQulZCz5r1
+         Zv6LeiRVZSRHUfwxKoWLLlROxQew6GdEFxj7dOnmCCqVQCD40Np3db82fj9La+mfsA
+         TVzSWKqOAEpjwpc8j2Iyy3Fh8U9EGG2lq2a9wjk5B5Nlqp2Gv34BaQgCnuOHD0Wco9
+         4I3KxL82LpiaTCt70dvoNGcbnx7dSlSoUQ56uYLHk+hnSnMq5Gs1UOXEO9HOgQxrIh
+         rm0cvx1g19XJ2A3vdwxoubASTbtxwoL9NGm9Q6CrSC1QFhiEj+YTeGqtHLVZ5rMmoc
+         fVEVo2RdPgczA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1nRGPS-00CqHn-2r; Mon, 07 Mar 2022 16:40:34 +0000
-Date:   Mon, 07 Mar 2022 16:40:33 +0000
-Message-ID: <874k491zsu.wl-maz@kernel.org>
+        id 1nRGam-00CqSm-6k; Mon, 07 Mar 2022 16:52:16 +0000
+Date:   Mon, 07 Mar 2022 16:52:15 +0000
+Message-ID: <8735jt1z9c.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Alexandru Elisei <alexandru.elisei@arm.com>
 Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
@@ -53,12 +53,12 @@ Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         karl.heubaum@oracle.com, mihai.carabas@oracle.com,
         miguel.luis@oracle.com, kernel-team@android.com
 Subject: Re: [PATCH v6 43/64] KVM: arm64: nv: arch_timer: Support hyp timer emulation
-In-Reply-To: <YiYx2h+E9HtJxLum@monolith.localdoman>
+In-Reply-To: <YiYyqvwp3xkieF6S@monolith.localdoman>
 References: <20220128121912.509006-1-maz@kernel.org>
         <20220128121912.509006-44-maz@kernel.org>
-        <YiYjdHbS3WeDMipR@monolith.localdoman>
-        <503754e615b9bc7605c379dd7f2549a1@kernel.org>
-        <YiYx2h+E9HtJxLum@monolith.localdoman>
+        <YiYcLIhdo5fQFbSA@monolith.localdoman>
+        <c084f234eff61b0ab8da5716879745e2@kernel.org>
+        <YiYyqvwp3xkieF6S@monolith.localdoman>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -78,72 +78,57 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 07 Mar 2022 16:24:58 +0000,
+On Mon, 07 Mar 2022 16:28:44 +0000,
 Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > 
 > Hi,
 > 
-> On Mon, Mar 07, 2022 at 03:44:43PM +0000, Marc Zyngier wrote:
-> > On 2022-03-07 15:23, Alexandru Elisei wrote:
+> On Mon, Mar 07, 2022 at 03:48:19PM +0000, Marc Zyngier wrote:
+> > On 2022-03-07 14:52, Alexandru Elisei wrote:
 > > > Hi,
 > > > 
-> > > On Fri, Jan 28, 2022 at 12:18:51PM +0000, Marc Zyngier wrote:
-> > > > From: Christoffer Dall <christoffer.dall@arm.com>
-> > > > 
-> > > > Emulating EL2 also means emulating the EL2 timers. To do so, we expand
-> > > > our timer framework to deal with at most 4 timers. At any given time,
-> > > > two timers are using the HW timers, and the two others are purely
-> > > > emulated.
-> > > > 
-> > > > The role of deciding which is which at any given time is left to a
-> > > > mapping function which is called every time we need to make such a
-> > > > decision.
-> > > > 
-> > > > Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
-> > > > [maz: added CNTVOFF support, general reworking for v4.8]
-> > > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > > ---
-> > > >  arch/arm64/include/asm/kvm_host.h |   4 +
-> > > >  arch/arm64/kvm/arch_timer.c       | 165
-> > > > ++++++++++++++++++++++++++++--
-> > > >  arch/arm64/kvm/sys_regs.c         |   7 +-
-> > > >  arch/arm64/kvm/trace_arm.h        |   6 +-
-> > > >  arch/arm64/kvm/vgic/vgic.c        |  15 +++
-> > > >  include/kvm/arm_arch_timer.h      |   8 +-
-> > > >  include/kvm/arm_vgic.h            |   1 +
-> > > >  7 files changed, 194 insertions(+), 12 deletions(-)
-> > > > 
-> > > [..]
-> > > > @@ -1301,6 +1445,7 @@ static void set_timer_irqs(struct kvm *kvm,
-> > > > int vtimer_irq, int ptimer_irq)
-> > > >  	kvm_for_each_vcpu(i, vcpu, kvm) {
-> > > >  		vcpu_vtimer(vcpu)->irq.irq = vtimer_irq;
-> > > >  		vcpu_ptimer(vcpu)->irq.irq = ptimer_irq;
-> > > > +		/* TODO: Add support for hv/hp timers */
-> > > >  	}
-> > > >  }
-> > > > 
-> > > > @@ -1311,6 +1456,8 @@ int kvm_arm_timer_set_attr(struct kvm_vcpu
-> > > > *vcpu, struct kvm_device_attr *attr)
-> > > >  	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
-> > > >  	int irq;
-> > > > 
-> > > > +	/* TODO: Add support for hv/hp timers */
-> > > 
-> > > Is the patch unfinished?
+> > > I was under the impression that KVM's nested virtualization doesn't
+> > > support
+> > > AArch32 in the guest, why is the subject about hyp mode aarch32 timers?
 > > 
-> > Just like the rest of the kernel.
+> > Where did you see *ANY* mention of AArch32?
 > 
-> That doesn't really answer my question. What I was asking if this is
-> the patch that is intended to be merged or if you still want to add
-> handling of those timers before merging it.
+> I saw an implicit mention of aarch32 when the commit message used
+> the term "hyp", which is the name of an aarch32 execution mode.
+> 
+> > 
+> > Or is that a very roundabout way to object to the 'hyp' name?
+> 
+> Bingo.
+> 
+> > If that's the case, just apply a mental 's/hyp/el2/' substitution.
+> 
+> I'm a bit confused about that. Is that something that anyone reading
+> the patch should apply mentally when reading the patch, or is it
+> something that you plan to change in the commit subject?
 
-It depends what people's expectations are.
+Big picture:
 
-If you want full support for everything the architecture has, plus all
-the features that KVM has such as save restore (which is what we this
-comment is about) before things can go in, then the answer probably is
-that I should go and erase that code as quickly as possible.
+maz@hot-poop:~/arm-platforms$ git grep -i hyp arch/arm64/|wc -l
+1701
+maz@hot-poop:~/arm-platforms$ git grep -i el2 arch/arm64/|wc -l
+1008
+
+Are we going to also repaint all these 'hyp' references?
+
+I really appreciate all the hard work you are putting in carefully
+reviewing the code. I *really* do. But bickering on this really
+doesn't help, and I know you understand exactly what this subject line
+means (you've been reviewing KVM code for long enough, and won't fool
+anyone).
+
+The point you are trying to make really is moot. Everybody understands
+that HYP means EL2. I'd even argue that it is clearer than EL2,
+because it indicates that we're running at EL2 with the role of a
+hypervisor, which isn't that clear with running with VHE.
+
+And if they don't understand that, it unfortunately means they can't
+really review this code.
 
 	M.
 
