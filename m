@@ -2,73 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C0FFF4D0C29
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 00:40:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 65B044D0C31
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 00:45:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238170AbiCGXlE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Mar 2022 18:41:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38844 "EHLO
+        id S243792AbiCGXqs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Mar 2022 18:46:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237072AbiCGXlC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Mar 2022 18:41:02 -0500
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4622410E5
-        for <kvm@vger.kernel.org>; Mon,  7 Mar 2022 15:40:05 -0800 (PST)
-Received: by mail-lf1-x129.google.com with SMTP id z11so13751665lfh.13
-        for <kvm@vger.kernel.org>; Mon, 07 Mar 2022 15:40:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=bH59quT9Rp4y+BYnuvhUI8Xloeds0wulYCUciw4C3j4=;
-        b=kCF5g2h+dd8QMyeJ20SqRvJJOIf1pabp7XZPoeaYBb6+gXXwoULqfICvDke96/mhhT
-         e2kNJHAmu/InctdLWMjGDRKXgL3m+XPeBSYX0G7qDiEdTyRTB3BJ1oS18l78SU6RBkYi
-         Y2USAPx06B5gxcdymMaMhhmN18O/NRL4g2KtrPfP5jkfwB+LpAOoXWHghflp6gZ0YjCP
-         Aeh1OumCrc18SVQqaR2l+Li+RmtLTevzmhJp8NBEjijRtmt2C1wvm7bhLxNB0QH974J0
-         6QNGwXaThNN25qCB1TVn2Pag26T1qfJ3AKRlHVzpJ8RU+O2dBOzqz7h6Vgfnmn4Rvku3
-         53iQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=bH59quT9Rp4y+BYnuvhUI8Xloeds0wulYCUciw4C3j4=;
-        b=vbasDHefD5VXCtA04RU+J02DmlX+Ns9LR36wuMKQusFvDez135QA8qB3b9k6o1Dl+n
-         /4U3E/ilTFJ7ZtOxeb7ELB90OJhEIeFrskJd3TC8blnGwRkKtODllsCxp+Qdn60sI6PI
-         fDYOWgg4wxlfxQ8AUQWg5j7io3/b3C+/z/YjGUrbk/WEKkYHPZqEGFOY2ApCrzxQHG+/
-         F/WannApSl2GnOuNDoPOLjmqsYa/Vgzf853Sd8LjYI2vgRFB+cg1HW3gd9iXpYxl6DBb
-         9FkuZYWmnymccbwnxLgS79kE0+57T/scnuGRb5jmIWd0P8OS+0V8wtbRVC1qOOZueZ77
-         YuaA==
-X-Gm-Message-State: AOAM5314x37a46l5pm1ujfsQGR5WMRfgWOsJjqYA1JnGLpW/K+Z42V9U
-        QQBLux4XE7hMZ4eXjn7S93e9QFigr0mU7iMiXUVyLg==
-X-Google-Smtp-Source: ABdhPJw7lc5h8kjZxLC9dZiRIvmTMM38trbW23obPTJ9KL11C7pLvI+HnbjPR2ROLjtDlGzyiR9h7DiJoV5nyQpMx54=
-X-Received: by 2002:a05:6512:1287:b0:447:5c8a:c9e2 with SMTP id
- u7-20020a056512128700b004475c8ac9e2mr9405466lfs.64.1646696404019; Mon, 07 Mar
- 2022 15:40:04 -0800 (PST)
+        with ESMTP id S243084AbiCGXqq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Mar 2022 18:46:46 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72E42294;
+        Mon,  7 Mar 2022 15:45:51 -0800 (PST)
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 227MxUpk017724;
+        Mon, 7 Mar 2022 23:45:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=uyIxG5y1JBocl+WfqDrffowhHyfi3AUk9e3P3tvDBO8=;
+ b=LDwB9axiQ+eDZ9zf8v2DQbjEI8JBnsfJordlyh7t8PcZAQWmZlpjbVbBcABBWg5Q7F5P
+ +AGbNUo+LwrEzFyC32o5cxN+csBb5iYSacva0mc4In9gHow9vodw7MJvU8FRu2pQiQHJ
+ zPZ3RCZ9s0vkNPxKzHNo13gc1GKSN/k6LXklKkkpY4QDTN1uQv4TBtZ/1UWFaahPSvHy
+ 4TQqK7l610vf4hqMtk+1YLWk6JboD2TaER29Q4fMxNk+PgRUqCCmWOU/ceEeuHjqJXSK
+ hijjKk1ZDakj+HgMVGCbKuiI+Mko+SUsNFrzg+HZdxsMHFc98wHRxE1KPEnScKWCOTBY NA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3enndrqxah-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 07 Mar 2022 23:45:49 +0000
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 227Ne90A032589;
+        Mon, 7 Mar 2022 23:45:49 GMT
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3enndrqxaa-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 07 Mar 2022 23:45:49 +0000
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+        by ppma02dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 227NT2iM003994;
+        Mon, 7 Mar 2022 23:45:48 GMT
+Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
+        by ppma02dal.us.ibm.com with ESMTP id 3ekyg9wfjk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 07 Mar 2022 23:45:48 +0000
+Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com [9.57.199.107])
+        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 227NjloW55902506
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 7 Mar 2022 23:45:47 GMT
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0A009124053;
+        Mon,  7 Mar 2022 23:45:47 +0000 (GMT)
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5800612405A;
+        Mon,  7 Mar 2022 23:45:46 +0000 (GMT)
+Received: from [9.160.116.147] (unknown [9.160.116.147])
+        by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
+        Mon,  7 Mar 2022 23:45:46 +0000 (GMT)
+Message-ID: <eb30a519-5707-717a-ff22-cc3a8e65dc7e@linux.ibm.com>
+Date:   Mon, 7 Mar 2022 18:45:45 -0500
 MIME-Version: 1.0
-References: <20220203010051.2813563-1-dmatlack@google.com> <YiWWdekvbPjI/WZm@xz-m1.local>
-In-Reply-To: <YiWWdekvbPjI/WZm@xz-m1.local>
-From:   David Matlack <dmatlack@google.com>
-Date:   Mon, 7 Mar 2022 15:39:37 -0800
-Message-ID: <CALzav=fzOkR4oNXoccc40GKzdBrmA+q5bgKE9ViE5W0UYjjHmw@mail.gmail.com>
-Subject: Re: [PATCH 00/23] Extend Eager Page Splitting to the shadow MMU
-To:     Peter Xu <peterx@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        leksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Peter Feiner <pfeiner@google.com>,
-        Andrew Jones <drjones@redhat.com>,
-        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
-        kvm list <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH v18 08/18] s390/vfio-ap: allow assignment of unavailable
+ AP queues to mdev device
+Content-Language: en-US
+To:     Halil Pasic <pasic@linux.ibm.com>
+Cc:     jjherne@linux.ibm.com, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        freude@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
+        mjrosato@linux.ibm.com, alex.williamson@redhat.com,
+        kwankhede@nvidia.com, fiuczy@linux.ibm.com
+References: <20220215005040.52697-1-akrowiak@linux.ibm.com>
+ <20220215005040.52697-9-akrowiak@linux.ibm.com>
+ <97681738-50a1-976d-9f0f-be326eab7202@linux.ibm.com>
+ <9ac3908e-06da-6276-d1df-94898918fc5b@linux.ibm.com>
+ <20220307142711.5af33ece.pasic@linux.ibm.com>
+ <151241e6-3099-4be2-da54-1f0e5cb3a705@linux.ibm.com>
+ <20220307181027.29c821b6.pasic@linux.ibm.com>
+From:   Tony Krowiak <akrowiak@linux.ibm.com>
+In-Reply-To: <20220307181027.29c821b6.pasic@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: JM6_2fVlWDg6C5D_slv-iLlRmtVzKvjk
+X-Proofpoint-GUID: zLOsl1U_XwxSOis-IU6ZNJdSREpIfF1h
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-03-07_12,2022-03-04_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
+ clxscore=1015 priorityscore=1501 bulkscore=0 impostorscore=0
+ suspectscore=0 mlxlogscore=999 spamscore=0 malwarescore=0 adultscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2203070119
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,158 +103,92 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Mar 6, 2022 at 9:22 PM Peter Xu <peterx@redhat.com> wrote:
->
-> Hi, David,
->
-> Sorry for a very late comment.
->
-> On Thu, Feb 03, 2022 at 01:00:28AM +0000, David Matlack wrote:
-> > Performance
-> > -----------
-> >
-> > Eager page splitting moves the cost of splitting huge pages off of the
-> > vCPU thread and onto the thread invoking VM-ioctls to configure dirty
-> > logging. This is useful because:
-> >
-> >  - Splitting on the vCPU thread interrupts vCPUs execution and is
-> >    disruptive to customers whereas splitting on VM ioctl threads can
-> >    run in parallel with vCPU execution.
-> >
-> >  - Splitting on the VM ioctl thread is more efficient because it does
-> >    no require performing VM-exit handling and page table walks for every
-> >    4K page.
-> >
-> > To measure the performance impact of Eager Page Splitting I ran
-> > dirty_log_perf_test with tdp_mmu=N, various virtual CPU counts, 1GiB per
-> > vCPU, and backed by 1GiB HugeTLB memory.
-> >
-> > To measure the imapct of customer performance, we can look at the time
-> > it takes all vCPUs to dirty memory after dirty logging has been enabled.
-> > Without Eager Page Splitting enabled, such dirtying must take faults to
-> > split huge pages and bottleneck on the MMU lock.
-> >
-> >              | "Iteration 1 dirty memory time"             |
-> >              | ------------------------------------------- |
-> > vCPU Count   | eager_page_split=N   | eager_page_split=Y   |
-> > ------------ | -------------------- | -------------------- |
-> > 2            | 0.310786549s         | 0.058731929s         |
-> > 4            | 0.419165587s         | 0.059615316s         |
-> > 8            | 1.061233860s         | 0.060945457s         |
-> > 16           | 2.852955595s         | 0.067069980s         |
-> > 32           | 7.032750509s         | 0.078623606s         |
-> > 64           | 16.501287504s        | 0.083914116s         |
-> >
-> > Eager Page Splitting does increase the time it takes to enable dirty
-> > logging when not using initially-all-set, since that's when KVM splits
-> > huge pages. However, this runs in parallel with vCPU execution and does
-> > not bottleneck on the MMU lock.
-> >
-> >              | "Enabling dirty logging time"               |
-> >              | ------------------------------------------- |
-> > vCPU Count   | eager_page_split=N   | eager_page_split=Y   |
-> > ------------ | -------------------- | -------------------- |
-> > 2            | 0.001581619s         |  0.025699730s        |
-> > 4            | 0.003138664s         |  0.051510208s        |
-> > 8            | 0.006247177s         |  0.102960379s        |
-> > 16           | 0.012603892s         |  0.206949435s        |
-> > 32           | 0.026428036s         |  0.435855597s        |
-> > 64           | 0.103826796s         |  1.199686530s        |
-> >
-> > Similarly, Eager Page Splitting increases the time it takes to clear the
-> > dirty log for when using initially-all-set. The first time userspace
-> > clears the dirty log, KVM will split huge pages:
-> >
-> >              | "Iteration 1 clear dirty log time"          |
-> >              | ------------------------------------------- |
-> > vCPU Count   | eager_page_split=N   | eager_page_split=Y   |
-> > ------------ | -------------------- | -------------------- |
-> > 2            | 0.001544730s         | 0.055327916s         |
-> > 4            | 0.003145920s         | 0.111887354s         |
-> > 8            | 0.006306964s         | 0.223920530s         |
-> > 16           | 0.012681628s         | 0.447849488s         |
-> > 32           | 0.026827560s         | 0.943874520s         |
-> > 64           | 0.090461490s         | 2.664388025s         |
-> >
-> > Subsequent calls to clear the dirty log incur almost no additional cost
-> > since KVM can very quickly determine there are no more huge pages to
-> > split via the RMAP. This is unlike the TDP MMU which must re-traverse
-> > the entire page table to check for huge pages.
-> >
-> >              | "Iteration 2 clear dirty log time"          |
-> >              | ------------------------------------------- |
-> > vCPU Count   | eager_page_split=N   | eager_page_split=Y   |
-> > ------------ | -------------------- | -------------------- |
-> > 2            | 0.015613726s         | 0.015771982s         |
-> > 4            | 0.031456620s         | 0.031911594s         |
-> > 8            | 0.063341572s         | 0.063837403s         |
-> > 16           | 0.128409332s         | 0.127484064s         |
-> > 32           | 0.255635696s         | 0.268837996s         |
-> > 64           | 0.695572818s         | 0.700420727s         |
->
-> Are all the tests above with ept=Y (except the one below)?
 
-Yes.
+
+On 3/7/22 12:10, Halil Pasic wrote:
+> On Mon, 7 Mar 2022 09:10:29 -0500
+> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+>
+>> On 3/7/22 08:27, Halil Pasic wrote:
+>>> On Mon, 7 Mar 2022 07:31:21 -0500
+>>> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+>>>   
+>>>> On 3/3/22 10:39, Jason J. Herne wrote:
+>>>>> On 2/14/22 19:50, Tony Krowiak wrote:
+>>>>>>     /**
+>>>>>> - * vfio_ap_mdev_verify_no_sharing - verifies that the AP matrix is
+>>>>>> not configured
+>>>>>> + * vfio_ap_mdev_verify_no_sharing - verify APQNs are not shared by
+>>>>>> matrix mdevs
+>>>>>>      *
+>>>>>> - * @matrix_mdev: the mediated matrix device
+>>>>>> + * @mdev_apm: mask indicating the APIDs of the APQNs to be verified
+>>>>>> + * @mdev_aqm: mask indicating the APQIs of the APQNs to be verified
+>>>>>>      *
+>>>>>> - * Verifies that the APQNs derived from the cross product of the AP
+>>>>>> adapter IDs
+>>>>>> - * and AP queue indexes comprising the AP matrix are not configured
+>>>>>> for another
+>>>>>> + * Verifies that each APQN derived from the Cartesian product of a
+>>>>>> bitmap of
+>>>>>> + * AP adapter IDs and AP queue indexes is not configured for any matrix
+>>>>>>      * mediated device. AP queue sharing is not allowed.
+>>>>>>      *
+>>>>>> - * Return: 0 if the APQNs are not shared; otherwise returns
+>>>>>> -EADDRINUSE.
+>>>>>> + * Return: 0 if the APQNs are not shared; otherwise return -EADDRINUSE.
+>>>>>>      */
+>>>>>> -static int vfio_ap_mdev_verify_no_sharing(struct ap_matrix_mdev
+>>>>>> *matrix_mdev)
+>>>>>> +static int vfio_ap_mdev_verify_no_sharing(unsigned long *mdev_apm,
+>>>>>> +                      unsigned long *mdev_aqm)
+>>>>>>     {
+>>>>>> -    struct ap_matrix_mdev *lstdev;
+>>>>>> +    struct ap_matrix_mdev *matrix_mdev;
+>>>>>>         DECLARE_BITMAP(apm, AP_DEVICES);
+>>>>>>         DECLARE_BITMAP(aqm, AP_DOMAINS);
+>>>>>>     -    list_for_each_entry(lstdev, &matrix_dev->mdev_list, node) {
+>>>>>> -        if (matrix_mdev == lstdev)
+>>>>>> +    list_for_each_entry(matrix_mdev, &matrix_dev->mdev_list, node) {
+>>>>>> +        /*
+>>>>>> +         * If the input apm and aqm belong to the matrix_mdev's matrix,
+>>> How about:
+>>>
+>>> s/belong to the matrix_mdev's matrix/are fields of the matrix_mdev
+>>> object/
+>> This is the comment I wrote:
+>>
+>>           /*
+>>            * Comparing an mdev's newly updated apm/aqm with itself would
+>>            * result in a false positive when verifying whether any APQNs
+>>            * are shared; so, if the input apm and aqm belong to the
+>>            * matrix_mdev's matrix, then move on to the next one.
+>>            */
+>>
+>> However, I'd be happy to change it to whatever either of you want.
+> What ain't obvious for the comment is that "belong to" actually means
+> composition and not association. In other words, there there is no
+> pointer/indirection involved, a pointer that would tell us what matrix
+> does belong to what matrix_mdev, but rather the matrix is just a part
+> of the matrix_mdev object.
+>
+> I don't like 'false positive' either, and whether the apm/aqm is
+> newly updated or not is also redundant and confusing in my opinion. When
+> we check because of inuse there is not updated whatever. IMHO the old
+> message was better than this one.
+>
+> Just my opinion, if you two agree, that this is the way to go, I'm fine
+> with that.
+>
+> Regards,
+> Halil
+
+Feel free to recommend the verbiage for this comment. I'm not married
+to my comments and am open to anything that helps others to
+understand what is going on here. It seems obvious to me, but I wrote
+the code. Obviously, it is not so obvious based on Jason's comments,
+so maybe someone else can compose a better comment.
 
 >
-> >
-> > Eager Page Splitting also improves the performance for shadow paging
-> > configurations, as measured with ept=N. Although the absolute gains are
-> > less since ept=N requires taking the MMU lock to track writes to 4KiB
-> > pages (i.e. no fast_page_fault() or PML), which dominates the dirty
-> > memory time.
-> >
-> >              | "Iteration 1 dirty memory time"             |
-> >              | ------------------------------------------- |
-> > vCPU Count   | eager_page_split=N   | eager_page_split=Y   |
-> > ------------ | -------------------- | -------------------- |
-> > 2            | 0.373022770s         | 0.348926043s         |
-> > 4            | 0.563697483s         | 0.453022037s         |
-> > 8            | 1.588492808s         | 1.524962010s         |
-> > 16           | 3.988934732s         | 3.369129917s         |
-> > 32           | 9.470333115s         | 8.292953856s         |
-> > 64           | 20.086419186s        | 18.531840021s        |
 >
-> This one is definitely for ept=N because it's written there. That's ~10%
-> performance increase which looks still good, but IMHO that increase is
-> "debatable" since a normal guest may not simply write over the whole guest
-> mem.. So that 10% increase is based on some assumptions.
->
-> What if the guest writes 80% and reads 20%?  IIUC the split thread will
-> also start to block the readers too for shadow mmu while it was not blocked
-> previusly?  From that pov, not sure whether the series needs some more
-> justification, as the changeset seems still large.
->
-> Is there other benefits besides the 10% increase on writes?
 
-Yes, in fact workloads that perform some reads will benefit _more_
-than workloads that perform only writes.
-
-The reason is that the current lazy splitting approach unmaps the
-entire huge page on write and then maps in the just the faulting 4K
-page. That means reads on the unmapped portion of the hugepage will
-now take a fault and require the MMU lock. In contrast, Eager Page
-Splitting fully splits each huge page so readers should never take
-faults.
-
-For example, here is the data with 20% writes and 80% reads (i.e. pass
-`-f 5` to dirty_log_perf_test):
-
-             | "Iteration 1 dirty memory time"             |
-             | ------------------------------------------- |
-vCPU Count   | eager_page_split=N   | eager_page_split=Y   |
------------- | -------------------- | -------------------- |
-2            | 0.403108098s         | 0.071808764s         |
-4            | 0.562173582s         | 0.105272819s         |
-8            | 1.382974557s         | 0.248713796s         |
-16           | 3.608993666s         | 0.571990327s         |
-32           | 9.100678321s         | 1.702453103s         |
-64           | 19.784780903s        | 3.489443239s        |
-
->
-> Thanks,
-
->
-> --
-> Peter Xu
->
