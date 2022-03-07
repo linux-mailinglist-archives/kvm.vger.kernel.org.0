@@ -2,49 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DC63E4CF59B
-	for <lists+kvm@lfdr.de>; Mon,  7 Mar 2022 10:29:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 547664CF6B9
+	for <lists+kvm@lfdr.de>; Mon,  7 Mar 2022 10:43:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237064AbiCGJaN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Mar 2022 04:30:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51368 "EHLO
+        id S236554AbiCGJnV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Mar 2022 04:43:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53386 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238458AbiCGJ3N (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Mar 2022 04:29:13 -0500
+        with ESMTP id S241076AbiCGJlt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Mar 2022 04:41:49 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 26DA566FA8
-        for <kvm@vger.kernel.org>; Mon,  7 Mar 2022 01:27:24 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7769666CBF
+        for <kvm@vger.kernel.org>; Mon,  7 Mar 2022 01:39:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646645195;
+        s=mimecast20190719; t=1646645998;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=G6zuLw2xFtTzT2CO4X/m2kFHpe+2zt7etCbaJPRh76U=;
-        b=SxDd5DE8hILKHDX34Z6eocFEjiFcrxTP6v/kHbUna3Us2nJMmeHr2SCDxWsQgGT1B+MHC9
-        WVW1ioevlEcOxxbUw/0APDUxw9RnjaRSAc38B048lJT8aNoTr4fZ6HCkbRq+2ChyfFc1Wp
-        Q9bksSOn9EX1+m20zzyVLb+4ZlE0dr4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=y+zHzclCF+KBdFtlbiqIco229vrhyO4TQmz2ouHkG1A=;
+        b=g+S1fZfF+0Ek4rjm3A6AZ7Gs8do51dtylyInzlofnP9qT93OeqgcBARPVpEi9S8YvDfTjz
+        QC3MYPlJa5OKXBTyWvEEOJ37jvo9eG654sAurqvKRsjB9UOtUTf5kosQnqCRAmUdtsLqf5
+        DN+zwIlVi5PcMMIwxhBDAJH4VQePgOk=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-562-4gWxIgl5Of-_wy-91_hrbw-1; Mon, 07 Mar 2022 04:26:32 -0500
-X-MC-Unique: 4gWxIgl5Of-_wy-91_hrbw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 855B8835DE9;
-        Mon,  7 Mar 2022 09:26:30 +0000 (UTC)
-Received: from localhost (unknown [10.39.193.253])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 913EA7FCF0;
-        Mon,  7 Mar 2022 09:25:58 +0000 (UTC)
-Date:   Mon, 7 Mar 2022 09:25:45 +0000
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Sergio Lopez <slp@redhat.com>
-Cc:     qemu-devel@nongnu.org, Matthew Rosato <mjrosato@linux.ibm.com>,
+ us-mta-622-tj7c5UO3O_q4o7vHWHz_fA-1; Mon, 07 Mar 2022 04:39:57 -0500
+X-MC-Unique: tj7c5UO3O_q4o7vHWHz_fA-1
+Received: by mail-wm1-f70.google.com with SMTP id d8-20020a05600c34c800b0037e3cd6225eso5053816wmq.6
+        for <kvm@vger.kernel.org>; Mon, 07 Mar 2022 01:39:57 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=y+zHzclCF+KBdFtlbiqIco229vrhyO4TQmz2ouHkG1A=;
+        b=YZCo4VQJWbPOYSf8td7pkqqRjp6wMdzDDz8Zj5IipjvX9Drs9aB1P3x8YvWvOrW3t8
+         kAZzpPSyWnSP/K9BWeW5DP8UMYPtqh34TREOFmKd8X9GWsu1n14IaV/wgEBaq4G5WoKs
+         LQMeXc2iLZOMfTLhhZjKsnXHsruORkDRFYs8LjIiNUkNUZVhDV0C/VIHS5iTnFSpfLiv
+         G3tvhuW3EJa8f5SU4mFidVZ97hB24hvMPvtJTeqnxmkFut5PjHM5ViKoxx9E6f9BInYh
+         apn/r7h0IqC9+fTyhF6vOtfSCrPtaeNDt24qeBzNXdUcoJXywfiiOW3R9agpBgrb/X/N
+         iQSg==
+X-Gm-Message-State: AOAM530XWLhrtpjhmBXzzZm8t3ZsJW8fd4JeV2fvOPOSbeVcjRzVe4lJ
+        W+Q8/9bNPCsm9xxNfi8iY3AlzjgRVkn1CnUMc83q4cpVwBxt7NuwkfNhx+Fdniet3yOyZHEQQlX
+        f0t2kKeDax4zZ
+X-Received: by 2002:a5d:4f06:0:b0:1f0:2346:36d9 with SMTP id c6-20020a5d4f06000000b001f0234636d9mr7284498wru.144.1646645996461;
+        Mon, 07 Mar 2022 01:39:56 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxdWpAGLHK/5fP86BoIoYjLNL7sdwsPbRxxYRa+1Ghc7dEKTUHcP/nBFh+CeoqgrHoc8P6MHg==
+X-Received: by 2002:a5d:4f06:0:b0:1f0:2346:36d9 with SMTP id c6-20020a5d4f06000000b001f0234636d9mr7284466wru.144.1646645996257;
+        Mon, 07 Mar 2022 01:39:56 -0800 (PST)
+Received: from [10.33.192.183] (nat-pool-str-t.redhat.com. [149.14.88.106])
+        by smtp.gmail.com with ESMTPSA id p18-20020adfba92000000b001e4ae791663sm11329312wrg.62.2022.03.07.01.39.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 07 Mar 2022 01:39:55 -0800 (PST)
+Message-ID: <17257e9d-1a2b-2c8d-954d-090d262ce079@redhat.com>
+Date:   Mon, 7 Mar 2022 10:39:54 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.0
+Subject: Re: [PATCH v4 3/4] configure, meson: allow enabling vhost-user on all
+ POSIX systems
+Content-Language: en-US
+To:     Sergio Lopez <slp@redhat.com>, qemu-devel@nongnu.org
+Cc:     Matthew Rosato <mjrosato@linux.ibm.com>,
         Richard Henderson <richard.henderson@linaro.org>,
-        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
         Fam Zheng <fam@euphon.net>, kvm@vger.kernel.org,
-        David Hildenbrand <david@redhat.com>,
-        Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        David Hildenbrand <david@redhat.com>, qemu-block@nongnu.org,
         "Michael S. Tsirkin" <mst@redhat.com>, qemu-s390x@nongnu.org,
         Alex Williamson <alex.williamson@redhat.com>,
         Christian Borntraeger <borntraeger@linux.ibm.com>,
@@ -57,96 +82,67 @@ Cc:     qemu-devel@nongnu.org, Matthew Rosato <mjrosato@linux.ibm.com>,
         Halil Pasic <pasic@linux.ibm.com>,
         Cornelia Huck <cohuck@redhat.com>,
         Hanna Reitz <hreitz@redhat.com>
-Subject: Re: [PATCH v4 0/4] Enable vhost-user to be used on BSD systems
-Message-ID: <YiXPmahXN9aUyR/N@stefanha-x1.localdomain>
 References: <20220304100854.14829-1-slp@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="E1RPB9JPYPPGj8HQ"
-Content-Disposition: inline
-In-Reply-To: <20220304100854.14829-1-slp@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+ <20220304100854.14829-4-slp@redhat.com>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <20220304100854.14829-4-slp@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 04/03/2022 11.08, Sergio Lopez wrote:
+> With the possibility of using a pipe pair via qemu_pipe() as a
+> replacement on operating systems that doesn't support eventfd,
+> vhost-user can also work on all POSIX systems.
+> 
+> This change allows enabling vhost-user on all non-Windows platforms
+> and makes libvhost_user (which still depends on eventfd) a linux-only
+> feature.
+> 
+> Signed-off-by: Sergio Lopez <slp@redhat.com>
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>   configure   | 4 ++--
+>   meson.build | 2 +-
+>   2 files changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/configure b/configure
+> index c56ed53ee3..daccf4be7c 100755
+> --- a/configure
+> +++ b/configure
+> @@ -1659,8 +1659,8 @@ fi
+>   # vhost interdependencies and host support
+>   
+>   # vhost backends
+> -if test "$vhost_user" = "yes" && test "$linux" != "yes"; then
+> -  error_exit "vhost-user is only available on Linux"
+> +if test "$vhost_user" = "yes" && test "$mingw32" = "yes"; then
+> +  error_exit "vhost-user is not available on Windows"
+>   fi
+>   test "$vhost_vdpa" = "" && vhost_vdpa=$linux
+>   if test "$vhost_vdpa" = "yes" && test "$linux" != "yes"; then
+> diff --git a/meson.build b/meson.build
+> index 8df40bfac4..f2bc439c30 100644
+> --- a/meson.build
+> +++ b/meson.build
+> @@ -2701,7 +2701,7 @@ if have_system or have_user
+>   endif
+>   
+>   vhost_user = not_found
+> -if 'CONFIG_VHOST_USER' in config_host
+> +if targetos == 'linux' and 'CONFIG_VHOST_USER' in config_host
+>     libvhost_user = subproject('libvhost-user')
+>     vhost_user = libvhost_user.get_variable('vhost_user_dep')
+>   endif
 
---E1RPB9JPYPPGj8HQ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Mar 04, 2022 at 11:08:50AM +0100, Sergio Lopez wrote:
-> Since QEMU is already able to emulate ioeventfd using pipefd, we're alrea=
-dy
-> pretty close to supporting vhost-user on non-Linux systems.
->=20
-> This two patches bridge the gap by:
->=20
-> 1. Adding a new event_notifier_get_wfd() to return wfd on the places where
->    the peer is expected to write to the notifier.
->=20
-> 2. Modifying the build system to it allows enabling vhost-user on BSD.
->=20
-> v1->v2:
->   - Drop: "Allow returning EventNotifier's wfd" (Alex Williamson)
->   - Add: "event_notifier: add event_notifier_get_wfd()" (Alex Williamson)
->   - Add: "vhost: use wfd on functions setting vring call fd"
->   - Rename: "Allow building vhost-user in BSD" to "configure, meson: allow
->     enabling vhost-user on all POSIX systems"
->   - Instead of making possible enabling vhost-user on Linux and BSD syste=
-ms,
->     allow enabling it on all non-Windows platforms. (Paolo Bonzini)
->=20
-> v2->v3:
->   - Add a section to docs/interop/vhost-user.rst explaining how vhost-user
->     is supported on non-Linux platforms. (Stefan Hajnoczi)
->=20
-> v3->v4:
->   - Some documentation fixes. (Stefan Hajnoczi)
->   - Pick up Reviewed-by tags.
->=20
-> Sergio Lopez (4):
->   event_notifier: add event_notifier_get_wfd()
->   vhost: use wfd on functions setting vring call fd
->   configure, meson: allow enabling vhost-user on all POSIX systems
->   docs: vhost-user: add subsection for non-Linux platforms
->=20
->  configure                     |  4 ++--
->  docs/interop/vhost-user.rst   | 20 ++++++++++++++++++++
->  hw/virtio/vhost.c             |  6 +++---
->  include/qemu/event_notifier.h |  1 +
->  meson.build                   |  2 +-
->  util/event_notifier-posix.c   |  5 +++++
->  6 files changed, 32 insertions(+), 6 deletions(-)
->=20
-> --=20
-> 2.35.1
->=20
->=20
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---E1RPB9JPYPPGj8HQ
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmIlz5kACgkQnKSrs4Gr
-c8h+MggAvksCQVHckjPNZKCDFTTE6r2ZZA5gLLh27xZ3WjgwwGztCIVOPL48vHSt
-rJpX4GVmQ/Sm/UzxtwjBw9s0UWlhRCnNwCGgVQOsoWzpkSbcT8GJ9CjlM/u++wvH
-KANgmYr7dND2Sa/LchoD2zf3/89r+VJeBOq9qmIFUv30ZiBU6xslhpThYVUwqjeZ
-4thRMM760mpmpkfSG9hPPcnHvCFXHssmOwYTLfkjm2ZO8haHoavVeiD6gnWqE3DK
-UVOw2/sdTkutZpCgNggwHHJb4Kd7MZ+QTnzSlvmlOK23TPs5j828UqjoIdFu0PL3
-wQaQwm8ok/xrRSkDKzAWeyn2wOIZ7w==
-=YFmW
------END PGP SIGNATURE-----
-
---E1RPB9JPYPPGj8HQ--
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
