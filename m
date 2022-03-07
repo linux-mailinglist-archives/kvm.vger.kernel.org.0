@@ -2,92 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D4714D02FE
-	for <lists+kvm@lfdr.de>; Mon,  7 Mar 2022 16:34:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C94D94D029C
+	for <lists+kvm@lfdr.de>; Mon,  7 Mar 2022 16:23:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243811AbiCGPfh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Mar 2022 10:35:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51960 "EHLO
+        id S241214AbiCGPYJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Mar 2022 10:24:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241144AbiCGPfg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Mar 2022 10:35:36 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26F425D5E6;
-        Mon,  7 Mar 2022 07:34:42 -0800 (PST)
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 227E0nUK015185;
-        Mon, 7 Mar 2022 15:34:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=qbnNa91uNhfOQsKK7p3VGeelGlfv8J0nLnT6NWA3Ta4=;
- b=pyiH/V6Bj5iKfWgDw6E2fhII/ixNMCHg9f/KXPUbOLr8fAfsSrUytFVipchbVSwkzQnE
- RyTlDutmlfhvF+MTzcecCNXlrZZyAtas9eZEY3kU8LMUP5KaBNMX4s/6+eZJepxR7RCA
- 6P4onN8VImX+Pvbraqi5mLNVlII0oXQ/d+AK646k8chAyroFiYv975aWt9Ibk2gk/eb8
- RFNMZSmdlIPErPibDwNS03rrYjutkOGBDdJit0lI5f+eEXbDu7DON8afwM0nO7JDHKVY
- de9BqPrJgMrCnY4q5v2AGYph+Z9RGOfKoRQyGZaayWfyAzPiF/kVK52U/BdO2qvf6Z4r zQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3ene0ph0s9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 07 Mar 2022 15:34:40 +0000
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 227FGCad011565;
-        Mon, 7 Mar 2022 15:34:40 GMT
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3ene0ph0rx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 07 Mar 2022 15:34:40 +0000
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 227FJMZr016885;
-        Mon, 7 Mar 2022 15:34:38 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma04fra.de.ibm.com with ESMTP id 3ekyg94b04-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 07 Mar 2022 15:34:38 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 227FYZTF47514042
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 7 Mar 2022 15:34:35 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 76B37A4054;
-        Mon,  7 Mar 2022 15:34:35 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1F5C0A4060;
-        Mon,  7 Mar 2022 15:34:35 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.10.106])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon,  7 Mar 2022 15:34:35 +0000 (GMT)
-Date:   Mon, 7 Mar 2022 16:22:52 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Eric Farman <farman@linux.ibm.com>
-Cc:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: Re: [PATCH kvm-unit-tests v1 2/6] s390x: smp: Test SIGP RESTART
- against stopped CPU
-Message-ID: <20220307162252.682de499@p-imbrenda>
-In-Reply-To: <20220303210425.1693486-3-farman@linux.ibm.com>
-References: <20220303210425.1693486-1-farman@linux.ibm.com>
-        <20220303210425.1693486-3-farman@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        with ESMTP id S237362AbiCGPYI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Mar 2022 10:24:08 -0500
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id CCC576FA10
+        for <kvm@vger.kernel.org>; Mon,  7 Mar 2022 07:23:13 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 93850113E;
+        Mon,  7 Mar 2022 07:23:13 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BE66F3F66F;
+        Mon,  7 Mar 2022 07:23:10 -0800 (PST)
+Date:   Mon, 7 Mar 2022 15:23:32 +0000
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Haibo Xu <haibo.xu@linaro.org>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        "Russell King (Oracle)" <linux@armlinux.org.uk>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        karl.heubaum@oracle.com, mihai.carabas@oracle.com,
+        miguel.luis@oracle.com, kernel-team@android.com
+Subject: Re: [PATCH v6 43/64] KVM: arm64: nv: arch_timer: Support hyp timer
+ emulation
+Message-ID: <YiYjdHbS3WeDMipR@monolith.localdoman>
+References: <20220128121912.509006-1-maz@kernel.org>
+ <20220128121912.509006-44-maz@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: nKp156ebS1WxwGIlmzvzKNKb9M-UpEn6
-X-Proofpoint-GUID: wHAHsew0pitFBkQy355G2YGCCmQsyrE1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-03-07_05,2022-03-04_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- priorityscore=1501 mlxlogscore=999 adultscore=0 mlxscore=0
- lowpriorityscore=0 suspectscore=0 bulkscore=0 spamscore=0 phishscore=0
- malwarescore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2202240000 definitions=main-2203070090
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220128121912.509006-44-maz@kernel.org>
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -96,50 +53,49 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu,  3 Mar 2022 22:04:21 +0100
-Eric Farman <farman@linux.ibm.com> wrote:
+Hi,
 
-> test_restart() makes two smp_cpu_restart() calls against CPU 1.
-> It claims to perform both of them against running (operating) CPUs,
-> but the first invocation tries to achieve this by calling
-> smp_cpu_stop() to CPU 0. This will be rejected by the library.
+On Fri, Jan 28, 2022 at 12:18:51PM +0000, Marc Zyngier wrote:
+> From: Christoffer Dall <christoffer.dall@arm.com>
 > 
-> Let's fix this by making the first restart operate on a stopped CPU,
-> to ensure it gets test coverage instead of relying on other callers.
+> Emulating EL2 also means emulating the EL2 timers. To do so, we expand
+> our timer framework to deal with at most 4 timers. At any given time,
+> two timers are using the HW timers, and the two others are purely
+> emulated.
 > 
-> Fixes: 166da884d ("s390x: smp: Add restart when running test")
-> Signed-off-by: Eric Farman <farman@linux.ibm.com>
-
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-
+> The role of deciding which is which at any given time is left to a
+> mapping function which is called every time we need to make such a
+> decision.
+> 
+> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+> [maz: added CNTVOFF support, general reworking for v4.8]
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  s390x/smp.c | 8 ++------
->  1 file changed, 2 insertions(+), 6 deletions(-)
+>  arch/arm64/include/asm/kvm_host.h |   4 +
+>  arch/arm64/kvm/arch_timer.c       | 165 ++++++++++++++++++++++++++++--
+>  arch/arm64/kvm/sys_regs.c         |   7 +-
+>  arch/arm64/kvm/trace_arm.h        |   6 +-
+>  arch/arm64/kvm/vgic/vgic.c        |  15 +++
+>  include/kvm/arm_arch_timer.h      |   8 +-
+>  include/kvm/arm_vgic.h            |   1 +
+>  7 files changed, 194 insertions(+), 12 deletions(-)
 > 
-> diff --git a/s390x/smp.c b/s390x/smp.c
-> index 068ac74d..2f4af820 100644
-> --- a/s390x/smp.c
-> +++ b/s390x/smp.c
-> @@ -50,10 +50,6 @@ static void test_start(void)
->  	report_pass("start");
+[..]
+> @@ -1301,6 +1445,7 @@ static void set_timer_irqs(struct kvm *kvm, int vtimer_irq, int ptimer_irq)
+>  	kvm_for_each_vcpu(i, vcpu, kvm) {
+>  		vcpu_vtimer(vcpu)->irq.irq = vtimer_irq;
+>  		vcpu_ptimer(vcpu)->irq.irq = ptimer_irq;
+> +		/* TODO: Add support for hv/hp timers */
+>  	}
 >  }
 >  
-> -/*
-> - * Does only test restart when the target is running.
-> - * The other tests do restarts when stopped multiple times already.
-> - */
->  static void test_restart(void)
->  {
->  	struct cpu *cpu = smp_cpu_from_idx(1);
-> @@ -62,8 +58,8 @@ static void test_restart(void)
->  	lc->restart_new_psw.mask = extract_psw_mask();
->  	lc->restart_new_psw.addr = (unsigned long)test_func;
+> @@ -1311,6 +1456,8 @@ int kvm_arm_timer_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+>  	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+>  	int irq;
 >  
-> -	/* Make sure cpu is running */
-> -	smp_cpu_stop(0);
-> +	/* Make sure cpu is stopped */
-> +	smp_cpu_stop(1);
->  	set_flag(0);
->  	smp_cpu_restart(1);
->  	wait_for_flag();
+> +	/* TODO: Add support for hv/hp timers */
 
+Is the patch unfinished?
+
+Thanks,
+Alex
