@@ -2,69 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8CE734CF461
-	for <lists+kvm@lfdr.de>; Mon,  7 Mar 2022 10:12:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DC63E4CF59B
+	for <lists+kvm@lfdr.de>; Mon,  7 Mar 2022 10:29:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236258AbiCGJNk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Mar 2022 04:13:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57260 "EHLO
+        id S237064AbiCGJaN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Mar 2022 04:30:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234885AbiCGJNi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Mar 2022 04:13:38 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AFC4B27B2E
-        for <kvm@vger.kernel.org>; Mon,  7 Mar 2022 01:12:44 -0800 (PST)
+        with ESMTP id S238458AbiCGJ3N (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Mar 2022 04:29:13 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 26DA566FA8
+        for <kvm@vger.kernel.org>; Mon,  7 Mar 2022 01:27:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646644363;
+        s=mimecast20190719; t=1646645195;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=c+/Hjl0zyOOuFnsu7B/cwfXdvV4IHIHkTUvIXxRfjIc=;
-        b=UMlYwrMhteGPnCOiHjFTSZEczzZIDz/6/gDBzG8GAKVbg6O7RmXSB+aL8x95875wXscXHz
-        EYjWYvqIuDV91L0PnpoBK48C3nsLCGAR2ftgzgtYWEkuhnA02biuJqjKCgMIt5+tXDz8Bp
-        K0unBOYVT1BicmpSBjWmC/TgC+uRdyU=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=G6zuLw2xFtTzT2CO4X/m2kFHpe+2zt7etCbaJPRh76U=;
+        b=SxDd5DE8hILKHDX34Z6eocFEjiFcrxTP6v/kHbUna3Us2nJMmeHr2SCDxWsQgGT1B+MHC9
+        WVW1ioevlEcOxxbUw/0APDUxw9RnjaRSAc38B048lJT8aNoTr4fZ6HCkbRq+2ChyfFc1Wp
+        Q9bksSOn9EX1+m20zzyVLb+4ZlE0dr4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-73--pDVN4uGO-m3a3e9bw-5HQ-1; Mon, 07 Mar 2022 04:12:42 -0500
-X-MC-Unique: -pDVN4uGO-m3a3e9bw-5HQ-1
-Received: by mail-wm1-f70.google.com with SMTP id d8-20020a05600c34c800b0037e3cd6225eso5029614wmq.6
-        for <kvm@vger.kernel.org>; Mon, 07 Mar 2022 01:12:42 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=c+/Hjl0zyOOuFnsu7B/cwfXdvV4IHIHkTUvIXxRfjIc=;
-        b=j/EDCZJvkUKlF1rhKQDxxxi1gQIHIoQL/9HlGTM+cWBaUdT61TRveu1TCJAV8dEDhi
-         rTDU8Cv0wOFy8x+mml1tvu/tA50lFw1mDdR1DeeFAArK5fKAWDFB4Nvj2M+nrrpLrUHf
-         x3BGufR4gZUKFuz/WHfoJc3+sA8j6l/ULPGFFI+ob9ZCHyMVV9OsxIu2oQ2ov7EMIkHf
-         mDA9ZtFI+aFBaOlM8dsZ1gNo7NYEuYrhsi6WzrKGLGGv1ZteXFoWSy8tDBkV+cFBHJgY
-         CqQxhrDHCn6YFXXap+X3HqCauNgANrpM3E/Xpi/W3qibxLi4Ee6PaDALZm/0ZKilOokl
-         ZTeA==
-X-Gm-Message-State: AOAM533gOwneXgJ5E4iOmEuwzHFnaxNmGBmGDK+B4Q00CkAUVFiIeBKe
-        2+ptt5ZWK+gqP01mPWLnlUtJBO4F0zZTvmcJelVjbpH1zN0oiFNoc8k0jMtZG1Jyt3Rl9TJDL+u
-        NLs5b5hk7MUXg
-X-Received: by 2002:adf:e3d2:0:b0:1f1:d9b1:b5a8 with SMTP id k18-20020adfe3d2000000b001f1d9b1b5a8mr7341505wrm.499.1646644361533;
-        Mon, 07 Mar 2022 01:12:41 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzf0ro+8gzIGF2cFevC9Cgf0kiVGSiBHipMijsey+1LsFqyQ1POBUgw9AxvN+ydDPjsSZ36Gw==
-X-Received: by 2002:adf:e3d2:0:b0:1f1:d9b1:b5a8 with SMTP id k18-20020adfe3d2000000b001f1d9b1b5a8mr7341490wrm.499.1646644361296;
-        Mon, 07 Mar 2022 01:12:41 -0800 (PST)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id n2-20020a05600c3b8200b00389a4ccd878sm3800807wms.0.2022.03.07.01.12.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Mar 2022 01:12:40 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Li RongQing <lirongqing@baidu.com>
-Cc:     pbonzini@redhat.com, seanjc@google.com, jmattson@google.com,
-        x86@kernel.org, kvm@vger.kernel.org, lirongqing@baidu.com
-Subject: Re: [PATCH][resend] KVM: x86: check steal time address when enable
- steal time
-In-Reply-To: <1646641011-55068-1-git-send-email-lirongqing@baidu.com>
-References: <1646641011-55068-1-git-send-email-lirongqing@baidu.com>
-Date:   Mon, 07 Mar 2022 10:12:39 +0100
-Message-ID: <87sfru9ldk.fsf@redhat.com>
+ us-mta-562-4gWxIgl5Of-_wy-91_hrbw-1; Mon, 07 Mar 2022 04:26:32 -0500
+X-MC-Unique: 4gWxIgl5Of-_wy-91_hrbw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 855B8835DE9;
+        Mon,  7 Mar 2022 09:26:30 +0000 (UTC)
+Received: from localhost (unknown [10.39.193.253])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 913EA7FCF0;
+        Mon,  7 Mar 2022 09:25:58 +0000 (UTC)
+Date:   Mon, 7 Mar 2022 09:25:45 +0000
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Sergio Lopez <slp@redhat.com>
+Cc:     qemu-devel@nongnu.org, Matthew Rosato <mjrosato@linux.ibm.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
+        Fam Zheng <fam@euphon.net>, kvm@vger.kernel.org,
+        David Hildenbrand <david@redhat.com>,
+        Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org,
+        "Michael S. Tsirkin" <mst@redhat.com>, qemu-s390x@nongnu.org,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        John G Johnson <john.g.johnson@oracle.com>,
+        Elena Ufimtseva <elena.ufimtseva@oracle.com>,
+        Kevin Wolf <kwolf@redhat.com>,
+        Jagannathan Raman <jag.raman@oracle.com>, vgoyal@redhat.com,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Hanna Reitz <hreitz@redhat.com>
+Subject: Re: [PATCH v4 0/4] Enable vhost-user to be used on BSD systems
+Message-ID: <YiXPmahXN9aUyR/N@stefanha-x1.localdomain>
+References: <20220304100854.14829-1-slp@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="E1RPB9JPYPPGj8HQ"
+Content-Disposition: inline
+In-Reply-To: <20220304100854.14829-1-slp@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
@@ -75,39 +76,77 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Li RongQing <lirongqing@baidu.com> writes:
 
-> check steal time address when enable steal time, do not update
-> arch.st.msr_val if the address is invalid,  and return in #GP
->
-> this can avoid unnecessary write/read invalid memory when guest
-> is running
->
-> Signed-off-by: Li RongQing <lirongqing@baidu.com>
-> ---
->  arch/x86/kvm/x86.c | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index eb402966..3ed0949 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -3616,6 +3616,9 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  		if (data & KVM_STEAL_RESERVED_MASK)
->  			return 1;
->  
-> +		if (!kvm_vcpu_gfn_to_memslot(vcpu, data >> PAGE_SHIFT))
-> +			return 1;
-> +
+--E1RPB9JPYPPGj8HQ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-What about we use stronger kvm_is_visible_gfn() instead? I didn't put
-much thought to what's going to happen if we put e.g. APIC access page
-addr to the MSR, let's just cut any possibility.
+On Fri, Mar 04, 2022 at 11:08:50AM +0100, Sergio Lopez wrote:
+> Since QEMU is already able to emulate ioeventfd using pipefd, we're alrea=
+dy
+> pretty close to supporting vhost-user on non-Linux systems.
+>=20
+> This two patches bridge the gap by:
+>=20
+> 1. Adding a new event_notifier_get_wfd() to return wfd on the places where
+>    the peer is expected to write to the notifier.
+>=20
+> 2. Modifying the build system to it allows enabling vhost-user on BSD.
+>=20
+> v1->v2:
+>   - Drop: "Allow returning EventNotifier's wfd" (Alex Williamson)
+>   - Add: "event_notifier: add event_notifier_get_wfd()" (Alex Williamson)
+>   - Add: "vhost: use wfd on functions setting vring call fd"
+>   - Rename: "Allow building vhost-user in BSD" to "configure, meson: allow
+>     enabling vhost-user on all POSIX systems"
+>   - Instead of making possible enabling vhost-user on Linux and BSD syste=
+ms,
+>     allow enabling it on all non-Windows platforms. (Paolo Bonzini)
+>=20
+> v2->v3:
+>   - Add a section to docs/interop/vhost-user.rst explaining how vhost-user
+>     is supported on non-Linux platforms. (Stefan Hajnoczi)
+>=20
+> v3->v4:
+>   - Some documentation fixes. (Stefan Hajnoczi)
+>   - Pick up Reviewed-by tags.
+>=20
+> Sergio Lopez (4):
+>   event_notifier: add event_notifier_get_wfd()
+>   vhost: use wfd on functions setting vring call fd
+>   configure, meson: allow enabling vhost-user on all POSIX systems
+>   docs: vhost-user: add subsection for non-Linux platforms
+>=20
+>  configure                     |  4 ++--
+>  docs/interop/vhost-user.rst   | 20 ++++++++++++++++++++
+>  hw/virtio/vhost.c             |  6 +++---
+>  include/qemu/event_notifier.h |  1 +
+>  meson.build                   |  2 +-
+>  util/event_notifier-posix.c   |  5 +++++
+>  6 files changed, 32 insertions(+), 6 deletions(-)
+>=20
+> --=20
+> 2.35.1
+>=20
+>=20
 
->  		vcpu->arch.st.msr_val = data;
->  
->  		if (!(data & KVM_MSR_ENABLED))
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
--- 
-Vitaly
+--E1RPB9JPYPPGj8HQ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmIlz5kACgkQnKSrs4Gr
+c8h+MggAvksCQVHckjPNZKCDFTTE6r2ZZA5gLLh27xZ3WjgwwGztCIVOPL48vHSt
+rJpX4GVmQ/Sm/UzxtwjBw9s0UWlhRCnNwCGgVQOsoWzpkSbcT8GJ9CjlM/u++wvH
+KANgmYr7dND2Sa/LchoD2zf3/89r+VJeBOq9qmIFUv30ZiBU6xslhpThYVUwqjeZ
+4thRMM760mpmpkfSG9hPPcnHvCFXHssmOwYTLfkjm2ZO8haHoavVeiD6gnWqE3DK
+UVOw2/sdTkutZpCgNggwHHJb4Kd7MZ+QTnzSlvmlOK23TPs5j828UqjoIdFu0PL3
+wQaQwm8ok/xrRSkDKzAWeyn2wOIZ7w==
+=YFmW
+-----END PGP SIGNATURE-----
+
+--E1RPB9JPYPPGj8HQ--
 
