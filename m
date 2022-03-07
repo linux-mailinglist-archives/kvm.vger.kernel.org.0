@@ -2,119 +2,233 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BDB424CF089
-	for <lists+kvm@lfdr.de>; Mon,  7 Mar 2022 04:55:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CF87F4CF032
+	for <lists+kvm@lfdr.de>; Mon,  7 Mar 2022 04:29:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234220AbiCGDxi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 6 Mar 2022 22:53:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38590 "EHLO
+        id S235006AbiCGDaN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 6 Mar 2022 22:30:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232670AbiCGDxg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 6 Mar 2022 22:53:36 -0500
-Received: from new4-smtp.messagingengine.com (new4-smtp.messagingengine.com [66.111.4.230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C46C60CE;
-        Sun,  6 Mar 2022 19:52:42 -0800 (PST)
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
-        by mailnew.nyi.internal (Postfix) with ESMTP id C20F658010F;
-        Sun,  6 Mar 2022 22:52:39 -0500 (EST)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute2.internal (MEProxy); Sun, 06 Mar 2022 22:52:39 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=turner.link; h=
-        cc:cc:content-type:date:date:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to; s=fm2; bh=bwDctYCk0Fg/pF78gRaQUi8ymG1aY/DQC+BW/U
-        UN48c=; b=dweBiPbo/ulGMiJYLHMNoYgpNsCzKA9axIatIkN33eaeKPHOcBXt5i
-        AJe0xaZ+JWtAISpeA7rTaISlmZuAHEyGHG+yCvs8SFTy0PuUas/9brKq2dFfR34L
-        ay8fKKKymtuyTY3qUuGthMmrC8lY/Rgl3PzfRtUO6f6HrViEZ3CnMOEChzAWoNDF
-        VUS9QPBPD+yUcghpY09ONyNs2cErywxyPZpN5Sx+X/qPpuYECtU2qru4IGkAzFX1
-        Pv30QjBmuqB596TA5ZZ+OOrfKLZHGoD2qJxp2WJac0cL4YkKUEYzb5PN3j6kGIUl
-        jneXzG2ZVy/4AnQpIQwbUQn8V9QRRuXw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:date:date:from:from
-        :in-reply-to:in-reply-to:message-id:mime-version:references
-        :reply-to:sender:subject:subject:to:to:x-me-proxy:x-me-proxy
-        :x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=bwDctYCk0Fg/pF78g
-        RaQUi8ymG1aY/DQC+BW/UUN48c=; b=WfHzcjOoiiCcGMm3x8k7VhFtOPE/fB8By
-        pWIcRF2B5Kr4KBIzRk/3DOVM+ejebImh3v+r8tS1XTd12QVoi6fRquF/5/50wSIP
-        kxG9o+qz/bT2CjqXadDohi+UC//+2Gd/6NPR2WoRpZeJPdS2Na5BVAosy7AnqWyh
-        7mx5ui4a8ez1nvnk7TQ7ULvddigoMWUhg4YEtp4uqlW36nZujqTU7Zo5Je2IH1hL
-        REy2n7ZofkWAz1mJmIEdDnwrUHX5l1atQJwiDODhJyhMvMBjIEG+1cW1DJm+iM0x
-        8qZ/QQQpcG6XVJ9OCAdB3YABTuQetYwZT58v0b4EKOQhU5Swwb3Xw==
-X-ME-Sender: <xms:h4ElYvR3eeo-IrQIsa8Y76T_YeKtDGdWJhIT6keRvchcmNBaiv2xDQ>
-    <xme:h4ElYgxnY2wuHeRmEAhyox32M_a5xB0IObtFHFFCU1ZHXUWtq_INXtn12cHIK4sNK
-    Tb0dYjRAVEYByYsyg>
-X-ME-Received: <xmr:h4ElYk0AWNOzQtOoR0Ec8gDwHlwIB7IeoLiBs1oS0JJlZzAyz1-KXkrejhVuHf7zyfP0BqK0Y0OSvC6Dqpct_GaHW7690JJBfPk>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvvddruddufedgieefucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfhfhvffuffgjkfggtgesthdtredttddttdenucfhrhhomheplfgrmhgvshcu
-    vfhurhhnvghruceolhhinhhugihkvghrnhgvlhdrfhhoshhssegumhgrrhgtqdhnohhnvg
-    drthhurhhnvghrrdhlihhnkheqnecuggftrfgrthhtvghrnheptedvfeduheeiueefgffh
-    vdetiedttdevhfeiteeuhfelveduvedttdffgffggfetnecuvehluhhsthgvrhfuihiivg
-    eptdenucfrrghrrghmpehmrghilhhfrhhomheplhhinhhugihkvghrnhgvlhdrfhhoshhs
-    segumhgrrhgtqdhnohhnvgdrthhurhhnvghrrdhlihhnkh
-X-ME-Proxy: <xmx:h4ElYvC6nF4BukqsBJmwN7piJccMseMnus6BFP9Il0PT5ffb8UM-Tg>
-    <xmx:h4ElYoj8MsoE-uua4Uz2ZOLBvND06_HZGTRjAkvPGD3Nc7FIjT3yBg>
-    <xmx:h4ElYjpS3iSJG8SS2kgtPTNg5E4lNoqTakNtzp4OrIJW2lN2W6Jw_w>
-    <xmx:h4ElYnQVgx9m6v7HDDqfeXetNTImZOmqSkI5HoMEf65c8YKEwjpb1g>
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
- 6 Mar 2022 22:52:39 -0500 (EST)
-References: <87ee57c8fu.fsf@turner.link>
- <acd2fd5e-d622-948c-82ef-629a8030c9d8@leemhuis.info>
- <87a6ftk9qy.fsf@dmarc-none.turner.link> <87zgnp96a4.fsf@turner.link>
- <fc2b7593-db8f-091c-67a0-ae5ffce71700@leemhuis.info>
- <CADnq5_Nr5-FR2zP1ViVsD_ZMiW=UHC1wO8_HEGm26K_EG2KDoA@mail.gmail.com>
- <87czkk1pmt.fsf@dmarc-none.turner.link>
- <BYAPR12MB46140BE09E37244AE129C01A975C9@BYAPR12MB4614.namprd12.prod.outlook.com>
- <87sftfqwlx.fsf@dmarc-none.turner.link>
- <BYAPR12MB4614E2CFEDDDEAABBAB986A0975E9@BYAPR12MB4614.namprd12.prod.outlook.com>
- <87ee4wprsx.fsf@turner.link>
- <4b3ed7f6-d2b6-443c-970e-d963066ebfe3@amd.com>
- <87pmo8r6ob.fsf@turner.link>
- <5a68afe4-1e9e-c683-e06d-30afc2156f14@leemhuis.info>
- <CADnq5_MCKTLOfWKWvi94Q9-d5CGdWBoWVxEYL3YXOpMiPnLOyg@mail.gmail.com>
- <87pmnnpmh5.fsf@dmarc-none.turner.link>
- <CADnq5_NG_dQCYwqHM0umjTMg5Uud6zC4=MiscH91Y9v7mW9bJA@mail.gmail.com>
- <092b825a-10ff-e197-18a1-d3e3a097b0e3@leemhuis.info>
-From:   James Turner <linuxkernel.foss@dmarc-none.turner.link>
-To:     Thorsten Leemhuis <regressions@leemhuis.info>
-Cc:     Alex Deucher <alexdeucher@gmail.com>,
-        "Lazar, Lijo" <lijo.lazar@amd.com>,
-        "Deucher, Alexander" <Alexander.Deucher@amd.com>,
-        "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        "Pan, Xinhui" <Xinhui.Pan@amd.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "amd-gfx@lists.freedesktop.org" <amd-gfx@lists.freedesktop.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        "Koenig, Christian" <Christian.Koenig@amd.com>
-Subject: Re: [REGRESSION] Too-low frequency limit for AMD GPU
- PCI-passed-through to Windows VM
-Date:   Sun, 06 Mar 2022 21:12:52 -0500
-In-reply-to: <092b825a-10ff-e197-18a1-d3e3a097b0e3@leemhuis.info>
-Message-ID: <877d96to55.fsf@dmarc-none.turner.link>
+        with ESMTP id S232195AbiCGDaM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 6 Mar 2022 22:30:12 -0500
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 966D449688;
+        Sun,  6 Mar 2022 19:29:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1646623758; x=1678159758;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=6xQOf0kATP8C8A35Fbf8Z13oskeZPkNu1nz+qlvE+1I=;
+  b=IBOnpAnGjqo8EmZmg+puo8i6ecovSxsOwKIBmMjzIgul+3Oiw7RUlqFL
+   XhqwnoeIEGXKXa2+fVPo9Otr7ilkcdXGB1RqOX/nKHsQtsbTPKBS63kq7
+   zjopwseBXC+B4tvzzM8wGpIbM8SjskDTcyEvBQSzu5pqxy2Nx+spJrdxQ
+   dlwTwRK/TqwcyvUo+jWOsrk2gtcrmq0eZ7ZDn0Fa3F3hMqEhQfbHyDoUc
+   9ZF4CgIilL5bEcBM+4iaYv+kn4PL5K0YnaPRYMMa0yGvtmR1pNZeCnwr8
+   7RKqavtjT2/YxxBTag26kojRUKC0cbsqiaxCJYURP/3/SRJeTMVgqmPrr
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10278"; a="254226748"
+X-IronPort-AV: E=Sophos;i="5.90,160,1643702400"; 
+   d="scan'208";a="254226748"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2022 19:29:18 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.90,160,1643702400"; 
+   d="scan'208";a="687400858"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.48]) ([10.239.159.48])
+  by fmsmga001.fm.intel.com with ESMTP; 06 Mar 2022 19:29:11 -0800
+Message-ID: <b1a5db0a-0373-5ca0-6256-85a96d029ec9@linux.intel.com>
+Date:   Mon, 7 Mar 2022 11:27:35 +0800
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Cc:     baolu.lu@linux.intel.com, Chaitanya Kulkarni <kch@nvidia.com>,
+        kvm@vger.kernel.org, Stuart Yoder <stuyoder@gmail.com>,
+        rafael@kernel.org, David Airlie <airlied@linux.ie>,
+        linux-pci@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
+        linux-kernel@vger.kernel.org,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        iommu@lists.linux-foundation.org,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Jacob jun Pan <jacob.jun.pan@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Li Yang <leoyang.li@nxp.com>, Will Deacon <will@kernel.org>,
+        Dmitry Osipenko <digetx@gmail.com>
+Subject: Re: [PATCH v7 01/11] iommu: Add DMA ownership management interfaces
+Content-Language: en-US
+To:     Robin Murphy <robin.murphy@arm.com>, eric.auger@redhat.com,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>
+References: <20220228005056.599595-1-baolu.lu@linux.intel.com>
+ <20220228005056.599595-2-baolu.lu@linux.intel.com>
+ <c75b6e04-bc1b-b9f6-1a44-bf1567a8c19d@redhat.com>
+ <7a3dc977-0c5f-6d88-6d3a-8e49bc717690@linux.intel.com>
+ <1648bc97-a0d3-4051-58d0-e24fa9e9d183@arm.com>
+ <350a8e09-08a9-082b-3ad1-b711c7d98d73@redhat.com>
+ <e2698dbe-18e2-1a82-8a12-fe45bc9be534@arm.com>
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+In-Reply-To: <e2698dbe-18e2-1a82-8a12-fe45bc9be534@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Thorsten,
+Hi Robin,
 
-My understanding at this point is that the root problem is probably not
-in the Linux kernel but rather something else (e.g. the machine firmware
-or AMD Windows driver) and that the change in
-f9b7f3703ff9 ("drm/amdgpu/acpi: make ATPX/ATCS structures global (v2)")
-simply exposed the underlying problem.
+On 3/4/22 10:10 PM, Robin Murphy wrote:
+> On 2022-03-04 13:55, Eric Auger wrote:
+>> Hi Robin,
+>>
+>> On 3/4/22 1:22 PM, Robin Murphy wrote:
+>>> On 2022-03-04 10:43, Lu Baolu wrote:
+>>>> Hi Eric,
+>>>>
+>>>> On 2022/3/4 18:34, Eric Auger wrote:
+>>>>> I hit a WARN_ON() when unbinding an e1000e driver just after boot:
+>>>>>
+>>>>> sudo modprobe -v vfio-pci
+>>>>> echo vfio-pci | sudo tee -a
+>>>>> /sys/bus/pci/devices/0004:01:00.0/driver_override
+>>>>> vfio-pci
+>>>>> echo 0004:01:00.0 | sudo tee -a  /sys/bus/pci/drivers/e1000e/unbind
+>>>>>
+>>>>>
+>>>>> [  390.042811] ------------[ cut here ]------------
+>>>>> [  390.046468] WARNING: CPU: 42 PID: 5589 at 
+>>>>> drivers/iommu/iommu.c:3123
+>>>>> iommu_device_unuse_default_domain+0x68/0x100
+>>>>> [  390.056710] Modules linked in: vfio_pci vfio_pci_core vfio_virqfd
+>>>>> vfio_iommu_type1 vfio xt_CHECKSUM xt_MASQUERADE xt_conntrack 
+>>>>> ipt_REJECT
+>>>>> nf_reject_ipv4 nft_compat nft_chain_nat nf_nat nf_conntrack
+>>>>> nf_defrag_ipv6 nf_defrag_ipv4 nf_tables nfnetlink bridge stp llc 
+>>>>> rfkill
+>>>>> sunrpc vfat fat mlx5_ib ib_uverbs ib_core acpi_ipmi ipmi_ssif
+>>>>> ipmi_devintf ipmi_msghandler cppc_cpufreq drm xfs libcrc32c
+>>>>> mlx5_core sg
+>>>>> mlxfw crct10dif_ce tls ghash_ce sha2_ce sha256_arm64 sha1_ce sbsa_gwdt
+>>>>> e1000e psample sdhci_acpi ahci_platform sdhci libahci_platform
+>>>>> qcom_emac
+>>>>> mmc_core hdma hdma_mgmt dm_mirror dm_region_hash dm_log dm_mod fuse
+>>>>> [  390.110618] CPU: 42 PID: 5589 Comm: tee Kdump: loaded Not tainted
+>>>>> 5.17.0-rc4-lu-v7-official+ #24
+>>>>> [  390.119384] Hardware name: WIWYNN QDF2400 Reference Evaluation
+>>>>> Platform CV90-LA115-P120/QDF2400 Customer Reference Board, BIOS
+>>>>> 0ACJA570
+>>>>> 11/05/2018
+>>>>> [  390.132492] pstate: a0400005 (NzCv daif +PAN -UAO -TCO -DIT -SSBS
+>>>>> BTYPE=--)
+>>>>> [  390.139436] pc : iommu_device_unuse_default_domain+0x68/0x100
+>>>>> [  390.145165] lr : iommu_device_unuse_default_domain+0x38/0x100
+>>>>> [  390.150894] sp : ffff80000fbb3bc0
+>>>>> [  390.154193] x29: ffff80000fbb3bc0 x28: ffff03c0cf6b2400 x27:
+>>>>> 0000000000000000
+>>>>> [  390.161311] x26: 0000000000000000 x25: 0000000000000000 x24:
+>>>>> ffff03c0c7cc5720
+>>>>> [  390.168429] x23: ffff03c0c2b9d150 x22: ffffb4e61df223f8 x21:
+>>>>> ffffb4e61df223f8
+>>>>> [  390.175547] x20: ffff03c7c03c3758 x19: ffff03c7c03c3700 x18:
+>>>>> 0000000000000000
+>>>>> [  390.182665] x17: 0000000000000000 x16: 0000000000000000 x15:
+>>>>> 0000000000000000
+>>>>> [  390.189783] x14: 0000000000000000 x13: 0000000000000030 x12:
+>>>>> ffff03c0d519cd80
+>>>>> [  390.196901] x11: 7f7f7f7f7f7f7f7f x10: 0000000000000dc0 x9 :
+>>>>> ffffb4e620b54f8c
+>>>>> [  390.204019] x8 : ffff03c0cf6b3220 x7 : ffff4ef132bba000 x6 :
+>>>>> 00000000000000ff
+>>>>> [  390.211137] x5 : ffff03c0c2b9f108 x4 : ffff03c0d51f6438 x3 :
+>>>>> 0000000000000000
+>>>>> [  390.218255] x2 : ffff03c0cf6b2400 x1 : 0000000000000000 x0 :
+>>>>> 0000000000000000
+>>>>> [  390.225374] Call trace:
+>>>>> [  390.227804]  iommu_device_unuse_default_domain+0x68/0x100
+>>>>> [  390.233187]  pci_dma_cleanup+0x38/0x44
+>>>>> [  390.236919]  __device_release_driver+0x1a8/0x260
+>>>>> [  390.241519]  device_driver_detach+0x50/0xd0
+>>>>> [  390.245686]  unbind_store+0xf8/0x120
+>>>>> [  390.249245]  drv_attr_store+0x30/0x44
+>>>>> [  390.252891]  sysfs_kf_write+0x50/0x60
+>>>>> [  390.256537]  kernfs_fop_write_iter+0x134/0x1cc
+>>>>> [  390.260964]  new_sync_write+0xf0/0x18c
+>>>>> [  390.264696]  vfs_write+0x230/0x2d0
+>>>>> [  390.268082]  ksys_write+0x74/0x100
+>>>>> [  390.271467]  __arm64_sys_write+0x28/0x3c
+>>>>> [  390.275373]  invoke_syscall.constprop.0+0x58/0xf0
+>>>>> [  390.280061]  el0_svc_common.constprop.0+0x160/0x164
+>>>>> [  390.284922]  do_el0_svc+0x34/0xcc
+>>>>> [  390.288221]  el0_svc+0x30/0x140
+>>>>> [  390.291346]  el0t_64_sync_handler+0xa4/0x130
+>>>>> [  390.295599]  el0t_64_sync+0x1a0/0x1a4
+>>>>> [  390.299245] ---[ end trace 0000000000000000 ]---
+>>>>>
+>>>>>
+>>>>> I put some traces in the code and I can see that
+>>>>> iommu_device_use_default_domain() effectively is called on
+>>>>> 0004:01:00.0 e1000e device on pci_dma_configure() but at that time
+>>>>> the iommu group is NULL:
+>>>>> [   10.569427] e1000e 0004:01:00.0: ------ ENTRY pci_dma_configure
+>>>>> driver_managed_area=0
+>>>>> [   10.569431] e1000e 0004:01:00.0: ****
+>>>>> iommu_device_use_default_domain ENTRY
+>>>>> [   10.569433] e1000e 0004:01:00.0: ****
+>>>>> iommu_device_use_default_domain no group
+>>>>> [   10.569435] e1000e 0004:01:00.0: pci_dma_configure
+>>>>> iommu_device_use_default_domain returned 0
+>>>>> [   10.569492] e1000e 0004:01:00.0: Adding to iommu group 3
+>>>>>
+>>>>> ^^^the group is added after the
+>>>>> iommu_device_use_default_domain() call
+>>>>> So the group->owner_cnt is not incremented as expected.
+>>>>
+>>>> Thank you for reporting this. Do you have any idea why the driver is
+>>>> loaded before iommu_probe_device()?
+>>>
+>>> Urgh, this is the horrible firmware-data-ordering thing again. The
+>>> stuff I've been saying about having to rework the whole .dma_configure
+>>> mechanism in the near future is to fix this properly.
+>>>
+>>> The summary is that in patch #4, calling
+>>> iommu_device_use_default_domain() *before* {of,acpi}_dma_configure is
+>>> currently a problem. As things stand, the IOMMU driver ignored the
+>>> initial iommu_probe_device() call when the device was added, since at
+>>> that point it had no fwspec yet. In this situation,
+>>> {of,acpi}_iommu_configure() are retriggering iommu_probe_device()
+>>> after the IOMMU driver has seen the firmware data via .of_xlate to
+>>> learn that it it actually responsible for the given device.
+>>
+>> thank you for providing the info. Hope this is something Lu can work 
+>> around.
+> 
+> Hopefully it's just a case of flipping the calls around, so that 
+> iommu_use_default_domain() goes at the end, and calls 
+> arch_teardown_dma_ops() if it fails. From a quick skim I *think* that 
+> should still work out to the desired behaviour (or at least close enough 
+> that we can move forward without a circular dependency between fixes...)
 
-This week, I'll double-check that this is the case by disabling the
-`amdgpu_atif_pci_probe_handle` function and testing again. I'll post the
-results here.
+This is a reasonable solution to me. Thank you for the information and
+suggestion.
 
-James
+Eric, I have updated the patch #4 and uploaded a new version here:
+
+https://github.com/LuBaolu/intel-iommu/commits/iommu-dma-ownership-v8
+
+Can you please give it a try?
+
+Best regards,
+baolu
