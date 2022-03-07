@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0687D4CF406
-	for <lists+kvm@lfdr.de>; Mon,  7 Mar 2022 09:53:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 560114CF408
+	for <lists+kvm@lfdr.de>; Mon,  7 Mar 2022 09:53:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233903AbiCGIyY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Mar 2022 03:54:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39162 "EHLO
+        id S235939AbiCGIy1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Mar 2022 03:54:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39472 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234149AbiCGIyV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Mar 2022 03:54:21 -0500
+        with ESMTP id S235467AbiCGIyY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Mar 2022 03:54:24 -0500
 Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6907B15A03;
-        Mon,  7 Mar 2022 00:53:25 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C72C41A822;
+        Mon,  7 Mar 2022 00:53:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1646643205; x=1678179205;
+  t=1646643209; x=1678179209;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=usTsLotS3IpAdfGPpvMJNzmulAHU4pEVranhDE3wmwA=;
-  b=H8e/eyllzvW1EJap/hi2pUrR6Vr6u2Alf00n+QeA20YWB8eVwtuzxMIQ
-   g0oZcswQ58h/eJjvsBqivsPOtUWL6ADHMfWsV+CH+1AdT7nWS40VR0j8O
-   3+MnLfuUSClsEiEBh8lz5HhTCAAdQZv8B5e5Gx6b/xroWCbr797JwQiTk
-   WXPnD8p6aWRZ4ScdafPwvy8Z4hWezVsMr9LKxpUUFv6HSa85jm4ESlk+m
-   5V4Ar76iOHgroKy2y1N2BdlgZIIp4XR09Amqs6eOcJMf46V2auqUkt7EX
-   rPLRekjjhsEAPQsI9+ZmdfFR44xQwrAbRo+of7NjhLMiPY3J/S0TmDaZq
-   g==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10278"; a="241771793"
+  bh=KlA1x9Cb1KblGKd9Hqgo2TLuaRy9LBgMjlsA9b/F7qw=;
+  b=m4IzEZb+nsmAJzl/NK/VRp4p3CR7teLqe+JWlxANsgUd6nP7ZzzCJNPW
+   d6GZRHlq8suL80wjdmmBqPbiPpPOJ92r5q5QkJqPcrIfEajPhOXDzj86D
+   WHZwzIYuvgji3hQfRNCxGCLdeVjMUEe1LI3R2yKJFw6/Bk8Vz68dnEHno
+   /ZuSnNbwF/sfTw3Xdml2zIoozL3eDZWkS/+d4CA0/cuuOcCDXqhCvtTxp
+   3CLqbySO+CjY0YoROleqHGgGokoCa+ZSFIuMOcdT9yBAWF30rK4lcuEzE
+   8kGtYsNRvn0I8Cyk1m2+51bK7HheqELgLT0c5rlskFu0uizOQsA0wWrtY
+   A==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10278"; a="241771802"
 X-IronPort-AV: E=Sophos;i="5.90,161,1643702400"; 
-   d="scan'208";a="241771793"
+   d="scan'208";a="241771802"
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2022 00:53:25 -0800
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2022 00:53:29 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.90,161,1643702400"; 
-   d="scan'208";a="537033497"
+   d="scan'208";a="537033514"
 Received: from ahunter-desktop.fi.intel.com ([10.237.72.92])
-  by orsmga007.jf.intel.com with ESMTP; 07 Mar 2022 00:53:21 -0800
+  by orsmga007.jf.intel.com with ESMTP; 07 Mar 2022 00:53:25 -0800
 From:   Adrian Hunter <adrian.hunter@intel.com>
 To:     Peter Zijlstra <peterz@infradead.org>
 Cc:     Alexander Shishkin <alexander.shishkin@linux.intel.com>,
@@ -49,9 +49,9 @@ Cc:     Alexander Shishkin <alexander.shishkin@linux.intel.com>,
         Mathieu Poirier <mathieu.poirier@linaro.org>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Leo Yan <leo.yan@linaro.org>
-Subject: [PATCH V3 02/10] perf/x86: Add support for TSC as a perf event clock
-Date:   Mon,  7 Mar 2022 10:53:04 +0200
-Message-Id: <20220307085312.1814506-3-adrian.hunter@intel.com>
+Subject: [PATCH V3 03/10] perf/x86: Add support for TSC in nanoseconds as a perf event clock
+Date:   Mon,  7 Mar 2022 10:53:05 +0200
+Message-Id: <20220307085312.1814506-4-adrian.hunter@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220307085312.1814506-1-adrian.hunter@intel.com>
 References: <20220307085312.1814506-1-adrian.hunter@intel.com>
@@ -68,120 +68,152 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Currently, using Intel PT to trace a VM guest is limited to kernel space
-because decoding requires side band events such as MMAP and CONTEXT_SWITCH.
-While these events can be collected for the host, there is not a way to do
-that yet for a guest. One approach, would be to collect them inside the
-guest, but that would require being able to synchronize with host
-timestamps.
+Currently, when Intel PT is used within a VM guest, it is not possible to
+make use of TSC because perf clock is subject to paravirtualization.
 
-The motivation for this patch is to provide a clock that can be used within
-a VM guest, and that correlates to a VM host clock. In the case of TSC, if
-the hypervisor leaves rdtsc alone, the TSC value will be subject only to
-the VMCS TSC Offset and Scaling. Adjusting for that would make it possible
-to inject events from a guest perf.data file, into a host perf.data file.
+If the hypervisor leaves rdtsc alone, the TSC value will be subject only to
+the VMCS TSC Offset and Scaling, the same as the TSC packet from Intel PT.
+The new clock is based on rdtsc and not subject to paravirtualization.
 
-Thus making possible the collection of VM guest side band for Intel PT
-decoding.
-
-There are other potential benefits of TSC as a perf event clock:
-	- ability to work directly with TSC
-	- ability to inject non-Intel-PT-related events from a guest
+Hence it would be possible to use this new clock for Intel PT decoding
+within a VM guest.
 
 Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 ---
- arch/x86/events/core.c            | 14 ++++++++++++++
- arch/x86/include/asm/perf_event.h |  3 +++
- include/uapi/linux/time.h         | 11 +++++++++++
- kernel/events/core.c              |  7 +++++++
- 4 files changed, 35 insertions(+)
+ arch/x86/events/core.c            | 39 ++++++++++++++++++++-----------
+ arch/x86/include/asm/perf_event.h |  2 ++
+ include/uapi/linux/time.h         |  6 +++++
+ kernel/events/core.c              |  6 +++++
+ 4 files changed, 40 insertions(+), 13 deletions(-)
 
 diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
-index e686c5e0537b..e2ad3f9cca93 100644
+index e2ad3f9cca93..bd3781fe5faa 100644
 --- a/arch/x86/events/core.c
 +++ b/arch/x86/events/core.c
-@@ -2728,6 +2728,15 @@ void arch_perf_update_userpage(struct perf_event *event,
+@@ -41,6 +41,7 @@
+ #include <asm/desc.h>
+ #include <asm/ldt.h>
+ #include <asm/unwind.h>
++#include <asm/tsc.h>
+ 
+ #include "perf_event.h"
+ 
+@@ -2728,16 +2729,26 @@ void arch_perf_update_userpage(struct perf_event *event,
  		!!(event->hw.flags & PERF_EVENT_FLAG_USER_READ_CNT);
  	userpg->pmc_width = x86_pmu.cntval_bits;
  
-+	if (event->attr.use_clockid && event->attr.clockid == CLOCK_PERF_HW_CLOCK) {
-+		userpg->cap_user_time_zero = 1;
-+		userpg->time_mult = 1;
-+		userpg->time_shift = 0;
-+		userpg->time_offset = 0;
-+		userpg->time_zero = 0;
-+		return;
+-	if (event->attr.use_clockid && event->attr.clockid == CLOCK_PERF_HW_CLOCK) {
+-		userpg->cap_user_time_zero = 1;
+-		userpg->time_mult = 1;
+-		userpg->time_shift = 0;
+-		userpg->time_offset = 0;
+-		userpg->time_zero = 0;
+-		return;
++	if (event->attr.use_clockid) {
++		if (event->attr.clockid == CLOCK_PERF_HW_CLOCK) {
++			userpg->cap_user_time_zero = 1;
++			userpg->time_mult = 1;
++			userpg->time_shift = 0;
++			userpg->time_offset = 0;
++			userpg->time_zero = 0;
++			return;
++		}
++		if (event->attr.clockid == CLOCK_PERF_HW_CLOCK_NS)
++			userpg->cap_user_time_zero = 1;
 +	}
 +
- 	if (!using_native_sched_clock() || !sched_clock_stable())
++	if (using_native_sched_clock() && sched_clock_stable()) {
++		userpg->cap_user_time = 1;
++		if (!event->attr.use_clockid)
++			userpg->cap_user_time_zero = 1;
+ 	}
+ 
+-	if (!using_native_sched_clock() || !sched_clock_stable())
++	if (!userpg->cap_user_time && !userpg->cap_user_time_zero)
  		return;
  
-@@ -2980,6 +2989,11 @@ unsigned long perf_misc_flags(struct pt_regs *regs)
- 	return misc;
+ 	cyc2ns_read_begin(&data);
+@@ -2748,19 +2759,16 @@ void arch_perf_update_userpage(struct perf_event *event,
+ 	 * Internal timekeeping for enabled/running/stopped times
+ 	 * is always in the local_clock domain.
+ 	 */
+-	userpg->cap_user_time = 1;
+ 	userpg->time_mult = data.cyc2ns_mul;
+ 	userpg->time_shift = data.cyc2ns_shift;
+ 	userpg->time_offset = offset - now;
+ 
+ 	/*
+ 	 * cap_user_time_zero doesn't make sense when we're using a different
+-	 * time base for the records.
++	 * time base for the records, except for CLOCK_PERF_HW_CLOCK_NS.
+ 	 */
+-	if (!event->attr.use_clockid) {
+-		userpg->cap_user_time_zero = 1;
++	if (userpg->cap_user_time_zero)
+ 		userpg->time_zero = offset;
+-	}
+ 
+ 	cyc2ns_read_end();
+ }
+@@ -2994,6 +3002,11 @@ u64 perf_hw_clock(void)
+ 	return rdtsc_ordered();
  }
  
-+u64 perf_hw_clock(void)
++u64 perf_hw_clock_ns(void)
 +{
-+	return rdtsc_ordered();
++	return native_sched_clock_from_tsc(perf_hw_clock());
 +}
 +
  void perf_get_x86_pmu_capability(struct x86_pmu_capability *cap)
  {
  	cap->version		= x86_pmu.version;
 diff --git a/arch/x86/include/asm/perf_event.h b/arch/x86/include/asm/perf_event.h
-index 8fc1b5003713..3c75459bdeaf 100644
+index 3c75459bdeaf..b429b473401e 100644
 --- a/arch/x86/include/asm/perf_event.h
 +++ b/arch/x86/include/asm/perf_event.h
-@@ -451,6 +451,9 @@ extern unsigned long perf_instruction_pointer(struct pt_regs *regs);
- extern unsigned long perf_misc_flags(struct pt_regs *regs);
- #define perf_misc_flags(regs)	perf_misc_flags(regs)
+@@ -453,6 +453,8 @@ extern unsigned long perf_misc_flags(struct pt_regs *regs);
  
-+extern u64 perf_hw_clock(void);
-+#define perf_hw_clock		perf_hw_clock
-+
+ extern u64 perf_hw_clock(void);
+ #define perf_hw_clock		perf_hw_clock
++extern u64 perf_hw_clock_ns(void);
++#define perf_hw_clock_ns	perf_hw_clock_ns
+ 
  #include <asm/stacktrace.h>
  
- /*
 diff --git a/include/uapi/linux/time.h b/include/uapi/linux/time.h
-index 4f4b6e48e01c..95602420122e 100644
+index 95602420122e..d527c42719f7 100644
 --- a/include/uapi/linux/time.h
 +++ b/include/uapi/linux/time.h
-@@ -67,6 +67,17 @@ struct timezone {
- #define CLOCKS_MASK			(CLOCK_REALTIME | CLOCK_MONOTONIC)
- #define CLOCKS_MONO			CLOCK_MONOTONIC
- 
+@@ -77,6 +77,12 @@ struct timezone {
+  * paravirtualized. Note the warning above can also apply to TSC.
+  */
+ #define CLOCK_PERF_HW_CLOCK		0x10000000
 +/*
-+ * If supported, clockid value for use in struct perf_event_attr to select an
-+ * architecture dependent hardware clock. Note this means the unit of time is
-+ * ticks not nanoseconds. WARNING: This clock may not be stable or well-behaved
-+ * in any way, including varying across different CPUs.
-+ *
-+ * On x86, this is provided by the rdtsc instruction, and is not
-+ * paravirtualized. Note the warning above can also apply to TSC.
++ * Same as CLOCK_PERF_HW_CLOCK but in nanoseconds. Note support of
++ * CLOCK_PERF_HW_CLOCK_NS does not necesssarily imply support of
++ * CLOCK_PERF_HW_CLOCK or vice versa.
 + */
-+#define CLOCK_PERF_HW_CLOCK		0x10000000
-+
++#define CLOCK_PERF_HW_CLOCK_NS		0x10000001
+ 
  /*
   * The various flags for setting POSIX.1b interval timers:
-  */
 diff --git a/kernel/events/core.c b/kernel/events/core.c
-index 6859229497b1..e2f06384de50 100644
+index e2f06384de50..284a44b385cf 100644
 --- a/kernel/events/core.c
 +++ b/kernel/events/core.c
-@@ -12034,6 +12034,13 @@ static int perf_event_set_clock(struct perf_event *event, clockid_t clk_id)
- 		event->clock = &ktime_get_clocktai_ns;
+@@ -12040,6 +12040,12 @@ static int perf_event_set_clock(struct perf_event *event, clockid_t clk_id)
+ 		nmi_safe = true;
  		break;
- 
-+#ifdef perf_hw_clock
-+	case CLOCK_PERF_HW_CLOCK:
-+		event->clock = &perf_hw_clock;
+ #endif
++#ifdef perf_hw_clock_ns
++	case CLOCK_PERF_HW_CLOCK_NS:
++		event->clock = &perf_hw_clock_ns;
 +		nmi_safe = true;
 +		break;
 +#endif
-+
+ 
  	default:
  		return -EINVAL;
- 	}
 -- 
 2.25.1
 
