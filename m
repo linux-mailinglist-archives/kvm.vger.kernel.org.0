@@ -2,123 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AC53D4D0759
-	for <lists+kvm@lfdr.de>; Mon,  7 Mar 2022 20:11:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 20BE84D0774
+	for <lists+kvm@lfdr.de>; Mon,  7 Mar 2022 20:18:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244993AbiCGTMv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Mar 2022 14:12:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33868 "EHLO
+        id S232515AbiCGTTA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Mar 2022 14:19:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244997AbiCGTMs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Mar 2022 14:12:48 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 46EDA5A0AD
-        for <kvm@vger.kernel.org>; Mon,  7 Mar 2022 11:11:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646680312;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=xbJb2hnF7RB31QQPcCB0cHRYiPJl+mMbTgOzYpqEqG4=;
-        b=Da4CB8bRlXGl+LZPvbSfqK/dCGDb2pL3YmLhwe86H3Tk2zXgeG5ID+1JpR2mYbYjdtaEwi
-        QYPu1b3PQD6RyFpURCAYuTxwv3CtJG+PiDQV2sBpu6LI4H4P1UxgrYv5X2b16kknd72dDi
-        f4SDcBpj5ec4ZSTa1W6hPleTsvhFF7U=
-Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com
- [209.85.167.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-383-lWBbjouPOAuoOpDipuJPag-1; Mon, 07 Mar 2022 14:11:51 -0500
-X-MC-Unique: lWBbjouPOAuoOpDipuJPag-1
-Received: by mail-oi1-f198.google.com with SMTP id k11-20020a54470b000000b002d538f56e6bso10213533oik.22
-        for <kvm@vger.kernel.org>; Mon, 07 Mar 2022 11:11:50 -0800 (PST)
+        with ESMTP id S235029AbiCGTS7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Mar 2022 14:18:59 -0500
+Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08C0BFD3A
+        for <kvm@vger.kernel.org>; Mon,  7 Mar 2022 11:18:00 -0800 (PST)
+Received: by mail-wm1-x32d.google.com with SMTP id 19so9558152wmy.3
+        for <kvm@vger.kernel.org>; Mon, 07 Mar 2022 11:17:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=dbqVSaoeE145ys9uRLEZZR3pFJY2Pmc5WG68rQTUDjk=;
+        b=k5NesdgsXTht6dMH9Zs1gYWtYMsdq2oaoUryBtRQ299vTq+wKnD4nno1egKbIrBVvt
+         u37JkSvL43u/gPcfLHEvrdES3On3K8okyZKtK5x2IaGkdK0XOr7WB7zQ9Zcbj6CmcmdK
+         9Q6QJ9Hpjk2XNo/+94qYcfJQzracg57M/trJW6e8B5gjvzvUh4ypNZwjQtF4ZxhHttPH
+         RY9eQVjhbBd/2+kGoSzknYgZXbhAs5GglyD9L3X75TZDWmEoUhXsoTT0NkLyTmW4h/na
+         S9CvMWfORnMzpWyVUpT8XabV69cJNTthtxd3VRYBNCWPUjkEEJsNFDT0CozCWgfN8F7p
+         NcRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=xbJb2hnF7RB31QQPcCB0cHRYiPJl+mMbTgOzYpqEqG4=;
-        b=JcWhpwLKtyE1zffCN4FP16ne+Oh1KRAOUM03AYOvPumrDAksyzCyYd7XFin/a4nIRW
-         wUj5y+jyBkbry+En79cBuNpgsHzxoq/tHK8oeGq+H9Y2vOTzxoreWlDohe+Xj23Q6DMQ
-         I8SWnth3IRaBGWOQ7n/WuE56LSG8/3r59aZhCRmuoQvzdGWhMvTuVoKOEzsVa/rhbmcv
-         L8Ii+QGg9yPXmaohT04YGeN5aBUIhSzKDmO7Z3Rk6cwh1Z8ttwNCQa6YLaTEQ8A1Vle4
-         A+nys6vYgFxJioCTrhA8YxDL2X7zlDbZBcD7qqSKCQSltgQindu+Kg39F89RG1oY7Zsv
-         6aag==
-X-Gm-Message-State: AOAM530GKBvp+JSyQjYNNEpGXLzj7At8fD21uZA7KD4g5Y2De9bfkN2v
-        819V4BGEMlFaHxfdrEkyPK3KC8N9wIDZAEvzyFJL0hAIn8EyJ7Urz+eVtb3SlfKZTo+7VUa79ms
-        MEK8uB7iEtxAB
-X-Received: by 2002:a9d:6e04:0:b0:5af:6426:6d39 with SMTP id e4-20020a9d6e04000000b005af64266d39mr6603706otr.75.1646680309249;
-        Mon, 07 Mar 2022 11:11:49 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyrESkXA1V/9qY/xyUZhdUFyJNgxWEtqLu7JVFsEUrY4QNKlYbaQPLHPF8qRRFz3N5uWmV5CA==
-X-Received: by 2002:a9d:6e04:0:b0:5af:6426:6d39 with SMTP id e4-20020a9d6e04000000b005af64266d39mr6603689otr.75.1646680309017;
-        Mon, 07 Mar 2022 11:11:49 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id o2-20020a05687072c200b000d9ae3e1fabsm5888678oak.12.2022.03.07.11.11.48
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=dbqVSaoeE145ys9uRLEZZR3pFJY2Pmc5WG68rQTUDjk=;
+        b=XRLNa3gpLDT7l5H9jYRparNtut3Yb9pptiA4pV/LDynJOfG+pJ6gudmF1OaB3R0M/E
+         D9fxO5Ha4jUHKFvgkDiRHXKZiPpzoGE4fVN++pZT9LBRoegeMkkrq2ddsQfOq0Pgy3+8
+         QsV1mrKCgwkmv8jQgIg5cipI18tqN9KGqaYTkKLB3ct+mWU9ekL/FMEGaJx4dpPMYRsP
+         F9cfCmakJocQp2BGz3szaLzuPWchl7kDCz0iO9ZLUDZxEa13bCUxU4MsEP8sQPOeDJ7q
+         w3q86fB567tVsq2JZRIRxcbcuHIHHWhjsCxw1qTYp2QAF7bfwYIR1B9rg5xJ/9k9BSNU
+         jS4A==
+X-Gm-Message-State: AOAM532SZVql254u2DyveDyyAiVNhwabT4EAtpu4njoWXZVLqgNKEHVZ
+        T57FvvRevIn4RSJ+2YXHUirRRA==
+X-Google-Smtp-Source: ABdhPJzlJiMYAf08xQYWLIojU4uURtjWC9ZBAz30RgCGZ9HLvlLDJ9lUmbZ5j3Q/JntOftXy/SgAdQ==
+X-Received: by 2002:a05:600c:4615:b0:386:9f67:8c63 with SMTP id m21-20020a05600c461500b003869f678c63mr381658wmo.12.1646680678579;
+        Mon, 07 Mar 2022 11:17:58 -0800 (PST)
+Received: from joneslee.c.googlers.com.com (205.215.190.35.bc.googleusercontent.com. [35.190.215.205])
+        by smtp.gmail.com with ESMTPSA id p15-20020a05600c1d8f00b003899d50f01csm200741wms.6.2022.03.07.11.17.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Mar 2022 11:11:48 -0800 (PST)
-Date:   Mon, 7 Mar 2022 12:11:47 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Leon Romanovsky <leon@kernel.org>
-Cc:     Leon Romanovsky <leonro@nvidia.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        linux-pci@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH vfio-next] PCI/IOV: Fix wrong kernel-doc identifier
-Message-ID: <20220307121147.4a12f2a7.alex.williamson@redhat.com>
-In-Reply-To: <8cecf7df45948a256dc56148cf9e87b2f2bb4198.1646652504.git.leonro@nvidia.com>
-References: <8cecf7df45948a256dc56148cf9e87b2f2bb4198.1646652504.git.leonro@nvidia.com>
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        Mon, 07 Mar 2022 11:17:58 -0800 (PST)
+From:   Lee Jones <lee.jones@linaro.org>
+To:     lee.jones@linaro.org, mst@redhat.com, jasowang@redhat.com
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        stable@vger.kernel.org,
+        syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
+Subject: [PATCH 1/1] vhost: Protect the virtqueue from being cleared whilst still in use
+Date:   Mon,  7 Mar 2022 19:17:57 +0000
+Message-Id: <20220307191757.3177139-1-lee.jones@linaro.org>
+X-Mailer: git-send-email 2.35.1.616.g0bdcbb4464-goog
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon,  7 Mar 2022 13:33:25 +0200
-Leon Romanovsky <leon@kernel.org> wrote:
+vhost_vsock_handle_tx_kick() already holds the mutex during its call
+to vhost_get_vq_desc().  All we have to do here is take the same lock
+during virtqueue clean-up and we mitigate the reported issues.
 
-> From: Leon Romanovsky <leonro@nvidia.com>
-> 
-> Replace "-" to be ":" in comment section to be aligned with
-> kernel-doc format.
-> 
-> drivers/pci/iov.c:67: warning: Function parameter or member 'dev' not described in 'pci_iov_get_pf_drvdata'
-> drivers/pci/iov.c:67: warning: Function parameter or member 'pf_driver' not described in 'pci_iov_get_pf_drvdata'
-> 
-> Fixes: a7e9f240c0da ("PCI/IOV: Add pci_iov_get_pf_drvdata() to allow VF reaching the drvdata of a PF")
-> Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
-> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> ---
->  drivers/pci/iov.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/pci/iov.c b/drivers/pci/iov.c
-> index 28ec952e1221..952217572113 100644
-> --- a/drivers/pci/iov.c
-> +++ b/drivers/pci/iov.c
-> @@ -49,8 +49,8 @@ EXPORT_SYMBOL_GPL(pci_iov_vf_id);
->  
->  /**
->   * pci_iov_get_pf_drvdata - Return the drvdata of a PF
-> - * @dev - VF pci_dev
-> - * @pf_driver - Device driver required to own the PF
-> + * @dev: VF pci_dev
-> + * @pf_driver: Device driver required to own the PF
->   *
->   * This must be called from a context that ensures that a VF driver is attached.
->   * The value returned is invalid once the VF driver completes its remove()
+Also WARN() as a precautionary measure.  The purpose of this is to
+capture possible future race conditions which may pop up over time.
 
-Applied to vfio next branch for v5.18 with acks from Randy and Bjorn.
-Thanks,
+Link: https://syzkaller.appspot.com/bug?extid=279432d30d825e63ba00
 
-Alex
+Cc: <stable@vger.kernel.org>
+Reported-by: syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
+Signed-off-by: Lee Jones <lee.jones@linaro.org>
+---
+ drivers/vhost/vhost.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+index 59edb5a1ffe28..ef7e371e3e649 100644
+--- a/drivers/vhost/vhost.c
++++ b/drivers/vhost/vhost.c
+@@ -693,6 +693,15 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
+ 	int i;
+ 
+ 	for (i = 0; i < dev->nvqs; ++i) {
++		/* No workers should run here by design. However, races have
++		 * previously occurred where drivers have been unable to flush
++		 * all work properly prior to clean-up.  Without a successful
++		 * flush the guest will malfunction, but avoiding host memory
++		 * corruption in those cases does seem preferable.
++		 */
++		WARN_ON(mutex_is_locked(&dev->vqs[i]->mutex));
++
++		mutex_lock(&dev->vqs[i]->mutex);
+ 		if (dev->vqs[i]->error_ctx)
+ 			eventfd_ctx_put(dev->vqs[i]->error_ctx);
+ 		if (dev->vqs[i]->kick)
+@@ -700,6 +709,7 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
+ 		if (dev->vqs[i]->call_ctx.ctx)
+ 			eventfd_ctx_put(dev->vqs[i]->call_ctx.ctx);
+ 		vhost_vq_reset(dev, dev->vqs[i]);
++		mutex_unlock(&dev->vqs[i]->mutex);
+ 	}
+ 	vhost_dev_free_iovecs(dev);
+ 	if (dev->log_ctx)
+-- 
+2.35.1.616.g0bdcbb4464-goog
 
