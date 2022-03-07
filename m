@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EFFC84CF40D
-	for <lists+kvm@lfdr.de>; Mon,  7 Mar 2022 09:53:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 202144CF40E
+	for <lists+kvm@lfdr.de>; Mon,  7 Mar 2022 09:54:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236221AbiCGIyh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Mar 2022 03:54:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39956 "EHLO
+        id S235443AbiCGIyv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Mar 2022 03:54:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40436 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236227AbiCGIyc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Mar 2022 03:54:32 -0500
+        with ESMTP id S236237AbiCGIyk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Mar 2022 03:54:40 -0500
 Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49FD91A39C;
-        Mon,  7 Mar 2022 00:53:38 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1068A1AF20;
+        Mon,  7 Mar 2022 00:53:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1646643218; x=1678179218;
+  t=1646643224; x=1678179224;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=NJf6gmZBiPlpFezwWwQIi57qinvlgQu7aMtORWhAzg4=;
-  b=eqOSdDsjlqsZCMheXKKEcjMXsEPWse8Rd7cUqeM3x27L1a8xYD1Gwvpw
-   T4rCkH99knyiY+0VuyKMDfGIVWxwimSMf6NSgLMVl0ySicc+Uxqt/+MqQ
-   /fNNcVEYQTxzx/De9U874utzfvRrpGrXypSzou4EZUcPK/itBIjg7bNQs
-   RnVVYwVTIShlATWXiyuuqe4P/0eMo+nDScRHoKfwx3zcyjOLHzOWAkqbe
-   aneqjKjU6/xw7SW41FXxJx1GTAnKnmiRkDqYdpVxzhwcy9wVCIyZYL6yZ
-   pk97sEBllLPyAAJ/l2adNfHmuz+reD+eNekcX07wptbpByRPMC9ukz2a7
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10278"; a="241771839"
+  bh=igIfzl614SJVVpOc/yOTouOngTlxdEUS35ptrQqkkbo=;
+  b=diMuQybr8uaLWWhTqCE+p6W3eg0IU95bszFbqFYTX8sRauKYTly6IHlQ
+   kPXx+kpHIe26IAP3fOwHXG2hbX3rhV4IJUMvymEsedeECh2HiH1jukYMy
+   bkycV0ZNQQsQD33rHQpSDesT222mNSk/VQK1RcKIlPGLfAgOxtVvk3xK3
+   fKHuJhHNNlJ4jSn2i/4WqatuQtLhIgYuNhn+yxnhL0qyhEJ1LK4uCZcs0
+   zcVfIgSfuiUjk8VVWmYgOPfdrrO6wxeCRJXpabJtF2uCoOMi4SRoZ4JE2
+   jQ3T7/JWwYrgY/xJrXRl3JPtwDAUdRtwfyt5zDHWZkJDDStTuNYCH+ULF
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10278"; a="241771854"
 X-IronPort-AV: E=Sophos;i="5.90,161,1643702400"; 
-   d="scan'208";a="241771839"
+   d="scan'208";a="241771854"
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2022 00:53:38 -0800
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2022 00:53:42 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.90,161,1643702400"; 
-   d="scan'208";a="537033546"
+   d="scan'208";a="537033567"
 Received: from ahunter-desktop.fi.intel.com ([10.237.72.92])
-  by orsmga007.jf.intel.com with ESMTP; 07 Mar 2022 00:53:33 -0800
+  by orsmga007.jf.intel.com with ESMTP; 07 Mar 2022 00:53:38 -0800
 From:   Adrian Hunter <adrian.hunter@intel.com>
 To:     Peter Zijlstra <peterz@infradead.org>
 Cc:     Alexander Shishkin <alexander.shishkin@linux.intel.com>,
@@ -49,9 +49,9 @@ Cc:     Alexander Shishkin <alexander.shishkin@linux.intel.com>,
         Mathieu Poirier <mathieu.poirier@linaro.org>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Leo Yan <leo.yan@linaro.org>
-Subject: [PATCH V3 05/10] perf tools: Add API probes for new clock IDs
-Date:   Mon,  7 Mar 2022 10:53:07 +0200
-Message-Id: <20220307085312.1814506-6-adrian.hunter@intel.com>
+Subject: [PATCH V3 06/10] perf tools: Add new clock IDs to "perf time to TSC" test
+Date:   Mon,  7 Mar 2022 10:53:08 +0200
+Message-Id: <20220307085312.1814506-7-adrian.hunter@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220307085312.1814506-1-adrian.hunter@intel.com>
 References: <20220307085312.1814506-1-adrian.hunter@intel.com>
@@ -68,73 +68,86 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add ability to check whether the kernel supports new clock IDs
+The same "Convert perf time to TSC" test can be used with new clock IDs
 CLOCK_PERF_HW_CLOCK and CLOCK_PERF_HW_CLOCK_NS.
-They will be used in a subsequent patch.
 
 Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 ---
- tools/perf/util/perf_api_probe.c | 23 +++++++++++++++++++++++
- tools/perf/util/perf_api_probe.h |  2 ++
- 2 files changed, 25 insertions(+)
+ tools/perf/tests/perf-time-to-tsc.c | 42 ++++++++++++++++++++++-------
+ 1 file changed, 33 insertions(+), 9 deletions(-)
 
-diff --git a/tools/perf/util/perf_api_probe.c b/tools/perf/util/perf_api_probe.c
-index c28dd50bd571..e3004791d45c 100644
---- a/tools/perf/util/perf_api_probe.c
-+++ b/tools/perf/util/perf_api_probe.c
-@@ -5,6 +5,7 @@
- #include "util/evlist.h"
- #include "util/evsel.h"
- #include "util/parse-events.h"
-+#include "util/clockid.h"
- #include "util/perf_api_probe.h"
- #include <perf/cpumap.h>
- #include <errno.h>
-@@ -109,6 +110,18 @@ static void perf_probe_cgroup(struct evsel *evsel)
- 	evsel->core.attr.cgroup = 1;
+diff --git a/tools/perf/tests/perf-time-to-tsc.c b/tools/perf/tests/perf-time-to-tsc.c
+index d12d0ad81801..62840ec98cea 100644
+--- a/tools/perf/tests/perf-time-to-tsc.c
++++ b/tools/perf/tests/perf-time-to-tsc.c
+@@ -22,6 +22,8 @@
+ #include "tests.h"
+ #include "pmu.h"
+ #include "pmu-hybrid.h"
++#include "clockid.h"
++#include "perf_api_probe.h"
+ 
+ /*
+  * Except x86_64/i386 and Arm64, other archs don't support TSC in perf.  Just
+@@ -47,15 +49,7 @@
+ 	}					\
  }
  
-+static void perf_probe_hw_clock(struct evsel *evsel)
-+{
-+	evsel->core.attr.use_clockid = 1;
-+	evsel->core.attr.clockid = CLOCK_PERF_HW_CLOCK;
-+}
-+
-+static void perf_probe_hw_clock_ns(struct evsel *evsel)
-+{
-+	evsel->core.attr.use_clockid = 1;
-+	evsel->core.attr.clockid = CLOCK_PERF_HW_CLOCK_NS;
-+}
-+
- bool perf_can_sample_identifier(void)
+-/**
+- * test__perf_time_to_tsc - test converting perf time to TSC.
+- *
+- * This function implements a test that checks that the conversion of perf time
+- * to and from TSC is consistent with the order of events.  If the test passes
+- * %0 is returned, otherwise %-1 is returned.  If TSC conversion is not
+- * supported then then the test passes but " (not supported)" is printed.
+- */
+-static int test__perf_time_to_tsc(struct test_suite *test __maybe_unused, int subtest __maybe_unused)
++static int perf_time_to_tsc_test(bool use_clockid, s32 clockid)
  {
- 	return perf_probe_api(perf_probe_sample_identifier);
-@@ -195,3 +208,13 @@ bool perf_can_record_cgroup(void)
- {
- 	return perf_probe_api(perf_probe_cgroup);
- }
-+
-+bool perf_can_perf_clock_hw_clock(void)
-+{
-+	return perf_probe_api(perf_probe_hw_clock);
-+}
-+
-+bool perf_can_perf_clock_hw_clock_ns(void)
-+{
-+	return perf_probe_api(perf_probe_hw_clock_ns);
-+}
-diff --git a/tools/perf/util/perf_api_probe.h b/tools/perf/util/perf_api_probe.h
-index b104168efb15..5b30cbd260cf 100644
---- a/tools/perf/util/perf_api_probe.h
-+++ b/tools/perf/util/perf_api_probe.h
-@@ -13,5 +13,7 @@ bool perf_can_record_text_poke_events(void);
- bool perf_can_sample_identifier(void);
- bool perf_can_record_build_id(void);
- bool perf_can_record_cgroup(void);
-+bool perf_can_perf_clock_hw_clock(void);
-+bool perf_can_perf_clock_hw_clock_ns(void);
+ 	struct record_opts opts = {
+ 		.mmap_pages	     = UINT_MAX,
+@@ -104,6 +98,8 @@ static int test__perf_time_to_tsc(struct test_suite *test __maybe_unused, int su
+ 	evsel->core.attr.comm = 1;
+ 	evsel->core.attr.disabled = 1;
+ 	evsel->core.attr.enable_on_exec = 0;
++	evsel->core.attr.use_clockid = use_clockid;
++	evsel->core.attr.clockid = clockid;
  
- #endif // __PERF_API_PROBE_H
+ 	/*
+ 	 * For hybrid "cycles:u", it creates two events.
+@@ -200,4 +196,32 @@ static int test__perf_time_to_tsc(struct test_suite *test __maybe_unused, int su
+ 	return err;
+ }
+ 
++/**
++ * test__perf_time_to_tsc - test converting perf time to TSC.
++ *
++ * This function implements a test that checks that the conversion of perf time
++ * to and from TSC is consistent with the order of events.  If the test passes
++ * %0 is returned, otherwise %-1 is returned.  If TSC conversion is not
++ * supported then the test passes but " (not supported)" is printed.
++ */
++static int test__perf_time_to_tsc(struct test_suite *test __maybe_unused,
++				  int subtest __maybe_unused)
++{
++	int err;
++
++	err = perf_time_to_tsc_test(false, 0);
++
++	if (!err && perf_can_perf_clock_hw_clock()) {
++		pr_debug("Testing CLOCK_PERF_HW_CLOCK\n");
++		err = perf_time_to_tsc_test(true, CLOCK_PERF_HW_CLOCK);
++	}
++
++	if (!err && perf_can_perf_clock_hw_clock_ns()) {
++		pr_debug("Testing CLOCK_PERF_HW_CLOCK_NS\n");
++		err = perf_time_to_tsc_test(true, CLOCK_PERF_HW_CLOCK_NS);
++	}
++
++	return err;
++}
++
+ DEFINE_SUITE("Convert perf time to TSC", perf_time_to_tsc);
 -- 
 2.25.1
 
