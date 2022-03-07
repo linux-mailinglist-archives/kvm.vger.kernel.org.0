@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A531F4CF402
-	for <lists+kvm@lfdr.de>; Mon,  7 Mar 2022 09:53:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 787924CF404
+	for <lists+kvm@lfdr.de>; Mon,  7 Mar 2022 09:53:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233375AbiCGIyM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Mar 2022 03:54:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38170 "EHLO
+        id S234001AbiCGIyQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Mar 2022 03:54:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38524 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229944AbiCGIyL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Mar 2022 03:54:11 -0500
+        with ESMTP id S233903AbiCGIyP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Mar 2022 03:54:15 -0500
 Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1268113DCB;
-        Mon,  7 Mar 2022 00:53:17 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38E6817E3E;
+        Mon,  7 Mar 2022 00:53:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1646643197; x=1678179197;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=J+6WHG/tzTC40q/wmvLqhi9qDMnhu0k9aa676Xc8LRg=;
-  b=GK8i3prt9MZJjr5WDUGwNI1xoCqzp8nn/K6UT2PBXwCQeqeOMLeCaeHe
-   DOKYWOzzMKpgfI8ufF8frK+mUGjOt21z1ScMGq+2XQFvFXN36P8gJuxIR
-   1SJjZO2Cs2In/Yy02KAL9jUeQK3E7smWZBVXuwD++QrFGNPi1Huiw1Lzt
-   a26hrk649WmgfJvhcquyxAdhtAzLsG3+23IAtlnAwx//wApk+6MtdzU2+
-   Rm7QOtjcAdN0AKl9ZS178B42uvKqh5FTTDMrNSraqQFCKESgREFI3zUd1
-   2XROZeRmpB5iK8i8n3AkqZvqjRVkBJk39Uo1QhzAyGlyAtbmySl+XNLcC
-   g==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10278"; a="241771761"
+  t=1646643201; x=1678179201;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=NlMzKT33h6Q6qqc7z4CyhD39p7yWH93N/HDO0fmlpcU=;
+  b=B88QsVAbzPv7IhwKbPHn3PQbq+M5H0fJiV6f8h6G8RRw1dulhqgzpArr
+   Cp2Bs/6GLd5x0+7AefmmWPHFUZLwVON3vNqLwc99WPDKGqw4kxzaDNHdv
+   1LpIZty7/aFUjRuhBqhZ4WCaXHesZ8ukzzNqb6Atl5+cdQzgMWVH9e7bw
+   MQog/UJ553gt3bIJTb/c4TOUhh6TokmK6EADHhlJLAshyJG0C6fQuYLFE
+   NASOQrH9+RnPoobt/Ng4eY08R1/mJpdsA/g5+ENZ6emeKCYokGU3HaTBr
+   JR2Ggvh4IOoTKdRjvFiPRxrBXfp2mHbXLjeALqrjcqwX5fMXna1RRGe9j
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10278"; a="241771776"
 X-IronPort-AV: E=Sophos;i="5.90,161,1643702400"; 
-   d="scan'208";a="241771761"
+   d="scan'208";a="241771776"
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2022 00:53:16 -0800
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2022 00:53:20 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.90,161,1643702400"; 
-   d="scan'208";a="537033472"
+   d="scan'208";a="537033482"
 Received: from ahunter-desktop.fi.intel.com ([10.237.72.92])
-  by orsmga007.jf.intel.com with ESMTP; 07 Mar 2022 00:53:12 -0800
+  by orsmga007.jf.intel.com with ESMTP; 07 Mar 2022 00:53:16 -0800
 From:   Adrian Hunter <adrian.hunter@intel.com>
 To:     Peter Zijlstra <peterz@infradead.org>
 Cc:     Alexander Shishkin <alexander.shishkin@linux.intel.com>,
@@ -49,10 +49,12 @@ Cc:     Alexander Shishkin <alexander.shishkin@linux.intel.com>,
         Mathieu Poirier <mathieu.poirier@linaro.org>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Leo Yan <leo.yan@linaro.org>
-Subject: [PATCH V3 00/10] perf intel-pt: Add perf event clocks to better support VM tracing
-Date:   Mon,  7 Mar 2022 10:53:02 +0200
-Message-Id: <20220307085312.1814506-1-adrian.hunter@intel.com>
+Subject: [PATCH V3 01/10] perf/x86: Fix native_perf_sched_clock_from_tsc() with __sched_clock_offset
+Date:   Mon,  7 Mar 2022 10:53:03 +0200
+Message-Id: <20220307085312.1814506-2-adrian.hunter@intel.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20220307085312.1814506-1-adrian.hunter@intel.com>
+References: <20220307085312.1814506-1-adrian.hunter@intel.com>
 MIME-Version: 1.0
 Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki, Business Identity Code: 0357606 - 4, Domiciled in Helsinki
 Content-Transfer-Encoding: 8bit
@@ -66,98 +68,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi
+native_perf_sched_clock_from_tsc() is used to produce a time value that can
+be consistent with perf_clock().  Consequently, it should be adjusted by
+__sched_clock_offset, the same as perf_clock() would be.
 
-Here is V3.
+Fixes: 698eff6355f735 ("sched/clock, x86/perf: Fix perf test tsc")
+Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+---
+ arch/x86/kernel/tsc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-These patches add 2 new perf event clocks based on TSC for use with VMs.
+diff --git a/arch/x86/kernel/tsc.c b/arch/x86/kernel/tsc.c
+index a698196377be..d9fe277c2471 100644
+--- a/arch/x86/kernel/tsc.c
++++ b/arch/x86/kernel/tsc.c
+@@ -242,7 +242,7 @@ u64 native_sched_clock(void)
+  */
+ u64 native_sched_clock_from_tsc(u64 tsc)
+ {
+-	return cycles_2_ns(tsc);
++	return cycles_2_ns(tsc) + __sched_clock_offset;
+ }
+ 
+ /* We need to define a real function for sched_clock, to override the
+-- 
+2.25.1
 
-The first patch is a minor fix, the next 2 patches add each of the 2 new
-clocks.  The remaining patches add minimal tools support and are based on
-top of the Intel PT Event Trace tools' patches.
-
-The future work, to add the ability to use perf inject to inject perf
-events from a VM guest perf.data file into a VM host perf.data file,
-has yet to be implemented.
-
-
-Changes in V3:
-
-      perf/x86: Add support for TSC as a perf event clock
-      perf/x86: Add support for TSC in nanoseconds as a perf event clock
-	Drop magic flag for non-standard clock ids
-	Move new clockids into clock.h
-	Adjust comments to warn about new clocks
-
-      perf tools: Add new perf clock IDs
-      perf tools: Add API probes for new clock IDs
-      perf tools: Add new clock IDs to "perf time to TSC" test
-      perf tools: Add perf_read_tsc_conv_for_clockid()
-      perf intel-pt: Add support for new clock IDs
-      perf intel-pt: Add config variables for timing parameters
-      perf intel-pt: Add documentation for new clock IDs
-	Drop magic flag for non-standard clock ids
-	Adjust documentation to warn about new clocks
-
-      perf intel-pt: Use CLOCK_PERF_HW_CLOCK_NS by default
-	Dropped patch
-
-
-Changes in V2:
-      perf/x86: Fix native_perf_sched_clock_from_tsc() with __sched_clock_offset
-	  Add __sched_clock_offset unconditionally
-
-      perf/x86: Add support for TSC as a perf event clock
-	  Use an attribute bit 'ns_clockid' to identify non-standard clockids
-
-      perf/x86: Add support for TSC in nanoseconds as a perf event clock
-	  Do not affect use of __sched_clock_offset
-	  Adjust to use 'ns_clockid'
-
-      perf tools: Add new perf clock IDs
-      perf tools: Add API probes for new clock IDs
-      perf tools: Add new clock IDs to "perf time to TSC" test
-      perf tools: Add perf_read_tsc_conv_for_clockid()
-      perf intel-pt: Add support for new clock IDs
-      perf intel-pt: Use CLOCK_PERF_HW_CLOCK_NS by default
-      perf intel-pt: Add config variables for timing parameters
-      perf intel-pt: Add documentation for new clock IDs
-	  Adjust to use 'ns_clockid'
-
-
-Adrian Hunter (10):
-      perf/x86: Fix native_perf_sched_clock_from_tsc() with __sched_clock_offset
-      perf/x86: Add support for TSC as a perf event clock
-      perf/x86: Add support for TSC in nanoseconds as a perf event clock
-      perf tools: Add new perf clock IDs
-      perf tools: Add API probes for new clock IDs
-      perf tools: Add new clock IDs to "perf time to TSC" test
-      perf tools: Add perf_read_tsc_conv_for_clockid()
-      perf intel-pt: Add support for new clock IDs
-      perf intel-pt: Add config variables for timing parameters
-      perf intel-pt: Add documentation for new clock IDs
-
- arch/x86/events/core.c                     | 39 +++++++++++--
- arch/x86/include/asm/perf_event.h          |  5 ++
- arch/x86/kernel/tsc.c                      |  2 +-
- include/uapi/linux/time.h                  | 17 ++++++
- kernel/events/core.c                       | 13 +++++
- tools/perf/Documentation/perf-config.txt   | 18 ++++++
- tools/perf/Documentation/perf-intel-pt.txt | 45 +++++++++++++++
- tools/perf/Documentation/perf-record.txt   | 11 +++-
- tools/perf/arch/x86/util/intel-pt.c        | 89 ++++++++++++++++++++++++++++--
- tools/perf/builtin-record.c                |  2 +-
- tools/perf/tests/perf-time-to-tsc.c        | 42 +++++++++++---
- tools/perf/util/clockid.c                  |  5 ++
- tools/perf/util/clockid.h                  |  8 +++
- tools/perf/util/intel-pt.c                 | 30 ++++++++--
- tools/perf/util/intel-pt.h                 |  7 ++-
- tools/perf/util/perf_api_probe.c           | 23 ++++++++
- tools/perf/util/perf_api_probe.h           |  2 +
- tools/perf/util/tsc.c                      | 56 +++++++++++++++++++
- tools/perf/util/tsc.h                      |  1 +
- 19 files changed, 387 insertions(+), 28 deletions(-)
-
-
-Regards
-Adrian
