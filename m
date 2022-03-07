@@ -2,100 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5961C4D019E
-	for <lists+kvm@lfdr.de>; Mon,  7 Mar 2022 15:42:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A2304D01A1
+	for <lists+kvm@lfdr.de>; Mon,  7 Mar 2022 15:43:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243333AbiCGOna (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Mar 2022 09:43:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50706 "EHLO
+        id S243341AbiCGOnv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Mar 2022 09:43:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239324AbiCGOn2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Mar 2022 09:43:28 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66D8A10FF;
-        Mon,  7 Mar 2022 06:42:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=dAZkd94tzcRdvRieKkWfcBkJvTkJnK9zBdITPJgPy6s=; b=mO9oSmUesbbSZM3vVK9HyTDYQq
-        cK133canotMxKAZ16MzaSlEApH4hnCI5CtCI6hsR7A6tEwzzsv4IUQX/bl6HD1kjRWY8887uvn+2T
-        6NUL7IIKV2it7/I+weTmFjEISS2i+GL1jllaCYFkdDROh+x3SM/j3u7m+tqv/+FnetomUX4A/TD5d
-        RZonGU9B6SYDqGlYKFlkw77GZX99AJNEzK3XSLH0Io9vhxjZ8fdzQtQuh9Zf2X+C0UPRfn1u5d6WU
-        xjS+BbZau/KIePTW8IudpNYy23HvK5oMyvndoV6Ov7JQBcwckuExbphCZQ6DwAiYLY67gF7wrnebe
-        NbU6hTmw==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nREYr-00FIlv-LY; Mon, 07 Mar 2022 14:42:09 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 462BC300169;
-        Mon,  7 Mar 2022 15:42:07 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 30A5B203C59BB; Mon,  7 Mar 2022 15:42:07 +0100 (CET)
-Date:   Mon, 7 Mar 2022 15:42:07 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Adrian Hunter <adrian.hunter@intel.com>
-Cc:     Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Jiri Olsa <jolsa@redhat.com>, linux-kernel@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        kvm@vger.kernel.org, H Peter Anvin <hpa@zytor.com>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Leo Yan <leo.yan@linaro.org>, jgross@suse.com,
-        sdeep@vmware.com, pv-drivers@vmware.com, pbonzini@redhat.com,
-        seanjc@google.com, kys@microsoft.com, sthemmin@microsoft.com,
-        virtualization@lists.linux-foundation.org,
-        Andrew.Cooper3@citrix.com, christopher.s.hall@intel.com
-Subject: Re: [PATCH V2 03/11] perf/x86: Add support for TSC in nanoseconds as
- a perf event clock
-Message-ID: <YiYZv+LOmjzi5wcm@hirez.programming.kicks-ass.net>
-References: <20220214110914.268126-1-adrian.hunter@intel.com>
- <20220214110914.268126-4-adrian.hunter@intel.com>
- <YiIXFmA4vpcTSk2L@hirez.programming.kicks-ass.net>
- <853ce127-25f0-d0fe-1d8f-0b0dd4f3ce71@intel.com>
- <YiXVgEk/1UClkygX@hirez.programming.kicks-ass.net>
- <30383f92-59cb-2875-1e1b-ff1a0eacd235@intel.com>
+        with ESMTP id S243329AbiCGOnr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Mar 2022 09:43:47 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0278D5B88E;
+        Mon,  7 Mar 2022 06:42:48 -0800 (PST)
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 227DCUqN001030;
+        Mon, 7 Mar 2022 14:42:48 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=KxRlOd4S9TJiKMSDEIq3H0S9uTnSJZ0AQ6tWk+HRuQg=;
+ b=RxgylVfGxAiOK53fZ1Ansm8j0nAWQDP1MUHupVke+HUzmWw42muXF/3z6EYW71zNYrYf
+ R4eWGcpQsPQEUgAPGBm7DIZedr84z0imwKbK9CfNTzMcPDixQTYQjOaI7I78mRt0QKx+
+ 9NYScuoXvBeEK9udtqxP/IWc2G0n/tMdVZk3Af+T/2jh2iaz2JOtUUpTYsK86VN0NslI
+ ATZ7ojedOUZ1uRVK1/4B6Z+oVKdfQDRVbXvNMHXVljSC/r0+SwgoUkVI1v2VBaYAR/b5
+ e8N1a16rWGKmAOwKnd+5EnSu7HTy/a25sf1QUUgFjE2IwoXBHZiPn5MtUVgWGN6ocp2O FA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3enjqq9xhb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 07 Mar 2022 14:42:48 +0000
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 227ENaSO002070;
+        Mon, 7 Mar 2022 14:42:47 GMT
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3enjqq9xge-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 07 Mar 2022 14:42:47 +0000
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 227EbbcJ010166;
+        Mon, 7 Mar 2022 14:42:45 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma06fra.de.ibm.com with ESMTP id 3eky4j48qd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 07 Mar 2022 14:42:45 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 227EggZf43778444
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 7 Mar 2022 14:42:42 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4B7874203F;
+        Mon,  7 Mar 2022 14:42:42 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EF1AA42042;
+        Mon,  7 Mar 2022 14:42:41 +0000 (GMT)
+Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1.ibm.com (unknown [9.171.55.208])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon,  7 Mar 2022 14:42:41 +0000 (GMT)
+Message-ID: <4d7026348507cd51188f0fc6300e7052d99b3747.camel@linux.ibm.com>
+Subject: Re: [PATCH kvm-unit-tests v1 6/6] lib: s390x: smp: Convert
+ remaining smp_sigp to _retry
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     Janosch Frank <frankja@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Date:   Mon, 07 Mar 2022 15:42:41 +0100
+In-Reply-To: <1aa3b683-061d-465a-89fa-2c748719564d@linux.ibm.com>
+References: <20220303210425.1693486-1-farman@linux.ibm.com>
+         <20220303210425.1693486-7-farman@linux.ibm.com>
+         <1aa3b683-061d-465a-89fa-2c748719564d@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <30383f92-59cb-2875-1e1b-ff1a0eacd235@intel.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 91vCyD6j8ql7IIBG-3JU_uIAZv7wB64D
+X-Proofpoint-ORIG-GUID: ATELLaXIOAFLPoNJvQgyiymGPfOPA_-e
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-03-07_05,2022-03-04_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1015
+ mlxscore=0 mlxlogscore=999 impostorscore=0 malwarescore=0 suspectscore=0
+ lowpriorityscore=0 bulkscore=0 adultscore=0 priorityscore=1501
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2203070084
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 07, 2022 at 02:36:03PM +0200, Adrian Hunter wrote:
-
-> > diff --git a/arch/x86/kernel/paravirt.c b/arch/x86/kernel/paravirt.c
-> > index 4420499f7bb4..a1f179ed39bf 100644
-> > --- a/arch/x86/kernel/paravirt.c
-> > +++ b/arch/x86/kernel/paravirt.c
-> > @@ -145,6 +145,15 @@ DEFINE_STATIC_CALL(pv_sched_clock, native_sched_clock);
-> >  
-> >  void paravirt_set_sched_clock(u64 (*func)(void))
-> >  {
-> > +	/*
-> > +	 * Anything with ART on promises to have sane TSC, otherwise the whole
-> > +	 * ART thing is useless. In order to make ART useful for guests, we
-> > +	 * should continue to use the TSC. As such, ignore any paravirt
-> > +	 * muckery.
-> > +	 */
-> > +	if (cpu_feature_enabled(X86_FEATURE_ART))
+On Fri, 2022-03-04 at 11:56 +0100, Janosch Frank wrote:
+> On 3/3/22 22:04, Eric Farman wrote:
+> > A SIGP SENSE is used to determine if a CPU is stopped or operating,
+> > and thus has a vested interest in ensuring it received a CC0 or
+> > CC1,
+> > instead of a CC2 (BUSY). But, any order could receive a CC2
+> > response,
+> > and is probably ill-equipped to respond to it.
 > 
-> Does not seem to work because the feature X86_FEATURE_ART does not seem to get set.
-> Possibly because detect_art() excludes anything running on a hypervisor.
+> sigp sense running status doesn't return a cc2, only sigp sense does
+> afaik.
+> Looking at the KVM implementation tells me that it's not doing more
+> than 
+> looking at the R bit in the sblk.
 
-Simple enough to delete that clause I suppose. Christopher, what is
-needed to make that go away? I suppose the guest needs to be aware of
-the active TSC scaling parameters to make it work ?
+From the POP I read _all_ orders may indeed return CC=2: case 1 under
+"Conditions precluding Interpretation of the Order Code".
+
+That being said, there are a few more users of smp_sigp (no retry) in
+smp.c (the test, not the lib). 
+
+Does it make sense to fix them aswell?
