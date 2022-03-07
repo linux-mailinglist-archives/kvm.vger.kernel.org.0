@@ -2,52 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 266624CFD05
-	for <lists+kvm@lfdr.de>; Mon,  7 Mar 2022 12:34:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3220A4CFD42
+	for <lists+kvm@lfdr.de>; Mon,  7 Mar 2022 12:45:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240623AbiCGLfD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Mar 2022 06:35:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58862 "EHLO
+        id S233825AbiCGLqk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Mar 2022 06:46:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242109AbiCGLe5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Mar 2022 06:34:57 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82D832B27C;
-        Mon,  7 Mar 2022 03:33:43 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 1F9F1B8111C;
-        Mon,  7 Mar 2022 11:33:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69A50C340F4;
-        Mon,  7 Mar 2022 11:33:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1646652820;
-        bh=oJjvQRlXDIORZ45BctpR1F4Q9zXJHSu07f6PG8R9taY=;
-        h=From:To:Cc:Subject:Date:From;
-        b=YL23wSNCGKMk5wn4HZrbDDSDjOVT1fPgNXsaQVR0vMwzO8H6gtd65SL8Wcb+5vuh/
-         E+py4FJwPp+KKw63KpETlZWT3RQu5fRTPV8xWS7rWqqPzgykq1KymBRx3amAZC2H7b
-         DMqXm7MdEcp9v8AXA/XJz3WdgRkENdEEuWNVLqiQ/zNMDx0PMJBB1rpkU0cIM89AR/
-         eCk0dcr6nDP2YBEr7uuIQAG4TKqHr/cquxz79GcbcmR6YmYroMmg4za5icivXxoJcP
-         Y0QWtjW3f42g1I5R5yv1FbfyKhOjwaS0VnGQvfLKKqdu9wqv0u0i4vEgUJytSMvWFM
-         rCAhTLh9gGqvQ==
-From:   Leon Romanovsky <leon@kernel.org>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Leon Romanovsky <leonro@nvidia.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        linux-pci@vger.kernel.org, kvm@vger.kernel.org
-Subject: [PATCH vfio-next] PCI/IOV: Fix wrong kernel-doc identifier
-Date:   Mon,  7 Mar 2022 13:33:25 +0200
-Message-Id: <8cecf7df45948a256dc56148cf9e87b2f2bb4198.1646652504.git.leonro@nvidia.com>
-X-Mailer: git-send-email 2.35.1
+        with ESMTP id S231160AbiCGLqj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Mar 2022 06:46:39 -0500
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2DD9665791
+        for <kvm@vger.kernel.org>; Mon,  7 Mar 2022 03:45:45 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 97E3C1042;
+        Mon,  7 Mar 2022 03:45:44 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6AF7A3F73D;
+        Mon,  7 Mar 2022 03:45:43 -0800 (PST)
+Date:   Mon, 7 Mar 2022 11:46:09 +0000
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Sebastian Ene <sebastianene@google.com>
+Cc:     kvm@vger.kernel.org, maz@kernel.org, will@kernel.org,
+        kvmarm@lists.cs.columbia.edu
+Subject: Re: [PATCH kvmtool v7 2/3] aarch64: Add stolen time support
+Message-ID: <YiXwgY/n4Y3W4XAi@monolith.localdoman>
+References: <20220302140734.1015958-1-sebastianene@google.com>
+ <20220302140734.1015958-3-sebastianene@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-7.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220302140734.1015958-3-sebastianene@google.com>
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -56,36 +42,133 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Leon Romanovsky <leonro@nvidia.com>
+Hi,
 
-Replace "-" to be ":" in comment section to be aligned with
-kernel-doc format.
+On Wed, Mar 02, 2022 at 02:07:35PM +0000, Sebastian Ene wrote:
+> This patch adds support for stolen time by sharing a memory region
+> with the guest which will be used by the hypervisor to store the stolen
+> time information. Reserve a 64kb MMIO memory region after the RTC peripheral
+> to be used by pvtime. The exact format of the structure stored by the
+> hypervisor is described in the ARM DEN0057A document.
+> 
+> Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> ---
+>  Makefile                               |   1 +
+>  arm/aarch64/arm-cpu.c                  |   2 +-
+>  arm/aarch64/include/kvm/kvm-cpu-arch.h |   1 +
+>  arm/aarch64/pvtime.c                   | 103 +++++++++++++++++++++++++
+>  arm/include/arm-common/kvm-arch.h      |   6 +-
+>  include/kvm/kvm-config.h               |   1 +
+>  6 files changed, 112 insertions(+), 2 deletions(-)
+>  create mode 100644 arm/aarch64/pvtime.c
+> 
+> diff --git a/Makefile b/Makefile
+> index f251147..e9121dc 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -182,6 +182,7 @@ ifeq ($(ARCH), arm64)
+>  	OBJS		+= arm/aarch64/arm-cpu.o
+>  	OBJS		+= arm/aarch64/kvm-cpu.o
+>  	OBJS		+= arm/aarch64/kvm.o
+> +	OBJS		+= arm/aarch64/pvtime.o
+>  	ARCH_INCLUDE	:= $(HDRS_ARM_COMMON)
+>  	ARCH_INCLUDE	+= -Iarm/aarch64/include
+>  
+> diff --git a/arm/aarch64/arm-cpu.c b/arm/aarch64/arm-cpu.c
+> index d7572b7..7e4a3c1 100644
+> --- a/arm/aarch64/arm-cpu.c
+> +++ b/arm/aarch64/arm-cpu.c
+> @@ -22,7 +22,7 @@ static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
+>  static int arm_cpu__vcpu_init(struct kvm_cpu *vcpu)
+>  {
+>  	vcpu->generate_fdt_nodes = generate_fdt_nodes;
+> -	return 0;
+> +	return kvm_cpu__setup_pvtime(vcpu);
+>  }
+>  
+>  static struct kvm_arm_target target_generic_v8 = {
+> diff --git a/arm/aarch64/include/kvm/kvm-cpu-arch.h b/arm/aarch64/include/kvm/kvm-cpu-arch.h
+> index 8dfb82e..2b2c1ff 100644
+> --- a/arm/aarch64/include/kvm/kvm-cpu-arch.h
+> +++ b/arm/aarch64/include/kvm/kvm-cpu-arch.h
+> @@ -19,5 +19,6 @@
+>  
+>  void kvm_cpu__select_features(struct kvm *kvm, struct kvm_vcpu_init *init);
+>  int kvm_cpu__configure_features(struct kvm_cpu *vcpu);
+> +int kvm_cpu__setup_pvtime(struct kvm_cpu *vcpu);
+>  
+>  #endif /* KVM__KVM_CPU_ARCH_H */
+> diff --git a/arm/aarch64/pvtime.c b/arm/aarch64/pvtime.c
+> new file mode 100644
+> index 0000000..fdde683
+> --- /dev/null
+> +++ b/arm/aarch64/pvtime.c
+> @@ -0,0 +1,103 @@
+> +#include "kvm/kvm.h"
+> +#include "kvm/kvm-cpu.h"
+> +#include "kvm/util.h"
+> +
+> +#include <linux/byteorder.h>
+> +#include <linux/types.h>
+> +
+> +#define ARM_PVTIME_STRUCT_SIZE		(64)
+> +
+> +struct pvtime_data_priv {
+> +	bool	is_supported;
+> +	char	*usr_mem;
+> +};
+> +
+> +static struct pvtime_data_priv pvtime_data = {
+> +	.is_supported	= true,
+> +	.usr_mem	= NULL
+> +};
+> +
+> +static int pvtime__alloc_region(struct kvm *kvm)
+> +{
+> +	char *mem;
+> +	int ret = 0;
+> +
+> +	mem = mmap(NULL, ARM_PVTIME_MMIO_SIZE, PROT_RW,
+> +		   MAP_ANON_NORESERVE, -1, 0);
+> +	if (mem == MAP_FAILED)
+> +		return -errno;
+> +
+> +	ret = kvm__register_dev_mem(kvm, ARM_PVTIME_MMIO_BASE,
+> +				    ARM_PVTIME_MMIO_SIZE, mem);
+> +	if (ret) {
+> +		munmap(mem, ARM_PVTIME_MMIO_SIZE);
+> +		return ret;
+> +	}
+> +
+> +	pvtime_data.usr_mem = mem;
+> +	return ret;
+> +}
+> +
+> +static int pvtime__teardown_region(struct kvm *kvm)
+> +{
+> +	if (pvtime_data.usr_mem == NULL)
+> +		return 0;
+> +
+> +	kvm__destroy_mem(kvm, ARM_PVTIME_MMIO_BASE,
+> +			 ARM_PVTIME_MMIO_SIZE, pvtime_data.usr_mem);
+> +	munmap(pvtime_data.usr_mem, ARM_PVTIME_MMIO_SIZE);
+> +	pvtime_data.usr_mem = NULL;
+> +	return 0;
+> +}
+> +
+> +dev_exit(pvtime__teardown_region);
 
-drivers/pci/iov.c:67: warning: Function parameter or member 'dev' not described in 'pci_iov_get_pf_drvdata'
-drivers/pci/iov.c:67: warning: Function parameter or member 'pf_driver' not described in 'pci_iov_get_pf_drvdata'
+This looks awkward: pvtime initialization is done in kvm_cpu__arch_init(), but
+teardown is done in the device exit stage.
 
-Fixes: a7e9f240c0da ("PCI/IOV: Add pci_iov_get_pf_drvdata() to allow VF reaching the drvdata of a PF")
-Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
-Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
----
- drivers/pci/iov.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+I think it would be better to choose one approach and stick with it: (1) keep
+initialization in kvm_cpu__arch_init() and move teardown to kvm_cpu__delete();
+or (2) treat pvtime as a device, move the code to hw/pvtime.c, compile the file
+only for arm64 and move initialization to dev_init() (and keep teardown in
+dev_exit()).
 
-diff --git a/drivers/pci/iov.c b/drivers/pci/iov.c
-index 28ec952e1221..952217572113 100644
---- a/drivers/pci/iov.c
-+++ b/drivers/pci/iov.c
-@@ -49,8 +49,8 @@ EXPORT_SYMBOL_GPL(pci_iov_vf_id);
- 
- /**
-  * pci_iov_get_pf_drvdata - Return the drvdata of a PF
-- * @dev - VF pci_dev
-- * @pf_driver - Device driver required to own the PF
-+ * @dev: VF pci_dev
-+ * @pf_driver: Device driver required to own the PF
-  *
-  * This must be called from a context that ensures that a VF driver is attached.
-  * The value returned is invalid once the VF driver completes its remove()
--- 
-2.35.1
+I have no preference for either, but I think a consistent approach to enabling
+pvtime is desirable.
 
+Thanks,
+Alex
