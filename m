@@ -2,115 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C1A084D17B8
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 13:36:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D5214D187A
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 13:59:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346931AbiCHMhA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 07:37:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34256 "EHLO
+        id S1346975AbiCHM74 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Mar 2022 07:59:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36068 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346934AbiCHMgw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Mar 2022 07:36:52 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 02CD246B36
-        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 04:35:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646742955;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=15wWv9LVAZnxxtccB9zs+XyKPK703Asi9tPPEBhDSuQ=;
-        b=EmdG8W7HJejBkf9qSR3ZUedoNx1rHTMy5uxrTKJySnt22TE46CMYpFKVmqGbWv10WE7wQB
-        tG8x/WkMLoIQllF3MeEDTgBbOjCdQd+BRFlX9bwsZaV8J2rm+0pW9b4ayEenhwcxIBBH7t
-        nX6Vb0F5c4Yvfj+8a638uRzVVq7Bpz4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-110-DOoRzjYPNguc3wplRM31XA-1; Tue, 08 Mar 2022 07:35:51 -0500
-X-MC-Unique: DOoRzjYPNguc3wplRM31XA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B49E61091DA0;
-        Tue,  8 Mar 2022 12:35:50 +0000 (UTC)
-Received: from thuth.com (dhcp-192-183.str.redhat.com [10.33.192.183])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B9CB28494F;
-        Tue,  8 Mar 2022 12:35:49 +0000 (UTC)
-From:   Thomas Huth <thuth@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org,
-        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-        Thomas Huth <thuth@redhat.com>
-Subject: [kvm-unit-tests PATCH] x86: Update the list of tests that we run in the Cirrus-CI
-Date:   Tue,  8 Mar 2022 13:35:38 +0100
-Message-Id: <20220308123538.538575-1-thuth@redhat.com>
-MIME-Version: 1.0
+        with ESMTP id S236730AbiCHM7x (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 07:59:53 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88C102BB23;
+        Tue,  8 Mar 2022 04:58:53 -0800 (PST)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 228BiuRt014705;
+        Tue, 8 Mar 2022 12:58:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=jIzA6sdYS4OpZklclX1bBzOYFYHMlhsCzjUveLVF8VE=;
+ b=Z8BdetqgQOYHUMKp138HF9JzbII13wCWhCOgBPi27M8nw/DVUEllTgNPBpSyvHFfaINC
+ uuqfMx3BhqeeIAcm2SPSxCN52RfcUcJHliolAsTBmlwZ12XUDLzQ2rxwTSErKmTnOBP3
+ tIU1Bxiakf6qn6krQ0AQgbqnMV4DKYmk0Cd3bxKqq24+LQkNbh3xCeUMgrenK1UfBNoX
+ RstjW5wSi6fzOadKPubj6LNv03D+wH5+S+9LonlPeohBwQeQh1EvtkVt0eyaBcfEEeiX
+ G547vCQn4zU5cLryN4DN8z7IBR7HVRr2IyPjnO8bIVcvS9yyYupFaH/XFvR4E5rcDtoS Nw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3envcuvwh7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Mar 2022 12:58:50 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 228CRSa3006761;
+        Tue, 8 Mar 2022 12:58:50 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3envcuvwgn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Mar 2022 12:58:50 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 228Cq0SX009361;
+        Tue, 8 Mar 2022 12:58:48 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma03ams.nl.ibm.com with ESMTP id 3ekyg8yfpb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Mar 2022 12:58:48 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 228CladC39452942
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 8 Mar 2022 12:47:36 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2533511C04A;
+        Tue,  8 Mar 2022 12:58:45 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B9EF511C04C;
+        Tue,  8 Mar 2022 12:58:44 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue,  8 Mar 2022 12:58:44 +0000 (GMT)
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+To:     Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Shuah Khan <shuah@kernel.org>
+Cc:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH RESEND v2 0/5] memop selftest for storage key checking
+Date:   Tue,  8 Mar 2022 13:58:36 +0100
+Message-Id: <20220308125841.3271721-1-scgl@linux.ibm.com>
+X-Mailer: git-send-email 2.32.0
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: VSPTinBryQK2DKWX1Nail1ZWqN6W4F5w
+X-Proofpoint-ORIG-GUID: 1dWKeXB8UY2cFcTSMeDqnAcw0KpsAbmb
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-03-08_03,2022-03-04_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 mlxscore=0
+ malwarescore=0 clxscore=1015 phishscore=0 impostorscore=0 mlxlogscore=774
+ priorityscore=1501 lowpriorityscore=0 bulkscore=0 spamscore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
+ definitions=main-2203080065
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The new tests that have been added in commit bc0dd8bdc627f0
-("x86/debug: Add single-step #DB + STI/MOVSS blocking tests")
-require a fixed kernel which we don't have in the Cirrus-CI yet,
-so let's disable the failing "debug" test for now.
+Refactor memop selftest and add tests.
+Add storage key tests, both for success as well as failure cases.
+Similarly, test both vcpu and vm ioctls.
 
-The "pcid" test has been renamed to "pcid-enabled" in commit
-cad94b1394aa519 ("x86: Add a 'pcid' group for the various PCID+INVPCID
-permutations").
+v1 -> v2
+ * restructure commits
+ * get rid of test_* wrapper functions that hid vm.vm
+ * minor changes
 
-Some additional tests are working fine now, too (pcid-asymmetric, msr,
-vmx_apic_passthrough_tpr_threshold_test, vmx_init_signal_test,
-vmx_pf_exception_test, vmx_sipi_signal_test), likely since the update
-to Fedora 35, so we can also enable them in the CI now.
+v0 -> v2
+ * complete rewrite
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- ci/cirrus-ci-fedora.yml | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+v1: https://lore.kernel.org/kvm/20220217145336.1794778-1-scgl@linux.ibm.com/
+v0: https://lore.kernel.org/kvm/20220211182215.2730017-11-scgl@linux.ibm.com/
 
-diff --git a/ci/cirrus-ci-fedora.yml b/ci/cirrus-ci-fedora.yml
-index a6b9cea..6eace8b 100644
---- a/ci/cirrus-ci-fedora.yml
-+++ b/ci/cirrus-ci-fedora.yml
-@@ -20,7 +20,6 @@ fedora_task:
-     - ./run_tests.sh
-         access
-         asyncpf
--        debug
-         emulator
-         ept
-         hypercall
-@@ -33,8 +32,10 @@ fedora_task:
-         ioapic
-         ioapic-split
-         kvmclock_test
--        pcid
-+        msr
-+        pcid-asymmetric
-         pcid-disabled
-+        pcid-enabled
-         rdpru
-         realmode
-         rmap_chain
-@@ -59,6 +60,10 @@ fedora_task:
-         vmexit_tscdeadline_immed
-         vmexit_vmcall
-         vmx_apic_passthrough_thread
-+        vmx_apic_passthrough_tpr_threshold_test
-+        vmx_init_signal_test
-+        vmx_pf_exception_test
-+        vmx_sipi_signal_test
-         xsave
-         | tee results.txt
-     - grep -q PASS results.txt && ! grep -q FAIL results.txt
+Janis Schoetterl-Glausch (5):
+  KVM: s390: selftests: Split memop tests
+  KVM: s390: selftests: Add macro as abstraction for MEM_OP
+  KVM: s390: selftests: Add named stages for memop test
+  KVM: s390: selftests: Add more copy memop tests
+  KVM: s390: selftests: Add error memop tests
+
+ tools/testing/selftests/kvm/s390x/memop.c | 735 ++++++++++++++++++----
+ 1 file changed, 617 insertions(+), 118 deletions(-)
+
+
+base-commit: ee6a569d3bf64c9676eee3eecb861fb01cc11311
 -- 
-2.27.0
+2.32.0
 
