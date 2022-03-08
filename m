@@ -2,197 +2,192 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4CED04D1741
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 13:28:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 144A74D1761
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 13:35:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346807AbiCHM2z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 07:28:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54124 "EHLO
+        id S1346830AbiCHMg0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Mar 2022 07:36:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33278 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346717AbiCHM2w (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Mar 2022 07:28:52 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 64C0C657F
-        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 04:27:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646742474;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=9pf/IVqL8yE3g13OAwcuAVKQfPo53FP6ApFVilX1pcQ=;
-        b=S+USZCvaGod29QApOxU/KFhcPs94Cab+KEmPf5SI/TosVvzaTbzz3TbQ6hiMUfJaZ2JLk/
-        Eo3yvMnBxyj7x6s8BvmqZ9f1GHgPSNLjd5/zD/H1rugivODgNRiYFTZr8C7Qm80n1IyeVL
-        P8sOgEeGfHcjey789RUuw71nAF+8UPk=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-423-OQM0pEyeNPW31bUCkU02Dg-1; Tue, 08 Mar 2022 07:27:53 -0500
-X-MC-Unique: OQM0pEyeNPW31bUCkU02Dg-1
-Received: by mail-ed1-f72.google.com with SMTP id b9-20020aa7d489000000b0041669cd2cbfso1338636edr.16
-        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 04:27:53 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=9pf/IVqL8yE3g13OAwcuAVKQfPo53FP6ApFVilX1pcQ=;
-        b=ANVIImAjTI6TCVgGQ4CT5bVDf+XOnn7z2Ciru3ylejbymf4wuO3Inth0q/peZgVClE
-         okB2yM56XuLUfO0VkaH1bT2bPE2w2/72VGE6td1MmPLs+My1p4y0s3nHB8suZyoImcgS
-         VtSWVsMMZTMi31jEd5RPUF5u8gTPj4csija90MgIMQPk1GHhC4MYR/lIze2cKjF9ptaP
-         iIZqYuQZMpTFY/iXsegjNRI6vgE1xvCfXUfoAfbJRbg10ajPnoaB2s2L9xESuhTllPxz
-         8drnDgNQLgZw1JM5yTI6CO5Im1y9Oebat85qtYglZLFwu9nBh++haqu1/h6jbToEHmjJ
-         ht1w==
-X-Gm-Message-State: AOAM533x7lJY05xnkimYClJiRfzmVrT5UPUh10igBst1HX/SGP8xKJPr
-        XFCgsTOyLZ92GmWGT6mMLpJdH6asCTf8gJty1tO+RTiVOxMwYv8+gTgxV9nANhd6mp6iIuuW6sS
-        cRFihz02YJfMz
-X-Received: by 2002:a17:907:7242:b0:6da:b561:d523 with SMTP id ds2-20020a170907724200b006dab561d523mr13282175ejc.118.1646742471605;
-        Tue, 08 Mar 2022 04:27:51 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyRLddVnWaTYQ7CEcx+H/uBDYSK5MuBK5kvSFUyJcedIYo1CrA8Y49v9huSdkQH7zA4WWcJdw==
-X-Received: by 2002:a17:907:7242:b0:6da:b561:d523 with SMTP id ds2-20020a170907724200b006dab561d523mr13282150ejc.118.1646742471316;
-        Tue, 08 Mar 2022 04:27:51 -0800 (PST)
-Received: from redhat.com ([2.55.138.228])
-        by smtp.gmail.com with ESMTPSA id p24-20020a1709061b5800b006da6435cedcsm5786231ejg.132.2022.03.08.04.27.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Mar 2022 04:27:50 -0800 (PST)
-Date:   Tue, 8 Mar 2022 07:27:47 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     Lee Jones <lee.jones@linaro.org>, jasowang@redhat.com,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        stable@vger.kernel.org,
-        syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
-Subject: Re: [PATCH 1/1] vhost: Protect the virtqueue from being cleared
- whilst still in use
-Message-ID: <20220308071718-mutt-send-email-mst@kernel.org>
-References: <20220307191757.3177139-1-lee.jones@linaro.org>
- <YiZeB7l49KC2Y5Gz@kroah.com>
- <YicPXnNFHpoJHcUN@google.com>
- <Yicalf1I6oBytbse@kroah.com>
- <Yicer3yGg5rrdSIs@google.com>
- <YicolvcbY9VT6AKc@kroah.com>
- <20220308055003-mutt-send-email-mst@kernel.org>
- <YidBz7SxED2ii1Lh@kroah.com>
+        with ESMTP id S230224AbiCHMgW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 07:36:22 -0500
+Received: from out30-57.freemail.mail.aliyun.com (out30-57.freemail.mail.aliyun.com [115.124.30.57])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D57153A703;
+        Tue,  8 Mar 2022 04:35:24 -0800 (PST)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R241e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04395;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=34;SR=0;TI=SMTPD_---0V6efcTq_1646742918;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0V6efcTq_1646742918)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Tue, 08 Mar 2022 20:35:19 +0800
+From:   Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Cc:     Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Mark Gross <markgross@kernel.org>,
+        Vadim Pasternak <vadimp@nvidia.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Johannes Berg <johannes.berg@intel.com>,
+        Vincent Whitchurch <vincent.whitchurch@axis.com>,
+        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        linux-um@lists.infradead.org, platform-driver-x86@vger.kernel.org,
+        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, bpf@vger.kernel.org
+Subject: [PATCH v7 00/26] virtio pci support VIRTIO_F_RING_RESET
+Date:   Tue,  8 Mar 2022 20:34:52 +0800
+Message-Id: <20220308123518.33800-1-xuanzhuo@linux.alibaba.com>
+X-Mailer: git-send-email 2.31.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YidBz7SxED2ii1Lh@kroah.com>
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Git-Hash: f06b131dbfed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 08, 2022 at 12:45:19PM +0100, Greg KH wrote:
-> On Tue, Mar 08, 2022 at 05:55:58AM -0500, Michael S. Tsirkin wrote:
-> > On Tue, Mar 08, 2022 at 10:57:42AM +0100, Greg KH wrote:
-> > > On Tue, Mar 08, 2022 at 09:15:27AM +0000, Lee Jones wrote:
-> > > > On Tue, 08 Mar 2022, Greg KH wrote:
-> > > > 
-> > > > > On Tue, Mar 08, 2022 at 08:10:06AM +0000, Lee Jones wrote:
-> > > > > > On Mon, 07 Mar 2022, Greg KH wrote:
-> > > > > > 
-> > > > > > > On Mon, Mar 07, 2022 at 07:17:57PM +0000, Lee Jones wrote:
-> > > > > > > > vhost_vsock_handle_tx_kick() already holds the mutex during its call
-> > > > > > > > to vhost_get_vq_desc().  All we have to do here is take the same lock
-> > > > > > > > during virtqueue clean-up and we mitigate the reported issues.
-> > > > > > > > 
-> > > > > > > > Also WARN() as a precautionary measure.  The purpose of this is to
-> > > > > > > > capture possible future race conditions which may pop up over time.
-> > > > > > > > 
-> > > > > > > > Link: https://syzkaller.appspot.com/bug?extid=279432d30d825e63ba00
-> > > > > > > > 
-> > > > > > > > Cc: <stable@vger.kernel.org>
-> > > > > > > > Reported-by: syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
-> > > > > > > > Signed-off-by: Lee Jones <lee.jones@linaro.org>
-> > > > > > > > ---
-> > > > > > > >  drivers/vhost/vhost.c | 10 ++++++++++
-> > > > > > > >  1 file changed, 10 insertions(+)
-> > > > > > > > 
-> > > > > > > > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> > > > > > > > index 59edb5a1ffe28..ef7e371e3e649 100644
-> > > > > > > > --- a/drivers/vhost/vhost.c
-> > > > > > > > +++ b/drivers/vhost/vhost.c
-> > > > > > > > @@ -693,6 +693,15 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
-> > > > > > > >  	int i;
-> > > > > > > >  
-> > > > > > > >  	for (i = 0; i < dev->nvqs; ++i) {
-> > > > > > > > +		/* No workers should run here by design. However, races have
-> > > > > > > > +		 * previously occurred where drivers have been unable to flush
-> > > > > > > > +		 * all work properly prior to clean-up.  Without a successful
-> > > > > > > > +		 * flush the guest will malfunction, but avoiding host memory
-> > > > > > > > +		 * corruption in those cases does seem preferable.
-> > > > > > > > +		 */
-> > > > > > > > +		WARN_ON(mutex_is_locked(&dev->vqs[i]->mutex));
-> > > > > > > 
-> > > > > > > So you are trading one syzbot triggered issue for another one in the
-> > > > > > > future?  :)
-> > > > > > > 
-> > > > > > > If this ever can happen, handle it, but don't log it with a WARN_ON() as
-> > > > > > > that will trigger the panic-on-warn boxes, as well as syzbot.  Unless
-> > > > > > > you want that to happen?
-> > > > > > 
-> > > > > > No, Syzbot doesn't report warnings, only BUGs and memory corruption.
-> > > > > 
-> > > > > Has it changed?  Last I looked, it did trigger on WARN_* calls, which
-> > > > > has resulted in a huge number of kernel fixes because of that.
-> > > > 
-> > > > Everything is customisable in syzkaller, so maybe there are specific
-> > > > builds which panic_on_warn enabled, but none that I'm involved with
-> > > > do.
-> > > 
-> > > Many systems run with panic-on-warn (i.e. the cloud), as they want to
-> > > drop a box and restart it if anything goes wrong.
-> > > 
-> > > That's why syzbot reports on WARN_* calls.  They should never be
-> > > reachable by userspace actions.
-> > > 
-> > > > Here follows a topical example.  The report above in the Link: tag
-> > > > comes with a crashlog [0].  In there you can see the WARN() at the
-> > > > bottom of vhost_dev_cleanup() trigger many times due to a populated
-> > > > (non-flushed) worker list, before finally tripping the BUG() which
-> > > > triggers the report:
-> > > > 
-> > > > [0] https://syzkaller.appspot.com/text?tag=CrashLog&x=16a61fce700000
-> > > 
-> > > Ok, so both happens here.  But don't add a warning for something that
-> > > can't happen.  Just handle it and move on.  It looks like you are
-> > > handling it in this code, so please drop the WARN_ON().
-> > > 
-> > > thanks,
-> > > 
-> > > greg k-h
-> > 
-> > Hmm. Well this will mean if we ever reintroduce the bug then
-> > syzkaller will not catch it for us :( And the bug is there,
-> > it just results in a hard to reproduce error for userspace.
-> 
-> Is this an error you can recover from in the kernel?
->  What is userspace
-> supposed to know with this information when it sees it?
+The virtio spec already supports the virtio queue reset function. This patch set
+is to add this function to the kernel. The relevant virtio spec information is
+here:
 
-IIUC we are talking about a use after free here since we somehow
-managed to have a pointer to the device in a worker while
-device is being destroyed.
+    https://github.com/oasis-tcs/virtio-spec/issues/124
 
-That's the point of the warning as use after free is hard to debug. You
-ask can we recover from a use after free? 
+Also regarding MMIO support for queue reset, I plan to support it after this
+patch is passed.
 
-As regards to the added lock, IIUC it kind of shifts the use after free
-window to later and since we zero out some of the memory just before we
-free it, it's a bit more likely to recover.  I would still like to see
-some more analysis on why the situation is always better than it was
-before though.
+Performing reset on a queue is divided into four steps:
+     1. virtio_reset_vq()              - notify the device to reset the queue
+     2. virtqueue_detach_unused_buf()  - recycle the buffer submitted
+     3. virtqueue_reset_vring()        - reset the vring (may re-alloc)
+     4. virtio_enable_resetq()         - mmap vring to device, and enable the queue
 
-> > Not sure what to do here. Export panic_on_warn flag to modules
-> > and check it here?
-> 
-> Hah, no, never do that :)
-> 
-> thanks,
-> 
-> greg k-h
+The first part 1-17 of this patch set implements virtio pci's support and API
+for queue reset. The latter part is to make virtio-net support set_ringparam. Do
+these things for this feature:
+
+      1. virtio-net support rx,tx reset
+      2. find_vqs() support to special the max size of each vq
+      3. virtio-net support set_ringparam
+
+#1 -#3 :       prepare
+#4 -#12:       virtio ring support reset vring of the vq
+#13-#14:       add helper
+#15-#17:       virtio pci support reset queue and re-enable
+#18-#21:       find_vqs() support sizes to special the max size of each vq
+#23-#24:       virtio-net support rx, tx reset
+#22, #25, #26: virtio-net support set ringparam
+
+Test environment:
+    Host: 4.19.91
+    Qemu: QEMU emulator version 6.2.50 (with vq reset support)
+    Test Cmd:  ethtool -G eth1 rx $1 tx $2; ethtool -g eth1
+
+    The default is split mode, modify Qemu virtio-net to add PACKED feature to test
+    packed mode.
+
+
+Please review. Thanks.
+
+v7:
+  1. fix #6 subject typo
+  2. fix #6 ring_size_in_bytes is uninitialized
+  3. check by: make W=12
+
+v6:
+  1. virtio_pci: use synchronize_irq(irq) to sync the irq callbacks
+  2. Introduce virtqueue_reset_vring() to implement the reset of vring during
+     the reset process. May use the old vring if num of the vq not change.
+  3. find_vqs() support sizes to special the max size of each vq
+
+v5:
+  1. add virtio-net support set_ringparam
+
+v4:
+  1. just the code of virtio, without virtio-net
+  2. Performing reset on a queue is divided into these steps:
+    1. reset_vq: reset one vq
+    2. recycle the buffer from vq by virtqueue_detach_unused_buf()
+    3. release the ring of the vq by vring_release_virtqueue()
+    4. enable_reset_vq: re-enable the reset queue
+  3. Simplify the parameters of enable_reset_vq()
+  4. add container structures for virtio_pci_common_cfg
+
+v3:
+  1. keep vq, irq unreleased
+
+*** BLURB HERE ***
+
+Xuan Zhuo (26):
+  virtio_pci: struct virtio_pci_common_cfg add queue_notify_data
+  virtio: queue_reset: add VIRTIO_F_RING_RESET
+  virtio: add helper virtqueue_get_vring_max_size()
+  virtio_ring: split: extract the logic of creating vring
+  virtio_ring: split: extract the logic of init vq and attach vring
+  virtio_ring: packed: extract the logic of creating vring
+  virtio_ring: packed: extract the logic of init vq and attach vring
+  virtio_ring: extract the logic of freeing vring
+  virtio_ring: split: implement virtqueue_reset_vring_split()
+  virtio_ring: packed: implement virtqueue_reset_vring_packed()
+  virtio_ring: introduce virtqueue_reset_vring()
+  virtio_ring: update the document of the virtqueue_detach_unused_buf
+    for queue reset
+  virtio: queue_reset: struct virtio_config_ops add callbacks for
+    queue_reset
+  virtio: add helper for queue reset
+  virtio_pci: queue_reset: update struct virtio_pci_common_cfg and
+    option functions
+  virtio_pci: queue_reset: extract the logic of active vq for modern pci
+  virtio_pci: queue_reset: support VIRTIO_F_RING_RESET
+  virtio: find_vqs() add arg sizes
+  virtio_pci: support the arg sizes of find_vqs()
+  virtio_mmio: support the arg sizes of find_vqs()
+  virtio: add helper virtio_find_vqs_ctx_size()
+  virtio_net: get ringparam by virtqueue_get_vring_max_size()
+  virtio_net: split free_unused_bufs()
+  virtio_net: support rx/tx queue reset
+  virtio_net: set the default max ring size by find_vqs()
+  virtio_net: support set_ringparam
+
+ arch/um/drivers/virtio_uml.c             |   2 +-
+ drivers/net/virtio_net.c                 | 257 ++++++++--
+ drivers/platform/mellanox/mlxbf-tmfifo.c |   3 +-
+ drivers/remoteproc/remoteproc_virtio.c   |   2 +-
+ drivers/s390/virtio/virtio_ccw.c         |   2 +-
+ drivers/virtio/virtio_mmio.c             |  12 +-
+ drivers/virtio/virtio_pci_common.c       |  28 +-
+ drivers/virtio/virtio_pci_common.h       |   3 +-
+ drivers/virtio/virtio_pci_legacy.c       |   8 +-
+ drivers/virtio/virtio_pci_modern.c       | 146 +++++-
+ drivers/virtio/virtio_pci_modern_dev.c   |  36 ++
+ drivers/virtio/virtio_ring.c             | 584 +++++++++++++++++------
+ drivers/virtio/virtio_vdpa.c             |   2 +-
+ include/linux/virtio.h                   |  12 +
+ include/linux/virtio_config.h            |  74 ++-
+ include/linux/virtio_pci_modern.h        |   2 +
+ include/uapi/linux/virtio_config.h       |   7 +-
+ include/uapi/linux/virtio_pci.h          |  14 +
+ 18 files changed, 979 insertions(+), 215 deletions(-)
+
+--
+2.31.0
 
