@@ -2,95 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ACE3E4D1CF3
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 17:14:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3CEA64D1CEE
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 17:14:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348197AbiCHQPc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 11:15:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35158 "EHLO
+        id S1346371AbiCHQOt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Mar 2022 11:14:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34104 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239312AbiCHQPb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Mar 2022 11:15:31 -0500
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C9D250B23;
-        Tue,  8 Mar 2022 08:14:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1646756075; x=1678292075;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=LR5CCv6Q3aBeORtqOyOOhZCKfF2QDO9kvzAaK6wB20k=;
-  b=ks2GICwVXdh1L3I3MutzB917xG/tdK2Mk8F1urr1sTBoLCLl07XRT2td
-   16PW7cQBRlIFAznS46DcprsuqbiO3ri+Xluo0rMxBY41EblqhQEHB0a/R
-   yfcJ0MB42EbBZIFJP6KoyQlVowu+FhzkLyuljo6/EoZfEZEGkkpYyhaCY
-   UE4Yh29HkaSUowkPBUN7jpAhiNyeTD0Xi9KnF1tAoXssMrspJ+nfgIoyv
-   6Xc6RDdf/ZpPObczS53YFfVwWGc/2m9PqUMUTbG0roTBpjf2dbVqu7vtk
-   Gd1blTK/AtcTdDCObAB9Qa7b4tyOYJZp51hPdWXgSuPcg9eHkMhafcCWY
-   Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10280"; a="253554926"
-X-IronPort-AV: E=Sophos;i="5.90,165,1643702400"; 
-   d="scan'208";a="253554926"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Mar 2022 08:11:34 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.90,165,1643702400"; 
-   d="scan'208";a="711580048"
-Received: from lkp-server02.sh.intel.com (HELO 89b41b6ae01c) ([10.239.97.151])
-  by orsmga005.jf.intel.com with ESMTP; 08 Mar 2022 08:11:31 -0800
-Received: from kbuild by 89b41b6ae01c with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1nRcQt-0001fZ-5b; Tue, 08 Mar 2022 16:11:31 +0000
-Date:   Wed, 9 Mar 2022 00:10:30 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     zhenwei pi <pizhenwei@bytedance.com>
-Cc:     kbuild-all@lists.01.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        lei he <helei.sig11@bytedance.com>,
-        Gonglei <arei.gonglei@huawei.com>
-Subject: [mst-vhost:vhost 28/60] nios2-linux-ld:
- virtio_crypto_akcipher_algs.c:undefined reference to `rsa_parse_pub_key'
-Message-ID: <202203090014.ulENdnAQ-lkp@intel.com>
+        with ESMTP id S244605AbiCHQOr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 11:14:47 -0500
+Received: from mail-io1-f45.google.com (mail-io1-f45.google.com [209.85.166.45])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F3CF5005E;
+        Tue,  8 Mar 2022 08:13:50 -0800 (PST)
+Received: by mail-io1-f45.google.com with SMTP id q11so6914226iod.6;
+        Tue, 08 Mar 2022 08:13:50 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=OiqyeB0b6J0rfF+qZiyPdJHBNMRJKO0i7S5FsGcKn6U=;
+        b=XJlIo8W6fhvylzMQQVW/0LXUccx8jyc4J7GNCQgtZZwxwz/fIpARi5Q/TJ9B4PjNmA
+         lHNWLUR27jPmh+nQhqCiBxOrXcBHmVzKHPk+xPnjJ8xJVghPkeupdwte7e9LBbzIp4Zg
+         gH/B8cFATPT0HEjqOx4cA1hjbPmHbC/FXTfOH/dFGFBj6J5TbZYLP1zf4iBIl7ezH0z1
+         TTtJtubulvLvV9RmPuwK4dD57B2UMX++NuwJBb8FJyTJPYM151PleUYlrCbnTdHGdlei
+         ffd+HIVTp8RJGHGEk5kU9GQIEZuaBqRGl0R+JGGXH2oPQmNzFz82F/jVno3hvko4m6vk
+         UxcA==
+X-Gm-Message-State: AOAM533u0dVUwv0StUdcUTwsKgX95OrYq2UQZK633uQ8aoKm++zn0sFQ
+        6LP+5RTTplZKW1pGSwDfF7ax27T8yPk=
+X-Google-Smtp-Source: ABdhPJxytH+Vzy+XUhqK4aPlSOSdpfI/yqmuWdQLh4Blw4P30hNSOKPzT3mOi/OUY1LF78hwilclag==
+X-Received: by 2002:a05:6638:3012:b0:317:9a63:ecd3 with SMTP id r18-20020a056638301200b003179a63ecd3mr16838924jak.210.1646756028135;
+        Tue, 08 Mar 2022 08:13:48 -0800 (PST)
+Received: from fedora (216-241-34-136.static.forethought.net. [216.241.34.136])
+        by smtp.gmail.com with ESMTPSA id x7-20020a056e021ca700b002c5f9136a2dsm12453334ill.36.2022.03.08.08.13.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Mar 2022 08:13:47 -0800 (PST)
+Date:   Tue, 8 Mar 2022 11:13:44 -0500
+From:   Dennis Zhou <dennis@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Tejun Heo <tj@kernel.org>, Christoph Lameter <cl@linux.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        Vladimir Davydov <vdavydov.dev@gmail.com>, linux-mm@kvack.org,
+        cgroups@vger.kernel.org
+Subject: Re: [PATCH 2/3] mm: use vmalloc_array and vcalloc for array
+ allocations
+Message-ID: <YieAuCGMRrJjEHMR@fedora>
+References: <20220308105918.615575-1-pbonzini@redhat.com>
+ <20220308105918.615575-3-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <20220308105918.615575-3-pbonzini@redhat.com>
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
+        FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git vhost
-head:   c5f633abfd09491ae7ecbc7fcfca08332ad00a8b
-commit: 8a75f36b5d7a48f1c5a0b46638961c951ec6ecd9 [28/60] virtio-crypto: implement RSA algorithm
-config: nios2-randconfig-p002-20220308 (https://download.01.org/0day-ci/archive/20220309/202203090014.ulENdnAQ-lkp@intel.com/config)
-compiler: nios2-linux-gcc (GCC) 11.2.0
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git/commit/?id=8a75f36b5d7a48f1c5a0b46638961c951ec6ecd9
-        git remote add mst-vhost https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git
-        git fetch --no-tags mst-vhost vhost
-        git checkout 8a75f36b5d7a48f1c5a0b46638961c951ec6ecd9
-        # save the config file to linux build tree
-        mkdir build_dir
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.2.0 make.cross O=build_dir ARCH=nios2 SHELL=/bin/bash
+Hello,
 
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
+On Tue, Mar 08, 2022 at 05:59:17AM -0500, Paolo Bonzini wrote:
+> Instead of using array_size or just a multiply, use a function that
+> takes care of both the multiplication and the overflow checks.
+> 
+> Cc: linux-mm@kvack.org
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  mm/percpu-stats.c | 2 +-
+>  mm/swap_cgroup.c  | 4 +---
+>  2 files changed, 2 insertions(+), 4 deletions(-)
+> 
+> diff --git a/mm/percpu-stats.c b/mm/percpu-stats.c
+> index c6bd092ff7a3..e71651cda2de 100644
+> --- a/mm/percpu-stats.c
+> +++ b/mm/percpu-stats.c
+> @@ -144,7 +144,7 @@ static int percpu_stats_show(struct seq_file *m, void *v)
+>  	spin_unlock_irq(&pcpu_lock);
+>  
+>  	/* there can be at most this many free and allocated fragments */
+> -	buffer = vmalloc(array_size(sizeof(int), (2 * max_nr_alloc + 1)));
+> +	buffer = vmalloc_array(2 * max_nr_alloc + 1, sizeof(int));
+>  	if (!buffer)
+>  		return -ENOMEM;
+>  
+> diff --git a/mm/swap_cgroup.c b/mm/swap_cgroup.c
+> index 7f34343c075a..5a9442979a18 100644
+> --- a/mm/swap_cgroup.c
+> +++ b/mm/swap_cgroup.c
+> @@ -167,14 +167,12 @@ unsigned short lookup_swap_cgroup_id(swp_entry_t ent)
+>  int swap_cgroup_swapon(int type, unsigned long max_pages)
+>  {
+>  	void *array;
+> -	unsigned long array_size;
+>  	unsigned long length;
+>  	struct swap_cgroup_ctrl *ctrl;
+>  
+>  	length = DIV_ROUND_UP(max_pages, SC_PER_PAGE);
+> -	array_size = length * sizeof(void *);
+>  
+> -	array = vzalloc(array_size);
+> +	array = vcalloc(length, sizeof(void *));
+>  	if (!array)
+>  		goto nomem;
+>  
+> -- 
+> 2.31.1
+> 
 
-All errors (new ones prefixed by >>):
+Acked-by: Dennis Zhou <dennis@kernel.org>
 
-   nios2-linux-ld: drivers/crypto/virtio/virtio_crypto_akcipher_algs.o: in function `virtio_crypto_rsa_set_key':
-   virtio_crypto_akcipher_algs.c:(.text+0x4bc): undefined reference to `rsa_parse_priv_key'
-   virtio_crypto_akcipher_algs.c:(.text+0x4bc): relocation truncated to fit: R_NIOS2_CALL26 against `rsa_parse_priv_key'
->> nios2-linux-ld: virtio_crypto_akcipher_algs.c:(.text+0x4e8): undefined reference to `rsa_parse_pub_key'
-   virtio_crypto_akcipher_algs.c:(.text+0x4e8): relocation truncated to fit: R_NIOS2_CALL26 against `rsa_parse_pub_key'
-
----
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+Thanks,
+Dennis
