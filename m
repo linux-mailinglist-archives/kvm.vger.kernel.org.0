@@ -2,89 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 974624D1E61
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 18:18:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B1474D1ED9
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 18:23:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348743AbiCHRS5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 12:18:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48858 "EHLO
+        id S244520AbiCHRYe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Mar 2022 12:24:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54404 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348736AbiCHRSz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Mar 2022 12:18:55 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9E56317AA0
-        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 09:17:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646759874;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=XS0ZDRJdbTaFXTIodebwWZ2Zs2A9XDPYU7p1D6O1mf0=;
-        b=dIjGTYSRPyf8AKazEXlpGRVbebGC4btXDfmoHeC6Jbfb4GwJKy6OTd0MbJrNk3IXt7ZHIN
-        t6hK+yMw9CuSIWM0adhzdFOofgGPMwX9hSfJ1P7dS+utshUS0kBaXTWP2CZLf12kIfbtQE
-        Fgh4bVS8xZ6RSnA9G1ApWvI7QHwsKeY=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-104-YuxIxFr4Oe20cmJyhcMYoA-1; Tue, 08 Mar 2022 12:17:53 -0500
-X-MC-Unique: YuxIxFr4Oe20cmJyhcMYoA-1
-Received: by mail-wm1-f72.google.com with SMTP id 14-20020a05600c104e00b003897a167353so1364644wmx.8
-        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 09:17:53 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=XS0ZDRJdbTaFXTIodebwWZ2Zs2A9XDPYU7p1D6O1mf0=;
-        b=TcI6eKKZ52WwlymtOXuSsxmCb0LJaEhZSrEkNTjLHjjREtUNqdXr0sccTNA4DrbgMn
-         K2L+J/wgEv21gbdg5Db6kqEBs3R+kfhpsj+grD6D6NRms/gIFuUhNKe3o8cBfzUBCMlw
-         d8k+tcAda0c08wMOq+WdN6wUV6uVnjV4yg4y70PzpeRRlho9/Ptgj7IIHd2A8NHsWyUa
-         wCKB0EHR7NFxsbziNSZaLe2dAQkca0ANyof2/oUNze4RpNOEtF4qPX7917hQbTdtyBKi
-         IY5p/a1+q0e1qn19T+eH/0b/tghRwOccILWppb/F2/P1E/B2u/VUB6atOnGit6vAzTdy
-         8Tyg==
-X-Gm-Message-State: AOAM532yMrvbDYlBDFhYoXYeUxZdRX/RhCq9zjjc2AaExth6Dsmt7qya
-        eUZY0HQWc/sphN3TUlJyR1StFSEQ4jNOMPNF5KkM1KuTj/WyGIEXIey9KIjfBN6Tu0qTJM9GHm6
-        7om4jg+U/AwrL
-X-Received: by 2002:a5d:6d88:0:b0:1e3:37c1:3633 with SMTP id l8-20020a5d6d88000000b001e337c13633mr13694526wrs.484.1646759870743;
-        Tue, 08 Mar 2022 09:17:50 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzaK2eVHRi2q7VHFxDpXED+f3vKvPZuHUTcfgXWJzM+PfGD7TWOts3SCW6T6OiVKQsiFqgzBw==
-X-Received: by 2002:a5d:6d88:0:b0:1e3:37c1:3633 with SMTP id l8-20020a5d6d88000000b001e337c13633mr13694505wrs.484.1646759870390;
-        Tue, 08 Mar 2022 09:17:50 -0800 (PST)
-Received: from redhat.com ([2.55.24.184])
-        by smtp.gmail.com with ESMTPSA id u18-20020adfdd52000000b001f04e9f215fsm13950204wrm.53.2022.03.08.09.17.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Mar 2022 09:17:49 -0800 (PST)
-Date:   Tue, 8 Mar 2022 12:17:45 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Lee Jones <lee.jones@linaro.org>
-Cc:     Greg KH <gregkh@linuxfoundation.org>, jasowang@redhat.com,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        stable@vger.kernel.org,
-        syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
-Subject: Re: [PATCH 1/1] vhost: Protect the virtqueue from being cleared
- whilst still in use
-Message-ID: <20220308120858-mutt-send-email-mst@kernel.org>
-References: <20220307191757.3177139-1-lee.jones@linaro.org>
- <YiZeB7l49KC2Y5Gz@kroah.com>
- <YicPXnNFHpoJHcUN@google.com>
- <Yicalf1I6oBytbse@kroah.com>
- <Yicer3yGg5rrdSIs@google.com>
- <YicolvcbY9VT6AKc@kroah.com>
- <20220308055003-mutt-send-email-mst@kernel.org>
- <YidBz7SxED2ii1Lh@kroah.com>
- <20220308071718-mutt-send-email-mst@kernel.org>
- <YidXT6zP1QN5KZUs@google.com>
+        with ESMTP id S1349140AbiCHRW2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 12:22:28 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2959555226
+        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 09:20:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=8KSTIfZ3A6YTActPeOsqennhlyfW6KiP7ReXGWyX8GA=; b=RW9zYzdKLXUtleTVGMAsWrC0yr
+        YAhkzfG04h3rwqSSsVZv5GP2Uw2MtSrjbXk7VtXaxLhYHTpC87e/uMZys6eLHoaTujsl+WuoeUzel
+        mA8BQtAaR0ninTti94CAAPw89dXxWCed0bl8nolXF1hyGv7zPc6Oo/yokaITbk2sRZ8p+j6ybFDoQ
+        q69tc6gwUKwv57afmDaUF5H1kHMVJtQC2vQAZT1tHvuhIQF1kureYSqXHx/ENd3hENE0OFJNyGoAe
+        vSdZ1j/ct+DNmavVbWNx2X6yGgJC20Y30e1CyoaIAxY4DR1z6hPciKKJuPyuVyszASq0FXHYlZLm+
+        xicXsk+w==;
+Received: from [54.239.6.188] (helo=u3832b3a9db3152.drs11.amazon.com)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nRdVK-00GNNf-R2; Tue, 08 Mar 2022 17:20:11 +0000
+Message-ID: <e745f08e615e5eacb04ba492f5fcd1e7d14fa96c.camel@infradead.org>
+Subject: Re: [PATCH v3 00/17] KVM: Add Xen event channel acceleration
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Metin Kaya <metikaya@amazon.co.uk>,
+        Paul Durrant <pdurrant@amazon.co.uk>
+Date:   Tue, 08 Mar 2022 18:20:08 +0100
+In-Reply-To: <5a0d39d9-48b9-5849-daf7-19fbadd75f8c@redhat.com>
+References: <20220303154127.202856-1-dwmw2@infradead.org>
+         <db8515e4-3668-51d2-d9af-711ebd48ad9b@redhat.com>
+         <ec930edc27998dcfe8135a01e368d89747f03c41.camel@infradead.org>
+         <adbaebac-19ed-e8b7-a79c-9831d2ac055f@redhat.com>
+         <42ed3b0c3a82627975eada3bcc610d4e074cb326.camel@infradead.org>
+         <5a0d39d9-48b9-5849-daf7-19fbadd75f8c@redhat.com>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-G3rXyE39JtERLj0ZEYPG"
+User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <YidXT6zP1QN5KZUs@google.com>
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -92,148 +63,167 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 08, 2022 at 01:17:03PM +0000, Lee Jones wrote:
-> On Tue, 08 Mar 2022, Michael S. Tsirkin wrote:
-> 
-> > On Tue, Mar 08, 2022 at 12:45:19PM +0100, Greg KH wrote:
-> > > On Tue, Mar 08, 2022 at 05:55:58AM -0500, Michael S. Tsirkin wrote:
-> > > > On Tue, Mar 08, 2022 at 10:57:42AM +0100, Greg KH wrote:
-> > > > > On Tue, Mar 08, 2022 at 09:15:27AM +0000, Lee Jones wrote:
-> > > > > > On Tue, 08 Mar 2022, Greg KH wrote:
-> > > > > > 
-> > > > > > > On Tue, Mar 08, 2022 at 08:10:06AM +0000, Lee Jones wrote:
-> > > > > > > > On Mon, 07 Mar 2022, Greg KH wrote:
-> > > > > > > > 
-> > > > > > > > > On Mon, Mar 07, 2022 at 07:17:57PM +0000, Lee Jones wrote:
-> > > > > > > > > > vhost_vsock_handle_tx_kick() already holds the mutex during its call
-> > > > > > > > > > to vhost_get_vq_desc().  All we have to do here is take the same lock
-> > > > > > > > > > during virtqueue clean-up and we mitigate the reported issues.
-> > > > > > > > > > 
-> > > > > > > > > > Also WARN() as a precautionary measure.  The purpose of this is to
-> > > > > > > > > > capture possible future race conditions which may pop up over time.
-> > > > > > > > > > 
-> > > > > > > > > > Link: https://syzkaller.appspot.com/bug?extid=279432d30d825e63ba00
-> > > > > > > > > > 
-> > > > > > > > > > Cc: <stable@vger.kernel.org>
-> > > > > > > > > > Reported-by: syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
-> > > > > > > > > > Signed-off-by: Lee Jones <lee.jones@linaro.org>
-> > > > > > > > > > ---
-> > > > > > > > > >  drivers/vhost/vhost.c | 10 ++++++++++
-> > > > > > > > > >  1 file changed, 10 insertions(+)
-> > > > > > > > > > 
-> > > > > > > > > > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> > > > > > > > > > index 59edb5a1ffe28..ef7e371e3e649 100644
-> > > > > > > > > > --- a/drivers/vhost/vhost.c
-> > > > > > > > > > +++ b/drivers/vhost/vhost.c
-> > > > > > > > > > @@ -693,6 +693,15 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
-> > > > > > > > > >  	int i;
-> > > > > > > > > >  
-> > > > > > > > > >  	for (i = 0; i < dev->nvqs; ++i) {
-> > > > > > > > > > +		/* No workers should run here by design. However, races have
-> > > > > > > > > > +		 * previously occurred where drivers have been unable to flush
-> > > > > > > > > > +		 * all work properly prior to clean-up.  Without a successful
-> > > > > > > > > > +		 * flush the guest will malfunction, but avoiding host memory
-> > > > > > > > > > +		 * corruption in those cases does seem preferable.
-> > > > > > > > > > +		 */
-> > > > > > > > > > +		WARN_ON(mutex_is_locked(&dev->vqs[i]->mutex));
-> > > > > > > > > 
-> > > > > > > > > So you are trading one syzbot triggered issue for another one in the
-> > > > > > > > > future?  :)
-> > > > > > > > > 
-> > > > > > > > > If this ever can happen, handle it, but don't log it with a WARN_ON() as
-> > > > > > > > > that will trigger the panic-on-warn boxes, as well as syzbot.  Unless
-> > > > > > > > > you want that to happen?
-> > > > > > > > 
-> > > > > > > > No, Syzbot doesn't report warnings, only BUGs and memory corruption.
-> > > > > > > 
-> > > > > > > Has it changed?  Last I looked, it did trigger on WARN_* calls, which
-> > > > > > > has resulted in a huge number of kernel fixes because of that.
-> > > > > > 
-> > > > > > Everything is customisable in syzkaller, so maybe there are specific
-> > > > > > builds which panic_on_warn enabled, but none that I'm involved with
-> > > > > > do.
-> > > > > 
-> > > > > Many systems run with panic-on-warn (i.e. the cloud), as they want to
-> > > > > drop a box and restart it if anything goes wrong.
-> > > > > 
-> > > > > That's why syzbot reports on WARN_* calls.  They should never be
-> > > > > reachable by userspace actions.
-> > > > > 
-> > > > > > Here follows a topical example.  The report above in the Link: tag
-> > > > > > comes with a crashlog [0].  In there you can see the WARN() at the
-> > > > > > bottom of vhost_dev_cleanup() trigger many times due to a populated
-> > > > > > (non-flushed) worker list, before finally tripping the BUG() which
-> > > > > > triggers the report:
-> > > > > > 
-> > > > > > [0] https://syzkaller.appspot.com/text?tag=CrashLog&x=16a61fce700000
-> > > > > 
-> > > > > Ok, so both happens here.  But don't add a warning for something that
-> > > > > can't happen.  Just handle it and move on.  It looks like you are
-> > > > > handling it in this code, so please drop the WARN_ON().
-> > > > > 
-> > > > > thanks,
-> > > > > 
-> > > > > greg k-h
-> > > > 
-> > > > Hmm. Well this will mean if we ever reintroduce the bug then
-> > > > syzkaller will not catch it for us :( And the bug is there,
-> > > > it just results in a hard to reproduce error for userspace.
-> > > 
-> > > Is this an error you can recover from in the kernel?
-> > >  What is userspace
-> > > supposed to know with this information when it sees it?
-> > 
-> > IIUC we are talking about a use after free here since we somehow
-> > managed to have a pointer to the device in a worker while
-> > device is being destroyed.
-> > 
-> > That's the point of the warning as use after free is hard to debug. You
-> > ask can we recover from a use after free? 
-> > 
-> > As regards to the added lock, IIUC it kind of shifts the use after free
-> > window to later and since we zero out some of the memory just before we
-> > free it, it's a bit more likely to recover.  I would still like to see
-> > some more analysis on why the situation is always better than it was
-> > before though.
-> 
-> With the locks in place, the UAF should not occur.
 
-This really depends which UAF. Yes use of vq->private_data is protected
-by a lock inside the VQ.
+--=-G3rXyE39JtERLj0ZEYPG
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-However, we are talking about vhost_net_release, which ends up doing
+On Tue, 2022-03-08 at 18:13 +0100, Paolo Bonzini wrote:
+> On 3/8/22 17:59, David Woodhouse wrote:
+> > > > Incremental diff to the 'oneshot timers' patch looks like the first
+> > > > hunk of this. I'm also pondering the second hunk which actively
+> > > > *cancels*  the pending timer on serialization.
+> > >=20
+> > > Hmm, why so?
+> >=20
+> > Don't know yet. But as I added the save/restore support to Joao's patch
+> > I had *assumed* that it would fail when the delta was negative, and was
+> > kind of surprised when it worked in the first place. So I'm sticking
+> > with "Don't Do That Then" as my initial response to fix it.
+>=20
+> Yes, I'm just talking about the second hunk.  The first is clear(ish).
 
-        kfree(n->dev.vqs);
-...
-        kvfree(n);
+Oh, I see.
 
-if someone is holding a pointer to a vq or the device itself at this
-point, no locks that are part of one of said structures will be
-effective in preventing a use after free, and using a lock to delay such
-accesses to this point just might make it more likely there's a use
-after free.
+When the oneshot timer has expired and hasn't been re-armed by the
+guest, we should return zero as 'expires_ns' so that it doesn't get re-
+armed in the past (and, hopefully, immediately retriggered) when the
+guest is restored.
+
+Also, we don't really want the timer firing *after* the guest vCPU
+state has been serialized, since the newly-injected interrupt might not
+get migrated. Hence using hrtimer_cancel() as our check for whether
+it's still pending or not.
+
+> > After a kexec, the deadline for the timer is past, and that's why it
+> > ends up getting restored with a negative delta. After a *few*  cycles o=
+f
+> > this it usually ends up with the timer callback never triggering.
+> >=20
+> > I'll stick a negative delta into the KVM selftest included in the patch
+> > series, instead of the nice polite '100ms in the future' that it uses
+> > at the moment. That ought to trigger it too, and I can instrument the
+> > hrtimer code to work out what's going on. Either way, I think 'Don't Do
+> > That Then' will continue to be the right answer:)
+>=20
+> Yep, let's keep both testcases through.
+
+Ultimately I think the negative one only ends up testing the kernel's
+hrtimer behaviour rather than KVM functionality, but I'll play with
+that some more and make sure I understand it.=20
 
 
-All of the above is why we didn't rush to apply the locking patch in the
-first place, for all that it seemed to fix the sysboz crash.
+--=-G3rXyE39JtERLj0ZEYPG
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIwMzA4MTcyMDA4WjAvBgkqhkiG9w0BCQQxIgQg7YhFdx+q
+ou4OZMwQSvu37tbH7ZFdVGN/s27Iw7JgsRIwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgB/EJswCbgS1bJKHrHJEw7bfGreUV1ocKB+
+VB2xQHsRDHS4EZERvAp+Z5sFSSHS0hdnEE4EvoNBFIvaTBROuft4UOtBEfdQdStMG8ldGWd8GIW3
+/8J03XoFnLipGvHhAOywlH76HdvDwoCcdZ3VOkE3ukG0jeXVeFbwNCDEFMFBdkAF8frzq2AjX61x
+E0zJa8YaqcTYuBcNtnGt/YCFi6l20KX6ZHkyQX5CO7PLU90OhQm6e82GIt4vh/D15Zh7lFuy0maL
+HbjJvBGKo6HWXczBHv5mFhdObiGYOXrgiAAsYIlZO+tBXzqyKRzJIxOvktd79JwpJx0kK4/PSWRG
+DG0xlOfo7qkqLCrBeSuqJkKl+9LZsfx3n+MtO2s0zIqyJgi3OM0L7r/I8sflMVVd+x42mg1fH1A2
+VYEqnPgcgfxdAKLhd5H1DK4U6ftGHxDl+qDAAB2GvtxZaF0smRvHvNWK6kUlGJ9AjwU6FSK8q4ML
+sVow4Viy6uV8O5eKSGJvwdHL+li3iwH0hLT/t4Jhv750yUP7+R0QQesZwALFohu75TiCrV6rajDA
+Tg638yh+EMuGboaqiua2oqcaT33mlllXSpkHcthkIFhCw+QK+l+y6ZnThS2yJ5XeAMRZ6s0i/XE+
+juonSAA58OiSxYALhimpJdwFS3BcqBEwv4cXAHBnNQAAAAAAAA==
 
 
-
-> The issue here is that you have 2 different tasks processing the
-> same area of memory (via pointers to structs).  In these scenarios you
-> should always provide locking and/or reference counting to prevent
-> memory corruption or UAF.
-
-But we should not have 2 tasks doing that, and if we do then lock
-just might be ineffective since the lock itself is released.
-
-Again maybe in this case it makes sense but it needs a more detailed
-analysis to show it's a net win than just "we have two tasks ergo we
-need locking".
-
-> -- 
-> Lee Jones [李琼斯]
-> Principal Technical Lead - Developer Services
-> Linaro.org │ Open source software for Arm SoCs
-> Follow Linaro: Facebook | Twitter | Blog
+--=-G3rXyE39JtERLj0ZEYPG--
 
