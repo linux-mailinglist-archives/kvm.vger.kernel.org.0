@@ -2,81 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8CCDD4D1B37
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 16:00:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 645D94D1BA1
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 16:26:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347713AbiCHPAp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 10:00:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58170 "EHLO
+        id S1347752AbiCHP13 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Mar 2022 10:27:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57548 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347715AbiCHPAo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Mar 2022 10:00:44 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D7F484D9D1
-        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 06:59:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646751587;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
+        with ESMTP id S234931AbiCHP11 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 10:27:27 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52D694754D;
+        Tue,  8 Mar 2022 07:26:30 -0800 (PST)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id F132B1F380;
+        Tue,  8 Mar 2022 15:26:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1646753188; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=jzr7Tjg5k88wWs3L1tmpG2SvYl/v6vmFVG1ptblPx8I=;
-        b=XtXIj8R4Ceo9NHsp+i5Fm4zULvywisxT+aPNMsrlVDuthizTQpe6maNyO4EDxA9Y/3zzxO
-        eWpR7VEDW68ekOh7sdVJFVPsG9ben4PpsZJ0veZZnN7iKtWVSQHKL+PI+Swgc+SqhDl/ac
-        9Ut4g4GqGqxTXlpFCwNrP7dOGPR99o0=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-627-u9aTCdBLN9yv2yTDaasmIA-1; Tue, 08 Mar 2022 09:59:46 -0500
-X-MC-Unique: u9aTCdBLN9yv2yTDaasmIA-1
-Received: by mail-ej1-f69.google.com with SMTP id k21-20020a1709063e1500b006d0777c06d6so8823042eji.1
-        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 06:59:44 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=jzr7Tjg5k88wWs3L1tmpG2SvYl/v6vmFVG1ptblPx8I=;
-        b=SftynOJxevDIpwwJ42zlxnfvy6KZLaCnSKu2CfDEcn9oKv3jB8rq9AerSzGeDpC/ZQ
-         YvlkKNJgqEk8bKarDhHRT3TRbvW/LALbCmPQZJSFoK0jqeJq0jAWSKnKlq3tNUh4FKPg
-         o0OrCVI0MlguVSPJa0KFllFHp5e4winmA96CMaeXz6BWNXLOoqSMXCjhyEcijj3JnYs0
-         a8cIjMbDNy+m+XMZK1ggYLX6O2eG9VI6NbOclPKvWn+05vxenotclS/K0dT3PYPuhWKY
-         93ePA6mLtfR79YToV/GTmjcaPlCyvDSllig35wYqAcKLWpLBG77GLsnVlshu0bIsBNep
-         kdkQ==
-X-Gm-Message-State: AOAM531podU4WDldHVyHMPPGnwv7TXpB9NqPgp4V8rxVb+DJOwMmcztq
-        y94e4CbT98Nf8BNKeSadVZh3DhBOX/OqrfetbBq1leNvfzezHheNh4PN8jiv7dbsJpVKkF9DX79
-        PRrkCpPQ2pd4A
-X-Received: by 2002:a05:6402:3492:b0:416:378e:c388 with SMTP id v18-20020a056402349200b00416378ec388mr12076687edc.241.1646751583789;
-        Tue, 08 Mar 2022 06:59:43 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzAIf05Z7tePcNG41qY85oWlbcDBl5BHMOBUho0m22NnwAN8Sw/cvL0grij/RNa6laYNY8PdA==
-X-Received: by 2002:a05:6402:3492:b0:416:378e:c388 with SMTP id v18-20020a056402349200b00416378ec388mr12076675edc.241.1646751583607;
-        Tue, 08 Mar 2022 06:59:43 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id m10-20020a056402510a00b00415eee901c0sm7069093edd.61.2022.03.08.06.59.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Mar 2022 06:59:42 -0800 (PST)
-Message-ID: <76606ce7-6bbf-dc92-af2c-ee3e54169ecd@redhat.com>
-Date:   Tue, 8 Mar 2022 15:59:42 +0100
+        bh=m2m+Ogcvgk7zAck8lJL9y5rOuyf0bq56RUWhNvKb8gE=;
+        b=OFDOb0EX8vyJa+0LJDX7Xt+dj6BWiRqgtFSXsPFEiYkQ6sdEw/loo4IXxjnn4hrfyZx4nu
+        xtvYdMNA0TmRGdgQCsrBvDWK+/YB3GNo5U1S690uSfCWm1EOUwu+z/F/Fl1e8LfoiK7zg1
+        decbmKM6dxZOdt3C97MlG/yD3bCKPZY=
+Received: from suse.cz (unknown [10.100.201.86])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay2.suse.de (Postfix) with ESMTPS id 80421A3B83;
+        Tue,  8 Mar 2022 15:26:26 +0000 (UTC)
+Date:   Tue, 8 Mar 2022 16:26:26 +0100
+From:   Michal Hocko <mhocko@suse.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>,
+        Christoph Lameter <cl@linux.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Vladimir Davydov <vdavydov.dev@gmail.com>, linux-mm@kvack.org,
+        cgroups@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH 1/3] mm: vmalloc: introduce array allocation functions
+Message-ID: <Yid1orgE/Yf56WSV@dhcp22.suse.cz>
+References: <20220308105918.615575-1-pbonzini@redhat.com>
+ <20220308105918.615575-2-pbonzini@redhat.com>
+ <Yidefp4G/Hk2Twfy@dhcp22.suse.cz>
+ <77a34051-2672-88cf-99dd-60f5acfb905e@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH v2 0/1] KVM: Dirty quota-based throttling
-Content-Language: en-US
-To:     Shivam Kumar <shivam.kumar1@nutanix.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, agraf@csgraf.de
-References: <20211220055722.204341-1-shivam.kumar1@nutanix.com>
- <f05cc9a6-f15b-77f8-7fad-72049648d16c@nutanix.com>
- <YdR9TSVgalKEfPIQ@google.com>
- <652f9222-45a8-ca89-a16b-0a12456e2afc@nutanix.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <652f9222-45a8-ca89-a16b-0a12456e2afc@nutanix.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <77a34051-2672-88cf-99dd-60f5acfb905e@redhat.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -84,21 +61,22 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/5/22 16:39, Shivam Kumar wrote:
+On Tue 08-03-22 14:55:39, Paolo Bonzini wrote:
+> On 3/8/22 14:47, Michal Hocko wrote:
+> > Seems useful
+> > Acked-by: Michal Hocko<mhocko@suse.com>
+> > 
+> > Is there any reason you haven't used __alloc_size(1, 2) annotation?
 > 
->> On Mon, Jan 03, 2022, Shivam Kumar wrote:
->>> I would be grateful if I could receive some feedback on the dirty 
->>> quota v2
->>> patchset.
->>    'Twas the week before Christmas, when all through the list,
->>    not a reviewer was stirring, not even a twit.
->>
->> There's a reason I got into programming and not literature.  Anyways, 
->> your patch
->> is in the review queue, it'll just be a few days/weeks. :-)
-> Thank you so much Sean for the update!
+> It's enough to have them in the header:
+> 
+> > > +extern void *__vmalloc_array(size_t n, size_t size, gfp_t flags) __alloc_size(1, 2);
+> > > +extern void *vmalloc_array(size_t n, size_t size) __alloc_size(1, 2);
+> > > +extern void *__vcalloc(size_t n, size_t size, gfp_t flags) __alloc_size(1, 2);
+> > > +extern void *vcalloc(size_t n, size_t size) __alloc_size(1, 2);
 
-Hi, are you going to send v3?
-
-Paolo
-
+My bad, I have expected __alloc_size before the function name and simply
+haven't noticed it at the end.
+-- 
+Michal Hocko
+SUSE Labs
