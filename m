@@ -2,143 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0C7E74D18FA
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 14:18:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7955D4D1952
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 14:37:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347108AbiCHNSo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 08:18:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33416 "EHLO
+        id S236036AbiCHNi0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Mar 2022 08:38:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42994 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244168AbiCHNSk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Mar 2022 08:18:40 -0500
-Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6F95BC91
-        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 05:17:41 -0800 (PST)
-Received: by mail-wr1-x429.google.com with SMTP id r10so28529977wrp.3
-        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 05:17:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=XfVP1Futsy++7m0TgbkvY6qiuRCjgerrga+g67lu1Ek=;
-        b=daU9XDRbpf5VVtFrY2QzcwF3ZtTcFBrXQsRNdZelyHpgJKdIFec7rg+VV/zCsSDTLV
-         +EnGy0tCVeGPFpsekK1W3dlBFpATezbhh3SeK6V9k1iBnVJNTlOfr3tpK6AWsyxHJ0SN
-         +oTJM3DO5dRsz2QnuPmw9+aAVUw0VVU+EICURKWHmBuPWwAiQZspNrKzrjlUJA/Sc0Ns
-         hMGAJTbDLIXQ9AaW+MFe1+2OkExuZsxMpiV0EAEs98sfGlGfgOOXhNozI4tCH2hTkdux
-         PGI8AYV+glVQMiXQWFpKrKBeL08Im9TCs71moi41c75P0JWJDIM7QD5ktYG8IPXiaBEi
-         mmzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=XfVP1Futsy++7m0TgbkvY6qiuRCjgerrga+g67lu1Ek=;
-        b=qfG5mCaVfy4j7RV6zdHodRoHq8qXef884k7zR2VZguUAcAXs9SEZ/q4yf8aHteiIzn
-         0LgPLvowVdzyslb97CnHGzUlpvCF9QpYWpn3VzJYbxhHT21yidjlFx0qj9r0osvexjG/
-         eAxX0ji2R96s6Cxt6bQCfh+cuDMP6xyOIOliYLvt25PA5fsd1ucsDgCt6/2yORI02nQI
-         aEGzyXKsDUkTyOucBNAsM19j+GzaFjIx5hQsqG1r6LiX9bf64QIw21FNOlXNOtkjvMDj
-         YSK4D59ZkyWgV8XOBeUrX55R0xrT8zdHAwsPangzWNcGR1VV97cpjFCuTbnjjwVUcoGd
-         tL/Q==
-X-Gm-Message-State: AOAM5310LJNw01RNvJpZk6J0amFrCfIgEJQ0HTT7ZWP9ZkYOBk4TtY/B
-        bcfg47hGQFbOPpon4r8UiRpvHw==
-X-Google-Smtp-Source: ABdhPJwMzbNS8dkm+oUEuSulCjhaXvI277sU1XFD3cangGoXohBMiM7L39t6Kf1rVlzeuymzembtoQ==
-X-Received: by 2002:a5d:4089:0:b0:1f0:4819:61ba with SMTP id o9-20020a5d4089000000b001f0481961bamr12511835wrp.307.1646745459965;
-        Tue, 08 Mar 2022 05:17:39 -0800 (PST)
-Received: from google.com (203.75.199.104.bc.googleusercontent.com. [104.199.75.203])
-        by smtp.gmail.com with ESMTPSA id bi6-20020a05600c3d8600b00381590dbb25sm2354561wmb.3.2022.03.08.05.17.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Mar 2022 05:17:39 -0800 (PST)
-Date:   Tue, 8 Mar 2022 13:17:38 +0000
-From:   Sebastian Ene <sebastianene@google.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     kvm@vger.kernel.org, qperret@google.com, will@kernel.org,
-        julien.thierry.kdev@gmail.com, maz@kernel.org
-Subject: Re: [PATCH kvmtool v8 1/3] aarch64: Populate the vCPU struct before
- target->init()
-Message-ID: <YidXctiW9xUoJl80@google.com>
-References: <20220307144243.2039409-1-sebastianene@google.com>
- <20220307144243.2039409-2-sebastianene@google.com>
- <YicvwRlojrgSSrdU@monolith.localdoman>
+        with ESMTP id S1347167AbiCHNiN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 08:38:13 -0500
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 97CF949906;
+        Tue,  8 Mar 2022 05:37:16 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 513A2139F;
+        Tue,  8 Mar 2022 05:37:16 -0800 (PST)
+Received: from [10.57.41.254] (unknown [10.57.41.254])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B013C3FA58;
+        Tue,  8 Mar 2022 05:37:10 -0800 (PST)
+Message-ID: <d8bbe591-b6c3-d44a-7a7d-3187e8377e4f@arm.com>
+Date:   Tue, 8 Mar 2022 13:37:05 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YicvwRlojrgSSrdU@monolith.localdoman>
-X-Spam-Status: No, score=-15.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,URI_DOTEDU,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.2
+Subject: Re: [PATCH v8 01/11] iommu: Add DMA ownership management interfaces
+Content-Language: en-GB
+To:     Lu Baolu <baolu.lu@linux.intel.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>
+Cc:     kvm@vger.kernel.org, rafael@kernel.org,
+        David Airlie <airlied@linux.ie>, linux-pci@vger.kernel.org,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Dmitry Osipenko <digetx@gmail.com>,
+        Will Deacon <will@kernel.org>,
+        Stuart Yoder <stuyoder@gmail.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        linux-kernel@vger.kernel.org, Li Yang <leoyang.li@nxp.com>,
+        iommu@lists.linux-foundation.org,
+        Jacob jun Pan <jacob.jun.pan@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>
+References: <20220308054421.847385-1-baolu.lu@linux.intel.com>
+ <20220308054421.847385-2-baolu.lu@linux.intel.com>
+From:   Robin Murphy <robin.murphy@arm.com>
+In-Reply-To: <20220308054421.847385-2-baolu.lu@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 08, 2022 at 10:28:17AM +0000, Alexandru Elisei wrote:
-> Hi,
+On 2022-03-08 05:44, Lu Baolu wrote:
+> Multiple devices may be placed in the same IOMMU group because they
+> cannot be isolated from each other. These devices must either be
+> entirely under kernel control or userspace control, never a mixture.
 > 
-
-Hi,
-
-> On Mon, Mar 07, 2022 at 02:42:42PM +0000, Sebastian Ene wrote:
-> > Move the vCPU structure initialisation before the target->init() call to
-> >  keep a reference to the kvm structure during init().
-> > This is required by the pvtime peripheral to reserve a memory region
-> > while the vCPU is beeing initialised.
-> > 
-> > Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> This adds dma ownership management in iommu core and exposes several
+> interfaces for the device drivers and the device userspace assignment
+> framework (i.e. VFIO), so that any conflict between user and kernel
+> controlled dma could be detected at the beginning.
 > 
-> I think you're missing Marc's Reviewed-by tag.
->
-
-I will add the Reviewed-by tag to the next iteration.
-
-> Thanks,
-> Alex
+> The device driver oriented interfaces are,
 > 
+> 	int iommu_device_use_default_domain(struct device *dev);
+> 	void iommu_device_unuse_default_domain(struct device *dev);
+> 
+> By calling iommu_device_use_default_domain(), the device driver tells
+> the iommu layer that the device dma is handled through the kernel DMA
+> APIs. The iommu layer will manage the IOVA and use the default domain
+> for DMA address translation.
+> 
+> The device user-space assignment framework oriented interfaces are,
+> 
+> 	int iommu_group_claim_dma_owner(struct iommu_group *group,
+> 					void *owner);
+> 	void iommu_group_release_dma_owner(struct iommu_group *group);
+> 	bool iommu_group_dma_owner_claimed(struct iommu_group *group);
+> 
+> The device userspace assignment must be disallowed if the DMA owner
+> claiming interface returns failure.
 
-Thanks,
-Sebastian
+Reviewed-by: Robin Murphy <robin.murphy@arm.com>
 
-> > ---
-> >  arm/kvm-cpu.c | 14 +++++++-------
-> >  1 file changed, 7 insertions(+), 7 deletions(-)
-> > 
-> > diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
-> > index 6a2408c..84ac1e9 100644
-> > --- a/arm/kvm-cpu.c
-> > +++ b/arm/kvm-cpu.c
-> > @@ -116,6 +116,13 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
-> >  			die("Unable to find matching target");
-> >  	}
-> >  
-> > +	/* Populate the vcpu structure. */
-> > +	vcpu->kvm		= kvm;
-> > +	vcpu->cpu_id		= cpu_id;
-> > +	vcpu->cpu_type		= vcpu_init.target;
-> > +	vcpu->cpu_compatible	= target->compatible;
-> > +	vcpu->is_running	= true;
-> > +
-> >  	if (err || target->init(vcpu))
-> >  		die("Unable to initialise vcpu");
-> >  
-> > @@ -125,13 +132,6 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
-> >  		vcpu->ring = (void *)vcpu->kvm_run +
-> >  			     (coalesced_offset * PAGE_SIZE);
-> >  
-> > -	/* Populate the vcpu structure. */
-> > -	vcpu->kvm		= kvm;
-> > -	vcpu->cpu_id		= cpu_id;
-> > -	vcpu->cpu_type		= vcpu_init.target;
-> > -	vcpu->cpu_compatible	= target->compatible;
-> > -	vcpu->is_running	= true;
-> > -
-> >  	if (kvm_cpu__configure_features(vcpu))
-> >  		die("Unable to configure requested vcpu features");
-> >  
-> > -- 
-> > 2.35.1.616.g0bdcbb4464-goog
-> > 
-> > _______________________________________________
-> > kvmarm mailing list
-> > kvmarm@lists.cs.columbia.edu
-> > https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> Signed-off-by: Kevin Tian <kevin.tian@intel.com>
+> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
