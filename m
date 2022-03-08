@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 68E584D1E0B
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 18:00:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C92F64D1E35
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 18:11:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241000AbiCHRBE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 12:01:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50556 "EHLO
+        id S242102AbiCHRMG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Mar 2022 12:12:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229740AbiCHRBD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Mar 2022 12:01:03 -0500
+        with ESMTP id S231548AbiCHRMF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 12:12:05 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FA2152E34
-        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 09:00:06 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B8634D63D
+        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 09:11:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=tq8L/02dkP02JAgNIr0SCOKarEFC5zBNUThgBFFb8zQ=; b=V3t9S9NM8e/7+pJNwTRRw+BrqW
-        qKqKUzHXv+hifCHZ8LPlq/lh9k/+yB7g28ips9OpKeyBoluehMGvfM5Xo+JNn2tU28/MBqdjcTB+0
-        ng8VmG2erFy7xD4Ur9P0cJD5L8jIf2TA+e1Wc66OZcgVLUF/UB2xLoSSbggLiU8hwr4xyOYwis4CH
-        lMtTLeaFQutY9YKebA/q1FXgNMDCXC9HPriaQqNBZcxnu9ON+FLL0x5fpcWoXhc0ZXogg/atksRGO
-        Ql74MAGFxB+ARqCePq8McF5Ffm5iND1bTsk1X3HExgnOOFuJLvDlBBrcZOz0ElMAlBGCUuam4zIXh
-        CBp/xy7Q==;
+        bh=6Kx9JxDBbvoVJ3EjvA8tUJKAojc5N3AjuFAEAuEAG/c=; b=vXXqQjHbq57lUbiTbhSNX8lDcC
+        gKG1BvaR2yyvL+Hwfyhnfzm325BslE/H+PS1Qp1001hWATEDiafOQBpP9UM62fylkUTbDhKjR6Kmx
+        ynjdPXr9V2A/IPgCyaYV/xgsxzV05mDT8HtBfnbkL30CEuLa//ly2MUOoAIlT3mExZG2FFau2PITQ
+        Ynqw3Elc/8MA7AV5sWjNO8k66bP6N6oaH8RrHYrhiNB/DhZHfNWohdPAq3QpIbafdymj7oj68KtSJ
+        2BGbkfqTekMavQmD3bxawmVg6zTHBAZepJ0S23ztbcIUXdSECGFrrDD0Adc+YGYTWq5vj2GzOizHA
+        aSOJUt0g==;
 Received: from [54.239.6.188] (helo=u3832b3a9db3152.drs11.amazon.com)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nRdBg-00GMRt-G5; Tue, 08 Mar 2022 16:59:52 +0000
-Message-ID: <42ed3b0c3a82627975eada3bcc610d4e074cb326.camel@infradead.org>
+        id 1nRdMK-00GMse-NS; Tue, 08 Mar 2022 17:10:52 +0000
+Message-ID: <7c9913c508f0c5e06d291380effaa1efb2ef03ce.camel@infradead.org>
 Subject: Re: [PATCH v3 00/17] KVM: Add Xen event channel acceleration
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
@@ -40,14 +40,15 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Boris Ostrovsky <boris.ostrovsky@oracle.com>,
         Metin Kaya <metikaya@amazon.co.uk>,
         Paul Durrant <pdurrant@amazon.co.uk>
-Date:   Tue, 08 Mar 2022 17:59:51 +0100
-In-Reply-To: <adbaebac-19ed-e8b7-a79c-9831d2ac055f@redhat.com>
+Date:   Tue, 08 Mar 2022 18:10:51 +0100
+In-Reply-To: <42ed3b0c3a82627975eada3bcc610d4e074cb326.camel@infradead.org>
 References: <20220303154127.202856-1-dwmw2@infradead.org>
          <db8515e4-3668-51d2-d9af-711ebd48ad9b@redhat.com>
          <ec930edc27998dcfe8135a01e368d89747f03c41.camel@infradead.org>
          <adbaebac-19ed-e8b7-a79c-9831d2ac055f@redhat.com>
+         <42ed3b0c3a82627975eada3bcc610d4e074cb326.camel@infradead.org>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-uPaTGkSCJgzb58lIIiWp"
+        boundary="=-d/Td+2yLX/XBYARoUh7X"
 User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
@@ -62,51 +63,34 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-uPaTGkSCJgzb58lIIiWp
+--=-d/Td+2yLX/XBYARoUh7X
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, 2022-03-08 at 17:49 +0100, Paolo Bonzini wrote:
-> On 3/8/22 17:41, David Woodhouse wrote:
-> > Thanks. I've literally just a couple of minutes ago finished diagnosing
-> > a sporadic live migration / live update bug which seems to happen
-> > because adding an hrtimer in the past*sometimes*  seems not to work,
-> > although it always worked in my dev testing.
-> >=20
-> > Incremental diff to the 'oneshot timers' patch looks like the first
-> > hunk of this. I'm also pondering the second hunk which actively
-> > *cancels*  the pending timer on serialization.
+On Tue, 2022-03-08 at 17:59 +0100, David Woodhouse wrote:
+> > kvm/queue is rebased routinely, so I'll just squash (only the first=20
+> > hunk, methinks).  Got a testcase, though?  That might be better as a=
+=20
+> > separate patch.
 >=20
-> Hmm, why so?
-
-Don't know yet. But as I added the save/restore support to Joao's patch
-I had *assumed* that it would fail when the delta was negative, and was
-kind of surprised when it worked in the first place. So I'm sticking
-with "Don't Do That Then" as my initial response to fix it.
-
-> > Do you want a repost, or a proper incremental patch on top of kvm/queue
-> > when it becomes visible?
+> My test case right now is to run 'while true; time sleep 1; done' in
+> the guest while I repeatedly kexec / live update the host.=20
 >=20
-> kvm/queue is rebased routinely, so I'll just squash (only the first=20
-> hunk, methinks).  Got a testcase, though?  That might be better as a=20
-> separate patch.
+> After a kexec, the deadline for the timer is past, and that's why it
+> ends up getting restored with a negative delta. After a *few* cycles of
+> this it usually ends up with the timer callback never triggering.
+>=20
+> I'll stick a negative delta into the KVM selftest included in the patch
+> series, instead of the nice polite '100ms in the future' that it uses
+> at the moment. That ought to trigger it too, and I can instrument the
+> hrtimer code to work out what's going on. Either way, I think 'Don't Do
+> That Then' will continue to be the right answer :)
 
-My test case right now is to run 'while true; time sleep 1; done' in
-the guest while I repeatedly kexec / live update the host.=20
+Oh, I bet that won't show it and the kexec is actually needed. I bet it
+only happens when the timer expiry is actually at a time *before* zero
+on the new kernel's clock.
 
-After a kexec, the deadline for the timer is past, and that's why it
-ends up getting restored with a negative delta. After a *few* cycles of
-this it usually ends up with the timer callback never triggering.
-
-I'll stick a negative delta into the KVM selftest included in the patch
-series, instead of the nice polite '100ms in the future' that it uses
-at the moment. That ought to trigger it too, and I can instrument the
-hrtimer code to work out what's going on. Either way, I think 'Don't Do
-That Then' will continue to be the right answer :)
-
-
-
---=-uPaTGkSCJgzb58lIIiWp
+--=-d/Td+2yLX/XBYARoUh7X
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -198,25 +182,25 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIwMzA4MTY1OTUxWjAvBgkqhkiG9w0BCQQxIgQgF1YqGjdE
-MZL5Qr0ahir0KMI48lojVJsW6MB+I/vHBkwwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIwMzA4MTcxMDUxWjAvBgkqhkiG9w0BCQQxIgQgirobcP6J
+7Jz0kPK8nLWLwlsdisyll/9AwBFA8Ngi3A8wgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBRT2aUOwEPIFoUDhJMkl4VbwaYna0zYmLp
-NJFosfQ5X/m5s5v2mWuh9c94S9hlnBM6AFiNRLrhQbpZ6KoCuvM1BPBpsFDHUNJ8e3AyJbg8wRTN
-/JGQtX+iY6vTxa4BF557Kjeqnd4n3vtIbFY+8wbCdJvzRWpscvwU07yjlCdQZttuaysEbSWMdYOi
-G2egt38rAND2j3MbShV2K2cxwxCgQCM7DlSVRXSunFE4GdLG3Svfa1R1zDJX2e3gulVRN5M9Y/qJ
-++WkW2pIWo8PDOyQq63m7PtWDEPTlhPpGQ5bP5WpxubO1FaBWwX3/EiacIq5UGxf0EubZSekasQp
-WT2G26voUT1+io07MkA0GlauyJvN3yuIttsUCdrbX6DxWZ1BJUkmPE80xUSlwT0E5l0AUUyJgQ2H
-0J/+kgte00xQJgoNYgq3s7CVimDoxc9HImY2wtPxIDNN8RPnvZnffpWfjd1sPh4pbd+8jisKXZ8M
-T9uD7cPlg0wh0zmnDlD4zmJek8a024G79GbRj0vkg1Es1wO2RdmNBOi+fpqhmqvMt33FZWrkMSNh
-RyaNEfJAG+w+6GPG2ssQHE2ax5Yq8Bau7eWIQmy3Y4BjsDjFNZsJNqw1RlWz+mNXuz6JOEZRkvfO
-m4cPztsuq2/HwKQmNRGvVRQzINvHm+YHnU0swNqlPAAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCKw4BekxBhhlZXG039oG26k+X1KBYOXuEC
+nteCvs1W9G4+lRVsEYx9MHGSCoI8TDs0HB2/0K0rmgHAiOeBhxS7bMgb7OMpimI0uHViEJ3opjsi
+uhAxuM6CZHUmK+HB4CcI9sQGhWOqw5wk6b8bceAIiEO7+kPnUjB4Es4dzoS+RZqLqZ0NLCbrQpxJ
+bb8VEfoM82B0R1cUTJ1RxApgYmWEh1HPB4PKME5HUShJqCED4/kpN5r1OjyCnQr7pG1maZAmkGfD
+ZcNOkZTaBlC1NZcvzIpwAbp9TLh4cqg2uvHz6TbN04vnC3suStfwkavY6NuLNb/QQ2qpY82OZyzR
+EhNBsBfR4YQ+Q9vuycx+7Z5eXjBdKPWxdMVEunT00dF4RKvzWnEpbkMapNsRqyCFfrAEfV+pE8dD
+wIleFlbcerRsoW0IlKSB2kKFEjn5+SgDDmNg5d3kmkmzaztJwfzDmXElKQ9TH7u+A7h+HiVS3JVH
+QAVZ7G29srX/I4PeyJmSF0WIWP78KBHQKxUa0IY6Vm/xZX5Q4bmdvKyHCN+66RBkA7XHkRdizlQS
+c3MITxGdG5+Fej3KuNN20PA5KsXAOAVzZMU/pBNxvpyhlzT/FbRAUVfoDsbfzsh8DpaS7rmHHsng
+c+Cy/bcOM5mli1om/yi+YTOMROhFp8IZEG+VLrQoMgAAAAAAAA==
 
 
---=-uPaTGkSCJgzb58lIIiWp--
+--=-d/Td+2yLX/XBYARoUh7X--
 
