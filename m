@@ -2,298 +2,415 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E0A704D22B7
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 21:35:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C03B44D22FC
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 21:58:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350258AbiCHUfx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 15:35:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36190 "EHLO
+        id S1345449AbiCHU7v (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Mar 2022 15:59:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34830 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344401AbiCHUfw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Mar 2022 15:35:52 -0500
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4815848385
-        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 12:34:54 -0800 (PST)
-Received: by mail-pj1-x1030.google.com with SMTP id mg21-20020a17090b371500b001bef9e4657cso3287309pjb.0
-        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 12:34:54 -0800 (PST)
+        with ESMTP id S233035AbiCHU7t (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 15:59:49 -0500
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 301DD37018
+        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 12:58:52 -0800 (PST)
+Received: by mail-pl1-x631.google.com with SMTP id 9so193061pll.6
+        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 12:58:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=osjEu/BzQjlMgIynCXPifURSKARPlb6CcHwdOG0TASU=;
-        b=rSi8eUgt5HjmDltnAVBs+TcNHyne2FZzqLvIx+y7nmvqStEp6BdD+zeusVa0Z7NIOL
-         grArvEwdeD3d5y07nZKqV8p+kwSvkmX1c/1ngs3Y5pLieAEDr5tbqK9vhuKWVtpcCldc
-         4JZYvasPEB4oHZ2UBZLSGWtDaOgnitLa4/zu64kYgwAtd0g0FIaPGrjBzLphTceHFMoD
-         bl50LXYgQbppvOlqWBYZbK6mVR83yWrZ0VahR+EJuRgCSc+mT8Y6ihhqI1uaxjyp9FKf
-         svJLoZa6Rk2UkX1jUXKH919T2bLdLFsH3BGG/Q99+omj4WcCV4G7PUoslCCUWrgCSmS2
-         4Llw==
+        bh=4IJlKs/eE7gOdCe8Uo/1nseLilbVaX3nge4KCMKFs8Y=;
+        b=N0+jpquqL/hxyaQ0I1FgFKidEJ2yASLqYqJ0hc5KUR9wg1RNj7O+QVffH++TpA9fjH
+         B6pJ866PkdsaWGmVFr1uyE+A1Oa0cYGdbNfy3cj8f2UurWk2TD/FCFm3J22/A9TZWOw4
+         aMgUlSSgTPD7e7k+yzLS7wEHykfmENrFPUirljCd/jbS3bSZ1nFUxvb2HuqNaczvTzYR
+         1yVvrkp+8xtuZ9wiViDuGcqgyabMmzoKZUcp2VxJ6tQhq9E08f5QcsoO4JoLL143Xnd2
+         WbyGml8Bs4YTU1l26Kb4zsZCnIZ3MTGsfEacsqsosOXMKsUD4N237QkKZDXvtLROcEkX
+         ywsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=osjEu/BzQjlMgIynCXPifURSKARPlb6CcHwdOG0TASU=;
-        b=kO+Lv50ofq+Ay65DprxY1haIa35PiP2ZifjQDAKr4Qqe6mZeYf2CEEB3oX+tyQrtu8
-         KQD2vOgOdoOv/QDUV8vlheTgHhCz/1BJhOU5ekCLHxkO+P7j+O3AZ9zN6UWf2rYLmAuk
-         kcC+3QC3ssbcFcZc7YZx2M3I2+ofeETB7xHR9EV+4RJH4dWjyrUQJhq/GJs/IazMSDRW
-         y2szY4aOdevbTHuClJVNeMQnCN3JKLep/qwsWu97rWUthHCqic+k0LWD+Q9D14L5pY8e
-         13uW4hmTrp19ti9ZQAWZIOVN+eA0ZiXigU4MM528LboUAPipePoujP3ml0xgYctRmRN6
-         tgtQ==
-X-Gm-Message-State: AOAM533UY5rwwnFSWxTGDKlEPHPrFOBEzVbYvsNzg3SZb4QG7sKSY50E
-        mU8okdJG7k2DatF7kmixp0tkkA==
-X-Google-Smtp-Source: ABdhPJyE5IcAOAHabCX2EwwigAkNWylbCiTy41Q2s8ug0zdsv3HojecbYVakGoAVIq9yFWxBxue4Hw==
-X-Received: by 2002:a17:90a:cce:b0:1bf:6387:30d9 with SMTP id 14-20020a17090a0cce00b001bf638730d9mr6765495pjt.196.1646771693437;
-        Tue, 08 Mar 2022 12:34:53 -0800 (PST)
+        bh=4IJlKs/eE7gOdCe8Uo/1nseLilbVaX3nge4KCMKFs8Y=;
+        b=gXziY/Ap6EjiZwpxgfuFXABLgKiARoHRSJXChaSenbN9ktMq3INgtHkktoUDXCCF9f
+         +xpxsrhDoByExxlyxTLuzgibEK5eVooSBb51Ti4dh3T0/ANsocCAufuj34DEIi8hODDT
+         w7e39ulz67ixxZ83/qLWLdf8V6875pRiuC0RJJUIgSH3lb6rDmG1+sBLTThefn/zsXLI
+         m8uItS9wrXfMw/qZ0seAhW9IlmupxG2TtgVLsV2vpV02h8xHDqmICFBrZXCYjjfxi7fa
+         KQj5AZCOktvN7jjyF34sIjZhDHOdH4WpLhdiCmX6Cb3xLQ2/DmmBTDZtOLIUKzS5398o
+         v5lg==
+X-Gm-Message-State: AOAM533L/f0PYNDWSHoTiZhTPmYn09wcr4wcM2Bs6hn0xhRUtaa7lH9b
+        72NHD75pA/wcvQKzXOqAiCPpIQ==
+X-Google-Smtp-Source: ABdhPJxGbK1SRRxGSOI4FdNaDa7/E8DXoy3todVz0eyJ4jsqnLgHBN0UoUeyS60nfAIgbqNGcg7brg==
+X-Received: by 2002:a17:90b:3b46:b0:1bf:b1f:588f with SMTP id ot6-20020a17090b3b4600b001bf0b1f588fmr6768417pjb.182.1646773131400;
+        Tue, 08 Mar 2022 12:58:51 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id c18-20020a056a000ad200b004cdccd3da08sm21393384pfl.44.2022.03.08.12.34.52
+        by smtp.gmail.com with ESMTPSA id h13-20020a056a00230d00b004f427ffd485sm22364255pfh.143.2022.03.08.12.58.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Mar 2022 12:34:52 -0800 (PST)
-Date:   Tue, 8 Mar 2022 20:34:49 +0000
+        Tue, 08 Mar 2022 12:58:50 -0800 (PST)
+Date:   Tue, 8 Mar 2022 20:58:47 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         dmatlack@google.com
-Subject: Re: [PATCH v2 06/25] KVM: nVMX/nSVM: do not monkey-patch
- inject_page_fault callback
-Message-ID: <Yie96ZqK8NYBOMYm@google.com>
+Subject: Re: [PATCH v2 24/25] KVM: x86/mmu: initialize constant-value fields
+ just once
+Message-ID: <YifDh5E63lAkJraV@google.com>
 References: <20220221162243.683208-1-pbonzini@redhat.com>
- <20220221162243.683208-7-pbonzini@redhat.com>
- <YieOvca6qbCDgrMl@google.com>
+ <20220221162243.683208-25-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YieOvca6qbCDgrMl@google.com>
+In-Reply-To: <20220221162243.683208-25-pbonzini@redhat.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 08, 2022, Sean Christopherson wrote:
-> On Mon, Feb 21, 2022, Paolo Bonzini wrote:
-> > Currently, vendor code is patching the inject_page_fault and later, on
-> > vmexit, expecting kvm_init_mmu to restore the inject_page_fault callback.
-> > 
-> > This is brittle, as exposed by the fact that SVM KVM_SET_NESTED_STATE
-> > forgets to do it.  Instead, do the check at the time a page fault actually
-> > has to be injected.  This does incur the cost of an extra retpoline
-> > for nested vmexits when TDP is disabled, but is overall much cleaner.
-> > While at it, add a comment that explains why the different behavior
-> > is needed in this case.
-> > 
-> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> > ---
-> 
-> If I have NAK powers, NAK NAK NAK NAK NAK :-)
-> 
-> Forcing a VM-Exit is a hack, e.g. it's the entire reason inject_emulated_exception()
-> returns a bool.  Even worse, it's confusing and misleading due to being incomplete.
-> 
-> The need hack for the hack is not unique to !tdp_enabled, the #DF can be triggered
-> any time L0 is intercepting #PF.  Hello, allow_smaller_maxphyaddr.
-> 
-> And while I think allow_smaller_maxphyaddr should be burned with fire, architecturally
-> it's still incomplete.  Any exception that is injected by KVM needs to be subjected
-> to nested interception checks, not just #PF.  E.g. a #GP while vectoring a different
-> fault should also be routed to L1.  KVM (mostly) gets away with special casing #PF
-> because that's the only common scenario where L1 wants to intercept _and fix_ a fault
-> that can occur while vectoring an exception.  E.g. in the #GP => #DF case, odds are
-> very good that L1 will inject a #DF too, but that doesn't make KVM's behavior correct.
-> 
-> I have a series to handle this by performing the interception checks when an exception
-> is queued, instead of when KVM injects the excepiton, and using a second kvm_queued_exception
-> field to track exceptions that are queued for VM-Exit (so as not to lose the injected
-> exception, which needs to be saved into vmc*12.  It's functional, though I haven't
-> tested migration (requires minor shenanigans to perform interception checks for pending
-> exceptions coming in from userspace).
+On Mon, Feb 21, 2022, Paolo Bonzini wrote:
+>  
+> +	vcpu->arch.root_mmu.get_guest_pgd = kvm_get_guest_cr3;
+> +	vcpu->arch.root_mmu.get_pdptr = kvm_pdptr_read;
+> +
+> +	if (tdp_enabled) {
 
-Here's my preferred band-aid for this so we can make inject_page_fault() constant
-without having to wait for a proper fix.  It's still putting lipstick on a pig,
-but is a bit more complete and IMO better documents the mess.  This slots into
-your series in place of your patch without much fuss.
+Putting all this code is in a separate helper reduces line-lengths via early
+returns.  And it'll allow us to do the same for the nested specific MMUs if we
+ever get smart and move "nested" to x86.c (preferably as enable_nested or
+nested_enabled).
+
+> +		vcpu->arch.root_mmu.inject_page_fault = kvm_inject_page_fault;
+> +		vcpu->arch.root_mmu.page_fault = kvm_tdp_page_fault;
+> +		vcpu->arch.root_mmu.sync_page = nonpaging_sync_page;
+> +		vcpu->arch.root_mmu.invlpg = NULL;
+> +		reset_tdp_shadow_zero_bits_mask(&vcpu->arch.root_mmu);
+> +
+> +		vcpu->arch.guest_mmu.get_guest_pgd = kvm_x86_ops.nested_ops->get_nested_pgd;
+> +		vcpu->arch.guest_mmu.get_pdptr = kvm_x86_ops.nested_ops->get_nested_pdptr;
+> +		vcpu->arch.guest_mmu.inject_page_fault = kvm_x86_ops.nested_ops->inject_nested_tdp_vmexit;
+
+Using nested_ops is clever, but IMO unnecessary, especially since we can go even
+further by adding a nEPT specific hook to initialize its constant shadow paging
+stuff.
+
+Here's what I had written spliced in with your code.  Compile tested only for
+this version.
 
 
-From: Sean Christopherson <seanjc@google.com>
-Date: Thu, 3 Mar 2022 20:20:17 -0800
-Subject: [PATCH] KVM: x86: Clean up and document nested #PF workaround
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon, 21 Feb 2022 11:22:42 -0500
+Subject: [PATCH] KVM: x86/mmu: initialize constant-value fields just once
 
-Replace the per-vendor hack-a-fix for KVM's #PF => #PF => #DF workaround
-with an explicit, common workaround in kvm_inject_emulated_page_fault().
-Aside from being a hack, the current approach is brittle and incomplete,
-e.g. nSVM's KVM_SET_NESTED_STATE fails to set ->inject_page_fault(),
-and nVMX fails to apply the workaround when VMX is intercepting #PF due
-to allow_smaller_maxphyaddr=1.
+The get_guest_pgd, get_pdptr and inject_page_fault pointers are constant
+for all three of root_mmu, guest_mmu and nested_mmu.  The guest_mmu
+function pointers depend on the processor vendor, but are otherwise
+constant.
 
+Opportunistically stop initializing get_pdptr for nested EPT, since it
+does not have PDPTRs.
+
+Opportunistically change kvm_mmu_create() to return '0' unconditionally
+in its happy path to make it obvious that it's a happy path.
+
+Co-developed-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/include/asm/kvm_host.h |  2 ++
- arch/x86/kvm/svm/nested.c       | 15 ++++++++-------
- arch/x86/kvm/vmx/nested.c       | 15 ++++++---------
- arch/x86/kvm/x86.c              | 21 ++++++++++++++++++++-
- 4 files changed, 36 insertions(+), 17 deletions(-)
+ arch/x86/kvm/mmu.h        |  1 +
+ arch/x86/kvm/mmu/mmu.c    | 85 ++++++++++++++++++++++++---------------
+ arch/x86/kvm/svm/nested.c | 15 +++++--
+ arch/x86/kvm/svm/svm.c    |  3 ++
+ arch/x86/kvm/svm/svm.h    |  1 +
+ arch/x86/kvm/vmx/nested.c | 13 ++++--
+ arch/x86/kvm/vmx/nested.h |  1 +
+ arch/x86/kvm/vmx/vmx.c    |  3 ++
+ 8 files changed, 82 insertions(+), 40 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index da2f3a21e37b..c372a74acd9c 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1496,6 +1496,8 @@ struct kvm_x86_ops {
- struct kvm_x86_nested_ops {
- 	void (*leave_nested)(struct kvm_vcpu *vcpu);
- 	int (*check_events)(struct kvm_vcpu *vcpu);
-+	int (*handle_page_fault_workaround)(struct kvm_vcpu *vcpu,
-+					    struct x86_exception *fault);
- 	bool (*hv_timer_pending)(struct kvm_vcpu *vcpu);
- 	void (*triple_fault)(struct kvm_vcpu *vcpu);
- 	int (*get_state)(struct kvm_vcpu *vcpu,
+diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+index 9517e56a0da1..bd2a6e20307c 100644
+--- a/arch/x86/kvm/mmu.h
++++ b/arch/x86/kvm/mmu.h
+@@ -71,6 +71,7 @@ void kvm_mmu_set_ept_masks(bool has_ad_bits, bool has_exec_only);
+ void kvm_init_mmu(struct kvm_vcpu *vcpu);
+ void kvm_init_shadow_npt_mmu(struct kvm_vcpu *vcpu, unsigned long cr0,
+ 			     unsigned long cr4, u64 efer, gpa_t nested_cr3);
++void kvm_init_shadow_ept_mmu_constants(struct kvm_vcpu *vcpu);
+ void kvm_init_shadow_ept_mmu(struct kvm_vcpu *vcpu, bool execonly,
+ 			     int huge_page_level, bool accessed_dirty,
+ 			     gpa_t new_eptp);
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 8c388add95cb..db2d88c59198 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -4778,12 +4778,6 @@ static void init_kvm_tdp_mmu(struct kvm_vcpu *vcpu,
+
+ 	context->cpu_mode.as_u64 = cpu_mode.as_u64;
+ 	context->root_role.word = root_role.word;
+-	context->page_fault = kvm_tdp_page_fault;
+-	context->sync_page = nonpaging_sync_page;
+-	context->invlpg = NULL;
+-	context->get_guest_pgd = kvm_get_guest_cr3;
+-	context->get_pdptr = kvm_pdptr_read;
+-	context->inject_page_fault = kvm_inject_page_fault;
+
+ 	if (!is_cr0_pg(context))
+ 		context->gva_to_gpa = nonpaging_gva_to_gpa;
+@@ -4793,7 +4787,6 @@ static void init_kvm_tdp_mmu(struct kvm_vcpu *vcpu,
+ 		context->gva_to_gpa = paging32_gva_to_gpa;
+
+ 	reset_guest_paging_metadata(vcpu, context);
+-	reset_tdp_shadow_zero_bits_mask(context);
+ }
+
+ static void shadow_mmu_init_context(struct kvm_vcpu *vcpu, struct kvm_mmu *context,
+@@ -4818,8 +4811,8 @@ static void shadow_mmu_init_context(struct kvm_vcpu *vcpu, struct kvm_mmu *conte
+ 	reset_shadow_zero_bits_mask(vcpu, context);
+ }
+
+-static void kvm_init_shadow_mmu(struct kvm_vcpu *vcpu,
+-				union kvm_mmu_paging_mode cpu_mode)
++static void init_kvm_softmmu(struct kvm_vcpu *vcpu,
++			     union kvm_mmu_paging_mode cpu_mode)
+ {
+ 	struct kvm_mmu *context = &vcpu->arch.root_mmu;
+ 	union kvm_mmu_page_role root_role;
+@@ -4891,6 +4884,17 @@ kvm_calc_shadow_ept_root_page_role(struct kvm_vcpu *vcpu, bool accessed_dirty,
+ 	return role;
+ }
+
++void kvm_init_shadow_ept_mmu_constants(struct kvm_vcpu *vcpu)
++{
++	struct kvm_mmu *guest_mmu = &vcpu->arch.guest_mmu;
++
++	guest_mmu->page_fault = ept_page_fault;
++	guest_mmu->gva_to_gpa = ept_gva_to_gpa;
++	guest_mmu->sync_page  = ept_sync_page;
++	guest_mmu->invlpg     = ept_invlpg;
++}
++EXPORT_SYMBOL_GPL(kvm_init_shadow_ept_mmu_constants);
++
+ void kvm_init_shadow_ept_mmu(struct kvm_vcpu *vcpu, bool execonly,
+ 			     int huge_page_level, bool accessed_dirty,
+ 			     gpa_t new_eptp)
+@@ -4912,7 +4916,6 @@ void kvm_init_shadow_ept_mmu(struct kvm_vcpu *vcpu, bool execonly,
+ 		context->invlpg = ept_invlpg;
+
+ 		update_permission_bitmask(context, true);
+-		context->pkru_mask = 0;
+ 		reset_rsvds_bits_mask_ept(vcpu, context, execonly, huge_page_level);
+ 		reset_ept_shadow_zero_bits_mask(context, execonly);
+ 	}
+@@ -4921,18 +4924,6 @@ void kvm_init_shadow_ept_mmu(struct kvm_vcpu *vcpu, bool execonly,
+ }
+ EXPORT_SYMBOL_GPL(kvm_init_shadow_ept_mmu);
+
+-static void init_kvm_softmmu(struct kvm_vcpu *vcpu,
+-			     union kvm_mmu_paging_mode cpu_mode)
+-{
+-	struct kvm_mmu *context = &vcpu->arch.root_mmu;
+-
+-	kvm_init_shadow_mmu(vcpu, cpu_mode);
+-
+-	context->get_guest_pgd	   = kvm_get_guest_cr3;
+-	context->get_pdptr         = kvm_pdptr_read;
+-	context->inject_page_fault = kvm_inject_page_fault;
+-}
+-
+ static void init_kvm_nested_mmu(struct kvm_vcpu *vcpu,
+ 				union kvm_mmu_paging_mode new_mode)
+ {
+@@ -4941,16 +4932,7 @@ static void init_kvm_nested_mmu(struct kvm_vcpu *vcpu,
+ 	if (new_mode.as_u64 == g_context->cpu_mode.as_u64)
+ 		return;
+
+-	g_context->cpu_mode.as_u64   = new_mode.as_u64;
+-	g_context->get_guest_pgd     = kvm_get_guest_cr3;
+-	g_context->get_pdptr         = kvm_pdptr_read;
+-	g_context->inject_page_fault = kvm_inject_page_fault;
+-
+-	/*
+-	 * L2 page tables are never shadowed, so there is no need to sync
+-	 * SPTEs.
+-	 */
+-	g_context->invlpg            = NULL;
++	g_context->cpu_mode.as_u64 = new_mode.as_u64;
+
+ 	/*
+ 	 * Note that arch.mmu->gva_to_gpa translates l2_gpa to l1_gpa using
+@@ -5499,6 +5481,40 @@ static void free_mmu_pages(struct kvm_mmu *mmu)
+ 	free_page((unsigned long)mmu->pml5_root);
+ }
+
++static void kvm_init_mmu_constants(struct kvm_vcpu *vcpu)
++{
++	struct kvm_mmu *nested_mmu = &vcpu->arch.nested_mmu;
++	struct kvm_mmu *root_mmu = &vcpu->arch.root_mmu;
++
++	root_mmu->get_guest_pgd	    = kvm_get_guest_cr3;
++	root_mmu->get_pdptr	    = kvm_pdptr_read;
++	root_mmu->inject_page_fault = kvm_inject_page_fault;
++
++	/*
++	 * When shadowing IA32 page tables, all other callbacks various based
++	 * on paging mode, and the guest+nested MMUs are unused.
++	 */
++	if (!tdp_enabled)
++		return;
++
++	root_mmu->page_fault = kvm_tdp_page_fault;
++	root_mmu->sync_page  = nonpaging_sync_page;
++	root_mmu->invlpg     = NULL;
++	reset_tdp_shadow_zero_bits_mask(&vcpu->arch.root_mmu);
++
++	/*
++	 * Nested TDP MMU callbacks that are constant are vendor specific due
++	 * to the vast differences between EPT and NPT.  NPT in particular is
++	 * nasty because L1 may use 32-bit and/or 64-bit paging.
++	 */
++	nested_mmu->get_guest_pgd     = kvm_get_guest_cr3;
++	nested_mmu->get_pdptr         = kvm_pdptr_read;
++	nested_mmu->inject_page_fault = kvm_inject_page_fault;
++
++	/* L2 page tables are never shadowed, there's no need to sync SPTEs. */
++	nested_mmu->invlpg            = NULL;
++}
++
+ static int __kvm_mmu_create(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu)
+ {
+ 	struct page *page;
+@@ -5575,7 +5591,10 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
+ 	if (ret)
+ 		goto fail_allocate_root;
+
+-	return ret;
++	kvm_init_mmu_constants(vcpu);
++
++	return 0;
++
+  fail_allocate_root:
+ 	free_mmu_pages(&vcpu->arch.guest_mmu);
+ 	return ret;
 diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 96bab464967f..dd942c719cf6 100644
+index dd942c719cf6..c58c9d876a6c 100644
 --- a/arch/x86/kvm/svm/nested.c
 +++ b/arch/x86/kvm/svm/nested.c
-@@ -54,22 +54,25 @@ static void nested_svm_inject_npf_exit(struct kvm_vcpu *vcpu,
- 	nested_svm_vmexit(svm);
+@@ -96,6 +96,15 @@ static unsigned long nested_svm_get_tdp_cr3(struct kvm_vcpu *vcpu)
+ 	return svm->nested.ctl.nested_cr3;
  }
 
--static void svm_inject_page_fault_nested(struct kvm_vcpu *vcpu, struct x86_exception *fault)
-+static int nested_svm_handle_page_fault_workaround(struct kvm_vcpu *vcpu,
-+						   struct x86_exception *fault)
++void nested_svm_init_mmu_constants(struct kvm_vcpu *vcpu)
++{
++	struct kvm_mmu *guest_mmu = &vcpu->arch.guest_mmu;
++
++	guest_mmu->get_guest_pgd     = nested_svm_get_tdp_cr3;
++	guest_mmu->get_pdptr         = nested_svm_get_tdp_pdptr;
++	guest_mmu->inject_page_fault = nested_svm_inject_npf_exit;
++}
++
+ static void nested_svm_init_mmu_context(struct kvm_vcpu *vcpu)
  {
-        struct vcpu_svm *svm = to_svm(vcpu);
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+@@ -112,10 +121,8 @@ static void nested_svm_init_mmu_context(struct kvm_vcpu *vcpu)
+ 	kvm_init_shadow_npt_mmu(vcpu, X86_CR0_PG, svm->vmcb01.ptr->save.cr4,
+ 				svm->vmcb01.ptr->save.efer,
+ 				svm->nested.ctl.nested_cr3);
+-	vcpu->arch.mmu->get_guest_pgd     = nested_svm_get_tdp_cr3;
+-	vcpu->arch.mmu->get_pdptr         = nested_svm_get_tdp_pdptr;
+-	vcpu->arch.mmu->inject_page_fault = nested_svm_inject_npf_exit;
+-	vcpu->arch.walk_mmu              = &vcpu->arch.nested_mmu;
 +
-        WARN_ON(!is_guest_mode(vcpu));
-
- 	if (vmcb12_is_intercept(&svm->nested.ctl,
- 				INTERCEPT_EXCEPTION_OFFSET + PF_VECTOR) &&
--	    !svm->nested.nested_run_pending) {
-+	    !WARN_ON_ONCE(svm->nested.nested_run_pending)) {
-                svm->vmcb->control.exit_code = SVM_EXIT_EXCP_BASE + PF_VECTOR;
-                svm->vmcb->control.exit_code_hi = 0;
-                svm->vmcb->control.exit_info_1 = fault->error_code;
-                svm->vmcb->control.exit_info_2 = fault->address;
-                nested_svm_vmexit(svm);
--       } else {
--               kvm_inject_page_fault(vcpu, fault);
-+	       return 0;
-        }
-+
-+	return -EINVAL;
++	vcpu->arch.walk_mmu = &vcpu->arch.nested_mmu;
  }
 
- static u64 nested_svm_get_tdp_pdptr(struct kvm_vcpu *vcpu, int index)
-@@ -680,9 +683,6 @@ int enter_svm_guest_mode(struct kvm_vcpu *vcpu, u64 vmcb12_gpa,
- 	if (ret)
- 		return ret;
+ static void nested_svm_uninit_mmu_context(struct kvm_vcpu *vcpu)
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index a8ee949b2403..db62b3e88317 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -1228,6 +1228,9 @@ static int svm_vcpu_create(struct kvm_vcpu *vcpu)
 
--	if (!npt_enabled)
--		vcpu->arch.mmu->inject_page_fault = svm_inject_page_fault_nested;
--
- 	if (!from_vmrun)
- 		kvm_make_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu);
+ 	svm->guest_state_loaded = false;
 
-@@ -1567,6 +1567,7 @@ static bool svm_get_nested_state_pages(struct kvm_vcpu *vcpu)
- struct kvm_x86_nested_ops svm_nested_ops = {
- 	.leave_nested = svm_leave_nested,
- 	.check_events = svm_check_nested_events,
-+	.handle_page_fault_workaround = nested_svm_handle_page_fault_workaround,
- 	.triple_fault = nested_svm_triple_fault,
- 	.get_nested_state_pages = svm_get_nested_state_pages,
- 	.get_state = svm_get_nested_state,
++	if (npt_enabled && nested)
++		nested_svm_init_mmu_constants(vcpu);
++
+ 	return 0;
+
+ error_free_vmsa_page:
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index e45b5645d5e0..99c5a57ab5dd 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -564,6 +564,7 @@ void nested_copy_vmcb_save_to_cache(struct vcpu_svm *svm,
+ void nested_sync_control_from_vmcb02(struct vcpu_svm *svm);
+ void nested_vmcb02_compute_g_pat(struct vcpu_svm *svm);
+ void svm_switch_vmcb(struct vcpu_svm *svm, struct kvm_vmcb_info *target_vmcb);
++void nested_svm_init_mmu_constants(struct kvm_vcpu *vcpu);
+
+ extern struct kvm_x86_nested_ops svm_nested_ops;
+
 diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index f18744f7ff82..cc4c74339d35 100644
+index cc4c74339d35..385f60305555 100644
 --- a/arch/x86/kvm/vmx/nested.c
 +++ b/arch/x86/kvm/vmx/nested.c
-@@ -476,24 +476,23 @@ static int nested_vmx_check_exception(struct kvm_vcpu *vcpu, unsigned long *exit
- 	return 0;
+@@ -407,15 +407,22 @@ static void nested_ept_new_eptp(struct kvm_vcpu *vcpu)
+ 				nested_ept_get_eptp(vcpu));
  }
 
--
--static void vmx_inject_page_fault_nested(struct kvm_vcpu *vcpu,
--		struct x86_exception *fault)
-+static int nested_vmx_handle_page_fault_workaround(struct kvm_vcpu *vcpu,
-+						   struct x86_exception *fault)
- {
- 	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
-
- 	WARN_ON(!is_guest_mode(vcpu));
-
- 	if (nested_vmx_is_page_fault_vmexit(vmcs12, fault->error_code) &&
--		!to_vmx(vcpu)->nested.nested_run_pending) {
-+	    !WARN_ON_ONCE(to_vmx(vcpu)->nested.nested_run_pending)) {
- 		vmcs12->vm_exit_intr_error_code = fault->error_code;
- 		nested_vmx_vmexit(vcpu, EXIT_REASON_EXCEPTION_NMI,
- 				  PF_VECTOR | INTR_TYPE_HARD_EXCEPTION |
- 				  INTR_INFO_DELIVER_CODE_MASK | INTR_INFO_VALID_MASK,
- 				  fault->address);
--	} else {
--		kvm_inject_page_fault(vcpu, fault);
-+		return 0;
- 	}
-+	return -EINVAL;
- }
-
- static int nested_vmx_check_io_bitmap_controls(struct kvm_vcpu *vcpu,
-@@ -2614,9 +2613,6 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
- 		vmcs_write64(GUEST_PDPTR3, vmcs12->guest_pdptr3);
- 	}
-
--	if (!enable_ept)
--		vcpu->arch.walk_mmu->inject_page_fault = vmx_inject_page_fault_nested;
--
- 	if ((vmcs12->vm_entry_controls & VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL) &&
- 	    WARN_ON_ONCE(kvm_set_msr(vcpu, MSR_CORE_PERF_GLOBAL_CTRL,
- 				     vmcs12->guest_ia32_perf_global_ctrl))) {
-@@ -6804,6 +6800,7 @@ __init int nested_vmx_hardware_setup(int (*exit_handlers[])(struct kvm_vcpu *))
- struct kvm_x86_nested_ops vmx_nested_ops = {
- 	.leave_nested = vmx_leave_nested,
- 	.check_events = vmx_check_nested_events,
-+	.handle_page_fault_workaround = nested_vmx_handle_page_fault_workaround,
- 	.hv_timer_pending = nested_vmx_preemption_timer_pending,
- 	.triple_fault = nested_vmx_triple_fault,
- 	.get_state = vmx_get_nested_state,
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 7fa1bdd9909e..010fb54a9a82 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -748,6 +748,7 @@ void kvm_inject_page_fault(struct kvm_vcpu *vcpu, struct x86_exception *fault)
- }
- EXPORT_SYMBOL_GPL(kvm_inject_page_fault);
-
-+/* Returns true if the page fault was immediately morphed into a VM-Exit. */
- bool kvm_inject_emulated_page_fault(struct kvm_vcpu *vcpu,
- 				    struct x86_exception *fault)
- {
-@@ -766,8 +767,26 @@ bool kvm_inject_emulated_page_fault(struct kvm_vcpu *vcpu,
- 		kvm_mmu_invalidate_gva(vcpu, fault_mmu, fault->address,
- 				       fault_mmu->root.hpa);
-
-+	/*
-+	 * A workaround for KVM's bad exception handling.  If KVM injected an
-+	 * exception into L2, and L2 encountered a #PF while vectoring the
-+	 * injected exception, manually check to see if L1 wants to intercept
-+	 * #PF, otherwise queuing the #PF will lead to #DF or a lost exception.
-+	 * In all other cases, defer the check to nested_ops->check_events(),
-+	 * which will correctly handle priority (this does not).  Note, other
-+	 * exceptions, e.g. #GP, are theoretically affected, #PF is simply the
-+	 * most problematic, e.g. when L0 and L1 are both intercepting #PF for
-+	 * shadow paging.
-+	 *
-+	 * TODO: Rewrite exception handling to track injected and pending
-+	 *       (VM-Exit) exceptions separately.
-+	 */
-+	if (unlikely(vcpu->arch.exception.injected && is_guest_mode(vcpu)) &&
-+	    !kvm_x86_ops.nested_ops->handle_page_fault_workaround(vcpu, fault))
-+		return true;
++void nested_ept_init_mmu_constants(struct kvm_vcpu *vcpu)
++{
++	struct kvm_mmu *mmu = &vcpu->arch.guest_mmu;
 +
- 	fault_mmu->inject_page_fault(vcpu, fault);
--	return fault->nested_page_fault;
-+	return false;
++	mmu->get_guest_pgd	= nested_ept_get_eptp;
++	mmu->inject_page_fault	= nested_ept_inject_page_fault;
++
++	kvm_init_shadow_ept_mmu_constants(vcpu);
++}
++
+ static void nested_ept_init_mmu_context(struct kvm_vcpu *vcpu)
+ {
+ 	WARN_ON(mmu_is_nested(vcpu));
+
+ 	vcpu->arch.mmu = &vcpu->arch.guest_mmu;
+ 	nested_ept_new_eptp(vcpu);
+-	vcpu->arch.mmu->get_guest_pgd     = nested_ept_get_eptp;
+-	vcpu->arch.mmu->inject_page_fault = nested_ept_inject_page_fault;
+-	vcpu->arch.mmu->get_pdptr         = kvm_pdptr_read;
+
+ 	vcpu->arch.walk_mmu              = &vcpu->arch.nested_mmu;
  }
- EXPORT_SYMBOL_GPL(kvm_inject_emulated_page_fault);
+diff --git a/arch/x86/kvm/vmx/nested.h b/arch/x86/kvm/vmx/nested.h
+index c92cea0b8ccc..78e6d9ba5839 100644
+--- a/arch/x86/kvm/vmx/nested.h
++++ b/arch/x86/kvm/vmx/nested.h
+@@ -37,6 +37,7 @@ void nested_vmx_pmu_refresh(struct kvm_vcpu *vcpu,
+ void nested_mark_vmcs12_pages_dirty(struct kvm_vcpu *vcpu);
+ bool nested_vmx_check_io_bitmaps(struct kvm_vcpu *vcpu, unsigned int port,
+ 				 int size);
++void nested_ept_init_mmu_constants(struct kvm_vcpu *vcpu);
 
+ static inline struct vmcs12 *get_vmcs12(struct kvm_vcpu *vcpu)
+ {
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 40e015e9b260..04edb8a761a8 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -7081,6 +7081,9 @@ static int vmx_vcpu_create(struct kvm_vcpu *vcpu)
+ 			goto free_vmcs;
+ 	}
 
-base-commit: bb92fb66dcf8735c5190f415fed587bff7dd6717
++	if (enable_ept && nested)
++		nested_ept_init_mmu_constants(vcpu);
++
+ 	return 0;
+
+ free_vmcs:
+
+base-commit: 94fd8078bd4f838cf9ced265e6ac4237cbcba7a1
 --
 
