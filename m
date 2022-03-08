@@ -2,79 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4DAE34D2358
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 22:30:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 140A74D2377
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 22:40:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350483AbiCHVaI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 16:30:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43264 "EHLO
+        id S1350521AbiCHVlQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Mar 2022 16:41:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35088 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350458AbiCHVaH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Mar 2022 16:30:07 -0500
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 808D749F91
-        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 13:29:09 -0800 (PST)
-Received: by mail-pf1-x42a.google.com with SMTP id e15so466658pfv.11
-        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 13:29:09 -0800 (PST)
+        with ESMTP id S1350522AbiCHVlP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 16:41:15 -0500
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 260A34CD4D
+        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 13:40:18 -0800 (PST)
+Received: by mail-pj1-x1035.google.com with SMTP id m22so580853pja.0
+        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 13:40:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=LMQ8AOMqqmqopzig17jUsU9/I303Wa2KV8iSyK2C8QA=;
-        b=WNDbXoXIOar/wXxjMrbLZybR4KUBP9I7doIbDaHXlaOZvNyWWyEki6sfU6jGydFaRk
-         eXOv1p69nRIvQy5jat7OAdT48dIFywwEon4KKy1nYiLVVs+i6fMpNzUbGueLFWYLr6I9
-         2rQbA023WRUUnsPQW32MJnzDsUOYuvgwdHOrDBgHBVU6mOJX4XfkQG7S2orpc15vMA9G
-         0krpTjx4KgzEzHwMv4rJOZmsTRKBZ/ks2icky8g2MiZ7cCnou26T1teHclapxVJAGYIG
-         nXqx4joM5vxY6I4TLRX4ZFKuOd0IerD3ZeF6h1/jPnGRcGYo0D1BTsHJucbuZ9xlFQAY
-         4mpQ==
+        bh=yXDaNo5Twd/bGEPxBGrFiEAJws30Rt0Ob1hJFSeUBOc=;
+        b=IvPbWr4sdruoLMR3M5bVRCv+/fvvN6Q9iH9X9WBrVD77yqOVgFgTEbLjWrHdVvhnzS
+         Jdqsp3i5uigJsJBQkt5uNlsgtojX66vWFpD14Ni2Dvj0XAL/S8ZSb2w83nJEs33SGlme
+         xngzlmHbH2P31Dk9RZwV7j76ob1ZQHJFoe9oxqv0FtjyN7WYqwWbePqk6xEhXN3fJQ47
+         2OFFAToBIbrJQs1oLg2gkpNhoav0/1Go3AkK+lzgul5yUQXZD32n0ideLop7RRXFk4dK
+         NKoGcNe6LyE37UxhdLLOlUrD5Kds78hPE9A1GaSkHQmefmOQSga+zg23tkfCpPVnqffe
+         TQ1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=LMQ8AOMqqmqopzig17jUsU9/I303Wa2KV8iSyK2C8QA=;
-        b=G7eAAmnUHkkxADJGFVHdTAui/rtVTGpQ2ibBSuQPk9YWFS3YBQhPGw9Udftd17XRsB
-         ESrOOaUhZ02SnICCqlf7YSn7aZQnQ/a9CdYJzL/Z9coZcBSyJlgvym5uIZQPwgQENCQX
-         c7c6pNSOVt742u7beuU4LJ55Ocq8JoF80F0uERuhEPOJeyVROyDA9TQDnrDgtu9azjA1
-         dfySobilPOQU5tTJJne85HvhFGM786L2cG1SccxqLV6DrQLWJOtmiIY4S+Aqk3NPO8mC
-         ZS7APGq8oJhHKKOUEEfojlGZtT7uMHQ7cbuxTKy5wf19xYV/0ICkc/2MjN3jGaiitHGk
-         mFMQ==
-X-Gm-Message-State: AOAM532h0vb7eoKInAcnveAiXSLti0ke8mDqi8SyDeGZlqkYQU7/TPwm
-        hxuE9/nzneQhyz/I/MwAbkXUPA==
-X-Google-Smtp-Source: ABdhPJxaudcIUUVL6UZGM/dSdkzC6iFnk2758wDZzs2B1y5Sgh+P0ylUpx0H2Bb0QaOPv2Z/zEl48w==
-X-Received: by 2002:a63:e84b:0:b0:372:a079:302 with SMTP id a11-20020a63e84b000000b00372a0790302mr15745200pgk.272.1646774948794;
-        Tue, 08 Mar 2022 13:29:08 -0800 (PST)
+        bh=yXDaNo5Twd/bGEPxBGrFiEAJws30Rt0Ob1hJFSeUBOc=;
+        b=cyZ2PNOZDtzuJP9CwwnnQx6kHVBTrWvjM4ClxkFtjo/1c51L1eMj9wJNMxNRt1KA6t
+         1PQ52GwvsMgi4OL7Gsmnvh30KDlOB07Qb6Ng/kU1+Zz2fb0SFx9OArlWPFraNT1Ec1zw
+         KtmrPI8uE9RchX993pPW/JoOPj4H5idkWup32HlWRsV8b1eZ/CzYKXt5/p2xMTX/ay5e
+         aLp1zR/V2yvRNQ+OyK2/YKXN3LAjLqd7NscisM792/ibJSH8Mdh7pzIhQ8YvxhWe4nC6
+         ND7jyA4wUudVsq5w83/aV/IBEtv/Ks8bGLwVX3QtbOipKhvPeYXxJUbKVCWjrj2dz0Fd
+         cIZA==
+X-Gm-Message-State: AOAM530xCKFE/9dVqVlwlX7fdmj+BDWiU+23MtiF7dz9lEPkAdHhcB83
+        zQMe0GNnNBsdDdvdULdaSMfBww==
+X-Google-Smtp-Source: ABdhPJzIvEjtibl34ljAgC2zisZuhQHc+ubnA5X6exOS8Uary99PfIF6h1GnY4PY7ybF9nQVYK4x7A==
+X-Received: by 2002:a17:90a:7f92:b0:1bc:f09:59 with SMTP id m18-20020a17090a7f9200b001bc0f090059mr7006696pjl.98.1646775617478;
+        Tue, 08 Mar 2022 13:40:17 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id o1-20020a637e41000000b003804d0e2c9esm51728pgn.35.2022.03.08.13.29.07
+        by smtp.gmail.com with ESMTPSA id nv4-20020a17090b1b4400b001bf64a39579sm3915281pjb.4.2022.03.08.13.40.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Mar 2022 13:29:07 -0800 (PST)
-Date:   Tue, 8 Mar 2022 21:29:04 +0000
+        Tue, 08 Mar 2022 13:40:16 -0800 (PST)
+Date:   Tue, 8 Mar 2022 21:40:13 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        David Hildenbrand <david@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        Mingwei Zhang <mizhang@google.com>
-Subject: Re: [PATCH v4 21/30] KVM: x86/mmu: Zap invalidated roots via
- asynchronous worker
-Message-ID: <YifKoCZAmymIxDTQ@google.com>
-References: <20220303193842.370645-1-pbonzini@redhat.com>
- <20220303193842.370645-22-pbonzini@redhat.com>
- <YiExLB3O2byI4Xdu@google.com>
- <YiEz3D18wEn8lcEq@google.com>
- <eeac12f0-0a18-8c63-1987-494a2032fa9d@redhat.com>
- <YiI4AmYkm2oiuiio@google.com>
- <8b8c28cf-cf54-f889-be7d-afc9f5430ecd@redhat.com>
- <YiKwFznqqiB9VRyn@google.com>
- <20497464-0606-7ea5-89b8-8f5cd56a1a68@redhat.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Gleb Natapov <gleb@redhat.com>, Rik van Riel <riel@redhat.com>,
+        bgardon@google.com, stable@vger.kernel.org
+Subject: Re: [PATCH RESEND 1/2] KVM: Prevent module exit until all VMs are
+ freed
+Message-ID: <YifNPekMfIta+xcv@google.com>
+References: <20220303183328.1499189-1-dmatlack@google.com>
+ <20220303183328.1499189-2-dmatlack@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20497464-0606-7ea5-89b8-8f5cd56a1a68@redhat.com>
+In-Reply-To: <20220303183328.1499189-2-dmatlack@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -86,30 +74,84 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Mar 05, 2022, Paolo Bonzini wrote:
-> On 3/5/22 01:34, Sean Christopherson wrote:
-> > On Fri, Mar 04, 2022, Paolo Bonzini wrote:
-> > > On 3/4/22 17:02, Sean Christopherson wrote:
-> > > > On Fri, Mar 04, 2022, Paolo Bonzini wrote:
-> > > > > On 3/3/22 22:32, Sean Christopherson wrote:
-> > > > > I didn't remove the paragraph from the commit message, but I think it's
-> > > > > unnecessary now.  The workqueue is flushed in kvm_mmu_zap_all_fast() and
-> > > > > kvm_mmu_uninit_tdp_mmu(), unlike the buggy patch, so it doesn't need to take
-> > > > > a reference to the VM.
-> > > > > 
-> > > > > I think I don't even need to check kvm->users_count in the defunct root
-> > > > > case, as long as kvm_mmu_uninit_tdp_mmu() flushes and destroys the workqueue
-> > > > > before it checks that the lists are empty.
-> > > > 
-> > > > Yes, that should work.  IIRC, the WARN_ONs will tell us/you quite quickly if
-> > > > we're wrong :-)  mmu_notifier_unregister() will call the "slow" kvm_mmu_zap_all()
-> > > > and thus ensure all non-root pages zapped, but "leaking" a worker will trigger
-> > > > the WARN_ON that there are no roots on the list.
-> > > 
-> > > Good, for the record these are the commit messages I have:
+On Thu, Mar 03, 2022, David Matlack wrote:
+> Tie the lifetime the KVM module to the lifetime of each VM via
+> kvm.users_count. This way anything that grabs a reference to the VM via
+> kvm_get_kvm() cannot accidentally outlive the KVM module.
 > 
-> I'm seeing some hangs in ~50% of installation jobs, both Windows and Linux.
-> I have not yet tried to reproduce outside the automated tests, or to bisect,
-> but I'll try to push at least the first part of the series for 5.18.
+> Prior to this commit, the lifetime of the KVM module was tied to the
+> lifetime of /dev/kvm file descriptors, VM file descriptors, and vCPU
+> file descriptors by their respective file_operations "owner" field.
+> This approach is insufficient because references grabbed via
+> kvm_get_kvm() do not prevent closing any of the aforementioned file
+> descriptors.
+> 
+> This fixes a long standing theoretical bug in KVM that at least affects
+> async page faults. kvm_setup_async_pf() grabs a reference via
+> kvm_get_kvm(), and drops it in an asynchronous work callback. Nothing
+> prevents the VM file descriptor from being closed and the KVM module
+> from being unloaded before this callback runs.
+> 
+> Fixes: af585b921e5d ("KVM: Halt vcpu if page it tries to access is swapped out")
 
-Out of curiosity, what was the bug?  I see this got pushed to kvm/next.
+And (or)
+
+  Fixes: 3d3aab1b973b ("KVM: set owner of cpu and vm file operations")
+
+because the above is x86-centric, at a glance PPC and maybe s390 have issues
+beyond async #PF.
+
+> Cc: stable@vger.kernel.org
+> Suggested-by: Ben Gardon <bgardon@google.com>
+> [ Based on a patch from Ben implemented for Google's kernel. ]
+> Signed-off-by: David Matlack <dmatlack@google.com>
+> ---
+>  virt/kvm/kvm_main.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+> 
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 35ae6d32dae5..b59f0a29dbd5 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -117,6 +117,8 @@ EXPORT_SYMBOL_GPL(kvm_debugfs_dir);
+>  
+>  static const struct file_operations stat_fops_per_vm;
+>  
+> +static struct file_operations kvm_chardev_ops;
+> +
+>  static long kvm_vcpu_ioctl(struct file *file, unsigned int ioctl,
+>  			   unsigned long arg);
+>  #ifdef CONFIG_KVM_COMPAT
+> @@ -1131,6 +1133,11 @@ static struct kvm *kvm_create_vm(unsigned long type)
+>  	preempt_notifier_inc();
+>  	kvm_init_pm_notifier(kvm);
+>  
+> +	if (!try_module_get(kvm_chardev_ops.owner)) {
+
+The "try" aspect is unnecessary.  Stealing from Paolo's version, 
+
+	/* KVM is pinned via open("/dev/kvm"), the fd passed to this ioctl(). */
+	__module_get(kvm_chardev_ops.owner);
+
+> +		r = -ENODEV;
+> +		goto out_err;
+> +	}
+> +
+>  	return kvm;
+>  
+>  out_err:
+> @@ -1220,6 +1227,7 @@ static void kvm_destroy_vm(struct kvm *kvm)
+>  	preempt_notifier_dec();
+>  	hardware_disable_all();
+>  	mmdrop(mm);
+> +	module_put(kvm_chardev_ops.owner);
+>  }
+>  
+>  void kvm_get_kvm(struct kvm *kvm)
+> 
+> base-commit: b13a3befc815eae574d87e6249f973dfbb6ad6cd
+> prerequisite-patch-id: 38f66d60319bf0bc9bf49f91f0f9119e5441629b
+> prerequisite-patch-id: 51aa921d68ea649d436ea68e1b8f4aabc3805156
+> -- 
+> 2.35.1.616.g0bdcbb4464-goog
+> 
