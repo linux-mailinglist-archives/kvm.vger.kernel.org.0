@@ -2,359 +2,199 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 16DD54D18E4
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 14:14:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 265874D18F0
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 14:17:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232457AbiCHNP0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 08:15:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58638 "EHLO
+        id S1347087AbiCHNSQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Mar 2022 08:18:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60398 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229635AbiCHNPZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Mar 2022 08:15:25 -0500
-Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C151192AD
-        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 05:14:28 -0800 (PST)
-Received: by mail-wm1-x336.google.com with SMTP id p184-20020a1c29c1000000b0037f76d8b484so1452567wmp.5
-        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 05:14:28 -0800 (PST)
+        with ESMTP id S1347162AbiCHNSF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 08:18:05 -0500
+Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9350448E75
+        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 05:17:07 -0800 (PST)
+Received: by mail-wr1-x42f.google.com with SMTP id k24so19034258wrd.7
+        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 05:17:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
+        d=linaro.org; s=google;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=Lkh2loZkpGZaLBuOXa8rDZHGHlZAmyJp5dJ6fHcIaV8=;
-        b=bmBCi0yv6gpJyAT676EfdpRo8TsN5BA9Cn2y9seebgdOqEEnbeKA6Lb1xXrL2mTSRX
-         bzIhoYdNtQsHRVJxB/BUKGY2UA5Mpnn0QxxONtvNLKw6pybtOjXPhJvQJ/fKGVizfKI3
-         gvkvBJVM+tOnYRnyWm5da7gWlM9q+B/sfRtbd0hoiByvWIFh/xgT269JS3me+S15hdur
-         3EKbcWHNc/3lufiUry/+abR1xkSV9J3VbS+2hb7BR/sa8idkggP0BA26NhdRI3BkdYXi
-         R0vhuTb2SPHFQl1oJ7+fXDHthVK35DjqtHcDHwWpQogGzEf5ESTqnOiOcu4ZO4LfS1S+
-         /zJg==
+        bh=DlKhxu+LqVz17YluSD/2WMyqg3I/bzdDeK8Xd5lH4Nc=;
+        b=tUpT+l/kDbEnrxwoPe0cSlkoHFeIwcOIW34nEeAfTPLzg9g3X3m+2wb+kf6CF5WruS
+         0uHfQcbl0j3HUZrgH5zNoEOadjHjWWZTyypxkET0RXrAYoWU0Jt3Pjv8KbMxMvpb3KVR
+         glykef1q0jt6Zr/UshpSLSB5H5CAsbcCvI9ZGfV21RY3q4jb1xdUew2vLy55dsDZ2dlc
+         m47imykZZVCdCkiLfI+A7NccsHLepDUnd3nnTWnCLXuKfrtxE+P8Uv5OeWTBry+vJB7z
+         9Mi2D4JmgdpMQ82s+1oeuJaLQRSx5zs4EUGATFnb4xNMQ6XQwISOyNY7NOI1gjPJpyeK
+         uTPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:content-transfer-encoding
          :in-reply-to;
-        bh=Lkh2loZkpGZaLBuOXa8rDZHGHlZAmyJp5dJ6fHcIaV8=;
-        b=OJvBSSKAVEsSQxdI9vlzxzQLELtDcEBe6EsXwwAv6ELnhsbWN6oOzuv8eqzIps/ifW
-         jkJjT2EbTCovU/foGwlTVXtCafb19cNZ5QFdtl/XWI6eNbJ0KPqnEXjIqjmMKKFdAHAU
-         C8N/MJKxT5mffiU+WUgrO68bm2G3MyFFfVBqozJ8GucsqjsGm2JRNc5CFLfIxH53r0gn
-         xq5ek7TVJVOB/JNNMg+W8A27jna8MZof8o+QthNhOKJdSuHjiVeZIVGWRrEQbAw42139
-         ju2XZrN/Mu73bxG4AS+gyCqcrnOX6eZhWl23DDKwDskEZlwAuzrpSTkBrSCYYMksDOXT
-         ddJQ==
-X-Gm-Message-State: AOAM532hcjHwwF+xuwC4pfw6oSM/8BoRNpk9w/MYR9Ea/wfa5jwIMZ/M
-        R1TuCjxY0t93uKIRbRW4JAA4yA==
-X-Google-Smtp-Source: ABdhPJwbH1x3I2fjChJUjN/5+qFHFWZDog1c79+WswirYY0HE8STyrN+r5XzivZ/TT4I2dJLJWCe3g==
-X-Received: by 2002:a7b:cd15:0:b0:389:a4f0:c3ba with SMTP id f21-20020a7bcd15000000b00389a4f0c3bamr3540318wmj.119.1646745266916;
-        Tue, 08 Mar 2022 05:14:26 -0800 (PST)
-Received: from google.com (203.75.199.104.bc.googleusercontent.com. [104.199.75.203])
-        by smtp.gmail.com with ESMTPSA id p125-20020a1c2983000000b00389cc36a3bfsm454951wmp.6.2022.03.08.05.14.26
+        bh=DlKhxu+LqVz17YluSD/2WMyqg3I/bzdDeK8Xd5lH4Nc=;
+        b=aIzNQ+OWkSpjlXIMSInGJAPnRAlvGb2dCBNuODG1I1R7Iiz9b/MrkVQC3+nphlRd/M
+         aO8baeYILYW3zi6ivHVYeXd4uVqqiHWCMJW1fBayYOGOiMRPPPOhFWigLEhnKtZr/Gn6
+         9hv9zNpgj1zaiR1IXcmWI/jah2CO3UtmVCcKvW1cb1N798SbMPPcK04cz4c+L/4m1Ilo
+         lPKGI8STcpdOCk5IPCajJqg6MgcM53oRUr6DAFpVQHDFR/Pdk79l7WZq8pcBjqIyCwzJ
+         i4OYSZMqyAt9PkNaGbFF5u8z/qUmOSgYgNxX7PZObViHwE7uQud/6TZzUj/IlBUXJPKn
+         0ypg==
+X-Gm-Message-State: AOAM530I3iwUrhSUOuZsJaxU7aTpAYJYwU0QIDXDcpx3g4GTWi4Dxqmb
+        uOAp2nM5aflAzRXXFV9nWzJx6w==
+X-Google-Smtp-Source: ABdhPJwbgYMOFPI4IWRNj/NoVcAezAtsLTQB67NBB/7Wxh6IySHxoNz1f7HejTNRMpjkOwC4T7R9yw==
+X-Received: by 2002:a05:6000:1acf:b0:1f0:5e62:9b28 with SMTP id i15-20020a0560001acf00b001f05e629b28mr11817701wry.448.1646745426018;
+        Tue, 08 Mar 2022 05:17:06 -0800 (PST)
+Received: from google.com (cpc155339-bagu17-2-0-cust87.1-3.cable.virginm.net. [86.27.177.88])
+        by smtp.gmail.com with ESMTPSA id w6-20020a5d6806000000b002036515dda7sm2022427wru.33.2022.03.08.05.17.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Mar 2022 05:14:26 -0800 (PST)
-Date:   Tue, 8 Mar 2022 13:14:25 +0000
-From:   Sebastian Ene <sebastianene@google.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     kvm@vger.kernel.org, qperret@google.com, will@kernel.org,
-        julien.thierry.kdev@gmail.com, maz@kernel.org
-Subject: Re: [PATCH kvmtool v8 2/3] aarch64: Add stolen time support
-Message-ID: <YidWsYk9Mwklng+n@google.com>
-References: <20220307144243.2039409-1-sebastianene@google.com>
- <20220307144243.2039409-3-sebastianene@google.com>
- <YiczmAGAIf0BYLNr@monolith.localdoman>
+        Tue, 08 Mar 2022 05:17:05 -0800 (PST)
+Date:   Tue, 8 Mar 2022 13:17:03 +0000
+From:   Lee Jones <lee.jones@linaro.org>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Greg KH <gregkh@linuxfoundation.org>, jasowang@redhat.com,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        stable@vger.kernel.org,
+        syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
+Subject: Re: [PATCH 1/1] vhost: Protect the virtqueue from being cleared
+ whilst still in use
+Message-ID: <YidXT6zP1QN5KZUs@google.com>
+References: <20220307191757.3177139-1-lee.jones@linaro.org>
+ <YiZeB7l49KC2Y5Gz@kroah.com>
+ <YicPXnNFHpoJHcUN@google.com>
+ <Yicalf1I6oBytbse@kroah.com>
+ <Yicer3yGg5rrdSIs@google.com>
+ <YicolvcbY9VT6AKc@kroah.com>
+ <20220308055003-mutt-send-email-mst@kernel.org>
+ <YidBz7SxED2ii1Lh@kroah.com>
+ <20220308071718-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <YiczmAGAIf0BYLNr@monolith.localdoman>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20220308071718-mutt-send-email-mst@kernel.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 08, 2022 at 10:44:40AM +0000, Alexandru Elisei wrote:
-> Hi,
+On Tue, 08 Mar 2022, Michael S. Tsirkin wrote:
 
-Hi,
-
-> 
-> On Mon, Mar 07, 2022 at 02:42:43PM +0000, Sebastian Ene wrote:
-> > This patch adds support for stolen time by sharing a memory region
-> > with the guest which will be used by the hypervisor to store the stolen
-> > time information. Reserve a 64kb MMIO memory region after the RTC peripheral
-> > to be used by pvtime. The exact format of the structure stored by the
-> > hypervisor is described in the ARM DEN0057A document.
+> On Tue, Mar 08, 2022 at 12:45:19PM +0100, Greg KH wrote:
+> > On Tue, Mar 08, 2022 at 05:55:58AM -0500, Michael S. Tsirkin wrote:
+> > > On Tue, Mar 08, 2022 at 10:57:42AM +0100, Greg KH wrote:
+> > > > On Tue, Mar 08, 2022 at 09:15:27AM +0000, Lee Jones wrote:
+> > > > > On Tue, 08 Mar 2022, Greg KH wrote:
+> > > > > 
+> > > > > > On Tue, Mar 08, 2022 at 08:10:06AM +0000, Lee Jones wrote:
+> > > > > > > On Mon, 07 Mar 2022, Greg KH wrote:
+> > > > > > > 
+> > > > > > > > On Mon, Mar 07, 2022 at 07:17:57PM +0000, Lee Jones wrote:
+> > > > > > > > > vhost_vsock_handle_tx_kick() already holds the mutex during its call
+> > > > > > > > > to vhost_get_vq_desc().  All we have to do here is take the same lock
+> > > > > > > > > during virtqueue clean-up and we mitigate the reported issues.
+> > > > > > > > > 
+> > > > > > > > > Also WARN() as a precautionary measure.  The purpose of this is to
+> > > > > > > > > capture possible future race conditions which may pop up over time.
+> > > > > > > > > 
+> > > > > > > > > Link: https://syzkaller.appspot.com/bug?extid=279432d30d825e63ba00
+> > > > > > > > > 
+> > > > > > > > > Cc: <stable@vger.kernel.org>
+> > > > > > > > > Reported-by: syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
+> > > > > > > > > Signed-off-by: Lee Jones <lee.jones@linaro.org>
+> > > > > > > > > ---
+> > > > > > > > >  drivers/vhost/vhost.c | 10 ++++++++++
+> > > > > > > > >  1 file changed, 10 insertions(+)
+> > > > > > > > > 
+> > > > > > > > > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> > > > > > > > > index 59edb5a1ffe28..ef7e371e3e649 100644
+> > > > > > > > > --- a/drivers/vhost/vhost.c
+> > > > > > > > > +++ b/drivers/vhost/vhost.c
+> > > > > > > > > @@ -693,6 +693,15 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
+> > > > > > > > >  	int i;
+> > > > > > > > >  
+> > > > > > > > >  	for (i = 0; i < dev->nvqs; ++i) {
+> > > > > > > > > +		/* No workers should run here by design. However, races have
+> > > > > > > > > +		 * previously occurred where drivers have been unable to flush
+> > > > > > > > > +		 * all work properly prior to clean-up.  Without a successful
+> > > > > > > > > +		 * flush the guest will malfunction, but avoiding host memory
+> > > > > > > > > +		 * corruption in those cases does seem preferable.
+> > > > > > > > > +		 */
+> > > > > > > > > +		WARN_ON(mutex_is_locked(&dev->vqs[i]->mutex));
+> > > > > > > > 
+> > > > > > > > So you are trading one syzbot triggered issue for another one in the
+> > > > > > > > future?  :)
+> > > > > > > > 
+> > > > > > > > If this ever can happen, handle it, but don't log it with a WARN_ON() as
+> > > > > > > > that will trigger the panic-on-warn boxes, as well as syzbot.  Unless
+> > > > > > > > you want that to happen?
+> > > > > > > 
+> > > > > > > No, Syzbot doesn't report warnings, only BUGs and memory corruption.
+> > > > > > 
+> > > > > > Has it changed?  Last I looked, it did trigger on WARN_* calls, which
+> > > > > > has resulted in a huge number of kernel fixes because of that.
+> > > > > 
+> > > > > Everything is customisable in syzkaller, so maybe there are specific
+> > > > > builds which panic_on_warn enabled, but none that I'm involved with
+> > > > > do.
+> > > > 
+> > > > Many systems run with panic-on-warn (i.e. the cloud), as they want to
+> > > > drop a box and restart it if anything goes wrong.
+> > > > 
+> > > > That's why syzbot reports on WARN_* calls.  They should never be
+> > > > reachable by userspace actions.
+> > > > 
+> > > > > Here follows a topical example.  The report above in the Link: tag
+> > > > > comes with a crashlog [0].  In there you can see the WARN() at the
+> > > > > bottom of vhost_dev_cleanup() trigger many times due to a populated
+> > > > > (non-flushed) worker list, before finally tripping the BUG() which
+> > > > > triggers the report:
+> > > > > 
+> > > > > [0] https://syzkaller.appspot.com/text?tag=CrashLog&x=16a61fce700000
+> > > > 
+> > > > Ok, so both happens here.  But don't add a warning for something that
+> > > > can't happen.  Just handle it and move on.  It looks like you are
+> > > > handling it in this code, so please drop the WARN_ON().
+> > > > 
+> > > > thanks,
+> > > > 
+> > > > greg k-h
+> > > 
+> > > Hmm. Well this will mean if we ever reintroduce the bug then
+> > > syzkaller will not catch it for us :( And the bug is there,
+> > > it just results in a hard to reproduce error for userspace.
 > > 
-> > Signed-off-by: Sebastian Ene <sebastianene@google.com>
-> > ---
-> >  Makefile                               |   1 +
-> >  arm/aarch64/arm-cpu.c                  |   2 +-
-> >  arm/aarch64/include/kvm/kvm-cpu-arch.h |   2 +
-> >  arm/aarch64/pvtime.c                   | 108 +++++++++++++++++++++++++
-> >  arm/include/arm-common/kvm-arch.h      |   6 +-
-> >  arm/kvm-cpu.c                          |   1 +
-> >  include/kvm/kvm-config.h               |   1 +
-> >  7 files changed, 119 insertions(+), 2 deletions(-)
-> >  create mode 100644 arm/aarch64/pvtime.c
-> > 
-> > diff --git a/Makefile b/Makefile
-> > index f251147..e9121dc 100644
-> > --- a/Makefile
-> > +++ b/Makefile
-> > @@ -182,6 +182,7 @@ ifeq ($(ARCH), arm64)
-> >  	OBJS		+= arm/aarch64/arm-cpu.o
-> >  	OBJS		+= arm/aarch64/kvm-cpu.o
-> >  	OBJS		+= arm/aarch64/kvm.o
-> > +	OBJS		+= arm/aarch64/pvtime.o
-> >  	ARCH_INCLUDE	:= $(HDRS_ARM_COMMON)
-> >  	ARCH_INCLUDE	+= -Iarm/aarch64/include
-> >  
-> > diff --git a/arm/aarch64/arm-cpu.c b/arm/aarch64/arm-cpu.c
-> > index d7572b7..7e4a3c1 100644
-> > --- a/arm/aarch64/arm-cpu.c
-> > +++ b/arm/aarch64/arm-cpu.c
-> > @@ -22,7 +22,7 @@ static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
-> >  static int arm_cpu__vcpu_init(struct kvm_cpu *vcpu)
-> >  {
-> >  	vcpu->generate_fdt_nodes = generate_fdt_nodes;
-> > -	return 0;
-> > +	return kvm_cpu__setup_pvtime(vcpu);
-> >  }
-> >  
-> >  static struct kvm_arm_target target_generic_v8 = {
-> > diff --git a/arm/aarch64/include/kvm/kvm-cpu-arch.h b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-> > index 8dfb82e..35996dc 100644
-> > --- a/arm/aarch64/include/kvm/kvm-cpu-arch.h
-> > +++ b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-> > @@ -19,5 +19,7 @@
-> >  
-> >  void kvm_cpu__select_features(struct kvm *kvm, struct kvm_vcpu_init *init);
-> >  int kvm_cpu__configure_features(struct kvm_cpu *vcpu);
-> > +int kvm_cpu__setup_pvtime(struct kvm_cpu *vcpu);
-> > +int kvm_cpu__teardown_pvtime(struct kvm *kvm);
-> >  
-> >  #endif /* KVM__KVM_CPU_ARCH_H */
-> > diff --git a/arm/aarch64/pvtime.c b/arm/aarch64/pvtime.c
-> > new file mode 100644
-> > index 0000000..4db2e9f
-> > --- /dev/null
-> > +++ b/arm/aarch64/pvtime.c
-> > @@ -0,0 +1,108 @@
-> > +#include "kvm/kvm.h"
-> > +#include "kvm/kvm-cpu.h"
-> > +#include "kvm/util.h"
-> > +
-> > +#include <linux/byteorder.h>
-> > +#include <linux/types.h>
-> > +
-> > +#define ARM_PVTIME_STRUCT_SIZE		(64)
-> > +
-> > +struct pvtime_data_priv {
-> > +	bool	is_failed_cfg;
-> > +	void	*usr_mem;
-> > +};
-> > +
-> > +static struct pvtime_data_priv pvtime_data = {
-> > +	.is_failed_cfg	= true,
-> > +	.usr_mem	= NULL
-> > +};
-> > +
-> > +static int pvtime__alloc_region(struct kvm *kvm)
-> > +{
-> > +	char *mem;
-> > +	int ret = 0;
-> > +
-> > +	mem = mmap(NULL, ARM_PVTIME_BASE, PROT_RW,
-> > +		   MAP_ANON_NORESERVE, -1, 0);
-> > +	if (mem == MAP_FAILED)
-> > +		return -errno;
-> > +
-> > +	ret = kvm__register_ram(kvm, ARM_PVTIME_BASE,
-> > +				ARM_PVTIME_BASE, mem);
-> > +	if (ret) {
-> > +		munmap(mem, ARM_PVTIME_BASE);
-> > +		return ret;
-> > +	}
-> > +
-> > +	pvtime_data.usr_mem = mem;
-> > +	return ret;
-> > +}
-> > +
-> > +static int pvtime__teardown_region(struct kvm *kvm)
-> > +{
-> > +	if (pvtime_data.usr_mem == NULL)
-> > +		return 0;
-> > +
-> > +	kvm__destroy_mem(kvm, ARM_PVTIME_BASE,
-> > +			 ARM_PVTIME_BASE, pvtime_data.usr_mem);
-> > +	munmap(pvtime_data.usr_mem, ARM_PVTIME_BASE);
-> > +	pvtime_data.usr_mem = NULL;
-> > +	return 0;
-> > +}
-> > +
-> > +int kvm_cpu__setup_pvtime(struct kvm_cpu *vcpu)
-> > +{
-> > +	int ret;
-> > +	bool has_stolen_time;
-> > +	u64 pvtime_guest_addr = ARM_PVTIME_BASE + vcpu->cpu_id *
-> > +		ARM_PVTIME_STRUCT_SIZE;
-> > +	struct kvm_config *kvm_cfg = NULL;
-> > +	struct kvm_device_attr pvtime_attr = (struct kvm_device_attr) {
-> > +		.group	= KVM_ARM_VCPU_PVTIME_CTRL,
-> > +		.addr	= KVM_ARM_VCPU_PVTIME_IPA
-> > +	};
-> > +
-> > +	kvm_cfg = &vcpu->kvm->cfg;
-> > +	if (kvm_cfg->no_pvtime)
-> > +		return 0;
-> > +
-> > +	if (!pvtime_data.is_failed_cfg)
-> > +		return -ENOTSUP;
-> > +
-> > +	has_stolen_time = kvm__supports_extension(vcpu->kvm,
-> > +						  KVM_CAP_STEAL_TIME);
-> > +	if (!has_stolen_time) {
-> > +		kvm_cfg->no_pvtime = true;
-> > +		return 0;
-> > +	}
-> > +
-> > +	ret = ioctl(vcpu->vcpu_fd, KVM_HAS_DEVICE_ATTR, &pvtime_attr);
-> > +	if (ret) {
-> > +		perror("KVM_HAS_DEVICE_ATTR failed\n");
-> > +		goto out_err;
-> > +	}
-> > +
-> > +	if (!pvtime_data.usr_mem) {
-> > +		ret = pvtime__alloc_region(vcpu->kvm);
-> > +		if (ret) {
-> > +			perror("Failed allocating pvtime region\n");
-> > +			goto out_err;
-> > +		}
-> > +	}
-> > +
-> > +	pvtime_attr.addr = (u64)&pvtime_guest_addr;
-> > +	ret = ioctl(vcpu->vcpu_fd, KVM_SET_DEVICE_ATTR, &pvtime_attr);
-> > +	if (!ret)
-> > +		return 0;
-> > +
-> > +	perror("KVM_SET_DEVICE_ATTR failed\n");
-> > +	pvtime__teardown_region(vcpu->kvm);
-> > +out_err:
-> > +	pvtime_data.is_failed_cfg = false;
+> > Is this an error you can recover from in the kernel?
+> >  What is userspace
+> > supposed to know with this information when it sees it?
 > 
-> kvm_cpu__init() calls kvm_cpu__arch_init()->kvm_cpu__setup_pvtime() for each
-> VCPU from the main thread (so sequentually), not from the VCPU threads.  If this
-> function returns an error, kvm_cpu__arch_init() calls die(), which means that
-> kvmtool will terminate without calling kvm_cpu__setup_pvtime() for the other
-> VCPUs.
+> IIUC we are talking about a use after free here since we somehow
+> managed to have a pointer to the device in a worker while
+> device is being destroyed.
 > 
-> What I'm trying to say is that the field is_failed_cfg is not useful, because if
-> one VCPU fails initialization, then kvmtool will not attempt to initialize the
-> rest of the VCPUs.
+> That's the point of the warning as use after free is hard to debug. You
+> ask can we recover from a use after free? 
 > 
-> If you drop is_failed_cfg you can also drop the pvtime_data_priv struct and use
-> a static user_mem variable (up to you).
-> 
+> As regards to the added lock, IIUC it kind of shifts the use after free
+> window to later and since we zero out some of the memory just before we
+> free it, it's a bit more likely to recover.  I would still like to see
+> some more analysis on why the situation is always better than it was
+> before though.
 
-Got it, thanks I will do the cleanup by dropping those pieces.
+With the locks in place, the UAF should not occur.
 
-> > +	return ret;
-> > +}
-> > +
-> > +int kvm_cpu__teardown_pvtime(struct kvm *kvm)
-> > +{
-> > +	return pvtime__teardown_region(kvm);
-> > +}
-> > diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
-> > index c645ac0..43b1f77 100644
-> > --- a/arm/include/arm-common/kvm-arch.h
-> > +++ b/arm/include/arm-common/kvm-arch.h
-> > @@ -15,7 +15,8 @@
-> >   * |  PCI  |////| plat  |       |        |     |         |
-> >   * |  I/O  |////| MMIO: | Flash | virtio | GIC |   PCI   |  DRAM
-> >   * | space |////| UART, |       |  MMIO  |     |  (AXI)  |
-> > - * |       |////| RTC   |       |        |     |         |
-> > + * |       |////| RTC,  |       |        |     |         |
-> > + * |       |////| PVTIME|       |        |     |         |
-> >   * +-------+----+-------+-------+--------+-----+---------+---......
-> >   */
-> >  
-> > @@ -34,6 +35,9 @@
-> >  #define ARM_RTC_MMIO_BASE	(ARM_UART_MMIO_BASE + ARM_UART_MMIO_SIZE)
-> >  #define ARM_RTC_MMIO_SIZE	0x10000
-> >  
-> > +#define ARM_PVTIME_BASE		(ARM_RTC_MMIO_BASE + ARM_RTC_MMIO_SIZE)
-> > +#define ARM_PVTIME_SIZE		SZ_64K
-> > +
-> >  #define KVM_FLASH_MMIO_BASE	(ARM_MMIO_AREA + 0x1000000)
-> >  #define KVM_FLASH_MAX_SIZE	0x1000000
-> >  
-> > diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
-> > index 84ac1e9..00660d6 100644
-> > --- a/arm/kvm-cpu.c
-> > +++ b/arm/kvm-cpu.c
-> > @@ -144,6 +144,7 @@ void kvm_cpu__arch_nmi(struct kvm_cpu *cpu)
-> >  
-> >  void kvm_cpu__delete(struct kvm_cpu *vcpu)
-> >  {
-> > +	kvm_cpu__teardown_pvtime(vcpu->kvm);
-> 
-> This causes compilation for aarch32 to fail:
-> 
-> arm/kvm-cpu.c: In function ‘kvm_cpu__delete’:
-> arm/kvm-cpu.c:147:2: error: implicit declaration of function ‘kvm_cpu__teardown_pvtime’ [-Werror=implicit-function-declaration]
->   147 |  kvm_cpu__teardown_pvtime(vcpu->kvm);
->       |  ^~~~~~~~~~~~~~~~~~~~~~~~
-> arm/kvm-cpu.c:147:2: error: nested extern declaration of ‘kvm_cpu__teardown_pvtime’ [-Werror=nested-externs]
-> cc1: all warnings being treated as errors
-> make: *** [Makefile:482: arm/kvm-cpu.o] Error 1
-> 
-> The reason for that is that there is no stub for kvm_cpu__teardown_pvtime() for
-> aarch32. This fixes the compilation error for me:
-> 
+The issue here is that you have 2 different tasks processing the
+same area of memory (via pointers to structs).  In these scenarios you
+should always provide locking and/or reference counting to prevent
+memory corruption or UAF.
 
-I am afraid I didn't check on aarch32. Thanks for raising this issue, I
-will fix the problem.
-
-> diff --git a/arm/aarch32/include/kvm/kvm-cpu-arch.h b/arm/aarch32/include/kvm/kvm-cpu-arch.h
-> index 780e0e2f0934..ae77a136d0ce 100644
-> --- a/arm/aarch32/include/kvm/kvm-cpu-arch.h
-> +++ b/arm/aarch32/include/kvm/kvm-cpu-arch.h
-> @@ -19,5 +19,9 @@ static inline int kvm_cpu__configure_features(struct kvm_cpu *vcpu)
->  {
->         return 0;
->  }
-> +static inline int kvm_cpu__teardown_pvtime(struct kvm *kvm)
-> +{
-> +       return 0;
-> +}
-> 
->  #endif /* KVM__KVM_CPU_ARCH_H */
-> 
-> Thanks,
-> Alex
-> 
-> >  	free(vcpu);
-> >  }
-
-Thanks for the review,
-Sebastian
-
-> >  
-> > diff --git a/include/kvm/kvm-config.h b/include/kvm/kvm-config.h
-> > index 6a5720c..48adf27 100644
-> > --- a/include/kvm/kvm-config.h
-> > +++ b/include/kvm/kvm-config.h
-> > @@ -62,6 +62,7 @@ struct kvm_config {
-> >  	bool no_dhcp;
-> >  	bool ioport_debug;
-> >  	bool mmio_debug;
-> > +	bool no_pvtime;
-> >  };
-> >  
-> >  #endif
-> > -- 
-> > 2.35.1.616.g0bdcbb4464-goog
-> > 
+-- 
+Lee Jones [李琼斯]
+Principal Technical Lead - Developer Services
+Linaro.org │ Open source software for Arm SoCs
+Follow Linaro: Facebook | Twitter | Blog
