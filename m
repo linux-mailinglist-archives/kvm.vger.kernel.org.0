@@ -2,35 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B1474D1ED9
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 18:23:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4B9724D1F08
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 18:26:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244520AbiCHRYe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 12:24:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54404 "EHLO
+        id S1348394AbiCHR0r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Mar 2022 12:26:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40224 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349140AbiCHRW2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Mar 2022 12:22:28 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2959555226
-        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 09:20:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=8KSTIfZ3A6YTActPeOsqennhlyfW6KiP7ReXGWyX8GA=; b=RW9zYzdKLXUtleTVGMAsWrC0yr
-        YAhkzfG04h3rwqSSsVZv5GP2Uw2MtSrjbXk7VtXaxLhYHTpC87e/uMZys6eLHoaTujsl+WuoeUzel
-        mA8BQtAaR0ninTti94CAAPw89dXxWCed0bl8nolXF1hyGv7zPc6Oo/yokaITbk2sRZ8p+j6ybFDoQ
-        q69tc6gwUKwv57afmDaUF5H1kHMVJtQC2vQAZT1tHvuhIQF1kureYSqXHx/ENd3hENE0OFJNyGoAe
-        vSdZ1j/ct+DNmavVbWNx2X6yGgJC20Y30e1CyoaIAxY4DR1z6hPciKKJuPyuVyszASq0FXHYlZLm+
-        xicXsk+w==;
-Received: from [54.239.6.188] (helo=u3832b3a9db3152.drs11.amazon.com)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nRdVK-00GNNf-R2; Tue, 08 Mar 2022 17:20:11 +0000
-Message-ID: <e745f08e615e5eacb04ba492f5fcd1e7d14fa96c.camel@infradead.org>
+        with ESMTP id S236302AbiCHR0q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 12:26:46 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 67E8855493
+        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 09:25:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646760348;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Q/lckdEEo4hed4la2Ow/NwQiBYvBPG8eF9jfDI+IWDk=;
+        b=TfwdV8+teKBXuoPRUWWKSiUxHRAQpbwidRjfM5fNP0srLwYvR/vfIeFxPwZNkOEPMcBarF
+        nl8YF0oDMcSz/sE1tEJ1UM3k4ht6OLD8GovIilV4QJPVX5RTxUJ3gOfo1WaBOg3Hw+6Xyp
+        PRziPvFxs5CYhZzVnKFThkzjW1AEPKw=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-62-gykqanL9P2eWEApjHJc1xA-1; Tue, 08 Mar 2022 12:25:47 -0500
+X-MC-Unique: gykqanL9P2eWEApjHJc1xA-1
+Received: by mail-wm1-f70.google.com with SMTP id m34-20020a05600c3b2200b0038115c73361so6700902wms.5
+        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 09:25:46 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=Q/lckdEEo4hed4la2Ow/NwQiBYvBPG8eF9jfDI+IWDk=;
+        b=f0kpRFYcNc0QfJhw/j9OjRELbAZuQSIQfHmjd7noK3betemqCmbs00J12eTI+UWVIc
+         C9BUob7tV7HGnA57rRHLBUhR93VelcauOZYpfp4+MtrrQrYveTHIAg5nM4t3kEmhaKmD
+         Nb8+hIe7W6LdKGnP3zgguJyuVuOAYYihx/8GspPQSAFFCHUOeJaQ53iSyk4wTYWJo7hg
+         fQOPV2OfyzpIZSEKkw7B5n01uZ48z+gnGgUOb/nixN1a6n0w5eaoQ80kTJrNToBe/Bye
+         yoHajfggNR1S7TXhizlJ/JXR8Q8KWs0wPaScbI4bXoe7NFMxnDGtkwiZC8J2OtgwItJm
+         k0rw==
+X-Gm-Message-State: AOAM531CHTzhH/YGI9191s0TbqbrAz5FOEdvoz/zR+M1ZLbFeLmYR3IE
+        +slAf3jit2N63IjEVVtxaAjMi3F4RsSjscho1OcAU2bqLVJ3Kmp/7xNLx8W6MdVjOwbdV2kzfgT
+        WkmaNZYMQcmMK
+X-Received: by 2002:a05:600c:354d:b0:389:cf43:da5b with SMTP id i13-20020a05600c354d00b00389cf43da5bmr274787wmq.197.1646760345865;
+        Tue, 08 Mar 2022 09:25:45 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJz2P7TKLZXECaFnC2SY1p8jvQuNdB2bFZjXt7vgrW3IR1ckvbpCgCFrbs8199T7DYQXB/XQ+g==
+X-Received: by 2002:a05:600c:354d:b0:389:cf43:da5b with SMTP id i13-20020a05600c354d00b00389cf43da5bmr274766wmq.197.1646760345532;
+        Tue, 08 Mar 2022 09:25:45 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id i8-20020a1c5408000000b00389bf11ba0csm2794086wmb.38.2022.03.08.09.25.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Mar 2022 09:25:45 -0800 (PST)
+Message-ID: <ec9b7bdd-f85a-5b39-1baa-86b5c68bcf31@redhat.com>
+Date:   Tue, 8 Mar 2022 18:25:43 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
 Subject: Re: [PATCH v3 00/17] KVM: Add Xen event channel acceleration
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Content-Language: en-US
+To:     David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org
 Cc:     Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
@@ -40,21 +72,20 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Boris Ostrovsky <boris.ostrovsky@oracle.com>,
         Metin Kaya <metikaya@amazon.co.uk>,
         Paul Durrant <pdurrant@amazon.co.uk>
-Date:   Tue, 08 Mar 2022 18:20:08 +0100
-In-Reply-To: <5a0d39d9-48b9-5849-daf7-19fbadd75f8c@redhat.com>
 References: <20220303154127.202856-1-dwmw2@infradead.org>
-         <db8515e4-3668-51d2-d9af-711ebd48ad9b@redhat.com>
-         <ec930edc27998dcfe8135a01e368d89747f03c41.camel@infradead.org>
-         <adbaebac-19ed-e8b7-a79c-9831d2ac055f@redhat.com>
-         <42ed3b0c3a82627975eada3bcc610d4e074cb326.camel@infradead.org>
-         <5a0d39d9-48b9-5849-daf7-19fbadd75f8c@redhat.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-G3rXyE39JtERLj0ZEYPG"
-User-Agent: Evolution 3.36.5-0ubuntu1 
-MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+ <db8515e4-3668-51d2-d9af-711ebd48ad9b@redhat.com>
+ <ec930edc27998dcfe8135a01e368d89747f03c41.camel@infradead.org>
+ <adbaebac-19ed-e8b7-a79c-9831d2ac055f@redhat.com>
+ <42ed3b0c3a82627975eada3bcc610d4e074cb326.camel@infradead.org>
+ <5a0d39d9-48b9-5849-daf7-19fbadd75f8c@redhat.com>
+ <e745f08e615e5eacb04ba492f5fcd1e7d14fa96c.camel@infradead.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <e745f08e615e5eacb04ba492f5fcd1e7d14fa96c.camel@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
         SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -63,167 +94,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 3/8/22 18:20, David Woodhouse wrote:
+>> Yes, I'm just talking about the second hunk.  The first is clear(ish).
+> Oh, I see.
+> 
+> When the oneshot timer has expired and hasn't been re-armed by the
+> guest, we should return zero as 'expires_ns' so that it doesn't get re-
+> armed in the past (and, hopefully, immediately retriggered) when the
+> guest is restored.
+> 
+> Also, we don't really want the timer firing*after*  the guest vCPU
+> state has been serialized, since the newly-injected interrupt might not
+> get migrated. Hence using hrtimer_cancel() as our check for whether
+> it's still pending or not.
+> 
 
---=-G3rXyE39JtERLj0ZEYPG
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+I think the two are different.  The first is also clear, and that should 
+be fixed with a separate bool or possibly a special meaning for 
+expires_ns == -1 (or INT64_MAX, I don't speak Xen hypercalls :)).
 
-On Tue, 2022-03-08 at 18:13 +0100, Paolo Bonzini wrote:
-> On 3/8/22 17:59, David Woodhouse wrote:
-> > > > Incremental diff to the 'oneshot timers' patch looks like the first
-> > > > hunk of this. I'm also pondering the second hunk which actively
-> > > > *cancels*  the pending timer on serialization.
-> > >=20
-> > > Hmm, why so?
-> >=20
-> > Don't know yet. But as I added the save/restore support to Joao's patch
-> > I had *assumed* that it would fail when the delta was negative, and was
-> > kind of surprised when it worked in the first place. So I'm sticking
-> > with "Don't Do That Then" as my initial response to fix it.
->=20
-> Yes, I'm just talking about the second hunk.  The first is clear(ish).
+The second should not be a problem.  The newly-injected interrupt might 
+not get migrated, but it will be injected on the destination.  So it 
+shouldn't be a problem, in fact anything that relies on that is probably 
+going to be racy.
 
-Oh, I see.
-
-When the oneshot timer has expired and hasn't been re-armed by the
-guest, we should return zero as 'expires_ns' so that it doesn't get re-
-armed in the past (and, hopefully, immediately retriggered) when the
-guest is restored.
-
-Also, we don't really want the timer firing *after* the guest vCPU
-state has been serialized, since the newly-injected interrupt might not
-get migrated. Hence using hrtimer_cancel() as our check for whether
-it's still pending or not.
-
-> > After a kexec, the deadline for the timer is past, and that's why it
-> > ends up getting restored with a negative delta. After a *few*  cycles o=
-f
-> > this it usually ends up with the timer callback never triggering.
-> >=20
-> > I'll stick a negative delta into the KVM selftest included in the patch
-> > series, instead of the nice polite '100ms in the future' that it uses
-> > at the moment. That ought to trigger it too, and I can instrument the
-> > hrtimer code to work out what's going on. Either way, I think 'Don't Do
-> > That Then' will continue to be the right answer:)
->=20
-> Yep, let's keep both testcases through.
-
-Ultimately I think the negative one only ends up testing the kernel's
-hrtimer behaviour rather than KVM functionality, but I'll play with
-that some more and make sure I understand it.=20
-
-
---=-G3rXyE39JtERLj0ZEYPG
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIwMzA4MTcyMDA4WjAvBgkqhkiG9w0BCQQxIgQg7YhFdx+q
-ou4OZMwQSvu37tbH7ZFdVGN/s27Iw7JgsRIwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgB/EJswCbgS1bJKHrHJEw7bfGreUV1ocKB+
-VB2xQHsRDHS4EZERvAp+Z5sFSSHS0hdnEE4EvoNBFIvaTBROuft4UOtBEfdQdStMG8ldGWd8GIW3
-/8J03XoFnLipGvHhAOywlH76HdvDwoCcdZ3VOkE3ukG0jeXVeFbwNCDEFMFBdkAF8frzq2AjX61x
-E0zJa8YaqcTYuBcNtnGt/YCFi6l20KX6ZHkyQX5CO7PLU90OhQm6e82GIt4vh/D15Zh7lFuy0maL
-HbjJvBGKo6HWXczBHv5mFhdObiGYOXrgiAAsYIlZO+tBXzqyKRzJIxOvktd79JwpJx0kK4/PSWRG
-DG0xlOfo7qkqLCrBeSuqJkKl+9LZsfx3n+MtO2s0zIqyJgi3OM0L7r/I8sflMVVd+x42mg1fH1A2
-VYEqnPgcgfxdAKLhd5H1DK4U6ftGHxDl+qDAAB2GvtxZaF0smRvHvNWK6kUlGJ9AjwU6FSK8q4ML
-sVow4Viy6uV8O5eKSGJvwdHL+li3iwH0hLT/t4Jhv750yUP7+R0QQesZwALFohu75TiCrV6rajDA
-Tg638yh+EMuGboaqiua2oqcaT33mlllXSpkHcthkIFhCw+QK+l+y6ZnThS2yJ5XeAMRZ6s0i/XE+
-juonSAA58OiSxYALhimpJdwFS3BcqBEwv4cXAHBnNQAAAAAAAA==
-
-
---=-G3rXyE39JtERLj0ZEYPG--
+Paolo
 
