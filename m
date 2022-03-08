@@ -2,155 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E33704D1320
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 10:15:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CEF794D13B3
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 10:47:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345114AbiCHJQ2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 04:16:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42920 "EHLO
+        id S1345406AbiCHJs3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Mar 2022 04:48:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48910 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238795AbiCHJQ1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Mar 2022 04:16:27 -0500
-Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83A364090C
-        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 01:15:31 -0800 (PST)
-Received: by mail-wr1-x431.google.com with SMTP id k24so17927247wrd.7
-        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 01:15:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=A67AlhskYiiSCgOgMfxOM8VtIq/AZbd8NuTpwj7+O9E=;
-        b=ru0ZMHr+H3SzWxJ5c6z+akoloC2eYUtrZZDP/bO0aM7LsTlONsVtFwFb/M0zFfOyf8
-         ElYyllP0vUy0v0lbdXhcPYe4WzX7ped6as7iO4g3cCmAJaWF+VZOQBy9ug42T440YpRF
-         GUNi+yilLEuh339WAnK2G0QLo/WGwWiiz6vZ/8lCD4bCmK0TFsJdNrkLS30iJ3WFSL83
-         SnRbArDjmbspkK6+UFofwFDjTRmpVBG0W/hwgBdGn/4koeWXQAPzHE106Pho9SQPGPFW
-         5I7zM7fAiaC+9DyvnsQWd0h5V5zBpL4P1Hkpp1YpcllRm9Tk5tHYCkPE7/0BSdXqV9ip
-         lg1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=A67AlhskYiiSCgOgMfxOM8VtIq/AZbd8NuTpwj7+O9E=;
-        b=EuwFHuwDz5oFt3Fap7yc/Md8CUk0VWjeJLx3mtiIGVGE/4JxZFk16oDEG9d/ixiz6c
-         hKqVREI6iFvYTrHlVa4k9zQPHlFVd8wttdhHTm7YSukEJ3RqEjJQPAh4opjnO0Q6rEVX
-         TLy/qylpbQxjoz9R6GKWpWspeQWORYFBDyZsWsREn9wgQYG6qnZDzbkX/JTApvyfeg/I
-         aPuxz4lK8eO9QKNgOS8HGjhhsU+Z4Ov+AS+M5o6zCB1WHFD6HcmR+0CnqZsYfqjFLiXF
-         NDynj2zQsW/18CCLdUSzq542duduQpb5FATV7DIuPEUer6ZsJoFXxMThsHAG7QvVY4nl
-         RFkg==
-X-Gm-Message-State: AOAM531BLoNtGuyVUu5SvHm2WhRrmnUYydqtP0pyXg6umYKRFZEJsvJU
-        4UbsLDOGj/fjSV41FeSh7kp0/w==
-X-Google-Smtp-Source: ABdhPJy9FjH8HkL7B/j6ELLmslkDBEpsnA6isr76dWseTv/sIBWInh7Ka7q7NHwbZ1Go3z4nK7Q0BQ==
-X-Received: by 2002:adf:e448:0:b0:1ea:c7b6:782 with SMTP id t8-20020adfe448000000b001eac7b60782mr11302842wrm.29.1646730930092;
-        Tue, 08 Mar 2022 01:15:30 -0800 (PST)
-Received: from google.com (cpc155339-bagu17-2-0-cust87.1-3.cable.virginm.net. [86.27.177.88])
-        by smtp.gmail.com with ESMTPSA id h13-20020adff18d000000b001f1de9f930esm15425518wro.81.2022.03.08.01.15.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Mar 2022 01:15:29 -0800 (PST)
-Date:   Tue, 8 Mar 2022 09:15:27 +0000
-From:   Lee Jones <lee.jones@linaro.org>
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     mst@redhat.com, jasowang@redhat.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, stable@vger.kernel.org,
-        syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
-Subject: Re: [PATCH 1/1] vhost: Protect the virtqueue from being cleared
- whilst still in use
-Message-ID: <Yicer3yGg5rrdSIs@google.com>
-References: <20220307191757.3177139-1-lee.jones@linaro.org>
- <YiZeB7l49KC2Y5Gz@kroah.com>
- <YicPXnNFHpoJHcUN@google.com>
- <Yicalf1I6oBytbse@kroah.com>
+        with ESMTP id S1345547AbiCHJry (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 04:47:54 -0500
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DF124198E;
+        Tue,  8 Mar 2022 01:46:58 -0800 (PST)
+Received: from kwepemi100002.china.huawei.com (unknown [172.30.72.53])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4KCVnB5SHxzdZn9;
+        Tue,  8 Mar 2022 17:45:34 +0800 (CST)
+Received: from kwepemm600005.china.huawei.com (7.193.23.191) by
+ kwepemi100002.china.huawei.com (7.221.188.188) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Tue, 8 Mar 2022 17:46:56 +0800
+Received: from [10.67.102.118] (10.67.102.118) by
+ kwepemm600005.china.huawei.com (7.193.23.191) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Tue, 8 Mar 2022 17:46:55 +0800
+Subject: Re: [PATCH v8 8/9] hisi_acc_vfio_pci: Add support for VFIO live
+ migration
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>
+CC:     Jason Gunthorpe <jgg@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
+        "yishaih@nvidia.com" <yishaih@nvidia.com>,
+        Linuxarm <linuxarm@huawei.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        Jonathan Cameron <jonathan.cameron@huawei.com>,
+        "Wangzhou (B)" <wangzhou1@hisilicon.com>,
+        Xu Zaibo <xuzaibo@huawei.com>
+References: <20220303230131.2103-1-shameerali.kolothum.thodi@huawei.com>
+ <20220303230131.2103-9-shameerali.kolothum.thodi@huawei.com>
+ <20220304205720.GE219866@nvidia.com>
+ <20220307120513.74743f17.alex.williamson@redhat.com>
+ <aac9a26dc27140d9a1ce56ebdec393a6@huawei.com>
+ <20220307125239.7261c97d.alex.williamson@redhat.com>
+From:   liulongfang <liulongfang@huawei.com>
+Message-ID: <e69d8246-79ba-fa37-fecf-c9f28db692f8@huawei.com>
+Date:   Tue, 8 Mar 2022 17:46:55 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Yicalf1I6oBytbse@kroah.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+In-Reply-To: <20220307125239.7261c97d.alex.williamson@redhat.com>
+Content-Type: text/plain; charset="gbk"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.102.118]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemm600005.china.huawei.com (7.193.23.191)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 08 Mar 2022, Greg KH wrote:
-
-> On Tue, Mar 08, 2022 at 08:10:06AM +0000, Lee Jones wrote:
-> > On Mon, 07 Mar 2022, Greg KH wrote:
-> > 
-> > > On Mon, Mar 07, 2022 at 07:17:57PM +0000, Lee Jones wrote:
-> > > > vhost_vsock_handle_tx_kick() already holds the mutex during its call
-> > > > to vhost_get_vq_desc().  All we have to do here is take the same lock
-> > > > during virtqueue clean-up and we mitigate the reported issues.
-> > > > 
-> > > > Also WARN() as a precautionary measure.  The purpose of this is to
-> > > > capture possible future race conditions which may pop up over time.
-> > > > 
-> > > > Link: https://syzkaller.appspot.com/bug?extid=279432d30d825e63ba00
-> > > > 
-> > > > Cc: <stable@vger.kernel.org>
-> > > > Reported-by: syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
-> > > > Signed-off-by: Lee Jones <lee.jones@linaro.org>
-> > > > ---
-> > > >  drivers/vhost/vhost.c | 10 ++++++++++
-> > > >  1 file changed, 10 insertions(+)
-> > > > 
-> > > > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> > > > index 59edb5a1ffe28..ef7e371e3e649 100644
-> > > > --- a/drivers/vhost/vhost.c
-> > > > +++ b/drivers/vhost/vhost.c
-> > > > @@ -693,6 +693,15 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
-> > > >  	int i;
-> > > >  
-> > > >  	for (i = 0; i < dev->nvqs; ++i) {
-> > > > +		/* No workers should run here by design. However, races have
-> > > > +		 * previously occurred where drivers have been unable to flush
-> > > > +		 * all work properly prior to clean-up.  Without a successful
-> > > > +		 * flush the guest will malfunction, but avoiding host memory
-> > > > +		 * corruption in those cases does seem preferable.
-> > > > +		 */
-> > > > +		WARN_ON(mutex_is_locked(&dev->vqs[i]->mutex));
-> > > 
-> > > So you are trading one syzbot triggered issue for another one in the
-> > > future?  :)
-> > > 
-> > > If this ever can happen, handle it, but don't log it with a WARN_ON() as
-> > > that will trigger the panic-on-warn boxes, as well as syzbot.  Unless
-> > > you want that to happen?
-> > 
-> > No, Syzbot doesn't report warnings, only BUGs and memory corruption.
+On 2022/3/8 3:52, Alex Williamson wrote:
+> On Mon, 7 Mar 2022 19:29:06 +0000
+> Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
 > 
-> Has it changed?  Last I looked, it did trigger on WARN_* calls, which
-> has resulted in a huge number of kernel fixes because of that.
-
-Everything is customisable in syzkaller, so maybe there are specific
-builds which panic_on_warn enabled, but none that I'm involved with
-do.
-
-Here follows a topical example.  The report above in the Link: tag
-comes with a crashlog [0].  In there you can see the WARN() at the
-bottom of vhost_dev_cleanup() trigger many times due to a populated
-(non-flushed) worker list, before finally tripping the BUG() which
-triggers the report:
-
-[0] https://syzkaller.appspot.com/text?tag=CrashLog&x=16a61fce700000
-
-> > > And what happens if the mutex is locked _RIGHT_ after you checked it?
-> > > You still have a race...
-> > 
-> > No, we miss a warning that one time.  Memory is still protected.
+>>> -----Original Message-----
+>>> From: Alex Williamson [mailto:alex.williamson@redhat.com]
+>>> Sent: 07 March 2022 19:05
+>>> To: Jason Gunthorpe <jgg@nvidia.com>
+>>> Cc: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
+>>> kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
+>>> linux-crypto@vger.kernel.org; linux-pci@vger.kernel.org; cohuck@redhat.com;
+>>> mgurtovoy@nvidia.com; yishaih@nvidia.com; Linuxarm
+>>> <linuxarm@huawei.com>; liulongfang <liulongfang@huawei.com>; Zengtao (B)
+>>> <prime.zeng@hisilicon.com>; Jonathan Cameron
+>>> <jonathan.cameron@huawei.com>; Wangzhou (B) <wangzhou1@hisilicon.com>
+>>> Subject: Re: [PATCH v8 8/9] hisi_acc_vfio_pci: Add support for VFIO live
+>>> migration
+>>>
+>>> On Fri, 4 Mar 2022 16:57:20 -0400
+>>> Jason Gunthorpe <jgg@nvidia.com> wrote:
+>>>   
+>>>> On Thu, Mar 03, 2022 at 11:01:30PM +0000, Shameer Kolothum wrote:  
+>>>>> From: Longfang Liu <liulongfang@huawei.com>
+>>>>>
+>>>>> VMs assigned with HiSilicon ACC VF devices can now perform live  
+>>> migration  
+>>>>> if the VF devices are bind to the hisi_acc_vfio_pci driver.
+>>>>>
+>>>>> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
+>>>>> Signed-off-by: Shameer Kolothum  
+>>> <shameerali.kolothum.thodi@huawei.com>  
+>>>>> ---
+>>>>>  drivers/vfio/pci/hisilicon/Kconfig            |    7 +
+>>>>>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 1078 ++++++++++++++++-
+>>>>>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |  114 ++
+>>>>>  3 files changed, 1181 insertions(+), 18 deletions(-)
+>>>>>  create mode 100644 drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+>>>>>
+>>>>> diff --git a/drivers/vfio/pci/hisilicon/Kconfig  
+>>> b/drivers/vfio/pci/hisilicon/Kconfig  
+>>>>> index dc723bad05c2..2a68d39f339f 100644
+>>>>> --- a/drivers/vfio/pci/hisilicon/Kconfig
+>>>>> +++ b/drivers/vfio/pci/hisilicon/Kconfig
+>>>>> @@ -3,6 +3,13 @@ config HISI_ACC_VFIO_PCI
+>>>>>  	tristate "VFIO PCI support for HiSilicon ACC devices"
+>>>>>  	depends on ARM64 || (COMPILE_TEST && 64BIT)
+>>>>>  	depends on VFIO_PCI_CORE
+>>>>> +	depends on PCI && PCI_MSI  
+>>>>
+>>>> PCI is already in the depends from the 2nd line in
+>>>> drivers/vfio/pci/Kconfig, but it is harmless
+>>>>  
+>>>>> +	depends on UACCE || UACCE=n
+>>>>> +	depends on ACPI  
+>>>>
+>>>> Scratching my head a bit on why we have these  
+>>>
+>>> Same curiosity from me, each of the CRYPTO_DEV_HISI_* options selected
+>>> also depend on these so they seem redundant.  
+>>
+>> Yes, they are redundant now since we have added CRYPTO_DEV_HISI_ drivers
+>> as "depends" now. I will remove that.
+>>  
+>>> I think we still require acks from Bjorn and Zaibo for select patches
+>>> in this series.  
+>>
+>> I checked with Ziabo. He moved projects and is no longer looking into crypto stuff.
+>> Wangzhou and LiuLongfang now take care of this. Received acks from Wangzhou
+>> already and I will request Longfang to provide his. Hope that's ok.
 > 
-> Then don't warn on something that doesn't matter.  This line can be
-> dropped as there's nothing anyone can do about it, right?
-
-You'll have to take that point up with Michael.
-
--- 
-Lee Jones [李琼斯]
-Principal Technical Lead - Developer Services
-Linaro.org │ Open source software for Arm SoCs
-Follow Linaro: Facebook | Twitter | Blog
+> Maybe a good time to have them update MAINTAINERS as well.  Thanks,
+> 
+> Alex
+> 
+OK, we have discussed it internally, I will send a patch to update
+MAINTAINERS of crypto stuff.
+Thanks.
+Longfang
+> .
+> 
