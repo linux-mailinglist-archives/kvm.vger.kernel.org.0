@@ -2,123 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 10C6C4D11DB
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 09:13:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E4034D11FC
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 09:19:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344827AbiCHIOi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 03:14:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38788 "EHLO
+        id S1344937AbiCHIUj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Mar 2022 03:20:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344803AbiCHIOg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Mar 2022 03:14:36 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id EC2772FFED
-        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 00:13:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646727219;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Vo5Lpx3jhLk8XX96vRv3ILFXkCDbfnvle5Ey5/KCjRw=;
-        b=NmeWJBPChPS2u4iZicsBBKvCAS9ue3jrR8Wq3ETBrE/COWzoSHVUnPS6z2bWrKBlZsI2jl
-        +fT8neEiycC43Q0nei242ZErjYM8H19lv5ill+GPZLA6d09xAngbrz3bebu1LeoiDAtPwd
-        WehmbiKNcVLrsxk5ppSeavd/wGK2WGU=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-8-B7H8TihFNgOQA7kEtkBVkA-1; Tue, 08 Mar 2022 03:13:37 -0500
-X-MC-Unique: B7H8TihFNgOQA7kEtkBVkA-1
-Received: by mail-ed1-f72.google.com with SMTP id l14-20020aa7cace000000b003f7f8e1cbbdso10111371edt.20
-        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 00:13:37 -0800 (PST)
+        with ESMTP id S234091AbiCHIUh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 03:20:37 -0500
+Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 315263EF21;
+        Tue,  8 Mar 2022 00:19:41 -0800 (PST)
+Received: by mail-pg1-x536.google.com with SMTP id t187so11511575pgb.1;
+        Tue, 08 Mar 2022 00:19:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id;
+        bh=Nm51/asUFghrpGhLBb2l9PncUBM4Fnpu/MUp5DxQXsE=;
+        b=c79I9kiJY1J6r2wf/s4lnZSp71zeNtQ2zuhM0ST/Hhusdmzk6evQR6moCABB6duP+V
+         MTZkeyQw/CuDs/0gqUJOEdumJELtYZwaGNJQqm6lwlKyDsuufSOIaE4f44sYBWWvMb2e
+         PrU8Avv2NLg8IoWkFsbE/cj2JvddveUjZPTUwRK7cntSpVT4POSJDHtveGmZUXrE/PxF
+         buvQg6+W4YpZ+C9mNKBJFfEpvw4VNweqPe1cZkwBPi4UFAkuwnqV57DqdhLuR+qvrX9p
+         Qw/UYD6qY1aKXRgn4YaRLn84e5loAmAixbWlD9DsXbXaveA4fNuwrJd5xqgMXOQ2en8b
+         6mTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=Vo5Lpx3jhLk8XX96vRv3ILFXkCDbfnvle5Ey5/KCjRw=;
-        b=rm1BanihlVB1OXdQU0og6b2joG3m5xfnB7lvjbXsEzZ2fQmknKVylZACdsTDVxgOUx
-         iSd8mDnqd3zPmEPk956QycpDOxSauJuUmaWl3PG4+HXp9d1G5WXAVNea9MlqUwPwp2qp
-         Rwxn1/ah1jwQvfFUZQCCJ82pckIx0UAzMK4RoedKNRAFaR4JNjHhGhNop0tylmZw+Hs3
-         gcmmTWB9uUTE2DJ0lIjvIvnV6ACnQrNJHcBKHmheGRQuKJ312fnNUtcxt9MKGlMe5pbi
-         /e3bd/K3axKyYFxJiuWoVNpnpQtvGiQrnaHNzoaxWMlkDBfiSqJ2Vb188aG682UcgdQo
-         gKuA==
-X-Gm-Message-State: AOAM5315T2Z7bdMV7EbFj7+yXxCJG3MS2kdpUvoQ12Okxyd/YDw7WQeU
-        ftNNe+m/7Uq/g1c2eXXt8XFTBA5JcfIFdxYiBEp19br/YGtQVxi6XP6L/BqOdsMYnTHOAB1fWEs
-        0jV3ad7TbMAla
-X-Received: by 2002:a17:906:b1da:b0:6d6:dd9a:3a9b with SMTP id bv26-20020a170906b1da00b006d6dd9a3a9bmr12184311ejb.766.1646727216613;
-        Tue, 08 Mar 2022 00:13:36 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwOdQ+BohdQua/sHBPJ2tnTmtj+3a1NGelClPL4W5LFDCZ3aUUnjuGf+CRHhRg8ebjHW7FsPw==
-X-Received: by 2002:a17:906:b1da:b0:6d6:dd9a:3a9b with SMTP id bv26-20020a170906b1da00b006d6dd9a3a9bmr12184295ejb.766.1646727216358;
-        Tue, 08 Mar 2022 00:13:36 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id u5-20020a170906780500b006d0b99162casm5562848ejm.114.2022.03.08.00.13.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Mar 2022 00:13:35 -0800 (PST)
-Message-ID: <5cb1e32e-c880-fa48-aa25-7660d8ad0cdd@redhat.com>
-Date:   Tue, 8 Mar 2022 09:13:33 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH] kvm: x86: Improve virtual machine startup performance
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Hao Peng <flyingpenghao@gmail.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220301063756.16817-1-flyingpeng@tencent.com>
- <Yh5d7XBD9D4FhEe3@google.com>
- <CAPm50a+p2pSjExDwPmGpZ_aTuxs=x6RZ4-AAD19RDQx2o-=NCw@mail.gmail.com>
- <YiAZ3wTICeLTVnJz@google.com>
- <CAPm50aLJ51mm9JVpTMQCkNENX_9-Do5UeH5zxu-5byOcOFsJBg@mail.gmail.com>
- <Yia5hsoq2ZZJM8gx@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <Yia5hsoq2ZZJM8gx@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=Nm51/asUFghrpGhLBb2l9PncUBM4Fnpu/MUp5DxQXsE=;
+        b=7AvMHQ97Gm/3SjOgd4Q1VbLXhFPnsGcHDeXuoooicsA6PZnuyDnc1EPyiQAoacPfG1
+         QmnOGQtZOncCZ0fIheLw0cyxfU2m7jbf+XiDYA36lMkXye/YsWQG80znk1pg/JLKX7ad
+         fx8sI7KtDYuWKFy7dJiqay96TpVQlRBYdFyB3IWElWKtJ5dtc1grjn4un3QOZuX4PpGK
+         mOtyeOJdWDwJYNtXhm7pnTUEwW4cjXV8tkgUdj8HOEdwXt4bj4CgnW9d+BVXU/DhKuoE
+         9FdtX8A+QA5+rqHJUkjcaakPQFASgiEjpFbKAV/zyau+ZuKeIbXGrUv8ZNCMdUQgBKGl
+         lRZg==
+X-Gm-Message-State: AOAM532+Pp3TjmJNDc4qdBQuYD+9oJFPAoBY9TS8k3lcq9QArfOhTxyt
+        seEDCp3UKdwhx5MQO1rPZeFWjeSWxbI=
+X-Google-Smtp-Source: ABdhPJxiuB/vZK+oyI3F7Cw34nqjJeYWe2yjILgpOumEPTSbhfWLnmYLH93JVXrdbZGC1v1MEKjjHA==
+X-Received: by 2002:a05:6a00:22c3:b0:4f7:7cb:26b0 with SMTP id f3-20020a056a0022c300b004f707cb26b0mr8171412pfj.47.1646727580533;
+        Tue, 08 Mar 2022 00:19:40 -0800 (PST)
+Received: from localhost.localdomain ([203.205.141.112])
+        by smtp.googlemail.com with ESMTPSA id mn3-20020a17090b188300b001bf3ac6c7e3sm1838677pjb.19.2022.03.08.00.19.38
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 08 Mar 2022 00:19:40 -0800 (PST)
+From:   Wanpeng Li <kernellwp@gmail.com>
+X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Subject: [PATCH] x86/kvm: Don't waste kvmclock memory if there is nopv parameter
+Date:   Tue,  8 Mar 2022 00:18:49 -0800
+Message-Id: <1646727529-11774-1-git-send-email-wanpengli@tencent.com>
+X-Mailer: git-send-email 2.7.4
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/8/22 03:03, Sean Christopherson wrote:
-> On Thu, Mar 03, 2022, Hao Peng wrote:
->> On Thu, Mar 3, 2022 at 9:29 AM Sean Christopherson <seanjc@google.com> wrote:
->>>
->>> On Wed, Mar 02, 2022, Hao Peng wrote:
->>>> Thanks for pointing this out. However, other than shadow_root_level,
->>>> other fields of context will not
->>>> change during the entire operation, such as
->>>> page_fault/sync_page/direct_map and so on under
->>>> the condition of tdp_mmu.
->>>> Is this patch still viable after careful confirmation of the fields
->>>> that won't be modified?
->>>
->>> No, passing around the "init" flag is a hack.
->>>
->>> But, we can achieve what you want simply by initializing the constant data once
->>> per vCPU.  There's a _lot_ of state that is constant for a given MMU now that KVM
->>> uses separate MMUs for L1 vs. L2 when TDP is enabled.  I should get patches posted
->>> tomorrow, just need to test (famous last words).
-> 
-> Famous last words indeed.  Long story short, the patches were mostly easy, but I
-> wandered deep into a rabbit hole when trying to make ->inject_page_fault() constant
-> per MMU.  I'll get something posted this week, though exactly what that something is
-> remains to be seen :-)
+From: Wanpeng Li <wanpengli@tencent.com>
 
-This is exactly what I have posted a few weeks ago:
+When the "nopv" command line parameter is used, it should not waste 
+memory for kvmclock.
 
-https://patchew.org/linux/20220221162243.683208-1-pbonzini@redhat.com/
+Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+---
+ arch/x86/kernel/kvmclock.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-See in particular
-
-   KVM: nVMX/nSVM: do not monkey-patch inject_page_fault callback
-   KVM: x86/mmu: initialize constant-value fields just once
-
-Paolo
+diff --git a/arch/x86/kernel/kvmclock.c b/arch/x86/kernel/kvmclock.c
+index c5caa73..16333ba 100644
+--- a/arch/x86/kernel/kvmclock.c
++++ b/arch/x86/kernel/kvmclock.c
+@@ -239,7 +239,7 @@ static void __init kvmclock_init_mem(void)
+ 
+ static int __init kvm_setup_vsyscall_timeinfo(void)
+ {
+-	if (!kvm_para_available() || !kvmclock)
++	if (!kvm_para_available() || !kvmclock || nopv)
+ 		return 0;
+ 
+ 	kvmclock_init_mem();
+-- 
+2.7.4
 
