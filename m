@@ -2,175 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0E7A24D1542
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 11:56:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8427A4D1556
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 11:59:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346020AbiCHK5H (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 05:57:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43304 "EHLO
+        id S1346072AbiCHLA0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Mar 2022 06:00:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53058 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346018AbiCHK5D (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Mar 2022 05:57:03 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3635B434A6
-        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 02:56:07 -0800 (PST)
+        with ESMTP id S1346032AbiCHLAY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 06:00:24 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B9E5B41F8A
+        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 02:59:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646736966;
+        s=mimecast20190719; t=1646737166;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=THPXJELvuxW6inJpizACi6yZwtZMXDw05fIwiYKfyWA=;
-        b=AFna5OAhbefrPrIvyAMsS21MiXx8SjxetTLlJtO9bI72xmqWqMaI5b79ZM33+jUljvqC1M
-        pBbMg9X99dgSA9iIaMFF/rKXC1npNbs8kj8fF3ELqZfXoE0XB6N7V4C+xZdp6txXAMUub7
-        ikLDpw6rKqt7PnnPSKX2THJnKeDDcao=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=3yqdS8zAEjaJjs00ZY9U4Ql4/aCVM8MsMEwUnD+zf4Q=;
+        b=gmxuOCBH0GYQ9xycyAssx2/7ahDXce5OBPi2NrUCH2L/q5PcL7TlBLuwx+T+ikRhSMeAne
+        VMSZs2Wy0OuzAageMDARFxzoW56iV0odV9Q/nhKyj0REwEHk8SMzoBoA0wo+lX1FOhvhVe
+        u9bZZYFgfc6Kqh65Cicuseh3y+uqQxA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-558-AOhLrHkxNP6MnFcVshiKpg-1; Tue, 08 Mar 2022 05:56:05 -0500
-X-MC-Unique: AOhLrHkxNP6MnFcVshiKpg-1
-Received: by mail-ej1-f72.google.com with SMTP id lf15-20020a170906ae4f00b006da86a43346so7335447ejb.14
-        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 02:56:04 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=THPXJELvuxW6inJpizACi6yZwtZMXDw05fIwiYKfyWA=;
-        b=tvEpja8x336hFRffSVXGzNZKwNyy8naPzle/9gZwlJtGcZHZ1ZVHBxQ/g/LrkLDvvk
-         +awHVHGLk5HHsLxoivR1Ruqfo6YG33WvNecdAUy6NBhwsUCqVvFKrXLzaCpwSww4rTAI
-         wzXzBuyB4dSZe3rlOT7HYsWtjebZgOVxNlGd40q7jZtSWxmqJZ1ZCj3tEHWhkgSNHFLN
-         bJnpCg00YSw7Z1fhzl1LMPbP0UY9bOAHBXWGKE5kLBNNfy/SYVviikMNm3we071EUDxG
-         G/nIx6AWcDry443i2ucWBq45vu51eA4n9xFqnRSTBqEsMlvZsJKiyCrIx53LoLsywUIl
-         cvxQ==
-X-Gm-Message-State: AOAM5326eEZNm7kT8Xs4hsae0J06As6ZFFEsbosbETt46+Es0VfQkQ7X
-        yyQQYj67N/gAWxM1zV2LEKlXoSoIXJwzCGxkBwxgWlbTliJAgXgesMTZUq7+yX6lzT86hq9+EJw
-        U8bP+YUj4v69M
-X-Received: by 2002:a17:907:6096:b0:6da:68d2:327f with SMTP id ht22-20020a170907609600b006da68d2327fmr12817790ejc.761.1646736962912;
-        Tue, 08 Mar 2022 02:56:02 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyKGG3Z63udeaeH1lPhQJidMdNIksYDzx/dSa/Eol2gRlzn6bu5TRgyUjAEl+sdkcHMtg9aTg==
-X-Received: by 2002:a17:907:6096:b0:6da:68d2:327f with SMTP id ht22-20020a170907609600b006da68d2327fmr12817773ejc.761.1646736962624;
-        Tue, 08 Mar 2022 02:56:02 -0800 (PST)
-Received: from redhat.com ([2.55.138.228])
-        by smtp.gmail.com with ESMTPSA id u5-20020a170906b10500b006ce6fa4f510sm5668769ejy.165.2022.03.08.02.56.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Mar 2022 02:56:02 -0800 (PST)
-Date:   Tue, 8 Mar 2022 05:55:58 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     Lee Jones <lee.jones@linaro.org>, jasowang@redhat.com,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        stable@vger.kernel.org,
-        syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
-Subject: Re: [PATCH 1/1] vhost: Protect the virtqueue from being cleared
- whilst still in use
-Message-ID: <20220308055003-mutt-send-email-mst@kernel.org>
-References: <20220307191757.3177139-1-lee.jones@linaro.org>
- <YiZeB7l49KC2Y5Gz@kroah.com>
- <YicPXnNFHpoJHcUN@google.com>
- <Yicalf1I6oBytbse@kroah.com>
- <Yicer3yGg5rrdSIs@google.com>
- <YicolvcbY9VT6AKc@kroah.com>
+ us-mta-345-D7y9jPIWOpia1cea1Qxr2w-1; Tue, 08 Mar 2022 05:59:23 -0500
+X-MC-Unique: D7y9jPIWOpia1cea1Qxr2w-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5D828801AEB;
+        Tue,  8 Mar 2022 10:59:21 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B9CB46FB03;
+        Tue,  8 Mar 2022 10:59:19 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Michael Ellerman <mpe@ellerman.id.au>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>,
+        Christoph Lameter <cl@linux.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        Vladimir Davydov <vdavydov.dev@gmail.com>, linux-mm@kvack.org,
+        cgroups@vger.kernel.org
+Subject: [PATCH 0/3] mm: vmalloc: introduce array allocation functions
+Date:   Tue,  8 Mar 2022 05:59:15 -0500
+Message-Id: <20220308105918.615575-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YicolvcbY9VT6AKc@kroah.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 08, 2022 at 10:57:42AM +0100, Greg KH wrote:
-> On Tue, Mar 08, 2022 at 09:15:27AM +0000, Lee Jones wrote:
-> > On Tue, 08 Mar 2022, Greg KH wrote:
-> > 
-> > > On Tue, Mar 08, 2022 at 08:10:06AM +0000, Lee Jones wrote:
-> > > > On Mon, 07 Mar 2022, Greg KH wrote:
-> > > > 
-> > > > > On Mon, Mar 07, 2022 at 07:17:57PM +0000, Lee Jones wrote:
-> > > > > > vhost_vsock_handle_tx_kick() already holds the mutex during its call
-> > > > > > to vhost_get_vq_desc().  All we have to do here is take the same lock
-> > > > > > during virtqueue clean-up and we mitigate the reported issues.
-> > > > > > 
-> > > > > > Also WARN() as a precautionary measure.  The purpose of this is to
-> > > > > > capture possible future race conditions which may pop up over time.
-> > > > > > 
-> > > > > > Link: https://syzkaller.appspot.com/bug?extid=279432d30d825e63ba00
-> > > > > > 
-> > > > > > Cc: <stable@vger.kernel.org>
-> > > > > > Reported-by: syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
-> > > > > > Signed-off-by: Lee Jones <lee.jones@linaro.org>
-> > > > > > ---
-> > > > > >  drivers/vhost/vhost.c | 10 ++++++++++
-> > > > > >  1 file changed, 10 insertions(+)
-> > > > > > 
-> > > > > > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> > > > > > index 59edb5a1ffe28..ef7e371e3e649 100644
-> > > > > > --- a/drivers/vhost/vhost.c
-> > > > > > +++ b/drivers/vhost/vhost.c
-> > > > > > @@ -693,6 +693,15 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
-> > > > > >  	int i;
-> > > > > >  
-> > > > > >  	for (i = 0; i < dev->nvqs; ++i) {
-> > > > > > +		/* No workers should run here by design. However, races have
-> > > > > > +		 * previously occurred where drivers have been unable to flush
-> > > > > > +		 * all work properly prior to clean-up.  Without a successful
-> > > > > > +		 * flush the guest will malfunction, but avoiding host memory
-> > > > > > +		 * corruption in those cases does seem preferable.
-> > > > > > +		 */
-> > > > > > +		WARN_ON(mutex_is_locked(&dev->vqs[i]->mutex));
-> > > > > 
-> > > > > So you are trading one syzbot triggered issue for another one in the
-> > > > > future?  :)
-> > > > > 
-> > > > > If this ever can happen, handle it, but don't log it with a WARN_ON() as
-> > > > > that will trigger the panic-on-warn boxes, as well as syzbot.  Unless
-> > > > > you want that to happen?
-> > > > 
-> > > > No, Syzbot doesn't report warnings, only BUGs and memory corruption.
-> > > 
-> > > Has it changed?  Last I looked, it did trigger on WARN_* calls, which
-> > > has resulted in a huge number of kernel fixes because of that.
-> > 
-> > Everything is customisable in syzkaller, so maybe there are specific
-> > builds which panic_on_warn enabled, but none that I'm involved with
-> > do.
-> 
-> Many systems run with panic-on-warn (i.e. the cloud), as they want to
-> drop a box and restart it if anything goes wrong.
-> 
-> That's why syzbot reports on WARN_* calls.  They should never be
-> reachable by userspace actions.
-> 
-> > Here follows a topical example.  The report above in the Link: tag
-> > comes with a crashlog [0].  In there you can see the WARN() at the
-> > bottom of vhost_dev_cleanup() trigger many times due to a populated
-> > (non-flushed) worker list, before finally tripping the BUG() which
-> > triggers the report:
-> > 
-> > [0] https://syzkaller.appspot.com/text?tag=CrashLog&x=16a61fce700000
-> 
-> Ok, so both happens here.  But don't add a warning for something that
-> can't happen.  Just handle it and move on.  It looks like you are
-> handling it in this code, so please drop the WARN_ON().
-> 
-> thanks,
-> 
-> greg k-h
+The first patch in this series introduces four array allocation
+functions to replace vmalloc(array_size()) and vzalloc(array_size()),
+of which Linux has dozens of occurrences.  The Functions take care of
+the multiplication and overflow check, result in simpler code and make
+it easier for developers to avoid overflow bugs.
 
-Hmm. Well this will mean if we ever reintroduce the bug then
-syzkaller will not catch it for us :( And the bug is there,
-it just results in a hard to reproduce error for userspace.
+The other two patches start to apply the functions in the mm/ and KVM
+areas.  In the case of KVM, it is also important to switch from kvcalloc
+to __vcalloc; the allocation size is driven by userspace and can be larger
+than 4GiB, which has been forbidden by the kv*alloc functions since 5.15.
 
-Not sure what to do here. Export panic_on_warn flag to modules
-and check it here?
+Paolo
 
+Paolo Bonzini (3):
+  mm: vmalloc: introduce array allocation functions
+  mm: use vmalloc_array and vcalloc for array allocations
+  KVM: use __vcalloc for very large allocations
+
+ arch/powerpc/kvm/book3s_hv_uvmem.c |  2 +-
+ arch/x86/kvm/mmu/page_track.c      |  7 +++--
+ arch/x86/kvm/x86.c                 |  4 +--
+ include/linux/vmalloc.h            |  5 +++
+ mm/percpu-stats.c                  |  2 +-
+ mm/swap_cgroup.c                   |  4 +--
+ mm/util.c                          | 50 ++++++++++++++++++++++++++++++
+ virt/kvm/kvm_main.c                |  4 +--
+ 9 files changed, 66 insertions(+), 12 deletions(-)
 
 -- 
-MST
+2.31.1
 
