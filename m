@@ -2,218 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A1F694D143E
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 11:07:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 124494D1446
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 11:08:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345639AbiCHKHu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 05:07:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35652 "EHLO
+        id S1345650AbiCHKJt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Mar 2022 05:09:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345633AbiCHKHq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Mar 2022 05:07:46 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1EA642A03;
-        Tue,  8 Mar 2022 02:06:49 -0800 (PST)
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 228920Td003295;
-        Tue, 8 Mar 2022 10:06:49 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=j/N/vhfOg+pIg3L0C07BIR5bJy+MUQ0Q1LwgTkzwZx4=;
- b=ED9gu6UFRdq+Mn1zOMSh0qFO8MJYo4CSQd/AXeQE4eLTJQEy1zg8BBvKGwE6/3/x4IcB
- BnqPyi0KkFTgqsbrIjiNCdvaHTYsoyT7NCfQxiuTuYqcWSxFHSi0uvKhkRAbXRh0q1+S
- DgM3P0/umi9wIbbNuWvSyvfh/42xqel3Lmvme3D0hq2RMfR1ccsG4d5yFbBaxCs8qtpV
- FNQ8XitNzqTpq8or3e44EZm2w+Ay1kCuz1D74DCqX4Y7Ma0BAyT6yOL4fllg6jhucKDE
- XftQBOy26AHQ5ZrY/MuHXvrpjyPMcMsOxUuPgMMtbrye47i64vaAlZYzENfujyUMcp6h 6g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3enww78g2d-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 08 Mar 2022 10:06:49 +0000
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 2289G9V4032710;
-        Tue, 8 Mar 2022 10:06:49 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3enww78g1p-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 08 Mar 2022 10:06:48 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 228A3vDM031785;
-        Tue, 8 Mar 2022 10:06:46 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma03ams.nl.ibm.com with ESMTP id 3ekyg8y3wa-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 08 Mar 2022 10:06:46 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 228A6hBD51511590
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 8 Mar 2022 10:06:43 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 519B011C04A;
-        Tue,  8 Mar 2022 10:06:43 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E650D11C052;
-        Tue,  8 Mar 2022 10:06:42 +0000 (GMT)
-Received: from [9.171.93.186] (unknown [9.171.93.186])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  8 Mar 2022 10:06:42 +0000 (GMT)
-Message-ID: <e8b39f16-211b-dc1c-0970-019b8375178c@de.ibm.com>
-Date:   Tue, 8 Mar 2022 11:06:42 +0100
+        with ESMTP id S1345625AbiCHKJs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 05:09:48 -0500
+Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D120722505
+        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 02:08:51 -0800 (PST)
+Received: by mail-wm1-x336.google.com with SMTP id p184-20020a1c29c1000000b0037f76d8b484so1121846wmp.5
+        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 02:08:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=SkUfNfh3Db7trPuKU1cr1xzPGmDu+V01w8HeZZrfZF4=;
+        b=TcEZ7SnCqx+88Ek0cWwzw0I0uG+pFNYXYTSd6/FUBFUNJcDZChkJJ7aym8/zsrh9wP
+         0WJgPgrTgga9nbrft6Qq3nPhOdr+MPh3ve1ACFwiAtZ1rDXFoxerrnct9JfMVDD9vNBu
+         OVt7YNvg58Lpaq4XSGltz3TE2P1VPLaSGGWj0ekHuYkbs1y0QLp2/q2TKPBPjgaBgYZm
+         FndSCehbwzLESjJjkPoLr143+oqKI3+53ODsNc2UrDsJ7JxHh88NLirt+Z0q4CIxGxz3
+         Vghz+IB7ZlQCNmZ0+SdIERYZwTdCaLnVmvnqMTFRhkSMoqNHWVB32uO4XfMp6DyYlqXs
+         OZVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=SkUfNfh3Db7trPuKU1cr1xzPGmDu+V01w8HeZZrfZF4=;
+        b=eSTKqBxLHKAaa3CyebmB31uAmlstk617BPY3ioHb24s0y+A3kilpsFQu1vxOEE61Bf
+         gHgZwsEot/LExuA92NuqelLNd9yPFVlcK33DvkKNM71or0wb8uod1a2YZn/OPIk3Nzqk
+         SPY7Mo+rMa9ZCKhbXkNMx7XCECAp1nFrQ8UzYyv/s9/jgoBqPRlE9u7vtSLVLmXEmvvJ
+         nOn6l2NN7jdbhtyBTC9mNN6alWKuKctxvGhy0EIp8CS8enfvgt08fHttFc1NnlKKcOl1
+         0tRlRN6uhrYT39bTCdgTKcJh764N4sZqT18X6PrLXJXypA52kFxfWHGs78ICipWQRpvv
+         U9jw==
+X-Gm-Message-State: AOAM532XL38InvqEuAhEwgb+XpqQcxekP1UUnxXfPGNg3ezJ++VkaxwQ
+        yDpWW/MMkQaws6h+0BRNHVk5Ng==
+X-Google-Smtp-Source: ABdhPJyrzL3jGMmbS7hVKMZbspK5xUkBY1M3etbicBcGEMsABnOdM650d1NvL9CixlA6YyPMGo+S2Q==
+X-Received: by 2002:a1c:6a08:0:b0:388:73a2:1548 with SMTP id f8-20020a1c6a08000000b0038873a21548mr2868053wmc.163.1646734130240;
+        Tue, 08 Mar 2022 02:08:50 -0800 (PST)
+Received: from google.com (cpc155339-bagu17-2-0-cust87.1-3.cable.virginm.net. [86.27.177.88])
+        by smtp.gmail.com with ESMTPSA id u14-20020adfed4e000000b001e3323611e5sm12978222wro.26.2022.03.08.02.08.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Mar 2022 02:08:49 -0800 (PST)
+Date:   Tue, 8 Mar 2022 10:08:47 +0000
+From:   Lee Jones <lee.jones@linaro.org>
+To:     Greg KH <gregkh@linuxfoundation.org>
+Cc:     mst@redhat.com, jasowang@redhat.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, stable@vger.kernel.org,
+        syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
+Subject: Re: [PATCH 1/1] vhost: Protect the virtqueue from being cleared
+ whilst still in use
+Message-ID: <YicrL1RXZhXXsA6t@google.com>
+References: <20220307191757.3177139-1-lee.jones@linaro.org>
+ <YiZeB7l49KC2Y5Gz@kroah.com>
+ <YicPXnNFHpoJHcUN@google.com>
+ <Yicalf1I6oBytbse@kroah.com>
+ <Yicer3yGg5rrdSIs@google.com>
+ <YicolvcbY9VT6AKc@kroah.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH v1 1/1] KVM: s390x: fix SCK locking
-Content-Language: en-US
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
-        thuth@redhat.com, mimu@linux.ibm.com
-References: <20220301143340.111129-1-imbrenda@linux.ibm.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-In-Reply-To: <20220301143340.111129-1-imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: r59TqA4nLSseMfnDsUXh8w_FaPexOtOV
-X-Proofpoint-GUID: fGjyXgU483M8V2sF_jUcp2oQjl5nwGeq
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-03-08_03,2022-03-04_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- lowpriorityscore=0 bulkscore=0 adultscore=0 clxscore=1015
- priorityscore=1501 malwarescore=0 impostorscore=0 spamscore=0
- mlxlogscore=999 phishscore=0 mlxscore=0 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2202240000
- definitions=main-2203080053
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <YicolvcbY9VT6AKc@kroah.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, 08 Mar 2022, Greg KH wrote:
 
+> On Tue, Mar 08, 2022 at 09:15:27AM +0000, Lee Jones wrote:
+> > On Tue, 08 Mar 2022, Greg KH wrote:
+> > 
+> > > On Tue, Mar 08, 2022 at 08:10:06AM +0000, Lee Jones wrote:
+> > > > On Mon, 07 Mar 2022, Greg KH wrote:
+> > > > 
+> > > > > On Mon, Mar 07, 2022 at 07:17:57PM +0000, Lee Jones wrote:
+> > > > > > vhost_vsock_handle_tx_kick() already holds the mutex during its call
+> > > > > > to vhost_get_vq_desc().  All we have to do here is take the same lock
+> > > > > > during virtqueue clean-up and we mitigate the reported issues.
+> > > > > > 
+> > > > > > Also WARN() as a precautionary measure.  The purpose of this is to
+> > > > > > capture possible future race conditions which may pop up over time.
+> > > > > > 
+> > > > > > Link: https://syzkaller.appspot.com/bug?extid=279432d30d825e63ba00
+> > > > > > 
+> > > > > > Cc: <stable@vger.kernel.org>
+> > > > > > Reported-by: syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
+> > > > > > Signed-off-by: Lee Jones <lee.jones@linaro.org>
+> > > > > > ---
+> > > > > >  drivers/vhost/vhost.c | 10 ++++++++++
+> > > > > >  1 file changed, 10 insertions(+)
+> > > > > > 
+> > > > > > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> > > > > > index 59edb5a1ffe28..ef7e371e3e649 100644
+> > > > > > --- a/drivers/vhost/vhost.c
+> > > > > > +++ b/drivers/vhost/vhost.c
+> > > > > > @@ -693,6 +693,15 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
+> > > > > >  	int i;
+> > > > > >  
+> > > > > >  	for (i = 0; i < dev->nvqs; ++i) {
+> > > > > > +		/* No workers should run here by design. However, races have
+> > > > > > +		 * previously occurred where drivers have been unable to flush
+> > > > > > +		 * all work properly prior to clean-up.  Without a successful
+> > > > > > +		 * flush the guest will malfunction, but avoiding host memory
+> > > > > > +		 * corruption in those cases does seem preferable.
+> > > > > > +		 */
+> > > > > > +		WARN_ON(mutex_is_locked(&dev->vqs[i]->mutex));
+> > > > > 
+> > > > > So you are trading one syzbot triggered issue for another one in the
+> > > > > future?  :)
+> > > > > 
+> > > > > If this ever can happen, handle it, but don't log it with a WARN_ON() as
+> > > > > that will trigger the panic-on-warn boxes, as well as syzbot.  Unless
+> > > > > you want that to happen?
+> > > > 
+> > > > No, Syzbot doesn't report warnings, only BUGs and memory corruption.
+> > > 
+> > > Has it changed?  Last I looked, it did trigger on WARN_* calls, which
+> > > has resulted in a huge number of kernel fixes because of that.
+> > 
+> > Everything is customisable in syzkaller, so maybe there are specific
+> > builds which panic_on_warn enabled, but none that I'm involved with
+> > do.
+> 
+> Many systems run with panic-on-warn (i.e. the cloud), as they want to
+> drop a box and restart it if anything goes wrong.
+> 
+> That's why syzbot reports on WARN_* calls.  They should never be
+> reachable by userspace actions.
+> 
+> > Here follows a topical example.  The report above in the Link: tag
+> > comes with a crashlog [0].  In there you can see the WARN() at the
+> > bottom of vhost_dev_cleanup() trigger many times due to a populated
+> > (non-flushed) worker list, before finally tripping the BUG() which
+> > triggers the report:
+> > 
+> > [0] https://syzkaller.appspot.com/text?tag=CrashLog&x=16a61fce700000
+> 
+> Ok, so both happens here.  But don't add a warning for something that
+> can't happen.  Just handle it and move on.  It looks like you are
+> handling it in this code, so please drop the WARN_ON().
 
-Am 01.03.22 um 15:33 schrieb Claudio Imbrenda:
-> When handling the SCK instruction, the kvm lock is taken, even though
-> the vcpu lock is already being held. The normal locking order is kvm
-> lock first and then vcpu lock. This is can (and in some circumstances
-> does) lead to deadlocks.
-> 
-> The function kvm_s390_set_tod_clock is called both by the SCK handler
-> and by some IOCTLs to set the clock. The IOCTLs will not hold the vcpu
-> lock, so they can safely take the kvm lock. The SCK handler holds the
-> vcpu lock, but will also somehow need to acquire the kvm lock without
-> relinquishing the vcpu lock.
-> 
-> The solution is to factor out the code to set the clock, and provide
-> two wrappers. One is called like the original function and does the
-> locking, the other is called kvm_s390_try_set_tod_clock and uses
-> trylock to try to acquire the kvm lock. This new wrapper is then used
-> in the SCK handler. If locking fails, -EAGAIN is returned, which is
-> eventually propagated to userspace, thus also freeing the vcpu lock and
-> allowing for forward progress.
-> 
-> This is not the most efficient or elegant way to solve this issue, but
-> the SCK instruction is deprecated and its performance is not critical.
-> 
-> The goal of this patch is just to provide a simple but correct way to
-> fix the bug.
-> 
-> Fixes: 6a3f95a6b04c ("KVM: s390: Intercept SCK instruction")
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Happy to oblige.
 
-Thanks applied. I will also add cc stable when queueing.
+Let's give Micheal a chance to speak, then I'll fix-up if he agrees.
 
-
-> ---
->   arch/s390/kvm/kvm-s390.c | 19 ++++++++++++++++---
->   arch/s390/kvm/kvm-s390.h |  4 ++--
->   arch/s390/kvm/priv.c     | 14 +++++++++++++-
->   3 files changed, 31 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index 2296b1ff1e02..4e3db4004bfd 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -3869,14 +3869,12 @@ static int kvm_s390_handle_requests(struct kvm_vcpu *vcpu)
->   	return 0;
->   }
->   
-> -void kvm_s390_set_tod_clock(struct kvm *kvm,
-> -			    const struct kvm_s390_vm_tod_clock *gtod)
-> +static void __kvm_s390_set_tod_clock(struct kvm *kvm, const struct kvm_s390_vm_tod_clock *gtod)
->   {
->   	struct kvm_vcpu *vcpu;
->   	union tod_clock clk;
->   	unsigned long i;
->   
-> -	mutex_lock(&kvm->lock);
->   	preempt_disable();
->   
->   	store_tod_clock_ext(&clk);
-> @@ -3897,7 +3895,22 @@ void kvm_s390_set_tod_clock(struct kvm *kvm,
->   
->   	kvm_s390_vcpu_unblock_all(kvm);
->   	preempt_enable();
-> +}
-> +
-> +void kvm_s390_set_tod_clock(struct kvm *kvm, const struct kvm_s390_vm_tod_clock *gtod)
-> +{
-> +	mutex_lock(&kvm->lock);
-> +	__kvm_s390_set_tod_clock(kvm, gtod);
-> +	mutex_unlock(&kvm->lock);
-> +}
-> +
-> +int kvm_s390_try_set_tod_clock(struct kvm *kvm, const struct kvm_s390_vm_tod_clock *gtod)
-> +{
-> +	if (!mutex_trylock(&kvm->lock))
-> +		return 0;
-> +	__kvm_s390_set_tod_clock(kvm, gtod);
->   	mutex_unlock(&kvm->lock);
-> +	return 1;
->   }
->   
->   /**
-> diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
-> index 098831e815e6..f2c910763d7f 100644
-> --- a/arch/s390/kvm/kvm-s390.h
-> +++ b/arch/s390/kvm/kvm-s390.h
-> @@ -349,8 +349,8 @@ int kvm_s390_handle_sigp(struct kvm_vcpu *vcpu);
->   int kvm_s390_handle_sigp_pei(struct kvm_vcpu *vcpu);
->   
->   /* implemented in kvm-s390.c */
-> -void kvm_s390_set_tod_clock(struct kvm *kvm,
-> -			    const struct kvm_s390_vm_tod_clock *gtod);
-> +void kvm_s390_set_tod_clock(struct kvm *kvm, const struct kvm_s390_vm_tod_clock *gtod);
-> +int kvm_s390_try_set_tod_clock(struct kvm *kvm, const struct kvm_s390_vm_tod_clock *gtod);
->   long kvm_arch_fault_in_page(struct kvm_vcpu *vcpu, gpa_t gpa, int writable);
->   int kvm_s390_store_status_unloaded(struct kvm_vcpu *vcpu, unsigned long addr);
->   int kvm_s390_vcpu_store_status(struct kvm_vcpu *vcpu, unsigned long addr);
-> diff --git a/arch/s390/kvm/priv.c b/arch/s390/kvm/priv.c
-> index 417154b314a6..7f3e7990ef82 100644
-> --- a/arch/s390/kvm/priv.c
-> +++ b/arch/s390/kvm/priv.c
-> @@ -102,7 +102,19 @@ static int handle_set_clock(struct kvm_vcpu *vcpu)
->   		return kvm_s390_inject_prog_cond(vcpu, rc);
->   
->   	VCPU_EVENT(vcpu, 3, "SCK: setting guest TOD to 0x%llx", gtod.tod);
-> -	kvm_s390_set_tod_clock(vcpu->kvm, &gtod);
-> +	/*
-> +	 * To set the TOD clock we need to take the kvm lock, but we are
-> +	 * already holding the vcpu lock, and the usual lock order is the
-> +	 * opposite. Therefore we use trylock instead of lock, and if the
-> +	 * kvm lock cannot be taken, we retry the instruction and return
-> +	 * -EAGAIN to userspace, thus freeing the vcpu lock.
-> +	 * The SCK instruction is considered legacy and at this point it's
-> +	 * not worth the effort to find a nicer solution.
-> +	 */
-> +	if (!kvm_s390_try_set_tod_clock(vcpu->kvm, &gtod)) {
-> +		kvm_s390_retry_instr(vcpu);
-> +		return -EAGAIN;
-> +	}
->   
->   	kvm_s390_set_psw_cc(vcpu, 0);
->   	return 0;
+-- 
+Lee Jones [李琼斯]
+Principal Technical Lead - Developer Services
+Linaro.org │ Open source software for Arm SoCs
+Follow Linaro: Facebook | Twitter | Blog
