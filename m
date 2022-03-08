@@ -2,189 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 10D8C4D20B1
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 19:51:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D4464D20C5
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 19:56:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349828AbiCHSwZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 13:52:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53208 "EHLO
+        id S244002AbiCHS44 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Mar 2022 13:56:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33178 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349796AbiCHSwT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Mar 2022 13:52:19 -0500
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57CAD53E35;
-        Tue,  8 Mar 2022 10:51:22 -0800 (PST)
-Received: from fraeml742-chm.china.huawei.com (unknown [172.18.147.201])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4KCksD3Q1qz67NqQ;
-        Wed,  9 Mar 2022 02:49:52 +0800 (CST)
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- fraeml742-chm.china.huawei.com (10.206.15.223) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Tue, 8 Mar 2022 19:51:20 +0100
-Received: from A2006125610.china.huawei.com (10.47.82.254) by
- lhreml710-chm.china.huawei.com (10.201.108.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Tue, 8 Mar 2022 18:51:12 +0000
-From:   Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-To:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>
-CC:     <linux-pci@vger.kernel.org>, <alex.williamson@redhat.com>,
-        <jgg@nvidia.com>, <cohuck@redhat.com>, <mgurtovoy@nvidia.com>,
-        <yishaih@nvidia.com>, <kevin.tian@intel.com>,
-        <linuxarm@huawei.com>, <liulongfang@huawei.com>,
-        <prime.zeng@hisilicon.com>, <jonathan.cameron@huawei.com>,
-        <wangzhou1@hisilicon.com>
-Subject: [PATCH v9 9/9] hisi_acc_vfio_pci: Use its own PCI reset_done error handler
-Date:   Tue, 8 Mar 2022 18:49:02 +0000
-Message-ID: <20220308184902.2242-10-shameerali.kolothum.thodi@huawei.com>
-X-Mailer: git-send-email 2.12.0.windows.1
-In-Reply-To: <20220308184902.2242-1-shameerali.kolothum.thodi@huawei.com>
-References: <20220308184902.2242-1-shameerali.kolothum.thodi@huawei.com>
+        with ESMTP id S236164AbiCHS4z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 13:56:55 -0500
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84B8453E1B
+        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 10:55:58 -0800 (PST)
+Received: by mail-pf1-x42b.google.com with SMTP id a5so182655pfv.2
+        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 10:55:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Y40f+LRCmG2arycVRHxOvpE+w/RZPs9orfaERHReGAg=;
+        b=bcCUYI+9/valn64igaiGGIKkFleK2VVOpLQ/Ce62yPauw4vMRigqISiCiyTYqxAkHQ
+         +oVGv80ZKvRJwlXg2Qb/+JDkRbq42rqCVi/G5e1TshasTHSKtI8YtwMb1fdI0A7tnzEV
+         Lx/0sfSqS/3w3TPB9LX2h7rO3qGKXHQJcXR3QbLzlxKusX0A4VXIU3UMeIBvIEXVatRh
+         gg3zEnioIFLtuYv3zudFcUO9XIX1q4qjWEuG2hKNcqxEVEbEO5hS3e9KgITt/QCE5l5l
+         hqb5XNkxo6PmRpDSkYz0S8aJMm91uZo/+Ctxa1sVlBOy/w8/4Ja8C7xbWXGwhtctt50d
+         n39A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Y40f+LRCmG2arycVRHxOvpE+w/RZPs9orfaERHReGAg=;
+        b=6bdjNinIr2zeKEeRPYfhFSjEia2wU/SLVVyAod6qtljQZIncxuzILb1D31sF93FdP+
+         OahZOTxyAP8CiAOIRwpLUhRk8WSF2o6YAsNnp9V6Hnh9UlpEkUo2xzHHCa7EGw3nI0O3
+         tFR3zoxr3eTjaxY6o0qIGbrjuZFQECn/HwUL8KLzggZ5d8l+zvXUoWn8+D4zBA9mZsz/
+         c/BlgcRsC88hH31cxBxqLl25jV3BDQKWxe3MiOTu+a9UbY7ANEUDGQ8fpbDlb0LwLzos
+         nEhogGemUm9m+0I00rCOd215o7yhHeI1MWVI6tOTT2V/pJkx47CdY0qFx45ML2eXOwjh
+         u9yg==
+X-Gm-Message-State: AOAM531CrBUnFolowDLAMKk+KgjknLCejpXMhicG1yCSxtsqzAVralHX
+        hD9RWgh6oSQLQXkKQkqdPlme/w==
+X-Google-Smtp-Source: ABdhPJwcEDBu6JX4mIGKlcpXlcrkdx2/792obZa79cvfvYy/QfjS4SaXi48cxFejeJgdTIyDxVMRiQ==
+X-Received: by 2002:a63:698a:0:b0:36c:1d0a:2808 with SMTP id e132-20020a63698a000000b0036c1d0a2808mr15284498pgc.567.1646765757848;
+        Tue, 08 Mar 2022 10:55:57 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id q20-20020a056a00151400b004f3cd061d33sm21169799pfu.204.2022.03.08.10.55.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Mar 2022 10:55:57 -0800 (PST)
+Date:   Tue, 8 Mar 2022 18:55:53 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        dmatlack@google.com
+Subject: Re: [PATCH v2 08/25] KVM: x86/mmu: split cpu_mode from mmu_role
+Message-ID: <YiemuYKEFjqFvDlL@google.com>
+References: <20220221162243.683208-1-pbonzini@redhat.com>
+ <20220221162243.683208-9-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.47.82.254]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- lhreml710-chm.china.huawei.com (10.201.108.61)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220221162243.683208-9-pbonzini@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Register private handler for pci_error_handlers.reset_done and update
-state accordingly.
+On Mon, Feb 21, 2022, Paolo Bonzini wrote:
+> @@ -4800,13 +4836,15 @@ kvm_calc_shadow_mmu_root_page_role(struct kvm_vcpu *vcpu,
+>  }
+>  
+>  static void shadow_mmu_init_context(struct kvm_vcpu *vcpu, struct kvm_mmu *context,
+> -				    const struct kvm_mmu_role_regs *regs,
+> -				    union kvm_mmu_role new_role)
+> +				    union kvm_mmu_role cpu_mode,
 
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-Reviewed-by: Longfang Liu <liulongfang@huawei.com>
-Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
----
- .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 57 ++++++++++++++++++-
- .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |  4 +-
- 2 files changed, 57 insertions(+), 4 deletions(-)
+Can you give all helpers this treatment (rename "role" => "cpu_mode")?  I got
+tripped up a few times reading patches because the ones where it wasn't necessary,
+i.e. where there's only a single kvm_mmu_role paramenter, were left as-is.
 
-diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-index 51b814f4303b..767b5d47631a 100644
---- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-+++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-@@ -626,6 +626,27 @@ static void hisi_acc_vf_disable_fds(struct hisi_acc_vf_core_device *hisi_acc_vde
- 	}
- }
- 
-+/*
-+ * This function is called in all state_mutex unlock cases to
-+ * handle a 'deferred_reset' if exists.
-+ */
-+static void
-+hisi_acc_vf_state_mutex_unlock(struct hisi_acc_vf_core_device *hisi_acc_vdev)
-+{
-+again:
-+	spin_lock(&hisi_acc_vdev->reset_lock);
-+	if (hisi_acc_vdev->deferred_reset) {
-+		hisi_acc_vdev->deferred_reset = false;
-+		spin_unlock(&hisi_acc_vdev->reset_lock);
-+		hisi_acc_vdev->vf_qm_state = QM_NOT_READY;
-+		hisi_acc_vdev->mig_state = VFIO_DEVICE_STATE_RUNNING;
-+		hisi_acc_vf_disable_fds(hisi_acc_vdev);
-+		goto again;
-+	}
-+	mutex_unlock(&hisi_acc_vdev->state_mutex);
-+	spin_unlock(&hisi_acc_vdev->reset_lock);
-+}
-+
- static void hisi_acc_vf_start_device(struct hisi_acc_vf_core_device *hisi_acc_vdev)
- {
- 	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
-@@ -922,7 +943,7 @@ hisi_acc_vfio_pci_set_device_state(struct vfio_device *vdev,
- 			break;
- 		}
- 	}
--	mutex_unlock(&hisi_acc_vdev->state_mutex);
-+	hisi_acc_vf_state_mutex_unlock(hisi_acc_vdev);
- 	return res;
- }
- 
-@@ -935,10 +956,35 @@ hisi_acc_vfio_pci_get_device_state(struct vfio_device *vdev,
- 
- 	mutex_lock(&hisi_acc_vdev->state_mutex);
- 	*curr_state = hisi_acc_vdev->mig_state;
--	mutex_unlock(&hisi_acc_vdev->state_mutex);
-+	hisi_acc_vf_state_mutex_unlock(hisi_acc_vdev);
- 	return 0;
- }
- 
-+static void hisi_acc_vf_pci_aer_reset_done(struct pci_dev *pdev)
-+{
-+	struct hisi_acc_vf_core_device *hisi_acc_vdev = dev_get_drvdata(&pdev->dev);
-+
-+	if (hisi_acc_vdev->core_device.vdev.migration_flags !=
-+				VFIO_MIGRATION_STOP_COPY)
-+		return;
-+
-+	/*
-+	 * As the higher VFIO layers are holding locks across reset and using
-+	 * those same locks with the mm_lock we need to prevent ABBA deadlock
-+	 * with the state_mutex and mm_lock.
-+	 * In case the state_mutex was taken already we defer the cleanup work
-+	 * to the unlock flow of the other running context.
-+	 */
-+	spin_lock(&hisi_acc_vdev->reset_lock);
-+	hisi_acc_vdev->deferred_reset = true;
-+	if (!mutex_trylock(&hisi_acc_vdev->state_mutex)) {
-+		spin_unlock(&hisi_acc_vdev->reset_lock);
-+		return;
-+	}
-+	spin_unlock(&hisi_acc_vdev->reset_lock);
-+	hisi_acc_vf_state_mutex_unlock(hisi_acc_vdev);
-+}
-+
- static int hisi_acc_vf_qm_init(struct hisi_acc_vf_core_device *hisi_acc_vdev)
- {
- 	struct vfio_pci_core_device *vdev = &hisi_acc_vdev->core_device;
-@@ -1259,12 +1305,17 @@ static const struct pci_device_id hisi_acc_vfio_pci_table[] = {
- 
- MODULE_DEVICE_TABLE(pci, hisi_acc_vfio_pci_table);
- 
-+static const struct pci_error_handlers hisi_acc_vf_err_handlers = {
-+	.reset_done = hisi_acc_vf_pci_aer_reset_done,
-+	.error_detected = vfio_pci_core_aer_err_detected,
-+};
-+
- static struct pci_driver hisi_acc_vfio_pci_driver = {
- 	.name = KBUILD_MODNAME,
- 	.id_table = hisi_acc_vfio_pci_table,
- 	.probe = hisi_acc_vfio_pci_probe,
- 	.remove = hisi_acc_vfio_pci_remove,
--	.err_handler = &vfio_pci_core_err_handlers,
-+	.err_handler = &hisi_acc_vf_err_handlers,
- };
- 
- module_pci_driver(hisi_acc_vfio_pci_driver);
-diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-index 1c7d75408790..5494f4983bbe 100644
---- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-+++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-@@ -98,6 +98,7 @@ struct hisi_acc_vf_migration_file {
- 
- struct hisi_acc_vf_core_device {
- 	struct vfio_pci_core_device core_device;
-+	u8 deferred_reset:1;
- 	/* for migration state */
- 	struct mutex state_mutex;
- 	enum vfio_device_mig_state mig_state;
-@@ -107,7 +108,8 @@ struct hisi_acc_vf_core_device {
- 	struct hisi_qm vf_qm;
- 	u32 vf_qm_state;
- 	int vf_id;
--
-+	/* for reset handler */
-+	spinlock_t reset_lock;
- 	struct hisi_acc_vf_migration_file *resuming_migf;
- 	struct hisi_acc_vf_migration_file *saving_migf;
- };
--- 
-2.25.1
+I think kvm_calc_shadow_npt_root_page_role() and kvm_calc_shadow_mmu_root_page_role()
+are the only offenders.
 
+> +				    union kvm_mmu_role mmu_role)
+>  {
+> -	if (new_role.as_u64 == context->mmu_role.as_u64)
+> +	if (cpu_mode.as_u64 == context->cpu_mode.as_u64 &&
+> +	    mmu_role.as_u64 == context->mmu_role.as_u64)
+>  		return;
+>  
+> -	context->mmu_role.as_u64 = new_role.as_u64;
+> +	context->cpu_mode.as_u64 = cpu_mode.as_u64;
+> +	context->mmu_role.as_u64 = mmu_role.as_u64;
+>  
+>  	if (!is_cr0_pg(context))
+>  		nonpaging_init_context(context);
