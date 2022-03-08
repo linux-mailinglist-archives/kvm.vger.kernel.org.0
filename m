@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C2764D1D7F
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 17:40:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AA0504D1D8B
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 17:40:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348502AbiCHQkz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 11:40:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38312 "EHLO
+        id S1348509AbiCHQk4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Mar 2022 11:40:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38352 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348469AbiCHQkw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Mar 2022 11:40:52 -0500
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2055.outbound.protection.outlook.com [40.107.236.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C765B517D7;
-        Tue,  8 Mar 2022 08:39:52 -0800 (PST)
+        with ESMTP id S1348478AbiCHQkx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 11:40:53 -0500
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam08on2071.outbound.protection.outlook.com [40.107.100.71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 644FD517DF;
+        Tue,  8 Mar 2022 08:39:53 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Yef1yiYcj495023eMqaho8d2sOdfL4PsbN2nK4SrJT08GMjdhjKAY4P2wIUNVu8AIuQOVKZq9IZ9r1NDC8QOsvDjDZc2fGsRHy3Q+FqVlDDMe+8eQXNw11i4gnUPMtGhpsLERmBwUN/Q+gveFRm8Wbomvv3dvBtONmikoRUggX/17K1C8b9rkYmKIKVRCxUvkBH/pdhhKrLVPF1ezpepstY1IFiqvn34QwhOLkGzQgAnZIuMZ/DKixY18dK63n1LSytlhSWP6se6YCghIt3DIqhONixI7OV/DjQPgPOKXS6VJc9jo0YRbZy52aKQCTv9R/SuoY0Rrvld+Z5aFLZDKA==
+ b=bsuyz3FzqS8VKWGhJGIxyj2Zxr8rpsvrPePmxeJ+HUlyjVkS3sim2NvdmuQ/FoRyaYEx3OiKiMOGkA9GE4NO1/mpRTSCQUnNLL9WkiUFDDLTt+9UcQINsAtlBzVzvEeHWuJEU67qk+WZUfI35Skst7PDKcdGtQmnbV1slbsHjTlR21i17fFkeFpNa6u8jQf+rhJnsYehR6jcnqgtJsQCqfDlpVac6UMOOgyT9GdIiauXXK2riZjgVqyl/ZQN5leJ/IKtCGMiy58k/bEFTODSSXZj819uxgBxH5LXCd3k1Nu9KKoXbDdP7HGIvhCmysvWKAdnknenxzT12jMQHO54zA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4HIz0qYgdLhzqha9SJoWKM3UBVlaBGI3PcSEWagWFWY=;
- b=hs2iF59IDCRLN3b8+37c9Uh/q+Mg6zVO/2ZWbyv85bIMX/dGJupxm7Ouk3B6+iPhpew2T+qSK4hQ+FQ8Ym6Kvo0WDBu25zVMLbGHqvOjOI/L+gxGtJMIq5ceurhhh3BYVWcHL7AvNQtaakXV36iZy2VC3o+TjeAR4qVQlitJLTFsnzBsHOiDrlsPpxwdHatbZjh+8mfOptArTv0ToeTlO6+x7gvyTWuLhOv2nqItH1/DkAn0QxTZbr5g/kvQrzR42ICzan43ru9ZG9iFEE5S6edUldj3yqQNWcMWBoTvF7KE758Ci+MHybtMo6ZQXnWC8p2jtcJF4lKISzc6p8kl1Q==
+ bh=ehRyC3GVKVAZRTKpx5jlzsRnBHEmgBQJSfDVkl0CmH4=;
+ b=WoNs7byysm4UHpvL0YX+J42K9cZEzLwMarEkUyFOJT+TfPgqpVrABuW/X9RuofwJutqiVc61jg1ygl2NcVUmHznuEVzfr11DJF5ygvonogp4SPJWtUN3uP1H9TDD37k62YXNZfmUy81AGvt+qR/3IszwscuVdE+0kzwadggfsQzaablmHGXR1Q4eEebStP6L6lwFkVNRFBZlNHfG8nk7j8sYfeYkVFhVhtoj3JHRqCx8zpFA5wZZhqDin0JXbpNPTpWaoX9lL84x7EfodoK56bLGLbCCgIAc8pT56Q/vNVRowYfscMNlxxCsOIQDqC/7CqBSzsT14wslwlZW4QsoqA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4HIz0qYgdLhzqha9SJoWKM3UBVlaBGI3PcSEWagWFWY=;
- b=q0KmgC2xoXYUnQkg116hbNgICHFcio5hs0EYHUnOq78iXyYFSTwUbRnu7JBYKWd51/zcoJdVx1he8ZvmvyHA13gpA3kavl/K35zzLYioFbLUIZ5CVsDzuAgyo0i4MjrEwTPErotkwm3R5mj/muVYAkMPo3zc38N5XGK5cJ0ImUI=
+ bh=ehRyC3GVKVAZRTKpx5jlzsRnBHEmgBQJSfDVkl0CmH4=;
+ b=Opb45G7dybR8QLnDWleJmo6qGtQW3674Zzd0UL0w/CJeCasTkcNZVB7L/rzUNfScTE0BeI5GPlT/GcrtmJb2SD3NGWJYd+wr/BbA/zRYq00UlNVDQUOD/Zwmn6VgnxJNS7seOp0mI/LpFCVSwaqLVrch0uxLaYMfK7+Wy58yXTk=
 Received: from BN9PR03CA0321.namprd03.prod.outlook.com (2603:10b6:408:112::26)
- by BYAPR12MB3046.namprd12.prod.outlook.com (2603:10b6:a03:aa::14) with
+ by MW5PR12MB5681.namprd12.prod.outlook.com (2603:10b6:303:19e::20) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5038.19; Tue, 8 Mar
- 2022 16:39:49 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5017.21; Tue, 8 Mar
+ 2022 16:39:50 +0000
 Received: from BN8NAM11FT012.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:112:cafe::d7) by BN9PR03CA0321.outlook.office365.com
+ (2603:10b6:408:112:cafe::e3) by BN9PR03CA0321.outlook.office365.com
  (2603:10b6:408:112::26) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5038.14 via Frontend
- Transport; Tue, 8 Mar 2022 16:39:48 +0000
+ Transport; Tue, 8 Mar 2022 16:39:50 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -48,7 +48,7 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
  BN8NAM11FT012.mail.protection.outlook.com (10.13.177.55) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5038.14 via Frontend Transport; Tue, 8 Mar 2022 16:39:48 +0000
+ 15.20.5038.14 via Frontend Transport; Tue, 8 Mar 2022 16:39:50 +0000
 Received: from sp5-759chost.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.18; Tue, 8 Mar
@@ -59,38 +59,38 @@ CC:     <pbonzini@redhat.com>, <mlevitsk@redhat.com>, <seanjc@google.com>,
         <joro@8bytes.org>, <jon.grimm@amd.com>, <wei.huang2@amd.com>,
         <terry.bowman@amd.com>,
         Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Subject: [RFCv2 PATCH 06/12] KVM: SVM: Do not update logical APIC ID table when in x2APIC mode
-Date:   Tue, 8 Mar 2022 10:39:20 -0600
-Message-ID: <20220308163926.563994-7-suravee.suthikulpanit@amd.com>
+Subject: [RFCv2 PATCH 07/12] KVM: SVM: Introduce helper function kvm_get_apic_id
+Date:   Tue, 8 Mar 2022 10:39:21 -0600
+Message-ID: <20220308163926.563994-8-suravee.suthikulpanit@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220308163926.563994-1-suravee.suthikulpanit@amd.com>
 References: <20220308163926.563994-1-suravee.suthikulpanit@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 X-Originating-IP: [10.180.168.240]
 X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 8768b5e5-ad56-4b99-05b6-08da012242af
-X-MS-TrafficTypeDiagnostic: BYAPR12MB3046:EE_
-X-Microsoft-Antispam-PRVS: <BYAPR12MB30469EC8E020C8BBE287B092F3099@BYAPR12MB3046.namprd12.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: b510b5d4-69a6-4bb2-437c-08da012243b5
+X-MS-TrafficTypeDiagnostic: MW5PR12MB5681:EE_
+X-Microsoft-Antispam-PRVS: <MW5PR12MB56819F747FBC0BC3973EA8D8F3099@MW5PR12MB5681.namprd12.prod.outlook.com>
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: yY24P5nvbGFR1jnz7KfuzrkCOIszo4zlHWuL7bzobd7SBlAJ2haIJMDKr6oRuhThWfMMFbU7Oy5ZhU0Y90g64UOcmHB8wkdjIiJWBE1z9NaQIMlqdU9doDLt9bj3SVF2o2gSwRiDVdlb7OHlCK/h2h8Va3Dqwy4S//CvAdZsufisxl3R9XoTzfSn1/NJaMTZBsEW/BCy4yiLVsFfbCe4p5Xv2z8rB6QpuTC/6lGaecdd2J7+vI8Hbg2jUkIkYrvFUZJv5DBpEQv7Qfeolgjy/WJUj7LpAYgJ3c6Ga+Rjw4udAc4IS8HlreULyXg38WlqfiicobgTseWGKj2Lwjv4dru4+/hHP7aXMjvGKFpdYcWCd3vTJ3Cl9ffkXSiMfvLm1DQ5PWeOScKI34uIyto6fqtisTYaFAyzYeA3w/FRpiLkYhi+wSMxMEoMvh2I1A+lLjXvNciF6VP9+8drGN76PUiTsFVSYyB/Dje9D/9Ge5G7EiBApTPG6D7qX/EyNzUEjVmCtHaa3oCFZY2CGR2PSd9zr/rNtmSojletBsby0XzJt9RbzcwouEEianJcjS3xTPqxZ1OqAy3aw0ysCOXwPREEha3e5ImPWzgvVUbQeeStpcUTnK1ZyG7FvR3voFdc3Bk92wgKaCfhyFgNYzRNJ8E3Yt1ymeCpGqOmHBgBaTqy5eh+Fu6NTLpWjFIlMLDVDXsFl7qBo8rAPJDCziaQjA==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230001)(4636009)(36840700001)(40470700004)(46966006)(16526019)(44832011)(86362001)(40460700003)(8936002)(2906002)(82310400004)(4326008)(36756003)(47076005)(8676002)(70206006)(70586007)(36860700001)(5660300002)(356005)(81166007)(110136005)(83380400001)(54906003)(316002)(7696005)(426003)(336012)(6666004)(26005)(186003)(508600001)(1076003)(2616005)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: Xr5bX8wYDfF4pxbSByTj1IzFGnpW9Gm8nHLpkeB1mnpshaEEcOW9yNPSH5JgiZ1W84aKM5PxIvEXFJe3/mfpSPxDMNC2sE+0uKHu1EymBu3J6ijg6UFvAFi+k69EViwrTTRZ6xqZrKgdiTJLmWlvF9hTa6jeg8rjfpg+0+Nx08PJWQLkGy1+YCidDuQqdV3P0meVM1WH+vLJPKaS5AOSYyIVXrKqkHbtK19g1hNkWacK1AIjaeLIs1ZNkM1DdA2p66SaRa4w445rYnD29oiII0BH47TSF6UkBxXVAOhwuMxzc9OGWzMe+KIPChyfFrUsIbX25zQZw8twocF1xbJgpMvtiShjIvYm0f02Sbx6NjC81NyF8FGEUv7ozRfP4AGz088Iec1P7PNBfPNkbAOupge4FyFWIKQ8gUHp8ws2S4822LSs8XXHtQFMYHqzBaxss/1ZvMlMXtNNcWOLmJyyFM0kQu5t/Q+fJbBG94Ce9eO2MSXB77wHGlzVIViS3Yp0lgWM4Reo6QszHuQJydcEqbOpE/uQw54krfDl9gN0mBjYVrPWlL/pjvE+75X6fFofFY+pCajvz5TwLnpWTnnhX6ZeYsNUWOoNP1WL4ZSMAMKEPQs36GAWDso39DZo8tKyu2xy8rKinUprkjzAewq4eSMTqAkz6d6EjVsIdrZhFRpPnglXCdxkOGf2YNMsdIGGjpW9cMetrfTxXJGFlVhVaA==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230001)(4636009)(46966006)(36840700001)(40470700004)(7696005)(70586007)(36860700001)(4326008)(82310400004)(8676002)(70206006)(2906002)(16526019)(26005)(86362001)(83380400001)(81166007)(336012)(356005)(8936002)(426003)(186003)(5660300002)(1076003)(44832011)(40460700003)(47076005)(316002)(2616005)(54906003)(110136005)(6666004)(36756003)(508600001)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Mar 2022 16:39:48.4847
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Mar 2022 16:39:50.1565
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8768b5e5-ad56-4b99-05b6-08da012242af
+X-MS-Exchange-CrossTenant-Network-Message-Id: b510b5d4-69a6-4bb2-437c-08da012243b5
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT012.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR12MB3046
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW5PR12MB5681
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
@@ -101,51 +101,122 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In X2APIC mode the Logical Destination Register is read-only,
-which provides a fixed mapping between the logical and physical
-APIC IDs. Therefore, there is no Logical APIC ID table in X2AVIC
-and the processor uses the X2APIC ID in the backing page to create
-a vCPU’s logical ID. Also, when x2AVIC is activated, a guest write
-to the x2APIC LDR register would result in #GP injection into
-the guest by the hardware.
+This function returns the currently programmed guest physical
+APIC ID of a vCPU in both xAPIC and x2APIC modes.
 
-Therefore, add logic to check x2APIC mode before updating logical
-APIC ID table.
-
+Suggested-by: Maxim Levitsky <mlevitsk@redhat.com>
 Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
 ---
- arch/x86/kvm/svm/avic.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ arch/x86/kvm/lapic.c    | 23 +++++++++++++++++++++++
+ arch/x86/kvm/lapic.h    |  5 +----
+ arch/x86/kvm/svm/avic.c | 21 +++++++++++++++++----
+ 3 files changed, 41 insertions(+), 8 deletions(-)
 
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 03d1b6325eb8..73a1e650a294 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -106,11 +106,34 @@ static inline int apic_enabled(struct kvm_lapic *apic)
+ 	(LVT_MASK | APIC_MODE_MASK | APIC_INPUT_POLARITY | \
+ 	 APIC_LVT_REMOTE_IRR | APIC_LVT_LEVEL_TRIGGER)
+ 
++static inline u8 kvm_xapic_id(struct kvm_lapic *apic)
++{
++	return kvm_lapic_get_reg(apic, APIC_ID) >> 24;
++}
++
+ static inline u32 kvm_x2apic_id(struct kvm_lapic *apic)
+ {
+ 	return apic->vcpu->vcpu_id;
+ }
+ 
++int kvm_get_apic_id(struct kvm_vcpu *vcpu, u32 *id)
++{
++	if (!id)
++		return -EINVAL;
++
++	if (!apic_x2apic_mode(vcpu->arch.apic)) {
++		/* For xAPIC, APIC ID cannot be larger than 254. */
++		if (vcpu->vcpu_id >= APIC_BROADCAST)
++			return -EINVAL;
++
++		*id = kvm_xapic_id(vcpu->arch.apic);
++	} else {
++		*id = kvm_x2apic_id(vcpu->arch.apic);
++	}
++	return 0;
++}
++EXPORT_SYMBOL_GPL(kvm_get_apic_id);
++
+ static bool kvm_can_post_timer_interrupt(struct kvm_vcpu *vcpu)
+ {
+ 	return pi_inject_timer && kvm_vcpu_apicv_active(vcpu);
+diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
+index 2b44e533fc8d..2b9463da1528 100644
+--- a/arch/x86/kvm/lapic.h
++++ b/arch/x86/kvm/lapic.h
+@@ -254,9 +254,6 @@ static inline enum lapic_mode kvm_apic_mode(u64 apic_base)
+ 	return apic_base & (MSR_IA32_APICBASE_ENABLE | X2APIC_ENABLE);
+ }
+ 
+-static inline u8 kvm_xapic_id(struct kvm_lapic *apic)
+-{
+-	return kvm_lapic_get_reg(apic, APIC_ID) >> 24;
+-}
++int kvm_get_apic_id(struct kvm_vcpu *vcpu, u32 *id);
+ 
+ #endif
 diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index 5329b93dc4cd..4d7a8743196e 100644
+index 4d7a8743196e..7e5a39a8e698 100644
 --- a/arch/x86/kvm/svm/avic.c
 +++ b/arch/x86/kvm/svm/avic.c
-@@ -406,6 +406,10 @@ static int avic_ldr_write(struct kvm_vcpu *vcpu, u8 g_physical_id, u32 ldr)
- 	bool flat;
- 	u32 *entry, new_entry;
+@@ -441,14 +441,21 @@ static void avic_invalidate_logical_id_entry(struct kvm_vcpu *vcpu)
  
-+	/* Note: x2AVIC does not use logical APIC ID table */
-+	if (apic_x2apic_mode(vcpu->arch.apic))
-+		return 0;
-+
- 	flat = kvm_lapic_get_reg(vcpu->arch.apic, APIC_DFR) == APIC_DFR_FLAT;
- 	entry = avic_get_logical_id_entry(vcpu, ldr, flat);
- 	if (!entry)
-@@ -424,8 +428,13 @@ static void avic_invalidate_logical_id_entry(struct kvm_vcpu *vcpu)
+ static int avic_handle_ldr_update(struct kvm_vcpu *vcpu)
  {
+-	int ret = 0;
++	int ret;
  	struct vcpu_svm *svm = to_svm(vcpu);
- 	bool flat = svm->dfr_reg == APIC_DFR_FLAT;
--	u32 *entry = avic_get_logical_id_entry(vcpu, svm->ldr_reg, flat);
-+	u32 *entry;
+ 	u32 ldr = kvm_lapic_get_reg(vcpu->arch.apic, APIC_LDR);
+-	u32 id = kvm_xapic_id(vcpu->arch.apic);
++	u32 id;
 +
-+	/* Note: x2AVIC does not use logical APIC ID table */
-+	if (apic_x2apic_mode(vcpu->arch.apic))
-+		return;
++	ret = kvm_get_apic_id(vcpu, &id);
++	if (ret)
++		return ret;
  
-+	entry = avic_get_logical_id_entry(vcpu, svm->ldr_reg, flat);
- 	if (entry)
- 		clear_bit(AVIC_LOGICAL_ID_ENTRY_VALID_BIT, (unsigned long *)entry);
+ 	if (ldr == svm->ldr_reg)
+ 		return 0;
+ 
++	if (id == X2APIC_BROADCAST)
++		return -EINVAL;
++
+ 	avic_invalidate_logical_id_entry(vcpu);
+ 
+ 	if (ldr)
+@@ -464,7 +471,12 @@ static int avic_handle_apic_id_update(struct kvm_vcpu *vcpu)
+ {
+ 	u64 *old, *new;
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+-	u32 id = kvm_xapic_id(vcpu->arch.apic);
++	u32 id;
++	int ret;
++
++	ret = kvm_get_apic_id(vcpu, &id);
++	if (ret)
++		return 1;
+ 
+ 	if (vcpu->vcpu_id == id)
+ 		return 0;
+@@ -484,7 +496,8 @@ static int avic_handle_apic_id_update(struct kvm_vcpu *vcpu)
+ 	 * APIC ID table entry if already setup the LDR.
+ 	 */
+ 	if (svm->ldr_reg)
+-		avic_handle_ldr_update(vcpu);
++		if (avic_handle_ldr_update(vcpu))
++			return 1;
+ 
+ 	return 0;
  }
 -- 
 2.25.1
