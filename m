@@ -2,62 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 752B84D2425
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 23:20:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0CFEA4D2447
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 23:30:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238847AbiCHWUl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 17:20:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57338 "EHLO
+        id S238847AbiCHWaS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Mar 2022 17:30:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41772 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232983AbiCHWUk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Mar 2022 17:20:40 -0500
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3F7725F0
-        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 14:19:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1646777983; x=1678313983;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=Cp8zGGLTLUHm8iCY4AoXsdfeinLenignQ5FmKmCOhbE=;
-  b=OmFmAlsHgTxD5DjeJ8YdhVnVyiOR1klvrK0pGuI3WJS3BgbmqycMESa5
-   ByqPWoknMpMA1bTNtLgGq540BAZeWakiGeMgbUrBe5YyvPLWlDaWVey8d
-   s7DDEs0orx4PZxrzvqfuHJRzdDDfraY09E0i/03NTs014wrNyr1NeGbUX
-   YUlCCx1zXXDHd2SnUKKU9vh4VrMFpCCt0xwru2xxYhx0ae+AJgszqJu6T
-   XWSXjZrg0ld0c6iDm4jZkazmnB6hazXokGT38Q8+CYncqXgOudXvpYjJI
-   Qg/coGah1bDRbLaeIgieFslK9eGkcN0JRwI0IrM/CxHBSdSLAUIJUpk4o
-   g==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10280"; a="252400134"
-X-IronPort-AV: E=Sophos;i="5.90,165,1643702400"; 
-   d="scan'208";a="252400134"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Mar 2022 14:19:43 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.90,165,1643702400"; 
-   d="scan'208";a="643816899"
-Received: from lkp-server02.sh.intel.com (HELO 89b41b6ae01c) ([10.239.97.151])
-  by orsmga004.jf.intel.com with ESMTP; 08 Mar 2022 14:19:40 -0800
-Received: from kbuild by 89b41b6ae01c with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1nRiBA-00025r-61; Tue, 08 Mar 2022 22:19:40 +0000
-Date:   Wed, 9 Mar 2022 06:18:53 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Li RongQing <lirongqing@baidu.com>
-Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org, kvm@vger.kernel.org,
-        Robert Hu <robert.hu@intel.com>,
-        Farrah Chen <farrah.chen@intel.com>,
-        Danmei Wei <danmei.wei@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Wang GuangJu <wangguangju@baidu.com>
-Subject: [kvm:queue 182/203] arch/x86/kernel/kvm.c:769:4: error: use of
- undeclared identifier '__raw_callee_save___kvm_vcpu_is_preempted'
-Message-ID: <202203090613.qYNxBFkZ-lkp@intel.com>
+        with ESMTP id S235352AbiCHWaR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 17:30:17 -0500
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F6561B78B
+        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 14:29:20 -0800 (PST)
+Received: by mail-pj1-x102c.google.com with SMTP id v4so646378pjh.2
+        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 14:29:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=lcrkkjBENIYesydqiaasOTxpBce7QoI3ujVOSnsO1B4=;
+        b=nJaHE2lI1yjIYJj/ybuRclsQuEbWR4Gm6ytnlJ6u9IDtCY6esGtyX8KJNebOkEokSJ
+         d0+AKITI/OY1Y68Zvu0mcFGgSgB1VNTMVou2x2HV0lZSuZcKQNIoW14Se5weuEPNW1MK
+         bTb2YUptnBdr90cub2sWw4LyBMTFVOH86nXqoFkHd1YbiA5MR+Oq9Eq2kxnOVyBuAogw
+         u+CRnnu18K1BCTywk1ZkQv9Z0xuTSuOkiHZemDTi4JmR3d4W5y3lYO76M0JwrLRRtz/h
+         l7xnRUbeFwc/57Q/xLM11EYjt0OYMCdMyE+dXPhS8o6uEmQ8uwkkrAzSqLD0Z09tM7yn
+         sepQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=lcrkkjBENIYesydqiaasOTxpBce7QoI3ujVOSnsO1B4=;
+        b=RIPJrq2iCw/xgPqMQViqKTYQCm7LnRVE7DmPkQziDYwvsCHdyS1O8/YI5Eq3MiorOl
+         LE4SDV81jmz8tb52Hi0xOwxG55RQkPXCpuNeWRiVodIodZzRStH1S29yP/N98DFxRGKI
+         xXRlwFfJK9IG5MbQJRiwBOAOZO3X6euUI4f1GcVFl1VwUuY0EMvR6A2VtyvSsRZXcTPr
+         as94x6HTBU8Nb3jzBzdvURGld2HuchxkSdJfhZDBjNPwesWk98TJTojGOKb3PPpxgo8S
+         idomSzHMsPtyAFuvxKyuf4hBeYgYOTYR9ZRngkLQGYBqoMTZCuggC21b1ERwJ59IqjcB
+         G7/g==
+X-Gm-Message-State: AOAM531nXZTKlNdgZpKOYzaqPTJKc/sNtuuxN+WwOjvW7XkOthGrWYjj
+        ru74BI4tKUYHlzp89jySE44C0S9abJvWLgdS1MHJ2g==
+X-Google-Smtp-Source: ABdhPJyFpRTvd02rvAC/Kf+WMGoh+2aCSSzrWOG96Yn5KqPBCJaSnmXw9faK4PL72W3N7T8tP/CyIPN67B/8aS1QiIM=
+X-Received: by 2002:a17:903:292:b0:149:460a:9901 with SMTP id
+ j18-20020a170903029200b00149460a9901mr19634846plr.44.1646778559549; Tue, 08
+ Mar 2022 14:29:19 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Spam-Status: No, score=-7.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+References: <20220303183328.1499189-1-dmatlack@google.com> <20220303183328.1499189-2-dmatlack@google.com>
+ <YifNPekMfIta+xcv@google.com>
+In-Reply-To: <YifNPekMfIta+xcv@google.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Tue, 8 Mar 2022 14:28:53 -0800
+Message-ID: <CALzav=frpbRMkDtVTwii2hJ+trtF0m0p5Y_Rc5KS42rp1KEaNw@mail.gmail.com>
+Subject: Re: [PATCH RESEND 1/2] KVM: Prevent module exit until all VMs are freed
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Gleb Natapov <gleb@redhat.com>, Rik van Riel <riel@redhat.com>,
+        Ben Gardon <bgardon@google.com>, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -65,68 +70,92 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
-head:   00a2bd3464280ca1f08e2cbfab22b884ffb731d8
-commit: dc889a8974087aba3eb1cc6db2066fbbdb58922a [182/203] KVM: x86: Support the vCPU preemption check with nopvspin and realtime hint
-config: x86_64-randconfig-a001 (https://download.01.org/0day-ci/archive/20220309/202203090613.qYNxBFkZ-lkp@intel.com/config)
-compiler: clang version 15.0.0 (https://github.com/llvm/llvm-project 0dc66b76fe4c33843755ade391b85ffda0742aeb)
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://git.kernel.org/pub/scm/virt/kvm/kvm.git/commit/?id=dc889a8974087aba3eb1cc6db2066fbbdb58922a
-        git remote add kvm https://git.kernel.org/pub/scm/virt/kvm/kvm.git
-        git fetch --no-tags kvm queue
-        git checkout dc889a8974087aba3eb1cc6db2066fbbdb58922a
-        # save the config file to linux build tree
-        mkdir build_dir
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=x86_64 SHELL=/bin/bash
+On Tue, Mar 8, 2022 at 1:40 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Thu, Mar 03, 2022, David Matlack wrote:
+> > Tie the lifetime the KVM module to the lifetime of each VM via
+> > kvm.users_count. This way anything that grabs a reference to the VM via
+> > kvm_get_kvm() cannot accidentally outlive the KVM module.
+> >
+> > Prior to this commit, the lifetime of the KVM module was tied to the
+> > lifetime of /dev/kvm file descriptors, VM file descriptors, and vCPU
+> > file descriptors by their respective file_operations "owner" field.
+> > This approach is insufficient because references grabbed via
+> > kvm_get_kvm() do not prevent closing any of the aforementioned file
+> > descriptors.
+> >
+> > This fixes a long standing theoretical bug in KVM that at least affects
+> > async page faults. kvm_setup_async_pf() grabs a reference via
+> > kvm_get_kvm(), and drops it in an asynchronous work callback. Nothing
+> > prevents the VM file descriptor from being closed and the KVM module
+> > from being unloaded before this callback runs.
+> >
+> > Fixes: af585b921e5d ("KVM: Halt vcpu if page it tries to access is swapped out")
+>
+> And (or)
+>
+>   Fixes: 3d3aab1b973b ("KVM: set owner of cpu and vm file operations")
+>
+> because the above is x86-centric, at a glance PPC and maybe s390 have issues
+> beyond async #PF.
+>
+> > Cc: stable@vger.kernel.org
+> > Suggested-by: Ben Gardon <bgardon@google.com>
+> > [ Based on a patch from Ben implemented for Google's kernel. ]
+> > Signed-off-by: David Matlack <dmatlack@google.com>
+> > ---
+> >  virt/kvm/kvm_main.c | 8 ++++++++
+> >  1 file changed, 8 insertions(+)
+> >
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index 35ae6d32dae5..b59f0a29dbd5 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -117,6 +117,8 @@ EXPORT_SYMBOL_GPL(kvm_debugfs_dir);
+> >
+> >  static const struct file_operations stat_fops_per_vm;
+> >
+> > +static struct file_operations kvm_chardev_ops;
+> > +
+> >  static long kvm_vcpu_ioctl(struct file *file, unsigned int ioctl,
+> >                          unsigned long arg);
+> >  #ifdef CONFIG_KVM_COMPAT
+> > @@ -1131,6 +1133,11 @@ static struct kvm *kvm_create_vm(unsigned long type)
+> >       preempt_notifier_inc();
+> >       kvm_init_pm_notifier(kvm);
+> >
+> > +     if (!try_module_get(kvm_chardev_ops.owner)) {
+>
+> The "try" aspect is unnecessary.  Stealing from Paolo's version,
+>
+>         /* KVM is pinned via open("/dev/kvm"), the fd passed to this ioctl(). */
+>         __module_get(kvm_chardev_ops.owner);
 
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
+Right, I did see that and agree we're guaranteed the KVM module has a
+reference at this point. But the KVM module might be in state
+MODULE_STATE_GOING (e.g. if someone ran "rmmod --wait"), which
+try_module_get() checks.
 
-All errors (new ones prefixed by >>):
-
->> arch/x86/kernel/kvm.c:769:4: error: use of undeclared identifier '__raw_callee_save___kvm_vcpu_is_preempted'
-                           PV_CALLEE_SAVE(__kvm_vcpu_is_preempted);
-                           ^
-   arch/x86/include/asm/paravirt.h:683:35: note: expanded from macro 'PV_CALLEE_SAVE'
-           ((struct paravirt_callee_save) { __raw_callee_save_##func })
-                                            ^
-   <scratch space>:52:1: note: expanded from here
-   __raw_callee_save___kvm_vcpu_is_preempted
-   ^
-   1 error generated.
-
-
-vim +/__raw_callee_save___kvm_vcpu_is_preempted +769 arch/x86/kernel/kvm.c
-
-   754	
-   755	static void __init kvm_guest_init(void)
-   756	{
-   757		int i;
-   758	
-   759		paravirt_ops_setup();
-   760		register_reboot_notifier(&kvm_pv_reboot_nb);
-   761		for (i = 0; i < KVM_TASK_SLEEP_HASHSIZE; i++)
-   762			raw_spin_lock_init(&async_pf_sleepers[i].lock);
-   763	
-   764		if (kvm_para_has_feature(KVM_FEATURE_STEAL_TIME)) {
-   765			has_steal_clock = 1;
-   766			static_call_update(pv_steal_clock, kvm_steal_clock);
-   767	
-   768			pv_ops.lock.vcpu_is_preempted =
- > 769				PV_CALLEE_SAVE(__kvm_vcpu_is_preempted);
-   770		}
-   771	
-   772		if (kvm_para_has_feature(KVM_FEATURE_PV_EOI))
-   773			apic_set_eoi_write(kvm_guest_apic_eoi_write);
-   774	
-   775		if (kvm_para_has_feature(KVM_FEATURE_ASYNC_PF_INT) && kvmapf) {
-   776			static_branch_enable(&kvm_async_pf_enabled);
-   777			alloc_intr_gate(HYPERVISOR_CALLBACK_VECTOR, asm_sysvec_kvm_asyncpf_interrupt);
-   778		}
-   779	
-
----
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+>
+> > +             r = -ENODEV;
+> > +             goto out_err;
+> > +     }
+> > +
+> >       return kvm;
+> >
+> >  out_err:
+> > @@ -1220,6 +1227,7 @@ static void kvm_destroy_vm(struct kvm *kvm)
+> >       preempt_notifier_dec();
+> >       hardware_disable_all();
+> >       mmdrop(mm);
+> > +     module_put(kvm_chardev_ops.owner);
+> >  }
+> >
+> >  void kvm_get_kvm(struct kvm *kvm)
+> >
+> > base-commit: b13a3befc815eae574d87e6249f973dfbb6ad6cd
+> > prerequisite-patch-id: 38f66d60319bf0bc9bf49f91f0f9119e5441629b
+> > prerequisite-patch-id: 51aa921d68ea649d436ea68e1b8f4aabc3805156
+> > --
+> > 2.35.1.616.g0bdcbb4464-goog
+> >
