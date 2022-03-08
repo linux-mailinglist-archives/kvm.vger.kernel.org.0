@@ -2,81 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 645D94D1BA1
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 16:26:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C4AF24D1BC1
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 16:33:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347752AbiCHP13 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 10:27:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57548 "EHLO
+        id S238506AbiCHPeD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Mar 2022 10:34:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38550 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234931AbiCHP11 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Mar 2022 10:27:27 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52D694754D;
-        Tue,  8 Mar 2022 07:26:30 -0800 (PST)
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id F132B1F380;
-        Tue,  8 Mar 2022 15:26:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1646753188; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=m2m+Ogcvgk7zAck8lJL9y5rOuyf0bq56RUWhNvKb8gE=;
-        b=OFDOb0EX8vyJa+0LJDX7Xt+dj6BWiRqgtFSXsPFEiYkQ6sdEw/loo4IXxjnn4hrfyZx4nu
-        xtvYdMNA0TmRGdgQCsrBvDWK+/YB3GNo5U1S690uSfCWm1EOUwu+z/F/Fl1e8LfoiK7zg1
-        decbmKM6dxZOdt3C97MlG/yD3bCKPZY=
-Received: from suse.cz (unknown [10.100.201.86])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id 80421A3B83;
-        Tue,  8 Mar 2022 15:26:26 +0000 (UTC)
-Date:   Tue, 8 Mar 2022 16:26:26 +0100
-From:   Michal Hocko <mhocko@suse.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>,
-        Christoph Lameter <cl@linux.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Vladimir Davydov <vdavydov.dev@gmail.com>, linux-mm@kvack.org,
-        cgroups@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH 1/3] mm: vmalloc: introduce array allocation functions
-Message-ID: <Yid1orgE/Yf56WSV@dhcp22.suse.cz>
-References: <20220308105918.615575-1-pbonzini@redhat.com>
- <20220308105918.615575-2-pbonzini@redhat.com>
- <Yidefp4G/Hk2Twfy@dhcp22.suse.cz>
- <77a34051-2672-88cf-99dd-60f5acfb905e@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <77a34051-2672-88cf-99dd-60f5acfb905e@redhat.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+        with ESMTP id S231245AbiCHPeC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 10:34:02 -0500
+Received: from mail-wm1-x349.google.com (mail-wm1-x349.google.com [IPv6:2a00:1450:4864:20::349])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C4581FA79
+        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 07:33:05 -0800 (PST)
+Received: by mail-wm1-x349.google.com with SMTP id 26-20020a05600c22da00b00388307f3503so1253083wmg.1
+        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 07:33:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=pFCZMIKsmv1NgfuYif6jC89cFJGtwVMy/ZQFUs6rUg4=;
+        b=Og4X5EgvD6ZGnF9GYC/nSoXWWIbI4ubeynG4LVZBHsNwEt4N7WDD3JAnr/aGH1N+Or
+         20btxSIx1YnatFPfC1Nb43bQhN9YFnTy/nFjuM+SebBb+LFTPUFDfJdP5U8WIqju5nF/
+         eCHZ7ylSKeqIxFi+A94QL848mgzxpx+aoIa3tkNNJQxmKmDy+znXZOfcJel212hss7F/
+         Fi3B2zqr3X48oXAcFKaFp0QqhZxPuEVe0+6/LEV6BQoE4DDIhsKkIlFiTMP1WP7eVC3O
+         6oBI+ym/FWJ8MVxOhuj0USkRJw4fId7JXtvGetAdqEIkeLvpiZtFiHhV/+ObaTg1fyKA
+         9NIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=pFCZMIKsmv1NgfuYif6jC89cFJGtwVMy/ZQFUs6rUg4=;
+        b=PNFGiCjau6S8jie29q1WULN+ri3qOu8gtlcQ3273YCWRKx38WNuSKDmPdtZ09cqVtc
+         qbGyPl+ror8PQKqquerW6TX14DD3T6zLqqz44VdZhKD4x1ORnUa3sA0I2ZP2ePuaglQP
+         0UucEWFobr8dGI+BFWcMK19zNUnClITyZsXLlvYoe/+6ezYjrMgRhlguyjpZcI+fibQl
+         o3LdL1lTXJDSyCRM5T+Vpqng3KRHRmzOrSGn0fE+Pv0K6JinBsqwL4w7reS0EP6wukDg
+         XT2tKo1sHohsV/EhL/EerrQprce6hJFxk0RKSMJHdIkSSJjp6m1zzMeFWRMRyH3uAuS4
+         t1AQ==
+X-Gm-Message-State: AOAM533XUyJssumQ8AYI/15NZgqXHcLZ0mKVQSNrHUXImMnviVp11tdc
+        v9cOCeqFtq/gFBWgzuB2TvKaLetlWpmvvlxzSKIv+zCU8itdbPAiygwkfcQTJiOBbuhI9qBZXd5
+        Y6tCB6tk+vM31D6uFPDR0V5cX0f0eoX3c1BGWnH+lDdZr5dzMwz2aZ9/zig4/45Z3/b1g6BxRng
+        ==
+X-Google-Smtp-Source: ABdhPJx+g3OUSF7ALEGrRok8o/uMoGiAUjj9sAb9rq2nfBww3UXx3vC6KKRHWk18QkFJyTvY1IYcyHhcvw2iFZPUTJU=
+X-Received: from sene.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:27c4])
+ (user=sebastianene job=sendgmr) by 2002:a05:600c:35cf:b0:389:b5f1:ce68 with
+ SMTP id r15-20020a05600c35cf00b00389b5f1ce68mr4042505wmq.149.1646753584000;
+ Tue, 08 Mar 2022 07:33:04 -0800 (PST)
+Date:   Tue,  8 Mar 2022 15:32:25 +0000
+Message-Id: <20220308153227.2238533-1-sebastianene@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.1.616.g0bdcbb4464-goog
+Subject: [PATCH kvmtool v9 0/3] aarch64: Add stolen time support
+From:   Sebastian Ene <sebastianene@google.com>
+To:     kvm@vger.kernel.org
+Cc:     qperret@google.com, maz@kernel.org, kvmarm@lists.cs.columbia.edu,
+        will@kernel.org, julien.thierry.kdev@gmail.com,
+        Sebastian Ene <sebastianene@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue 08-03-22 14:55:39, Paolo Bonzini wrote:
-> On 3/8/22 14:47, Michal Hocko wrote:
-> > Seems useful
-> > Acked-by: Michal Hocko<mhocko@suse.com>
-> > 
-> > Is there any reason you haven't used __alloc_size(1, 2) annotation?
-> 
-> It's enough to have them in the header:
-> 
-> > > +extern void *__vmalloc_array(size_t n, size_t size, gfp_t flags) __alloc_size(1, 2);
-> > > +extern void *vmalloc_array(size_t n, size_t size) __alloc_size(1, 2);
-> > > +extern void *__vcalloc(size_t n, size_t size, gfp_t flags) __alloc_size(1, 2);
-> > > +extern void *vcalloc(size_t n, size_t size) __alloc_size(1, 2);
+This series adds support for stolen time functionality.
 
-My bad, I have expected __alloc_size before the function name and simply
-haven't noticed it at the end.
+Patch #1 moves the vCPU structure initialisation before the target->init()
+call to allow early access to the kvm structure from the vCPU
+during target->init().
+
+Patch #2 modifies the memory layout in arm-common/kvm-arch.h and adds a
+new MMIO device PVTIME after the RTC region. A new flag is added in
+kvm-config.h that will be used to control [enable/disable] the pvtime
+functionality. Stolen time is enabled by default when the host
+supports KVM_CAP_STEAL_TIME.
+
+Patch #3 adds a new command line argument to disable the stolen time
+functionality(by default is enabled).
+
+Changelog since v8:
+ - fix an error caused by kvm_cpu__teardown_pvtime() not beeing defined
+   for aarch32
+ - cleanup the pvtime setup by removing the flag 'is_failed_cfg' and
+   drop the 'pvtime_data_priv' definition
+ - add missing Review-by tag 
+
+The patch has been tested on qemu-system-aarch64.
+
+Sebastian Ene (3):
+  aarch64: Populate the vCPU struct before target->init()
+  aarch64: Add stolen time support
+  Add --no-pvtime command line argument
+
+ Makefile                               |  1 +
+ arm/aarch32/include/kvm/kvm-cpu-arch.h |  5 ++
+ arm/aarch64/arm-cpu.c                  |  2 +-
+ arm/aarch64/include/kvm/kvm-cpu-arch.h |  2 +
+ arm/aarch64/pvtime.c                   | 96 ++++++++++++++++++++++++++
+ arm/include/arm-common/kvm-arch.h      |  6 +-
+ arm/kvm-cpu.c                          | 15 ++--
+ builtin-run.c                          |  2 +
+ include/kvm/kvm-config.h               |  1 +
+ 9 files changed, 121 insertions(+), 9 deletions(-)
+ create mode 100644 arm/aarch64/pvtime.c
+
 -- 
-Michal Hocko
-SUSE Labs
+2.35.1.616.g0bdcbb4464-goog
+
