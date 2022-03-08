@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 161104D0F49
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 06:46:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9BF544D0F4F
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 06:46:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245523AbiCHFrO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 00:47:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38916 "EHLO
+        id S1343636AbiCHFr0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Mar 2022 00:47:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245604AbiCHFrL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Mar 2022 00:47:11 -0500
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA8693BBE4;
-        Mon,  7 Mar 2022 21:46:14 -0800 (PST)
+        with ESMTP id S1343593AbiCHFrU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 00:47:20 -0500
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B16203BF84;
+        Mon,  7 Mar 2022 21:46:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1646718374; x=1678254374;
+  t=1646718384; x=1678254384;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=YgSh5+zkpRoIJgCE/g6wcfO+mwq/lO0z+otlloGUuI4=;
-  b=fTcAA69EaALgAMKHBfDlTr4vKC2tQ4juY9iITXHedBZzZKoutT1sD7sT
-   n7Pr/3Dhkw4FYLDg5DjXXTn1pc6EjVe0TJbvUbbo1PpAviputPvdCKjww
-   xv6zd8y2eiiKFJID0er7mf5PjSvdfAGrE0L3GU6P1JNmMtOwcmeXkVFx0
-   30+LmvqnzofoMlut+RmPYjHEeQlosSykwhgXq+WNWY94M+8eiFEm6Zu5P
-   h2YxO058QufKqQLbgKVftm9yraikGW5FBf62gJvMzD1cA0Gt3kjXZ953R
-   9AJhlNKFnapmYMcHzTELywJKqotW4h6poHXHNk6jGJ14Myl2gG/aV0XXV
+  bh=7RqVH7LEIAgp5LCm2Qn1GAJ89sBrOf2aUr2sUfMN69I=;
+  b=nO7LR4mJgr4bwOS+a5hzyAZuWwaxIdBYgCyn22/hg3SKSQJVfBN68GnL
+   10WAHkn9X0HnAsAfp7f5O1Av+Yt2XyTAAtMxuOfmDKRVl5/oUj/wuc/P7
+   g5L/pTuPUCpNiDimzWbLwG4KbtfspqkGLCM07mKm2zSb6hit3G+aj/nLy
+   iXoNonvHkitWJYo+FKILENEIhIKpeTYlO2S4EuZ4OJb3hLGj2lilh5xgX
+   1tuDXLl9Tffjp/NZGwuQkRFuK+hEtoxMin1ymFJUwv/5Qoy4jTrgv2rmo
+   qxuh/azPiWCF88LsLqkwStdPcZ+GLa6djsBdsVsgKEns3BBGdSnfDZrE7
    w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10279"; a="234553088"
+X-IronPort-AV: E=McAfee;i="6200,9189,10279"; a="253427477"
 X-IronPort-AV: E=Sophos;i="5.90,163,1643702400"; 
-   d="scan'208";a="234553088"
+   d="scan'208";a="253427477"
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2022 21:46:14 -0800
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2022 21:46:21 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.90,163,1643702400"; 
-   d="scan'208";a="537430005"
+   d="scan'208";a="537430035"
 Received: from allen-box.sh.intel.com ([10.239.159.48])
-  by orsmga007.jf.intel.com with ESMTP; 07 Mar 2022 21:46:07 -0800
+  by orsmga007.jf.intel.com with ESMTP; 07 Mar 2022 21:46:14 -0800
 From:   Lu Baolu <baolu.lu@linux.intel.com>
 To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Joerg Roedel <joro@8bytes.org>,
@@ -65,16 +65,16 @@ Cc:     Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
         iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Lu Baolu <baolu.lu@linux.intel.com>
-Subject: [PATCH v8 01/11] iommu: Add DMA ownership management interfaces
-Date:   Tue,  8 Mar 2022 13:44:11 +0800
-Message-Id: <20220308054421.847385-2-baolu.lu@linux.intel.com>
+Subject: [PATCH v8 02/11] driver core: Add dma_cleanup callback in bus_type
+Date:   Tue,  8 Mar 2022 13:44:12 +0800
+Message-Id: <20220308054421.847385-3-baolu.lu@linux.intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220308054421.847385-1-baolu.lu@linux.intel.com>
 References: <20220308054421.847385-1-baolu.lu@linux.intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
         SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -83,281 +83,79 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Multiple devices may be placed in the same IOMMU group because they
-cannot be isolated from each other. These devices must either be
-entirely under kernel control or userspace control, never a mixture.
+The bus_type structure defines dma_configure() callback for bus drivers
+to configure DMA on the devices. This adds the paired dma_cleanup()
+callback and calls it during driver unbinding so that bus drivers can do
+some cleanup work.
 
-This adds dma ownership management in iommu core and exposes several
-interfaces for the device drivers and the device userspace assignment
-framework (i.e. VFIO), so that any conflict between user and kernel
-controlled dma could be detected at the beginning.
+One use case for this paired DMA callbacks is for the bus driver to check
+for DMA ownership conflicts during driver binding, where multiple devices
+belonging to a same IOMMU group (the minimum granularity of isolation and
+protection) may be assigned to kernel drivers or user space respectively.
 
-The device driver oriented interfaces are,
+Without this change, for example, the vfio driver has to listen to a bus
+BOUND_DRIVER event and then BUG_ON() in case of dma ownership conflict.
+This leads to bad user experience since careless driver binding operation
+may crash the system if the admin overlooks the group restriction. Aside
+from bad design, this leads to a security problem as a root user, even with
+lockdown=integrity, can force the kernel to BUG.
 
-	int iommu_device_use_default_domain(struct device *dev);
-	void iommu_device_unuse_default_domain(struct device *dev);
+With this change, the bus driver could check and set the DMA ownership in
+driver binding process and fail on ownership conflicts. The DMA ownership
+should be released during driver unbinding.
 
-By calling iommu_device_use_default_domain(), the device driver tells
-the iommu layer that the device dma is handled through the kernel DMA
-APIs. The iommu layer will manage the IOVA and use the default domain
-for DMA address translation.
-
-The device user-space assignment framework oriented interfaces are,
-
-	int iommu_group_claim_dma_owner(struct iommu_group *group,
-					void *owner);
-	void iommu_group_release_dma_owner(struct iommu_group *group);
-	bool iommu_group_dma_owner_claimed(struct iommu_group *group);
-
-The device userspace assignment must be disallowed if the DMA owner
-claiming interface returns failure.
-
-Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-Signed-off-by: Kevin Tian <kevin.tian@intel.com>
 Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 ---
- include/linux/iommu.h |  31 +++++++++
- drivers/iommu/iommu.c | 153 +++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 181 insertions(+), 3 deletions(-)
+ include/linux/device/bus.h | 3 +++
+ drivers/base/dd.c          | 5 +++++
+ 2 files changed, 8 insertions(+)
 
-diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-index 9208eca4b0d1..77972ef978b5 100644
---- a/include/linux/iommu.h
-+++ b/include/linux/iommu.h
-@@ -675,6 +675,13 @@ struct iommu_sva *iommu_sva_bind_device(struct device *dev,
- void iommu_sva_unbind_device(struct iommu_sva *handle);
- u32 iommu_sva_get_pasid(struct iommu_sva *handle);
+diff --git a/include/linux/device/bus.h b/include/linux/device/bus.h
+index a039ab809753..d8b29ccd07e5 100644
+--- a/include/linux/device/bus.h
++++ b/include/linux/device/bus.h
+@@ -59,6 +59,8 @@ struct fwnode_handle;
+  *		bus supports.
+  * @dma_configure:	Called to setup DMA configuration on a device on
+  *			this bus.
++ * @dma_cleanup:	Called to cleanup DMA configuration on a device on
++ *			this bus.
+  * @pm:		Power management operations of this bus, callback the specific
+  *		device driver's pm-ops.
+  * @iommu_ops:  IOMMU specific operations for this bus, used to attach IOMMU
+@@ -103,6 +105,7 @@ struct bus_type {
+ 	int (*num_vf)(struct device *dev);
  
-+int iommu_device_use_default_domain(struct device *dev);
-+void iommu_device_unuse_default_domain(struct device *dev);
-+
-+int iommu_group_claim_dma_owner(struct iommu_group *group, void *owner);
-+void iommu_group_release_dma_owner(struct iommu_group *group);
-+bool iommu_group_dma_owner_claimed(struct iommu_group *group);
-+
- #else /* CONFIG_IOMMU_API */
+ 	int (*dma_configure)(struct device *dev);
++	void (*dma_cleanup)(struct device *dev);
  
- struct iommu_ops {};
-@@ -1031,6 +1038,30 @@ static inline struct iommu_fwspec *dev_iommu_fwspec_get(struct device *dev)
- {
- 	return NULL;
- }
-+
-+static inline int iommu_device_use_default_domain(struct device *dev)
-+{
-+	return 0;
-+}
-+
-+static inline void iommu_device_unuse_default_domain(struct device *dev)
-+{
-+}
-+
-+static inline int
-+iommu_group_claim_dma_owner(struct iommu_group *group, void *owner)
-+{
-+	return -ENODEV;
-+}
-+
-+static inline void iommu_group_release_dma_owner(struct iommu_group *group)
-+{
-+}
-+
-+static inline bool iommu_group_dma_owner_claimed(struct iommu_group *group)
-+{
-+	return false;
-+}
- #endif /* CONFIG_IOMMU_API */
+ 	const struct dev_pm_ops *pm;
  
- /**
-diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-index f2c45b85b9fc..eba8e8ccf19d 100644
---- a/drivers/iommu/iommu.c
-+++ b/drivers/iommu/iommu.c
-@@ -48,6 +48,8 @@ struct iommu_group {
- 	struct iommu_domain *default_domain;
- 	struct iommu_domain *domain;
- 	struct list_head entry;
-+	unsigned int owner_cnt;
-+	void *owner;
- };
+diff --git a/drivers/base/dd.c b/drivers/base/dd.c
+index f47cab21430f..7c3c9b4c3deb 100644
+--- a/drivers/base/dd.c
++++ b/drivers/base/dd.c
+@@ -665,6 +665,8 @@ static int really_probe(struct device *dev, struct device_driver *drv)
+ 	if (dev->bus)
+ 		blocking_notifier_call_chain(&dev->bus->p->bus_notifier,
+ 					     BUS_NOTIFY_DRIVER_NOT_BOUND, dev);
++	if (dev->bus && dev->bus->dma_cleanup)
++		dev->bus->dma_cleanup(dev);
+ pinctrl_bind_failed:
+ 	device_links_no_driver(dev);
+ 	devres_release_all(dev);
+@@ -1208,6 +1210,9 @@ static void __device_release_driver(struct device *dev, struct device *parent)
+ 		else if (drv->remove)
+ 			drv->remove(dev);
  
- struct group_device {
-@@ -294,7 +296,11 @@ int iommu_probe_device(struct device *dev)
- 	mutex_lock(&group->mutex);
- 	iommu_alloc_default_domain(group, dev);
++		if (dev->bus && dev->bus->dma_cleanup)
++			dev->bus->dma_cleanup(dev);
++
+ 		device_links_driver_cleanup(dev);
  
--	if (group->default_domain) {
-+	/*
-+	 * If device joined an existing group which has been claimed, don't
-+	 * attach the default domain.
-+	 */
-+	if (group->default_domain && !group->owner) {
- 		ret = __iommu_attach_device(group->default_domain, dev);
- 		if (ret) {
- 			mutex_unlock(&group->mutex);
-@@ -2109,7 +2115,7 @@ static int __iommu_attach_group(struct iommu_domain *domain,
- {
- 	int ret;
- 
--	if (group->default_domain && group->domain != group->default_domain)
-+	if (group->domain && group->domain != group->default_domain)
- 		return -EBUSY;
- 
- 	ret = __iommu_group_for_each_dev(group, domain,
-@@ -2146,7 +2152,11 @@ static void __iommu_detach_group(struct iommu_domain *domain,
- {
- 	int ret;
- 
--	if (!group->default_domain) {
-+	/*
-+	 * If the group has been claimed already, do not re-attach the default
-+	 * domain.
-+	 */
-+	if (!group->default_domain || group->owner) {
- 		__iommu_group_for_each_dev(group, domain,
- 					   iommu_group_do_detach_device);
- 		group->domain = NULL;
-@@ -3095,3 +3105,140 @@ static ssize_t iommu_group_store_type(struct iommu_group *group,
- 
- 	return ret;
- }
-+
-+/**
-+ * iommu_device_use_default_domain() - Device driver wants to handle device
-+ *                                     DMA through the kernel DMA API.
-+ * @dev: The device.
-+ *
-+ * The device driver about to bind @dev wants to do DMA through the kernel
-+ * DMA API. Return 0 if it is allowed, otherwise an error.
-+ */
-+int iommu_device_use_default_domain(struct device *dev)
-+{
-+	struct iommu_group *group = iommu_group_get(dev);
-+	int ret = 0;
-+
-+	if (!group)
-+		return 0;
-+
-+	mutex_lock(&group->mutex);
-+	if (group->owner_cnt) {
-+		if (group->domain != group->default_domain ||
-+		    group->owner) {
-+			ret = -EBUSY;
-+			goto unlock_out;
-+		}
-+	}
-+
-+	group->owner_cnt++;
-+
-+unlock_out:
-+	mutex_unlock(&group->mutex);
-+	iommu_group_put(group);
-+
-+	return ret;
-+}
-+
-+/**
-+ * iommu_device_unuse_default_domain() - Device driver stops handling device
-+ *                                       DMA through the kernel DMA API.
-+ * @dev: The device.
-+ *
-+ * The device driver doesn't want to do DMA through kernel DMA API anymore.
-+ * It must be called after iommu_device_use_default_domain().
-+ */
-+void iommu_device_unuse_default_domain(struct device *dev)
-+{
-+	struct iommu_group *group = iommu_group_get(dev);
-+
-+	if (!group)
-+		return;
-+
-+	mutex_lock(&group->mutex);
-+	if (!WARN_ON(!group->owner_cnt))
-+		group->owner_cnt--;
-+
-+	mutex_unlock(&group->mutex);
-+	iommu_group_put(group);
-+}
-+
-+/**
-+ * iommu_group_claim_dma_owner() - Set DMA ownership of a group
-+ * @group: The group.
-+ * @owner: Caller specified pointer. Used for exclusive ownership.
-+ *
-+ * This is to support backward compatibility for vfio which manages
-+ * the dma ownership in iommu_group level. New invocations on this
-+ * interface should be prohibited.
-+ */
-+int iommu_group_claim_dma_owner(struct iommu_group *group, void *owner)
-+{
-+	int ret = 0;
-+
-+	mutex_lock(&group->mutex);
-+	if (group->owner_cnt) {
-+		ret = -EPERM;
-+		goto unlock_out;
-+	} else {
-+		if (group->domain && group->domain != group->default_domain) {
-+			ret = -EBUSY;
-+			goto unlock_out;
-+		}
-+
-+		group->owner = owner;
-+		if (group->domain)
-+			__iommu_detach_group(group->domain, group);
-+	}
-+
-+	group->owner_cnt++;
-+unlock_out:
-+	mutex_unlock(&group->mutex);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(iommu_group_claim_dma_owner);
-+
-+/**
-+ * iommu_group_release_dma_owner() - Release DMA ownership of a group
-+ * @group: The group.
-+ *
-+ * Release the DMA ownership claimed by iommu_group_claim_dma_owner().
-+ */
-+void iommu_group_release_dma_owner(struct iommu_group *group)
-+{
-+	mutex_lock(&group->mutex);
-+	if (WARN_ON(!group->owner_cnt || !group->owner))
-+		goto unlock_out;
-+
-+	group->owner_cnt = 0;
-+	/*
-+	 * The UNMANAGED domain should be detached before all USER
-+	 * owners have been released.
-+	 */
-+	if (!WARN_ON(group->domain) && group->default_domain)
-+		__iommu_attach_group(group->default_domain, group);
-+	group->owner = NULL;
-+unlock_out:
-+	mutex_unlock(&group->mutex);
-+}
-+EXPORT_SYMBOL_GPL(iommu_group_release_dma_owner);
-+
-+/**
-+ * iommu_group_dma_owner_claimed() - Query group dma ownership status
-+ * @group: The group.
-+ *
-+ * This provides status query on a given group. It is racy and only for
-+ * non-binding status reporting.
-+ */
-+bool iommu_group_dma_owner_claimed(struct iommu_group *group)
-+{
-+	unsigned int user;
-+
-+	mutex_lock(&group->mutex);
-+	user = group->owner_cnt;
-+	mutex_unlock(&group->mutex);
-+
-+	return user;
-+}
-+EXPORT_SYMBOL_GPL(iommu_group_dma_owner_claimed);
+ 		devres_release_all(dev);
 -- 
 2.25.1
 
