@@ -2,70 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4EE124D249F
-	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 00:09:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6AF474D2538
+	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 02:13:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229776AbiCHXKF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 18:10:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41148 "EHLO
+        id S229733AbiCIBF4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Mar 2022 20:05:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46008 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229670AbiCHXKE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Mar 2022 18:10:04 -0500
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B9266C93B
-        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 15:09:04 -0800 (PST)
-Received: by mail-pj1-x1029.google.com with SMTP id gj15-20020a17090b108f00b001bef86c67c1so685887pjb.3
-        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 15:09:04 -0800 (PST)
+        with ESMTP id S229880AbiCIBFs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 20:05:48 -0500
+Received: from mail-qv1-xf2b.google.com (mail-qv1-xf2b.google.com [IPv6:2607:f8b0:4864:20::f2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECEF81385A6
+        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 16:44:04 -0800 (PST)
+Received: by mail-qv1-xf2b.google.com with SMTP id b12so856252qvk.1
+        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 16:44:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=eEcOwEnTCsoRODrbH9WKZeOW5g4d6mtfEmYy7dNkCgk=;
-        b=QxMDvrC37ShjB2pSN9wA20Vlar3+06Cm4YnIP3YVV/IGHAYKErEoDG4beO8uH30ubs
-         HBdZPpAIAyqbHZxgC/r3/IVfTvA7fJebDWfmrzzD/mcdMNs7H7h4pIEBcsjJDcJ2XWVl
-         9yLTmLVYCC28tRxqry9y//t/g+YJM4UG5gqmSXHnSrz9PXFtqYuY0sM6W8ZnBtwYM+bD
-         YxrmWPXKaeuj0wsfbXgJDgqxwEYiUdoPTZBm3x9oZt8iOxNct4t0A/v0w7kFCQLpjAA4
-         M4tdrO8Nfv51rN04kKYBHGpeoBBnKPz6hhEsR6D1lf1y6fyjwObB7ZWaQqajHYysXxn4
-         Nlxg==
+        bh=2kU1A0mZ+Yf718gi2yxK3phVn7nYLq00SbSALiBBt2c=;
+        b=a3wxXsXXiZ50ZckVfXFMr8KdVU78K5T3RLsMnlj3KUTmsXr2mTTchwj6lfSmoIW6Jw
+         Xxcj7nT6ioNm+beNeT7w/gpTTEoesAjFfDTQkbfIWQwfq91ifPoOm3HZ8d5QpMlRFFmu
+         /SvS/C3P+W10CB6HG+SZCcWMlW7qlD0MjWDZHoph8a3b1v7eqS2BfyKguOEWwdkttbdX
+         RqHb2uCJ+bspxUluBYFhwxvdHNOj0fFpnkuHxLzLPAlkPVyOzDfrRkJ8/tz488d1UDi3
+         MOfKNkuD4sJ9Xv7tvkhmywY4CjEK6CRMke81P29RSspDH8NnokaenIYa9TIs71rPiZ4j
+         hzYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=eEcOwEnTCsoRODrbH9WKZeOW5g4d6mtfEmYy7dNkCgk=;
-        b=PhfsNdePU+iSXG57sNxpZtliH/2BNZ1kqjtX1fG9xeNz0Os6HZkTkEgZ+mB8GdOKvI
-         d7WImzaPO18qhq/VE6Ssrxx/5SCUC1Bsd4iXrCH2cmUpdy0nVqNkmGlmTtH8jel6oVk8
-         5ZwsQMsUdDGRUp19P7Rk5KmzBl5tIqLVe0NFi/EPa7XacNll818FiIn1oBwcabJBt3Ep
-         WvpbiadiVbdDEr+8DrvrU7etJibTbRS7GMUh+C4MPnfREaqrXSIyEt77OCa2DaiSWM6s
-         3OyPr3fmB5d7sI56so1uhD0QgbL12huKJS5B2r7Krc3FnXbOAn5nWlfNLsTMxbga3gph
-         HL8Q==
-X-Gm-Message-State: AOAM533DajuFNh4OEgSUEQryq+jAb3d6iLEG8x0D6XWKev4UYS45U2Gf
-        1XeIcXvnHVroxN3ej7hEzohfJA==
-X-Google-Smtp-Source: ABdhPJzw3CB/8gpoMZy8L1RPu7Ynf156Hx+5E0vsaoqcpRaxfS9hWV3nxQqMxHcDoxtVsc+NwtKPOg==
-X-Received: by 2002:a17:90a:19d2:b0:1be:d815:477f with SMTP id 18-20020a17090a19d200b001bed815477fmr7325044pjj.23.1646780943683;
-        Tue, 08 Mar 2022 15:09:03 -0800 (PST)
+        bh=2kU1A0mZ+Yf718gi2yxK3phVn7nYLq00SbSALiBBt2c=;
+        b=PQ2ueJsXgwtKpamte8nSKrAeBGIg55ps2D8Ewgx3Gf2qp6DJnTQXn1NaodZWSqZop5
+         IhOly5krptgjFpt+5KkkFQyVe2r6/ihkCUfZOVwGNviIIo9YC+hjAx7pp/UjHI2ZdbUs
+         O9lJAUb8NigMR0JonuPUx1qHDOHB4ltwKwn1yft9MWUfzhwXIOW8Elq2wb+ji3WfbkCs
+         HoJALL783EkLEMnHHEyg+nHr4JTWvJOxzEfGlXaiFG8DvNCBvqebM6LXo/rCicS5OetU
+         uPBHi1lsN665PNBCT0xcd2FILsp6rJmta9gqWa3ph9K/m+hPcppRKWn36BoSlyJYys17
+         aICw==
+X-Gm-Message-State: AOAM5301MqVtU/LwdAedA6diniT70IdXyhouBXt0tyC3p9nGBGfScM8S
+        z6IPiHyXxxKuO9TYIazmuwd+DzvKOs9i4Q==
+X-Google-Smtp-Source: ABdhPJxu5BNOL66aUTFVR0ibkfjQAJZxN1/5Jln5I65fELTDrubmqTQaTFywu9mFnXzUzDH+EMVzEQ==
+X-Received: by 2002:a17:902:b602:b0:14f:e42b:d547 with SMTP id b2-20020a170902b60200b0014fe42bd547mr19779057pls.91.1646782670904;
+        Tue, 08 Mar 2022 15:37:50 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id m4-20020a17090a7f8400b001bef3fc3938sm146223pjl.49.2022.03.08.15.09.02
+        by smtp.gmail.com with ESMTPSA id e13-20020a056a001a8d00b004f0f28910cdsm185636pfv.42.2022.03.08.15.37.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Mar 2022 15:09:02 -0800 (PST)
-Date:   Tue, 8 Mar 2022 23:08:59 +0000
+        Tue, 08 Mar 2022 15:37:50 -0800 (PST)
+Date:   Tue, 8 Mar 2022 23:37:46 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Gleb Natapov <gleb@redhat.com>, Rik van Riel <riel@redhat.com>,
-        Ben Gardon <bgardon@google.com>, stable@vger.kernel.org
-Subject: Re: [PATCH RESEND 1/2] KVM: Prevent module exit until all VMs are
- freed
-Message-ID: <YifiC2Gqs98p0Tiy@google.com>
-References: <20220303183328.1499189-1-dmatlack@google.com>
- <20220303183328.1499189-2-dmatlack@google.com>
- <YifNPekMfIta+xcv@google.com>
- <CALzav=frpbRMkDtVTwii2hJ+trtF0m0p5Y_Rc5KS42rp1KEaNw@mail.gmail.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org, Kieran Bingham <kbingham@kernel.org>,
+        Jan Kiszka <jan.kiszka@siemens.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Johannes Berg <johannes.berg@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Jessica Yu <jeyu@kernel.org>,
+        Jim Mattson <jmattson@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Yang Weijiang <weijiang.yang@intel.com>,
+        linux-kernel@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Borislav Petkov <bp@suse.de>
+Subject: Re: [PATCH v3 2/6] KVM: x86: add force_intercept_exceptions_mask
+Message-ID: <YifoysEvfnQgq59A@google.com>
+References: <20210811122927.900604-1-mlevitsk@redhat.com>
+ <20210811122927.900604-3-mlevitsk@redhat.com>
+ <YTECUaPa9kySQxRX@google.com>
+ <0cdac80177eea408b7e316bd1fc4c0c5839ba1d4.camel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CALzav=frpbRMkDtVTwii2hJ+trtF0m0p5Y_Rc5KS42rp1KEaNw@mail.gmail.com>
+In-Reply-To: <0cdac80177eea408b7e316bd1fc4c0c5839ba1d4.camel@redhat.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -77,79 +93,65 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 08, 2022, David Matlack wrote:
-> On Tue, Mar 8, 2022 at 1:40 PM Sean Christopherson <seanjc@google.com> wrote:
-> >
-> > On Thu, Mar 03, 2022, David Matlack wrote:
-> > > Tie the lifetime the KVM module to the lifetime of each VM via
-> > > kvm.users_count. This way anything that grabs a reference to the VM via
-> > > kvm_get_kvm() cannot accidentally outlive the KVM module.
-> > >
-> > > Prior to this commit, the lifetime of the KVM module was tied to the
-> > > lifetime of /dev/kvm file descriptors, VM file descriptors, and vCPU
-> > > file descriptors by their respective file_operations "owner" field.
-> > > This approach is insufficient because references grabbed via
-> > > kvm_get_kvm() do not prevent closing any of the aforementioned file
-> > > descriptors.
-> > >
-> > > This fixes a long standing theoretical bug in KVM that at least affects
-> > > async page faults. kvm_setup_async_pf() grabs a reference via
-> > > kvm_get_kvm(), and drops it in an asynchronous work callback. Nothing
-> > > prevents the VM file descriptor from being closed and the KVM module
-> > > from being unloaded before this callback runs.
-> > >
-> > > Fixes: af585b921e5d ("KVM: Halt vcpu if page it tries to access is swapped out")
-> >
-> > And (or)
-> >
-> >   Fixes: 3d3aab1b973b ("KVM: set owner of cpu and vm file operations")
-> >
-> > because the above is x86-centric, at a glance PPC and maybe s390 have issues
-> > beyond async #PF.
-> >
-> > > Cc: stable@vger.kernel.org
-> > > Suggested-by: Ben Gardon <bgardon@google.com>
-> > > [ Based on a patch from Ben implemented for Google's kernel. ]
-> > > Signed-off-by: David Matlack <dmatlack@google.com>
+On Tue, Feb 08, 2022, Maxim Levitsky wrote:
+> On Thu, 2021-09-02 at 16:56 +0000, Sean Christopherson wrote:
+> > Assuming this hasn't been abandoned...
+> > 
+> > On Wed, Aug 11, 2021, Maxim Levitsky wrote:
+> > > This parameter will be used by VMX and SVM code to force
+> > > interception of a set of exceptions, given by a bitmask
+> > > for guest debug and/or kvm debug.
+> > > 
+> > > This is based on an idea first shown here:
+> > > https://patchwork.kernel.org/project/kvm/patch/20160301192822.GD22677@pd.tnic/
+> > > 
+> > > CC: Borislav Petkov <bp@suse.de>
+> > > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 > > > ---
-> > >  virt/kvm/kvm_main.c | 8 ++++++++
-> > >  1 file changed, 8 insertions(+)
-> > >
-> > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > > index 35ae6d32dae5..b59f0a29dbd5 100644
-> > > --- a/virt/kvm/kvm_main.c
-> > > +++ b/virt/kvm/kvm_main.c
-> > > @@ -117,6 +117,8 @@ EXPORT_SYMBOL_GPL(kvm_debugfs_dir);
-> > >
-> > >  static const struct file_operations stat_fops_per_vm;
-> > >
-> > > +static struct file_operations kvm_chardev_ops;
-> > > +
-> > >  static long kvm_vcpu_ioctl(struct file *file, unsigned int ioctl,
-> > >                          unsigned long arg);
-> > >  #ifdef CONFIG_KVM_COMPAT
-> > > @@ -1131,6 +1133,11 @@ static struct kvm *kvm_create_vm(unsigned long type)
-> > >       preempt_notifier_inc();
-> > >       kvm_init_pm_notifier(kvm);
-> > >
-> > > +     if (!try_module_get(kvm_chardev_ops.owner)) {
-> >
-> > The "try" aspect is unnecessary.  Stealing from Paolo's version,
-> >
-> >         /* KVM is pinned via open("/dev/kvm"), the fd passed to this ioctl(). */
-> >         __module_get(kvm_chardev_ops.owner);
+> > >  arch/x86/kvm/x86.c | 3 +++
+> > >  arch/x86/kvm/x86.h | 2 ++
+> > >  2 files changed, 5 insertions(+)
+> > > 
+> > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > > index fdc0c18339fb..092e2fad3c0d 100644
+> > > --- a/arch/x86/kvm/x86.c
+> > > +++ b/arch/x86/kvm/x86.c
+> > > @@ -184,6 +184,9 @@ module_param(force_emulation_prefix, bool, S_IRUGO);
+> > >  int __read_mostly pi_inject_timer = -1;
+> > >  module_param(pi_inject_timer, bint, S_IRUGO | S_IWUSR);
+> > >  
+> > > +uint force_intercept_exceptions_mask;
+> > > +module_param(force_intercept_exceptions_mask, uint, S_IRUGO | S_IWUSR);
+> > 
+> > Use octal permissions.  This also can't be a simple writable param, at least not
+> > without a well-documented disclaimer, as there's no guarantee a vCPU will update
+> > its exception bitmap in a timely fashion.  An alternative to a module param would
+> > be to extend/add a per-VM ioctl(), e.g. maybe KVM_SET_GUEST_DEBUG?  The downside
+> > of an ioctl() is that it would require userspace enabling :-/
+> > 
 > 
-> Right, I did see that and agree we're guaranteed the KVM module has a
-> reference at this point. But the KVM module might be in state
-> MODULE_STATE_GOING (e.g. if someone ran "rmmod --wait"), which
-> try_module_get() checks.
+> All other module params in this file use macros for permissions, that is why
+> I used them too.
+> 
+> I'll add a comment with a disclaimer here - this is only for debug.
+> I strongly don't want to have this as ioctl as that will indeed need qemu patches,
+> not to mention things like unit tests and which don't even always use qemu.
+> 
+> Or I can make this parameter read-only. I don't mind reloading kvm module when
+> I change this parameter.
 
-Ah, can you throw that in as a comment?  Doesn't have to be much, just enough of
-a breadcrumb to connect the dots and to prevent us from "optimizing" this to
-__module_get() in the future.
+Oh!  We can force an update, a la nx_huge_pages, where the setter loops through
+all VMs and does a kvm_make_all_cpus_request() to instruct vCPUs to update their
+bitmaps.  Requires a new request, but that doesn't seem like a huge deal, and it
+might help pave the way for adding more debug hooks for developers.
 
-	/* Use the "try" variant to play nice with e.g. "rmmod --wait". */
+The param should also be "unsafe".
 
-With a comment,
+E.g. something like
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+static const struct kernel_param_ops force_ex_intercepts_ops = {
+	.set = set_force_exception_intercepts,
+	.get = get_force_exception_intercepts,
+};
+module_param_cb_unsafe(force_exception_intercepts, &force_ex_intercepts_ops,
+		       &force_exception_intercepts, 0644);
