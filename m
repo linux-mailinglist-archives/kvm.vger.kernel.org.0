@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 98C474D1559
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 11:59:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 237FF4D155B
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 11:59:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346084AbiCHLA3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 06:00:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53074 "EHLO
+        id S1346092AbiCHLAb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Mar 2022 06:00:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53166 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346069AbiCHLA0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Mar 2022 06:00:26 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 17F5841F8A
-        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 02:59:30 -0800 (PST)
+        with ESMTP id S1346069AbiCHLA3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 06:00:29 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0CF5742A25
+        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 02:59:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646737169;
+        s=mimecast20190719; t=1646737172;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=aqPCGU3/YxaZYETOn7Lp2yXhW5De7uTDNtK+spwoHhQ=;
-        b=B8zRqxlj6tUvCIQEM0VATH5HXq17MrfwGV3ViUWOV4vl031ZRMEgGx5T9J+onLDN06Qxqb
-        tHujEFEjhRHlDq5Gi44oTZjKbFxoJrD/wPVdnwDqMfcuVGKi5XaoETPb7eW3XD9uVssC6H
-        iZwqU8SssokTdQuOtS9lzwlk7nsOnQw=
+        bh=u7L8HPCDt5lQJUN1tDnCrctmaA+f57JR/0xy1mw5PmA=;
+        b=MCG4wTzBpDPPJ/wiyMQr2AzbSBh7VY+c3rv5ZLi4PUlLoTgipGEbRH0pdw31AMEEdyFoCP
+        6laJeFHg8gDOgNizQtSXNy3C2gQw+MuElYG5GgMgeqPS8FxzF57T3e1eD54QL/pee4LEjY
+        0v6AuiwQVmWln6l4F0uvsXv0rl444lA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-391-rc6sWkT3NxS1VHxqq63bzA-1; Tue, 08 Mar 2022 05:59:25 -0500
-X-MC-Unique: rc6sWkT3NxS1VHxqq63bzA-1
+ us-mta-496-chAL4ODlPyqgTlVgKLSBag-1; Tue, 08 Mar 2022 05:59:26 -0500
+X-MC-Unique: chAL4ODlPyqgTlVgKLSBag-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6412C800050;
-        Tue,  8 Mar 2022 10:59:23 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7067C1091DA1;
+        Tue,  8 Mar 2022 10:59:24 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 82C976FB03;
-        Tue,  8 Mar 2022 10:59:22 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7F35F6FB03;
+        Tue,  8 Mar 2022 10:59:23 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Michael Ellerman <mpe@ellerman.id.au>,
@@ -46,10 +46,10 @@ Cc:     Michael Ellerman <mpe@ellerman.id.au>,
         Johannes Weiner <hannes@cmpxchg.org>,
         Michal Hocko <mhocko@kernel.org>,
         Vladimir Davydov <vdavydov.dev@gmail.com>, linux-mm@kvack.org,
-        cgroups@vger.kernel.org
-Subject: [PATCH 2/3] mm: use vmalloc_array and vcalloc for array allocations
-Date:   Tue,  8 Mar 2022 05:59:17 -0500
-Message-Id: <20220308105918.615575-3-pbonzini@redhat.com>
+        cgroups@vger.kernel.org, stable@vger.kernel.org
+Subject: [PATCH 3/3] KVM: use vcalloc/__vcalloc for very large allocations
+Date:   Tue,  8 Mar 2022 05:59:18 -0500
+Message-Id: <20220308105918.615575-4-pbonzini@redhat.com>
 In-Reply-To: <20220308105918.615575-1-pbonzini@redhat.com>
 References: <20220308105918.615575-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -66,51 +66,97 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Instead of using array_size or just a multiply, use a function that
-takes care of both the multiplication and the overflow checks.
+Allocations whose size is related to the memslot size can be arbitrarily
+large.  Do not use kvzalloc/kvcalloc, as those are limited to "not crazy"
+sizes that fit in 32 bits.  Now that it is available, they can use either
+vcalloc or __vcalloc, the latter if accounting is required.
 
-Cc: linux-mm@kvack.org
+Cc: stable@vger.kernel.org
+Cc: kvm@vger.kernel.org
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- mm/percpu-stats.c | 2 +-
- mm/swap_cgroup.c  | 4 +---
- 2 files changed, 2 insertions(+), 4 deletions(-)
+ arch/powerpc/kvm/book3s_hv_uvmem.c | 2 +-
+ arch/x86/kvm/mmu/page_track.c      | 7 ++++---
+ arch/x86/kvm/x86.c                 | 4 ++--
+ virt/kvm/kvm_main.c                | 4 ++--
+ 4 files changed, 9 insertions(+), 8 deletions(-)
 
-diff --git a/mm/percpu-stats.c b/mm/percpu-stats.c
-index c6bd092ff7a3..e71651cda2de 100644
---- a/mm/percpu-stats.c
-+++ b/mm/percpu-stats.c
-@@ -144,7 +144,7 @@ static int percpu_stats_show(struct seq_file *m, void *v)
- 	spin_unlock_irq(&pcpu_lock);
+diff --git a/arch/powerpc/kvm/book3s_hv_uvmem.c b/arch/powerpc/kvm/book3s_hv_uvmem.c
+index e414ca44839f..be441403925b 100644
+--- a/arch/powerpc/kvm/book3s_hv_uvmem.c
++++ b/arch/powerpc/kvm/book3s_hv_uvmem.c
+@@ -251,7 +251,7 @@ int kvmppc_uvmem_slot_init(struct kvm *kvm, const struct kvm_memory_slot *slot)
+ 	p = kzalloc(sizeof(*p), GFP_KERNEL);
+ 	if (!p)
+ 		return -ENOMEM;
+-	p->pfns = vzalloc(array_size(slot->npages, sizeof(*p->pfns)));
++	p->pfns = vcalloc(slot->npages, sizeof(*p->pfns));
+ 	if (!p->pfns) {
+ 		kfree(p);
+ 		return -ENOMEM;
+diff --git a/arch/x86/kvm/mmu/page_track.c b/arch/x86/kvm/mmu/page_track.c
+index 68eb1fb548b6..2e09d1b6249f 100644
+--- a/arch/x86/kvm/mmu/page_track.c
++++ b/arch/x86/kvm/mmu/page_track.c
+@@ -47,8 +47,8 @@ int kvm_page_track_create_memslot(struct kvm *kvm,
+ 			continue;
  
- 	/* there can be at most this many free and allocated fragments */
--	buffer = vmalloc(array_size(sizeof(int), (2 * max_nr_alloc + 1)));
-+	buffer = vmalloc_array(2 * max_nr_alloc + 1, sizeof(int));
- 	if (!buffer)
+ 		slot->arch.gfn_track[i] =
+-			kvcalloc(npages, sizeof(*slot->arch.gfn_track[i]),
+-				 GFP_KERNEL_ACCOUNT);
++			__vcalloc(npages, sizeof(*slot->arch.gfn_track[i]),
++				  GFP_KERNEL_ACCOUNT);
+ 		if (!slot->arch.gfn_track[i])
+ 			goto track_free;
+ 	}
+@@ -75,7 +75,8 @@ int kvm_page_track_write_tracking_alloc(struct kvm_memory_slot *slot)
+ 	if (slot->arch.gfn_track[KVM_PAGE_TRACK_WRITE])
+ 		return 0;
+ 
+-	gfn_track = kvcalloc(slot->npages, sizeof(*gfn_track), GFP_KERNEL_ACCOUNT);
++	gfn_track = __vcalloc(slot->npages, sizeof(*gfn_track),
++			      GFP_KERNEL_ACCOUNT);
+ 	if (gfn_track == NULL)
  		return -ENOMEM;
  
-diff --git a/mm/swap_cgroup.c b/mm/swap_cgroup.c
-index 7f34343c075a..5a9442979a18 100644
---- a/mm/swap_cgroup.c
-+++ b/mm/swap_cgroup.c
-@@ -167,14 +167,12 @@ unsigned short lookup_swap_cgroup_id(swp_entry_t ent)
- int swap_cgroup_swapon(int type, unsigned long max_pages)
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index f79bf4552082..4fa4d8269e5b 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -11838,7 +11838,7 @@ int memslot_rmap_alloc(struct kvm_memory_slot *slot, unsigned long npages)
+ 		if (slot->arch.rmap[i])
+ 			continue;
+ 
+-		slot->arch.rmap[i] = kvcalloc(lpages, sz, GFP_KERNEL_ACCOUNT);
++		slot->arch.rmap[i] = __vcalloc(lpages, sz, GFP_KERNEL_ACCOUNT);
+ 		if (!slot->arch.rmap[i]) {
+ 			memslot_rmap_free(slot);
+ 			return -ENOMEM;
+@@ -11875,7 +11875,7 @@ static int kvm_alloc_memslot_metadata(struct kvm *kvm,
+ 
+ 		lpages = __kvm_mmu_slot_lpages(slot, npages, level);
+ 
+-		linfo = kvcalloc(lpages, sizeof(*linfo), GFP_KERNEL_ACCOUNT);
++		linfo = __vcalloc(lpages, sizeof(*linfo), GFP_KERNEL_ACCOUNT);
+ 		if (!linfo)
+ 			goto out_free;
+ 
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index c941b97fa133..a5726099df67 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1274,9 +1274,9 @@ static int kvm_vm_release(struct inode *inode, struct file *filp)
+  */
+ static int kvm_alloc_dirty_bitmap(struct kvm_memory_slot *memslot)
  {
- 	void *array;
--	unsigned long array_size;
- 	unsigned long length;
- 	struct swap_cgroup_ctrl *ctrl;
+-	unsigned long dirty_bytes = 2 * kvm_dirty_bitmap_bytes(memslot);
++	unsigned long dirty_bytes = kvm_dirty_bitmap_bytes(memslot);
  
- 	length = DIV_ROUND_UP(max_pages, SC_PER_PAGE);
--	array_size = length * sizeof(void *);
- 
--	array = vzalloc(array_size);
-+	array = vcalloc(length, sizeof(void *));
- 	if (!array)
- 		goto nomem;
+-	memslot->dirty_bitmap = kvzalloc(dirty_bytes, GFP_KERNEL_ACCOUNT);
++	memslot->dirty_bitmap = __vcalloc(2, dirty_bytes, GFP_KERNEL_ACCOUNT);
+ 	if (!memslot->dirty_bitmap)
+ 		return -ENOMEM;
  
 -- 
 2.31.1
-
-
 
