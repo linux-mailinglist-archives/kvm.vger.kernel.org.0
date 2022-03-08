@@ -2,116 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 149904D0D1F
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 01:57:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4014F4D0D3F
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 02:07:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241660AbiCHA6h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Mar 2022 19:58:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53926 "EHLO
+        id S244352AbiCHBIR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Mar 2022 20:08:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38328 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243861AbiCHA6f (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Mar 2022 19:58:35 -0500
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A58DDDFFE
-        for <kvm@vger.kernel.org>; Mon,  7 Mar 2022 16:57:39 -0800 (PST)
-Received: by mail-pl1-x631.google.com with SMTP id p17so15592814plo.9
-        for <kvm@vger.kernel.org>; Mon, 07 Mar 2022 16:57:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=8qS3TzKPL75XICp05kREKW8KRScobRKaXAD+ax7RQFw=;
-        b=Ci/h8oBVMef9Rx4X5O9DK0VRqasexjFfYKmlBn2wDIhDissu+Dop63KOi3NfqUKfQX
-         du1i9OvH1JvHgaaS9IVCZORrhhHj7fBJcgFqBjGHFsPGUSZWjOOyayZNcUo0SFkUUAt5
-         E3viOkKwFMQ8TBBPc+FN13hEPwymbCMK7Aak9YO3exc40nyf8t/MRdaA27p76vmrycI3
-         /nNrKx0nr9pKNjqto7jAINHtJplgf9oiDpWmHbPsd2d3f97E/weptoNzxrDy86h6bZoj
-         pyw49YZvogIzm7nM0Lgqjk1vH3XQywnJzS4ggOz2FXd3PmEqAomS+OVlbmH41U3+8bJO
-         ZBcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=8qS3TzKPL75XICp05kREKW8KRScobRKaXAD+ax7RQFw=;
-        b=mPW1hADNZflXCUgQeNH7+EyuchLEdu5n2mjfG1Pvs1hW63ivuzTW4j9tLQ1WNoh/xu
-         U2TVQ+EzG0DCd9+grIJE2pRGyr6lYZpxM5reHgIoMCEUyGKa0xDPwhbg+qAWVJo/RiFg
-         ST3WfjGeKKNThsG3iAffgLqlLQYtAywneE9lVrhEbtxAp+1zggbT14ALZp6JIY79VGvx
-         z1qAWJQIVzrlRWFyg2BLhxr+no7yNulayIqbX2+OSxMTTZkA7KlkL+QyY4+NKGr0uwF4
-         e7+NYM+rzhofogjD+6cER+HAqh4z4dYzl6x7mmfIbOrQ+kA4mEysa5Y4r+vIZeMZhb+w
-         t7jQ==
-X-Gm-Message-State: AOAM5307j4WhYNjXPwWCHv/Xcr/hRa4nk1qWDRit/lFhJ+wscZw1hdaP
-        cmKYO02AlOS9sGNLzW+j/MuJAw==
-X-Google-Smtp-Source: ABdhPJxVCkz0h6/CxZGnaJgaTvJx3cqk5I4li1eW25r1ih1AAGZaSvy1GALcrVbMoFLzsUB0zsiSiw==
-X-Received: by 2002:a17:903:247:b0:151:b174:fba9 with SMTP id j7-20020a170903024700b00151b174fba9mr14870422plh.79.1646701059040;
-        Mon, 07 Mar 2022 16:57:39 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id c11-20020a056a000acb00b004f35ee129bbsm18175192pfl.140.2022.03.07.16.57.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Mar 2022 16:57:38 -0800 (PST)
-Date:   Tue, 8 Mar 2022 00:57:35 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Li RongQing <lirongqing@baidu.com>, pbonzini@redhat.com,
-        jmattson@google.com, x86@kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH][resend] KVM: x86: check steal time address when enable
- steal time
-Message-ID: <Yiap/zUi2TgGcurq@google.com>
-References: <1646641011-55068-1-git-send-email-lirongqing@baidu.com>
- <87sfru9ldk.fsf@redhat.com>
+        with ESMTP id S231221AbiCHBIP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Mar 2022 20:08:15 -0500
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E52E331202;
+        Mon,  7 Mar 2022 17:07:18 -0800 (PST)
+Received: from kwepemi100018.china.huawei.com (unknown [172.30.72.53])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4KCHFb25nSzdfwr;
+        Tue,  8 Mar 2022 09:05:55 +0800 (CST)
+Received: from kwepemm600005.china.huawei.com (7.193.23.191) by
+ kwepemi100018.china.huawei.com (7.221.188.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Tue, 8 Mar 2022 09:07:16 +0800
+Received: from [10.67.102.118] (10.67.102.118) by
+ kwepemm600005.china.huawei.com (7.193.23.191) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Tue, 8 Mar 2022 09:07:16 +0800
+Subject: Re: [PATCH v8 1/9] crypto: hisilicon/qm: Move the QM header to
+ include/linux
+To:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>
+CC:     <linux-pci@vger.kernel.org>, <alex.williamson@redhat.com>,
+        <jgg@nvidia.com>, <cohuck@redhat.com>, <mgurtovoy@nvidia.com>,
+        <yishaih@nvidia.com>, <linuxarm@huawei.com>,
+        <prime.zeng@hisilicon.com>, <jonathan.cameron@huawei.com>,
+        <wangzhou1@hisilicon.com>
+References: <20220303230131.2103-1-shameerali.kolothum.thodi@huawei.com>
+ <20220303230131.2103-2-shameerali.kolothum.thodi@huawei.com>
+From:   liulongfang <liulongfang@huawei.com>
+Message-ID: <42d94745-c664-bd7c-7bc5-d20359669765@huawei.com>
+Date:   Tue, 8 Mar 2022 09:07:15 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87sfru9ldk.fsf@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20220303230131.2103-2-shameerali.kolothum.thodi@huawei.com>
+Content-Type: text/plain; charset="gbk"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.102.118]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemm600005.china.huawei.com (7.193.23.191)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 07, 2022, Vitaly Kuznetsov wrote:
-> Li RongQing <lirongqing@baidu.com> writes:
+On 2022/3/4 7:01, Shameer Kolothum Wrote:
+> Since we are going to introduce VFIO PCI HiSilicon ACC driver for live
+> migration in subsequent patches, move the ACC QM header file to a
+> common include dir.
 > 
-> > check steal time address when enable steal time, do not update
-> > arch.st.msr_val if the address is invalid,  and return in #GP
-> >
-> > this can avoid unnecessary write/read invalid memory when guest
-> > is running
-
-Are you concerned about the host cycles, or about the guest triggering emulated
-MMIO?
-
-> > Signed-off-by: Li RongQing <lirongqing@baidu.com>
-> > ---
-> >  arch/x86/kvm/x86.c | 3 +++
-> >  1 file changed, 3 insertions(+)
-> >
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index eb402966..3ed0949 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -3616,6 +3616,9 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-> >  		if (data & KVM_STEAL_RESERVED_MASK)
-> >  			return 1;
-> >  
-> > +		if (!kvm_vcpu_gfn_to_memslot(vcpu, data >> PAGE_SHIFT))
-> > +			return 1;
-> > +
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> ---
+>  drivers/crypto/hisilicon/hpre/hpre.h                         | 2 +-
+>  drivers/crypto/hisilicon/qm.c                                | 2 +-
+>  drivers/crypto/hisilicon/sec2/sec.h                          | 2 +-
+>  drivers/crypto/hisilicon/sgl.c                               | 2 +-
+>  drivers/crypto/hisilicon/zip/zip.h                           | 2 +-
+>  drivers/crypto/hisilicon/qm.h => include/linux/hisi_acc_qm.h | 0
+>  6 files changed, 5 insertions(+), 5 deletions(-)
+>  rename drivers/crypto/hisilicon/qm.h => include/linux/hisi_acc_qm.h (100%)
 > 
-> What about we use stronger kvm_is_visible_gfn() instead? I didn't put
-> much thought to what's going to happen if we put e.g. APIC access page
-> addr to the MSR, let's just cut any possibility.
+> diff --git a/drivers/crypto/hisilicon/hpre/hpre.h b/drivers/crypto/hisilicon/hpre/hpre.h
+> index e0b4a1982ee9..9a0558ed82f9 100644
+> --- a/drivers/crypto/hisilicon/hpre/hpre.h
+> +++ b/drivers/crypto/hisilicon/hpre/hpre.h
+> @@ -4,7 +4,7 @@
+>  #define __HISI_HPRE_H
+>  
+>  #include <linux/list.h>
+> -#include "../qm.h"
+> +#include <linux/hisi_acc_qm.h>
+>  
+>  #define HPRE_SQE_SIZE			sizeof(struct hpre_sqe)
+>  #define HPRE_PF_DEF_Q_NUM		64
+> diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+> index c5b84a5ea350..ed23e1d3fa27 100644
+> --- a/drivers/crypto/hisilicon/qm.c
+> +++ b/drivers/crypto/hisilicon/qm.c
+> @@ -15,7 +15,7 @@
+>  #include <linux/uacce.h>
+>  #include <linux/uaccess.h>
+>  #include <uapi/misc/uacce/hisi_qm.h>
+> -#include "qm.h"
+> +#include <linux/hisi_acc_qm.h>
+>  
+>  /* eq/aeq irq enable */
+>  #define QM_VF_AEQ_INT_SOURCE		0x0
+> diff --git a/drivers/crypto/hisilicon/sec2/sec.h b/drivers/crypto/hisilicon/sec2/sec.h
+> index d97cf02b1df7..c2e9b01187a7 100644
+> --- a/drivers/crypto/hisilicon/sec2/sec.h
+> +++ b/drivers/crypto/hisilicon/sec2/sec.h
+> @@ -4,7 +4,7 @@
+>  #ifndef __HISI_SEC_V2_H
+>  #define __HISI_SEC_V2_H
+>  
+> -#include "../qm.h"
+> +#include <linux/hisi_acc_qm.h>
+>  #include "sec_crypto.h"
+>  
+>  /* Algorithm resource per hardware SEC queue */
+> diff --git a/drivers/crypto/hisilicon/sgl.c b/drivers/crypto/hisilicon/sgl.c
+> index 057273769f26..f7efc02b065f 100644
+> --- a/drivers/crypto/hisilicon/sgl.c
+> +++ b/drivers/crypto/hisilicon/sgl.c
+> @@ -1,9 +1,9 @@
+>  // SPDX-License-Identifier: GPL-2.0
+>  /* Copyright (c) 2019 HiSilicon Limited. */
+>  #include <linux/dma-mapping.h>
+> +#include <linux/hisi_acc_qm.h>
+>  #include <linux/module.h>
+>  #include <linux/slab.h>
+> -#include "qm.h"
+>  
+>  #define HISI_ACC_SGL_SGE_NR_MIN		1
+>  #define HISI_ACC_SGL_NR_MAX		256
+> diff --git a/drivers/crypto/hisilicon/zip/zip.h b/drivers/crypto/hisilicon/zip/zip.h
+> index 517fdbdff3ea..3dfd3bac5a33 100644
+> --- a/drivers/crypto/hisilicon/zip/zip.h
+> +++ b/drivers/crypto/hisilicon/zip/zip.h
+> @@ -7,7 +7,7 @@
+>  #define pr_fmt(fmt)	"hisi_zip: " fmt
+>  
+>  #include <linux/list.h>
+> -#include "../qm.h"
+> +#include <linux/hisi_acc_qm.h>
+>  
+>  enum hisi_zip_error_type {
+>  	/* negative compression */
+> diff --git a/drivers/crypto/hisilicon/qm.h b/include/linux/hisi_acc_qm.h
+> similarity index 100%
+> rename from drivers/crypto/hisilicon/qm.h
+> rename to include/linux/hisi_acc_qm.h
+> 
+Acked-by: Longfang Liu <liulongfang@huawei.com>
 
-Hmm, I don't love handling this at WRMSR, e.g. the memslot might be moved/deleted,
-and it's not necessarily a guest problem, userspace could be at fault.  The other
-issue is that there's no guarantee the guest will actually handle the #GP correctly,
-e.g. Linux guests will simply continue on (with a WARN).
-
-That said, I can't think of a better idea.  Documentation/virt/kvm/msr.rst does say:
-
-  64-byte alignment physical address of a memory area which must be in guest RAM
-
-But doesn't enforce that :-/  So it's at least reasonable behavior.
+Thanks,
+Longfang
