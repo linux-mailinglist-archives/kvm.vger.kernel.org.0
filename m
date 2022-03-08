@@ -2,75 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 68BAE4D1630
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 12:25:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CCB514D1683
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 12:44:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346179AbiCHL0x (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 06:26:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46096 "EHLO
+        id S238703AbiCHLpk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Mar 2022 06:45:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233551AbiCHL0w (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Mar 2022 06:26:52 -0500
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E7DC3ED25;
-        Tue,  8 Mar 2022 03:25:56 -0800 (PST)
-Received: by mail-pj1-x102f.google.com with SMTP id gj15-20020a17090b108f00b001bef86c67c1so2112813pjb.3;
-        Tue, 08 Mar 2022 03:25:56 -0800 (PST)
+        with ESMTP id S1346566AbiCHLpe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 06:45:34 -0500
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F58631530;
+        Tue,  8 Mar 2022 03:44:10 -0800 (PST)
+Received: by mail-pl1-x62c.google.com with SMTP id s18so3599875plp.1;
+        Tue, 08 Mar 2022 03:44:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=message-id:date:mime-version:user-agent:subject:content-language:to
          :cc:references:from:organization:in-reply-to
          :content-transfer-encoding;
-        bh=cy+w1mMChm1Hkz8fLvEHCL0lUwa62I5Ra7YiL5cjBo4=;
-        b=lupN6ZbikkKdfRx2fUqnib3W0nHEbroqbhop9IGGa/421sZayuz4ycHxpDyz/Tfe3O
-         iT6OpFuuZBSDLE3b311G3ebsGN0ecRpMrItFovoJEBV1wuINfe6813gFqHJMvX30A4DB
-         ZbUjY9+YkqsTi/amivj09M+MGDenTuX+KV1irgCp20UN2ir0X3np1B6tU7fLaQcFrQAo
-         MXhcwdtL0AHv6qPMiD5KedZs/9zrabHQzy8hZOsY3zqU/sQyXyOeJcgrSYnzcJ4oe+tI
-         6kay5kODBp5Mo399uTbfduC75PM3dpqIjebJXddEsTqe1zfK13MHQ6byPcyxrxho2EO1
-         UWFw==
+        bh=PsnYcALElaSEddN27dmZjvzCTwgE3HzvzMiPEnPOVxQ=;
+        b=pxp8Dnr+tk9VVvKvNLUMMPe7nsUzbmSkBCNII6KWn8c4Khlgp4PXG8ZWv7CloZSH0A
+         oRl7jTTy+AckkIrKQCZoLREwheo1x3LlTxBVHnOnQdRPqsmWKqn9uVG0S/GwRlES1GC4
+         eXchnmfTS3UOjo3SDbA+rvzZAj84HBM2H97PnAG3CYQbwqCEu+fnV0rLFGMBigUJbrlM
+         Sw8k06F9yPinnDumtvE/dvKyTH4L7sqjn7uAO8q6mA368GcGApvg4Kpm7Xud0/hp+4bE
+         GkuJD4xWpet+cP4Gwt2X7SwHObkNJocogjLCV69nvez/s2N7DwjgRe1m6g8nAKHHDnxU
+         lxkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:organization:in-reply-to
          :content-transfer-encoding;
-        bh=cy+w1mMChm1Hkz8fLvEHCL0lUwa62I5Ra7YiL5cjBo4=;
-        b=EO9PxMJZThz+C5nLGNSKR4uToDFk36qhsHDtvpDj/Lde9/t/lRwpjySGO7wE5kdEHg
-         7fCll24PdSgjbpNsg7G8IXNb9AydqqOfWui9M9lt7ixS70R8aCiRGSr1zRp+Fq1TGv7R
-         6/U1EPYGgQohk1r8Z8km/S8LQkS6X3yuesdMeUfWjWtw/8Ps2pIgyY2/foeSiyTrCh9k
-         wa6nl+crttlDxILDFSR5Z5HOjnkibE6NF+9BQ3TSgnWvZlx+ym3HQtd1EGntyuQF15iT
-         tMlpS+hVswUEAJivGNl6D2td3JI1erao0bdj6oLmIaGfyxYZbJQ0S+4JIklKarfEyV4b
-         JJDA==
-X-Gm-Message-State: AOAM532wjkZFFPsSuiEwbuX/TNjKJRjh/04VKS8lAaUv8+OQGR5TJaY5
-        fi5Iv9SwC+1Zp1FXl+ztOIs=
-X-Google-Smtp-Source: ABdhPJz/hEQJZHRqB9iTQYW3NTPCyYXuHq2nb7uVTnJ5J+/3sx+SZuVPNlbvM+g96Dwe2138wzSWYA==
-X-Received: by 2002:a17:90b:4a44:b0:1bf:8deb:9435 with SMTP id lb4-20020a17090b4a4400b001bf8deb9435mr2038120pjb.16.1646738755774;
-        Tue, 08 Mar 2022 03:25:55 -0800 (PST)
+        bh=PsnYcALElaSEddN27dmZjvzCTwgE3HzvzMiPEnPOVxQ=;
+        b=BtU9DlpNRR8LTUt1/8OyIPYgPy3iVV3m9zyD02/Ak5qkmNbQZHDqWMyD9AX3/lAaSh
+         By28JnQ3Sb69uWHDpewju6V7mRUZRM26ZjxzLh66fK3sPcRcTRejgYe7Gz3Tn2iratMl
+         BNh/2i6ygUN9El23P4mjpgWcMLX9rCUVEyKg+ZAzwrtzI1LQgT8Gmf3ukK4boFK2mH1j
+         HBgikEH47185xYtyCU14FQ1G0tvWT+FldQ6gs6nJ5x2f6B+dbmWEcSNAmuLx/MgREpbD
+         gFg835UyKb4s7+dEspzKw6xCCSfBAOBd48pgzpj71BMLcG66YGGI9/WBGSsqyt2MlFSE
+         ZnIg==
+X-Gm-Message-State: AOAM533fU6/IL5byyEDdYuMw1N8yrkb3U0XNoDnxxYPlwB8lfPZa/RNn
+        CTqLy8sHiF4NPV5qQdUy3tc=
+X-Google-Smtp-Source: ABdhPJxgH59IV4zmpFOMKJiy+MMw9boPwn6G1VOc/ZQQrQBAgve626tO8CH4zg/XPE0FI+vKPv5HPA==
+X-Received: by 2002:a17:902:bcc6:b0:151:f36d:2658 with SMTP id o6-20020a170902bcc600b00151f36d2658mr7171515pls.125.1646739849646;
+        Tue, 08 Mar 2022 03:44:09 -0800 (PST)
 Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id z35-20020a631923000000b00373520fddd5sm15257262pgl.83.2022.03.08.03.25.53
+        by smtp.gmail.com with ESMTPSA id k7-20020a63ff07000000b00372dc67e854sm14904406pgi.14.2022.03.08.03.44.06
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Mar 2022 03:25:55 -0800 (PST)
-Message-ID: <158bcefb-4087-c2a3-cfcf-e33ab53af649@gmail.com>
-Date:   Tue, 8 Mar 2022 19:25:47 +0800
+        Tue, 08 Mar 2022 03:44:08 -0800 (PST)
+Message-ID: <888d5878-a2be-4624-d2c5-227fa19c8150@gmail.com>
+Date:   Tue, 8 Mar 2022 19:43:59 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
  Gecko/20100101 Thunderbird/91.6.2
-Subject: Re: [PATCH v2 12/12] KVM: x86/pmu: Clear reserved bit PERF_CTL2[43]
- for AMD erratum 1292
+Subject: Re: [PATCH v2 07/12] KVM: x86/pmu: Use PERF_TYPE_RAW to merge
+ reprogram_{gp, fixed}counter()
 Content-Language: en-US
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>,
+To:     Jim Mattson <jmattson@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org
+        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
+        Like Xu <likexu@tencent.com>,
+        Peter Zijlstra <peterz@infradead.org>
 References: <20220302111334.12689-1-likexu@tencent.com>
- <20220302111334.12689-13-likexu@tencent.com>
- <CALMp9eT1N_HeipXjpyqrXs_WmBEip2vchy4d1GffpwrEd+444w@mail.gmail.com>
- <273a7631-188b-a7a9-a551-4e577dcdd8d1@gmail.com>
- <CALMp9eRM9kTxmyHr2k1r=VSjFyDy=Dyvek5gdgZ8bHHrmPL5gQ@mail.gmail.com>
+ <20220302111334.12689-8-likexu@tencent.com>
+ <CALMp9eQtzS6HEHZ4__K9VuG+-Duwt5uUFb_FcW4DaBKPDmcYkA@mail.gmail.com>
 From:   Like Xu <like.xu.linux@gmail.com>
 Organization: Tencent
-In-Reply-To: <CALMp9eRM9kTxmyHr2k1r=VSjFyDy=Dyvek5gdgZ8bHHrmPL5gQ@mail.gmail.com>
+In-Reply-To: <CALMp9eQtzS6HEHZ4__K9VuG+-Duwt5uUFb_FcW4DaBKPDmcYkA@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -83,28 +83,236 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/3/2022 3:06 am, Jim Mattson wrote:
-> We should continue to synthesize a #GP for an attempt to set "must be
-> zero" bits or for rule violations, like "address must be canonical."
+On 8/3/2022 8:36 am, Jim Mattson wrote:
+> On Wed, Mar 2, 2022 at 3:14 AM Like Xu <like.xu.linux@gmail.com> wrote:
+>>
+>> From: Like Xu <likexu@tencent.com>
+>>
+>> The code sketch for reprogram_{gp, fixed}_counter() is similar, while the
+>> fixed counter using the PERF_TYPE_HARDWAR type and the gp being
+>> able to use either PERF_TYPE_HARDWAR or PERF_TYPE_RAW type
+>> depending on the pmc->eventsel value.
+>>
+>> After 'commit 761875634a5e ("KVM: x86/pmu: Setup pmc->eventsel
+>> for fixed PMCs")', the pmc->eventsel of the fixed counter will also have
+>> been setup with the same semantic value and will not be changed during
+>> the guest runtime. But essentially, "the HARDWARE is just a convenience
+>> wrapper over RAW IIRC", quoated from Peterz. So it could be pretty safe
+>> to use the PERF_TYPE_RAW type only to program both gp and fixed
+>> counters naturally in the reprogram_counter().
+>>
+>> To make the gp and fixed counters more semantically symmetrical,
+>> the selection of EVENTSEL_{USER, OS, INT} bits is temporarily translated
+>> via fixed_ctr_ctrl before the pmc_reprogram_counter() call.
+>>
+>> Cc: Peter Zijlstra <peterz@infradead.org>
+>> Suggested-by: Jim Mattson <jmattson@google.com>
+>> Signed-off-by: Like Xu <likexu@tencent.com>
+>> ---
+>>   arch/x86/kvm/pmu.c           | 128 +++++++++++++----------------------
+>>   arch/x86/kvm/vmx/pmu_intel.c |   2 +-
+>>   2 files changed, 47 insertions(+), 83 deletions(-)
+>>
+>> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+>> index 5299488b002c..00e1660c10ca 100644
+>> --- a/arch/x86/kvm/pmu.c
+>> +++ b/arch/x86/kvm/pmu.c
+>> @@ -215,85 +215,60 @@ static bool check_pmu_event_filter(struct kvm_pmc *pmc)
+>>          return allow_event;
+>>   }
+>>
+>> -static void reprogram_gp_counter(struct kvm_pmc *pmc)
+>> -{
+>> -       u64 config;
+>> -       u32 type = PERF_TYPE_RAW;
+>> -       u64 eventsel = pmc->eventsel;
+>> -
+>> -       if (eventsel & ARCH_PERFMON_EVENTSEL_PIN_CONTROL)
+>> -               printk_once("kvm pmu: pin control bit is ignored\n");
+>> -
+>> -       pmc_pause_counter(pmc);
+>> -
+>> -       if (!(eventsel & ARCH_PERFMON_EVENTSEL_ENABLE) || !pmc_is_enabled(pmc))
+>> -               return;
+>> -
+>> -       if (!check_pmu_event_filter(pmc))
+>> -               return;
+>> -
+>> -       if (!(eventsel & (ARCH_PERFMON_EVENTSEL_EDGE |
+>> -                         ARCH_PERFMON_EVENTSEL_INV |
+>> -                         ARCH_PERFMON_EVENTSEL_CMASK |
+>> -                         HSW_IN_TX |
+>> -                         HSW_IN_TX_CHECKPOINTED))) {
+>> -               config = kvm_x86_ops.pmu_ops->pmc_perf_hw_id(pmc);
+>> -               if (config != PERF_COUNT_HW_MAX)
+>> -                       type = PERF_TYPE_HARDWARE;
+>> -       }
+>> -
+>> -       if (type == PERF_TYPE_RAW)
+>> -               config = eventsel & AMD64_RAW_EVENT_MASK;
+>> -
+>> -       if (pmc->current_config == eventsel && pmc_resume_counter(pmc))
+>> -               return;
+>> -
+>> -       pmc_release_perf_event(pmc);
+>> -
+>> -       pmc->current_config = eventsel;
+>> -       pmc_reprogram_counter(pmc, type, config,
+>> -                             !(eventsel & ARCH_PERFMON_EVENTSEL_USR),
+>> -                             !(eventsel & ARCH_PERFMON_EVENTSEL_OS),
+>> -                             eventsel & ARCH_PERFMON_EVENTSEL_INT,
+>> -                             (eventsel & HSW_IN_TX),
+>> -                             (eventsel & HSW_IN_TX_CHECKPOINTED));
+>> -}
+>> -
+>> -static void reprogram_fixed_counter(struct kvm_pmc *pmc)
+>> +static inline bool pmc_speculative_in_use(struct kvm_pmc *pmc)
+>>   {
+>>          struct kvm_pmu *pmu = pmc_to_pmu(pmc);
+>> -       int idx = pmc->idx - INTEL_PMC_IDX_FIXED;
+>> -       u8 ctrl = fixed_ctrl_field(pmu->fixed_ctr_ctrl, idx);
+>> -       unsigned en_field = ctrl & 0x3;
+>> -       bool pmi = ctrl & 0x8;
+>>
+>> -       pmc_pause_counter(pmc);
+>> +       if (pmc_is_fixed(pmc))
+>> +               return fixed_ctrl_field(pmu->fixed_ctr_ctrl,
+>> +                       pmc->idx - INTEL_PMC_IDX_FIXED) & 0x3;
+>>
+>> -       if (!en_field || !pmc_is_enabled(pmc))
+>> -               return;
+>> -
+>> -       if (!check_pmu_event_filter(pmc))
+>> -               return;
+>> -
+>> -       if (pmc->current_config == (u64)ctrl && pmc_resume_counter(pmc))
+>> -               return;
+>> -
+>> -       pmc_release_perf_event(pmc);
+>> -
+>> -       pmc->current_config = (u64)ctrl;
+>> -       pmc_reprogram_counter(pmc, PERF_TYPE_HARDWARE,
+>> -                             kvm_x86_ops.pmu_ops->pmc_perf_hw_id(pmc),
+>> -                             !(en_field & 0x2), /* exclude user */
+>> -                             !(en_field & 0x1), /* exclude kernel */
+>> -                             pmi, false, false);
+>> +       return pmc->eventsel & ARCH_PERFMON_EVENTSEL_ENABLE;
+>>   }
+>>
+>>   void reprogram_counter(struct kvm_pmc *pmc)
+>>   {
+>> -       if (pmc_is_gp(pmc))
+>> -               reprogram_gp_counter(pmc);
+>> -       else
+>> -               reprogram_fixed_counter(pmc);
+>> +       struct kvm_pmu *pmu = pmc_to_pmu(pmc);
+>> +       u64 eventsel = pmc->eventsel;
+>> +       u64 new_config = eventsel;
+>> +       u8 fixed_ctr_ctrl;
+>> +
+>> +       pmc_pause_counter(pmc);
+>> +
+>> +       if (!pmc_speculative_in_use(pmc) || !pmc_is_enabled(pmc))
+>> +               return;
+>> +
+>> +       if (!check_pmu_event_filter(pmc))
+>> +               return;
+>> +
+>> +       if (eventsel & ARCH_PERFMON_EVENTSEL_PIN_CONTROL)
+>> +               printk_once("kvm pmu: pin control bit is ignored\n");
+>> +
+>> +       if (pmc_is_fixed(pmc)) {
+>> +               fixed_ctr_ctrl = fixed_ctrl_field(pmu->fixed_ctr_ctrl,
+>> +                                                 pmc->idx - INTEL_PMC_IDX_FIXED);
+>> +               if (fixed_ctr_ctrl & 0x1)
+>> +                       eventsel |= ARCH_PERFMON_EVENTSEL_OS;
+>> +               if (fixed_ctr_ctrl & 0x2)
+>> +                       eventsel |= ARCH_PERFMON_EVENTSEL_USR;
+>> +               if (fixed_ctr_ctrl & 0x8)
+>> +                       eventsel |= ARCH_PERFMON_EVENTSEL_INT;
+>> +               new_config = (u64)fixed_ctr_ctrl;
+>> +       }
+>> +
+>> +       if (pmc->current_config == new_config && pmc_resume_counter(pmc))
+>> +               return;
+>> +
+>> +       pmc_release_perf_event(pmc);
+>> +
+>> +       pmc->current_config = new_config;
+>> +       pmc_reprogram_counter(pmc, PERF_TYPE_RAW,
+>> +                       (eventsel & AMD64_RAW_EVENT_MASK),
+>> +                       !(eventsel & ARCH_PERFMON_EVENTSEL_USR),
+>> +                       !(eventsel & ARCH_PERFMON_EVENTSEL_OS),
+>> +                       eventsel & ARCH_PERFMON_EVENTSEL_INT,
+>> +                       (eventsel & HSW_IN_TX),
+>> +                       (eventsel & HSW_IN_TX_CHECKPOINTED));
+> 
+> It seems that this extremely long argument list was motivated by the
+> differences between the two original call sites. Now that you have
+> mocked up a full eventsel (with USR, OS, INT, IN_TX, and IN_TXCP bits)
+> for the fixed counters, why not pass the entire eventsel as the third
 
-Actually, I do stand in the same position as you.
+I've thought about it.
 
-> However, we have absolutely no business making up our own hardware
-> specification. This is a bug, and it should be fixed, like any other
-> bug.
-Current virtual hardware interfaces do not strictly comply with vendor 
-specifications
-and may not be the same in the first step of enablement, or some of them may have
-to be compromised later out of various complexity.
+I'm trying to pass-in generic bits (EVENT_MASK, USER, OS, INT) to
+pmc_reprogram_counter() and let the latter handle the implementation details
+of assembling the "struct perf_event_attr" to talk carefully with perf core.
 
-The behavior of AMD's "synthesize a #GP" to "reserved without qualification" bits
-is clearly a legacy tech decision (not sure if it was intentional). We may need 
-a larger
-independent patch set to apply this one-time surgery, including of course this 
-pmu issue.
+I suppose the fixed counters doesn't support IN_TX* bits and I try to
+clean those two away in another patch as you know.
 
-What do you think ?
+In terms of code readability, the current one achieves a good balance.
 
+> argument and drop all of the rest? Then, pmc_reprogram_counter() can
+> extract/check the bits of interest.
+> 
+>>   }
+>>   EXPORT_SYMBOL_GPL(reprogram_counter);
+>>
+>> @@ -451,17 +426,6 @@ void kvm_pmu_init(struct kvm_vcpu *vcpu)
+>>          kvm_pmu_refresh(vcpu);
+>>   }
+>>
+>> -static inline bool pmc_speculative_in_use(struct kvm_pmc *pmc)
+>> -{
+>> -       struct kvm_pmu *pmu = pmc_to_pmu(pmc);
+>> -
+>> -       if (pmc_is_fixed(pmc))
+>> -               return fixed_ctrl_field(pmu->fixed_ctr_ctrl,
+>> -                       pmc->idx - INTEL_PMC_IDX_FIXED) & 0x3;
+>> -
+>> -       return pmc->eventsel & ARCH_PERFMON_EVENTSEL_ENABLE;
+>> -}
+>> -
+>>   /* Release perf_events for vPMCs that have been unused for a full time slice.  */
+>>   void kvm_pmu_cleanup(struct kvm_vcpu *vcpu)
+>>   {
+>> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+>> index 19b78a9d9d47..d823fbe4e155 100644
+>> --- a/arch/x86/kvm/vmx/pmu_intel.c
+>> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+>> @@ -492,7 +492,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+>>          pmu->reserved_bits = 0xffffffff00200000ull;
+>>
+>>          entry = kvm_find_cpuid_entry(vcpu, 0xa, 0);
+>> -       if (!entry || !vcpu->kvm->arch.enable_pmu)
+>> +       if (!entry || !vcpu->kvm->arch.enable_pmu || !boot_cpu_has(X86_FEATURE_ARCH_PERFMON))
+> 
+> This change seems unrelated.
 
+The intention of using the PERF_TYPE_HARDWARE type is to emulate guest architecture
+PMU on a host without architecture PMU (the oldest Pentium 4), for which the 
+guest vPMC
+needs to be reprogrammed using the kernel generic perf_hw_id.
 
+This is the most original story of PERF_TYPE_HARDWARE, thanks to history teacher 
+Paolo,
+who also suggested this way to drop this kind of support.
 
+> 
+>>                  return;
+>>          eax.full = entry->eax;
+>>          edx.full = entry->edx;
+>> --
+>> 2.35.1
+>>
