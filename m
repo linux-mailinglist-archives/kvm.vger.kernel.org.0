@@ -2,173 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4CF594D205F
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 19:44:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 82E384D207E
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 19:49:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349204AbiCHSpw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 13:45:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45144 "EHLO
+        id S1349701AbiCHSuX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Mar 2022 13:50:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49734 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240493AbiCHSpv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Mar 2022 13:45:51 -0500
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3E504FC7A
-        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 10:44:53 -0800 (PST)
-Received: by mail-pf1-x432.google.com with SMTP id s42so185507pfg.0
-        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 10:44:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=F9iW0OVbthqHVjxJAxEXlEyGZtYeqKxwSIaWo5GZTas=;
-        b=Q3cQnIc3ElpP/gss4isBnkT5tvfJ3hTwiROMAEWXzVNHtn7vH5rTDwbrOteD8UaeRk
-         NKMKiJB0UDv0RkR5hVLcsB66LS3g2CsFZrZRpQbTEencmQWRTTSmKjL09M0srYleG5k+
-         VgLKi/RFKKSBZwBtdfN2SmS4DGCqGUCRa0le+spniEFp4QKUwoKOI7pmrQlWqtqfYrkp
-         jayz4RWUnq3lMz9WFrWHpZx65NczM2L9UbGLSS6axF1tiSbvzMB07LTuigbwobeINlD7
-         pkCDFMGFDU3QSm0PTYrB5Tb00AqWmftitCtIhxhTKapgESQrGgaEdqHnosObJlPS1Jjj
-         OE8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=F9iW0OVbthqHVjxJAxEXlEyGZtYeqKxwSIaWo5GZTas=;
-        b=imWoRCNeLROGTJ2GOIFEWEnL9wd/Zr4mkuS5ND2A656iopdYkcmgbs7fXJ6uuH8coc
-         a0Hmyj5vCtAdsc8TDN6IB58j6TGhnOlhRDZNH0RnPYhCWoPudRpO2SSYv7Tfuckahfwe
-         kiE91qCxSVf8cHCBzX+Tt9E+Vxd2abhQn56YzChLaTYYKrcH7CfV+b6E14km7SS6TDCH
-         jgOp/9GjrPVfXsxiowFPzqOLs2B5VL3Gf40TYPLzYcz77PRhQuqziS6TVk06+NRO3gTH
-         WAUe4cbVktogites0a61JpEjmJcjMjDE+iJiIYN+qkXU5lxVs/uAa3kg3vM3Yvj/P5nE
-         MziA==
-X-Gm-Message-State: AOAM5318EORqs1pCbi3k4iQnTyPb6W9LNkokUGqpoqOcB0sfQlsbaela
-        0YQ9beVkq9iPfM08X+IgRpalqw==
-X-Google-Smtp-Source: ABdhPJwqZg/ojI0iBDzhfukakkpXarGU5usTmUXLDTEA9mCTtIohCGSu3Rrew29iVrh/UUrA0h9aFg==
-X-Received: by 2002:a62:8389:0:b0:4f7:2b72:3589 with SMTP id h131-20020a628389000000b004f72b723589mr5100912pfe.57.1646765093267;
-        Tue, 08 Mar 2022 10:44:53 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id b5-20020a056a0002c500b004f6dbd217c9sm12807965pft.108.2022.03.08.10.44.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Mar 2022 10:44:52 -0800 (PST)
-Date:   Tue, 8 Mar 2022 18:44:49 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        dmatlack@google.com
-Subject: Re: [PATCH v2 12/25] KVM: x86/mmu: cleanup computation of MMU roles
- for two-dimensional paging
-Message-ID: <YiekIeAfGpPnqHT0@google.com>
-References: <20220221162243.683208-1-pbonzini@redhat.com>
- <20220221162243.683208-13-pbonzini@redhat.com>
- <YiecYxd/YreGFWpB@google.com>
- <2e6c4c58-d4d2-69e2-f8ed-c93d9c13365b@redhat.com>
+        with ESMTP id S1349685AbiCHSuU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 13:50:20 -0500
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA64A532EB;
+        Tue,  8 Mar 2022 10:49:22 -0800 (PST)
+Received: from fraeml706-chm.china.huawei.com (unknown [172.18.147.201])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4KCkq2469kz67Qtq;
+        Wed,  9 Mar 2022 02:47:58 +0800 (CST)
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ fraeml706-chm.china.huawei.com (10.206.15.55) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2308.21; Tue, 8 Mar 2022 19:49:20 +0100
+Received: from A2006125610.china.huawei.com (10.47.82.254) by
+ lhreml710-chm.china.huawei.com (10.201.108.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Tue, 8 Mar 2022 18:49:12 +0000
+From:   Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+To:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>
+CC:     <linux-pci@vger.kernel.org>, <alex.williamson@redhat.com>,
+        <jgg@nvidia.com>, <cohuck@redhat.com>, <mgurtovoy@nvidia.com>,
+        <yishaih@nvidia.com>, <kevin.tian@intel.com>,
+        <linuxarm@huawei.com>, <liulongfang@huawei.com>,
+        <prime.zeng@hisilicon.com>, <jonathan.cameron@huawei.com>,
+        <wangzhou1@hisilicon.com>
+Subject: [PATCH v9 0/9] vfio/hisilicon: add ACC live migration driver
+Date:   Tue, 8 Mar 2022 18:48:53 +0000
+Message-ID: <20220308184902.2242-1-shameerali.kolothum.thodi@huawei.com>
+X-Mailer: git-send-email 2.12.0.windows.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2e6c4c58-d4d2-69e2-f8ed-c93d9c13365b@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.47.82.254]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ lhreml710-chm.china.huawei.com (10.201.108.61)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-1.2 required=5.0 tests=AC_FROM_MANY_DOTS,BAYES_00,
+        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 08, 2022, Paolo Bonzini wrote:
-> On 3/8/22 19:11, Sean Christopherson wrote:
-> > On Mon, Feb 21, 2022, Paolo Bonzini wrote:
-> > > Extended bits are unnecessary because page walking uses the CPU mode,
-> > > and EFER.NX/CR0.WP can be set to one unconditionally---matching the
-> > > format of shadow pages rather than the format of guest pages.
-> > 
-> > But they don't match the format of shadow pages.  EPT has an equivalent to NX in
-> > that KVM can always clear X, but KVM explicitly supports running with EPT and
-> > EFER.NX=0 in the host (32-bit non-PAE kernels).
-> 
-> In which case bit 2 of EPTs doesn't change meaning, does it?
-> 
-> > CR0.WP equally confusing.  Yes, both EPT and NPT enforce write protection at all
-> > times, but EPT has no concept of user vs. supervisor in the EPT tables themselves,
-> > at least with respect to writes (thanks mode-based execution for the qualifier...).
-> > NPT is even worse as the APM explicitly states:
-> > 
-> >    The host hCR0.WP bit is ignored under nested paging.
-> > 
-> > Unless there's some hidden dependency I'm missing, I'd prefer we arbitrarily leave
-> > them zero.
-> 
-> Setting EFER.NX=0 might be okay for EPT/NPT, but I'd prefer to set it
-> respectively to 1 (X bit always present) and host EFER.NX (NX bit present
-> depending on host EFER).
-> 
-> For CR0.WP it should really be 1 in my opinion, because CR0.WP=0 implies
-> having a concept of user vs. supervisor access: CR0.WP=1 is the "default",
-> while CR0.WP=0 is "always allow *supervisor* writes".
+Hi,
 
-Yeah, I think we generally agree, just came to different conclusions :-)  I'm
-totally fine setting them to '1', especially given the patch I just "posted",
-but please add comments (suggested NX comment below).  The explicit "WP is ignored"
-blurb for hCR0 on NPT will be especially confusing at some point.
+This series attempts to add vfio live migration support for HiSilicon
+ACC VF devices based on the new v2 migration protocol definition and
+mlx5 v9 series discussed here[0].
 
-With efer_nx forced to '1', we can do this somewhere in this series.  I really,
-really despise "context" :-).
+v8 --> v9
+ - Added acks by Wangzhou/Longfang/Yekai
+ - Added R-by tags by Jason.
+ - Addressed comments by Alex on v8.
+ - Fixed the pf_queue pointer assignment error in patch #8.
+ - Addressed comments from Kevin,
+    -Updated patch #5 commit log msg with a clarification that VF
+     migration BAR assignment is fine if migration support is not there.
+    -Added QM description to patch #8 commit msg.
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 9c79a0927a48..657df7fd74bf 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4461,25 +4461,15 @@ static inline bool boot_cpu_is_amd(void)
-        return shadow_x_mask == 0;
- }
- 
--static void
--reset_tdp_shadow_zero_bits_mask(struct kvm_mmu *context)
-+static void reset_tdp_shadow_zero_bits_mask(struct kvm_mmu *mmu)
- {
--       /*
--        * KVM doesn't honor execute-protection from the host page tables, but
--        * NX is required and potentially used at any time by KVM for NPT, as
--        * the NX hugepages iTLB multi-hit mitigation is supported for any CPU
--        * despite no known AMD (and derivative) CPUs being affected by erratum.
--        */
--       bool efer_nx = true;
--
--       struct rsvd_bits_validate *shadow_zero_check;
-        int i;
- 
--       shadow_zero_check = &context->shadow_zero_check;
-+       shadow_zero_check = &mmu->shadow_zero_check;
- 
-        if (boot_cpu_is_amd())
-                __reset_rsvds_bits_mask(shadow_zero_check, reserved_hpa_bits(),
--                                       context->shadow_root_level, efer_nx,
-+                                       mmu->shadow_root_level, is_efer_nx(mmu),
-                                        boot_cpu_has(X86_FEATURE_GBPAGES),
-                                        false, true);
-        else
-@@ -4490,7 +4480,7 @@ reset_tdp_shadow_zero_bits_mask(struct kvm_mmu *context)
-        if (!shadow_me_mask)
-                return;
- 
--       for (i = context->shadow_root_level; --i >= 0;) {
-+       for (i = mmu->shadow_root_level; --i >= 0;) {
-                shadow_zero_check->rsvd_bits_mask[0][i] &= ~shadow_me_mask;
-                shadow_zero_check->rsvd_bits_mask[1][i] &= ~shadow_me_mask;
-        }
-@@ -4751,6 +4741,16 @@ kvm_calc_tdp_mmu_root_page_role(struct kvm_vcpu *vcpu,
- 
-        role.base.access = ACC_ALL;
-        role.base.cr0_wp = true;
-+
-+       /*
-+        * KVM doesn't honor execute-protection from the host page tables, but
-+        * NX is required and potentially used at any time by KVM for NPT, as
-+        * the NX hugepages iTLB multi-hit mitigation is supported for any CPU
-+        * despite no known AMD (and derivative) CPUs being affected by erratum.
-+        *
-+        * This is functionally accurate for EPT, if technically wrong, as KVM
-+        * can always clear the X bit on EPT,
-+        */
-        role.base.efer_nx = true;
-        role.base.smm = cpu_mode.base.smm;
-        role.base.guest_mode = cpu_mode.base.guest_mode;
+This is sanity tested on a HiSilicon platform using the Qemu branch
+provided here[1].
+
+Please take a look and let me know your feedback.
+
+Thanks,
+Shameer
+[0] https://lore.kernel.org/kvm/20220224142024.147653-1-yishaih@nvidia.com/
+[1] https://github.com/jgunthorpe/qemu/commits/vfio_migration_v2
+
+v7 --> v8
+ - Dropped PRE_COPY support and early compatibility checking based on
+   the discussion here[1].
+ - Addressed comments from John, Jason & Alex (Thanks!).
+
+v6 --> v7
+ -Renamed MIG_PRECOPY ioctl name and struct name. Updated ioctl descriptions
+  regarding ioctl validity (patch #7).
+- Adressed comments from Jason and Alex on PRE_COPY read() and ioctl() fns
+  (patch #9).
+- Moved only VF PCI ids to pci_ids.h(patch #3).
+
+v5 --> v6
+ -Report PRE_COPY support and use that for early compatibility check
+  between src and dst devices.
+ -For generic PRE_COPY support, included patch #7 from Jason(Thanks!).
+ -Addressed comments from Alex(Thanks!).
+ -Added the QM state register update to QM driver(patch #8) since that
+  is being used in migration driver to decide whether the device is
+  ready to save the state.
+
+RFCv4 --> v5
+  - Dropped RFC tag as v2 migration APIs are more stable now.
+  - Addressed review comments from Jason and Alex (Thanks!).
+
+v3 --> RFCv4
+-Based on migration v2 protocol and mlx5 v7 series.
+-Added RFC tag again as migration v2 protocol is still under discussion.
+-Added new patch #6 to retrieve the PF QM data.
+-PRE_COPY compatibility check is now done after the migration data
+ transfer. This is not ideal and needs discussion.
+
+RFC v2 --> v3
+ -Dropped RFC tag as the vfio_pci_core subsystem framework is now
+  part of 5.15-rc1.
+ -Added override methods for vfio_device_ops read/write/mmap calls
+  to limit the access within the functional register space.
+ -Patches 1 to 3 are code refactoring to move the common ACC QM
+  definitions and header around.
+
+RFCv1 --> RFCv2
+
+ -Adds a new vendor-specific vfio_pci driver(hisi-acc-vfio-pci)
+  for HiSilicon ACC VF devices based on the new vfio-pci-core
+  framework proposal.
+
+ -Since HiSilicon ACC VF device MMIO space contains both the
+  functional register space and migration control register space,
+  override the vfio_device_ops ioctl method to report only the
+  functional space to VMs.
+
+ -For a successful migration, we still need access to VF dev
+  functional register space mainly to read the status registers.
+  But accessing these while the Guest vCPUs are running may leave
+  a security hole. To avoid any potential security issues, we
+  map/unmap the MMIO regions on a need basis and is safe to do so.
+  (Please see hisi_acc_vf_ioremap/unmap() fns in patch #4).
+ 
+ -Dropped debugfs support for now.
+ -Uses common QM functions for mailbox access(patch #3).
+
+Longfang Liu (3):
+  crypto: hisilicon/qm: Move few definitions to common header
+  crypto: hisilicon/qm: Set the VF QM state register
+  hisi_acc_vfio_pci: Add support for VFIO live migration
+
+Shameer Kolothum (6):
+  crypto: hisilicon/qm: Move the QM header to include/linux
+  hisi_acc_qm: Move VF PCI device IDs to common header
+  hisi_acc_vfio_pci: add new vfio_pci driver for HiSilicon ACC devices
+  hisi_acc_vfio_pci: Restrict access to VF dev BAR2 migration region
+  hisi_acc_vfio_pci: Add helper to retrieve the struct pci_driver
+  hisi_acc_vfio_pci: Use its own PCI reset_done error handler
+
+ MAINTAINERS                                   |    7 +
+ drivers/crypto/hisilicon/hpre/hpre.h          |    2 +-
+ drivers/crypto/hisilicon/hpre/hpre_main.c     |   19 +-
+ drivers/crypto/hisilicon/qm.c                 |   68 +-
+ drivers/crypto/hisilicon/sec2/sec.h           |    2 +-
+ drivers/crypto/hisilicon/sec2/sec_main.c      |   21 +-
+ drivers/crypto/hisilicon/sgl.c                |    2 +-
+ drivers/crypto/hisilicon/zip/zip.h            |    2 +-
+ drivers/crypto/hisilicon/zip/zip_main.c       |   17 +-
+ drivers/vfio/pci/Kconfig                      |    2 +
+ drivers/vfio/pci/Makefile                     |    2 +
+ drivers/vfio/pci/hisilicon/Kconfig            |   15 +
+ drivers/vfio/pci/hisilicon/Makefile           |    4 +
+ .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 1326 +++++++++++++++++
+ .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |  116 ++
+ .../qm.h => include/linux/hisi_acc_qm.h       |   49 +
+ include/linux/pci_ids.h                       |    3 +
+ 17 files changed, 1591 insertions(+), 66 deletions(-)
+ create mode 100644 drivers/vfio/pci/hisilicon/Kconfig
+ create mode 100644 drivers/vfio/pci/hisilicon/Makefile
+ create mode 100644 drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+ create mode 100644 drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+ rename drivers/crypto/hisilicon/qm.h => include/linux/hisi_acc_qm.h (87%)
+
+-- 
+2.25.1
+
