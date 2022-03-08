@@ -2,69 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 937ED4D1C55
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 16:53:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D8464D1C88
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 16:58:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347978AbiCHPyK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 10:54:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50022 "EHLO
+        id S241510AbiCHP7P (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Mar 2022 10:59:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233754AbiCHPyJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Mar 2022 10:54:09 -0500
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DFF43A1B1
-        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 07:53:11 -0800 (PST)
-Received: by mail-pj1-x1036.google.com with SMTP id m11-20020a17090a7f8b00b001beef6143a8so2783087pjl.4
-        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 07:53:11 -0800 (PST)
+        with ESMTP id S1348427AbiCHP6K (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 10:58:10 -0500
+Received: from mail-oo1-xc33.google.com (mail-oo1-xc33.google.com [IPv6:2607:f8b0:4864:20::c33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B64350B3C
+        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 07:56:19 -0800 (PST)
+Received: by mail-oo1-xc33.google.com with SMTP id x26-20020a4a9b9a000000b003211029e80fso6064485ooj.5
+        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 07:56:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=DvGT3bHO3eTMD0KXTbeLdljGXwbAYf6pMl/rX/qRoGc=;
-        b=f53CxNhvRcd6gIVul16MgYj35gn1Yjah6ootqVkktMN1C1a1wH4BtM8mkG+vLNz5Ju
-         3/oV7D5zLvOCUxBkC//RaLlhGuBOOMH8GRKzS15lTpbxqScwAFbVKGX0GQ+IHlraIVVc
-         ZYgtsekraPJ6jfiZo59YSxT/ibNx7Q5+/LYkGGF6SckhUD87JM/430BvFbv0yDPtMLQI
-         UPvaEebIbjjFnMleatlRaOT/5n0g2VbB5yZQBo9oAsIhIPTxDHP/YocMRzUu33YbQr0y
-         rIpY2AHiyJU0exLHYo2lbeHSRwSOp/rGBTtJpIqHxXWpNi51MPcwbYdKknY20jiVY5QU
-         0VQQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=SwFPke7Gr1UGcWPkqgL/0NX1ZL3Kwja1sgGpM0B0lXc=;
+        b=EkU8DIry0Y0EHH6yDRow4ZGgo5UDBvi+YZ6ReTK+1pLp9nxDQwwCj177g9p7lCzUKR
+         9cqybkcLoAZndGq+/c4oLRD9SsJN0TOCaXghMU9xrLPT9MMTPNAmMLF5GTBhPiq3jUTe
+         wcEWhWGKxEZOApY+Fv/07Wao04D/dvjzZ//o3kmABVpJ/XBf6gaQ5vcqjP4ohlQibLSE
+         khINEaeCoq6krS9KzAXDeKV7gIlegV93GgQAXKRutjsd+zNbYh909NXV0UYxFFNxO1lv
+         mOjnT9wVKkLiRrrL5soPMvjn5SWqvVuCOzHeKlVU93xSrmthdozEWV9QDQ3QGzpZw58T
+         Qbuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=DvGT3bHO3eTMD0KXTbeLdljGXwbAYf6pMl/rX/qRoGc=;
-        b=TxRx4HXqaz8f+gL74Jwjs2HPbzsp5yr5MfNybcZRanDAhuqtX4F9vHk2ZKRj4j2pkX
-         bGo8fK/KMXFAg2bXNDzeUWLx9zIY5IISkpSD0mHSAjP6Wf3rfsQK3Kvda9MC1J8DGLZJ
-         +sUXbRaolki6ZQaorKDA59DA/91mRNMmPjwsVNYNrYMF4Yazj+dNzDNwKB2JgE1M8O/e
-         /adC6Zm00oqd/v/W7Rr+Un+PyYk7ZExPLBBYfojvSXl7VDydE+/iHXwbykjpvlw2MHdt
-         rNeA8jIM68WtbRqEWBiMFh7fxWDrdhwFKoPqeg9hIdsjYkgXnub5/I1yB6VhjH9A0yMm
-         vT0Q==
-X-Gm-Message-State: AOAM533p/hMJMy25z/lJke7MzSTto305Cv+dJXEGWZOhGnHjNaFzglCE
-        EhP8DrGYcNlk/EtFnq5P7F/W21erc/0JGg==
-X-Google-Smtp-Source: ABdhPJz0YaRP5SVfSTDDnadJfYWRblCfhFuHMQtgYMJ53i34cH9p2wG0+2iQE171iRz2GnyOLhrJhQ==
-X-Received: by 2002:a17:90b:1b4c:b0:1bf:d91:e157 with SMTP id nv12-20020a17090b1b4c00b001bf0d91e157mr5391516pjb.82.1646754790341;
-        Tue, 08 Mar 2022 07:53:10 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id b17-20020a056a000a9100b004e1b7cdb8fdsm21428055pfl.70.2022.03.08.07.53.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Mar 2022 07:53:09 -0800 (PST)
-Date:   Tue, 8 Mar 2022 15:53:06 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Shivam Kumar <shivam.kumar1@nutanix.com>, kvm@vger.kernel.org,
-        agraf@csgraf.de
-Subject: Re: [PATCH v2 0/1] KVM: Dirty quota-based throttling
-Message-ID: <Yid74seFMjB49FIZ@google.com>
-References: <20211220055722.204341-1-shivam.kumar1@nutanix.com>
- <f05cc9a6-f15b-77f8-7fad-72049648d16c@nutanix.com>
- <YdR9TSVgalKEfPIQ@google.com>
- <652f9222-45a8-ca89-a16b-0a12456e2afc@nutanix.com>
- <76606ce7-6bbf-dc92-af2c-ee3e54169ecd@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=SwFPke7Gr1UGcWPkqgL/0NX1ZL3Kwja1sgGpM0B0lXc=;
+        b=Q6ppZminF7AfIz9B/B5QH/u5QoJuljjySEbs4qY9bAxnCEK8OblupE+b/FyVdAnjSE
+         IoSW71GnYMA+V9gVb7wYtL5VWcj4kZmz/FRY9m8mdLW9FZpH1NUsNUqI2RiV4BVjx7FL
+         WI/L6AAwZu0bj8fKzziQfmlIpQJGPBax3ISsj3E4LPyfBXmu9bTnrTIHdLh8XySVzzRm
+         3c8p+wPLoSEHKW8Zys9VL2zaU85dOdNMsFyGIiQStpjv4Gsl8c/6yvcgjrzOBRJIqKg4
+         h2TfeDqaXS/6nG3u8evfm9j7YAzghC0vzUx5twntSdiGjzHoslqMlvaSh+eKidOTZLUr
+         7/dQ==
+X-Gm-Message-State: AOAM5300eJKn7R14np7cuLYO6sHebwQ/Tp0Go0HTEgOtATWABLkAGcvC
+        najEdRyi4GWW8zDB/R4/Fd52IlhVj3TiGZME+YT5OQ==
+X-Google-Smtp-Source: ABdhPJz86mC/0S+lKsEKY+b7OuwttIY21p1PRTJ/ienpi9sYvBliWzE24lYxYlDe4FFvfyuz0OF4Qr3n0xtQQXDhCto=
+X-Received: by 2002:a05:6870:1041:b0:d3:521b:f78a with SMTP id
+ 1-20020a056870104100b000d3521bf78amr2788929oaj.13.1646754978753; Tue, 08 Mar
+ 2022 07:56:18 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <76606ce7-6bbf-dc92-af2c-ee3e54169ecd@redhat.com>
+References: <20220308012452.3468611-1-jmattson@google.com> <01af48ad-fee3-603a-7b14-5a0ae52bb7f9@gmail.com>
+In-Reply-To: <01af48ad-fee3-603a-7b14-5a0ae52bb7f9@gmail.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Tue, 8 Mar 2022 07:56:07 -0800
+Message-ID: <CALMp9eSKGaGdoDwEs_kiokEGBih5+PxUB5kvKuwKeMcvVhypmQ@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86/pmu: Use different raw event masks for AMD and Intel
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        "Paolo Bonzini - Distinguished Engineer (kernel-recipes.org) (KVM HoF)" 
+        <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -76,21 +67,32 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 08, 2022, Paolo Bonzini wrote:
-> On 1/5/22 16:39, Shivam Kumar wrote:
-> > 
-> > > On Mon, Jan 03, 2022, Shivam Kumar wrote:
-> > > > I would be grateful if I could receive some feedback on the
-> > > > dirty quota v2
-> > > > patchset.
-> > >    'Twas the week before Christmas, when all through the list,
-> > >    not a reviewer was stirring, not even a twit.
-> > > 
-> > > There's a reason I got into programming and not literature. 
-> > > Anyways, your patch
-> > > is in the review queue, it'll just be a few days/weeks. :-)
-> > Thank you so much Sean for the update!
-> 
-> Hi, are you going to send v3?
+On Tue, Mar 8, 2022 at 2:29 AM Like Xu <like.xu.linux@gmail.com> wrote:
+>
+> On 8/3/2022 9:24 am, Jim Mattson wrote:
+> > The third nybble of AMD's event select overlaps with Intel's IN_TX and
+> > IN_TXCP bits. Therefore, we can't use AMD64_RAW_EVENT_MASK on Intel
+> > platforms that support TSX.
+>
+> We already have pmu->reserved_bits as the first wall to check "can't use".
 
-https://lore.kernel.org/all/20220306220849.215358-1-shivam.kumar1@nutanix.com
+That is only a safeguard for Intel platforms that *don't* support TSX.
+
+> >
+> > Declare a raw_event_mask in the kvm_pmu structure, initialize it in
+> > the vendor-specific pmu_refresh() functions, and use that mask for
+> > PERF_TYPE_RAW configurations in reprogram_gp_counter().
+> >
+> > Fixes: 710c47651431 ("KVM: x86/pmu: Use AMD64_RAW_EVENT_MASK for PERF_TYPE_RAW")
+>
+> Is it really a fix ?
+
+When I submitted the commit referenced above, it was not my intention
+to introduce semantic changes on Intel platforms. I hadn't realized at
+the time that IN_TX and IN_TXCP overlapped with bits 11:8 of AMD's
+event select.
+
+But, you are right. Previously, the code would mask off IN_TX and
+IN_TXCP, just to or them back in again later. So, the aforementioned
+commit did not change the semantics of the existing code; it just
+rendered the statements to or the bits back in redundant.
