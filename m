@@ -2,174 +2,243 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 472D44D0C4A
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 00:50:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 98A2B4D0CCF
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 01:31:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344034AbiCGXuy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Mar 2022 18:50:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34220 "EHLO
+        id S244091AbiCHAcV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Mar 2022 19:32:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39586 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344094AbiCGXuo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Mar 2022 18:50:44 -0500
-Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77A5931534
-        for <kvm@vger.kernel.org>; Mon,  7 Mar 2022 15:49:34 -0800 (PST)
-Received: by mail-lf1-x12f.google.com with SMTP id bu29so29266697lfb.0
-        for <kvm@vger.kernel.org>; Mon, 07 Mar 2022 15:49:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=+HV+Ci0qJtjgVMkQdTkkYhKKFn98HHEwEQ3QOExliA8=;
-        b=k+XbHid5SoPRF9RbXl4EtPmVI98v19t1I1vtT5E5dQJO6WaUSx35+h51vHqhYs20rr
-         Dg5tfI1ikotcHxP0LJiohsks2iUf4bU+R35/5Iyt+eF4QExNKgPt5Nkkqhe58zgBz4xE
-         Ym8FTkJb1dTM25hqOp/7uS9quUqOQEGBgldLOD9XX+bQbdNZ/o3D/g2MycVI+oFvG1CH
-         emgECcn5XFNw1QgcpX3J+QoNsihAmc0N0JA95u3aziuHxOywwJSWmSY+6dP6gyBvw+3V
-         lR2PEt7xHNGQ7pe1uL4po/24+RECG6DUF5j+w+Aaz1tGAn45vcZAEtXyrzCPVBClEHAG
-         rD+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=+HV+Ci0qJtjgVMkQdTkkYhKKFn98HHEwEQ3QOExliA8=;
-        b=XpxPTcWdefCgOZvUYbYc2kxRWhHqtvAUcC+Uy9kMpQO4/RifO095Mzt3CZA+niJYQx
-         lXzb/ShSgYJeDEnDnjwlfjiPwaOR4acrobncVC8ZK24t20YDb8DW8tewWbNuVj1ztOYo
-         MdCOhgNzOwW6O6YV/w68R3FMVkkywo0t3aPf+LQmG1sxXfvaskEj0DN7Z22n1ZR4T7Vh
-         T/UqqUgLbhfmfhpY16eg0lY2KS/Q1Y5uh7kYaQtOFyY8pVswPESvMwxGkNQreI19/JE5
-         LuvDx7lfa+d7QZlCC/Fo7OdiG9F1BYqN2kQ7wRsUC+uQvS6krpiGjAVBX1sWXVTDNbVE
-         eTsA==
-X-Gm-Message-State: AOAM532N7QELKqnTP0oJebI5hCV9FD38+5coR79LHZOdaRPZaYqpy53g
-        ux10BTfYBLZlg1VLOXcwWZ/mjSnR1ZW41W37Q98jJw==
-X-Google-Smtp-Source: ABdhPJxaPxjN8MsjQmHlhG3pV8/RqCE6os3e5JBxXe0ADfI4+gDRpEkfNIVcZzgycBHxAaBCqqHU93F3FCgtqyeE28M=
-X-Received: by 2002:a19:674c:0:b0:448:3f49:e6d5 with SMTP id
- e12-20020a19674c000000b004483f49e6d5mr326936lfj.518.1646696972615; Mon, 07
- Mar 2022 15:49:32 -0800 (PST)
+        with ESMTP id S230263AbiCHAcT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Mar 2022 19:32:19 -0500
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3AB112ADA;
+        Mon,  7 Mar 2022 16:31:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1646699483; x=1678235483;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=oSu0Z2jGUkfhbuVOaedzXc4LteEqQxU2xU+auVYA8/8=;
+  b=J/D3yqrMTipJDADD0loQoVIfJnWEePK9vKs2mESF8VeGelRWLWv0S3yC
+   VyU94kbCuC+og0HV5nYYvfGwVRr3Gceie3RhPJxB1YWh09CKrlngG09CT
+   MSVUDCF/vxuQSHknRfNDjYJRMPN7eO0qN3w9nZsd6n+9ldZ5xZHhiAFAd
+   xGwu0KG0fvjkWYfZnms0I17ugdiqfdL5BM/Pq1Ex9x7beyCbINASL3Zin
+   mYgOjOUiwaw6zI3JtPEsg9HXh+f/O1UXyKpK3KSc28srjnPl5OYyITci+
+   znHh/S0KVGrrOvUJG0/yk94kkXkPjNVmqUxi/in///ieoabcBd91ip3S5
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10279"; a="235154024"
+X-IronPort-AV: E=Sophos;i="5.90,163,1643702400"; 
+   d="scan'208";a="235154024"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2022 16:31:23 -0800
+X-IronPort-AV: E=Sophos;i="5.90,163,1643702400"; 
+   d="scan'208";a="711324392"
+Received: from blu2-mobl3.ccr.corp.intel.com (HELO [10.254.209.195]) ([10.254.209.195])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2022 16:31:16 -0800
+Message-ID: <5fb85230-466c-9615-0867-bb17cab34be5@linux.intel.com>
+Date:   Tue, 8 Mar 2022 08:31:14 +0800
 MIME-Version: 1.0
-References: <20220203010051.2813563-1-dmatlack@google.com> <20220203010051.2813563-20-dmatlack@google.com>
- <8735k84i6f.wl-maz@kernel.org> <CALzav=d9dRWCV=R8Ypvy4KzgzPQvd-7qhGTbxso5r9eTh9kkqw@mail.gmail.com>
- <CALzav=ccRmvCB+FsN64JujOVpb7-ocdzkiBrYLFGFRQUa7DbWQ@mail.gmail.com> <878rtotk3h.wl-maz@kernel.org>
-In-Reply-To: <878rtotk3h.wl-maz@kernel.org>
-From:   David Matlack <dmatlack@google.com>
-Date:   Mon, 7 Mar 2022 15:49:06 -0800
-Message-ID: <CALzav=e7vH87uyphgL8vXPMmn8vX8TmkpUY_3OWuRXrKFhy_ag@mail.gmail.com>
-Subject: Re: [PATCH 19/23] KVM: Allow for different capacities in
- kvm_mmu_memory_cache structs
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        leksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.2
+Cc:     baolu.lu@linux.intel.com, Chaitanya Kulkarni <kch@nvidia.com>,
+        kvm@vger.kernel.org, Stuart Yoder <stuyoder@gmail.com>,
+        rafael@kernel.org, David Airlie <airlied@linux.ie>,
+        linux-pci@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
+        linux-kernel@vger.kernel.org,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        iommu@lists.linux-foundation.org,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Jacob jun Pan <jacob.jun.pan@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Li Yang <leoyang.li@nxp.com>, Will Deacon <will@kernel.org>,
+        Dmitry Osipenko <digetx@gmail.com>
+Subject: Re: [PATCH v7 01/11] iommu: Add DMA ownership management interfaces
+Content-Language: en-US
+To:     eric.auger@redhat.com, Robin Murphy <robin.murphy@arm.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Joerg Roedel <joro@8bytes.org>,
-        Peter Feiner <pfeiner@google.com>,
-        Andrew Jones <drjones@redhat.com>,
-        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
-        kvm list <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        Alex Williamson <alex.williamson@redhat.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>
+References: <20220228005056.599595-1-baolu.lu@linux.intel.com>
+ <20220228005056.599595-2-baolu.lu@linux.intel.com>
+ <c75b6e04-bc1b-b9f6-1a44-bf1567a8c19d@redhat.com>
+ <7a3dc977-0c5f-6d88-6d3a-8e49bc717690@linux.intel.com>
+ <1648bc97-a0d3-4051-58d0-e24fa9e9d183@arm.com>
+ <350a8e09-08a9-082b-3ad1-b711c7d98d73@redhat.com>
+ <e2698dbe-18e2-1a82-8a12-fe45bc9be534@arm.com>
+ <b1a5db0a-0373-5ca0-6256-85a96d029ec9@linux.intel.com>
+ <ac75c521-fb13-8414-a81b-9178cbed3471@redhat.com>
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+In-Reply-To: <ac75c521-fb13-8414-a81b-9178cbed3471@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Mar 5, 2022 at 8:55 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> On Fri, 04 Mar 2022 21:59:12 +0000,
-> David Matlack <dmatlack@google.com> wrote:
-> >
-> > On Thu, Feb 24, 2022 at 11:20 AM David Matlack <dmatlack@google.com> wrote:
-> > >
-> > > On Thu, Feb 24, 2022 at 3:29 AM Marc Zyngier <maz@kernel.org> wrote:
-> > > >
-> > > > On Thu, 03 Feb 2022 01:00:47 +0000,
-> > > > David Matlack <dmatlack@google.com> wrote:
-> > > > >
-> >
-> > [...]
-> >
-> > > > >
-> > > > >       /* Cache some mmu pages needed inside spinlock regions */
-> > > > > -     struct kvm_mmu_memory_cache mmu_page_cache;
-> > > > > +     DEFINE_KVM_MMU_MEMORY_CACHE(mmu_page_cache);
-> > > >
-> > > > I must say I'm really not a fan of the anonymous structure trick. I
-> > > > can see why you are doing it that way, but it feels pretty brittle.
-> > >
-> > > Yeah I don't love it. It's really optimizing for minimizing the patch diff.
-> > >
-> > > The alternative I considered was to dynamically allocate the
-> > > kvm_mmu_memory_cache structs. This would get rid of the anonymous
-> > > struct and the objects array, and also eliminate the rather gross
-> > > capacity hack in kvm_mmu_topup_memory_cache().
-> > >
-> > > The downsides of this approach is more code and more failure paths if
-> > > the allocation fails.
-> >
-> > I tried changing all kvm_mmu_memory_cache structs to be dynamically
-> > allocated, but it created a lot of complexity to the setup/teardown
-> > code paths in x86, arm64, mips, and riscv (the arches that use the
-> > caches). I don't think this route is worth it, especially since these
-> > structs don't *need* to be dynamically allocated.
-> >
-> > When you said the anonymous struct feels brittle, what did you have in
-> > mind specifically?
->
-> I can perfectly see someone using a kvm_mmu_memory_cache and searching
-> for a bit why they end-up with memory corruption. Yes, this would be a
-> rookie mistake, but this are some expectations all over the kernel
-> that DEFINE_* and the corresponding structure are the same object.
+On 2022/3/7 20:42, Eric Auger wrote:
+> Hi Lu,
+> 
+> On 3/7/22 4:27 AM, Lu Baolu wrote:
+>> Hi Robin,
+>>
+>> On 3/4/22 10:10 PM, Robin Murphy wrote:
+>>> On 2022-03-04 13:55, Eric Auger wrote:
+>>>> Hi Robin,
+>>>>
+>>>> On 3/4/22 1:22 PM, Robin Murphy wrote:
+>>>>> On 2022-03-04 10:43, Lu Baolu wrote:
+>>>>>> Hi Eric,
+>>>>>>
+>>>>>> On 2022/3/4 18:34, Eric Auger wrote:
+>>>>>>> I hit a WARN_ON() when unbinding an e1000e driver just after boot:
+>>>>>>>
+>>>>>>> sudo modprobe -v vfio-pci
+>>>>>>> echo vfio-pci | sudo tee -a
+>>>>>>> /sys/bus/pci/devices/0004:01:00.0/driver_override
+>>>>>>> vfio-pci
+>>>>>>> echo 0004:01:00.0 | sudo tee -a  /sys/bus/pci/drivers/e1000e/unbind
+>>>>>>>
+>>>>>>>
+>>>>>>> [  390.042811] ------------[ cut here ]------------
+>>>>>>> [  390.046468] WARNING: CPU: 42 PID: 5589 at
+>>>>>>> drivers/iommu/iommu.c:3123
+>>>>>>> iommu_device_unuse_default_domain+0x68/0x100
+>>>>>>> [  390.056710] Modules linked in: vfio_pci vfio_pci_core vfio_virqfd
+>>>>>>> vfio_iommu_type1 vfio xt_CHECKSUM xt_MASQUERADE xt_conntrack
+>>>>>>> ipt_REJECT
+>>>>>>> nf_reject_ipv4 nft_compat nft_chain_nat nf_nat nf_conntrack
+>>>>>>> nf_defrag_ipv6 nf_defrag_ipv4 nf_tables nfnetlink bridge stp llc
+>>>>>>> rfkill
+>>>>>>> sunrpc vfat fat mlx5_ib ib_uverbs ib_core acpi_ipmi ipmi_ssif
+>>>>>>> ipmi_devintf ipmi_msghandler cppc_cpufreq drm xfs libcrc32c
+>>>>>>> mlx5_core sg
+>>>>>>> mlxfw crct10dif_ce tls ghash_ce sha2_ce sha256_arm64 sha1_ce
+>>>>>>> sbsa_gwdt
+>>>>>>> e1000e psample sdhci_acpi ahci_platform sdhci libahci_platform
+>>>>>>> qcom_emac
+>>>>>>> mmc_core hdma hdma_mgmt dm_mirror dm_region_hash dm_log dm_mod fuse
+>>>>>>> [  390.110618] CPU: 42 PID: 5589 Comm: tee Kdump: loaded Not tainted
+>>>>>>> 5.17.0-rc4-lu-v7-official+ #24
+>>>>>>> [  390.119384] Hardware name: WIWYNN QDF2400 Reference Evaluation
+>>>>>>> Platform CV90-LA115-P120/QDF2400 Customer Reference Board, BIOS
+>>>>>>> 0ACJA570
+>>>>>>> 11/05/2018
+>>>>>>> [  390.132492] pstate: a0400005 (NzCv daif +PAN -UAO -TCO -DIT -SSBS
+>>>>>>> BTYPE=--)
+>>>>>>> [  390.139436] pc : iommu_device_unuse_default_domain+0x68/0x100
+>>>>>>> [  390.145165] lr : iommu_device_unuse_default_domain+0x38/0x100
+>>>>>>> [  390.150894] sp : ffff80000fbb3bc0
+>>>>>>> [  390.154193] x29: ffff80000fbb3bc0 x28: ffff03c0cf6b2400 x27:
+>>>>>>> 0000000000000000
+>>>>>>> [  390.161311] x26: 0000000000000000 x25: 0000000000000000 x24:
+>>>>>>> ffff03c0c7cc5720
+>>>>>>> [  390.168429] x23: ffff03c0c2b9d150 x22: ffffb4e61df223f8 x21:
+>>>>>>> ffffb4e61df223f8
+>>>>>>> [  390.175547] x20: ffff03c7c03c3758 x19: ffff03c7c03c3700 x18:
+>>>>>>> 0000000000000000
+>>>>>>> [  390.182665] x17: 0000000000000000 x16: 0000000000000000 x15:
+>>>>>>> 0000000000000000
+>>>>>>> [  390.189783] x14: 0000000000000000 x13: 0000000000000030 x12:
+>>>>>>> ffff03c0d519cd80
+>>>>>>> [  390.196901] x11: 7f7f7f7f7f7f7f7f x10: 0000000000000dc0 x9 :
+>>>>>>> ffffb4e620b54f8c
+>>>>>>> [  390.204019] x8 : ffff03c0cf6b3220 x7 : ffff4ef132bba000 x6 :
+>>>>>>> 00000000000000ff
+>>>>>>> [  390.211137] x5 : ffff03c0c2b9f108 x4 : ffff03c0d51f6438 x3 :
+>>>>>>> 0000000000000000
+>>>>>>> [  390.218255] x2 : ffff03c0cf6b2400 x1 : 0000000000000000 x0 :
+>>>>>>> 0000000000000000
+>>>>>>> [  390.225374] Call trace:
+>>>>>>> [  390.227804]  iommu_device_unuse_default_domain+0x68/0x100
+>>>>>>> [  390.233187]  pci_dma_cleanup+0x38/0x44
+>>>>>>> [  390.236919]  __device_release_driver+0x1a8/0x260
+>>>>>>> [  390.241519]  device_driver_detach+0x50/0xd0
+>>>>>>> [  390.245686]  unbind_store+0xf8/0x120
+>>>>>>> [  390.249245]  drv_attr_store+0x30/0x44
+>>>>>>> [  390.252891]  sysfs_kf_write+0x50/0x60
+>>>>>>> [  390.256537]  kernfs_fop_write_iter+0x134/0x1cc
+>>>>>>> [  390.260964]  new_sync_write+0xf0/0x18c
+>>>>>>> [  390.264696]  vfs_write+0x230/0x2d0
+>>>>>>> [  390.268082]  ksys_write+0x74/0x100
+>>>>>>> [  390.271467]  __arm64_sys_write+0x28/0x3c
+>>>>>>> [  390.275373]  invoke_syscall.constprop.0+0x58/0xf0
+>>>>>>> [  390.280061]  el0_svc_common.constprop.0+0x160/0x164
+>>>>>>> [  390.284922]  do_el0_svc+0x34/0xcc
+>>>>>>> [  390.288221]  el0_svc+0x30/0x140
+>>>>>>> [  390.291346]  el0t_64_sync_handler+0xa4/0x130
+>>>>>>> [  390.295599]  el0t_64_sync+0x1a0/0x1a4
+>>>>>>> [  390.299245] ---[ end trace 0000000000000000 ]---
+>>>>>>>
+>>>>>>>
+>>>>>>> I put some traces in the code and I can see that
+>>>>>>> iommu_device_use_default_domain() effectively is called on
+>>>>>>> 0004:01:00.0 e1000e device on pci_dma_configure() but at that time
+>>>>>>> the iommu group is NULL:
+>>>>>>> [   10.569427] e1000e 0004:01:00.0: ------ ENTRY pci_dma_configure
+>>>>>>> driver_managed_area=0
+>>>>>>> [   10.569431] e1000e 0004:01:00.0: ****
+>>>>>>> iommu_device_use_default_domain ENTRY
+>>>>>>> [   10.569433] e1000e 0004:01:00.0: ****
+>>>>>>> iommu_device_use_default_domain no group
+>>>>>>> [   10.569435] e1000e 0004:01:00.0: pci_dma_configure
+>>>>>>> iommu_device_use_default_domain returned 0
+>>>>>>> [   10.569492] e1000e 0004:01:00.0: Adding to iommu group 3
+>>>>>>>
+>>>>>>> ^^^the group is added after the
+>>>>>>> iommu_device_use_default_domain() call
+>>>>>>> So the group->owner_cnt is not incremented as expected.
+>>>>>>
+>>>>>> Thank you for reporting this. Do you have any idea why the driver is
+>>>>>> loaded before iommu_probe_device()?
+>>>>>
+>>>>> Urgh, this is the horrible firmware-data-ordering thing again. The
+>>>>> stuff I've been saying about having to rework the whole .dma_configure
+>>>>> mechanism in the near future is to fix this properly.
+>>>>>
+>>>>> The summary is that in patch #4, calling
+>>>>> iommu_device_use_default_domain() *before* {of,acpi}_dma_configure is
+>>>>> currently a problem. As things stand, the IOMMU driver ignored the
+>>>>> initial iommu_probe_device() call when the device was added, since at
+>>>>> that point it had no fwspec yet. In this situation,
+>>>>> {of,acpi}_iommu_configure() are retriggering iommu_probe_device()
+>>>>> after the IOMMU driver has seen the firmware data via .of_xlate to
+>>>>> learn that it it actually responsible for the given device.
+>>>>
+>>>> thank you for providing the info. Hope this is something Lu can work
+>>>> around.
+>>>
+>>> Hopefully it's just a case of flipping the calls around, so that
+>>> iommu_use_default_domain() goes at the end, and calls
+>>> arch_teardown_dma_ops() if it fails. From a quick skim I *think* that
+>>> should still work out to the desired behaviour (or at least close
+>>> enough that we can move forward without a circular dependency between
+>>> fixes...)
+>>
+>> This is a reasonable solution to me. Thank you for the information and
+>> suggestion.
+>>
+>> Eric, I have updated the patch #4 and uploaded a new version here:
+>>
+>> https://github.com/LuBaolu/intel-iommu/commits/iommu-dma-ownership-v8
+> 
+> with v8 I do not hit the warning anymore and the owner accounting seems
+> to work as expected.
 
-That is a good point. And that risk is very real given that
-kvm_mmu_topup_memory_cache() assumes the capacity is
-KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE if the capacity field is 0.
+Thank you, Eric! I will post the v8 soon.
 
-One way to mitigate this would be to get rid of the capacity hack in
-kvm_mmu_topup_memory_cache() and require the capacity field be
-explicitly initialized. That will make it harder to trip over this
-and/or easier to debug because kvm_mmu_topup_memory_cache() can issue
-a WARN() if the capacity is 0. Once you see that warning and go to
-initialize the capacity field you'll realize why it needs to be set in
-the first place. The diff will just be slightly larger to set capacity
-for each cache.
-
->
-> [...]
->
-> > I see two alternatives to make this cleaner:
-> >
-> > 1. Dynamically allocate just this cache. The caches defined in
-> > vcpu_arch will continue to use DEFINE_KVM_MMU_MEMORY_CACHE(). This
-> > would get rid of the outer struct but require an extra memory
-> > allocation.
-> > 2. Move this cache to struct kvm_arch using
-> > DEFINE_KVM_MMU_MEMORY_CACHE(). Then we don't need to stack allocate it
-> > or dynamically allocate it.
-> >
-> > Do either of these approaches appeal to you more than the current one?
->
-> Certainly, #2 feels more solid. Dynamic allocations (and the resulting
-> pointer chasing) are usually costly in terms of performance, so I'd
-> avoid it if at all possible.
->
-> That being said, if it turns out that #2 isn't practical, I won't get
-> in the way of your current approach. Moving kvm_mmu_memory_cache to
-> core code was definitely a good cleanup, and I'm not overly excited
-> with the perspective of *more* arch-specific code.
-
-Ok I'll play with #2. Thanks for the feedback.
-
->
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+Best regards,
+baolu
