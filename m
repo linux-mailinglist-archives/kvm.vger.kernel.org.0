@@ -2,70 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CEFB34D119E
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 09:08:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ECE204D11C6
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 09:11:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344779AbiCHIJa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 03:09:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58746 "EHLO
+        id S1344850AbiCHILo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Mar 2022 03:11:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33028 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344558AbiCHIJ2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Mar 2022 03:09:28 -0500
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 728A73E0D2
-        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 00:08:30 -0800 (PST)
-Received: by mail-wr1-x433.google.com with SMTP id j17so27196075wrc.0
-        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 00:08:30 -0800 (PST)
+        with ESMTP id S1344930AbiCHILa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 03:11:30 -0500
+Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A03CE3EBB8
+        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 00:10:10 -0800 (PST)
+Received: by mail-wr1-x434.google.com with SMTP id k24so17657263wrd.7
+        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 00:10:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=w2kpbDHbmA0uZN+CsMThxfqb9nbhJ8u8Feprw4xNVCo=;
-        b=H2fvfqR+I6VM2Kk9IJYxRI4A6ijk4Qn7lQFH2W2PR+olehv6klS+VeDxePKtFAVv7S
-         8ygNpmOvYIXEw1Jkyy3vf1JJnxERuP+XaHmS1D4zxXtN2EdyDs7ra39Jt13vr/RQNfP8
-         fHCRtN0Qudi90mb33HhTUycYmfmsCLq+k+OPt/4IbfQvQfL/Z/f2gIPMksMlUZLRgkD8
-         DU4VmMObglStBQIyHpInbQRCEWzwYPwePXiQ0+mePYzxV2j3z475Kofkfj5CBFw6AG0O
-         9pvZkuyTRM9guHFOE+Omp3Pxm3rFlyC8wW4M9fzHgQqGa08mdIaUWy/nC7uUgSRFuYZk
-         XCIQ==
+        bh=bC4nX/4w2hAp8ne90xPCyTuVT60oAJGeczdCQbo0l3c=;
+        b=QmDNjmplj+bPdQf7fQe47SUylL4K0+DMOKwd1ybuiZGCaFLMOK8TYpXB5AN6ao8waC
+         3RZ+8T5oBvLk7sE8SOLy3Vz1qthxs76QJ5vxuIzAQn2tIcCjEx/kMREVsJJ8aV8zKTVg
+         H+F+0e0ovnAOA9t3tYMnV8ptAl5j9ZBM5bIKWPUDTYj1jx2IDv6Dcp/OPIkhOrvT1Iac
+         sB/7dFSog87yqWl1RZnPK5SURyoAx5s88de7qeZCRoVaffTncrbKpLpjju3MFchUQ6KE
+         gCpshgv7aHnKpeJNFdT71GJq6SZgRbqKt3YqoJwgKbGm57vDDUhGBEiKEsWqgdR+jPje
+         ny/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:content-transfer-encoding
          :in-reply-to;
-        bh=w2kpbDHbmA0uZN+CsMThxfqb9nbhJ8u8Feprw4xNVCo=;
-        b=6GdV87KjWIOCHMQ0WzICjA+dg9FwiZnCZA9WekDa99R2Vqx3FMXZVMVcpr4IDE/Vyi
-         su+LEQuk7bPMXdlUeENm9XRdLhhre+iRTz3MWmE48TGyWxWFyxNlEwviyNnKT5NfmU0m
-         E6ISMg5uWbynso1TM0azufx9Asfa52aVTVTPPAdep3iegPCD509ULB8OkmwdofluV4Km
-         QV7sGHNTDkJ+jXtMdl4DPZpeQt09SM3fvCHs2TclahrItoFfkMJU+ASTZCTMwmm/UdGK
-         tUBiulxrTjVr2E8Lv/sNJMfd2xBEx7/+nqbwbFmhWGOA7zKFYCU4lTiXlcjtZPb0sA8d
-         tfUg==
-X-Gm-Message-State: AOAM530jBc+PPa7/9jVH82CYxm/OgQOJUpACK0dY9C27AeIAvtLmKg1K
-        JTR8vlqrAIOOiflX1O6vmsizKg==
-X-Google-Smtp-Source: ABdhPJzxQ/wNPlE0Op8r9v7pQTLfIf/oRM+ZegzSmvEtfz5rbvQrhtQyNtGfUsLEaBrywseYTM9mjA==
-X-Received: by 2002:adf:fd50:0:b0:1f0:7a8e:c922 with SMTP id h16-20020adffd50000000b001f07a8ec922mr11353776wrs.166.1646726908942;
-        Tue, 08 Mar 2022 00:08:28 -0800 (PST)
+        bh=bC4nX/4w2hAp8ne90xPCyTuVT60oAJGeczdCQbo0l3c=;
+        b=sWVqnn65ALBk2UG1gVjvrxkGHYbMRcUM6cNQZEQoqLR+i58uszg+AkiLwS+WhdmTvj
+         zSHxCqIVhAYs59mMw+/VTpnXuc5/XjBYJ5W6c/rzchO/oWIl5PhmoCAUBRY2nKzWBA+n
+         Oa7/sq7VPmIulYcFHugwykUSqWVbARESR6M7tRFy4tA13Q4MReAPKwxb4Zaq5Al3pF1X
+         cLG1rtMnoAqo9x4/kwsZd8S0iD9sWYPseSpWtKeZD7v9x7xXmmh9indpgfkBIUJqQpIo
+         Pfuc1b7mWUOyIAh6cKWeArj+A0bVl9YiP1QC6lYIPNw7hS8lFXz5ydTRV3RODEdlXFzG
+         vfeA==
+X-Gm-Message-State: AOAM532IFN1lmGFElGN6cPmD1X/1wgN1WgZMIgY6nPeAfp6Dm5K5kvhV
+        OjBRfx7kjAf8h3jUV3PAfCf5Vg==
+X-Google-Smtp-Source: ABdhPJzUt2KoS6npL3OLj00DKa4VkVnkLSkI4Qmgp881qSFd1k1FRRraWZrqYUd/ozCf3xX3VYvw8Q==
+X-Received: by 2002:adf:dcc2:0:b0:1f0:4c38:d6be with SMTP id x2-20020adfdcc2000000b001f04c38d6bemr11263420wrm.79.1646727008778;
+        Tue, 08 Mar 2022 00:10:08 -0800 (PST)
 Received: from google.com (cpc155339-bagu17-2-0-cust87.1-3.cable.virginm.net. [86.27.177.88])
-        by smtp.gmail.com with ESMTPSA id m18-20020a05600c3b1200b003899d242c3asm1461077wms.44.2022.03.08.00.08.27
+        by smtp.gmail.com with ESMTPSA id f20-20020a05600c4e9400b003898e252cd4sm1555824wmq.12.2022.03.08.00.10.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Mar 2022 00:08:28 -0800 (PST)
-Date:   Tue, 8 Mar 2022 08:08:25 +0000
+        Tue, 08 Mar 2022 00:10:08 -0800 (PST)
+Date:   Tue, 8 Mar 2022 08:10:06 +0000
 From:   Lee Jones <lee.jones@linaro.org>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     mst <mst@redhat.com>, linux-kernel <linux-kernel@vger.kernel.org>,
-        kvm <kvm@vger.kernel.org>,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        netdev <netdev@vger.kernel.org>, stable@vger.kernel.org,
+To:     Greg KH <gregkh@linuxfoundation.org>
+Cc:     mst@redhat.com, jasowang@redhat.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, stable@vger.kernel.org,
         syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
 Subject: Re: [PATCH 1/1] vhost: Protect the virtqueue from being cleared
  whilst still in use
-Message-ID: <YicO+aF4VhaBYNqK@google.com>
+Message-ID: <YicPXnNFHpoJHcUN@google.com>
 References: <20220307191757.3177139-1-lee.jones@linaro.org>
- <CACGkMEsjmCNQPjxPjXL0WUfbMg8ARnumEp4yjUxqznMKR1nKSQ@mail.gmail.com>
+ <YiZeB7l49KC2Y5Gz@kroah.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACGkMEsjmCNQPjxPjXL0WUfbMg8ARnumEp4yjUxqznMKR1nKSQ@mail.gmail.com>
+In-Reply-To: <YiZeB7l49KC2Y5Gz@kroah.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
@@ -76,70 +75,54 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 08 Mar 2022, Jason Wang wrote:
+On Mon, 07 Mar 2022, Greg KH wrote:
 
-> On Tue, Mar 8, 2022 at 3:18 AM Lee Jones <lee.jones@linaro.org> wrote:
-> >
+> On Mon, Mar 07, 2022 at 07:17:57PM +0000, Lee Jones wrote:
 > > vhost_vsock_handle_tx_kick() already holds the mutex during its call
 > > to vhost_get_vq_desc().  All we have to do here is take the same lock
 > > during virtqueue clean-up and we mitigate the reported issues.
-> >
+> > 
 > > Also WARN() as a precautionary measure.  The purpose of this is to
 > > capture possible future race conditions which may pop up over time.
-> >
+> > 
 > > Link: https://syzkaller.appspot.com/bug?extid=279432d30d825e63ba00
-> >
+> > 
 > > Cc: <stable@vger.kernel.org>
 > > Reported-by: syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
 > > Signed-off-by: Lee Jones <lee.jones@linaro.org>
 > > ---
 > >  drivers/vhost/vhost.c | 10 ++++++++++
 > >  1 file changed, 10 insertions(+)
-> >
+> > 
 > > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
 > > index 59edb5a1ffe28..ef7e371e3e649 100644
 > > --- a/drivers/vhost/vhost.c
 > > +++ b/drivers/vhost/vhost.c
 > > @@ -693,6 +693,15 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
-> >         int i;
-> >
-> >         for (i = 0; i < dev->nvqs; ++i) {
-> > +               /* No workers should run here by design. However, races have
-> > +                * previously occurred where drivers have been unable to flush
-> > +                * all work properly prior to clean-up.  Without a successful
-> > +                * flush the guest will malfunction, but avoiding host memory
-> > +                * corruption in those cases does seem preferable.
-> > +                */
-> > +               WARN_ON(mutex_is_locked(&dev->vqs[i]->mutex));
-> > +
+> >  	int i;
+> >  
+> >  	for (i = 0; i < dev->nvqs; ++i) {
+> > +		/* No workers should run here by design. However, races have
+> > +		 * previously occurred where drivers have been unable to flush
+> > +		 * all work properly prior to clean-up.  Without a successful
+> > +		 * flush the guest will malfunction, but avoiding host memory
+> > +		 * corruption in those cases does seem preferable.
+> > +		 */
+> > +		WARN_ON(mutex_is_locked(&dev->vqs[i]->mutex));
 > 
-> I don't get how this can help, the mutex could be grabbed in the
-> middle of the above and below line.
-
-The worst that happens in this slim scenario is we miss a warning.
-The mutexes below will still function as expected and prevent possible
-memory corruption.
-
-> > +               mutex_lock(&dev->vqs[i]->mutex);
-> >                 if (dev->vqs[i]->error_ctx)
-> >                         eventfd_ctx_put(dev->vqs[i]->error_ctx);
-> >                 if (dev->vqs[i]->kick)
-> > @@ -700,6 +709,7 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
-> >                 if (dev->vqs[i]->call_ctx.ctx)
-> >                         eventfd_ctx_put(dev->vqs[i]->call_ctx.ctx);
-> >                 vhost_vq_reset(dev, dev->vqs[i]);
-> > +               mutex_unlock(&dev->vqs[i]->mutex);
-> >         }
+> So you are trading one syzbot triggered issue for another one in the
+> future?  :)
 > 
-> I'm not sure it's correct to assume some behaviour of a buggy device.
-> For the device mutex, we use that to protect more than just err/call
-> and vq.
+> If this ever can happen, handle it, but don't log it with a WARN_ON() as
+> that will trigger the panic-on-warn boxes, as well as syzbot.  Unless
+> you want that to happen?
 
-When I authored this, I did so as *the* fix.  However, since the cause
-of today's crash has now been patched, this has become a belt and
-braces solution.  Michael's addition of the WARN() also has the
-benefit of providing us with an early warning system for future
-breakages.  Personally, I think it's kinda neat.
+No, Syzbot doesn't report warnings, only BUGs and memory corruption.
+
+> And what happens if the mutex is locked _RIGHT_ after you checked it?
+> You still have a race...
+
+No, we miss a warning that one time.  Memory is still protected.
 
 -- 
 Lee Jones [李琼斯]
