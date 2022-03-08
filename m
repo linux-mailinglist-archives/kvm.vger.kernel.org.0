@@ -2,106 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 076604D1DC1
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 17:50:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E9F404D1DC9
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 17:53:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237545AbiCHQu7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 11:50:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58204 "EHLO
+        id S241414AbiCHQyO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Mar 2022 11:54:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231637AbiCHQu5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Mar 2022 11:50:57 -0500
-Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20A524924F
-        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 08:50:01 -0800 (PST)
-Received: by mail-ej1-x636.google.com with SMTP id bg10so40624984ejb.4
-        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 08:50:01 -0800 (PST)
+        with ESMTP id S235755AbiCHQyM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 11:54:12 -0500
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C8933587F
+        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 08:53:15 -0800 (PST)
+Received: by mail-pl1-x62f.google.com with SMTP id n15so7613279plh.2
+        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 08:53:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=ED351dHlsOTEDVr6K25lYC9Ef6ipOfRlBtu/ru3/8RA=;
-        b=Qh5YV6qpIfakIMuD7Cl1xXzYKqV16yvA2ZzWZdmDTA2+mfau4998V9UPgnH47rRmHP
-         GGFnpvLp4kEIdCsMeK8rLZRJuBIAg7nXPDKXuzMSbh+ip2vPQRW4JEx9L2SxZuQwEKlR
-         u3VeypXDlPR7ga4lc11Fyarm5qlDzjuSVq+cbwIdsJBqt4xte5RxJV0l26+dTA01uit4
-         LQ9z7ANoylWiiiq7DCV4XEPtPPMSd/DloqZdRGgG3tV5JstvLRMVEJLOufRPgqb2CBRG
-         hNJPUH4mzPnQgMw9vvcuEJ+b7sptEa9HNb0ySvCAL3IlsFR0rRO3vuVxHel8axnoQg0O
-         JCDw==
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Aw18J68slMX3u6w2BrCY37hjJvd4h9lWvYqiNLs4b7Y=;
+        b=rzRbOfUZOfhElw8AngwSYQi0wDv+onU3eZNvsbkqdyxvclz7Zr6mzrE32F2JkXEB3h
+         qquq89/Nfnnx+ocxbv7dxKi6o1WdyAJJCf4x8MMUYl6HuvevN3g1+Sc1iK4XFOTam9kk
+         LImDreePxQ/+7vLjuufPF+nN1ptc4DEmfLhZo55PMXI4yO+vg3oPSf1wmlIzcvDBMaps
+         sO4cAAJc+uzjuw/EJmxufPiJbs5mpgOOAnj+GA3rfc5wBWrmZqDW6HCQ6OusDc4JXrKE
+         buRXaU367GtMJ803qGtPhfIhcirjhgRLUDlUnSmC5kxeIj88+KW1oRcMTkAElv4EeHqH
+         WzbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=ED351dHlsOTEDVr6K25lYC9Ef6ipOfRlBtu/ru3/8RA=;
-        b=n8XnVPP8+8p+YFufSEpqxTlqayDt8ODfnG/ETvnlm7X7tJuml/x8gBpdgWeh/9arM5
-         cMF4S4MgVG6hQCj5PAXinD3Quj8Yu3bhRpFvo8pW5iY+58hC82e0R8mZnJf+LWb8KTsO
-         2a5evxJa0w6TKGc1oi0tGoYZc+873EF+dSxGJdOps0azaPVd6ITtfYextt2IcpTy8mG1
-         jOFR7upb61tP65G4ZA8N4vzyw8HA2p4muEBr/4mi/gEuBXz4pOC2LIYiCIY85REeI20q
-         KeBJJ/RNBV4xgtsYPmW+PWFPwlQK+K8qJMFv1RETAtaZRPfzT0iJhShvxV3m1o2+tqCk
-         MSfw==
-X-Gm-Message-State: AOAM5306vK8lu+PPHoVL5Ism+soMfgpTQ5QMuWpDv5EcdE7D8Ag7kzhN
-        dw3LzaYeSbvFqme98NjveDk=
-X-Google-Smtp-Source: ABdhPJzoRKgDfpH/rR1m/Hzbo0977lUfTL2mbPf50EDoHhmt1SXHlKc8ymiljrLz/T5mQIqooVOeUA==
-X-Received: by 2002:a17:906:fb1b:b0:6da:9e7d:1390 with SMTP id lz27-20020a170906fb1b00b006da9e7d1390mr13696232ejb.644.1646758199690;
-        Tue, 08 Mar 2022 08:49:59 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id o23-20020a170906861700b006da745f7233sm6032162ejx.5.2022.03.08.08.49.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Mar 2022 08:49:59 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <adbaebac-19ed-e8b7-a79c-9831d2ac055f@redhat.com>
-Date:   Tue, 8 Mar 2022 17:49:58 +0100
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Aw18J68slMX3u6w2BrCY37hjJvd4h9lWvYqiNLs4b7Y=;
+        b=VdUTAzBxVn5tDT07Dj0OMShyIh02k8kHmcnR7o7fHtXB83O1stvyFb6I/SaF0sfWw0
+         A5DBEoUPIFm+0akdG/HgjvLEBLf9QLC+F/VJ6cMPui/29+F1wHoNNRAiMAlOeUqGfH0Z
+         vdNt+YtzL7HDs4LbpLJxmwnyv6MJn9cNeLW0hfTJrMq3BkTC1sQPKqf9f2D8r1XZEywL
+         P9xmUpUAwn0zg2ijJQyIHi9FuVNdLZ2AuWMKXNRF5ZndTUL+cbPRqnvSMM7GhOoRVqQG
+         DJJV9xJoX1Ht2zFgtGo9pOVthYYIIe01HUwP6j95FmGSFH2pyNHN5vxV59H9TTwHcW2T
+         XoKQ==
+X-Gm-Message-State: AOAM531ct1JBx9U9eeLeUt/B2gv+46e4lC+1+Y2sLh0HYBSngrGWo6iV
+        6CRlpFCrna/d+RcdpzOhmOjxaA==
+X-Google-Smtp-Source: ABdhPJwgJzz9fp6vtbUf9hQK5YdRHFNGxcelBmBpwGv/bCRXr90BgcERD99wdZgWPE6ZvkBRi3yAQw==
+X-Received: by 2002:a17:90a:bf91:b0:1b9:bda3:10ff with SMTP id d17-20020a17090abf9100b001b9bda310ffmr5617947pjs.38.1646758394503;
+        Tue, 08 Mar 2022 08:53:14 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id l2-20020a056a0016c200b004e10af156adsm20976388pfc.190.2022.03.08.08.53.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Mar 2022 08:53:13 -0800 (PST)
+Date:   Tue, 8 Mar 2022 16:53:10 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        dmatlack@google.com
+Subject: Re: [PATCH v2 01/25] KVM: x86/mmu: avoid indirect call for get_cr3
+Message-ID: <YieJ9lkq7R87m1mJ@google.com>
+References: <20220221162243.683208-1-pbonzini@redhat.com>
+ <20220221162243.683208-2-pbonzini@redhat.com>
+ <YieBXzkOkB9SZpyp@google.com>
+ <2652c27e-ce8c-eb40-1979-9fe732aa9085@redhat.com>
+ <YieFKfjrgTTnYkL7@google.com>
+ <96ff1628-eeb2-4d12-f4eb-287dd8fc9948@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH v3 00/17] KVM: Add Xen event channel acceleration
-Content-Language: en-US
-To:     David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Metin Kaya <metikaya@amazon.co.uk>,
-        Paul Durrant <pdurrant@amazon.co.uk>
-References: <20220303154127.202856-1-dwmw2@infradead.org>
- <db8515e4-3668-51d2-d9af-711ebd48ad9b@redhat.com>
- <ec930edc27998dcfe8135a01e368d89747f03c41.camel@infradead.org>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <ec930edc27998dcfe8135a01e368d89747f03c41.camel@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <96ff1628-eeb2-4d12-f4eb-287dd8fc9948@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/8/22 17:41, David Woodhouse wrote:
-> Thanks. I've literally just a couple of minutes ago finished diagnosing
-> a sporadic live migration / live update bug which seems to happen
-> because adding an hrtimer in the past*sometimes*  seems not to work,
-> although it always worked in my dev testing.
+On Tue, Mar 08, 2022, Paolo Bonzini wrote:
+> On 3/8/22 17:32, Sean Christopherson wrote:
+> > 
+> > Aha!  An idea that would provide line of sight to avoiding retpoline in all cases
+> > once we use static_call() for nested_ops, which I really want to do...  Drop the
+> > mmu hook entirely and replace it with:
+> > 
+> > static inline kvm_mmu_get_guest_pgd(struct kvm_vcpu *vcpu)
+> > {
+> > 	if (!mmu_is_nested(vcpu))
+> > 		return kvm_read_cr3(vcpu);
+> > 	else
+> > 		return kvm_x86_ops.nested_ops->get_guest_pgd(vcpu);
+> > }
 > 
-> Incremental diff to the 'oneshot timers' patch looks like the first
-> hunk of this. I'm also pondering the second hunk which actively
-> *cancels*  the pending timer on serialization.
+> Makes sense, but I think you mean
+> 
+> static inline unsigned long kvm_mmu_get_guest_pgd(struct kvm_vcpu *vcpu,
+> 						  struct kvm_mmu *mmu)
+> {
+> 	if (unlikely(vcpu == &vcpu->arch.guest_mmu))
 
-Hmm, why so?
+Well, not that certainly :-)
 
-> Do you want a repost, or a proper incremental patch on top of kvm/queue
-> when it becomes visible?
+	if (mmu == &vcpu->arch.guest_mmu)
 
-kvm/queue is rebased routinely, so I'll just squash (only the first 
-hunk, methinks).  Got a testcase, though?  That might be better as a 
-separate patch.
+But you're right, we need to be able to do kvm_read_cr3() for the actual nested_mmu.
 
-Paolo
+> 		return kvm_x86_ops.nested_ops->get_guest_pgd(vcpu);
+> 	else
+> 		return kvm_read_cr3(vcpu);
+> }
+> 
+> ?
