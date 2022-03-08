@@ -2,127 +2,197 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 999804D170D
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 13:17:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4CED04D1741
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 13:28:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237288AbiCHMST (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 07:18:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59916 "EHLO
+        id S1346807AbiCHM2z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Mar 2022 07:28:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54124 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346780AbiCHMSD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Mar 2022 07:18:03 -0500
-Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A711E43EEC;
-        Tue,  8 Mar 2022 04:17:06 -0800 (PST)
-Received: by mail-ej1-x62f.google.com with SMTP id qa43so38708312ejc.12;
-        Tue, 08 Mar 2022 04:17:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=OFA2/eM8lwGnQdw8L8HYozWRTs8bN4HRmWhwr7+OpfQ=;
-        b=dZxiz91cR9d8+CC4dJkv0i2jFfJ9CP0b3NlEsXD6TPHMGYacNdhru2mSELTl8O+6T+
-         FkPBsspyt6yrQV1UNk0fLDyvuyTBbsyYl6/T/V6x+ZilvnI0NzYTKb6PgY7cnu5zGc3W
-         z8u6cgybLElr2aEZQqTCU+yd3hjzgyX32dfmIm7l1uFqFRVNXPWDahWbmtxQMKSxUF6t
-         mDip2hxkD1fj4trIskXiu0dLQGix1y5LAmHMsfX0r/TW2pyZZX5NoWOICWOAFwOo7IeO
-         jpGsIE8IKRoh4awk7E5UsjXtaPmC6jPN5sC8oetFJ5PMyH0bpwZVfBbDUpiUazI2kL/w
-         rFpA==
+        with ESMTP id S1346717AbiCHM2w (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 07:28:52 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 64C0C657F
+        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 04:27:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646742474;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=9pf/IVqL8yE3g13OAwcuAVKQfPo53FP6ApFVilX1pcQ=;
+        b=S+USZCvaGod29QApOxU/KFhcPs94Cab+KEmPf5SI/TosVvzaTbzz3TbQ6hiMUfJaZ2JLk/
+        Eo3yvMnBxyj7x6s8BvmqZ9f1GHgPSNLjd5/zD/H1rugivODgNRiYFTZr8C7Qm80n1IyeVL
+        P8sOgEeGfHcjey789RUuw71nAF+8UPk=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-423-OQM0pEyeNPW31bUCkU02Dg-1; Tue, 08 Mar 2022 07:27:53 -0500
+X-MC-Unique: OQM0pEyeNPW31bUCkU02Dg-1
+Received: by mail-ed1-f72.google.com with SMTP id b9-20020aa7d489000000b0041669cd2cbfso1338636edr.16
+        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 04:27:53 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=OFA2/eM8lwGnQdw8L8HYozWRTs8bN4HRmWhwr7+OpfQ=;
-        b=r0OKZEy++X04LXgPuvGLZAV+xqgFCxlzL6HlMYMJf6JxxF04BeYhNVTU8XzJHIO8nk
-         aZgZUXbLfjkjWXfxH8IlCdmW8F8TnOqVjczIF+iVuePU9vbwwSF244Ehvr/8uEROWI/L
-         P+Cd8Nsi/7iE8uXREHzZFilsz4L3KlOesSuHvQhesdBNtpx7VQMZNMwdMTfYdQicBXBz
-         EUO+8pqg1gLmbpI0OA1F7lwBkgmKDdyQ4tSZwzq0S2WmActedAslT1sAlmVkAOe0LTUz
-         3C0PbKqfPbYDP/HCR9xoMprgKFlwBbdR3Bgj8eIRx2J7NOMLyNmL5ySKWRzTneFvIZOc
-         AYJg==
-X-Gm-Message-State: AOAM533xcSInz+ARxj+U1EvNpk0EEFQc8bJvKhJSrgEVCyMbHaV0G2kT
-        Bo/trlK3AEy8vNwwSdMvW1/W9qLbtgY=
-X-Google-Smtp-Source: ABdhPJwE9PU5xJ81uImIisWcDcAXQ3ECFtBqwX9p5ItDnR0zlR5H81k8PeGbgOyJEUFk90ZFZol5QQ==
-X-Received: by 2002:a17:907:97cc:b0:6da:a8fb:d1db with SMTP id js12-20020a17090797cc00b006daa8fbd1dbmr13315004ejc.267.1646741825187;
-        Tue, 08 Mar 2022 04:17:05 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id r19-20020a17090638d300b006d6e4fc047bsm5886872ejd.11.2022.03.08.04.17.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Mar 2022 04:17:04 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <800a68f8-fbe0-5980-4290-bdc0ed4d05bd@redhat.com>
-Date:   Tue, 8 Mar 2022 13:17:02 +0100
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=9pf/IVqL8yE3g13OAwcuAVKQfPo53FP6ApFVilX1pcQ=;
+        b=ANVIImAjTI6TCVgGQ4CT5bVDf+XOnn7z2Ciru3ylejbymf4wuO3Inth0q/peZgVClE
+         okB2yM56XuLUfO0VkaH1bT2bPE2w2/72VGE6td1MmPLs+My1p4y0s3nHB8suZyoImcgS
+         VtSWVsMMZTMi31jEd5RPUF5u8gTPj4csija90MgIMQPk1GHhC4MYR/lIze2cKjF9ptaP
+         iIZqYuQZMpTFY/iXsegjNRI6vgE1xvCfXUfoAfbJRbg10ajPnoaB2s2L9xESuhTllPxz
+         8drnDgNQLgZw1JM5yTI6CO5Im1y9Oebat85qtYglZLFwu9nBh++haqu1/h6jbToEHmjJ
+         ht1w==
+X-Gm-Message-State: AOAM533x7lJY05xnkimYClJiRfzmVrT5UPUh10igBst1HX/SGP8xKJPr
+        XFCgsTOyLZ92GmWGT6mMLpJdH6asCTf8gJty1tO+RTiVOxMwYv8+gTgxV9nANhd6mp6iIuuW6sS
+        cRFihz02YJfMz
+X-Received: by 2002:a17:907:7242:b0:6da:b561:d523 with SMTP id ds2-20020a170907724200b006dab561d523mr13282175ejc.118.1646742471605;
+        Tue, 08 Mar 2022 04:27:51 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyRLddVnWaTYQ7CEcx+H/uBDYSK5MuBK5kvSFUyJcedIYo1CrA8Y49v9huSdkQH7zA4WWcJdw==
+X-Received: by 2002:a17:907:7242:b0:6da:b561:d523 with SMTP id ds2-20020a170907724200b006dab561d523mr13282150ejc.118.1646742471316;
+        Tue, 08 Mar 2022 04:27:51 -0800 (PST)
+Received: from redhat.com ([2.55.138.228])
+        by smtp.gmail.com with ESMTPSA id p24-20020a1709061b5800b006da6435cedcsm5786231ejg.132.2022.03.08.04.27.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Mar 2022 04:27:50 -0800 (PST)
+Date:   Tue, 8 Mar 2022 07:27:47 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Greg KH <gregkh@linuxfoundation.org>
+Cc:     Lee Jones <lee.jones@linaro.org>, jasowang@redhat.com,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        stable@vger.kernel.org,
+        syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
+Subject: Re: [PATCH 1/1] vhost: Protect the virtqueue from being cleared
+ whilst still in use
+Message-ID: <20220308071718-mutt-send-email-mst@kernel.org>
+References: <20220307191757.3177139-1-lee.jones@linaro.org>
+ <YiZeB7l49KC2Y5Gz@kroah.com>
+ <YicPXnNFHpoJHcUN@google.com>
+ <Yicalf1I6oBytbse@kroah.com>
+ <Yicer3yGg5rrdSIs@google.com>
+ <YicolvcbY9VT6AKc@kroah.com>
+ <20220308055003-mutt-send-email-mst@kernel.org>
+ <YidBz7SxED2ii1Lh@kroah.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH v4 01/12] mm/shmem: Introduce F_SEAL_INACCESSIBLE
-Content-Language: en-US
-To:     Chao Peng <chao.p.peng@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>
-Cc:     Steven Price <steven.price@arm.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        qemu-devel@nongnu.org, Linux API <linux-api@vger.kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        "Nakajima, Jun" <jun.nakajima@intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Andi Kleen <ak@linux.intel.com>,
-        David Hildenbrand <david@redhat.com>
-References: <20220118132121.31388-1-chao.p.peng@linux.intel.com>
- <20220118132121.31388-2-chao.p.peng@linux.intel.com>
- <619547ad-de96-1be9-036b-a7b4e99b09a6@kernel.org>
- <20220217130631.GB32679@chaop.bj.intel.com>
- <2ca78dcb-61d9-4c9d-baa9-955b6f4298bb@www.fastmail.com>
- <20220223114935.GA53733@chaop.bj.intel.com>
- <71a06402-6743-bfd2-bbd4-997f8e256554@arm.com>
- <7cc65bbd-e323-eabb-c576-b5656a3355ac@kernel.org>
- <20220307132602.GA58690@chaop.bj.intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220307132602.GA58690@chaop.bj.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YidBz7SxED2ii1Lh@kroah.com>
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/7/22 14:26, Chao Peng wrote:
->> In pseudo-Rust, this is the difference between:
->>
->> fn convert_to_private(in: &mut Memfd)
->>
->> and
->>
->> fn convert_to_private(in: Memfd) -> PrivateMemoryFd
->>
->> This doesn't map particularly nicely to the kernel, though.
-> I understand this Rust semantics and the difficulty to handle races.
-> Probably we should not expose F_SEAL_INACCESSIBLE to userspace, instead
-> we can use a new in-kernel flag to indicate the same thing. That flag
-> should be set only when the memfd is created with MFD_INACCESSIBLE.
+On Tue, Mar 08, 2022 at 12:45:19PM +0100, Greg KH wrote:
+> On Tue, Mar 08, 2022 at 05:55:58AM -0500, Michael S. Tsirkin wrote:
+> > On Tue, Mar 08, 2022 at 10:57:42AM +0100, Greg KH wrote:
+> > > On Tue, Mar 08, 2022 at 09:15:27AM +0000, Lee Jones wrote:
+> > > > On Tue, 08 Mar 2022, Greg KH wrote:
+> > > > 
+> > > > > On Tue, Mar 08, 2022 at 08:10:06AM +0000, Lee Jones wrote:
+> > > > > > On Mon, 07 Mar 2022, Greg KH wrote:
+> > > > > > 
+> > > > > > > On Mon, Mar 07, 2022 at 07:17:57PM +0000, Lee Jones wrote:
+> > > > > > > > vhost_vsock_handle_tx_kick() already holds the mutex during its call
+> > > > > > > > to vhost_get_vq_desc().  All we have to do here is take the same lock
+> > > > > > > > during virtqueue clean-up and we mitigate the reported issues.
+> > > > > > > > 
+> > > > > > > > Also WARN() as a precautionary measure.  The purpose of this is to
+> > > > > > > > capture possible future race conditions which may pop up over time.
+> > > > > > > > 
+> > > > > > > > Link: https://syzkaller.appspot.com/bug?extid=279432d30d825e63ba00
+> > > > > > > > 
+> > > > > > > > Cc: <stable@vger.kernel.org>
+> > > > > > > > Reported-by: syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
+> > > > > > > > Signed-off-by: Lee Jones <lee.jones@linaro.org>
+> > > > > > > > ---
+> > > > > > > >  drivers/vhost/vhost.c | 10 ++++++++++
+> > > > > > > >  1 file changed, 10 insertions(+)
+> > > > > > > > 
+> > > > > > > > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> > > > > > > > index 59edb5a1ffe28..ef7e371e3e649 100644
+> > > > > > > > --- a/drivers/vhost/vhost.c
+> > > > > > > > +++ b/drivers/vhost/vhost.c
+> > > > > > > > @@ -693,6 +693,15 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
+> > > > > > > >  	int i;
+> > > > > > > >  
+> > > > > > > >  	for (i = 0; i < dev->nvqs; ++i) {
+> > > > > > > > +		/* No workers should run here by design. However, races have
+> > > > > > > > +		 * previously occurred where drivers have been unable to flush
+> > > > > > > > +		 * all work properly prior to clean-up.  Without a successful
+> > > > > > > > +		 * flush the guest will malfunction, but avoiding host memory
+> > > > > > > > +		 * corruption in those cases does seem preferable.
+> > > > > > > > +		 */
+> > > > > > > > +		WARN_ON(mutex_is_locked(&dev->vqs[i]->mutex));
+> > > > > > > 
+> > > > > > > So you are trading one syzbot triggered issue for another one in the
+> > > > > > > future?  :)
+> > > > > > > 
+> > > > > > > If this ever can happen, handle it, but don't log it with a WARN_ON() as
+> > > > > > > that will trigger the panic-on-warn boxes, as well as syzbot.  Unless
+> > > > > > > you want that to happen?
+> > > > > > 
+> > > > > > No, Syzbot doesn't report warnings, only BUGs and memory corruption.
+> > > > > 
+> > > > > Has it changed?  Last I looked, it did trigger on WARN_* calls, which
+> > > > > has resulted in a huge number of kernel fixes because of that.
+> > > > 
+> > > > Everything is customisable in syzkaller, so maybe there are specific
+> > > > builds which panic_on_warn enabled, but none that I'm involved with
+> > > > do.
+> > > 
+> > > Many systems run with panic-on-warn (i.e. the cloud), as they want to
+> > > drop a box and restart it if anything goes wrong.
+> > > 
+> > > That's why syzbot reports on WARN_* calls.  They should never be
+> > > reachable by userspace actions.
+> > > 
+> > > > Here follows a topical example.  The report above in the Link: tag
+> > > > comes with a crashlog [0].  In there you can see the WARN() at the
+> > > > bottom of vhost_dev_cleanup() trigger many times due to a populated
+> > > > (non-flushed) worker list, before finally tripping the BUG() which
+> > > > triggers the report:
+> > > > 
+> > > > [0] https://syzkaller.appspot.com/text?tag=CrashLog&x=16a61fce700000
+> > > 
+> > > Ok, so both happens here.  But don't add a warning for something that
+> > > can't happen.  Just handle it and move on.  It looks like you are
+> > > handling it in this code, so please drop the WARN_ON().
+> > > 
+> > > thanks,
+> > > 
+> > > greg k-h
+> > 
+> > Hmm. Well this will mean if we ever reintroduce the bug then
+> > syzkaller will not catch it for us :( And the bug is there,
+> > it just results in a hard to reproduce error for userspace.
+> 
+> Is this an error you can recover from in the kernel?
+>  What is userspace
+> supposed to know with this information when it sees it?
 
-Yes, I like this.
+IIUC we are talking about a use after free here since we somehow
+managed to have a pointer to the device in a worker while
+device is being destroyed.
 
-Paolo
+That's the point of the warning as use after free is hard to debug. You
+ask can we recover from a use after free? 
+
+As regards to the added lock, IIUC it kind of shifts the use after free
+window to later and since we zero out some of the memory just before we
+free it, it's a bit more likely to recover.  I would still like to see
+some more analysis on why the situation is always better than it was
+before though.
+
+> > Not sure what to do here. Export panic_on_warn flag to modules
+> > and check it here?
+> 
+> Hah, no, never do that :)
+> 
+> thanks,
+> 
+> greg k-h
 
