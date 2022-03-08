@@ -2,168 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 682C44D14C2
+	by mail.lfdr.de (Postfix) with ESMTP id 7BACD4D14C3
 	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 11:29:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345876AbiCHKaC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 05:30:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40114 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345848AbiCHK37 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1345862AbiCHK37 (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Tue, 8 Mar 2022 05:29:59 -0500
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5F0F3C489
-        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 02:29:03 -0800 (PST)
-Received: by mail-pj1-x1032.google.com with SMTP id kx6-20020a17090b228600b001bf859159bfso1822157pjb.1
-        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 02:29:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :references:cc:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=p8/NRHDkv4nhYswvOn46nNnRF6vVZN1beNLSnAJ1y1M=;
-        b=F5WUhuR7tiMuhNfbZcB4Lm3QgVdXlaZ26OYKp5ZyJ/2TRz0EzfK5rG6+r77waUAXiW
-         tFkPkSCMT93z9qFZPaV2RFQCehogxl2mPfzml7pXUWGQyBgC12A4AHQXB85Ub2HsJ6z0
-         ZnqHKRQGjy1QBIEbZCVn/lLIpyENW/FCwMXFSinXYl36EmXJntxP8Ovy3Fr9wmDcmBLr
-         VvB5m+wuZjANPbmSHFmEX3shV+/EVceExRw92iRjf1b/DVEJnw2CDlKdev3C3uUQuc9W
-         lh9EaSkfJC+6P+35tkW4TgWgTMZ+FDPMdSyHztMDP8OCRGzoACb8mTPvuLLyzfnvYPCF
-         +WPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:references:cc:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=p8/NRHDkv4nhYswvOn46nNnRF6vVZN1beNLSnAJ1y1M=;
-        b=nAnq+mwduXchPdGArzj6WkKHHUROzB8wwOLVA1OCriH3OOkRmbyyCzJMamxZxJbOAW
-         EAFErtlbj6DAE7kVRyUqeU/a8HCS6YKqud9H5rDSzavT4ydnUyKhNmCQdU5vcDuLLgie
-         xnc7INcV+sdn2TOqwuPAhnv10Z3dCwZ6WxtNQ5hPIz5jqOklIGnSth3MA3NAQu/C1ec5
-         AawOG0H1hF0KerWEWEKT3ma/eZJGpseEpPNQ1KeruZmmvpXm+Xr3xMxQWIc6zevUZcX7
-         fJOzzjkp872JFgTxxoR2CX2trvyuMueulyatsX5VB3kHxMLoeXeDebFqnbVY6Ldoi5Wg
-         Nuig==
-X-Gm-Message-State: AOAM532bmPrm0hPRFHH/cArc3TJdAPtrBfLvjflLrGdowi5qMcsyQ7Ln
-        I23hiz2nU+e1ffnRs7z4yAxlrS9JMB8RU07K
-X-Google-Smtp-Source: ABdhPJx5bkAy4eByDtuuX3LcVxeHXUeR3KAaTfsiEBXG+K4ijGK/yIgjJlL97oV/JTvsX3QLSNqQxQ==
-X-Received: by 2002:a17:90b:3805:b0:1bf:6eca:2fc7 with SMTP id mq5-20020a17090b380500b001bf6eca2fc7mr3909163pjb.228.1646735343274;
-        Tue, 08 Mar 2022 02:29:03 -0800 (PST)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id 23-20020a17090a0b9700b001b8f602eaeasm2326221pjr.53.2022.03.08.02.29.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Mar 2022 02:29:02 -0800 (PST)
-Message-ID: <01af48ad-fee3-603a-7b14-5a0ae52bb7f9@gmail.com>
-Date:   Tue, 8 Mar 2022 18:28:55 +0800
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40088 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S244341AbiCHK36 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 05:29:58 -0500
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDB1D3C48F;
+        Tue,  8 Mar 2022 02:29:01 -0800 (PST)
+Received: from dggpeml500024.china.huawei.com (unknown [172.30.72.53])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4KCWjk5KmWzdb2N;
+        Tue,  8 Mar 2022 18:27:38 +0800 (CST)
+Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
+ dggpeml500024.china.huawei.com (7.185.36.10) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Tue, 8 Mar 2022 18:29:00 +0800
+Received: from [10.67.103.212] (10.67.103.212) by
+ dggpeml100012.china.huawei.com (7.185.36.121) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Tue, 8 Mar 2022 18:28:59 +0800
+Subject: Re: [PATCH v8 6/9] hisi_acc_vfio_pci: Add helper to retrieve the
+ struct pci_driver
+To:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>
+References: <20220303230131.2103-1-shameerali.kolothum.thodi@huawei.com>
+ <20220303230131.2103-7-shameerali.kolothum.thodi@huawei.com>
+CC:     <linux-pci@vger.kernel.org>, <alex.williamson@redhat.com>,
+        <jgg@nvidia.com>, <cohuck@redhat.com>, <mgurtovoy@nvidia.com>,
+        <yishaih@nvidia.com>, <linuxarm@huawei.com>,
+        <liulongfang@huawei.com>, <prime.zeng@hisilicon.com>,
+        <jonathan.cameron@huawei.com>, <wangzhou1@hisilicon.com>
+From:   "yekai(A)" <yekai13@huawei.com>
+Message-ID: <77d96509-bad2-b271-aaaf-07ca6b699db6@huawei.com>
+Date:   Tue, 8 Mar 2022 18:28:59 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.6.2
-Subject: Re: [PATCH] KVM: x86/pmu: Use different raw event masks for AMD and
- Intel
-Content-Language: en-US
-To:     Jim Mattson <jmattson@google.com>
-References: <20220308012452.3468611-1-jmattson@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        "Paolo Bonzini - Distinguished Engineer (kernel-recipes.org) (KVM HoF)" 
-        <pbonzini@redhat.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-Organization: Tencent
-In-Reply-To: <20220308012452.3468611-1-jmattson@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <20220303230131.2103-7-shameerali.kolothum.thodi@huawei.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Originating-IP: [10.67.103.212]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpeml100012.china.huawei.com (7.185.36.121)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/3/2022 9:24 am, Jim Mattson wrote:
-> The third nybble of AMD's event select overlaps with Intel's IN_TX and
-> IN_TXCP bits. Therefore, we can't use AMD64_RAW_EVENT_MASK on Intel
-> platforms that support TSX.
 
-We already have pmu->reserved_bits as the first wall to check "can't use".
 
-> 
-> Declare a raw_event_mask in the kvm_pmu structure, initialize it in
-> the vendor-specific pmu_refresh() functions, and use that mask for
-> PERF_TYPE_RAW configurations in reprogram_gp_counter().
-> 
-> Fixes: 710c47651431 ("KVM: x86/pmu: Use AMD64_RAW_EVENT_MASK for PERF_TYPE_RAW")
-
-Is it really a fix ?
-
-> Signed-off-by: Jim Mattson <jmattson@google.com>
+On 2022/3/4 7:01, Shameer Kolothum wrote:
+> struct pci_driver pointer is an input into the pci_iov_get_pf_drvdata().
+> Introduce helpers to retrieve the ACC PF dev struct pci_driver pointers
+> as we use this in ACC vfio migration driver.
+>
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 > ---
->   arch/x86/include/asm/kvm_host.h | 1 +
->   arch/x86/kvm/pmu.c              | 3 ++-
->   arch/x86/kvm/svm/pmu.c          | 1 +
->   arch/x86/kvm/vmx/pmu_intel.c    | 1 +
->   4 files changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index c45ab8b5c37f..cacd27c1aa19 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -510,6 +510,7 @@ struct kvm_pmu {
->   	u64 global_ctrl_mask;
->   	u64 global_ovf_ctrl_mask;
->   	u64 reserved_bits;
-> +	u64 raw_event_mask;
->   	u8 version;
->   	struct kvm_pmc gp_counters[INTEL_PMC_MAX_GENERIC];
->   	struct kvm_pmc fixed_counters[INTEL_PMC_MAX_FIXED];
-> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-> index b1a02993782b..902b6d700215 100644
-> --- a/arch/x86/kvm/pmu.c
-> +++ b/arch/x86/kvm/pmu.c
-> @@ -185,6 +185,7 @@ void reprogram_gp_counter(struct kvm_pmc *pmc, u64 eventsel)
->   	u32 type = PERF_TYPE_RAW;
->   	struct kvm *kvm = pmc->vcpu->kvm;
->   	struct kvm_pmu_event_filter *filter;
-> +	struct kvm_pmu *pmu = vcpu_to_pmu(pmc->vcpu);
+>  drivers/crypto/hisilicon/hpre/hpre_main.c | 6 ++++++
+>  drivers/crypto/hisilicon/sec2/sec_main.c  | 6 ++++++
+>  drivers/crypto/hisilicon/zip/zip_main.c   | 6 ++++++
+>  include/linux/hisi_acc_qm.h               | 5 +++++
+>  4 files changed, 23 insertions(+)
+>
+> diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
+> index 3589d8879b5e..36ab30e9e654 100644
+> --- a/drivers/crypto/hisilicon/hpre/hpre_main.c
+> +++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
+> @@ -1190,6 +1190,12 @@ static struct pci_driver hpre_pci_driver = {
+>  	.driver.pm		= &hpre_pm_ops,
+>  };
+>
+> +struct pci_driver *hisi_hpre_get_pf_driver(void)
+> +{
+> +	return &hpre_pci_driver;
+> +}
+> +EXPORT_SYMBOL_GPL(hisi_hpre_get_pf_driver);
+> +
+>  static void hpre_register_debugfs(void)
+>  {
+>  	if (!debugfs_initialized())
+> diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
+> index 311a8747b5bf..421a405ca337 100644
+> --- a/drivers/crypto/hisilicon/sec2/sec_main.c
+> +++ b/drivers/crypto/hisilicon/sec2/sec_main.c
+> @@ -1088,6 +1088,12 @@ static struct pci_driver sec_pci_driver = {
+>  	.driver.pm = &sec_pm_ops,
+>  };
+>
+> +struct pci_driver *hisi_sec_get_pf_driver(void)
+> +{
+> +	return &sec_pci_driver;
+> +}
+> +EXPORT_SYMBOL_GPL(hisi_sec_get_pf_driver);
+> +
+>  static void sec_register_debugfs(void)
+>  {
+>  	if (!debugfs_initialized())
+> diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
+> index 66decfe07282..4534e1e107d1 100644
+> --- a/drivers/crypto/hisilicon/zip/zip_main.c
+> +++ b/drivers/crypto/hisilicon/zip/zip_main.c
+> @@ -1012,6 +1012,12 @@ static struct pci_driver hisi_zip_pci_driver = {
+>  	.driver.pm		= &hisi_zip_pm_ops,
+>  };
+>
+> +struct pci_driver *hisi_zip_get_pf_driver(void)
+> +{
+> +	return &hisi_zip_pci_driver;
+> +}
+> +EXPORT_SYMBOL_GPL(hisi_zip_get_pf_driver);
+> +
+>  static void hisi_zip_register_debugfs(void)
+>  {
+>  	if (!debugfs_initialized())
+> diff --git a/include/linux/hisi_acc_qm.h b/include/linux/hisi_acc_qm.h
+> index 6a6477c34666..00f2a4db8723 100644
+> --- a/include/linux/hisi_acc_qm.h
+> +++ b/include/linux/hisi_acc_qm.h
+> @@ -476,4 +476,9 @@ void hisi_qm_pm_init(struct hisi_qm *qm);
+>  int hisi_qm_get_dfx_access(struct hisi_qm *qm);
+>  void hisi_qm_put_dfx_access(struct hisi_qm *qm);
+>  void hisi_qm_regs_dump(struct seq_file *s, struct debugfs_regset32 *regset);
+> +
+> +/* Used by VFIO ACC live migration driver */
+> +struct pci_driver *hisi_sec_get_pf_driver(void);
+> +struct pci_driver *hisi_hpre_get_pf_driver(void);
+> +struct pci_driver *hisi_zip_get_pf_driver(void);
+>  #endif
+>
 
-How about pmc_to_pmu(pmc) ?
+Hi Shameer,
 
->   	bool allow_event = true;
->   
->   	if (eventsel & ARCH_PERFMON_EVENTSEL_PIN_CONTROL)
-> @@ -221,7 +222,7 @@ void reprogram_gp_counter(struct kvm_pmc *pmc, u64 eventsel)
->   	}
->   
->   	if (type == PERF_TYPE_RAW)
-> -		config = eventsel & AMD64_RAW_EVENT_MASK;
-> +		config = eventsel & pmu->raw_event_mask;
+It looks good to me for this movement.
 
-If the code base is current kvm/queue,
-the checks about (eventsel & HSW_IN_TX*) is still there.
+Acked-by:  Kai Ye <yekai13@huawei.com>
 
-Not sure why we're wasting extra 'u64' space for nothing.
-
->   
->   	if (pmc->current_config == eventsel && pmc_resume_counter(pmc))
->   		return;
-> diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
-> index 886e8ac5cfaa..24eb935b6f85 100644
-> --- a/arch/x86/kvm/svm/pmu.c
-> +++ b/arch/x86/kvm/svm/pmu.c
-> @@ -282,6 +282,7 @@ static void amd_pmu_refresh(struct kvm_vcpu *vcpu)
->   
->   	pmu->counter_bitmask[KVM_PMC_GP] = ((u64)1 << 48) - 1;
->   	pmu->reserved_bits = 0xfffffff000280000ull;
-> +	pmu->raw_event_mask = AMD64_RAW_EVENT_MASK;
->   	pmu->version = 1;
->   	/* not applicable to AMD; but clean them to prevent any fall out */
->   	pmu->counter_bitmask[KVM_PMC_FIXED] = 0;
-> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-> index 4e5b1eeeb77c..da71160a50d6 100644
-> --- a/arch/x86/kvm/vmx/pmu_intel.c
-> +++ b/arch/x86/kvm/vmx/pmu_intel.c
-> @@ -485,6 +485,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
->   	pmu->counter_bitmask[KVM_PMC_FIXED] = 0;
->   	pmu->version = 0;
->   	pmu->reserved_bits = 0xffffffff00200000ull;
-> +	pmu->raw_event_mask = X86_RAW_EVENT_MASK;
->   
->   	entry = kvm_find_cpuid_entry(vcpu, 0xa, 0);
->   	if (!entry || !vcpu->kvm->arch.enable_pmu)
+Thanks,
+Kai
