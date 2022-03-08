@@ -2,142 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 038754D1229
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 09:26:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 98E5C4D124C
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 09:33:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240780AbiCHI1F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 03:27:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52950 "EHLO
+        id S1344945AbiCHIeR convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Tue, 8 Mar 2022 03:34:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234091AbiCHI1E (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Mar 2022 03:27:04 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C5E53F318
-        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 00:26:08 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id E9C35B817D4
-        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 08:26:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9806CC340F7
-        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 08:26:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1646727965;
-        bh=guvk9x1Op97zuzURP3QqZ9xuFIprOfjMyPIa+lWEAsc=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=t3hrTae4TGY+vb2jQsHaUn6k2adXAJdkW2QsLACHLr12mp00/FtJeAI8wlpqiXXJO
-         qsDd+0k8Oio/WUZGZoHMi2q6vycg36dOfOsdS2AYeLK3mbCuJkyilw6Me0L9ieQTo+
-         fN8VXOY9nvSUoF713yte4JhbRAIXi2LXpcLPOoQAtQEfb7zYQ5mUp1OP8wxArNmPQW
-         ghTed4ZCB7/237HXifLjV8RdbgwCTY/3r8BmUjMlrXnQUa2CitD4g82VJNnRCgqQWk
-         BE0htlcRn/fUiiVnIIVbAj+4Ln4UwIMjiTtIrAh0IVJ56sNZMCB12Q9QaK5LCk7s+t
-         +Nydu84w+0ouw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 86887C05FD6; Tue,  8 Mar 2022 08:26:05 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 199727] CPU freezes in KVM guests during high IO load on host
-Date:   Tue, 08 Mar 2022 08:26:05 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: stefanha@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-199727-28872-gXV1Zq937Z@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-199727-28872@https.bugzilla.kernel.org/>
-References: <bug-199727-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        with ESMTP id S241170AbiCHIeQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 03:34:16 -0500
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C06424F06;
+        Tue,  8 Mar 2022 00:33:20 -0800 (PST)
+Received: from fraeml705-chm.china.huawei.com (unknown [172.18.147.200])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4KCT870WDgz67NB8;
+        Tue,  8 Mar 2022 16:31:51 +0800 (CST)
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ fraeml705-chm.china.huawei.com (10.206.15.54) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2308.21; Tue, 8 Mar 2022 09:33:17 +0100
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ lhreml710-chm.china.huawei.com (10.201.108.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Tue, 8 Mar 2022 08:33:17 +0000
+Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
+ lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
+ 15.01.2308.021; Tue, 8 Mar 2022 08:33:17 +0000
+From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+CC:     "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
+        "yishaih@nvidia.com" <yishaih@nvidia.com>,
+        Linuxarm <linuxarm@huawei.com>,
+        liulongfang <liulongfang@huawei.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        "Jonathan Cameron" <jonathan.cameron@huawei.com>,
+        "Wangzhou (B)" <wangzhou1@hisilicon.com>
+Subject: RE: [PATCH v8 5/9] hisi_acc_vfio_pci: Restrict access to VF dev BAR2
+ migration region
+Thread-Topic: [PATCH v8 5/9] hisi_acc_vfio_pci: Restrict access to VF dev BAR2
+ migration region
+Thread-Index: AQHYL1LES66RK6Gs/kmsjFJ+eUfqqKy1C2eAgAAh4CA=
+Date:   Tue, 8 Mar 2022 08:33:16 +0000
+Message-ID: <21c1ddd171df45bdb62220cf997e58e6@huawei.com>
+References: <20220303230131.2103-1-shameerali.kolothum.thodi@huawei.com>
+ <20220303230131.2103-6-shameerali.kolothum.thodi@huawei.com>
+ <BN9PR11MB527681F9F6B0906596A77A178C099@BN9PR11MB5276.namprd11.prod.outlook.com>
+In-Reply-To: <BN9PR11MB527681F9F6B0906596A77A178C099@BN9PR11MB5276.namprd11.prod.outlook.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.47.27.151]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-X-Spam-Status: No, score=-7.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D199727
+Hi Kevin,
 
---- Comment #16 from Stefan Hajnoczi (stefanha@gmail.com) ---
-On Tue, 8 Mar 2022 at 08:01, <bugzilla-daemon@kernel.org> wrote:
->
-> https://bugzilla.kernel.org/show_bug.cgi?id=3D199727
->
-> --- Comment #15 from Roland Kletzing (devzero@web.de) ---
-> yes, i was using cache=3Dnone and io_uring also caused issues.
->
-> >aio=3Dthreads avoids softlockups because the preadv(2)/pwritev(2)/fdatas=
-ync(2)
-> > syscalls run in worker threads that don't take the QEMU global mutex.
-> >Therefore vcpu threads can execute even when I/O is stuck in the kernel =
-due
-> to
-> >a lock.
->
-> yes, that was a long search/journey to get to this information/params....
->
-> regarding io_uring - after proxmox enabled it as default, it was taken ba=
-ck
-> again after some issues had been reported.
->
-> have look at:
-> https://github.com/proxmox/qemu-server/blob/master/debian/changelog
->
-> maybe it's not ready for primetime yet !?
->
-> -- Proxmox Support Team <support@proxmox.com>  Fri, 30 Jul 2021 16:53:44
-> +0200
-> qemu-server (7.0-11) bullseye; urgency=3Dmedium
-> <snip>
->   * lvm: avoid the use of io_uring for now
-> <snip>
-> -- Proxmox Support Team <support@proxmox.com>  Fri, 23 Jul 2021 11:08:48
-> +0200
-> qemu-server (7.0-10) bullseye; urgency=3Dmedium
-> <snip>
->   * avoid using io_uring for drives backed by LVM and configured for
->   write-back
->     or write-through cache
-> <snip>
->  -- Proxmox Support Team <support@proxmox.com>  Mon, 05 Jul 2021 20:49:50
->  +0200
-> qemu-server (7.0-6) bullseye; urgency=3Dmedium
-> <snip>
->   * For now do not use io_uring for drives backed by Ceph RBD, with KRBD =
-and
->     write-back or write-through cache enabled, as in that case some
->     polling/IO
->     may hang in QEMU 6.0.
-> <snip>
+> -----Original Message-----
+> From: Tian, Kevin [mailto:kevin.tian@intel.com]
+> Sent: 08 March 2022 06:23
+> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
+> kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
+> linux-crypto@vger.kernel.org
+> Cc: linux-pci@vger.kernel.org; alex.williamson@redhat.com; jgg@nvidia.com;
+> cohuck@redhat.com; mgurtovoy@nvidia.com; yishaih@nvidia.com; Linuxarm
+> <linuxarm@huawei.com>; liulongfang <liulongfang@huawei.com>; Zengtao (B)
+> <prime.zeng@hisilicon.com>; Jonathan Cameron
+> <jonathan.cameron@huawei.com>; Wangzhou (B) <wangzhou1@hisilicon.com>
+> Subject: RE: [PATCH v8 5/9] hisi_acc_vfio_pci: Restrict access to VF dev BAR2
+> migration region
+> 
+> Hi, Shameer,
+> 
+> > From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> > Sent: Friday, March 4, 2022 7:01 AM
+> >
+> > HiSilicon ACC VF device BAR2 region consists of both functional
+> > register space and migration control register space. From a
+> > security point of view, it's not advisable to export the migration
+> > control region to Guest.
+> >
+> > Hence, introduce a separate struct vfio_device_ops for migration
+> > support which will override the ioctl/read/write/mmap methods to
+> > hide the migration region and limit the access only to the
+> > functional register space.
+> >
+> > This will be used in subsequent patches when we add migration
+> > support to the driver.
+> 
+> As a security concern the migration control region should be always
+> disabled regardless of whether migration support is added to the
+> driver for such device... It sounds like we should first fix this security
+> hole for acc device assignment and then add the migration support
+> atop (at least organize the series in this way).
 
-Changelog messages mention cache=3Dwritethrough and cache=3Dwriteback,
-which are both problematic because host memory pressure will interfere
-with guest performance. That is probably not an issue with io_uring
-per se, just another symptom of using cache=3Dwriteback/writethrough in
-cases where it's inappropriate.
+By exposing the migration BAR region, there is a possibility that a malicious
+Guest can prevent migration from happening by manipulating the migration
+BAR region. I don't think there are any other security concerns now especially
+since we only support the STOP_COPY state.  And the approach has been that
+we only restrict this if migration support is enabled. I think I can change the
+above "security concern" description to "malicious Guest can prevent migration"
+to make it more clear.
 
-If you have trace data showing io_uring_enter(2) hanging with
-cache=3Dnone then Jens Axboe and other io_uring developers may be able
-to help resolve that.
+Hope this is fine.
 
-Stefan
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+Thanks,
+Shameer
