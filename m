@@ -2,207 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 90A354D16C1
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 12:59:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 070F84D16C8
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 13:02:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346577AbiCHMAt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 07:00:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33594 "EHLO
+        id S1346641AbiCHMDd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Mar 2022 07:03:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233849AbiCHMAs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Mar 2022 07:00:48 -0500
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11C43289B6;
-        Tue,  8 Mar 2022 03:59:52 -0800 (PST)
-Received: by mail-pj1-x1030.google.com with SMTP id mg21-20020a17090b371500b001bef9e4657cso2059299pjb.0;
-        Tue, 08 Mar 2022 03:59:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=wHCHcNv35jsq9uJZNtNUOMWI8ofZ17Ys+sOz/RMBH2Y=;
-        b=fTSu255snnLS1boMzSwSXCtpILYhn+fxqGJRzzIQnOWPzwmidDgpWj1EZ/nWrooPUN
-         m13gywxcmYTKSpWE1e1F6Rw1DipevK83Hxf6qqdC9Ie1911j3Wl5pW1X5gZ2Ln+96jzo
-         JnqXi9Kf+LNfSJ2Y/3XV2xU+LA3avuZ3CZDbMeFXl7+tpwSp0eJOWu5V4UyljVvKkOKI
-         peWTHRRDYunnqaJfPckjNa9ppHRUSUKH/sGf0bJpxGzAsJlUQNXxgWUDC6wx2kieFKFp
-         K7Hg42WPcTa2gbSjKC8VXJKGiU7Je+9m/OKJSqtEYFOA6Z6Jxk/V2UoC0EuryrgY2EHd
-         to4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=wHCHcNv35jsq9uJZNtNUOMWI8ofZ17Ys+sOz/RMBH2Y=;
-        b=uZynL9CPSWyLjqjKep2G0706w6HC2E2my47fd4Gr+3oeY8WDKdMdrZILql39Synu4n
-         d5OyOK8izoCToi59fe6fXZYomz7q5UGfEOu6OgLPfaruoPLk6puGbdEid/t0Uf8snYBA
-         sQFGuavPmiMdHQ/Tf/bln+Sny/Ckpn9Rm6HtPAGOpJZyMejxdlo8OX6TVgR9MwAmn2Op
-         X0mju5d5CfG3CrzpLh2q6N0l5hVGuUNRl6oEjkw/yE0aQq5x5ZgPBAI3FbFEmCVnd63U
-         8W7zEXnLloEhNjyepbEsuA0UVclHSs6uvbh2z27v7WkqH6faMmt7PxTqnn1kFj/d5vc+
-         olEA==
-X-Gm-Message-State: AOAM530/TTfZuUykSnIHWbg2YgYmMxob4txfqjjIiaqFNcwcxrD9jjs6
-        xJ46p43AU0M7U7G2wOSJ2jA=
-X-Google-Smtp-Source: ABdhPJyXsq3i+35vKFEFyBvbGkmze5hQ2fkRfm7MLFRJfgDr4mENQ/dUF95fvfqJBLBgVyQHQyNiQQ==
-X-Received: by 2002:a17:90b:38ce:b0:1bf:a34:5bad with SMTP id nn14-20020a17090b38ce00b001bf0a345badmr4315295pjb.129.1646740791559;
-        Tue, 08 Mar 2022 03:59:51 -0800 (PST)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id l20-20020a056a00141400b004f65cedfb09sm19707996pfu.48.2022.03.08.03.59.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Mar 2022 03:59:51 -0800 (PST)
-Message-ID: <f1f846f6-a544-d38c-beef-611bf70c4fcc@gmail.com>
-Date:   Tue, 8 Mar 2022 19:59:42 +0800
+        with ESMTP id S233849AbiCHMDc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 07:03:32 -0500
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6DC8AE69;
+        Tue,  8 Mar 2022 04:02:34 -0800 (PST)
+Received: from kwepemi500009.china.huawei.com (unknown [172.30.72.57])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4KCYjh6Clnz1GCDT;
+        Tue,  8 Mar 2022 19:57:44 +0800 (CST)
+Received: from kwepemm600005.china.huawei.com (7.193.23.191) by
+ kwepemi500009.china.huawei.com (7.221.188.199) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Tue, 8 Mar 2022 20:02:32 +0800
+Received: from [10.67.102.118] (10.67.102.118) by
+ kwepemm600005.china.huawei.com (7.193.23.191) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Tue, 8 Mar 2022 20:02:31 +0800
+Subject: Re: [PATCH v8 6/9] hisi_acc_vfio_pci: Add helper to retrieve the
+ struct pci_driver
+To:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>
+CC:     <linux-pci@vger.kernel.org>, <alex.williamson@redhat.com>,
+        <jgg@nvidia.com>, <cohuck@redhat.com>, <mgurtovoy@nvidia.com>,
+        <yishaih@nvidia.com>, <linuxarm@huawei.com>,
+        <prime.zeng@hisilicon.com>, <jonathan.cameron@huawei.com>,
+        <wangzhou1@hisilicon.com>
+References: <20220303230131.2103-1-shameerali.kolothum.thodi@huawei.com>
+ <20220303230131.2103-7-shameerali.kolothum.thodi@huawei.com>
+From:   liulongfang <liulongfang@huawei.com>
+Message-ID: <553bf6f3-b473-d72c-f120-230d02f9a74a@huawei.com>
+Date:   Tue, 8 Mar 2022 20:02:31 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.6.2
-Subject: Re: [PATCH] KVM: x86/pmu: Isolate TSX specific perf_event_attr.attr
- logic for AMD
-Content-Language: en-US
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Ravi Bangoria <ravi.bangoria@amd.com>,
-        Andi Kleen <ak@linux.intel.com>, kvm@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
-        Kan Liang <kan.liang@linux.intel.com>
-References: <20220307063805.65030-1-likexu@tencent.com>
- <CALMp9eSCWxM5-_-S6SK_0o-aTCWGzyut-L2qsqnaeR_dJc6n3g@mail.gmail.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-Organization: Tencent
-In-Reply-To: <CALMp9eSCWxM5-_-S6SK_0o-aTCWGzyut-L2qsqnaeR_dJc6n3g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20220303230131.2103-7-shameerali.kolothum.thodi@huawei.com>
+Content-Type: text/plain; charset="gbk"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.102.118]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemm600005.china.huawei.com (7.193.23.191)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/3/2022 5:39 am, Jim Mattson wrote:
-> On Sun, Mar 6, 2022 at 10:38 PM Like Xu <like.xu.linux@gmail.com> wrote:
->>
->> From: Like Xu <likexu@tencent.com>
->>
->> HSW_IN_TX* bits are used in generic code which are not supported on
->> AMD. Worse, these bits overlap with AMD EventSelect[11:8] and hence
->> using HSW_IN_TX* bits unconditionally in generic code is resulting in
->> unintentional pmu behavior on AMD. For example, if EventSelect[11:8]
->> is 0x2, pmc_reprogram_counter() wrongly assumes that
->> HSW_IN_TX_CHECKPOINTED is set and thus forces sampling period to be 0.
->>
->> Opportunistically remove two TSX specific incoming parameters for
->> the generic interface reprogram_counter().
->>
->> Fixes: 103af0a98788 ("perf, kvm: Support the in_tx/in_tx_cp modifiers in KVM arch perfmon emulation v5")
->> Co-developed-by: Ravi Bangoria <ravi.bangoria@amd.com>
->> Signed-off-by: Ravi Bangoria <ravi.bangoria@amd.com>
->> Signed-off-by: Like Xu <likexu@tencent.com>
->> ---
->> Note: this patch is based on [1] which is considered to be a necessary cornerstone.
->> [1] https://lore.kernel.org/kvm/20220302111334.12689-1-likexu@tencent.com/
->>
->>   arch/x86/kvm/pmu.c | 29 ++++++++++++++---------------
->>   1 file changed, 14 insertions(+), 15 deletions(-)
->>
->> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
->> index 17c61c990282..d0f9515c37dd 100644
->> --- a/arch/x86/kvm/pmu.c
->> +++ b/arch/x86/kvm/pmu.c
->> @@ -99,8 +99,7 @@ static void kvm_perf_overflow(struct perf_event *perf_event,
->>
->>   static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
->>                                    u64 config, bool exclude_user,
->> -                                 bool exclude_kernel, bool intr,
->> -                                 bool in_tx, bool in_tx_cp)
->> +                                 bool exclude_kernel, bool intr)
->>   {
->>          struct perf_event *event;
->>          struct perf_event_attr attr = {
->> @@ -116,16 +115,18 @@ static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
->>
->>          attr.sample_period = get_sample_period(pmc, pmc->counter);
->>
->> -       if (in_tx)
->> -               attr.config |= HSW_IN_TX;
->> -       if (in_tx_cp) {
->> -               /*
->> -                * HSW_IN_TX_CHECKPOINTED is not supported with nonzero
->> -                * period. Just clear the sample period so at least
->> -                * allocating the counter doesn't fail.
->> -                */
->> -               attr.sample_period = 0;
->> -               attr.config |= HSW_IN_TX_CHECKPOINTED;
->> +       if (guest_cpuid_is_intel(pmc->vcpu)) {
+On 2022/3/4 7:01, Shameer Kolothum wrote:
+> struct pci_driver pointer is an input into the pci_iov_get_pf_drvdata().
+> Introduce helpers to retrieve the ACC PF dev struct pci_driver pointers
+> as we use this in ACC vfio migration driver.
 > 
-> This is not the right condition to check. Per the SDM, both bits 32
-> and 33 "may only be set if the processor supports HLE or RTM." On
-> other Intel processors, this bit is reserved and any attempts to set
-> them result in a #GP.
-
-We already have this part of the code:
-
-	entry = kvm_find_cpuid_entry(vcpu, 7, 0);
-	if (entry &&
-	    (boot_cpu_has(X86_FEATURE_HLE) || boot_cpu_has(X86_FEATURE_RTM)) &&
-	    (entry->ebx & (X86_FEATURE_HLE|X86_FEATURE_RTM)))
-		pmu->reserved_bits ^= HSW_IN_TX|HSW_IN_TX_CHECKPOINTED;
-
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> ---
+>  drivers/crypto/hisilicon/hpre/hpre_main.c | 6 ++++++
+>  drivers/crypto/hisilicon/sec2/sec_main.c  | 6 ++++++
+>  drivers/crypto/hisilicon/zip/zip_main.c   | 6 ++++++
+>  include/linux/hisi_acc_qm.h               | 5 +++++
+>  4 files changed, 23 insertions(+)
 > 
->> +               if (pmc->eventsel & HSW_IN_TX)
->> +                       attr.config |= HSW_IN_TX;
+Acked-by: Longfang Liu <liulongfang@huawei.com>
+
+Thanks,
+Longfang.
+> diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
+> index 3589d8879b5e..36ab30e9e654 100644
+> --- a/drivers/crypto/hisilicon/hpre/hpre_main.c
+> +++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
+> @@ -1190,6 +1190,12 @@ static struct pci_driver hpre_pci_driver = {
+>  	.driver.pm		= &hpre_pm_ops,
+>  };
+>  
+> +struct pci_driver *hisi_hpre_get_pf_driver(void)
+> +{
+> +	return &hpre_pci_driver;
+> +}
+> +EXPORT_SYMBOL_GPL(hisi_hpre_get_pf_driver);
+> +
+>  static void hpre_register_debugfs(void)
+>  {
+>  	if (!debugfs_initialized())
+> diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
+> index 311a8747b5bf..421a405ca337 100644
+> --- a/drivers/crypto/hisilicon/sec2/sec_main.c
+> +++ b/drivers/crypto/hisilicon/sec2/sec_main.c
+> @@ -1088,6 +1088,12 @@ static struct pci_driver sec_pci_driver = {
+>  	.driver.pm = &sec_pm_ops,
+>  };
+>  
+> +struct pci_driver *hisi_sec_get_pf_driver(void)
+> +{
+> +	return &sec_pci_driver;
+> +}
+> +EXPORT_SYMBOL_GPL(hisi_sec_get_pf_driver);
+> +
+>  static void sec_register_debugfs(void)
+>  {
+>  	if (!debugfs_initialized())
+> diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
+> index 66decfe07282..4534e1e107d1 100644
+> --- a/drivers/crypto/hisilicon/zip/zip_main.c
+> +++ b/drivers/crypto/hisilicon/zip/zip_main.c
+> @@ -1012,6 +1012,12 @@ static struct pci_driver hisi_zip_pci_driver = {
+>  	.driver.pm		= &hisi_zip_pm_ops,
+>  };
+>  
+> +struct pci_driver *hisi_zip_get_pf_driver(void)
+> +{
+> +	return &hisi_zip_pci_driver;
+> +}
+> +EXPORT_SYMBOL_GPL(hisi_zip_get_pf_driver);
+> +
+>  static void hisi_zip_register_debugfs(void)
+>  {
+>  	if (!debugfs_initialized())
+> diff --git a/include/linux/hisi_acc_qm.h b/include/linux/hisi_acc_qm.h
+> index 6a6477c34666..00f2a4db8723 100644
+> --- a/include/linux/hisi_acc_qm.h
+> +++ b/include/linux/hisi_acc_qm.h
+> @@ -476,4 +476,9 @@ void hisi_qm_pm_init(struct hisi_qm *qm);
+>  int hisi_qm_get_dfx_access(struct hisi_qm *qm);
+>  void hisi_qm_put_dfx_access(struct hisi_qm *qm);
+>  void hisi_qm_regs_dump(struct seq_file *s, struct debugfs_regset32 *regset);
+> +
+> +/* Used by VFIO ACC live migration driver */
+> +struct pci_driver *hisi_sec_get_pf_driver(void);
+> +struct pci_driver *hisi_hpre_get_pf_driver(void);
+> +struct pci_driver *hisi_zip_get_pf_driver(void);
+>  #endif
 > 
-> This statement does nothing. If HSW_IN_TX is set in pmc->eventsel, it
-> is set in attr.config already.
-
-Agree for the redundancy, since attr.config is "(eventsel & AMD64_RAW_EVENT_MASK)".
-
-> 
->> +               if (pmc->eventsel & HSW_IN_TX_CHECKPOINTED) {
->> +                       /*
->> +                        * HSW_IN_TX_CHECKPOINTED is not supported with nonzero
->> +                        * period. Just clear the sample period so at least
->> +                        * allocating the counter doesn't fail.
->> +                        */
->> +                       attr.sample_period = 0;
->> +                       attr.config |= HSW_IN_TX_CHECKPOINTED;
-> 
-> As above, this statement does nothing. We should just set
-> attr.sample_period to 0. Note, however, that the SDM documents an
-
-Thanks and applied.
-
-> additional constraint which is ignored here: "This bit may only be set
-> for IA32_PERFEVTSEL2." I have confirmed that a #GP is raised for an
-> attempt to set bit 33 in any PerfEvtSeln other than PerfEvtSel2 on a
-> Broadwell Xeon E5.
-
-Yes, "19.3.6.5 Performance Monitoring and Intel® TSX".
-
-I'm not sure if the host perf scheduler indicate this restriction.
-
-cc Kan.
-
-> 
->> +               }
->>          }
->>
->>          event = perf_event_create_kernel_counter(&attr, -1, current,
->> @@ -268,9 +269,7 @@ void reprogram_counter(struct kvm_pmc *pmc)
->>                          (eventsel & AMD64_RAW_EVENT_MASK),
->>                          !(eventsel & ARCH_PERFMON_EVENTSEL_USR),
->>                          !(eventsel & ARCH_PERFMON_EVENTSEL_OS),
->> -                       eventsel & ARCH_PERFMON_EVENTSEL_INT,
->> -                       (eventsel & HSW_IN_TX),
->> -                       (eventsel & HSW_IN_TX_CHECKPOINTED));
->> +                       eventsel & ARCH_PERFMON_EVENTSEL_INT);
->>   }
->>   EXPORT_SYMBOL_GPL(reprogram_counter);
->>
->> --
->> 2.35.1
->>
