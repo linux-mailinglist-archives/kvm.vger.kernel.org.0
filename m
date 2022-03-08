@@ -2,78 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 796FF4D1E4A
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 18:13:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D7304D1E4B
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 18:14:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348682AbiCHROq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 12:14:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44538 "EHLO
+        id S1348684AbiCHRPb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Mar 2022 12:15:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45240 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348670AbiCHROn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Mar 2022 12:14:43 -0500
-Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A44722BD0
-        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 09:13:46 -0800 (PST)
-Received: by mail-ej1-x632.google.com with SMTP id hw13so40572458ejc.9
-        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 09:13:46 -0800 (PST)
+        with ESMTP id S1344409AbiCHRPa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 12:15:30 -0500
+Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D25B52E0B;
+        Tue,  8 Mar 2022 09:14:32 -0800 (PST)
+Received: by mail-ej1-x62a.google.com with SMTP id hw13so40576946ejc.9;
+        Tue, 08 Mar 2022 09:14:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=sender:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=U1ORBeqJC6fQUGgkgeSP1sHe0LHXhoV2o6IOKLiQIsM=;
-        b=IPojLBRjlZStqJME3O2TCiz+OuaYsot/H7h5SvvY5ZCEIUgaFilW5LD/456LlI1IBD
-         6ihoqK9XKgnzZ5ZMi8PDrmCUNrxhKDMiPpH1PEKXx5tznAklAdP1RdAk5Zq2ABWkPu9y
-         Xq11gtZIfRbGaZ4ONewHFuckoKsjUN4VZCqOfQFmIPjz2ZxZbt7+JmHPBf/zCaFs9zz+
-         yxvVgtlTWjkDtIUCaQNwv8oZjGAkgrKwnrB9zKM8sk/ZDtW0+NTInKoTKPnXS9tNobv/
-         7QYmMujLiAY+FuAftaCCu/Xe8FAYGisGpMlNY2fyhpdZyOC92qll4jXoNwoFRW9W8gDG
-         7WZQ==
+        bh=fhW09ywHlIWvxHyjvBP0vXcd0+UN13egflttmd7VoRo=;
+        b=bn13C/AkGmAwG/nuqCyIJMC9NLYannba4eloFSYpDgTFhOlBD91oCIEEQSRBuyMYqv
+         E+lbcezmFzJWvZwWU09I68/NDGKBZnib62HTnmTZiTixWLNHKQUIVRz1hLWy/cwL1MlF
+         VF/2PJk4U9kAwglp5oXiv6vCyWV/b9nKaRNFK37k4NDjy7RzIUjPcdwXrMfs5t9s97W7
+         iWT7UsFxkf71UK1dd1h/t/S9kI8bSedbeThdMfxtshI1EHZK4+P/V5QEvkV7hqdQIfz8
+         xLxsTAMS5fXCgPLZWeSb3NC/seIl87u5uHqtMPdISP1kN3g6AZGxfCL8/z634OLUlEuY
+         UDhg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
          :subject:content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=U1ORBeqJC6fQUGgkgeSP1sHe0LHXhoV2o6IOKLiQIsM=;
-        b=qTi8qJaK8XmYJ7JVklN11FzL+U6aXTBBTbt1zK97lOsrHu+eKT1xGQgXdfB3K+CQxC
-         tQxixwJnaXBcrNeexi7hzQ6AMqTa1/qpE3AN1k3cAWOt7u8K5eF0frbC/hpa5wHdD2yI
-         C5KPA5IYv6I5v0WtpAMjgV77nC6FPmDrOmWprXl8JOVmfvPlXaPMw7W9WCpHKyfOxY/x
-         1f6IP6Py2osoeNSo2RRdw8gTSVEaQCobKA8rpDhYLXJLFOMBNffRKqFEFDe4FAdWrQtl
-         AiKILttSe7i1k2Kvs+Qnk3q+2Fn+jwkujr119/QWMTwec7E89KeGelursuSLlwnqnqpu
-         hSQQ==
-X-Gm-Message-State: AOAM5315fqNSYJpyzm7czpFSWtXmPFl/Eq6dKRsm9BctdSSZj9UNVBWF
-        MvSzlOEv6uUBGDnfYtxIf7g=
-X-Google-Smtp-Source: ABdhPJz3ZkeIfzh71QwEOb4JV31mRYxVvZc6S1LkySDWpxe6jKOSS3xkctWCSlB1Trr3WFxkxVqI/Q==
-X-Received: by 2002:a17:907:6297:b0:6da:6388:dc58 with SMTP id nd23-20020a170907629700b006da6388dc58mr14238948ejc.472.1646759624795;
-        Tue, 08 Mar 2022 09:13:44 -0800 (PST)
+        bh=fhW09ywHlIWvxHyjvBP0vXcd0+UN13egflttmd7VoRo=;
+        b=dX1gGcsVl8ZXfXYU8f/PsXGD8ub/ZiKivsRxDLjrqIVrofQhVHVGeIw9YWd4yzZXEG
+         clknktqqSnRg9nEU45vIqm1nXjfCh1v3nYoi2wFuQ51OzCxkGYWnN+eeSWRVpL6kOfr2
+         /MU2lQxRewXzWw1Y/qYW/zEpnRWIE33BiewhNB+X/hwR91z+6b8f9XzEvvukagxdFKQl
+         vWzIZoTlYHfyOUl7T7Rj45/cPROGJV5r7GW/+M9d/CxuqyFqbJqFD5zcUGc3nIr6fGdh
+         Hd8/5BA/tbPFEZ+dwft54SHhqt3Mh/gnGrF2AbTQ5vMPGUxJYORn1RhbsLBKl9jhSsvQ
+         WQZA==
+X-Gm-Message-State: AOAM530OVMwSczjwDWVq+LR1KtPb22PdsQI+gKU0aYqDwjf68u0RHPGt
+        MBFmPkz87PR/GswemWQi0Q5bkozCXGc=
+X-Google-Smtp-Source: ABdhPJxs2MwwTvWAl37XplBVwMcLrAsdbW0FtadE3FoJJrD4CmNV8w7xVQikMEiltEwtobmZrmWL/g==
+X-Received: by 2002:a17:906:79c4:b0:6cf:5489:da57 with SMTP id m4-20020a17090679c400b006cf5489da57mr13681071ejo.48.1646759671359;
+        Tue, 08 Mar 2022 09:14:31 -0800 (PST)
 Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id z11-20020a50e68b000000b00412ec8b2180sm8012111edm.90.2022.03.08.09.13.43
+        by smtp.googlemail.com with ESMTPSA id a22-20020a50ff16000000b00410d029ea5csm7844646edu.96.2022.03.08.09.14.30
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Mar 2022 09:13:44 -0800 (PST)
+        Tue, 08 Mar 2022 09:14:30 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <5a0d39d9-48b9-5849-daf7-19fbadd75f8c@redhat.com>
-Date:   Tue, 8 Mar 2022 18:13:41 +0100
+Message-ID: <d028d59f-2a33-2562-5709-fcc56c80f7fe@redhat.com>
+Date:   Tue, 8 Mar 2022 18:14:29 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.5.0
-Subject: Re: [PATCH v3 00/17] KVM: Add Xen event channel acceleration
+Subject: Re: [PATCH v2 01/25] KVM: x86/mmu: avoid indirect call for get_cr3
 Content-Language: en-US
-To:     David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Metin Kaya <metikaya@amazon.co.uk>,
-        Paul Durrant <pdurrant@amazon.co.uk>
-References: <20220303154127.202856-1-dwmw2@infradead.org>
- <db8515e4-3668-51d2-d9af-711ebd48ad9b@redhat.com>
- <ec930edc27998dcfe8135a01e368d89747f03c41.camel@infradead.org>
- <adbaebac-19ed-e8b7-a79c-9831d2ac055f@redhat.com>
- <42ed3b0c3a82627975eada3bcc610d4e074cb326.camel@infradead.org>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        dmatlack@google.com
+References: <20220221162243.683208-1-pbonzini@redhat.com>
+ <20220221162243.683208-2-pbonzini@redhat.com> <YieBXzkOkB9SZpyp@google.com>
+ <2652c27e-ce8c-eb40-1979-9fe732aa9085@redhat.com>
+ <YieFKfjrgTTnYkL7@google.com>
+ <96ff1628-eeb2-4d12-f4eb-287dd8fc9948@redhat.com>
+ <YieJ9lkq7R87m1mJ@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <42ed3b0c3a82627975eada3bcc610d4e074cb326.camel@infradead.org>
+In-Reply-To: <YieJ9lkq7R87m1mJ@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -87,30 +81,20 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/8/22 17:59, David Woodhouse wrote:
->>> Incremental diff to the 'oneshot timers' patch looks like the first
->>> hunk of this. I'm also pondering the second hunk which actively
->>> *cancels*  the pending timer on serialization.
->> 
->> Hmm, why so?
->
-> Don't know yet. But as I added the save/restore support to Joao's patch
-> I had *assumed* that it would fail when the delta was negative, and was
-> kind of surprised when it worked in the first place. So I'm sticking
-> with "Don't Do That Then" as my initial response to fix it.
-
-Yes, I'm just talking about the second hunk.  The first is clear(ish).
-
-> After a kexec, the deadline for the timer is past, and that's why it
-> ends up getting restored with a negative delta. After a *few*  cycles of
-> this it usually ends up with the timer callback never triggering.
+On 3/8/22 17:53, Sean Christopherson wrote:
+>> static inline unsigned long kvm_mmu_get_guest_pgd(struct kvm_vcpu *vcpu,
+>> 						  struct kvm_mmu *mmu)
+>> {
+>> 	if (unlikely(vcpu == &vcpu->arch.guest_mmu))
+> Well, not that certainly:-)
 > 
-> I'll stick a negative delta into the KVM selftest included in the patch
-> series, instead of the nice polite '100ms in the future' that it uses
-> at the moment. That ought to trigger it too, and I can instrument the
-> hrtimer code to work out what's going on. Either way, I think 'Don't Do
-> That Then' will continue to be the right answer:)
+> 	if (mmu == &vcpu->arch.guest_mmu)
+> 
+> But you're right, we need to be able to do kvm_read_cr3() for the actual nested_mmu.
+> 
 
-Yep, let's keep both testcases through.
+Ok, I'll drop this patch for now since the end of the series actually 
+introduces the nested_ops already.  And then we can do it for both 
+get_guest_pgd and get_pdptr.
 
 Paolo
