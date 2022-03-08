@@ -2,144 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 070F84D16C8
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 13:02:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A2C3E4D16F6
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 13:12:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346641AbiCHMDd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 07:03:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35622 "EHLO
+        id S1346716AbiCHMNL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Mar 2022 07:13:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51714 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233849AbiCHMDc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Mar 2022 07:03:32 -0500
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6DC8AE69;
-        Tue,  8 Mar 2022 04:02:34 -0800 (PST)
-Received: from kwepemi500009.china.huawei.com (unknown [172.30.72.57])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4KCYjh6Clnz1GCDT;
-        Tue,  8 Mar 2022 19:57:44 +0800 (CST)
-Received: from kwepemm600005.china.huawei.com (7.193.23.191) by
- kwepemi500009.china.huawei.com (7.221.188.199) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Tue, 8 Mar 2022 20:02:32 +0800
-Received: from [10.67.102.118] (10.67.102.118) by
- kwepemm600005.china.huawei.com (7.193.23.191) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Tue, 8 Mar 2022 20:02:31 +0800
-Subject: Re: [PATCH v8 6/9] hisi_acc_vfio_pci: Add helper to retrieve the
- struct pci_driver
-To:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>
-CC:     <linux-pci@vger.kernel.org>, <alex.williamson@redhat.com>,
-        <jgg@nvidia.com>, <cohuck@redhat.com>, <mgurtovoy@nvidia.com>,
-        <yishaih@nvidia.com>, <linuxarm@huawei.com>,
-        <prime.zeng@hisilicon.com>, <jonathan.cameron@huawei.com>,
-        <wangzhou1@hisilicon.com>
-References: <20220303230131.2103-1-shameerali.kolothum.thodi@huawei.com>
- <20220303230131.2103-7-shameerali.kolothum.thodi@huawei.com>
-From:   liulongfang <liulongfang@huawei.com>
-Message-ID: <553bf6f3-b473-d72c-f120-230d02f9a74a@huawei.com>
-Date:   Tue, 8 Mar 2022 20:02:31 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        with ESMTP id S1344736AbiCHMNK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 07:13:10 -0500
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 650103F30B
+        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 04:12:14 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 36071139F;
+        Tue,  8 Mar 2022 04:12:13 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8DFC13FA5D;
+        Tue,  8 Mar 2022 04:12:12 -0800 (PST)
+Date:   Tue, 8 Mar 2022 12:12:38 +0000
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Dongli Si <sidongli1997@gmail.com>
+Cc:     kvm@vger.kernel.org
+Subject: Re: [PATCH kvmtool] x86: Fixed Unable to execute init process since
+ glibc version 2.33
+Message-ID: <YidINk5BxfZLaFyL@monolith.localdoman>
+References: <20220226060048.3-1-sidongli1997@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20220303230131.2103-7-shameerali.kolothum.thodi@huawei.com>
-Content-Type: text/plain; charset="gbk"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.102.118]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemm600005.china.huawei.com (7.193.23.191)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220226060048.3-1-sidongli1997@gmail.com>
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2022/3/4 7:01, Shameer Kolothum wrote:
-> struct pci_driver pointer is an input into the pci_iov_get_pf_drvdata().
-> Introduce helpers to retrieve the ACC PF dev struct pci_driver pointers
-> as we use this in ACC vfio migration driver.
-> 
-> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> ---
->  drivers/crypto/hisilicon/hpre/hpre_main.c | 6 ++++++
->  drivers/crypto/hisilicon/sec2/sec_main.c  | 6 ++++++
->  drivers/crypto/hisilicon/zip/zip_main.c   | 6 ++++++
->  include/linux/hisi_acc_qm.h               | 5 +++++
->  4 files changed, 23 insertions(+)
-> 
-Acked-by: Longfang Liu <liulongfang@huawei.com>
+Hi,
+
+Hi, I was unable to apply the patch as is because your base is missing
+commit 20b93be583f6 ("x86: Set the correct APIC ID"). Changing it is so it
+applies was trivial though.
+
+I tested the patch with a VM image using glibc 2.36 and Linux v5.17-rc7,
+the glibc error went away and I was able to boot to userspace; as an added
+bonus, this kernel message went away:
+
+[    0.000000] CPU: vendor_id 'LKVMLKVMLKVM' unknown, using generic init.
+[    0.000000] CPU: Your system may be unstable.
+
+But this warning is new:
+
+[    0.000000] [Firmware Bug]: TSC doesn't count with P0 frequency!
+
+I don't know what causes it (kvmtool's bios implementation is not feature
+complete with regards to my CPU features?), and doesn't look like it's
+something introduced by this patch, so as far as I'm concerned the patch is
+working as intended:
+
+Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
 Thanks,
-Longfang.
-> diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
-> index 3589d8879b5e..36ab30e9e654 100644
-> --- a/drivers/crypto/hisilicon/hpre/hpre_main.c
-> +++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
-> @@ -1190,6 +1190,12 @@ static struct pci_driver hpre_pci_driver = {
->  	.driver.pm		= &hpre_pm_ops,
->  };
+Alex
+
+On Sat, Feb 26, 2022 at 02:00:48PM +0800, Dongli Si wrote:
+> From: Dongli Si <sidongli1997@gmail.com>
+> 
+> glibc detected invalid CPU Vendor name will cause an error:
+> 
+> [    0.450127] Run /sbin/init as init process
+> /lib64/libc.so.6: CPU ISA level is lower than required
+> [    0.451931] Kernel panic - not syncing: Attempted to kill init! exitcode=0x00007f00
+> [    0.452117] CPU: 0 PID: 1 Comm: init Not tainted 5.17.0-rc1 #72
+> 
+> Signed-off-by: Dongli Si <sidongli1997@gmail.com>
+> ---
+>  x86/cpuid.c | 14 +++++++++-----
+>  1 file changed, 9 insertions(+), 5 deletions(-)
+> 
+> diff --git a/x86/cpuid.c b/x86/cpuid.c
+> index c3b67d9..d58a027 100644
+> --- a/x86/cpuid.c
+> +++ b/x86/cpuid.c
+> @@ -2,6 +2,7 @@
 >  
-> +struct pci_driver *hisi_hpre_get_pf_driver(void)
-> +{
-> +	return &hpre_pci_driver;
-> +}
-> +EXPORT_SYMBOL_GPL(hisi_hpre_get_pf_driver);
-> +
->  static void hpre_register_debugfs(void)
->  {
->  	if (!debugfs_initialized())
-> diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
-> index 311a8747b5bf..421a405ca337 100644
-> --- a/drivers/crypto/hisilicon/sec2/sec_main.c
-> +++ b/drivers/crypto/hisilicon/sec2/sec_main.c
-> @@ -1088,6 +1088,12 @@ static struct pci_driver sec_pci_driver = {
->  	.driver.pm = &sec_pm_ops,
->  };
+>  #include "kvm/kvm.h"
+>  #include "kvm/util.h"
+> +#include "kvm/cpufeature.h"
 >  
-> +struct pci_driver *hisi_sec_get_pf_driver(void)
-> +{
-> +	return &sec_pci_driver;
-> +}
-> +EXPORT_SYMBOL_GPL(hisi_sec_get_pf_driver);
-> +
->  static void sec_register_debugfs(void)
->  {
->  	if (!debugfs_initialized())
-> diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
-> index 66decfe07282..4534e1e107d1 100644
-> --- a/drivers/crypto/hisilicon/zip/zip_main.c
-> +++ b/drivers/crypto/hisilicon/zip/zip_main.c
-> @@ -1012,6 +1012,12 @@ static struct pci_driver hisi_zip_pci_driver = {
->  	.driver.pm		= &hisi_zip_pm_ops,
->  };
+>  #include <sys/ioctl.h>
+>  #include <stdlib.h>
+> @@ -10,7 +11,7 @@
 >  
-> +struct pci_driver *hisi_zip_get_pf_driver(void)
-> +{
-> +	return &hisi_zip_pci_driver;
-> +}
-> +EXPORT_SYMBOL_GPL(hisi_zip_get_pf_driver);
-> +
->  static void hisi_zip_register_debugfs(void)
+>  static void filter_cpuid(struct kvm_cpuid2 *kvm_cpuid)
 >  {
->  	if (!debugfs_initialized())
-> diff --git a/include/linux/hisi_acc_qm.h b/include/linux/hisi_acc_qm.h
-> index 6a6477c34666..00f2a4db8723 100644
-> --- a/include/linux/hisi_acc_qm.h
-> +++ b/include/linux/hisi_acc_qm.h
-> @@ -476,4 +476,9 @@ void hisi_qm_pm_init(struct hisi_qm *qm);
->  int hisi_qm_get_dfx_access(struct hisi_qm *qm);
->  void hisi_qm_put_dfx_access(struct hisi_qm *qm);
->  void hisi_qm_regs_dump(struct seq_file *s, struct debugfs_regset32 *regset);
-> +
-> +/* Used by VFIO ACC live migration driver */
-> +struct pci_driver *hisi_sec_get_pf_driver(void);
-> +struct pci_driver *hisi_hpre_get_pf_driver(void);
-> +struct pci_driver *hisi_zip_get_pf_driver(void);
->  #endif
+> -	unsigned int signature[3];
+> +	struct cpuid_regs regs;
+>  	unsigned int i;
+>  
+>  	/*
+> @@ -22,10 +23,13 @@ static void filter_cpuid(struct kvm_cpuid2 *kvm_cpuid)
+>  		switch (entry->function) {
+>  		case 0:
+>  			/* Vendor name */
+> -			memcpy(signature, "LKVMLKVMLKVM", 12);
+> -			entry->ebx = signature[0];
+> -			entry->ecx = signature[1];
+> -			entry->edx = signature[2];
+> +			regs = (struct cpuid_regs) {
+> +				.eax		= 0x00,
+> +			};
+> +			host_cpuid(&regs);
+> +			entry->ebx = regs.ebx;
+> +			entry->ecx = regs.ecx;
+> +			entry->edx = regs.edx;
+>  			break;
+>  		case 1:
+>  			/* Set X86_FEATURE_HYPERVISOR */
+> -- 
+> 2.32.0
 > 
