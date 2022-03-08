@@ -2,66 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 904184D1C52
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 16:51:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 937ED4D1C55
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 16:53:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348008AbiCHPw3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 10:52:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47382 "EHLO
+        id S1347978AbiCHPyK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Mar 2022 10:54:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50022 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347920AbiCHPw3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Mar 2022 10:52:29 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E16F24F469
-        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 07:51:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646754692;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cyh9GNwkSeiWX8VVWJet6cmrStrv1Y1BhHYKMAKCy08=;
-        b=H2neXkxGNEc4b7pZVYO2vK4xXAqlNj1gQ2keJkOlVxuwthvwfSUPVMJJMdaooRczjE2ss6
-        bF2mHOlehWQfsoa3cpAXFPkh7siSX4CmCB87/yZfwsAbxRMOrED6ILU04fc78TjVxq9g70
-        zVm0mBwXZj+PX4yy+rGN5KP3szVcNPE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-185-QHVBMGK-Nq6GQL_r1Q9ZZw-1; Tue, 08 Mar 2022 10:51:28 -0500
-X-MC-Unique: QHVBMGK-Nq6GQL_r1Q9ZZw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4A9CEFC82;
-        Tue,  8 Mar 2022 15:51:27 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D92307BCDA;
-        Tue,  8 Mar 2022 15:51:26 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     Peter Gonda <pgonda@google.com>
-Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH V2] KVM: SVM: Fix kvm_cache_regs.h inclusions for is_guest_mode()
-Date:   Tue,  8 Mar 2022 10:51:21 -0500
-Message-Id: <20220308155121.777714-1-pbonzini@redhat.com>
-In-Reply-To: <20220304161032.2270688-1-pgonda@google.com>
-References: 
+        with ESMTP id S233754AbiCHPyJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 10:54:09 -0500
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DFF43A1B1
+        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 07:53:11 -0800 (PST)
+Received: by mail-pj1-x1036.google.com with SMTP id m11-20020a17090a7f8b00b001beef6143a8so2783087pjl.4
+        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 07:53:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=DvGT3bHO3eTMD0KXTbeLdljGXwbAYf6pMl/rX/qRoGc=;
+        b=f53CxNhvRcd6gIVul16MgYj35gn1Yjah6ootqVkktMN1C1a1wH4BtM8mkG+vLNz5Ju
+         3/oV7D5zLvOCUxBkC//RaLlhGuBOOMH8GRKzS15lTpbxqScwAFbVKGX0GQ+IHlraIVVc
+         ZYgtsekraPJ6jfiZo59YSxT/ibNx7Q5+/LYkGGF6SckhUD87JM/430BvFbv0yDPtMLQI
+         UPvaEebIbjjFnMleatlRaOT/5n0g2VbB5yZQBo9oAsIhIPTxDHP/YocMRzUu33YbQr0y
+         rIpY2AHiyJU0exLHYo2lbeHSRwSOp/rGBTtJpIqHxXWpNi51MPcwbYdKknY20jiVY5QU
+         0VQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=DvGT3bHO3eTMD0KXTbeLdljGXwbAYf6pMl/rX/qRoGc=;
+        b=TxRx4HXqaz8f+gL74Jwjs2HPbzsp5yr5MfNybcZRanDAhuqtX4F9vHk2ZKRj4j2pkX
+         bGo8fK/KMXFAg2bXNDzeUWLx9zIY5IISkpSD0mHSAjP6Wf3rfsQK3Kvda9MC1J8DGLZJ
+         +sUXbRaolki6ZQaorKDA59DA/91mRNMmPjwsVNYNrYMF4Yazj+dNzDNwKB2JgE1M8O/e
+         /adC6Zm00oqd/v/W7Rr+Un+PyYk7ZExPLBBYfojvSXl7VDydE+/iHXwbykjpvlw2MHdt
+         rNeA8jIM68WtbRqEWBiMFh7fxWDrdhwFKoPqeg9hIdsjYkgXnub5/I1yB6VhjH9A0yMm
+         vT0Q==
+X-Gm-Message-State: AOAM533p/hMJMy25z/lJke7MzSTto305Cv+dJXEGWZOhGnHjNaFzglCE
+        EhP8DrGYcNlk/EtFnq5P7F/W21erc/0JGg==
+X-Google-Smtp-Source: ABdhPJz0YaRP5SVfSTDDnadJfYWRblCfhFuHMQtgYMJ53i34cH9p2wG0+2iQE171iRz2GnyOLhrJhQ==
+X-Received: by 2002:a17:90b:1b4c:b0:1bf:d91:e157 with SMTP id nv12-20020a17090b1b4c00b001bf0d91e157mr5391516pjb.82.1646754790341;
+        Tue, 08 Mar 2022 07:53:10 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id b17-20020a056a000a9100b004e1b7cdb8fdsm21428055pfl.70.2022.03.08.07.53.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Mar 2022 07:53:09 -0800 (PST)
+Date:   Tue, 8 Mar 2022 15:53:06 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Shivam Kumar <shivam.kumar1@nutanix.com>, kvm@vger.kernel.org,
+        agraf@csgraf.de
+Subject: Re: [PATCH v2 0/1] KVM: Dirty quota-based throttling
+Message-ID: <Yid74seFMjB49FIZ@google.com>
+References: <20211220055722.204341-1-shivam.kumar1@nutanix.com>
+ <f05cc9a6-f15b-77f8-7fad-72049648d16c@nutanix.com>
+ <YdR9TSVgalKEfPIQ@google.com>
+ <652f9222-45a8-ca89-a16b-0a12456e2afc@nutanix.com>
+ <76606ce7-6bbf-dc92-af2c-ee3e54169ecd@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+In-Reply-To: <76606ce7-6bbf-dc92-af2c-ee3e54169ecd@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Queued, thanks.
+On Tue, Mar 08, 2022, Paolo Bonzini wrote:
+> On 1/5/22 16:39, Shivam Kumar wrote:
+> > 
+> > > On Mon, Jan 03, 2022, Shivam Kumar wrote:
+> > > > I would be grateful if I could receive some feedback on the
+> > > > dirty quota v2
+> > > > patchset.
+> > >    'Twas the week before Christmas, when all through the list,
+> > >    not a reviewer was stirring, not even a twit.
+> > > 
+> > > There's a reason I got into programming and not literature. 
+> > > Anyways, your patch
+> > > is in the review queue, it'll just be a few days/weeks. :-)
+> > Thank you so much Sean for the update!
+> 
+> Hi, are you going to send v3?
 
-Paolo
-
-
+https://lore.kernel.org/all/20220306220849.215358-1-shivam.kumar1@nutanix.com
