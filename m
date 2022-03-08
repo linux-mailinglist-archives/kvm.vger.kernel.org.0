@@ -2,66 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 91F9D4D116D
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 09:01:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 82F6D4D116E
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 09:01:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344711AbiCHICS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 03:02:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48652 "EHLO
+        id S1344732AbiCHICe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Mar 2022 03:02:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48934 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344719AbiCHICQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Mar 2022 03:02:16 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7F883E0F9
-        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 00:01:20 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 3404D61667
-        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 08:01:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9284AC340F9
-        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 08:01:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1646726479;
-        bh=ivCtQC3bMa4ayLf/ORXW2lRC+T0uGUS8CsGmBMWIDIE=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=aMyMB7Bs6wHyO5EJbYfkgQdSbDnThP+fHNkgrgpaEH51A/N9sI7wTvFYYjzGjDWpt
-         9QNKXOp3Mu4jk0rvN+P0pzswGWSNblhNgKTs2b9gTYngn7iv6fstrHv7RGDIs8N+xw
-         aBGJRDGu1u3c1ctsY4Zihi6Ue08fMT+SUIuGPvZ7R2K3FL9J2qy9KtaVLAJ9tuFPEI
-         kwKO3Xie3JoMI9156slwsovVF3DMHeeJM0PsQTmmJO/dWO1SslWW4C+hvc4mrrdz2H
-         g6B35tHr6ItODpN7Pi0ORkpLQ1t8XT0de2FqdixoQEWZlnApIjjvkB2oXGtebiDhwE
-         /sm4eIQhUYkdg==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 7FD04C05F98; Tue,  8 Mar 2022 08:01:19 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 199727] CPU freezes in KVM guests during high IO load on host
-Date:   Tue, 08 Mar 2022 08:01:19 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: devzero@web.de
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-199727-28872-ruBssut0qW@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-199727-28872@https.bugzilla.kernel.org/>
-References: <bug-199727-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        with ESMTP id S1344721AbiCHICd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 03:02:33 -0500
+Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E4113E5D3
+        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 00:01:36 -0800 (PST)
+Received: by mail-wr1-x42e.google.com with SMTP id i8so27059639wrr.8
+        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 00:01:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=IucybA/BbH72cgwgMkENy2nc0cw2uppzQpsI3A+UQng=;
+        b=n2kvax4T596zRbJNHl3pnQBK56Kh3dAHGIATboCR3y4jygN1ehcf5ApBgDCV5Vb3y2
+         SLWndLQ0RqQWcpJbKcyPuO4ztnaTn3WfZR+tAtBuAeiJ0Y4BNeMp+yu7V3xAAAEvQsfw
+         vGDZbgQA8EuIXMQU+qtoE3wx/BO1VbroSviRdyIUievVZU8k63A/eymNH8QYO7RND78l
+         0P+hi35rqJI6VNdQR07pPSUOTsEeJ7ZspVOX8afsoJi3MTripFjC89dnGdmYHSVLZ1dl
+         3WbZw96mkjwI/2AQL/umBpbHA+/2eq+3Ehftz+AHUwt9F0eWyqjKCErDO6inxcJrERVt
+         OwuA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=IucybA/BbH72cgwgMkENy2nc0cw2uppzQpsI3A+UQng=;
+        b=65GgAJ1LLtx4YBWbervDXrwLDaqG6cqvksqMpCX60Y0npigBQqNjdDBqoUT2UX9Ga2
+         ZyrEKP2SVCzQJnPXjxiq3zlOaRoTsvTvv06tmwID5vIdMiKkU8YZTSfsx+K1/D6bPWdl
+         SV8EDdVL6ybnEsBy+BEOeFGDWvJfo12pv0ZurVAn77knOI2FI6OEYVuwJIKKgelP59oo
+         24zP+HscePYxhKrTUbAKNggalm+63y/JRsd3sgVdYyz8hWUFWajjcrIxOjiQG6z5kvRe
+         9H8kONsnyFTnaqwiQwni/mLp/ArtYJb46eAoG3s7/7fRTCKE6bS/FqzTFM700qCBmjhq
+         48fA==
+X-Gm-Message-State: AOAM530Z99WJmRjFawOD8clRHRmEVR2xyHZqVfLTIDNFo4ZIOnHdyvcP
+        d0DjCb5QO06XZnNsHpMsCRGN0A==
+X-Google-Smtp-Source: ABdhPJz+6S70Pvi8hGyqht0OJu08Ak+kz7cIlHduA+N2p+09HFTvirJzU5DqlyxwJQXndXnzxWy20w==
+X-Received: by 2002:adf:e7c5:0:b0:1f2:1a3:f1a0 with SMTP id e5-20020adfe7c5000000b001f201a3f1a0mr5098043wrn.21.1646726495571;
+        Tue, 08 Mar 2022 00:01:35 -0800 (PST)
+Received: from google.com (cpc155339-bagu17-2-0-cust87.1-3.cable.virginm.net. [86.27.177.88])
+        by smtp.gmail.com with ESMTPSA id bg42-20020a05600c3caa00b00380deeaae72sm1978124wmb.1.2022.03.08.00.01.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Mar 2022 00:01:35 -0800 (PST)
+Date:   Tue, 8 Mar 2022 08:01:32 +0000
+From:   Lee Jones <lee.jones@linaro.org>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     jasowang@redhat.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, stable@vger.kernel.org,
+        syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
+Subject: Re: [PATCH 1/1] vhost: Protect the virtqueue from being cleared
+ whilst still in use
+Message-ID: <YicNXOlH8al/Rlk3@google.com>
+References: <20220307191757.3177139-1-lee.jones@linaro.org>
+ <20220307173439-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-7.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220307173439-mutt-send-email-mst@kernel.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -70,54 +75,35 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D199727
+On Mon, 07 Mar 2022, Michael S. Tsirkin wrote:
 
---- Comment #15 from Roland Kletzing (devzero@web.de) ---
-yes, i was using cache=3Dnone and io_uring also caused issues.=20
+> On Mon, Mar 07, 2022 at 07:17:57PM +0000, Lee Jones wrote:
+> > vhost_vsock_handle_tx_kick() already holds the mutex during its call
+> > to vhost_get_vq_desc().  All we have to do here is take the same lock
+> > during virtqueue clean-up and we mitigate the reported issues.
+> 
+> Pls just basically copy the code comment here. this is just confuses.
+> 
+> > Also WARN() as a precautionary measure.  The purpose of this is to
+> > capture possible future race conditions which may pop up over time.
+> > 
+> > Link: https://syzkaller.appspot.com/bug?extid=279432d30d825e63ba00
+> 
+> And this is a bug we already fixed, right?
 
->aio=3Dthreads avoids softlockups because the preadv(2)/pwritev(2)/fdatasyn=
-c(2)
-> syscalls run in worker threads that don't take the QEMU global mutex.=20
->Therefore vcpu threads can execute even when I/O is stuck in the kernel du=
-e to
->a lock.
+Well, this was the bug I set out to fix.
 
-yes, that was a long search/journey to get to this information/params....
+I didn't know your patch was in flight at the time.
 
-regarding io_uring - after proxmox enabled it as default, it was taken back
-again after some issues had been reported.
+> > Cc: <stable@vger.kernel.org>
+> > Reported-by: syzbot+adc3cb32385586bec859@syzkaller.appspotmail.com
+> 
+> not really applicable anymore ...
 
-have look at:
-https://github.com/proxmox/qemu-server/blob/master/debian/changelog
+I can remove these if it helps.
 
-maybe it's not ready for primetime yet !?
-
--- Proxmox Support Team <support@proxmox.com>  Fri, 30 Jul 2021 16:53:44 +0=
-200
-qemu-server (7.0-11) bullseye; urgency=3Dmedium
-<snip>
-  * lvm: avoid the use of io_uring for now
-<snip>
--- Proxmox Support Team <support@proxmox.com>  Fri, 23 Jul 2021 11:08:48 +0=
-200
-qemu-server (7.0-10) bullseye; urgency=3Dmedium
-<snip>
-  * avoid using io_uring for drives backed by LVM and configured for write-=
-back
-    or write-through cache
-<snip>
- -- Proxmox Support Team <support@proxmox.com>  Mon, 05 Jul 2021 20:49:50 +=
-0200
-qemu-server (7.0-6) bullseye; urgency=3Dmedium
-<snip>
-  * For now do not use io_uring for drives backed by Ceph RBD, with KRBD and
-    write-back or write-through cache enabled, as in that case some polling=
-/IO
-    may hang in QEMU 6.0.
-<snip>
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+-- 
+Lee Jones [李琼斯]
+Principal Technical Lead - Developer Services
+Linaro.org │ Open source software for Arm SoCs
+Follow Linaro: Facebook | Twitter | Blog
