@@ -2,95 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C9754D2051
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 19:36:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D7274D2054
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 19:38:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348787AbiCHShF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 13:37:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36420 "EHLO
+        id S1349163AbiCHSji (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Mar 2022 13:39:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39724 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233885AbiCHShE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Mar 2022 13:37:04 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63A1852B03;
-        Tue,  8 Mar 2022 10:36:04 -0800 (PST)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 228GEa2j002220;
-        Tue, 8 Mar 2022 18:36:02 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=rBw7fx6XJaHkGHGfHk4SKERRNkT2Vl5PYR6AQBXP4Uw=;
- b=bfdi4EWxZUgTlWPYAc1tFNsOCIgiUdgFaSvovMnSNS6d9pRRbAHUHEcvHhZhsWCFjYj/
- zfnDLuQ4WpbJ58I8DSWDjrYJxY0rBE4x4dbki6BPB4UC+pNBFzikn6IzAKjm159BiwL/
- J3ImKFDttBokAdGj8NSaUQPEi/gltZWYfEqZjtRJ/aEeRJJYXcWzfFzuG84NV0YlAyA9
- qY3KpihE08tbWKxPkOyT93hjcnnaPhkeX1uFikkuxhVCiL014v3eyJnN6PONm9963Tw2
- nsfAOzD85Vq6PqOMzMhJfMIKlTb+d2+7+aY/TKE4+3jxSSKYbDEePXbeZL44DRb9wMlu pw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3enx3mare4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 08 Mar 2022 18:36:02 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 228HPjTc010774;
-        Tue, 8 Mar 2022 18:36:01 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3enx3mardp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 08 Mar 2022 18:36:01 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 228IS3kL019157;
-        Tue, 8 Mar 2022 18:35:59 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma03fra.de.ibm.com with ESMTP id 3enpk2tgbp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 08 Mar 2022 18:35:59 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 228IZtSA50528648
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 8 Mar 2022 18:35:55 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BB7354C040;
-        Tue,  8 Mar 2022 18:35:55 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 555B24C044;
-        Tue,  8 Mar 2022 18:35:55 +0000 (GMT)
-Received: from [9.171.51.11] (unknown [9.171.51.11])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  8 Mar 2022 18:35:55 +0000 (GMT)
-Message-ID: <897de29d-227d-5111-f176-41dce7071bbb@linux.ibm.com>
-Date:   Tue, 8 Mar 2022 19:35:55 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH RESEND v2 0/5] memop selftest for storage key checking
-Content-Language: en-US
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Shuah Khan <shuah@kernel.org>
-Cc:     Thomas Huth <thuth@redhat.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220308125841.3271721-1-scgl@linux.ibm.com>
-From:   Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <20220308125841.3271721-1-scgl@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: lzVI5DLj6UCJTSlgZBNlRI0sA0Pi-Nko
-X-Proofpoint-GUID: NM42rIFnmvxZvGP_PWpJ1Ounq2L2SHZj
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        with ESMTP id S245605AbiCHSjh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 13:39:37 -0500
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C942B4D61A
+        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 10:38:40 -0800 (PST)
+Received: by mail-pj1-x1029.google.com with SMTP id c16-20020a17090aa61000b001befad2bfaaso146593pjq.1
+        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 10:38:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=up5SOqkS1c2YxufJMitUtCe/F041I0eBoqVuvFaIi14=;
+        b=Yu+OEkPEBS8oeTtsT+vohVPQVY0eJugguC8PVRzsIdtoUrjakTG2ZwN5nBUCG8Y5cs
+         OIxPqxLfDiVt+SLmjC7EYWZKCbAyJLesSFAwV83jOS37DekiTEKNoKdHffJclwiTn/9o
+         mTCOkVpCZ8qH0dqDIyV/VWgKEzJnbB4zNvxnz+2GcO1bGj735ahjfYAGHSpmBKau4DjO
+         DJV92sPKVbPbLWk96poS+Gh+YApIguYBUndckk58uMq4l3OKGZsOlSe+x3kT/PBgDofC
+         pLcq9FjkQ5Mq7NuLC77yLfxgLN3d1N2M4Hhzs3Y2eZXbDvhxi0hjKQPbRj1MJwCU8Y3p
+         3Jug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=up5SOqkS1c2YxufJMitUtCe/F041I0eBoqVuvFaIi14=;
+        b=xrj5ocHTw357ZVgsfX3KaEYV9oHddzpSxGgLksnMRW8H6w1gq5ED/YbNoHa9UkPnJ4
+         R9+sbO7poAqqTjFeLSMBrPuEI55stlnsKja+DjqtcAVdDNYfmJbr7pd0qcSIFJYigSO0
+         dUNQIIlr31gqB/NPosUTV7Q5cdIiV63XMieAcHKu/m1upw8JAlmgIpm+q6WGWBANItKO
+         K3x1fI7bbDI2jWhNFeZd03ki3hibnEvWNmOqx7i0ev24WklHlUeBy1VOo/ofwmNaNHM+
+         XF6RP7qFxaw/k4H4qc5wUmf3RzFtiwygajzMnc03Css9/KxLLHTO5f1jAueaaN5ZdKbw
+         tASQ==
+X-Gm-Message-State: AOAM532v2Q99fgY3lKGBAzelIWt/74KJ05/Wu/fdViGQbFCitr3tpW83
+        EUTJFMHE0Tjz2MAYnikAZWvR9Q==
+X-Google-Smtp-Source: ABdhPJysNWcyyQtHfaWhBht4VOiyJfISxakl1SxR9PkH4FPhQ6OEMqTAFTp3KYnN0nBW81eeadBhUQ==
+X-Received: by 2002:a17:902:e852:b0:151:f805:30fc with SMTP id t18-20020a170902e85200b00151f80530fcmr7749014plg.87.1646764719847;
+        Tue, 08 Mar 2022 10:38:39 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id l10-20020a056a00140a00b004c55d0dcbd1sm20472715pfu.120.2022.03.08.10.38.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Mar 2022 10:38:39 -0800 (PST)
+Date:   Tue, 8 Mar 2022 18:38:36 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        dmatlack@google.com
+Subject: Re: [PATCH v2 12/25] KVM: x86/mmu: cleanup computation of MMU roles
+ for two-dimensional paging
+Message-ID: <YieirBSr1FfELXXH@google.com>
+References: <20220221162243.683208-1-pbonzini@redhat.com>
+ <20220221162243.683208-13-pbonzini@redhat.com>
+ <YiecYxd/YreGFWpB@google.com>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-03-08_07,2022-03-04_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 clxscore=1015
- impostorscore=0 mlxscore=0 lowpriorityscore=0 phishscore=0 suspectscore=0
- mlxlogscore=839 priorityscore=1501 spamscore=0 bulkscore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
- definitions=main-2203080095
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YiecYxd/YreGFWpB@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -98,35 +73,82 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Shuah,
+On Tue, Mar 08, 2022, Sean Christopherson wrote:
+> On Mon, Feb 21, 2022, Paolo Bonzini wrote:
+> > Inline kvm_calc_mmu_role_common into its sole caller, and simplify it
+> > by removing the computation of unnecessary bits.
+> > 
+> > Extended bits are unnecessary because page walking uses the CPU mode,
+> > and EFER.NX/CR0.WP can be set to one unconditionally---matching the
+> > format of shadow pages rather than the format of guest pages.
+> 
+> But they don't match the format of shadow pages.  EPT has an equivalent to NX in
+> that KVM can always clear X, but KVM explicitly supports running with EPT and
+> EFER.NX=0 in the host (32-bit non-PAE kernels).
 
-I am planning to queue this for the kvm tree. Any concerns?
+Oof, digging into this made me realize we probably have yet another bug in the
+handling of the NX hugepages workaround.  Unless I'm overlooking something, NX is
+treated as reserved for NPT shadow pages and would cause WARN spam if someone
+enabled the mitigation on AMD CPUs.
 
-Am 08.03.22 um 13:58 schrieb Janis Schoetterl-Glausch:
-> Refactor memop selftest and add tests.
-> Add storage key tests, both for success as well as failure cases.
-> Similarly, test both vcpu and vm ioctls.
-> 
-> v1 -> v2
->   * restructure commits
->   * get rid of test_* wrapper functions that hid vm.vm
->   * minor changes
-> 
-> v0 -> v2
->   * complete rewrite
-> 
-> v1: https://lore.kernel.org/kvm/20220217145336.1794778-1-scgl@linux.ibm.com/
-> v0: https://lore.kernel.org/kvm/20220211182215.2730017-11-scgl@linux.ibm.com/
-> 
-> Janis Schoetterl-Glausch (5):
->    KVM: s390: selftests: Split memop tests
->    KVM: s390: selftests: Add macro as abstraction for MEM_OP
->    KVM: s390: selftests: Add named stages for memop test
->    KVM: s390: selftests: Add more copy memop tests
->    KVM: s390: selftests: Add error memop tests
-> 
->   tools/testing/selftests/kvm/s390x/memop.c | 735 ++++++++++++++++++----
->   1 file changed, 617 insertions(+), 118 deletions(-)
-> 
-> 
-> base-commit: ee6a569d3bf64c9676eee3eecb861fb01cc11311
+Untested...  If this is needed, it also means I didn't properly test commit
+b26a71a1a5b9 ("KVM: SVM: Refuse to load kvm_amd if NX support is not available").
+
+:-(
+
+From: Sean Christopherson <seanjc@google.com>
+Date: Tue, 8 Mar 2022 10:31:27 -0800
+Subject: [PATCH] KVM: x86/mmu: Don't treat NX as reserved for NPT MMUs
+
+Mark the NX bit as allowed for NPT shadow pages.  KVM doesn't use NX in
+"normal" operation as KVM doesn't honor userspace execute-protection
+settings, but KVM allows userspace to enable the NX hugepages mitigation
+on AMD CPUs, despite no known AMD CPUs being affected by the iTLB
+multi-hit erratum.
+
+Fixes: b8e8c8303ff2 ("kvm: mmu: ITLB_MULTIHIT mitigation")
+Cc: stable@vger.kernel.org
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/mmu/mmu.c | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 47a2c5f3044d..9c79a0927a48 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -4461,13 +4461,17 @@ static inline bool boot_cpu_is_amd(void)
+ 	return shadow_x_mask == 0;
+ }
+
+-/*
+- * the direct page table on host, use as much mmu features as
+- * possible, however, kvm currently does not do execution-protection.
+- */
+ static void
+ reset_tdp_shadow_zero_bits_mask(struct kvm_mmu *context)
+ {
++	/*
++	 * KVM doesn't honor execute-protection from the host page tables, but
++	 * NX is required and potentially used at any time by KVM for NPT, as
++	 * the NX hugepages iTLB multi-hit mitigation is supported for any CPU
++	 * despite no known AMD (and derivative) CPUs being affected by erratum.
++	 */
++	bool efer_nx = true;
++
+ 	struct rsvd_bits_validate *shadow_zero_check;
+ 	int i;
+
+@@ -4475,7 +4479,7 @@ reset_tdp_shadow_zero_bits_mask(struct kvm_mmu *context)
+
+ 	if (boot_cpu_is_amd())
+ 		__reset_rsvds_bits_mask(shadow_zero_check, reserved_hpa_bits(),
+-					context->shadow_root_level, false,
++					context->shadow_root_level, efer_nx,
+ 					boot_cpu_has(X86_FEATURE_GBPAGES),
+ 					false, true);
+ 	else
+
+base-commit: 2a809a65d88e7e071dc6ef4a6be8416d25885efe
+--
+
