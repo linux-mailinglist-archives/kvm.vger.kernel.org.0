@@ -2,151 +2,224 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7BACD4D14C3
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 11:29:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DF8764D14D2
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 11:32:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345862AbiCHK37 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 05:29:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40088 "EHLO
+        id S232278AbiCHKdJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Mar 2022 05:33:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244341AbiCHK36 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Mar 2022 05:29:58 -0500
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDB1D3C48F;
-        Tue,  8 Mar 2022 02:29:01 -0800 (PST)
-Received: from dggpeml500024.china.huawei.com (unknown [172.30.72.53])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4KCWjk5KmWzdb2N;
-        Tue,  8 Mar 2022 18:27:38 +0800 (CST)
-Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
- dggpeml500024.china.huawei.com (7.185.36.10) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Tue, 8 Mar 2022 18:29:00 +0800
-Received: from [10.67.103.212] (10.67.103.212) by
- dggpeml100012.china.huawei.com (7.185.36.121) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Tue, 8 Mar 2022 18:28:59 +0800
-Subject: Re: [PATCH v8 6/9] hisi_acc_vfio_pci: Add helper to retrieve the
- struct pci_driver
-To:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>
-References: <20220303230131.2103-1-shameerali.kolothum.thodi@huawei.com>
- <20220303230131.2103-7-shameerali.kolothum.thodi@huawei.com>
-CC:     <linux-pci@vger.kernel.org>, <alex.williamson@redhat.com>,
-        <jgg@nvidia.com>, <cohuck@redhat.com>, <mgurtovoy@nvidia.com>,
-        <yishaih@nvidia.com>, <linuxarm@huawei.com>,
-        <liulongfang@huawei.com>, <prime.zeng@hisilicon.com>,
-        <jonathan.cameron@huawei.com>, <wangzhou1@hisilicon.com>
-From:   "yekai(A)" <yekai13@huawei.com>
-Message-ID: <77d96509-bad2-b271-aaaf-07ca6b699db6@huawei.com>
-Date:   Tue, 8 Mar 2022 18:28:59 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+        with ESMTP id S1345901AbiCHKdA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 05:33:00 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D422A42EF5;
+        Tue,  8 Mar 2022 02:32:04 -0800 (PST)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 2287Q4pV013390;
+        Tue, 8 Mar 2022 10:32:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=+Rkqa/FeIGw5LwvCZhlrJeoyRXSJ+gn4GGc1oqUoRQ4=;
+ b=JcYT+DCIS4pjxDiBQ4BtXA+4d7dXp8ki8fKTtY98dK6k0b/7eSDuWrklyk/EI8wWcoU3
+ 2vMDWJ1IufNLUnUxKGR+BIPuidIpqJvwR/QOZGUAslgjzvQ3xJy0R5GunGANx7QOo5km
+ lDsaJ60q7A9F6uE0EJej9x9IZzxNYTUPv5HqIvr7NuLMfwTPJMWyIC3RwDmLtw2fZ0Qr
+ UZvdMEHLisqN32CrldeaP0q/m7/4vlbrg4GAWbj1I0N+8o4Dy476LD3mLV63b2fI45FW
+ glleZvUYFqGJ8kjjf3yR3CM943Kzc2qK1BsV5DCc8M6J6tKWgijGSztewOxQntAl39Vq mQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3envcut5fw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Mar 2022 10:32:03 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 228AFa3h015136;
+        Tue, 8 Mar 2022 10:32:03 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3envcut5fm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Mar 2022 10:32:03 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 228ABxZf007690;
+        Tue, 8 Mar 2022 10:32:01 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 3ekyg8y5rb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Mar 2022 10:32:01 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 228AVwZO31523092
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 8 Mar 2022 10:31:58 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 80E4F5206D;
+        Tue,  8 Mar 2022 10:31:58 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.10.106])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 2964C52074;
+        Tue,  8 Mar 2022 10:31:58 +0000 (GMT)
+Date:   Tue, 8 Mar 2022 11:31:55 +0100
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Eric Farman <farman@linux.ibm.com>
+Cc:     Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: Re: [PATCH kvm-unit-tests v1 4/6] s390x: smp: Create and use a
+ non-waiting CPU stop
+Message-ID: <20220308113155.24c7a5f4@p-imbrenda>
+In-Reply-To: <2066eb382d42a27db9417ea47d79f2fbee0a2af0.camel@linux.ibm.com>
+References: <20220303210425.1693486-1-farman@linux.ibm.com>
+        <20220303210425.1693486-5-farman@linux.ibm.com>
+        <20220307163007.0213714e@p-imbrenda>
+        <2066eb382d42a27db9417ea47d79f2fbee0a2af0.camel@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20220303230131.2103-7-shameerali.kolothum.thodi@huawei.com>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.103.212]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpeml100012.china.huawei.com (7.185.36.121)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: SR-FzUN75TiuDLJNii78-Con3oAxkCzT
+X-Proofpoint-ORIG-GUID: yGmHTdDCHf02sDw26lOYjcUrGa_bbUe5
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-03-08_03,2022-03-04_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 mlxscore=0
+ malwarescore=0 clxscore=1015 phishscore=0 impostorscore=0 mlxlogscore=999
+ priorityscore=1501 lowpriorityscore=0 bulkscore=0 spamscore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
+ definitions=main-2203080055
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, 07 Mar 2022 14:03:45 -0500
+Eric Farman <farman@linux.ibm.com> wrote:
 
+> On Mon, 2022-03-07 at 16:30 +0100, Claudio Imbrenda wrote:
+> > On Thu,  3 Mar 2022 22:04:23 +0100
+> > Eric Farman <farman@linux.ibm.com> wrote:
+> >   
+> > > When stopping a CPU, kvm-unit-tests serializes/waits for everything
+> > > to finish, in order to get a consistent result whenever those
+> > > functions are used.
+> > > 
+> > > But to test the SIGP STOP itself, these additional measures could
+> > > mask other problems. For example, did the STOP work, or is the CPU
+> > > still operating?
+> > > 
+> > > Let's create a non-waiting SIGP STOP and use it here, to ensure
+> > > that
+> > > the CPU is correctly stopped. A smp_cpu_stopped() call will still
+> > > be used to see that the SIGP STOP has been processed, and the state
+> > > of the CPU can be used to determine whether the test passes/fails.
+> > > 
+> > > Signed-off-by: Eric Farman <farman@linux.ibm.com>
+> > > ---
+> > >  lib/s390x/smp.c | 25 +++++++++++++++++++++++++
+> > >  lib/s390x/smp.h |  1 +
+> > >  s390x/smp.c     | 10 ++--------
+> > >  3 files changed, 28 insertions(+), 8 deletions(-)
+> > > 
+> > > diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
+> > > index 368d6add..84e536e8 100644
+> > > --- a/lib/s390x/smp.c
+> > > +++ b/lib/s390x/smp.c
+> > > @@ -119,6 +119,31 @@ int smp_cpu_stop(uint16_t idx)
+> > >  	return rc;
+> > >  }
+> > >  
+> > > +/*
+> > > + * Functionally equivalent to smp_cpu_stop(), but without the
+> > > + * elements that wait/serialize matters itself.
+> > > + * Used to see if KVM itself is serialized correctly.
+> > > + */
+> > > +int smp_cpu_stop_nowait(uint16_t idx)
+> > > +{
+> > > +	/* refuse to work on the boot CPU */
+> > > +	if (idx == 0)
+> > > +		return -1;
+> > > +
+> > > +	spin_lock(&lock);
+> > > +
+> > > +	/* Don't suppress a CC2 with sigp_retry() */
+> > > +	if (smp_sigp(idx, SIGP_STOP, 0, NULL)) {
+> > > +		spin_unlock(&lock);
+> > > +		return -1;
+> > > +	}
+> > > +
+> > > +	cpus[idx].active = false;
+> > > +	spin_unlock(&lock);
+> > > +
+> > > +	return 0;
+> > > +}
+> > > +
+> > >  int smp_cpu_stop_store_status(uint16_t idx)
+> > >  {
+> > >  	int rc;
+> > > diff --git a/lib/s390x/smp.h b/lib/s390x/smp.h
+> > > index 1e69a7de..bae03dfd 100644
+> > > --- a/lib/s390x/smp.h
+> > > +++ b/lib/s390x/smp.h
+> > > @@ -44,6 +44,7 @@ bool smp_sense_running_status(uint16_t idx);
+> > >  int smp_cpu_restart(uint16_t idx);
+> > >  int smp_cpu_start(uint16_t idx, struct psw psw);
+> > >  int smp_cpu_stop(uint16_t idx);
+> > > +int smp_cpu_stop_nowait(uint16_t idx);
+> > >  int smp_cpu_stop_store_status(uint16_t idx);
+> > >  int smp_cpu_destroy(uint16_t idx);
+> > >  int smp_cpu_setup(uint16_t idx, struct psw psw);
+> > > diff --git a/s390x/smp.c b/s390x/smp.c
+> > > index 50811bd0..11c2c673 100644
+> > > --- a/s390x/smp.c
+> > > +++ b/s390x/smp.c
+> > > @@ -76,14 +76,8 @@ static void test_restart(void)
+> > >  
+> > >  static void test_stop(void)
+> > >  {
+> > > -	smp_cpu_stop(1);
+> > > -	/*
+> > > -	 * The smp library waits for the CPU to shut down, but let's
+> > > -	 * also do it here, so we don't rely on the library
+> > > -	 * implementation
+> > > -	 */
+> > > -	while (!smp_cpu_stopped(1)) {}
+> > > -	report_pass("stop");
+> > > +	smp_cpu_stop_nowait(1);  
+> > 
+> > can it happen that the SIGP STOP order is accepted, but the target
+> > CPU
+> > is still running (and not even busy)?  
+> 
+> Of course. A SIGP that's processed by userspace (which is many of them)
+> injects a STOP IRQ back to the kernel, which means the CPU might not be
+> stopped for some time. But...
+> 
+> >   
+> > > +	report(smp_cpu_stopped(1), "stop");  
+> > 
+> > e.g. can this ^ check race with the actual stopping of the CPU?  
+> 
+> ...the smp_cpu_stopped() routine now loops on the CC2 that SIGP SENSE
+> returns because of that pending IRQ. If SIGP SENSE returns CC0/1, then
+> the CPU can correctly be identified stopped/operating, and the test can
+> correctly pass/fail.
 
-On 2022/3/4 7:01, Shameer Kolothum wrote:
-> struct pci_driver pointer is an input into the pci_iov_get_pf_drvdata().
-> Introduce helpers to retrieve the ACC PF dev struct pci_driver pointers
-> as we use this in ACC vfio migration driver.
->
-> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> ---
->  drivers/crypto/hisilicon/hpre/hpre_main.c | 6 ++++++
->  drivers/crypto/hisilicon/sec2/sec_main.c  | 6 ++++++
->  drivers/crypto/hisilicon/zip/zip_main.c   | 6 ++++++
->  include/linux/hisi_acc_qm.h               | 5 +++++
->  4 files changed, 23 insertions(+)
->
-> diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
-> index 3589d8879b5e..36ab30e9e654 100644
-> --- a/drivers/crypto/hisilicon/hpre/hpre_main.c
-> +++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
-> @@ -1190,6 +1190,12 @@ static struct pci_driver hpre_pci_driver = {
->  	.driver.pm		= &hpre_pm_ops,
->  };
->
-> +struct pci_driver *hisi_hpre_get_pf_driver(void)
-> +{
-> +	return &hpre_pci_driver;
-> +}
-> +EXPORT_SYMBOL_GPL(hisi_hpre_get_pf_driver);
-> +
->  static void hpre_register_debugfs(void)
->  {
->  	if (!debugfs_initialized())
-> diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
-> index 311a8747b5bf..421a405ca337 100644
-> --- a/drivers/crypto/hisilicon/sec2/sec_main.c
-> +++ b/drivers/crypto/hisilicon/sec2/sec_main.c
-> @@ -1088,6 +1088,12 @@ static struct pci_driver sec_pci_driver = {
->  	.driver.pm = &sec_pm_ops,
->  };
->
-> +struct pci_driver *hisi_sec_get_pf_driver(void)
-> +{
-> +	return &sec_pci_driver;
-> +}
-> +EXPORT_SYMBOL_GPL(hisi_sec_get_pf_driver);
-> +
->  static void sec_register_debugfs(void)
->  {
->  	if (!debugfs_initialized())
-> diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
-> index 66decfe07282..4534e1e107d1 100644
-> --- a/drivers/crypto/hisilicon/zip/zip_main.c
-> +++ b/drivers/crypto/hisilicon/zip/zip_main.c
-> @@ -1012,6 +1012,12 @@ static struct pci_driver hisi_zip_pci_driver = {
->  	.driver.pm		= &hisi_zip_pm_ops,
->  };
->
-> +struct pci_driver *hisi_zip_get_pf_driver(void)
-> +{
-> +	return &hisi_zip_pci_driver;
-> +}
-> +EXPORT_SYMBOL_GPL(hisi_zip_get_pf_driver);
-> +
->  static void hisi_zip_register_debugfs(void)
->  {
->  	if (!debugfs_initialized())
-> diff --git a/include/linux/hisi_acc_qm.h b/include/linux/hisi_acc_qm.h
-> index 6a6477c34666..00f2a4db8723 100644
-> --- a/include/linux/hisi_acc_qm.h
-> +++ b/include/linux/hisi_acc_qm.h
-> @@ -476,4 +476,9 @@ void hisi_qm_pm_init(struct hisi_qm *qm);
->  int hisi_qm_get_dfx_access(struct hisi_qm *qm);
->  void hisi_qm_put_dfx_access(struct hisi_qm *qm);
->  void hisi_qm_regs_dump(struct seq_file *s, struct debugfs_regset32 *regset);
-> +
-> +/* Used by VFIO ACC live migration driver */
-> +struct pci_driver *hisi_sec_get_pf_driver(void);
-> +struct pci_driver *hisi_hpre_get_pf_driver(void);
-> +struct pci_driver *hisi_zip_get_pf_driver(void);
->  #endif
->
+my question was: is it possible architecturally that there is a window
+where the STOP order is accepted, but a SENSE on the target CPU still
+successfully returns that the CPU is running?
 
-Hi Shameer,
+in other words: is it specified architecturally that, once an order is
+accepted for a target CPU, that CPU can't accept any other order (and
+will return CC2), including SENSE, until the order has been completed
+successfully?
 
-It looks good to me for this movement.
+> 
+> >   
+> > >  }
+> > >  
+> > >  static void test_stop_store_status(void)  
+> 
 
-Acked-by:  Kai Ye <yekai13@huawei.com>
-
-Thanks,
-Kai
