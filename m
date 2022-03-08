@@ -2,81 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A05F54D1D03
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 17:18:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 65E414D1D0D
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 17:21:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347518AbiCHQT1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 11:19:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40472 "EHLO
+        id S1348310AbiCHQWP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Mar 2022 11:22:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232896AbiCHQT0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Mar 2022 11:19:26 -0500
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E81855FCE
-        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 08:18:29 -0800 (PST)
-Received: by mail-pl1-x631.google.com with SMTP id n2so7998663plf.4
-        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 08:18:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=/g6o8su2Hk/zPgoUfjrHPTRcmqqT0E/Il4cBIitP3q8=;
-        b=GTCzEH82Rnt5FXgl1VRwd7dNo+KQvT4TpRHahjGuBnV/x2AKKeIC9XKrvuZEmbRSC9
-         ocZyofopdAHtAf5AUhqf+pIcHOkhMSr90cpLPkPW7cJ3bcAd/kua5xF/u9lYswfP+ClF
-         Y4Nl+H8d7W/Py3AKp23Ps1IoGT0So+1y3lKwYQ7qat5s7g3S1n+QdA6R3KppamK8ssym
-         EVPwrf2oj1ZHOuwnRWggdGe7YkGZTP8ocLdnxkzXfbpkPmHH0FzUqC1odPX98BU5e8ji
-         iMkpgqK27vF9X5hNXbn6jDmiyE3O3OAcZOU6oh91zbbAYWJtOmouXVg1iIGjVKnuMPxr
-         11qg==
+        with ESMTP id S1348293AbiCHQWN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 11:22:13 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 47AAF5FCE
+        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 08:21:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646756475;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=CBvsK7yZkBxfmY+8RqkH2up0UVblpUA0JK9TMDfqBZE=;
+        b=A5nTX7XmAqIJzCNxoHJu8BFTyxvjbBn90IBw3L3SA0E/dCYXeil6tvg7+iZ6DmSDt+q+Xw
+        Zv5YxjcW2lnZ9h4nfPg3SkOLtwcyVdpgRWyTkYpSGViivUO4FG3gQfdQ2dBHXsUS+vQ1jo
+        XJt2Bj8hdk8uPjoJY3Ux0AQQ0F2nBCc=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-302-DGIiHJoUMxCpxLSvMJvpVg-1; Tue, 08 Mar 2022 11:21:13 -0500
+X-MC-Unique: DGIiHJoUMxCpxLSvMJvpVg-1
+Received: by mail-ed1-f69.google.com with SMTP id r8-20020aa7d588000000b00416438ed9a2so4434545edq.11
+        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 08:21:13 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=/g6o8su2Hk/zPgoUfjrHPTRcmqqT0E/Il4cBIitP3q8=;
-        b=GoJiujpVGg1HBmV3ke9TYc99O7L/KfWqRo0tg7QfhAZTweVQnv5GF+VY8TI2et8k3k
-         nyw7CvgvPilj8JonQGdoY/g0GqeSIQPu92VdIeIL32JL9+M/H7/+r2atiTIm7RjBzdFq
-         UQA+NaIOtUmCva6B0uZKTFbtpcf52YWHAByeYVFlJDMTRwsO/8sTDN+FD4jy3a/a/l2M
-         yPqhMI45BX5nC0eciaRL0Rvxxewl2N3Sr3En9P1pzQjYRxDpLm2GmVbAgU4DrxpaFqsL
-         TUXlohClH4K1sZQPa3RyfMvu7szbK7+F9+ilRhv9/wOWOpvf3XKmawukhFcr2n6rdNii
-         gQOA==
-X-Gm-Message-State: AOAM5315zBFBE7IPAEgDuXuCrt/P3xVM4pIqRA6VIaQd87iddX6ETG4Y
-        IqC/fgRavnb9QuJEUbuZBg9PY7uGSfQIyA==
-X-Google-Smtp-Source: ABdhPJyHIHEShx9RNJ9IjV0iPtEFIr+XzYj+oAzTTb2boOxTjsTZ42kcLJ9Z0kcYLlt0fjKzHrX5mQ==
-X-Received: by 2002:a17:90b:314:b0:1be:dc22:62f2 with SMTP id ay20-20020a17090b031400b001bedc2262f2mr5513818pjb.102.1646756309299;
-        Tue, 08 Mar 2022 08:18:29 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id kk12-20020a17090b4a0c00b001bed1ff3717sm3309593pjb.6.2022.03.08.08.18.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Mar 2022 08:18:28 -0800 (PST)
-Date:   Tue, 8 Mar 2022 16:18:25 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=CBvsK7yZkBxfmY+8RqkH2up0UVblpUA0JK9TMDfqBZE=;
+        b=Hx9ef14JauW8bLpSlfYSJ8ouuVpofTpj3BIj+bNBnVSQDy+H027zhR7Icr4vqLD50/
+         JgHi5KPwr6QMWibDUqzA+xrbalJuuXAHMX+d0OSSd3kX5zJm2KhbKV6V3/v6TtgUxlkK
+         8yfD+MWxbSLJyBM4TVVaCrJVU2Hjkx0tydW/c6temwpSUqkqCJu0yj9qZTHPqmPKZwB5
+         8b757o8zX9lLqlcgZPg4yXoOSUmCd2WhBb7iFRbhMheEZAl+TJuAZAWAaMaeVQC3R/WO
+         xCyiAtD04MPmzn6YBsKhdcoEuaWWF9cm/sSA9l31xWTfZyDW9+73MBi86XTCXKZLAGty
+         cLXw==
+X-Gm-Message-State: AOAM533vHV5vlJwlujbuhUk/by2g4DAJXtOoyGOLdBRIgaq27ENJnQDK
+        1yTUL8wygFib18LA9O885aEHZSWvzc1BrIceb7ec7iryGz6UWebSFs9iLkGu2nJtF9E5o7xuWG1
+        KlddZHIHqMSnq
+X-Received: by 2002:a17:906:7d83:b0:6ce:fee:9256 with SMTP id v3-20020a1709067d8300b006ce0fee9256mr14590787ejo.647.1646756471794;
+        Tue, 08 Mar 2022 08:21:11 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzxQu7IYyETha9E2LZivWjB76N0egbFW8CxeJzmf5k7Cicjr6tmzT1LuArWcSRv8IfHIN9HAA==
+X-Received: by 2002:a17:906:7d83:b0:6ce:fee:9256 with SMTP id v3-20020a1709067d8300b006ce0fee9256mr14590769ejo.647.1646756471507;
+        Tue, 08 Mar 2022 08:21:11 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id s8-20020a170906354800b006da9dec91f2sm5746016eja.163.2022.03.08.08.21.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Mar 2022 08:21:10 -0800 (PST)
+Message-ID: <2652c27e-ce8c-eb40-1979-9fe732aa9085@redhat.com>
+Date:   Tue, 8 Mar 2022 17:21:09 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH v2 01/25] KVM: x86/mmu: avoid indirect call for get_cr3
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         dmatlack@google.com
-Subject: Re: [PATCH v2 02/25] KVM: x86/mmu: nested EPT cannot be used in SMM
-Message-ID: <YieB0VT8HrurWYD8@google.com>
 References: <20220221162243.683208-1-pbonzini@redhat.com>
- <20220221162243.683208-3-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220221162243.683208-3-pbonzini@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+ <20220221162243.683208-2-pbonzini@redhat.com> <YieBXzkOkB9SZpyp@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <YieBXzkOkB9SZpyp@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 21, 2022, Paolo Bonzini wrote:
-> The role.base.smm flag is always zero when setting up shadow EPT,
-> do not bother copying it over from vcpu->arch.root_mmu.
+On 3/8/22 17:16, Sean Christopherson wrote:
 > 
-> Reviewed-by: David Matlack <dmatlack@google.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
+>> +static inline unsigned long kvm_mmu_get_guest_pgd(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu)
+> Wrap the params, no reason to make this line so long.
+> 
+>> +{
+>> +#ifdef CONFIG_RETPOLINE
+>> +	if (mmu->get_guest_pgd == kvm_get_guest_cr3)
+>> +		return kvm_read_cr3(vcpu);
+> This is unnecessarily fragile and confusing at first glance.  Compilers are smart
+> enough to generate a non-inline version of functions if they're used for function
+> pointers, while still inlining where appropriate.  In other words, just drop
+> kvm_get_guest_cr3() entirely, a al get_pdptr => kvm_pdptr_read().
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+Unfortunately this isn't entirely true.  The function pointer will not 
+match between compilation units, in this case between the one that calls 
+kvm_mmu_get_guest_pgd and the one that assigned kvm_read_cr3 to the 
+function pointer.
+
+Paolo
+
