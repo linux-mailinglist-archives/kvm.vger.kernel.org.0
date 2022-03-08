@@ -2,67 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0CFEA4D2447
+	by mail.lfdr.de (Postfix) with ESMTP id EE81C4D244A
 	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 23:30:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238847AbiCHWaS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 17:30:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41772 "EHLO
+        id S1350739AbiCHWaq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Mar 2022 17:30:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235352AbiCHWaR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Mar 2022 17:30:17 -0500
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F6561B78B
-        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 14:29:20 -0800 (PST)
-Received: by mail-pj1-x102c.google.com with SMTP id v4so646378pjh.2
-        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 14:29:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=lcrkkjBENIYesydqiaasOTxpBce7QoI3ujVOSnsO1B4=;
-        b=nJaHE2lI1yjIYJj/ybuRclsQuEbWR4Gm6ytnlJ6u9IDtCY6esGtyX8KJNebOkEokSJ
-         d0+AKITI/OY1Y68Zvu0mcFGgSgB1VNTMVou2x2HV0lZSuZcKQNIoW14Se5weuEPNW1MK
-         bTb2YUptnBdr90cub2sWw4LyBMTFVOH86nXqoFkHd1YbiA5MR+Oq9Eq2kxnOVyBuAogw
-         u+CRnnu18K1BCTywk1ZkQv9Z0xuTSuOkiHZemDTi4JmR3d4W5y3lYO76M0JwrLRRtz/h
-         l7xnRUbeFwc/57Q/xLM11EYjt0OYMCdMyE+dXPhS8o6uEmQ8uwkkrAzSqLD0Z09tM7yn
-         sepQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=lcrkkjBENIYesydqiaasOTxpBce7QoI3ujVOSnsO1B4=;
-        b=RIPJrq2iCw/xgPqMQViqKTYQCm7LnRVE7DmPkQziDYwvsCHdyS1O8/YI5Eq3MiorOl
-         LE4SDV81jmz8tb52Hi0xOwxG55RQkPXCpuNeWRiVodIodZzRStH1S29yP/N98DFxRGKI
-         xXRlwFfJK9IG5MbQJRiwBOAOZO3X6euUI4f1GcVFl1VwUuY0EMvR6A2VtyvSsRZXcTPr
-         as94x6HTBU8Nb3jzBzdvURGld2HuchxkSdJfhZDBjNPwesWk98TJTojGOKb3PPpxgo8S
-         idomSzHMsPtyAFuvxKyuf4hBeYgYOTYR9ZRngkLQGYBqoMTZCuggC21b1ERwJ59IqjcB
-         G7/g==
-X-Gm-Message-State: AOAM531nXZTKlNdgZpKOYzaqPTJKc/sNtuuxN+WwOjvW7XkOthGrWYjj
-        ru74BI4tKUYHlzp89jySE44C0S9abJvWLgdS1MHJ2g==
-X-Google-Smtp-Source: ABdhPJyFpRTvd02rvAC/Kf+WMGoh+2aCSSzrWOG96Yn5KqPBCJaSnmXw9faK4PL72W3N7T8tP/CyIPN67B/8aS1QiIM=
-X-Received: by 2002:a17:903:292:b0:149:460a:9901 with SMTP id
- j18-20020a170903029200b00149460a9901mr19634846plr.44.1646778559549; Tue, 08
- Mar 2022 14:29:19 -0800 (PST)
+        with ESMTP id S1350488AbiCHWam (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 17:30:42 -0500
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1585758E7D
+        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 14:29:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1646778583; x=1678314583;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=MsZS/snTdXJtUsxglht7BmeMVVrRncz9zab3wOMFjpw=;
+  b=l189JKXGQc+BTRUzCqRJpgcpATVUrzGzo6IPfVZHASlYBsg8fxCNuXdM
+   mI0LWTNAklFBRLuFvCaWZ1H3aduP7T8DqOcM1OBjiCdfA8HWFt5YrbLTn
+   wdncsFaWZrMTNXJSy7ormh+70+rUSyFF/VOvwGZLKgAlNCEAoBT4K+d/m
+   CZ7JKMmjBdpPwthFTeHpqOvO/8PPNHhr9jM5kUdpdYvReCDuQmz63Y1Qf
+   4QM4kREchLN8NjsDMumuIkTWG2/OBQ4ZL2R635e9R8gvbnNB0S8MXSuFn
+   3yGZscQ2k3AXR3wE/jc5n9h/ZD7Rh3Vqx9o00cEn2N1jlgbokQkEepwuE
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10280"; a="234783016"
+X-IronPort-AV: E=Sophos;i="5.90,165,1643702400"; 
+   d="scan'208";a="234783016"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Mar 2022 14:29:42 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.90,165,1643702400"; 
+   d="scan'208";a="688085532"
+Received: from lkp-server02.sh.intel.com (HELO 89b41b6ae01c) ([10.239.97.151])
+  by fmsmga001.fm.intel.com with ESMTP; 08 Mar 2022 14:29:41 -0800
+Received: from kbuild by 89b41b6ae01c with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1nRiKq-00026R-BB; Tue, 08 Mar 2022 22:29:40 +0000
+Date:   Wed, 9 Mar 2022 06:29:11 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Li RongQing <lirongqing@baidu.com>
+Cc:     kbuild-all@lists.01.org, kvm@vger.kernel.org,
+        Robert Hu <robert.hu@intel.com>,
+        Farrah Chen <farrah.chen@intel.com>,
+        Danmei Wei <danmei.wei@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Wang GuangJu <wangguangju@baidu.com>
+Subject: [kvm:queue 182/203] arch/x86/include/asm/paravirt.h:683:35: error:
+ '__raw_callee_save___kvm_vcpu_is_preempted' undeclared
+Message-ID: <202203090607.5kEhVF3N-lkp@intel.com>
 MIME-Version: 1.0
-References: <20220303183328.1499189-1-dmatlack@google.com> <20220303183328.1499189-2-dmatlack@google.com>
- <YifNPekMfIta+xcv@google.com>
-In-Reply-To: <YifNPekMfIta+xcv@google.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Tue, 8 Mar 2022 14:28:53 -0800
-Message-ID: <CALzav=frpbRMkDtVTwii2hJ+trtF0m0p5Y_Rc5KS42rp1KEaNw@mail.gmail.com>
-Subject: Re: [PATCH RESEND 1/2] KVM: Prevent module exit until all VMs are freed
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Gleb Natapov <gleb@redhat.com>, Rik van Riel <riel@redhat.com>,
-        Ben Gardon <bgardon@google.com>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HEXHASH_WORD,
+        RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,92 +65,93 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 8, 2022 at 1:40 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Thu, Mar 03, 2022, David Matlack wrote:
-> > Tie the lifetime the KVM module to the lifetime of each VM via
-> > kvm.users_count. This way anything that grabs a reference to the VM via
-> > kvm_get_kvm() cannot accidentally outlive the KVM module.
-> >
-> > Prior to this commit, the lifetime of the KVM module was tied to the
-> > lifetime of /dev/kvm file descriptors, VM file descriptors, and vCPU
-> > file descriptors by their respective file_operations "owner" field.
-> > This approach is insufficient because references grabbed via
-> > kvm_get_kvm() do not prevent closing any of the aforementioned file
-> > descriptors.
-> >
-> > This fixes a long standing theoretical bug in KVM that at least affects
-> > async page faults. kvm_setup_async_pf() grabs a reference via
-> > kvm_get_kvm(), and drops it in an asynchronous work callback. Nothing
-> > prevents the VM file descriptor from being closed and the KVM module
-> > from being unloaded before this callback runs.
-> >
-> > Fixes: af585b921e5d ("KVM: Halt vcpu if page it tries to access is swapped out")
->
-> And (or)
->
->   Fixes: 3d3aab1b973b ("KVM: set owner of cpu and vm file operations")
->
-> because the above is x86-centric, at a glance PPC and maybe s390 have issues
-> beyond async #PF.
->
-> > Cc: stable@vger.kernel.org
-> > Suggested-by: Ben Gardon <bgardon@google.com>
-> > [ Based on a patch from Ben implemented for Google's kernel. ]
-> > Signed-off-by: David Matlack <dmatlack@google.com>
-> > ---
-> >  virt/kvm/kvm_main.c | 8 ++++++++
-> >  1 file changed, 8 insertions(+)
-> >
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index 35ae6d32dae5..b59f0a29dbd5 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -117,6 +117,8 @@ EXPORT_SYMBOL_GPL(kvm_debugfs_dir);
-> >
-> >  static const struct file_operations stat_fops_per_vm;
-> >
-> > +static struct file_operations kvm_chardev_ops;
-> > +
-> >  static long kvm_vcpu_ioctl(struct file *file, unsigned int ioctl,
-> >                          unsigned long arg);
-> >  #ifdef CONFIG_KVM_COMPAT
-> > @@ -1131,6 +1133,11 @@ static struct kvm *kvm_create_vm(unsigned long type)
-> >       preempt_notifier_inc();
-> >       kvm_init_pm_notifier(kvm);
-> >
-> > +     if (!try_module_get(kvm_chardev_ops.owner)) {
->
-> The "try" aspect is unnecessary.  Stealing from Paolo's version,
->
->         /* KVM is pinned via open("/dev/kvm"), the fd passed to this ioctl(). */
->         __module_get(kvm_chardev_ops.owner);
+tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
+head:   00a2bd3464280ca1f08e2cbfab22b884ffb731d8
+commit: dc889a8974087aba3eb1cc6db2066fbbdb58922a [182/203] KVM: x86: Support the vCPU preemption check with nopvspin and realtime hint
+config: i386-randconfig-a003 (https://download.01.org/0day-ci/archive/20220309/202203090607.5kEhVF3N-lkp@intel.com/config)
+compiler: gcc-9 (Debian 9.3.0-22) 9.3.0
+reproduce (this is a W=1 build):
+        # https://git.kernel.org/pub/scm/virt/kvm/kvm.git/commit/?id=dc889a8974087aba3eb1cc6db2066fbbdb58922a
+        git remote add kvm https://git.kernel.org/pub/scm/virt/kvm/kvm.git
+        git fetch --no-tags kvm queue
+        git checkout dc889a8974087aba3eb1cc6db2066fbbdb58922a
+        # save the config file to linux build tree
+        mkdir build_dir
+        make W=1 O=build_dir ARCH=i386 SHELL=/bin/bash
 
-Right, I did see that and agree we're guaranteed the KVM module has a
-reference at this point. But the KVM module might be in state
-MODULE_STATE_GOING (e.g. if someone ran "rmmod --wait"), which
-try_module_get() checks.
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
 
->
-> > +             r = -ENODEV;
-> > +             goto out_err;
-> > +     }
-> > +
-> >       return kvm;
-> >
-> >  out_err:
-> > @@ -1220,6 +1227,7 @@ static void kvm_destroy_vm(struct kvm *kvm)
-> >       preempt_notifier_dec();
-> >       hardware_disable_all();
-> >       mmdrop(mm);
-> > +     module_put(kvm_chardev_ops.owner);
-> >  }
-> >
-> >  void kvm_get_kvm(struct kvm *kvm)
-> >
-> > base-commit: b13a3befc815eae574d87e6249f973dfbb6ad6cd
-> > prerequisite-patch-id: 38f66d60319bf0bc9bf49f91f0f9119e5441629b
-> > prerequisite-patch-id: 51aa921d68ea649d436ea68e1b8f4aabc3805156
-> > --
-> > 2.35.1.616.g0bdcbb4464-goog
-> >
+All errors (new ones prefixed by >>):
+
+   In file included from arch/x86/include/asm/spinlock.h:10,
+                    from include/linux/spinlock.h:93,
+                    from include/linux/wait.h:9,
+                    from include/linux/pid.h:6,
+                    from include/linux/sched.h:14,
+                    from include/linux/context_tracking.h:5,
+                    from arch/x86/kernel/kvm.c:12:
+   arch/x86/kernel/kvm.c: In function 'kvm_guest_init':
+>> arch/x86/include/asm/paravirt.h:683:35: error: '__raw_callee_save___kvm_vcpu_is_preempted' undeclared (first use in this function)
+     683 |  ((struct paravirt_callee_save) { __raw_callee_save_##func })
+         |                                   ^~~~~~~~~~~~~~~~~~
+   arch/x86/kernel/kvm.c:769:4: note: in expansion of macro 'PV_CALLEE_SAVE'
+     769 |    PV_CALLEE_SAVE(__kvm_vcpu_is_preempted);
+         |    ^~~~~~~~~~~~~~
+   arch/x86/include/asm/paravirt.h:683:35: note: each undeclared identifier is reported only once for each function it appears in
+     683 |  ((struct paravirt_callee_save) { __raw_callee_save_##func })
+         |                                   ^~~~~~~~~~~~~~~~~~
+   arch/x86/kernel/kvm.c:769:4: note: in expansion of macro 'PV_CALLEE_SAVE'
+     769 |    PV_CALLEE_SAVE(__kvm_vcpu_is_preempted);
+         |    ^~~~~~~~~~~~~~
+
+
+vim +/__raw_callee_save___kvm_vcpu_is_preempted +683 arch/x86/include/asm/paravirt.h
+
+2e47d3e6c35bb5 include/asm-x86/paravirt.h      Glauber de Oliveira Costa 2008-01-30  648  
+ecb93d1ccd0aac arch/x86/include/asm/paravirt.h Jeremy Fitzhardinge       2009-01-28  649  /*
+ecb93d1ccd0aac arch/x86/include/asm/paravirt.h Jeremy Fitzhardinge       2009-01-28  650   * Generate a thunk around a function which saves all caller-save
+ecb93d1ccd0aac arch/x86/include/asm/paravirt.h Jeremy Fitzhardinge       2009-01-28  651   * registers except for the return value.  This allows C functions to
+ecb93d1ccd0aac arch/x86/include/asm/paravirt.h Jeremy Fitzhardinge       2009-01-28  652   * be called from assembler code where fewer than normal registers are
+ecb93d1ccd0aac arch/x86/include/asm/paravirt.h Jeremy Fitzhardinge       2009-01-28  653   * available.  It may also help code generation around calls from C
+ecb93d1ccd0aac arch/x86/include/asm/paravirt.h Jeremy Fitzhardinge       2009-01-28  654   * code if the common case doesn't use many registers.
+ecb93d1ccd0aac arch/x86/include/asm/paravirt.h Jeremy Fitzhardinge       2009-01-28  655   *
+ecb93d1ccd0aac arch/x86/include/asm/paravirt.h Jeremy Fitzhardinge       2009-01-28  656   * When a callee is wrapped in a thunk, the caller can assume that all
+ecb93d1ccd0aac arch/x86/include/asm/paravirt.h Jeremy Fitzhardinge       2009-01-28  657   * arg regs and all scratch registers are preserved across the
+ecb93d1ccd0aac arch/x86/include/asm/paravirt.h Jeremy Fitzhardinge       2009-01-28  658   * call. The return value in rax/eax will not be saved, even for void
+ecb93d1ccd0aac arch/x86/include/asm/paravirt.h Jeremy Fitzhardinge       2009-01-28  659   * functions.
+ecb93d1ccd0aac arch/x86/include/asm/paravirt.h Jeremy Fitzhardinge       2009-01-28  660   */
+87b240cbe3e51b arch/x86/include/asm/paravirt.h Josh Poimboeuf            2016-01-21  661  #define PV_THUNK_NAME(func) "__raw_callee_save_" #func
+20125c872a3f12 arch/x86/include/asm/paravirt.h Peter Zijlstra            2021-06-24  662  #define __PV_CALLEE_SAVE_REGS_THUNK(func, section)			\
+ecb93d1ccd0aac arch/x86/include/asm/paravirt.h Jeremy Fitzhardinge       2009-01-28  663  	extern typeof(func) __raw_callee_save_##func;			\
+ecb93d1ccd0aac arch/x86/include/asm/paravirt.h Jeremy Fitzhardinge       2009-01-28  664  									\
+20125c872a3f12 arch/x86/include/asm/paravirt.h Peter Zijlstra            2021-06-24  665  	asm(".pushsection " section ", \"ax\";"				\
+87b240cbe3e51b arch/x86/include/asm/paravirt.h Josh Poimboeuf            2016-01-21  666  	    ".globl " PV_THUNK_NAME(func) ";"				\
+87b240cbe3e51b arch/x86/include/asm/paravirt.h Josh Poimboeuf            2016-01-21  667  	    ".type " PV_THUNK_NAME(func) ", @function;"			\
+87b240cbe3e51b arch/x86/include/asm/paravirt.h Josh Poimboeuf            2016-01-21  668  	    PV_THUNK_NAME(func) ":"					\
+87b240cbe3e51b arch/x86/include/asm/paravirt.h Josh Poimboeuf            2016-01-21  669  	    FRAME_BEGIN							\
+ecb93d1ccd0aac arch/x86/include/asm/paravirt.h Jeremy Fitzhardinge       2009-01-28  670  	    PV_SAVE_ALL_CALLER_REGS					\
+ecb93d1ccd0aac arch/x86/include/asm/paravirt.h Jeremy Fitzhardinge       2009-01-28  671  	    "call " #func ";"						\
+ecb93d1ccd0aac arch/x86/include/asm/paravirt.h Jeremy Fitzhardinge       2009-01-28  672  	    PV_RESTORE_ALL_CALLER_REGS					\
+87b240cbe3e51b arch/x86/include/asm/paravirt.h Josh Poimboeuf            2016-01-21  673  	    FRAME_END							\
+b17c2baa305ccc arch/x86/include/asm/paravirt.h Peter Zijlstra            2021-12-04  674  	    ASM_RET							\
+083db676482199 arch/x86/include/asm/paravirt.h Josh Poimboeuf            2019-07-17  675  	    ".size " PV_THUNK_NAME(func) ", .-" PV_THUNK_NAME(func) ";"	\
+ecb93d1ccd0aac arch/x86/include/asm/paravirt.h Jeremy Fitzhardinge       2009-01-28  676  	    ".popsection")
+ecb93d1ccd0aac arch/x86/include/asm/paravirt.h Jeremy Fitzhardinge       2009-01-28  677  
+20125c872a3f12 arch/x86/include/asm/paravirt.h Peter Zijlstra            2021-06-24  678  #define PV_CALLEE_SAVE_REGS_THUNK(func)			\
+20125c872a3f12 arch/x86/include/asm/paravirt.h Peter Zijlstra            2021-06-24  679  	__PV_CALLEE_SAVE_REGS_THUNK(func, ".text")
+20125c872a3f12 arch/x86/include/asm/paravirt.h Peter Zijlstra            2021-06-24  680  
+ecb93d1ccd0aac arch/x86/include/asm/paravirt.h Jeremy Fitzhardinge       2009-01-28  681  /* Get a reference to a callee-save function */
+ecb93d1ccd0aac arch/x86/include/asm/paravirt.h Jeremy Fitzhardinge       2009-01-28  682  #define PV_CALLEE_SAVE(func)						\
+ecb93d1ccd0aac arch/x86/include/asm/paravirt.h Jeremy Fitzhardinge       2009-01-28 @683  	((struct paravirt_callee_save) { __raw_callee_save_##func })
+ecb93d1ccd0aac arch/x86/include/asm/paravirt.h Jeremy Fitzhardinge       2009-01-28  684  
+
+:::::: The code at line 683 was first introduced by commit
+:::::: ecb93d1ccd0aac63f03be2db3cac3fa974716f4c x86/paravirt: add register-saving thunks to reduce caller register pressure
+
+:::::: TO: Jeremy Fitzhardinge <jeremy@goop.org>
+:::::: CC: H. Peter Anvin <hpa@linux.intel.com>
+
+---
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
