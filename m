@@ -2,78 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A2C384D0DA7
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 02:46:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 45E9E4D0DCD
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 03:04:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232589AbiCHBrH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Mar 2022 20:47:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34606 "EHLO
+        id S244741AbiCHCEx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Mar 2022 21:04:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344303AbiCHBrG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Mar 2022 20:47:06 -0500
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26D373B2AB;
-        Mon,  7 Mar 2022 17:46:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1646703970; x=1678239970;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   mime-version:in-reply-to;
-  bh=mHBCi6qAEBh/nnklYLjjX0eLK1S8y5VX77Z1SPbc3yQ=;
-  b=ULmH3UEBLdccUYzQgIXK0dw+/n2E3nyWqtarEdlbrhI/qPGrgDozMej3
-   XODS3M2TAfukAkmK28C/7WUE0m1FhZjKGwWOTFcwYncWUriBNuf861Ulf
-   iUyHGFEzYSzu3RuSaZoVHJPydGtvyptuDeqiiJV/dHXEEM8dXiCigeN4k
-   21t2qgVVI4kp+GcymcBYFJOgQVmLRTk204HJtYUamYpzzVCivVu+UDlse
-   GCL/Uk+aGnFehCVIXjUnXei17+5UOF35VCeP4KvKm+F61+qcCCQHVj5Lb
-   o4tcvZwbTSsawDGzU0RQ7xla5jUUDx8PeI7/GkFpW4lAUfXrDClF5GKrs
-   w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10279"; a="252132725"
-X-IronPort-AV: E=Sophos;i="5.90,163,1643702400"; 
-   d="scan'208";a="252132725"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2022 17:46:09 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.90,163,1643702400"; 
-   d="scan'208";a="495276231"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.101])
-  by orsmga003.jf.intel.com with ESMTP; 07 Mar 2022 17:46:02 -0800
-Date:   Tue, 8 Mar 2022 09:45:45 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     Vlastimil Babka <vbabka@suse.cz>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com
-Subject: Re: [PATCH v4 03/12] mm: Introduce memfile_notifier
-Message-ID: <20220308014545.GA43625@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <20220118132121.31388-1-chao.p.peng@linux.intel.com>
- <20220118132121.31388-4-chao.p.peng@linux.intel.com>
- <9ac9a88f-54b4-a49f-0857-c3094d3e0d2b@suse.cz>
+        with ESMTP id S233856AbiCHCEv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Mar 2022 21:04:51 -0500
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1C6437AB2
+        for <kvm@vger.kernel.org>; Mon,  7 Mar 2022 18:03:55 -0800 (PST)
+Received: by mail-pf1-x42a.google.com with SMTP id t5so16052825pfg.4
+        for <kvm@vger.kernel.org>; Mon, 07 Mar 2022 18:03:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=zPzE/KfxbqfCkt+sqJq4FYPy7nIua70yVKy4tSIv5RA=;
+        b=VwTw70sJKoLQiysdLPX6D/SefpFSl81t2xvKLz2JnVk36UTyxEl5w9/YGj7WWqSmkY
+         MAej2K+cZwfZGKdyRuU00RuqRFS36roucvKoFEEPiErMtBRcvM2FfumcB/DIyYdl/ST5
+         hIIM2MIjKXmhrt1rDRXTKheQtHHk1kXMQn4+3Src+BzTTa47Dh5Lr6lCgoIBgjm85IDk
+         2gfDrNbvHZ9+NrJVQ7IeAyS1zlA4lO/FiCAZUv1v+hSBWUaUvI8DkHOWCiLM1k+u2NiW
+         8k7r8UkOpplGn27bT12UbxpgH+VvUjdUjMPnC9HYpz+zWUdDrIUJDAY6sSzpTGaOKehV
+         ZubA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=zPzE/KfxbqfCkt+sqJq4FYPy7nIua70yVKy4tSIv5RA=;
+        b=opp9lDf7Yuv+eE9Jt6inRfYID9zR+e6Pba2XzCY/4nGWuYKCPZgf5UBl+b6D3u0Mcv
+         0U/NKv+IfGgvTumsJUx3/P6zSlzvK65f778swM8YFfdQ4nTqn1TjiKjyB1FZOm12HRG/
+         8XR/lkwYRUizJn43VFnhw7iCOuqm10jlgRG2d/CLkVUsfh1Y+nN17nrWuXZV0RnxrvWE
+         V8YkuJzxJ9Aa63/BNRFmUt30AydjXzmIFzdhs/PNmTPE7kJZkGBJ2gj8rLBOFbJgjVwC
+         /9RsZNqP5tWfC4hdo5iGChrDYPna6DpKIPapbhwh5MiisJwRgAGF00AxOt7XgW5HLzzH
+         X8gg==
+X-Gm-Message-State: AOAM533v9NUxNyHupd9FE+1WrvZ5wHPZEdUe7iVHR0PzWMAHQuSzW1rn
+        mcgs38iR1IbCfOutZa3cY6fYUg==
+X-Google-Smtp-Source: ABdhPJySyxMD46AZLFdfyu+2YVLdLlsgsst7NXg+2/aGLlTxFGSpNWOI/il55Lz0Dbvf78yMXeM+kg==
+X-Received: by 2002:a05:6a02:18b:b0:362:c8e4:d8f4 with SMTP id bj11-20020a056a02018b00b00362c8e4d8f4mr12427851pgb.86.1646705035060;
+        Mon, 07 Mar 2022 18:03:55 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id i192-20020a636dc9000000b0037c7149fb0asm11654410pgc.89.2022.03.07.18.03.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Mar 2022 18:03:54 -0800 (PST)
+Date:   Tue, 8 Mar 2022 02:03:50 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Hao Peng <flyingpenghao@gmail.com>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] kvm: x86: Improve virtual machine startup performance
+Message-ID: <Yia5hsoq2ZZJM8gx@google.com>
+References: <20220301063756.16817-1-flyingpeng@tencent.com>
+ <Yh5d7XBD9D4FhEe3@google.com>
+ <CAPm50a+p2pSjExDwPmGpZ_aTuxs=x6RZ4-AAD19RDQx2o-=NCw@mail.gmail.com>
+ <YiAZ3wTICeLTVnJz@google.com>
+ <CAPm50aLJ51mm9JVpTMQCkNENX_9-Do5UeH5zxu-5byOcOFsJBg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <9ac9a88f-54b4-a49f-0857-c3094d3e0d2b@suse.cz>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Spam-Status: No, score=-7.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+In-Reply-To: <CAPm50aLJ51mm9JVpTMQCkNENX_9-Do5UeH5zxu-5byOcOFsJBg@mail.gmail.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -81,45 +74,26 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 07, 2022 at 04:42:08PM +0100, Vlastimil Babka wrote:
-> On 1/18/22 14:21, Chao Peng wrote:
-> > This patch introduces memfile_notifier facility so existing memory file
-> > subsystems (e.g. tmpfs/hugetlbfs) can provide memory pages to allow a
-> > third kernel component to make use of memory bookmarked in the memory
-> > file and gets notified when the pages in the memory file become
-> > allocated/invalidated.
-> > 
-> > It will be used for KVM to use a file descriptor as the guest memory
-> > backing store and KVM will use this memfile_notifier interface to
-> > interact with memory file subsystems. In the future there might be other
-> > consumers (e.g. VFIO with encrypted device memory).
-> > 
-> > It consists two sets of callbacks:
-> >   - memfile_notifier_ops: callbacks for memory backing store to notify
-> >     KVM when memory gets allocated/invalidated.
-> >   - memfile_pfn_ops: callbacks for KVM to call into memory backing store
-> >     to request memory pages for guest private memory.
-> > 
-> > Userspace is in charge of guest memory lifecycle: it first allocates
-> > pages in memory backing store and then passes the fd to KVM and lets KVM
-> > register each memory slot to memory backing store via
-> > memfile_register_notifier.
-> > 
-> > The supported memory backing store should maintain a memfile_notifier list
-> > and provide routine for memfile_notifier to get the list head address and
-> > memfile_pfn_ops callbacks for memfile_register_notifier. It also should call
-> > memfile_notifier_fallocate/memfile_notifier_invalidate when the bookmarked
-> > memory gets allocated/invalidated.
-> > 
-> > Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-> 
-> Process nitpick:
-> Here and in patch 4/12 you have Kirill's S-o-b so there should probably be
-> also "From: Kirill ..." as was in v3? Or in case you modified the original
-> patches so much to become the primary author, you should add
-> "Co-developed-by: Kirill ..." here before his S-o-b.
+On Thu, Mar 03, 2022, Hao Peng wrote:
+> On Thu, Mar 3, 2022 at 9:29 AM Sean Christopherson <seanjc@google.com> wrote:
+> >
+> > On Wed, Mar 02, 2022, Hao Peng wrote:
+> > > Thanks for pointing this out. However, other than shadow_root_level,
+> > > other fields of context will not
+> > > change during the entire operation, such as
+> > > page_fault/sync_page/direct_map and so on under
+> > > the condition of tdp_mmu.
+> > > Is this patch still viable after careful confirmation of the fields
+> > > that won't be modified?
+> >
+> > No, passing around the "init" flag is a hack.
+> >
+> > But, we can achieve what you want simply by initializing the constant data once
+> > per vCPU.  There's a _lot_ of state that is constant for a given MMU now that KVM
+> > uses separate MMUs for L1 vs. L2 when TDP is enabled.  I should get patches posted
+> > tomorrow, just need to test (famous last words).
 
-Thanks. 3/12 is vastly rewritten so the latter case can be applied.
-4/12 should keep Kirill as the primary author.
-
-Chao
+Famous last words indeed.  Long story short, the patches were mostly easy, but I
+wandered deep into a rabbit hole when trying to make ->inject_page_fault() constant
+per MMU.  I'll get something posted this week, though exactly what that something is
+remains to be seen :-)
