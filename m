@@ -2,194 +2,272 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5444C4D0EFC
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 06:24:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 68E964D0F47
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 06:46:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242471AbiCHFZq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 00:25:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47128 "EHLO
+        id S245524AbiCHFrN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Mar 2022 00:47:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39082 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232026AbiCHFZo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Mar 2022 00:25:44 -0500
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2081.outbound.protection.outlook.com [40.107.94.81])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42A913B56C;
-        Mon,  7 Mar 2022 21:24:48 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UqpG2MNqLnTcQcgJ/BOI72uMgHArPshb+EPplqMj0fYX9Mw2GEf3Zg+SjFOlhqdGHiuG/bIvHcoX6YPKzuaYjhkkHnTRa/jJQ+yhBHfRsbWEcSoSaHeTXDto9SIJzQS+EbgZTxg01ec5PMeE4nmhRWyjT2N4XNoBACdUxWNA6H4Q6W7udbUn7uj7XhaBEhYj0ihvApT9rWgmbSpc034VIoiBcL0wD+qsCvTO5FGwp9ewXp9qX8FmTJ5Yx3cz86TD81xwufuvAOqa3bWTbjsrMaHhYSPfMode1WBLPwGTteqVu2TsRWZ5lr9l2CYOf/Np7Fd+kQJdPaCIfP0/sWdN1w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=aHBp2YQ+04wv3mP8DDVx6VEXWm8SLR3WzKPwMZPBNs0=;
- b=X9BT82z9KO6tF3R9aF29rcmhLG1KzTvaVY5AEjS2Mkpp4lctKM8O5cO/KFsYEX1cXQXTgu7QZUKwj1YEQ17ULKakCFY+srBGVKF5Gx/mOzS9uysqG58Q0WS5rTNQsslJ70UWSHD7OlOQK+ApdSFCMq0Jo0dGQPIIeMYYkU6BlAxmSdbOOryGTwJmnngP87hr3f5AgiSWAoADXYs8PSAqv6Xgw/JX0ze1RXUVUrNDWZ0KiAAAnJiL63/xtq8IT0jSS88FWZMzwspKojDb0vjEXmnYboBiR+o1frCV5BHEwieUMW01MaJH+VHbBYyrK5HOEBWRE57fnF9Vzmf7P0hp4A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aHBp2YQ+04wv3mP8DDVx6VEXWm8SLR3WzKPwMZPBNs0=;
- b=fl32V85BIWT3aaTHtqDYnSsXIZBfQRLboHabWmKRZ/crtyuxNORBoZ6lblTVVy53LUF5MO/knoycPnV755IfOIXHdSWVBca1To1wIgFAvFR7C4uBvIYh+Z66RMAtZKMSvy9lJZzuS7bIlTks6uttz++vpagDAo2tgfsH8UZIoX0=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM8PR12MB5445.namprd12.prod.outlook.com (2603:10b6:8:24::7) by
- DM5PR12MB1738.namprd12.prod.outlook.com (2603:10b6:3:112::22) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5038.15; Tue, 8 Mar 2022 05:24:46 +0000
-Received: from DM8PR12MB5445.namprd12.prod.outlook.com
- ([fe80::6807:3c6c:a619:3527]) by DM8PR12MB5445.namprd12.prod.outlook.com
- ([fe80::6807:3c6c:a619:3527%5]) with mapi id 15.20.5038.027; Tue, 8 Mar 2022
- 05:24:46 +0000
-Message-ID: <83cc0a88-b212-c3f1-a2d5-68142344245a@amd.com>
-Date:   Tue, 8 Mar 2022 12:24:37 +0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.1
-Subject: Re: [RFC PATCH 08/13] KVM: SVM: Do not update logical APIC ID table
- when in x2APIC mode
-Content-Language: en-US
-To:     Maxim Levitsky <mlevitsk@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, seanjc@google.com, joro@8bytes.org,
-        jon.grimm@amd.com, wei.huang2@amd.com, terry.bowman@amd.com
-References: <20220221021922.733373-1-suravee.suthikulpanit@amd.com>
- <20220221021922.733373-9-suravee.suthikulpanit@amd.com>
- <55c391a51bf6b7d3927493ff56333e9846e04a4a.camel@redhat.com>
-From:   "Suthikulpanit, Suravee" <suravee.suthikulpanit@amd.com>
-In-Reply-To: <55c391a51bf6b7d3927493ff56333e9846e04a4a.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: HKAPR04CA0012.apcprd04.prod.outlook.com
- (2603:1096:203:d0::22) To DM8PR12MB5445.namprd12.prod.outlook.com
- (2603:10b6:8:24::7)
+        with ESMTP id S245719AbiCHFrI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 00:47:08 -0500
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E00983BF84;
+        Mon,  7 Mar 2022 21:46:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1646718367; x=1678254367;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=h5Gl6i6ysgskZd8ciPyhjY2DGz3Py3n895BxmTYcWhk=;
+  b=K6EHQM8T8KguQ/lzykC+28innXkyknfzLDJyh6Eped+Q5eSV5CMv7fHr
+   GE5MyYAquFgpEk6+YOYxrenGC9/ELvefN22OqbbajfMk1n038eFIrbbU4
+   Ccj9s7RWXrTf5hhaxxMFTBAWm1bQBb1pJuAxeSPN0nKAO/FSVfjxCsyeg
+   l3dl39J7Y7CV6gXv0vzfujIg3UmmAXWaxnJ9B22M5uA72k+5iWEZw2HMq
+   BXbdRp7vnATLaGIxpDo7wMQALb/OjWqYrWazmmbIx7mCg6LYD/mePA6oG
+   t9HXkcwtZoYWOPg8YiRNc5emGX1hOLF5eonJQ+x5AXvs5aF5H5tmbpCRd
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10279"; a="254789237"
+X-IronPort-AV: E=Sophos;i="5.90,163,1643702400"; 
+   d="scan'208";a="254789237"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2022 21:46:07 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.90,163,1643702400"; 
+   d="scan'208";a="537429984"
+Received: from allen-box.sh.intel.com ([10.239.159.48])
+  by orsmga007.jf.intel.com with ESMTP; 07 Mar 2022 21:46:00 -0800
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>
+Cc:     Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+        Dan Williams <dan.j.williams@intel.com>, rafael@kernel.org,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Liu Yi L <yi.l.liu@intel.com>,
+        Jacob jun Pan <jacob.jun.pan@intel.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Stuart Yoder <stuyoder@gmail.com>,
+        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Li Yang <leoyang.li@nxp.com>,
+        Dmitry Osipenko <digetx@gmail.com>,
+        iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Lu Baolu <baolu.lu@linux.intel.com>
+Subject: [PATCH v8 00/11] Fix BUG_ON in vfio_iommu_group_notifier()
+Date:   Tue,  8 Mar 2022 13:44:10 +0800
+Message-Id: <20220308054421.847385-1-baolu.lu@linux.intel.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: ff6779e7-fbab-483f-0fac-08da00c3f542
-X-MS-TrafficTypeDiagnostic: DM5PR12MB1738:EE_
-X-Microsoft-Antispam-PRVS: <DM5PR12MB17386D5EA8139BB45A7031A0F3099@DM5PR12MB1738.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: JFQsZll9a3wc48Orhlc2l9KZFZSLQhkaV9wkS2hpsBaiasprWfnA67ZvH1UcUT8RoaDPfwi1flX5z3BOgFMD6W4dr+VdjPGAWG8B6eyIVnRMrCAHJ/NbCMFuPN2jhYBb2CtjAC4Fs4u2RQMJQCpI5v7mendfo6Bvt7XbYc1Ww1NM1L8WHgCdlYI1j9VwMOgpFIOCaCbL8xd0G8+D/Vj4U9mWQRSyMMmzV0CnXY374BO2vIfx4tQtQKr/HhxBkTqzVwFZoX3hL85UCurfmjkQW9QMC/rbPMX3QqEwoY5cyswqCKvi0VQm5s0g0Ye6kRiBr8zHlZ1L90Ff6Ybh5ecMzVqCGZVyzl1buIXZ+xoCubcHexWefRQ73J/CtwfiA96l+uMSynaBII5Ge5bnxb+qwAZMf6iPF2u+QofQHha+mh4rykgW0dKroH5SKEe+XNzElIz0XuIg9OQWPIdBGeRCba8781OXy8wl/iWR6by/CxGZxu6PA1DYoOby+O+5aul6PrPyk8Cn08y3w9/xfcMmRzHuzP9qOxheVD7WfClQfyN+uRqdrqXTxEZHypxIqQdgNOa4X/9CPxBqLvTDQsju25Tjyo30a5mjnl8CWocxIOo28AnMic52IuA8gIw1XxCLE+BlFdxVnxA/oR8hnnkKBBQnAuK+JAuYAbUVCeM1bKrh+1xFqq+xEVNlWcb8Uh0i0Suy0YQOGoJ7ZP/ARPBQSnPWayUEa+YiUmCWxHRZ2JI/NI+GKfrfo8BuRVXSzV6L
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR12MB5445.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(5660300002)(186003)(26005)(2616005)(6486002)(6666004)(316002)(53546011)(83380400001)(4326008)(6512007)(8676002)(31696002)(6506007)(8936002)(86362001)(508600001)(66556008)(66476007)(66946007)(31686004)(2906002)(38100700002)(36756003)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?S1lPMkFuVHNlQ21LQjAvaDhUZzUwVHdGdlpxVk9xdkhscWR1ZUpIM3BQZFZp?=
- =?utf-8?B?VytmMXpKb0N1M3RJZm5BQ0I2SjNGd0xiUjc3bmc5L3Rja294d1hNbDMyV2pi?=
- =?utf-8?B?dTZLaW0xSUlKYlFHNHlZdEZQckJsbldER3VTSEdaWmhoaWtBU1ducEZ1UFE2?=
- =?utf-8?B?dms0cTlXaVhyUlVlb2FQVEVlTFhaL2pTaWhGMHJodHJEenp1UDE1blpvKy8z?=
- =?utf-8?B?WjRKclQzZXhtQ1h1aWtWeUoyeDFxTzJmQ3RyYXJ3Rkt1aVJQcXBTYzdheS9i?=
- =?utf-8?B?cmVlUmh6d1Exb0tFTVJtK2d3Z09FV3VtWitBcktpdFVRSXcrUWlkcG9ycCt1?=
- =?utf-8?B?S0w3VjlzSGxvZHBlQ2VWc01LK09hWWptZ2k5cVBZVjhKRDFKeUE4M1RyeFNO?=
- =?utf-8?B?NVlnSXVmSjhJWW5jZmgydlJINVZNVGhnMWFFRTlnWEhsK0xsd2RXdzhKZCtY?=
- =?utf-8?B?NTUzYTMwdzduT05zekp0RkNRY3h1azl6NlZSdVZieUJTZ0FuU29JQ015a3Ry?=
- =?utf-8?B?VXlkRzU2WGJwM3pRMEFybDR1enlkYmZPS3A1cFYxMzBXbUttUFdEYldzWHE4?=
- =?utf-8?B?amdGcmNhRFZvNUZkblVnNnJraU9qVS9hYUlDTkQ2ancyMHNlTFYxQWozV3Fs?=
- =?utf-8?B?NTllMTI2dkNrNDl6OWsycVpxWXhkeEtDSkxuU3VaRlhVRzlPNkR4cy9ZSUFQ?=
- =?utf-8?B?TFRPRkNaenJML21GWWZmZ0dXMkJZeGdEOGFPYmpOSDBlYkJkQUVJRkcvMGVi?=
- =?utf-8?B?L3hLd3NlRzE4dG9hVkM3c1JJelRvTHd2ZGtjcndybUpXN3lTZi9pdXV1UDZN?=
- =?utf-8?B?d25xQnNjOW5jQ25iYmNua1ZBNndJN1NvTG1mQ3MrNG9adk5iSTVzWU41RFQ4?=
- =?utf-8?B?MExrR01SRE9zQW5PbEszQ2hUTVk4ZmhqaU1tU1ozRUN2Z3JMTE1RRHIyOGFw?=
- =?utf-8?B?UFhXRUpseWZWcHlyOENUQ1N1c25jUkRyR3JjZVdtRGJ0VlJDTFgxdDRleUdF?=
- =?utf-8?B?WHhSVkVIVUZ0VDBGQU4vSW52OCtvaWh4bjBtMmQvK2lFQWo5L21FbHVMSklz?=
- =?utf-8?B?bm54ZUg0TVVEbkpOYmRVK0JiaUdudXV2QkRnZE5LQWpTZXdXZnB0azZlclo1?=
- =?utf-8?B?OXF0K29VZnJFbWNIUFVwVTlaNTY0d0sxTWlxTXd0c093bE4yRStvYUszYnNu?=
- =?utf-8?B?amR2RUYySi9VL1VhSmlVMVYyN2ZlV21aQlM4cEZnTkhGSUpSRkp2SkY5d0pQ?=
- =?utf-8?B?WEQ2ZkFiMm94RmlhR010VDQxam1QYklTUTlzRzVRRUNsRDB5NFExZzF3dDlt?=
- =?utf-8?B?SVJYcWQwaS9GNFNORGlCOUtsbzVtN3pBdkpSL3R5S09DbUJxVDBpREoxMjBH?=
- =?utf-8?B?b3JPVjBvWmRsa3JHY0dRK3RIOVIwN1lERDl5NUhnL0pwZkxYeVlUWURya1p3?=
- =?utf-8?B?ODNpbkhBdTlLeHhsM1VnaDB2Q0RIY25QajAyWTNRN2JQTnVLR0lDUE1GWCtN?=
- =?utf-8?B?M0xwajNhT0tGOVRab1d0aURMYm82RG9mUzZoRXM4K2FqcXpVYTlTYjlDelZv?=
- =?utf-8?B?M3JFN0tBSjVUNHUvOUZqV2pqbzRtRkNCdXE5d1FyL2NwTk5XYXBxZmpDeERJ?=
- =?utf-8?B?eGtCU3FaSXl2OW1lcWZuNFNrVHg3eEdlZlQyVll0VUN2dWcrdlc1MDRqdUhq?=
- =?utf-8?B?Y0NONC9IVUlzazhtOEdrM1FpNCtXTTVoY29zcThtK1JPL2hDOHlTZitqdGQ0?=
- =?utf-8?B?aFA0dmhrL0hzUFR5TkN4Uy81VDlkeGd2ZUc0YlkyaFB3UnZVMFJzd0NSN09N?=
- =?utf-8?B?bkEzdG5zek1tVkJKYzhIdmlOTjJWSWxrajU1UmJodStibWRvWlhEd2ZCVEZv?=
- =?utf-8?B?US9maytLcnJQaGhDZ2tYWUJGbFhXMkQycEVCS1E2NEk4YXhSSlZKVmxyT0xk?=
- =?utf-8?B?VG5yVSsyWWxKSkVjSk5oTElaWjhWMEk1NTRQQy96Y3dPZmgyNWxjVG1Vd0JQ?=
- =?utf-8?B?MXhjL1Q2a3p5Rk1oWkJkY0dtMHBpL3VqZFZOOXU0dU1YQks1N3RYL2lkc0hX?=
- =?utf-8?B?enFLWFdwUHYxZlRJb0RwUGMrUlgwZUwxZGJqS3FtTXpMVDZITjZQYVd2aG5W?=
- =?utf-8?B?VzhWZjl5SExrS0paQnppS3FjOHVTOXRtMHFLTW5waXlkeTRDeGIyNUV4OFdO?=
- =?utf-8?Q?ufSvo7F3gQMEIuGT2ddJUtk=3D?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ff6779e7-fbab-483f-0fac-08da00c3f542
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR12MB5445.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Mar 2022 05:24:46.3309
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: m1V1EXqctv0npLKOVzmrMlCEpZFLQyZnsdm9SdYl1Za5tGCbukzMcghgvtL/IMTFWOQFnNYcskMyPcPTN8whpQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1738
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-7.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Maxim,
+Hi folks,
 
-On 2/25/2022 12:41 AM, Maxim Levitsky wrote:
-> On Sun, 2022-02-20 at 20:19 -0600, Suravee Suthikulpanit wrote:
->> In X2APIC mode the Logical Destination Register is read-only,
->> which provides a fixed mapping between the logical and physical
->> APIC IDs. Therefore, there is no Logical APIC ID table in X2AVIC
->> and the processor uses the X2APIC ID in the backing page to create
->> a vCPU’s logical ID.
->>
->> Therefore, add logic to check x2APIC mode before updating logical
->> APIC ID table.
->>
->> Signed-off-by: Suravee Suthikulpanit<suravee.suthikulpanit@amd.com>
->> ---
->>   arch/x86/kvm/svm/avic.c | 11 ++++++++++-
->>   1 file changed, 10 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
->> index 215d8a7dbc1d..55b3b703b93b 100644
->> --- a/arch/x86/kvm/svm/avic.c
->> +++ b/arch/x86/kvm/svm/avic.c
->> @@ -417,6 +417,10 @@ static int avic_ldr_write(struct kvm_vcpu *vcpu, u8 g_physical_id, u32 ldr)
->>   	bool flat;
->>   	u32 *entry, new_entry;
->>   
->> +	/* Note: x2AVIC does not use logical APIC ID table */
->> +	if (apic_x2apic_mode(vcpu->arch.apic))
->> +		return 0;
->> +
->>   	flat = kvm_lapic_get_reg(vcpu->arch.apic, APIC_DFR) == APIC_DFR_FLAT;
->>   	entry = avic_get_logical_id_entry(vcpu, ldr, flat);
->>   	if (!entry)
->> @@ -435,8 +439,13 @@ static void avic_invalidate_logical_id_entry(struct kvm_vcpu *vcpu)
->>   {
->>   	struct vcpu_svm *svm = to_svm(vcpu);
->>   	bool flat = svm->dfr_reg == APIC_DFR_FLAT;
->> -	u32 *entry = avic_get_logical_id_entry(vcpu, svm->ldr_reg, flat);
->> +	u32 *entry;
->> +
->> +	/* Note: x2AVIC does not use logical APIC ID table */
->> +	if (apic_x2apic_mode(vcpu->arch.apic))
->> +		return;
->>   
->> +	entry = avic_get_logical_id_entry(vcpu, svm->ldr_reg, flat);
->>   	if (entry)
->>   		clear_bit(AVIC_LOGICAL_ID_ENTRY_VALID_BIT, (unsigned long *)entry);
->>   }
-> 
-> Here actually the good apic_x2apic_mode was used.
-> 
-> However, shouldn't we inject #GP in avic_ldr_write to make this read realy read-only?
-> It might be too late to do so here, since most AVIC writes are trap like.
+The iommu group is the minimal isolation boundary for DMA. Devices in
+a group can access each other's MMIO registers via peer to peer DMA
+and also need share the same I/O address space.
 
-I'm checking to see how HW would respond to LDR write in x2AVIC enabled case.
+Once the I/O address space is assigned to user control it is no longer
+available to the dma_map* API, which effectively makes the DMA API
+non-working.
 
-> Thus we need to make the msr that corresponds to LDR to be write protected in the msr bitmap,
-> and inject #GP when write it attempted.
+Second, userspace can use DMA initiated by a device that it controls
+to access the MMIO spaces of other devices in the group. This allows
+userspace to indirectly attack any kernel owned device and it's driver.
 
-Actually, we can setup the MSR interception for LDR register (0x80d) to intercept
-into hypervisor (i.e. not virtualized by AVIC HW), and let the current KVM
-implementation handles the WRMSR emulation (i.e. inject #GP). Would that be sufficient?
+Therefore groups must either be entirely under kernel control or
+userspace control, never a mixture. Unfortunately some systems have
+problems with the granularity of groups and there are a couple of
+important exceptions:
 
-Regards,
-Suravee
+ - pci_stub allows the admin to block driver binding on a device and
+   make it permanently shared with userspace. Since PCI stub does not
+   do DMA it is safe, however the admin must understand that using
+   pci_stub allows userspace to attack whatever device it was bound
+   it.
+
+ - PCI bridges are sometimes included in groups. Typically PCI bridges
+   do not use DMA, and generally do not have MMIO regions.
+
+Generally any device that does not have any MMIO registers is a
+possible candidate for an exception.
+
+Currently vfio adopts a workaround to detect violations of the above
+restrictions by monitoring the driver core BOUND event, and hardwiring
+the above exceptions. Since there is no way for vfio to reject driver
+binding at this point, BUG_ON() is triggered if a violation is
+captured (kernel driver BOUND event on a group which already has some
+devices assigned to userspace). Aside from the bad user experience
+this opens a way for root userspace to crash the kernel, even in high
+integrity configurations, by manipulating the module binding and
+triggering the BUG_ON.
+
+This series solves this problem by making the user/kernel ownership a
+core concept at the IOMMU layer. The driver core enforces kernel
+ownership while drivers are bound and violations now result in a error
+codes during probe, not BUG_ON failures.
+
+Patch partitions:
+  [PATCH 1-4]: Detect DMA ownership conflicts during driver binding;
+  [PATCH 5-7]: Add security context management for assigned devices;
+  [PATCH 8-11]: Various cleanups.
+
+This is also part one of three initial series for IOMMUFD:
+ * Move IOMMU Group security into the iommu layer
+ - Generic IOMMUFD implementation
+ - VFIO ability to consume IOMMUFD
+
+Change log:
+v1: initial post
+  - https://lore.kernel.org/linux-iommu/20211115020552.2378167-1-baolu.lu@linux.intel.com/
+
+v2:
+  - https://lore.kernel.org/linux-iommu/20211128025051.355578-1-baolu.lu@linux.intel.com/
+
+  - Move kernel dma ownership auto-claiming from driver core to bus
+    callback. [Greg/Christoph/Robin/Jason]
+    https://lore.kernel.org/linux-iommu/20211115020552.2378167-1-baolu.lu@linux.intel.com/T/#m153706912b770682cb12e3c28f57e171aa1f9d0c
+
+  - Code and interface refactoring for iommu_set/release_dma_owner()
+    interfaces. [Jason]
+    https://lore.kernel.org/linux-iommu/20211115020552.2378167-1-baolu.lu@linux.intel.com/T/#mea70ed8e4e3665aedf32a5a0a7db095bf680325e
+
+  - [NEW]Add new iommu_attach/detach_device_shared() interfaces for
+    multiple devices group. [Robin/Jason]
+    https://lore.kernel.org/linux-iommu/20211115020552.2378167-1-baolu.lu@linux.intel.com/T/#mea70ed8e4e3665aedf32a5a0a7db095bf680325e
+
+  - [NEW]Use iommu_attach/detach_device_shared() in drm/tegra drivers.
+
+  - Refactoring and description refinement.
+
+v3:
+  - https://lore.kernel.org/linux-iommu/20211206015903.88687-1-baolu.lu@linux.intel.com/
+
+  - Rename bus_type::dma_unconfigure to bus_type::dma_cleanup. [Greg]
+    https://lore.kernel.org/linux-iommu/c3230ace-c878-39db-1663-2b752ff5384e@linux.intel.com/T/#m6711e041e47cb0cbe3964fad0a3466f5ae4b3b9b
+
+  - Avoid _platform_dma_configure for platform_bus_type::dma_configure.
+    [Greg]
+    https://lore.kernel.org/linux-iommu/c3230ace-c878-39db-1663-2b752ff5384e@linux.intel.com/T/#m43fc46286611aa56a5c0eeaad99d539e5519f3f6
+
+  - Patch "0012-iommu-Add-iommu_at-de-tach_device_shared-for-mult.patch"
+    and "0018-drm-tegra-Use-the-iommu-dma_owner-mechanism.patch" have
+    been tested by Dmitry Osipenko <digetx@gmail.com>.
+
+v4:
+  - https://lore.kernel.org/linux-iommu/20211217063708.1740334-1-baolu.lu@linux.intel.com/
+  - Remove unnecessary tegra->domain chech in the tegra patch. (Jason)
+  - Remove DMA_OWNER_NONE. (Joerg)
+  - Change refcount to unsigned int. (Christoph)
+  - Move mutex lock into group set_dma_owner functions. (Christoph)
+  - Add kernel doc for iommu_attach/detach_domain_shared(). (Christoph)
+  - Move dma auto-claim into driver core. (Jason/Christoph)
+
+v5:
+  - https://lore.kernel.org/linux-iommu/20220104015644.2294354-1-baolu.lu@linux.intel.com/
+  - Move kernel dma ownership auto-claiming from driver core to bus
+    callback. (Greg)
+  - Refactor the iommu interfaces to make them more specific.
+    (Jason/Robin)
+  - Simplify the dma ownership implementation by removing the owner
+    type. (Jason)
+  - Commit message refactoring for PCI drivers. (Bjorn)
+  - Move iommu_attach/detach_device() improvement patches into another
+    series as there are a lot of code refactoring and cleanup staffs
+    in various device drivers.
+
+v6:
+  - https://lore.kernel.org/linux-iommu/20220218005521.172832-1-baolu.lu@linux.intel.com/
+  - Refine comments and commit mesages.
+  - Rename iommu_group_set_dma_owner() to iommu_group_claim_dma_owner().
+  - Rename iommu_device_use/unuse_kernel_dma() to
+    iommu_device_use/unuse_default_domain().
+  - Remove unnecessary EXPORT_SYMBOL_GPL.
+  - Change flag name from no_kernel_api_dma to driver_managed_dma.
+  - Merge 4 "Add driver dma ownership management" patches into single
+    one.
+
+v7:
+  - We discussed about adding some fields in driver structure and
+    intercepting it in the bus notifier for driver unbinding. We agreed
+    that the driver structure should not be used out of the driver core.
+  - As iommu_group_claim/release_dma_owner() are only used by the VFIO,
+    there're no use cases for multiple calls for a single group.
+  - Add some commit messages in "vfio: Set DMA ownership for
+    VFIO" to describe the intentional enhancement of unsafe bridge
+    drivers.
+  - Comments refinement.
+
+v8:
+  - Move iommu_use_default_domain() to the end of .dma_configure
+    callback to avoid firmware-data-ordering thing.
+    Link: https://lore.kernel.org/linux-iommu/e2698dbe-18e2-1a82-8a12-fe45bc9be534@arm.com/
+  - Add Acked-by from PCI and VFIO maintainers.
+
+This is based on next branch of linux-iommu tree:
+https://git.kernel.org/pub/scm/linux/kernel/git/joro/iommu.git
+and also available on github:
+https://github.com/LuBaolu/intel-iommu/commits/iommu-dma-ownership-v8
+
+Best regards,
+baolu
+
+Jason Gunthorpe (1):
+  vfio: Delete the unbound_list
+
+Lu Baolu (10):
+  iommu: Add DMA ownership management interfaces
+  driver core: Add dma_cleanup callback in bus_type
+  amba: Stop sharing platform_dma_configure()
+  bus: platform,amba,fsl-mc,PCI: Add device DMA ownership management
+  PCI: pci_stub: Set driver_managed_dma
+  PCI: portdrv: Set driver_managed_dma
+  vfio: Set DMA ownership for VFIO devices
+  vfio: Remove use of vfio_group_viable()
+  vfio: Remove iommu group notifier
+  iommu: Remove iommu group changes notifier
+
+ include/linux/amba/bus.h              |   8 +
+ include/linux/device/bus.h            |   3 +
+ include/linux/fsl/mc.h                |   8 +
+ include/linux/iommu.h                 |  54 +++---
+ include/linux/pci.h                   |   8 +
+ include/linux/platform_device.h       |  10 +-
+ drivers/amba/bus.c                    |  37 +++-
+ drivers/base/dd.c                     |   5 +
+ drivers/base/platform.c               |  21 ++-
+ drivers/bus/fsl-mc/fsl-mc-bus.c       |  24 ++-
+ drivers/iommu/iommu.c                 | 228 ++++++++++++++++--------
+ drivers/pci/pci-driver.c              |  18 ++
+ drivers/pci/pci-stub.c                |   1 +
+ drivers/pci/pcie/portdrv_pci.c        |   2 +
+ drivers/vfio/fsl-mc/vfio_fsl_mc.c     |   1 +
+ drivers/vfio/pci/vfio_pci.c           |   1 +
+ drivers/vfio/platform/vfio_amba.c     |   1 +
+ drivers/vfio/platform/vfio_platform.c |   1 +
+ drivers/vfio/vfio.c                   | 245 ++------------------------
+ 19 files changed, 338 insertions(+), 338 deletions(-)
+
+-- 
+2.25.1
+
