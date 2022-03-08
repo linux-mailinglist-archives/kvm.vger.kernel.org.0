@@ -2,121 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5308F4D0E24
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 03:54:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 563204D0EBB
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 05:40:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240927AbiCHCzL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Mar 2022 21:55:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37064 "EHLO
+        id S245126AbiCHElG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Mar 2022 23:41:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229906AbiCHCzK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Mar 2022 21:55:10 -0500
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam07on2059.outbound.protection.outlook.com [40.107.212.59])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B02D611165
-        for <kvm@vger.kernel.org>; Mon,  7 Mar 2022 18:54:14 -0800 (PST)
+        with ESMTP id S237826AbiCHElD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Mar 2022 23:41:03 -0500
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2056.outbound.protection.outlook.com [40.107.243.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 796982C647;
+        Mon,  7 Mar 2022 20:40:06 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gMmb5DkE8dd1jtZRUpQocsH/qKGumq7tCG5jtrztFnf4+Q6oKDpVgjSbEyOxp5WSXOXSn2F2hM2ukLnr21sNKP+z0DkFck98N5pxQPTAH2YX3/WEjnayWhktaFKnwEFD0jzbcFheFAMx6FibEcw2dkNBjNP9dfdNtBLj0GJKGY9Fbr+guFkfI/Oyc3JQozk1z8ihCM861qwzg/r9v81BcZu6qJPqFNzVcPSA7Ch8GbBjH6vGie+A4M7/gI1DCuUMvdadkGaqxtLjvu2QxJIroqYao+BhoZLri1yLHIcENX2IjrenFEn1Gk/OKGAKPHl8i+7c/zPawNNKH/fTGVV8gg==
+ b=h8Rd+KqvZK/E1JCyGUW5GTk/nyoyEx3qzaoWB+abGKIRJdk7ITXidEvpjEnTFlJcFUuUIxdBOIrJeCwRmxQ0lKHVx1CU1jiT0muhrcgGLu4M/tx9Tgvws+T0mt8JkKsOUdEIA6H4aRQcMAs5gssA5Q5XTLfpaZZJlTrHamGEsHMWQ+d2t4FteIrgwqq/+wq6jZMeytsYJ/4w5F4F15zccO8YLuyY5wDEKFweyFwq3G3qirdbfvJZBjLdUNuiYR+lCcf0IdfuQ+T2LLwaiQQbN9iSVM384BVy7wm2bilKPjf5qrMmL0fYsUZ2EBMlYQsOBExrGuwZYTIT1tAhvA+mwQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tQupX1YpQBERrQW34w0OM8p2KuEDJSe/9mXxR24U9C8=;
- b=b1XdKkwXBsxXbJ45eETj+Tg+VEBEg/WA34hrsb8S0YqL2ehF8zuryWs6xHE9N4i/f+hQY1OUeOgpJvx+68I0jfTmPwOogCDXHX1di0s6+IjpvV1uExwvPVnvOezMNRjtQSCVDk3V68FpaMqjhIMM6z1IfvvqPK6dgOpHHsh6nsqvuGDf/IMdZUX67HQ7NrNaiSH+1lt/xRqHDUSz50OfZJjloI7oPIPdeudHbjPbd3NYj7UfvHUVQzhpYsRvHBMZjAD5RKdWnjLl4+FtWWx89M4+VfTliAj5pkMo9uNp1iqUaq2l9xUoO2rTaFKGniwWA3gxKiU5wa2RKZbOaevv0w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
+ bh=hRSWIaFdDxHjtWTmisJOX4D/9oQ5CZLyTd69G0sOm+A=;
+ b=gaCfo3CDkiVpMkGRB0BU2PPyjaemu4yHmyjUmoxJBRIgKBlF/EDn4fSKc4EPzN+0V82VePQKk8lu3XAJlX/I5bT2d1hARqzxCZNcXiDXXOoE0FfrWjdMQwHmz0+jI41Xk1AVfZsZsLlb77jeoeieVL72qEA4T2Hn/Alb8opnQd7eu/v25NGJgau0w3DErdwhgjiaL9bAYo31/5aPtmoo20B43JR8rfx+mKOmsTq+FWePxPL4E4J0gb8FmhTcXgDKZTV2Stsb9Ilftr8vY1gVVClf3YM6qJkYEOPE1BOIIn57AOXapMcbxto1pg+7xRripfo02bwpAPQzcIg33E6LHA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tQupX1YpQBERrQW34w0OM8p2KuEDJSe/9mXxR24U9C8=;
- b=g+RrOY2s9LXDsTyIrs7nB5GqTqAXRdY4+vERpXXDMTA0um+s8QcEiR+WdFDpqnlRgsVKYWTNLr4phzXyuREJuDYiodvbGlLsxaWNMuOn0MeFW+58YyE1OOkGCJjc+fJT06Sr7bdnLvyOuYSzQ/dYoWqYWiEiuqZLQQmpE/szbF4=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from BN9PR12MB5179.namprd12.prod.outlook.com (2603:10b6:408:11c::18)
- by SN6PR12MB4717.namprd12.prod.outlook.com (2603:10b6:805:e2::31) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5038.14; Tue, 8 Mar
- 2022 02:54:12 +0000
-Received: from BN9PR12MB5179.namprd12.prod.outlook.com
- ([fe80::e9be:e1be:5abe:f94c]) by BN9PR12MB5179.namprd12.prod.outlook.com
- ([fe80::e9be:e1be:5abe:f94c%4]) with mapi id 15.20.5038.027; Tue, 8 Mar 2022
- 02:54:12 +0000
-Message-ID: <edb33ebb-a720-2a89-c19f-582a39e56375@amd.com>
-Date:   Tue, 8 Mar 2022 08:24:01 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.1
-Subject: Re: [kvm-unit-tests PATCH 0/3] Move nNPT test cases to a seperate
- file
-Content-Language: en-US
-To:     pbonzini@redhat.com, seanjc@google.com
-Cc:     kvm@vger.kernel.org, aaronlewis@google.com
-References: <20220228061737.22233-1-manali.shukla@amd.com>
-From:   "Shukla, Manali" <mashukla@amd.com>
-In-Reply-To: <20220228061737.22233-1-manali.shukla@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BM1PR01CA0106.INDPRD01.PROD.OUTLOOK.COM (2603:1096:b00::22)
- To BN9PR12MB5179.namprd12.prod.outlook.com (2603:10b6:408:11c::18)
+ bh=hRSWIaFdDxHjtWTmisJOX4D/9oQ5CZLyTd69G0sOm+A=;
+ b=ox4hJhVMoo3+CiDwOV7UpLbgcbyRnYJmtsP3cesQohzIL+1YZN1lJzGX2YRXvtnlyhuWjx24+VxONy4yylD4hVRUd/44JttVkev0YVK6TIuvdqip5sW/Pd7YyXwnRFi/3GbnkF24PksaBbkeoPFY+m/r9lqlAN6QYEtsn1PmPj8=
+Received: from DM5PR20CA0013.namprd20.prod.outlook.com (2603:10b6:3:93::23) by
+ MWHPR12MB1310.namprd12.prod.outlook.com (2603:10b6:300:a::21) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5038.15; Tue, 8 Mar 2022 04:40:03 +0000
+Received: from DM6NAM11FT051.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:3:93:cafe::cc) by DM5PR20CA0013.outlook.office365.com
+ (2603:10b6:3:93::23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5038.14 via Frontend
+ Transport; Tue, 8 Mar 2022 04:40:03 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com;
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ DM6NAM11FT051.mail.protection.outlook.com (10.13.172.243) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.5038.14 via Frontend Transport; Tue, 8 Mar 2022 04:40:03 +0000
+Received: from gomati.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.18; Mon, 7 Mar
+ 2022 22:39:56 -0600
+From:   Nikunj A Dadhania <nikunj@amd.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+CC:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Peter Gonda <pgonda@google.com>,
+        Bharata B Rao <bharata@amd.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Mingwei Zhang <mizhang@google.com>,
+        "David Hildenbrand" <david@redhat.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, Nikunj A Dadhania <nikunj@amd.com>
+Subject: [PATCH RFC v1 0/9] KVM: SVM: Defer page pinning for SEV guests
+Date:   Tue, 8 Mar 2022 10:08:48 +0530
+Message-ID: <20220308043857.13652-1-nikunj@amd.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 4251ef20-a6ba-4742-e5ff-08da00aeec96
-X-MS-TrafficTypeDiagnostic: SN6PR12MB4717:EE_
-X-Microsoft-Antispam-PRVS: <SN6PR12MB471764DEB760A9C9FA7148BDFD099@SN6PR12MB4717.namprd12.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: 45450a2f-f7b5-4276-162b-08da00bdb62e
+X-MS-TrafficTypeDiagnostic: MWHPR12MB1310:EE_
+X-Microsoft-Antispam-PRVS: <MWHPR12MB13109C187F4F12D74BAAF440E2099@MWHPR12MB1310.namprd12.prod.outlook.com>
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: tk/HyUQkZPrenCAcJyyM7a2KXMq6Gfq7o6j40ECa0nggtWAaaxf1ur2DRrVLyh5pM31XuRSCOfxzdWxHpcQfeS6PrM9h1teBUlizuIcNaH8F2JT1MN71s36MG0iEIG/w7hkQZhXvOuduRM89r4mlpdEHoylbiGxJSePnkQKuFIDNr7XXyj7dT04eMSMby+kq5OpDRzy3ZYjr+N6SgHuSVOId7W+KIpAV3Uo+v/ublOeu+/w3rYpzg7AconqQ+8cKmRIvEV6fm0M7DCeNDRhm8t5RIrzBxhWB7ddt8JMqIMfDeAOWuN+RiDZqx2Y8a3+1pJXPPOe0rmacGU/fanR2T9W3QxP2uKzHuzdc4WOsWunz/0H2FYHb52/Cpv/pcPPIXYthAqHbRSoUBdn2bCc18I62X00Z/brYV6qpHU1+mCanJNsi0N0zOxN1sYCJVPqoErIZXqbdYMm1GxSA7Id6HwY9rMrqU1YC8u2gtTPfFUDO7VN107eolP/Ak8o5u/skXpCUljKZi7ORrRWKg0GtSV2eg/lQyBYIb4RWd1a7KB+xc5g0mSv7gBeKtR0apJG4pJrkihqCQ1jrLv1VbRoyNCe22Y9SOQOkNL2olB6DCX5zzxY637c9xJWMY1bU2G6GRaOo9HVrQMfAjIO0n/34jCx60aegDOhQAxxChvS5G22HHvNfx6NSkhd1II0u2/L9rwUleZaOBlyznjz5iB2XZ8g3tG8oflYqViXXYAJI2s8=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR12MB5179.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(316002)(36756003)(31686004)(38100700002)(186003)(31696002)(2616005)(83380400001)(8936002)(4326008)(8676002)(6486002)(6666004)(5660300002)(53546011)(508600001)(6506007)(2906002)(66556008)(66946007)(6512007)(66476007)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cXdOcThmUE1ORW10RlNJcjBPUWI1cGpGNCs0VjFESDhPUEJEMW5hME1xUWgx?=
- =?utf-8?B?V3V5amFaTTA5WjVBcU1yamtZZlNyWHFaZTZWNFpaTnd0QVlzcjByM2VZaCtC?=
- =?utf-8?B?d0ZqK0d2eDJiZ2EveGZhdTlnc2xQamRHN2V6eTQvUlZSaUhtd2l5Y0JidHBl?=
- =?utf-8?B?aTFZazduU0tUMVNMampWaHFSdkVRUElPTUY2ZnV6c0hOa09lejN4VEs5RmRs?=
- =?utf-8?B?bGMrRThIRUFnNndSM0tXODJ3MXM2NVFyTlNZK3VieWJPeFBWYW54M3R6eXky?=
- =?utf-8?B?L2JoMWphenJHTm1wNDlyQVI2cEszRGE1Rnp0WjVEWFBWN2h1RGloQTFaV3VW?=
- =?utf-8?B?VTQ2MlE2L0JzYXpVVThFbG9VeHJRQlpzVWFreWRLd0VUTmg1NzZFTXlBZy84?=
- =?utf-8?B?ZWY5d0Ewb1pTck1Qc1NmZkQ2NWR6V0Q3SlZUL2VMM0VScnI3aFhTeEp4T1pG?=
- =?utf-8?B?OUpWN3lrcUg3V0xHK1BES2lCTmEzS0h5R09aMjRra0FvZmdOMm5ldnZibUlj?=
- =?utf-8?B?OHM1QUM2QysrNkNxaE9UL29ndjgzVTVYLy8yUWhrUFpiek5aaXErT3JDMzBo?=
- =?utf-8?B?RmM5OVN6WVRWRENyZHo5YmJKZlVNVTlvZCtWVmxiYmFLQjErN0xyY0FzTEZl?=
- =?utf-8?B?QzNMVnFRckpQRzhGNWJRNUhmWGZtZnVFVmZwbEllVWxRVHZQL0grRWliZHdY?=
- =?utf-8?B?S0VPWUR3TVhjT3doSG1NVlNCY1pxOVVOY0pTQ2tJRVBQTUxxZW5BOE1MSjlI?=
- =?utf-8?B?ZFEzZ1pNbHFyVXhzNTdaSU4zYitLTVZkK0NOUDdXYmsvdktIUzUzaFFrZzFl?=
- =?utf-8?B?NndSQm1RSjZBZWFkbmZZczFGdGpkTFRwVEdtN2dvVk9oZ05wWWdRUlZnTE5B?=
- =?utf-8?B?bUZVOHRjU1dpTzJKZ2hXMFZXN0tOVXBPQy9ReGdHRmMvd1hUa1ljWnZIMjJ3?=
- =?utf-8?B?TC9PZWRyWHpaeUxHSlNEaFNyUlpjTlZGVm1HaVZOY0htOGJjL2NyY2F1OWNW?=
- =?utf-8?B?NVFEek1uY3R1Q0ZmY0l3bGxkUnpYZXVjOVJJYndQT2dUeUFtODZXNzI5WmxT?=
- =?utf-8?B?QktGbDRFVFB1TFpuYWVHa2Q1dnZabHl0ZVB4YUpwNXFqYXVVTklJNmk1YkhX?=
- =?utf-8?B?L1libm9wMFlqenE3VFNDck5IK2UvK1c4M2JqeUpQTGdTcUd3bGdJd0JURklO?=
- =?utf-8?B?dFVaK0d6cWVTL2ZOTzJXOCt1RWoyNjkxKzBpWnhoSUdsVkxhd3FwMnRHbmdu?=
- =?utf-8?B?b3dqMThsLzFjd0owODRmNTdFbzVzY3JPUVVyQ1EzUWYrQzQzZEk1QlZNZFYx?=
- =?utf-8?B?a1hNY05jMFhWVkMrN1FDalcvanVRU21leFViNnMwbDUrWldEc0E4bXE1T2Y2?=
- =?utf-8?B?a29obk9pNWluWmVpSG83bW9GRWw2OTNVT1pIcHE2SHl0NEhWMW9jS09vYlcx?=
- =?utf-8?B?U3I5eFVraWxLZTcxQVMwZTdoQmxIKzJ5TExCazNaSGNsUUNkWHdjTFJwT2xr?=
- =?utf-8?B?b2xnTDYzbkl5UkdTL3Z3WGl6Rmd0anpKYnVFRzFObmJCSm5aV3dHL0FvQUlx?=
- =?utf-8?B?eXlRVnNHZncza29keGhnZnhjQUZua1ZKbFhRaXJPeGNSaEdxVGduSzBhTjZP?=
- =?utf-8?B?L01SR1hZNHI2SDA5b3hJOWY2My9kVWdQbnVtdG90bHYzUi9WaTNaQTJKOER5?=
- =?utf-8?B?QXJOT2NNVnN0SmYwOVM5TkQwb2loSTh0RlhxMXExRGtETFpvdjZGT3Jvd2w3?=
- =?utf-8?B?NzRZSWVLaFBidDFIaEJrbWJwcHIzTlV0OFMwVXR1NnZHd2swRjJHTlZGQm9n?=
- =?utf-8?B?cWkyT3dvVGJlUi9VODcvakpMUzh6aFh1RDgrTjlZQm5ITzBYckZUM1FTUHV4?=
- =?utf-8?B?M2R5UFJNYURwNndheE8xNnZqbXpRek9vaEd0RThnM0NPWEtEeGJ6ZWxtTlFZ?=
- =?utf-8?B?UTFzYVBOdGkwZUViOW1URHNSdDU1OEhmSUNBZ3RuYUE0NWJ4MXV1bEtHRkZv?=
- =?utf-8?B?SXFMell2UkxLeGZlVDR3Z3UxeE1UVXN5L2xmZVhreEhGWUdpelBTWUgrK3ZN?=
- =?utf-8?B?bEtHd2lhNW11R0o0YUtwNFZCampqdW42eXMwdGZpS3NGTm1CS01PckV0cVQ0?=
- =?utf-8?B?ZWxyTkZBZEFrc1dvR3pjQWl4R0Q1L3ZzQkJVMDFrQTl2VHB0aWFQY0RGNVRG?=
- =?utf-8?B?MG9QVmY3V0o0Y3BMTXN5UDEyZTB6WVdEdThyY0xBQi9zQWZXcjBrcWJhZnJi?=
- =?utf-8?Q?4WgpC5XJbhOsFLHAkTuaLoq9Jk352/nw/c4NOvydAw=3D?=
+X-Microsoft-Antispam-Message-Info: o6C8L4sYazcdC8TsiIgVUv9C7c9EtL9vGSAC+tlYmirNiQfKoL0gR9xn+rbC2BepWB4o+CYxzocjPef7QD3+PGVclEiz6i2K/3s9yqlc8V65gYxlqutCiFUiv5nRb5omCElNrn9UPLlDFwJkTkeqCYFlElKi4fIJCnr8kM067BtB//NFBDWPSTZ2y8HB/VehMqukxffCCAcGx7KvDAhc6EgO+0QAhoD9WSxpk4/qMjviOSqq/9jz3B5oFkuqKU4W+Osi10NfYde+p64zF7NXlqBdZrqeaouvMEWH1MEd4kiV0N6Eu8IuZQAKC6Hui0FyNMnLjWD+Jda87d5sW8lKa2sZVIWyf3+5iMbGbfzzGoSZ20zT+XGVge83ZTToX9dsR5fCw4W9eyGSxrTv8Mxk6T02GQ1GPbS8lO5XYKlokZaTxmU7js8PPriAa5dt64nrvFARipp0os/nej50qhbio4/il5poWjInla3EJKP+lUWSM2w++lc3+swa2WnG00+g4Qw8fbqJMBFyNBVfGASvlKjJAoL/64UImqMrGGj6ZKlIrlZPzH5TpY8tgs239cWCJzXoev1CgPiaMfqi/PAlMfH/haPXYT/Mjrub4a9LBEkMjTvqyGpBMNYarbLUA7w+tc7Gl9hc+mwvSUp43bC4Fd6WeD9E7Pizbz8UIHIXuiYMUGYtvc4KaJajAH9YOHQ3oTBPmIXwE3PcCzHPdkTeOlesNY20AoB3lFswdB/RfD1nvgrc5rX79+HNnD9rB/X0RkokpF7OM0yNJJZA+LvYpBRxi4fbxmm/txLB7RpTJQ0=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230001)(4636009)(36840700001)(40470700004)(46966006)(26005)(36860700001)(40460700003)(36756003)(186003)(336012)(47076005)(16526019)(426003)(2906002)(1076003)(2616005)(54906003)(83380400001)(316002)(6916009)(5660300002)(7416002)(966005)(356005)(8936002)(508600001)(81166007)(82310400004)(70586007)(70206006)(7696005)(8676002)(4326008)(6666004)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4251ef20-a6ba-4742-e5ff-08da00aeec96
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR12MB5179.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Mar 2022 02:54:12.3093
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Mar 2022 04:40:03.0545
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Network-Message-Id: 45450a2f-f7b5-4276-162b-08da00bdb62e
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: K3dBriVZ6JSzVic3m4LLWUQ+LW1qT56qVggg0rrOTdpwNlVrlDs4Mp0IcRJVxGqU8+A50rUQM9QZ1w6otI2lPg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB4717
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT051.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR12MB1310
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -125,44 +107,95 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+This is a follow-up to the RFC implementation [1] that incorporates
+review feedback and bug fixes. See the "RFC v1" section below for a 
+list of changes.
 
-On 2/28/2022 11:47 AM, Manali Shukla wrote:
-> Commit 916635a813e975600335c6c47250881b7a328971
-> (nSVM: Add test for NPT reserved bit and #NPF error code behavior)
-> clears PT_USER_MASK for all svm testcases. Any tests that requires
-> usermode access will fail after this commit.
-> 
-> If __setup_vm() is changed to setup_vm(), KUT will build tests with
-> PT_USER_MASK set on all PTEs. It is a better idea to move nNPT tests
-> to  their own file so that tests don't need to fiddle with page tables
-> midway.
-> 
-> The quick approach to do this would be to turn the current main into a small
-> helper, without calling __setup_vm() from helper.
-> 
-> There are three patches in this patch series
-> 1) Turned current main into helper function minus setup_vm()
-> 2) Moved all nNPT test cases from svm_tests.c to svm_npt.c
-> 3) Change __setup_vm to setup_vm() on svm_tests.c
-> 
-> Manali Shukla (3):
->   x86: nSVM: Move common functionality of the main() to helper
->     run_svm_tests
->   x86: nSVM: Move all nNPT test cases from svm_tests.c to a seperate
->     file.
->   x86: nSVM: Allow nSVM tests run with PT_USER_MASK enabled
-> 
->  x86/Makefile.common |   2 +
->  x86/Makefile.x86_64 |   2 +
->  x86/svm.c           |   6 +-
->  x86/svm.h           |   1 +
->  x86/svm_npt.c       | 386 ++++++++++++++++++++++++++++++++++++++++++++
->  x86/svm_tests.c     | 369 +-----------------------------------------
->  6 files changed, 398 insertions(+), 368 deletions(-)
->  create mode 100644 x86/svm_npt.c
-> 
+SEV guest requires the guest's pages to be pinned in host physical
+memory as migration of encrypted pages is not supported. The memory
+encryption scheme uses the physical address of the memory being
+encrypted. If guest pages are moved by the host, content decrypted in
+the guest would be incorrect thereby corrupting guest's memory.
 
-A gentle reminder for review
+For SEV/SEV-ES guests, the hypervisor doesn't know which pages are
+encrypted and when the guest is done using those pages. Hypervisor
+should treat all the guest pages as encrypted until they are 
+deallocated or the guest is destroyed.
 
-Thanks 
-Manali
+While provision a pfn, make KVM aware that guest pages need to be 
+pinned for long-term and use appropriate pin_user_pages API for these
+special encrypted memory regions. KVM takes the first reference and
+holds it until a mapping is done. Take an extra reference before KVM
+releases the pfn. 
+
+Actual pinning management is handled by vendor code via new
+kvm_x86_ops hooks. MMU calls in to vendor code to pin the page on
+demand. Metadata of the pinning is stored in architecture specific
+memslot area. During the memslot freeing path and deallocation path
+guest pages are unpinned.
+
+Guest boot time comparison:
++---------------+----------------+-------------------+
+| Guest Memory  |   baseline     |  Demand Pinning + |
+| Size (GB)     | v5.17-rc6(secs)| v5.17-rc6(secs)   |
++---------------+----------------+-------------------+
+|      4        |     6.16       |      5.71         |
++---------------+----------------+-------------------+
+|     16        |     7.38       |      5.91         |
++---------------+----------------+-------------------+
+|     64        |    12.17       |      6.16         |
++---------------+----------------+-------------------+
+|    128        |    18.20       |      6.50         |
++---------------+----------------+-------------------+
+|    192        |    24.56       |      6.80         |
++---------------+----------------+-------------------+
+
+
+Changelog:
+RFC v1:
+* Use pin_user_pages API with FOLL_LONGTERM flag for pinning the 
+  encrypted guest pages. [David Hildenbrand]
+* Use new api kvm_for_each_memslot_in_hva_range to walk the memslot.
+  [Maciej S. Szmigiero]
+* Maintain the non-mmu pinned memory and free them on destruction.
+  [Peter Gonda]
+* Handle non-mmu pinned memory for intra host migration. [Peter Gonda]
+* Add the missing RLIMIT_MEMLOCK check. [David Hildenbrand]
+* Use pin_user_pages API for long term pinning of pages.
+  [David Hildenbrand]
+* Flush the page before releasing it to the host system.
+  [Mingwei Zhang]
+
+[1] https://lore.kernel.org/kvm/20220118110621.62462-1-nikunj@amd.com/
+
+Nikunj A Dadhania (7):
+  KVM: Introduce pinning flag to hva_to_pfn*
+  KVM: x86/mmu: Move hugepage adjust to direct_page_fault
+  KVM: x86/mmu: Add hook to pin PFNs on demand in MMU
+  KVM: SVM: Add pinning metadata in the arch memslot
+  KVM: SVM: Implement demand page pinning
+  KVM: SEV: Carve out routine for allocation of pages
+  KVM: Move kvm_for_each_memslot_in_hva_range() to be used in SVM
+
+Sean Christopherson (2):
+  KVM: x86/mmu: Introduce kvm_mmu_map_tdp_page() for use by SEV/TDX
+  KVM: SVM: Pin SEV pages in MMU during sev_launch_update_data()
+
+ arch/x86/include/asm/kvm-x86-ops.h |   3 +
+ arch/x86/include/asm/kvm_host.h    |  10 +
+ arch/x86/kvm/mmu.h                 |   3 +
+ arch/x86/kvm/mmu/mmu.c             |  57 +++-
+ arch/x86/kvm/mmu/tdp_mmu.c         |   2 -
+ arch/x86/kvm/svm/sev.c             | 531 ++++++++++++++++++++++-------
+ arch/x86/kvm/svm/svm.c             |   4 +
+ arch/x86/kvm/svm/svm.h             |  12 +-
+ arch/x86/kvm/x86.c                 |  11 +-
+ include/linux/kvm_host.h           |  12 +
+ virt/kvm/kvm_main.c                |  69 ++--
+ virt/kvm/kvm_mm.h                  |   2 +-
+ virt/kvm/pfncache.c                |   2 +-
+ 13 files changed, 556 insertions(+), 162 deletions(-)
+
+-- 
+2.32.0
+
