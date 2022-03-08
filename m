@@ -2,161 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 237FF4D155B
-	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 11:59:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5AFA34D1564
+	for <lists+kvm@lfdr.de>; Tue,  8 Mar 2022 12:02:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346092AbiCHLAb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 06:00:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53166 "EHLO
+        id S1346100AbiCHLDS convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Tue, 8 Mar 2022 06:03:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55568 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346069AbiCHLA3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Mar 2022 06:00:29 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0CF5742A25
-        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 02:59:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646737172;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=u7L8HPCDt5lQJUN1tDnCrctmaA+f57JR/0xy1mw5PmA=;
-        b=MCG4wTzBpDPPJ/wiyMQr2AzbSBh7VY+c3rv5ZLi4PUlLoTgipGEbRH0pdw31AMEEdyFoCP
-        6laJeFHg8gDOgNizQtSXNy3C2gQw+MuElYG5GgMgeqPS8FxzF57T3e1eD54QL/pee4LEjY
-        0v6AuiwQVmWln6l4F0uvsXv0rl444lA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-496-chAL4ODlPyqgTlVgKLSBag-1; Tue, 08 Mar 2022 05:59:26 -0500
-X-MC-Unique: chAL4ODlPyqgTlVgKLSBag-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7067C1091DA1;
-        Tue,  8 Mar 2022 10:59:24 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7F35F6FB03;
-        Tue,  8 Mar 2022 10:59:23 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Michael Ellerman <mpe@ellerman.id.au>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>,
-        Christoph Lameter <cl@linux.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        Vladimir Davydov <vdavydov.dev@gmail.com>, linux-mm@kvack.org,
-        cgroups@vger.kernel.org, stable@vger.kernel.org
-Subject: [PATCH 3/3] KVM: use vcalloc/__vcalloc for very large allocations
-Date:   Tue,  8 Mar 2022 05:59:18 -0500
-Message-Id: <20220308105918.615575-4-pbonzini@redhat.com>
-In-Reply-To: <20220308105918.615575-1-pbonzini@redhat.com>
-References: <20220308105918.615575-1-pbonzini@redhat.com>
+        with ESMTP id S1346137AbiCHLDG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 06:03:06 -0500
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D29443AED;
+        Tue,  8 Mar 2022 03:02:08 -0800 (PST)
+Received: from fraeml703-chm.china.huawei.com (unknown [172.18.147.201])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4KCXRw6Gsmz67bj2;
+        Tue,  8 Mar 2022 19:00:44 +0800 (CST)
+Received: from lhreml719-chm.china.huawei.com (10.201.108.70) by
+ fraeml703-chm.china.huawei.com (10.206.15.52) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2308.21; Tue, 8 Mar 2022 12:02:06 +0100
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ lhreml719-chm.china.huawei.com (10.201.108.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Tue, 8 Mar 2022 11:02:05 +0000
+Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
+ lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
+ 15.01.2308.021; Tue, 8 Mar 2022 11:02:05 +0000
+From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+CC:     "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
+        "yishaih@nvidia.com" <yishaih@nvidia.com>,
+        Linuxarm <linuxarm@huawei.com>,
+        liulongfang <liulongfang@huawei.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        "Jonathan Cameron" <jonathan.cameron@huawei.com>,
+        "Wangzhou (B)" <wangzhou1@hisilicon.com>
+Subject: RE: [PATCH v8 5/9] hisi_acc_vfio_pci: Restrict access to VF dev BAR2
+ migration region
+Thread-Topic: [PATCH v8 5/9] hisi_acc_vfio_pci: Restrict access to VF dev BAR2
+ migration region
+Thread-Index: AQHYL1LES66RK6Gs/kmsjFJ+eUfqqKy1C2eAgAAh4CCAAB0qAIAADCAA
+Date:   Tue, 8 Mar 2022 11:02:05 +0000
+Message-ID: <1695cf776d7744bdb984e9f8f61d63b1@huawei.com>
+References: <20220303230131.2103-1-shameerali.kolothum.thodi@huawei.com>
+ <20220303230131.2103-6-shameerali.kolothum.thodi@huawei.com>
+ <BN9PR11MB527681F9F6B0906596A77A178C099@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <21c1ddd171df45bdb62220cf997e58e6@huawei.com>
+ <BN9PR11MB527673BB7DCF28B782927E658C099@BN9PR11MB5276.namprd11.prod.outlook.com>
+In-Reply-To: <BN9PR11MB527673BB7DCF28B782927E658C099@BN9PR11MB5276.namprd11.prod.outlook.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.47.27.151]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Allocations whose size is related to the memslot size can be arbitrarily
-large.  Do not use kvzalloc/kvcalloc, as those are limited to "not crazy"
-sizes that fit in 32 bits.  Now that it is available, they can use either
-vcalloc or __vcalloc, the latter if accounting is required.
 
-Cc: stable@vger.kernel.org
-Cc: kvm@vger.kernel.org
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/powerpc/kvm/book3s_hv_uvmem.c | 2 +-
- arch/x86/kvm/mmu/page_track.c      | 7 ++++---
- arch/x86/kvm/x86.c                 | 4 ++--
- virt/kvm/kvm_main.c                | 4 ++--
- 4 files changed, 9 insertions(+), 8 deletions(-)
 
-diff --git a/arch/powerpc/kvm/book3s_hv_uvmem.c b/arch/powerpc/kvm/book3s_hv_uvmem.c
-index e414ca44839f..be441403925b 100644
---- a/arch/powerpc/kvm/book3s_hv_uvmem.c
-+++ b/arch/powerpc/kvm/book3s_hv_uvmem.c
-@@ -251,7 +251,7 @@ int kvmppc_uvmem_slot_init(struct kvm *kvm, const struct kvm_memory_slot *slot)
- 	p = kzalloc(sizeof(*p), GFP_KERNEL);
- 	if (!p)
- 		return -ENOMEM;
--	p->pfns = vzalloc(array_size(slot->npages, sizeof(*p->pfns)));
-+	p->pfns = vcalloc(slot->npages, sizeof(*p->pfns));
- 	if (!p->pfns) {
- 		kfree(p);
- 		return -ENOMEM;
-diff --git a/arch/x86/kvm/mmu/page_track.c b/arch/x86/kvm/mmu/page_track.c
-index 68eb1fb548b6..2e09d1b6249f 100644
---- a/arch/x86/kvm/mmu/page_track.c
-+++ b/arch/x86/kvm/mmu/page_track.c
-@@ -47,8 +47,8 @@ int kvm_page_track_create_memslot(struct kvm *kvm,
- 			continue;
- 
- 		slot->arch.gfn_track[i] =
--			kvcalloc(npages, sizeof(*slot->arch.gfn_track[i]),
--				 GFP_KERNEL_ACCOUNT);
-+			__vcalloc(npages, sizeof(*slot->arch.gfn_track[i]),
-+				  GFP_KERNEL_ACCOUNT);
- 		if (!slot->arch.gfn_track[i])
- 			goto track_free;
- 	}
-@@ -75,7 +75,8 @@ int kvm_page_track_write_tracking_alloc(struct kvm_memory_slot *slot)
- 	if (slot->arch.gfn_track[KVM_PAGE_TRACK_WRITE])
- 		return 0;
- 
--	gfn_track = kvcalloc(slot->npages, sizeof(*gfn_track), GFP_KERNEL_ACCOUNT);
-+	gfn_track = __vcalloc(slot->npages, sizeof(*gfn_track),
-+			      GFP_KERNEL_ACCOUNT);
- 	if (gfn_track == NULL)
- 		return -ENOMEM;
- 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index f79bf4552082..4fa4d8269e5b 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -11838,7 +11838,7 @@ int memslot_rmap_alloc(struct kvm_memory_slot *slot, unsigned long npages)
- 		if (slot->arch.rmap[i])
- 			continue;
- 
--		slot->arch.rmap[i] = kvcalloc(lpages, sz, GFP_KERNEL_ACCOUNT);
-+		slot->arch.rmap[i] = __vcalloc(lpages, sz, GFP_KERNEL_ACCOUNT);
- 		if (!slot->arch.rmap[i]) {
- 			memslot_rmap_free(slot);
- 			return -ENOMEM;
-@@ -11875,7 +11875,7 @@ static int kvm_alloc_memslot_metadata(struct kvm *kvm,
- 
- 		lpages = __kvm_mmu_slot_lpages(slot, npages, level);
- 
--		linfo = kvcalloc(lpages, sizeof(*linfo), GFP_KERNEL_ACCOUNT);
-+		linfo = __vcalloc(lpages, sizeof(*linfo), GFP_KERNEL_ACCOUNT);
- 		if (!linfo)
- 			goto out_free;
- 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index c941b97fa133..a5726099df67 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -1274,9 +1274,9 @@ static int kvm_vm_release(struct inode *inode, struct file *filp)
-  */
- static int kvm_alloc_dirty_bitmap(struct kvm_memory_slot *memslot)
- {
--	unsigned long dirty_bytes = 2 * kvm_dirty_bitmap_bytes(memslot);
-+	unsigned long dirty_bytes = kvm_dirty_bitmap_bytes(memslot);
- 
--	memslot->dirty_bitmap = kvzalloc(dirty_bytes, GFP_KERNEL_ACCOUNT);
-+	memslot->dirty_bitmap = __vcalloc(2, dirty_bytes, GFP_KERNEL_ACCOUNT);
- 	if (!memslot->dirty_bitmap)
- 		return -ENOMEM;
- 
--- 
-2.31.1
+> -----Original Message-----
+> From: Tian, Kevin [mailto:kevin.tian@intel.com]
+> Sent: 08 March 2022 10:09
+> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
+> kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
+> linux-crypto@vger.kernel.org
+> Cc: linux-pci@vger.kernel.org; alex.williamson@redhat.com; jgg@nvidia.com;
+> cohuck@redhat.com; mgurtovoy@nvidia.com; yishaih@nvidia.com; Linuxarm
+> <linuxarm@huawei.com>; liulongfang <liulongfang@huawei.com>; Zengtao (B)
+> <prime.zeng@hisilicon.com>; Jonathan Cameron
+> <jonathan.cameron@huawei.com>; Wangzhou (B) <wangzhou1@hisilicon.com>
+> Subject: RE: [PATCH v8 5/9] hisi_acc_vfio_pci: Restrict access to VF dev BAR2
+> migration region
+> 
+> > From: Shameerali Kolothum Thodi
+> > <shameerali.kolothum.thodi@huawei.com>
+> > Sent: Tuesday, March 8, 2022 4:33 PM
+> >
+> > Hi Kevin,
+> >
+> > > -----Original Message-----
+> > > From: Tian, Kevin [mailto:kevin.tian@intel.com]
+> > > Sent: 08 March 2022 06:23
+> > > To: Shameerali Kolothum Thodi
+> > <shameerali.kolothum.thodi@huawei.com>;
+> > > kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
+> > > linux-crypto@vger.kernel.org
+> > > Cc: linux-pci@vger.kernel.org; alex.williamson@redhat.com;
+> > jgg@nvidia.com;
+> > > cohuck@redhat.com; mgurtovoy@nvidia.com; yishaih@nvidia.com;
+> > Linuxarm
+> > > <linuxarm@huawei.com>; liulongfang <liulongfang@huawei.com>;
+> > Zengtao (B)
+> > > <prime.zeng@hisilicon.com>; Jonathan Cameron
+> > > <jonathan.cameron@huawei.com>; Wangzhou (B)
+> > <wangzhou1@hisilicon.com>
+> > > Subject: RE: [PATCH v8 5/9] hisi_acc_vfio_pci: Restrict access to VF dev
+> > BAR2
+> > > migration region
+> > >
+> > > Hi, Shameer,
+> > >
+> > > > From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> > > > Sent: Friday, March 4, 2022 7:01 AM
+> > > >
+> > > > HiSilicon ACC VF device BAR2 region consists of both functional
+> > > > register space and migration control register space. From a
+> > > > security point of view, it's not advisable to export the migration
+> > > > control region to Guest.
+> > > >
+> > > > Hence, introduce a separate struct vfio_device_ops for migration
+> > > > support which will override the ioctl/read/write/mmap methods to
+> > > > hide the migration region and limit the access only to the
+> > > > functional register space.
+> > > >
+> > > > This will be used in subsequent patches when we add migration
+> > > > support to the driver.
+> > >
+> > > As a security concern the migration control region should be always
+> > > disabled regardless of whether migration support is added to the
+> > > driver for such device... It sounds like we should first fix this security
+> > > hole for acc device assignment and then add the migration support
+> > > atop (at least organize the series in this way).
+> >
+> > By exposing the migration BAR region, there is a possibility that a malicious
+> > Guest can prevent migration from happening by manipulating the migration
+> > BAR region. I don't think there are any other security concerns now
+> especially
+> > since we only support the STOP_COPY state.  And the approach has been
+> > that
+> > we only restrict this if migration support is enabled. I think I can change the
+> > above "security concern" description to "malicious Guest can prevent
+> > migration"
+> > to make it more clear.
+> >
+> 
+> In concept migrated device state may include both the state directly
+> touched by the guest driver and also the one that is configured by
+> the PF driver. Unless there is guarantee that the state managed via
+> the migration control interface only touches the former (which implies
+> the latter managed via the PF driver) this security concern will hold
+> even for normal device assignment.
+> 
+> If the acc device has such guarantee it's worth of a clarification here.
 
+I just double-checked with our ACC team and the VF migration region 
+manipulations will not affect the PF configurations. I will add a clarification
+here to make it clear.
+
+Thanks,
+Shameer
