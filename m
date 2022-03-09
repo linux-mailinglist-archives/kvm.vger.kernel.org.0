@@ -2,150 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DC1274D2B4E
-	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 10:04:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2BA5D4D2B5F
+	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 10:05:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231425AbiCIJFe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Mar 2022 04:05:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33398 "EHLO
+        id S231770AbiCIJGv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Mar 2022 04:06:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39106 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231676AbiCIJFc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Mar 2022 04:05:32 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 131BA16AA70
-        for <kvm@vger.kernel.org>; Wed,  9 Mar 2022 01:04:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646816673;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=8eOwlkZcGQDXJozobV2VKRCePhnXpJDnIKdIuSxdQwY=;
-        b=DJdxwQi1J2c9dRDmsnS39cdJafN5qr1aTjSlsSzwM9BND+eT2OsXjN2cBwKgKPP1KcQDKy
-        v0rGS3k/FrlcWHZJLUeYcSsLytuTwf0gOlT6iYQY3mL6e0qFB4a5HDCAJcLcRIZC8HC+NW
-        XryrYE2yEEZ4nnB3ArGQpPCmImkDnjQ=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-264-lyMOdJmvPwKsJSqqK-OnWw-1; Wed, 09 Mar 2022 04:04:29 -0500
-X-MC-Unique: lyMOdJmvPwKsJSqqK-OnWw-1
-Received: by mail-pj1-f72.google.com with SMTP id b9-20020a17090aa58900b001b8b14b4aabso1198918pjq.9
-        for <kvm@vger.kernel.org>; Wed, 09 Mar 2022 01:04:29 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=8eOwlkZcGQDXJozobV2VKRCePhnXpJDnIKdIuSxdQwY=;
-        b=GtIMe+Vu+RjMGkhw0vrmcD1y13LKs65lQfxqdFrMIe8+67jKUadp7MbFuJtkAkiNWD
-         kyVur7b1kPLwhCuYiyEPcbB1uxNPaOQKRjb/yn8ANbWCfYKkW+eJXAyDBbcrPUo7+lRp
-         q1OqquG5FAuC52+cMrosfHusWhvEwZNj2ZI271CgedWy41VJUjS1bPJPQah0XUu4SiNJ
-         yB94/WEmmYGRtKo/6Jhli2lnUsLO4y7nfFpIuccWez78QSertZg0re5eQx4TsEcGUkyJ
-         yctyVpdMpz4TsO4jDqPT3lxEKXuEnOaPQ3fV0WdI1coZrbdFPWfDh9umKm6AVoDmjgUN
-         ZiLg==
-X-Gm-Message-State: AOAM533ckfRWXXIlF3AKsdhO/q8KC/yWSDmsjkblD0HZA0YomCSCaYzf
-        Ith+11KCT7BLf5/YW4A1aXRvaVSrKB/tCdq1I+ysRdMUmaX/GBW2EVw0qJdesEFdNuBtZYalq6b
-        9x6CA93BurZki
-X-Received: by 2002:a62:1881:0:b0:4e0:1b4c:36f8 with SMTP id 123-20020a621881000000b004e01b4c36f8mr22643962pfy.26.1646816668191;
-        Wed, 09 Mar 2022 01:04:28 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzUnje7NyiCBB5gGNjdXAqLUtIZXfE6NBoxWfMgYiTY4JFlOMy5UMt3jQvXKvTlc37/MUAVcA==
-X-Received: by 2002:a62:1881:0:b0:4e0:1b4c:36f8 with SMTP id 123-20020a621881000000b004e01b4c36f8mr22643942pfy.26.1646816667945;
-        Wed, 09 Mar 2022 01:04:27 -0800 (PST)
-Received: from [10.72.12.183] ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id d25-20020a639919000000b00364f999aed5sm1614910pge.20.2022.03.09.01.04.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Mar 2022 01:04:27 -0800 (PST)
-Message-ID: <f1fb522d-74ce-a642-7768-deaad76aeddc@redhat.com>
-Date:   Wed, 9 Mar 2022 17:04:12 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.6.1
-Subject: Re: [PATCH v7 21/26] virtio: add helper virtio_find_vqs_ctx_size()
+        with ESMTP id S231739AbiCIJGu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Mar 2022 04:06:50 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71F1716AA6C;
+        Wed,  9 Mar 2022 01:05:51 -0800 (PST)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 2298qWbu002023;
+        Wed, 9 Mar 2022 09:05:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=GQbuPmzwqFnOz9KKZhOipe3YMFQ//f3hjp/Mvlz4XPE=;
+ b=NIXYfwBWtfadWrvvDSvGt9p/7J98t2q/5+S46L14MXjvWLic+yQaG5ke+ZLs64yQUBwo
+ lIm01xLWpGFh6K2nJpH536ME6vSGFzr3ZgJ1+g3a5BlTklf0GQwYSid9LZJAUDSB58V/
+ KmMAzaXE4YNZYXxOFVb52wodXkX5gbFZ67sHepexgAhYx2HFrmovkGBSTL0qLR3urbRK
+ 4AtVoOK+YWdqPpfZARCRQF/KYouzDM76uBFSO4CYhpOmZNjkCuviVK/pcyhdTjfOiK2o
+ ilO+X5WogYcMBtVwW4mZJLu4QEGmZTuHI83jIWVnQZQoODnpB6y+LN6HMp4yu9klDzF1 8A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ep0bdnvjn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 09 Mar 2022 09:05:42 +0000
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 2298usJ3017660;
+        Wed, 9 Mar 2022 09:05:42 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ep0bdnvj5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 09 Mar 2022 09:05:41 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22993aFK027470;
+        Wed, 9 Mar 2022 09:05:40 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma02fra.de.ibm.com with ESMTP id 3ekyg9088v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 09 Mar 2022 09:05:40 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22995a0M10027380
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 9 Mar 2022 09:05:36 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id ABE1A5205A;
+        Wed,  9 Mar 2022 09:05:36 +0000 (GMT)
+Received: from [9.171.87.105] (unknown [9.171.87.105])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 3D92752050;
+        Wed,  9 Mar 2022 09:05:36 +0000 (GMT)
+Message-ID: <eab904c4-608f-d3e2-9aae-51a9b56994bb@linux.ibm.com>
+Date:   Wed, 9 Mar 2022 10:05:35 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH RESEND v2 0/5] memop selftest for storage key checking
 Content-Language: en-US
-To:     Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Cc:     Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mark Gross <markgross@kernel.org>,
-        Vadim Pasternak <vadimp@nvidia.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Johannes Berg <johannes.berg@intel.com>,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>,
-        linux-um@lists.infradead.org, platform-driver-x86@vger.kernel.org,
-        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, bpf@vger.kernel.org
-References: <20220308123518.33800-1-xuanzhuo@linux.alibaba.com>
- <20220308123518.33800-22-xuanzhuo@linux.alibaba.com>
-From:   Jason Wang <jasowang@redhat.com>
-In-Reply-To: <20220308123518.33800-22-xuanzhuo@linux.alibaba.com>
+To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Shuah Khan <shuah@kernel.org>
+Cc:     Thomas Huth <thuth@redhat.com>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20220308125841.3271721-1-scgl@linux.ibm.com>
+From:   Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <20220308125841.3271721-1-scgl@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: ceGAY2aMWb4ygWPGLEQNDZDS-Y20EoqU
+X-Proofpoint-ORIG-GUID: IddzAA4Fi7KZGqKO1XD6ywxclvE71a49
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-03-09_04,2022-03-04_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
+ priorityscore=1501 suspectscore=0 phishscore=0 lowpriorityscore=0
+ malwarescore=0 mlxlogscore=929 spamscore=0 impostorscore=0 adultscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2203090049
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Am 08.03.22 um 13:58 schrieb Janis Schoetterl-Glausch:
+> Refactor memop selftest and add tests.
+> Add storage key tests, both for success as well as failure cases.
+> Similarly, test both vcpu and vm ioctls.
+> 
+> v1 -> v2
+>   * restructure commits
+>   * get rid of test_* wrapper functions that hid vm.vm
+>   * minor changes
+> 
+> v0 -> v2
+>   * complete rewrite
+> 
+> v1: https://lore.kernel.org/kvm/20220217145336.1794778-1-scgl@linux.ibm.com/
+> v0: https://lore.kernel.org/kvm/20220211182215.2730017-11-scgl@linux.ibm.com/
+> 
+> Janis Schoetterl-Glausch (5):
+>    KVM: s390: selftests: Split memop tests
+>    KVM: s390: selftests: Add macro as abstraction for MEM_OP
+>    KVM: s390: selftests: Add named stages for memop test
+>    KVM: s390: selftests: Add more copy memop tests
+>    KVM: s390: selftests: Add error memop tests
+> 
+>   tools/testing/selftests/kvm/s390x/memop.c | 735 ++++++++++++++++++----
+>   1 file changed, 617 insertions(+), 118 deletions(-)
+> 
+> 
+> base-commit: ee6a569d3bf64c9676eee3eecb861fb01cc11311
 
-在 2022/3/8 下午8:35, Xuan Zhuo 写道:
-> Introduce helper virtio_find_vqs_ctx_size() to call find_vqs and specify
-> the maximum size of each vq ring.
->
-> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> ---
->   include/linux/virtio_config.h | 12 ++++++++++++
->   1 file changed, 12 insertions(+)
->
-> diff --git a/include/linux/virtio_config.h b/include/linux/virtio_config.h
-> index 5157524d8036..921d8610db0c 100644
-> --- a/include/linux/virtio_config.h
-> +++ b/include/linux/virtio_config.h
-> @@ -233,6 +233,18 @@ int virtio_find_vqs_ctx(struct virtio_device *vdev, unsigned nvqs,
->   				      desc, NULL);
->   }
->   
-> +static inline
-> +int virtio_find_vqs_ctx_size(struct virtio_device *vdev, u32 nvqs,
-> +				 struct virtqueue *vqs[],
-> +				 vq_callback_t *callbacks[],
-> +				 const char * const names[],
-> +				 const bool *ctx, struct irq_affinity *desc,
-> +				 u32 sizes[])
-> +{
-> +	return vdev->config->find_vqs(vdev, nvqs, vqs, callbacks, names, ctx,
-> +				      desc, sizes);
-> +}
-
-
-Do we need to convert all the open coded direct call to find_vqs() other 
-than net?
-
-Thanks
-
-
-> +
->   /**
->    * virtio_reset_vq - reset a queue individually
->    * @vq: the virtqueue
-
+applied (with minor whitespace fixes). Will queue for kvms390/next.
