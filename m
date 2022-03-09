@@ -2,65 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 58C834D29BF
-	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 08:51:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 48BEE4D2A1C
+	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 08:57:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229866AbiCIHwi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Mar 2022 02:52:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39674 "EHLO
+        id S229601AbiCIH6o (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Mar 2022 02:58:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229776AbiCIHwg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Mar 2022 02:52:36 -0500
+        with ESMTP id S230414AbiCIH5q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Mar 2022 02:57:46 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D919D15AF16
-        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 23:51:37 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4174816920C
+        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 23:56:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646812297;
+        s=mimecast20190719; t=1646812566;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=8EooiEDUIiNqsLqksX/5gFpvlfrwnXfbsnSG7xyKFRM=;
-        b=WbLjoaHEUmFA517eiWLah8J7TamEmzDw7yrH4elF2S9aBwXPYeObr20kb3Ja2UbVhWiQpK
-        Y7fmpYpvoB32m8Exaggq79+kdi4HNShMiB14xL5PK/VF0KfpTb/l+UDaOdZSIHx0XtRlEq
-        VuAg8LrJ2h4ZvaWEIndeD6w77dvOR8I=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=nXuB3B5jDtB5OBhHstqyNyrujXVHiDK4qma1A4MbOm0=;
+        b=Bs2vgeoFTJeiA/Xv0iuZS7ktCfeWz5pkq9DTEI/3kWiuGaJOdADr+rP8TEpthNbOckMqeA
+        7RMwDNXz+XeZZ4+PueVMa1wV6MRuA98JKSM0gypBZw30kbrpU3IIvjxRKLYjDWRABTzx0T
+        l+/KcVTsTTwyQ1ja8deHNn29mA3WlLo=
+Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
+ [209.85.215.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-587-Sp26XrcsMRGHgmnqe3lsvQ-1; Wed, 09 Mar 2022 02:51:35 -0500
-X-MC-Unique: Sp26XrcsMRGHgmnqe3lsvQ-1
-Received: by mail-pj1-f70.google.com with SMTP id c14-20020a17090a674e00b001bf1c750f9bso3292224pjm.9
-        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 23:51:35 -0800 (PST)
+ us-mta-661--OFLt0eeNeKCi_rHKST4yQ-1; Wed, 09 Mar 2022 02:56:05 -0500
+X-MC-Unique: -OFLt0eeNeKCi_rHKST4yQ-1
+Received: by mail-pg1-f200.google.com with SMTP id o30-20020a634e5e000000b00373598b71d4so862953pgl.21
+        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 23:56:04 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=8EooiEDUIiNqsLqksX/5gFpvlfrwnXfbsnSG7xyKFRM=;
-        b=f/unXG2eMdThtvyy+XYCjbdf9tgP/cE5DpPedM3WqJdQvHp54aW76mzPaNwyXImlFi
-         m+hnqg9A2E/h7Ke2Jv8afYVwyIel/pNv7PiutLv9T8SaYL1+qPl5kDCsFz67DMrnxaLZ
-         Md6TfReKXFWXPyF0zgcMRwnPgC8JUuOTEVsleRLCzj+VZNcTPpHrJ2KDTQNA1UyBM3Vy
-         Y/LuUTbpL1Ixe1xn7KyEv4djyHQbQ4TNyewDt0Ff0PKGrB55RN/GGw1U3kMU5M5cLZoj
-         9NKdiQdQ09r3eyi6XmAgD8w+fAGsKXOCAI6crts/95B8/PlUlS8rZsRGlbhA10Rvlzer
-         htnA==
-X-Gm-Message-State: AOAM533Az2n0PW18mA3/zGv+UN37JcXZ5JRoyaLc1gJB7RiNe/olkp6m
-        qqfxLthkH9Y2cxvWgoWj1wLA70h8qQL4s/jI1n7Y/5ZyiVQzC/T7RRO+inqBUuSl+K9hqo7ZNFf
-        JFpY71mMe4Bhv
-X-Received: by 2002:a05:6a00:1aca:b0:4e1:a2b6:5b9 with SMTP id f10-20020a056a001aca00b004e1a2b605b9mr22032664pfv.4.1646812294738;
-        Tue, 08 Mar 2022 23:51:34 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJw7Di4SBo0vIcLZV8aD0YrzixtPGak4ozbl1xizUy139HXfoBpN9nPz+x4ygNPWdbKEaJoHaw==
-X-Received: by 2002:a05:6a00:1aca:b0:4e1:a2b6:5b9 with SMTP id f10-20020a056a001aca00b004e1a2b605b9mr22032623pfv.4.1646812294417;
-        Tue, 08 Mar 2022 23:51:34 -0800 (PST)
+        bh=nXuB3B5jDtB5OBhHstqyNyrujXVHiDK4qma1A4MbOm0=;
+        b=SbUGfD5BIcc3exQl56qrvWRbFWBEI2U7iGy7gVp0mfnKrvkhBEkggI3OdugDmwXheG
+         lZmWPwryku5U3v4ZpBq6WgKjzNk0VGgcidFIV3Folc5oLP57uyTZxExTjk30JL+klGO5
+         550XLU509B5LMZg4YYUQV7Ek1iCqOXk3FySKqvYvsVwwsj3zIZQRwDuLS710p7MHdFH2
+         teNLLSYnSbiQRvJwH+2C6NGxpthSDjMk8MP6LpOX2OBYK8KygBvYqufeN6hQ+rB2rHCm
+         9gij9t2wBGyqO7gOTF4eW9CJ0W6JwgUxK/zQuiaD1QACfAP9X36fnmRgw5ESJjNbh2td
+         B5jw==
+X-Gm-Message-State: AOAM530gZmVFtI8DZiF7rImW+aBYB+M2TDKWxPd/Xq54TfrnfB2MCQgX
+        Ern0niBhSMbIM+w06xcGvI/zJv1xTNKdH1g7YzrZ9+Jf4smMqFO4x/INWAzJmFMRQpwh93Y1Vjz
+        lugJSHlh9QMPa
+X-Received: by 2002:a17:903:32c4:b0:151:c6ae:e24b with SMTP id i4-20020a17090332c400b00151c6aee24bmr22112776plr.85.1646812563884;
+        Tue, 08 Mar 2022 23:56:03 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJybDKg7kAlq7E11Ti35K1Cy6HiZbN5h1MuN+e0cBpBT9cOyctGw5IATTQsVpIPtETRU/6u7tg==
+X-Received: by 2002:a17:903:32c4:b0:151:c6ae:e24b with SMTP id i4-20020a17090332c400b00151c6aee24bmr22112759plr.85.1646812563582;
+        Tue, 08 Mar 2022 23:56:03 -0800 (PST)
 Received: from [10.72.12.183] ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id s16-20020a63ff50000000b003650ee901e1sm1468074pgk.68.2022.03.08.23.51.18
+        by smtp.gmail.com with ESMTPSA id bd10-20020a056a00278a00b004f6fe0f4cbasm1395974pfb.101.2022.03.08.23.55.48
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Mar 2022 23:51:33 -0800 (PST)
-Message-ID: <aa24df8c-787a-0db5-7b16-60adcb86ab0c@redhat.com>
-Date:   Wed, 9 Mar 2022 15:51:13 +0800
+        Tue, 08 Mar 2022 23:56:03 -0800 (PST)
+Message-ID: <512de020-b36e-8473-69c8-8b3925fbb6c1@redhat.com>
+Date:   Wed, 9 Mar 2022 15:55:44 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
  Gecko/20100101 Thunderbird/91.6.1
-Subject: Re: [PATCH v7 08/26] virtio_ring: extract the logic of freeing vring
+Subject: Re: [PATCH v7 09/26] virtio_ring: split: implement
+ virtqueue_reset_vring_split()
 Content-Language: en-US
 To:     Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
         virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
@@ -91,9 +92,9 @@ Cc:     Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>,
         linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
         kvm@vger.kernel.org, bpf@vger.kernel.org
 References: <20220308123518.33800-1-xuanzhuo@linux.alibaba.com>
- <20220308123518.33800-9-xuanzhuo@linux.alibaba.com>
+ <20220308123518.33800-10-xuanzhuo@linux.alibaba.com>
 From:   Jason Wang <jasowang@redhat.com>
-In-Reply-To: <20220308123518.33800-9-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <20220308123518.33800-10-xuanzhuo@linux.alibaba.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -109,99 +110,165 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 在 2022/3/8 下午8:35, Xuan Zhuo 写道:
-> Introduce vring_free() to free the vring of vq.
+> virtio ring supports reset.
 >
-> Prevent double free by setting vq->reset.
+> Queue reset is divided into several stages.
+>
+> 1. notify device queue reset
+> 2. vring release
+> 3. attach new vring
+> 4. notify device queue re-enable
+>
+> After the first step is completed, the vring reset operation can be
+> performed. If the newly set vring num does not change, then just reset
+> the vq related value.
+>
+> Otherwise, the vring will be released and the vring will be reallocated.
+> And the vring will be attached to the vq. If this process fails, the
+> function will exit, and the state of the vq will be the vring release
+> state. You can call this function again to reallocate the vring.
+>
+> In addition, vring_align, may_reduce_num are necessary for reallocating
+> vring, so they are retained when creating vq.
 >
 > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 > ---
->   drivers/virtio/virtio_ring.c | 25 ++++++++++++++++++++-----
->   include/linux/virtio.h       |  8 ++++++++
->   2 files changed, 28 insertions(+), 5 deletions(-)
+>   drivers/virtio/virtio_ring.c | 69 ++++++++++++++++++++++++++++++++++++
+>   1 file changed, 69 insertions(+)
 >
 > diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
-> index b5a9bf4f45b3..e0422c04c903 100644
+> index e0422c04c903..148fb1fd3d5a 100644
 > --- a/drivers/virtio/virtio_ring.c
 > +++ b/drivers/virtio/virtio_ring.c
-> @@ -2442,14 +2442,10 @@ struct virtqueue *vring_new_virtqueue(unsigned int index,
->   }
->   EXPORT_SYMBOL_GPL(vring_new_virtqueue);
+> @@ -158,6 +158,12 @@ struct vring_virtqueue {
+>   			/* DMA address and size information */
+>   			dma_addr_t queue_dma_addr;
+>   			size_t queue_size_in_bytes;
+> +
+> +			/* The parameters for creating vrings are reserved for
+> +			 * creating new vrings when enabling reset queue.
+> +			 */
+> +			u32 vring_align;
+> +			bool may_reduce_num;
+>   		} split;
 >   
-> -void vring_del_virtqueue(struct virtqueue *_vq)
-> +static void __vring_free(struct virtqueue *_vq)
->   {
->   	struct vring_virtqueue *vq = to_vvq(_vq);
+>   		/* Available for packed ring */
+> @@ -217,6 +223,12 @@ struct vring_virtqueue {
+>   #endif
+>   };
 >   
-> -	spin_lock(&vq->vq.vdev->vqs_list_lock);
-> -	list_del(&_vq->list);
-> -	spin_unlock(&vq->vq.vdev->vqs_list_lock);
-> -
->   	if (vq->we_own_ring) {
->   		if (vq->packed_ring) {
->   			vring_free_queue(vq->vq.vdev,
-> @@ -2480,6 +2476,25 @@ void vring_del_virtqueue(struct virtqueue *_vq)
->   		kfree(vq->split.desc_state);
->   		kfree(vq->split.desc_extra);
+> +static void vring_free(struct virtqueue *vq);
+> +static void __vring_virtqueue_init_split(struct vring_virtqueue *vq,
+> +					 struct virtio_device *vdev);
+> +static int __vring_virtqueue_attach_split(struct vring_virtqueue *vq,
+> +					  struct virtio_device *vdev,
+> +					  struct vring vring);
+>   
+>   /*
+>    * Helpers.
+> @@ -1012,6 +1024,8 @@ static struct virtqueue *vring_create_virtqueue_split(
+>   		return NULL;
 >   	}
-> +}
-> +
-> +static void vring_free(struct virtqueue *vq)
-> +{
-> +	__vring_free(vq);
-> +	vq->reset = VIRTIO_VQ_RESET_STEP_VRING_RELEASE;
-> +}
-> +
-> +void vring_del_virtqueue(struct virtqueue *_vq)
-> +{
-> +	struct vring_virtqueue *vq = to_vvq(_vq);
-> +
-> +	spin_lock(&vq->vq.vdev->vqs_list_lock);
-> +	list_del(&_vq->list);
-> +	spin_unlock(&vq->vq.vdev->vqs_list_lock);
-> +
-> +	if (_vq->reset != VIRTIO_VQ_RESET_STEP_VRING_RELEASE)
-> +		__vring_free(_vq);
-> +
->   	kfree(vq);
->   }
->   EXPORT_SYMBOL_GPL(vring_del_virtqueue);
-> diff --git a/include/linux/virtio.h b/include/linux/virtio.h
-> index d59adc4be068..e3714e6db330 100644
-> --- a/include/linux/virtio.h
-> +++ b/include/linux/virtio.h
-> @@ -10,6 +10,13 @@
->   #include <linux/mod_devicetable.h>
->   #include <linux/gfp.h>
 >   
-> +enum virtio_vq_reset_step {
-> +	VIRTIO_VQ_RESET_STEP_NONE,
-> +	VIRTIO_VQ_RESET_STEP_DEVICE,
-> +	VIRTIO_VQ_RESET_STEP_VRING_RELEASE,
-> +	VIRTIO_VQ_RESET_STEP_VRING_ATTACH,
-> +};
+> +	to_vvq(vq)->split.vring_align = vring_align;
+> +	to_vvq(vq)->split.may_reduce_num = may_reduce_num;
+>   	to_vvq(vq)->split.queue_dma_addr = vring.dma_addr;
+>   	to_vvq(vq)->split.queue_size_in_bytes = vring.queue_size_in_bytes;
+>   	to_vvq(vq)->we_own_ring = true;
+> @@ -1019,6 +1033,59 @@ static struct virtqueue *vring_create_virtqueue_split(
+>   	return vq;
+>   }
+>   
+> +static int virtqueue_reset_vring_split(struct virtqueue *_vq, u32 num)
+> +{
 
 
-This part looks not related to the subject.
+So what this function does is to resize the virtqueue actually, I 
+suggest to rename it as virtqueue_resize_split().
 
-And it needs detail documentation on this.
 
-But I wonder how useful it is, anyway we can check the reset status via 
-transport specific way and in the future we may want to do more than 
-just resizing (e.g PASID).
+> +	struct vring_virtqueue *vq = to_vvq(_vq);
+> +	struct virtio_device *vdev = _vq->vdev;
+> +	struct vring_split vring;
+> +	int err;
+> +
+> +	if (num > _vq->num_max)
+> +		return -E2BIG;
+> +
+> +	switch (vq->vq.reset) {
+> +	case VIRTIO_VQ_RESET_STEP_NONE:
+> +		return -ENOENT;
+> +
+> +	case VIRTIO_VQ_RESET_STEP_VRING_ATTACH:
+> +	case VIRTIO_VQ_RESET_STEP_DEVICE:
+> +		if (vq->split.vring.num == num || !num)
+> +			break;
+> +
+> +		vring_free(_vq);
+> +
+> +		fallthrough;
+> +
+> +	case VIRTIO_VQ_RESET_STEP_VRING_RELEASE:
+> +		if (!num)
+> +			num = vq->split.vring.num;
+> +
+> +		err = vring_create_vring_split(&vring, vdev,
+> +					       vq->split.vring_align,
+> +					       vq->weak_barriers,
+> +					       vq->split.may_reduce_num, num);
+> +		if (err)
+> +			return -ENOMEM;
+
+
+We'd better need a safe fallback here like:
+
+If we can't allocate new memory, we can keep using the current one. 
+Otherwise an ethtool -G fail may make the device not usable.
+
+This could be done by not freeing the old vring and virtqueue states 
+until new is allocated.
+
+
+> +
+> +		err = __vring_virtqueue_attach_split(vq, vdev, vring.vring);
+> +		if (err) {
+> +			vring_free_queue(vdev, vring.queue_size_in_bytes,
+> +					 vring.queue,
+> +					 vring.dma_addr);
+> +			return -ENOMEM;
+> +		}
+> +
+> +		vq->split.queue_dma_addr = vring.dma_addr;
+> +		vq->split.queue_size_in_bytes = vring.queue_size_in_bytes;
+> +	}
+> +
+> +	__vring_virtqueue_init_split(vq, vdev);
+> +	vq->we_own_ring = true;
+
+
+This seems wrong, we have the transport (rproc/mlxtbf) that allocate the 
+vring by themselves. I think we need to fail the resize for we_own_ring 
+== false.
 
 Thanks
 
 
+
+> +	vq->vq.reset = VIRTIO_VQ_RESET_STEP_VRING_ATTACH;
 > +
->   /**
->    * virtqueue - a queue to register buffers for sending or receiving.
->    * @list: the chain of virtqueues for this device
-> @@ -33,6 +40,7 @@ struct virtqueue {
->   	unsigned int num_free;
->   	unsigned int num_max;
->   	void *priv;
-> +	enum virtio_vq_reset_step reset;
->   };
+> +	return 0;
+> +}
+> +
 >   
->   int virtqueue_add_outbuf(struct virtqueue *vq,
+>   /*
+>    * Packed ring specific functions - *_packed().
+> @@ -2317,6 +2384,8 @@ static int __vring_virtqueue_attach_split(struct vring_virtqueue *vq,
+>   static void __vring_virtqueue_init_split(struct vring_virtqueue *vq,
+>   					 struct virtio_device *vdev)
+>   {
+> +	vq->vq.reset = VIRTIO_VQ_RESET_STEP_NONE;
+> +
+>   	vq->packed_ring = false;
+>   	vq->we_own_ring = false;
+>   	vq->broken = false;
 
