@@ -2,154 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 649644D28A3
-	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 07:01:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C0C24D28D4
+	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 07:15:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229824AbiCIGCb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Mar 2022 01:02:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42940 "EHLO
+        id S229926AbiCIGP5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Mar 2022 01:15:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49480 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229461AbiCIGC3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Mar 2022 01:02:29 -0500
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D71E514FBE2
-        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 22:01:31 -0800 (PST)
-Received: by mail-pl1-x629.google.com with SMTP id q11so1052249pln.11
-        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 22:01:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=kcevlsyX45S/Hs4PDG56PNJGS3qbrRGtHL6niPzRHnY=;
-        b=HnzXBO4oekApP/g7/vkFeOIByJVtdG5Qws7E+wxbSI68GmPXFUzJRt4GmX95ytIsrd
-         BYwzBnjb3CefVFvxfuSSnAmE1koKwzeZrJpvcgi7XVbtw2SMkpqxxjlVg3RcImSWNbsc
-         vnXffs3oREuUZGk06U8i0nokJl7DXauIKg0zdjSAxseRSNJcdq5ahzU8FSAo2KldzL1A
-         IoamfzRriD6U7IdeVQobndfx2CXEalHjL8YJZxnJGMCMp5xICVjU0twGyr5zTf3NniKV
-         dy9MWnI0dO7EL1s+8FT0wwDtF1Lh9eNRdXgBfMHuKtEKR5tq69IhslPQPSJ211m69ywb
-         vERQ==
+        with ESMTP id S229929AbiCIGPv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Mar 2022 01:15:51 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3BFA716111E
+        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 22:14:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646806489;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Ap6RrdGHmNkYVL8OAqPmtOOXTX9dVLo0fsotyLbFTFg=;
+        b=d2TS+Hy3FBoYz64XltSspcIpJWbwAC2ceQBa1WhCut1XhLf2CwlmhE4M++pkDhm0UIFpCP
+        I4ZWvLZElMPgv9qWPmjKov/XepoiyawFm8s5YxYqoH05FjHMxnmC3QijkDe6yKg44kkowK
+        DBtgdHLM4Hyw8uG+gNgljUQSriL7Lfs=
+Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com
+ [209.85.215.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-470-xnqOpB3wOY6RvxK7TI7JCg-1; Wed, 09 Mar 2022 01:14:48 -0500
+X-MC-Unique: xnqOpB3wOY6RvxK7TI7JCg-1
+Received: by mail-pg1-f199.google.com with SMTP id p21-20020a631e55000000b00372d919267cso782214pgm.1
+        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 22:14:47 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=kcevlsyX45S/Hs4PDG56PNJGS3qbrRGtHL6niPzRHnY=;
-        b=cHmLEtd6gBVf21gxkNL2Y91zKAUy51Jid4HPC5CrZEa3HebrXy3gAL9p9tkyRsHmhC
-         yByV4Lcy20oC/FeE8V05j3Vnmv8wJCz+9HeTOkfKrJMgeFAHZgRSoSknZ33qlu2WpMnd
-         Fqc0+oEoxWioCfZXGb9cbs61+BB9wt2H/F1WwRpyRhIvOpIA10rmyUT5Jo1B3/KJ4uvl
-         yMASZkLiACdUxTPsU0Mx8cIOkFVjUD7Itq6yPE7h1/rL/RwkOg2I+f6veasT1IYo+g7a
-         PXRmmhmR4UI9ftG++qEgbIUa6/muHbrqCozMsJBNzNjU84ItCiBraKo1+Ezb1tTxZ93+
-         a4jw==
-X-Gm-Message-State: AOAM5313OSV8fLOV5f5o+7/oYeiqSCUqz23Nf6fr/K15uB5kglclkQoM
-        o6UtDsARkkoXYp0tYPgtqdHi/A==
-X-Google-Smtp-Source: ABdhPJxHlzjX2z1M+HRZG2YfkjXprz/P3vNuoWngAMGkjIaBQ6Tk6GVwQ0+Q/ZjC9IYTLtFG4JjcNQ==
-X-Received: by 2002:a17:902:e889:b0:14f:c4bc:677b with SMTP id w9-20020a170902e88900b0014fc4bc677bmr21129060plg.68.1646805690611;
-        Tue, 08 Mar 2022 22:01:30 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id d15-20020a056a00198f00b004f7109da1c4sm1044146pfl.205.2022.03.08.22.01.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Mar 2022 22:01:29 -0800 (PST)
-Date:   Wed, 9 Mar 2022 06:01:26 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Chao Gao <chao.gao@intel.com>
-Cc:     Zeng Guang <guang.zeng@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jethro Beekman <jethro@fortanix.com>,
-        Kai Huang <kai.huang@intel.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, Robert Hu <robert.hu@intel.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Subject: Re: [PATCH v6 6/9] KVM: x86: lapic: don't allow to change APIC ID
- unconditionally
-Message-ID: <YihCtvDps/qJ2TOW@google.com>
-References: <20220225082223.18288-1-guang.zeng@intel.com>
- <20220225082223.18288-7-guang.zeng@intel.com>
- <Yifg4bea6zYEz1BK@google.com>
- <20220309052013.GA2915@gao-cwp>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=Ap6RrdGHmNkYVL8OAqPmtOOXTX9dVLo0fsotyLbFTFg=;
+        b=5Igd4Cwuhx0jIv/LOg6tjUrvVrJRHEXU10Ku7A7nfU8RH3vcpT9a+3r91LZK3wdlBG
+         7JKtNKVr1+rQNiZIZQtkLQjjPDcgmWvCU0CAB41eb2JaRfP0oWhhDk6yK6jgKRI16tVR
+         f5wOCNu7gTTEwcykALfY0tGBCsgJL9xjXTYDwOPVRW1RDKES+YI5kkh7nJWcjmM0ecuC
+         6S6ncI085dpxfjdeXxaOT1TuYCezl/TSf7lEc031Fk8jYv0GpHo7gv8QeS+Dm4+BdX+m
+         KKEkusXA8hHDIfS6vbjNFXcM2bbDzsVJmwXlXlf7NKJ/rl3ftOwIto96/1bNEIo+jdFB
+         fZjg==
+X-Gm-Message-State: AOAM53014/5hx8mVc7FR1aTTeQs0M44lgoo8eBWlcNm0zAesWrnD0w6f
+        u9pRZxeIvw80jpNuWvMcXW+KCpJS5Oq62MA4M0+Bk5KUReEv1k9K27syYNyTd3AceQDzjkbzqpA
+        K/rtI1uyOqicW
+X-Received: by 2002:a17:903:22cb:b0:151:9f41:8738 with SMTP id y11-20020a17090322cb00b001519f418738mr21847660plg.46.1646806487037;
+        Tue, 08 Mar 2022 22:14:47 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyBCiRie4tAloFgqDg9JGwKT4KtqZzw2Fk+Xq44JLOLrxTAEP8NZVRRnFNWgW3q7UR+lbtsrg==
+X-Received: by 2002:a17:903:22cb:b0:151:9f41:8738 with SMTP id y11-20020a17090322cb00b001519f418738mr21847626plg.46.1646806486782;
+        Tue, 08 Mar 2022 22:14:46 -0800 (PST)
+Received: from [10.72.12.183] ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id v14-20020a056a00148e00b004e1cee6f6b4sm1233248pfu.47.2022.03.08.22.14.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Mar 2022 22:14:46 -0800 (PST)
+Message-ID: <4bc140fa-9e72-4bb5-47d9-84d9db384898@redhat.com>
+Date:   Wed, 9 Mar 2022 14:14:31 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220309052013.GA2915@gao-cwp>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.6.1
+Subject: Re: [PATCH v7 02/26] virtio: queue_reset: add VIRTIO_F_RING_RESET
+Content-Language: en-US
+To:     Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Cc:     Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Mark Gross <markgross@kernel.org>,
+        Vadim Pasternak <vadimp@nvidia.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Johannes Berg <johannes.berg@intel.com>,
+        Vincent Whitchurch <vincent.whitchurch@axis.com>,
+        linux-um@lists.infradead.org, platform-driver-x86@vger.kernel.org,
+        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, bpf@vger.kernel.org
+References: <20220308123518.33800-1-xuanzhuo@linux.alibaba.com>
+ <20220308123518.33800-3-xuanzhuo@linux.alibaba.com>
+From:   Jason Wang <jasowang@redhat.com>
+In-Reply-To: <20220308123518.33800-3-xuanzhuo@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-TL;DR: Maxim, any objection to yet another inhibit?  Any potential issues you can think of?
 
-On Wed, Mar 09, 2022, Chao Gao wrote:
-> On Tue, Mar 08, 2022 at 11:04:01PM +0000, Sean Christopherson wrote:
-> >On Fri, Feb 25, 2022, Zeng Guang wrote:
-> >> From: Maxim Levitsky <mlevitsk@redhat.com>
-> >> 
-> >> No normal guest has any reason to change physical APIC IDs,
-> >
-> >I don't think we can reasonably assume this, my analysis in the link (that I just
-> >realized I deleted from context here) shows it's at least plausible that an existing
-> >guest could rely on the APIC ID being writable.  And that's just one kernel, who
-> >know what else is out there, especially given that people use KVM to emulate really
-> >old stuff, often on really old hardware.
-> 
-> Making xAPIC ID readonly is not only based on your analysis, but also Intel SDM
-> clearly saying writable xAPIC ID is processor model specific and ***software should
-> avoid writing to xAPIC ID***.
+在 2022/3/8 下午8:34, Xuan Zhuo 写道:
+> Added VIRTIO_F_RING_RESET, it came from here
+> https://github.com/oasis-tcs/virtio-spec/issues/124
 
-Intel isn't the only vendor KVM supports, and xAPIC ID is fully writable according
-to AMD's docs and AMD's hardware.  x2APIC is even (indirectly) writable, but luckily
-KVM has never modeled that...
 
-Don't get me wrong, I would love to make xAPIC ID read-only, and I fully agree
-that the probability of breaking someone's setup is very low, I just don't think
-the benefits of forcing it are worth the risk of breaking userspace.
+Nit: it's better to explain VIRTIO_F_RING_RESET a little bit here.
 
-> If writable xAPIC ID support should be retained and is tied to a module param,
-> live migration would depend on KVM's module params: e.g., migrate a VM with
-> modified xAPIC ID (apic_id_readonly off on this system) to one with
-> xapic_id_readonly on would fail, right? Is this failure desired?
+Other than this.
 
-Hrm, I was originally thinking it's not a terrible outcome, but I was assuming
-that userspace would gracefully handle migration failure.  That's a bad assumption.
+Acked-by: Jason Wang <jasowang@redhat.com>
 
-> if not, we need to have a VM-scope control. e.g., add an inhibitor of APICv
-> (XAPIC_ID_MODIFIED) and disable APICv forever for this VM if its vCPUs or
-> QEMU modifies xAPIC ID.
 
-Inhibiting APICv if IPIv is enabled (implied for AMD's AVIC) is probably a better
-option than a module param.  I was worried about ending up with silently degraded
-VM performance, but that's easily solved by adding a stat to track APICv inhibitions,
-which would be useful for other cases too (getting AMD's AVIC enabled is comically
-difficult).
+>
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> ---
+>   include/uapi/linux/virtio_config.h | 7 ++++++-
+>   1 file changed, 6 insertions(+), 1 deletion(-)
+>
+> diff --git a/include/uapi/linux/virtio_config.h b/include/uapi/linux/virtio_config.h
+> index b5eda06f0d57..0862be802ff8 100644
+> --- a/include/uapi/linux/virtio_config.h
+> +++ b/include/uapi/linux/virtio_config.h
+> @@ -52,7 +52,7 @@
+>    * rest are per-device feature bits.
+>    */
+>   #define VIRTIO_TRANSPORT_F_START	28
+> -#define VIRTIO_TRANSPORT_F_END		38
+> +#define VIRTIO_TRANSPORT_F_END		41
+>   
+>   #ifndef VIRTIO_CONFIG_NO_LEGACY
+>   /* Do we get callbacks when the ring is completely used, even if we've
+> @@ -92,4 +92,9 @@
+>    * Does the device support Single Root I/O Virtualization?
+>    */
+>   #define VIRTIO_F_SR_IOV			37
+> +
+> +/*
+> + * This feature indicates that the driver can reset a queue individually.
+> + */
+> +#define VIRTIO_F_RING_RESET		40
+>   #endif /* _UAPI_LINUX_VIRTIO_CONFIG_H */
 
-That would also let us drop the code buggy avic_handle_apic_id_update().
-
-And it wouldn't necessarily have to be forever, though I agree that's a perfectly
-fine approach until we have data that shows anything fancier is necessary.
-
-> >Practically speaking, anyone that wants to deploy IPIv is going to have to make
-> >the switch at some point, but that doesn't help people running legacy crud that
-> >don't care about IPIv.
-> >
-> >I was thinking a module param would be trivial, and it is (see below) if the
-> >param is off by default.  A module param will also provide a convenient opportunity
-> >to resolve the loophole reported by Maxim[1][2], though it's a bit funky.
-> 
-> Could you share the links?
-
-Doh, sorry (they're both in this one).
-
-https://lore.kernel.org/all/20220301135526.136554-5-mlevitsk@redhat.com
