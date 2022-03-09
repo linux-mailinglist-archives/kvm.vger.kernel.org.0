@@ -2,287 +2,235 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0069C4D2BE9
-	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 10:28:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DDB844D2BEF
+	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 10:28:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232051AbiCIJ2z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Mar 2022 04:28:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47584 "EHLO
+        id S231664AbiCIJ3o (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Mar 2022 04:29:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52240 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232047AbiCIJ2t (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Mar 2022 04:28:49 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77B1AEACA9;
-        Wed,  9 Mar 2022 01:27:50 -0800 (PST)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 2297AxTU007486;
-        Wed, 9 Mar 2022 09:27:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=iiUjcAi2ykvAKHr+OQ67IHswc70CxDzOeKzoZ8ZJcJI=;
- b=GHUFdqnFscK75697nlBDrkpXjaNlX63bEYKftPB8bM+qLfTm1qq8TpouCtxVO6HD5MT7
- KC1fzYl0fJgD/q/qozpd2jxuuNTlY5iv1PBoMxIKLFjkPuTkwG5fmcNgY2X+EIJTtbdb
- SfwoWXPOvSQ0nbF7V3zqTlLfWEwLayREhzhnRA4+20QpFPMRFKyXEA9+6xPq+3SMdwh6
- YrKHmPX7UtBBj1t3jt1ZMCJJfh7qq2E4PGeTCKFza6ngtRj5p0+T/g4gS6B3/h986YdI
- T3AxhKYJAZIiXYTWpBB9dOdt//vn19+zSPK/gNrYt9BHhNAWl/hbLd0mqDfh4/iDAmK+ sw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3env4uu2j9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 09 Mar 2022 09:27:49 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 2299Jb3d000390;
-        Wed, 9 Mar 2022 09:27:49 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3env4uu2hq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 09 Mar 2022 09:27:49 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2299Bxwq025895;
-        Wed, 9 Mar 2022 09:27:46 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma04ams.nl.ibm.com with ESMTP id 3enqgnm8ux-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 09 Mar 2022 09:27:46 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2299Rhp841222428
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 9 Mar 2022 09:27:43 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7048E42045;
-        Wed,  9 Mar 2022 09:27:43 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 17C364203F;
-        Wed,  9 Mar 2022 09:27:43 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.10.106])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed,  9 Mar 2022 09:27:43 +0000 (GMT)
-Date:   Wed, 9 Mar 2022 10:27:39 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Eric Farman <farman@linux.ibm.com>
-Cc:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: Re: [PATCH kvm-unit-tests v1 4/6] s390x: smp: Create and use a
- non-waiting CPU stop
-Message-ID: <20220309102739.3078e551@p-imbrenda>
-In-Reply-To: <555b6644b4a1003991f778a6b3e2ba12962d1571.camel@linux.ibm.com>
-References: <20220303210425.1693486-1-farman@linux.ibm.com>
-        <20220303210425.1693486-5-farman@linux.ibm.com>
-        <20220307163007.0213714e@p-imbrenda>
-        <2066eb382d42a27db9417ea47d79f2fbee0a2af0.camel@linux.ibm.com>
-        <20220308113155.24c7a5f4@p-imbrenda>
-        <555b6644b4a1003991f778a6b3e2ba12962d1571.camel@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        with ESMTP id S229623AbiCIJ3n (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Mar 2022 04:29:43 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DCD7B157229
+        for <kvm@vger.kernel.org>; Wed,  9 Mar 2022 01:28:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646818124;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=hWn8/vrpqWZiMgWnWn1Y0AikbZvs5gY1FZ1FP2CFNp8=;
+        b=h+BzGU0unQ/SCXfK+AgnuQRMBIXWI8an8Upld52VcV6o22PjHzN3GPIvxjHKFGNcDfBGJe
+        PbnhNIDJDkJ0CcoDzT9wmgdButUgGFkHwc8kD7r+yK1v/9vmMCxKSI+yT2GdjTa4I+Y1mB
+        uQWEVhFcRhNv0KAvSmD/Yv588lJn0Hc=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-122--t7iQm94M-a6IizGSA67bA-1; Wed, 09 Mar 2022 04:28:42 -0500
+X-MC-Unique: -t7iQm94M-a6IizGSA67bA-1
+Received: by mail-pj1-f69.google.com with SMTP id s12-20020a17090a13cc00b001bee1e1677fso1261743pjf.0
+        for <kvm@vger.kernel.org>; Wed, 09 Mar 2022 01:28:42 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=hWn8/vrpqWZiMgWnWn1Y0AikbZvs5gY1FZ1FP2CFNp8=;
+        b=pKbUOK0C/Y7buG+BuTW2y5KPTnY3htHD3ZsOb48pO5QBaltLz4IgOOXkfxyaB6v5lR
+         1hrO+mEAjYWLTcW1fCHIO7A48CumEBXVRHCK+kCYecpUGZkhm5Q5UJuujqWCrVs2GcXF
+         O/2/7K0C+1LhoWcQHoUYtC7PH46hGGAj/MCkp21qAu/PmrrGCpb1YTSuP08cHNHcWNqp
+         nEOIlU87B9RsS8NlwPJPIWVjvd+fTgPq5m/k5DdWZM4pbUjnMAHRQUOaU2rjoXg0NZgE
+         APG2nvd7pVoNvLvZCPZ5eN1312kx64vB0UK7tW/0x8ujG4qymMY5d2ZTUXgPi7YRr+zI
+         esJg==
+X-Gm-Message-State: AOAM530KUoE6rpg7Bar+vq+Bj6d7NmQA6RE0/lX07TAwWNnGR7G2doNl
+        8P+nJZAyYWzhcqQf2gsjYZgyRtNczBsgrCUu1HNt63TnBvYS2bTNbHuioohJfbeyhKBPHD8jYWv
+        OCZ98DdrdIRM/
+X-Received: by 2002:a17:902:8f83:b0:151:5c71:a6e6 with SMTP id z3-20020a1709028f8300b001515c71a6e6mr22071869plo.126.1646818121763;
+        Wed, 09 Mar 2022 01:28:41 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwKLZVIwZDJNnQ8YaxGrbHS5lO7yIdkUUhfXnPrMYsGuclXTOzQNdeuiPknSERt+cv2yMNnwA==
+X-Received: by 2002:a17:902:8f83:b0:151:5c71:a6e6 with SMTP id z3-20020a1709028f8300b001515c71a6e6mr22071834plo.126.1646818121459;
+        Wed, 09 Mar 2022 01:28:41 -0800 (PST)
+Received: from [10.72.12.183] ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id f21-20020a056a00239500b004f754dd3d4csm2116960pfc.3.2022.03.09.01.28.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 09 Mar 2022 01:28:40 -0800 (PST)
+Message-ID: <d7ec6eed-d692-091b-a438-1ae1cc5ee614@redhat.com>
+Date:   Wed, 9 Mar 2022 17:28:21 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: -q3e87MjMqo5JnvsJi7HZJL1nH9lrsY-
-X-Proofpoint-ORIG-GUID: gv8OPoPEaMCorpkKYP0TCLAn6F9fejnK
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-03-09_04,2022-03-04_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- clxscore=1015 suspectscore=0 adultscore=0 bulkscore=0 priorityscore=1501
- phishscore=0 spamscore=0 mlxlogscore=999 malwarescore=0 impostorscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2203090049
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.6.1
+Subject: Re: [PATCH v7 25/26] virtio_net: set the default max ring size by
+ find_vqs()
+Content-Language: en-US
+To:     Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Cc:     Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Mark Gross <markgross@kernel.org>,
+        Vadim Pasternak <vadimp@nvidia.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Johannes Berg <johannes.berg@intel.com>,
+        Vincent Whitchurch <vincent.whitchurch@axis.com>,
+        linux-um@lists.infradead.org, platform-driver-x86@vger.kernel.org,
+        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, bpf@vger.kernel.org
+References: <20220308123518.33800-1-xuanzhuo@linux.alibaba.com>
+ <20220308123518.33800-26-xuanzhuo@linux.alibaba.com>
+From:   Jason Wang <jasowang@redhat.com>
+In-Reply-To: <20220308123518.33800-26-xuanzhuo@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 08 Mar 2022 16:18:16 -0500
-Eric Farman <farman@linux.ibm.com> wrote:
 
-> On Tue, 2022-03-08 at 11:31 +0100, Claudio Imbrenda wrote:
-> > On Mon, 07 Mar 2022 14:03:45 -0500
-> > Eric Farman <farman@linux.ibm.com> wrote:
-> >   
-> > > On Mon, 2022-03-07 at 16:30 +0100, Claudio Imbrenda wrote:  
-> > > > On Thu,  3 Mar 2022 22:04:23 +0100
-> > > > Eric Farman <farman@linux.ibm.com> wrote:
-> > > >     
-> > > > > When stopping a CPU, kvm-unit-tests serializes/waits for
-> > > > > everything
-> > > > > to finish, in order to get a consistent result whenever those
-> > > > > functions are used.
-> > > > > 
-> > > > > But to test the SIGP STOP itself, these additional measures
-> > > > > could
-> > > > > mask other problems. For example, did the STOP work, or is the
-> > > > > CPU
-> > > > > still operating?
-> > > > > 
-> > > > > Let's create a non-waiting SIGP STOP and use it here, to ensure
-> > > > > that
-> > > > > the CPU is correctly stopped. A smp_cpu_stopped() call will
-> > > > > still
-> > > > > be used to see that the SIGP STOP has been processed, and the
-> > > > > state
-> > > > > of the CPU can be used to determine whether the test
-> > > > > passes/fails.
-> > > > > 
-> > > > > Signed-off-by: Eric Farman <farman@linux.ibm.com>
-> > > > > ---
-> > > > >  lib/s390x/smp.c | 25 +++++++++++++++++++++++++
-> > > > >  lib/s390x/smp.h |  1 +
-> > > > >  s390x/smp.c     | 10 ++--------
-> > > > >  3 files changed, 28 insertions(+), 8 deletions(-)
-> > > > > 
-> > > > > diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
-> > > > > index 368d6add..84e536e8 100644
-> > > > > --- a/lib/s390x/smp.c
-> > > > > +++ b/lib/s390x/smp.c
-> > > > > @@ -119,6 +119,31 @@ int smp_cpu_stop(uint16_t idx)
-> > > > >  	return rc;
-> > > > >  }
-> > > > >  
-> > > > > +/*
-> > > > > + * Functionally equivalent to smp_cpu_stop(), but without the
-> > > > > + * elements that wait/serialize matters itself.
-> > > > > + * Used to see if KVM itself is serialized correctly.
-> > > > > + */
-> > > > > +int smp_cpu_stop_nowait(uint16_t idx)
-> > > > > +{
-> > > > > +	/* refuse to work on the boot CPU */
-> > > > > +	if (idx == 0)
-> > > > > +		return -1;
-> > > > > +
-> > > > > +	spin_lock(&lock);
-> > > > > +
-> > > > > +	/* Don't suppress a CC2 with sigp_retry() */
-> > > > > +	if (smp_sigp(idx, SIGP_STOP, 0, NULL)) {
-> > > > > +		spin_unlock(&lock);
-> > > > > +		return -1;
-> > > > > +	}
-> > > > > +
-> > > > > +	cpus[idx].active = false;
-> > > > > +	spin_unlock(&lock);
-> > > > > +
-> > > > > +	return 0;
-> > > > > +}
-> > > > > +
-> > > > >  int smp_cpu_stop_store_status(uint16_t idx)
-> > > > >  {
-> > > > >  	int rc;
-> > > > > diff --git a/lib/s390x/smp.h b/lib/s390x/smp.h
-> > > > > index 1e69a7de..bae03dfd 100644
-> > > > > --- a/lib/s390x/smp.h
-> > > > > +++ b/lib/s390x/smp.h
-> > > > > @@ -44,6 +44,7 @@ bool smp_sense_running_status(uint16_t idx);
-> > > > >  int smp_cpu_restart(uint16_t idx);
-> > > > >  int smp_cpu_start(uint16_t idx, struct psw psw);
-> > > > >  int smp_cpu_stop(uint16_t idx);
-> > > > > +int smp_cpu_stop_nowait(uint16_t idx);
-> > > > >  int smp_cpu_stop_store_status(uint16_t idx);
-> > > > >  int smp_cpu_destroy(uint16_t idx);
-> > > > >  int smp_cpu_setup(uint16_t idx, struct psw psw);
-> > > > > diff --git a/s390x/smp.c b/s390x/smp.c
-> > > > > index 50811bd0..11c2c673 100644
-> > > > > --- a/s390x/smp.c
-> > > > > +++ b/s390x/smp.c
-> > > > > @@ -76,14 +76,8 @@ static void test_restart(void)
-> > > > >  
-> > > > >  static void test_stop(void)
-> > > > >  {
-> > > > > -	smp_cpu_stop(1);
-> > > > > -	/*
-> > > > > -	 * The smp library waits for the CPU to shut down, but
-> > > > > let's
-> > > > > -	 * also do it here, so we don't rely on the library
-> > > > > -	 * implementation
-> > > > > -	 */
-> > > > > -	while (!smp_cpu_stopped(1)) {}
-> > > > > -	report_pass("stop");
-> > > > > +	smp_cpu_stop_nowait(1);    
-> > > > 
-> > > > can it happen that the SIGP STOP order is accepted, but the
-> > > > target
-> > > > CPU
-> > > > is still running (and not even busy)?    
-> > > 
-> > > Of course. A SIGP that's processed by userspace (which is many of
-> > > them)
-> > > injects a STOP IRQ back to the kernel, which means the CPU might
-> > > not be
-> > > stopped for some time. But...
-> > >   
-> > > >     
-> > > > > +	report(smp_cpu_stopped(1), "stop");    
-> > > > 
-> > > > e.g. can this ^ check race with the actual stopping of the CPU?    
-> > > 
-> > > ...the smp_cpu_stopped() routine now loops on the CC2 that SIGP
-> > > SENSE
-> > > returns because of that pending IRQ. If SIGP SENSE returns CC0/1,
-> > > then
-> > > the CPU can correctly be identified stopped/operating, and the test
-> > > can
-> > > correctly pass/fail.  
-> > 
-> > my question was: is it possible architecturally that there is a
-> > window
-> > where the STOP order is accepted, but a SENSE on the target CPU still
-> > successfully returns that the CPU is running?  
-> 
-> Not to my knowledge. The "Conditions Determining Response" section of
-> POPS (v12, page 4-95; also below) specifically states that the SIGP
-> SENSE will return CC2 when a SIGP STOP order is outstanding.
-> 
-> In our implementation, the stop IRQ will be injected before the STOP
-> order gets accepted, such that a SIGP SENSE would see it immediately.
-> 
-> """
-> A previously issued start, stop, restart, stop-
-> and-store-status, set-prefix, store-status-at-
-> address order, or store-additional-status-at-
-> address has been accepted by the
-> addressed CPU, and execution of the func-
-> tion requested by the order has not yet been
-> completed.
-> ...
-> If the currently specified order is sense, external
-> call, emergency signal, start, stop, restart, stop
-> and store status, set prefix, store status at
-> address, set architecture, set multithreading, or
-> store additional status at address, then the order
-> is rejected, and condition code 2 is set.
-> """
-> 
-> > 
-> > in other words: is it specified architecturally that, once an order
-> > is
-> > accepted for a target CPU, that CPU can't accept any other order (and
-> > will return CC2), including SENSE, until the order has been completed
-> > successfully?  
-> 
-> The POPS quote I placed above excludes store-extended-status-address,
-> conditional-emergency-signal, and sense-running-status orders as
-> returning a CC2. That's something Janosch and I have chatted about
-> offline, but don't have an answer to at this time. Besides that, any
-> other order would get a CC2 until the STOP has been completed.
-
-this is what I wanted to know, thanks
-
-you can add
-
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+在 2022/3/8 下午8:35, Xuan Zhuo 写道:
+> Use virtio_find_vqs_ctx_size() to specify the maximum ring size of tx,
+> rx at the same time.
+>
+>                           | rx/tx ring size
+> -------------------------------------------
+> speed == UNKNOWN or < 10G| 1024
+> speed < 40G              | 4096
+> speed >= 40G             | 8192
+>
+> Call virtnet_update_settings() once before calling init_vqs() to update
+> speed.
+>
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> ---
+>   drivers/net/virtio_net.c | 42 ++++++++++++++++++++++++++++++++++++----
+>   1 file changed, 38 insertions(+), 4 deletions(-)
+>
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index ffff323dcef0..f1bdc6ce21c3 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -2977,6 +2977,29 @@ static unsigned int mergeable_min_buf_len(struct virtnet_info *vi, struct virtqu
+>   		   (unsigned int)GOOD_PACKET_LEN);
+>   }
+>   
+> +static void virtnet_config_sizes(struct virtnet_info *vi, u32 *sizes)
+> +{
+> +	u32 i, rx_size, tx_size;
+> +
+> +	if (vi->speed == SPEED_UNKNOWN || vi->speed < SPEED_10000) {
+> +		rx_size = 1024;
+> +		tx_size = 1024;
+> +
+> +	} else if (vi->speed < SPEED_40000) {
+> +		rx_size = 1024 * 4;
+> +		tx_size = 1024 * 4;
+> +
+> +	} else {
+> +		rx_size = 1024 * 8;
+> +		tx_size = 1024 * 8;
+> +	}
+> +
+> +	for (i = 0; i < vi->max_queue_pairs; i++) {
+> +		sizes[rxq2vq(i)] = rx_size;
+> +		sizes[txq2vq(i)] = tx_size;
+> +	}
+> +}
+> +
+>   static int virtnet_find_vqs(struct virtnet_info *vi)
+>   {
+>   	vq_callback_t **callbacks;
+> @@ -2984,6 +3007,7 @@ static int virtnet_find_vqs(struct virtnet_info *vi)
+>   	int ret = -ENOMEM;
+>   	int i, total_vqs;
+>   	const char **names;
+> +	u32 *sizes;
+>   	bool *ctx;
+>   
+>   	/* We expect 1 RX virtqueue followed by 1 TX virtqueue, followed by
+> @@ -3011,10 +3035,15 @@ static int virtnet_find_vqs(struct virtnet_info *vi)
+>   		ctx = NULL;
+>   	}
+>   
+> +	sizes = kmalloc_array(total_vqs, sizeof(*sizes), GFP_KERNEL);
+> +	if (!sizes)
+> +		goto err_sizes;
+> +
+>   	/* Parameters for control virtqueue, if any */
+>   	if (vi->has_cvq) {
+>   		callbacks[total_vqs - 1] = NULL;
+>   		names[total_vqs - 1] = "control";
+> +		sizes[total_vqs - 1] = 0;
 
 
-> 
-> >   
-> > > >     
-> > > > >  }
-> > > > >  
-> > > > >  static void test_stop_store_status(void)    
-> 
+Nit: Do we need a sane value for the control vq? (e.g 64)
+
+Thanks
+
+
+>   	}
+>   
+>   	/* Allocate/initialize parameters for send/receive virtqueues */
+> @@ -3029,8 +3058,10 @@ static int virtnet_find_vqs(struct virtnet_info *vi)
+>   			ctx[rxq2vq(i)] = true;
+>   	}
+>   
+> -	ret = virtio_find_vqs_ctx(vi->vdev, total_vqs, vqs, callbacks,
+> -				  names, ctx, NULL);
+> +	virtnet_config_sizes(vi, sizes);
+> +
+> +	ret = virtio_find_vqs_ctx_size(vi->vdev, total_vqs, vqs, callbacks,
+> +				       names, ctx, NULL, sizes);
+>   	if (ret)
+>   		goto err_find;
+>   
+> @@ -3050,6 +3081,8 @@ static int virtnet_find_vqs(struct virtnet_info *vi)
+>   
+>   
+>   err_find:
+> +	kfree(sizes);
+> +err_sizes:
+>   	kfree(ctx);
+>   err_ctx:
+>   	kfree(names);
+> @@ -3368,6 +3401,9 @@ static int virtnet_probe(struct virtio_device *vdev)
+>   		vi->curr_queue_pairs = num_online_cpus();
+>   	vi->max_queue_pairs = max_queue_pairs;
+>   
+> +	virtnet_init_settings(dev);
+> +	virtnet_update_settings(vi);
+> +
+>   	/* Allocate/initialize the rx/tx queues, and invoke find_vqs */
+>   	err = init_vqs(vi);
+>   	if (err)
+> @@ -3380,8 +3416,6 @@ static int virtnet_probe(struct virtio_device *vdev)
+>   	netif_set_real_num_tx_queues(dev, vi->curr_queue_pairs);
+>   	netif_set_real_num_rx_queues(dev, vi->curr_queue_pairs);
+>   
+> -	virtnet_init_settings(dev);
+> -
+>   	if (virtio_has_feature(vdev, VIRTIO_NET_F_STANDBY)) {
+>   		vi->failover = net_failover_create(vi->dev);
+>   		if (IS_ERR(vi->failover)) {
 
