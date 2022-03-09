@@ -2,68 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 077A44D2B8D
-	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 10:15:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C40C24D2BAE
+	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 10:20:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231923AbiCIJP7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Mar 2022 04:15:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38438 "EHLO
+        id S231987AbiCIJVv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Mar 2022 04:21:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34000 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231922AbiCIJP5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Mar 2022 04:15:57 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C925C157234
-        for <kvm@vger.kernel.org>; Wed,  9 Mar 2022 01:14:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646817297;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=sc9oWQ1T35bRoFzTSlgzenvWUozmVf90/ZtKZIwMHUs=;
-        b=FAgXLb0kidXSPk3IOmYBVYYfxUiVYe+4P2faacRtJoRaDLnqjQylsJeshSPLINpum/Firz
-        b+zLn3NAIYWGI4eni9P3RlN5/HfgJW//hFh2T4YdEVQAKkZ4+80AMkPg92YleNPiHN7yTG
-        o2YpH+m7irbJBEktGHbzk3kmEhcW9kU=
-Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
- [209.85.214.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-119-kzIahA2NPRmQq6Ez1vPaNg-1; Wed, 09 Mar 2022 04:14:56 -0500
-X-MC-Unique: kzIahA2NPRmQq6Ez1vPaNg-1
-Received: by mail-pl1-f197.google.com with SMTP id x10-20020a170902a38a00b00151e09a4e15so837689pla.15
-        for <kvm@vger.kernel.org>; Wed, 09 Mar 2022 01:14:55 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=sc9oWQ1T35bRoFzTSlgzenvWUozmVf90/ZtKZIwMHUs=;
-        b=n8E3fSq6AN9SWi+Giforv0nsxz8eH+B+IEpL0cZqZcp1kwQ+4xAhiTI+7/A5yUbuX/
-         ghcgWkEWdX24/JYEqaUWQebEEJc6q3y5Ot7gyHz7QOhFok6uA7A9SPSn2HLFEjN9O/oY
-         JtASwRV4KxAOOOzZ5I9oR4ccug2oi2dW/1vE4qbQjeCE/kZdWsCdW5dJY1r/vvLwPKxD
-         /+pwavtABwM0YpafJfS1Z3oLl7vfF3saJNVbjbDH0vl3ZnEPL/ubRmAIW1EBJppaSF/5
-         1CdlbpuZDM7KPvzQ6lQzoMHtuI+AT2T1gzuftPciDRWZVyrhiJF2P6DdDNoNV9LP6KYp
-         uAbQ==
-X-Gm-Message-State: AOAM531fEJ1S+efcsIyB08ykUUWnHABAOxc1Ij9e2BN88BlMEKXkON5K
-        e15UTycd0Cgnd/lJTfvTL1+pmv8dOHLMq+KEVrS02PvMI5uV3g9fk5PP+E37n3pJiqO9dAkf8Ga
-        I6Mb3/G41B3gr
-X-Received: by 2002:a17:90b:1b43:b0:1bf:6180:367a with SMTP id nv3-20020a17090b1b4300b001bf6180367amr9413298pjb.172.1646817294435;
-        Wed, 09 Mar 2022 01:14:54 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJybmsMuEBcxZ7oYSDw9tPVnvRoFjWIEzgnMTihTr3NYtzJOE9wVfTp/SLtdAOZZcYSLhnlPZw==
-X-Received: by 2002:a17:90b:1b43:b0:1bf:6180:367a with SMTP id nv3-20020a17090b1b4300b001bf6180367amr9413201pjb.172.1646817294071;
-        Wed, 09 Mar 2022 01:14:54 -0800 (PST)
-Received: from [10.72.12.183] ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id h17-20020a63df51000000b0036b9776ae5bsm1721846pgj.85.2022.03.09.01.14.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Mar 2022 01:14:53 -0800 (PST)
-Message-ID: <7ff78ff8-bdd0-bb5e-1cea-cf1126226feb@redhat.com>
-Date:   Wed, 9 Mar 2022 17:14:34 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.6.1
-Subject: Re: [PATCH v7 24/26] virtio_net: support rx/tx queue reset
-Content-Language: en-US
-To:     Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+        with ESMTP id S229744AbiCIJVu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Mar 2022 04:21:50 -0500
+Received: from out30-42.freemail.mail.aliyun.com (out30-42.freemail.mail.aliyun.com [115.124.30.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFE4E3465F;
+        Wed,  9 Mar 2022 01:20:50 -0800 (PST)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R231e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04394;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=33;SR=0;TI=SMTPD_---0V6j5tde_1646817644;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0V6j5tde_1646817644)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Wed, 09 Mar 2022 17:20:45 +0800
+Message-ID: <1646817603.8985817-3-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH v7 04/26] virtio_ring: split: extract the logic of creating vring
+Date:   Wed, 9 Mar 2022 17:20:03 +0800
+From:   Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To:     Jason Wang <jasowang@redhat.com>
 Cc:     Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>,
         Anton Ivanov <anton.ivanov@cambridgegreys.com>,
         "Michael S. Tsirkin" <mst@redhat.com>,
@@ -89,236 +48,210 @@ Cc:     Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>,
         Vincent Whitchurch <vincent.whitchurch@axis.com>,
         linux-um@lists.infradead.org, platform-driver-x86@vger.kernel.org,
         linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, bpf@vger.kernel.org
+        kvm@vger.kernel.org, bpf@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
 References: <20220308123518.33800-1-xuanzhuo@linux.alibaba.com>
- <20220308123518.33800-25-xuanzhuo@linux.alibaba.com>
-From:   Jason Wang <jasowang@redhat.com>
-In-Reply-To: <20220308123518.33800-25-xuanzhuo@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+ <20220308123518.33800-5-xuanzhuo@linux.alibaba.com>
+ <4b32d0b4-b794-cc1c-25f7-50b5ea6ac25e@redhat.com>
+In-Reply-To: <4b32d0b4-b794-cc1c-25f7-50b5ea6ac25e@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Agree for all.
 
-在 2022/3/8 下午8:35, Xuan Zhuo 写道:
-> This patch implements the reset function of the rx, tx queues.
+Thanks.
+
+On Wed, 9 Mar 2022 14:46:01 +0800, Jason Wang <jasowang@redhat.com> wrote:
 >
-> Based on this function, it is possible to modify the ring num of the
-> queue. And quickly recycle the buffer in the queue.
+> =E5=9C=A8 2022/3/8 =E4=B8=8B=E5=8D=888:34, Xuan Zhuo =E5=86=99=E9=81=93:
+> > Separate the logic of split to create vring queue.
+> >
+> > For the convenience of passing parameters, add a structure
+> > vring_split.
+> >
+> > This feature is required for subsequent virtuqueue reset vring.
+> >
+> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > ---
+> >   drivers/virtio/virtio_ring.c | 74 +++++++++++++++++++++++++-----------
+> >   1 file changed, 51 insertions(+), 23 deletions(-)
+> >
+> > diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
+> > index b87130c8f312..d32793615451 100644
+> > --- a/drivers/virtio/virtio_ring.c
+> > +++ b/drivers/virtio/virtio_ring.c
+> > @@ -85,6 +85,13 @@ struct vring_desc_extra {
+> >   	u16 next;			/* The next desc state in a list. */
+> >   };
+> >
+> > +struct vring_split {
+> > +	void *queue;
+> > +	dma_addr_t dma_addr;
+> > +	size_t queue_size_in_bytes;
+> > +	struct vring vring;
+> > +};
 >
-> In the process of the queue disable, in theory, as long as virtio
-> supports queue reset, there will be no exceptions.
 >
-> However, in the process of the queue enable, there may be exceptions due to
-> memory allocation.  In this case, vq is not available, but we still have
-> to execute napi_enable(). Because napi_disable is similar to a lock,
-> napi_enable must be called after calling napi_disable.
+> So this structure will be only used in vring_create_vring_split() which
+> seems not that useful.
 >
-> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> ---
->   drivers/net/virtio_net.c | 107 +++++++++++++++++++++++++++++++++++++++
->   1 file changed, 107 insertions(+)
+> More see below.
 >
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 409a8e180918..ffff323dcef0 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -251,6 +251,11 @@ struct padded_vnet_hdr {
->   	char padding[4];
->   };
->   
-> +static void virtnet_sq_free_unused_bufs(struct virtnet_info *vi,
-> +					struct send_queue *sq);
-> +static void virtnet_rq_free_unused_bufs(struct virtnet_info *vi,
-> +					struct receive_queue *rq);
-> +
->   static bool is_xdp_frame(void *ptr)
->   {
->   	return (unsigned long)ptr & VIRTIO_XDP_FLAG;
-> @@ -1369,6 +1374,9 @@ static void virtnet_napi_enable(struct virtqueue *vq, struct napi_struct *napi)
->   {
->   	napi_enable(napi);
->   
-> +	if (vq->reset)
-> +		return;
-> +
-
-
-Let's WARN_ONCE() here?
-
-
->   	/* If all buffers were filled by other side before we napi_enabled, we
->   	 * won't get another interrupt, so process any outstanding packets now.
->   	 * Call local_bh_enable after to trigger softIRQ processing.
-> @@ -1413,6 +1421,10 @@ static void refill_work(struct work_struct *work)
->   		struct receive_queue *rq = &vi->rq[i];
->   
->   		napi_disable(&rq->napi);
-> +		if (rq->vq->reset) {
-> +			virtnet_napi_enable(rq->vq, &rq->napi);
-> +			continue;
-> +		}
-
-
-This seems racy and it's a hint that we need sync with the refill work 
-during reset like what we did in virtnet_close():
-
-         /* Make sure refill_work doesn't re-enable napi! */
-         cancel_delayed_work_sync(&vi->refill);
-
-
->   		still_empty = !try_fill_recv(vi, rq, GFP_KERNEL);
->   		virtnet_napi_enable(rq->vq, &rq->napi);
->   
-> @@ -1523,6 +1535,9 @@ static void virtnet_poll_cleantx(struct receive_queue *rq)
->   	if (!sq->napi.weight || is_xdp_raw_buffer_queue(vi, index))
->   		return;
->   
-> +	if (sq->vq->reset)
-> +		return;
-
-
-It looks to me we'd better either WARN or just remove this. Since it 
-looks like a workaround for the un-synchronized NAPI somehow.
-
-
-> +
->   	if (__netif_tx_trylock(txq)) {
->   		do {
->   			virtqueue_disable_cb(sq->vq);
-> @@ -1769,6 +1784,98 @@ static netdev_tx_t start_xmit(struct sk_buff *skb, struct net_device *dev)
->   	return NETDEV_TX_OK;
->   }
->   
-> +static int virtnet_rx_vq_reset(struct virtnet_info *vi,
-> +			       struct receive_queue *rq, u32 ring_num)
-
-
-It's better to rename this as virtnet_rx_resize().
-
-
-> +{
-> +	int err;
-> +
-> +	/* stop napi */
-> +	napi_disable(&rq->napi);
-> +
-
-
-Here, as discussed above, we need synchronize with the refill work.
-
-
-> +	/* reset the queue */
-> +	err = virtio_reset_vq(rq->vq);
-> +	if (err)
-> +		goto err;
-
-
-Btw, most comment of this function seems useless since code already 
-explain themselves.
-
-
-> +
-> +	/* free bufs */
-> +	virtnet_rq_free_unused_bufs(vi, rq);
-> +
-> +	/* reset vring. */
-> +	err = virtqueue_reset_vring(rq->vq, ring_num);
-> +	if (err)
-> +		goto err;
-> +
-> +	/* enable reset queue */
-> +	err = virtio_enable_resetq(rq->vq);
-> +	if (err)
-> +		goto err;
-> +
-> +	/* fill recv */
-> +	if (!try_fill_recv(vi, rq, GFP_KERNEL))
-> +		schedule_delayed_work(&vi->refill, 0);
-> +
-> +	/* enable napi */
-> +	virtnet_napi_enable(rq->vq, &rq->napi);
-> +	return 0;
-> +
-> +err:
-> +	netdev_err(vi->dev,
-> +		   "reset rx reset vq fail: rx queue index: %ld err: %d\n",
-> +		   rq - vi->rq, err);
-> +	virtnet_napi_enable(rq->vq, &rq->napi);
-> +	return err;
-> +}
-> +
-> +static int virtnet_tx_vq_reset(struct virtnet_info *vi,
-> +			       struct send_queue *sq, u32 ring_num)
-> +{
-
-
-It looks to me it's better to rename this as "virtnet_rx_resize()"
-
-
-> +	struct netdev_queue *txq;
-> +	int err, qindex;
-> +
-> +	qindex = sq - vi->sq;
-> +
-> +	txq = netdev_get_tx_queue(vi->dev, qindex);
-> +	__netif_tx_lock_bh(txq);
-> +
-> +	/* stop tx queue and napi */
-> +	netif_stop_subqueue(vi->dev, qindex);
-> +	virtnet_napi_tx_disable(&sq->napi);
-
-
-There's no need to hold tx lock for napi disable.
-
-Thanks
-
-
-> +
-> +	__netif_tx_unlock_bh(txq);
-> +
-> +	/* reset the queue */
-> +	err = virtio_reset_vq(sq->vq);
-> +	if (err) {
-> +		netif_start_subqueue(vi->dev, qindex);
-> +		goto err;
-> +	}
-> +
-> +	/* free bufs */
-> +	virtnet_sq_free_unused_bufs(vi, sq);
-> +
-> +	/* reset vring. */
-> +	err = virtqueue_reset_vring(sq->vq, ring_num);
-> +	if (err)
-> +		goto err;
-> +
-> +	/* enable reset queue */
-> +	err = virtio_enable_resetq(sq->vq);
-> +	if (err)
-> +		goto err;
-> +
-> +	/* start tx queue and napi */
-> +	netif_start_subqueue(vi->dev, qindex);
-> +	virtnet_napi_tx_enable(vi, sq->vq, &sq->napi);
-> +	return 0;
-> +
-> +err:
-> +	netdev_err(vi->dev,
-> +		   "reset tx reset vq fail: tx queue index: %ld err: %d\n",
-> +		   sq - vi->sq, err);
-> +	virtnet_napi_tx_enable(vi, sq->vq, &sq->napi);
-> +	return err;
-> +}
-> +
->   /*
->    * Send command via the control virtqueue and check status.  Commands
->    * supported by the hypervisor, as indicated by feature bits, should
-
+>
+> > +
+> >   struct vring_virtqueue {
+> >   	struct virtqueue vq;
+> >
+> > @@ -915,28 +922,21 @@ static void *virtqueue_detach_unused_buf_split(st=
+ruct virtqueue *_vq)
+> >   	return NULL;
+> >   }
+> >
+> > -static struct virtqueue *vring_create_virtqueue_split(
+> > -	unsigned int index,
+> > -	unsigned int num,
+> > -	unsigned int vring_align,
+> > -	struct virtio_device *vdev,
+> > -	bool weak_barriers,
+> > -	bool may_reduce_num,
+> > -	bool context,
+> > -	bool (*notify)(struct virtqueue *),
+> > -	void (*callback)(struct virtqueue *),
+> > -	const char *name)
+> > +static int vring_create_vring_split(struct vring_split *vring,
+> > +				    struct virtio_device *vdev,
+> > +				    unsigned int vring_align,
+> > +				    bool weak_barriers,
+> > +				    bool may_reduce_num,
+> > +				    u32 num)
+>
+>
+> I'd rename this as vring_alloc_queue_split() and let it simply return
+> the address of queue like vring_alloc_queue().
+>
+> And let it simple accept dma_addr_t *dma_adder instead of vring_split.
+>
+>
+> >   {
+> > -	struct virtqueue *vq;
+> >   	void *queue =3D NULL;
+> >   	dma_addr_t dma_addr;
+> >   	size_t queue_size_in_bytes;
+> > -	struct vring vring;
+> >
+> >   	/* We assume num is a power of 2. */
+> >   	if (num & (num - 1)) {
+> >   		dev_warn(&vdev->dev, "Bad virtqueue length %u\n", num);
+> > -		return NULL;
+> > +		return -EINVAL;
+> >   	}
+> >
+> >   	/* TODO: allocate each queue chunk individually */
+> > @@ -947,11 +947,11 @@ static struct virtqueue *vring_create_virtqueue_s=
+plit(
+> >   		if (queue)
+> >   			break;
+> >   		if (!may_reduce_num)
+> > -			return NULL;
+> > +			return -ENOMEM;
+> >   	}
+> >
+> >   	if (!num)
+> > -		return NULL;
+> > +		return -ENOMEM;
+> >
+> >   	if (!queue) {
+> >   		/* Try to get a single page. You are my only hope! */
+> > @@ -959,21 +959,49 @@ static struct virtqueue *vring_create_virtqueue_s=
+plit(
+> >   					  &dma_addr, GFP_KERNEL|__GFP_ZERO);
+> >   	}
+> >   	if (!queue)
+> > -		return NULL;
+> > +		return -ENOMEM;
+> >
+> >   	queue_size_in_bytes =3D vring_size(num, vring_align);
+> > -	vring_init(&vring, num, queue, vring_align);
+> > +	vring_init(&vring->vring, num, queue, vring_align);
+>
+>
+> It's better to move this to its caller (vring_create_virtqueue_split),
+> so we have rather simple logic below:
+>
+>
+>
+> > +
+> > +	vring->dma_addr =3D dma_addr;
+> > +	vring->queue =3D queue;
+> > +	vring->queue_size_in_bytes =3D queue_size_in_bytes;
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +static struct virtqueue *vring_create_virtqueue_split(
+> > +	unsigned int index,
+> > +	unsigned int num,
+> > +	unsigned int vring_align,
+> > +	struct virtio_device *vdev,
+> > +	bool weak_barriers,
+> > +	bool may_reduce_num,
+> > +	bool context,
+> > +	bool (*notify)(struct virtqueue *),
+> > +	void (*callback)(struct virtqueue *),
+> > +	const char *name)
+> > +{
+> > +	struct vring_split vring;
+> > +	struct virtqueue *vq;
+> > +	int err;
+> > +
+> > +	err =3D vring_create_vring_split(&vring, vdev, vring_align, weak_barr=
+iers,
+> > +				       may_reduce_num, num);
+> > +	if (err)
+> > +		return NULL;
+>
+>
+> queue =3D vring_alloc_queue_split(vdev, &dma_addr, ...);
+>
+> if (!queue)
+>
+>  =C2=A0=C2=A0=C2=A0 return -ENOMEM;
+>
+> vring_init();
+>
+> ...
+>
+> Thanks
+>
+>
+> >
+> > -	vq =3D __vring_new_virtqueue(index, vring, vdev, weak_barriers, conte=
+xt,
+> > +	vq =3D __vring_new_virtqueue(index, vring.vring, vdev, weak_barriers,=
+ context,
+> >   				   notify, callback, name);
+> >   	if (!vq) {
+> > -		vring_free_queue(vdev, queue_size_in_bytes, queue,
+> > -				 dma_addr);
+> > +		vring_free_queue(vdev, vring.queue_size_in_bytes, vring.queue,
+> > +				 vring.dma_addr);
+> >   		return NULL;
+> >   	}
+> >
+> > -	to_vvq(vq)->split.queue_dma_addr =3D dma_addr;
+> > -	to_vvq(vq)->split.queue_size_in_bytes =3D queue_size_in_bytes;
+> > +	to_vvq(vq)->split.queue_dma_addr =3D vring.dma_addr;
+> > +	to_vvq(vq)->split.queue_size_in_bytes =3D vring.queue_size_in_bytes;
+> >   	to_vvq(vq)->we_own_ring =3D true;
+> >
+> >   	return vq;
+>
