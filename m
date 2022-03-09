@@ -2,169 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 65B3B4D35F6
-	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 18:42:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4EF244D35AC
+	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 18:42:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237215AbiCIRIy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Mar 2022 12:08:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44486 "EHLO
+        id S237314AbiCIRJx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Mar 2022 12:09:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44490 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237604AbiCIRIi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S237608AbiCIRIi (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 9 Mar 2022 12:08:38 -0500
-Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 000355A14C;
-        Wed,  9 Mar 2022 08:58:11 -0800 (PST)
-Received: from MUA
-        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <mail@maciej.szmigiero.name>)
-        id 1nRzdI-0001mC-K3; Wed, 09 Mar 2022 17:57:52 +0100
-Message-ID: <421f4fba-3e1c-b676-d74c-02c6c3f804d2@maciej.szmigiero.name>
-Date:   Wed, 9 Mar 2022 17:57:46 +0100
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9B7A2C0854
+        for <kvm@vger.kernel.org>; Wed,  9 Mar 2022 08:58:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646845100;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=SAUeJG8UY6RhUcIGm8viMKGF/F+Mz8ELefSwyfTVQTI=;
+        b=dpCUdjg3+Q4yz4bbRXsZLlFaFOlzklO2Cg4ZJJps1VC7YZb3hu641+BJd9Uf/tt6dF4EwF
+        LZ403oPO7tii9NdLgyXKT8jBse1/pm7IxJR8BU+ejegeVny33Sq/PYtiMqJnUtuxKvtsVJ
+        6/r4jcUxId1NhA3JmVorJrnvL1JoYHs=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-552-yFm4yLw3NSaZuXxbCSumUA-1; Wed, 09 Mar 2022 11:58:17 -0500
+X-MC-Unique: yFm4yLw3NSaZuXxbCSumUA-1
+Received: by mail-ej1-f69.google.com with SMTP id ey18-20020a1709070b9200b006da9614af58so1622033ejc.10
+        for <kvm@vger.kernel.org>; Wed, 09 Mar 2022 08:58:17 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=SAUeJG8UY6RhUcIGm8viMKGF/F+Mz8ELefSwyfTVQTI=;
+        b=fW3k3NyaEAATpfT9vK1r6KYDT0ROao4rlT5G0qBIBMGCnmVY6J0GDMCg35mrjfipWd
+         BlL+PBtkzTxY88qkjJR7+5jwdadtsmID8yv94EmRaZqKQJ477of/s/JBUTq3+BRUmHbb
+         pE6OVvGn1VuwKFAvXQ3wJ+aI3RrKuzic7JYSLoBTCoStHEnOGcbkaAks7oOhC7+j/apT
+         2A+MLSMXn6W4lUSWLrEugGK5Iki+Zi3ODbbzsKRcduUX2UCs2x1AYJWDlZBBpTxgvatn
+         u3ToTX/vfPcMZo/gn2du46EYDHJzpAcw7bnZG1MJTcX0eW/wNJp6Ilez1KYroHXTaSHG
+         Jimg==
+X-Gm-Message-State: AOAM532Y10IlUwyroXP6qQmKvT1ZeG2q07mKq2wK44zYCMMvvBomXFC6
+        jt4uQuMfS5yRulatHZLuwt+7ECMCpj9AzUfuzKSbVTHRToUVQFohyDR2zuvvhIoZR7WnvNlYHt2
+        FvIDVGnTMvcpA
+X-Received: by 2002:a17:907:c1c:b0:6db:62b7:8357 with SMTP id ga28-20020a1709070c1c00b006db62b78357mr637255ejc.536.1646845096315;
+        Wed, 09 Mar 2022 08:58:16 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzLGi3RtaPnymESOcjh/lKXdPE2+WXXCEbhupK9tOpWsDHLVS5te2YjIiSdqV+8bbb7Q0NcVg==
+X-Received: by 2002:a17:907:c1c:b0:6db:62b7:8357 with SMTP id ga28-20020a1709070c1c00b006db62b78357mr637236ejc.536.1646845096102;
+        Wed, 09 Mar 2022 08:58:16 -0800 (PST)
+Received: from gator (cst-prg-78-140.cust.vodafone.cz. [46.135.78.140])
+        by smtp.gmail.com with ESMTPSA id v2-20020a509d02000000b00412d53177a6sm1071505ede.20.2022.03.09.08.58.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Mar 2022 08:58:15 -0800 (PST)
+Date:   Wed, 9 Mar 2022 17:58:12 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        pbonzini@redhat.com, thuth@redhat.com
+Subject: Re: [kvm-unit-tests PATCH 2/2] arm/run: Fix using
+ qemu-system-aarch64 to run aarch32 tests on aarch64
+Message-ID: <20220309165812.46xmnjek72yrv3g6@gator>
+References: <20220309162117.56681-1-alexandru.elisei@arm.com>
+ <20220309162117.56681-3-alexandru.elisei@arm.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.1
-Content-Language: en-US
-To:     Nikunj A Dadhania <nikunj@amd.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Peter Gonda <pgonda@google.com>,
-        Bharata B Rao <bharata@amd.com>,
-        Mingwei Zhang <mizhang@google.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-References: <20220308043857.13652-1-nikunj@amd.com>
- <20220308043857.13652-10-nikunj@amd.com>
-From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Subject: Re: [PATCH RFC v1 9/9] KVM: SVM: Pin SEV pages in MMU during
- sev_launch_update_data()
-In-Reply-To: <20220308043857.13652-10-nikunj@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220309162117.56681-3-alexandru.elisei@arm.com>
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8.03.2022 05:38, Nikunj A Dadhania wrote:
-> From: Sean Christopherson <sean.j.christopherson@intel.com>
+On Wed, Mar 09, 2022 at 04:21:17PM +0000, Alexandru Elisei wrote:
+> From: Andrew Jones <drjones@redhat.com>
 > 
-> Pin the memory for the data being passed to launch_update_data()
-> because it gets encrypted before the guest is first run and must
-> not be moved which would corrupt it.
+> KVM on arm64 can create 32 bit and 64 bit VMs. kvm-unit-tests tries to
+> take advantage of this by setting the aarch64=off -cpu option. However,
+> get_qemu_accelerator() isn't aware that KVM on arm64 can run both types
+> of VMs and it selects qemu-system-arm instead of qemu-system-aarch64.
+> This leads to an error in premature_failure() and the test is marked as
+> skipped:
 > 
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> [ * Use kvm_for_each_memslot_in_hva_range() to find slot and iterate
->    * Updated sev_pin_memory_in_mmu() error handling.
->    * As pinning/unpining pages is handled within MMU, removed
->      {get,put}_user(). ]
-> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
+> $ ./run_tests.sh selftest-setup
+> SKIP selftest-setup (qemu-system-arm: -accel kvm: invalid accelerator kvm)
+> 
+> Fix this by setting QEMU to the correct qemu binary before calling
+> get_qemu_accelerator().
+> 
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> [ Alex E: Added commit message, changed the logic to make it clearer ]
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 > ---
->   arch/x86/kvm/svm/sev.c | 146 +++++++++++++++++++++++++++++++++++++----
->   1 file changed, 134 insertions(+), 12 deletions(-)
+>  arm/run | 5 +++++
+>  1 file changed, 5 insertions(+)
 > 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 7e39320fc65d..1c371268934b 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -22,6 +22,7 @@
->   #include <asm/trapnr.h>
->   #include <asm/fpu/xcr.h>
->   
-> +#include "mmu.h"
->   #include "x86.h"
->   #include "svm.h"
->   #include "svm_ops.h"
-> @@ -428,9 +429,93 @@ static void *sev_alloc_pages(struct kvm_sev_info *sev, unsigned long uaddr,
->   	return pages;
->   }
->   
-> +#define SEV_PFERR_RO (PFERR_USER_MASK)
-> +#define SEV_PFERR_RW (PFERR_WRITE_MASK | PFERR_USER_MASK)
+> diff --git a/arm/run b/arm/run
+> index 2153bd320751..5fe0a45c4820 100755
+> --- a/arm/run
+> +++ b/arm/run
+> @@ -13,6 +13,11 @@ processor="$PROCESSOR"
+>  ACCEL=$(get_qemu_accelerator) ||
+>  	exit $?
+>  
+> +# KVM for arm64 can create a VM in either aarch32 or aarch64 modes.
+> +if [ "$ACCEL" = kvm ] && [ -z "$QEMU" ] && [ "$HOST" = "aarch64" ]; then
+> +	QEMU=qemu-system-aarch64
+> +fi
 > +
-> +static struct page **sev_pin_memory_in_mmu(struct kvm *kvm, unsigned long addr,
-> +					   unsigned long size,
-> +					   unsigned long *npages)
-> +{
-> +	unsigned long hva_start, hva_end, uaddr, end, slot_start, slot_end;
-> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-> +	struct interval_tree_node *node;
-> +	struct kvm_memory_slot *slot;
-> +	struct kvm_memslots *slots;
-> +	int idx, ret = 0, i = 0;
-> +	struct kvm_vcpu *vcpu;
-> +	struct page **pages;
-> +	kvm_pfn_t pfn;
-> +	u32 err_code;
-> +	gfn_t gfn;
-> +
-> +	pages = sev_alloc_pages(sev, addr, size, npages);
-> +	if (IS_ERR(pages))
-> +		return pages;
-> +
-> +	vcpu = kvm_get_vcpu(kvm, 0);
-> +	if (mutex_lock_killable(&vcpu->mutex)) {
-> +		kvfree(pages);
-> +		return ERR_PTR(-EINTR);
-> +	}
-> +
-> +	vcpu_load(vcpu);
-> +	idx = srcu_read_lock(&kvm->srcu);
-> +
-> +	kvm_mmu_load(vcpu);
-> +
-> +	end = addr + (*npages << PAGE_SHIFT);
-> +	slots = kvm_memslots(kvm);
-> +
-> +	kvm_for_each_memslot_in_hva_range(node, slots, addr, end) {
-> +		slot = container_of(node, struct kvm_memory_slot,
-> +				    hva_node[slots->node_idx]);
-> +		slot_start = slot->userspace_addr;
-> +		slot_end = slot_start + (slot->npages << PAGE_SHIFT);
-> +		hva_start = max(addr, slot_start);
-> +		hva_end = min(end, slot_end);
-> +
-> +		err_code = (slot->flags & KVM_MEM_READONLY) ?
-> +			SEV_PFERR_RO : SEV_PFERR_RW;
-> +
-> +		for (uaddr = hva_start; uaddr < hva_end; uaddr += PAGE_SIZE) {
-> +			if (signal_pending(current)) {
-> +				ret = -ERESTARTSYS;
-> +				break;
-> +			}
-> +
-> +			if (need_resched())
-> +				cond_resched();
-> +
-> +			/*
-> +			 * Fault in the page and sev_pin_page() will handle the
-> +			 * pinning
-> +			 */
-> +			gfn = hva_to_gfn_memslot(uaddr, slot);
-> +			pfn = kvm_mmu_map_tdp_page(vcpu, gfn_to_gpa(gfn),
-> +						   err_code, PG_LEVEL_4K);
-> +			if (is_error_noslot_pfn(pfn)) {
-> +				ret = -EFAULT;
-> +				break;
-> +			}
-> +			pages[i++] = pfn_to_page(pfn);
-> +		}
-> +	}
+>  qemu=$(search_qemu_binary) ||
+>  	exit $?
+>  
+> -- 
+> 2.35.1
+>
 
-This algorithm looks much better than the previews one - thanks!
+So there's a bug with this patch which was also present in the patch I
+proposed. By setting $QEMU before we call search_qemu_binary() we may
+force a "A QEMU binary was not found." failure even though a perfectly
+good 'qemu-kvm' binary is present.
 
-By the way, as far as I know, there could be duplicates in the "page" array
-above since the same hva can be mapped to multiple gfns (in different memslots).
-Is the code prepared to deal with this possibility?
+I'll try to come up with something better.
 
 Thanks,
-Maciej
+drew
+
