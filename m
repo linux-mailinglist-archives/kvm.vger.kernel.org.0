@@ -2,332 +2,253 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 60C434D2CED
-	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 11:15:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 675864D2CD5
+	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 11:11:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229892AbiCIKQW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Mar 2022 05:16:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48644 "EHLO
+        id S231660AbiCIKLt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Mar 2022 05:11:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35710 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229455AbiCIKQU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Mar 2022 05:16:20 -0500
-Received: from out30-54.freemail.mail.aliyun.com (out30-54.freemail.mail.aliyun.com [115.124.30.54])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFEFF16A59F;
-        Wed,  9 Mar 2022 02:15:19 -0800 (PST)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04394;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=33;SR=0;TI=SMTPD_---0V6jAw-c_1646820913;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0V6jAw-c_1646820913)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Wed, 09 Mar 2022 18:15:14 +0800
-Message-ID: <1646820327.1766295-14-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH v7 24/26] virtio_net: support rx/tx queue reset
-Date:   Wed, 9 Mar 2022 18:05:27 +0800
-From:   Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mark Gross <markgross@kernel.org>,
-        Vadim Pasternak <vadimp@nvidia.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Johannes Berg <johannes.berg@intel.com>,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>,
-        linux-um@lists.infradead.org, platform-driver-x86@vger.kernel.org,
-        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, bpf@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-References: <20220308123518.33800-1-xuanzhuo@linux.alibaba.com>
- <20220308123518.33800-25-xuanzhuo@linux.alibaba.com>
- <7ff78ff8-bdd0-bb5e-1cea-cf1126226feb@redhat.com>
-In-Reply-To: <7ff78ff8-bdd0-bb5e-1cea-cf1126226feb@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229579AbiCIKLr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Mar 2022 05:11:47 -0500
+Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42D8F1693BC;
+        Wed,  9 Mar 2022 02:10:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1646820648; x=1678356648;
+  h=message-id:date:mime-version:subject:to:references:from:
+   in-reply-to:content-transfer-encoding;
+  bh=lhMuw8oMB0US5FNdoG7E+f6RM3YC1SeyLDCWnsWJizw=;
+  b=u5BP9XNd9BTv3q3bfHUlzDFZgjs0H0wyog5QuKt+u8HOvJt09w1CLfK3
+   wdMGZS9jnnIzzwrpPrwFaPF5N1eJjtaklad6j9L5IyUNF/JdH662k4uZU
+   anaEDnqkWk2yVS4zoZRnWPJKInlSFuln64JG9HGKwg6+jNvP9mQcTaIqs
+   o=;
+X-IronPort-AV: E=Sophos;i="5.90,167,1643673600"; 
+   d="scan'208";a="69276529"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2b-2520d768.us-west-2.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP; 09 Mar 2022 10:10:32 +0000
+Received: from EX13MTAUWC002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+        by email-inbound-relay-pdx-2b-2520d768.us-west-2.amazon.com (Postfix) with ESMTPS id CA5BE41578;
+        Wed,  9 Mar 2022 10:10:27 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC002.ant.amazon.com (10.43.162.240) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.28; Wed, 9 Mar 2022 10:10:26 +0000
+Received: from [0.0.0.0] (10.43.162.93) by EX13D20UWC001.ant.amazon.com
+ (10.43.162.244) with Microsoft SMTP Server (TLS) id 15.0.1497.28; Wed, 9 Mar
+ 2022 10:10:20 +0000
+Message-ID: <c5181fb5-38fb-f261-9de5-24655be1c749@amazon.com>
+Date:   Wed, 9 Mar 2022 11:10:15 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.6.2
+Subject: Re: propagating vmgenid outward and upward
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <qemu-devel@nongnu.org>, <linux-hyperv@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>, <mikelley@microsoft.com>,
+        <gregkh@linuxfoundation.org>, <adrian@parity.io>,
+        <lersek@redhat.com>, <berrange@redhat.com>,
+        <linux@dominikbrodowski.net>, <jannh@google.com>, <mst@redhat.com>,
+        <rafael@kernel.org>, <len.brown@intel.com>, <pavel@ucw.cz>,
+        <linux-pm@vger.kernel.org>, <colmmacc@amazon.com>, <tytso@mit.edu>,
+        <arnd@arndb.de>
+References: <Yh4+9+UpanJWAIyZ@zx2c4.com>
+From:   Alexander Graf <graf@amazon.com>
+In-Reply-To: <Yh4+9+UpanJWAIyZ@zx2c4.com>
+X-Originating-IP: [10.43.162.93]
+X-ClientProxiedBy: EX13D01UWB002.ant.amazon.com (10.43.161.136) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+        NICE_REPLY_A,RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 9 Mar 2022 17:14:34 +0800, Jason Wang <jasowang@redhat.com> wrote:
->
-> =E5=9C=A8 2022/3/8 =E4=B8=8B=E5=8D=888:35, Xuan Zhuo =E5=86=99=E9=81=93:
-> > This patch implements the reset function of the rx, tx queues.
-> >
-> > Based on this function, it is possible to modify the ring num of the
-> > queue. And quickly recycle the buffer in the queue.
-> >
-> > In the process of the queue disable, in theory, as long as virtio
-> > supports queue reset, there will be no exceptions.
-> >
-> > However, in the process of the queue enable, there may be exceptions du=
-e to
-> > memory allocation.  In this case, vq is not available, but we still have
-> > to execute napi_enable(). Because napi_disable is similar to a lock,
-> > napi_enable must be called after calling napi_disable.
-> >
-> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > ---
-> >   drivers/net/virtio_net.c | 107 +++++++++++++++++++++++++++++++++++++++
-> >   1 file changed, 107 insertions(+)
-> >
-> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > index 409a8e180918..ffff323dcef0 100644
-> > --- a/drivers/net/virtio_net.c
-> > +++ b/drivers/net/virtio_net.c
-> > @@ -251,6 +251,11 @@ struct padded_vnet_hdr {
-> >   	char padding[4];
-> >   };
-> >
-> > +static void virtnet_sq_free_unused_bufs(struct virtnet_info *vi,
-> > +					struct send_queue *sq);
-> > +static void virtnet_rq_free_unused_bufs(struct virtnet_info *vi,
-> > +					struct receive_queue *rq);
-> > +
-> >   static bool is_xdp_frame(void *ptr)
-> >   {
-> >   	return (unsigned long)ptr & VIRTIO_XDP_FLAG;
-> > @@ -1369,6 +1374,9 @@ static void virtnet_napi_enable(struct virtqueue =
-*vq, struct napi_struct *napi)
-> >   {
-> >   	napi_enable(napi);
-> >
-> > +	if (vq->reset)
-> > +		return;
-> > +
->
->
-> Let's WARN_ONCE() here?
->
->
-> >   	/* If all buffers were filled by other side before we napi_enabled, =
-we
-> >   	 * won't get another interrupt, so process any outstanding packets n=
-ow.
-> >   	 * Call local_bh_enable after to trigger softIRQ processing.
-> > @@ -1413,6 +1421,10 @@ static void refill_work(struct work_struct *work)
-> >   		struct receive_queue *rq =3D &vi->rq[i];
-> >
-> >   		napi_disable(&rq->napi);
-> > +		if (rq->vq->reset) {
-> > +			virtnet_napi_enable(rq->vq, &rq->napi);
-> > +			continue;
-> > +		}
->
->
-> This seems racy and it's a hint that we need sync with the refill work
-> during reset like what we did in virtnet_close():
->
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* Make sure refill_work does=
-n't re-enable napi! */
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cancel_delayed_work_sync(&vi-=
->refill);
->
->
-> >   		still_empty =3D !try_fill_recv(vi, rq, GFP_KERNEL);
-> >   		virtnet_napi_enable(rq->vq, &rq->napi);
-> >
-> > @@ -1523,6 +1535,9 @@ static void virtnet_poll_cleantx(struct receive_q=
-ueue *rq)
-> >   	if (!sq->napi.weight || is_xdp_raw_buffer_queue(vi, index))
-> >   		return;
-> >
-> > +	if (sq->vq->reset)
-> > +		return;
->
->
-> It looks to me we'd better either WARN or just remove this. Since it
-> looks like a workaround for the un-synchronized NAPI somehow.
->
+Ck9uIDAxLjAzLjIyIDE2OjQyLCBKYXNvbiBBLiBEb25lbmZlbGQgd3JvdGU6Cj4KPiBIZXkgZm9s
+a3MsCj4KPiBIYXZpbmcgZmluYWxseSB3cmFwcGVkIHVwIGRldmVsb3BtZW50IG9mIHRoZSBpbml0
+aWFsIHZtZ2VuaWQgZHJpdmVyLCBJCj4gdGhvdWdodCBJJ2QgcHVsbCB0b2dldGhlciBzb21lIHRo
+b3VnaHRzIG9uIHZtZ2VuaWQsIG5vdGlmaWNhdGlvbiwgYW5kCj4gcHJvcGFnYXRpbmcsIGZyb20g
+ZGlzam9pbnRlZCBjb252ZXJzYXRpb25zIEkndmUgaGFkIHdpdGggYSBmZXcgb2YgeW91Cj4gb3Zl
+ciB0aGUgbGFzdCBzZXZlcmFsIHdlZWtzLgo+Cj4gVGhlIGJhc2ljIHByb2JsZW0gaXM6IFZNcyBj
+YW4gYmUgY2xvbmVkLCBmb3JrZWQsIHJld291bmQsIG9yCj4gc25hcHNob3R0ZWQsIGFuZCB3aGVu
+IHRoaXMgaGFwcGVucywgYSkgdGhlIFJORyBuZWVkcyB0byByZXNlZWQgaXRzZWxmLAo+IGFuZCBi
+KSBjcnlwdG9ncmFwaGljIGFsZ29yaXRobXMgdGhhdCBhcmUgbm90IHJldXNlIHJlc2lzdGFudCBu
+ZWVkIHRvCj4gcmVpbml0aWFsaXplIGluIG9uZSB3YXkgb3IgYW5vdGhlci4gRm9yIDUuMTgsIHdl
+J3JlIGhhbmRsaW5nIChhKSB2aWEgdGhlCj4gbmV3IHZtZ2VuaWQgZHJpdmVyLCB3aGljaCBpbXBs
+ZW1lbnRzIGEgc3BlYyBmcm9tIE1pY3Jvc29mdCwgd2hlcmVieSB0aGUKPiBkcml2ZXIgcmVjZWl2
+ZXMgQUNQSSBub3RpZmljYXRpb25zIHdoZW4gYSAxNiBieXRlIHVuaXF1ZSB2YWx1ZSBjaGFuZ2Vz
+Lgo+Cj4gVGhlIHZtZ2VuaWQgZHJpdmVyIGJhc2ljYWxseSB3b3JrcywgdGhvdWdoIGl0IGlzIHJh
+Y3ksIGJlY2F1c2UgdGhhdCBBQ1BJCj4gbm90aWZpY2F0aW9uIGNhbiBhcnJpdmUgYWZ0ZXIgdGhl
+IHN5c3RlbSBpcyBhbHJlYWR5IHJ1bm5pbmcgYWdhaW4uIFRoaXMKCgpJIGJlbGlldmUgZW5vdWdo
+IHBlb3BsZSBhbHJlYWR5IHBvaW50ZWQgb3V0IHRoYXQgdGhpcyBhc3N1bXB0aW9uIGlzIAppbmNv
+cnJlY3QuIFRoZSB0aGluZyB0aGF0IGlzIHJhY3kgYWJvdXQgVk1HZW5JRCBpcyB0aGUgaW50ZXJy
+dXB0IGJhc2VkIApub3RpZmljYXRpb24uIFRoZSBhY3R1YWwgaWRlbnRpZmllciBpcyB1cGRhdGVk
+IGJlZm9yZSB0aGUgVk0gcmVzdW1lcyAKZnJvbSBpdHMgY2xvbmUgb3BlcmF0aW9uLCBzbyBpZiB5
+b3UgbWF0Y2ggb24gdGhhdCB5b3Ugd2lsbCBrbm93IHdoZXRoZXIgCnlvdSBhcmUgaW4gYSBuZXcg
+b3Igb2xkIHdvcmxkLiBBbmQgdGhhdCBpcyBlbm91Z2ggdG8gY3JlYXRlIAp0cmFuc2FjdGlvbnM6
+IFNhdmUgdGhlIGlkZW50aWZpZXIgYmVmb3JlIGEgImNyeXB0byB0cmFuc2FjdGlvbiIsIAp2YWxp
+ZGF0ZSBiZWZvcmUgeW91IGZpbmlzaCwgaWYgdGhleSBkb24ndCBtYXRjaCwgYWJvcnQsIHJlc2Vl
+ZCBhbmQgcmVwbGF5LgoKCj4gcmFjZSBpcyBldmVuIHdvcnNlIG9uIFdpbmRvd3MsIHdoZXJlIHRo
+ZXkga2ljayB0aGUgbm90aWZpY2F0aW9uIGludG8gYQo+IHdvcmtlciB0aHJlYWQsIHdoaWNoIHRo
+ZW4gcHVibGlzaGVzIGl0IHVwd2FyZCBlbHNld2hlcmUgdG8gYW5vdGhlciBhc3luYwo+IG1lY2hh
+bmlzbSwgYW5kIGV2ZW50dWFsbHkgaXQgaGl0cyB0aGUgUk5HIGFuZCB2YXJpb3VzIHVzZXJzcGFj
+ZSBhcHBzLgo+IE9uIExpbnV4IGl0J3Mgbm90IHRoYXQgYmFkIC0tIHdlIHJlc2VlZCBpbW1lZGlh
+dGVseSB1cG9uIHJlY2VpdmluZyB0aGUKPiBub3RpZmljYXRpb24gLS0gYnV0IGl0IHN0aWxsIGlu
+aGVyaXRzIHRoaXMgc2FtZSAicHVzaCItbW9kZWwgZGVmaWNpZW5jeSwKPiB3aGljaCBhICJwdWxs
+Ii1tb2RlbCB3b3VsZCBub3QgaGF2ZS4KPgo+IElmIHdlIGhhZCBhICJwdWxsIiBtb2RlbCwgcmF0
+aGVyIHRoYW4ganVzdCBleHBvc2UgYSAxNi1ieXRlIHVuaXF1ZQo+IGlkZW50aWZpZXIsIHRoZSB2
+bWdlbmlkIHZpcnR1YWwgaGFyZHdhcmUgd291bGQgX2Fsc29fIGV4cG9zZSBhCj4gd29yZC1zaXpl
+ZCBnZW5lcmF0aW9uIGNvdW50ZXIsIHdoaWNoIHdvdWxkIGJlIGluY3JlbWVudGVkIGV2ZXJ5IHRp
+bWUgdGhlCj4gdW5pcXVlIElEIGNoYW5nZWQuIFRoZW4sIGV2ZXJ5IHRpbWUgd2Ugd291bGQgdG91
+Y2ggdGhlIFJORywgd2UnZCBzaW1wbHkKPiBkbyBhbiBpbmV4cGVuc2l2ZSBjaGVjayBvZiB0aGlz
+IG1lbXJlbWFwKCknZCBpbnRlZ2VyLCBhbmQgcmVpbml0aWFsaXplCj4gd2l0aCB0aGUgdW5pcXVl
+IElEIGlmIHRoZSBpbnRlZ2VyIGNoYW5nZWQuIEluIHRoaXMgd2F5LCB0aGUgcmFjZSB3b3VsZAo+
+IGJlIGVudGlyZWx5IGVsaW1pbmF0ZWQuIFdlIHdvdWxkIHRoZW4gYmUgYWJsZSB0byBwcm9wYWdh
+dGUgdGhpcyBvdXR3YXJkcwo+IHRvIG90aGVyIGRyaXZlcnMsIGJ5IGp1c3QgZXhwb3J0aW5nIGFu
+IGV4dGVybiBzeW1ib2wsIGluIHRoZSBtYW5uZXIgb2YKPiBgamlmZmllc2AsIGFuZCBwcm9wYWdh
+dGUgaXQgdXB3YXJkcyB0byB1c2Vyc3BhY2UsIGJ5IHB1dHRpbmcgaXQgaW4gdGhlCj4gdkRTTywg
+aW4gdGhlIG1hbm5lciBvZiBnZXR0aW1lb2ZkYXkuIEFuZCBsaWtlIHRoYXQsIHRoZXJlJ2QgYmUg
+bm8KPiB0ZXJyaWJsZSBhc3luYyB0aGluZyBhbmQgdGhpbmdzIHdvdWxkIHdvcmsgcHJldHR5IGVh
+c2lseS4KPgo+IEJ1dCB0aGF0J3Mgbm90IHdoYXQgd2UgaGF2ZSwgYmVjYXVzZSBNaWNyb3NvZnQg
+ZGlkbid0IGNvbGxhYm9yYXRlIHdpdGgKPiBhbnlib2R5IG9uIHRoaXMsIGFuZCBub3cgaXQncyBp
+bXBsZW1lbnRlZCBpbiBzZXZlcmFsIGh5cGVydmlzb3JzLiBHaXZlbgo+IHRoYXQgSSdtIGFscmVh
+ZHkgc3BlbmRpbmcgY29uc2lkZXJhYmxlIHRpbWUgd29ya2luZyBvbiB0aGUgUk5HLCBlbnRpcmVs
+eQo+IHdpdGhvdXQgZnVuZGluZywgc29tZWhvdyBJJ20gbm90IHN1cGVyIG1vdGl2YXRlZCB0byBs
+ZWFkIGEKPiBjcm9zcy1pbmR1c3RyeSBwb2xpdGljYWwgZWZmb3J0IHRvIGNoYW5nZSBNaWNyb3Nv
+ZnQncyB2bWdlbmlkIHNwZWMuCj4gTWF5YmUgc29tZWJvZHkgZWxzZSBoYXMgYW4gYXBwZXRpdGUg
+Zm9yIHRoaXMsIGJ1dCBlaXRoZXIgd2F5LCB0aG9zZQo+IGNoYW5nZXMgd291bGQgYmUgc2V2ZXJh
+bCB5ZWFycyBvZmYgYXQgYmVzdC4KPgo+IFNvIGdpdmVuIHdlIGhhdmUgYSAicHVzaCItbW9kZWwg
+bWVjaGFuaXNtLCB0aGVyZSBhcmUgdHdvIHByb2JsZW1zIHRvCj4gdGFja2xlLCBwZXJoYXBzIGlu
+IHRoZSBzYW1lIHdheSwgcGVyaGFwcyBpbiBhIGRpZmZlcmVudCB3YXk6Cj4KPiBBKSBPdXR3YXJk
+cyBwcm9wYWdhdGlvbiB0b3dhcmQgb3RoZXIga2VybmVsIGRyaXZlcnM6IGluIHRoaXMgY2FzZSwg
+SQo+ICAgICBoYXZlIGluIG1pbmQgV2lyZUd1YXJkLCBuYXR1cmFsbHksIHdoaWNoIHZlcnkgbXVj
+aCBuZWVkcyB0byBjbGVhciBpdHMKPiAgICAgZXhpc3Rpbmcgc2Vzc2lvbnMgd2hlbiBWTXMgYXJl
+IGZvcmtlZC4KPgo+IEIpIFVwd2FyZHMgcHJvcGFnYXRpb24gdG8gdXNlcnNwYWNlOiBpbiB0aGlz
+IGNhc2UsIHdlIGhhbmRsZSB0aGUKPiAgICAgY29uY2VybnMgb2YgdGhlIEFtYXpvbiBlbmdpbmVl
+cnMgb24gdGhpcyB0aHJlYWQgd2hvIGJyb2FjaGVkIHRoaXMKPiAgICAgdG9waWMgYSBmZXcgeWVh
+cnMgYWdvLCBpbiB3aGljaCBzMm4sIHRoZWlyIFRMUyBsaWJyYXJ5LCB3YW50cyB0bwo+ICAgICBy
+ZWluaXRpYWxpemUgaXRzIHVzZXJzcGFjZSBSTkcgKGEgc2lsbHkgdGhpbmcsIGJ1dCBJIGRpZ3Jl
+c3MpIGFuZAo+ICAgICBwcm9iYWJseSBjbGVhciBzZXNzaW9uIGtleXMgdG9vLCBmb3IgdGhlIHNh
+bWUgZ29vZCByZWFzb24gYXMKPiAgICAgV2lyZUd1YXJkLgo+Cj4gRm9yIChBKSwgYXQgbGVhc3Qg
+d2VhcmluZyBteSBXaXJlR3VhcmQtbWFpbnRhaW5lciBoYXQsIHRoZXJlIGlzIGFuIGVhc3kKPiB3
+YXkgYW5kIHRoZXJlIGlzIGEgInJhY2UtZnJlZSIgd2F5LiBJIHVzZSBzY2FyZSBxdW90ZXMgdGhl
+cmUgYmVjYXVzZQo+IHdlJ3JlIHN0aWxsIGluIGEgInB1c2giLW1vZGVsLCB3aGljaCBtZWFucyBp
+dCdzIHN0aWxsIHJhY3kgbm8gbWF0dGVyCj4gd2hhdC4KPgo+IFRoZSBmYXV4ICJyYWNlLWZyZWUi
+IHdheSBpbnZvbHZlcyBoYXZpbmcgYGV4dGVybiB1MzIgcm5nX3ZtX2dlbmVyYXRpb247YAo+IG9y
+IHNpbWlsYXIgaW4gcmFuZG9tLmgsIGFuZCB0aGVuIGV2ZXJ5dGhpbmcgdGhhdCBnZW5lcmF0ZXMg
+YSBzZXNzaW9uIGtleQo+IHdvdWxkIHNuYXBzaG90IHRoaXMgdmFsdWUsIGFuZCBldmVyeSB0aW1l
+IGEgc2Vzc2lvbiBrZXkgaXMgdXNlZCwgYQo+IGNvbXBhcmlzb24gd291bGQgYmUgbWFkZS4gVGhp
+cyB3b3JrcywgYnV0IGdpdmVuIHRoYXQgd2UncmUgZ29pbmcgdG8gYmUKPiByYWN5IG5vIG1hdHRl
+ciB3aGF0LCBJIHRoaW5rIEknZCBwcmVmZXIgYXZvaWRpbmcgdGhlIGV4dHJhIGNvZGUgaW4gdGhl
+Cj4gaG90IHBhdGggYW5kIGV4dHJhIHBlci1zZXNzaW9uIHN0b3JhZ2UuIEl0IHNlZW1zIGxpa2Ug
+dGhhdCdkIGludm9sdmUgYQo+IGxvdCBvZiBmaWRkbHkgZW5naW5lZXJpbmcgZm9yIG5vIHJlYWwg
+d29ybGQgYmVuZWZpdC4KPgo+IFRoZSBlYXN5IHdheSwgYW5kIHRoZSB3YXkgdGhhdCBJIHRoaW5r
+IEkgcHJlZmVyLCB3b3VsZCBiZSB0byBqdXN0IGhhdmUgYQo+IHN5bmMgbm90aWZpZXJfYmxvY2sg
+Zm9yIHRoaXMsIGp1c3QgbGlrZSB3ZSBoYXZlIHdpdGgKPiByZWdpc3Rlcl9wbV9ub3RpZmllcigp
+LiBGcm9tIG15IHBlcnNwZWN0aXZlLCBpdCdkIGJlIHNpbXBsZXN0IHRvIGp1c3QKPiBwaWdneSBi
+YWNrIG9uIHRoZSBhbHJlYWR5IGV4aXN0aW5nIFBNIG5vdGlmaWVyIHdpdGggYW4gZXh0cmEgZXZl
+bnQsCj4gUE1fUE9TVF9WTUZPUkssIHdoaWNoIHdvdWxkIGpvaW4gdGhlIGV4aXN0aW5nIHNldCBv
+ZiA3LCBmb2xsb3dpbmcKPiBQTV9QT1NUX1JFU1RPUkUuIEkgdGhpbmsgdGhhdCdkIGJlIGNvaGVy
+ZW50LiBIb3dldmVyLCBpZiB0aGUgUE0gcGVvcGxlCj4gZG9uJ3Qgd2FudCB0byBwbGF5IGJhbGws
+IHdlIGNvdWxkIGFsd2F5cyBjb21lIHVwIHdpdGggb3VyIG93bgo+IG5vdGlmaWVyX2Jsb2NrLiBC
+dXQgSSBkb24ndCBzZWUgdGhlIG5lZWQuIFBsdXMsIFdpcmVHdWFyZCAqYWxyZWFkeSoKPiB1c2Vz
+IHRoZSBQTSBub3RpZmllciBmb3IgY2xlYXJpbmcga2V5cywgc28gY29kZS13aXNlIGZvciBteSB1
+c2UgY2FzZSwKPiB0aGF0J2QgYW1vdW50IGFkZGluZyBhbm90aGVyIGNhc2UgZm9yIFBNX1BPU1Rf
+Vk1GT1JLLCBpbiBhZGRpdGlvbiB0byB0aGUKPiBjdXJyZW50bHkgZXhpc3RpbmcgUE1fSElCRVJO
+QVRJT05fUFJFUEFSRSBhbmQgUE1fU1VTUEVORF9QUkVQQVJFIGNhc2VzLAo+IHdoaWNoIGFsbCB3
+b3VsZCBiZSB0cmVhdGVkIHRoZSBzYW1lIHdheS4gRXpwei4gU28gaWYgdGhhdCBzb3VuZHMgbGlr
+ZSBhbgo+IGludGVyZXN0aW5nIHRoaW5nIHRvIHRoZSBQTSBwZW9wbGUsIEkgdGhpbmsgSSdkIGxp
+a2UgdG8gcHJvcG9zZSBhIHBhdGNoCj4gZm9yIHRoYXQsIHBvc3NpYmx5IGV2ZW4gZm9yIDUuMTgs
+IGdpdmVuIHRoYXQgaXQnZCBiZSB2ZXJ5IHN0cmFpZ2h0LQo+IGZvcndhcmQuCj4KPiBGb3IgKEIp
+LCBpdCdzIGEgbGl0dGxlIGJpdCB0cmlja2llci4gQnV0IEkgdGhpbmsgb3VyIG9wdGlvbnMgZm9s
+bG93IHRoZQo+IHNhbWUgcnVicmljLiBXZSBjYW4gZXhwb3NlIGEgZ2VuZXJhdGlvbiBjb3VudGVy
+IGluIHRoZSB2RFNPLCB3aXRoCj4gc2VtYW50aWNzIGFraW4gdG8gdGhlIGV4dGVybiBpbnRlZ2Vy
+IEkgZGVzY3JpYmVkIGFib3ZlLiBPciB3ZSBjb3VsZAo+IGV4cG9zZSB0aGF0IGNvdW50ZXIgaW4g
+YSBmaWxlIHRoYXQgdXNlcnNwYWNlIGNvdWxkIHBvbGwoKSBvbiBhbmQgcmVjZWl2ZQo+IG5vdGlm
+aWNhdGlvbnMgdGhhdCB3YXkuIE9yIHBlcmhhcHMgYSB0aGlyZCB3YXkuIEknbSBhbGwgZWFycyBo
+ZXJlLgo+IEFsZXgncyB0ZWFtIGZyb20gQW1hem9uIGxhc3QgeWVhciBwcm9wb3NlZCBzb21ldGhp
+bmcgc2ltaWxhciB0byB0aGUgdkRTTwo+IGlkZWEsIGV4Y2VwdCB1c2luZyBtbWFwIG9uIGEgc3lz
+ZnMgZmlsZSwgdGhvdWdoIGZyb20gd2hhdCBJIGNhbiB0ZWxsLAo+IHRoYXQgd291bmQgdXAgYmVp
+bmcga2luZCBvZiBjb21wbGljYXRlZC4gRHVlIHRvIHRoZSBmYWN0IHRoYXQgd2UncmUKPiBfYWxy
+ZWFkeV8gcmFjeSwgSSB0aGluayBJJ20gbW9zdCBpbmNsaW5lZCBhdCB0aGlzIHBvaW50IHRvd2Fy
+ZCB0aGUKPiBwb2xsKCkgYXBwcm9hY2ggZm9yIHRoZSBzYW1lIHJlYXNvbnMgYXMgSSBwcmVmZXIg
+YSBub3RpZmllcl9ibG9jay4gQnV0Cj4gb24gdXNlcnNwYWNlIEkgY291bGQgYmUgY29udmluY2Vk
+IG90aGVyd2lzZSwgYW5kIEknZCBiZSBpbnRlcmVzdGVkIGluCj4gdG90YWxseSBkaWZmZXJlbnQg
+aWRlYXMgaGVyZSB0b28uCj4KPiBBbm90aGVyIHRoaW5nIEkgc2hvdWxkIG5vdGUgaXMgdGhhdCwg
+d2hpbGUgSSdtIG5vdCBjdXJyZW50bHkgbGVhbmluZwo+IHRvd2FyZCBpdCwgdGhlIHZEU08gYXBw
+cm9hY2ggYWxzbyB0aWVzIGludG8gaW50ZXJlc3RpbmcgZGlzY3Vzc2lvbnMKPiBhYm91dCB1c2Vy
+c3BhY2UgUk5HcyAoZ2VuZXJhbGx5IGEgc2lsbHkgaWRlYSksIGFuZCB0aGVpciBuZWVkIGZvciB0
+aGluZ3MKPiBsaWtlIGZvcmsgZGV0ZWN0aW9uIGFuZCBhbHNvIGxlYXJuaW5nIHdoZW4gdGhlIGtl
+cm5lbCBSTkcgd2FzIGxhc3QKPiByZXNlZWRlZC4gU28gY3JhY2tpbmcgb3BlbiB0aGUgdkRTTyBi
+b29rIG1pZ2h0IGludml0ZSBhbGwgc29ydHMgb2Ygb3RoZXIKPiBpbnRlcmVzdGluZyBxdWVzdGlv
+bnMgYW5kIGRpc2N1c3Npb25zLCB3aGljaCBtYXkgYmUgcHJvZHVjdGl2ZSBvciBtYXkgYmUKPiBh
+IGh1bW9uZ291cyBkaXN0cmFjdGlvbi4gKEFsc28sIGFnYWluLCBJJ20gbm90IHN1cGVyIGVudGh1
+c2lhc3RpYyBhYm91dAo+IHVzZXJzcGFjZSBSTkdzLikKPgo+IEFsc28sIHRoZXJlIGlzIGFuIGlu
+dGVyZXN0aW5nIHF1ZXN0aW9uIHRvIGRlY2lkZSB3aXRoIHJlZ2FyZHMgdG8KPiB1c2Vyc3BhY2Us
+IHdoaWNoIGlzIHdoZXRoZXIgdGhlIHZtZ2VuaWQgZHJpdmVyIHNob3VsZCBleHBvc2UgaXRzIHVu
+aXF1ZQo+IElEIHRvIHVzZXJzcGFjZSwgYXMgQWxleCByZXF1ZXN0ZWQgb24gYW4gZWFybGllciB0
+aHJlYWQuIEkgYW0gYWN0dWFsbHkKPiBzb3J0IG9mIG9wcG9zZWQgdG8gdGhpcy4gVGhhdCB1bmlx
+dWUgSUQgbWF5IG9yIG1heSBub3QgYmUgc2VjcmV0IGFuZAo+IGVudHJvcGljOyBpZiBpdCBpc24n
+dCwgdGhlIGNyeXB0byBpcyBkZXNpZ25lZCB0byBub3QgYmUgaW1wYWN0ZWQKPiBuZWdhdGl2ZWx5
+LCBidXQgaWYgaXQgaXMsIHdlIHNob3VsZCBrZWVwIGl0IHNlY3JldC4gU28sIHJhdGhlciwgSSB0
+aGluawo+IHRoZSBjb3JyZWN0IGZsb3cgaXMgdGhhdCB1c2Vyc3BhY2Ugc2ltcGx5IGNhbGxzIGdl
+dHJhbmRvbSgpIHVwb24KPiBsZWFybmluZyB0aGF0IHRoZSBWTSBmb3JrZWQsIHdoaWNoIGlzIGd1
+YXJhbnRlZWQgdG8gaGF2ZSBiZWVuCj4gcmVpbml0aWFsaXplZCBhbHJlYWR5IGJ5IGFkZF92bWZv
+cmtfcmFuZG9tbmVzcygpLCBhbmQgdGhhdCB3aWxsCj4gZ3VhcmFudGVlIGEgdmFsdWUgdGhhdCBp
+cyB1bmlxdWUgdG8gdGhlIFZNLCB3aXRob3V0IGhhdmluZyB0byBhY3R1YWxseQo+IGV4cG9zZSB0
+aGF0IHZhbHVlLgoKCklmIHlvdSBmb2xsb3cgdGhlIGxvZ2ljIGF0IHRoZSBiZWdpbm5pbmcgb2Yg
+dGhlIG1haWwsIHlvdSBjYW4gY3JlYXRlIApzb21ldGhpbmcgcmFjZSBmcmVlIGlmIHlvdSBjb25z
+dW1lIHRoZSBoYXJkd2FyZSBWTUdlbklEIGNvdW50ZXIuIFlvdSBjYW4gCm5vdCBtYWtlIGl0IHJh
+Y2UgZnJlZSBpZiB5b3UgcmVseSBvbiB0aGUgaW50ZXJydXB0IG1lY2hhbmlzbS4KClNvIGZvbGxv
+d2luZyB0aGF0IHRyYWluIG9mIHRob3VnaHQsIGlmIHlvdSBleHBvc2UgdGhlIGhhcmR3YXJlIFZN
+R2VuSUQgCnRvIHVzZXIgc3BhY2UsIHlvdSBjb3VsZCBhbGxvdyB1c2VyIHNwYWNlIHRvIGFjdCBy
+YWNlIGZyZWUgYmFzZWQgb24gClZNR2VuSUQuIFRoYXQgbWVhbnMgY29uc3VtZXJzIG9mIHVzZXIg
+c3BhY2UgUk5HcyBjb3VsZCB2YWxpZGF0ZSB3aGV0aGVyIAp0aGUgSUQgaXMgaWRlbnRpY2FsIGJl
+dHdlZW4gdGhlIGJlZ2lubmluZyBvZiB0aGUgY3J5cHRvIG9wZXJhdGlvbiBhbmQgCnRoZSBlbmQu
+CgpUaGF0IHNhaWQsIHRoZXJlIGFyZSAyIHBpZWNlcyB0byB0aGUgcHV6emxlIG9mIHVzZXIgc3Bh
+Y2Ugbm90aWZpY2F0aW9uOiAKUG9sbGluZyBhbmQgZXZlbnQgYmFzZWQuIFRoZSBwYXJ0IGFib3Zl
+IHNvbHZlcyB0aGUgcG9sbGluZyB1c2UgY2FzZXMgLSAKdXNlciBzcGFjZSBsaWJyYXJpZXMgdGhh
+dCBqdXN0IHdhbnQgdG8ga25vdyB3aGV0aGVyIHRoZXkgYXJlIG5vdyBpbiBhIApuZXcgd29ybGQu
+CgpIb3dldmVyLCB0aGVyZSBhcmUgbW9yZSBjb21wbGljYXRlZCBjYXNlcyBhcyB3ZWxsLiBXaGF0
+IGRvIHlvdSBkbyB3aXRoIApTYW1iYSBmb3IgZXhhbXBsZT8gSXQgbmVlZHMgdG8gZ2VuZXJhdGUg
+YSBuZXcgU0lEIGFmdGVyIHRoZSBjbG9uZS4gClRoYXQncyBhIHN1cGVyIGhlYXZ5IG9wZXJhdGlv
+bi4gRG8geW91IHdhbnQgdG8gaGF2ZSBzbWJkIGNvbnN0YW50bHkgcG9sbCAKb24gdGhlIFZNR2Vu
+SUQganVzdCB0byBzZWUgd2hldGhlciBpdCBuZWVkcyB0byBraWNrIG9mZiBzb21lIAphZG1pbmlz
+dHJhdGl2ZSBhY3Rpb25zPwoKRm9yIHRoZSBldmVudCBiYXNlZCBhcHByb2FjaCwgd2UncmUgaW4g
+dGhlIHNhbWUgYm9hdCBhcyAiUzMgcmVzdW1lIiAtIHdlIApuZWVkIGEgZ2xvYmFsIG5vdGlmaWNh
+dGlvbiBtZWNoYW5pc20gdGhhdCB0aGUgc3RhdGUgb2YgdGhlIHN5c3RlbSAKY2hhbmdlZCBhbmQg
+YWN0IGFjY29yZGluZ2x5LiBUaGF0J3Mgd2hlcmUgdGhlIHN5c3RlbWQgcHJvcG9zYWxbMV0gY29t
+ZXMgCmluOiBDcmVhdGUgaW5oaWJpdG9ycyBhbmQgc2NyaXB0bGV0cyB0aGF0IGdldCBzcGF3bmVk
+IHdoZW4gd2Ugd2FudCB0byAKc3VzcGVuZCBhbmQgdGhlbiByZXN1bWUtY2xvbmVkIGxhdGVyLiBJ
+J20gcGVyc29uYWxseSBldmVuIG9rIGlmIHdlIGp1c3QgCmxpbWl0IHRoYXQgd2hvbGUgdXNlIGNh
+c2UgdG8gY2xvbmluZyB3aGlsZSB5b3UncmUgaW4gUzMgb25seS4KCkluIHRoYXQgY2FzZSwgYWxs
+IHdlIHdvdWxkIG5lZWQgZnJvbSB0aGUga2VybmVsIGlzIGFuIGVhc2lseSByZWFkYWJsZSAKR2Vu
+SUQgdGhhdCBjaGFuZ2VzIGJlZm9yZSBzeXN0ZW1kIHJ1bnMgYWdhaW4gYWZ0ZXIgc3VzcGVuZDog
+U3lzdGVtZCAKd2FrZXMgdXAgYWZ0ZXIgcmVzdW1lLCBjaGVja3MgaWYgdGhlIEdlbklEIGNoYW5n
+ZWQgYW5kIGlmIHNvLCBpbnZva2VzIAp0aGUgdW5xdWllc2NpbmcgdGFyZ2V0IGluIGFmdGVyIHRo
+ZSByZXN1bWUgb25lLgoKRm9yIHRoaXMgcGFydGljdWxhciB1c2UgY2FzZSB3ZSdyZSBub3QgaW4g
+dGhlIGZhc3QgcGF0aCwgc28gd2UgY291bGQgCm1ha2UgR2VuSUQgcmVhZGluZyBhIHN5c2NhbGwg
+d2hpY2ggY2hlY2tzIGFnYWluc3QgVk1HZW5JRC4gQnV0IHRoYXQgCndvbid0IGN1dCBpdCBmb3Ig
+dGhlIHBvbGxpbmcgdXNlIGNhc2UuCgpJJ20gYWxzbyBub3QgYSBzdXBlciBiaWcgZmFuIG9mIHB1
+dHRpbmcgYWxsIHRoYXQgbG9naWMgaW50byBzeXN0ZW1kLiBJdCAKbWVhbnMgYXBwbGljYXRpb25z
+IG5lZWQgdG8gY3JlYXRlIHRoZWlyIG93biBub3RpZmljYXRpb24gbWVjaGFuaXNtcyB0byAKcGFz
+cyB0aGF0IGNsb25pbmcgbm90aWZpY2F0aW9uIGludG8gYWN0dWFsIHByb2Nlc3Nlcy4gRG9uJ3Qg
+d2UgaGF2ZSBhbnkgCm1lY2hhbmlzbSB0aGF0IGFwcGxpY2F0aW9ucyBhbmQgbGlicmFyaWVzIGNv
+dWxkIHVzZSB0byBuYXRpdmVseSBnZXQgYW4gCmV2ZW50IHdoZW4gdGhlIEdlbklEIGNoYW5nZXM/
+CgoKQWxleAoKClsxXSBodHRwczovL2dpdGh1Yi5jb20vc3lzdGVtZC9zeXN0ZW1kL2lzc3Vlcy8y
+MDIyMgoKCj4KPiBTbywgYW55d2F5LCB0aGlzIGlzIG1vcmUgb3IgbGVzcyB3aGVyZSBteSB0aGlu
+a2luZyBvbiB0aGlzIG1hdHRlciBpcy4KPiBXb3VsZCBiZSBoYXBweSB0byBoZWFyIHNvbWUgZnJl
+c2ggaWRlYXMgaGVyZSB0b28uCj4KPiBSZWdhcmRzLAo+IEphc29uCgoKCkFtYXpvbiBEZXZlbG9w
+bWVudCBDZW50ZXIgR2VybWFueSBHbWJICktyYXVzZW5zdHIuIDM4CjEwMTE3IEJlcmxpbgpHZXNj
+aGFlZnRzZnVlaHJ1bmc6IENocmlzdGlhbiBTY2hsYWVnZXIsIEpvbmF0aGFuIFdlaXNzCkVpbmdl
+dHJhZ2VuIGFtIEFtdHNnZXJpY2h0IENoYXJsb3R0ZW5idXJnIHVudGVyIEhSQiAxNDkxNzMgQgpT
+aXR6OiBCZXJsaW4KVXN0LUlEOiBERSAyODkgMjM3IDg3OQoKCg==
 
-During the reset process, both ring reset and enable may fail. In the case =
-of
-failure, vq will be unavailable. All three cases prevent this situation.
-
-Even if it fails, napi still needs to be enabled. This is to prevent
-napi_disable from being stuck when the network card is closed.
-
-
-So the first and second cases above are that napi is enabled, but vq has not
-been reset successfully or is still in reset.
-
-And the third case is to deal with tx in reset, and rx is in working state,=
- then
-here will access the vq of sq.
-
-
-
-
->
-> > +
-> >   	if (__netif_tx_trylock(txq)) {
-> >   		do {
-> >   			virtqueue_disable_cb(sq->vq);
-> > @@ -1769,6 +1784,98 @@ static netdev_tx_t start_xmit(struct sk_buff *sk=
-b, struct net_device *dev)
-> >   	return NETDEV_TX_OK;
-> >   }
-> >
-> > +static int virtnet_rx_vq_reset(struct virtnet_info *vi,
-> > +			       struct receive_queue *rq, u32 ring_num)
->
->
-> It's better to rename this as virtnet_rx_resize().
-
-
-I don't think resize is good enough, because I think resize is an effect of
-reset. Inside af_xdp, we will call it just to reset to free the buffer with=
-out
-resize with ring_num =3D=3D 0.
-
-So virtnet_rx_reset() might be better.
-
->
->
-> > +{
-> > +	int err;
-> > +
-> > +	/* stop napi */
-> > +	napi_disable(&rq->napi);
-> > +
->
->
-> Here, as discussed above, we need synchronize with the refill work.
->
->
-> > +	/* reset the queue */
-> > +	err =3D virtio_reset_vq(rq->vq);
-> > +	if (err)
-> > +		goto err;
->
->
-> Btw, most comment of this function seems useless since code already
-> explain themselves.
-
-OK, I will remove these.
-
->
->
-> > +
-> > +	/* free bufs */
-> > +	virtnet_rq_free_unused_bufs(vi, rq);
-> > +
-> > +	/* reset vring. */
-> > +	err =3D virtqueue_reset_vring(rq->vq, ring_num);
-> > +	if (err)
-> > +		goto err;
-> > +
-> > +	/* enable reset queue */
-> > +	err =3D virtio_enable_resetq(rq->vq);
-> > +	if (err)
-> > +		goto err;
-> > +
-> > +	/* fill recv */
-> > +	if (!try_fill_recv(vi, rq, GFP_KERNEL))
-> > +		schedule_delayed_work(&vi->refill, 0);
-> > +
-> > +	/* enable napi */
-> > +	virtnet_napi_enable(rq->vq, &rq->napi);
-> > +	return 0;
-> > +
-> > +err:
-> > +	netdev_err(vi->dev,
-> > +		   "reset rx reset vq fail: rx queue index: %ld err: %d\n",
-> > +		   rq - vi->rq, err);
-> > +	virtnet_napi_enable(rq->vq, &rq->napi);
-> > +	return err;
-> > +}
-> > +
-> > +static int virtnet_tx_vq_reset(struct virtnet_info *vi,
-> > +			       struct send_queue *sq, u32 ring_num)
-> > +{
->
->
-> It looks to me it's better to rename this as "virtnet_rx_resize()"
->
->
-> > +	struct netdev_queue *txq;
-> > +	int err, qindex;
-> > +
-> > +	qindex =3D sq - vi->sq;
-> > +
-> > +	txq =3D netdev_get_tx_queue(vi->dev, qindex);
-> > +	__netif_tx_lock_bh(txq);
-> > +
-> > +	/* stop tx queue and napi */
-> > +	netif_stop_subqueue(vi->dev, qindex);
-> > +	virtnet_napi_tx_disable(&sq->napi);
->
->
-> There's no need to hold tx lock for napi disable.
-
-tx lock =E7=9A=84=E4=B8=BB=E8=A6=81=E7=9B=AE=E7=9A=84=E6=98=AF=E7=AD=89=E5=
-=BE=85=E5=85=B6=E5=AE=83=E7=9A=84 xmit =E8=B0=83=E7=94=A8=E7=BB=93=E6=9D=9F.
-=E5=B9=B6=E8=AE=BE=E7=BD=AE netif_stop_subqueue()
-
-The main purpose of tx lock is to wait for other xmit calls to end. And set
-netif_stop_subqueue()
-
-Thanks.
-
->
-> Thanks
->
->
-> > +
-> > +	__netif_tx_unlock_bh(txq);
-> > +
-> > +	/* reset the queue */
-> > +	err =3D virtio_reset_vq(sq->vq);
-> > +	if (err) {
-> > +		netif_start_subqueue(vi->dev, qindex);
-> > +		goto err;
-> > +	}
-> > +
-> > +	/* free bufs */
-> > +	virtnet_sq_free_unused_bufs(vi, sq);
-> > +
-> > +	/* reset vring. */
-> > +	err =3D virtqueue_reset_vring(sq->vq, ring_num);
-> > +	if (err)
-> > +		goto err;
-> > +
-> > +	/* enable reset queue */
-> > +	err =3D virtio_enable_resetq(sq->vq);
-> > +	if (err)
-> > +		goto err;
-> > +
-> > +	/* start tx queue and napi */
-> > +	netif_start_subqueue(vi->dev, qindex);
-> > +	virtnet_napi_tx_enable(vi, sq->vq, &sq->napi);
-> > +	return 0;
-> > +
-> > +err:
-> > +	netdev_err(vi->dev,
-> > +		   "reset tx reset vq fail: tx queue index: %ld err: %d\n",
-> > +		   sq - vi->sq, err);
-> > +	virtnet_napi_tx_enable(vi, sq->vq, &sq->napi);
-> > +	return err;
-> > +}
-> > +
-> >   /*
-> >    * Send command via the control virtqueue and check status.  Commands
-> >    * supported by the hypervisor, as indicated by feature bits, should
->
