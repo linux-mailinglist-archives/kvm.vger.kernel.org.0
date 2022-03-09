@@ -2,184 +2,321 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CE4934D2FBE
-	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 14:13:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 59A424D2FD4
+	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 14:21:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233013AbiCINN6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Mar 2022 08:13:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54022 "EHLO
+        id S231759AbiCINV4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Mar 2022 08:21:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231186AbiCINN4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Mar 2022 08:13:56 -0500
-Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C387710A7C8;
-        Wed,  9 Mar 2022 05:12:56 -0800 (PST)
-Received: by mail-wr1-x434.google.com with SMTP id r10so2989113wrp.3;
-        Wed, 09 Mar 2022 05:12:56 -0800 (PST)
+        with ESMTP id S229738AbiCINVz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Mar 2022 08:21:55 -0500
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 506BF179250
+        for <kvm@vger.kernel.org>; Wed,  9 Mar 2022 05:20:56 -0800 (PST)
+Received: by mail-wr1-x432.google.com with SMTP id u1so2975881wrg.11
+        for <kvm@vger.kernel.org>; Wed, 09 Mar 2022 05:20:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=pfyYykHjxrLm7TI65zNbRgH0big2KedF7YuccyrnveI=;
-        b=DI27C8UYjpWIrC9nmE+cQjsLu24yCR2g67UiBwdv36USOSBBM70AbZkdG9amasF+nZ
-         tVF5EDraK0ml5Quh+8KVlNT7k3kZOkqv9TiieJy0k+LeGv2aL4bLGlQmRxNAZIXUNoXM
-         B6R6nmXg1TKls4EHtGksX4xTKDhCBhSlRHhdZeOJbPbZEHy0A81mNP3sx6XtpALPFQmy
-         RNK3HX42c+iu9DXxg4Vi957Al+mva4ewWRTXnMYyUBzvpYjHWafjWsn8iBJXSWvUz1je
-         /6leVgwm2MMVvKhpaNgo/wBSqy9hDfbhyisRwJDjvy1z9vmrazq9wT01A+406PHM5evA
-         aLqg==
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=BliLg0I6GQNRm+9J6hpahlGPKM+LjQC7zR5fB3dy6N4=;
+        b=IY26HYZSTtIaa5msZzOr6URf8C8JpbqqxJvsglG1nQbdFkpfkR8KPn3aitMXjdOOhS
+         e5jdjZcQsZ4gyA4Fz/80IMyW1o3ldk5RYzLRBiRpn+G5/KjI2UXJOuU7ue68vC5VmeJk
+         rA+ndUl9z6LFKdJxvRKF55+8+zoSXofhPvvIdJqQjq6qWcqN118jlVL7uJdrVjMxtTUo
+         tgEFkZwEAMiYVYXwaKId470Md1tCVCc3G1BzfUjD3EDZ8aNwd4zHC0Ypwb84DI/InLX4
+         zSNuPyu8iKgA04rCXDU4xai7IPp+NT3FWb8Hv7n4nDjSO7N3cwA0yU0XvDQbsX/6r4in
+         9BVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=pfyYykHjxrLm7TI65zNbRgH0big2KedF7YuccyrnveI=;
-        b=N7IHeWMvMCNWJE9HoH5z8tetg7LVIZDlCQhqCqsPTLsB3qqUGHAo4G1Uk41232N/7t
-         qPfRCi2Mul/SNei1/GjCTVh2XEZjynd/KFdiTkylagw+XZ7GxPamMX7NI10Pp9U54+iD
-         sM18Q0nxTkx1BdB29SGmo46X+coa+mmskTP34BH/9/u6I1idQkmjOF58XJpPpnk+aFDq
-         hcZA+0xx4mgcSxB+tV+VMaT/gi9xaWnAQjT/iT91KLPruK7wG4Doh5u04Id5NFNDTHGv
-         X5EH7ccxI0Tj39kCmZZ8NCDU7Olbf5h4H81B9QsbZJ7rDvYGgZD6JxMdfshz8KC1wTlA
-         m0Sg==
-X-Gm-Message-State: AOAM5307sSP41rY5wtEtbzuHkH5Gk9nL8gZ7mSm3a2zYuSpucSjkUq8O
-        uv+x6OGr3ZXWWxPTzgn/yvA=
-X-Google-Smtp-Source: ABdhPJzTky0CXdrII5RNjyQSvU6YcmYbOn1mgrM9buvP6zTC9hvCzfaSy39VP/cXdne/ieUpx37pMA==
-X-Received: by 2002:a5d:404b:0:b0:1f1:f880:7aca with SMTP id w11-20020a5d404b000000b001f1f8807acamr11488947wrp.179.1646831575243;
-        Wed, 09 Mar 2022 05:12:55 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id b15-20020adfc74f000000b001e888b871a0sm1697959wrh.87.2022.03.09.05.12.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Mar 2022 05:12:54 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <a235df4f-ba06-1b01-c588-06f12d8341b7@redhat.com>
-Date:   Wed, 9 Mar 2022 14:12:52 +0100
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=BliLg0I6GQNRm+9J6hpahlGPKM+LjQC7zR5fB3dy6N4=;
+        b=HDhY5ylbGQIz6uBdEn9wZ1jjdkbRssZoEL6vZl5zAYY3+YolEVpDcKOgnfAEtvt+uA
+         lg2L0NYYIqqiRidHZvUL/WGH63q7JTT9XQAbrayGMXhaGz91FIjz1y14Cd+1OwKKd0sy
+         NGW5rg3YqVd8f0qo2ipjE5j0Tpgrmi8B56Nq3GIerXAOOREmrSkpsTmzJWG7sFY5tjn0
+         dxRBKgWbCtcrqnd+taKMx6dTSg5Rz8bpCkQk4NwdcmEAGSG3wc+XTz89xO7PeL32PKAN
+         IJLlDWpPrRrvhyqpywaHHwU+1m63ApxIb8FHaTVgZ8naOKjIxmc1UZZuI6a/hyJm6eG+
+         qTiw==
+X-Gm-Message-State: AOAM5327R77LKc+RtocKDGjqHnhWbHGdkB450WDQRfkxv2P7M3fylbwA
+        wNsvrAGPemwrv41SGW+C5449/g==
+X-Google-Smtp-Source: ABdhPJy6Ezoo4W6okv8p87oIH7rEzQH9aygXBsxBxyyFfnnJlFvTzi2RoniKpWpIJ7wdbZmKjwwDWQ==
+X-Received: by 2002:adf:f74b:0:b0:203:7515:3be4 with SMTP id z11-20020adff74b000000b0020375153be4mr3106263wrp.610.1646832054693;
+        Wed, 09 Mar 2022 05:20:54 -0800 (PST)
+Received: from google.com (203.75.199.104.bc.googleusercontent.com. [104.199.75.203])
+        by smtp.gmail.com with ESMTPSA id r187-20020a1c44c4000000b0038377fb18f8sm2606152wma.5.2022.03.09.05.20.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Mar 2022 05:20:54 -0800 (PST)
+Date:   Wed, 9 Mar 2022 13:20:52 +0000
+From:   Sebastian Ene <sebastianene@google.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     kvm@vger.kernel.org, qperret@google.com, will@kernel.org,
+        julien.thierry.kdev@gmail.com, maz@kernel.org
+Subject: Re: [PATCH kvmtool v9 2/3] aarch64: Add stolen time support
+Message-ID: <YiiptPk6hkeGqqXk@google.com>
+References: <20220308153227.2238533-1-sebastianene@google.com>
+ <20220308153227.2238533-3-sebastianene@google.com>
+ <YiilEbM1wVPsH7vB@monolith.localdoman>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH v3 4/7] KVM: x86: nSVM: support PAUSE filter threshold and
- count when cpu_pm=on
-Content-Language: en-US
-To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
-Cc:     Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Jim Mattson <jmattson@google.com>, x86@kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
-        Wanpeng Li <wanpengli@tencent.com>
-References: <20220301143650.143749-1-mlevitsk@redhat.com>
- <20220301143650.143749-5-mlevitsk@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220301143650.143749-5-mlevitsk@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YiilEbM1wVPsH7vB@monolith.localdoman>
+X-Spam-Status: No, score=-15.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,URI_DOTEDU,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/1/22 15:36, Maxim Levitsky wrote:
-> Allow L1 to use these settings if L0 disables PAUSE interception
-> (AKA cpu_pm=on)
+On Wed, Mar 09, 2022 at 01:02:54PM +0000, Alexandru Elisei wrote:
+> Hi,
+>
+
+Hi,
+
+> On Tue, Mar 08, 2022 at 03:32:29PM +0000, Sebastian Ene wrote:
+> > This patch adds support for stolen time by sharing a memory region
+> > with the guest which will be used by the hypervisor to store the stolen
+> > time information. Reserve a 64kb MMIO memory region after the RTC peripheral
+> > to be used by pvtime. The exact format of the structure stored by the
+> > hypervisor is described in the ARM DEN0057A document.
+> > 
+> > Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> > ---
+> >  Makefile                               |  1 +
+> >  arm/aarch32/include/kvm/kvm-cpu-arch.h |  5 ++
+> >  arm/aarch64/arm-cpu.c                  |  2 +-
+> >  arm/aarch64/include/kvm/kvm-cpu-arch.h |  2 +
+> >  arm/aarch64/pvtime.c                   | 96 ++++++++++++++++++++++++++
+> >  arm/include/arm-common/kvm-arch.h      |  6 +-
+> >  arm/kvm-cpu.c                          |  1 +
+> >  include/kvm/kvm-config.h               |  1 +
+> >  8 files changed, 112 insertions(+), 2 deletions(-)
+> >  create mode 100644 arm/aarch64/pvtime.c
+> > 
+> > diff --git a/Makefile b/Makefile
+> > index f251147..e9121dc 100644
+> > --- a/Makefile
+> > +++ b/Makefile
+> > @@ -182,6 +182,7 @@ ifeq ($(ARCH), arm64)
+> >  	OBJS		+= arm/aarch64/arm-cpu.o
+> >  	OBJS		+= arm/aarch64/kvm-cpu.o
+> >  	OBJS		+= arm/aarch64/kvm.o
+> > +	OBJS		+= arm/aarch64/pvtime.o
+> >  	ARCH_INCLUDE	:= $(HDRS_ARM_COMMON)
+> >  	ARCH_INCLUDE	+= -Iarm/aarch64/include
+> >  
+> > diff --git a/arm/aarch32/include/kvm/kvm-cpu-arch.h b/arm/aarch32/include/kvm/kvm-cpu-arch.h
+> > index 780e0e2..6fe0206 100644
+> > --- a/arm/aarch32/include/kvm/kvm-cpu-arch.h
+> > +++ b/arm/aarch32/include/kvm/kvm-cpu-arch.h
+> > @@ -20,4 +20,9 @@ static inline int kvm_cpu__configure_features(struct kvm_cpu *vcpu)
+> >  	return 0;
+> >  }
+> >  
+> > +static inline int kvm_cpu__teardown_pvtime(struct kvm *kvm)
+> > +{
+> > +	return 0;
+> > +}
+> > +
+> >  #endif /* KVM__KVM_CPU_ARCH_H */
+> > diff --git a/arm/aarch64/arm-cpu.c b/arm/aarch64/arm-cpu.c
+> > index d7572b7..7e4a3c1 100644
+> > --- a/arm/aarch64/arm-cpu.c
+> > +++ b/arm/aarch64/arm-cpu.c
+> > @@ -22,7 +22,7 @@ static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
+> >  static int arm_cpu__vcpu_init(struct kvm_cpu *vcpu)
+> >  {
+> >  	vcpu->generate_fdt_nodes = generate_fdt_nodes;
+> > -	return 0;
+> > +	return kvm_cpu__setup_pvtime(vcpu);
+> >  }
+> >  
+> >  static struct kvm_arm_target target_generic_v8 = {
+> > diff --git a/arm/aarch64/include/kvm/kvm-cpu-arch.h b/arm/aarch64/include/kvm/kvm-cpu-arch.h
+> > index 8dfb82e..35996dc 100644
+> > --- a/arm/aarch64/include/kvm/kvm-cpu-arch.h
+> > +++ b/arm/aarch64/include/kvm/kvm-cpu-arch.h
+> > @@ -19,5 +19,7 @@
+> >  
+> >  void kvm_cpu__select_features(struct kvm *kvm, struct kvm_vcpu_init *init);
+> >  int kvm_cpu__configure_features(struct kvm_cpu *vcpu);
+> > +int kvm_cpu__setup_pvtime(struct kvm_cpu *vcpu);
+> > +int kvm_cpu__teardown_pvtime(struct kvm *kvm);
+> >  
+> >  #endif /* KVM__KVM_CPU_ARCH_H */
+> > diff --git a/arm/aarch64/pvtime.c b/arm/aarch64/pvtime.c
+> > new file mode 100644
+> > index 0000000..a45f0ea
+> > --- /dev/null
+> > +++ b/arm/aarch64/pvtime.c
+> > @@ -0,0 +1,96 @@
+> > +#include "kvm/kvm.h"
+> > +#include "kvm/kvm-cpu.h"
+> > +#include "kvm/util.h"
+> > +
+> > +#include <linux/byteorder.h>
+> > +#include <linux/types.h>
+> > +
+> > +#define ARM_PVTIME_STRUCT_SIZE		(64)
+> > +
+> > +static void *usr_mem;
+> > +
+> > +static int pvtime__alloc_region(struct kvm *kvm)
+> > +{
+> > +	char *mem;
+> > +	int ret = 0;
+> > +
+> > +	mem = mmap(NULL, ARM_PVTIME_BASE, PROT_RW,
+> > +		   MAP_ANON_NORESERVE, -1, 0);
+> > +	if (mem == MAP_FAILED)
+> > +		return -errno;
+> > +
+> > +	ret = kvm__register_ram(kvm, ARM_PVTIME_BASE,
+> > +				ARM_PVTIME_BASE, mem);
+> > +	if (ret) {
+> > +		munmap(mem, ARM_PVTIME_BASE);
+> > +		return ret;
+> > +	}
+> > +
+> > +	usr_mem = mem;
+> > +	return ret;
+> > +}
+> > +
+> > +static int pvtime__teardown_region(struct kvm *kvm)
+> > +{
+> > +	if (usr_mem == NULL)
+> > +		return 0;
+> > +
+> > +	kvm__destroy_mem(kvm, ARM_PVTIME_BASE,
+> > +			 ARM_PVTIME_BASE, usr_mem);
+> > +	munmap(usr_mem, ARM_PVTIME_BASE);
+> > +	usr_mem = NULL;
+> > +	return 0;
+> > +}
+> > +
+> > +int kvm_cpu__setup_pvtime(struct kvm_cpu *vcpu)
+> > +{
+> > +	int ret;
+> > +	bool has_stolen_time;
+> > +	u64 pvtime_guest_addr = ARM_PVTIME_BASE + vcpu->cpu_id *
+> > +		ARM_PVTIME_STRUCT_SIZE;
+> > +	struct kvm_config *kvm_cfg = NULL;
+> > +	struct kvm_device_attr pvtime_attr = (struct kvm_device_attr) {
+> > +		.group	= KVM_ARM_VCPU_PVTIME_CTRL,
+> > +		.addr	= KVM_ARM_VCPU_PVTIME_IPA
 > 
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> ---
->   arch/x86/kvm/svm/nested.c |  6 ++++++
->   arch/x86/kvm/svm/svm.c    | 17 +++++++++++++++++
->   arch/x86/kvm/svm/svm.h    |  2 ++
->   3 files changed, 25 insertions(+)
+> As far as I can tell, that should be the attr field, not addr. It has been
+> been working so far because attr will be set to 0 by the initializer and
+> KVM_ARM_VCPU_PVTIME_IPA is defined as 0 by the kernel API.
 > 
-> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> index 37510cb206190..4cb0bc49986d5 100644
-> --- a/arch/x86/kvm/svm/nested.c
-> +++ b/arch/x86/kvm/svm/nested.c
-> @@ -664,6 +664,12 @@ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm)
->   	if (!nested_vmcb_needs_vls_intercept(svm))
->   		svm->vmcb->control.virt_ext |= VIRTUAL_VMLOAD_VMSAVE_ENABLE_MASK;
->   
-> +	if (svm->pause_filter_enabled)
-> +		svm->vmcb->control.pause_filter_count = svm->nested.ctl.pause_filter_count;
-> +
-> +	if (svm->pause_threshold_enabled)
-> +		svm->vmcb->control.pause_filter_thresh = svm->nested.ctl.pause_filter_thresh;
 
-I think this should be
+Ack, good catch ! I will update this to use the 'attr' field.
 
-	if (kvm_pause_in_guest(vcpu->kvm)) {
-		/* copy from VMCB12 if guest has CPUID, else set to 0 */
-	} else {
-		/* copy from VMCB01, unconditionally */
-	}
+> Thanks,
+> Alex
 
-and likewise it should be copied back to VMCB01 unconditionally on 
-vmexit if !kvm_pause_in_guest(vcpu->kvm).
-
->   	nested_svm_transition_tlb_flush(vcpu);
->   
->   	/* Enter Guest-Mode */
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 6a571eed32ef4..52198e63c5fc4 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -4008,6 +4008,17 @@ static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
->   
->   	svm->v_vmload_vmsave_enabled = vls && guest_cpuid_has(vcpu, X86_FEATURE_V_VMSAVE_VMLOAD);
->   
-> +	if (kvm_pause_in_guest(vcpu->kvm)) {
-> +		svm->pause_filter_enabled = pause_filter_count > 0 &&
-> +					    guest_cpuid_has(vcpu, X86_FEATURE_PAUSEFILTER);
-> +
-> +		svm->pause_threshold_enabled = pause_filter_thresh > 0 &&
-> +					    guest_cpuid_has(vcpu, X86_FEATURE_PFTHRESHOLD);
-
-Why only if the module parameters are >0?  The module parameter is 
-unused if pause-in-guest is active.
-
-> +	} else {
-> +		svm->pause_filter_enabled = false;
-> +		svm->pause_threshold_enabled = false;
-> +	}
-> +
->   	svm_recalc_instruction_intercepts(vcpu, svm);
->   
->   	/* For sev guests, the memory encryption bit is not reserved in CR3.  */
-> @@ -4763,6 +4774,12 @@ static __init void svm_set_cpu_caps(void)
->   		if (vls)
->   			kvm_cpu_cap_set(X86_FEATURE_V_VMSAVE_VMLOAD);
->   
-> +		if (pause_filter_count)
-> +			kvm_cpu_cap_set(X86_FEATURE_PAUSEFILTER);
-> +
-> +		if (pause_filter_thresh)
-> +			kvm_cpu_cap_set(X86_FEATURE_PFTHRESHOLD);
-
-Likewise, this should be set using just boot_cpu_has, not the module 
-parameters.
-
-Paolo
-
->   		/* Nested VM can receive #VMEXIT instead of triggering #GP */
->   		kvm_cpu_cap_set(X86_FEATURE_SVME_ADDR_CHK);
->   	}
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index a3c93f9c02847..6fa81eb3ffb78 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -234,6 +234,8 @@ struct vcpu_svm {
->   	bool tsc_scaling_enabled          : 1;
->   	bool lbrv_enabled                 : 1;
->   	bool v_vmload_vmsave_enabled      : 1;
-> +	bool pause_filter_enabled         : 1;
-> +	bool pause_threshold_enabled      : 1;
->   
->   	u32 ldr_reg;
->   	u32 dfr_reg;
-
+Cheers,
+Sebastian 
+> 
+> > +	};
+> > +
+> > +	kvm_cfg = &vcpu->kvm->cfg;
+> > +	if (kvm_cfg->no_pvtime)
+> > +		return 0;
+> > +
+> > +	has_stolen_time = kvm__supports_extension(vcpu->kvm,
+> > +						  KVM_CAP_STEAL_TIME);
+> > +	if (!has_stolen_time) {
+> > +		kvm_cfg->no_pvtime = true;
+> > +		return 0;
+> > +	}
+> > +
+> > +	ret = ioctl(vcpu->vcpu_fd, KVM_HAS_DEVICE_ATTR, &pvtime_attr);
+> > +	if (ret) {
+> > +		perror("KVM_HAS_DEVICE_ATTR failed\n");
+> > +		goto out_err;
+> > +	}
+> > +
+> > +	if (!usr_mem) {
+> > +		ret = pvtime__alloc_region(vcpu->kvm);
+> > +		if (ret) {
+> > +			perror("Failed allocating pvtime region\n");
+> > +			goto out_err;
+> > +		}
+> > +	}
+> > +
+> > +	pvtime_attr.addr = (u64)&pvtime_guest_addr;
+> > +	ret = ioctl(vcpu->vcpu_fd, KVM_SET_DEVICE_ATTR, &pvtime_attr);
+> > +	if (!ret)
+> > +		return 0;
+> > +
+> > +	perror("KVM_SET_DEVICE_ATTR failed\n");
+> > +	pvtime__teardown_region(vcpu->kvm);
+> > +out_err:
+> > +	return ret;
+> > +}
+> > +
+> > +int kvm_cpu__teardown_pvtime(struct kvm *kvm)
+> > +{
+> > +	return pvtime__teardown_region(kvm);
+> > +}
+> > diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
+> > index c645ac0..43b1f77 100644
+> > --- a/arm/include/arm-common/kvm-arch.h
+> > +++ b/arm/include/arm-common/kvm-arch.h
+> > @@ -15,7 +15,8 @@
+> >   * |  PCI  |////| plat  |       |        |     |         |
+> >   * |  I/O  |////| MMIO: | Flash | virtio | GIC |   PCI   |  DRAM
+> >   * | space |////| UART, |       |  MMIO  |     |  (AXI)  |
+> > - * |       |////| RTC   |       |        |     |         |
+> > + * |       |////| RTC,  |       |        |     |         |
+> > + * |       |////| PVTIME|       |        |     |         |
+> >   * +-------+----+-------+-------+--------+-----+---------+---......
+> >   */
+> >  
+> > @@ -34,6 +35,9 @@
+> >  #define ARM_RTC_MMIO_BASE	(ARM_UART_MMIO_BASE + ARM_UART_MMIO_SIZE)
+> >  #define ARM_RTC_MMIO_SIZE	0x10000
+> >  
+> > +#define ARM_PVTIME_BASE		(ARM_RTC_MMIO_BASE + ARM_RTC_MMIO_SIZE)
+> > +#define ARM_PVTIME_SIZE		SZ_64K
+> > +
+> >  #define KVM_FLASH_MMIO_BASE	(ARM_MMIO_AREA + 0x1000000)
+> >  #define KVM_FLASH_MAX_SIZE	0x1000000
+> >  
+> > diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
+> > index 84ac1e9..00660d6 100644
+> > --- a/arm/kvm-cpu.c
+> > +++ b/arm/kvm-cpu.c
+> > @@ -144,6 +144,7 @@ void kvm_cpu__arch_nmi(struct kvm_cpu *cpu)
+> >  
+> >  void kvm_cpu__delete(struct kvm_cpu *vcpu)
+> >  {
+> > +	kvm_cpu__teardown_pvtime(vcpu->kvm);
+> >  	free(vcpu);
+> >  }
+> >  
+> > diff --git a/include/kvm/kvm-config.h b/include/kvm/kvm-config.h
+> > index 6a5720c..48adf27 100644
+> > --- a/include/kvm/kvm-config.h
+> > +++ b/include/kvm/kvm-config.h
+> > @@ -62,6 +62,7 @@ struct kvm_config {
+> >  	bool no_dhcp;
+> >  	bool ioport_debug;
+> >  	bool mmio_debug;
+> > +	bool no_pvtime;
+> >  };
+> >  
+> >  #endif
+> > -- 
+> > 2.35.1.616.g0bdcbb4464-goog
+> > 
+> > _______________________________________________
+> > kvmarm mailing list
+> > kvmarm@lists.cs.columbia.edu
+> > https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
