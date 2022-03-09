@@ -2,66 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AC3694D2ADA
-	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 09:47:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2BE274D2AE1
+	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 09:48:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231463AbiCIIsg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Mar 2022 03:48:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35220 "EHLO
+        id S231494AbiCIItp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Mar 2022 03:49:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229525AbiCIIse (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Mar 2022 03:48:34 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6BB926438
-        for <kvm@vger.kernel.org>; Wed,  9 Mar 2022 00:47:33 -0800 (PST)
+        with ESMTP id S231473AbiCIItn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Mar 2022 03:49:43 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4F3AE127572
+        for <kvm@vger.kernel.org>; Wed,  9 Mar 2022 00:48:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646815652;
+        s=mimecast20190719; t=1646815724;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=9ffS413S/InwxV5O0x2uo8HI1Zzb6CIePH7gzRiVJ4s=;
-        b=Rwu3uEKXiY3vULpMLR0RIcM/P/wSI4F1NJkTUIWktGlJU9Eq3ESjd4L3dsZfrDYzMFMEuN
-        WSfhYG63Qw8+iDjrwvNPVNglT7dr36vvxpvvWk+Id7csxdHqd6zzDHe9yuyoEE1QBCzq3G
-        CVOFoQNo3X1fRk4PA40/BpLQXE0EbeU=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=TO8OA67xOJIVUQ+IzXv9BnLhNmwQiU+fyDz+FkJQweU=;
+        b=g5J+PGEoU/CPiFQ80HiaO3LHPUvF/NcUe/FU+FPmJYM6JMXfekzHECII3e4ktuc9CgYvGt
+        WgYjxFAaDpKiTFdY4joYX8Hu/wqPGAQOVHE9nBnapdtO2cIMd10dS79CcY8kuIb5jpOBmF
+        DoqERkWb7oUJqrBcT8ZmO6i1gnrVIyI=
+Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
+ [209.85.210.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-135-khmMUqfuOgWTtX59OXwIeQ-1; Wed, 09 Mar 2022 03:47:31 -0500
-X-MC-Unique: khmMUqfuOgWTtX59OXwIeQ-1
-Received: by mail-pj1-f70.google.com with SMTP id mm2-20020a17090b358200b001bf529127dfso1177497pjb.6
-        for <kvm@vger.kernel.org>; Wed, 09 Mar 2022 00:47:30 -0800 (PST)
+ us-mta-270-qTbARLJpM1iJ_k53PdpvkA-1; Wed, 09 Mar 2022 03:48:43 -0500
+X-MC-Unique: qTbARLJpM1iJ_k53PdpvkA-1
+Received: by mail-pf1-f200.google.com with SMTP id m22-20020a628c16000000b004f6f1b43114so1193016pfd.3
+        for <kvm@vger.kernel.org>; Wed, 09 Mar 2022 00:48:43 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=9ffS413S/InwxV5O0x2uo8HI1Zzb6CIePH7gzRiVJ4s=;
-        b=TDG2Iz4U9+K/H3caZyz6ruaBt2J7BfuzRJioKICAe0eg8Jjj7nf7HpU6uok25ZwmAd
-         ec4+3touH20YS5HBCZr9D/PvFr4b2OAvvPkORITzxgrlIrvtEE3WGEBEvkmThyr7O3A7
-         8aq5UIIcI7e2DCRV+HDxcCRADBLXI/Bqj/Kkr0iK30EfCK/d7t1Vla6JVx70dJWLjXXc
-         QH2TN0K81fAv3O6FoiyaCoJbUFq+PsdYXIPW41fZGZdiIE7yg7da+DgzJD9elcphHO1/
-         +w7Bo/1fI5hGO+Ffa+Ny+LFrXYyHARRh9R8gnNBRUZ6EyZt8liQ3yU3y5bFE7JzIuSMp
-         bbAw==
-X-Gm-Message-State: AOAM533mi8ypDkNRHwWcxk7FYI7XcQrYRWjHr+zud+Pjy08c9FbfFC3N
-        hgEOanElsEJ5AStF4aQmTlTlRKqqdK6xDMOdZe+n3Yph/YComr3vHxFhqYsAZ1LlDCsE2CuOvO7
-        veuf1f3G/6Ag0
-X-Received: by 2002:a63:4756:0:b0:373:e14b:5848 with SMTP id w22-20020a634756000000b00373e14b5848mr17589444pgk.337.1646815649955;
-        Wed, 09 Mar 2022 00:47:29 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJy8AxlCNXVWTVj7iH9SvFqBnT+ALE8NBgyTqiezfIt6S/mnWP42+w8t2ODBwFju+xJKaGATOA==
-X-Received: by 2002:a63:4756:0:b0:373:e14b:5848 with SMTP id w22-20020a634756000000b00373e14b5848mr17589411pgk.337.1646815649649;
-        Wed, 09 Mar 2022 00:47:29 -0800 (PST)
+        bh=TO8OA67xOJIVUQ+IzXv9BnLhNmwQiU+fyDz+FkJQweU=;
+        b=2DMinfihCHABkNT2FK+L4GSth1F6+ldkBRp/U/k9Xjjm/cx7EwNrX3SZ2JTRAy6U0b
+         liGfF2j3TO4i9FZ8MKikeK4qSwKvM7dIXqFkx3Orp8+mxjfMk7aMNVSZj2RaQTQwTPj2
+         fda88sPnpTj8MM8LZylRUONoCduAcQgVmzTczRHEfQ1Ol3R06vL/odkg1n0kapnaXigL
+         Ttk1BM+fVwLROMGEoFWVpCbh1JZU3QijvEhN+qop54X6KN+WUOvBROmbMJSAHILUPfMw
+         UTSK1MigzdEv88NJTIIdk3ezlYhGZ3LriZaGx4Yss3QjUyIy+5VXuVbQl8WlqrdMmMbF
+         Y7pQ==
+X-Gm-Message-State: AOAM531Qc/18oIYBi1PZATER8KYAcZa01SFi3gGwrEpYufhmqkXo21lc
+        dT7kISVoRWjby0LLHzKH03qh4qFcyGGy8sZs4xtfMhpLoeujbNCMTpGKdvVh6EsbSnj8Iwx6AGS
+        0QP7yxoGwtZEj
+X-Received: by 2002:aa7:8882:0:b0:4df:7b9e:1ccb with SMTP id z2-20020aa78882000000b004df7b9e1ccbmr22312161pfe.41.1646815722241;
+        Wed, 09 Mar 2022 00:48:42 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJy7/YbZyXIgHV6hqpeiO7757QCskmbcneG6gJIkE8+QzhmuMcmfZenCb/AE2A7PcyT+4y4qLw==
+X-Received: by 2002:aa7:8882:0:b0:4df:7b9e:1ccb with SMTP id z2-20020aa78882000000b004df7b9e1ccbmr22312131pfe.41.1646815721958;
+        Wed, 09 Mar 2022 00:48:41 -0800 (PST)
 Received: from [10.72.12.183] ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id l17-20020a637011000000b0037d5eac87e3sm1577760pgc.18.2022.03.09.00.47.16
+        by smtp.gmail.com with ESMTPSA id 142-20020a621894000000b004dfc714b076sm2024468pfy.11.2022.03.09.00.48.30
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Mar 2022 00:47:29 -0800 (PST)
-Message-ID: <a3782384-c7e5-b0b3-6529-3aa3b8b589de@redhat.com>
-Date:   Wed, 9 Mar 2022 16:47:11 +0800
+        Wed, 09 Mar 2022 00:48:41 -0800 (PST)
+Message-ID: <fda406d7-3ed9-7c62-0f26-4058a63e73a9@redhat.com>
+Date:   Wed, 9 Mar 2022 16:48:28 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
  Gecko/20100101 Thunderbird/91.6.1
-Subject: Re: [PATCH v7 13/26] virtio: queue_reset: struct virtio_config_ops
- add callbacks for queue_reset
+Subject: Re: [PATCH v7 14/26] virtio: add helper for queue reset
 Content-Language: en-US
 To:     Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
         virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
@@ -92,9 +91,9 @@ Cc:     Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>,
         linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
         kvm@vger.kernel.org, bpf@vger.kernel.org
 References: <20220308123518.33800-1-xuanzhuo@linux.alibaba.com>
- <20220308123518.33800-14-xuanzhuo@linux.alibaba.com>
+ <20220308123518.33800-15-xuanzhuo@linux.alibaba.com>
 From:   Jason Wang <jasowang@redhat.com>
-In-Reply-To: <20220308123518.33800-14-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <20220308123518.33800-15-xuanzhuo@linux.alibaba.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -110,58 +109,76 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 在 2022/3/8 下午8:35, Xuan Zhuo 写道:
-> Performing reset on a queue is divided into four steps:
+> Add helper for virtio queue reset.
 >
->   1. reset_vq()                     - notify the device to reset the queue
->   2. virtqueue_detach_unused_buf()  - recycle the buffer submitted
->   3. virtqueue_reset_vring()        - reset the vring (may re-alloc)
->   4. enable_reset_vq()              - mmap vring to device, and enable the queue
->
-> So add two callbacks reset_vq, enable_reset_vq to struct
-> virtio_config_ops.
+> * virtio_reset_vq(): reset a queue individually
+> * virtio_enable_resetq(): enable a reset queue
 >
 > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 > ---
->   include/linux/virtio_config.h | 11 +++++++++++
->   1 file changed, 11 insertions(+)
+>   include/linux/virtio_config.h | 40 +++++++++++++++++++++++++++++++++++
+>   1 file changed, 40 insertions(+)
 >
 > diff --git a/include/linux/virtio_config.h b/include/linux/virtio_config.h
-> index 4d107ad31149..d51906b1389f 100644
+> index d51906b1389f..0b81fbe17c85 100644
 > --- a/include/linux/virtio_config.h
 > +++ b/include/linux/virtio_config.h
-> @@ -74,6 +74,15 @@ struct virtio_shm_region {
->    * @set_vq_affinity: set the affinity for a virtqueue (optional).
->    * @get_vq_affinity: get the affinity for a virtqueue (optional).
->    * @get_shm_region: get a shared memory region based on the index.
-> + * @reset_vq: reset a queue individually (optional).
-> + *	vq: the virtqueue
-> + *	Returns 0 on success or error status
-> + *	Caller should guarantee that the vring is not accessed by any functions
-> + *	of virtqueue.
+> @@ -230,6 +230,46 @@ int virtio_find_vqs_ctx(struct virtio_device *vdev, unsigned nvqs,
+>   				      desc);
+>   }
+>   
+> +/**
+> + * virtio_reset_vq - reset a queue individually
+> + * @vq: the virtqueue
+> + *
+> + * returns 0 on success or error status
+> + *
+> + * The api process of reset under normal circumstances:
+> + *	1. virtio_reset_vq()              - notify the device to reset the queue
+> + *	2. virtqueue_detach_unused_buf()  - recycle the buffer submitted
+> + *	3. virtqueue_reset_vring()        - reset the vring (may re-alloc)
+> + *	4. virtio_enable_resetq()         - mmap vring to device, and enable the queue
+> + *
+> + * Caller should guarantee that the vring is not accessed by any functions
+> + * of virtqueue.
+> + */
+> +static inline
+> +int virtio_reset_vq(struct virtqueue *vq)
+> +{
 
 
-We probably need to be more accurate here:
+It looks to me the prefix "virtio" is used for the device specific 
+operations.
 
-1) reset_vq will guarantee that the callbacks are disabled or synchronized
-2) except for the callback, the caller should guarantee ...
+I wonder if it's better to rename this as virtqueue_reste() and move it 
+to virtio_ring.c?
 
 Thanks
 
 
-> + * @enable_reset_vq: enable a reset queue
-> + *	vq: the virtqueue
-> + *	Returns 0 on success or error status
-> + *	If reset_vq is set, then enable_reset_vq must also be set.
->    */
->   typedef void vq_callback_t(struct virtqueue *);
->   struct virtio_config_ops {
-> @@ -100,6 +109,8 @@ struct virtio_config_ops {
->   			int index);
->   	bool (*get_shm_region)(struct virtio_device *vdev,
->   			       struct virtio_shm_region *region, u8 id);
-> +	int (*reset_vq)(struct virtqueue *vq);
-> +	int (*enable_reset_vq)(struct virtqueue *vq);
->   };
->   
->   /* If driver didn't advertise the feature, it will never appear. */
+> +	if (!vq->vdev->config->reset_vq)
+> +		return -ENOENT;
+> +
+> +	return vq->vdev->config->reset_vq(vq);
+> +}
+> +
+> +/**
+> + * virtio_enable_resetq - enable a reset queue
+> + * @vq: the virtqueue
+> + *
+> + * returns 0 on success or error status
+> + *
+> + */
+> +static inline
+> +int virtio_enable_resetq(struct virtqueue *vq)
+> +{
+> +	if (!vq->vdev->config->enable_reset_vq)
+> +		return -ENOENT;
+> +
+> +	return vq->vdev->config->enable_reset_vq(vq);
+> +}
+> +
+>   /**
+>    * virtio_device_ready - enable vq use in probe function
+>    * @vdev: the device
 
