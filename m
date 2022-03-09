@@ -2,94 +2,332 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2FD524D2CA4
-	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 10:59:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 60C434D2CED
+	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 11:15:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232360AbiCIJ76 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Mar 2022 04:59:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51264 "EHLO
+        id S229892AbiCIKQW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Mar 2022 05:16:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231266AbiCIJ74 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Mar 2022 04:59:56 -0500
-Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16A19129BB7;
-        Wed,  9 Mar 2022 01:58:58 -0800 (PST)
-Received: by mail-ed1-x532.google.com with SMTP id t1so1907682edc.3;
-        Wed, 09 Mar 2022 01:58:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=WvBJ1bCYmOpUz9sA2X7ttEKRPJ5e2lRH183jSE/0mtI=;
-        b=D49GbhhMWElAvxVZqt+JI2yYnMree6VqtRkg2bg8NFou0W4gSTHSN1CPz+VECruU/M
-         ZdojhZRGosAacK3OO0KLYjg4QM3U6dDHy9xk+odQsb/rDpDO0PFO7qz6EL6WfVs5uU0X
-         d1FiVaCBGu84e6cPqImY37dxrixcVJnLVX8HgFdYYwHamMbeQLEI/13j4hJSjDIh4mLc
-         npkKBZSdjXZs8dxVz7Uf0gW0Wchx7gO+e70LZnLM1gSRQR5W521GWuNwRW8JLUsAndtb
-         wuHQJUNbHdDe5Qjv+n81SyZReygB5eMJZdMU4+1nNrvMBrEB3N2VnOP0iwnG0IqdgPSz
-         Tbnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=WvBJ1bCYmOpUz9sA2X7ttEKRPJ5e2lRH183jSE/0mtI=;
-        b=aLV+C/OZTzTJlcvOxcDgkZ49mpmSEvJA8hw1o2dpV2wepVaK0S1Lzv8VD6bzFYxaMu
-         N+A0nAF/Ceix6+mmw4bqm3jW49ZM/n6VRXKhEYN9I1hKawSb7UQ1H3fBuK9JNhapoiic
-         kwwg5o+mamncoKJ/dHBPk9/TYvpF6NKyIP2i7prk4vCn+pdFn2B0tgmuEt5VfLA4ZuKF
-         avyfq+M8+jSsIJrLxSGusgOoJ7fDm4V9X25RLqcq6177UFHMMksIV9oB6IWhmfMqVZ77
-         /gIGrZO1cJ0p3V9tD0AFzu8LVJlsR8JR0R7zE12+InUihQG0AicLIMs8lwp4JThOAq4t
-         g+SA==
-X-Gm-Message-State: AOAM5328X69Y/d/gK9mtOC5TPuxpyRCgqPfPho8os5pjvWFUSPUXGi/F
-        cqj2evXl/1LgRd0pWPC+3pw=
-X-Google-Smtp-Source: ABdhPJw+njvmNggCfx5Yl4DtOUfmT/TZk9Zj9sdzyD2ye1Lh3M2PohyXgqqXuiVm1pN3S/h80TZSQw==
-X-Received: by 2002:a05:6402:3582:b0:416:6413:d2ae with SMTP id y2-20020a056402358200b004166413d2aemr9704298edc.192.1646819936447;
-        Wed, 09 Mar 2022 01:58:56 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id k19-20020a1709067ad300b006da92735c32sm544940ejo.16.2022.03.09.01.58.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Mar 2022 01:58:55 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <175b89f0-14a6-2309-041f-69314d9f191a@redhat.com>
-Date:   Wed, 9 Mar 2022 10:58:54 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH v2 08/25] KVM: x86/mmu: split cpu_mode from mmu_role
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        dmatlack@google.com
-References: <20220221162243.683208-1-pbonzini@redhat.com>
- <20220221162243.683208-9-pbonzini@redhat.com> <YiemuYKEFjqFvDlL@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YiemuYKEFjqFvDlL@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
-        autolearn_force=no version=3.4.6
+        with ESMTP id S229455AbiCIKQU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Mar 2022 05:16:20 -0500
+Received: from out30-54.freemail.mail.aliyun.com (out30-54.freemail.mail.aliyun.com [115.124.30.54])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFEFF16A59F;
+        Wed,  9 Mar 2022 02:15:19 -0800 (PST)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04394;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=33;SR=0;TI=SMTPD_---0V6jAw-c_1646820913;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0V6jAw-c_1646820913)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Wed, 09 Mar 2022 18:15:14 +0800
+Message-ID: <1646820327.1766295-14-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH v7 24/26] virtio_net: support rx/tx queue reset
+Date:   Wed, 9 Mar 2022 18:05:27 +0800
+From:   Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Mark Gross <markgross@kernel.org>,
+        Vadim Pasternak <vadimp@nvidia.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Johannes Berg <johannes.berg@intel.com>,
+        Vincent Whitchurch <vincent.whitchurch@axis.com>,
+        linux-um@lists.infradead.org, platform-driver-x86@vger.kernel.org,
+        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, bpf@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+References: <20220308123518.33800-1-xuanzhuo@linux.alibaba.com>
+ <20220308123518.33800-25-xuanzhuo@linux.alibaba.com>
+ <7ff78ff8-bdd0-bb5e-1cea-cf1126226feb@redhat.com>
+In-Reply-To: <7ff78ff8-bdd0-bb5e-1cea-cf1126226feb@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/8/22 19:55, Sean Christopherson wrote:
->>   static void shadow_mmu_init_context(struct kvm_vcpu *vcpu, struct kvm_mmu *context,
->> -				    const struct kvm_mmu_role_regs *regs,
->> -				    union kvm_mmu_role new_role)
->> +				    union kvm_mmu_role cpu_mode,
-> Can you give all helpers this treatment (rename "role" => "cpu_mode")?  I got
-> tripped up a few times reading patches because the ones where it wasn't necessary,
-> i.e. where there's only a single kvm_mmu_role paramenter, were left as-is.
-> 
-> I think kvm_calc_shadow_npt_root_page_role() and kvm_calc_shadow_mmu_root_page_role()
-> are the only offenders.
+On Wed, 9 Mar 2022 17:14:34 +0800, Jason Wang <jasowang@redhat.com> wrote:
+>
+> =E5=9C=A8 2022/3/8 =E4=B8=8B=E5=8D=888:35, Xuan Zhuo =E5=86=99=E9=81=93:
+> > This patch implements the reset function of the rx, tx queues.
+> >
+> > Based on this function, it is possible to modify the ring num of the
+> > queue. And quickly recycle the buffer in the queue.
+> >
+> > In the process of the queue disable, in theory, as long as virtio
+> > supports queue reset, there will be no exceptions.
+> >
+> > However, in the process of the queue enable, there may be exceptions du=
+e to
+> > memory allocation.  In this case, vq is not available, but we still have
+> > to execute napi_enable(). Because napi_disable is similar to a lock,
+> > napi_enable must be called after calling napi_disable.
+> >
+> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > ---
+> >   drivers/net/virtio_net.c | 107 +++++++++++++++++++++++++++++++++++++++
+> >   1 file changed, 107 insertions(+)
+> >
+> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> > index 409a8e180918..ffff323dcef0 100644
+> > --- a/drivers/net/virtio_net.c
+> > +++ b/drivers/net/virtio_net.c
+> > @@ -251,6 +251,11 @@ struct padded_vnet_hdr {
+> >   	char padding[4];
+> >   };
+> >
+> > +static void virtnet_sq_free_unused_bufs(struct virtnet_info *vi,
+> > +					struct send_queue *sq);
+> > +static void virtnet_rq_free_unused_bufs(struct virtnet_info *vi,
+> > +					struct receive_queue *rq);
+> > +
+> >   static bool is_xdp_frame(void *ptr)
+> >   {
+> >   	return (unsigned long)ptr & VIRTIO_XDP_FLAG;
+> > @@ -1369,6 +1374,9 @@ static void virtnet_napi_enable(struct virtqueue =
+*vq, struct napi_struct *napi)
+> >   {
+> >   	napi_enable(napi);
+> >
+> > +	if (vq->reset)
+> > +		return;
+> > +
+>
+>
+> Let's WARN_ONCE() here?
+>
+>
+> >   	/* If all buffers were filled by other side before we napi_enabled, =
+we
+> >   	 * won't get another interrupt, so process any outstanding packets n=
+ow.
+> >   	 * Call local_bh_enable after to trigger softIRQ processing.
+> > @@ -1413,6 +1421,10 @@ static void refill_work(struct work_struct *work)
+> >   		struct receive_queue *rq =3D &vi->rq[i];
+> >
+> >   		napi_disable(&rq->napi);
+> > +		if (rq->vq->reset) {
+> > +			virtnet_napi_enable(rq->vq, &rq->napi);
+> > +			continue;
+> > +		}
+>
+>
+> This seems racy and it's a hint that we need sync with the refill work
+> during reset like what we did in virtnet_close():
+>
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* Make sure refill_work does=
+n't re-enable napi! */
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cancel_delayed_work_sync(&vi-=
+>refill);
+>
+>
+> >   		still_empty =3D !try_fill_recv(vi, rq, GFP_KERNEL);
+> >   		virtnet_napi_enable(rq->vq, &rq->napi);
+> >
+> > @@ -1523,6 +1535,9 @@ static void virtnet_poll_cleantx(struct receive_q=
+ueue *rq)
+> >   	if (!sq->napi.weight || is_xdp_raw_buffer_queue(vi, index))
+> >   		return;
+> >
+> > +	if (sq->vq->reset)
+> > +		return;
+>
+>
+> It looks to me we'd better either WARN or just remove this. Since it
+> looks like a workaround for the un-synchronized NAPI somehow.
+>
 
-These take struct kvm_mmu_role_regs; they *return* union kvm_mmu_role 
-but that is changed later in the series to the base part only.
+During the reset process, both ring reset and enable may fail. In the case =
+of
+failure, vq will be unavailable. All three cases prevent this situation.
 
-Paolo
+Even if it fails, napi still needs to be enabled. This is to prevent
+napi_disable from being stuck when the network card is closed.
+
+
+So the first and second cases above are that napi is enabled, but vq has not
+been reset successfully or is still in reset.
+
+And the third case is to deal with tx in reset, and rx is in working state,=
+ then
+here will access the vq of sq.
+
+
+
+
+>
+> > +
+> >   	if (__netif_tx_trylock(txq)) {
+> >   		do {
+> >   			virtqueue_disable_cb(sq->vq);
+> > @@ -1769,6 +1784,98 @@ static netdev_tx_t start_xmit(struct sk_buff *sk=
+b, struct net_device *dev)
+> >   	return NETDEV_TX_OK;
+> >   }
+> >
+> > +static int virtnet_rx_vq_reset(struct virtnet_info *vi,
+> > +			       struct receive_queue *rq, u32 ring_num)
+>
+>
+> It's better to rename this as virtnet_rx_resize().
+
+
+I don't think resize is good enough, because I think resize is an effect of
+reset. Inside af_xdp, we will call it just to reset to free the buffer with=
+out
+resize with ring_num =3D=3D 0.
+
+So virtnet_rx_reset() might be better.
+
+>
+>
+> > +{
+> > +	int err;
+> > +
+> > +	/* stop napi */
+> > +	napi_disable(&rq->napi);
+> > +
+>
+>
+> Here, as discussed above, we need synchronize with the refill work.
+>
+>
+> > +	/* reset the queue */
+> > +	err =3D virtio_reset_vq(rq->vq);
+> > +	if (err)
+> > +		goto err;
+>
+>
+> Btw, most comment of this function seems useless since code already
+> explain themselves.
+
+OK, I will remove these.
+
+>
+>
+> > +
+> > +	/* free bufs */
+> > +	virtnet_rq_free_unused_bufs(vi, rq);
+> > +
+> > +	/* reset vring. */
+> > +	err =3D virtqueue_reset_vring(rq->vq, ring_num);
+> > +	if (err)
+> > +		goto err;
+> > +
+> > +	/* enable reset queue */
+> > +	err =3D virtio_enable_resetq(rq->vq);
+> > +	if (err)
+> > +		goto err;
+> > +
+> > +	/* fill recv */
+> > +	if (!try_fill_recv(vi, rq, GFP_KERNEL))
+> > +		schedule_delayed_work(&vi->refill, 0);
+> > +
+> > +	/* enable napi */
+> > +	virtnet_napi_enable(rq->vq, &rq->napi);
+> > +	return 0;
+> > +
+> > +err:
+> > +	netdev_err(vi->dev,
+> > +		   "reset rx reset vq fail: rx queue index: %ld err: %d\n",
+> > +		   rq - vi->rq, err);
+> > +	virtnet_napi_enable(rq->vq, &rq->napi);
+> > +	return err;
+> > +}
+> > +
+> > +static int virtnet_tx_vq_reset(struct virtnet_info *vi,
+> > +			       struct send_queue *sq, u32 ring_num)
+> > +{
+>
+>
+> It looks to me it's better to rename this as "virtnet_rx_resize()"
+>
+>
+> > +	struct netdev_queue *txq;
+> > +	int err, qindex;
+> > +
+> > +	qindex =3D sq - vi->sq;
+> > +
+> > +	txq =3D netdev_get_tx_queue(vi->dev, qindex);
+> > +	__netif_tx_lock_bh(txq);
+> > +
+> > +	/* stop tx queue and napi */
+> > +	netif_stop_subqueue(vi->dev, qindex);
+> > +	virtnet_napi_tx_disable(&sq->napi);
+>
+>
+> There's no need to hold tx lock for napi disable.
+
+tx lock =E7=9A=84=E4=B8=BB=E8=A6=81=E7=9B=AE=E7=9A=84=E6=98=AF=E7=AD=89=E5=
+=BE=85=E5=85=B6=E5=AE=83=E7=9A=84 xmit =E8=B0=83=E7=94=A8=E7=BB=93=E6=9D=9F.
+=E5=B9=B6=E8=AE=BE=E7=BD=AE netif_stop_subqueue()
+
+The main purpose of tx lock is to wait for other xmit calls to end. And set
+netif_stop_subqueue()
+
+Thanks.
+
+>
+> Thanks
+>
+>
+> > +
+> > +	__netif_tx_unlock_bh(txq);
+> > +
+> > +	/* reset the queue */
+> > +	err =3D virtio_reset_vq(sq->vq);
+> > +	if (err) {
+> > +		netif_start_subqueue(vi->dev, qindex);
+> > +		goto err;
+> > +	}
+> > +
+> > +	/* free bufs */
+> > +	virtnet_sq_free_unused_bufs(vi, sq);
+> > +
+> > +	/* reset vring. */
+> > +	err =3D virtqueue_reset_vring(sq->vq, ring_num);
+> > +	if (err)
+> > +		goto err;
+> > +
+> > +	/* enable reset queue */
+> > +	err =3D virtio_enable_resetq(sq->vq);
+> > +	if (err)
+> > +		goto err;
+> > +
+> > +	/* start tx queue and napi */
+> > +	netif_start_subqueue(vi->dev, qindex);
+> > +	virtnet_napi_tx_enable(vi, sq->vq, &sq->napi);
+> > +	return 0;
+> > +
+> > +err:
+> > +	netdev_err(vi->dev,
+> > +		   "reset tx reset vq fail: tx queue index: %ld err: %d\n",
+> > +		   sq - vi->sq, err);
+> > +	virtnet_napi_tx_enable(vi, sq->vq, &sq->napi);
+> > +	return err;
+> > +}
+> > +
+> >   /*
+> >    * Send command via the control virtqueue and check status.  Commands
+> >    * supported by the hypervisor, as indicated by feature bits, should
+>
