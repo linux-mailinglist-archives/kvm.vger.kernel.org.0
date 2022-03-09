@@ -2,30 +2,30 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 133364D34B8
-	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 17:26:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AFDDC4D34BB
+	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 17:26:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235894AbiCIQ0X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Mar 2022 11:26:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38794 "EHLO
+        id S233077AbiCIQ0b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Mar 2022 11:26:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38908 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238337AbiCIQVw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Mar 2022 11:21:52 -0500
+        with ESMTP id S238352AbiCIQVx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Mar 2022 11:21:53 -0500
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id EF2283A5
-        for <kvm@vger.kernel.org>; Wed,  9 Mar 2022 08:20:53 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3C31B3A5
+        for <kvm@vger.kernel.org>; Wed,  9 Mar 2022 08:20:55 -0800 (PST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BD673168F;
-        Wed,  9 Mar 2022 08:20:53 -0800 (PST)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 09B8B1691;
+        Wed,  9 Mar 2022 08:20:55 -0800 (PST)
 Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BF9B33F7F5;
-        Wed,  9 Mar 2022 08:20:52 -0800 (PST)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0C0933F7F5;
+        Wed,  9 Mar 2022 08:20:53 -0800 (PST)
 From:   Alexandru Elisei <alexandru.elisei@arm.com>
 To:     drjones@redhat.com, kvm@vger.kernel.org,
         kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, thuth@redhat.com
-Subject: [kvm-unit-tests PATCH 1/2] arm: Change text base address for 32 bit tests when running under kvmtool
-Date:   Wed,  9 Mar 2022 16:21:16 +0000
-Message-Id: <20220309162117.56681-2-alexandru.elisei@arm.com>
+Subject: [kvm-unit-tests PATCH 2/2] arm/run: Fix using qemu-system-aarch64 to run aarch32 tests on aarch64
+Date:   Wed,  9 Mar 2022 16:21:17 +0000
+Message-Id: <20220309162117.56681-3-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20220309162117.56681-1-alexandru.elisei@arm.com>
 References: <20220309162117.56681-1-alexandru.elisei@arm.com>
@@ -40,39 +40,44 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The 32 bit tests do not have relocation support and rely on the build
-system to set the text base address to 0x4001_0000, which is the memory
-location where the test is placed by qemu. However, kvmtool loads a payload
-at a different address, 0x8000_8000, when loading a test with --kernel.
-When using --firmware, the default is 0x8000_0000, but that can be changed
-with the --firmware-address comand line option.
+From: Andrew Jones <drjones@redhat.com>
 
-When 32 bit tests are configured to run under kvmtool, set the text base
-address to 0x8000_8000.
+KVM on arm64 can create 32 bit and 64 bit VMs. kvm-unit-tests tries to
+take advantage of this by setting the aarch64=off -cpu option. However,
+get_qemu_accelerator() isn't aware that KVM on arm64 can run both types
+of VMs and it selects qemu-system-arm instead of qemu-system-aarch64.
+This leads to an error in premature_failure() and the test is marked as
+skipped:
 
+$ ./run_tests.sh selftest-setup
+SKIP selftest-setup (qemu-system-arm: -accel kvm: invalid accelerator kvm)
+
+Fix this by setting QEMU to the correct qemu binary before calling
+get_qemu_accelerator().
+
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+[ Alex E: Added commit message, changed the logic to make it clearer ]
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- arm/Makefile.arm | 6 ++++++
- 1 file changed, 6 insertions(+)
+ arm/run | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/arm/Makefile.arm b/arm/Makefile.arm
-index 3a4cc6b26234..01fd4c7bb6e2 100644
---- a/arm/Makefile.arm
-+++ b/arm/Makefile.arm
-@@ -14,7 +14,13 @@ CFLAGS += $(machine)
- CFLAGS += -mcpu=$(PROCESSOR)
- CFLAGS += -mno-unaligned-access
+diff --git a/arm/run b/arm/run
+index 2153bd320751..5fe0a45c4820 100755
+--- a/arm/run
++++ b/arm/run
+@@ -13,6 +13,11 @@ processor="$PROCESSOR"
+ ACCEL=$(get_qemu_accelerator) ||
+ 	exit $?
  
-+ifeq ($(TARGET),qemu)
- arch_LDFLAGS = -Ttext=40010000
-+else ifeq ($(TARGET),kvmtool)
-+arch_LDFLAGS = -Ttext=80008000
-+else
-+$(error Unknown target $(TARGET))
-+endif
++# KVM for arm64 can create a VM in either aarch32 or aarch64 modes.
++if [ "$ACCEL" = kvm ] && [ -z "$QEMU" ] && [ "$HOST" = "aarch64" ]; then
++	QEMU=qemu-system-aarch64
++fi
++
+ qemu=$(search_qemu_binary) ||
+ 	exit $?
  
- define arch_elf_check =
- endef
 -- 
 2.35.1
 
