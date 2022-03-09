@@ -2,148 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0888B4D27F9
-	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 05:48:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 093D94D2703
+	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 05:06:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229524AbiCIEtu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 23:49:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42696 "EHLO
+        id S231805AbiCIDxb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Mar 2022 22:53:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49772 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229525AbiCIEts (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Mar 2022 23:49:48 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 237CE15A22F
-        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 20:48:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646801328;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=7yW1kWq855MoycbxENZXn/INYb5Qcrtgiwr9xtyGJCE=;
-        b=BqcZKHSgPtV7wWEAkPYeiBzssX0Az1kSsBGdDEKxPjUvA7V2z5hV1mkVlg0JxvlQnA8Y/0
-        VxeVA6q+OC04lUufrR7TOzDd2br5jEc5uQFn3UPUaVLmPXn/5kFttwlcy4EvpivAPdlxTm
-        heJyLu3qEqXVlYqzbPVjgnG3RREYeG8=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-320-puXRHAPrPSWGMs2B-F29IA-1; Tue, 08 Mar 2022 23:48:46 -0500
-X-MC-Unique: puXRHAPrPSWGMs2B-F29IA-1
-Received: by mail-pj1-f71.google.com with SMTP id j10-20020a17090a7e8a00b001bbef243093so3060423pjl.1
-        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 20:48:46 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=7yW1kWq855MoycbxENZXn/INYb5Qcrtgiwr9xtyGJCE=;
-        b=KBOCUMy//6+9q+/+QZ3I/YXEXtCUFHWTwjlnWUZv057YKGAGdGk8wDXHQpVYHnCc1P
-         u+p1B13FSQUIIh1Nm082O4snkiGzP8yLQAcmjTlDyot3Kstm+eBg6BaneaK+RI7sT+VZ
-         AQjtVJFQokre+IelcboXxE2Rvcps2pCGxVWsoo+ym5AW0BC7DbNIwxYk66W+72VtV4v0
-         m1/giHFcpH8p64wemqfd476vct/uxQjuOw6tJ10xha2aBYw8n7TgzZiMCuszdKxIt5io
-         HyU5fqCaSM3sT9DX0JK28Mfs8hqMIztheSOEyM/0QL5qs0D+YJgs96nBrumx0LKR2V/k
-         pt+A==
-X-Gm-Message-State: AOAM5324GLRkhdCfZEb9PlLynyFOibqzBNF46MON9NJ0Ue7Mb4/FqOYl
-        wsnaLpglgblxZF3NDhbaiHJuxdH51phWD6Wodmz3Fudkn8j7+ZRkEQZSqOKh8FqkUCRtQNiFsi4
-        hJKN6xfWJmIT7
-X-Received: by 2002:a17:90b:17ca:b0:1bf:6188:cc00 with SMTP id me10-20020a17090b17ca00b001bf6188cc00mr8597575pjb.2.1646801325734;
-        Tue, 08 Mar 2022 20:48:45 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwosqJUOOIblsYGQ27dg95V2/uz330dPMJom2dl9RgGa8k3TOiXYiGNo7Wasa+ovCrQzyH4wQ==
-X-Received: by 2002:a17:90b:17ca:b0:1bf:6188:cc00 with SMTP id me10-20020a17090b17ca00b001bf6188cc00mr8597538pjb.2.1646801325443;
-        Tue, 08 Mar 2022 20:48:45 -0800 (PST)
-Received: from [10.72.13.251] ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id g15-20020a056a0023cf00b004e17e11cb17sm821341pfc.111.2022.03.08.20.48.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Mar 2022 20:48:44 -0800 (PST)
-Message-ID: <373494ae-825b-d573-012c-4e7d453934da@redhat.com>
-Date:   Wed, 9 Mar 2022 12:48:33 +0800
+        with ESMTP id S231785AbiCIDx3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 22:53:29 -0500
+X-Greylist: delayed 344 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 08 Mar 2022 19:52:29 PST
+Received: from mxct.zte.com.cn (mxct.zte.com.cn [58.251.27.85])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC3105F93;
+        Tue,  8 Mar 2022 19:52:28 -0800 (PST)
+Received: from mxde.zte.com.cn (unknown [10.35.8.63])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mxct.zte.com.cn (FangMail) with ESMTPS id 4KCymf24yFz1FH2k;
+        Wed,  9 Mar 2022 11:46:42 +0800 (CST)
+Received: from mxus.zte.com.cn (unknown [10.207.168.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mxde.zte.com.cn (FangMail) with ESMTPS id 4KCymL6cn9z9vxpP;
+        Wed,  9 Mar 2022 11:46:26 +0800 (CST)
+Received: from mxhk.zte.com.cn (unknown [192.168.250.137])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mxus.zte.com.cn (FangMail) with ESMTPS id 4KCymH2jSgzdmX8h;
+        Wed,  9 Mar 2022 11:46:23 +0800 (CST)
+Received: from mse-fl1.zte.com.cn (unknown [10.30.14.238])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mxhk.zte.com.cn (FangMail) with ESMTPS id 4KCymC4rBbzCBHnN;
+        Wed,  9 Mar 2022 11:46:19 +0800 (CST)
+Received: from szxlzmapp02.zte.com.cn ([10.5.231.79])
+        by mse-fl1.zte.com.cn with SMTP id 2293kAWN075179;
+        Wed, 9 Mar 2022 11:46:10 +0800 (GMT-8)
+        (envelope-from wang.yi59@zte.com.cn)
+Received: from fox-cloudhost8.localdomain (unknown [10.234.72.110])
+        by smtp (Zmail) with SMTP;
+        Wed, 9 Mar 2022 11:46:10 +0800
+X-Zmail-TransId: 3e8162282301005-d1ec4
+From:   Yi Wang <wang.yi59@zte.com.cn>
+To:     pbonzini@redhat.com
+Cc:     seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, hpa@zytor.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, xue.zhihong@zte.com.cn,
+        wang.yi59@zte.com.cn, up2wing@gmail.com, wang.liang82@zte.com.cn,
+        Yi Liu <liu.yi24@zte.com.cn>
+Subject: [PATCH] KVM: SVM: fix panic on out-of-bounds guest IRQ
+Date:   Wed,  9 Mar 2022 19:30:25 +0800
+Message-Id: <20220309113025.44469-1-wang.yi59@zte.com.cn>
+X-Mailer: git-send-email 2.33.0.rc0.dirty
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.6.1
-Subject: Re: [PATCH v7 01/26] virtio_pci: struct virtio_pci_common_cfg add
- queue_notify_data
-Content-Language: en-US
-To:     Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Cc:     Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mark Gross <markgross@kernel.org>,
-        Vadim Pasternak <vadimp@nvidia.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Johannes Berg <johannes.berg@intel.com>,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>,
-        linux-um@lists.infradead.org, platform-driver-x86@vger.kernel.org,
-        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, bpf@vger.kernel.org
-References: <20220308123518.33800-1-xuanzhuo@linux.alibaba.com>
- <20220308123518.33800-2-xuanzhuo@linux.alibaba.com>
-From:   Jason Wang <jasowang@redhat.com>
-In-Reply-To: <20220308123518.33800-2-xuanzhuo@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain;
+        charset="UTF-8"
+X-MAIL: mse-fl1.zte.com.cn 2293kAWN075179
+X-Fangmail-Gw-Spam-Type: 0
+X-FangMail-Miltered: at cgslv5.04-192.168.251.14.novalocal with ID 62282321.000 by FangMail milter!
+X-FangMail-Envelope: 1646797602/4KCymf24yFz1FH2k/62282321.000/10.35.8.63/[10.35.8.63]/mxde.zte.com.cn/<wang.yi59@zte.com.cn>
+X-Fangmail-Anti-Spam-Filtered: true
+X-Fangmail-MID-QID: 62282321.000/4KCymf24yFz1FH2k
+X-Spam-Status: No, score=0.0 required=5.0 tests=BAYES_00,DATE_IN_FUTURE_06_12,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+As guest_irq is coming from KVM_IRQFD API call, it may trigger
+crash in svm_update_pi_irte() due to out-of-bounds:
 
-在 2022/3/8 下午8:34, Xuan Zhuo 写道:
-> Add queue_notify_data in struct virtio_pci_common_cfg, which comes from
-> here https://github.com/oasis-tcs/virtio-spec/issues/89
->
-> For not breaks uABI, add a new struct virtio_pci_common_cfg_notify.
->
-> Since I want to add queue_reset after queue_notify_data, I submitted
-> this patch first.
->
-> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+crash> bt
+PID: 22218  TASK: ffff951a6ad74980  CPU: 73  COMMAND: "vcpu8"
+ #0 [ffffb1ba6707fa40] machine_kexec at ffffffff8565b397
+ #1 [ffffb1ba6707fa90] __crash_kexec at ffffffff85788a6d
+ #2 [ffffb1ba6707fb58] crash_kexec at ffffffff8578995d
+ #3 [ffffb1ba6707fb70] oops_end at ffffffff85623c0d
+ #4 [ffffb1ba6707fb90] no_context at ffffffff856692c9
+ #5 [ffffb1ba6707fbf8] exc_page_fault at ffffffff85f95b51
+ #6 [ffffb1ba6707fc50] asm_exc_page_fault at ffffffff86000ace
+    [exception RIP: svm_update_pi_irte+227]
+    RIP: ffffffffc0761b53  RSP: ffffb1ba6707fd08  RFLAGS: 00010086
+    RAX: ffffb1ba6707fd78  RBX: ffffb1ba66d91000  RCX: 0000000000000001
+    RDX: 00003c803f63f1c0  RSI: 000000000000019a  RDI: ffffb1ba66db2ab8
+    RBP: 000000000000019a   R8: 0000000000000040   R9: ffff94ca41b82200
+    R10: ffffffffffffffcf  R11: 0000000000000001  R12: 0000000000000001
+    R13: 0000000000000001  R14: ffffffffffffffcf  R15: 000000000000005f
+    ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
+ #7 [ffffb1ba6707fdb8] kvm_irq_routing_update at ffffffffc09f19a1 [kvm]
+ #8 [ffffb1ba6707fde0] kvm_set_irq_routing at ffffffffc09f2133 [kvm]
+ #9 [ffffb1ba6707fe18] kvm_vm_ioctl at ffffffffc09ef544 [kvm]
+#10 [ffffb1ba6707ff10] __x64_sys_ioctl at ffffffff85935474
+#11 [ffffb1ba6707ff40] do_syscall_64 at ffffffff85f921d3
+#12 [ffffb1ba6707ff50] entry_SYSCALL_64_after_hwframe at ffffffff8600007c
+    RIP: 00007f143c36488b  RSP: 00007f143a4e04b8  RFLAGS: 00000246
+    RAX: ffffffffffffffda  RBX: 00007f05780041d0  RCX: 00007f143c36488b
+    RDX: 00007f05780041d0  RSI: 000000004008ae6a  RDI: 0000000000000020
+    RBP: 00000000000004e8   R8: 0000000000000008   R9: 00007f05780041e0
+    R10: 00007f0578004560  R11: 0000000000000246  R12: 00000000000004e0
+    R13: 000000000000001a  R14: 00007f1424001c60  R15: 00007f0578003bc0
+    ORIG_RAX: 0000000000000010  CS: 0033  SS: 002b
 
+Vmx have been fix this in commit 3a8b0677fc61 (KVM: VMX: Do not BUG() on
+out-of-bounds guest IRQ), so we can just copy source from that to fix
+this.
 
-Acked-by: Jason Wang <jasowang@redhat.com>
+Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
+Signed-off-by: Yi Liu <liu.yi24@zte.com.cn>
+---
+ arch/x86/kvm/svm/avic.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-
-> ---
->   include/uapi/linux/virtio_pci.h | 7 +++++++
->   1 file changed, 7 insertions(+)
->
-> diff --git a/include/uapi/linux/virtio_pci.h b/include/uapi/linux/virtio_pci.h
-> index 3a86f36d7e3d..22bec9bd0dfc 100644
-> --- a/include/uapi/linux/virtio_pci.h
-> +++ b/include/uapi/linux/virtio_pci.h
-> @@ -166,6 +166,13 @@ struct virtio_pci_common_cfg {
->   	__le32 queue_used_hi;		/* read-write */
->   };
->   
-> +struct virtio_pci_common_cfg_notify {
-> +	struct virtio_pci_common_cfg cfg;
-> +
-> +	__le16 queue_notify_data;	/* read-write */
-> +	__le16 padding;
-> +};
-> +
->   /* Fields in VIRTIO_PCI_CAP_PCI_CFG: */
->   struct virtio_pci_cfg_cap {
->   	struct virtio_pci_cap cap;
-
+diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+index fb3e20791338..f59b93d8e95a 100644
+--- a/arch/x86/kvm/svm/avic.c
++++ b/arch/x86/kvm/svm/avic.c
+@@ -783,7 +783,7 @@ int svm_update_pi_irte(struct kvm *kvm, unsigned int host_irq,
+ {
+ 	struct kvm_kernel_irq_routing_entry *e;
+ 	struct kvm_irq_routing_table *irq_rt;
+-	int idx, ret = -EINVAL;
++	int idx, ret = 0;
+ 
+ 	if (!kvm_arch_has_assigned_device(kvm) ||
+ 	    !irq_remapping_cap(IRQ_POSTING_CAP))
+@@ -794,7 +794,13 @@ int svm_update_pi_irte(struct kvm *kvm, unsigned int host_irq,
+ 
+ 	idx = srcu_read_lock(&kvm->irq_srcu);
+ 	irq_rt = srcu_dereference(kvm->irq_routing, &kvm->irq_srcu);
+-	WARN_ON(guest_irq >= irq_rt->nr_rt_entries);
++
++	if (guest_irq >= irq_rt->nr_rt_entries ||
++		hlist_empty(&irq_rt->map[guest_irq])) {
++		pr_warn_once("no route for guest_irq %u/%u (broken user space?)\n",
++			     guest_irq, irq_rt->nr_rt_entries);
++		goto out;
++	}
+ 
+ 	hlist_for_each_entry(e, &irq_rt->map[guest_irq], link) {
+ 		struct vcpu_data vcpu_info;
+-- 
+2.33.0.rc0.dirty
