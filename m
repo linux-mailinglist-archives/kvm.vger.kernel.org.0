@@ -2,49 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AFECB4D313C
-	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 15:47:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F1CCB4D3166
+	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 16:04:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231513AbiCIOsq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Mar 2022 09:48:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48788 "EHLO
+        id S233098AbiCIPE4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Mar 2022 10:04:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233400AbiCIOsp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Mar 2022 09:48:45 -0500
+        with ESMTP id S230095AbiCIPE4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Mar 2022 10:04:56 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FE814B1E6
-        for <kvm@vger.kernel.org>; Wed,  9 Mar 2022 06:47:46 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77DF3B1AB8;
+        Wed,  9 Mar 2022 07:03:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=FJGYt290tivYxTytS4eejaFIrbXhlad2LOLXVLfb6i8=; b=mfv8K1+0KPbFkxIMm4SCMNSjg9
-        eeU3K8vMKLz1qqWS5R6qc2bpgFezulEjLra512RaB3eOiHcF/0aN+LNn3G5hHpbqt9vJI9WoVh/3u
-        l+HTl7QA3ysloppQRKn10+fPEq667wsyqUUsMrssUwAnG0XnESW54O2NHi1VATsZWEsvwoosGIHF9
-        9EJ7nWI76cErcwyBR0aCIukDtCB4CWgFZHUKRy+4Rhs9c/3m/hw9YreADrs1cj8jLyjfCnjFNABsK
-        OcbOdD+Saf4G/pu5VoUwiWAMkCT3gnOcDkhVBKyJiwqnHRAGd41XtslL8H+tifxb/FqpUKOv8K477
-        uiasCgWQ==;
+        bh=kaDMk40kkbRkmKF6Kh1qJAiYnvUxpwHNkkg9zKmPd4A=; b=IMce/udvJ8Lhbi8t3P3FO7jnPj
+        vf9NqCfWofhh1YMmaquyLtFiR47/L5sBw09GYgz85/7yxQncSceyK80n3dkni2RTXeZTB1Fifj9iG
+        huqeqV44rBPOAFlBG6HjJTvpyrlO22JzQ1WWE3bCUJMHEeYj6fqZnb28EkGFiLJOI4XuK068L/5aY
+        Tp1THn7JL7OL5ZwhUzcQCB9u1/+R4nfkfB6sztROmZIJMh4BqLekRYnw+KV6CibGjTr78L4aYJaoL
+        joRlHi7YXKh1hRPuQ3fVlipaFCkYWobIzdx9qhHMImJIPwFy8OOvw/Tn/U8iGY7dqtsXCHUf/U56r
+        PLKjAkvA==;
 Received: from [54.239.6.184] (helo=u3832b3a9db3152.drs11.amazon.com)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nRxb8-00HCz7-Lo; Wed, 09 Mar 2022 14:47:30 +0000
-Message-ID: <e0148f80b8cc583c182691c952aaa7f10d852527.camel@infradead.org>
-Subject: Re: [PATCH 0/2] KVM: Xen PV timer fixups
+        id 1nRxr0-00HDeT-PJ; Wed, 09 Mar 2022 15:03:55 +0000
+Message-ID: <0e8f1e1a9653d95332cc8f0d461c3015ae20d03e.camel@infradead.org>
+Subject: Re: [PATCH v7 1/2] KVM: LAPIC: Make lapic timer unpinned
 From:   David Woodhouse <dwmw2@infradead.org>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Metin Kaya <metikaya@amazon.co.uk>,
-        Paul Durrant <pdurrant@amazon.co.uk>
-Date:   Wed, 09 Mar 2022 15:47:29 +0100
-In-Reply-To: <20220309143835.253911-1-dwmw2@infradead.org>
-References: <20220309143835.253911-1-dwmw2@infradead.org>
+To:     Marcelo Tosatti <mtosatti@redhat.com>
+Cc:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Date:   Wed, 09 Mar 2022 16:03:54 +0100
+In-Reply-To: <YiiOZaQCf1K653MS@fuller.cnet>
+References: <1562376411-3533-1-git-send-email-wanpengli@tencent.com>
+         <1562376411-3533-2-git-send-email-wanpengli@tencent.com>
+         <ab523b0e930129a100d306d0959445665eb69457.camel@infradead.org>
+         <YiiOZaQCf1K653MS@fuller.cnet>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-xId2IlI9OwM1vZglSFZ0"
+        boundary="=-ItVIb4GwMd88VWexudHc"
 User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
@@ -59,22 +55,84 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-xId2IlI9OwM1vZglSFZ0
+--=-ItVIb4GwMd88VWexudHc
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 2022-03-09 at 14:38 +0000, David Woodhouse wrote:
-> I'll follow up separately with a patch to remove __kvm_migrate_apic_timer
-> because it seems to be utterly pointless now.
+On Wed, 2022-03-09 at 08:24 -0300, Marcelo Tosatti wrote:
+> On Wed, Mar 09, 2022 at 10:26:51AM +0100, David Woodhouse wrote:
+> > On Sat, 2019-07-06 at 09:26 +0800, Wanpeng Li wrote:
+> > > From: Wanpeng Li <wanpengli@tencent.com>
+> > >=20
+> > > Commit 61abdbe0bcc2 ("kvm: x86: make lapic hrtimer pinned") pinned th=
+e
+> > > lapic timer to avoid to wait until the next kvm exit for the guest to
+> > > see KVM_REQ_PENDING_TIMER set. There is another solution to give a ki=
+ck
+> > > after setting the KVM_REQ_PENDING_TIMER bit, make lapic timer unpinne=
+d
+> > > will be used in follow up patches.
+> > >=20
+> > > Cc: Paolo Bonzini <pbonzini@redhat.com>
+> > > Cc: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
+> > > Cc: Marcelo Tosatti <mtosatti@redhat.com>
+> > > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> > > ---
+> > >  arch/x86/kvm/lapic.c | 8 ++++----
+> > >  arch/x86/kvm/x86.c   | 6 +-----
+> > >  2 files changed, 5 insertions(+), 9 deletions(-)
+> >=20
+> > ...
+> >=20
+> >=20
+> > > @@ -2510,7 +2510,7 @@ void __kvm_migrate_apic_timer(struct kvm_vcpu *=
+vcpu)
+> > > =20
+> > >  	timer =3D &vcpu->arch.apic->lapic_timer.timer;
+> > >  	if (hrtimer_cancel(timer))
+> > > -		hrtimer_start_expires(timer, HRTIMER_MODE_ABS_PINNED);
+> > > +		hrtimer_start_expires(timer, HRTIMER_MODE_ABS);
+> > >  }
+> > > =20
+> > >  /*
+> >=20
+> > Wait, in that case why are we even bothering to cancel and restart the
+> > timer? I thought the whole point of that was to pin it to the *new* CPU
+> > that this vCPU is running on.
+> >=20
+> > If not, can't we just kill __kvm_migrate_apic_timer() off completely
+> > not?
+>=20
+> Current code looks like this:
+>=20
+> void __kvm_migrate_apic_timer(struct kvm_vcpu *vcpu)
+> {
+>         struct hrtimer *timer;
+>=20
+>         if (!lapic_in_kernel(vcpu) ||
+>                 kvm_can_post_timer_interrupt(vcpu)) <----------
+>                 return;
+>=20
+>         timer =3D &vcpu->arch.apic->lapic_timer.timer;
+>         if (hrtimer_cancel(timer))
+>                 hrtimer_start_expires(timer, HRTIMER_MODE_ABS_HARD);
+> }
+>=20
+> Yeah, should be HRTIMER_MODE_ABS_PINNED AFAICS.
 
-No I won't, because that and the PIT timer can both be *periodic*, so
-do potentially still want migrating for the original reasons described
-in commit a3d7f85f471.
+No, it's *intentionally* not pinned any more, since this patch that I'm
+replying to, which became commit 4d151bf3b89. It doesn't *have* to run
+on the same physical CPU, because of the epiphany that it can just call
+kvm_vcpu_kick() after making the request.
 
-But the Xen one really is just oneshot, so will expire soon and be
-restarted anyway, and will land on the right physical CPU then.
+But if it's a recurring timer it's still *best* for it to run on the
+same physical CPU, just for cache locality reasons. So I think I was
+wrong; the migration *isn't* pointless. It's still a valid
+optimisation; it's just not *mandatory* any more.
 
---=-xId2IlI9OwM1vZglSFZ0
+
+
+--=-ItVIb4GwMd88VWexudHc
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -166,25 +224,25 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIwMzA5MTQ0NzI5WjAvBgkqhkiG9w0BCQQxIgQg4oOrZuPZ
-kyNkbshz0PmIuiFosVB55vRwu6EVNpn5zJIwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIwMzA5MTUwMzU0WjAvBgkqhkiG9w0BCQQxIgQgRRym0ZcD
+yYOIHpv7GVGAHvREai2rzpulK1E3o9s3JhYwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAtB5drs7lxa1WKpuOzUIsH8lsR5GTTe6Zf
-aCoyZkvJ5HrF/PZDAHgTlmPFKRN+gERyJvLbDLRzoCDoN2uZRCSOdAzKPvlErY+JZRPGFPBXlqm+
-05UQKy+xEFnIdnIveUxu57yRj8/yG5YWbDMCf22N8U88t1ijpyOc2h+/ZPuD0dkhCOeZwL7eLp5+
-quIretw7hbFLqH197eKQBK17N0Mo6BnbM5ZwuX3fbVrp0TGofq9/jamy0Wf7Ko80m4cn+DCsjoUb
-4p46nlm0jCFkqq2b6dDU2jeE07vs1DHWWa1kUUdSOOPoGVWyWCp53YOXWh2LsLwfB/SPcXhvY281
-EpKjeUxJdmZG9Bn9AxZSEgzmbeBcl8zMtX4ZDBjUllsRTWeHAVwkkRIW1ln5UAaKjbBKouk1I+US
-dSe9Njd62r17LxWMGRWqoTrb/+d2Pg0unscHVpjGqQG4FRI5eRdbsEPCgF1Yq+fgwR13B2vDG8I+
-hZ71Uic6pzhrt52SPhsN+CqMLoEqS8977RO808ck8E3ZEjksJc3Ywjym9XGd0j3EYStZiH8oBdqH
-g/jK95hlsltTQhd+ZfksdBFXaroK+cLjpE37erkIPYcyu1bY5mcugbjNayY7DxW2F/YpL7P8lIa/
-hMrR+/+XbeiZF1DEZq3+92VWCC7GNfSU6QEZ1xZpDAAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgADOTKS4zfSBirGL9rTLRaUBZcFK3/Q/QbM
+0AweN8Wk+WeoQb33DOqp9o2dwGPLwVDKD0Xlf/29LcJMn+GnJYNIvmyW/aeo3Mlli1GCDxEE0+/6
+g29GJdSi+UNlpVKZQ7BbFdRPJUlbS3wuCD4r/Ovs/79ruGVeFNWSAOnpnftkHf0X0TiQf5cciibO
+O0YdXy2WTpKjwJadtl7IAiKyfrsDv8qVSdzhQAZ+IFZYNpvuz+wIJvaoCYNOwZ+dFON6YEfo+Brd
+qD5b1qZQHPiswN2UifpGqMzlfD055YEdp6ffBhKgqtalxziHEoJpdmlPtM8WICGwaNBPch2kV5Dl
+HD4//G2cxHy5lkM7YMZx1j+F2WeJsy40cHGC37loaob0Dqs2fn/vViruA2QZxRc1RWYgrBe+JhIT
+9kW7TeNdyZPpRTleGh6nEYjHABH19SpEkmobL/1TI3eI5L8fwyhTxe4pcNCaQje1id7XdFbGl8md
+nQNBsiySf5J2dIBf10N0XSbaVZFzC4R9mA+qVC9qt3tLLeAdNKR2d6BUDpM32fQFx8Au8YJjNHAY
+7FeYA84G96xopm86+/x3px/8w5kyPsSRFRLiWQKBPKu1OFO2fZb8kfW1ru6BQLUOlkZQwbMPDb2v
+21CzDk1u+joAwU5PhYW0HC3e00zmqI+DejSxIjv7eQAAAAAAAA==
 
 
---=-xId2IlI9OwM1vZglSFZ0--
+--=-ItVIb4GwMd88VWexudHc--
 
