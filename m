@@ -2,106 +2,287 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EDD654D2916
-	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 07:43:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 59A274D291F
+	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 07:46:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230100AbiCIGoe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Mar 2022 01:44:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48762 "EHLO
+        id S230118AbiCIGrV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Mar 2022 01:47:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230097AbiCIGod (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Mar 2022 01:44:33 -0500
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB46F10875C;
-        Tue,  8 Mar 2022 22:43:35 -0800 (PST)
-Received: by mail-pl1-x636.google.com with SMTP id t19so1149381plr.5;
-        Tue, 08 Mar 2022 22:43:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=9mn5K9B417wVFNbI6f3KgoYGVyI5GZhPDEl+ILoDQxo=;
-        b=q32i1Mh79YKmt+VYP6HsuEIJyO3w7XO+u38oZMFlPEPsE3G8sXSDgoPb6loVs0o0qy
-         68wEp2Cj9uLhbqh51EoFcM1dSS/lnKLHC2se3cA743I0ljILPHnX0gU8NRM46J43PEFX
-         Nj165j6Lc+POtck7CT5pVSbz8QshvT19Vzv3HuSnRwtQLuz+iPJcraO55VMurVKqaA8U
-         5JJh0wgt6hP08VDwoLEiJx5vBXkNPfFcqc4sLUidenD1PnepKkxR03kSYPpGlDktwUDC
-         S4N3XjtHhHpo+SNVbN42gE/C0ug+a/sCK05h8xFoSSd5D7bf7y0LMK6aeJzjcr53YSEp
-         HHqg==
+        with ESMTP id S230116AbiCIGrU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Mar 2022 01:47:20 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E67D6148666
+        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 22:46:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646808381;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ZRVRzg4ndvIzPu33NbzHcBz6mikHjCXmzmHbidN+vIU=;
+        b=gNu6+ZCiK9QsO1969G4vTTzqk02RSZU7CASUspPFgQsQzxySegzXLvX4XMblglE91JIsaI
+        CN6lWfDxYm0dk0AoZDY+XxCYkEJlUUhYo2iY9l8vZ2aFAP/ZaWfy744JVcGEikUGLDlsnt
+        7za8KL1taZNRNuxjBCfpAcvhjtOW4vk=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-551-zlbJgMkEOvS0UP8hB7PEoQ-1; Wed, 09 Mar 2022 01:46:19 -0500
+X-MC-Unique: zlbJgMkEOvS0UP8hB7PEoQ-1
+Received: by mail-pj1-f69.google.com with SMTP id mz5-20020a17090b378500b001bf46a762baso1016982pjb.5
+        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 22:46:19 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=9mn5K9B417wVFNbI6f3KgoYGVyI5GZhPDEl+ILoDQxo=;
-        b=hId1+lRe3z9RYvo+TE67DHEJu8H1WPAwISSnOVHd7I1BMxHQGaTeXi36JRi18NhnPO
-         2iATknTFrd/r5wgFFv4+hUN1EO0damCGEVsyRdzgfYDBsxerA6dWERHokpw5VXNiKomt
-         MqQvhlI6w1hHlUlCR1lOyqHNsCwU01wHXUIC4vOV7AzvnPv4PfS5ijBOsjiWMRDjvr/q
-         aDU6WtEFubSxvpSkz6pJQW3TKzNrllh1nDiQvGmyQWcHkXzIjRY68E624XrslgRRSY6E
-         0B8ltywxLGHSb1N9DF8iuoUs5Oha/roTtVRi0ENQ+Ob+5tGuMtqtmNiBRykCAwhCf2W2
-         LodQ==
-X-Gm-Message-State: AOAM532jDGT1paL/eNs2dBoN05JSbMo99ehbzaIkdA8dgWsdvA3XUIxy
-        5ipNTVhdXvPbg43jgtzitRA=
-X-Google-Smtp-Source: ABdhPJxXaP5Afjqm/XUVymXXASG6Af/PTshP2NTF5ciPk6IR7CEOeJXgLJhj9qnHX6CuwtE9nxqZBA==
-X-Received: by 2002:a17:90b:3b92:b0:1bf:a61b:742b with SMTP id pc18-20020a17090b3b9200b001bfa61b742bmr3143820pjb.157.1646808215393;
-        Tue, 08 Mar 2022 22:43:35 -0800 (PST)
-Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id l1-20020a17090aec0100b001bfa1bafeadsm1913094pjy.53.2022.03.08.22.43.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Mar 2022 22:43:35 -0800 (PST)
-From:   Like Xu <like.xu.linux@gmail.com>
-X-Google-Original-From: Like Xu <likexu@tencent.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Joao Martins <joao.m.martins@oracle.com>, kvm@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: x86/xen: Use a safer data type for delta to avoid shift-count-overflow
-Date:   Wed,  9 Mar 2022 14:43:24 +0800
-Message-Id: <20220309064324.58213-1-likexu@tencent.com>
-X-Mailer: git-send-email 2.35.1
+        bh=ZRVRzg4ndvIzPu33NbzHcBz6mikHjCXmzmHbidN+vIU=;
+        b=duLJokvaAOIqBie41wRR/ng+k4x5dzg7rirApFH+m0Dt/MH4nMQeO9fqL10Ddt4Ir6
+         sFtrz6l1Y/7eJ4RB2T4LrLmr2Y6o5hrU4NzU8N28DbgBpVTDp0ftwRW9cpjZDkN9KXRj
+         hMa7xTIYAWuDngpGZ+jDxtDIpkn/1DPKBjX2wrL14NREd0QTk7QBsdyHvORvEl3RTH18
+         OanYKswrzBtqrob5EzqZHE0qMS6tTUspK/NBNLykLifvUpHcJunVipOhluKniZdKEmM0
+         n8UTQoXu7uuLW/LG+0uZjQGQL84NJ3ak5voXHpgm9SYqUuBB+GmDbVQtLLboqi3nbPwW
+         muVA==
+X-Gm-Message-State: AOAM530RW4DwYfYpQ4/Oj4uxZjXqmyRMXqsDdx30pOwIbFwJHOoiNrWW
+        9p0Ha7/SVOoM6kV16ynBaT0K5Z7dT3zh1IfMvM5mJzBwrT5dmX4OeFME35UBMqnSCp2+/2MqtQi
+        Edfi/O2Mm9r2u
+X-Received: by 2002:a17:90a:c252:b0:1bc:52a8:cac8 with SMTP id d18-20020a17090ac25200b001bc52a8cac8mr8770684pjx.61.1646808378300;
+        Tue, 08 Mar 2022 22:46:18 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwCn5oXYtQPYpNPdMU9Bvo1WQfVx7qdQtm4/+iiiL6XGVmBAI7JHTUBwTId/vpyk0ZnEZggTw==
+X-Received: by 2002:a17:90a:c252:b0:1bc:52a8:cac8 with SMTP id d18-20020a17090ac25200b001bc52a8cac8mr8770665pjx.61.1646808378008;
+        Tue, 08 Mar 2022 22:46:18 -0800 (PST)
+Received: from [10.72.12.183] ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id c3-20020a056a00248300b004f6f729e485sm1396753pfv.127.2022.03.08.22.46.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Mar 2022 22:46:17 -0800 (PST)
+Message-ID: <4b32d0b4-b794-cc1c-25f7-50b5ea6ac25e@redhat.com>
+Date:   Wed, 9 Mar 2022 14:46:01 +0800
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.6.1
+Subject: Re: [PATCH v7 04/26] virtio_ring: split: extract the logic of
+ creating vring
+Content-Language: en-US
+To:     Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Cc:     Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Mark Gross <markgross@kernel.org>,
+        Vadim Pasternak <vadimp@nvidia.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Johannes Berg <johannes.berg@intel.com>,
+        Vincent Whitchurch <vincent.whitchurch@axis.com>,
+        linux-um@lists.infradead.org, platform-driver-x86@vger.kernel.org,
+        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, bpf@vger.kernel.org
+References: <20220308123518.33800-1-xuanzhuo@linux.alibaba.com>
+ <20220308123518.33800-5-xuanzhuo@linux.alibaba.com>
+From:   Jason Wang <jasowang@redhat.com>
+In-Reply-To: <20220308123518.33800-5-xuanzhuo@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <likexu@tencent.com>
 
-Clang warns:
+在 2022/3/8 下午8:34, Xuan Zhuo 写道:
+> Separate the logic of split to create vring queue.
+>
+> For the convenience of passing parameters, add a structure
+> vring_split.
+>
+> This feature is required for subsequent virtuqueue reset vring.
+>
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> ---
+>   drivers/virtio/virtio_ring.c | 74 +++++++++++++++++++++++++-----------
+>   1 file changed, 51 insertions(+), 23 deletions(-)
+>
+> diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
+> index b87130c8f312..d32793615451 100644
+> --- a/drivers/virtio/virtio_ring.c
+> +++ b/drivers/virtio/virtio_ring.c
+> @@ -85,6 +85,13 @@ struct vring_desc_extra {
+>   	u16 next;			/* The next desc state in a list. */
+>   };
+>   
+> +struct vring_split {
+> +	void *queue;
+> +	dma_addr_t dma_addr;
+> +	size_t queue_size_in_bytes;
+> +	struct vring vring;
+> +};
 
-arch/x86/kvm/xen.c:1219:41: warning: right shift count >= width of type [-Wshift-count-overflow]
- 1219 |         (delta > 0 && (uint32_t) (delta >> 50) != 0))) {
-      |                                         ^~
 
-The delta is long, which is 32-bit on ARCH=i386, hence the overflow
-warning. Switch to uint64_t, which is 64-bit and will not overflow.
+So this structure will be only used in vring_create_vring_split() which 
+seems not that useful.
 
-Fixes: 49c0b9159bce ("KVM: x86/xen: handle PV timers oneshot mode")
-Signed-off-by: Like Xu <likexu@tencent.com>
----
- arch/x86/kvm/xen.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+More see below.
 
-diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index 8c85a71aa8ca..097181613be5 100644
---- a/arch/x86/kvm/xen.c
-+++ b/arch/x86/kvm/xen.c
-@@ -1204,7 +1204,7 @@ static bool kvm_xen_hcall_set_timer_op(struct kvm_vcpu *vcpu, uint64_t timeout,
- 
- 	if (timeout) {
- 		uint64_t guest_now = get_kvmclock_ns(vcpu->kvm);
--		long delta = timeout - guest_now;
-+		uint64_t delta = timeout - guest_now;
- 
- 		/* Xen has a 'Linux workaround' in do_set_timer_op() which
- 		 * checks for negative absolute timeout values (caused by
--- 
-2.35.1
+
+> +
+>   struct vring_virtqueue {
+>   	struct virtqueue vq;
+>   
+> @@ -915,28 +922,21 @@ static void *virtqueue_detach_unused_buf_split(struct virtqueue *_vq)
+>   	return NULL;
+>   }
+>   
+> -static struct virtqueue *vring_create_virtqueue_split(
+> -	unsigned int index,
+> -	unsigned int num,
+> -	unsigned int vring_align,
+> -	struct virtio_device *vdev,
+> -	bool weak_barriers,
+> -	bool may_reduce_num,
+> -	bool context,
+> -	bool (*notify)(struct virtqueue *),
+> -	void (*callback)(struct virtqueue *),
+> -	const char *name)
+> +static int vring_create_vring_split(struct vring_split *vring,
+> +				    struct virtio_device *vdev,
+> +				    unsigned int vring_align,
+> +				    bool weak_barriers,
+> +				    bool may_reduce_num,
+> +				    u32 num)
+
+
+I'd rename this as vring_alloc_queue_split() and let it simply return 
+the address of queue like vring_alloc_queue().
+
+And let it simple accept dma_addr_t *dma_adder instead of vring_split.
+
+
+>   {
+> -	struct virtqueue *vq;
+>   	void *queue = NULL;
+>   	dma_addr_t dma_addr;
+>   	size_t queue_size_in_bytes;
+> -	struct vring vring;
+>   
+>   	/* We assume num is a power of 2. */
+>   	if (num & (num - 1)) {
+>   		dev_warn(&vdev->dev, "Bad virtqueue length %u\n", num);
+> -		return NULL;
+> +		return -EINVAL;
+>   	}
+>   
+>   	/* TODO: allocate each queue chunk individually */
+> @@ -947,11 +947,11 @@ static struct virtqueue *vring_create_virtqueue_split(
+>   		if (queue)
+>   			break;
+>   		if (!may_reduce_num)
+> -			return NULL;
+> +			return -ENOMEM;
+>   	}
+>   
+>   	if (!num)
+> -		return NULL;
+> +		return -ENOMEM;
+>   
+>   	if (!queue) {
+>   		/* Try to get a single page. You are my only hope! */
+> @@ -959,21 +959,49 @@ static struct virtqueue *vring_create_virtqueue_split(
+>   					  &dma_addr, GFP_KERNEL|__GFP_ZERO);
+>   	}
+>   	if (!queue)
+> -		return NULL;
+> +		return -ENOMEM;
+>   
+>   	queue_size_in_bytes = vring_size(num, vring_align);
+> -	vring_init(&vring, num, queue, vring_align);
+> +	vring_init(&vring->vring, num, queue, vring_align);
+
+
+It's better to move this to its caller (vring_create_virtqueue_split), 
+so we have rather simple logic below:
+
+
+
+> +
+> +	vring->dma_addr = dma_addr;
+> +	vring->queue = queue;
+> +	vring->queue_size_in_bytes = queue_size_in_bytes;
+> +
+> +	return 0;
+> +}
+> +
+> +static struct virtqueue *vring_create_virtqueue_split(
+> +	unsigned int index,
+> +	unsigned int num,
+> +	unsigned int vring_align,
+> +	struct virtio_device *vdev,
+> +	bool weak_barriers,
+> +	bool may_reduce_num,
+> +	bool context,
+> +	bool (*notify)(struct virtqueue *),
+> +	void (*callback)(struct virtqueue *),
+> +	const char *name)
+> +{
+> +	struct vring_split vring;
+> +	struct virtqueue *vq;
+> +	int err;
+> +
+> +	err = vring_create_vring_split(&vring, vdev, vring_align, weak_barriers,
+> +				       may_reduce_num, num);
+> +	if (err)
+> +		return NULL;
+
+
+queue = vring_alloc_queue_split(vdev, &dma_addr, ...);
+
+if (!queue)
+
+     return -ENOMEM;
+
+vring_init();
+
+...
+
+Thanks
+
+
+>   
+> -	vq = __vring_new_virtqueue(index, vring, vdev, weak_barriers, context,
+> +	vq = __vring_new_virtqueue(index, vring.vring, vdev, weak_barriers, context,
+>   				   notify, callback, name);
+>   	if (!vq) {
+> -		vring_free_queue(vdev, queue_size_in_bytes, queue,
+> -				 dma_addr);
+> +		vring_free_queue(vdev, vring.queue_size_in_bytes, vring.queue,
+> +				 vring.dma_addr);
+>   		return NULL;
+>   	}
+>   
+> -	to_vvq(vq)->split.queue_dma_addr = dma_addr;
+> -	to_vvq(vq)->split.queue_size_in_bytes = queue_size_in_bytes;
+> +	to_vvq(vq)->split.queue_dma_addr = vring.dma_addr;
+> +	to_vvq(vq)->split.queue_size_in_bytes = vring.queue_size_in_bytes;
+>   	to_vvq(vq)->we_own_ring = true;
+>   
+>   	return vq;
 
