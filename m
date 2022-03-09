@@ -2,329 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A4294D2CFF
-	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 11:20:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8784B4D2D1A
+	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 11:28:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229627AbiCIKVm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Mar 2022 05:21:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36932 "EHLO
+        id S230128AbiCIK3D (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Mar 2022 05:29:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56354 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229492AbiCIKVk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Mar 2022 05:21:40 -0500
-Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03F881688FD;
-        Wed,  9 Mar 2022 02:20:40 -0800 (PST)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e01424;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=33;SR=0;TI=SMTPD_---0V6jFsoZ_1646821234;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0V6jFsoZ_1646821234)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Wed, 09 Mar 2022 18:20:35 +0800
-Message-ID: <1646821007.3534708-15-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH v7 24/26] virtio_net: support rx/tx queue reset
-Date:   Wed, 9 Mar 2022 18:16:47 +0800
-From:   Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mark Gross <markgross@kernel.org>,
-        Vadim Pasternak <vadimp@nvidia.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Johannes Berg <johannes.berg@intel.com>,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>,
-        linux-um@lists.infradead.org, platform-driver-x86@vger.kernel.org,
-        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, bpf@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-References: <20220308123518.33800-1-xuanzhuo@linux.alibaba.com>
- <20220308123518.33800-25-xuanzhuo@linux.alibaba.com>
- <7ff78ff8-bdd0-bb5e-1cea-cf1126226feb@redhat.com>
-In-Reply-To: <7ff78ff8-bdd0-bb5e-1cea-cf1126226feb@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S230082AbiCIK3C (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Mar 2022 05:29:02 -0500
+X-Greylist: delayed 24101 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 09 Mar 2022 02:28:02 PST
+Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [63.216.63.35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBF8839BB5
+        for <kvm@vger.kernel.org>; Wed,  9 Mar 2022 02:28:02 -0800 (PST)
+Received: from mse-fl2.zte.com.cn (unknown [10.30.14.239])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mxhk.zte.com.cn (FangMail) with ESMTPS id 4KD7gj09JNz7jZwY;
+        Wed,  9 Mar 2022 18:28:01 +0800 (CST)
+Received: from szxlzmapp01.zte.com.cn ([10.5.231.85])
+        by mse-fl2.zte.com.cn with SMTP id 229ARuqL046075;
+        Wed, 9 Mar 2022 18:27:56 +0800 (GMT-8)
+        (envelope-from wang.yi59@zte.com.cn)
+Received: from mapi (szxlzmapp07[null])
+        by mapi (Zmail) with MAPI id mid14;
+        Wed, 9 Mar 2022 18:27:56 +0800 (CST)
+Date:   Wed, 9 Mar 2022 18:27:56 +0800 (CST)
+X-Zmail-TransId: 2b096228812c90d01bcd
+X-Mailer: Zmail v1.0
+Message-ID: <202203091827565144689@zte.com.cn>
+In-Reply-To: <2bd92846-381b-f083-754a-89dfcdccc90c@redhat.com>
+References: 20220309113025.44469-1-wang.yi59@zte.com.cn,2bd92846-381b-f083-754a-89dfcdccc90c@redhat.com
+Mime-Version: 1.0
+From:   <wang.yi59@zte.com.cn>
+To:     <pbonzini@redhat.com>
+Cc:     <seanjc@google.com>, <vkuznets@redhat.com>,
+        <wanpengli@tencent.com>, <jmattson@google.com>, <joro@8bytes.org>,
+        <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
+        <dave.hansen@linux.intel.com>, <x86@kernel.org>, <hpa@zytor.com>,
+        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <xue.zhihong@zte.com.cn>, <up2wing@gmail.com>,
+        <wang.liang82@zte.com.cn>, <liu.yi24@zte.com.cn>
+Subject: =?UTF-8?B?UmU6W1BBVENIXSBLVk06IFNWTTogZml4IHBhbmljIG9uIG91dC1vZi1ib3VuZHMgZ3Vlc3QgSVJR?=
+Content-Type: text/plain;
+        charset="UTF-8"
+X-MAIL: mse-fl2.zte.com.cn 229ARuqL046075
+X-Fangmail-Gw-Spam-Type: 0
+X-FangMail-Miltered: at cgslv5.04-192.168.250.138.novalocal with ID 62288131.000 by FangMail milter!
+X-FangMail-Envelope: 1646821681/4KD7gj09JNz7jZwY/62288131.000/10.30.14.239/[10.30.14.239]/mse-fl2.zte.com.cn/<wang.yi59@zte.com.cn>
+X-Fangmail-Anti-Spam-Filtered: true
+X-Fangmail-MID-QID: 62288131.000/4KD7gj09JNz7jZwY
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        UNPARSEABLE_RELAY autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sorry, the last reply email was too fast, with some Chinese mixed in. So se=
-nd
-another email.
+Hi Paolo,
 
-On Wed, 9 Mar 2022 17:14:34 +0800, Jason Wang <jasowang@redhat.com> wrote:
->
-> =E5=9C=A8 2022/3/8 =E4=B8=8B=E5=8D=888:35, Xuan Zhuo =E5=86=99=E9=81=93:
-> > This patch implements the reset function of the rx, tx queues.
-> >
-> > Based on this function, it is possible to modify the ring num of the
-> > queue. And quickly recycle the buffer in the queue.
-> >
-> > In the process of the queue disable, in theory, as long as virtio
-> > supports queue reset, there will be no exceptions.
-> >
-> > However, in the process of the queue enable, there may be exceptions du=
-e to
-> > memory allocation.  In this case, vq is not available, but we still have
-> > to execute napi_enable(). Because napi_disable is similar to a lock,
-> > napi_enable must be called after calling napi_disable.
-> >
-> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > ---
-> >   drivers/net/virtio_net.c | 107 +++++++++++++++++++++++++++++++++++++++
-> >   1 file changed, 107 insertions(+)
-> >
-> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > index 409a8e180918..ffff323dcef0 100644
-> > --- a/drivers/net/virtio_net.c
-> > +++ b/drivers/net/virtio_net.c
-> > @@ -251,6 +251,11 @@ struct padded_vnet_hdr {
-> >   	char padding[4];
-> >   };
-> >
-> > +static void virtnet_sq_free_unused_bufs(struct virtnet_info *vi,
-> > +					struct send_queue *sq);
-> > +static void virtnet_rq_free_unused_bufs(struct virtnet_info *vi,
-> > +					struct receive_queue *rq);
-> > +
-> >   static bool is_xdp_frame(void *ptr)
-> >   {
-> >   	return (unsigned long)ptr & VIRTIO_XDP_FLAG;
-> > @@ -1369,6 +1374,9 @@ static void virtnet_napi_enable(struct virtqueue =
-*vq, struct napi_struct *napi)
-> >   {
-> >   	napi_enable(napi);
-> >
-> > +	if (vq->reset)
-> > +		return;
-> > +
->
->
-> Let's WARN_ONCE() here?
->
->
-> >   	/* If all buffers were filled by other side before we napi_enabled, =
-we
-> >   	 * won't get another interrupt, so process any outstanding packets n=
-ow.
-> >   	 * Call local_bh_enable after to trigger softIRQ processing.
-> > @@ -1413,6 +1421,10 @@ static void refill_work(struct work_struct *work)
-> >   		struct receive_queue *rq =3D &vi->rq[i];
-> >
-> >   		napi_disable(&rq->napi);
-> > +		if (rq->vq->reset) {
-> > +			virtnet_napi_enable(rq->vq, &rq->napi);
-> > +			continue;
-> > +		}
->
->
-> This seems racy and it's a hint that we need sync with the refill work
-> during reset like what we did in virtnet_close():
->
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* Make sure refill_work does=
-n't re-enable napi! */
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cancel_delayed_work_sync(&vi-=
->refill);
->
->
-> >   		still_empty =3D !try_fill_recv(vi, rq, GFP_KERNEL);
-> >   		virtnet_napi_enable(rq->vq, &rq->napi);
-> >
-> > @@ -1523,6 +1535,9 @@ static void virtnet_poll_cleantx(struct receive_q=
-ueue *rq)
-> >   	if (!sq->napi.weight || is_xdp_raw_buffer_queue(vi, index))
-> >   		return;
-> >
-> > +	if (sq->vq->reset)
-> > +		return;
->
->
-> It looks to me we'd better either WARN or just remove this. Since it
-> looks like a workaround for the un-synchronized NAPI somehow.
+> On 3/9/22 12:30, Yi Wang wrote:
+> > As guest_irq is coming from KVM_IRQFD API call, it may trigger
+> > crash in svm_update_pi_irte() due to out-of-bounds:
+> > 
+> > crash> bt
+> > PID: 22218  TASK: ffff951a6ad74980  CPU: 73  COMMAND: "vcpu8"
+> >   #0 [ffffb1ba6707fa40] machine_kexec at ffffffff8565b397
+> >   #1 [ffffb1ba6707fa90] __crash_kexec at ffffffff85788a6d
+> >   #2 [ffffb1ba6707fb58] crash_kexec at ffffffff8578995d
+> >   #3 [ffffb1ba6707fb70] oops_end at ffffffff85623c0d
+> >   #4 [ffffb1ba6707fb90] no_context at ffffffff856692c9
+> >   #5 [ffffb1ba6707fbf8] exc_page_fault at ffffffff85f95b51
+> >   #6 [ffffb1ba6707fc50] asm_exc_page_fault at ffffffff86000ace
+> >      [exception RIP: svm_update_pi_irte+227]
+> >      RIP: ffffffffc0761b53  RSP: ffffb1ba6707fd08  RFLAGS: 00010086
+> >      RAX: ffffb1ba6707fd78  RBX: ffffb1ba66d91000  RCX: 0000000000000001
+> >      RDX: 00003c803f63f1c0  RSI: 000000000000019a  RDI: ffffb1ba66db2ab8
+> >      RBP: 000000000000019a   R8: 0000000000000040   R9: ffff94ca41b82200
+> >      R10: ffffffffffffffcf  R11: 0000000000000001  R12: 0000000000000001
+> >      R13: 0000000000000001  R14: ffffffffffffffcf  R15: 000000000000005f
+> >      ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
+> >   #7 [ffffb1ba6707fdb8] kvm_irq_routing_update at ffffffffc09f19a1 [kvm]
+> >   #8 [ffffb1ba6707fde0] kvm_set_irq_routing at ffffffffc09f2133 [kvm]
+> >   #9 [ffffb1ba6707fe18] kvm_vm_ioctl at ffffffffc09ef544 [kvm]
+> > #10 [ffffb1ba6707ff10] __x64_sys_ioctl at ffffffff85935474
+> > #11 [ffffb1ba6707ff40] do_syscall_64 at ffffffff85f921d3
+> > #12 [ffffb1ba6707ff50] entry_SYSCALL_64_after_hwframe at ffffffff8600007c
+> >      RIP: 00007f143c36488b  RSP: 00007f143a4e04b8  RFLAGS: 00000246
+> >      RAX: ffffffffffffffda  RBX: 00007f05780041d0  RCX: 00007f143c36488b
+> >      RDX: 00007f05780041d0  RSI: 000000004008ae6a  RDI: 0000000000000020
+> >      RBP: 00000000000004e8   R8: 0000000000000008   R9: 00007f05780041e0
+> >      R10: 00007f0578004560  R11: 0000000000000246  R12: 00000000000004e0
+> >      R13: 000000000000001a  R14: 00007f1424001c60  R15: 00007f0578003bc0
+> >      ORIG_RAX: 0000000000000010  CS: 0033  SS: 002b
+> > 
+> > Vmx have been fix this in commit 3a8b0677fc61 (KVM: VMX: Do not BUG() on
+> > out-of-bounds guest IRQ), so we can just copy source from that to fix
+> > this.
+> > 
+> > Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
+> > Signed-off-by: Yi Liu <liu.yi24@zte.com.cn>
+> 
+> Hi, the Signed-off-by chain is wrong.  Did Yi Liu write the patch (and 
+> you are just sending it)?
 
-During the reset process, both ring reset and enable may fail. In the case =
-of
-failure, vq will be unavailable. All three cases prevent this situation.
+The Signed-off-by chain is not wrong, I (Yi Wang) wrote this patch and Yi Liu
+co-developed it.
 
-Even if it fails, napi still needs to be enabled. This is to prevent
-napi_disable from being stuck when the network card is closed.
-
-
-So the first and second cases above are that napi is enabled, but vq has not
-been reset successfully or is still in reset.
-
-And the third case is to deal with tx in reset, and rx is in working state,=
- then
-here will access the vq of sq.
-
->
->
-> > +
-> >   	if (__netif_tx_trylock(txq)) {
-> >   		do {
-> >   			virtqueue_disable_cb(sq->vq);
-> > @@ -1769,6 +1784,98 @@ static netdev_tx_t start_xmit(struct sk_buff *sk=
-b, struct net_device *dev)
-> >   	return NETDEV_TX_OK;
-> >   }
-> >
-> > +static int virtnet_rx_vq_reset(struct virtnet_info *vi,
-> > +			       struct receive_queue *rq, u32 ring_num)
->
->
-> It's better to rename this as virtnet_rx_resize().
-
-I don't think resize is good enough, because I think resize is an effect of
-reset. Inside af_xdp, we will call it just to reset to free the buffer with=
-out
-resize with ring_num =3D=3D 0.
-
-So virtnet_rx_reset() might be better.
-
-
->
->
-> > +{
-> > +	int err;
-> > +
-> > +	/* stop napi */
-> > +	napi_disable(&rq->napi);
-> > +
->
->
-> Here, as discussed above, we need synchronize with the refill work.
->
->
-> > +	/* reset the queue */
-> > +	err =3D virtio_reset_vq(rq->vq);
-> > +	if (err)
-> > +		goto err;
->
->
-> Btw, most comment of this function seems useless since code already
-> explain themselves.
->
-
-OK, I will remove these.
-
->
-> > +
-> > +	/* free bufs */
-> > +	virtnet_rq_free_unused_bufs(vi, rq);
-> > +
-> > +	/* reset vring. */
-> > +	err =3D virtqueue_reset_vring(rq->vq, ring_num);
-> > +	if (err)
-> > +		goto err;
-> > +
-> > +	/* enable reset queue */
-> > +	err =3D virtio_enable_resetq(rq->vq);
-> > +	if (err)
-> > +		goto err;
-> > +
-> > +	/* fill recv */
-> > +	if (!try_fill_recv(vi, rq, GFP_KERNEL))
-> > +		schedule_delayed_work(&vi->refill, 0);
-> > +
-> > +	/* enable napi */
-> > +	virtnet_napi_enable(rq->vq, &rq->napi);
-> > +	return 0;
-> > +
-> > +err:
-> > +	netdev_err(vi->dev,
-> > +		   "reset rx reset vq fail: rx queue index: %ld err: %d\n",
-> > +		   rq - vi->rq, err);
-> > +	virtnet_napi_enable(rq->vq, &rq->napi);
-> > +	return err;
-> > +}
-> > +
-> > +static int virtnet_tx_vq_reset(struct virtnet_info *vi,
-> > +			       struct send_queue *sq, u32 ring_num)
-> > +{
->
->
-> It looks to me it's better to rename this as "virtnet_rx_resize()"
->
->
-> > +	struct netdev_queue *txq;
-> > +	int err, qindex;
-> > +
-> > +	qindex =3D sq - vi->sq;
-> > +
-> > +	txq =3D netdev_get_tx_queue(vi->dev, qindex);
-> > +	__netif_tx_lock_bh(txq);
-> > +
-> > +	/* stop tx queue and napi */
-> > +	netif_stop_subqueue(vi->dev, qindex);
-> > +	virtnet_napi_tx_disable(&sq->napi);
->
->
-> There's no need to hold tx lock for napi disable.
-
-The main purpose of tx lock is to wait for other xmit calls to end. And set
-netif_stop_subqueue()
-
-Thanks.
-
->
-> Thanks
->
->
-> > +
-> > +	__netif_tx_unlock_bh(txq);
-> > +
-> > +	/* reset the queue */
-> > +	err =3D virtio_reset_vq(sq->vq);
-> > +	if (err) {
-> > +		netif_start_subqueue(vi->dev, qindex);
-> > +		goto err;
-> > +	}
-> > +
-> > +	/* free bufs */
-> > +	virtnet_sq_free_unused_bufs(vi, sq);
-> > +
-> > +	/* reset vring. */
-> > +	err =3D virtqueue_reset_vring(sq->vq, ring_num);
-> > +	if (err)
-> > +		goto err;
-> > +
-> > +	/* enable reset queue */
-> > +	err =3D virtio_enable_resetq(sq->vq);
-> > +	if (err)
-> > +		goto err;
-> > +
-> > +	/* start tx queue and napi */
-> > +	netif_start_subqueue(vi->dev, qindex);
-> > +	virtnet_napi_tx_enable(vi, sq->vq, &sq->napi);
-> > +	return 0;
-> > +
-> > +err:
-> > +	netdev_err(vi->dev,
-> > +		   "reset tx reset vq fail: tx queue index: %ld err: %d\n",
-> > +		   sq - vi->sq, err);
-> > +	virtnet_napi_tx_enable(vi, sq->vq, &sq->napi);
-> > +	return err;
-> > +}
-> > +
-> >   /*
-> >    * Send command via the control virtqueue and check status.  Commands
-> >    * supported by the hypervisor, as indicated by feature bits, should
->
+> 
+> Paolo
