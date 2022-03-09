@@ -2,69 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 464254D2D25
-	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 11:33:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 49A844D2D28
+	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 11:34:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230255AbiCIKeY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Mar 2022 05:34:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47872 "EHLO
+        id S230311AbiCIKfN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Mar 2022 05:35:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229846AbiCIKeX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Mar 2022 05:34:23 -0500
-Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8871986D6;
-        Wed,  9 Mar 2022 02:33:24 -0800 (PST)
-Received: by mail-wr1-x42c.google.com with SMTP id u10so2263251wra.9;
-        Wed, 09 Mar 2022 02:33:24 -0800 (PST)
+        with ESMTP id S229953AbiCIKfL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Mar 2022 05:35:11 -0500
+Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71DDDE44BE;
+        Wed,  9 Mar 2022 02:34:13 -0800 (PST)
+Received: by mail-wr1-x433.google.com with SMTP id u10so2266660wra.9;
+        Wed, 09 Mar 2022 02:34:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=sender:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=2TIhBGZZT2Sdj20iP1ZMGyRasB0aL4dQ4VGA6wpujWU=;
-        b=SLnnOOaUySE/vVlhHO0c/KRIc7THdFeNsIMeGM1c/hHtnb+0WLrJkcfu7tpE9dg8RT
-         TtuGO8SRKPGYUU9vbfnQNuNL6SdXpc6Lr9vtP/P+WVo+vs6/pOZFhbnly7oP1TGgzBII
-         z9DQeCX0jk0v+3BRYzfZRxw64ZMHeLyV3fbKx0B9JGv6FKYROzJS1BDjoCtgujYxLmSs
-         K1Hw+RxoZcK1T1stvKHE7eBoHwp1UIzTAIdF8pTV4XvqWhBf5T5/o0hYiNl0VWIvWRR1
-         xFFYBw7xlvmpV29GmhOapd5BVSGez/1Bj9H8JgDOI4k0KpOqcJgBmBxwqZ2rGMBKv0Yw
-         6GZw==
+        bh=Dr1lE4tyQ/hl/XtFcan3CZdUBU9oU7rRqhzzfp6nEuQ=;
+        b=IPvFQTKx1i3QLvzOgqUFdZZV+Cv1RyqMlXIFO+hHZJa4hFsfEc3oTiIE3dE/xo7mrm
+         eYL8NC6f1TD3GxL51x+z0CFiU4dKr4QnHg3K7E6QXcL0Cs1HLx8uJ+4Mpn/dP7sL/lL1
+         JOe0bWI8SIyr/qAlfPIVWf9844hUBWg0e38A5fjnsJtvUUFsKD8mes6/A9YRiKyXPFHX
+         HF78OHgY+mEKablrzepAao0/R0KoCgLP1NJs9XqpzmFMWeMjn4nrtVy+xVsOY7zdCc6E
+         QXgZpdJumkDJ+MI37tUokYtzTgom6199ifBG0i2Jh7IiF7vVqjq/JQn2XunrWbKD/LPN
+         gnEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
          :subject:content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=2TIhBGZZT2Sdj20iP1ZMGyRasB0aL4dQ4VGA6wpujWU=;
-        b=3/hTsAXU9ZTxFtKJDaaJQ1suLfldqKT6PXvG3lwR4f1qt96yrrLjrNdbnoU2YTkbeI
-         ySTIO2co9BQVSU2pC5jssGH3yeg93xT3lU3fKpTzlMvlVInTqjOw619GFAj/SgvQ1pwO
-         BgQ9bndjTuKLHi1Jd0iFumfACapJ7LiL5T9IDzYP+eVN2Q1MykwPuAUAP9xTtM61bjNq
-         Ml0Di0NZw07P8y/vg5ZpCT4k6ITk9NAcGRFdpO128WEAFOBAlt2pIY2J3JJo+OtcbjnG
-         ArakxNG2/RvKolMoXJqjZv+efJoWN5s9OE35dfORfjDrCh6c+FjBquG1CJvvLul+HKiB
-         vFSg==
-X-Gm-Message-State: AOAM531x8UQc0gDtCXVQT7k9R0eF8GlDRlhT34FdNKOaNANRbBY9e8Uj
-        gLDyEnVbSUKHN9GqSVj2q92bnCpLS7o=
-X-Google-Smtp-Source: ABdhPJx3I4CgjUpRaHWG6b5XR5TDvqoHm2ZOnASwxM/9LBEK2jnkDeM8X5SIRtt0bHfv7whyKHx9ww==
-X-Received: by 2002:a05:6000:1449:b0:1fc:a870:4b85 with SMTP id v9-20020a056000144900b001fca8704b85mr8097325wrx.639.1646822003335;
-        Wed, 09 Mar 2022 02:33:23 -0800 (PST)
+        bh=Dr1lE4tyQ/hl/XtFcan3CZdUBU9oU7rRqhzzfp6nEuQ=;
+        b=n0mAygPnpGtDqArxAoAxPzRy6dgkQZLGS3eY3bx9YWmyCLUpWC+4lNVD8P2RxQUV5a
+         xulgXIpHKo8MR8qYhltXQkGCEfstvorjXe3zBBE4JkZbDJDSI+0HJTkfe9/JMX7y7K0p
+         2ftHHqaJejqfQdBMy3U5H7QinATn6W5hy5SA5Pg75F7GjJExl5vDV8f+Dfyv2ULPfh/Z
+         cMX9oIP4l8gGML4iZE4kR7FoJGoMH5f6TLjp5FDT8cdkdRbR0uDf1BnkDYIkwYq4LSXn
+         SnRU4611/bE6Nq02ft7cAtFv4NpXBx08hd6A24LVE1GRO9wlsTVUWzXtYVbOAsyo66B9
+         C85A==
+X-Gm-Message-State: AOAM532BAThWRjosHZqF3RyY0/65ig3BaquaW5T/1Ze+E+aEWv22hQYa
+        XZrFXgeKsbjfhvwUPUzoHYk=
+X-Google-Smtp-Source: ABdhPJyOU4VlBzK+DMvvkpdNHot0wM4wwu2nmapSl+oHDq/a9gJPnw8H/NtbUi4mZoLCWJRjHaYUQA==
+X-Received: by 2002:a5d:5105:0:b0:1f1:d115:c9f with SMTP id s5-20020a5d5105000000b001f1d1150c9fmr16227494wrt.77.1646822052049;
+        Wed, 09 Mar 2022 02:34:12 -0800 (PST)
 Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id o19-20020a05600c511300b00389c3a281d7sm6250982wms.0.2022.03.09.02.33.22
+        by smtp.googlemail.com with ESMTPSA id s17-20020adfdb11000000b001f02d5fea43sm1410343wri.98.2022.03.09.02.34.11
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Mar 2022 02:33:22 -0800 (PST)
+        Wed, 09 Mar 2022 02:34:11 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <2f983feb-0afa-ce3d-5065-bd27d3a6a948@redhat.com>
-Date:   Wed, 9 Mar 2022 11:33:21 +0100
+Message-ID: <0d4cf6ad-a374-51ef-5879-967de1c09cc6@redhat.com>
+Date:   Wed, 9 Mar 2022 11:34:10 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.5.0
-Subject: Re: [PATCH v2 19/25] KVM: x86/mmu: simplify and/or inline computation
- of shadow MMU roles
+Subject: Re: [PATCH v2 24/25] KVM: x86/mmu: initialize constant-value fields
+ just once
 Content-Language: en-US
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         dmatlack@google.com
 References: <20220221162243.683208-1-pbonzini@redhat.com>
- <20220221162243.683208-20-pbonzini@redhat.com> <Yiev/V/KPd1IrLta@google.com>
+ <20220221162243.683208-25-pbonzini@redhat.com> <YifDh5E63lAkJraV@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <Yiev/V/KPd1IrLta@google.com>
+In-Reply-To: <YifDh5E63lAkJraV@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -78,19 +78,15 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/8/22 20:35, Sean Christopherson wrote:
->> +	root_role = cpu_mode.base;
->> +	root_role.level = max_t(u32, root_role.level, PT32E_ROOT_LEVEL);
-> Heh, we have different definitions of "simpler".   Can we split the difference
-> and do?
+On 3/8/22 21:58, Sean Christopherson wrote:
+> Using nested_ops is clever, but IMO unnecessary, especially since we can go even
+> further by adding a nEPT specific hook to initialize its constant shadow paging
+> stuff.
 > 
-> 	/* KVM uses PAE paging whenever the guest isn't using 64-bit paging. */
-> 	if (!____is_efer_lma(regs))
-> 		root_role.level = PT32E_ROOT_LEVEL;
-> 
+> Here's what I had written spliced in with your code.  Compile tested only for
+> this version.
 
-It's not that easy until the very end (when cpu_mode is set in 
-kvm_mmu_init_walker), but I'll make sure to switch to is_efer_lma once 
-it is possible.
+I'll do something in between, keeping the nested_ops but with three 
+functions to initialize the various kvm_mmu structs.
 
 Paolo
