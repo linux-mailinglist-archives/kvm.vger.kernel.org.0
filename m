@@ -2,167 +2,257 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CF1BD4D2B3D
-	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 10:02:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A04B34D2B45
+	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 10:02:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231698AbiCIJDM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Mar 2022 04:03:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54248 "EHLO
+        id S231706AbiCIJDf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Mar 2022 04:03:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54692 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231764AbiCIJC4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Mar 2022 04:02:56 -0500
+        with ESMTP id S231612AbiCIJDa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Mar 2022 04:03:30 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8127216AA5E
-        for <kvm@vger.kernel.org>; Wed,  9 Mar 2022 01:01:58 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id CF82F3B3F4
+        for <kvm@vger.kernel.org>; Wed,  9 Mar 2022 01:02:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646816517;
+        s=mimecast20190719; t=1646816549;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=BgihzrLoyH/kzw4agGF/2fpwe3C4H7hKVoUZxMMuCSc=;
-        b=frlL4TwvOvf8XI3U3cL7Vz82dbPGYKkcbfTlomcMPhpQJTmKqsMUjdiPd/7eEjF9IvmkXg
-        kHI6dqsgXwqYjkHpl+vXoMiZALRWgqnh/PMymu3Zz9EZTAtdcSfSi5oes9Mmr4PirIcPwh
-        +QW9qO0zle7YE2RRa2Ws3entuVQ5CaU=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=5aObMD6Ok3RFIxMTKg8qnF6qbjrqHlGEfR26y0Xh7So=;
+        b=QUXYqipsbGVkk8colGFNvkCatBH3mK0b0l2bkDHSAToVOmvuM2b9hScEjxBWfyFBPyvgQP
+        M1j7L9a6MQZGCvXYOEOu4SUDI4QpTpEdAASBIexjdSHsne00acIK5pPR28ToNYaWFaBs3B
+        6rwSg+Q6elXhmGvLvu1wlkAIfzP9KpU=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-28-_N5iidE9MwqENNnwVnLB8Q-1; Wed, 09 Mar 2022 04:01:56 -0500
-X-MC-Unique: _N5iidE9MwqENNnwVnLB8Q-1
-Received: by mail-wr1-f71.google.com with SMTP id q14-20020adfea0e000000b002036c16c6daso525953wrm.8
-        for <kvm@vger.kernel.org>; Wed, 09 Mar 2022 01:01:56 -0800 (PST)
+ us-mta-56-bZzWe08lM267DfjMcXyWhw-1; Wed, 09 Mar 2022 04:02:28 -0500
+X-MC-Unique: bZzWe08lM267DfjMcXyWhw-1
+Received: by mail-wm1-f70.google.com with SMTP id 14-20020a05600c104e00b003897a167353so703607wmx.8
+        for <kvm@vger.kernel.org>; Wed, 09 Mar 2022 01:02:28 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=BgihzrLoyH/kzw4agGF/2fpwe3C4H7hKVoUZxMMuCSc=;
-        b=Zy+7eJi2uwwFYZPIjTJsX3/bqn6z883dQkdEbea4F8dfTu5TuUq5X4/kQ3EnY4tvGI
-         gF2A7htSKwhgav6IQ4Qbm9TEo7Jz2aFOseUu/bj0KI07OuN2k18IJxWdEiv3TFZbhoB+
-         T9cRa2bJK2iMk+TC3WLqQZWxi8IxQlP2ErX/Yo3nBiBwozI4AjJaFQEiYHMehteDFfnM
-         nlCmxzLo6KW1230+i+Xv/LjHjZ2hXfmj26oYIoa0VnUh8hIk6lSvTEZLrXxd2S3ydiJo
-         NvLxWCiv9TQEA89thXq0eWMKDk3tyeUVBBEByeSmJY5SNbJHMtBFnyvrfUrvFiYXLXFw
-         mVag==
-X-Gm-Message-State: AOAM530v+R2SkjDeigyGnCtqQnVxBdgu2noNwTKBGVxox+9GvXTSSVlE
-        VvBeOE8hfqnC03I0yhZdN79v2nPvQIKQsx1Jf/PWTdkyKnZ7iNaySTxGHcVv8E5E6NcajKpAzGS
-        biKqAywSS7e6F
-X-Received: by 2002:a05:600c:4284:b0:389:c472:e05e with SMTP id v4-20020a05600c428400b00389c472e05emr2417558wmc.19.1646816514296;
-        Wed, 09 Mar 2022 01:01:54 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyAXoU+4WoIZYbFO+NXA9MK58DX0yxqbTORMzXVOGXqqWnQvtw1moTN4UdJ53YnAHPs7z7S4w==
-X-Received: by 2002:a05:600c:4284:b0:389:c472:e05e with SMTP id v4-20020a05600c428400b00389c472e05emr2417528wmc.19.1646816514034;
-        Wed, 09 Mar 2022 01:01:54 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id ay24-20020a05600c1e1800b00389a420e1ecsm1098507wmb.37.2022.03.09.01.01.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Mar 2022 01:01:53 -0800 (PST)
-Message-ID: <2bd92846-381b-f083-754a-89dfcdccc90c@redhat.com>
-Date:   Wed, 9 Mar 2022 10:01:52 +0100
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=5aObMD6Ok3RFIxMTKg8qnF6qbjrqHlGEfR26y0Xh7So=;
+        b=IQzS97acCWaehNUl10KEK3nYx5mNWLgbyVBXIWtcU+FZwicsaHBNAisr2Mm/Xrcwrh
+         ++ahBxBlyWqcvi765w46Ih8CNzSyxaCMpzlIGVHf/27+EvwhsXXcEVbFqwxT8IafPPcf
+         2oe2V8FD7DTk+YM8hqD/977tHY6l6jCKmU7hezGKhONbmjLQJaw1uqB9pmejsDnY9GGG
+         w3TMfoyonk5vC/J/Esv/2JAj3slKpUMQorbLbYsv5210ZPO6Mg6287fGR/Ow8Yh+fgAw
+         pGL2ldudhmEZdbwl60fAovnFZT+gX8PMiDsFYtHlUCSqSkmva+RiyMBdXKuzN/eVONuE
+         BndA==
+X-Gm-Message-State: AOAM53186dnH3HPHGYGDKWJdtq0Li4tQbb8JC2h0rBprw+6r0xCb+san
+        uH7Ca56+ph3RGROIwFZfxb3Ub9xEGhBZO0BlrE5CimLJ0olmPf0KPT8KUKSEbk35bM31LA6paTV
+        LXwbyQpRdsS44
+X-Received: by 2002:a05:6000:18c3:b0:1e5:82d3:e4e2 with SMTP id w3-20020a05600018c300b001e582d3e4e2mr14993287wrq.575.1646816547199;
+        Wed, 09 Mar 2022 01:02:27 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJw/K3pXZ+ppWTfZ6/r7oUGokhYCJ/UF0RyQUca34snHdSOK5obfoBIbDyvpSzzrgemP9xZiVA==
+X-Received: by 2002:a05:6000:18c3:b0:1e5:82d3:e4e2 with SMTP id w3-20020a05600018c300b001e582d3e4e2mr14993243wrq.575.1646816546861;
+        Wed, 09 Mar 2022 01:02:26 -0800 (PST)
+Received: from redhat.com ([2.55.46.250])
+        by smtp.gmail.com with ESMTPSA id u10-20020adfa18a000000b001f04c24afe7sm1094077wru.41.2022.03.09.01.02.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Mar 2022 01:02:26 -0800 (PST)
+Date:   Wed, 9 Mar 2022 04:02:18 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        Jeff Dike <jdike@addtoit.com>,
+        Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Mark Gross <markgross@kernel.org>,
+        Vadim Pasternak <vadimp@nvidia.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Johannes Berg <johannes.berg@intel.com>,
+        Vincent Whitchurch <vincent.whitchurch@axis.com>,
+        linux-um@lists.infradead.org, platform-driver-x86@vger.kernel.org,
+        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH v7 00/26] virtio pci support VIRTIO_F_RING_RESET
+Message-ID: <20220309035751-mutt-send-email-mst@kernel.org>
+References: <20220308123518.33800-1-xuanzhuo@linux.alibaba.com>
+ <2c823fed-8024-39e7-f6f5-176fb518fc1a@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH] KVM: SVM: fix panic on out-of-bounds guest IRQ
-Content-Language: en-US
-To:     Yi Wang <wang.yi59@zte.com.cn>
-Cc:     seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        x86@kernel.org, hpa@zytor.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, xue.zhihong@zte.com.cn,
-        up2wing@gmail.com, wang.liang82@zte.com.cn,
-        Yi Liu <liu.yi24@zte.com.cn>
-References: <20220309113025.44469-1-wang.yi59@zte.com.cn>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220309113025.44469-1-wang.yi59@zte.com.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <2c823fed-8024-39e7-f6f5-176fb518fc1a@redhat.com>
 X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/9/22 12:30, Yi Wang wrote:
-> As guest_irq is coming from KVM_IRQFD API call, it may trigger
-> crash in svm_update_pi_irte() due to out-of-bounds:
+On Wed, Mar 09, 2022 at 12:45:57PM +0800, Jason Wang wrote:
 > 
-> crash> bt
-> PID: 22218  TASK: ffff951a6ad74980  CPU: 73  COMMAND: "vcpu8"
->   #0 [ffffb1ba6707fa40] machine_kexec at ffffffff8565b397
->   #1 [ffffb1ba6707fa90] __crash_kexec at ffffffff85788a6d
->   #2 [ffffb1ba6707fb58] crash_kexec at ffffffff8578995d
->   #3 [ffffb1ba6707fb70] oops_end at ffffffff85623c0d
->   #4 [ffffb1ba6707fb90] no_context at ffffffff856692c9
->   #5 [ffffb1ba6707fbf8] exc_page_fault at ffffffff85f95b51
->   #6 [ffffb1ba6707fc50] asm_exc_page_fault at ffffffff86000ace
->      [exception RIP: svm_update_pi_irte+227]
->      RIP: ffffffffc0761b53  RSP: ffffb1ba6707fd08  RFLAGS: 00010086
->      RAX: ffffb1ba6707fd78  RBX: ffffb1ba66d91000  RCX: 0000000000000001
->      RDX: 00003c803f63f1c0  RSI: 000000000000019a  RDI: ffffb1ba66db2ab8
->      RBP: 000000000000019a   R8: 0000000000000040   R9: ffff94ca41b82200
->      R10: ffffffffffffffcf  R11: 0000000000000001  R12: 0000000000000001
->      R13: 0000000000000001  R14: ffffffffffffffcf  R15: 000000000000005f
->      ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
->   #7 [ffffb1ba6707fdb8] kvm_irq_routing_update at ffffffffc09f19a1 [kvm]
->   #8 [ffffb1ba6707fde0] kvm_set_irq_routing at ffffffffc09f2133 [kvm]
->   #9 [ffffb1ba6707fe18] kvm_vm_ioctl at ffffffffc09ef544 [kvm]
-> #10 [ffffb1ba6707ff10] __x64_sys_ioctl at ffffffff85935474
-> #11 [ffffb1ba6707ff40] do_syscall_64 at ffffffff85f921d3
-> #12 [ffffb1ba6707ff50] entry_SYSCALL_64_after_hwframe at ffffffff8600007c
->      RIP: 00007f143c36488b  RSP: 00007f143a4e04b8  RFLAGS: 00000246
->      RAX: ffffffffffffffda  RBX: 00007f05780041d0  RCX: 00007f143c36488b
->      RDX: 00007f05780041d0  RSI: 000000004008ae6a  RDI: 0000000000000020
->      RBP: 00000000000004e8   R8: 0000000000000008   R9: 00007f05780041e0
->      R10: 00007f0578004560  R11: 0000000000000246  R12: 00000000000004e0
->      R13: 000000000000001a  R14: 00007f1424001c60  R15: 00007f0578003bc0
->      ORIG_RAX: 0000000000000010  CS: 0033  SS: 002b
+> 在 2022/3/8 下午8:34, Xuan Zhuo 写道:
+> > The virtio spec already supports the virtio queue reset function. This patch set
+> > is to add this function to the kernel. The relevant virtio spec information is
+> > here:
+> > 
+> >      https://github.com/oasis-tcs/virtio-spec/issues/124
+> > 
+> > Also regarding MMIO support for queue reset, I plan to support it after this
+> > patch is passed.
+> > 
+> > Performing reset on a queue is divided into four steps:
+> >       1. virtio_reset_vq()              - notify the device to reset the queue
+> >       2. virtqueue_detach_unused_buf()  - recycle the buffer submitted
+> >       3. virtqueue_reset_vring()        - reset the vring (may re-alloc)
+> >       4. virtio_enable_resetq()         - mmap vring to device, and enable the queue
+> > 
+> > The first part 1-17 of this patch set implements virtio pci's support and API
+> > for queue reset. The latter part is to make virtio-net support set_ringparam. Do
+> > these things for this feature:
+> > 
+> >        1. virtio-net support rx,tx reset
+> >        2. find_vqs() support to special the max size of each vq
+> >        3. virtio-net support set_ringparam
+> > 
+> > #1 -#3 :       prepare
+> > #4 -#12:       virtio ring support reset vring of the vq
+> > #13-#14:       add helper
+> > #15-#17:       virtio pci support reset queue and re-enable
+> > #18-#21:       find_vqs() support sizes to special the max size of each vq
+> > #23-#24:       virtio-net support rx, tx reset
+> > #22, #25, #26: virtio-net support set ringparam
+> > 
+> > Test environment:
+> >      Host: 4.19.91
+> >      Qemu: QEMU emulator version 6.2.50 (with vq reset support)
+> >      Test Cmd:  ethtool -G eth1 rx $1 tx $2; ethtool -g eth1
+> > 
+> >      The default is split mode, modify Qemu virtio-net to add PACKED feature to test
+> >      packed mode.
+> > 
+> > 
+> > Please review. Thanks.
+> > 
+> > v7:
+> >    1. fix #6 subject typo
+> >    2. fix #6 ring_size_in_bytes is uninitialized
+> >    3. check by: make W=12
+> > 
+> > v6:
+> >    1. virtio_pci: use synchronize_irq(irq) to sync the irq callbacks
+> >    2. Introduce virtqueue_reset_vring() to implement the reset of vring during
+> >       the reset process. May use the old vring if num of the vq not change.
+> >    3. find_vqs() support sizes to special the max size of each vq
+> > 
+> > v5:
+> >    1. add virtio-net support set_ringparam
+> > 
+> > v4:
+> >    1. just the code of virtio, without virtio-net
+> >    2. Performing reset on a queue is divided into these steps:
+> >      1. reset_vq: reset one vq
+> >      2. recycle the buffer from vq by virtqueue_detach_unused_buf()
+> >      3. release the ring of the vq by vring_release_virtqueue()
+> >      4. enable_reset_vq: re-enable the reset queue
+> >    3. Simplify the parameters of enable_reset_vq()
+> >    4. add container structures for virtio_pci_common_cfg
+> > 
+> > v3:
+> >    1. keep vq, irq unreleased
 > 
-> Vmx have been fix this in commit 3a8b0677fc61 (KVM: VMX: Do not BUG() on
-> out-of-bounds guest IRQ), so we can just copy source from that to fix
-> this.
 > 
-> Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
-> Signed-off-by: Yi Liu <liu.yi24@zte.com.cn>
+> The series became kind of huge.
+> 
+> I'd suggest to split it into two series.
+> 
+> 1) refactoring of the virtio_ring to prepare for the resize
+> 2) the reset support + virtio-net support
+> 
+> Thanks
 
-Hi, the Signed-off-by chain is wrong.  Did Yi Liu write the patch (and 
-you are just sending it)?
 
-Paolo
+And just to clarify, I think you mean all the "extract logic"
+things need to also go into the refactoring part, right?
+Just making 3 first patches a series by themselves won't help ...
+I'm kind of ambivalent on the splitup - both parts
+need work for now, so I wonder how does it help.
+But if you care about it, I don't mind.
 
-> ---
->   arch/x86/kvm/svm/avic.c | 10 ++++++++--
->   1 file changed, 8 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> index fb3e20791338..f59b93d8e95a 100644
-> --- a/arch/x86/kvm/svm/avic.c
-> +++ b/arch/x86/kvm/svm/avic.c
-> @@ -783,7 +783,7 @@ int svm_update_pi_irte(struct kvm *kvm, unsigned int host_irq,
->   {
->   	struct kvm_kernel_irq_routing_entry *e;
->   	struct kvm_irq_routing_table *irq_rt;
-> -	int idx, ret = -EINVAL;
-> +	int idx, ret = 0;
->   
->   	if (!kvm_arch_has_assigned_device(kvm) ||
->   	    !irq_remapping_cap(IRQ_POSTING_CAP))
-> @@ -794,7 +794,13 @@ int svm_update_pi_irte(struct kvm *kvm, unsigned int host_irq,
->   
->   	idx = srcu_read_lock(&kvm->irq_srcu);
->   	irq_rt = srcu_dereference(kvm->irq_routing, &kvm->irq_srcu);
-> -	WARN_ON(guest_irq >= irq_rt->nr_rt_entries);
-> +
-> +	if (guest_irq >= irq_rt->nr_rt_entries ||
-> +		hlist_empty(&irq_rt->map[guest_irq])) {
-> +		pr_warn_once("no route for guest_irq %u/%u (broken user space?)\n",
-> +			     guest_irq, irq_rt->nr_rt_entries);
-> +		goto out;
-> +	}
->   
->   	hlist_for_each_entry(e, &irq_rt->map[guest_irq], link) {
->   		struct vcpu_data vcpu_info;
+> > 
+> > *** BLURB HERE ***
+
+
+You don't want this in your cover letters btw.
+
+> > Xuan Zhuo (26):
+> >    virtio_pci: struct virtio_pci_common_cfg add queue_notify_data
+> >    virtio: queue_reset: add VIRTIO_F_RING_RESET
+> >    virtio: add helper virtqueue_get_vring_max_size()
+> >    virtio_ring: split: extract the logic of creating vring
+> >    virtio_ring: split: extract the logic of init vq and attach vring
+> >    virtio_ring: packed: extract the logic of creating vring
+> >    virtio_ring: packed: extract the logic of init vq and attach vring
+> >    virtio_ring: extract the logic of freeing vring
+> >    virtio_ring: split: implement virtqueue_reset_vring_split()
+> >    virtio_ring: packed: implement virtqueue_reset_vring_packed()
+> >    virtio_ring: introduce virtqueue_reset_vring()
+> >    virtio_ring: update the document of the virtqueue_detach_unused_buf
+> >      for queue reset
+> >    virtio: queue_reset: struct virtio_config_ops add callbacks for
+> >      queue_reset
+> >    virtio: add helper for queue reset
+> >    virtio_pci: queue_reset: update struct virtio_pci_common_cfg and
+> >      option functions
+> >    virtio_pci: queue_reset: extract the logic of active vq for modern pci
+> >    virtio_pci: queue_reset: support VIRTIO_F_RING_RESET
+> >    virtio: find_vqs() add arg sizes
+> >    virtio_pci: support the arg sizes of find_vqs()
+> >    virtio_mmio: support the arg sizes of find_vqs()
+> >    virtio: add helper virtio_find_vqs_ctx_size()
+> >    virtio_net: get ringparam by virtqueue_get_vring_max_size()
+> >    virtio_net: split free_unused_bufs()
+> >    virtio_net: support rx/tx queue reset
+> >    virtio_net: set the default max ring size by find_vqs()
+> >    virtio_net: support set_ringparam
+> > 
+> >   arch/um/drivers/virtio_uml.c             |   2 +-
+> >   drivers/net/virtio_net.c                 | 257 ++++++++--
+> >   drivers/platform/mellanox/mlxbf-tmfifo.c |   3 +-
+> >   drivers/remoteproc/remoteproc_virtio.c   |   2 +-
+> >   drivers/s390/virtio/virtio_ccw.c         |   2 +-
+> >   drivers/virtio/virtio_mmio.c             |  12 +-
+> >   drivers/virtio/virtio_pci_common.c       |  28 +-
+> >   drivers/virtio/virtio_pci_common.h       |   3 +-
+> >   drivers/virtio/virtio_pci_legacy.c       |   8 +-
+> >   drivers/virtio/virtio_pci_modern.c       | 146 +++++-
+> >   drivers/virtio/virtio_pci_modern_dev.c   |  36 ++
+> >   drivers/virtio/virtio_ring.c             | 584 +++++++++++++++++------
+> >   drivers/virtio/virtio_vdpa.c             |   2 +-
+> >   include/linux/virtio.h                   |  12 +
+> >   include/linux/virtio_config.h            |  74 ++-
+> >   include/linux/virtio_pci_modern.h        |   2 +
+> >   include/uapi/linux/virtio_config.h       |   7 +-
+> >   include/uapi/linux/virtio_pci.h          |  14 +
+> >   18 files changed, 979 insertions(+), 215 deletions(-)
+> > 
+> > --
+> > 2.31.0
+> > 
 
