@@ -2,103 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C7A714D2D9D
-	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 12:02:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ADD914D2DCC
+	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 12:17:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231778AbiCILDx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Mar 2022 06:03:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38484 "EHLO
+        id S232125AbiCILSr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Mar 2022 06:18:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231169AbiCILDw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Mar 2022 06:03:52 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4DEC626121
-        for <kvm@vger.kernel.org>; Wed,  9 Mar 2022 03:02:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646823772;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=l3XbrCovqtdO2alSM1NhHDwkb673n4bp3acsIFhcLTE=;
-        b=amPnXfr0W2fB/DUoSMxLJV6NiCBnaetAGbysbYx+u5sZiygqlPVdG7SScpLEsAtKminzrM
-        sBxbxaleEHF/CS8kNkDWn9FSomSNKXd1dDsb/v8p+0JOriw1nPpH5spuB63BnaFKUe/RYj
-        M7oQy9GKrCIB8kR3ied/3ig6fbtANuw=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-600-ivdcz89rOkG50RJAUvdO1Q-1; Wed, 09 Mar 2022 06:02:51 -0500
-X-MC-Unique: ivdcz89rOkG50RJAUvdO1Q-1
-Received: by mail-ej1-f72.google.com with SMTP id m4-20020a170906160400b006be3f85906eso1081096ejd.23
-        for <kvm@vger.kernel.org>; Wed, 09 Mar 2022 03:02:50 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=l3XbrCovqtdO2alSM1NhHDwkb673n4bp3acsIFhcLTE=;
-        b=d+Ssrjtf9xfYIYHJPW2Y+m+fEMNwr3fRjjEl2c5lx+TnY+E+P+1rq0JwgsSXHok0LM
-         vMc5N+v39n/zifJOGet6Ptg9AKLE8pQN64q1sdQiSxvF83ZSscbzH92WmUqxzRQwvdF0
-         ZBNLm8wX2+lcVGUh8gEg57R9aT42H7LGBdj9Saj7R4GGZaZUrqZobetTLnp0he9cAJPA
-         lUrtYxeOCiBoUTQFlLcR/JLN7S7HFYKlIs/j1e2p74wn50bTaRDzh5dEgSiVPj28zs6V
-         rERoPxhKPdzi18GhWk88jyD7cQPbKW0TKJVilBUk4sApI025Sm3yzHeR9EifrY+Cjx69
-         /vNA==
-X-Gm-Message-State: AOAM533HDsxmZr+LRcNHYznlPLqfnaJCr9b4vkrZDW64O7vMJNMWHOAe
-        JMWA5tzQnSVC3gISGq0hQxS0w+lLh8B1C3lH16Ncflk3WETMyM6BDKSgnu2R408A3/kP9vnAxWq
-        P2t58964R1SHj
-X-Received: by 2002:a17:907:e9e:b0:6da:68cd:fe43 with SMTP id ho30-20020a1709070e9e00b006da68cdfe43mr17296617ejc.161.1646823769864;
-        Wed, 09 Mar 2022 03:02:49 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwLFK+hu10hbW+53duxLixYqGk1vI3LHURrtIszmQjP1c+mERaelOMU8OSY5UwM9Bkh+CExAg==
-X-Received: by 2002:a17:907:e9e:b0:6da:68cd:fe43 with SMTP id ho30-20020a1709070e9e00b006da68cdfe43mr17296592ejc.161.1646823769645;
-        Wed, 09 Mar 2022 03:02:49 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id y18-20020a170906471200b006da8a883b5fsm587812ejq.54.2022.03.09.03.02.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Mar 2022 03:02:49 -0800 (PST)
-Message-ID: <3b1de531-a2b8-2638-0c8f-fc23fdf5473c@redhat.com>
-Date:   Wed, 9 Mar 2022 12:02:47 +0100
+        with ESMTP id S232115AbiCILSo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Mar 2022 06:18:44 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E90832ED2
+        for <kvm@vger.kernel.org>; Wed,  9 Mar 2022 03:17:46 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 0ECE0B82040
+        for <kvm@vger.kernel.org>; Wed,  9 Mar 2022 11:17:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE5F5C340E8;
+        Wed,  9 Mar 2022 11:17:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1646824663;
+        bh=JlkIqCPe8EccB301HGf03mUUxO/iuY/OiZe+7CVnF2s=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=nWKcIX1WtcJWMTI3tqI2/IaDK7VQ+5erDN46fkvy68oBIyx2lNZcCSCW/wGoMd1fJ
+         qBnqjW50tbhc57u+DxKm6lj7tgzKCKnH9Ki5KMrJMyCI5QQEe8KdoD/HnIfePk+1fW
+         nFOIui2aLCxc5gpoMUqhyY0v086Bs+Y+RWi+hx+0PSEXeXdGyg2smYH5zc7taBbE3T
+         rvzitDDefdRBmnPpvykjg/JmnNepJgIfpRj5c3Mrp2n0OUQyUfTS95x9YVuKrZDVSF
+         Orxywajd/wTklVPvgMgZQyo9cjA6oW9AHo1inb9Txsn/nNfTdzFH8tkj7gNdx7ldfJ
+         z5bXYW2ZXItqA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nRuK5-00DIeD-G7; Wed, 09 Mar 2022 11:17:41 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     kvmarm@lists.cs.columbia.edu, Oliver Upton <oupton@google.com>
+Cc:     Ricardo Koller <ricarkol@google.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Peter Shier <pshier@google.com>
+Subject: Re: [PATCH v2] Documentation: KVM: Update documentation to indicate KVM is arm64-only
+Date:   Wed,  9 Mar 2022 11:17:34 +0000
+Message-Id: <164682464677.3740483.6091628911446790457.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220308172856.2997250-1-oupton@google.com>
+References: <20220308172856.2997250-1-oupton@google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH] KVM: SVM: fix panic on out-of-bounds guest IRQ
-Content-Language: en-US
-To:     wang.yi59@zte.com.cn
-Cc:     seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        x86@kernel.org, hpa@zytor.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, xue.zhihong@zte.com.cn,
-        up2wing@gmail.com, wang.liang82@zte.com.cn, liu.yi24@zte.com.cn
-References: <202203091827565144689@zte.com.cn>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <202203091827565144689@zte.com.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, oupton@google.com, ricarkol@google.com, alexandru.elisei@arm.com, kvm@vger.kernel.org, james.morse@arm.com, pbonzini@redhat.com, suzuki.poulose@arm.com, reijiw@google.com, linux-arm-kernel@lists.infradead.org, pshier@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/9/22 11:27, wang.yi59@zte.com.cn wrote:
->> Hi, the Signed-off-by chain is wrong.  Did Yi Liu write the patch (and
->> you are just sending it)?
-> The Signed-off-by chain is not wrong, I (Yi Wang) wrote this patch and Yi Liu
-> co-developed it.
+On Tue, 8 Mar 2022 17:28:57 +0000, Oliver Upton wrote:
+> KVM support for 32-bit ARM hosts (KVM/arm) has been removed from the
+> kernel since commit 541ad0150ca4 ("arm: Remove 32bit KVM host
+> support"). There still exists some remnants of the old architecture in
+> the KVM documentation.
 > 
+> Remove all traces of 32-bit host support from the documentation. Note
+> that AArch32 guests are still supported.
 
-Ok, so it should be
+Applied to next, thanks!
 
-Co-developed-by: Yi Liu <liu.yi24@zte.com.cn>
-Signed-off-by: Yi Liu <liu.yi24@zte.com.cn>
-Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
+[1/1] Documentation: KVM: Update documentation to indicate KVM is arm64-only
+      commit: 3fbf4207dc6807bf98e3d32558753cfa5eac2fa1
 
-I'll fix it myself - thanks for the quick reply!
+Cheers,
 
-Paolo
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
+
 
