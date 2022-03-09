@@ -2,153 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9B7454D251C
-	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 02:13:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 634604D256E
+	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 02:14:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229881AbiCIBHK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Mar 2022 20:07:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51070 "EHLO
+        id S230375AbiCIBOT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Mar 2022 20:14:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44762 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229949AbiCIBHD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Mar 2022 20:07:03 -0500
-Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F6A71390C9
-        for <kvm@vger.kernel.org>; Tue,  8 Mar 2022 16:46:26 -0800 (PST)
-Received: by mail-lj1-x232.google.com with SMTP id bn33so933024ljb.6
-        for <kvm@vger.kernel.org>; Tue, 08 Mar 2022 16:46:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=27qMIFA3SdVzHCN8QyFhnWM7hDBzyl2BeONHmhYOf8E=;
-        b=ZzhkTDjM6jz+YP82Qy2AN7vuROXTbLjG8ZA8xzlHYer7eC5+TzcEnp9+YFaimnX9Sj
-         6VrTiif7AocdizcPrNCrkw0BQE7s+nHZPt8txEkFBLhx11/oAsMmZlgHfOmoUO7C8JAh
-         dYac38sepqqnHxZCQcJ8r18IcialSeyUOId04AqRy3++yTOf3yN/nMeeQWd1nZ6NW/U+
-         3hfUEi+sDjipwsfcq5VfeYJ5HxDWMWMB/Bs+CrG3Ts8XQvbMnB/Uw9MXVMPMlz8pQI9D
-         9WxMxR0+pX/LJ/ZSxlHSdmVbpQiIGWUs2L/pbDTOvw5S7T7eZWLXyqn3UGrYzYoGPdx6
-         4i6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=27qMIFA3SdVzHCN8QyFhnWM7hDBzyl2BeONHmhYOf8E=;
-        b=8FwHBUYV3CtazniWrlPHByQmhygi6wszPSG3slANVoX/zkCfOsu8lGLP2WvJcMfgSn
-         iNXYHvSHqPEgQtWfeZTnD5GB6QKfLuRMK+B5RPJbVksu5ebvPSo7aegyBwgtOwyjMmyw
-         liWew6zWqWCH1YhHne795cC6PA38iWilaqj+a45QQ93MRTcvKmo64KrAnf547GKI9n+c
-         IvZVim6uzEHIZqslqF7ly308rF2hXjA0JTEW2jpnMPt0UW8v3fjLSDlOUYxxnM7kFbN5
-         DwLT3D3l6DX+NDWtlH0rN3qlAXmZ/h/lBmQ03V35oJgT/XcQCgILZjUkCHk1GAP6iLYU
-         d9CQ==
-X-Gm-Message-State: AOAM530QCz5r9mPGEY3aYbucrXNbGmfTApVA+CALUJA1Ou41opP99rUP
-        tvSDItn0YyOsmpay0mcAodMGt9xv2EeyPg/O16X5Y936w0M=
-X-Google-Smtp-Source: ABdhPJyNerlkbKDY3ZYw8bWJeCf9eEsUR1qHjsQTkZmQXzmYzerqaUnikiE3xvgSYw0AD6UBO32cxiBdGdIMgoynOX4=
-X-Received: by 2002:a2e:8255:0:b0:247:dff4:1f with SMTP id j21-20020a2e8255000000b00247dff4001fmr9886575ljh.16.1646783123273;
- Tue, 08 Mar 2022 15:45:23 -0800 (PST)
+        with ESMTP id S231428AbiCIBNV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Mar 2022 20:13:21 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C663158EA4;
+        Tue,  8 Mar 2022 16:56:44 -0800 (PST)
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 2290uJh5032621;
+        Wed, 9 Mar 2022 00:56:43 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=4aVxwyeD2G4aJ13Isb/s8+ZwAEF2AuWYkvaBomm/JKk=;
+ b=kHgaffANgvHzTSZJ46ZtEWlnPxjbQ30eNnAcGmfXdZn5S6UxLYL6DPreoxyfVE627YA+
+ 3CpJnandNQOcLBbYEGCd7D7SzuD6+D5m/NnFLgQJBvjkvyGuKlH0MUkl6CHdsJOvzues
+ iU8jN5ohP7/mb1MyGEg/R3j77nszf6eXoHGoz8/bqNklrJmUzztvtjEnu7iFle7ztjN/
+ quenmZJ9JkMyrrh60m3uXT7gryH9TeaspDwKc1LOFfNaYEf6+cStM+yQEkL/7wpZoebm
+ i3boAI6OgGgxMsQaoRTcNA7eaU8Z66nyqaex/uLfsVfkNH28JE3F4yeAsbPkxWbDfMa1 aQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3enxs0fdkr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 09 Mar 2022 00:56:42 +0000
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 2290ugoG005484;
+        Wed, 9 Mar 2022 00:56:42 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3enxs0fdkc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 09 Mar 2022 00:56:42 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2290mRTX026754;
+        Wed, 9 Mar 2022 00:56:39 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma03ams.nl.ibm.com with ESMTP id 3ekyg90q5n-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 09 Mar 2022 00:56:39 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2290jQRs50135422
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 9 Mar 2022 00:45:26 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 48D38A4040;
+        Wed,  9 Mar 2022 00:56:36 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 98817A4051;
+        Wed,  9 Mar 2022 00:56:35 +0000 (GMT)
+Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.68.74])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with SMTP;
+        Wed,  9 Mar 2022 00:56:35 +0000 (GMT)
+Date:   Wed, 9 Mar 2022 01:56:22 +0100
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     "Jason J. Herne" <jjherne@linux.ibm.com>
+Cc:     Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        freude@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
+        mjrosato@linux.ibm.com, alex.williamson@redhat.com,
+        kwankhede@nvidia.com, fiuczy@linux.ibm.com,
+        Halil Pasic <pasic@linux.ibm.com>
+Subject: Re: [PATCH v18 08/18] s390/vfio-ap: allow assignment of unavailable
+ AP queues to mdev device
+Message-ID: <20220309015623.41543d75.pasic@linux.ibm.com>
+In-Reply-To: <439f929f-9d15-c33c-b40d-88dd06cebd85@linux.ibm.com>
+References: <20220215005040.52697-1-akrowiak@linux.ibm.com>
+        <20220215005040.52697-9-akrowiak@linux.ibm.com>
+        <97681738-50a1-976d-9f0f-be326eab7202@linux.ibm.com>
+        <9ac3908e-06da-6276-d1df-94898918fc5b@linux.ibm.com>
+        <439f929f-9d15-c33c-b40d-88dd06cebd85@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20220303183328.1499189-1-dmatlack@google.com> <20220303183328.1499189-2-dmatlack@google.com>
- <YifNPekMfIta+xcv@google.com> <CALzav=frpbRMkDtVTwii2hJ+trtF0m0p5Y_Rc5KS42rp1KEaNw@mail.gmail.com>
- <YifiC2Gqs98p0Tiy@google.com>
-In-Reply-To: <YifiC2Gqs98p0Tiy@google.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Tue, 8 Mar 2022 15:44:56 -0800
-Message-ID: <CALzav=dWJjbabpDy9sVvyuYe4NteNnX_U8eJc0BNmJ_A9bcp+w@mail.gmail.com>
-Subject: Re: [PATCH RESEND 1/2] KVM: Prevent module exit until all VMs are freed
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Gleb Natapov <gleb@redhat.com>, Rik van Riel <riel@redhat.com>,
-        Ben Gardon <bgardon@google.com>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: GA7MBmohm27r3Zs2kEBhAhj3DjFWk2M6
+X-Proofpoint-ORIG-GUID: LKkedgjD1fvryOKywwrOlMlSNoswUhsZ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-03-08_09,2022-03-04_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 impostorscore=0
+ bulkscore=0 mlxlogscore=537 clxscore=1015 adultscore=0 spamscore=0
+ suspectscore=0 malwarescore=0 mlxscore=0 lowpriorityscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2203090000
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 8, 2022 at 3:09 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Tue, Mar 08, 2022, David Matlack wrote:
-> > On Tue, Mar 8, 2022 at 1:40 PM Sean Christopherson <seanjc@google.com> wrote:
-> > >
-> > > On Thu, Mar 03, 2022, David Matlack wrote:
-> > > > Tie the lifetime the KVM module to the lifetime of each VM via
-> > > > kvm.users_count. This way anything that grabs a reference to the VM via
-> > > > kvm_get_kvm() cannot accidentally outlive the KVM module.
-> > > >
-> > > > Prior to this commit, the lifetime of the KVM module was tied to the
-> > > > lifetime of /dev/kvm file descriptors, VM file descriptors, and vCPU
-> > > > file descriptors by their respective file_operations "owner" field.
-> > > > This approach is insufficient because references grabbed via
-> > > > kvm_get_kvm() do not prevent closing any of the aforementioned file
-> > > > descriptors.
-> > > >
-> > > > This fixes a long standing theoretical bug in KVM that at least affects
-> > > > async page faults. kvm_setup_async_pf() grabs a reference via
-> > > > kvm_get_kvm(), and drops it in an asynchronous work callback. Nothing
-> > > > prevents the VM file descriptor from being closed and the KVM module
-> > > > from being unloaded before this callback runs.
-> > > >
-> > > > Fixes: af585b921e5d ("KVM: Halt vcpu if page it tries to access is swapped out")
-> > >
-> > > And (or)
-> > >
-> > >   Fixes: 3d3aab1b973b ("KVM: set owner of cpu and vm file operations")
-> > >
-> > > because the above is x86-centric, at a glance PPC and maybe s390 have issues
-> > > beyond async #PF.
-> > >
-> > > > Cc: stable@vger.kernel.org
-> > > > Suggested-by: Ben Gardon <bgardon@google.com>
-> > > > [ Based on a patch from Ben implemented for Google's kernel. ]
-> > > > Signed-off-by: David Matlack <dmatlack@google.com>
-> > > > ---
-> > > >  virt/kvm/kvm_main.c | 8 ++++++++
-> > > >  1 file changed, 8 insertions(+)
-> > > >
-> > > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > > > index 35ae6d32dae5..b59f0a29dbd5 100644
-> > > > --- a/virt/kvm/kvm_main.c
-> > > > +++ b/virt/kvm/kvm_main.c
-> > > > @@ -117,6 +117,8 @@ EXPORT_SYMBOL_GPL(kvm_debugfs_dir);
-> > > >
-> > > >  static const struct file_operations stat_fops_per_vm;
-> > > >
-> > > > +static struct file_operations kvm_chardev_ops;
-> > > > +
-> > > >  static long kvm_vcpu_ioctl(struct file *file, unsigned int ioctl,
-> > > >                          unsigned long arg);
-> > > >  #ifdef CONFIG_KVM_COMPAT
-> > > > @@ -1131,6 +1133,11 @@ static struct kvm *kvm_create_vm(unsigned long type)
-> > > >       preempt_notifier_inc();
-> > > >       kvm_init_pm_notifier(kvm);
-> > > >
-> > > > +     if (!try_module_get(kvm_chardev_ops.owner)) {
-> > >
-> > > The "try" aspect is unnecessary.  Stealing from Paolo's version,
-> > >
-> > >         /* KVM is pinned via open("/dev/kvm"), the fd passed to this ioctl(). */
-> > >         __module_get(kvm_chardev_ops.owner);
-> >
-> > Right, I did see that and agree we're guaranteed the KVM module has a
-> > reference at this point. But the KVM module might be in state
-> > MODULE_STATE_GOING (e.g. if someone ran "rmmod --wait"), which
-> > try_module_get() checks.
->
-> Ah, can you throw that in as a comment?  Doesn't have to be much, just enough of
-> a breadcrumb to connect the dots and to prevent us from "optimizing" this to
-> __module_get() in the future.
->
->         /* Use the "try" variant to play nice with e.g. "rmmod --wait". */
+On Tue, 8 Mar 2022 10:39:09 -0500
+"Jason J. Herne" <jjherne@linux.ibm.com> wrote:
 
-Yeah. I should have included this in the first place (or at least a
-blurb in the commit message).
+> On 3/7/22 07:31, Tony Krowiak wrote:
+> >>> +         * If the input apm and aqm belong to the matrix_mdev's matrix,
+> >>> +         * then move on to the next.
+> >>> +         */
+> >>> +        if (mdev_apm == matrix_mdev->matrix.apm &&
+> >>> +            mdev_aqm == matrix_mdev->matrix.aqm)
+> >>>               continue;  
+> >>
+> >> We may have a problem here. This check seems like it exists to stop you from
+> >> comparing an mdev's apm/aqm with itself. Obviously comparing an mdev's newly
+> >> updated apm/aqm with itself would cause a false positive sharing check, right?
+> >> If this is the case, I think the comment should be changed to reflect that.  
+> > 
+> > You are correct, this check is performed to prevent comparing an mdev to
+> > itself, I'll improve the comment.
+> >   
+> >>
+> >> Aside from the comment, what stops this particular series of if statements from
+> >> allowing us to configure a second mdev with the exact same apm/aqm values as an
+> >> existing mdev? If we do, then this check's continue will short circuit the rest
+> >> of the function thereby allowing that 2nd mdev even though it should be a
+> >> sharing violation.  
+> > 
+> > I don't see how this is possible.  
+> 
+> You are correct. I missed the fact that you are comparing pointers here, and not
+> values. Apologies. Now that I understand the code, I agree that this is fine as is.
+> 
 
->
-> With a comment,
->
-> Reviewed-by: Sean Christopherson <seanjc@google.com>
+I believe clarifying the 'belongs to' vs 'is a part of' stuff is still
+worthwhile, because 'belongs to' does beg the question you asked. Thus
+IMHO it is good that you raised the question.
+
+Regards,
+Halil
