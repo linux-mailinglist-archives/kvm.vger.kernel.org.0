@@ -2,187 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 97F084D2AD4
-	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 09:46:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AC3694D2ADA
+	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 09:47:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231434AbiCIIry (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Mar 2022 03:47:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34502 "EHLO
+        id S231463AbiCIIsg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Mar 2022 03:48:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35220 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229525AbiCIIry (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Mar 2022 03:47:54 -0500
-Received: from njjs-sys-mailin01.njjs.baidu.com (mx315.baidu.com [180.101.52.204])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 22A991617F2
-        for <kvm@vger.kernel.org>; Wed,  9 Mar 2022 00:46:54 -0800 (PST)
-Received: from bjhw-sys-rpm015653cc5.bjhw.baidu.com (bjhw-sys-rpm015653cc5.bjhw.baidu.com [10.227.53.39])
-        by njjs-sys-mailin01.njjs.baidu.com (Postfix) with ESMTP id A10547F00053;
-        Wed,  9 Mar 2022 16:46:52 +0800 (CST)
-Received: from localhost (localhost [127.0.0.1])
-        by bjhw-sys-rpm015653cc5.bjhw.baidu.com (Postfix) with ESMTP id 8A9B7D9932;
-        Wed,  9 Mar 2022 16:46:52 +0800 (CST)
-From:   Li RongQing <lirongqing@baidu.com>
-To:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
-        jmattson@google.com, x86@kernel.org, kvm@vger.kernel.org,
-        lirongqing@baidu.com, wanpengli@tencent.com
-Subject: [PATCH][v3] KVM: x86: Support the vCPU preemption check with nopvspin and realtime hint
-Date:   Wed,  9 Mar 2022 16:46:50 +0800
-Message-Id: <1646815610-43315-1-git-send-email-lirongqing@baidu.com>
-X-Mailer: git-send-email 1.7.1
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S229525AbiCIIse (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Mar 2022 03:48:34 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6BB926438
+        for <kvm@vger.kernel.org>; Wed,  9 Mar 2022 00:47:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646815652;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=9ffS413S/InwxV5O0x2uo8HI1Zzb6CIePH7gzRiVJ4s=;
+        b=Rwu3uEKXiY3vULpMLR0RIcM/P/wSI4F1NJkTUIWktGlJU9Eq3ESjd4L3dsZfrDYzMFMEuN
+        WSfhYG63Qw8+iDjrwvNPVNglT7dr36vvxpvvWk+Id7csxdHqd6zzDHe9yuyoEE1QBCzq3G
+        CVOFoQNo3X1fRk4PA40/BpLQXE0EbeU=
+Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
+ [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-135-khmMUqfuOgWTtX59OXwIeQ-1; Wed, 09 Mar 2022 03:47:31 -0500
+X-MC-Unique: khmMUqfuOgWTtX59OXwIeQ-1
+Received: by mail-pj1-f70.google.com with SMTP id mm2-20020a17090b358200b001bf529127dfso1177497pjb.6
+        for <kvm@vger.kernel.org>; Wed, 09 Mar 2022 00:47:30 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=9ffS413S/InwxV5O0x2uo8HI1Zzb6CIePH7gzRiVJ4s=;
+        b=TDG2Iz4U9+K/H3caZyz6ruaBt2J7BfuzRJioKICAe0eg8Jjj7nf7HpU6uok25ZwmAd
+         ec4+3touH20YS5HBCZr9D/PvFr4b2OAvvPkORITzxgrlIrvtEE3WGEBEvkmThyr7O3A7
+         8aq5UIIcI7e2DCRV+HDxcCRADBLXI/Bqj/Kkr0iK30EfCK/d7t1Vla6JVx70dJWLjXXc
+         QH2TN0K81fAv3O6FoiyaCoJbUFq+PsdYXIPW41fZGZdiIE7yg7da+DgzJD9elcphHO1/
+         +w7Bo/1fI5hGO+Ffa+Ny+LFrXYyHARRh9R8gnNBRUZ6EyZt8liQ3yU3y5bFE7JzIuSMp
+         bbAw==
+X-Gm-Message-State: AOAM533mi8ypDkNRHwWcxk7FYI7XcQrYRWjHr+zud+Pjy08c9FbfFC3N
+        hgEOanElsEJ5AStF4aQmTlTlRKqqdK6xDMOdZe+n3Yph/YComr3vHxFhqYsAZ1LlDCsE2CuOvO7
+        veuf1f3G/6Ag0
+X-Received: by 2002:a63:4756:0:b0:373:e14b:5848 with SMTP id w22-20020a634756000000b00373e14b5848mr17589444pgk.337.1646815649955;
+        Wed, 09 Mar 2022 00:47:29 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJy8AxlCNXVWTVj7iH9SvFqBnT+ALE8NBgyTqiezfIt6S/mnWP42+w8t2ODBwFju+xJKaGATOA==
+X-Received: by 2002:a63:4756:0:b0:373:e14b:5848 with SMTP id w22-20020a634756000000b00373e14b5848mr17589411pgk.337.1646815649649;
+        Wed, 09 Mar 2022 00:47:29 -0800 (PST)
+Received: from [10.72.12.183] ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id l17-20020a637011000000b0037d5eac87e3sm1577760pgc.18.2022.03.09.00.47.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 09 Mar 2022 00:47:29 -0800 (PST)
+Message-ID: <a3782384-c7e5-b0b3-6529-3aa3b8b589de@redhat.com>
+Date:   Wed, 9 Mar 2022 16:47:11 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.6.1
+Subject: Re: [PATCH v7 13/26] virtio: queue_reset: struct virtio_config_ops
+ add callbacks for queue_reset
+Content-Language: en-US
+To:     Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Cc:     Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Mark Gross <markgross@kernel.org>,
+        Vadim Pasternak <vadimp@nvidia.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Johannes Berg <johannes.berg@intel.com>,
+        Vincent Whitchurch <vincent.whitchurch@axis.com>,
+        linux-um@lists.infradead.org, platform-driver-x86@vger.kernel.org,
+        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, bpf@vger.kernel.org
+References: <20220308123518.33800-1-xuanzhuo@linux.alibaba.com>
+ <20220308123518.33800-14-xuanzhuo@linux.alibaba.com>
+From:   Jason Wang <jasowang@redhat.com>
+In-Reply-To: <20220308123518.33800-14-xuanzhuo@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If guest kernel is configured with nopvspin, or CONFIG_PARAVIRT_SPINLOCK
-is disabled, or guest find its has dedicated pCPUs from realtime hint
-feature, the pvspinlock will be disabled, and vCPU preemption check
-is disabled too.
 
-but KVM still can emulating HLT for vCPU for both cases, and check if vCPU
-is preempted or not, and can boost performance
+在 2022/3/8 下午8:35, Xuan Zhuo 写道:
+> Performing reset on a queue is divided into four steps:
+>
+>   1. reset_vq()                     - notify the device to reset the queue
+>   2. virtqueue_detach_unused_buf()  - recycle the buffer submitted
+>   3. virtqueue_reset_vring()        - reset the vring (may re-alloc)
+>   4. enable_reset_vq()              - mmap vring to device, and enable the queue
+>
+> So add two callbacks reset_vq, enable_reset_vq to struct
+> virtio_config_ops.
+>
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> ---
+>   include/linux/virtio_config.h | 11 +++++++++++
+>   1 file changed, 11 insertions(+)
+>
+> diff --git a/include/linux/virtio_config.h b/include/linux/virtio_config.h
+> index 4d107ad31149..d51906b1389f 100644
+> --- a/include/linux/virtio_config.h
+> +++ b/include/linux/virtio_config.h
+> @@ -74,6 +74,15 @@ struct virtio_shm_region {
+>    * @set_vq_affinity: set the affinity for a virtqueue (optional).
+>    * @get_vq_affinity: get the affinity for a virtqueue (optional).
+>    * @get_shm_region: get a shared memory region based on the index.
+> + * @reset_vq: reset a queue individually (optional).
+> + *	vq: the virtqueue
+> + *	Returns 0 on success or error status
+> + *	Caller should guarantee that the vring is not accessed by any functions
+> + *	of virtqueue.
 
-so move the setting of pv_ops.lock.vcpu_is_preempted to kvm_guest_init, make
-it not depend on pvspinlock
 
-Like unixbench, single copy, vcpu with dedicated pCPU and guest kernel with
-nopvspin, but emulating HLT for vCPU`:
+We probably need to be more accurate here:
 
-Testcase                                  Base    with patch
-System Benchmarks Index Values            INDEX     INDEX
-Dhrystone 2 using register variables     3278.4    3277.7
-Double-Precision Whetstone                822.8     825.8
-Execl Throughput                         1296.5     941.1
-File Copy 1024 bufsize 2000 maxblocks    2124.2    2142.7
-File Copy 256 bufsize 500 maxblocks      1335.9    1353.6
-File Copy 4096 bufsize 8000 maxblocks    4256.3    4760.3
-Pipe Throughput                          1050.1    1054.0
-Pipe-based Context Switching              243.3     352.0
-Process Creation                          820.1     814.4
-Shell Scripts (1 concurrent)             2169.0    2086.0
-Shell Scripts (8 concurrent)             7710.3    7576.3
-System Call Overhead                      672.4     673.9
-                                      ========    =======
-System Benchmarks Index Score             1467.2   1483.0
+1) reset_vq will guarantee that the callbacks are disabled or synchronized
+2) except for the callback, the caller should guarantee ...
 
-Signed-off-by: Li RongQing <lirongqing@baidu.com>
----
-diff v3: fix building failure when CONFIG_PARAVIRT_SPINLOCK is disable
-         and setting preemption check only when unhalt
-diff v2: move setting preemption check to kvm_guest_init
+Thanks
 
- arch/x86/kernel/kvm.c | 74 +++++++++++++++++++++++++--------------------------
- 1 file changed, 37 insertions(+), 37 deletions(-)
 
-diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-index d77481ec..959f919 100644
---- a/arch/x86/kernel/kvm.c
-+++ b/arch/x86/kernel/kvm.c
-@@ -752,6 +752,39 @@ static void kvm_crash_shutdown(struct pt_regs *regs)
- }
- #endif
- 
-+#ifdef CONFIG_X86_32
-+__visible bool __kvm_vcpu_is_preempted(long cpu)
-+{
-+	struct kvm_steal_time *src = &per_cpu(steal_time, cpu);
-+
-+	return !!(src->preempted & KVM_VCPU_PREEMPTED);
-+}
-+PV_CALLEE_SAVE_REGS_THUNK(__kvm_vcpu_is_preempted);
-+
-+#else
-+
-+#include <asm/asm-offsets.h>
-+
-+extern bool __raw_callee_save___kvm_vcpu_is_preempted(long);
-+
-+/*
-+ * Hand-optimize version for x86-64 to avoid 8 64-bit register saving and
-+ * restoring to/from the stack.
-+ */
-+asm(
-+".pushsection .text;"
-+".global __raw_callee_save___kvm_vcpu_is_preempted;"
-+".type __raw_callee_save___kvm_vcpu_is_preempted, @function;"
-+"__raw_callee_save___kvm_vcpu_is_preempted:"
-+"movq	__per_cpu_offset(,%rdi,8), %rax;"
-+"cmpb	$0, " __stringify(KVM_STEAL_TIME_preempted) "+steal_time(%rax);"
-+"setne	%al;"
-+"ret;"
-+".size __raw_callee_save___kvm_vcpu_is_preempted, .-__raw_callee_save___kvm_vcpu_is_preempted;"
-+".popsection");
-+
-+#endif
-+
- static void __init kvm_guest_init(void)
- {
- 	int i;
-@@ -764,6 +797,10 @@ static void __init kvm_guest_init(void)
- 	if (kvm_para_has_feature(KVM_FEATURE_STEAL_TIME)) {
- 		has_steal_clock = 1;
- 		static_call_update(pv_steal_clock, kvm_steal_clock);
-+
-+		if (kvm_para_has_feature(KVM_FEATURE_PV_UNHALT))
-+			pv_ops.lock.vcpu_is_preempted =
-+				PV_CALLEE_SAVE(__kvm_vcpu_is_preempted);
- 	}
- 
- 	if (kvm_para_has_feature(KVM_FEATURE_PV_EOI))
-@@ -1005,39 +1042,6 @@ static void kvm_wait(u8 *ptr, u8 val)
- 	}
- }
- 
--#ifdef CONFIG_X86_32
--__visible bool __kvm_vcpu_is_preempted(long cpu)
--{
--	struct kvm_steal_time *src = &per_cpu(steal_time, cpu);
--
--	return !!(src->preempted & KVM_VCPU_PREEMPTED);
--}
--PV_CALLEE_SAVE_REGS_THUNK(__kvm_vcpu_is_preempted);
--
--#else
--
--#include <asm/asm-offsets.h>
--
--extern bool __raw_callee_save___kvm_vcpu_is_preempted(long);
--
--/*
-- * Hand-optimize version for x86-64 to avoid 8 64-bit register saving and
-- * restoring to/from the stack.
-- */
--asm(
--".pushsection .text;"
--".global __raw_callee_save___kvm_vcpu_is_preempted;"
--".type __raw_callee_save___kvm_vcpu_is_preempted, @function;"
--"__raw_callee_save___kvm_vcpu_is_preempted:"
--"movq	__per_cpu_offset(,%rdi,8), %rax;"
--"cmpb	$0, " __stringify(KVM_STEAL_TIME_preempted) "+steal_time(%rax);"
--"setne	%al;"
--"ret;"
--".size __raw_callee_save___kvm_vcpu_is_preempted, .-__raw_callee_save___kvm_vcpu_is_preempted;"
--".popsection");
--
--#endif
--
- /*
-  * Setup pv_lock_ops to exploit KVM_FEATURE_PV_UNHALT if present.
-  */
-@@ -1081,10 +1085,6 @@ void __init kvm_spinlock_init(void)
- 	pv_ops.lock.wait = kvm_wait;
- 	pv_ops.lock.kick = kvm_kick_cpu;
- 
--	if (kvm_para_has_feature(KVM_FEATURE_STEAL_TIME)) {
--		pv_ops.lock.vcpu_is_preempted =
--			PV_CALLEE_SAVE(__kvm_vcpu_is_preempted);
--	}
- 	/*
- 	 * When PV spinlock is enabled which is preferred over
- 	 * virt_spin_lock(), virt_spin_lock_key's value is meaningless.
--- 
-2.9.4
+> + * @enable_reset_vq: enable a reset queue
+> + *	vq: the virtqueue
+> + *	Returns 0 on success or error status
+> + *	If reset_vq is set, then enable_reset_vq must also be set.
+>    */
+>   typedef void vq_callback_t(struct virtqueue *);
+>   struct virtio_config_ops {
+> @@ -100,6 +109,8 @@ struct virtio_config_ops {
+>   			int index);
+>   	bool (*get_shm_region)(struct virtio_device *vdev,
+>   			       struct virtio_shm_region *region, u8 id);
+> +	int (*reset_vq)(struct virtqueue *vq);
+> +	int (*enable_reset_vq)(struct virtqueue *vq);
+>   };
+>   
+>   /* If driver didn't advertise the feature, it will never appear. */
 
