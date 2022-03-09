@@ -2,161 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D36FB4D3C19
-	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 22:32:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A4174D3C1A
+	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 22:32:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237457AbiCIVdT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Mar 2022 16:33:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57188 "EHLO
+        id S233029AbiCIVdV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Mar 2022 16:33:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57226 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234999AbiCIVdP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Mar 2022 16:33:15 -0500
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 277B011D79A
+        with ESMTP id S237633AbiCIVdR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Mar 2022 16:33:17 -0500
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89DCD11D7A2
         for <kvm@vger.kernel.org>; Wed,  9 Mar 2022 13:32:16 -0800 (PST)
-Received: by mail-pg1-x54a.google.com with SMTP id 196-20020a6307cd000000b0038027886594so1841956pgh.4
+Received: by mail-pf1-x449.google.com with SMTP id y193-20020a62ceca000000b004f6f5bbaf7cso2159101pfg.16
         for <kvm@vger.kernel.org>; Wed, 09 Mar 2022 13:32:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=DltPH0st+zcTt7ExaGUOnDWmqYAMuLJGnVYZchyVijI=;
-        b=TlJAPWd3FIqAPldxeFcHS5vNQk546W45NQ0zFTpfbsBvVJw7yq48JmH0tZV5p7TG16
-         Twn5DzqDVjAhfV9hhqDYCR7NP+gqOx1E+c8kPG82pYwAw9NIe+nCx20aXlKfjUlVPwHv
-         /SaLs7EyDywSOK7xF8MzAC7zhVcguYQxA3RexiIMe2qgWvCc2fIdQzUoLBglP0nc7IQW
-         1vI/vBuCwrJICZ7oMy8j3UG6W97YzjnW1t4mSmIMm7crbLdQhD6zxfT2pnvV6Uk+z1aH
-         LKJVpuHZSxhv0zQ40i/gcmuJXb19jmcYc9/NXQHGPVD2mqKzPngqAJRrjpW/ryRER3+L
-         MxHg==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=OuHKMBHK1hfsv9PTwgLrKkJAtQ7PY6TuBBA78I/fvJ4=;
+        b=AIIwunmbHzVTF90VIuxF0B+cPMpBG7vFTP0OkJvOthEDzWNCqONIkLvtNxhmiLHBxu
+         EjEd0vKZjhfo3xMhZrnrf3N27GYOWuqyKJAHKpzQo3vO9ZGvzvU3dyvrFvbvQoC8T0mX
+         /vo3+PRWA2NW2uPyyinE5+Gyjw0JZ0T7ZILAQomQiqHWK+XFPzzdh5yaOoUCo98mGGRp
+         eLo5gIKTejRzAwtYCi89OWk3MaLRJkHnOS1joG4QKxe+55pelAMy1Bcg1cB2PTedaDfs
+         j5YSlO3C5IDBkoIf1t5C6s/dp664blVOML9S8pQI8LmSDx2mMb0kTDYjxx4Ilf2j0jLm
+         whyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=DltPH0st+zcTt7ExaGUOnDWmqYAMuLJGnVYZchyVijI=;
-        b=Cxn4e/+ubEJ1sf8h+dDoKO8t8FLIy8w1MiKOSNjnLfBX0CaCtpMOVGRVECRpuuNzGj
-         a+5qtdN22aDF5tVsjTRJpin6zKNKmisN1upu+cUC6yZajantk3QN2RH3aYEMkFVsfUuE
-         AcfNe3XSybifzAWe0IxUUP/dXErBbS1UhlYw4R4iisfuahK+TPm8yIZly0qA7JHcKomI
-         oI0zYDyg0Q4RLBvSV1fEjtLOvZS1zK7jSyBO8pm469wflsp1kH9nNCUqx8gbIHMZ40db
-         Jyqzgv9UHQobhlu1X8lrGrkFEMlaXjUKsJqWurza8NiGoT4QU3i6o2s3G+6DUIFHEOEl
-         k4Lw==
-X-Gm-Message-State: AOAM533gDu1BmOYdO/YlsYoOrtOwWsyQOCkPUNm+jyzH/gH6hiJULOfb
-        SsQPJtPkkkr8dcxLZ7l6YgEnU5BRgJpCeA==
-X-Google-Smtp-Source: ABdhPJzViIpraLXz5IlOTLmdAPsujWcON7wDQ762/bdowz6gfthnBvqnTeK4L5vdhnv/1cVcyKbM13N+5gtmVA==
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=OuHKMBHK1hfsv9PTwgLrKkJAtQ7PY6TuBBA78I/fvJ4=;
+        b=Owccm7o58DU/ZsIfXS/Gqy8kY22LvItggB98czZOLPReIzXIfWJk6SYXzg8DOlMzwc
+         7wIvObTUq2o+1bgemxFOuRyKmZhirAMSfCkENBKWpX6OmZidrE7xDhtp85EFziVippYd
+         zNuj+O3EMpKwa3dnRXklzVAspnnQB1nnb53NIKC4GzPXI6tKaIL4Q2J/FvFg2ZVUmq4X
+         +gEdAaoo9RE+Th7pnpPI5CblydAhwx8+IIg8mtqA7QoNzr3LH31zEn1LMBPvUcZ7axnd
+         bAWJUc88WpCzcrDCn7XcIk729b78z1MSFT5fnAsqrroxg+Ui7LnRcCJsfaJq3VoJNqFo
+         Ge0w==
+X-Gm-Message-State: AOAM530bCfG87N/coioFR5gyvPKrN6M/opf04QUJZhiUuGaBz3LPbH9W
+        gOjHV2HgFxUd1zUKpm+Pu+r6/oHsaFKWag==
+X-Google-Smtp-Source: ABdhPJxw1hDwld16WPMlCFx0ZIw0ORi+ox3/ggeKsSO3s8u+x8KpQLec5E5jW86ylGJ1R4b7fyyLWZB9eZ/c6A==
 X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a17:902:d4c6:b0:151:d21c:7eb7 with SMTP
- id o6-20020a170902d4c600b00151d21c7eb7mr1765717plg.148.1646861534400; Wed, 09
- Mar 2022 13:32:14 -0800 (PST)
-Date:   Wed,  9 Mar 2022 21:32:06 +0000
-Message-Id: <20220309213208.872644-1-dmatlack@google.com>
+ (user=dmatlack job=sendgmr) by 2002:a17:90a:a087:b0:1b9:157f:4cc1 with SMTP
+ id r7-20020a17090aa08700b001b9157f4cc1mr1521697pjp.117.1646861536007; Wed, 09
+ Mar 2022 13:32:16 -0800 (PST)
+Date:   Wed,  9 Mar 2022 21:32:07 +0000
+In-Reply-To: <20220309213208.872644-1-dmatlack@google.com>
+Message-Id: <20220309213208.872644-2-dmatlack@google.com>
 Mime-Version: 1.0
+References: <20220309213208.872644-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.35.1.616.g0bdcbb4464-goog
-Subject: [PATCH v2 0/2] KVM: Prevent module exit until all VMs are freed
+Subject: [PATCH v2 1/2] KVM: Prevent module exit until all VMs are freed
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     David Matlack <dmatlack@google.com>,
         "open list:KERNEL VIRTUAL MACHINE (KVM)" <kvm@vger.kernel.org>,
         Marcelo Tosatti <mtosatti@redhat.com>, seanjc@google.com,
-        bgardon@google.com
+        bgardon@google.com, stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This series fixes a long-standing theoretical bug where the KVM module
-can be unloaded while there are still references to a struct kvm. This
-can be reproduced with a simple patch [1] to run some delayed work 10
-seconds after a VM file descriptor is released.
+Tie the lifetime the KVM module to the lifetime of each VM via
+kvm.users_count. This way anything that grabs a reference to the VM via
+kvm_get_kvm() cannot accidentally outlive the KVM module.
 
-This bug was originally fixed by Ben Gardon <bgardon@google.com> in
-Google's kernel due to a race with an internal kernel daemon.
+Prior to this commit, the lifetime of the KVM module was tied to the
+lifetime of /dev/kvm file descriptors, VM file descriptors, and vCPU
+file descriptors by their respective file_operations "owner" field.
+This approach is insufficient because references grabbed via
+kvm_get_kvm() donot prevent closing any of the aforementioned file
+descriptors.
 
-KVM's async_pf code looks susceptible to this race since its inception,
-but clearly no one has noticed. Upcoming changes to the TDP MMU will
-move zapping to asynchronous workers which is much more likely to hit
-this issue. Fix it now to close the gap in async_pf and prepare for the
-TDP MMU zapping changes.
+This fixes a long standing theoretical bug in KVM that at least affects
+async page faults. kvm_setup_async_pf() grabs a reference via
+kvm_get_kvm(), and drops it in an asynchronous work callback. Nothing
+prevents the VM file descriptor from being closed and the KVM module
+from being unloaded before this callback runs.
 
-While here I noticed some further cleanups that could be done in the
-async_pf code. It seems unnecessary for the async_pf code to grab a
-reference via kvm_get_kvm() because there's code to synchronously drain
-its queue of work in kvm_destroy_vm() -> ... ->
-kvm_clear_async_pf_completion_queue() (at least on x86). This is
-actually dead code because kvm_destroy_vm() will never be called while
-there are references to kvm.users_count (which the async_pf callbacks
-themselves hold). It seems we could either drop the reference grabbing
-in async_pf.c or drop the call to kvm_clear_async_pf_completion_queue().
+PPC and s390 also look broken beyond the Fixes commits listed below, but
+the below commits should be more than enough to guarantee inclusion in
+all stable kernels.
 
-These patches apply on the latest kvm/queue commit b13a3befc815 ("KVM:
-selftests: Add test to populate a VM with the max possible guest mem")
-after reverting commit c9bdd0aa6800 ("KVM: allow struct kvm to outlive
-the file descriptors").
+Fixes: 3d3aab1b973b ("KVM: set owner of cpu and vm file operations")
+[ This 2.6.29 commit was an incomplete attempt to fix this bug. ]
+Fixes: af585b921e5d ("KVM: Halt vcpu if page it tries to access is swapped out")
+[ This 2.6.38 commit introduced async_pf and is definitely broken. ]
+Cc: stable@vger.kernel.org
+Suggested-by: Ben Gardon <bgardon@google.com>
+[ Based on a patch from Ben implemented for Google's kernel. ]
+Reviewed-by: Sean Christopherson <seanjc@google.com>
 
-v2:
- - Add comment explaining try variant [Sean]
- - Additional fixes commit to clarify bug not limited to async_pf [Sean]
- - Collect R-b tags.
+Signed-off-by: David Matlack <dmatlack@google.com>
+---
+ virt/kvm/kvm_main.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-v1: https://lore.kernel.org/kvm/20220303183328.1499189-1-dmatlack@google.com/
-
-[1] To repro: Apply the following patch, run a KVM selftest, and then
-unload the KVM module within 10 seconds of the selftest finishing. The
-kernel will panic. With the fix applied, module unloading will fail
-until the final struct kvm reference is put.
-
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 9536ffa0473b..db827cf6a7a7 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -771,6 +771,8 @@ struct kvm {
-        struct notifier_block pm_notifier;
- #endif
-        char stats_id[KVM_STATS_NAME_SIZE];
-+
-+       struct delayed_work run_after_vm_release_work;
- };
-
- #define kvm_err(fmt, ...) \
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 64eb99444688..35ae6d32dae5 100644
+index 9581a24c3d17..e17f9fd847e0 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -1258,12 +1258,25 @@ void kvm_put_kvm_no_destroy(struct kvm *kvm)
+@@ -117,6 +117,8 @@ EXPORT_SYMBOL_GPL(kvm_debugfs_dir);
+ 
+ static const struct file_operations stat_fops_per_vm;
+ 
++static struct file_operations kvm_chardev_ops;
++
+ static long kvm_vcpu_ioctl(struct file *file, unsigned int ioctl,
+ 			   unsigned long arg);
+ #ifdef CONFIG_KVM_COMPAT
+@@ -1132,6 +1134,12 @@ static struct kvm *kvm_create_vm(unsigned long type)
+ 	preempt_notifier_inc();
+ 	kvm_init_pm_notifier(kvm);
+ 
++	/* Use the "try" variant to play nice with e.g. "rmmod --wait". */
++	if (!try_module_get(kvm_chardev_ops.owner)) {
++		r = -ENODEV;
++		goto out_err;
++	}
++
+ 	return kvm;
+ 
+ out_err:
+@@ -1221,6 +1229,7 @@ static void kvm_destroy_vm(struct kvm *kvm)
+ 	preempt_notifier_dec();
+ 	hardware_disable_all();
+ 	mmdrop(mm);
++	module_put(kvm_chardev_ops.owner);
  }
- EXPORT_SYMBOL_GPL(kvm_put_kvm_no_destroy);
-
-+static void run_after_vm_release(struct work_struct *work)
-+{
-+       struct delayed_work *dwork = to_delayed_work(work);
-+       struct kvm *kvm = container_of(dwork, struct kvm, run_after_vm_release_work);
-+
-+       pr_info("I'm still alive!\n");
-+       kvm_put_kvm(kvm);
-+}
-+
- static int kvm_vm_release(struct inode *inode, struct file *filp)
- {
-        struct kvm *kvm = filp->private_data;
-
-        kvm_irqfd_release(kvm);
-
-+       kvm_get_kvm(kvm);
-+       INIT_DELAYED_WORK(&kvm->run_after_vm_release_work, run_after_vm_release);
-+       schedule_delayed_work(&kvm->run_after_vm_release_work, 10 * HZ);
-+
-        kvm_put_kvm(kvm);
-        return 0;
- }
-
-David Matlack (2):
-  KVM: Prevent module exit until all VMs are freed
-  Revert "KVM: set owner of cpu and vm file operations"
-
- virt/kvm/kvm_main.c | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
-
+ 
+ void kvm_get_kvm(struct kvm *kvm)
 
 base-commit: ce41d078aaa9cf15cbbb4a42878cc6160d76525e
 -- 
