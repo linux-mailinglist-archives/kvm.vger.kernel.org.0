@@ -2,91 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 49A844D2D28
-	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 11:34:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E4C84D2D50
+	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 11:44:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230311AbiCIKfN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Mar 2022 05:35:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51432 "EHLO
+        id S231342AbiCIKod (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Mar 2022 05:44:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229953AbiCIKfL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Mar 2022 05:35:11 -0500
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71DDDE44BE;
-        Wed,  9 Mar 2022 02:34:13 -0800 (PST)
-Received: by mail-wr1-x433.google.com with SMTP id u10so2266660wra.9;
-        Wed, 09 Mar 2022 02:34:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=Dr1lE4tyQ/hl/XtFcan3CZdUBU9oU7rRqhzzfp6nEuQ=;
-        b=IPvFQTKx1i3QLvzOgqUFdZZV+Cv1RyqMlXIFO+hHZJa4hFsfEc3oTiIE3dE/xo7mrm
-         eYL8NC6f1TD3GxL51x+z0CFiU4dKr4QnHg3K7E6QXcL0Cs1HLx8uJ+4Mpn/dP7sL/lL1
-         JOe0bWI8SIyr/qAlfPIVWf9844hUBWg0e38A5fjnsJtvUUFsKD8mes6/A9YRiKyXPFHX
-         HF78OHgY+mEKablrzepAao0/R0KoCgLP1NJs9XqpzmFMWeMjn4nrtVy+xVsOY7zdCc6E
-         QXgZpdJumkDJ+MI37tUokYtzTgom6199ifBG0i2Jh7IiF7vVqjq/JQn2XunrWbKD/LPN
-         gnEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=Dr1lE4tyQ/hl/XtFcan3CZdUBU9oU7rRqhzzfp6nEuQ=;
-        b=n0mAygPnpGtDqArxAoAxPzRy6dgkQZLGS3eY3bx9YWmyCLUpWC+4lNVD8P2RxQUV5a
-         xulgXIpHKo8MR8qYhltXQkGCEfstvorjXe3zBBE4JkZbDJDSI+0HJTkfe9/JMX7y7K0p
-         2ftHHqaJejqfQdBMy3U5H7QinATn6W5hy5SA5Pg75F7GjJExl5vDV8f+Dfyv2ULPfh/Z
-         cMX9oIP4l8gGML4iZE4kR7FoJGoMH5f6TLjp5FDT8cdkdRbR0uDf1BnkDYIkwYq4LSXn
-         SnRU4611/bE6Nq02ft7cAtFv4NpXBx08hd6A24LVE1GRO9wlsTVUWzXtYVbOAsyo66B9
-         C85A==
-X-Gm-Message-State: AOAM532BAThWRjosHZqF3RyY0/65ig3BaquaW5T/1Ze+E+aEWv22hQYa
-        XZrFXgeKsbjfhvwUPUzoHYk=
-X-Google-Smtp-Source: ABdhPJyOU4VlBzK+DMvvkpdNHot0wM4wwu2nmapSl+oHDq/a9gJPnw8H/NtbUi4mZoLCWJRjHaYUQA==
-X-Received: by 2002:a5d:5105:0:b0:1f1:d115:c9f with SMTP id s5-20020a5d5105000000b001f1d1150c9fmr16227494wrt.77.1646822052049;
-        Wed, 09 Mar 2022 02:34:12 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id s17-20020adfdb11000000b001f02d5fea43sm1410343wri.98.2022.03.09.02.34.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Mar 2022 02:34:11 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <0d4cf6ad-a374-51ef-5879-967de1c09cc6@redhat.com>
-Date:   Wed, 9 Mar 2022 11:34:10 +0100
-MIME-Version: 1.0
+        with ESMTP id S231152AbiCIKob (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Mar 2022 05:44:31 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6279E6928D;
+        Wed,  9 Mar 2022 02:43:32 -0800 (PST)
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 2298gv7b028548;
+        Wed, 9 Mar 2022 10:43:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=ZgDGVBrrAfsjgCI/Vfni/1ReZgf2yue8xtodUcqZE8k=;
+ b=c7aYjhV8cPLktBSE83E67mKHSHl2q600QP/kvGb3LEehVtI2Ln/c9oDfWJx53nRE37s1
+ z13uOeNZK3/EPiNPnU2FLbXdI4F76bpcVbzEgSPBgbeowuuswp5e6segi9wRogZk+jCl
+ yieEhEEe5dWEQQLEZBw3yBdxYbv06XaUfxJ/fRBSIRUTAnl4zL98TXF1qvNzWXiIBkaw
+ W5pG4/whvDfZT25wWK8Wu/d+hMShJIkTvuANH/mjJnNz0Vvzdh0knGg0iaPBfw3KhrgC
+ GpG43BEsTfOH+bIVqaZTAGK+B5MzLHRb0PhUAjLrCRdczokVqeP2EQmkcn2eS7FXW96R wA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3eny1918x1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 09 Mar 2022 10:43:30 +0000
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 229AhUsX003383;
+        Wed, 9 Mar 2022 10:43:30 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3eny1918wd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 09 Mar 2022 10:43:30 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 229AfrbF019448;
+        Wed, 9 Mar 2022 10:43:27 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma04ams.nl.ibm.com with ESMTP id 3enqgnmeay-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 09 Mar 2022 10:43:27 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 229AhOj132047448
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 9 Mar 2022 10:43:24 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5B9AD11C064;
+        Wed,  9 Mar 2022 10:43:24 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EC3AB11C05C;
+        Wed,  9 Mar 2022 10:43:23 +0000 (GMT)
+Received: from [9.171.31.6] (unknown [9.171.31.6])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed,  9 Mar 2022 10:43:23 +0000 (GMT)
+Message-ID: <5fce5827-c022-c285-0786-9e0c68bd145c@linux.ibm.com>
+Date:   Wed, 9 Mar 2022 11:43:23 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.5.0
-Subject: Re: [PATCH v2 24/25] KVM: x86/mmu: initialize constant-value fields
- just once
+Subject: Re: [PATCH RESEND v2 0/5] memop selftest for storage key checking
 Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        dmatlack@google.com
-References: <20220221162243.683208-1-pbonzini@redhat.com>
- <20220221162243.683208-25-pbonzini@redhat.com> <YifDh5E63lAkJraV@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YifDh5E63lAkJraV@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
-        autolearn_force=no version=3.4.6
+To:     Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Shuah Khan <shuah@kernel.org>
+Cc:     Thomas Huth <thuth@redhat.com>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20220308125841.3271721-1-scgl@linux.ibm.com>
+ <eab904c4-608f-d3e2-9aae-51a9b56994bb@linux.ibm.com>
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+In-Reply-To: <eab904c4-608f-d3e2-9aae-51a9b56994bb@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: l0S34nDkJyXDp-57BP0hUOIL8JgFw_NP
+X-Proofpoint-ORIG-GUID: T2FaDBhqLA_cfvtB9S1hKYBgqqqXtCoB
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-03-09_04,2022-03-04_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ adultscore=0 mlxlogscore=757 phishscore=0 mlxscore=0 spamscore=0
+ clxscore=1015 priorityscore=1501 impostorscore=0 malwarescore=0
+ suspectscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2203090057
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/8/22 21:58, Sean Christopherson wrote:
-> Using nested_ops is clever, but IMO unnecessary, especially since we can go even
-> further by adding a nEPT specific hook to initialize its constant shadow paging
-> stuff.
+On 3/9/22 10:05, Christian Borntraeger wrote:
+> Am 08.03.22 um 13:58 schrieb Janis Schoetterl-Glausch:
+>> Refactor memop selftest and add tests.
+>> Add storage key tests, both for success as well as failure cases.
+>> Similarly, test both vcpu and vm ioctls.
+>>
+>> v1 -> v2
+>>   * restructure commits
+>>   * get rid of test_* wrapper functions that hid vm.vm
+>>   * minor changes
+>>
+>> v0 -> v2
+>>   * complete rewrite
+>>
+>> v1: https://lore.kernel.org/kvm/20220217145336.1794778-1-scgl@linux.ibm.com/
+>> v0: https://lore.kernel.org/kvm/20220211182215.2730017-11-scgl@linux.ibm.com/
+>>
+>> Janis Schoetterl-Glausch (5):
+>>    KVM: s390: selftests: Split memop tests
+>>    KVM: s390: selftests: Add macro as abstraction for MEM_OP
+>>    KVM: s390: selftests: Add named stages for memop test
+>>    KVM: s390: selftests: Add more copy memop tests
+>>    KVM: s390: selftests: Add error memop tests
+>>
+>>   tools/testing/selftests/kvm/s390x/memop.c | 735 ++++++++++++++++++----
+>>   1 file changed, 617 insertions(+), 118 deletions(-)
+>>
+>>
+>> base-commit: ee6a569d3bf64c9676eee3eecb861fb01cc11311
 > 
-> Here's what I had written spliced in with your code.  Compile tested only for
-> this version.
+> applied (with minor whitespace fixes). Will queue for kvms390/next.
 
-I'll do something in between, keeping the nested_ops but with three 
-functions to initialize the various kvm_mmu structs.
+Not sure if it's a good idea, but I broke style rules here intentionally:
 
-Paolo
++	CHECK_N_DO(MOP, t.vcpu, LOGICAL, READ, mem2, PAGE_SIZE + 2048,
++			GADDR_V(guest_last_page), KEY(2));
+
+in order to emphasize that the arguments are ultimately arguments to MOP.
+I did the same in the DEFAULT(_WRITE)?_READ macros, which checkpatch might
+not warn about because of the line break escapes.
