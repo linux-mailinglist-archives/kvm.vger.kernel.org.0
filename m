@@ -2,132 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C1E374D31E5
-	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 16:38:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C01DD4D31EA
+	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 16:40:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233869AbiCIPjo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Mar 2022 10:39:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55586 "EHLO
+        id S233936AbiCIPlH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Mar 2022 10:41:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33174 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232818AbiCIPjn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Mar 2022 10:39:43 -0500
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FF24DE2E0
-        for <kvm@vger.kernel.org>; Wed,  9 Mar 2022 07:38:44 -0800 (PST)
-Received: by mail-pf1-x432.google.com with SMTP id z15so2623650pfe.7
-        for <kvm@vger.kernel.org>; Wed, 09 Mar 2022 07:38:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=4858y4BMWr2gJcJLKJUNVqF74EyV3FrLTR/2w1+cBpk=;
-        b=sha44opMxj3RxRy1WwA1JpkDf55Ph6UGxBENd7g/pHUz3RNkNLhQ696ctcWQKKbrCc
-         Ph5/P5qnN7wFMoI09zqXLC0cBv1lXc3P4fZsszT4Kp0r4TNhJxHha+rniMnjlIPuKKHx
-         r4Yg9mKzb9Q3ZfdsUlHzMXHF+pamX86bhZKrWDMgJ+ahtjUNz2m17oIEovvEiIJalukY
-         LK7uwa3f9j8WmjH/omLlKjkabB6JznX4XQ9RSwCI8lCtQw3R9LmgjSlZ1iiC5LllmjLK
-         nMGeMg5BPMpIrELoVl+NaA5oYAL5lXKIcJIsBb5XERc9j0fCDKQyapApL9kN5DLLQVsU
-         JnvQ==
+        with ESMTP id S233616AbiCIPlG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Mar 2022 10:41:06 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C7E56119F06
+        for <kvm@vger.kernel.org>; Wed,  9 Mar 2022 07:40:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646840407;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=mf8CVJpykjONlYIj4F2lxLtCErMCmabEpV4EdOBokJ8=;
+        b=V5q+KcS8ZvMg+7mKSoNFF11DRgjRJzKNlta1UiSBQSOVYplKhUy/0YpVUt3FrgDgR0fGVU
+        Fmyrc3pNn7ksiaaYcWqADVdCbfNX81nIYD4Xkq7M1T9n+0p7MS02S6VrN0aExBb5Zg7SCb
+        O6hy1QHeI1C4xYkuCEgqsIWyNMg3NkI=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-413-y8qRDL3MN3KMl3_aiZHBPA-1; Wed, 09 Mar 2022 10:40:06 -0500
+X-MC-Unique: y8qRDL3MN3KMl3_aiZHBPA-1
+Received: by mail-ed1-f72.google.com with SMTP id l24-20020a056402231800b00410f19a3103so1485771eda.5
+        for <kvm@vger.kernel.org>; Wed, 09 Mar 2022 07:40:05 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=4858y4BMWr2gJcJLKJUNVqF74EyV3FrLTR/2w1+cBpk=;
-        b=1UPkcFk4FKyNLyC00ZU7kpQafbrIu2M/Aj+UFsC+za28gpQ6W0WNDk6uDxD67Uzb8F
-         mOvkBQdk26ajSogkB+Y6afP2kDce2uzYnoongWD0+2J2HRSortsLNebIonuaj8pUG5oc
-         8h6JjrIMeCLBJZyJ5DBna+dnOdhY8UlA+U+ZQkoYQwkZBO29B5MdkDLqjRdncPuFmv25
-         s7lpnDKcMDt+3r2qHYjjJuPoNVzLYyNUu6B67DjxPo647DVnFzgg/n0teHBxUjR8/wki
-         GbH1W/tWUwPrZP4GaImub7wbYVKx/RhLDE16/6VXjuRBq9QE1hHZziEzajcefYmt0mOm
-         zLew==
-X-Gm-Message-State: AOAM533inIdoEed0F0LDbd32c/85RheLi4NFi1G7u48d3MhkItP56LIK
-        GwZAQ7ZU5+RT6Hv/FqWumcSRIg==
-X-Google-Smtp-Source: ABdhPJxDX3EJ+7XUkClySg12OgQg8R10EgeeO15wlTSLQwyFzAFoksxH+R/yN5vzdAt8k6VHTx6ayA==
-X-Received: by 2002:a63:ef03:0:b0:374:7286:14d0 with SMTP id u3-20020a63ef03000000b00374728614d0mr248206pgh.552.1646840323625;
-        Wed, 09 Mar 2022 07:38:43 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id e6-20020a63aa06000000b00380c8bed5a6sm1226627pgf.46.2022.03.09.07.38.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Mar 2022 07:38:42 -0800 (PST)
-Date:   Wed, 9 Mar 2022 15:38:39 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        dmatlack@google.com
-Subject: Re: [PATCH v2 08/25] KVM: x86/mmu: split cpu_mode from mmu_role
-Message-ID: <YijJ/3frxdLAsuKV@google.com>
-References: <20220221162243.683208-1-pbonzini@redhat.com>
- <20220221162243.683208-9-pbonzini@redhat.com>
- <YiemuYKEFjqFvDlL@google.com>
- <175b89f0-14a6-2309-041f-69314d9f191a@redhat.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=mf8CVJpykjONlYIj4F2lxLtCErMCmabEpV4EdOBokJ8=;
+        b=pdBV/niOmmSRULSYUVlhWyXr02HPuwkALgG7/EgBz3cNV/crjRPDrFd8f0iK4lX5F7
+         iMVpsRAwHQ4mF1CQqSfq6nzWvHbZryUK78a2mTxymQFblIZh5Br5h4YS5ptpa6+DBu6l
+         198OPEtsxmxaYZdVIKZahJB/nENVyAqR86U2PxNqWejQ7JpdGeoCjtEiJxIiPYvl5/5q
+         HBCh/hyGYCLSKaX+/277IFSCRkEW5T7GPrDuUTRaaG5BaPnDQhhgsof3Wh4ojBvZqTFJ
+         DoIN0sxuEh0LR4P9FE4ETh4HsPGijYHFzFlvDEe3Wl0S5hHhZS19vPx3INq/JjbIiDXg
+         PIyg==
+X-Gm-Message-State: AOAM531GcsK+jFtDXlfaLKYjlzBUAE8hRfB8uuj1/rvaguUOTzA1KKuj
+        krFske/W+Szj3KZd2WBW+ehajTWeQMxYYe6uSXN+qBeBW9Xvzpz36z74Y68VM9Ixplk9Z3oBBGn
+        25clooc9o0LL6
+X-Received: by 2002:a17:906:4408:b0:6da:bec1:2808 with SMTP id x8-20020a170906440800b006dabec12808mr278740ejo.543.1646840404469;
+        Wed, 09 Mar 2022 07:40:04 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxx+gvGRmVfFoZip0H7v1AKRQ8cZ9dAFh83V03KTg4KylOolG2+P2B049hhG1L+4ZZBoqFKgw==
+X-Received: by 2002:a17:906:4408:b0:6da:bec1:2808 with SMTP id x8-20020a170906440800b006dabec12808mr278714ejo.543.1646840404209;
+        Wed, 09 Mar 2022 07:40:04 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id n9-20020a05640205c900b00415fbbdabbbsm965130edx.9.2022.03.09.07.39.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 09 Mar 2022 07:40:02 -0800 (PST)
+Message-ID: <846caa99-2e42-4443-1070-84e49d2f11d2@redhat.com>
+Date:   Wed, 9 Mar 2022 16:39:58 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <175b89f0-14a6-2309-041f-69314d9f191a@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH 1/2] KVM: x86/xen: PV oneshot timer fixes
+Content-Language: en-US
+To:     David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Metin Kaya <metikaya@amazon.co.uk>,
+        Paul Durrant <pdurrant@amazon.co.uk>
+References: <20220309143835.253911-1-dwmw2@infradead.org>
+ <20220309143835.253911-2-dwmw2@infradead.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20220309143835.253911-2-dwmw2@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 09, 2022, Paolo Bonzini wrote:
-> On 3/8/22 19:55, Sean Christopherson wrote:
-> > >   static void shadow_mmu_init_context(struct kvm_vcpu *vcpu, struct kvm_mmu *context,
-> > > -				    const struct kvm_mmu_role_regs *regs,
-> > > -				    union kvm_mmu_role new_role)
-> > > +				    union kvm_mmu_role cpu_mode,
-> > Can you give all helpers this treatment (rename "role" => "cpu_mode")?  I got
-> > tripped up a few times reading patches because the ones where it wasn't necessary,
-> > i.e. where there's only a single kvm_mmu_role paramenter, were left as-is.
-> > 
-> > I think kvm_calc_shadow_npt_root_page_role() and kvm_calc_shadow_mmu_root_page_role()
-> > are the only offenders.
-> 
-> These take struct kvm_mmu_role_regs; they *return* union kvm_mmu_role but
-> that is changed later in the series to the base part only.
+On 3/9/22 15:38, David Woodhouse wrote:
+> +		if (hrtimer_active(&vcpu->arch.xen.timer))
+> +			data->u.timer.expires_ns = vcpu->arch.xen.timer_expires;
+> +		else
+> +			data->u.timer.expires_ns = 0;
+>   		r = 0;
 
-Doh, sorry, a later patch is what confused me.  Lost track of things when moving
-around in the series.
+This is still racy.  You should instead clear timer_expires in 
+xen_timer_callback, and only do so after a *successful* write to the 
+event channel (setting timer_pending is not enough).
 
-Patch 12, "KVM: x86/mmu: cleanup computation of MMU roles for shadow paging", is
-where we end up with
+Still, this only works if userspace reads the pending events *after* 
+expires_ns.  It's the usual pattern:
 
-	static union kvm_mmu_role
-	kvm_calc_shadow_mmu_root_page_role(struct kvm_vcpu *vcpu,
-					   union kvm_mmu_role role)
-	{
-		if (!role.ext.efer_lma)
-			role.base.level = PT32E_ROOT_LEVEL;
-		else if (role.ext.cr4_la57)
-			role.base.level = PT64_ROOT_5LEVEL;
-		else
-			role.base.level = PT64_ROOT_4LEVEL;
+	xen_timer_callback()		userspace
+	------------------------	------------------------
+	kvm_xen_set_evtchn_fast()	read timer_expires
+	smp_wmb()			smp_rmb()
+	expires_ns = 0;			read event channel
 
-		return role;
-	}
+Now, if expires is read as 0, userspace surely will read the event properly.
 
-Can we instead tweak that patch to make it and kvm_calc_shadow_npt_root_page_role() be
+Is this doable with the KVM ioctls that you have, considering that the 
+pending events are in memory?  If not, you should add pause timer and 
+resume timer ioctls.  These will change the hrtimer state without 
+touching timer_expires and timer_pending.
 
-	static union kvm_mmu_role
-	kvm_calc_shadow_mmu_root_page_role(struct kvm_vcpu *vcpu,
-					union kvm_mmu_role cpu_role)
-	{
-		union kvm_mmu_role root_role = cpu_role;
+But even better, and even simpler: just set timer_pending in 
+xen_timer_callback, always go through the delayed injection path, and 
+remove this "if" from KVM_XEN_VCPU_GET_ATTR.  Then there are no races, 
+because KVM_RUN and KVM_XEN_VCPU_GET_ATTR are protected with vcpu->mutex:
 
-		if (!cpu_role.ext.efer_lma)
-			root_role.base.level = PT32E_ROOT_LEVEL;
-		else if (cpu_role.ext.cr4_la57)
-			root_role.base.level = PT64_ROOT_5LEVEL;
-		else
-			root_role.base.level = PT64_ROOT_4LEVEL;
+	xen_timer_callback()		migration source
+	------------------------	------------------------
+					read event channel
+	inc timer_pending
+					ioctl(KVM_XEN_VCPU_GET_ATTR)
+					  read timer_expires
 
-		return root_role;
-	}
+timer_expires is *not* read as zero, because the clearing happens only 
+in kvm_xen_inject_timer_irqs(), which cannot be concurrent with 
+KVM_XEN_VCPU_GET_ATTR.  And the destination does:
 
-This is effectively the same feedback I gave in Patch 15[*], I messed up when
-trying to track back where the "union kvm_mmu_role role" param was introduced.
+	migration destination			xen_timer_callback()
+	------------------------		------------------------
+	ioctl(KVM_XEN_VCPU_SET_ATTR)
+	  set timer_expires
+	    hrtimer_start()
+					        inc timer_pending
+	ioctl(KVM_RUN)
+	  kvm_xen_inject_timer_irqs()
+	    kvm_xen_set_evtchn()
+	      kvm_xen_set_evtchn_fast()
+	    expires_ns = 0;
 
-https://lore.kernel.org/all/YieoXYBFyo9pZhhX@google.com
+Paolo
+
