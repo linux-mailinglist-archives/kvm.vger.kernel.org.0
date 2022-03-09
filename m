@@ -2,144 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A4174D3C1A
-	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 22:32:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 886924D3C18
+	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 22:32:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233029AbiCIVdV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Mar 2022 16:33:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57226 "EHLO
+        id S238056AbiCIVdU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Mar 2022 16:33:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237633AbiCIVdR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Mar 2022 16:33:17 -0500
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89DCD11D7A2
-        for <kvm@vger.kernel.org>; Wed,  9 Mar 2022 13:32:16 -0800 (PST)
-Received: by mail-pf1-x449.google.com with SMTP id y193-20020a62ceca000000b004f6f5bbaf7cso2159101pfg.16
-        for <kvm@vger.kernel.org>; Wed, 09 Mar 2022 13:32:16 -0800 (PST)
+        with ESMTP id S237819AbiCIVdS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Mar 2022 16:33:18 -0500
+Received: from mail-oi1-x249.google.com (mail-oi1-x249.google.com [IPv6:2607:f8b0:4864:20::249])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9178111D7B2
+        for <kvm@vger.kernel.org>; Wed,  9 Mar 2022 13:32:18 -0800 (PST)
+Received: by mail-oi1-x249.google.com with SMTP id h25-20020a056808015900b002d6048692beso2391396oie.8
+        for <kvm@vger.kernel.org>; Wed, 09 Mar 2022 13:32:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=OuHKMBHK1hfsv9PTwgLrKkJAtQ7PY6TuBBA78I/fvJ4=;
-        b=AIIwunmbHzVTF90VIuxF0B+cPMpBG7vFTP0OkJvOthEDzWNCqONIkLvtNxhmiLHBxu
-         EjEd0vKZjhfo3xMhZrnrf3N27GYOWuqyKJAHKpzQo3vO9ZGvzvU3dyvrFvbvQoC8T0mX
-         /vo3+PRWA2NW2uPyyinE5+Gyjw0JZ0T7ZILAQomQiqHWK+XFPzzdh5yaOoUCo98mGGRp
-         eLo5gIKTejRzAwtYCi89OWk3MaLRJkHnOS1joG4QKxe+55pelAMy1Bcg1cB2PTedaDfs
-         j5YSlO3C5IDBkoIf1t5C6s/dp664blVOML9S8pQI8LmSDx2mMb0kTDYjxx4Ilf2j0jLm
-         whyQ==
+        bh=0dfXPpydeZEC3VDqzkrY7+izQjMCWin/le7c3KYdolQ=;
+        b=JzjNKDWxPAvJ4+G+kuVfG7e4Logr2FT5nUikbifToloS5Ap3uNMqPgXIIDJSjSlgaq
+         wsk5ddzs9BI4FftUbrxuweNJmI/kBfzde5I+obRBCkSxNHdl5BgasCuSTDigoM79L3lI
+         5df7GbhzQyF1YEh+WP6yKO9MhRn8ae+TOX/T8HRLV0gL7PBmeaBYZz0HN+oQsa/0mWb7
+         ay8g8YZgl9wxCxbM2df9OBgOH/l636R9jw+HMOXOYDacQF2m8y1vZOYibUJSIX9h700T
+         qgQiJyJdrxBANaHVtkNfMXv8cwnUOksnR5lsrTdqNZbCD7//pmxvWdEftn7yihU/tW8n
+         Fkaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=OuHKMBHK1hfsv9PTwgLrKkJAtQ7PY6TuBBA78I/fvJ4=;
-        b=Owccm7o58DU/ZsIfXS/Gqy8kY22LvItggB98czZOLPReIzXIfWJk6SYXzg8DOlMzwc
-         7wIvObTUq2o+1bgemxFOuRyKmZhirAMSfCkENBKWpX6OmZidrE7xDhtp85EFziVippYd
-         zNuj+O3EMpKwa3dnRXklzVAspnnQB1nnb53NIKC4GzPXI6tKaIL4Q2J/FvFg2ZVUmq4X
-         +gEdAaoo9RE+Th7pnpPI5CblydAhwx8+IIg8mtqA7QoNzr3LH31zEn1LMBPvUcZ7axnd
-         bAWJUc88WpCzcrDCn7XcIk729b78z1MSFT5fnAsqrroxg+Ui7LnRcCJsfaJq3VoJNqFo
-         Ge0w==
-X-Gm-Message-State: AOAM530bCfG87N/coioFR5gyvPKrN6M/opf04QUJZhiUuGaBz3LPbH9W
-        gOjHV2HgFxUd1zUKpm+Pu+r6/oHsaFKWag==
-X-Google-Smtp-Source: ABdhPJxw1hDwld16WPMlCFx0ZIw0ORi+ox3/ggeKsSO3s8u+x8KpQLec5E5jW86ylGJ1R4b7fyyLWZB9eZ/c6A==
+        bh=0dfXPpydeZEC3VDqzkrY7+izQjMCWin/le7c3KYdolQ=;
+        b=J3QppRlzez/++FsI3wEAUoNYwC3ygVV0KShP2QGQHShq5Ibk5ZouY+QN73HmjU8j34
+         pWbDWbnnqXDLcFaa1jj1WAL/WUPvYFskGBdv2zCbleaVJZqQMnivdwB/oStmolze3vPs
+         PYmtZL3tx2vFO4q2Kozj1vcSE9iDRK6EI5oV2YwWqwvM0ii2r7z+ZUwdUmBVgBUMbdzR
+         U9o7hRS5jncI1kj9KnzE6gxWj94wTF1hc1NJv7V/YOLtaJ4UVKt7iaaHCtsCFntWkSLn
+         9Nz5Y6CX9hz/f0epWKFKUEvktJozYwrMFP+N46mf0TxwnteAGIBQZjuwsGuHfK5naksX
+         BmdA==
+X-Gm-Message-State: AOAM533OWN0aig3MCWceCbv2dI9NAbp1P+PkntP+x1QngZLd5zqTe5aD
+        BWGPePdZ1utEX00z2RpodJkmf4EzbqwlRw==
+X-Google-Smtp-Source: ABdhPJzugdz5iy4t+ODhE2oOSy5pXQPLmy8G5RbFUGz5yrY9ME1XbkrifokL2llwjZ4yWvT6fRiCc05+ZzqPEQ==
 X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a17:90a:a087:b0:1b9:157f:4cc1 with SMTP
- id r7-20020a17090aa08700b001b9157f4cc1mr1521697pjp.117.1646861536007; Wed, 09
- Mar 2022 13:32:16 -0800 (PST)
-Date:   Wed,  9 Mar 2022 21:32:07 +0000
+ (user=dmatlack job=sendgmr) by 2002:a05:6808:17a8:b0:2d9:e067:e090 with SMTP
+ id bg40-20020a05680817a800b002d9e067e090mr7405802oib.25.1646861537828; Wed,
+ 09 Mar 2022 13:32:17 -0800 (PST)
+Date:   Wed,  9 Mar 2022 21:32:08 +0000
 In-Reply-To: <20220309213208.872644-1-dmatlack@google.com>
-Message-Id: <20220309213208.872644-2-dmatlack@google.com>
+Message-Id: <20220309213208.872644-3-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20220309213208.872644-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.35.1.616.g0bdcbb4464-goog
-Subject: [PATCH v2 1/2] KVM: Prevent module exit until all VMs are freed
+Subject: [PATCH v2 2/2] Revert "KVM: set owner of cpu and vm file operations"
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     David Matlack <dmatlack@google.com>,
         "open list:KERNEL VIRTUAL MACHINE (KVM)" <kvm@vger.kernel.org>,
         Marcelo Tosatti <mtosatti@redhat.com>, seanjc@google.com,
-        bgardon@google.com, stable@vger.kernel.org
+        bgardon@google.com
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Tie the lifetime the KVM module to the lifetime of each VM via
-kvm.users_count. This way anything that grabs a reference to the VM via
-kvm_get_kvm() cannot accidentally outlive the KVM module.
+This reverts commit 3d3aab1b973b01bd2a1aa46307e94a1380b1d802.
 
-Prior to this commit, the lifetime of the KVM module was tied to the
-lifetime of /dev/kvm file descriptors, VM file descriptors, and vCPU
-file descriptors by their respective file_operations "owner" field.
-This approach is insufficient because references grabbed via
-kvm_get_kvm() donot prevent closing any of the aforementioned file
-descriptors.
+Now that the KVM module's lifetime is tied to kvm.users_count, there is
+no need to also tie it's lifetime to the lifetime of the VM and vCPU
+file descriptors.
 
-This fixes a long standing theoretical bug in KVM that at least affects
-async page faults. kvm_setup_async_pf() grabs a reference via
-kvm_get_kvm(), and drops it in an asynchronous work callback. Nothing
-prevents the VM file descriptor from being closed and the KVM module
-from being unloaded before this callback runs.
-
-PPC and s390 also look broken beyond the Fixes commits listed below, but
-the below commits should be more than enough to guarantee inclusion in
-all stable kernels.
-
-Fixes: 3d3aab1b973b ("KVM: set owner of cpu and vm file operations")
-[ This 2.6.29 commit was an incomplete attempt to fix this bug. ]
-Fixes: af585b921e5d ("KVM: Halt vcpu if page it tries to access is swapped out")
-[ This 2.6.38 commit introduced async_pf and is definitely broken. ]
-Cc: stable@vger.kernel.org
-Suggested-by: Ben Gardon <bgardon@google.com>
-[ Based on a patch from Ben implemented for Google's kernel. ]
+Suggested-by: Sean Christopherson <seanjc@google.com>
 Reviewed-by: Sean Christopherson <seanjc@google.com>
-
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- virt/kvm/kvm_main.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ virt/kvm/kvm_main.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 9581a24c3d17..e17f9fd847e0 100644
+index e17f9fd847e0..dfbd9592eaba 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -117,6 +117,8 @@ EXPORT_SYMBOL_GPL(kvm_debugfs_dir);
- 
- static const struct file_operations stat_fops_per_vm;
- 
-+static struct file_operations kvm_chardev_ops;
-+
- static long kvm_vcpu_ioctl(struct file *file, unsigned int ioctl,
- 			   unsigned long arg);
- #ifdef CONFIG_KVM_COMPAT
-@@ -1132,6 +1134,12 @@ static struct kvm *kvm_create_vm(unsigned long type)
- 	preempt_notifier_inc();
- 	kvm_init_pm_notifier(kvm);
- 
-+	/* Use the "try" variant to play nice with e.g. "rmmod --wait". */
-+	if (!try_module_get(kvm_chardev_ops.owner)) {
-+		r = -ENODEV;
-+		goto out_err;
-+	}
-+
- 	return kvm;
- 
- out_err:
-@@ -1221,6 +1229,7 @@ static void kvm_destroy_vm(struct kvm *kvm)
- 	preempt_notifier_dec();
- 	hardware_disable_all();
- 	mmdrop(mm);
-+	module_put(kvm_chardev_ops.owner);
+@@ -3673,7 +3673,7 @@ static int kvm_vcpu_release(struct inode *inode, struct file *filp)
+ 	return 0;
  }
  
- void kvm_get_kvm(struct kvm *kvm)
-
-base-commit: ce41d078aaa9cf15cbbb4a42878cc6160d76525e
+-static struct file_operations kvm_vcpu_fops = {
++static const struct file_operations kvm_vcpu_fops = {
+ 	.release        = kvm_vcpu_release,
+ 	.unlocked_ioctl = kvm_vcpu_ioctl,
+ 	.mmap           = kvm_vcpu_mmap,
+@@ -4724,7 +4724,7 @@ static long kvm_vm_compat_ioctl(struct file *filp,
+ }
+ #endif
+ 
+-static struct file_operations kvm_vm_fops = {
++static const struct file_operations kvm_vm_fops = {
+ 	.release        = kvm_vm_release,
+ 	.unlocked_ioctl = kvm_vm_ioctl,
+ 	.llseek		= noop_llseek,
+@@ -5731,8 +5731,6 @@ int kvm_init(void *opaque, unsigned vcpu_size, unsigned vcpu_align,
+ 		goto out_free_5;
+ 
+ 	kvm_chardev_ops.owner = module;
+-	kvm_vm_fops.owner = module;
+-	kvm_vcpu_fops.owner = module;
+ 
+ 	r = misc_register(&kvm_dev);
+ 	if (r) {
 -- 
 2.35.1.616.g0bdcbb4464-goog
 
