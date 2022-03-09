@@ -2,120 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6602C4D2CAC
-	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 11:00:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2FD524D2CA4
+	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 10:59:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232369AbiCIKA6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Mar 2022 05:00:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55638 "EHLO
+        id S232360AbiCIJ76 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Mar 2022 04:59:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51264 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231266AbiCIKAz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Mar 2022 05:00:55 -0500
-Received: from out30-54.freemail.mail.aliyun.com (out30-54.freemail.mail.aliyun.com [115.124.30.54])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE7FF16F970;
-        Wed,  9 Mar 2022 01:59:55 -0800 (PST)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R231e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04394;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=33;SR=0;TI=SMTPD_---0V6jAtL._1646819988;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0V6jAtL._1646819988)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Wed, 09 Mar 2022 17:59:49 +0800
-Message-ID: <1646819926.6046128-13-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH v7 21/26] virtio: add helper virtio_find_vqs_ctx_size()
-Date:   Wed, 9 Mar 2022 17:58:46 +0800
-From:   Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mark Gross <markgross@kernel.org>,
-        Vadim Pasternak <vadimp@nvidia.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Johannes Berg <johannes.berg@intel.com>,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>,
-        linux-um@lists.infradead.org, platform-driver-x86@vger.kernel.org,
-        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, bpf@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-References: <20220308123518.33800-1-xuanzhuo@linux.alibaba.com>
- <20220308123518.33800-22-xuanzhuo@linux.alibaba.com>
- <f1fb522d-74ce-a642-7768-deaad76aeddc@redhat.com>
-In-Reply-To: <f1fb522d-74ce-a642-7768-deaad76aeddc@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S231266AbiCIJ74 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Mar 2022 04:59:56 -0500
+Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16A19129BB7;
+        Wed,  9 Mar 2022 01:58:58 -0800 (PST)
+Received: by mail-ed1-x532.google.com with SMTP id t1so1907682edc.3;
+        Wed, 09 Mar 2022 01:58:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=WvBJ1bCYmOpUz9sA2X7ttEKRPJ5e2lRH183jSE/0mtI=;
+        b=D49GbhhMWElAvxVZqt+JI2yYnMree6VqtRkg2bg8NFou0W4gSTHSN1CPz+VECruU/M
+         ZdojhZRGosAacK3OO0KLYjg4QM3U6dDHy9xk+odQsb/rDpDO0PFO7qz6EL6WfVs5uU0X
+         d1FiVaCBGu84e6cPqImY37dxrixcVJnLVX8HgFdYYwHamMbeQLEI/13j4hJSjDIh4mLc
+         npkKBZSdjXZs8dxVz7Uf0gW0Wchx7gO+e70LZnLM1gSRQR5W521GWuNwRW8JLUsAndtb
+         wuHQJUNbHdDe5Qjv+n81SyZReygB5eMJZdMU4+1nNrvMBrEB3N2VnOP0iwnG0IqdgPSz
+         Tbnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=WvBJ1bCYmOpUz9sA2X7ttEKRPJ5e2lRH183jSE/0mtI=;
+        b=aLV+C/OZTzTJlcvOxcDgkZ49mpmSEvJA8hw1o2dpV2wepVaK0S1Lzv8VD6bzFYxaMu
+         N+A0nAF/Ceix6+mmw4bqm3jW49ZM/n6VRXKhEYN9I1hKawSb7UQ1H3fBuK9JNhapoiic
+         kwwg5o+mamncoKJ/dHBPk9/TYvpF6NKyIP2i7prk4vCn+pdFn2B0tgmuEt5VfLA4ZuKF
+         avyfq+M8+jSsIJrLxSGusgOoJ7fDm4V9X25RLqcq6177UFHMMksIV9oB6IWhmfMqVZ77
+         /gIGrZO1cJ0p3V9tD0AFzu8LVJlsR8JR0R7zE12+InUihQG0AicLIMs8lwp4JThOAq4t
+         g+SA==
+X-Gm-Message-State: AOAM5328X69Y/d/gK9mtOC5TPuxpyRCgqPfPho8os5pjvWFUSPUXGi/F
+        cqj2evXl/1LgRd0pWPC+3pw=
+X-Google-Smtp-Source: ABdhPJw+njvmNggCfx5Yl4DtOUfmT/TZk9Zj9sdzyD2ye1Lh3M2PohyXgqqXuiVm1pN3S/h80TZSQw==
+X-Received: by 2002:a05:6402:3582:b0:416:6413:d2ae with SMTP id y2-20020a056402358200b004166413d2aemr9704298edc.192.1646819936447;
+        Wed, 09 Mar 2022 01:58:56 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id k19-20020a1709067ad300b006da92735c32sm544940ejo.16.2022.03.09.01.58.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 09 Mar 2022 01:58:55 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <175b89f0-14a6-2309-041f-69314d9f191a@redhat.com>
+Date:   Wed, 9 Mar 2022 10:58:54 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH v2 08/25] KVM: x86/mmu: split cpu_mode from mmu_role
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        dmatlack@google.com
+References: <20220221162243.683208-1-pbonzini@redhat.com>
+ <20220221162243.683208-9-pbonzini@redhat.com> <YiemuYKEFjqFvDlL@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <YiemuYKEFjqFvDlL@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 9 Mar 2022 17:04:12 +0800, Jason Wang <jasowang@redhat.com> wrote:
->
-> =E5=9C=A8 2022/3/8 =E4=B8=8B=E5=8D=888:35, Xuan Zhuo =E5=86=99=E9=81=93:
-> > Introduce helper virtio_find_vqs_ctx_size() to call find_vqs and specify
-> > the maximum size of each vq ring.
-> >
-> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > ---
-> >   include/linux/virtio_config.h | 12 ++++++++++++
-> >   1 file changed, 12 insertions(+)
-> >
-> > diff --git a/include/linux/virtio_config.h b/include/linux/virtio_confi=
-g.h
-> > index 5157524d8036..921d8610db0c 100644
-> > --- a/include/linux/virtio_config.h
-> > +++ b/include/linux/virtio_config.h
-> > @@ -233,6 +233,18 @@ int virtio_find_vqs_ctx(struct virtio_device *vdev=
-, unsigned nvqs,
-> >   				      desc, NULL);
-> >   }
-> >
-> > +static inline
-> > +int virtio_find_vqs_ctx_size(struct virtio_device *vdev, u32 nvqs,
-> > +				 struct virtqueue *vqs[],
-> > +				 vq_callback_t *callbacks[],
-> > +				 const char * const names[],
-> > +				 const bool *ctx, struct irq_affinity *desc,
-> > +				 u32 sizes[])
-> > +{
-> > +	return vdev->config->find_vqs(vdev, nvqs, vqs, callbacks, names, ctx,
-> > +				      desc, sizes);
-> > +}
->
->
-> Do we need to convert all the open coded direct call to find_vqs() other
-> than net?
+On 3/8/22 19:55, Sean Christopherson wrote:
+>>   static void shadow_mmu_init_context(struct kvm_vcpu *vcpu, struct kvm_mmu *context,
+>> -				    const struct kvm_mmu_role_regs *regs,
+>> -				    union kvm_mmu_role new_role)
+>> +				    union kvm_mmu_role cpu_mode,
+> Can you give all helpers this treatment (rename "role" => "cpu_mode")?  I got
+> tripped up a few times reading patches because the ones where it wasn't necessary,
+> i.e. where there's only a single kvm_mmu_role paramenter, were left as-is.
+> 
+> I think kvm_calc_shadow_npt_root_page_role() and kvm_calc_shadow_mmu_root_page_role()
+> are the only offenders.
 
+These take struct kvm_mmu_role_regs; they *return* union kvm_mmu_role 
+but that is changed later in the series to the base part only.
 
-Do you mean calling find_vqs without a helper? The kernel doesn't do that
-anymore.
-
-Thanks.
-
-
->
-> Thanks
->
->
-> > +
-> >   /**
-> >    * virtio_reset_vq - reset a queue individually
-> >    * @vq: the virtqueue
->
+Paolo
