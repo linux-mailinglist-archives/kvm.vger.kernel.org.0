@@ -2,107 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4AF474D31F5
-	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 16:41:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 119CA4D321B
+	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 16:47:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233966AbiCIPl7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Mar 2022 10:41:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35714 "EHLO
+        id S233993AbiCIPr6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Mar 2022 10:47:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233955AbiCIPl5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Mar 2022 10:41:57 -0500
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FD4616306E
-        for <kvm@vger.kernel.org>; Wed,  9 Mar 2022 07:40:58 -0800 (PST)
-Received: by mail-pf1-x42e.google.com with SMTP id a5so2660066pfv.2
-        for <kvm@vger.kernel.org>; Wed, 09 Mar 2022 07:40:58 -0800 (PST)
+        with ESMTP id S234001AbiCIPry (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Mar 2022 10:47:54 -0500
+Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 495F511629F;
+        Wed,  9 Mar 2022 07:46:54 -0800 (PST)
+Received: by mail-wr1-x430.google.com with SMTP id u1so3674918wrg.11;
+        Wed, 09 Mar 2022 07:46:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=awNm7ncYJS5runeS2crmI62S72vDnlHWFXIoD08zsCQ=;
-        b=L95s3l8KwvKSoVBp7CenGSpuMYCVVN7GYKixyJEeDlmj6to8MhL0pIcnvDahgNOvxi
-         JfjZ0TGsVg8yLTggwW59sBAVvTyJ2+ahvDMzZ1X/cpIaGcZw/Yfu+FTW13ogQdC5gcUx
-         WduOO+A0oDbV8KctSwlgphgr4QbcVJIbd4eTAk9QTeMSmzdnIvnMpo4DZt6s3GqCCXWQ
-         I9FjVUcItyTicv7V147R87ZLFIeV9kXVghbdYNWZYNmZvi5YRVLgDg/4HmWm3BJp0jeP
-         tBfOIvJm8gJ5J9VEv9NMcb8m5DNZx/lSzmLslFTLe9wlqmNqqJUqnt1TS7+FBUg/Et+J
-         4D3A==
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=rUxlp0PyM2gm522aFsSG3DVXlsPAiJ3a25VeEzybOso=;
+        b=Xs/DlaSp6/RycZSWX+MQMeH0V4xoWXtgw6dp6jntcLjOLJBzh6hCLiElYScSsGqAuQ
+         1FMF30zFbNOLeB9emv3r9+qIiFkPtV86EuJEpUh785jpM8896uqd6z/aGDB4mPXZzg63
+         wW5OSRNnNIsHmL4yrUsXQ/JDA629Y9dD5t6Q9PAgsuAMgqPnoF8Emu1HOiXMgnyTPUnd
+         ggkZHpinUnsZQ1woMhtepRF+q9QVyw8p7aZsoBtoTD1T+ixRFzEv8m7GdHPOdpIuTWtX
+         oI6upBdpKf4pDTMuuAoZZ4nBKdEDOigHvYE8Rrzp3vjok6f+mBD6CrVAs1JWo5xzCgst
+         3Iuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=awNm7ncYJS5runeS2crmI62S72vDnlHWFXIoD08zsCQ=;
-        b=JSGkTtr4sc5/Vn0Mqjco57tHEFM/HsRW9aCLJW+5jcmXWaI/N9whuEjxlMl10Tqui8
-         7p2Ulr5JIu4SUqL46DU2sEMeiNCbiFCKo4uSfn4FRYZeMc/WxM0m8J4WUGvDxauCVK/w
-         01pKB9p3Bsb0s6Bro9OBF7nB9mOXxSZi7uYCS6KmrQR0798motbq23VFx5f6DV6OznDK
-         Y1jcJFBknUzYOnXtBuEeFA2O5g+0mGYey5F2hq7icV3iE1PmjLr/Vfe/UkQC6qrEASkH
-         2KpgT2M5YByM+GqToeFPda1Xhm2ve3cyyD/PPfC7WkqO7Y0gP4f46mqgwkjeez8AMLZp
-         YIaQ==
-X-Gm-Message-State: AOAM530mvQo2x/Z2jc2bMP0OjoOvCt/JgmFYZZETKp86yqrJAv1t/dio
-        s0y4GMh0gKWADQBMk0QTJd8vdw==
-X-Google-Smtp-Source: ABdhPJy0fy+gKxWpiweokALKmNhNvXvpZLPvXf3Aa/Du9Pmy7tGAgvR6HKEPghwWq0MWpSuGrYsfnQ==
-X-Received: by 2002:a05:6a00:ac1:b0:4f1:29e4:b3a1 with SMTP id c1-20020a056a000ac100b004f129e4b3a1mr295081pfl.63.1646840457963;
-        Wed, 09 Mar 2022 07:40:57 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id o1-20020a637e41000000b003804d0e2c9esm2819543pgn.35.2022.03.09.07.40.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Mar 2022 07:40:57 -0800 (PST)
-Date:   Wed, 9 Mar 2022 15:40:53 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
-        Kieran Bingham <kbingham@kernel.org>,
-        Jan Kiszka <jan.kiszka@siemens.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Johannes Berg <johannes.berg@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Jessica Yu <jeyu@kernel.org>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Yang Weijiang <weijiang.yang@intel.com>,
-        linux-kernel@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Borislav Petkov <bp@suse.de>
-Subject: Re: [PATCH v3 2/6] KVM: x86: add force_intercept_exceptions_mask
-Message-ID: <YijKhYNjZpG7EX9y@google.com>
-References: <20210811122927.900604-1-mlevitsk@redhat.com>
- <20210811122927.900604-3-mlevitsk@redhat.com>
- <YTECUaPa9kySQxRX@google.com>
- <0cdac80177eea408b7e316bd1fc4c0c5839ba1d4.camel@redhat.com>
- <YifoysEvfnQgq59A@google.com>
- <3221c2385e1148fe0ee77d4717b52726e1db9d8d.camel@redhat.com>
- <a7b27887-ce00-c173-a7e7-8ad3470154f5@redhat.com>
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=rUxlp0PyM2gm522aFsSG3DVXlsPAiJ3a25VeEzybOso=;
+        b=3uQThw7Khoqh1rfVN25rc5XzdAV3OtDC6ZOiTuAkbXqNq+JJy6Hh56fKP1ZTrVg84d
+         Z/Capf3iAUzzGhjszb3O9Vx63qYPV5EgeX7OWnPV361KpiaVGE/nM9XZe4k7/e82xVc9
+         iMloKtApkWftqqAzSwCKSaPyy0IV0vgQhZkPvX+c/zWaxJlGmRjhMXbsXmFC4py5SW/4
+         nbcRFG3TDxwz6J1YCaSo9C6U4fQmnI9kt4INAZgRyWRNENj5X+EdT+9gr3VmhEUzPKRa
+         cVKt2AL4zRbtDQ8JakL7KwfnP3n41ZnDkkb4Wsg37HjQWTStMC+nuWQEIXnaMBOtZq6I
+         OueQ==
+X-Gm-Message-State: AOAM531knjoLzQFaYRvfYmvCrKS45RC3ekfOv2siUrbzyKJoZ9fm/yLH
+        kP4CmKc6LLI+REH2/0a7pdk=
+X-Google-Smtp-Source: ABdhPJxeGdN4zPkYLuIwePnp6MzdSYNfgeNRVT49hltNOfqEuL3Wh5n3y3KgFLzKlu4JT509ECjMYg==
+X-Received: by 2002:a05:6000:2a8:b0:203:7a50:5dfe with SMTP id l8-20020a05600002a800b002037a505dfemr203939wry.260.1646840812758;
+        Wed, 09 Mar 2022 07:46:52 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id o7-20020a5d6707000000b001f067c7b47fsm3089040wru.27.2022.03.09.07.46.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 09 Mar 2022 07:46:52 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <da421a98-cca2-aece-b3a2-eb83e9795801@redhat.com>
+Date:   Wed, 9 Mar 2022 16:46:50 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a7b27887-ce00-c173-a7e7-8ad3470154f5@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH 1/4] KVM: x86: mark synthetic SMM vmexit as SVM_EXIT_SW
+Content-Language: en-US
+To:     Maxim Levitsky <mlevitsk@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, Jim Mattson <jmattson@google.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Borislav Petkov <bp@alien8.de>, x86@kernel.org
+References: <20220301135526.136554-1-mlevitsk@redhat.com>
+ <20220301135526.136554-2-mlevitsk@redhat.com> <Yh5KTtLhRyfmx/ZF@google.com>
+ <2fddbfd6b6e68f3f8e972536c27a87ffadbe1911.camel@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <2fddbfd6b6e68f3f8e972536c27a87ffadbe1911.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 09, 2022, Paolo Bonzini wrote:
-> On 3/9/22 13:31, Maxim Levitsky wrote:
-> > Question: is it worth it? Since I am very busy with various things, this
-> > feature, beeing just small debug help which I used once in a while doesn't
-> > get much time from me.
+On 3/1/22 18:13, Maxim Levitsky wrote:
+> The fact that we have a stale VM exit reason in vmcb without this
+> patch which can be in theory consumed somewhere down the road.
 > 
-> I agree it's not very much worth.
+> This stale vm exit reason also appears in the tracs which is
+> very misleading.
 
-I don't have a use case, was just trying to find the bottom of my inbox and came
-across this thread.
+Let's put it in the commit message:
+
+This makes it a bit easier to read the KVM trace, and avoids
+other potential problems due to a stale vmexit reason in the vmcb.  If
+SVM_EXIT_SW somehow reaches svm_invoke_exit_handler(), instead, 
+svm_check_exit_valid() will return false and a WARN will be logged.
+
+Paolo
