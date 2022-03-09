@@ -2,127 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 784334D37C8
-	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 18:45:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B10204D364A
+	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 18:43:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236888AbiCIRPr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Mar 2022 12:15:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53188 "EHLO
+        id S236879AbiCIRP6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Mar 2022 12:15:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36058 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238424AbiCIROY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Mar 2022 12:14:24 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6F641130196
-        for <kvm@vger.kernel.org>; Wed,  9 Mar 2022 09:09:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646845774;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=s/o3sPCCWF9DwYJSFG90KCzdlkqUEgVretFfIHQN8Mo=;
-        b=Vb3UoZoV4KBfPGn7MtVO9YVx/pMaaLMB7wvfln4Qeq197X5Mj7uteRxslu8sRppneMZHED
-        zAHlTNNw4r8TVqGNPUPaHCS7JVGSpMzAS4hH38bChiABoTZ+4t4cZI7yl9w7arJofofvlB
-        GC8AEbX6JZXgo69Z8VoBJKJd1bm1vV4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-362-T5WUUdbbMmGXVTHoigC-hA-1; Wed, 09 Mar 2022 12:09:31 -0500
-X-MC-Unique: T5WUUdbbMmGXVTHoigC-hA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4BAEE1854E2A;
-        Wed,  9 Mar 2022 17:09:30 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DA28B866F1;
-        Wed,  9 Mar 2022 17:09:29 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     vkuznets@redhat.com, jmattson@google.com
-Subject: [PATCH 2/2] KVM: x86: synthesize CPUID leaf 0x80000021h if useful
-Date:   Wed,  9 Mar 2022 12:09:28 -0500
-Message-Id: <20220309170928.1032664-3-pbonzini@redhat.com>
-In-Reply-To: <20220309170928.1032664-1-pbonzini@redhat.com>
-References: <20220309170928.1032664-1-pbonzini@redhat.com>
+        with ESMTP id S238894AbiCIRPM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Mar 2022 12:15:12 -0500
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C345C154D09
+        for <kvm@vger.kernel.org>; Wed,  9 Mar 2022 09:11:45 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 42CA81691;
+        Wed,  9 Mar 2022 09:11:45 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 226CA3F7F5;
+        Wed,  9 Mar 2022 09:11:44 -0800 (PST)
+Date:   Wed, 9 Mar 2022 17:12:05 +0000
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        pbonzini@redhat.com, thuth@redhat.com
+Subject: Re: [kvm-unit-tests PATCH 2/2] arm/run: Fix using
+ qemu-system-aarch64 to run aarch32 tests on aarch64
+Message-ID: <Yijf5TlbOKhV+Mw6@monolith.localdoman>
+References: <20220309162117.56681-1-alexandru.elisei@arm.com>
+ <20220309162117.56681-3-alexandru.elisei@arm.com>
+ <20220309165812.46xmnjek72yrv3g6@gator>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220309165812.46xmnjek72yrv3g6@gator>
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Guests should have X86_BUG_NULL_SEG if and only if the host has the bug.
-Use the info from static_cpu_has_bug to form the 0x80000021 CPUID leaf
-that was defined for Zen3.  Userspace can then set the bit even on older
-CPUs that do not have the bug, such as Zen2.
+Hi,
 
-Do the same for X86_FEATURE_LFENCE_RDTSC as well, since various processors
-have had very different ways of detecting it and not all of them are
-available to userspace.
+On Wed, Mar 09, 2022 at 05:58:12PM +0100, Andrew Jones wrote:
+> On Wed, Mar 09, 2022 at 04:21:17PM +0000, Alexandru Elisei wrote:
+> > From: Andrew Jones <drjones@redhat.com>
+> > 
+> > KVM on arm64 can create 32 bit and 64 bit VMs. kvm-unit-tests tries to
+> > take advantage of this by setting the aarch64=off -cpu option. However,
+> > get_qemu_accelerator() isn't aware that KVM on arm64 can run both types
+> > of VMs and it selects qemu-system-arm instead of qemu-system-aarch64.
+> > This leads to an error in premature_failure() and the test is marked as
+> > skipped:
+> > 
+> > $ ./run_tests.sh selftest-setup
+> > SKIP selftest-setup (qemu-system-arm: -accel kvm: invalid accelerator kvm)
+> > 
+> > Fix this by setting QEMU to the correct qemu binary before calling
+> > get_qemu_accelerator().
+> > 
+> > Signed-off-by: Andrew Jones <drjones@redhat.com>
+> > [ Alex E: Added commit message, changed the logic to make it clearer ]
+> > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > ---
+> >  arm/run | 5 +++++
+> >  1 file changed, 5 insertions(+)
+> > 
+> > diff --git a/arm/run b/arm/run
+> > index 2153bd320751..5fe0a45c4820 100755
+> > --- a/arm/run
+> > +++ b/arm/run
+> > @@ -13,6 +13,11 @@ processor="$PROCESSOR"
+> >  ACCEL=$(get_qemu_accelerator) ||
+> >  	exit $?
+> >  
+> > +# KVM for arm64 can create a VM in either aarch32 or aarch64 modes.
+> > +if [ "$ACCEL" = kvm ] && [ -z "$QEMU" ] && [ "$HOST" = "aarch64" ]; then
+> > +	QEMU=qemu-system-aarch64
+> > +fi
+> > +
+> >  qemu=$(search_qemu_binary) ||
+> >  	exit $?
+> >  
+> > -- 
+> > 2.35.1
+> >
+> 
+> So there's a bug with this patch which was also present in the patch I
+> proposed. By setting $QEMU before we call search_qemu_binary() we may
+> force a "A QEMU binary was not found." failure even though a perfectly
+> good 'qemu-kvm' binary is present.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/cpuid.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+I noticed that search_qemu_binary() tries to search for both
+qemu-system-ARCH_NAME and qemu-kvm, and I first thought that qemu-kvm is a
+legacy name for qemu-system-ARCH_NAME.
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 30832aad402f..58b0b4e0263c 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -723,6 +723,19 @@ static struct kvm_cpuid_entry2 *do_host_cpuid(struct kvm_cpuid_array *array,
- 		/* Hypervisor leaves are always synthesized by __do_cpuid_func.  */
- 		return entry;
- 
-+	case 0x80000000:
-+		/*
-+		 * 0x80000021 is sometimes synthesized by __do_cpuid_func, which
-+		 * would result in out-of-bounds calls to do_host_cpuid.
-+		 */
-+		{
-+			static int max_cpuid_80000000;
-+			if (!READ_ONCE(max_cpuid_80000000))
-+				WRITE_ONCE(max_cpuid_80000000, cpuid_eax(0x80000000));
-+			if (function > READ_ONCE(max_cpuid_80000000))
-+				return entry;
-+		}
-+
- 	default:
- 		break;
- 	}
-@@ -1069,6 +1082,14 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
- 		break;
- 	case 0x80000000:
- 		entry->eax = min(entry->eax, 0x80000021);
-+		/*
-+		 * Serializing LFENCE is reported in a multitude of ways,
-+		 * and NullSegClearsBase is not reported in CPUID on Zen2;
-+		 * help userspace by providing the CPUID leaf ourselves.
-+		 */
-+		if (static_cpu_has(X86_FEATURE_LFENCE_RDTSC)
-+		    || !static_cpu_has_bug(X86_BUG_NULL_SEG))
-+			entry->eax = max(entry->eax, 0x80000021);
- 		break;
- 	case 0x80000001:
- 		cpuid_entry_override(entry, CPUID_8000_0001_EDX);
-@@ -1155,6 +1176,10 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
- 		 *   EAX      13     PCMSR, Prefetch control MSR
- 		 */
- 		entry->eax &= BIT(0) | BIT(2) | BIT(6);
-+		if (static_cpu_has(X86_FEATURE_LFENCE_RDTSC))
-+			entry->eax |= BIT(2);
-+		if (!static_cpu_has_bug(X86_BUG_NULL_SEG))
-+			entry->eax |= BIT(6);
- 		break;
- 	/*Add support for Centaur's CPUID instruction*/
- 	case 0xC0000000:
--- 
-2.31.1
+I just did some googling, and I think it's actually how certain distros (like
+SLES) package qemu-system-ARCH_NAME, is that correct?
 
+If that is so, one idea I toyed with (for something else) is to move the error
+messages from search_qemu_binary() to the call sites, that way arm/run can first
+try to find qemu-system-aarch64, then fallback to qemu-kvm, and only after both
+aren't found exit with an error. Just a suggestion, in case you find it useful.
+
+Thanks,
+Alex
+
+> 
+> I'll try to come up with something better.
+> 
+> Thanks,
+> drew
+> 
