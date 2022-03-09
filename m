@@ -2,65 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 91DC54D2B6A
-	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 10:07:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 077A44D2B8D
+	for <lists+kvm@lfdr.de>; Wed,  9 Mar 2022 10:15:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231797AbiCIJHq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Mar 2022 04:07:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41398 "EHLO
+        id S231923AbiCIJP7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Mar 2022 04:15:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231803AbiCIJHo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Mar 2022 04:07:44 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C140F16BCFF
-        for <kvm@vger.kernel.org>; Wed,  9 Mar 2022 01:06:45 -0800 (PST)
+        with ESMTP id S231922AbiCIJP5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Mar 2022 04:15:57 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C925C157234
+        for <kvm@vger.kernel.org>; Wed,  9 Mar 2022 01:14:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646816804;
+        s=mimecast20190719; t=1646817297;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=dmarRpfjcD+wJIBdiG5Aw9gDSJ+EPWEuC8CvMx7WuN8=;
-        b=L8Srg0nwvYsJ+ReIt6n6AgpZNE+w6g2EltcoZWyQ5QtkGFzKLg//JMj+aKs6jVochSySum
-        g3vD6cSA4QoiwjwbRFqfhDIRJHVW4xq+lYotB5i0QNeUHAApHEk69Oawgf369GzFuhOcHd
-        Q/53iR6vdB5mjFIUG0nzhOmKFvIg3NY=
-Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
- [209.85.210.200]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=sc9oWQ1T35bRoFzTSlgzenvWUozmVf90/ZtKZIwMHUs=;
+        b=FAgXLb0kidXSPk3IOmYBVYYfxUiVYe+4P2faacRtJoRaDLnqjQylsJeshSPLINpum/Firz
+        b+zLn3NAIYWGI4eni9P3RlN5/HfgJW//hFh2T4YdEVQAKkZ4+80AMkPg92YleNPiHN7yTG
+        o2YpH+m7irbJBEktGHbzk3kmEhcW9kU=
+Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
+ [209.85.214.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-608-nnQnJS42Pv-emRuia92epg-1; Wed, 09 Mar 2022 04:06:43 -0500
-X-MC-Unique: nnQnJS42Pv-emRuia92epg-1
-Received: by mail-pf1-f200.google.com with SMTP id y193-20020a62ceca000000b004f6f5bbaf7cso1188881pfg.16
-        for <kvm@vger.kernel.org>; Wed, 09 Mar 2022 01:06:43 -0800 (PST)
+ us-mta-119-kzIahA2NPRmQq6Ez1vPaNg-1; Wed, 09 Mar 2022 04:14:56 -0500
+X-MC-Unique: kzIahA2NPRmQq6Ez1vPaNg-1
+Received: by mail-pl1-f197.google.com with SMTP id x10-20020a170902a38a00b00151e09a4e15so837689pla.15
+        for <kvm@vger.kernel.org>; Wed, 09 Mar 2022 01:14:55 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=dmarRpfjcD+wJIBdiG5Aw9gDSJ+EPWEuC8CvMx7WuN8=;
-        b=hi8JhqRMVbXqHgYhdo3AqKmYxB2jt9HU4eH/Co/fKE8llfTc8GwtbFZOMGIJsMlJEd
-         D2z2NtI5U13hJFmlyejtJo3tHxC7u4P7vA5M8nCnU1V9cQw1q+QsYQFKy3GCf/AEeMzj
-         iVxn1cDfovHg9DafBZK4ePRTasljdlDbXLJMF44sGsu+6FbSkPr57NeEPfQiG9QVZvGT
-         8wahjLiV9Lz9MS2MyKXhGZkF5kbFKykZ5StiqWVpVX08SAECTpMgx7VnrxzdHvS67Uys
-         m4fDLzudN7LEUlgknhCVrNwNhtM0HPs9q1r6ueOO83H9I+VLoscbuMtjnzgDkpBgV75x
-         zpDw==
-X-Gm-Message-State: AOAM531rTUCVDLmTbxJ3FImYOI8sE86WEF5lCL3fyCqCfSw16vWV/4LK
-        wNuTEafqrJCKNvWgVFujiqF9Bij1t0ZtifBTMfP2w3Lk186I9OADKD/OFGEpBJMK4pqu8HBJjuQ
-        PU9v2qWx7p+Mh
-X-Received: by 2002:a63:854a:0:b0:380:352e:8009 with SMTP id u71-20020a63854a000000b00380352e8009mr12892133pgd.292.1646816802490;
-        Wed, 09 Mar 2022 01:06:42 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJz9eDcfFxbje1rdv28H7WkiZwFVsxL2GSk9kNibKQYu1fo/Qm/IxgRXDvzx0fDGJ0esSBvzvg==
-X-Received: by 2002:a63:854a:0:b0:380:352e:8009 with SMTP id u71-20020a63854a000000b00380352e8009mr12892088pgd.292.1646816802085;
-        Wed, 09 Mar 2022 01:06:42 -0800 (PST)
+        bh=sc9oWQ1T35bRoFzTSlgzenvWUozmVf90/ZtKZIwMHUs=;
+        b=n8E3fSq6AN9SWi+Giforv0nsxz8eH+B+IEpL0cZqZcp1kwQ+4xAhiTI+7/A5yUbuX/
+         ghcgWkEWdX24/JYEqaUWQebEEJc6q3y5Ot7gyHz7QOhFok6uA7A9SPSn2HLFEjN9O/oY
+         JtASwRV4KxAOOOzZ5I9oR4ccug2oi2dW/1vE4qbQjeCE/kZdWsCdW5dJY1r/vvLwPKxD
+         /+pwavtABwM0YpafJfS1Z3oLl7vfF3saJNVbjbDH0vl3ZnEPL/ubRmAIW1EBJppaSF/5
+         1CdlbpuZDM7KPvzQ6lQzoMHtuI+AT2T1gzuftPciDRWZVyrhiJF2P6DdDNoNV9LP6KYp
+         uAbQ==
+X-Gm-Message-State: AOAM531fEJ1S+efcsIyB08ykUUWnHABAOxc1Ij9e2BN88BlMEKXkON5K
+        e15UTycd0Cgnd/lJTfvTL1+pmv8dOHLMq+KEVrS02PvMI5uV3g9fk5PP+E37n3pJiqO9dAkf8Ga
+        I6Mb3/G41B3gr
+X-Received: by 2002:a17:90b:1b43:b0:1bf:6180:367a with SMTP id nv3-20020a17090b1b4300b001bf6180367amr9413298pjb.172.1646817294435;
+        Wed, 09 Mar 2022 01:14:54 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJybmsMuEBcxZ7oYSDw9tPVnvRoFjWIEzgnMTihTr3NYtzJOE9wVfTp/SLtdAOZZcYSLhnlPZw==
+X-Received: by 2002:a17:90b:1b43:b0:1bf:6180:367a with SMTP id nv3-20020a17090b1b4300b001bf6180367amr9413201pjb.172.1646817294071;
+        Wed, 09 Mar 2022 01:14:54 -0800 (PST)
 Received: from [10.72.12.183] ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id x3-20020a17090ad68300b001b8bcd47c35sm5646802pju.6.2022.03.09.01.06.29
+        by smtp.gmail.com with ESMTPSA id h17-20020a63df51000000b0036b9776ae5bsm1721846pgj.85.2022.03.09.01.14.39
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Mar 2022 01:06:41 -0800 (PST)
-Message-ID: <9049128d-543e-be7b-a0a1-08e9bf94c282@redhat.com>
-Date:   Wed, 9 Mar 2022 17:06:22 +0800
+        Wed, 09 Mar 2022 01:14:53 -0800 (PST)
+Message-ID: <7ff78ff8-bdd0-bb5e-1cea-cf1126226feb@redhat.com>
+Date:   Wed, 9 Mar 2022 17:14:34 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
  Gecko/20100101 Thunderbird/91.6.1
-Subject: Re: [PATCH v7 23/26] virtio_net: split free_unused_bufs()
+Subject: Re: [PATCH v7 24/26] virtio_net: support rx/tx queue reset
 Content-Language: en-US
 To:     Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
         virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
@@ -91,9 +91,9 @@ Cc:     Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>,
         linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
         kvm@vger.kernel.org, bpf@vger.kernel.org
 References: <20220308123518.33800-1-xuanzhuo@linux.alibaba.com>
- <20220308123518.33800-24-xuanzhuo@linux.alibaba.com>
+ <20220308123518.33800-25-xuanzhuo@linux.alibaba.com>
 From:   Jason Wang <jasowang@redhat.com>
-In-Reply-To: <20220308123518.33800-24-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <20220308123518.33800-25-xuanzhuo@linux.alibaba.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -109,92 +109,216 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 在 2022/3/8 下午8:35, Xuan Zhuo 写道:
-> This patch separates two functions for freeing sq buf and rq buf from
-> free_unused_bufs().
+> This patch implements the reset function of the rx, tx queues.
 >
-> When supporting the enable/disable tx/rq queue in the future, it is
-> necessary to support separate recovery of a sq buf or a rq buf.
+> Based on this function, it is possible to modify the ring num of the
+> queue. And quickly recycle the buffer in the queue.
+>
+> In the process of the queue disable, in theory, as long as virtio
+> supports queue reset, there will be no exceptions.
+>
+> However, in the process of the queue enable, there may be exceptions due to
+> memory allocation.  In this case, vq is not available, but we still have
+> to execute napi_enable(). Because napi_disable is similar to a lock,
+> napi_enable must be called after calling napi_disable.
 >
 > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-
-
-Acked-by: Jason Wang <jasowang@redhat.com>
-
-
 > ---
->   drivers/net/virtio_net.c | 53 +++++++++++++++++++++++-----------------
->   1 file changed, 31 insertions(+), 22 deletions(-)
+>   drivers/net/virtio_net.c | 107 +++++++++++++++++++++++++++++++++++++++
+>   1 file changed, 107 insertions(+)
 >
 > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 59b1ea82f5f0..409a8e180918 100644
+> index 409a8e180918..ffff323dcef0 100644
 > --- a/drivers/net/virtio_net.c
 > +++ b/drivers/net/virtio_net.c
-> @@ -2804,36 +2804,45 @@ static void free_receive_page_frags(struct virtnet_info *vi)
->   			put_page(vi->rq[i].alloc_frag.page);
->   }
+> @@ -251,6 +251,11 @@ struct padded_vnet_hdr {
+>   	char padding[4];
+>   };
 >   
-> -static void free_unused_bufs(struct virtnet_info *vi)
 > +static void virtnet_sq_free_unused_bufs(struct virtnet_info *vi,
-> +					struct send_queue *sq)
->   {
->   	void *buf;
-> -	int i;
->   
-> -	for (i = 0; i < vi->max_queue_pairs; i++) {
-> -		struct virtqueue *vq = vi->sq[i].vq;
-> -		while ((buf = virtqueue_detach_unused_buf(vq)) != NULL) {
-> -			if (!is_xdp_frame(buf))
-> -				dev_kfree_skb(buf);
-> -			else
-> -				xdp_return_frame(ptr_to_xdp(buf));
-> -		}
-> +	while ((buf = virtqueue_detach_unused_buf(sq->vq)) != NULL) {
-> +		if (!is_xdp_frame(buf))
-> +			dev_kfree_skb(buf);
-> +		else
-> +			xdp_return_frame(ptr_to_xdp(buf));
->   	}
-> +}
->   
-> -	for (i = 0; i < vi->max_queue_pairs; i++) {
-> -		struct virtqueue *vq = vi->rq[i].vq;
-> -
-> -		while ((buf = virtqueue_detach_unused_buf(vq)) != NULL) {
-> -			if (vi->mergeable_rx_bufs) {
-> -				put_page(virt_to_head_page(buf));
-> -			} else if (vi->big_packets) {
-> -				give_pages(&vi->rq[i], buf);
-> -			} else {
-> -				put_page(virt_to_head_page(buf));
-> -			}
-> -		}
+> +					struct send_queue *sq);
 > +static void virtnet_rq_free_unused_bufs(struct virtnet_info *vi,
-> +					struct receive_queue *rq)
-> +{
-> +	void *buf;
+> +					struct receive_queue *rq);
 > +
-> +	while ((buf = virtqueue_detach_unused_buf(rq->vq)) != NULL) {
-> +		if (vi->mergeable_rx_bufs)
-> +			put_page(virt_to_head_page(buf));
-> +		else if (vi->big_packets)
-> +			give_pages(rq, buf);
-> +		else
-> +			put_page(virt_to_head_page(buf));
->   	}
+>   static bool is_xdp_frame(void *ptr)
+>   {
+>   	return (unsigned long)ptr & VIRTIO_XDP_FLAG;
+> @@ -1369,6 +1374,9 @@ static void virtnet_napi_enable(struct virtqueue *vq, struct napi_struct *napi)
+>   {
+>   	napi_enable(napi);
+>   
+> +	if (vq->reset)
+> +		return;
+> +
+
+
+Let's WARN_ONCE() here?
+
+
+>   	/* If all buffers were filled by other side before we napi_enabled, we
+>   	 * won't get another interrupt, so process any outstanding packets now.
+>   	 * Call local_bh_enable after to trigger softIRQ processing.
+> @@ -1413,6 +1421,10 @@ static void refill_work(struct work_struct *work)
+>   		struct receive_queue *rq = &vi->rq[i];
+>   
+>   		napi_disable(&rq->napi);
+> +		if (rq->vq->reset) {
+> +			virtnet_napi_enable(rq->vq, &rq->napi);
+> +			continue;
+> +		}
+
+
+This seems racy and it's a hint that we need sync with the refill work 
+during reset like what we did in virtnet_close():
+
+         /* Make sure refill_work doesn't re-enable napi! */
+         cancel_delayed_work_sync(&vi->refill);
+
+
+>   		still_empty = !try_fill_recv(vi, rq, GFP_KERNEL);
+>   		virtnet_napi_enable(rq->vq, &rq->napi);
+>   
+> @@ -1523,6 +1535,9 @@ static void virtnet_poll_cleantx(struct receive_queue *rq)
+>   	if (!sq->napi.weight || is_xdp_raw_buffer_queue(vi, index))
+>   		return;
+>   
+> +	if (sq->vq->reset)
+> +		return;
+
+
+It looks to me we'd better either WARN or just remove this. Since it 
+looks like a workaround for the un-synchronized NAPI somehow.
+
+
+> +
+>   	if (__netif_tx_trylock(txq)) {
+>   		do {
+>   			virtqueue_disable_cb(sq->vq);
+> @@ -1769,6 +1784,98 @@ static netdev_tx_t start_xmit(struct sk_buff *skb, struct net_device *dev)
+>   	return NETDEV_TX_OK;
 >   }
 >   
-> +static void free_unused_bufs(struct virtnet_info *vi)
+> +static int virtnet_rx_vq_reset(struct virtnet_info *vi,
+> +			       struct receive_queue *rq, u32 ring_num)
+
+
+It's better to rename this as virtnet_rx_resize().
+
+
 > +{
-> +	int i;
+> +	int err;
 > +
-> +	for (i = 0; i < vi->max_queue_pairs; i++)
-> +		virtnet_sq_free_unused_bufs(vi, vi->sq + i);
+> +	/* stop napi */
+> +	napi_disable(&rq->napi);
 > +
-> +	for (i = 0; i < vi->max_queue_pairs; i++)
-> +		virtnet_rq_free_unused_bufs(vi, vi->rq + i);
+
+
+Here, as discussed above, we need synchronize with the refill work.
+
+
+> +	/* reset the queue */
+> +	err = virtio_reset_vq(rq->vq);
+> +	if (err)
+> +		goto err;
+
+
+Btw, most comment of this function seems useless since code already 
+explain themselves.
+
+
+> +
+> +	/* free bufs */
+> +	virtnet_rq_free_unused_bufs(vi, rq);
+> +
+> +	/* reset vring. */
+> +	err = virtqueue_reset_vring(rq->vq, ring_num);
+> +	if (err)
+> +		goto err;
+> +
+> +	/* enable reset queue */
+> +	err = virtio_enable_resetq(rq->vq);
+> +	if (err)
+> +		goto err;
+> +
+> +	/* fill recv */
+> +	if (!try_fill_recv(vi, rq, GFP_KERNEL))
+> +		schedule_delayed_work(&vi->refill, 0);
+> +
+> +	/* enable napi */
+> +	virtnet_napi_enable(rq->vq, &rq->napi);
+> +	return 0;
+> +
+> +err:
+> +	netdev_err(vi->dev,
+> +		   "reset rx reset vq fail: rx queue index: %ld err: %d\n",
+> +		   rq - vi->rq, err);
+> +	virtnet_napi_enable(rq->vq, &rq->napi);
+> +	return err;
 > +}
 > +
->   static void virtnet_del_vqs(struct virtnet_info *vi)
->   {
->   	struct virtio_device *vdev = vi->vdev;
+> +static int virtnet_tx_vq_reset(struct virtnet_info *vi,
+> +			       struct send_queue *sq, u32 ring_num)
+> +{
+
+
+It looks to me it's better to rename this as "virtnet_rx_resize()"
+
+
+> +	struct netdev_queue *txq;
+> +	int err, qindex;
+> +
+> +	qindex = sq - vi->sq;
+> +
+> +	txq = netdev_get_tx_queue(vi->dev, qindex);
+> +	__netif_tx_lock_bh(txq);
+> +
+> +	/* stop tx queue and napi */
+> +	netif_stop_subqueue(vi->dev, qindex);
+> +	virtnet_napi_tx_disable(&sq->napi);
+
+
+There's no need to hold tx lock for napi disable.
+
+Thanks
+
+
+> +
+> +	__netif_tx_unlock_bh(txq);
+> +
+> +	/* reset the queue */
+> +	err = virtio_reset_vq(sq->vq);
+> +	if (err) {
+> +		netif_start_subqueue(vi->dev, qindex);
+> +		goto err;
+> +	}
+> +
+> +	/* free bufs */
+> +	virtnet_sq_free_unused_bufs(vi, sq);
+> +
+> +	/* reset vring. */
+> +	err = virtqueue_reset_vring(sq->vq, ring_num);
+> +	if (err)
+> +		goto err;
+> +
+> +	/* enable reset queue */
+> +	err = virtio_enable_resetq(sq->vq);
+> +	if (err)
+> +		goto err;
+> +
+> +	/* start tx queue and napi */
+> +	netif_start_subqueue(vi->dev, qindex);
+> +	virtnet_napi_tx_enable(vi, sq->vq, &sq->napi);
+> +	return 0;
+> +
+> +err:
+> +	netdev_err(vi->dev,
+> +		   "reset tx reset vq fail: tx queue index: %ld err: %d\n",
+> +		   sq - vi->sq, err);
+> +	virtnet_napi_tx_enable(vi, sq->vq, &sq->napi);
+> +	return err;
+> +}
+> +
+>   /*
+>    * Send command via the control virtqueue and check status.  Commands
+>    * supported by the hypervisor, as indicated by feature bits, should
 
