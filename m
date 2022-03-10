@@ -2,285 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 459314D44BC
-	for <lists+kvm@lfdr.de>; Thu, 10 Mar 2022 11:33:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C7514D44E2
+	for <lists+kvm@lfdr.de>; Thu, 10 Mar 2022 11:42:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241267AbiCJKdr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Mar 2022 05:33:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57964 "EHLO
+        id S241385AbiCJKne (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Mar 2022 05:43:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53410 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241349AbiCJKdK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Mar 2022 05:33:10 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34FB213EF8C;
-        Thu, 10 Mar 2022 02:32:09 -0800 (PST)
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22AAKi8p023317;
-        Thu, 10 Mar 2022 10:32:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=dwZYYLkddX0Dq45BOjcw37bL1fM6cRkPOQZ2Lq960CQ=;
- b=nTvylxPeFa2rX1hjb6k5RyOgcQZeSX3stPpDrebh8nfrcc7V4YIgT48a8zhM0fotXYMV
- AoYxAyPefUU5fJpcsar39+yG93wvIpMjoP2PoTt/1hOUD1ipfxgcWvDlWvbNnMBVy03e
- kwFrBxrpRt2c7NmIQYd6Pcxja9dwSgdlUJvjIjoa9GC6yvddjNGdzgqtMzZzlld6b2gh
- UWqBbqAlNM2Fu1K0Dj78t84rt1jWsshMTrRB/3IgiPZa8pdQn2hwDc/BvLAHL+/54M0p
- VI5n+v/8CxVUAxp/V1RNi0ISRCe9RWu4KxJwFfMjtaEhRvJj4XxtoP1R0fjdBfhrOFYn DQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3ep0sdqd21-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 10 Mar 2022 10:32:07 +0000
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22AAW7JW025682;
-        Thu, 10 Mar 2022 10:32:07 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3ep0sdqcwn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 10 Mar 2022 10:32:07 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22AAL3FJ027827;
-        Thu, 10 Mar 2022 10:31:54 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma01fra.de.ibm.com with ESMTP id 3ekyg8jj0j-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 10 Mar 2022 10:31:54 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22AAVo7V18547118
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 10 Mar 2022 10:31:50 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 79BC752057;
-        Thu, 10 Mar 2022 10:31:50 +0000 (GMT)
-Received: from linux6.. (unknown [9.114.12.104])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id DED0B5204F;
-        Thu, 10 Mar 2022 10:31:49 +0000 (GMT)
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
-        david@redhat.com, borntraeger@linux.ibm.com
-Subject: [PATCH v2 9/9] Documentation/virt/kvm/api.rst: Add protvirt dump/info api descriptions
-Date:   Thu, 10 Mar 2022 10:31:12 +0000
-Message-Id: <20220310103112.2156-10-frankja@linux.ibm.com>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20220310103112.2156-1-frankja@linux.ibm.com>
-References: <20220310103112.2156-1-frankja@linux.ibm.com>
+        with ESMTP id S241358AbiCJKnc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Mar 2022 05:43:32 -0500
+Received: from mail-yw1-x1136.google.com (mail-yw1-x1136.google.com [IPv6:2607:f8b0:4864:20::1136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E92C9E547
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 02:42:31 -0800 (PST)
+Received: by mail-yw1-x1136.google.com with SMTP id 00721157ae682-2dc242a79beso52686017b3.8
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 02:42:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=PjvVFIKZnpSRC+f09phnGX4Uu5Wyj+AZlMtNPwY4epI=;
+        b=N2WsR4ppwa1hiSYpMnQi16CZJFt0xsiOm/GSJGOrjM/kDllAE5FbmrSUzSAPq3085X
+         H4N9BU3YlYt74jkDWlHY/hTW7RQKmYd7QyZViNS7vwVuOuys/XZu773r8mFJDW3Fjg1P
+         wYXZ1h0iQdak6Lzr/jOpJe1sUd6ncN2JSrZEFKYj8i7jaR+3DFKlmLtIiDQgb5Ci5CjT
+         mfddlFomZJOiROWg89ER9sEVMOQLBkuFYlV/1+fpKRwLlzxea9LVM5DialZcX2FS72zk
+         E9oZTmf1+JwYLRUbi4RYOuJBspe1qh66RVqCOERCQwpt0dPWO3sgRYq6fNzAB4Kx39rn
+         L1GA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=PjvVFIKZnpSRC+f09phnGX4Uu5Wyj+AZlMtNPwY4epI=;
+        b=jkKgNdlYROrrBl/tyfTAT+e0rpqFiZrm68e0BE4F9KE6yYtOAf3KqmJrtRKTWWmSAT
+         WWPqSbUdm8WsXc56EYXAebPiTP/CaP8EL0VmftmaezJFAOntq16BGz9gFg37jKH71dsO
+         BqFIqlKPVfG/AmNyF1zVX/xIOZhNhoXfeCqmVTLBFA/LMUeu4NfnK/Otk1eaiy+r1WWN
+         tPrI8OoYJ2sZ4X2UjMs9jXyUCoRQYqIM9mJsdd/PX2O9CIl8ezSV642bPvf0IXC3CHF9
+         Bl7i7bdN6dvqzzrm5CURTAKWReqrb/XfwqwMXF/4C/RHjnVxy8ISqTRh7qOHVEFQQTcR
+         AU6A==
+X-Gm-Message-State: AOAM532YWqA5+b+3LkQ1akgyfYBl0DhP1DBtTOPpWFiMz/MUGezLTcY0
+        yNrwhwkXv1zXwKCiCQfaJ7Jafn//IREJML/2iqc/yA==
+X-Google-Smtp-Source: ABdhPJxsqY3tbTUqohNm2XSgz8up04CIOjs4jevepGkNfFHKU6IKs0Os1NqJ9ZAfQ69oRydLyjunFjUm0eFl3YDC5Dk=
+X-Received: by 2002:a81:e85:0:b0:2dc:50d1:145 with SMTP id 127-20020a810e85000000b002dc50d10145mr3361489ywo.314.1646908950510;
+ Thu, 10 Mar 2022 02:42:30 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: l6jhuN64sYKHeW2R-jDPxJvO69CGbvrw
-X-Proofpoint-GUID: B7VIg0kQxOv0cSPdwj7GSE3Kx8U_oxtz
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-03-10_03,2022-03-09_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 adultscore=0
- suspectscore=0 impostorscore=0 priorityscore=1501 phishscore=0
- clxscore=1015 bulkscore=0 spamscore=0 mlxscore=0 lowpriorityscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2203100056
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <20220310081854.2487280-1-jiyong@google.com> <20220310085931.cpgc2cv4yg7sd4vu@sgarzare-redhat>
+In-Reply-To: <20220310085931.cpgc2cv4yg7sd4vu@sgarzare-redhat>
+From:   Jiyong Park <jiyong@google.com>
+Date:   Thu, 10 Mar 2022 19:41:54 +0900
+Message-ID: <CALeUXe6heGD9J+5fkLs9TJ7Mn0UT=BSdGNK_wZ4gkor_Ax_SqA@mail.gmail.com>
+Subject: Re: [PATCH] vhost/vsock: reset only the h2g connections upon release
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>, adelva@google.com,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Time to add the dump API changes to the api documentation file.
-Also some minor cleanup.
+Hi Stefano,
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
----
- Documentation/virt/kvm/api.rst | 150 ++++++++++++++++++++++++++++++++-
- 1 file changed, 148 insertions(+), 2 deletions(-)
+On Thu, Mar 10, 2022 at 5:59 PM Stefano Garzarella <sgarzare@redhat.com> wrote:
+>
+> Hi Jiyong,
+>
+> On Thu, Mar 10, 2022 at 05:18:54PM +0900, Jiyong Park wrote:
+> >Filtering non-h2g connections out when determining orphaned connections.
+> >Otherwise, in a nested VM configuration, destroying the nested VM (which
+> >often involves the closing of /dev/vhost-vsock if there was h2g
+> >connections to the nested VM) kills not only the h2g connections, but
+> >also all existing g2h connections to the (outmost) host which are
+> >totally unrelated.
+> >
+> >Tested: Executed the following steps on Cuttlefish (Android running on a
+> >VM) [1]: (1) Enter into an `adb shell` session - to have a g2h
+> >connection inside the VM, (2) open and then close /dev/vhost-vsock by
+> >`exec 3< /dev/vhost-vsock && exec 3<&-`, (3) observe that the adb
+> >session is not reset.
+> >
+> >[1] https://android.googlesource.com/device/google/cuttlefish/
+> >
+> >Signed-off-by: Jiyong Park <jiyong@google.com>
+> >---
+> > drivers/vhost/vsock.c | 4 ++++
+> > 1 file changed, 4 insertions(+)
+> >
+> >diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+> >index 37f0b4274113..2f6d5d66f5ed 100644
+> >--- a/drivers/vhost/vsock.c
+> >+++ b/drivers/vhost/vsock.c
+> >@@ -722,6 +722,10 @@ static void vhost_vsock_reset_orphans(struct sock *sk)
+> >        * executing.
+> >        */
+> >
+> >+      /* Only the h2g connections are reset */
+> >+      if (vsk->transport != &vhost_transport.transport)
+> >+              return;
+> >+
+> >       /* If the peer is still valid, no need to reset connection */
+> >       if (vhost_vsock_get(vsk->remote_addr.svm_cid))
+> >               return;
+> >--
+> >2.35.1.723.g4982287a31-goog
+> >
+>
+> Thanks for your patch!
+>
+> Yes, I see the problem and I think I introduced it with the
+> multi-transports support (ooops).
+>
+> So we should add this fixes tag:
+>
+> Fixes: c0cfa2d8a788 ("vsock: add multi-transports support")
+>
+>
+> IIUC the problem is for all transports that should only cycle on their
+> own sockets. Indeed I think there is the same problem if the g2h driver
+> will be unloaded (or a reset event is received after a VM migration), it
+> will close all sockets of the nested h2g.
+>
+> So I suggest a more generic solution, modifying
+> vsock_for_each_connected_socket() like this (not tested):
+>
+> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+> index 38baeb189d4e..f04abf662ec6 100644
+> --- a/net/vmw_vsock/af_vsock.c
+> +++ b/net/vmw_vsock/af_vsock.c
+> @@ -334,7 +334,8 @@ void vsock_remove_sock(struct vsock_sock *vsk)
+>   }
+>   EXPORT_SYMBOL_GPL(vsock_remove_sock);
+>
+> -void vsock_for_each_connected_socket(void (*fn)(struct sock *sk))
+> +void vsock_for_each_connected_socket(struct vsock_transport *transport,
+> +                                    void (*fn)(struct sock *sk))
+>   {
+>          int i;
+>
+> @@ -343,8 +344,12 @@ void vsock_for_each_connected_socket(void (*fn)(struct sock *sk))
+>          for (i = 0; i < ARRAY_SIZE(vsock_connected_table); i++) {
+>                  struct vsock_sock *vsk;
+>                  list_for_each_entry(vsk, &vsock_connected_table[i],
+> -                                   connected_table)
+> +                                   connected_table) {
+> +                       if (vsk->transport != transport)
+> +                               continue;
+> +
+>                          fn(sk_vsock(vsk));
+> +               }
+>          }
+>
+>
+> And all transports that call it.
+>
+> Thanks,
+> Stefano
+>
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index b4ed71345051..44e628be496a 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -5062,7 +5062,7 @@ into ESA mode. This reset is a superset of the initial reset.
- 	__u32 reserved[3];
-   };
- 
--cmd values:
-+**cmd values:**
- 
- KVM_PV_ENABLE
-   Allocate memory and register the VM with the Ultravisor, thereby
-@@ -5078,7 +5078,6 @@ KVM_PV_ENABLE
-   =====      =============================
- 
- KVM_PV_DISABLE
--
-   Deregister the VM from the Ultravisor and reclaim the memory that
-   had been donated to the Ultravisor, making it usable by the kernel
-   again.  All registered VCPUs are converted back to non-protected
-@@ -5095,6 +5094,114 @@ KVM_PV_VM_VERIFY
-   Verify the integrity of the unpacked image. Only if this succeeds,
-   KVM is allowed to start protected VCPUs.
- 
-+KVM_PV_INFO
-+  :Capability: KVM_CAP_S390_PROTECTED_DUMP
-+
-+  Presents an API that provides Ultravisor related data to userspace
-+  via subcommands. len_max is the size of the user space buffer,
-+  len_written is KVM's indication of how much bytes of that buffer
-+  were actually written to. len_written can be used to determine the
-+  valid fields if more response fields are added in the future.
-+
-+  ::
-+     enum pv_cmd_info_id {
-+        KVM_PV_INFO_VM,
-+        KVM_PV_INFO_DUMP,
-+     };
-+
-+     struct kvm_s390_pv_info_header {
-+        __u32 id;
-+        __u32 len_max;
-+        __u32 len_written;
-+        __u32 reserved;
-+     };
-+
-+     struct kvm_s390_pv_info {
-+        struct kvm_s390_pv_info_header header;
-+        struct kvm_s390_pv_info_dump dump;
-+	struct kvm_s390_pv_info_vm vm;
-+     };
-+
-+**subcommands:**
-+
-+  KVM_PV_INFO_VM
-+    This subcommand provides basic Ultravisor information for PV
-+    hosts. These values are likely also exported as files in the sysfs
-+    firmware UV query interface but they are more easily available to
-+    programs in this API.
-+
-+    The installed calls and feature_indication members provide the
-+    installed UV calls and the UV's other feature indications.
-+
-+    The max_* members provide information about the maximum number of PV
-+    vcpus, PV guests and PV guest memory size.
-+
-+    ::
-+
-+      struct kvm_s390_pv_info_vm {
-+        __u64 inst_calls_list[4];
-+        __u64 max_cpus;
-+        __u64 max_guests;
-+        __u64 max_guest_addr;
-+        __u64 feature_indication;
-+      };
-+
-+
-+  KVM_PV_INFO_DUMP
-+    This subcommand provides information related to dumping PV guests.
-+
-+    ::
-+
-+      struct kvm_s390_pv_info_dump {
-+        __u64 dump_cpu_buffer_len;
-+        __u64 dump_config_mem_buffer_per_1m;
-+        __u64 dump_config_finalize_len;
-+      };
-+
-+KVM_PV_DUMP
-+  :Capability: KVM_CAP_S390_PROTECTED_DUMP
-+
-+  Presents an API that provides calls which facilitate dumping a
-+  protected VM.
-+
-+  ::
-+
-+    struct kvm_s390_pv_dmp {
-+      __u64 subcmd;
-+      __u64 buff_addr;
-+      __u64 buff_len;
-+      __u64 gaddr;		/* For dump storage state */
-+    };
-+
-+  **subcommands:**
-+
-+  KVM_PV_DUMP_INIT
-+    Initializes the dump process of a protected VM. If this call does
-+    not succeed all other subcommands will fail with -EINVAL. This
-+    subcommand will return -EINVAL if a dump process has not yet been
-+    completed.
-+
-+    Not all PV vms can be dumped, the owner needs to set `dump
-+    allowed` PCF bit 34 in the SE header to allow dumping.
-+
-+  KVM_PV_DUMP_CONFIG_STOR_STATE
-+    Stores `buff_len` bytes of tweak component values starting with
-+    the 1MB block specified by the absolute guest address
-+    (`gaddr`). `buff_len` needs to be `conf_dump_storage_state_len`
-+    aligned and at least >= the `conf_dump_storage_state_len` value
-+    provided by the dump uv_info data.
-+
-+  KVM_PV_DUMP_COMPLETE
-+    If the subcommand succeeds it completes the dump process and lets
-+    KVM_PV_DUMP_INIT be called again.
-+
-+    On success `conf_dump_finalize_len` bytes of completion data will be
-+    stored to the `buff_addr`. The completion data contains a key
-+    derivation seed, IV, tweak nonce and encryption keys as well as an
-+    authentication tag all of which are needed to decrypt the dump at a
-+    later time.
-+
-+
- 4.126 KVM_X86_SET_MSR_FILTER
- ----------------------------
- 
-@@ -5643,6 +5750,32 @@ The offsets of the state save areas in struct kvm_xsave follow the contents
- of CPUID leaf 0xD on the host.
- 
- 
-+4.135 KVM_S390_PV_CPU_COMMAND
-+-----------------------------
-+
-+:Capability: KVM_CAP_S390_PROTECTED_DUMP
-+:Architectures: s390
-+:Type: vcpu ioctl
-+:Parameters: none
-+:Returns: 0 on success, < 0 on error
-+
-+This ioctl closely mirrors `KVM_S390_PV_COMMAND` but handles requests
-+for vcpus. It re-uses the kvm_s390_pv_dmp struct and hence also shares
-+the command ids.
-+
-+**command:**
-+
-+KVM_PV_DUMP
-+  Presents an API that provides calls which facilitate dumping a vcpu
-+  of a protected VM.
-+
-+**subcommand:**
-+
-+KVM_PV_DUMP_CPU
-+  Provides encrypted dump data like register values.
-+  The length of the returned data is provided by uv_info.guest_cpu_stor_len.
-+
-+
- 5. The kvm_run structure
- ========================
- 
-@@ -7643,3 +7776,16 @@ The argument to KVM_ENABLE_CAP is also a bitmask, and must be a subset
- of the result of KVM_CHECK_EXTENSION.  KVM will forward to userspace
- the hypercalls whose corresponding bit is in the argument, and return
- ENOSYS for the others.
-+
-+8.35 KVM_CAP_S390_PROTECTED_DUMP
-+--------------------------------
-+
-+:Capability: KVM_CAP_S390_PROTECTED_DUMP
-+:Architectures: s390
-+:Type: vm
-+
-+This capability indicates that KVM and the Ultravisor support dumping
-+PV guests. The `KVM_PV_DUMP` command is available for the
-+`KVM_S390_PV_COMMAND` ioctl and the `KVM_PV_INFO` command provides
-+dump related UV data. Also the vcpu ioctl `KVM_S390_PV_CPU_COMMAND` is
-+available and supports the `KVM_PV_DUMP_CPU` subcommand.
--- 
-2.32.0
+Thanks for the suggestion, which looks much better. It actually worked well.
 
+By the way, the suggested change will alter the kernel-module interface (KMI),
+which will make it difficult to land the change on older releases where we'd
+like to keep the KMI stable [1]. Would it be OK if we let the supplied function
+(fn) be responsible for checking the transport? I think that there, in
+the future,
+might be a case where one needs to cycle over all sockets for inspection or so.
+I admit that this would be prone to error, though.
+
+Please let me know what you think. I don't have a strong preference. I will
+submit a revision as you want.
+
+[1] https://source.android.com/devices/architecture/kernel/generic-kernel-image#kmi-stability
