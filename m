@@ -2,125 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 07B934D51AB
-	for <lists+kvm@lfdr.de>; Thu, 10 Mar 2022 20:43:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DAA614D51B1
+	for <lists+kvm@lfdr.de>; Thu, 10 Mar 2022 20:43:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243497AbiCJSmS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Mar 2022 13:42:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36528 "EHLO
+        id S1343583AbiCJT2F (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Mar 2022 14:28:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236522AbiCJSmR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Mar 2022 13:42:17 -0500
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2042.outbound.protection.outlook.com [40.107.243.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D36A318CC6E
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 10:41:15 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=X0Yx4J3CkNx7/xF7PQZD+wqr9JT/LDp99Mo+3Dn2K1f2s2WseZvk3gDRPg7BmXfD7facnhjWwVKzrqO+P0vfm2D7gJyq0QL+KTj+jntIXpEuVELTsuY4MeLnet4yMlAOTC9+edDQ/0DWLCkYC+cb974/SuWf6h7l4k/BPBwYlzZf2VvpAbHTloiW44+gSDaWB8WOFQJ4HbfwsFA69KQ1Z0CkK5+mJVc2YAIFn7emRE2df286YwO6r18D8ULYNO9BesE7PchGtBASm7Y1ljT/Nz3y4eDBJCHK6LThniNOkL/9xN78muX8u1oPPUCLcEKHanoqqRkwbFCu3pthpcd22w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rZCav6tq0UCBCwkacB+17vRxgMrvYWKsjeLMmBORBGo=;
- b=cPwoWqoS7AdXEhWmudVh54njvNUhChDL6y7fEEtr919mr15lAZQ+2XFc4HpTCmm+hpBUBto7/keTItgMoXYiQLDhs7Cp9ScJt+aKTvEs8sJxBT90ZIpLotkM7pUzmCE0aif8wTmaDdBvB/SvgshaycilZ5jAjDAuPvcPjjECaneSxWSH66TKaOAp3IKweKwx9bra8F5n4OSI+o443dN5+/xI5rgsYY1xIlQmTkerClB0DAzLATAH0lyK4r0UgMMxLe1+1B05uOYtbgePzkpPzq0yA/KsQjfazxKC9PpkBQPvrqxROXuyLfr9lGqZ0iWkkBwxlxmGRrkdPOJI9siEQQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rZCav6tq0UCBCwkacB+17vRxgMrvYWKsjeLMmBORBGo=;
- b=j3zyxz6TkW5e0LqAGd8c02/fjA63XLpP1U0vnen4ahJYJsIHDQR2C6VOuXamcHvjJu1D0CJbkkuu3J9RGGrbg66ZBI/qlAC17kkq8rOQEXfMBAkrQhy8U6k9h/XBQGEZcbTkjogVzgqdOWSzHtJGLmzoC45xvOZRrbMHW/NMUtI=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from BN9PR12MB5179.namprd12.prod.outlook.com (2603:10b6:408:11c::18)
- by CY4PR1201MB0053.namprd12.prod.outlook.com (2603:10b6:910:23::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5038.19; Thu, 10 Mar
- 2022 18:41:13 +0000
-Received: from BN9PR12MB5179.namprd12.prod.outlook.com
- ([fe80::e9be:e1be:5abe:f94c]) by BN9PR12MB5179.namprd12.prod.outlook.com
- ([fe80::e9be:e1be:5abe:f94c%4]) with mapi id 15.20.5038.027; Thu, 10 Mar 2022
- 18:41:13 +0000
-Message-ID: <78ea846a-d349-cf5d-4f3d-fb5312c3c7f4@amd.com>
-Date:   Fri, 11 Mar 2022 00:11:03 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.1
-Subject: Re: [kvm-unit-tests PATCH 0/3] Move nNPT test cases to a seperate
- file
-Content-Language: en-US
-To:     Paolo Bonzini <pbonzini@redhat.com>, seanjc@google.com,
-        "Shukla, Manali" <manali.shukla@amd.com>
-Cc:     kvm@vger.kernel.org, aaronlewis@google.com
-References: <20220228061737.22233-1-manali.shukla@amd.com>
- <cc543e9d-6891-b53d-b34c-7cd7406e5dc7@redhat.com>
-From:   "Shukla, Manali" <mashukla@amd.com>
-In-Reply-To: <cc543e9d-6891-b53d-b34c-7cd7406e5dc7@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: PN3PR01CA0047.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:98::18) To BN9PR12MB5179.namprd12.prod.outlook.com
- (2603:10b6:408:11c::18)
+        with ESMTP id S1343584AbiCJT14 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Mar 2022 14:27:56 -0500
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9A6914144F
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 11:26:53 -0800 (PST)
+Received: by mail-lj1-x22f.google.com with SMTP id q10so9172355ljc.7
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 11:26:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=J2Fbf82yHCwNzVcJIy4GM/oEnrLRJTaV+KXEw0F8JlI=;
+        b=Yh98uc0fgjaehYBQBMhbaZ0MLXLJQXpZJ18vzOmk5b0EAEm0ZKtHHMcWyInnGFx9S6
+         2eUaij+VSozDI02RhKwNDgW1SzfYsbbSAp0/wrg5KsGkj4WwAttPNytdvfvtcZesUvRA
+         DOZBAMCa6u55nw29qWUkj4HRQPesY2aqBi6XoEO9RsUxFewJ/68mLpHftMLCcGDSiNOR
+         +lroX0qB3onYZAlwf0NLppnGMoSjYFESPmJBT+rO6lAwGDH76egS/DocAjQ1CWDq43ju
+         vtHc0ACZLPW6B1WN1snHkhad/asHCsxMnovCxBJ7EAPYosR1aXy3x9fvU5ZedJagL+12
+         lp1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=J2Fbf82yHCwNzVcJIy4GM/oEnrLRJTaV+KXEw0F8JlI=;
+        b=nFHpohn8bdVKctpmpTlJiA3ZMtbB//2NZFMztNnBO9d5bqwcuruPBUzQNNgR5jHirA
+         na+t/wnexqRxKMiIUTuBwMRK0d1FIJvrcTAe8EnRYTeAqHqiM/+f4qPJbCF72X1DKn8k
+         taFvYQSkgbG0o4+Nna0fiBfT1iIHVpfQnDtApePI3LchI5va92GaaIsqlvDRLEas15UI
+         7b3quwr+4bdeygUC8/SZ7yMPfURxKU6tSjcVtcKL+sXvZxe0IENqK0zvZy6fCFkm/epY
+         mc+Cup1cvSMAElZuq1RLKgomqx3PNaCmNqykW/TtqiG9trd7wNTB3snDNN/9idMtaHKi
+         Aldw==
+X-Gm-Message-State: AOAM532TqN1RwC7WObphcfjK+xRISJ1S3jyl8z3zSdr9wMGWeImJfkb0
+        ZB9RhhDeIrtKNU+9UMHkO2skNxTKgFO2HuNN/Ml6pA==
+X-Google-Smtp-Source: ABdhPJxuL9+pBSEcKRbcYRcPlM+H0eZf19wrZqGYeujA5cB5DWVeFoUYr2Wkd2uMrlnhFZtAqKEwTCAsh/Uz95V5DPQ=
+X-Received: by 2002:a05:651c:1792:b0:235:1df3:7b8e with SMTP id
+ bn18-20020a05651c179200b002351df37b8emr3945764ljb.464.1646940411722; Thu, 10
+ Mar 2022 11:26:51 -0800 (PST)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: ad68b071-6a57-4ffb-889c-08da02c58d34
-X-MS-TrafficTypeDiagnostic: CY4PR1201MB0053:EE_
-X-Microsoft-Antispam-PRVS: <CY4PR1201MB00539525E2C64410D2E2555CFD0B9@CY4PR1201MB0053.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: /MKU+39sT1PilW3eSUH56Qhn80uUjzXPwh/WmJ6l4E1bgqoXTlqZBuDGF+fdyPen8KvJMDoJlokclqkVv65rEnIKmcXOzf6QiKsBbwzdLAhEWUguLh5dvq4PZs0MYuv3soJxK0B/glpnrAPkArgfakICVB2eSWJsZ+L56vUglysxjSuCbNemF4KYMiG55nKTMOuYsnn3GVvEEIVMzqhv5YUPQwCeQFN39o05+hcxI3iyplkdieDzyWX4ZbMH8G0lG3NbnGq5IsEezUAN4i+IoiZhMGtsoZYkaRnWqZT+J1i1zk/X03PzjwFIXU5x0E/1Tu+Ixn5OE+2b1dX+7MPnJCv/xXGNFXDoUBICRpb9O9F9C+Y7LSiHFTkQY2groXioFGEu+2EStG5iAsG9jsu5QQp+xoy5SqvAsSmZ6E8VKblbwsdeus6siUo0tXdW0mKJgyiC94RE4ZjX1Yqj2YBqmIEUPMQ98LK/71hwKAa7YuLZOD6+GLfkgiYkBIu3SybGG02iv681hlA0ctqYsrbArHQuRvW4nd0WFy8NUQdh8BDIzm5Q+LbPEJSjBKQNo8+Muoue4ePmZfsgjGhw82G4715JeykVPZJAT4KfYAkhfTagHTVbgtWI7WwB++JT0fqJP+L91jplxRGqyYL+UfiVZqk94hTNspGvFuy9LyaSGMXjeHdAiztUs3vjsgot0l9E9fw+U6XcldKA5nYOTMR3vyKm5fNqluyUGWzuCOSJOTc=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR12MB5179.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(6636002)(508600001)(316002)(6486002)(31696002)(2616005)(186003)(6666004)(53546011)(110136005)(6506007)(83380400001)(6512007)(66946007)(66476007)(31686004)(66556008)(8936002)(2906002)(8676002)(5660300002)(4326008)(36756003)(38100700002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cU5kb1BDTHNKa1prTnFaQStEaUw5Z2loQkM3U05tdlBHUDZCNXhtTW03emJC?=
- =?utf-8?B?WXpyRDZPdTRRTmNNU0RQYklXOHRYV29WUytndU1wZllNaUxBcU5CYU1mcCt2?=
- =?utf-8?B?ZkMzQ0UyY1JFbCtiQXBVK1BXN3lzYkI2SmpPOVlGOU1oOTBRVW52WFBpT2xs?=
- =?utf-8?B?RkJuZ3UyaU02Q0kwL01YMkRPS3FvaXljOGxzcWFycXRPbDJrWUdrbG5iTGhm?=
- =?utf-8?B?S2hReEROQkowaGlOeUc2SHZ2UWRRaER2Z3RZQ29PMklhdEoyOGtxcDNhdnBR?=
- =?utf-8?B?QSs5Tk9FYUt5bzFpYWFiV1l3Y3h5TWJSZG9PNXhKajNGTjMvelRhcGsramZt?=
- =?utf-8?B?S1d2VERTVlhwY0E0bS9yQ2pOOTdvZ3RXai91Snp6elEzU3lCSWEzWVhmSzJK?=
- =?utf-8?B?b09Kbk9RTEFXVUF1ZlRndlpERi9aRkcrMFZMZ3MvdXFoakJZV2hvd3QvcVFF?=
- =?utf-8?B?OGxpMUVPaGxmbTBxUkJzZjJzWU01ZFRYQnMwK1VuMEh4ZndGTFA1TkdIRkVh?=
- =?utf-8?B?am5valNhVzNEYVZSU3ZiNWdmTWh5VW42eVJ4YnV4dDNWSFBtbFRRR1pHUXk3?=
- =?utf-8?B?WGFjTE51bVVyOEY2YkVSbFU5OStHSUYrZHI2VU5HcEZmZlRLTTFrRXhNODla?=
- =?utf-8?B?YmNNQUo0Z3lJamtvbVNyalYxUWp3NWc2MktqYVJYb0ZxMENUL21vRG9hZGwv?=
- =?utf-8?B?d09mY1FQMlFiU0gzdTQxY2NmcXdib0tiUG1SZkViZVRQSFBwejBXTTdXY2hL?=
- =?utf-8?B?VUhQK1ZNeDh5bWQzUG1YeTVaeEhKRGZQWHd6TkFyWVJLdVVEZXN4bkU0aUhk?=
- =?utf-8?B?Q1JHRVJSbWtqYk03VGZxOFliejg3NS9ETnp3SWFrVFpkeGxDSnZVWFlqOEd5?=
- =?utf-8?B?U1pyaEpnQ3hFL3FpNXhVYWQvRm5rTDk0cXgxOWpFck1UbDVRTUtyOFJVVDBj?=
- =?utf-8?B?N2ZDUE5weGt5ejFBU1NucThZTzh5VmV6UHN0VmNDRnh2OGxINnp0U3VwOGl3?=
- =?utf-8?B?YUxKZHBNWFFtUzVHV3ppeWlRN245WkdSYzdrb2VIMHB4ajlNVWc2Y2tyd0gw?=
- =?utf-8?B?R0pucFJZckwrWElkcjRKd0kvQlIyS1lFa0YrWU9rbzRsRkJVZUFRcGRydUVi?=
- =?utf-8?B?Z0hobzFtZlYwU3lUV3huYTJtVmRPOUxGR2pZalhUMCtEN1VlVkVVU3QzMGg2?=
- =?utf-8?B?YnFZNGJFWnlvMHJZb0ZJdGtLblo4VkVxbkRIbm9RV0FsTWJaQ0M0Y1JQUTlD?=
- =?utf-8?B?QitNVG1YUzRRN094SHNHa205ckNTdUZnTU1nMmV1OW5Vd2hoQXlmSVpGYUox?=
- =?utf-8?B?cEZXdkZEV3M5T3dLUWlBY3BuVVhRUW80YUdtbkcxUm5DM243aEtON0xzU1gy?=
- =?utf-8?B?TU12cXZPMUJsb0ZEK0ZJTWlBWHh6UG5PVTZVVk96RTZxVVdYMENUR3hJdWJE?=
- =?utf-8?B?ZmZpMC9VU3ZyWXRjU056WGR1cEVQSnhLSWo2TlVJWnErbWl4Q1ppVFMwZG9J?=
- =?utf-8?B?dmh3RytDYzJ1LzAyUThLbXpnUERQOVA1eHZ0NFd4d2E3UGxEbXQ4U1dzaFB1?=
- =?utf-8?B?cHlpOVF6NHQ3Z0RkcmtBazZKTGh2WFJQRHNNYUhvQmNtYjROK3h6dHFlZFFV?=
- =?utf-8?B?SDV4bW43YjZnRHJ6elk5bWFrOWhMNG5FYTk0aU00bS9ZakVDOUx5aXZ0VS9w?=
- =?utf-8?B?Tk5tMlRvWEkrL2xlS0VUVTVaRTEwaHJYZ1V2ZE5tOWlPVzgyZFNJOWFZV0pt?=
- =?utf-8?B?eWJIeVJvNHYrcEV2anlRZk92UVcrUUZNMnpLOU40dHA3THQzbk5YNmNuMndu?=
- =?utf-8?B?Z0luZkF3aHJSelozMU1Ubzdab2Jwc29kYkJYWEVvd0N0Zk9uUUIzQlVQV3M4?=
- =?utf-8?B?ajVCSGxIbkJERjlTR1BYN1FCUGZvQm5MMTQzdVlnZ0kzRFlTVGNHUUhSWVpG?=
- =?utf-8?B?c053SDBQdHM5bGtBQy91MXFUN2JXZVlkd1ZnSCttNHorbjhEb2lEK21WemJz?=
- =?utf-8?B?OFpmVkovbEdBMEhTbUgwZUR3WDMrRFRsNTU4U1RMQTJ4aVBPSzJNK29jQXFL?=
- =?utf-8?B?Slo1NVZjRWY1QjRINDZSVCt3aWV3dzZCT29XYnBkMzJ4MmhhenU1blJTNG5I?=
- =?utf-8?B?RVMxUTUyWG1EeWF2VDIzZi9vYzdNTDVlWlpmampmdkZWQjhtbzNpME14Vkwy?=
- =?utf-8?B?d0IxaERDM3pvK0FxTXFzL0RTd3dpOXVrNjBuN0l5QVIvekU4L1RzdXpZQ0FJ?=
- =?utf-8?Q?UnIfllI5zSulZYCHg1r3Ilb6b6rE2XQSCepnNkcu3Q=3D?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ad68b071-6a57-4ffb-889c-08da02c58d34
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR12MB5179.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Mar 2022 18:41:13.0001
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ISb6kBKq23ZYoxMVpFmowQlinW2FHsNm8IRCNS+ZNiPmuY0Ye97SM7eXY4hO9t/usIJHb1Dt26xYeLc6oArClw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR1201MB0053
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+References: <20220203010051.2813563-1-dmatlack@google.com> <YiWWdekvbPjI/WZm@xz-m1.local>
+ <CALzav=fzOkR4oNXoccc40GKzdBrmA+q5bgKE9ViE5W0UYjjHmw@mail.gmail.com>
+ <YihX2rcVIqOd/Yej@xz-m1.local> <CALzav=dewe5jovbk-QbHUyzH5ipRxMT923n8847jyVhLKkUbBA@mail.gmail.com>
+ <YimiZ3/I6aSpbyvr@xz-m1.local>
+In-Reply-To: <YimiZ3/I6aSpbyvr@xz-m1.local>
+From:   David Matlack <dmatlack@google.com>
+Date:   Thu, 10 Mar 2022 11:26:25 -0800
+Message-ID: <CALzav=cdePTb0eyHK96ykfnGr5qxReU_yUuuA2bHd0Tmsiy3FQ@mail.gmail.com>
+Subject: Re: [PATCH 00/23] Extend Eager Page Splitting to the shadow MMU
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        leksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Peter Feiner <pfeiner@google.com>,
+        Andrew Jones <drjones@redhat.com>,
+        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
+        kvm list <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -128,40 +79,321 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Mar 9, 2022 at 11:03 PM Peter Xu <peterx@redhat.com> wrote:
+>
+> On Wed, Mar 09, 2022 at 03:39:44PM -0800, David Matlack wrote:
+> > On Tue, Mar 8, 2022 at 11:31 PM Peter Xu <peterx@redhat.com> wrote:
+> > >
+> > > On Mon, Mar 07, 2022 at 03:39:37PM -0800, David Matlack wrote:
+> > > > On Sun, Mar 6, 2022 at 9:22 PM Peter Xu <peterx@redhat.com> wrote:
+> > > > >
+> > > > > Hi, David,
+> > > > >
+> > > > > Sorry for a very late comment.
+> > > > >
+> > > > > On Thu, Feb 03, 2022 at 01:00:28AM +0000, David Matlack wrote:
+> > > > > > Performance
+> > > > > > -----------
+> > > > > >
+> > > > > > Eager page splitting moves the cost of splitting huge pages off of the
+> > > > > > vCPU thread and onto the thread invoking VM-ioctls to configure dirty
+> > > > > > logging. This is useful because:
+> > > > > >
+> > > > > >  - Splitting on the vCPU thread interrupts vCPUs execution and is
+> > > > > >    disruptive to customers whereas splitting on VM ioctl threads can
+> > > > > >    run in parallel with vCPU execution.
+> > > > > >
+> > > > > >  - Splitting on the VM ioctl thread is more efficient because it does
+> > > > > >    no require performing VM-exit handling and page table walks for every
+> > > > > >    4K page.
+> > > > > >
+> > > > > > To measure the performance impact of Eager Page Splitting I ran
+> > > > > > dirty_log_perf_test with tdp_mmu=N, various virtual CPU counts, 1GiB per
+> > > > > > vCPU, and backed by 1GiB HugeTLB memory.
+> > > > > >
+> > > > > > To measure the imapct of customer performance, we can look at the time
+> > > > > > it takes all vCPUs to dirty memory after dirty logging has been enabled.
+> > > > > > Without Eager Page Splitting enabled, such dirtying must take faults to
+> > > > > > split huge pages and bottleneck on the MMU lock.
+> > > > > >
+> > > > > >              | "Iteration 1 dirty memory time"             |
+> > > > > >              | ------------------------------------------- |
+> > > > > > vCPU Count   | eager_page_split=N   | eager_page_split=Y   |
+> > > > > > ------------ | -------------------- | -------------------- |
+> > > > > > 2            | 0.310786549s         | 0.058731929s         |
+> > > > > > 4            | 0.419165587s         | 0.059615316s         |
+> > > > > > 8            | 1.061233860s         | 0.060945457s         |
+> > > > > > 16           | 2.852955595s         | 0.067069980s         |
+> > > > > > 32           | 7.032750509s         | 0.078623606s         |
+> > > > > > 64           | 16.501287504s        | 0.083914116s         |
+> > > > > >
+> > > > > > Eager Page Splitting does increase the time it takes to enable dirty
+> > > > > > logging when not using initially-all-set, since that's when KVM splits
+> > > > > > huge pages. However, this runs in parallel with vCPU execution and does
+> > > > > > not bottleneck on the MMU lock.
+> > > > > >
+> > > > > >              | "Enabling dirty logging time"               |
+> > > > > >              | ------------------------------------------- |
+> > > > > > vCPU Count   | eager_page_split=N   | eager_page_split=Y   |
+> > > > > > ------------ | -------------------- | -------------------- |
+> > > > > > 2            | 0.001581619s         |  0.025699730s        |
+> > > > > > 4            | 0.003138664s         |  0.051510208s        |
+> > > > > > 8            | 0.006247177s         |  0.102960379s        |
+> > > > > > 16           | 0.012603892s         |  0.206949435s        |
+> > > > > > 32           | 0.026428036s         |  0.435855597s        |
+> > > > > > 64           | 0.103826796s         |  1.199686530s        |
+> > > > > >
+> > > > > > Similarly, Eager Page Splitting increases the time it takes to clear the
+> > > > > > dirty log for when using initially-all-set. The first time userspace
+> > > > > > clears the dirty log, KVM will split huge pages:
+> > > > > >
+> > > > > >              | "Iteration 1 clear dirty log time"          |
+> > > > > >              | ------------------------------------------- |
+> > > > > > vCPU Count   | eager_page_split=N   | eager_page_split=Y   |
+> > > > > > ------------ | -------------------- | -------------------- |
+> > > > > > 2            | 0.001544730s         | 0.055327916s         |
+> > > > > > 4            | 0.003145920s         | 0.111887354s         |
+> > > > > > 8            | 0.006306964s         | 0.223920530s         |
+> > > > > > 16           | 0.012681628s         | 0.447849488s         |
+> > > > > > 32           | 0.026827560s         | 0.943874520s         |
+> > > > > > 64           | 0.090461490s         | 2.664388025s         |
+> > > > > >
+> > > > > > Subsequent calls to clear the dirty log incur almost no additional cost
+> > > > > > since KVM can very quickly determine there are no more huge pages to
+> > > > > > split via the RMAP. This is unlike the TDP MMU which must re-traverse
+> > > > > > the entire page table to check for huge pages.
+> > > > > >
+> > > > > >              | "Iteration 2 clear dirty log time"          |
+> > > > > >              | ------------------------------------------- |
+> > > > > > vCPU Count   | eager_page_split=N   | eager_page_split=Y   |
+> > > > > > ------------ | -------------------- | -------------------- |
+> > > > > > 2            | 0.015613726s         | 0.015771982s         |
+> > > > > > 4            | 0.031456620s         | 0.031911594s         |
+> > > > > > 8            | 0.063341572s         | 0.063837403s         |
+> > > > > > 16           | 0.128409332s         | 0.127484064s         |
+> > > > > > 32           | 0.255635696s         | 0.268837996s         |
+> > > > > > 64           | 0.695572818s         | 0.700420727s         |
+> > > > >
+> > > > > Are all the tests above with ept=Y (except the one below)?
+> > > >
+> > > > Yes.
+> > > >
+> > > > >
+> > > > > >
+> > > > > > Eager Page Splitting also improves the performance for shadow paging
+> > > > > > configurations, as measured with ept=N. Although the absolute gains are
+> > > > > > less since ept=N requires taking the MMU lock to track writes to 4KiB
+> > > > > > pages (i.e. no fast_page_fault() or PML), which dominates the dirty
+> > > > > > memory time.
+> > > > > >
+> > > > > >              | "Iteration 1 dirty memory time"             |
+> > > > > >              | ------------------------------------------- |
+> > > > > > vCPU Count   | eager_page_split=N   | eager_page_split=Y   |
+> > > > > > ------------ | -------------------- | -------------------- |
+> > > > > > 2            | 0.373022770s         | 0.348926043s         |
+> > > > > > 4            | 0.563697483s         | 0.453022037s         |
+> > > > > > 8            | 1.588492808s         | 1.524962010s         |
+> > > > > > 16           | 3.988934732s         | 3.369129917s         |
+> > > > > > 32           | 9.470333115s         | 8.292953856s         |
+> > > > > > 64           | 20.086419186s        | 18.531840021s        |
+> > > > >
+> > > > > This one is definitely for ept=N because it's written there. That's ~10%
+> > > > > performance increase which looks still good, but IMHO that increase is
+> > > > > "debatable" since a normal guest may not simply write over the whole guest
+> > > > > mem.. So that 10% increase is based on some assumptions.
+> > > > >
+> > > > > What if the guest writes 80% and reads 20%?  IIUC the split thread will
+> > > > > also start to block the readers too for shadow mmu while it was not blocked
+> > > > > previusly?  From that pov, not sure whether the series needs some more
+> > > > > justification, as the changeset seems still large.
+> > > > >
+> > > > > Is there other benefits besides the 10% increase on writes?
+> > > >
+> > > > Yes, in fact workloads that perform some reads will benefit _more_
+> > > > than workloads that perform only writes.
+> > > >
+> > > > The reason is that the current lazy splitting approach unmaps the
+> > > > entire huge page on write and then maps in the just the faulting 4K
+> > > > page. That means reads on the unmapped portion of the hugepage will
+> > > > now take a fault and require the MMU lock. In contrast, Eager Page
+> > > > Splitting fully splits each huge page so readers should never take
+> > > > faults.
+> > > >
+> > > > For example, here is the data with 20% writes and 80% reads (i.e. pass
+> > > > `-f 5` to dirty_log_perf_test):
+> > > >
+> > > >              | "Iteration 1 dirty memory time"             |
+> > > >              | ------------------------------------------- |
+> > > > vCPU Count   | eager_page_split=N   | eager_page_split=Y   |
+> > > > ------------ | -------------------- | -------------------- |
+> > > > 2            | 0.403108098s         | 0.071808764s         |
+> > > > 4            | 0.562173582s         | 0.105272819s         |
+> > > > 8            | 1.382974557s         | 0.248713796s         |
+> > > > 16           | 3.608993666s         | 0.571990327s         |
+> > > > 32           | 9.100678321s         | 1.702453103s         |
+> > > > 64           | 19.784780903s        | 3.489443239s        |
+> > >
+> > > It's very interesting to know these numbers, thanks for sharing that.
+> > >
+> > > Above reminded me that eager page split actually does two things:
+> > >
+> > > (1) When a page is mapped as huge, we "assume" this whole page will be
+> > >     accessed in the near future, so when split is needed we map all the
+> > >     small ptes, and,
+> >
+> > Note, this series does not add this behavior to the fault path.
+> >
+> > >
+> > > (2) We move the split operation from page faults to when enable-dirty-track
+> > >     happens.
+> > >
+> > > We could have done (1) already without the whole eager split patchsets: if
+> > > we see a read-only huge page on a page fault, we could populat the whole
+> > > range of ptes, only marking current small pte writable but leaving the rest
+> > > small ptes wr-protected.  I had a feeling this will speedup the above 19.78
+> > > seconds (64 cores case) fairly much too to some point.
+> >
+> > The problem with (1) is that it still requires faults to split the
+> > huge pages. Those faults will need to contend for the MMU lock, and
+> > will hold the lock for longer than they do today since they are doing
+> > extra work.
+>
+> Right.  But that overhead is very limited, IMHO.. per the numbers, it's the
+> 20sec and 18sec difference for full write faults.
+>
+> The thing is either split or vcpu will take the write lock anyway.  So it
+> either contends during split, or later.  Without tdp (so never PML) it'll
+> need a slow page fault anyway even if split is done before hand..
+>
+> >
+> > I agree there might be some benefit for workloads, but for write-heavy
+> > workloads there will still be a "thundering herd" problem when dirty
+> > logging is first enable. I'll admit though I have not testing this
+> > approach.
+>
+> Indeed that's majorly the core of my question, on why this series cares
+> more on write than read workloads.  To me they are all possible workloads,
+> but maybe I'm wrong?  This series benefits heavy writes, but it may not
+> benefit (or even make it slower on) heavy reads.
 
+It's not that either workload is more important than the other, or
+that we care about one more than the other. It's about the effects of
+dirty logging on each workload.
 
-On 3/8/2022 9:05 PM, Paolo Bonzini wrote:
-> On 2/28/22 07:17, Manali Shukla wrote:
->> Commit 916635a813e975600335c6c47250881b7a328971
->> (nSVM: Add test for NPT reserved bit and #NPF error code behavior)
->> clears PT_USER_MASK for all svm testcases. Any tests that requires
->> usermode access will fail after this commit.
->>
->> If __setup_vm() is changed to setup_vm(), KUT will build tests with
->> PT_USER_MASK set on all PTEs. It is a better idea to move nNPT tests
->> to  their own file so that tests don't need to fiddle with page tables
->> midway.
->>
->> The quick approach to do this would be to turn the current main into a small
->> helper, without calling __setup_vm() from helper.
->>
->> There are three patches in this patch series
->> 1) Turned current main into helper function minus setup_vm()
->> 2) Moved all nNPT test cases from svm_tests.c to svm_npt.c
->> 3) Change __setup_vm to setup_vm() on svm_tests.c
-> 
-> What ideas do you have for SVM tests that require usermode access in the test (not in the guest)?
-> 
-> Paolo
-> 
+Eager page splitting is all about avoiding the large (like 99%
+degradation), abrupt, scales-with-the-number-of-vcpus, drop in
+performance when dirty logging is enabled. This drop can be
+catastrophic to customer workloads, causing application failure. Eager
+page splitting may introduce higher TLB miss costs for read-heavy
+workloads, making them worse than without Eager page splitting, but
+that is not something that causes application failure. Maybe this is
+bias from working for a cloud provider, but it's much better to have
+predictable performance for all workloads (even if it's slightly worse
+for some workloads) than a system that causes catastrophic failure for
+some workloads.
 
-I have tried running the user mode function from L1 guest, with setup_vm(), this 
-seems to be working fine. 
+Now that being said, KVM's shadow paging can still cause "catastrophic
+failure" since it requires the write lock to handle 4KiB
+write-protection faults. That's something that would be worth
+addressing as well, but separately.
 
-But I am not very clear about your ask for svm tests which require usermode access 
-in the test (not in the guest).
-Can you please elaborate on it if possible?
-Are there any sample tests you are referring to which I can check out.
+>
+> The tdp mmu case is more persuasive in that:
+>
+>   (a) Split runs concurrently on vcpu faults,
+>
+>   (b) When with PML the tdp mmu case could completely avoid the small write
+>       page faults.
+>
+> All these benefits do not exist for shadow mmu.
 
-Thank you 
-Manali
+Here's how I reason about the benefits of eager page splitting for the
+shadow MMU. During dirty logging the shadow MMU suffers from:
+
+(1) Write-protection faults on huge pages that take the MMU lock to
+unmap the huge page, map a 4KiB page, and update the dirty log.
+(2) Non-present faults caused by (1) that take the MMU lock to map in
+the missing page.
+(3) Write-protection faults on 4KiB pages that take the MMU lock to
+make the page writable and update the dirty log.
+
+The benefit of eager page splitting is to eliminate (1) and (2).
+
+(BTW, maybe to address (3) we could try to handle these
+write-protection faults under the MMU read lock.)
+
+>
+> I don't think I'm against this series..  I think at least with the series
+> we can have matching feature on tdp and !tdp, meanwhile it still benefits a
+> lot on read+write mix workloads are you proved in the follow up tests (PS:
+> do you think that should be mentioned in the cover letter too?).
+
+Yes, will do!
+
+>
+> IMHO when a performance feature is merged, it'll be harder to be removed
+> because once merged it'll be harder to be proved wrong.  I hope it'll be
+> worth it when it gets merged and being maintained in upstream kvm, so I
+> raised these questions, hope that we at least thoroughly discuss the pros
+> and cons.
+>
+> >
+> > An alternative approach to handling read-heavy workloads we're looking
+> > at is to perform dirty logging at 2M.
+>
+> I agree that's still something worth exploring.
+>
+> >
+> > >
+> > > Entry (1) makes a lot of sense to me; OTOH I can understand entry (2) but
+> > > not strongly.
+> > >
+> > > My previous concern was majorly about having readers being blocked during
+> > > splitting of huge pages (not after).  For shadow mmu, IIUC the split thread
+> > > will start to take write lock rather than read lock (comparing to tdp mmu),
+> > > hence any vcpu page faults (hmm, not only reader but writters too I think
+> > > with non-present pte..) will be blocked longer than before, am I right?
+> > >
+> > > Meanwhile for shadow mmu I think there can be more page tables to walk
+> > > comparing to the tdp mmu for a single huge page to split?  My understanding
+> > > is tdp mmu pgtables are mostly limited by the number of address spaces (?),
+> > > but shadow pgtables are per-task.
+> >
+> > Or per-L2 VM, in the case of nested virtualization.
+> >
+> > > So I'm not sure whether for a guest with
+> > > a lot of active tasks sharing pages, the split thread can spend quite some
+> > > time splitting, during which time with write lock held without releasing.
+> >
+> > The eager page splitting code does check for contention and drop the
+> > MMU lock in between every SPTE it tries to split. But there still
+> > might be some increase in contention due to eager page splitting.
+>
+> Ah right..
+>
+> >
+> > >
+> > > These are kind of against the purpose of eager split on shadowing, which is
+> > > to reduce influence for guest vcpu threads?  But I can't tell, I could have
+> > > missed something else.  It's just that when applying the idea to shadow mmu
+> > > it sounds less attractive than the tdp mmu case.
+> >
+> > The shadow MMU is also used for Nested Virtualization, which is a bit
+> > different from "typical" shadow paging (ept/npt=N) because VMs tend
+> > not to share pages, their page tables are fairly static (compared to
+> > process page tables), and they tend to be longer lived. So there will
+> > not be as much steady-state MMU lock contention that would be
+> > negatively impacted by eager page splitting.
+> >
+> > You might be right though that ept/npt=N has enough steady-state MMU
+> > lock contention that it will notice eager page splitting. But then
+> > again, it would be even more affected by lazy splitting unless the
+> > guest is doing very few writes.
+>
+> Yes, indeed I see no easy solution to this due to the same lock contention.
+>
+> Thanks,
+>
+> --
+> Peter Xu
+>
