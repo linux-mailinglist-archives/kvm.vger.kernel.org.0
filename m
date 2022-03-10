@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9041D4D42F4
-	for <lists+kvm@lfdr.de>; Thu, 10 Mar 2022 09:59:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B16474D42F5
+	for <lists+kvm@lfdr.de>; Thu, 10 Mar 2022 09:59:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240548AbiCJJAV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Mar 2022 04:00:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39802 "EHLO
+        id S240551AbiCJJAX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Mar 2022 04:00:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39848 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239986AbiCJJAU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Mar 2022 04:00:20 -0500
+        with ESMTP id S239986AbiCJJAW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Mar 2022 04:00:22 -0500
 Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C0A9F8BA3
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 00:59:19 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBC03F8BA3
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 00:59:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1646902760; x=1678438760;
+  t=1646902761; x=1678438761;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references;
-  bh=O0BNcoBFHZHkV7lU+UOxTS5MwHKWWt61DX+AER73+ME=;
-  b=PxoLg/GBZ1nieZ9u7E3g5OUijxmF3UVuXSa3ZJYp4tRNcxBCThx0/hFq
-   V0NEgYTAb62Q4d//gQ8nOB+wGiXDd3ValixqABCLRPBRuk/gW8tHBsgQj
-   8FSpFq1HRWqnmK364Gr1speVcqxdwz8vcFAvLJn0nY9BkYmLLF4uIo1iv
-   LE6VJxXDVWkzYeJXLrf5h9FGTqdWuavNEGqdS0OchCZ7knpS7LJ+RfRFS
-   MRbh3lPKgjiKGPAds6y+fWHBm+4z1IX3rN3ve929Mt02t4wsO54RZFlj0
-   dweN8W+FHNjoMhSwKwDgJ6H4VfUWxU4Xo8KECPmsTxPWtxcOBOppsy34J
-   Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10281"; a="235148766"
+  bh=YQ4QSPDPDFW9bScDCHDZIGKz3XUzqzpZVqrdZLdzL94=;
+  b=SPzN58BNw2o3WtexnQQzG1MyPUn3rAM/QWi7nuvD3WH0yLy5k6c3urC1
+   elfIC92KCG5EX3o1SDVEcj1kXdbZANAn/F7RKN/zwpq1Itiss0d3P7lb8
+   CvSEhZYNKW0xHh27UJWejFi0pA/C4NXcCRErjyZbNPC+Wbts+k/7mDhOl
+   2I4LWywBTe71LIwWpo/GZgit9+1BuVlTInDdqgv0YzDFBnQlA5SUDIJh4
+   rVIlWiCtPHvUBWTATKyhfTYeySGsNGccHOcCp5QP43NEoozlKcDsJxX/s
+   mew3VS/MRHfh4ihNxa3w/5tS2TmbSNwGFoRb6CnrUQEZQ4LC3js4zljEq
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10281"; a="235148776"
 X-IronPort-AV: E=Sophos;i="5.90,169,1643702400"; 
-   d="scan'208";a="235148766"
+   d="scan'208";a="235148776"
 Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2022 00:59:11 -0800
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2022 00:59:13 -0800
 X-IronPort-AV: E=Sophos;i="5.90,169,1643702400"; 
-   d="scan'208";a="644367209"
+   d="scan'208";a="644367228"
 Received: from chenyi-pc.sh.intel.com ([10.239.159.73])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2022 00:59:08 -0800
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2022 00:59:11 -0800
 From:   Chenyi Qiang <chenyi.qiang@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Richard Henderson <richard.henderson@linaro.org>,
@@ -44,9 +44,9 @@ To:     Paolo Bonzini <pbonzini@redhat.com>,
         Xiaoyao Li <xiaoyao.li@intel.com>
 Cc:     Chenyi Qiang <chenyi.qiang@intel.com>, qemu-devel@nongnu.org,
         kvm@vger.kernel.org
-Subject: [PATCH 1/2] linux-headers: Sync the linux headers
-Date:   Thu, 10 Mar 2022 17:02:04 +0800
-Message-Id: <20220310090205.10645-2-chenyi.qiang@intel.com>
+Subject: [PATCH 2/2] i386: Add notify VM exit support
+Date:   Thu, 10 Mar 2022 17:02:05 +0800
+Message-Id: <20220310090205.10645-3-chenyi.qiang@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20220310090205.10645-1-chenyi.qiang@intel.com>
 References: <20220310090205.10645-1-chenyi.qiang@intel.com>
@@ -60,125 +60,199 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+There are cases that malicious virtual machine can cause CPU stuck (due
+to event windows don't open up), e.g., infinite loop in microcode when
+nested #AC (CVE-2015-5307). No event window means no event (NMI, SMI and
+IRQ) can be delivered. It leads the CPU to be unavailable to host or
+other VMs. Notify VM exit is introduced to mitigate such kind of
+attacks, which will generate a VM exit if no event window occurs in VM
+non-root mode for a specified amount of time (notify window).
+
+A new KVM capability KVM_CAP_X86_NOTIFY_VMEXIT is exposed to user space
+so that the user can query the capability and set the expected notify
+window when creating VMs.
+
+If notify VM exit happens with VM_INVALID_CONTEXT, hypervisor should
+exit to user space with the exit reason KVM_EXIT_NOTIFY to inform the
+fatal case. Then user space can inject a SHUTDOWN event to the target
+vcpu. This is implemented by defining a new bit in flags field of
+kvm_vcpu_event in KVM_SET_VCPU_EVENTS ioctl.
+
 Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
 ---
- linux-headers/asm-x86/kvm.h |  4 ++++
- linux-headers/linux/kvm.h   | 29 ++++++++++++++++++++++++-----
- 2 files changed, 28 insertions(+), 5 deletions(-)
+ hw/i386/x86.c         | 24 ++++++++++++++++++
+ include/hw/i386/x86.h |  3 +++
+ target/i386/kvm/kvm.c | 58 ++++++++++++++++++++++++++++---------------
+ 3 files changed, 65 insertions(+), 20 deletions(-)
 
-diff --git a/linux-headers/asm-x86/kvm.h b/linux-headers/asm-x86/kvm.h
-index 2da3316bb5..44757bd612 100644
---- a/linux-headers/asm-x86/kvm.h
-+++ b/linux-headers/asm-x86/kvm.h
-@@ -325,6 +325,7 @@ struct kvm_reinject_control {
- #define KVM_VCPUEVENT_VALID_SHADOW	0x00000004
- #define KVM_VCPUEVENT_VALID_SMM		0x00000008
- #define KVM_VCPUEVENT_VALID_PAYLOAD	0x00000010
-+#define KVM_VCPUEVENT_SHUTDOWN		0x00000020
+diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+index b84840a1bb..25e6c50b1e 100644
+--- a/hw/i386/x86.c
++++ b/hw/i386/x86.c
+@@ -1309,6 +1309,23 @@ static void machine_set_sgx_epc(Object *obj, Visitor *v, const char *name,
+     qapi_free_SgxEPCList(list);
+ }
  
- /* Interrupt shadow states */
- #define KVM_X86_SHADOW_INT_MOV_SS	0x01
-@@ -452,6 +453,9 @@ struct kvm_sync_regs {
- 
- #define KVM_STATE_VMX_PREEMPTION_TIMER_DEADLINE	0x00000001
- 
-+/* attributes for system fd (group 0) */
-+#define KVM_X86_XCOMP_GUEST_SUPP	0
++static void x86_machine_get_notify_window(Object *obj, Visitor *v,
++                                const char *name, void *opaque, Error **errp)
++{
++    X86MachineState *x86ms = X86_MACHINE(obj);
++    int32_t notify_window = x86ms->notify_window;
 +
- struct kvm_vmx_nested_state_data {
- 	__u8 vmcs12[KVM_STATE_NESTED_VMX_VMCS_SIZE];
- 	__u8 shadow_vmcs12[KVM_STATE_NESTED_VMX_VMCS_SIZE];
-diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-index 00af3bc333..9579b10a46 100644
---- a/linux-headers/linux/kvm.h
-+++ b/linux-headers/linux/kvm.h
-@@ -270,6 +270,7 @@ struct kvm_xen_exit {
- #define KVM_EXIT_X86_BUS_LOCK     33
- #define KVM_EXIT_XEN              34
- #define KVM_EXIT_RISCV_SBI        35
-+#define KVM_EXIT_NOTIFY           36
++    visit_type_int32(v, name, &notify_window, errp);
++}
++
++static void x86_machine_set_notify_window(Object *obj, Visitor *v,
++                               const char *name, void *opaque, Error **errp)
++{
++    X86MachineState *x86ms = X86_MACHINE(obj);
++
++    visit_type_int32(v, name, &x86ms->notify_window, errp);
++}
++
+ static void x86_machine_initfn(Object *obj)
+ {
+     X86MachineState *x86ms = X86_MACHINE(obj);
+@@ -1319,6 +1336,7 @@ static void x86_machine_initfn(Object *obj)
+     x86ms->oem_id = g_strndup(ACPI_BUILD_APPNAME6, 6);
+     x86ms->oem_table_id = g_strndup(ACPI_BUILD_APPNAME8, 8);
+     x86ms->bus_lock_ratelimit = 0;
++    x86ms->notify_window = -1;
+ }
  
- /* For KVM_EXIT_INTERNAL_ERROR */
- /* Emulate instruction failed. */
-@@ -487,6 +488,11 @@ struct kvm_run {
- 			unsigned long args[6];
- 			unsigned long ret[2];
- 		} riscv_sbi;
-+		/* KVM_EXIT_NOTIFY */
-+		struct {
-+#define KVM_NOTIFY_CONTEXT_INVALID	(1 << 0)
-+			__u32 data;
-+		} notify;
- 		/* Fix the size of the union. */
- 		char padding[256];
- 	};
-@@ -562,9 +568,12 @@ struct kvm_s390_mem_op {
- 	__u32 op;		/* type of operation */
- 	__u64 buf;		/* buffer in userspace */
- 	union {
--		__u8 ar;	/* the access register number */
-+		struct {
-+			__u8 ar;	/* the access register number */
-+			__u8 key;	/* access key, ignored if flag unset */
-+		};
- 		__u32 sida_offset; /* offset into the sida */
--		__u8 reserved[32]; /* should be set to 0 */
-+		__u8 reserved[32]; /* ignored */
- 	};
+ static void x86_machine_class_init(ObjectClass *oc, void *data)
+@@ -1375,6 +1393,12 @@ static void x86_machine_class_init(ObjectClass *oc, void *data)
+         NULL, NULL);
+     object_class_property_set_description(oc, "sgx-epc",
+         "SGX EPC device");
++
++    object_class_property_add(oc, X86_MACHINE_NOTIFY_WINDOW, "int32_t",
++                                x86_machine_get_notify_window,
++                                x86_machine_set_notify_window, NULL, NULL);
++    object_class_property_set_description(oc, X86_MACHINE_NOTIFY_WINDOW,
++            "Set the notify window required by notify VM exit");
+ }
+ 
+ static const TypeInfo x86_machine_info = {
+diff --git a/include/hw/i386/x86.h b/include/hw/i386/x86.h
+index a145a30370..2a4ca21a94 100644
+--- a/include/hw/i386/x86.h
++++ b/include/hw/i386/x86.h
+@@ -82,6 +82,8 @@ struct X86MachineState {
+      * which means no limitation on the guest's bus locks.
+      */
+     uint64_t bus_lock_ratelimit;
++
++    int32_t notify_window;
  };
- /* types for kvm_s390_mem_op->op */
-@@ -572,9 +581,12 @@ struct kvm_s390_mem_op {
- #define KVM_S390_MEMOP_LOGICAL_WRITE	1
- #define KVM_S390_MEMOP_SIDA_READ	2
- #define KVM_S390_MEMOP_SIDA_WRITE	3
-+#define KVM_S390_MEMOP_ABSOLUTE_READ	4
-+#define KVM_S390_MEMOP_ABSOLUTE_WRITE	5
- /* flags for kvm_s390_mem_op->flags */
- #define KVM_S390_MEMOP_F_CHECK_ONLY		(1ULL << 0)
- #define KVM_S390_MEMOP_F_INJECT_EXCEPTION	(1ULL << 1)
-+#define KVM_S390_MEMOP_F_SKEY_PROTECTION	(1ULL << 2)
  
- /* for KVM_INTERRUPT */
- struct kvm_interrupt {
-@@ -1133,6 +1145,11 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM 206
- #define KVM_CAP_VM_GPA_BITS 207
- #define KVM_CAP_XSAVE2 208
-+#define KVM_CAP_SYS_ATTRIBUTES 209
-+#define KVM_CAP_PPC_AIL_MODE_3 210
-+#define KVM_CAP_S390_MEM_OP_EXTENSION 211
-+#define KVM_CAP_PMU_CAPABILITY 212
-+#define KVM_CAP_X86_NOTIFY_VMEXIT 213
+ #define X86_MACHINE_SMM              "smm"
+@@ -89,6 +91,7 @@ struct X86MachineState {
+ #define X86_MACHINE_OEM_ID           "x-oem-id"
+ #define X86_MACHINE_OEM_TABLE_ID     "x-oem-table-id"
+ #define X86_MACHINE_BUS_LOCK_RATELIMIT  "bus-lock-ratelimit"
++#define X86_MACHINE_NOTIFY_WINDOW     "notify-window"
  
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-@@ -1623,9 +1640,6 @@ struct kvm_enc_region {
- #define KVM_S390_NORMAL_RESET	_IO(KVMIO,   0xc3)
- #define KVM_S390_CLEAR_RESET	_IO(KVMIO,   0xc4)
- 
--/* Available with KVM_CAP_XSAVE2 */
--#define KVM_GET_XSAVE2		  _IOR(KVMIO,  0xcf, struct kvm_xsave)
--
- struct kvm_s390_pv_sec_parm {
- 	__u64 origin;
- 	__u64 length;
-@@ -1972,6 +1986,8 @@ struct kvm_dirty_gfn {
- #define KVM_BUS_LOCK_DETECTION_OFF             (1 << 0)
- #define KVM_BUS_LOCK_DETECTION_EXIT            (1 << 1)
- 
-+#define KVM_PMU_CAP_DISABLE                    (1 << 0)
+ #define TYPE_X86_MACHINE   MACHINE_TYPE_NAME("x86")
+ OBJECT_DECLARE_TYPE(X86MachineState, X86MachineClass, X86_MACHINE)
+diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+index 83d0988302..65ad370652 100644
+--- a/target/i386/kvm/kvm.c
++++ b/target/i386/kvm/kvm.c
+@@ -2299,6 +2299,10 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+     int ret;
+     struct utsname utsname;
+     Error *local_err = NULL;
++    X86MachineState *x86ms;
 +
- /**
-  * struct kvm_stats_header - Header of per vm/vcpu binary statistics data.
-  * @flags: Some extra information for header, always 0 for now.
-@@ -2047,4 +2063,7 @@ struct kvm_stats_desc {
++    assert(object_dynamic_cast(OBJECT(ms), TYPE_X86_MACHINE));
++    x86ms = X86_MACHINE(ms);
  
- #define KVM_GET_STATS_FD  _IO(KVMIO,  0xce)
+     /*
+      * Initialize SEV context, if required
+@@ -2394,8 +2398,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+     }
  
-+/* Available with KVM_CAP_XSAVE2 */
-+#define KVM_GET_XSAVE2		  _IOR(KVMIO,  0xcf, struct kvm_xsave)
-+
- #endif /* __LINUX_KVM_H */
+     if (kvm_check_extension(s, KVM_CAP_X86_SMM) &&
+-        object_dynamic_cast(OBJECT(ms), TYPE_X86_MACHINE) &&
+-        x86_machine_is_smm_enabled(X86_MACHINE(ms))) {
++        x86_machine_is_smm_enabled(x86ms)) {
+         smram_machine_done.notify = register_smram_listener;
+         qemu_add_machine_init_done_notifier(&smram_machine_done);
+     }
+@@ -2423,25 +2426,31 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+         }
+     }
+ 
+-    if (object_dynamic_cast(OBJECT(ms), TYPE_X86_MACHINE)) {
+-        X86MachineState *x86ms = X86_MACHINE(ms);
++    if (x86ms->bus_lock_ratelimit > 0) {
++        ret = kvm_check_extension(s, KVM_CAP_X86_BUS_LOCK_EXIT);
++        if (!(ret & KVM_BUS_LOCK_DETECTION_EXIT)) {
++            error_report("kvm: bus lock detection unsupported");
++            return -ENOTSUP;
++        }
++        ret = kvm_vm_enable_cap(s, KVM_CAP_X86_BUS_LOCK_EXIT, 0,
++                                KVM_BUS_LOCK_DETECTION_EXIT);
++        if (ret < 0) {
++            error_report("kvm: Failed to enable bus lock detection cap: %s",
++                         strerror(-ret));
++            return ret;
++        }
++        ratelimit_init(&bus_lock_ratelimit_ctrl);
++        ratelimit_set_speed(&bus_lock_ratelimit_ctrl,
++                            x86ms->bus_lock_ratelimit, BUS_LOCK_SLICE_TIME);
++    }
+ 
+-        if (x86ms->bus_lock_ratelimit > 0) {
+-            ret = kvm_check_extension(s, KVM_CAP_X86_BUS_LOCK_EXIT);
+-            if (!(ret & KVM_BUS_LOCK_DETECTION_EXIT)) {
+-                error_report("kvm: bus lock detection unsupported");
+-                return -ENOTSUP;
+-            }
+-            ret = kvm_vm_enable_cap(s, KVM_CAP_X86_BUS_LOCK_EXIT, 0,
+-                                    KVM_BUS_LOCK_DETECTION_EXIT);
+-            if (ret < 0) {
+-                error_report("kvm: Failed to enable bus lock detection cap: %s",
+-                             strerror(-ret));
+-                return ret;
+-            }
+-            ratelimit_init(&bus_lock_ratelimit_ctrl);
+-            ratelimit_set_speed(&bus_lock_ratelimit_ctrl,
+-                                x86ms->bus_lock_ratelimit, BUS_LOCK_SLICE_TIME);
++    if (kvm_check_extension(s, KVM_CAP_X86_NOTIFY_VMEXIT)) {
++        ret = kvm_vm_enable_cap(s, KVM_CAP_X86_NOTIFY_VMEXIT, 0,
++                                x86ms->notify_window);
++        if (ret < 0) {
++            error_report("kvm: Failed to enable notify vmexit cap: %s",
++                         strerror(-ret));
++            return ret;
+         }
+     }
+ 
+@@ -4856,6 +4865,7 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
+     X86CPU *cpu = X86_CPU(cs);
+     uint64_t code;
+     int ret;
++    struct kvm_vcpu_events events = {};
+ 
+     switch (run->exit_reason) {
+     case KVM_EXIT_HLT:
+@@ -4911,6 +4921,14 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
+         /* already handled in kvm_arch_post_run */
+         ret = 0;
+         break;
++    case KVM_EXIT_NOTIFY:
++        ret = 0;
++        if (run->notify.data & KVM_NOTIFY_CONTEXT_INVALID) {
++            warn_report("KVM: invalid context due to notify vmexit");
++            events.flags |= KVM_VCPUEVENT_SHUTDOWN;
++            ret = kvm_vcpu_ioctl(cs, KVM_SET_VCPU_EVENTS, &events);
++        }
++        break;
+     default:
+         fprintf(stderr, "KVM: unknown exit reason %d\n", run->exit_reason);
+         ret = -1;
 -- 
 2.17.1
 
