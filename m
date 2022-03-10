@@ -2,72 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F26924D478E
-	for <lists+kvm@lfdr.de>; Thu, 10 Mar 2022 14:01:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A25A4D4796
+	for <lists+kvm@lfdr.de>; Thu, 10 Mar 2022 14:02:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242204AbiCJNAZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Mar 2022 08:00:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39068 "EHLO
+        id S242255AbiCJNDE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Mar 2022 08:03:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43746 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233708AbiCJNAY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Mar 2022 08:00:24 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2813B5748F
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 04:59:23 -0800 (PST)
+        with ESMTP id S242244AbiCJNDD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Mar 2022 08:03:03 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4EC6F14AC9C
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 05:02:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646917162;
+        s=mimecast20190719; t=1646917321;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=hwCuIDSsPjX4AERceBeOtiMJvDAZVLHVVFLuVfFYlm4=;
-        b=BH7O8ZkaqBXBI7e5a3Sg3UozcHA2L49+QDlxMCk/J9NROom0uIwsARykkzgXjmPEmIt11F
-        x4ptZDV896fqck7OOBNx5OC9KIIJpthVmdqbYwMdT0G8mTNs7uihjFnPl+iabfYzPjVYID
-        +56C70l3Qu11nbD9suc/eO/nBxSS8MI=
+        bh=RWMS1CuuTjg/dxyi6dNPKqfhAnq0QfD6tRtdo/5dGxE=;
+        b=W1g7RahzbNxKakHYRAI8Gb91Ur6sa+U/V15LaW89gJ7d2puQzfYpDwdeEDCuo4P30R7nr8
+        zdbvPWMi+rmdLpE09TBXY43OdvdhEol9TG+/8nSlnbKykLz1W43Yf7UuQoeLhlz7mqMS66
+        u9uxboBBrH+ws/uV36uqSNE5/1QtADk=
 Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
  [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-490-r95DBicGOayUHzUs6wF-Qg-1; Thu, 10 Mar 2022 07:59:21 -0500
-X-MC-Unique: r95DBicGOayUHzUs6wF-Qg-1
-Received: by mail-wm1-f71.google.com with SMTP id t2-20020a7bc3c2000000b003528fe59cb9so2259862wmj.5
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 04:59:20 -0800 (PST)
+ us-mta-621-3_QQDdMLOROEthkRVUpXiw-1; Thu, 10 Mar 2022 08:02:00 -0500
+X-MC-Unique: 3_QQDdMLOROEthkRVUpXiw-1
+Received: by mail-wm1-f71.google.com with SMTP id 3-20020a05600c230300b00384e15ceae4so4032562wmo.7
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 05:01:59 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=hwCuIDSsPjX4AERceBeOtiMJvDAZVLHVVFLuVfFYlm4=;
-        b=xyJhZ2NaieDeH2pux9G9zB7XpDXdP87xyeYB8TV1CS/CejAazSxfyFkOj41FgCCPMa
-         1ISZEfTnAlDBjZNi9KwC5YINaHQbKPN0dhtsnVmZ4Ydfna7Fnqcg297ryXsnOi5IqWJN
-         jPKdXv5QqgfZjLga0O+amt54R6qZUQfSTG1DNEnaOcH1HGC1SaKlHS0xHoFCb5vHpaDf
-         NbsyyMLRhcyOGqBnlsvd1tSXihUlWe/6C5URTL0Cr225aJwW0Hh2JuiVCDDya4xP3KiE
-         Wawhuccn62Pb3gxSsgL+2MB2JkF7F7geGRt1WbwzhmLpL2vwz8Pg4wwheYn3P6lqT3ui
-         gNsw==
-X-Gm-Message-State: AOAM531ZTYq50whFvEwSCFh61DnAla6qyj9by53E4gekHAUMyWleg44l
-        Yrby4yAYduMs4PMwZyj8mwLOP/ECc5VIvVU6W2QkCS1UB/WlhzD1yH5XEQ5VyjQgaqbGHD9M6/e
-        2pSOpaottGIXC
-X-Received: by 2002:adf:e74a:0:b0:1f0:25cb:3ad5 with SMTP id c10-20020adfe74a000000b001f025cb3ad5mr3347341wrn.231.1646917159910;
-        Thu, 10 Mar 2022 04:59:19 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJy4qf2SKWvXQvwoAB9Gh/FK48f8OJZe69JH0iUoqd3J7EpB6Fi2Yt+tJIwgM/gUJZtaibSlQA==
-X-Received: by 2002:adf:e74a:0:b0:1f0:25cb:3ad5 with SMTP id c10-20020adfe74a000000b001f025cb3ad5mr3347324wrn.231.1646917159674;
-        Thu, 10 Mar 2022 04:59:19 -0800 (PST)
+        bh=RWMS1CuuTjg/dxyi6dNPKqfhAnq0QfD6tRtdo/5dGxE=;
+        b=eeWmethPyHbqiYIyjnF9dLm5LcVcSJbs1sU601rNQnvcLMJ7p26mFZf3rj7sMZsd+e
+         ehB9fxV/+UV7ZnQtrZG8AhLt4/ptioPNN22sIknf4D+qi22/X9xnuUxkVjIxjZ9w1FWh
+         TmEj2PX9JPoQGrIHh4lf0eh3GBmSSGMdh0YQwbucXOSBniHxV3AxBk8Ub8aeoNYXVm8P
+         dEHIPKp9ya/Ldnu65tHjbtBuaESaBGwb8pWjWz/Wqs/YkdVJycCfGEpDk5R2Alj5oeRc
+         X1IqeYQxOZNMfsJLeL4WeoT10KfxBnIPv1v60tbmVfChhm19qPVKQqk1wdw/vmLHZ2Y3
+         ZIEw==
+X-Gm-Message-State: AOAM533MYevjazC+RgurXzyn6onYmKa54jFswKzr6lY648by3YfH43bI
+        ncXj4UKoZkrGjusckOtHva+vXvCl0ON1asDERBOC/7dzVLQdiN8MTMnEkb8+xj2kbGNeGwTzLeP
+        lPMIFYa2zFCTP
+X-Received: by 2002:a5d:6d41:0:b0:1ef:f32c:18ee with SMTP id k1-20020a5d6d41000000b001eff32c18eemr3489863wri.532.1646917318874;
+        Thu, 10 Mar 2022 05:01:58 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzG8zUynya3aZ1k62/HZYUuzx+jvS8PFleAyItoEwxyNae7kQtcQuOPFd+KwfonhP3HTCC0Bw==
+X-Received: by 2002:a5d:6d41:0:b0:1ef:f32c:18ee with SMTP id k1-20020a5d6d41000000b001eff32c18eemr3489798wri.532.1646917317914;
+        Thu, 10 Mar 2022 05:01:57 -0800 (PST)
 Received: from redhat.com ([2.53.27.107])
-        by smtp.gmail.com with ESMTPSA id n7-20020a05600c3b8700b00389a6241669sm8676255wms.33.2022.03.10.04.59.17
+        by smtp.gmail.com with ESMTPSA id r186-20020a1c2bc3000000b0037bdd94a4e5sm4477363wmr.39.2022.03.10.05.01.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Mar 2022 04:59:19 -0800 (PST)
-Date:   Thu, 10 Mar 2022 07:59:15 -0500
+        Thu, 10 Mar 2022 05:01:57 -0800 (PST)
+Date:   Thu, 10 Mar 2022 08:01:53 -0500
 From:   "Michael S. Tsirkin" <mst@redhat.com>
 To:     Jiyong Park <jiyong@google.com>
 Cc:     sgarzare@redhat.com, stefanha@redhat.com, jasowang@redhat.com,
         davem@davemloft.net, kuba@kernel.org, adelva@google.com,
         kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
         netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/2] vsock: cycle only on its own socket
-Message-ID: <20220310075854-mutt-send-email-mst@kernel.org>
+Subject: Re: [PATCH 1/2] vsock: each transport cycles only on its own sockets
+Message-ID: <20220310075933-mutt-send-email-mst@kernel.org>
 References: <20220310125425.4193879-1-jiyong@google.com>
- <20220310075554-mutt-send-email-mst@kernel.org>
+ <20220310125425.4193879-2-jiyong@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220310075554-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20220310125425.4193879-2-jiyong@google.com>
 X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
@@ -79,45 +79,112 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 10, 2022 at 07:57:58AM -0500, Michael S. Tsirkin wrote:
-> On Thu, Mar 10, 2022 at 09:54:23PM +0900, Jiyong Park wrote:
-> > Hi Stefano,
-> > 
-> > As suggested [1], I've made two patches for easier backporting without
-> > breaking KMI.
-> > 
-> > PATCH 1 fixes the very issue of cycling all vsocks regardless of the
-> > transport and shall be backported.
-> > 
-> > PATCH 2 is a refactor of PATCH 1 that forces the filtering to all
-> > (including future) uses of vsock_for_each_connected_socket.
-> > 
-> > Thanks,
-> > 
-> > [1] https://lore.kernel.org/lkml/20220310110036.fgy323c4hvk3mziq@sgarzare-redhat/
+On Thu, Mar 10, 2022 at 09:54:24PM +0900, Jiyong Park wrote:
+> When iterating over sockets using vsock_for_each_connected_socket, make
+> sure that a transport filters out sockets that don't belong to the
+> transport.
 > 
+> There actually was an issue caused by this; in a nested VM
+> configuration, destroying the nested VM (which often involves the
+> closing of /dev/vhost-vsock if there was h2g connections to the nested
+> VM) kills not only the h2g connections, but also all existing g2h
+> connections to the (outmost) host which are totally unrelated.
 > 
-> OK that's better. Pls do include changelog in the future.
+> Tested: Executed the following steps on Cuttlefish (Android running on a
+> VM) [1]: (1) Enter into an `adb shell` session - to have a g2h
+> connection inside the VM, (2) open and then close /dev/vhost-vsock by
+> `exec 3< /dev/vhost-vsock && exec 3<&-`, (3) observe that the adb
+> session is not reset.
 > 
-> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> [1] https://android.googlesource.com/device/google/cuttlefish/
+> 
+> Fixes: c0cfa2d8a788 ("vsock: add multi-transports support")
+> Signed-off-by: Jiyong Park <jiyong@google.com>
+> ---
+>  drivers/vhost/vsock.c            | 4 ++++
+>  net/vmw_vsock/virtio_transport.c | 7 +++++++
+>  net/vmw_vsock/vmci_transport.c   | 5 +++++
+>  3 files changed, 16 insertions(+)
+> 
+> diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+> index 37f0b4274113..853ddac00d5b 100644
+> --- a/drivers/vhost/vsock.c
+> +++ b/drivers/vhost/vsock.c
+> @@ -722,6 +722,10 @@ static void vhost_vsock_reset_orphans(struct sock *sk)
+>  	 * executing.
+>  	 */
+>  
+> +	/* Only handle our own sockets */
+> +	if (vsk->transport != &vhost_transport.transport)
+> +		return;
+> +
+>  	/* If the peer is still valid, no need to reset connection */
+>  	if (vhost_vsock_get(vsk->remote_addr.svm_cid))
+>  		return;
 
-Hmm actually I think I have a better idea. Hang on.
 
-> 
-> 
-> > Jiyong Park (2):
-> >   vsock: each transport cycles only on its own sockets
-> >   vsock: refactor vsock_for_each_connected_socket
-> > 
-> >  drivers/vhost/vsock.c            | 3 ++-
-> >  include/net/af_vsock.h           | 3 ++-
-> >  net/vmw_vsock/af_vsock.c         | 9 +++++++--
-> >  net/vmw_vsock/virtio_transport.c | 7 +++++--
-> >  net/vmw_vsock/vmci_transport.c   | 3 ++-
-> >  5 files changed, 18 insertions(+), 7 deletions(-)
-> > 
-> > 
-> > base-commit: 3bf7edc84a9eb4007dd9a0cb8878a7e1d5ec6a3b
-> > -- 
-> > 2.35.1.723.g4982287a31-goog
+We know this is incomplete though. So I think it's the wrong thing to do
+when you backport, too. If all you worry about is breaking a binary
+module interface, how about simply exporting a new function when you
+backport. Thus you will have downstream both:
+
+void vsock_for_each_connected_socket(void (*fn)(struct sock *sk));
+
+void vsock_for_each_connected_socket_new(struct vsock_transport *transport,
+                                    void (*fn)(struct sock *sk));
+
+
+and then upstream we can squash these two patches.
+
+Hmm?
+
+
+> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+> index fb3302fff627..61b24eb31d4b 100644
+> --- a/net/vmw_vsock/virtio_transport.c
+> +++ b/net/vmw_vsock/virtio_transport.c
+> @@ -24,6 +24,7 @@
+>  static struct workqueue_struct *virtio_vsock_workqueue;
+>  static struct virtio_vsock __rcu *the_virtio_vsock;
+>  static DEFINE_MUTEX(the_virtio_vsock_mutex); /* protects the_virtio_vsock */
+> +static struct virtio_transport virtio_transport; /* forward declaration */
+>  
+>  struct virtio_vsock {
+>  	struct virtio_device *vdev;
+> @@ -357,11 +358,17 @@ static void virtio_vsock_event_fill(struct virtio_vsock *vsock)
+>  
+>  static void virtio_vsock_reset_sock(struct sock *sk)
+>  {
+> +	struct vsock_sock *vsk = vsock_sk(sk);
+> +
+>  	/* vmci_transport.c doesn't take sk_lock here either.  At least we're
+>  	 * under vsock_table_lock so the sock cannot disappear while we're
+>  	 * executing.
+>  	 */
+>  
+> +	/* Only handle our own sockets */
+> +	if (vsk->transport != &virtio_transport.transport)
+> +		return;
+> +
+>  	sk->sk_state = TCP_CLOSE;
+>  	sk->sk_err = ECONNRESET;
+>  	sk_error_report(sk);
+> diff --git a/net/vmw_vsock/vmci_transport.c b/net/vmw_vsock/vmci_transport.c
+> index 7aef34e32bdf..cd2f01513fae 100644
+> --- a/net/vmw_vsock/vmci_transport.c
+> +++ b/net/vmw_vsock/vmci_transport.c
+> @@ -803,6 +803,11 @@ static void vmci_transport_handle_detach(struct sock *sk)
+>  	struct vsock_sock *vsk;
+>  
+>  	vsk = vsock_sk(sk);
+> +
+> +	/* Only handle our own sockets */
+> +	if (vsk->transport != &vmci_transport)
+> +		return;
+> +
+>  	if (!vmci_handle_is_invalid(vmci_trans(vsk)->qp_handle)) {
+>  		sock_set_flag(sk, SOCK_DONE);
+>  
+> -- 
+> 2.35.1.723.g4982287a31-goog
 
