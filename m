@@ -2,296 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BB7CF4D4281
-	for <lists+kvm@lfdr.de>; Thu, 10 Mar 2022 09:29:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D7F084D4289
+	for <lists+kvm@lfdr.de>; Thu, 10 Mar 2022 09:30:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240345AbiCJIaJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Mar 2022 03:30:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42998 "EHLO
+        id S240334AbiCJIbi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Mar 2022 03:31:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47872 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232250AbiCJIaI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Mar 2022 03:30:08 -0500
-Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8811135701;
-        Thu, 10 Mar 2022 00:29:05 -0800 (PST)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R481e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04357;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=33;SR=0;TI=SMTPD_---0V6neRLx_1646900938;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0V6neRLx_1646900938)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Thu, 10 Mar 2022 16:28:59 +0800
-Message-ID: <1646900411.6481435-2-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH v7 17/26] virtio_pci: queue_reset: support VIRTIO_F_RING_RESET
-Date:   Thu, 10 Mar 2022 16:20:11 +0800
-From:   Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mark Gross <markgross@kernel.org>,
-        Vadim Pasternak <vadimp@nvidia.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Johannes Berg <johannes.berg@intel.com>,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>,
-        linux-um@lists.infradead.org, platform-driver-x86@vger.kernel.org,
-        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, bpf@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-References: <20220308123518.33800-1-xuanzhuo@linux.alibaba.com>
- <20220308123518.33800-18-xuanzhuo@linux.alibaba.com>
- <8b9d337d-71c2-07b4-8e65-6f83cf09bf7a@redhat.com>
-In-Reply-To: <8b9d337d-71c2-07b4-8e65-6f83cf09bf7a@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
-        version=3.4.6
+        with ESMTP id S232250AbiCJIbh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Mar 2022 03:31:37 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 094C8135701
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 00:30:35 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 4E9D2B82549
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 08:30:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10005C340E8;
+        Thu, 10 Mar 2022 08:30:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1646901033;
+        bh=x2w4YCh8zXACrKp+r92F1M5/iu5aNSGm4udnt9xxu9Q=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=B5WtLt39l2iASMRRDy7YhKUHMA2M1rMfc5M5QIU01BWemlZrfw4DGKKm20U64OUD1
+         tSf63zMrtYcMsTJprGHUMFc9U7IwOqLJKKxJpaqn1ZheluiovgBpuTaCp7h8El0D2n
+         MIwm3vBN+0/YShFHn0f2NGoghAk0VagkSIn5T8pBhotb4p1skcuYffd9ZiW9jBn6Ew
+         oONNl/OX0dQdu8B+TSyGB/WrV8OxfqK9xXsZh5gNribZKq5KBMp5SCCkOSo5H4SfPz
+         +qfjjd7Kd7icdl4ie4sxbdGJsTB7e6mPAW24qt8la80eesNykdPBRX80shO87KQlgZ
+         ghfm/bgKkioBA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nSEBq-00DWbd-JW; Thu, 10 Mar 2022 08:30:30 +0000
+Date:   Thu, 10 Mar 2022 08:30:30 +0000
+Message-ID: <87r17ayztl.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        leksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Peter Feiner <pfeiner@google.com>,
+        Andrew Jones <drjones@redhat.com>,
+        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
+        kvm list <kvm@vger.kernel.org>
+Subject: Re: [PATCH 19/23] KVM: Allow for different capacities in kvm_mmu_memory_cache structs
+In-Reply-To: <CALzav=dZXEx80JsTzQe1vyDg6c_NR89HXCcu=W1EsvShysW7HQ@mail.gmail.com>
+References: <20220203010051.2813563-1-dmatlack@google.com>
+        <20220203010051.2813563-20-dmatlack@google.com>
+        <8735k84i6f.wl-maz@kernel.org>
+        <CALzav=d9dRWCV=R8Ypvy4KzgzPQvd-7qhGTbxso5r9eTh9kkqw@mail.gmail.com>
+        <CALzav=ccRmvCB+FsN64JujOVpb7-ocdzkiBrYLFGFRQUa7DbWQ@mail.gmail.com>
+        <878rtotk3h.wl-maz@kernel.org>
+        <CALzav=e7vH87uyphgL8vXPMmn8vX8TmkpUY_3OWuRXrKFhy_ag@mail.gmail.com>
+        <CALzav=dZXEx80JsTzQe1vyDg6c_NR89HXCcu=W1EsvShysW7HQ@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: dmatlack@google.com, pbonzini@redhat.com, chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, seanjc@google.com, vkuznets@redhat.com, peterx@redhat.com, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org, pfeiner@google.com, drjones@redhat.com, maciej.szmigiero@oracle.com, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 9 Mar 2022 16:54:10 +0800, Jason Wang <jasowang@redhat.com> wrote:
->
-> =E5=9C=A8 2022/3/8 =E4=B8=8B=E5=8D=888:35, Xuan Zhuo =E5=86=99=E9=81=93:
-> > This patch implements virtio pci support for QUEUE RESET.
+On Wed, 09 Mar 2022 21:49:01 +0000,
+David Matlack <dmatlack@google.com> wrote:
+> 
+> On Mon, Mar 7, 2022 at 3:49 PM David Matlack <dmatlack@google.com> wrote:
 > >
-> > Performing reset on a queue is divided into these steps:
+> > On Sat, Mar 5, 2022 at 8:55 AM Marc Zyngier <maz@kernel.org> wrote:
+> > >
+> > > On Fri, 04 Mar 2022 21:59:12 +0000,
+> > > David Matlack <dmatlack@google.com> wrote:
+> > > > I see two alternatives to make this cleaner:
+> > > >
+> > > > 1. Dynamically allocate just this cache. The caches defined in
+> > > > vcpu_arch will continue to use DEFINE_KVM_MMU_MEMORY_CACHE(). This
+> > > > would get rid of the outer struct but require an extra memory
+> > > > allocation.
+> > > > 2. Move this cache to struct kvm_arch using
+> > > > DEFINE_KVM_MMU_MEMORY_CACHE(). Then we don't need to stack allocate it
+> > > > or dynamically allocate it.
+> > > >
+> > > > Do either of these approaches appeal to you more than the current one?
+> > >
+> > > Certainly, #2 feels more solid. Dynamic allocations (and the resulting
+> > > pointer chasing) are usually costly in terms of performance, so I'd
+> > > avoid it if at all possible.
+> > >
+> > > That being said, if it turns out that #2 isn't practical, I won't get
+> > > in the way of your current approach. Moving kvm_mmu_memory_cache to
+> > > core code was definitely a good cleanup, and I'm not overly excited
+> > > with the perspective of *more* arch-specific code.
 > >
-> >   1. virtio_reset_vq()              - notify the device to reset the qu=
-eue
-> >   2. virtqueue_detach_unused_buf()  - recycle the buffer submitted
-> >   3. virtqueue_reset_vring()        - reset the vring (may re-alloc)
-> >   4. virtio_enable_resetq()         - mmap vring to device, and enable =
-the queue
-> >
-> > This patch implements virtio_reset_vq(), virtio_enable_resetq() in the
-> > pci scenario.
-> >
-> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > ---
-> >   drivers/virtio/virtio_pci_common.c |  8 +--
-> >   drivers/virtio/virtio_pci_modern.c | 83 ++++++++++++++++++++++++++++++
-> >   2 files changed, 88 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/drivers/virtio/virtio_pci_common.c b/drivers/virtio/virtio=
-_pci_common.c
-> > index fdbde1db5ec5..863d3a8a0956 100644
-> > --- a/drivers/virtio/virtio_pci_common.c
-> > +++ b/drivers/virtio/virtio_pci_common.c
-> > @@ -248,9 +248,11 @@ static void vp_del_vq(struct virtqueue *vq)
-> >   	struct virtio_pci_vq_info *info =3D vp_dev->vqs[vq->index];
-> >   	unsigned long flags;
-> >
-> > -	spin_lock_irqsave(&vp_dev->lock, flags);
-> > -	list_del(&info->node);
-> > -	spin_unlock_irqrestore(&vp_dev->lock, flags);
-> > +	if (!vq->reset) {
-> > +		spin_lock_irqsave(&vp_dev->lock, flags);
-> > +		list_del(&info->node);
-> > +		spin_unlock_irqrestore(&vp_dev->lock, flags);
-> > +	}
-> >
-> >   	vp_dev->del_vq(info);
-> >   	kfree(info);
-> > diff --git a/drivers/virtio/virtio_pci_modern.c b/drivers/virtio/virtio=
-_pci_modern.c
-> > index 49a4493732cf..3c67d3607802 100644
-> > --- a/drivers/virtio/virtio_pci_modern.c
-> > +++ b/drivers/virtio/virtio_pci_modern.c
-> > @@ -34,6 +34,9 @@ static void vp_transport_features(struct virtio_devic=
-e *vdev, u64 features)
-> >   	if ((features & BIT_ULL(VIRTIO_F_SR_IOV)) &&
-> >   			pci_find_ext_capability(pci_dev, PCI_EXT_CAP_ID_SRIOV))
-> >   		__virtio_set_bit(vdev, VIRTIO_F_SR_IOV);
-> > +
-> > +	if (features & BIT_ULL(VIRTIO_F_RING_RESET))
-> > +		__virtio_set_bit(vdev, VIRTIO_F_RING_RESET);
-> >   }
-> >
-> >   /* virtio config->finalize_features() implementation */
-> > @@ -199,6 +202,82 @@ static int vp_active_vq(struct virtqueue *vq, u16 =
-msix_vec)
-> >   	return 0;
-> >   }
-> >
-> > +static int vp_modern_reset_vq(struct virtqueue *vq)
-> > +{
-> > +	struct virtio_pci_device *vp_dev =3D to_vp_device(vq->vdev);
-> > +	struct virtio_pci_modern_device *mdev =3D &vp_dev->mdev;
-> > +	struct virtio_pci_vq_info *info;
-> > +	unsigned long flags;
-> > +	unsigned int irq;
-> > +
-> > +	if (!virtio_has_feature(vq->vdev, VIRTIO_F_RING_RESET))
-> > +		return -ENOENT;
-> > +
-> > +	vp_modern_set_queue_reset(mdev, vq->index);
-> > +
-> > +	info =3D vp_dev->vqs[vq->index];
-> > +
-> > +	/* delete vq from irq handler */
-> > +	spin_lock_irqsave(&vp_dev->lock, flags);
-> > +	list_del(&info->node);
-> > +	spin_unlock_irqrestore(&vp_dev->lock, flags);
-> > +
-> > +	INIT_LIST_HEAD(&info->node);
-> > +
-> > +	vq->reset =3D VIRTIO_VQ_RESET_STEP_DEVICE;
-> > +
-> > +	/* sync irq callback. */
-> > +	if (vp_dev->intx_enabled) {
-> > +		irq =3D vp_dev->pci_dev->irq;
-> > +
-> > +	} else {
-> > +		if (info->msix_vector =3D=3D VIRTIO_MSI_NO_VECTOR)
-> > +			return 0;
-> > +
-> > +		irq =3D pci_irq_vector(vp_dev->pci_dev, info->msix_vector);
-> > +	}
-> > +
-> > +	synchronize_irq(irq);
->
->
-> Synchronize_irq() is not sufficient here since it breaks the effort of
-> the interrupt hardening which is done by commits:
->
-> 080cd7c3ac87 virtio-pci: harden INTX interrupts
-> 9e35276a5344 virtio_pci: harden MSI-X interrupts
->
-> Unfortunately=C2=A0 080cd7c3ac87 introduces an issue that disable_irq() w=
-ere
-> used for the affinity managed irq but we're discussing a fix.
->
+> > Ok I'll play with #2. Thanks for the feedback.
+> 
+> #2 is very clean to implement but it ends up being a bit silly. It
+> increases the size of struct kvm_arch by 336 bytes for all VMs but
+> only ever gets used during kvm_vgic_map_resources(), which is only
+> called the first time a vCPU is run (according to the comment in
+> kvm_arch_vcpu_run_pid_change()). I think stack allocation makes the
+> most sense for this object, I don't think it's worth dancing around
+> that solely to avoid the inner struct grottiness.
 
+Fair enough, and thanks for having had a look. I'll look at the next
+version once you post it.
 
-ok, I think disable_irq() is still used here.
+Thanks,
 
-I want to determine the solution for this detail first. So I posted the cod=
-e, I
-hope Jason can help confirm this point first.
+	M.
 
-There are three situations in which vq corresponds to an interrupt
-
-1. intx
-2. msix: per vq vectors
-2. msix: share irq
-
-Essentially can be divided into two categories: per vq vectors and share ir=
-q.
-
-For share irq is based on virtqueues to find vq, so I think it is safe as l=
-ong
-as list_del() is executed under the protection of the lock.
-
-In the case of per vq vectors, disable_irq() is used.
-
-Thanks.
-
-+static int vp_modern_reset_vq(struct virtqueue *vq)
-+{
-+       struct virtio_pci_device *vp_dev =3D to_vp_device(vq->vdev);
-+       struct virtio_pci_modern_device *mdev =3D &vp_dev->mdev;
-+       struct virtio_pci_vq_info *info;
-+       unsigned long flags;
-+       unsigned int irq;
-+
-+       if (!virtio_has_feature(vq->vdev, VIRTIO_F_RING_RESET))
-+               return -ENOENT;
-+
-+       vp_modern_set_queue_reset(mdev, vq->index);
-+
-+       info =3D vp_dev->vqs[vq->index];
-+
-+       /* delete vq from irq handler */
-+       spin_lock_irqsave(&vp_dev->lock, flags);
-+       list_del(&info->node);
-+       vp_modern_set_queue_reset(mdev, vq->index);
-+
-+       info =3D vp_dev->vqs[vq->index];
-+
-+       /* delete vq from irq handler */
-+       spin_lock_irqsave(&vp_dev->lock, flags);
-+       list_del(&info->node);
-+       spin_unlock_irqrestore(&vp_dev->lock, flags);
-+
-+       INIT_LIST_HEAD(&info->node);
-+
-+       /* For the case where vq has an exclusive irq, to prevent the irq f=
-rom
-+        * being received again and the pending irq, call disable_irq().
-+        *
-+        * In the scenario based on shared interrupts, vq will be searched =
-from
-+        * the queue virtqueues. Since the previous list_del() has been del=
-eted
-+        * from the queue, it is impossible for vq to be called in this cas=
-e.
-+        * There is no need to close the corresponding interrupt.
-+        */
-+       if (vp_dev->per_vq_vectors && msix_vec !=3D VIRTIO_MSI_NO_VECTOR)
-+               disable_irq(pci_irq_vector(vp_dev->pci_dev, info->msix_vect=
-or));
-+
-+       vq->reset =3D true;
-+
-+       return 0;
-+}
-+
-+static int vp_modern_enable_reset_vq(struct virtqueue *vq)
-+{
-+       struct virtio_pci_device *vp_dev =3D to_vp_device(vq->vdev);
-+       struct virtio_pci_modern_device *mdev =3D &vp_dev->mdev;
-+       struct virtio_pci_vq_info *info;
-+       unsigned long flags, index;
-+       int err;
-+
-+       if (!vq->reset)
-+               return -EBUSY;
-+
-+       index =3D vq->index;
-+       info =3D vp_dev->vqs[index];
-+
-+       /* check queue reset status */
-+       if (vp_modern_get_queue_reset(mdev, index) !=3D 1)
-+               return -EBUSY;
-+
-+       err =3D vp_active_vq(vq, info->msix_vector);
-+       if (err)
-+               return err;
-+
-+       if (vq->callback) {
-+               spin_lock_irqsave(&vp_dev->lock, flags);
-+               list_add(&info->node, &vp_dev->virtqueues);
-+               spin_unlock_irqrestore(&vp_dev->lock, flags);
-+       } else {
-+               INIT_LIST_HEAD(&info->node);
-+       }
-+
-+       vp_modern_set_queue_enable(&vp_dev->mdev, index, true);
-+       vq->reset =3D false;
-+
-+       if (vp_dev->per_vq_vectors && msix_vec !=3D VIRTIO_MSI_NO_VECTOR)
-+               enable_irq(pci_irq_vector(vp_dev->pci_dev, info->msix_vecto=
-r));
-+
-+       return 0;
-+}
-
-
+-- 
+Without deviation from the norm, progress is not possible.
