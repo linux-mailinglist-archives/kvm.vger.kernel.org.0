@@ -2,173 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D4E14D42FA
-	for <lists+kvm@lfdr.de>; Thu, 10 Mar 2022 09:59:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BEAF54D42F3
+	for <lists+kvm@lfdr.de>; Thu, 10 Mar 2022 09:59:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240556AbiCJJAp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Mar 2022 04:00:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40306 "EHLO
+        id S240545AbiCJJAK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Mar 2022 04:00:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39702 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240555AbiCJJAj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Mar 2022 04:00:39 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 255FEF68C0
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 00:59:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646902777;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=WQ/dYEhklhPcMo587rvR2qJ7KNlk74jXJG+JhU1AbRA=;
-        b=e95muxb6WI7Hm9hXGWAp8uv0ThoXIjHOCRlbmL7zXuig99OnnF9PEjOZgQGWcZcSarYvok
-        4NQLEaZSYCrgLpu9y67M9V0sgPWvAl5xN7rIzYdjSpGa7Evjn5f2cKrJ0Mg6neTKy0Ppcg
-        jIAgUeLI56yyLDAOUKosebunRUNhUFo=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-270-K66Qup4WPVa6xLC0m_1r9w-1; Thu, 10 Mar 2022 03:59:36 -0500
-X-MC-Unique: K66Qup4WPVa6xLC0m_1r9w-1
-Received: by mail-ej1-f69.google.com with SMTP id le4-20020a170907170400b006dab546bc40so2741430ejc.15
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 00:59:35 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=WQ/dYEhklhPcMo587rvR2qJ7KNlk74jXJG+JhU1AbRA=;
-        b=w3FAtn9LKesS0a3tP/xIvdlY3Lsy6s8UyB1AUhY6fYF6xlS1kZsP1igmoQm0TZvT9Q
-         FXHaZfFAU+baspaPLoOaccXyDTPsp+IEw6I8on33c8y58kukN15optqGq6J5JTUpPqSo
-         YiSoU0mybBODsDEQhp5bRAlCO/TQtQ8acugYjgZlnwnJtXZPvoYLfOHpdVMX6xvXulf8
-         qjMLPnH9QXWF/gYNoZyboqajNDzuRarBB0NvuRQagA8/EWY08alnjgDeW/+aiEruqdr+
-         ShclWHqFQx83SXThk/ZewLCR69J6D4pok8m61+Vpj+opDRDZcpZrjAcxzLhaXfu4/Am4
-         YFcA==
-X-Gm-Message-State: AOAM533FvES2T4L50A7S4NZhelG2SKU22qgQiXbgpMswdXge95bUBhcz
-        CGNe8mXjNGreH2xwXJE/CFtWOhoZhr2iPC6MgAmxZ6zxTxRNsSIA8kGx60GueIqksLCEZr4hWOf
-        DAreFaMZV9mJ1
-X-Received: by 2002:a17:907:2a53:b0:6ce:e4fe:3f92 with SMTP id fe19-20020a1709072a5300b006cee4fe3f92mr3207211ejc.389.1646902774852;
-        Thu, 10 Mar 2022 00:59:34 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJz3lIVlYhT5pB9vGmIIkaBIM5FzigFqHE7Plk2kLwaMt42aBHUIWqvpJN1SkNr5CjX+UXVYzg==
-X-Received: by 2002:a17:907:2a53:b0:6ce:e4fe:3f92 with SMTP id fe19-20020a1709072a5300b006cee4fe3f92mr3207197ejc.389.1646902774597;
-        Thu, 10 Mar 2022 00:59:34 -0800 (PST)
-Received: from sgarzare-redhat (host-212-171-187-184.pool212171.interbusiness.it. [212.171.187.184])
-        by smtp.gmail.com with ESMTPSA id n13-20020a1709062bcd00b006cf71d46a1csm1546859ejg.136.2022.03.10.00.59.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Mar 2022 00:59:34 -0800 (PST)
-Date:   Thu, 10 Mar 2022 09:59:31 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Jiyong Park <jiyong@google.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>, adelva@google.com,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] vhost/vsock: reset only the h2g connections upon release
-Message-ID: <20220310085931.cpgc2cv4yg7sd4vu@sgarzare-redhat>
-References: <20220310081854.2487280-1-jiyong@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20220310081854.2487280-1-jiyong@google.com>
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        with ESMTP id S239986AbiCJJAJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Mar 2022 04:00:09 -0500
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5D2DE3C7B
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 00:59:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1646902748; x=1678438748;
+  h=from:to:cc:subject:date:message-id;
+  bh=cEQvWn6cKH//ZmRKF+kqgy60d5rxkvhGVp21E2JHYXc=;
+  b=AtNPGIRBhIPAHosP4xNmL+xgGpAy1vOoo6VrAAYHJxeYBteYllJKAJ7b
+   bIJ15YykcFHQnminyg7qSGPE2Fz6IGfVXc8kbQQbqTUD0VRfEz0P4Zi7U
+   7EfHtU0/9GFt9+1CaUD2jxTYZMhq9awq1aggLYCtdLG5Ddl1t2ON/Jc5N
+   hG8Z9QIszcoUHQ5m3J0IA/z/clXOFj5PLdxp0Hr5S0BnBpcfyQa/ysMWV
+   M+zthgEiYHGL445au9HjdFGvFihxHTKLhq3+mBJaqeT4O6PzCs8TI2IUP
+   Z/5o70oJvk+gplRUAUaA35Udtbrn58larxAJM6AgBmtrMtysv4onO0djm
+   A==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10281"; a="235148759"
+X-IronPort-AV: E=Sophos;i="5.90,169,1643702400"; 
+   d="scan'208";a="235148759"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2022 00:59:08 -0800
+X-IronPort-AV: E=Sophos;i="5.90,169,1643702400"; 
+   d="scan'208";a="644367169"
+Received: from chenyi-pc.sh.intel.com ([10.239.159.73])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2022 00:59:06 -0800
+From:   Chenyi Qiang <chenyi.qiang@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Chenyi Qiang <chenyi.qiang@intel.com>, qemu-devel@nongnu.org,
+        kvm@vger.kernel.org
+Subject: [PATCH 0/2] Enable notify VM exit
+Date:   Thu, 10 Mar 2022 17:02:03 +0800
+Message-Id: <20220310090205.10645-1-chenyi.qiang@intel.com>
+X-Mailer: git-send-email 2.17.1
+X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Jiyong,
+Notify VM exit is introduced to mitigate the potential DOS attach from
+malicious VM. This series is the userspace part to enable this feature
+through a new KVM capability KVM_CAP_X86_NOTIFY_VMEXIT. The
+corresponding KVM patch series is available at
 
-On Thu, Mar 10, 2022 at 05:18:54PM +0900, Jiyong Park wrote:
->Filtering non-h2g connections out when determining orphaned connections.
->Otherwise, in a nested VM configuration, destroying the nested VM (which
->often involves the closing of /dev/vhost-vsock if there was h2g
->connections to the nested VM) kills not only the h2g connections, but
->also all existing g2h connections to the (outmost) host which are
->totally unrelated.
->
->Tested: Executed the following steps on Cuttlefish (Android running on a
->VM) [1]: (1) Enter into an `adb shell` session - to have a g2h
->connection inside the VM, (2) open and then close /dev/vhost-vsock by
->`exec 3< /dev/vhost-vsock && exec 3<&-`, (3) observe that the adb
->session is not reset.
->
->[1] https://android.googlesource.com/device/google/cuttlefish/
->
->Signed-off-by: Jiyong Park <jiyong@google.com>
->---
-> drivers/vhost/vsock.c | 4 ++++
-> 1 file changed, 4 insertions(+)
->
->diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
->index 37f0b4274113..2f6d5d66f5ed 100644
->--- a/drivers/vhost/vsock.c
->+++ b/drivers/vhost/vsock.c
->@@ -722,6 +722,10 @@ static void vhost_vsock_reset_orphans(struct sock *sk)
-> 	 * executing.
-> 	 */
->
->+	/* Only the h2g connections are reset */
->+	if (vsk->transport != &vhost_transport.transport)
->+		return;
->+
-> 	/* If the peer is still valid, no need to reset connection */
-> 	if (vhost_vsock_get(vsk->remote_addr.svm_cid))
-> 		return;
->-- 
->2.35.1.723.g4982287a31-goog
->
+https://lore.kernel.org/lkml/20220310084001.10235-1-chenyi.qiang@intel.com/
 
-Thanks for your patch!
+Chenyi Qiang (2):
+  linux-headers: Sync the linux headers
+  i386: Add notify VM exit support
 
-Yes, I see the problem and I think I introduced it with the 
-multi-transports support (ooops).
+ hw/i386/x86.c               | 24 +++++++++++++++
+ include/hw/i386/x86.h       |  3 ++
+ linux-headers/asm-x86/kvm.h |  4 +++
+ linux-headers/linux/kvm.h   | 29 +++++++++++++++----
+ target/i386/kvm/kvm.c       | 58 ++++++++++++++++++++++++-------------
+ 5 files changed, 93 insertions(+), 25 deletions(-)
 
-So we should add this fixes tag:
-
-Fixes: c0cfa2d8a788 ("vsock: add multi-transports support")
-
-
-IIUC the problem is for all transports that should only cycle on their 
-own sockets. Indeed I think there is the same problem if the g2h driver 
-will be unloaded (or a reset event is received after a VM migration), it 
-will close all sockets of the nested h2g.
-
-So I suggest a more generic solution, modifying 
-vsock_for_each_connected_socket() like this (not tested):
-
-diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-index 38baeb189d4e..f04abf662ec6 100644
---- a/net/vmw_vsock/af_vsock.c
-+++ b/net/vmw_vsock/af_vsock.c
-@@ -334,7 +334,8 @@ void vsock_remove_sock(struct vsock_sock *vsk)
-  }
-  EXPORT_SYMBOL_GPL(vsock_remove_sock);
-
--void vsock_for_each_connected_socket(void (*fn)(struct sock *sk))
-+void vsock_for_each_connected_socket(struct vsock_transport *transport,
-+                                    void (*fn)(struct sock *sk))
-  {
-         int i;
-
-@@ -343,8 +344,12 @@ void vsock_for_each_connected_socket(void (*fn)(struct sock *sk))
-         for (i = 0; i < ARRAY_SIZE(vsock_connected_table); i++) {
-                 struct vsock_sock *vsk;
-                 list_for_each_entry(vsk, &vsock_connected_table[i],
--                                   connected_table)
-+                                   connected_table) {
-+                       if (vsk->transport != transport)
-+                               continue;
-+
-                         fn(sk_vsock(vsk));
-+               }
-         }
-
-
-And all transports that call it.
-
-Thanks,
-Stefano
+-- 
+2.17.1
 
