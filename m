@@ -2,71 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D1134D4872
-	for <lists+kvm@lfdr.de>; Thu, 10 Mar 2022 14:56:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D08AB4D48A3
+	for <lists+kvm@lfdr.de>; Thu, 10 Mar 2022 15:10:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242580AbiCJN46 convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Thu, 10 Mar 2022 08:56:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47122 "EHLO
+        id S242697AbiCJOKj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Mar 2022 09:10:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46972 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232346AbiCJN45 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Mar 2022 08:56:57 -0500
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E914141FF4;
-        Thu, 10 Mar 2022 05:55:52 -0800 (PST)
-Received: from fraeml735-chm.china.huawei.com (unknown [172.18.147.206])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4KDrDQ5q6Tz67vZB;
-        Thu, 10 Mar 2022 21:55:18 +0800 (CST)
-Received: from lhreml717-chm.china.huawei.com (10.201.108.68) by
- fraeml735-chm.china.huawei.com (10.206.15.216) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Thu, 10 Mar 2022 14:55:49 +0100
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- lhreml717-chm.china.huawei.com (10.201.108.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Thu, 10 Mar 2022 13:55:48 +0000
-Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
- lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
- 15.01.2308.021; Thu, 10 Mar 2022 13:55:48 +0000
-From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To:     Alex Williamson <alex.williamson@redhat.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        "helgaas@kernel.org" <helgaas@kernel.org>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "jgg@nvidia.com" <jgg@nvidia.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
-        "yishaih@nvidia.com" <yishaih@nvidia.com>,
-        Linuxarm <linuxarm@huawei.com>,
-        liulongfang <liulongfang@huawei.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        "Jonathan Cameron" <jonathan.cameron@huawei.com>,
-        "Wangzhou (B)" <wangzhou1@hisilicon.com>
-Subject: RE: [PATCH v8 3/9] hisi_acc_qm: Move VF PCI device IDs to common
- header
-Thread-Topic: [PATCH v8 3/9] hisi_acc_qm: Move VF PCI device IDs to common
- header
-Thread-Index: AQHYL1K65T0xdQtNbkGb+oampkIrK6y0Oe0AgARyolA=
-Date:   Thu, 10 Mar 2022 13:55:48 +0000
-Message-ID: <ec2b1e7168714144afcd4bfe5cd39058@huawei.com>
-References: <20220303230131.2103-1-shameerali.kolothum.thodi@huawei.com>
-        <20220303230131.2103-4-shameerali.kolothum.thodi@huawei.com>
- <20220307105344.171b4621.alex.williamson@redhat.com>
-In-Reply-To: <20220307105344.171b4621.alex.williamson@redhat.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.47.85.233]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
+        with ESMTP id S234624AbiCJOKh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Mar 2022 09:10:37 -0500
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BD6457499;
+        Thu, 10 Mar 2022 06:09:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1646921376; x=1678457376;
+  h=from:to:cc:subject:date:message-id;
+  bh=qOgHsb0TerXs6BotdtqnRubNe5gkoi8JAE7y4owcZNM=;
+  b=VZlo9WvZcFU4DH2iqp1IjB67PABnlJsF9QhgcCF6EcBm3VDewb1X0B0+
+   W8WI3OVfW/mhp7Wg5eD2/hbKcuzjTtQPJtC789aDwv8GdPElk+sMGUsZS
+   vURPkq1sobN1O6AWYxOvpC+9gS2zL4h0I/K1GskaALPljzgLjEciH8QNO
+   44yp4iUSaYRzC3lARrk6qo26GOqKoiBe+LrIH/4oQl1otVB5PMCMHDa2m
+   2+dOC/INdY3M4GD8XyqY8a8vM3oXKg1UHPlMoeF2qO9UmGeYf54TjCGg9
+   6t6jUGArYu78iuBvyF9OPbpe592icTlZp4R+JvY5L/Sa2+qLertW6jvsI
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10281"; a="242702393"
+X-IronPort-AV: E=Sophos;i="5.90,170,1643702400"; 
+   d="scan'208";a="242702393"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2022 06:09:36 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.90,170,1643702400"; 
+   d="scan'208";a="554654744"
+Received: from chaop.bj.intel.com ([10.240.192.101])
+  by orsmga008.jf.intel.com with ESMTP; 10 Mar 2022 06:09:27 -0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-api@vger.kernel.org, qemu-devel@nongnu.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com
+Subject: [PATCH v5 00/13] KVM: mm: fd-based approach for supporting KVM guest private memory 
+Date:   Thu, 10 Mar 2022 22:08:58 +0800
+Message-Id: <20220310140911.50924-1-chao.p.peng@linux.intel.com>
+X-Mailer: git-send-email 2.17.1
+X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,245 +78,168 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Bjorn,
+This is the v5 of this series which tries to implement the fd-based KVM
+guest private memory. The patches are based on latest kvm/queue branch
+commit:
 
-> -----Original Message-----
-> From: Alex Williamson [mailto:alex.williamson@redhat.com]
-> Sent: 07 March 2022 17:54
-> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
-> Bjorn Helgaas <bhelgaas@google.com>
-> Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
-> linux-crypto@vger.kernel.org; linux-pci@vger.kernel.org; jgg@nvidia.com;
-> cohuck@redhat.com; mgurtovoy@nvidia.com; yishaih@nvidia.com; Linuxarm
-> <linuxarm@huawei.com>; liulongfang <liulongfang@huawei.com>; Zengtao (B)
-> <prime.zeng@hisilicon.com>; Jonathan Cameron
-> <jonathan.cameron@huawei.com>; Wangzhou (B) <wangzhou1@hisilicon.com>
-> Subject: Re: [PATCH v8 3/9] hisi_acc_qm: Move VF PCI device IDs to common
-> header
-> 
-> Hi Bjorn,
-> 
-> Here's the respin of this patch that adds only the VF device IDs to
-> pci_ids.h.  The next patch in the series[1] adds a consumer of these
-> IDs as a vfio-pci vendor driver.  Thanks,
+  d5089416b7fb KVM: x86: Introduce KVM_CAP_DISABLE_QUIRKS2
+ 
+Introduction
+------------
+In general this patch series introduce fd-based memslot which provides
+guest memory through memory file descriptor fd[offset,size] instead of
+hva/size. The fd can be created from a supported memory filesystem
+like tmpfs/hugetlbfs etc. which we refer as memory backing store. KVM
+and the the memory backing store exchange callbacks when such memslot
+gets created. At runtime KVM will call into callbacks provided by the
+backing store to get the pfn with the fd+offset. Memory backing store
+will also call into KVM callbacks when userspace fallocate/punch hole
+on the fd to notify KVM to map/unmap secondary MMU page tables.
 
-Just a gentle ping on this. Also the latest respin is now at v9 and can be
-found here.
+Comparing to existing hva-based memslot, this new type of memslot allows
+guest memory unmapped from host userspace like QEMU and even the kernel
+itself, therefore reduce attack surface and prevent bugs.
 
-https://lore.kernel.org/kvm/20220308184902.2242-4-shameerali.kolothum.thodi@huawei.com/
+Based on this fd-based memslot, we can build guest private memory that
+is going to be used in confidential computing environments such as Intel
+TDX and AMD SEV. When supported, the memory backing store can provide
+more enforcement on the fd and KVM can use a single memslot to hold both
+the private and shared part of the guest memory. 
 
-Thanks,
-Shameer
+mm extension
+---------------------
+Introduces new MFD_INACCESSIBLE flag for memfd_create(), the file created
+with these flags cannot read(), write() or mmap() etc via normal
+MMU operations. The file content can only be used with the newly
+introduced memfile_notifier extension.
 
-> Alex
-> 
-> [1]https://lore.kernel.org/all/20220303230131.2103-5-shameerali.kolothum.t
-> hodi@huawei.com/
-> 
-> On Thu, 3 Mar 2022 23:01:25 +0000
-> Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
-> 
-> > Move the PCI Device IDs of HiSilicon ACC VF devices to a common header
-> > and also use a uniform naming convention.
-> >
-> > This will be useful when we introduce the vfio PCI HiSilicon ACC live
-> > migration driver in subsequent patches.
-> >
-> > Signed-off-by: Shameer Kolothum
-> <shameerali.kolothum.thodi@huawei.com>
-> > ---
-> >  drivers/crypto/hisilicon/hpre/hpre_main.c | 13 ++++++-------
-> >  drivers/crypto/hisilicon/sec2/sec_main.c  | 15 +++++++--------
-> >  drivers/crypto/hisilicon/zip/zip_main.c   | 11 +++++------
-> >  include/linux/pci_ids.h                   |  3 +++
-> >  4 files changed, 21 insertions(+), 21 deletions(-)
-> >
-> > diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c
-> b/drivers/crypto/hisilicon/hpre/hpre_main.c
-> > index ebfab3e14499..3589d8879b5e 100644
-> > --- a/drivers/crypto/hisilicon/hpre/hpre_main.c
-> > +++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
-> > @@ -68,8 +68,7 @@
-> >  #define HPRE_REG_RD_INTVRL_US		10
-> >  #define HPRE_REG_RD_TMOUT_US		1000
-> >  #define HPRE_DBGFS_VAL_MAX_LEN		20
-> > -#define HPRE_PCI_DEVICE_ID		0xa258
-> > -#define HPRE_PCI_VF_DEVICE_ID		0xa259
-> > +#define PCI_DEVICE_ID_HUAWEI_HPRE_PF	0xa258
-> >  #define HPRE_QM_USR_CFG_MASK		GENMASK(31, 1)
-> >  #define HPRE_QM_AXI_CFG_MASK		GENMASK(15, 0)
-> >  #define HPRE_QM_VFG_AX_MASK		GENMASK(7, 0)
-> > @@ -111,8 +110,8 @@
-> >  static const char hpre_name[] = "hisi_hpre";
-> >  static struct dentry *hpre_debugfs_root;
-> >  static const struct pci_device_id hpre_dev_ids[] = {
-> > -	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, HPRE_PCI_DEVICE_ID) },
-> > -	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, HPRE_PCI_VF_DEVICE_ID) },
-> > +	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI,
-> PCI_DEVICE_ID_HUAWEI_HPRE_PF) },
-> > +	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI,
-> PCI_DEVICE_ID_HUAWEI_HPRE_VF) },
-> >  	{ 0, }
-> >  };
-> >
-> > @@ -242,7 +241,7 @@ MODULE_PARM_DESC(uacce_mode,
-> UACCE_MODE_DESC);
-> >
-> >  static int pf_q_num_set(const char *val, const struct kernel_param *kp)
-> >  {
-> > -	return q_num_set(val, kp, HPRE_PCI_DEVICE_ID);
-> > +	return q_num_set(val, kp, PCI_DEVICE_ID_HUAWEI_HPRE_PF);
-> >  }
-> >
-> >  static const struct kernel_param_ops hpre_pf_q_num_ops = {
-> > @@ -921,7 +920,7 @@ static int hpre_debugfs_init(struct hisi_qm *qm)
-> >  	qm->debug.sqe_mask_len = HPRE_SQE_MASK_LEN;
-> >  	hisi_qm_debug_init(qm);
-> >
-> > -	if (qm->pdev->device == HPRE_PCI_DEVICE_ID) {
-> > +	if (qm->pdev->device == PCI_DEVICE_ID_HUAWEI_HPRE_PF) {
-> >  		ret = hpre_ctrl_debug_init(qm);
-> >  		if (ret)
-> >  			goto failed_to_create;
-> > @@ -958,7 +957,7 @@ static int hpre_qm_init(struct hisi_qm *qm, struct
-> pci_dev *pdev)
-> >  	qm->sqe_size = HPRE_SQE_SIZE;
-> >  	qm->dev_name = hpre_name;
-> >
-> > -	qm->fun_type = (pdev->device == HPRE_PCI_DEVICE_ID) ?
-> > +	qm->fun_type = (pdev->device == PCI_DEVICE_ID_HUAWEI_HPRE_PF) ?
-> >  			QM_HW_PF : QM_HW_VF;
-> >  	if (qm->fun_type == QM_HW_PF) {
-> >  		qm->qp_base = HPRE_PF_DEF_Q_BASE;
-> > diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c
-> b/drivers/crypto/hisilicon/sec2/sec_main.c
-> > index 26d3ab1d308b..311a8747b5bf 100644
-> > --- a/drivers/crypto/hisilicon/sec2/sec_main.c
-> > +++ b/drivers/crypto/hisilicon/sec2/sec_main.c
-> > @@ -20,8 +20,7 @@
-> >
-> >  #define SEC_VF_NUM			63
-> >  #define SEC_QUEUE_NUM_V1		4096
-> > -#define SEC_PF_PCI_DEVICE_ID		0xa255
-> > -#define SEC_VF_PCI_DEVICE_ID		0xa256
-> > +#define PCI_DEVICE_ID_HUAWEI_SEC_PF	0xa255
-> >
-> >  #define SEC_BD_ERR_CHK_EN0		0xEFFFFFFF
-> >  #define SEC_BD_ERR_CHK_EN1		0x7ffff7fd
-> > @@ -225,7 +224,7 @@ static const struct debugfs_reg32 sec_dfx_regs[] = {
-> >
-> >  static int sec_pf_q_num_set(const char *val, const struct kernel_param
-> *kp)
-> >  {
-> > -	return q_num_set(val, kp, SEC_PF_PCI_DEVICE_ID);
-> > +	return q_num_set(val, kp, PCI_DEVICE_ID_HUAWEI_SEC_PF);
-> >  }
-> >
-> >  static const struct kernel_param_ops sec_pf_q_num_ops = {
-> > @@ -313,8 +312,8 @@ module_param_cb(uacce_mode,
-> &sec_uacce_mode_ops, &uacce_mode, 0444);
-> >  MODULE_PARM_DESC(uacce_mode, UACCE_MODE_DESC);
-> >
-> >  static const struct pci_device_id sec_dev_ids[] = {
-> > -	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, SEC_PF_PCI_DEVICE_ID) },
-> > -	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, SEC_VF_PCI_DEVICE_ID) },
-> > +	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI,
-> PCI_DEVICE_ID_HUAWEI_SEC_PF) },
-> > +	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI,
-> PCI_DEVICE_ID_HUAWEI_SEC_VF) },
-> >  	{ 0, }
-> >  };
-> >  MODULE_DEVICE_TABLE(pci, sec_dev_ids);
-> > @@ -717,7 +716,7 @@ static int sec_core_debug_init(struct hisi_qm *qm)
-> >  	regset->base = qm->io_base;
-> >  	regset->dev = dev;
-> >
-> > -	if (qm->pdev->device == SEC_PF_PCI_DEVICE_ID)
-> > +	if (qm->pdev->device == PCI_DEVICE_ID_HUAWEI_SEC_PF)
-> >  		debugfs_create_file("regs", 0444, tmp_d, regset, &sec_regs_fops);
-> >
-> >  	for (i = 0; i < ARRAY_SIZE(sec_dfx_labels); i++) {
-> > @@ -735,7 +734,7 @@ static int sec_debug_init(struct hisi_qm *qm)
-> >  	struct sec_dev *sec = container_of(qm, struct sec_dev, qm);
-> >  	int i;
-> >
-> > -	if (qm->pdev->device == SEC_PF_PCI_DEVICE_ID) {
-> > +	if (qm->pdev->device == PCI_DEVICE_ID_HUAWEI_SEC_PF) {
-> >  		for (i = SEC_CLEAR_ENABLE; i < SEC_DEBUG_FILE_NUM; i++) {
-> >  			spin_lock_init(&sec->debug.files[i].lock);
-> >  			sec->debug.files[i].index = i;
-> > @@ -877,7 +876,7 @@ static int sec_qm_init(struct hisi_qm *qm, struct
-> pci_dev *pdev)
-> >  	qm->sqe_size = SEC_SQE_SIZE;
-> >  	qm->dev_name = sec_name;
-> >
-> > -	qm->fun_type = (pdev->device == SEC_PF_PCI_DEVICE_ID) ?
-> > +	qm->fun_type = (pdev->device == PCI_DEVICE_ID_HUAWEI_SEC_PF) ?
-> >  			QM_HW_PF : QM_HW_VF;
-> >  	if (qm->fun_type == QM_HW_PF) {
-> >  		qm->qp_base = SEC_PF_DEF_Q_BASE;
-> > diff --git a/drivers/crypto/hisilicon/zip/zip_main.c
-> b/drivers/crypto/hisilicon/zip/zip_main.c
-> > index 678f8b58ec42..66decfe07282 100644
-> > --- a/drivers/crypto/hisilicon/zip/zip_main.c
-> > +++ b/drivers/crypto/hisilicon/zip/zip_main.c
-> > @@ -15,8 +15,7 @@
-> >  #include <linux/uacce.h>
-> >  #include "zip.h"
-> >
-> > -#define PCI_DEVICE_ID_ZIP_PF		0xa250
-> > -#define PCI_DEVICE_ID_ZIP_VF		0xa251
-> > +#define PCI_DEVICE_ID_HUAWEI_ZIP_PF	0xa250
-> >
-> >  #define HZIP_QUEUE_NUM_V1		4096
-> >
-> > @@ -246,7 +245,7 @@ MODULE_PARM_DESC(uacce_mode,
-> UACCE_MODE_DESC);
-> >
-> >  static int pf_q_num_set(const char *val, const struct kernel_param *kp)
-> >  {
-> > -	return q_num_set(val, kp, PCI_DEVICE_ID_ZIP_PF);
-> > +	return q_num_set(val, kp, PCI_DEVICE_ID_HUAWEI_ZIP_PF);
-> >  }
-> >
-> >  static const struct kernel_param_ops pf_q_num_ops = {
-> > @@ -268,8 +267,8 @@ module_param_cb(vfs_num, &vfs_num_ops,
-> &vfs_num, 0444);
-> >  MODULE_PARM_DESC(vfs_num, "Number of VFs to enable(1-63),
-> 0(default)");
-> >
-> >  static const struct pci_device_id hisi_zip_dev_ids[] = {
-> > -	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_ZIP_PF) },
-> > -	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_ZIP_VF) },
-> > +	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI,
-> PCI_DEVICE_ID_HUAWEI_ZIP_PF) },
-> > +	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI,
-> PCI_DEVICE_ID_HUAWEI_ZIP_VF) },
-> >  	{ 0, }
-> >  };
-> >  MODULE_DEVICE_TABLE(pci, hisi_zip_dev_ids);
-> > @@ -838,7 +837,7 @@ static int hisi_zip_qm_init(struct hisi_qm *qm, struct
-> pci_dev *pdev)
-> >  	qm->sqe_size = HZIP_SQE_SIZE;
-> >  	qm->dev_name = hisi_zip_name;
-> >
-> > -	qm->fun_type = (pdev->device == PCI_DEVICE_ID_ZIP_PF) ?
-> > +	qm->fun_type = (pdev->device == PCI_DEVICE_ID_HUAWEI_ZIP_PF) ?
-> >  			QM_HW_PF : QM_HW_VF;
-> >  	if (qm->fun_type == QM_HW_PF) {
-> >  		qm->qp_base = HZIP_PF_DEF_Q_BASE;
-> > diff --git a/include/linux/pci_ids.h b/include/linux/pci_ids.h
-> > index aad54c666407..31dee2b65a62 100644
-> > --- a/include/linux/pci_ids.h
-> > +++ b/include/linux/pci_ids.h
-> > @@ -2529,6 +2529,9 @@
-> >  #define PCI_DEVICE_ID_KORENIX_JETCARDF3	0x17ff
-> >
-> >  #define PCI_VENDOR_ID_HUAWEI		0x19e5
-> > +#define PCI_DEVICE_ID_HUAWEI_ZIP_VF	0xa251
-> > +#define PCI_DEVICE_ID_HUAWEI_SEC_VF	0xa256
-> > +#define PCI_DEVICE_ID_HUAWEI_HPRE_VF	0xa259
-> >
-> >  #define PCI_VENDOR_ID_NETRONOME		0x19ee
-> >  #define PCI_DEVICE_ID_NETRONOME_NFP4000	0x4000
+The memfile_notifier extension provides two sets of callbacks for KVM to
+interact with the memory backing store:
+  - memfile_notifier_ops: callbacks for memory backing store to notify
+    KVM when memory gets allocated/invalidated.
+  - memfile_pfn_ops: callbacks for KVM to call into memory backing store
+    to request memory pages for guest private memory.
+
+The memfile_notifier extension also provides APIs for memory backing
+store to register/unregister itself and to trigger the notifier when the
+bookmarked memory gets fallocated/invalidated.
+
+memslot extension
+-----------------
+Add the private fd and the fd offset to existing 'shared' memslot so that
+both private/shared guest memory can live in one single memslot. A page in
+the memslot is either private or shared. A page is private only when it's
+already allocated in the backing store fd, all the other cases it's treated
+as shared, this includes those already mapped as shared as well as those
+having not been mapped. This means the memory backing store is the place
+which tells the truth of which page is private.
+
+Private memory map/unmap and conversion
+---------------------------------------
+Userspace's map/unmap operations are done by fallocate() ioctl on the
+backing store fd.
+  - map: default fallocate() with mode=0.
+  - unmap: fallocate() with FALLOC_FL_PUNCH_HOLE.
+The map/unmap will trigger above memfile_notifier_ops to let KVM map/unmap
+secondary MMU page tables.
+
+Test
+----
+To test the new functionalities of this patch TDX patchset is needed.
+Since TDX patchset has not been merged so I did two kinds of test:
+
+-  Regresion test on kvm/queue (this patch)
+   Most new code are not covered. I only tested building and booting.
+
+-  New Funational test on latest TDX code
+   The patch is rebased to latest TDX code and tested the new
+   funcationalities.
+
+For TDX test please see below repos:
+Linux: https://github.com/chao-p/linux/tree/privmem-v5.1
+QEMU: https://github.com/chao-p/qemu/tree/privmem-v4
+
+And an example QEMU command line:
+-object tdx-guest,id=tdx \
+-object memory-backend-memfd-private,id=ram1,size=2G \
+-machine q35,kvm-type=tdx,pic=no,kernel_irqchip=split,memory-encryption=tdx,memory-backend=ram1
+
+Changelog
+----------
+v5:
+  - Removed userspace visible F_SEAL_INACCESSIBLE, instead using an
+    in-kernel flag (SHM_F_INACCESSIBLE for shmem). Private fd can only
+    be created by MFD_INACCESSIBLE.
+  - Introduced new APIs for backing store to register itself to
+    memfile_notifier instead of direct function call.
+  - Added the accounting and restriction for MFD_INACCESSIBLE memory.
+  - Added KVM API doc for new memslot extensions and man page for the new
+    MFD_INACCESSIBLE flag.
+  - Removed the overlap check for mapping the same file+offset into
+    multiple gfns due to perf consideration, warned in document.
+  - Addressed other comments in v4.
+v4:
+  - Decoupled the callbacks between KVM/mm from memfd and use new
+    name 'memfile_notifier'.
+  - Supported register multiple memslots to the same backing store.
+  - Added per-memslot pfn_ops instead of per-system.
+  - Reworked the invalidation part.
+  - Improved new KVM uAPIs (private memslot extension and memory
+    error) per Sean's suggestions.
+  - Addressed many other minor fixes for comments from v3.
+v3:
+  - Added locking protection when calling
+    invalidate_page_range/fallocate callbacks.
+  - Changed memslot structure to keep use useraddr for shared memory.
+  - Re-organized F_SEAL_INACCESSIBLE and MEMFD_OPS.
+  - Added MFD_INACCESSIBLE flag to force F_SEAL_INACCESSIBLE.
+  - Commit message improvement.
+  - Many small fixes for comments from the last version.
+
+Links to previous discussions
+-----------------------------
+[1] Original design proposal:
+https://lkml.kernel.org/kvm/20210824005248.200037-1-seanjc@google.com/
+[2] Updated proposal and RFC patch v1:
+https://lkml.kernel.org/linux-fsdevel/20211111141352.26311-1-chao.p.peng@linux.intel.com/
+[3] Patch v4: https://lkml.org/lkml/2022/1/18/395
+
+Chao Peng (10):
+  mm: Introduce memfile_notifier
+  mm/shmem: Restrict MFD_INACCESSIBLE memory against RLIMIT_MEMLOCK
+  KVM: Extend the memslot to support fd-based private memory
+  KVM: Use kvm_userspace_memory_region_ext
+  KVM: Add KVM_EXIT_MEMORY_ERROR exit
+  KVM: Use memfile_pfn_ops to obtain pfn for private pages
+  KVM: Handle page fault for private memory
+  KVM: Register private memslot to memory backing store
+  KVM: Zap existing KVM mappings when pages changed in the private fd
+  KVM: Expose KVM_MEM_PRIVATE
+
+Kirill A. Shutemov (2):
+  mm/memfd: Introduce MFD_INACCESSIBLE flag
+  mm/shmem: Support memfile_notifier
+
+ Documentation/virt/kvm/api.rst   |  59 +++++++++--
+ arch/x86/kvm/Kconfig             |   1 +
+ arch/x86/kvm/mmu/mmu.c           |  73 +++++++++++++-
+ arch/x86/kvm/mmu/paging_tmpl.h   |  11 ++-
+ arch/x86/kvm/x86.c               |  12 +--
+ include/linux/kvm_host.h         |  49 ++++++++-
+ include/linux/memfile_notifier.h |  64 ++++++++++++
+ include/linux/shmem_fs.h         |  11 +++
+ include/uapi/linux/kvm.h         |  17 ++++
+ include/uapi/linux/memfd.h       |   1 +
+ mm/Kconfig                       |   4 +
+ mm/Makefile                      |   1 +
+ mm/memfd.c                       |  26 ++++-
+ mm/memfile_notifier.c            | 114 +++++++++++++++++++++
+ mm/shmem.c                       | 156 +++++++++++++++++++++++++++++
+ virt/kvm/kvm_main.c              | 165 +++++++++++++++++++++++++++----
+ 16 files changed, 717 insertions(+), 47 deletions(-)
+ create mode 100644 include/linux/memfile_notifier.h
+ create mode 100644 mm/memfile_notifier.c
+
+-- 
+2.17.1
 
