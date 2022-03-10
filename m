@@ -2,103 +2,258 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B630C4D46BE
-	for <lists+kvm@lfdr.de>; Thu, 10 Mar 2022 13:22:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 538C54D470F
+	for <lists+kvm@lfdr.de>; Thu, 10 Mar 2022 13:35:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241963AbiCJMXT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Mar 2022 07:23:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55778 "EHLO
+        id S242008AbiCJMgy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Mar 2022 07:36:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50728 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237763AbiCJMXS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Mar 2022 07:23:18 -0500
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2415E148645
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 04:22:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1646914938; x=1678450938;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=IJjHA8jBLDxHPajmWm+quBmfQOVfT6c5MhN0RjRDbR8=;
-  b=h4biP0VMvLBFFOzfGgOY9c1uEoeMNiawGkq/YY12MGOx/dlPK2w7B/b2
-   VseWB26ysfMv+eFMnJjDPOJl9bvB5AfV6XKqMbs6Qt2syhcgvLYjsYIgE
-   zEgQAfjs6SGyX0IIck8/d3CEc/bphiWFzRGQNfuBHTwSTdsUeEqyZPbAW
-   9JSmAZnhKVFR4pdklRCn+SdVV0J5wjeF9VDoAduXrcVVFgZl5yjBPJh1K
-   E2+lSf80H0rhkXI7YDw1tP+ctRyBUwvTDbjpb8kp4ccLxnlOydVWgIiRm
-   g3G8OWViAeqqfhz+rn/1VzsF+xpoGegYBLu2601VR40r7HSq58ngZrLQF
-   g==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10281"; a="252803868"
-X-IronPort-AV: E=Sophos;i="5.90,170,1643702400"; 
-   d="scan'208";a="252803868"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2022 04:22:17 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.90,170,1643702400"; 
-   d="scan'208";a="496236550"
-Received: from lxy-dell.sh.intel.com ([10.239.159.55])
-  by orsmga003.jf.intel.com with ESMTP; 10 Mar 2022 04:22:15 -0800
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, mtosatti@redhat.com,
-        richard.henderson@linaro.org
-Cc:     kvm@vger.kernel.org, qemu-devel@nongnu.org, xiaoyao.li@intel.com
-Subject: [PATCH RESEND v1] trace: Split address space and slot id in trace_kvm_set_user_memory()
-Date:   Thu, 10 Mar 2022 20:22:15 +0800
-Message-Id: <20220310122215.804233-1-xiaoyao.li@intel.com>
-X-Mailer: git-send-email 2.27.0
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-5.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
-        HK_RANDOM_FROM,RCVD_IN_DNSWL_HI,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+        with ESMTP id S235301AbiCJMgy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Mar 2022 07:36:54 -0500
+Received: from out30-54.freemail.mail.aliyun.com (out30-54.freemail.mail.aliyun.com [115.124.30.54])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28B6213D932;
+        Thu, 10 Mar 2022 04:35:47 -0800 (PST)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R661e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04426;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=33;SR=0;TI=SMTPD_---0V6oh3qv_1646915740;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0V6oh3qv_1646915740)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Thu, 10 Mar 2022 20:35:41 +0800
+Message-ID: <1646915610.3936472-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH v7 09/26] virtio_ring: split: implement virtqueue_reset_vring_split()
+Date:   Thu, 10 Mar 2022 20:33:30 +0800
+From:   Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        Jeff Dike <jdike@addtoit.com>,
+        Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Mark Gross <markgross@kernel.org>,
+        Vadim Pasternak <vadimp@nvidia.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Johannes Berg <johannes.berg@intel.com>,
+        Vincent Whitchurch <vincent.whitchurch@axis.com>,
+        linux-um@lists.infradead.org, platform-driver-x86@vger.kernel.org,
+        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, bpf@vger.kernel.org
+References: <20220308123518.33800-1-xuanzhuo@linux.alibaba.com>
+ <20220308123518.33800-10-xuanzhuo@linux.alibaba.com>
+ <20220310015418-mutt-send-email-mst@kernel.org>
+ <1646896623.3794115-2-xuanzhuo@linux.alibaba.com>
+ <20220310025930-mutt-send-email-mst@kernel.org>
+ <1646900056.7775025-1-xuanzhuo@linux.alibaba.com>
+ <20220310071335-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20220310071335-mutt-send-email-mst@kernel.org>
+X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The upper 16 bits of kvm_userspace_memory_region::slot are
-address space id. Parse it separately in trace_kvm_set_user_memory().
+On Thu, 10 Mar 2022 07:17:09 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> On Thu, Mar 10, 2022 at 04:14:16PM +0800, Xuan Zhuo wrote:
+> > On Thu, 10 Mar 2022 03:07:22 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > > On Thu, Mar 10, 2022 at 03:17:03PM +0800, Xuan Zhuo wrote:
+> > > > On Thu, 10 Mar 2022 02:00:39 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > > > > On Tue, Mar 08, 2022 at 08:35:01PM +0800, Xuan Zhuo wrote:
+> > > > > > virtio ring supports reset.
+> > > > > >
+> > > > > > Queue reset is divided into several stages.
+> > > > > >
+> > > > > > 1. notify device queue reset
+> > > > > > 2. vring release
+> > > > > > 3. attach new vring
+> > > > > > 4. notify device queue re-enable
+> > > > > >
+> > > > > > After the first step is completed, the vring reset operation can be
+> > > > > > performed. If the newly set vring num does not change, then just reset
+> > > > > > the vq related value.
+> > > > > >
+> > > > > > Otherwise, the vring will be released and the vring will be reallocated.
+> > > > > > And the vring will be attached to the vq. If this process fails, the
+> > > > > > function will exit, and the state of the vq will be the vring release
+> > > > > > state. You can call this function again to reallocate the vring.
+> > > > > >
+> > > > > > In addition, vring_align, may_reduce_num are necessary for reallocating
+> > > > > > vring, so they are retained when creating vq.
+> > > > > >
+> > > > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > > > > > ---
+> > > > > >  drivers/virtio/virtio_ring.c | 69 ++++++++++++++++++++++++++++++++++++
+> > > > > >  1 file changed, 69 insertions(+)
+> > > > > >
+> > > > > > diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
+> > > > > > index e0422c04c903..148fb1fd3d5a 100644
+> > > > > > --- a/drivers/virtio/virtio_ring.c
+> > > > > > +++ b/drivers/virtio/virtio_ring.c
+> > > > > > @@ -158,6 +158,12 @@ struct vring_virtqueue {
+> > > > > >  			/* DMA address and size information */
+> > > > > >  			dma_addr_t queue_dma_addr;
+> > > > > >  			size_t queue_size_in_bytes;
+> > > > > > +
+> > > > > > +			/* The parameters for creating vrings are reserved for
+> > > > > > +			 * creating new vrings when enabling reset queue.
+> > > > > > +			 */
+> > > > > > +			u32 vring_align;
+> > > > > > +			bool may_reduce_num;
+> > > > > >  		} split;
+> > > > > >
+> > > > > >  		/* Available for packed ring */
+> > > > > > @@ -217,6 +223,12 @@ struct vring_virtqueue {
+> > > > > >  #endif
+> > > > > >  };
+> > > > > >
+> > > > > > +static void vring_free(struct virtqueue *vq);
+> > > > > > +static void __vring_virtqueue_init_split(struct vring_virtqueue *vq,
+> > > > > > +					 struct virtio_device *vdev);
+> > > > > > +static int __vring_virtqueue_attach_split(struct vring_virtqueue *vq,
+> > > > > > +					  struct virtio_device *vdev,
+> > > > > > +					  struct vring vring);
+> > > > > >
+> > > > > >  /*
+> > > > > >   * Helpers.
+> > > > > > @@ -1012,6 +1024,8 @@ static struct virtqueue *vring_create_virtqueue_split(
+> > > > > >  		return NULL;
+> > > > > >  	}
+> > > > > >
+> > > > > > +	to_vvq(vq)->split.vring_align = vring_align;
+> > > > > > +	to_vvq(vq)->split.may_reduce_num = may_reduce_num;
+> > > > > >  	to_vvq(vq)->split.queue_dma_addr = vring.dma_addr;
+> > > > > >  	to_vvq(vq)->split.queue_size_in_bytes = vring.queue_size_in_bytes;
+> > > > > >  	to_vvq(vq)->we_own_ring = true;
+> > > > > > @@ -1019,6 +1033,59 @@ static struct virtqueue *vring_create_virtqueue_split(
+> > > > > >  	return vq;
+> > > > > >  }
+> > > > > >
+> > > > > > +static int virtqueue_reset_vring_split(struct virtqueue *_vq, u32 num)
+> > > > > > +{
+> > > > > > +	struct vring_virtqueue *vq = to_vvq(_vq);
+> > > > > > +	struct virtio_device *vdev = _vq->vdev;
+> > > > > > +	struct vring_split vring;
+> > > > > > +	int err;
+> > > > > > +
+> > > > > > +	if (num > _vq->num_max)
+> > > > > > +		return -E2BIG;
+> > > > > > +
+> > > > > > +	switch (vq->vq.reset) {
+> > > > > > +	case VIRTIO_VQ_RESET_STEP_NONE:
+> > > > > > +		return -ENOENT;
+> > > > > > +
+> > > > > > +	case VIRTIO_VQ_RESET_STEP_VRING_ATTACH:
+> > > > > > +	case VIRTIO_VQ_RESET_STEP_DEVICE:
+> > > > > > +		if (vq->split.vring.num == num || !num)
+> > > > > > +			break;
+> > > > > > +
+> > > > > > +		vring_free(_vq);
+> > > > > > +
+> > > > > > +		fallthrough;
+> > > > > > +
+> > > > > > +	case VIRTIO_VQ_RESET_STEP_VRING_RELEASE:
+> > > > > > +		if (!num)
+> > > > > > +			num = vq->split.vring.num;
+> > > > > > +
+> > > > > > +		err = vring_create_vring_split(&vring, vdev,
+> > > > > > +					       vq->split.vring_align,
+> > > > > > +					       vq->weak_barriers,
+> > > > > > +					       vq->split.may_reduce_num, num);
+> > > > > > +		if (err)
+> > > > > > +			return -ENOMEM;
+> > > > > > +
+> > > > > > +		err = __vring_virtqueue_attach_split(vq, vdev, vring.vring);
+> > > > > > +		if (err) {
+> > > > > > +			vring_free_queue(vdev, vring.queue_size_in_bytes,
+> > > > > > +					 vring.queue,
+> > > > > > +					 vring.dma_addr);
+> > > > > > +			return -ENOMEM;
+> > > > > > +		}
+> > > > > > +
+> > > > > > +		vq->split.queue_dma_addr = vring.dma_addr;
+> > > > > > +		vq->split.queue_size_in_bytes = vring.queue_size_in_bytes;
+> > > > > > +	}
+> > > > > > +
+> > > > > > +	__vring_virtqueue_init_split(vq, vdev);
+> > > > > > +	vq->we_own_ring = true;
+> > > > > > +	vq->vq.reset = VIRTIO_VQ_RESET_STEP_VRING_ATTACH;
+> > > > > > +
+> > > > > > +	return 0;
+> > > > > > +}
+> > > > > > +
+> > > > >
+> > > > > I kind of dislike this state machine.
+> > > > >
+> > > > > Hacks like special-casing num = 0 to mean "reset" are especially
+> > > > > confusing.
+> > > >
+> > > > I'm removing it. I'll say in the function description that this function is
+> > > > currently only called when vq has been reset. I'm no longer checking it based on
+> > > > state.
+> > > >
+> > > > >
+> > > > > And as Jason points out, when we want a resize then yes this currently
+> > > > > implies reset but that is an implementation detail.
+> > > > >
+> > > > > There should be a way to just make these cases separate functions
+> > > > > and then use them to compose consistent external APIs.
+> > > >
+> > > > Yes, virtqueue_resize_split() is fine for ethtool -G.
+> > > >
+> > > > But in the case of AF_XDP, just execute reset to free the buffer. The name
+> > > > virtqueue_reset_vring_split() I think can cover both cases. Or we use two apis
+> > > > to handle both scenarios?
+> > > >
+> > > > Or can anyone think of a better name. ^_^
+> > > >
+> > > > Thanks.
+> > >
+> > >
+> > > I'd say resize should be called resize and reset should be called reset.
+> >
+> >
+> > OK, I'll change it to resize here.
+> >
+> > But I want to know that when I implement virtio-net to support AF_XDP, its
+> > requirement is to release all submitted buffers. Then should I add a new api
+> > such as virtqueue_reset_vring()?
+>
+> Sounds like a reasonable name.
+>
+> > >
+> > > The big issue is a sane API for resize. Ideally it would resubmit
+> > > buffers which did not get used. Question is what to do
+> > > about buffers which don't fit (if ring has been downsized)?
+> > > Maybe a callback that will handle them?
+> > > And then what? Queue them up and readd later? Drop?
+> > > If we drop we should drop from the head not the tail ...
+> >
+> > It's a good idea, let's implement it later.
+> >
+> > Thanks.
+>
+> Well ... not sure how you are going to support resize
+> if you don't know what to do with buffers that were
+> in the ring.
 
-Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
----
-Resend: 
- - rebase to 2048c4eba2b4 ("Merge remote-tracking branch 'remotes/philmd/tags/pmbus-20220308' into staging")
----
- accel/kvm/kvm-all.c    | 5 +++--
- accel/kvm/trace-events | 2 +-
- 2 files changed, 4 insertions(+), 3 deletions(-)
+The current solution is to call virtqueue_detach_unused_buf() to release buffers
+before resize ring.
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 0e66ebb49717..6b9fd943494b 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -379,8 +379,9 @@ static int kvm_set_user_memory_region(KVMMemoryListener *kml, KVMSlot *slot, boo
-     ret = kvm_vm_ioctl(s, KVM_SET_USER_MEMORY_REGION, &mem);
-     slot->old_flags = mem.flags;
- err:
--    trace_kvm_set_user_memory(mem.slot, mem.flags, mem.guest_phys_addr,
--                              mem.memory_size, mem.userspace_addr, ret);
-+    trace_kvm_set_user_memory(mem.slot >> 16, (uint16_t)mem.slot, mem.flags,
-+                              mem.guest_phys_addr, mem.memory_size,
-+                              mem.userspace_addr, ret);
-     if (ret < 0) {
-         error_report("%s: KVM_SET_USER_MEMORY_REGION failed, slot=%d,"
-                      " start=0x%" PRIx64 ", size=0x%" PRIx64 ": %s",
-diff --git a/accel/kvm/trace-events b/accel/kvm/trace-events
-index 399aaeb0ec75..14ebfa1b991c 100644
---- a/accel/kvm/trace-events
-+++ b/accel/kvm/trace-events
-@@ -15,7 +15,7 @@ kvm_irqchip_update_msi_route(int virq) "Updating MSI route virq=%d"
- kvm_irqchip_release_virq(int virq) "virq %d"
- kvm_set_ioeventfd_mmio(int fd, uint64_t addr, uint32_t val, bool assign, uint32_t size, bool datamatch) "fd: %d @0x%" PRIx64 " val=0x%x assign: %d size: %d match: %d"
- kvm_set_ioeventfd_pio(int fd, uint16_t addr, uint32_t val, bool assign, uint32_t size, bool datamatch) "fd: %d @0x%x val=0x%x assign: %d size: %d match: %d"
--kvm_set_user_memory(uint32_t slot, uint32_t flags, uint64_t guest_phys_addr, uint64_t memory_size, uint64_t userspace_addr, int ret) "Slot#%d flags=0x%x gpa=0x%"PRIx64 " size=0x%"PRIx64 " ua=0x%"PRIx64 " ret=%d"
-+kvm_set_user_memory(uint16_t as, uint16_t slot, uint32_t flags, uint64_t guest_phys_addr, uint64_t memory_size, uint64_t userspace_addr, int ret) "AddrSpace#%d Slot#%d flags=0x%x gpa=0x%"PRIx64 " size=0x%"PRIx64 " ua=0x%"PRIx64 " ret=%d"
- kvm_clear_dirty_log(uint32_t slot, uint64_t start, uint32_t size) "slot#%"PRId32" start 0x%"PRIx64" size 0x%"PRIx32
- kvm_resample_fd_notify(int gsi) "gsi %d"
- kvm_dirty_ring_full(int id) "vcpu %d"
--- 
-2.27.0
+Thanks.
 
