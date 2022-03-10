@@ -2,72 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A25A4D4796
-	for <lists+kvm@lfdr.de>; Thu, 10 Mar 2022 14:02:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 22D534D47A6
+	for <lists+kvm@lfdr.de>; Thu, 10 Mar 2022 14:05:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242255AbiCJNDE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Mar 2022 08:03:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43746 "EHLO
+        id S242270AbiCJNFj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Mar 2022 08:05:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52574 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242244AbiCJNDD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Mar 2022 08:03:03 -0500
+        with ESMTP id S242271AbiCJNFi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Mar 2022 08:05:38 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4EC6F14AC9C
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 05:02:02 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 47A7414ACBA
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 05:04:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646917321;
+        s=mimecast20190719; t=1646917476;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=RWMS1CuuTjg/dxyi6dNPKqfhAnq0QfD6tRtdo/5dGxE=;
-        b=W1g7RahzbNxKakHYRAI8Gb91Ur6sa+U/V15LaW89gJ7d2puQzfYpDwdeEDCuo4P30R7nr8
-        zdbvPWMi+rmdLpE09TBXY43OdvdhEol9TG+/8nSlnbKykLz1W43Yf7UuQoeLhlz7mqMS66
-        u9uxboBBrH+ws/uV36uqSNE5/1QtADk=
+        bh=bdyc38wZ2iH9r3WKn+t93MmqB7rhoqJHCNg2E4+WN7U=;
+        b=SpEFkZV/zuSBLNW8fJmhMLfrDvIjSwHymuv1ZMoL918rp13XovnL7A5lI9zLVaARMwDDnj
+        XkRR7Xo6BCX11czI383MreDHa6TLGpqNouK2l1tP5aovX8BNlZrk6qojnFbtcyQPB2Vtbw
+        VX6B22kxhOVzZ7hUJTHa+f7qpP5LT4M=
 Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
  [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-621-3_QQDdMLOROEthkRVUpXiw-1; Thu, 10 Mar 2022 08:02:00 -0500
-X-MC-Unique: 3_QQDdMLOROEthkRVUpXiw-1
-Received: by mail-wm1-f71.google.com with SMTP id 3-20020a05600c230300b00384e15ceae4so4032562wmo.7
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 05:01:59 -0800 (PST)
+ us-mta-517-fzVWzCIzPwmFsi_Kuey2sw-1; Thu, 10 Mar 2022 08:04:35 -0500
+X-MC-Unique: fzVWzCIzPwmFsi_Kuey2sw-1
+Received: by mail-wm1-f71.google.com with SMTP id 187-20020a1c19c4000000b0037cc0d56524so4058062wmz.2
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 05:04:34 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=RWMS1CuuTjg/dxyi6dNPKqfhAnq0QfD6tRtdo/5dGxE=;
-        b=eeWmethPyHbqiYIyjnF9dLm5LcVcSJbs1sU601rNQnvcLMJ7p26mFZf3rj7sMZsd+e
-         ehB9fxV/+UV7ZnQtrZG8AhLt4/ptioPNN22sIknf4D+qi22/X9xnuUxkVjIxjZ9w1FWh
-         TmEj2PX9JPoQGrIHh4lf0eh3GBmSSGMdh0YQwbucXOSBniHxV3AxBk8Ub8aeoNYXVm8P
-         dEHIPKp9ya/Ldnu65tHjbtBuaESaBGwb8pWjWz/Wqs/YkdVJycCfGEpDk5R2Alj5oeRc
-         X1IqeYQxOZNMfsJLeL4WeoT10KfxBnIPv1v60tbmVfChhm19qPVKQqk1wdw/vmLHZ2Y3
-         ZIEw==
-X-Gm-Message-State: AOAM533MYevjazC+RgurXzyn6onYmKa54jFswKzr6lY648by3YfH43bI
-        ncXj4UKoZkrGjusckOtHva+vXvCl0ON1asDERBOC/7dzVLQdiN8MTMnEkb8+xj2kbGNeGwTzLeP
-        lPMIFYa2zFCTP
-X-Received: by 2002:a5d:6d41:0:b0:1ef:f32c:18ee with SMTP id k1-20020a5d6d41000000b001eff32c18eemr3489863wri.532.1646917318874;
-        Thu, 10 Mar 2022 05:01:58 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzG8zUynya3aZ1k62/HZYUuzx+jvS8PFleAyItoEwxyNae7kQtcQuOPFd+KwfonhP3HTCC0Bw==
-X-Received: by 2002:a5d:6d41:0:b0:1ef:f32c:18ee with SMTP id k1-20020a5d6d41000000b001eff32c18eemr3489798wri.532.1646917317914;
-        Thu, 10 Mar 2022 05:01:57 -0800 (PST)
+        bh=bdyc38wZ2iH9r3WKn+t93MmqB7rhoqJHCNg2E4+WN7U=;
+        b=vmOo/jeMdFFr+HvTUBXD3gWQyE7oF362O+LJchYUYbkgITERSqkNiw4rI0DyHMSLfC
+         q76oOqp5l1H5vhB0R1zevH1oTnOwo4afRiqkKKPbvUZ7dtbWvpp7yZqPT3rZ6XH4k3F9
+         89TosOxHIi9TIA5BcuB1snoPnIQqgcZ7YV7/kDBXmijDb9dZq2gw4io9g2nNbE6WSqjU
+         Hx5k8nAAzI72EMAzOXUTknfhIctbkYCrpNsY3eyCG7ZRu8xRZ7/2NE+XDFYWRDEX7ecg
+         38gpyw232nb2R+QMbOH81OMHmWIuc9kLLVo3kxNnyWGYdV4QWkg95mPHxP4IItPXJblj
+         uhCw==
+X-Gm-Message-State: AOAM532UD4GRq7I8xIm5D9tszhDXFG4zOeZy/zdoSn0e9LseWAwKBl+6
+        aKbHYPepjAO3m55W7LqhiULqhJyZB3x1ARc7gjng/4lLK4B295JbVDG/gpAmk5uOJTxi/Ro2Xhg
+        vLbNo7bgFBaOX
+X-Received: by 2002:adf:de8b:0:b0:203:7a51:9cd2 with SMTP id w11-20020adfde8b000000b002037a519cd2mr3317896wrl.596.1646917473921;
+        Thu, 10 Mar 2022 05:04:33 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwFfnvrAlCV1H1HX6YvfASjcXGHtL+mw46jnJLY1T+Nd4lSI9nkDqnoZvkqahCBW9kDpy9wvg==
+X-Received: by 2002:adf:de8b:0:b0:203:7a51:9cd2 with SMTP id w11-20020adfde8b000000b002037a519cd2mr3317878wrl.596.1646917473640;
+        Thu, 10 Mar 2022 05:04:33 -0800 (PST)
 Received: from redhat.com ([2.53.27.107])
-        by smtp.gmail.com with ESMTPSA id r186-20020a1c2bc3000000b0037bdd94a4e5sm4477363wmr.39.2022.03.10.05.01.55
+        by smtp.gmail.com with ESMTPSA id u10-20020adfa18a000000b001f04c24afe7sm4182953wru.41.2022.03.10.05.04.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Mar 2022 05:01:57 -0800 (PST)
-Date:   Thu, 10 Mar 2022 08:01:53 -0500
+        Thu, 10 Mar 2022 05:04:32 -0800 (PST)
+Date:   Thu, 10 Mar 2022 08:04:27 -0500
 From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jiyong Park <jiyong@google.com>
-Cc:     sgarzare@redhat.com, stefanha@redhat.com, jasowang@redhat.com,
-        davem@davemloft.net, kuba@kernel.org, adelva@google.com,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] vsock: each transport cycles only on its own sockets
-Message-ID: <20220310075933-mutt-send-email-mst@kernel.org>
-References: <20220310125425.4193879-1-jiyong@google.com>
- <20220310125425.4193879-2-jiyong@google.com>
+To:     Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        Jeff Dike <jdike@addtoit.com>,
+        Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Mark Gross <markgross@kernel.org>,
+        Vadim Pasternak <vadimp@nvidia.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Johannes Berg <johannes.berg@intel.com>,
+        Vincent Whitchurch <vincent.whitchurch@axis.com>,
+        linux-um@lists.infradead.org, platform-driver-x86@vger.kernel.org,
+        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH v7 09/26] virtio_ring: split: implement
+ virtqueue_reset_vring_split()
+Message-ID: <20220310080212-mutt-send-email-mst@kernel.org>
+References: <20220308123518.33800-1-xuanzhuo@linux.alibaba.com>
+ <20220308123518.33800-10-xuanzhuo@linux.alibaba.com>
+ <20220310015418-mutt-send-email-mst@kernel.org>
+ <1646896623.3794115-2-xuanzhuo@linux.alibaba.com>
+ <20220310025930-mutt-send-email-mst@kernel.org>
+ <1646900056.7775025-1-xuanzhuo@linux.alibaba.com>
+ <20220310071335-mutt-send-email-mst@kernel.org>
+ <1646915610.3936472-1-xuanzhuo@linux.alibaba.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220310125425.4193879-2-jiyong@google.com>
+In-Reply-To: <1646915610.3936472-1-xuanzhuo@linux.alibaba.com>
 X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
@@ -79,112 +110,204 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 10, 2022 at 09:54:24PM +0900, Jiyong Park wrote:
-> When iterating over sockets using vsock_for_each_connected_socket, make
-> sure that a transport filters out sockets that don't belong to the
-> transport.
+On Thu, Mar 10, 2022 at 08:33:30PM +0800, Xuan Zhuo wrote:
+> On Thu, 10 Mar 2022 07:17:09 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > On Thu, Mar 10, 2022 at 04:14:16PM +0800, Xuan Zhuo wrote:
+> > > On Thu, 10 Mar 2022 03:07:22 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > > > On Thu, Mar 10, 2022 at 03:17:03PM +0800, Xuan Zhuo wrote:
+> > > > > On Thu, 10 Mar 2022 02:00:39 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > > > > > On Tue, Mar 08, 2022 at 08:35:01PM +0800, Xuan Zhuo wrote:
+> > > > > > > virtio ring supports reset.
+> > > > > > >
+> > > > > > > Queue reset is divided into several stages.
+> > > > > > >
+> > > > > > > 1. notify device queue reset
+> > > > > > > 2. vring release
+> > > > > > > 3. attach new vring
+> > > > > > > 4. notify device queue re-enable
+> > > > > > >
+> > > > > > > After the first step is completed, the vring reset operation can be
+> > > > > > > performed. If the newly set vring num does not change, then just reset
+> > > > > > > the vq related value.
+> > > > > > >
+> > > > > > > Otherwise, the vring will be released and the vring will be reallocated.
+> > > > > > > And the vring will be attached to the vq. If this process fails, the
+> > > > > > > function will exit, and the state of the vq will be the vring release
+> > > > > > > state. You can call this function again to reallocate the vring.
+> > > > > > >
+> > > > > > > In addition, vring_align, may_reduce_num are necessary for reallocating
+> > > > > > > vring, so they are retained when creating vq.
+> > > > > > >
+> > > > > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > > > > > > ---
+> > > > > > >  drivers/virtio/virtio_ring.c | 69 ++++++++++++++++++++++++++++++++++++
+> > > > > > >  1 file changed, 69 insertions(+)
+> > > > > > >
+> > > > > > > diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
+> > > > > > > index e0422c04c903..148fb1fd3d5a 100644
+> > > > > > > --- a/drivers/virtio/virtio_ring.c
+> > > > > > > +++ b/drivers/virtio/virtio_ring.c
+> > > > > > > @@ -158,6 +158,12 @@ struct vring_virtqueue {
+> > > > > > >  			/* DMA address and size information */
+> > > > > > >  			dma_addr_t queue_dma_addr;
+> > > > > > >  			size_t queue_size_in_bytes;
+> > > > > > > +
+> > > > > > > +			/* The parameters for creating vrings are reserved for
+> > > > > > > +			 * creating new vrings when enabling reset queue.
+> > > > > > > +			 */
+> > > > > > > +			u32 vring_align;
+> > > > > > > +			bool may_reduce_num;
+> > > > > > >  		} split;
+> > > > > > >
+> > > > > > >  		/* Available for packed ring */
+> > > > > > > @@ -217,6 +223,12 @@ struct vring_virtqueue {
+> > > > > > >  #endif
+> > > > > > >  };
+> > > > > > >
+> > > > > > > +static void vring_free(struct virtqueue *vq);
+> > > > > > > +static void __vring_virtqueue_init_split(struct vring_virtqueue *vq,
+> > > > > > > +					 struct virtio_device *vdev);
+> > > > > > > +static int __vring_virtqueue_attach_split(struct vring_virtqueue *vq,
+> > > > > > > +					  struct virtio_device *vdev,
+> > > > > > > +					  struct vring vring);
+> > > > > > >
+> > > > > > >  /*
+> > > > > > >   * Helpers.
+> > > > > > > @@ -1012,6 +1024,8 @@ static struct virtqueue *vring_create_virtqueue_split(
+> > > > > > >  		return NULL;
+> > > > > > >  	}
+> > > > > > >
+> > > > > > > +	to_vvq(vq)->split.vring_align = vring_align;
+> > > > > > > +	to_vvq(vq)->split.may_reduce_num = may_reduce_num;
+> > > > > > >  	to_vvq(vq)->split.queue_dma_addr = vring.dma_addr;
+> > > > > > >  	to_vvq(vq)->split.queue_size_in_bytes = vring.queue_size_in_bytes;
+> > > > > > >  	to_vvq(vq)->we_own_ring = true;
+> > > > > > > @@ -1019,6 +1033,59 @@ static struct virtqueue *vring_create_virtqueue_split(
+> > > > > > >  	return vq;
+> > > > > > >  }
+> > > > > > >
+> > > > > > > +static int virtqueue_reset_vring_split(struct virtqueue *_vq, u32 num)
+> > > > > > > +{
+> > > > > > > +	struct vring_virtqueue *vq = to_vvq(_vq);
+> > > > > > > +	struct virtio_device *vdev = _vq->vdev;
+> > > > > > > +	struct vring_split vring;
+> > > > > > > +	int err;
+> > > > > > > +
+> > > > > > > +	if (num > _vq->num_max)
+> > > > > > > +		return -E2BIG;
+> > > > > > > +
+> > > > > > > +	switch (vq->vq.reset) {
+> > > > > > > +	case VIRTIO_VQ_RESET_STEP_NONE:
+> > > > > > > +		return -ENOENT;
+> > > > > > > +
+> > > > > > > +	case VIRTIO_VQ_RESET_STEP_VRING_ATTACH:
+> > > > > > > +	case VIRTIO_VQ_RESET_STEP_DEVICE:
+> > > > > > > +		if (vq->split.vring.num == num || !num)
+> > > > > > > +			break;
+> > > > > > > +
+> > > > > > > +		vring_free(_vq);
+> > > > > > > +
+> > > > > > > +		fallthrough;
+> > > > > > > +
+> > > > > > > +	case VIRTIO_VQ_RESET_STEP_VRING_RELEASE:
+> > > > > > > +		if (!num)
+> > > > > > > +			num = vq->split.vring.num;
+> > > > > > > +
+> > > > > > > +		err = vring_create_vring_split(&vring, vdev,
+> > > > > > > +					       vq->split.vring_align,
+> > > > > > > +					       vq->weak_barriers,
+> > > > > > > +					       vq->split.may_reduce_num, num);
+> > > > > > > +		if (err)
+> > > > > > > +			return -ENOMEM;
+> > > > > > > +
+> > > > > > > +		err = __vring_virtqueue_attach_split(vq, vdev, vring.vring);
+> > > > > > > +		if (err) {
+> > > > > > > +			vring_free_queue(vdev, vring.queue_size_in_bytes,
+> > > > > > > +					 vring.queue,
+> > > > > > > +					 vring.dma_addr);
+> > > > > > > +			return -ENOMEM;
+> > > > > > > +		}
+> > > > > > > +
+> > > > > > > +		vq->split.queue_dma_addr = vring.dma_addr;
+> > > > > > > +		vq->split.queue_size_in_bytes = vring.queue_size_in_bytes;
+> > > > > > > +	}
+> > > > > > > +
+> > > > > > > +	__vring_virtqueue_init_split(vq, vdev);
+> > > > > > > +	vq->we_own_ring = true;
+> > > > > > > +	vq->vq.reset = VIRTIO_VQ_RESET_STEP_VRING_ATTACH;
+> > > > > > > +
+> > > > > > > +	return 0;
+> > > > > > > +}
+> > > > > > > +
+> > > > > >
+> > > > > > I kind of dislike this state machine.
+> > > > > >
+> > > > > > Hacks like special-casing num = 0 to mean "reset" are especially
+> > > > > > confusing.
+> > > > >
+> > > > > I'm removing it. I'll say in the function description that this function is
+> > > > > currently only called when vq has been reset. I'm no longer checking it based on
+> > > > > state.
+> > > > >
+> > > > > >
+> > > > > > And as Jason points out, when we want a resize then yes this currently
+> > > > > > implies reset but that is an implementation detail.
+> > > > > >
+> > > > > > There should be a way to just make these cases separate functions
+> > > > > > and then use them to compose consistent external APIs.
+> > > > >
+> > > > > Yes, virtqueue_resize_split() is fine for ethtool -G.
+> > > > >
+> > > > > But in the case of AF_XDP, just execute reset to free the buffer. The name
+> > > > > virtqueue_reset_vring_split() I think can cover both cases. Or we use two apis
+> > > > > to handle both scenarios?
+> > > > >
+> > > > > Or can anyone think of a better name. ^_^
+> > > > >
+> > > > > Thanks.
+> > > >
+> > > >
+> > > > I'd say resize should be called resize and reset should be called reset.
+> > >
+> > >
+> > > OK, I'll change it to resize here.
+> > >
+> > > But I want to know that when I implement virtio-net to support AF_XDP, its
+> > > requirement is to release all submitted buffers. Then should I add a new api
+> > > such as virtqueue_reset_vring()?
+> >
+> > Sounds like a reasonable name.
+> >
+> > > >
+> > > > The big issue is a sane API for resize. Ideally it would resubmit
+> > > > buffers which did not get used. Question is what to do
+> > > > about buffers which don't fit (if ring has been downsized)?
+> > > > Maybe a callback that will handle them?
+> > > > And then what? Queue them up and readd later? Drop?
+> > > > If we drop we should drop from the head not the tail ...
+> > >
+> > > It's a good idea, let's implement it later.
+> > >
+> > > Thanks.
+> >
+> > Well ... not sure how you are going to support resize
+> > if you don't know what to do with buffers that were
+> > in the ring.
 > 
-> There actually was an issue caused by this; in a nested VM
-> configuration, destroying the nested VM (which often involves the
-> closing of /dev/vhost-vsock if there was h2g connections to the nested
-> VM) kills not only the h2g connections, but also all existing g2h
-> connections to the (outmost) host which are totally unrelated.
+> The current solution is to call virtqueue_detach_unused_buf() to release buffers
+> before resize ring.
 > 
-> Tested: Executed the following steps on Cuttlefish (Android running on a
-> VM) [1]: (1) Enter into an `adb shell` session - to have a g2h
-> connection inside the VM, (2) open and then close /dev/vhost-vsock by
-> `exec 3< /dev/vhost-vsock && exec 3<&-`, (3) observe that the adb
-> session is not reset.
-> 
-> [1] https://android.googlesource.com/device/google/cuttlefish/
-> 
-> Fixes: c0cfa2d8a788 ("vsock: add multi-transports support")
-> Signed-off-by: Jiyong Park <jiyong@google.com>
-> ---
->  drivers/vhost/vsock.c            | 4 ++++
->  net/vmw_vsock/virtio_transport.c | 7 +++++++
->  net/vmw_vsock/vmci_transport.c   | 5 +++++
->  3 files changed, 16 insertions(+)
-> 
-> diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-> index 37f0b4274113..853ddac00d5b 100644
-> --- a/drivers/vhost/vsock.c
-> +++ b/drivers/vhost/vsock.c
-> @@ -722,6 +722,10 @@ static void vhost_vsock_reset_orphans(struct sock *sk)
->  	 * executing.
->  	 */
->  
-> +	/* Only handle our own sockets */
-> +	if (vsk->transport != &vhost_transport.transport)
-> +		return;
-> +
->  	/* If the peer is still valid, no need to reset connection */
->  	if (vhost_vsock_get(vsk->remote_addr.svm_cid))
->  		return;
+> Thanks.
 
+This requires basically a richer api:
+- stop
+- detach
+- resize
+- start
 
-We know this is incomplete though. So I think it's the wrong thing to do
-when you backport, too. If all you worry about is breaking a binary
-module interface, how about simply exporting a new function when you
-backport. Thus you will have downstream both:
+with a callback you would just have a resize, and the fact
+it resets internally becomes an implementation detail.
 
-void vsock_for_each_connected_socket(void (*fn)(struct sock *sk));
-
-void vsock_for_each_connected_socket_new(struct vsock_transport *transport,
-                                    void (*fn)(struct sock *sk));
-
-
-and then upstream we can squash these two patches.
-
-Hmm?
-
-
-> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
-> index fb3302fff627..61b24eb31d4b 100644
-> --- a/net/vmw_vsock/virtio_transport.c
-> +++ b/net/vmw_vsock/virtio_transport.c
-> @@ -24,6 +24,7 @@
->  static struct workqueue_struct *virtio_vsock_workqueue;
->  static struct virtio_vsock __rcu *the_virtio_vsock;
->  static DEFINE_MUTEX(the_virtio_vsock_mutex); /* protects the_virtio_vsock */
-> +static struct virtio_transport virtio_transport; /* forward declaration */
->  
->  struct virtio_vsock {
->  	struct virtio_device *vdev;
-> @@ -357,11 +358,17 @@ static void virtio_vsock_event_fill(struct virtio_vsock *vsock)
->  
->  static void virtio_vsock_reset_sock(struct sock *sk)
->  {
-> +	struct vsock_sock *vsk = vsock_sk(sk);
-> +
->  	/* vmci_transport.c doesn't take sk_lock here either.  At least we're
->  	 * under vsock_table_lock so the sock cannot disappear while we're
->  	 * executing.
->  	 */
->  
-> +	/* Only handle our own sockets */
-> +	if (vsk->transport != &virtio_transport.transport)
-> +		return;
-> +
->  	sk->sk_state = TCP_CLOSE;
->  	sk->sk_err = ECONNRESET;
->  	sk_error_report(sk);
-> diff --git a/net/vmw_vsock/vmci_transport.c b/net/vmw_vsock/vmci_transport.c
-> index 7aef34e32bdf..cd2f01513fae 100644
-> --- a/net/vmw_vsock/vmci_transport.c
-> +++ b/net/vmw_vsock/vmci_transport.c
-> @@ -803,6 +803,11 @@ static void vmci_transport_handle_detach(struct sock *sk)
->  	struct vsock_sock *vsk;
->  
->  	vsk = vsock_sk(sk);
-> +
-> +	/* Only handle our own sockets */
-> +	if (vsk->transport != &vmci_transport)
-> +		return;
-> +
->  	if (!vmci_handle_is_invalid(vmci_trans(vsk)->qp_handle)) {
->  		sock_set_flag(sk, SOCK_DONE);
->  
-> -- 
-> 2.35.1.723.g4982287a31-goog
+-- 
+MST
 
