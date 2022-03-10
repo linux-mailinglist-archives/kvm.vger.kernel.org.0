@@ -2,155 +2,260 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C9B114D4171
-	for <lists+kvm@lfdr.de>; Thu, 10 Mar 2022 07:59:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F1A144D4179
+	for <lists+kvm@lfdr.de>; Thu, 10 Mar 2022 08:01:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239951AbiCJHAv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Mar 2022 02:00:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58318 "EHLO
+        id S239976AbiCJHCI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Mar 2022 02:02:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233872AbiCJHAt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Mar 2022 02:00:49 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E035C12F40A
-        for <kvm@vger.kernel.org>; Wed,  9 Mar 2022 22:59:48 -0800 (PST)
+        with ESMTP id S239960AbiCJHCF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Mar 2022 02:02:05 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id EBB6F12F433
+        for <kvm@vger.kernel.org>; Wed,  9 Mar 2022 23:00:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646895587;
+        s=mimecast20190719; t=1646895648;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=skQuq6bUu9CQKoQjP/6DzDdhCXF+NhdIYDq6kSNE/tU=;
-        b=CKIm+q6HiXaf/RJEI9PTJD+pjC6vmFmvbFkTCRmhKIkrJkafTDf7406ddmYDAwnK68M1wA
-        ynbKwzXiZFyOGK1wLtJsqqRKzbkeIzR6TDt2Pb+yOnbrxN79mKRJ2U7UoOQhsAle7dD8Zk
-        RCRhkL7YTfrsCcHI9Z6E9WMkoxNW75o=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=LkMQorCMU7xc93uPK5gJZgn4oA7Bb7VUOpIFgodhLkk=;
+        b=Y5HfUX+g8XcOPc95Yl+vYg3fQC4JDRx5uYuLS0evCwbO9Ln8j8CTEYwEBcxp0bLqiJkUr7
+        bsGN7wj3SL7IAxRYGnRcISouPBBH471SnuNUA2+3tw0TvkPD+7CfCDfcTRwDd52bSl3Jbk
+        /gGQjVyfv/8EUAkxzbOcSEVOapS3by0=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-669-NfgvrOX5NEmBdFWX-mJk4w-1; Thu, 10 Mar 2022 01:59:46 -0500
-X-MC-Unique: NfgvrOX5NEmBdFWX-mJk4w-1
-Received: by mail-ej1-f72.google.com with SMTP id ey18-20020a1709070b9200b006da9614af58so2594368ejc.10
-        for <kvm@vger.kernel.org>; Wed, 09 Mar 2022 22:59:46 -0800 (PST)
+ us-mta-590-yfmi8wn9OFudm4CcYLxJjA-1; Thu, 10 Mar 2022 02:00:47 -0500
+X-MC-Unique: yfmi8wn9OFudm4CcYLxJjA-1
+Received: by mail-wm1-f72.google.com with SMTP id 10-20020a1c020a000000b0037fae68fcc2so3686818wmc.8
+        for <kvm@vger.kernel.org>; Wed, 09 Mar 2022 23:00:47 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=skQuq6bUu9CQKoQjP/6DzDdhCXF+NhdIYDq6kSNE/tU=;
-        b=ZJVr4SD93YvHUdw82dE1qaNSYGNHcdFCHWM+phUPGR3yaM3ktcZ159J1vCJCejURwQ
-         Z3PNejz/uENJTrTBff3SYwCuE0++s1ia+Gj9g59YNkgvnjJFlEHF8ZW5V6xqWErJ2cmv
-         JFGvh0yyEn9HxqYIVofbH0hm0Dy1vKHked1StADKfMiSpcYRMXI3NbczhVYRYlmuYUu/
-         uTyLrlLX0OUbz72YxR/Ijp5/iXJxSmoZhmFo21nqV9/ktW9D7GpCzJS1VUnxgayXoFJX
-         +QVz0ELRKIWZQdD/S4Q1WD80K69y7k1s2YSQlJIEhR9vG++Nku1aQum+f7pYxb1s02hd
-         6djA==
-X-Gm-Message-State: AOAM531YpCcWQ/RvEUvbVIUpTo/4VY/wGTDXq9TAjXdBysKU+X3TG/sG
-        mLB/aOX9q5jA1iJX51/q8X8KyVuBO+RXBOaue+9ugLStI+8urZ3OiTBl/k0rn+j4Muuqsnf+jVw
-        6K+NNZSxbZ01k
-X-Received: by 2002:a05:6402:518c:b0:416:b9bb:46d with SMTP id q12-20020a056402518c00b00416b9bb046dmr670695edd.297.1646895585516;
-        Wed, 09 Mar 2022 22:59:45 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwcJDnzMitALmVPhEH/srLzLmpQDrONXmjWGOdwmzwyTnp1nu72Pal3goJ8BGfiwfD2EJCK0A==
-X-Received: by 2002:a05:6402:518c:b0:416:b9bb:46d with SMTP id q12-20020a056402518c00b00416b9bb046dmr670683edd.297.1646895585295;
-        Wed, 09 Mar 2022 22:59:45 -0800 (PST)
-Received: from gator (cst-prg-19-210.cust.vodafone.cz. [46.135.19.210])
-        by smtp.gmail.com with ESMTPSA id z15-20020a170906240f00b006d703ca573fsm1446380eja.85.2022.03.09.22.59.43
+        bh=LkMQorCMU7xc93uPK5gJZgn4oA7Bb7VUOpIFgodhLkk=;
+        b=4kAhMOSvsJRSMpLHNahPS/DNjGn56Muk2mMfC2uyYu2UaBgZHZLStINLFlsL33DPQV
+         cFjn7YbYxtRgd8Igx8AllYbSOSFx7KqVM7NAvNM5/cTqy0ZNYi3ISCHMaqMTMf0zGnC8
+         mfmShYKEBDqi0ynrNunlq5g+oIRPlVmKxFKOFMmQNqUYk3KdhqZnkCOajiXRcnzzwo1s
+         NWkHV3OOhCNRB9xGsXTpg39Z2P9JdFgKSZF8Mu75iNm9+icz0RCmN/BuOM7dwuRTw+xE
+         LZpwal9lBgWYrYEKe4GhL+2UeRA6l4n4RI2eGysKSWJVMuhYbZYoAnrIV1/R5oQKPo90
+         u6ew==
+X-Gm-Message-State: AOAM532FEUP+80vPN9U4fjAmuJOqbWoDOCy60r5Wcv4UpeOE1T9M19E3
+        NtV7/pbJAbakD1jyvki0dDXGoen4/8Xky2T3I8PC+6BzqGeOHMa3fqapS2tzMea/ntjXPE7HM16
+        8qx9mb+ewnbHK
+X-Received: by 2002:a05:6000:1104:b0:1f9:7df6:c864 with SMTP id z4-20020a056000110400b001f97df6c864mr2313862wrw.63.1646895645819;
+        Wed, 09 Mar 2022 23:00:45 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzsDaUfg1Dzks5kcvSZTIGN65fjx4oj0qZwLxHiAr1eXZpgoIX0Ngv/xjK7eBdLbtD4hrdZUQ==
+X-Received: by 2002:a05:6000:1104:b0:1f9:7df6:c864 with SMTP id z4-20020a056000110400b001f97df6c864mr2313828wrw.63.1646895645533;
+        Wed, 09 Mar 2022 23:00:45 -0800 (PST)
+Received: from redhat.com ([2.55.24.184])
+        by smtp.gmail.com with ESMTPSA id o7-20020a5d6707000000b001f067c7b47fsm5312811wru.27.2022.03.09.23.00.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Mar 2022 22:59:44 -0800 (PST)
-Date:   Thu, 10 Mar 2022 07:59:41 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        pbonzini@redhat.com, thuth@redhat.com
-Subject: Re: [kvm-unit-tests PATCH 2/2] arm/run: Fix using
- qemu-system-aarch64 to run aarch32 tests on aarch64
-Message-ID: <20220310065941.2na6kig2o5hxh4vx@gator>
-References: <20220309162117.56681-1-alexandru.elisei@arm.com>
- <20220309162117.56681-3-alexandru.elisei@arm.com>
- <20220309165812.46xmnjek72yrv3g6@gator>
- <Yijf5TlbOKhV+Mw6@monolith.localdoman>
+        Wed, 09 Mar 2022 23:00:44 -0800 (PST)
+Date:   Thu, 10 Mar 2022 02:00:39 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        Jeff Dike <jdike@addtoit.com>,
+        Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Mark Gross <markgross@kernel.org>,
+        Vadim Pasternak <vadimp@nvidia.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Johannes Berg <johannes.berg@intel.com>,
+        Vincent Whitchurch <vincent.whitchurch@axis.com>,
+        linux-um@lists.infradead.org, platform-driver-x86@vger.kernel.org,
+        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH v7 09/26] virtio_ring: split: implement
+ virtqueue_reset_vring_split()
+Message-ID: <20220310015418-mutt-send-email-mst@kernel.org>
+References: <20220308123518.33800-1-xuanzhuo@linux.alibaba.com>
+ <20220308123518.33800-10-xuanzhuo@linux.alibaba.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Yijf5TlbOKhV+Mw6@monolith.localdoman>
+In-Reply-To: <20220308123518.33800-10-xuanzhuo@linux.alibaba.com>
 X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 09, 2022 at 05:12:05PM +0000, Alexandru Elisei wrote:
-> Hi,
+On Tue, Mar 08, 2022 at 08:35:01PM +0800, Xuan Zhuo wrote:
+> virtio ring supports reset.
 > 
-> On Wed, Mar 09, 2022 at 05:58:12PM +0100, Andrew Jones wrote:
-> > On Wed, Mar 09, 2022 at 04:21:17PM +0000, Alexandru Elisei wrote:
-> > > From: Andrew Jones <drjones@redhat.com>
-> > > 
-> > > KVM on arm64 can create 32 bit and 64 bit VMs. kvm-unit-tests tries to
-> > > take advantage of this by setting the aarch64=off -cpu option. However,
-> > > get_qemu_accelerator() isn't aware that KVM on arm64 can run both types
-> > > of VMs and it selects qemu-system-arm instead of qemu-system-aarch64.
-> > > This leads to an error in premature_failure() and the test is marked as
-> > > skipped:
-> > > 
-> > > $ ./run_tests.sh selftest-setup
-> > > SKIP selftest-setup (qemu-system-arm: -accel kvm: invalid accelerator kvm)
-> > > 
-> > > Fix this by setting QEMU to the correct qemu binary before calling
-> > > get_qemu_accelerator().
-> > > 
-> > > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> > > [ Alex E: Added commit message, changed the logic to make it clearer ]
-> > > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > > ---
-> > >  arm/run | 5 +++++
-> > >  1 file changed, 5 insertions(+)
-> > > 
-> > > diff --git a/arm/run b/arm/run
-> > > index 2153bd320751..5fe0a45c4820 100755
-> > > --- a/arm/run
-> > > +++ b/arm/run
-> > > @@ -13,6 +13,11 @@ processor="$PROCESSOR"
-> > >  ACCEL=$(get_qemu_accelerator) ||
-> > >  	exit $?
-> > >  
-> > > +# KVM for arm64 can create a VM in either aarch32 or aarch64 modes.
-> > > +if [ "$ACCEL" = kvm ] && [ -z "$QEMU" ] && [ "$HOST" = "aarch64" ]; then
-> > > +	QEMU=qemu-system-aarch64
-> > > +fi
-> > > +
-> > >  qemu=$(search_qemu_binary) ||
-> > >  	exit $?
-> > >  
-> > > -- 
-> > > 2.35.1
-> > >
-> > 
-> > So there's a bug with this patch which was also present in the patch I
-> > proposed. By setting $QEMU before we call search_qemu_binary() we may
-> > force a "A QEMU binary was not found." failure even though a perfectly
-> > good 'qemu-kvm' binary is present.
+> Queue reset is divided into several stages.
 > 
-> I noticed that search_qemu_binary() tries to search for both
-> qemu-system-ARCH_NAME and qemu-kvm, and I first thought that qemu-kvm is a
-> legacy name for qemu-system-ARCH_NAME.
+> 1. notify device queue reset
+> 2. vring release
+> 3. attach new vring
+> 4. notify device queue re-enable
 > 
-> I just did some googling, and I think it's actually how certain distros (like
-> SLES) package qemu-system-ARCH_NAME, is that correct?
-
-Right
-
+> After the first step is completed, the vring reset operation can be
+> performed. If the newly set vring num does not change, then just reset
+> the vq related value.
 > 
-> If that is so, one idea I toyed with (for something else) is to move the error
-> messages from search_qemu_binary() to the call sites, that way arm/run can first
-> try to find qemu-system-aarch64, then fallback to qemu-kvm, and only after both
-> aren't found exit with an error. Just a suggestion, in case you find it useful.
+> Otherwise, the vring will be released and the vring will be reallocated.
+> And the vring will be attached to the vq. If this process fails, the
+> function will exit, and the state of the vq will be the vring release
+> state. You can call this function again to reallocate the vring.
+> 
+> In addition, vring_align, may_reduce_num are necessary for reallocating
+> vring, so they are retained when creating vq.
+> 
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> ---
+>  drivers/virtio/virtio_ring.c | 69 ++++++++++++++++++++++++++++++++++++
+>  1 file changed, 69 insertions(+)
+> 
+> diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
+> index e0422c04c903..148fb1fd3d5a 100644
+> --- a/drivers/virtio/virtio_ring.c
+> +++ b/drivers/virtio/virtio_ring.c
+> @@ -158,6 +158,12 @@ struct vring_virtqueue {
+>  			/* DMA address and size information */
+>  			dma_addr_t queue_dma_addr;
+>  			size_t queue_size_in_bytes;
+> +
+> +			/* The parameters for creating vrings are reserved for
+> +			 * creating new vrings when enabling reset queue.
+> +			 */
+> +			u32 vring_align;
+> +			bool may_reduce_num;
+>  		} split;
+>  
+>  		/* Available for packed ring */
+> @@ -217,6 +223,12 @@ struct vring_virtqueue {
+>  #endif
+>  };
+>  
+> +static void vring_free(struct virtqueue *vq);
+> +static void __vring_virtqueue_init_split(struct vring_virtqueue *vq,
+> +					 struct virtio_device *vdev);
+> +static int __vring_virtqueue_attach_split(struct vring_virtqueue *vq,
+> +					  struct virtio_device *vdev,
+> +					  struct vring vring);
+>  
+>  /*
+>   * Helpers.
+> @@ -1012,6 +1024,8 @@ static struct virtqueue *vring_create_virtqueue_split(
+>  		return NULL;
+>  	}
+>  
+> +	to_vvq(vq)->split.vring_align = vring_align;
+> +	to_vvq(vq)->split.may_reduce_num = may_reduce_num;
+>  	to_vvq(vq)->split.queue_dma_addr = vring.dma_addr;
+>  	to_vvq(vq)->split.queue_size_in_bytes = vring.queue_size_in_bytes;
+>  	to_vvq(vq)->we_own_ring = true;
+> @@ -1019,6 +1033,59 @@ static struct virtqueue *vring_create_virtqueue_split(
+>  	return vq;
+>  }
+>  
+> +static int virtqueue_reset_vring_split(struct virtqueue *_vq, u32 num)
+> +{
+> +	struct vring_virtqueue *vq = to_vvq(_vq);
+> +	struct virtio_device *vdev = _vq->vdev;
+> +	struct vring_split vring;
+> +	int err;
+> +
+> +	if (num > _vq->num_max)
+> +		return -E2BIG;
+> +
+> +	switch (vq->vq.reset) {
+> +	case VIRTIO_VQ_RESET_STEP_NONE:
+> +		return -ENOENT;
+> +
+> +	case VIRTIO_VQ_RESET_STEP_VRING_ATTACH:
+> +	case VIRTIO_VQ_RESET_STEP_DEVICE:
+> +		if (vq->split.vring.num == num || !num)
+> +			break;
+> +
+> +		vring_free(_vq);
+> +
+> +		fallthrough;
+> +
+> +	case VIRTIO_VQ_RESET_STEP_VRING_RELEASE:
+> +		if (!num)
+> +			num = vq->split.vring.num;
+> +
+> +		err = vring_create_vring_split(&vring, vdev,
+> +					       vq->split.vring_align,
+> +					       vq->weak_barriers,
+> +					       vq->split.may_reduce_num, num);
+> +		if (err)
+> +			return -ENOMEM;
+> +
+> +		err = __vring_virtqueue_attach_split(vq, vdev, vring.vring);
+> +		if (err) {
+> +			vring_free_queue(vdev, vring.queue_size_in_bytes,
+> +					 vring.queue,
+> +					 vring.dma_addr);
+> +			return -ENOMEM;
+> +		}
+> +
+> +		vq->split.queue_dma_addr = vring.dma_addr;
+> +		vq->split.queue_size_in_bytes = vring.queue_size_in_bytes;
+> +	}
+> +
+> +	__vring_virtqueue_init_split(vq, vdev);
+> +	vq->we_own_ring = true;
+> +	vq->vq.reset = VIRTIO_VQ_RESET_STEP_VRING_ATTACH;
+> +
+> +	return 0;
+> +}
+> +
 
-We don't have to move the error messages, even if we want to use
-search_qemu_binary() as a silent check. We can just call it with
-a &>/dev/null and then check its return code. I still need to
-allocate some time to think more about this though.
+I kind of dislike this state machine.
 
-Thanks,
-drew
+Hacks like special-casing num = 0 to mean "reset" are especially
+confusing.
+
+And as Jason points out, when we want a resize then yes this currently
+implies reset but that is an implementation detail.
+
+There should be a way to just make these cases separate functions
+and then use them to compose consistent external APIs.
+
+If we additionally want to track state for debugging then bool flags
+seem more appropriate for this, though from experience that is
+not always worth the extra code.
+
+
+
+>  /*
+>   * Packed ring specific functions - *_packed().
+> @@ -2317,6 +2384,8 @@ static int __vring_virtqueue_attach_split(struct vring_virtqueue *vq,
+>  static void __vring_virtqueue_init_split(struct vring_virtqueue *vq,
+>  					 struct virtio_device *vdev)
+>  {
+> +	vq->vq.reset = VIRTIO_VQ_RESET_STEP_NONE;
+> +
+>  	vq->packed_ring = false;
+>  	vq->we_own_ring = false;
+>  	vq->broken = false;
+> -- 
+> 2.31.0
 
