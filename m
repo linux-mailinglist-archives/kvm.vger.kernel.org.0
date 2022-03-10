@@ -2,135 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E9FA34D4D44
-	for <lists+kvm@lfdr.de>; Thu, 10 Mar 2022 16:43:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 911B94D4FA4
+	for <lists+kvm@lfdr.de>; Thu, 10 Mar 2022 17:47:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236569AbiCJP3Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Mar 2022 10:29:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34844 "EHLO
+        id S242928AbiCJQqr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Mar 2022 11:46:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56120 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232950AbiCJP3O (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Mar 2022 10:29:14 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7AB2F14891B
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 07:28:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646926090;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=OxmhgsYDn7lN+Q9MYhLi71z6xn1cSXOJwJ0aQe2hQ+o=;
-        b=T5RyIYcFqN48CN7CIalc12XykVE/70e3LRyIRYZH7VqmxpfTd6d6E9d1xhP3I03p8aQZCM
-        ctm/Ovc3j7rnehpeb+PsJMtDfFobEsQ2C2jb6ktrd4mcbcqt9U2owR5M0H3JDUEFzkPsit
-        HA3KoEyeA+iA6vdLo4XICJ1NSa9NV3k=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-246-TN-l7e2SM06dJD90-TuD3w-1; Thu, 10 Mar 2022 10:28:09 -0500
-X-MC-Unique: TN-l7e2SM06dJD90-TuD3w-1
-Received: by mail-wm1-f69.google.com with SMTP id f24-20020a1c6a18000000b00388874b17a8so2434412wmc.3
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 07:28:08 -0800 (PST)
+        with ESMTP id S237560AbiCJQqq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Mar 2022 11:46:46 -0500
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24DDE15C652
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 08:45:45 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id b70-20020a253449000000b0062c16d950c5so4893010yba.9
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 08:45:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=u3uM3T4fqIIeENkI/oDpiYVbdZfSHJ4n+nq816F+RHI=;
+        b=U2lUv0c5x8Z0tN10iiJZ878tYRw0HCaxpmIWdgxRG42XmJ2qQxvxlr55QWE0uba6NF
+         w24obauq196u/V/FWSukU1rEvuuXS7Gf9PI09w9CreeXa151tTESSChdK1qsS85Q3Q9d
+         XN0VJMNQxqbYSykfz4PV70Nu+JGcqny+V5ajpc2ECC5Dp8L/O2lXAY9IrdtoB3+OQSLI
+         yuumD9zr9RQEjaXpH5KegTN5RlU/lUVzKJUGxIl+7Qw3MjA6LvVNgWlK84i131Rv6yO4
+         pTJeWOmDo20DosIqYhXf0PI87OtHUU3jGeDwXWZKQAW0BmE1+lm0lGbPTfjEXCpiqi5+
+         b8SQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=OxmhgsYDn7lN+Q9MYhLi71z6xn1cSXOJwJ0aQe2hQ+o=;
-        b=69/T219dk8AFfCgqAdZRcA33er6ZRCpZSJA0EGqbRzLicnMysruPKBlH8eZ6k9eJeW
-         XUsbatd853Is2oV+kEvCqAWUrJi0bVVgOwP1okj83Zmtwxbh8NvD1KwZky7/linZX7xq
-         VJmVXckjuaMyNdFv0L4PIYielAwuBd5PCaVTFiCojxwm3NHW7/90bE0nMB5n88uHbTM8
-         NDc/hZC6P84QgmnPs6Hlhj2kJBWwtD27SuTOKxHcjzBJngyRJYRNmqhKs1+YokctRepI
-         vVPdjcCti62zDv02WKRXFpzOgXw3t54Icpzs/CDssa33xzpdsP8G3NQh+ugc4PcCSBI1
-         lFJA==
-X-Gm-Message-State: AOAM533AcEhxIhrrX3CFwGUMiHkydukjd7VZAgNx+zHE8SoLcRJLySMD
-        64jSu1waZjf307vCXckscFUc9tOuWi1QrX81RvSskLahrwp9JuMZe5+J9GJkqTCD5OG3jyppOSR
-        ZZYEtxK0E8vu2
-X-Received: by 2002:adf:d1c2:0:b0:1f1:f89a:24ba with SMTP id b2-20020adfd1c2000000b001f1f89a24bamr4024598wrd.515.1646926087872;
-        Thu, 10 Mar 2022 07:28:07 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwvVyRWRHj93/hZgey9ZXI65IZxEXwz2fuNHtQ5iBMjN5xH2pI0mLBomxlME5TCxbw4FP1ESQ==
-X-Received: by 2002:adf:d1c2:0:b0:1f1:f89a:24ba with SMTP id b2-20020adfd1c2000000b001f1f89a24bamr4024578wrd.515.1646926087550;
-        Thu, 10 Mar 2022 07:28:07 -0800 (PST)
-Received: from redhat.com ([2.53.27.107])
-        by smtp.gmail.com with ESMTPSA id x14-20020adfffce000000b001f1dfee4867sm5998858wrs.99.2022.03.10.07.28.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Mar 2022 07:28:06 -0800 (PST)
-Date:   Thu, 10 Mar 2022 10:28:03 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     Jiyong Park <jiyong@google.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, adelva@google.com,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3] vsock: each transport cycles only on its own sockets
-Message-ID: <20220310102636-mutt-send-email-mst@kernel.org>
-References: <20220310135012.175219-1-jiyong@google.com>
- <20220310141420.lsdchdfcybzmdhnz@sgarzare-redhat>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220310141420.lsdchdfcybzmdhnz@sgarzare-redhat>
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=u3uM3T4fqIIeENkI/oDpiYVbdZfSHJ4n+nq816F+RHI=;
+        b=bIuzfqIwRUxyaMAmsoDIOFXUA2mH4Dwi79Ilz87GQ5rzwbG8Kwc1Moznm3uFVydn8P
+         Em69w7UgHEdbkeOyucvlkL1rqzK1ymdFeT7NjAtT0lEdsEFNcfq0VrvCdzs7F5xeQhha
+         u5P17jJQjuhXY59hTqmV2TxsCPjIEKn6Ca3g35aEdYSxjByn7ZwNMH0LfZbMRzjVzzqT
+         hsy6IouVcUi14SeplNDfU+OkqXcjJ6YCObVtzPOH597tl2roJ4RAgTAOk29VboiB/aJC
+         tjVRvM8MQ+1htMtX60w9M6bqNA5IhR1yuTss9tBYc3CEgQhq6SkoqYteL7Z7iOEqTaS4
+         CqmA==
+X-Gm-Message-State: AOAM533GAo3MKIdVUe5zB6CNrI/AQHDDOyRgSUUAHp06Ox1qwsfDvsDs
+        ZMNl8kxVqcI8H+EeJzD1RIculFJvDGFs
+X-Google-Smtp-Source: ABdhPJydjXqqkEgL+Wd+e99wiH5YSGHqTeHibW+DKcVMd0Qem1lVbAgVSdLWzBZL6FnyP7b5P0DAKt1MkO5E
+X-Received: from bgardon.sea.corp.google.com ([2620:15c:100:202:2d58:733f:1853:8e86])
+ (user=bgardon job=sendgmr) by 2002:a25:c0ce:0:b0:628:7267:b0f2 with SMTP id
+ c197-20020a25c0ce000000b006287267b0f2mr4785097ybf.570.1646930744265; Thu, 10
+ Mar 2022 08:45:44 -0800 (PST)
+Date:   Thu, 10 Mar 2022 08:45:19 -0800
+Message-Id: <20220310164532.1821490-1-bgardon@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.1.616.g0bdcbb4464-goog
+Subject: [PATCH 00/13] KVM: x86: Add a cap to disable NX hugepages on a VM
+From:   Ben Gardon <bgardon@google.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Dunn <daviddunn@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Ben Gardon <bgardon@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 10, 2022 at 03:14:20PM +0100, Stefano Garzarella wrote:
-> On Thu, Mar 10, 2022 at 10:50:11PM +0900, Jiyong Park wrote:
-> > When iterating over sockets using vsock_for_each_connected_socket, make
-> > sure that a transport filters out sockets that don't belong to the
-> > transport.
-> > 
-> > There actually was an issue caused by this; in a nested VM
-> > configuration, destroying the nested VM (which often involves the
-> > closing of /dev/vhost-vsock if there was h2g connections to the nested
-> > VM) kills not only the h2g connections, but also all existing g2h
-> > connections to the (outmost) host which are totally unrelated.
-> > 
-> > Tested: Executed the following steps on Cuttlefish (Android running on a
-> > VM) [1]: (1) Enter into an `adb shell` session - to have a g2h
-> > connection inside the VM, (2) open and then close /dev/vhost-vsock by
-> > `exec 3< /dev/vhost-vsock && exec 3<&-`, (3) observe that the adb
-> > session is not reset.
-> > 
-> > [1] https://android.googlesource.com/device/google/cuttlefish/
-> > 
-> > Fixes: c0cfa2d8a788 ("vsock: add multi-transports support")
-> > Signed-off-by: Jiyong Park <jiyong@google.com>
-> > ---
-> > Changes in v3:
-> >  - Fixed the build error in vmci_transport.c
-> > Changes in v2:
-> >  - Squashed into a single patch
-> > 
-> > drivers/vhost/vsock.c            | 3 ++-
-> > include/net/af_vsock.h           | 3 ++-
-> > net/vmw_vsock/af_vsock.c         | 9 +++++++--
-> > net/vmw_vsock/virtio_transport.c | 7 +++++--
-> > net/vmw_vsock/vmci_transport.c   | 5 ++++-
-> > 5 files changed, 20 insertions(+), 7 deletions(-)
-> 
-> It seems okay now, I ran my test suite and everything seems to be fine:
-> 
-> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-> 
-> Thanks,
-> Stefanoc
+Given the high cost of NX hugepages in terms of TLB performance, it may
+be desirable to disable the mitigation on a per-VM basis. In the case of public
+cloud providers with many VMs on a single host, some VMs may be more trusted
+than others. In order to maximize performance on critical VMs, while still
+providing some protection to the host from iTLB Multihit, allow the mitigation
+to be selectively disabled.
 
-Thanks!
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
+Disabling NX hugepages on a VM is relatively straightforward, but I took this
+as an opportunity to add some NX hugepages test coverage and clean up selftests
+infrastructure a bit.
 
-Not a new regression so I think we should take this in the next cycle,
-let's be careful here especially since previous version was not even
-build-tested by the contributor.
+Patches 1-2 add some library calls for accessing stats via the binary stats API.
+Patches 3-5 improve memslot ID handling in the KVM util library.
+Patch 6 is a misc logging improvement.
+Patches 7 and 13 implement an NX hugepages test.
+Patches 8, 9, 10, and 12 implement disabling NX on a VM.
+Patch 11 is a small cleanup of a bad merge.
+
+This series was tested with the new selftest and the rest of the KVM selftests
+on an Intel Haswell machine.
+
+The following tests failed, but I do not believe that has anything to do with
+this series:
+	userspace_io_test
+	vmx_nested_tsc_scaling_test
+	vmx_preemption_timer_test
+
+Ben Gardon (13):
+  selftests: KVM: Dump VM stats in binary stats test
+  selftests: KVM: Test reading a single stat
+  selftests: KVM: Wrap memslot IDs in a struct for readability
+  selftests: KVM: Add memslot parameter to VM vaddr allocation
+  selftests: KVM: Add memslot parameter to elf_load
+  selftests: KVM: Improve error message in vm_phy_pages_alloc
+  selftests: KVM: Add NX huge pages test
+  KVM: x86/MMU: Factor out updating NX hugepages state for a VM
+  KVM: x86/MMU: Track NX hugepages on a per-VM basis
+  KVM: x86/MMU: Allow NX huge pages to be disabled on a per-vm basis
+  KVM: x86: Fix errant brace in KVM capability handling
+  KVM: x86/MMU: Require reboot permission to disable NX hugepages
+  selftests: KVM: Test disabling NX hugepages on a VM
+
+ arch/x86/include/asm/kvm_host.h               |   3 +
+ arch/x86/kvm/mmu.h                            |   9 +-
+ arch/x86/kvm/mmu/mmu.c                        |  23 +-
+ arch/x86/kvm/mmu/spte.c                       |   7 +-
+ arch/x86/kvm/mmu/spte.h                       |   3 +-
+ arch/x86/kvm/mmu/tdp_mmu.c                    |   3 +-
+ arch/x86/kvm/x86.c                            |  24 +-
+ include/uapi/linux/kvm.h                      |   1 +
+ tools/testing/selftests/kvm/Makefile          |   3 +-
+ .../selftests/kvm/aarch64/psci_cpu_on_test.c  |   2 +-
+ .../selftests/kvm/dirty_log_perf_test.c       |   7 +-
+ tools/testing/selftests/kvm/dirty_log_test.c  |  45 +--
+ .../selftests/kvm/hardware_disable_test.c     |   2 +-
+ .../selftests/kvm/include/kvm_util_base.h     |  57 ++--
+ .../selftests/kvm/include/x86_64/vmx.h        |   4 +-
+ .../selftests/kvm/kvm_binary_stats_test.c     |   6 +
+ .../selftests/kvm/kvm_page_table_test.c       |   9 +-
+ .../selftests/kvm/lib/aarch64/processor.c     |   7 +-
+ tools/testing/selftests/kvm/lib/elf.c         |   5 +-
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 311 +++++++++++++++---
+ .../selftests/kvm/lib/kvm_util_internal.h     |   2 +-
+ .../selftests/kvm/lib/perf_test_util.c        |   4 +-
+ .../selftests/kvm/lib/riscv/processor.c       |   5 +-
+ .../selftests/kvm/lib/s390x/processor.c       |   9 +-
+ .../kvm/lib/x86_64/nx_huge_pages_guest.S      |  45 +++
+ .../selftests/kvm/lib/x86_64/processor.c      |  11 +-
+ tools/testing/selftests/kvm/lib/x86_64/svm.c  |   8 +-
+ tools/testing/selftests/kvm/lib/x86_64/vmx.c  |  26 +-
+ .../selftests/kvm/max_guest_memory_test.c     |   6 +-
+ .../kvm/memslot_modification_stress_test.c    |   6 +-
+ .../testing/selftests/kvm/memslot_perf_test.c |  11 +-
+ .../selftests/kvm/set_memory_region_test.c    |   8 +-
+ tools/testing/selftests/kvm/steal_time.c      |   3 +-
+ tools/testing/selftests/kvm/x86_64/amx_test.c |   6 +-
+ .../testing/selftests/kvm/x86_64/cpuid_test.c |   2 +-
+ .../kvm/x86_64/emulator_error_test.c          |   2 +-
+ .../selftests/kvm/x86_64/hyperv_clock.c       |   2 +-
+ .../selftests/kvm/x86_64/hyperv_features.c    |   6 +-
+ .../selftests/kvm/x86_64/kvm_clock_test.c     |   2 +-
+ .../selftests/kvm/x86_64/mmu_role_test.c      |   3 +-
+ .../selftests/kvm/x86_64/nx_huge_pages_test.c | 149 +++++++++
+ .../kvm/x86_64/nx_huge_pages_test.sh          |  25 ++
+ .../selftests/kvm/x86_64/set_boot_cpu_id.c    |   2 +-
+ tools/testing/selftests/kvm/x86_64/smm_test.c |   2 +-
+ .../selftests/kvm/x86_64/vmx_dirty_log_test.c |  10 +-
+ .../selftests/kvm/x86_64/xapic_ipi_test.c     |   2 +-
+ .../selftests/kvm/x86_64/xen_shinfo_test.c    |   4 +-
+ .../selftests/kvm/x86_64/xen_vmcall_test.c    |   2 +-
+ 48 files changed, 704 insertions(+), 190 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/lib/x86_64/nx_huge_pages_guest.S
+ create mode 100644 tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
+ create mode 100755 tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.sh
 
 -- 
-MST
+2.35.1.616.g0bdcbb4464-goog
 
