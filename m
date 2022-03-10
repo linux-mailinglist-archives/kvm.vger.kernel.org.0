@@ -2,219 +2,317 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 16BFA4D4863
-	for <lists+kvm@lfdr.de>; Thu, 10 Mar 2022 14:50:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D1134D4872
+	for <lists+kvm@lfdr.de>; Thu, 10 Mar 2022 14:56:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242579AbiCJNvk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Mar 2022 08:51:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38618 "EHLO
+        id S242580AbiCJN46 convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Thu, 10 Mar 2022 08:56:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47122 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242574AbiCJNvi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Mar 2022 08:51:38 -0500
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C870314FBD9
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 05:50:36 -0800 (PST)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-2dd2c5ef10eso40651227b3.14
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 05:50:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=RyC7JYTZVE920vCW2abRPxzJi7BHTSbmvzYhXrT0HUc=;
-        b=K0g7rEqLV7glGY9VoczOQ7tamfCv9ocaLTqQ9pA6K1hKCvyVnz/biCZJdiR8gt8Vun
-         W9gInBQtu7UZnXtuylJdRbY+++aJMY2bp4SA15h24liWnXcsSXBhYgXQ/EK7yzbsbgzK
-         vjTYTdWUU+RGXRSlUNsjo4pxS0VYbiD2d81ufwuLfnWFQtND58Cl11GtfJ6MyjIBD8qB
-         SWfdxVO4TF5rVUC7AzC+HVIVZEmjtP8PPTbq4GKJl+tuw/bF3h6UkZD0rRub+C8KalIa
-         AuT3pDyB1YA7tFMzR+r571RmxPEJedF9DncfdlvTqAVxZG2OWHumJB0W8bHPr7OX00JW
-         oE9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=RyC7JYTZVE920vCW2abRPxzJi7BHTSbmvzYhXrT0HUc=;
-        b=EBdwJqUzCkk0SLw1YxSDOIPrVcsL7KWeN5ZhGNMxxc0r42gp3QQS+Mp6Xi2kx2i9tQ
-         oeJ5cB1C1g19UykmWTkbvdU2x9uoDCsxh/BQFmEGkJwUIdzS+b/y9AUdsjiaqdvNAnlm
-         wZPCA2M5NFpiAEiwEA4gCdqYJT/65iKnXsJ93yCIxw7xuyPo3gtOYi1Vriejm9brZms4
-         zmX8Oi8GxCkbb189YPMmnibTD91RsPzD7mSTgBRvzNkKqvqfEpmWu6zZgiF31MulGolt
-         StPIZe2lW1tINsBHYnFf9fn0XqIn0QlF4zeycFebJsCuB+kFCTQi/1yHUIMn69VrjN3h
-         P85A==
-X-Gm-Message-State: AOAM531qRvlT1g1lH8bIXUubIRhHAPFTSPF/FKG+f8L1Luw/8cG9HpGI
-        qVK9HVa+NKlo5OcFJOVyW/R42RPu/0Y=
-X-Google-Smtp-Source: ABdhPJwbFxS4WB8cd5FG5SW40KLsWQMyZN4ed5ofd7m8SZn2puewTqpYphgovRQMb3BP/CNUeBr3IvzMptw=
-X-Received: from jiyong.seo.corp.google.com ([2401:fa00:d:11:f59e:134:eb7:e1d2])
- (user=jiyong job=sendgmr) by 2002:a25:d606:0:b0:629:187c:e514 with SMTP id
- n6-20020a25d606000000b00629187ce514mr3895138ybg.158.1646920236015; Thu, 10
- Mar 2022 05:50:36 -0800 (PST)
-Date:   Thu, 10 Mar 2022 22:50:11 +0900
-Message-Id: <20220310135012.175219-1-jiyong@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.35.1.723.g4982287a31-goog
-Subject: [PATCH v3] vsock: each transport cycles only on its own sockets
-From:   Jiyong Park <jiyong@google.com>
-To:     Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>
-Cc:     adelva@google.com, Jiyong Park <jiyong@google.com>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        with ESMTP id S232346AbiCJN45 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Mar 2022 08:56:57 -0500
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E914141FF4;
+        Thu, 10 Mar 2022 05:55:52 -0800 (PST)
+Received: from fraeml735-chm.china.huawei.com (unknown [172.18.147.206])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4KDrDQ5q6Tz67vZB;
+        Thu, 10 Mar 2022 21:55:18 +0800 (CST)
+Received: from lhreml717-chm.china.huawei.com (10.201.108.68) by
+ fraeml735-chm.china.huawei.com (10.206.15.216) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Thu, 10 Mar 2022 14:55:49 +0100
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ lhreml717-chm.china.huawei.com (10.201.108.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Thu, 10 Mar 2022 13:55:48 +0000
+Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
+ lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
+ 15.01.2308.021; Thu, 10 Mar 2022 13:55:48 +0000
+From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        "helgaas@kernel.org" <helgaas@kernel.org>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
+        "yishaih@nvidia.com" <yishaih@nvidia.com>,
+        Linuxarm <linuxarm@huawei.com>,
+        liulongfang <liulongfang@huawei.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        "Jonathan Cameron" <jonathan.cameron@huawei.com>,
+        "Wangzhou (B)" <wangzhou1@hisilicon.com>
+Subject: RE: [PATCH v8 3/9] hisi_acc_qm: Move VF PCI device IDs to common
+ header
+Thread-Topic: [PATCH v8 3/9] hisi_acc_qm: Move VF PCI device IDs to common
+ header
+Thread-Index: AQHYL1K65T0xdQtNbkGb+oampkIrK6y0Oe0AgARyolA=
+Date:   Thu, 10 Mar 2022 13:55:48 +0000
+Message-ID: <ec2b1e7168714144afcd4bfe5cd39058@huawei.com>
+References: <20220303230131.2103-1-shameerali.kolothum.thodi@huawei.com>
+        <20220303230131.2103-4-shameerali.kolothum.thodi@huawei.com>
+ <20220307105344.171b4621.alex.williamson@redhat.com>
+In-Reply-To: <20220307105344.171b4621.alex.williamson@redhat.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.47.85.233]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When iterating over sockets using vsock_for_each_connected_socket, make
-sure that a transport filters out sockets that don't belong to the
-transport.
+Hi Bjorn,
 
-There actually was an issue caused by this; in a nested VM
-configuration, destroying the nested VM (which often involves the
-closing of /dev/vhost-vsock if there was h2g connections to the nested
-VM) kills not only the h2g connections, but also all existing g2h
-connections to the (outmost) host which are totally unrelated.
+> -----Original Message-----
+> From: Alex Williamson [mailto:alex.williamson@redhat.com]
+> Sent: 07 March 2022 17:54
+> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
+> Bjorn Helgaas <bhelgaas@google.com>
+> Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
+> linux-crypto@vger.kernel.org; linux-pci@vger.kernel.org; jgg@nvidia.com;
+> cohuck@redhat.com; mgurtovoy@nvidia.com; yishaih@nvidia.com; Linuxarm
+> <linuxarm@huawei.com>; liulongfang <liulongfang@huawei.com>; Zengtao (B)
+> <prime.zeng@hisilicon.com>; Jonathan Cameron
+> <jonathan.cameron@huawei.com>; Wangzhou (B) <wangzhou1@hisilicon.com>
+> Subject: Re: [PATCH v8 3/9] hisi_acc_qm: Move VF PCI device IDs to common
+> header
+> 
+> Hi Bjorn,
+> 
+> Here's the respin of this patch that adds only the VF device IDs to
+> pci_ids.h.  The next patch in the series[1] adds a consumer of these
+> IDs as a vfio-pci vendor driver.  Thanks,
 
-Tested: Executed the following steps on Cuttlefish (Android running on a
-VM) [1]: (1) Enter into an `adb shell` session - to have a g2h
-connection inside the VM, (2) open and then close /dev/vhost-vsock by
-`exec 3< /dev/vhost-vsock && exec 3<&-`, (3) observe that the adb
-session is not reset.
+Just a gentle ping on this. Also the latest respin is now at v9 and can be
+found here.
 
-[1] https://android.googlesource.com/device/google/cuttlefish/
+https://lore.kernel.org/kvm/20220308184902.2242-4-shameerali.kolothum.thodi@huawei.com/
 
-Fixes: c0cfa2d8a788 ("vsock: add multi-transports support")
-Signed-off-by: Jiyong Park <jiyong@google.com>
----
-Changes in v3:
-  - Fixed the build error in vmci_transport.c
-Changes in v2:
-  - Squashed into a single patch
+Thanks,
+Shameer
 
- drivers/vhost/vsock.c            | 3 ++-
- include/net/af_vsock.h           | 3 ++-
- net/vmw_vsock/af_vsock.c         | 9 +++++++--
- net/vmw_vsock/virtio_transport.c | 7 +++++--
- net/vmw_vsock/vmci_transport.c   | 5 ++++-
- 5 files changed, 20 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-index 37f0b4274113..e6c9d41db1de 100644
---- a/drivers/vhost/vsock.c
-+++ b/drivers/vhost/vsock.c
-@@ -753,7 +753,8 @@ static int vhost_vsock_dev_release(struct inode *inode, struct file *file)
- 
- 	/* Iterating over all connections for all CIDs to find orphans is
- 	 * inefficient.  Room for improvement here. */
--	vsock_for_each_connected_socket(vhost_vsock_reset_orphans);
-+	vsock_for_each_connected_socket(&vhost_transport.transport,
-+					vhost_vsock_reset_orphans);
- 
- 	/* Don't check the owner, because we are in the release path, so we
- 	 * need to stop the vsock device in any case.
-diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
-index ab207677e0a8..f742e50207fb 100644
---- a/include/net/af_vsock.h
-+++ b/include/net/af_vsock.h
-@@ -205,7 +205,8 @@ struct sock *vsock_find_bound_socket(struct sockaddr_vm *addr);
- struct sock *vsock_find_connected_socket(struct sockaddr_vm *src,
- 					 struct sockaddr_vm *dst);
- void vsock_remove_sock(struct vsock_sock *vsk);
--void vsock_for_each_connected_socket(void (*fn)(struct sock *sk));
-+void vsock_for_each_connected_socket(struct vsock_transport *transport,
-+				     void (*fn)(struct sock *sk));
- int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk);
- bool vsock_find_cid(unsigned int cid);
- 
-diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-index 38baeb189d4e..f04abf662ec6 100644
---- a/net/vmw_vsock/af_vsock.c
-+++ b/net/vmw_vsock/af_vsock.c
-@@ -334,7 +334,8 @@ void vsock_remove_sock(struct vsock_sock *vsk)
- }
- EXPORT_SYMBOL_GPL(vsock_remove_sock);
- 
--void vsock_for_each_connected_socket(void (*fn)(struct sock *sk))
-+void vsock_for_each_connected_socket(struct vsock_transport *transport,
-+				     void (*fn)(struct sock *sk))
- {
- 	int i;
- 
-@@ -343,8 +344,12 @@ void vsock_for_each_connected_socket(void (*fn)(struct sock *sk))
- 	for (i = 0; i < ARRAY_SIZE(vsock_connected_table); i++) {
- 		struct vsock_sock *vsk;
- 		list_for_each_entry(vsk, &vsock_connected_table[i],
--				    connected_table)
-+				    connected_table) {
-+			if (vsk->transport != transport)
-+				continue;
-+
- 			fn(sk_vsock(vsk));
-+		}
- 	}
- 
- 	spin_unlock_bh(&vsock_table_lock);
-diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
-index fb3302fff627..5afc194a58bb 100644
---- a/net/vmw_vsock/virtio_transport.c
-+++ b/net/vmw_vsock/virtio_transport.c
-@@ -24,6 +24,7 @@
- static struct workqueue_struct *virtio_vsock_workqueue;
- static struct virtio_vsock __rcu *the_virtio_vsock;
- static DEFINE_MUTEX(the_virtio_vsock_mutex); /* protects the_virtio_vsock */
-+static struct virtio_transport virtio_transport; /* forward declaration */
- 
- struct virtio_vsock {
- 	struct virtio_device *vdev;
-@@ -384,7 +385,8 @@ static void virtio_vsock_event_handle(struct virtio_vsock *vsock,
- 	switch (le32_to_cpu(event->id)) {
- 	case VIRTIO_VSOCK_EVENT_TRANSPORT_RESET:
- 		virtio_vsock_update_guest_cid(vsock);
--		vsock_for_each_connected_socket(virtio_vsock_reset_sock);
-+		vsock_for_each_connected_socket(&virtio_transport.transport,
-+						virtio_vsock_reset_sock);
- 		break;
- 	}
- }
-@@ -662,7 +664,8 @@ static void virtio_vsock_remove(struct virtio_device *vdev)
- 	synchronize_rcu();
- 
- 	/* Reset all connected sockets when the device disappear */
--	vsock_for_each_connected_socket(virtio_vsock_reset_sock);
-+	vsock_for_each_connected_socket(&virtio_transport.transport,
-+					virtio_vsock_reset_sock);
- 
- 	/* Stop all work handlers to make sure no one is accessing the device,
- 	 * so we can safely call virtio_reset_device().
-diff --git a/net/vmw_vsock/vmci_transport.c b/net/vmw_vsock/vmci_transport.c
-index 7aef34e32bdf..b17dc9745188 100644
---- a/net/vmw_vsock/vmci_transport.c
-+++ b/net/vmw_vsock/vmci_transport.c
-@@ -75,6 +75,8 @@ static u32 vmci_transport_qp_resumed_sub_id = VMCI_INVALID_ID;
- 
- static int PROTOCOL_OVERRIDE = -1;
- 
-+static struct vsock_transport vmci_transport; /* forward declaration */
-+
- /* Helper function to convert from a VMCI error code to a VSock error code. */
- 
- static s32 vmci_transport_error_to_vsock_error(s32 vmci_error)
-@@ -882,7 +884,8 @@ static void vmci_transport_qp_resumed_cb(u32 sub_id,
- 					 const struct vmci_event_data *e_data,
- 					 void *client_data)
- {
--	vsock_for_each_connected_socket(vmci_transport_handle_detach);
-+	vsock_for_each_connected_socket(&vmci_transport,
-+					vmci_transport_handle_detach);
- }
- 
- static void vmci_transport_recv_pkt_work(struct work_struct *work)
-
-base-commit: 3bf7edc84a9eb4007dd9a0cb8878a7e1d5ec6a3b
--- 
-2.35.1.723.g4982287a31-goog
+> Alex
+> 
+> [1]https://lore.kernel.org/all/20220303230131.2103-5-shameerali.kolothum.t
+> hodi@huawei.com/
+> 
+> On Thu, 3 Mar 2022 23:01:25 +0000
+> Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
+> 
+> > Move the PCI Device IDs of HiSilicon ACC VF devices to a common header
+> > and also use a uniform naming convention.
+> >
+> > This will be useful when we introduce the vfio PCI HiSilicon ACC live
+> > migration driver in subsequent patches.
+> >
+> > Signed-off-by: Shameer Kolothum
+> <shameerali.kolothum.thodi@huawei.com>
+> > ---
+> >  drivers/crypto/hisilicon/hpre/hpre_main.c | 13 ++++++-------
+> >  drivers/crypto/hisilicon/sec2/sec_main.c  | 15 +++++++--------
+> >  drivers/crypto/hisilicon/zip/zip_main.c   | 11 +++++------
+> >  include/linux/pci_ids.h                   |  3 +++
+> >  4 files changed, 21 insertions(+), 21 deletions(-)
+> >
+> > diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c
+> b/drivers/crypto/hisilicon/hpre/hpre_main.c
+> > index ebfab3e14499..3589d8879b5e 100644
+> > --- a/drivers/crypto/hisilicon/hpre/hpre_main.c
+> > +++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
+> > @@ -68,8 +68,7 @@
+> >  #define HPRE_REG_RD_INTVRL_US		10
+> >  #define HPRE_REG_RD_TMOUT_US		1000
+> >  #define HPRE_DBGFS_VAL_MAX_LEN		20
+> > -#define HPRE_PCI_DEVICE_ID		0xa258
+> > -#define HPRE_PCI_VF_DEVICE_ID		0xa259
+> > +#define PCI_DEVICE_ID_HUAWEI_HPRE_PF	0xa258
+> >  #define HPRE_QM_USR_CFG_MASK		GENMASK(31, 1)
+> >  #define HPRE_QM_AXI_CFG_MASK		GENMASK(15, 0)
+> >  #define HPRE_QM_VFG_AX_MASK		GENMASK(7, 0)
+> > @@ -111,8 +110,8 @@
+> >  static const char hpre_name[] = "hisi_hpre";
+> >  static struct dentry *hpre_debugfs_root;
+> >  static const struct pci_device_id hpre_dev_ids[] = {
+> > -	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, HPRE_PCI_DEVICE_ID) },
+> > -	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, HPRE_PCI_VF_DEVICE_ID) },
+> > +	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI,
+> PCI_DEVICE_ID_HUAWEI_HPRE_PF) },
+> > +	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI,
+> PCI_DEVICE_ID_HUAWEI_HPRE_VF) },
+> >  	{ 0, }
+> >  };
+> >
+> > @@ -242,7 +241,7 @@ MODULE_PARM_DESC(uacce_mode,
+> UACCE_MODE_DESC);
+> >
+> >  static int pf_q_num_set(const char *val, const struct kernel_param *kp)
+> >  {
+> > -	return q_num_set(val, kp, HPRE_PCI_DEVICE_ID);
+> > +	return q_num_set(val, kp, PCI_DEVICE_ID_HUAWEI_HPRE_PF);
+> >  }
+> >
+> >  static const struct kernel_param_ops hpre_pf_q_num_ops = {
+> > @@ -921,7 +920,7 @@ static int hpre_debugfs_init(struct hisi_qm *qm)
+> >  	qm->debug.sqe_mask_len = HPRE_SQE_MASK_LEN;
+> >  	hisi_qm_debug_init(qm);
+> >
+> > -	if (qm->pdev->device == HPRE_PCI_DEVICE_ID) {
+> > +	if (qm->pdev->device == PCI_DEVICE_ID_HUAWEI_HPRE_PF) {
+> >  		ret = hpre_ctrl_debug_init(qm);
+> >  		if (ret)
+> >  			goto failed_to_create;
+> > @@ -958,7 +957,7 @@ static int hpre_qm_init(struct hisi_qm *qm, struct
+> pci_dev *pdev)
+> >  	qm->sqe_size = HPRE_SQE_SIZE;
+> >  	qm->dev_name = hpre_name;
+> >
+> > -	qm->fun_type = (pdev->device == HPRE_PCI_DEVICE_ID) ?
+> > +	qm->fun_type = (pdev->device == PCI_DEVICE_ID_HUAWEI_HPRE_PF) ?
+> >  			QM_HW_PF : QM_HW_VF;
+> >  	if (qm->fun_type == QM_HW_PF) {
+> >  		qm->qp_base = HPRE_PF_DEF_Q_BASE;
+> > diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c
+> b/drivers/crypto/hisilicon/sec2/sec_main.c
+> > index 26d3ab1d308b..311a8747b5bf 100644
+> > --- a/drivers/crypto/hisilicon/sec2/sec_main.c
+> > +++ b/drivers/crypto/hisilicon/sec2/sec_main.c
+> > @@ -20,8 +20,7 @@
+> >
+> >  #define SEC_VF_NUM			63
+> >  #define SEC_QUEUE_NUM_V1		4096
+> > -#define SEC_PF_PCI_DEVICE_ID		0xa255
+> > -#define SEC_VF_PCI_DEVICE_ID		0xa256
+> > +#define PCI_DEVICE_ID_HUAWEI_SEC_PF	0xa255
+> >
+> >  #define SEC_BD_ERR_CHK_EN0		0xEFFFFFFF
+> >  #define SEC_BD_ERR_CHK_EN1		0x7ffff7fd
+> > @@ -225,7 +224,7 @@ static const struct debugfs_reg32 sec_dfx_regs[] = {
+> >
+> >  static int sec_pf_q_num_set(const char *val, const struct kernel_param
+> *kp)
+> >  {
+> > -	return q_num_set(val, kp, SEC_PF_PCI_DEVICE_ID);
+> > +	return q_num_set(val, kp, PCI_DEVICE_ID_HUAWEI_SEC_PF);
+> >  }
+> >
+> >  static const struct kernel_param_ops sec_pf_q_num_ops = {
+> > @@ -313,8 +312,8 @@ module_param_cb(uacce_mode,
+> &sec_uacce_mode_ops, &uacce_mode, 0444);
+> >  MODULE_PARM_DESC(uacce_mode, UACCE_MODE_DESC);
+> >
+> >  static const struct pci_device_id sec_dev_ids[] = {
+> > -	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, SEC_PF_PCI_DEVICE_ID) },
+> > -	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, SEC_VF_PCI_DEVICE_ID) },
+> > +	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI,
+> PCI_DEVICE_ID_HUAWEI_SEC_PF) },
+> > +	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI,
+> PCI_DEVICE_ID_HUAWEI_SEC_VF) },
+> >  	{ 0, }
+> >  };
+> >  MODULE_DEVICE_TABLE(pci, sec_dev_ids);
+> > @@ -717,7 +716,7 @@ static int sec_core_debug_init(struct hisi_qm *qm)
+> >  	regset->base = qm->io_base;
+> >  	regset->dev = dev;
+> >
+> > -	if (qm->pdev->device == SEC_PF_PCI_DEVICE_ID)
+> > +	if (qm->pdev->device == PCI_DEVICE_ID_HUAWEI_SEC_PF)
+> >  		debugfs_create_file("regs", 0444, tmp_d, regset, &sec_regs_fops);
+> >
+> >  	for (i = 0; i < ARRAY_SIZE(sec_dfx_labels); i++) {
+> > @@ -735,7 +734,7 @@ static int sec_debug_init(struct hisi_qm *qm)
+> >  	struct sec_dev *sec = container_of(qm, struct sec_dev, qm);
+> >  	int i;
+> >
+> > -	if (qm->pdev->device == SEC_PF_PCI_DEVICE_ID) {
+> > +	if (qm->pdev->device == PCI_DEVICE_ID_HUAWEI_SEC_PF) {
+> >  		for (i = SEC_CLEAR_ENABLE; i < SEC_DEBUG_FILE_NUM; i++) {
+> >  			spin_lock_init(&sec->debug.files[i].lock);
+> >  			sec->debug.files[i].index = i;
+> > @@ -877,7 +876,7 @@ static int sec_qm_init(struct hisi_qm *qm, struct
+> pci_dev *pdev)
+> >  	qm->sqe_size = SEC_SQE_SIZE;
+> >  	qm->dev_name = sec_name;
+> >
+> > -	qm->fun_type = (pdev->device == SEC_PF_PCI_DEVICE_ID) ?
+> > +	qm->fun_type = (pdev->device == PCI_DEVICE_ID_HUAWEI_SEC_PF) ?
+> >  			QM_HW_PF : QM_HW_VF;
+> >  	if (qm->fun_type == QM_HW_PF) {
+> >  		qm->qp_base = SEC_PF_DEF_Q_BASE;
+> > diff --git a/drivers/crypto/hisilicon/zip/zip_main.c
+> b/drivers/crypto/hisilicon/zip/zip_main.c
+> > index 678f8b58ec42..66decfe07282 100644
+> > --- a/drivers/crypto/hisilicon/zip/zip_main.c
+> > +++ b/drivers/crypto/hisilicon/zip/zip_main.c
+> > @@ -15,8 +15,7 @@
+> >  #include <linux/uacce.h>
+> >  #include "zip.h"
+> >
+> > -#define PCI_DEVICE_ID_ZIP_PF		0xa250
+> > -#define PCI_DEVICE_ID_ZIP_VF		0xa251
+> > +#define PCI_DEVICE_ID_HUAWEI_ZIP_PF	0xa250
+> >
+> >  #define HZIP_QUEUE_NUM_V1		4096
+> >
+> > @@ -246,7 +245,7 @@ MODULE_PARM_DESC(uacce_mode,
+> UACCE_MODE_DESC);
+> >
+> >  static int pf_q_num_set(const char *val, const struct kernel_param *kp)
+> >  {
+> > -	return q_num_set(val, kp, PCI_DEVICE_ID_ZIP_PF);
+> > +	return q_num_set(val, kp, PCI_DEVICE_ID_HUAWEI_ZIP_PF);
+> >  }
+> >
+> >  static const struct kernel_param_ops pf_q_num_ops = {
+> > @@ -268,8 +267,8 @@ module_param_cb(vfs_num, &vfs_num_ops,
+> &vfs_num, 0444);
+> >  MODULE_PARM_DESC(vfs_num, "Number of VFs to enable(1-63),
+> 0(default)");
+> >
+> >  static const struct pci_device_id hisi_zip_dev_ids[] = {
+> > -	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_ZIP_PF) },
+> > -	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_ZIP_VF) },
+> > +	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI,
+> PCI_DEVICE_ID_HUAWEI_ZIP_PF) },
+> > +	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI,
+> PCI_DEVICE_ID_HUAWEI_ZIP_VF) },
+> >  	{ 0, }
+> >  };
+> >  MODULE_DEVICE_TABLE(pci, hisi_zip_dev_ids);
+> > @@ -838,7 +837,7 @@ static int hisi_zip_qm_init(struct hisi_qm *qm, struct
+> pci_dev *pdev)
+> >  	qm->sqe_size = HZIP_SQE_SIZE;
+> >  	qm->dev_name = hisi_zip_name;
+> >
+> > -	qm->fun_type = (pdev->device == PCI_DEVICE_ID_ZIP_PF) ?
+> > +	qm->fun_type = (pdev->device == PCI_DEVICE_ID_HUAWEI_ZIP_PF) ?
+> >  			QM_HW_PF : QM_HW_VF;
+> >  	if (qm->fun_type == QM_HW_PF) {
+> >  		qm->qp_base = HZIP_PF_DEF_Q_BASE;
+> > diff --git a/include/linux/pci_ids.h b/include/linux/pci_ids.h
+> > index aad54c666407..31dee2b65a62 100644
+> > --- a/include/linux/pci_ids.h
+> > +++ b/include/linux/pci_ids.h
+> > @@ -2529,6 +2529,9 @@
+> >  #define PCI_DEVICE_ID_KORENIX_JETCARDF3	0x17ff
+> >
+> >  #define PCI_VENDOR_ID_HUAWEI		0x19e5
+> > +#define PCI_DEVICE_ID_HUAWEI_ZIP_VF	0xa251
+> > +#define PCI_DEVICE_ID_HUAWEI_SEC_VF	0xa256
+> > +#define PCI_DEVICE_ID_HUAWEI_HPRE_VF	0xa259
+> >
+> >  #define PCI_VENDOR_ID_NETRONOME		0x19ee
+> >  #define PCI_DEVICE_ID_NETRONOME_NFP4000	0x4000
 
