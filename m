@@ -2,79 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D7F084D4289
-	for <lists+kvm@lfdr.de>; Thu, 10 Mar 2022 09:30:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CD3D74D429E
+	for <lists+kvm@lfdr.de>; Thu, 10 Mar 2022 09:34:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240334AbiCJIbi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Mar 2022 03:31:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47872 "EHLO
+        id S240389AbiCJIfI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Mar 2022 03:35:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232250AbiCJIbh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Mar 2022 03:31:37 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 094C8135701
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 00:30:35 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 4E9D2B82549
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 08:30:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10005C340E8;
-        Thu, 10 Mar 2022 08:30:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1646901033;
-        bh=x2w4YCh8zXACrKp+r92F1M5/iu5aNSGm4udnt9xxu9Q=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=B5WtLt39l2iASMRRDy7YhKUHMA2M1rMfc5M5QIU01BWemlZrfw4DGKKm20U64OUD1
-         tSf63zMrtYcMsTJprGHUMFc9U7IwOqLJKKxJpaqn1ZheluiovgBpuTaCp7h8El0D2n
-         MIwm3vBN+0/YShFHn0f2NGoghAk0VagkSIn5T8pBhotb4p1skcuYffd9ZiW9jBn6Ew
-         oONNl/OX0dQdu8B+TSyGB/WrV8OxfqK9xXsZh5gNribZKq5KBMp5SCCkOSo5H4SfPz
-         +qfjjd7Kd7icdl4ie4sxbdGJsTB7e6mPAW24qt8la80eesNykdPBRX80shO87KQlgZ
-         ghfm/bgKkioBA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1nSEBq-00DWbd-JW; Thu, 10 Mar 2022 08:30:30 +0000
-Date:   Thu, 10 Mar 2022 08:30:30 +0000
-Message-ID: <87r17ayztl.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        leksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        with ESMTP id S240359AbiCJIfH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Mar 2022 03:35:07 -0500
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0942C5BE58;
+        Thu, 10 Mar 2022 00:34:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1646901246; x=1678437246;
+  h=from:to:cc:subject:date:message-id;
+  bh=nz5FzexQmq7xmux0Vn9kIxPKVazZKup2wF1i2KERivk=;
+  b=ihjvRKREeBn6xQYTMuahJyIqhLfwHMjYERNMrgfGYhxK8hDrmGBbe0AP
+   u33nN2O15BN9LT60fHyIjlTY8MqLF5FW9EO5QoigdCPCD7XekmW0mVEJr
+   69kOFd4M1V3OSsShTgatqrlnRfm3Rw9UWabRNT4ejY+PBKBEkfnTicF0f
+   pUBnd1aSfIcAwtW9WGCtRQUJkx92nKqrsKhDZSyBqsiLzEreeed/tj/d+
+   9vRifD5KSlS2kE06FZJgSPSdoDXqO68h5c7b76kTfrZal2UHFMmPN2L4G
+   1PpbXan/a5fctush6l4oLj86VW4vqH3fydP2OWmP5A+Fb1S7ydzjytjGq
+   A==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10281"; a="235800117"
+X-IronPort-AV: E=Sophos;i="5.90,169,1643702400"; 
+   d="scan'208";a="235800117"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2022 00:34:06 -0800
+X-IronPort-AV: E=Sophos;i="5.90,169,1643702400"; 
+   d="scan'208";a="513891422"
+Received: from chenyi-pc.sh.intel.com ([10.239.159.73])
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2022 00:34:04 -0800
+From:   Chenyi Qiang <chenyi.qiang@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
-        Peter Feiner <pfeiner@google.com>,
-        Andrew Jones <drjones@redhat.com>,
-        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
-        kvm list <kvm@vger.kernel.org>
-Subject: Re: [PATCH 19/23] KVM: Allow for different capacities in kvm_mmu_memory_cache structs
-In-Reply-To: <CALzav=dZXEx80JsTzQe1vyDg6c_NR89HXCcu=W1EsvShysW7HQ@mail.gmail.com>
-References: <20220203010051.2813563-1-dmatlack@google.com>
-        <20220203010051.2813563-20-dmatlack@google.com>
-        <8735k84i6f.wl-maz@kernel.org>
-        <CALzav=d9dRWCV=R8Ypvy4KzgzPQvd-7qhGTbxso5r9eTh9kkqw@mail.gmail.com>
-        <CALzav=ccRmvCB+FsN64JujOVpb7-ocdzkiBrYLFGFRQUa7DbWQ@mail.gmail.com>
-        <878rtotk3h.wl-maz@kernel.org>
-        <CALzav=e7vH87uyphgL8vXPMmn8vX8TmkpUY_3OWuRXrKFhy_ag@mail.gmail.com>
-        <CALzav=dZXEx80JsTzQe1vyDg6c_NR89HXCcu=W1EsvShysW7HQ@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: dmatlack@google.com, pbonzini@redhat.com, chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, seanjc@google.com, vkuznets@redhat.com, peterx@redhat.com, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org, pfeiner@google.com, drjones@redhat.com, maciej.szmigiero@oracle.com, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v4 0/3] Introduce Notify VM exit
+Date:   Thu, 10 Mar 2022 16:39:58 +0800
+Message-Id: <20220310084001.10235-1-chenyi.qiang@intel.com>
+X-Mailer: git-send-email 2.17.1
+X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -82,52 +58,69 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 09 Mar 2022 21:49:01 +0000,
-David Matlack <dmatlack@google.com> wrote:
-> 
-> On Mon, Mar 7, 2022 at 3:49 PM David Matlack <dmatlack@google.com> wrote:
-> >
-> > On Sat, Mar 5, 2022 at 8:55 AM Marc Zyngier <maz@kernel.org> wrote:
-> > >
-> > > On Fri, 04 Mar 2022 21:59:12 +0000,
-> > > David Matlack <dmatlack@google.com> wrote:
-> > > > I see two alternatives to make this cleaner:
-> > > >
-> > > > 1. Dynamically allocate just this cache. The caches defined in
-> > > > vcpu_arch will continue to use DEFINE_KVM_MMU_MEMORY_CACHE(). This
-> > > > would get rid of the outer struct but require an extra memory
-> > > > allocation.
-> > > > 2. Move this cache to struct kvm_arch using
-> > > > DEFINE_KVM_MMU_MEMORY_CACHE(). Then we don't need to stack allocate it
-> > > > or dynamically allocate it.
-> > > >
-> > > > Do either of these approaches appeal to you more than the current one?
-> > >
-> > > Certainly, #2 feels more solid. Dynamic allocations (and the resulting
-> > > pointer chasing) are usually costly in terms of performance, so I'd
-> > > avoid it if at all possible.
-> > >
-> > > That being said, if it turns out that #2 isn't practical, I won't get
-> > > in the way of your current approach. Moving kvm_mmu_memory_cache to
-> > > core code was definitely a good cleanup, and I'm not overly excited
-> > > with the perspective of *more* arch-specific code.
-> >
-> > Ok I'll play with #2. Thanks for the feedback.
-> 
-> #2 is very clean to implement but it ends up being a bit silly. It
-> increases the size of struct kvm_arch by 336 bytes for all VMs but
-> only ever gets used during kvm_vgic_map_resources(), which is only
-> called the first time a vCPU is run (according to the comment in
-> kvm_arch_vcpu_run_pid_change()). I think stack allocation makes the
-> most sense for this object, I don't think it's worth dancing around
-> that solely to avoid the inner struct grottiness.
+Virtual machines can exploit Intel ISA characterstics to cause
+functional denial of service to the VMM. This series introduces a new
+feature named Notify VM exit, which can help mitigate such kind of
+attack.
 
-Fair enough, and thanks for having had a look. I'll look at the next
-version once you post it.
+Patch 1: An extension of KVM_SET_VCPU_EVENTS ioctl to inject a
+synthesized shutdown event from user space.
 
-Thanks,
+Patch 2: The main patch to enable Notify VM exit.
 
-	M.
+Patch 3: Add document about the new KVM capability and KVM exit reason.
+
+---
+Change logs:
+v3 -> v4
+- Change this feature to per-VM scope. (Jim)
+- Once VM_CONTEXT_INVALID set in exit_qualification, exit to user space
+  notify this fatal case, especially the notify VM exit happens in L2.
+  (Jim)
+- extend KVM_SET_VCPU_EVENTS to allow user space to inject a shutdown
+  event. (Jim)
+- A minor code changes.
+- Add document for the new KVM capability.
+- v3: https://lore.kernel.org/lkml/20220223062412.22334-1-chenyi.qiang@intel.com/
+
+v2 -> v3
+- add a vcpu state notify_window_exits to record the number of
+  occurence as well as a pr_warn output. (Sean)
+- Add the handling in nested VM to prevent L1 bypassing the restriction
+  through launching a L2. (Sean)
+- Only kill L2 when L2 VM is context invalid, synthesize a
+  EXIT_REASON_TRIPLE_FAULT to L1 (Sean)
+- To ease the current implementation, make module parameter
+  notify_window read-only. (Sean)
+- Disable notify window exit by default.
+- v2: https://lore.kernel.org/lkml/20210525051204.1480610-1-tao3.xu@intel.com/
+
+v1 -> v2
+- Default set notify window to 0, less than 0 to disable.
+- Add more description in commit message.
+---
+
+Chenyi Qiang (2):
+  KVM: X86: Extend KVM_SET_VCPU_EVENTS to inject a SHUTDOWN event
+  KVM: Add document for KVM_CAP_X86_NOTIFY_VMEXIT and KVM_EXIT_NOTIFY
+
+Tao Xu (1):
+  KVM: VMX: Enable Notify VM exit
+
+ Documentation/virt/kvm/api.rst     | 42 ++++++++++++++++++++++++++++
+ arch/x86/include/asm/kvm_host.h    |  5 ++++
+ arch/x86/include/asm/vmx.h         |  7 +++++
+ arch/x86/include/asm/vmxfeatures.h |  1 +
+ arch/x86/include/uapi/asm/kvm.h    |  1 +
+ arch/x86/include/uapi/asm/vmx.h    |  4 ++-
+ arch/x86/kvm/vmx/capabilities.h    |  6 ++++
+ arch/x86/kvm/vmx/nested.c          | 17 +++++++++++-
+ arch/x86/kvm/vmx/vmx.c             | 44 ++++++++++++++++++++++++++++--
+ arch/x86/kvm/x86.c                 | 25 +++++++++++++++--
+ arch/x86/kvm/x86.h                 |  5 ++++
+ include/uapi/linux/kvm.h           |  7 +++++
+ 12 files changed, 156 insertions(+), 8 deletions(-)
 
 -- 
-Without deviation from the norm, progress is not possible.
+2.17.1
+
