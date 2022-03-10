@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 67D164D4F9E
-	for <lists+kvm@lfdr.de>; Thu, 10 Mar 2022 17:47:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CDB824D4FA8
+	for <lists+kvm@lfdr.de>; Thu, 10 Mar 2022 17:47:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244279AbiCJQrp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Mar 2022 11:47:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57374 "EHLO
+        id S244166AbiCJQrm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Mar 2022 11:47:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244125AbiCJQr3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Mar 2022 11:47:29 -0500
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64F221986EA
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 08:46:17 -0800 (PST)
-Received: by mail-pl1-x64a.google.com with SMTP id e13-20020a17090301cd00b00150145346f9so2958342plh.23
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 08:46:17 -0800 (PST)
+        with ESMTP id S244180AbiCJQrb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Mar 2022 11:47:31 -0500
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A88C198D1E
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 08:46:20 -0800 (PST)
+Received: by mail-pl1-x649.google.com with SMTP id b4-20020a170902a9c400b001532ec9005aso195041plr.10
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 08:46:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=6/GjUUfRe2TednvAxOrIHMT0ZcA0ouG3TTihxHdaCW0=;
-        b=Ci9RymXtUyaxSqLze1CsiykAC+coEyY7bha7vdnz2IIfbsq+NipcxCu5E/6SKCYP8P
-         AZWfyT5rXjCdQA1Gc4bceeNSCG3fmAHG5yIaY6IZRZjo4kFmN0YpfdldarRV/GfHnuBu
-         S6vSmARKH46PTiE2z01E5t/V2c3KvFKPvZOphqNi9lLlORngKiLyJmhydv2dYqkYeqtA
-         1c/QNL7R77dPvsGRnw1KCbfnc/kg1T0Dxlq2eZnnBoYWzQ1Jma9qeKXqm9VBmtJC6bEA
-         JuLGJJoLaYlYhGieelYs4IiVe8BaquDMzGy0TH0xQKbMAD3FEy/HRFuNfprA6v5y0zjf
-         MNeg==
+        bh=OmK9ig5jJPqHc1lT2kwZLVXWHtYR0m8aDz/I++ZnaZg=;
+        b=HdFmzmvSIq4czsk8EyXnKZqkaBCWAJbd0VwxsSv4+1Yw7/3bw6MYRa7aMqdk0mV1e1
+         VHNRH9xx/5Te44HQJHZxuyptGPbnXf/j+pXB8dusDq5udVzrfFDbXHWHGiOxW42yBKen
+         taetvPR9Zt8E8HQhExhww8N+Q6aj4bq83pNPzWJvmGhzYl+GVOBOWmdrug0kgrir4KZz
+         L6/euPHhjKO+W6ssAnsgPJ21R2zI0j4v2cB3usLUUpZK8YA/1cRRoCXlU3X5FAklbDdX
+         P1J5k3k7z+EPGWsSylCef3Wx0ns0t++tyYbzx6fhn5LJuHFXaBPNV8cRK6oFrWrcojdz
+         pcgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=6/GjUUfRe2TednvAxOrIHMT0ZcA0ouG3TTihxHdaCW0=;
-        b=FWJi/Gu68m78ey+15p0wGvzOyMMhv4wU4Cz0LZPyy6Se+x2hQHEf2grIp9B8pnbZdU
-         llybw5PP7DBSKgtO5P/z7S0KgIMN6ZoXhv2nLiL+LIw2JR3OKyypBaqrD/hFTvG/iROQ
-         5pzulVhFjg+CN/cm8dDvcwcwbH/OiOiJfWOPJZBGoHay3faw2g5nygnb9cLb1zeytHyh
-         tCL6Jylq9GCQjpJKRdUIPAbkQ2vnEfWuEroIJMzo9fXAIuM65EieoYiF91pJ4N+HgTn2
-         B58r7e6l+zG4z8TShbVy0etbPbJstlVi6Ewt65cd0OG6QZuxe4s7p3vsrxqi64+hjULd
-         YK2w==
-X-Gm-Message-State: AOAM532tf8OjSEB+fivbvneMNcO9Ikb4WGF5AdLQ4+9csuSBj2whFmxv
-        WH8c3YJ2O8cdWgZY2+vfiMjUWNdkkMcZ
-X-Google-Smtp-Source: ABdhPJzwNz0xJOQ5UQ4Rax3VSodtAuXU0L+axkICu24kh0fHPhU/xTF0kOdXzALpDVGWwJbMh3I+GHUH8LsJ
+        bh=OmK9ig5jJPqHc1lT2kwZLVXWHtYR0m8aDz/I++ZnaZg=;
+        b=QmAasxVPuWQlEWBcT0VcwhrAOO2JV4rGwMb4YNXfziHvzhEYxKb/XQ+XaPB28X3awM
+         ngDI/Lnan8GBLYjML/UVsBd/Qus+LZtFHh3/fQ0Cq+CmwRjwjttzapkGyOGJs9DSslmk
+         ubxSofsnSgJdsl0z9+5qO/ah6BpgLCX4Phm7gANrUfLxEn5l25EhwWO4GAT8eWSJfRag
+         cVmogZm7hLzbD/670OTb5UZkttUVYh5Wmw10I/JsdUBM2CotjmPA5ylxbSNwn4YD/ye6
+         dQY7yiNWJjQWL++3bcbWNI9iOXFRGGhSV45U+prpnxyHFWSIbdra2ZkST7K2O+qDGOl5
+         ORUQ==
+X-Gm-Message-State: AOAM530gfcvDmZ0hZgvCSd8CKAmpA5gVSxPuOt+5faXWTZNU3DoZYS1C
+        JsJtAU+mxDRkZuVEI2IhLVkwKKPLuWh6
+X-Google-Smtp-Source: ABdhPJwrSHkEApdTW6RNQ1Yq3YoC+LnnBLVKJr3xZgwX2aqe4qJL7KcpDIGjBo9jF5gVpEqZyPMtdxBy110l
 X-Received: from bgardon.sea.corp.google.com ([2620:15c:100:202:2d58:733f:1853:8e86])
- (user=bgardon job=sendgmr) by 2002:aa7:8889:0:b0:4f7:7283:e378 with SMTP id
- z9-20020aa78889000000b004f77283e378mr4535906pfe.36.1646930776770; Thu, 10 Mar
- 2022 08:46:16 -0800 (PST)
-Date:   Thu, 10 Mar 2022 08:45:30 -0800
+ (user=bgardon job=sendgmr) by 2002:a17:90b:1e10:b0:1bf:6c78:54a9 with SMTP id
+ pg16-20020a17090b1e1000b001bf6c7854a9mr94496pjb.1.1646930779582; Thu, 10 Mar
+ 2022 08:46:19 -0800 (PST)
+Date:   Thu, 10 Mar 2022 08:45:31 -0800
 In-Reply-To: <20220310164532.1821490-1-bgardon@google.com>
-Message-Id: <20220310164532.1821490-12-bgardon@google.com>
+Message-Id: <20220310164532.1821490-13-bgardon@google.com>
 Mime-Version: 1.0
 References: <20220310164532.1821490-1-bgardon@google.com>
 X-Mailer: git-send-email 2.35.1.616.g0bdcbb4464-goog
-Subject: [PATCH 11/13] KVM: x86: Fix errant brace in KVM capability handling
+Subject: [PATCH 12/13] KVM: x86/MMU: Require reboot permission to disable NX hugepages
 From:   Ben Gardon <bgardon@google.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
@@ -73,32 +73,64 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The braces around the KVM_CAP_XSAVE2 block also surround the
-KVM_CAP_PMU_CAPABILITY block, likely the result of a merge issue. Simply
-move the curly brace back to where it belongs.
+Ensure that the userspace actor attempting to disable NX hugepages has
+permission to reboot the system. Since disabling NX hugepages would
+allow a guest to crash the system, it is similar to reboot permissions.
 
-Fixes: ba7bb663f5547 ("KVM: x86: Provide per VM capability for disabling PMU virtualization")
+This approach is the simplest permission gating, but passing a file
+descriptor opened for write for the module parameter would also work
+well and be more precise.
+The latter approach was suggested by Sean Christopherson.
+
+Suggested-by: Jim Mattson <jmattson@google.com>
 Signed-off-by: Ben Gardon <bgardon@google.com>
 ---
- arch/x86/kvm/x86.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/x86/kvm/x86.c | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
 
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 73df90a6932b..74351cbb9b5b 100644
+index 74351cbb9b5b..995f30667619 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -4352,10 +4352,10 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		if (r < sizeof(struct kvm_xsave))
- 			r = sizeof(struct kvm_xsave);
+@@ -4256,7 +4256,6 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_SYS_ATTRIBUTES:
+ 	case KVM_CAP_VAPIC:
+ 	case KVM_CAP_ENABLE_CAP:
+-	case KVM_CAP_VM_DISABLE_NX_HUGE_PAGES:
+ 		r = 1;
  		break;
-+	}
- 	case KVM_CAP_PMU_CAPABILITY:
- 		r = enable_pmu ? KVM_CAP_PMU_VALID_MASK : 0;
- 		break;
--	}
+ 	case KVM_CAP_EXIT_HYPERCALL:
+@@ -4359,6 +4358,14 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
  	case KVM_CAP_DISABLE_QUIRKS2:
  		r = KVM_X86_VALID_QUIRKS;
  		break;
++	case KVM_CAP_VM_DISABLE_NX_HUGE_PAGES:
++		/*
++		 * Since the risk of disabling NX hugepages is a guest crashing
++		 * the system, ensure the userspace process has permission to
++		 * reboot the system.
++		 */
++		r = capable(CAP_SYS_BOOT);
++		break;
+ 	default:
+ 		break;
+ 	}
+@@ -6050,6 +6057,15 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 		mutex_unlock(&kvm->lock);
+ 		break;
+ 	case KVM_CAP_VM_DISABLE_NX_HUGE_PAGES:
++		/*
++		 * Since the risk of disabling NX hugepages is a guest crashing
++		 * the system, ensure the userspace process has permission to
++		 * reboot the system.
++		 */
++		if (!capable(CAP_SYS_BOOT)) {
++			r = -EPERM;
++			break;
++		}
+ 		kvm->arch.disable_nx_huge_pages = true;
+ 		kvm_update_nx_huge_pages(kvm);
+ 		r = 0;
 -- 
 2.35.1.616.g0bdcbb4464-goog
 
