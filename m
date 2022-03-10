@@ -2,134 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 523254D46A6
-	for <lists+kvm@lfdr.de>; Thu, 10 Mar 2022 13:18:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B630C4D46BE
+	for <lists+kvm@lfdr.de>; Thu, 10 Mar 2022 13:22:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241943AbiCJMSX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Mar 2022 07:18:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42128 "EHLO
+        id S241963AbiCJMXT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Mar 2022 07:23:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241931AbiCJMSV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Mar 2022 07:18:21 -0500
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 68A3414864B
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 04:17:19 -0800 (PST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E859D1691;
-        Thu, 10 Mar 2022 04:17:18 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 386523FA27;
-        Thu, 10 Mar 2022 04:17:18 -0800 (PST)
-Date:   Thu, 10 Mar 2022 12:17:41 +0000
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Andre Przywara <andre.przywara@arm.com>
-Cc:     Dongli Si <sidongli1997@gmail.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH kvmtool] x86: Fixed Unable to execute init process since
- glibc version 2.33
-Message-ID: <YinsZYqYbxH2Kcbq@monolith.localdoman>
-References: <20220226060048.3-1-sidongli1997@gmail.com>
- <20220308173125.13130a28@donnerap.cambridge.arm.com>
+        with ESMTP id S237763AbiCJMXS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Mar 2022 07:23:18 -0500
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2415E148645
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 04:22:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1646914938; x=1678450938;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=IJjHA8jBLDxHPajmWm+quBmfQOVfT6c5MhN0RjRDbR8=;
+  b=h4biP0VMvLBFFOzfGgOY9c1uEoeMNiawGkq/YY12MGOx/dlPK2w7B/b2
+   VseWB26ysfMv+eFMnJjDPOJl9bvB5AfV6XKqMbs6Qt2syhcgvLYjsYIgE
+   zEgQAfjs6SGyX0IIck8/d3CEc/bphiWFzRGQNfuBHTwSTdsUeEqyZPbAW
+   9JSmAZnhKVFR4pdklRCn+SdVV0J5wjeF9VDoAduXrcVVFgZl5yjBPJh1K
+   E2+lSf80H0rhkXI7YDw1tP+ctRyBUwvTDbjpb8kp4ccLxnlOydVWgIiRm
+   g3G8OWViAeqqfhz+rn/1VzsF+xpoGegYBLu2601VR40r7HSq58ngZrLQF
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10281"; a="252803868"
+X-IronPort-AV: E=Sophos;i="5.90,170,1643702400"; 
+   d="scan'208";a="252803868"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2022 04:22:17 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.90,170,1643702400"; 
+   d="scan'208";a="496236550"
+Received: from lxy-dell.sh.intel.com ([10.239.159.55])
+  by orsmga003.jf.intel.com with ESMTP; 10 Mar 2022 04:22:15 -0800
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, mtosatti@redhat.com,
+        richard.henderson@linaro.org
+Cc:     kvm@vger.kernel.org, qemu-devel@nongnu.org, xiaoyao.li@intel.com
+Subject: [PATCH RESEND v1] trace: Split address space and slot id in trace_kvm_set_user_memory()
+Date:   Thu, 10 Mar 2022 20:22:15 +0800
+Message-Id: <20220310122215.804233-1-xiaoyao.li@intel.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220308173125.13130a28@donnerap.cambridge.arm.com>
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-5.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
+        HK_RANDOM_FROM,RCVD_IN_DNSWL_HI,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+The upper 16 bits of kvm_userspace_memory_region::slot are
+address space id. Parse it separately in trace_kvm_set_user_memory().
 
-On Tue, Mar 08, 2022 at 05:31:25PM +0000, Andre Przywara wrote:
-> On Sat, 26 Feb 2022 14:00:48 +0800
-> Dongli Si <sidongli1997@gmail.com> wrote:
-> 
-> Hi,
-> 
-> > From: Dongli Si <sidongli1997@gmail.com>
-> > 
-> > glibc detected invalid CPU Vendor name will cause an error:
-> > 
-> > [    0.450127] Run /sbin/init as init process
-> > /lib64/libc.so.6: CPU ISA level is lower than required
-> > [    0.451931] Kernel panic - not syncing: Attempted to kill init! exitcode=0x00007f00
-> > [    0.452117] CPU: 0 PID: 1 Comm: init Not tainted 5.17.0-rc1 #72
-> > 
-> > Signed-off-by: Dongli Si <sidongli1997@gmail.com>
-> > ---
-> >  x86/cpuid.c | 14 +++++++++-----
-> >  1 file changed, 9 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/x86/cpuid.c b/x86/cpuid.c
-> > index c3b67d9..d58a027 100644
-> > --- a/x86/cpuid.c
-> > +++ b/x86/cpuid.c
-> > @@ -2,6 +2,7 @@
-> >  
-> >  #include "kvm/kvm.h"
-> >  #include "kvm/util.h"
-> > +#include "kvm/cpufeature.h"
-> >  
-> >  #include <sys/ioctl.h>
-> >  #include <stdlib.h>
-> > @@ -10,7 +11,7 @@
-> >  
-> >  static void filter_cpuid(struct kvm_cpuid2 *kvm_cpuid)
-> >  {
-> > -	unsigned int signature[3];
-> > +	struct cpuid_regs regs;
-> >  	unsigned int i;
-> >  
-> >  	/*
-> > @@ -22,10 +23,13 @@ static void filter_cpuid(struct kvm_cpuid2 *kvm_cpuid)
-> >  		switch (entry->function) {
-> >  		case 0:
-> >  			/* Vendor name */
-> > -			memcpy(signature, "LKVMLKVMLKVM", 12);
-> > -			entry->ebx = signature[0];
-> > -			entry->ecx = signature[1];
-> > -			entry->edx = signature[2];
-> > +			regs = (struct cpuid_regs) {
-> > +				.eax		= 0x00,
-> > +			};
-> > +			host_cpuid(&regs);
-> > +			entry->ebx = regs.ebx;
-> > +			entry->ecx = regs.ecx;
-> > +			entry->edx = regs.edx;
-> 
-> But that's redundant, isn't it? We already get the host vendor ID in the
-> three registers in entry, and the current code is just there to overwrite
-> this. So just removing the whole "case 0:" part should do the trick.
-> 
-> Also please be aware that there was a reason for this fixup, as explained
-> in commit bc0b99a2a740 ("kvm tools: Filter out CPU vendor string").
-> 
-> Alex, did you boot this on an AMD box, to spot if this is still an issue?
+Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+---
+Resend: 
+ - rebase to 2048c4eba2b4 ("Merge remote-tracking branch 'remotes/philmd/tags/pmbus-20220308' into staging")
+---
+ accel/kvm/kvm-all.c    | 5 +++--
+ accel/kvm/trace-events | 2 +-
+ 2 files changed, 4 insertions(+), 3 deletions(-)
 
-I did a boot on an AMD Ryzen 3900x, didn't find any issues. But I don't
-think a sample of one CPU is representative, so I'm not sure if the error
-will not manifest with other models which exist now, or be released in the
-future.
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 0e66ebb49717..6b9fd943494b 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -379,8 +379,9 @@ static int kvm_set_user_memory_region(KVMMemoryListener *kml, KVMSlot *slot, boo
+     ret = kvm_vm_ioctl(s, KVM_SET_USER_MEMORY_REGION, &mem);
+     slot->old_flags = mem.flags;
+ err:
+-    trace_kvm_set_user_memory(mem.slot, mem.flags, mem.guest_phys_addr,
+-                              mem.memory_size, mem.userspace_addr, ret);
++    trace_kvm_set_user_memory(mem.slot >> 16, (uint16_t)mem.slot, mem.flags,
++                              mem.guest_phys_addr, mem.memory_size,
++                              mem.userspace_addr, ret);
+     if (ret < 0) {
+         error_report("%s: KVM_SET_USER_MEMORY_REGION failed, slot=%d,"
+                      " start=0x%" PRIx64 ", size=0x%" PRIx64 ": %s",
+diff --git a/accel/kvm/trace-events b/accel/kvm/trace-events
+index 399aaeb0ec75..14ebfa1b991c 100644
+--- a/accel/kvm/trace-events
++++ b/accel/kvm/trace-events
+@@ -15,7 +15,7 @@ kvm_irqchip_update_msi_route(int virq) "Updating MSI route virq=%d"
+ kvm_irqchip_release_virq(int virq) "virq %d"
+ kvm_set_ioeventfd_mmio(int fd, uint64_t addr, uint32_t val, bool assign, uint32_t size, bool datamatch) "fd: %d @0x%" PRIx64 " val=0x%x assign: %d size: %d match: %d"
+ kvm_set_ioeventfd_pio(int fd, uint16_t addr, uint32_t val, bool assign, uint32_t size, bool datamatch) "fd: %d @0x%x val=0x%x assign: %d size: %d match: %d"
+-kvm_set_user_memory(uint32_t slot, uint32_t flags, uint64_t guest_phys_addr, uint64_t memory_size, uint64_t userspace_addr, int ret) "Slot#%d flags=0x%x gpa=0x%"PRIx64 " size=0x%"PRIx64 " ua=0x%"PRIx64 " ret=%d"
++kvm_set_user_memory(uint16_t as, uint16_t slot, uint32_t flags, uint64_t guest_phys_addr, uint64_t memory_size, uint64_t userspace_addr, int ret) "AddrSpace#%d Slot#%d flags=0x%x gpa=0x%"PRIx64 " size=0x%"PRIx64 " ua=0x%"PRIx64 " ret=%d"
+ kvm_clear_dirty_log(uint32_t slot, uint64_t start, uint32_t size) "slot#%"PRId32" start 0x%"PRIx64" size 0x%"PRIx32
+ kvm_resample_fd_notify(int gsi) "gsi %d"
+ kvm_dirty_ring_full(int id) "vcpu %d"
+-- 
+2.27.0
 
-From what I can tell, kvmtool doesn't use KVM_X86_SET_MSR_FILTER, and the
-default behaviour for KVM is to try to emulate the accesses to the MSRs in
-the kernel instead of reflecting them to userspace. So I guess if the user
-is running kvmtool on a very new AMD or Intel CPU (one of the CPUs
-mentioned in the commit message for the fix was an engineering sample, for
-example) for which KVM doesn't have full support, the error can manifest
-again.
-
-I'm not sure adding code to emulate a specific CPU is the right solution
-for kvmtool. So I'm thinking either use the host CPU and tolerate the KVM
-error messages, the frequency of which depends on how fast new MSRs are
-added to KVM (I have no clue about that), or choose a very simple CPU model
-that can be emulated by a particular version of KVM.
-
-Thoughts?
-
-Thanks,
-Alex
