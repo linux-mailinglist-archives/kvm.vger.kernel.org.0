@@ -2,148 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8792A4D50C5
-	for <lists+kvm@lfdr.de>; Thu, 10 Mar 2022 18:43:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D61414D50D9
+	for <lists+kvm@lfdr.de>; Thu, 10 Mar 2022 18:47:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242974AbiCJRoO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Mar 2022 12:44:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52532 "EHLO
+        id S237133AbiCJRrw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Mar 2022 12:47:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234164AbiCJRoN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Mar 2022 12:44:13 -0500
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA65412D088
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 09:43:11 -0800 (PST)
-Received: by mail-pj1-x1030.google.com with SMTP id v4so5939413pjh.2
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 09:43:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=U2/1SQEW+tBxMVNWHvxV6hzm1CuOWDHQm+P5ss8iTBE=;
-        b=bjyh/1bolV7ox6A8Wziq5hVMf1xAaOUWapyZlBPbiqWsied8s8+6Wthye5+WQw5zdE
-         HA3YygMVSzq9LvkGLM2H/Hs8lZ6mEz4sr5MlQK3VgFo483M9luAMWyJv1s0/2AyQRu0K
-         g1ywCYsoadyUunyNyc/nDSom8TW82eWtWU1ujxwbs3V+CS9Q3uALHpMRwKv0dSDLYUFr
-         hDKNt0Fm5vXp7IK2UxaqgwAiPG3SB0IDKSuqxSmL220A5ahcSzDhPJYIf2Yito7f8Xfg
-         gK/cTbGBuKXYJjAB3zV4e9E+b/FFDT1Vm7zBpQx5MaQ7nCOgLYugkKZJPRA5o1nR1Qcw
-         7g2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=U2/1SQEW+tBxMVNWHvxV6hzm1CuOWDHQm+P5ss8iTBE=;
-        b=gzurVKxM6eZfuJKpX5JrdBsJPPnwzkQ/fOM6P+CYRm/wNGMXq7DWxUi3VPmnV08MSD
-         GoaWXnHAMpuvZ94x3d2LZsakBohZH2hSS4YadzeiVHY/1yHHWnQ4CXaPxo0ehKbaFzqk
-         J+UIvYVrbZU/D+t3xj8TQ3ZHZTAB1hy3HBfNqpqRu7bZ4m0YSf0E1fO9uvwIi9WJrgZh
-         64DWe35hJMapjpzi3DVlHZzm5Zj3ASkfN5jf8jOBwu6JvdP+rMK1vu1Jed4I5IqE3RpG
-         xTKNw2dunCsFL+oFLbI12kOfB5Hp2XnfhDiqWJTXSlOJ6kdADAEcq+5oDmFaG938hIbf
-         Gv4Q==
-X-Gm-Message-State: AOAM533HfWziZCKikqBn0Eg/u81hujCfVQezSS0z4a0ptuKUVhemNjZv
-        FJUifkTjDtD5HW9K7DPiRK/V6XsTO9WJNA==
-X-Google-Smtp-Source: ABdhPJw2CevXJ/wrierohIkyDHBh7k6yZIbqg2kCUxcIvk+7QecPx8bwKXjgdvrIxWWcZtJDoZY3lw==
-X-Received: by 2002:a17:902:d48a:b0:151:dd60:4177 with SMTP id c10-20020a170902d48a00b00151dd604177mr6296689plg.2.1646934190890;
-        Thu, 10 Mar 2022 09:43:10 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id h5-20020a056a001a4500b004f731e23491sm8196301pfv.7.2022.03.10.09.43.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Mar 2022 09:43:10 -0800 (PST)
-Date:   Thu, 10 Mar 2022 17:43:06 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Chenyi Qiang <chenyi.qiang@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Xiaoyao Li <xiaoyao.li@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 1/3] KVM: X86: Extend KVM_SET_VCPU_EVENTS to inject a
- SHUTDOWN event
-Message-ID: <Yio4qknizH25MBkP@google.com>
-References: <20220310084001.10235-1-chenyi.qiang@intel.com>
- <20220310084001.10235-2-chenyi.qiang@intel.com>
+        with ESMTP id S233573AbiCJRrv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Mar 2022 12:47:51 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0B2818DA83
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 09:46:49 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2CE4E61E13
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 17:46:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A046C340E8;
+        Thu, 10 Mar 2022 17:46:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1646934408;
+        bh=LxrudhChGHrWoF38IaSbjEege9yFf0TdQNlrpDPlnzY=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=ZU1GyeQmIgwUqzKzHhAwr1T6sq0dJwnbY19s6LOErPieKaKNFF11L0iHWK8+PkdYU
+         fMXVuhEXvBn3zXgiB36LwKWPKkq4c2zku6AjryeV7MTnKOLydfIelEOvuiQUftc/g6
+         qvzQtl22mf1EzX+X9lympGIAkx5AxzH75Hq8XNpMghfOF83NbQlOXDI3gV+ahpDtZv
+         lkGdlbo4fWs80sG1XUh5V1ksI8h6m39xciPf43IfXf3Dm1sfFtxMkusJS04T+dAr0a
+         x0xQ7rBIpSr9SfWEnrFIv+aGKu4V5jraBZCAyaPgLKArmeO3u224oyLLNXws45v30m
+         rwBMqnL/eMDFg==
+Date:   Thu, 10 Mar 2022 10:46:41 -0700
+From:   Nathan Chancellor <nathan@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org, kvm@vger.kernel.org,
+        Robert Hu <robert.hu@intel.com>,
+        Farrah Chen <farrah.chen@intel.com>,
+        Danmei Wei <danmei.wei@intel.com>,
+        kernel test robot <lkp@intel.com>
+Subject: Re: [kvm:queue 210/210] arch/x86/kvm/cpuid.c:739:2: warning:
+ unannotated fall-through between switch labels
+Message-ID: <Yio5gfTHY5qvcEyU@dev-arch.thelio-3990X>
+References: <202203101604.2rV6WBqW-lkp@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220310084001.10235-2-chenyi.qiang@intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <202203101604.2rV6WBqW-lkp@intel.com>
+X-Spam-Status: No, score=-7.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 10, 2022, Chenyi Qiang wrote:
-> In some fatal case, the target vcpu would run into unexpected behavior
-> and should get shutdown (e.g. VM context is corrupted and not valid in
-> VMCS). User space would be informed in such case. To kill the target
-> vcpu, extend KVM_SET_VCPU_EVENTS ioctl to inject a synthesized SHUTDOWN
-> event with a new bit set in flags field. KVM would accordingly make
-> KVM_REQ_TRIPLE_FAULT request to trigger the real shutdown exit. Noting
-> that the KVM_REQ_TRIPLE_FAULT request also applies to the nested case,
-> so that only the target L2 vcpu would be killed.
-> 
-> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
-> ---
->  Documentation/virt/kvm/api.rst  | 3 +++
->  arch/x86/include/uapi/asm/kvm.h | 1 +
->  arch/x86/kvm/x86.c              | 6 +++++-
->  3 files changed, 9 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 691ff84444bd..d1971ef613e7 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -1241,6 +1241,9 @@ can be set in the flags field to signal that the
->  exception_has_payload, exception_payload, and exception.pending fields
->  contain a valid state and shall be written into the VCPU.
->  
-> +KVM_VCPUEVENT_SHUTDOWN can be set in flags field to synthesize a SHUTDOWN
-> +event for a vcpu from user space.
-> +
->  ARM/ARM64:
->  ^^^^^^^^^^
->  
-> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-> index bf6e96011dfe..44757bd6122d 100644
-> --- a/arch/x86/include/uapi/asm/kvm.h
-> +++ b/arch/x86/include/uapi/asm/kvm.h
-> @@ -325,6 +325,7 @@ struct kvm_reinject_control {
->  #define KVM_VCPUEVENT_VALID_SHADOW	0x00000004
->  #define KVM_VCPUEVENT_VALID_SMM		0x00000008
->  #define KVM_VCPUEVENT_VALID_PAYLOAD	0x00000010
-> +#define KVM_VCPUEVENT_SHUTDOWN		0x00000020
->  
->  /* Interrupt shadow states */
->  #define KVM_X86_SHADOW_INT_MOV_SS	0x01
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 4fa4d8269e5b..53c8592066c8 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -4903,7 +4903,8 @@ static int kvm_vcpu_ioctl_x86_set_vcpu_events(struct kvm_vcpu *vcpu,
->  			      | KVM_VCPUEVENT_VALID_SIPI_VECTOR
->  			      | KVM_VCPUEVENT_VALID_SHADOW
->  			      | KVM_VCPUEVENT_VALID_SMM
-> -			      | KVM_VCPUEVENT_VALID_PAYLOAD))
-> +			      | KVM_VCPUEVENT_VALID_PAYLOAD
-> +			      | KVM_VCPUEVENT_SHUTDOWN))
->  		return -EINVAL;
->  
->  	if (events->flags & KVM_VCPUEVENT_VALID_PAYLOAD) {
-> @@ -4976,6 +4977,9 @@ static int kvm_vcpu_ioctl_x86_set_vcpu_events(struct kvm_vcpu *vcpu,
->  		}
->  	}
->  
-> +	if (events->flags & KVM_VCPUEVENT_SHUTDOWN)
-> +		kvm_make_request(KVM_REQ_TRIPLE_FAULT, vcpu);
+Hi Paolo,
 
-Huh.  I think we need to make this bidirection and add it to get_vcpu_events()
-as well, and treat it as a bug fix.  In direct triple fault cases, i.e. hardware
-detected and morphed to VM-Exit, KVM will never lose the triple fault.  But for
-triple faults sythesized by KVM, e.g. the RSM path or nested_vmx_abort(), if KVM
-exits to userspace before the request is serviced, userspace could migrate the
-VM and lose the triple fault.
+On Thu, Mar 10, 2022 at 05:05:41PM +0800, kernel test robot wrote:
+> tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
+> head:   ce41d078aaa9cf15cbbb4a42878cc6160d76525e
+> commit: ce41d078aaa9cf15cbbb4a42878cc6160d76525e [210/210] KVM: x86: synthesize CPUID leaf 0x80000021h if useful
+> config: x86_64-randconfig-a014 (https://download.01.org/0day-ci/archive/20220310/202203101604.2rV6WBqW-lkp@intel.com/config)
+> compiler: clang version 15.0.0 (https://github.com/llvm/llvm-project 276ca87382b8f16a65bddac700202924228982f6)
+> reproduce (this is a W=1 build):
+>         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+>         chmod +x ~/bin/make.cross
+>         # https://git.kernel.org/pub/scm/virt/kvm/kvm.git/commit/?id=ce41d078aaa9cf15cbbb4a42878cc6160d76525e
+>         git remote add kvm https://git.kernel.org/pub/scm/virt/kvm/kvm.git
+>         git fetch --no-tags kvm queue
+>         git checkout ce41d078aaa9cf15cbbb4a42878cc6160d76525e
+>         # save the config file to linux build tree
+>         mkdir build_dir
+>         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=x86_64 SHELL=/bin/bash arch/x86/kvm/
+> 
+> If you fix the issue, kindly add following tag as appropriate
+> Reported-by: kernel test robot <lkp@intel.com>
+> 
+> All warnings (new ones prefixed by >>):
+> 
+> >> arch/x86/kvm/cpuid.c:739:2: warning: unannotated fall-through between switch labels [-Wimplicit-fallthrough]
+>            default:
+>            ^
+>    arch/x86/kvm/cpuid.c:739:2: note: insert 'break;' to avoid fall-through
+>            default:
+>            ^
+>            break; 
+>    1 warning generated.
+> 
+> 
+> vim +739 arch/x86/kvm/cpuid.c
+> 
+> e53c95e8d41ef9 Sean Christopherson 2020-03-02  707  
+> e53c95e8d41ef9 Sean Christopherson 2020-03-02  708  static struct kvm_cpuid_entry2 *do_host_cpuid(struct kvm_cpuid_array *array,
+> aa10a7dc8858f6 Sean Christopherson 2020-03-02  709  					      u32 function, u32 index)
+> 00b27a3efb1160 Avi Kivity          2011-11-23  710  {
+> e53c95e8d41ef9 Sean Christopherson 2020-03-02  711  	struct kvm_cpuid_entry2 *entry;
+> e53c95e8d41ef9 Sean Christopherson 2020-03-02  712  
+> e53c95e8d41ef9 Sean Christopherson 2020-03-02  713  	if (array->nent >= array->maxnent)
+> aa10a7dc8858f6 Sean Christopherson 2020-03-02  714  		return NULL;
+> e53c95e8d41ef9 Sean Christopherson 2020-03-02  715  
+> e53c95e8d41ef9 Sean Christopherson 2020-03-02  716  	entry = &array->entries[array->nent++];
+> aa10a7dc8858f6 Sean Christopherson 2020-03-02  717  
+> 2746a6b72ab9a9 Paolo Bonzini       2021-10-28  718  	memset(entry, 0, sizeof(*entry));
+> 00b27a3efb1160 Avi Kivity          2011-11-23  719  	entry->function = function;
+> 00b27a3efb1160 Avi Kivity          2011-11-23  720  	entry->index = index;
+> 2746a6b72ab9a9 Paolo Bonzini       2021-10-28  721  	switch (function & 0xC0000000) {
+> 2746a6b72ab9a9 Paolo Bonzini       2021-10-28  722  	case 0x40000000:
+> 2746a6b72ab9a9 Paolo Bonzini       2021-10-28  723  		/* Hypervisor leaves are always synthesized by __do_cpuid_func.  */
+> 2746a6b72ab9a9 Paolo Bonzini       2021-10-28  724  		return entry;
+> 2746a6b72ab9a9 Paolo Bonzini       2021-10-28  725  
+> ce41d078aaa9cf Paolo Bonzini       2021-10-21  726  	case 0x80000000:
+> ce41d078aaa9cf Paolo Bonzini       2021-10-21  727  		/*
+> ce41d078aaa9cf Paolo Bonzini       2021-10-21  728  		 * 0x80000021 is sometimes synthesized by __do_cpuid_func, which
+> ce41d078aaa9cf Paolo Bonzini       2021-10-21  729  		 * would result in out-of-bounds calls to do_host_cpuid.
+> ce41d078aaa9cf Paolo Bonzini       2021-10-21  730  		 */
+> ce41d078aaa9cf Paolo Bonzini       2021-10-21  731  		{
+> ce41d078aaa9cf Paolo Bonzini       2021-10-21  732  			static int max_cpuid_80000000;
+> ce41d078aaa9cf Paolo Bonzini       2021-10-21  733  			if (!READ_ONCE(max_cpuid_80000000))
+> ce41d078aaa9cf Paolo Bonzini       2021-10-21  734  				WRITE_ONCE(max_cpuid_80000000, cpuid_eax(0x80000000));
+> ce41d078aaa9cf Paolo Bonzini       2021-10-21  735  			if (function > READ_ONCE(max_cpuid_80000000))
+> ce41d078aaa9cf Paolo Bonzini       2021-10-21  736  				return entry;
+> ce41d078aaa9cf Paolo Bonzini       2021-10-21  737  		}
+> ce41d078aaa9cf Paolo Bonzini       2021-10-21  738  
+
+Please add a "break;" here to fix this clang warning. GCC does not warn
+when falling through to a case statement that just contains "break" or
+"return" but clang's verion of the warning does, which matches the
+kernel's guidance in Documentation/process/deprecated.rst for having all
+case statements end in either "break", "continue", "fallthrough",
+"goto", or "return".
+
+> 2746a6b72ab9a9 Paolo Bonzini       2021-10-28 @739  	default:
+> 2746a6b72ab9a9 Paolo Bonzini       2021-10-28  740  		break;
+> 2746a6b72ab9a9 Paolo Bonzini       2021-10-28  741  	}
+> ab8bcf64971180 Paolo Bonzini       2019-06-24  742  
+> 00b27a3efb1160 Avi Kivity          2011-11-23  743  	cpuid_count(entry->function, entry->index,
+> 00b27a3efb1160 Avi Kivity          2011-11-23  744  		    &entry->eax, &entry->ebx, &entry->ecx, &entry->edx);
+> d9aadaf689928b Paolo Bonzini       2019-07-04  745  
+> d9aadaf689928b Paolo Bonzini       2019-07-04  746  	switch (function) {
+> d9aadaf689928b Paolo Bonzini       2019-07-04  747  	case 4:
+> d9aadaf689928b Paolo Bonzini       2019-07-04  748  	case 7:
+> d9aadaf689928b Paolo Bonzini       2019-07-04  749  	case 0xb:
+> d9aadaf689928b Paolo Bonzini       2019-07-04  750  	case 0xd:
+> a06dcd625d6181 Jim Mattson         2019-09-12  751  	case 0xf:
+> a06dcd625d6181 Jim Mattson         2019-09-12  752  	case 0x10:
+> a06dcd625d6181 Jim Mattson         2019-09-12  753  	case 0x12:
+> d9aadaf689928b Paolo Bonzini       2019-07-04  754  	case 0x14:
+> a06dcd625d6181 Jim Mattson         2019-09-12  755  	case 0x17:
+> a06dcd625d6181 Jim Mattson         2019-09-12  756  	case 0x18:
+> 690a757d610e50 Jing Liu            2022-01-05  757  	case 0x1d:
+> 690a757d610e50 Jing Liu            2022-01-05  758  	case 0x1e:
+> a06dcd625d6181 Jim Mattson         2019-09-12  759  	case 0x1f:
+> d9aadaf689928b Paolo Bonzini       2019-07-04  760  	case 0x8000001d:
+> d9aadaf689928b Paolo Bonzini       2019-07-04  761  		entry->flags |= KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
+> d9aadaf689928b Paolo Bonzini       2019-07-04  762  		break;
+> d9aadaf689928b Paolo Bonzini       2019-07-04  763  	}
+> aa10a7dc8858f6 Sean Christopherson 2020-03-02  764  
+> aa10a7dc8858f6 Sean Christopherson 2020-03-02  765  	return entry;
+> 00b27a3efb1160 Avi Kivity          2011-11-23  766  }
+> 00b27a3efb1160 Avi Kivity          2011-11-23  767  
+> 
+> :::::: The code at line 739 was first introduced by commit
+> :::::: 2746a6b72ab9a92bd188c4ac3e4122ee1c18f754 KVM: x86: skip host CPUID call for hypervisor leaves
+> 
+> :::::: TO: Paolo Bonzini <pbonzini@redhat.com>
+> :::::: CC: Paolo Bonzini <pbonzini@redhat.com>
+> 
+
+Cheers,
+Nathan
