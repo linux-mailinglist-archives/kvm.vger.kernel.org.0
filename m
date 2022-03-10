@@ -2,74 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A25D24D3DD5
-	for <lists+kvm@lfdr.de>; Thu, 10 Mar 2022 01:04:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 48AD44D3EBC
+	for <lists+kvm@lfdr.de>; Thu, 10 Mar 2022 02:29:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237020AbiCJAFA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Mar 2022 19:05:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42568 "EHLO
+        id S236533AbiCJBag (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Mar 2022 20:30:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229834AbiCJAE6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Mar 2022 19:04:58 -0500
-Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DBD55BD38
-        for <kvm@vger.kernel.org>; Wed,  9 Mar 2022 16:03:57 -0800 (PST)
-Received: by mail-ej1-x62e.google.com with SMTP id bg10so8591266ejb.4
-        for <kvm@vger.kernel.org>; Wed, 09 Mar 2022 16:03:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:sender:from:date:message-id:subject:to;
-        bh=4SL1/qbkTptdsuZGoXAM80S4DBJva1Vt53CdfbCl4nw=;
-        b=ekc9NaLOGjzKr0E4zbVf9pwTNT2F3An1NMtK2n7FA8OuN8r9hZk9kXr3mBUqXQn3jZ
-         iAdv6zS1m2bGHg1mCF3/fRFETJP66RX7t+sXSCrWTAx6MLnOjpFUoDBcl8P47JqAHWt+
-         C3m08NjMrelpDUXEr6A2uYFRqEKfryumu1JyY002J0QbhyYoi+HBs0dQViPlbkFBNqBw
-         PLF5saeA9OrZtB1eU/v7F7GK4tTPZk7Vp/d4v3bLdD8TqU3De5cg8HXt1PkAGpEWCJ1I
-         s4RHSO8+vWx/gcCOoXv35DYV+O+RcbCoj/ua6AC5UgwtWen+JaQOxyL0EdKKNascjMhd
-         Bevw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:sender:from:date:message-id:subject
-         :to;
-        bh=4SL1/qbkTptdsuZGoXAM80S4DBJva1Vt53CdfbCl4nw=;
-        b=F90ln0m+FJDEzLK/+A0UQMhTncd6tA/YTLsmNnvzpMl0kIglNaem/zwjZ6A5aRAD7w
-         1xtj8J9ZC8wu9TI4nls8RSYBrO+b/hL4gnIoBa1gazaMh6xuxP/kUXLnkbW3OD9JfMkU
-         mO83eKEnzI1n6i3tJ4HSE5ih6w+s+gCINyQWwGYk2UM7mtqi/slLT0Ka+0N6vrMxeaCD
-         mLbNSh+xnKTbMVgdg2in/3/Q8rGU6OMxK0+t//Fg9RkyZANyFza+ES6WLmWazXox1k5P
-         isA0YOEoSkIQkKk1WjNTOBT3bwQFCPmvWgWnjsB+cZdVPFNelRWMQprlE8qwkLcIa+s1
-         +X/w==
-X-Gm-Message-State: AOAM530o6qIdoa0nNsqyfv2dPwpyASYAjI+lM4oMlJcY4blwbESnPWQB
-        DKFloIZlusvbJPepFxzV/ygpmxjC5FHN/ARYejY=
-X-Google-Smtp-Source: ABdhPJxVjwdrh3t+bXKaAmMeyjE5zNr483nXanPUMp2n/5O2l0UIsU0V7Wq9L9U1I/bzzfBNUgM+CP7tACvKOabvwS4=
-X-Received: by 2002:a17:906:3fd4:b0:6db:143a:cf62 with SMTP id
- k20-20020a1709063fd400b006db143acf62mr2006975ejj.454.1646870635883; Wed, 09
- Mar 2022 16:03:55 -0800 (PST)
+        with ESMTP id S232854AbiCJBaf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Mar 2022 20:30:35 -0500
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1CA2E61F1
+        for <kvm@vger.kernel.org>; Wed,  9 Mar 2022 17:29:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1646875775; x=1678411775;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=OXbYneJInVZwCybUdFLiYyvUCfRWNANF7grxShhCeP8=;
+  b=h9mmfMUxIbambi4RXL1j9JlJ5TH1ZyPZVfQfWp6pGVEQoBtgQPU3PAV+
+   JpySUOecGjtfNbccbjQaIoNIMFU9+U3OYpl5y/hQ3ITJutR8WNUO+tqqi
+   xkLGPIotCodO3uD1R2LI5mT0gRZVYg3WjYG30bp2lmb6JsASiPvg7tnn4
+   gPI6zf0ceJOkIo2ralqeIf8TA+ctGtuNvbM55yNtL/EnPNWR8zTRGY9Yq
+   AkYmS8ZimcvUQw3lNKgxhlEYUDX2l/xnXXGdYdDRtT7wzMB0BaTknEGE3
+   uQkMw6fAEYuMgaHhoMUFvE2ldYGjQEtjuY7l7IlHee+I52uqq7pC2CXRB
+   A==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10281"; a="235083075"
+X-IronPort-AV: E=Sophos;i="5.90,169,1643702400"; 
+   d="scan'208";a="235083075"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Mar 2022 17:29:35 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.90,169,1643702400"; 
+   d="scan'208";a="611571847"
+Received: from lkp-server02.sh.intel.com (HELO 89b41b6ae01c) ([10.239.97.151])
+  by fmsmga004.fm.intel.com with ESMTP; 09 Mar 2022 17:29:33 -0800
+Received: from kbuild by 89b41b6ae01c with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1nS7cS-00048o-J7; Thu, 10 Mar 2022 01:29:32 +0000
+Date:   Thu, 10 Mar 2022 09:28:32 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Li RongQing <lirongqing@baidu.com>
+Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org, kvm@vger.kernel.org,
+        Robert Hu <robert.hu@intel.com>,
+        Farrah Chen <farrah.chen@intel.com>,
+        Danmei Wei <danmei.wei@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: [kvm:queue 182/205] <inline asm>:40:208: error: expected relocatable
+ expression
+Message-ID: <202203100905.1o88Cp2l-lkp@intel.com>
 MIME-Version: 1.0
-Sender: julianterry39@gmail.com
-Received: by 2002:a54:2346:0:0:0:0:0 with HTTP; Wed, 9 Mar 2022 16:03:55 -0800 (PST)
-From:   "Mrs. Latifa Rassim Mohamad" <rassimlatifa400@gmail.com>
-Date:   Wed, 9 Mar 2022 16:03:55 -0800
-X-Google-Sender-Auth: M5h18z150_hlbrRhYQiv9AmkZ54
-Message-ID: <CA+Kqa7f5XEie06WBak4LGQJfD_U-7JuY9SCFoqeYSQP0g22xKg@mail.gmail.com>
-Subject: Hello my beloved.
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=4.4 required=5.0 tests=BAYES_50,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FROM,HK_NAME_FM_MR_MRS,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,UNDISC_MONEY autolearn=no
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
-X-Spam-Level: ****
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Greetings dears,
+tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
+head:   8c1db5a775bc8314d78e99263e0d063a01b692c2
+commit: 4ab22f38c2046f2c949cb43fc0f7515666a2a2fb [182/205] KVM: x86: Support the vCPU preemption check with nopvspin and realtime hint
+config: x86_64-randconfig-a012 (https://download.01.org/0day-ci/archive/20220310/202203100905.1o88Cp2l-lkp@intel.com/config)
+compiler: clang version 15.0.0 (https://github.com/llvm/llvm-project 276ca87382b8f16a65bddac700202924228982f6)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://git.kernel.org/pub/scm/virt/kvm/kvm.git/commit/?id=4ab22f38c2046f2c949cb43fc0f7515666a2a2fb
+        git remote add kvm https://git.kernel.org/pub/scm/virt/kvm/kvm.git
+        git fetch --no-tags kvm queue
+        git checkout 4ab22f38c2046f2c949cb43fc0f7515666a2a2fb
+        # save the config file to linux build tree
+        mkdir build_dir
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=x86_64 SHELL=/bin/bash
 
-Hello my dear Good evening from here this evening, how are you doing
-today? My name is Mrs.  Latifa Rassim Mohamad from Saudi Arabia, I
-have something very important and serious i will like to discuss with
-you privately, so i hope this is your private email?
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
 
-Mrs. Latifa Rassim Mohamad.
+All errors (new ones prefixed by >>):
+
+>> <inline asm>:40:208: error: expected relocatable expression
+   .pushsection .text;.global __raw_callee_save___kvm_vcpu_is_preempted;.type __raw_callee_save___kvm_vcpu_is_preempted, @function;__raw_callee_save___kvm_vcpu_is_preempted:movq  __per_cpu_offset(,%rdi,8), %rax;cmpb    $0, KVM_STEAL_TIME_preempted+steal_time(%rax);setne     %al;ret;.size __raw_callee_save___kvm_vcpu_is_preempted, .-__raw_callee_save___kvm_vcpu_is_preempted;.popsection
+                                                                                                                                                                                                                   ^
+   1 error generated.
+
+---
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
