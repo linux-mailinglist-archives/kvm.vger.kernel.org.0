@@ -2,154 +2,243 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 380194D5508
-	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 00:08:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6AA434D5663
+	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 01:13:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344546AbiCJXJf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Mar 2022 18:09:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51364 "EHLO
+        id S1344739AbiCKAOV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Mar 2022 19:14:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33022 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232714AbiCJXJe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Mar 2022 18:09:34 -0500
-Received: from mail105.syd.optusnet.com.au (mail105.syd.optusnet.com.au [211.29.132.249])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DE6F8119F3E;
-        Thu, 10 Mar 2022 15:08:32 -0800 (PST)
-Received: from dread.disaster.area (pa49-186-150-27.pa.vic.optusnet.com.au [49.186.150.27])
-        by mail105.syd.optusnet.com.au (Postfix) with ESMTPS id 73D1310E29AA;
-        Fri, 11 Mar 2022 10:08:23 +1100 (AEDT)
-Received: from dave by dread.disaster.area with local (Exim 4.92.3)
-        (envelope-from <david@fromorbit.com>)
-        id 1nSRtO-003xhf-9L; Fri, 11 Mar 2022 10:08:22 +1100
-Date:   Fri, 11 Mar 2022 10:08:22 +1100
-From:   Dave Chinner <david@fromorbit.com>
-To:     Chao Peng <chao.p.peng@linux.intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-api@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
+        with ESMTP id S238512AbiCKAOU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Mar 2022 19:14:20 -0500
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F446A1BDE
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 16:13:18 -0800 (PST)
+Received: by mail-pj1-x1049.google.com with SMTP id w3-20020a17090ac98300b001b8b914e91aso4178313pjt.0
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 16:13:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=8u1aPiGW/o27wTV56C41DyPROp99q3kPdYLfCSmvyXA=;
+        b=kNm7mfwLzQXjrt3m9rW6/pTgtcbgoMOsvtbAt4D1PVW30e/8WMfq2SViV3ev8WjRPI
+         rTzaYvo750KeeK2KRrcN1H5HNmnlaRuFjrlYmV2bPWuSIXv8694z4zIIX9ClSGS0/9n4
+         0PjcLETfVwnavoM3k91KWojfvB+TlRkeV6kw+RWr5AggfrNxwVfOOM7ob9ZNJB9ePQo9
+         XTV8R3dp8XBNrKQPrNDjg/+FvrrrRNH6Qt7xigyGa4oc2ZlAr9auwV9ujN1jEHdeDgwK
+         2fhdt3qE1h9UI8TVqDx28RGfc58G63xj8lGefyTP8FSsdLCrla30tdM5gECTRgTQwqdA
+         S4rQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=8u1aPiGW/o27wTV56C41DyPROp99q3kPdYLfCSmvyXA=;
+        b=AlJhYkEa2HgQsy1Mxjb0mK0fKJRf7SO892nicS/7Q8rEgCFUdCnR2kwhlHcpcMBHpY
+         6FxvfST6shUpBq7QTkrbLC2qPRntIZsjyMi2+YEqhBJZ7DeZ/yK+695KPC7BQSJvzPqN
+         e0kQQS3e752i/smOmDeWE441U2jDG7opwfom0cgsbiYOQYMQVt9AQHLEfMHRUFUpB4Ae
+         GzdaOI5o1vnahbmGuMwX9kdWxGpG30EMwpttRYZcrcxemdhQHNuTCjkZ6zVMytFA/blH
+         4x9AsapuB8jMpD3bbDsv/dF70Jo/Pfqbr/1wCpBkyNQFEvnlM8mOCbZxzVPMsnsr3b4Q
+         57lQ==
+X-Gm-Message-State: AOAM533s0dpIb35yF8jsqcdg/lDYz6dfGbHjOt+nmI227WF6S9sJvnob
+        r/CRq5cMifqG8q1TeXCE27/hB6lY9q58hH6H
+X-Google-Smtp-Source: ABdhPJw2ajaJNAzIOKb5V2NPwn0Kvslh/PvFKP6JTod3DIf570v+T9cZeeQ8gCz3zhnbZ/UBWRRx0a4qSqlK2vKt
+X-Received: from yosry.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2327])
+ (user=yosryahmed job=sendgmr) by 2002:a17:903:291:b0:150:4197:7cf2 with SMTP
+ id j17-20020a170903029100b0015041977cf2mr7444516plr.173.1646957597899; Thu,
+ 10 Mar 2022 16:13:17 -0800 (PST)
+Date:   Fri, 11 Mar 2022 00:12:52 +0000
+Message-Id: <20220311001252.195690-1-yosryahmed@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.1.723.g4982287a31-goog
+Subject: [PATCH] KVM: memcg: count KVM page table pages used by KVM in memcg
+ pagetable stats
+From:   Yosry Ahmed <yosryahmed@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com
-Subject: Re: [PATCH v5 03/13] mm/shmem: Support memfile_notifier
-Message-ID: <20220310230822.GO661808@dread.disaster.area>
-References: <20220310140911.50924-1-chao.p.peng@linux.intel.com>
- <20220310140911.50924-4-chao.p.peng@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220310140911.50924-4-chao.p.peng@linux.intel.com>
-X-Optus-CM-Score: 0
-X-Optus-CM-Analysis: v=2.4 cv=deDjYVbe c=1 sm=1 tr=0 ts=622a84f0
-        a=sPqof0Mm7fxWrhYUF33ZaQ==:117 a=sPqof0Mm7fxWrhYUF33ZaQ==:17
-        a=kj9zAlcOel0A:10 a=o8Y5sQTvuykA:10 a=QyXUC8HyAAAA:8 a=7-415B0cAAAA:8
-        a=RCrhQ6IY2R1Uy-UsxHgA:9 a=CjuIK1q_8ugA:10 a=biEYGPWJfzWAr4FL6Ov7:22
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        Roman Gushchin <roman.gushchin@linux.dev>
+Cc:     Shakeel Butt <shakeelb@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        David Matlack <dmatlack@google.com>, kvm@vger.kernel.org,
+        Yosry Ahmed <yosryahmed@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 10, 2022 at 10:09:01PM +0800, Chao Peng wrote:
-> From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-> 
-> It maintains a memfile_notifier list in shmem_inode_info structure and
-> implements memfile_pfn_ops callbacks defined by memfile_notifier. It
-> then exposes them to memfile_notifier via
-> shmem_get_memfile_notifier_info.
-> 
-> We use SGP_NOALLOC in shmem_get_lock_pfn since the pages should be
-> allocated by userspace for private memory. If there is no pages
-> allocated at the offset then error should be returned so KVM knows that
-> the memory is not private memory.
-> 
-> Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> ---
->  include/linux/shmem_fs.h |  4 +++
->  mm/shmem.c               | 76 ++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 80 insertions(+)
-> 
-> diff --git a/include/linux/shmem_fs.h b/include/linux/shmem_fs.h
-> index 2dde843f28ef..7bb16f2d2825 100644
-> --- a/include/linux/shmem_fs.h
-> +++ b/include/linux/shmem_fs.h
-> @@ -9,6 +9,7 @@
->  #include <linux/percpu_counter.h>
->  #include <linux/xattr.h>
->  #include <linux/fs_parser.h>
-> +#include <linux/memfile_notifier.h>
->  
->  /* inode in-kernel data */
->  
-> @@ -28,6 +29,9 @@ struct shmem_inode_info {
->  	struct simple_xattrs	xattrs;		/* list of xattrs */
->  	atomic_t		stop_eviction;	/* hold when working on inode */
->  	unsigned int		xflags;		/* shmem extended flags */
-> +#ifdef CONFIG_MEMFILE_NOTIFIER
-> +	struct memfile_notifier_list memfile_notifiers;
-> +#endif
->  	struct inode		vfs_inode;
->  };
->  
-> diff --git a/mm/shmem.c b/mm/shmem.c
-> index 9b31a7056009..7b43e274c9a2 100644
-> --- a/mm/shmem.c
-> +++ b/mm/shmem.c
-> @@ -903,6 +903,28 @@ static struct folio *shmem_get_partial_folio(struct inode *inode, pgoff_t index)
->  	return page ? page_folio(page) : NULL;
->  }
->  
-> +static void notify_fallocate(struct inode *inode, pgoff_t start, pgoff_t end)
-> +{
-> +#ifdef CONFIG_MEMFILE_NOTIFIER
-> +	struct shmem_inode_info *info = SHMEM_I(inode);
-> +
-> +	memfile_notifier_fallocate(&info->memfile_notifiers, start, end);
-> +#endif
-> +}
+Count the pages used by KVM for page tables in pagetable memcg stats in
+memory.stat.
 
-*notify_populate(), not fallocate.  This is a notification that a
-range has been populated, not that the fallocate() syscall was run
-to populate the backing store of a file.
+Most pages used for KVM page tables come from the mmu_shadow_page_cache,
+in addition to a few allocations in __kvm_mmu_create() and
+mmu_alloc_special_roots().
 
-i.e.  fallocate is the name of a userspace filesystem API that can
-be used to manipulate the backing store of a file in various ways.
-It can both populate and punch away the backing store of a file, and
-some operations that fallocate() can run will do both (e.g.
-FALLOC_FL_ZERO_RANGE) and so could generate both
-notify_invalidate() and a notify_populate() events.
+For allocations from the mmu_shadow_page_cache, the pages are counted as
+pagetables when they are actually used by KVM (when
+mmu_memory_cache_alloc_obj() is called), rather than when they are
+allocated in the cache itself. In other words, pages sitting in the
+cache are not counted as pagetables (they are still accounted as kernel
+memory).
 
-Hence "fallocate" as an internal mm namespace or operation does not
-belong anywhere in core MM infrastructure - it should never get used
-anywhere other than the VFS/filesystem layers that implement the
-fallocate() syscall or use it directly.
+The reason for this is to avoid the complexity and confusion of
+incrementing the stats in the cache layer, while decerementing them
+by the cache users when they are being freed (pages are freed directly
+and not returned to the cache).
+For the sake of simplicity, the stats are incremented and decremented by
+the users of the cache when they get the page and when they free it.
 
-Cheers,
+Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
+---
+ arch/x86/include/asm/kvm_host.h |  7 +++++++
+ arch/x86/kvm/mmu/mmu.c          | 19 +++++++++++++++++++
+ arch/x86/kvm/mmu/tdp_mmu.c      |  4 ++++
+ virt/kvm/kvm_main.c             | 17 +++++++++++++++++
+ 4 files changed, 47 insertions(+)
 
-Dave.
-
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index f72e80178ffc..4a1dda2f56e1 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -458,6 +458,13 @@ struct kvm_mmu {
+ 	*/
+ 	u32 pkru_mask;
+ 
++	/*
++	 * After a page is allocated for any of these roots,
++	 * increment per-memcg pagetable stats by calling:
++	 * inc_lruvec_page_state(page, NR_PAGETABLE)
++	 * Before the page is freed, decrement the stats by calling:
++	 * dec_lruvec_page_state(page, NR_PAGETABLE).
++	 */
+ 	u64 *pae_root;
+ 	u64 *pml4_root;
+ 	u64 *pml5_root;
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 3b8da8b0745e..5f87e1b0da91 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -1673,7 +1673,10 @@ static void kvm_mmu_free_page(struct kvm_mmu_page *sp)
+ 	MMU_WARN_ON(!is_empty_shadow_page(sp->spt));
+ 	hlist_del(&sp->hash_link);
+ 	list_del(&sp->link);
++
++	dec_lruvec_page_state(virt_to_page(sp->spt), NR_PAGETABLE);
+ 	free_page((unsigned long)sp->spt);
++
+ 	if (!sp->role.direct)
+ 		free_page((unsigned long)sp->gfns);
+ 	kmem_cache_free(mmu_page_header_cache, sp);
+@@ -1711,7 +1714,10 @@ static struct kvm_mmu_page *kvm_mmu_alloc_page(struct kvm_vcpu *vcpu, int direct
+ 	struct kvm_mmu_page *sp;
+ 
+ 	sp = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_page_header_cache);
++
+ 	sp->spt = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_shadow_page_cache);
++	inc_lruvec_page_state(virt_to_page(sp->spt), NR_PAGETABLE);
++
+ 	if (!direct)
+ 		sp->gfns = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_gfn_array_cache);
+ 	set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
+@@ -3602,6 +3608,10 @@ static int mmu_alloc_special_roots(struct kvm_vcpu *vcpu)
+ 	mmu->pml4_root = pml4_root;
+ 	mmu->pml5_root = pml5_root;
+ 
++	/* Update per-memcg pagetable stats */
++	inc_lruvec_page_state(virt_to_page(pae_root), NR_PAGETABLE);
++	inc_lruvec_page_state(virt_to_page(pml4_root), NR_PAGETABLE);
++	inc_lruvec_page_state(virt_to_page(pml5_root), NR_PAGETABLE);
+ 	return 0;
+ 
+ #ifdef CONFIG_X86_64
+@@ -5554,6 +5564,12 @@ static void free_mmu_pages(struct kvm_mmu *mmu)
+ {
+ 	if (!tdp_enabled && mmu->pae_root)
+ 		set_memory_encrypted((unsigned long)mmu->pae_root, 1);
++
++	/* Update per-memcg pagetable stats */
++	dec_lruvec_page_state(virt_to_page(mmu->pae_root), NR_PAGETABLE);
++	dec_lruvec_page_state(virt_to_page(mmu->pml4_root), NR_PAGETABLE);
++	dec_lruvec_page_state(virt_to_page(mmu->pml5_root), NR_PAGETABLE);
++
+ 	free_page((unsigned long)mmu->pae_root);
+ 	free_page((unsigned long)mmu->pml4_root);
+ 	free_page((unsigned long)mmu->pml5_root);
+@@ -5591,6 +5607,9 @@ static int __kvm_mmu_create(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu)
+ 	if (!page)
+ 		return -ENOMEM;
+ 
++	/* Update per-memcg pagetable stats */
++	inc_lruvec_page_state(page, NR_PAGETABLE);
++
+ 	mmu->pae_root = page_address(page);
+ 
+ 	/*
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index af60922906ef..ce8930fd0835 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -64,6 +64,7 @@ void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm)
+ 
+ static void tdp_mmu_free_sp(struct kvm_mmu_page *sp)
+ {
++	dec_lruvec_page_state(virt_to_page(sp->spt), NR_PAGETABLE);
+ 	free_page((unsigned long)sp->spt);
+ 	kmem_cache_free(mmu_page_header_cache, sp);
+ }
+@@ -273,7 +274,9 @@ static struct kvm_mmu_page *tdp_mmu_alloc_sp(struct kvm_vcpu *vcpu)
+ 	struct kvm_mmu_page *sp;
+ 
+ 	sp = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_page_header_cache);
++
+ 	sp->spt = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_shadow_page_cache);
++	inc_lruvec_page_state(virt_to_page(sp->spt), NR_PAGETABLE);
+ 
+ 	return sp;
+ }
+@@ -1410,6 +1413,7 @@ static struct kvm_mmu_page *__tdp_mmu_alloc_sp_for_split(gfp_t gfp)
+ 		return NULL;
+ 	}
+ 
++	inc_lruvec_page_state(virt_to_page(sp->spt), NR_PAGETABLE);
+ 	return sp;
+ }
+ 
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 9581a24c3d17..3c8cce440c34 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -397,6 +397,23 @@ void kvm_mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc)
+ 	}
+ }
+ 
++/*
++ * After this funciton is called to get a page from mmu_shadow_page_cache,
++ * increment per-memcg pagetable stats by calling:
++ * inc_lruvec_page_state(page, NR_PAGETABLE)
++ * Before the page is freed, decrement the stats by calling:
++ * dec_lruvec_page_state(page, NR_PAGETABLE).
++ *
++ * Note that for the sake per-memcg stats in memory.stat, the pages will be
++ * counted as pagetable pages only they are allocated from the cache. This means
++ * that pages sitting in the mmu_shadow_page_cache will not be counted as
++ * pagetable pages (but will still be counted as kernel memory).
++ *
++ * Counting pages in the cache can introduce unnecessary complexity as we will
++ * need to increment the stats in the cache layer when pages are allocated, and
++ * decrement the stats outside the cache layer when pages are freed. This can be
++ * confusing for new users of the cache.
++ */
+ void *kvm_mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc)
+ {
+ 	void *p;
 -- 
-Dave Chinner
-david@fromorbit.com
+2.35.1.723.g4982287a31-goog
+
