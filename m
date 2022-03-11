@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 37F3A4D58FD
-	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 04:29:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 544F84D58F0
+	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 04:29:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346164AbiCKD3t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Mar 2022 22:29:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43936 "EHLO
+        id S1346135AbiCKD3x (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Mar 2022 22:29:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346097AbiCKD3m (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Mar 2022 22:29:42 -0500
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1453ECC72
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 19:28:20 -0800 (PST)
-Received: by mail-pf1-x44a.google.com with SMTP id a23-20020aa794b7000000b004f6a3ac7a87so4410793pfl.23
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 19:28:20 -0800 (PST)
+        with ESMTP id S1346117AbiCKD3o (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Mar 2022 22:29:44 -0500
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8F40EEA66
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 19:28:22 -0800 (PST)
+Received: by mail-pj1-x104a.google.com with SMTP id j10-20020a17090a7e8a00b001bbef243093so7090122pjl.1
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 19:28:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=AcJat6mfsYesUxiLsf097aJKwH7FBxsnrZltNc4YjNY=;
-        b=UXgtWo/oc9ev1snc+o3QfD26We+3IV17jR3vHN8gwuLYsncQj9wSpNhPG4zDoDm6FR
-         0M6Ggegix0R7PfGseTLt4fXluy6idQUfX/jT0o4n4tsmfmYuQlZvTAgm0403CBs2Cw10
-         JRge3iUCXhNB8WaXwGbUjsal9IXUpKK3OGwysKxKjjxSZlOX4u+NUdswylh44YA884eN
-         UabTfHqHkJR00Qle96v6J0+oSg5XIRMLQJYe7lDb/p6WhEZuhRye5XAd4XnD/qbrgm6J
-         iK+rAKNBGq/vsUUx5YcqadXCx2nT48ExD00+fCAtpEf9YmwIeyqmSJzBBzozMeEMjxIx
-         YxhQ==
+        bh=hDEsiW/1JCBAL6rnpjAoAKowK88eFadHJbQ+k7mmB9A=;
+        b=RFF8YW6U9Bnsdg9ppIYdODr3twU98mGctgU6cl8f3boBCowDbMpo4eeue3p4MdWSAa
+         Np0Tk6nTzyjg/sEQU+UR2QiiO6C8feFoVBL7/Y0GoWRFEgnprHnc6zXbr+57unQbg+np
+         p0RKvMzLCgSglH5rGIauZNKXmiV4jtNhKYAg1rTY6ZTFO8dJD9j2oM83HenlbGmp+ImU
+         1+gqT1Bkr7JdXwCHbdixFiuOOWrFCzmT5TwRAutxA1YQxwvDD5zE0JU8GSQAaDL7tr1a
+         u2ewtiIGWsw3pGrmLNImaBnmXeGnzi0UHAbwqBv0MPeUuWUnf0mdg3FRmwGHI6aZcSIt
+         Ayrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=AcJat6mfsYesUxiLsf097aJKwH7FBxsnrZltNc4YjNY=;
-        b=Y9x9MPOL/GTRvDnN+D0m9EKjqhzIEqwscOiiYTbwaH+kknuh24t5/JlR6v/MAMR4gc
-         aqCnczy/nwzs2FnptJqvoI+3bnUhmTfPH35dBw9ef/RcbOXFnxiJgW06HCP9/85USO2B
-         YwsifxKk6tEqbVBsKaPFMtIbWL8ijNee+v0YxnXuJOd6bIZVFXwG8AO1e8rqsH1s3Z22
-         Yo30ZPdeTQptUvNmGd/IneYzFoUrvMT+RuPBrhknupbf/jgS9Hin3G6LMLW4SwIkNngH
-         JpKv5B/cRnwZ2VMYuYD1Pe4KgdMUgfjXERtHAI4trgbY4Mwrws11IIDhCTZsUVU5jF72
-         C/Hw==
-X-Gm-Message-State: AOAM532VmUAq1RdIA2vdDS4dEvOYb2f4NcKn8th0Q22Qajl5drkFtGmt
-        gzd3xlkzO7RrprvuyQLYsXG1oKfBucY=
-X-Google-Smtp-Source: ABdhPJyliGAu6H5Nz54834Q3GV0caw3GdOFbWEVZpIm/9XuBICxNCnAsmjPKoCEANi2gYwoHf39zGnEdCGs=
+        bh=hDEsiW/1JCBAL6rnpjAoAKowK88eFadHJbQ+k7mmB9A=;
+        b=OSb7MxaiAWhGN+Ug7imm5guVie3YRaWABdn8cJ7EatRNIoRXcfo+Z/DAXDM2ZNO5zt
+         QMbbbYtoZjp9vYJTTTM5a78CbgfrNPWSwdZD/WfonbDtIx8giCJGl8joMVhN4LP3BLRm
+         j8kLUXYiZOcHvTfJ5qwCUccYT1euzvMGkl19wjd3oQT5JFRtIpyYoSUYVlamjpu+2YcH
+         AeNwz6FZ9pBZMChdGaUJy+LnzZlPb8+s9jSwcDHPmfqqIIJwNWitKC99sjLBk1ZcbtKW
+         Stx9tATF2+wuU4nprNw5W542WJ7G5gBCgYRH72OrGQAeTuiq55GFtK5+/t5ZHubYQP1V
+         V+vw==
+X-Gm-Message-State: AOAM532zhQaXbRK6F5eQI0AOYhZOCLVw5QRmA4SqHqygY0RzTyngLsQJ
+        osMilmPTySoHyx1N8Ch36yL/ZBust/c=
+X-Google-Smtp-Source: ABdhPJyhaE75SPhWVJQ1hIPPBNsxEpMhN69TxBTr0IeMQB2WoyGtw6PbXHuvKQdeNPQ/xASLq5yjvdDpSNA=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:90b:4c42:b0:1bf:c572:cc45 with SMTP id
- np2-20020a17090b4c4200b001bfc572cc45mr8597614pjb.238.1646969300408; Thu, 10
- Mar 2022 19:28:20 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a17:902:a3c3:b0:151:ec83:d88 with SMTP id
+ q3-20020a170902a3c300b00151ec830d88mr8717054plb.9.1646969302136; Thu, 10 Mar
+ 2022 19:28:22 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 11 Mar 2022 03:27:50 +0000
+Date:   Fri, 11 Mar 2022 03:27:51 +0000
 In-Reply-To: <20220311032801.3467418-1-seanjc@google.com>
-Message-Id: <20220311032801.3467418-11-seanjc@google.com>
+Message-Id: <20220311032801.3467418-12-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220311032801.3467418-1-seanjc@google.com>
 X-Mailer: git-send-email 2.35.1.723.g4982287a31-goog
-Subject: [PATCH 10/21] KVM: nVMX: Unconditionally clear mtf_pending on nested VM-Exit
+Subject: [PATCH 11/21] KVM: VMX: Inject #PF on ENCLS as "emulated" #PF
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -73,72 +73,31 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Clear mtf_pending on nested VM-Exit instead of handling the clear on a
-case-by-case basis in vmx_check_nested_events().  The pending MTF should
-never survive nested VM-Exit, as it is a property of KVM's run of the
-current L2, i.e. should never affect the next L2 run by L1.  In practice,
-this is likely a nop as getting to L1 with nested_run_pending is
-impossible, and KVM doesn't correctly handle morphing a pending exception
-that occurs on a prior injected exception (need for re-injected exception
-being the other case where MTF isn't cleared).  However, KVM will
-hopefully soon correctly deal with a pending exception on top of an
-injected exception.
+Treat #PFs that occur during emulation of ENCLS as, wait for it, emulated
+page faults.  Practically speaking, this is a glorified nop as the
+exception is never of the nested flavor, and it's extremely unlikely the
+guest is relying on the side effect of an implicit INVLPG on the faulting
+address.
 
+Fixes: 70210c044b4e ("KVM: VMX: Add SGX ENCLS[ECREATE] handler to enforce CPUID restrictions")
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/nested.c | 16 +++++++---------
- 1 file changed, 7 insertions(+), 9 deletions(-)
+ arch/x86/kvm/vmx/sgx.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index b22089ebfe76..82b2d9dde611 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -3884,16 +3884,8 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
- 	unsigned long exit_qual;
- 	bool block_nested_events =
- 	    vmx->nested.nested_run_pending || kvm_event_needs_reinjection(vcpu);
--	bool mtf_pending = vmx->nested.mtf_pending;
- 	struct kvm_lapic *apic = vcpu->arch.apic;
- 
--	/*
--	 * Clear the MTF state. If a higher priority VM-exit is delivered first,
--	 * this state is discarded.
--	 */
--	if (!block_nested_events)
--		vmx->nested.mtf_pending = false;
--
- 	if (lapic_in_kernel(vcpu) &&
- 		test_bit(KVM_APIC_INIT, &apic->pending_events)) {
- 		if (block_nested_events)
-@@ -3902,6 +3894,9 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
- 		clear_bit(KVM_APIC_INIT, &apic->pending_events);
- 		if (vcpu->arch.mp_state != KVM_MP_STATE_INIT_RECEIVED)
- 			nested_vmx_vmexit(vcpu, EXIT_REASON_INIT_SIGNAL, 0, 0);
-+
-+		/* MTF is discarded if the vCPU is in WFS. */
-+		vmx->nested.mtf_pending = false;
- 		return 0;
+diff --git a/arch/x86/kvm/vmx/sgx.c b/arch/x86/kvm/vmx/sgx.c
+index 35e7ec91ae86..966cfa228f2a 100644
+--- a/arch/x86/kvm/vmx/sgx.c
++++ b/arch/x86/kvm/vmx/sgx.c
+@@ -129,7 +129,7 @@ static int sgx_inject_fault(struct kvm_vcpu *vcpu, gva_t gva, int trapnr)
+ 		ex.address = gva;
+ 		ex.error_code_valid = true;
+ 		ex.nested_page_fault = false;
+-		kvm_inject_page_fault(vcpu, &ex);
++		kvm_inject_emulated_page_fault(vcpu, &ex);
+ 	} else {
+ 		kvm_inject_gp(vcpu, 0);
  	}
- 
-@@ -3939,7 +3934,7 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
- 		return 0;
- 	}
- 
--	if (mtf_pending) {
-+	if (vmx->nested.mtf_pending) {
- 		if (block_nested_events)
- 			return -EBUSY;
- 		nested_vmx_update_pending_dbg(vcpu);
-@@ -4532,6 +4527,9 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
- 
-+	/* Pending MTF traps are discarded on VM-Exit. */
-+	vmx->nested.mtf_pending = false;
-+
- 	/* trying to cancel vmlaunch/vmresume is a bug */
- 	WARN_ON_ONCE(vmx->nested.nested_run_pending);
- 
 -- 
 2.35.1.723.g4982287a31-goog
 
