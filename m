@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A4D2A4D5BFA
-	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 08:05:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CE66F4D5BF5
+	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 08:05:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346987AbiCKHEf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Mar 2022 02:04:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49360 "EHLO
+        id S1347007AbiCKHEh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Mar 2022 02:04:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49790 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346944AbiCKHE2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Mar 2022 02:04:28 -0500
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 192A585950;
-        Thu, 10 Mar 2022 23:03:22 -0800 (PST)
-Received: by mail-pl1-x632.google.com with SMTP id e2so6964240pls.10;
-        Thu, 10 Mar 2022 23:03:22 -0800 (PST)
+        with ESMTP id S1346985AbiCKHEe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Mar 2022 02:04:34 -0500
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D91BD8BF52;
+        Thu, 10 Mar 2022 23:03:28 -0800 (PST)
+Received: by mail-pl1-x62e.google.com with SMTP id n2so6990293plf.4;
+        Thu, 10 Mar 2022 23:03:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=mGM0ZiK+NvSXxBCFgDxX2j+AvMkjH2c5Fn9qXNWdyQQ=;
-        b=VWtLfvf4rRksbcko3VrPqjGmWuDEcSV9GLG22i4QcHrev7UoasurYNeOuSiXg/15bT
-         QeSjJwAlZBKDERqolggzLGHuqQIoXXHCtu23yK0/odG1h748l1fFggkMil7m8J7v5iGS
-         iuT0sOa0zJfiZlvjLPx72h0t7OkpJ3db2S4oRW4ZVcA5l1tcDqVBTtNDeb4FJtatvmvQ
-         TBgIe8EXIXzwMklzuXSCkqfKtpyFDdbCUKqvq/a+qOT2IX84gqCEF7q4YdYpBoWM+4h1
-         jcwnanCER0IVU/AFL3kww+0eZUZFrwidC5SZojo9JkXlwHtMmxjJhaalCAAAkOOt0aez
-         3DYQ==
+        bh=5aBihaRQYwPecRxz8n1A5pbPTnQ+xsKLR/Mkgvq9vX8=;
+        b=W1iJMAwdQaOrDdchIMgobBvD5ADT1Zg00vXo8Usi2e48m1vTtIjM7h2hvYFaz7BlfS
+         /Z0bevouYl0xGIqXIBdppUhFTcb7QUHjZ4afKYMSPA19r1EdWUuTaZZEaQKJ3KK+gYGn
+         wH/pHAxmpkLheMEqc8hiWvYpaaONs+bzxIFeTdgw52UXE+CszUsbTfKWh6JzugFAK8TY
+         zUrDMocyc3HFUF/MvRf1u/TUIHnut0deqQUOpnalknjWnnpb314JEZWdK3aKkUQe+e2P
+         IOXGZyx7yfEHaxidxXtHTED7xNUWf+HBUk0qNA5yOELHzGghyOsDBWoYvvZyDoOdRCER
+         1OMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=mGM0ZiK+NvSXxBCFgDxX2j+AvMkjH2c5Fn9qXNWdyQQ=;
-        b=gsB9n1xTeEaziHJye0EHjaj3eYfEhuh7uJK0g3LmkVI7gIGTQA3U6LO63J8gF2UXmn
-         Y12vcxn7BHuwlIk02Nj6IdEl6ynOd6APPhZlpaLUr28vARjS5/dJi6NISod68UwHu5pg
-         0b9YecdN4M7uqHe7Ne2bthPstvkEXHZt8xW07Hr93iD382jnz4nKyFNwpXQLaNmZ+mrY
-         sxUn8qziZkbjP7qK+lahHHo+SDFf1BlvZ6yfYc98pemM9lfKvnzjDQ574vZXIBDk/9LX
-         itc+eI70Im3u4hFqllTJIIyPq7kzUm1bfKzYxjyCLlISQUp2XwYJV3ZuSDKHl7Wxlzx5
-         Y8PQ==
-X-Gm-Message-State: AOAM531qt652vrRGwjhiqP+GQuGdTIqDVouxAJ/Cy7woE3SyUBnpyVQ+
-        Oq87x76UswqZy5kXTnGAOEFbxwZwHEk=
-X-Google-Smtp-Source: ABdhPJxYto/Z+1zCP3rHxcbEpBGXmSMvdcMy46HTJNDxKQCbIYD9UZv9vx3N1O1zLyb63rGpINn+uw==
-X-Received: by 2002:a17:902:b406:b0:14f:bb35:95ab with SMTP id x6-20020a170902b40600b0014fbb3595abmr8869206plr.140.1646982201440;
-        Thu, 10 Mar 2022 23:03:21 -0800 (PST)
+        bh=5aBihaRQYwPecRxz8n1A5pbPTnQ+xsKLR/Mkgvq9vX8=;
+        b=pnbw7yL+pNTc69ql9ZeaKlAwrCopfwsJrNVfJJHWnRXhtoGyS+izkAcX7BXnaPb1p+
+         vtGCMGTm3ADL2LSguZH7kCUORJviYELYdVUIVpSDFkBbTxWT0cOV/j5deSOk6fR3Tl79
+         eW29sRl/3091cb3KqXNA2ULaDYCJ/FOu2XKuhtv0mHxLu2JdBYN4YL2LIKhQ5eWvo8/Z
+         RWRfEGyDq55E1TGektkY1/2dqGwJhM7jBpJwx9xGIfvNoGarD87YRXIS/XeIokH4W/J1
+         kYTQCG6q3JeyeWY0gEWFfIOsCtXr2lFXP3dcmQd5HEBXDgWb9TkyUK4yTbxMGxGbN/tO
+         SFcQ==
+X-Gm-Message-State: AOAM531grd4vP6BppZQzu0tbxtJeCirVzVUwKdNsgehqG2gWkE7CJ/ak
+        QOvfsuXpig7myV61V37Ifodm5Fe66rM=
+X-Google-Smtp-Source: ABdhPJzNDyNEZdgWFPxL0Be75suzoWNROVTW1tpMvu4CxVEBWGArVhzqoNO1TUGbbSe8+idNEzaZXA==
+X-Received: by 2002:a17:90a:bf16:b0:1bf:37e2:e71c with SMTP id c22-20020a17090abf1600b001bf37e2e71cmr20539384pjs.96.1646982208234;
+        Thu, 10 Mar 2022 23:03:28 -0800 (PST)
 Received: from localhost ([47.251.4.198])
-        by smtp.gmail.com with ESMTPSA id c3-20020a056a00248300b004f6f729e485sm9707560pfv.127.2022.03.10.23.03.20
+        by smtp.gmail.com with ESMTPSA id hg1-20020a17090b300100b001bf70e72794sm11639121pjb.40.2022.03.10.23.03.27
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 10 Mar 2022 23:03:21 -0800 (PST)
+        Thu, 10 Mar 2022 23:03:27 -0800 (PST)
 From:   Lai Jiangshan <jiangshanlai@gmail.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -60,9 +60,9 @@ Cc:     Lai Jiangshan <jiangshan.ljs@antgroup.com>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
         "H. Peter Anvin" <hpa@zytor.com>
-Subject: [PATCH V2 2/5] KVM: X86: Fix comments in update_permission_bitmask
-Date:   Fri, 11 Mar 2022 15:03:42 +0800
-Message-Id: <20220311070346.45023-3-jiangshanlai@gmail.com>
+Subject: [PATCH V2 3/5] KVM: X86: Rename variable smap to not_smap in permission_fault()
+Date:   Fri, 11 Mar 2022 15:03:43 +0800
+Message-Id: <20220311070346.45023-4-jiangshanlai@gmail.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
 In-Reply-To: <20220311070346.45023-1-jiangshanlai@gmail.com>
 References: <20220311070346.45023-1-jiangshanlai@gmail.com>
@@ -80,32 +80,34 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 
-The commit 09f037aa48f3 ("KVM: MMU: speedup update_permission_bitmask")
-refactored the code of update_permission_bitmask() and change the
-comments.  It added a condition into a list to match the new code,
-so the number/order for conditions in the comments should be updated
-too.
+Comments above the variable says the bit is set when SMAP is overridden
+or the same meaning in update_permission_bitmask(): it is not subjected
+to SMAP restriction.
+
+Renaming it to reflect the negative implication and make the code better
+readability.
 
 Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 4 ++--
+ arch/x86/kvm/mmu.h | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index c12133c3cf00..781f90480d00 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4583,8 +4583,8 @@ static void update_permission_bitmask(struct kvm_mmu *mmu, bool ept)
- 			 *   - Page fault in kernel mode
- 			 *   - if CPL = 3 or X86_EFLAGS_AC is clear
- 			 *
--			 * Here, we cover the first three conditions.
--			 * The fourth is computed dynamically in permission_fault();
-+			 * Here, we cover the first four conditions.
-+			 * The fifth is computed dynamically in permission_fault();
- 			 * PFERR_RSVD_MASK bit will be set in PFEC if the access is
- 			 * *not* subject to SMAP restrictions.
- 			 */
+diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+index 74efeaefa8f8..24d94f6d378d 100644
+--- a/arch/x86/kvm/mmu.h
++++ b/arch/x86/kvm/mmu.h
+@@ -234,9 +234,9 @@ static inline u8 permission_fault(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
+ 	 * but it will be one in index if SMAP checks are being overridden.
+ 	 * It is important to keep this branchless.
+ 	 */
+-	unsigned long smap = (cpl - 3) & (rflags & X86_EFLAGS_AC);
++	unsigned long not_smap = (cpl - 3) & (rflags & X86_EFLAGS_AC);
+ 	int index = (pfec >> 1) +
+-		    (smap >> (X86_EFLAGS_AC_BIT - PFERR_RSVD_BIT + 1));
++		    (not_smap >> (X86_EFLAGS_AC_BIT - PFERR_RSVD_BIT + 1));
+ 	bool fault = (mmu->permissions[index] >> pte_access) & 1;
+ 	u32 errcode = PFERR_PRESENT_MASK;
+ 
 -- 
 2.19.1.6.gb485710b
 
