@@ -2,334 +2,341 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 27D254D5A49
-	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 06:09:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D26FA4D5ACB
+	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 06:51:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344410AbiCKFK4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Mar 2022 00:10:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55330 "EHLO
+        id S1346524AbiCKFwN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Mar 2022 00:52:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241284AbiCKFKy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Mar 2022 00:10:54 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 061FF1AC295
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 21:09:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646975390;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=9nBenv8s0AYm2+pJMUm/jGEPBjH6r3BWfbAB/qp2ZZE=;
-        b=NWVQDmdOIHj3vLiw+Bp5Ehb5JIh06xg0j0yI7sVx0gU6MTKZ05CEj42gQgnv84aqLuiByn
-        YoGrE76Ojge8fxc9L0V7heGAuy6RlE39h7OZ1WmWy9ob17who6TbE+e1DmmgW8ZRc11JyT
-        avlFQpWlX+IFE8KhE9kVNtgcU8d/syM=
-Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com
- [209.85.210.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-622-tswQvjTzOViO724IYFshxA-1; Fri, 11 Mar 2022 00:09:48 -0500
-X-MC-Unique: tswQvjTzOViO724IYFshxA-1
-Received: by mail-pf1-f198.google.com with SMTP id a23-20020aa794b7000000b004f6a3ac7a87so4527955pfl.23
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 21:09:48 -0800 (PST)
+        with ESMTP id S1346517AbiCKFwN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Mar 2022 00:52:13 -0500
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92BB3ECB30
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 21:51:07 -0800 (PST)
+Received: by mail-pf1-x44a.google.com with SMTP id d145-20020a621d97000000b004f7285f67e8so4624312pfd.2
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 21:51:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=m+zrLQV2v8uq4zkPfu5p9jArDq+18jogCFTcPpgzke0=;
+        b=mZWR4TO+ja4MFPPNRURqpOZdF7XcXrtvbin/1TevsX3LItGyhGgZyR306GBtZ52E5S
+         /t7rw+jA34ALr8095C5Zi6DiSek6dlgcAkHCKMtVVW15bi/oQlKRk1UqdAGOsEVDAyPZ
+         I3Fhbg0WUVRs9Q4QQc0ERsEzCGLri0ZrBdiOHENQTQlKSt3Nc55o18xy1mmTiT2QpApi
+         tU6SbWmRspwYNBNyo+6RSMUfUsQ0w2RmM7HL8ZGxNStap1QZsph/iVTg3MJeeNY5Tr39
+         sAHTowS8ZF5DkkCid7FGricgmQcHq7gA6S8k2qyK66lq+7bRMfnBJwxapLOGTJs+vJGB
+         9D6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=9nBenv8s0AYm2+pJMUm/jGEPBjH6r3BWfbAB/qp2ZZE=;
-        b=ssETj2i0UJFsZrze4bSp20H3mEAuGhDNO/09Zd7XkF3XdHBqhGyFZ9JpfB3p4BSYjz
-         vzJpJnj6cm19wKVc53dgt5ZnXuF/SmCJnVZXj4n7cCcu7PMKyzSmSo3FMjvEuHIJfPGW
-         lLfw4dnsBnQPrci1y/4Sm6E38nwSs0EUDXMQgApqZN0GnycqvTlSDcKl0/h69cKVKBJ/
-         BadEHH3WvlJaUH0xfbHFYeWZw8CMW83zmO6lyyCQJu1aTnKbwn8iCKFLdVsVGhPoTFwh
-         9cMd8773YeeNm+yXyaILzeOWuvwZUgL4UDUINml9o4tNBCaLim6Aft+h+LIx2RPgIy/R
-         liRw==
-X-Gm-Message-State: AOAM533Y1+pFlZStHw24aV3qoFeJkDzmoD1VA3YEXW+RtvDs/h0hIyx+
-        aLz9BQVfMdOmbPsWgSBpce7PbOq+AmvDtDyoV2eVrvah4L6EC7I6Rf3ZzJ5l3CSA4hK6vRcFxYD
-        gfk9D1mKZXWSQ
-X-Received: by 2002:a17:90a:d3d0:b0:1bb:f5b3:2fbf with SMTP id d16-20020a17090ad3d000b001bbf5b32fbfmr8820741pjw.87.1646975387575;
-        Thu, 10 Mar 2022 21:09:47 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJx8JKZXffEodSfmEHpMRgYWBvpIlhcshqGZgVYLA+ugGNosDsbJfihtdbxn5vtUMGsfzlzXdw==
-X-Received: by 2002:a17:90a:d3d0:b0:1bb:f5b3:2fbf with SMTP id d16-20020a17090ad3d000b001bbf5b32fbfmr8820693pjw.87.1646975387226;
-        Thu, 10 Mar 2022 21:09:47 -0800 (PST)
-Received: from [10.72.13.226] ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id z7-20020a056a00240700b004e1cde37bc1sm8792099pfh.84.2022.03.10.21.09.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Mar 2022 21:09:46 -0800 (PST)
-Message-ID: <06b3adbb-6777-7022-00d2-beca2b166e10@redhat.com>
-Date:   Fri, 11 Mar 2022 13:09:36 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.6.2
-Subject: Re: [PATCH v7 17/26] virtio_pci: queue_reset: support
- VIRTIO_F_RING_RESET
-Content-Language: en-US
-To:     Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc:     Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mark Gross <markgross@kernel.org>,
-        Vadim Pasternak <vadimp@nvidia.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Johannes Berg <johannes.berg@intel.com>,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>,
-        linux-um@lists.infradead.org, platform-driver-x86@vger.kernel.org,
-        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, bpf@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-References: <20220308123518.33800-1-xuanzhuo@linux.alibaba.com>
- <20220308123518.33800-18-xuanzhuo@linux.alibaba.com>
- <8b9d337d-71c2-07b4-8e65-6f83cf09bf7a@redhat.com>
- <1646900411.6481435-2-xuanzhuo@linux.alibaba.com>
-From:   Jason Wang <jasowang@redhat.com>
-In-Reply-To: <1646900411.6481435-2-xuanzhuo@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=m+zrLQV2v8uq4zkPfu5p9jArDq+18jogCFTcPpgzke0=;
+        b=kArhPFvPpxcARV010OJ/0qJfcas7OCzZ1ZmSGCGoheiJgGHSb3TS1wLj7xuTk57q9h
+         ddeoTg/QmQsh18i33lb13VzJQtW2bulzWaE4UVFTiV/oPx764Z78IOCPQRXM3gDXZ+pL
+         /g9jIL+x9nLjsWnqUuiYSJikdGkPrOTkDDtHzSu9+iwdSQ52xwiCEHgkw65Fox979PEI
+         DQYX2v1KPMvtPzYqZe8sUsoCnjpHQOttBhv8nnm6L0+fgPAYmVgEH8fpCnlAmdF/MppB
+         8EC1W5pFEO7DaQ1Jr1NETSmz9a4YGDAd5wSMcI7SqCYkTeG7fk8LRSApuyJ2ZFUa7kXm
+         meCA==
+X-Gm-Message-State: AOAM533vxpHnKPIKLADKjIn/svZ8NZxi7SxHoZK5UhrbaVPMOWIS+3zP
+        oD8k89Rjw0p78J+q0Bk/LfhX4nkC9Js=
+X-Google-Smtp-Source: ABdhPJzMm/MchNZwY6Kh+sUy0nC2hWwRDYwa5hqbN8fgd4iwJarAnq353gwGILMqB/C9EK8uGP+bce4qGJI=
+X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
+ (user=seanjc job=sendgmr) by 2002:a17:902:7608:b0:153:32d3:f721 with SMTP id
+ k8-20020a170902760800b0015332d3f721mr2415202pll.168.1646977867070; Thu, 10
+ Mar 2022 21:51:07 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Fri, 11 Mar 2022 05:49:11 +0000
+Message-Id: <20220311055056.57265-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.1.723.g4982287a31-goog
+Subject: [RFC PATCH 000/105] KVM: selftests: Overhaul APIs, purge VCPU_ID
+From:   Sean Christopherson <seanjc@google.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Andrew Jones <drjones@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        Oliver Upton <oupton@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+First off, hopefully I didn't just spam you with 106 emails.  In theory,
+unless you're subscribed to LKML, you should see only the cover letter
+and everything else should be on lore if you want to pull down the mbox
+(instead of saying "LOL, 105 patches!?!?", or maybe after you say that).
 
-在 2022/3/10 下午4:20, Xuan Zhuo 写道:
-> On Wed, 9 Mar 2022 16:54:10 +0800, Jason Wang <jasowang@redhat.com> wrote:
->> 在 2022/3/8 下午8:35, Xuan Zhuo 写道:
->>> This patch implements virtio pci support for QUEUE RESET.
->>>
->>> Performing reset on a queue is divided into these steps:
->>>
->>>    1. virtio_reset_vq()              - notify the device to reset the queue
->>>    2. virtqueue_detach_unused_buf()  - recycle the buffer submitted
->>>    3. virtqueue_reset_vring()        - reset the vring (may re-alloc)
->>>    4. virtio_enable_resetq()         - mmap vring to device, and enable the queue
->>>
->>> This patch implements virtio_reset_vq(), virtio_enable_resetq() in the
->>> pci scenario.
->>>
->>> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
->>> ---
->>>    drivers/virtio/virtio_pci_common.c |  8 +--
->>>    drivers/virtio/virtio_pci_modern.c | 83 ++++++++++++++++++++++++++++++
->>>    2 files changed, 88 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/drivers/virtio/virtio_pci_common.c b/drivers/virtio/virtio_pci_common.c
->>> index fdbde1db5ec5..863d3a8a0956 100644
->>> --- a/drivers/virtio/virtio_pci_common.c
->>> +++ b/drivers/virtio/virtio_pci_common.c
->>> @@ -248,9 +248,11 @@ static void vp_del_vq(struct virtqueue *vq)
->>>    	struct virtio_pci_vq_info *info = vp_dev->vqs[vq->index];
->>>    	unsigned long flags;
->>>
->>> -	spin_lock_irqsave(&vp_dev->lock, flags);
->>> -	list_del(&info->node);
->>> -	spin_unlock_irqrestore(&vp_dev->lock, flags);
->>> +	if (!vq->reset) {
->>> +		spin_lock_irqsave(&vp_dev->lock, flags);
->>> +		list_del(&info->node);
->>> +		spin_unlock_irqrestore(&vp_dev->lock, flags);
->>> +	}
->>>
->>>    	vp_dev->del_vq(info);
->>>    	kfree(info);
->>> diff --git a/drivers/virtio/virtio_pci_modern.c b/drivers/virtio/virtio_pci_modern.c
->>> index 49a4493732cf..3c67d3607802 100644
->>> --- a/drivers/virtio/virtio_pci_modern.c
->>> +++ b/drivers/virtio/virtio_pci_modern.c
->>> @@ -34,6 +34,9 @@ static void vp_transport_features(struct virtio_device *vdev, u64 features)
->>>    	if ((features & BIT_ULL(VIRTIO_F_SR_IOV)) &&
->>>    			pci_find_ext_capability(pci_dev, PCI_EXT_CAP_ID_SRIOV))
->>>    		__virtio_set_bit(vdev, VIRTIO_F_SR_IOV);
->>> +
->>> +	if (features & BIT_ULL(VIRTIO_F_RING_RESET))
->>> +		__virtio_set_bit(vdev, VIRTIO_F_RING_RESET);
->>>    }
->>>
->>>    /* virtio config->finalize_features() implementation */
->>> @@ -199,6 +202,82 @@ static int vp_active_vq(struct virtqueue *vq, u16 msix_vec)
->>>    	return 0;
->>>    }
->>>
->>> +static int vp_modern_reset_vq(struct virtqueue *vq)
->>> +{
->>> +	struct virtio_pci_device *vp_dev = to_vp_device(vq->vdev);
->>> +	struct virtio_pci_modern_device *mdev = &vp_dev->mdev;
->>> +	struct virtio_pci_vq_info *info;
->>> +	unsigned long flags;
->>> +	unsigned int irq;
->>> +
->>> +	if (!virtio_has_feature(vq->vdev, VIRTIO_F_RING_RESET))
->>> +		return -ENOENT;
->>> +
->>> +	vp_modern_set_queue_reset(mdev, vq->index);
->>> +
->>> +	info = vp_dev->vqs[vq->index];
->>> +
->>> +	/* delete vq from irq handler */
->>> +	spin_lock_irqsave(&vp_dev->lock, flags);
->>> +	list_del(&info->node);
->>> +	spin_unlock_irqrestore(&vp_dev->lock, flags);
->>> +
->>> +	INIT_LIST_HEAD(&info->node);
->>> +
->>> +	vq->reset = VIRTIO_VQ_RESET_STEP_DEVICE;
->>> +
->>> +	/* sync irq callback. */
->>> +	if (vp_dev->intx_enabled) {
->>> +		irq = vp_dev->pci_dev->irq;
->>> +
->>> +	} else {
->>> +		if (info->msix_vector == VIRTIO_MSI_NO_VECTOR)
->>> +			return 0;
->>> +
->>> +		irq = pci_irq_vector(vp_dev->pci_dev, info->msix_vector);
->>> +	}
->>> +
->>> +	synchronize_irq(irq);
->>
->> Synchronize_irq() is not sufficient here since it breaks the effort of
->> the interrupt hardening which is done by commits:
->>
->> 080cd7c3ac87 virtio-pci: harden INTX interrupts
->> 9e35276a5344 virtio_pci: harden MSI-X interrupts
->>
->> Unfortunately  080cd7c3ac87 introduces an issue that disable_irq() were
->> used for the affinity managed irq but we're discussing a fix.
->>
->
-> ok, I think disable_irq() is still used here.
->
-> I want to determine the solution for this detail first. So I posted the code, I
-> hope Jason can help confirm this point first.
->
-> There are three situations in which vq corresponds to an interrupt
->
-> 1. intx
-> 2. msix: per vq vectors
-> 2. msix: share irq
->
-> Essentially can be divided into two categories: per vq vectors and share irq.
->
-> For share irq is based on virtqueues to find vq, so I think it is safe as long
-> as list_del() is executed under the protection of the lock.
->
-> In the case of per vq vectors, disable_irq() is used.
+This is a (very) early RFC for overhauling KVM's selftests APIs.  It's
+compile tested only (maybe), there are no changelogs, etc...
+
+My end goal with an overhaul is to get to a state where adding new
+features and writing tests is less painful/disgusting (I feel dirty every
+time I copy+paste VCPU_ID).  I opted to directly send only the cover
+letter because most of the individual patches aren't all that interesting,
+there's still 46 patches even if the per-test conversions are omitted, and
+it's the final state that I really care about and want to discuss.
+
+The overarching theme of my take on where to go with selftests is to stop
+treating tests like second class citizens.  Stop hiding vcpu, kvm_vm, etc...
+There's no sensitive data/constructs, and the encapsulation has led to
+really, really bad and difficult to maintain code.  E.g. Want to call a
+vCPU ioctl()?  Hope you have the VM...
+
+The other theme in the rework is to deduplicate code and try to set us
+up for success in the future.  E.g. provide macros/helpers instead of
+spamming CTRL-C => CTRL-V (see the -700 LoC).
+
+I was hoping to get this into a less shabby state before posting, but I'm
+I'm going to be OOO for the next few weeks and want to get the ball rolling
+instead of waiting another month or so.
+
+Based on an older version of kvm/queue.  The full thing is also on github:
+
+  https://github.com/sean-jc/linux.git x86/selftests_overhaul
+
+Cc: kvm@vger.kernel.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: Wanpeng Li <wanpengli@tencent.com>
+Cc: Jim Mattson <jmattson@google.com>
+Cc: Joerg Roedel <joro@8bytes.org>
+Cc: Andrew Jones <drjones@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>
+Cc: Janosch Frank <frankja@linux.ibm.com>
+Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc: David Hildenbrand <david@redhat.com>
+Cc: David Matlack <dmatlack@google.com>
+Cc: Ben Gardon <bgardon@google.com>
+Cc: Oliver Upton <oupton@google.com>
+
+Sean Christopherson (105):
+  KVM: selftests: Fix buggy check in test_v3_new_redist_regions()
+  KVM: selftests: Always open VM file descriptors with O_RDWR
+  KVM: selftest: Add another underscore to inner ioctl helpers
+  KVM: selftests: Make vcpu_ioctl() a wrapper to pretty print ioctl name
+  KVM: selftests: Drop @mode from common vm_create() helper
+  KVM: selftests: Split vcpu_set_nested_state() into two helpers
+  KVM: selftests: Add hyperv_svm_test test binary to .gitignore
+  KVM: sefltests: Use vcpu_ioctl() and __vcpu_ioctl() helpers
+  KVM: selftests: Add __vcpu_run() helper
+  KVM: selftests: Use vcpu_access_device_attr() in arm64 code
+  KVM: selftests: Remove vcpu_get_fd()
+  KVM: selftests: Add vcpu_get() to retrieve and assert on vCPU
+    existence
+  KVM: selftests: Make vm_ioctl() a wrapper to pretty print ioctl name
+  KVM: sefltests: Use vm_ioctl() and __vm_ioctl() helpers
+  KVM: selftests: Make kvm_ioctl() a wrapper to pretty print ioctl name
+  KVM: selftests: Use kvm_ioctl() helpers
+  KVM: selftests: Make x86-64's register dump helpers static
+  KVM: selftests: Get rid of kvm_util_internal.h
+  KVM: selftests: Use KVM_IOCTL_ERROR() for one-off arm64 ioctls
+  KVM: selftests: Drop @test param from kvm_create_device()
+  KVM: selftests: Move KVM_CREATE_DEVICE_TEST code to separate helper
+  KVM: selftests: Multiplex return code and fd in __kvm_create_device()
+  KVM: selftests: Rename KVM_HAS_DEVICE_ATTR helpers for consistency
+  KVM: selftests: Drop 'int' return from asserting *_device_has_attr()
+  KVM: selftests: Split get/set device_attr helpers
+  KVM: selftests: Add a VM backpointer to 'struct vcpu'
+  KVM: selftests: Add vm_create_*() variants to expose/return 'struct
+    vcpu'
+  KVM: selftests: Rename vcpu.state => vcpu.run
+  KVM: selftests: Rename 'struct vcpu' to 'struct kvm_vcpu'
+  KVM: selftests: Return the created vCPU from vm_vcpu_add()
+  KVM: selftests: Convert memslot_perf_test away from VCPU_ID
+  KVM: selftests: Convert rseq_test away from VCPU_ID
+  KVM: selftests: Convert xss_msr_test away from VCPU_ID
+  KVM: selftests: Convert vmx_preemption_timer_test away from VCPU_ID
+  KVM: selftests: Convert vmx_pmu_msrs_test away from VCPU_ID
+  KVM: selftests: Convert vmx_set_nested_state_test away from VCPU_ID
+  KVM: selftests: Convert vmx_tsc_adjust_test away from VCPU_ID
+  KVM: selftests: Convert mmu_role_test away from VCPU_ID
+  KVM: selftests: Convert pmu_event_filter_test away from VCPU_ID
+  KVM: selftests: Convert smm_test away from VCPU_ID
+  KVM: selftests: Convert state_test away from VCPU_ID
+  KVM: selftests: Convert svm_int_ctl_test away from VCPU_ID
+  KVM: selftests: Convert svm_vmcall_test away from VCPU_ID
+  KVM: selftests: Convert sync_regs_test away from VCPU_ID
+  KVM: selftests: Convert hyperv_cpuid away from VCPU_ID
+  KVM: selftests: Convert kvm_pv_test away from VCPU_ID
+  KVM: selftests: Convert platform_info_test away from VCPU_ID
+  KVM: selftests: Convert vmx_nested_tsc_scaling_test away from VCPU_ID
+  KVM: selftests: Convert set_sregs_test away from VCPU_ID
+  KVM: selftests: Convert vmx_dirty_log_test away from VCPU_ID
+  KVM: selftests: Convert vmx_close_while_nested_test away from VCPU_ID
+  KVM: selftests: Convert vmx_apic_access_test away from VCPU_ID
+  KVM: selftests: Convert userspace_msr_exit_test away from VCPU_ID
+  KVM: selftests: Convert vmx_exception_with_invalid_guest_state away
+    from VCPU_ID
+  KVM: selftests: Convert tsc_msrs_test away from VCPU_ID
+  KVM: selftests: Convert kvm_clock_test away from VCPU_ID
+  KVM: selftests: Convert hyperv_svm_test away from VCPU_ID
+  KVM: selftests: Convert hyperv_features away from VCPU_ID
+  KVM: selftests: Convert hyperv_clock away from VCPU_ID
+  KVM: selftests: Convert evmcs_test away from VCPU_ID
+  KVM: selftests: Convert emulator_error_test away from VCPU_ID
+  KVM: selftests: Convert debug_regs away from VCPU_ID
+  KVM: selftests: Add proper helper for advancing RIP in debug_regs
+  KVM: selftests: Convert amx_test away from VCPU_ID
+  KVM: selftests: Convert cr4_cpuid_sync_test away from VCPU_ID
+  KVM: selftests: Convert cpuid_test away from VCPU_ID
+  KVM: selftests: Convert userspace_io_test away from VCPU_ID
+  KVM: selftests: Convert vmx_invalid_nested_guest_state away from
+    VCPU_ID
+  KVM: selftests: Convert xen_vmcall_test away from VCPU_ID
+  KVM: selftests: Convert xen_shinfo_test away from VCPU_ID
+  KVM: selftests: Convert dirty_log_test away from VCPU_ID
+  KVM: selftests: Convert set_memory_region_test away from VCPU_ID
+  KVM: selftests: Convert system_counter_offset_test away from VCPU_ID
+  KVM: selftests: Convert debug-exceptions away from VCPU_ID
+  KVM: selftests: Convert vgic_irq.c include/aarch64/vgic.h
+    lib/aarch64/vgic away from VCPU_ID
+  KVM: selftests: Make arm64's guest_get_vcpuid() declaration arm64-only
+  KVM: selftests: Move vm_is_unrestricted_guest() to x86-64
+  KVM: selftests: Add "arch" to common utils that have arch
+    implementations
+  KVM: selftests: Return created vcpu from vm_vcpu_add_default()
+  KVM: selftests: Rename vm_vcpu_add* helpers to better show
+    relationships
+  KVM: selftests: Convert set_boot_cpu_id away from VCPU_ID
+  KVM: selftests: Convert psci_cpu_on_test away from VCPU_ID
+  KVM: selftests: Convert hardware_disable_test away from VCPU_ID
+  KVM: selftests: Add VM creation helper that "returns" vCPUs
+  KVM: selftests: Convert steal_time away from VCPU_ID
+  KVM: selftests: Convert arch_timer away from VCPU_ID
+  KVM: selftests: Fix typo in vgic_init test
+  KVM: selftests: Convert vgic_init away from
+    vm_create_default_with_vcpus()
+  KVM: selftests: Convert xapic_ipi_test away from *_VCPU_ID
+  KVM: selftests: Convert sync_regs_test away from VCPU_ID
+  KVM: selftests: Convert resets away from VCPU_ID
+  KVM: selftests: Convert memop away from VCPU_ID
+  KVM: selftests: Convert s390x/diag318_test_handler away from VCPU_ID
+  KVM: selftests: Drop vm_create_default* helpers
+  KVM: selftests: Drop vcpuids param from VM creators
+  KVM: selftests: Convert kvm_page_table_test away from reliance on
+    vcpu_id
+  KVM: selftests: Convert kvm_binary_stats_test away from VCPU_ID
+  KVM: selftests: Convert get-reg-list away from VCPU_ID
+  KVM: selftests: Stop conflating vCPU index and ID in perf tests
+  KVM: selftests: Remove vcpu_get() usage from dirty_log_test
+  KVM: selftests: Require vCPU output array when creating VM with vCPUs
+  KVM: selftest: Purge vm+vcpu_id == vcpu silliness
+  KVM: selftests: Drop vcpu_get(), rename vcpu_find() => vcpu_exists()
+  KVM: selftests: Remove vcpu_state() helper
+  KVM: selftests: Open code and drop kvm_vm accessors
+
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ .../selftests/kvm/aarch64/arch_timer.c        |  68 +-
+ .../selftests/kvm/aarch64/debug-exceptions.c  |  17 +-
+ .../selftests/kvm/aarch64/get-reg-list.c      |  19 +-
+ .../selftests/kvm/aarch64/psci_cpu_on_test.c  |  22 +-
+ .../testing/selftests/kvm/aarch64/vgic_init.c | 369 +++----
+ .../testing/selftests/kvm/aarch64/vgic_irq.c  |  30 +-
+ .../selftests/kvm/access_tracking_perf_test.c |  81 +-
+ .../selftests/kvm/demand_paging_test.c        |  39 +-
+ .../selftests/kvm/dirty_log_perf_test.c       |  42 +-
+ tools/testing/selftests/kvm/dirty_log_test.c  |  80 +-
+ .../selftests/kvm/hardware_disable_test.c     |  27 +-
+ .../selftests/kvm/include/aarch64/processor.h |  20 +-
+ .../selftests/kvm/include/aarch64/vgic.h      |   6 +-
+ .../selftests/kvm/include/kvm_util_base.h     | 677 ++++++++----
+ .../selftests/kvm/include/perf_test_util.h    |   5 +-
+ .../selftests/kvm/include/riscv/processor.h   |   8 +-
+ .../selftests/kvm/include/ucall_common.h      |   2 +-
+ .../selftests/kvm/include/x86_64/evmcs.h      |   2 +-
+ .../selftests/kvm/include/x86_64/processor.h  |  52 +-
+ .../selftests/kvm/kvm_binary_stats_test.c     |  27 +-
+ .../selftests/kvm/kvm_create_max_vcpus.c      |   4 +-
+ .../selftests/kvm/kvm_page_table_test.c       |  66 +-
+ .../selftests/kvm/lib/aarch64/processor.c     |  79 +-
+ .../testing/selftests/kvm/lib/aarch64/ucall.c |   9 +-
+ .../testing/selftests/kvm/lib/aarch64/vgic.c  |  44 +-
+ tools/testing/selftests/kvm/lib/elf.c         |   1 -
+ tools/testing/selftests/kvm/lib/guest_modes.c |   6 +-
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 981 +++---------------
+ .../selftests/kvm/lib/kvm_util_internal.h     | 128 ---
+ .../selftests/kvm/lib/perf_test_util.c        |  84 +-
+ .../selftests/kvm/lib/riscv/processor.c       | 110 +-
+ tools/testing/selftests/kvm/lib/riscv/ucall.c |   7 +-
+ .../kvm/lib/s390x/diag318_test_handler.c      |   9 +-
+ .../selftests/kvm/lib/s390x/processor.c       |  44 +-
+ tools/testing/selftests/kvm/lib/s390x/ucall.c |   8 +-
+ .../selftests/kvm/lib/x86_64/processor.c      | 311 ++----
+ tools/testing/selftests/kvm/lib/x86_64/svm.c  |   1 -
+ .../testing/selftests/kvm/lib/x86_64/ucall.c  |  10 +-
+ tools/testing/selftests/kvm/lib/x86_64/vmx.c  |   5 +-
+ .../kvm/memslot_modification_stress_test.c    |  13 +-
+ .../testing/selftests/kvm/memslot_perf_test.c |  28 +-
+ tools/testing/selftests/kvm/rseq_test.c       |   9 +-
+ tools/testing/selftests/kvm/s390x/memop.c     |  31 +-
+ tools/testing/selftests/kvm/s390x/resets.c    | 137 +--
+ .../selftests/kvm/s390x/sync_regs_test.c      |  37 +-
+ .../selftests/kvm/set_memory_region_test.c    |  45 +-
+ tools/testing/selftests/kvm/steal_time.c      | 120 +--
+ .../kvm/system_counter_offset_test.c          |  29 +-
+ tools/testing/selftests/kvm/x86_64/amx_test.c |  33 +-
+ .../testing/selftests/kvm/x86_64/cpuid_test.c |  29 +-
+ .../kvm/x86_64/cr4_cpuid_sync_test.c          |  17 +-
+ .../testing/selftests/kvm/x86_64/debug_regs.c |  72 +-
+ .../kvm/x86_64/emulator_error_test.c          |  65 +-
+ .../testing/selftests/kvm/x86_64/evmcs_test.c |  51 +-
+ .../kvm/x86_64/get_msr_index_features.c       |  16 +-
+ .../selftests/kvm/x86_64/hyperv_clock.c       |  25 +-
+ .../selftests/kvm/x86_64/hyperv_cpuid.c       |  25 +-
+ .../selftests/kvm/x86_64/hyperv_features.c    |  51 +-
+ .../selftests/kvm/x86_64/hyperv_svm_test.c    |  14 +-
+ .../selftests/kvm/x86_64/kvm_clock_test.c     |  23 +-
+ .../selftests/kvm/x86_64/kvm_pv_test.c        |  25 +-
+ .../selftests/kvm/x86_64/mmio_warning_test.c  |   6 +-
+ .../selftests/kvm/x86_64/mmu_role_test.c      |  20 +-
+ .../selftests/kvm/x86_64/platform_info_test.c |  34 +-
+ .../kvm/x86_64/pmu_event_filter_test.c        |  60 +-
+ .../selftests/kvm/x86_64/set_boot_cpu_id.c    |  87 +-
+ .../selftests/kvm/x86_64/set_sregs_test.c     |  47 +-
+ .../selftests/kvm/x86_64/sev_migrate_tests.c  |  17 +-
+ tools/testing/selftests/kvm/x86_64/smm_test.c |  37 +-
+ .../testing/selftests/kvm/x86_64/state_test.c |  29 +-
+ .../selftests/kvm/x86_64/svm_int_ctl_test.c   |  21 +-
+ .../selftests/kvm/x86_64/svm_vmcall_test.c    |  16 +-
+ .../selftests/kvm/x86_64/sync_regs_test.c     |  52 +-
+ .../selftests/kvm/x86_64/tsc_msrs_test.c      |  35 +-
+ .../selftests/kvm/x86_64/userspace_io_test.c  |  18 +-
+ .../kvm/x86_64/userspace_msr_exit_test.c      | 165 ++-
+ .../kvm/x86_64/vmx_apic_access_test.c         |  18 +-
+ .../kvm/x86_64/vmx_close_while_nested_test.c  |  17 +-
+ .../selftests/kvm/x86_64/vmx_dirty_log_test.c |  13 +-
+ .../vmx_exception_with_invalid_guest_state.c  |  62 +-
+ .../x86_64/vmx_invalid_nested_guest_state.c   |  18 +-
+ .../kvm/x86_64/vmx_nested_tsc_scaling_test.c  |  19 +-
+ .../selftests/kvm/x86_64/vmx_pmu_msrs_test.c  |  25 +-
+ .../kvm/x86_64/vmx_preemption_timer_test.c    |  30 +-
+ .../kvm/x86_64/vmx_set_nested_state_test.c    |  86 +-
+ .../kvm/x86_64/vmx_tsc_adjust_test.c          |  12 +-
+ .../selftests/kvm/x86_64/xapic_ipi_test.c     |  48 +-
+ .../selftests/kvm/x86_64/xen_shinfo_test.c    |  35 +-
+ .../selftests/kvm/x86_64/xen_vmcall_test.c    |  17 +-
+ .../selftests/kvm/x86_64/xss_msr_test.c       |  10 +-
+ 91 files changed, 2363 insertions(+), 3087 deletions(-)
+ delete mode 100644 tools/testing/selftests/kvm/lib/kvm_util_internal.h
 
 
-See the discussion here[1], disable_irq() could be problematic for the 
-block and scsi device that using affinity managed irq. We're waiting for 
-the IRQ maintainer to comment on a solution. Other looks sane.
-
-Thanks
-
-[1] https://lkml.org/lkml/2022/3/8/743
-
-
->
-> Thanks.
->
-> +static int vp_modern_reset_vq(struct virtqueue *vq)
-> +{
-> +       struct virtio_pci_device *vp_dev = to_vp_device(vq->vdev);
-> +       struct virtio_pci_modern_device *mdev = &vp_dev->mdev;
-> +       struct virtio_pci_vq_info *info;
-> +       unsigned long flags;
-> +       unsigned int irq;
-> +
-> +       if (!virtio_has_feature(vq->vdev, VIRTIO_F_RING_RESET))
-> +               return -ENOENT;
-> +
-> +       vp_modern_set_queue_reset(mdev, vq->index);
-> +
-> +       info = vp_dev->vqs[vq->index];
-> +
-> +       /* delete vq from irq handler */
-> +       spin_lock_irqsave(&vp_dev->lock, flags);
-> +       list_del(&info->node);
-> +       vp_modern_set_queue_reset(mdev, vq->index);
-> +
-> +       info = vp_dev->vqs[vq->index];
-> +
-> +       /* delete vq from irq handler */
-> +       spin_lock_irqsave(&vp_dev->lock, flags);
-> +       list_del(&info->node);
-> +       spin_unlock_irqrestore(&vp_dev->lock, flags);
-> +
-> +       INIT_LIST_HEAD(&info->node);
-> +
-> +       /* For the case where vq has an exclusive irq, to prevent the irq from
-> +        * being received again and the pending irq, call disable_irq().
-> +        *
-> +        * In the scenario based on shared interrupts, vq will be searched from
-> +        * the queue virtqueues. Since the previous list_del() has been deleted
-> +        * from the queue, it is impossible for vq to be called in this case.
-> +        * There is no need to close the corresponding interrupt.
-> +        */
-> +       if (vp_dev->per_vq_vectors && msix_vec != VIRTIO_MSI_NO_VECTOR)
-> +               disable_irq(pci_irq_vector(vp_dev->pci_dev, info->msix_vector));
-> +
-> +       vq->reset = true;
-> +
-> +       return 0;
-> +}
-> +
-> +static int vp_modern_enable_reset_vq(struct virtqueue *vq)
-> +{
-> +       struct virtio_pci_device *vp_dev = to_vp_device(vq->vdev);
-> +       struct virtio_pci_modern_device *mdev = &vp_dev->mdev;
-> +       struct virtio_pci_vq_info *info;
-> +       unsigned long flags, index;
-> +       int err;
-> +
-> +       if (!vq->reset)
-> +               return -EBUSY;
-> +
-> +       index = vq->index;
-> +       info = vp_dev->vqs[index];
-> +
-> +       /* check queue reset status */
-> +       if (vp_modern_get_queue_reset(mdev, index) != 1)
-> +               return -EBUSY;
-> +
-> +       err = vp_active_vq(vq, info->msix_vector);
-> +       if (err)
-> +               return err;
-> +
-> +       if (vq->callback) {
-> +               spin_lock_irqsave(&vp_dev->lock, flags);
-> +               list_add(&info->node, &vp_dev->virtqueues);
-> +               spin_unlock_irqrestore(&vp_dev->lock, flags);
-> +       } else {
-> +               INIT_LIST_HEAD(&info->node);
-> +       }
-> +
-> +       vp_modern_set_queue_enable(&vp_dev->mdev, index, true);
-> +       vq->reset = false;
-> +
-> +       if (vp_dev->per_vq_vectors && msix_vec != VIRTIO_MSI_NO_VECTOR)
-> +               enable_irq(pci_irq_vector(vp_dev->pci_dev, info->msix_vector));
-> +
-> +       return 0;
-> +}
->
->
+base-commit: f6ae04ddb347f526b4620d1053690ecf1f87d77f
+-- 
+2.35.1.723.g4982287a31-goog
 
