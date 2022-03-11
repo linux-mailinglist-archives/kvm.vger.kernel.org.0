@@ -2,114 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3EBD44D5D59
-	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 09:31:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A57C4D5DA2
+	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 09:42:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236636AbiCKIbZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Mar 2022 03:31:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47088 "EHLO
+        id S238609AbiCKInm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Mar 2022 03:43:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42406 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236694AbiCKIbU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Mar 2022 03:31:20 -0500
-Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 156E31B45FD;
-        Fri, 11 Mar 2022 00:30:18 -0800 (PST)
-Received: by mail-pg1-x52f.google.com with SMTP id o23so6871494pgk.13;
-        Fri, 11 Mar 2022 00:30:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=EV0wmNwRVxX8NQcoop+BEUS5js89FYD4nmxPHK49pWQ=;
-        b=RrVI3XYBW4Johmu7rVRoRIRMELwbIMEQGU6gIqjMpTGdMT8ebwN8sRXICZNvCvvu5j
-         l/hb2+A5ZXJ5vqw3gXP4MwbmhAA4HGSZr+0IJH7DGxTVBjqkbrLeqhzE9fv6UzIx+QNj
-         xj3JpteEUBMII006M1xmgqcp4q2G2hem5fEMpyzal58kW/U6ZXQCN/AvAn9m39qbuN2U
-         P41237l1RVwxdvtfJ2ZOh7rIvBwrOe3JwfG3sEe9+jLU140EJ/F3C6z5i4JfddZikt7p
-         bCHCoPSISq/ePfh8UIoEjfabIAP9g5i1bPIB41eWaVqAIMHS8U2gA8rJn7GxyoAYlNS5
-         kcog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=EV0wmNwRVxX8NQcoop+BEUS5js89FYD4nmxPHK49pWQ=;
-        b=yMR1fynUYq9YPX9QI19wAzpPpvHPHy0PCy+t853xja9xSrf0NpSrIoDs/Zaz47ToUk
-         IkaivxMT91tr2pXJUamu4gIyyPLh/0ki+mnyzt8PQHI+5KIeC3nEpzDmZsGVPg42EZ83
-         8MFYdM8HzDuULe3/UIiKJhiqRsF945We5QcXVvV6gVWQ/0sAdyPDl6ii8lacIBXHCMhh
-         7azUvAHAc6N8oiDNLxlnWPVhH7tCAdY76Q5OFkKU4tgefV4Wrad2XYP6t8Wfe4Q14MWJ
-         hM3QpDOya9srRylqGb/4Zb+LcgI2F3U3OKdkR9Bx+vnNx+0ndggOE+FsJpLKDiFMM7Ie
-         FdKg==
-X-Gm-Message-State: AOAM531ZRxEKsKrYs+E2jBtyEfirVitXSu3OjrbxynEg0rVlw/g7//UU
-        DiPghfryqsI2v64fDQe+MJJGmE1BsFs=
-X-Google-Smtp-Source: ABdhPJzlNsy3e1ptcNA1gVdmyGzeVVvFjO+vtZKTXz+mMFFivnXYL8Q+yd6xL5Xp3kOTB5m7PdGErg==
-X-Received: by 2002:a63:82c2:0:b0:37c:942b:96db with SMTP id w185-20020a6382c2000000b0037c942b96dbmr7422065pgd.286.1646987417357;
-        Fri, 11 Mar 2022 00:30:17 -0800 (PST)
-Received: from localhost.localdomain ([203.205.141.111])
-        by smtp.googlemail.com with ESMTPSA id l1-20020a17090aec0100b001bfa1bafeadsm9090576pjy.53.2022.03.11.00.30.15
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 11 Mar 2022 00:30:17 -0800 (PST)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        with ESMTP id S238414AbiCKInk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Mar 2022 03:43:40 -0500
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D3B73B3F4;
+        Fri, 11 Mar 2022 00:42:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1646988157; x=1678524157;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   mime-version:in-reply-to;
+  bh=rnnCy0Hbi4uhBKWJV93SLPhz7c/vwnMymNdqjK9CGiI=;
+  b=TSElsKllxlM6Vbk/Yu5miqQ82L2dxUe/dDgksMB0D2EdOXf8XYk2WkEj
+   myfQNcCnR6zYAGT12LUIKb8v3YV9o/90cR3BDbuXEH+LX9DqDeVD32A1M
+   8rNxfacfmDOdjrJiizTANRs3sG23rLUpT9TSd9jxsx1ZO2+pX2Kxy+Cq8
+   nNPz0jbwJzTVG/OayqiycDDw3+vZOaAntqGF4w+S4wRM1YExYLl09AMQ6
+   vkqLelSenko/TAyf/FG1Ngp00gfmzfLgYgD4beHN9Op/lpMch9ZLhABxN
+   u1g/19eSh9AuGotby4eBXtAboRcwbyLK/1dgRkKnzlZJtpeEgILjBNmVD
+   A==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10282"; a="341958572"
+X-IronPort-AV: E=Sophos;i="5.90,173,1643702400"; 
+   d="scan'208";a="341958572"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2022 00:42:35 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.90,173,1643702400"; 
+   d="scan'208";a="538926645"
+Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.101])
+  by orsmga007.jf.intel.com with ESMTP; 11 Mar 2022 00:42:24 -0800
+Date:   Fri, 11 Mar 2022 16:42:08 +0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     Dave Chinner <david@fromorbit.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-api@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
         Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: [PATCH 5/5] KVM: X86: Expose PREEMT_COUNT CPUID feature bit to guest
-Date:   Fri, 11 Mar 2022 00:29:14 -0800
-Message-Id: <1646987354-28644-6-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1646987354-28644-1-git-send-email-wanpengli@tencent.com>
-References: <1646987354-28644-1-git-send-email-wanpengli@tencent.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com
+Subject: Re: [PATCH v5 03/13] mm/shmem: Support memfile_notifier
+Message-ID: <20220311084208.GB56193@chaop.bj.intel.com>
+Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
+References: <20220310140911.50924-1-chao.p.peng@linux.intel.com>
+ <20220310140911.50924-4-chao.p.peng@linux.intel.com>
+ <20220310230822.GO661808@dread.disaster.area>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220310230822.GO661808@dread.disaster.area>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+On Fri, Mar 11, 2022 at 10:08:22AM +1100, Dave Chinner wrote:
+> On Thu, Mar 10, 2022 at 10:09:01PM +0800, Chao Peng wrote:
+> > From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+> > 
+> > It maintains a memfile_notifier list in shmem_inode_info structure and
+> > implements memfile_pfn_ops callbacks defined by memfile_notifier. It
+> > then exposes them to memfile_notifier via
+> > shmem_get_memfile_notifier_info.
+> > 
+> > We use SGP_NOALLOC in shmem_get_lock_pfn since the pages should be
+> > allocated by userspace for private memory. If there is no pages
+> > allocated at the offset then error should be returned so KVM knows that
+> > the memory is not private memory.
+> > 
+> > Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+> > Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> > ---
+> >  include/linux/shmem_fs.h |  4 +++
+> >  mm/shmem.c               | 76 ++++++++++++++++++++++++++++++++++++++++
+> >  2 files changed, 80 insertions(+)
+> > 
+> > diff --git a/include/linux/shmem_fs.h b/include/linux/shmem_fs.h
+> > index 2dde843f28ef..7bb16f2d2825 100644
+> > --- a/include/linux/shmem_fs.h
+> > +++ b/include/linux/shmem_fs.h
+> > @@ -9,6 +9,7 @@
+> >  #include <linux/percpu_counter.h>
+> >  #include <linux/xattr.h>
+> >  #include <linux/fs_parser.h>
+> > +#include <linux/memfile_notifier.h>
+> >  
+> >  /* inode in-kernel data */
+> >  
+> > @@ -28,6 +29,9 @@ struct shmem_inode_info {
+> >  	struct simple_xattrs	xattrs;		/* list of xattrs */
+> >  	atomic_t		stop_eviction;	/* hold when working on inode */
+> >  	unsigned int		xflags;		/* shmem extended flags */
+> > +#ifdef CONFIG_MEMFILE_NOTIFIER
+> > +	struct memfile_notifier_list memfile_notifiers;
+> > +#endif
+> >  	struct inode		vfs_inode;
+> >  };
+> >  
+> > diff --git a/mm/shmem.c b/mm/shmem.c
+> > index 9b31a7056009..7b43e274c9a2 100644
+> > --- a/mm/shmem.c
+> > +++ b/mm/shmem.c
+> > @@ -903,6 +903,28 @@ static struct folio *shmem_get_partial_folio(struct inode *inode, pgoff_t index)
+> >  	return page ? page_folio(page) : NULL;
+> >  }
+> >  
+> > +static void notify_fallocate(struct inode *inode, pgoff_t start, pgoff_t end)
+> > +{
+> > +#ifdef CONFIG_MEMFILE_NOTIFIER
+> > +	struct shmem_inode_info *info = SHMEM_I(inode);
+> > +
+> > +	memfile_notifier_fallocate(&info->memfile_notifiers, start, end);
+> > +#endif
+> > +}
+> 
+> *notify_populate(), not fallocate.  This is a notification that a
+> range has been populated, not that the fallocate() syscall was run
+> to populate the backing store of a file.
+> 
+> i.e.  fallocate is the name of a userspace filesystem API that can
+> be used to manipulate the backing store of a file in various ways.
+> It can both populate and punch away the backing store of a file, and
+> some operations that fallocate() can run will do both (e.g.
+> FALLOC_FL_ZERO_RANGE) and so could generate both
+> notify_invalidate() and a notify_populate() events.
 
-Expose the PREEMPT_COUNT feature bit to the guest, the guest can check this
-feature bit before using MSR_KVM_PREEMPT_COUNT.
+Yes, I fully agreed fallocate syscall has both populating and hole
+punching semantics so notify_fallocate can be misleading since we
+actually mean populate here.
 
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- Documentation/virt/kvm/cpuid.rst | 3 +++
- arch/x86/kvm/cpuid.c             | 3 ++-
- 2 files changed, 5 insertions(+), 1 deletion(-)
+> 
+> Hence "fallocate" as an internal mm namespace or operation does not
+> belong anywhere in core MM infrastructure - it should never get used
+> anywhere other than the VFS/filesystem layers that implement the
+> fallocate() syscall or use it directly.
 
-diff --git a/Documentation/virt/kvm/cpuid.rst b/Documentation/virt/kvm/cpuid.rst
-index bda3e3e737d7..c45158af98a7 100644
---- a/Documentation/virt/kvm/cpuid.rst
-+++ b/Documentation/virt/kvm/cpuid.rst
-@@ -103,6 +103,9 @@ KVM_FEATURE_HC_MAP_GPA_RANGE       16          guest checks this feature bit bef
- KVM_FEATURE_MIGRATION_CONTROL      17          guest checks this feature bit before
-                                                using MSR_KVM_MIGRATION_CONTROL
- 
-+KVM_FEATURE_PREEMPT_COUNT          18          guest checks this feature bit before
-+                                               using MSR_KVM_PREEMPT_COUNT
-+
- KVM_FEATURE_CLOCKSOURCE_STABLE_BIT 24          host will warn if no guest-side
-                                                per-cpu warps are expected in
-                                                kvmclock
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 58b0b4e0263c..4785f5a63d8d 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -1071,7 +1071,8 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
- 			     (1 << KVM_FEATURE_PV_SEND_IPI) |
- 			     (1 << KVM_FEATURE_POLL_CONTROL) |
- 			     (1 << KVM_FEATURE_PV_SCHED_YIELD) |
--			     (1 << KVM_FEATURE_ASYNC_PF_INT);
-+			     (1 << KVM_FEATURE_ASYNC_PF_INT) |
-+			     (1 << KVM_FEATURE_PREEMPT_COUNT);
- 
- 		if (sched_info_on())
- 			entry->eax |= (1 << KVM_FEATURE_STEAL_TIME);
--- 
-2.25.1
+Will use your suggestion through the series where applied. Thanks for
+your suggestion.
 
+Chao
+> 
+> Cheers,
+> 
+> Dave.
+> 
+> -- 
+> Dave Chinner
+> david@fromorbit.com
