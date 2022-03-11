@@ -2,252 +2,250 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1B4DD4D636A
-	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 15:27:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 546404D6459
+	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 16:10:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349253AbiCKO2M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Mar 2022 09:28:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37590 "EHLO
+        id S1345245AbiCKPLa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Mar 2022 10:11:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60402 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349207AbiCKO2H (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Mar 2022 09:28:07 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1E061C7EBF;
-        Fri, 11 Mar 2022 06:27:03 -0800 (PST)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22BDK3OB021042;
-        Fri, 11 Mar 2022 14:27:02 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : reply-to : subject : to : cc : references : from :
- in-reply-to : content-type : content-transfer-encoding; s=pp1;
- bh=YHOoZuIhJIGUv6nvueS7vbShkSx6GnV2gdzqgAxu/N4=;
- b=oBwHks/afpX7AHd703lqSFwssmM4M3O2/GXreTQrTSV9M5wiYzXZYmc8eHlwiu0OmgCS
- GYCwus3LPeE9km1GqYP2VolzfmM5TqLu6Ve8C8NcHL162+JdJ5eou+lTSF5d9o9QYFT/
- v4jeDXlCZ/+o5cz6KNECzHHXoGqwK8Vh2LYtQ1WhoFSEgK1wZ8aYJ9uAHgrCXZQXP1cS
- MKXbLtWdx0iIS+9VXr2fWJUAHdA4vMyL7ezRIBazLJIrwHccGVw7VFnN/c6aOeaJj6ou
- z0GuV//cB3OSJqf2OxDjPhicw5z8YbizSWkzbk5GWj8gq/p4IZn4dW2Ibhigrbt5peqK hQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3eqs9289c9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 11 Mar 2022 14:27:01 +0000
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22BEKNux026331;
-        Fri, 11 Mar 2022 14:27:01 GMT
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3eqs9289bq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 11 Mar 2022 14:27:01 +0000
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
-        by ppma04dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22BEDGXW026475;
-        Fri, 11 Mar 2022 14:27:00 GMT
-Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
-        by ppma04dal.us.ibm.com with ESMTP id 3epb9d1m99-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 11 Mar 2022 14:27:00 +0000
-Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
-        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22BEQwBs28049692
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 11 Mar 2022 14:26:58 GMT
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8B474BE058;
-        Fri, 11 Mar 2022 14:26:58 +0000 (GMT)
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6187FBE053;
-        Fri, 11 Mar 2022 14:26:57 +0000 (GMT)
-Received: from [9.65.72.149] (unknown [9.65.72.149])
-        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Fri, 11 Mar 2022 14:26:57 +0000 (GMT)
-Message-ID: <fcce28f2-64f7-0946-3f33-3158b7909d6b@linux.ibm.com>
-Date:   Fri, 11 Mar 2022 09:26:25 -0500
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Reply-To: jjherne@linux.ibm.com
-Subject: Re: [PATCH v18 10/18] s390/vfio-ap: allow hot plug/unplug of AP
- devices when assigned/unassigned
-Content-Language: en-US
-To:     Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
+        with ESMTP id S1348602AbiCKPL0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Mar 2022 10:11:26 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7F9E01C4B14
+        for <kvm@vger.kernel.org>; Fri, 11 Mar 2022 07:10:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1647011421;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=S86JNNozDNBpXX5OqlAvYtryTmTo71qDJCBEDOod3jQ=;
+        b=cQ0QrSboDhpd4krAWwLfX+3QdENZD7VyapQOGL1yAxvw9stBn5L/wQjiUcL+nrxS9LkD/T
+        bUNksSKfbFsy2eDbGiu1i+ozR9PW1U2UwrXqWJt3x8ni/CpH5ZOks6jPJoUkChhKfY1Yog
+        woWrjqRR8mTyk8f/yiVWB+uCvXfz6vo=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-133-cfmCbE3YN264cMHMmS0VCA-1; Fri, 11 Mar 2022 10:10:15 -0500
+X-MC-Unique: cfmCbE3YN264cMHMmS0VCA-1
+Received: by mail-ed1-f71.google.com with SMTP id r8-20020aa7d588000000b00416438ed9a2so5015505edq.11
+        for <kvm@vger.kernel.org>; Fri, 11 Mar 2022 07:10:15 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=S86JNNozDNBpXX5OqlAvYtryTmTo71qDJCBEDOod3jQ=;
+        b=IWq4fpU5qhl4z0Zyx5+nHXHwrqu7+EhmBmMRRcBgubgsgcxsqrYAjdQ29HOSw7d4Ud
+         ac4ThM5qzZQuUeqMwvnsYwSzKnnbt9OcPZrYm1XfoNMsaMactMjt4StHQba3R5YEVW8I
+         c0ovna/MNc3bDD5EtEqask56A0az2jBteEcXtWAQwAlwG+xyGnuav0ao2F1tt2xmAj5q
+         y+PIiJ3LqyJ2VEAEbibY9nSYRLGxeOcc3nXProq7fcWnF85x0vrux2296oV63HX3lCjk
+         uOC88MQQSrPC4N8ZgUkd01z+/f0fhdIfXvvgPFEmYZJfQd0bPr1A6SzQpkxVJ88Fq7Sp
+         kz7g==
+X-Gm-Message-State: AOAM531yqe5bLLN3u/qYjaZmZQT8aPqcXlU9AFWbgc2jGp+/TXpNV78z
+        Rh9UwUFnQXDT6r2z2DZxLBSKI8Ap+O//ye79USBZc+IDrdU6kQ1RYlJkX9xl6MubfHL6Vj/ZkI4
+        i3qQZci3+2GGHsMlzkTKEGZ3lF9kwn5u8y0W9gAVH4aIUuyCag4PGoSqAGg57r8Fs
+X-Received: by 2002:a17:906:9f21:b0:6b6:1f07:fb86 with SMTP id fy33-20020a1709069f2100b006b61f07fb86mr8922195ejc.495.1647011410933;
+        Fri, 11 Mar 2022 07:10:10 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxpg4AhO6R+aOLseJyWOkNzsFA5iV8kBdrbE562CRDglmbNK4DdT28I2Eiql+gwjeGck5AhzA==
+X-Received: by 2002:a17:906:9f21:b0:6b6:1f07:fb86 with SMTP id fy33-20020a1709069f2100b006b61f07fb86mr8921290ejc.495.1647011397721;
+        Fri, 11 Mar 2022 07:09:57 -0800 (PST)
+Received: from fedora (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id j20-20020a508a94000000b00416c19650e8sm1728303edj.71.2022.03.11.07.09.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Mar 2022 07:09:57 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        David Hildenbrand <david@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        Mingwei Zhang <mizhang@google.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     freude@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
-        mjrosato@linux.ibm.com, pasic@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com
-References: <20220215005040.52697-1-akrowiak@linux.ibm.com>
- <20220215005040.52697-11-akrowiak@linux.ibm.com>
-From:   "Jason J. Herne" <jjherne@linux.ibm.com>
-Organization: IBM
-In-Reply-To: <20220215005040.52697-11-akrowiak@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: cmxpyDpTfjAQ5EnIkLLkLBcgvvXXQr8a
-X-Proofpoint-ORIG-GUID: CDbEbwXNSCzK9CIn_QTDmS9rqxgaL4fz
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-03-11_06,2022-03-11_02,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- suspectscore=0 adultscore=0 clxscore=1015 mlxlogscore=999 spamscore=0
- mlxscore=0 impostorscore=0 phishscore=0 malwarescore=0 bulkscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2203110069
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Subject: Re: [PATCH v4 18/30] KVM: x86/mmu: Zap only TDP MMU leafs in
+ kvm_zap_gfn_range()
+In-Reply-To: <20220303193842.370645-19-pbonzini@redhat.com>
+References: <20220303193842.370645-1-pbonzini@redhat.com>
+ <20220303193842.370645-19-pbonzini@redhat.com>
+Date:   Fri, 11 Mar 2022 16:09:56 +0100
+Message-ID: <87wnh08r0b.fsf@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/14/22 19:50, Tony Krowiak wrote:
-> Let's allow adapters, domains and control domains to be hot plugged
-> into and hot unplugged from a KVM guest using a matrix mdev when an
-> adapter, domain or control domain is assigned to or unassigned from
-> the matrix mdev.
-> 
-> Whenever an assignment or unassignment of an adapter, domain or control
-> domain is performed, the AP configuration assigned to the matrix
-> mediated device will be filtered and assigned to the AP control block
-> (APCB) that supplies the AP configuration to the guest so that no
-> adapter, domain or control domain that is not in the host's AP
-> configuration nor any APQN that does not reference a queue device bound
-> to the vfio_ap device driver is assigned.
-> 
-> After updating the APCB, if the mdev is in use by a KVM guest, it is
-> hot plugged into the guest to dynamically provide access to the adapters,
-> domains and control domains provided via the newly refreshed APCB.
-> 
-> Keep in mind that the matrix_dev->guests_lock must be taken outside of the
-> matrix_mdev->kvm->lock which in turn must be taken outside of the
-> matrix_dev->mdevs_lock in order to avoid circular lock dependencies (i.e.,
-> a lockdep splat).Consequently, the locking order for hot plugging the
-> guest's APCB must be:
-> 
-> matrix_dev->guests_lock => matrix_mdev->kvm->lock => matrix_dev->mdevs_lock
-> 
-> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+Paolo Bonzini <pbonzini@redhat.com> writes:
+
+> From: Sean Christopherson <seanjc@google.com>
+>
+> Zap only leaf SPTEs in the TDP MMU's zap_gfn_range(), and rename various
+> functions accordingly.  When removing mappings for functional correctness
+> (except for the stupid VFIO GPU passthrough memslots bug), zapping the
+> leaf SPTEs is sufficient as the paging structures themselves do not point
+> at guest memory and do not directly impact the final translation (in the
+> TDP MMU).
+>
+> Note, this aligns the TDP MMU with the legacy/full MMU, which zaps only
+> the rmaps, a.k.a. leaf SPTEs, in kvm_zap_gfn_range() and
+> kvm_unmap_gfn_range().
+>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Reviewed-by: Ben Gardon <bgardon@google.com>
+> Message-Id: <20220226001546.360188-18-seanjc@google.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+I've noticed that multi-vCPU Hyper-V guests started crashing randomly on
+boot with the latest kvm/queue and I've bisected the problem to this
+particular patch. Basically, I'm not able to boot e.g. 16-vCPU guest
+successfully anymore. Both Intel and AMD seem to be affected. Reverting
+this commit saves the day.
+
+Having some experience with similarly looking crashes in the past, I'd
+suspect it is TLB flush related. I'd appreciate any thoughts.
+
 > ---
->   drivers/s390/crypto/vfio_ap_ops.c | 198 +++++++++++++++++++-----------
->   1 file changed, 125 insertions(+), 73 deletions(-)
-> 
-> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-> index 623a4b38676d..4c382cd3afc7 100644
-> --- a/drivers/s390/crypto/vfio_ap_ops.c
-> +++ b/drivers/s390/crypto/vfio_ap_ops.c
-> @@ -317,10 +317,25 @@ static void vfio_ap_matrix_init(struct ap_config_info *info,
->   	matrix->adm_max = info->apxa ? info->Nd : 15;
->   }
->   
-> -static void vfio_ap_mdev_filter_cdoms(struct ap_matrix_mdev *matrix_mdev)
-> +static void vfio_ap_mdev_hotplug_apcb(struct ap_matrix_mdev *matrix_mdev)
->   {
-> +	if (matrix_mdev->kvm)
-> +		kvm_arch_crypto_set_masks(matrix_mdev->kvm,
-> +					  matrix_mdev->shadow_apcb.apm,
-> +					  matrix_mdev->shadow_apcb.aqm,
-> +					  matrix_mdev->shadow_apcb.adm);
-> +}
-
-This function updates a kvm guest's apcb. So let's rename it to
-vfio_ap_update_apcb(). You can also call this function in vfio_ap_mdev_set_kvm,
-instead of duplicating the code to call kvm_arch_crypto_set_masks().
-
-
-
-> +static bool vfio_ap_mdev_filter_cdoms(struct ap_matrix_mdev *matrix_mdev)
-> +{
-> +	DECLARE_BITMAP(shadow_adm, AP_DOMAINS);
-> +
-> +	bitmap_copy(shadow_adm, matrix_mdev->shadow_apcb.adm, AP_DOMAINS);
->   	bitmap_and(matrix_mdev->shadow_apcb.adm, matrix_mdev->matrix.adm,
->   		   (unsigned long *)matrix_dev->info.adm, AP_DOMAINS);
-> +
-> +	return !bitmap_equal(shadow_adm, matrix_mdev->shadow_apcb.adm,
-> +			     AP_DOMAINS);
->   }
-
-your variable, shadow_adm, should be named original_adm. Since it represents
-the original value before filtering. This makes the intent much more clear.
-Same goes for the vars in vfio_ap_mdev_filter_matrix().
-
-...
-> +/**
-> + * vfio_ap_mdev_get_locks - acquire the locks required to assign/unassign AP
-> + *			    adapters, domains and control domains for an mdev in
-> + *			    the proper locking order.
-> + *
-> + * @matrix_mdev: the matrix mediated device object
-> + */
-> +static void vfio_ap_mdev_get_locks(struct ap_matrix_mdev *matrix_mdev)
-> +{
-> +	/* Lock the mutex required to access the KVM guest's state */
-> +	mutex_lock(&matrix_dev->guests_lock);
-> +
-> +	/* If a KVM guest is running, lock the mutex required to plug/unplug the
-> +	 * AP devices passed through to the guest
-> +	 */
-> +	if (matrix_mdev->kvm)
-> +		mutex_lock(&matrix_mdev->kvm->lock);
-> +
-> +	/* The lock required to access the mdev's state */
-> +	mutex_lock(&matrix_dev->mdevs_lock);
-> +}
-
-Simplifying the cdoe, and removing duplication by moving the locking code to a
-function is probably a good thing. But I don't feel like this belongs to this
-particular patch. In general, a patch should only do one thing, and ideally that
-one thing should be as small as reasonably possible. This makes the patch easier
-to read and to review.
-
-I feel like, as much as possible, you should refactor the locking in a series
-of patches that are all kept together. Ideally, they would be a patch series
-completely separate from dynamic ap. After all, this series is already at 18
-patches. :)
-
-...
->   /**
->    * assign_adapter_store - parses the APID from @buf and sets the
->    * corresponding bit in the mediated matrix device's APM
-> @@ -649,17 +723,9 @@ static ssize_t assign_adapter_store(struct device *dev,
->   	int ret;
->   	unsigned long apid;
->   	DECLARE_BITMAP(apm, AP_DEVICES);
+>  arch/x86/kvm/mmu/mmu.c     |  4 ++--
+>  arch/x86/kvm/mmu/tdp_mmu.c | 41 ++++++++++----------------------------
+>  arch/x86/kvm/mmu/tdp_mmu.h |  8 +-------
+>  3 files changed, 14 insertions(+), 39 deletions(-)
+>
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 8408d7db8d2a..febdcaaa7b94 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -5834,8 +5834,8 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
+>  
+>  	if (is_tdp_mmu_enabled(kvm)) {
+>  		for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++)
+> -			flush = kvm_tdp_mmu_zap_gfn_range(kvm, i, gfn_start,
+> -							  gfn_end, flush);
+> +			flush = kvm_tdp_mmu_zap_leafs(kvm, i, gfn_start,
+> +						      gfn_end, true, flush);
+>  	}
+>  
+>  	if (flush)
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index f3939ce4a115..c71debdbc732 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -834,10 +834,8 @@ bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
+>  }
+>  
+>  /*
+> - * Tears down the mappings for the range of gfns, [start, end), and frees the
+> - * non-root pages mapping GFNs strictly within that range. Returns true if
+> - * SPTEs have been cleared and a TLB flush is needed before releasing the
+> - * MMU lock.
+> + * Zap leafs SPTEs for the range of gfns, [start, end). Returns true if SPTEs
+> + * have been cleared and a TLB flush is needed before releasing the MMU lock.
+>   *
+>   * If can_yield is true, will release the MMU lock and reschedule if the
+>   * scheduler needs the CPU or there is contention on the MMU lock. If this
+> @@ -845,42 +843,25 @@ bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
+>   * the caller must ensure it does not supply too large a GFN range, or the
+>   * operation can cause a soft lockup.
+>   */
+> -static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
+> -			  gfn_t start, gfn_t end, bool can_yield, bool flush)
+> +static bool tdp_mmu_zap_leafs(struct kvm *kvm, struct kvm_mmu_page *root,
+> +			      gfn_t start, gfn_t end, bool can_yield, bool flush)
+>  {
+> -	bool zap_all = (start == 0 && end >= tdp_mmu_max_gfn_host());
+>  	struct tdp_iter iter;
+>  
+> -	/*
+> -	 * No need to try to step down in the iterator when zapping all SPTEs,
+> -	 * zapping the top-level non-leaf SPTEs will recurse on their children.
+> -	 */
+> -	int min_level = zap_all ? root->role.level : PG_LEVEL_4K;
 > -
->   	struct ap_matrix_mdev *matrix_mdev = dev_get_drvdata(dev);
->   
-> -	mutex_lock(&matrix_dev->guests_lock);
-> -	mutex_lock(&matrix_dev->mdevs_lock);
+>  	end = min(end, tdp_mmu_max_gfn_host());
+>  
+>  	lockdep_assert_held_write(&kvm->mmu_lock);
+>  
+>  	rcu_read_lock();
+>  
+> -	for_each_tdp_pte_min_level(iter, root, min_level, start, end) {
+> +	for_each_tdp_pte_min_level(iter, root, PG_LEVEL_4K, start, end) {
+>  		if (can_yield &&
+>  		    tdp_mmu_iter_cond_resched(kvm, &iter, flush, false)) {
+>  			flush = false;
+>  			continue;
+>  		}
+>  
+> -		if (!is_shadow_present_pte(iter.old_spte))
+> -			continue;
 > -
-> -	/* If the KVM guest is running, disallow assignment of adapter */
-> -	if (matrix_mdev->kvm) {
-> -		ret = -EBUSY;
-> -		goto done;
-> -	}
-> +	vfio_ap_mdev_get_locks(matrix_mdev);
->   
->   	ret = kstrtoul(buf, 0, &apid);
->   	if (ret)
-> @@ -671,8 +737,6 @@ static ssize_t assign_adapter_store(struct device *dev,
->   	}
->   
->   	set_bit_inv(apid, matrix_mdev->matrix.apm);
-> -	memset(apm, 0, sizeof(apm));
-> -	set_bit_inv(apid, apm);
->   
->   	ret = vfio_ap_mdev_validate_masks(matrix_mdev);
-
-It looks like you moved the memset() and set_bit_inv() to be closer to where
-"apm" is used, namely, the call to vfio_ap_mdev_filter_matrix(). Any reason you
-cannot move it down under the call to vfio_ap_mdev_link_adapter()? That would
-get it even closer to where it is used.
-
-Also, I think renaming apm to apm_delta or apm_diff makes sense here. After all,
-it is the difference between the original apm, and the new apm. The new apm
-has an extra bit for the newly added adapter. Do I have that right? If so, I
-think renaming the variable will make the code clearer.
-
-Both of the above comments also apply to assign_domain_store().
+> -		/*
+> -		 * If this is a non-last-level SPTE that covers a larger range
+> -		 * than should be zapped, continue, and zap the mappings at a
+> -		 * lower level, except when zapping all SPTEs.
+> -		 */
+> -		if (!zap_all &&
+> -		    (iter.gfn < start ||
+> -		     iter.gfn + KVM_PAGES_PER_HPAGE(iter.level) > end) &&
+> +		if (!is_shadow_present_pte(iter.old_spte) ||
+>  		    !is_last_spte(iter.old_spte, iter.level))
+>  			continue;
+>  
+> @@ -898,13 +879,13 @@ static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
+>   * SPTEs have been cleared and a TLB flush is needed before releasing the
+>   * MMU lock.
+>   */
+> -bool __kvm_tdp_mmu_zap_gfn_range(struct kvm *kvm, int as_id, gfn_t start,
+> -				 gfn_t end, bool can_yield, bool flush)
+> +bool kvm_tdp_mmu_zap_leafs(struct kvm *kvm, int as_id, gfn_t start, gfn_t end,
+> +			   bool can_yield, bool flush)
+>  {
+>  	struct kvm_mmu_page *root;
+>  
+>  	for_each_tdp_mmu_root_yield_safe(kvm, root, as_id)
+> -		flush = zap_gfn_range(kvm, root, start, end, can_yield, flush);
+> +		flush = tdp_mmu_zap_leafs(kvm, root, start, end, can_yield, false);
+>  
+>  	return flush;
+>  }
+> @@ -1202,8 +1183,8 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+>  bool kvm_tdp_mmu_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range,
+>  				 bool flush)
+>  {
+> -	return __kvm_tdp_mmu_zap_gfn_range(kvm, range->slot->as_id, range->start,
+> -					   range->end, range->may_block, flush);
+> +	return kvm_tdp_mmu_zap_leafs(kvm, range->slot->as_id, range->start,
+> +				     range->end, range->may_block, flush);
+>  }
+>  
+>  typedef bool (*tdp_handler_t)(struct kvm *kvm, struct tdp_iter *iter,
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
+> index 5e5ef2576c81..54bc8118c40a 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.h
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.h
+> @@ -15,14 +15,8 @@ __must_check static inline bool kvm_tdp_mmu_get_root(struct kvm_mmu_page *root)
+>  void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
+>  			  bool shared);
+>  
+> -bool __kvm_tdp_mmu_zap_gfn_range(struct kvm *kvm, int as_id, gfn_t start,
+> +bool kvm_tdp_mmu_zap_leafs(struct kvm *kvm, int as_id, gfn_t start,
+>  				 gfn_t end, bool can_yield, bool flush);
+> -static inline bool kvm_tdp_mmu_zap_gfn_range(struct kvm *kvm, int as_id,
+> -					     gfn_t start, gfn_t end, bool flush)
+> -{
+> -	return __kvm_tdp_mmu_zap_gfn_range(kvm, as_id, start, end, true, flush);
+> -}
+> -
+>  bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp);
+>  void kvm_tdp_mmu_zap_all(struct kvm *kvm);
+>  void kvm_tdp_mmu_invalidate_all_roots(struct kvm *kvm);
 
 -- 
--- Jason J. Herne (jjherne@linux.ibm.com)
+Vitaly
+
