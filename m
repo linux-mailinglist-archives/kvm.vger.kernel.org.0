@@ -2,245 +2,252 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E024D4D629A
-	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 14:52:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B4DD4D636A
+	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 15:27:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348984AbiCKNxH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Mar 2022 08:53:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41860 "EHLO
+        id S1349253AbiCKO2M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Mar 2022 09:28:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37590 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348976AbiCKNxG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Mar 2022 08:53:06 -0500
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A4F01C4B3D;
-        Fri, 11 Mar 2022 05:52:02 -0800 (PST)
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22BDTA5g008309;
-        Fri, 11 Mar 2022 13:51:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
- from : subject : to : cc : references : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2021-07-09;
- bh=5TnFPFk+Fu0RsokePgRwyIAazP1IVxZFSs1puHEbDOs=;
- b=Gzk3SsABo7ca5bXDAcL8e7cZgdbieUAghQ6OtEaqbqJJteMUwyQEw8VWgpeLB1IKvASn
- 889TDAdx+uOJy1imQ4+iFo4Msu8Fyr2TCLMJK2zMKSAWhuRZDLL1UpWrQCqYskhN0qfJ
- /CST3+2uO1DitdmFBfilYOqkL/HVHx+EYhFCXCGAcxvazSjJ8TNq9nfZH2gcP/ShfHYX
- mV91pZsoLGeAwssfiMtHHZc/+Wj5meAjEClj3aE0vSQdOUugU9Y1LBURWiXh//RrsD8A
- qPo1TYfhOuImfNZjtkLSTBedVYkmATZfq5FcXSNJQeyZ0bkoGFPHgTPAx5VOkA30ZNR2 CQ== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by mx0b-00069f02.pphosted.com with ESMTP id 3ekx9crms1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 11 Mar 2022 13:51:44 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 22BDlCt2136635;
-        Fri, 11 Mar 2022 13:51:42 GMT
-Received: from nam02-sn1-obe.outbound.protection.outlook.com (mail-sn1anam02lp2046.outbound.protection.outlook.com [104.47.57.46])
-        by userp3020.oracle.com with ESMTP id 3envvp5v0s-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 11 Mar 2022 13:51:42 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Kk+ySanPQjlaeMyIRa9Fl8OHzUHBFC/2OtpAp0j/HSrclFlKMAjRpm+XAm31UUewT5znI05iyAyGcbLIeD6clR2ffGjqPhMXyNenc57tEdvjO01sUenaJyvJ6Lzxu8yPuWqlmQEQ0UOpYO4d0fK1OH+r18OXiwrpE/mxlPQ9Va1Si1nXxmsNQWBmiGoXLlIc7WZKvLYekyrxh7tMyGUC2dx/1SZ/6EcLzX25pKRJqaOOuiiSTFGbB6fXjBQH6069NtkcfjWKnU7bk8OQAQpsZTyxUiZVkE1pu8inW/oRlw3fAufXpcKhAuQixrGOAtuMzcSzGIyaCqBKlfymu1noHA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5TnFPFk+Fu0RsokePgRwyIAazP1IVxZFSs1puHEbDOs=;
- b=UprjKQ4G3q8fgKYEqRiAQqWV7X8O/ntfoZTftR/kC0GbCirHw62/gG8J8xb34dS8/lElwLDFczsI6wdyKedKAFRDjfiCmQaHhZ6vOzv3I38gC03oHUJ7h68xI1S49WkvBAR4Jzi5/vAuiRpwnGSUKK6P3/k045+YRy+tftNqCMuRTTYODhQkIeZtzZRovuH/hyratGlxr1IPvRFsh5NLi2C1Gp6mb55HxLGeJb/FLohkV9YdpCfaDXHiM0agv3T3UtTuQq9SoIjHPEQUL7Fvq2Uwzuk0JGK0eT22U4eFVDJ33Ub4KkY4v50Nw0dG232iZhI87mjbhssWAq7DW3d/Kw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5TnFPFk+Fu0RsokePgRwyIAazP1IVxZFSs1puHEbDOs=;
- b=pkd9Zpy00Ca8yHYGgkafPwxcnUYImkT1gzp6DQNjoi6aBgyUZvTySZ/emhofVfiXaKZHiOZNTQUx5Z/xwgN3qXkwGBi0Cy6Bfcg2z7x0AxHaR9QP7U3p5S0jLDt81N/k6xSGja7hSizQeg2RkYejFTTGZEphlzlkLYhD6y/EeZQ=
-Received: from BLAPR10MB4835.namprd10.prod.outlook.com (2603:10b6:208:331::11)
- by MWHPR1001MB2301.namprd10.prod.outlook.com (2603:10b6:301:2d::38) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5061.22; Fri, 11 Mar
- 2022 13:51:40 +0000
-Received: from BLAPR10MB4835.namprd10.prod.outlook.com
- ([fe80::5cee:6897:b292:12d0]) by BLAPR10MB4835.namprd10.prod.outlook.com
- ([fe80::5cee:6897:b292:12d0%6]) with mapi id 15.20.5061.022; Fri, 11 Mar 2022
- 13:51:40 +0000
-Message-ID: <8448d7fb-3808-c4e8-66cf-4a3184c24ec0@oracle.com>
-Date:   Fri, 11 Mar 2022 13:51:32 +0000
-From:   Joao Martins <joao.m.martins@oracle.com>
-Subject: iommufd(+vfio-compat) dirty tracking (Was: Re: [RFC v2 0/4]
- vfio/hisilicon: add acc live migration driver)
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
-        Linuxarm <linuxarm@huawei.com>,
-        liulongfang <liulongfang@huawei.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        yuzenghui <yuzenghui@huawei.com>,
-        Jonathan Cameron <jonathan.cameron@huawei.com>,
-        "Wangzhou (B)" <wangzhou1@hisilicon.com>
-References: <20220211174933.GQ4160@nvidia.com>
- <34ac016b-000f-d6d6-acf1-f39ca1ca9c54@oracle.com>
- <20220212000117.GS4160@nvidia.com>
- <8338fe24-04ab-130a-1324-ab8f8e14816d@oracle.com>
- <20220214140649.GC4160@nvidia.com>
- <6198d35c-f810-cab1-8b43-2f817de2c1ea@oracle.com>
- <20220215162133.GV4160@nvidia.com>
- <7db79281-e72a-29f8-7192-07b739a63897@oracle.com>
- <20220223010303.GK10061@nvidia.com>
- <e4dba6f8-7f5b-e0d5-8ea8-5588459816f7@oracle.com>
- <20220225204424.GA219866@nvidia.com>
- <30066724-b100-a14e-e3d8-092645298d8a@oracle.com>
-Content-Language: en-US
-In-Reply-To: <30066724-b100-a14e-e3d8-092645298d8a@oracle.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PR0P264CA0151.FRAP264.PROD.OUTLOOK.COM
- (2603:10a6:100:1b::19) To BLAPR10MB4835.namprd10.prod.outlook.com
- (2603:10b6:208:331::11)
+        with ESMTP id S1349207AbiCKO2H (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Mar 2022 09:28:07 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1E061C7EBF;
+        Fri, 11 Mar 2022 06:27:03 -0800 (PST)
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22BDK3OB021042;
+        Fri, 11 Mar 2022 14:27:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : reply-to : subject : to : cc : references : from :
+ in-reply-to : content-type : content-transfer-encoding; s=pp1;
+ bh=YHOoZuIhJIGUv6nvueS7vbShkSx6GnV2gdzqgAxu/N4=;
+ b=oBwHks/afpX7AHd703lqSFwssmM4M3O2/GXreTQrTSV9M5wiYzXZYmc8eHlwiu0OmgCS
+ GYCwus3LPeE9km1GqYP2VolzfmM5TqLu6Ve8C8NcHL162+JdJ5eou+lTSF5d9o9QYFT/
+ v4jeDXlCZ/+o5cz6KNECzHHXoGqwK8Vh2LYtQ1WhoFSEgK1wZ8aYJ9uAHgrCXZQXP1cS
+ MKXbLtWdx0iIS+9VXr2fWJUAHdA4vMyL7ezRIBazLJIrwHccGVw7VFnN/c6aOeaJj6ou
+ z0GuV//cB3OSJqf2OxDjPhicw5z8YbizSWkzbk5GWj8gq/p4IZn4dW2Ibhigrbt5peqK hQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3eqs9289c9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 11 Mar 2022 14:27:01 +0000
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22BEKNux026331;
+        Fri, 11 Mar 2022 14:27:01 GMT
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3eqs9289bq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 11 Mar 2022 14:27:01 +0000
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22BEDGXW026475;
+        Fri, 11 Mar 2022 14:27:00 GMT
+Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
+        by ppma04dal.us.ibm.com with ESMTP id 3epb9d1m99-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 11 Mar 2022 14:27:00 +0000
+Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
+        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22BEQwBs28049692
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 11 Mar 2022 14:26:58 GMT
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8B474BE058;
+        Fri, 11 Mar 2022 14:26:58 +0000 (GMT)
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6187FBE053;
+        Fri, 11 Mar 2022 14:26:57 +0000 (GMT)
+Received: from [9.65.72.149] (unknown [9.65.72.149])
+        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Fri, 11 Mar 2022 14:26:57 +0000 (GMT)
+Message-ID: <fcce28f2-64f7-0946-3f33-3158b7909d6b@linux.ibm.com>
+Date:   Fri, 11 Mar 2022 09:26:25 -0500
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 65e94017-4916-42e4-c486-08da036644a4
-X-MS-TrafficTypeDiagnostic: MWHPR1001MB2301:EE_
-X-Microsoft-Antispam-PRVS: <MWHPR1001MB230167DB2A7CFDB7E190EEF3BB0C9@MWHPR1001MB2301.namprd10.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: /9WZQ8sIwdH3v210oOWfEY80vKGmE2z2b6uI5zIefDyvDt1KQCOBLtsUsjQSWLlRGyUfXv9v8HCTjp56dL+KCFciRjFGEzWtw1RL2Vh3zD4pPxNysnL19OrnxMN0s9xM9PT4ZvxshQz5JT1NDni2fU8Jlhi17Pg2o8ujSsYDjXLDZcMXUApBrir5nJZTyp/AMKNQFq98ggJ4dGbIhiVFmk34aNDd/kTbtyBYAT29EZoA6XAF8cb/2xOwOBArR0egCASNBYsgyQDTqdonRYxBpGVMZAqm82iBfFMbYOP8pLAi83V2hKY8msLS5u/VbEI0Hm9DCHwCIXoF3MoHwvb2DF82aBYBV3PrclamxnNynCUEyiDSLGI5x/Ivo16JZFaa666G7q3ncQYlJJXKh8iErAe02SYjUXRDWgWcL0T5EoHGbcE3sptfQXJC/5u3Tht4wiPiAJ4+QezuYZev6lCb/Rji4KBrmPxCJHTRMqm/z0MYsDazHBpexcmeQ/UP3b42XgfNxMae1om3cWlErzwwTKehwxfQuN2Hx3v6eL6aY1N4GjfkBmlVVUPII+KrFyYi7XoAWW7CBYufgmoTN63KMV7jpuu7Gdp4VinpkI9q2ggvqyvuvFsSFuih/oVpSFYY8AubgzqZgh8qhGwLU4WtRk/hoOES0u8Pl8Jg3l35BU7xNzkD6DJIm8VOaJcbb8PetX6495AwGOAkP8Eh0mi69+XI7zAsz/HApnOSJjPHConk5cNm163enJGdBeynMF0J3dd2BZnwkyCOY4na0FzkxlKN7a1jPMTQg3PIHzPNfKmVQ6Qkia60ST8mZwGwAIQw
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BLAPR10MB4835.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(66946007)(31696002)(36756003)(966005)(6916009)(54906003)(38100700002)(6486002)(6666004)(6512007)(83380400001)(31686004)(8676002)(66556008)(66476007)(4326008)(86362001)(508600001)(316002)(5660300002)(8936002)(7416002)(26005)(186003)(2906002)(53546011)(6506007)(2616005)(14143004)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cEZMTDlIVTVmeDN3NHpXZC9GM2dzbzRDMVlmK1FSYXE3dDBzblFlbDZnWC9T?=
- =?utf-8?B?cEpKOGFwVHRaanIrcWIxTktOVElYeUE5ZlJvRmVNMTJqdkNYUk5oNW1ySUdB?=
- =?utf-8?B?Z09HWTlpNDh0Z2RhUEs5NyttcDJKR2MrM255V01sVXNYV0FXVmkxeUMvbEw0?=
- =?utf-8?B?SkhWeCt1cm9pRXE3WmUrVnJHY2xPcHpkcWNEMWhKMjlCUWhLd0xkZkVxdFNL?=
- =?utf-8?B?b3N6dmdMejhrbFJFT0VJaU9NRHpjQTZxVjFHT2ZWUy80and4MzFYUHV4OGV5?=
- =?utf-8?B?S1FnMXBhQml0dUFwNFFzUUlhVGhaa3V1MmN6MTZoVHBBV2dFZ281ZjZNSzBI?=
- =?utf-8?B?SFFab054SlcwNlhVaUdtUVJiRnZHNllXQTFxRXhxN1pja2ZOM01xMkxKSXBP?=
- =?utf-8?B?RXlzZDVEZzZsYVV2VDEvZWJIeHkyTjV2T1BiMmltNVVEbExYUE02M0tKUHk4?=
- =?utf-8?B?WTRZU0xQZkp2SWp0LzBpSDltM1dwbnI3SFVEWS9HYzQ3SGJ1UEdqWWxtUXB0?=
- =?utf-8?B?OS9wNFIwcXRiUVFlSWZXS054bFV2Mkh0RWNiRDQvMWRyc2xUU0FvYUV5MUx4?=
- =?utf-8?B?OGlnYUZkczY0RFQwN1M3dGEweWFoRkhrSDZDRmhXQ01RMTVNL2krOThFbjRz?=
- =?utf-8?B?MmVGdVpGVm5rZjlUZHZ3T3VLNlZ3NGJSekJYWjNmZk8yWEx3cHVPTFJDbWFx?=
- =?utf-8?B?R1FJcE02cUxTUWkvMi9XeVpaUXY1R1RlN0szd29mTkpXZUVrR1RwZUYxbEdj?=
- =?utf-8?B?a1BZRTg4RmhwNmI4cWdINEhObEpONldkaG9MaVdYV0EwODRBa0JVQUI0bFJO?=
- =?utf-8?B?NDkxZ2pydStPTHVtZndKK2NtZXpqKzFzc3M1WDAzQ2dWWFgyMjhEQi9US1FF?=
- =?utf-8?B?UEtXTFViM3Y5SUxRL0JCcWRKcG44K2RXSlFVZkVJSllPUVdyZ1ptcmlTSmRm?=
- =?utf-8?B?QjY0QXB2UVRGNXlHaDdiWW8zVHg2ZmJPSTJBd2U4NDZTRDFZbWdqUDgvOHha?=
- =?utf-8?B?eFQxdmdRNDhXb1ZLVTFCRTIyYUdDRUpPTHNsSExsdk1odWhHSURNUnAxUDNa?=
- =?utf-8?B?Z0NHWkd2ZTV5NU1VWEdROG5yQWV4UUgzL1p0NDNoUXdqR25VL2ZOZ3E2eE1p?=
- =?utf-8?B?eTdPOExJQi80YWt3d1p3TXMxaWlqMS9xRFFtQWZ5Umx1Y3VOV3hVSWtoR1Vw?=
- =?utf-8?B?eEkwdmEvVS8wUnNudms0RVdOMU1nNHRjbjFWZ3d3b1diM3oxYjJneGFTMVZ0?=
- =?utf-8?B?TFh4U2QyRFJYWkgrdFFENHBhOFVCUmMzOUtpaUlmcEhVTVNvWnVuTUxyM2t3?=
- =?utf-8?B?M0NTV1lvaVc5WDZLY1VQNkttank0UTIwM01sZHRnR3RWSVRyN280b2tuZVho?=
- =?utf-8?B?a2FnM0dtZUpyMDlBNEFXOWNZc2VycnNqK29OZFV5SDNhc25yRDZNRGJZSW1G?=
- =?utf-8?B?Sk41eGFsaTFraDBqSkFxbWZ1d2hzV3JFMU5FZkplUTdKdCtQOEZoNzJoTFk2?=
- =?utf-8?B?UDdhUC92QUVrWk9wb0owbW5FdC9UbFlMK3diSFlyTnMvZUM0UGlIU1FHOFN0?=
- =?utf-8?B?NVFQaEdjalptZFI2Vm9PeTcyeE8veXA2SXBMYkE0bzRDN1RleWZobDJna2R1?=
- =?utf-8?B?WGlvamYxTGMxeE41c3F3dFB6anRkSHBkR0ppZnVuQ2FobWh3MjltdDVtdzgz?=
- =?utf-8?B?UlZwaitnNkYra0hzZ0RYcHlKcnZXbzBkcEpZVmQvV2pacG0wNVpLYWF1ZDlR?=
- =?utf-8?B?M2VLQm9ONWVIK2RvaWJsaHR2c1c0VUFyWGZMTlJxMjBNNG9WV3RKSk1wRVh0?=
- =?utf-8?B?alJySzh4NU83dXBHaDVCWUltaWpMMEVGTTdEOVlSdHhvQUxjdVJnQmh0Y1R2?=
- =?utf-8?B?bTZFRVJZZFk2djhmRC9zTmtNL01SUXJ3TW9DM1VQV3pWSlJOTnJYRUh5UTNw?=
- =?utf-8?B?OVoyMmFIQTFCSWY1eE1JY2g0T3ZPNzc1Qi93WGYvWUtLTFpmZ3B1ODVOZ3Uy?=
- =?utf-8?B?d2JOSGJFY3JRPT0=?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 65e94017-4916-42e4-c486-08da036644a4
-X-MS-Exchange-CrossTenant-AuthSource: BLAPR10MB4835.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Mar 2022 13:51:40.2354
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Y8c/Epj0orICZcHL/R/coWWIm7VgZwa4UfF+fFH+Gi6cxaprAfEAeK2XyHfb6Cnqa/3qRDqzuL5xRDRKrIiqDHw1ZO4FK+3+blobBp/K5uw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR1001MB2301
-X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10282 signatures=692556
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxlogscore=999 bulkscore=0
- phishscore=0 malwarescore=0 suspectscore=0 mlxscore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
- definitions=main-2203110067
-X-Proofpoint-ORIG-GUID: rzdhJyRe4J4UE5jUs9p1nWPWYh5DwVsi
-X-Proofpoint-GUID: rzdhJyRe4J4UE5jUs9p1nWPWYh5DwVsi
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Reply-To: jjherne@linux.ibm.com
+Subject: Re: [PATCH v18 10/18] s390/vfio-ap: allow hot plug/unplug of AP
+ devices when assigned/unassigned
+Content-Language: en-US
+To:     Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     freude@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
+        mjrosato@linux.ibm.com, pasic@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com
+References: <20220215005040.52697-1-akrowiak@linux.ibm.com>
+ <20220215005040.52697-11-akrowiak@linux.ibm.com>
+From:   "Jason J. Herne" <jjherne@linux.ibm.com>
+Organization: IBM
+In-Reply-To: <20220215005040.52697-11-akrowiak@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: cmxpyDpTfjAQ5EnIkLLkLBcgvvXXQr8a
+X-Proofpoint-ORIG-GUID: CDbEbwXNSCzK9CIn_QTDmS9rqxgaL4fz
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-03-11_06,2022-03-11_02,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ suspectscore=0 adultscore=0 clxscore=1015 mlxlogscore=999 spamscore=0
+ mlxscore=0 impostorscore=0 phishscore=0 malwarescore=0 bulkscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2203110069
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/28/22 13:01, Joao Martins wrote:
-> On 2/25/22 20:44, Jason Gunthorpe wrote:
->> On Fri, Feb 25, 2022 at 07:18:37PM +0000, Joao Martins wrote:
->>> On 2/23/22 01:03, Jason Gunthorpe wrote:
->>>> On Tue, Feb 22, 2022 at 11:55:55AM +0000, Joao Martins wrote:
->>> I'll be simplifying the interface in the other type1 series I had and making it
->>> a simple iommu_set_feature(domain, flag, value) behind an ioctl for iommufd that can
->>> enable/disable over a domain. Perhaps same trick could be expanded to other
->>> features to have a bit more control on what userspace is allowed to use. I think
->>> this just needs to set/clear a feature bit in the domain, for VFIO or userspace
->>> to have full control during the different stages of migration of dirty tracking.
->>> In all of the IOMMU implementations/manuals I read it means setting a protection
->>> domain descriptor flag: AMD is a 2-bit field in the DTE, on Intel likewise but on
->>> the PASID table only for scalable-mode PTEs, on SMMUv3.2 there's an equivalent
->>> (albeit past work had also it always-on).
->>>
->>> Provided the iommufd does /separately/ more finer granularity on what we can
->>> do with page tables. Thus the VMM can demote/promote the ioptes to a lower page size
->>> at will as separate operations, before and after migration respectivally. That logic
->>> would probably be better to be in separate iommufd ioctls(), as that it's going to be
->>> expensive.
->>
->> This all sounds right to me
->>
->> Questions I have:
->>  - Do we need ranges for some reason? You mentioned ARM SMMU wants
->>    ranges? how/what/why?
->>
-> Ignore that. I got mislead by the implementation and when I read the SDM
-> I realized that the implementation was doing the same thing I was doing
-> i.e. enabling dirty-bit in the protection domain at start rather than
-> dynamic toggling. So ARM is similar to Intel/AMD in which you set CD.HD
-> bit in the context descriptor to enable dirty bits or the STE.S2HD in the
-> stream table entry for the stage2 equivalent. Nothing here is per-range
-> basis. And the ranges was only used by the implementation for the eager
-> splitting/merging of IO page table levels.
+On 2/14/22 19:50, Tony Krowiak wrote:
+> Let's allow adapters, domains and control domains to be hot plugged
+> into and hot unplugged from a KVM guest using a matrix mdev when an
+> adapter, domain or control domain is assigned to or unassigned from
+> the matrix mdev.
 > 
->>  - What about the unmap and read dirty without races operation that
->>    vfio has?
->>
-> I am afraid that might need a new unmap iommu op that reads the dirty bit
-> after clearing the page table entry. It's marshalling the bits from
-> iopte into a bitmap as opposed to some logic added on top. As far as I
-> looked for AMD this isn't difficult to add, (same for Intel) it can
-> *I think* reuse all of the unmap code.
+> Whenever an assignment or unassignment of an adapter, domain or control
+> domain is performed, the AP configuration assigned to the matrix
+> mediated device will be filtered and assigned to the AP control block
+> (APCB) that supplies the AP configuration to the guest so that no
+> adapter, domain or control domain that is not in the host's AP
+> configuration nor any APQN that does not reference a queue device bound
+> to the vfio_ap device driver is assigned.
 > 
+> After updating the APCB, if the mdev is in use by a KVM guest, it is
+> hot plugged into the guest to dynamically provide access to the adapters,
+> domains and control domains provided via the newly refreshed APCB.
+> 
+> Keep in mind that the matrix_dev->guests_lock must be taken outside of the
+> matrix_mdev->kvm->lock which in turn must be taken outside of the
+> matrix_dev->mdevs_lock in order to avoid circular lock dependencies (i.e.,
+> a lockdep splat).Consequently, the locking order for hot plugging the
+> guest's APCB must be:
+> 
+> matrix_dev->guests_lock => matrix_mdev->kvm->lock => matrix_dev->mdevs_lock
+> 
+> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> ---
+>   drivers/s390/crypto/vfio_ap_ops.c | 198 +++++++++++++++++++-----------
+>   1 file changed, 125 insertions(+), 73 deletions(-)
+> 
+> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+> index 623a4b38676d..4c382cd3afc7 100644
+> --- a/drivers/s390/crypto/vfio_ap_ops.c
+> +++ b/drivers/s390/crypto/vfio_ap_ops.c
+> @@ -317,10 +317,25 @@ static void vfio_ap_matrix_init(struct ap_config_info *info,
+>   	matrix->adm_max = info->apxa ? info->Nd : 15;
+>   }
+>   
+> -static void vfio_ap_mdev_filter_cdoms(struct ap_matrix_mdev *matrix_mdev)
+> +static void vfio_ap_mdev_hotplug_apcb(struct ap_matrix_mdev *matrix_mdev)
+>   {
+> +	if (matrix_mdev->kvm)
+> +		kvm_arch_crypto_set_masks(matrix_mdev->kvm,
+> +					  matrix_mdev->shadow_apcb.apm,
+> +					  matrix_mdev->shadow_apcb.aqm,
+> +					  matrix_mdev->shadow_apcb.adm);
+> +}
 
-OK, made some progress.
+This function updates a kvm guest's apcb. So let's rename it to
+vfio_ap_update_apcb(). You can also call this function in vfio_ap_mdev_set_kvm,
+instead of duplicating the code to call kvm_arch_crypto_set_masks().
 
-It's a WIP (here be dragons!) and still missing things e.g. iommufd selftests,
-revising locking, bugs, and more -- works with my emulated qemu patches which
-is a good sign. But hopefully starts some sort of skeleton of what we were
-talking about in the above thread.
 
-The bigger TODO, though is the equivalent UAPI for IOMMUFD; I started with
-the vfio-compat one as it was easier provided there's existing userspace to work
-with (Qemu). To be fair the API is not that "far" from what would be IOMMUFD onto
-steering the dirty tracking, read-clear the dirty bits, unmap and get dirty. But
-as we discussed earlier, the one gap of VFIO dirty API is that it lacks controls
-for upgrading/downgrading area/IOPTE sizes which is where IOMMUFD would most
-likely shine. When that latter part is done we can probably adopt an eager-split
-approach inside vfio-compat.
 
-Additionally I also sort of want to skeleton ARM and Intel to see how it looks.
-Some of the commits made notes of some of research I made, so *I think* the APIs
-introduced capture h/w semantics for all the three IOMMUs supporting dirty
-tracking.
+> +static bool vfio_ap_mdev_filter_cdoms(struct ap_matrix_mdev *matrix_mdev)
+> +{
+> +	DECLARE_BITMAP(shadow_adm, AP_DOMAINS);
+> +
+> +	bitmap_copy(shadow_adm, matrix_mdev->shadow_apcb.adm, AP_DOMAINS);
+>   	bitmap_and(matrix_mdev->shadow_apcb.adm, matrix_mdev->matrix.adm,
+>   		   (unsigned long *)matrix_dev->info.adm, AP_DOMAINS);
+> +
+> +	return !bitmap_equal(shadow_adm, matrix_mdev->shadow_apcb.adm,
+> +			     AP_DOMAINS);
+>   }
 
-I am storing my dirty-tracking bits here:
+your variable, shadow_adm, should be named original_adm. Since it represents
+the original value before filtering. This makes the intent much more clear.
+Same goes for the vars in vfio_ap_mdev_filter_matrix().
 
-	https://github.com/jpemartins/linux	iommufd
+...
+> +/**
+> + * vfio_ap_mdev_get_locks - acquire the locks required to assign/unassign AP
+> + *			    adapters, domains and control domains for an mdev in
+> + *			    the proper locking order.
+> + *
+> + * @matrix_mdev: the matrix mediated device object
+> + */
+> +static void vfio_ap_mdev_get_locks(struct ap_matrix_mdev *matrix_mdev)
+> +{
+> +	/* Lock the mutex required to access the KVM guest's state */
+> +	mutex_lock(&matrix_dev->guests_lock);
+> +
+> +	/* If a KVM guest is running, lock the mutex required to plug/unplug the
+> +	 * AP devices passed through to the guest
+> +	 */
+> +	if (matrix_mdev->kvm)
+> +		mutex_lock(&matrix_mdev->kvm->lock);
+> +
+> +	/* The lock required to access the mdev's state */
+> +	mutex_lock(&matrix_dev->mdevs_lock);
+> +}
 
-It's a version of it rebased on top of your iommufd branch.
+Simplifying the cdoe, and removing duplication by moving the locking code to a
+function is probably a good thing. But I don't feel like this belongs to this
+particular patch. In general, a patch should only do one thing, and ideally that
+one thing should be as small as reasonably possible. This makes the patch easier
+to read and to review.
+
+I feel like, as much as possible, you should refactor the locking in a series
+of patches that are all kept together. Ideally, they would be a patch series
+completely separate from dynamic ap. After all, this series is already at 18
+patches. :)
+
+...
+>   /**
+>    * assign_adapter_store - parses the APID from @buf and sets the
+>    * corresponding bit in the mediated matrix device's APM
+> @@ -649,17 +723,9 @@ static ssize_t assign_adapter_store(struct device *dev,
+>   	int ret;
+>   	unsigned long apid;
+>   	DECLARE_BITMAP(apm, AP_DEVICES);
+> -
+>   	struct ap_matrix_mdev *matrix_mdev = dev_get_drvdata(dev);
+>   
+> -	mutex_lock(&matrix_dev->guests_lock);
+> -	mutex_lock(&matrix_dev->mdevs_lock);
+> -
+> -	/* If the KVM guest is running, disallow assignment of adapter */
+> -	if (matrix_mdev->kvm) {
+> -		ret = -EBUSY;
+> -		goto done;
+> -	}
+> +	vfio_ap_mdev_get_locks(matrix_mdev);
+>   
+>   	ret = kstrtoul(buf, 0, &apid);
+>   	if (ret)
+> @@ -671,8 +737,6 @@ static ssize_t assign_adapter_store(struct device *dev,
+>   	}
+>   
+>   	set_bit_inv(apid, matrix_mdev->matrix.apm);
+> -	memset(apm, 0, sizeof(apm));
+> -	set_bit_inv(apid, apm);
+>   
+>   	ret = vfio_ap_mdev_validate_masks(matrix_mdev);
+
+It looks like you moved the memset() and set_bit_inv() to be closer to where
+"apm" is used, namely, the call to vfio_ap_mdev_filter_matrix(). Any reason you
+cannot move it down under the call to vfio_ap_mdev_link_adapter()? That would
+get it even closer to where it is used.
+
+Also, I think renaming apm to apm_delta or apm_diff makes sense here. After all,
+it is the difference between the original apm, and the new apm. The new apm
+has an extra bit for the newly added adapter. Do I have that right? If so, I
+think renaming the variable will make the code clearer.
+
+Both of the above comments also apply to assign_domain_store().
+
+-- 
+-- Jason J. Herne (jjherne@linux.ibm.com)
