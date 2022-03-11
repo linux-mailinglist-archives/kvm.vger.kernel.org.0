@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A01F94D5A19
-	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 05:50:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C3D64D5A05
+	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 05:49:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346231AbiCKEuf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Mar 2022 23:50:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46132 "EHLO
+        id S1346511AbiCKEuj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Mar 2022 23:50:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346472AbiCKEuM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Mar 2022 23:50:12 -0500
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 127781AC29C
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 20:49:04 -0800 (PST)
-Received: by mail-pg1-x549.google.com with SMTP id u75-20020a63794e000000b003810e49ae0eso293892pgc.3
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 20:49:04 -0800 (PST)
+        with ESMTP id S1346462AbiCKEuP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Mar 2022 23:50:15 -0500
+Received: from mail-oi1-x249.google.com (mail-oi1-x249.google.com [IPv6:2607:f8b0:4864:20::249])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9E231AAFE8
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 20:49:06 -0800 (PST)
+Received: by mail-oi1-x249.google.com with SMTP id x15-20020a54400f000000b002d9be4bd8a2so5234678oie.20
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 20:49:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=xLUCA41gdz7FCF8bUZA9Zti+AcGuAvR0DZ5YiMSov0E=;
-        b=Vc1EayLhrOzYdEvO5XuG7Sgh7TZEmWxNUoLCYTfidCSdg7vSpbf5BcKDmMUiZl0R4L
-         CcNTXxUh+KYp/iwYE1FVJOkNwuRBUIRgJJ06rfIze0sumJqVgeVADx0lWC6ZegwQwGV7
-         rZd7qnPTxFexvkYJpVgyrh7VoKI38Vw+/6Bm4wxZxwbL3oSfWGHOr/oXFkcox9o4aOZR
-         qoWOPG2Lg6D7YwkNu6abWchaG/BHS0j5K51sVIMGZUvWrCud0I3x3dG9lgbSG7VoE/Pf
-         sFKHEuec5XVRta/06pVQrd8by8u3oAeYEkNBzh0/2/duFKN4qLtp8pYOEcYBHEztNXJm
-         FwoQ==
+        bh=BOtqtDPmFVbXSVQplJqqHWzAUqxe06WK8Hgp5xswEjo=;
+        b=hjhU16IsuclGFWjBCSbzTVlbAwlKDoX+LoOaMMapNL8w6ClETZtePMebhWY3wK5qIK
+         RZEHvgJmeqic7DauveyRHrogrFXjjQ85aC3eM8tEEZDRQgwFFdu1DoR7i7O5ksFs8Txt
+         svGWTqmO2+IXkKE0AZ43wyFmymaBBq/gDGxMFfrjh4/l3akP8lAMWo204hbl6MV1Zg/k
+         qKMoVz0evWLjjaVKZeDfsnMMG9pfgq7OYNe+xMFlARUmlTiBUCwPaIpoYMUuftn6NsV/
+         Baw2+PpEMVAYvXavy87vEyU6/Fx6J3KYqq0/epl8LhXllOnBkt2+UKcqAlmAixhzde6Z
+         pHWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=xLUCA41gdz7FCF8bUZA9Zti+AcGuAvR0DZ5YiMSov0E=;
-        b=DtRjNdNDLp9nbgJqLmm7gOGkWahWzBPhxb0S0Wl5TRg+QRKy+W6uYggYTSRdJ7pPPR
-         GN54G3To21LGK1QvAIQerDnfjsx601aHuZo3JRVEXqHBkiiUJa6hlKoi6bpS5igQPou1
-         VGUPv7BFYPFl7QHzCFOyJCaqHz3za67M0/JVcgdIU0P+9ugwHqpenWAK2kG2/s+0/ttE
-         1jI5aNrlkrAiCdnfWld8jXAn07vuVY0DUcwkCYo3LkGwg6QejKajM9idxs+zdug3NMo9
-         Io4C8gTo+vAeVS2o2SgIi+UQhODYfhYrOD/eTWXi8hyIGvgetGaPZZEiA1qeqg/m+tWm
-         P0Gw==
-X-Gm-Message-State: AOAM530M9aL27wjjWH2gLqT+PgNBCJIknCACu91VxIyaDcbVcJufvoug
-        PXDD43wviNvJ+ukwpiHLBNEsBkCCnco=
-X-Google-Smtp-Source: ABdhPJwyRNt8QZSL25MhBfqeOrj7itaUKc+bzv73Qi9m6d1fIbeodfC9ndqspbZ/YEChD2vpQA5YzFqEYxw=
+        bh=BOtqtDPmFVbXSVQplJqqHWzAUqxe06WK8Hgp5xswEjo=;
+        b=QFQtRHtCjIIPqKO+scFRC4yEitjqNlQlezomBgUI9+S8O/xX5slpUD+Run2mypMRh6
+         VvzRfR5SRZUEG4jO0/PiJNp5OLEK1RQSWx9Tp+dNOEabE5A5UsOSQicG6qKTqIgVDHGP
+         Bxq7qbkz+A82xS6Eq6sW0lLiKC6NAcRD0L76aGgWIjZbB5X90AKBLwjOdupWG+yPtG3A
+         0n+pB5sjwBtVxI3ziR1QLTJ1IeFNCopMYDb68J7nk4iwaJ+0FFuKfbwpBrhLBB3qxTM8
+         gZkq8kILNtKtCtbVswkFaQp5VMIc0tWxJydCeTRDqb0pKcH19RG1SW8VvrR0rgSdSaE6
+         QuLQ==
+X-Gm-Message-State: AOAM532aC1VI1wqd9iR6oiDbqL9gSDJBKNY0dFLiL8VDNGvkjCILyPbZ
+        wP32rkUAIo3ksRCpeYYy1dHIoT5gcec=
+X-Google-Smtp-Source: ABdhPJwxlwQXx8fxZeLKU4n6nbDbzjRmOlYI/0f1fj5lPlt6ZBH1yo0WCK5jePLAp870++wELV/pob1U/z4=
 X-Received: from reiji-vws-sp.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3d59])
- (user=reijiw job=sendgmr) by 2002:a05:6a00:b92:b0:4f6:dfe0:9abb with SMTP id
- g18-20020a056a000b9200b004f6dfe09abbmr8235033pfj.68.1646974144149; Thu, 10
- Mar 2022 20:49:04 -0800 (PST)
-Date:   Thu, 10 Mar 2022 20:48:06 -0800
+ (user=reijiw job=sendgmr) by 2002:a05:6870:c588:b0:da:3d88:de58 with SMTP id
+ ba8-20020a056870c58800b000da3d88de58mr10499144oab.32.1646974145880; Thu, 10
+ Mar 2022 20:49:05 -0800 (PST)
+Date:   Thu, 10 Mar 2022 20:48:07 -0800
 In-Reply-To: <20220311044811.1980336-1-reijiw@google.com>
-Message-Id: <20220311044811.1980336-21-reijiw@google.com>
+Message-Id: <20220311044811.1980336-22-reijiw@google.com>
 Mime-Version: 1.0
 References: <20220311044811.1980336-1-reijiw@google.com>
 X-Mailer: git-send-email 2.35.1.723.g4982287a31-goog
-Subject: [PATCH v6 20/25] KVM: arm64: Trap disabled features of ID_AA64PFR1_EL1
+Subject: [PATCH v6 21/25] KVM: arm64: Trap disabled features of ID_AA64DFR0_EL1
 From:   Reiji Watanabe <reijiw@google.com>
 To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu
 Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
@@ -80,58 +80,105 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add feature_config_ctrl for MTE, which is indicated in
-ID_AA64PFR1_EL1, to program configuration register to trap the
-guest's using the feature when it is not exposed to the guest.
+Add feature_config_ctrl for PMUv3, PMS and TraceFilt, which are
+indicated in ID_AA64DFR0_EL1, to program configuration registers
+to trap guest's using those features when they are not exposed to
+the guest.
 
 Signed-off-by: Reiji Watanabe <reijiw@google.com>
 ---
- arch/arm64/kvm/sys_regs.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ arch/arm64/kvm/sys_regs.c | 64 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 64 insertions(+)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 3f3f2800ff8b..924ffedf4b05 100644
+index 924ffedf4b05..677815030d44 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -345,6 +345,11 @@ static void feature_amu_trap_activate(struct kvm_vcpu *vcpu)
- 	feature_trap_activate(vcpu, VCPU_CPTR_EL2, CPTR_EL2_TAM, 0);
+@@ -350,6 +350,30 @@ static void feature_mte_trap_activate(struct kvm_vcpu *vcpu)
+ 	feature_trap_activate(vcpu, VCPU_HCR_EL2, HCR_TID5, HCR_DCT | HCR_ATA);
  }
  
-+static void feature_mte_trap_activate(struct kvm_vcpu *vcpu)
++static void feature_trace_trap_activate(struct kvm_vcpu *vcpu)
 +{
-+	feature_trap_activate(vcpu, VCPU_HCR_EL2, HCR_TID5, HCR_DCT | HCR_ATA);
++	if (has_vhe())
++		feature_trap_activate(vcpu, VCPU_CPTR_EL2, CPACR_EL1_TTA, 0);
++	else
++		feature_trap_activate(vcpu, VCPU_CPTR_EL2, CPTR_EL2_TTA, 0);
++}
++
++static void feature_pmuv3_trap_activate(struct kvm_vcpu *vcpu)
++{
++	feature_trap_activate(vcpu, VCPU_MDCR_EL2, MDCR_EL2_TPM, 0);
++}
++
++static void feature_pms_trap_activate(struct kvm_vcpu *vcpu)
++{
++	feature_trap_activate(vcpu, VCPU_MDCR_EL2, MDCR_EL2_TPMS,
++			      MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT);
++}
++
++static void feature_tracefilt_trap_activate(struct kvm_vcpu *vcpu)
++{
++	feature_trap_activate(vcpu, VCPU_MDCR_EL2, MDCR_EL2_TTRF, 0);
 +}
 +
  /* For ID_AA64PFR0_EL1 */
  static struct feature_config_ctrl ftr_ctrl_ras = {
  	.ftr_reg = SYS_ID_AA64PFR0_EL1,
-@@ -362,6 +367,15 @@ static struct feature_config_ctrl ftr_ctrl_amu = {
- 	.trap_activate = feature_amu_trap_activate,
+@@ -376,6 +400,39 @@ static struct feature_config_ctrl ftr_ctrl_mte = {
+ 	.trap_activate = feature_mte_trap_activate,
  };
  
-+/* For ID_AA64PFR1_EL1 */
-+static struct feature_config_ctrl ftr_ctrl_mte = {
-+	.ftr_reg = SYS_ID_AA64PFR1_EL1,
-+	.ftr_shift = ID_AA64PFR1_MTE_SHIFT,
-+	.ftr_min = ID_AA64PFR1_MTE_EL0,
++/* For ID_AA64DFR0_EL1 */
++static struct feature_config_ctrl ftr_ctrl_trace = {
++	.ftr_reg = SYS_ID_AA64DFR0_EL1,
++	.ftr_shift = ID_AA64DFR0_TRACEVER_SHIFT,
++	.ftr_min = 1,
 +	.ftr_signed = FTR_UNSIGNED,
-+	.trap_activate = feature_mte_trap_activate,
++	.trap_activate = feature_trace_trap_activate,
++};
++
++static struct feature_config_ctrl ftr_ctrl_pmuv3 = {
++	.ftr_reg = SYS_ID_AA64DFR0_EL1,
++	.ftr_shift = ID_AA64DFR0_PMUVER_SHIFT,
++	.ftr_min = ID_AA64DFR0_PMUVER_8_0,
++	.ftr_signed = FTR_UNSIGNED,
++	.trap_activate = feature_pmuv3_trap_activate,
++};
++
++static struct feature_config_ctrl ftr_ctrl_pms = {
++	.ftr_reg = SYS_ID_AA64DFR0_EL1,
++	.ftr_shift = ID_AA64DFR0_PMSVER_SHIFT,
++	.ftr_min = ID_AA64DFR0_PMSVER_8_2,
++	.ftr_signed = FTR_UNSIGNED,
++	.trap_activate = feature_pms_trap_activate,
++};
++
++static struct feature_config_ctrl ftr_ctrl_tracefilt = {
++	.ftr_reg = SYS_ID_AA64DFR0_EL1,
++	.ftr_shift = ID_AA64DFR0_TRACE_FILT_SHIFT,
++	.ftr_min = 1,
++	.ftr_signed = FTR_UNSIGNED,
++	.trap_activate = feature_tracefilt_trap_activate,
 +};
 +
  /* id_reg_desc flags field values */
  #define ID_DESC_REG_UNALLOC	(1UL << 0)
  #define ID_DESC_REG_HIDDEN	(1UL << 1)
-@@ -3682,6 +3696,10 @@ static struct id_reg_desc id_aa64pfr1_el1_desc = {
- 	.init = init_id_aa64pfr1_el1_desc,
- 	.validate = validate_id_aa64pfr1_el1,
- 	.vcpu_mask = vcpu_mask_id_aa64pfr1_el1,
+@@ -3733,6 +3790,13 @@ static struct id_reg_desc id_aa64dfr0_el1_desc = {
+ 	.init = init_id_aa64dfr0_el1_desc,
+ 	.validate = validate_id_aa64dfr0_el1,
+ 	.vcpu_mask = vcpu_mask_id_aa64dfr0_el1,
 +	.trap_features = &(const struct feature_config_ctrl *[]) {
-+		&ftr_ctrl_mte,
++		&ftr_ctrl_trace,
++		&ftr_ctrl_pmuv3,
++		&ftr_ctrl_pms,
++		&ftr_ctrl_tracefilt,
 +		NULL,
 +	},
  };
  
- static struct id_reg_desc id_aa64isar0_el1_desc = {
+ static struct id_reg_desc id_dfr0_el1_desc = {
 -- 
 2.35.1.723.g4982287a31-goog
 
