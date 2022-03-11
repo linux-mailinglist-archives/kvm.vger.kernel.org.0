@@ -2,54 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 485D44D58E7
-	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 04:28:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 46DE64D58E4
+	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 04:28:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346001AbiCKD3H (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Mar 2022 22:29:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40836 "EHLO
+        id S1346020AbiCKD3O (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Mar 2022 22:29:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41012 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231359AbiCKD3G (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Mar 2022 22:29:06 -0500
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94B65EACA0
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 19:28:04 -0800 (PST)
-Received: by mail-pg1-x54a.google.com with SMTP id v4-20020a63f844000000b003745fd0919aso4037453pgj.20
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 19:28:04 -0800 (PST)
+        with ESMTP id S1346006AbiCKD3I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Mar 2022 22:29:08 -0500
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E5BEEAC83
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 19:28:06 -0800 (PST)
+Received: by mail-pj1-x104a.google.com with SMTP id p15-20020a17090a748f00b001bf3ba2ae95so4514096pjk.9
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 19:28:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
-        bh=XKkoV9WqAMW6txuBkF5Wd3rs0lT6dWVS/pJ+2/MRtag=;
-        b=kufdfWVgYM9IzhcIFS2Zm75ZysbcrHo+Ft1gBPcwjP2xCCig08BOid5sNt+kBPWRCt
-         Ovz6oGnz2qY/BmB4MJJ6UNIZ/H8ietBfYnn5sVsOHxpNc6NScHhfFnq4RBZEl8hehthK
-         trb78KhZBvWAPpHIauti2B4oEYlX8VRIMdKqK9TcUZjfDEqlcGcrb1FeKztPVY/pOYf/
-         +a00MkCYl8XEqFqYIhj9SSHFrR02lJqzd4OSOOOyd0FfcAWXXF4yCKMU85lnOXpJEBCl
-         2cTtAImJkpdW04qL3ZFJe9E+JX4lhJcq8QiAauf9Re1Z7r1omuYMWrT3ntK69u4uP89q
-         SeTQ==
+        h=reply-to:date:in-reply-to:message-id:mime-version:references
+         :subject:from:to:cc;
+        bh=05/9tl1rLPgUBreYUw7eEtnH71YqeV4kQqIYEJJG048=;
+        b=mTFhxyAL3l7jFh6smGX49alsnQYJtzV77gVFS1xKNxi+Ww+Y4j3A4/X0QodMpGbt3h
+         nzocS9cCTkxKrB4aI/RpCWlONph10GWM+igP3L2vZj+8dBxmt5R2Qx7UUaYidHLbMSME
+         5HgxOL+4uS4+ZF4bVTYTow3BtyBBN+z9UTVgK4eh6++p+5tKhwoUzchO1BkQsBVXLcO6
+         aKeqa18iXa1g8o9OGezwfdUfGFxMnGJD0GFjJzcZ+eAwjK04cdNPg7KQn3pNCC/Z6h76
+         YAmuYiFnn1C4MXcESZi4iHNgDRA+AoaYYCXAgX3vEr2NeCzun+u5/w/1xoz3GRJI3FLi
+         QBNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
-         :from:to:cc;
-        bh=XKkoV9WqAMW6txuBkF5Wd3rs0lT6dWVS/pJ+2/MRtag=;
-        b=c5TTueUJiJVtWdDdulHDdG68XmwyqpE8X6GaHJfbyS224oN13RFmSD4/bwpvv7OSh+
-         oELsiGcWc3SshtxUCI2a7cS54hQh2cO0lgheEd1wC3Qe0NmDVQGOtDzb+xgph6oDq13C
-         h6xFf7MepcM1XOfmJk/qLeeEv1UijGxeI07y+JiaIzhAjA7eMY4TAvc/bI6SfKtisrpU
-         rIVizW+n81Uki7Niqu9ZrNkxtkH6w4wBeOzUydX5gtXP7pQ7ILbPmsII692G+SAMuXMr
-         QwssLcTr2vP1x2YrKFquCC+k9YU4JiAtBWcLYNXLm9e/PyYEZhG1r6Wh5jBNkXg92WwP
-         F+OQ==
-X-Gm-Message-State: AOAM533T1isyC6Ob4inGnMfuOKC3tZ+FHyEzR2Yg9hUHJsrQFN3nRpdG
-        +/fV6jbyRW+tvPlhs4Rc1BtJZM0wBxw=
-X-Google-Smtp-Source: ABdhPJwIG2XZcUj85RKHGPmCh8wL09k3iIswXlIqpkv0ONOnCCRLF0z1lkYsbPsHDBhGQ3AIDKCVaQ/orcQ=
+        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
+         :mime-version:references:subject:from:to:cc;
+        bh=05/9tl1rLPgUBreYUw7eEtnH71YqeV4kQqIYEJJG048=;
+        b=tMGx2+WZeEw4p2uWRP9uGBBB8fA4oleownLXhsEM41rC64VuMSmqV04sCctj+TU/Z1
+         qDFh/lcJ7YRdLfIHX4iOGcBa0cCkiiK9V6N1kVDtF6P72Ve4BJuVROhvExrQO+/woJ0U
+         by+wj3ixl7cZ9DlRLgG8Mg4Ws90GEk9oteCwlt20/s58GlIndTJP17xkQoNb9/aDLsB3
+         +vgPTUBCAa14SJyk38K5CWwjxWPnZxQCiaDm+IXn6kloAdFE8GvcMW4zyxfW63bRx0mi
+         9Yp3mW/7aUY0mJb064fTrBWpJL4uCC+vAvhkuy8/XF5uxTTZTzOEaSSD4LEjHcLt1DAf
+         qFwQ==
+X-Gm-Message-State: AOAM531dCk2ujoCq0IxYGNx9xG6HNgNTR6lRFZzwNv4qzbRgmiUly06C
+        nHwcTe3BC/qT9igmldARog9NWHZ1aTI=
+X-Google-Smtp-Source: ABdhPJxHI4xHm2rn6sArcUXsyJPhkn5IvKDkgnSWCGlQa5SEghkMuvBVwOq39SUscIuYo0+UjDC5n6k72NI=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:130e:b0:4f3:9654:266d with SMTP id
- j14-20020a056a00130e00b004f39654266dmr8042509pfu.59.1646969284051; Thu, 10
- Mar 2022 19:28:04 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a17:90b:4d81:b0:1bf:8ce4:4f51 with SMTP id
+ oj1-20020a17090b4d8100b001bf8ce44f51mr404030pjb.0.1646969285541; Thu, 10 Mar
+ 2022 19:28:05 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 11 Mar 2022 03:27:40 +0000
-Message-Id: <20220311032801.3467418-1-seanjc@google.com>
+Date:   Fri, 11 Mar 2022 03:27:41 +0000
+In-Reply-To: <20220311032801.3467418-1-seanjc@google.com>
+Message-Id: <20220311032801.3467418-2-seanjc@google.com>
 Mime-Version: 1.0
+References: <20220311032801.3467418-1-seanjc@google.com>
 X-Mailer: git-send-email 2.35.1.723.g4982287a31-goog
-Subject: [PATCH 00/21] KVM: x86: Event/exception fixes and cleanups
+Subject: [PATCH 01/21] KVM: x86: Return immediately from x86_emulate_instruction()
+ on code #DB
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -63,83 +67,89 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The main goal of this series is to fix KVM's longstanding bug of not
-honoring L1's exception intercepts wants when handling an exception that
-occurs during delivery of a different exception.  E.g. if L0 and L1 are
-using shadow paging, and L2 hits a #PF, and then hits another #PF while
-vectoring the first #PF due to _L1_ not having a shadow page for the IDT,
-KVM needs to check L1's intercepts before morphing the #PF => #PF => #DF
-so that the #PF is routed to L1, not injected into L2 as a #DF.
+Return immediately if a code #DB is encountered during instruction
+emulation, code #DBs have fault-like behavior and are higher priority
+than any exceptions that occur on the code fetch itself, and obviously
+should prevent decode/execution.
 
-nVMX has hacked around the bug for years by overriding the #PF injector
-for shadow paging to go straight to VM-Exit, and nSVM has started doing
-the same.  The hacks mostly work, but they're incomplete, confusing, and
-lead to other hacky code, e.g. bailing from the emulator because #PF
-injection forced a VM-Exit and suddenly KVM is back in L1.
+Fixes: 4aa2691dcbd3 ("KVM: x86: Factor out x86 instruction emulation with decoding")
+Cc: stable@vger.kernel.org
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/x86.c | 31 +++++++++++++++++++------------
+ 1 file changed, 19 insertions(+), 12 deletions(-)
 
-Everything leading up to that are related fixes and cleanups I encountered
-along the way; some through code inspection, some through tests (I truly
-thought this series was finished 10 commits and 3 days ago...).
-
-Nothing in here is all that urgent; all bugs tagged for stable have been
-around for multiple releases (years in most cases).
-
-Sean Christopherson (21):
-  KVM: x86: Return immediately from x86_emulate_instruction() on code
-    #DB
-  KVM: nVMX: Unconditionally purge queued/injected events on nested
-    "exit"
-  KVM: VMX: Drop bits 31:16 when shoving exception error code into VMCS
-  KVM: x86: Don't check for code breakpoints when emulating on exception
-  KVM: nVMX: Treat General Detect #DB (DR7.GD=1) as fault-like
-  KVM: nVMX: Prioritize TSS T-flag #DBs over Monitor Trap Flag
-  KVM: x86: Treat #DBs from the emulator as fault-like (code and
-    DR7.GD=1)
-  KVM: x86: Use DR7_GD macro instead of open coding check in emulator
-  KVM: nVMX: Ignore SIPI that arrives in L2 when vCPU is not in WFS
-  KVM: nVMX: Unconditionally clear mtf_pending on nested VM-Exit
-  KVM: VMX: Inject #PF on ENCLS as "emulated" #PF
-  KVM: x86: Rename kvm_x86_ops.queue_exception to inject_exception
-  KVM: x86: Make kvm_queued_exception a properly named, visible struct
-  KVM: x86: Formalize blocking of nested pending exceptions
-  KVM: x86: Use kvm_queue_exception_e() to queue #DF
-  KVM: x86: Hoist nested event checks above event injection logic
-  KVM: x86: Evaluate ability to inject SMI/NMI/IRQ after potential
-    VM-Exit
-  KVM: x86: Morph pending exceptions to pending VM-Exits at queue time
-  KVM: VMX: Update MTF and ICEBP comments to document KVM's subtle
-    behavior
-  KVM: selftests: Use uapi header to get VMX and SVM exit reasons/codes
-  KVM: selftests: Add an x86-only test to verify nested exception
-    queueing
-
- arch/x86/include/asm/kvm-x86-ops.h            |   2 +-
- arch/x86/include/asm/kvm_host.h               |  33 +-
- arch/x86/kvm/emulate.c                        |   3 +-
- arch/x86/kvm/svm/nested.c                     | 100 ++---
- arch/x86/kvm/svm/svm.c                        |  18 +-
- arch/x86/kvm/vmx/nested.c                     | 322 +++++++++-----
- arch/x86/kvm/vmx/sgx.c                        |   2 +-
- arch/x86/kvm/vmx/vmx.c                        |  53 ++-
- arch/x86/kvm/x86.c                            | 409 ++++++++++++------
- arch/x86/kvm/x86.h                            |  10 +-
- tools/testing/selftests/kvm/.gitignore        |   1 +
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../selftests/kvm/include/x86_64/svm_util.h   |   5 +-
- .../selftests/kvm/include/x86_64/vmx.h        |  51 +--
- .../kvm/x86_64/nested_exceptions_test.c       | 307 +++++++++++++
- 15 files changed, 914 insertions(+), 403 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/x86_64/nested_exceptions_test.c
-
-
-base-commit: 4a204f7895878363ca8211f50ec610408c8c70aa
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 4fa4d8269e5b..feacc0901c24 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -8212,7 +8212,7 @@ int kvm_skip_emulated_instruction(struct kvm_vcpu *vcpu)
+ }
+ EXPORT_SYMBOL_GPL(kvm_skip_emulated_instruction);
+ 
+-static bool kvm_vcpu_check_breakpoint(struct kvm_vcpu *vcpu, int *r)
++static bool kvm_vcpu_check_code_breakpoint(struct kvm_vcpu *vcpu, int *r)
+ {
+ 	if (unlikely(vcpu->guest_debug & KVM_GUESTDBG_USE_HW_BP) &&
+ 	    (vcpu->arch.guest_debug_dr7 & DR7_BP_EN_MASK)) {
+@@ -8281,25 +8281,23 @@ static bool is_vmware_backdoor_opcode(struct x86_emulate_ctxt *ctxt)
+ }
+ 
+ /*
+- * Decode to be emulated instruction. Return EMULATION_OK if success.
++ * Decode an instruction for emulation.  The caller is responsible for handling
++ * code breakpoints.  Note, manually detecting code breakpoints is unnecessary
++ * (and wrong) when emulating on an intercepted fault-like exception[*], as
++ * code breakpoints have higher priority and thus have already been done by
++ * hardware.
++ *
++ * [*] Except #MC, which is higher priority, but KVM should never emulate in
++ *     response to a machine check.
+  */
+ int x86_decode_emulated_instruction(struct kvm_vcpu *vcpu, int emulation_type,
+ 				    void *insn, int insn_len)
+ {
+-	int r = EMULATION_OK;
+ 	struct x86_emulate_ctxt *ctxt = vcpu->arch.emulate_ctxt;
++	int r;
+ 
+ 	init_emulate_ctxt(vcpu);
+ 
+-	/*
+-	 * We will reenter on the same instruction since we do not set
+-	 * complete_userspace_io. This does not handle watchpoints yet,
+-	 * those would be handled in the emulate_ops.
+-	 */
+-	if (!(emulation_type & EMULTYPE_SKIP) &&
+-	    kvm_vcpu_check_breakpoint(vcpu, &r))
+-		return r;
+-
+ 	r = x86_decode_insn(ctxt, insn, insn_len, emulation_type);
+ 
+ 	trace_kvm_emulate_insn_start(vcpu);
+@@ -8332,6 +8330,15 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+ 	if (!(emulation_type & EMULTYPE_NO_DECODE)) {
+ 		kvm_clear_exception_queue(vcpu);
+ 
++		/*
++		 * Return immediately if RIP hits a code breakpoint, such #DBs
++		 * are fault-like and are higher priority than any faults on
++		 * the code fetch itself.
++		 */
++		if (!(emulation_type & EMULTYPE_SKIP) &&
++		    kvm_vcpu_check_code_breakpoint(vcpu, &r))
++			return r;
++
+ 		r = x86_decode_emulated_instruction(vcpu, emulation_type,
+ 						    insn, insn_len);
+ 		if (r != EMULATION_OK)  {
 -- 
 2.35.1.723.g4982287a31-goog
 
