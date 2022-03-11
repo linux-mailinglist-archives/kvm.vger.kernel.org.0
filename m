@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CF78C4D5A17
-	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 05:50:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 56FA04D5A03
+	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 05:49:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346484AbiCKEuE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Mar 2022 23:50:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44450 "EHLO
+        id S242853AbiCKEuh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Mar 2022 23:50:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44216 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346454AbiCKEts (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1346480AbiCKEts (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 10 Mar 2022 23:49:48 -0500
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 316E81AC287
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 20:48:40 -0800 (PST)
-Received: by mail-pl1-x64a.google.com with SMTP id d13-20020a170902b70d00b0015317d9f08bso2606450pls.1
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 20:48:40 -0800 (PST)
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B65EF1AC28D
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 20:48:41 -0800 (PST)
+Received: by mail-pj1-x104a.google.com with SMTP id e1-20020a17090a280100b001bf44b6d74bso7211474pjd.0
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 20:48:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=uBoyKzZk3Qtv9aZ00wbOXF/ba3q4Fu49o+9bq2Th1Ww=;
-        b=WaOEzQ3J63TTZvIp5H/lnZK5BcWK/0Md7Gxah9ozJWTjDdZZC9UvfdGXYgP9LilqU+
-         sGSsV8EwJD/Ug/h0cTRJGvN5EVdPxOfsDaM8dgkcFQgh7GUeQPrPuRXPfGZnswqjU9m1
-         o1aNriRRHMPgy57Zbt1IjI9BeXj+A7Zks11gx9CDeya7BSM1y2OljGQgFMP+jYUajo4z
-         jfHlLPscsINpYKG94NQSEfftScLI6kNjHMPt5RzTcza0jhZaoHOSstIAnzTEcGfIm5C8
-         fxw014HKohpMkivmaWj3BFqjDArfo3Ei2h4NN+Bh31LZo7Wkkjgj2wZ0rKcuzVoHHhw8
-         JO3Q==
+        bh=i1Q8oMVcIDawwcpspY0YFzmCHnlNLuWjVrH+1Iwojj8=;
+        b=jVLOPO1C6Ge6K9MG6QbzCVTmnGDbg8jZOD1sL0KvfQwDeSvvbXuCxHIh9stqZKw7o7
+         m0BVY3IxNn55nzY/Tq9XLu/IiOng74LRlvqo6E6T1rr/98gS9IDg8BpcnCjATjov5so9
+         PtUgvUnGTNwMTLRZG1vo1oh9KTI7T9CSS/aHcKZjuFkCJ9JZVO64cqoNqredM66vA/hu
+         LDihsicff+dxFB7+dRK10RK6CIvs3oKpyaKUMhvuJF+tGg1wBRtAiAjJsXrcLaiqZLXy
+         E+wRlPN8J8Sn7I3xE/U1ZPoYGH5asekcZGHH0u4dk9Xg3hj2WMXVj+HaHl48qqjp7Abo
+         0pWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=uBoyKzZk3Qtv9aZ00wbOXF/ba3q4Fu49o+9bq2Th1Ww=;
-        b=O5Kv7kIJR1zgkwuUt35PLC+ecErVYSotNnL3Tgkp2sFhpV5wpdfKeEmRzfVBUCFGBa
-         WmY6veQKPWg0RlOr5sgHgABZgz1q69bS4BLXzp581JTSkpGkH5/h6ZJ4O61SOmexRDO4
-         kpNsU6b1gnbfAX1lleaXIclPZeF4oYilS+6BZ5ZJnNpjaqLp6IxZBOI9RTnK7nHNyRVJ
-         dHiLf7ezbxkZY/0qVjhjE/qilMhy8YL74KE+zO4IC6WtCxGmPEF5Ol9DCf6q1cPyyRlE
-         XQuH10RTyg0EGb2E+9tqdRUqIeXcGOPieHe682iG2jG1AKSEgcdwr98sNx6jjAGv78Qb
-         cAfA==
-X-Gm-Message-State: AOAM533mp/cER28J39pyO2UlF1RyXxjWE5TCSAjfw4iXlBMx7HMMEYpk
-        X1LKYbGXH9lmahKmY2F6V9i+6PeM+1Q=
-X-Google-Smtp-Source: ABdhPJyOxSYFndroMYYb/thCoU6B1JaiKrgug4u+QvotKZqS7wBgDmUI8tVODpRPXtY1pGqD5AxfCVCODJs=
+        bh=i1Q8oMVcIDawwcpspY0YFzmCHnlNLuWjVrH+1Iwojj8=;
+        b=x2hsgD3v5coYdNTsdYxAmztlQY+AdP/WnBInUppwxzA5KJMpATltdZBAMNoESoWKML
+         gFOJIDdiWIjSOxp5BncZnUTBkdefxL+854aykIeQCWM9eNtaSLBCvsdh6DBgFJ2GPAQ+
+         gwxBp1BdayQ/qB2QAITr42E9upkLh3Fy/tDCUAeqHcEPUD+9B/mWTSX5BUv5ooTNbDvU
+         akhMJJe6pVzSiuKoadd293xhQ65IeDKZCQiHry/5wSJ5q9kue1tS/mKjwv1PoifItVTi
+         dgIi7cmoXURsmHctBYBWLzCiHpisIRNEbeo9gZIOLnNWJAXdwWcAbt8gIzxlgXg5ODcw
+         qErg==
+X-Gm-Message-State: AOAM530+9L4agEg9CS+hLYSpvVzXwR5lAYp7ojWGtkRaEGDJKhALQgEQ
+        o9oFC582XMJZWLasN1byDW4P2bRxr+Q=
+X-Google-Smtp-Source: ABdhPJyqzZBFBrLfDZqJ/MEY5oQH2n+E2ImHCp7e6LaNBlZdtcnXcxrMItVl9Ayaa8AX1b+4PjFrf3CrT4s=
 X-Received: from reiji-vws-sp.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3d59])
- (user=reijiw job=sendgmr) by 2002:a17:902:e811:b0:151:f486:a32f with SMTP id
- u17-20020a170902e81100b00151f486a32fmr8570545plg.141.1646974119624; Thu, 10
- Mar 2022 20:48:39 -0800 (PST)
-Date:   Thu, 10 Mar 2022 20:47:51 -0800
+ (user=reijiw job=sendgmr) by 2002:a17:903:11c7:b0:151:7290:ccc with SMTP id
+ q7-20020a17090311c700b0015172900cccmr8717277plh.95.1646974121195; Thu, 10 Mar
+ 2022 20:48:41 -0800 (PST)
+Date:   Thu, 10 Mar 2022 20:47:52 -0800
 In-Reply-To: <20220311044811.1980336-1-reijiw@google.com>
-Message-Id: <20220311044811.1980336-6-reijiw@google.com>
+Message-Id: <20220311044811.1980336-7-reijiw@google.com>
 Mime-Version: 1.0
 References: <20220311044811.1980336-1-reijiw@google.com>
 X-Mailer: git-send-email 2.35.1.723.g4982287a31-goog
-Subject: [PATCH v6 05/25] KVM: arm64: Make ID_AA64PFR1_EL1 writable
+Subject: [PATCH v6 06/25] KVM: arm64: Make ID_AA64ISAR0_EL1 writable
 From:   Reiji Watanabe <reijiw@google.com>
 To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu
 Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
@@ -80,52 +80,44 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch adds id_reg_desc for ID_AA64PFR1_EL1 to make it writable
+This patch adds id_reg_desc for ID_AA64ISAR0_EL1 to make it writable
 by userspace.
 
-Return an error if userspace tries to set MTE field of the register
-to a value that conflicts with KVM_CAP_ARM_MTE configuration for
-the guest.
-Skip fractional feature fields validation at present and they will
-be handled by the following patches.
+Updating sm3, sm4, sha1, sha2 and sha3 fields are allowed only
+if values of those fields follow Arm ARM.
 
 Signed-off-by: Reiji Watanabe <reijiw@google.com>
 ---
- arch/arm64/include/asm/sysreg.h |  1 +
- arch/arm64/kvm/sys_regs.c       | 42 +++++++++++++++++++++++++++++----
- 2 files changed, 39 insertions(+), 4 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 84edc87f0005..249f1fdc1f59 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -816,6 +816,7 @@
- #define ID_AA64PFR0_GIC3		0x1
- 
- /* id_aa64pfr1 */
-+#define ID_AA64PFR1_CSV2FRAC_SHIFT	32
- #define ID_AA64PFR1_MPAMFRAC_SHIFT	16
- #define ID_AA64PFR1_RASFRAC_SHIFT	12
- #define ID_AA64PFR1_MTE_SHIFT		8
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 9e9fa90afb82..4294dbfd8fd4 100644
+index 4294dbfd8fd4..378777238c68 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -374,6 +374,21 @@ static int validate_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+@@ -389,6 +389,29 @@ static int validate_id_aa64pfr1_el1(struct kvm_vcpu *vcpu,
  	return 0;
  }
  
-+static int validate_id_aa64pfr1_el1(struct kvm_vcpu *vcpu,
-+				    const struct id_reg_desc *id_reg, u64 val)
++static int validate_id_aa64isar0_el1(struct kvm_vcpu *vcpu,
++				     const struct id_reg_desc *id_reg, u64 val)
 +{
-+	bool kvm_mte = kvm_has_mte(vcpu->kvm);
-+	unsigned int mte;
++	unsigned int sm3, sm4, sha1, sha2, sha3;
 +
-+	mte = cpuid_feature_extract_unsigned_field(val, ID_AA64PFR1_MTE_SHIFT);
++	/* Run consistency checkings according to Arm ARM */
++	sm3 = cpuid_feature_extract_unsigned_field(val, ID_AA64ISAR0_SM3_SHIFT);
++	sm4 = cpuid_feature_extract_unsigned_field(val, ID_AA64ISAR0_SM4_SHIFT);
++	if (sm3 != sm4)
++		return -EINVAL;
 +
-+	/* Check if there is a conflict with a request via KVM_ARM_VCPU_INIT. */
-+	if (kvm_mte ^ (mte > 0))
-+		return -EPERM;
++	sha1 = cpuid_feature_extract_unsigned_field(val, ID_AA64ISAR0_SHA1_SHIFT);
++	sha2 = cpuid_feature_extract_unsigned_field(val, ID_AA64ISAR0_SHA2_SHIFT);
++	if ((sha1 == 0) ^ (sha2 == 0))
++		return -EINVAL;
++
++	sha3 = cpuid_feature_extract_unsigned_field(val, ID_AA64ISAR0_SHA3_SHIFT);
++	if (((sha2 == 2) ^ (sha3 == 1)) || (!sha1 && sha3))
++		return -EINVAL;
 +
 +	return 0;
 +}
@@ -133,64 +125,25 @@ index 9e9fa90afb82..4294dbfd8fd4 100644
  static void init_id_aa64pfr0_el1_desc(struct id_reg_desc *id_reg)
  {
  	u64 limit = id_reg->vcpu_limit_val;
-@@ -405,12 +420,24 @@ static void init_id_aa64pfr0_el1_desc(struct id_reg_desc *id_reg)
- 	id_reg->vcpu_limit_val = limit;
- }
- 
-+static void init_id_aa64pfr1_el1_desc(struct id_reg_desc *id_reg)
-+{
-+	if (!system_supports_mte())
-+		id_reg->vcpu_limit_val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_MTE);
-+}
-+
- static u64 vcpu_mask_id_aa64pfr0_el1(const struct kvm_vcpu *vcpu,
- 					 const struct id_reg_desc *idr)
- {
- 	return vcpu_has_sve(vcpu) ? 0 : ARM64_FEATURE_MASK(ID_AA64PFR0_SVE);
- }
- 
-+static u64 vcpu_mask_id_aa64pfr1_el1(const struct kvm_vcpu *vcpu,
-+					 const struct id_reg_desc *idr)
-+{
-+	return kvm_has_mte(vcpu->kvm) ? 0 : (ARM64_FEATURE_MASK(ID_AA64PFR1_MTE));
-+}
-+
- static int validate_id_reg(struct kvm_vcpu *vcpu,
- 			   const struct id_reg_desc *id_reg, u64 val)
- {
-@@ -1344,10 +1371,6 @@ static u64 read_id_reg_with_encoding(const struct kvm_vcpu *vcpu, u32 id)
- 
- 	val = read_kvm_id_reg(vcpu->kvm, id);
- 	switch (id) {
--	case SYS_ID_AA64PFR1_EL1:
--		if (!kvm_has_mte(vcpu->kvm))
--			val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_MTE);
--		break;
- 	case SYS_ID_AA64ISAR1_EL1:
- 		if (!vcpu_has_ptrauth(vcpu))
- 			val &= ~(ARM64_FEATURE_MASK(ID_AA64ISAR1_APA) |
-@@ -3134,6 +3157,16 @@ static struct id_reg_desc id_aa64pfr0_el1_desc = {
- 	.vcpu_mask = vcpu_mask_id_aa64pfr0_el1,
+@@ -3167,6 +3190,11 @@ static struct id_reg_desc id_aa64pfr1_el1_desc = {
+ 	.vcpu_mask = vcpu_mask_id_aa64pfr1_el1,
  };
  
-+static struct id_reg_desc id_aa64pfr1_el1_desc = {
-+	.reg_desc = ID_SANITISED(ID_AA64PFR1_EL1),
-+	.ignore_mask = ARM64_FEATURE_MASK(ID_AA64PFR1_RASFRAC) |
-+		       ARM64_FEATURE_MASK(ID_AA64PFR1_MPAMFRAC) |
-+		       ARM64_FEATURE_MASK(ID_AA64PFR1_CSV2FRAC),
-+	.init = init_id_aa64pfr1_el1_desc,
-+	.validate = validate_id_aa64pfr1_el1,
-+	.vcpu_mask = vcpu_mask_id_aa64pfr1_el1,
++static struct id_reg_desc id_aa64isar0_el1_desc = {
++	.reg_desc = ID_SANITISED(ID_AA64ISAR0_EL1),
++	.validate = validate_id_aa64isar0_el1,
 +};
 +
  #define ID_DESC(id_reg_name, id_reg_desc)	\
  	[IDREG_IDX(SYS_##id_reg_name)] = (id_reg_desc)
  
-@@ -3141,6 +3174,7 @@ static struct id_reg_desc id_aa64pfr0_el1_desc = {
- static struct id_reg_desc *id_reg_desc_table[KVM_ARM_ID_REG_MAX_NUM] = {
+@@ -3175,6 +3203,9 @@ static struct id_reg_desc *id_reg_desc_table[KVM_ARM_ID_REG_MAX_NUM] = {
  	/* CRm=4 */
  	ID_DESC(ID_AA64PFR0_EL1, &id_aa64pfr0_el1_desc),
-+	ID_DESC(ID_AA64PFR1_EL1, &id_aa64pfr1_el1_desc),
+ 	ID_DESC(ID_AA64PFR1_EL1, &id_aa64pfr1_el1_desc),
++
++	/* CRm=6 */
++	ID_DESC(ID_AA64ISAR0_EL1, &id_aa64isar0_el1_desc),
  };
  
  static inline struct id_reg_desc *get_id_reg_desc(u32 id)
