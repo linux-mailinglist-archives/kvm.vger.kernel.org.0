@@ -2,37 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2778B4D6078
-	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 12:18:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F2E34D6082
+	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 12:23:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242291AbiCKLTi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Mar 2022 06:19:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50266 "EHLO
+        id S1344884AbiCKLYb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Mar 2022 06:24:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60486 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235465AbiCKLTg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Mar 2022 06:19:36 -0500
+        with ESMTP id S244398AbiCKLY3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Mar 2022 06:24:29 -0500
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0BB56496B5
-        for <kvm@vger.kernel.org>; Fri, 11 Mar 2022 03:18:33 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D3C732610C
+        for <kvm@vger.kernel.org>; Fri, 11 Mar 2022 03:23:25 -0800 (PST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C3CC1175D;
-        Fri, 11 Mar 2022 03:18:32 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C69F73FA45;
-        Fri, 11 Mar 2022 03:18:31 -0800 (PST)
-Date:   Fri, 11 Mar 2022 11:18:55 +0000
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Sebastian Ene <sebastianene@google.com>
-Cc:     kvm@vger.kernel.org, maz@kernel.org, will@kernel.org,
-        kvmarm@lists.cs.columbia.edu
-Subject: Re: [PATCH kvmtool v10 2/3] aarch64: Add stolen time support
-Message-ID: <YiswH2PGOB86gLNQ@monolith.localdoman>
-References: <20220309133422.2432649-1-sebastianene@google.com>
- <20220309133422.2432649-3-sebastianene@google.com>
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8BFC3175D;
+        Fri, 11 Mar 2022 03:23:25 -0800 (PST)
+Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B91A23FA45;
+        Fri, 11 Mar 2022 03:23:24 -0800 (PST)
+Date:   Fri, 11 Mar 2022 11:23:21 +0000
+From:   Andre Przywara <andre.przywara@arm.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     Martin Radev <martin.b.radev@gmail.com>, kvm@vger.kernel.org,
+        will@kernel.org, julien.thierry.kdev@gmail.com
+Subject: Re: [PATCH v2 kvmtool 0/5] Fix few small issues in virtio code
+Message-ID: <20220311112321.2f71b6bd@donnerap.cambridge.arm.com>
+In-Reply-To: <YioRnsym4HmOSgjl@monolith.localdoman>
+References: <20220303231050.2146621-1-martin.b.radev@gmail.com>
+        <YioRnsym4HmOSgjl@monolith.localdoman>
+Organization: ARM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220309133422.2432649-3-sebastianene@google.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
@@ -42,257 +44,109 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, 10 Mar 2022 14:56:30 +0000
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+
 Hi,
 
-On Wed, Mar 09, 2022 at 01:34:23PM +0000, Sebastian Ene wrote:
-> This patch adds support for stolen time by sharing a memory region
-> with the guest which will be used by the hypervisor to store the stolen
-> time information. Reserve a 64kb MMIO memory region after the RTC peripheral
-> to be used by pvtime. The exact format of the structure stored by the
-> hypervisor is described in the ARM DEN0057A document.
+> Hi Martin,
 > 
-> Signed-off-by: Sebastian Ene <sebastianene@google.com>
-> ---
->  Makefile                               |  1 +
->  arm/aarch32/include/kvm/kvm-cpu-arch.h |  5 ++
->  arm/aarch64/arm-cpu.c                  |  2 +-
->  arm/aarch64/include/kvm/kvm-cpu-arch.h |  2 +
->  arm/aarch64/pvtime.c                   | 96 ++++++++++++++++++++++++++
->  arm/include/arm-common/kvm-arch.h      |  6 +-
->  arm/kvm-cpu.c                          |  1 +
->  include/kvm/kvm-config.h               |  1 +
->  8 files changed, 112 insertions(+), 2 deletions(-)
->  create mode 100644 arm/aarch64/pvtime.c
+> On Fri, Mar 04, 2022 at 01:10:45AM +0200, Martin Radev wrote:
+> > Hello everyone,
+> >   
+> [..]
+> > The Makefile change is kept in its original form because I didn't understand
+> > if there is an issue with it on aarch64.  
 > 
-> diff --git a/Makefile b/Makefile
-> index f251147..e9121dc 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -182,6 +182,7 @@ ifeq ($(ARCH), arm64)
->  	OBJS		+= arm/aarch64/arm-cpu.o
->  	OBJS		+= arm/aarch64/kvm-cpu.o
->  	OBJS		+= arm/aarch64/kvm.o
-> +	OBJS		+= arm/aarch64/pvtime.o
->  	ARCH_INCLUDE	:= $(HDRS_ARM_COMMON)
->  	ARCH_INCLUDE	+= -Iarm/aarch64/include
->  
-> diff --git a/arm/aarch32/include/kvm/kvm-cpu-arch.h b/arm/aarch32/include/kvm/kvm-cpu-arch.h
-> index 780e0e2..6fe0206 100644
-> --- a/arm/aarch32/include/kvm/kvm-cpu-arch.h
-> +++ b/arm/aarch32/include/kvm/kvm-cpu-arch.h
-> @@ -20,4 +20,9 @@ static inline int kvm_cpu__configure_features(struct kvm_cpu *vcpu)
->  	return 0;
->  }
->  
-> +static inline int kvm_cpu__teardown_pvtime(struct kvm *kvm)
-> +{
-> +	return 0;
-> +}
-> +
->  #endif /* KVM__KVM_CPU_ARCH_H */
-> diff --git a/arm/aarch64/arm-cpu.c b/arm/aarch64/arm-cpu.c
-> index d7572b7..7e4a3c1 100644
-> --- a/arm/aarch64/arm-cpu.c
-> +++ b/arm/aarch64/arm-cpu.c
-> @@ -22,7 +22,7 @@ static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
->  static int arm_cpu__vcpu_init(struct kvm_cpu *vcpu)
->  {
->  	vcpu->generate_fdt_nodes = generate_fdt_nodes;
-> -	return 0;
-> +	return kvm_cpu__setup_pvtime(vcpu);
->  }
->  
->  static struct kvm_arm_target target_generic_v8 = {
-> diff --git a/arm/aarch64/include/kvm/kvm-cpu-arch.h b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-> index 8dfb82e..35996dc 100644
-> --- a/arm/aarch64/include/kvm/kvm-cpu-arch.h
-> +++ b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-> @@ -19,5 +19,7 @@
->  
->  void kvm_cpu__select_features(struct kvm *kvm, struct kvm_vcpu_init *init);
->  int kvm_cpu__configure_features(struct kvm_cpu *vcpu);
-> +int kvm_cpu__setup_pvtime(struct kvm_cpu *vcpu);
-> +int kvm_cpu__teardown_pvtime(struct kvm *kvm);
->  
->  #endif /* KVM__KVM_CPU_ARCH_H */
-> diff --git a/arm/aarch64/pvtime.c b/arm/aarch64/pvtime.c
-> new file mode 100644
-> index 0000000..720e9de
-> --- /dev/null
-> +++ b/arm/aarch64/pvtime.c
-> @@ -0,0 +1,96 @@
-> +#include "kvm/kvm.h"
-> +#include "kvm/kvm-cpu.h"
-> +#include "kvm/util.h"
-> +
-> +#include <linux/byteorder.h>
-> +#include <linux/types.h>
-> +
-> +#define ARM_PVTIME_STRUCT_SIZE		(64)
-> +
-> +static void *usr_mem;
-> +
-> +static int pvtime__alloc_region(struct kvm *kvm)
-> +{
-> +	char *mem;
-> +	int ret = 0;
-> +
-> +	mem = mmap(NULL, ARM_PVTIME_BASE, PROT_RW,
-> +		   MAP_ANON_NORESERVE, -1, 0);
-> +	if (mem == MAP_FAILED)
-> +		return -errno;
-> +
-> +	ret = kvm__register_ram(kvm, ARM_PVTIME_BASE,
-> +				ARM_PVTIME_BASE, mem);
-> +	if (ret) {
-> +		munmap(mem, ARM_PVTIME_BASE);
-> +		return ret;
-> +	}
-> +
-> +	usr_mem = mem;
-> +	return ret;
-> +}
-> +
-> +static int pvtime__teardown_region(struct kvm *kvm)
-> +{
-> +	if (usr_mem == NULL)
-> +		return 0;
-> +
-> +	kvm__destroy_mem(kvm, ARM_PVTIME_BASE,
-> +			 ARM_PVTIME_BASE, usr_mem);
-> +	munmap(usr_mem, ARM_PVTIME_BASE);
-> +	usr_mem = NULL;
-> +	return 0;
-> +}
-> +
-> +int kvm_cpu__setup_pvtime(struct kvm_cpu *vcpu)
-> +{
-> +	int ret;
-> +	bool has_stolen_time;
-> +	u64 pvtime_guest_addr = ARM_PVTIME_BASE + vcpu->cpu_id *
-> +		ARM_PVTIME_STRUCT_SIZE;
-> +	struct kvm_config *kvm_cfg = NULL;
-> +	struct kvm_device_attr pvtime_attr = (struct kvm_device_attr) {
-> +		.group	= KVM_ARM_VCPU_PVTIME_CTRL,
-> +		.attr	= KVM_ARM_VCPU_PVTIME_IPA
-> +	};
-> +
-> +	kvm_cfg = &vcpu->kvm->cfg;
-> +	if (kvm_cfg->no_pvtime)
-> +		return 0;
-> +
-> +	has_stolen_time = kvm__supports_extension(vcpu->kvm,
-> +						  KVM_CAP_STEAL_TIME);
-> +	if (!has_stolen_time) {
-> +		kvm_cfg->no_pvtime = true;
-> +		return 0;
-> +	}
-> +
-> +	ret = ioctl(vcpu->vcpu_fd, KVM_HAS_DEVICE_ATTR, &pvtime_attr);
-> +	if (ret) {
-> +		perror("KVM_HAS_DEVICE_ATTR failed\n");
-> +		goto out_err;
+> I'll try to explain it better. According to this blogpost about executable
+> stacks [1], gcc marks the stack as executable automatically for assembly
+> (.S) files. C files have their stack mark as non-executable by default. If
+> any of the object files have the stack executable, then the resulting
+> binary also has the stack marked as executable (obviously).
+> 
+> To mark the stack as non-executable in assembly files, the empty section
+> .note.GNU-stack must be present in the file. This is a marking to tell
+> the linker that the final executable does not require an executable stack.
+> When the linker finds this section, it will create a PT_GNU_STACK empty
+> segment in the final executable. This segment tells Linux to mark the stack
+> as non-executable when it loads the binary.
 
-Nitpick: here we return -1 (ioctl() return value when it fails) instead of
-returning -errno. You can set ret = -errno before the perror() call (in
-case it also fails for some reason, thus changing the value of errno).
+Ah, many thanks for the explanation, that makes sense.
 
-Not a big deal, but it changes the semantics of the return value for the
-function: below, for pvtime__alloc_region() we return -errno, but here we
-return -1. Someone who is debugging an error might print this return value
-and think that the ioctl() failed with error code EPERM (EPERM is 1), which
-is not a valid error code for ioctl() according to man 2 ioctl. It will
-also look rather strange for the perror to print the error message
-associated with a different error code than the error code that is returned
-from this function.
+> The only assembly files that kvmtool compiles into objects are the x86
+> files x86/bios/entry.S and x86/bios/bios-rom.S; the other architectures are
+> not affected by this. I haven't found any instances where these files (and
+> the other files they are including) do a call/jmp to something on the
+> stack, so I've added the .note.GNU-Stack section to the files:
 
-> +	}
+Yes, looks that the same to me, actually the assembly looks more like
+marshalling arguments than actual code, so we should be safe.
+
+Alex, can you send this as a proper patch. It should be somewhat
+independent of Martin's series, code-wise, so at least it should apply and
+build.
+
+Cheers,
+Andre
+
+> 
+> diff --git a/x86/bios/bios-rom.S b/x86/bios/bios-rom.S
+> index 3269ce9793ae..571029fc157e 100644
+> --- a/x86/bios/bios-rom.S
+> +++ b/x86/bios/bios-rom.S
+> @@ -10,3 +10,6 @@
+>  GLOBAL(bios_rom)
+>         .incbin "x86/bios/bios.bin"
+>  END(bios_rom)
 > +
-> +	if (!usr_mem) {
-> +		ret = pvtime__alloc_region(vcpu->kvm);
-> +		if (ret) {
-> +			perror("Failed allocating pvtime region\n");
-> +			goto out_err;
-> +		}
-> +	}
+> +# Mark the stack as non-executable.
+> +.section .note.GNU-stack,"",@progbits
+> diff --git a/x86/bios/entry.S b/x86/bios/entry.S
+> index 85056e9816c4..4d5bb663a25d 100644
+> --- a/x86/bios/entry.S
+> +++ b/x86/bios/entry.S
+> @@ -90,3 +90,6 @@ GLOBAL(__locals)
+>  #include "local.S"
+> 
+>  END(__locals)
 > +
-> +	pvtime_attr.addr = (u64)&pvtime_guest_addr;
-> +	ret = ioctl(vcpu->vcpu_fd, KVM_SET_DEVICE_ATTR, &pvtime_attr);
-> +	if (!ret)
-> +		return 0;
+> +# Mark the stack as non-executable.
+> +.section .note.GNU-stack,"",@progbits
+> 
+> which makes the final executable have a non-executable stack. Did some very
+> *light* testing by booting a guest, and everything looked right to me.
+> 
+> [1] https://www.airs.com/blog/archives/518
+> 
+> Thanks,
+> Alex
+> 
+> > 
+> > Martin Radev (5):
+> >   kvmtool: Add WARN_ONCE macro
+> >   virtio: Sanitize config accesses
+> >   virtio: Check for overflows in QUEUE_NOTIFY and QUEUE_SEL
+> >   Makefile: Mark stack as not executable
+> >   mmio: Sanitize addr and len
+> > 
+> >  Makefile                |  7 +++--
+> >  include/kvm/util.h      | 10 +++++++
+> >  include/kvm/virtio-9p.h |  1 +
+> >  include/kvm/virtio.h    |  3 ++-
+> >  mmio.c                  |  4 +++
+> >  virtio/9p.c             | 27 ++++++++++++++-----
+> >  virtio/balloon.c        | 10 ++++++-
+> >  virtio/blk.c            | 10 ++++++-
+> >  virtio/console.c        | 10 ++++++-
+> >  virtio/mmio.c           | 44 +++++++++++++++++++++++++-----
+> >  virtio/net.c            | 12 +++++++--
+> >  virtio/pci.c            | 59 ++++++++++++++++++++++++++++++++++++++---
+> >  virtio/rng.c            |  8 +++++-
+> >  virtio/scsi.c           | 10 ++++++-
+> >  virtio/vsock.c          | 10 ++++++-
+> >  15 files changed, 199 insertions(+), 26 deletions(-)
+> > 
+> > -- 
+> > 2.25.1
+> >   
 
-Nitpick: same here, ret must be set to -errno before returning.
-
-> +
-> +	perror("KVM_SET_DEVICE_ATTR failed\n");
-> +	pvtime__teardown_region(vcpu->kvm);
-> +out_err:
-> +	return ret;
-> +}
-> +
-> +int kvm_cpu__teardown_pvtime(struct kvm *kvm)
-> +{
-> +	return pvtime__teardown_region(kvm);
-> +}
-> diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
-> index c645ac0..43b1f77 100644
-> --- a/arm/include/arm-common/kvm-arch.h
-> +++ b/arm/include/arm-common/kvm-arch.h
-> @@ -15,7 +15,8 @@
->   * |  PCI  |////| plat  |       |        |     |         |
->   * |  I/O  |////| MMIO: | Flash | virtio | GIC |   PCI   |  DRAM
->   * | space |////| UART, |       |  MMIO  |     |  (AXI)  |
-> - * |       |////| RTC   |       |        |     |         |
-> + * |       |////| RTC,  |       |        |     |         |
-> + * |       |////| PVTIME|       |        |     |         |
->   * +-------+----+-------+-------+--------+-----+---------+---......
->   */
->  
-> @@ -34,6 +35,9 @@
->  #define ARM_RTC_MMIO_BASE	(ARM_UART_MMIO_BASE + ARM_UART_MMIO_SIZE)
->  #define ARM_RTC_MMIO_SIZE	0x10000
->  
-> +#define ARM_PVTIME_BASE		(ARM_RTC_MMIO_BASE + ARM_RTC_MMIO_SIZE)
-> +#define ARM_PVTIME_SIZE		SZ_64K
-> +
->  #define KVM_FLASH_MMIO_BASE	(ARM_MMIO_AREA + 0x1000000)
->  #define KVM_FLASH_MAX_SIZE	0x1000000
->  
-> diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
-> index 84ac1e9..00660d6 100644
-> --- a/arm/kvm-cpu.c
-> +++ b/arm/kvm-cpu.c
-> @@ -144,6 +144,7 @@ void kvm_cpu__arch_nmi(struct kvm_cpu *cpu)
->  
->  void kvm_cpu__delete(struct kvm_cpu *vcpu)
->  {
-> +	kvm_cpu__teardown_pvtime(vcpu->kvm);
->  	free(vcpu);
->  }
->  
-> diff --git a/include/kvm/kvm-config.h b/include/kvm/kvm-config.h
-> index 6a5720c..48adf27 100644
-> --- a/include/kvm/kvm-config.h
-> +++ b/include/kvm/kvm-config.h
-> @@ -62,6 +62,7 @@ struct kvm_config {
->  	bool no_dhcp;
->  	bool ioport_debug;
->  	bool mmio_debug;
-> +	bool no_pvtime;
->  };
->  
->  #endif
-> -- 
-
-Tested the series, a guest is able to detect pvtime:
-
-[    0.008661] arm-pv: using stolen time PV
-
-Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
-
-With the two nitpicks above fixed, the patch looks correct to me:
-
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-
-Thanks,
-Alex
