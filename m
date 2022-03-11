@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ED9D04D67D3
-	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 18:41:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 761CA4D67D7
+	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 18:41:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350854AbiCKRmS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Mar 2022 12:42:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42270 "EHLO
+        id S1350835AbiCKRmT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Mar 2022 12:42:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42296 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350835AbiCKRmM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Mar 2022 12:42:12 -0500
-Received: from mail-io1-xd4a.google.com (mail-io1-xd4a.google.com [IPv6:2607:f8b0:4864:20::d4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C52BE1C57EA
-        for <kvm@vger.kernel.org>; Fri, 11 Mar 2022 09:41:08 -0800 (PST)
-Received: by mail-io1-xd4a.google.com with SMTP id d19-20020a0566022bf300b00645eba5c992so6778373ioy.4
-        for <kvm@vger.kernel.org>; Fri, 11 Mar 2022 09:41:08 -0800 (PST)
+        with ESMTP id S1350837AbiCKRmN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Mar 2022 12:42:13 -0500
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 173011C57EA
+        for <kvm@vger.kernel.org>; Fri, 11 Mar 2022 09:41:10 -0800 (PST)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-2d726bd83a2so74286237b3.20
+        for <kvm@vger.kernel.org>; Fri, 11 Mar 2022 09:41:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=9XdJKUFytcHkfxO8A0zHHdaSq5C6RUOo0dHsNroWzi4=;
-        b=iBYHZZIu4+glns+DBM+1sLjFX7LQFA3zP0tDyNnFwpnRI/lNEol8HGFtx6Y2+Mi7ZK
-         bQtPSTWOAKYg0fLgu1VqZ6kbC9RU/AJW6FF/ihA6uwiYBOHi1mk8SMwigIy/2ixjySNR
-         tPuIxyMPycs0AUgDQulOYiG6DlF4YTQTc3sq37NMQn+Ohtd7drMQyK77PNolcn2BeeOV
-         qzyTOTnZmWjZ6VaMTWv36WU9dPNOA1B5S+XBQqnCsDEK/FRqSBALFbxs5m91dBcFGMae
-         y4S1v/2F5Sil92fkkuNmvMeX1cSkC8BFJL67AirOBoNyu1OH5kEKaDoVbtFCenBSFAzW
-         w4uA==
+        bh=w/UueSoSfkkV5ZaqeN0ZkehJnNoFhHswChR0IcyQwpo=;
+        b=TfK01IHyAJv8UjNfgpMHJTRDOcY+rjaLXLwHX8CTPaggNTNSs0HThWZMwPyEW+RH6b
+         Df/jtoIuvebeXdJL5qwLz6xDhezAQfiw2Q2Kqlk7SMBqvPfhBdPpqinjwyM6JndYT29J
+         T5JEBqfXLSys4nSDeEviHGA23CQ5D40dPJYzfP8su0JbVaUV4U0ohlDz4pUmaPuJM7Xo
+         f05u8DHN2kp/671bnZG7AMZ7a+0bvS+xvkBRgOuzxHHtfqq1CcbXJwn8ZtcOsTWUL7MZ
+         FPM9x9cuBiYHoNf60PAc9taPpdHg3t5D2RCSUBVSWG+trlTI+MZ93yJFGyuuX9cQfLN8
+         sLdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=9XdJKUFytcHkfxO8A0zHHdaSq5C6RUOo0dHsNroWzi4=;
-        b=XWnHYNrmwFnA/JO6vvqu+qOOJwaelrpu1740QPwDs/qp6okrY9xqkbJ2ONldlq4NCu
-         oR2/TpWhKAbGhzBPyP0pTVXJFsMKNOkXQ4s7aDUbmi4M6RLu7KU2QTZhAWSAD5pwALCR
-         aZT6Dmb3ubp/jIvTYbdKDFdjP8u9QmUmLbyY6Bki52QidO/QkLQImbm8+DSmTvnYK1P6
-         kuuYaTDNpIJi3jdIbz8BuhPw7RGhArUh45lfyrs00Vbnx5yHybsMYsQoaziZgNlOA7on
-         lXyTrWoWO4BlTKF2k5IQicxf9bcAcZvE3ZXN/COIgUdkUFfdmtbV/gV4hzitGPUp/TbT
-         dfrw==
-X-Gm-Message-State: AOAM53029e7Hh3er/drtKGVIV6FI+MQyBXDB8qLuBTsGAhl43GcZyZL7
-        UhOhnh5D2zkZ9MH1q15Lz9jc3IVT9w8=
-X-Google-Smtp-Source: ABdhPJy0gVFdG3BgjTaM6i8MVhqzhgFYYyl2pWvpkR0CNXcn7tlc65SXQKYNv9FC9ebaoIoCLgIk9P8Y8yM=
+        bh=w/UueSoSfkkV5ZaqeN0ZkehJnNoFhHswChR0IcyQwpo=;
+        b=tZT3TTVIA0DfNsDlbS8zzbxyPwJkUez1FDBtT61MuGK1MCzf5UHQe237U6yhFBJI3n
+         p2PfQjhX6UFEJQxKhZpLkcsWhWBHnICM1r9InDv/UZKA9ybwwVutfhzdaR83nhNV/jT4
+         MkO7F0jTRjOj8jgtNCT/jwqSu/9NbQ5bE++gR7w7BTURQgawBswhX0T6EZHpNGdi2J53
+         gPS5lRG0TD1y+s+vH+A98C24RW13tov1NaGBYFtBo1adN6zZ1+45XZaTTcgzhniQmbS5
+         jckPQpl21IK42id888kHmq6j+HBpueVrS9LKFb8zbWM68mCRPv3wwaLY2BgLM4z3jAEk
+         Tjxg==
+X-Gm-Message-State: AOAM530zWu5COFNP0D3JERjdMPxuyMEmuQv3pedW+YC2JbOI4y7TyRdi
+        3THoCTCapxtBs/77KPAcfH/SwT92Xgw=
+X-Google-Smtp-Source: ABdhPJxoEVMNtFjxHU99BsNcOYHXwhP+US3YZzXI2U5bhTrho6KkLYFgzIovIc/T+wSFvNoNO7bsaIvB9iM=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a05:6e02:1569:b0:2be:ffc9:8bb4 with SMTP id
- k9-20020a056e02156900b002beffc98bb4mr9168928ilu.229.1647020468144; Fri, 11
- Mar 2022 09:41:08 -0800 (PST)
-Date:   Fri, 11 Mar 2022 17:39:53 +0000
+ (user=oupton job=sendgmr) by 2002:a5b:dcc:0:b0:628:d6d9:d4bc with SMTP id
+ t12-20020a5b0dcc000000b00628d6d9d4bcmr8743678ybr.178.1647020469266; Fri, 11
+ Mar 2022 09:41:09 -0800 (PST)
+Date:   Fri, 11 Mar 2022 17:39:54 +0000
 In-Reply-To: <20220311174001.605719-1-oupton@google.com>
-Message-Id: <20220311174001.605719-8-oupton@google.com>
+Message-Id: <20220311174001.605719-9-oupton@google.com>
 Mime-Version: 1.0
 References: <20220311174001.605719-1-oupton@google.com>
 X-Mailer: git-send-email 2.35.1.723.g4982287a31-goog
-Subject: [PATCH v4 07/15] KVM: Create helper for setting a system event exit
+Subject: [PATCH v4 08/15] KVM: arm64: Return a value from check_vcpu_requests()
 From:   Oliver Upton <oupton@google.com>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     alexandru.elisei@arm.com, anup@brainfault.org,
@@ -73,106 +73,56 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Create a helper that appropriately configures kvm_run for a system event
-exit.
+A subsequent change to KVM will introduce a vCPU request that could
+result in an exit to userspace. Change check_vcpu_requests() to return a
+value and document the function. Unconditionally return 1 for now.
 
-No functional change intended.
-
-Suggested-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Oliver Upton <oupton@google.com>
-Acked-by: Anup Patel <anup@brainfault.org>
 ---
- arch/arm64/kvm/psci.c         | 5 +----
- arch/riscv/kvm/vcpu_sbi_v01.c | 4 +---
- arch/x86/kvm/x86.c            | 6 ++----
- include/linux/kvm_host.h      | 2 ++
- virt/kvm/kvm_main.c           | 8 ++++++++
- 5 files changed, 14 insertions(+), 11 deletions(-)
+ arch/arm64/kvm/arm.c | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
-index efd4428fda1c..78266716165e 100644
---- a/arch/arm64/kvm/psci.c
-+++ b/arch/arm64/kvm/psci.c
-@@ -173,10 +173,7 @@ static void kvm_prepare_system_event(struct kvm_vcpu *vcpu, u32 type, u64 flags)
- 		tmp->arch.mp_state.mp_state = KVM_MP_STATE_STOPPED;
- 	kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_SLEEP);
- 
--	memset(&vcpu->run->system_event, 0, sizeof(vcpu->run->system_event));
--	vcpu->run->system_event.type = type;
--	vcpu->run->system_event.flags = flags;
--	vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
-+	kvm_vcpu_set_system_event_exit(vcpu, type, flags);
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 7c297ddc8177..8eed0556ccaa 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -648,7 +648,16 @@ void kvm_vcpu_wfi(struct kvm_vcpu *vcpu)
+ 	preempt_enable();
  }
  
- static void kvm_psci_system_off(struct kvm_vcpu *vcpu)
-diff --git a/arch/riscv/kvm/vcpu_sbi_v01.c b/arch/riscv/kvm/vcpu_sbi_v01.c
-index 07e2de14433a..c5581008dd88 100644
---- a/arch/riscv/kvm/vcpu_sbi_v01.c
-+++ b/arch/riscv/kvm/vcpu_sbi_v01.c
-@@ -24,9 +24,7 @@ static void kvm_sbi_system_shutdown(struct kvm_vcpu *vcpu,
- 		tmp->arch.power_off = true;
- 	kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_SLEEP);
- 
--	memset(&run->system_event, 0, sizeof(run->system_event));
--	run->system_event.type = type;
--	run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
-+	kvm_vcpu_set_system_event_exit(vcpu, type, 0);
- }
- 
- static int kvm_sbi_ext_v01_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 7131d735b1ef..b3b94408cc61 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9903,14 +9903,12 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 		if (kvm_check_request(KVM_REQ_APIC_PAGE_RELOAD, vcpu))
- 			kvm_vcpu_reload_apic_access_page(vcpu);
- 		if (kvm_check_request(KVM_REQ_HV_CRASH, vcpu)) {
--			vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
--			vcpu->run->system_event.type = KVM_SYSTEM_EVENT_CRASH;
-+			kvm_vcpu_set_system_event_exit(vcpu, KVM_SYSTEM_EVENT_CRASH, 0);
- 			r = 0;
- 			goto out;
- 		}
- 		if (kvm_check_request(KVM_REQ_HV_RESET, vcpu)) {
--			vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
--			vcpu->run->system_event.type = KVM_SYSTEM_EVENT_RESET;
-+			kvm_vcpu_set_system_event_exit(vcpu, KVM_SYSTEM_EVENT_RESET, 0);
- 			r = 0;
- 			goto out;
- 		}
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index f11039944c08..c2a4fd2382e2 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -2202,6 +2202,8 @@ static inline void kvm_handle_signal_exit(struct kvm_vcpu *vcpu)
- }
- #endif /* CONFIG_KVM_XFER_TO_GUEST_WORK */
- 
-+void kvm_vcpu_set_system_event_exit(struct kvm_vcpu *vcpu, u32 type, u64 flags);
-+
- /*
-  * This defines how many reserved entries we want to keep before we
-  * kick the vcpu to the userspace to avoid dirty ring full.  This
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 58d31da8a2f7..197bae04ca34 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -3194,6 +3194,14 @@ void kvm_vcpu_mark_page_dirty(struct kvm_vcpu *vcpu, gfn_t gfn)
- }
- EXPORT_SYMBOL_GPL(kvm_vcpu_mark_page_dirty);
- 
-+void kvm_vcpu_set_system_event_exit(struct kvm_vcpu *vcpu, u32 type, u64 flags)
-+{
-+	memset(&vcpu->run->system_event, 0, sizeof(vcpu->run->system_event));
-+	vcpu->run->system_event.type = type;
-+	vcpu->run->system_event.flags = flags;
-+	vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
-+}
-+
- void kvm_sigset_activate(struct kvm_vcpu *vcpu)
+-static void check_vcpu_requests(struct kvm_vcpu *vcpu)
++/**
++ * check_vcpu_requests - check and handle pending vCPU requests
++ * @vcpu:	the VCPU pointer
++ *
++ * Return: 1 if we should enter the guest
++ *	   0 if we should exit to userspace
++ *	   <= 0 if we should exit to userspace, where the return value indicates
++ *	   an error
++ */
++static int check_vcpu_requests(struct kvm_vcpu *vcpu)
  {
- 	if (!vcpu->sigset_active)
+ 	if (kvm_request_pending(vcpu)) {
+ 		if (kvm_check_request(KVM_REQ_SLEEP, vcpu))
+@@ -678,6 +687,8 @@ static void check_vcpu_requests(struct kvm_vcpu *vcpu)
+ 			kvm_pmu_handle_pmcr(vcpu,
+ 					    __vcpu_sys_reg(vcpu, PMCR_EL0));
+ 	}
++
++	return 1;
+ }
+ 
+ static bool vcpu_mode_is_bad_32bit(struct kvm_vcpu *vcpu)
+@@ -793,7 +804,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 		if (!ret)
+ 			ret = 1;
+ 
+-		check_vcpu_requests(vcpu);
++		if (ret > 0)
++			ret = check_vcpu_requests(vcpu);
+ 
+ 		/*
+ 		 * Preparing the interrupts to be injected also
 -- 
 2.35.1.723.g4982287a31-goog
 
