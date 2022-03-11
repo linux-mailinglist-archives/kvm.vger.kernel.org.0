@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C57F4D5A12
-	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 05:50:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 262514D5A18
+	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 05:50:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346518AbiCKEue (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Mar 2022 23:50:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45080 "EHLO
+        id S1346508AbiCKEub (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Mar 2022 23:50:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45124 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346231AbiCKEt7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1346451AbiCKEt7 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 10 Mar 2022 23:49:59 -0500
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A36DE86B6
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 20:48:45 -0800 (PST)
-Received: by mail-pj1-x104a.google.com with SMTP id q9-20020a17090a7a8900b001bf0a7d9dfdso4617882pjf.4
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 20:48:45 -0800 (PST)
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8EF1F118F
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 20:48:46 -0800 (PST)
+Received: by mail-pf1-x44a.google.com with SMTP id 67-20020a621446000000b004f739ef52f1so4558342pfu.0
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 20:48:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=BC/RhHZyQh20zJ4o/L/jR6ipTx5n23zl8pNE5Kswitk=;
-        b=lI34I92LM8QIflRlzMT6EfFDAy+1YBmg8eJPRcNsFzEaEHoumYH1WYQw3kZilJENyE
-         dtWeXXFAxTSqdv6eyxMvE18sw4WTaQ4u+k27UeLSOvKMERLk3ZLePx+v277Oe1qsJXYQ
-         7+uAAFCSeWx6QKH9g83hOq1SvSKcgRbGcq+cZzbbNje8nDQc0SGt6qhcF52YSZrY76dS
-         oi01m32m6XMrD5Z0yPlgmWJaII/TA04eC2vsOcXCvc0/uM7A56Rcu5U1W6D9UZhCWCEp
-         K2ezwCf1YL3aXhgj4GAumNh4az0xH1pC2aP5o1bDxEB3KWvsPJGWIIPIqiwg/kM5BNDZ
-         IlPg==
+        bh=U4vObHr07JOA9r35Oli1yvQZsMPbxDR2eZHL3vHOgIc=;
+        b=nrWVcz4xkbY4HLXt4miecw5Dd7wLv/8Qw3R+jAAFN9fhmzj+Km0AqV2L7X/z/fTo4T
+         fL7e+zIuPCBBSuik+Y7SuRFNxJX8kJONi/D+iLHDUdfxxWsmDVi52r5r/Vym9Py4ZnJb
+         DUCrq+Sdrh98urXQ+qN9CRfIcyQkvloyBr6QCXiGRFJqN4UZQr4afAx+MJeWbodDBWE0
+         9Otebs4TqewY0HE8AACw4s05zVtk6BylH/FuCffghUfJynHdzDYur70qlhqiFHCAnl1A
+         JjqvLUoI5yAiAsPtMAdXC0XcXOqKyZqOzkDoHrUYhTOWkN+45sZZLPY4e7c5pXI+D3De
+         VnTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=BC/RhHZyQh20zJ4o/L/jR6ipTx5n23zl8pNE5Kswitk=;
-        b=lSKTn4+0fcwOR6VvEuuzPpgHQWSMYTEj8w1aW6h9S5dSOTN45BX8LbnBs/rha7xV1n
-         dGWcMWjcPuh6jyTqTGd9JBDFNDJu2zfsTo7yxX37ktjz5oRpGShS0gw9AMI3rw5mXHkc
-         1w6faFJpGE4kfl7DjhBzB4zb1ONxuAEj+jWPqKrLzHlbyUCUQ2SRBEP3UUR7xy2LfXNG
-         m9P0UnNlCG+roMpw5XHBeAjIilp6w8YeVB6x9p131zvb8K47XVySdY9v+Y9O6l18KliU
-         EUU4WsnjkvI+t5hF30lgupQSX8DJW5UMaXVnXUFKLgEcdUdRo/Ghycpr/JttnFOW9adW
-         DIzw==
-X-Gm-Message-State: AOAM532s81yye52n5Lr6afS5L3vyb5DKeDmuqFjuVXjtAiZj9VZRVqPn
-        w+3chYHgSYIWwkwerggnUM4unPXkXZQ=
-X-Google-Smtp-Source: ABdhPJy7JXTk0HnRt/o3W8puG08ezjtccoA9tPMKC2datbpeXgEETraGwWU0YIdJv6KUiq8OPkEUw6kaylo=
+        bh=U4vObHr07JOA9r35Oli1yvQZsMPbxDR2eZHL3vHOgIc=;
+        b=2ya/Kj1ISIRjaozRMLUsUjcuKfN+T+BUljNJDT5MbdnFR+CpigXgqn9ZT+GacvUa6M
+         zTCeiX6klwjCjAiDf1s1gXlqYsPsABG3sGd4NntnaZEF63T2YPBJKtVUqGXwSEubvLnu
+         pm9rf+IYhYACleWG4/JO4b5mCDE8H+f3WG10BwMpp2R+j76rzg3Bil+fQzHDg1fzK/xV
+         1D6cgdYRlU2VOOu3L6alTX/YxdW0AHcBDG5cqwEp2BHSh2wbu9g6Z+ZTfFwbZSlJWOW7
+         8y0xKEmERfv59tRW5y17nkorURDtCVOFOJmpLWagAIQ8ouZYT5q6JaHEvq6o8epIO2b0
+         CD/g==
+X-Gm-Message-State: AOAM530BmZsZlQSIUk/OM1RMl2PG695Tvz5GQYEVu+stiovWw7JSw7VI
+        2EWa9wMMgZeM/twcSuXydXVP/RTgnck=
+X-Google-Smtp-Source: ABdhPJz02TnbQPY0kPnlOASS0GWIbEagDC4DxiLpCYD0ZfEPttap+gCUxytayfCPG35mVswRACXJk9ILkN8=
 X-Received: from reiji-vws-sp.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3d59])
- (user=reijiw job=sendgmr) by 2002:a17:902:7246:b0:151:49e7:d4fc with SMTP id
- c6-20020a170902724600b0015149e7d4fcmr8872189pll.88.1646974124662; Thu, 10 Mar
- 2022 20:48:44 -0800 (PST)
-Date:   Thu, 10 Mar 2022 20:47:54 -0800
+ (user=reijiw job=sendgmr) by 2002:a17:902:8e82:b0:151:6f68:7088 with SMTP id
+ bg2-20020a1709028e8200b001516f687088mr8972609plb.11.1646974126310; Thu, 10
+ Mar 2022 20:48:46 -0800 (PST)
+Date:   Thu, 10 Mar 2022 20:47:55 -0800
 In-Reply-To: <20220311044811.1980336-1-reijiw@google.com>
-Message-Id: <20220311044811.1980336-9-reijiw@google.com>
+Message-Id: <20220311044811.1980336-10-reijiw@google.com>
 Mime-Version: 1.0
 References: <20220311044811.1980336-1-reijiw@google.com>
 X-Mailer: git-send-email 2.35.1.723.g4982287a31-goog
-Subject: [PATCH v6 08/25] KVM: arm64: Make ID_AA64MMFR0_EL1 writable
+Subject: [PATCH v6 09/25] KVM: arm64: Make ID_AA64DFR0_EL1/ID_DFR0_EL1 writable
 From:   Reiji Watanabe <reijiw@google.com>
 To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu
 Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
@@ -80,133 +80,112 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch adds id_reg_desc for ID_AA64MMFR0_EL1 to make it
-writable by userspace.
+This patch adds id_reg_desc for ID_AA64DFR0_EL1 and ID_DFR0_EL1
+to make them writable by userspace.
 
-Since ID_AA64MMFR0_EL1 stage 2 granule size fields don't follow the
-standard ID scheme, we need a special handling to validate those fields.
+Return an error if userspace tries to set PMUVER/PerfMon field
+of ID_AA64DFR0_EL1/ID_DFR0_EL1 to a value that conflicts with the
+PMU configuration.
 
+When a value of ID_AA64DFR0_EL1.PMUVER or ID_DFR0_EL1.PERFMON on the
+host is 0xf, which means IMPLEMENTATION DEFINED PMU supported, KVM
+erroneously expose the value for the guest as it is even though KVM
+doesn't support it for the guest. In that case, since KVM should
+expose 0x0 (PMU is not implemented), change the initial value of
+ID_AA64DFR0_EL1.PMUVER and ID_DFR0_EL1.PERFMON for the guest to 0x0.
+If userspace requests KVM to set them to 0xf, which shouldn't be
+allowed as KVM doesn't support IMPLEMENTATION DEFINED PMU for the
+guest, ignore the request (set the fields to 0x0 instead) so that
+a live migration from the older kernel works fine.
+
+Since number of context-aware breakpoints must be no more than number
+of supported breakpoints according to Arm ARM, return an error
+if userspace tries to set CTX_CMPS field to such value.
+
+Fixes: 8e35aa642ee4 ("arm64: cpufeature: Extract capped perfmon fields")
 Signed-off-by: Reiji Watanabe <reijiw@google.com>
 ---
- arch/arm64/kvm/sys_regs.c | 129 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 129 insertions(+)
+ arch/arm64/include/asm/cpufeature.h |   2 +-
+ arch/arm64/kvm/sys_regs.c           | 143 +++++++++++++++++++++++-----
+ 2 files changed, 122 insertions(+), 23 deletions(-)
 
+diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+index a9edf1ca7dcb..375c9cd0123c 100644
+--- a/arch/arm64/include/asm/cpufeature.h
++++ b/arch/arm64/include/asm/cpufeature.h
+@@ -553,7 +553,7 @@ cpuid_feature_cap_perfmon_field(u64 features, int field, u64 cap)
+ 
+ 	/* Treat IMPLEMENTATION DEFINED functionality as unimplemented */
+ 	if (val == ID_AA64DFR0_PMUVER_IMP_DEF)
+-		val = 0;
++		return (features & ~mask);
+ 
+ 	if (val > cap) {
+ 		features &= ~mask;
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 33b4918109b7..ad23361d3a3b 100644
+index ad23361d3a3b..46d95626f4d5 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -460,6 +460,118 @@ static int validate_id_aa64isar1_el1(struct kvm_vcpu *vcpu,
+@@ -572,6 +572,66 @@ static int validate_id_aa64mmfr0_el1(struct kvm_vcpu *vcpu,
  	return 0;
  }
  
-+/*
-+ * Check if the requested stage2 translation granule size indicated in
-+ * @mmfr0 is also indicated in @mmfr0_lim.
-+ * If TGranX_2 field is zero, the value must be validated based on TGranX
-+ * field because that indicates the feature support is identified in
-+ * TGranX field.
-+ * This function relies on the fact TGranX fields are validated before
-+ * through arm64_check_features_kvm.
-+ */
-+static int aa64mmfr0_tgran2_check(int field, u64 mmfr0, u64 mmfr0_lim)
++static bool id_reg_has_pmu(u64 val, u64 shift, unsigned int min)
 +{
-+	s64 tgran2, lim_tgran2, rtgran1;
-+	int f1;
-+	bool is_signed;
-+
-+	tgran2 = cpuid_feature_extract_unsigned_field(mmfr0, field);
-+	lim_tgran2 = cpuid_feature_extract_unsigned_field(mmfr0_lim, field);
-+	if (tgran2 && lim_tgran2)
-+		/*
-+		 * We don't need to check TGranX field. We can simply
-+		 * compare tgran2 and lim_tgran2.
-+		 */
-+		return (tgran2 > lim_tgran2) ? -E2BIG : 0;
-+
-+	if (tgran2 == lim_tgran2)
-+		/*
-+		 * Both of them are zero.  Since TGranX in @mmfr0 is already
-+		 * validated by arm64_check_features_kvm, tgran2 must be fine.
-+		 */
-+		return 0;
++	unsigned int pmu = cpuid_feature_extract_unsigned_field(val, shift);
 +
 +	/*
-+	 * Either tgran2 or lim_tgran2 is zero.
-+	 * Need stage1 granule size to validate tgran2.
++	 * Treat IMPLEMENTATION DEFINED functionality as unimplemented for
++	 * ID_AA64DFR0_EL1.PMUVer/ID_DFR0_EL1.PerfMon.
 +	 */
++	if (pmu == 0xf)
++		pmu = 0;
++
++	return (pmu >= min);
++}
++
++static int validate_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
++				    const struct id_reg_desc *id_reg, u64 val)
++{
++	unsigned int brps, ctx_cmps;
++	bool vcpu_pmu, dfr0_pmu;
++
++	brps = cpuid_feature_extract_unsigned_field(val, ID_AA64DFR0_BRPS_SHIFT);
++	ctx_cmps = cpuid_feature_extract_unsigned_field(val, ID_AA64DFR0_CTX_CMPS_SHIFT);
 +
 +	/*
-+	 * Get TGranX's bit position by subtracting 12 from TGranX_2's bit
-+	 * position.
++	 * Number of context-aware breakpoints can be no more than number of
++	 * supported breakpoints.
 +	 */
-+	f1 = field - 12;
++	if (ctx_cmps > brps)
++		return -EINVAL;
 +
-+	/* TGran4/TGran64 is signed and TGran16 is unsigned field. */
-+	is_signed = (f1 == ID_AA64MMFR0_TGRAN16_SHIFT) ? false : true;
-+
-+	/*
-+	 * If tgran2 == 0 (&& lim_tgran2 != 0), the requested stage2 granule
-+	 * size is indicated in the stage1 granule size field of @mmfr0.
-+	 * So, validate the stage1 granule size against the stage2 limit
-+	 * granule size.
-+	 * If lim_tgran2 == 0 (&& tgran2 != 0), the stage2 limit granule size
-+	 * is indicated in the stage1 granule size field of @mmfr0_lim.
-+	 * So, validate the requested stage2 granule size against the stage1
-+	 * limit granule size.
-+	 */
-+
-+	 /* Get the relevant stage1 granule size to validate tgran2 */
-+	if (tgran2 == 0)
-+		/* The requested stage1 granule size */
-+		rtgran1 = cpuid_feature_extract_field(mmfr0, f1, is_signed);
-+	else /* lim_tgran2 == 0 */
-+		/* The stage1 limit granule size */
-+		rtgran1 = cpuid_feature_extract_field(mmfr0_lim, f1, is_signed);
-+
-+	/*
-+	 * Adjust the value of rtgran1 to compare with stage2 granule size,
-+	 * which indicates: 1: Not supported, 2: Supported, etc.
-+	 */
-+	if (is_signed)
-+		/* For signed, -1: Not supported, 0: Supported, etc. */
-+		rtgran1 += 0x2;
-+	else
-+		/* For unsigned, 0: Not supported, 1: Supported, etc. */
-+		rtgran1 += 0x1;
-+
-+	if ((tgran2 == 0) && (rtgran1 > lim_tgran2))
-+		/*
-+		 * The requested stage1 granule size (== the requested stage2
-+		 * granule size) is larger than the stage2 limit granule size.
-+		 */
-+		return -E2BIG;
-+	else if ((lim_tgran2 == 0) && (tgran2 > rtgran1))
-+		/*
-+		 * The requested stage2 granule size is larger than the stage1
-+		 * limit granulze size (== the stage2 limit granule size).
-+		 */
-+		return -E2BIG;
++	vcpu_pmu = kvm_vcpu_has_pmu(vcpu);
++	dfr0_pmu = id_reg_has_pmu(val, ID_AA64DFR0_PMUVER_SHIFT, ID_AA64DFR0_PMUVER_8_0);
++	/* Check if there is a conflict with a request via KVM_ARM_VCPU_INIT */
++	if (vcpu_pmu ^ dfr0_pmu)
++		return -EPERM;
 +
 +	return 0;
 +}
 +
-+static int validate_id_aa64mmfr0_el1(struct kvm_vcpu *vcpu,
-+				     const struct id_reg_desc *id_reg, u64 val)
++static int validate_id_dfr0_el1(struct kvm_vcpu *vcpu,
++				const struct id_reg_desc *id_reg, u64 val)
 +{
-+	u64 limit = id_reg->vcpu_limit_val;
-+	int ret;
++	bool vcpu_pmu, dfr0_pmu;
++	unsigned int perfmon;
 +
-+	ret = aa64mmfr0_tgran2_check(ID_AA64MMFR0_TGRAN4_2_SHIFT, val, limit);
-+	if (ret)
-+		return ret;
++	perfmon = cpuid_feature_extract_unsigned_field(val, ID_DFR0_PERFMON_SHIFT);
++	if (perfmon == 1 || perfmon == 2)
++		/* PMUv1 or PMUv2 is not allowed on ARMv8. */
++		return -EINVAL;
 +
-+	ret = aa64mmfr0_tgran2_check(ID_AA64MMFR0_TGRAN64_2_SHIFT, val, limit);
-+	if (ret)
-+		return ret;
++	vcpu_pmu = kvm_vcpu_has_pmu(vcpu);
++	dfr0_pmu = id_reg_has_pmu(val, ID_DFR0_PERFMON_SHIFT, ID_DFR0_PERFMON_8_0);
 +
-+	ret = aa64mmfr0_tgran2_check(ID_AA64MMFR0_TGRAN16_2_SHIFT, val, limit);
-+	if (ret)
-+		return ret;
++	/* Check if there is a conflict with a request via KVM_ARM_VCPU_INIT */
++	if (vcpu_pmu ^ dfr0_pmu)
++		return -EPERM;
 +
 +	return 0;
 +}
@@ -214,37 +193,126 @@ index 33b4918109b7..ad23361d3a3b 100644
  static void init_id_aa64pfr0_el1_desc(struct id_reg_desc *id_reg)
  {
  	u64 limit = id_reg->vcpu_limit_val;
-@@ -3255,6 +3367,20 @@ static struct id_reg_desc id_aa64isar1_el1_desc = {
- 	.vcpu_mask = vcpu_mask_id_aa64isar1_el1,
+@@ -615,6 +675,32 @@ static void init_id_aa64isar1_el1_desc(struct id_reg_desc *id_reg)
+ 		id_reg->vcpu_limit_val &= ~PTRAUTH_MASK;
+ }
+ 
++static void init_id_aa64dfr0_el1_desc(struct id_reg_desc *id_reg)
++{
++	u64 limit = id_reg->vcpu_limit_val;
++
++	/* Limit guests to PMUv3 for ARMv8.4 */
++	limit = cpuid_feature_cap_perfmon_field(limit, ID_AA64DFR0_PMUVER_SHIFT,
++						ID_AA64DFR0_PMUVER_8_4);
++	/* Limit debug to ARMv8.0 */
++	limit &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_DEBUGVER);
++	limit |= (FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_DEBUGVER), 6));
++
++	/* Hide SPE from guests */
++	limit &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_PMSVER);
++
++	id_reg->vcpu_limit_val = limit;
++}
++
++static void init_id_dfr0_el1_desc(struct id_reg_desc *id_reg)
++{
++	/* Limit guests to PMUv3 for ARMv8.4 */
++	id_reg->vcpu_limit_val =
++		cpuid_feature_cap_perfmon_field(id_reg->vcpu_limit_val,
++						ID_DFR0_PERFMON_SHIFT,
++						ID_DFR0_PERFMON_8_4);
++}
++
+ static u64 vcpu_mask_id_aa64pfr0_el1(const struct kvm_vcpu *vcpu,
+ 				     const struct id_reg_desc *idr)
+ {
+@@ -633,6 +719,18 @@ static u64 vcpu_mask_id_aa64isar1_el1(const struct kvm_vcpu *vcpu,
+ 	return vcpu_has_ptrauth(vcpu) ? 0 : PTRAUTH_MASK;
+ }
+ 
++static u64 vcpu_mask_id_aa64dfr0_el1(const struct kvm_vcpu *vcpu,
++					 const struct id_reg_desc *idr)
++{
++	return kvm_vcpu_has_pmu(vcpu) ? 0 : ARM64_FEATURE_MASK(ID_AA64DFR0_PMUVER);
++}
++
++static u64 vcpu_mask_id_dfr0_el1(const struct kvm_vcpu *vcpu,
++				     const struct id_reg_desc *idr)
++{
++	return kvm_vcpu_has_pmu(vcpu) ? 0 : ARM64_FEATURE_MASK(ID_DFR0_PERFMON);
++}
++
+ static int validate_id_reg(struct kvm_vcpu *vcpu,
+ 			   const struct id_reg_desc *id_reg, u64 val)
+ {
+@@ -1562,28 +1660,9 @@ static u64 read_id_reg_with_encoding(const struct kvm_vcpu *vcpu, u32 id)
+ 	const struct id_reg_desc *id_reg = get_id_reg_desc(id);
+ 
+ 	if (id_reg)
+-		return __read_id_reg(vcpu, id_reg);
+-
+-	val = read_kvm_id_reg(vcpu->kvm, id);
+-	switch (id) {
+-	case SYS_ID_AA64DFR0_EL1:
+-		/* Limit debug to ARMv8.0 */
+-		val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_DEBUGVER);
+-		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_DEBUGVER), 6);
+-		/* Limit guests to PMUv3 for ARMv8.4 */
+-		val = cpuid_feature_cap_perfmon_field(val,
+-						      ID_AA64DFR0_PMUVER_SHIFT,
+-						      kvm_vcpu_has_pmu(vcpu) ? ID_AA64DFR0_PMUVER_8_4 : 0);
+-		/* Hide SPE from guests */
+-		val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_PMSVER);
+-		break;
+-	case SYS_ID_DFR0_EL1:
+-		/* Limit guests to PMUv3 for ARMv8.4 */
+-		val = cpuid_feature_cap_perfmon_field(val,
+-						      ID_DFR0_PERFMON_SHIFT,
+-						      kvm_vcpu_has_pmu(vcpu) ? ID_DFR0_PERFMON_8_4 : 0);
+-		break;
+-	}
++		val = __read_id_reg(vcpu, id_reg);
++	else
++		val = read_kvm_id_reg(vcpu->kvm, id);
+ 
+ 	return val;
+ }
+@@ -3381,15 +3460,35 @@ static struct id_reg_desc id_aa64mmfr0_el1_desc = {
+ 	.validate = validate_id_aa64mmfr0_el1,
  };
  
-+static struct id_reg_desc id_aa64mmfr0_el1_desc = {
-+	.reg_desc = ID_SANITISED(ID_AA64MMFR0_EL1),
-+	/*
-+	 * When TGranX_2 value is 0, validity of the value depend on TGranX
-+	 * value, and TGranX_2 value must be validated against TGranX value,
-+	 * which is done by validate_id_aa64mmfr0_el1.
-+	 * So, skip the regular validity checking for TGranX_2 fields.
-+	 */
-+	.ignore_mask = ARM64_FEATURE_MASK(ID_AA64MMFR0_TGRAN4_2) |
-+		       ARM64_FEATURE_MASK(ID_AA64MMFR0_TGRAN64_2) |
-+		       ARM64_FEATURE_MASK(ID_AA64MMFR0_TGRAN16_2),
-+	.validate = validate_id_aa64mmfr0_el1,
++static struct id_reg_desc id_aa64dfr0_el1_desc = {
++	.reg_desc = ID_SANITISED(ID_AA64DFR0_EL1),
++	.init = init_id_aa64dfr0_el1_desc,
++	.validate = validate_id_aa64dfr0_el1,
++	.vcpu_mask = vcpu_mask_id_aa64dfr0_el1,
++};
++
++static struct id_reg_desc id_dfr0_el1_desc = {
++	.reg_desc = ID_SANITISED(ID_DFR0_EL1),
++	.init = init_id_dfr0_el1_desc,
++	.validate = validate_id_dfr0_el1,
++	.vcpu_mask = vcpu_mask_id_dfr0_el1,
 +};
 +
  #define ID_DESC(id_reg_name, id_reg_desc)	\
  	[IDREG_IDX(SYS_##id_reg_name)] = (id_reg_desc)
  
-@@ -3267,6 +3393,9 @@ static struct id_reg_desc *id_reg_desc_table[KVM_ARM_ID_REG_MAX_NUM] = {
+ /* A table for ID registers's information. */
+ static struct id_reg_desc *id_reg_desc_table[KVM_ARM_ID_REG_MAX_NUM] = {
++	/* CRm=1 */
++	ID_DESC(ID_DFR0_EL1, &id_dfr0_el1_desc),
++
+ 	/* CRm=4 */
+ 	ID_DESC(ID_AA64PFR0_EL1, &id_aa64pfr0_el1_desc),
+ 	ID_DESC(ID_AA64PFR1_EL1, &id_aa64pfr1_el1_desc),
+ 
++	/* CRm=5 */
++	ID_DESC(ID_AA64DFR0_EL1, &id_aa64dfr0_el1_desc),
++
  	/* CRm=6 */
  	ID_DESC(ID_AA64ISAR0_EL1, &id_aa64isar0_el1_desc),
  	ID_DESC(ID_AA64ISAR1_EL1, &id_aa64isar1_el1_desc),
-+
-+	/* CRm=7 */
-+	ID_DESC(ID_AA64MMFR0_EL1, &id_aa64mmfr0_el1_desc),
- };
- 
- static inline struct id_reg_desc *get_id_reg_desc(u32 id)
 -- 
 2.35.1.723.g4982287a31-goog
 
