@@ -2,72 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 36C3F4D5BFF
-	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 08:05:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E2434D5D49
+	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 09:29:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347130AbiCKHFQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Mar 2022 02:05:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51070 "EHLO
+        id S233541AbiCKIaG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Mar 2022 03:30:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46000 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347082AbiCKHEx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Mar 2022 02:04:53 -0500
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B824B9F6E7;
-        Thu, 10 Mar 2022 23:03:49 -0800 (PST)
-Received: by mail-pj1-x102d.google.com with SMTP id cx5so7412812pjb.1;
-        Thu, 10 Mar 2022 23:03:49 -0800 (PST)
+        with ESMTP id S229565AbiCKIaF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Mar 2022 03:30:05 -0500
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D57EF1B0BE5;
+        Fri, 11 Mar 2022 00:29:02 -0800 (PST)
+Received: by mail-pl1-x632.google.com with SMTP id n2so7134051plf.4;
+        Fri, 11 Mar 2022 00:29:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=PHRKmoOpdVOx/pR8qbguqjvyNTEJ3bXLgyEzmCfW7IA=;
-        b=Pd3JO5VGOU2LL2nfJBODpe5Kb7ywmPlHuJyMwgjRY7zfioOnLHaaLCPYMAscrN721N
-         2YTNfENdSdRF4Bbeh9N8C4BkdLQWT41VZySTLF/8ZdJA3DpyxU2znAxioIkWwaqHocG7
-         SQQI1+R1KEOwY9O2DpOX7omMZ6jHaGdIdGM+bNEKrbfcRuankTzp9CAlsAaniznJaZ6P
-         Wtpop2DMtSaRQ3xtaTmZvWrKQ2HQh6Da17nIOjG440XbOKyKf8eM9uQzfQYBv4s4wzgn
-         QQ6WwESy9R4jO76fBQmFc/Y/UWNvQxekuja8WHT0qHWhYJ6Azw8m969xDe0v3wcIBpVd
-         78lA==
+        h=from:to:cc:subject:date:message-id;
+        bh=yfQz7z8KZumc1Ycb9CqfcOoNgNnJJq7vzR6ooG1K2JQ=;
+        b=pe5wuNZgg6d3LXKiCChXh5TnqXyI1eYgWqE9f2t/h7FMxufbl5ktYUr55uhaGedqA1
+         nk/3fDSlLyAAS63VCnYojUXxvECFROYfjZnAdAWYoINV3kqi9Kou3fJNyNZsHen7coVD
+         9kopPY3klo+ypfbwBmeKm+uku4nFUP76F/KYfcuIoyMCpy8TBoYhDFWA0myBtcDwFsqQ
+         FlP4x0fvouo98vQO/PkSYOWWatishPoufkUvUyWotxKv2AG/Nt/dKyanST/iTrQW0JJo
+         ckByBxJz+8QPKlxrsvTPaja4DTgmAVsg73iTYvTtXNgFxNTF447QjI5vxyGpFE4IWzkf
+         x10A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=PHRKmoOpdVOx/pR8qbguqjvyNTEJ3bXLgyEzmCfW7IA=;
-        b=hwt7EA7S23GGHaTgzpYLBpEG5EcUj1/9B2gm4WanCQbTfvKVvIIIxonbQlApUO6TAB
-         L9ddruW6n2sujWnXXxNvfWwXJ1JW3aT1SH2kSfEvm9bNRosShIIdaX0EthkboZu2shzS
-         Vg5TwYclvgud+EHU7p8x6IcaatJS74g9klBbJXlrDgzsDL39rzoDBD7ESFPpbYdn1hNH
-         IV6U/YsYcwe8TGT852ufRG9L2oy3ljx9MFw4AFM4VPIAb4db3Rf0OcDDqyoAg1+DcoXH
-         UeNvSsmjMtnpYkNNdbjwPDiB603v2HjK/Ln8BoJGG2s2KhK4GESDSfb92b2ikLdb+QtV
-         1sCg==
-X-Gm-Message-State: AOAM530Ls+t+FKdl+QAnyZUIhP2yUbXgCCbRbwy9shbSwtRjiamkfNGr
-        yw0psSWRoQdVtij0fTUGxPANrFqtexY=
-X-Google-Smtp-Source: ABdhPJyu0YmUGsKJEy4FIXKekCurj/9SpISDUGXFi1BJpgO2rJUHXpvF77AnKkOEC1rhChsQZP7aeA==
-X-Received: by 2002:a17:902:e547:b0:151:c5d5:a2c4 with SMTP id n7-20020a170902e54700b00151c5d5a2c4mr8948614plf.78.1646982228999;
-        Thu, 10 Mar 2022 23:03:48 -0800 (PST)
-Received: from localhost ([47.251.4.198])
-        by smtp.gmail.com with ESMTPSA id j13-20020a056a00130d00b004f1025a4361sm10019818pfu.202.2022.03.10.23.03.47
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=yfQz7z8KZumc1Ycb9CqfcOoNgNnJJq7vzR6ooG1K2JQ=;
+        b=5/8VXtGcyLGvApFatrdCWh9tHqL/cPx64s9NUhp+gTv9E0YqLYcQ+FWxgetK0KdCdU
+         wOjr62ISyC82ri6o/3uA4ZP7fNSQg5UjqJsspnxwhfBpu5OTFqxV0qoaDLEKqZRjzUgx
+         IW7YEiYiKi41MlRk9gyxnKaQ0awPjewDbItIsjGIZ4bXJ7ix77eWNEB5OVqVb6eUrPNB
+         e9B3QJ+qRrBeXFNBQtIOLCwfPMmYKaSe8MADpFpJlMtbzFkBWNuyh8Dvp0gEtPKa/nc+
+         PSUNdE9d4XW3U25viCJdV8Sv3GyNcW0r/PGzcorCsc5EspYbGnm3bUaXpN6rdWdK8hCr
+         vTwA==
+X-Gm-Message-State: AOAM5302QeHMkznh0puQD9y5JM8ewGW5llDRsTIGT+yoOKyf/nccGrEy
+        Ibbm/j4cr6Dr8LSyVF26CVn1KFoxioY=
+X-Google-Smtp-Source: ABdhPJymbb8g9GfpxZY7Dyp91Z9WiGBqnyp0l7iDDQjn5ozr/TV16SmEk1jJLha+NULL5oSSrzxFKA==
+X-Received: by 2002:a17:90a:10d6:b0:1bc:48ad:c8c8 with SMTP id b22-20020a17090a10d600b001bc48adc8c8mr9605292pje.149.1646987342111;
+        Fri, 11 Mar 2022 00:29:02 -0800 (PST)
+Received: from localhost.localdomain ([203.205.141.115])
+        by smtp.googlemail.com with ESMTPSA id y19-20020a056a00181300b004f7203ad991sm9630115pfa.210.2022.03.11.00.28.59
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 10 Mar 2022 23:03:48 -0800 (PST)
-From:   Lai Jiangshan <jiangshanlai@gmail.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Lai Jiangshan <jiangshan.ljs@antgroup.com>,
+        Fri, 11 Mar 2022 00:29:01 -0800 (PST)
+From:   Wanpeng Li <kernellwp@gmail.com>
+X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>
-Subject: [RFC PATCH V2 6/5] KVM: X86: Propagate the nested page fault info to the guest
-Date:   Fri, 11 Mar 2022 15:03:46 +0800
-Message-Id: <20220311070346.45023-7-jiangshanlai@gmail.com>
-X-Mailer: git-send-email 2.19.1.6.gb485710b
-In-Reply-To: <20220311070346.45023-1-jiangshanlai@gmail.com>
-References: <20220311070346.45023-1-jiangshanlai@gmail.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Joerg Roedel <joro@8bytes.org>
+Subject: [PATCH 0/5] KVM: X86: Scaling Guest OS Critical Sections with boosting
+Date:   Fri, 11 Mar 2022 00:28:11 -0800
+Message-Id: <1646987291-28598-1-git-send-email-wanpengli@tencent.com>
+X-Mailer: git-send-email 2.7.4
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
         RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
@@ -78,140 +68,68 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
+The missing semantic gap that occurs when a guest OS is preempted 
+when executing its own critical section, this leads to degradation 
+of application scalability. We try to bridge this semantic gap in 
+some ways, by passing guest preempt_count to the host and checking 
+guest irq disable state, the hypervisor now knows whether guest 
+OSes are running in the critical section, the hypervisor yield-on-spin 
+heuristics can be more smart this time to boost the vCPU candidate 
+who is in the critical section to mitigate this preemption problem, 
+in addition, it is more likely to be a potential lock holder.
 
-Feed the nested page fault info into ->gva_to_gpa() in
-walk_addr_generic(), so that the nested walk_addr_generic() can
-propagate the nested page fault info into x86_exception.
+Testing on 96 HT 2 socket Xeon CLX server, with 96 vCPUs VM 100GB RAM,
+one VM running benchmark, the other(none-2) VMs running cpu-bound 
+workloads, There is no performance regression for other benchmarks 
+like Unixbench etc.
 
-Propagate the nested page fault info into EXIT_INFO_1 for SVM.
+1VM
+            vanilla    optimized    improved
 
-Morph the nested page fault info and other page fault error code into
-EXIT_QUOLIFICATION for VMX.
+hackbench -l 50000
+              28         21.45        30.5%
+ebizzy -M
+             12189       12354        1.4%
+dbench
+             712 MB/sec  722 MB/sec   1.4%
 
-It is a patch that makes use of the patch1.
+2VM:
+            vanilla    optimized    improved
 
-It is untested, just served as a request for somebody to fix a known
-problem, and will not be included in next version of this patchset
-if the patchset needs to be updated.
+hackbench -l 10000
+              29.4        26          13%
+ebizzy -M
+             3834        4033          5%
+dbench
+           42.3 MB/sec  44.1 MB/sec   4.3%
 
-Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
----
- arch/x86/include/asm/kvm_host.h |  2 ++
- arch/x86/kvm/kvm_emulate.h      |  3 ++-
- arch/x86/kvm/mmu/paging_tmpl.h  |  8 ++++++--
- arch/x86/kvm/svm/nested.c       | 10 ++--------
- arch/x86/kvm/vmx/nested.c       | 11 +++++++++++
- 5 files changed, 23 insertions(+), 11 deletions(-)
+3VM:
+            vanilla    optimized    improved
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 565d9eb42429..68efa9d1ef0e 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -265,6 +265,8 @@ enum x86_intercept_stage;
- 				 PFERR_WRITE_MASK |		\
- 				 PFERR_PRESENT_MASK)
- 
-+#define PFERR_GUEST_MASK (PFERR_GUEST_FINAL_MASK | PFERR_GUEST_PAGE_MASK)
-+
- /* apic attention bits */
- #define KVM_APIC_CHECK_VAPIC	0
- /*
-diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
-index 39eded2426ff..cdc2977ce086 100644
---- a/arch/x86/kvm/kvm_emulate.h
-+++ b/arch/x86/kvm/kvm_emulate.h
-@@ -24,8 +24,9 @@ struct x86_exception {
- 	bool error_code_valid;
- 	u16 error_code;
- 	bool nested_page_fault;
--	u64 address; /* cr2 or nested page fault gpa */
- 	u8 async_page_fault;
-+	u64 nested_pfec; /* nested page fault error code */
-+	u64 address; /* cr2 or nested page fault gpa */
- };
- 
- /*
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index 8621188b46df..95367f5ca998 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -383,7 +383,8 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
- 	 * by the MOV to CR instruction are treated as reads and do not cause the
- 	 * processor to set the dirty flag in any EPT paging-structure entry.
- 	 */
--	nested_access = (have_ad ? PFERR_WRITE_MASK : 0) | PFERR_USER_MASK;
-+	nested_access = (have_ad ? PFERR_WRITE_MASK : 0) | PFERR_USER_MASK |
-+			PFERR_GUEST_PAGE_MASK;
- 
- 	pte_access = ~0;
- 	++walker->level;
-@@ -466,7 +467,8 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
- 	if (PTTYPE == 32 && walker->level > PG_LEVEL_4K && is_cpuid_PSE36())
- 		gfn += pse36_gfn_delta(pte);
- 
--	real_gpa = kvm_translate_gpa(vcpu, mmu, gfn_to_gpa(gfn), access, &walker->fault);
-+	real_gpa = kvm_translate_gpa(vcpu, mmu, gfn_to_gpa(gfn),
-+			access | PFERR_GUEST_FINAL_MASK, &walker->fault);
- 	if (real_gpa == UNMAPPED_GVA)
- 		return 0;
- 
-@@ -534,6 +536,8 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
- 	walker->fault.address = addr;
- 	walker->fault.nested_page_fault = mmu != vcpu->arch.walk_mmu;
- 	walker->fault.async_page_fault = false;
-+	if (walker->fault.nested_page_fault)
-+		walker->fault.nested_pfec = errcode | (access & PFERR_GUEST_MASK);
- 
- 	trace_kvm_mmu_walker_error(walker->fault.error_code);
- 	return 0;
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 96bab464967f..0abcbd3de892 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -38,18 +38,12 @@ static void nested_svm_inject_npf_exit(struct kvm_vcpu *vcpu,
- 	struct vcpu_svm *svm = to_svm(vcpu);
- 
- 	if (svm->vmcb->control.exit_code != SVM_EXIT_NPF) {
--		/*
--		 * TODO: track the cause of the nested page fault, and
--		 * correctly fill in the high bits of exit_info_1.
--		 */
- 		svm->vmcb->control.exit_code = SVM_EXIT_NPF;
- 		svm->vmcb->control.exit_code_hi = 0;
--		svm->vmcb->control.exit_info_1 = (1ULL << 32);
--		svm->vmcb->control.exit_info_2 = fault->address;
- 	}
- 
--	svm->vmcb->control.exit_info_1 &= ~0xffffffffULL;
--	svm->vmcb->control.exit_info_1 |= fault->error_code;
-+	svm->vmcb->control.exit_info_1 = fault->nested_pfec;
-+	svm->vmcb->control.exit_info_2 = fault->address;
- 
- 	nested_svm_vmexit(svm);
- }
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 1dfe23963a9e..fd5dd5acf63b 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -372,6 +372,17 @@ static void nested_ept_inject_page_fault(struct kvm_vcpu *vcpu,
- 	u32 vm_exit_reason;
- 	unsigned long exit_qualification = vcpu->arch.exit_qualification;
- 
-+	exit_qualification &= ~(EPT_VIOLATION_ACC_READ | EPT_VIOLATION_ACC_WRITE |
-+				EPT_VIOLATION_ACC_INSTR | EPT_VIOLATION_GVA_TRANSLATED);
-+	exit_qualification |= fault->nested_pfec & PFERR_USER_MASK ?
-+				EPT_VIOLATION_ACC_READ : 0;
-+	exit_qualification |= fault->nested_pfec & PFERR_WRITE_MASK ?
-+				EPT_VIOLATION_ACC_WRITE : 0;
-+	exit_qualification |= fault->nested_pfec & PFERR_FETCH_MASK ?
-+				EPT_VIOLATION_ACC_INSTR : 0;
-+	exit_qualification |= fault->nested_pfec & PFERR_GUEST_FINAL_MASK ?
-+				EPT_VIOLATION_GVA_TRANSLATED : 0;
-+
- 	if (vmx->nested.pml_full) {
- 		vm_exit_reason = EXIT_REASON_PML_FULL;
- 		vmx->nested.pml_full = false;
+hackbench -l 10000
+              47         35.46        33%
+ebizzy -M
+	     3828        4031         5%
+dbench 
+           30.5 MB/sec  31.16 MB/sec  2.3%
+
+Wanpeng Li (5):
+  KVM: X86: Add MSR_KVM_PREEMPT_COUNT support
+  KVM: X86: Add guest interrupt disable state support
+  KVM: X86: Boost vCPU which is in the critical section
+  x86/kvm: Add MSR_KVM_PREEMPT_COUNT guest support
+  KVM: X86: Expose PREEMT_COUNT CPUID feature bit to guest
+
+ Documentation/virt/kvm/cpuid.rst     |  3 ++
+ arch/x86/include/asm/kvm_host.h      |  7 ++++
+ arch/x86/include/uapi/asm/kvm_para.h |  2 +
+ arch/x86/kernel/kvm.c                | 10 +++++
+ arch/x86/kvm/cpuid.c                 |  3 +-
+ arch/x86/kvm/x86.c                   | 60 ++++++++++++++++++++++++++++
+ include/linux/kvm_host.h             |  1 +
+ virt/kvm/kvm_main.c                  |  7 ++++
+ 8 files changed, 92 insertions(+), 1 deletion(-)
+
 -- 
-2.19.1.6.gb485710b
+2.25.1
 
