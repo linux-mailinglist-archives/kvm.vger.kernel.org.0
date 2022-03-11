@@ -2,146 +2,297 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 269F34D6043
-	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 11:59:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2778B4D6078
+	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 12:18:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348126AbiCKK74 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Mar 2022 05:59:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37758 "EHLO
+        id S242291AbiCKLTi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Mar 2022 06:19:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50266 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346129AbiCKK7y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Mar 2022 05:59:54 -0500
-Received: from mail.sberdevices.ru (mail.sberdevices.ru [45.89.227.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5A9813C39F;
-        Fri, 11 Mar 2022 02:58:50 -0800 (PST)
-Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
-        by mail.sberdevices.ru (Postfix) with ESMTP id 2683C5FD03;
-        Fri, 11 Mar 2022 13:58:48 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1646996328;
-        bh=WyQa/Gu+vWVCPA15DPgEI2x5TX1alJGD8E5F+CE4TPE=;
-        h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version;
-        b=LWFMqCacZCmAYwL9jnJ1qoHMCKSQ2Ov1UF0/5/3U3sVUr08UEsdiUUta3GCIHmdh6
-         +C11Q+nms9NSIO2Jd10gXbphwuFn8NFJH1RhDcL8uw9+cWdyvndMyY02s8ie5xw7u7
-         /q5vKWeHzsv/qGcALZ0Kr0aeN1Cuq2qpKUbCSVWjFhaoJyhIQmLTlBzHw63LaRK1q4
-         9+MZfpVCKNlTbcwDZH2x6+4MdD1Rxs1t4zHNTrLe+61qPXXuIcOt6oOOi8XVDwiyg/
-         aSkPGfN1lYeXxawti09Y59wKlo5FLK7oxb4ZcFE0CFPMP1a9nDztahrG+/G5gm+kmo
-         r+ijCfwu/zamA==
-Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
-        by mail.sberdevices.ru (Postfix) with ESMTP;
-        Fri, 11 Mar 2022 13:58:48 +0300 (MSK)
-From:   Krasnov Arseniy Vladimirovich <AVKrasnov@sberdevices.ru>
-To:     Stefano Garzarella <sgarzare@redhat.com>
-CC:     Krasnov Arseniy <oxffffaa@gmail.com>,
-        Rokosov Dmitry Dmitrievich <DDRokosov@sberdevices.ru>,
-        Krasnov Arseniy Vladimirovich <AVKrasnov@sberdevices.ru>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: [RFC PATCH v1 3/3] af_vsock: SOCK_SEQPACKET broken buffer test
-Thread-Topic: [RFC PATCH v1 3/3] af_vsock: SOCK_SEQPACKET broken buffer test
-Thread-Index: AQHYNTbvjWQnm44js0u5mxZaYZpaaQ==
-Date:   Fri, 11 Mar 2022 10:58:32 +0000
-Message-ID: <bc309cf9-5bcf-b645-577f-8e5b0cf6f220@sberdevices.ru>
-In-Reply-To: <1bb5ce91-da53-7de9-49ba-f49f76f45512@sberdevices.ru>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.16.1.12]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <067E1A7C5BB85447BE521D93922C4087@sberdevices.ru>
-Content-Transfer-Encoding: base64
+        with ESMTP id S235465AbiCKLTg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Mar 2022 06:19:36 -0500
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0BB56496B5
+        for <kvm@vger.kernel.org>; Fri, 11 Mar 2022 03:18:33 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C3CC1175D;
+        Fri, 11 Mar 2022 03:18:32 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C69F73FA45;
+        Fri, 11 Mar 2022 03:18:31 -0800 (PST)
+Date:   Fri, 11 Mar 2022 11:18:55 +0000
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Sebastian Ene <sebastianene@google.com>
+Cc:     kvm@vger.kernel.org, maz@kernel.org, will@kernel.org,
+        kvmarm@lists.cs.columbia.edu
+Subject: Re: [PATCH kvmtool v10 2/3] aarch64: Add stolen time support
+Message-ID: <YiswH2PGOB86gLNQ@monolith.localdoman>
+References: <20220309133422.2432649-1-sebastianene@google.com>
+ <20220309133422.2432649-3-sebastianene@google.com>
 MIME-Version: 1.0
-X-KSMG-Rule-ID: 4
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Status: not scanned, disabled by settings
-X-KSMG-AntiSpam-Interceptor-Info: not scanned
-X-KSMG-AntiPhishing: not scanned, disabled by settings
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2022/03/11 07:23:00 #18938550
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220309133422.2432649-3-sebastianene@google.com>
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-QWRkIHRlc3Qgd2hlcmUgc2VuZGVyIHNlbmRzIHR3byBtZXNzYWdlLCBlYWNoIHdpdGggb3duDQpk
-YXRhIHBhdHRlcm4uIFJlYWRlciB0cmllcyB0byByZWFkIGZpcnN0IHRvIGJyb2tlbiBidWZmZXI6
-DQppdCBoYXMgdGhyZWUgcGFnZXMgc2l6ZSwgYnV0IG1pZGRsZSBwYWdlIGlzIHVubWFwcGVkLiBU
-aGVuLA0KcmVhZGVyIHRyaWVzIHRvIHJlYWQgc2Vjb25kIG1lc3NhZ2UgdG8gdmFsaWQgYnVmZmVy
-LiBUZXN0DQpjaGVja3MsIHRoYXQgdW5jb3BpZWQgcGFydCBvZiBmaXJzdCBtZXNzYWdlIHdhcyBk
-cm9wcGVkDQphbmQgdGh1cyBub3QgY29waWVkIGFzIHBhcnQgb2Ygc2Vjb25kIG1lc3NhZ2UuDQoN
-ClNpZ25lZC1vZmYtYnk6IEFyc2VuaXkgS3Jhc25vdiA8QVZLcmFzbm92QHNiZXJkZXZpY2VzLnJ1
-Pg0KLS0tDQogdG9vbHMvdGVzdGluZy92c29jay92c29ja190ZXN0LmMgfCAxMjEgKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKw0KIDEgZmlsZSBjaGFuZ2VkLCAxMjEgaW5zZXJ0aW9ucygr
-KQ0KDQpkaWZmIC0tZ2l0IGEvdG9vbHMvdGVzdGluZy92c29jay92c29ja190ZXN0LmMgYi90b29s
-cy90ZXN0aW5nL3Zzb2NrL3Zzb2NrX3Rlc3QuYw0KaW5kZXggYWEyZGUyN2QwZjc3Li42ODZhZjcx
-MmI0YWQgMTAwNjQ0DQotLS0gYS90b29scy90ZXN0aW5nL3Zzb2NrL3Zzb2NrX3Rlc3QuYw0KKysr
-IGIvdG9vbHMvdGVzdGluZy92c29jay92c29ja190ZXN0LmMNCkBAIC0xNiw2ICsxNiw3IEBADQog
-I2luY2x1ZGUgPGxpbnV4L2tlcm5lbC5oPg0KICNpbmNsdWRlIDxzeXMvdHlwZXMuaD4NCiAjaW5j
-bHVkZSA8c3lzL3NvY2tldC5oPg0KKyNpbmNsdWRlIDxzeXMvbW1hbi5oPg0KIA0KICNpbmNsdWRl
-ICJ0aW1lb3V0LmgiDQogI2luY2x1ZGUgImNvbnRyb2wuaCINCkBAIC00MzUsNiArNDM2LDEyMSBA
-QCBzdGF0aWMgdm9pZCB0ZXN0X3NlcXBhY2tldF90aW1lb3V0X3NlcnZlcihjb25zdCBzdHJ1Y3Qg
-dGVzdF9vcHRzICpvcHRzKQ0KIAljbG9zZShmZCk7DQogfQ0KIA0KKyNkZWZpbmUgQlVGX1BBVFRF
-Uk5fMSAnYScNCisjZGVmaW5lIEJVRl9QQVRURVJOXzIgJ2InDQorDQorc3RhdGljIHZvaWQgdGVz
-dF9zZXFwYWNrZXRfaW52YWxpZF9yZWNfYnVmZmVyX2NsaWVudChjb25zdCBzdHJ1Y3QgdGVzdF9v
-cHRzICpvcHRzKQ0KK3sNCisJaW50IGZkOw0KKwl1bnNpZ25lZCBjaGFyICpidWYxOw0KKwl1bnNp
-Z25lZCBjaGFyICpidWYyOw0KKwlpbnQgYnVmX3NpemUgPSBnZXRwYWdlc2l6ZSgpICogMzsNCisN
-CisJZmQgPSB2c29ja19zZXFwYWNrZXRfY29ubmVjdChvcHRzLT5wZWVyX2NpZCwgMTIzNCk7DQor
-CWlmIChmZCA8IDApIHsNCisJCXBlcnJvcigiY29ubmVjdCIpOw0KKwkJZXhpdChFWElUX0ZBSUxV
-UkUpOw0KKwl9DQorDQorCWJ1ZjEgPSBtYWxsb2MoYnVmX3NpemUpOw0KKwlpZiAoYnVmMSA9PSBO
-VUxMKSB7DQorCQlwZXJyb3IoIidtYWxsb2MoKScgZm9yICdidWYxJyIpOw0KKwkJZXhpdChFWElU
-X0ZBSUxVUkUpOw0KKwl9DQorDQorCWJ1ZjIgPSBtYWxsb2MoYnVmX3NpemUpOw0KKwlpZiAoYnVm
-MiA9PSBOVUxMKSB7DQorCQlwZXJyb3IoIidtYWxsb2MoKScgZm9yICdidWYyJyIpOw0KKwkJZXhp
-dChFWElUX0ZBSUxVUkUpOw0KKwl9DQorDQorCW1lbXNldChidWYxLCBCVUZfUEFUVEVSTl8xLCBi
-dWZfc2l6ZSk7DQorCW1lbXNldChidWYyLCBCVUZfUEFUVEVSTl8yLCBidWZfc2l6ZSk7DQorDQor
-CWlmIChzZW5kKGZkLCBidWYxLCBidWZfc2l6ZSwgMCkgIT0gYnVmX3NpemUpIHsNCisJCXBlcnJv
-cigic2VuZCBmYWlsZWQiKTsNCisJCWV4aXQoRVhJVF9GQUlMVVJFKTsNCisJfQ0KKw0KKwlpZiAo
-c2VuZChmZCwgYnVmMiwgYnVmX3NpemUsIDApICE9IGJ1Zl9zaXplKSB7DQorCQlwZXJyb3IoInNl
-bmQgZmFpbGVkIik7DQorCQlleGl0KEVYSVRfRkFJTFVSRSk7DQorCX0NCisNCisJY2xvc2UoZmQp
-Ow0KK30NCisNCitzdGF0aWMgdm9pZCB0ZXN0X3NlcXBhY2tldF9pbnZhbGlkX3JlY19idWZmZXJf
-c2VydmVyKGNvbnN0IHN0cnVjdCB0ZXN0X29wdHMgKm9wdHMpDQorew0KKwlpbnQgZmQ7DQorCXVu
-c2lnbmVkIGNoYXIgKmJyb2tlbl9idWY7DQorCXVuc2lnbmVkIGNoYXIgKnZhbGlkX2J1ZjsNCisJ
-aW50IHBhZ2Vfc2l6ZSA9IGdldHBhZ2VzaXplKCk7DQorCWludCBidWZfc2l6ZSA9IHBhZ2Vfc2l6
-ZSAqIDM7DQorCXNzaXplX3QgcmVzOw0KKwlpbnQgcHJvdCA9IFBST1RfUkVBRCB8IFBST1RfV1JJ
-VEU7DQorCWludCBmbGFncyA9IE1BUF9QUklWQVRFIHwgTUFQX0FOT05ZTU9VUzsNCisJaW50IGk7
-DQorDQorCWZkID0gdnNvY2tfc2VxcGFja2V0X2FjY2VwdChWTUFERFJfQ0lEX0FOWSwgMTIzNCwg
-TlVMTCk7DQorCWlmIChmZCA8IDApIHsNCisJCXBlcnJvcigiYWNjZXB0Iik7DQorCQlleGl0KEVY
-SVRfRkFJTFVSRSk7DQorCX0NCisNCisJLyogU2V0dXAgZmlyc3QgYnVmZmVyLiAqLw0KKwlicm9r
-ZW5fYnVmID0gbW1hcChOVUxMLCBidWZfc2l6ZSwgcHJvdCwgZmxhZ3MsIC0xLCAwKTsNCisJaWYg
-KGJyb2tlbl9idWYgPT0gTUFQX0ZBSUxFRCkgew0KKwkJcGVycm9yKCJtbWFwIGZvciAnYnJva2Vu
-X2J1ZiciKTsNCisJCWV4aXQoRVhJVF9GQUlMVVJFKTsNCisJfQ0KKw0KKwkvKiBVbm1hcCAiaG9s
-ZSIgaW4gYnVmZmVyLiAqLw0KKwlpZiAobXVubWFwKGJyb2tlbl9idWYgKyBwYWdlX3NpemUsIHBh
-Z2Vfc2l6ZSkpIHsNCisJCXBlcnJvcigiJ2Jyb2tlbl9idWYnIHNldHVwIik7DQorCQlleGl0KEVY
-SVRfRkFJTFVSRSk7DQorCX0NCisNCisJdmFsaWRfYnVmID0gbW1hcChOVUxMLCBidWZfc2l6ZSwg
-cHJvdCwgZmxhZ3MsIC0xLCAwKTsNCisJaWYgKHZhbGlkX2J1ZiA9PSBNQVBfRkFJTEVEKSB7DQor
-CQlwZXJyb3IoIm1tYXAgZm9yICd2YWxpZF9idWYnIik7DQorCQlleGl0KEVYSVRfRkFJTFVSRSk7
-DQorCX0NCisNCisJLyogVHJ5IHRvIGZpbGwgYnVmZmVyIHdpdGggdW5tYXBwZWQgbWlkZGxlLiAq
-Lw0KKwlyZXMgPSByZWFkKGZkLCBicm9rZW5fYnVmLCBidWZfc2l6ZSk7DQorCWlmIChyZXMgIT0g
-LTEpIHsNCisJCXBlcnJvcigiaW52YWxpZCByZWFkIHJlc3VsdCBvZiAnYnJva2VuX2J1ZiciKTsN
-CisJCWV4aXQoRVhJVF9GQUlMVVJFKTsNCisJfQ0KKw0KKwlpZiAoZXJybm8gIT0gRU5PTUVNKSB7
-DQorCQlwZXJyb3IoImludmFsaWQgZXJybm8gb2YgJ2Jyb2tlbl9idWYnIik7DQorCQlleGl0KEVY
-SVRfRkFJTFVSRSk7DQorCX0NCisNCisJLyogVHJ5IHRvIGZpbGwgdmFsaWQgYnVmZmVyLiAqLw0K
-KwlyZXMgPSByZWFkKGZkLCB2YWxpZF9idWYsIGJ1Zl9zaXplKTsNCisJaWYgKHJlcyAhPSBidWZf
-c2l6ZSkgew0KKwkJcGVycm9yKCJpbnZhbGlkIHJlYWQgcmVzdWx0IG9mICd2YWxpZF9idWYnIik7
-DQorCQlleGl0KEVYSVRfRkFJTFVSRSk7DQorCX0NCisNCisJZm9yIChpID0gMDsgaSA8IGJ1Zl9z
-aXplOyBpKyspIHsNCisJCWlmICh2YWxpZF9idWZbaV0gIT0gQlVGX1BBVFRFUk5fMikgew0KKwkJ
-CXBlcnJvcigiaW52YWxpZCBwYXR0ZXJuIGZvciB2YWxpZCBidWYiKTsNCisJCQlleGl0KEVYSVRf
-RkFJTFVSRSk7DQorCQl9DQorCX0NCisNCisNCisJLyogVW5tYXAgYnVmZmVycy4gKi8NCisJbXVu
-bWFwKGJyb2tlbl9idWYsIHBhZ2Vfc2l6ZSk7DQorCW11bm1hcChicm9rZW5fYnVmICsgcGFnZV9z
-aXplICogMiwgcGFnZV9zaXplKTsNCisJbXVubWFwKHZhbGlkX2J1ZiwgYnVmX3NpemUpOw0KKwlj
-bG9zZShmZCk7DQorfQ0KKw0KIHN0YXRpYyBzdHJ1Y3QgdGVzdF9jYXNlIHRlc3RfY2FzZXNbXSA9
-IHsNCiAJew0KIAkJLm5hbWUgPSAiU09DS19TVFJFQU0gY29ubmVjdGlvbiByZXNldCIsDQpAQCAt
-NDgwLDYgKzU5NiwxMSBAQCBzdGF0aWMgc3RydWN0IHRlc3RfY2FzZSB0ZXN0X2Nhc2VzW10gPSB7
-DQogCQkucnVuX2NsaWVudCA9IHRlc3Rfc2VxcGFja2V0X3RpbWVvdXRfY2xpZW50LA0KIAkJLnJ1
-bl9zZXJ2ZXIgPSB0ZXN0X3NlcXBhY2tldF90aW1lb3V0X3NlcnZlciwNCiAJfSwNCisJew0KKwkJ
-Lm5hbWUgPSAiU09DS19TRVFQQUNLRVQgaW52YWxpZCByZWNlaXZlIGJ1ZmZlciIsDQorCQkucnVu
-X2NsaWVudCA9IHRlc3Rfc2VxcGFja2V0X2ludmFsaWRfcmVjX2J1ZmZlcl9jbGllbnQsDQorCQku
-cnVuX3NlcnZlciA9IHRlc3Rfc2VxcGFja2V0X2ludmFsaWRfcmVjX2J1ZmZlcl9zZXJ2ZXIsDQor
-CX0sDQogCXt9LA0KIH07DQogDQotLSANCjIuMjUuMQ0K
+Hi,
+
+On Wed, Mar 09, 2022 at 01:34:23PM +0000, Sebastian Ene wrote:
+> This patch adds support for stolen time by sharing a memory region
+> with the guest which will be used by the hypervisor to store the stolen
+> time information. Reserve a 64kb MMIO memory region after the RTC peripheral
+> to be used by pvtime. The exact format of the structure stored by the
+> hypervisor is described in the ARM DEN0057A document.
+> 
+> Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> ---
+>  Makefile                               |  1 +
+>  arm/aarch32/include/kvm/kvm-cpu-arch.h |  5 ++
+>  arm/aarch64/arm-cpu.c                  |  2 +-
+>  arm/aarch64/include/kvm/kvm-cpu-arch.h |  2 +
+>  arm/aarch64/pvtime.c                   | 96 ++++++++++++++++++++++++++
+>  arm/include/arm-common/kvm-arch.h      |  6 +-
+>  arm/kvm-cpu.c                          |  1 +
+>  include/kvm/kvm-config.h               |  1 +
+>  8 files changed, 112 insertions(+), 2 deletions(-)
+>  create mode 100644 arm/aarch64/pvtime.c
+> 
+> diff --git a/Makefile b/Makefile
+> index f251147..e9121dc 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -182,6 +182,7 @@ ifeq ($(ARCH), arm64)
+>  	OBJS		+= arm/aarch64/arm-cpu.o
+>  	OBJS		+= arm/aarch64/kvm-cpu.o
+>  	OBJS		+= arm/aarch64/kvm.o
+> +	OBJS		+= arm/aarch64/pvtime.o
+>  	ARCH_INCLUDE	:= $(HDRS_ARM_COMMON)
+>  	ARCH_INCLUDE	+= -Iarm/aarch64/include
+>  
+> diff --git a/arm/aarch32/include/kvm/kvm-cpu-arch.h b/arm/aarch32/include/kvm/kvm-cpu-arch.h
+> index 780e0e2..6fe0206 100644
+> --- a/arm/aarch32/include/kvm/kvm-cpu-arch.h
+> +++ b/arm/aarch32/include/kvm/kvm-cpu-arch.h
+> @@ -20,4 +20,9 @@ static inline int kvm_cpu__configure_features(struct kvm_cpu *vcpu)
+>  	return 0;
+>  }
+>  
+> +static inline int kvm_cpu__teardown_pvtime(struct kvm *kvm)
+> +{
+> +	return 0;
+> +}
+> +
+>  #endif /* KVM__KVM_CPU_ARCH_H */
+> diff --git a/arm/aarch64/arm-cpu.c b/arm/aarch64/arm-cpu.c
+> index d7572b7..7e4a3c1 100644
+> --- a/arm/aarch64/arm-cpu.c
+> +++ b/arm/aarch64/arm-cpu.c
+> @@ -22,7 +22,7 @@ static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
+>  static int arm_cpu__vcpu_init(struct kvm_cpu *vcpu)
+>  {
+>  	vcpu->generate_fdt_nodes = generate_fdt_nodes;
+> -	return 0;
+> +	return kvm_cpu__setup_pvtime(vcpu);
+>  }
+>  
+>  static struct kvm_arm_target target_generic_v8 = {
+> diff --git a/arm/aarch64/include/kvm/kvm-cpu-arch.h b/arm/aarch64/include/kvm/kvm-cpu-arch.h
+> index 8dfb82e..35996dc 100644
+> --- a/arm/aarch64/include/kvm/kvm-cpu-arch.h
+> +++ b/arm/aarch64/include/kvm/kvm-cpu-arch.h
+> @@ -19,5 +19,7 @@
+>  
+>  void kvm_cpu__select_features(struct kvm *kvm, struct kvm_vcpu_init *init);
+>  int kvm_cpu__configure_features(struct kvm_cpu *vcpu);
+> +int kvm_cpu__setup_pvtime(struct kvm_cpu *vcpu);
+> +int kvm_cpu__teardown_pvtime(struct kvm *kvm);
+>  
+>  #endif /* KVM__KVM_CPU_ARCH_H */
+> diff --git a/arm/aarch64/pvtime.c b/arm/aarch64/pvtime.c
+> new file mode 100644
+> index 0000000..720e9de
+> --- /dev/null
+> +++ b/arm/aarch64/pvtime.c
+> @@ -0,0 +1,96 @@
+> +#include "kvm/kvm.h"
+> +#include "kvm/kvm-cpu.h"
+> +#include "kvm/util.h"
+> +
+> +#include <linux/byteorder.h>
+> +#include <linux/types.h>
+> +
+> +#define ARM_PVTIME_STRUCT_SIZE		(64)
+> +
+> +static void *usr_mem;
+> +
+> +static int pvtime__alloc_region(struct kvm *kvm)
+> +{
+> +	char *mem;
+> +	int ret = 0;
+> +
+> +	mem = mmap(NULL, ARM_PVTIME_BASE, PROT_RW,
+> +		   MAP_ANON_NORESERVE, -1, 0);
+> +	if (mem == MAP_FAILED)
+> +		return -errno;
+> +
+> +	ret = kvm__register_ram(kvm, ARM_PVTIME_BASE,
+> +				ARM_PVTIME_BASE, mem);
+> +	if (ret) {
+> +		munmap(mem, ARM_PVTIME_BASE);
+> +		return ret;
+> +	}
+> +
+> +	usr_mem = mem;
+> +	return ret;
+> +}
+> +
+> +static int pvtime__teardown_region(struct kvm *kvm)
+> +{
+> +	if (usr_mem == NULL)
+> +		return 0;
+> +
+> +	kvm__destroy_mem(kvm, ARM_PVTIME_BASE,
+> +			 ARM_PVTIME_BASE, usr_mem);
+> +	munmap(usr_mem, ARM_PVTIME_BASE);
+> +	usr_mem = NULL;
+> +	return 0;
+> +}
+> +
+> +int kvm_cpu__setup_pvtime(struct kvm_cpu *vcpu)
+> +{
+> +	int ret;
+> +	bool has_stolen_time;
+> +	u64 pvtime_guest_addr = ARM_PVTIME_BASE + vcpu->cpu_id *
+> +		ARM_PVTIME_STRUCT_SIZE;
+> +	struct kvm_config *kvm_cfg = NULL;
+> +	struct kvm_device_attr pvtime_attr = (struct kvm_device_attr) {
+> +		.group	= KVM_ARM_VCPU_PVTIME_CTRL,
+> +		.attr	= KVM_ARM_VCPU_PVTIME_IPA
+> +	};
+> +
+> +	kvm_cfg = &vcpu->kvm->cfg;
+> +	if (kvm_cfg->no_pvtime)
+> +		return 0;
+> +
+> +	has_stolen_time = kvm__supports_extension(vcpu->kvm,
+> +						  KVM_CAP_STEAL_TIME);
+> +	if (!has_stolen_time) {
+> +		kvm_cfg->no_pvtime = true;
+> +		return 0;
+> +	}
+> +
+> +	ret = ioctl(vcpu->vcpu_fd, KVM_HAS_DEVICE_ATTR, &pvtime_attr);
+> +	if (ret) {
+> +		perror("KVM_HAS_DEVICE_ATTR failed\n");
+> +		goto out_err;
+
+Nitpick: here we return -1 (ioctl() return value when it fails) instead of
+returning -errno. You can set ret = -errno before the perror() call (in
+case it also fails for some reason, thus changing the value of errno).
+
+Not a big deal, but it changes the semantics of the return value for the
+function: below, for pvtime__alloc_region() we return -errno, but here we
+return -1. Someone who is debugging an error might print this return value
+and think that the ioctl() failed with error code EPERM (EPERM is 1), which
+is not a valid error code for ioctl() according to man 2 ioctl. It will
+also look rather strange for the perror to print the error message
+associated with a different error code than the error code that is returned
+from this function.
+
+> +	}
+> +
+> +	if (!usr_mem) {
+> +		ret = pvtime__alloc_region(vcpu->kvm);
+> +		if (ret) {
+> +			perror("Failed allocating pvtime region\n");
+> +			goto out_err;
+> +		}
+> +	}
+> +
+> +	pvtime_attr.addr = (u64)&pvtime_guest_addr;
+> +	ret = ioctl(vcpu->vcpu_fd, KVM_SET_DEVICE_ATTR, &pvtime_attr);
+> +	if (!ret)
+> +		return 0;
+
+Nitpick: same here, ret must be set to -errno before returning.
+
+> +
+> +	perror("KVM_SET_DEVICE_ATTR failed\n");
+> +	pvtime__teardown_region(vcpu->kvm);
+> +out_err:
+> +	return ret;
+> +}
+> +
+> +int kvm_cpu__teardown_pvtime(struct kvm *kvm)
+> +{
+> +	return pvtime__teardown_region(kvm);
+> +}
+> diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
+> index c645ac0..43b1f77 100644
+> --- a/arm/include/arm-common/kvm-arch.h
+> +++ b/arm/include/arm-common/kvm-arch.h
+> @@ -15,7 +15,8 @@
+>   * |  PCI  |////| plat  |       |        |     |         |
+>   * |  I/O  |////| MMIO: | Flash | virtio | GIC |   PCI   |  DRAM
+>   * | space |////| UART, |       |  MMIO  |     |  (AXI)  |
+> - * |       |////| RTC   |       |        |     |         |
+> + * |       |////| RTC,  |       |        |     |         |
+> + * |       |////| PVTIME|       |        |     |         |
+>   * +-------+----+-------+-------+--------+-----+---------+---......
+>   */
+>  
+> @@ -34,6 +35,9 @@
+>  #define ARM_RTC_MMIO_BASE	(ARM_UART_MMIO_BASE + ARM_UART_MMIO_SIZE)
+>  #define ARM_RTC_MMIO_SIZE	0x10000
+>  
+> +#define ARM_PVTIME_BASE		(ARM_RTC_MMIO_BASE + ARM_RTC_MMIO_SIZE)
+> +#define ARM_PVTIME_SIZE		SZ_64K
+> +
+>  #define KVM_FLASH_MMIO_BASE	(ARM_MMIO_AREA + 0x1000000)
+>  #define KVM_FLASH_MAX_SIZE	0x1000000
+>  
+> diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
+> index 84ac1e9..00660d6 100644
+> --- a/arm/kvm-cpu.c
+> +++ b/arm/kvm-cpu.c
+> @@ -144,6 +144,7 @@ void kvm_cpu__arch_nmi(struct kvm_cpu *cpu)
+>  
+>  void kvm_cpu__delete(struct kvm_cpu *vcpu)
+>  {
+> +	kvm_cpu__teardown_pvtime(vcpu->kvm);
+>  	free(vcpu);
+>  }
+>  
+> diff --git a/include/kvm/kvm-config.h b/include/kvm/kvm-config.h
+> index 6a5720c..48adf27 100644
+> --- a/include/kvm/kvm-config.h
+> +++ b/include/kvm/kvm-config.h
+> @@ -62,6 +62,7 @@ struct kvm_config {
+>  	bool no_dhcp;
+>  	bool ioport_debug;
+>  	bool mmio_debug;
+> +	bool no_pvtime;
+>  };
+>  
+>  #endif
+> -- 
+
+Tested the series, a guest is able to detect pvtime:
+
+[    0.008661] arm-pv: using stolen time PV
+
+Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
+
+With the two nitpicks above fixed, the patch looks correct to me:
+
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+
+Thanks,
+Alex
