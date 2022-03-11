@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D584C4D5A11
-	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 05:49:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A2794D5A09
+	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 05:49:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346391AbiCKEuM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Mar 2022 23:50:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45246 "EHLO
+        id S1346455AbiCKEuN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Mar 2022 23:50:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45258 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346493AbiCKEuB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1346494AbiCKEuB (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 10 Mar 2022 23:50:01 -0500
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 021A2EF0A9
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 20:48:52 -0800 (PST)
-Received: by mail-pl1-x64a.google.com with SMTP id z10-20020a170902708a00b0014fc3888923so3908751plk.22
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 20:48:51 -0800 (PST)
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55CE01AAFD0
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 20:48:53 -0800 (PST)
+Received: by mail-pf1-x44a.google.com with SMTP id x123-20020a626381000000b004f6fc50208eso4535309pfb.11
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 20:48:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=a5NZVbIGTYSicQYzOe725Txq1lABLpfJECv3sjtkGuU=;
-        b=rZWabE3/DjqFkZZ9yem9BCkI5hKWm8VfpXefmCQaPcTs14QvUZ0vcayO45kMleKK29
-         GMp09uKACG3tWlNHVh3GPHV2J0SwJPZCeNrIONstfq05qxdkbiLxCVXxS/XrIwKo4WnA
-         AeHEt3sWNHx3yld+TIk/OJY6tevxKHjWwYOQ7AjpX2hbpmhAnpy7wBO2QmW1uQa7QIbs
-         OpK+PLPBOAIEvTVYxTTjye4f7GxhrytGEIbBeTpAEaoW3VyZBxElnQ0cYInZQYvlCN2O
-         tY3S0V0dkRY4PvNVsk3du41C01mZyzMVDQ4fwQChOKSbCTqvCx4/AWIpb0mUwmpAtiKc
-         HsMg==
+        bh=DltmKg7opwhIQvsCwmEx6qs3h14xPlDqswCiLBq3BvI=;
+        b=N39NQTTkdbZnRTzSRZEqZFrgTaFi2lK42y1/qZ1pn8Pbr5yj0p9nYTSuhihb/Lu7sN
+         dcVYmv/4AvKdLQy0RzMJr/m5lgP/QBuf9FWhQU5tcKmJLEpCItk3qaBIYUuyaqVenVRb
+         QPqY7gVLWPRDfezgK4RqFc7luPzOknbDAl0I0mtaKwd/XlEWy/XLC2GGb8aWgsnsZ/ld
+         DT+bSp2hAUW+34+S4eKwqMNUNcpyxVHKM97cmvbV3wBjdQJNAzCQTistKsISe5uLVoZz
+         8//fO4tniGmbUOmnQGpOVgylJluO75sgWNrifgjIbTlzAefKYxlH7Fi09jTmhfkjfLl6
+         r6rQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=a5NZVbIGTYSicQYzOe725Txq1lABLpfJECv3sjtkGuU=;
-        b=2IMvFQUZ6eIiz0s3udOyb3GD8vjmHNzecxMGY5XhWJ7pxQ38x2NsjkbK2BNpYqCU8x
-         8M6MMxoSbPaba9vTzLF0UIbA16TAFEiBvSoc1PhIB02mqzUzh+mCvipnikd+JcDzjQ/q
-         xhF7UIgQpgYJyFBEc98LsEVQdFW4+FDzygfsqVTy2yKxpyw7PrNcg4AylVi2a+cWrJ+g
-         F/vyXz6lEO+bg59Xv8f46Z9BBClBCc5G/udqT+nlFHUfLLwLF3dM8D/0jObhWYX1xh5U
-         halLLymuYzjOXaR40MUq6i8jN2yOp2skJPxq/0QGgsqskuWq2gg+9Srif3pFUKrTW/Pr
-         lTwg==
-X-Gm-Message-State: AOAM533is1SAvmaa8hmDxZO1DC9/oid+o4f6s+bnHbOmYGxg1+2T7RQv
-        XQzFUxd4wETJxTruLGw/PKUgfOkhIo8=
-X-Google-Smtp-Source: ABdhPJzvkmL3IM37HsTGDKBcNfNxa8ZQ40eJ1UsQa3PnTHm4qaAZLEQpv/Muf4haE6tVZuP1eE4Yz/InSqM=
+        bh=DltmKg7opwhIQvsCwmEx6qs3h14xPlDqswCiLBq3BvI=;
+        b=cqYTKk0VbPkNUVZ9R77kb1xo/6WHSknsB8xLEQsSaN2YDxfZkoxu63DK8wiSkL1Aad
+         WtmtvqxRtRdoJQwgvxop1luIDsbgUd5ZCLDFds0UDX08ibZf6O/Q4QSUylYZmBnbna+I
+         l/taNTTTk7XWtQ+np0JvNrADHOItLV9h1twu4Ri2qT1qgLcqs5HbD3S3r6NAWpsXKdwY
+         efQrAm2FAqGg8YKBBTNj4vXx5msRrAqmbnCnL5bTQQLk8z53TPuKSQMa5aW8BreKBjZ6
+         dXtXFqAl/IiNh8Wwdo0PpxmlDBeyVbdhj76oE2zwyiT7pKl9LmwtYNuoWWdstmy0Nqig
+         yzOg==
+X-Gm-Message-State: AOAM530gZNU1zCmPrzgZ+7+Cwlj0B08qqoj461VDJvouM/d+8SrZnfZd
+        Z26WhCBTjGFI7/YZkxilZOc0pZzmjFI=
+X-Google-Smtp-Source: ABdhPJwFRwT5Fgamh4l+5MQdfg7BYHp05vvdFwuVRvSeFNzp6LJbqoSWM+rN32ZUxVO+QSRSMIPfjJ4nruM=
 X-Received: from reiji-vws-sp.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3d59])
- (user=reijiw job=sendgmr) by 2002:a17:90b:4d81:b0:1bf:8ce4:4f51 with SMTP id
- oj1-20020a17090b4d8100b001bf8ce44f51mr435697pjb.0.1646974131159; Thu, 10 Mar
- 2022 20:48:51 -0800 (PST)
-Date:   Thu, 10 Mar 2022 20:47:58 -0800
+ (user=reijiw job=sendgmr) by 2002:a05:6a00:10cf:b0:4f6:5834:aefb with SMTP id
+ d15-20020a056a0010cf00b004f65834aefbmr8229183pfu.77.1646974132762; Thu, 10
+ Mar 2022 20:48:52 -0800 (PST)
+Date:   Thu, 10 Mar 2022 20:47:59 -0800
 In-Reply-To: <20220311044811.1980336-1-reijiw@google.com>
-Message-Id: <20220311044811.1980336-13-reijiw@google.com>
+Message-Id: <20220311044811.1980336-14-reijiw@google.com>
 Mime-Version: 1.0
 References: <20220311044811.1980336-1-reijiw@google.com>
 X-Mailer: git-send-email 2.35.1.723.g4982287a31-goog
-Subject: [PATCH v6 12/25] KVM: arm64: Use id_reg_desc_table for ID registers
+Subject: [PATCH v6 13/25] KVM: arm64: Add consistency checking for frac fields
+ of ID registers
 From:   Reiji Watanabe <reijiw@google.com>
 To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu
 Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
@@ -80,321 +81,182 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use id_reg_desc_table for ID registers instead of sys_reg_descs as
-id_reg_desc_table has all ID register entries that sys_reg_descs
-has, and remove the ID register entries from sys_reg_descs, which
-are no longer used.
+Feature fractional field of an ID register cannot be simply validated
+at KVM_SET_ONE_REG because its validity depends on its (main) feature
+field value, which could be in a different ID register (and might be
+set later).
+Validate fractional fields at the first KVM_RUN instead.
 
 Signed-off-by: Reiji Watanabe <reijiw@google.com>
 ---
- arch/arm64/kvm/sys_regs.c | 201 +++++++++++++++++---------------------
- 1 file changed, 92 insertions(+), 109 deletions(-)
+ arch/arm64/include/asm/kvm_host.h |   1 +
+ arch/arm64/kvm/arm.c              |   3 +
+ arch/arm64/kvm/sys_regs.c         | 112 ++++++++++++++++++++++++++++++
+ 3 files changed, 116 insertions(+)
 
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 9ffe6604a58a..5e53102a1ac1 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -748,6 +748,7 @@ long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+ 
+ void set_default_id_regs(struct kvm *kvm);
+ int kvm_set_id_reg_feature(struct kvm *kvm, u32 id, u8 field_shift, u8 fval);
++int kvm_id_regs_check_frac_fields(const struct kvm_vcpu *vcpu);
+ 
+ /* Guest/host FPSIMD coordination helpers */
+ int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 91110d996ed6..e7dcc7704302 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -599,6 +599,9 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
+ 	if (likely(vcpu_has_run_once(vcpu)))
+ 		return 0;
+ 
++	if (!kvm_vm_is_protected(kvm) && kvm_id_regs_check_frac_fields(vcpu))
++		return -EPERM;
++
+ 	kvm_arm_vcpu_init_debug(vcpu);
+ 
+ 	if (likely(irqchip_in_kernel(kvm))) {
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index fe2a4de2b8f3..ba851de6486d 100644
+index ba851de6486d..3805b69ed23e 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -337,6 +337,11 @@ struct id_reg_desc {
- 			 const struct id_reg_desc *id_reg);
- };
+@@ -3397,6 +3397,102 @@ void kvm_sys_reg_table_init(void)
+ 	id_reg_desc_init_all();
+ }
  
-+static inline struct id_reg_desc *sys_to_id_desc(const struct sys_reg_desc *r)
++/* ID register's fractional field information with its feature field. */
++struct feature_frac {
++	u32	id;
++	u32	shift;
++	u32	frac_id;
++	u32	frac_shift;
++};
++
++static struct feature_frac feature_frac_table[] = {
++	{
++		.frac_id = SYS_ID_AA64PFR1_EL1,
++		.frac_shift = ID_AA64PFR1_RASFRAC_SHIFT,
++		.id = SYS_ID_AA64PFR0_EL1,
++		.shift = ID_AA64PFR0_RAS_SHIFT,
++	},
++	{
++		.frac_id = SYS_ID_AA64PFR1_EL1,
++		.frac_shift = ID_AA64PFR1_MPAMFRAC_SHIFT,
++		.id = SYS_ID_AA64PFR0_EL1,
++		.shift = ID_AA64PFR0_MPAM_SHIFT,
++	},
++	{
++		.frac_id = SYS_ID_AA64PFR1_EL1,
++		.frac_shift = ID_AA64PFR1_CSV2FRAC_SHIFT,
++		.id = SYS_ID_AA64PFR0_EL1,
++		.shift = ID_AA64PFR0_CSV2_SHIFT,
++	},
++};
++
++/*
++ * Return non-zero if the feature/fractional fields pair are not
++ * supported. Return zero otherwise.
++ * This function validates only the fractional feature field,
++ * and relies on the fact the feature field is validated before
++ * through arm64_check_features_kvm.
++ */
++static int vcpu_id_reg_feature_frac_check(const struct kvm_vcpu *vcpu,
++					  const struct feature_frac *ftr_frac)
 +{
-+	return container_of(r, struct id_reg_desc, reg_desc);
++	const struct id_reg_desc *id_reg;
++	u32 id;
++	u64 val, lim, mask;
++
++	/* Check if the feature field value is same as the limit */
++	id = ftr_frac->id;
++	id_reg = get_id_reg_desc(id);
++
++	mask = (u64)ARM64_FEATURE_FIELD_MASK << ftr_frac->shift;
++	val = __read_id_reg(vcpu, id_reg) & mask;
++	lim = id_reg ? id_reg->vcpu_limit_val : read_sanitised_ftr_reg(id);
++	lim &= mask;
++
++	if (val != lim)
++		/*
++		 * The feature level is lower than the limit.
++		 * Any fractional version should be fine.
++		 */
++		return 0;
++
++	/* Check the fractional feature field */
++	id = ftr_frac->frac_id;
++	id_reg = get_id_reg_desc(id);
++
++	mask = (u64)ARM64_FEATURE_FIELD_MASK << ftr_frac->frac_shift;
++	val = __read_id_reg(vcpu, id_reg) & mask;
++	lim = id_reg ? id_reg->vcpu_limit_val : read_sanitised_ftr_reg(id);
++	lim &= mask;
++
++	if (val == lim)
++		/*
++		 * Both the feature and fractional fields are the same
++		 * as limit.
++		 */
++		return 0;
++
++	return arm64_check_features_kvm(id, val, lim);
 +}
 +
- static void id_reg_desc_init(struct id_reg_desc *id_reg)
- {
- 	u32 id = reg_to_encoding(&id_reg->reg_desc);
-@@ -1696,23 +1701,15 @@ static u64 __read_id_reg(const struct kvm_vcpu *vcpu,
- 	return val;
- }
- 
--static u64 read_id_reg_with_encoding(const struct kvm_vcpu *vcpu, u32 id)
-+static u64 read_id_reg_with_encoding(const struct kvm_vcpu *vcpu, u32 encoding)
- {
--	u64 val;
--	const struct id_reg_desc *id_reg = get_id_reg_desc(id);
--
--	if (id_reg)
--		val = __read_id_reg(vcpu, id_reg);
--	else
--		val = read_kvm_id_reg(vcpu->kvm, id);
--
--	return val;
-+	return __read_id_reg(vcpu, get_id_reg_desc(encoding));
- }
- 
- static u64 read_id_reg(const struct kvm_vcpu *vcpu,
- 		       struct sys_reg_desc const *r, bool raz)
- {
--	return raz ? 0 : read_id_reg_with_encoding(vcpu, reg_to_encoding(r));
-+	return raz ? 0 : __read_id_reg(vcpu, sys_to_id_desc(r));
- }
- 
- static unsigned int id_visibility(const struct kvm_vcpu *vcpu,
-@@ -1826,13 +1823,7 @@ static int __set_id_reg(struct kvm_vcpu *vcpu,
- 	if (raz)
- 		return -EINVAL;
- 
--	/*
--	 * Don't allow to modify the register's value if the register doesn't
--	 * have the id_reg_desc.
--	 */
--	id_reg = get_id_reg_desc(encoding);
--	if (!id_reg)
--		return -EINVAL;
-+	id_reg = sys_to_id_desc(rd);
- 
- 	/*
- 	 * Skip the validation of AArch32 ID registers if the system doesn't
-@@ -2055,83 +2046,6 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 
- 	{ SYS_DESC(SYS_MPIDR_EL1), NULL, reset_mpidr, MPIDR_EL1 },
- 
--	/*
--	 * ID regs: all ID_SANITISED() entries here must have corresponding
--	 * entries in arm64_ftr_regs[].
--	 */
--
--	/* AArch64 mappings of the AArch32 ID registers */
--	/* CRm=1 */
--	ID_SANITISED(ID_PFR0_EL1),
--	ID_SANITISED(ID_PFR1_EL1),
--	ID_SANITISED(ID_DFR0_EL1),
--	ID_HIDDEN(ID_AFR0_EL1),
--	ID_SANITISED(ID_MMFR0_EL1),
--	ID_SANITISED(ID_MMFR1_EL1),
--	ID_SANITISED(ID_MMFR2_EL1),
--	ID_SANITISED(ID_MMFR3_EL1),
--
--	/* CRm=2 */
--	ID_SANITISED(ID_ISAR0_EL1),
--	ID_SANITISED(ID_ISAR1_EL1),
--	ID_SANITISED(ID_ISAR2_EL1),
--	ID_SANITISED(ID_ISAR3_EL1),
--	ID_SANITISED(ID_ISAR4_EL1),
--	ID_SANITISED(ID_ISAR5_EL1),
--	ID_SANITISED(ID_MMFR4_EL1),
--	ID_SANITISED(ID_ISAR6_EL1),
--
--	/* CRm=3 */
--	ID_SANITISED(MVFR0_EL1),
--	ID_SANITISED(MVFR1_EL1),
--	ID_SANITISED(MVFR2_EL1),
--	ID_UNALLOCATED(3,3),
--	ID_SANITISED(ID_PFR2_EL1),
--	ID_HIDDEN(ID_DFR1_EL1),
--	ID_SANITISED(ID_MMFR5_EL1),
--	ID_UNALLOCATED(3,7),
--
--	/* AArch64 ID registers */
--	/* CRm=4 */
--	ID_SANITISED(ID_AA64PFR0_EL1),
--	ID_SANITISED(ID_AA64PFR1_EL1),
--	ID_UNALLOCATED(4,2),
--	ID_UNALLOCATED(4,3),
--	ID_SANITISED(ID_AA64ZFR0_EL1),
--	ID_UNALLOCATED(4,5),
--	ID_UNALLOCATED(4,6),
--	ID_UNALLOCATED(4,7),
--
--	/* CRm=5 */
--	ID_SANITISED(ID_AA64DFR0_EL1),
--	ID_SANITISED(ID_AA64DFR1_EL1),
--	ID_UNALLOCATED(5,2),
--	ID_UNALLOCATED(5,3),
--	ID_HIDDEN(ID_AA64AFR0_EL1),
--	ID_HIDDEN(ID_AA64AFR1_EL1),
--	ID_UNALLOCATED(5,6),
--	ID_UNALLOCATED(5,7),
--
--	/* CRm=6 */
--	ID_SANITISED(ID_AA64ISAR0_EL1),
--	ID_SANITISED(ID_AA64ISAR1_EL1),
--	ID_SANITISED(ID_AA64ISAR2_EL1),
--	ID_UNALLOCATED(6,3),
--	ID_UNALLOCATED(6,4),
--	ID_UNALLOCATED(6,5),
--	ID_UNALLOCATED(6,6),
--	ID_UNALLOCATED(6,7),
--
--	/* CRm=7 */
--	ID_SANITISED(ID_AA64MMFR0_EL1),
--	ID_SANITISED(ID_AA64MMFR1_EL1),
--	ID_SANITISED(ID_AA64MMFR2_EL1),
--	ID_UNALLOCATED(7,3),
--	ID_UNALLOCATED(7,4),
--	ID_UNALLOCATED(7,5),
--	ID_UNALLOCATED(7,6),
--	ID_UNALLOCATED(7,7),
--
- 	{ SYS_DESC(SYS_SCTLR_EL1), access_vm_reg, reset_val, SCTLR_EL1, 0x00C50078 },
- 	{ SYS_DESC(SYS_ACTLR_EL1), access_actlr, reset_actlr, ACTLR_EL1 },
- 	{ SYS_DESC(SYS_CPACR_EL1), NULL, reset_val, CPACR_EL1, 0 },
-@@ -2946,12 +2860,38 @@ static bool is_imp_def_sys_reg(struct sys_reg_params *params)
- 	return params->Op0 == 3 && (params->CRn & 0b1011) == 0b1011;
- }
- 
-+static inline const struct sys_reg_desc *
-+find_id_reg(const struct sys_reg_params *params)
++int kvm_id_regs_check_frac_fields(const struct kvm_vcpu *vcpu)
 +{
-+	u32 id = reg_to_encoding(params);
-+	struct id_reg_desc *idr;
++	int i, err;
++	const struct feature_frac *frac;
 +
-+	if (!is_id_reg(id))
-+		return NULL;
-+
-+	idr = get_id_reg_desc(id);
-+
-+	return idr ? &idr->reg_desc : NULL;
-+}
-+
-+static const struct sys_reg_desc *
-+find_sys_reg(const struct sys_reg_params *params)
-+{
-+	const struct sys_reg_desc *r = NULL;
-+
-+	r = find_id_reg(params);
-+	if (!r)
-+		r = find_reg(params, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
-+
-+	return r;
-+}
-+
- static int emulate_sys_reg(struct kvm_vcpu *vcpu,
- 			   struct sys_reg_params *params)
- {
- 	const struct sys_reg_desc *r;
- 
--	r = find_reg(params, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
-+	r = find_sys_reg(params);
- 
- 	if (likely(r)) {
- 		perform_access(vcpu, params, r);
-@@ -2966,6 +2906,8 @@ static int emulate_sys_reg(struct kvm_vcpu *vcpu,
- 	return 1;
- }
- 
-+static void kvm_reset_id_regs(struct kvm_vcpu *vcpu);
-+
- /**
-  * kvm_reset_sys_regs - sets system registers to reset value
-  * @vcpu: The VCPU pointer
-@@ -2980,6 +2922,8 @@ void kvm_reset_sys_regs(struct kvm_vcpu *vcpu)
- 	for (i = 0; i < ARRAY_SIZE(sys_reg_descs); i++)
- 		if (sys_reg_descs[i].reset)
- 			sys_reg_descs[i].reset(vcpu, &sys_reg_descs[i]);
-+
-+	kvm_reset_id_regs(vcpu);
- }
- 
- /**
-@@ -3063,7 +3007,7 @@ static const struct sys_reg_desc *index_to_sys_reg_desc(struct kvm_vcpu *vcpu,
- 	if (!index_to_params(id, &params))
- 		return NULL;
- 
--	r = find_reg(&params, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
-+	r = find_sys_reg(&params);
- 
- 	/* Not saved in the sys_reg array and not otherwise accessible? */
- 	if (r && !(r->reg || r->get_user))
-@@ -3360,6 +3304,8 @@ static int walk_one_sys_reg(const struct kvm_vcpu *vcpu,
- 	return 0;
- }
- 
-+static int walk_id_regs(struct kvm_vcpu *vcpu, u64 __user *uind);
-+
- /* Assumed ordered tables, see kvm_sys_reg_table_init. */
- static int walk_sys_regs(struct kvm_vcpu *vcpu, u64 __user *uind)
- {
-@@ -3375,6 +3321,12 @@ static int walk_sys_regs(struct kvm_vcpu *vcpu, u64 __user *uind)
- 		if (err)
- 			return err;
- 	}
-+
-+	err = walk_id_regs(vcpu, uind);
-+	if (err < 0)
-+		return err;
-+
-+	total += err;
- 	return total;
- }
- 
-@@ -3625,6 +3577,25 @@ static inline struct id_reg_desc *get_id_reg_desc(u32 id)
- 	return id_reg_desc_table[IDREG_IDX(id)];
- }
- 
-+static int walk_id_regs(struct kvm_vcpu *vcpu, u64 __user *uind)
-+{
-+	const struct sys_reg_desc *sys_reg;
-+	int err, i;
-+	unsigned int total = 0;
-+
-+	for (i = 0; i < ARRAY_SIZE(id_reg_desc_table); i++) {
-+		if (!id_reg_desc_table[i])
-+			continue;
-+
-+		sys_reg = &id_reg_desc_table[i]->reg_desc;
-+		err = walk_one_sys_reg(vcpu, sys_reg, &uind, &total);
++	/*
++	 * Check ID registers' fractional fields, which aren't checked
++	 * at KVM_SET_ONE_REG.
++	 */
++	for (i = 0; i < ARRAY_SIZE(feature_frac_table); i++) {
++		frac = &feature_frac_table[i];
++		err = vcpu_id_reg_feature_frac_check(vcpu, frac);
 +		if (err)
 +			return err;
 +	}
-+
-+	return total;
++	return 0;
 +}
 +
- static void id_reg_desc_init_all(void)
+ /*
+  * Update the ID register's field with @fval for the guest.
+  * The caller is expected to hold the kvm->lock.
+@@ -3600,6 +3696,8 @@ static void id_reg_desc_init_all(void)
  {
  	int i;
-@@ -3647,23 +3618,35 @@ void set_default_id_regs(struct kvm *kvm)
- {
- 	int i;
- 	u32 id;
--	const struct sys_reg_desc *rd;
--	u64 val;
- 	struct id_reg_desc *idr;
+ 	struct id_reg_desc *id_reg;
++	struct feature_frac *frac;
++	u64 ftr_mask = ARM64_FEATURE_FIELD_MASK;
  
--	for (i = 0; i < ARRAY_SIZE(sys_reg_descs); i++) {
--		rd = &sys_reg_descs[i];
--		if (rd->access != access_id_reg)
--			/* Not ID register, or hidden/reserved ID register */
-+	for (i = 0; i < ARRAY_SIZE(id_reg_desc_table); i++) {
-+		idr = id_reg_desc_table[i];
-+		if (!idr)
+ 	for (i = 0; i < ARRAY_SIZE(id_reg_desc_table); i++) {
+ 		id_reg = (struct id_reg_desc *)id_reg_desc_table[i];
+@@ -3608,6 +3706,20 @@ static void id_reg_desc_init_all(void)
+ 
+ 		id_reg_desc_init(id_reg);
+ 	}
++
++	/*
++	 * Update ignore_mask of ID registers based on fractional fields
++	 * information.  Any ID register that have fractional fields
++	 * is expected to have its own id_reg_desc.
++	 */
++	for (i = 0; i < ARRAY_SIZE(feature_frac_table); i++) {
++		frac = &feature_frac_table[i];
++		id_reg = get_id_reg_desc(frac->frac_id);
++		if (WARN_ON_ONCE(!id_reg))
 +			continue;
 +
-+		if (idr->flags & (ID_DESC_REG_HIDDEN | ID_DESC_REG_UNALLOC))
-+			/* Nothing to do for hidden/unalloc registers */
- 			continue;
- 
--		id = reg_to_encoding(rd);
--		if (WARN_ON_ONCE(!is_id_reg(id)))
--			/* Shouldn't happen */
-+		id = reg_to_encoding(&idr->reg_desc);
-+		WARN_ON_ONCE(write_kvm_id_reg(kvm, id, idr->vcpu_limit_val));
++		id_reg->ignore_mask |= ftr_mask << frac->frac_shift;
 +	}
-+}
-+
-+static void kvm_reset_id_regs(struct kvm_vcpu *vcpu)
-+{
-+	int i;
-+	const struct sys_reg_desc *r;
-+	struct id_reg_desc *id_reg;
-+
-+	for (i = 0; i < ARRAY_SIZE(id_reg_desc_table); i++) {
-+		id_reg = (struct id_reg_desc *)id_reg_desc_table[i];
-+		if (!id_reg)
- 			continue;
- 
--		idr = get_id_reg_desc(id);
--		val = idr ? idr->vcpu_limit_val : read_sanitised_ftr_reg(id);
--		WARN_ON_ONCE(write_kvm_id_reg(kvm, id, val));
-+		r = &id_reg->reg_desc;
-+		if (r->reset)
-+			r->reset(vcpu, r);
- 	}
  }
+ 
+ /*
 -- 
 2.35.1.723.g4982287a31-goog
 
