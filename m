@@ -2,152 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 56BB74D5875
-	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 03:56:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 485D44D58E7
+	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 04:28:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345818AbiCKC4W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Mar 2022 21:56:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52596 "EHLO
+        id S1346001AbiCKD3H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Mar 2022 22:29:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243446AbiCKC4V (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Mar 2022 21:56:21 -0500
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6EEF1A6FAB;
-        Thu, 10 Mar 2022 18:55:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1646967319; x=1678503319;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=uemGpo3r1Ljzh7J5aQez3PPGjZxZAPOCkt2/GKim9c8=;
-  b=ccJ5gZgQZ3Q/ovJ+yyYeK8M11XsA8fow2xX1eX5U2fIZOrz7T4CpUJYi
-   7UqWd09/u5cNo1Z02lhz1LTSf39ItRodQp5zIZE26mvUgHxSgwzn2clj9
-   A5vabYAD8fkhyZiOpS2hI+WOk6Z4xy4wpkxt5fj1txXDeOa1f5HpRQAea
-   dvVJIYWUtYY18Rptz3VdSmEf03lrjAPPQawMgmxb2lAZT8ezBPsh/PZE8
-   AaOLBAQ+ofDT3tlLploJNfoh0dDfcucwZDuwmnNd7W0brzJrUpUcItVv3
-   E3gzniJJDms0nJMPcFyfAEQ9/GR654qHcYfNMrcDYXBNeDWo+unULPS2O
-   Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10282"; a="253048095"
-X-IronPort-AV: E=Sophos;i="5.90,172,1643702400"; 
-   d="scan'208";a="253048095"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2022 18:55:19 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.90,172,1643702400"; 
-   d="scan'208";a="688937088"
-Received: from lkp-server02.sh.intel.com (HELO 89b41b6ae01c) ([10.239.97.151])
-  by fmsmga001.fm.intel.com with ESMTP; 10 Mar 2022 18:55:16 -0800
-Received: from kbuild by 89b41b6ae01c with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1nSVQy-0005k9-1G; Fri, 11 Mar 2022 02:55:16 +0000
-Date:   Fri, 11 Mar 2022 10:55:10 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Jiyong Park <jiyong@google.com>, sgarzare@redhat.com,
-        stefanha@redhat.com, mst@redhat.com, jasowang@redhat.com,
-        davem@davemloft.net, kuba@kernel.org
-Cc:     kbuild-all@lists.01.org, adelva@google.com, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Jiyong Park <jiyong@google.com>
-Subject: Re: [PATCH 1/2] vsock: each transport cycles only on its own sockets
-Message-ID: <202203111023.SPYFGn7W-lkp@intel.com>
-References: <20220310125425.4193879-2-jiyong@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220310125425.4193879-2-jiyong@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Spam-Status: No, score=-7.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S231359AbiCKD3G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Mar 2022 22:29:06 -0500
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94B65EACA0
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 19:28:04 -0800 (PST)
+Received: by mail-pg1-x54a.google.com with SMTP id v4-20020a63f844000000b003745fd0919aso4037453pgj.20
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 19:28:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=XKkoV9WqAMW6txuBkF5Wd3rs0lT6dWVS/pJ+2/MRtag=;
+        b=kufdfWVgYM9IzhcIFS2Zm75ZysbcrHo+Ft1gBPcwjP2xCCig08BOid5sNt+kBPWRCt
+         Ovz6oGnz2qY/BmB4MJJ6UNIZ/H8ietBfYnn5sVsOHxpNc6NScHhfFnq4RBZEl8hehthK
+         trb78KhZBvWAPpHIauti2B4oEYlX8VRIMdKqK9TcUZjfDEqlcGcrb1FeKztPVY/pOYf/
+         +a00MkCYl8XEqFqYIhj9SSHFrR02lJqzd4OSOOOyd0FfcAWXXF4yCKMU85lnOXpJEBCl
+         2cTtAImJkpdW04qL3ZFJe9E+JX4lhJcq8QiAauf9Re1Z7r1omuYMWrT3ntK69u4uP89q
+         SeTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=XKkoV9WqAMW6txuBkF5Wd3rs0lT6dWVS/pJ+2/MRtag=;
+        b=c5TTueUJiJVtWdDdulHDdG68XmwyqpE8X6GaHJfbyS224oN13RFmSD4/bwpvv7OSh+
+         oELsiGcWc3SshtxUCI2a7cS54hQh2cO0lgheEd1wC3Qe0NmDVQGOtDzb+xgph6oDq13C
+         h6xFf7MepcM1XOfmJk/qLeeEv1UijGxeI07y+JiaIzhAjA7eMY4TAvc/bI6SfKtisrpU
+         rIVizW+n81Uki7Niqu9ZrNkxtkH6w4wBeOzUydX5gtXP7pQ7ILbPmsII692G+SAMuXMr
+         QwssLcTr2vP1x2YrKFquCC+k9YU4JiAtBWcLYNXLm9e/PyYEZhG1r6Wh5jBNkXg92WwP
+         F+OQ==
+X-Gm-Message-State: AOAM533T1isyC6Ob4inGnMfuOKC3tZ+FHyEzR2Yg9hUHJsrQFN3nRpdG
+        +/fV6jbyRW+tvPlhs4Rc1BtJZM0wBxw=
+X-Google-Smtp-Source: ABdhPJwIG2XZcUj85RKHGPmCh8wL09k3iIswXlIqpkv0ONOnCCRLF0z1lkYsbPsHDBhGQ3AIDKCVaQ/orcQ=
+X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:130e:b0:4f3:9654:266d with SMTP id
+ j14-20020a056a00130e00b004f39654266dmr8042509pfu.59.1646969284051; Thu, 10
+ Mar 2022 19:28:04 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Fri, 11 Mar 2022 03:27:40 +0000
+Message-Id: <20220311032801.3467418-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.1.723.g4982287a31-goog
+Subject: [PATCH 00/21] KVM: x86: Event/exception fixes and cleanups
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Oliver Upton <oupton@google.com>,
+        Peter Shier <pshier@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Jiyong,
+The main goal of this series is to fix KVM's longstanding bug of not
+honoring L1's exception intercepts wants when handling an exception that
+occurs during delivery of a different exception.  E.g. if L0 and L1 are
+using shadow paging, and L2 hits a #PF, and then hits another #PF while
+vectoring the first #PF due to _L1_ not having a shadow page for the IDT,
+KVM needs to check L1's intercepts before morphing the #PF => #PF => #DF
+so that the #PF is routed to L1, not injected into L2 as a #DF.
 
-Thank you for the patch! Yet something to improve:
+nVMX has hacked around the bug for years by overriding the #PF injector
+for shadow paging to go straight to VM-Exit, and nSVM has started doing
+the same.  The hacks mostly work, but they're incomplete, confusing, and
+lead to other hacky code, e.g. bailing from the emulator because #PF
+injection forced a VM-Exit and suddenly KVM is back in L1.
 
-[auto build test ERROR on 3bf7edc84a9eb4007dd9a0cb8878a7e1d5ec6a3b]
+Everything leading up to that are related fixes and cleanups I encountered
+along the way; some through code inspection, some through tests (I truly
+thought this series was finished 10 commits and 3 days ago...).
 
-url:    https://github.com/0day-ci/linux/commits/Jiyong-Park/vsock-cycle-only-on-its-own-socket/20220310-205638
-base:   3bf7edc84a9eb4007dd9a0cb8878a7e1d5ec6a3b
-config: x86_64-rhel-8.3 (https://download.01.org/0day-ci/archive/20220311/202203111023.SPYFGn7W-lkp@intel.com/config)
-compiler: gcc-9 (Ubuntu 9.4.0-1ubuntu1~20.04) 9.4.0
-reproduce (this is a W=1 build):
-        # https://github.com/0day-ci/linux/commit/6219060e1d706d7055fb0829b3bf23c5ae84790e
-        git remote add linux-review https://github.com/0day-ci/linux
-        git fetch --no-tags linux-review Jiyong-Park/vsock-cycle-only-on-its-own-socket/20220310-205638
-        git checkout 6219060e1d706d7055fb0829b3bf23c5ae84790e
-        # save the config file to linux build tree
-        mkdir build_dir
-        make W=1 O=build_dir ARCH=x86_64 SHELL=/bin/bash net/vmw_vsock/
+Nothing in here is all that urgent; all bugs tagged for stable have been
+around for multiple releases (years in most cases).
 
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
+Sean Christopherson (21):
+  KVM: x86: Return immediately from x86_emulate_instruction() on code
+    #DB
+  KVM: nVMX: Unconditionally purge queued/injected events on nested
+    "exit"
+  KVM: VMX: Drop bits 31:16 when shoving exception error code into VMCS
+  KVM: x86: Don't check for code breakpoints when emulating on exception
+  KVM: nVMX: Treat General Detect #DB (DR7.GD=1) as fault-like
+  KVM: nVMX: Prioritize TSS T-flag #DBs over Monitor Trap Flag
+  KVM: x86: Treat #DBs from the emulator as fault-like (code and
+    DR7.GD=1)
+  KVM: x86: Use DR7_GD macro instead of open coding check in emulator
+  KVM: nVMX: Ignore SIPI that arrives in L2 when vCPU is not in WFS
+  KVM: nVMX: Unconditionally clear mtf_pending on nested VM-Exit
+  KVM: VMX: Inject #PF on ENCLS as "emulated" #PF
+  KVM: x86: Rename kvm_x86_ops.queue_exception to inject_exception
+  KVM: x86: Make kvm_queued_exception a properly named, visible struct
+  KVM: x86: Formalize blocking of nested pending exceptions
+  KVM: x86: Use kvm_queue_exception_e() to queue #DF
+  KVM: x86: Hoist nested event checks above event injection logic
+  KVM: x86: Evaluate ability to inject SMI/NMI/IRQ after potential
+    VM-Exit
+  KVM: x86: Morph pending exceptions to pending VM-Exits at queue time
+  KVM: VMX: Update MTF and ICEBP comments to document KVM's subtle
+    behavior
+  KVM: selftests: Use uapi header to get VMX and SVM exit reasons/codes
+  KVM: selftests: Add an x86-only test to verify nested exception
+    queueing
 
-All errors (new ones prefixed by >>):
+ arch/x86/include/asm/kvm-x86-ops.h            |   2 +-
+ arch/x86/include/asm/kvm_host.h               |  33 +-
+ arch/x86/kvm/emulate.c                        |   3 +-
+ arch/x86/kvm/svm/nested.c                     | 100 ++---
+ arch/x86/kvm/svm/svm.c                        |  18 +-
+ arch/x86/kvm/vmx/nested.c                     | 322 +++++++++-----
+ arch/x86/kvm/vmx/sgx.c                        |   2 +-
+ arch/x86/kvm/vmx/vmx.c                        |  53 ++-
+ arch/x86/kvm/x86.c                            | 409 ++++++++++++------
+ arch/x86/kvm/x86.h                            |  10 +-
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/include/x86_64/svm_util.h   |   5 +-
+ .../selftests/kvm/include/x86_64/vmx.h        |  51 +--
+ .../kvm/x86_64/nested_exceptions_test.c       | 307 +++++++++++++
+ 15 files changed, 914 insertions(+), 403 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/nested_exceptions_test.c
 
-   net/vmw_vsock/vmci_transport.c: In function 'vmci_transport_handle_detach':
->> net/vmw_vsock/vmci_transport.c:808:25: error: 'vmci_transport' undeclared (first use in this function)
-     808 |  if (vsk->transport != &vmci_transport)
-         |                         ^~~~~~~~~~~~~~
-   net/vmw_vsock/vmci_transport.c:808:25: note: each undeclared identifier is reported only once for each function it appears in
 
+base-commit: 4a204f7895878363ca8211f50ec610408c8c70aa
+-- 
+2.35.1.723.g4982287a31-goog
 
-vim +/vmci_transport +808 net/vmw_vsock/vmci_transport.c
-
-   800	
-   801	static void vmci_transport_handle_detach(struct sock *sk)
-   802	{
-   803		struct vsock_sock *vsk;
-   804	
-   805		vsk = vsock_sk(sk);
-   806	
-   807		/* Only handle our own sockets */
- > 808		if (vsk->transport != &vmci_transport)
-   809			return;
-   810	
-   811		if (!vmci_handle_is_invalid(vmci_trans(vsk)->qp_handle)) {
-   812			sock_set_flag(sk, SOCK_DONE);
-   813	
-   814			/* On a detach the peer will not be sending or receiving
-   815			 * anymore.
-   816			 */
-   817			vsk->peer_shutdown = SHUTDOWN_MASK;
-   818	
-   819			/* We should not be sending anymore since the peer won't be
-   820			 * there to receive, but we can still receive if there is data
-   821			 * left in our consume queue. If the local endpoint is a host,
-   822			 * we can't call vsock_stream_has_data, since that may block,
-   823			 * but a host endpoint can't read data once the VM has
-   824			 * detached, so there is no available data in that case.
-   825			 */
-   826			if (vsk->local_addr.svm_cid == VMADDR_CID_HOST ||
-   827			    vsock_stream_has_data(vsk) <= 0) {
-   828				if (sk->sk_state == TCP_SYN_SENT) {
-   829					/* The peer may detach from a queue pair while
-   830					 * we are still in the connecting state, i.e.,
-   831					 * if the peer VM is killed after attaching to
-   832					 * a queue pair, but before we complete the
-   833					 * handshake. In that case, we treat the detach
-   834					 * event like a reset.
-   835					 */
-   836	
-   837					sk->sk_state = TCP_CLOSE;
-   838					sk->sk_err = ECONNRESET;
-   839					sk_error_report(sk);
-   840					return;
-   841				}
-   842				sk->sk_state = TCP_CLOSE;
-   843			}
-   844			sk->sk_state_change(sk);
-   845		}
-   846	}
-   847	
-
----
-0-DAY CI Kernel Test Service
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
