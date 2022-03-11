@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A2794D5A09
-	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 05:49:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 43F7D4D5A00
+	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 05:49:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346455AbiCKEuN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Mar 2022 23:50:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45258 "EHLO
+        id S1344030AbiCKEuW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Mar 2022 23:50:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346494AbiCKEuB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1346500AbiCKEuB (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 10 Mar 2022 23:50:01 -0500
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55CE01AAFD0
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 20:48:53 -0800 (PST)
-Received: by mail-pf1-x44a.google.com with SMTP id x123-20020a626381000000b004f6fc50208eso4535309pfb.11
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 20:48:53 -0800 (PST)
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 299ED1AC2BD
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 20:48:55 -0800 (PST)
+Received: by mail-pl1-x649.google.com with SMTP id x10-20020a170902a38a00b00151e09a4e15so3911673pla.15
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 20:48:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=DltmKg7opwhIQvsCwmEx6qs3h14xPlDqswCiLBq3BvI=;
-        b=N39NQTTkdbZnRTzSRZEqZFrgTaFi2lK42y1/qZ1pn8Pbr5yj0p9nYTSuhihb/Lu7sN
-         dcVYmv/4AvKdLQy0RzMJr/m5lgP/QBuf9FWhQU5tcKmJLEpCItk3qaBIYUuyaqVenVRb
-         QPqY7gVLWPRDfezgK4RqFc7luPzOknbDAl0I0mtaKwd/XlEWy/XLC2GGb8aWgsnsZ/ld
-         DT+bSp2hAUW+34+S4eKwqMNUNcpyxVHKM97cmvbV3wBjdQJNAzCQTistKsISe5uLVoZz
-         8//fO4tniGmbUOmnQGpOVgylJluO75sgWNrifgjIbTlzAefKYxlH7Fi09jTmhfkjfLl6
-         r6rQ==
+        bh=YvkdLZdpcr97EpSsUi5adIM71O6zx1+CVaghTM2lKQc=;
+        b=WW9mUBlAXTHtpKEr3Ay7NmT20frRkus2LqacrMY+0B0b1ZhuU3tEvhK6b3wZU/ORFt
+         sa55nV3ZrgY5MgtjlQVBpdtqyFbjZppWQCm2l0cVBWAqi1VDRVbjrjB/uu1VrUXHsT3v
+         JTQv7fegNAfQHGW26cOwiExvl2UWjMKnpBMAexNgf8VDKqrGSfZLt3A33jk7p/97Cfn4
+         9+3/YGnvvaatyDI8WqBeDbkRQt/2eHQO/TObdfaHNMTWEOnV/efpI33e3RpcIgKOFDFS
+         ++uMr4ZigfVe97viZ9lx3iiQPIXSsluL57ZzBOGYES5FDwrFO0ILP8RZ5oAwpA43s2IW
+         Abzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=DltmKg7opwhIQvsCwmEx6qs3h14xPlDqswCiLBq3BvI=;
-        b=cqYTKk0VbPkNUVZ9R77kb1xo/6WHSknsB8xLEQsSaN2YDxfZkoxu63DK8wiSkL1Aad
-         WtmtvqxRtRdoJQwgvxop1luIDsbgUd5ZCLDFds0UDX08ibZf6O/Q4QSUylYZmBnbna+I
-         l/taNTTTk7XWtQ+np0JvNrADHOItLV9h1twu4Ri2qT1qgLcqs5HbD3S3r6NAWpsXKdwY
-         efQrAm2FAqGg8YKBBTNj4vXx5msRrAqmbnCnL5bTQQLk8z53TPuKSQMa5aW8BreKBjZ6
-         dXtXFqAl/IiNh8Wwdo0PpxmlDBeyVbdhj76oE2zwyiT7pKl9LmwtYNuoWWdstmy0Nqig
-         yzOg==
-X-Gm-Message-State: AOAM530gZNU1zCmPrzgZ+7+Cwlj0B08qqoj461VDJvouM/d+8SrZnfZd
-        Z26WhCBTjGFI7/YZkxilZOc0pZzmjFI=
-X-Google-Smtp-Source: ABdhPJwFRwT5Fgamh4l+5MQdfg7BYHp05vvdFwuVRvSeFNzp6LJbqoSWM+rN32ZUxVO+QSRSMIPfjJ4nruM=
+        bh=YvkdLZdpcr97EpSsUi5adIM71O6zx1+CVaghTM2lKQc=;
+        b=HVu7GzTRGnvrjOfHsbmRioAv84DwN1jUOo0X5o0Lfs4NYBiXswJ+m6OhbxOprYrTO/
+         YlLuwnN87H7woizqaXBhrOLgvHJb7dSZgowOt9qAYbvZPGQWz74KkIEoAo/sSgTLivFZ
+         ySBlNyPL59yrmSjbDRkW5P/yPWWZ/fGyGTbs9GF/TBs330OFDh5oDjm/i1OhAp3FQjUn
+         wKSsqwdHcGIslmtlNh2OwiYPotIEx5NqVYni++RoP2xJCgf5eZCJqX1IUTH3AmhWY6vN
+         0thBCIoHVuEVSoLSRfhg0fqYZljYs0P86tFDmWMouvr7/F1vEmu1ogXIopVz/TSAyI7m
+         emtw==
+X-Gm-Message-State: AOAM53110cwcDiV19Qwu+CcvLAYExretvMgYCuSrZ47/1RZuK7FEVCrd
+        Faviapb/0ARJuGXmLw1trEzGD8Q32F8=
+X-Google-Smtp-Source: ABdhPJyXnNci0fOzvDdVKJf4gcHvVbtR1SLTxJuXYaGJpVy9F9SwRVGou9JVMngVfwiQy4DD8uTH1DNToK8=
 X-Received: from reiji-vws-sp.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3d59])
- (user=reijiw job=sendgmr) by 2002:a05:6a00:10cf:b0:4f6:5834:aefb with SMTP id
- d15-20020a056a0010cf00b004f65834aefbmr8229183pfu.77.1646974132762; Thu, 10
- Mar 2022 20:48:52 -0800 (PST)
-Date:   Thu, 10 Mar 2022 20:47:59 -0800
+ (user=reijiw job=sendgmr) by 2002:a05:6a00:c96:b0:4f7:203a:e8de with SMTP id
+ a22-20020a056a000c9600b004f7203ae8demr8180188pfv.32.1646974134582; Thu, 10
+ Mar 2022 20:48:54 -0800 (PST)
+Date:   Thu, 10 Mar 2022 20:48:00 -0800
 In-Reply-To: <20220311044811.1980336-1-reijiw@google.com>
-Message-Id: <20220311044811.1980336-14-reijiw@google.com>
+Message-Id: <20220311044811.1980336-15-reijiw@google.com>
 Mime-Version: 1.0
 References: <20220311044811.1980336-1-reijiw@google.com>
 X-Mailer: git-send-email 2.35.1.723.g4982287a31-goog
-Subject: [PATCH v6 13/25] KVM: arm64: Add consistency checking for frac fields
- of ID registers
+Subject: [PATCH v6 14/25] KVM: arm64: Introduce KVM_CAP_ARM_ID_REG_CONFIGURABLE
+ capability
 From:   Reiji Watanabe <reijiw@google.com>
 To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu
 Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
@@ -81,182 +81,67 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Feature fractional field of an ID register cannot be simply validated
-at KVM_SET_ONE_REG because its validity depends on its (main) feature
-field value, which could be in a different ID register (and might be
-set later).
-Validate fractional fields at the first KVM_RUN instead.
+Introduce a new capability KVM_CAP_ARM_ID_REG_CONFIGURABLE to indicate
+that ID registers are writable by userspace.
 
 Signed-off-by: Reiji Watanabe <reijiw@google.com>
 ---
- arch/arm64/include/asm/kvm_host.h |   1 +
- arch/arm64/kvm/arm.c              |   3 +
- arch/arm64/kvm/sys_regs.c         | 112 ++++++++++++++++++++++++++++++
- 3 files changed, 116 insertions(+)
+ Documentation/virt/kvm/api.rst | 12 ++++++++++++
+ arch/arm64/kvm/arm.c           |  1 +
+ include/uapi/linux/kvm.h       |  1 +
+ 3 files changed, 14 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 9ffe6604a58a..5e53102a1ac1 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -748,6 +748,7 @@ long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 9f3172376ec3..d2cd404d74c2 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -2607,6 +2607,10 @@ EINVAL.
+ After the vcpu's SVE configuration is finalized, further attempts to
+ write this register will fail with EPERM.
  
- void set_default_id_regs(struct kvm *kvm);
- int kvm_set_id_reg_feature(struct kvm *kvm, u32 id, u8 field_shift, u8 fval);
-+int kvm_id_regs_check_frac_fields(const struct kvm_vcpu *vcpu);
++The arm64 ID registers (where Op0=3, Op1=0, CRn=0, 0<=CRm<8, 0<=Op2<8)
++are allowed to set by userspace if KVM_CAP_ARM_ID_REG_CONFIGURABLE is
++available.  They become immutable after calling KVM_RUN on any of the
++vcpus in the guest (modifying values of those registers will fail).
  
- /* Guest/host FPSIMD coordination helpers */
- int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
+ MIPS registers are mapped using the lower 32 bits.  The upper 16 of that is
+ the register group type:
+@@ -7575,3 +7579,11 @@ The argument to KVM_ENABLE_CAP is also a bitmask, and must be a subset
+ of the result of KVM_CHECK_EXTENSION.  KVM will forward to userspace
+ the hypercalls whose corresponding bit is in the argument, and return
+ ENOSYS for the others.
++
++8.35 KVM_CAP_ARM_ID_REG_CONFIGURABLE
++------------------------------------
++
++:Architectures: arm64
++
++This capability indicates that userspace can modify the ID registers
++via KVM_SET_ONE_REG ioctl.
 diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 91110d996ed6..e7dcc7704302 100644
+index e7dcc7704302..68ffced5b09e 100644
 --- a/arch/arm64/kvm/arm.c
 +++ b/arch/arm64/kvm/arm.c
-@@ -599,6 +599,9 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
- 	if (likely(vcpu_has_run_once(vcpu)))
- 		return 0;
+@@ -210,6 +210,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_SET_GUEST_DEBUG:
+ 	case KVM_CAP_VCPU_ATTRIBUTES:
+ 	case KVM_CAP_PTP_KVM:
++	case KVM_CAP_ARM_ID_REG_CONFIGURABLE:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_SET_GUEST_DEBUG2:
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 507ee1f2aa96..a9351727a7aa 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1135,6 +1135,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_XSAVE2 208
+ #define KVM_CAP_SYS_ATTRIBUTES 209
+ #define KVM_CAP_PPC_AIL_MODE_3 210
++#define KVM_CAP_ARM_ID_REG_CONFIGURABLE 211
  
-+	if (!kvm_vm_is_protected(kvm) && kvm_id_regs_check_frac_fields(vcpu))
-+		return -EPERM;
-+
- 	kvm_arm_vcpu_init_debug(vcpu);
+ #ifdef KVM_CAP_IRQ_ROUTING
  
- 	if (likely(irqchip_in_kernel(kvm))) {
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index ba851de6486d..3805b69ed23e 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -3397,6 +3397,102 @@ void kvm_sys_reg_table_init(void)
- 	id_reg_desc_init_all();
- }
- 
-+/* ID register's fractional field information with its feature field. */
-+struct feature_frac {
-+	u32	id;
-+	u32	shift;
-+	u32	frac_id;
-+	u32	frac_shift;
-+};
-+
-+static struct feature_frac feature_frac_table[] = {
-+	{
-+		.frac_id = SYS_ID_AA64PFR1_EL1,
-+		.frac_shift = ID_AA64PFR1_RASFRAC_SHIFT,
-+		.id = SYS_ID_AA64PFR0_EL1,
-+		.shift = ID_AA64PFR0_RAS_SHIFT,
-+	},
-+	{
-+		.frac_id = SYS_ID_AA64PFR1_EL1,
-+		.frac_shift = ID_AA64PFR1_MPAMFRAC_SHIFT,
-+		.id = SYS_ID_AA64PFR0_EL1,
-+		.shift = ID_AA64PFR0_MPAM_SHIFT,
-+	},
-+	{
-+		.frac_id = SYS_ID_AA64PFR1_EL1,
-+		.frac_shift = ID_AA64PFR1_CSV2FRAC_SHIFT,
-+		.id = SYS_ID_AA64PFR0_EL1,
-+		.shift = ID_AA64PFR0_CSV2_SHIFT,
-+	},
-+};
-+
-+/*
-+ * Return non-zero if the feature/fractional fields pair are not
-+ * supported. Return zero otherwise.
-+ * This function validates only the fractional feature field,
-+ * and relies on the fact the feature field is validated before
-+ * through arm64_check_features_kvm.
-+ */
-+static int vcpu_id_reg_feature_frac_check(const struct kvm_vcpu *vcpu,
-+					  const struct feature_frac *ftr_frac)
-+{
-+	const struct id_reg_desc *id_reg;
-+	u32 id;
-+	u64 val, lim, mask;
-+
-+	/* Check if the feature field value is same as the limit */
-+	id = ftr_frac->id;
-+	id_reg = get_id_reg_desc(id);
-+
-+	mask = (u64)ARM64_FEATURE_FIELD_MASK << ftr_frac->shift;
-+	val = __read_id_reg(vcpu, id_reg) & mask;
-+	lim = id_reg ? id_reg->vcpu_limit_val : read_sanitised_ftr_reg(id);
-+	lim &= mask;
-+
-+	if (val != lim)
-+		/*
-+		 * The feature level is lower than the limit.
-+		 * Any fractional version should be fine.
-+		 */
-+		return 0;
-+
-+	/* Check the fractional feature field */
-+	id = ftr_frac->frac_id;
-+	id_reg = get_id_reg_desc(id);
-+
-+	mask = (u64)ARM64_FEATURE_FIELD_MASK << ftr_frac->frac_shift;
-+	val = __read_id_reg(vcpu, id_reg) & mask;
-+	lim = id_reg ? id_reg->vcpu_limit_val : read_sanitised_ftr_reg(id);
-+	lim &= mask;
-+
-+	if (val == lim)
-+		/*
-+		 * Both the feature and fractional fields are the same
-+		 * as limit.
-+		 */
-+		return 0;
-+
-+	return arm64_check_features_kvm(id, val, lim);
-+}
-+
-+int kvm_id_regs_check_frac_fields(const struct kvm_vcpu *vcpu)
-+{
-+	int i, err;
-+	const struct feature_frac *frac;
-+
-+	/*
-+	 * Check ID registers' fractional fields, which aren't checked
-+	 * at KVM_SET_ONE_REG.
-+	 */
-+	for (i = 0; i < ARRAY_SIZE(feature_frac_table); i++) {
-+		frac = &feature_frac_table[i];
-+		err = vcpu_id_reg_feature_frac_check(vcpu, frac);
-+		if (err)
-+			return err;
-+	}
-+	return 0;
-+}
-+
- /*
-  * Update the ID register's field with @fval for the guest.
-  * The caller is expected to hold the kvm->lock.
-@@ -3600,6 +3696,8 @@ static void id_reg_desc_init_all(void)
- {
- 	int i;
- 	struct id_reg_desc *id_reg;
-+	struct feature_frac *frac;
-+	u64 ftr_mask = ARM64_FEATURE_FIELD_MASK;
- 
- 	for (i = 0; i < ARRAY_SIZE(id_reg_desc_table); i++) {
- 		id_reg = (struct id_reg_desc *)id_reg_desc_table[i];
-@@ -3608,6 +3706,20 @@ static void id_reg_desc_init_all(void)
- 
- 		id_reg_desc_init(id_reg);
- 	}
-+
-+	/*
-+	 * Update ignore_mask of ID registers based on fractional fields
-+	 * information.  Any ID register that have fractional fields
-+	 * is expected to have its own id_reg_desc.
-+	 */
-+	for (i = 0; i < ARRAY_SIZE(feature_frac_table); i++) {
-+		frac = &feature_frac_table[i];
-+		id_reg = get_id_reg_desc(frac->frac_id);
-+		if (WARN_ON_ONCE(!id_reg))
-+			continue;
-+
-+		id_reg->ignore_mask |= ftr_mask << frac->frac_shift;
-+	}
- }
- 
- /*
 -- 
 2.35.1.723.g4982287a31-goog
 
