@@ -2,52 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 87D7B4D59C6
-	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 05:48:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A22194D5A04
+	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 05:49:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346376AbiCKEtW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Mar 2022 23:49:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42708 "EHLO
+        id S233926AbiCKEtx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Mar 2022 23:49:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44216 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346207AbiCKEtT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Mar 2022 23:49:19 -0500
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC35D96828
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 20:48:16 -0800 (PST)
-Received: by mail-pj1-x1049.google.com with SMTP id p8-20020a17090a74c800b001bf257861efso7173002pjl.6
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 20:48:16 -0800 (PST)
+        with ESMTP id S1346463AbiCKEtq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Mar 2022 23:49:46 -0500
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1924F1AAFEB
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 20:48:34 -0800 (PST)
+Received: by mail-pl1-x649.google.com with SMTP id j9-20020a170903024900b0015195e68490so3903460plh.19
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 20:48:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=xCBZXe4E9m9q6+FTKOpm/OIuBMhCnJJ0A2x3FMK2uRw=;
-        b=qHZml4JCTSvPLsXwRubE604N/sW/gRVnO+A/jEoff1E5Q6xoTJA3kjTGl5QeR/9Eht
-         CyICyvdUR36IDY2/D5P5WCLosPf8CV/D2oeBPbcpnvBeeqPAKfEOQo7ZOlImpVlwgEYs
-         y0XsFB2XOXHbVfJAWRxf5k2ZlsINEkck9fNNWgtcCVYwewF3n5srw8+EKFM+E+EeaxYA
-         CdzD5xsW/KzhlO4smZpMHCwxefc2+wWkEeKtHHepk7IjePSjIF5ieAFvfDtM8fdW86il
-         A4niMN5mj1duw7HLiPsg3BaYRevSvfJWXyQlWhDzfV3zy7A4T+6kh1HUv56t/jcIZgI/
-         XVJw==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=glthwEK6ZgvlT5BCv3FygX03+dB4t3Wompz6ZLZl/V4=;
+        b=oviYyd1hL6FXW8xYwUit8H/JinCSV5FQkoO3lcvrchXcQFvfEiSq1X3c9NPTP7/j9d
+         qTg5Fl6CX7dEBMl+88l0cCWi2zq0tyvG3mtfS4gFalQJ0YwYzamZ86x01f6n3pq0dXyp
+         vN0gbdRRdKvSFLmojQIab9Ya9ZYaOVtOFX9HQGKJkllCYLQExOkmgw5HewYzzsahrafn
+         Aj1lUK0Dn4B8o6PJ6V3opL61uVO2pHF8po63kJVpRRIW+y2oMBBP5J4hx7OgyirSpHT+
+         QIN7GB2gBKoDJFzJ9Z07xJKB24YK8XhJ7zVVeaQdV9vLEBdDkylJajXhrEPlQ/t5qrWr
+         vUiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=xCBZXe4E9m9q6+FTKOpm/OIuBMhCnJJ0A2x3FMK2uRw=;
-        b=A3Lop2AzavTypsIkgQJYzRcDGGHHKcnu2SkWxG8HXXzM8HTg/fRruccuObnGpCcvNl
-         gwMUji23nRVdGscPiw/YDb9kbHWgo754wQrDNiJBw/1q4qX6SZGaTJ0GwXk/IsDJAYzY
-         wQIRT/gNwMwBxrNucPW/3CyuBpj6hyDQT+cY7DI8K3CTnfTehBzRsa82kb3nbMB4Thda
-         KB2fbwWVD9wPLb88yUR0dBpOk7+uTz6f8uSU1wnRWHEZjSfzYmnc6HUsylOZLI4xZ2Z3
-         /ZnV4PMOES3WFMkuckoqEF30TGd/CV57uhR+b87bsOiHzWf2bk4N7cGbh0ctxy9kUDN1
-         UO1g==
-X-Gm-Message-State: AOAM530suMyAmYZKSMj7TXelOcM+aQ6nEcrZYJlRnH+s1UFLQcuG5/dY
-        mpv6ynbe+Tjq7WX9UlEvXF4H+XPL65A=
-X-Google-Smtp-Source: ABdhPJzj6nL4pWiYfgGNBZvQQApUL//v0g+9TDHguUna9Uaj8GEf5DP7qNgfDWRGQQjCPFqSL96Q92IIntY=
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=glthwEK6ZgvlT5BCv3FygX03+dB4t3Wompz6ZLZl/V4=;
+        b=WsHd9F9eSEDsa+E+1qUBut/PgUhSD1lh8r1SQeY8ij28tTeLhJRzq7lvHiyXz9Ya9F
+         DEdVh6kcz0VWbvMybi73/DwThpqvo42/RkNrV2BfSd42//CVOpdLV1S5tGD9Nm7KzEa2
+         UYmMNnNFuyhuq9JE5WdLHatqsHJXbQ4vZ2enr8dSPhryRFex0PxVRtKP5KaVvKpl5Y1/
+         ToSmyNT1ZkwCPDzFf3oqgJVzXpWajA9fAudJLZNejsDr5KhCt+sVb+e+8VBjOe6e51h5
+         iMwqv9MKQXZE5DaGbZM/deLTS2JXYQjW+KWfXDOCCxfIcT5d8lmRvw3k+ldQAc+PAF3f
+         0hXg==
+X-Gm-Message-State: AOAM530Zv9vPaM+atXqXI6TVC9l+Bjnm6LhWUdWGOp/ze5EoM96+oNi5
+        yiGUgootpTa/y1K5h6TCLNJ2VHOAD8c=
+X-Google-Smtp-Source: ABdhPJyDl7llyO11kbEl8dR7kC5MFAqZY1r0+1cYoSOlTioTkSnQq8vl9f4N+JpB633eoMtJSJWLqXRsVXU=
 X-Received: from reiji-vws-sp.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3d59])
- (user=reijiw job=sendgmr) by 2002:a62:5291:0:b0:4f7:ad3:1532 with SMTP id
- g139-20020a625291000000b004f70ad31532mr8541972pfb.80.1646974096269; Thu, 10
- Mar 2022 20:48:16 -0800 (PST)
-Date:   Thu, 10 Mar 2022 20:47:46 -0800
-Message-Id: <20220311044811.1980336-1-reijiw@google.com>
+ (user=reijiw job=sendgmr) by 2002:a17:902:9043:b0:14f:aa08:8497 with SMTP id
+ w3-20020a170902904300b0014faa088497mr8396367plz.109.1646974113545; Thu, 10
+ Mar 2022 20:48:33 -0800 (PST)
+Date:   Thu, 10 Mar 2022 20:47:47 -0800
+In-Reply-To: <20220311044811.1980336-1-reijiw@google.com>
+Message-Id: <20220311044811.1980336-2-reijiw@google.com>
 Mime-Version: 1.0
+References: <20220311044811.1980336-1-reijiw@google.com>
 X-Mailer: git-send-email 2.35.1.723.g4982287a31-goog
-Subject: [PATCH v6 00/25] KVM: arm64: Make CPU ID registers writable by userspace
+Subject: [PATCH v6 01/25] KVM: arm64: Introduce a validation function for an
+ ID register
 From:   Reiji Watanabe <reijiw@google.com>
 To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu
 Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
@@ -76,188 +81,287 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In KVM/arm64, values of ID registers for a guest are mostly same as
-its host's values except for bits for feature that KVM doesn't support
-and for opt-in features that userspace didn't configure.  Userspace
-can use KVM_SET_ONE_REG to a set ID register value, but it fails
-if userspace attempts to modify the register value.
+Introduce arm64_check_features(), which does a basic validity checking
+of an ID register value against the register's limit value, which is
+generally the host's sanitized value.
 
-This patch series adds support to allow userspace to modify a value of
-ID registers (as long as KVM can support features that are indicated
-in the registers) so userspace can have more control of configuring
-and unconfiguring features for guests.  We need this because we would
-like to expose a uniform set/level of features for a group of guests on
-systems with different ARM CPUs.  Since some features are not binary
-in nature (e.g. AA64DFR0_EL1.BRPs fields indicate number of
-breakpoints minus 1), using KVM_ARM_VCPU_INIT to control such features
-is inconvenient.
+This function will be used by the following patches to check if an ID
+register value that userspace tries to set for a guest can be supported
+on the host.
 
-The patch series is for both VHE and non-VHE, except for protected VMs,
-which have a different way of configuring ID registers based on its
-different requirements [1].
-There was a patch series that tried to achieve the same thing [2].
-A few snippets of codes in this series were inspired by or came from [2].
+The validation is done using arm64_ftr_bits_kvm, which is created from
+arm64_ftr_regs, with some entries overwritten by entries from
+arm64_ftr_bits_kvm_override.
 
-The initial value of ID registers for a vCPU will be the host's value
-with bits cleared for unsupported features and for opt-in features that
-were not configured. So, the initial value userspace can see (via
-KVM_GET_ONE_REG) is the upper limit that can be set for the register.
-Any requests to change the value that conflicts with opt-in features'
-configuration will fail (e.g. if KVM_ARM_VCPU_PMU_V3 is configured by
-KVM_ARM_VCPU_INIT, ID_AA64DFR0_EL1.PMUVER cannot be set to zero.
-Otherwise, the initial value of ID_AA64DFR0_EL1.PMUVER will be zero,
-and cannot be changed from zero).
+Signed-off-by: Reiji Watanabe <reijiw@google.com>
+---
+ arch/arm64/include/asm/cpufeature.h |   1 +
+ arch/arm64/kernel/cpufeature.c      | 229 ++++++++++++++++++++++++++++
+ 2 files changed, 230 insertions(+)
 
-When a guest tries to use a CPU feature that is not exposed to the guest,
-trapping it (to emulate a real CPU's behavior) would generally be a
-desirable behavior (when it is possible with no or little side effects).
-The later patches in the series add codes for this.  Only features that
-can be trapped independently will be trapped by this series though.
-
-This series adds kunit tests for new functions in sys_regs.c (except for
-trivial ones), and these tests are enabled with a new configuration
-option 'CONFIG_KVM_KUNIT_TEST'.
-
-The series is based on v5.17-rc7 with the patch [3] applied.
-
-v6:
-  - Remove entries for all ID register entries from sys_reg_descs[],
-    and use id_reg_desc_table[] for ID registers instead. [Oliver]
-  - Remove sys_reg field from id_reg_info, add reg_desc (sys_reg_desc)
-    field to id_reg_info, and rename 'id_reg_info' to 'id_reg_desc'.
-  - Merge the following three patches of v5 into one patch "KVM: arm64:
-    Make ID_AA64DFR0_EL1/ID_DFR0_EL1 writable" to accept userspace's
-    request to set ID_AA64DFR0_EL1.PMUVER/ID_DFR0_EL1.PERFMON to 0xf
-    (they are set to 0 though) even after applying the patch-10. [Oliver]
-     patch-10 KVM: arm64: Hide IMPLEMENTATION DEFINED PMU support for the guest
-     patch-11 KVM: arm64: Make ID_AA64DFR0_EL1 writable"
-     patch-12 KVM: arm64: Make ID_DFR0_EL1 writable"
-
-v5: https://lore.kernel.org/all/20220214065746.1230608-1-reijiw@google.com/
-  - Change the return value of kcalloc failure of init_arm64_ftr_bits_kvm
-    to -ENOMEM from ENOMEM. [Fuad]
-  - Call init_arm64_ftr_bits_kvm from init_cpu_features(). [Ricardo, Fuad]
-  - Move is_id_reg() in arch/arm64/kvm/sys_regs.c. [Fuad]
-  - Remove frac_ftr_check from feature_frac [Fuad]
-  - Rename kvm_id_regs_consistency_check() [Fuad]
-  - Add feature_config_ctrl for ID_AA64DFR0_TRACEVER [Fuad]
-  - Move changes for kvm_set_id_reg_feature and __modify_kvm_id_reg from
-    patch-4 to patch-3. [Fuad]
-  - Comment additions and fixes [Fuad]
-  - Rename arm64_check_features() [Ricardo]
-  - Run arm64_check_features_kvm() for the default guest value [Ricardo]
-  - Add ID_AA64MMFR1_EL1.HAFDBS validation
-  - Cosmetic fixes
-
-v4: https://lore.kernel.org/all/20220106042708.2869332-1-reijiw@google.com/
-  - Make ID registers storage per VM instead of per vCPU. [Marc]
-  - Implement arm64_check_features() in arch/arm64/kernel/cpufeature.c
-    by using existing codes in the file. [Marc]
-  - Use a configuration function to enable traps for disabled
-    features. [Marc]
-  - Document ID registers become immutable after the first KVM_RUN [Eric]
-  - Update ID_AA64PFR0.GIC at the point where a GICv3 is created. [Marc]
-  - Get TGranX's bit position by substracting 12 from TGranX_2's bit
-    position. [Eric]
-  - Don't validate AArch32 ID registers when the system doesn't support
-    32bit EL0. [Eric]
-  - Add/fixes comments for patches. [Eric]
-  - Made bug fixes/improvements of the selftest. [Eric]
-  - Added .kunitconfig for arm64 KUnit tests
-
-v3: https://lore.kernel.org/all/20211117064359.2362060-1-reijiw@google.com/
-  - Remove ID register consistency checking across vCPUs. [Oliver]
-  - Change KVM_CAP_ARM_ID_REG_WRITABLE to
-    KVM_CAP_ARM_ID_REG_CONFIGURABLE. [Oliver]
-  - Add KUnit testing for ID register validation and trap initialization.
-  - Change read_id_reg() to take care of ID_AA64PFR0_EL1.GIC.
-  - Add a helper of read_id_reg() (__read_id_reg()) and use the helper
-    instead of directly using __vcpu_sys_reg().
-  - Change not to run kvm_id_regs_consistency_check() and
-    kvm_vcpu_init_traps() for protected VMs.
-  - Update selftest to remove test cases for ID register consistency.
-    checking across vCPUs and to add test cases for ID_AA64PFR0_EL1.GIC.
-
-v2: https://lore.kernel.org/all/20211103062520.1445832-1-reijiw@google.com/
-  - Remove unnecessary line breaks. [Andrew]
-  - Use @params for comments. [Andrew]
-  - Move arm64_check_features to arch/arm64/kvm/sys_regs.c and
-    change that KVM specific feature check function.  [Andrew]
-  - Remove unnecessary raz handling from __set_id_reg. [Andrew]
-  - Remove sys_val field from the initial id_reg_info and add it
-    in the later patch. [Andrew]
-  - Call id_reg->init() from id_reg_info_init(). [Andrew]
-  - Fix cpuid_feature_cap_perfmon_field() to convert 0xf to 0x0
-    (and use it in the following patches).
-  - Change kvm_vcpu_first_run_init to set has_run_once to false
-    when kvm_id_regs_consistency_check() fails.
-  - Add a patch to introduce id_reg_info for ID_AA64MMFR0_EL1,
-    which requires special validity checking for TGran*_2 fields.
-  - Add patches to introduce id_reg_info for ID_DFR1_EL1 and
-    ID_MMFR0_EL1, which are required due to arm64_check_features
-    implementation change.
-  - Add a new argument, which is a pointer to id_reg_info, for
-    id_reg_info's validate().
-
-v1: https://lore.kernel.org/all/20211012043535.500493-1-reijiw@google.com/
-
-[1] https://lore.kernel.org/all/20211010145636.1950948-1-tabba@google.com/
-[2] https://lore.kernel.org/all/20201102033422.657391-1-liangpeng10@huawei.com/
-[3] https://lore.kernel.org/all/20220127161759.53553-2-alexandru.elisei@arm.com/
-
-Reiji Watanabe (25):
-  KVM: arm64: Introduce a validation function for an ID register
-  KVM: arm64: Save ID registers' sanitized value per guest
-  KVM: arm64: Introduce struct id_reg_desc
-  KVM: arm64: Make ID_AA64PFR0_EL1 writable
-  KVM: arm64: Make ID_AA64PFR1_EL1 writable
-  KVM: arm64: Make ID_AA64ISAR0_EL1 writable
-  KVM: arm64: Make ID_AA64ISAR1_EL1 writable
-  KVM: arm64: Make ID_AA64MMFR0_EL1 writable
-  KVM: arm64: Make ID_AA64DFR0_EL1/ID_DFR0_EL1 writable
-  KVM: arm64: Make MVFR1_EL1 writable
-  KVM: arm64: Add remaining ID registers to id_reg_desc_table
-  KVM: arm64: Use id_reg_desc_table for ID registers
-  KVM: arm64: Add consistency checking for frac fields of ID registers
-  KVM: arm64: Introduce KVM_CAP_ARM_ID_REG_CONFIGURABLE capability
-  KVM: arm64: Add kunit test for ID register validation
-  KVM: arm64: Use vcpu->arch cptr_el2 to track value of cptr_el2 for VHE
-  KVM: arm64: Use vcpu->arch.mdcr_el2 to track value of mdcr_el2
-  KVM: arm64: Introduce framework to trap disabled features
-  KVM: arm64: Trap disabled features of ID_AA64PFR0_EL1
-  KVM: arm64: Trap disabled features of ID_AA64PFR1_EL1
-  KVM: arm64: Trap disabled features of ID_AA64DFR0_EL1
-  KVM: arm64: Trap disabled features of ID_AA64MMFR1_EL1
-  KVM: arm64: Trap disabled features of ID_AA64ISAR1_EL1
-  KVM: arm64: Add kunit test for trap initialization
-  KVM: arm64: selftests: Introduce id_reg_test
-
- Documentation/virt/kvm/api.rst                |   12 +
- arch/arm64/include/asm/cpufeature.h           |    3 +-
- arch/arm64/include/asm/kvm_arm.h              |   32 +
- arch/arm64/include/asm/kvm_host.h             |   15 +
- arch/arm64/include/asm/sysreg.h               |    5 +-
- arch/arm64/kernel/cpufeature.c                |  229 +++
- arch/arm64/kvm/.kunitconfig                   |    4 +
- arch/arm64/kvm/Kconfig                        |   11 +
- arch/arm64/kvm/arm.c                          |   24 +-
- arch/arm64/kvm/debug.c                        |   13 +-
- arch/arm64/kvm/hyp/vhe/switch.c               |   14 +-
- arch/arm64/kvm/sys_regs.c                     | 1637 +++++++++++++++--
- arch/arm64/kvm/sys_regs_test.c                | 1238 +++++++++++++
- arch/arm64/kvm/vgic/vgic-init.c               |    9 +
- include/uapi/linux/kvm.h                      |    1 +
- tools/arch/arm64/include/asm/sysreg.h         |    1 +
- tools/testing/selftests/kvm/.gitignore        |    1 +
- tools/testing/selftests/kvm/Makefile          |    1 +
- .../selftests/kvm/aarch64/id_reg_test.c       | 1300 +++++++++++++
- 19 files changed, 4324 insertions(+), 226 deletions(-)
- create mode 100644 arch/arm64/kvm/.kunitconfig
- create mode 100644 arch/arm64/kvm/sys_regs_test.c
- create mode 100644 tools/testing/selftests/kvm/aarch64/id_reg_test.c
-
-
-base-commit: d1358550d36d8514b340f27a35ee0afc68f27cfc
+diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+index ef6be92b1921..a9edf1ca7dcb 100644
+--- a/arch/arm64/include/asm/cpufeature.h
++++ b/arch/arm64/include/asm/cpufeature.h
+@@ -631,6 +631,7 @@ void check_local_cpu_capabilities(void);
+ 
+ u64 read_sanitised_ftr_reg(u32 id);
+ u64 __read_sysreg_by_encoding(u32 sys_id);
++int arm64_check_features_kvm(u32 sys_reg, u64 val, u64 limit);
+ 
+ static inline bool cpu_supports_mixed_endian_el0(void)
+ {
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index e5f23dab1c8d..bc0ed09aa1b5 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -928,6 +928,10 @@ static void init_32bit_cpu_features(struct cpuinfo_32bit *info)
+ 	init_cpu_ftr_reg(SYS_MVFR2_EL1, info->reg_mvfr2);
+ }
+ 
++#ifdef CONFIG_KVM
++static void init_arm64_ftr_bits_kvm(void);
++#endif
++
+ void __init init_cpu_features(struct cpuinfo_arm64 *info)
+ {
+ 	/* Before we start using the tables, make sure it is sorted */
+@@ -970,6 +974,14 @@ void __init init_cpu_features(struct cpuinfo_arm64 *info)
+ 	 * after we have initialised the CPU feature infrastructure.
+ 	 */
+ 	setup_boot_cpu_capabilities();
++
++#ifdef CONFIG_KVM
++	/*
++	 * Initialize arm64_ftr_bits_kvm, which will be used to provide
++	 * KVM with general feature checking for its guests.
++	 */
++	init_arm64_ftr_bits_kvm();
++#endif
+ }
+ 
+ static void update_cpu_ftr_reg(struct arm64_ftr_reg *reg, u64 new)
+@@ -3156,3 +3168,220 @@ ssize_t cpu_show_meltdown(struct device *dev, struct device_attribute *attr,
+ 		return sprintf(buf, "Vulnerable\n");
+ 	}
+ }
++
++#ifdef CONFIG_KVM
++/*
++ * arm64_ftr_bits_kvm[] is used for KVM to check if features that are
++ * indicated in an ID register value for the guest are available on the host.
++ * arm64_ftr_bits_kvm[] is created based on arm64_ftr_regs[].  But, for
++ * registers for which arm64_ftr_bits_kvm_override[] has a corresponding
++ * entry, replace arm64_ftr_bits entries in arm64_ftr_bits_kvm[] with the
++ * ones in arm64_ftr_bits_kvm_override[].
++ *
++ * What to add to arm64_ftr_bits_kvm_override[] shouldn't be decided according
++ * to KVM's implementation, but according to schemes of ID register fields.
++ * (e.g. For ID_AA64DFR0_EL1.PMUVER, a higher value on the field indicates
++ * more features. So, the arm64_ftr_bits' type for the field can be
++ * FTR_LOWER_SAFE instead of FTR_EXACT unlike arm64_ftr_regs)
++ */
++
++/*
++ * The number of __ftr_reg_bits_entry entries in arm64_ftr_bits_kvm must be
++ * the same as the number of __ftr_reg_entry entries in arm64_ftr_regs.
++ */
++static struct __ftr_reg_bits_entry {
++	u32	sys_id;
++	struct arm64_ftr_bits	*ftr_bits;
++} arm64_ftr_bits_kvm[ARRAY_SIZE(arm64_ftr_regs)];
++
++/*
++ * Number of arm64_ftr_bits entries for each register.
++ * (Number of 4 bits fields in 64 bit register + 1 entry for ARM64_FTR_END)
++ */
++#define	MAX_FTR_BITS_LEN	17
++
++/* Use FTR_LOWER_SAFE for AA64DFR0_EL1.PMUVER and AA64DFR0_EL1.DEBUGVER. */
++static struct arm64_ftr_bits ftr_id_aa64dfr0_kvm[MAX_FTR_BITS_LEN] = {
++	S_ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64DFR0_PMUVER_SHIFT, 4, 0),
++	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR0_DEBUGVER_SHIFT, 4, 0x6),
++	ARM64_FTR_END,
++};
++
++#define	ARM64_FTR_REG_BITS(id, table)	{	\
++	.sys_id = id,				\
++	.ftr_bits = &((table)[0]),		\
++}
++
++/*
++ * All entries in arm64_ftr_bits_kvm_override[] are used to override
++ * the corresponding entries in arm64_ftr_bits_kvm[].
++ */
++static struct __ftr_reg_bits_entry arm64_ftr_bits_kvm_override[] = {
++	ARM64_FTR_REG_BITS(SYS_ID_AA64DFR0_EL1, ftr_id_aa64dfr0_kvm),
++};
++
++/*
++ * Override entries in @orig_ftrp with the ones in @new_ftrp when their shift
++ * fields match.  The last entry of @orig_ftrp and @new_ftrp must be
++ * ARM64_FTR_END (.width == 0).
++ */
++static void arm64_ftr_reg_bits_override(struct arm64_ftr_bits *orig_ftrp,
++					const struct arm64_ftr_bits *new_ftrp)
++{
++	const struct arm64_ftr_bits *n_ftrp;
++	struct arm64_ftr_bits *o_ftrp;
++
++	for (n_ftrp = new_ftrp; n_ftrp->width; n_ftrp++) {
++		for (o_ftrp = orig_ftrp; o_ftrp->width; o_ftrp++) {
++			if (o_ftrp->shift == n_ftrp->shift) {
++				*o_ftrp = *n_ftrp;
++				break;
++			}
++		}
++	}
++}
++
++/*
++ * Copy arm64_ftr_bits entries from @src_ftrp to @dst_ftrp.  The last entries
++ * of @dst_ftrp and @src_ftrp must be ARM64_FTR_END (.width == 0).
++ */
++static void copy_arm64_ftr_bits(struct arm64_ftr_bits *dst_ftrp,
++				const struct arm64_ftr_bits *src_ftrp)
++{
++	int i = 0;
++
++	for (; src_ftrp[i].width; i++) {
++		if (WARN_ON_ONCE(i >= (MAX_FTR_BITS_LEN - 1)))
++			break;
++
++		dst_ftrp[i] = src_ftrp[i];
++	}
++
++	dst_ftrp[i].width = 0;
++}
++
++/*
++ * Initialize arm64_ftr_bits_kvm.  Copy arm64_ftr_bits for each ID register
++ * from arm64_ftr_regs to arm64_ftr_bits_kvm, and then override entries in
++ * arm64_ftr_bits_kvm with ones in arm64_ftr_bits_kvm_override.
++ */
++static void init_arm64_ftr_bits_kvm(void)
++{
++	struct arm64_ftr_bits ftr_temp[MAX_FTR_BITS_LEN];
++	static struct __ftr_reg_bits_entry *bits, *o_bits;
++	int i, j;
++
++	/* Copy entries from arm64_ftr_regs to arm64_ftr_bits_kvm */
++	for (i = 0; i < ARRAY_SIZE(arm64_ftr_bits_kvm); i++) {
++		bits = &arm64_ftr_bits_kvm[i];
++		bits->sys_id = arm64_ftr_regs[i].sys_id;
++		bits->ftr_bits = (struct arm64_ftr_bits *)arm64_ftr_regs[i].reg->ftr_bits;
++	};
++
++	/*
++	 * Override the entries in arm64_ftr_bits_kvm with the ones in
++	 * arm64_ftr_bits_kvm_override.
++	 */
++	for (i = 0; i < ARRAY_SIZE(arm64_ftr_bits_kvm_override); i++) {
++		o_bits = &arm64_ftr_bits_kvm_override[i];
++		for (j = 0; j < ARRAY_SIZE(arm64_ftr_bits_kvm); j++) {
++			bits = &arm64_ftr_bits_kvm[j];
++			if (bits->sys_id != o_bits->sys_id)
++				continue;
++
++			/*
++			 * The code below tries to sustain the ordering of
++			 * entries in bits even in o_bits, just in case
++			 * arm64_ftr_bits entries in arm64_ftr_regs have
++			 * any ordering requirements in the future (so that
++			 * the ones in arm64_ftr_bits_kvm_override doesn't
++			 * have to care).
++			 * So, rather than directly copying them to empty
++			 * slots in o_bits, the code simply copies entries
++			 * from bits to o_bits first, then overrides them with
++			 * original entries in o_bits.
++			 */
++			memset(ftr_temp, 0, sizeof(ftr_temp));
++
++			/*
++			 * Temporary save all entries in o_bits->ftr_bits
++			 * to ftr_temp.
++			 */
++			copy_arm64_ftr_bits(ftr_temp, o_bits->ftr_bits);
++
++			/*
++			 * Copy entries from bits->ftr_bits to o_bits->ftr_bits.
++			 */
++			copy_arm64_ftr_bits(o_bits->ftr_bits, bits->ftr_bits);
++
++			/*
++			 * Override entries in o_bits->ftr_bits with the
++			 * saved ones, and update bits->ftr_bits with
++			 * o_bits->ftr_bits.
++			 */
++			arm64_ftr_reg_bits_override(o_bits->ftr_bits, ftr_temp);
++			bits->ftr_bits = o_bits->ftr_bits;
++			break;
++		}
++	}
++}
++
++static int search_cmp_ftr_reg_bits(const void *id, const void *regp)
++{
++	return ((int)(unsigned long)id -
++		(int)((const struct __ftr_reg_bits_entry *)regp)->sys_id);
++}
++
++static const struct arm64_ftr_bits *get_arm64_ftr_bits_kvm(u32 sys_id)
++{
++	const struct __ftr_reg_bits_entry *ret;
++
++	ret = bsearch((const void *)(unsigned long)sys_id,
++		      arm64_ftr_bits_kvm,
++		      ARRAY_SIZE(arm64_ftr_bits_kvm),
++		      sizeof(arm64_ftr_bits_kvm[0]),
++		      search_cmp_ftr_reg_bits);
++	if (ret)
++		return ret->ftr_bits;
++
++	return NULL;
++}
++
++/*
++ * Check if features (or levels of features) that are indicated in the ID
++ * register value @val are also indicated in @limit.
++ * This function is for KVM to check if features that are indicated in @val,
++ * which will be used as the ID register value for its guest, are supported
++ * on the host.
++ * For AA64MMFR0_EL1.TGranX_2 fields, which don't follow the standard ID
++ * scheme, the function checks if values of the fields in @val are the same
++ * as the ones in @limit.
++ */
++int arm64_check_features_kvm(u32 sys_reg, u64 val, u64 limit)
++{
++	const struct arm64_ftr_bits *ftrp = get_arm64_ftr_bits_kvm(sys_reg);
++	u64 exposed_mask = 0;
++
++	if (!ftrp)
++		return -ENOENT;
++
++	for (; ftrp->width; ftrp++) {
++		s64 ftr_val = arm64_ftr_value(ftrp, val);
++		s64 ftr_lim = arm64_ftr_value(ftrp, limit);
++
++		exposed_mask |= arm64_ftr_mask(ftrp);
++
++		if (ftr_val == ftr_lim)
++			continue;
++
++		if (ftr_val != arm64_ftr_safe_value(ftrp, ftr_val, ftr_lim))
++			return -E2BIG;
++	}
++
++	/* Make sure that no unrecognized fields are set in @val. */
++	if (val & ~exposed_mask)
++		return -E2BIG;
++
++	return 0;
++}
++#endif /* CONFIG_KVM */
 -- 
 2.35.1.723.g4982287a31-goog
 
