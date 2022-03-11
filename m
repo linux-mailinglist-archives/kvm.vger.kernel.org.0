@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 474D64D5BFC
-	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 08:05:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 36C3F4D5BFF
+	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 08:05:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347063AbiCKHEx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Mar 2022 02:04:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51018 "EHLO
+        id S1347130AbiCKHFQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Mar 2022 02:05:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51070 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347050AbiCKHEv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Mar 2022 02:04:51 -0500
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92EA2A9A76;
-        Thu, 10 Mar 2022 23:03:42 -0800 (PST)
-Received: by mail-pl1-x62c.google.com with SMTP id p17so6969217plo.9;
-        Thu, 10 Mar 2022 23:03:42 -0800 (PST)
+        with ESMTP id S1347082AbiCKHEx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Mar 2022 02:04:53 -0500
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B824B9F6E7;
+        Thu, 10 Mar 2022 23:03:49 -0800 (PST)
+Received: by mail-pj1-x102d.google.com with SMTP id cx5so7412812pjb.1;
+        Thu, 10 Mar 2022 23:03:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=Iy67NItp+GEC8UykPY0qxJon7huk/5WIMi5uX5I8nDo=;
-        b=ZV415Q4ZLugJt8Rh2xnuSE2f5W9YfzjcqfA6GrNxgYDEUpUWH5wW83QKXhCrMuRZSe
-         mRWqtAVJSi0VWPrbayJRpc9wdmUGM7fpsVOBOvGh7V/mSaqxXW6FMd4JHDph6FpttxsX
-         T59H/2KCjTCPDREnagOXn25I04nOAioi3jdB4L654BW0+oJn4IF/ygtby5A/AWdp70YR
-         Lcj3gL4EL/7duzq6N56Sm+HET0hN4rVynv/C0GrCdKe+DeMfoJ1qRzaedM7iDroidu1P
-         IsTHaKudg5FheURQvTaP2bjJseREkikbr4dBW+wI6pKkIESFABpj07k9VgAOkkHpacZv
-         oHuw==
+        bh=PHRKmoOpdVOx/pR8qbguqjvyNTEJ3bXLgyEzmCfW7IA=;
+        b=Pd3JO5VGOU2LL2nfJBODpe5Kb7ywmPlHuJyMwgjRY7zfioOnLHaaLCPYMAscrN721N
+         2YTNfENdSdRF4Bbeh9N8C4BkdLQWT41VZySTLF/8ZdJA3DpyxU2znAxioIkWwaqHocG7
+         SQQI1+R1KEOwY9O2DpOX7omMZ6jHaGdIdGM+bNEKrbfcRuankTzp9CAlsAaniznJaZ6P
+         Wtpop2DMtSaRQ3xtaTmZvWrKQ2HQh6Da17nIOjG440XbOKyKf8eM9uQzfQYBv4s4wzgn
+         QQ6WwESy9R4jO76fBQmFc/Y/UWNvQxekuja8WHT0qHWhYJ6Azw8m969xDe0v3wcIBpVd
+         78lA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=Iy67NItp+GEC8UykPY0qxJon7huk/5WIMi5uX5I8nDo=;
-        b=MJEhOsidRlbGNOgjODcrFPJONHQZN71SH2wNHuLb7a23u8KvhNKkZmS5+ksaXpEHHn
-         xZab3KmZr/AqWN2cWWurW0ry5HPOQG/wTC3ZUYWXW4B7j8RtI2sCiOJM+htoh9ewKKT8
-         eY8KsSJWATA87W8kMTYtfM+GEG4wHwD9NcFrdHlewtqYPA9jENnwtbmSQrDRi+qQvm16
-         ioB3pLvkUhARIOwgMAAeHOc2BjgL7cV1+rr3YVN2vPUUsIKmkvWiIpiodrpN9dcKP/9R
-         8Mw/7cNu9gkhd009cj1FYdJKabHFrvnh8qK/sWGbp7vz0jJM8qAK+95DPPcK/9jhI/n/
-         BV9A==
-X-Gm-Message-State: AOAM531uJLklRrSIvHznoM9kFZrlcK/a0Mrh6bhCa0RprDOksyaDeAFD
-        PQt0onaqaDs0T6tH+y2Wzmog2bWT944=
-X-Google-Smtp-Source: ABdhPJzV4EKUrFLGMRxwYzqpwYtgez54ARNd2Fmvdf8wIwxD5QmH3Jyc5W3AiFofwiN7hnc94ZPEXw==
-X-Received: by 2002:a17:90a:6c01:b0:1bf:1e67:b532 with SMTP id x1-20020a17090a6c0100b001bf1e67b532mr20339718pjj.138.1646982221886;
-        Thu, 10 Mar 2022 23:03:41 -0800 (PST)
+        bh=PHRKmoOpdVOx/pR8qbguqjvyNTEJ3bXLgyEzmCfW7IA=;
+        b=hwt7EA7S23GGHaTgzpYLBpEG5EcUj1/9B2gm4WanCQbTfvKVvIIIxonbQlApUO6TAB
+         L9ddruW6n2sujWnXXxNvfWwXJ1JW3aT1SH2kSfEvm9bNRosShIIdaX0EthkboZu2shzS
+         Vg5TwYclvgud+EHU7p8x6IcaatJS74g9klBbJXlrDgzsDL39rzoDBD7ESFPpbYdn1hNH
+         IV6U/YsYcwe8TGT852ufRG9L2oy3ljx9MFw4AFM4VPIAb4db3Rf0OcDDqyoAg1+DcoXH
+         UeNvSsmjMtnpYkNNdbjwPDiB603v2HjK/Ln8BoJGG2s2KhK4GESDSfb92b2ikLdb+QtV
+         1sCg==
+X-Gm-Message-State: AOAM530Ls+t+FKdl+QAnyZUIhP2yUbXgCCbRbwy9shbSwtRjiamkfNGr
+        yw0psSWRoQdVtij0fTUGxPANrFqtexY=
+X-Google-Smtp-Source: ABdhPJyu0YmUGsKJEy4FIXKekCurj/9SpISDUGXFi1BJpgO2rJUHXpvF77AnKkOEC1rhChsQZP7aeA==
+X-Received: by 2002:a17:902:e547:b0:151:c5d5:a2c4 with SMTP id n7-20020a170902e54700b00151c5d5a2c4mr8948614plf.78.1646982228999;
+        Thu, 10 Mar 2022 23:03:48 -0800 (PST)
 Received: from localhost ([47.251.4.198])
-        by smtp.gmail.com with ESMTPSA id u10-20020a056a00124a00b004f783abfa0esm3147517pfi.28.2022.03.10.23.03.40
+        by smtp.gmail.com with ESMTPSA id j13-20020a056a00130d00b004f1025a4361sm10019818pfu.202.2022.03.10.23.03.47
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 10 Mar 2022 23:03:41 -0800 (PST)
+        Thu, 10 Mar 2022 23:03:48 -0800 (PST)
 From:   Lai Jiangshan <jiangshanlai@gmail.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -60,9 +60,9 @@ Cc:     Lai Jiangshan <jiangshan.ljs@antgroup.com>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
         "H. Peter Anvin" <hpa@zytor.com>
-Subject: [PATCH V2 5/5] KVM: X86: Only get rflags when needed in permission_fault()
-Date:   Fri, 11 Mar 2022 15:03:45 +0800
-Message-Id: <20220311070346.45023-6-jiangshanlai@gmail.com>
+Subject: [RFC PATCH V2 6/5] KVM: X86: Propagate the nested page fault info to the guest
+Date:   Fri, 11 Mar 2022 15:03:46 +0800
+Message-Id: <20220311070346.45023-7-jiangshanlai@gmail.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
 In-Reply-To: <20220311070346.45023-1-jiangshanlai@gmail.com>
 References: <20220311070346.45023-1-jiangshanlai@gmail.com>
@@ -80,71 +80,138 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 
-The SMAP checking and rflags are only needed in permission_fault()
-when it is supervisor access and SMAP is enabled.  These information is
-already encoded in the combination of mmu->permissions[] and the index.
+Feed the nested page fault info into ->gva_to_gpa() in
+walk_addr_generic(), so that the nested walk_addr_generic() can
+propagate the nested page fault info into x86_exception.
 
-So we can use the encoded information to see if we need the SMAP checking
-instead of getting the rflags unconditionally.
+Propagate the nested page fault info into EXIT_INFO_1 for SVM.
+
+Morph the nested page fault info and other page fault error code into
+EXIT_QUOLIFICATION for VMX.
+
+It is a patch that makes use of the patch1.
+
+It is untested, just served as a request for somebody to fix a known
+problem, and will not be included in next version of this patchset
+if the patchset needs to be updated.
 
 Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 ---
- arch/x86/kvm/mmu.h | 28 +++++++++++++++++++++++-----
- 1 file changed, 23 insertions(+), 5 deletions(-)
+ arch/x86/include/asm/kvm_host.h |  2 ++
+ arch/x86/kvm/kvm_emulate.h      |  3 ++-
+ arch/x86/kvm/mmu/paging_tmpl.h  |  8 ++++++--
+ arch/x86/kvm/svm/nested.c       | 10 ++--------
+ arch/x86/kvm/vmx/nested.c       | 11 +++++++++++
+ 5 files changed, 23 insertions(+), 11 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-index 4cb7a39ecd51..ceac1e9e21e9 100644
---- a/arch/x86/kvm/mmu.h
-+++ b/arch/x86/kvm/mmu.h
-@@ -218,13 +218,12 @@ static inline u8 permission_fault(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
- {
- 	/* strip nested paging fault error codes */
- 	unsigned int pfec = access;
--	unsigned long rflags = static_call(kvm_x86_get_rflags)(vcpu);
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 565d9eb42429..68efa9d1ef0e 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -265,6 +265,8 @@ enum x86_intercept_stage;
+ 				 PFERR_WRITE_MASK |		\
+ 				 PFERR_PRESENT_MASK)
  
- 	/*
- 	 * For explicit supervisor accesses, SMAP is disabled if EFLAGS.AC = 1.
- 	 * For implicit supervisor accesses, SMAP cannot be overridden.
- 	 *
--	 * SMAP works on supervisor accesses only, and not_smap can
-+	 * SMAP works on supervisor accesses only, and the SMAP checking bit can
- 	 * be set or not set when user access with neither has any bearing
- 	 * on the result.
- 	 *
-@@ -233,11 +232,30 @@ static inline u8 permission_fault(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
- 	 * if SMAP checks are being disabled.
- 	 */
- 	bool explicit_access = !(access & PFERR_IMPLICIT_ACCESS);
--	bool not_smap = (rflags & X86_EFLAGS_AC) && explicit_access;
--	int index = (pfec + (!!not_smap << PFERR_RSVD_BIT)) >> 1;
--	bool fault = (mmu->permissions[index] >> pte_access) & 1;
-+	bool fault = (mmu->permissions[pfec >> 1] >> pte_access) & 1;
-+	int index = (pfec + PFERR_RSVD_MASK) >> 1;
-+	bool fault_not_smap = (mmu->permissions[index] >> pte_access) & 1;
- 	u32 errcode = PFERR_PRESENT_MASK;
- 
-+	/*
-+	 * The value of fault has included SMAP checking if it is supervisor
-+	 * access and SMAP is enabled and encoded in mmu->permissions.
-+	 *
-+	 * fault	fault_not_smap
-+	 * 0		0		not fault due to UWX nor SMAP
-+	 * 0		1		impossible combination
-+	 * 1		1		fault due to UWX
-+	 * 1		0		fault due to SMAP, need to check if
-+	 * 				SMAP is prevented
-+	 *
-+	 * SMAP is prevented only when X86_EFLAGS_AC is set on explicit
-+	 * supervisor access.
-+	 */
-+	if (unlikely(fault && !fault_not_smap && explicit_access)) {
-+		unsigned long rflags = static_call(kvm_x86_get_rflags)(vcpu);
-+		fault = !(rflags & X86_EFLAGS_AC);
-+	}
++#define PFERR_GUEST_MASK (PFERR_GUEST_FINAL_MASK | PFERR_GUEST_PAGE_MASK)
 +
- 	WARN_ON(pfec & (PFERR_PK_MASK | PFERR_RSVD_MASK));
- 	if (unlikely(mmu->pkru_mask)) {
- 		u32 pkru_bits, offset;
+ /* apic attention bits */
+ #define KVM_APIC_CHECK_VAPIC	0
+ /*
+diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
+index 39eded2426ff..cdc2977ce086 100644
+--- a/arch/x86/kvm/kvm_emulate.h
++++ b/arch/x86/kvm/kvm_emulate.h
+@@ -24,8 +24,9 @@ struct x86_exception {
+ 	bool error_code_valid;
+ 	u16 error_code;
+ 	bool nested_page_fault;
+-	u64 address; /* cr2 or nested page fault gpa */
+ 	u8 async_page_fault;
++	u64 nested_pfec; /* nested page fault error code */
++	u64 address; /* cr2 or nested page fault gpa */
+ };
+ 
+ /*
+diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+index 8621188b46df..95367f5ca998 100644
+--- a/arch/x86/kvm/mmu/paging_tmpl.h
++++ b/arch/x86/kvm/mmu/paging_tmpl.h
+@@ -383,7 +383,8 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
+ 	 * by the MOV to CR instruction are treated as reads and do not cause the
+ 	 * processor to set the dirty flag in any EPT paging-structure entry.
+ 	 */
+-	nested_access = (have_ad ? PFERR_WRITE_MASK : 0) | PFERR_USER_MASK;
++	nested_access = (have_ad ? PFERR_WRITE_MASK : 0) | PFERR_USER_MASK |
++			PFERR_GUEST_PAGE_MASK;
+ 
+ 	pte_access = ~0;
+ 	++walker->level;
+@@ -466,7 +467,8 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
+ 	if (PTTYPE == 32 && walker->level > PG_LEVEL_4K && is_cpuid_PSE36())
+ 		gfn += pse36_gfn_delta(pte);
+ 
+-	real_gpa = kvm_translate_gpa(vcpu, mmu, gfn_to_gpa(gfn), access, &walker->fault);
++	real_gpa = kvm_translate_gpa(vcpu, mmu, gfn_to_gpa(gfn),
++			access | PFERR_GUEST_FINAL_MASK, &walker->fault);
+ 	if (real_gpa == UNMAPPED_GVA)
+ 		return 0;
+ 
+@@ -534,6 +536,8 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
+ 	walker->fault.address = addr;
+ 	walker->fault.nested_page_fault = mmu != vcpu->arch.walk_mmu;
+ 	walker->fault.async_page_fault = false;
++	if (walker->fault.nested_page_fault)
++		walker->fault.nested_pfec = errcode | (access & PFERR_GUEST_MASK);
+ 
+ 	trace_kvm_mmu_walker_error(walker->fault.error_code);
+ 	return 0;
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index 96bab464967f..0abcbd3de892 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -38,18 +38,12 @@ static void nested_svm_inject_npf_exit(struct kvm_vcpu *vcpu,
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+ 
+ 	if (svm->vmcb->control.exit_code != SVM_EXIT_NPF) {
+-		/*
+-		 * TODO: track the cause of the nested page fault, and
+-		 * correctly fill in the high bits of exit_info_1.
+-		 */
+ 		svm->vmcb->control.exit_code = SVM_EXIT_NPF;
+ 		svm->vmcb->control.exit_code_hi = 0;
+-		svm->vmcb->control.exit_info_1 = (1ULL << 32);
+-		svm->vmcb->control.exit_info_2 = fault->address;
+ 	}
+ 
+-	svm->vmcb->control.exit_info_1 &= ~0xffffffffULL;
+-	svm->vmcb->control.exit_info_1 |= fault->error_code;
++	svm->vmcb->control.exit_info_1 = fault->nested_pfec;
++	svm->vmcb->control.exit_info_2 = fault->address;
+ 
+ 	nested_svm_vmexit(svm);
+ }
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 1dfe23963a9e..fd5dd5acf63b 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -372,6 +372,17 @@ static void nested_ept_inject_page_fault(struct kvm_vcpu *vcpu,
+ 	u32 vm_exit_reason;
+ 	unsigned long exit_qualification = vcpu->arch.exit_qualification;
+ 
++	exit_qualification &= ~(EPT_VIOLATION_ACC_READ | EPT_VIOLATION_ACC_WRITE |
++				EPT_VIOLATION_ACC_INSTR | EPT_VIOLATION_GVA_TRANSLATED);
++	exit_qualification |= fault->nested_pfec & PFERR_USER_MASK ?
++				EPT_VIOLATION_ACC_READ : 0;
++	exit_qualification |= fault->nested_pfec & PFERR_WRITE_MASK ?
++				EPT_VIOLATION_ACC_WRITE : 0;
++	exit_qualification |= fault->nested_pfec & PFERR_FETCH_MASK ?
++				EPT_VIOLATION_ACC_INSTR : 0;
++	exit_qualification |= fault->nested_pfec & PFERR_GUEST_FINAL_MASK ?
++				EPT_VIOLATION_GVA_TRANSLATED : 0;
++
+ 	if (vmx->nested.pml_full) {
+ 		vm_exit_reason = EXIT_REASON_PML_FULL;
+ 		vmx->nested.pml_full = false;
 -- 
 2.19.1.6.gb485710b
 
