@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A708F4D650D
+	by mail.lfdr.de (Postfix) with ESMTP id 2D2FB4D650C
 	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 16:50:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349867AbiCKPvp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Mar 2022 10:51:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58108 "EHLO
+        id S1349691AbiCKPvm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Mar 2022 10:51:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58402 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349724AbiCKPvX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1349639AbiCKPvX (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 11 Mar 2022 10:51:23 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 67A341CABCB
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 299BE1CABDA
         for <kvm@vger.kernel.org>; Fri, 11 Mar 2022 07:50:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647013817;
+        s=mimecast20190719; t=1647013818;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=0tDVPG+cSC0wZSZXXfWO0Gv51YvV+L3gtZb8BmeIrIg=;
-        b=jCITjxjh28iKyJW6BEeKogvSCIFPpXD/8xRetRdyEExCfG0L0GjbT8BgcuTOk7VXliJ/qn
-        62eGRkDMKKl3mCVbskFcqKsVt3qnFQcJH5PgcCoaG/cG0ng9tbBfB3NFBk+Y/2lsE+64HE
-        NOeqVtHSTV7TE0WPp0GwadRDzlAJQKA=
+        bh=r0U93TwJKtCWSRp8OCIeSktwKEFUnEWgPi81ndGHy4o=;
+        b=H+K3edlGk0rldFM4Pn8Ei52Cy3d9s/DyF7zjdcoowIOSc8vY+DZ00zFQa8jdjTsVzDMCvB
+        nGQxJuRm3izzSjn8cn5yxXzKkxefjhRXYGIopV5MU+pZ0xZbxq1fa1h+oDA20X0R0ISMDw
+        Lk7gKEXy+kvjQhy0RLr9eSsJTcRqZZk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-587-Ul6qfZXpOyKcmD6QQluqHw-1; Fri, 11 Mar 2022 10:50:12 -0500
-X-MC-Unique: Ul6qfZXpOyKcmD6QQluqHw-1
+ us-mta-641-YK2MpHZ8OsKdOJHHUKqrGw-1; Fri, 11 Mar 2022 10:50:15 -0500
+X-MC-Unique: YK2MpHZ8OsKdOJHHUKqrGw-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A5733824FAB;
-        Fri, 11 Mar 2022 15:50:10 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 84BA7824FA6;
+        Fri, 11 Mar 2022 15:50:13 +0000 (UTC)
 Received: from fedora.redhat.com (unknown [10.40.194.45])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 27F9D785FD;
-        Fri, 11 Mar 2022 15:50:07 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 10AC9866C1;
+        Fri, 11 Mar 2022 15:50:10 +0000 (UTC)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -46,9 +46,9 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         linux-hyperv@vger.kernel.org,
         Siddharth Chandrasekaran <sidcha@amazon.de>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 08/31] KVM: x86: hyper-v: Use preallocated buffer in 'struct kvm_vcpu_hv' instead of on-stack 'sparse_banks'
-Date:   Fri, 11 Mar 2022 16:49:20 +0100
-Message-Id: <20220311154943.2299191-9-vkuznets@redhat.com>
+Subject: [PATCH 09/31] KVM: nVMX: Keep track of hv_vm_id/hv_vp_id when eVMCS is in use
+Date:   Fri, 11 Mar 2022 16:49:21 +0100
+Message-Id: <20220311154943.2299191-10-vkuznets@redhat.com>
 In-Reply-To: <20220311154943.2299191-1-vkuznets@redhat.com>
 References: <20220311154943.2299191-1-vkuznets@redhat.com>
 MIME-Version: 1.0
@@ -64,69 +64,76 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-To make kvm_hv_flush_tlb() ready to handle Direct TLB flush request
-KVM needs to allow for all 64 sparse vCPU banks regardless of KVM_MAX_VCPUs
-as L1 may use vCPU overcommit for L2. To avoid growing on-stack allocation,
-make 'sparse_banks' part of per-vCPU 'struct kvm_vcpu_hv' which is
-allocated dynamically.
-
-Note: sparse_set_to_vcpu_mask() keeps using on-stack allocation as it
-won't be used to handle Direct TLB flush requests.
+To handle Direct TLB flush requests from L2, KVM needs to keep track
+of L2's VM_ID/VP_IDs which are set by L1 hypervisor. 'Partition assist
+page' address is also needed to handle post-flush exit to L1 upon
+request.
 
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- arch/x86/include/asm/kvm_host.h | 3 +++
- arch/x86/kvm/hyperv.c           | 6 ++++--
- 2 files changed, 7 insertions(+), 2 deletions(-)
+ arch/x86/include/asm/kvm_host.h |  6 ++++++
+ arch/x86/kvm/vmx/nested.c       | 12 ++++++++++++
+ 2 files changed, 18 insertions(+)
 
 diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 750ac4055d0c..1fce8232a2e9 100644
+index 1fce8232a2e9..21b502aa9655 100644
 --- a/arch/x86/include/asm/kvm_host.h
 +++ b/arch/x86/include/asm/kvm_host.h
-@@ -615,6 +615,9 @@ struct kvm_vcpu_hv {
+@@ -618,6 +618,12 @@ struct kvm_vcpu_hv {
  
- 	/* Two rings for regular Hyper-V TLB flush and Direct TLB flush */
- 	struct kvm_vcpu_hv_tlbflush_ring tlb_flush_ring[2];
+ 	/* Preallocated buffer for handling hypercalls passing sparse vCPU set */
+ 	u64 sparse_banks[64];
 +
-+	/* Preallocated buffer for handling hypercalls passing sparse vCPU set */
-+	u64 sparse_banks[64];
++	struct {
++		u64 pa_page_gpa;
++		u64 vm_id;
++		u32 vp_id;
++	} nested;
  };
  
  /* Xen HVM per vcpu emulation context */
-diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index 9dfc122d5eca..b88e44a126b8 100644
---- a/arch/x86/kvm/hyperv.c
-+++ b/arch/x86/kvm/hyperv.c
-@@ -1969,13 +1969,14 @@ void kvm_hv_vcpu_flush_tlb(struct kvm_vcpu *vcpu)
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index f18744f7ff82..0cd6d5475578 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -225,6 +225,7 @@ static void vmx_disable_shadow_vmcs(struct vcpu_vmx *vmx)
  
- static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
+ static inline void nested_release_evmcs(struct kvm_vcpu *vcpu)
  {
 +	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
-+	u64 *sparse_banks = hv_vcpu->sparse_banks;
- 	struct kvm *kvm = vcpu->kvm;
- 	struct hv_tlb_flush_ex flush_ex;
- 	struct hv_tlb_flush flush;
- 	DECLARE_BITMAP(vcpu_mask, KVM_MAX_VCPUS);
- 	u64 entries[KVM_HV_TLB_FLUSH_RING_SIZE - 2];
- 	u64 valid_bank_mask;
--	u64 sparse_banks[KVM_HV_MAX_SPARSE_VCPU_SET_BITS];
- 	struct kvm_vcpu *v;
- 	unsigned long i;
- 	bool all_cpus, all_addr;
-@@ -2127,11 +2128,12 @@ static void kvm_hv_send_ipi_to_many(struct kvm *kvm, u32 vector,
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
  
- static u64 kvm_hv_send_ipi(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
+ 	if (evmptr_is_valid(vmx->nested.hv_evmcs_vmptr)) {
+@@ -233,6 +234,9 @@ static inline void nested_release_evmcs(struct kvm_vcpu *vcpu)
+ 	}
+ 
+ 	vmx->nested.hv_evmcs_vmptr = EVMPTR_INVALID;
++	hv_vcpu->nested.pa_page_gpa = INVALID_GPA;
++	hv_vcpu->nested.vm_id = 0;
++	hv_vcpu->nested.vp_id = 0;
+ }
+ 
+ static void vmx_sync_vmcs_host_state(struct vcpu_vmx *vmx,
+@@ -1592,11 +1596,19 @@ static void copy_enlightened_to_vmcs12(struct vcpu_vmx *vmx, u32 hv_clean_fields
  {
-+	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
-+	u64 *sparse_banks = hv_vcpu->sparse_banks;
- 	struct kvm *kvm = vcpu->kvm;
- 	struct hv_send_ipi_ex send_ipi_ex;
- 	struct hv_send_ipi send_ipi;
- 	unsigned long valid_bank_mask;
--	u64 sparse_banks[KVM_HV_MAX_SPARSE_VCPU_SET_BITS];
- 	u32 vector;
- 	bool all_cpus;
+ 	struct vmcs12 *vmcs12 = vmx->nested.cached_vmcs12;
+ 	struct hv_enlightened_vmcs *evmcs = vmx->nested.hv_evmcs;
++	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(&vmx->vcpu);
  
+ 	/* HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE */
+ 	vmcs12->tpr_threshold = evmcs->tpr_threshold;
+ 	vmcs12->guest_rip = evmcs->guest_rip;
+ 
++	if (unlikely(!(hv_clean_fields &
++		       HV_VMX_ENLIGHTENED_CLEAN_FIELD_ENLIGHTENMENTSCONTROL))) {
++		hv_vcpu->nested.pa_page_gpa = evmcs->partition_assist_page;
++		hv_vcpu->nested.vm_id = evmcs->hv_vm_id;
++		hv_vcpu->nested.vp_id = evmcs->hv_vp_id;
++	}
++
+ 	if (unlikely(!(hv_clean_fields &
+ 		       HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_BASIC))) {
+ 		vmcs12->guest_rsp = evmcs->guest_rsp;
 -- 
 2.35.1
 
