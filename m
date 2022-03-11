@@ -2,161 +2,302 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 15C874D6679
-	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 17:37:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 890154D66E6
+	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 17:56:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350549AbiCKQiP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Mar 2022 11:38:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40738 "EHLO
+        id S1349507AbiCKQ5V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Mar 2022 11:57:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52790 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350408AbiCKQhw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Mar 2022 11:37:52 -0500
+        with ESMTP id S240931AbiCKQ5V (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Mar 2022 11:57:21 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E47C81C65C7
-        for <kvm@vger.kernel.org>; Fri, 11 Mar 2022 08:36:48 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8D6851D3052
+        for <kvm@vger.kernel.org>; Fri, 11 Mar 2022 08:56:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647016608;
+        s=mimecast20190719; t=1647017776;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=6iV6PzyNn8RULyHZxri/N0ee8Slwz+DlYnq8A+sMdcA=;
-        b=U9262J9DawfaFT06UxeKKAqur+UefJQYDfWr6RlcGpkGLDS8qI1snKdI9+Gs1Syf7zZKWP
-        mJ0tKuPyLlhqnFinpwRXXCs74TnMIWcCuT0SqouT3F5q9vcNKnwYtNWJQiY0Da4Dp80zfj
-        b/GHK1ItxWzHcG7L9QQ900H6CGePFL0=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+         to:to:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=GnNrjAxrT5ZrO3afz3SeyvIGZ5jINI+roKjTEpwxAD8=;
+        b=TsndNmtauQx0N0b7GKif8Lqs37k1TB9gTJMxd5uBvIZZLOSKxO4tsWcpNQcI2TrWWp7y2e
+        K0sQOCVLiuvYbmdRMsbDXoSxgF29UzgAD6uH8omrl6kb9n8f4qg5iHd/OoTqorL2FutjSf
+        nqB9bSKLmXIwgEHrjk1RjbyLFUyJd4A=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-206-HN2lh0psN1Go4RAACCNOng-1; Fri, 11 Mar 2022 11:36:46 -0500
-X-MC-Unique: HN2lh0psN1Go4RAACCNOng-1
-Received: by mail-wm1-f69.google.com with SMTP id o21-20020a05600c511500b003818c4b98b5so3200953wms.0
-        for <kvm@vger.kernel.org>; Fri, 11 Mar 2022 08:36:46 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=6iV6PzyNn8RULyHZxri/N0ee8Slwz+DlYnq8A+sMdcA=;
-        b=OkJ6eKGiP/IBfQl0hpcAr3/t5G5IkX/T4FEs027gHNLsHqjP3b8d08M0rttF2T9wvq
-         OuNopeAX/CtFlLy3kKvEHPvHWxfnyyl0QDKJ4fK1n1oAgOvlVcqAoNhKrgb8ZL5iGc/v
-         RLWMb5LdK5C0jCYUUKb/2sgJvArgLAZvfwKL/sCUv36Uh1uBRdqm2otRY2p6/P/1zTdR
-         3Vo51wx/BWF/EN/0QZkvyCaJnuQ+Y3D6VZb3S9o5wTolvnpD0vaiPNWY1z6mugziGxyq
-         h3J/d/kBAI949mzlCNS4cO5o/CigxyXNfVxozgYbVMx8FcX9TdBWhX8GKQWiyazJb20D
-         AyRA==
-X-Gm-Message-State: AOAM532Mnvzd/mHW2qPLJ9fzRclPmJlr2beRC+E85rvF2XDFbmwJAOzl
-        okt9+bCXgRndkm7uY+vRolC/PMjel+As1x5WdvHs3A9P4zk4xlzYyfbmEjWgc+HROOaxZsTuIrp
-        1mP8tdje5OBaJ
-X-Received: by 2002:a05:6000:15cb:b0:1f1:e283:fcc0 with SMTP id y11-20020a05600015cb00b001f1e283fcc0mr7892693wry.18.1647016605730;
-        Fri, 11 Mar 2022 08:36:45 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxAHa73hakSAWL1S5ih1aRAwF6xW1UdKMTfQZY/xa2pcKsHFHB68E6Wp0O6FpeZjalssPpl8Q==
-X-Received: by 2002:a05:6000:15cb:b0:1f1:e283:fcc0 with SMTP id y11-20020a05600015cb00b001f1e283fcc0mr7892672wry.18.1647016605423;
-        Fri, 11 Mar 2022 08:36:45 -0800 (PST)
-Received: from [192.168.8.104] (tmo-098-218.customers.d1-online.com. [80.187.98.218])
-        by smtp.gmail.com with ESMTPSA id v6-20020a5d5906000000b001f0639f69e6sm7312188wrd.55.2022.03.11.08.36.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Mar 2022 08:36:43 -0800 (PST)
-Message-ID: <dc4ddb94-7714-b242-92ec-051de3d7e648@redhat.com>
-Date:   Fri, 11 Mar 2022 17:36:41 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.0
-Subject: Re: [kvm-unit-tests PATCH] x86: pmu: Test full-width counter writes
- support
-Content-Language: en-US
-To:     Jim Mattson <jmattson@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm list <kvm@vger.kernel.org>, Andrew Jones <drjones@redhat.com>,
-        Like Xu <like.xu.linux@gmail.com>
-References: <20200529074347.124619-1-like.xu@linux.intel.com>
- <20200529074347.124619-4-like.xu@linux.intel.com>
- <CALMp9eQNZsk-odGHNkLkkakk+Y01qqY5Mzm3x8n0A3YizfUJ7Q@mail.gmail.com>
- <7c44617d-39f5-4e82-ee45-f0d142ba0dbc@linux.intel.com>
- <CALMp9eTYPqZ-NMuBKkoNX+ZvomzSsCgz1=C2n+Ajaq-ttMys1Q@mail.gmail.com>
+ us-mta-426-GUr94pwmPyK05ihjJc4bbg-1; Fri, 11 Mar 2022 11:56:15 -0500
+X-MC-Unique: GUr94pwmPyK05ihjJc4bbg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8E145835DE4
+        for <kvm@vger.kernel.org>; Fri, 11 Mar 2022 16:56:14 +0000 (UTC)
+Received: from thuth.com (unknown [10.39.194.213])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 70BAF7BCC9;
+        Fri, 11 Mar 2022 16:56:13 +0000 (UTC)
 From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <CALMp9eTYPqZ-NMuBKkoNX+ZvomzSsCgz1=C2n+Ajaq-ttMys1Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Subject: [kvm-unit-tests PATCH] x86: Fix typos
+Date:   Fri, 11 Mar 2022 17:56:10 +0100
+Message-Id: <20220311165610.2898136-1-thuth@redhat.com>
+MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 08/01/2022 01.06, Jim Mattson wrote:
-> On Tue, May 11, 2021 at 11:33 PM Like Xu <like.xu@linux.intel.com> wrote:
->>
->> On 2021/5/12 5:27, Jim Mattson wrote:
->>> On Fri, May 29, 2020 at 12:44 AM Like Xu <like.xu@linux.intel.com> wrote:
->>>>
->>>> When the full-width writes capability is set, use the alternative MSR
->>>> range to write larger sign counter values (up to GP counter width).
->>>>
->>>> Signed-off-by: Like Xu <like.xu@linux.intel.com>
->>>> ---
->>>
->>>> +       /*
->>>> +        * MSR_IA32_PMCn supports writing values â€‹â€‹up to GP counter width,
->>>> +        * and only the lowest bits of GP counter width are valid.
->>>> +        */
->>>
->>> Could you rewrite this comment in ASCII, please? I would do it, but
->>> I'm not sure what the correct translation is.
->>>
->>
->> My first submitted patch says that
->> they are just Unicode "ZERO WIDTH SPACE".
->>
->> https://lore.kernel.org/kvm/20200508083218.120559-2-like.xu@linux.intel.com/
->>
->> Here you go:
->>
->> ---
->>
->>   From 1b058846aabcd7a85b5c5f41cb2b63b6a348bdc4 Mon Sep 17 00:00:00 2001
->> From: Like Xu <like.xu@linux.intel.com>
->> Date: Wed, 12 May 2021 14:26:40 +0800
->> Subject: [PATCH] x86: pmu: Fix a comment about full-width counter writes
->>    support
->>
->> Remove two Unicode characters 'ZERO WIDTH SPACE' (U+200B).
->>
->> Fixes: 22f2901a0e ("x86: pmu: Test full-width counter writes support")
->> Reported-by: Jim Mattson <jmattson@google.com>
->> Signed-off-by: Like Xu <like.xu@linux.intel.com>
->> ---
->>    x86/pmu.c | 2 +-
->>    1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/x86/pmu.c b/x86/pmu.c
->> index 5a3d55b..6cb3506 100644
->> --- a/x86/pmu.c
->> +++ b/x86/pmu.c
->> @@ -510,7 +510,7 @@ static void  check_gp_counters_write_width(void)
->>           }
->>
->>           /*
->> -        * MSR_IA32_PMCn supports writing values Ã¢â‚¬â€¹Ã¢â‚¬â€¹up to GP
->> counter width,
->> +        * MSR_IA32_PMCn supports writing values up to GP counter width,
->>            * and only the lowest bits of GP counter width are valid.
->>            */
->>           for (i = 0; i < num_counters; i++) {
->> --
->> 2.31.1
-> 
-> Paolo:
-> 
-> Did this patch get overlooked? I'm still seeing the unicode characters
-> in this comment.
+Correct typos which were discovered with the "codespell" utility.
 
-Yes, seems like it felt through the cracks. It's better to send patches as a 
-new mail thread instead of posting them in a reply, otherwise they might be 
-overlooked. Anyway, I've pushed this patch now to the repo.
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ x86/access.c      | 10 +++++-----
+ x86/cet.c         |  2 +-
+ x86/eventinj.c    |  6 +++---
+ x86/kvmclock.c    |  4 ++--
+ x86/svm.c         |  2 +-
+ x86/svm_tests.c   |  4 ++--
+ x86/taskswitch2.c | 12 ++++++------
+ x86/vmx.c         |  2 +-
+ x86/vmx_tests.c   |  8 ++++----
+ 9 files changed, 25 insertions(+), 25 deletions(-)
 
-  Thomas
+diff --git a/x86/access.c b/x86/access.c
+index 83c8221..086bc84 100644
+--- a/x86/access.c
++++ b/x86/access.c
+@@ -891,10 +891,10 @@ static void ac_test_show(ac_test_t *at)
+ }
+ 
+ /*
+- * This test case is used to triger the bug which is fixed by
++ * This test case is used to trigger the bug which is fixed by
+  * commit e09e90a5 in the kvm tree
+  */
+-static int corrupt_hugepage_triger(ac_pt_env_t *pt_env)
++static int corrupt_hugepage_trigger(ac_pt_env_t *pt_env)
+ {
+ 	ac_test_t at1, at2;
+ 
+@@ -924,12 +924,12 @@ static int corrupt_hugepage_triger(ac_pt_env_t *pt_env)
+ 	return 1;
+ 
+ err:
+-	printf("corrupt_hugepage_triger test fail\n");
++	printf("corrupt_hugepage_trigger test fail\n");
+ 	return 0;
+ }
+ 
+ /*
+- * This test case is used to triger the bug which is fixed by
++ * This test case is used to trigger the bug which is fixed by
+  * commit 3ddf6c06e13e in the kvm tree
+  */
+ static int check_pfec_on_prefetch_pte(ac_pt_env_t *pt_env)
+@@ -1146,7 +1146,7 @@ static int ac_test_exec(ac_test_t *at, ac_pt_env_t *pt_env)
+ typedef int (*ac_test_fn)(ac_pt_env_t *pt_env);
+ const ac_test_fn ac_test_cases[] =
+ {
+-	corrupt_hugepage_triger,
++	corrupt_hugepage_trigger,
+ 	check_pfec_on_prefetch_pte,
+ 	check_large_pte_dirty_for_nowp,
+ 	check_smep_andnot_wp,
+diff --git a/x86/cet.c b/x86/cet.c
+index a4b79cb..7a392a3 100644
+--- a/x86/cet.c
++++ b/x86/cet.c
+@@ -45,7 +45,7 @@ static u64 cet_shstk_func(void)
+ static u64 cet_ibt_func(void)
+ {
+ 	/*
+-	 * In below assembly code, the first instruction at lable 2 is not
++	 * In below assembly code, the first instruction at label 2 is not
+ 	 * endbr64, it'll trigger #CP with error code 0x3, and the execution
+ 	 * is terminated when HW detects the violation.
+ 	 */
+diff --git a/x86/eventinj.c b/x86/eventinj.c
+index 3c0db56..3031c04 100644
+--- a/x86/eventinj.c
++++ b/x86/eventinj.c
+@@ -286,7 +286,7 @@ int main(void)
+ 	printf("After int $33\n");
+ 	report(test_count == 1, "int $33");
+ 
+-	/* Inject two HW interrupt than open iterrupt windows. Both interrupt
++	/* Inject two HW interrupt than open interrupt windows. Both interrupt
+ 	   will fault on IDT access */
+ 	test_count = 0;
+ 	flush_idt_page();
+@@ -302,8 +302,8 @@ int main(void)
+ 
+ 
+ 	/* Inject HW interrupt, do sti and than (while in irq shadow) inject
+-	   soft interrupt. Fault during soft interrupt. Soft interrup shoud be
+-	   handled before HW interrupt */
++	   soft interrupt. Fault during soft interrupt. Soft interrupt should
++	   be handled before HW interrupt */
+ 	test_count = 0;
+ 	flush_idt_page();
+ 	printf("Sending vec 32 and int $33\n");
+diff --git a/x86/kvmclock.c b/x86/kvmclock.c
+index de30a5e..f190048 100644
+--- a/x86/kvmclock.c
++++ b/x86/kvmclock.c
+@@ -201,8 +201,8 @@ static cycle_t pvclock_clocksource_read(struct pvclock_vcpu_time_info *src)
+ 	/*
+ 	 * Assumption here is that last_value, a global accumulator, always goes
+ 	 * forward. If we are less than that, we should not be much smaller.
+-	 * We assume there is an error marging we're inside, and then the correction
+-	 * does not sacrifice accuracy.
++	 * We assume there is an error margin we're inside, and then the
++	 * correction does not sacrifice accuracy.
+ 	 *
+ 	 * For reads: global may have changed between test and return,
+ 	 * but this means someone else updated poked the clock at a later time.
+diff --git a/x86/svm.c b/x86/svm.c
+index 3f94b2a..f170924 100644
+--- a/x86/svm.c
++++ b/x86/svm.c
+@@ -418,7 +418,7 @@ int main(int ac, char **av)
+ 	__setup_vm(&opt_mask);
+ 
+ 	if (!this_cpu_has(X86_FEATURE_SVM)) {
+-		printf("SVM not availble\n");
++		printf("SVM not available\n");
+ 		return report_summary();
+ 	}
+ 
+diff --git a/x86/svm_tests.c b/x86/svm_tests.c
+index 0707786..da38400 100644
+--- a/x86/svm_tests.c
++++ b/x86/svm_tests.c
+@@ -397,7 +397,7 @@ static bool msr_intercept_finished(struct svm_test *test)
+         }
+ 
+         /*
+-         * Warn that #GP exception occured instead.
++         * Warn that #GP exception occurred instead.
+          * RCX holds the MSR index.
+          */
+         printf("%s 0x%lx #GP exception\n",
+@@ -3071,7 +3071,7 @@ static void svm_nm_test(void)
+ 
+     vmcb->save.cr0 = vmcb->save.cr0 & ~(X86_CR0_TS | X86_CR0_EM);
+     report(svm_vmrun() == SVM_EXIT_VMMCALL && nm_test_counter == 2,
+-        "fnop with CR0.TS and CR0.EM unset no #NM excpetion");
++        "fnop with CR0.TS and CR0.EM unset no #NM exception");
+ }
+ 
+ struct svm_test svm_tests[] = {
+diff --git a/x86/taskswitch2.c b/x86/taskswitch2.c
+index 3c9af4c..db69f07 100644
+--- a/x86/taskswitch2.c
++++ b/x86/taskswitch2.c
+@@ -148,13 +148,13 @@ static void test_kernel_mode_int(void)
+ 
+ 	/* test that HW exception triggesr task gate */
+ 	set_intr_task_gate(0, de_tss);
+-	printf("Try to devide by 0\n");
++	printf("Try to divide by 0\n");
+ 	asm volatile ("divl %3": "=a"(res)
+ 		      : "d"(0), "a"(1500), "m"(test_divider));
+ 	printf("Result is %d\n", res);
+-	report(res == 150, "DE exeption");
++	report(res == 150, "DE exception");
+ 
+-	/* test if call HW exeption DE by int $0 triggers task gate */
++	/* test if call HW exception DE by int $0 triggers task gate */
+ 	test_count = 0;
+ 	set_intr_task_gate(0, de_tss);
+ 	printf("Call int 0\n");
+@@ -168,7 +168,7 @@ static void test_kernel_mode_int(void)
+ 	printf("Call into\n");
+ 	asm volatile ("addb $127, %b0\ninto"::"a"(127));
+ 	printf("Return from into\n");
+-	report(test_count, "OF exeption");
++	report(test_count, "OF exception");
+ 
+ 	/* test if HW exception BP triggers task gate */
+ 	test_count = 0;
+@@ -176,7 +176,7 @@ static void test_kernel_mode_int(void)
+ 	printf("Call int 3\n");
+ 	asm volatile ("int $3");
+ 	printf("Return from int 3\n");
+-	report(test_count == 1, "BP exeption");
++	report(test_count == 1, "BP exception");
+ 
+ 	/*
+ 	 * test that PF triggers task gate and error code is placed on
+@@ -189,7 +189,7 @@ static void test_kernel_mode_int(void)
+ 	printf("Access unmapped page\n");
+ 	*fault_addr = 0;
+ 	printf("Return from pf tss\n");
+-	report(test_count == 1, "PF exeption");
++	report(test_count == 1, "PF exception");
+ }
+ 
+ static void test_gdt_task_gate(void)
+diff --git a/x86/vmx.c b/x86/vmx.c
+index 51eed8c..362e603 100644
+--- a/x86/vmx.c
++++ b/x86/vmx.c
+@@ -1477,7 +1477,7 @@ static int test_vmxon(void)
+ 		goto out;
+ 	}
+ 
+-	/* invalid revision indentifier */
++	/* invalid revision identifier */
+ 	*bsp_vmxon_region = 0xba9da9;
+ 	ret1 = vmx_on();
+ 	report(ret1, "test vmxon with invalid revision identifier");
+diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+index df93198..4d581e7 100644
+--- a/x86/vmx_tests.c
++++ b/x86/vmx_tests.c
+@@ -459,7 +459,7 @@ static void cr_shadowing_main(void)
+ 	vmx_set_test_stage(2);
+ 	write_cr0(guest_cr0);
+ 	if (vmx_get_test_stage() == 3)
+-		report_fail("Write throuth CR0");
++		report_fail("Write through CR0");
+ 	else
+ 		vmcall();
+ 	vmx_set_test_stage(3);
+@@ -2549,7 +2549,7 @@ static void ept_access_paddr(unsigned long ept_access, unsigned long pte_ad,
+ 	 * constructed our test such that those other 511 PTEs aren't used by
+ 	 * the guest: data->gva is at the beginning of a 1G huge page, thus the
+ 	 * PTE we're modifying is at the beginning of a 4K page and the
+-	 * following 511 entires are also under our control (and not touched by
++	 * following 511 entries are also under our control (and not touched by
+ 	 * the guest).
+ 	 */
+ 	gpa = virt_to_phys(ptep);
+@@ -4063,7 +4063,7 @@ static void test_posted_intr(void)
+ 	report_prefix_pop();
+ 
+ 	/*
+-	 * Test posted-interrupt descriptor addresss
++	 * Test posted-interrupt descriptor address
+ 	 */
+ 	for (i = 0; i < 6; i++) {
+ 		test_pi_desc_addr(1ul << i, false);
+@@ -10499,7 +10499,7 @@ static void atomic_switch_msrs_test(int count)
+         struct vmx_msr_entry *vm_exit_store;
+ 	int max_allowed = max_msr_list_size();
+ 	int byte_capacity = 1ul << (msr_list_page_order + PAGE_SHIFT);
+-	/* Exceeding the max MSR list size at exit trigers KVM to abort. */
++	/* Exceeding the max MSR list size at exit triggers KVM to abort. */
+ 	int exit_count = count > max_allowed ? max_allowed : count;
+ 	int cleanup_count = count > max_allowed ? 2 : 1;
+ 	int i;
+-- 
+2.27.0
 
