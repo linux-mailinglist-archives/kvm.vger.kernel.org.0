@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 103154D681E
-	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 18:57:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B34144D6821
+	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 18:57:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350393AbiCKR6b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Mar 2022 12:58:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47240 "EHLO
+        id S1350479AbiCKR6n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Mar 2022 12:58:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350253AbiCKR6b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Mar 2022 12:58:31 -0500
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B34EB9A4D6
-        for <kvm@vger.kernel.org>; Fri, 11 Mar 2022 09:57:26 -0800 (PST)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-2dcc326fc4dso74372297b3.16
-        for <kvm@vger.kernel.org>; Fri, 11 Mar 2022 09:57:26 -0800 (PST)
+        with ESMTP id S1350458AbiCKR6n (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Mar 2022 12:58:43 -0500
+Received: from mail-io1-xd4a.google.com (mail-io1-xd4a.google.com [IPv6:2607:f8b0:4864:20::d4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70BDD6C96B
+        for <kvm@vger.kernel.org>; Fri, 11 Mar 2022 09:57:39 -0800 (PST)
+Received: by mail-io1-xd4a.google.com with SMTP id f11-20020a056602070b00b00645d08010fcso6772056iox.15
+        for <kvm@vger.kernel.org>; Fri, 11 Mar 2022 09:57:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=XCuvtprnSb0PQ/tTeAtCenAIJT2ThbfBVkwuYC3SZPg=;
-        b=kt7/mh7D7/XK6jC/qxq5AKckTCsDG9s1vf0i5tSAGW3qW+PMa+EbHCv7HEUNbZqBhn
-         yWZM0d5kwmCn3UPnOiteAwCNH/RHYa1o5c1R5jo8a2mbiVT1BlQdcX08fWiKdTf3inGd
-         /wA2Nspc1mpYoqG3077m2DcigYRNrisUBQxjc+WR8l6t9YyToIDr1FoyvzRozet51MAp
-         WDbs7eygrxtaCKkB07ogoj7KfiS02MArxQf8AGUZemcSUnL+eKAi/V2jj/IgENgEnisM
-         1AWYtPsvAfBxtwunoa98mEFgtQK3j9S0fT466vXE3yggcKERk61aovGUFw/uZZyAQ3CX
-         5DFA==
+        bh=BGsr6pN9enYniNk4zGr+nWX2xORuU1JL7wS+cLweFVM=;
+        b=G8cB3TIlGOvwQlgqnb6Mv3A6ZDlk82Jx93jjWrLxun3vDuSleV+2ZENfuUS1eSZq+K
+         IgQ+GM9Xo82V8Mun7Lw//GhahVM4rZ371b9ilQF12s4J9ZiMeW81c7rONn3ZnADLdkRR
+         u2WDOuwVoayXZQ+3DSiHPrNnfLhLIsa/IdvllbJZZ7pvFOzW7aSZNQ8W7lifUWwLCuf2
+         DzxMLwqWeIeg6ntp2KnMOFHYpbHF7VkUH7zkgVfTqKkbCvbnG93z8jQ35Nzt65Ow3VLB
+         yQHFcdwj2Grigd5frLaWlCQhcWFuBSzZAr/5LUkcx2FguOxyMPYLNFA5zfXBNAuS2oIg
+         Zn/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=XCuvtprnSb0PQ/tTeAtCenAIJT2ThbfBVkwuYC3SZPg=;
-        b=3BJ5pkrFrDk1oQch+kCqFEPT0V4N2rYTZTvalu9Q/A9tQHQEhgzke8ZcqnD5IVaJd2
-         dfMtuI0BNYkFdycxWJTckrxGrBB7mS+Vu38vOPgSQtRQD3+ySiP+KNMVZkaGOprOKctd
-         5IniBWyvlGeAz+AaGlNhz0+iM6NJgxqiWQ7PjGnn0QrukKGQJSCEnjTvp1ujoUG/2M7D
-         B7VPZ+S+h1OPF/i5T/SkZBW/OG4AFv6ZpXSeoPjmsqYBVtEi57Tx7NuXZINobjm3bFdQ
-         AjFA9rrxYkuqYqGIKY5pHxcmBjTzCPVNGuQsXy8xRiBCI+oFZlaYzKwiRen79Ze3IAuy
-         wtBQ==
-X-Gm-Message-State: AOAM532LXOsj/rYreePWmIDmPXG2+wK3mpBV0Qiz8x+lbcIzIleb1E4T
-        LhqAWWLs5MrFOVlqwcgjRI6bfI3sukw=
-X-Google-Smtp-Source: ABdhPJzyWAv8S/KHu/ZXZs/nZFoiMKCNOwLwIUWaIPx4cyu6tv+ii6X96+maMdMohSISaf+E5F1ZO7oskvs=
+        bh=BGsr6pN9enYniNk4zGr+nWX2xORuU1JL7wS+cLweFVM=;
+        b=yuTGfsFc89Ae4QW45S3dm5oP53TRf2THMvOTesUsd7UpJ/HmbVhG+6TiyNP93AUcx1
+         HCu0Usmbqb5NBLa75oBYZxmy1NJyN2DJUYwxyK4UGbRUb6WlHK9gy531SPLftkMghcCc
+         UHob9G0PgX7YysWXaDKdfKlIcUrjrpSjQLHieO8E8rFseFectWOu9X1flQ8rXbZJrPjY
+         zhio60OqTUmqliNaAiE2U6wQ+OBvDah9uEeeWOZCJGeqbmuMUneu1H4YJRj/VUUOwY6g
+         MTI3mFI7oCJ/nbHZOECyJ5uEp0JZHwZBMy9RXsM+GaGiwXjIDIoHD9gUGzMMvF0w/IIO
+         R5Uw==
+X-Gm-Message-State: AOAM532aSIA3sbsnbZ3Panpar6Qny083tF2mBweNf3Vfe6KADiLWUCOL
+        bvbYK2BO/UZD4ffE40HGQiznM/N70Mw=
+X-Google-Smtp-Source: ABdhPJzy7TljJ49dSoKSsh7qQwadwo8KUyffYqNTXf0RMjBpnuNAtwt/ATgmZWQS3claaoNqk/pp2mmirz8=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a25:fb05:0:b0:628:8c88:acf5 with SMTP id
- j5-20020a25fb05000000b006288c88acf5mr8952224ybe.187.1647021445912; Fri, 11
- Mar 2022 09:57:25 -0800 (PST)
-Date:   Fri, 11 Mar 2022 17:57:12 +0000
-In-Reply-To: <20220311174001.605719-1-oupton@google.com>
-Message-Id: <20220311175717.616958-1-oupton@google.com>
+ (user=oupton job=sendgmr) by 2002:a05:6602:15c5:b0:646:4d0f:7728 with SMTP id
+ f5-20020a05660215c500b006464d0f7728mr8810250iow.63.1647021458831; Fri, 11 Mar
+ 2022 09:57:38 -0800 (PST)
+Date:   Fri, 11 Mar 2022 17:57:13 +0000
+In-Reply-To: <20220311175717.616958-1-oupton@google.com>
+Message-Id: <20220311175717.616958-2-oupton@google.com>
 Mime-Version: 1.0
-References: <20220311174001.605719-1-oupton@google.com>
+References: <20220311174001.605719-1-oupton@google.com> <20220311175717.616958-1-oupton@google.com>
 X-Mailer: git-send-email 2.35.1.723.g4982287a31-goog
-Subject: [RFC PATCH kvmtool 0/5] ARM: Implement PSCI SYSTEM_SUSPEND
+Subject: [RFC PATCH kvmtool 1/5] TESTONLY: Sync KVM headers with pending changes
 From:   Oliver Upton <oupton@google.com>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
@@ -76,51 +76,88 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is a prototype for supporting KVM_CAP_ARM_SYSTEM_SUSPEND on
-kvmtool. The capability allows userspace to expose the SYSTEM_SUSPEND
-PSCI call to its guests.
+Signed-off-by: Oliver Upton <oupton@google.com>
+---
+ include/linux/kvm.h | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-Implement SYSTEM_SUSPEND using KVM_MP_STATE_SUSPENDED, which emulates
-the execution of a WFI instruction in the kernel. Resume the guest when
-a wakeup event is recognized and reset it to the requested entry address
-and context ID.
-
-Patches 2-4 are small reworks to more easily shoehorn PSCI support into
-kvmtool.
-
-Patch 5 adds some SMCCC handlers and makes use of them to implement PSCI
-SYSTEM_SUSPEND. For now, just check the bare-minimum, that all vCPUs
-besides the caller have stopped. There are also checks that can be made
-against the requested entry address, but they are at the discretion of
-the implementation.
-
-Tested with 'echo mem > /sys/power/state' to see that the vCPU is in
-fact placed in a suspended state for the PSCI call. Hacked the switch
-statement to fall through to WAKEUP immediately after to verify the vCPU
-is set up correctly for resume.
-
-It would be nice if kvmtool actually provided a device good for wakeups,
-since the RTC implementation has omitted any interrupt support.
-
-kernel changes: http://lore.kernel.org/r/20220311174001.605719-1-oupton@google.com
-
-Oliver Upton (5):
-  TESTONLY: Sync KVM headers with pending changes
-  Allow architectures to hook KVM_EXIT_SYSTEM_EVENT
-  ARM: Stash vcpu_init in the vCPU structure
-  ARM: Add a helper to re-init a vCPU
-  ARM: Implement PSCI SYSTEM_SUSPEND
-
- arm/aarch32/kvm-cpu.c                 | 72 ++++++++++++++++++++
- arm/aarch64/kvm-cpu.c                 | 66 +++++++++++++++++++
- arm/include/arm-common/kvm-cpu-arch.h | 23 ++++---
- arm/kvm-cpu.c                         | 95 ++++++++++++++++++++++++++-
- arm/kvm.c                             |  9 +++
- include/kvm/kvm-cpu.h                 |  1 +
- include/linux/kvm.h                   | 21 ++++++
- kvm-cpu.c                             |  8 +++
- 8 files changed, 283 insertions(+), 12 deletions(-)
-
+diff --git a/include/linux/kvm.h b/include/linux/kvm.h
+index 1daa452..e5bb5f1 100644
+--- a/include/linux/kvm.h
++++ b/include/linux/kvm.h
+@@ -444,6 +444,8 @@ struct kvm_run {
+ #define KVM_SYSTEM_EVENT_SHUTDOWN       1
+ #define KVM_SYSTEM_EVENT_RESET          2
+ #define KVM_SYSTEM_EVENT_CRASH          3
++#define KVM_SYSTEM_EVENT_WAKEUP         4
++#define KVM_SYSTEM_EVENT_SUSPEND        5
+ 			__u32 type;
+ 			__u64 flags;
+ 		} system_event;
+@@ -634,6 +636,7 @@ struct kvm_vapic_addr {
+ #define KVM_MP_STATE_OPERATING         7
+ #define KVM_MP_STATE_LOAD              8
+ #define KVM_MP_STATE_AP_RESET_HOLD     9
++#define KVM_MP_STATE_SUSPENDED         10
+ 
+ struct kvm_mp_state {
+ 	__u32 mp_state;
+@@ -1131,6 +1134,10 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_EXIT_ON_EMULATION_FAILURE 204
+ #define KVM_CAP_ARM_MTE 205
+ #define KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM 206
++#define KVM_CAP_VM_GPA_BITS 207
++#define KVM_CAP_XSAVE2 208
++#define KVM_CAP_SYS_ATTRIBUTES 209
++#define KVM_CAP_ARM_SYSTEM_SUSPEND 210
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+@@ -1162,11 +1169,20 @@ struct kvm_irq_routing_hv_sint {
+ 	__u32 sint;
+ };
+ 
++struct kvm_irq_routing_xen_evtchn {
++	__u32 port;
++	__u32 vcpu;
++	__u32 priority;
++};
++
++#define KVM_IRQ_ROUTING_XEN_EVTCHN_PRIO_2LEVEL ((__u32)(-1))
++
+ /* gsi routing entry types */
+ #define KVM_IRQ_ROUTING_IRQCHIP 1
+ #define KVM_IRQ_ROUTING_MSI 2
+ #define KVM_IRQ_ROUTING_S390_ADAPTER 3
+ #define KVM_IRQ_ROUTING_HV_SINT 4
++#define KVM_IRQ_ROUTING_XEN_EVTCHN 5
+ 
+ struct kvm_irq_routing_entry {
+ 	__u32 gsi;
+@@ -1178,6 +1194,7 @@ struct kvm_irq_routing_entry {
+ 		struct kvm_irq_routing_msi msi;
+ 		struct kvm_irq_routing_s390_adapter adapter;
+ 		struct kvm_irq_routing_hv_sint hv_sint;
++		struct kvm_irq_routing_xen_evtchn xen_evtchn;
+ 		__u32 pad[8];
+ 	} u;
+ };
+@@ -1208,6 +1225,7 @@ struct kvm_x86_mce {
+ #define KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL	(1 << 1)
+ #define KVM_XEN_HVM_CONFIG_SHARED_INFO		(1 << 2)
+ #define KVM_XEN_HVM_CONFIG_RUNSTATE		(1 << 3)
++#define KVM_XEN_HVM_CONFIG_EVTCHN_2LEVEL	(1 << 4)
+ 
+ struct kvm_xen_hvm_config {
+ 	__u32 flags;
+@@ -2031,4 +2049,7 @@ struct kvm_stats_desc {
+ 
+ #define KVM_GET_STATS_FD  _IO(KVMIO,  0xce)
+ 
++/* Available with KVM_CAP_XSAVE2 */
++#define KVM_GET_XSAVE2		  _IOR(KVMIO,  0xcf, struct kvm_xsave)
++
+ #endif /* __LINUX_KVM_H */
 -- 
 2.35.1.723.g4982287a31-goog
 
