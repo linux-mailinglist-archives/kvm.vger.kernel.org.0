@@ -2,175 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 393874D56A8
-	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 01:26:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C629E4D5726
+	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 02:09:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345246AbiCKA12 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Mar 2022 19:27:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50058 "EHLO
+        id S1345253AbiCKBKB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Mar 2022 20:10:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244821AbiCKA10 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Mar 2022 19:27:26 -0500
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA8261A2724
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 16:26:15 -0800 (PST)
-Received: by mail-pf1-x44a.google.com with SMTP id 67-20020a621446000000b004f739ef52f1so4207932pfu.0
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 16:26:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=C/6kqtgpfTZHxI5VWOjwoNRlEkRWSpZD6XXLim3vJOQ=;
-        b=Bs0Nt6VPOSGpoyrAZTXHtLQrqfTnnHH0UC9KK9A0vLWpFqtNCmQ76QkKCaoiU7vlME
-         Q0bTazFlFcbJfqcpCjLO9tF13nAtANqrfJ4/weyLzjhfeuO+6qrSrtOmMS7TIYUEvmoj
-         3jWCRL/2/6pXWfByCKv+9rhnbh7rbU0XaID/OlkGYUR1Z4dQD7f/Cw2G6GMi4iWL1Uec
-         P+O9K7voxCptiW2ggUfO7UL3R6VkHHKXqZbW0O4DhLGBotN31nqItGDXOibW5YjGwp66
-         nMmg3cEoPd8Q4NTBLdQxpNMCsJJ+tFv4B4qQ12ZQNrnMrYMMdODRkSRN3LkqTjAlbCWy
-         wjpw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=C/6kqtgpfTZHxI5VWOjwoNRlEkRWSpZD6XXLim3vJOQ=;
-        b=bzYcTFUaGF/jxB2JKm9fsrrMRaRcvXpk+F/qG/kk9T4jRY1f3jtBFsIgagny7pRfzg
-         Nh60c/SU4pgVCxHuVPvz10YS2WN3JL6pgXPL0xy/xyBxab6AiqvS9bNtcuPBglKFne1V
-         G3ouLZC0alFMiY0N97q1S4NBOIyPWGtke+glKlhC6e6PtLw7ot+VfN29M56jF9oz7T3j
-         qwJ0dLtac0xIOsFB/39jIrxaWDOpwvCEzXRDYCCMhr8ggIYEe2Rd33Z+VbT4mdb1meIE
-         jYgIWvuJkplQQRyowyDpLuPIm/ya3hEYGfPJS1wmTsg7DC7lMq7f08ygpiLZZrsxvW1o
-         QlnA==
-X-Gm-Message-State: AOAM532CyXjKEvzL8sxcybFCEzbIKUoo7iKXfBD1OMzKG0kSjARxfB2q
-        svggseYuEJhrBiwm9nv45WR6GTP+8wJhag==
-X-Google-Smtp-Source: ABdhPJxWLEVXby9lk2SDFDSYjtNrAmaCeZHIJ0XIStrXC375fHHUc9G7571Y4uEmDYxZrmSHCBqVZt0xqwpthw==
-X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a17:90a:12c8:b0:1bf:6484:3e27 with SMTP
- id b8-20020a17090a12c800b001bf64843e27mr7807022pjg.209.1646958375426; Thu, 10
- Mar 2022 16:26:15 -0800 (PST)
-Date:   Fri, 11 Mar 2022 00:25:28 +0000
-In-Reply-To: <20220311002528.2230172-1-dmatlack@google.com>
-Message-Id: <20220311002528.2230172-27-dmatlack@google.com>
-Mime-Version: 1.0
-References: <20220311002528.2230172-1-dmatlack@google.com>
-X-Mailer: git-send-email 2.35.1.723.g4982287a31-goog
-Subject: [PATCH v2 26/26] KVM: selftests: Map x86_64 guest virtual memory with
- huge pages
-From:   David Matlack <dmatlack@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Sean Christopherson <seanjc@google.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
-        maciej.szmigiero@oracle.com,
-        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
-        <kvmarm@lists.cs.columbia.edu>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <linux-mips@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <kvm@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>,
-        David Matlack <dmatlack@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S231467AbiCKBKA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Mar 2022 20:10:00 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A340C1C8C;
+        Thu, 10 Mar 2022 17:08:58 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id B02EBB82997;
+        Fri, 11 Mar 2022 01:08:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA54CC340E8;
+        Fri, 11 Mar 2022 01:08:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1646960935;
+        bh=UZlMxVHtgUhOf3NIn877YeWd/ZtNXQOWjYEbnWchk8w=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=KDOGWF7PIehsIwJumfOPddh93hUYCEinkGQ0A+0jp2SISTz6VtpranUPwzd3fp/Ch
+         mW2zFdHntxs5IZOpDokQ36IOPzbgyp0fmhvay7TKxoxjY2mBysjmDZpsW0XXh35+nr
+         nPv5+Henf/Lh36ETHjYYcGIIsq/Q88oKOeX7BgXbaj4DReug/lQ7KW0y+0RxvXY0H6
+         /+hEpOD2qu23Kqq98oRJFMg4hoy3X/tlWcvU7YLyPV9eFkIttamjYi3lpI7tT4E9se
+         TwrIwlr8OTNQ/+4xbic7kSe5H6D3kruzbdmCenEwuUIgKASmklQtppcNihhcE/Hv0L
+         nEvlIHNC1ZF8g==
+Date:   Thu, 10 Mar 2022 17:08:53 -0800
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Stefano Garzarella <sgarzare@redhat.com>,
+        Jiyong Park <jiyong@google.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>, adelva@google.com,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3] vsock: each transport cycles only on its own sockets
+Message-ID: <20220310170853.0e07140f@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+In-Reply-To: <20220310102636-mutt-send-email-mst@kernel.org>
+References: <20220310135012.175219-1-jiyong@google.com>
+        <20220310141420.lsdchdfcybzmdhnz@sgarzare-redhat>
+        <20220310102636-mutt-send-email-mst@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-7.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Override virt_map() in x86_64 selftests to use the largest page size
-possible when mapping guest virtual memory. This enables testing eager
-page splitting with shadow paging (e.g. kvm_intel.ept=N), as it allows
-KVM to shadow guest memory with huge pages.
+On Thu, 10 Mar 2022 10:28:03 -0500 Michael S. Tsirkin wrote:
+> On Thu, Mar 10, 2022 at 03:14:20PM +0100, Stefano Garzarella wrote:
+> > On Thu, Mar 10, 2022 at 10:50:11PM +0900, Jiyong Park wrote:  
+> > > When iterating over sockets using vsock_for_each_connected_socket, make
+> > > sure that a transport filters out sockets that don't belong to the
+> > > transport.
+> > > 
+> > > There actually was an issue caused by this; in a nested VM
+> > > configuration, destroying the nested VM (which often involves the
+> > > closing of /dev/vhost-vsock if there was h2g connections to the nested
+> > > VM) kills not only the h2g connections, but also all existing g2h
+> > > connections to the (outmost) host which are totally unrelated.
+> > > 
+> > > Tested: Executed the following steps on Cuttlefish (Android running on a
+> > > VM) [1]: (1) Enter into an `adb shell` session - to have a g2h
+> > > connection inside the VM, (2) open and then close /dev/vhost-vsock by
+> > > `exec 3< /dev/vhost-vsock && exec 3<&-`, (3) observe that the adb
+> > > session is not reset.
+> > > 
+> > > [1] https://android.googlesource.com/device/google/cuttlefish/
+> > > 
+> > > Fixes: c0cfa2d8a788 ("vsock: add multi-transports support")
+> > > Signed-off-by: Jiyong Park <jiyong@google.com>
+> > > ---
+> > > Changes in v3:
+> > >  - Fixed the build error in vmci_transport.c
+> > > Changes in v2:
+> > >  - Squashed into a single patch
+> > > 
+> > > drivers/vhost/vsock.c            | 3 ++-
+> > > include/net/af_vsock.h           | 3 ++-
+> > > net/vmw_vsock/af_vsock.c         | 9 +++++++--
+> > > net/vmw_vsock/virtio_transport.c | 7 +++++--
+> > > net/vmw_vsock/vmci_transport.c   | 5 ++++-
+> > > 5 files changed, 20 insertions(+), 7 deletions(-)  
+> > 
+> > It seems okay now, I ran my test suite and everything seems to be fine:
+> > 
+> > Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+> 
+> Thanks!
+> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> 
+> Not a new regression so I think we should take this in the next cycle,
+> let's be careful here especially since previous version was not even
+> build-tested by the contributor.
 
-Signed-off-by: David Matlack <dmatlack@google.com>
----
- .../selftests/kvm/include/x86_64/processor.h  |  6 ++++
- tools/testing/selftests/kvm/lib/kvm_util.c    |  4 +--
- .../selftests/kvm/lib/x86_64/processor.c      | 31 +++++++++++++++++++
- 3 files changed, 39 insertions(+), 2 deletions(-)
+Ack, our build bot ignored it as well :( 
 
-diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index 37db341d4cc5..efb228d2fbf7 100644
---- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -470,6 +470,12 @@ enum x86_page_size {
- 	X86_PAGE_SIZE_2M,
- 	X86_PAGE_SIZE_1G,
- };
-+
-+static inline size_t page_size_bytes(enum x86_page_size page_size)
-+{
-+	return 1UL << (page_size * 9 + 12);
-+}
-+
- void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
- 		   enum x86_page_size page_size);
- 
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 1665a220abcb..60198587236d 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -1432,8 +1432,8 @@ vm_vaddr_t vm_vaddr_alloc_page(struct kvm_vm *vm)
-  * Within the VM given by @vm, creates a virtual translation for
-  * @npages starting at @vaddr to the page range starting at @paddr.
-  */
--void virt_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
--	      unsigned int npages)
-+void __weak virt_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
-+		     unsigned int npages)
- {
- 	size_t page_size = vm->page_size;
- 	size_t size = npages * page_size;
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index 9f000dfb5594..7df84292d5de 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -282,6 +282,37 @@ void virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
- 	__virt_pg_map(vm, vaddr, paddr, X86_PAGE_SIZE_4K);
- }
- 
-+void virt_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr, unsigned int npages)
-+{
-+	size_t size = (size_t) npages * vm->page_size;
-+	size_t vend = vaddr + size;
-+	enum x86_page_size page_size;
-+	size_t stride;
-+
-+	TEST_ASSERT(vaddr + size > vaddr, "Vaddr overflow");
-+	TEST_ASSERT(paddr + size > paddr, "Paddr overflow");
-+
-+	/*
-+	 * Map the region with all 1G pages if possible, falling back to all
-+	 * 2M pages, and finally all 4K pages. This could be improved to use
-+	 * a mix of page sizes so that more of the region is mapped with large
-+	 * pages.
-+	 */
-+	for (page_size = X86_PAGE_SIZE_1G; page_size >= X86_PAGE_SIZE_4K; page_size--) {
-+		stride = page_size_bytes(page_size);
-+
-+		if (!(vaddr % stride) && !(paddr % stride) && !(size % stride))
-+			break;
-+	}
-+
-+	TEST_ASSERT(page_size >= X86_PAGE_SIZE_4K,
-+		    "Cannot map unaligned region: vaddr 0x%lx paddr 0x%lx npages 0x%x\n",
-+		    vaddr, paddr, npages);
-+
-+	for (; vaddr < vend; vaddr += stride, paddr += stride)
-+		__virt_pg_map(vm, vaddr, paddr, page_size);
-+}
-+
- static struct pageTableEntry *_vm_get_page_table_entry(struct kvm_vm *vm, int vcpuid,
- 						       uint64_t vaddr)
- {
--- 
-2.35.1.723.g4982287a31-goog
-
+Jiyong, would you mind collecting the tags from Stefano and Michael 
+and reposting? I fixed our build bot, it should build test the patch
+- I can't re-run on an already ignored patch, sadly.
