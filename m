@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 38C6C4D5696
-	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 01:26:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E1D554D5695
+	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 01:26:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345136AbiCKA0m (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Mar 2022 19:26:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48316 "EHLO
+        id S1345166AbiCKA0o (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Mar 2022 19:26:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48390 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233337AbiCKA0k (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Mar 2022 19:26:40 -0500
+        with ESMTP id S1345162AbiCKA0m (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Mar 2022 19:26:42 -0500
 Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D43C91A1C71
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 16:25:38 -0800 (PST)
-Received: by mail-pg1-x54a.google.com with SMTP id r11-20020a63440b000000b0038068f34b0cso3813094pga.0
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 16:25:38 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C853D1A1C7C
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 16:25:40 -0800 (PST)
+Received: by mail-pg1-x54a.google.com with SMTP id t18-20020a63dd12000000b00342725203b5so3766139pgg.16
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 16:25:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=preyZmoxeWV7bpSqcaT1D2ICPD7/5D40rW8RXyddS98=;
-        b=LgWaICfxIBaJDsFBkUTdBOob1Y2k3/FFvQsolbqLhuk8ZrTeTkJdlWwjlTc00oGLEe
-         LBi95aRVL4ltQZa1ZoBqImyXhIE6KCt5BKv4apSd5/TOgPmKoi9AKXn5JzAOW8qfkaFV
-         lZPfstcYqk94YJDubOqRH4/FF9knojxzys4+ZWckaWnU9yCfGXEnP/dJMk0PlsKerJEz
-         RFtEO4H2uxJnJcfrKsAd8SgRK/Z+vZHqCgqBMoQjTSjUQPefL7dqPZMkO0BphwLCxzPg
-         WXAwwCmQdYAe2L1ybmPKCSs84V9vIKdpb9I5nboekQUX1+Mq9bO8ySuBjnvDZm/f7Gzo
-         TQrQ==
+        bh=HT5iizWaNyX/scodM/UgaJfvTolyFgDlKXTIQK5ovbE=;
+        b=ci1RV/cDxZwD5zNwmfmqMYmXEiXEpZeRiCx1bWeGOaV4x9h0XElhebmz7axQ94hcJK
+         bZap8UCpYa0n+D0V1WGsj49i9GocZPpnOW/R6liGZwWWd+MLFvGP4SmRm18uGvNf7VJA
+         hM4w3wETJZ3BZ98Lv4ivSwkHviUvB82J6N2Xmv9hmmGXSXClEANNQCTSmZl/thTSHvF3
+         qMaREJKuH529np34JrNojketBObofC9CldBCVw8lMyUMfILV1nVUnlrgaj9SjXRE3cnb
+         ez8mqQgD4jcpfyLRKrLcfMsV8AyaZdBvsT3nFJZl/AvexHb6QnSL9UFeXZ9O9z2drwbU
+         ZGeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=preyZmoxeWV7bpSqcaT1D2ICPD7/5D40rW8RXyddS98=;
-        b=PhDOXwUgRE0cFmJXcRQew+i7o+PtYg9JMG3n/YeMbYePTy42kykxHUyQSOwPUVNsVV
-         kl1AQAlfmFey2SUt+PjPh8iWTMT0B7JpbgNo3HHEPEGQe6hPIiWsPhd6OGBBcBkdmSGP
-         JfIHHFR5PDfMtLG/11+St7bRNQRCpSaTLD1C4zQYFLbuzTTnDtIkSxu0d/ifkC03Y3G6
-         3lhVor+WJjt7meW+QZ5wyW09Bm/2VTSvDtpG/GdwdWa+oNl/cZ9/e+V5kexYHZjLHCRc
-         EOQdumWKsi9oz4kGJdsmskdpQvvthsx5jtgzK/nZOI9EquS4UdQqMyuIpWb3Vq/cVKTY
-         20lw==
-X-Gm-Message-State: AOAM532jrQuwLgYJI6xDEWaplBc5CDkvwheX99jChp+cc/ritEMjPlDU
-        oyrUCbtQxZTH2krp4+bd/jDKvV5ELHVR/Q==
-X-Google-Smtp-Source: ABdhPJw4zPv1Jtev5tqhHtyUpqsXBloi5wAf9YuGxFv3zUHJ0lLUE9syCfw79D+xC+vv/19YPx/1nSCKvLkKDQ==
+        bh=HT5iizWaNyX/scodM/UgaJfvTolyFgDlKXTIQK5ovbE=;
+        b=aT+NaunHM7CDwP3SWQ2NNLmqj8lxAFK8mMp56iNIcGc7Q1+PYuU9IZdY6097L9VbQY
+         GTk7gnEF67AkCSwImzJJFfEMOyGJJmbXCm1SMdh0Rxl8Mm02RDoAfGcwLlfRxJVaNJ1A
+         eJGXJI7xOXo3AC8qMHc7tcguj5GOO9UiT6nDL+y424FcCdId4ktGmREbXxSw1Nm+ZLhj
+         di55f/ZUs/PB9kF08NS90H+yskvY1vdeorcLa2wBDn+IoUEBBK4dJIX5wBIwCuLfnYfs
+         30N50gafwEhYAdDx7LRJjJI1WNroTvU0DWlWXjZeTqGsBlk5nSfV6M7SKtFHENVJqw+B
+         IYsA==
+X-Gm-Message-State: AOAM533H+FgNvcw0ObU/5BLivoK8HHd+S8oQ9YbXyqSuUhXQ/pvBjfH9
+        EcTd5NwFgfD2alSVq8qVZUAN4fbz5KP4mA==
+X-Google-Smtp-Source: ABdhPJzSyoUJ2mS8Kxw0tWZmurwVG8N3wCZURTli9JtC3Otg5er4JZvYmqgznJT5OSafq4YssNwt2bbQk0+S3g==
 X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
  (user=dmatlack job=sendgmr) by 2002:a17:90b:1e10:b0:1bf:6c78:54a9 with SMTP
- id pg16-20020a17090b1e1000b001bf6c7854a9mr321576pjb.1.1646958337790; Thu, 10
- Mar 2022 16:25:37 -0800 (PST)
-Date:   Fri, 11 Mar 2022 00:25:06 +0000
+ id pg16-20020a17090b1e1000b001bf6c7854a9mr321588pjb.1.1646958339516; Thu, 10
+ Mar 2022 16:25:39 -0800 (PST)
+Date:   Fri, 11 Mar 2022 00:25:07 +0000
 In-Reply-To: <20220311002528.2230172-1-dmatlack@google.com>
-Message-Id: <20220311002528.2230172-5-dmatlack@google.com>
+Message-Id: <20220311002528.2230172-6-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20220311002528.2230172-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.35.1.723.g4982287a31-goog
-Subject: [PATCH v2 04/26] KVM: x86/mmu: Decompose kvm_mmu_get_page() into
- separate functions
+Subject: [PATCH v2 05/26] KVM: x86/mmu: Rename shadow MMU functions that deal
+ with shadow pages
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
@@ -85,248 +85,92 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Decompose kvm_mmu_get_page() into separate helper functions to increase
-readability and prepare for allocating shadow pages without a vcpu
-pointer.
+Rename 3 functions:
 
-Specifically, pull the guts of kvm_mmu_get_page() into 3 helper
-functions:
+  kvm_mmu_get_page()   -> kvm_mmu_get_shadow_page()
+  kvm_mmu_alloc_page() -> kvm_mmu_alloc_shadow_page()
+  kvm_mmu_free_page()  -> kvm_mmu_free_shadow_page()
 
-__kvm_mmu_find_shadow_page() -
-  Walks the page hash checking for any existing mmu pages that match the
-  given gfn and role. Does not attempt to synchronize the page if it is
-  unsync.
-
-kvm_mmu_find_shadow_page() -
-  Wraps __kvm_mmu_find_shadow_page() and handles syncing if necessary.
-
-kvm_mmu_new_shadow_page()
-  Allocates and initializes an entirely new kvm_mmu_page. This currently
-  requries a vcpu pointer for allocation and looking up the memslot but
-  that will be removed in a future commit.
-
-  Note, kvm_mmu_new_shadow_page() is temporary and will be removed in a
-  subsequent commit. The name uses "new" rather than the more typical
-  "alloc" to avoid clashing with the existing kvm_mmu_alloc_page().
-
-No functional change intended.
+This change makes it clear that these functions deal with shadow pages
+rather than struct pages. Prefer "shadow_page" over the shorter "sp"
+since these are core routines.
 
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c         | 132 ++++++++++++++++++++++++---------
- arch/x86/kvm/mmu/paging_tmpl.h |   5 +-
- arch/x86/kvm/mmu/spte.c        |   5 +-
- 3 files changed, 101 insertions(+), 41 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 23c2004c6435..80dbfe07c87b 100644
+index 80dbfe07c87b..b6fb50e32291 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -2027,16 +2027,25 @@ static void clear_sp_write_flooding_count(u64 *spte)
- 	__clear_sp_write_flooding_count(sptep_to_sp(spte));
+@@ -1668,7 +1668,7 @@ static inline void kvm_mod_used_mmu_pages(struct kvm *kvm, long nr)
+ 	percpu_counter_add(&kvm_total_used_mmu_pages, nr);
+ }
+ 
+-static void kvm_mmu_free_page(struct kvm_mmu_page *sp)
++static void kvm_mmu_free_shadow_page(struct kvm_mmu_page *sp)
+ {
+ 	MMU_WARN_ON(!is_empty_shadow_page(sp->spt));
+ 	hlist_del(&sp->hash_link);
+@@ -1706,7 +1706,8 @@ static void drop_parent_pte(struct kvm_mmu_page *sp,
+ 	mmu_spte_clear_no_track(parent_pte);
+ }
+ 
+-static struct kvm_mmu_page *kvm_mmu_alloc_page(struct kvm_vcpu *vcpu, bool direct)
++static struct kvm_mmu_page *kvm_mmu_alloc_shadow_page(struct kvm_vcpu *vcpu,
++						      bool direct)
+ {
+ 	struct kvm_mmu_page *sp;
+ 
+@@ -2134,7 +2135,7 @@ static struct kvm_mmu_page *kvm_mmu_new_shadow_page(struct kvm_vcpu *vcpu,
+ 
+ 	++vcpu->kvm->stat.mmu_cache_miss;
+ 
+-	sp = kvm_mmu_alloc_page(vcpu, role.direct);
++	sp = kvm_mmu_alloc_shadow_page(vcpu, role.direct);
+ 	sp->gfn = gfn;
+ 	sp->role = role;
+ 
+@@ -2150,8 +2151,9 @@ static struct kvm_mmu_page *kvm_mmu_new_shadow_page(struct kvm_vcpu *vcpu,
+ 	return sp;
  }
  
 -static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu, gfn_t gfn,
 -					     union kvm_mmu_page_role role)
-+/*
-+ * Searches for an existing SP for the given gfn and role. Makes no attempt to
-+ * sync the SP if it is marked unsync.
-+ *
-+ * If creating an upper-level page table, zaps unsynced pages for the same
-+ * gfn and adds them to the invalid_list. It's the callers responsibility
-+ * to call kvm_mmu_commit_zap_page() on invalid_list.
-+ */
-+static struct kvm_mmu_page *__kvm_mmu_find_shadow_page(struct kvm *kvm,
-+						       gfn_t gfn,
-+						       union kvm_mmu_page_role role,
-+						       struct list_head *invalid_list)
- {
- 	struct hlist_head *sp_list;
- 	struct kvm_mmu_page *sp;
- 	int collisions = 0;
--	LIST_HEAD(invalid_list);
- 
--	sp_list = &vcpu->kvm->arch.mmu_page_hash[kvm_page_table_hashfn(gfn)];
--	for_each_valid_sp(vcpu->kvm, sp, sp_list) {
-+	sp_list = &kvm->arch.mmu_page_hash[kvm_page_table_hashfn(gfn)];
-+	for_each_valid_sp(kvm, sp, sp_list) {
- 		if (sp->gfn != gfn) {
- 			collisions++;
- 			continue;
-@@ -2053,60 +2062,109 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu, gfn_t gfn,
- 			 * upper-level page will be write-protected.
- 			 */
- 			if (role.level > PG_LEVEL_4K && sp->unsync)
--				kvm_mmu_prepare_zap_page(vcpu->kvm, sp,
--							 &invalid_list);
-+				kvm_mmu_prepare_zap_page(kvm, sp, invalid_list);
-+
- 			continue;
- 		}
- 
--		/* unsync and write-flooding only apply to indirect SPs. */
--		if (sp->role.direct)
--			goto trace_get_page;
-+		/* Write-flooding is only tracked for indirect SPs. */
-+		if (!sp->role.direct)
-+			__clear_sp_write_flooding_count(sp);
- 
--		if (sp->unsync) {
--			/*
--			 * The page is good, but is stale.  kvm_sync_page does
--			 * get the latest guest state, but (unlike mmu_unsync_children)
--			 * it doesn't write-protect the page or mark it synchronized!
--			 * This way the validity of the mapping is ensured, but the
--			 * overhead of write protection is not incurred until the
--			 * guest invalidates the TLB mapping.  This allows multiple
--			 * SPs for a single gfn to be unsync.
--			 *
--			 * If the sync fails, the page is zapped.  If so, break
--			 * in order to rebuild it.
--			 */
--			if (!kvm_sync_page(vcpu, sp, &invalid_list))
--				break;
-+		goto out;
-+	}
- 
--			WARN_ON(!list_empty(&invalid_list));
--			kvm_flush_remote_tlbs(vcpu->kvm);
--		}
-+	sp = NULL;
- 
--		__clear_sp_write_flooding_count(sp);
-+out:
-+	if (collisions > kvm->stat.max_mmu_page_hash_collisions)
-+		kvm->stat.max_mmu_page_hash_collisions = collisions;
-+
-+	return sp;
-+}
- 
--trace_get_page:
--		trace_kvm_mmu_get_page(sp, false);
-+/*
-+ * Looks up an existing SP for the given gfn and role if one exists. The
-+ * return SP is guaranteed to be synced.
-+ */
-+static struct kvm_mmu_page *kvm_mmu_find_shadow_page(struct kvm_vcpu *vcpu,
-+						     gfn_t gfn,
-+						     union kvm_mmu_page_role role)
-+{
-+	struct kvm_mmu_page *sp;
-+	LIST_HEAD(invalid_list);
-+
-+	sp = __kvm_mmu_find_shadow_page(vcpu->kvm, gfn, role, &invalid_list);
-+	if (!sp)
- 		goto out;
-+
-+	if (sp->unsync) {
-+		/*
-+		 * The page is good, but is stale.  kvm_sync_page does
-+		 * get the latest guest state, but (unlike mmu_unsync_children)
-+		 * it doesn't write-protect the page or mark it synchronized!
-+		 * This way the validity of the mapping is ensured, but the
-+		 * overhead of write protection is not incurred until the
-+		 * guest invalidates the TLB mapping.  This allows multiple
-+		 * SPs for a single gfn to be unsync.
-+		 *
-+		 * If the sync fails, the page is zapped and added to the
-+		 * invalid_list.
-+		 */
-+		if (!kvm_sync_page(vcpu, sp, &invalid_list)) {
-+			sp = NULL;
-+			goto out;
-+		}
-+
-+		WARN_ON(!list_empty(&invalid_list));
-+		kvm_flush_remote_tlbs(vcpu->kvm);
- 	}
- 
-+out:
-+	kvm_mmu_commit_zap_page(vcpu->kvm, &invalid_list);
-+	return sp;
-+}
-+
-+static struct kvm_mmu_page *kvm_mmu_new_shadow_page(struct kvm_vcpu *vcpu,
++static struct kvm_mmu_page *kvm_mmu_get_shadow_page(struct kvm_vcpu *vcpu,
 +						    gfn_t gfn,
 +						    union kvm_mmu_page_role role)
-+{
-+	struct kvm_mmu_page *sp;
-+	struct hlist_head *sp_list;
-+
- 	++vcpu->kvm->stat.mmu_cache_miss;
+ {
+ 	struct kvm_mmu_page *sp;
+ 	bool created = false;
+@@ -2210,7 +2212,7 @@ static struct kvm_mmu_page *kvm_mmu_get_child_sp(struct kvm_vcpu *vcpu,
+ 	union kvm_mmu_page_role role;
  
- 	sp = kvm_mmu_alloc_page(vcpu, role.direct);
--
- 	sp->gfn = gfn;
- 	sp->role = role;
-+
-+	sp_list = &vcpu->kvm->arch.mmu_page_hash[kvm_page_table_hashfn(gfn)];
- 	hlist_add_head(&sp->hash_link, sp_list);
-+
- 	if (!role.direct) {
- 		account_shadowed(vcpu->kvm, sp);
- 		if (role.level == PG_LEVEL_4K && kvm_vcpu_write_protect_gfn(vcpu, gfn))
- 			kvm_flush_remote_tlbs_with_address(vcpu->kvm, gfn, 1);
- 	}
--	trace_kvm_mmu_get_page(sp, true);
--out:
--	kvm_mmu_commit_zap_page(vcpu->kvm, &invalid_list);
- 
--	if (collisions > vcpu->kvm->stat.max_mmu_page_hash_collisions)
--		vcpu->kvm->stat.max_mmu_page_hash_collisions = collisions;
-+	return sp;
-+}
-+
-+static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu, gfn_t gfn,
-+					     union kvm_mmu_page_role role)
-+{
-+	struct kvm_mmu_page *sp;
-+	bool created = false;
-+
-+	sp = kvm_mmu_find_shadow_page(vcpu, gfn, role);
-+	if (sp)
-+		goto out;
-+
-+	created = true;
-+	sp = kvm_mmu_new_shadow_page(vcpu, gfn, role);
-+
-+out:
-+	trace_kvm_mmu_get_page(sp, created);
- 	return sp;
+ 	role = kvm_mmu_child_role(sptep, direct, access);
+-	return kvm_mmu_get_page(vcpu, gfn, role);
++	return kvm_mmu_get_shadow_page(vcpu, gfn, role);
  }
  
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index c3909a07e938..55cac59b9c9b 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -692,8 +692,9 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
- 			 * the gpte is changed from non-present to present.
- 			 * Otherwise, the guest may use the wrong mapping.
- 			 *
--			 * For PG_LEVEL_4K, kvm_mmu_get_page() has already
--			 * synchronized it transiently via kvm_sync_page().
-+			 * For PG_LEVEL_4K, kvm_mmu_get_existing_sp() has
-+			 * already synchronized it transiently via
-+			 * kvm_sync_page().
- 			 *
- 			 * For higher level pagetable, we synchronize it via
- 			 * the slower mmu_sync_children().  If it needs to
-diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
-index 4739b53c9734..d10189d9c877 100644
---- a/arch/x86/kvm/mmu/spte.c
-+++ b/arch/x86/kvm/mmu/spte.c
-@@ -150,8 +150,9 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
- 		/*
- 		 * Optimization: for pte sync, if spte was writable the hash
- 		 * lookup is unnecessary (and expensive). Write protection
--		 * is responsibility of kvm_mmu_get_page / kvm_mmu_sync_roots.
--		 * Same reasoning can be applied to dirty page accounting.
-+		 * is responsibility of kvm_mmu_create_sp() and
-+		 * kvm_mmu_sync_roots(). Same reasoning can be applied to dirty
-+		 * page accounting.
- 		 */
- 		if (is_writable_pte(old_spte))
- 			goto out;
+ static void shadow_walk_init_using_root(struct kvm_shadow_walk_iterator *iterator,
+@@ -2486,7 +2488,7 @@ static void kvm_mmu_commit_zap_page(struct kvm *kvm,
+ 
+ 	list_for_each_entry_safe(sp, nsp, invalid_list, link) {
+ 		WARN_ON(!sp->role.invalid || sp->root_count);
+-		kvm_mmu_free_page(sp);
++		kvm_mmu_free_shadow_page(sp);
+ 	}
+ }
+ 
+@@ -3417,7 +3419,7 @@ static hpa_t mmu_alloc_root(struct kvm_vcpu *vcpu, gfn_t gfn, gva_t gva,
+ 		role.quadrant = quadrant;
+ 	}
+ 
+-	sp = kvm_mmu_get_page(vcpu, gfn, role);
++	sp = kvm_mmu_get_shadow_page(vcpu, gfn, role);
+ 	++sp->root_count;
+ 
+ 	return __pa(sp->spt);
 -- 
 2.35.1.723.g4982287a31-goog
 
