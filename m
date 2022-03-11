@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C6E74D59AC
-	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 05:36:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 77F214D59AA
+	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 05:36:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346357AbiCKEgb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Mar 2022 23:36:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40392 "EHLO
+        id S1346364AbiCKEgf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Mar 2022 23:36:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40544 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346339AbiCKEgY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Mar 2022 23:36:24 -0500
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A36741A615B
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 20:35:21 -0800 (PST)
-Received: by mail-pl1-x64a.google.com with SMTP id d13-20020a170902b70d00b0015317d9f08bso2592218pls.1
-        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 20:35:21 -0800 (PST)
+        with ESMTP id S1346344AbiCKEg1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Mar 2022 23:36:27 -0500
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E30A1A617D
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 20:35:23 -0800 (PST)
+Received: by mail-pl1-x649.google.com with SMTP id e13-20020a17090301cd00b00150145346f9so3884347plh.23
+        for <kvm@vger.kernel.org>; Thu, 10 Mar 2022 20:35:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=usB0GBxRRdVr+B/0aKHFypKAZ1hq6jlpz8Jy0DI+uF4=;
-        b=gcHWOWIHV+tTBgjHJX9jzdk/PMrKUgkzRAmL1ZK+8U2EPTyUUHFmURiZcg+BigNFsH
-         ujMYWZOZrgbQF+dzAta+k1PyYB9jdNYoVcW15KywCDadDz1Ryol6l9GNrZC25QcNKr7u
-         2BsMUnRQOTrCNuHeM4aW+zb//QrgOW1V3QHS5+fndf6fEOoEV586J3f2ZmLGzQIPcJh9
-         kAqIdPTHRBGSPRuADdyxTfPKWTfIaDaP2X0zwCnnFUvpIS8KJp9bJ+pVe96WiF2svSdv
-         iVcGLvIz0+6fmsL5msdZ9BKAmmqp9kiiaRMF3qxbvI5xk5YFbc/REQLfui3DyqkGy+jA
-         K+Ng==
+        bh=rElojjO9wtOKkUJFhLoQ3fdEIDVTPTX23a5LuSKdRPk=;
+        b=p//7KiL6MwJom0iJgtiZjaY8HIbRESAhqvn1T+w/JgdZbzqloNsNQN8GtU9cNLT1fn
+         ACle9TcWYMST1f69v70dUqKdfttpQgXAjTR8OSdK963+F1wpJ/bfDWuKoO5e3vNmJXjG
+         Xzr5Eb0tHyLPy8bI9WkiSGDt8OOhA4c8MhUZ7nFYbFAtA/P2bblFxeJJaLLBFcWJUKbf
+         gisCKhl73J6kqN9TaVCOMFjfMmH/CQXWTYEvDYLalQEUsOBRwkCG+/MfRRbNkeMWL84K
+         voMtJ77ve1kvYFCiJ5DY11uvGAljdxBveF7r2NiYCU2ObxmePQM2A6Kz5A5qzUJtT/ha
+         VipA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=usB0GBxRRdVr+B/0aKHFypKAZ1hq6jlpz8Jy0DI+uF4=;
-        b=ervhyjr7ZQdclHMEl3udLUCpESLCqkc3IBIdsqY7wsidEdZHadnwy0DdZ6/vwOYV22
-         Jxqg4+FlCNpjKduZtvMGkdwTnTIWRa8IoG6sUe3ppilUKTK/DXIw23X8V2lBfTul+tFN
-         gIQhPTtVu5DM1AD2CPK4XwC3P7msYLnKb5mRs7U+OWTPsjmvwnejxeBiZDnwZ91BOnko
-         8N4Xk5qp9H70dofKMh+FqJjzyLRq5XsDWP01ZZWXegikELtG3G1MQHH6NuzFI57PV7PQ
-         1+osRXCzSVhkXtlHAoddgpvASy9rajScufLKHKUsElmPACh0bKejcx/kcBhhw0t/PXR5
-         h/eg==
-X-Gm-Message-State: AOAM533Ekv3JoFdan5XsSeV+7ZVyjr/7+dwvnFd3ZF4vmpwz0sr3Pr9T
-        QtIGZrjmTQpQifI/zaX36ncvZxJE0XA=
-X-Google-Smtp-Source: ABdhPJyJhPX61vPOaIFpK6NgMZc4sXBFVf0JJT3JwPXm1Qngue1PPW6Z0JVdCgJ/Dc6GWeLWzee8AAcANYA=
+        bh=rElojjO9wtOKkUJFhLoQ3fdEIDVTPTX23a5LuSKdRPk=;
+        b=Q95v8QOBPsP1QRWy2iuxoW3Mrhob/aQ049DaTZi6f3f35pdfHLDkiadmlPhR26oybq
+         56oFgxoE+7nUyLuoXtK5nTeGzpU9YZ+0WKBnrpG1lJV6gzTO9qkh82L7RliVNsJKE82z
+         mOOiOj/64zBs2KiKp5BzbBrf1EOjvitZgjMNjeh6WIyKDBX670LoBRKlroWTROF7BS7m
+         /uliELjCLDfoSEoMcBe2iRxef+gWVsoQK0+GkyVLzA5lbvCWIKS6IsrrW2nPYQLjmuSI
+         H1aYvf30BEJ62FeRr4hGWDaaKHCKcyTon0UwphY+RUa1SQQpydkWKCm+kskmhgV9dkxC
+         eCtw==
+X-Gm-Message-State: AOAM53027QmRywnYA9bvS3cdkvDo24vJ5P5ekGZ8UVO6+a9iKGB4tn3E
+        qvwkZjEUke0OIF9ryhfrKtYQQ+/ioWk=
+X-Google-Smtp-Source: ABdhPJyw12AOmfiB/1wupY4ZG+BUfQQpWDGifYq99wnD5EsqZ8FcgXbfxG/4DzZZGhKilN4gSSIIw/kH+Jw=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:14c1:b0:4f7:55ba:5f5a with SMTP id
- w1-20020a056a0014c100b004f755ba5f5amr8500794pfu.76.1646973321130; Thu, 10 Mar
- 2022 20:35:21 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:124e:b0:4f7:6d35:c1d5 with SMTP id
+ u14-20020a056a00124e00b004f76d35c1d5mr7528582pfi.83.1646973322917; Thu, 10
+ Mar 2022 20:35:22 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 11 Mar 2022 04:35:15 +0000
+Date:   Fri, 11 Mar 2022 04:35:16 +0000
 In-Reply-To: <20220311043517.17027-1-seanjc@google.com>
-Message-Id: <20220311043517.17027-2-seanjc@google.com>
+Message-Id: <20220311043517.17027-3-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220311043517.17027-1-seanjc@google.com>
 X-Mailer: git-send-email 2.35.1.723.g4982287a31-goog
-Subject: [PATCH 1/3] KVM: x86: Make APICv inihibit reasons an enum and cleanup naming
+Subject: [PATCH 2/3] KVM: x86: Add wrappers for setting/clearing APICv inhibits
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -72,222 +72,272 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use an enum for the APICv inhibit reasons, there is no meaning behind
-their values and they most definitely are not "unsigned longs".  Rename
-the various params to "reason" for consistency and clarity (inhibit may
-be confused as a command, i.e. inhibit APICv, instead of the reason that
-is getting toggled/checked).
+Add set/clear wrappers for toggling APICv inhibits to make the call sites
+more readable, and opportunistically rename the inner helpers to align
+with the new wrappers and to make them more readable as well.  Invert the
+flag from "activate" to "set"; activate is painfully ambiguous as it's
+not obvious if the inhibit is being activated, or if APICv is being
+activated, in which case the inhibit is being deactivated.
 
-No functional change intended.
+For the functions that take @set, swap the order of the inhibit reason
+and @set so that the call sites are visually similar to those that bounce
+through the wrapper.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/include/asm/kvm_host.h | 25 +++++++++++++------------
- arch/x86/kvm/svm/avic.c         |  4 ++--
- arch/x86/kvm/svm/svm.h          |  2 +-
- arch/x86/kvm/trace.h            | 12 ++++++------
- arch/x86/kvm/vmx/vmx.c          |  4 ++--
- arch/x86/kvm/x86.c              | 19 +++++++++++--------
- 6 files changed, 35 insertions(+), 31 deletions(-)
+ arch/x86/include/asm/kvm_host.h | 20 ++++++++++++++++----
+ arch/x86/kvm/hyperv.c           | 10 +++++++---
+ arch/x86/kvm/i8254.c            |  6 ++----
+ arch/x86/kvm/svm/svm.c          | 11 +++++------
+ arch/x86/kvm/trace.h            |  8 ++++----
+ arch/x86/kvm/x86.c              | 30 +++++++++++++++---------------
+ 6 files changed, 49 insertions(+), 36 deletions(-)
 
 diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index f72e80178ffc..16f46faa7f80 100644
+index 16f46faa7f80..2b59a5e485ba 100644
 --- a/arch/x86/include/asm/kvm_host.h
 +++ b/arch/x86/include/asm/kvm_host.h
-@@ -1047,14 +1047,16 @@ struct kvm_x86_msr_filter {
- 	struct msr_bitmap_range ranges[16];
- };
+@@ -1804,10 +1804,22 @@ gpa_t kvm_mmu_gva_to_gpa_system(struct kvm_vcpu *vcpu, gva_t gva,
  
--#define APICV_INHIBIT_REASON_DISABLE    0
--#define APICV_INHIBIT_REASON_HYPERV     1
--#define APICV_INHIBIT_REASON_NESTED     2
--#define APICV_INHIBIT_REASON_IRQWIN     3
--#define APICV_INHIBIT_REASON_PIT_REINJ  4
--#define APICV_INHIBIT_REASON_X2APIC	5
--#define APICV_INHIBIT_REASON_BLOCKIRQ	6
--#define APICV_INHIBIT_REASON_ABSENT	7
-+enum kvm_apicv_inhibit {
-+	APICV_INHIBIT_REASON_DISABLE,
-+	APICV_INHIBIT_REASON_HYPERV,
-+	APICV_INHIBIT_REASON_NESTED,
-+	APICV_INHIBIT_REASON_IRQWIN,
-+	APICV_INHIBIT_REASON_PIT_REINJ,
-+	APICV_INHIBIT_REASON_X2APIC,
-+	APICV_INHIBIT_REASON_BLOCKIRQ,
-+	APICV_INHIBIT_REASON_ABSENT,
-+};
- 
- struct kvm_arch {
- 	unsigned long n_used_mmu_pages;
-@@ -1408,7 +1410,7 @@ struct kvm_x86_ops {
- 	void (*enable_nmi_window)(struct kvm_vcpu *vcpu);
- 	void (*enable_irq_window)(struct kvm_vcpu *vcpu);
- 	void (*update_cr8_intercept)(struct kvm_vcpu *vcpu, int tpr, int irr);
--	bool (*check_apicv_inhibit_reasons)(ulong bit);
-+	bool (*check_apicv_inhibit_reasons)(enum kvm_apicv_inhibit reason);
- 	void (*refresh_apicv_exec_ctrl)(struct kvm_vcpu *vcpu);
- 	void (*hwapic_irr_update)(struct kvm_vcpu *vcpu, int max_irr);
- 	void (*hwapic_isr_update)(struct kvm_vcpu *vcpu, int isr);
-@@ -1803,10 +1805,9 @@ gpa_t kvm_mmu_gva_to_gpa_system(struct kvm_vcpu *vcpu, gva_t gva,
  bool kvm_apicv_activated(struct kvm *kvm);
  void kvm_vcpu_update_apicv(struct kvm_vcpu *vcpu);
- void kvm_request_apicv_update(struct kvm *kvm, bool activate,
--			      unsigned long bit);
--
-+			      enum kvm_apicv_inhibit reason);
- void __kvm_request_apicv_update(struct kvm *kvm, bool activate,
--				unsigned long bit);
-+				enum kvm_apicv_inhibit reason);
+-void kvm_request_apicv_update(struct kvm *kvm, bool activate,
+-			      enum kvm_apicv_inhibit reason);
+-void __kvm_request_apicv_update(struct kvm *kvm, bool activate,
+-				enum kvm_apicv_inhibit reason);
++void __kvm_set_or_clear_apicv_inhibit(struct kvm *kvm,
++				      enum kvm_apicv_inhibit reason, bool set);
++void kvm_set_or_clear_apicv_inhibit(struct kvm *kvm,
++				    enum kvm_apicv_inhibit reason, bool set);
++
++static inline void kvm_set_apicv_inhibit(struct kvm *kvm,
++					 enum kvm_apicv_inhibit reason)
++{
++	kvm_set_or_clear_apicv_inhibit(kvm, reason, true);
++}
++
++static inline void kvm_clear_apicv_inhibit(struct kvm *kvm,
++					   enum kvm_apicv_inhibit reason)
++{
++	kvm_set_or_clear_apicv_inhibit(kvm, reason, false);
++}
  
  int kvm_emulate_hypercall(struct kvm_vcpu *vcpu);
  
-diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index b37b353ec086..c5ef4715f3e0 100644
---- a/arch/x86/kvm/svm/avic.c
-+++ b/arch/x86/kvm/svm/avic.c
-@@ -822,7 +822,7 @@ int avic_pi_update_irte(struct kvm *kvm, unsigned int host_irq,
- 	return ret;
- }
+diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+index a32f54ab84a2..7480e3562d30 100644
+--- a/arch/x86/kvm/hyperv.c
++++ b/arch/x86/kvm/hyperv.c
+@@ -122,9 +122,13 @@ static void synic_update_vector(struct kvm_vcpu_hv_synic *synic,
+ 	else
+ 		hv->synic_auto_eoi_used--;
  
--bool avic_check_apicv_inhibit_reasons(ulong bit)
-+bool avic_check_apicv_inhibit_reasons(enum kvm_apicv_inhibit reason)
+-	__kvm_request_apicv_update(vcpu->kvm,
+-				   !hv->synic_auto_eoi_used,
+-				   APICV_INHIBIT_REASON_HYPERV);
++	/*
++	 * Inhibit APICv if any vCPU is using SynIC's AutoEOI, which relies on
++	 * the hypervisor to manually inject IRQs.
++	 */
++	__kvm_set_or_clear_apicv_inhibit(vcpu->kvm,
++					 APICV_INHIBIT_REASON_HYPERV,
++					 !!hv->synic_auto_eoi_used);
+ 
+ 	up_write(&vcpu->kvm->arch.apicv_update_lock);
+ }
+diff --git a/arch/x86/kvm/i8254.c b/arch/x86/kvm/i8254.c
+index 0b65a764ed3a..1c83076091af 100644
+--- a/arch/x86/kvm/i8254.c
++++ b/arch/x86/kvm/i8254.c
+@@ -305,15 +305,13 @@ void kvm_pit_set_reinject(struct kvm_pit *pit, bool reinject)
+ 	 * So, deactivate APICv when PIT is in reinject mode.
+ 	 */
+ 	if (reinject) {
+-		kvm_request_apicv_update(kvm, false,
+-					 APICV_INHIBIT_REASON_PIT_REINJ);
++		kvm_set_apicv_inhibit(kvm, APICV_INHIBIT_REASON_PIT_REINJ);
+ 		/* The initial state is preserved while ps->reinject == 0. */
+ 		kvm_pit_reset_reinject(pit);
+ 		kvm_register_irq_ack_notifier(kvm, &ps->irq_ack_notifier);
+ 		kvm_register_irq_mask_notifier(kvm, 0, &pit->mask_notifier);
+ 	} else {
+-		kvm_request_apicv_update(kvm, true,
+-					 APICV_INHIBIT_REASON_PIT_REINJ);
++		kvm_clear_apicv_inhibit(kvm, APICV_INHIBIT_REASON_PIT_REINJ);
+ 		kvm_unregister_irq_ack_notifier(kvm, &ps->irq_ack_notifier);
+ 		kvm_unregister_irq_mask_notifier(kvm, 0, &pit->mask_notifier);
+ 	}
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index b069493ad5c7..75feba3539e8 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -2923,7 +2923,7 @@ static int interrupt_window_interception(struct kvm_vcpu *vcpu)
+ 	 * In this case AVIC was temporarily disabled for
+ 	 * requesting the IRQ window and we have to re-enable it.
+ 	 */
+-	kvm_request_apicv_update(vcpu->kvm, true, APICV_INHIBIT_REASON_IRQWIN);
++	kvm_clear_apicv_inhibit(vcpu->kvm, APICV_INHIBIT_REASON_IRQWIN);
+ 
+ 	++vcpu->stat.irq_window_exits;
+ 	return 1;
+@@ -3521,7 +3521,7 @@ static void svm_enable_irq_window(struct kvm_vcpu *vcpu)
+ 		 * via AVIC. In such case, we need to temporarily disable AVIC,
+ 		 * and fallback to injecting IRQ via V_IRQ.
+ 		 */
+-		kvm_request_apicv_update(vcpu->kvm, false, APICV_INHIBIT_REASON_IRQWIN);
++		kvm_set_apicv_inhibit(vcpu->kvm, APICV_INHIBIT_REASON_IRQWIN);
+ 		svm_set_vintr(svm);
+ 	}
+ }
+@@ -3948,6 +3948,7 @@ static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
  {
- 	ulong supported = BIT(APICV_INHIBIT_REASON_DISABLE) |
- 			  BIT(APICV_INHIBIT_REASON_ABSENT) |
-@@ -833,7 +833,7 @@ bool avic_check_apicv_inhibit_reasons(ulong bit)
- 			  BIT(APICV_INHIBIT_REASON_X2APIC) |
- 			  BIT(APICV_INHIBIT_REASON_BLOCKIRQ);
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+ 	struct kvm_cpuid_entry2 *best;
++	struct kvm *kvm = vcpu->kvm;
  
--	return supported & BIT(bit);
-+	return supported & BIT(reason);
+ 	vcpu->arch.xsaves_enabled = guest_cpuid_has(vcpu, X86_FEATURE_XSAVE) &&
+ 				    boot_cpu_has(X86_FEATURE_XSAVE) &&
+@@ -3976,16 +3977,14 @@ static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+ 		 * is exposed to the guest, disable AVIC.
+ 		 */
+ 		if (guest_cpuid_has(vcpu, X86_FEATURE_X2APIC))
+-			kvm_request_apicv_update(vcpu->kvm, false,
+-						 APICV_INHIBIT_REASON_X2APIC);
++			kvm_set_apicv_inhibit(kvm, APICV_INHIBIT_REASON_X2APIC);
+ 
+ 		/*
+ 		 * Currently, AVIC does not work with nested virtualization.
+ 		 * So, we disable AVIC when cpuid for SVM is set in the L1 guest.
+ 		 */
+ 		if (nested && guest_cpuid_has(vcpu, X86_FEATURE_SVM))
+-			kvm_request_apicv_update(vcpu->kvm, false,
+-						 APICV_INHIBIT_REASON_NESTED);
++			kvm_set_apicv_inhibit(kvm, APICV_INHIBIT_REASON_NESTED);
+ 	}
+ 	init_vmcb_after_set_cpuid(vcpu);
  }
- 
- 
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 93502d2a52ce..d07a5b88ea96 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -600,7 +600,7 @@ void __avic_vcpu_put(struct kvm_vcpu *vcpu);
- void avic_apicv_post_state_restore(struct kvm_vcpu *vcpu);
- void avic_set_virtual_apic_mode(struct kvm_vcpu *vcpu);
- void avic_refresh_apicv_exec_ctrl(struct kvm_vcpu *vcpu);
--bool avic_check_apicv_inhibit_reasons(ulong bit);
-+bool avic_check_apicv_inhibit_reasons(enum kvm_apicv_inhibit reason);
- void avic_hwapic_irr_update(struct kvm_vcpu *vcpu, int max_irr);
- void avic_hwapic_isr_update(struct kvm_vcpu *vcpu, int max_isr);
- bool avic_dy_apicv_has_pending_interrupt(struct kvm_vcpu *vcpu);
 diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-index 193f5ba930d1..cf3e4838c86a 100644
+index cf3e4838c86a..105037a251b5 100644
 --- a/arch/x86/kvm/trace.h
 +++ b/arch/x86/kvm/trace.h
-@@ -1340,22 +1340,22 @@ TRACE_EVENT(kvm_hv_stimer_cleanup,
+@@ -1340,17 +1340,17 @@ TRACE_EVENT(kvm_hv_stimer_cleanup,
  );
  
  TRACE_EVENT(kvm_apicv_update_request,
--	    TP_PROTO(bool activate, unsigned long bit),
--	    TP_ARGS(activate, bit),
-+	    TP_PROTO(bool activate, int reason),
-+	    TP_ARGS(activate, reason),
+-	    TP_PROTO(bool activate, int reason),
+-	    TP_ARGS(activate, reason),
++	    TP_PROTO(int reason, bool activate),
++	    TP_ARGS(reason, activate),
  
  	TP_STRUCT__entry(
- 		__field(bool, activate)
--		__field(unsigned long, bit)
-+		__field(int, reason)
+-		__field(bool, activate)
+ 		__field(int, reason)
++		__field(bool, activate)
  	),
  
  	TP_fast_assign(
- 		__entry->activate = activate;
--		__entry->bit = bit;
-+		__entry->reason = reason;
+-		__entry->activate = activate;
+ 		__entry->reason = reason;
++		__entry->activate = activate;
  	),
  
--	TP_printk("%s bit=%lu",
-+	TP_printk("%s reason=%u",
- 		  __entry->activate ? "activate" : "deactivate",
--		  __entry->bit)
-+		  __entry->reason)
- );
- 
- TRACE_EVENT(kvm_apicv_accept_irq,
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index e8963f5af618..fb8d5b6d05f7 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7705,14 +7705,14 @@ static void vmx_hardware_unsetup(void)
- 	free_kvm_area();
- }
- 
--static bool vmx_check_apicv_inhibit_reasons(ulong bit)
-+static bool vmx_check_apicv_inhibit_reasons(enum kvm_apicv_inhibit reason)
- {
- 	ulong supported = BIT(APICV_INHIBIT_REASON_DISABLE) |
- 			  BIT(APICV_INHIBIT_REASON_ABSENT) |
- 			  BIT(APICV_INHIBIT_REASON_HYPERV) |
- 			  BIT(APICV_INHIBIT_REASON_BLOCKIRQ);
- 
--	return supported & BIT(bit);
-+	return supported & BIT(reason);
- }
- 
- static struct kvm_x86_ops vmx_x86_ops __initdata = {
+ 	TP_printk("%s reason=%u",
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 51106d32f04e..f295db4580a7 100644
+index f295db4580a7..965688aa6b45 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -9735,24 +9735,25 @@ void kvm_vcpu_update_apicv(struct kvm_vcpu *vcpu)
+@@ -5930,7 +5930,7 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 		smp_wmb();
+ 		kvm->arch.irqchip_mode = KVM_IRQCHIP_SPLIT;
+ 		kvm->arch.nr_reserved_ioapic_pins = cap->args[0];
+-		kvm_request_apicv_update(kvm, true, APICV_INHIBIT_REASON_ABSENT);
++		kvm_clear_apicv_inhibit(kvm, APICV_INHIBIT_REASON_ABSENT);
+ 		r = 0;
+ split_irqchip_unlock:
+ 		mutex_unlock(&kvm->lock);
+@@ -6327,7 +6327,7 @@ long kvm_arch_vm_ioctl(struct file *filp,
+ 		/* Write kvm->irq_routing before enabling irqchip_in_kernel. */
+ 		smp_wmb();
+ 		kvm->arch.irqchip_mode = KVM_IRQCHIP_KERNEL;
+-		kvm_request_apicv_update(kvm, true, APICV_INHIBIT_REASON_ABSENT);
++		kvm_clear_apicv_inhibit(kvm, APICV_INHIBIT_REASON_ABSENT);
+ 	create_irqchip_unlock:
+ 		mutex_unlock(&kvm->lock);
+ 		break;
+@@ -9735,8 +9735,8 @@ void kvm_vcpu_update_apicv(struct kvm_vcpu *vcpu)
  }
  EXPORT_SYMBOL_GPL(kvm_vcpu_update_apicv);
  
--void __kvm_request_apicv_update(struct kvm *kvm, bool activate, ulong bit)
-+void __kvm_request_apicv_update(struct kvm *kvm, bool activate,
-+				enum kvm_apicv_inhibit reason)
+-void __kvm_request_apicv_update(struct kvm *kvm, bool activate,
+-				enum kvm_apicv_inhibit reason)
++void __kvm_set_or_clear_apicv_inhibit(struct kvm *kvm,
++				      enum kvm_apicv_inhibit reason, bool set)
  {
  	unsigned long old, new;
  
- 	lockdep_assert_held_write(&kvm->arch.apicv_update_lock);
- 
--	if (!static_call(kvm_x86_check_apicv_inhibit_reasons)(bit))
-+	if (!static_call(kvm_x86_check_apicv_inhibit_reasons)(reason))
- 		return;
+@@ -9747,13 +9747,13 @@ void __kvm_request_apicv_update(struct kvm *kvm, bool activate,
  
  	old = new = kvm->arch.apicv_inhibit_reasons;
  
- 	if (activate)
--		__clear_bit(bit, &new);
+-	if (activate)
+-		__clear_bit(reason, &new);
+-	else
++	if (set)
+ 		__set_bit(reason, &new);
++	else
 +		__clear_bit(reason, &new);
- 	else
--		__set_bit(bit, &new);
-+		__set_bit(reason, &new);
  
  	if (!!old != !!new) {
--		trace_kvm_apicv_update_request(activate, bit);
-+		trace_kvm_apicv_update_request(activate, reason);
+-		trace_kvm_apicv_update_request(activate, reason);
++		trace_kvm_apicv_update_request(reason, !set);
  		/*
  		 * Kick all vCPUs before setting apicv_inhibit_reasons to avoid
  		 * false positives in the sanity check WARN in svm_vcpu_run().
-@@ -9771,17 +9772,19 @@ void __kvm_request_apicv_update(struct kvm *kvm, bool activate, ulong bit)
- 			unsigned long gfn = gpa_to_gfn(APIC_DEFAULT_PHYS_BASE);
- 			kvm_zap_gfn_range(kvm, gfn, gfn+1);
- 		}
--	} else
-+	} else {
- 		kvm->arch.apicv_inhibit_reasons = new;
-+	}
+@@ -9777,17 +9777,17 @@ void __kvm_request_apicv_update(struct kvm *kvm, bool activate,
+ 	}
  }
  
--void kvm_request_apicv_update(struct kvm *kvm, bool activate, ulong bit)
-+void kvm_request_apicv_update(struct kvm *kvm, bool activate,
-+			      enum kvm_apicv_inhibit reason)
+-void kvm_request_apicv_update(struct kvm *kvm, bool activate,
+-			      enum kvm_apicv_inhibit reason)
++void kvm_set_or_clear_apicv_inhibit(struct kvm *kvm,
++				    enum kvm_apicv_inhibit reason, bool set)
  {
  	if (!enable_apicv)
  		return;
  
  	down_write(&kvm->arch.apicv_update_lock);
--	__kvm_request_apicv_update(kvm, activate, bit);
-+	__kvm_request_apicv_update(kvm, activate, reason);
+-	__kvm_request_apicv_update(kvm, activate, reason);
++	__kvm_set_or_clear_apicv_inhibit(kvm, reason, set);
  	up_write(&kvm->arch.apicv_update_lock);
  }
- EXPORT_SYMBOL_GPL(kvm_request_apicv_update);
+-EXPORT_SYMBOL_GPL(kvm_request_apicv_update);
++EXPORT_SYMBOL_GPL(kvm_set_or_clear_apicv_inhibit);
+ 
+ static void vcpu_scan_ioapic(struct kvm_vcpu *vcpu)
+ {
+@@ -10938,7 +10938,7 @@ int kvm_arch_vcpu_ioctl_set_sregs(struct kvm_vcpu *vcpu,
+ 
+ static void kvm_arch_vcpu_guestdbg_update_apicv_inhibit(struct kvm *kvm)
+ {
+-	bool inhibit = false;
++	bool set = false;
+ 	struct kvm_vcpu *vcpu;
+ 	unsigned long i;
+ 
+@@ -10946,11 +10946,11 @@ static void kvm_arch_vcpu_guestdbg_update_apicv_inhibit(struct kvm *kvm)
+ 
+ 	kvm_for_each_vcpu(i, vcpu, kvm) {
+ 		if (vcpu->guest_debug & KVM_GUESTDBG_BLOCKIRQ) {
+-			inhibit = true;
++			set = true;
+ 			break;
+ 		}
+ 	}
+-	__kvm_request_apicv_update(kvm, !inhibit, APICV_INHIBIT_REASON_BLOCKIRQ);
++	__kvm_set_or_clear_apicv_inhibit(kvm, APICV_INHIBIT_REASON_BLOCKIRQ, set);
+ 	up_write(&kvm->arch.apicv_update_lock);
+ }
+ 
 -- 
 2.35.1.723.g4982287a31-goog
 
