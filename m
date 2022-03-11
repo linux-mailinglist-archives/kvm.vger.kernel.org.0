@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 966D64D682A
-	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 18:57:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8797B4D682E
+	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 18:57:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350549AbiCKR6x (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Mar 2022 12:58:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48190 "EHLO
+        id S1350497AbiCKR6y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Mar 2022 12:58:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350472AbiCKR6t (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Mar 2022 12:58:49 -0500
-Received: from mail-io1-xd4a.google.com (mail-io1-xd4a.google.com [IPv6:2607:f8b0:4864:20::d4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C62F972D8
-        for <kvm@vger.kernel.org>; Fri, 11 Mar 2022 09:57:43 -0800 (PST)
-Received: by mail-io1-xd4a.google.com with SMTP id g11-20020a056602072b00b00645cc0735d7so6791052iox.1
-        for <kvm@vger.kernel.org>; Fri, 11 Mar 2022 09:57:43 -0800 (PST)
+        with ESMTP id S1350633AbiCKR6v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Mar 2022 12:58:51 -0500
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BF50A94DB
+        for <kvm@vger.kernel.org>; Fri, 11 Mar 2022 09:57:45 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id b11-20020a5b008b000000b00624ea481d55so7932286ybp.19
+        for <kvm@vger.kernel.org>; Fri, 11 Mar 2022 09:57:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=BxxrnSwrIA4lSZ5dK5jxyr2r2tLhZUFOrxcbnlilois=;
-        b=fa5WoWeDUYBwu4AqAKpVBlulmdk6ITEQVYZONtJ2u9pcPIxaUyOx/pOBQgOFg52Yd/
-         wSfGcWikT539Mu8oowRqbz3fzCMwnwM2i5FeKo6/JzeMJsuGnlAwC+RArs0TelINjAXJ
-         YiiylZhsdD+TKZvFRp2bvcQju/VH3KxGC+y7ml99Qp85+xH7mQOVUVbQSpIhRWsaekAN
-         zUx51OPbUCnvBVDxI6VrdMmWwvrjuDqtvEB+rxlLXPR1SULdF0qUS6NAVJnqAB18H1g1
-         DwvvD2Doyg3jUEWe2BlVwIkjcpUQlP74u15eK66wr6aSPlw3R/xOQ6q7VbMENibsurOl
-         iEYw==
+        bh=iMUX4p8oYYdLskY6YlQfUR43FNfUoWfkZJK4wIrDvVI=;
+        b=kbWvR7NSwT//jyD2uA/WkBGtSra3OAWNZLtQDDPfNKfREZh2jH89JBDrkrpTgQ+YNv
+         BUozf2+Uo6ONunKNVgwoR5E9m7HxiNyKMvg/WGnR+sSX0XuH3X6nfPaGNxi3vJ37o/lM
+         d+e2mKjeL9oPXKYywZpE/b7Xl/51yZO7v1R8Wc8yzsnBcH7u1/IxQKScxbUdOYyJ2EmK
+         LOX+JHVm4kFAdEXVqPovN8vrY7fDTjstsHEv/kIjboyaWqWt/BP/PCBTiUiUXfkaA2m/
+         FTSD1xnG8bA32t2Mx3cnmlZRYON6s8EvQNUCszZAool1frje4oMd6fFK+SEr9nABWojl
+         +9xQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=BxxrnSwrIA4lSZ5dK5jxyr2r2tLhZUFOrxcbnlilois=;
-        b=oCaFnXkZTcvsy6nvd5E1DtANhgZ8YXZ2BLaBeI8AuqJvZ5hBDVJAntnrnaC5vG8Rwf
-         ZSohyXBka6k05fgQtUDTeGO7RYoBsPR2fCt1p/ZSuP5snasvsx9GlPa4UBwr2yvCGmrX
-         NKzFsmZyKK8yfYukE934B9ev0NLpdTlsJalDHxG2EMLJdVJD6rNAWcMaWUZ/CwpFKicK
-         jBiQouwSRjvR2cGNW2nRHTGkhzbn7YVomdHukc3pDcnEEg0Ywn9/d5+3XKFK+Dlga9bb
-         tnA/PNsMssVK7FHVdppm9xEYRSG51dYfUelkKr+YXZK/IZM5yMyDG8oD2tJIxfYSNjVz
-         CYow==
-X-Gm-Message-State: AOAM533sdKZ6rWX+9AAKR6TsZ27TLloPGtvIIVQD+rbgctZxExPbdETD
-        xOXEl3eOfqNJnk+qke8rj0IZPacea7A=
-X-Google-Smtp-Source: ABdhPJwX1T89M6pC5yjyrmOZYn4413egwXefNOi34Uw2IPjEjKr6OBMM3S5JvF/Oiv1+jz9CqWb3dK8SDTQ=
+        bh=iMUX4p8oYYdLskY6YlQfUR43FNfUoWfkZJK4wIrDvVI=;
+        b=VjJFhT6nTysXOA6sJ2KYcH8vNCfAJIJQFiR1YHiphBaLz+buzeytfpfpiFau83m1lO
+         ZjVmntJCyZGrfZcrseWtyagokAV54d+0wyj4g3Io/yqQ9S0iwOQMnCOBeHr/5cNdN7U/
+         FHI+vVSjzTZDO28DOojrHf/K2BOYPmFxNA/fItlCyVGn586WpM4wM4faa49b4PNHLGH0
+         0CZP2oLl9KFTL1wH77KL/xUjo0cSt+Uya7yiLAznQvWxtVpVY1jMNVZzL3/LjIUIyDyt
+         yDEJ9B6JS19OAbaTHY4FolWa6wZtOB/lzJvAC+i7osxCjYcvdKC7LwZyv4REbUGfREpD
+         rb7g==
+X-Gm-Message-State: AOAM530luwNq31QB61xr9bwjDDY3qyG7O9uDq2DWcN/J+R4Q3n/+3Pi4
+        5LK42nNP7D7wkYO/X/mQeEjAs2hFGP0=
+X-Google-Smtp-Source: ABdhPJzPRbWq+blf3W5J139AGKxE7e6TJnEjyAP/74A7vawiP9FcCu7oAu7fi1c5ZnCuQttujGbnOdDK+/Y=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a05:6638:2388:b0:314:1ec0:b012 with SMTP id
- q8-20020a056638238800b003141ec0b012mr9295720jat.224.1647021462801; Fri, 11
- Mar 2022 09:57:42 -0800 (PST)
-Date:   Fri, 11 Mar 2022 17:57:15 +0000
+ (user=oupton job=sendgmr) by 2002:a81:d847:0:b0:2d8:1c55:942a with SMTP id
+ n7-20020a81d847000000b002d81c55942amr9375589ywl.260.1647021464480; Fri, 11
+ Mar 2022 09:57:44 -0800 (PST)
+Date:   Fri, 11 Mar 2022 17:57:16 +0000
 In-Reply-To: <20220311175717.616958-1-oupton@google.com>
-Message-Id: <20220311175717.616958-4-oupton@google.com>
+Message-Id: <20220311175717.616958-5-oupton@google.com>
 Mime-Version: 1.0
 References: <20220311174001.605719-1-oupton@google.com> <20220311175717.616958-1-oupton@google.com>
 X-Mailer: git-send-email 2.35.1.723.g4982287a31-goog
-Subject: [RFC PATCH kvmtool 3/5] ARM: Stash vcpu_init in the vCPU structure
+Subject: [RFC PATCH kvmtool 4/5] ARM: Add a helper to re-init a vCPU
 From:   Oliver Upton <oupton@google.com>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
@@ -76,61 +76,49 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-A subsequent change to kvmtool will require that a vCPU be reset more
-than once. Derive a valid target/feature set exactly once and stash that
-for later use.
+Create a helper that can be called to reinitialize a particular vCPU, or
+in other words issue the KVM_ARM_VCPU_INIT and KVM_ARM_VCPU_FINALIZE
+ioctls accordingly.
+
+Make use of the helper from kvm_cpu__arch_init() after the correct
+target/feature set have been identified. Calling KVM_ARM_VCPU_INIT with
+the same target more than once is benign.
 
 Signed-off-by: Oliver Upton <oupton@google.com>
 ---
- arm/include/arm-common/kvm-cpu-arch.h | 18 +++++++++---------
- arm/kvm-cpu.c                         |  2 +-
- 2 files changed, 10 insertions(+), 10 deletions(-)
+ arm/kvm-cpu.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/arm/include/arm-common/kvm-cpu-arch.h b/arm/include/arm-common/kvm-cpu-arch.h
-index 923d2c4..4027afe 100644
---- a/arm/include/arm-common/kvm-cpu-arch.h
-+++ b/arm/include/arm-common/kvm-cpu-arch.h
-@@ -10,18 +10,18 @@ struct kvm;
- struct kvm_cpu {
- 	pthread_t	thread;
- 
--	unsigned long	cpu_id;
--	unsigned long	cpu_type;
--	const char	*cpu_compatible;
-+	unsigned long		cpu_id;
-+	struct kvm_vcpu_init	init;
-+	const char		*cpu_compatible;
- 
--	struct kvm	*kvm;
--	int		vcpu_fd;
--	struct kvm_run	*kvm_run;
-+	struct kvm		*kvm;
-+	int			vcpu_fd;
-+	struct kvm_run		*kvm_run;
- 	struct kvm_cpu_task	*task;
- 
--	u8		is_running;
--	u8		paused;
--	u8		needs_nmi;
-+	u8			is_running;
-+	u8			paused;
-+	u8			needs_nmi;
- 
- 	struct kvm_coalesced_mmio_ring	*ring;
- 
 diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
-index 6a2408c..1ea56bb 100644
+index 1ea56bb..164e399 100644
 --- a/arm/kvm-cpu.c
 +++ b/arm/kvm-cpu.c
-@@ -128,7 +128,7 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
- 	/* Populate the vcpu structure. */
- 	vcpu->kvm		= kvm;
- 	vcpu->cpu_id		= cpu_id;
--	vcpu->cpu_type		= vcpu_init.target;
-+	vcpu->init		= vcpu_init;
+@@ -35,6 +35,15 @@ int kvm_cpu__register_kvm_arm_target(struct kvm_arm_target *target)
+ 	return -ENOSPC;
+ }
+ 
++static void kvm_cpu__arch_reinit(struct kvm_cpu *vcpu)
++{
++	if (ioctl(vcpu->vcpu_fd, KVM_ARM_VCPU_INIT, &vcpu->init) < 0)
++		die("KVM_ARM_VCPU_INIT failed");
++
++	if (kvm_cpu__configure_features(vcpu))
++		die("Unable to configure requested vcpu features");
++}
++
+ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
+ {
+ 	struct kvm_arm_target *target;
+@@ -132,8 +141,7 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
  	vcpu->cpu_compatible	= target->compatible;
  	vcpu->is_running	= true;
  
+-	if (kvm_cpu__configure_features(vcpu))
+-		die("Unable to configure requested vcpu features");
++	kvm_cpu__arch_reinit(vcpu);
+ 
+ 	return vcpu;
+ }
 -- 
 2.35.1.723.g4982287a31-goog
 
