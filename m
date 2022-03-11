@@ -2,50 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8968A4D5D5A
-	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 09:31:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 52EF04D5D56
+	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 09:31:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236322AbiCKIbU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Mar 2022 03:31:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46914 "EHLO
+        id S236917AbiCKIbV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Mar 2022 03:31:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236040AbiCKIbM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Mar 2022 03:31:12 -0500
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 394361B45FD;
-        Fri, 11 Mar 2022 00:30:10 -0800 (PST)
-Received: by mail-pj1-x102f.google.com with SMTP id gj15-20020a17090b108f00b001bef86c67c1so7548677pjb.3;
-        Fri, 11 Mar 2022 00:30:10 -0800 (PST)
+        with ESMTP id S233350AbiCKIbP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Mar 2022 03:31:15 -0500
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28F761B9882;
+        Fri, 11 Mar 2022 00:30:13 -0800 (PST)
+Received: by mail-pf1-x436.google.com with SMTP id s11so7266163pfu.13;
+        Fri, 11 Mar 2022 00:30:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=bg55DIKCupebm5f4NqZ1g4YC1+NWU4JZUPE3B9his68=;
-        b=FSBiFrp2EFh5RmqWuzLMcjAmroQnEnE9yw7vJXNjwVHqRPIWfux2pKZbvcwhluUVV+
-         FoPvvMujHYJ5BfIDZ2ABkv/RlqE3Rj4oY5HtjReuw0zGKe/P+KNzExmXwhuhVTrWdGM9
-         egDKBCdtHFCpSta8gVPdn3LLtE985CVPqd/TtRuwmw+yg2LBBpVlHLj3G5TzRabUe8Kb
-         c1fdRBCTyujvvI3X/kkQ7WC0vmkCoTH4P9qL/Yn8rbHIh4VFUg8z6Dg5KCoebRjFL5Ga
-         eiRcdOBDhRsuYANJ6SH2XDKTPikqpSrAjPsuEj/JhweLWgidvO57UHVIgIHog0BqbDIR
-         zUyQ==
+        bh=NsYPjIMYV5tX+pXV9c5Xqy6DdjLmleLEjTqHZPocps0=;
+        b=S3MDpP6CG9hy5C3F2jdmw1F5XMoi2qqCEwDIu62mcrMxBW0MQa2eWbFRLpNjkMIpXw
+         pyTV0p+3ZwMzIG4FT8wxYYMBK7fL8BtbMVJmjVPiDtu3UDSIUVWV8SffTR5pjo5Wpmux
+         pwmnl4Pb0KtNEGe79mJJSVuLbE81u9XqSrjwhDO/r2kyUMzzU9CACsIdUerLf7Wj8cVr
+         KoWhHlQR2ELFHFv7UhCo9Hp3DFd5StfFTYaTLGaK9f3IvAgErkHb8CKycYG/hwPbfBNh
+         1IkbWFJi5mUTeLXdxEYxjxB9vFdR2Q+8MPkHdRCG30KgSD6LrzUX8c8czAHx2+RsIP9y
+         RtQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=bg55DIKCupebm5f4NqZ1g4YC1+NWU4JZUPE3B9his68=;
-        b=QyIjUYxDlic6d4WY1k17JJNkSJLtzHZMlMjvcHOT+L3FXUEllKqXYLNFLlsrt1E6DM
-         V0CoOFubYQXDKE3/zaImPqLx+fTMlpeWpQqCISd0L807/OZQFF9wqrc6ioigluZmJbMd
-         kLNFmLWP1nbi1dPOmS02ruMtZBm26+RrFPuG9AAf6YEJIgSoQPeUs7/WWT0vQnbRSRuZ
-         2SQ4jP4M7EbzC5epsclDaw72ZR25WHUPw7YmmJ4uRDGZO73cSscSD4/L1xGshwbtC2f/
-         FTjPHp6GVkb6lZ/ORMFXmE1uaMYFKJah7BrSlakCrp7BqXieHfsfQb8xtwaxrt/u/eVc
-         c98g==
-X-Gm-Message-State: AOAM533jpF1XVSAT2yhBPobtvkhqgb7KME/OEQsoOxujR3A9eaYY0TxE
-        TFjhL6Dtlg/8GAC80nLYHt55IfNA2cg=
-X-Google-Smtp-Source: ABdhPJyGH6VBWlCi6KneX/AvpkwmrBm1Oe7zOEAaHBwhOGeVdFskQ29FwrAzKSI73+1WUByBy2T9cg==
-X-Received: by 2002:a17:90a:1941:b0:1bf:3918:d49e with SMTP id 1-20020a17090a194100b001bf3918d49emr9411051pjh.136.1646987409672;
-        Fri, 11 Mar 2022 00:30:09 -0800 (PST)
+        bh=NsYPjIMYV5tX+pXV9c5Xqy6DdjLmleLEjTqHZPocps0=;
+        b=d/+gREeM4U36OjP/qETZ32LQwCn6FMdsmrEJuNS2X7cUDkGxKtL8Ns7B6TCD1WsKEE
+         C6PLYTMXBcxMb976PjX0X9wk/3AmSif4qoKYBKjt1RV4NohAZnXxkmPBdDHu2G8sz8JD
+         srHdnkrlfRrOWhXxV0lahb+u3Vlurmr5kHUKgfFOUu+zB3TIFnmnINwpLldfggoV/YCE
+         s62tH4VWMnb77nvAalfEFE8tELibQY9XB52FLPPfsi67hvoPq71Py4o/nUzBdSiEjcQZ
+         IuJG0/HBX3oaHDK5ng6PBRFOvBNBHXy4Ay3wrAqQLH5lUvEBt7bScHmK+UodiPJzRdhp
+         K0FQ==
+X-Gm-Message-State: AOAM532Q1k7VMvwGUac4XM1sDHs6GwrbnUdG5uyTWdsi6DynG6kDPnkz
+        19HgCc1vg5/3NMBnJSrzh2RPAfr5dmk=
+X-Google-Smtp-Source: ABdhPJw3gCV80jRT9CDgfCsAV9mCk1p3R1GPkSXxWXR1LPAwd+ESOJ8gmooAWRB5PeOLIcEFg9Rxng==
+X-Received: by 2002:a05:6a00:10cb:b0:4f7:942:6a22 with SMTP id d11-20020a056a0010cb00b004f709426a22mr9016766pfu.84.1646987412231;
+        Fri, 11 Mar 2022 00:30:12 -0800 (PST)
 Received: from localhost.localdomain ([203.205.141.111])
-        by smtp.googlemail.com with ESMTPSA id l1-20020a17090aec0100b001bfa1bafeadsm9090576pjy.53.2022.03.11.00.30.07
+        by smtp.googlemail.com with ESMTPSA id l1-20020a17090aec0100b001bfa1bafeadsm9090576pjy.53.2022.03.11.00.30.09
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 11 Mar 2022 00:30:09 -0800 (PST)
+        Fri, 11 Mar 2022 00:30:12 -0800 (PST)
 From:   Wanpeng Li <kernellwp@gmail.com>
 X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
@@ -55,9 +55,9 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>
-Subject: [PATCH 2/5] KVM: X86: Add guest interrupt disable state support
-Date:   Fri, 11 Mar 2022 00:29:11 -0800
-Message-Id: <1646987354-28644-3-git-send-email-wanpengli@tencent.com>
+Subject: [PATCH 3/5] KVM: X86: Boost vCPU which is in the critical section
+Date:   Fri, 11 Mar 2022 00:29:12 -0800
+Message-Id: <1646987354-28644-4-git-send-email-wanpengli@tencent.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1646987354-28644-1-git-send-email-wanpengli@tencent.com>
 References: <1646987354-28644-1-git-send-email-wanpengli@tencent.com>
@@ -73,54 +73,128 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Wanpeng Li <wanpengli@tencent.com>
 
-Let's get the information whether or not guests disable interruptions.
+The missing semantic gap that occurs when a guest OS is preempted 
+when executing its own critical section, this leads to degradation 
+of application scalability. We try to bridge this semantic gap in 
+some ways, by passing guest preempt_count to the host and checking 
+guest irq disable state, the hypervisor now knows whether guest 
+OSes are running in the critical section, the hypervisor yield-on-spin 
+heuristics can be more smart this time to boost the vCPU candidate 
+who is in the critical section to mitigate this preemption problem, 
+in addition, it is more likely to be a potential lock holder.
+
+Testing on 96 HT 2 socket Xeon CLX server, with 96 vCPUs VM 100GB RAM,
+one VM running benchmark, the other(none-2) VMs running cpu-bound 
+workloads, There is no performance regression for other benchmarks 
+like Unixbench etc.
+
+1VM:
+            vanilla    optimized    improved
+
+hackbench -l 50000
+              28         21.45        30.5%
+ebizzy -M
+             12189       12354        1.4%
+dbench
+             712 MB/sec  722 MB/sec   1.4%
+
+2VM:
+            vanilla    optimized    improved
+
+hackbench -l 10000
+              29.4        26          13%
+ebizzy -M
+             3834        4033          5%
+dbench
+           42.3 MB/sec  44.1 MB/sec   4.3%
+
+3VM:
+            vanilla    optimized    improved
+
+hackbench -l 10000
+              47         35.46        33%
+ebizzy -M
+	     3828        4031         5%
+dbench 
+           30.5 MB/sec  31.16 MB/sec  2.3%
 
 Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 ---
- arch/x86/include/asm/kvm_host.h | 1 +
- arch/x86/kvm/x86.c              | 3 +++
- 2 files changed, 4 insertions(+)
+ arch/x86/kvm/x86.c       | 22 ++++++++++++++++++++++
+ include/linux/kvm_host.h |  1 +
+ virt/kvm/kvm_main.c      |  7 +++++++
+ 3 files changed, 30 insertions(+)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 50f011a7445a..8e05cbfa9827 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -861,6 +861,7 @@ struct kvm_vcpu_arch {
- 		bool preempt_count_enabled;
- 		struct gfn_to_hva_cache preempt_count_cache;
- 	} pv_pc;
-+	bool irq_disabled;
- 
- 	/*
- 	 * Indicates the guest is trying to write a gfn that contains one or
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index af75e273cb32..425fd7f38fa9 100644
+index 425fd7f38fa9..6b300496bbd0 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -4576,6 +4576,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 
- 	static_call(kvm_x86_vcpu_load)(vcpu, cpu);
- 
-+	vcpu->arch.irq_disabled = false;
- 	/* Save host pkru register if supported */
- 	vcpu->arch.host_pkru = read_pkru();
- 
-@@ -4668,6 +4669,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
- 
- 	static_call(kvm_x86_vcpu_put)(vcpu);
- 	vcpu->arch.last_host_tsc = rdtsc();
-+	vcpu->arch.irq_disabled = !static_call(kvm_x86_get_if_flag)(vcpu);
+@@ -10375,6 +10375,28 @@ static int vcpu_run(struct kvm_vcpu *vcpu)
+ 	return r;
  }
  
- static int kvm_vcpu_ioctl_get_lapic(struct kvm_vcpu *vcpu,
-@@ -11225,6 +11227,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- 	vcpu->arch.pending_external_vector = -1;
- 	vcpu->arch.preempted_in_kernel = false;
- 	vcpu->arch.pv_pc.preempt_count_enabled = false;
-+	vcpu->arch.irq_disabled = false;
++static int kvm_vcpu_non_preemptable(struct kvm_vcpu *vcpu)
++{
++	int count;
++
++	if (!vcpu->arch.pv_pc.preempt_count_enabled)
++		return 0;
++
++	if (!kvm_read_guest_cached(vcpu->kvm, &vcpu->arch.pv_pc.preempt_count_cache,
++	    &count, sizeof(int)))
++		return (count & ~PREEMPT_NEED_RESCHED);
++
++	return 0;
++}
++
++bool kvm_arch_boost_candidate(struct kvm_vcpu *vcpu)
++{
++	if (vcpu->arch.irq_disabled || kvm_vcpu_non_preemptable(vcpu))
++		return true;
++
++	return false;
++}
++
+ static inline int complete_emulated_io(struct kvm_vcpu *vcpu)
+ {
+ 	int r;
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 252ee4a61b58..9f1a7d9540de 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1428,6 +1428,7 @@ bool kvm_arch_dy_has_pending_interrupt(struct kvm_vcpu *vcpu);
+ int kvm_arch_post_init_vm(struct kvm *kvm);
+ void kvm_arch_pre_destroy_vm(struct kvm *kvm);
+ int kvm_arch_create_vm_debugfs(struct kvm *kvm);
++bool kvm_arch_boost_candidate(struct kvm_vcpu *vcpu);
  
- #if IS_ENABLED(CONFIG_HYPERV)
- 	vcpu->arch.hv_root_tdp = INVALID_PAGE;
+ #ifndef __KVM_HAVE_ARCH_VM_ALLOC
+ /*
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 9581a24c3d17..ee5a788892e0 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -3545,6 +3545,11 @@ bool __weak kvm_arch_dy_has_pending_interrupt(struct kvm_vcpu *vcpu)
+ 	return false;
+ }
+ 
++bool __weak kvm_arch_boost_candidate(struct kvm_vcpu *vcpu)
++{
++	return true;
++}
++
+ void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
+ {
+ 	struct kvm *kvm = me->kvm;
+@@ -3580,6 +3585,8 @@ void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
+ 			    !kvm_arch_dy_has_pending_interrupt(vcpu) &&
+ 			    !kvm_arch_vcpu_in_kernel(vcpu))
+ 				continue;
++			if (!kvm_arch_boost_candidate(vcpu))
++				continue;
+ 			if (!kvm_vcpu_eligible_for_directed_yield(vcpu))
+ 				continue;
+ 
 -- 
 2.25.1
 
