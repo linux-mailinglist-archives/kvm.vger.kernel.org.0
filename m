@@ -2,204 +2,196 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 439EA4D67B4
-	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 18:38:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1F7EE4D67C7
+	for <lists+kvm@lfdr.de>; Fri, 11 Mar 2022 18:41:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350801AbiCKRjk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Mar 2022 12:39:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34178 "EHLO
+        id S1350830AbiCKRmK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Mar 2022 12:42:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42230 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349966AbiCKRjj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Mar 2022 12:39:39 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AAF31AEED6;
-        Fri, 11 Mar 2022 09:38:32 -0800 (PST)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22BGsGfL036707;
-        Fri, 11 Mar 2022 17:38:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=RmvsHlrSbWmMzkAo4uoT0ON7Vo7tU5zQpftq26s97GI=;
- b=IvLhHs166oq9QtDngECNkn05NKZb9fSEkf6AhIqnrVBlvJtHtetizgvQ9gJKVKKGBTVe
- X0QzsEQAuzCy3UB26hmoziK32Ly6PtYO0PFLppnROMaMCjqkES7ht83fc7N7tEK9wxJV
- Dk+dO5TOBD14dUWtZa+5wCzw0oqrBaiuCHRsp4N5Easbrz/2NmI9TTpme42crzdQduUS
- Dqr6zFikhQZnphl79JbPWgfxFWikZYZWIdxrV7Izw3cc+YdbUl6cPqbho8+D9A2S69mb
- AxBlw8Ezs1Snmlzkjbigpnoy5Asi6dvLro2yI+VlciunvyAlo29w3+wQ6FMxad2pZfiK eQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3eqg9ssk5c-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 11 Mar 2022 17:38:31 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22BFtOs4032208;
-        Fri, 11 Mar 2022 17:38:31 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3eqg9ssk4q-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 11 Mar 2022 17:38:31 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22BHY6lb027261;
-        Fri, 11 Mar 2022 17:38:29 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma06ams.nl.ibm.com with ESMTP id 3eqqf0a5h4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 11 Mar 2022 17:38:29 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22BHcQM434669026
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 11 Mar 2022 17:38:26 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6F48EAE053;
-        Fri, 11 Mar 2022 17:38:26 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5D8CBAE051;
-        Fri, 11 Mar 2022 17:38:26 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Fri, 11 Mar 2022 17:38:26 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
-        id CFAA6E13C1; Fri, 11 Mar 2022 18:38:25 +0100 (CET)
-From:   Eric Farman <farman@linux.ibm.com>
-To:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Nico Boehr <nrb@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, Eric Farman <farman@linux.ibm.com>
-Subject: [PATCH kvm-unit-tests v2 6/6] lib: s390x: smp: Remove smp_sigp_retry
-Date:   Fri, 11 Mar 2022 18:38:22 +0100
-Message-Id: <20220311173822.1234617-7-farman@linux.ibm.com>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20220311173822.1234617-1-farman@linux.ibm.com>
-References: <20220311173822.1234617-1-farman@linux.ibm.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: CXtSemz4c5W0LCTtez_OhpIUF9j9KE3G
-X-Proofpoint-ORIG-GUID: 2-kW8utXVlUgeF2XE7dAMnkIcMdnbM5H
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-03-11_07,2022-03-11_02,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 malwarescore=0
- mlxlogscore=999 bulkscore=0 spamscore=0 clxscore=1015 impostorscore=0
- suspectscore=0 mlxscore=0 priorityscore=1501 lowpriorityscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2203110085
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S243959AbiCKRmJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Mar 2022 12:42:09 -0500
+Received: from mail-il1-x149.google.com (mail-il1-x149.google.com [IPv6:2607:f8b0:4864:20::149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F69B1BE4D0
+        for <kvm@vger.kernel.org>; Fri, 11 Mar 2022 09:41:01 -0800 (PST)
+Received: by mail-il1-x149.google.com with SMTP id a2-20020a056e020e0200b002c6344a01c9so5984057ilk.13
+        for <kvm@vger.kernel.org>; Fri, 11 Mar 2022 09:41:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=CaZECgSQQngAZ4EFaCTOOf/knhTC32OnUGVX63d7H30=;
+        b=Z7i8z7fruZx8KKcK+U57/Z4fpEHj/pSiGoZWk7dkaay7yQzSe9vy1hOh4vU6+xj0uN
+         Df/OW1pUWUBf6i2QaEpW6LN/soXfqT3UgGESIihLN5LnqTyR7Xbr6kYScZnkc3bJunIR
+         HbU8IQoUpj+Z83fchRrtPmNMul5E32Il5zQKIxjHPrihRsuooKXBMXsbmpMXYEwyblkn
+         oBvaeYQE7gDaqXMIyMehK5WmVsKonuLKWFUdTGKkVRUmeFVZjs0DToycOvdf4FiyvMrt
+         MwUbDYlhz+8gSXiuSFXMMs9+bx+fsWUHPBt1NJz0xA1w83/Mgaw6GWcd+Z5LZKik8y4P
+         WN3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=CaZECgSQQngAZ4EFaCTOOf/knhTC32OnUGVX63d7H30=;
+        b=I6kRDCAS6KDRDtU9/eGlGZCcUFlECXE6ROPq1fMUddJ1O+U1rWrynSU8xIutSf8ZI9
+         pjcLPRZXpe6ipjBgnlClZV0ZqVEiAt+a3vJP5dfiKjJZcnt2HSxLKQznuF2g8EkT8pph
+         42z923RYunBghoknV70681TQ1tjgaeqe4cAztOqm5P5hAf0DFXMyTYLlRBn47wW8WAmd
+         +WKIxgMONICjEcjYQdKy5Dis+UwS1h+q/zN81ZPJDRJ64IrMr8ZmBuZ5JWQ8fVue0wDZ
+         Zbcve6r3l10wHGvUhFtx23r/ZEkWCCJ4AVkuCneKowp6fKceRx+1shcvlccUi3VWpjjF
+         vxFQ==
+X-Gm-Message-State: AOAM5325TZ0PIVMry8pz3vU0m90HYgOw83FU84Evp4/ppYvwZjkJCZnt
+        9K7n0esEtz2H6kHDULRoOOIWYsv3YrE=
+X-Google-Smtp-Source: ABdhPJyEHlgCGDdV6xgBOz7Pnzf7qCUae7tY13dxi43ECMUekR46DfcK8JkoEyIMWvetCp5+i4QJrNChqqs=
+X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
+ (user=oupton job=sendgmr) by 2002:a02:6a60:0:b0:315:4758:1be1 with SMTP id
+ m32-20020a026a60000000b0031547581be1mr9375898jaf.316.1647020460754; Fri, 11
+ Mar 2022 09:41:00 -0800 (PST)
+Date:   Fri, 11 Mar 2022 17:39:46 +0000
+Message-Id: <20220311174001.605719-1-oupton@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.1.723.g4982287a31-goog
+Subject: [PATCH v4 00/15] KVM: arm64: PSCI SYSTEM_SUSPEND + SYSTEM_RESET2 bugfix
+From:   Oliver Upton <oupton@google.com>
+To:     kvmarm@lists.cs.columbia.edu
+Cc:     alexandru.elisei@arm.com, anup@brainfault.org,
+        atishp@atishpatra.org, james.morse@arm.com, jingzhangos@google.com,
+        jmattson@google.com, joro@8bytes.org,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, maz@kernel.org,
+        pbonzini@redhat.com, pshier@google.com, rananta@google.com,
+        reijiw@google.com, ricarkol@google.com, seanjc@google.com,
+        suzuki.poulose@arm.com, vkuznets@redhat.com, wanpengli@tencent.com,
+        Oliver Upton <oupton@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The SIGP instruction presents a CC0 when an order is accepted,
-though the work for the order may be performed asynchronously.
-While any such work is outstanding, nearly any other SIGP order
-sent to the same CPU will be returned with a CC2.
+**NOTE** Patch 2 is a bugfix for commit d43583b890e7 ("KVM: arm64:
+Expose PSCI SYSTEM_RESET2 call to the guest") on kvmarm/next. Without
+this patch, it is possible for the guest to call
+PSCI_1_1_FN64_SYSTEM_RESET2 from AArch32.
 
-Currently, there are two library functions that perform a SIGP,
-one which retries a SIGP that gets a CC2, and one which doesn't.
-In practice, the users of this functionality want the CC2 to be
-handled by the library itself, rather than determine whether it
-needs to retry the request or not.
+The PSCI v1.0 specification describes a call, SYSTEM_SUSPEND, which
+allows software to request that the system be placed into the lowest
+possible power state and await an IMPLEMENTATION DEFINED wakeup event.
+This call is optional in v1.0 and v1.1. KVM does not currently support
+this optional call.
 
-To avoid confusion, let's convert the smp_sigp() routine to
-perform the sigp_retry() logic, and then convert any users of
-smp_sigp_retry() to smp_sigp(). This of course means that the
-external _retry() interface can be removed for simplicity.
+This series adds support for the PSCI SYSTEM_SUSPEND call to KVM/arm64.
+For reasons best explained in PATCH 09/15, it is infeasible to correctly
+implement PSCI SYSTEM_SUSPEND like the other system-wide PSCI calls,
+wherein part of the implementation exists in the kernel and the rest in
+userspace. To that end, this series affords userspace the ability to
+trap SYSTEM_SUSPEND calls (with opt-in) and to optionally leverage
+in-kernel emulation of a suspension by way of a new MP_STATE.
 
-Signed-off-by: Eric Farman <farman@linux.ibm.com>
----
- lib/s390x/smp.c | 14 ++++----------
- lib/s390x/smp.h |  1 -
- s390x/smp.c     |  4 ++--
- 3 files changed, 6 insertions(+), 13 deletions(-)
+Patch 1 snags a useful change from Marc to use bits in an unsigned long
+to indicate boolean properties of a VM instead of boolean fields. This
+patch was lifted from [1] and modified to eliminate kvm_arch::ran_once.
 
-diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
-index 5be29d36..a0495cd9 100644
---- a/lib/s390x/smp.c
-+++ b/lib/s390x/smp.c
-@@ -40,12 +40,6 @@ int smp_query_num_cpus(void)
- }
- 
- int smp_sigp(uint16_t idx, uint8_t order, unsigned long parm, uint32_t *status)
--{
--	check_idx(idx);
--	return sigp(cpus[idx].addr, order, parm, status);
--}
--
--int smp_sigp_retry(uint16_t idx, uint8_t order, unsigned long parm, uint32_t *status)
- {
- 	check_idx(idx);
- 	return sigp_retry(cpus[idx].addr, order, parm, status);
-@@ -78,7 +72,7 @@ bool smp_cpu_stopped(uint16_t idx)
- {
- 	uint32_t status;
- 
--	if (smp_sigp_retry(idx, SIGP_SENSE, 0, &status) != SIGP_CC_STATUS_STORED)
-+	if (smp_sigp(idx, SIGP_SENSE, 0, &status) != SIGP_CC_STATUS_STORED)
- 		return false;
- 	return !!(status & (SIGP_STATUS_CHECK_STOP|SIGP_STATUS_STOPPED));
- }
-@@ -99,7 +93,7 @@ static int smp_cpu_stop_nolock(uint16_t idx, bool store)
- 	if (idx == 0)
- 		return -1;
- 
--	if (smp_sigp_retry(idx, order, 0, NULL))
-+	if (smp_sigp(idx, order, 0, NULL))
- 		return -1;
- 
- 	while (!smp_cpu_stopped(idx))
-@@ -251,11 +245,11 @@ static int smp_cpu_setup_nolock(uint16_t idx, struct psw psw)
- 	if (cpus[idx].active)
- 		return -1;
- 
--	smp_sigp_retry(idx, SIGP_INITIAL_CPU_RESET, 0, NULL);
-+	smp_sigp(idx, SIGP_INITIAL_CPU_RESET, 0, NULL);
- 
- 	lc = alloc_pages_flags(1, AREA_DMA31);
- 	cpus[idx].lowcore = lc;
--	smp_sigp_retry(idx, SIGP_SET_PREFIX, (unsigned long )lc, NULL);
-+	smp_sigp(idx, SIGP_SET_PREFIX, (unsigned long )lc, NULL);
- 
- 	/* Copy all exception psws. */
- 	memcpy(lc, cpus[0].lowcore, 512);
-diff --git a/lib/s390x/smp.h b/lib/s390x/smp.h
-index 24a0e2e0..df184cb8 100644
---- a/lib/s390x/smp.h
-+++ b/lib/s390x/smp.h
-@@ -52,6 +52,5 @@ int smp_cpu_setup(uint16_t idx, struct psw psw);
- void smp_teardown(void);
- void smp_setup(void);
- int smp_sigp(uint16_t idx, uint8_t order, unsigned long parm, uint32_t *status);
--int smp_sigp_retry(uint16_t idx, uint8_t order, unsigned long parm, uint32_t *status);
- 
- #endif
-diff --git a/s390x/smp.c b/s390x/smp.c
-index 913da155..81e02195 100644
---- a/s390x/smp.c
-+++ b/s390x/smp.c
-@@ -266,7 +266,7 @@ static void test_reset_initial(void)
- 	smp_cpu_start(1, psw);
- 	wait_for_flag();
- 
--	smp_sigp_retry(1, SIGP_INITIAL_CPU_RESET, 0, NULL);
-+	smp_sigp(1, SIGP_INITIAL_CPU_RESET, 0, NULL);
- 	smp_sigp(1, SIGP_STORE_STATUS_AT_ADDRESS, (uintptr_t)status, NULL);
- 
- 	report_prefix_push("clear");
-@@ -316,7 +316,7 @@ static void test_reset(void)
- 	smp_sigp(1, SIGP_EXTERNAL_CALL, 0, NULL);
- 	smp_cpu_start(1, psw);
- 
--	smp_sigp_retry(1, SIGP_CPU_RESET, 0, NULL);
-+	smp_sigp(1, SIGP_CPU_RESET, 0, NULL);
- 	report(smp_cpu_stopped(1), "cpu stopped");
- 
- 	set_flag(0);
+Patches 2-3 rework some of the PSCI switch statements to make them a bit
+more futureproof for later extension. Namely, eliminate dependence on
+falling through to the default case. Additionally, reject any and all
+SMC64 calls made from AArch32 instead of checking on a case-by-case
+basis.
+
+Patch 4 starts tracking the MP state of vCPUs explicitly, as subsequent
+changes add additional states that cannot be otherwise represented.
+
+Patch 5 is a renaming nit to clarify the KVM_REQ_SLEEP handler processes
+(instead of makes) requests.
+
+Patch 6 creates a helper for preparing kvm_run to do a system event
+exit.
+
+Patch 7 prepares for the case where a vCPU request could result in an
+exit to userspace.
+
+Patch 8 adds support for userspace to request in-kernel emulation of a
+suspended vCPU as the architectural execution of a WFI instruction.
+Userspace gets to decide when to resume the vCPU, so KVM will just exit
+every time a wakeup event is recognized (unmasked pending interrupt).
+
+Patch 9 adds a capability that allows userspace to trap the
+SYSTEM_SUSPEND PSCI call. KVM does absolutely nothing besides exit to
+avoid possible races when exiting to userspace.
+
+Patches 10-14 rework some SMCCC handling in KVM selftests as well as
+prepare the PSCI test for more test cases.
+
+Lastly, patch 15 adds test cases for SYSTEM_SUSPEND, verifying that it
+is discoverable with the PSCI_FEATURES call and results in exits to
+userspace when directly called.
+
+Given the conflicts/fixes for SYSTEM_RESET2 and conflicts with
+Documentation changes, this series is based on kvmarm/next at commit:
+
+  9872e6bc08d6 ("Merge branch kvm-arm64/psci-1.1 into kvmarm-master/next")
+
+This series was tested with the included selftest as well as a kvmtool
+series that instruments the userspace portion of SYSTEM_SUSPEND that
+will be sent out soon.
+
+[1]: https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/commit/?h=kvm-arm64/mmu/guest-MMIO-guard&id=7dd0a13a4217b870f2e83cdc6045e5ce482a5340
+
+v3: https://patchwork.kernel.org/project/kvm/cover/20220223041844.3984439-1-oupton@google.com/
+
+v3 -> v4:
+ - Rebase to kvmarm/next
+ - Grab Marc's VM feature patch
+ - Drop filtering for an invalid IPA. It is no longer directly relevant
+   to this series and can be sent out separately.
+ - Use the kvm_mp_state structure to store a vCPU's MP state (Marc)
+ - Rename helper to better fit MP state mnemonic (Marc)
+ - Don't even bother with an in-kernel implementation of the
+   SYSTEM_SUSPEND call (Marc)
+ - Add discoverability tests for SYSTEM_SUSPEND
+ - Ack from Anup for RISC-V change.
+
+Marc Zyngier (1):
+  KVM: arm64: Generalise VM features into a set of flags
+
+Oliver Upton (14):
+  KVM: arm64: Generally disallow SMC64 for AArch32 guests
+  KVM: arm64: Don't depend on fallthrough to hide SYSTEM_RESET2
+  KVM: arm64: Dedupe vCPU power off helpers
+  KVM: arm64: Track vCPU power state using MP state values
+  KVM: arm64: Rename the KVM_REQ_SLEEP handler
+  KVM: Create helper for setting a system event exit
+  KVM: arm64: Return a value from check_vcpu_requests()
+  KVM: arm64: Add support for userspace to suspend a vCPU
+  KVM: arm64: Implement PSCI SYSTEM_SUSPEND
+  selftests: KVM: Rename psci_cpu_on_test to psci_test
+  selftests: KVM: Create helper for making SMCCC calls
+  selftests: KVM: Use KVM_SET_MP_STATE to power off vCPU in psci_test
+  selftests: KVM: Refactor psci_test to make it amenable to new tests
+  selftests: KVM: Test SYSTEM_SUSPEND PSCI call
+
+ Documentation/virt/kvm/api.rst                |  76 ++++++-
+ arch/arm64/include/asm/kvm_host.h             |  25 +-
+ arch/arm64/kvm/arm.c                          | 100 ++++++--
+ arch/arm64/kvm/mmio.c                         |   3 +-
+ arch/arm64/kvm/pmu-emul.c                     |   4 +-
+ arch/arm64/kvm/psci.c                         |  80 ++++---
+ arch/riscv/kvm/vcpu_sbi_v01.c                 |   4 +-
+ arch/x86/kvm/x86.c                            |   6 +-
+ include/linux/kvm_host.h                      |   2 +
+ include/uapi/linux/kvm.h                      |   4 +
+ tools/testing/selftests/kvm/.gitignore        |   2 +-
+ tools/testing/selftests/kvm/Makefile          |   2 +-
+ .../selftests/kvm/aarch64/psci_cpu_on_test.c  | 121 ----------
+ .../testing/selftests/kvm/aarch64/psci_test.c | 213 ++++++++++++++++++
+ .../selftests/kvm/include/aarch64/processor.h |  22 ++
+ .../selftests/kvm/lib/aarch64/processor.c     |  25 ++
+ tools/testing/selftests/kvm/steal_time.c      |  13 +-
+ virt/kvm/kvm_main.c                           |   8 +
+ 18 files changed, 501 insertions(+), 209 deletions(-)
+ delete mode 100644 tools/testing/selftests/kvm/aarch64/psci_cpu_on_test.c
+ create mode 100644 tools/testing/selftests/kvm/aarch64/psci_test.c
+
 -- 
-2.32.0
+2.35.1.723.g4982287a31-goog
 
