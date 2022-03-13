@@ -2,252 +2,228 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F327E4D7779
-	for <lists+kvm@lfdr.de>; Sun, 13 Mar 2022 19:41:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EF0B54D789C
+	for <lists+kvm@lfdr.de>; Sun, 13 Mar 2022 23:42:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235273AbiCMSmF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 13 Mar 2022 14:42:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43232 "EHLO
+        id S235384AbiCMWnj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 13 Mar 2022 18:43:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48276 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233375AbiCMSmE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 13 Mar 2022 14:42:04 -0400
-Received: from mail-qk1-x72e.google.com (mail-qk1-x72e.google.com [IPv6:2607:f8b0:4864:20::72e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 194C87C175
-        for <kvm@vger.kernel.org>; Sun, 13 Mar 2022 11:40:56 -0700 (PDT)
-Received: by mail-qk1-x72e.google.com with SMTP id g8so7609939qke.2
-        for <kvm@vger.kernel.org>; Sun, 13 Mar 2022 11:40:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=9bPraKHQSPApCS4zXrLsYTAtSP08ox4AHFZsxX+X+So=;
-        b=S4+eaGwZ5G3TOxNsf27mR/klfpGd/1SZF8zUpfws/QhFN3TRVDtTBPSC9CmiQjk5vy
-         /Bj6EvLcklgupojIvXEsCpIOEtHB426sXWBVwQGUJFwsFLeC6rWxTViIy/G+hggjvnEA
-         RkFzxSgEbG3NRK0hY8d/tgjYuBsi4jR1kjeoalL4AHCWO+ShN1Bi944vf7PH/yMnBSqc
-         h8WCr/vp7FUwGQmgS7kyPjPQF60Eb35rwdwjIAA0ZXaTMKuvNDzcLBxqcirIUdy9aNC3
-         NuN2y/cw129VbXUXeb9ucw9t5Kowz19SF80iMxsi7V9ruiSPhU2Tr6tBILq5xixvshZa
-         AA3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=9bPraKHQSPApCS4zXrLsYTAtSP08ox4AHFZsxX+X+So=;
-        b=rhVw42XCnCQ/PgxZ84nz0803vntSI9y192oWHfeKgtWOXtDOI1Bs4WpYaPzCmA/dX7
-         9jotffpzT1Axv+fGToiAT9r1SCn5JHrLWCASWhXXe5NHKoF9cW+tATms1Un3DO74ihjn
-         de0SJ+By8FnFLXA1vH8Ry1EN1xy3agtFXg2uk8OX+pG3u2Yw0jcmmHOhX7YeP+mbBPfX
-         14bsrQJpB0BevNNbEWOgZOLmwQ4VMXSvHlZvVZF5/pLERW/P0jhcJzhXvkOBwBbRbEhU
-         rLtw8qFnBdg1P0uGJmO2ZK2aYCsfaC7h4zoepxiy62ImjvkI54jj3VD/dT3LQts+mAQi
-         XpeA==
-X-Gm-Message-State: AOAM530vY2beX5zZ+I3NcKCruw3qK0LugbLIqBxV5Kb1ixuksxq+ITM7
-        e2572OLQ5YftzETxCkysW5zw6ArTeuymGvBx2x0z+A==
-X-Google-Smtp-Source: ABdhPJxSnBoZFlouaq675FevDv7Qawrsa0Z7dS5iR5AKNJEdPBmi5KmTIvd8LfLeBq9XCr2+52dBWuoz6h0Cb7Hjv4Y=
-X-Received: by 2002:a37:b2c3:0:b0:67b:118d:81ea with SMTP id
- b186-20020a37b2c3000000b0067b118d81eamr12754466qkf.148.1647196855017; Sun, 13
- Mar 2022 11:40:55 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220303193842.370645-1-pbonzini@redhat.com> <20220303193842.370645-19-pbonzini@redhat.com>
-In-Reply-To: <20220303193842.370645-19-pbonzini@redhat.com>
-From:   Mingwei Zhang <mizhang@google.com>
-Date:   Sun, 13 Mar 2022 11:40:44 -0700
-Message-ID: <CAL715WJc3QdFe4gkbefW5zHPaYZfErG9vQmOLsbXz=kbaB-6uw@mail.gmail.com>
-Subject: Re: [PATCH v4 18/30] KVM: x86/mmu: Zap only TDP MMU leafs in kvm_zap_gfn_range()
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        with ESMTP id S229463AbiCMWnh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 13 Mar 2022 18:43:37 -0400
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0055774DD7;
+        Sun, 13 Mar 2022 15:42:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1647211348; x=1678747348;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=cyiTK7byaZJ6qM8AR155i2GjEMQZs5N+uOLkdJTzm0o=;
+  b=iHVftaLxOWQnr98yeP0hNhwEX2Rets0TvaMMbZdQzKT8PAiacapM00R3
+   xGu3svvyPlwCXFB5XsvU9b4wwOZXHa7Dq/xeK7owT1TbdkkvTyxalOCi8
+   Q5mJLxFE40OqYLYcsDiR8l0nQGykaTPWi3zXBumZGiMqu7k7zUEju8NHC
+   NpwOFzWj9s9l9coR1w5rJlXDiSN2Js8J5/n8aTXpaETXQaTSKKy7hi20l
+   HaCJHWJLZgzkqejaF2nv/no4BaaBAvSUypZQd5LmO6P5JwT4c7UTXuwnX
+   DGlQI3L12CS8CowkyxQ5VThnnAGKSK+TeJNdUOVa9aiOFuwM7+DaIbhJ/
+   A==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10285"; a="238074935"
+X-IronPort-AV: E=Sophos;i="5.90,179,1643702400"; 
+   d="scan'208";a="238074935"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2022 15:42:28 -0700
+X-IronPort-AV: E=Sophos;i="5.90,179,1643702400"; 
+   d="scan'208";a="549012627"
+Received: from mvideche-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.251.130.249])
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2022 15:42:26 -0700
+Message-ID: <292e56e9b2050a1e8c7d64ff3f4ccaf0593a3deb.camel@intel.com>
+Subject: Re: [RFC PATCH v5 014/104] KVM: TDX: Add a function for KVM to
+ invoke SEAMCALL
+From:   Kai Huang <kai.huang@intel.com>
+To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>, erdemaktas@google.com,
+        Connor Kuehl <ckuehl@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        David Hildenbrand <david@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>
+        kirill.shutemov@linux.intel.com
+Date:   Mon, 14 Mar 2022 11:42:24 +1300
+In-Reply-To: <355f08931d2b1917fd7230393de6f1052bf6f0c9.1646422845.git.isaku.yamahata@intel.com>
+References: <cover.1646422845.git.isaku.yamahata@intel.com>
+         <355f08931d2b1917fd7230393de6f1052bf6f0c9.1646422845.git.isaku.yamahata@intel.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 3, 2022 at 11:39 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> From: Sean Christopherson <seanjc@google.com>
->
-> Zap only leaf SPTEs in the TDP MMU's zap_gfn_range(), and rename various
-> functions accordingly.  When removing mappings for functional correctness
-> (except for the stupid VFIO GPU passthrough memslots bug), zapping the
-> leaf SPTEs is sufficient as the paging structures themselves do not point
-> at guest memory and do not directly impact the final translation (in the
-> TDP MMU).
->
-> Note, this aligns the TDP MMU with the legacy/full MMU, which zaps only
-> the rmaps, a.k.a. leaf SPTEs, in kvm_zap_gfn_range() and
-> kvm_unmap_gfn_range().
->
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> Reviewed-by: Ben Gardon <bgardon@google.com>
-> Message-Id: <20220226001546.360188-18-seanjc@google.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+On Fri, 2022-03-04 at 11:48 -0800, isaku.yamahata@intel.com wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
+> 
+> Add an assembly function for KVM to call the TDX module because __seamcall
+> defined in arch/x86/virt/vmx/seamcall.S doesn't fit for the KVM use case.
+> 
+> TDX module API returns extended error information in registers, rcx, rdx,
+> r8, r9, r10, and r11 in addition to success case.  KVM uses those extended
+> error information in addition to the status code returned in RAX.  Update
+> the assembly code to optionally return those outputs even in the error case
+> and define the specific version for KVM to call the TDX module.
+
++Kirill.
+
+Kirill's patches hasn't been merged yet.  Can Kirill just change his patch so
+you don't have to change the assembly code again?  Btw this change is
+reasonable for host kernel support series as well.  Sorry that I failed to
+notice.
+
+Btw, SEAMCALL C function is already implemented in host kernel support series:
+
+https://lore.kernel.org/kvm/269a053607357eedd9a1e8ddf0e7240ae0c3985c.1647167475.git.kai.huang@intel.com/
+
+I think maybe you can just export __seamcall() and use it?
+
+> 
+> SEAMCALL to the SEAM module (P-SEAMLDR or TDX module) can result in the
+> error of VmFailInvalid indicated by CF=1 when VMX isn't enabled by VMXON
+> instruction.  Because KVM guarantees that VMX is enabled, VmFailInvalid
+> error won't happen.  Don't check the error for KVM.
+
+Perhaps you can introduce kvm_seamcall() which calls __seamcall(), but WARN()
+if it returns VMfailInvalid?
+
+> 
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 > ---
->  arch/x86/kvm/mmu/mmu.c     |  4 ++--
->  arch/x86/kvm/mmu/tdp_mmu.c | 41 ++++++++++----------------------------
->  arch/x86/kvm/mmu/tdp_mmu.h |  8 +-------
->  3 files changed, 14 insertions(+), 39 deletions(-)
->
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 8408d7db8d2a..febdcaaa7b94 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -5834,8 +5834,8 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
->
->         if (is_tdp_mmu_enabled(kvm)) {
->                 for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++)
-> -                       flush = kvm_tdp_mmu_zap_gfn_range(kvm, i, gfn_start,
-> -                                                         gfn_end, flush);
-> +                       flush = kvm_tdp_mmu_zap_leafs(kvm, i, gfn_start,
-> +                                                     gfn_end, true, flush);
->         }
->
->         if (flush)
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index f3939ce4a115..c71debdbc732 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -834,10 +834,8 @@ bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
->  }
->
->  /*
-> - * Tears down the mappings for the range of gfns, [start, end), and frees the
-> - * non-root pages mapping GFNs strictly within that range. Returns true if
-> - * SPTEs have been cleared and a TLB flush is needed before releasing the
-> - * MMU lock.
-> + * Zap leafs SPTEs for the range of gfns, [start, end). Returns true if SPTEs
-> + * have been cleared and a TLB flush is needed before releasing the MMU lock.
->   *
->   * If can_yield is true, will release the MMU lock and reschedule if the
->   * scheduler needs the CPU or there is contention on the MMU lock. If this
-> @@ -845,42 +843,25 @@ bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
->   * the caller must ensure it does not supply too large a GFN range, or the
->   * operation can cause a soft lockup.
->   */
-> -static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
-> -                         gfn_t start, gfn_t end, bool can_yield, bool flush)
-> +static bool tdp_mmu_zap_leafs(struct kvm *kvm, struct kvm_mmu_page *root,
-> +                             gfn_t start, gfn_t end, bool can_yield, bool flush)
->  {
-> -       bool zap_all = (start == 0 && end >= tdp_mmu_max_gfn_host());
->         struct tdp_iter iter;
->
-> -       /*
-> -        * No need to try to step down in the iterator when zapping all SPTEs,
-> -        * zapping the top-level non-leaf SPTEs will recurse on their children.
-> -        */
-> -       int min_level = zap_all ? root->role.level : PG_LEVEL_4K;
-> -
->         end = min(end, tdp_mmu_max_gfn_host());
->
->         lockdep_assert_held_write(&kvm->mmu_lock);
->
->         rcu_read_lock();
->
-> -       for_each_tdp_pte_min_level(iter, root, min_level, start, end) {
-> +       for_each_tdp_pte_min_level(iter, root, PG_LEVEL_4K, start, end) {
->                 if (can_yield &&
->                     tdp_mmu_iter_cond_resched(kvm, &iter, flush, false)) {
->                         flush = false;
->                         continue;
->                 }
->
-> -               if (!is_shadow_present_pte(iter.old_spte))
-> -                       continue;
-> -
-> -               /*
-> -                * If this is a non-last-level SPTE that covers a larger range
-> -                * than should be zapped, continue, and zap the mappings at a
-> -                * lower level, except when zapping all SPTEs.
-> -                */
-> -               if (!zap_all &&
-> -                   (iter.gfn < start ||
-> -                    iter.gfn + KVM_PAGES_PER_HPAGE(iter.level) > end) &&
-> +               if (!is_shadow_present_pte(iter.old_spte) ||
->                     !is_last_spte(iter.old_spte, iter.level))
->                         continue;
->
-> @@ -898,13 +879,13 @@ static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
->   * SPTEs have been cleared and a TLB flush is needed before releasing the
->   * MMU lock.
->   */
-> -bool __kvm_tdp_mmu_zap_gfn_range(struct kvm *kvm, int as_id, gfn_t start,
-> -                                gfn_t end, bool can_yield, bool flush)
-> +bool kvm_tdp_mmu_zap_leafs(struct kvm *kvm, int as_id, gfn_t start, gfn_t end,
-> +                          bool can_yield, bool flush)
->  {
->         struct kvm_mmu_page *root;
->
->         for_each_tdp_mmu_root_yield_safe(kvm, root, as_id)
-> -               flush = zap_gfn_range(kvm, root, start, end, can_yield, flush);
-> +               flush = tdp_mmu_zap_leafs(kvm, root, start, end, can_yield, false);
+>  arch/x86/kvm/Makefile       |  2 +-
+>  arch/x86/kvm/vmx/seamcall.S | 55 +++++++++++++++++++++++++++++++++++++
+>  arch/x86/virt/tdxcall.S     |  8 ++++--
+>  3 files changed, 62 insertions(+), 3 deletions(-)
+>  create mode 100644 arch/x86/kvm/vmx/seamcall.S
+> 
+> diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
+> index e2c05195cb95..e8f83a7d0dc3 100644
+> --- a/arch/x86/kvm/Makefile
+> +++ b/arch/x86/kvm/Makefile
+> @@ -24,7 +24,7 @@ kvm-$(CONFIG_KVM_XEN)	+= xen.o
+>  kvm-intel-y		+= vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o \
+>  			   vmx/evmcs.o vmx/nested.o vmx/posted_intr.o vmx/main.o
+>  kvm-intel-$(CONFIG_X86_SGX_KVM)	+= vmx/sgx.o
+> -kvm-intel-$(CONFIG_INTEL_TDX_HOST)	+= vmx/tdx.o
+> +kvm-intel-$(CONFIG_INTEL_TDX_HOST)	+= vmx/tdx.o vmx/seamcall.o
+>  
+>  kvm-amd-y		+= svm/svm.o svm/vmenter.o svm/pmu.o svm/nested.o svm/avic.o svm/sev.o
+>  
+> diff --git a/arch/x86/kvm/vmx/seamcall.S b/arch/x86/kvm/vmx/seamcall.S
+> new file mode 100644
+> index 000000000000..4a15017fc7dd
+> --- /dev/null
+> +++ b/arch/x86/kvm/vmx/seamcall.S
+> @@ -0,0 +1,55 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +#include <linux/linkage.h>
+> +#include <asm/export.h>
+> +#include <asm/frame.h>
+> +
+> +#include "../../virt/tdxcall.S"
+> +
+> +/*
+> + * kvm_seamcall()  - Host-side interface functions to SEAM software (TDX module)
+> + *
+> + * Transform function call register arguments into the SEAMCALL register
+> + * ABI.  Return the completion status of the SEAMCALL.  Additional output
+> + * operands are saved in @out (if it is provided by the user).
+> + * It doesn't check TDX_SEAMCALL_VMFAILINVALID unlike __semcall() because KVM
+> + * guarantees that VMX is enabled so that TDX_SEAMCALL_VMFAILINVALID doesn't
+> + * happen.  In the case of error completion status code, extended error code may
+> + * be stored in leaf specific output registers.
+> + *
+> + *-------------------------------------------------------------------------
+> + * SEAMCALL ABI:
+> + *-------------------------------------------------------------------------
+> + * Input Registers:
+> + *
+> + * RAX                 - SEAMCALL Leaf number.
+> + * RCX,RDX,R8-R9       - SEAMCALL Leaf specific input registers.
+> + *
+> + * Output Registers:
+> + *
+> + * RAX                 - SEAMCALL completion status code.
+> + * RCX,RDX,R8-R11      - SEAMCALL Leaf specific output registers.
+> + *
+> + *-------------------------------------------------------------------------
+> + *
+> + * kvm_seamcall() function ABI:
+> + *
+> + * @fn  (RDI)          - SEAMCALL Leaf number, moved to RAX
+> + * @rcx (RSI)          - Input parameter 1, moved to RCX
+> + * @rdx (RDX)          - Input parameter 2, moved to RDX
+> + * @r8  (RCX)          - Input parameter 3, moved to R8
+> + * @r9  (R8)           - Input parameter 4, moved to R9
+> + *
+> + * @out (R9)           - struct tdx_module_output pointer
+> + *                       stored temporarily in R12 (not
+> + *                       shared with the TDX module). It
+> + *                       can be NULL.
+> + *
+> + * Return (via RAX) the completion status of the SEAMCALL
+> + */
+> +SYM_FUNC_START(kvm_seamcall)
+> +        FRAME_BEGIN
+> +        TDX_MODULE_CALL host=1 error_check=0
+> +        FRAME_END
+> +        ret
+> +SYM_FUNC_END(kvm_seamcall)
+> +EXPORT_SYMBOL_GPL(kvm_seamcall)
 
-hmm, I think we might have to be very careful here. If we only zap
-leafs, then there could be side effects. For instance, the code in
-disallowed_hugepage_adjust() may not work as intended. If you check
-the following condition in arch/x86/kvm/mmu/mmu.c:2918
+> diff --git a/arch/x86/virt/tdxcall.S b/arch/x86/virt/tdxcall.S
+> index 90569faedacc..2e614b6b5f1e 100644
+> --- a/arch/x86/virt/tdxcall.S
+> +++ b/arch/x86/virt/tdxcall.S
+> @@ -13,7 +13,7 @@
+>  #define tdcall		.byte 0x66,0x0f,0x01,0xcc
+>  #define seamcall	.byte 0x66,0x0f,0x01,0xcf
+>  
+> -.macro TDX_MODULE_CALL host:req
+> +.macro TDX_MODULE_CALL host:req error_check=1
+>  	/*
+>  	 * R12 will be used as temporary storage for struct tdx_module_output
+>  	 * pointer. Since R12-R15 registers are not used by TDCALL/SEAMCALL
+> @@ -51,9 +51,11 @@
+>  	 *
+>  	 * Set %rax to TDX_SEAMCALL_VMFAILINVALID for VMfailInvalid.
+>  	 * This value will never be used as actual SEAMCALL error code.
+> -	 */
+> +	*/
+> +	.if \error_check
+>  	jnc .Lno_vmfailinvalid
+>  	mov $TDX_SEAMCALL_VMFAILINVALID, %rax
+> +	.endif
+>  .Lno_vmfailinvalid:
+>  	.else
+>  	tdcall
+> @@ -66,8 +68,10 @@
+>  	pop %r12
+>  
+>  	/* Check for success: 0 - Successful, otherwise failed */
+> +	.if \error_check
+>  	test %rax, %rax
+>  	jnz .Lno_output_struct
+> +	.endif
+>  
 
-if (cur_level > PG_LEVEL_4K &&
-    cur_level == fault->goal_level &&
-    is_shadow_present_pte(spte) &&
-    !is_large_pte(spte)) {
+Checking VMfailInvalid, and checking whether %rax is 0 are totally different
+things.  I don't think it's good to use one single 'error_check' to handle.
 
-If we previously use 4K mappings in this range due to various reasons
-(dirty logging etc), then afterwards, we zap the range. Then the guest
-touches a 4K and now we should map the range with whatever the maximum
-level we can for the guest.
+As I mentioned above, I think checking whether %rax is 0 can be just removed
+in Kirill's patch.  But I don't have strong opinion on whether you should add
+another parameter to determine whether to check VMfailInvalid, or you should
+just call __seamcall() which is implemented in host support series.
 
-However, if we just zap only the leafs, then when the code comes to
-the above location, is_shadow_present_pte(spte) will return true,
-since the spte is a non-leaf (say a regular PMD entry). The whole if
-statement will be true, then we never allow remapping guest memory
-with huge pages.
-
->
->         return flush;
->  }
-> @@ -1202,8 +1183,8 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
->  bool kvm_tdp_mmu_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range,
->                                  bool flush)
->  {
-> -       return __kvm_tdp_mmu_zap_gfn_range(kvm, range->slot->as_id, range->start,
-> -                                          range->end, range->may_block, flush);
-> +       return kvm_tdp_mmu_zap_leafs(kvm, range->slot->as_id, range->start,
-> +                                    range->end, range->may_block, flush);
->  }
->
->  typedef bool (*tdp_handler_t)(struct kvm *kvm, struct tdp_iter *iter,
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
-> index 5e5ef2576c81..54bc8118c40a 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.h
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.h
-> @@ -15,14 +15,8 @@ __must_check static inline bool kvm_tdp_mmu_get_root(struct kvm_mmu_page *root)
->  void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
->                           bool shared);
->
-> -bool __kvm_tdp_mmu_zap_gfn_range(struct kvm *kvm, int as_id, gfn_t start,
-> +bool kvm_tdp_mmu_zap_leafs(struct kvm *kvm, int as_id, gfn_t start,
->                                  gfn_t end, bool can_yield, bool flush);
-> -static inline bool kvm_tdp_mmu_zap_gfn_range(struct kvm *kvm, int as_id,
-> -                                            gfn_t start, gfn_t end, bool flush)
-> -{
-> -       return __kvm_tdp_mmu_zap_gfn_range(kvm, as_id, start, end, true, flush);
-> -}
-> -
->  bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp);
->  void kvm_tdp_mmu_zap_all(struct kvm *kvm);
->  void kvm_tdp_mmu_invalidate_all_roots(struct kvm *kvm);
-> --
-> 2.31.1
->
->
