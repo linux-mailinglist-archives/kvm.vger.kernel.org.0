@@ -2,61 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E4B734D75BF
-	for <lists+kvm@lfdr.de>; Sun, 13 Mar 2022 15:11:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 909184D75C1
+	for <lists+kvm@lfdr.de>; Sun, 13 Mar 2022 15:12:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234473AbiCMOM5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 13 Mar 2022 10:12:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40852 "EHLO
+        id S234545AbiCMONm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 13 Mar 2022 10:13:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234571AbiCMOMz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 13 Mar 2022 10:12:55 -0400
-Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D722F1BEAF;
-        Sun, 13 Mar 2022 07:11:47 -0700 (PDT)
-Received: by mail-wm1-x32f.google.com with SMTP id 19so7850047wmy.3;
-        Sun, 13 Mar 2022 07:11:47 -0700 (PDT)
+        with ESMTP id S231871AbiCMONl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 13 Mar 2022 10:13:41 -0400
+Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 149531BEAF;
+        Sun, 13 Mar 2022 07:12:34 -0700 (PDT)
+Received: by mail-wm1-x333.google.com with SMTP id 19so7850618wmy.3;
+        Sun, 13 Mar 2022 07:12:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=sender:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=mG5HH6nqD1iO3ujIo5ypOCSibOJXtCmf7BdHByX18qs=;
-        b=hl41bOxZH1F73UO71NgC1fWGtfIpWPVDtTg8teHRgkV8FomDdZ2iL8ib7dOPq1e7DA
-         5fSJtrGBPYPvcgrfa+qQJPugeHWl2QRVzr+gl+2u+j1mQ7NLxLWy1PwiCSTXdUgu3T3d
-         eqeIS99ZpyHGGwLH1Dw7CYmsZyk6BAtnQcsJ3fvV9Njd1PxrHsx2Ehwcj1BLY7OCtWRS
-         KURPkhGBIxVyeIOFa/cRRdNQ6w4B/MBbFZnXKhSflO/T+IggljcGl/jtWcGh9lRJDJ+0
-         ukotl368CgZ5tzS7vVGAvHRxkDhurtqHu/knrM0RFiy5/7V7LBF7WpeofQIW+INbuR8+
-         XZCg==
+        bh=mb7PDca+3I5O8BOlO0II3uFS6ORKg+kbdWf9TIxP6CY=;
+        b=ETKsPGKKAJ3tRSNQKgguN8zvUj+K0x8GhMG7KFv+nNSK94YaOumma0fRosLB08nNCo
+         EyXD+4ysbaHq5Vna64YndfQXQYDcB+r6at4PjPf6VrnEJzNplaa1cKBQxqrCN3x3y0gi
+         J+6h3+SQlAaHasRYzdkoEZX1vByp4uLZhw7MLY/Jlr19Jp5LASp7T3kQux5Z5Rq50L51
+         ChiUyisQMtNy3rAhdS+pgrQp4O7KJnv4KOsbvCV+QodA9FvBfR7T08vVIdzU98hLLFYL
+         njn92R1yaf0rChegNntpNj2Yy82HTLYbjZDnqqQXJwtYMrvnujH16vg7acGs/9Akueve
+         s7ug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
          :subject:content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=mG5HH6nqD1iO3ujIo5ypOCSibOJXtCmf7BdHByX18qs=;
-        b=BO5PhjPIP+XPYQwz9xwwEax3CbpVkLVeHt+Yszekfu7fSwZdT3sstktXMO3Ga52qgS
-         QQ3oYu3pFz2f4KmzWm2ihTWdkIQ7QPd4UXuhxOzn3CcgfktDBO4WaXEX0IXjwA0A35X9
-         LDlAqp+vjf5FiVTkV4Gf6q7EtQdq2sTZohgj3Ml9WIrc6BV4EXYeH97fleh00JyBk83p
-         Vnri3xsi8DO7g8nnootGOqACaiwJgAWU/IhSV8PSfnT3j7vIVudsOxRGkkhT9PTmzYDW
-         l2+j6s20NJGk7HIL9rnr/daOuHsec5hwpwsNdNxCIFNQM+oDTfryWzA2C743z+aJtytP
-         eTVA==
-X-Gm-Message-State: AOAM531pYWG6jKFdFcfHcHwAdiCnMU47/MrK97hioz4mY/zO9z421AK9
-        plBzoiSLLpBi0goMOE2fOvqW6JwROBQ=
-X-Google-Smtp-Source: ABdhPJz9tN2MsP/yVeC8XG9FmG2IMtNZjQKCwrh8pxPv2fs/fHH3vjhVIaKzxiof0ksQY5Cy7DPmrA==
-X-Received: by 2002:a05:600c:4f95:b0:38a:165:f2af with SMTP id n21-20020a05600c4f9500b0038a0165f2afmr4641756wmq.16.1647180706456;
-        Sun, 13 Mar 2022 07:11:46 -0700 (PDT)
+        bh=mb7PDca+3I5O8BOlO0II3uFS6ORKg+kbdWf9TIxP6CY=;
+        b=4bRL058itaOYVStCIgEMrCFgaO0WCh/3+Sn7Zb8t7HtXRGPA+V8y1i7ED8gPNlQMQe
+         oGyQzlFpNZ82CqSaoCA+Zle9Nv2G0IeSc1icj1TS9DHJwY31eIw/8C9woWXN9qFPgqBT
+         7XVwZrBDYFr34lQvdVeLN06Tk5ECmwhPeOFKFetSPmNn7He4cnoNBkKECkvC8bVe1fP8
+         jghJ5sp9Y/7O/fAwB4ke8mPhMx1WuNlsTsJ3hN9gP8nloqNnC4MFC+tfefi7GXGI2z+L
+         +t+V3EdlPJFBN88WjpVo+DtIwM9ckTfENxXXiT08zXrjWo5NheRZKspWKrxghPKzRgmp
+         w0iQ==
+X-Gm-Message-State: AOAM532vMWeG6G/obZ0DZEbRYFJSGJ23rqyx0RZ33A8DmS8UJD8yQF8U
+        CKSWg/OgJ89WfJ2NVYKeF6QvbIHYJGw=
+X-Google-Smtp-Source: ABdhPJwgl4zCSyLoWbiJH3eBM899dcFaDThhGF3Y9cQbVSI0HYB8bywhF0pxGJ6ApV1ouL2Jj/gaTg==
+X-Received: by 2002:a05:600c:190e:b0:389:d75e:2a66 with SMTP id j14-20020a05600c190e00b00389d75e2a66mr14286752wmq.124.1647180752658;
+        Sun, 13 Mar 2022 07:12:32 -0700 (PDT)
 Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.googlemail.com with ESMTPSA id k17-20020a05600c1c9100b00386bb6e9c50sm25991598wms.45.2022.03.13.07.11.45
+        by smtp.googlemail.com with ESMTPSA id n8-20020adf8b08000000b001f046cc8891sm11364972wra.24.2022.03.13.07.12.31
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 13 Mar 2022 07:11:46 -0700 (PDT)
+        Sun, 13 Mar 2022 07:12:32 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <8c5a9392-d6e0-35c7-73e1-d37b2f013d18@redhat.com>
-Date:   Sun, 13 Mar 2022 15:11:44 +0100
+Message-ID: <be3b3abe-688d-42b3-ed5e-3927538a30cc@redhat.com>
+Date:   Sun, 13 Mar 2022 15:12:31 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.5.0
-Subject: Re: [RFC PATCH v5 015/104] KVM: TDX: add a helper function for KVM to
- issue SEAMCALL
+Subject: Re: [RFC PATCH v5 017/104] KVM: TDX: Add helper functions to print
+ TDX SEAMCALL error
 Content-Language: en-US
 To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
@@ -64,9 +64,9 @@ Cc:     isaku.yamahata@gmail.com, Jim Mattson <jmattson@google.com>,
         erdemaktas@google.com, Connor Kuehl <ckuehl@redhat.com>,
         Sean Christopherson <seanjc@google.com>
 References: <cover.1646422845.git.isaku.yamahata@intel.com>
- <5cf00a5f5d108443a081ef95db9c7695be99c7d4.1646422845.git.isaku.yamahata@intel.com>
+ <7d89296e776b125b75762c040879c16afa7b6da6.1646422845.git.isaku.yamahata@intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <5cf00a5f5d108443a081ef95db9c7695be99c7d4.1646422845.git.isaku.yamahata@intel.com>
+In-Reply-To: <7d89296e776b125b75762c040879c16afa7b6da6.1646422845.git.isaku.yamahata@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -83,65 +83,70 @@ X-Mailing-List: kvm@vger.kernel.org
 On 3/4/22 20:48, isaku.yamahata@intel.com wrote:
 > From: Isaku Yamahata <isaku.yamahata@intel.com>
 > 
-> TODO: Consolidate seamcall helper function with TDX host/guest patch series.
-> For now, this is kept to make this patch series compile/work.
+> Add helper functions to print out errors from the TDX module in a uniform
+> manner.
 > 
-> A VMM interacts with the TDX module using a new instruction (SEAMCALL).  A
-> TDX VMM uses SEAMCALLs where a VMX VMM would have directly interacted with
-> VMX instructions.  For instance, a TDX VMM does not have full access to the
-> VM control structure corresponding to VMX VMCS.  Instead, a VMM induces the
-> TDX module to act on behalf via SEAMCALLs.
-> 
-> Add a helper function for KVM C code to execute SEAMCALL instruction to
-> hide its SEAMCALL ABI details.  Although the x86 TDX host patch series
-> defines a similar wrapper, the KVM TDX patch series defines its own because
-> KVM TDX case is performance-critical, unlike the x86 TDX one that does
-> one-time initialization.  The difference is that the KVM TDX one is defined
-> as a static inline function without an error check that is known to not
-> happen so that compiler can optimize it better.  The wrapper fiction in the
-> x86 TDX host patch is defined as a function written in assembly code with
-> error check so that it can detect errors that can occur only during the
-> initialization.
-
-I assume whatever survives of this patch will be merged in the previous one.
-
-Paolo
-
-> Co-developed-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 > ---
->   arch/x86/kvm/vmx/seamcall.h | 23 +++++++++++++++++++++++
->   1 file changed, 23 insertions(+)
->   create mode 100644 arch/x86/kvm/vmx/seamcall.h
+>   arch/x86/kvm/Makefile        |  2 +-
+>   arch/x86/kvm/vmx/seamcall.h  |  2 ++
+>   arch/x86/kvm/vmx/tdx_error.c | 22 ++++++++++++++++++++++
+>   3 files changed, 25 insertions(+), 1 deletion(-)
+>   create mode 100644 arch/x86/kvm/vmx/tdx_error.c
 > 
+> diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
+> index e8f83a7d0dc3..3d6550c73fb5 100644
+> --- a/arch/x86/kvm/Makefile
+> +++ b/arch/x86/kvm/Makefile
+> @@ -24,7 +24,7 @@ kvm-$(CONFIG_KVM_XEN)	+= xen.o
+>   kvm-intel-y		+= vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o \
+>   			   vmx/evmcs.o vmx/nested.o vmx/posted_intr.o vmx/main.o
+>   kvm-intel-$(CONFIG_X86_SGX_KVM)	+= vmx/sgx.o
+> -kvm-intel-$(CONFIG_INTEL_TDX_HOST)	+= vmx/tdx.o vmx/seamcall.o
+> +kvm-intel-$(CONFIG_INTEL_TDX_HOST)	+= vmx/tdx.o vmx/seamcall.o vmx/tdx_error.o
+>   
+>   kvm-amd-y		+= svm/svm.o svm/vmenter.o svm/pmu.o svm/nested.o svm/avic.o svm/sev.o
+>   
 > diff --git a/arch/x86/kvm/vmx/seamcall.h b/arch/x86/kvm/vmx/seamcall.h
-> new file mode 100644
-> index 000000000000..604792e9a59f
-> --- /dev/null
+> index 604792e9a59f..5ac419cd8e27 100644
+> --- a/arch/x86/kvm/vmx/seamcall.h
 > +++ b/arch/x86/kvm/vmx/seamcall.h
-> @@ -0,0 +1,23 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +#ifndef __KVM_VMX_SEAMCALL_H
-> +#define __KVM_VMX_SEAMCALL_H
+> @@ -16,6 +16,8 @@ struct tdx_module_output;
+>   u64 kvm_seamcall(u64 op, u64 rcx, u64 rdx, u64 r8, u64 r9, u64 r10,
+>   		struct tdx_module_output *out);
+>   
+> +void pr_tdx_error(u64 op, u64 error_code, const struct tdx_module_output *out);
 > +
-> +#ifdef CONFIG_INTEL_TDX_HOST
+>   #endif /* !__ASSEMBLY__ */
+>   
+>   #endif	/* CONFIG_INTEL_TDX_HOST */
+> diff --git a/arch/x86/kvm/vmx/tdx_error.c b/arch/x86/kvm/vmx/tdx_error.c
+> new file mode 100644
+> index 000000000000..61ed855d1188
+> --- /dev/null
+> +++ b/arch/x86/kvm/vmx/tdx_error.c
+> @@ -0,0 +1,22 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/* functions to record TDX SEAMCALL error */
 > +
-> +#ifdef __ASSEMBLY__
+> +#include <linux/kernel.h>
+> +#include <linux/bug.h>
 > +
-> +.macro seamcall
-> +	.byte 0x66, 0x0f, 0x01, 0xcf
-> +.endm
+> +#include "tdx_ops.h"
 > +
-> +#else
+> +void pr_tdx_error(u64 op, u64 error_code, const struct tdx_module_output *out)
+> +{
+> +	if (!out) {
+> +		pr_err_ratelimited("SEAMCALL[%lld] failed: 0x%llx\n",
+> +				op, error_code);
+> +		return;
+> +	}
 > +
-> +struct tdx_module_output;
-> +u64 kvm_seamcall(u64 op, u64 rcx, u64 rdx, u64 r8, u64 r9, u64 r10,
-> +		struct tdx_module_output *out);
-> +
-> +#endif /* !__ASSEMBLY__ */
-> +
-> +#endif	/* CONFIG_INTEL_TDX_HOST */
-> +
-> +#endif /* __KVM_VMX_SEAMCALL_H */
+> +	pr_err_ratelimited(
+> +		"SEAMCALL[%lld] failed: 0x%llx "
+> +		"RCX 0x%llx, RDX 0x%llx, R8 0x%llx, R9 0x%llx, R10 0x%llx, R11 0x%llx\n",
+> +		op, error_code,
+> +		out->rcx, out->rdx, out->r8, out->r9, out->r10, out->r11);
+> +}
 
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
