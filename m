@@ -2,224 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 490674D73ED
-	for <lists+kvm@lfdr.de>; Sun, 13 Mar 2022 10:19:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8DA7A4D73F0
+	for <lists+kvm@lfdr.de>; Sun, 13 Mar 2022 10:22:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234096AbiCMJUe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 13 Mar 2022 05:20:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43792 "EHLO
+        id S234123AbiCMJYA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 13 Mar 2022 05:24:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233296AbiCMJUd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 13 Mar 2022 05:20:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 253AE8C7E9
-        for <kvm@vger.kernel.org>; Sun, 13 Mar 2022 01:19:24 -0800 (PST)
+        with ESMTP id S234110AbiCMJX7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 13 Mar 2022 05:23:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9B23810FF1
+        for <kvm@vger.kernel.org>; Sun, 13 Mar 2022 01:22:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647163162;
+        s=mimecast20190719; t=1647163370;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=nvKTv7LOXTbCJAJOkinI/jyD3SC+28JyXjXfMIA5frA=;
-        b=Ahgu83p9TDUREW+r+ySLBgYLh1Ika7neIsS83uKep2gWot05w0CTZSTCbAPk0AGoR3rMxB
-        PM3J2CO/y8fcP/toSkRgwLz43WrqFowkFtfwfnpVeTNq9yppR4WyUpTOkiXc8gLO5kSZrD
-        bA1sMPuboW5m2Th3Vu2yBwSbXFF1220=
+        bh=oKr9dqn8/NxnlnFSTIb6/d+Le/Vlc/vnCa6Sa4GLvaA=;
+        b=eAa3npKGY4Kr6sCJhjhl7aqiUWwKzVOTPg7OaKgg3MdwtuNBn1lU6oamhFAlZBNrnNfEfF
+        13YnHq4sW5i9vkfecnWq9h6nTJZK6La/9e6kmZRK8ZvOgTp9p6rXCEw8JYekEhNLVFPxTb
+        WgsMXn5BGBYDPSovXcSxLGDYF1MY+KE=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-326-3VFttM20Pq2RS3UPiXSOVA-1; Sun, 13 Mar 2022 05:19:19 -0400
-X-MC-Unique: 3VFttM20Pq2RS3UPiXSOVA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+ us-mta-209-ZJbb_Gv2NsG_N4Wn_gxbkw-1; Sun, 13 Mar 2022 05:22:46 -0400
+X-MC-Unique: ZJbb_Gv2NsG_N4Wn_gxbkw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BDF1F85A5BC;
-        Sun, 13 Mar 2022 09:19:18 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4FC43802A67;
+        Sun, 13 Mar 2022 09:22:46 +0000 (UTC)
 Received: from starship (unknown [10.40.192.8])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7BB483323B;
-        Sun, 13 Mar 2022 09:19:13 +0000 (UTC)
-Message-ID: <01586c518de0c72ff3997d32654b8fa6e7df257d.camel@redhat.com>
-Subject: Re: [PATCH v6 6/9] KVM: x86: lapic: don't allow to change APIC ID
- unconditionally
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 146C3C4C7B8;
+        Sun, 13 Mar 2022 09:22:43 +0000 (UTC)
+Message-ID: <08548cb00c4b20426e5ee9ae2432744d6fa44fe8.camel@redhat.com>
+Subject: Re: [PATCH 00/21] KVM: x86: Event/exception fixes and cleanups
 From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Zeng Guang <guang.zeng@intel.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     "Gao, Chao" <chao.gao@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jethro Beekman <jethro@fortanix.com>,
-        "Huang, Kai" <kai.huang@intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Hu, Robert" <robert.hu@intel.com>
-Date:   Sun, 13 Mar 2022 11:19:12 +0200
-In-Reply-To: <29c76393-4884-94a8-f224-08d313b73f71@intel.com>
-References: <20220225082223.18288-1-guang.zeng@intel.com>
-         <20220225082223.18288-7-guang.zeng@intel.com> <Yifg4bea6zYEz1BK@google.com>
-         <20220309052013.GA2915@gao-cwp> <YihCtvDps/qJ2TOW@google.com>
-         <6dc7cff15812864ed14b5c014769488d80ce7f49.camel@redhat.com>
-         <YirPkr5efyylrD0x@google.com>
-         <29c76393-4884-94a8-f224-08d313b73f71@intel.com>
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Oliver Upton <oupton@google.com>,
+        Peter Shier <pshier@google.com>
+Date:   Sun, 13 Mar 2022 11:22:43 +0200
+In-Reply-To: <20220311032801.3467418-1-seanjc@google.com>
+References: <20220311032801.3467418-1-seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
 X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2022-03-11 at 21:28 +0800, Zeng Guang wrote:
+On Fri, 2022-03-11 at 03:27 +0000, Sean Christopherson wrote:
+> The main goal of this series is to fix KVM's longstanding bug of not
+> honoring L1's exception intercepts wants when handling an exception that
+> occurs during delivery of a different exception.  E.g. if L0 and L1 are
+> using shadow paging, and L2 hits a #PF, and then hits another #PF while
+> vectoring the first #PF due to _L1_ not having a shadow page for the IDT,
+> KVM needs to check L1's intercepts before morphing the #PF => #PF => #DF
+> so that the #PF is routed to L1, not injected into L2 as a #DF.
 > 
-> On 3/11/2022 12:26 PM, Sean Christopherson wrote:
-> > On Wed, Mar 09, 2022, Maxim Levitsky wrote:
-> > > On Wed, 2022-03-09 at 06:01 +0000, Sean Christopherson wrote:
-> > > > > Could you share the links?
-> > > > 
-> > > > Doh, sorry (they're both in this one).
-> > > > 
-> > > > https://lore.kernel.org/all/20220301135526.136554-5-mlevitsk@redhat.com
-> > > > 
-> > > > 
-> > > 
-> > > My opinion on this subject is very simple: we need to draw the line somewhere.
-> > 
-> > ...
-> > 
-> > 
-> > Since the goal is to simplify KVM, can we try the inhibit route and see what the
-> > code looks like before making a decision?  I think it might actually yield a less
-> > awful KVM than the readonly approach, especially if the inhibit is "sticky", i.e.
-> > we don't try to remove the inhibit on subsequent changes.
-> > 
-> > Killing the VM, as proposed, is very user unfriendly as the user will have no idea
-> > why the VM was killed.  WARN is out of the question because this is user triggerable.
-> > Returning an emulation error would be ideal, but getting that result up through
-> > apic_mmio_write() could be annoying and end up being more complex.
-> > 
-> > The touchpoints will all be the same, unless I'm missing something the difference
-> > should only be a call to set an inhibit instead killing the VM.
+> nVMX has hacked around the bug for years by overriding the #PF injector
+> for shadow paging to go straight to VM-Exit, and nSVM has started doing
+> the same.  The hacks mostly work, but they're incomplete, confusing, and
+> lead to other hacky code, e.g. bailing from the emulator because #PF
+> injection forced a VM-Exit and suddenly KVM is back in L1.
 > 
-> Introduce an inhibition - APICV_INHIBIT_REASON_APICID_CHG to deactivate
-> APICv once KVM guest would try to change APIC ID in xapic mode, and same
-> sanity check in KVM_{SET,GET}_LAPIC for live migration. KVM will keep
-> alive but obviously lose benefit from hardware acceleration in this way.
+> Everything leading up to that are related fixes and cleanups I encountered
+> along the way; some through code inspection, some through tests (I truly
+> thought this series was finished 10 commits and 3 days ago...).
 > 
-> So how do you think the proposal like this ?
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 6dcccb304775..30d825c069be 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1046,6 +1046,7 @@ struct kvm_x86_msr_filter {
->  #define APICV_INHIBIT_REASON_X2APIC    5
->  #define APICV_INHIBIT_REASON_BLOCKIRQ  6
->  #define APICV_INHIBIT_REASON_ABSENT    7
-> +#define APICV_INHIBIT_REASON_APICID_CHG 8
+> Nothing in here is all that urgent; all bugs tagged for stable have been
+> around for multiple releases (years in most cases).
 > 
->  struct kvm_arch {
->         unsigned long n_used_mmu_pages;
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 22929b5b3f9b..66cd54fa4515 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -2044,10 +2044,19 @@ static int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
+> Sean Christopherson (21):
+>   KVM: x86: Return immediately from x86_emulate_instruction() on code
+>     #DB
+>   KVM: nVMX: Unconditionally purge queued/injected events on nested
+>     "exit"
+>   KVM: VMX: Drop bits 31:16 when shoving exception error code into VMCS
+>   KVM: x86: Don't check for code breakpoints when emulating on exception
+>   KVM: nVMX: Treat General Detect #DB (DR7.GD=1) as fault-like
+>   KVM: nVMX: Prioritize TSS T-flag #DBs over Monitor Trap Flag
+>   KVM: x86: Treat #DBs from the emulator as fault-like (code and
+>     DR7.GD=1)
+>   KVM: x86: Use DR7_GD macro instead of open coding check in emulator
+>   KVM: nVMX: Ignore SIPI that arrives in L2 when vCPU is not in WFS
+>   KVM: nVMX: Unconditionally clear mtf_pending on nested VM-Exit
+>   KVM: VMX: Inject #PF on ENCLS as "emulated" #PF
+>   KVM: x86: Rename kvm_x86_ops.queue_exception to inject_exception
+>   KVM: x86: Make kvm_queued_exception a properly named, visible struct
+>   KVM: x86: Formalize blocking of nested pending exceptions
+>   KVM: x86: Use kvm_queue_exception_e() to queue #DF
+>   KVM: x86: Hoist nested event checks above event injection logic
+>   KVM: x86: Evaluate ability to inject SMI/NMI/IRQ after potential
+>     VM-Exit
+>   KVM: x86: Morph pending exceptions to pending VM-Exits at queue time
+>   KVM: VMX: Update MTF and ICEBP comments to document KVM's subtle
+>     behavior
+>   KVM: selftests: Use uapi header to get VMX and SVM exit reasons/codes
+>   KVM: selftests: Add an x86-only test to verify nested exception
+>     queueing
 > 
->         switch (reg) {
->         case APIC_ID:           /* Local APIC ID */
-> -               if (!apic_x2apic_mode(apic))
-> -                       kvm_apic_set_xapic_id(apic, val >> 24);
-> -               else
-> +               if (apic_x2apic_mode(apic)) {
->                         ret = 1;
-> +                       break;
-> +               }
-> +               /*
-> +                * If changing APIC ID with any APIC acceleration enabled,
-> +                * deactivate APICv to avoid unexpected issues.
-> +                */
-> +               if (enable_apicv && (val >> 24) != apic->vcpu->vcpu_id)
-> +                       kvm_request_apicv_update(apic->vcpu->kvm,
-> +                               false, APICV_INHIBIT_REASON_APICID_CHG);
-> +
-> +               kvm_apic_set_xapic_id(apic, val >> 24);
->                 break;
-> 
->         case APIC_TASKPRI:
-> @@ -2628,11 +2637,19 @@ int kvm_get_apic_interrupt(struct kvm_vcpu *vcpu)
->  static int kvm_apic_state_fixup(struct kvm_vcpu *vcpu,
->                 struct kvm_lapic_state *s, bool set)
->  {
-> -       if (apic_x2apic_mode(vcpu->arch.apic)) {
-> -               u32 *id = (u32 *)(s->regs + APIC_ID);
-> -               u32 *ldr = (u32 *)(s->regs + APIC_LDR);
-> -               u64 icr;
-> +       u32 *id = (u32 *)(s->regs + APIC_ID);
-> +       u32 *ldr = (u32 *)(s->regs + APIC_LDR);
-> +       u64 icr;
-> +       if (!apic_x2apic_mode(vcpu->arch.apic)) {
-> +               /*
-> +                * If APIC ID changed with any APIC acceleration enabled,
-> +                * deactivate APICv to avoid unexpected issues.
-> +                */
-> +               if (enable_apicv && (*id >> 24) != vcpu->vcpu_id)
-> +                       kvm_request_apicv_update(vcpu->kvm,
-> +                               false, APICV_INHIBIT_REASON_APICID_CHG);
-> +       } else {
->                 if (vcpu->kvm->arch.x2apic_format) {
->                         if (*id != vcpu->vcpu_id)
->                                 return -EINVAL;
-> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> index 82d56f8055de..f78754bdc1d0 100644
-> --- a/arch/x86/kvm/svm/avic.c
-> +++ b/arch/x86/kvm/svm/avic.c
-> @@ -931,7 +931,8 @@ bool svm_check_apicv_inhibit_reasons(ulong bit)
->                           BIT(APICV_INHIBIT_REASON_IRQWIN) |
->                           BIT(APICV_INHIBIT_REASON_PIT_REINJ) |
->                           BIT(APICV_INHIBIT_REASON_X2APIC) |
-> -                         BIT(APICV_INHIBIT_REASON_BLOCKIRQ);
-> +                         BIT(APICV_INHIBIT_REASON_BLOCKIRQ) |
-> +                         BIT(APICV_INHIBIT_REASON_APICID_CHG);
-> 
->         return supported & BIT(bit);
->  }
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 7beba7a9f247..91265f0784bd 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -7751,7 +7751,8 @@ static bool vmx_check_apicv_inhibit_reasons(ulong bit)
->         ulong supported = BIT(APICV_INHIBIT_REASON_DISABLE) |
->                           BIT(APICV_INHIBIT_REASON_ABSENT) |
->                           BIT(APICV_INHIBIT_REASON_HYPERV) |
-> -                         BIT(APICV_INHIBIT_REASON_BLOCKIRQ);
-> +                         BIT(APICV_INHIBIT_REASON_BLOCKIRQ) |
-> +                         BIT(APICV_INHIBIT_REASON_APICID_CHG);
-> 
->         return supported & BIT(bit);
->  }
+>  arch/x86/include/asm/kvm-x86-ops.h            |   2 +-
+>  arch/x86/include/asm/kvm_host.h               |  33 +-
+>  arch/x86/kvm/emulate.c                        |   3 +-
+>  arch/x86/kvm/svm/nested.c                     | 100 ++---
+>  arch/x86/kvm/svm/svm.c                        |  18 +-
+>  arch/x86/kvm/vmx/nested.c                     | 322 +++++++++-----
+>  arch/x86/kvm/vmx/sgx.c                        |   2 +-
+>  arch/x86/kvm/vmx/vmx.c                        |  53 ++-
+>  arch/x86/kvm/x86.c                            | 409 ++++++++++++------
+>  arch/x86/kvm/x86.h                            |  10 +-
+>  tools/testing/selftests/kvm/.gitignore        |   1 +
+>  tools/testing/selftests/kvm/Makefile          |   1 +
+>  .../selftests/kvm/include/x86_64/svm_util.h   |   5 +-
+>  .../selftests/kvm/include/x86_64/vmx.h        |  51 +--
+>  .../kvm/x86_64/nested_exceptions_test.c       | 307 +++++++++++++
+>  15 files changed, 914 insertions(+), 403 deletions(-)
+>  create mode 100644 tools/testing/selftests/kvm/x86_64/nested_exceptions_test.c
 > 
 > 
-> 
+> base-commit: 4a204f7895878363ca8211f50ec610408c8c70aa
 
-This won't work with nested AVIC - we can't just inhibit a nested guest using its own AVIC,
-because migration happens.
+I am just curious. Are you aware that I worked on this few months ago?
+I am sure that you even reviewed some of my code back then.
+
+If so, could you have had at least mentioned this and/or pinged me to continue
+working on this instead of re-implementing it?
 
 Best regards,
 	Maxim Levitsky
+
 
