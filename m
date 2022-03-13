@@ -2,392 +2,234 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 75DB34D7475
-	for <lists+kvm@lfdr.de>; Sun, 13 Mar 2022 11:52:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BD0E44D74C9
+	for <lists+kvm@lfdr.de>; Sun, 13 Mar 2022 12:00:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234398AbiCMKxW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 13 Mar 2022 06:53:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43578 "EHLO
+        id S234658AbiCMLBV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 13 Mar 2022 07:01:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47476 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234449AbiCMKwy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 13 Mar 2022 06:52:54 -0400
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85B8412F159;
-        Sun, 13 Mar 2022 03:51:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1647168690; x=1678704690;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=SpjC3CbH42U1qa3ksr4Ka1FAutv97ZtYm4oaP1Da4rY=;
-  b=Qfs0OOtqsluBHxItZTVgZ/1T5hJixWtX5ewVe7zKYj6yGbuf2kODwraw
-   njb+VpOdq4EHvg1J8dcXHaMO1vTkIoeGRI1rZPiHkbNPsG0gTyN+DmxJM
-   0fzTmNX6TuMfW/91KVBUTCd7sdDBTJi3OK850nhsYbfLywCJsaLPp7DYO
-   gaLyo4ahNLOIeuuvatASEsdYGOhPHClqJWfgRadYlR7JfKE5PIAVb7wYF
-   XtEDNWKQAjujnwgmlKLdL5AZQIX4UBfTo2hr0BuOzTE87g+KAVExfFCyF
-   ++U1vNn+OXg34a58tONnKvVI8csP+uuxwIBNYYvZnDChjvzVpBwpvrCYJ
-   w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10284"; a="255590725"
-X-IronPort-AV: E=Sophos;i="5.90,178,1643702400"; 
-   d="scan'208";a="255590725"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2022 03:51:18 -0700
-X-IronPort-AV: E=Sophos;i="5.90,178,1643702400"; 
-   d="scan'208";a="645448259"
-Received: from mvideche-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.251.130.249])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2022 03:51:15 -0700
-From:   Kai Huang <kai.huang@intel.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     dave.hansen@intel.com, seanjc@google.com, pbonzini@redhat.com,
-        kirill.shutemov@linux.intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, peterz@infradead.org,
-        tony.luck@intel.com, ak@linux.intel.com, dan.j.williams@intel.com,
-        isaku.yamahata@intel.com, kai.huang@intel.com
-Subject: [PATCH v2 21/21] Documentation/x86: Add documentation for TDX host support
-Date:   Sun, 13 Mar 2022 23:50:01 +1300
-Message-Id: <e94f17682960fe9e40c255e7bbd3de6855325a01.1647167475.git.kai.huang@intel.com>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <cover.1647167475.git.kai.huang@intel.com>
-References: <cover.1647167475.git.kai.huang@intel.com>
+        with ESMTP id S234655AbiCMLAy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 13 Mar 2022 07:00:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AFC60D4CA0
+        for <kvm@vger.kernel.org>; Sun, 13 Mar 2022 03:59:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1647169186;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ydYQlcdWBx6DLdxNSVJhNFn+Jsx+dRyjUHL0Hzpc8Nw=;
+        b=eyLAnLKbuMQ4bBZgu5baLD8Y8leGQernS7+jXkUEc4eGSxvMzQtpBCFrySgyc56oHC1oWT
+        LiMzk+G6cP8IIOlff33UtQW1ltEoJQbZdGGePnHlMSzRxzHcxE8ynho8NCKx4BPv208o72
+        TwAgLdhyp90IHDdyYMNcUgjCbooor6s=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-231-chUAXzk1Of6tQPciTabVYA-1; Sun, 13 Mar 2022 06:59:43 -0400
+X-MC-Unique: chUAXzk1Of6tQPciTabVYA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id ED22B3C00102;
+        Sun, 13 Mar 2022 10:59:42 +0000 (UTC)
+Received: from starship (unknown [10.40.192.8])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A0E0540D2820;
+        Sun, 13 Mar 2022 10:59:37 +0000 (UTC)
+Message-ID: <2900660d947a878e583ebedf60e7332e74a1af5f.camel@redhat.com>
+Subject: Re: [PATCH v6 6/9] KVM: x86: lapic: don't allow to change APIC ID
+ unconditionally
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Zeng Guang <guang.zeng@intel.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     "Gao, Chao" <chao.gao@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jethro Beekman <jethro@fortanix.com>,
+        "Huang, Kai" <kai.huang@intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Hu, Robert" <robert.hu@intel.com>
+Date:   Sun, 13 Mar 2022 12:59:36 +0200
+In-Reply-To: <01586c518de0c72ff3997d32654b8fa6e7df257d.camel@redhat.com>
+References: <20220225082223.18288-1-guang.zeng@intel.com>
+         <20220225082223.18288-7-guang.zeng@intel.com> <Yifg4bea6zYEz1BK@google.com>
+         <20220309052013.GA2915@gao-cwp> <YihCtvDps/qJ2TOW@google.com>
+         <6dc7cff15812864ed14b5c014769488d80ce7f49.camel@redhat.com>
+         <YirPkr5efyylrD0x@google.com>
+         <29c76393-4884-94a8-f224-08d313b73f71@intel.com>
+         <01586c518de0c72ff3997d32654b8fa6e7df257d.camel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-5.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add <Documentation/x86/tdx_host.rst> for TDX host support.
+On Sun, 2022-03-13 at 11:19 +0200, Maxim Levitsky wrote:
+> On Fri, 2022-03-11 at 21:28 +0800, Zeng Guang wrote:
+> > On 3/11/2022 12:26 PM, Sean Christopherson wrote:
+> > > On Wed, Mar 09, 2022, Maxim Levitsky wrote:
+> > > > On Wed, 2022-03-09 at 06:01 +0000, Sean Christopherson wrote:
+> > > > > > Could you share the links?
+> > > > > 
+> > > > > Doh, sorry (they're both in this one).
+> > > > > 
+> > > > > https://lore.kernel.org/all/20220301135526.136554-5-mlevitsk@redhat.com
+> > > > > 
+> > > > > 
+> > > > 
+> > > > My opinion on this subject is very simple: we need to draw the line somewhere.
+> > > 
+> > > ...
+> > > 
+> > > 
+> > > Since the goal is to simplify KVM, can we try the inhibit route and see what the
+> > > code looks like before making a decision?  I think it might actually yield a less
+> > > awful KVM than the readonly approach, especially if the inhibit is "sticky", i.e.
+> > > we don't try to remove the inhibit on subsequent changes.
+> > > 
+> > > Killing the VM, as proposed, is very user unfriendly as the user will have no idea
+> > > why the VM was killed.  WARN is out of the question because this is user triggerable.
+> > > Returning an emulation error would be ideal, but getting that result up through
+> > > apic_mmio_write() could be annoying and end up being more complex.
+> > > 
+> > > The touchpoints will all be the same, unless I'm missing something the difference
+> > > should only be a call to set an inhibit instead killing the VM.
+> > 
+> > Introduce an inhibition - APICV_INHIBIT_REASON_APICID_CHG to deactivate
+> > APICv once KVM guest would try to change APIC ID in xapic mode, and same
+> > sanity check in KVM_{SET,GET}_LAPIC for live migration. KVM will keep
+> > alive but obviously lose benefit from hardware acceleration in this way.
+> > 
+> > So how do you think the proposal like this ?
+> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > index 6dcccb304775..30d825c069be 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -1046,6 +1046,7 @@ struct kvm_x86_msr_filter {
+> >  #define APICV_INHIBIT_REASON_X2APIC    5
+> >  #define APICV_INHIBIT_REASON_BLOCKIRQ  6
+> >  #define APICV_INHIBIT_REASON_ABSENT    7
+> > +#define APICV_INHIBIT_REASON_APICID_CHG 8
+> > 
+> >  struct kvm_arch {
+> >         unsigned long n_used_mmu_pages;
+> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> > index 22929b5b3f9b..66cd54fa4515 100644
+> > --- a/arch/x86/kvm/lapic.c
+> > +++ b/arch/x86/kvm/lapic.c
+> > @@ -2044,10 +2044,19 @@ static int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
+> > 
+> >         switch (reg) {
+> >         case APIC_ID:           /* Local APIC ID */
+> > -               if (!apic_x2apic_mode(apic))
+> > -                       kvm_apic_set_xapic_id(apic, val >> 24);
+> > -               else
+> > +               if (apic_x2apic_mode(apic)) {
+> >                         ret = 1;
+> > +                       break;
+> > +               }
+> > +               /*
+> > +                * If changing APIC ID with any APIC acceleration enabled,
+> > +                * deactivate APICv to avoid unexpected issues.
+> > +                */
+> > +               if (enable_apicv && (val >> 24) != apic->vcpu->vcpu_id)
+> > +                       kvm_request_apicv_update(apic->vcpu->kvm,
+> > +                               false, APICV_INHIBIT_REASON_APICID_CHG);
+> > +
+> > +               kvm_apic_set_xapic_id(apic, val >> 24);
+> >                 break;
+> > 
+> >         case APIC_TASKPRI:
+> > @@ -2628,11 +2637,19 @@ int kvm_get_apic_interrupt(struct kvm_vcpu *vcpu)
+> >  static int kvm_apic_state_fixup(struct kvm_vcpu *vcpu,
+> >                 struct kvm_lapic_state *s, bool set)
+> >  {
+> > -       if (apic_x2apic_mode(vcpu->arch.apic)) {
+> > -               u32 *id = (u32 *)(s->regs + APIC_ID);
+> > -               u32 *ldr = (u32 *)(s->regs + APIC_LDR);
+> > -               u64 icr;
+> > +       u32 *id = (u32 *)(s->regs + APIC_ID);
+> > +       u32 *ldr = (u32 *)(s->regs + APIC_LDR);
+> > +       u64 icr;
+> > +       if (!apic_x2apic_mode(vcpu->arch.apic)) {
+> > +               /*
+> > +                * If APIC ID changed with any APIC acceleration enabled,
+> > +                * deactivate APICv to avoid unexpected issues.
+> > +                */
+> > +               if (enable_apicv && (*id >> 24) != vcpu->vcpu_id)
+> > +                       kvm_request_apicv_update(vcpu->kvm,
+> > +                               false, APICV_INHIBIT_REASON_APICID_CHG);
+> > +       } else {
+> >                 if (vcpu->kvm->arch.x2apic_format) {
+> >                         if (*id != vcpu->vcpu_id)
+> >                                 return -EINVAL;
+> > diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> > index 82d56f8055de..f78754bdc1d0 100644
+> > --- a/arch/x86/kvm/svm/avic.c
+> > +++ b/arch/x86/kvm/svm/avic.c
+> > @@ -931,7 +931,8 @@ bool svm_check_apicv_inhibit_reasons(ulong bit)
+> >                           BIT(APICV_INHIBIT_REASON_IRQWIN) |
+> >                           BIT(APICV_INHIBIT_REASON_PIT_REINJ) |
+> >                           BIT(APICV_INHIBIT_REASON_X2APIC) |
+> > -                         BIT(APICV_INHIBIT_REASON_BLOCKIRQ);
+> > +                         BIT(APICV_INHIBIT_REASON_BLOCKIRQ) |
+> > +                         BIT(APICV_INHIBIT_REASON_APICID_CHG);
+> > 
+> >         return supported & BIT(bit);
+> >  }
+> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> > index 7beba7a9f247..91265f0784bd 100644
+> > --- a/arch/x86/kvm/vmx/vmx.c
+> > +++ b/arch/x86/kvm/vmx/vmx.c
+> > @@ -7751,7 +7751,8 @@ static bool vmx_check_apicv_inhibit_reasons(ulong bit)
+> >         ulong supported = BIT(APICV_INHIBIT_REASON_DISABLE) |
+> >                           BIT(APICV_INHIBIT_REASON_ABSENT) |
+> >                           BIT(APICV_INHIBIT_REASON_HYPERV) |
+> > -                         BIT(APICV_INHIBIT_REASON_BLOCKIRQ);
+> > +                         BIT(APICV_INHIBIT_REASON_BLOCKIRQ) |
+> > +                         BIT(APICV_INHIBIT_REASON_APICID_CHG);
+> > 
+> >         return supported & BIT(bit);
+> >  }
+> > 
+> > 
+> > 
+> 
+> This won't work with nested AVIC - we can't just inhibit a nested guest using its own AVIC,
+> because migration happens.
 
-Signed-off-by: Kai Huang <kai.huang@intel.com>
----
- Documentation/x86/index.rst    |   1 +
- Documentation/x86/tdx_host.rst | 300 +++++++++++++++++++++++++++++++++
- 2 files changed, 301 insertions(+)
- create mode 100644 Documentation/x86/tdx_host.rst
+I mean because host decided to change its apic id, which it can in theory do any time,
+even after the nested guest has started. Seriously, the only reason guest has to change apic id,
+is to try to exploit some security hole.
+ 
+Best regards,
+	Maxim Levitsky
 
-diff --git a/Documentation/x86/index.rst b/Documentation/x86/index.rst
-index 382e53ca850a..145fc251fbfc 100644
---- a/Documentation/x86/index.rst
-+++ b/Documentation/x86/index.rst
-@@ -25,6 +25,7 @@ x86-specific Documentation
-    intel_txt
-    amd-memory-encryption
-    tdx
-+   tdx_host
-    pti
-    mds
-    microcode
-diff --git a/Documentation/x86/tdx_host.rst b/Documentation/x86/tdx_host.rst
-new file mode 100644
-index 000000000000..a843ede9d45c
---- /dev/null
-+++ b/Documentation/x86/tdx_host.rst
-@@ -0,0 +1,300 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+=========================================================
-+Intel Trusted Domain Extensions (TDX) host kernel support
-+=========================================================
-+
-+Intel Trusted Domain Extensions (TDX) protects guest VMs from malicious
-+host and certain physical attacks. To support TDX, a new CPU mode called
-+Secure Arbitration Mode (SEAM) is added to Intel processors.
-+
-+SEAM is an extension to the VMX architecture to define a new VMX root
-+operation called 'SEAM VMX root' and a new VMX non-root operation called
-+'VMX non-root'. Collectively, the SEAM VMX root and SEAM VMX non-root
-+execution modes are called operation in SEAM.
-+
-+SEAM VMX root operation is designed to host a CPU-attested, software
-+module called 'Intel TDX module' to manage virtual machine (VM) guests
-+called Trust Domains (TD). The TDX module implements the functions to
-+build, tear down, and start execution of TD VMs. SEAM VMX root is also
-+designed to additionally host a CPU-attested, software module called the
-+'Intel Persistent SEAMLDR (Intel P-SEAMLDR)' module to load and update
-+the Intel TDX module.
-+
-+The software in SEAM VMX root runs in the memory region defined by the
-+SEAM range register (SEAMRR). Access to this range is restricted to SEAM
-+VMX root operation. Code fetches outside of SEAMRR when in SEAM VMX root
-+operation are meant to be disallowed and lead to an unbreakable shutdown.
-+
-+TDX leverages Intel Multi-Key Total Memory Encryption (MKTME) to crypto
-+protect TD guests. TDX reserves part of MKTME KeyID space as TDX private
-+KeyIDs, which can only be used by software runs in SEAM. The physical
-+address bits reserved for encoding TDX private KeyID are treated as
-+reserved bits when not in SEAM operation. The partitioning of MKTME
-+KeyIDs and TDX private KeyIDs is configured by BIOS.
-+
-+Host kernel transits to either P-SEAMLDR or TDX module via the new
-+SEAMCALL instruction. SEAMCALLs are host-side interface functions
-+defined by P-SEAMLDR and TDX module around the new SEAMCALL instruction.
-+They are similar to a hypercall, except they are made by host kernel to
-+the SEAM software modules.
-+
-+Before being able to manage TD guests, the TDX module must be loaded
-+into SEAMRR and properly initialized using SEAMCALLs defined by TDX
-+architecture. The current implementation assumes both P-SEAMLDR and
-+TDX module are loaded by BIOS before the kernel boots.
-+
-+Detection and Initialization
-+----------------------------
-+
-+The presence of SEAMRR is reported via a new SEAMRR bit (15) of the
-+IA32_MTRRCAP MSR. The SEAMRR range registers consist of a pair of MSRs:
-+IA32_SEAMRR_PHYS_BASE (0x1400) and IA32_SEAMRR_PHYS_MASK (0x1401).
-+SEAMRR is enabled when bit 3 of IA32_SEAMRR_PHYS_BASE is set and
-+bit 10/11 of IA32_SEAMRR_PHYS_MASK are set.
-+
-+However, there is no CPUID or MSR for querying the presence of the TDX
-+module or the P-SEAMLDR. SEAMCALL fails with VMfailInvalid when SEAM
-+software is not loaded, so SEAMCALL can be used to detect P-SEAMLDR and
-+TDX module. SEAMLDR.INFO SEAMCALL is used to detect both P-SEAMLDR and
-+TDX module.  Success of the SEAMCALL means P-SEAMLDR is loaded, and the
-+P-SEAMLDR information returned by the SEAMCALL further tells whether TDX
-+module is loaded or not.
-+
-+User can check whether the TDX module is initialized via dmesg:
-+
-+  [..] tdx: P-SEAMLDR: version 0x0, vendor_id: 0x8086, build_date: 20211209, build_num 160, major 1, minor 0
-+  [..] tdx: TDX module detected.
-+  [..] tdx: TDX module: vendor_id 0x8086, major_version 1, minor_version 0, build_date 20211209, build_num 160
-+  [..] tdx: TDX module initialized.
-+
-+Initializing TDX takes time (in seconds) and additional memory space (for
-+metadata). Both are affected by the size of total usable memory which the
-+TDX module is configured with. In particular, the TDX metadata consumes
-+~1/256 of TDX usable memory. This leads to a non-negligible burden as the
-+current implementation simply treats all E820 RAM ranges as TDX usable
-+memory (all system RAM meets the security requirements on the first
-+generation of TDX-capable platforms).
-+
-+Therefore, kernel uses lazy TDX initialization to avoid such burden for
-+all users on a TDX-capable platform. The software component (e.g. KVM)
-+which wants to use TDX is expected to call two helpers below to detect
-+and initialize the TDX module until TDX is truly needed:
-+
-+        if (tdx_detect())
-+                goto no_tdx;
-+        if (tdx_init())
-+                goto no_tdx;
-+
-+TDX detection and initialization are done via SEAMCALLs which require the
-+CPU in VMX operation. The caller of the above two helpers should ensure
-+that condition.
-+
-+Currently, only KVM is the only user of TDX and KVM already handles
-+entering/leaving VMX operation. Letting KVM initialize TDX on demand
-+avoids handling entering/leaving VMX operation, which isn't trivial, in
-+core-kernel.
-+
-+In addition, a new kernel parameter 'tdx_host={on/off}' can be used to
-+force disabling the TDX capability by the admin.
-+
-+TDX Memory Management
-+---------------------
-+
-+TDX architecture manages TDX memory via below data structures:
-+
-+1) Convertible Memory Regions (CMRs)
-+
-+TDX provides increased levels of memory confidentiality and integrity.
-+This requires special hardware support for features like memory
-+encryption and storage of memory integrity checksums. A CMR represents a
-+memory range that meets those requirements and can be used as TDX memory.
-+The list of CMRs can be queried from TDX module.
-+
-+2) TD Memory Regions (TDMRs)
-+
-+The TDX module manages TDX usable memory via TD Memory Regions (TDMR).
-+Each TDMR has information of its base and size, its metadata (PAMT)'s
-+base and size, and an array of reserved areas to hold the memory region
-+address holes and PAMTs. TDMR must be 1G aligned and in 1G granularity.
-+
-+Host kernel is responsible for choosing which convertible memory regions
-+(reside in CMRs) to use as TDX memory, and constructing a list of TDMRs
-+to cover all those memory regions, and configure the TDMRs to TDX module.
-+
-+3) Physical Address Metadata Tables (PAMTs)
-+
-+This metadata essentially serves as the 'struct page' for the TDX module,
-+recording things like which TD guest 'owns' a given page of memory. Each
-+TDMR has a dedicated PAMT.
-+
-+PAMT is not reserved by the hardware upfront and must be allocated by the
-+kernel and given to the TDX module. PAMT for a given TDMR doesn't have
-+to be within that TDMR, but a PAMT must be within one CMR.  Additionally,
-+if a PAMT overlaps with a TDMR, the overlapping part must be marked as
-+reserved in that particular TDMR.
-+
-+Kernel Policy of TDX Memory
-+---------------------------
-+
-+The first generation of TDX essentially guarantees that all system RAM
-+memory regions (excluding the memory below 1MB) are covered by CMRs.
-+Currently, to avoid having to modify the page allocator to support both
-+TDX and non-TDX allocation, the kernel choose to use all system RAM as
-+TDX memory. A list of TDMRs are constructed based on all RAM entries in
-+e820 table and configured to the TDX module.
-+
-+Limitations
-+-----------
-+
-+1. Constructing TDMRs
-+
-+Currently, the kernel tries to create one TDMR for each RAM entry in
-+e820. 'e820_table' is used to find all RAM entries to honor 'mem' and
-+'memmap' kernel command line. However, 'memmap' command line may also
-+result in many discrete RAM entries. TDX architecturally only supports a
-+limited number of TDMRs (currently 64). In this case, constructing TDMRs
-+may fail due to exceeding the maximum number of TDMRs. The user is
-+responsible for not doing so otherwise TDX may not be available. This
-+can be further enhanced by supporting merging adjacent TDMRs.
-+
-+2. PAMT allocation
-+
-+Currently, the kernel allocates PAMT for each TDMR separately using
-+alloc_contig_pages(). alloc_contig_pages() only guarantees the PAMT is
-+allocated from a given NUMA node, but doesn't have control over
-+allocating PAMT from a given TDMR range. This may result in all PAMTs
-+on one NUMA node being within one single TDMR. PAMTs overlapping with
-+a given TDMR must be put into the TDMR's reserved areas too. However TDX
-+only supports a limited number of reserved areas per TDMR (currently 16),
-+thus too many PAMTs in one NUMA node may result in constructing TDMR
-+failure due to exceeding TDMR's maximum reserved areas.
-+
-+The user is responsible for not creating too many discrete RAM entries
-+on one NUMA node, which may result in having too many TDMRs on one node,
-+which eventually results in constructing TDMR failure due to exceeding
-+the maximum reserved areas. This can be further enhanced to support
-+per-NUMA-node PAMT allocation, which could reduce the number of PAMT to
-+1 for each node.
-+
-+3. TDMR initialization
-+
-+Currently, the kernel initialize TDMRs one by one. This may take couple
-+of seconds to finish on large memory systems (TBs). This can be further
-+enhanced by allowing initializing different TDMRs in parallel on multiple
-+cpus.
-+
-+4. CPU hotplug
-+
-+The first generation of TDX architecturally doesn't support ACPI CPU
-+hotplug. All logical cpus are enabled by BIOS in MADT table. Also, the
-+first generation of TDX-capable platforms don't support ACPI CPU hotplug
-+either. Since this physically cannot happen, currently kernel doesn't
-+have any check in ACPI CPU hotplug code path to disable it.
-+
-+Also, only TDX module initialization requires all BIOS-enabled cpus are
-+online. After the initialization, any logical cpu can be brought down
-+and brought up to online again later. Therefore this series doesn't
-+change logical CPU hotplug either.
-+
-+This can be enhanced when any future generation of TDX starts to support
-+ACPI cpu hotplug.
-+
-+5. Memory hotplug
-+
-+The first generation of TDX architecturally doesn't support memory
-+hotplug. The CMRs are generated by BIOS during boot and it is fixed
-+during machine's runtime.
-+
-+However, the first generation of TDX-capable platforms don't support ACPI
-+memory hotplug. Since it physically cannot happen, currently kernel
-+doesn't have any check in ACPI memory hotplug code path to disable it.
-+
-+A special case of memory hotplug is adding NVDIMM as system RAM using
-+kmem driver. However the first generation of TDX-capable platforms
-+cannot turn on TDX and NVDIMM simultaneously, so in practice this cannot
-+happen either.
-+
-+Another case is admin can use 'memmap' kernel command line to create
-+legacy PMEMs and use them as TD guest memory, or theoretically, can use
-+kmem driver to add them as system RAM. Current implementation always
-+includes legacy PMEMs when constructing TDMRs so they are also TDX memory.
-+So legacy PMEMs can either be used as TD guest memory directly or can be
-+converted to system RAM via kmem driver.
-+
-+This can be enhanced when future generation of TDX starts to support ACPI
-+memory hotplug, or NVDIMM and TDX can be enabled simultaneously on the
-+same platform.
-+
-+6. Online CPUs
-+
-+TDX initialization includes a step where certain SEAMCALL must be called
-+on every BIOS-enabled CPU (with a ACPI MADT entry marked as enabled).
-+Otherwise, the initialization process aborts at a later step.
-+
-+The user should avoid using boot parameters (such as maxcpus, nr_cpus,
-+possible_cpus) or offlining CPUs before initializing TDX. Doing so will
-+lead to the mismatch between online CPUs and BIOS-enabled CPUs, resulting
-+TDX module initialization failure.
-+
-+It is ok to offline CPUs after TDX initialization is completed.
-+
-+7. Kexec
-+
-+The TDX module can be initialized only once during its lifetime. The
-+first generation of TDX doesn't have interface to reset TDX module to
-+uninitialized state so it can be initialized again.
-+
-+This implies:
-+
-+  - If the old kernel fails to initialize TDX, the new kernel cannot
-+    use TDX too unless the new kernel fixes the bug which leads to
-+    initialization failure in the old kernel and can resume from where
-+    the old kernel stops. This requires certain coordination between
-+    the two kernels.
-+
-+  - If the old kernel has initialized TDX successfully, the new kernel
-+    may be able to use TDX if the two kernels have exactly the same
-+    configurations on the TDX module. It further requires the new kernel
-+    to reserve the TDX metadata pages (allocated by the old kernel) in
-+    its page allocator. It also requires coordination between the two
-+    kernels. Furthermore, if kexec() is done when there are active TD
-+    guests running, the new kernel cannot use TDX because it's extremely
-+    hard for the old kernel to pass all TDX private pages to the new
-+    kernel.
-+
-+Given that, the current implementation doesn't support TDX after kexec()
-+(except the old kernel hasn't initialized TDX at all).
-+
-+The current implementation doesn't shut down TDX module but leaves it
-+open during kexec().  This is because shutting down TDX module requires
-+CPU being in VMX operation but there's no guarantee of this during
-+kexec(). Leaving the TDX module open is not the best case, but it is OK
-+since the new kernel won't be able to use TDX anyway (therefore TDX
-+module won't run at all).
-+
-+This can be further enhanced when core-kernele (non-KVM) can handle
-+VMXON.
-+
-+If TDX is ever enabled and/or used to run any TD guests, the cachelines
-+of TDX private memory, including PAMTs, used by TDX module need to be
-+flushed before transiting to the new kernel otherwise they may silently
-+corrupt the new kernel. Similar to SME, the current implementation
-+flushes cache in stop_this_cpu().
-+
-+8. Initialization error
-+
-+Currently, any error happened during TDX initialization moves the TDX
-+module to the SHUTDOWN state. No SEAMCALL is allowed in this state, and
-+the TDX module cannot be re-initialized without a hard reset.
-+
-+This can be further enhanced to treat some errors as recoverable errors
-+and let the caller retry later. A more detailed state machine can be
-+added to record the internal state of TDX module, and the initialization
-+can resume from that state in the next try.
-+
-+Specifically, there are three cases that can be treated as recoverable
-+error: 1) -ENOMEM (i.e. due to PAMT allocation); 2) TDH.SYS.CONFIG error
-+due to TDH.SYS.LP.INIT is not called on all cpus (i.e. due to offline
-+cpus); 3) -EPERM when the caller doesn't guarantee all cpus are in VMX
-+operation.
--- 
-2.35.1
+> 
+> Best regards,
+> 	Maxim Levitsky
+
 
