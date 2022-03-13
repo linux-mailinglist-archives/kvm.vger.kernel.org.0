@@ -2,149 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8DA7A4D73F0
-	for <lists+kvm@lfdr.de>; Sun, 13 Mar 2022 10:22:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D37854D73F4
+	for <lists+kvm@lfdr.de>; Sun, 13 Mar 2022 10:24:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234123AbiCMJYA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 13 Mar 2022 05:24:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54210 "EHLO
+        id S234130AbiCMJZa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 13 Mar 2022 05:25:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60062 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234110AbiCMJX7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 13 Mar 2022 05:23:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9B23810FF1
-        for <kvm@vger.kernel.org>; Sun, 13 Mar 2022 01:22:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647163370;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=oKr9dqn8/NxnlnFSTIb6/d+Le/Vlc/vnCa6Sa4GLvaA=;
-        b=eAa3npKGY4Kr6sCJhjhl7aqiUWwKzVOTPg7OaKgg3MdwtuNBn1lU6oamhFAlZBNrnNfEfF
-        13YnHq4sW5i9vkfecnWq9h6nTJZK6La/9e6kmZRK8ZvOgTp9p6rXCEw8JYekEhNLVFPxTb
-        WgsMXn5BGBYDPSovXcSxLGDYF1MY+KE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-209-ZJbb_Gv2NsG_N4Wn_gxbkw-1; Sun, 13 Mar 2022 05:22:46 -0400
-X-MC-Unique: ZJbb_Gv2NsG_N4Wn_gxbkw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4FC43802A67;
-        Sun, 13 Mar 2022 09:22:46 +0000 (UTC)
-Received: from starship (unknown [10.40.192.8])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 146C3C4C7B8;
-        Sun, 13 Mar 2022 09:22:43 +0000 (UTC)
-Message-ID: <08548cb00c4b20426e5ee9ae2432744d6fa44fe8.camel@redhat.com>
-Subject: Re: [PATCH 00/21] KVM: x86: Event/exception fixes and cleanups
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Oliver Upton <oupton@google.com>,
-        Peter Shier <pshier@google.com>
-Date:   Sun, 13 Mar 2022 11:22:43 +0200
-In-Reply-To: <20220311032801.3467418-1-seanjc@google.com>
-References: <20220311032801.3467418-1-seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        with ESMTP id S231891AbiCMJZ3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 13 Mar 2022 05:25:29 -0400
+Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14C18FA22D
+        for <kvm@vger.kernel.org>; Sun, 13 Mar 2022 01:24:22 -0800 (PST)
+Received: by mail-wm1-x334.google.com with SMTP id i66so7599177wma.5
+        for <kvm@vger.kernel.org>; Sun, 13 Mar 2022 01:24:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:sender:from:date:message-id:subject:to;
+        bh=Q/dSPLd14jBsqRkvVImwwZEsLVw2fno/X7Lt85ZSOio=;
+        b=hg86shtiyPVezfyn8lXRz7/VycJrlJAry3gbYVD1uQm6Kdb4RxqLj3+kuSMAaWig/A
+         3mDpxbM9zsYrPh3WhhZ0fWBYWZQ+fEc7XvOwO49BIrbY3qIloXiEUSQnh6i0lsv+bDBv
+         qeTIJjR5I3HgFKauyWQwp0McWD9Ymuu0QQI0U6JilqBNhAxwZC9V3ZHgccZuM6F4SPOj
+         aLzGW3Goh8B9RD4BmQGDGeAGm5t9hutv3ZoYiuifFKw2MrILdJg/tS654H+VrBX+Sz1k
+         3InIME0eASxW7u7Ms0t0IH81l4yfq9gSiseIcsmvqAQv+8/Vzy/ZFsAp3oLWjXcoPSoV
+         0J7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:sender:from:date:message-id:subject
+         :to;
+        bh=Q/dSPLd14jBsqRkvVImwwZEsLVw2fno/X7Lt85ZSOio=;
+        b=UoFu2TJ8tkf6E8hOlYpjRfGD0+Bpdh16cXLdUpmEi/zcImAvM0p4+jAVFlz5GJnik/
+         kXttqEKhlD6b7WyfdyWWxBQGg5uKi3xKlZwBYnyp3eVJmGsfYlRzrQVMTvqacJpoZsre
+         HW9hqZcjegGHxs48RRqGHIr4M5C9fuEl00ERB5ynCdDQDzWe1gRkptVFu58i9X6qYWQI
+         4Z2/oDQ4fU5au6X8BhjlrQgdPhm1qq1mHSiCyaSvkqcm/2LKH2p7G9n2VeFX0Mnuo6mv
+         Yh1jd6Wxu/cv0axv7AXN6ivi7C+TMRCY1CivdP7uXG9iJZT34W9V2ngjC7soHIdiIlSn
+         /Ftw==
+X-Gm-Message-State: AOAM532bcmwmS8M4+q5G73t7zUxpp30dXi2H8aePXhTQz9XrFLz+lUxI
+        6UI15+9dQ30jD5ZNgENA6Kr8mvUreVs+bowktAE=
+X-Google-Smtp-Source: ABdhPJycAKdGxqVdTgt4K/ZWBxjEnIsFvkALFgSKFIvcIl05ZGNF3+Mg0ERw0ZVjEFKMwdA3erW4nGSY9PFqTrBktNs=
+X-Received: by 2002:a1c:4c13:0:b0:389:a4ab:df7c with SMTP id
+ z19-20020a1c4c13000000b00389a4abdf7cmr13223557wmf.14.1647163460342; Sun, 13
+ Mar 2022 01:24:20 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Sender: mrsgracel326@gmail.com
+Received: by 2002:a5d:47cd:0:0:0:0:0 with HTTP; Sun, 13 Mar 2022 01:24:19
+ -0800 (PST)
+From:   Mrs Cornelia Pascal <mrscorneliap@gmail.com>
+Date:   Sun, 13 Mar 2022 01:24:19 -0800
+X-Google-Sender-Auth: -zwEGo_VEy_8UdBACQV5YnJXosM
+Message-ID: <CAB-7u0DkaDPROX5hC8xtY=Gxfa4QbtiyWfnFVNjbBLOwp=PF5Q@mail.gmail.com>
+Subject: Dear Beloved,
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: Yes, score=7.3 required=5.0 tests=ADVANCE_FEE_5_NEW_MONEY,
+        BAYES_50,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        FORM_FRAUD_5,FREEMAIL_ENVFROM_END_DIGIT,FREEMAIL_FROM,
+        HK_NAME_FM_MR_MRS,LOTS_OF_MONEY,MONEY_FORM_SHORT,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_FILL_THIS_FORM_SHORT,T_SCC_BODY_TEXT_LINE,
+        UNDISC_MONEY autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Report: * -0.0 RCVD_IN_DNSWL_NONE RBL: Sender listed at
+        *      https://www.dnswl.org/, no trust
+        *      [2a00:1450:4864:20:0:0:0:334 listed in]
+        [list.dnswl.org]
+        *  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
+        *      [score: 0.5000]
+        *  0.0 FREEMAIL_FROM Sender email is commonly abused enduser mail
+        *      provider
+        *      [mrscorneliap[at]gmail.com]
+        *  0.2 FREEMAIL_ENVFROM_END_DIGIT Envelope-from freemail username ends
+        *       in digit
+        *      [mrsgracel326[at]gmail.com]
+        * -0.0 SPF_PASS SPF: sender matches SPF record
+        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
+        * -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
+        * -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
+        *      author's domain
+        * -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
+        *      envelope-from domain
+        *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
+        *       valid
+        *  0.0 LOTS_OF_MONEY Huge... sums of money
+        * -0.0 T_SCC_BODY_TEXT_LINE No description available.
+        *  0.0 HK_NAME_FM_MR_MRS No description available.
+        *  0.0 T_FILL_THIS_FORM_SHORT Fill in a short form with personal
+        *      information
+        *  0.0 MONEY_FORM_SHORT Lots of money if you fill out a short form
+        *  3.0 ADVANCE_FEE_5_NEW_MONEY Advance Fee fraud and lots of money
+        *  3.5 UNDISC_MONEY Undisclosed recipients + money/fraud signs
+        *  0.0 FORM_FRAUD_5 Fill a form and many fraud phrases
+X-Spam-Level: *******
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2022-03-11 at 03:27 +0000, Sean Christopherson wrote:
-> The main goal of this series is to fix KVM's longstanding bug of not
-> honoring L1's exception intercepts wants when handling an exception that
-> occurs during delivery of a different exception.  E.g. if L0 and L1 are
-> using shadow paging, and L2 hits a #PF, and then hits another #PF while
-> vectoring the first #PF due to _L1_ not having a shadow page for the IDT,
-> KVM needs to check L1's intercepts before morphing the #PF => #PF => #DF
-> so that the #PF is routed to L1, not injected into L2 as a #DF.
-> 
-> nVMX has hacked around the bug for years by overriding the #PF injector
-> for shadow paging to go straight to VM-Exit, and nSVM has started doing
-> the same.  The hacks mostly work, but they're incomplete, confusing, and
-> lead to other hacky code, e.g. bailing from the emulator because #PF
-> injection forced a VM-Exit and suddenly KVM is back in L1.
-> 
-> Everything leading up to that are related fixes and cleanups I encountered
-> along the way; some through code inspection, some through tests (I truly
-> thought this series was finished 10 commits and 3 days ago...).
-> 
-> Nothing in here is all that urgent; all bugs tagged for stable have been
-> around for multiple releases (years in most cases).
-> 
-> Sean Christopherson (21):
->   KVM: x86: Return immediately from x86_emulate_instruction() on code
->     #DB
->   KVM: nVMX: Unconditionally purge queued/injected events on nested
->     "exit"
->   KVM: VMX: Drop bits 31:16 when shoving exception error code into VMCS
->   KVM: x86: Don't check for code breakpoints when emulating on exception
->   KVM: nVMX: Treat General Detect #DB (DR7.GD=1) as fault-like
->   KVM: nVMX: Prioritize TSS T-flag #DBs over Monitor Trap Flag
->   KVM: x86: Treat #DBs from the emulator as fault-like (code and
->     DR7.GD=1)
->   KVM: x86: Use DR7_GD macro instead of open coding check in emulator
->   KVM: nVMX: Ignore SIPI that arrives in L2 when vCPU is not in WFS
->   KVM: nVMX: Unconditionally clear mtf_pending on nested VM-Exit
->   KVM: VMX: Inject #PF on ENCLS as "emulated" #PF
->   KVM: x86: Rename kvm_x86_ops.queue_exception to inject_exception
->   KVM: x86: Make kvm_queued_exception a properly named, visible struct
->   KVM: x86: Formalize blocking of nested pending exceptions
->   KVM: x86: Use kvm_queue_exception_e() to queue #DF
->   KVM: x86: Hoist nested event checks above event injection logic
->   KVM: x86: Evaluate ability to inject SMI/NMI/IRQ after potential
->     VM-Exit
->   KVM: x86: Morph pending exceptions to pending VM-Exits at queue time
->   KVM: VMX: Update MTF and ICEBP comments to document KVM's subtle
->     behavior
->   KVM: selftests: Use uapi header to get VMX and SVM exit reasons/codes
->   KVM: selftests: Add an x86-only test to verify nested exception
->     queueing
-> 
->  arch/x86/include/asm/kvm-x86-ops.h            |   2 +-
->  arch/x86/include/asm/kvm_host.h               |  33 +-
->  arch/x86/kvm/emulate.c                        |   3 +-
->  arch/x86/kvm/svm/nested.c                     | 100 ++---
->  arch/x86/kvm/svm/svm.c                        |  18 +-
->  arch/x86/kvm/vmx/nested.c                     | 322 +++++++++-----
->  arch/x86/kvm/vmx/sgx.c                        |   2 +-
->  arch/x86/kvm/vmx/vmx.c                        |  53 ++-
->  arch/x86/kvm/x86.c                            | 409 ++++++++++++------
->  arch/x86/kvm/x86.h                            |  10 +-
->  tools/testing/selftests/kvm/.gitignore        |   1 +
->  tools/testing/selftests/kvm/Makefile          |   1 +
->  .../selftests/kvm/include/x86_64/svm_util.h   |   5 +-
->  .../selftests/kvm/include/x86_64/vmx.h        |  51 +--
->  .../kvm/x86_64/nested_exceptions_test.c       | 307 +++++++++++++
->  15 files changed, 914 insertions(+), 403 deletions(-)
->  create mode 100644 tools/testing/selftests/kvm/x86_64/nested_exceptions_test.c
-> 
-> 
-> base-commit: 4a204f7895878363ca8211f50ec610408c8c70aa
+Dear Beloved,
 
-I am just curious. Are you aware that I worked on this few months ago?
-I am sure that you even reviewed some of my code back then.
+I am Mrs. Cornelia Pascal. an aging widow suffering from Cancer
+illness  .I have some funds Which I have inherited from my late
+husband, the sum of  ($10.9 Million Dollars) And I needed a very
+honest and sincere Individual  or co-operate organization that will
+use the fund for work of humanity, I found your email address from the
+Human resources data base and decided to contact you.
 
-If so, could you have had at least mentioned this and/or pinged me to continue
-working on this instead of re-implementing it?
+Please if you would be able to use the funds for the work  of humanity
+as I have stated here in order to fulfill my late husband  wishes
+please, kindly reply me back immediately through my private email
+address for more details:  <mrscorneliap@gmail.com>
 
-Best regards,
-	Maxim Levitsky
-
-
+Thanks.
+Regards,
+Mrs.Cornelia Pascal
