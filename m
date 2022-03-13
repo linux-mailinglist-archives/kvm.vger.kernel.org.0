@@ -2,85 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8BB5B4D7586
-	for <lists+kvm@lfdr.de>; Sun, 13 Mar 2022 14:40:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EFCC44D7591
+	for <lists+kvm@lfdr.de>; Sun, 13 Mar 2022 14:54:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234007AbiCMNlb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 13 Mar 2022 09:41:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44344 "EHLO
+        id S234007AbiCMNz2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 13 Mar 2022 09:55:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60436 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232158AbiCMNla (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 13 Mar 2022 09:41:30 -0400
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4F9444778;
-        Sun, 13 Mar 2022 06:40:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1647178822; x=1678714822;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Tx8cXzXDDDYuTIhecej4Hm0R9TtX+lgqF2jmEwnAvdo=;
-  b=k9l/fECybO9UGG57vDLI1+WsJy68CZq5UJq8KiE+nymK9w46XsGcBsWJ
-   T0U8TEQAqc7y9qKjDFjNKVPSF0S8Egk112KtlpyWcLl9b6YfAJvstObgo
-   QQ+IOvq/utu+QJ+JwftEUjzED8DfO8V8O0CPnBN/yOSYgVp7h2Ke2tmqr
-   qFe1hEwCnOGQdmQN9S3CrRQKtopyXAE34wo+itB7v9vhgMtvRv4Y/a9m2
-   UiTyVkRIha0xWy2JCFnckWz97J5/H+UNyf86x2ciHwW6YkBG2q1majzNR
-   FviG2STTzd5dBK9dEAx0H35Ise5/G/xf6lAwi5Qlmtr6r49Nlk2GmStu6
-   Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10284"; a="253429941"
-X-IronPort-AV: E=Sophos;i="5.90,178,1643702400"; 
-   d="scan'208";a="253429941"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2022 06:40:11 -0700
-X-IronPort-AV: E=Sophos;i="5.90,178,1643702400"; 
-   d="scan'208";a="556030492"
-Received: from gao-cwp.sh.intel.com (HELO gao-cwp) ([10.239.159.23])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2022 06:40:05 -0700
-Date:   Sun, 13 Mar 2022 21:53:36 +0800
-From:   Chao Gao <chao.gao@intel.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Zeng Guang <guang.zeng@intel.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jethro Beekman <jethro@fortanix.com>,
-        "Huang, Kai" <kai.huang@intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Hu, Robert" <robert.hu@intel.com>
-Subject: Re: [PATCH v6 6/9] KVM: x86: lapic: don't allow to change APIC ID
- unconditionally
-Message-ID: <20220313135335.GA18405@gao-cwp>
-References: <20220225082223.18288-1-guang.zeng@intel.com>
- <20220225082223.18288-7-guang.zeng@intel.com>
- <Yifg4bea6zYEz1BK@google.com>
- <20220309052013.GA2915@gao-cwp>
- <YihCtvDps/qJ2TOW@google.com>
- <6dc7cff15812864ed14b5c014769488d80ce7f49.camel@redhat.com>
- <YirPkr5efyylrD0x@google.com>
- <29c76393-4884-94a8-f224-08d313b73f71@intel.com>
- <01586c518de0c72ff3997d32654b8fa6e7df257d.camel@redhat.com>
- <2900660d947a878e583ebedf60e7332e74a1af5f.camel@redhat.com>
+        with ESMTP id S229936AbiCMNz1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 13 Mar 2022 09:55:27 -0400
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 863F731207;
+        Sun, 13 Mar 2022 06:54:18 -0700 (PDT)
+Received: by mail-wm1-x32c.google.com with SMTP id bg31-20020a05600c3c9f00b00381590dbb33so8065330wmb.3;
+        Sun, 13 Mar 2022 06:54:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=znNe9soEQ7eI1KS+sUMdfzuE9wnqU0OeB5IQG7hvRYY=;
+        b=qZf1UPVJvCajwApb7Ocv1qNi0lSmWZGZrLOUr96XeDzjHrWkOhpqiesPTR/U6xgEJt
+         dnEjkEiGlno7K5Ivx4D+oVO0ZaIIsSFaGyT6LqKMnSK7hodGvg6XY46Sxq2piV7g7ORa
+         yicRAbSqBhyrjEYd+6BogaO73gMaIP2hoSv6sOvm/Uao6K1vtBd2298Cz5yFLEV4T8VS
+         2dZFYpEGl0Ssei/RHa+9o/emU224trfMdAwwgsFCF7hr3Tp2JNvDIo0OhlvajGZ1CDKZ
+         6ykJ5sW8A9HnBulpU/crQu6bSs9liOCDBWJmMI1Vye8Qpyrfp+hqroWwR1zqP63ww95S
+         FR/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=znNe9soEQ7eI1KS+sUMdfzuE9wnqU0OeB5IQG7hvRYY=;
+        b=xCVXGr8BAesvVDHaHlZg4gX2i1/1niNzqdo6easSinexb1O8Gr0KcOni1GkYp/Vdfx
+         BUR396FJoklFvpaGO5eL93aRh+/EHDZLFM+B/7CdEt+bXIoICop4DnBmpNMzgErmnMir
+         Q8GuXXLmn9CBaImItSKvUtk54dWnVlzI9BYzIsSlQoyZ/DQygDK++H77XfTNIVv4iTNm
+         Agdp7dTIihIeNVyUUGud8LyX53uVhOw/5g+i67gaOkVKa6MvyJb0wiIHCql9+cNicomz
+         xB9/WnWPH/e34X9UlmzTRKPKfc5R1taTwVRJGpWd9rpwg+7EbMxkye+yn+fp5lvMkESk
+         tIDA==
+X-Gm-Message-State: AOAM532gM9/kPx/9Pomk6xTZNWtQOhzMvMx9JBy1APSOoiWuhAX5djZL
+        Tg8b5aX4Cz97MJ1DssMSV5kgVfoIS/E=
+X-Google-Smtp-Source: ABdhPJwllde4zOH9NjS1TpyaoWRnorYljK4DhKcNw5rz/FlWGIMjMdKeaTwoIflxWxDuO4IjiHmCWA==
+X-Received: by 2002:a1c:7c06:0:b0:389:7fd0:f6ec with SMTP id x6-20020a1c7c06000000b003897fd0f6ecmr22019640wmc.44.1647179656967;
+        Sun, 13 Mar 2022 06:54:16 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.googlemail.com with ESMTPSA id p16-20020adff210000000b001f062b80091sm10788010wro.34.2022.03.13.06.54.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 13 Mar 2022 06:54:16 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <d1c7ee86-8093-d04f-747d-aabbc1452801@redhat.com>
+Date:   Sun, 13 Mar 2022 14:54:15 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2900660d947a878e583ebedf60e7332e74a1af5f.camel@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Spam-Status: No, score=-8.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [RFC PATCH v5 005/104] KVM: x86: Refactor KVM VMX module
+ init/exit functions
+Content-Language: en-US
+To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     isaku.yamahata@gmail.com, Jim Mattson <jmattson@google.com>,
+        erdemaktas@google.com, Connor Kuehl <ckuehl@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+References: <cover.1646422845.git.isaku.yamahata@intel.com>
+ <8a8ec76f1700114d739623b2860630eacd277ab6.1646422845.git.isaku.yamahata@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <8a8ec76f1700114d739623b2860630eacd277ab6.1646422845.git.isaku.yamahata@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -88,150 +80,241 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Mar 13, 2022 at 12:59:36PM +0200, Maxim Levitsky wrote:
->On Sun, 2022-03-13 at 11:19 +0200, Maxim Levitsky wrote:
->> On Fri, 2022-03-11 at 21:28 +0800, Zeng Guang wrote:
->> > On 3/11/2022 12:26 PM, Sean Christopherson wrote:
->> > > On Wed, Mar 09, 2022, Maxim Levitsky wrote:
->> > > > On Wed, 2022-03-09 at 06:01 +0000, Sean Christopherson wrote:
->> > > > > > Could you share the links?
->> > > > > 
->> > > > > Doh, sorry (they're both in this one).
->> > > > > 
->> > > > > https://lore.kernel.org/all/20220301135526.136554-5-mlevitsk@redhat.com
->> > > > > 
->> > > > > 
->> > > > 
->> > > > My opinion on this subject is very simple: we need to draw the line somewhere.
->> > > 
->> > > ...
->> > > 
->> > > 
->> > > Since the goal is to simplify KVM, can we try the inhibit route and see what the
->> > > code looks like before making a decision?  I think it might actually yield a less
->> > > awful KVM than the readonly approach, especially if the inhibit is "sticky", i.e.
->> > > we don't try to remove the inhibit on subsequent changes.
->> > > 
->> > > Killing the VM, as proposed, is very user unfriendly as the user will have no idea
->> > > why the VM was killed.  WARN is out of the question because this is user triggerable.
->> > > Returning an emulation error would be ideal, but getting that result up through
->> > > apic_mmio_write() could be annoying and end up being more complex.
->> > > 
->> > > The touchpoints will all be the same, unless I'm missing something the difference
->> > > should only be a call to set an inhibit instead killing the VM.
->> > 
->> > Introduce an inhibition - APICV_INHIBIT_REASON_APICID_CHG to deactivate
->> > APICv once KVM guest would try to change APIC ID in xapic mode, and same
->> > sanity check in KVM_{SET,GET}_LAPIC for live migration. KVM will keep
->> > alive but obviously lose benefit from hardware acceleration in this way.
->> > 
->> > So how do you think the proposal like this ?
->> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
->> > index 6dcccb304775..30d825c069be 100644
->> > --- a/arch/x86/include/asm/kvm_host.h
->> > +++ b/arch/x86/include/asm/kvm_host.h
->> > @@ -1046,6 +1046,7 @@ struct kvm_x86_msr_filter {
->> >  #define APICV_INHIBIT_REASON_X2APIC    5
->> >  #define APICV_INHIBIT_REASON_BLOCKIRQ  6
->> >  #define APICV_INHIBIT_REASON_ABSENT    7
->> > +#define APICV_INHIBIT_REASON_APICID_CHG 8
->> > 
->> >  struct kvm_arch {
->> >         unsigned long n_used_mmu_pages;
->> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
->> > index 22929b5b3f9b..66cd54fa4515 100644
->> > --- a/arch/x86/kvm/lapic.c
->> > +++ b/arch/x86/kvm/lapic.c
->> > @@ -2044,10 +2044,19 @@ static int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
->> > 
->> >         switch (reg) {
->> >         case APIC_ID:           /* Local APIC ID */
->> > -               if (!apic_x2apic_mode(apic))
->> > -                       kvm_apic_set_xapic_id(apic, val >> 24);
->> > -               else
->> > +               if (apic_x2apic_mode(apic)) {
->> >                         ret = 1;
->> > +                       break;
->> > +               }
->> > +               /*
->> > +                * If changing APIC ID with any APIC acceleration enabled,
->> > +                * deactivate APICv to avoid unexpected issues.
->> > +                */
->> > +               if (enable_apicv && (val >> 24) != apic->vcpu->vcpu_id)
->> > +                       kvm_request_apicv_update(apic->vcpu->kvm,
->> > +                               false, APICV_INHIBIT_REASON_APICID_CHG);
->> > +
->> > +               kvm_apic_set_xapic_id(apic, val >> 24);
->> >                 break;
->> > 
->> >         case APIC_TASKPRI:
->> > @@ -2628,11 +2637,19 @@ int kvm_get_apic_interrupt(struct kvm_vcpu *vcpu)
->> >  static int kvm_apic_state_fixup(struct kvm_vcpu *vcpu,
->> >                 struct kvm_lapic_state *s, bool set)
->> >  {
->> > -       if (apic_x2apic_mode(vcpu->arch.apic)) {
->> > -               u32 *id = (u32 *)(s->regs + APIC_ID);
->> > -               u32 *ldr = (u32 *)(s->regs + APIC_LDR);
->> > -               u64 icr;
->> > +       u32 *id = (u32 *)(s->regs + APIC_ID);
->> > +       u32 *ldr = (u32 *)(s->regs + APIC_LDR);
->> > +       u64 icr;
->> > +       if (!apic_x2apic_mode(vcpu->arch.apic)) {
->> > +               /*
->> > +                * If APIC ID changed with any APIC acceleration enabled,
->> > +                * deactivate APICv to avoid unexpected issues.
->> > +                */
->> > +               if (enable_apicv && (*id >> 24) != vcpu->vcpu_id)
->> > +                       kvm_request_apicv_update(vcpu->kvm,
->> > +                               false, APICV_INHIBIT_REASON_APICID_CHG);
->> > +       } else {
->> >                 if (vcpu->kvm->arch.x2apic_format) {
->> >                         if (*id != vcpu->vcpu_id)
->> >                                 return -EINVAL;
->> > diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
->> > index 82d56f8055de..f78754bdc1d0 100644
->> > --- a/arch/x86/kvm/svm/avic.c
->> > +++ b/arch/x86/kvm/svm/avic.c
->> > @@ -931,7 +931,8 @@ bool svm_check_apicv_inhibit_reasons(ulong bit)
->> >                           BIT(APICV_INHIBIT_REASON_IRQWIN) |
->> >                           BIT(APICV_INHIBIT_REASON_PIT_REINJ) |
->> >                           BIT(APICV_INHIBIT_REASON_X2APIC) |
->> > -                         BIT(APICV_INHIBIT_REASON_BLOCKIRQ);
->> > +                         BIT(APICV_INHIBIT_REASON_BLOCKIRQ) |
->> > +                         BIT(APICV_INHIBIT_REASON_APICID_CHG);
->> > 
->> >         return supported & BIT(bit);
->> >  }
->> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
->> > index 7beba7a9f247..91265f0784bd 100644
->> > --- a/arch/x86/kvm/vmx/vmx.c
->> > +++ b/arch/x86/kvm/vmx/vmx.c
->> > @@ -7751,7 +7751,8 @@ static bool vmx_check_apicv_inhibit_reasons(ulong bit)
->> >         ulong supported = BIT(APICV_INHIBIT_REASON_DISABLE) |
->> >                           BIT(APICV_INHIBIT_REASON_ABSENT) |
->> >                           BIT(APICV_INHIBIT_REASON_HYPERV) |
->> > -                         BIT(APICV_INHIBIT_REASON_BLOCKIRQ);
->> > +                         BIT(APICV_INHIBIT_REASON_BLOCKIRQ) |
->> > +                         BIT(APICV_INHIBIT_REASON_APICID_CHG);
->> > 
->> >         return supported & BIT(bit);
->> >  }
->> > 
->> > 
->> > 
->> 
->> This won't work with nested AVIC - we can't just inhibit a nested guest using its own AVIC,
->> because migration happens.
->
->I mean because host decided to change its apic id, which it can in theory do any time,
->even after the nested guest has started. Seriously, the only reason guest has to change apic id,
->is to try to exploit some security hole.
+On 3/4/22 20:48, isaku.yamahata@intel.com wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
+> 
+> Currently, KVM VMX module initialization/exit functions are a single
+> function each.  Refactor KVM VMX module initialization functions into KVM
+> common part and VMX part so that TDX specific part can be added cleanly.
+> Opportunistically refactor module exit function as well.
+> 
+> The current module initialization flow is, 1.) calculate the sizes of VMX
+> kvm structure and VMX vcpu structure, 2.) report those sizes to the KVM
+> common layer and KVM common initialization, and 3.) VMX specific
+> system-wide initialization.
+> 
+> Refactor the KVM VMX module initialization function into functions with a
+> wrapper function to separate VMX logic in vmx.c from a file, main.c, common
+> among VMX and TDX.  We have a wrapper function,
+> "vt_init() {vmx_pre_kvm_init(); kvm_init(); vmx_init(); }" in main.c, and
+> vmx_pre_kvm_init() and vmx_init() in vmx.c.  vmx_pre_kvm_init() calculates
+> the sizes of VMX kvm structure and KVM vcpu structure, kvm_init() does
+> system-wide initialization of the KVM common layer, and vmx_init() does
+> system-wide VMX initialization.
+> 
+> The KVM architecture common layer allocates struct kvm with reported size
+> for architecture-specific code.  The KVM VMX module defines its structure
+> as struct vmx_kvm { struct kvm; VMX specific members;} and uses it as
+> struct vmx kvm.  Similar for vcpu structure. TDX KVM patches will define
+> TDX specific kvm and vcpu structures, add tdx_pre_kvm_init() to report the
+> sizes of them to the KVM common layer.
+> 
+> The current module exit function is also a single function, a combination
+> of VMX specific logic and common KVM logic.  Refactor it into VMX specific
+> logic and KVM common logic.  This is just refactoring to keep the VMX
+> specific logic in vmx.c from main.c.
+> 
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> ---
+>   arch/x86/kvm/vmx/main.c    | 33 +++++++++++++
+>   arch/x86/kvm/vmx/vmx.c     | 97 +++++++++++++++++++-------------------
+>   arch/x86/kvm/vmx/x86_ops.h |  5 +-
+>   3 files changed, 86 insertions(+), 49 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+> index b79fcc8d81dd..8ff13c7881f2 100644
+> --- a/arch/x86/kvm/vmx/main.c
+> +++ b/arch/x86/kvm/vmx/main.c
+> @@ -165,3 +165,36 @@ struct kvm_x86_init_ops vt_init_ops __initdata = {
+>   
+>   	.runtime_ops = &vt_x86_ops,
+>   };
+> +
+> +static int __init vt_init(void)
+> +{
+> +	unsigned int vcpu_size = 0, vcpu_align = 0;
+> +	int r;
+> +
+> +	vmx_pre_kvm_init(&vcpu_size, &vcpu_align);
+> +
+> +	r = kvm_init(&vt_init_ops, vcpu_size, vcpu_align, THIS_MODULE);
+> +	if (r)
+> +		goto err_vmx_post_exit;
+> +
+> +	r = vmx_init();
+> +	if (r)
+> +		goto err_kvm_exit;
+> +
+> +	return 0;
+> +
+> +err_kvm_exit:
+> +	kvm_exit();
+> +err_vmx_post_exit:
+> +	vmx_post_kvm_exit();
+> +	return r;
+> +}
+> +module_init(vt_init);
+> +
+> +static void vt_exit(void)
+> +{
+> +	vmx_exit();
+> +	kvm_exit();
+> +	vmx_post_kvm_exit();
+> +}
+> +module_exit(vt_exit);
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index f6f5d0dac579..7838cd177f0e 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -7929,47 +7929,12 @@ static void vmx_cleanup_l1d_flush(void)
+>   	l1tf_vmx_mitigation = VMENTER_L1D_FLUSH_AUTO;
+>   }
+>   
+> -static void vmx_exit(void)
+> +void __init vmx_pre_kvm_init(unsigned int *vcpu_size, unsigned int *vcpu_align)
+>   {
+> -#ifdef CONFIG_KEXEC_CORE
+> -	RCU_INIT_POINTER(crash_vmclear_loaded_vmcss, NULL);
+> -	synchronize_rcu();
+> -#endif
+> -
+> -	kvm_exit();
+> -
+> -#if IS_ENABLED(CONFIG_HYPERV)
+> -	if (static_branch_unlikely(&enable_evmcs)) {
+> -		int cpu;
+> -		struct hv_vp_assist_page *vp_ap;
+> -		/*
+> -		 * Reset everything to support using non-enlightened VMCS
+> -		 * access later (e.g. when we reload the module with
+> -		 * enlightened_vmcs=0)
+> -		 */
+> -		for_each_online_cpu(cpu) {
+> -			vp_ap =	hv_get_vp_assist_page(cpu);
+> -
+> -			if (!vp_ap)
+> -				continue;
+> -
+> -			vp_ap->nested_control.features.directhypercall = 0;
+> -			vp_ap->current_nested_vmcs = 0;
+> -			vp_ap->enlighten_vmentry = 0;
+> -		}
+> -
+> -		static_branch_disable(&enable_evmcs);
+> -	}
+> -#endif
+> -	vmx_cleanup_l1d_flush();
+> -
+> -	allow_smaller_maxphyaddr = false;
+> -}
+> -module_exit(vmx_exit);
+> -
+> -static int __init vmx_init(void)
+> -{
+> -	int r, cpu;
+> +	if (sizeof(struct vcpu_vmx) > *vcpu_size)
+> +		*vcpu_size = sizeof(struct vcpu_vmx);
+> +	if (__alignof__(struct vcpu_vmx) > *vcpu_align)
+> +		*vcpu_align = __alignof__(struct vcpu_vmx);
 
-Hi
+Please keep these four lines in vt_init, and rename the rest of 
+vmx_pre_kvm_init to hv_vp_assist_page_init.  Likewise, rename 
+vmx_post_kvm_exit to hv_vp_assist_page_exit.
 
-Thanks for the information.  
+Adjusting the vcpu_size and vcpu_align for TDX (I guess) can be added 
+later when TDX ops are introduced.
 
-IIUC, you mean KVM applies APICv inhibition only to L1 VM, leaving APICv
-enabled for L2 VM. Shouldn't KVM disable APICv for L2 VM in this case?
-It looks like a generic issue in dynamically toggling APICv scheme,
-e.g., qemu can set KVM_GUESTDBG_BLOCKIRQ after nested guest has started.
+Paolo
+
+>   
+>   #if IS_ENABLED(CONFIG_HYPERV)
+>   	/*
+> @@ -8004,11 +7969,38 @@ static int __init vmx_init(void)
+>   		enlightened_vmcs = false;
+>   	}
+>   #endif
+> +}
+>   
+> -	r = kvm_init(&vt_init_ops, sizeof(struct vcpu_vmx),
+> -		__alignof__(struct vcpu_vmx), THIS_MODULE);
+> -	if (r)
+> -		return r;
+> +void vmx_post_kvm_exit(void)
+> +{
+> +#if IS_ENABLED(CONFIG_HYPERV)
+> +	if (static_branch_unlikely(&enable_evmcs)) {
+> +		int cpu;
+> +		struct hv_vp_assist_page *vp_ap;
+> +		/*
+> +		 * Reset everything to support using non-enlightened VMCS
+> +		 * access later (e.g. when we reload the module with
+> +		 * enlightened_vmcs=0)
+> +		 */
+> +		for_each_online_cpu(cpu) {
+> +			vp_ap =	hv_get_vp_assist_page(cpu);
+> +
+> +			if (!vp_ap)
+> +				continue;
+> +
+> +			vp_ap->nested_control.features.directhypercall = 0;
+> +			vp_ap->current_nested_vmcs = 0;
+> +			vp_ap->enlighten_vmentry = 0;
+> +		}
+> +
+> +		static_branch_disable(&enable_evmcs);
+> +	}
+> +#endif
+> +}
+> +
+> +int __init vmx_init(void)
+> +{
+> +	int r, cpu;
+>   
+>   	/*
+>   	 * Must be called after kvm_init() so enable_ept is properly set
+> @@ -8018,10 +8010,8 @@ static int __init vmx_init(void)
+>   	 * mitigation mode.
+>   	 */
+>   	r = vmx_setup_l1d_flush(vmentry_l1d_flush_param);
+> -	if (r) {
+> -		vmx_exit();
+> +	if (r)
+>   		return r;
+> -	}
+>   
+>   	for_each_possible_cpu(cpu) {
+>   		INIT_LIST_HEAD(&per_cpu(loaded_vmcss_on_cpu, cpu));
+> @@ -8045,4 +8035,15 @@ static int __init vmx_init(void)
+>   
+>   	return 0;
+>   }
+> -module_init(vmx_init);
+> +
+> +void vmx_exit(void)
+> +{
+> +#ifdef CONFIG_KEXEC_CORE
+> +	RCU_INIT_POINTER(crash_vmclear_loaded_vmcss, NULL);
+> +	synchronize_rcu();
+> +#endif
+> +
+> +	vmx_cleanup_l1d_flush();
+> +
+> +	allow_smaller_maxphyaddr = false;
+> +}
+> diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+> index ccf98e79d8c3..7da541e1c468 100644
+> --- a/arch/x86/kvm/vmx/x86_ops.h
+> +++ b/arch/x86/kvm/vmx/x86_ops.h
+> @@ -8,7 +8,10 @@
+>   
+>   #include "x86.h"
+>   
+> -extern struct kvm_x86_init_ops vt_init_ops __initdata;
+> +void __init vmx_pre_kvm_init(unsigned int *vcpu_size, unsigned int *vcpu_align);
+> +int __init vmx_init(void);
+> +void vmx_exit(void);
+> +void vmx_post_kvm_exit(void);
+>   
+>   __init int vmx_cpu_has_kvm_support(void);
+>   __init int vmx_disabled_by_bios(void);
+
