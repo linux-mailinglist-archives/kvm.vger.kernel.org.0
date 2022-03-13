@@ -2,63 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BBBF94D76B3
-	for <lists+kvm@lfdr.de>; Sun, 13 Mar 2022 17:20:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0095F4D76B5
+	for <lists+kvm@lfdr.de>; Sun, 13 Mar 2022 17:20:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234988AbiCMQWA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 13 Mar 2022 12:22:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52536 "EHLO
+        id S234990AbiCMQWD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 13 Mar 2022 12:22:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52724 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234971AbiCMQV7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 13 Mar 2022 12:21:59 -0400
+        with ESMTP id S233054AbiCMQWC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 13 Mar 2022 12:22:02 -0400
 Received: from mail-wm1-x349.google.com (mail-wm1-x349.google.com [IPv6:2a00:1450:4864:20::349])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16E4B81890
-        for <kvm@vger.kernel.org>; Sun, 13 Mar 2022 09:20:52 -0700 (PDT)
-Received: by mail-wm1-x349.google.com with SMTP id a26-20020a7bc1da000000b003857205ec7cso5785296wmj.2
-        for <kvm@vger.kernel.org>; Sun, 13 Mar 2022 09:20:52 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30AC1818A0
+        for <kvm@vger.kernel.org>; Sun, 13 Mar 2022 09:20:54 -0700 (PDT)
+Received: by mail-wm1-x349.google.com with SMTP id c126-20020a1c3584000000b00380dee8a62cso4586651wma.8
+        for <kvm@vger.kernel.org>; Sun, 13 Mar 2022 09:20:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=SeD4Qzgh/sHfvC8bjBiziK/e63h3+qRRDuOCSxAtRyU=;
-        b=PnyhGUpo0WrgazIr8uDW4N3gs0xJHwKFIZiYrlq9Hc3T9feIf7NQrM/a9nuc+gKFw8
-         vGUCw9bNsPCrfwJ2Y/+raF+mJG09gugnXcsuaQhyZXTCFkafMYfayL3qAzE+mOHgwyHj
-         xc8PaChyGJw/RcwtolTaPvj4B4zCSr6RMKJQk/h2Rde/lHmlqa4RwaqYhn5j58orluzG
-         KKPnHCQ9fIUiePG7+gOM7IwXZ7/BrHygGdtC0fFabVvdWO+hlRRhFeuSgwF2aMzxtJqs
-         TgSOG14klT1oE8Q4NDLZUK/j4qEsOkWS8BzKBJzMoL1b0jEhOoB/uLqCP7LrKk+K3pzK
-         dyJg==
+        bh=EyKnKMlDs3oKW1PMbKGcMuzZIc8VEaJSskTDb0/5zX0=;
+        b=CbZ7vTtpENNJP0oXdYJWb4CWp5AELkdqCNiShpwXzsxrbWRHZyfv+vSoeD7Vv+ixiY
+         GxCqAh9R6DMdx0kGg52ikSWhIogD97XSZiaPSCKdBJSn8WZRQ/h0PUwpoGBA9ly67DJF
+         nuUadNdJ33LdJr/YG9LW8xGdc2LWxrrAHeGBK20jq+krAjqqhKeHLEd/WUEA5wo2kV9E
+         afcaJbTpKHPDPIKDBhRNeSkxyYaJlnmk/7Jk+VV1KsDehrDzyKj7EJkuDGUfjgmzUrrX
+         WeYTEzK7aa2BpxbR44OY3kGsT8GqxndQCWaxTtcS2E4O+cTw+YnoOBm0mUwxmpCdya+i
+         GKEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=SeD4Qzgh/sHfvC8bjBiziK/e63h3+qRRDuOCSxAtRyU=;
-        b=s0dR00H0BKuTXYxDGFUrMTMJLnSiiFw9MpInJfQdoQ1PIggmaoHfoXO/0LX8nxu+IV
-         eUWWSvc6BbAbZpYHNj9QlwnqmOtvoIxnwfAMTseZsObGWK/ZPUEcnzXgddLU6ZPPE2a3
-         q2s7IDkReP5VbaNH79GyemeIUhGN/5MogGN/UM2Cv2AoPnEK1hy4TzG6MYvblw3G/RTA
-         Y5vLHynnpY0as0rsinBwvUW6RFhgK8lVSQfAkEWQGLvF+GU0ubU2RJBk9iF0uyIrcwPh
-         n6bf3izjYNMUhIcq/jfBa22YPKWd7RQZUkmKNPjFBNBoMCiDzAINzvO+e5AwkJiYNqm5
-         Wtcg==
-X-Gm-Message-State: AOAM5317PoY1jHlbNpL08BS1jiMb/zae+DMqZIeppxsa2uQOsIUNnqaz
-        PjkU/ESrXUoa7J2o04qA2AD3SHVZck558T3z1MleLNQzplZgn7BWW+IAwOu7t+8lYKHdLyVQi0N
-        HDuEJlmPKxjjHoFBdSCk+D8vRZKVRuWsUfFsD/MKhZWAJHy3duh0KKZmIgUmupSFTk6k0h7cfsQ
+        bh=EyKnKMlDs3oKW1PMbKGcMuzZIc8VEaJSskTDb0/5zX0=;
+        b=QiOiJt7tsK0ClP3PdfauNiKflahaeWLNi/Gh6fAX4USSSNOY4B2dPgZ409xkeojjo1
+         09CmHThTDlo/o3tjikm+1SWTvlXRStl4rtcjFWZOWbQrDWnxDCdBp0DipRol1kcWENP0
+         OQ49MC8AAl5zxYLDsADJ5P111T/Prh3CAFozYGQYkKs7eoOe35xfWEnwo/OfImJoeq9R
+         bGnSJJRGTGhn9SJ7POCg0/zD37qVTTJHlXZH9b8wyPENHqsYFXxAJkCu0tQBQZ1UTsyT
+         farBuBsLejslAn9hJMyfoZc7KlYmTFqrv6PjpB9NM2YHDYZvRSNYD4u1saNkKHrxt05x
+         R8Fg==
+X-Gm-Message-State: AOAM530U5Q9VXwBtamUejniUz1Ptw6rGXpzQl9Tk4VDj3pK/mrsMBQTm
+        ge7adhYr+2/+mkTU3lOrLrs9JIYuZjcijM3HBvWkBfEtLF7Jc305nuO9oGuBSz1z5Ki4dqAHmyy
+        IEPzHeajMfyZaRBmb7tfbyoq0iAHbBgEFEgUz4q3bFJ22yFVrdf9XpEIGE3MG1Dnp3Q01B3o/JA
         ==
-X-Google-Smtp-Source: ABdhPJzqcbVtACj62ep3LZlqhTo9GesJQnwZ8D/9dKWe+MvvBQWPqLqZQ6BD33SYazsTGRfTx+fE62r7Mddnm08si14=
+X-Google-Smtp-Source: ABdhPJyBEiGRpN93dCyDh2C4GLeSPBWuwzjYaojgpXohF8gpf2N2s1LqtBsKv6g/umkbEDVdD3Sey+M4EDjulfzG46c=
 X-Received: from sene.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:27c4])
- (user=sebastianene job=sendgmr) by 2002:a05:600c:ac5:b0:389:a170:c34 with
- SMTP id c5-20020a05600c0ac500b00389a1700c34mr22917340wmr.100.1647188450683;
- Sun, 13 Mar 2022 09:20:50 -0700 (PDT)
-Date:   Sun, 13 Mar 2022 16:19:48 +0000
+ (user=sebastianene job=sendgmr) by 2002:a5d:5911:0:b0:1f0:3272:2ac9 with SMTP
+ id v17-20020a5d5911000000b001f032722ac9mr13801146wrd.1.1647188452663; Sun, 13
+ Mar 2022 09:20:52 -0700 (PDT)
+Date:   Sun, 13 Mar 2022 16:19:49 +0000
 In-Reply-To: <20220313161949.3565171-1-sebastianene@google.com>
-Message-Id: <20220313161949.3565171-2-sebastianene@google.com>
+Message-Id: <20220313161949.3565171-3-sebastianene@google.com>
 Mime-Version: 1.0
 References: <20220313161949.3565171-1-sebastianene@google.com>
 X-Mailer: git-send-email 2.35.1.723.g4982287a31-goog
-Subject: [PATCH kvmtool v11 1/3] aarch64: Populate the vCPU struct before target->init()
+Subject: [PATCH kvmtool v11 2/3] aarch64: Add stolen time support
 From:   Sebastian Ene <sebastianene@google.com>
 To:     kvm@vger.kernel.org
 Cc:     qperret@google.com, maz@kernel.org, kvmarm@lists.cs.columbia.edu,
         will@kernel.org, julien.thierry.kdev@gmail.com,
-        Sebastian Ene <sebastianene@google.com>
+        Sebastian Ene <sebastianene@google.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -70,49 +71,230 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Move the vCPU structure initialisation before the target->init() call to
- keep a reference to the kvm structure during init().
-This is required by the pvtime peripheral to reserve a memory region
-while the vCPU is beeing initialised.
+This patch adds support for stolen time by sharing a memory region
+with the guest which will be used by the hypervisor to store the stolen
+time information. Reserve a 64kb MMIO memory region after the RTC peripheral
+to be used by pvtime. The exact format of the structure stored by the
+hypervisor is described in the ARM DEN0057A document.
 
-Reviewed-by: Marc Zyngier <maz@kernel.org>
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
 Signed-off-by: Sebastian Ene <sebastianene@google.com>
 ---
- arm/kvm-cpu.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ Makefile                               |  1 +
+ arm/aarch32/include/kvm/kvm-cpu-arch.h |  5 ++
+ arm/aarch64/arm-cpu.c                  |  2 +-
+ arm/aarch64/include/kvm/kvm-cpu-arch.h |  2 +
+ arm/aarch64/pvtime.c                   | 98 ++++++++++++++++++++++++++
+ arm/include/arm-common/kvm-arch.h      |  6 +-
+ arm/kvm-cpu.c                          |  1 +
+ include/kvm/kvm-config.h               |  1 +
+ 8 files changed, 114 insertions(+), 2 deletions(-)
+ create mode 100644 arm/aarch64/pvtime.c
 
+diff --git a/Makefile b/Makefile
+index f251147..e9121dc 100644
+--- a/Makefile
++++ b/Makefile
+@@ -182,6 +182,7 @@ ifeq ($(ARCH), arm64)
+ 	OBJS		+= arm/aarch64/arm-cpu.o
+ 	OBJS		+= arm/aarch64/kvm-cpu.o
+ 	OBJS		+= arm/aarch64/kvm.o
++	OBJS		+= arm/aarch64/pvtime.o
+ 	ARCH_INCLUDE	:= $(HDRS_ARM_COMMON)
+ 	ARCH_INCLUDE	+= -Iarm/aarch64/include
+ 
+diff --git a/arm/aarch32/include/kvm/kvm-cpu-arch.h b/arm/aarch32/include/kvm/kvm-cpu-arch.h
+index 780e0e2..6fe0206 100644
+--- a/arm/aarch32/include/kvm/kvm-cpu-arch.h
++++ b/arm/aarch32/include/kvm/kvm-cpu-arch.h
+@@ -20,4 +20,9 @@ static inline int kvm_cpu__configure_features(struct kvm_cpu *vcpu)
+ 	return 0;
+ }
+ 
++static inline int kvm_cpu__teardown_pvtime(struct kvm *kvm)
++{
++	return 0;
++}
++
+ #endif /* KVM__KVM_CPU_ARCH_H */
+diff --git a/arm/aarch64/arm-cpu.c b/arm/aarch64/arm-cpu.c
+index d7572b7..7e4a3c1 100644
+--- a/arm/aarch64/arm-cpu.c
++++ b/arm/aarch64/arm-cpu.c
+@@ -22,7 +22,7 @@ static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
+ static int arm_cpu__vcpu_init(struct kvm_cpu *vcpu)
+ {
+ 	vcpu->generate_fdt_nodes = generate_fdt_nodes;
+-	return 0;
++	return kvm_cpu__setup_pvtime(vcpu);
+ }
+ 
+ static struct kvm_arm_target target_generic_v8 = {
+diff --git a/arm/aarch64/include/kvm/kvm-cpu-arch.h b/arm/aarch64/include/kvm/kvm-cpu-arch.h
+index 8dfb82e..35996dc 100644
+--- a/arm/aarch64/include/kvm/kvm-cpu-arch.h
++++ b/arm/aarch64/include/kvm/kvm-cpu-arch.h
+@@ -19,5 +19,7 @@
+ 
+ void kvm_cpu__select_features(struct kvm *kvm, struct kvm_vcpu_init *init);
+ int kvm_cpu__configure_features(struct kvm_cpu *vcpu);
++int kvm_cpu__setup_pvtime(struct kvm_cpu *vcpu);
++int kvm_cpu__teardown_pvtime(struct kvm *kvm);
+ 
+ #endif /* KVM__KVM_CPU_ARCH_H */
+diff --git a/arm/aarch64/pvtime.c b/arm/aarch64/pvtime.c
+new file mode 100644
+index 0000000..2f5774e
+--- /dev/null
++++ b/arm/aarch64/pvtime.c
+@@ -0,0 +1,98 @@
++#include "kvm/kvm.h"
++#include "kvm/kvm-cpu.h"
++#include "kvm/util.h"
++
++#include <linux/byteorder.h>
++#include <linux/types.h>
++
++#define ARM_PVTIME_STRUCT_SIZE		(64)
++
++static void *usr_mem;
++
++static int pvtime__alloc_region(struct kvm *kvm)
++{
++	char *mem;
++	int ret = 0;
++
++	mem = mmap(NULL, ARM_PVTIME_BASE, PROT_RW,
++		   MAP_ANON_NORESERVE, -1, 0);
++	if (mem == MAP_FAILED)
++		return -errno;
++
++	ret = kvm__register_ram(kvm, ARM_PVTIME_BASE,
++				ARM_PVTIME_BASE, mem);
++	if (ret) {
++		munmap(mem, ARM_PVTIME_BASE);
++		return ret;
++	}
++
++	usr_mem = mem;
++	return ret;
++}
++
++static int pvtime__teardown_region(struct kvm *kvm)
++{
++	if (usr_mem == NULL)
++		return 0;
++
++	kvm__destroy_mem(kvm, ARM_PVTIME_BASE,
++			 ARM_PVTIME_BASE, usr_mem);
++	munmap(usr_mem, ARM_PVTIME_BASE);
++	usr_mem = NULL;
++	return 0;
++}
++
++int kvm_cpu__setup_pvtime(struct kvm_cpu *vcpu)
++{
++	int ret;
++	bool has_stolen_time;
++	u64 pvtime_guest_addr = ARM_PVTIME_BASE + vcpu->cpu_id *
++		ARM_PVTIME_STRUCT_SIZE;
++	struct kvm_config *kvm_cfg = NULL;
++	struct kvm_device_attr pvtime_attr = (struct kvm_device_attr) {
++		.group	= KVM_ARM_VCPU_PVTIME_CTRL,
++		.attr	= KVM_ARM_VCPU_PVTIME_IPA
++	};
++
++	kvm_cfg = &vcpu->kvm->cfg;
++	if (kvm_cfg->no_pvtime)
++		return 0;
++
++	has_stolen_time = kvm__supports_extension(vcpu->kvm,
++						  KVM_CAP_STEAL_TIME);
++	if (!has_stolen_time) {
++		kvm_cfg->no_pvtime = true;
++		return 0;
++	}
++
++	ret = ioctl(vcpu->vcpu_fd, KVM_HAS_DEVICE_ATTR, &pvtime_attr);
++	if (ret) {
++		ret = -errno;
++		perror("KVM_HAS_DEVICE_ATTR failed\n");
++		goto out_err;
++	}
++
++	if (!usr_mem) {
++		ret = pvtime__alloc_region(vcpu->kvm);
++		if (ret) {
++			perror("Failed allocating pvtime region\n");
++			goto out_err;
++		}
++	}
++
++	pvtime_attr.addr = (u64)&pvtime_guest_addr;
++	ret = ioctl(vcpu->vcpu_fd, KVM_SET_DEVICE_ATTR, &pvtime_attr);
++	if (!ret)
++		return 0;
++
++	ret = -errno;
++	perror("KVM_SET_DEVICE_ATTR failed\n");
++	pvtime__teardown_region(vcpu->kvm);
++out_err:
++	return ret;
++}
++
++int kvm_cpu__teardown_pvtime(struct kvm *kvm)
++{
++	return pvtime__teardown_region(kvm);
++}
+diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
+index c645ac0..43b1f77 100644
+--- a/arm/include/arm-common/kvm-arch.h
++++ b/arm/include/arm-common/kvm-arch.h
+@@ -15,7 +15,8 @@
+  * |  PCI  |////| plat  |       |        |     |         |
+  * |  I/O  |////| MMIO: | Flash | virtio | GIC |   PCI   |  DRAM
+  * | space |////| UART, |       |  MMIO  |     |  (AXI)  |
+- * |       |////| RTC   |       |        |     |         |
++ * |       |////| RTC,  |       |        |     |         |
++ * |       |////| PVTIME|       |        |     |         |
+  * +-------+----+-------+-------+--------+-----+---------+---......
+  */
+ 
+@@ -34,6 +35,9 @@
+ #define ARM_RTC_MMIO_BASE	(ARM_UART_MMIO_BASE + ARM_UART_MMIO_SIZE)
+ #define ARM_RTC_MMIO_SIZE	0x10000
+ 
++#define ARM_PVTIME_BASE		(ARM_RTC_MMIO_BASE + ARM_RTC_MMIO_SIZE)
++#define ARM_PVTIME_SIZE		SZ_64K
++
+ #define KVM_FLASH_MMIO_BASE	(ARM_MMIO_AREA + 0x1000000)
+ #define KVM_FLASH_MAX_SIZE	0x1000000
+ 
 diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
-index 6a2408c..84ac1e9 100644
+index 84ac1e9..00660d6 100644
 --- a/arm/kvm-cpu.c
 +++ b/arm/kvm-cpu.c
-@@ -116,6 +116,13 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
- 			die("Unable to find matching target");
- 	}
+@@ -144,6 +144,7 @@ void kvm_cpu__arch_nmi(struct kvm_cpu *cpu)
  
-+	/* Populate the vcpu structure. */
-+	vcpu->kvm		= kvm;
-+	vcpu->cpu_id		= cpu_id;
-+	vcpu->cpu_type		= vcpu_init.target;
-+	vcpu->cpu_compatible	= target->compatible;
-+	vcpu->is_running	= true;
-+
- 	if (err || target->init(vcpu))
- 		die("Unable to initialise vcpu");
+ void kvm_cpu__delete(struct kvm_cpu *vcpu)
+ {
++	kvm_cpu__teardown_pvtime(vcpu->kvm);
+ 	free(vcpu);
+ }
  
-@@ -125,13 +132,6 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
- 		vcpu->ring = (void *)vcpu->kvm_run +
- 			     (coalesced_offset * PAGE_SIZE);
+diff --git a/include/kvm/kvm-config.h b/include/kvm/kvm-config.h
+index 6a5720c..48adf27 100644
+--- a/include/kvm/kvm-config.h
++++ b/include/kvm/kvm-config.h
+@@ -62,6 +62,7 @@ struct kvm_config {
+ 	bool no_dhcp;
+ 	bool ioport_debug;
+ 	bool mmio_debug;
++	bool no_pvtime;
+ };
  
--	/* Populate the vcpu structure. */
--	vcpu->kvm		= kvm;
--	vcpu->cpu_id		= cpu_id;
--	vcpu->cpu_type		= vcpu_init.target;
--	vcpu->cpu_compatible	= target->compatible;
--	vcpu->is_running	= true;
--
- 	if (kvm_cpu__configure_features(vcpu))
- 		die("Unable to configure requested vcpu features");
- 
+ #endif
 -- 
 2.35.1.723.g4982287a31-goog
 
