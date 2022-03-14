@@ -2,307 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 16C344D7FF0
-	for <lists+kvm@lfdr.de>; Mon, 14 Mar 2022 11:34:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 494644D805C
+	for <lists+kvm@lfdr.de>; Mon, 14 Mar 2022 12:07:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238593AbiCNKf4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Mar 2022 06:35:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45958 "EHLO
+        id S238036AbiCNLIQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Mar 2022 07:08:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238098AbiCNKfz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Mar 2022 06:35:55 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01818275E8;
-        Mon, 14 Mar 2022 03:34:45 -0700 (PDT)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22E8WI8V019284;
-        Mon, 14 Mar 2022 10:34:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=Tcfu5MGNXQLmRhnrj0ViqZIGQnW9H+Y9XMCycdN66p8=;
- b=Lok6JcLV7jzIygsZTzVxR7v+fxx22TRitvLbwH+lFEBI9xOD4Rc8N29jbv5n5PnGBvHr
- pIrdDqWL2WxVj4EiWRW/seVNpwmkiBR5BmgV5ikQwT0H1jT0SdJAJ69MhdTSgcSnj7If
- 1LC3amBEXpYCqtdm9yS8tC4TPih8A75t6UutHtfxLOn6w9JMQPfOSesbhK95m3vctpOu
- fJaKThLHyIq5CRf8tj8IR0xg6Jjk0xmvCYk08lWObQkgW3EinJKwULIw+B/AMN0k5USO
- iGJtqYkrLSC8DV08jtaiBsu1j/30tW7klhbIkuxhZlKWShHusTF07nH38Jb90OUh8sm/ Ig== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3es53qqjeq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 14 Mar 2022 10:34:45 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22EAQGq0017601;
-        Mon, 14 Mar 2022 10:34:45 GMT
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3es53qqje4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 14 Mar 2022 10:34:44 +0000
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22EAX7hn012923;
-        Mon, 14 Mar 2022 10:34:42 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma06fra.de.ibm.com with ESMTP id 3erjshkcf7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 14 Mar 2022 10:34:42 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22EAYcGM55378338
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 14 Mar 2022 10:34:39 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D499CA4846;
-        Mon, 14 Mar 2022 10:34:38 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9C585A4844;
-        Mon, 14 Mar 2022 10:34:38 +0000 (GMT)
-Received: from [9.145.181.26] (unknown [9.145.181.26])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 14 Mar 2022 10:34:38 +0000 (GMT)
-Message-ID: <0cb6bfd9-10c7-a9ec-6473-bb25c37fb91c@linux.ibm.com>
-Date:   Mon, 14 Mar 2022 11:34:38 +0100
+        with ESMTP id S231660AbiCNLIO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Mar 2022 07:08:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 56D8C47ACD
+        for <kvm@vger.kernel.org>; Mon, 14 Mar 2022 04:07:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1647256023;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=BLRs68CPmtcOOmJUEUtuz0QjAh+LK/7FJhncH6x/EEo=;
+        b=Yjdeum6tofEFIr369Ht4TQAXUBeRO14UkhtfK76AHcnywvcBLzxZ6thmqtPltGwKxFL6N7
+        uX/kT84qvgstCttDRyHwP/IZiFwAXGX5YPZfzao4s4ybrXjtymDaS+P4UFM5vJbZQrM5aj
+        18aMc2Ahbu71zq9C+8sb7m76Afic/t8=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-332-XXWd30KjPuuitN9HEWXHrA-1; Mon, 14 Mar 2022 07:06:57 -0400
+X-MC-Unique: XXWd30KjPuuitN9HEWXHrA-1
+Received: by mail-wm1-f71.google.com with SMTP id v184-20020a1cacc1000000b0038a12dbc23bso483635wme.5
+        for <kvm@vger.kernel.org>; Mon, 14 Mar 2022 04:06:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=BLRs68CPmtcOOmJUEUtuz0QjAh+LK/7FJhncH6x/EEo=;
+        b=V0N519XC/4mI0Ey8beHtRAvoiI98W1BKZ7RQNIF6+xKyvCIxEk7svZo/97hPbLG0Ua
+         nLAHH3TNbYBJxBeVRx6T4bHJPzezp/OBoWCIFaqZXnV0ZvEqS7LDWkVFLGXidZtDy70G
+         N7OeAkNLqS3CdChRem45X98PxwolBlJEj1gwFH0Z+lsaQgwipzQXNlBMrWCt5kfakAFy
+         D5BEqN4LhGcVS4Me3EL9kcQQy2FNfyOvu34EoZndE/yn/f52VatT3/ZGBgHKc9EPIVBJ
+         g3Rmte5IYyqGXPGZmKDYr8QgYl5j9B4ZQmHSyvUPf5lnq+DVof6ee8p2TdNCBmXKrdg9
+         T93g==
+X-Gm-Message-State: AOAM5326PMufxihXw5C8HmFRjwr5VHHDQPtqjIj5jHIkLlzsVma0W0tO
+        AdIiHDuO04tMlCwlVpYDiekAj4mjmDe7Gg6tm6b/Bhi9UfBQZJQk49/nyUkhEjSWbVYOTLSatWL
+        EeyFejngXAhuu
+X-Received: by 2002:adf:9d88:0:b0:1fd:872a:3a0a with SMTP id p8-20020adf9d88000000b001fd872a3a0amr15620424wre.579.1647256016150;
+        Mon, 14 Mar 2022 04:06:56 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwDX2/Els7mxEyTxNLaQi6KS3CEEUZl7kN4Gi+HlG0m0rhAIBD9QQawS/L0DgWyElEpRqGYyw==
+X-Received: by 2002:adf:9d88:0:b0:1fd:872a:3a0a with SMTP id p8-20020adf9d88000000b001fd872a3a0amr15620397wre.579.1647256015917;
+        Mon, 14 Mar 2022 04:06:55 -0700 (PDT)
+Received: from gator (cst2-173-70.cust.vodafone.cz. [31.30.173.70])
+        by smtp.gmail.com with ESMTPSA id t184-20020a1c46c1000000b003814de297fcsm17674129wma.16.2022.03.14.04.06.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Mar 2022 04:06:55 -0700 (PDT)
+Date:   Mon, 14 Mar 2022 12:06:53 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        Oliver Upton <oupton@google.com>
+Subject: Re: [RFC PATCH 000/105] KVM: selftests: Overhaul APIs, purge VCPU_ID
+Message-ID: <20220314110653.a46vy5hqegt75wpb@gator>
+References: <20220311055056.57265-1-seanjc@google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH v2 3/9] KVM: s390: pv: Add query interface
-Content-Language: en-US
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com,
-        borntraeger@linux.ibm.com
-References: <20220310103112.2156-1-frankja@linux.ibm.com>
- <20220310103112.2156-4-frankja@linux.ibm.com>
- <20220311184059.25161d62@p-imbrenda>
- <0a39b94c-db5e-a8cc-b84b-ae17559f1091@linux.ibm.com>
- <20220314111718.2509a093@p-imbrenda>
-From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <20220314111718.2509a093@p-imbrenda>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 7I0TMGbqGJkJV_-8ZZFlm04PVD4ksm6B
-X-Proofpoint-ORIG-GUID: ArTNi7yB5QMbTpt5LtJ6pdbwA_9UyIn4
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-03-14_04,2022-03-14_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 bulkscore=0
- phishscore=0 lowpriorityscore=0 malwarescore=0 spamscore=0 mlxlogscore=999
- priorityscore=1501 suspectscore=0 adultscore=0 impostorscore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
- definitions=main-2203140065
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220311055056.57265-1-seanjc@google.com>
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/14/22 11:17, Claudio Imbrenda wrote:
-> On Mon, 14 Mar 2022 11:02:40 +0100
-> Janosch Frank <frankja@linux.ibm.com> wrote:
+On Fri, Mar 11, 2022 at 05:49:11AM +0000, Sean Christopherson wrote:
+> First off, hopefully I didn't just spam you with 106 emails.  In theory,
+> unless you're subscribed to LKML, you should see only the cover letter
+> and everything else should be on lore if you want to pull down the mbox
+> (instead of saying "LOL, 105 patches!?!?", or maybe after you say that).
 > 
->> On 3/11/22 18:40, Claudio Imbrenda wrote:
->>> On Thu, 10 Mar 2022 10:31:06 +0000
->>> Janosch Frank <frankja@linux.ibm.com> wrote:
->>>    
->>>> Some of the query information is already available via sysfs but
->>>> having a IOCTL makes the information easier to retrieve.
->>>
->>> if I understand correctly, this will be forward-compatible but not
->>> backwards compatible.
->>>
->>> you return the amount of bytes written into the buffer, but only if the
->>> buffer was already big enough.
->>>
->>> a newer userspace will work with an older kernel, but an older
->>> userspace will not work with a newer kernel.
->>
->> I expect the first version of userspace to request a minimum length
->> hence I return -EINVAL if less space is given.
+> This is a (very) early RFC for overhauling KVM's selftests APIs.  It's
+> compile tested only (maybe), there are no changelogs, etc...
 > 
-> this makes sense
+> My end goal with an overhaul is to get to a state where adding new
+> features and writing tests is less painful/disgusting (I feel dirty every
+> time I copy+paste VCPU_ID).  I opted to directly send only the cover
+> letter because most of the individual patches aren't all that interesting,
+> there's still 46 patches even if the per-test conversions are omitted, and
+> it's the final state that I really care about and want to discuss.
 > 
->>
->> In the future the minimum will be a constant and we'll write between the
->> min and the new data length.
-> 
-> fair enough, but this means that future patches must be careful and not
-> forget this.
+> The overarching theme of my take on where to go with selftests is to stop
+> treating tests like second class citizens.  Stop hiding vcpu, kvm_vm, etc...
+> There's no sensitive data/constructs, and the encapsulation has led to
+> really, really bad and difficult to maintain code.  E.g. Want to call a
+> vCPU ioctl()?  Hope you have the VM...
 
-Sure, I'll find a way to make this clearer.
+Ack to dropping the privateness of structs.
 
 > 
-> it's probably easier to read, and more future proof, if you put a check
-> for the minimum size (and perhaps also a comment to explain why), and
-> not use sizeof(struct ...)
+> The other theme in the rework is to deduplicate code and try to set us
+> up for success in the future.  E.g. provide macros/helpers instead of
+> spamming CTRL-C => CTRL-V (see the -700 LoC).
+
+Ack to more helper functions. I'm not sure what the best way to document
+or provide examples for the API is though. Currently we mostly rely on
+test writers to read other tests (I suppose the function headers help a
+bit, but, IMO, not much). Maybe we need a heavily commented example.c
+that can help test writers get started, along with better API function
+descriptions for anything exported from the lib.
+
 > 
->>
->> IMHO there's no sense in allowing to request less data than the v1 of
->> the interface will provide.
-> 
-> of course
-> 
->>
->>
->>>
->>> a solution would be to return the size of the struct, so userspace can
->>> know how much of the buffer was written (if it was bigger than the
->>> struct), or that there are unwritten bits (if the buffer was smaller).
->>>
->>> and even if the buffer was too small, write back as much of it as
->>> possible to userspace.
->>>
->>> this way, an older userspace will get the information it expects.
->>>
->>>
->>> I am also not a big fan of writing the size in the input struct (I think
->>> returning it would be cleaner), but I do not have a strong opinion
->>>    
->>>>
->>>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->>>> ---
->>>>    arch/s390/kvm/kvm-s390.c | 76 ++++++++++++++++++++++++++++++++++++++++
->>>>    include/uapi/linux/kvm.h | 25 +++++++++++++
->>>>    2 files changed, 101 insertions(+)
->>>>
->>>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
->>>> index 020356653d1a..67e1e445681f 100644
->>>> --- a/arch/s390/kvm/kvm-s390.c
->>>> +++ b/arch/s390/kvm/kvm-s390.c
->>>> @@ -2224,6 +2224,42 @@ static int kvm_s390_cpus_to_pv(struct kvm *kvm, u16 *rc, u16 *rrc)
->>>>    	return r;
->>>>    }
->>>>    
->>>> +/*
->>>> + * Here we provide user space with a direct interface to query UV
->>>> + * related data like UV maxima and available features as well as
->>>> + * feature specific data.
->>>> + *
->>>> + * To facilitate future extension of the data structures we'll try to
->>>> + * write data up to the maximum requested length.
->>>> + */
->>>> +static ssize_t kvm_s390_handle_pv_info(struct kvm_s390_pv_info *info)
->>>> +{
->>>> +	ssize_t len;
->>>> +
->>>> +	switch (info->header.id) {
->>>> +	case KVM_PV_INFO_VM: {
->>>> +		len =  sizeof(info->header) + sizeof(info->vm);
->>>> +
->>>> +		if (info->header.len_max < len)
->>>> +			return -EINVAL;
->>>> +
->>>> +		memcpy(info->vm.inst_calls_list,
->>>> +		       uv_info.inst_calls_list,
->>>> +		       sizeof(uv_info.inst_calls_list));
->>>> +
->>>> +		/* It's max cpuidm not max cpus so it's off by one */
->>>> +		info->vm.max_cpus = uv_info.max_guest_cpu_id + 1;
->>>> +		info->vm.max_guests = uv_info.max_num_sec_conf;
->>>> +		info->vm.max_guest_addr = uv_info.max_sec_stor_addr;
->>>> +		info->vm.feature_indication = uv_info.uv_feature_indications;
->>>> +
->>>> +		return len;
->>>> +	}
->>>> +	default:
->>>> +		return -EINVAL;
->>>> +	}
->>>> +}
->>>> +
->>>>    static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
->>>>    {
->>>>    	int r = 0;
->>>> @@ -2360,6 +2396,46 @@ static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
->>>>    			     cmd->rc, cmd->rrc);
->>>>    		break;
->>>>    	}
->>>> +	case KVM_PV_INFO: {
->>>> +		struct kvm_s390_pv_info info = {};
->>>> +		ssize_t data_len;
->>>> +
->>>> +		/*
->>>> +		 * No need to check the VM protection here.
->>>> +		 *
->>>> +		 * Maybe user space wants to query some of the data
->>>> +		 * when the VM is still unprotected. If we see the
->>>> +		 * need to fence a new data command we can still
->>>> +		 * return an error in the info handler.
->>>> +		 */
->>>> +
->>>> +		r = -EFAULT;
->>>> +		if (copy_from_user(&info, argp, sizeof(info.header)))
->>>> +			break;
->>>> +
->>>> +		r = -EINVAL;
->>>> +		if (info.header.len_max < sizeof(info.header))
->>>> +			break;
->>>> +
->>>> +		data_len = kvm_s390_handle_pv_info(&info);
->>>> +		if (data_len < 0) {
->>>> +			r = data_len;
->>>> +			break;
->>>> +		}
->>>> +		/*
->>>> +		 * If a data command struct is extended (multiple
->>>> +		 * times) this can be used to determine how much of it
->>>> +		 * is valid.
->>>> +		 */
->>>> +		info.header.len_written = data_len;
->>>> +
->>>> +		r = -EFAULT;
->>>> +		if (copy_to_user(argp, &info, data_len))
->>>> +			break;
->>>> +
->>>> +		r = 0;
->>>> +		break;
->>>> +	}
->>>>    	default:
->>>>    		r = -ENOTTY;
->>>>    	}
->>>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
->>>> index a02bbf8fd0f6..21f19863c417 100644
->>>> --- a/include/uapi/linux/kvm.h
->>>> +++ b/include/uapi/linux/kvm.h
->>>> @@ -1643,6 +1643,30 @@ struct kvm_s390_pv_unp {
->>>>    	__u64 tweak;
->>>>    };
->>>>    
->>>> +enum pv_cmd_info_id {
->>>> +	KVM_PV_INFO_VM,
->>>> +};
->>>> +
->>>> +struct kvm_s390_pv_info_vm {
->>>> +	__u64 inst_calls_list[4];
->>>> +	__u64 max_cpus;
->>>> +	__u64 max_guests;
->>>> +	__u64 max_guest_addr;
->>>> +	__u64 feature_indication;
->>>> +};
->>>> +
->>>> +struct kvm_s390_pv_info_header {
->>>> +	__u32 id;
->>>> +	__u32 len_max;
->>>> +	__u32 len_written;
->>>> +	__u32 reserved;
->>>> +};
->>>> +
->>>> +struct kvm_s390_pv_info {
->>>> +	struct kvm_s390_pv_info_header header;
->>>> +	struct kvm_s390_pv_info_vm vm;
->>>> +};
->>>> +
->>>>    enum pv_cmd_id {
->>>>    	KVM_PV_ENABLE,
->>>>    	KVM_PV_DISABLE,
->>>> @@ -1651,6 +1675,7 @@ enum pv_cmd_id {
->>>>    	KVM_PV_VERIFY,
->>>>    	KVM_PV_PREP_RESET,
->>>>    	KVM_PV_UNSHARE_ALL,
->>>> +	KVM_PV_INFO,
->>>>    };
->>>>    
->>>>    struct kvm_pv_cmd {
->>>    
->>
-> 
+> I was hoping to get this into a less shabby state before posting, but I'm
+> I'm going to be OOO for the next few weeks and want to get the ball rolling
+> instead of waiting another month or so.
+
+Ideas look good to me, but I'll wait for the cleaned up series posted to
+the KVM ML to review it. Also, I see at least patch 1/105 is a fix. It'd
+be nice to post all fixes separately so they get in sooner than later.
+
+Oh, some of the renaming doesn't look all that important to me, like
+prefixing with kvm_ or adding _arch_, but I don't have strong preferences
+on the names. Also, for the _arch_ functions it'd be nice to create
+common, weak functions which the arch must override. The common function
+would just assert. That should help people who want to port to other
+architectures determine what they need to implement first. And, for
+anything which an arch can optionally adopt a common implementation,
+*not* naming the common function with _arch_, but still defining it as
+weak, would make sense to me too.
+
+Thanks,
+drew
 
