@@ -2,246 +2,224 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D2D9C4D8CAB
-	for <lists+kvm@lfdr.de>; Mon, 14 Mar 2022 20:45:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 53D4B4D8DE7
+	for <lists+kvm@lfdr.de>; Mon, 14 Mar 2022 21:09:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244184AbiCNTqn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Mar 2022 15:46:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45928 "EHLO
+        id S243568AbiCNULF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Mar 2022 16:11:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53258 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244199AbiCNTqk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Mar 2022 15:46:40 -0400
-Received: from mail-il1-x12c.google.com (mail-il1-x12c.google.com [IPv6:2607:f8b0:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BA993DA79
-        for <kvm@vger.kernel.org>; Mon, 14 Mar 2022 12:45:29 -0700 (PDT)
-Received: by mail-il1-x12c.google.com with SMTP id h21so3893363ila.7
-        for <kvm@vger.kernel.org>; Mon, 14 Mar 2022 12:45:29 -0700 (PDT)
+        with ESMTP id S243995AbiCNULE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Mar 2022 16:11:04 -0400
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD22713D0C
+        for <kvm@vger.kernel.org>; Mon, 14 Mar 2022 13:09:52 -0700 (PDT)
+Received: by mail-ed1-x52f.google.com with SMTP id g20so21505954edw.6
+        for <kvm@vger.kernel.org>; Mon, 14 Mar 2022 13:09:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=BWFI5h416BXkQSSoLp6it0M+QIIpZiht4kihVcXhZts=;
-        b=VZ2cAUX8Ar0g9XwlSwMUsAJFJ+x9WoBP8ZUB6v4eL265wgG+R7Yg+AHG6eBB9s36q+
-         acas52nuQwIOC2kAnffOOIPVbaZ9CsbEUqvZ9ubN/y27tiGvuGx7f55KXJCuPs5g4L0B
-         Zvb0HwQblFcZjAHSFwulEWa84Nh7s+o1qSje5u9ZWBlI29Mxdd/h0T5AVmH3Ip/J/cEy
-         Xo+rB9DWuAhQkC1vuQA0G75aFWpioKs+9NpJ380LPswDKkyS1ZPp/ovsKyUcA4nK5OHs
-         6A0Q1xlpuoF+4ZuF3LvkEBES9Z4bFPvPSacHgcHRgM4y8kaKq1fjZcfltW/52aCw2zLF
-         tzDA==
+        d=linaro.org; s=google;
+        h=references:user-agent:from:to:cc:subject:date:in-reply-to
+         :message-id:mime-version:content-transfer-encoding;
+        bh=TyjIR8cu39wafofM+zk55pMOkvXNU/TH+17qM8XX/mo=;
+        b=bXMVXacOlW6oQtjRy6EEwOPK02lVKTTyd6/63WJ9myEU1O9NELNBNQFwJwnU1Q+IV4
+         a78TJqmzB0yQV61DcsiteBFtBrYAxi4UyScHw46RQ01k7cch+G5Ewh1QQePtNuyWlHgn
+         vzFykmfP7UPG0DGfUPYpQGUs3MPI/Uz7x8ZBLCOnfYh841aN/yYy991ZkoY8y96vevQT
+         rYgPvCHsucOivuwXVbuFg8WfMPJoEnRA0iEIV6Ki9rvqrDNfEdtjhtuyFT6UDnYOPX1z
+         T77pzcl0RkLg4VymdgVZj8xTOFCCNeA8qOc10IeoZnUENHsGsyVB5/919v10tE9Dn4b+
+         YYtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=BWFI5h416BXkQSSoLp6it0M+QIIpZiht4kihVcXhZts=;
-        b=RoK0CbK4Ec9gVVrLIwI54PixubNVCPBYtiJ2KL2+b7rgktu6HKB6/qfEofSBJabwJf
-         z7bu5Kyk3esaQTMD/KubZcz+SnCq+xnMNI3Sqqpt9gfReo5kkfF50an8BqZqpUEdFUSy
-         zy+qxZjV8JNfbS8RMeYgil3Xp/5w7a7LBdwaPaQ0HG3Ccm0xi7vQwzaOoMAnrnaLFdwk
-         F3mY385SyCJ88OuVBo7tnoQ8KcWqG/WPTiol20Z7R15zfk/PyftBGMfrQMq07w0UNLOF
-         Gb8ZbAMORJ13pggoi8X/HVgS0E5hHF3wLYHcbNTd13l9zPOX10IKJbleW7SuhCm6MsZZ
-         RLaQ==
-X-Gm-Message-State: AOAM533w8Z45aedRHol81B+fJaWLQtcTSlnbUJfpoMAMsFqLDDMDYcre
-        X+n5z7oZWySm695VQHEJ/EPyhA==
-X-Google-Smtp-Source: ABdhPJwQ3i+7pigTCE79ECMNKcgYpSK4txWbWXeonLwGpNYGsyXDVr849fLZJT/ZuycgWpgB3cB76g==
-X-Received: by 2002:a05:6e02:1a2c:b0:2c7:89cb:6bc8 with SMTP id g12-20020a056e021a2c00b002c789cb6bc8mr11174471ile.236.1647287128338;
-        Mon, 14 Mar 2022 12:45:28 -0700 (PDT)
-Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
-        by smtp.gmail.com with ESMTPSA id c6-20020a056e020bc600b002c6731e7cb8sm9091010ilu.31.2022.03.14.12.45.27
+        h=x-gm-message-state:references:user-agent:from:to:cc:subject:date
+         :in-reply-to:message-id:mime-version:content-transfer-encoding;
+        bh=TyjIR8cu39wafofM+zk55pMOkvXNU/TH+17qM8XX/mo=;
+        b=k1bTbxb3fi2r6dWi3/4/6ll8IATyeSrIpJLao8EYD7OUllMavajkzrUiX8t/VK1BjG
+         v+X++Sp20Ar/EtvZMywE129UX5Ket/s3ff6I+fLJ/97R5lSvFfg7443d1AoWt1byzOKD
+         fTAntORL0b3CF1PP4j8qiEgALkoQodEb2NqM7zDCLWLvzAJpDkPIHGYeQNs0a98CmMPJ
+         YXZ2g539bEP5P8dOwdu7LR2vdqxZTqElG7G+NWXYDkUqi/pSMSRrxhuRhzXoMDD/6yjL
+         GiVMokVdoaXZUyG/ZhPxw37qNFOLd/b4wl6PKgn5Gmov8klsMuESnFuyoqHQ0+aNtrCc
+         f2rw==
+X-Gm-Message-State: AOAM530q39d12wD3N+ruGim3oyTJrMmu+sEC7OcJcA4dFVVJqOyxavGG
+        NQ0mafVfckNmyM7pf5rp738/ew==
+X-Google-Smtp-Source: ABdhPJznYGtR95KUPe9viDQEiWUDwag47XoMVAUfo6SJ9261VlD5UsguQvpBts7G5RsM9cuR85zXaQ==
+X-Received: by 2002:a05:6402:2915:b0:416:cad2:d619 with SMTP id ee21-20020a056402291500b00416cad2d619mr17345135edb.221.1647288591200;
+        Mon, 14 Mar 2022 13:09:51 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+        by smtp.gmail.com with ESMTPSA id r23-20020aa7da17000000b00415a1431488sm8701634eds.4.2022.03.14.13.09.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Mar 2022 12:45:27 -0700 (PDT)
-Date:   Mon, 14 Mar 2022 19:45:24 +0000
-From:   Oliver Upton <oupton@google.com>
-To:     Raghavendra Rao Ananta <rananta@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Andrew Jones <drjones@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v4 06/13] KVM: arm64: Add standard hypervisor firmware
- register
-Message-ID: <Yi+bVM742+9W4TYj@google.com>
-References: <20220224172559.4170192-1-rananta@google.com>
- <20220224172559.4170192-7-rananta@google.com>
+        Mon, 14 Mar 2022 13:09:49 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+        by zen.linaroharston (Postfix) with ESMTP id 1FAB51FFB7;
+        Mon, 14 Mar 2022 20:09:49 +0000 (GMT)
+References: <20220314160108.1440470-1-armbru@redhat.com>
+ <20220314160108.1440470-4-armbru@redhat.com>
+User-agent: mu4e 1.7.10; emacs 28.0.92
+From:   Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To:     Markus Armbruster <armbru@redhat.com>
+Cc:     qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Christian Schoenebeck <qemu_oss@crudebyte.com>,
+        "Gonglei (Arei)" <arei.gonglei@huawei.com>,
+        =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Ani Sinha <ani@anisinha.ca>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Amit Shah <amit@kernel.org>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Anthony Perard <anthony.perard@citrix.com>,
+        Paul Durrant <paul@xen.org>,
+        =?utf-8?Q?Herv=C3=A9?= Poussineau <hpoussin@reactos.org>,
+        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        Corey Minyard <cminyard@mvista.com>,
+        Patrick Venture <venture@google.com>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Peter Xu <peterx@redhat.com>, Jason Wang <jasowang@redhat.com>,
+        =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
+        Daniel Henrique Barboza <danielhb413@gmail.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Greg Kurz <groug@kaod.org>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+        Jean-Christophe Dubois <jcd@tribudubois.net>,
+        Keith Busch <kbusch@kernel.org>,
+        Klaus Jensen <its@irrelevant.dk>,
+        Yuval Shaia <yuval.shaia.ml@gmail.com>,
+        Yoshinori Sato <ysato@users.sourceforge.jp>,
+        Magnus Damm <magnus.damm@gmail.com>,
+        Fabien Chouteau <chouteau@adacore.com>,
+        KONRAD Frederic <frederic.konrad@adacore.com>,
+        Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+        Artyom Tarasenko <atar4qemu@gmail.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        Juan Quintela <quintela@redhat.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Konstantin Kostiuk <kkostiuk@redhat.com>,
+        Michael Roth <michael.roth@amd.com>,
+        =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+        Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
+        David Hildenbrand <david@redhat.com>,
+        Wenchao Wang <wenchao.wang@intel.com>,
+        Kamil Rytarowski <kamil@netbsd.org>,
+        Reinoud Zandijk <reinoud@netbsd.org>,
+        Sunil Muthuswamy <sunilmut@microsoft.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Thomas Huth <thuth@redhat.com>, Eric Blake <eblake@redhat.com>,
+        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+        John Snow <jsnow@redhat.com>, kvm@vger.kernel.org,
+        qemu-arm@nongnu.org, xen-devel@lists.xenproject.org,
+        qemu-ppc@nongnu.org, qemu-block@nongnu.org, haxm-team@intel.com,
+        qemu-s390x@nongnu.org
+Subject: Re: [PATCH 3/3] Use g_new() & friends where that makes obvious sense
+Date:   Mon, 14 Mar 2022 19:48:47 +0000
+In-reply-to: <20220314160108.1440470-4-armbru@redhat.com>
+Message-ID: <877d8w5m9e.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220224172559.4170192-7-rananta@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 24, 2022 at 05:25:52PM +0000, Raghavendra Rao Ananta wrote:
-> Introduce the firmware register to hold the standard hypervisor
-> service calls (owner value 5) as a bitmap. The bitmap represents
-> the features that'll be enabled for the guest, as configured by
-> the user-space. Currently, this includes support only for
-> Paravirtualized time, represented by bit-0.
-> 
-> The register is also added to the kvm_arm_vm_scope_fw_regs[] list
-> as it maintains its state per-VM.
-> 
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> ---
->  arch/arm64/include/asm/kvm_host.h |  2 ++
->  arch/arm64/include/uapi/asm/kvm.h |  4 ++++
->  arch/arm64/kvm/guest.c            |  1 +
->  arch/arm64/kvm/hypercalls.c       | 20 +++++++++++++++++++-
->  include/kvm/arm_hypercalls.h      |  3 +++
->  5 files changed, 29 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 1909ced3208f..318148b69279 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -105,9 +105,11 @@ struct kvm_arch_memory_slot {
->   * struct kvm_hvc_desc: KVM ARM64 hypercall descriptor
->   *
->   * @hvc_std_bmap: Bitmap of standard secure service calls
-> + * @hvc_std_hyp_bmap: Bitmap of standard hypervisor service calls
->   */
->  struct kvm_hvc_desc {
->  	u64 hvc_std_bmap;
-> +	u64 hvc_std_hyp_bmap;
->  };
->  
->  struct kvm_arch {
-> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> index 2decc30d6b84..9a2caead7359 100644
-> --- a/arch/arm64/include/uapi/asm/kvm.h
-> +++ b/arch/arm64/include/uapi/asm/kvm.h
-> @@ -295,6 +295,10 @@ struct kvm_arm_copy_mte_tags {
->  #define KVM_REG_ARM_STD_BIT_TRNG_V1_0		BIT(0)
->  #define KVM_REG_ARM_STD_BMAP_BIT_MAX		0       /* Last valid bit */
->  
-> +#define KVM_REG_ARM_STD_HYP_BMAP		KVM_REG_ARM_FW_BMAP_REG(1)
-> +#define KVM_REG_ARM_STD_HYP_BIT_PV_TIME		BIT(0)
-> +#define KVM_REG_ARM_STD_HYP_BMAP_BIT_MAX	0       /* Last valid bit */
-> +
->  /* SVE registers */
->  #define KVM_REG_ARM64_SVE		(0x15 << KVM_REG_ARM_COPROC_SHIFT)
->  
-> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> index d66e6c742bbe..c42426d6137e 100644
-> --- a/arch/arm64/kvm/guest.c
-> +++ b/arch/arm64/kvm/guest.c
-> @@ -66,6 +66,7 @@ static const u64 kvm_arm_vm_scope_fw_regs[] = {
->  	KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1,
->  	KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2,
->  	KVM_REG_ARM_STD_BMAP,
-> +	KVM_REG_ARM_STD_HYP_BMAP,
->  };
->  
->  /**
-> diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-> index 48c126c3da72..ebc0cc26cf2e 100644
-> --- a/arch/arm64/kvm/hypercalls.c
-> +++ b/arch/arm64/kvm/hypercalls.c
-> @@ -75,6 +75,10 @@ static bool kvm_hvc_call_supported(struct kvm_vcpu *vcpu, u32 func_id)
->  	case ARM_SMCCC_TRNG_RND64:
->  		return kvm_arm_fw_reg_feat_enabled(hvc_desc->hvc_std_bmap,
->  						KVM_REG_ARM_STD_BIT_TRNG_V1_0);
-> +	case ARM_SMCCC_HV_PV_TIME_FEATURES:
-> +	case ARM_SMCCC_HV_PV_TIME_ST:
-> +		return kvm_arm_fw_reg_feat_enabled(hvc_desc->hvc_std_hyp_bmap,
-> +					KVM_REG_ARM_STD_HYP_BIT_PV_TIME);
->  	default:
->  		/* By default, allow the services that aren't listed here */
->  		return true;
-> @@ -83,6 +87,7 @@ static bool kvm_hvc_call_supported(struct kvm_vcpu *vcpu, u32 func_id)
->  
->  int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
->  {
-> +	struct kvm_hvc_desc *hvc_desc = &vcpu->kvm->arch.hvc_desc;
->  	u32 func_id = smccc_get_function(vcpu);
->  	u64 val[4] = {SMCCC_RET_NOT_SUPPORTED};
->  	u32 feature;
-> @@ -134,7 +139,10 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
->  			}
->  			break;
->  		case ARM_SMCCC_HV_PV_TIME_FEATURES:
-> -			val[0] = SMCCC_RET_SUCCESS;
-> +			if (kvm_arm_fw_reg_feat_enabled(
-> +					hvc_desc->hvc_std_hyp_bmap,
 
-It is probably OK to keep this parameter on the line above (just stay
-under 100 characters a line).
+Markus Armbruster <armbru@redhat.com> writes:
 
-> +					KVM_REG_ARM_STD_HYP_BIT_PV_TIME))
-> +				val[0] = SMCCC_RET_SUCCESS;
->  			break;
->  		}
->  		break;
-> @@ -179,6 +187,7 @@ static const u64 kvm_arm_fw_reg_ids[] = {
->  	KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1,
->  	KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2,
->  	KVM_REG_ARM_STD_BMAP,
-> +	KVM_REG_ARM_STD_HYP_BMAP,
->  };
->  
->  void kvm_arm_init_hypercalls(struct kvm *kvm)
-> @@ -186,6 +195,7 @@ void kvm_arm_init_hypercalls(struct kvm *kvm)
->  	struct kvm_hvc_desc *hvc_desc = &kvm->arch.hvc_desc;
->  
->  	hvc_desc->hvc_std_bmap = ARM_SMCCC_STD_FEATURES;
-> +	hvc_desc->hvc_std_hyp_bmap = ARM_SMCCC_STD_HYP_FEATURES;
+> g_new(T, n) is neater than g_malloc(sizeof(T) * n).  It's also safer,
+> for two reasons.  One, it catches multiplication overflowing size_t.
+> Two, it returns T * rather than void *, which lets the compiler catch
+> more type errors.
+>
+> This commit only touches allocations with size arguments of the form
+> sizeof(T).
+>
+> Patch created mechanically with:
+>
+>     $ spatch --in-place --sp-file scripts/coccinelle/use-g_new-etc.cocci \
+> 	     --macro-file scripts/cocci-macro-file.h FILES...
+>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+<snip>
+> --- a/audio/jackaudio.c
+> +++ b/audio/jackaudio.c
+> @@ -97,9 +97,9 @@ static void qjack_buffer_create(QJackBuffer *buffer, in=
+t channels, int frames)
+>      buffer->used     =3D 0;
+>      buffer->rptr     =3D 0;
+>      buffer->wptr     =3D 0;
+> -    buffer->data     =3D g_malloc(channels * sizeof(float *));
+> +    buffer->data     =3D g_new(float *, channels);
+>      for (int i =3D 0; i < channels; ++i) {
+> -        buffer->data[i] =3D g_malloc(frames * sizeof(float));
+> +        buffer->data[i] =3D g_new(float, frames);
+
+Are these actually buffers of pointers to floats? I guess I leave that
+to the JACK experts...
+
+>      }
 >  }
->  
->  int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu)
-> @@ -272,6 +282,9 @@ int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->  	case KVM_REG_ARM_STD_BMAP:
->  		val = READ_ONCE(hvc_desc->hvc_std_bmap);
->  		break;
-> +	case KVM_REG_ARM_STD_HYP_BMAP:
-> +		val = READ_ONCE(hvc_desc->hvc_std_hyp_bmap);
-> +		break;
->  	default:
->  		return -ENOENT;
->  	}
-> @@ -294,6 +307,10 @@ static int kvm_arm_set_fw_reg_bmap(struct kvm_vcpu *vcpu, u64 reg_id, u64 val)
->  		fw_reg_bmap = &hvc_desc->hvc_std_bmap;
->  		fw_reg_features = ARM_SMCCC_STD_FEATURES;
->  		break;
-> +	case KVM_REG_ARM_STD_HYP_BMAP:
-> +		fw_reg_bmap = &hvc_desc->hvc_std_hyp_bmap;
-> +		fw_reg_features = ARM_SMCCC_STD_HYP_FEATURES;
-> +		break;
->  	default:
->  		return -ENOENT;
->  	}
-> @@ -398,6 +415,7 @@ int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->  
->  		return 0;
->  	case KVM_REG_ARM_STD_BMAP:
-> +	case KVM_REG_ARM_STD_HYP_BMAP:
->  		return kvm_arm_set_fw_reg_bmap(vcpu, reg_id, val);
->  	default:
->  		return -ENOENT;
-> diff --git a/include/kvm/arm_hypercalls.h b/include/kvm/arm_hypercalls.h
-> index 64d30b452809..a1cb6e839c74 100644
-> --- a/include/kvm/arm_hypercalls.h
-> +++ b/include/kvm/arm_hypercalls.h
-> @@ -9,6 +9,9 @@
->  #define ARM_SMCCC_STD_FEATURES \
->  	GENMASK_ULL(KVM_REG_ARM_STD_BMAP_BIT_MAX, 0)
->  
-> +#define ARM_SMCCC_STD_HYP_FEATURES \
-> +	GENMASK_ULL(KVM_REG_ARM_STD_HYP_BMAP_BIT_MAX, 0)
-> +
->  int kvm_hvc_call_handler(struct kvm_vcpu *vcpu);
->  
->  static inline u32 smccc_get_function(struct kvm_vcpu *vcpu)
-> -- 
-> 2.35.1.473.g83b2b277ed-goog
-> 
+>=20=20
+> @@ -453,7 +453,7 @@ static int qjack_client_init(QJackClient *c)
+>      jack_on_shutdown(c->client, qjack_shutdown, c);
+>=20=20
+>      /* allocate and register the ports */
+> -    c->port =3D g_malloc(sizeof(jack_port_t *) * c->nchannels);
+> +    c->port =3D g_new(jack_port_t *, c->nchannels);
+>      for (int i =3D 0; i < c->nchannels; ++i) {
+
+I guess JACK just likes double indirection...
+
+>=20=20
+>          char port_name[16];
+<snip>
+> --- a/hw/pci/pcie_sriov.c
+> +++ b/hw/pci/pcie_sriov.c
+> @@ -177,7 +177,7 @@ static void register_vfs(PCIDevice *dev)
+>      assert(sriov_cap > 0);
+>      num_vfs =3D pci_get_word(dev->config + sriov_cap + PCI_SRIOV_NUM_VF);
+>=20=20
+> -    dev->exp.sriov_pf.vf =3D g_malloc(sizeof(PCIDevice *) * num_vfs);
+> +    dev->exp.sriov_pf.vf =3D g_new(PCIDevice *, num_vfs);
+>      assert(dev->exp.sriov_pf.vf);
+
+So what I find confusing about the conversion of sizeof(foo *) is that
+while the internal sizeof in g_new is unaffected I think the casting
+ends up as
+
+ foo **
+
+but I guess the compiler would have complained so maybe I don't
+understand the magic enough.
+
+<snip>
+> index 42130667a7..598e6adc5e 100644
+> --- a/hw/rdma/vmw/pvrdma_dev_ring.c
+> +++ b/hw/rdma/vmw/pvrdma_dev_ring.c
+> @@ -41,7 +41,7 @@ int pvrdma_ring_init(PvrdmaRing *ring, const char *name=
+, PCIDevice *dev,
+>      qatomic_set(&ring->ring_state->cons_head, 0);
+>      */
+>      ring->npages =3D npages;
+> -    ring->pages =3D g_malloc0(npages * sizeof(void *));
+> +    ring->pages =3D g_new0(void *, npages);
+
+At least here ring->pages agrees about void ** being the result.
+
+<snip>
+
+So other than my queries about the sizeof(foo *) which I'd like someone
+to assuage me of my concerns it looks like the script has done a
+thorough mechanical job as all good scripts should ;-)
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+--=20
+Alex Benn=C3=A9e
