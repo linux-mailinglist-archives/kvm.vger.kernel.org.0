@@ -2,57 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B7534D88D8
-	for <lists+kvm@lfdr.de>; Mon, 14 Mar 2022 17:09:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 29B3B4D89FD
+	for <lists+kvm@lfdr.de>; Mon, 14 Mar 2022 17:44:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242898AbiCNQK1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Mar 2022 12:10:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43182 "EHLO
+        id S243337AbiCNQmp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Mar 2022 12:42:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242896AbiCNQKZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Mar 2022 12:10:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A7A803E0C3
-        for <kvm@vger.kernel.org>; Mon, 14 Mar 2022 09:09:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647274153;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=eRrQObFUahcLPQZ/TYAwN/v6sVBzI0WsVdJ7+dwE/Wg=;
-        b=Kd8o1baarO9Sgmk21ok2sH9Gp9igIzgdffOuhQOdDgUq57WAkJXWCodL4dy769iJrmsz/S
-        OBSTcPK3m7Tykw8KuSKsavs9FOWzckET9T5n8am3H5a6w2flZlcxDY6eeaA+l4tHGPh9Zv
-        jMVSGD4uxmHsd+ASTWLGaLWu42XGUv8=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-669-B0yzMFd_PC2rL0ngtCkrlw-1; Mon, 14 Mar 2022 12:09:09 -0400
-X-MC-Unique: B0yzMFd_PC2rL0ngtCkrlw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S242178AbiCNQmN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Mar 2022 12:42:13 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36A1143ACF
+        for <kvm@vger.kernel.org>; Mon, 14 Mar 2022 09:40:59 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4084B833959;
-        Mon, 14 Mar 2022 16:09:09 +0000 (UTC)
-Received: from [172.30.41.16] (unknown [10.2.17.101])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9606F404C31A;
-        Mon, 14 Mar 2022 16:09:08 +0000 (UTC)
-Subject: [PATCH] vfio-pci: Provide reviewers and acceptance criteria for
- vendor drivers
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     alex.williamson@redhat.com, kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, jgg@nvidia.com,
-        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
-        yishaih@nvidia.com, linux-doc@vger.kernel.org, corbet@lwn.net
-Date:   Mon, 14 Mar 2022 10:09:08 -0600
-Message-ID: <164727326053.17467.1731353533389014796.stgit@omen>
-User-Agent: StGit/1.0-8-g6af9-dirty
+        by ams.source.kernel.org (Postfix) with ESMTPS id DA619B80E7F
+        for <kvm@vger.kernel.org>; Mon, 14 Mar 2022 16:40:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80008C340EE;
+        Mon, 14 Mar 2022 16:40:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1647276056;
+        bh=uxi3l7XD1dsCHWv/V+37GxYxDWy+/GagQ9LpcOEAld8=;
+        h=From:To:Cc:Subject:Date:From;
+        b=b3vju7KpuxWzL0Th0rFVIMLGLVXfrMn1gh6R1Pj0ixRO1tGY+nPicps9FSyfvANQv
+         16mvkgpfof8s5XJEjSpnkhr/xnHeP5yvKqFUpQUAaGXUG8jWNoUlmXhjbxO6b+phFo
+         n7bQvKCwaYNyfX1otXWgwbQCkpUK9cB8qYr5HSJT5357Z7w/obIrvYhSx7EYFvgFZ2
+         Ox4WCruGxd97TldBZ333a5tSlPKcngAO5TgSuTajGlPMpYyjOWeFNPKC8KFbcjiB76
+         gLutIMup/bRuovq+HgsrOAyycIFC3sT93I5CR1e4dHqz6wNT7lAsvbSCsgp9Muo8Ax
+         jT6fpX78oUWMQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nTnkb-00EPS0-6D; Mon, 14 Mar 2022 16:40:54 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu
+Cc:     James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Eric Auger <eric.auger@redhat.com>, kernel-team@android.com
+Subject: [PATCH 0/4] KVM: arm64: vgic-v3: MMIO-based LPI invalidation and co
+Date:   Mon, 14 Mar 2022 16:40:40 +0000
+Message-Id: <20220314164044.772709-1-maz@kernel.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.1
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, andre.przywara@arm.com, eric.auger@redhat.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-8.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -60,96 +64,46 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Vendor or device specific extensions for devices exposed to userspace
-through the vfio-pci-core library open both new functionality and new
-risks.  Here we attempt to provided formalized requirements and
-expectations to ensure that future drivers both collaborate in their
-interaction with existing host drivers, as well as receive additional
-reviews from community members with experience in this area.
+Since revision IHI0069G of the GICv3 spec, an implementation is
+allowed to implement MMIO-based LPI invalidation, without having to
+support RVPEI (which is essentially a GICv4.1 feature).
 
-Cc: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Yishai Hadas <yishaih@nvidia.com>
-Cc: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Cc: Kevin Tian <kevin.tian@intel.com>
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
----
+This has the potential to make workloads using heavy LPI invalidation
+fare a bit better, as they don't need to lock the access to the
+command queue.
 
-Per the proposal here[1], I've collected those that volunteered and
-those that I interpreted as showing interest (alpha by last name).  For
-those on the reviewers list below, please R-b/A-b to keep your name as a
-reviewer.  More volunteers are still welcome, please let me know
-explicitly; R-b/A-b will not be used to automatically add reviewers but
-are of course welcome.  Thanks,
+Similarly, an implementation can now expose that it allows LPIs to be
+turned off, something that we always supported.
 
-Alex
+This series implements both these features, exposing the new
+GICR_{INVLPIR,INVALLR,SYNCR} registers, transitions of the
+GICR_CTLR.RWP bit on LPI disabling, and finally exposes these to
+userspace and the guest with a new GICD_IIDR revision (and the ability
+to save/restore it).
 
-[1]https://lore.kernel.org/all/20220310134954.0df4bb12.alex.williamson@redhat.com/
+This series has been extremely useful to debug related GIC features,
+and will be complemented by a few GIC patches.
 
- .../vfio/vfio-pci-vendor-driver-acceptance.rst     |   35 ++++++++++++++++++++
- MAINTAINERS                                        |    9 +++++
- 2 files changed, 44 insertions(+)
- create mode 100644 Documentation/vfio/vfio-pci-vendor-driver-acceptance.rst
+Patches on top of 5.17-rc3.
 
-diff --git a/Documentation/vfio/vfio-pci-vendor-driver-acceptance.rst b/Documentation/vfio/vfio-pci-vendor-driver-acceptance.rst
-new file mode 100644
-index 000000000000..3a108d748681
---- /dev/null
-+++ b/Documentation/vfio/vfio-pci-vendor-driver-acceptance.rst
-@@ -0,0 +1,35 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+Acceptance criteria for vfio-pci device specific driver variants
-+================================================================
-+
-+Overview
-+--------
-+The vfio-pci driver exists as a device agnostic driver using the
-+system IOMMU and relying on the robustness of platform fault
-+handling to provide isolated device access to userspace.  While the
-+vfio-pci driver does include some device specific support, further
-+extensions for yet more advanced device specific features are not
-+sustainable.  The vfio-pci driver has therefore split out
-+vfio-pci-core as a library that may be reused to implement features
-+requiring device specific knowledge, ex. saving and loading device
-+state for the purposes of supporting migration.
-+
-+In support of such features, it's expected that some device specific
-+variants may interact with parent devices (ex. SR-IOV PF in support of
-+a user assigned VF) or other extensions that may not be otherwise
-+accessible via the vfio-pci base driver.  Authors of such drivers
-+should be diligent not to create exploitable interfaces via such
-+interactions or allow unchecked userspace data to have an effect
-+beyond the scope of the assigned device.
-+
-+New driver submissions are therefore requested to have approval via
-+Sign-off/Acked-by/etc for any interactions with parent drivers.
-+Additionally, drivers should make an attempt to provide sufficient
-+documentation for reviewers to understand the device specific
-+extensions, for example in the case of migration data, how is the
-+device state composed and consumed, which portions are not otherwise
-+available to the user via vfio-pci, what safeguards exist to validate
-+the data, etc.  To that extent, authors should additionally expect to
-+require reviews from at least one of the listed reviewers, in addition
-+to the overall vfio maintainer.
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 4322b5321891..7847b1492586 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -20314,6 +20314,15 @@ F:	drivers/vfio/mdev/
- F:	include/linux/mdev.h
- F:	samples/vfio-mdev/
- 
-+VFIO PCI VENDOR DRIVERS
-+R:	Jason Gunthorpe <jgg@nvidia.com>
-+R:	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-+R:	Kevin Tian <kevin.tian@intel.com>
-+L:	kvm@vger.kernel.org
-+S:	Maintained
-+P:	Documentation/vfio/vfio-pci-vendor-driver-acceptance.rst
-+F:	drivers/vfio/pci/*/
-+
- VFIO PLATFORM DRIVER
- M:	Eric Auger <eric.auger@redhat.com>
- L:	kvm@vger.kernel.org
+	M.
 
+Marc Zyngier (4):
+  irqchip/gic-v3: Exposes bit values for GICR_CTLR.{IR,CES}
+  KVM: arm64: vgic-v3: Implement MMIO-based LPI invalidation
+  KVM: arm64: vgic-v3: Expose GICR_CTLR.RWP when disabling LPIs
+  KVM: arm64: vgic-v3: Advertise GICR_CTLR.{IR,CES} as a new GICD_IIDR
+    revision
+
+ arch/arm64/kvm/vgic/vgic-init.c    |   7 +-
+ arch/arm64/kvm/vgic/vgic-its.c     |  64 ++++++++++------
+ arch/arm64/kvm/vgic/vgic-mmio-v2.c |  18 ++++-
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c | 119 ++++++++++++++++++++++++++---
+ arch/arm64/kvm/vgic/vgic.h         |   5 ++
+ include/kvm/arm_vgic.h             |   8 +-
+ include/linux/irqchip/arm-gic-v3.h |   2 +
+ 7 files changed, 184 insertions(+), 39 deletions(-)
+
+-- 
+2.34.1
 
