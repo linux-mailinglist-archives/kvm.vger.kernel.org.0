@@ -2,123 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DF0B74D8D6F
-	for <lists+kvm@lfdr.de>; Mon, 14 Mar 2022 20:52:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ABD294D8CA0
+	for <lists+kvm@lfdr.de>; Mon, 14 Mar 2022 20:45:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244704AbiCNTxr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Mar 2022 15:53:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37086 "EHLO
+        id S243178AbiCNTq0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Mar 2022 15:46:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45406 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244778AbiCNTwq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Mar 2022 15:52:46 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B609403E6;
-        Mon, 14 Mar 2022 12:51:06 -0700 (PDT)
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22EJlYtp025603;
-        Mon, 14 Mar 2022 19:50:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : content-transfer-encoding
- : mime-version; s=pp1; bh=EIN5YKNShvtpefl6wXDR1mrno0orRYnzj0xkq2tV9tY=;
- b=IuUXQ4g6nE6s+CbTewHR0HBK37VysywtedFxJHDgFICWNQzV7p/4IZFO1RU+QR1pIw3/
- 7nK49OonFLPkFQreR8DASVesWL3DQF8oP6URCY9fQSb2cwD8IKRnVohFEToNRCRkeEip
- 30BJPEMJW5HVV3+OVIao2fGpm+Pq/GhyWYnUr5g+KErgO8KtgyVOasjqucCQFq3aITWR
- DBEEJX2WFxtHUunstvBvuGfnOSf3cShnvvuHJ6ylR5jbJUeHox1BAhWKCFS7A9T5UpZK
- 12oK519Uw6GsMJvF81y1o+2JkcpKJE0w1jT2jlz5sHuf/UC5ID0QnqJ7tdn3iaVBC/jU xw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3et6ag101c-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 14 Mar 2022 19:50:23 +0000
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22EJlklL026151;
-        Mon, 14 Mar 2022 19:50:22 GMT
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3et6ag100w-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 14 Mar 2022 19:50:22 +0000
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22EJlqUq003136;
-        Mon, 14 Mar 2022 19:50:21 GMT
-Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com [9.57.198.27])
-        by ppma02dal.us.ibm.com with ESMTP id 3etaj6gpse-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 14 Mar 2022 19:50:21 +0000
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
-        by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22EJoJMH22020566
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 14 Mar 2022 19:50:19 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 622A9112069;
-        Mon, 14 Mar 2022 19:50:19 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A3F57112065;
-        Mon, 14 Mar 2022 19:50:10 +0000 (GMT)
-Received: from li-c92d2ccc-254b-11b2-a85c-a700b5bfb098.ibm.com.com (unknown [9.211.32.184])
-        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
-        Mon, 14 Mar 2022 19:50:10 +0000 (GMT)
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-To:     linux-s390@vger.kernel.org
-Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
-        schnelle@linux.ibm.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
-        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
-        svens@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
-        oberpar@linux.ibm.com, freude@linux.ibm.com, thuth@redhat.com,
-        pasic@linux.ibm.com, joro@8bytes.org, will@kernel.org,
-        pbonzini@redhat.com, corbet@lwn.net, jgg@nvidia.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        iommu@lists.linux-foundation.org, linux-doc@vger.kernel.org
-Subject: [PATCH v4 32/32] MAINTAINERS: update s390 IOMMU entry
-Date:   Mon, 14 Mar 2022 15:44:51 -0400
-Message-Id: <20220314194451.58266-33-mjrosato@linux.ibm.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20220314194451.58266-1-mjrosato@linux.ibm.com>
-References: <20220314194451.58266-1-mjrosato@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: M3EoNyUKbnbOabH4Rxt-JZJHmpcH11J5
-X-Proofpoint-GUID: gSFlrQQ5rUK4xe3pNmkYLRLcmVNL5p4l
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        with ESMTP id S235483AbiCNTq0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Mar 2022 15:46:26 -0400
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F0193DA67;
+        Mon, 14 Mar 2022 12:45:16 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id z3so14432415plg.8;
+        Mon, 14 Mar 2022 12:45:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=f2mx1XUUlp12T6iVJ8ZfTCd5aF5zOWGaDksJ5HhBih0=;
+        b=PUGAWiWtYQEI/LUdwRv6HXIubdu5SR1S/o23kfD/KnvlEQX6ZMpK2yoTcgoPbus2xT
+         QckGUaxfeZr6pNQNNtQQfA+cOSOkGcsbjgQ+7XjISICFNcIxz62o1v/bDChAUmGvpbSU
+         EnVJAMreRu7PYHGESfMx1GQ4aCDHRLFPMFNg31gtgE7HfZTGze6EbbwZnp7i6RdFSI3h
+         V/MesHVQuVRbxRDwtF0JilFj2PrR2+JCPwUlvRrMTgpGQZuKJWHT3bzXgld7hPvLHryX
+         t4Z66j3nmSjNuIPxGAS4qVAHj2N6sfc5VyNeHZz/ufJPDoqeBuzXKzMO3cUFbMlYKyrj
+         u5ww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=f2mx1XUUlp12T6iVJ8ZfTCd5aF5zOWGaDksJ5HhBih0=;
+        b=t9qUunt5dx2zudSw+RY1yehcugI7rFh5auqDmqkirprbCWldNwVVtRVzctZiEyq3Ac
+         fXJKslX49RIW3LnDHNNlEENVd6diFz+ASxZYQg8YJNNsuU2hrAe+74/Vpbdp+fcT+bZs
+         fQI+Y/5+T0/kfgCvxkt277T4XeJlGZuASeM5PicBREoBoEHguKAr+nlOGKoZVjF12Ohq
+         vy7BSbd+Rx5bFefchFqZ9etVwjrrNl9ZZ3Dj2F8GWhA/AgTR6B0hR3QPGDa3s7XYGsh1
+         pclP1ISNOjW7pORevRNBuhUeQwj1gxPsFaRcxQd5+XD207COOnxCGr1t93EzioUMygDE
+         JQiQ==
+X-Gm-Message-State: AOAM533badiUmxUOxXLvNQgqc0k1zu8Kiu8Em1Y/W5q1BMH+7eijnB4Z
+        dTrdTQcgFy0C+oZDVOHvkss=
+X-Google-Smtp-Source: ABdhPJyRZEyaNutfTz5mGvSc/4rUw4DvMFHvknAn9RLKhno2/pAiQQ/M1AJHGUYXvsJJa/8O1+JGMQ==
+X-Received: by 2002:a17:90a:528b:b0:1bc:c5f9:82a with SMTP id w11-20020a17090a528b00b001bcc5f9082amr777771pjh.210.1647287115917;
+        Mon, 14 Mar 2022 12:45:15 -0700 (PDT)
+Received: from localhost ([192.55.54.52])
+        by smtp.gmail.com with ESMTPSA id p186-20020a62d0c3000000b004f6fa49c4b9sm20134226pfg.218.2022.03.14.12.45.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Mar 2022 12:45:14 -0700 (PDT)
+Date:   Mon, 14 Mar 2022 12:45:13 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
+        Jim Mattson <jmattson@google.com>, erdemaktas@google.com,
+        Connor Kuehl <ckuehl@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Subject: Re: [RFC PATCH v5 008/104] KVM: TDX: Add a function to initialize
+ TDX module
+Message-ID: <20220314194513.GD1964605@ls.amr.corp.intel.com>
+References: <cover.1646422845.git.isaku.yamahata@intel.com>
+ <b92217283fa96b85e9a683ca3fcf1b368cf8d1c4.1646422845.git.isaku.yamahata@intel.com>
+ <05aecc5a-e8d2-b357-3bf1-3d0cb247c28d@redhat.com>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-03-14_13,2022-03-14_02,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- lowpriorityscore=0 priorityscore=1501 bulkscore=0 malwarescore=0
- adultscore=0 phishscore=0 impostorscore=0 mlxscore=0 mlxlogscore=865
- suspectscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2203140116
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <05aecc5a-e8d2-b357-3bf1-3d0cb247c28d@redhat.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use wildcard to pick up new parts added by KVM domain support.
+On Sun, Mar 13, 2022 at 03:03:40PM +0100,
+Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
----
- MAINTAINERS | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> On 3/4/22 20:48, isaku.yamahata@intel.com wrote:
+> > +
+> > +	if (!tdx_module_initialized) {
+> > +		if (enable_tdx) {
+> > +			ret = __tdx_module_setup();
+> > +			if (ret)
+> > +				enable_tdx = false;
+> 
+> "enable_tdx = false" isn't great to do only when a VM is created.  Does it
+> make sense to anticipate this to the point when the kvm_intel.ko module is
+> loaded?
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 6c76eb66b10a..d803f490eafb 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -16867,7 +16867,7 @@ M:	Gerald Schaefer <gerald.schaefer@linux.ibm.com>
- L:	linux-s390@vger.kernel.org
- S:	Supported
- W:	http://www.ibm.com/developerworks/linux/linux390/
--F:	drivers/iommu/s390-iommu.c
-+F:	drivers/iommu/s390*
- 
- S390 IUCV NETWORK LAYER
- M:	Alexandra Winter <wintera@linux.ibm.com>
+It's possible.  I have the following two reasons to chose to defer TDX module
+initialization until creating first TD.  Given those reasons, do you still want
+the initialization at loading kvm_intel.ko module?  If yes, I'll change it.
+
+- memory over head: The initialization of TDX module requires to allocate
+physically contiguous memory whose size is about 0.43% of the system memory.
+If user don't use TD, it will be wasted.
+
+- VMXON on all pCPUs: The TDX module initialization requires to enable VMX
+(VMXON) on all present pCPUs.  vmx_hardware_enable() which is called on creating
+guest does it.  It naturally fits with the TDX module initialization at creating
+first TD.  I wanted to avoid code to enable VMXON on loading the kvm_intel.ko.
 -- 
-2.27.0
-
+Isaku Yamahata <isaku.yamahata@gmail.com>
