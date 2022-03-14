@@ -2,132 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 886574D79CE
-	for <lists+kvm@lfdr.de>; Mon, 14 Mar 2022 04:56:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B18844D7A99
+	for <lists+kvm@lfdr.de>; Mon, 14 Mar 2022 07:03:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236143AbiCND51 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 13 Mar 2022 23:57:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38248 "EHLO
+        id S236224AbiCNGEk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Mar 2022 02:04:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232277AbiCND50 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 13 Mar 2022 23:57:26 -0400
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A31731DD5;
-        Sun, 13 Mar 2022 20:56:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1647230177; x=1678766177;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=6bkM5qkPnQ8XQAJyJzGj5m4VADZeV4mTAnh7ytVk5t8=;
-  b=nJjDVNXIJzKHe7lucGwQ3LnMoki4zcUbV1Qk8aFoUN/vei5TYAfC1rn2
-   OZ5WEJzlQMWyBanpMy4A9BJj1ZUUeaJowqbBELhPjiGBpaguKw98vrX8g
-   CMKMY6k5a3WbgbRwnkYjbU4uxeRVA87gwZAtDVqStXfZ5eGD5fFewPej6
-   Z1HH7SnCGDEfqYvM1CAvzxgfh8BHsbWm+U56b232Mh70+Xe5KZF0b9yWG
-   u1t1V805q7CyiUoPWVmWB8aZIjvA+QIrdhoWcvsV3jw0pKfOiimhx+DlE
-   SDLOLwiAXzclhtDrJOkLzWB2HhtLfODJhjXmLQQhcA+LabmWX82sVj9BZ
-   Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10285"; a="236532311"
-X-IronPort-AV: E=Sophos;i="5.90,179,1643702400"; 
-   d="scan'208";a="236532311"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2022 20:56:17 -0700
-X-IronPort-AV: E=Sophos;i="5.90,179,1643702400"; 
-   d="scan'208";a="713561551"
-Received: from gao-cwp.sh.intel.com (HELO gao-cwp) ([10.239.159.23])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2022 20:56:11 -0700
-Date:   Mon, 14 Mar 2022 12:09:42 +0800
-From:   Chao Gao <chao.gao@intel.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Zeng Guang <guang.zeng@intel.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jethro Beekman <jethro@fortanix.com>,
-        "Huang, Kai" <kai.huang@intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Hu, Robert" <robert.hu@intel.com>
-Subject: Re: [PATCH v6 6/9] KVM: x86: lapic: don't allow to change APIC ID
- unconditionally
-Message-ID: <20220314040941.GA18296@gao-cwp>
-References: <Yifg4bea6zYEz1BK@google.com>
- <20220309052013.GA2915@gao-cwp>
- <YihCtvDps/qJ2TOW@google.com>
- <6dc7cff15812864ed14b5c014769488d80ce7f49.camel@redhat.com>
- <YirPkr5efyylrD0x@google.com>
- <29c76393-4884-94a8-f224-08d313b73f71@intel.com>
- <01586c518de0c72ff3997d32654b8fa6e7df257d.camel@redhat.com>
- <2900660d947a878e583ebedf60e7332e74a1af5f.camel@redhat.com>
- <20220313135335.GA18405@gao-cwp>
- <fbf929e0793a6b4df59ec9d95a018d1f6737db35.camel@redhat.com>
+        with ESMTP id S234271AbiCNGEi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Mar 2022 02:04:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 566A9E0B9
+        for <kvm@vger.kernel.org>; Sun, 13 Mar 2022 23:03:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1647237808;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=+bVeXSAPAIyLEMvADgvGsIj3wikzII/B9d4vv1jFOjU=;
+        b=GvIMzyYfR2BWKuKRWlta4wpiqOx7VkglSjdUzV0dschE37M4812GxhEVTMtG3Mnte08F/x
+        rHvP3MnQQwyU7TosVTrgO9f3LNZ9kcVPGCMZuknlc+pKp7hhd+7GHXVuF4AGYOzZvK5/P4
+        sm98ZQl5ij7AItbsvBdn4Lbe/DtUE2c=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-445-AgcKa0xCMD6yZMBuMChOuQ-1; Mon, 14 Mar 2022 02:03:26 -0400
+X-MC-Unique: AgcKa0xCMD6yZMBuMChOuQ-1
+Received: by mail-pj1-f72.google.com with SMTP id o41-20020a17090a0a2c00b001bf06e5badfso9253346pjo.3
+        for <kvm@vger.kernel.org>; Sun, 13 Mar 2022 23:03:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=+bVeXSAPAIyLEMvADgvGsIj3wikzII/B9d4vv1jFOjU=;
+        b=3peDTHkWlp7aNNR6CRCAbJY3WUc1gJrJOcRJtpQ/s1KuD8/cWpl0ZQR2ZXE+uJK2Qf
+         wpYLkrDwzTQRIYVPAysujcE0XNL3DNtb6i1dpGKcaKtKjJFEYAggE9NREIwfOrgdK8aM
+         3hbMikcAk3//zFdmlsIgDO6kS1ZsF2P2qQF53ESjzrli22Z8DuSwheFnkWVMCLYOwiOg
+         Z+hg6Vkbnd7/kNvbFR0hNNxkBrf7g8DGmkXs/5mEV/+c23iEHXJ/rhSzXQKKemkGPHUd
+         x+42lz2RcA/Vl2UWQPBOZZuI77o6j8WGhyro64XR730fWl+1oeHYT+PjllA44miR/UGR
+         DCow==
+X-Gm-Message-State: AOAM530BgDUejXLYR7TBhrp/nPy8sWtkZpKF5VCRGdYsBpmmNe4U1kIo
+        rfTzMU5OjKctd9QLdlZNWARrZTp+yWMKqx2Hf8qV49QPLNrUHMIiN1VI9UoxX3OH2EQlQZ49kud
+        pJ2xr9Xpg8XRG
+X-Received: by 2002:a17:90a:430d:b0:1bc:f340:8096 with SMTP id q13-20020a17090a430d00b001bcf3408096mr23310093pjg.93.1647237805714;
+        Sun, 13 Mar 2022 23:03:25 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyHJLlKsy+iGZWFfSSZs5522fWpCLPCuJ5+r/iAxz9GOr2pZgULqn0VLRevvecGY0GD+eDtZQ==
+X-Received: by 2002:a17:90a:430d:b0:1bc:f340:8096 with SMTP id q13-20020a17090a430d00b001bcf3408096mr23310068pjg.93.1647237805387;
+        Sun, 13 Mar 2022 23:03:25 -0700 (PDT)
+Received: from [10.72.13.210] ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id v22-20020a17090ad59600b001b7deb42251sm19777664pju.15.2022.03.13.23.03.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 13 Mar 2022 23:03:24 -0700 (PDT)
+Message-ID: <dc92c90e-fbb6-dc60-a73b-5415c40cbf5b@redhat.com>
+Date:   Mon, 14 Mar 2022 14:03:19 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fbf929e0793a6b4df59ec9d95a018d1f6737db35.camel@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Spam-Status: No, score=-5.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.6.2
+Subject: Re: [PATCH v2 1/2] vdpa: support exposing the config size to
+ userspace
+Content-Language: en-US
+To:     "Longpeng(Mike)" <longpeng2@huawei.com>, mst@redhat.com,
+        sgarzare@redhat.com, stefanha@redhat.com
+Cc:     virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        arei.gonglei@huawei.com, yechuan@huawei.com,
+        huangzhichao@huawei.com, gdawar@xilinx.com
+References: <20220310072051.2175-1-longpeng2@huawei.com>
+ <20220310072051.2175-2-longpeng2@huawei.com>
+From:   Jason Wang <jasowang@redhat.com>
+In-Reply-To: <20220310072051.2175-2-longpeng2@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
->> > > This won't work with nested AVIC - we can't just inhibit a nested guest using its own AVIC,
->> > > because migration happens.
->> > 
->> > I mean because host decided to change its apic id, which it can in theory do any time,
->> > even after the nested guest has started. Seriously, the only reason guest has to change apic id,
->> > is to try to exploit some security hole.
->> 
->> Hi
->> 
->> Thanks for the information.  
->> 
->> IIUC, you mean KVM applies APICv inhibition only to L1 VM, leaving APICv
->> enabled for L2 VM. Shouldn't KVM disable APICv for L2 VM in this case?
->> It looks like a generic issue in dynamically toggling APICv scheme,
->> e.g., qemu can set KVM_GUESTDBG_BLOCKIRQ after nested guest has started.
->> 
+
+在 2022/3/10 下午3:20, Longpeng(Mike) 写道:
+> From: Longpeng <longpeng2@huawei.com>
 >
->That is the problem - you can't disable it for L2, unless you are willing to emulate it in software.
->Or in other words, when nested guest uses a hardware feature, you can't at some point say to it:
->sorry buddy - hardware feature disappeared.
-
-Agreed. I missed this.
-
+> - GET_CONFIG_SIZE: return the size of the virtio config space.
 >
->It is *currently* not a problem for APICv because it doesn't do IPI virtualization,
->and even with these patches, it doesn't do this for nesting.
->It does become when you allow nested guest to use this which I did in the nested AVIC code.
+> The size contains the fields which are conditional on feature
+> bits.
 >
+> Signed-off-by: Longpeng <longpeng2@huawei.com>
+
+
+Acked-by: Jason Wang <jasowang@redhat.com>
+
+
+> ---
+>   drivers/vhost/vdpa.c       | 17 +++++++++++++++++
+>   include/linux/vdpa.h       |  3 ++-
+>   include/uapi/linux/vhost.h |  4 ++++
+>   3 files changed, 23 insertions(+), 1 deletion(-)
 >
->and writable apic ids do pose a large problem, since nested AVIC, will target L1's apic ids,
->and when they can change under you without any notice, and even worse be duplicate,
->it is just nightmare.
+> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> index ec5249e..605c7ae 100644
+> --- a/drivers/vhost/vdpa.c
+> +++ b/drivers/vhost/vdpa.c
+> @@ -355,6 +355,20 @@ static long vhost_vdpa_get_iova_range(struct vhost_vdpa *v, u32 __user *argp)
+>   	return 0;
+>   }
+>   
+> +static long vhost_vdpa_get_config_size(struct vhost_vdpa *v, u32 __user *argp)
+> +{
+> +	struct vdpa_device *vdpa = v->vdpa;
+> +	const struct vdpa_config_ops *ops = vdpa->config;
+> +	u32 size;
+> +
+> +	size = ops->get_config_size(vdpa);
+> +
+> +	if (copy_to_user(argp, &size, sizeof(size)))
+> +		return -EFAULT;
+> +
+> +	return 0;
+> +}
+> +
+>   static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int cmd,
+>   				   void __user *argp)
+>   {
+> @@ -492,6 +506,9 @@ static long vhost_vdpa_unlocked_ioctl(struct file *filep,
+>   	case VHOST_VDPA_GET_IOVA_RANGE:
+>   		r = vhost_vdpa_get_iova_range(v, argp);
+>   		break;
+> +	case VHOST_VDPA_GET_CONFIG_SIZE:
+> +		r = vhost_vdpa_get_config_size(v, argp);
+> +		break;
+>   	default:
+>   		r = vhost_dev_ioctl(&v->vdev, cmd, argp);
+>   		if (r == -ENOIOCTLCMD)
+> diff --git a/include/linux/vdpa.h b/include/linux/vdpa.h
+> index 721089b..a526919 100644
+> --- a/include/linux/vdpa.h
+> +++ b/include/linux/vdpa.h
+> @@ -207,7 +207,8 @@ struct vdpa_map_file {
+>    * @reset:			Reset device
+>    *				@vdev: vdpa device
+>    *				Returns integer: success (0) or error (< 0)
+> - * @get_config_size:		Get the size of the configuration space
+> + * @get_config_size:		Get the size of the configuration space includes
+> + *				fields that are conditional on feature bits.
+>    *				@vdev: vdpa device
+>    *				Returns size_t: configuration size
+>    * @get_config:			Read from device specific configuration space
+> diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
+> index c998860..bc74e95 100644
+> --- a/include/uapi/linux/vhost.h
+> +++ b/include/uapi/linux/vhost.h
+> @@ -150,4 +150,8 @@
+>   /* Get the valid iova range */
+>   #define VHOST_VDPA_GET_IOVA_RANGE	_IOR(VHOST_VIRTIO, 0x78, \
+>   					     struct vhost_vdpa_iova_range)
+> +
+> +/* Get the config size */
+> +#define VHOST_VDPA_GET_CONFIG_SIZE	_IOR(VHOST_VIRTIO, 0x79, __u32)
+> +
+>   #endif
 
-OK. So the problem of disabling APICv is if we choose to disable APICv instead
-of making APIC ID read-only, although it can work perfectly for VMX IPIv, it
-effectively makes future cleanup to AVIC difficult/impossible because nested
-AVIC is practically to implement without assuming APIC IDs of L1 is immutable.
-
-Sean & Maxim
-
-How about go back to use a module parameter to opt in to read-only APIC ID.
-Although migration in some cases may fail but it shouldn't be a big issue as
-migration VMs from a KVM with nested=on to a KVM with nested=off may also fail.
