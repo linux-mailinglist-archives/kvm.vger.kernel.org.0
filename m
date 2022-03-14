@@ -2,203 +2,194 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4796E4D8994
-	for <lists+kvm@lfdr.de>; Mon, 14 Mar 2022 17:43:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 660914D8A13
+	for <lists+kvm@lfdr.de>; Mon, 14 Mar 2022 17:44:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244523AbiCNQoK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Mar 2022 12:44:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60728 "EHLO
+        id S244526AbiCNQoM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Mar 2022 12:44:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237119AbiCNQmN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Mar 2022 12:42:13 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86D1643ED5
-        for <kvm@vger.kernel.org>; Mon, 14 Mar 2022 09:40:59 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id BAE9160B19
-        for <kvm@vger.kernel.org>; Mon, 14 Mar 2022 16:40:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2830EC36AE2;
-        Mon, 14 Mar 2022 16:40:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1647276057;
-        bh=ZWtAY23Xb95QLutpD0WIyDlallLPbNinEqh3WUhRRGg=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=MqenvIp2dF3mLhIyesuCWlFwlloYTv9oK2TkHcW5S9lbgQI7jMRYGD5RCrADyTMax
-         hV+c8K5oIsUp/c6GOqm/zucp9yd1rq/Fv8w6clMenrHRG3s9ZibVCWC29bKUOLWf9/
-         FLrj6P5uZLJC/0HR+k6AyS2qT0w9gGp8qqUx1FzBGGHMbDAXTgo0HUzmxjmZxX391y
-         +L7MOTVpvUDEprb9Pr9DP2bn/A2K3TiuN5b5H3acHQqPGMcuDU/MH3/CC4ocDTj1bT
-         si2ofGSvrCBzTWCt7zGTgGCmOhk0LxCBugUmcyWtHJlzYH47CDRUDGOcvn4ISgzz/+
-         6+dMRDlx2GDKQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1nTnkd-00EPS0-59; Mon, 14 Mar 2022 16:40:55 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu
-Cc:     James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Eric Auger <eric.auger@redhat.com>, kernel-team@android.com
-Subject: [PATCH 4/4] KVM: arm64: vgic-v3: Advertise GICR_CTLR.{IR,CES} as a new GICD_IIDR revision
-Date:   Mon, 14 Mar 2022 16:40:44 +0000
-Message-Id: <20220314164044.772709-5-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220314164044.772709-1-maz@kernel.org>
-References: <20220314164044.772709-1-maz@kernel.org>
+        with ESMTP id S243795AbiCNQnP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Mar 2022 12:43:15 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4959347ACE
+        for <kvm@vger.kernel.org>; Mon, 14 Mar 2022 09:41:28 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id rm8-20020a17090b3ec800b001c55791fdb1so7395999pjb.1
+        for <kvm@vger.kernel.org>; Mon, 14 Mar 2022 09:41:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=W0zrBM+N0hxFD4HvfoclDpELnmJr/18GN6q0lPZatEw=;
+        b=fmpUDGOi8OZUJgMmHkU4ZiecIW8QqM1a02qsRb5yuKVzZqkKGRd0gAv5AfPJZciLC2
+         wyfwXolLcpsITp6G/VgGOl4n+QuCOLQk3Yq16Z7BHeO1D5wgcSAf/IDLm72KrjEXZHV/
+         M4BRhf0N2E/JnyG/RHuUFZTe+nWC8OwxMU8ozx661gpkTL/UO2ghlDIt48sBGxo0Msdh
+         /YNfia3uEbrZh1oI7H2fo/d1bB9/w6wpunLJALQRD5SqFqrj8TQigLM4Ted+4sWSxOKR
+         FPVMqV/tM1261P8Mf1g7qtmMopnyahbNNaai7t7ssi2iWy+HgxXH9dvrAsqdbHKia6V5
+         abag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=W0zrBM+N0hxFD4HvfoclDpELnmJr/18GN6q0lPZatEw=;
+        b=0vz37SNy2jacQF2Y2eEeiYoODJE7s4F+gcmqHZmQwuMZQ9AgQiLzogPMZdzcLpuU9f
+         k2t/64SNqnZFXa+Y0vHPUPZjUYvZlgfpQg3HVPT0bkgbIV44UWn+TwelAzJYYWqBtFMv
+         M3x+gfumj0xv6CJjPL7e8PyV0f17Kmen9uRCpBVNaJBTTrg4FT5oMDBIAqrAZAGrtX5h
+         8VUZHDBy7Ffa2N7Mcf3TIaOSHdR1T+7MBPuqn8OnjaDzSALQwDOzYFRSBY6MxAhfzq4i
+         /Qs2BMNJtj50/iaBZH3hAFMzKW4BzutF+D+nWHw6Zwpn/FU3oJE/H2ioxrszSmgZn9XS
+         /Nag==
+X-Gm-Message-State: AOAM530sQ/efz12GllIDDHWLeA5SYhU0tCHqp8k32TJV1Q83tEQOi6xX
+        Ew5oJp4LWc79u1CIXaUe0Rc=
+X-Google-Smtp-Source: ABdhPJwPi5HHkN9qRkorFbCauI5zttPHA5P4ioPiaxV0wCn1Jl6lXBIv9n8vWOh2Ce6Vb5rH2bPC8Q==
+X-Received: by 2002:a17:90a:1b4a:b0:1bf:1112:5ef with SMTP id q68-20020a17090a1b4a00b001bf111205efmr36323pjq.143.1647276087626;
+        Mon, 14 Mar 2022 09:41:27 -0700 (PDT)
+Received: from [192.168.1.115] ([185.126.107.38])
+        by smtp.gmail.com with ESMTPSA id s1-20020a056a00178100b004f731a1a952sm22043486pfg.168.2022.03.14.09.41.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 14 Mar 2022 09:41:27 -0700 (PDT)
+Message-ID: <8ac83023-3609-4b24-6ffc-9f93478ce69b@gmail.com>
+Date:   Mon, 14 Mar 2022 17:41:09 +0100
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.6.1
+Subject: Re: [PATCH 0/3] Use g_new() & friends where that makes obvious
+Content-Language: en-US
+To:     Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Christian Schoenebeck <qemu_oss@crudebyte.com>,
+        "Gonglei (Arei)" <arei.gonglei@huawei.com>,
+        =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Ani Sinha <ani@anisinha.ca>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Amit Shah <amit@kernel.org>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Anthony Perard <anthony.perard@citrix.com>,
+        Paul Durrant <paul@xen.org>,
+        =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        Corey Minyard <cminyard@mvista.com>,
+        Patrick Venture <venture@google.com>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Peter Xu <peterx@redhat.com>, Jason Wang <jasowang@redhat.com>,
+        =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+        Daniel Henrique Barboza <danielhb413@gmail.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Greg Kurz <groug@kaod.org>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+        Jean-Christophe Dubois <jcd@tribudubois.net>,
+        Keith Busch <kbusch@kernel.org>,
+        Klaus Jensen <its@irrelevant.dk>,
+        Yuval Shaia <yuval.shaia.ml@gmail.com>,
+        Yoshinori Sato <ysato@users.sourceforge.jp>,
+        Magnus Damm <magnus.damm@gmail.com>,
+        Fabien Chouteau <chouteau@adacore.com>,
+        KONRAD Frederic <frederic.konrad@adacore.com>,
+        Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+        Artyom Tarasenko <atar4qemu@gmail.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        Juan Quintela <quintela@redhat.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Konstantin Kostiuk <kkostiuk@redhat.com>,
+        Michael Roth <michael.roth@amd.com>,
+        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+        Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
+        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+        David Hildenbrand <david@redhat.com>,
+        Wenchao Wang <wenchao.wang@intel.com>,
+        Colin Xu <colin.xu@intel.com>,
+        Kamil Rytarowski <kamil@netbsd.org>,
+        Reinoud Zandijk <reinoud@netbsd.org>,
+        Sunil Muthuswamy <sunilmut@microsoft.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Thomas Huth <thuth@redhat.com>, Eric Blake <eblake@redhat.com>,
+        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+        John Snow <jsnow@redhat.com>, kvm@vger.kernel.org,
+        qemu-arm@nongnu.org, xen-devel@lists.xenproject.org,
+        qemu-ppc@nongnu.org, qemu-block@nongnu.org, haxm-team@intel.com,
+        qemu-s390x@nongnu.org
+References: <20220314160108.1440470-1-armbru@redhat.com>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= 
+        <philippe.mathieu.daude@gmail.com>
+In-Reply-To: <20220314160108.1440470-1-armbru@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, andre.przywara@arm.com, eric.auger@redhat.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-8.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Since adversising GICR_CTLR.{IC,CES} is directly observable from
-a guest, we need to make it selectable from userspace.
+On 14/3/22 17:01, Markus Armbruster wrote:
+> g_new(T, n) is neater than g_malloc(sizeof(T) * n).  It's also safer,
+> for two reasons.  One, it catches multiplication overflowing size_t.
+> Two, it returns T * rather than void *, which lets the compiler catch
+> more type errors.
+> 
+> This series only touches allocations with size arguments of the form
+> sizeof(T).  It's mechanical, except for a tiny fix in PATCH 2.
+> 
+> PATCH 1 adds the Coccinelle script.
+> 
+> PATCH 2 cleans up the virtio-9p subsystem, and fixes a harmless typing
+> error uncovered by the cleanup.
+> 
+> PATCH 3 cleans up everything else.  I started to split it up, but
+> splitting is a lot of decisions, and I just can't see the value.
+> 
+> For instance, MAINTAINERS tells me to split for subsystem "virtio",
+> patching
+> 
+>      hw/char/virtio-serial-bus.c
+>      hw/display/virtio-gpu.c
+>      hw/net/virtio-net.c
+>      hw/virtio/virtio-crypto.c
+>      hw/virtio/virtio-iommu.c
+>      hw/virtio/virtio.c
+> 
+> But it also tells me to split for subsystem "Character devices",
+> patching
+> 
+>      hw/char/parallel.c                       |  2 +-
+>      hw/char/riscv_htif.c                     |  2 +-
+>      hw/char/virtio-serial-bus.c              |  6 +-
+> 
+> and for subsystem "Network devices", patching
+> 
+>      hw/net/virtio-net.c
+> 
+> and for subsystem "virtio-gpu", patching
+> 
+>      hw/display/virtio-gpu.c
+> 
+> I guess I'd go with "virtio".  Six files down, 103 to go.  Thanks, but
+> no thanks.
+> 
+> Since the transformation is local to a function call, dropping is
+> completely safe.  We can deal with conflicts by dropping conflicting
+> hunks, with "git-pull -s recursive -X ours".  Or drop entire files
+> with conflicts.
+> 
+> If you want me to split off certain parts, please tell me exactly what
+> you want split off, and I'll gladly do the splitting.  I don't mind
+> the splitting part, I do mind the *thinking* part.
+> 
+> Markus Armbruster (3):
+>    scripts/coccinelle: New use-g_new-etc.cocci
+>    9pfs: Use g_new() & friends where that makes obvious sense
+>    Use g_new() & friends where that makes obvious sense
 
-For that, bump the default GICD_IIDR revision and let userspace
-downgrade it to the previous default. For GICv2, the two distributor
-revisions are strictly equivalent.
-
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/vgic/vgic-init.c    |  7 ++++++-
- arch/arm64/kvm/vgic/vgic-mmio-v2.c | 18 +++++++++++++++---
- arch/arm64/kvm/vgic/vgic-mmio-v3.c | 23 +++++++++++++++++++++--
- include/kvm/arm_vgic.h             |  3 +++
- 4 files changed, 45 insertions(+), 6 deletions(-)
-
-diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-index fc00304fe7d8..f84e04f334c6 100644
---- a/arch/arm64/kvm/vgic/vgic-init.c
-+++ b/arch/arm64/kvm/vgic/vgic-init.c
-@@ -319,7 +319,12 @@ int vgic_init(struct kvm *kvm)
- 
- 	vgic_debug_init(kvm);
- 
--	dist->implementation_rev = 2;
-+	/*
-+	 * If userspace didn't set the GIC implementation revision,
-+	 * default to the latest and greatest. You know want it.
-+	 */
-+	if (!dist->implementation_rev)
-+		dist->implementation_rev = KVM_VGIC_IMP_REV_LATEST;
- 	dist->initialized = true;
- 
- out:
-diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v2.c b/arch/arm64/kvm/vgic/vgic-mmio-v2.c
-index 12e4c223e6b8..f2246c4ca812 100644
---- a/arch/arm64/kvm/vgic/vgic-mmio-v2.c
-+++ b/arch/arm64/kvm/vgic/vgic-mmio-v2.c
-@@ -73,9 +73,13 @@ static int vgic_mmio_uaccess_write_v2_misc(struct kvm_vcpu *vcpu,
- 					   gpa_t addr, unsigned int len,
- 					   unsigned long val)
- {
-+	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
-+	u32 reg;
-+
- 	switch (addr & 0x0c) {
- 	case GIC_DIST_IIDR:
--		if (val != vgic_mmio_read_v2_misc(vcpu, addr, len))
-+		reg = vgic_mmio_read_v2_misc(vcpu, addr, len);
-+		if ((reg ^ val) & ~GICD_IIDR_REVISION_MASK)
- 			return -EINVAL;
- 
- 		/*
-@@ -87,8 +91,16 @@ static int vgic_mmio_uaccess_write_v2_misc(struct kvm_vcpu *vcpu,
- 		 * migration from old kernels to new kernels with legacy
- 		 * userspace.
- 		 */
--		vcpu->kvm->arch.vgic.v2_groups_user_writable = true;
--		return 0;
-+		reg = FIELD_GET(GICD_IIDR_REVISION_MASK, reg);
-+		switch (reg) {
-+		case KVM_VGIC_IMP_REV_2:
-+		case KVM_VGIC_IMP_REV_3:
-+			dist->v2_groups_user_writable = true;
-+			dist->implementation_rev = reg;
-+			return 0;
-+		default:
-+			return -EINVAL;
-+		}
- 	}
- 
- 	vgic_mmio_write_v2_misc(vcpu, addr, len, val);
-diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-index a6be403996c6..4c8e4f83e3d1 100644
---- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-@@ -155,13 +155,27 @@ static int vgic_mmio_uaccess_write_v3_misc(struct kvm_vcpu *vcpu,
- 					   unsigned long val)
- {
- 	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
-+	u32 reg;
- 
- 	switch (addr & 0x0c) {
- 	case GICD_TYPER2:
--	case GICD_IIDR:
- 		if (val != vgic_mmio_read_v3_misc(vcpu, addr, len))
- 			return -EINVAL;
- 		return 0;
-+	case GICD_IIDR:
-+		reg = vgic_mmio_read_v3_misc(vcpu, addr, len);
-+		if ((reg ^ val) & ~GICD_IIDR_REVISION_MASK)
-+			return -EINVAL;
-+
-+		reg = FIELD_GET(GICD_IIDR_REVISION_MASK, reg);
-+		switch (reg) {
-+		case KVM_VGIC_IMP_REV_2:
-+		case KVM_VGIC_IMP_REV_3:
-+			dist->implementation_rev = reg;
-+			return 0;
-+		default:
-+			return -EINVAL;
-+		}
- 	case GICD_CTLR:
- 		/* Not a GICv4.1? No HW SGIs */
- 		if (!kvm_vgic_global_state.has_gicv4_1)
-@@ -232,8 +246,13 @@ static unsigned long vgic_mmio_read_v3r_ctlr(struct kvm_vcpu *vcpu,
- 					     gpa_t addr, unsigned int len)
- {
- 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-+	unsigned long val;
-+
-+	val = atomic_read(&vgic_cpu->ctlr);
-+	if (vcpu->kvm->arch.vgic.implementation_rev >= KVM_VGIC_IMP_REV_3)
-+		val |= GICR_CTLR_IR | GICR_CTLR_CES;
- 
--	return vgic_cpu->lpis_enabled ? GICR_CTLR_ENABLE_LPIS : 0;
-+	return val;
- }
- 
- static void vgic_mmio_write_v3r_ctlr(struct kvm_vcpu *vcpu,
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 401236f97cf2..2d8f2e90edc2 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -231,6 +231,9 @@ struct vgic_dist {
- 
- 	/* Implementation revision as reported in the GICD_IIDR */
- 	u32			implementation_rev;
-+#define KVM_VGIC_IMP_REV_2	2 /* GICv2 restorable groups */
-+#define KVM_VGIC_IMP_REV_3	3 /* GICv3 GICR_CTLR.{IW,CES,RWP} */
-+#define KVM_VGIC_IMP_REV_LATEST	KVM_VGIC_IMP_REV_3
- 
- 	/* Userspace can write to GICv2 IGROUPR */
- 	bool			v2_groups_user_writable;
--- 
-2.34.1
-
+Series:
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
