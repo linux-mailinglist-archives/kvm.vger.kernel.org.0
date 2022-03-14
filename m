@@ -2,191 +2,231 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F1624D85F0
-	for <lists+kvm@lfdr.de>; Mon, 14 Mar 2022 14:32:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8935E4D85F8
+	for <lists+kvm@lfdr.de>; Mon, 14 Mar 2022 14:33:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241730AbiCNNda (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Mar 2022 09:33:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47018 "EHLO
+        id S241772AbiCNNeX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Mar 2022 09:34:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232918AbiCNNd2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Mar 2022 09:33:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2B25713DCE
-        for <kvm@vger.kernel.org>; Mon, 14 Mar 2022 06:32:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647264737;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=N2dBQ7kyew540zi+JMXl0o4PlnhZGpL163gOjfNKUtE=;
-        b=Dem1Ri40A9B5AUGUbW20ZGXveWY8rwXQ9XMi5izPprDDjgwtuMC1DZZ6Htgayj0dFwDIoQ
-        tSLXf4QWkVoD3iUTGF1YingnPc5fruTQZFx/Eip4dkN6Opcp36A5A1WwcHKH2FaCibMmeV
-        gBsI0DTeE9aQytS8oMpshmjzu7g4Nl4=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-321-uC9n-J7PPXqQtvWMQyRSZA-1; Mon, 14 Mar 2022 09:32:16 -0400
-X-MC-Unique: uC9n-J7PPXqQtvWMQyRSZA-1
-Received: by mail-ej1-f71.google.com with SMTP id hq34-20020a1709073f2200b006d677c94909so7991719ejc.8
-        for <kvm@vger.kernel.org>; Mon, 14 Mar 2022 06:32:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=N2dBQ7kyew540zi+JMXl0o4PlnhZGpL163gOjfNKUtE=;
-        b=A7Thj/QzRNXx4CCwYPPFTg+gDUyAdudp3Ig4t5DddZ68i39yqqBIr6s0VsvwvgRISL
-         ybYaWyuEuzymE7LVasLvcDXqSJ67TmGVneEb5dKH5bw1ztXL5e3z/Ju+338VwgDQjYT1
-         SXP93mCIWVOfr8Sif1JkS894/ekXx/FVq8yh5sQkrQBmOL+sx6LzxNBZHMqRaiIH/KMT
-         ZFq/hRI3GSNan26BTrdj/teDWnduy0ePLlZRoW0gS6sHaa35qkrbfPVSgWG2iYnMvPwG
-         3t9naCcJ8T4Tip2QgT4dIseHgZRbhCpgAcAcDq7BCI4ZcmjlUmopD6TjtztNkv8xq2et
-         QT1A==
-X-Gm-Message-State: AOAM530BioAeeKDIQ3h7bz2kPwg0Lbp7azQEOsXj+Ef1ct0Yxe+qZjq3
-        LaPs/tCvxTbvEOJ323UTDGgqoLXDFLtNHVSMPHi5vLULseTJQzQ+Rg+FVatEW8IV8tvGo0CZkuG
-        dx5ltAc8ctv8m
-X-Received: by 2002:a17:907:608f:b0:6db:af2c:ab7e with SMTP id ht15-20020a170907608f00b006dbaf2cab7emr11800380ejc.694.1647264731571;
-        Mon, 14 Mar 2022 06:32:11 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw2A4Jg7pFV8JQfJlYOlmkdwJUWsVc9ARLKYhWxh7NvlxsXly+PiHlJ2Xpyw1flCD87GI4MFA==
-X-Received: by 2002:a17:907:608f:b0:6db:af2c:ab7e with SMTP id ht15-20020a170907608f00b006dbaf2cab7emr11800348ejc.694.1647264731307;
-        Mon, 14 Mar 2022 06:32:11 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id g2-20020aa7c842000000b0041314b98872sm7887639edt.22.2022.03.14.06.32.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 14 Mar 2022 06:32:10 -0700 (PDT)
-Message-ID: <9f804acc-00b5-f619-f107-e3dc3c5ec8a6@redhat.com>
-Date:   Mon, 14 Mar 2022 14:32:08 +0100
+        with ESMTP id S236441AbiCNNeT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Mar 2022 09:34:19 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A401A220F8;
+        Mon, 14 Mar 2022 06:33:09 -0700 (PDT)
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22ED7Ce7005665;
+        Mon, 14 Mar 2022 13:33:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=ftoGDCTTZkmxdOHtHDjixHFUt9ePrLJ1PFX2dlqcOXw=;
+ b=TlmMwFTMV2XMoFZ0HWm7Z3K/C3hQHZp38d4hK1W4BV3PXJn7Esgjpi1ehT3n8fz+xbre
+ hKA1mBYv3ILpbo6OyzkHXNh0AEPRV1wQUBC5q2DdmXwrC+J5Pa3FYwStz5U1eoufaCas
+ 2lHnG/x5HqrtLQ7DGK1R8oT9Ci7/nW+m0jq/HtW88EcnW9iN6GsbDIXe7GMMSpI+pRLM
+ lUsxwy+lpg7+v3P4qDQPrPnSzQgR4MSoyPlIuPQGqF1ly/+r2J2H+WbEQFyMi20Pt6pg
+ cwZ+bSBW8dSKh2uo63qWjdOvK0EyIV96WyiujmHzi+r11xRrhABWWeYQP8fVKIV1eXoQ 1w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3et6a6s52y-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 14 Mar 2022 13:33:09 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22ED7Eva007430;
+        Mon, 14 Mar 2022 13:33:08 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3et6a6s51j-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 14 Mar 2022 13:33:08 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22EDDVoa023278;
+        Mon, 14 Mar 2022 13:33:06 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 3erk58v70r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 14 Mar 2022 13:33:06 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22EDX4tP41025842
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 14 Mar 2022 13:33:04 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 399B4AE075;
+        Mon, 14 Mar 2022 13:33:03 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D9A52AE058;
+        Mon, 14 Mar 2022 13:33:02 +0000 (GMT)
+Received: from [9.171.33.132] (unknown [9.171.33.132])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 14 Mar 2022 13:33:02 +0000 (GMT)
+Message-ID: <391eeaf9-3fa6-13eb-c9c9-bc4768b0605b@de.ibm.com>
+Date:   Mon, 14 Mar 2022 14:33:02 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: WARNING: CPU: 0 PID: 884 at
- arch/x86/kvm/../../../virt/kvm/kvm_main.c:3162 mark_page_dirty_in_slot
+ Thunderbird/91.6.0
+Subject: Re: [PATCH v1 1/1] KVM: s390x: fix SCK locking
 Content-Language: en-US
-To:     Naresh Kamboju <naresh.kamboju@linaro.org>,
-        Wanpeng Li <wanpengli@tencent.com>
-Cc:     open list <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        lkft-triage@lists.linaro.org
-References: <CA+G9fYsziOWHkV+YbKymtpVBkL=DAHnmMfkeuWvx0pJPg=fMEA@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <CA+G9fYsziOWHkV+YbKymtpVBkL=DAHnmMfkeuWvx0pJPg=fMEA@mail.gmail.com>
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
+        thuth@redhat.com, mimu@linux.ibm.com,
+        Heiko Carstens <hca@linux.ibm.com>
+References: <20220301143340.111129-1-imbrenda@linux.ibm.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+In-Reply-To: <20220301143340.111129-1-imbrenda@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: rSMxwYClecnzQn0EZcdxCWY4gwSdk6Tz
+X-Proofpoint-ORIG-GUID: FoBuKXckRBB7NJNI69RzS-NLOBubdTXR
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-03-14_08,2022-03-14_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 spamscore=0
+ malwarescore=0 phishscore=0 bulkscore=0 mlxscore=0 adultscore=0
+ clxscore=1015 suspectscore=0 priorityscore=1501 mlxlogscore=999
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2203140085
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/14/22 13:51, Naresh Kamboju wrote:
-> While running kselftest kvm tests on Linux mainline 5.17.0-rc8 on x86_64 device
-> the following kernel warning was noticed
+Am 01.03.22 um 15:33 schrieb Claudio Imbrenda:
+> When handling the SCK instruction, the kvm lock is taken, even though
+> the vcpu lock is already being held. The normal locking order is kvm
+> lock first and then vcpu lock. This is can (and in some circumstances
+> does) lead to deadlocks.
+> 
+> The function kvm_s390_set_tod_clock is called both by the SCK handler
+> and by some IOCTLs to set the clock. The IOCTLs will not hold the vcpu
+> lock, so they can safely take the kvm lock. The SCK handler holds the
+> vcpu lock, but will also somehow need to acquire the kvm lock without
+> relinquishing the vcpu lock.
+> 
+> The solution is to factor out the code to set the clock, and provide
+> two wrappers. One is called like the original function and does the
+> locking, the other is called kvm_s390_try_set_tod_clock and uses
+> trylock to try to acquire the kvm lock. This new wrapper is then used
+> in the SCK handler. If locking fails, -EAGAIN is returned, which is
+> eventually propagated to userspace, thus also freeing the vcpu lock and
+> allowing for forward progress.
+> 
+> This is not the most efficient or elegant way to solve this issue, but
+> the SCK instruction is deprecated and its performance is not critical.
+> 
+> The goal of this patch is just to provide a simple but correct way to
+> fix the bug.
+> 
+> Fixes: 6a3f95a6b04c ("KVM: s390: Intercept SCK instruction")
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> ---
+>   arch/s390/kvm/kvm-s390.c | 19 ++++++++++++++++---
+>   arch/s390/kvm/kvm-s390.h |  4 ++--
+>   arch/s390/kvm/priv.c     | 14 +++++++++++++-
+>   3 files changed, 31 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 2296b1ff1e02..4e3db4004bfd 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -3869,14 +3869,12 @@ static int kvm_s390_handle_requests(struct kvm_vcpu *vcpu)
+>   	return 0;
+>   }
+>   
+> -void kvm_s390_set_tod_clock(struct kvm *kvm,
+> -			    const struct kvm_s390_vm_tod_clock *gtod)
+> +static void __kvm_s390_set_tod_clock(struct kvm *kvm, const struct kvm_s390_vm_tod_clock *gtod)
+>   {
+>   	struct kvm_vcpu *vcpu;
+>   	union tod_clock clk;
+>   	unsigned long i;
+>   
+> -	mutex_lock(&kvm->lock);
+>   	preempt_disable();
+>   
+>   	store_tod_clock_ext(&clk);
+> @@ -3897,7 +3895,22 @@ void kvm_s390_set_tod_clock(struct kvm *kvm,
+>   
+>   	kvm_s390_vcpu_unblock_all(kvm);
+>   	preempt_enable();
+> +}
+> +
+> +void kvm_s390_set_tod_clock(struct kvm *kvm, const struct kvm_s390_vm_tod_clock *gtod)
+> +{
+> +	mutex_lock(&kvm->lock);
+> +	__kvm_s390_set_tod_clock(kvm, gtod);
+> +	mutex_unlock(&kvm->lock);
+> +}
+> +
+> +int kvm_s390_try_set_tod_clock(struct kvm *kvm, const struct kvm_s390_vm_tod_clock *gtod)
+> +{
+> +	if (!mutex_trylock(&kvm->lock))
+> +		return 0;
+> +	__kvm_s390_set_tod_clock(kvm, gtod);
+>   	mutex_unlock(&kvm->lock);
+> +	return 1;
+>   }
+>   
+>   /**
+> diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
+> index 098831e815e6..f2c910763d7f 100644
+> --- a/arch/s390/kvm/kvm-s390.h
+> +++ b/arch/s390/kvm/kvm-s390.h
+> @@ -349,8 +349,8 @@ int kvm_s390_handle_sigp(struct kvm_vcpu *vcpu);
+>   int kvm_s390_handle_sigp_pei(struct kvm_vcpu *vcpu);
+>   
+>   /* implemented in kvm-s390.c */
+> -void kvm_s390_set_tod_clock(struct kvm *kvm,
+> -			    const struct kvm_s390_vm_tod_clock *gtod);
+> +void kvm_s390_set_tod_clock(struct kvm *kvm, const struct kvm_s390_vm_tod_clock *gtod);
+> +int kvm_s390_try_set_tod_clock(struct kvm *kvm, const struct kvm_s390_vm_tod_clock *gtod);
+>   long kvm_arch_fault_in_page(struct kvm_vcpu *vcpu, gpa_t gpa, int writable);
+>   int kvm_s390_store_status_unloaded(struct kvm_vcpu *vcpu, unsigned long addr);
+>   int kvm_s390_vcpu_store_status(struct kvm_vcpu *vcpu, unsigned long addr);
+> diff --git a/arch/s390/kvm/priv.c b/arch/s390/kvm/priv.c
+> index 417154b314a6..7f3e7990ef82 100644
+> --- a/arch/s390/kvm/priv.c
+> +++ b/arch/s390/kvm/priv.c
+> @@ -102,7 +102,19 @@ static int handle_set_clock(struct kvm_vcpu *vcpu)
+>   		return kvm_s390_inject_prog_cond(vcpu, rc);
+>   
+>   	VCPU_EVENT(vcpu, 3, "SCK: setting guest TOD to 0x%llx", gtod.tod);
+> -	kvm_s390_set_tod_clock(vcpu->kvm, &gtod);
+> +	/*
+> +	 * To set the TOD clock we need to take the kvm lock, but we are
+> +	 * already holding the vcpu lock, and the usual lock order is the
+> +	 * opposite. Therefore we use trylock instead of lock, and if the
+> +	 * kvm lock cannot be taken, we retry the instruction and return
+> +	 * -EAGAIN to userspace, thus freeing the vcpu lock.
+> +	 * The SCK instruction is considered legacy and at this point it's
+> +	 * not worth the effort to find a nicer solution.
+> +	 */
 
-Thanks, this is known.  I'll get back to it this week since Linus gave 
-me an extra week. :)
+To comply more with usual comment style (no we, us) and to give more context
+on the legacy I will slightly modify the comment before sending out.
 
-Paolo
+	/*
+	 * To set the TOD clock the kvm lock must be taken, but the vcpu
+	 * lock is already held in handle_set_clock. The usual lock order
+	 * is the opposite.
+	 * As SCK is deprecated and should not be used in several cases
+	 * like the existence of the multiple epoch facility or TOD clock
+	 * steering (see Principles of Operation) a slow path can be used.
+	 * If the lock can not be taken via try_lock, the instruction will
+	 * be retried via -EAGAIN at a later point in time.
+          */
 
-> # selftests: kvm: hyperv_clock
-> [   59.752584] ------------[ cut here ]------------
-> [   59.757297] WARNING: CPU: 0 PID: 884 at
-> arch/x86/kvm/../../../virt/kvm/kvm_main.c:3162
-> mark_page_dirty_in_slot+0xba/0xd0
-> [   59.768196] Modules linked in: x86_pkg_temp_thermal fuse
-> [   59.773531] CPU: 0 PID: 884 Comm: hyperv_clock Not tainted 5.17.0-rc8 #1
-> [   59.780242] Hardware name: Supermicro SYS-5019S-ML/X11SSH-F, BIOS
-> 2.5 11/26/2020
-> [   59.787652] RIP: 0010:mark_page_dirty_in_slot+0xba/0xd0
-> [   59.792894] Code: 89 ea 09 c6 e8 07 cd 00 00 5b 41 5c 41 5d 41 5e
-> 5d c3 48 8b 83 c0 00 00 00 49 63 d5 f0 48 0f ab 10 5b 41 5c 41 5d 41
-> 5e 5d c3 <0f> 0b 5b 41 5c 41 5d 41 5e 5d c3 0f 1f 44 00 00 eb 80 0f 1f
-> 40 00
-> [   59.811659] RSP: 0018:ffffa1548109bbe0 EFLAGS: 00010246
-> [   59.816919] RAX: 0000000080000000 RBX: ffff9174c5303a00 RCX: 0000000000000000
-> [   59.824068] RDX: 0000000000000000 RSI: ffffffffb6e29061 RDI: ffffffffb6e29061
-> [   59.831219] RBP: ffffa1548109bc00 R08: 0000000000000000 R09: 0000000000000001
-> [   59.838369] R10: 0000000000000001 R11: 0000000000000000 R12: ffffa1548109d000
-> [   59.845545] R13: 0000000000000022 R14: 0000000000000000 R15: 0000000000000004
-> [   59.852721] FS:  00007f07cc7b9740(0000) GS:ffff917827a00000(0000)
-> knlGS:0000000000000000
-> [   59.860822] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [   59.866585] CR2: 0000000000000000 CR3: 0000000106700006 CR4: 00000000003726f0
-> [   59.873737] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> [   59.880886] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> [   59.888034] Call Trace:
-> [   59.890512]  <TASK>
-> [   59.892641]  __kvm_write_guest_page+0xc8/0x100
-> [   59.897112]  kvm_write_guest+0x61/0xb0
-> [   59.900882]  kvm_hv_invalidate_tsc_page+0xd3/0x140
-> [   59.905688]  ? kvm_hv_invalidate_tsc_page+0x72/0x140
-> [   59.910676]  kvm_arch_vm_ioctl+0x20f/0xb70
-> [   59.914789]  ? __lock_acquire+0x3af/0x2370
-> [   59.918913]  ? __this_cpu_preempt_check+0x13/0x20
-> [   59.923638]  ? lock_is_held_type+0xdd/0x130
-> [   59.927845]  kvm_vm_ioctl+0x774/0xe10
-> [   59.931530]  ? ktime_get_coarse_real_ts64+0xbe/0xd0
-> [   59.936429]  ? __this_cpu_preempt_check+0x13/0x20
-> [   59.941178]  ? lockdep_hardirqs_on+0x7e/0x100
-> [   59.945552]  ? ktime_get_coarse_real_ts64+0xbe/0xd0
-> [   59.950493]  ? ktime_get_coarse_real_ts64+0xbe/0xd0
-> [   59.955459]  ? security_file_ioctl+0x37/0x50
-> [   59.959753]  __x64_sys_ioctl+0x91/0xc0
-> [   59.963524]  do_syscall_64+0x5c/0x80
-> [   59.967125]  ? do_syscall_64+0x69/0x80
-> [   59.970896]  ? syscall_exit_to_user_mode+0x3e/0x50
-> [   59.975706]  ? do_syscall_64+0x69/0x80
-> [   59.979495]  ? exc_page_fault+0x7c/0x250
-> [   59.983453]  ? asm_exc_page_fault+0x8/0x30
-> [   59.987570]  entry_SYSCALL_64_after_hwframe+0x44/0xae
-> [   59.992637] RIP: 0033:0x7f07cc0b78f7
-> [   59.996234] Code: b3 66 90 48 8b 05 a1 35 2c 00 64 c7 00 26 00 00
-> 00 48 c7 c0 ff ff ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 b8 10 00 00
-> 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 71 35 2c 00 f7 d8 64 89
-> 01 48
-> [   60.014996] RSP: 002b:00007ffdf0b37478 EFLAGS: 00000246 ORIG_RAX:
-> 0000000000000010
-> [   60.022581] RAX: ffffffffffffffda RBX: 000000004030ae7b RCX: 00007f07cc0b78f7
-> [   60.029729] RDX: 00007ffdf0b374b0 RSI: 000000004030ae7b RDI: 0000000000000006
-> [   60.036880] RBP: 0000000000000007 R08: 000000000040de60 R09: 0000000000000007
-> [   60.044030] R10: 0000000000067816 R11: 0000000000000246 R12: 00007f07cc7bf000
-> [   60.051180] R13: 0000000000000007 R14: 0000000000006592 R15: 0000000000136843
-> [   60.058357]  </TASK>
-> [   60.060566] irq event stamp: 6625
-> [   60.063925] hardirqs last  enabled at (6635): [<ffffffffb7064848>]
-> __up_console_sem+0x58/0x60
-> [   60.072511] hardirqs last disabled at (6644): [<ffffffffb706482d>]
-> __up_console_sem+0x3d/0x60
-> [   60.081044] softirqs last  enabled at (6092): [<ffffffffb8400327>]
-> __do_softirq+0x327/0x493
-> [   60.089407] softirqs last disabled at (6085): [<ffffffffb6fe3a65>]
-> irq_exit_rcu+0xe5/0x130
-> [   60.097735] ---[ end trace 0000000000000000 ]---
-> ok 6 selftests: kvm: hyperv_clock
-> 
-> Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
-> 
-> metadata:
->    git_describe: v5.17-rc8
->    git_ref: master
->    git_repo: https://gitlab.com/Linaro/lkft/mirrors/torvalds/linux-mainline
->    git_sha: 09688c0166e76ce2fb85e86b9d99be8b0084cdf9
->    kernel-config: https://builds.tuxbuild.com/26LbaUN6vcuAN7Rd69gZkFWp5J8/config
->    build: https://builds.tuxbuild.com/26LbaUN6vcuAN7Rd69gZkFWp5J8/
-> 
-> --
-> Linaro LKFT
-> https://lkft.linaro.org
-> 
-> [1] https://lkft.validation.linaro.org/scheduler/job/4714912#L1520
-> [2] https://qa-reports.linaro.org/lkft/linux-mainline-master/build/v5.17-rc8/testrun/8445627/suite/linux-log-parser/test/check-kernel-warning-4714912/details/
-> 
+Ok with everybody?
 
+
+
+> +	if (!kvm_s390_try_set_tod_clock(vcpu->kvm, &gtod)) {
+> +		kvm_s390_retry_instr(vcpu);
+> +		return -EAGAIN;
+> +	}
+>   
+>   	kvm_s390_set_psw_cc(vcpu, 0);
+>   	return 0;
