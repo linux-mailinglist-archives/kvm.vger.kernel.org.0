@@ -2,154 +2,423 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 61E8D4D8C76
-	for <lists+kvm@lfdr.de>; Mon, 14 Mar 2022 20:32:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 221FA4D8C92
+	for <lists+kvm@lfdr.de>; Mon, 14 Mar 2022 20:41:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240059AbiCNTdm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Mar 2022 15:33:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46920 "EHLO
+        id S244113AbiCNTmU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Mar 2022 15:42:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35654 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234713AbiCNTdi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Mar 2022 15:33:38 -0400
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C5E03B54A;
-        Mon, 14 Mar 2022 12:32:28 -0700 (PDT)
-Received: from fraeml743-chm.china.huawei.com (unknown [172.18.147.200])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4KHRVk2vyPz67tWy;
-        Tue, 15 Mar 2022 03:31:42 +0800 (CST)
-Received: from lhreml717-chm.china.huawei.com (10.201.108.68) by
- fraeml743-chm.china.huawei.com (10.206.15.224) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Mon, 14 Mar 2022 20:32:25 +0100
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- lhreml717-chm.china.huawei.com (10.201.108.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Mon, 14 Mar 2022 19:32:24 +0000
-Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
- lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
- 15.01.2308.021; Mon, 14 Mar 2022 19:32:24 +0000
-From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To:     Alex Williamson <alex.williamson@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "jgg@nvidia.com" <jgg@nvidia.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>,
-        "yishaih@nvidia.com" <yishaih@nvidia.com>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "corbet@lwn.net" <corbet@lwn.net>
-Subject: RE: [PATCH v2] vfio-pci: Provide reviewers and acceptance criteria
- for vendor drivers
-Thread-Topic: [PATCH v2] vfio-pci: Provide reviewers and acceptance criteria
- for vendor drivers
-Thread-Index: AQHYN9fUy7fxUOZsykSafATTP7QdGKy/Q+lA
-Date:   Mon, 14 Mar 2022 19:32:24 +0000
-Message-ID: <07c58f14b98647f1833f1aac1220bc44@huawei.com>
-References: <164728518026.40450.7442813673746870904.stgit@omen>
-In-Reply-To: <164728518026.40450.7442813673746870904.stgit@omen>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.47.89.194]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        with ESMTP id S232288AbiCNTmT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Mar 2022 15:42:19 -0400
+Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 146233CA45
+        for <kvm@vger.kernel.org>; Mon, 14 Mar 2022 12:41:07 -0700 (PDT)
+Received: by mail-io1-xd2c.google.com with SMTP id c23so19651194ioi.4
+        for <kvm@vger.kernel.org>; Mon, 14 Mar 2022 12:41:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=dOhxfMjGjR8ZaJk+jcBpHhmGin6K+/4J7u9JMGmRLbg=;
+        b=sI9JdJno8Hz1lo2nyb+hKD45ZTwd6x3OrlZO82XCfr6ct7E42iIesJomUDPZFQOSD9
+         b46oJTTQeiC6vI+7c2ZyW4CI4iy0P6/OZcr1KP/Hnq5Y8Ep2gE+m1EbMNOFisUUZEoAi
+         h8QIFVubMcDQ54aaQzGwsZWB1D66g0pMwIHPBpn+zo7gpWudcxRo0t6qZxNjZokT7ccf
+         HNCQmBDZxE0F5/VCU2wqKZ2772urmIRdTGnF2JN7eqCzqAtueIuGkedvz6jRXeR2wGU9
+         CT3pOSTEaSKoWxEmjLpCvG9C8VVVtQ1uBRueEaTF1weE4E23+o3NmJKvA+meswYZaCef
+         g9NQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=dOhxfMjGjR8ZaJk+jcBpHhmGin6K+/4J7u9JMGmRLbg=;
+        b=AeCNxfLBiQrbzKb3uLgEGjN+zFD38OUuAFVMcHFJBVlYiz849d1MlQIjadiYCd5LFq
+         frZnPTK1g4DQ+OunoYo6SJhgyXAzJk3ZsTdnJxmnaHIHA2O5NEgjqb8UlJqAOwuzmqUQ
+         jXOvmmHNpPnEI0PApMn0tBCDwFxrtJR0ny47p4ba2Pb/Acr1QzLRo+eNIBXR2yjFpT4J
+         K+SHyo7zxe/r+H9DyeWmD3xEJduscL8Iok0ZxH0aEzrag3n1c4BqxEVyame5n3qXLrvz
+         NrDLwQdBhKTn8Ry8cWN9pZ1I7TxTQQgOsyUw+FUVPm8lh1vtcFxRYdvnXxR/gZQaEE+k
+         w8Lg==
+X-Gm-Message-State: AOAM532cmo2ryrkGfbQkCoMRWbkSOfyhapxHcBh5qWUQJXDxKFFj140x
+        kevJbknzvVsVzvRUvjLJ9JX5Ng==
+X-Google-Smtp-Source: ABdhPJz0l581C049GmPkMTOXgT/diIr856f/NAzBGVobnGkkZfNp7av7ul9drC37wsRTbkSa2Mdh0w==
+X-Received: by 2002:a05:6602:29cb:b0:638:d53c:d212 with SMTP id z11-20020a05660229cb00b00638d53cd212mr20547956ioq.167.1647286866075;
+        Mon, 14 Mar 2022 12:41:06 -0700 (PDT)
+Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
+        by smtp.gmail.com with ESMTPSA id t1-20020a92cc41000000b002c796ff2f95sm3364445ilq.9.2022.03.14.12.41.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Mar 2022 12:41:05 -0700 (PDT)
+Date:   Mon, 14 Mar 2022 19:41:02 +0000
+From:   Oliver Upton <oupton@google.com>
+To:     Raghavendra Rao Ananta <rananta@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Andrew Jones <drjones@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v4 05/13] KVM: arm64: Setup a framework for hypercall
+ bitmap firmware registers
+Message-ID: <Yi+aTs4ufnxHXg4r@google.com>
+References: <20220224172559.4170192-1-rananta@google.com>
+ <20220224172559.4170192-6-rananta@google.com>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220224172559.4170192-6-rananta@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogQWxleCBXaWxsaWFtc29u
-IFttYWlsdG86YWxleC53aWxsaWFtc29uQHJlZGhhdC5jb21dDQo+IFNlbnQ6IDE0IE1hcmNoIDIw
-MjIgMTk6MTUNCj4gVG86IGFsZXgud2lsbGlhbXNvbkByZWRoYXQuY29tOyBrdm1Admdlci5rZXJu
-ZWwub3JnDQo+IENjOiBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnOyBqZ2dAbnZpZGlhLmNv
-bTsgU2hhbWVlcmFsaSBLb2xvdGh1bSBUaG9kaQ0KPiA8c2hhbWVlcmFsaS5rb2xvdGh1bS50aG9k
-aUBodWF3ZWkuY29tPjsga2V2aW4udGlhbkBpbnRlbC5jb207DQo+IHlpc2hhaWhAbnZpZGlhLmNv
-bTsgbGludXgtZG9jQHZnZXIua2VybmVsLm9yZzsgY29yYmV0QGx3bi5uZXQNCj4gU3ViamVjdDog
-W1BBVENIIHYyXSB2ZmlvLXBjaTogUHJvdmlkZSByZXZpZXdlcnMgYW5kIGFjY2VwdGFuY2UgY3Jp
-dGVyaWEgZm9yDQo+IHZlbmRvciBkcml2ZXJzDQo+IA0KPiBWZW5kb3Igb3IgZGV2aWNlIHNwZWNp
-ZmljIGV4dGVuc2lvbnMgZm9yIGRldmljZXMgZXhwb3NlZCB0byB1c2Vyc3BhY2UNCj4gdGhyb3Vn
-aCB0aGUgdmZpby1wY2ktY29yZSBsaWJyYXJ5IG9wZW4gYm90aCBuZXcgZnVuY3Rpb25hbGl0eSBh
-bmQgbmV3DQo+IHJpc2tzLiAgSGVyZSB3ZSBhdHRlbXB0IHRvIHByb3ZpZGVkIGZvcm1hbGl6ZWQg
-cmVxdWlyZW1lbnRzIGFuZA0KPiBleHBlY3RhdGlvbnMgdG8gZW5zdXJlIHRoYXQgZnV0dXJlIGRy
-aXZlcnMgYm90aCBjb2xsYWJvcmF0ZSBpbiB0aGVpcg0KPiBpbnRlcmFjdGlvbiB3aXRoIGV4aXN0
-aW5nIGhvc3QgZHJpdmVycywgYXMgd2VsbCBhcyByZWNlaXZlIGFkZGl0aW9uYWwNCj4gcmV2aWV3
-cyBmcm9tIGNvbW11bml0eSBtZW1iZXJzIHdpdGggZXhwZXJpZW5jZSBpbiB0aGlzIGFyZWEuDQo+
-IA0KPiBDYzogSmFzb24gR3VudGhvcnBlIDxqZ2dAbnZpZGlhLmNvbT4NCj4gQ2M6IFlpc2hhaSBI
-YWRhcyA8eWlzaGFpaEBudmlkaWEuY29tPg0KPiBDYzogU2hhbWVlciBLb2xvdGh1bSA8c2hhbWVl
-cmFsaS5rb2xvdGh1bS50aG9kaUBodWF3ZWkuY29tPg0KPiBDYzogS2V2aW4gVGlhbiA8a2V2aW4u
-dGlhbkBpbnRlbC5jb20+DQo+IFNpZ25lZC1vZmYtYnk6IEFsZXggV2lsbGlhbXNvbiA8YWxleC53
-aWxsaWFtc29uQHJlZGhhdC5jb20+DQoNCkFja2VkLWJ5OiBTaGFtZWVyIEtvbG90aHVtIDxzaGFt
-ZWVyYWxpLmtvbG90aHVtLnRob2RpQGh1YXdlaS5jb20+DQoNClRoYW5rcywNClNoYW1lZXINCg0K
-PiAtLS0NCj4gDQo+IHYyOg0KPiANCj4gQWRkZWQgWWlzaGFpDQo+IA0KPiB2MToNCj4gDQo+IFBl
-ciB0aGUgcHJvcG9zYWwgaGVyZVsxXSwgSSd2ZSBjb2xsZWN0ZWQgdGhvc2UgdGhhdCB2b2x1bnRl
-ZXJlZCBhbmQNCj4gdGhvc2UgdGhhdCBJIGludGVycHJldGVkIGFzIHNob3dpbmcgaW50ZXJlc3Qg
-KGFscGhhIGJ5IGxhc3QgbmFtZSkuICBGb3INCj4gdGhvc2Ugb24gdGhlIHJldmlld2VycyBsaXN0
-IGJlbG93LCBwbGVhc2UgUi1iL0EtYiB0byBrZWVwIHlvdXIgbmFtZSBhcyBhDQo+IHJldmlld2Vy
-LiAgTW9yZSB2b2x1bnRlZXJzIGFyZSBzdGlsbCB3ZWxjb21lLCBwbGVhc2UgbGV0IG1lIGtub3cN
-Cj4gZXhwbGljaXRseTsgUi1iL0EtYiB3aWxsIG5vdCBiZSB1c2VkIHRvIGF1dG9tYXRpY2FsbHkg
-YWRkIHJldmlld2VycyBidXQNCj4gYXJlIG9mIGNvdXJzZSB3ZWxjb21lLiAgVGhhbmtzLA0KPiAN
-Cj4gQWxleA0KPiANCj4gWzFdaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcvYWxsLzIwMjIwMzEwMTM0
-OTU0LjBkZjRiYjEyLmFsZXgud2lsbGlhbXNvbkByZWQNCj4gaGF0LmNvbS8NCj4gIC4uLi92Zmlv
-L3ZmaW8tcGNpLXZlbmRvci1kcml2ZXItYWNjZXB0YW5jZS5yc3QgICAgIHwgICAzNQ0KPiArKysr
-KysrKysrKysrKysrKysrKw0KPiAgTUFJTlRBSU5FUlMgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgfCAgIDEwICsrKysrKw0KPiAgMiBmaWxlcyBjaGFuZ2VkLCA0NSBpbnNl
-cnRpb25zKCspDQo+ICBjcmVhdGUgbW9kZSAxMDA2NDQNCj4gRG9jdW1lbnRhdGlvbi92ZmlvL3Zm
-aW8tcGNpLXZlbmRvci1kcml2ZXItYWNjZXB0YW5jZS5yc3QNCj4gDQo+IGRpZmYgLS1naXQgYS9E
-b2N1bWVudGF0aW9uL3ZmaW8vdmZpby1wY2ktdmVuZG9yLWRyaXZlci1hY2NlcHRhbmNlLnJzdA0K
-PiBiL0RvY3VtZW50YXRpb24vdmZpby92ZmlvLXBjaS12ZW5kb3ItZHJpdmVyLWFjY2VwdGFuY2Uu
-cnN0DQo+IG5ldyBmaWxlIG1vZGUgMTAwNjQ0DQo+IGluZGV4IDAwMDAwMDAwMDAwMC4uM2ExMDhk
-NzQ4NjgxDQo+IC0tLSAvZGV2L251bGwNCj4gKysrIGIvRG9jdW1lbnRhdGlvbi92ZmlvL3ZmaW8t
-cGNpLXZlbmRvci1kcml2ZXItYWNjZXB0YW5jZS5yc3QNCj4gQEAgLTAsMCArMSwzNSBAQA0KPiAr
-Li4gU1BEWC1MaWNlbnNlLUlkZW50aWZpZXI6IEdQTC0yLjANCj4gKw0KPiArQWNjZXB0YW5jZSBj
-cml0ZXJpYSBmb3IgdmZpby1wY2kgZGV2aWNlIHNwZWNpZmljIGRyaXZlciB2YXJpYW50cw0KPiAr
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PQ0KPiArDQo+ICtPdmVydmlldw0KPiArLS0tLS0tLS0NCj4gK1RoZSB2ZmlvLXBjaSBk
-cml2ZXIgZXhpc3RzIGFzIGEgZGV2aWNlIGFnbm9zdGljIGRyaXZlciB1c2luZyB0aGUNCj4gK3N5
-c3RlbSBJT01NVSBhbmQgcmVseWluZyBvbiB0aGUgcm9idXN0bmVzcyBvZiBwbGF0Zm9ybSBmYXVs
-dA0KPiAraGFuZGxpbmcgdG8gcHJvdmlkZSBpc29sYXRlZCBkZXZpY2UgYWNjZXNzIHRvIHVzZXJz
-cGFjZS4gIFdoaWxlIHRoZQ0KPiArdmZpby1wY2kgZHJpdmVyIGRvZXMgaW5jbHVkZSBzb21lIGRl
-dmljZSBzcGVjaWZpYyBzdXBwb3J0LCBmdXJ0aGVyDQo+ICtleHRlbnNpb25zIGZvciB5ZXQgbW9y
-ZSBhZHZhbmNlZCBkZXZpY2Ugc3BlY2lmaWMgZmVhdHVyZXMgYXJlIG5vdA0KPiArc3VzdGFpbmFi
-bGUuICBUaGUgdmZpby1wY2kgZHJpdmVyIGhhcyB0aGVyZWZvcmUgc3BsaXQgb3V0DQo+ICt2Zmlv
-LXBjaS1jb3JlIGFzIGEgbGlicmFyeSB0aGF0IG1heSBiZSByZXVzZWQgdG8gaW1wbGVtZW50IGZl
-YXR1cmVzDQo+ICtyZXF1aXJpbmcgZGV2aWNlIHNwZWNpZmljIGtub3dsZWRnZSwgZXguIHNhdmlu
-ZyBhbmQgbG9hZGluZyBkZXZpY2UNCj4gK3N0YXRlIGZvciB0aGUgcHVycG9zZXMgb2Ygc3VwcG9y
-dGluZyBtaWdyYXRpb24uDQo+ICsNCj4gK0luIHN1cHBvcnQgb2Ygc3VjaCBmZWF0dXJlcywgaXQn
-cyBleHBlY3RlZCB0aGF0IHNvbWUgZGV2aWNlIHNwZWNpZmljDQo+ICt2YXJpYW50cyBtYXkgaW50
-ZXJhY3Qgd2l0aCBwYXJlbnQgZGV2aWNlcyAoZXguIFNSLUlPViBQRiBpbiBzdXBwb3J0IG9mDQo+
-ICthIHVzZXIgYXNzaWduZWQgVkYpIG9yIG90aGVyIGV4dGVuc2lvbnMgdGhhdCBtYXkgbm90IGJl
-IG90aGVyd2lzZQ0KPiArYWNjZXNzaWJsZSB2aWEgdGhlIHZmaW8tcGNpIGJhc2UgZHJpdmVyLiAg
-QXV0aG9ycyBvZiBzdWNoIGRyaXZlcnMNCj4gK3Nob3VsZCBiZSBkaWxpZ2VudCBub3QgdG8gY3Jl
-YXRlIGV4cGxvaXRhYmxlIGludGVyZmFjZXMgdmlhIHN1Y2gNCj4gK2ludGVyYWN0aW9ucyBvciBh
-bGxvdyB1bmNoZWNrZWQgdXNlcnNwYWNlIGRhdGEgdG8gaGF2ZSBhbiBlZmZlY3QNCj4gK2JleW9u
-ZCB0aGUgc2NvcGUgb2YgdGhlIGFzc2lnbmVkIGRldmljZS4NCj4gKw0KPiArTmV3IGRyaXZlciBz
-dWJtaXNzaW9ucyBhcmUgdGhlcmVmb3JlIHJlcXVlc3RlZCB0byBoYXZlIGFwcHJvdmFsIHZpYQ0K
-PiArU2lnbi1vZmYvQWNrZWQtYnkvZXRjIGZvciBhbnkgaW50ZXJhY3Rpb25zIHdpdGggcGFyZW50
-IGRyaXZlcnMuDQo+ICtBZGRpdGlvbmFsbHksIGRyaXZlcnMgc2hvdWxkIG1ha2UgYW4gYXR0ZW1w
-dCB0byBwcm92aWRlIHN1ZmZpY2llbnQNCj4gK2RvY3VtZW50YXRpb24gZm9yIHJldmlld2VycyB0
-byB1bmRlcnN0YW5kIHRoZSBkZXZpY2Ugc3BlY2lmaWMNCj4gK2V4dGVuc2lvbnMsIGZvciBleGFt
-cGxlIGluIHRoZSBjYXNlIG9mIG1pZ3JhdGlvbiBkYXRhLCBob3cgaXMgdGhlDQo+ICtkZXZpY2Ug
-c3RhdGUgY29tcG9zZWQgYW5kIGNvbnN1bWVkLCB3aGljaCBwb3J0aW9ucyBhcmUgbm90IG90aGVy
-d2lzZQ0KPiArYXZhaWxhYmxlIHRvIHRoZSB1c2VyIHZpYSB2ZmlvLXBjaSwgd2hhdCBzYWZlZ3Vh
-cmRzIGV4aXN0IHRvIHZhbGlkYXRlDQo+ICt0aGUgZGF0YSwgZXRjLiAgVG8gdGhhdCBleHRlbnQs
-IGF1dGhvcnMgc2hvdWxkIGFkZGl0aW9uYWxseSBleHBlY3QgdG8NCj4gK3JlcXVpcmUgcmV2aWV3
-cyBmcm9tIGF0IGxlYXN0IG9uZSBvZiB0aGUgbGlzdGVkIHJldmlld2VycywgaW4gYWRkaXRpb24N
-Cj4gK3RvIHRoZSBvdmVyYWxsIHZmaW8gbWFpbnRhaW5lci4NCj4gZGlmZiAtLWdpdCBhL01BSU5U
-QUlORVJTIGIvTUFJTlRBSU5FUlMNCj4gaW5kZXggNDMyMmI1MzIxODkxLi43ZjZiMTQwMTM0MTIg
-MTAwNjQ0DQo+IC0tLSBhL01BSU5UQUlORVJTDQo+ICsrKyBiL01BSU5UQUlORVJTDQo+IEBAIC0y
-MDMxNCw2ICsyMDMxNCwxNiBAQCBGOglkcml2ZXJzL3ZmaW8vbWRldi8NCj4gIEY6CWluY2x1ZGUv
-bGludXgvbWRldi5oDQo+ICBGOglzYW1wbGVzL3ZmaW8tbWRldi8NCj4gDQo+ICtWRklPIFBDSSBW
-RU5ET1IgRFJJVkVSUw0KPiArUjoJSmFzb24gR3VudGhvcnBlIDxqZ2dAbnZpZGlhLmNvbT4NCj4g
-K1I6CVlpc2hhaSBIYWRhcyA8eWlzaGFpaEBudmlkaWEuY29tPg0KPiArUjoJU2hhbWVlciBLb2xv
-dGh1bSA8c2hhbWVlcmFsaS5rb2xvdGh1bS50aG9kaUBodWF3ZWkuY29tPg0KPiArUjoJS2V2aW4g
-VGlhbiA8a2V2aW4udGlhbkBpbnRlbC5jb20+DQo+ICtMOglrdm1Admdlci5rZXJuZWwub3JnDQo+
-ICtTOglNYWludGFpbmVkDQo+ICtQOglEb2N1bWVudGF0aW9uL3ZmaW8vdmZpby1wY2ktdmVuZG9y
-LWRyaXZlci1hY2NlcHRhbmNlLnJzdA0KPiArRjoJZHJpdmVycy92ZmlvL3BjaS8qLw0KPiArDQo+
-ICBWRklPIFBMQVRGT1JNIERSSVZFUg0KPiAgTToJRXJpYyBBdWdlciA8ZXJpYy5hdWdlckByZWRo
-YXQuY29tPg0KPiAgTDoJa3ZtQHZnZXIua2VybmVsLm9yZw0KPiANCj4gDQoNCg==
+On Thu, Feb 24, 2022 at 05:25:51PM +0000, Raghavendra Rao Ananta wrote:
+> KVM regularly introduces new hypercall services to the guests without
+> any consent from the userspace. This means, the guests can observe
+> hypercall services in and out as they migrate across various host
+> kernel versions. This could be a major problem if the guest
+> discovered a hypercall, started using it, and after getting migrated
+> to an older kernel realizes that it's no longer available. Depending
+> on how the guest handles the change, there's a potential chance that
+> the guest would just panic.
+> 
+> As a result, there's a need for the userspace to elect the services
+> that it wishes the guest to discover. It can elect these services
+> based on the kernels spread across its (migration) fleet. To remedy
+> this, extend the existing firmware psuedo-registers, such as
+> KVM_REG_ARM_PSCI_VERSION, for all the hypercall services available.
+> 
+> These firmware registers are categorized based on the service call
+> owners, and unlike the existing firmware psuedo-registers, they hold
+> the features supported in the form of a bitmap.
+> 
+> During the VM initialization, the registers holds an upper-limit of
+> the features supported by the corresponding registers. It's expected
+> that the VMMs discover the features provided by each register via
+> GET_ONE_REG, and writeback the desired values using SET_ONE_REG.
+> KVM allows this modification only until the VM has started.
+> 
+> Older userspace code can simply ignore the capability and the
+> hypercall services will be exposed unconditionally to the guests, thus
+> ensuring backward compatibility.
+> 
+> In this patch, the framework adds the register only for ARM's standard
+> secure services (owner value 4). Currently, this includes support only
+> for ARM True Random Number Generator (TRNG) service, with bit-0 of the
+> register representing mandatory features of v1.0. The register is also
+> added to the kvm_arm_vm_scope_fw_regs[] list as it maintains its state
+> per-VM. Other services are momentarily added in the upcoming patches.
+> 
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 12 +++++
+>  arch/arm64/include/uapi/asm/kvm.h |  8 ++++
+>  arch/arm64/kvm/arm.c              |  8 ++++
+>  arch/arm64/kvm/guest.c            |  1 +
+>  arch/arm64/kvm/hypercalls.c       | 78 +++++++++++++++++++++++++++++++
+>  include/kvm/arm_hypercalls.h      |  4 ++
+>  6 files changed, 111 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index e823571e50cc..1909ced3208f 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -101,6 +101,15 @@ struct kvm_s2_mmu {
+>  struct kvm_arch_memory_slot {
+>  };
+>  
+> +/**
+> + * struct kvm_hvc_desc: KVM ARM64 hypercall descriptor
+> + *
+> + * @hvc_std_bmap: Bitmap of standard secure service calls
+> + */
+> +struct kvm_hvc_desc {
+
+nit: maybe call this structure kvm_hypercall_features? When nested comes
+along guests will need to use the SVC conduit as HVC traps are always
+taken to EL2. Same will need to be true for virtual EL2.
+
+> +	u64 hvc_std_bmap;
+> +};
+> +
+>  struct kvm_arch {
+>  	struct kvm_s2_mmu mmu;
+>  
+> @@ -142,6 +151,9 @@ struct kvm_arch {
+>  
+>  	/* Capture first run of the VM */
+>  	bool has_run_once;
+> +
+> +	/* Hypercall firmware register' descriptor */
+> +	struct kvm_hvc_desc hvc_desc;
+>  };
+>  
+>  struct kvm_vcpu_fault_info {
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> index c35447cc0e0c..2decc30d6b84 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -287,6 +287,14 @@ struct kvm_arm_copy_mte_tags {
+>  #define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_REQUIRED	3
+>  #define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED     	(1U << 4)
+>  
+> +/* Bitmap firmware registers, extension to the existing psuedo-register space */
+> +#define KVM_REG_ARM_FW_BMAP			KVM_REG_ARM_FW_REG(0xff00)
+
+What is the motivation for moving the bitmap register indices so far
+away from the rest of the firmware regs?
+
+> +#define KVM_REG_ARM_FW_BMAP_REG(r)		(KVM_REG_ARM_FW_BMAP | (r))
+
+If you are still going to use the index offset, just pass 'r' through to
+the other macro:
+
+  #define KVM_REG_ARM_FW_BMAP_REG(r) 		KVM_REG_ARM_FW_REG(0xff00 + r)
+
+> +#define KVM_REG_ARM_STD_BMAP			KVM_REG_ARM_FW_BMAP_REG(0)
+> +#define KVM_REG_ARM_STD_BIT_TRNG_V1_0		BIT(0)
+> +#define KVM_REG_ARM_STD_BMAP_BIT_MAX		0       /* Last valid bit */
+
+Implementation details such as this probably shouldn't live in UAPI
+headers. We'll likely need to bump the value in the future.
+
+> +
+>  /* SVE registers */
+>  #define KVM_REG_ARM64_SVE		(0x15 << KVM_REG_ARM_COPROC_SHIFT)
+>  
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index f61cd8d57eae..e9f9edb1cf55 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -156,6 +156,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>  	kvm->arch.max_vcpus = kvm_arm_default_max_vcpus();
+>  
+>  	set_default_spectre(kvm);
+> +	kvm_arm_init_hypercalls(kvm);
+>  
+>  	return ret;
+>  out_free_stage2_pgd:
+> @@ -635,7 +636,14 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
+>  	if (kvm_vm_is_protected(kvm))
+>  		kvm_call_hyp_nvhe(__pkvm_vcpu_init_traps, vcpu);
+>  
+> +	/*
+> +	 * Grab kvm->lock such that the reader of has_run_once can finish
+> +	 * the necessary operation atomically, such as deciding whether to
+> +	 * block the writes to the firmware registers if the VM has run once.
+> +	 */
+> +	mutex_lock(&kvm->lock);
+>  	kvm->arch.has_run_once = true;
+> +	mutex_unlock(&kvm->lock);
+
+Shouldn't this have just grabbed the kvm lock in patch 04/13?
+
+>  	return ret;
+>  }
+> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> index eb061e64a7a5..d66e6c742bbe 100644
+> --- a/arch/arm64/kvm/guest.c
+> +++ b/arch/arm64/kvm/guest.c
+> @@ -65,6 +65,7 @@ const struct kvm_stats_header kvm_vcpu_stats_header = {
+>  static const u64 kvm_arm_vm_scope_fw_regs[] = {
+>  	KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1,
+>  	KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2,
+> +	KVM_REG_ARM_STD_BMAP,
+>  };
+>  
+>  /**
+> diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+> index 8624e6964940..48c126c3da72 100644
+> --- a/arch/arm64/kvm/hypercalls.c
+> +++ b/arch/arm64/kvm/hypercalls.c
+> @@ -58,6 +58,29 @@ static void kvm_ptp_get_time(struct kvm_vcpu *vcpu, u64 *val)
+>  	val[3] = lower_32_bits(cycles);
+>  }
+>  
+> +static bool kvm_arm_fw_reg_feat_enabled(u64 reg_bmap, u64 feat_bit)
+> +{
+> +	return reg_bmap & feat_bit;
+> +}
+> +
+> +static bool kvm_hvc_call_supported(struct kvm_vcpu *vcpu, u32 func_id)
+> +{
+> +	struct kvm_hvc_desc *hvc_desc = &vcpu->kvm->arch.hvc_desc;
+> +
+> +	switch (func_id) {
+> +	case ARM_SMCCC_TRNG_VERSION:
+> +	case ARM_SMCCC_TRNG_FEATURES:
+> +	case ARM_SMCCC_TRNG_GET_UUID:
+> +	case ARM_SMCCC_TRNG_RND32:
+> +	case ARM_SMCCC_TRNG_RND64:
+> +		return kvm_arm_fw_reg_feat_enabled(hvc_desc->hvc_std_bmap,
+> +						KVM_REG_ARM_STD_BIT_TRNG_V1_0);
+> +	default:
+> +		/* By default, allow the services that aren't listed here */
+> +		return true;
+
+I think your default case should really return false. It keeps people
+honest when they add new patches to set up a new hypercall bit (no bit?
+no call!)
+
+That of course requires that you only return false once all of the
+preexisting hypercalls are enumerated, otherwise such a patch would
+cause a regression in isolation.
+
+> +	}
+> +}
+> +
+>  int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+>  {
+>  	u32 func_id = smccc_get_function(vcpu);
+> @@ -65,6 +88,9 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+>  	u32 feature;
+>  	gpa_t gpa;
+>  
+> +	if (!kvm_hvc_call_supported(vcpu, func_id))
+> +		goto out;
+> +
+>  	switch (func_id) {
+>  	case ARM_SMCCC_VERSION_FUNC_ID:
+>  		val[0] = ARM_SMCCC_VERSION_1_1;
+> @@ -143,6 +169,7 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+>  		return kvm_psci_call(vcpu);
+>  	}
+>  
+> +out:
+>  	smccc_set_retval(vcpu, val[0], val[1], val[2], val[3]);
+>  	return 1;
+>  }
+> @@ -151,8 +178,16 @@ static const u64 kvm_arm_fw_reg_ids[] = {
+>  	KVM_REG_ARM_PSCI_VERSION,
+>  	KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1,
+>  	KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2,
+> +	KVM_REG_ARM_STD_BMAP,
+>  };
+>  
+> +void kvm_arm_init_hypercalls(struct kvm *kvm)
+> +{
+> +	struct kvm_hvc_desc *hvc_desc = &kvm->arch.hvc_desc;
+> +
+> +	hvc_desc->hvc_std_bmap = ARM_SMCCC_STD_FEATURES;
+> +}
+> +
+>  int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu)
+>  {
+>  	return ARRAY_SIZE(kvm_arm_fw_reg_ids);
+> @@ -220,6 +255,7 @@ static int get_kernel_wa_level(u64 regid)
+>  
+>  int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>  {
+> +	struct kvm_hvc_desc *hvc_desc = &vcpu->kvm->arch.hvc_desc;
+>  	void __user *uaddr = (void __user *)(long)reg->addr;
+>  	u64 val, reg_id = reg->id;
+>  
+> @@ -233,6 +269,9 @@ int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>  	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2:
+>  		val = get_kernel_wa_level(reg_id) & KVM_REG_FEATURE_LEVEL_MASK;
+>  		break;
+> +	case KVM_REG_ARM_STD_BMAP:
+> +		val = READ_ONCE(hvc_desc->hvc_std_bmap);
+> +		break;
+>  	default:
+>  		return -ENOENT;
+>  	}
+> @@ -243,6 +282,43 @@ int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>  	return 0;
+>  }
+>  
+> +static int kvm_arm_set_fw_reg_bmap(struct kvm_vcpu *vcpu, u64 reg_id, u64 val)
+> +{
+> +	int ret = 0;
+> +	struct kvm *kvm = vcpu->kvm;
+> +	struct kvm_hvc_desc *hvc_desc = &kvm->arch.hvc_desc;
+> +	u64 *fw_reg_bmap, fw_reg_features;
+
+nit: use reverse fir tree ordering for locals (longest line first,
+shortest last).
+
+> +	switch (reg_id) {
+> +	case KVM_REG_ARM_STD_BMAP:
+> +		fw_reg_bmap = &hvc_desc->hvc_std_bmap;
+> +		fw_reg_features = ARM_SMCCC_STD_FEATURES;
+> +		break;
+> +	default:
+> +		return -ENOENT;
+> +	}
+> +
+> +	/* Check for unsupported bit */
+> +	if (val & ~fw_reg_features)
+> +		return -EINVAL;
+> +
+> +	mutex_lock(&kvm->lock);
+> +
+> +	/*
+> +	 * If the VM (any vCPU) has already started running, return success
+> +	 * if there's no change in the value. Else, return -EBUSY.
+
+How about returning -EINVAL instead? We already do this for
+KVM_ARM_VCPU_INIT if userspace uses a different target than the one
+previously set.
+
+> +	 */
+> +	if (kvm_arm_vm_has_run_once(&kvm->arch)) {
+> +		ret = *fw_reg_bmap != val ? -EBUSY : 0;
+> +		goto out;
+> +	}
+> +
+> +	WRITE_ONCE(*fw_reg_bmap, val);
+> +out:
+> +	mutex_unlock(&kvm->lock);
+> +	return ret;
+> +}
+> +
+>  int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>  {
+>  	void __user *uaddr = (void __user *)(long)reg->addr;
+> @@ -321,6 +397,8 @@ int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>  			return -EINVAL;
+>  
+>  		return 0;
+> +	case KVM_REG_ARM_STD_BMAP:
+> +		return kvm_arm_set_fw_reg_bmap(vcpu, reg_id, val);
+>  	default:
+>  		return -ENOENT;
+>  	}
+> diff --git a/include/kvm/arm_hypercalls.h b/include/kvm/arm_hypercalls.h
+> index 5d38628a8d04..64d30b452809 100644
+> --- a/include/kvm/arm_hypercalls.h
+> +++ b/include/kvm/arm_hypercalls.h
+> @@ -6,6 +6,9 @@
+>  
+>  #include <asm/kvm_emulate.h>
+>  
+> +#define ARM_SMCCC_STD_FEATURES \
+> +	GENMASK_ULL(KVM_REG_ARM_STD_BMAP_BIT_MAX, 0)
+> +
+
+This probably needs KVM_ somewhere in its name for the sake of scoping.
+
+>  int kvm_hvc_call_handler(struct kvm_vcpu *vcpu);
+>  
+>  static inline u32 smccc_get_function(struct kvm_vcpu *vcpu)
+> @@ -42,6 +45,7 @@ static inline void smccc_set_retval(struct kvm_vcpu *vcpu,
+>  
+>  struct kvm_one_reg;
+>  
+> +void kvm_arm_init_hypercalls(struct kvm *kvm);
+>  int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu);
+>  int kvm_arm_copy_fw_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices);
+>  int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
+> -- 
+> 2.35.1.473.g83b2b277ed-goog
+> 
