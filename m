@@ -2,187 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8327F4D8AC3
-	for <lists+kvm@lfdr.de>; Mon, 14 Mar 2022 18:27:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 08E574D8ADF
+	for <lists+kvm@lfdr.de>; Mon, 14 Mar 2022 18:35:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243330AbiCNR2O (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Mar 2022 13:28:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50528 "EHLO
+        id S243422AbiCNRgL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Mar 2022 13:36:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41018 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234685AbiCNR2O (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Mar 2022 13:28:14 -0400
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BA293EBB7;
-        Mon, 14 Mar 2022 10:27:03 -0700 (PDT)
-Received: from fraeml703-chm.china.huawei.com (unknown [172.18.147.200])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4KHNj61xD6z67L0F;
-        Tue, 15 Mar 2022 01:25:30 +0800 (CST)
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- fraeml703-chm.china.huawei.com (10.206.15.52) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2375.24; Mon, 14 Mar 2022 18:27:00 +0100
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- lhreml710-chm.china.huawei.com (10.201.108.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Mon, 14 Mar 2022 17:27:00 +0000
-Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
- lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
- 15.01.2308.021; Mon, 14 Mar 2022 17:26:59 +0000
-From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>
-CC:     "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "jgg@nvidia.com" <jgg@nvidia.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
-        "yishaih@nvidia.com" <yishaih@nvidia.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>,
-        liulongfang <liulongfang@huawei.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        Jonathan Cameron <jonathan.cameron@huawei.com>,
-        "Wangzhou (B)" <wangzhou1@hisilicon.com>,
-        Linuxarm <linuxarm@huawei.com>
-Subject: RE: [PATCH v9 0/9] vfio/hisilicon: add ACC live migration driver
-Thread-Topic: [PATCH v9 0/9] vfio/hisilicon: add ACC live migration driver
-Thread-Index: AQHYMx05i/r2eazEYUSmGD9dldyyTay/KQYA
-Date:   Mon, 14 Mar 2022 17:26:59 +0000
-Message-ID: <df217839a41b47dc94ef201dfe379e4e@huawei.com>
-References: <20220308184902.2242-1-shameerali.kolothum.thodi@huawei.com>
-In-Reply-To: <20220308184902.2242-1-shameerali.kolothum.thodi@huawei.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.47.89.194]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        with ESMTP id S241894AbiCNRgI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Mar 2022 13:36:08 -0400
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E89F656D
+        for <kvm@vger.kernel.org>; Mon, 14 Mar 2022 10:34:57 -0700 (PDT)
+Received: by mail-lf1-x12c.google.com with SMTP id w7so28514188lfd.6
+        for <kvm@vger.kernel.org>; Mon, 14 Mar 2022 10:34:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=8A3cxPbkf5/imDcGfqUsgEkAZ/Yq4pAldU3s8K2mQzc=;
+        b=tfX+LbUtQWULAhzeWtmsYWPMAURZzqdsjSM/aDGl+qglrfZ5bNzfGleMtHFaTt3jZv
+         3UyQ5yndXqQ8IyXR6tjdhKwpYv9aaculLUgdA6PMil4v28IhdiEX2uhZI0KYNH460tQ6
+         GKcfKXGVcGVxcLcjPvKm3Y+xr7jKp0lTmNP15knWHThq1yVvN8ocGYyB/el//U+71WsO
+         9kxkVPpZ6bjpiPklFVZMRSxBgbjd89SZz6rNYPQo0Uto/u5sjUUJwJwIeOikglGO6VNE
+         lvYLAnfBrGRNUOM81j19C9LApg+tiwD55XcFvJbf4tDEynsa5BMJpjgefQARvNRiNVXn
+         Zf9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=8A3cxPbkf5/imDcGfqUsgEkAZ/Yq4pAldU3s8K2mQzc=;
+        b=D6mOufskdB37MiCvT7ium3WGaYNLIhFHgjzZAQmDLHXRl2eV1tvjM1Szrg2LT78lz1
+         HhN6WDDSEv5ihGgxcgMoaoasxhtWelp6VRWYlRFUKakwuKPTK5Y2PrZ6Ge6GSbCWHNrL
+         9B52qEhY6IS3VVXi8ZvOBdYK9ur49JSjgV/VbDJOOJp/VhqX9IIjWuzceLAwmu55Wyzw
+         8hhASgrCfm0buLetlGyFdXWVt8Gl6TvUSZlR2tF16xIFb+UKD4SaXXS0MpmXCorIbbch
+         2UmJfqo6ZIoKqMf2XRQHbAG7ye9cg6wErFYa+dlDbtBVyXrsht8qsstvPBumZ3oeJXBH
+         EszQ==
+X-Gm-Message-State: AOAM533PCrHTCHERPI0VJhN3FwoJ2Rq9E06f562Bv9kX9BHCqLrmT2XF
+        kw3U7IscbiAUAQ2FIitm9V6ClET58rwxBV8GW20qhA==
+X-Google-Smtp-Source: ABdhPJwyJUQnuBymc31Rm47cQ/NdVZrkI9p8VQjPdQxJrZbxv7kE4yinBibZy7OcE53BDtGYf0q134NUBFysmwbOxgc=
+X-Received: by 2002:a19:ca07:0:b0:448:7eab:f1a with SMTP id
+ a7-20020a19ca07000000b004487eab0f1amr7790394lfg.456.1647279294144; Mon, 14
+ Mar 2022 10:34:54 -0700 (PDT)
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+References: <20220307213356.2797205-1-brijesh.singh@amd.com>
+ <20220307213356.2797205-33-brijesh.singh@amd.com> <CAMkAt6pO0xZb2pye-VEKdFQ_dYFgLA21fkYmnYPTWo8mzPrKDQ@mail.gmail.com>
+ <20220310212504.2kt6sidexljh2s6p@amd.com> <YiuBqZnjEUyMfBMu@suse.de>
+In-Reply-To: <YiuBqZnjEUyMfBMu@suse.de>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Mon, 14 Mar 2022 11:34:42 -0600
+Message-ID: <CAMkAt6r==_=U4Ha6ZTmii-JL3htJ3-dD4tc+QBqN7dVt711N2A@mail.gmail.com>
+Subject: Re: [PATCH v12 32/46] x86/compressed/64: Add support for SEV-SNP
+ CPUID table in #VC handlers
+To:     Joerg Roedel <jroedel@suse.de>
+Cc:     Michael Roth <michael.roth@amd.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        "the arch/x86 maintainers" <x86@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>, linux-efi@vger.kernel.org,
+        platform-driver-x86@vger.kernel.org, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        brijesh.ksingh@gmail.com, Tony Luck <tony.luck@intel.com>,
+        Marc Orr <marcorr@google.com>,
+        Sathyanarayanan Kuppuswamy 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SGkgQWxleCwNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBTaGFtZWVy
-YWxpIEtvbG90aHVtIFRob2RpDQo+IFNlbnQ6IDA4IE1hcmNoIDIwMjIgMTg6NDkNCj4gVG86IGt2
-bUB2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7DQo+IGxpbnV4
-LWNyeXB0b0B2Z2VyLmtlcm5lbC5vcmcNCj4gQ2M6IGxpbnV4LXBjaUB2Z2VyLmtlcm5lbC5vcmc7
-IGFsZXgud2lsbGlhbXNvbkByZWRoYXQuY29tOyBqZ2dAbnZpZGlhLmNvbTsNCj4gY29odWNrQHJl
-ZGhhdC5jb207IG1ndXJ0b3ZveUBudmlkaWEuY29tOyB5aXNoYWloQG52aWRpYS5jb207DQo+IGtl
-dmluLnRpYW5AaW50ZWwuY29tOyBMaW51eGFybSA8bGludXhhcm1AaHVhd2VpLmNvbT47IGxpdWxv
-bmdmYW5nDQo+IDxsaXVsb25nZmFuZ0BodWF3ZWkuY29tPjsgWmVuZ3RhbyAoQikgPHByaW1lLnpl
-bmdAaGlzaWxpY29uLmNvbT47DQo+IEpvbmF0aGFuIENhbWVyb24gPGpvbmF0aGFuLmNhbWVyb25A
-aHVhd2VpLmNvbT47IFdhbmd6aG91IChCKQ0KPiA8d2FuZ3pob3UxQGhpc2lsaWNvbi5jb20+DQo+
-IFN1YmplY3Q6IFtQQVRDSCB2OSAwLzldIHZmaW8vaGlzaWxpY29uOiBhZGQgQUNDIGxpdmUgbWln
-cmF0aW9uIGRyaXZlcg0KPiANCj4gSGksDQo+IA0KPiBUaGlzIHNlcmllcyBhdHRlbXB0cyB0byBh
-ZGQgdmZpbyBsaXZlIG1pZ3JhdGlvbiBzdXBwb3J0IGZvciBIaVNpbGljb24NCj4gQUNDIFZGIGRl
-dmljZXMgYmFzZWQgb24gdGhlIG5ldyB2MiBtaWdyYXRpb24gcHJvdG9jb2wgZGVmaW5pdGlvbiBh
-bmQNCj4gbWx4NSB2OSBzZXJpZXMgZGlzY3Vzc2VkIGhlcmVbMF0uDQo+IA0KPiB2OCAtLT4gdjkN
-Cj4gwqAtIEFkZGVkIGFja3MgYnkgV2FuZ3pob3UvTG9uZ2ZhbmcvWWVrYWkNCj4gwqAtIEFkZGVk
-IFItYnkgdGFncyBieSBKYXNvbi4NCj4gwqAtIEFkZHJlc3NlZCBjb21tZW50c8KgYnkgQWxleCBv
-biB2OC4NCj4gwqAtIEZpeGVkIHRoZSBwZl9xdWV1ZSBwb2ludGVyIGFzc2lnbm1lbnQgZXJyb3Ig
-aW4gcGF0Y2ggIzguDQo+IMKgLSBBZGRyZXNzZWTCoGNvbW1lbnRzIGZyb20gS2V2aW4sDQo+ICDC
-oCDCoC1VcGRhdGVkIHBhdGNoICM1IGNvbW1pdCBsb2cgbXNnIHdpdGggYSBjbGFyaWZpY2F0aW9u
-IHRoYXQgVkYNCj4gwqAgwqAgwqBtaWdyYXRpb24gQkFSIGFzc2lnbm1lbnQgaXMgZmluZSBpZiBt
-aWdyYXRpb24gc3VwcG9ydCBpcyBub3QgdGhlcmUuDQo+ICDCoCDCoC1BZGRlZCBRTSBkZXNjcmlw
-dGlvbiB0byBwYXRjaCAjOCBjb21taXQgbXNnLg0KDQpIb3BlIHRoZXJlIGlzIG5vdGhpbmcgcGVu
-ZGluZyBmb3IgdGhpcyBzZXJpZXMgbm93IHRvIG1ha2UgaXQgdG8gbmV4dC4NCkkga25vdyBhY2sg
-ZnJvbSBCam9ybiBpcyBzdGlsbCBwZW5kaW5nIGZvciBwYXRjaCAjMywgYW5kIEkgaGF2ZQ0Kc2Vu
-dCBhIHBpbmcgbGFzdCB3ZWVrIGFuZCBhbHNvIENDZCBoaW0gb24gdGhhdCBwYXRjaC4NCg0KUGxl
-YXNlIGxldCBtZSBrbm93IGlmIHRoZXJlIGlzIGFueXRoaW5nIEkgbWlzc2VkLiANCg0KVGhhbmtz
-LA0KU2hhbWVlcg0KDQoNCj4gDQo+IFRoaXMgaXMgc2FuaXR5IHRlc3RlZCBvbiBhIEhpU2lsaWNv
-biBwbGF0Zm9ybSB1c2luZyB0aGUgUWVtdSBicmFuY2gNCj4gcHJvdmlkZWQgaGVyZVsxXS4NCj4g
-DQo+IFBsZWFzZSB0YWtlIGEgbG9vayBhbmQgbGV0IG1lIGtub3cgeW91ciBmZWVkYmFjay4NCj4g
-DQo+IFRoYW5rcywNCj4gU2hhbWVlcg0KPiBbMF0NCj4gaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcv
-a3ZtLzIwMjIwMjI0MTQyMDI0LjE0NzY1My0xLXlpc2hhaWhAbnZpZGlhLmNvbS8NCj4gWzFdIGh0
-dHBzOi8vZ2l0aHViLmNvbS9qZ3VudGhvcnBlL3FlbXUvY29tbWl0cy92ZmlvX21pZ3JhdGlvbl92
-Mg0KPiANCj4gdjcgLS0+IHY4DQo+IMKgLSBEcm9wcGVkIFBSRV9DT1BZIHN1cHBvcnQgYW5kIGVh
-cmx5wqBjb21wYXRpYmlsaXR5IGNoZWNraW5nIGJhc2VkIG9uDQo+ICAgIHRoZSBkaXNjdXNzaW9u
-IGhlcmVbMV0uDQo+IMKgLSBBZGRyZXNzZWTCoGNvbW1lbnRzwqBmcm9tIEpvaG4sIEphc29uICYg
-QWxleCAoVGhhbmtzISkuDQo+IA0KPiB2NiAtLT4gdjcNCj4gwqAtUmVuYW1lZCBNSUdfUFJFQ09Q
-WSBpb2N0bCBuYW1lIGFuZCBzdHJ1Y3QgbmFtZS4gVXBkYXRlZCBpb2N0bA0KPiBkZXNjcmlwdGlv
-bnMNCj4gwqAgcmVnYXJkaW5nIGlvY3RsIHZhbGlkaXR5IChwYXRjaCAjNykuDQo+IC0gQWRyZXNz
-ZWQgY29tbWVudHMgZnJvbSBKYXNvbiBhbmQgQWxleCBvbiBQUkVfQ09QWSByZWFkKCkgYW5kIGlv
-Y3RsKCkgZm5zDQo+ICAgKHBhdGNoICM5KS4NCj4gLSBNb3ZlZCBvbmx5IFZGIFBDSSBpZHMgdG8g
-cGNpX2lkcy5oKHBhdGNoICMzKS4NCj4gDQo+IHY1IC0tPiB2Ng0KPiAgLVJlcG9ydCBQUkVfQ09Q
-WSBzdXBwb3J0IGFuZCB1c2UgdGhhdCBmb3IgZWFybHkgY29tcGF0aWJpbGl0eSBjaGVjaw0KPiAg
-IGJldHdlZW4gc3JjIGFuZCBkc3QgZGV2aWNlcy4NCj4gIC1Gb3IgZ2VuZXJpYyBQUkVfQ09QWSBz
-dXBwb3J0LCBpbmNsdWRlZCBwYXRjaCAjNyBmcm9tIEphc29uKFRoYW5rcyEpLg0KPiAgLUFkZHJl
-c3NlZCBjb21tZW50cyBmcm9tIEFsZXgoVGhhbmtzISkuDQo+ICAtQWRkZWQgdGhlIFFNIHN0YXRl
-IHJlZ2lzdGVyIHVwZGF0ZSB0byBRTSBkcml2ZXIocGF0Y2ggIzgpIHNpbmNlIHRoYXQNCj4gICBp
-cyBiZWluZyB1c2VkIGluIG1pZ3JhdGlvbiBkcml2ZXIgdG8gZGVjaWRlIHdoZXRoZXIgdGhlIGRl
-dmljZSBpcw0KPiAgIHJlYWR5IHRvIHNhdmUgdGhlIHN0YXRlLg0KPiANCj4gUkZDdjQgLS0+IHY1
-DQo+ICAgLSBEcm9wcGVkIFJGQyB0YWcgYXMgdjIgbWlncmF0aW9uIEFQSXMgYXJlIG1vcmUgc3Rh
-YmxlIG5vdy4NCj4gICAtIEFkZHJlc3NlZCByZXZpZXcgY29tbWVudHMgZnJvbSBKYXNvbiBhbmQg
-QWxleCAoVGhhbmtzISkuDQo+IA0KPiB2MyAtLT4gUkZDdjQNCj4gLUJhc2VkIG9uIG1pZ3JhdGlv
-biB2MiBwcm90b2NvbCBhbmQgbWx4NSB2NyBzZXJpZXMuDQo+IC1BZGRlZCBSRkMgdGFnIGFnYWlu
-IGFzIG1pZ3JhdGlvbiB2MiBwcm90b2NvbCBpcyBzdGlsbCB1bmRlciBkaXNjdXNzaW9uLg0KPiAt
-QWRkZWQgbmV3IHBhdGNoICM2IHRvIHJldHJpZXZlIHRoZSBQRiBRTSBkYXRhLg0KPiAtUFJFX0NP
-UFkgY29tcGF0aWJpbGl0eSBjaGVjayBpcyBub3cgZG9uZSBhZnRlciB0aGUgbWlncmF0aW9uIGRh
-dGENCj4gwqB0cmFuc2Zlci4gVGhpcyBpcyBub3QgaWRlYWwgYW5kIG5lZWRzIGRpc2N1c3Npb24u
-DQo+IA0KPiBSRkMgdjIgLS0+IHYzDQo+IMKgLURyb3BwZWQgUkZDIHRhZyBhcyB0aGUgdmZpb19w
-Y2lfY29yZSBzdWJzeXN0ZW0gZnJhbWV3b3JrIGlzIG5vdw0KPiDCoCBwYXJ0IG9mIDUuMTUtcmMx
-Lg0KPiDCoC1BZGRlZCBvdmVycmlkZSBtZXRob2RzIGZvciB2ZmlvX2RldmljZV9vcHMgcmVhZC93
-cml0ZS9tbWFwIGNhbGxzDQo+IMKgIHRvIGxpbWl0IHRoZSBhY2Nlc3Mgd2l0aGluIHRoZSBmdW5j
-dGlvbmFsIHJlZ2lzdGVyIHNwYWNlLg0KPiDCoC1QYXRjaGVzIDEgdG8gMyBhcmUgY29kZSByZWZh
-Y3RvcmluZyB0byBtb3ZlIHRoZSBjb21tb24gQUNDIFFNDQo+IMKgIGRlZmluaXRpb25zIGFuZCBo
-ZWFkZXIgYXJvdW5kLg0KPiANCj4gUkZDdjEgLS0+IFJGQ3YyDQo+IA0KPiDCoC1BZGRzIGEgbmV3
-IHZlbmRvci1zcGVjaWZpYyB2ZmlvX3BjaSBkcml2ZXIoaGlzaS1hY2MtdmZpby1wY2kpDQo+IMKg
-IGZvciBIaVNpbGljb24gQUNDIFZGIGRldmljZXMgYmFzZWQgb24gdGhlIG5ldyB2ZmlvLXBjaS1j
-b3JlDQo+IMKgIGZyYW1ld29yayBwcm9wb3NhbC4NCj4gDQo+IMKgLVNpbmNlIEhpU2lsaWNvbiBB
-Q0MgVkYgZGV2aWNlIE1NSU8gc3BhY2UgY29udGFpbnMgYm90aCB0aGUNCj4gwqAgZnVuY3Rpb25h
-bCByZWdpc3RlciBzcGFjZSBhbmQgbWlncmF0aW9uIGNvbnRyb2wgcmVnaXN0ZXIgc3BhY2UsDQo+
-IMKgIG92ZXJyaWRlIHRoZSB2ZmlvX2RldmljZV9vcHMgaW9jdGwgbWV0aG9kIHRvIHJlcG9ydCBv
-bmx5IHRoZQ0KPiDCoCBmdW5jdGlvbmFsIHNwYWNlIHRvIFZNcy4NCj4gDQo+IMKgLUZvciBhIHN1
-Y2Nlc3NmdWwgbWlncmF0aW9uLCB3ZSBzdGlsbCBuZWVkIGFjY2VzcyB0byBWRiBkZXYNCj4gwqAg
-ZnVuY3Rpb25hbCByZWdpc3RlciBzcGFjZSBtYWlubHkgdG8gcmVhZCB0aGUgc3RhdHVzIHJlZ2lz
-dGVycy4NCj4gwqAgQnV0IGFjY2Vzc2luZyB0aGVzZSB3aGlsZSB0aGUgR3Vlc3QgdkNQVXMgYXJl
-IHJ1bm5pbmcgbWF5IGxlYXZlDQo+IMKgIGEgc2VjdXJpdHkgaG9sZS4gVG8gYXZvaWQgYW55IHBv
-dGVudGlhbCBzZWN1cml0eSBpc3N1ZXMsIHdlDQo+IMKgIG1hcC91bm1hcCB0aGUgTU1JTyByZWdp
-b25zIG9uIGEgbmVlZCBiYXNpcyBhbmQgaXMgc2FmZSB0byBkbyBzby4NCj4gwqAgKFBsZWFzZSBz
-ZWUgaGlzaV9hY2NfdmZfaW9yZW1hcC91bm1hcCgpIGZucyBpbiBwYXRjaCAjNCkuDQo+IA0KPiDC
-oC1Ecm9wcGVkIGRlYnVnZnMgc3VwcG9ydCBmb3Igbm93Lg0KPiDCoC1Vc2VzIGNvbW1vbiBRTSBm
-dW5jdGlvbnMgZm9yIG1haWxib3ggYWNjZXNzKHBhdGNoICMzKS4NCj4gDQo+IExvbmdmYW5nIExp
-dSAoMyk6DQo+ICAgY3J5cHRvOiBoaXNpbGljb24vcW06IE1vdmUgZmV3IGRlZmluaXRpb25zIHRv
-IGNvbW1vbiBoZWFkZXINCj4gICBjcnlwdG86IGhpc2lsaWNvbi9xbTogU2V0IHRoZSBWRiBRTSBz
-dGF0ZSByZWdpc3Rlcg0KPiAgIGhpc2lfYWNjX3ZmaW9fcGNpOiBBZGQgc3VwcG9ydCBmb3IgVkZJ
-TyBsaXZlIG1pZ3JhdGlvbg0KPiANCj4gU2hhbWVlciBLb2xvdGh1bSAoNik6DQo+ICAgY3J5cHRv
-OiBoaXNpbGljb24vcW06IE1vdmUgdGhlIFFNIGhlYWRlciB0byBpbmNsdWRlL2xpbnV4DQo+ICAg
-aGlzaV9hY2NfcW06IE1vdmUgVkYgUENJIGRldmljZSBJRHMgdG8gY29tbW9uIGhlYWRlcg0KPiAg
-IGhpc2lfYWNjX3ZmaW9fcGNpOiBhZGQgbmV3IHZmaW9fcGNpIGRyaXZlciBmb3IgSGlTaWxpY29u
-IEFDQyBkZXZpY2VzDQo+ICAgaGlzaV9hY2NfdmZpb19wY2k6IFJlc3RyaWN0IGFjY2VzcyB0byBW
-RiBkZXYgQkFSMiBtaWdyYXRpb24gcmVnaW9uDQo+ICAgaGlzaV9hY2NfdmZpb19wY2k6IEFkZCBo
-ZWxwZXIgdG8gcmV0cmlldmUgdGhlIHN0cnVjdCBwY2lfZHJpdmVyDQo+ICAgaGlzaV9hY2NfdmZp
-b19wY2k6IFVzZSBpdHMgb3duIFBDSSByZXNldF9kb25lIGVycm9yIGhhbmRsZXINCj4gDQo+ICBN
-QUlOVEFJTkVSUyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgICA3ICsNCj4g
-IGRyaXZlcnMvY3J5cHRvL2hpc2lsaWNvbi9ocHJlL2hwcmUuaCAgICAgICAgICB8ICAgIDIgKy0N
-Cj4gIGRyaXZlcnMvY3J5cHRvL2hpc2lsaWNvbi9ocHJlL2hwcmVfbWFpbi5jICAgICB8ICAgMTkg
-Ky0NCj4gIGRyaXZlcnMvY3J5cHRvL2hpc2lsaWNvbi9xbS5jICAgICAgICAgICAgICAgICB8ICAg
-NjggKy0NCj4gIGRyaXZlcnMvY3J5cHRvL2hpc2lsaWNvbi9zZWMyL3NlYy5oICAgICAgICAgICB8
-ICAgIDIgKy0NCj4gIGRyaXZlcnMvY3J5cHRvL2hpc2lsaWNvbi9zZWMyL3NlY19tYWluLmMgICAg
-ICB8ICAgMjEgKy0NCj4gIGRyaXZlcnMvY3J5cHRvL2hpc2lsaWNvbi9zZ2wuYyAgICAgICAgICAg
-ICAgICB8ICAgIDIgKy0NCj4gIGRyaXZlcnMvY3J5cHRvL2hpc2lsaWNvbi96aXAvemlwLmggICAg
-ICAgICAgICB8ICAgIDIgKy0NCj4gIGRyaXZlcnMvY3J5cHRvL2hpc2lsaWNvbi96aXAvemlwX21h
-aW4uYyAgICAgICB8ICAgMTcgKy0NCj4gIGRyaXZlcnMvdmZpby9wY2kvS2NvbmZpZyAgICAgICAg
-ICAgICAgICAgICAgICB8ICAgIDIgKw0KPiAgZHJpdmVycy92ZmlvL3BjaS9NYWtlZmlsZSAgICAg
-ICAgICAgICAgICAgICAgIHwgICAgMiArDQo+ICBkcml2ZXJzL3ZmaW8vcGNpL2hpc2lsaWNvbi9L
-Y29uZmlnICAgICAgICAgICAgfCAgIDE1ICsNCj4gIGRyaXZlcnMvdmZpby9wY2kvaGlzaWxpY29u
-L01ha2VmaWxlICAgICAgICAgICB8ICAgIDQgKw0KPiAgLi4uL3ZmaW8vcGNpL2hpc2lsaWNvbi9o
-aXNpX2FjY192ZmlvX3BjaS5jICAgIHwgMTMyNiArKysrKysrKysrKysrKysrKw0KPiAgLi4uL3Zm
-aW8vcGNpL2hpc2lsaWNvbi9oaXNpX2FjY192ZmlvX3BjaS5oICAgIHwgIDExNiArKw0KPiAgLi4u
-L3FtLmggPT4gaW5jbHVkZS9saW51eC9oaXNpX2FjY19xbS5oICAgICAgIHwgICA0OSArDQo+ICBp
-bmNsdWRlL2xpbnV4L3BjaV9pZHMuaCAgICAgICAgICAgICAgICAgICAgICAgfCAgICAzICsNCj4g
-IDE3IGZpbGVzIGNoYW5nZWQsIDE1OTEgaW5zZXJ0aW9ucygrKSwgNjYgZGVsZXRpb25zKC0pDQo+
-ICBjcmVhdGUgbW9kZSAxMDA2NDQgZHJpdmVycy92ZmlvL3BjaS9oaXNpbGljb24vS2NvbmZpZw0K
-PiAgY3JlYXRlIG1vZGUgMTAwNjQ0IGRyaXZlcnMvdmZpby9wY2kvaGlzaWxpY29uL01ha2VmaWxl
-DQo+ICBjcmVhdGUgbW9kZSAxMDA2NDQgZHJpdmVycy92ZmlvL3BjaS9oaXNpbGljb24vaGlzaV9h
-Y2NfdmZpb19wY2kuYw0KPiAgY3JlYXRlIG1vZGUgMTAwNjQ0IGRyaXZlcnMvdmZpby9wY2kvaGlz
-aWxpY29uL2hpc2lfYWNjX3ZmaW9fcGNpLmgNCj4gIHJlbmFtZSBkcml2ZXJzL2NyeXB0by9oaXNp
-bGljb24vcW0uaCA9PiBpbmNsdWRlL2xpbnV4L2hpc2lfYWNjX3FtLmggKDg3JSkNCj4gDQo+IC0t
-DQo+IDIuMjUuMQ0KDQo=
+On Fri, Mar 11, 2022 at 10:06 AM Joerg Roedel <jroedel@suse.de> wrote:
+>
+> On Thu, Mar 10, 2022 at 03:25:04PM -0600, Michael Roth wrote:
+> > Joerg, do you have more background on that? Would it make sense, outsid=
+e
+> > of this series, to change it to a terminate? Maybe with a specific set
+> > of error codes for ES_{OK,UNSUPPORTED,VMM_ERROR,DECODE_FAILED}?
+>
+> This seems to be a left over from development of the SEV-ES guest
+> patch-set. I wanted to see whether the VM crashed due to a triple fault
+> or an error in the #VC handler. The halt loop can be replaced by
+> termination request now.
+>
+> > > I am still working on why the early_printk()s in that function are no=
+t
+> > > working, it seems that they lead to a different halt.
+> >
+> > I don't see a different halt. They just don't seem to print anything.
+> > (keep in mind you still need to advance the IP or else the guest is
+> > still gonna end up spinning here, even if you're removing the halt loop
+> > for testing purposes)
+>
+> The early_printks() also cause #VC exceptions, and if that handling is
+> broken for some reason nothing will be printed.
+>
+> >
+> > > working, it seems that they lead to a different halt. Have you tested
+> > > any of those error paths manually? For example if you set your CPUID
+> > > bits to explicitly fail here do you see the expected printks?
+> >
+> > I think at that point in the code, when the XSAVE stuff is setup, the
+> > console hasn't been enabled yet, so messages would get buffered until t=
+hey
+> > get flushed later (which won't happen since there's halt loop after). I
+> > know in some cases devs will dump the log buffer from memory instead to=
+ get
+> > at the error messages for early failures. (Maybe that's also why Joerg
+> > decided to use a halt loop there instead of terminating?)
+>
+> It is hard to dump the log-buffer from encrypted memory :) But I
+> remember having seen messages from these early_printks under SEV-ES for
+> different bugs. Not sure why they don't appear in this situation.
+>
+> > So maybe reworking the error handling in handle_vc_boot_ghcb() to use
+> > sev_es_terminate() might be warranted, but probably worth checking with
+> > Joerg first, and should be done as a separate series since it is not
+> > SNP-related.
+>
+> I am fine with this change.
+
+I'll send a patch out for that.
+
+I was also thinking about adding a vcpu run exit reason for
+termination. It would be nice to get a more informative exit reason
+than -EINVAL in userspace. Thoughts?
+
+>
+> Regards,
+>
+> --
+> J=C3=B6rg R=C3=B6del
+> jroedel@suse.de
+>
+> SUSE Software Solutions Germany GmbH
+> Maxfeldstr. 5
+> 90409 N=C3=BCrnberg
+> Germany
+>
+> (HRB 36809, AG N=C3=BCrnberg)
+> Gesch=C3=A4ftsf=C3=BChrer: Ivo Totev
+>
