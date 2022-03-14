@@ -2,68 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 51C454D87F2
-	for <lists+kvm@lfdr.de>; Mon, 14 Mar 2022 16:21:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 25A8A4D8803
+	for <lists+kvm@lfdr.de>; Mon, 14 Mar 2022 16:24:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238216AbiCNPWd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Mar 2022 11:22:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49410 "EHLO
+        id S238293AbiCNP0F (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Mar 2022 11:26:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58460 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232620AbiCNPWb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Mar 2022 11:22:31 -0400
+        with ESMTP id S234226AbiCNP0E (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Mar 2022 11:26:04 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 34D8B13F66
-        for <kvm@vger.kernel.org>; Mon, 14 Mar 2022 08:21:22 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4D254644E
+        for <kvm@vger.kernel.org>; Mon, 14 Mar 2022 08:24:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647271281;
+        s=mimecast20190719; t=1647271493;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=rlWhetxs47d+8wbP0AiIKxYRMBnXFj9a44pgP9CO7tY=;
-        b=SLfiiHClreOHHUkt63SrgktQSqbNqfObLTEz4Jk95qn33w+nUiA13YxLnTi36PIvmnPpA9
-        73m5IsYyrOkmywExZYbgl5qnUkYFg6EAuXvbjmgfzeb+kwkAOOCkJ/Z1gBxrv8PfMsYgLg
-        LmcA8BCCXCYQSB9b9wLr5vVuiZ8bJuo=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=xOJcx0cmLDQK1gGjHMb+p67BMvylagIHDxUOd/Ur3nU=;
+        b=CtxGmOd1i9mhCqEWdNqM+VG1cAObMVLRecpEMVEsSt+SJFCmeHZrRZbHE90NsIsrdT2lcX
+        UhbZqEJfVCNWZon0E8Igmnwpg+Y16JigLgCE8Wi3zyr0cadpx4Zsi5mvWGlcTkp5BeZqyn
+        jDgPQxWlqTPRUvPFPmHILMKHLDovyAY=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-533-vE7okSW8NfWyTk2v-cupHQ-1; Mon, 14 Mar 2022 11:21:17 -0400
-X-MC-Unique: vE7okSW8NfWyTk2v-cupHQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4F4843800528;
-        Mon, 14 Mar 2022 15:21:16 +0000 (UTC)
-Received: from starship (unknown [10.40.192.8])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 93067145B961;
-        Mon, 14 Mar 2022 15:21:12 +0000 (UTC)
-Message-ID: <b8794277078e9622c4e1d50f3ca55e785c643ddb.camel@redhat.com>
-Subject: Re: [PATCH v3 5/7] KVM: x86: nSVM: implement nested vGIF
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Jim Mattson <jmattson@google.com>, x86@kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
-        Wanpeng Li <wanpengli@tencent.com>
-Date:   Mon, 14 Mar 2022 17:21:11 +0200
-In-Reply-To: <8c5fe4f6-49bd-c87a-e76d-64417a1370c0@redhat.com>
-References: <20220301143650.143749-1-mlevitsk@redhat.com>
-         <20220301143650.143749-6-mlevitsk@redhat.com>
-         <8c5fe4f6-49bd-c87a-e76d-64417a1370c0@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+ us-mta-3-O3BfoxQoNPypqHfMVfZVuA-1; Mon, 14 Mar 2022 11:24:52 -0400
+X-MC-Unique: O3BfoxQoNPypqHfMVfZVuA-1
+Received: by mail-wr1-f72.google.com with SMTP id j44-20020adf912f000000b00203a5a55817so829256wrj.13
+        for <kvm@vger.kernel.org>; Mon, 14 Mar 2022 08:24:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=xOJcx0cmLDQK1gGjHMb+p67BMvylagIHDxUOd/Ur3nU=;
+        b=JUqt2DPr40KKB3dvw8/xTz/aif+muU1Atm9ilwtuW2yQVIYTt41FKUgqNSf47V+YzD
+         sjorz5cztpq6ERTY9uYh9PghvWZ1jI7kDBNe6g3ZClpyQG2P9jk7I/hbsff5FpuOEttZ
+         2mN3fgC2SjjMZWDmtjVWBCQZBnnuAI6MqE+q8bkcUV+BGqDuelwUhkoV4UFgYhYbbJ54
+         MLVu2BbxG59S4jeHmEGELtJH9+Q8lvgndVGvvoojPPGDr8gxIJJ6/NXOpMf/vVc5IFps
+         OC7ABLJtp2FNQBPB8XggAxW8SlfbvCrnzIhFzPxT6F3lfXr8n899bsH7xIkTd2s58cyu
+         Wz7w==
+X-Gm-Message-State: AOAM5309Mn6Djm+yjCoq9NwNW3OZKE5kwSFQDCgIOgC4kjwyA3IjnYrN
+        OOxozklehUSPyq+xAy1Ikb+RoYxmf5fC53o2WBr6BvqqOya4JcDjjK8XYNu29iIxyztd0tQGTmS
+        HFnLPVMHNcx9U
+X-Received: by 2002:a5d:5850:0:b0:1fc:a7d7:e33b with SMTP id i16-20020a5d5850000000b001fca7d7e33bmr16569430wrf.157.1647271491016;
+        Mon, 14 Mar 2022 08:24:51 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyepgEI9wbW8AcLZafdUt5uVHDnPcukrfvttKQVcKQzMTVgYp8UJK8zfzUC/C9d5e0S72EjVA==
+X-Received: by 2002:a5d:5850:0:b0:1fc:a7d7:e33b with SMTP id i16-20020a5d5850000000b001fca7d7e33bmr16569415wrf.157.1647271490804;
+        Mon, 14 Mar 2022 08:24:50 -0700 (PDT)
+Received: from redhat.com ([2.55.155.245])
+        by smtp.gmail.com with ESMTPSA id n2-20020a056000170200b001f1e16f3c53sm13658963wrc.51.2022.03.14.08.24.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Mar 2022 08:24:50 -0700 (PDT)
+Date:   Mon, 14 Mar 2022 11:24:45 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     David Woodhouse <dwmw2@infradead.org>
+Cc:     qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org,
+        Claudio Fontana <cfontana@suse.de>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>
+Subject: Re: [PATCH 2/4] intel_iommu: Support IR-only mode without DMA
+ translation
+Message-ID: <20220314112001-mutt-send-email-mst@kernel.org>
+References: <20220314142544.150555-1-dwmw2@infradead.org>
+ <20220314142544.150555-2-dwmw2@infradead.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220314142544.150555-2-dwmw2@infradead.org>
 X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,119 +85,85 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2022-03-09 at 14:40 +0100, Paolo Bonzini wrote:
-> The patch is good but I think it's possibly to rewrite some parts in an 
-> easier way.
+On Mon, Mar 14, 2022 at 02:25:42PM +0000, David Woodhouse wrote:
+> From: David Woodhouse <dwmw@amazon.co.uk>
 > 
-> On 3/1/22 15:36, Maxim Levitsky wrote:
-> > +	if (svm->vgif_enabled && (svm->nested.ctl.int_ctl & V_GIF_ENABLE_MASK))
-> > +		int_ctl_vmcb12_bits |= (V_GIF_MASK | V_GIF_ENABLE_MASK);
-> > +	else
-> > +		int_ctl_vmcb01_bits |= (V_GIF_MASK | V_GIF_ENABLE_MASK);
+> By setting none of the SAGAW bits we can indicate to a guest that DMA
+> translation isn't supported. Tested by booting Windows 10, as well as
+> Linux guests with the fix at https://git.kernel.org/torvalds/c/c40aaaac10
 > 
-> To remember for later: svm->vmcb's V_GIF_ENABLE_MASK is always the same 
-> as vgif:
+> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+> Reviewed-by: Peter Xu <peterx@redhat.com>
+> Acked-by: Jason Wang <jasowang@redhat.com>
+
+this is borderline like a feature, but ...
+
+> ---
+>  hw/i386/intel_iommu.c         | 14 ++++++++++----
+>  include/hw/i386/intel_iommu.h |  1 +
+>  2 files changed, 11 insertions(+), 4 deletions(-)
 > 
-> - if it comes from vmcb12, it must be 1 (and then vgif is also 1)
-> 
-> - if it comes from vmcb01, it must be equal to vgif (because 
-> V_GIF_ENABLE_MASK is set in init_vmcb and never touched again).
-> 
-> >   
-> > +static bool nested_vgif_enabled(struct vcpu_svm *svm)
-> > +{
-> > +	if (!is_guest_mode(&svm->vcpu) || !svm->vgif_enabled)
-> > +		return false;
-> > +	return svm->nested.ctl.int_ctl & V_GIF_ENABLE_MASK;
-> > +}
-> > +
-> >   static inline bool vgif_enabled(struct vcpu_svm *svm)
-> >   {
-> > -	return !!(svm->vmcb->control.int_ctl & V_GIF_ENABLE_MASK);
-> > +	struct vmcb *vmcb = nested_vgif_enabled(svm) ? svm->vmcb01.ptr : svm->vmcb;
-> > +
-> > +	return !!(vmcb->control.int_ctl & V_GIF_ENABLE_MASK);
-> >   }
-> >   
-> 
-> Slight simplification:
-> 
-> - before the patch, vgif_enabled() is just "vgif", because 
-> V_GIF_ENABLE_MASK is set in init_vmcb and copied to vmcb02
-> 
-> - after the patch, vgif_enabled() is also just "vgif".  Outside guest 
-> mode the same reasoning applies.  If L2 has enabled vGIF,  vmcb01's 
-> V_GIF_ENABLE is equal to vgif per the previous bullet.  If L2 has not 
-> enabled vGIF, vmcb02's V_GIF_ENABLE uses svm->vmcb's int_ctl field which 
-> is always the same as vgif (see remark above).
-> 
-> You can make this simplification a separate patch.
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index 32471a44cb..948c653e74 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -2214,7 +2214,7 @@ static void vtd_handle_gcmd_write(IntelIOMMUState *s)
+>      uint32_t changed = status ^ val;
+>  
+>      trace_vtd_reg_write_gcmd(status, val);
+> -    if (changed & VTD_GCMD_TE) {
+> +    if ((changed & VTD_GCMD_TE) && s->dma_translation) {
+>          /* Translation enable/disable */
+>          vtd_handle_gcmd_te(s, val & VTD_GCMD_TE);
+>      }
+> @@ -3122,6 +3122,7 @@ static Property vtd_properties[] = {
+>      DEFINE_PROP_BOOL("x-scalable-mode", IntelIOMMUState, scalable_mode, FALSE),
+>      DEFINE_PROP_BOOL("snoop-control", IntelIOMMUState, snoop_control, false),
+>      DEFINE_PROP_BOOL("dma-drain", IntelIOMMUState, dma_drain, true),
+> +    DEFINE_PROP_BOOL("dma-translation", IntelIOMMUState, dma_translation, true),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> @@ -3627,12 +3628,17 @@ static void vtd_init(IntelIOMMUState *s)
+>      s->next_frcd_reg = 0;
+>      s->cap = VTD_CAP_FRO | VTD_CAP_NFR | VTD_CAP_ND |
+>               VTD_CAP_MAMV | VTD_CAP_PSI | VTD_CAP_SLLPS |
+> -             VTD_CAP_SAGAW_39bit | VTD_CAP_MGAW(s->aw_bits);
+> +             VTD_CAP_MGAW(s->aw_bits);
+>      if (s->dma_drain) {
+>          s->cap |= VTD_CAP_DRAIN;
+>      }
+> -    if (s->aw_bits == VTD_HOST_AW_48BIT) {
+> -        s->cap |= VTD_CAP_SAGAW_48bit;
+> +    if (s->dma_translation) {
+> +            if (s->aw_bits >= VTD_HOST_AW_39BIT) {
+> +                    s->cap |= VTD_CAP_SAGAW_39bit;
+> +            }
+> +            if (s->aw_bits >= VTD_HOST_AW_48BIT) {
+> +                    s->cap |= VTD_CAP_SAGAW_48bit;
+> +            }
+>      }
+>      s->ecap = VTD_ECAP_QI | VTD_ECAP_IRO;
+>
 
 
-This is a very good idea - I'll do this in a separate patch.
+... this looks like you are actually fixing aw_bits < VTD_HOST_AW_39BIT,
+right? So maybe this patch is ok like this since it also fixes a
+bug. Pls add this to commit log though.
 
-> 
-> >  static inline void enable_gif(struct vcpu_svm *svm)
-> >  {
-> > +	struct vmcb *vmcb = nested_vgif_enabled(svm) ? svm->vmcb01.ptr : svm->vmcb;
-> > +
-> >  	if (vgif_enabled(svm))
-> > -		svm->vmcb->control.int_ctl |= V_GIF_MASK;
-> > +		vmcb->control.int_ctl |= V_GIF_MASK;
-> >  	else
-> >  		svm->vcpu.arch.hflags |= HF_GIF_MASK;
-> >  }
-> >  
-> >  static inline void disable_gif(struct vcpu_svm *svm)
-> >  {
-> > +	struct vmcb *vmcb = nested_vgif_enabled(svm) ? svm->vmcb01.ptr : svm->vmcb;
-> > +
-> >  	if (vgif_enabled(svm))
-> > -		svm->vmcb->control.int_ctl &= ~V_GIF_MASK;
-> > +		vmcb->control.int_ctl &= ~V_GIF_MASK;
-> >  	else
-> >  		svm->vcpu.arch.hflags &= ~HF_GIF_MASK;
-> > +
-> >  }
-> 
-> Looks good.  For a little optimization however you could write
-> 
-> static inline struct vmcb *get_vgif_vmcb(struct vcpu_svm *svm)
-> {
-> 	if (!vgif)
-> 		return NULL;
-> 	if (!is_guest_mode(&svm->vcpu)
-> 		return svm->vmcb01.ptr;
-> 	if ((svm->vgif_enabled && (svm->nested.ctl.int_ctl & V_GIF_ENABLE_MASK))
-> 		return svm->vmcb01.ptr;
-> 	else
-> 		return svm->nested.vmcb02.ptr;
-> }
-> 
-> and then
-> 
-> 	struct vmcb *vmcb = get_vgif_vmcb(svm);
-> 	if (vmcb)
-> 		/* use vmcb->control.int_ctl */
-> 	else
-> 		/* use hflags */
-
-Good idea as well.
-
-Thanks for the review!
-Best regards,
-	Maxim Levitsky
-
-> 
-> Paolo
-> 
-> >  
-> > +static bool nested_vgif_enabled(struct vcpu_svm *svm)
-> > +{
-> > +	if (!is_guest_mode(&svm->vcpu) || !svm->vgif_enabled)
-> > +		return false;
-> > +	return svm->nested.ctl.int_ctl & V_GIF_ENABLE_MASK;
-> > +}
-> > +
-
+  
+> diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
+> index 3b5ac869db..d898be85ce 100644
+> --- a/include/hw/i386/intel_iommu.h
+> +++ b/include/hw/i386/intel_iommu.h
+> @@ -267,6 +267,7 @@ struct IntelIOMMUState {
+>      bool buggy_eim;                 /* Force buggy EIM unless eim=off */
+>      uint8_t aw_bits;                /* Host/IOVA address width (in bits) */
+>      bool dma_drain;                 /* Whether DMA r/w draining enabled */
+> +    bool dma_translation;           /* Whether DMA translation supported */
+>  
+>      /*
+>       * Protects IOMMU states in general.  Currently it protects the
+> -- 
+> 2.33.1
 
