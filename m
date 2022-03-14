@@ -2,166 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 969084D8A8B
-	for <lists+kvm@lfdr.de>; Mon, 14 Mar 2022 18:10:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8327F4D8AC3
+	for <lists+kvm@lfdr.de>; Mon, 14 Mar 2022 18:27:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237003AbiCNRL4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Mar 2022 13:11:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49836 "EHLO
+        id S243330AbiCNR2O (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Mar 2022 13:28:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50528 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233904AbiCNRLz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Mar 2022 13:11:55 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B225B3DDF6
-        for <kvm@vger.kernel.org>; Mon, 14 Mar 2022 10:10:44 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7767ED6E;
-        Mon, 14 Mar 2022 10:10:44 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7DB533F66F;
-        Mon, 14 Mar 2022 10:10:43 -0700 (PDT)
-Date:   Mon, 14 Mar 2022 17:11:08 +0000
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Andre Przywara <andre.przywara@arm.com>
-Cc:     Martin Radev <martin.b.radev@gmail.com>, kvm@vger.kernel.org,
-        will@kernel.org, julien.thierry.kdev@gmail.com
-Subject: Re: [PATCH v2 kvmtool 0/5] Fix few small issues in virtio code
-Message-ID: <Yi926JwV50u86yRB@monolith.localdoman>
-References: <20220303231050.2146621-1-martin.b.radev@gmail.com>
- <YioRnsym4HmOSgjl@monolith.localdoman>
- <20220311112321.2f71b6bd@donnerap.cambridge.arm.com>
+        with ESMTP id S234685AbiCNR2O (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Mar 2022 13:28:14 -0400
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BA293EBB7;
+        Mon, 14 Mar 2022 10:27:03 -0700 (PDT)
+Received: from fraeml703-chm.china.huawei.com (unknown [172.18.147.200])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4KHNj61xD6z67L0F;
+        Tue, 15 Mar 2022 01:25:30 +0800 (CST)
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ fraeml703-chm.china.huawei.com (10.206.15.52) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2375.24; Mon, 14 Mar 2022 18:27:00 +0100
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ lhreml710-chm.china.huawei.com (10.201.108.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Mon, 14 Mar 2022 17:27:00 +0000
+Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
+ lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
+ 15.01.2308.021; Mon, 14 Mar 2022 17:26:59 +0000
+From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>
+CC:     "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
+        "yishaih@nvidia.com" <yishaih@nvidia.com>,
+        "kevin.tian@intel.com" <kevin.tian@intel.com>,
+        liulongfang <liulongfang@huawei.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        Jonathan Cameron <jonathan.cameron@huawei.com>,
+        "Wangzhou (B)" <wangzhou1@hisilicon.com>,
+        Linuxarm <linuxarm@huawei.com>
+Subject: RE: [PATCH v9 0/9] vfio/hisilicon: add ACC live migration driver
+Thread-Topic: [PATCH v9 0/9] vfio/hisilicon: add ACC live migration driver
+Thread-Index: AQHYMx05i/r2eazEYUSmGD9dldyyTay/KQYA
+Date:   Mon, 14 Mar 2022 17:26:59 +0000
+Message-ID: <df217839a41b47dc94ef201dfe379e4e@huawei.com>
+References: <20220308184902.2242-1-shameerali.kolothum.thodi@huawei.com>
+In-Reply-To: <20220308184902.2242-1-shameerali.kolothum.thodi@huawei.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.47.89.194]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220311112321.2f71b6bd@donnerap.cambridge.arm.com>
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
-
-On Fri, Mar 11, 2022 at 11:23:21AM +0000, Andre Przywara wrote:
-> On Thu, 10 Mar 2022 14:56:30 +0000
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> 
-> Hi,
-> 
-> > Hi Martin,
-> > 
-> > On Fri, Mar 04, 2022 at 01:10:45AM +0200, Martin Radev wrote:
-> > > Hello everyone,
-> > >   
-> > [..]
-> > > The Makefile change is kept in its original form because I didn't understand
-> > > if there is an issue with it on aarch64.  
-> > 
-> > I'll try to explain it better. According to this blogpost about executable
-> > stacks [1], gcc marks the stack as executable automatically for assembly
-> > (.S) files. C files have their stack mark as non-executable by default. If
-> > any of the object files have the stack executable, then the resulting
-> > binary also has the stack marked as executable (obviously).
-> > 
-> > To mark the stack as non-executable in assembly files, the empty section
-> > .note.GNU-stack must be present in the file. This is a marking to tell
-> > the linker that the final executable does not require an executable stack.
-> > When the linker finds this section, it will create a PT_GNU_STACK empty
-> > segment in the final executable. This segment tells Linux to mark the stack
-> > as non-executable when it loads the binary.
-> 
-> Ah, many thanks for the explanation, that makes sense.
-> 
-> > The only assembly files that kvmtool compiles into objects are the x86
-> > files x86/bios/entry.S and x86/bios/bios-rom.S; the other architectures are
-> > not affected by this. I haven't found any instances where these files (and
-> > the other files they are including) do a call/jmp to something on the
-> > stack, so I've added the .note.GNU-Stack section to the files:
-> 
-> Yes, looks that the same to me, actually the assembly looks more like
-> marshalling arguments than actual code, so we should be safe.
-> 
-> Alex, can you send this as a proper patch. It should be somewhat
-> independent of Martin's series, code-wise, so at least it should apply and
-> build.
-
-Martin, would you like to pick up the diff and turn it into a proper patch? You
-don't need to credit me as the author, you can just add a Suggested-by:
-Alexandru Elisei <alexandru.elisei@arm.com> tag in the commit message. Or do you
-want me to turn this into a patch? If I do, I'll add a Reported-by: Martin Radev
-<martin.b.radev@gmail.com> tag to it.
-
-I don't have a preference, I am asking because you were the first person who
-discovered and tried to fix this.
-
-Thanks,
-Alex
-
-> 
-> Cheers,
-> Andre
-> 
-> > 
-> > diff --git a/x86/bios/bios-rom.S b/x86/bios/bios-rom.S
-> > index 3269ce9793ae..571029fc157e 100644
-> > --- a/x86/bios/bios-rom.S
-> > +++ b/x86/bios/bios-rom.S
-> > @@ -10,3 +10,6 @@
-> >  GLOBAL(bios_rom)
-> >         .incbin "x86/bios/bios.bin"
-> >  END(bios_rom)
-> > +
-> > +# Mark the stack as non-executable.
-> > +.section .note.GNU-stack,"",@progbits
-> > diff --git a/x86/bios/entry.S b/x86/bios/entry.S
-> > index 85056e9816c4..4d5bb663a25d 100644
-> > --- a/x86/bios/entry.S
-> > +++ b/x86/bios/entry.S
-> > @@ -90,3 +90,6 @@ GLOBAL(__locals)
-> >  #include "local.S"
-> > 
-> >  END(__locals)
-> > +
-> > +# Mark the stack as non-executable.
-> > +.section .note.GNU-stack,"",@progbits
-> > 
-> > which makes the final executable have a non-executable stack. Did some very
-> > *light* testing by booting a guest, and everything looked right to me.
-> > 
-> > [1] https://www.airs.com/blog/archives/518
-> > 
-> > Thanks,
-> > Alex
-> > 
-> > > 
-> > > Martin Radev (5):
-> > >   kvmtool: Add WARN_ONCE macro
-> > >   virtio: Sanitize config accesses
-> > >   virtio: Check for overflows in QUEUE_NOTIFY and QUEUE_SEL
-> > >   Makefile: Mark stack as not executable
-> > >   mmio: Sanitize addr and len
-> > > 
-> > >  Makefile                |  7 +++--
-> > >  include/kvm/util.h      | 10 +++++++
-> > >  include/kvm/virtio-9p.h |  1 +
-> > >  include/kvm/virtio.h    |  3 ++-
-> > >  mmio.c                  |  4 +++
-> > >  virtio/9p.c             | 27 ++++++++++++++-----
-> > >  virtio/balloon.c        | 10 ++++++-
-> > >  virtio/blk.c            | 10 ++++++-
-> > >  virtio/console.c        | 10 ++++++-
-> > >  virtio/mmio.c           | 44 +++++++++++++++++++++++++-----
-> > >  virtio/net.c            | 12 +++++++--
-> > >  virtio/pci.c            | 59 ++++++++++++++++++++++++++++++++++++++---
-> > >  virtio/rng.c            |  8 +++++-
-> > >  virtio/scsi.c           | 10 ++++++-
-> > >  virtio/vsock.c          | 10 ++++++-
-> > >  15 files changed, 199 insertions(+), 26 deletions(-)
-> > > 
-> > > -- 
-> > > 2.25.1
-> > >   
-> 
+SGkgQWxleCwNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBTaGFtZWVy
+YWxpIEtvbG90aHVtIFRob2RpDQo+IFNlbnQ6IDA4IE1hcmNoIDIwMjIgMTg6NDkNCj4gVG86IGt2
+bUB2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7DQo+IGxpbnV4
+LWNyeXB0b0B2Z2VyLmtlcm5lbC5vcmcNCj4gQ2M6IGxpbnV4LXBjaUB2Z2VyLmtlcm5lbC5vcmc7
+IGFsZXgud2lsbGlhbXNvbkByZWRoYXQuY29tOyBqZ2dAbnZpZGlhLmNvbTsNCj4gY29odWNrQHJl
+ZGhhdC5jb207IG1ndXJ0b3ZveUBudmlkaWEuY29tOyB5aXNoYWloQG52aWRpYS5jb207DQo+IGtl
+dmluLnRpYW5AaW50ZWwuY29tOyBMaW51eGFybSA8bGludXhhcm1AaHVhd2VpLmNvbT47IGxpdWxv
+bmdmYW5nDQo+IDxsaXVsb25nZmFuZ0BodWF3ZWkuY29tPjsgWmVuZ3RhbyAoQikgPHByaW1lLnpl
+bmdAaGlzaWxpY29uLmNvbT47DQo+IEpvbmF0aGFuIENhbWVyb24gPGpvbmF0aGFuLmNhbWVyb25A
+aHVhd2VpLmNvbT47IFdhbmd6aG91IChCKQ0KPiA8d2FuZ3pob3UxQGhpc2lsaWNvbi5jb20+DQo+
+IFN1YmplY3Q6IFtQQVRDSCB2OSAwLzldIHZmaW8vaGlzaWxpY29uOiBhZGQgQUNDIGxpdmUgbWln
+cmF0aW9uIGRyaXZlcg0KPiANCj4gSGksDQo+IA0KPiBUaGlzIHNlcmllcyBhdHRlbXB0cyB0byBh
+ZGQgdmZpbyBsaXZlIG1pZ3JhdGlvbiBzdXBwb3J0IGZvciBIaVNpbGljb24NCj4gQUNDIFZGIGRl
+dmljZXMgYmFzZWQgb24gdGhlIG5ldyB2MiBtaWdyYXRpb24gcHJvdG9jb2wgZGVmaW5pdGlvbiBh
+bmQNCj4gbWx4NSB2OSBzZXJpZXMgZGlzY3Vzc2VkIGhlcmVbMF0uDQo+IA0KPiB2OCAtLT4gdjkN
+Cj4gwqAtIEFkZGVkIGFja3MgYnkgV2FuZ3pob3UvTG9uZ2ZhbmcvWWVrYWkNCj4gwqAtIEFkZGVk
+IFItYnkgdGFncyBieSBKYXNvbi4NCj4gwqAtIEFkZHJlc3NlZCBjb21tZW50c8KgYnkgQWxleCBv
+biB2OC4NCj4gwqAtIEZpeGVkIHRoZSBwZl9xdWV1ZSBwb2ludGVyIGFzc2lnbm1lbnQgZXJyb3Ig
+aW4gcGF0Y2ggIzguDQo+IMKgLSBBZGRyZXNzZWTCoGNvbW1lbnRzIGZyb20gS2V2aW4sDQo+ICDC
+oCDCoC1VcGRhdGVkIHBhdGNoICM1IGNvbW1pdCBsb2cgbXNnIHdpdGggYSBjbGFyaWZpY2F0aW9u
+IHRoYXQgVkYNCj4gwqAgwqAgwqBtaWdyYXRpb24gQkFSIGFzc2lnbm1lbnQgaXMgZmluZSBpZiBt
+aWdyYXRpb24gc3VwcG9ydCBpcyBub3QgdGhlcmUuDQo+ICDCoCDCoC1BZGRlZCBRTSBkZXNjcmlw
+dGlvbiB0byBwYXRjaCAjOCBjb21taXQgbXNnLg0KDQpIb3BlIHRoZXJlIGlzIG5vdGhpbmcgcGVu
+ZGluZyBmb3IgdGhpcyBzZXJpZXMgbm93IHRvIG1ha2UgaXQgdG8gbmV4dC4NCkkga25vdyBhY2sg
+ZnJvbSBCam9ybiBpcyBzdGlsbCBwZW5kaW5nIGZvciBwYXRjaCAjMywgYW5kIEkgaGF2ZQ0Kc2Vu
+dCBhIHBpbmcgbGFzdCB3ZWVrIGFuZCBhbHNvIENDZCBoaW0gb24gdGhhdCBwYXRjaC4NCg0KUGxl
+YXNlIGxldCBtZSBrbm93IGlmIHRoZXJlIGlzIGFueXRoaW5nIEkgbWlzc2VkLiANCg0KVGhhbmtz
+LA0KU2hhbWVlcg0KDQoNCj4gDQo+IFRoaXMgaXMgc2FuaXR5IHRlc3RlZCBvbiBhIEhpU2lsaWNv
+biBwbGF0Zm9ybSB1c2luZyB0aGUgUWVtdSBicmFuY2gNCj4gcHJvdmlkZWQgaGVyZVsxXS4NCj4g
+DQo+IFBsZWFzZSB0YWtlIGEgbG9vayBhbmQgbGV0IG1lIGtub3cgeW91ciBmZWVkYmFjay4NCj4g
+DQo+IFRoYW5rcywNCj4gU2hhbWVlcg0KPiBbMF0NCj4gaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcv
+a3ZtLzIwMjIwMjI0MTQyMDI0LjE0NzY1My0xLXlpc2hhaWhAbnZpZGlhLmNvbS8NCj4gWzFdIGh0
+dHBzOi8vZ2l0aHViLmNvbS9qZ3VudGhvcnBlL3FlbXUvY29tbWl0cy92ZmlvX21pZ3JhdGlvbl92
+Mg0KPiANCj4gdjcgLS0+IHY4DQo+IMKgLSBEcm9wcGVkIFBSRV9DT1BZIHN1cHBvcnQgYW5kIGVh
+cmx5wqBjb21wYXRpYmlsaXR5IGNoZWNraW5nIGJhc2VkIG9uDQo+ICAgIHRoZSBkaXNjdXNzaW9u
+IGhlcmVbMV0uDQo+IMKgLSBBZGRyZXNzZWTCoGNvbW1lbnRzwqBmcm9tIEpvaG4sIEphc29uICYg
+QWxleCAoVGhhbmtzISkuDQo+IA0KPiB2NiAtLT4gdjcNCj4gwqAtUmVuYW1lZCBNSUdfUFJFQ09Q
+WSBpb2N0bCBuYW1lIGFuZCBzdHJ1Y3QgbmFtZS4gVXBkYXRlZCBpb2N0bA0KPiBkZXNjcmlwdGlv
+bnMNCj4gwqAgcmVnYXJkaW5nIGlvY3RsIHZhbGlkaXR5IChwYXRjaCAjNykuDQo+IC0gQWRyZXNz
+ZWQgY29tbWVudHMgZnJvbSBKYXNvbiBhbmQgQWxleCBvbiBQUkVfQ09QWSByZWFkKCkgYW5kIGlv
+Y3RsKCkgZm5zDQo+ICAgKHBhdGNoICM5KS4NCj4gLSBNb3ZlZCBvbmx5IFZGIFBDSSBpZHMgdG8g
+cGNpX2lkcy5oKHBhdGNoICMzKS4NCj4gDQo+IHY1IC0tPiB2Ng0KPiAgLVJlcG9ydCBQUkVfQ09Q
+WSBzdXBwb3J0IGFuZCB1c2UgdGhhdCBmb3IgZWFybHkgY29tcGF0aWJpbGl0eSBjaGVjaw0KPiAg
+IGJldHdlZW4gc3JjIGFuZCBkc3QgZGV2aWNlcy4NCj4gIC1Gb3IgZ2VuZXJpYyBQUkVfQ09QWSBz
+dXBwb3J0LCBpbmNsdWRlZCBwYXRjaCAjNyBmcm9tIEphc29uKFRoYW5rcyEpLg0KPiAgLUFkZHJl
+c3NlZCBjb21tZW50cyBmcm9tIEFsZXgoVGhhbmtzISkuDQo+ICAtQWRkZWQgdGhlIFFNIHN0YXRl
+IHJlZ2lzdGVyIHVwZGF0ZSB0byBRTSBkcml2ZXIocGF0Y2ggIzgpIHNpbmNlIHRoYXQNCj4gICBp
+cyBiZWluZyB1c2VkIGluIG1pZ3JhdGlvbiBkcml2ZXIgdG8gZGVjaWRlIHdoZXRoZXIgdGhlIGRl
+dmljZSBpcw0KPiAgIHJlYWR5IHRvIHNhdmUgdGhlIHN0YXRlLg0KPiANCj4gUkZDdjQgLS0+IHY1
+DQo+ICAgLSBEcm9wcGVkIFJGQyB0YWcgYXMgdjIgbWlncmF0aW9uIEFQSXMgYXJlIG1vcmUgc3Rh
+YmxlIG5vdy4NCj4gICAtIEFkZHJlc3NlZCByZXZpZXcgY29tbWVudHMgZnJvbSBKYXNvbiBhbmQg
+QWxleCAoVGhhbmtzISkuDQo+IA0KPiB2MyAtLT4gUkZDdjQNCj4gLUJhc2VkIG9uIG1pZ3JhdGlv
+biB2MiBwcm90b2NvbCBhbmQgbWx4NSB2NyBzZXJpZXMuDQo+IC1BZGRlZCBSRkMgdGFnIGFnYWlu
+IGFzIG1pZ3JhdGlvbiB2MiBwcm90b2NvbCBpcyBzdGlsbCB1bmRlciBkaXNjdXNzaW9uLg0KPiAt
+QWRkZWQgbmV3IHBhdGNoICM2IHRvIHJldHJpZXZlIHRoZSBQRiBRTSBkYXRhLg0KPiAtUFJFX0NP
+UFkgY29tcGF0aWJpbGl0eSBjaGVjayBpcyBub3cgZG9uZSBhZnRlciB0aGUgbWlncmF0aW9uIGRh
+dGENCj4gwqB0cmFuc2Zlci4gVGhpcyBpcyBub3QgaWRlYWwgYW5kIG5lZWRzIGRpc2N1c3Npb24u
+DQo+IA0KPiBSRkMgdjIgLS0+IHYzDQo+IMKgLURyb3BwZWQgUkZDIHRhZyBhcyB0aGUgdmZpb19w
+Y2lfY29yZSBzdWJzeXN0ZW0gZnJhbWV3b3JrIGlzIG5vdw0KPiDCoCBwYXJ0IG9mIDUuMTUtcmMx
+Lg0KPiDCoC1BZGRlZCBvdmVycmlkZSBtZXRob2RzIGZvciB2ZmlvX2RldmljZV9vcHMgcmVhZC93
+cml0ZS9tbWFwIGNhbGxzDQo+IMKgIHRvIGxpbWl0IHRoZSBhY2Nlc3Mgd2l0aGluIHRoZSBmdW5j
+dGlvbmFsIHJlZ2lzdGVyIHNwYWNlLg0KPiDCoC1QYXRjaGVzIDEgdG8gMyBhcmUgY29kZSByZWZh
+Y3RvcmluZyB0byBtb3ZlIHRoZSBjb21tb24gQUNDIFFNDQo+IMKgIGRlZmluaXRpb25zIGFuZCBo
+ZWFkZXIgYXJvdW5kLg0KPiANCj4gUkZDdjEgLS0+IFJGQ3YyDQo+IA0KPiDCoC1BZGRzIGEgbmV3
+IHZlbmRvci1zcGVjaWZpYyB2ZmlvX3BjaSBkcml2ZXIoaGlzaS1hY2MtdmZpby1wY2kpDQo+IMKg
+IGZvciBIaVNpbGljb24gQUNDIFZGIGRldmljZXMgYmFzZWQgb24gdGhlIG5ldyB2ZmlvLXBjaS1j
+b3JlDQo+IMKgIGZyYW1ld29yayBwcm9wb3NhbC4NCj4gDQo+IMKgLVNpbmNlIEhpU2lsaWNvbiBB
+Q0MgVkYgZGV2aWNlIE1NSU8gc3BhY2UgY29udGFpbnMgYm90aCB0aGUNCj4gwqAgZnVuY3Rpb25h
+bCByZWdpc3RlciBzcGFjZSBhbmQgbWlncmF0aW9uIGNvbnRyb2wgcmVnaXN0ZXIgc3BhY2UsDQo+
+IMKgIG92ZXJyaWRlIHRoZSB2ZmlvX2RldmljZV9vcHMgaW9jdGwgbWV0aG9kIHRvIHJlcG9ydCBv
+bmx5IHRoZQ0KPiDCoCBmdW5jdGlvbmFsIHNwYWNlIHRvIFZNcy4NCj4gDQo+IMKgLUZvciBhIHN1
+Y2Nlc3NmdWwgbWlncmF0aW9uLCB3ZSBzdGlsbCBuZWVkIGFjY2VzcyB0byBWRiBkZXYNCj4gwqAg
+ZnVuY3Rpb25hbCByZWdpc3RlciBzcGFjZSBtYWlubHkgdG8gcmVhZCB0aGUgc3RhdHVzIHJlZ2lz
+dGVycy4NCj4gwqAgQnV0IGFjY2Vzc2luZyB0aGVzZSB3aGlsZSB0aGUgR3Vlc3QgdkNQVXMgYXJl
+IHJ1bm5pbmcgbWF5IGxlYXZlDQo+IMKgIGEgc2VjdXJpdHkgaG9sZS4gVG8gYXZvaWQgYW55IHBv
+dGVudGlhbCBzZWN1cml0eSBpc3N1ZXMsIHdlDQo+IMKgIG1hcC91bm1hcCB0aGUgTU1JTyByZWdp
+b25zIG9uIGEgbmVlZCBiYXNpcyBhbmQgaXMgc2FmZSB0byBkbyBzby4NCj4gwqAgKFBsZWFzZSBz
+ZWUgaGlzaV9hY2NfdmZfaW9yZW1hcC91bm1hcCgpIGZucyBpbiBwYXRjaCAjNCkuDQo+IA0KPiDC
+oC1Ecm9wcGVkIGRlYnVnZnMgc3VwcG9ydCBmb3Igbm93Lg0KPiDCoC1Vc2VzIGNvbW1vbiBRTSBm
+dW5jdGlvbnMgZm9yIG1haWxib3ggYWNjZXNzKHBhdGNoICMzKS4NCj4gDQo+IExvbmdmYW5nIExp
+dSAoMyk6DQo+ICAgY3J5cHRvOiBoaXNpbGljb24vcW06IE1vdmUgZmV3IGRlZmluaXRpb25zIHRv
+IGNvbW1vbiBoZWFkZXINCj4gICBjcnlwdG86IGhpc2lsaWNvbi9xbTogU2V0IHRoZSBWRiBRTSBz
+dGF0ZSByZWdpc3Rlcg0KPiAgIGhpc2lfYWNjX3ZmaW9fcGNpOiBBZGQgc3VwcG9ydCBmb3IgVkZJ
+TyBsaXZlIG1pZ3JhdGlvbg0KPiANCj4gU2hhbWVlciBLb2xvdGh1bSAoNik6DQo+ICAgY3J5cHRv
+OiBoaXNpbGljb24vcW06IE1vdmUgdGhlIFFNIGhlYWRlciB0byBpbmNsdWRlL2xpbnV4DQo+ICAg
+aGlzaV9hY2NfcW06IE1vdmUgVkYgUENJIGRldmljZSBJRHMgdG8gY29tbW9uIGhlYWRlcg0KPiAg
+IGhpc2lfYWNjX3ZmaW9fcGNpOiBhZGQgbmV3IHZmaW9fcGNpIGRyaXZlciBmb3IgSGlTaWxpY29u
+IEFDQyBkZXZpY2VzDQo+ICAgaGlzaV9hY2NfdmZpb19wY2k6IFJlc3RyaWN0IGFjY2VzcyB0byBW
+RiBkZXYgQkFSMiBtaWdyYXRpb24gcmVnaW9uDQo+ICAgaGlzaV9hY2NfdmZpb19wY2k6IEFkZCBo
+ZWxwZXIgdG8gcmV0cmlldmUgdGhlIHN0cnVjdCBwY2lfZHJpdmVyDQo+ICAgaGlzaV9hY2NfdmZp
+b19wY2k6IFVzZSBpdHMgb3duIFBDSSByZXNldF9kb25lIGVycm9yIGhhbmRsZXINCj4gDQo+ICBN
+QUlOVEFJTkVSUyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgICA3ICsNCj4g
+IGRyaXZlcnMvY3J5cHRvL2hpc2lsaWNvbi9ocHJlL2hwcmUuaCAgICAgICAgICB8ICAgIDIgKy0N
+Cj4gIGRyaXZlcnMvY3J5cHRvL2hpc2lsaWNvbi9ocHJlL2hwcmVfbWFpbi5jICAgICB8ICAgMTkg
+Ky0NCj4gIGRyaXZlcnMvY3J5cHRvL2hpc2lsaWNvbi9xbS5jICAgICAgICAgICAgICAgICB8ICAg
+NjggKy0NCj4gIGRyaXZlcnMvY3J5cHRvL2hpc2lsaWNvbi9zZWMyL3NlYy5oICAgICAgICAgICB8
+ICAgIDIgKy0NCj4gIGRyaXZlcnMvY3J5cHRvL2hpc2lsaWNvbi9zZWMyL3NlY19tYWluLmMgICAg
+ICB8ICAgMjEgKy0NCj4gIGRyaXZlcnMvY3J5cHRvL2hpc2lsaWNvbi9zZ2wuYyAgICAgICAgICAg
+ICAgICB8ICAgIDIgKy0NCj4gIGRyaXZlcnMvY3J5cHRvL2hpc2lsaWNvbi96aXAvemlwLmggICAg
+ICAgICAgICB8ICAgIDIgKy0NCj4gIGRyaXZlcnMvY3J5cHRvL2hpc2lsaWNvbi96aXAvemlwX21h
+aW4uYyAgICAgICB8ICAgMTcgKy0NCj4gIGRyaXZlcnMvdmZpby9wY2kvS2NvbmZpZyAgICAgICAg
+ICAgICAgICAgICAgICB8ICAgIDIgKw0KPiAgZHJpdmVycy92ZmlvL3BjaS9NYWtlZmlsZSAgICAg
+ICAgICAgICAgICAgICAgIHwgICAgMiArDQo+ICBkcml2ZXJzL3ZmaW8vcGNpL2hpc2lsaWNvbi9L
+Y29uZmlnICAgICAgICAgICAgfCAgIDE1ICsNCj4gIGRyaXZlcnMvdmZpby9wY2kvaGlzaWxpY29u
+L01ha2VmaWxlICAgICAgICAgICB8ICAgIDQgKw0KPiAgLi4uL3ZmaW8vcGNpL2hpc2lsaWNvbi9o
+aXNpX2FjY192ZmlvX3BjaS5jICAgIHwgMTMyNiArKysrKysrKysrKysrKysrKw0KPiAgLi4uL3Zm
+aW8vcGNpL2hpc2lsaWNvbi9oaXNpX2FjY192ZmlvX3BjaS5oICAgIHwgIDExNiArKw0KPiAgLi4u
+L3FtLmggPT4gaW5jbHVkZS9saW51eC9oaXNpX2FjY19xbS5oICAgICAgIHwgICA0OSArDQo+ICBp
+bmNsdWRlL2xpbnV4L3BjaV9pZHMuaCAgICAgICAgICAgICAgICAgICAgICAgfCAgICAzICsNCj4g
+IDE3IGZpbGVzIGNoYW5nZWQsIDE1OTEgaW5zZXJ0aW9ucygrKSwgNjYgZGVsZXRpb25zKC0pDQo+
+ICBjcmVhdGUgbW9kZSAxMDA2NDQgZHJpdmVycy92ZmlvL3BjaS9oaXNpbGljb24vS2NvbmZpZw0K
+PiAgY3JlYXRlIG1vZGUgMTAwNjQ0IGRyaXZlcnMvdmZpby9wY2kvaGlzaWxpY29uL01ha2VmaWxl
+DQo+ICBjcmVhdGUgbW9kZSAxMDA2NDQgZHJpdmVycy92ZmlvL3BjaS9oaXNpbGljb24vaGlzaV9h
+Y2NfdmZpb19wY2kuYw0KPiAgY3JlYXRlIG1vZGUgMTAwNjQ0IGRyaXZlcnMvdmZpby9wY2kvaGlz
+aWxpY29uL2hpc2lfYWNjX3ZmaW9fcGNpLmgNCj4gIHJlbmFtZSBkcml2ZXJzL2NyeXB0by9oaXNp
+bGljb24vcW0uaCA9PiBpbmNsdWRlL2xpbnV4L2hpc2lfYWNjX3FtLmggKDg3JSkNCj4gDQo+IC0t
+DQo+IDIuMjUuMQ0KDQo=
