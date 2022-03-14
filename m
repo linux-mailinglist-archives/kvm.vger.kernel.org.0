@@ -2,165 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A74524D8FDE
-	for <lists+kvm@lfdr.de>; Mon, 14 Mar 2022 23:50:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2327D4D8FE9
+	for <lists+kvm@lfdr.de>; Mon, 14 Mar 2022 23:55:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343517AbiCNWv4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Mar 2022 18:51:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58742 "EHLO
+        id S1343536AbiCNW4Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Mar 2022 18:56:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39772 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245751AbiCNWvw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Mar 2022 18:51:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B692C2409A
-        for <kvm@vger.kernel.org>; Mon, 14 Mar 2022 15:50:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647298237;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Dr8vjVeMC0DL0KsvggB3fHeVAbBUF+c93QlSTnv4NdI=;
-        b=U7Wn+0ikSuIU5tjeAQL8EQIug7bI0u2IV4P+O52kphoJCPM2jxKLjVeUpEJBAi3ObrWhv0
-        GEV9RA3Nzw5c6ec0wEK18MUUWY6ZzZ3awWf4b88QhBo7UijhByFo/pxT667eCIfyjf6IEP
-        wnVN8+nNzJ7ZE2RXkPEYOsBdEdUtXtI=
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
- [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-324--4kSVn1oP0KcMuJoWNpO2w-1; Mon, 14 Mar 2022 18:50:36 -0400
-X-MC-Unique: -4kSVn1oP0KcMuJoWNpO2w-1
-Received: by mail-io1-f69.google.com with SMTP id e27-20020a056602045b00b00645bd576184so13276917iov.3
-        for <kvm@vger.kernel.org>; Mon, 14 Mar 2022 15:50:36 -0700 (PDT)
+        with ESMTP id S237538AbiCNW4X (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Mar 2022 18:56:23 -0400
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A237F36E2A
+        for <kvm@vger.kernel.org>; Mon, 14 Mar 2022 15:55:12 -0700 (PDT)
+Received: by mail-ed1-x52c.google.com with SMTP id b24so21940006edu.10
+        for <kvm@vger.kernel.org>; Mon, 14 Mar 2022 15:55:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=references:user-agent:from:to:cc:subject:date:in-reply-to
+         :message-id:mime-version:content-transfer-encoding;
+        bh=y2Q/inabtnNQGMD1STwoVXN1cYBrHr5EEIPdNdUQA8M=;
+        b=B3Ph160SYsccuR00NVF/PocSGd5KiKeGpNJQ+RhhnFCFJnM/0IodWWwadeJcwcmY+1
+         p7mK/8zR77h4sFn6DIJS4jdi8ycIdBa6GBZQ6BXKTb3vVVmexiMZjgQShP38GekQRhLR
+         OFFa1yqM6ceyWSEt+cqGDYutIRVgD92f7oipq5Mg9BeeGJDwvUB0CNZczv+2oAKHL7RU
+         XtPyTH4G288CVUiVrITqt6JutYE0Qb0TgEX3xgugz+3QvZ9/Wgx/vbThbekaqzBLCdmr
+         djWEZim/YuTV6z1bWLbTLYuLWSD1hi3Ql3isNXnEieORmw90FONvnt5WSh0jULarEWnD
+         mY5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=Dr8vjVeMC0DL0KsvggB3fHeVAbBUF+c93QlSTnv4NdI=;
-        b=WPq8l+BS3mJ4hYllJUYUYqewLzu2V7hRrjjBd3aoVHz9XvvU5sl5l7bRepY/MSITMo
-         OLynADihyccj1m1NIbw8ayrJ7RCGfwB/cYwa2eDEGxGzCjdvBAzbwL1tWeWN89/Mmf2N
-         yFbIQvocS/X0lJFX0L6ULd58etGT6Wqx9YsLP0LCu9VFr5Dee0cD21qdvsut8ik9poaw
-         iKApk3uazmcvgMyusadiuHbSQSBY94yjbZKz1lafCk6aaV8DS+Nq93dO9gCVkiJlskaX
-         I4NNmLDCS8HphTu9koyfgjTZbuR8LCDVRyJswdbxPTw6snQx+UJlO2cJt5nXSDi0mIo3
-         sdQg==
-X-Gm-Message-State: AOAM533B9fdPILsanL+mV1Nahk35xf+fQxcfnaSfhjTgoyzOdB75W3Zc
-        daAOUzXZ6flCOfMjCVDZD5sxQgumI2t4qr9rdAElP/yss8XzpZz3nmOXvcUEbRresgH8KgyFJ+m
-        8oiWPzi0h2G1z
-X-Received: by 2002:a6b:620e:0:b0:611:4b19:6ca8 with SMTP id f14-20020a6b620e000000b006114b196ca8mr20995640iog.49.1647298236055;
-        Mon, 14 Mar 2022 15:50:36 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxg8HJ/3lVgtLPe6Yd5ht2l45iOmV2X8AafJZFuKi1YIsK1jkfd5ZA3a4unIG0CxlWIAReolA==
-X-Received: by 2002:a6b:620e:0:b0:611:4b19:6ca8 with SMTP id f14-20020a6b620e000000b006114b196ca8mr20995618iog.49.1647298235835;
-        Mon, 14 Mar 2022 15:50:35 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id g8-20020a056602248800b006409fb2cbccsm9036619ioe.32.2022.03.14.15.50.33
+        h=x-gm-message-state:references:user-agent:from:to:cc:subject:date
+         :in-reply-to:message-id:mime-version:content-transfer-encoding;
+        bh=y2Q/inabtnNQGMD1STwoVXN1cYBrHr5EEIPdNdUQA8M=;
+        b=Oh7Z45Kpas59xPtAWvCycOI4ATrudFwtewh7UwfK0M2n4y/lwl/LrPUbMVpdFuwn5y
+         AjmPBOrmTmvh9XeZDLPnAhyFxQ0HMykl/eYsP5ZSdESNYggOX40nlM9ecijYB8y3+07O
+         /zesfMXGFlaW6H1F2fKLgmpbyK/XXhDkx2ntyuBRhUzT7TbNcRKDHtS6c+CbtbPnpasK
+         opK/ZDK5hDnCROnqJHNn/EdBdp7GNu2TnkYKzO09psypKOtrHk94sTz21bCyuRvQqYjJ
+         LWLhkGL9ZNrYntdpTW63GVSoMXIquYmtdbAjlywFViqe+2sivVHF7fV7ySemlIZmQTJS
+         Pk3A==
+X-Gm-Message-State: AOAM533LpEA5u+cp3LeVd3+UgHOCZGPAzuef7RwLWXRdan/IXHTMJUpV
+        hteaoxjW4I0uOEnJyAxC+STsMQ==
+X-Google-Smtp-Source: ABdhPJxuZxtDdnhy4Gj1uUNyNIF4Q1otKPH/l3hhaM0nWqHIIS9oPgWPUcws559h68k7pQArpUf2fg==
+X-Received: by 2002:aa7:c6d7:0:b0:415:a0fc:1dcd with SMTP id b23-20020aa7c6d7000000b00415a0fc1dcdmr23455380eds.266.1647298511203;
+        Mon, 14 Mar 2022 15:55:11 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+        by smtp.gmail.com with ESMTPSA id v5-20020a50c405000000b004161123bf7asm8674775edf.67.2022.03.14.15.55.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Mar 2022 15:50:35 -0700 (PDT)
-Date:   Mon, 14 Mar 2022 16:50:33 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Matthew Rosato <mjrosato@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, cohuck@redhat.com,
-        schnelle@linux.ibm.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
-        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
-        svens@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
-        oberpar@linux.ibm.com, freude@linux.ibm.com, thuth@redhat.com,
-        pasic@linux.ibm.com, joro@8bytes.org, will@kernel.org,
-        pbonzini@redhat.com, corbet@lwn.net, jgg@nvidia.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        iommu@lists.linux-foundation.org, linux-doc@vger.kernel.org
-Subject: Re: [PATCH v4 15/32] vfio: introduce KVM-owned IOMMU type
-Message-ID: <20220314165033.6d2291a5.alex.williamson@redhat.com>
-In-Reply-To: <20220314194451.58266-16-mjrosato@linux.ibm.com>
-References: <20220314194451.58266-1-mjrosato@linux.ibm.com>
-        <20220314194451.58266-16-mjrosato@linux.ibm.com>
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        Mon, 14 Mar 2022 15:55:10 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+        by zen.linaroharston (Postfix) with ESMTP id 47A0E1FFB7;
+        Mon, 14 Mar 2022 22:55:09 +0000 (GMT)
+References: <20220314160108.1440470-1-armbru@redhat.com>
+ <20220314160108.1440470-4-armbru@redhat.com>
+User-agent: mu4e 1.7.10; emacs 28.0.92
+From:   Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To:     Markus Armbruster <armbru@redhat.com>
+Cc:     qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Christian Schoenebeck <qemu_oss@crudebyte.com>,
+        "Gonglei (Arei)" <arei.gonglei@huawei.com>,
+        =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Ani Sinha <ani@anisinha.ca>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Amit Shah <amit@kernel.org>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Anthony Perard <anthony.perard@citrix.com>,
+        Paul Durrant <paul@xen.org>,
+        =?utf-8?Q?Herv=C3=A9?= Poussineau <hpoussin@reactos.org>,
+        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        Corey Minyard <cminyard@mvista.com>,
+        Patrick Venture <venture@google.com>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Peter Xu <peterx@redhat.com>, Jason Wang <jasowang@redhat.com>,
+        =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
+        Daniel Henrique Barboza <danielhb413@gmail.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Greg Kurz <groug@kaod.org>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+        Jean-Christophe Dubois <jcd@tribudubois.net>,
+        Keith Busch <kbusch@kernel.org>,
+        Klaus Jensen <its@irrelevant.dk>,
+        Yuval Shaia <yuval.shaia.ml@gmail.com>,
+        Yoshinori Sato <ysato@users.sourceforge.jp>,
+        Magnus Damm <magnus.damm@gmail.com>,
+        Fabien Chouteau <chouteau@adacore.com>,
+        KONRAD Frederic <frederic.konrad@adacore.com>,
+        Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+        Artyom Tarasenko <atar4qemu@gmail.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        Juan Quintela <quintela@redhat.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Konstantin Kostiuk <kkostiuk@redhat.com>,
+        Michael Roth <michael.roth@amd.com>,
+        =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+        Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
+        David Hildenbrand <david@redhat.com>,
+        Wenchao Wang <wenchao.wang@intel.com>,
+        Colin Xu <colin.xu@intel.com>,
+        Kamil Rytarowski <kamil@netbsd.org>,
+        Reinoud Zandijk <reinoud@netbsd.org>,
+        Sunil Muthuswamy <sunilmut@microsoft.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Thomas Huth <thuth@redhat.com>, Eric Blake <eblake@redhat.com>,
+        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+        John Snow <jsnow@redhat.com>, kvm@vger.kernel.org,
+        qemu-arm@nongnu.org, xen-devel@lists.xenproject.org,
+        qemu-ppc@nongnu.org, qemu-block@nongnu.org, haxm-team@intel.com,
+        qemu-s390x@nongnu.org
+Subject: Re: [PATCH 3/3] Use g_new() & friends where that makes obvious sense
+Date:   Mon, 14 Mar 2022 22:52:52 +0000
+In-reply-to: <20220314160108.1440470-4-armbru@redhat.com>
+Message-ID: <87y21c401e.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 14 Mar 2022 15:44:34 -0400
-Matthew Rosato <mjrosato@linux.ibm.com> wrote:
 
-> s390x will introduce a new IOMMU domain type where the mappings are
-> managed by KVM rather than in response to userspace mapping ioctls.  Allow
-> for specifying this type on the VFIO_SET_IOMMU ioctl and triggering the
-> appropriate iommu interface for overriding the default domain.
-> 
-> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> ---
->  drivers/vfio/vfio_iommu_type1.c | 12 +++++++++++-
->  include/uapi/linux/vfio.h       |  6 ++++++
->  2 files changed, 17 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 9394aa9444c1..0bec97077d61 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -77,6 +77,7 @@ struct vfio_iommu {
->  	bool			nesting;
->  	bool			dirty_page_tracking;
->  	bool			container_open;
-> +	bool			kvm;
->  	struct list_head	emulated_iommu_groups;
->  };
->  
-> @@ -2203,7 +2204,12 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
->  		goto out_free_group;
->  
->  	ret = -EIO;
-> -	domain->domain = iommu_domain_alloc(bus);
-> +
-> +	if (iommu->kvm)
-> +		domain->domain = iommu_domain_alloc_type(bus, IOMMU_DOMAIN_KVM);
-> +	else
-> +		domain->domain = iommu_domain_alloc(bus);
-> +
->  	if (!domain->domain)
->  		goto out_free_domain;
->  
-> @@ -2552,6 +2558,9 @@ static void *vfio_iommu_type1_open(unsigned long arg)
->  	case VFIO_TYPE1v2_IOMMU:
->  		iommu->v2 = true;
->  		break;
-> +	case VFIO_KVM_IOMMU:
-> +		iommu->kvm = true;
-> +		break;
->  	default:
->  		kfree(iommu);
->  		return ERR_PTR(-EINVAL);
-> @@ -2637,6 +2646,7 @@ static int vfio_iommu_type1_check_extension(struct vfio_iommu *iommu,
->  	case VFIO_TYPE1_NESTING_IOMMU:
->  	case VFIO_UNMAP_ALL:
->  	case VFIO_UPDATE_VADDR:
-> +	case VFIO_KVM_IOMMU:
->  		return 1;
->  	case VFIO_DMA_CC_IOMMU:
->  		if (!iommu)
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index ef33ea002b0b..666edb6957ac 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -52,6 +52,12 @@
->  /* Supports the vaddr flag for DMA map and unmap */
->  #define VFIO_UPDATE_VADDR		10
->  
-> +/*
-> + * The KVM_IOMMU type implies that the hypervisor will control the mappings
-> + * rather than userspace
-> + */
-> +#define VFIO_KVM_IOMMU			11
+Markus Armbruster <armbru@redhat.com> writes:
 
-Then why is this hosted in the type1 code that exposes a wide variety
-of userspace interfaces?  Thanks,
+> g_new(T, n) is neater than g_malloc(sizeof(T) * n).  It's also safer,
+> for two reasons.  One, it catches multiplication overflowing size_t.
+> Two, it returns T * rather than void *, which lets the compiler catch
+> more type errors.
+>
+<snip>
+> diff --git a/semihosting/config.c b/semihosting/config.c
+> index 137171b717..6d48ec9566 100644
+> --- a/semihosting/config.c
+> +++ b/semihosting/config.c
+> @@ -98,7 +98,7 @@ static int add_semihosting_arg(void *opaque,
+>      if (strcmp(name, "arg") =3D=3D 0) {
+>          s->argc++;
+>          /* one extra element as g_strjoinv() expects NULL-terminated arr=
+ay */
+> -        s->argv =3D g_realloc(s->argv, (s->argc + 1) * sizeof(void *));
+> +        s->argv =3D g_renew(void *, s->argv, s->argc + 1);
 
-Alex
+This did indeed break CI because s->argv is an array of *char:
 
+../semihosting/config.c:101:17: error: assignment to =E2=80=98const char **=
+=E2=80=99 from incompatible pointer type =E2=80=98void **=E2=80=99 [-Werror=
+=3Dincompatible-pointer-types]
+  101 |         s->argv =3D g_renew(void *, s->argv, s->argc + 1);
+      |                 ^
+cc1: all warnings being treated as errors
+
+So it did the job of type checking but failed to build ;-)
+
+
+--=20
+Alex Benn=C3=A9e
