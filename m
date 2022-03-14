@@ -2,203 +2,211 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5796E4D8BEA
-	for <lists+kvm@lfdr.de>; Mon, 14 Mar 2022 19:47:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 897464D8C0B
+	for <lists+kvm@lfdr.de>; Mon, 14 Mar 2022 20:07:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235715AbiCNSsa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Mar 2022 14:48:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45244 "EHLO
+        id S237143AbiCNTIW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Mar 2022 15:08:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235443AbiCNSs3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Mar 2022 14:48:29 -0400
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C092646E
-        for <kvm@vger.kernel.org>; Mon, 14 Mar 2022 11:47:19 -0700 (PDT)
-Received: by mail-pf1-x42d.google.com with SMTP id s11so15486292pfu.13
-        for <kvm@vger.kernel.org>; Mon, 14 Mar 2022 11:47:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=3D0LjBNgeX0U7Mj4vXtRyZDTtfua4bw8Cy52CIrKEcE=;
-        b=bfJjZ7cZndCjiv9SqHZ+gz/0oKTvtPYtt1gyUvSRswS4RFTsSgGz7nyM7i3zTsn0l7
-         TrXxYHSA7bX7Fzgiv1e9Iq6gmhINLk7AIsPQriBACClelMz0NCtN/89NlMGaZHFIEEHe
-         /OhsYPq9qlQnLm0YMaVyIacmu7wCbANhH2Z2P4N0wSykFtKrau7nb3gBpQsmYUKVBk6m
-         E8WpjP0G7/3p45G4eCysz94M/86UmhtbyPnn54CCc6qGUdooPX6Yp49QzyFe0M/Xy3jo
-         1qqQkUXRdKhFns65phIRg7cAgWHXb57FXw5ZrQBHTbqa96fWU7mOCIdjQB+niAOpUT4z
-         co/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=3D0LjBNgeX0U7Mj4vXtRyZDTtfua4bw8Cy52CIrKEcE=;
-        b=GW31l56Umz7qehM3NelapihRrf5FaqnNdgc6UMjbaCon7Vrab5RU60o74VkjpiUJM3
-         TvM6gIs8/fzA882cPINHHGKvXG/5ds3wcRzTmiASCkUSDEyWGT7QnpivStMRQL+5Ozr0
-         jJPOdNvaEHLxnSKvVvYvMVzlsWeg0qC8VJgN1w6VuLNgTfiLhtUSCDKa7AsQlFc5pUd9
-         3GR3oVS6VnllvEvHyQs4EBiipWnOlXxwXcMS6fU1rKOaYn3Ke3qpc7382yPERsRRLASB
-         gvWjjp6rcw+EyuW67Oy9dNKPUKRcMlOnF1pGAqsxi9p2rNnU2u7QUCvb7QLEakSXEVTu
-         8kzA==
-X-Gm-Message-State: AOAM531to2JKbJepxYk/dY4FSKEhq0COhaZewUMskQjtVoAmhj0WrK/Z
-        hoTJHJEZYGZVMxDE4bOV5mY=
-X-Google-Smtp-Source: ABdhPJwzbMEzP8c3c5sDX3mZK/oaJ86+KZMRKvtRIkv5Sn/gYzmdRImdNKkSWPP0IhMCI2ss///OUA==
-X-Received: by 2002:a63:ba47:0:b0:380:493a:7ed6 with SMTP id l7-20020a63ba47000000b00380493a7ed6mr20860797pgu.355.1647283638334;
-        Mon, 14 Mar 2022 11:47:18 -0700 (PDT)
-Received: from [192.168.1.115] ([185.126.107.38])
-        by smtp.gmail.com with ESMTPSA id k14-20020a056a00134e00b004f83f05608esm2061600pfu.31.2022.03.14.11.47.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 14 Mar 2022 11:47:17 -0700 (PDT)
-Message-ID: <78a0febe-348a-8398-c57a-4b58038d041d@gmail.com>
-Date:   Mon, 14 Mar 2022 19:46:59 +0100
+        with ESMTP id S233327AbiCNTIV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Mar 2022 15:08:21 -0400
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2082.outbound.protection.outlook.com [40.107.243.82])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7156935DDD;
+        Mon, 14 Mar 2022 12:07:10 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NsvyFDeRr/ZTpmT9UoWOF+PhZYHpj9yzqkv1f1NzNuPgPJt1HBfpFN10TE4FmM/iYVjWYO2d+vGLS6EiYQkUadfiqJc76NExOxWpAniGPrk6UHU3gpzWIx98YlZ+6LAL4/iSQaPCLMB3zpQIawbEOoHG5U7ja460jC4Lx32eWxOKLxMpc+WuUs+Xt+qCHm7ikMiP7uTONBbJkoiCMnumqIN2VhuJBVM9BxhrdZR8nbuxG+LN0PEAEPCDfJxsZsrGLKgheudoh7sbbtDMdCFV2eFOWXYok+4DoBUC2g71VdQKJAZp1eMIs0Z5My00cKHIaplbK07ztppCoNi9NEENRw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3+ya3MaCf7MD8xRHgB/cYTCittpJlr4x1dtMKiCjNus=;
+ b=iC/I+KdBKB4U97G8YXSnm0gJG9i4PK9yDqeRRzl3vIepkVP+mVHlvLXZ2mmrNHmmWXMmBJENs8rPyjv3chJIZ5V9yYGmg0mTIpIym3RQXNJ76HooiaFR4+T1qOLODiSO3QDYROwe5LisfeTlBqkaqB4SyRkd8GLuBqGxxz2YLXb+xbmr08J3R0gzQzLoMSHTU1fswgfvrLiuZKD1WoV3TQRKtF/6rhOMAeA4/KbS5zcucL/NFNlBUehmWm5V6klK9r0adlhNLExq91qXepp/2KKgTb4NRSWcNBERzFMUuIVyj+ulOKdYHp28Az8OdX4GwJ/q2KbnJEqqMRqgpiGLVg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 12.22.5.236) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3+ya3MaCf7MD8xRHgB/cYTCittpJlr4x1dtMKiCjNus=;
+ b=ATGEFT4l/XzevmesraRPJ3zV4twcHDW+KJY53aRtJ+qSNWvhzkjdHRcFKHnsiVrQneMpN9eG24q4MtELehSuaZOTIVFx0T+0eb3CQ9Tdt1dVVHb/1XLN1dGthf4tAnyvf4hNxatwvP/LYstoIpowoXdfZXxo4EP3+IuC1ASxDntUO78zedY9PyH80EmcKQnjaphDsQf2pyL1uSLXJ2IWm+p/UlC13MXWvdYMLEg8oyLG3nUYFk2DaUQykx0KA42HHzY0V7z0UjqGaqyOifnGPxatSaDzVUgPhXSJOYVojakVpdiMUrTmxk0OXPqnpbgs1l6W3BOofT9GvdQFuDME+w==
+Received: from MW4PR03CA0293.namprd03.prod.outlook.com (2603:10b6:303:b5::28)
+ by CH2PR12MB4280.namprd12.prod.outlook.com (2603:10b6:610:ac::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5061.25; Mon, 14 Mar
+ 2022 19:07:08 +0000
+Received: from CO1NAM11FT067.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:303:b5:cafe::f2) by MW4PR03CA0293.outlook.office365.com
+ (2603:10b6:303:b5::28) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5061.28 via Frontend
+ Transport; Mon, 14 Mar 2022 19:07:08 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.236)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 12.22.5.236 as permitted sender) receiver=protection.outlook.com;
+ client-ip=12.22.5.236; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (12.22.5.236) by
+ CO1NAM11FT067.mail.protection.outlook.com (10.13.174.212) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.5061.22 via Frontend Transport; Mon, 14 Mar 2022 19:07:07 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by DRHQMAIL109.nvidia.com
+ (10.27.9.19) with Microsoft SMTP Server (TLS) id 15.0.1497.32; Mon, 14 Mar
+ 2022 19:07:07 +0000
+Received: from [172.27.14.25] (10.126.230.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.22; Mon, 14 Mar
+ 2022 12:07:04 -0700
+Message-ID: <a635abc8-be36-a9ee-dd8b-2950cc368562@nvidia.com>
+Date:   Mon, 14 Mar 2022 21:07:01 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.6.1
-Subject: Re: [PATCH 2/3] 9pfs: Use g_new() & friends where that makes obvious
- sense
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.2
+Subject: Re: [PATCH] vfio-pci: Provide reviewers and acceptance criteria for
+ vendor drivers
 Content-Language: en-US
-To:     Christian Schoenebeck <qemu_oss@crudebyte.com>,
-        qemu-devel@nongnu.org
-Cc:     Markus Armbruster <armbru@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Daniel Henrique Barboza <danielhb413@gmail.com>,
-        kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Yuval Shaia <yuval.shaia.ml@gmail.com>,
-        Peter Xu <peterx@redhat.com>, Klaus Jensen <its@irrelevant.dk>,
-        KONRAD Frederic <frederic.konrad@adacore.com>,
-        Konstantin Kostiuk <kkostiuk@redhat.com>,
-        Gerd Hoffmann <kraxel@redhat.com>, Ani Sinha <ani@anisinha.ca>,
-        Reinoud Zandijk <reinoud@netbsd.org>,
-        Eric Blake <eblake@redhat.com>,
-        Sunil Muthuswamy <sunilmut@microsoft.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        xen-devel@lists.xenproject.org,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        Juan Quintela <quintela@redhat.com>,
-        John Snow <jsnow@redhat.com>, Paul Durrant <paul@xen.org>,
-        Magnus Damm <magnus.damm@gmail.com>,
-        Kamil Rytarowski <kamil@netbsd.org>,
-        "Gonglei (Arei)" <arei.gonglei@huawei.com>,
-        =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
-        Mich ael Roth <michael.roth@amd.com>,
-        Anthony Perard <anthony.perard@citrix.com>,
-        =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
-        Artyom Tarasenko <atar4qemu@gmail.com>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
-        Amit Shah <amit@kernel.org>,
-        Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-        haxm-team@intel.com,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Greg Kurz <groug@kaod.org>,
-        Fabien Chouteau <chouteau@adacore.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        qemu-arm@nongnu.org,
-        =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
-        Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Keith Busch <kbusch@kernel.org>, qemu-ppc@nongnu.org,
-        David Hildenbrand <david@redhat.com>,
-        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
-        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-        qemu-block@nongnu.org, Max Filippov <jcmvbkbc@gmail.com>,
-        qemu-s390x@nongnu.org, Patrick Venture <venture@google.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
-        Jean-Christophe Dubois <jcd@tribudubois.net>,
-        Corey Minyard <cminyard@mvista.com>,
-        Wenchao Wang <wenchao.wang@intel.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Colin Xu <colin.xu@intel.com>
-References: <20220314160108.1440470-1-armbru@redhat.com>
- <20220314160108.1440470-3-armbru@redhat.com> <2292394.T0kE68JRDY@silver>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= 
-        <philippe.mathieu.daude@gmail.com>
-In-Reply-To: <2292394.T0kE68JRDY@silver>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     <linux-kernel@vger.kernel.org>, <jgg@nvidia.com>,
+        <shameerali.kolothum.thodi@huawei.com>, <kevin.tian@intel.com>,
+        <linux-doc@vger.kernel.org>, <corbet@lwn.net>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+References: <164727326053.17467.1731353533389014796.stgit@omen>
+From:   Yishai Hadas <yishaih@nvidia.com>
+In-Reply-To: <164727326053.17467.1731353533389014796.stgit@omen>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.126.230.35]
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 3398d45e-189d-4659-b9cd-08da05edd5e6
+X-MS-TrafficTypeDiagnostic: CH2PR12MB4280:EE_
+X-Microsoft-Antispam-PRVS: <CH2PR12MB42800AACF02E2BB9E221BA4AC30F9@CH2PR12MB4280.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: I94h3HG9WGlr5/gEkhv2dX50HFsJKEy2Bmm/6Vfds5pRjXdPfLTwvHhFraiztGL3+ZlYUyEFQoNsgvknUEdHlG00yS8y+iFoEnkoqJDDPOAB5LvozYXeoymQAiW/Ko5B6wWaIVZ/48+N8FBbxIc+UPX+9zK9KpnB/6yc82XxHiMb6QHkVHdJJTjqV3UVOlNTHTvMdnTL/Y3hq952H7vhl6zmZD+fo6XTL5A3MrD+itzyYBWeynYWmB9l9uZ9X+qGw1dObtW+JxjJEjRpKNR47OtpzCA6NuQZv3HpdBd5yw8pT4QkPwrRcdxzDVb1x7XbcG7ri8qlJe52PnjJLOkf3GJLCWwXgiUH11cI9DGPYzlPfsBA54TN8cjuVwJoEXFTrBafjLa28MgwwDI8+GOOKyXlXgEc/Iyhna4Fibj3hwkV1oIgqd+BMwpWiZWiGLIZ/lIN7iToe4KbSdrOIpNjUa6LtwjGFE4EGNRee5L/I8vUtW/ieGDbm8s2uNmw7B+YFJhQ5dKuphg/7wEsMdful6ezyhTLi3f/i+wPE7OL01IjTc1WcgRktCfLnzP3/FTfr3TlquohnhhTS1naGLccP3rqL4U7mL5qm7egTgioEkIhR2zNm4+oyhO3nKLTu+l/x7F9Dm2/jaOHpcJI2N2JbxO8GTCcDEfTT/wIyvRcRhu+vI3QdvMLszrfpb7ZRsSWCTrlKR0MxOzvXrEDCc+ZbuavqUMobm0Iadxe+u7VFxH7Hy5L28Qbn79GEmdhywG8sHXpMaZvDmdlJsDmMDeNISXt6FALYc18kHDPdWRlXn7Q2xPKvVd4yM9yhTNiHMNmhwAiRRqn/hMGeHkHr2W4qw==
+X-Forefront-Antispam-Report: CIP:12.22.5.236;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230001)(4636009)(46966006)(36840700001)(40470700004)(4326008)(316002)(36860700001)(81166007)(26005)(356005)(70206006)(70586007)(2616005)(16576012)(426003)(8676002)(186003)(45080400002)(8936002)(54906003)(336012)(508600001)(31686004)(82310400004)(53546011)(36756003)(16526019)(2906002)(86362001)(6916009)(31696002)(5660300002)(6666004)(83380400001)(47076005)(40460700003)(36900700001)(43740500002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Mar 2022 19:07:07.9308
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3398d45e-189d-4659-b9cd-08da05edd5e6
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.236];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT067.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4280
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Christian,
+On 3/14/2022 6:09 PM, Alex Williamson wrote:
+> Vendor or device specific extensions for devices exposed to userspace
+> through the vfio-pci-core library open both new functionality and new
+> risks.  Here we attempt to provided formalized requirements and
+> expectations to ensure that future drivers both collaborate in their
+> interaction with existing host drivers, as well as receive additional
+> reviews from community members with experience in this area.
+>
+> Cc: Jason Gunthorpe <jgg@nvidia.com>
+> Cc: Yishai Hadas <yishaih@nvidia.com>
+> Cc: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> ---
+>
+> Per the proposal here[1], I've collected those that volunteered and
+> those that I interpreted as showing interest (alpha by last name).  For
+> those on the reviewers list below, please R-b/A-b to keep your name as a
+> reviewer.  More volunteers are still welcome, please let me know
+> explicitly; R-b/A-b will not be used to automatically add reviewers but
+> are of course welcome.  Thanks,
 
-On 14/3/22 17:42, Christian Schoenebeck wrote:
-> On Montag, 14. März 2022 17:01:07 CET Markus Armbruster wrote:
->> g_new(T, n) is neater than g_malloc(sizeof(T) * n).  It's also safer,
->> for two reasons.  One, it catches multiplication overflowing size_t.
->> Two, it returns T * rather than void *, which lets the compiler catch
->> more type errors.
->>
->> This commit only touches allocations with size arguments of the form
->> sizeof(T).
->>
->> Patch created mechanically with:
->>
->>      $ spatch --in-place --sp-file scripts/coccinelle/use-g_new-etc.cocci \
->> 	     --macro-file scripts/cocci-macro-file.h FILES...
->>
->> Except this uncovers a typing error:
->>
->>      ../hw/9pfs/9p.c:855:13: warning: incompatible pointer types assigning to
->> 'QpfEntry *' from 'QppEntry *' [-Wincompatible-pointer-types] val =
->> g_new0(QppEntry, 1);
->> 		^ ~~~~~~~~~~~~~~~~~~~
->>      1 warning generated.
->>
->> Harmless, because QppEntry is larger than QpfEntry.  Fix to allocate a
->> QpfEntry instead.
->>
->> Cc: Greg Kurz <groug@kaod.org>
->> Cc: Christian Schoenebeck <qemu_oss@crudebyte.com>
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
-> 
-> Reviewed-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+You can add me as well to the reviewers list.
 
-FYI your domain is also quarantined by Google:
+Thanks,
 
-ARC-Authentication-Results: i=1; mx.google.com;
-        dkim=fail header.i=@crudebyte.com header.s=lizzy header.b=olij9WvS;
-        spf=softfail (google.com: domain of transitioning 
-qemu_oss@crudebyte.com does not designate 172.105.152.211 as permitted 
-sender) smtp.mailfrom=qemu_oss@crudebyte.com;
-        dmarc=fail (p=QUARANTINE sp=QUARANTINE dis=QUARANTINE) 
-header.from=crudebyte.com
-Received-SPF: softfail (google.com: domain of transitioning 
-qemu_oss@crudebyte.com does not designate 172.105.152.211 as permitted 
-sender) client-ip=172.105.152.211;
-Authentication-Results: mx.google.com;
-        dkim=fail header.i=@crudebyte.com header.s=lizzy header.b=olij9WvS;
-        spf=softfail (google.com: domain of transitioning 
-qemu_oss@crudebyte.com does not designate 172.105.152.211 as permitted 
-sender) smtp.mailfrom=qemu_oss@crudebyte.com;
-        dmarc=fail (p=QUARANTINE sp=QUARANTINE dis=QUARANTINE) 
-header.from=crudebyte.com
-X-Rspamd-Queue-Id: AC61617709E
-X-Spamd-Result: default: False [-2.01 / 7.00]; 
-BAYES_HAM(-3.00)[100.00%]; SUSPICIOUS_RECIPS(1.50)[]; 
-DMARC_POLICY_ALLOW(-0.50)[crudebyte.com,quarantine]; 
-MID_RHS_NOT_FQDN(0.50)[]; R_DKIM_ALLOW(-0.20)[crudebyte.com:s=lizzy]; 
-R_SPF_ALLOW(-0.20)[+ip4:91.194.90.13]; MIME_GOOD(-0.10)[text/plain]; 
-MX_GOOD(-0.01)[]; RCVD_COUNT_ZERO(0.00)[0]; ASN(0.00)[asn:51167, 
-ipnet:91.194.90.0/23, country:DE]; MIME_TRACE(0.00)[0:+]; 
-FREEMAIL_CC(0.00)[redhat.com,linaro.org,gmail.com,vger.kernel.org,irrelevant.dk,adacore.com,anisinha.ca,netbsd.org,microsoft.com,kernel.org,lists.xenproject.org,users.sourceforge.jp,xen.org,huawei.com,reactos.org,amd.com,citrix.com,syrmia.com,ilande.co.uk,intel.com,kaod.org,nongnu.org,ispras.ru,gibson.dropbear.id.au,habkost.net,virtuozzo.com,google.com,amsat.org,tribudubois.net,mvista.com]; 
-FROM_EQ_ENVFROM(0.00)[]; NEURAL_HAM(-0.00)[-0.923]; ARC_NA(0.00)[]; 
-DKIM_TRACE(0.00)[crudebyte.com:+]; FROM_HAS_DN(0.00)[]; 
-RCPT_COUNT_GT_50(0.00)[66]; TO_DN_SOME(0.00)[]; 
-TO_MATCH_ENVRCPT_SOME(0.00)[]; TAGGED_RCPT(0.00)[]; 
-RCVD_IN_DNSWL_FAIL(0.00)[91.194.90.13:server fail]
-X-Rspamd-Server: atlanta189
+Yishai
+
+> Alex
+>
+> [1]https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fall%2F20220310134954.0df4bb12.alex.williamson%40redhat.com%2F&amp;data=04%7C01%7Cyishaih%40nvidia.com%7C914efb56c83d4b8d1b4808da05d4fd37%7C43083d15727340c1b7db39efd9ccc17a%7C0%7C0%7C637828709598448083%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000&amp;sdata=OCpxnavNm2klUpkGRDX1CFb6ucO32jO4e%2BUADebVFbo%3D&amp;reserved=0
+>
+>   .../vfio/vfio-pci-vendor-driver-acceptance.rst     |   35 ++++++++++++++++++++
+>   MAINTAINERS                                        |    9 +++++
+>   2 files changed, 44 insertions(+)
+>   create mode 100644 Documentation/vfio/vfio-pci-vendor-driver-acceptance.rst
+>
+> diff --git a/Documentation/vfio/vfio-pci-vendor-driver-acceptance.rst b/Documentation/vfio/vfio-pci-vendor-driver-acceptance.rst
+> new file mode 100644
+> index 000000000000..3a108d748681
+> --- /dev/null
+> +++ b/Documentation/vfio/vfio-pci-vendor-driver-acceptance.rst
+> @@ -0,0 +1,35 @@
+> +.. SPDX-License-Identifier: GPL-2.0
+> +
+> +Acceptance criteria for vfio-pci device specific driver variants
+> +================================================================
+> +
+> +Overview
+> +--------
+> +The vfio-pci driver exists as a device agnostic driver using the
+> +system IOMMU and relying on the robustness of platform fault
+> +handling to provide isolated device access to userspace.  While the
+> +vfio-pci driver does include some device specific support, further
+> +extensions for yet more advanced device specific features are not
+> +sustainable.  The vfio-pci driver has therefore split out
+> +vfio-pci-core as a library that may be reused to implement features
+> +requiring device specific knowledge, ex. saving and loading device
+> +state for the purposes of supporting migration.
+> +
+> +In support of such features, it's expected that some device specific
+> +variants may interact with parent devices (ex. SR-IOV PF in support of
+> +a user assigned VF) or other extensions that may not be otherwise
+> +accessible via the vfio-pci base driver.  Authors of such drivers
+> +should be diligent not to create exploitable interfaces via such
+> +interactions or allow unchecked userspace data to have an effect
+> +beyond the scope of the assigned device.
+> +
+> +New driver submissions are therefore requested to have approval via
+> +Sign-off/Acked-by/etc for any interactions with parent drivers.
+> +Additionally, drivers should make an attempt to provide sufficient
+> +documentation for reviewers to understand the device specific
+> +extensions, for example in the case of migration data, how is the
+> +device state composed and consumed, which portions are not otherwise
+> +available to the user via vfio-pci, what safeguards exist to validate
+> +the data, etc.  To that extent, authors should additionally expect to
+> +require reviews from at least one of the listed reviewers, in addition
+> +to the overall vfio maintainer.
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 4322b5321891..7847b1492586 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -20314,6 +20314,15 @@ F:	drivers/vfio/mdev/
+>   F:	include/linux/mdev.h
+>   F:	samples/vfio-mdev/
+>   
+> +VFIO PCI VENDOR DRIVERS
+> +R:	Jason Gunthorpe <jgg@nvidia.com>
+> +R:	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> +R:	Kevin Tian <kevin.tian@intel.com>
+> +L:	kvm@vger.kernel.org
+> +S:	Maintained
+> +P:	Documentation/vfio/vfio-pci-vendor-driver-acceptance.rst
+> +F:	drivers/vfio/pci/*/
+> +
+>   VFIO PLATFORM DRIVER
+>   M:	Eric Auger <eric.auger@redhat.com>
+>   L:	kvm@vger.kernel.org
+>
+>
+
