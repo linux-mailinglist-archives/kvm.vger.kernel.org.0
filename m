@@ -2,69 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 718EB4D7EC9
-	for <lists+kvm@lfdr.de>; Mon, 14 Mar 2022 10:38:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D0274D7EE5
+	for <lists+kvm@lfdr.de>; Mon, 14 Mar 2022 10:43:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237176AbiCNJjm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Mar 2022 05:39:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36846 "EHLO
+        id S237883AbiCNJom (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Mar 2022 05:44:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236656AbiCNJjj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Mar 2022 05:39:39 -0400
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05CDF1ADAF;
-        Mon, 14 Mar 2022 02:38:27 -0700 (PDT)
-Received: from dggpeml500020.china.huawei.com (unknown [172.30.72.53])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4KHBDV14hSz1GCRS;
-        Mon, 14 Mar 2022 17:33:30 +0800 (CST)
-Received: from dggpeml100026.china.huawei.com (7.185.36.103) by
- dggpeml500020.china.huawei.com (7.185.36.88) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Mon, 14 Mar 2022 17:38:25 +0800
-Received: from dggpeml100016.china.huawei.com (7.185.36.216) by
- dggpeml100026.china.huawei.com (7.185.36.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Mon, 14 Mar 2022 17:38:25 +0800
-Received: from dggpeml100016.china.huawei.com ([7.185.36.216]) by
- dggpeml100016.china.huawei.com ([7.185.36.216]) with mapi id 15.01.2308.021;
- Mon, 14 Mar 2022 17:38:25 +0800
-From:   "Longpeng (Mike, Cloud Infrastructure Service Product Dept.)" 
-        <longpeng2@huawei.com>
-To:     Jason Wang <jasowang@redhat.com>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "sgarzare@redhat.com" <sgarzare@redhat.com>,
-        "stefanha@redhat.com" <stefanha@redhat.com>
-CC:     "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "Gonglei (Arei)" <arei.gonglei@huawei.com>,
-        Yechuan <yechuan@huawei.com>,
-        Huangzhichao <huangzhichao@huawei.com>,
-        "gdawar@xilinx.com" <gdawar@xilinx.com>
-Subject: RE: [PATCH v2 2/2] vdpa: support exposing the count of vqs to
- userspace
-Thread-Topic: [PATCH v2 2/2] vdpa: support exposing the count of vqs to
- userspace
-Thread-Index: AQHYNE9ilXZ4q7gcNEGAUh/4m44ES6y949sAgADB2WA=
-Date:   Mon, 14 Mar 2022 09:38:25 +0000
-Message-ID: <44f3932d183f4e9a8a77bc1f8e0340b5@huawei.com>
-References: <20220310072051.2175-1-longpeng2@huawei.com>
- <20220310072051.2175-3-longpeng2@huawei.com>
- <7f7553d0-2217-6122-227a-a3bfd5706ac5@redhat.com>
-In-Reply-To: <7f7553d0-2217-6122-227a-a3bfd5706ac5@redhat.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.174.148.223]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        with ESMTP id S231747AbiCNJol (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Mar 2022 05:44:41 -0400
+Received: from wout2-smtp.messagingengine.com (wout2-smtp.messagingengine.com [64.147.123.25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1432BC87;
+        Mon, 14 Mar 2022 02:43:31 -0700 (PDT)
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+        by mailout.west.internal (Postfix) with ESMTP id CCF083201F32;
+        Mon, 14 Mar 2022 05:43:29 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute4.internal (MEProxy); Mon, 14 Mar 2022 05:43:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
+        :cc:content-type:date:date:from:from:in-reply-to:in-reply-to
+        :message-id:mime-version:references:reply-to:sender:subject
+        :subject:to:to; s=fm3; bh=rJASCHSYYgVb9BFHNfNzV+AT7ib80gn5MNJDrZ
+        LkXCg=; b=hf4awhxY6xVbOOCUTdqbioJqLvnq4/0GZPNanCO8k2PPsJGT60tdDn
+        FHSqcjL4HaEyG6rfx0M5z4Dhm1z81RZtt5O+3UqEtn+QlhJ3PddmjZ21QSx1nZBt
+        TG5euPt9JjFcyD9sjwMFi2i36MqbS0L7JSd43yiv/U75JU27sLMzIMVUP0+ZaoU9
+        QRwMzJ/eGJ02q0pCnc5VYWqT1VJbx6MjuDbGOkU+y8hlstQDooXZJ0NaxiKn6Msd
+        4wxvpUVeaTFixC2crvvFhN15w9EFzZCuw8u/3v4ruPr6D0pXcsK+cB3yPhSQsn7V
+        T6GBqzRiL8n9aHqa1YxhtNWVySIt4qJA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:date:date:from:from
+        :in-reply-to:in-reply-to:message-id:mime-version:references
+        :reply-to:sender:subject:subject:to:to:x-me-proxy:x-me-proxy
+        :x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=rJASCHSYYgVb9BFHN
+        fNzV+AT7ib80gn5MNJDrZLkXCg=; b=Y674Ni4rlRUdgxhlZz8pjCyOfqGpKtbzy
+        QGQboV28wf2HMgkoZPHgA/m5fUjg2lBsMkSVkJYSPI4xi9vi/Tf+2rkOuEHqxXSL
+        0+kp/6LEUrg52/H95WbjJ2+Q8H5nYJksEzAkJH17MhCapkcFgdKI8HUrienGVPKd
+        c3okDAPifiTBshx6h9hKYH5UnH6d0oMffdTmHDglFbwh8MRdEWZlw0PNkKWo2obI
+        CFtMyCaEnjPezkvDxkfWT017Qee39G5bPiSWTyXrSPyPsBRVGWPq9JW1m8SSuRHk
+        lGqUS8u8DtteJ6LzZXzTYQF5QzhdOWFf9AuFKb3u9GOz00vcYkibg==
+X-ME-Sender: <xms:QA4vYqeF9nKUzKgFVY0h-Uc4EL0oGngjJRqT2WrGq8ZMOagXMp2xLg>
+    <xme:QA4vYkMO9b6yIFK9yZvoBEEIeg64IkMofm3EPWCMJiF9jCalzV2CKv18pFsKxAl-v
+    lFM1FMorygBaw>
+X-ME-Received: <xmr:QA4vYricS7CrRh0git_Zx6czqkqNe2PgPBNON44eTq91MsVVV4CtOjpRaXg9uzaTSY3i6BLoF2jhUFMpZvnDivvE94P4WM-N>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvvddruddvkedgtdeiucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvffukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefirhgvghcu
+    mffjuceoghhrvghgsehkrhhorghhrdgtohhmqeenucggtffrrghtthgvrhhnpeevueehje
+    fgfffgiedvudekvdektdelleelgefhleejieeugeegveeuuddukedvteenucevlhhushht
+    vghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehgrhgvgheskhhrohgrhh
+    drtghomh
+X-ME-Proxy: <xmx:QA4vYn92gk2fMH6mtFCQlowuS1KL_b-cYjjKh8bXt_kBvnmbsDLBVg>
+    <xmx:QA4vYmtSWtIU_EMHOQWkeaQ5DjKSFAPtJLeFlOMEKFJbLvPg7ANzQA>
+    <xmx:QA4vYuHVC_wVWDG5102vAzsZkv9PH-nJVZQsh_VMOFD52sEWIMyUSA>
+    <xmx:QQ4vYhkdmVbF49LuOO4KCoZUMRw2rB_WHS_9kxFVTd4OFQ8lLsJgNw>
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 14 Mar 2022 05:43:28 -0400 (EDT)
+Date:   Mon, 14 Mar 2022 10:43:26 +0100
+From:   Greg KH <greg@kroah.com>
+To:     Liam Merwick <liam.merwick@oracle.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        stable@vger.kernel.org, x86@kernel.org, pbonzini@redhat.com,
+        bp@alien8.de, thomas.lendacky@amd.com, brijesh.singh@amd.com,
+        krish.sadhukhan@oracle.com
+Subject: Re: [PATCH 5.4 0/4] Backport fixes to avoid SEV guest with 380GB+
+ memory causing host cpu softhang
+Message-ID: <Yi8OPqQgYKwwzVnb@kroah.com>
+References: <20220311112927.8400-1-liam.merwick@oracle.com>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220311112927.8400-1-liam.merwick@oracle.com>
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,115 +83,99 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogSmFzb24gV2FuZyBbbWFp
-bHRvOmphc293YW5nQHJlZGhhdC5jb21dDQo+IFNlbnQ6IE1vbmRheSwgTWFyY2ggMTQsIDIwMjIg
-MjowNCBQTQ0KPiBUbzogTG9uZ3BlbmcgKE1pa2UsIENsb3VkIEluZnJhc3RydWN0dXJlIFNlcnZp
-Y2UgUHJvZHVjdCBEZXB0LikNCj4gPGxvbmdwZW5nMkBodWF3ZWkuY29tPjsgbXN0QHJlZGhhdC5j
-b207IHNnYXJ6YXJlQHJlZGhhdC5jb207DQo+IHN0ZWZhbmhhQHJlZGhhdC5jb20NCj4gQ2M6IHZp
-cnR1YWxpemF0aW9uQGxpc3RzLmxpbnV4LWZvdW5kYXRpb24ub3JnOyBrdm1Admdlci5rZXJuZWwu
-b3JnOw0KPiBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnOyBuZXRkZXZAdmdlci5rZXJuZWwu
-b3JnOyBHb25nbGVpIChBcmVpKQ0KPiA8YXJlaS5nb25nbGVpQGh1YXdlaS5jb20+OyBZZWNodWFu
-IDx5ZWNodWFuQGh1YXdlaS5jb20+OyBIdWFuZ3poaWNoYW8NCj4gPGh1YW5nemhpY2hhb0BodWF3
-ZWkuY29tPjsgZ2Rhd2FyQHhpbGlueC5jb20NCj4gU3ViamVjdDogUmU6IFtQQVRDSCB2MiAyLzJd
-IHZkcGE6IHN1cHBvcnQgZXhwb3NpbmcgdGhlIGNvdW50IG9mIHZxcyB0byB1c2Vyc3BhY2UNCj4g
-DQo+IA0KPiDlnKggMjAyMi8zLzEwIOS4i+WNiDM6MjAsIExvbmdwZW5nKE1pa2UpIOWGmemBkzoN
-Cj4gPiBGcm9tOiBMb25ncGVuZyA8bG9uZ3BlbmcyQGh1YXdlaS5jb20+DQo+ID4NCj4gPiAtIEdF
-VF9WUVNfQ09VTlQ6IHRoZSBjb3VudCBvZiB2aXJ0cXVldWVzIHRoYXQgZXhwb3NlZA0KPiA+DQo+
-ID4gQW5kIGNoYW5nZSB2ZHBhX2RldmljZS5udnFzIGFuZCB2aG9zdF92ZHBhLm52cXMgdG8gdXNl
-IHUzMi4NCj4gDQo+IA0KPiBQYXRjaCBsb29rcyBnb29kLCBhIG5pdCBpcyB0aGF0IHdlJ2QgYmV0
-dGVyIHVzZSBhIHNlcGFyYXRlIHBhdGNoIGZvciB0aGUNCj4gdTMyIGNvbnZlcnRpbmcuDQo+IA0K
-DQpPSywgd2lsbCBkbyBpbiB2MywgdGhhbmtzLg0KDQo+IFRoYW5rcw0KPiANCj4gDQo+ID4NCj4g
-PiBTaWduZWQtb2ZmLWJ5OiBMb25ncGVuZyA8bG9uZ3BlbmcyQGh1YXdlaS5jb20+DQo+ID4gLS0t
-DQo+ID4gICBkcml2ZXJzL3ZkcGEvdmRwYS5jICAgICAgICB8ICA2ICsrKy0tLQ0KPiA+ICAgZHJp
-dmVycy92aG9zdC92ZHBhLmMgICAgICAgfCAyMyArKysrKysrKysrKysrKysrKysrLS0tLQ0KPiA+
-ICAgaW5jbHVkZS9saW51eC92ZHBhLmggICAgICAgfCAgNiArKystLS0NCj4gPiAgIGluY2x1ZGUv
-dWFwaS9saW51eC92aG9zdC5oIHwgIDMgKysrDQo+ID4gICA0IGZpbGVzIGNoYW5nZWQsIDI4IGlu
-c2VydGlvbnMoKyksIDEwIGRlbGV0aW9ucygtKQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL2RyaXZl
-cnMvdmRwYS92ZHBhLmMgYi9kcml2ZXJzL3ZkcGEvdmRwYS5jDQo+ID4gaW5kZXggMWVhNTI1NC4u
-MmI3NWMwMCAxMDA2NDQNCj4gPiAtLS0gYS9kcml2ZXJzL3ZkcGEvdmRwYS5jDQo+ID4gKysrIGIv
-ZHJpdmVycy92ZHBhL3ZkcGEuYw0KPiA+IEBAIC0yMzIsNyArMjMyLDcgQEAgc3RhdGljIGludCB2
-ZHBhX25hbWVfbWF0Y2goc3RydWN0IGRldmljZSAqZGV2LCBjb25zdCB2b2lkDQo+ICpkYXRhKQ0K
-PiA+ICAgCXJldHVybiAoc3RyY21wKGRldl9uYW1lKCZ2ZGV2LT5kZXYpLCBkYXRhKSA9PSAwKTsN
-Cj4gPiAgIH0NCj4gPg0KPiA+IC1zdGF0aWMgaW50IF9fdmRwYV9yZWdpc3Rlcl9kZXZpY2Uoc3Ry
-dWN0IHZkcGFfZGV2aWNlICp2ZGV2LCBpbnQgbnZxcykNCj4gPiArc3RhdGljIGludCBfX3ZkcGFf
-cmVnaXN0ZXJfZGV2aWNlKHN0cnVjdCB2ZHBhX2RldmljZSAqdmRldiwgdTMyIG52cXMpDQo+ID4g
-ICB7DQo+ID4gICAJc3RydWN0IGRldmljZSAqZGV2Ow0KPiA+DQo+ID4gQEAgLTI1Nyw3ICsyNTcs
-NyBAQCBzdGF0aWMgaW50IF9fdmRwYV9yZWdpc3Rlcl9kZXZpY2Uoc3RydWN0IHZkcGFfZGV2aWNl
-ICp2ZGV2LA0KPiBpbnQgbnZxcykNCj4gPiAgICAqDQo+ID4gICAgKiBSZXR1cm46IFJldHVybnMg
-YW4gZXJyb3Igd2hlbiBmYWlsIHRvIGFkZCBkZXZpY2UgdG8gdkRQQSBidXMNCj4gPiAgICAqLw0K
-PiA+IC1pbnQgX3ZkcGFfcmVnaXN0ZXJfZGV2aWNlKHN0cnVjdCB2ZHBhX2RldmljZSAqdmRldiwg
-aW50IG52cXMpDQo+ID4gK2ludCBfdmRwYV9yZWdpc3Rlcl9kZXZpY2Uoc3RydWN0IHZkcGFfZGV2
-aWNlICp2ZGV2LCB1MzIgbnZxcykNCj4gPiAgIHsNCj4gPiAgIAlpZiAoIXZkZXYtPm1kZXYpDQo+
-ID4gICAJCXJldHVybiAtRUlOVkFMOw0KPiA+IEBAIC0yNzQsNyArMjc0LDcgQEAgaW50IF92ZHBh
-X3JlZ2lzdGVyX2RldmljZShzdHJ1Y3QgdmRwYV9kZXZpY2UgKnZkZXYsIGludA0KPiBudnFzKQ0K
-PiA+ICAgICoNCj4gPiAgICAqIFJldHVybjogUmV0dXJucyBhbiBlcnJvciB3aGVuIGZhaWwgdG8g
-YWRkIHRvIHZEUEEgYnVzDQo+ID4gICAgKi8NCj4gPiAtaW50IHZkcGFfcmVnaXN0ZXJfZGV2aWNl
-KHN0cnVjdCB2ZHBhX2RldmljZSAqdmRldiwgaW50IG52cXMpDQo+ID4gK2ludCB2ZHBhX3JlZ2lz
-dGVyX2RldmljZShzdHJ1Y3QgdmRwYV9kZXZpY2UgKnZkZXYsIHUzMiBudnFzKQ0KPiA+ICAgew0K
-PiA+ICAgCWludCBlcnI7DQo+ID4NCj4gPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy92aG9zdC92ZHBh
-LmMgYi9kcml2ZXJzL3Zob3N0L3ZkcGEuYw0KPiA+IGluZGV4IDYwNWM3YWUuLjY5YjNmMDUgMTAw
-NjQ0DQo+ID4gLS0tIGEvZHJpdmVycy92aG9zdC92ZHBhLmMNCj4gPiArKysgYi9kcml2ZXJzL3Zo
-b3N0L3ZkcGEuYw0KPiA+IEBAIC00Miw3ICs0Miw3IEBAIHN0cnVjdCB2aG9zdF92ZHBhIHsNCj4g
-PiAgIAlzdHJ1Y3QgZGV2aWNlIGRldjsNCj4gPiAgIAlzdHJ1Y3QgY2RldiBjZGV2Ow0KPiA+ICAg
-CWF0b21pY190IG9wZW5lZDsNCj4gPiAtCWludCBudnFzOw0KPiA+ICsJdTMyIG52cXM7DQo+ID4g
-ICAJaW50IHZpcnRpb19pZDsNCj4gPiAgIAlpbnQgbWlub3I7DQo+ID4gICAJc3RydWN0IGV2ZW50
-ZmRfY3R4ICpjb25maWdfY3R4Ow0KPiA+IEBAIC0xNTgsNyArMTU4LDggQEAgc3RhdGljIGxvbmcg
-dmhvc3RfdmRwYV9zZXRfc3RhdHVzKHN0cnVjdCB2aG9zdF92ZHBhICp2LA0KPiB1OCBfX3VzZXIg
-KnN0YXR1c3ApDQo+ID4gICAJc3RydWN0IHZkcGFfZGV2aWNlICp2ZHBhID0gdi0+dmRwYTsNCj4g
-PiAgIAljb25zdCBzdHJ1Y3QgdmRwYV9jb25maWdfb3BzICpvcHMgPSB2ZHBhLT5jb25maWc7DQo+
-ID4gICAJdTggc3RhdHVzLCBzdGF0dXNfb2xkOw0KPiA+IC0JaW50IHJldCwgbnZxcyA9IHYtPm52
-cXM7DQo+ID4gKwl1MzIgbnZxcyA9IHYtPm52cXM7DQo+ID4gKwlpbnQgcmV0Ow0KPiA+ICAgCXUx
-NiBpOw0KPiA+DQo+ID4gICAJaWYgKGNvcHlfZnJvbV91c2VyKCZzdGF0dXMsIHN0YXR1c3AsIHNp
-emVvZihzdGF0dXMpKSkNCj4gPiBAQCAtMzY5LDYgKzM3MCwxNiBAQCBzdGF0aWMgbG9uZyB2aG9z
-dF92ZHBhX2dldF9jb25maWdfc2l6ZShzdHJ1Y3Qgdmhvc3RfdmRwYQ0KPiAqdiwgdTMyIF9fdXNl
-ciAqYXJncCkNCj4gPiAgIAlyZXR1cm4gMDsNCj4gPiAgIH0NCj4gPg0KPiA+ICtzdGF0aWMgbG9u
-ZyB2aG9zdF92ZHBhX2dldF92cXNfY291bnQoc3RydWN0IHZob3N0X3ZkcGEgKnYsIHUzMiBfX3Vz
-ZXIgKmFyZ3ApDQo+ID4gK3sNCj4gPiArCXN0cnVjdCB2ZHBhX2RldmljZSAqdmRwYSA9IHYtPnZk
-cGE7DQo+ID4gKw0KPiA+ICsJaWYgKGNvcHlfdG9fdXNlcihhcmdwLCAmdmRwYS0+bnZxcywgc2l6
-ZW9mKHZkcGEtPm52cXMpKSkNCj4gPiArCQlyZXR1cm4gLUVGQVVMVDsNCj4gPiArDQo+ID4gKwly
-ZXR1cm4gMDsNCj4gPiArfQ0KPiA+ICsNCj4gPiAgIHN0YXRpYyBsb25nIHZob3N0X3ZkcGFfdnJp
-bmdfaW9jdGwoc3RydWN0IHZob3N0X3ZkcGEgKnYsIHVuc2lnbmVkIGludCBjbWQsDQo+ID4gICAJ
-CQkJICAgdm9pZCBfX3VzZXIgKmFyZ3ApDQo+ID4gICB7DQo+ID4gQEAgLTUwOSw2ICs1MjAsOSBA
-QCBzdGF0aWMgbG9uZyB2aG9zdF92ZHBhX3VubG9ja2VkX2lvY3RsKHN0cnVjdCBmaWxlICpmaWxl
-cCwNCj4gPiAgIAljYXNlIFZIT1NUX1ZEUEFfR0VUX0NPTkZJR19TSVpFOg0KPiA+ICAgCQlyID0g
-dmhvc3RfdmRwYV9nZXRfY29uZmlnX3NpemUodiwgYXJncCk7DQo+ID4gICAJCWJyZWFrOw0KPiA+
-ICsJY2FzZSBWSE9TVF9WRFBBX0dFVF9WUVNfQ09VTlQ6DQo+ID4gKwkJciA9IHZob3N0X3ZkcGFf
-Z2V0X3Zxc19jb3VudCh2LCBhcmdwKTsNCj4gPiArCQlicmVhazsNCj4gPiAgIAlkZWZhdWx0Og0K
-PiA+ICAgCQlyID0gdmhvc3RfZGV2X2lvY3RsKCZ2LT52ZGV2LCBjbWQsIGFyZ3ApOw0KPiA+ICAg
-CQlpZiAociA9PSAtRU5PSU9DVExDTUQpDQo+ID4gQEAgLTk2NSw3ICs5NzksOCBAQCBzdGF0aWMg
-aW50IHZob3N0X3ZkcGFfb3BlbihzdHJ1Y3QgaW5vZGUgKmlub2RlLCBzdHJ1Y3QNCj4gZmlsZSAq
-ZmlsZXApDQo+ID4gICAJc3RydWN0IHZob3N0X3ZkcGEgKnY7DQo+ID4gICAJc3RydWN0IHZob3N0
-X2RldiAqZGV2Ow0KPiA+ICAgCXN0cnVjdCB2aG9zdF92aXJ0cXVldWUgKip2cXM7DQo+ID4gLQlp
-bnQgbnZxcywgaSwgciwgb3BlbmVkOw0KPiA+ICsJaW50IHIsIG9wZW5lZDsNCj4gPiArCXUzMiBp
-LCBudnFzOw0KPiA+DQo+ID4gICAJdiA9IGNvbnRhaW5lcl9vZihpbm9kZS0+aV9jZGV2LCBzdHJ1
-Y3Qgdmhvc3RfdmRwYSwgY2Rldik7DQo+ID4NCj4gPiBAQCAtMTAxOCw3ICsxMDMzLDcgQEAgc3Rh
-dGljIGludCB2aG9zdF92ZHBhX29wZW4oc3RydWN0IGlub2RlICppbm9kZSwgc3RydWN0DQo+IGZp
-bGUgKmZpbGVwKQ0KPiA+DQo+ID4gICBzdGF0aWMgdm9pZCB2aG9zdF92ZHBhX2NsZWFuX2lycShz
-dHJ1Y3Qgdmhvc3RfdmRwYSAqdikNCj4gPiAgIHsNCj4gPiAtCWludCBpOw0KPiA+ICsJdTMyIGk7
-DQo+ID4NCj4gPiAgIAlmb3IgKGkgPSAwOyBpIDwgdi0+bnZxczsgaSsrKQ0KPiA+ICAgCQl2aG9z
-dF92ZHBhX3Vuc2V0dXBfdnFfaXJxKHYsIGkpOw0KPiA+IGRpZmYgLS1naXQgYS9pbmNsdWRlL2xp
-bnV4L3ZkcGEuaCBiL2luY2x1ZGUvbGludXgvdmRwYS5oDQo+ID4gaW5kZXggYTUyNjkxOS4uODk0
-M2EyMCAxMDA2NDQNCj4gPiAtLS0gYS9pbmNsdWRlL2xpbnV4L3ZkcGEuaA0KPiA+ICsrKyBiL2lu
-Y2x1ZGUvbGludXgvdmRwYS5oDQo+ID4gQEAgLTgzLDcgKzgzLDcgQEAgc3RydWN0IHZkcGFfZGV2
-aWNlIHsNCj4gPiAgIAl1bnNpZ25lZCBpbnQgaW5kZXg7DQo+ID4gICAJYm9vbCBmZWF0dXJlc192
-YWxpZDsNCj4gPiAgIAlib29sIHVzZV92YTsNCj4gPiAtCWludCBudnFzOw0KPiA+ICsJdTMyIG52
-cXM7DQo+ID4gICAJc3RydWN0IHZkcGFfbWdtdF9kZXYgKm1kZXY7DQo+ID4gICB9Ow0KPiA+DQo+
-ID4gQEAgLTMzOCwxMCArMzM4LDEwIEBAIHN0cnVjdCB2ZHBhX2RldmljZSAqX192ZHBhX2FsbG9j
-X2RldmljZShzdHJ1Y3QgZGV2aWNlDQo+ICpwYXJlbnQsDQo+ID4gICAJCQkJICAgICAgIGRldl9z
-dHJ1Y3QsIG1lbWJlcikpLCBuYW1lLCB1c2VfdmEpLCBcDQo+ID4gICAJCQkJICAgICAgIGRldl9z
-dHJ1Y3QsIG1lbWJlcikNCj4gPg0KPiA+IC1pbnQgdmRwYV9yZWdpc3Rlcl9kZXZpY2Uoc3RydWN0
-IHZkcGFfZGV2aWNlICp2ZGV2LCBpbnQgbnZxcyk7DQo+ID4gK2ludCB2ZHBhX3JlZ2lzdGVyX2Rl
-dmljZShzdHJ1Y3QgdmRwYV9kZXZpY2UgKnZkZXYsIHUzMiBudnFzKTsNCj4gPiAgIHZvaWQgdmRw
-YV91bnJlZ2lzdGVyX2RldmljZShzdHJ1Y3QgdmRwYV9kZXZpY2UgKnZkZXYpOw0KPiA+DQo+ID4g
-LWludCBfdmRwYV9yZWdpc3Rlcl9kZXZpY2Uoc3RydWN0IHZkcGFfZGV2aWNlICp2ZGV2LCBpbnQg
-bnZxcyk7DQo+ID4gK2ludCBfdmRwYV9yZWdpc3Rlcl9kZXZpY2Uoc3RydWN0IHZkcGFfZGV2aWNl
-ICp2ZGV2LCB1MzIgbnZxcyk7DQo+ID4gICB2b2lkIF92ZHBhX3VucmVnaXN0ZXJfZGV2aWNlKHN0
-cnVjdCB2ZHBhX2RldmljZSAqdmRldik7DQo+ID4NCj4gPiAgIC8qKg0KPiA+IGRpZmYgLS1naXQg
-YS9pbmNsdWRlL3VhcGkvbGludXgvdmhvc3QuaCBiL2luY2x1ZGUvdWFwaS9saW51eC92aG9zdC5o
-DQo+ID4gaW5kZXggYmM3NGU5NS4uNWQ5OWU3YyAxMDA2NDQNCj4gPiAtLS0gYS9pbmNsdWRlL3Vh
-cGkvbGludXgvdmhvc3QuaA0KPiA+ICsrKyBiL2luY2x1ZGUvdWFwaS9saW51eC92aG9zdC5oDQo+
-ID4gQEAgLTE1NCw0ICsxNTQsNyBAQA0KPiA+ICAgLyogR2V0IHRoZSBjb25maWcgc2l6ZSAqLw0K
-PiA+ICAgI2RlZmluZSBWSE9TVF9WRFBBX0dFVF9DT05GSUdfU0laRQlfSU9SKFZIT1NUX1ZJUlRJ
-TywgMHg3OSwgX191MzIpDQo+ID4NCj4gPiArLyogR2V0IHRoZSBjb3VudCBvZiBhbGwgdmlydHF1
-ZXVlcyAqLw0KPiA+ICsjZGVmaW5lIFZIT1NUX1ZEUEFfR0VUX1ZRU19DT1VOVAlfSU9SKFZIT1NU
-X1ZJUlRJTywgMHg4MCwgX191MzIpDQo+ID4gKw0KPiA+ICAgI2VuZGlmDQoNCg==
+On Fri, Mar 11, 2022 at 11:29:23AM +0000, Liam Merwick wrote:
+> [ patch series targeting linux-5.4.y stable branch. ]
+> 
+> Creating a SEV-enabled guest with 380GB or more of memory causes a
+> cpu soft-hang in the host running 5.4 with the following stacktrace:
+> 
+> kernel: watchdog: BUG: soft lockup - CPU#214 stuck for 22s! [qemu-kvm:6424]
+> ...
+> kernel: CPU: 214 PID: 6424 Comm: qemu-kvm Not tainted 5.4.183.stable #1
+> kernel: Hardware name: Oracle Corporation ORACLE SERVER E4-2c/Asm,MB
+> Tray,2U,E4-2c, BIOS 78014000 01/05/2022
+> kernel: RIP: 0010:clflush_cache_range+0x35/0x40
+> kernel: Code: f0 0f b7 15 63 53 99 01 89 f6 48 89 d0 48 f7 d8 48 21 f8 48 01 f7
+> 48 39 f8 73 0c 66 0f ae 38 48 01 d0 48 39 c7 77 f4 0f ae f0 <5d> c3 66 0f 1f 84
+> 00 00 00 00 00 0f 1f 44 00 00 55 48 89 e5 0f ae
+> kernel: RSP: 0018:ffffacba5e98fc30 EFLAGS: 00000246 ORIG_RAX: ffffffffffffff13
+> kernel: RAX: ffffa1193cfbc000 RBX: ffffacbba4701000 RCX: 0000000000000000
+> kernel: RDX: 0000000000000040 RSI: 0000000000001000 RDI: ffffa1193cfbc000
+> kernel: RBP: ffffacba5e98fc30 R08: ffffacba5f44aca0 R09: ffffacbac3701000
+> kernel: R10: 0000000000000080 R11: ffff9f8500000af0 R12: ffffa18074a22f80
+> kernel: R13: ffffacbaf6889dd8 R14: ffffacba5f41d960 R15: ffffacba5f44aca0
+> kernel: FS:  00007fbe04321f00(0000) GS:ffffa1814ed80000(0000)
+> knlGS:0000000000000000
+> kernel: CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> kernel: CR2: 00007dfbebd7d000 CR3: 000801fb93d68002 CR4: 0000000000760ee0
+> kernel: PKRU: 55555554
+> kernel: Call Trace:
+> kernel: sev_clflush_pages.part.56+0x50/0x70 [kvm_amd]
+> kernel: svm_register_enc_region+0xe2/0x120 [kvm_amd]
+> kernel: kvm_arch_vm_ioctl+0x524/0xbd0 [kvm]
+> kernel: ? release_pages+0x212/0x430
+> kernel: ? __pagevec_lru_add_fn+0x192/0x2f0
+> kernel: kvm_vm_ioctl+0x9c/0x9d0 [kvm]
+> kernel: ? __lru_cache_add+0x59/0x70
+> kernel: ? lru_cache_add_active_or_unevictable+0x39/0xb0
+> kernel: ? __handle_mm_fault+0xa74/0xfd0
+> kernel: ? __switch_to_asm+0x34/0x70
+> kernel: do_vfs_ioctl+0xa9/0x640
+> kernel: ? __audit_syscall_entry+0xdd/0x130
+> kernel: ksys_ioctl+0x67/0x90
+> kernel: __x64_sys_ioctl+0x1a/0x20
+> kernel: do_syscall_64+0x60/0x1d0
+> kernel: entry_SYSCALL_64_after_hwframe+0x44/0xa9
+> kernel: RIP: 0033:0x7fbe0086563b
+> kernel: Code: 0f 1e fa 48 8b 05 4d b8 2c 00 64 c7 00 26 00 00 00 48 c7 c0 ff ff
+> ff ff c3 66 0f 1f 44 00 00 f3 0f 1e fa b8 10 00 00 00 0f 05 <48> 3d 01 f0 ff ff
+> 73 01 c3 48 8b 0d 1d b8 2c 00 f7 d8 64 89 01 48
+> kernel: RSP: 002b:00007ffedf577418 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+> kernel: RAX: ffffffffffffffda RBX: 00007dfbebe00000 RCX: 00007fbe0086563b
+> kernel: RDX: 00007ffedf577490 RSI: ffffffff8010aebb RDI: 000000000000000d
+> kernel: RBP: 000001c200000000 R08: ffffffffffffffff R09: ffffffffffffffff
+> kernel: R10: ffffffffffffffff R11: 0000000000000246 R12: 000001c200000000
+> kernel: R13: 00007dfbebe00000 R14: 0000000000000000 R15: 0000000000000000
+> 
+> The problem is the time spent flushing the caches when pinning memory for
+> SEV but it's unnecessary as it turns out - it is resolved by backporting
+> the following commits from Linux 5.10
+> 
+> e1ebb2b49048 KVM: SVM: Don't flush cache if hardware enforces cache coherency
+> across encryption domains
+> (conflict due to the function it fixed being moved in a refactoring in 5.7).
+> 
+> along with 3 other commits needed as dependencies.
+> (fbd5969d1ff2 avoids a conflict in 5866e9205b47)
+> 
+> fbd5969d1ff2 x86/cpufeatures: Mark two free bits in word 3
+> 5866e9205b47 x86/cpu: Add hardware-enforced cache coherency as a CPUID feature
+> 75d1cc0e05af x86/mm/pat: Don't flush cache if hardware enforces cache coherency across encryption domnains                                                                                                        
+> 
+> Tested by creating various sized guests up to 1.8TB, with and without SEV enabled,
+> running a few benchmarks and passing kvm-unit-tests.
+> 
+> 
+> Borislav Petkov (1):
+>   x86/cpufeatures: Mark two free bits in word 3
+> 
+> Krish Sadhukhan (3):
+>   x86/cpu: Add hardware-enforced cache coherency as a CPUID feature
+>   x86/mm/pat: Don't flush cache if hardware enforces cache coherency
+>     across encryption domnains
+>   KVM: SVM: Don't flush cache if hardware enforces cache coherency
+>     across encryption domains
+> 
+>  arch/x86/include/asm/cpufeatures.h | 2 ++
+>  arch/x86/kernel/cpu/scattered.c    | 1 +
+>  arch/x86/kvm/svm.c                 | 3 ++-
+>  arch/x86/mm/pageattr.c             | 2 +-
+>  4 files changed, 6 insertions(+), 2 deletions(-)
+> 
+> -- 
+> 2.27.0
+> 
+
+All now queued up, thanks!
+
+greg k-h
