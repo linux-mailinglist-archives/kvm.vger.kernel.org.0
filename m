@@ -2,124 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6DF0F4D8D7A
-	for <lists+kvm@lfdr.de>; Mon, 14 Mar 2022 20:53:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A60124D8D76
+	for <lists+kvm@lfdr.de>; Mon, 14 Mar 2022 20:53:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244763AbiCNTy7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Mar 2022 15:54:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42226 "EHLO
+        id S244483AbiCNTys (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Mar 2022 15:54:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41992 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243086AbiCNTyr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Mar 2022 15:54:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1FE97B6A
-        for <kvm@vger.kernel.org>; Mon, 14 Mar 2022 12:53:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647287540;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=GBOGyth8SUjOhbMl4iXnJi0rODftuyM/OOyrFjsN+/8=;
-        b=YDi9++S7ansLS1XXVkMeV3KK2bR5HXzt7v4NlkzidBfh5qkYT7yNOaKwgT+F1X30DLZb3U
-        O3r6RETn5h00jQuW6C5xEGFiFjmoEdp8RHItFrP0XziNiJUJ4ooZ5X69mUBl1nz9CbHKKz
-        8EICQpdQetMLvUVV3QQdEY8gskt6qQE=
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
- [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-387-m_-_8S9wNDmQGhomt_2Esw-1; Mon, 14 Mar 2022 15:52:18 -0400
-X-MC-Unique: m_-_8S9wNDmQGhomt_2Esw-1
-Received: by mail-io1-f72.google.com with SMTP id k10-20020a5d91ca000000b006414a00b160so12962543ior.18
-        for <kvm@vger.kernel.org>; Mon, 14 Mar 2022 12:52:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=GBOGyth8SUjOhbMl4iXnJi0rODftuyM/OOyrFjsN+/8=;
-        b=p6yiMPJzjNxd6Ov/Y7J4YMLgtmxj7xfWLUMLtwTZdlamtDfPgUZS20u0Ljzp7zbvKp
-         cerY18ODqosMxXV9GIVGbjz66cdWwVxiUgY3z9hJvR0xgNIlyqpQfXdMuKwnhLpyM9dQ
-         wgu3O4k1v3p8RkOYe93qAa9JGUfEzcFYOw7h+Y//FNjhx6+cWAYrVGpKxeAql3Io+nrn
-         Fv3ZFjUQr8HG8FS1H9US67xM7mfy98J+7q5Egu4Afxm1v0AqzSFi1YgsqUGcM4sDuCj4
-         8aQqHk5DSwLz8cOcGiss+KmFShCNrmbai80jjdQA+4eO7OcyvqwoMOY00VMYEgj06DYD
-         2g0Q==
-X-Gm-Message-State: AOAM5328D4mzEQO/w6vNosa3C5jV6MhDPQDV5sYTpULXUYbRIpx+cpcM
-        rpxChw6PS4d6DdP1lsBW8M6xz9ME/gZIL4VM6vLC1MntfKxYn5AEtJnxgFdr9eucUEpt47BlR0J
-        U+RoYARwmKitl
-X-Received: by 2002:a02:1d45:0:b0:317:c1ed:882f with SMTP id 66-20020a021d45000000b00317c1ed882fmr22366747jaj.33.1647287538238;
-        Mon, 14 Mar 2022 12:52:18 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzL70MDAi9m5dOEzNFXAK2hOJ4q3gZT3CFGBlHf6tZ4stiRQUgD9xY/OIi31lTSnRRajnBrsQ==
-X-Received: by 2002:a02:1d45:0:b0:317:c1ed:882f with SMTP id 66-20020a021d45000000b00317c1ed882fmr22366737jaj.33.1647287538003;
-        Mon, 14 Mar 2022 12:52:18 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id w6-20020a056e021c8600b002c602537ab9sm9693969ill.54.2022.03.14.12.52.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Mar 2022 12:52:17 -0700 (PDT)
-Date:   Mon, 14 Mar 2022 13:52:16 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jonathan Corbet <corbet@lwn.net>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, jgg@nvidia.com,
-        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
-        yishaih@nvidia.com, linux-doc@vger.kernel.org
-Subject: Re: [PATCH v2] vfio-pci: Provide reviewers and acceptance criteria
- for vendor drivers
-Message-ID: <20220314135216.0cd5e16a.alex.williamson@redhat.com>
-In-Reply-To: <87pmmoxqv8.fsf@meer.lwn.net>
-References: <164728518026.40450.7442813673746870904.stgit@omen>
-        <87pmmoxqv8.fsf@meer.lwn.net>
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+        with ESMTP id S239865AbiCNTyn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Mar 2022 15:54:43 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15C252BDC;
+        Mon, 14 Mar 2022 12:53:17 -0700 (PDT)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22EJlVow009230;
+        Mon, 14 Mar 2022 19:52:45 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ subject : from : to : cc : references : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=Nz145SLyNi28nDypmA/G+HJQLmQB+0wmYqr6hIhwoeo=;
+ b=Xl6RztJu3Wk/XCcQ9rhrBfHBcvmqiy4Txi/m07WzBWDFp4/Q4klXql9AxKZf+4cdw0v+
+ gzsB6DpqGCNPmmOtoR5MfqD8wHtqHsXqMUP8O68pq0gh6ClXPIHVJ4JwoWN5/onN2F3G
+ zdscp8TsabO9vPRZ8ZYbwibj6YuQBSvsnYwif4GYS13jexouscyAJB/YBrjvaqJURvVO
+ Usx3zOJoPm0e7gG/mtEqZmvM2wpnkTdaNAwTPgkNFLR8i2OiJkx1IpOF/LPJkQkWi4aU
+ E/RkK2PsXPERG4ZWUzxVoi/H36SCNJQSyUaA8QkungXdE0Rut5xFXeNqVfrSq3OjhBSW FQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3et6mer52x-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 14 Mar 2022 19:52:45 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22EJlocI010076;
+        Mon, 14 Mar 2022 19:52:44 GMT
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3et6mer52m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 14 Mar 2022 19:52:44 +0000
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+        by ppma05wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22EJl9Jg010220;
+        Mon, 14 Mar 2022 19:52:43 GMT
+Received: from b03cxnp07028.gho.boulder.ibm.com (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
+        by ppma05wdc.us.ibm.com with ESMTP id 3erk59rb4m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 14 Mar 2022 19:52:43 +0000
+Received: from b03ledav001.gho.boulder.ibm.com (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
+        by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22EJqfYf28443130
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 14 Mar 2022 19:52:41 GMT
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B87A46E053;
+        Mon, 14 Mar 2022 19:52:41 +0000 (GMT)
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id F0CA76E050;
+        Mon, 14 Mar 2022 19:52:38 +0000 (GMT)
+Received: from [9.211.32.184] (unknown [9.211.32.184])
+        by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Mon, 14 Mar 2022 19:52:38 +0000 (GMT)
+Message-ID: <681190b6-487f-ca4a-ba67-0ade2b20501b@linux.ibm.com>
+Date:   Mon, 14 Mar 2022 15:52:38 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.0
+Subject: Re: [PATCH v4 00/32] KVM: s390: enable zPCI for interpretive
+ execution
+Content-Language: en-US
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+To:     linux-s390@vger.kernel.org
+Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
+        schnelle@linux.ibm.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
+        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
+        svens@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
+        oberpar@linux.ibm.com, freude@linux.ibm.com, thuth@redhat.com,
+        pasic@linux.ibm.com, joro@8bytes.org, will@kernel.org,
+        pbonzini@redhat.com, corbet@lwn.net, jgg@nvidia.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        iommu@lists.linux-foundation.org, linux-doc@vger.kernel.org
+References: <20220314194451.58266-1-mjrosato@linux.ibm.com>
+In-Reply-To: <20220314194451.58266-1-mjrosato@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 21ijjdY1juiR5jFmwFjvzgJY7ymU_E62
+X-Proofpoint-ORIG-GUID: _BV1xKNxlXflt-dk1w49L0lWqpgQQT-R
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-03-14_13,2022-03-14_02,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ impostorscore=0 adultscore=0 lowpriorityscore=0 malwarescore=0
+ clxscore=1015 mlxlogscore=593 suspectscore=0 mlxscore=0 spamscore=0
+ phishscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2203140116
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Jon,
-
-On Mon, 14 Mar 2022 13:42:51 -0600
-Jonathan Corbet <corbet@lwn.net> wrote:
-
-> Alex Williamson <alex.williamson@redhat.com> writes:
+On 3/14/22 3:44 PM, Matthew Rosato wrote:
+> Note: A few patches in this series are dependent on Baolu's IOMMU domain ops
+> split, which is currently in the next branch of linux-iommu. This series
+> applies on top:
+> https://git.kernel.org/pub/scm/linux/kernel/git/joro/iommu.git
 > 
-> > Vendor or device specific extensions for devices exposed to userspace
-> > through the vfio-pci-core library open both new functionality and new
-> > risks.  Here we attempt to provided formalized requirements and
-> > expectations to ensure that future drivers both collaborate in their
-> > interaction with existing host drivers, as well as receive additional
-> > reviews from community members with experience in this area.
-> >
-> > Cc: Jason Gunthorpe <jgg@nvidia.com>
-> > Cc: Yishai Hadas <yishaih@nvidia.com>
-> > Cc: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> > Cc: Kevin Tian <kevin.tian@intel.com>
-> > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-> > ---  
+> Enable interpretive execution of zPCI instructions + adapter interruption
+> forwarding for s390x KVM vfio-pci.  This is done by introducing a new IOMMU
+> domain for s390x (KVM-managed), indicating via vfio that this IOMMU domain
+> should be used instead of the default, with subsequent management of the
+> hardware assists being handled via a new KVM ioctl for zPCI management.
 > 
-> One thing...
+> By allowing intepretation of zPCI instructions and firmware delivery of
+> interrupts to guests, we can significantly reduce the frequency of guest
+> SIE exits for zPCI.  We then see additional gains by handling a hot-path
+> instruction that can still intercept to the hypervisor (RPCIT) directly
+> in kvm via the new IOMMU domain, whose map operations update the host
+> DMA table with pinned guest entries over the specified range.
 > 
-> >  .../vfio/vfio-pci-vendor-driver-acceptance.rst     |   35 ++++++++++++++++++++
-> >  MAINTAINERS                                        |   10 ++++++
-> >  2 files changed, 45 insertions(+)  
+>  From the perspective of guest configuration, you passthrough zPCI devices
+> in the same manner as before, with intepretation support being used by
+> default if available in kernel+qemu.
 > 
-> If you add a new RST file, you need to add it to an index.rst somewhere
-> so that it becomes part of the kernel docs build.
+> Will reply with a link to the associated QEMU series.
 
-Whoops
-
-> Also, though: can we avoid creating a new top-level documentation
-> directory for just this file?  It seems like it would logically be a
-> part of the maintainers guide (Documentation/maintainer) ... ?
-
-I'm not sure it's appropriate for Documentation/maintainer/ but it
-would make sense to link it from maintainer-entry-profile.rst there.
-What if I move it to Documentation/driver-api where there are a couple
-other vfio docs?  Thanks,
-
-Alex
+QEMU series:
+https://lore.kernel.org/kvm/20220314194920.58888-1-mjrosato@linux.ibm.com/
 
