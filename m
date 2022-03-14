@@ -2,140 +2,319 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6ADAF4D8F05
-	for <lists+kvm@lfdr.de>; Mon, 14 Mar 2022 22:49:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 386814D8F6B
+	for <lists+kvm@lfdr.de>; Mon, 14 Mar 2022 23:19:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245384AbiCNVur (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Mar 2022 17:50:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50164 "EHLO
+        id S244288AbiCNWUg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Mar 2022 18:20:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52314 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236193AbiCNVup (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Mar 2022 17:50:45 -0400
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2044.outbound.protection.outlook.com [40.107.236.44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE836340F6;
-        Mon, 14 Mar 2022 14:49:34 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Omq6Pc0L5YKE0/jTx3HjzJi8VTDsOgTTROMl9GEeX6Kj/dZd9MPJyy1Wea86m4TJMHh/hiVTTBPLqgQDZNpnxySeF4Df4FA8xqu0fEV92jZmcWa5GxEeC3TfdswbmkmXIgswBpouTKvT+s9vPh13hOnE2yH/ca7raUHvGAEeWf7FgKS18xnf7t4QFqx7vL1VxoYR+iikNqRI5JRX+C/k7+QplXCcWGXLhyvqhImRsSx8awldkp/MpEQF+nW7Ofr+cMJxkynss0rVmPua1Hhmb+48Ew5iJVEAU0ZASkBtbEBDd7qFK2SvA6SuAsS64fOo1jgqRwToViwUhSfeYDd4HA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=31SYqNiHWFjuf56QD8Z23OoU3v91m/m3QJxpZCzNnag=;
- b=FRHxBwQQSudtj2bhHUhSOt3zBSQctCj0mE2ZbXKfvVRuJK0uDg8T4yVg8UDrUlI7JX5GkE0ckb/cZXIndze9Y7KIy42kYG7JTxsWU0qVRr3Rti7AiJu2GP84CkBbgp2kYQb9rPFfskbYRNQA4sw96M0gFuesSmyaSlhFL6gpQ3yMENiTuXVDJY/8qprpTAvS9Z58A5AUgyckEwVVG9bGjoyh++Ow3yXM+O1gXsikT9vyNcEbnCCLrLe8Bq1VGy8Z12GIWaxYNY6e2zhEiCUXQ8n7bBdvLL4fkLF1/dchM/VEsjHk37blT1BzoaeednbpLE8gBLOAJBlLeOlLGCjZUQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=31SYqNiHWFjuf56QD8Z23OoU3v91m/m3QJxpZCzNnag=;
- b=jvU8doVx6qWuZnqwxPF8scniMZy8wGoyYs3MsbCZc2P7RpuGu2f4gjaWM4Gz3yXh/fB61MHW01LVGoMHXk/YGs12GGyvpbzM0FM9oC7bdOny4cwTHhE3mPfEfmM5jhUgeTa1aonR+zJPcTBlxet+GkvQzgsoxSrRY8ozml1dWU6ysh0r7a1zd6r89hd7AJ2vAIGtC1JSzyfSt5NyhzxRdOGxNdRFhIGO5lobAr2ie61/MNQZBCTEoPqEi4q85l/HEmVImceDrV97+i44Nc7DSsurpZQ39CD11e2VGG9tPHFQ57Bmftwg1zZq8uhPjDs0VzG0ukX3ZwwphsjtOYN2kQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by CY4PR12MB1174.namprd12.prod.outlook.com (2603:10b6:903:36::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5061.25; Mon, 14 Mar
- 2022 21:49:29 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::51a0:4aee:2b4c:ca28]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::51a0:4aee:2b4c:ca28%4]) with mapi id 15.20.5061.028; Mon, 14 Mar 2022
- 21:49:29 +0000
-Date:   Mon, 14 Mar 2022 18:49:28 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Matthew Rosato <mjrosato@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, alex.williamson@redhat.com,
-        cohuck@redhat.com, schnelle@linux.ibm.com, farman@linux.ibm.com,
-        pmorel@linux.ibm.com, borntraeger@linux.ibm.com, hca@linux.ibm.com,
-        gor@linux.ibm.com, gerald.schaefer@linux.ibm.com,
-        agordeev@linux.ibm.com, svens@linux.ibm.com, frankja@linux.ibm.com,
-        david@redhat.com, imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
-        oberpar@linux.ibm.com, freude@linux.ibm.com, thuth@redhat.com,
-        pasic@linux.ibm.com, joro@8bytes.org, will@kernel.org,
-        pbonzini@redhat.com, corbet@lwn.net, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org,
-        linux-doc@vger.kernel.org
-Subject: Re: [PATCH v4 29/32] vfio-pci/zdev: add DTSM to clp group capability
-Message-ID: <20220314214928.GK11336@nvidia.com>
-References: <20220314194451.58266-1-mjrosato@linux.ibm.com>
- <20220314194451.58266-30-mjrosato@linux.ibm.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220314194451.58266-30-mjrosato@linux.ibm.com>
-X-ClientProxiedBy: MN2PR06CA0023.namprd06.prod.outlook.com
- (2603:10b6:208:23d::28) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 7900b9f4-e3e0-461d-a170-08da06048412
-X-MS-TrafficTypeDiagnostic: CY4PR12MB1174:EE_
-X-Microsoft-Antispam-PRVS: <CY4PR12MB117480D2774739DDC0A1F387C20F9@CY4PR12MB1174.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: pBh7RkmfwwhB8Zixsc2nzm35NuhVbKBoYNCJ0nkfJPBK+z1twCTA30kEp/I8iZCW8vtcsdSsANn6dux/z8c/r5z03308hu7ssa4rzayh7cClzg8BApssY7qnWEGGSwsrJBkb19cXO3BHxuMEqNGZaCc4SoIoB02y2nFColXoaJSf4f86guY3M51uMR49NfV4x6sfRP9oXlm8mGrr0aa1/pRGHIAvyY6mOxAigbkSlOdl5yrVe99g16HbUHcYFhjvh+XXPpRW7oRfIgLRRGhjYTZS8Ou7JkZs4GmXZlsuTkLOGl6lhx9aszilDqxOFnCYtBYnTWh06znZzIXLYmiL+U6ilA4VkJuPCmwYVB5HRAiNF0QiQ0j00PmGEN9uHLpP93++uLRZ+vg4WosG1/ojVoFntCUbTeB+YMUWJC80TyEyoTtliqnq4q5TNl+PmLRpS5G9DvT3x6dFq/nzv06LhzKvRcnEBKlbnjg4021ix7N2Y3JhGictqSxTvkQIa/qmg23jJk8C39Pm/Bt15LEB92OYxgDOb7QcdhvUiqnYKlDA8i6LIRLnVQDIQ/sNo4jwNAztIblBHVYFt16ivIGZM1qZVZNTcWj4aFYpeE7fMSTnjHIKmyP9+35m4/sikwGF/ngKvk+lqGuJRvoLX2B97g==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(6916009)(316002)(33656002)(2906002)(36756003)(66946007)(508600001)(8936002)(6486002)(4744005)(7416002)(66476007)(5660300002)(38100700002)(8676002)(4326008)(66556008)(86362001)(186003)(6512007)(6506007)(26005)(1076003)(2616005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?JXLz8C8CDg2ibpjBeDUZAhe/RBRYjYSAYb9Yo7/F9FhA0/q6+6pbCX27QeZJ?=
- =?us-ascii?Q?sjXhbP3CrWGPBXx/JAcwQtwI27/K3J3NWUgQKMjqevp/NHN0RDwJTNi+XcY9?=
- =?us-ascii?Q?u6ko/wiYbNYmbfsRHF+RNpZdTYdb3w+szInjfNn1Rj6hv9XUX3LFmeIGqHtA?=
- =?us-ascii?Q?OmucCDHuLCxDLM+PS2naEpGeuiyNMa7PM7NP4JRsVlT1rlnYkJko2KcRHpFR?=
- =?us-ascii?Q?swexLSUMKJZ4aq4DkaO9LPTliFfLcNnoZO+3BoVesW4lcWnRB9mco7gGKqDj?=
- =?us-ascii?Q?BRmPlme1WmbBa8z9hl5F1NWM+6thUeC6m67sMVqUMuKOiV1FSaAHxnvSdMyn?=
- =?us-ascii?Q?WWJ465569o9W1L/C5oG8PpIPL4wM6wo2AFARon3vTk3jlg35D5D2xFJigGRy?=
- =?us-ascii?Q?eCGHGJBNWqEjBB4scsB/2AncdcdLpPiY1FCKKPj6Uh+ASDTj/LjS8R4ur2Ww?=
- =?us-ascii?Q?zoEG2QVCML4iceUwyminPFjIxydOGzAT2+v5kKzgPZZ96hbx/sZU4/kmbSXZ?=
- =?us-ascii?Q?dmBp2jDyh9ApSYguJBpjKQUoE9IwmGxFaH7JC0HUw99dU/Nl9EhsPZbCLCHI?=
- =?us-ascii?Q?cl/e8jgDNONAoqwmwD0c/IMD1jDxArJv2OhrpUg7zQrkabf+/sZkdaaROCyx?=
- =?us-ascii?Q?0VKwcyBIh84rdvUL9EV/vSfhXNBoY1SVdUmKcpdDtTrXDmm8i+6jxMWQ3Np1?=
- =?us-ascii?Q?UP5acGbBoVIr+9D6LsooNJYP/r1edc0gpZba4AEd0LTF3W2c1hpstr6uRODP?=
- =?us-ascii?Q?rA0GQEjQALAqjz2ot5OwZSPYp4x4NbhhXjRJCcRiN1A+mXO3htdzX8zl8YK8?=
- =?us-ascii?Q?O1W2c5VcUYKphjJoahuHCu54y7cAIwgDFOuE9oRthAjjbLfhVgIwIfhUFvTX?=
- =?us-ascii?Q?FvbFPC2Y3ma/MaHJui2Gf84ifLKakQs+ZBz6vrE4+G7yw2FCvns3JMUYTh59?=
- =?us-ascii?Q?mqj3PWIuw6Gj69YTX/O/5k72nBRNp4ArEqDLL9vzqmY1B6nx+BoadtHGwS3y?=
- =?us-ascii?Q?M8wuqm0fidPRl6cxv89W6YPczUe9/3KhQHP3CuZy5xj5KJ2EVpkSX6FmsYTe?=
- =?us-ascii?Q?yH/oKoGI46tUSGCh2lccIJl9liG9eFXUmhHfhUSiIVSGzWs069DIkwfN2QPm?=
- =?us-ascii?Q?Qms3VIwI/2lYjRHC/s0plU7O8MWuBky1PdSzin0pfOSUH1vWdn15PVzIxM5B?=
- =?us-ascii?Q?X5k5aQykIq4LVVtqiZpi5vpSA8LqfFS1gUJ77DGqdM1uQPqLL547fyaYrdSR?=
- =?us-ascii?Q?lnUy6Dgk2zQMEZXoYu07+k0p99xnB2gW+HJDYtQLnxX7QrGIW00qztAp+2hd?=
- =?us-ascii?Q?RJh8hxucWjmyB1WwswCqPnLUMaoENcBxAiQ+aAH7BMOeSdkmJh9MqAmVj78r?=
- =?us-ascii?Q?FaOF7jeSpIbw8VhnUhZwuOhFhJYOjgrlg4tHpzEINCjK60NvzLqYkifNk2UC?=
- =?us-ascii?Q?eR9qu0fVYTBn/RU3Gvnael4XWQgn+2JA?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7900b9f4-e3e0-461d-a170-08da06048412
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Mar 2022 21:49:29.3201
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: jLx/2rceEV40bH+wEiqgKMMldtrdLV1Z4ZGoEzWYxb/NSNFW6lJL0gcuAyr+dIpo
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR12MB1174
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S232234AbiCNWUg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Mar 2022 18:20:36 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46EA9FD16
+        for <kvm@vger.kernel.org>; Mon, 14 Mar 2022 15:19:22 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id y19-20020a25ad13000000b006336877f6d0so1591880ybi.9
+        for <kvm@vger.kernel.org>; Mon, 14 Mar 2022 15:19:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=PUbw9oR4TOWQqbTABcpCBiJL0Yev5THBA5pdKZN8yvA=;
+        b=J1hE3hHr1zsdx2TTT9uQ8g+cnB6YxCSxV/wyXzB5ur+pe3dFPt3rEDefpO4XE55lsi
+         8gZiynrR3zS+GagnwyB0TvwYdmUul0KHqjqaIgpD5T46pJmV0OASYur87Q7bFLZiNDL9
+         2ZmcmF7zGimVqA9byNlp52uJl4VPvf93OGjKWOHQ1dlyii6F67dB9vyYXwt4snrOVhRO
+         aRC6Uir5qzkUNS4BGa4DvdECbKXrWaq5ZffLZWKmDXltB+6n9bktUoRYgRJbAnF4rZSO
+         coryXU4576gWvx5IoZQz+Vdu7MFNiBcenKyUl7qG3OLRplbEr8GhlIVXm2xJelcBJNVD
+         sMPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=PUbw9oR4TOWQqbTABcpCBiJL0Yev5THBA5pdKZN8yvA=;
+        b=DufcdepXIIK1hzTTq+xYU7zh7tCrk7Sgl9MfGKQ6ftoPFZ0v2wfWN7zhsC/IMUgU3Q
+         nwSSFdrp1w2jmbe3iuHkLpiynXP5mc9NEVidtP24xqKMlNQCKOal/1M2ZXDV7nK0+vBB
+         T1d+Et/S56zwo+ouioobwt7so2ySGArUnuqdTAIQhJvU8T9wV3Ku6+z6ej2TEdrB2fQ1
+         80FnNjeVNvl3czZggMA7HxaMUC+50/hiyuBnQtWjNkcGgOWctu+w3rgXhRfFyFnzk8OS
+         4RzA01iUanXmZl3QMrbFiSz6zriL7xXxEW3CuKuwReewieHbozrXMdBCT6NDb/OKY0pM
+         pCuA==
+X-Gm-Message-State: AOAM531GMVPViRfobotE0yq/iuAP/wutpEnGD6UeXIUBnuvd5l08lj+2
+        n+7+eOxkyBOv2Hnp/OHzBhJRcsJTtFuJqDI4hSI=
+X-Google-Smtp-Source: ABdhPJyVdzLvoXd1ovJfPXOpK4i088ln7nkAB8by2vP1a15Mrq9AQrg9C6VUjpBiPOWFoO0KptOWMVCryVCPZwLSxY0=
+X-Received: from ndesaulniers1.mtv.corp.google.com ([2620:15c:211:202:eff1:725e:2848:530f])
+ (user=ndesaulniers job=sendgmr) by 2002:a5b:7cf:0:b0:623:df1c:b83d with SMTP
+ id t15-20020a5b07cf000000b00623df1cb83dmr20604797ybq.75.1647296361448; Mon,
+ 14 Mar 2022 15:19:21 -0700 (PDT)
+Date:   Mon, 14 Mar 2022 15:19:03 -0700
+Message-Id: <20220314221909.2027027-1-ndesaulniers@google.com>
+Mime-Version: 1.0
+X-Developer-Key: i=ndesaulniers@google.com; a=ed25519; pk=lvO/pmg+aaCb6dPhyGC1GyOCvPueDrrc8Zeso5CaGKE=
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1647296343; l=8543;
+ s=20211004; h=from:subject; bh=/onzoCSytyNT3SABwW/OByMJJIxIi8oEiyApyZBwU0U=;
+ b=E+R0wTk1bVgZLouAH40yCEBUVKAcS1zwU8U71ZI/iiVQFeBG4+m1x/2/gvtH8niazhrp3Bn/yx2d
+ /snHQfSVAOa+pZQIMJOV1CmVLD3K6sFRL3Xkykt9GB5kiposo2GQ
+X-Mailer: git-send-email 2.35.1.723.g4982287a31-goog
+Subject: [PATCH] lockdep: fix -Wunused-parameter for _THIS_IP_
+From:   Nick Desaulniers <ndesaulniers@google.com>
+To:     Ingo Molnar <mingo@redhat.com>, Waiman Long <longman@redhat.com>,
+        Boqun Feng <boqun.feng@gmail.com>
+Cc:     Nick Desaulniers <ndesaulniers@google.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Dietmar Eggemann <dietmar.eggemann@arm.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Joey Gouly <joey.gouly@arm.com>, Marc Zyngier <maz@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 14, 2022 at 03:44:48PM -0400, Matthew Rosato wrote:
-> The DTSM, or designation type supported mask, indicates what IOAT formats
-> are available to the guest.  For an interpreted device, userspace will not
-> know what format(s) the IOAT assist supports, so pass it via the
-> capability chain.  Since the value belongs to the Query PCI Function Group
-> clp, let's extend the existing capability with a new version.
+While looking into a bug related to the compiler's handling of addresses
+of labels, I noticed some uses of _THIS_IP_ seemed unused in lockdep.
+Drive by cleanup.
 
-Why is this on the VFIO device?
+-Wunused-parameter:
+kernel/locking/lockdep.c:1383:22: warning: unused parameter 'ip'
+kernel/locking/lockdep.c:4246:48: warning: unused parameter 'ip'
+kernel/locking/lockdep.c:4844:19: warning: unused parameter 'ip'
 
-Maybe I don't quite understand it right, but the IOAT is the
-'userspace page table'?
+Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+---
+ arch/arm64/kernel/entry-common.c |  8 ++++----
+ include/linux/irqflags.h         |  4 ++--
+ include/linux/kvm_host.h         |  2 +-
+ kernel/entry/common.c            |  6 +++---
+ kernel/locking/lockdep.c         | 22 ++++++++--------------
+ kernel/sched/idle.c              |  2 +-
+ kernel/trace/trace_preemptirq.c  |  4 ++--
+ 7 files changed, 21 insertions(+), 27 deletions(-)
 
-That is something that should be modeled as a nested iommu domain.
+diff --git a/arch/arm64/kernel/entry-common.c b/arch/arm64/kernel/entry-common.c
+index ef7fcefb96bd..8a4244316e25 100644
+--- a/arch/arm64/kernel/entry-common.c
++++ b/arch/arm64/kernel/entry-common.c
+@@ -73,7 +73,7 @@ static __always_inline void __exit_to_kernel_mode(struct pt_regs *regs)
+ 	if (interrupts_enabled(regs)) {
+ 		if (regs->exit_rcu) {
+ 			trace_hardirqs_on_prepare();
+-			lockdep_hardirqs_on_prepare(CALLER_ADDR0);
++			lockdep_hardirqs_on_prepare();
+ 			rcu_irq_exit();
+ 			lockdep_hardirqs_on(CALLER_ADDR0);
+ 			return;
+@@ -118,7 +118,7 @@ static __always_inline void enter_from_user_mode(struct pt_regs *regs)
+ static __always_inline void __exit_to_user_mode(void)
+ {
+ 	trace_hardirqs_on_prepare();
+-	lockdep_hardirqs_on_prepare(CALLER_ADDR0);
++	lockdep_hardirqs_on_prepare();
+ 	user_enter_irqoff();
+ 	lockdep_hardirqs_on(CALLER_ADDR0);
+ }
+@@ -176,7 +176,7 @@ static void noinstr arm64_exit_nmi(struct pt_regs *regs)
+ 	ftrace_nmi_exit();
+ 	if (restore) {
+ 		trace_hardirqs_on_prepare();
+-		lockdep_hardirqs_on_prepare(CALLER_ADDR0);
++		lockdep_hardirqs_on_prepare();
+ 	}
+ 
+ 	rcu_nmi_exit();
+@@ -212,7 +212,7 @@ static void noinstr arm64_exit_el1_dbg(struct pt_regs *regs)
+ 
+ 	if (restore) {
+ 		trace_hardirqs_on_prepare();
+-		lockdep_hardirqs_on_prepare(CALLER_ADDR0);
++		lockdep_hardirqs_on_prepare();
+ 	}
+ 
+ 	rcu_nmi_exit();
+diff --git a/include/linux/irqflags.h b/include/linux/irqflags.h
+index 4b140938b03e..5ec0fa71399e 100644
+--- a/include/linux/irqflags.h
++++ b/include/linux/irqflags.h
+@@ -20,13 +20,13 @@
+ #ifdef CONFIG_PROVE_LOCKING
+   extern void lockdep_softirqs_on(unsigned long ip);
+   extern void lockdep_softirqs_off(unsigned long ip);
+-  extern void lockdep_hardirqs_on_prepare(unsigned long ip);
++  extern void lockdep_hardirqs_on_prepare(void);
+   extern void lockdep_hardirqs_on(unsigned long ip);
+   extern void lockdep_hardirqs_off(unsigned long ip);
+ #else
+   static inline void lockdep_softirqs_on(unsigned long ip) { }
+   static inline void lockdep_softirqs_off(unsigned long ip) { }
+-  static inline void lockdep_hardirqs_on_prepare(unsigned long ip) { }
++  static inline void lockdep_hardirqs_on_prepare(void) { }
+   static inline void lockdep_hardirqs_on(unsigned long ip) { }
+   static inline void lockdep_hardirqs_off(unsigned long ip) { }
+ #endif
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index f11039944c08..f32bed70a5c5 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -441,7 +441,7 @@ static __always_inline void guest_state_enter_irqoff(void)
+ {
+ 	instrumentation_begin();
+ 	trace_hardirqs_on_prepare();
+-	lockdep_hardirqs_on_prepare(CALLER_ADDR0);
++	lockdep_hardirqs_on_prepare();
+ 	instrumentation_end();
+ 
+ 	guest_context_enter_irqoff();
+diff --git a/kernel/entry/common.c b/kernel/entry/common.c
+index bad713684c2e..3ce3a0a6c762 100644
+--- a/kernel/entry/common.c
++++ b/kernel/entry/common.c
+@@ -124,7 +124,7 @@ static __always_inline void __exit_to_user_mode(void)
+ {
+ 	instrumentation_begin();
+ 	trace_hardirqs_on_prepare();
+-	lockdep_hardirqs_on_prepare(CALLER_ADDR0);
++	lockdep_hardirqs_on_prepare();
+ 	instrumentation_end();
+ 
+ 	user_enter_irqoff();
+@@ -412,7 +412,7 @@ noinstr void irqentry_exit(struct pt_regs *regs, irqentry_state_t state)
+ 			instrumentation_begin();
+ 			/* Tell the tracer that IRET will enable interrupts */
+ 			trace_hardirqs_on_prepare();
+-			lockdep_hardirqs_on_prepare(CALLER_ADDR0);
++			lockdep_hardirqs_on_prepare();
+ 			instrumentation_end();
+ 			rcu_irq_exit();
+ 			lockdep_hardirqs_on(CALLER_ADDR0);
+@@ -465,7 +465,7 @@ void noinstr irqentry_nmi_exit(struct pt_regs *regs, irqentry_state_t irq_state)
+ 	ftrace_nmi_exit();
+ 	if (irq_state.lockdep) {
+ 		trace_hardirqs_on_prepare();
+-		lockdep_hardirqs_on_prepare(CALLER_ADDR0);
++		lockdep_hardirqs_on_prepare();
+ 	}
+ 	instrumentation_end();
+ 
+diff --git a/kernel/locking/lockdep.c b/kernel/locking/lockdep.c
+index f8a0212189ca..05604795b39c 100644
+--- a/kernel/locking/lockdep.c
++++ b/kernel/locking/lockdep.c
+@@ -1378,7 +1378,7 @@ static struct lock_list *alloc_list_entry(void)
+  */
+ static int add_lock_to_list(struct lock_class *this,
+ 			    struct lock_class *links_to, struct list_head *head,
+-			    unsigned long ip, u16 distance, u8 dep,
++			    u16 distance, u8 dep,
+ 			    const struct lock_trace *trace)
+ {
+ 	struct lock_list *entry;
+@@ -3131,19 +3131,15 @@ check_prev_add(struct task_struct *curr, struct held_lock *prev,
+ 	 * to the previous lock's dependency list:
+ 	 */
+ 	ret = add_lock_to_list(hlock_class(next), hlock_class(prev),
+-			       &hlock_class(prev)->locks_after,
+-			       next->acquire_ip, distance,
+-			       calc_dep(prev, next),
+-			       *trace);
++			       &hlock_class(prev)->locks_after, distance,
++			       calc_dep(prev, next), *trace);
+ 
+ 	if (!ret)
+ 		return 0;
+ 
+ 	ret = add_lock_to_list(hlock_class(prev), hlock_class(next),
+-			       &hlock_class(next)->locks_before,
+-			       next->acquire_ip, distance,
+-			       calc_depb(prev, next),
+-			       *trace);
++			       &hlock_class(next)->locks_before, distance,
++			       calc_depb(prev, next), *trace);
+ 	if (!ret)
+ 		return 0;
+ 
+@@ -4234,14 +4230,13 @@ static void __trace_hardirqs_on_caller(void)
+ 
+ /**
+  * lockdep_hardirqs_on_prepare - Prepare for enabling interrupts
+- * @ip:		Caller address
+  *
+  * Invoked before a possible transition to RCU idle from exit to user or
+  * guest mode. This ensures that all RCU operations are done before RCU
+  * stops watching. After the RCU transition lockdep_hardirqs_on() has to be
+  * invoked to set the final state.
+  */
+-void lockdep_hardirqs_on_prepare(unsigned long ip)
++void lockdep_hardirqs_on_prepare(void)
+ {
+ 	if (unlikely(!debug_locks))
+ 		return;
+@@ -4838,8 +4833,7 @@ EXPORT_SYMBOL_GPL(__lockdep_no_validate__);
+ 
+ static void
+ print_lock_nested_lock_not_held(struct task_struct *curr,
+-				struct held_lock *hlock,
+-				unsigned long ip)
++				struct held_lock *hlock)
+ {
+ 	if (!debug_locks_off())
+ 		return;
+@@ -5015,7 +5009,7 @@ static int __lock_acquire(struct lockdep_map *lock, unsigned int subclass,
+ 	chain_key = iterate_chain_key(chain_key, hlock_id(hlock));
+ 
+ 	if (nest_lock && !__lock_is_held(nest_lock, -1)) {
+-		print_lock_nested_lock_not_held(curr, hlock, ip);
++		print_lock_nested_lock_not_held(curr, hlock);
+ 		return 0;
+ 	}
+ 
+diff --git a/kernel/sched/idle.c b/kernel/sched/idle.c
+index d17b0a5ce6ac..499a3e286cd0 100644
+--- a/kernel/sched/idle.c
++++ b/kernel/sched/idle.c
+@@ -105,7 +105,7 @@ void __cpuidle default_idle_call(void)
+ 		 * last -- this is very similar to the entry code.
+ 		 */
+ 		trace_hardirqs_on_prepare();
+-		lockdep_hardirqs_on_prepare(_THIS_IP_);
++		lockdep_hardirqs_on_prepare();
+ 		rcu_idle_enter();
+ 		lockdep_hardirqs_on(_THIS_IP_);
+ 
+diff --git a/kernel/trace/trace_preemptirq.c b/kernel/trace/trace_preemptirq.c
+index f4938040c228..95b58bd757ce 100644
+--- a/kernel/trace/trace_preemptirq.c
++++ b/kernel/trace/trace_preemptirq.c
+@@ -46,7 +46,7 @@ void trace_hardirqs_on(void)
+ 		this_cpu_write(tracing_irq_cpu, 0);
+ 	}
+ 
+-	lockdep_hardirqs_on_prepare(CALLER_ADDR0);
++	lockdep_hardirqs_on_prepare();
+ 	lockdep_hardirqs_on(CALLER_ADDR0);
+ }
+ EXPORT_SYMBOL(trace_hardirqs_on);
+@@ -94,7 +94,7 @@ __visible void trace_hardirqs_on_caller(unsigned long caller_addr)
+ 		this_cpu_write(tracing_irq_cpu, 0);
+ 	}
+ 
+-	lockdep_hardirqs_on_prepare(CALLER_ADDR0);
++	lockdep_hardirqs_on_prepare();
+ 	lockdep_hardirqs_on(CALLER_ADDR0);
+ }
+ EXPORT_SYMBOL(trace_hardirqs_on_caller);
+-- 
+2.35.1.723.g4982287a31-goog
 
-Querying the formats and any control logic for this should be on the
-iommu side not built into VFIO.
-
-Jason
