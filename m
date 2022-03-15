@@ -2,171 +2,172 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CFE894D9724
-	for <lists+kvm@lfdr.de>; Tue, 15 Mar 2022 10:08:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F341C4D979B
+	for <lists+kvm@lfdr.de>; Tue, 15 Mar 2022 10:26:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344543AbiCOJJP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Mar 2022 05:09:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48904 "EHLO
+        id S1346597AbiCOJ1i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Mar 2022 05:27:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346368AbiCOJJN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Mar 2022 05:09:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1FE1163E2
-        for <kvm@vger.kernel.org>; Tue, 15 Mar 2022 02:08:01 -0700 (PDT)
+        with ESMTP id S235697AbiCOJ1g (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Mar 2022 05:27:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id EE1AD48890
+        for <kvm@vger.kernel.org>; Tue, 15 Mar 2022 02:26:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647335280;
+        s=mimecast20190719; t=1647336383;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=x2QdncLjS9RyVOy6Iatqoky3XG297fiHr6QRUqmYbXw=;
-        b=i6zaMYfVvOYLgg8pBXl5ABhkHzJVhuWK9bIAnkzG4OE7yATYB+Y+uz2cQSDFGoGon/egnO
-        HNQ4WhA4CtvH3r0dluV4kgLmj9qjynW89++TmzZh8UiGa+19Yj99l3pgiFe6tly7ANKxKY
-        Nogl5mmB1jO6QjBJG0koaLK1Qwd3YAw=
+        bh=musgu39DMn+QpLBIcTaqCJ85bbJTBT0GNCkqT/YTdCw=;
+        b=XdKbNuLhCZls7eYUybtus0lMJgHF9Rvcw2BYfWSkUc1g5RqgYQywLANMXWmS4e7qb8pWmq
+        wV017ySpVfxG0jqYcVdqIZp9tZTd//A2zczdfoa1IRmhBxqJGX/XDgI8pNsEiik76lu9jr
+        4/+JJJb3EtwVJ3SzfrLMrfVy1gPa0OE=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-398-licyuROAPcScV15uQzTVhQ-1; Tue, 15 Mar 2022 05:07:58 -0400
-X-MC-Unique: licyuROAPcScV15uQzTVhQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+ us-mta-641-gjlaw87DM8G4TWOA9TQRfg-1; Tue, 15 Mar 2022 05:26:19 -0400
+X-MC-Unique: gjlaw87DM8G4TWOA9TQRfg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C84D0803B22;
-        Tue, 15 Mar 2022 09:07:56 +0000 (UTC)
-Received: from redhat.com (unknown [10.22.17.185])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9478240C128B;
-        Tue, 15 Mar 2022 09:07:50 +0000 (UTC)
-Date:   Tue, 15 Mar 2022 04:07:48 -0500
-From:   Eric Blake <eblake@redhat.com>
-To:     Markus Armbruster <armbru@redhat.com>
-Cc:     qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Christian Schoenebeck <qemu_oss@crudebyte.com>,
-        "Gonglei (Arei)" <arei.gonglei@huawei.com>,
-        =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Ani Sinha <ani@anisinha.ca>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Amit Shah <amit@kernel.org>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Anthony Perard <anthony.perard@citrix.com>,
-        Paul Durrant <paul@xen.org>,
-        =?utf-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>,
-        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
-        Corey Minyard <cminyard@mvista.com>,
-        Patrick Venture <venture@google.com>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Peter Xu <peterx@redhat.com>, Jason Wang <jasowang@redhat.com>,
-        =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
-        Daniel Henrique Barboza <danielhb413@gmail.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Greg Kurz <groug@kaod.org>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
-        Jean-Christophe Dubois <jcd@tribudubois.net>,
-        Keith Busch <kbusch@kernel.org>,
-        Klaus Jensen <its@irrelevant.dk>,
-        Yuval Shaia <yuval.shaia.ml@gmail.com>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        Magnus Damm <magnus.damm@gmail.com>,
-        Fabien Chouteau <chouteau@adacore.com>,
-        KONRAD Frederic <frederic.konrad@adacore.com>,
-        Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-        Artyom Tarasenko <atar4qemu@gmail.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        Juan Quintela <quintela@redhat.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Konstantin Kostiuk <kkostiuk@redhat.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
-        Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
-        Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
-        David Hildenbrand <david@redhat.com>,
-        Wenchao Wang <wenchao.wang@intel.com>,
-        Colin Xu <colin.xu@intel.com>,
-        Kamil Rytarowski <kamil@netbsd.org>,
-        Reinoud Zandijk <reinoud@netbsd.org>,
-        Sunil Muthuswamy <sunilmut@microsoft.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
-        John Snow <jsnow@redhat.com>, kvm@vger.kernel.org,
-        qemu-arm@nongnu.org, xen-devel@lists.xenproject.org,
-        qemu-ppc@nongnu.org, qemu-block@nongnu.org, haxm-team@intel.com,
-        qemu-s390x@nongnu.org
-Subject: Re: [PATCH 3/3] Use g_new() & friends where that makes obvious sense
-Message-ID: <20220315090748.acju5mjbe4tax272@redhat.com>
-References: <20220314160108.1440470-1-armbru@redhat.com>
- <20220314160108.1440470-4-armbru@redhat.com>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 109F3185A79C;
+        Tue, 15 Mar 2022 09:26:19 +0000 (UTC)
+Received: from localhost (unknown [10.39.194.62])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 74D0D141DC2B;
+        Tue, 15 Mar 2022 09:26:18 +0000 (UTC)
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        alex.williamson@redhat.com, kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, jgg@nvidia.com,
+        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
+        yishaih@nvidia.com, linux-doc@vger.kernel.org, corbet@lwn.net
+Subject: Re: [PATCH v3] vfio-pci: Provide reviewers and acceptance criteria
+ for vendor drivers
+In-Reply-To: <164728932975.54581.1235687116658126625.stgit@omen>
+Organization: Red Hat GmbH
+References: <164728932975.54581.1235687116658126625.stgit@omen>
+User-Agent: Notmuch/0.34 (https://notmuchmail.org)
+Date:   Tue, 15 Mar 2022 10:26:17 +0100
+Message-ID: <87a6drh8hy.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220314160108.1440470-4-armbru@redhat.com>
-User-Agent: NeoMutt/20211029-427-23b03a
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
 X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 14, 2022 at 05:01:08PM +0100, Markus Armbruster wrote:
-> g_new(T, n) is neater than g_malloc(sizeof(T) * n).  It's also safer,
-> for two reasons.  One, it catches multiplication overflowing size_t.
-> Two, it returns T * rather than void *, which lets the compiler catch
-> more type errors.
-> 
-> This commit only touches allocations with size arguments of the form
-> sizeof(T).
-> 
-> Patch created mechanically with:
-> 
->     $ spatch --in-place --sp-file scripts/coccinelle/use-g_new-etc.cocci \
-> 	     --macro-file scripts/cocci-macro-file.h FILES...
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+On Mon, Mar 14 2022, Alex Williamson <alex.williamson@redhat.com> wrote:
+
+> Vendor or device specific extensions for devices exposed to userspace
+> through the vfio-pci-core library open both new functionality and new
+> risks.  Here we attempt to provided formalized requirements and
+> expectations to ensure that future drivers both collaborate in their
+> interaction with existing host drivers, as well as receive additional
+> reviews from community members with experience in this area.
+>
+> Cc: Jason Gunthorpe <jgg@nvidia.com>
+> Cc: Yishai Hadas <yishaih@nvidia.com>
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> Acked-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 > ---
 
-I agree that this is mechanical, but...
+(...)
 
-<snip>
->  qga/commands-win32.c                     |  8 ++---
->  qga/commands.c                           |  2 +-
->  qom/qom-qmp-cmds.c                       |  2 +-
->  replay/replay-char.c                     |  4 +--
->  replay/replay-events.c                   | 10 +++---
->  scripts/coverity-scan/model.c            |  2 +-
+> diff --git a/Documentation/driver-api/vfio-pci-vendor-driver-acceptance.rst b/Documentation/driver-api/vfio-pci-vendor-driver-acceptance.rst
+> new file mode 100644
+> index 000000000000..3a108d748681
+> --- /dev/null
+> +++ b/Documentation/driver-api/vfio-pci-vendor-driver-acceptance.rst
 
-...are we sure we want to touch this particular file?
+What about Christoph's request to drop the "vendor" name?
+vfio-pci-device-specific-driver-acceptance.rst would match the actual
+title of the document, and the only drawback I see is that it is a bit
+longer.
 
-> diff --git a/scripts/coverity-scan/model.c b/scripts/coverity-scan/model.c
-> index 9d4fba53d9..30bea672e1 100644
-> --- a/scripts/coverity-scan/model.c
-> +++ b/scripts/coverity-scan/model.c
-> @@ -356,7 +356,7 @@ int g_poll (GPollFD *fds, unsigned nfds, int timeout)
->  typedef struct _GIOChannel GIOChannel;
->  GIOChannel *g_io_channel_unix_new(int fd)
->  {
-> -    GIOChannel *c = g_malloc0(sizeof(GIOChannel));
-> +    GIOChannel *c = g_new0(GIOChannel, 1);
->      __coverity_escape__(fd);
->      return c;
->  }
+> @@ -0,0 +1,35 @@
+> +.. SPDX-License-Identifier: GPL-2.0
+> +
+> +Acceptance criteria for vfio-pci device specific driver variants
+> +================================================================
+> +
+> +Overview
+> +--------
+> +The vfio-pci driver exists as a device agnostic driver using the
+> +system IOMMU and relying on the robustness of platform fault
+> +handling to provide isolated device access to userspace.  While the
+> +vfio-pci driver does include some device specific support, further
+> +extensions for yet more advanced device specific features are not
+> +sustainable.  The vfio-pci driver has therefore split out
+> +vfio-pci-core as a library that may be reused to implement features
+> +requiring device specific knowledge, ex. saving and loading device
+> +state for the purposes of supporting migration.
+> +
+> +In support of such features, it's expected that some device specific
+> +variants may interact with parent devices (ex. SR-IOV PF in support of
+> +a user assigned VF) or other extensions that may not be otherwise
+> +accessible via the vfio-pci base driver.  Authors of such drivers
+> +should be diligent not to create exploitable interfaces via such
+> +interactions or allow unchecked userspace data to have an effect
+> +beyond the scope of the assigned device.
+> +
+> +New driver submissions are therefore requested to have approval via
+> +Sign-off/Acked-by/etc for any interactions with parent drivers.
 
-Our model has a definition of g_malloc0(), but I'm not sure whether
-Coverity picks up the macro g_new0() in the same manner.
+s/Sign-off/Reviewed-by/ ?
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+I would not generally expect the reviewers listed to sign off on other
+people's patches.
+
+> +Additionally, drivers should make an attempt to provide sufficient
+> +documentation for reviewers to understand the device specific
+> +extensions, for example in the case of migration data, how is the
+> +device state composed and consumed, which portions are not otherwise
+> +available to the user via vfio-pci, what safeguards exist to validate
+> +the data, etc.  To that extent, authors should additionally expect to
+> +require reviews from at least one of the listed reviewers, in addition
+> +to the overall vfio maintainer.
+> diff --git a/Documentation/maintainer/maintainer-entry-profile.rst b/Documentation/maintainer/maintainer-entry-profile.rst
+> index 5d5cc3acdf85..8b4971c7e3fa 100644
+> --- a/Documentation/maintainer/maintainer-entry-profile.rst
+> +++ b/Documentation/maintainer/maintainer-entry-profile.rst
+> @@ -103,3 +103,4 @@ to do something different in the near future.
+>     ../nvdimm/maintainer-entry-profile
+>     ../riscv/patch-acceptance
+>     ../driver-api/media/maintainer-entry-profile
+> +   ../driver-api/vfio-pci-vendor-driver-acceptance
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 4322b5321891..fd17d1891216 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -20314,6 +20314,16 @@ F:	drivers/vfio/mdev/
+>  F:	include/linux/mdev.h
+>  F:	samples/vfio-mdev/
+>  
+> +VFIO PCI VENDOR DRIVERS
+
+VFIO PCI DEVICE SPECIFIC DRIVERS ?
+
+> +R:	Jason Gunthorpe <jgg@nvidia.com>
+> +R:	Yishai Hadas <yishaih@nvidia.com>
+> +R:	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> +R:	Kevin Tian <kevin.tian@intel.com>
+> +L:	kvm@vger.kernel.org
+> +S:	Maintained
+> +P:	Documentation/driver-api/vfio-pci-vendor-driver-acceptance.rst
+> +F:	drivers/vfio/pci/*/
+> +
+>  VFIO PLATFORM DRIVER
+>  M:	Eric Auger <eric.auger@redhat.com>
+>  L:	kvm@vger.kernel.org
+
+Other than that, looks good to me (and thanks to the people volunteering
+for review!)
 
