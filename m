@@ -2,37 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C0A14D9B75
-	for <lists+kvm@lfdr.de>; Tue, 15 Mar 2022 13:44:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D73F04D9BA3
+	for <lists+kvm@lfdr.de>; Tue, 15 Mar 2022 13:55:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348416AbiCOMpk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Mar 2022 08:45:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39516 "EHLO
+        id S242105AbiCOM43 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Mar 2022 08:56:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35142 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348408AbiCOMph (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Mar 2022 08:45:37 -0400
-Received: from mail.sberdevices.ru (mail.sberdevices.ru [45.89.227.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA508387BE;
-        Tue, 15 Mar 2022 05:44:23 -0700 (PDT)
-Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
-        by mail.sberdevices.ru (Postfix) with ESMTP id EEB595FD02;
-        Tue, 15 Mar 2022 15:44:20 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1647348261;
-        bh=mQhUfvKpUI6JHevWAQdFEtd3/C+mAIPjLSkY7xnFgH4=;
-        h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version;
-        b=Pu22Qm7Y2FEvdZjPT9629dyfxbNPjD0Zc5xXERDPslJsi5FC+CHXbyfSKA+dfgY4K
-         jmRK0kFp+WOuGAH0KmIO9xnBtV6Bvcm+XHtvlcFnV/k8Raspm0uMsnULyHx/yMuWuX
-         1J9jDq8UsHdlHYilmPnruYwNMFE9YLKC4KkgC+9aHCc0f7S79LRInp0PVaPyQkWZtW
-         Lp0HsgPtOgKQSsfFz7ewTsg7bFIt0yyd5G8HsDsaF/YoPS0VaFNC/ggh8AehUZMjMF
-         Shsecv6S9HixKwIlKm/ReQ6mAp/ECKMSyZ19FkPAET22z/dTquvmxlaDrQVZuZeeo1
-         sUJ/FwV1XdOKA==
-Received: from S-MS-EXCH02.sberdevices.ru (S-MS-EXCH02.sberdevices.ru [172.16.1.5])
-        by mail.sberdevices.ru (Postfix) with ESMTP;
-        Tue, 15 Mar 2022 15:44:11 +0300 (MSK)
-From:   Krasnov Arseniy Vladimirovich <AVKrasnov@sberdevices.ru>
-To:     Stefano Garzarella <sgarzare@redhat.com>
-CC:     Krasnov Arseniy <oxffffaa@gmail.com>,
+        with ESMTP id S235491AbiCOM42 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Mar 2022 08:56:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A7FEA4474C
+        for <kvm@vger.kernel.org>; Tue, 15 Mar 2022 05:55:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1647348914;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=/7kF6mwRMvcQL1DtiGEysf7dz4yz7QqO8NSJRvpKnr4=;
+        b=DKBmqFg1HlKuETJ/TdoLqLnERW9Q5aBrSFBh7oPIdKDZ1cnexxxqndR8xjCFRPfF18mw22
+        eI/YewnIsKGQkmMKmA27CG4GQIOVhQR3XpmTSn//riN/h8JAvlkzS1s+CoCq9L2VFKxX9b
+        zveyLrdIdYNmAFOTkjKsJwDQg5+duQw=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-90-Yl3YmQfVNpq3VbBk0yR4lw-1; Tue, 15 Mar 2022 08:55:13 -0400
+X-MC-Unique: Yl3YmQfVNpq3VbBk0yR4lw-1
+Received: by mail-qv1-f69.google.com with SMTP id h18-20020a05621402f200b00440cedaa9a2so26614qvu.17
+        for <kvm@vger.kernel.org>; Tue, 15 Mar 2022 05:55:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=/7kF6mwRMvcQL1DtiGEysf7dz4yz7QqO8NSJRvpKnr4=;
+        b=yAKP8XNBJTvWrALOsNoxT6MnomDrF8Kx0Z9EcD4rR7pjtrO8y0NRFqpGFhqzFmA+UR
+         kgccExlmRWoljGeNvlrlXDJdIV/gfX+DrQMznIAk6mlEkkpzOEIvH4E2aB9X3zJmnybk
+         K14uL4jJ7qjdEGtSjSc9XZoIXAfY9eaR3xu4fBw7qqI/KUKw35S9PescVlajy9pyp0ot
+         3c5HZMHho73WHf7SSIcQkX4gXMFeMwJoW0EeSNj9tEie4YFmOVrc23hNx90st8T0T7d8
+         NhjB3D/GYRzFMhw4X5QZR2yVKQp7hZCHZdcCWUOc+ywlBGQ7Nda+PX9IshNsDrEweq4T
+         VXgA==
+X-Gm-Message-State: AOAM530U6Ilu3OxtmPaASYeTFyUKjuXyxBstgi+B2mhCD0vHZvKd3ZA0
+        /cCFE2DojxvD3+D7N+rKR5jvbTDVmy0Iqgs9+IPwoOIyrJ2tp9MHMoLP4lY/ozPjFm8UEI4CUhF
+        pbvXgEsJYnEBs
+X-Received: by 2002:a05:6214:2689:b0:435:be79:a17e with SMTP id gm9-20020a056214268900b00435be79a17emr20994835qvb.35.1647348913104;
+        Tue, 15 Mar 2022 05:55:13 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxBekmlL+mi9yLEYSbEo0oZTdDpBDWm38egtm8H1DGuL5A7k5WLIfNlBSOt5YUdgYGPYOnxvA==
+X-Received: by 2002:a05:6214:2689:b0:435:be79:a17e with SMTP id gm9-20020a056214268900b00435be79a17emr20994818qvb.35.1647348912845;
+        Tue, 15 Mar 2022 05:55:12 -0700 (PDT)
+Received: from sgarzare-redhat (host-212-171-187-184.pool212171.interbusiness.it. [212.171.187.184])
+        by smtp.gmail.com with ESMTPSA id g7-20020a376b07000000b006492f19ae76sm9286561qkc.27.2022.03.15.05.55.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Mar 2022 05:55:12 -0700 (PDT)
+Date:   Tue, 15 Mar 2022 13:55:04 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Krasnov Arseniy Vladimirovich <AVKrasnov@sberdevices.ru>
+Cc:     Krasnov Arseniy <oxffffaa@gmail.com>,
         Rokosov Dmitry Dmitrievich <DDRokosov@sberdevices.ru>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "virtualization@lists.linux-foundation.org" 
@@ -40,33 +66,20 @@ CC:     Krasnov Arseniy <oxffffaa@gmail.com>,
         "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 Subject: Re: [RFC PATCH v1 3/3] af_vsock: SOCK_SEQPACKET broken buffer test
-Thread-Topic: [RFC PATCH v1 3/3] af_vsock: SOCK_SEQPACKET broken buffer test
-Thread-Index: AQHYNTbvjWQnm44js0u5mxZaYZpaaay/8sGAgAAQfoCAADSuAA==
-Date:   Tue, 15 Mar 2022 12:43:13 +0000
-Message-ID: <f05280bb-9b48-8705-a2ef-3d02ea98fd25@sberdevices.ru>
+Message-ID: <20220315125504.ut3bxfw5jvuop33d@sgarzare-redhat>
 References: <1bb5ce91-da53-7de9-49ba-f49f76f45512@sberdevices.ru>
  <bc309cf9-5bcf-b645-577f-8e5b0cf6f220@sberdevices.ru>
  <20220315083617.n33naazzf3se4ozo@sgarzare-redhat>
  <b452aeac-9628-5e37-e0e6-d33f8bb47b22@sberdevices.ru>
-In-Reply-To: <b452aeac-9628-5e37-e0e6-d33f8bb47b22@sberdevices.ru>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.16.1.12]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <557F3838B3FE2A4EB0E8D8B55808C76D@sberdevices.ru>
-Content-Transfer-Encoding: base64
+ <f05280bb-9b48-8705-a2ef-3d02ea98fd25@sberdevices.ru>
 MIME-Version: 1.0
-X-KSMG-Rule-ID: 4
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Status: not scanned, disabled by settings
-X-KSMG-AntiSpam-Interceptor-Info: not scanned
-X-KSMG-AntiPhishing: not scanned, disabled by settings
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2022/03/15 06:52:00 #18973197
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <f05280bb-9b48-8705-a2ef-3d02ea98fd25@sberdevices.ru>
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,135 +87,226 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gMTUuMDMuMjAyMiAxMjozNSwgQXJzZW5peSBLcmFzbm92IHdyb3RlOg0KPiBPbiAxNS4wMy4y
-MDIyIDExOjM2LCBTdGVmYW5vIEdhcnphcmVsbGEgd3JvdGU6DQo+PiBPbiBGcmksIE1hciAxMSwg
-MjAyMiBhdCAxMDo1ODozMkFNICswMDAwLCBLcmFzbm92IEFyc2VuaXkgVmxhZGltaXJvdmljaCB3
-cm90ZToNCj4+PiBBZGQgdGVzdCB3aGVyZSBzZW5kZXIgc2VuZHMgdHdvIG1lc3NhZ2UsIGVhY2gg
-d2l0aCBvd24NCj4+PiBkYXRhIHBhdHRlcm4uIFJlYWRlciB0cmllcyB0byByZWFkIGZpcnN0IHRv
-IGJyb2tlbiBidWZmZXI6DQo+Pj4gaXQgaGFzIHRocmVlIHBhZ2VzIHNpemUsIGJ1dCBtaWRkbGUg
-cGFnZSBpcyB1bm1hcHBlZC4gVGhlbiwNCj4+PiByZWFkZXIgdHJpZXMgdG8gcmVhZCBzZWNvbmQg
-bWVzc2FnZSB0byB2YWxpZCBidWZmZXIuIFRlc3QNCj4+PiBjaGVja3MsIHRoYXQgdW5jb3BpZWQg
-cGFydCBvZiBmaXJzdCBtZXNzYWdlIHdhcyBkcm9wcGVkDQo+Pj4gYW5kIHRodXMgbm90IGNvcGll
-ZCBhcyBwYXJ0IG9mIHNlY29uZCBtZXNzYWdlLg0KPj4+DQo+Pj4gU2lnbmVkLW9mZi1ieTogQXJz
-ZW5peSBLcmFzbm92IDxBVktyYXNub3ZAc2JlcmRldmljZXMucnU+DQo+Pj4gLS0tDQo+Pj4gdG9v
-bHMvdGVzdGluZy92c29jay92c29ja190ZXN0LmMgfCAxMjEgKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKw0KPj4+IDEgZmlsZSBjaGFuZ2VkLCAxMjEgaW5zZXJ0aW9ucygrKQ0KPj4+DQo+
-Pj4gZGlmZiAtLWdpdCBhL3Rvb2xzL3Rlc3RpbmcvdnNvY2svdnNvY2tfdGVzdC5jIGIvdG9vbHMv
-dGVzdGluZy92c29jay92c29ja190ZXN0LmMNCj4+PiBpbmRleCBhYTJkZTI3ZDBmNzcuLjY4NmFm
-NzEyYjRhZCAxMDA2NDQNCj4+PiAtLS0gYS90b29scy90ZXN0aW5nL3Zzb2NrL3Zzb2NrX3Rlc3Qu
-Yw0KPj4+ICsrKyBiL3Rvb2xzL3Rlc3RpbmcvdnNvY2svdnNvY2tfdGVzdC5jDQo+Pj4gQEAgLTE2
-LDYgKzE2LDcgQEANCj4+PiAjaW5jbHVkZSA8bGludXgva2VybmVsLmg+DQo+Pj4gI2luY2x1ZGUg
-PHN5cy90eXBlcy5oPg0KPj4+ICNpbmNsdWRlIDxzeXMvc29ja2V0Lmg+DQo+Pj4gKyNpbmNsdWRl
-IDxzeXMvbW1hbi5oPg0KPj4+DQo+Pj4gI2luY2x1ZGUgInRpbWVvdXQuaCINCj4+PiAjaW5jbHVk
-ZSAiY29udHJvbC5oIg0KPj4+IEBAIC00MzUsNiArNDM2LDEyMSBAQCBzdGF0aWMgdm9pZCB0ZXN0
-X3NlcXBhY2tldF90aW1lb3V0X3NlcnZlcihjb25zdCBzdHJ1Y3QgdGVzdF9vcHRzICpvcHRzKQ0K
-Pj4+IMKgwqDCoMKgY2xvc2UoZmQpOw0KPj4+IH0NCj4+Pg0KPj4+ICsjZGVmaW5lIEJVRl9QQVRU
-RVJOXzEgJ2EnDQo+Pj4gKyNkZWZpbmUgQlVGX1BBVFRFUk5fMiAnYicNCj4+PiArDQo+Pj4gK3N0
-YXRpYyB2b2lkIHRlc3Rfc2VxcGFja2V0X2ludmFsaWRfcmVjX2J1ZmZlcl9jbGllbnQoY29uc3Qg
-c3RydWN0IHRlc3Rfb3B0cyAqb3B0cykNCj4+PiArew0KPj4+ICvCoMKgwqAgaW50IGZkOw0KPj4+
-ICvCoMKgwqAgdW5zaWduZWQgY2hhciAqYnVmMTsNCj4+PiArwqDCoMKgIHVuc2lnbmVkIGNoYXIg
-KmJ1ZjI7DQo+Pj4gK8KgwqDCoCBpbnQgYnVmX3NpemUgPSBnZXRwYWdlc2l6ZSgpICogMzsNCj4+
-PiArDQo+Pj4gK8KgwqDCoCBmZCA9IHZzb2NrX3NlcXBhY2tldF9jb25uZWN0KG9wdHMtPnBlZXJf
-Y2lkLCAxMjM0KTsNCj4+PiArwqDCoMKgIGlmIChmZCA8IDApIHsNCj4+PiArwqDCoMKgwqDCoMKg
-wqAgcGVycm9yKCJjb25uZWN0Iik7DQo+Pj4gK8KgwqDCoMKgwqDCoMKgIGV4aXQoRVhJVF9GQUlM
-VVJFKTsNCj4+PiArwqDCoMKgIH0NCj4+PiArDQo+Pj4gK8KgwqDCoCBidWYxID0gbWFsbG9jKGJ1
-Zl9zaXplKTsNCj4+PiArwqDCoMKgIGlmIChidWYxID09IE5VTEwpIHsNCj4+PiArwqDCoMKgwqDC
-oMKgwqAgcGVycm9yKCInbWFsbG9jKCknIGZvciAnYnVmMSciKTsNCj4+PiArwqDCoMKgwqDCoMKg
-wqAgZXhpdChFWElUX0ZBSUxVUkUpOw0KPj4+ICvCoMKgwqAgfQ0KPj4+ICsNCj4+PiArwqDCoMKg
-IGJ1ZjIgPSBtYWxsb2MoYnVmX3NpemUpOw0KPj4+ICvCoMKgwqAgaWYgKGJ1ZjIgPT0gTlVMTCkg
-ew0KPj4+ICvCoMKgwqDCoMKgwqDCoCBwZXJyb3IoIidtYWxsb2MoKScgZm9yICdidWYyJyIpOw0K
-Pj4+ICvCoMKgwqDCoMKgwqDCoCBleGl0KEVYSVRfRkFJTFVSRSk7DQo+Pj4gK8KgwqDCoCB9DQo+
-Pj4gKw0KPj4+ICvCoMKgwqAgbWVtc2V0KGJ1ZjEsIEJVRl9QQVRURVJOXzEsIGJ1Zl9zaXplKTsN
-Cj4+PiArwqDCoMKgIG1lbXNldChidWYyLCBCVUZfUEFUVEVSTl8yLCBidWZfc2l6ZSk7DQo+Pj4g
-Kw0KPj4+ICvCoMKgwqAgaWYgKHNlbmQoZmQsIGJ1ZjEsIGJ1Zl9zaXplLCAwKSAhPSBidWZfc2l6
-ZSkgew0KPj4+ICvCoMKgwqDCoMKgwqDCoCBwZXJyb3IoInNlbmQgZmFpbGVkIik7DQo+Pj4gK8Kg
-wqDCoMKgwqDCoMKgIGV4aXQoRVhJVF9GQUlMVVJFKTsNCj4+PiArwqDCoMKgIH0NCj4+PiArDQo+
-Pj4gK8KgwqDCoCBpZiAoc2VuZChmZCwgYnVmMiwgYnVmX3NpemUsIDApICE9IGJ1Zl9zaXplKSB7
-DQo+Pj4gK8KgwqDCoMKgwqDCoMKgIHBlcnJvcigic2VuZCBmYWlsZWQiKTsNCj4+PiArwqDCoMKg
-wqDCoMKgwqAgZXhpdChFWElUX0ZBSUxVUkUpOw0KPj4+ICvCoMKgwqAgfQ0KPj4+ICsNCj4+PiAr
-wqDCoMKgIGNsb3NlKGZkKTsNCj4+PiArfQ0KPj4+ICsNCj4+PiArc3RhdGljIHZvaWQgdGVzdF9z
-ZXFwYWNrZXRfaW52YWxpZF9yZWNfYnVmZmVyX3NlcnZlcihjb25zdCBzdHJ1Y3QgdGVzdF9vcHRz
-ICpvcHRzKQ0KPj4+ICt7DQo+Pj4gK8KgwqDCoCBpbnQgZmQ7DQo+Pj4gK8KgwqDCoCB1bnNpZ25l
-ZCBjaGFyICpicm9rZW5fYnVmOw0KPj4+ICvCoMKgwqAgdW5zaWduZWQgY2hhciAqdmFsaWRfYnVm
-Ow0KPj4+ICvCoMKgwqAgaW50IHBhZ2Vfc2l6ZSA9IGdldHBhZ2VzaXplKCk7DQo+Pj4gK8KgwqDC
-oCBpbnQgYnVmX3NpemUgPSBwYWdlX3NpemUgKiAzOw0KPj4+ICvCoMKgwqAgc3NpemVfdCByZXM7
-DQo+Pj4gK8KgwqDCoCBpbnQgcHJvdCA9IFBST1RfUkVBRCB8IFBST1RfV1JJVEU7DQo+Pj4gK8Kg
-wqDCoCBpbnQgZmxhZ3MgPSBNQVBfUFJJVkFURSB8IE1BUF9BTk9OWU1PVVM7DQo+Pj4gK8KgwqDC
-oCBpbnQgaTsNCj4+PiArDQo+Pj4gK8KgwqDCoCBmZCA9IHZzb2NrX3NlcXBhY2tldF9hY2NlcHQo
-Vk1BRERSX0NJRF9BTlksIDEyMzQsIE5VTEwpOw0KPj4+ICvCoMKgwqAgaWYgKGZkIDwgMCkgew0K
-Pj4+ICvCoMKgwqDCoMKgwqDCoCBwZXJyb3IoImFjY2VwdCIpOw0KPj4+ICvCoMKgwqDCoMKgwqDC
-oCBleGl0KEVYSVRfRkFJTFVSRSk7DQo+Pj4gK8KgwqDCoCB9DQo+Pj4gKw0KPj4+ICvCoMKgwqAg
-LyogU2V0dXAgZmlyc3QgYnVmZmVyLiAqLw0KPj4+ICvCoMKgwqAgYnJva2VuX2J1ZiA9IG1tYXAo
-TlVMTCwgYnVmX3NpemUsIHByb3QsIGZsYWdzLCAtMSwgMCk7DQo+Pj4gK8KgwqDCoCBpZiAoYnJv
-a2VuX2J1ZiA9PSBNQVBfRkFJTEVEKSB7DQo+Pj4gK8KgwqDCoMKgwqDCoMKgIHBlcnJvcigibW1h
-cCBmb3IgJ2Jyb2tlbl9idWYnIik7DQo+Pj4gK8KgwqDCoMKgwqDCoMKgIGV4aXQoRVhJVF9GQUlM
-VVJFKTsNCj4+PiArwqDCoMKgIH0NCj4+PiArDQo+Pj4gK8KgwqDCoCAvKiBVbm1hcCAiaG9sZSIg
-aW4gYnVmZmVyLiAqLw0KPj4+ICvCoMKgwqAgaWYgKG11bm1hcChicm9rZW5fYnVmICsgcGFnZV9z
-aXplLCBwYWdlX3NpemUpKSB7DQo+Pj4gK8KgwqDCoMKgwqDCoMKgIHBlcnJvcigiJ2Jyb2tlbl9i
-dWYnIHNldHVwIik7DQo+Pj4gK8KgwqDCoMKgwqDCoMKgIGV4aXQoRVhJVF9GQUlMVVJFKTsNCj4+
-PiArwqDCoMKgIH0NCj4+PiArDQo+Pj4gK8KgwqDCoCB2YWxpZF9idWYgPSBtbWFwKE5VTEwsIGJ1
-Zl9zaXplLCBwcm90LCBmbGFncywgLTEsIDApOw0KPj4+ICvCoMKgwqAgaWYgKHZhbGlkX2J1ZiA9
-PSBNQVBfRkFJTEVEKSB7DQo+Pj4gK8KgwqDCoMKgwqDCoMKgIHBlcnJvcigibW1hcCBmb3IgJ3Zh
-bGlkX2J1ZiciKTsNCj4+PiArwqDCoMKgwqDCoMKgwqAgZXhpdChFWElUX0ZBSUxVUkUpOw0KPj4+
-ICvCoMKgwqAgfQ0KPj4+ICsNCj4+PiArwqDCoMKgIC8qIFRyeSB0byBmaWxsIGJ1ZmZlciB3aXRo
-IHVubWFwcGVkIG1pZGRsZS4gKi8NCj4+PiArwqDCoMKgIHJlcyA9IHJlYWQoZmQsIGJyb2tlbl9i
-dWYsIGJ1Zl9zaXplKTsNCj4+PiArwqDCoMKgIGlmIChyZXMgIT0gLTEpIHsNCj4+PiArwqDCoMKg
-wqDCoMKgwqAgcGVycm9yKCJpbnZhbGlkIHJlYWQgcmVzdWx0IG9mICdicm9rZW5fYnVmJyIpOw0K
-Pj4NCj4+IGlmIGByZXNgIGlzIHZhbGlkLCBlcnJubyBpcyBub3Qgc2V0LCBiZXR0ZXIgdG8gdXNl
-IGZwcmludGYoc3RkZXJyLCAuLi4pIHByaW50aW5nIHRoZSBleHBlY3RlZCBhbmQgcmVjZWl2ZWQg
-cmVzdWx0Lg0KPj4gVGFrZSBhIGxvb2sgYXQgdGVzdF9zdHJlYW1fY29ubmVjdGlvbl9yZXNldCgp
-DQo+IA0KPiBBY2ssIGZpeCBpdCBpbiB2Mg0KPiANCj4+DQo+Pj4gK8KgwqDCoMKgwqDCoMKgIGV4
-aXQoRVhJVF9GQUlMVVJFKTsNCj4+PiArwqDCoMKgIH0NCj4+PiArDQo+Pj4gK8KgwqDCoCBpZiAo
-ZXJybm8gIT0gRU5PTUVNKSB7DQo+Pj4gK8KgwqDCoMKgwqDCoMKgIHBlcnJvcigiaW52YWxpZCBl
-cnJubyBvZiAnYnJva2VuX2J1ZiciKTsNCj4+DQo+PiBJbnN0ZWFkIG9mICJpbnZhbGlkIiwgSSB3
-b3VsZCBzYXkgInVuZXhwZWN0ZWQiLg0KPiANCj4gQWNrDQo+IA0KPj4NCj4+PiArwqDCoMKgwqDC
-oMKgwqAgZXhpdChFWElUX0ZBSUxVUkUpOw0KPj4+ICvCoMKgwqAgfQ0KPj4NCj4+DQo+Pj4gKw0K
-Pj4+ICvCoMKgwqAgLyogVHJ5IHRvIGZpbGwgdmFsaWQgYnVmZmVyLiAqLw0KPj4+ICvCoMKgwqAg
-cmVzID0gcmVhZChmZCwgdmFsaWRfYnVmLCBidWZfc2l6ZSk7DQo+Pj4gK8KgwqDCoCBpZiAocmVz
-ICE9IGJ1Zl9zaXplKSB7DQo+Pj4gK8KgwqDCoMKgwqDCoMKgIHBlcnJvcigiaW52YWxpZCByZWFk
-IHJlc3VsdCBvZiAndmFsaWRfYnVmJyIpOw0KPj4NCj4+IEkgd291bGQgc3BsaXQgaW4gMiBjaGVj
-a3M6DQo+PiAtIChyZXMgPCAwKSB0aGVuIHVzZSBwZXJyb3IoKQ0KPj4gLSAocmVzICE9IGJ1Zl9z
-aXplKSB0aGVuIHVzZSBmcHJpbnRmKHN0ZGVyciwgLi4uKSBwcmludGluZyB0aGUgZXhwZWN0ZWQg
-wqAgYW5kIHJlY2VpdmVkIHJlc3VsdC4NCj4gDQo+IEFjaw0KPiANCj4+DQo+Pj4gK8KgwqDCoMKg
-wqDCoMKgIGV4aXQoRVhJVF9GQUlMVVJFKTsNCj4+PiArwqDCoMKgIH0NCj4+PiArDQo+Pj4gK8Kg
-wqDCoCBmb3IgKGkgPSAwOyBpIDwgYnVmX3NpemU7IGkrKykgew0KPj4+ICvCoMKgwqDCoMKgwqDC
-oCBpZiAodmFsaWRfYnVmW2ldICE9IEJVRl9QQVRURVJOXzIpIHsNCj4+PiArwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoCBwZXJyb3IoImludmFsaWQgcGF0dGVybiBmb3IgdmFsaWQgYnVmIik7DQo+Pg0K
-Pj4gZXJybm8gaXMgbm90IHNldCBoZXJlLCBiZXR0ZXIgdG8gdXNlIGZwcmludGYoc3RkZXJyLCAu
-Li4pDQo+IA0KPiBBY2sNCj4gDQo+Pg0KPj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGV4aXQo
-RVhJVF9GQUlMVVJFKTsNCj4+PiArwqDCoMKgwqDCoMKgwqAgfQ0KPj4+ICvCoMKgwqAgfQ0KPj4N
-Cj4+IFdoYXQgYWJvdXQgcmVwbGFjZSB0aGlzIGZvciB3aXRoIGEgbWVtY21wKCk/DQoNCm1lbWNt
-cCgpIHdpbGwgcmVxdWlyZSBzcGVjaWFsIGJ1ZmZlciB3aXRoIEJVRl9QQVRURVJOXzIgZGF0YSBh
-cw0Kc2Vjb25kIGFyZ3VtZW50LiBJIHRoaW5rICdpZigpJyBjb25kaXRpb24gaXMgYmV0dGVyIGhl
-cmUsIGFzIHdlDQpjb21wYXJlIGVhY2ggZWxlbWVudCBvZiBidWZmZXIgd2l0aCBzaW5nbGUgYnl0
-ZS4gQW55d2F5LCAnbWVtY21wKCknDQpkb2VzIHRoZSBzYW1lIHRoaW5ncyBpbnNpZGUgaXRzZWxm
-Lg0KDQo+IA0KPiBBY2sNCj4gDQo+Pg0KPj4+ICsNCj4+PiArDQo+Pj4gK8KgwqDCoCAvKiBVbm1h
-cCBidWZmZXJzLiAqLw0KPj4+ICvCoMKgwqAgbXVubWFwKGJyb2tlbl9idWYsIHBhZ2Vfc2l6ZSk7
-DQo+Pj4gK8KgwqDCoCBtdW5tYXAoYnJva2VuX2J1ZiArIHBhZ2Vfc2l6ZSAqIDIsIHBhZ2Vfc2l6
-ZSk7DQo+Pj4gK8KgwqDCoCBtdW5tYXAodmFsaWRfYnVmLCBidWZfc2l6ZSk7DQo+Pj4gK8KgwqDC
-oCBjbG9zZShmZCk7DQo+Pj4gK30NCj4+PiArDQo+Pj4gc3RhdGljIHN0cnVjdCB0ZXN0X2Nhc2Ug
-dGVzdF9jYXNlc1tdID0gew0KPj4+IMKgwqDCoMKgew0KPj4+IMKgwqDCoMKgwqDCoMKgIC5uYW1l
-ID0gIlNPQ0tfU1RSRUFNIGNvbm5lY3Rpb24gcmVzZXQiLA0KPj4+IEBAIC00ODAsNiArNTk2LDEx
-IEBAIHN0YXRpYyBzdHJ1Y3QgdGVzdF9jYXNlIHRlc3RfY2FzZXNbXSA9IHsNCj4+PiDCoMKgwqDC
-oMKgwqDCoCAucnVuX2NsaWVudCA9IHRlc3Rfc2VxcGFja2V0X3RpbWVvdXRfY2xpZW50LA0KPj4+
-IMKgwqDCoMKgwqDCoMKgIC5ydW5fc2VydmVyID0gdGVzdF9zZXFwYWNrZXRfdGltZW91dF9zZXJ2
-ZXIsDQo+Pj4gwqDCoMKgwqB9LA0KPj4+ICvCoMKgwqAgew0KPj4+ICvCoMKgwqDCoMKgwqDCoCAu
-bmFtZSA9ICJTT0NLX1NFUVBBQ0tFVCBpbnZhbGlkIHJlY2VpdmUgYnVmZmVyIiwNCj4+PiArwqDC
-oMKgwqDCoMKgwqAgLnJ1bl9jbGllbnQgPSB0ZXN0X3NlcXBhY2tldF9pbnZhbGlkX3JlY19idWZm
-ZXJfY2xpZW50LA0KPj4+ICvCoMKgwqDCoMKgwqDCoCAucnVuX3NlcnZlciA9IHRlc3Rfc2VxcGFj
-a2V0X2ludmFsaWRfcmVjX2J1ZmZlcl9zZXJ2ZXIsDQo+Pj4gK8KgwqDCoCB9LA0KPj4NCj4+DQo+
-PiBJcyB0aGlzIHRoZSByaWdodCBiZWhhdmlvcj8gSWYgcmVhZCgpIGZhaWxzIGJlY2F1c2UgdGhl
-IGJ1ZmZlciBpcyBpbnZhbGlkLCBkbyB3ZSB0aHJvdyBvdXQgdGhlIHdob2xlIHBhY2tldD8NCj4+
-DQo+PiBJIHdhcyBleHBlY3RpbmcgdGhlIHBhY2tldCBub3QgdG8gYmUgY29uc3VtZWQsIGhhdmUg
-eW91IHRyaWVkIEFGX1VOSVgsIGRvZXMgaXQgaGF2ZSB0aGUgc2FtZSBiZWhhdmlvcj8NCj4gDQo+
-IEkndmUganVzdCBjaGVja2VkIEFGX1VOSVggaW1wbGVtZW50YXRpb24gb2YgU0VRUEFDS0VUIHJl
-Y2VpdmUgaW4gbmV0L3VuaXgvYWZfdW5peC5jLiBTbywgaWYgJ3NrYl9jb3B5X2RhdGFncmFtX21z
-ZygpJw0KPiBmYWlscywgaXQgY2FsbHMgJ3NrYl9mcmVlX2RhdGFncmFtKCknLiBJIHRoaW5rIHRo
-aXMgbWVhbnMgdGhhdCB3aG9sZSBzayBidWZmIHdpbGwgYmUgZHJvcHBlZCwgYnV0IGFueXdheSwg
-aSdsbCBjaGVjaw0KPiB0aGlzIGJlaGF2aW91ciBpbiBwcmFjdGljZS4gU2VlICdfX3VuaXhfZGdy
-YW1fcmVjdm1zZygpJyBpbiBuZXQvdW5peC9hZl91bml4LmMuDQoNClNvIGkndmUgY2hlY2tlZCB0
-aGF0IGFzc3VtcHRpb24gZm9yIFNFUVBBQ0tFVCArIEFGX1VOSVg6IHdoZW4gdXNlciBwYXNzZXMg
-YnJva2VuIGJ1ZmZlciB0bw0KdGhlIGtlcm5lbChmb3IgZXhhbXBsZSB3aXRoIHVubWFwcGVkIHBh
-Z2UgaW4gdGhlIG1pZCksIHJlc3Qgb2YgbWVzc2FnZSB3aWxsIGJlIGRyb3BwZWQuIE5leHQNCnJl
-YWQgd2lsbCBuZXZlciBnZXQgdGFpbCBvZiB0aGUgZHJvcHBlZCBtZXNzYWdlLg0KDQo+IA0KPiAN
-Cj4+DQo+PiBUaGFua3MsDQo+PiBTdGVmYW5vDQo+Pg0KPiANCg0K
+On Tue, Mar 15, 2022 at 12:43:13PM +0000, Krasnov Arseniy Vladimirovich wrote:
+>On 15.03.2022 12:35, Arseniy Krasnov wrote:
+>> On 15.03.2022 11:36, Stefano Garzarella wrote:
+>>> On Fri, Mar 11, 2022 at 10:58:32AM +0000, Krasnov Arseniy Vladimirovich wrote:
+>>>> Add test where sender sends two message, each with own
+>>>> data pattern. Reader tries to read first to broken buffer:
+>>>> it has three pages size, but middle page is unmapped. Then,
+>>>> reader tries to read second message to valid buffer. Test
+>>>> checks, that uncopied part of first message was dropped
+>>>> and thus not copied as part of second message.
+>>>>
+>>>> Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+>>>> ---
+>>>> tools/testing/vsock/vsock_test.c | 121 +++++++++++++++++++++++++++++++
+>>>> 1 file changed, 121 insertions(+)
+>>>>
+>>>> diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+>>>> index aa2de27d0f77..686af712b4ad 100644
+>>>> --- a/tools/testing/vsock/vsock_test.c
+>>>> +++ b/tools/testing/vsock/vsock_test.c
+>>>> @@ -16,6 +16,7 @@
+>>>> #include <linux/kernel.h>
+>>>> #include <sys/types.h>
+>>>> #include <sys/socket.h>
+>>>> +#include <sys/mman.h>
+>>>>
+>>>> #include "timeout.h"
+>>>> #include "control.h"
+>>>> @@ -435,6 +436,121 @@ static void test_seqpacket_timeout_server(const struct test_opts *opts)
+>>>>     close(fd);
+>>>> }
+>>>>
+>>>> +#define BUF_PATTERN_1 'a'
+>>>> +#define BUF_PATTERN_2 'b'
+>>>> +
+>>>> +static void test_seqpacket_invalid_rec_buffer_client(const struct test_opts *opts)
+>>>> +{
+>>>> +    int fd;
+>>>> +    unsigned char *buf1;
+>>>> +    unsigned char *buf2;
+>>>> +    int buf_size = getpagesize() * 3;
+>>>> +
+>>>> +    fd = vsock_seqpacket_connect(opts->peer_cid, 1234);
+>>>> +    if (fd < 0) {
+>>>> +        perror("connect");
+>>>> +        exit(EXIT_FAILURE);
+>>>> +    }
+>>>> +
+>>>> +    buf1 = malloc(buf_size);
+>>>> +    if (buf1 == NULL) {
+>>>> +        perror("'malloc()' for 'buf1'");
+>>>> +        exit(EXIT_FAILURE);
+>>>> +    }
+>>>> +
+>>>> +    buf2 = malloc(buf_size);
+>>>> +    if (buf2 == NULL) {
+>>>> +        perror("'malloc()' for 'buf2'");
+>>>> +        exit(EXIT_FAILURE);
+>>>> +    }
+>>>> +
+>>>> +    memset(buf1, BUF_PATTERN_1, buf_size);
+>>>> +    memset(buf2, BUF_PATTERN_2, buf_size);
+>>>> +
+>>>> +    if (send(fd, buf1, buf_size, 0) != buf_size) {
+>>>> +        perror("send failed");
+>>>> +        exit(EXIT_FAILURE);
+>>>> +    }
+>>>> +
+>>>> +    if (send(fd, buf2, buf_size, 0) != buf_size) {
+>>>> +        perror("send failed");
+>>>> +        exit(EXIT_FAILURE);
+>>>> +    }
+>>>> +
+>>>> +    close(fd);
+>>>> +}
+>>>> +
+>>>> +static void test_seqpacket_invalid_rec_buffer_server(const struct test_opts *opts)
+>>>> +{
+>>>> +    int fd;
+>>>> +    unsigned char *broken_buf;
+>>>> +    unsigned char *valid_buf;
+>>>> +    int page_size = getpagesize();
+>>>> +    int buf_size = page_size * 3;
+>>>> +    ssize_t res;
+>>>> +    int prot = PROT_READ | PROT_WRITE;
+>>>> +    int flags = MAP_PRIVATE | MAP_ANONYMOUS;
+>>>> +    int i;
+>>>> +
+>>>> +    fd = vsock_seqpacket_accept(VMADDR_CID_ANY, 1234, NULL);
+>>>> +    if (fd < 0) {
+>>>> +        perror("accept");
+>>>> +        exit(EXIT_FAILURE);
+>>>> +    }
+>>>> +
+>>>> +    /* Setup first buffer. */
+>>>> +    broken_buf = mmap(NULL, buf_size, prot, flags, -1, 0);
+>>>> +    if (broken_buf == MAP_FAILED) {
+>>>> +        perror("mmap for 'broken_buf'");
+>>>> +        exit(EXIT_FAILURE);
+>>>> +    }
+>>>> +
+>>>> +    /* Unmap "hole" in buffer. */
+>>>> +    if (munmap(broken_buf + page_size, page_size)) {
+>>>> +        perror("'broken_buf' setup");
+>>>> +        exit(EXIT_FAILURE);
+>>>> +    }
+>>>> +
+>>>> +    valid_buf = mmap(NULL, buf_size, prot, flags, -1, 0);
+>>>> +    if (valid_buf == MAP_FAILED) {
+>>>> +        perror("mmap for 'valid_buf'");
+>>>> +        exit(EXIT_FAILURE);
+>>>> +    }
+>>>> +
+>>>> +    /* Try to fill buffer with unmapped middle. */
+>>>> +    res = read(fd, broken_buf, buf_size);
+>>>> +    if (res != -1) {
+>>>> +        perror("invalid read result of 'broken_buf'");
+>>>
+>>> if `res` is valid, errno is not set, better to use fprintf(stderr, ...) printing the expected and received result.
+>>> Take a look at test_stream_connection_reset()
+>>
+>> Ack, fix it in v2
+>>
+>>>
+>>>> +        exit(EXIT_FAILURE);
+>>>> +    }
+>>>> +
+>>>> +    if (errno != ENOMEM) {
+>>>> +        perror("invalid errno of 'broken_buf'");
+>>>
+>>> Instead of "invalid", I would say "unexpected".
+>>
+>> Ack
+>>
+>>>
+>>>> +        exit(EXIT_FAILURE);
+>>>> +    }
+>>>
+>>>
+>>>> +
+>>>> +    /* Try to fill valid buffer. */
+>>>> +    res = read(fd, valid_buf, buf_size);
+>>>> +    if (res != buf_size) {
+>>>> +        perror("invalid read result of 'valid_buf'");
+>>>
+>>> I would split in 2 checks:
+>>> - (res < 0) then use perror()
+>>> - (res != buf_size) then use fprintf(stderr, ...) printing the expected   and received result.
+>>
+>> Ack
+>>
+>>>
+>>>> +        exit(EXIT_FAILURE);
+>>>> +    }
+>>>> +
+>>>> +    for (i = 0; i < buf_size; i++) {
+>>>> +        if (valid_buf[i] != BUF_PATTERN_2) {
+>>>> +            perror("invalid pattern for valid buf");
+>>>
+>>> errno is not set here, better to use fprintf(stderr, ...)
+>>
+>> Ack
+>>
+>>>
+>>>> +            exit(EXIT_FAILURE);
+>>>> +        }
+>>>> +    }
+>>>
+>>> What about replace this for with a memcmp()?
+>
+>memcmp() will require special buffer with BUF_PATTERN_2 data as
+>second argument. I think 'if()' condition is better here, as we
+>compare each element of buffer with single byte. Anyway, 'memcmp()'
+>does the same things inside itself.
+
+Ah, I see. Okay, I agree on for()/if(), maybe we can also print more 
+info (index, expected value, current value).
+
+>
+>>
+>> Ack
+>>
+>>>
+>>>> +
+>>>> +
+>>>> +    /* Unmap buffers. */
+>>>> +    munmap(broken_buf, page_size);
+>>>> +    munmap(broken_buf + page_size * 2, page_size);
+>>>> +    munmap(valid_buf, buf_size);
+>>>> +    close(fd);
+>>>> +}
+>>>> +
+>>>> static struct test_case test_cases[] = {
+>>>>     {
+>>>>         .name = "SOCK_STREAM connection reset",
+>>>> @@ -480,6 +596,11 @@ static struct test_case test_cases[] = {
+>>>>         .run_client = test_seqpacket_timeout_client,
+>>>>         .run_server = test_seqpacket_timeout_server,
+>>>>     },
+>>>> +    {
+>>>> +        .name = "SOCK_SEQPACKET invalid receive buffer",
+>>>> +        .run_client = test_seqpacket_invalid_rec_buffer_client,
+>>>> +        .run_server = test_seqpacket_invalid_rec_buffer_server,
+>>>> +    },
+>>>
+>>>
+>>> Is this the right behavior? If read() fails because the buffer is invalid, do we throw out the whole packet?
+>>>
+>>> I was expecting the packet not to be consumed, have you tried AF_UNIX, does it have the same behavior?
+>>
+>> I've just checked AF_UNIX implementation of SEQPACKET receive in net/unix/af_unix.c. So, if 'skb_copy_datagram_msg()'
+>> fails, it calls 'skb_free_datagram()'. I think this means that whole sk buff will be dropped, but anyway, i'll check
+>> this behaviour in practice. See '__unix_dgram_recvmsg()' in net/unix/af_unix.c.
+>
+>So i've checked that assumption for SEQPACKET + AF_UNIX: when user passes broken buffer to
+>the kernel(for example with unmapped page in the mid), rest of message will be dropped. Next
+>read will never get tail of the dropped message.
+
+Thanks for checking, so it seems the same behaviour.
+Let's go ahead with this test :-)
+
+Stefano
+
