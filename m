@@ -2,108 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6BB1E4D98F1
-	for <lists+kvm@lfdr.de>; Tue, 15 Mar 2022 11:39:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1F2744D99A1
+	for <lists+kvm@lfdr.de>; Tue, 15 Mar 2022 11:52:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233588AbiCOKki (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Mar 2022 06:40:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49284 "EHLO
+        id S1347697AbiCOKwC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Mar 2022 06:52:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51564 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245566AbiCOKkg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Mar 2022 06:40:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8FCC14F9EB
-        for <kvm@vger.kernel.org>; Tue, 15 Mar 2022 03:39:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647340763;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=kJDd/9JiDZbTHZohyZFbEtBTCygNnRdmmrmfy8MFg0M=;
-        b=SNrc0B7LfQET7HJElrLhlhklWn3/m126GaZV1xU2K1WinqUGy2QgUbrj2rYoqtg86TzXjW
-        YFjOGiSXRwwpw1YAJS2cdJh79LrXai3wFKUZ3HFlB6KAVbx1lM1MJNPBQTKwnl+GYKVrqK
-        rEPPDitgjWmsZbmERBL0Bo1YH+iqWYA=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-362-ZPc3LiGlPWWYjSIH3y7j6w-1; Tue, 15 Mar 2022 06:39:22 -0400
-X-MC-Unique: ZPc3LiGlPWWYjSIH3y7j6w-1
-Received: by mail-pj1-f70.google.com with SMTP id ge20-20020a17090b0e1400b001c64f568305so129827pjb.8
-        for <kvm@vger.kernel.org>; Tue, 15 Mar 2022 03:39:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=kJDd/9JiDZbTHZohyZFbEtBTCygNnRdmmrmfy8MFg0M=;
-        b=GItIpSKPOysYHEjKJr6iVoD9BFEWzOmSsuLmUy4N60ITyqtkISfNKweXsg78r9n5yO
-         tuu+1OksqNFiXLBJH33sNikDd5W3j/ob8/K2BV1s8xIWYhLYzde9LVKE4q7lyYE2UO/S
-         Rqn4dVPMbtJHvZfaDCZJbaEPEEYmdnD6Cy0pBbht7W8uWFJrRiZDB1CZKizp1357d5rw
-         BYzLHKX1ditzpe3d47tCud1pFtrKsSjcU4qGnLg/YgRHO2cHDXLVs2HF1WtAy93SFB0W
-         xog2TqyzCfJ0VGWJeA/RQ5p9k+kGeDJXh5WzqWfiz44BDoHn+deYU/UI/zAUQa51stM1
-         uf9w==
-X-Gm-Message-State: AOAM5317lfVz2zeKpjFKr5IMv5QX3lyUpNykqBPhU3rt3mQ+cnr1EgVU
-        a0SuNU61HnvFwV5Gl5NuWfNxNCGvEmK3T2Jlcs3QZUAQHlJRbc/3Yu48hUW9Qy0gzSAQETwbcRq
-        TWQKVgDNimqdH
-X-Received: by 2002:a05:6a00:140f:b0:4e0:6995:9c48 with SMTP id l15-20020a056a00140f00b004e069959c48mr27468840pfu.59.1647340760977;
-        Tue, 15 Mar 2022 03:39:20 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwSfNOcUi9xy2ekJmnOxedBPrTrKX0N/yrTIaL/Gy94SQN4Gb5kFP9OF6Ce9WSip5I+m8Q7zA==
-X-Received: by 2002:a05:6a00:140f:b0:4e0:6995:9c48 with SMTP id l15-20020a056a00140f00b004e069959c48mr27468818pfu.59.1647340760732;
-        Tue, 15 Mar 2022 03:39:20 -0700 (PDT)
-Received: from xz-m1.local ([191.101.132.43])
-        by smtp.gmail.com with ESMTPSA id q2-20020a056a00150200b004f8d80ced3csm4351131pfu.40.2022.03.15.03.39.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Mar 2022 03:39:20 -0700 (PDT)
-Date:   Tue, 15 Mar 2022 18:39:11 +0800
-From:   Peter Xu <peterx@redhat.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Sean Christopherson <seanjc@google.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Ben Gardon <bgardon@google.com>, maciej.szmigiero@oracle.com,
-        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
-        <kvmarm@lists.cs.columbia.edu>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <linux-mips@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <kvm@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>
-Subject: Re: [PATCH v2 15/26] KVM: x86/mmu: Update page stats in __rmap_add()
-Message-ID: <YjBsz/V7FLsNkNh3@xz-m1.local>
-References: <20220311002528.2230172-1-dmatlack@google.com>
- <20220311002528.2230172-16-dmatlack@google.com>
+        with ESMTP id S1347643AbiCOKvz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Mar 2022 06:51:55 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id EEDDC3BA4A;
+        Tue, 15 Mar 2022 03:49:11 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 945BE1474;
+        Tue, 15 Mar 2022 03:49:11 -0700 (PDT)
+Received: from [10.57.42.204] (unknown [10.57.42.204])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1B3C03F66F;
+        Tue, 15 Mar 2022 03:49:06 -0700 (PDT)
+Message-ID: <a9637631-c23b-4158-d2cb-597a36b09a6b@arm.com>
+Date:   Tue, 15 Mar 2022 10:49:02 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20220311002528.2230172-16-dmatlack@google.com>
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.2
+Subject: Re: [PATCH v4 14/32] iommu: introduce iommu_domain_alloc_type and the
+ KVM type
+Content-Language: en-GB
+To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     kvm@vger.kernel.org, david@redhat.com, thuth@redhat.com,
+        linux-kernel@vger.kernel.org, vneethv@linux.ibm.com,
+        agordeev@linux.ibm.com, imbrenda@linux.ibm.com, will@kernel.org,
+        frankja@linux.ibm.com, corbet@lwn.net, linux-doc@vger.kernel.org,
+        pasic@linux.ibm.com, jgg@nvidia.com, gerald.schaefer@linux.ibm.com,
+        borntraeger@linux.ibm.com, farman@linux.ibm.com, gor@linux.ibm.com,
+        schnelle@linux.ibm.com, hca@linux.ibm.com,
+        alex.williamson@redhat.com, freude@linux.ibm.com,
+        pmorel@linux.ibm.com, cohuck@redhat.com, oberpar@linux.ibm.com,
+        iommu@lists.linux-foundation.org, svens@linux.ibm.com,
+        pbonzini@redhat.com,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>
+References: <20220314194451.58266-1-mjrosato@linux.ibm.com>
+ <20220314194451.58266-15-mjrosato@linux.ibm.com>
+From:   Robin Murphy <robin.murphy@arm.com>
+In-Reply-To: <20220314194451.58266-15-mjrosato@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 11, 2022 at 12:25:17AM +0000, David Matlack wrote:
-> Update the page stats in __rmap_add() rather than at the call site. This
-> will avoid having to manually update page stats when splitting huge
-> pages in a subsequent commit.
+On 2022-03-14 19:44, Matthew Rosato wrote:
+> s390x will introduce an additional domain type that is used for
+> managing IOMMU owned by KVM.  Define the type here and add an
+> interface for allocating a specified type vs the default type.
+
+I'm also not a huge fan of adding a new domain_alloc interface like 
+this, however if it is justifiable, then please make it take struct 
+device rather than struct bus_type as an argument.
+
+It also sounds like there may be a degree of conceptual overlap here 
+with what Jean-Philippe is working on for sharing pagetables between KVM 
+and SMMU for Android pKVM, so it's probably worth some thought over 
+whether there's any scope for common interfaces in terms of actual 
+implementation.
+
+Thanks,
+Robin.
+
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> ---
+>   drivers/iommu/iommu.c |  7 +++++++
+>   include/linux/iommu.h | 12 ++++++++++++
+>   2 files changed, 19 insertions(+)
 > 
-> No functional change intended.
-> 
-> Reviewed-by: Ben Gardon <bgardon@google.com>
-> Signed-off-by: David Matlack <dmatlack@google.com>
-
-Reviewed-by: Peter Xu <peterx@redhat.com>
-
--- 
-Peter Xu
-
+> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> index f2c45b85b9fc..8bb57e0e3945 100644
+> --- a/drivers/iommu/iommu.c
+> +++ b/drivers/iommu/iommu.c
+> @@ -1976,6 +1976,13 @@ void iommu_domain_free(struct iommu_domain *domain)
+>   }
+>   EXPORT_SYMBOL_GPL(iommu_domain_free);
+>   
+> +struct iommu_domain *iommu_domain_alloc_type(struct bus_type *bus,
+> +					     unsigned int t)
+> +{
+> +	return __iommu_domain_alloc(bus, t);
+> +}
+> +EXPORT_SYMBOL_GPL(iommu_domain_alloc_type);
+> +
+>   static int __iommu_attach_device(struct iommu_domain *domain,
+>   				 struct device *dev)
+>   {
+> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+> index 9208eca4b0d1..b427bbb9f387 100644
+> --- a/include/linux/iommu.h
+> +++ b/include/linux/iommu.h
+> @@ -63,6 +63,7 @@ struct iommu_domain_geometry {
+>   					      implementation              */
+>   #define __IOMMU_DOMAIN_PT	(1U << 2)  /* Domain is identity mapped   */
+>   #define __IOMMU_DOMAIN_DMA_FQ	(1U << 3)  /* DMA-API uses flush queue    */
+> +#define __IOMMU_DOMAIN_KVM	(1U << 4)  /* Domain is controlled by KVM */
+>   
+>   /*
+>    * This are the possible domain-types
+> @@ -77,6 +78,7 @@ struct iommu_domain_geometry {
+>    *				  certain optimizations for these domains
+>    *	IOMMU_DOMAIN_DMA_FQ	- As above, but definitely using batched TLB
+>    *				  invalidation.
+> + *	IOMMU_DOMAIN_KVM	- DMA mappings managed by KVM, used for VMs
+>    */
+>   #define IOMMU_DOMAIN_BLOCKED	(0U)
+>   #define IOMMU_DOMAIN_IDENTITY	(__IOMMU_DOMAIN_PT)
+> @@ -86,6 +88,8 @@ struct iommu_domain_geometry {
+>   #define IOMMU_DOMAIN_DMA_FQ	(__IOMMU_DOMAIN_PAGING |	\
+>   				 __IOMMU_DOMAIN_DMA_API |	\
+>   				 __IOMMU_DOMAIN_DMA_FQ)
+> +#define IOMMU_DOMAIN_KVM	(__IOMMU_DOMAIN_PAGING |	\
+> +				 __IOMMU_DOMAIN_KVM)
+>   
+>   struct iommu_domain {
+>   	unsigned type;
+> @@ -421,6 +425,8 @@ extern bool iommu_capable(struct bus_type *bus, enum iommu_cap cap);
+>   extern struct iommu_domain *iommu_domain_alloc(struct bus_type *bus);
+>   extern struct iommu_group *iommu_group_get_by_id(int id);
+>   extern void iommu_domain_free(struct iommu_domain *domain);
+> +extern struct iommu_domain *iommu_domain_alloc_type(struct bus_type *bus,
+> +						    unsigned int t);
+>   extern int iommu_attach_device(struct iommu_domain *domain,
+>   			       struct device *dev);
+>   extern void iommu_detach_device(struct iommu_domain *domain,
+> @@ -708,6 +714,12 @@ static inline void iommu_domain_free(struct iommu_domain *domain)
+>   {
+>   }
+>   
+> +static inline struct iommu_domain *iommu_domain_alloc_type(struct bus_type *bus,
+> +							   unsigned int t)
+> +{
+> +	return NULL;
+> +}
+> +
+>   static inline int iommu_attach_device(struct iommu_domain *domain,
+>   				      struct device *dev)
+>   {
