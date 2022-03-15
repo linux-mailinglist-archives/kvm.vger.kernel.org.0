@@ -2,98 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 724A34D99D8
-	for <lists+kvm@lfdr.de>; Tue, 15 Mar 2022 12:01:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9AF144D9AA3
+	for <lists+kvm@lfdr.de>; Tue, 15 Mar 2022 12:49:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347764AbiCOLCo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Mar 2022 07:02:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47400 "EHLO
+        id S1348032AbiCOLut (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Mar 2022 07:50:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40738 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237136AbiCOLCn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Mar 2022 07:02:43 -0400
-Received: from mail.sberdevices.ru (mail.sberdevices.ru [45.89.227.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BFC54348C;
-        Tue, 15 Mar 2022 04:01:29 -0700 (PDT)
-Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
-        by mail.sberdevices.ru (Postfix) with ESMTP id 88F165FD02;
-        Tue, 15 Mar 2022 14:01:26 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1647342086;
-        bh=RW5IjNKHFJtjqsH4ITCzR2lYLoB/q/SCRxVZYrFoF2M=;
-        h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version;
-        b=muk+0uigRIiMIRqEOQ2SYbS71/y0+PA7hbtudQIn3xYGeSHuKLRplpsW70W4IbNl7
-         l7oxHA9vTTgKM6GJMg703xMSkaiyc6d8cWEjnwcLkYVUxYAl3wMa5Spbbd3m56jALy
-         2lt8fEI1vQxzBno8Uyl0RHXUS6pqUghnEO5CSPdlytIkIRIuAHMGYTvMIQdc4LNkK9
-         ghXaaMQ+uP7G36xYl/WO37ZBHnE0rWmFRg8GvPsyycv1d0eKPDVNpNS6iySZAMwML7
-         p1KwCGkopfnevYJw36OQ74qLhtiF1/lQr160pV5AsyRVti3GkMCZHx3qi+Oh135p9e
-         G5uzIoZc4q/pQ==
-Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
-        by mail.sberdevices.ru (Postfix) with ESMTP;
-        Tue, 15 Mar 2022 14:01:20 +0300 (MSK)
-From:   Krasnov Arseniy Vladimirovich <AVKrasnov@sberdevices.ru>
-To:     Stefano Garzarella <sgarzare@redhat.com>
-CC:     Krasnov Arseniy <oxffffaa@gmail.com>,
+        with ESMTP id S1348016AbiCOLur (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Mar 2022 07:50:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 36399506EA
+        for <kvm@vger.kernel.org>; Tue, 15 Mar 2022 04:49:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1647344975;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=PterqoyvBh+msSA0i+V9VnnV0+IT1msM0OrO0D3B12Q=;
+        b=KnBZGG80EsS9R4FoQfzywwUmjAcrZKQC+XeQKGFvgZn3+1sYE0FBzK3yZoFAoQ3/60nhQw
+        d3Wkwsx1vJPKhtsfRVt1tF2f71JgzaGN3MkyplS1s3ojBEw5kD6HSiQGpNWX5SMLRHkseS
+        hLAPx0odJMucyrq+jxJumtPkjykrT6Y=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-616-B3BDa9a6Pn-f5LpokbE_Mw-1; Tue, 15 Mar 2022 07:49:33 -0400
+X-MC-Unique: B3BDa9a6Pn-f5LpokbE_Mw-1
+Received: by mail-qv1-f69.google.com with SMTP id 33-20020a0c8024000000b0043d17ffb0bdso9147680qva.18
+        for <kvm@vger.kernel.org>; Tue, 15 Mar 2022 04:49:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=PterqoyvBh+msSA0i+V9VnnV0+IT1msM0OrO0D3B12Q=;
+        b=J+CeNAgOc4pKB+AVAH9HM5hGxnDEqSyYNFDLdhz+mPptltmhTMOjQsEACcSKxXWJSu
+         QofQVEYKEW+SkjuPkVwQaStFra8mg7l2KVvr7J2cSXoyijhQEfDEl1CLSVtcZfcOwQs+
+         JYK26c5LTV1MhyhdL8sqIlaUACohmeotW0om3M+/sRdoyjQhZm5+65BOzI1PaO7vVUeJ
+         Z5v4mkV5KtPs7aECbZPyS5U1wPltR78zShJanZb2BwS17sj69kWLCqDEeqQsFmG1PUYw
+         pcKFwjnAH7qMHx5j8WHxx9Qp0uwOHM0wqM3jZ6HWgEdwPmB9td5XtOgGXCkgSU8LtfQE
+         I1Aw==
+X-Gm-Message-State: AOAM533JK4l7S75Jng8rUWdPn8msdaP4EoOU0/LFeCS5mXWy7wFprLs0
+        vNFNOM2l3kbaLxFNQcIVLz4zEovNlHY1u7Teg+ua0zRQwV9bB/oGRXyw6wCe9bfXUrOMMMG5MxE
+        fvcFlcMwgAzlY
+X-Received: by 2002:a05:620a:284d:b0:5ff:320d:c0a5 with SMTP id h13-20020a05620a284d00b005ff320dc0a5mr17984061qkp.681.1647344972639;
+        Tue, 15 Mar 2022 04:49:32 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwlVn8tnyxlBYGoPjGDSTQP/ITXgasxjqs34flNZkJRFrJ4Au6tkURG5Do6GTqcbi4TFZ7ZTQ==
+X-Received: by 2002:a05:620a:284d:b0:5ff:320d:c0a5 with SMTP id h13-20020a05620a284d00b005ff320dc0a5mr17984052qkp.681.1647344972385;
+        Tue, 15 Mar 2022 04:49:32 -0700 (PDT)
+Received: from sgarzare-redhat (host-212-171-187-184.pool212171.interbusiness.it. [212.171.187.184])
+        by smtp.gmail.com with ESMTPSA id s12-20020a05622a018c00b002e1cd88645dsm5305032qtw.74.2022.03.15.04.49.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Mar 2022 04:49:31 -0700 (PDT)
+Date:   Tue, 15 Mar 2022 12:49:24 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Krasnov Arseniy Vladimirovich <AVKrasnov@sberdevices.ru>
+Cc:     Krasnov Arseniy <oxffffaa@gmail.com>,
         Rokosov Dmitry Dmitrievich <DDRokosov@sberdevices.ru>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "virtualization@lists.linux-foundation.org" 
         <virtualization@lists.linux-foundation.org>,
         "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC PATCH v1 1/3] af_vsock: add two new tests for SOCK_SEQPACKET
-Thread-Topic: [RFC PATCH v1 1/3] af_vsock: add two new tests for
- SOCK_SEQPACKET
-Thread-Index: AQHYNTYb8Fo8I4zas06sN3idOLyY0qy/9J+AgAAmooA=
-Date:   Tue, 15 Mar 2022 11:00:35 +0000
-Message-ID: <74154bf9-06c9-5072-af60-38819ff01fe3@sberdevices.ru>
+Subject: Re: [RFC PATCH v1 3/3] af_vsock: SOCK_SEQPACKET broken buffer test
+Message-ID: <20220315114924.er65xwzw6mg3zp6t@sgarzare-redhat>
 References: <1bb5ce91-da53-7de9-49ba-f49f76f45512@sberdevices.ru>
- <20220315084257.lbrbsilpndswv3zy@sgarzare-redhat>
-In-Reply-To: <20220315084257.lbrbsilpndswv3zy@sgarzare-redhat>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.16.1.12]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <E15ECCD410AEC24DAC43049E86EA6EAE@sberdevices.ru>
-Content-Transfer-Encoding: base64
+ <bc309cf9-5bcf-b645-577f-8e5b0cf6f220@sberdevices.ru>
+ <20220315083617.n33naazzf3se4ozo@sgarzare-redhat>
+ <b452aeac-9628-5e37-e0e6-d33f8bb47b22@sberdevices.ru>
 MIME-Version: 1.0
-X-KSMG-Rule-ID: 4
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Status: not scanned, disabled by settings
-X-KSMG-AntiSpam-Interceptor-Info: not scanned
-X-KSMG-AntiPhishing: not scanned, disabled by settings
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2022/03/15 06:52:00 #18973197
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <b452aeac-9628-5e37-e0e6-d33f8bb47b22@sberdevices.ru>
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gMTUuMDMuMjAyMiAxMTo0MiwgU3RlZmFubyBHYXJ6YXJlbGxhIHdyb3RlOg0KPiBIaSBBcnNl
-bml5LA0KPiANCj4gT24gRnJpLCBNYXIgMTEsIDIwMjIgYXQgMTA6NTI6MzZBTSArMDAwMCwgS3Jh
-c25vdiBBcnNlbml5IFZsYWRpbWlyb3ZpY2ggd3JvdGU6DQo+PiBUaGlzIGFkZHMgdHdvIHRlc3Rz
-OiBmb3IgcmVjZWl2ZSB0aW1lb3V0IGFuZCByZWFkaW5nIHRvIGludmFsaWQNCj4+IGJ1ZmZlciBw
-cm92aWRlZCBieSB1c2VyLiBJIGZvcmdvdCB0byBwdXQgYm90aCBwYXRjaGVzIHRvIG1haW4NCj4+
-IHBhdGNoc2V0Lg0KPj4NCj4+IEFyc2VuaXkgS3Jhc25vdigyKToNCj4+DQo+PiBhZl92c29jazog
-U09DS19TRVFQQUNLRVQgcmVjZWl2ZSB0aW1lb3V0IHRlc3QNCj4+IGFmX3Zzb2NrOiBTT0NLX1NF
-UVBBQ0tFVCBicm9rZW4gYnVmZmVyIHRlc3QNCj4+DQo+PiB0b29scy90ZXN0aW5nL3Zzb2NrL3Zz
-b2NrX3Rlc3QuYyB8IDE3MCArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysN
-Cj4+IDEgZmlsZSBjaGFuZ2VkLCAxNzAgaW5zZXJ0aW9ucygrKQ0KPiANCj4gVGhhbmsgeW91IGZv
-ciB0aGVzZSB0ZXN0cyENCg0KR3JlYXQhIFRoYW5rIFlvdQ0KDQo+IA0KPiBJIGxlZnQgYSBmZXcg
-Y29tbWVudHMgYW5kIEknbSBub3Qgc3VyZSBhYm91dCB0aGUgJ2Jyb2tlbiBidWZmZXIgdGVzdCcg
-YmVoYXZpb3IuDQoNCkFjaw0KDQo+IA0KPiBBYm91dCB0aGUgc2VyaWVzLCBpdCBzb3VuZHMgbGlr
-ZSBzb21ldGhpbmcgaXMgd3Jvbmcgd2l0aCB5b3VyIHNldHVwLCB1c3VhbGx5IHRoZSBjb3ZlciBs
-ZXR0ZXIgaXMgInBhdGNoIiAwLiBJbiB0aGlzIGNhc2UgSSB3b3VsZCBoYXZlIGV4cGVjdGVkOg0K
-PiANCj4gwqDCoMKgIFswLzJdIGFmX3Zzb2NrOiBhZGQgdHdvIG5ldyB0ZXN0cyBmb3IgU09DS19T
-RVFQQUNLRVQNCj4gwqDCoMKgIFsxLzJdIGFmX3Zzb2NrOiBTT0NLX1NFUVBBQ0tFVCByZWNlaXZl
-IHRpbWVvdXQgdGVzdA0KPiDCoMKgwqAgWzIvMl0gYWZfdnNvY2s6IFNPQ0tfU0VRUEFDS0VUIGJy
-b2tlbiBidWZmZXIgdGVzdA0KDQpBY2sNCg0KPiANCj4gQXJlIHlvdSB1c2luZyBgZ2l0IHNlbmQt
-ZW1haWxgIG9yIGBnaXQgcHVibGlzaGA/DQo+IA0KDQpJJ20gdXNpbmcgdGh1bmRlcmJpcmQgdG8g
-c2VuZCBwYXRjaGVzPjwsIGJlY2F1c2Ugd2UgZG9uJ3QgaGF2ZSBTTVRQIHNlcnZlcihleGNoYW5n
-ZSBvbmx5KS4gDQoNCj4gDQo+IFdoZW4geW91IHdpbGwgcmVtb3ZlIHRoZSBSRkMsIHBsZWFzZSBh
-ZGQgYG5ldC1uZXh0YCBsYWJlbDoNCj4gW1BBVENIIG5ldC1uZXh0IDAvMl0sIGV0Yy4uDQo+IA0K
-PiBUaGFua3MsDQo+IFN0ZWZhbm8NCj4gDQoNCg==
+On Tue, Mar 15, 2022 at 09:34:35AM +0000, Krasnov Arseniy Vladimirovich 
+wrote:
+>On 15.03.2022 11:36, Stefano Garzarella wrote:
+>>
+>> Is this the right behavior? If read() fails because the buffer is invalid, do we throw out the whole packet?
+>>
+>> I was expecting the packet not to be consumed, have you tried AF_UNIX, does it have the same behavior?
+>
+>I've just checked AF_UNIX implementation of SEQPACKET receive in net/unix/af_unix.c. So, if 'skb_copy_datagram_msg()'
+>fails, it calls 'skb_free_datagram()'. I think this means that whole sk buff will be dropped, but anyway, i'll check
+>this behaviour in practice. See '__unix_dgram_recvmsg()' in net/unix/af_unix.c.
+>
+
+Yep. you are right it seems to be discarded but I don't know that
+code very well, so better to test as you said ;-)
+
+Thanks,
+Stefano
+
