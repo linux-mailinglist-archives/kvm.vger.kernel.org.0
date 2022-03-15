@@ -2,202 +2,254 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 904194DA128
-	for <lists+kvm@lfdr.de>; Tue, 15 Mar 2022 18:30:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 26A5A4DA12E
+	for <lists+kvm@lfdr.de>; Tue, 15 Mar 2022 18:30:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345617AbiCORbX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Mar 2022 13:31:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33786 "EHLO
+        id S1350584AbiCORcC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Mar 2022 13:32:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34476 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349378AbiCORbW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Mar 2022 13:31:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8A21D56C01
-        for <kvm@vger.kernel.org>; Tue, 15 Mar 2022 10:30:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647365408;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=pz5UPpl4j3XPTUhZRFMRyVJBOf0cLUBPAWfU9mPDU+A=;
-        b=IkYLu4/4/nSJ7hRtLeTiRgOyNRbDh4ap53hwB3A2rsTJs1YR4zW9lotaID9vhze98uDmdA
-        2v+oBa+gX+DtLScM3HMzCgi4pAvEdizTkwUx43BeSYEmxYQsU1+9UXSO1S+8YwdEs0nYFk
-        vs382KrOHhCda7ZaxGxK8LeUmAkCJ8E=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-428-7kaFxLv5PjGJpW9ea0qqLg-1; Tue, 15 Mar 2022 13:30:03 -0400
-X-MC-Unique: 7kaFxLv5PjGJpW9ea0qqLg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S236042AbiCORcB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Mar 2022 13:32:01 -0400
+Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D1B156771;
+        Tue, 15 Mar 2022 10:30:47 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AA896106655A;
-        Tue, 15 Mar 2022 17:30:02 +0000 (UTC)
-Received: from [172.30.41.16] (unknown [10.2.17.101])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7309330B80;
-        Tue, 15 Mar 2022 17:29:57 +0000 (UTC)
-Subject: [PATCH v4] vfio-pci: Provide reviewers and acceptance criteria for
- variant drivers
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     alex.williamson@redhat.com, kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, jgg@nvidia.com,
-        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
-        yishaih@nvidia.com, linux-doc@vger.kernel.org, corbet@lwn.net,
-        hch@infradead.org
-Date:   Tue, 15 Mar 2022 11:29:57 -0600
-Message-ID: <164736509088.181560.2887686123582116702.stgit@omen>
-User-Agent: StGit/1.0-8-g6af9-dirty
+        by sin.source.kernel.org (Postfix) with ESMTPS id 878D5CE1C2F;
+        Tue, 15 Mar 2022 17:30:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C02BBC340F5;
+        Tue, 15 Mar 2022 17:30:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1647365444;
+        bh=MKZ1FBnWhRw3+Onsjj47uEyG6R09YKLOHaysX/LnFdg=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:From;
+        b=N+OqYB7MuOEUBiVT15o4Tr0iC3sYRIHqOphPQKOZFhJo/8Ltw4R/8ViEAwJTfKaty
+         6C9gCzkdb+GHTqTamqskahfWgxxIXqVXHwS8mNyJ/DGjgSCOWY5QyhIznRcAfP1Cx8
+         ZlL/ATSy7Atr/ZdNyxdLFUAG3O7gqrCnDvCSsnyyQcyfuVpd8v0wxf1sSq6uZJMVu0
+         PwsnDSmmWqLHUAkiNhpCIu+/Y1KCO04K+A0GQyVMwVmtwHoda9MbheUDPkDghaaKzf
+         50G3n+EHMJRiIamf4mcgVxBdZo4dHMM9nop2CrjHkXmxq658zxaFALxVHr55mt9J5r
+         Sscw74nS/6mPw==
+Date:   Tue, 15 Mar 2022 12:30:42 -0500
+From:   Bjorn Helgaas <helgaas@kernel.org>
+To:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-pci@vger.kernel.org,
+        alex.williamson@redhat.com, jgg@nvidia.com, cohuck@redhat.com,
+        mgurtovoy@nvidia.com, yishaih@nvidia.com, kevin.tian@intel.com,
+        linuxarm@huawei.com, liulongfang@huawei.com,
+        prime.zeng@hisilicon.com, jonathan.cameron@huawei.com,
+        wangzhou1@hisilicon.com, Bjorn Helgaas <bhelgaas@google.com>
+Subject: Re: [PATCH v9 3/9] hisi_acc_qm: Move VF PCI device IDs to common
+ header
+Message-ID: <20220315173042.GA636129@bhelgaas>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220308184902.2242-4-shameerali.kolothum.thodi@huawei.com>
+X-Spam-Status: No, score=-8.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Device specific extensions for devices exposed to userspace through
-the vfio-pci-core library open both new functionality and new risks.
-Here we attempt to provided formalized requirements and expectations
-to ensure that future drivers both collaborate in their interaction
-with existing host drivers, as well as receive additional reviews
-from community members with experience in this area.
+On Tue, Mar 08, 2022 at 06:48:56PM +0000, Shameer Kolothum wrote:
+> Move the PCI Device IDs of HiSilicon ACC VF devices to a common header
+> and also use a uniform naming convention.
+> 
+> This will be useful when we introduce the vfio PCI HiSilicon ACC live
+> migration driver in subsequent patches.
+> 
+> Cc: Bjorn Helgaas <bhelgaas@google.com>
+> Acked-by: Zhou Wang <wangzhou1@hisilicon.com>
+> Acked-by: Longfang Liu <liulongfang@huawei.com>
+> Acked-by: Kai Ye <yekai13@huawei.com>
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 
-Cc: Jason Gunthorpe <jgg@nvidia.com>
-Acked-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Reviewed-by: Yishai Hadas <yishaih@nvidia.com>
-Acked-by: Kevin Tian <kevin.tian@intel.com>
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
----
+Acked-by: Bjorn Helgaas <bhelgaas@google.com>	# pci_ids.h
 
-v4:
-
-Banish the word "vendor", replace with "device specific"
-Minor wording changes in docs file
-Add sign-offs from Kevin and Yishai
-
-I'll drop Jason from reviewers if there's no positive approval
-after this round.
-
-v3:
-
-Relocate to Documentation/driver-api/
-Include index.rst reference
-Cross link from maintainer-entry-profile
-Add Shameer's Ack
-
-v2:
-
-Added Yishai
-
-v1:
-
-Per the proposal here[1], I've collected those that volunteered and
-those that I interpreted as showing interest (alpha by last name).  For
-those on the reviewers list below, please R-b/A-b to keep your name as a
-reviewer.  More volunteers are still welcome, please let me know
-explicitly; R-b/A-b will not be used to automatically add reviewers but
-are of course welcome.  Thanks,
-
-Alex
-
-[1]https://lore.kernel.org/all/20220310134954.0df4bb12.alex.williamson@redhat.com/
-
- Documentation/driver-api/index.rst                 |    1 +
- .../vfio-pci-device-specific-driver-acceptance.rst |   35 ++++++++++++++++++++
- .../maintainer/maintainer-entry-profile.rst        |    1 +
- MAINTAINERS                                        |   10 ++++++
- 4 files changed, 47 insertions(+)
- create mode 100644 Documentation/driver-api/vfio-pci-device-specific-driver-acceptance.rst
-
-diff --git a/Documentation/driver-api/index.rst b/Documentation/driver-api/index.rst
-index c57c609ad2eb..a7b0223e2886 100644
---- a/Documentation/driver-api/index.rst
-+++ b/Documentation/driver-api/index.rst
-@@ -103,6 +103,7 @@ available subsections can be seen below.
-    sync_file
-    vfio-mediated-device
-    vfio
-+   vfio-pci-device-specific-driver-acceptance
-    xilinx/index
-    xillybus
-    zorro
-diff --git a/Documentation/driver-api/vfio-pci-device-specific-driver-acceptance.rst b/Documentation/driver-api/vfio-pci-device-specific-driver-acceptance.rst
-new file mode 100644
-index 000000000000..b7b99b876b50
---- /dev/null
-+++ b/Documentation/driver-api/vfio-pci-device-specific-driver-acceptance.rst
-@@ -0,0 +1,35 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+Acceptance criteria for vfio-pci device specific driver variants
-+================================================================
-+
-+Overview
-+--------
-+The vfio-pci driver exists as a device agnostic driver using the
-+system IOMMU and relying on the robustness of platform fault
-+handling to provide isolated device access to userspace.  While the
-+vfio-pci driver does include some device specific support, further
-+extensions for yet more advanced device specific features are not
-+sustainable.  The vfio-pci driver has therefore split out
-+vfio-pci-core as a library that may be reused to implement features
-+requiring device specific knowledge, ex. saving and loading device
-+state for the purposes of supporting migration.
-+
-+In support of such features, it's expected that some device specific
-+variants may interact with parent devices (ex. SR-IOV PF in support of
-+a user assigned VF) or other extensions that may not be otherwise
-+accessible via the vfio-pci base driver.  Authors of such drivers
-+should be diligent not to create exploitable interfaces via these
-+interactions or allow unchecked userspace data to have an effect
-+beyond the scope of the assigned device.
-+
-+New driver submissions are therefore requested to have approval via
-+sign-off/ack/review/etc for any interactions with parent drivers.
-+Additionally, drivers should make an attempt to provide sufficient
-+documentation for reviewers to understand the device specific
-+extensions, for example in the case of migration data, how is the
-+device state composed and consumed, which portions are not otherwise
-+available to the user via vfio-pci, what safeguards exist to validate
-+the data, etc.  To that extent, authors should additionally expect to
-+require reviews from at least one of the listed reviewers, in addition
-+to the overall vfio maintainer.
-diff --git a/Documentation/maintainer/maintainer-entry-profile.rst b/Documentation/maintainer/maintainer-entry-profile.rst
-index 5d5cc3acdf85..93b2ae6c34a9 100644
---- a/Documentation/maintainer/maintainer-entry-profile.rst
-+++ b/Documentation/maintainer/maintainer-entry-profile.rst
-@@ -103,3 +103,4 @@ to do something different in the near future.
-    ../nvdimm/maintainer-entry-profile
-    ../riscv/patch-acceptance
-    ../driver-api/media/maintainer-entry-profile
-+   ../driver-api/vfio-pci-device-specific-driver-acceptance
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 4322b5321891..fb71542c46d6 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -20314,6 +20314,16 @@ F:	drivers/vfio/mdev/
- F:	include/linux/mdev.h
- F:	samples/vfio-mdev/
- 
-+VFIO PCI DEVICE SPECIFIC DRIVERS
-+R:	Jason Gunthorpe <jgg@nvidia.com>
-+R:	Yishai Hadas <yishaih@nvidia.com>
-+R:	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-+R:	Kevin Tian <kevin.tian@intel.com>
-+L:	kvm@vger.kernel.org
-+S:	Maintained
-+P:	Documentation/driver-api/vfio-pci-device-specific-driver-acceptance.rst
-+F:	drivers/vfio/pci/*/
-+
- VFIO PLATFORM DRIVER
- M:	Eric Auger <eric.auger@redhat.com>
- L:	kvm@vger.kernel.org
-
-
+> ---
+>  drivers/crypto/hisilicon/hpre/hpre_main.c | 13 ++++++-------
+>  drivers/crypto/hisilicon/sec2/sec_main.c  | 15 +++++++--------
+>  drivers/crypto/hisilicon/zip/zip_main.c   | 11 +++++------
+>  include/linux/pci_ids.h                   |  3 +++
+>  4 files changed, 21 insertions(+), 21 deletions(-)
+> 
+> diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
+> index ebfab3e14499..3589d8879b5e 100644
+> --- a/drivers/crypto/hisilicon/hpre/hpre_main.c
+> +++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
+> @@ -68,8 +68,7 @@
+>  #define HPRE_REG_RD_INTVRL_US		10
+>  #define HPRE_REG_RD_TMOUT_US		1000
+>  #define HPRE_DBGFS_VAL_MAX_LEN		20
+> -#define HPRE_PCI_DEVICE_ID		0xa258
+> -#define HPRE_PCI_VF_DEVICE_ID		0xa259
+> +#define PCI_DEVICE_ID_HUAWEI_HPRE_PF	0xa258
+>  #define HPRE_QM_USR_CFG_MASK		GENMASK(31, 1)
+>  #define HPRE_QM_AXI_CFG_MASK		GENMASK(15, 0)
+>  #define HPRE_QM_VFG_AX_MASK		GENMASK(7, 0)
+> @@ -111,8 +110,8 @@
+>  static const char hpre_name[] = "hisi_hpre";
+>  static struct dentry *hpre_debugfs_root;
+>  static const struct pci_device_id hpre_dev_ids[] = {
+> -	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, HPRE_PCI_DEVICE_ID) },
+> -	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, HPRE_PCI_VF_DEVICE_ID) },
+> +	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_HUAWEI_HPRE_PF) },
+> +	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_HUAWEI_HPRE_VF) },
+>  	{ 0, }
+>  };
+>  
+> @@ -242,7 +241,7 @@ MODULE_PARM_DESC(uacce_mode, UACCE_MODE_DESC);
+>  
+>  static int pf_q_num_set(const char *val, const struct kernel_param *kp)
+>  {
+> -	return q_num_set(val, kp, HPRE_PCI_DEVICE_ID);
+> +	return q_num_set(val, kp, PCI_DEVICE_ID_HUAWEI_HPRE_PF);
+>  }
+>  
+>  static const struct kernel_param_ops hpre_pf_q_num_ops = {
+> @@ -921,7 +920,7 @@ static int hpre_debugfs_init(struct hisi_qm *qm)
+>  	qm->debug.sqe_mask_len = HPRE_SQE_MASK_LEN;
+>  	hisi_qm_debug_init(qm);
+>  
+> -	if (qm->pdev->device == HPRE_PCI_DEVICE_ID) {
+> +	if (qm->pdev->device == PCI_DEVICE_ID_HUAWEI_HPRE_PF) {
+>  		ret = hpre_ctrl_debug_init(qm);
+>  		if (ret)
+>  			goto failed_to_create;
+> @@ -958,7 +957,7 @@ static int hpre_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
+>  	qm->sqe_size = HPRE_SQE_SIZE;
+>  	qm->dev_name = hpre_name;
+>  
+> -	qm->fun_type = (pdev->device == HPRE_PCI_DEVICE_ID) ?
+> +	qm->fun_type = (pdev->device == PCI_DEVICE_ID_HUAWEI_HPRE_PF) ?
+>  			QM_HW_PF : QM_HW_VF;
+>  	if (qm->fun_type == QM_HW_PF) {
+>  		qm->qp_base = HPRE_PF_DEF_Q_BASE;
+> diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
+> index 26d3ab1d308b..311a8747b5bf 100644
+> --- a/drivers/crypto/hisilicon/sec2/sec_main.c
+> +++ b/drivers/crypto/hisilicon/sec2/sec_main.c
+> @@ -20,8 +20,7 @@
+>  
+>  #define SEC_VF_NUM			63
+>  #define SEC_QUEUE_NUM_V1		4096
+> -#define SEC_PF_PCI_DEVICE_ID		0xa255
+> -#define SEC_VF_PCI_DEVICE_ID		0xa256
+> +#define PCI_DEVICE_ID_HUAWEI_SEC_PF	0xa255
+>  
+>  #define SEC_BD_ERR_CHK_EN0		0xEFFFFFFF
+>  #define SEC_BD_ERR_CHK_EN1		0x7ffff7fd
+> @@ -225,7 +224,7 @@ static const struct debugfs_reg32 sec_dfx_regs[] = {
+>  
+>  static int sec_pf_q_num_set(const char *val, const struct kernel_param *kp)
+>  {
+> -	return q_num_set(val, kp, SEC_PF_PCI_DEVICE_ID);
+> +	return q_num_set(val, kp, PCI_DEVICE_ID_HUAWEI_SEC_PF);
+>  }
+>  
+>  static const struct kernel_param_ops sec_pf_q_num_ops = {
+> @@ -313,8 +312,8 @@ module_param_cb(uacce_mode, &sec_uacce_mode_ops, &uacce_mode, 0444);
+>  MODULE_PARM_DESC(uacce_mode, UACCE_MODE_DESC);
+>  
+>  static const struct pci_device_id sec_dev_ids[] = {
+> -	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, SEC_PF_PCI_DEVICE_ID) },
+> -	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, SEC_VF_PCI_DEVICE_ID) },
+> +	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_HUAWEI_SEC_PF) },
+> +	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_HUAWEI_SEC_VF) },
+>  	{ 0, }
+>  };
+>  MODULE_DEVICE_TABLE(pci, sec_dev_ids);
+> @@ -717,7 +716,7 @@ static int sec_core_debug_init(struct hisi_qm *qm)
+>  	regset->base = qm->io_base;
+>  	regset->dev = dev;
+>  
+> -	if (qm->pdev->device == SEC_PF_PCI_DEVICE_ID)
+> +	if (qm->pdev->device == PCI_DEVICE_ID_HUAWEI_SEC_PF)
+>  		debugfs_create_file("regs", 0444, tmp_d, regset, &sec_regs_fops);
+>  
+>  	for (i = 0; i < ARRAY_SIZE(sec_dfx_labels); i++) {
+> @@ -735,7 +734,7 @@ static int sec_debug_init(struct hisi_qm *qm)
+>  	struct sec_dev *sec = container_of(qm, struct sec_dev, qm);
+>  	int i;
+>  
+> -	if (qm->pdev->device == SEC_PF_PCI_DEVICE_ID) {
+> +	if (qm->pdev->device == PCI_DEVICE_ID_HUAWEI_SEC_PF) {
+>  		for (i = SEC_CLEAR_ENABLE; i < SEC_DEBUG_FILE_NUM; i++) {
+>  			spin_lock_init(&sec->debug.files[i].lock);
+>  			sec->debug.files[i].index = i;
+> @@ -877,7 +876,7 @@ static int sec_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
+>  	qm->sqe_size = SEC_SQE_SIZE;
+>  	qm->dev_name = sec_name;
+>  
+> -	qm->fun_type = (pdev->device == SEC_PF_PCI_DEVICE_ID) ?
+> +	qm->fun_type = (pdev->device == PCI_DEVICE_ID_HUAWEI_SEC_PF) ?
+>  			QM_HW_PF : QM_HW_VF;
+>  	if (qm->fun_type == QM_HW_PF) {
+>  		qm->qp_base = SEC_PF_DEF_Q_BASE;
+> diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
+> index 678f8b58ec42..66decfe07282 100644
+> --- a/drivers/crypto/hisilicon/zip/zip_main.c
+> +++ b/drivers/crypto/hisilicon/zip/zip_main.c
+> @@ -15,8 +15,7 @@
+>  #include <linux/uacce.h>
+>  #include "zip.h"
+>  
+> -#define PCI_DEVICE_ID_ZIP_PF		0xa250
+> -#define PCI_DEVICE_ID_ZIP_VF		0xa251
+> +#define PCI_DEVICE_ID_HUAWEI_ZIP_PF	0xa250
+>  
+>  #define HZIP_QUEUE_NUM_V1		4096
+>  
+> @@ -246,7 +245,7 @@ MODULE_PARM_DESC(uacce_mode, UACCE_MODE_DESC);
+>  
+>  static int pf_q_num_set(const char *val, const struct kernel_param *kp)
+>  {
+> -	return q_num_set(val, kp, PCI_DEVICE_ID_ZIP_PF);
+> +	return q_num_set(val, kp, PCI_DEVICE_ID_HUAWEI_ZIP_PF);
+>  }
+>  
+>  static const struct kernel_param_ops pf_q_num_ops = {
+> @@ -268,8 +267,8 @@ module_param_cb(vfs_num, &vfs_num_ops, &vfs_num, 0444);
+>  MODULE_PARM_DESC(vfs_num, "Number of VFs to enable(1-63), 0(default)");
+>  
+>  static const struct pci_device_id hisi_zip_dev_ids[] = {
+> -	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_ZIP_PF) },
+> -	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_ZIP_VF) },
+> +	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_HUAWEI_ZIP_PF) },
+> +	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_HUAWEI_ZIP_VF) },
+>  	{ 0, }
+>  };
+>  MODULE_DEVICE_TABLE(pci, hisi_zip_dev_ids);
+> @@ -838,7 +837,7 @@ static int hisi_zip_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
+>  	qm->sqe_size = HZIP_SQE_SIZE;
+>  	qm->dev_name = hisi_zip_name;
+>  
+> -	qm->fun_type = (pdev->device == PCI_DEVICE_ID_ZIP_PF) ?
+> +	qm->fun_type = (pdev->device == PCI_DEVICE_ID_HUAWEI_ZIP_PF) ?
+>  			QM_HW_PF : QM_HW_VF;
+>  	if (qm->fun_type == QM_HW_PF) {
+>  		qm->qp_base = HZIP_PF_DEF_Q_BASE;
+> diff --git a/include/linux/pci_ids.h b/include/linux/pci_ids.h
+> index aad54c666407..31dee2b65a62 100644
+> --- a/include/linux/pci_ids.h
+> +++ b/include/linux/pci_ids.h
+> @@ -2529,6 +2529,9 @@
+>  #define PCI_DEVICE_ID_KORENIX_JETCARDF3	0x17ff
+>  
+>  #define PCI_VENDOR_ID_HUAWEI		0x19e5
+> +#define PCI_DEVICE_ID_HUAWEI_ZIP_VF	0xa251
+> +#define PCI_DEVICE_ID_HUAWEI_SEC_VF	0xa256
+> +#define PCI_DEVICE_ID_HUAWEI_HPRE_VF	0xa259
+>  
+>  #define PCI_VENDOR_ID_NETRONOME		0x19ee
+>  #define PCI_DEVICE_ID_NETRONOME_NFP4000	0x4000
+> -- 
+> 2.25.1
+> 
