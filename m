@@ -2,318 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 809534D9E4A
-	for <lists+kvm@lfdr.de>; Tue, 15 Mar 2022 16:00:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 74EB84D9E3A
+	for <lists+kvm@lfdr.de>; Tue, 15 Mar 2022 15:57:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349529AbiCOPB0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Mar 2022 11:01:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53722 "EHLO
+        id S1348288AbiCOO6b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Mar 2022 10:58:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349544AbiCOPBY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Mar 2022 11:01:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6D47155BD7
-        for <kvm@vger.kernel.org>; Tue, 15 Mar 2022 08:00:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647356410;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=khFAaXb87QUv7Avz4IPJcQUVJx3txq8L5uNH3RG0cQ8=;
-        b=bhveUt2TQ5iiqwjwbLIR0v4InhwA84isramNTs4r16UmQ4ee5o5GwcS9QYPgv8QmDGSRFG
-        dvFbsdJhwDuqGCaNyeW6ZcjzaWsWAyeh8lddZm4xfY3YFYVspCLFeeauAS2DfMVmshjomc
-        4T+IkZDED3pcBiC2sOURp1Cnf6cWrmk=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-516-y0UEwhkwNk2oVvrJ_is5Vw-1; Tue, 15 Mar 2022 11:00:07 -0400
-X-MC-Unique: y0UEwhkwNk2oVvrJ_is5Vw-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4FE39805F46;
-        Tue, 15 Mar 2022 15:00:06 +0000 (UTC)
-Received: from [10.22.34.226] (unknown [10.22.34.226])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2553A555C92;
-        Tue, 15 Mar 2022 15:00:05 +0000 (UTC)
-Message-ID: <2a77efcb-8dbb-732d-bc5d-d4cfe4c32184@redhat.com>
-Date:   Tue, 15 Mar 2022 11:00:04 -0400
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH] lockdep: fix -Wunused-parameter for _THIS_IP_
-Content-Language: en-US
-To:     Nick Desaulniers <ndesaulniers@google.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Boqun Feng <boqun.feng@gmail.com>
-Cc:     Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
+        with ESMTP id S1349435AbiCOO6a (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Mar 2022 10:58:30 -0400
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA59555779;
+        Tue, 15 Mar 2022 07:57:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1647356238; x=1678892238;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Wiowgzt+S+zwJZOS0VvV/vb4jvXFxf9uHBLJ2GB62nk=;
+  b=Sh+HbAdT1sFN5xpwkYdQ07ER9q5ajL33CdMnKR4iapKeZXh9LWtIL1p6
+   crx40T7FOiS98VbO3G/ckDQjfV6YhGL/3CCHvzsM/I6xcgc7fx3QjwZX3
+   1dvWThSxjLvteuK4AD322g4BXHkagRO3NF+uWqfuRZkzvyUtDVwuZZXQZ
+   c1bXj6CBCAQFtKEtUX5ZJUd+7TW6BMmMyErDXDp18sAfdsnH7ubyJ1RG/
+   klcmmC/u1RWAbW9EfJTINc33/TwsEtuIlcrghPHwYuQyqDt5ASODXVeXM
+   LbtimZtOFLGbgZfIJXDzW0OJTQwvfZSWIQA764rjkcAFaWwU8c+fpqQt9
+   A==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10286"; a="255153951"
+X-IronPort-AV: E=Sophos;i="5.90,183,1643702400"; 
+   d="scan'208";a="255153951"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2022 07:57:09 -0700
+X-IronPort-AV: E=Sophos;i="5.90,183,1643702400"; 
+   d="scan'208";a="515899241"
+Received: from gao-cwp.sh.intel.com (HELO gao-cwp) ([10.239.159.23])
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2022 07:57:03 -0700
+Date:   Tue, 15 Mar 2022 23:10:34 +0800
+From:   Chao Gao <chao.gao@intel.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Zeng Guang <guang.zeng@intel.com>,
+        Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        Kan Liang <kan.liang@linux.intel.com>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        Dietmar Eggemann <dietmar.eggemann@arm.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Joey Gouly <joey.gouly@arm.com>, Marc Zyngier <maz@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <20220314221909.2027027-1-ndesaulniers@google.com>
-From:   Waiman Long <longman@redhat.com>
-In-Reply-To: <20220314221909.2027027-1-ndesaulniers@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jethro Beekman <jethro@fortanix.com>,
+        "Huang, Kai" <kai.huang@intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Hu, Robert" <robert.hu@intel.com>
+Subject: Re: [PATCH v6 6/9] KVM: x86: lapic: don't allow to change APIC ID
+ unconditionally
+Message-ID: <20220315151033.GA6038@gao-cwp>
+References: <Yifg4bea6zYEz1BK@google.com>
+ <20220309052013.GA2915@gao-cwp>
+ <YihCtvDps/qJ2TOW@google.com>
+ <6dc7cff15812864ed14b5c014769488d80ce7f49.camel@redhat.com>
+ <YirPkr5efyylrD0x@google.com>
+ <29c76393-4884-94a8-f224-08d313b73f71@intel.com>
+ <01586c518de0c72ff3997d32654b8fa6e7df257d.camel@redhat.com>
+ <2900660d947a878e583ebedf60e7332e74a1af5f.camel@redhat.com>
+ <20220313135335.GA18405@gao-cwp>
+ <fbf929e0793a6b4df59ec9d95a018d1f6737db35.camel@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fbf929e0793a6b4df59ec9d95a018d1f6737db35.camel@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Spam-Status: No, score=-5.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/14/22 18:19, Nick Desaulniers wrote:
-> While looking into a bug related to the compiler's handling of addresses
-> of labels, I noticed some uses of _THIS_IP_ seemed unused in lockdep.
-> Drive by cleanup.
+On Sun, Mar 13, 2022 at 05:09:08PM +0200, Maxim Levitsky wrote:
+>> > > This won't work with nested AVIC - we can't just inhibit a nested guest using its own AVIC,
+>> > > because migration happens.
+>> > 
+>> > I mean because host decided to change its apic id, which it can in theory do any time,
+>> > even after the nested guest has started. Seriously, the only reason guest has to change apic id,
+>> > is to try to exploit some security hole.
+>> 
+>> Hi
+>> 
+>> Thanks for the information.  
+>> 
+>> IIUC, you mean KVM applies APICv inhibition only to L1 VM, leaving APICv
+>> enabled for L2 VM. Shouldn't KVM disable APICv for L2 VM in this case?
+>> It looks like a generic issue in dynamically toggling APICv scheme,
+>> e.g., qemu can set KVM_GUESTDBG_BLOCKIRQ after nested guest has started.
+>> 
 >
-> -Wunused-parameter:
-> kernel/locking/lockdep.c:1383:22: warning: unused parameter 'ip'
-> kernel/locking/lockdep.c:4246:48: warning: unused parameter 'ip'
-> kernel/locking/lockdep.c:4844:19: warning: unused parameter 'ip'
->
-> Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
-> ---
->   arch/arm64/kernel/entry-common.c |  8 ++++----
->   include/linux/irqflags.h         |  4 ++--
->   include/linux/kvm_host.h         |  2 +-
->   kernel/entry/common.c            |  6 +++---
->   kernel/locking/lockdep.c         | 22 ++++++++--------------
->   kernel/sched/idle.c              |  2 +-
->   kernel/trace/trace_preemptirq.c  |  4 ++--
->   7 files changed, 21 insertions(+), 27 deletions(-)
->
-> diff --git a/arch/arm64/kernel/entry-common.c b/arch/arm64/kernel/entry-common.c
-> index ef7fcefb96bd..8a4244316e25 100644
-> --- a/arch/arm64/kernel/entry-common.c
-> +++ b/arch/arm64/kernel/entry-common.c
-> @@ -73,7 +73,7 @@ static __always_inline void __exit_to_kernel_mode(struct pt_regs *regs)
->   	if (interrupts_enabled(regs)) {
->   		if (regs->exit_rcu) {
->   			trace_hardirqs_on_prepare();
-> -			lockdep_hardirqs_on_prepare(CALLER_ADDR0);
-> +			lockdep_hardirqs_on_prepare();
->   			rcu_irq_exit();
->   			lockdep_hardirqs_on(CALLER_ADDR0);
->   			return;
-> @@ -118,7 +118,7 @@ static __always_inline void enter_from_user_mode(struct pt_regs *regs)
->   static __always_inline void __exit_to_user_mode(void)
->   {
->   	trace_hardirqs_on_prepare();
-> -	lockdep_hardirqs_on_prepare(CALLER_ADDR0);
-> +	lockdep_hardirqs_on_prepare();
->   	user_enter_irqoff();
->   	lockdep_hardirqs_on(CALLER_ADDR0);
->   }
-> @@ -176,7 +176,7 @@ static void noinstr arm64_exit_nmi(struct pt_regs *regs)
->   	ftrace_nmi_exit();
->   	if (restore) {
->   		trace_hardirqs_on_prepare();
-> -		lockdep_hardirqs_on_prepare(CALLER_ADDR0);
-> +		lockdep_hardirqs_on_prepare();
->   	}
->   
->   	rcu_nmi_exit();
-> @@ -212,7 +212,7 @@ static void noinstr arm64_exit_el1_dbg(struct pt_regs *regs)
->   
->   	if (restore) {
->   		trace_hardirqs_on_prepare();
-> -		lockdep_hardirqs_on_prepare(CALLER_ADDR0);
-> +		lockdep_hardirqs_on_prepare();
->   	}
->   
->   	rcu_nmi_exit();
-> diff --git a/include/linux/irqflags.h b/include/linux/irqflags.h
-> index 4b140938b03e..5ec0fa71399e 100644
-> --- a/include/linux/irqflags.h
-> +++ b/include/linux/irqflags.h
-> @@ -20,13 +20,13 @@
->   #ifdef CONFIG_PROVE_LOCKING
->     extern void lockdep_softirqs_on(unsigned long ip);
->     extern void lockdep_softirqs_off(unsigned long ip);
-> -  extern void lockdep_hardirqs_on_prepare(unsigned long ip);
-> +  extern void lockdep_hardirqs_on_prepare(void);
->     extern void lockdep_hardirqs_on(unsigned long ip);
->     extern void lockdep_hardirqs_off(unsigned long ip);
->   #else
->     static inline void lockdep_softirqs_on(unsigned long ip) { }
->     static inline void lockdep_softirqs_off(unsigned long ip) { }
-> -  static inline void lockdep_hardirqs_on_prepare(unsigned long ip) { }
-> +  static inline void lockdep_hardirqs_on_prepare(void) { }
->     static inline void lockdep_hardirqs_on(unsigned long ip) { }
->     static inline void lockdep_hardirqs_off(unsigned long ip) { }
->   #endif
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index f11039944c08..f32bed70a5c5 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -441,7 +441,7 @@ static __always_inline void guest_state_enter_irqoff(void)
->   {
->   	instrumentation_begin();
->   	trace_hardirqs_on_prepare();
-> -	lockdep_hardirqs_on_prepare(CALLER_ADDR0);
-> +	lockdep_hardirqs_on_prepare();
->   	instrumentation_end();
->   
->   	guest_context_enter_irqoff();
-> diff --git a/kernel/entry/common.c b/kernel/entry/common.c
-> index bad713684c2e..3ce3a0a6c762 100644
-> --- a/kernel/entry/common.c
-> +++ b/kernel/entry/common.c
-> @@ -124,7 +124,7 @@ static __always_inline void __exit_to_user_mode(void)
->   {
->   	instrumentation_begin();
->   	trace_hardirqs_on_prepare();
-> -	lockdep_hardirqs_on_prepare(CALLER_ADDR0);
-> +	lockdep_hardirqs_on_prepare();
->   	instrumentation_end();
->   
->   	user_enter_irqoff();
-> @@ -412,7 +412,7 @@ noinstr void irqentry_exit(struct pt_regs *regs, irqentry_state_t state)
->   			instrumentation_begin();
->   			/* Tell the tracer that IRET will enable interrupts */
->   			trace_hardirqs_on_prepare();
-> -			lockdep_hardirqs_on_prepare(CALLER_ADDR0);
-> +			lockdep_hardirqs_on_prepare();
->   			instrumentation_end();
->   			rcu_irq_exit();
->   			lockdep_hardirqs_on(CALLER_ADDR0);
-> @@ -465,7 +465,7 @@ void noinstr irqentry_nmi_exit(struct pt_regs *regs, irqentry_state_t irq_state)
->   	ftrace_nmi_exit();
->   	if (irq_state.lockdep) {
->   		trace_hardirqs_on_prepare();
-> -		lockdep_hardirqs_on_prepare(CALLER_ADDR0);
-> +		lockdep_hardirqs_on_prepare();
->   	}
->   	instrumentation_end();
->   
-> diff --git a/kernel/locking/lockdep.c b/kernel/locking/lockdep.c
-> index f8a0212189ca..05604795b39c 100644
-> --- a/kernel/locking/lockdep.c
-> +++ b/kernel/locking/lockdep.c
-> @@ -1378,7 +1378,7 @@ static struct lock_list *alloc_list_entry(void)
->    */
->   static int add_lock_to_list(struct lock_class *this,
->   			    struct lock_class *links_to, struct list_head *head,
-> -			    unsigned long ip, u16 distance, u8 dep,
-> +			    u16 distance, u8 dep,
->   			    const struct lock_trace *trace)
->   {
->   	struct lock_list *entry;
-> @@ -3131,19 +3131,15 @@ check_prev_add(struct task_struct *curr, struct held_lock *prev,
->   	 * to the previous lock's dependency list:
->   	 */
->   	ret = add_lock_to_list(hlock_class(next), hlock_class(prev),
-> -			       &hlock_class(prev)->locks_after,
-> -			       next->acquire_ip, distance,
-> -			       calc_dep(prev, next),
-> -			       *trace);
-> +			       &hlock_class(prev)->locks_after, distance,
-> +			       calc_dep(prev, next), *trace);
->   
->   	if (!ret)
->   		return 0;
->   
->   	ret = add_lock_to_list(hlock_class(prev), hlock_class(next),
-> -			       &hlock_class(next)->locks_before,
-> -			       next->acquire_ip, distance,
-> -			       calc_depb(prev, next),
-> -			       *trace);
-> +			       &hlock_class(next)->locks_before, distance,
-> +			       calc_depb(prev, next), *trace);
->   	if (!ret)
->   		return 0;
->   
-> @@ -4234,14 +4230,13 @@ static void __trace_hardirqs_on_caller(void)
->   
->   /**
->    * lockdep_hardirqs_on_prepare - Prepare for enabling interrupts
-> - * @ip:		Caller address
->    *
->    * Invoked before a possible transition to RCU idle from exit to user or
->    * guest mode. This ensures that all RCU operations are done before RCU
->    * stops watching. After the RCU transition lockdep_hardirqs_on() has to be
->    * invoked to set the final state.
->    */
-> -void lockdep_hardirqs_on_prepare(unsigned long ip)
-> +void lockdep_hardirqs_on_prepare(void)
->   {
->   	if (unlikely(!debug_locks))
->   		return;
-> @@ -4838,8 +4833,7 @@ EXPORT_SYMBOL_GPL(__lockdep_no_validate__);
->   
->   static void
->   print_lock_nested_lock_not_held(struct task_struct *curr,
-> -				struct held_lock *hlock,
-> -				unsigned long ip)
-> +				struct held_lock *hlock)
->   {
->   	if (!debug_locks_off())
->   		return;
-> @@ -5015,7 +5009,7 @@ static int __lock_acquire(struct lockdep_map *lock, unsigned int subclass,
->   	chain_key = iterate_chain_key(chain_key, hlock_id(hlock));
->   
->   	if (nest_lock && !__lock_is_held(nest_lock, -1)) {
-> -		print_lock_nested_lock_not_held(curr, hlock, ip);
-> +		print_lock_nested_lock_not_held(curr, hlock);
->   		return 0;
->   	}
->   
-> diff --git a/kernel/sched/idle.c b/kernel/sched/idle.c
-> index d17b0a5ce6ac..499a3e286cd0 100644
-> --- a/kernel/sched/idle.c
-> +++ b/kernel/sched/idle.c
-> @@ -105,7 +105,7 @@ void __cpuidle default_idle_call(void)
->   		 * last -- this is very similar to the entry code.
->   		 */
->   		trace_hardirqs_on_prepare();
-> -		lockdep_hardirqs_on_prepare(_THIS_IP_);
-> +		lockdep_hardirqs_on_prepare();
->   		rcu_idle_enter();
->   		lockdep_hardirqs_on(_THIS_IP_);
->   
-> diff --git a/kernel/trace/trace_preemptirq.c b/kernel/trace/trace_preemptirq.c
-> index f4938040c228..95b58bd757ce 100644
-> --- a/kernel/trace/trace_preemptirq.c
-> +++ b/kernel/trace/trace_preemptirq.c
-> @@ -46,7 +46,7 @@ void trace_hardirqs_on(void)
->   		this_cpu_write(tracing_irq_cpu, 0);
->   	}
->   
-> -	lockdep_hardirqs_on_prepare(CALLER_ADDR0);
-> +	lockdep_hardirqs_on_prepare();
->   	lockdep_hardirqs_on(CALLER_ADDR0);
->   }
->   EXPORT_SYMBOL(trace_hardirqs_on);
-> @@ -94,7 +94,7 @@ __visible void trace_hardirqs_on_caller(unsigned long caller_addr)
->   		this_cpu_write(tracing_irq_cpu, 0);
->   	}
->   
-> -	lockdep_hardirqs_on_prepare(CALLER_ADDR0);
-> +	lockdep_hardirqs_on_prepare();
->   	lockdep_hardirqs_on(CALLER_ADDR0);
->   }
->   EXPORT_SYMBOL(trace_hardirqs_on_caller);
+>That is the problem - you can't disable it for L2, unless you are willing to emulate it in software.
+>Or in other words, when nested guest uses a hardware feature, you can't at some point say to it:
+>sorry buddy - hardware feature disappeared.
 
-LGTM
+Hi Maxim,
 
-Acked-by: Waiman Long <longman@redhat.com>
+I may miss something. When reading Sean's APICv inhibition cleanups, I
+find AVIC is disabled for L1 when nested is enabled (SVM is advertised
+to L1). Then, I think the new inhibition introduced for changed xAPIC ID
+shouldn't be a problem for L2 VM. Or, you plan to remove
+APICV_INHIBIT_REASON_NESTED and expose AVIC to L1?
 
+svm_vcpu_after_set_cpuid:
+                /*
+                 * Currently, AVIC does not work with nested virtualization.
+                 * So, we disable AVIC when cpuid for SVM is set in the L1 guest.
+                 */
+                if (nested && guest_cpuid_has(vcpu, X86_FEATURE_SVM))
+                        kvm_request_apicv_update(vcpu->kvm, false,
+                                                 APICV_INHIBIT_REASON_NESTED);
