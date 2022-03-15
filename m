@@ -2,195 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EE6EA4D9D34
-	for <lists+kvm@lfdr.de>; Tue, 15 Mar 2022 15:17:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E24E4D9D5D
+	for <lists+kvm@lfdr.de>; Tue, 15 Mar 2022 15:22:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349067AbiCOOSt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Mar 2022 10:18:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38850 "EHLO
+        id S1349278AbiCOOXX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Mar 2022 10:23:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50222 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231822AbiCOOSs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Mar 2022 10:18:48 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 532CE50047;
-        Tue, 15 Mar 2022 07:17:36 -0700 (PDT)
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22FD12oq030252;
-        Tue, 15 Mar 2022 14:17:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=IVfChuQuBl9tidWv81ZwzKVdCtqrR9qE7AtHlAOFUrU=;
- b=F9reZYG83UJO0xE59n2cUUgogCErizwga/uM10Fm4cd/leVgELNNLsgWWTpgAxQ3Mae3
- bmpY8b2gVj/bYtyC/+XJVmZ353WDRLZosX+/moacNtpOPJNiQ9KnbkamfSvegELY12Y9
- u3C8XGU4Qt6jdt/Qmwvc7Mmh3WU7Z4sI3+Rmj2iL3aHLJURgPNA+t/yhzJgLswuxoL/0
- VrbhlVN5hxGlbCrRtA85AY0Yo/vog6g6koi0xAhQfHPDvQa/4tJqrGuwjq1hGgzNGHMb
- Qu4UFuZv00VC0pX7KYzqcgkeLo9fGIePkfiO/FFOfbIix7B92OHi55YIkPxTOoNGuh6u iA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3etuajhv1f-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Mar 2022 14:17:24 +0000
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22FDf7LA014460;
-        Tue, 15 Mar 2022 14:17:24 GMT
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3etuajhv14-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Mar 2022 14:17:24 +0000
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22FE98qY023423;
-        Tue, 15 Mar 2022 14:17:23 GMT
-Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
-        by ppma02wdc.us.ibm.com with ESMTP id 3erk59npvh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Mar 2022 14:17:23 +0000
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
-        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22FEHMqk49545516
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 15 Mar 2022 14:17:22 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 557D9AC059;
-        Tue, 15 Mar 2022 14:17:22 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7E727AC065;
-        Tue, 15 Mar 2022 14:17:09 +0000 (GMT)
-Received: from [9.211.32.184] (unknown [9.211.32.184])
-        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
-        Tue, 15 Mar 2022 14:17:09 +0000 (GMT)
-Message-ID: <72dd168c-dd40-356c-1fe5-02bdfca57d73@linux.ibm.com>
-Date:   Tue, 15 Mar 2022 10:17:07 -0400
+        with ESMTP id S1349186AbiCOOXA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Mar 2022 10:23:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3C39C51313
+        for <kvm@vger.kernel.org>; Tue, 15 Mar 2022 07:21:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1647354105;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=7o+dVXIRX3PUfrylBhmOJ1IjtNvLAddRpzAp+y2JIUg=;
+        b=WOhyh8XP1l/hjKfz5hdopSnGBkyV1QY274NVD2veHhDkvg9Ufb6BaXDy67/JpyrUKbnyt7
+        utPpM68+g/n4PpPoaoBUKwDhmEY2Z1Rs3NP5WiNWYjlodtIUMZapSo8znwdvFe2pWwnfFe
+        YCfY3qNpdxNMMUACMgSxVbYoVT5nXXs=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-325-ecvwVdxYO6KG1ovqVhjznA-1; Tue, 15 Mar 2022 10:21:43 -0400
+X-MC-Unique: ecvwVdxYO6KG1ovqVhjznA-1
+Received: by mail-wm1-f70.google.com with SMTP id k41-20020a05600c1ca900b00389a2b983efso6696788wms.4
+        for <kvm@vger.kernel.org>; Tue, 15 Mar 2022 07:21:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=7o+dVXIRX3PUfrylBhmOJ1IjtNvLAddRpzAp+y2JIUg=;
+        b=bihxrSSKm9CkkyPsoW6cjmRDmTA0awlrE4Cr42QOmJ7RutJMhxvwqo0yr+tOuRDEku
+         lPzqjf+78t2EoZCjv0dTDx2tBJQd4s5fJ32xNeRc3ryQa6/JSd4Asexk7Tq48/uKpKWV
+         /9PjyVjCqRXRVjhLnBl4aAajpeCYaz1j7O+0c06+xZBMt4wxcKj5cCAz8FtCKhgB5xwP
+         qr7WK+CkGt0WHqkGtv0E8K8xeXEOVcL7eCAULfrnS4BTlDXQQLD0XHb2l4cDhUoGosZx
+         GYM1/cwdtA6Zb4Uwp6A+cqC3dm6tK2bRZSgrPTzyHrWJn2YgTUrmJTGUwBj4SQ3wLIfE
+         mKWA==
+X-Gm-Message-State: AOAM533IWVA2o9om7u3M3RBAaqnui0avBH/ZywQSExjDcZSFz7UVFzI5
+        p1Bgk1yvvUhtRj4JkNZdWBmPDuEHjyt6Ahucu2O5SJtXKEpXtChjKQzMVSTf/7hA+X3f8tg7cz2
+        z9zFXslDqR/ie
+X-Received: by 2002:a05:600c:4296:b0:38c:1b43:1562 with SMTP id v22-20020a05600c429600b0038c1b431562mr1352864wmc.122.1647354102767;
+        Tue, 15 Mar 2022 07:21:42 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzK6Yb1VdEQLbeaGqI3HGFeG6+S8T9reHNHXB33jwMdYCBjxnxNe7ZZesEpwCLsV4703roQaw==
+X-Received: by 2002:a05:600c:4296:b0:38c:1b43:1562 with SMTP id v22-20020a05600c429600b0038c1b431562mr1352843wmc.122.1647354102505;
+        Tue, 15 Mar 2022 07:21:42 -0700 (PDT)
+Received: from [192.168.8.104] (tmo-098-218.customers.d1-online.com. [80.187.98.218])
+        by smtp.gmail.com with ESMTPSA id c24-20020a7bc018000000b0038a18068cf5sm2363742wmb.15.2022.03.15.07.21.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 15 Mar 2022 07:21:41 -0700 (PDT)
+Message-ID: <b1d5e4b7-c07c-0e34-ef6d-58aab19a41b2@redhat.com>
+Date:   Tue, 15 Mar 2022 15:21:39 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.6.0
-Subject: Re: [PATCH v4 15/32] vfio: introduce KVM-owned IOMMU type
+Subject: Re: [kvm-unit-tests] Adding the QCBOR library to kvm-unit-tests
 Content-Language: en-US
-To:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>
-Cc:     "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "schnelle@linux.ibm.com" <schnelle@linux.ibm.com>,
-        "farman@linux.ibm.com" <farman@linux.ibm.com>,
-        "pmorel@linux.ibm.com" <pmorel@linux.ibm.com>,
-        "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
-        "hca@linux.ibm.com" <hca@linux.ibm.com>,
-        "gor@linux.ibm.com" <gor@linux.ibm.com>,
-        "gerald.schaefer@linux.ibm.com" <gerald.schaefer@linux.ibm.com>,
-        "agordeev@linux.ibm.com" <agordeev@linux.ibm.com>,
-        "svens@linux.ibm.com" <svens@linux.ibm.com>,
-        "frankja@linux.ibm.com" <frankja@linux.ibm.com>,
-        "david@redhat.com" <david@redhat.com>,
-        "imbrenda@linux.ibm.com" <imbrenda@linux.ibm.com>,
-        "vneethv@linux.ibm.com" <vneethv@linux.ibm.com>,
-        "oberpar@linux.ibm.com" <oberpar@linux.ibm.com>,
-        "freude@linux.ibm.com" <freude@linux.ibm.com>,
-        "thuth@redhat.com" <thuth@redhat.com>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "will@kernel.org" <will@kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>
-References: <20220314194451.58266-1-mjrosato@linux.ibm.com>
- <20220314194451.58266-16-mjrosato@linux.ibm.com>
- <20220314165033.6d2291a5.alex.williamson@redhat.com>
- <20220314231801.GN11336@nvidia.com>
- <BL1PR11MB5271DE700698C5FB11F5EEE78C109@BL1PR11MB5271.namprd11.prod.outlook.com>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-In-Reply-To: <BL1PR11MB5271DE700698C5FB11F5EEE78C109@BL1PR11MB5271.namprd11.prod.outlook.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>, pbonzini@redhat.com,
+        drjones@redhat.com, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     suzuki.poulose@arm.com, mark.rutland@arm.com
+References: <YjCVxT1yo0hi6Vdc@monolith.localdoman>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <YjCVxT1yo0hi6Vdc@monolith.localdoman>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: J982lXTGru7znHLoUNVPj9khaDwswGhb
-X-Proofpoint-GUID: UK70Moee3Tu1hHGpP4w5h9IJVUljqARl
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-03-15_03,2022-03-15_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 bulkscore=0
- malwarescore=0 suspectscore=0 mlxlogscore=999 impostorscore=0 adultscore=0
- clxscore=1011 mlxscore=0 lowpriorityscore=0 priorityscore=1501 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
- definitions=main-2203150092
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H4,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/15/22 3:57 AM, Tian, Kevin wrote:
->> From: Jason Gunthorpe <jgg@nvidia.com>
->> Sent: Tuesday, March 15, 2022 7:18 AM
->>
->> On Mon, Mar 14, 2022 at 04:50:33PM -0600, Alex Williamson wrote:
->>
->>>> +/*
->>>> + * The KVM_IOMMU type implies that the hypervisor will control the
->> mappings
->>>> + * rather than userspace
->>>> + */
->>>> +#define VFIO_KVM_IOMMU			11
->>>
->>> Then why is this hosted in the type1 code that exposes a wide variety
->>> of userspace interfaces?  Thanks,
->>
->> It is really badly named, this is the root level of a 2 stage nested
->> IO page table, and this approach needed a special flag to distinguish
->> the setup from the normal iommu_domain.
->>
->> If we do try to stick this into VFIO it should probably use the
->> VFIO_TYPE1_NESTING_IOMMU instead - however, we would like to delete
->> that flag entirely as it was never fully implemented, was never used,
->> and isn't part of what we are proposing for IOMMU nesting on ARM
->> anyhow. (So far I've found nobody to explain what the plan here was..)
->>
->> This is why I said the second level should be an explicit iommu_domain
->> all on its own that is explicitly coupled to the KVM to read the page
->> tables, if necessary.
->>
->> But I'm not sure that reading the userspace io page tables with KVM is
->> even the best thing to do - the iommu driver already has the pinned
->> memory, it would be faster and more modular to traverse the io page
->> tables through the pfns in the root iommu_domain than by having KVM do
->> the translations. Lets see what Matthew says..
->>
+On 15/03/2022 14.33, Alexandru Elisei wrote:
+> Hi,
 > 
-> Reading this thread it's sort of like an optimization to software nesting.
-
-Yes, we want to avoid breaking to userspace for a very frequent 
-operation (RPCIT / updating shadow mappings)
-
-> If that is the case does it make more sense to complete the basic form
-> of software nesting first and then adds this optimization?
+> Arm is planning to upstream tests that are being developed as part of the
+> Confidential Compute Architecture [1]. Some of the tests target the
+> attestation part of creating and managing a confidential compute VM, which
+> requires the manipulation of messages in the Concise Binary Object
+> Representation (CBOR) format [2].
 > 
-> The basic form would allow the userspace to create a special domain
-> type which points to a user/guest page table (like hardware nesting)
-> but doesn't install the user page table to the IOMMU hardware (unlike
-> hardware nesting). When receiving invalidate cmd from userspace > the iommu driver walks the user page table (1st-level) and the parent
-> page table (2nd-level) to generate a shadow mapping for the
-> invalidated range in the non-nested hardware page table of this
-> special domain type.
+> I would like to ask if it would be acceptable from a license perspective to
+> include the QCBOR library [3] into kvm-unit-tests, which will be used for
+> encoding and decoding of CBOR messages.
 > 
-> Once that works what this series does just changes the matter of
-> how the invalidate cmd is triggered. Previously iommu driver receives
-> invalidate cmd from Qemu (via iommufd uAPI) while now receiving
-> the cmd from kvm (via iommufd kAPI) upon interception of RPCIT.
->  From this angle once the connection between iommufd and kvm fd
-> is established there is even no direct talk between iommu driver and
-> kvm.
+> The library is licensed under the 3-Clause BSD license, which is compatible
+> with GPLv2 [4]. Some of the files that were created inside Qualcomm before
+> the library was open-sourced have a slightly modified 3-Clause BSD license,
+> where a NON-INFRINGMENT clause is added to the disclaimer:
+> 
+> "THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
+> WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+> MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE **AND NON-INFRINGEMENT**
+> ARE DISCLAIMED" (emphasis by me on the added clause).
+> 
+> The files in question include the core files that implement the
+> encode/decode functionality, and thus would have to be included in
+> kvm-unit-tests. I believe that the above modification does not affect the
+> compatibility with GPLv2.
 
-But something somewhere still needs to be responsible for 
-pinning/unpinning of the guest table entries upon each RPCIT 
-interception.  e.g. the RPCIT intercept can happen because the guest 
-wants to invalidate some old mappings or has generated some new mappings 
-over a range, so we must shadow the new mappings (by pinning the guest 
-entries and placing them in the host hardware table / unpinning 
-invalidated ones and clearing their entry in the host hardware table).
+IANAL, but I think it should be ok to add those files to the kvm-unit-tests. 
+With regards to the "non-infringement" extension, it seems to be the one 
+mentioned here: https://enterprise.dejacode.com/licenses/public/bsd-x11/ ... 
+and on the "license condition" tab they mention that it is compatible with 
+the GPL. On gnu.org, they list e.g. the 
+https://www.gnu.org/licenses/license-list.html#X11License which also 
+contains a "non-infringement" statement, so that should really be compatible.
 
+  Thomas
 
