@@ -2,62 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 054484D9D19
-	for <lists+kvm@lfdr.de>; Tue, 15 Mar 2022 15:12:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 24CC54D9D12
+	for <lists+kvm@lfdr.de>; Tue, 15 Mar 2022 15:11:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349033AbiCOONL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Mar 2022 10:13:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56178 "EHLO
+        id S1349034AbiCOONI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Mar 2022 10:13:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349035AbiCOOM7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1349037AbiCOOM7 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 15 Mar 2022 10:12:59 -0400
 Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0692E546B8;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08E3954BC2;
         Tue, 15 Mar 2022 07:11:45 -0700 (PDT)
 Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22FCiUqt010657;
-        Tue, 15 Mar 2022 14:11:44 GMT
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22FCiX6C010791;
+        Tue, 15 Mar 2022 14:11:45 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : content-transfer-encoding
- : mime-version; s=pp1; bh=8f22+OALsNAkpqF/krJV+8RdsVd0gmS6s4o79r5zrlc=;
- b=r1amNqqOiumAseXHpR9RRCNuhWrpCffRabzqm+mX84kfe9S9hcUTJ4PH7lZc9d9YXuU1
- W12+f4B95xqF4qtNXXhYP7O5VOkSjVU/O+3YYqaFQr982eB9HjprndZ2T4quoVgIzgKa
- BhBo+ZZBQwh+DgqLeQmclaWmJ9lxOIkXhRaHUWdJa7JX1PWDHi8g8eRhUZUaQcDnMlB4
- a78FjHAVjjZ8C7QwC8/9iTDAE4wAe4fQGgoKxtPlCcZz5Q1ikmDmuddLZf6QsShKsxJW
- zVjBiuZVkEmIf5GZEICDDnvnhwv1GqspNG/oX7coeImYxppyoNqxpPfLmo1Ba6H23FD/ Zg== 
+ : mime-version; s=pp1; bh=FZ9Ihi1kXsB14+EdFBOQEH0lWlzEWGpkJH0MBanFw1g=;
+ b=WgiVtNHXsbYhqlafoH9PSXEL6eyHaT94d5cXI10Tf7EEwrjks5/JuuHa1KEsZ1q/eqOw
+ XVXBWtumRZ9G8p+rVeNo1ijCZewHUBWxSGFMmGZajBPqeMQAW/TqXD8MnKhNqKAQmgpk
+ eCgciwQ2e1chvqf4B6Uv6JX/A2VhxTc6iRFwcDBdGhymoxYgos9CK+YsnYKOq/FVwRVx
+ jvEo9q8IyqjzrMRj851HdEdBCIuaE9KsYXYoJfFF+O56X3M8GMuZx1G//jSaocA7eJ2X
+ qSicGYuulzEmlyl3CEiJLzhvzd6P5993BnfnuG3Df0qfCW3gFkvpABJn+sZXyPlfmU3l /Q== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3etu2st0s8-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3etu2st0t0-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Mar 2022 14:11:43 +0000
+        Tue, 15 Mar 2022 14:11:44 +0000
 Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22FDtr8u018282;
-        Tue, 15 Mar 2022 14:11:43 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3etu2st0rc-1
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22FDmAtr015297;
+        Tue, 15 Mar 2022 14:11:44 GMT
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3etu2st0rp-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Mar 2022 14:11:43 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22FE9Msw013300;
-        Tue, 15 Mar 2022 14:11:41 GMT
+        Tue, 15 Mar 2022 14:11:44 +0000
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22FE9EEU008152;
+        Tue, 15 Mar 2022 14:11:42 GMT
 Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma06ams.nl.ibm.com with ESMTP id 3erjshptbj-1
+        by ppma01fra.de.ibm.com with ESMTP id 3erk58nsnj-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Mar 2022 14:11:41 +0000
+        Tue, 15 Mar 2022 14:11:42 +0000
 Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22FEBcXE51511706
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22FEBdFI51511710
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 15 Mar 2022 14:11:38 GMT
+        Tue, 15 Mar 2022 14:11:39 GMT
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9C95D42047;
+        by IMSVA (Postfix) with ESMTP id E3DF54203F;
         Tue, 15 Mar 2022 14:11:38 +0000 (GMT)
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8537042042;
+        by IMSVA (Postfix) with ESMTP id CC0CA42042;
         Tue, 15 Mar 2022 14:11:38 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
         by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
         Tue, 15 Mar 2022 14:11:38 +0000 (GMT)
 Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
-        id 43ABFE127A; Tue, 15 Mar 2022 15:11:38 +0100 (CET)
+        id 87F88E11F3; Tue, 15 Mar 2022 15:11:38 +0100 (CET)
 From:   Christian Borntraeger <borntraeger@linux.ibm.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     KVM <kvm@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
@@ -70,15 +70,15 @@ Cc:     KVM <kvm@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
         Alexander Gordeev <agordeev@linux.ibm.com>,
         Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
         Thomas Huth <thuth@redhat.com>
-Subject: [GIT PULL 1/7] KVM: s390: pv: make use of ultravisor AIV support
-Date:   Tue, 15 Mar 2022 15:11:31 +0100
-Message-Id: <20220315141137.357923-2-borntraeger@linux.ibm.com>
+Subject: [GIT PULL 2/7] KVM: s390x: fix SCK locking
+Date:   Tue, 15 Mar 2022 15:11:32 +0100
+Message-Id: <20220315141137.357923-3-borntraeger@linux.ibm.com>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20220315141137.357923-1-borntraeger@linux.ibm.com>
 References: <20220315141137.357923-1-borntraeger@linux.ibm.com>
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: gKjHUStmX51uPySKu5FI7UMFefG6NDXT
-X-Proofpoint-ORIG-GUID: JaFRnC_p-jiPViZWJaAooyhfCOB37AdB
+X-Proofpoint-GUID: rLBdIFX30dDUk0fFm77O9k_JEwqHi_uA
+X-Proofpoint-ORIG-GUID: lOxc0aI0ZWBBjVdeaiQexxN5RrNbkJVo
 Content-Transfer-Encoding: 8bit
 X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
@@ -87,8 +87,8 @@ X-Proofpoint-Virus-Version: vendor=baseguard
  definitions=2022-03-15_03,2022-03-15_01,2022-02-23_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
  suspectscore=0 bulkscore=0 phishscore=0 priorityscore=1501 spamscore=0
- lowpriorityscore=0 malwarescore=0 mlxlogscore=885 adultscore=0 mlxscore=0
- clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
+ lowpriorityscore=0 malwarescore=0 mlxlogscore=999 adultscore=0 mlxscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2202240000 definitions=main-2203150092
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
@@ -100,193 +100,132 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Michael Mueller <mimu@linux.ibm.com>
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
-This patch enables the ultravisor adapter interruption vitualization
-support indicated by UV feature BIT_UV_FEAT_AIV. This allows ISC
-interruption injection directly into the GISA IPM for PV kvm guests.
+When handling the SCK instruction, the kvm lock is taken, even though
+the vcpu lock is already being held. The normal locking order is kvm
+lock first and then vcpu lock. This is can (and in some circumstances
+does) lead to deadlocks.
 
-Hardware that does not support this feature will continue to use the
-UV interruption interception method to deliver ISC interruptions to
-PV kvm guests. For this purpose, the ECA_AIV bit for all guest cpus
-will be cleared and the GISA will be disabled during PV CPU setup.
+The function kvm_s390_set_tod_clock is called both by the SCK handler
+and by some IOCTLs to set the clock. The IOCTLs will not hold the vcpu
+lock, so they can safely take the kvm lock. The SCK handler holds the
+vcpu lock, but will also somehow need to acquire the kvm lock without
+relinquishing the vcpu lock.
 
-In addition a check in __inject_io() has been removed. That reduces the
-required instructions for interruption handling for PV and traditional
-kvm guests.
+The solution is to factor out the code to set the clock, and provide
+two wrappers. One is called like the original function and does the
+locking, the other is called kvm_s390_try_set_tod_clock and uses
+trylock to try to acquire the kvm lock. This new wrapper is then used
+in the SCK handler. If locking fails, -EAGAIN is returned, which is
+eventually propagated to userspace, thus also freeing the vcpu lock and
+allowing for forward progress.
 
-Signed-off-by: Michael Mueller <mimu@linux.ibm.com>
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
-Link: https://lore.kernel.org/r/20220209152217.1793281-2-mimu@linux.ibm.com
+This is not the most efficient or elegant way to solve this issue, but
+the SCK instruction is deprecated and its performance is not critical.
+
+The goal of this patch is just to provide a simple but correct way to
+fix the bug.
+
+Fixes: 6a3f95a6b04c ("KVM: s390: Intercept SCK instruction")
+Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 Reviewed-by: Christian Borntraeger <borntraeger@linux.ibm.com>
+Reviewed-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+Link: https://lore.kernel.org/r/20220301143340.111129-1-imbrenda@linux.ibm.com
+Cc: stable@vger.kernel.org
 Signed-off-by: Christian Borntraeger <borntraeger@linux.ibm.com>
 ---
- arch/s390/include/asm/uv.h |  1 +
- arch/s390/kvm/interrupt.c  | 54 +++++++++++++++++++++++++++++++++-----
- arch/s390/kvm/kvm-s390.c   | 11 +++++---
- arch/s390/kvm/kvm-s390.h   | 11 ++++++++
- 4 files changed, 68 insertions(+), 9 deletions(-)
+ arch/s390/kvm/kvm-s390.c | 19 ++++++++++++++++---
+ arch/s390/kvm/kvm-s390.h |  4 ++--
+ arch/s390/kvm/priv.c     | 15 ++++++++++++++-
+ 3 files changed, 32 insertions(+), 6 deletions(-)
 
-diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
-index 86218382d29c..a2d376b8bce3 100644
---- a/arch/s390/include/asm/uv.h
-+++ b/arch/s390/include/asm/uv.h
-@@ -80,6 +80,7 @@ enum uv_cmds_inst {
- 
- enum uv_feat_ind {
- 	BIT_UV_FEAT_MISC = 0,
-+	BIT_UV_FEAT_AIV = 1,
- };
- 
- struct uv_cb_header {
-diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
-index db933c252dbc..9b30beac904d 100644
---- a/arch/s390/kvm/interrupt.c
-+++ b/arch/s390/kvm/interrupt.c
-@@ -1901,13 +1901,12 @@ static int __inject_io(struct kvm *kvm, struct kvm_s390_interrupt_info *inti)
- 	isc = int_word_to_isc(inti->io.io_int_word);
- 
- 	/*
--	 * Do not make use of gisa in protected mode. We do not use the lock
--	 * checking variant as this is just a performance optimization and we
--	 * do not hold the lock here. This is ok as the code will pick
--	 * interrupts from both "lists" for delivery.
-+	 * We do not use the lock checking variant as this is just a
-+	 * performance optimization and we do not hold the lock here.
-+	 * This is ok as the code will pick interrupts from both "lists"
-+	 * for delivery.
- 	 */
--	if (!kvm_s390_pv_get_handle(kvm) &&
--	    gi->origin && inti->type & KVM_S390_INT_IO_AI_MASK) {
-+	if (gi->origin && inti->type & KVM_S390_INT_IO_AI_MASK) {
- 		VM_EVENT(kvm, 4, "%s isc %1u", "inject: I/O (AI/gisa)", isc);
- 		gisa_set_ipm_gisc(gi->origin, isc);
- 		kfree(inti);
-@@ -3171,9 +3170,33 @@ void kvm_s390_gisa_init(struct kvm *kvm)
- 	VM_EVENT(kvm, 3, "gisa 0x%pK initialized", gi->origin);
- }
- 
-+void kvm_s390_gisa_enable(struct kvm *kvm)
-+{
-+	struct kvm_s390_gisa_interrupt *gi = &kvm->arch.gisa_int;
-+	struct kvm_vcpu *vcpu;
-+	unsigned long i;
-+	u32 gisa_desc;
-+
-+	if (gi->origin)
-+		return;
-+	kvm_s390_gisa_init(kvm);
-+	gisa_desc = kvm_s390_get_gisa_desc(kvm);
-+	if (!gisa_desc)
-+		return;
-+	kvm_for_each_vcpu(i, vcpu, kvm) {
-+		mutex_lock(&vcpu->mutex);
-+		vcpu->arch.sie_block->gd = gisa_desc;
-+		vcpu->arch.sie_block->eca |= ECA_AIV;
-+		VCPU_EVENT(vcpu, 3, "AIV gisa format-%u enabled for cpu %03u",
-+			   vcpu->arch.sie_block->gd & 0x3, vcpu->vcpu_id);
-+		mutex_unlock(&vcpu->mutex);
-+	}
-+}
-+
- void kvm_s390_gisa_destroy(struct kvm *kvm)
- {
- 	struct kvm_s390_gisa_interrupt *gi = &kvm->arch.gisa_int;
-+	struct kvm_s390_gisa *gisa = gi->origin;
- 
- 	if (!gi->origin)
- 		return;
-@@ -3184,6 +3207,25 @@ void kvm_s390_gisa_destroy(struct kvm *kvm)
- 		cpu_relax();
- 	hrtimer_cancel(&gi->timer);
- 	gi->origin = NULL;
-+	VM_EVENT(kvm, 3, "gisa 0x%pK destroyed", gisa);
-+}
-+
-+void kvm_s390_gisa_disable(struct kvm *kvm)
-+{
-+	struct kvm_s390_gisa_interrupt *gi = &kvm->arch.gisa_int;
-+	struct kvm_vcpu *vcpu;
-+	unsigned long i;
-+
-+	if (!gi->origin)
-+		return;
-+	kvm_for_each_vcpu(i, vcpu, kvm) {
-+		mutex_lock(&vcpu->mutex);
-+		vcpu->arch.sie_block->eca &= ~ECA_AIV;
-+		vcpu->arch.sie_block->gd = 0U;
-+		mutex_unlock(&vcpu->mutex);
-+		VCPU_EVENT(vcpu, 3, "AIV disabled for cpu %03u", vcpu->vcpu_id);
-+	}
-+	kvm_s390_gisa_destroy(kvm);
- }
- 
- /**
 diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index e056ad86ccd2..b5ea95cf8686 100644
+index b5ea95cf8686..b53ff693b66e 100644
 --- a/arch/s390/kvm/kvm-s390.c
 +++ b/arch/s390/kvm/kvm-s390.c
-@@ -2195,6 +2195,9 @@ static int kvm_s390_cpus_from_pv(struct kvm *kvm, u16 *rcp, u16 *rrcp)
- 		}
- 		mutex_unlock(&vcpu->mutex);
- 	}
-+	/* Ensure that we re-enable gisa if the non-PV guest used it but the PV guest did not. */
-+	if (use_gisa)
-+		kvm_s390_gisa_enable(kvm);
- 	return ret;
+@@ -3961,14 +3961,12 @@ static int kvm_s390_handle_requests(struct kvm_vcpu *vcpu)
+ 	return 0;
  }
  
-@@ -2206,6 +2209,10 @@ static int kvm_s390_cpus_to_pv(struct kvm *kvm, u16 *rc, u16 *rrc)
- 
+-void kvm_s390_set_tod_clock(struct kvm *kvm,
+-			    const struct kvm_s390_vm_tod_clock *gtod)
++static void __kvm_s390_set_tod_clock(struct kvm *kvm, const struct kvm_s390_vm_tod_clock *gtod)
+ {
  	struct kvm_vcpu *vcpu;
+ 	union tod_clock clk;
+ 	unsigned long i;
  
-+	/* Disable the GISA if the ultravisor does not support AIV. */
-+	if (!test_bit_inv(BIT_UV_FEAT_AIV, &uv_info.uv_feature_indications))
-+		kvm_s390_gisa_disable(kvm);
-+
- 	kvm_for_each_vcpu(i, vcpu, kvm) {
- 		mutex_lock(&vcpu->mutex);
- 		r = kvm_s390_pv_create_cpu(vcpu, rc, rrc);
-@@ -3350,9 +3357,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+-	mutex_lock(&kvm->lock);
+ 	preempt_disable();
  
- 	vcpu->arch.sie_block->icpua = vcpu->vcpu_id;
- 	spin_lock_init(&vcpu->arch.local_int.lock);
--	vcpu->arch.sie_block->gd = (u32)(u64)vcpu->kvm->arch.gisa_int.origin;
--	if (vcpu->arch.sie_block->gd && sclp.has_gisaf)
--		vcpu->arch.sie_block->gd |= GISA_FORMAT1;
-+	vcpu->arch.sie_block->gd = kvm_s390_get_gisa_desc(vcpu->kvm);
- 	seqcount_init(&vcpu->arch.cputm_seqcount);
+ 	store_tod_clock_ext(&clk);
+@@ -3989,9 +3987,24 @@ void kvm_s390_set_tod_clock(struct kvm *kvm,
  
- 	vcpu->arch.pfault_token = KVM_S390_PFAULT_TOKEN_INVALID;
-diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
-index 098831e815e6..4ba8fc30d87a 100644
---- a/arch/s390/kvm/kvm-s390.h
-+++ b/arch/s390/kvm/kvm-s390.h
-@@ -231,6 +231,15 @@ static inline unsigned long kvm_s390_get_gfn_end(struct kvm_memslots *slots)
- 	return ms->base_gfn + ms->npages;
- }
- 
-+static inline u32 kvm_s390_get_gisa_desc(struct kvm *kvm)
-+{
-+	u32 gd = (u32)(u64)kvm->arch.gisa_int.origin;
-+
-+	if (gd && sclp.has_gisaf)
-+		gd |= GISA_FORMAT1;
-+	return gd;
+ 	kvm_s390_vcpu_unblock_all(kvm);
+ 	preempt_enable();
 +}
 +
- /* implemented in pv.c */
- int kvm_s390_pv_destroy_cpu(struct kvm_vcpu *vcpu, u16 *rc, u16 *rrc);
- int kvm_s390_pv_create_cpu(struct kvm_vcpu *vcpu, u16 *rc, u16 *rrc);
-@@ -450,6 +459,8 @@ int kvm_s390_get_irq_state(struct kvm_vcpu *vcpu,
- void kvm_s390_gisa_init(struct kvm *kvm);
- void kvm_s390_gisa_clear(struct kvm *kvm);
- void kvm_s390_gisa_destroy(struct kvm *kvm);
-+void kvm_s390_gisa_disable(struct kvm *kvm);
-+void kvm_s390_gisa_enable(struct kvm *kvm);
- int kvm_s390_gib_init(u8 nisc);
- void kvm_s390_gib_destroy(void);
++void kvm_s390_set_tod_clock(struct kvm *kvm, const struct kvm_s390_vm_tod_clock *gtod)
++{
++	mutex_lock(&kvm->lock);
++	__kvm_s390_set_tod_clock(kvm, gtod);
+ 	mutex_unlock(&kvm->lock);
+ }
  
++int kvm_s390_try_set_tod_clock(struct kvm *kvm, const struct kvm_s390_vm_tod_clock *gtod)
++{
++	if (!mutex_trylock(&kvm->lock))
++		return 0;
++	__kvm_s390_set_tod_clock(kvm, gtod);
++	mutex_unlock(&kvm->lock);
++	return 1;
++}
++
+ /**
+  * kvm_arch_fault_in_page - fault-in guest page if necessary
+  * @vcpu: The corresponding virtual cpu
+diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
+index 4ba8fc30d87a..798955b62fa3 100644
+--- a/arch/s390/kvm/kvm-s390.h
++++ b/arch/s390/kvm/kvm-s390.h
+@@ -358,8 +358,8 @@ int kvm_s390_handle_sigp(struct kvm_vcpu *vcpu);
+ int kvm_s390_handle_sigp_pei(struct kvm_vcpu *vcpu);
+ 
+ /* implemented in kvm-s390.c */
+-void kvm_s390_set_tod_clock(struct kvm *kvm,
+-			    const struct kvm_s390_vm_tod_clock *gtod);
++void kvm_s390_set_tod_clock(struct kvm *kvm, const struct kvm_s390_vm_tod_clock *gtod);
++int kvm_s390_try_set_tod_clock(struct kvm *kvm, const struct kvm_s390_vm_tod_clock *gtod);
+ long kvm_arch_fault_in_page(struct kvm_vcpu *vcpu, gpa_t gpa, int writable);
+ int kvm_s390_store_status_unloaded(struct kvm_vcpu *vcpu, unsigned long addr);
+ int kvm_s390_vcpu_store_status(struct kvm_vcpu *vcpu, unsigned long addr);
+diff --git a/arch/s390/kvm/priv.c b/arch/s390/kvm/priv.c
+index 30b24c42ef99..5beb7a4a11b3 100644
+--- a/arch/s390/kvm/priv.c
++++ b/arch/s390/kvm/priv.c
+@@ -102,7 +102,20 @@ static int handle_set_clock(struct kvm_vcpu *vcpu)
+ 		return kvm_s390_inject_prog_cond(vcpu, rc);
+ 
+ 	VCPU_EVENT(vcpu, 3, "SCK: setting guest TOD to 0x%llx", gtod.tod);
+-	kvm_s390_set_tod_clock(vcpu->kvm, &gtod);
++	/*
++	 * To set the TOD clock the kvm lock must be taken, but the vcpu lock
++	 * is already held in handle_set_clock. The usual lock order is the
++	 * opposite.  As SCK is deprecated and should not be used in several
++	 * cases, for example when the multiple epoch facility or TOD clock
++	 * steering facility is installed (see Principles of Operation),  a
++	 * slow path can be used.  If the lock can not be taken via try_lock,
++	 * the instruction will be retried via -EAGAIN at a later point in
++	 * time.
++	 */
++	if (!kvm_s390_try_set_tod_clock(vcpu->kvm, &gtod)) {
++		kvm_s390_retry_instr(vcpu);
++		return -EAGAIN;
++	}
+ 
+ 	kvm_s390_set_psw_cc(vcpu, 0);
+ 	return 0;
 -- 
 2.35.1
 
