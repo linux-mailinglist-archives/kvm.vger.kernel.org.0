@@ -2,146 +2,459 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B65E4D9128
-	for <lists+kvm@lfdr.de>; Tue, 15 Mar 2022 01:21:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5DF644D9134
+	for <lists+kvm@lfdr.de>; Tue, 15 Mar 2022 01:23:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244984AbiCOAWl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Mar 2022 20:22:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36084 "EHLO
+        id S245699AbiCOAX7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Mar 2022 20:23:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230466AbiCOAWj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Mar 2022 20:22:39 -0400
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2061.outbound.protection.outlook.com [40.107.236.61])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 272CE3BA6C;
-        Mon, 14 Mar 2022 17:21:29 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DDACaqsZC6QnsTvwX4NaBhFgUiwoy1LUdKszfRZ3oqFK69K4GA4sGBUGSoZaFVR/IGLyLV5Bhp3BdsG53AjJcMTLlgiYhPgBDOGYyRGEmOSPWNC2Sm8heK3tBD+NHEJVrhobEUcAQ33ALxlhtafW33IfypjDsMZPx5mwz11y819bYxPBW/zgyNLkp0etZT2fATTXi/HoHQ7WpzppMtJ1+cOk3s59FaNc7sZASKPp+ZxY08kMm1fF21fUzwOJdPH48OIOKI+dNjiVza1kBnki35iMSfS8zZJZHgOxznOYyqZV1GVXcDMy23/E7Ar1TT2kxyyjLOo1bOnxIh8XUIX6BA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=SHA4OMOCUl1HYoG2QLcaafJ6FG6OjkweJ2kcI7qgZ9s=;
- b=njZgY+zV/p2P/BDdR60loWlYcY2SR7VimfWd31sTlRzZmTuwoXYyxNzqY+1qGT2kLTASLIPlMTgvu42/lCFLtOCWdXLUPfKuWKcRiw4qrrdCIKWNVvS/JQNmPj98gCRjI4kIy2tbNPL12jpvfUZNVCGsid6EAsPYyq9Ry2buruG+SRmeJ4pw2MNPQmDkoV7Avo2/4GUCmCLEaH7DXsesIcyzWzJK0CX2CMiYfKn/jjiw2xf47l9JoubGRO4N6MC/esxiKGkqNZgmYtlShsdmgV7ru4SEH00wc9VWtXx0ebNd3zTs3QH0CnclP/bjRykBS3iF9DSY0SKqO8jOsC/amQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SHA4OMOCUl1HYoG2QLcaafJ6FG6OjkweJ2kcI7qgZ9s=;
- b=IqZYi9EDtnRi+iqM6cSlmsI50po27hLff+b1IZSbx3Hwq1Pr6L9uJPj/uQYr9LXpRvlRH9ZBjDzOnR3XpAQASvVys0ajHNuyFBFBFjF7NZYa+JXh7rxq++JiQRKTpOSqEFP3goXIah9x4SPNpbZTtw0G+r+rpbfKsP5MqAwbd6H+yY9utgwckyydK/tPG2fqMDvu7ERfMqrV8CVGevinMQ6FILktBL3e2WsI6Jd8kxWBClrxtNDyFnYiGlHos2hQW5mTVu/AiBIy2F9mpIx9C3qZ+YVgAnlULLGk30JHspS1NjzkXJzmFLurX/0uKVvTVEbCq++zlke2OI02QSMA9A==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by SN1PR12MB2590.namprd12.prod.outlook.com (2603:10b6:802:2e::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5061.24; Tue, 15 Mar
- 2022 00:21:27 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::51a0:4aee:2b4c:ca28]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::51a0:4aee:2b4c:ca28%4]) with mapi id 15.20.5061.028; Tue, 15 Mar 2022
- 00:21:26 +0000
-Date:   Mon, 14 Mar 2022 21:21:25 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Lu Baolu <baolu.lu@linux.intel.com>, Joerg Roedel <joro@8bytes.org>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Ashok Raj <ashok.raj@intel.com>, Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Dan Williams <dan.j.williams@intel.com>, rafael@kernel.org,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Liu Yi L <yi.l.liu@intel.com>,
-        Jacob jun Pan <jacob.jun.pan@intel.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Stuart Yoder <stuyoder@gmail.com>,
-        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        Li Yang <leoyang.li@nxp.com>,
-        Dmitry Osipenko <digetx@gmail.com>,
-        iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v8 00/11] Fix BUG_ON in vfio_iommu_group_notifier()
-Message-ID: <20220315002125.GU11336@nvidia.com>
-References: <20220308054421.847385-1-baolu.lu@linux.intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220308054421.847385-1-baolu.lu@linux.intel.com>
-X-ClientProxiedBy: BL1PR13CA0029.namprd13.prod.outlook.com
- (2603:10b6:208:256::34) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
+        with ESMTP id S245612AbiCOAX4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Mar 2022 20:23:56 -0400
+Received: from mail-yb1-xb2d.google.com (mail-yb1-xb2d.google.com [IPv6:2607:f8b0:4864:20::b2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BAD63F316
+        for <kvm@vger.kernel.org>; Mon, 14 Mar 2022 17:22:44 -0700 (PDT)
+Received: by mail-yb1-xb2d.google.com with SMTP id u10so34121591ybd.9
+        for <kvm@vger.kernel.org>; Mon, 14 Mar 2022 17:22:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=eKi3+CsLVruOvOPsr9J61HA1F8KIWvYLuWMmc9nb/Ts=;
+        b=WhRUWGbqWRYXIjDWHpk7A2k1VsbR3QHvyMpYxhaX0Gd8jHa4syTaJP4TjbxP5PVtqX
+         TZXWDjzo797/S3/i7LRChjoW/sh+FZR7zcB5XlCqta1W47tI4HMQo4G0CSasD7+2HtO9
+         x+CcfCHFFXRp8vVVSFSrPvUVwYVDgU09W2cCWEQimVKrtHlDLhI+5apSfN1xAD+Qx3Ph
+         dFA4oWgGnKZOr8gF1cngTYVhumk3KB07kykcbYgXN9qDC5VnQEvB7oE79fS/YKHmFD5+
+         Zuj3zv6tWUbwvwaW/AqOtQkz/O+QHmH6AJglOoo9zJkFRynt/ircwnjnVmhxhlkFmg2F
+         yqTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=eKi3+CsLVruOvOPsr9J61HA1F8KIWvYLuWMmc9nb/Ts=;
+        b=RVHuZwi6esmfal0/NFC5h9yAnroGelEOFx9bu+5KVzGfyphp2AHs4DIeLkfzaC3SBa
+         z1mF9MmeaPvQQ+Sp/UNLvjZQTT8gL+K4YaNL4bzTNZym3RpxHNRAY3S24mFhApCzKeB8
+         HOKB0CQW9eNh89DAC6ccO2k9IcLeWsqS62/psS7cc80RNQ+x/qAmE2sDSZ0zIhzpQPkn
+         4eNn7s/j5ocOETpI2PsozuVT9aeTapUYHNDhdGhLn47BM91XikLc8QhVVY9Y8gAf7hgu
+         2qgLV92GhbW/EI+disAvzvc8TS4w4h6pK6S93LHIX5dqHm41CVm30/pmV+/IlqE4cr0d
+         6ntQ==
+X-Gm-Message-State: AOAM530DscbVvOFqN0LAK9jpLdXSlD8wokC670LVcI0mhN2pRUOnZMeD
+        M7E/AyppJiogEzYyOx+xZ/MY2lfZKQ3vXhlmepxAoQ==
+X-Google-Smtp-Source: ABdhPJw6Ox3E4V7guMFGZ3JuyT1NQW2VRJuc0wkTONax3iEe5m6CrEEHzOJRfdiQUO2hqMhFZEyrapNgQPeZWr3zVNc=
+X-Received: by 2002:a5b:5c1:0:b0:633:3374:7684 with SMTP id
+ w1-20020a5b05c1000000b0063333747684mr7722908ybp.23.1647303763386; Mon, 14 Mar
+ 2022 17:22:43 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: c95f2ebb-43ae-492e-1425-08da0619be43
-X-MS-TrafficTypeDiagnostic: SN1PR12MB2590:EE_
-X-Microsoft-Antispam-PRVS: <SN1PR12MB2590FFF757E74BCC2BB52437C2109@SN1PR12MB2590.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: zUAb67HHe0Lcbba8gEU26JGabEjxcN4Bzp/hzFL1tn+b6Rbrk7zVrctHGq3WcYsOiX5SixXjzZM7cDQPNsy94/umhxfb+iCEjaT3y6izolfImVK1UJZAf7AtuD8UO9Q8DSKBW/Y7Wv3Axju1bnDLOTYtYPF6sURD1B1NhH1TSfejiTxCnZDpJRuJeCGiDexkaLNwP9l3ec3lXOpSAe012fv9nLJQmkcj2QKUkABR/28FPqekk3IXaDvjCqSVhOr/GALHoh1I8wXktplbmeexYu8M70K/lE9QUUzh6yundRiEoFv6aBEvqrS48+1B9d0RFrAfUA9yxCYFaQ4Ma29S5Umc+KLYZ7iit17irNej2vjlFt+apZp+2Q4NfLfh4iqprGNEC/sTHUReayUs/Ey+o69cWMApKie9TP/pnV/Hb6OTQF8SVjPzML2ZGuIfWmRh6b20zhq/bFlq+O8hG1/GIcT1FNUTun1QhF/oGWSXfH4+svpbTgj7jwtctmVo66tA1nW4FMu39fwyt7FRnj4k8fXI0ypXZaycxO/E8wWqB0Gn1n3Kxy1JUWZZE26zA1J8yUx5Nb+2QF/xqujc1CD+cz91SqrIObGowvL+nO6ghox7Ieo0EvcpsXnKkMT0iS/Cg33vQH43V0vs3ZiuLNtXGQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(186003)(38100700002)(8936002)(6506007)(6512007)(36756003)(6486002)(508600001)(7416002)(5660300002)(26005)(1076003)(2616005)(4326008)(110136005)(8676002)(66556008)(66476007)(316002)(2906002)(54906003)(66946007)(33656002)(4744005)(83380400001)(86362001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?2BeG50apAi9xQ4LEMb0xBkzRnEHTO2C75KpC4rb1/9zGeiYTMTpydq+pCiha?=
- =?us-ascii?Q?Tuw6hplTtV4Oiekwhi0ub386UU1HdvwSiL4xjlJVjeFwtKGORc3ZxWvzy06U?=
- =?us-ascii?Q?XG7IIlu5RAbi2UT86jr43ccyFf5ivok0ejgPgeuQN8UbGSSVXGnxz1jzsbyd?=
- =?us-ascii?Q?JYqw6MCr2cMQGZImROEw57n8bM1iILWLFZ/6AvIXGrFY8s/+snOctyhhte4Z?=
- =?us-ascii?Q?LUn01u9V6a9z3vFuAB8vZMTG57o0fihqDvN3UmoIyBs/ppWgUE4XK7eLYfTT?=
- =?us-ascii?Q?vPbo+HxbjvHMF0TySpu8dOdaLJnKcWl2JIGayNPjExWULgtRsDtmAQgaSsoI?=
- =?us-ascii?Q?cTgU7TpV9/K2UQmLFeWKGOG7w81DxCDfknqh0kJ6el2WxgHOnF+uHxWmzEzL?=
- =?us-ascii?Q?se0m8qTYOmnlIe6i6DTTDkyRjCScb64f7ZPgQSNsuja0k8+HUV/y4IbKwTRh?=
- =?us-ascii?Q?O6LnMFv57epUl9X8DmytmIX6hXf3rApaVLCzMWCp8Nro0JfiVVqCQ2q3p22q?=
- =?us-ascii?Q?Sng9tp6TIL7h9BUrlwL7d3Yk/EcGBxpqDEtwXqxk4ghLDAXSvVkO5Fuh+AR1?=
- =?us-ascii?Q?QfREzGkaM3+lOlLHUPlIAvLH3R0ApAr/2wqHQEb0ibD9BVZ2LppoYj5WYABb?=
- =?us-ascii?Q?6WGi3YVWXfLuV9NS/a4acACqQ/pMU5NOLMeSnFjnrZMjHApgWWXJYYkdYZ8h?=
- =?us-ascii?Q?ixIrQkZnX0Ao1vCxq7z9IuOcMRecLvAq9rl1/ohwTLwqE1rtHp2XIdUO29rH?=
- =?us-ascii?Q?zoQwfwJn9LbZis1XcwbZIyIcHtVkFoJtQVVGY/2i9IiL6T016lx8411qCa9n?=
- =?us-ascii?Q?57N2A/z5t8HiPBEwAB7+VnifTURv1vMZOdFSuhtxCuFO8cj68HAwpvt/vviy?=
- =?us-ascii?Q?qZU186piPV4HW3xKPeyjpEDGdrbkXs060YBaDeMr0jxAktYPv5RIxVGXnWXe?=
- =?us-ascii?Q?eDSI2S2zowlvTXdYCstgn1RCi5C/2X1sdwY58yw2ZeSK7XbyjXJyjHoAVytv?=
- =?us-ascii?Q?bnQhy2AckX6GKSFch+Z6MnrXiudHFCnrLxiFgVQ9+vH0ettc/TMViHDIhZBG?=
- =?us-ascii?Q?oXAE/9delphD8eXp+IDTerf2grG2M1BEwzTlFA4YFIAV+x3PvNn8jRRsHXFy?=
- =?us-ascii?Q?PjUtLA5ncazCIANICZ0RoVhLKbntUCQWhrA+qIm/YDj0T0pKcd0yemc++06L?=
- =?us-ascii?Q?+sa3PNRqYX11Z+AtXV3bqYNWvMDxqt+lEomW5Nj+S6zfJv/0HqvZ4aNshSTA?=
- =?us-ascii?Q?3TDXhyrA/jcVkpISp68d9daZIcBAiKb2U1U/kRaCpJSd6EdtPgb8PeI4PvJV?=
- =?us-ascii?Q?u4muY03/VK2p5jJKb7dUiYvIiB9mBZbg9l+55DlnYyyMGaPPfQKTk/J6SiHv?=
- =?us-ascii?Q?0Bm6bw1O18befqr/I/scC8sJcGiHPn4/7WM74nwnP3sX1SOXM2eoBLc1+IIh?=
- =?us-ascii?Q?PAQjD3i+dLeOAGTtwWomLgkrh/78AAp/?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c95f2ebb-43ae-492e-1425-08da0619be43
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Mar 2022 00:21:26.5330
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: yqdl1RRZxGLBUzUORcxTRhruROcwGi+8w4OMna9Psybe6WycmPcfdKvk/yNfKNm8
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2590
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+References: <20220224172559.4170192-1-rananta@google.com> <20220224172559.4170192-6-rananta@google.com>
+ <Yi+aTs4ufnxHXg4r@google.com>
+In-Reply-To: <Yi+aTs4ufnxHXg4r@google.com>
+From:   Raghavendra Rao Ananta <rananta@google.com>
+Date:   Mon, 14 Mar 2022 17:22:31 -0700
+Message-ID: <CAJHc60yuSfd9YUXmXQjoS+K5u562nAArriB_tVP=mvuLuDeKFQ@mail.gmail.com>
+Subject: Re: [PATCH v4 05/13] KVM: arm64: Setup a framework for hypercall
+ bitmap firmware registers
+To:     Oliver Upton <oupton@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Andrew Jones <drjones@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 08, 2022 at 01:44:10PM +0800, Lu Baolu wrote:
-> Hi folks,
-> 
-> The iommu group is the minimal isolation boundary for DMA. Devices in
-> a group can access each other's MMIO registers via peer to peer DMA
-> and also need share the same I/O address space.
+Hi Oliver,
 
-Joerg, are we good for the coming v5.18 merge window now? There are
-several things backed up behind this series.
+On Mon, Mar 14, 2022 at 12:41 PM Oliver Upton <oupton@google.com> wrote:
+>
+> On Thu, Feb 24, 2022 at 05:25:51PM +0000, Raghavendra Rao Ananta wrote:
+> > KVM regularly introduces new hypercall services to the guests without
+> > any consent from the userspace. This means, the guests can observe
+> > hypercall services in and out as they migrate across various host
+> > kernel versions. This could be a major problem if the guest
+> > discovered a hypercall, started using it, and after getting migrated
+> > to an older kernel realizes that it's no longer available. Depending
+> > on how the guest handles the change, there's a potential chance that
+> > the guest would just panic.
+> >
+> > As a result, there's a need for the userspace to elect the services
+> > that it wishes the guest to discover. It can elect these services
+> > based on the kernels spread across its (migration) fleet. To remedy
+> > this, extend the existing firmware psuedo-registers, such as
+> > KVM_REG_ARM_PSCI_VERSION, for all the hypercall services available.
+> >
+> > These firmware registers are categorized based on the service call
+> > owners, and unlike the existing firmware psuedo-registers, they hold
+> > the features supported in the form of a bitmap.
+> >
+> > During the VM initialization, the registers holds an upper-limit of
+> > the features supported by the corresponding registers. It's expected
+> > that the VMMs discover the features provided by each register via
+> > GET_ONE_REG, and writeback the desired values using SET_ONE_REG.
+> > KVM allows this modification only until the VM has started.
+> >
+> > Older userspace code can simply ignore the capability and the
+> > hypercall services will be exposed unconditionally to the guests, thus
+> > ensuring backward compatibility.
+> >
+> > In this patch, the framework adds the register only for ARM's standard
+> > secure services (owner value 4). Currently, this includes support only
+> > for ARM True Random Number Generator (TRNG) service, with bit-0 of the
+> > register representing mandatory features of v1.0. The register is also
+> > added to the kvm_arm_vm_scope_fw_regs[] list as it maintains its state
+> > per-VM. Other services are momentarily added in the upcoming patches.
+> >
+> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_host.h | 12 +++++
+> >  arch/arm64/include/uapi/asm/kvm.h |  8 ++++
+> >  arch/arm64/kvm/arm.c              |  8 ++++
+> >  arch/arm64/kvm/guest.c            |  1 +
+> >  arch/arm64/kvm/hypercalls.c       | 78 +++++++++++++++++++++++++++++++
+> >  include/kvm/arm_hypercalls.h      |  4 ++
+> >  6 files changed, 111 insertions(+)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index e823571e50cc..1909ced3208f 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -101,6 +101,15 @@ struct kvm_s2_mmu {
+> >  struct kvm_arch_memory_slot {
+> >  };
+> >
+> > +/**
+> > + * struct kvm_hvc_desc: KVM ARM64 hypercall descriptor
+> > + *
+> > + * @hvc_std_bmap: Bitmap of standard secure service calls
+> > + */
+> > +struct kvm_hvc_desc {
+>
+> nit: maybe call this structure kvm_hypercall_features? When nested comes
+> along guests will need to use the SVC conduit as HVC traps are always
+> taken to EL2. Same will need to be true for virtual EL2.
+>
+Sure, I can rename it to be more generic.
 
-Thanks,
-Jason
+> > +     u64 hvc_std_bmap;
+> > +};
+> > +
+> >  struct kvm_arch {
+> >       struct kvm_s2_mmu mmu;
+> >
+> > @@ -142,6 +151,9 @@ struct kvm_arch {
+> >
+> >       /* Capture first run of the VM */
+> >       bool has_run_once;
+> > +
+> > +     /* Hypercall firmware register' descriptor */
+> > +     struct kvm_hvc_desc hvc_desc;
+> >  };
+> >
+> >  struct kvm_vcpu_fault_info {
+> > diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> > index c35447cc0e0c..2decc30d6b84 100644
+> > --- a/arch/arm64/include/uapi/asm/kvm.h
+> > +++ b/arch/arm64/include/uapi/asm/kvm.h
+> > @@ -287,6 +287,14 @@ struct kvm_arm_copy_mte_tags {
+> >  #define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_REQUIRED     3
+> >  #define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED          (1U << 4)
+> >
+> > +/* Bitmap firmware registers, extension to the existing psuedo-register space */
+> > +#define KVM_REG_ARM_FW_BMAP                  KVM_REG_ARM_FW_REG(0xff00)
+>
+> What is the motivation for moving the bitmap register indices so far
+> away from the rest of the firmware regs?
+>
+The original motivation to create a sub-space came from Reiji's
+comment on v3 [1] so that user-space can distinguish between bitmapped
+and regular fw registers.
+As with the spacing, I thought a 50/50 split would do a good job of
+avoiding collisions. Do you have any recommendations here?
+
+> > +#define KVM_REG_ARM_FW_BMAP_REG(r)           (KVM_REG_ARM_FW_BMAP | (r))
+>
+> If you are still going to use the index offset, just pass 'r' through to
+> the other macro:
+>
+>   #define KVM_REG_ARM_FW_BMAP_REG(r)            KVM_REG_ARM_FW_REG(0xff00 + r)
+>
+I'm sorry, what's the advantage of doing this?
+
+> > +#define KVM_REG_ARM_STD_BMAP                 KVM_REG_ARM_FW_BMAP_REG(0)
+> > +#define KVM_REG_ARM_STD_BIT_TRNG_V1_0                BIT(0)
+> > +#define KVM_REG_ARM_STD_BMAP_BIT_MAX         0       /* Last valid bit */
+>
+> Implementation details such as this probably shouldn't live in UAPI
+> headers. We'll likely need to bump the value in the future.
+>
+Wouldn't the macros act as helpers to userspace as well?
+I agree with your point about the limited spacing, and we may need to
+expand/shrink as needed, but isn't that a general register-space
+problem?
+
+> > +
+> >  /* SVE registers */
+> >  #define KVM_REG_ARM64_SVE            (0x15 << KVM_REG_ARM_COPROC_SHIFT)
+> >
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index f61cd8d57eae..e9f9edb1cf55 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -156,6 +156,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+> >       kvm->arch.max_vcpus = kvm_arm_default_max_vcpus();
+> >
+> >       set_default_spectre(kvm);
+> > +     kvm_arm_init_hypercalls(kvm);
+> >
+> >       return ret;
+> >  out_free_stage2_pgd:
+> > @@ -635,7 +636,14 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
+> >       if (kvm_vm_is_protected(kvm))
+> >               kvm_call_hyp_nvhe(__pkvm_vcpu_init_traps, vcpu);
+> >
+> > +     /*
+> > +      * Grab kvm->lock such that the reader of has_run_once can finish
+> > +      * the necessary operation atomically, such as deciding whether to
+> > +      * block the writes to the firmware registers if the VM has run once.
+> > +      */
+> > +     mutex_lock(&kvm->lock);
+> >       kvm->arch.has_run_once = true;
+> > +     mutex_unlock(&kvm->lock);
+>
+> Shouldn't this have just grabbed the kvm lock in patch 04/13?
+>
+It could have, and I agree it's a little igly. But thinking that
+there's are no parallel threads/consumers when it was initially
+implemented gave me no reason to grab the locks.
+> >       return ret;
+> >  }
+> > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> > index eb061e64a7a5..d66e6c742bbe 100644
+> > --- a/arch/arm64/kvm/guest.c
+> > +++ b/arch/arm64/kvm/guest.c
+> > @@ -65,6 +65,7 @@ const struct kvm_stats_header kvm_vcpu_stats_header = {
+> >  static const u64 kvm_arm_vm_scope_fw_regs[] = {
+> >       KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1,
+> >       KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2,
+> > +     KVM_REG_ARM_STD_BMAP,
+> >  };
+> >
+> >  /**
+> > diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+> > index 8624e6964940..48c126c3da72 100644
+> > --- a/arch/arm64/kvm/hypercalls.c
+> > +++ b/arch/arm64/kvm/hypercalls.c
+> > @@ -58,6 +58,29 @@ static void kvm_ptp_get_time(struct kvm_vcpu *vcpu, u64 *val)
+> >       val[3] = lower_32_bits(cycles);
+> >  }
+> >
+> > +static bool kvm_arm_fw_reg_feat_enabled(u64 reg_bmap, u64 feat_bit)
+> > +{
+> > +     return reg_bmap & feat_bit;
+> > +}
+> > +
+> > +static bool kvm_hvc_call_supported(struct kvm_vcpu *vcpu, u32 func_id)
+> > +{
+> > +     struct kvm_hvc_desc *hvc_desc = &vcpu->kvm->arch.hvc_desc;
+> > +
+> > +     switch (func_id) {
+> > +     case ARM_SMCCC_TRNG_VERSION:
+> > +     case ARM_SMCCC_TRNG_FEATURES:
+> > +     case ARM_SMCCC_TRNG_GET_UUID:
+> > +     case ARM_SMCCC_TRNG_RND32:
+> > +     case ARM_SMCCC_TRNG_RND64:
+> > +             return kvm_arm_fw_reg_feat_enabled(hvc_desc->hvc_std_bmap,
+> > +                                             KVM_REG_ARM_STD_BIT_TRNG_V1_0);
+> > +     default:
+> > +             /* By default, allow the services that aren't listed here */
+> > +             return true;
+>
+> I think your default case should really return false. It keeps people
+> honest when they add new patches to set up a new hypercall bit (no bit?
+> no call!)
+>
+> That of course requires that you only return false once all of the
+> preexisting hypercalls are enumerated, otherwise such a patch would
+> cause a regression in isolation.
+>
+I agree, but not all hypercalls may have a bit. For example, guarding
+ARM_SMCCC_VERSION_FUNC_ID doesn't make sense and may not be gated by
+the bit. Hence, the idea was to do an initial check if the func_id is
+in fact gated. If yes, check the bit, else let the actual
+implementation take care of it.
+
+> > +}
+> > +
+> >  int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+> >  {
+> >       u32 func_id = smccc_get_function(vcpu);
+> > @@ -65,6 +88,9 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+> >       u32 feature;
+> >       gpa_t gpa;
+> >
+> > +     if (!kvm_hvc_call_supported(vcpu, func_id))
+> > +             goto out;
+> > +
+> >       switch (func_id) {
+> >       case ARM_SMCCC_VERSION_FUNC_ID:
+> >               val[0] = ARM_SMCCC_VERSION_1_1;
+> > @@ -143,6 +169,7 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+> >               return kvm_psci_call(vcpu);
+> >       }
+> >
+> > +out:
+> >       smccc_set_retval(vcpu, val[0], val[1], val[2], val[3]);
+> >       return 1;
+> >  }
+> > @@ -151,8 +178,16 @@ static const u64 kvm_arm_fw_reg_ids[] = {
+> >       KVM_REG_ARM_PSCI_VERSION,
+> >       KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1,
+> >       KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2,
+> > +     KVM_REG_ARM_STD_BMAP,
+> >  };
+> >
+> > +void kvm_arm_init_hypercalls(struct kvm *kvm)
+> > +{
+> > +     struct kvm_hvc_desc *hvc_desc = &kvm->arch.hvc_desc;
+> > +
+> > +     hvc_desc->hvc_std_bmap = ARM_SMCCC_STD_FEATURES;
+> > +}
+> > +
+> >  int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu)
+> >  {
+> >       return ARRAY_SIZE(kvm_arm_fw_reg_ids);
+> > @@ -220,6 +255,7 @@ static int get_kernel_wa_level(u64 regid)
+> >
+> >  int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+> >  {
+> > +     struct kvm_hvc_desc *hvc_desc = &vcpu->kvm->arch.hvc_desc;
+> >       void __user *uaddr = (void __user *)(long)reg->addr;
+> >       u64 val, reg_id = reg->id;
+> >
+> > @@ -233,6 +269,9 @@ int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+> >       case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2:
+> >               val = get_kernel_wa_level(reg_id) & KVM_REG_FEATURE_LEVEL_MASK;
+> >               break;
+> > +     case KVM_REG_ARM_STD_BMAP:
+> > +             val = READ_ONCE(hvc_desc->hvc_std_bmap);
+> > +             break;
+> >       default:
+> >               return -ENOENT;
+> >       }
+> > @@ -243,6 +282,43 @@ int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+> >       return 0;
+> >  }
+> >
+> > +static int kvm_arm_set_fw_reg_bmap(struct kvm_vcpu *vcpu, u64 reg_id, u64 val)
+> > +{
+> > +     int ret = 0;
+> > +     struct kvm *kvm = vcpu->kvm;
+> > +     struct kvm_hvc_desc *hvc_desc = &kvm->arch.hvc_desc;
+> > +     u64 *fw_reg_bmap, fw_reg_features;
+>
+> nit: use reverse fir tree ordering for locals (longest line first,
+> shortest last).
+>
+Got it.
+> > +     switch (reg_id) {
+> > +     case KVM_REG_ARM_STD_BMAP:
+> > +             fw_reg_bmap = &hvc_desc->hvc_std_bmap;
+> > +             fw_reg_features = ARM_SMCCC_STD_FEATURES;
+> > +             break;
+> > +     default:
+> > +             return -ENOENT;
+> > +     }
+> > +
+> > +     /* Check for unsupported bit */
+> > +     if (val & ~fw_reg_features)
+> > +             return -EINVAL;
+> > +
+> > +     mutex_lock(&kvm->lock);
+> > +
+> > +     /*
+> > +      * If the VM (any vCPU) has already started running, return success
+> > +      * if there's no change in the value. Else, return -EBUSY.
+>
+> How about returning -EINVAL instead? We already do this for
+> KVM_ARM_VCPU_INIT if userspace uses a different target than the one
+> previously set.
+>
+Returning EBUSY could help userspace distinguish the cause of failure
+better as compared to EINVAL, since technically, the arguments
+supplied by the user are in fact valid. It's just that the timing is
+wrong.
+
+> > +      */
+> > +     if (kvm_arm_vm_has_run_once(&kvm->arch)) {
+> > +             ret = *fw_reg_bmap != val ? -EBUSY : 0;
+> > +             goto out;
+> > +     }
+> > +
+> > +     WRITE_ONCE(*fw_reg_bmap, val);
+> > +out:
+> > +     mutex_unlock(&kvm->lock);
+> > +     return ret;
+> > +}
+> > +
+> >  int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+> >  {
+> >       void __user *uaddr = (void __user *)(long)reg->addr;
+> > @@ -321,6 +397,8 @@ int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+> >                       return -EINVAL;
+> >
+> >               return 0;
+> > +     case KVM_REG_ARM_STD_BMAP:
+> > +             return kvm_arm_set_fw_reg_bmap(vcpu, reg_id, val);
+> >       default:
+> >               return -ENOENT;
+> >       }
+> > diff --git a/include/kvm/arm_hypercalls.h b/include/kvm/arm_hypercalls.h
+> > index 5d38628a8d04..64d30b452809 100644
+> > --- a/include/kvm/arm_hypercalls.h
+> > +++ b/include/kvm/arm_hypercalls.h
+> > @@ -6,6 +6,9 @@
+> >
+> >  #include <asm/kvm_emulate.h>
+> >
+> > +#define ARM_SMCCC_STD_FEATURES \
+> > +     GENMASK_ULL(KVM_REG_ARM_STD_BMAP_BIT_MAX, 0)
+> > +
+>
+> This probably needs KVM_ somewhere in its name for the sake of scoping.
+>
+RIght, I can append that.
+
+> >  int kvm_hvc_call_handler(struct kvm_vcpu *vcpu);
+> >
+> >  static inline u32 smccc_get_function(struct kvm_vcpu *vcpu)
+> > @@ -42,6 +45,7 @@ static inline void smccc_set_retval(struct kvm_vcpu *vcpu,
+> >
+> >  struct kvm_one_reg;
+> >
+> > +void kvm_arm_init_hypercalls(struct kvm *kvm);
+> >  int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu);
+> >  int kvm_arm_copy_fw_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices);
+> >  int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
+> > --
+> > 2.35.1.473.g83b2b277ed-goog
+> >
+
+Regards,
+Raghavendra
+
+[1]: https://lore.kernel.org/linux-arm-kernel/CAJHc60y6b-scY8zcPuLnjGtr6HzSBnmhi2mCnmkNm4nTxgMTUQ@mail.gmail.com/
