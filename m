@@ -2,79 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D3ED94DA47A
-	for <lists+kvm@lfdr.de>; Tue, 15 Mar 2022 22:19:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B51CD4DA48E
+	for <lists+kvm@lfdr.de>; Tue, 15 Mar 2022 22:23:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351920AbiCOVUz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Mar 2022 17:20:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47020 "EHLO
+        id S243445AbiCOVXP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Mar 2022 17:23:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51400 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244702AbiCOVUy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Mar 2022 17:20:54 -0400
+        with ESMTP id S243249AbiCOVW6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Mar 2022 17:22:58 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 198545B3F3
-        for <kvm@vger.kernel.org>; Tue, 15 Mar 2022 14:19:42 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6E29F5B3F3
+        for <kvm@vger.kernel.org>; Tue, 15 Mar 2022 14:21:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647379181;
+        s=mimecast20190719; t=1647379304;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=7jUK/Zy3c/rIDtBsF8csvV0VQ7PgqvLYqxZFFngnNhM=;
-        b=dhOTTN/Gw8Pa0jUX5nkag6O8mkP73vyNc4w+ekkaodxYMsl3XDQ1bTjtmaUHfGCjfJtKMb
-        /rGbG10oEnrKjt1krLJI1hJ+VUFwGILynBs0Pp0RnG3mCq87fnFKD5aSPDGI1juPLjGfn6
-        D7/fGkNkbM1otl0NaYxuig7cBbd1ylM=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=NXuCGWU9zewjDGKsl7YtKtE7zLqAQ3xKq0SzE1COLFI=;
+        b=Vp49a6yKRpw1+pCHdect9+Ln6Oas8WSxyAsq3ZpGf6gJDz7P78ym12RCdMX8HtmMhhdp0b
+        OwWEqP0XCuph0hmywFXvVqZ47PIasD3OOk96dV11YqgCotCV/AVuuaP5wgzWnvxhWO978M
+        pD+G4bIGkwRymBAKrr9a01WHD9hP5XY=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-222-rD3waI9bMNOuzadb1z4kuw-1; Tue, 15 Mar 2022 17:19:40 -0400
-X-MC-Unique: rD3waI9bMNOuzadb1z4kuw-1
-Received: by mail-ej1-f69.google.com with SMTP id el10-20020a170907284a00b006db9df1f3bbso74299ejc.5
-        for <kvm@vger.kernel.org>; Tue, 15 Mar 2022 14:19:39 -0700 (PDT)
+ us-mta-542-tbItATQmP0ytCkYrNmb0Ug-1; Tue, 15 Mar 2022 17:21:43 -0400
+X-MC-Unique: tbItATQmP0ytCkYrNmb0Ug-1
+Received: by mail-ej1-f71.google.com with SMTP id de35-20020a1709069be300b006df795e2326so81872ejc.2
+        for <kvm@vger.kernel.org>; Tue, 15 Mar 2022 14:21:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=7jUK/Zy3c/rIDtBsF8csvV0VQ7PgqvLYqxZFFngnNhM=;
-        b=5NaUUkMREFFTR5pr4KXlrAmze6YND2lZGCx0SsGZ3Z2MgaGfUoG3Ag1g5mPW9RxBYU
-         O8aHe9RUL75l8DgRREgMgkZbKB/WFi63Y62lNF45ihsbB7K6grqexW5RgTcmTc40vD2Y
-         RdVxLJPZlzuTtKw/gKA7PPvWQZTy26OUhh0AvSNPxvYb92gMj8MqFTx0B2pgpoN9EMzq
-         zhqzxHjJjXsqXJnZAf9XJ5KGAUOS9SSZTxzIHJtCrA3LhYhEeUf+8pQADo9Y+XIswaCs
-         huqURz18b20rjbhQQ914QRnqkeyoKrBzyNCCsoxvDNCQYufKq59UfHyTgGRsx32epG/V
-         e3cA==
-X-Gm-Message-State: AOAM530QVgqpCDUkjdAuLyjsQkYWa343vtyYQqfpalnFcvztxnecJfBd
-        Knu19jN/YsgDWK21s6SNWZldmzcJpE+iCDYXoNU6q3HqBDs/hS7hTTZ8JUEU86gHHHcP001ZEHL
-        hmiH3g+0uwQmS
-X-Received: by 2002:a50:a6d2:0:b0:418:63e1:e4ac with SMTP id f18-20020a50a6d2000000b0041863e1e4acmr16209295edc.169.1647379178872;
-        Tue, 15 Mar 2022 14:19:38 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxGoQOeEdXSq9l09EDd9Ie4vogmFni75MTcsHW4UVuCdrEbQa5cQxionuGJWQcEe9HBBX5IXQ==
-X-Received: by 2002:a50:a6d2:0:b0:418:63e1:e4ac with SMTP id f18-20020a50a6d2000000b0041863e1e4acmr16209280edc.169.1647379178687;
-        Tue, 15 Mar 2022 14:19:38 -0700 (PDT)
+        bh=NXuCGWU9zewjDGKsl7YtKtE7zLqAQ3xKq0SzE1COLFI=;
+        b=iIY3iunAeFKWbQo9IWE8khuVQsn4gE3M0WnblPL9cdM8zns3BJ9B+ejAaGS7gpZfLk
+         DzQkfOV/l8J8AEkFiyDqA6frr1ux/LUqPH8/m0R53O0+rA7sPssl9VBqrGkQ3ahav/Az
+         VoQxcLHBs9Xr9uOR7TGJbYbkoiiVb8HAnftXs/tmtsVtps+dpgrsQ/8fXTIgPOfyEPZN
+         M62xBjHQQM40GLhWOTKqJbKAT6o70KODpTCFelmwo691R1CCoxwatBPutiRbAYOS87YW
+         jJrny08SeoMlRQ1vIcQbuSkSkVgax184V0GZIfdhtPQAt2bHN8Tlo4wqw5KucFruepiY
+         kuRQ==
+X-Gm-Message-State: AOAM532qGFTNr1ddFSUvrPTJwwwIB8QdzzE0oGfsVa7LbNRB4zkEu3Ww
+        aYgy9LsjW4jtEF0bRK4PwH/gayuBbniwm/n05pvkYH8TKmhyh4lywdPETKtNIftl2nZmWi20p/s
+        JmdaJmnPL9b9F
+X-Received: by 2002:a17:906:4fc7:b0:6da:92b2:f572 with SMTP id i7-20020a1709064fc700b006da92b2f572mr24103914ejw.184.1647379301811;
+        Tue, 15 Mar 2022 14:21:41 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJye+k2UJTgNQv/poK+0J3x/pPcB5kz1U3x1hR6oTFFyJZjNE3X2xHxa3ovb3ZV592gAJ2VXfg==
+X-Received: by 2002:a17:906:4fc7:b0:6da:92b2:f572 with SMTP id i7-20020a1709064fc700b006da92b2f572mr24103902ejw.184.1647379301596;
+        Tue, 15 Mar 2022 14:21:41 -0700 (PDT)
 Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.googlemail.com with ESMTPSA id z11-20020a50e68b000000b00412ec8b2180sm43881edm.90.2022.03.15.14.19.37
+        by smtp.googlemail.com with ESMTPSA id q15-20020a1709060e4f00b006cdf4535cf2sm77812eji.67.2022.03.15.14.21.40
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Mar 2022 14:19:38 -0700 (PDT)
-Message-ID: <f9c0542b-f2cc-c90d-1644-fba62a11e85d@redhat.com>
-Date:   Tue, 15 Mar 2022 22:19:35 +0100
+        Tue, 15 Mar 2022 14:21:41 -0700 (PDT)
+Message-ID: <47f64c5e-fa36-9e87-763b-4e7385713e76@redhat.com>
+Date:   Tue, 15 Mar 2022 22:21:39 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.5.0
-Subject: Re: [GIT PULL 0/7] KVM: s390: Fix, test and feature for 5.18 part 2
+Subject: Re: [GIT PULL] KVM/riscv changes for 5.18
 Content-Language: en-US
-To:     Christian Borntraeger <borntraeger@linux.ibm.com>
-Cc:     KVM <kvm@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>
-References: <20220315141137.357923-1-borntraeger@linux.ibm.com>
+To:     Anup Patel <anup@brainfault.org>
+Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
+        Atish Patra <atishp@atishpatra.org>,
+        KVM General <kvm@vger.kernel.org>,
+        kvm-riscv@lists.infradead.org,
+        linux-riscv <linux-riscv@lists.infradead.org>
+References: <CAAhSdy1cBkGqBLN7iZY-FUx2BFGoXmxd4WZJemPSRKz6my8cZQ@mail.gmail.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220315141137.357923-1-borntraeger@linux.ibm.com>
+In-Reply-To: <CAAhSdy1cBkGqBLN7iZY-FUx2BFGoXmxd4WZJemPSRKz6my8cZQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -88,31 +84,75 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/15/22 15:11, Christian Borntraeger wrote:
-> Paolo,
+On 3/11/22 18:02, Anup Patel wrote:
+> Hi Paolo,
 > 
-> the 2nd chunk for 5.18 via kvm/next.
+> We have three KVM RISC-V changes for 5.18 which are:
+> 1) Prevent KVM_COMPAT from being selected
+> 2) Refine __kvm_riscv_switch_to() implementation
+> 3) RISC-V SBI v0.3 support
 > 
-> The following changes since commit 3d9042f8b923810c169ece02d91c70ec498eff0b:
+> I don't expect any other KVM RISC-V changes for 5.18.
 > 
->    KVM: s390: Add missing vm MEM_OP size check (2022-02-22 09:16:18 +0100)
+> Please pull.
+> 
+> Regards,
+> Anup
+> 
+> The following changes since commit 4a204f7895878363ca8211f50ec610408c8c70aa:
+> 
+>    KVM: SVM: Allow AVIC support on system w/ physical APIC ID > 255
+> (2022-03-08 10:59:12 -0500)
 > 
 > are available in the Git repository at:
 > 
->    git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git  tags/kvm-s390-next-5.18-2
+>    https://github.com/kvm-riscv/linux.git tags/kvm-riscv-5.18-1
+> 
+> for you to fetch changes up to 763c8bed8c05ffcce8cba882e69cd6b03df07019:
+> 
+>    RISC-V: KVM: Implement SBI HSM suspend call (2022-03-11 19:02:39 +0530)
+> 
+> ----------------------------------------------------------------
+> KVM/riscv changes for 5.18
+> 
+> - Prevent KVM_COMPAT from being selected
+> - Refine __kvm_riscv_switch_to() implementation
+> - RISC-V SBI v0.3 support
 
 Pulled, thanks.
 
 Paolo
 
-> for you to fetch changes up to 3bcc372c9865bec3ab9bfcf30b2426cf68bc18af:
-> 
->    KVM: s390: selftests: Add error memop tests (2022-03-14 16:12:27 +0100)
 > 
 > ----------------------------------------------------------------
-> KVM: s390: Fix, test and feature for 5.18 part 2
+> Anup Patel (6):
+>        RISC-V: KVM: Upgrade SBI spec version to v0.3
+>        RISC-V: KVM: Add common kvm_riscv_vcpu_sbi_system_reset() function
+>        RISC-V: KVM: Implement SBI v0.3 SRST extension
+>        RISC-V: Add SBI HSM suspend related defines
+>        RISC-V: KVM: Add common kvm_riscv_vcpu_wfi() function
+>        RISC-V: KVM: Implement SBI HSM suspend call
 > 
-> - memop selftest
-> - fix SCK locking
-> - adapter interruptions virtualization for secure guests
+> Guo Ren (1):
+>        KVM: compat: riscv: Prevent KVM_COMPAT from being selected
+> 
+> Vincent Chen (1):
+>        RISC-V: KVM: Refine __kvm_riscv_switch_to() implementation
+> 
+> Yang Li (1):
+>        RISC-V: KVM: remove unneeded semicolon
+> 
+>   arch/riscv/include/asm/kvm_host.h     |  1 +
+>   arch/riscv/include/asm/kvm_vcpu_sbi.h |  5 ++-
+>   arch/riscv/include/asm/sbi.h          | 27 +++++++++++++---
+>   arch/riscv/kernel/cpu_ops_sbi.c       |  2 +-
+>   arch/riscv/kvm/vcpu_exit.c            | 22 +++++++++----
+>   arch/riscv/kvm/vcpu_sbi.c             | 19 +++++++++++
+>   arch/riscv/kvm/vcpu_sbi_hsm.c         | 18 +++++++++--
+>   arch/riscv/kvm/vcpu_sbi_replace.c     | 44 +++++++++++++++++++++++++
+>   arch/riscv/kvm/vcpu_sbi_v01.c         | 20 ++----------
+>   arch/riscv/kvm/vcpu_switch.S          | 60 ++++++++++++++++++++---------------
+>   virt/kvm/Kconfig                      |  2 +-
+>   11 files changed, 161 insertions(+), 59 deletions(-)
+> 
 
