@@ -2,161 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D449D4D9EBB
-	for <lists+kvm@lfdr.de>; Tue, 15 Mar 2022 16:31:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D5FBA4D9EEE
+	for <lists+kvm@lfdr.de>; Tue, 15 Mar 2022 16:43:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349644AbiCOPb5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Mar 2022 11:31:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59672 "EHLO
+        id S1349700AbiCOPo4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Mar 2022 11:44:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51030 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243514AbiCOPbz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Mar 2022 11:31:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1585453736
-        for <kvm@vger.kernel.org>; Tue, 15 Mar 2022 08:30:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647358241;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=L47ys7Ju+ra6uvzgdggF4XXVDzazg4VAs7Nuc4o2sMU=;
-        b=QqNVz5cJghhJorVwd0aX53Y2PMMlJO5jTPt6sbQW4EQLUYPbUqi+UqC2XxmZHYcYykFO1h
-        Xz34UjQUTYF3xX/J+q8HLYxWKjV5MZ5OyZZINJVTAB5HPai444wBA35q8lXzcW1nWTX0UG
-        Kjns0dFAFbO/CUQ+9NvY5jgk76L2SjE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-262-nmT2wb9tMqizw23om19_jA-1; Tue, 15 Mar 2022 11:30:38 -0400
-X-MC-Unique: nmT2wb9tMqizw23om19_jA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CAB44106655C;
-        Tue, 15 Mar 2022 15:30:37 +0000 (UTC)
-Received: from starship (unknown [10.40.192.8])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 28B50C33260;
-        Tue, 15 Mar 2022 15:30:32 +0000 (UTC)
-Message-ID: <c903e82ed2a1e98f66910c35b5aabdcf56e08e72.camel@redhat.com>
-Subject: Re: [PATCH v6 6/9] KVM: x86: lapic: don't allow to change APIC ID
- unconditionally
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Chao Gao <chao.gao@intel.com>
-Cc:     Zeng Guang <guang.zeng@intel.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jethro Beekman <jethro@fortanix.com>,
-        "Huang, Kai" <kai.huang@intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Hu, Robert" <robert.hu@intel.com>
-Date:   Tue, 15 Mar 2022 17:30:32 +0200
-In-Reply-To: <20220315151033.GA6038@gao-cwp>
-References: <Yifg4bea6zYEz1BK@google.com> <20220309052013.GA2915@gao-cwp>
-         <YihCtvDps/qJ2TOW@google.com>
-         <6dc7cff15812864ed14b5c014769488d80ce7f49.camel@redhat.com>
-         <YirPkr5efyylrD0x@google.com>
-         <29c76393-4884-94a8-f224-08d313b73f71@intel.com>
-         <01586c518de0c72ff3997d32654b8fa6e7df257d.camel@redhat.com>
-         <2900660d947a878e583ebedf60e7332e74a1af5f.camel@redhat.com>
-         <20220313135335.GA18405@gao-cwp>
-         <fbf929e0793a6b4df59ec9d95a018d1f6737db35.camel@redhat.com>
-         <20220315151033.GA6038@gao-cwp>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        with ESMTP id S1349696AbiCOPoz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Mar 2022 11:44:55 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A838412A88;
+        Tue, 15 Mar 2022 08:43:42 -0700 (PDT)
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22FEVL9X005682;
+        Tue, 15 Mar 2022 15:43:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : reply-to : subject : to : cc : references : from :
+ in-reply-to : content-type : content-transfer-encoding; s=pp1;
+ bh=459r01xmZlAP+2cSVQlS9UqVmJK+42DZpl6dRPzzILs=;
+ b=lYEQBSfwgvrVjPkMY8vmVr8ZztqyEl74uZlG+Bu/MkfhC5eRK0E3KnthyyuOPeG328hL
+ oFS9Jl2Udt7QNcgcoK/1DnyMR9IJvMY59aR8kY6W9b5eDH0HA+W4rpXTI5rHwfAfbvgy
+ dRkVIrYZv65G7AdLDXltqq5lqN/W7MPKbgsSAKW8PW/5lweM0HUsZ6sMmd+KuqKCu3se
+ GmRPAYIUJy3EPT+QOYuCtzVKQL1jrkEUDMAbgXhkM/KWdaNDbeR12K8UHGe195z38HXZ
+ erpwfMpXyP6xZ1Ge6+Q2Bv7YuZCcZINL1rA4K8SQ5Bse+mFcEmL6h28bj4Y283/kRbEf Hg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3etvbk26t8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 15 Mar 2022 15:43:42 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22FFe3BX017066;
+        Tue, 15 Mar 2022 15:43:41 GMT
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3etvbk26st-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 15 Mar 2022 15:43:41 +0000
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+        by ppma05wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22FFXCIt001387;
+        Tue, 15 Mar 2022 15:43:40 GMT
+Received: from b03cxnp08027.gho.boulder.ibm.com (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
+        by ppma05wdc.us.ibm.com with ESMTP id 3erk59x9qe-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 15 Mar 2022 15:43:40 +0000
+Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
+        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22FFhdQ614287452
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 15 Mar 2022 15:43:39 GMT
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 173E1C6065;
+        Tue, 15 Mar 2022 15:43:39 +0000 (GMT)
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 980E7C605F;
+        Tue, 15 Mar 2022 15:43:36 +0000 (GMT)
+Received: from [9.160.176.198] (unknown [9.160.176.198])
+        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTPS;
+        Tue, 15 Mar 2022 15:43:36 +0000 (GMT)
+Message-ID: <cb11c10b-0520-02ef-afb5-6f524847d67f@linux.ibm.com>
+Date:   Tue, 15 Mar 2022 12:43:34 -0300
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Firefox/91.0 Thunderbird/91.6.2
+Reply-To: muriloo@linux.ibm.com
+Subject: Re: [PATCH RESEND 1/2] KVM: Prevent module exit until all VMs are
+ freed
+Content-Language: en-US
+To:     David Matlack <dmatlack@google.com>, pbonzini@redhat.com
+Cc:     kvm@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>,
+        Gleb Natapov <gleb@redhat.com>, Rik van Riel <riel@redhat.com>,
+        seanjc@google.com, bgardon@google.com, stable@vger.kernel.org,
+        farosas@linux.ibm.com
+References: <20220303183328.1499189-1-dmatlack@google.com>
+ <20220303183328.1499189-2-dmatlack@google.com>
+From:   =?UTF-8?Q?Murilo_Opsfelder_Ara=c3=bajo?= <muriloo@linux.ibm.com>
+Organization: IBM
+In-Reply-To: <20220303183328.1499189-2-dmatlack@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: bmcD82FCleoXPe_xRkh2OLyuTvBmgPBM
+X-Proofpoint-ORIG-GUID: xPOGm2O2ZRhdPuIZrcwqS2YAq_Xn5tRr
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-03-15_03,2022-03-15_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxlogscore=999
+ malwarescore=0 priorityscore=1501 suspectscore=0 clxscore=1011
+ lowpriorityscore=0 impostorscore=0 mlxscore=0 bulkscore=0 spamscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2203150101
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-03-15 at 23:10 +0800, Chao Gao wrote:
-> On Sun, Mar 13, 2022 at 05:09:08PM +0200, Maxim Levitsky wrote:
-> > > > > This won't work with nested AVIC - we can't just inhibit a nested guest using its own AVIC,
-> > > > > because migration happens.
-> > > > 
-> > > > I mean because host decided to change its apic id, which it can in theory do any time,
-> > > > even after the nested guest has started. Seriously, the only reason guest has to change apic id,
-> > > > is to try to exploit some security hole.
-> > > 
-> > > Hi
-> > > 
-> > > Thanks for the information.  
-> > > 
-> > > IIUC, you mean KVM applies APICv inhibition only to L1 VM, leaving APICv
-> > > enabled for L2 VM. Shouldn't KVM disable APICv for L2 VM in this case?
-> > > It looks like a generic issue in dynamically toggling APICv scheme,
-> > > e.g., qemu can set KVM_GUESTDBG_BLOCKIRQ after nested guest has started.
-> > > 
-> > 
-> > That is the problem - you can't disable it for L2, unless you are willing to emulate it in software.
-> > Or in other words, when nested guest uses a hardware feature, you can't at some point say to it:
-> > sorry buddy - hardware feature disappeared.
+Hi, David.
+
+Some comments below.
+
+On 3/3/22 15:33, David Matlack wrote:
+> Tie the lifetime the KVM module to the lifetime of each VM via
+> kvm.users_count. This way anything that grabs a reference to the VM via
+> kvm_get_kvm() cannot accidentally outlive the KVM module.
 > 
-> Hi Maxim,
+> Prior to this commit, the lifetime of the KVM module was tied to the
+> lifetime of /dev/kvm file descriptors, VM file descriptors, and vCPU
+> file descriptors by their respective file_operations "owner" field.
+> This approach is insufficient because references grabbed via
+> kvm_get_kvm() do not prevent closing any of the aforementioned file
+> descriptors.
 > 
-> I may miss something. When reading Sean's APICv inhibition cleanups, I
-> find AVIC is disabled for L1 when nested is enabled (SVM is advertised
-> to L1). Then, I think the new inhibition introduced for changed xAPIC ID
-> shouldn't be a problem for L2 VM. Or, you plan to remove
-> APICV_INHIBIT_REASON_NESTED and expose AVIC to L1?
-
-Yep, I  have a patch for this ( which I hope to be accepted really soon
-(KVM: x86: SVM: allow AVIC to co-exist with a nested guest running)
- 
-I also implemented working support for nested AVIC, which includes support for IPI without vm exits
-between L2's vCPUs. I had sent an RFC for that.
- 
-With all patches applied both L1 and L2 switch hands on AVIC, L1's avic is inhibited
-(only locally) on the vCPU which runs nested, and while it runs nested, L2 uses AVIC
-to target other vCPUs which also run nested.
- 
-I and Paolo talked about this, and we reached a very promising conclusion.
-
-I will add new KVM cap, say KVM_CAP_READ_ONLY_APIC, which userspace will set
-prior to creating a vCPU, and which will make APIC ID fully readonly when set.
- 
-As a bonus, if you don't object, I will also make this cap, make APIC base read-only,
-since this feature is also broken in kvm, optional in x86 spec, and not really
-used by guests just like writable apic id.
-
-I hope to have patches in day or two for this.
- 
-When this cap is not set, it is fair to disable both IPIv, my nested AVIC,
-or even better inhibit AVIC completely, including any nested support.
- 
-Best regards,
-	Maxim Levitsky
-
+> This fixes a long standing theoretical bug in KVM that at least affects
+> async page faults. kvm_setup_async_pf() grabs a reference via
+> kvm_get_kvm(), and drops it in an asynchronous work callback. Nothing
+> prevents the VM file descriptor from being closed and the KVM module
+> from being unloaded before this callback runs.
 > 
-> svm_vcpu_after_set_cpuid:
->                 /*
->                  * Currently, AVIC does not work with nested virtualization.
->                  * So, we disable AVIC when cpuid for SVM is set in the L1 guest.
->                  */
->                 if (nested && guest_cpuid_has(vcpu, X86_FEATURE_SVM))
->                         kvm_request_apicv_update(vcpu->kvm, false,
->                                                  APICV_INHIBIT_REASON_NESTED);
+> Fixes: af585b921e5d ("KVM: Halt vcpu if page it tries to access is swapped out")
+> Cc: stable@vger.kernel.org
+> Suggested-by: Ben Gardon <bgardon@google.com>
+> [ Based on a patch from Ben implemented for Google's kernel. ]
+> Signed-off-by: David Matlack <dmatlack@google.com>
+> ---
+>   virt/kvm/kvm_main.c | 8 ++++++++
+>   1 file changed, 8 insertions(+)
 > 
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 35ae6d32dae5..b59f0a29dbd5 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -117,6 +117,8 @@ EXPORT_SYMBOL_GPL(kvm_debugfs_dir);
+>   
+>   static const struct file_operations stat_fops_per_vm;
+>   
+> +static struct file_operations kvm_chardev_ops;
+> +
+>   static long kvm_vcpu_ioctl(struct file *file, unsigned int ioctl,
+>   			   unsigned long arg);
+>   #ifdef CONFIG_KVM_COMPAT
+> @@ -1131,6 +1133,11 @@ static struct kvm *kvm_create_vm(unsigned long type)
+>   	preempt_notifier_inc();
+>   	kvm_init_pm_notifier(kvm);
+>   
+> +	if (!try_module_get(kvm_chardev_ops.owner)) {
+> +		r = -ENODEV;
+> +		goto out_err;
+> +	}
+> +
 
+Doesn't this problem also affects the other functions called from
+kvm_dev_ioctl()?
 
+Is it possible that the module is removed while other ioctl's are still running,
+e.g. KVM_GET_API_VERSION and KVM_CHECK_EXTENSION, even though they don't use
+struct kvm?
+
+I wonder if this try_module_get() (along with module_put() in the out path of
+the function) shouldn't be placed in the upper function kvm_dev_ioctl() so it
+would cover all the other ioctl's.
+
+>   	return kvm;
+>   
+>   out_err:
+> @@ -1220,6 +1227,7 @@ static void kvm_destroy_vm(struct kvm *kvm)
+>   	preempt_notifier_dec();
+>   	hardware_disable_all();
+>   	mmdrop(mm);
+> +	module_put(kvm_chardev_ops.owner);
+>   }
+>   
+>   void kvm_get_kvm(struct kvm *kvm)
+> 
+> base-commit: b13a3befc815eae574d87e6249f973dfbb6ad6cd
+> prerequisite-patch-id: 38f66d60319bf0bc9bf49f91f0f9119e5441629b
+> prerequisite-patch-id: 51aa921d68ea649d436ea68e1b8f4aabc3805156
+
+-- 
+Murilo
