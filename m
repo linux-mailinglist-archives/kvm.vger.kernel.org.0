@@ -2,176 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D5A1F4D9CFB
-	for <lists+kvm@lfdr.de>; Tue, 15 Mar 2022 15:08:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6341C4D9D17
+	for <lists+kvm@lfdr.de>; Tue, 15 Mar 2022 15:12:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239793AbiCOOJL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Mar 2022 10:09:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45916 "EHLO
+        id S1349017AbiCOONK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Mar 2022 10:13:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242593AbiCOOJK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Mar 2022 10:09:10 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4031B11C30
-        for <kvm@vger.kernel.org>; Tue, 15 Mar 2022 07:07:56 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id gj15-20020a17090b108f00b001bef86c67c1so2508582pjb.3
-        for <kvm@vger.kernel.org>; Tue, 15 Mar 2022 07:07:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=n5RJV7EKOnS1kazx80dECSrxKL3JUdNPyUQ+rH9sbVY=;
-        b=HJForaCGjZ8+I/OPktEd9hFdMN585TTk+jl0Z7jRfAN/CjsP95sSEv7t3CUHUya9Fq
-         cmUxhqCxwnY8Jq9ZkM9jf+mTNdryW8tioEHIGLTnxomd2LGvSvmFeOEFu1+TJUQv/gsA
-         YaORRHawDzG1lXX9EHWybS1bRAYDLNtJF2kJHqL54XciTXijv6ZA3GOWFkvtFiHLZ+SA
-         4kf26f+rEExuA6NlZ1qB3stka8I1CYBJz/5JQegh/lDX4u2BnNEce4wHmJ5LrJiopGsP
-         QZQsfwz8N7g6wzUwgwsojTXJm7WfA39eegwwQBtQsfwcFCsGITjD3GnOhrtFtvdHKflj
-         KUvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=n5RJV7EKOnS1kazx80dECSrxKL3JUdNPyUQ+rH9sbVY=;
-        b=2cDfemZCOik9EzOfaj8fwyimV/GnJIeG2XzwdQCiy3EQn2teVVmMEvnGdzRtfEdOmR
-         okeh72WH8/xBL5ugx2LVf1jrX1nZlp/R4ciXRQJzz9vKkjJMEFplSZq36hcG68jdT8xJ
-         mU15zmHS7rFdixbqonP2DlnIDR+1/l94KG3kzq412+tl3TQzzp1C+9BRabEwdtQ1Go0n
-         klXmX3z88y0Wa103Ib3Z2meQ33pq9dmrfakLS7TnRYLktAyUI/DPd5rgKt21pRmDNA+n
-         TdUuB6tW3O1NZyTu1xE4W0C7q1oTGcfU41LdihOe1YEcPerYUcXlI+8W4I5IQIGsAQhL
-         VINQ==
-X-Gm-Message-State: AOAM5320gyh1RaPAXm1bUFgZgX+4P4G9K+meSz93GpoE+6s6X5LPnnA2
-        Nmz7BiuD2yDr3w8dDl59l/o=
-X-Google-Smtp-Source: ABdhPJzx03KXda7KzQgJ08jUr9c6CHZ/lPdQQFMd5dF0oFpdZHS7Vx/Bjs3VhxRjXoejIy7drn4agA==
-X-Received: by 2002:a17:902:9b97:b0:153:85ac:abc0 with SMTP id y23-20020a1709029b9700b0015385acabc0mr7132480plp.100.1647353275700;
-        Tue, 15 Mar 2022 07:07:55 -0700 (PDT)
-Received: from [192.168.1.115] ([185.126.107.38])
-        by smtp.gmail.com with ESMTPSA id m125-20020a628c83000000b004f7baad5c20sm10671055pfd.144.2022.03.15.07.07.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Mar 2022 07:07:55 -0700 (PDT)
-Message-ID: <02307072-4bff-dbbb-67fb-ca9800c34b3c@gmail.com>
-Date:   Tue, 15 Mar 2022 15:07:36 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.6.1
-Subject: Re: [PATCH 3/3] Use g_new() & friends where that makes obvious sense
-Content-Language: en-US
-To:     Markus Armbruster <armbru@redhat.com>,
-        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc:     qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Christian Schoenebeck <qemu_oss@crudebyte.com>,
-        "Gonglei (Arei)" <arei.gonglei@huawei.com>,
-        =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Ani Sinha <ani@anisinha.ca>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Amit Shah <amit@kernel.org>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Anthony Perard <anthony.perard@citrix.com>,
-        Paul Durrant <paul@xen.org>,
-        =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
-        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
-        Corey Minyard <cminyard@mvista.com>,
-        Patrick Venture <venture@google.com>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Peter Xu <peterx@redhat.com>, Jason Wang <jasowang@redhat.com>,
-        =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
-        Daniel Henrique Barboza <danielhb413@gmail.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Greg Kurz <groug@kaod.org>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
-        Jean-Christophe Dubois <jcd@tribudubois.net>,
-        Keith Busch <kbusch@kernel.org>,
-        Klaus Jensen <its@irrelevant.dk>,
-        Yuval Shaia <yuval.shaia.ml@gmail.com>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        Magnus Damm <magnus.damm@gmail.com>,
-        Fabien Chouteau <chouteau@adacore.com>,
-        KONRAD Frederic <frederic.konrad@adacore.com>,
-        Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-        Artyom Tarasenko <atar4qemu@gmail.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        Juan Quintela <quintela@redhat.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Konstantin Kostiuk <kkostiuk@redhat.com>,
-        Michael Roth <michael.roth@amd.com>,
-        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-        Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
+        with ESMTP id S1349026AbiCOOM4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Mar 2022 10:12:56 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC1BF546B2;
+        Tue, 15 Mar 2022 07:11:44 -0700 (PDT)
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22FDTPR0000913;
+        Tue, 15 Mar 2022 14:11:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=ssaIfS7bjnzPkJAxH28Mboj6c3MPVUwPQhnDGZAwIXk=;
+ b=g8sGVj2mEQbREIZuiIQD2DAIwjcKkONHzJV3AwhzBto+rDuBpfJKS66YDQLuRBSX2BhL
+ gr/LWY4IrkleL2U111ofwE/pMwHiUN8D7aH2Uu6WrxWf42PIcJ5w8TPxP6/RQ7iGah1L
+ XN3gUC58ZQuR7EShS8g70UFoht9kM6tXze5Rm7zx5ajgUQc8XN+4aqzfoHkswNrBapD3
+ 3LxVooIimD5eUnh12uXvSJEBxLTgruYa9rLu4P4ak3thp+dgZ5S3lxCMnu6b/MCHC+cr
+ ary61XPqU2/2bakHsOsrC22QcDXtZRCZT8ywy6b5r65/P1sIdRO7I4xyDwUkBSdlOWCk /g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3etuqvs1nn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 15 Mar 2022 14:11:43 +0000
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22FDXlhG011443;
+        Tue, 15 Mar 2022 14:11:43 GMT
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3etuqvs1n2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 15 Mar 2022 14:11:43 +0000
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22FE9F2A008200;
+        Tue, 15 Mar 2022 14:11:41 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma01fra.de.ibm.com with ESMTP id 3erk58nsnd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 15 Mar 2022 14:11:41 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22FEBcJ440632742
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 15 Mar 2022 14:11:38 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5C78211C04C;
+        Tue, 15 Mar 2022 14:11:38 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 49F1411C04A;
+        Tue, 15 Mar 2022 14:11:38 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Tue, 15 Mar 2022 14:11:38 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
+        id 0651CE11F3; Tue, 15 Mar 2022 15:11:38 +0100 (CET)
+From:   Christian Borntraeger <borntraeger@linux.ibm.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     KVM <kvm@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
         David Hildenbrand <david@redhat.com>,
-        Wenchao Wang <wenchao.wang@intel.com>,
-        Colin Xu <colin.xu@intel.com>,
-        Kamil Rytarowski <kamil@netbsd.org>,
-        Reinoud Zandijk <reinoud@netbsd.org>,
-        Sunil Muthuswamy <sunilmut@microsoft.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Thomas Huth <thuth@redhat.com>, Eric Blake <eblake@redhat.com>,
-        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
-        John Snow <jsnow@redhat.com>, kvm@vger.kernel.org,
-        qemu-arm@nongnu.org, xen-devel@lists.xenproject.org,
-        qemu-ppc@nongnu.org, qemu-block@nongnu.org, haxm-team@intel.com,
-        qemu-s390x@nongnu.org
-References: <20220314160108.1440470-1-armbru@redhat.com>
- <20220314160108.1440470-4-armbru@redhat.com> <87y21c401e.fsf@linaro.org>
- <875yofl3k3.fsf@pond.sub.org>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= 
-        <philippe.mathieu.daude@gmail.com>
-In-Reply-To: <875yofl3k3.fsf@pond.sub.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>
+Subject: [GIT PULL 0/7] KVM: s390: Fix, test and feature for 5.18 part 2
+Date:   Tue, 15 Mar 2022 15:11:30 +0100
+Message-Id: <20220315141137.357923-1-borntraeger@linux.ibm.com>
+X-Mailer: git-send-email 2.35.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: GaZIYHfzLV0xiEbWHLp8qhCv-kkwO24F
+X-Proofpoint-ORIG-GUID: Gho7twNlypdW2Q8Uk6Rs2QlZWs9I-9FB
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-03-15_03,2022-03-15_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 bulkscore=0
+ phishscore=0 malwarescore=0 mlxlogscore=999 impostorscore=0
+ lowpriorityscore=0 clxscore=1015 priorityscore=1501 mlxscore=0
+ suspectscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2202240000 definitions=main-2203150092
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15/3/22 14:59, Markus Armbruster wrote:
-> Alex Bennée <alex.bennee@linaro.org> writes:
-> 
->> Markus Armbruster <armbru@redhat.com> writes:
->>
->>> g_new(T, n) is neater than g_malloc(sizeof(T) * n).  It's also safer,
->>> for two reasons.  One, it catches multiplication overflowing size_t.
->>> Two, it returns T * rather than void *, which lets the compiler catch
->>> more type errors.
->>>
->> <snip>
->>> diff --git a/semihosting/config.c b/semihosting/config.c
->>> index 137171b717..6d48ec9566 100644
->>> --- a/semihosting/config.c
->>> +++ b/semihosting/config.c
->>> @@ -98,7 +98,7 @@ static int add_semihosting_arg(void *opaque,
->>>       if (strcmp(name, "arg") == 0) {
->>>           s->argc++;
->>>           /* one extra element as g_strjoinv() expects NULL-terminated array */
->>> -        s->argv = g_realloc(s->argv, (s->argc + 1) * sizeof(void *));
->>> +        s->argv = g_renew(void *, s->argv, s->argc + 1);
->>
->> This did indeed break CI because s->argv is an array of *char:
->>
->> ../semihosting/config.c:101:17: error: assignment to ‘const char **’ from incompatible pointer type ‘void **’ [-Werror=incompatible-pointer-types]
->>    101 |         s->argv = g_renew(void *, s->argv, s->argc + 1);
->>        |                 ^
->> cc1: all warnings being treated as errors
->>
->> So it did the job of type checking but failed to build ;-)
-> 
-> You found a hole in my compile testing, thanks!
-> 
-> I got confused about the configuration of my build trees.  Catching such
-> mistakes is what CI is for :)
+Paolo,
 
-FYI Alex fixed this here:
-https://lore.kernel.org/qemu-devel/20220315121251.2280317-8-alex.bennee@linaro.org/
+the 2nd chunk for 5.18 via kvm/next.
 
-So your series could go on top (modulo the Coverity change).
+The following changes since commit 3d9042f8b923810c169ece02d91c70ec498eff0b:
 
+  KVM: s390: Add missing vm MEM_OP size check (2022-02-22 09:16:18 +0100)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git  tags/kvm-s390-next-5.18-2
+
+for you to fetch changes up to 3bcc372c9865bec3ab9bfcf30b2426cf68bc18af:
+
+  KVM: s390: selftests: Add error memop tests (2022-03-14 16:12:27 +0100)
+
+----------------------------------------------------------------
+KVM: s390: Fix, test and feature for 5.18 part 2
+
+- memop selftest
+- fix SCK locking
+- adapter interruptions virtualization for secure guests
+
+----------------------------------------------------------------
+Claudio Imbrenda (1):
+      KVM: s390x: fix SCK locking
+
+Janis Schoetterl-Glausch (5):
+      KVM: s390: selftests: Split memop tests
+      KVM: s390: selftests: Add macro as abstraction for MEM_OP
+      KVM: s390: selftests: Add named stages for memop test
+      KVM: s390: selftests: Add more copy memop tests
+      KVM: s390: selftests: Add error memop tests
+
+Michael Mueller (1):
+      KVM: s390: pv: make use of ultravisor AIV support
+
+ arch/s390/include/asm/uv.h                |   1 +
+ arch/s390/kvm/interrupt.c                 |  54 ++-
+ arch/s390/kvm/kvm-s390.c                  |  30 +-
+ arch/s390/kvm/kvm-s390.h                  |  15 +-
+ arch/s390/kvm/priv.c                      |  15 +-
+ tools/testing/selftests/kvm/s390x/memop.c | 731 +++++++++++++++++++++++++-----
+ 6 files changed, 715 insertions(+), 131 deletions(-)
