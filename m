@@ -2,348 +2,274 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CF96D4D9594
-	for <lists+kvm@lfdr.de>; Tue, 15 Mar 2022 08:48:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2006A4D95B2
+	for <lists+kvm@lfdr.de>; Tue, 15 Mar 2022 08:54:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345567AbiCOHtg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Mar 2022 03:49:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47330 "EHLO
+        id S1345701AbiCOHzP convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Tue, 15 Mar 2022 03:55:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33450 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244757AbiCOHte (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Mar 2022 03:49:34 -0400
-Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 313DB12AB9
-        for <kvm@vger.kernel.org>; Tue, 15 Mar 2022 00:48:22 -0700 (PDT)
-Received: by mail-lf1-x12b.google.com with SMTP id w7so31470527lfd.6
-        for <kvm@vger.kernel.org>; Tue, 15 Mar 2022 00:48:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=jtmeeb0pfZwoaZkwm8IwKPhjw1b77pqcacHddIcCw/g=;
-        b=otwCPsDN3kfCyiK3vNpJvNBORPnC9YsaZLL9OhEx/sYPC2vX8xEtuVmfUDZxNgIxhf
-         8DQjrHGLVKYtTSsx9g6iypceyYJy5NcLfXL/qcgFTNlb7sxEgbRkO7P34YBzn3k6W1O0
-         Bb/3PdjpvZ6pyTBzaAYv1LTKmrOv56wPZj8eEjCc0gkfYlZ17Kh/C/92OSHJE9cCWubN
-         AusOkQD2WMQu1VEd6yUujilDrYOuM/qShCgCqta6XqRhwJkUWStgXV288HYF8BCYf1qO
-         JcgGgK5E3bQoscvOeZk57pO5ytau/FohkWlQNLxjaLYLNPVFI8hwF5VgJ5ci0iOe5SWS
-         DB6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=jtmeeb0pfZwoaZkwm8IwKPhjw1b77pqcacHddIcCw/g=;
-        b=E8uPw/RyLWcuI/A6qQUbFQcrz9Leoq+DRQGmapm2b/R0BlAi93diJ8fQoglCTfx3Pq
-         a9usLJrgmhoaEAGTQUDIqboCeqA91XwoADLWE7KoDATyiRklIR9l1Q13WHNYYjRBl622
-         GVqkB9nfBkSeleMNJa5r02kYdQG3G8MqV9KOxlr4XVp7KDa/Cbgpm3XNW7Vx5EMRTOLp
-         xLPBJR9HSlfEDJEo6w8BIZfosXdMS5RtfhQiLFcIczhGb+6ADUQJRD8ta4BG3LSIthib
-         9RIjtH0wyIpdE+ssdlheyeoblDVLdYfX8VDlZcULeOEENS4MRJWZHk7RngejQVu787CO
-         ZzPg==
-X-Gm-Message-State: AOAM531V3K6bVNWOABF+oCUnorSqQSOdOc+H/FjnOKjT1gilWbsmLB3j
-        uELAcT2fpLenwNKb+0U0Sgt9nDmPhs6K8q44M3OVEg==
-X-Google-Smtp-Source: ABdhPJxYnM2BU7IRwXtrCKWuCXeiCqFpjgN337WBL4OMsUyrUWh1nicZ0pZ4uuEKm992+NKG401/b94smpx9gvDWMow=
-X-Received: by 2002:a19:7612:0:b0:448:307a:4bca with SMTP id
- c18-20020a197612000000b00448307a4bcamr16163258lff.361.1647330500112; Tue, 15
- Mar 2022 00:48:20 -0700 (PDT)
+        with ESMTP id S1345693AbiCOHzO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Mar 2022 03:55:14 -0400
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [207.211.30.44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1DA96E0E3
+        for <kvm@vger.kernel.org>; Tue, 15 Mar 2022 00:54:02 -0700 (PDT)
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-41-wQ12KsT-PDSqq8y9SNA3Rw-1; Tue, 15 Mar 2022 03:53:56 -0400
+X-MC-Unique: wQ12KsT-PDSqq8y9SNA3Rw-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 25BE18001EA;
+        Tue, 15 Mar 2022 07:53:54 +0000 (UTC)
+Received: from bahia (unknown [10.39.192.202])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id ED3FC7CB810;
+        Tue, 15 Mar 2022 07:53:43 +0000 (UTC)
+Date:   Tue, 15 Mar 2022 08:53:42 +0100
+From:   Greg Kurz <groug@kaod.org>
+To:     Markus Armbruster <armbru@redhat.com>
+Cc:     qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Christian Schoenebeck <qemu_oss@crudebyte.com>,
+        "Gonglei (Arei)" <arei.gonglei@huawei.com>,
+        =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Ani Sinha <ani@anisinha.ca>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Amit Shah <amit@kernel.org>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Anthony Perard <anthony.perard@citrix.com>,
+        Paul Durrant <paul@xen.org>,
+        =?UTF-8?B?SGVy?= =?UTF-8?B?dsOp?= Poussineau 
+        <hpoussin@reactos.org>,
+        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        Corey Minyard <cminyard@mvista.com>,
+        Patrick Venture <venture@google.com>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Peter Xu <peterx@redhat.com>, Jason Wang <jasowang@redhat.com>,
+        =?UTF-8?B?Q8Op?= =?UTF-8?B?ZHJpYw==?= Le Goater 
+        <clg@kaod.org>, Daniel Henrique Barboza <danielhb413@gmail.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>,
+        Jean-Christophe Dubois <jcd@tribudubois.net>,
+        Keith Busch <kbusch@kernel.org>,
+        Klaus Jensen <its@irrelevant.dk>,
+        Yuval Shaia <yuval.shaia.ml@gmail.com>,
+        Yoshinori Sato <ysato@users.sourceforge.jp>,
+        Magnus Damm <magnus.damm@gmail.com>,
+        Fabien Chouteau <chouteau@adacore.com>,
+        KONRAD Frederic <frederic.konrad@adacore.com>,
+        Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+        Artyom Tarasenko <atar4qemu@gmail.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        Juan Quintela <quintela@redhat.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Konstantin Kostiuk <kkostiuk@redhat.com>,
+        Michael Roth <michael.roth@amd.com>,
+        "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
+        Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
+        Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>,
+        David Hildenbrand <david@redhat.com>,
+        Wenchao Wang <wenchao.wang@intel.com>,
+        Colin Xu <colin.xu@intel.com>,
+        Kamil Rytarowski <kamil@netbsd.org>,
+        Reinoud Zandijk <reinoud@netbsd.org>,
+        Sunil Muthuswamy <sunilmut@microsoft.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Thomas Huth <thuth@redhat.com>, Eric Blake <eblake@redhat.com>,
+        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+        John Snow <jsnow@redhat.com>, kvm@vger.kernel.org,
+        qemu-arm@nongnu.org, xen-devel@lists.xenproject.org,
+        qemu-ppc@nongnu.org, qemu-block@nongnu.org, haxm-team@intel.com,
+        qemu-s390x@nongnu.org
+Subject: Re: [PATCH 2/3] 9pfs: Use g_new() & friends where that makes
+ obvious sense
+Message-ID: <20220315085342.2b07eff8@bahia>
+In-Reply-To: <20220314160108.1440470-3-armbru@redhat.com>
+References: <20220314160108.1440470-1-armbru@redhat.com>
+        <20220314160108.1440470-3-armbru@redhat.com>
 MIME-Version: 1.0
-References: <20220314061959.3349716-1-reijiw@google.com> <20220314061959.3349716-3-reijiw@google.com>
- <Yi+j7zGxA80ZR4t7@google.com> <27834312-1877-f244-634d-6e645dea9f9e@google.com>
-In-Reply-To: <27834312-1877-f244-634d-6e645dea9f9e@google.com>
-From:   Oliver Upton <oupton@google.com>
-Date:   Tue, 15 Mar 2022 00:48:08 -0700
-Message-ID: <CAOQ_Qsgw9iUPBA7o_reEbt96NDgVHit46_b_UozyNtNzFaFnHw@mail.gmail.com>
-Subject: Re: [PATCH v4 2/3] KVM: arm64: mixed-width check should be skipped
- for uninitialized vCPUs
-To:     Reiji Watanabe <reijiw@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <Alexandru.Elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Peng Liang <liangpeng10@huawei.com>,
-        Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=groug@kaod.org
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: kaod.org
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: 8BIT
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_SOFTFAIL,T_SCC_BODY_TEXT_LINE autolearn=no
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 14, 2022 at 11:19 PM Reiji Watanabe <reijiw@google.com> wrote:
->
-> Hi Oliver,
->
-> On 3/14/22 1:22 PM, Oliver Upton wrote:
-> > On Sun, Mar 13, 2022 at 11:19:58PM -0700, Reiji Watanabe wrote:
-> >> KVM allows userspace to configure either all EL1 32bit or 64bit vCPUs
-> >> for a guest.  At vCPU reset, vcpu_allowed_register_width() checks
-> >> if the vcpu's register width is consistent with all other vCPUs'.
-> >> Since the checking is done even against vCPUs that are not initialized
-> >> (KVM_ARM_VCPU_INIT has not been done) yet, the uninitialized vCPUs
-> >> are erroneously treated as 64bit vCPU, which causes the function to
-> >> incorrectly detect a mixed-width VM.
-> >>
-> >> Introduce KVM_ARCH_FLAG_EL1_32BIT and KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED
-> >> bits for kvm->arch.flags.  A value of the EL1_32BIT bit indicates that
-> >> the guest needs to be configured with all 32bit or 64bit vCPUs, and
-> >> a value of the REG_WIDTH_CONFIGURED bit indicates if a value of the
-> >> EL1_32BIT bit is valid (already set up). Values in those bits are set at
-> >> the first KVM_ARM_VCPU_INIT for the guest based on KVM_ARM_VCPU_EL1_32BIT
-> >> configuration for the vCPU.
-> >>
-> >> Check vcpu's register width against those new bits at the vcpu's
-> >> KVM_ARM_VCPU_INIT (instead of against other vCPUs' register width).
-> >>
-> >> Fixes: 66e94d5cafd4 ("KVM: arm64: Prevent mixed-width VM creation")
-> >> Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> >
-> > Hrmph... I hate to be asking this question so late in the game, but...
-> >
-> > Are there any bits that we really allow variation per-vCPU besides
-> > KVM_ARM_VCPU_POWER_OFF? We unintentionally allow for variance with the
-> > KVM_ARM_VCPU_PSCI_0_2 bit even though that's complete nonsense.
-> >
-> > Stated plainly, should we just deny any attempts at asymmetry besides
-> > POWER_OFF?>
-> > Besides the nits, I see nothing objectionable with the patch. I'd really
-> > like to see more generalized constraints on vCPU configuration, but if
-> > this is the route we take:
->
-> Prohibiting the mixed width configuration is not a new constraint that
-> this patch creates (this patch fixes a bug that erroneously detects
-> mixed-width configuration), and enforcing symmetry of other features
-> among vCPUs is a bit different matter.
+On Mon, 14 Mar 2022 17:01:07 +0100
+Markus Armbruster <armbru@redhat.com> wrote:
 
-Right, I had managed to forget that context for a moment when I
-replied to you. Then I fully agree with this patch, and the other
-feature flags can be handled later.
+> g_new(T, n) is neater than g_malloc(sizeof(T) * n).  It's also safer,
+> for two reasons.  One, it catches multiplication overflowing size_t.
+> Two, it returns T * rather than void *, which lets the compiler catch
+> more type errors.
+> 
+> This commit only touches allocations with size arguments of the form
+> sizeof(T).
+> 
+> Patch created mechanically with:
+> 
+>     $ spatch --in-place --sp-file scripts/coccinelle/use-g_new-etc.cocci \
+> 	     --macro-file scripts/cocci-macro-file.h FILES...
+> 
+> Except this uncovers a typing error:
+> 
+>     ../hw/9pfs/9p.c:855:13: warning: incompatible pointer types assigning to 'QpfEntry *' from 'QppEntry *' [-Wincompatible-pointer-types]
+> 	    val = g_new0(QppEntry, 1);
+> 		^ ~~~~~~~~~~~~~~~~~~~
+>     1 warning generated.
+> 
+> Harmless, because QppEntry is larger than QpfEntry.  Fix to allocate a
+> QpfEntry instead.
+> 
+> Cc: Greg Kurz <groug@kaod.org>
+> Cc: Christian Schoenebeck <qemu_oss@crudebyte.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
 
->
-> Having said that, I like the idea, which will be more consistent with
-> my ID register series (it can simplify things).  But, I'm not sure
-> if creating the constraint for those features would be a problem for
-> existing userspace even if allowing variation per-vCPU for the features
-> was not our intention.
-> I would guess having the constraint for KVM_ARM_VCPU_PSCI_0_2 should
-> be fine.  Do you think that should be fine for PMU, SVE, and PTRAUTH*
-> as well ?
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
-Personally, yes, but it prompts the question of if we could break
-userspace by applying restrictions after the fact. The original patch
-that applied the register width restrictions didn't cause much of a
-stir, so it seems possible we could get away with it.
+>  hw/9pfs/9p-proxy.c           | 2 +-
+>  hw/9pfs/9p-synth.c           | 4 ++--
+>  hw/9pfs/9p.c                 | 8 ++++----
+>  hw/9pfs/codir.c              | 6 +++---
+>  tests/qtest/virtio-9p-test.c | 4 ++--
+>  5 files changed, 12 insertions(+), 12 deletions(-)
+> 
+> diff --git a/hw/9pfs/9p-proxy.c b/hw/9pfs/9p-proxy.c
+> index 8b4b5cf7dc..4c5e0fc217 100644
+> --- a/hw/9pfs/9p-proxy.c
+> +++ b/hw/9pfs/9p-proxy.c
+> @@ -1187,7 +1187,7 @@ static int proxy_parse_opts(QemuOpts *opts, FsDriverEntry *fs, Error **errp)
+>  
+>  static int proxy_init(FsContext *ctx, Error **errp)
+>  {
+> -    V9fsProxy *proxy = g_malloc(sizeof(V9fsProxy));
+> +    V9fsProxy *proxy = g_new(V9fsProxy, 1);
+>      int sock_id;
+>  
+>      if (ctx->export_flags & V9FS_PROXY_SOCK_NAME) {
+> diff --git a/hw/9pfs/9p-synth.c b/hw/9pfs/9p-synth.c
+> index b3080e415b..d99d263985 100644
+> --- a/hw/9pfs/9p-synth.c
+> +++ b/hw/9pfs/9p-synth.c
+> @@ -49,7 +49,7 @@ static V9fsSynthNode *v9fs_add_dir_node(V9fsSynthNode *parent, int mode,
+>  
+>      /* Add directory type and remove write bits */
+>      mode = ((mode & 0777) | S_IFDIR) & ~(S_IWUSR | S_IWGRP | S_IWOTH);
+> -    node = g_malloc0(sizeof(V9fsSynthNode));
+> +    node = g_new0(V9fsSynthNode, 1);
+>      if (attr) {
+>          /* We are adding .. or . entries */
+>          node->attr = attr;
+> @@ -128,7 +128,7 @@ int qemu_v9fs_synth_add_file(V9fsSynthNode *parent, int mode,
+>      }
+>      /* Add file type and remove write bits */
+>      mode = ((mode & 0777) | S_IFREG);
+> -    node = g_malloc0(sizeof(V9fsSynthNode));
+> +    node = g_new0(V9fsSynthNode, 1);
+>      node->attr         = &node->actual_attr;
+>      node->attr->inode  = synth_node_count++;
+>      node->attr->nlink  = 1;
+> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+> index a6d6b3f835..8e9d4aea73 100644
+> --- a/hw/9pfs/9p.c
+> +++ b/hw/9pfs/9p.c
+> @@ -324,7 +324,7 @@ static V9fsFidState *alloc_fid(V9fsState *s, int32_t fid)
+>              return NULL;
+>          }
+>      }
+> -    f = g_malloc0(sizeof(V9fsFidState));
+> +    f = g_new0(V9fsFidState, 1);
+>      f->fid = fid;
+>      f->fid_type = P9_FID_NONE;
+>      f->ref = 1;
+> @@ -804,7 +804,7 @@ static int qid_inode_prefix_hash_bits(V9fsPDU *pdu, dev_t dev)
+>  
+>      val = qht_lookup(&pdu->s->qpd_table, &lookup, hash);
+>      if (!val) {
+> -        val = g_malloc0(sizeof(QpdEntry));
+> +        val = g_new0(QpdEntry, 1);
+>          *val = lookup;
+>          affix = affixForIndex(pdu->s->qp_affix_next);
+>          val->prefix_bits = affix.bits;
+> @@ -852,7 +852,7 @@ static int qid_path_fullmap(V9fsPDU *pdu, const struct stat *stbuf,
+>              return -ENFILE;
+>          }
+>  
+> -        val = g_malloc0(sizeof(QppEntry));
+> +        val = g_new0(QpfEntry, 1);
+>          *val = lookup;
+>  
+>          /* new unique inode and device combo */
+> @@ -928,7 +928,7 @@ static int qid_path_suffixmap(V9fsPDU *pdu, const struct stat *stbuf,
+>              return -ENFILE;
+>          }
+>  
+> -        val = g_malloc0(sizeof(QppEntry));
+> +        val = g_new0(QppEntry, 1);
+>          *val = lookup;
+>  
+>          /* new unique inode affix and device combo */
+> diff --git a/hw/9pfs/codir.c b/hw/9pfs/codir.c
+> index 75148bc985..93ba44fb75 100644
+> --- a/hw/9pfs/codir.c
+> +++ b/hw/9pfs/codir.c
+> @@ -141,9 +141,9 @@ static int do_readdir_many(V9fsPDU *pdu, V9fsFidState *fidp,
+>  
+>          /* append next node to result chain */
+>          if (!e) {
+> -            *entries = e = g_malloc0(sizeof(V9fsDirEnt));
+> +            *entries = e = g_new0(V9fsDirEnt, 1);
+>          } else {
+> -            e = e->next = g_malloc0(sizeof(V9fsDirEnt));
+> +            e = e->next = g_new0(V9fsDirEnt, 1);
+>          }
+>          e->dent = qemu_dirent_dup(dent);
+>  
+> @@ -163,7 +163,7 @@ static int do_readdir_many(V9fsPDU *pdu, V9fsFidState *fidp,
+>                  break;
+>              }
+>  
+> -            e->st = g_malloc0(sizeof(struct stat));
+> +            e->st = g_new0(struct stat, 1);
+>              memcpy(e->st, &stbuf, sizeof(struct stat));
+>          }
+>  
+> diff --git a/tests/qtest/virtio-9p-test.c b/tests/qtest/virtio-9p-test.c
+> index 01ca076afe..e28c71bd8f 100644
+> --- a/tests/qtest/virtio-9p-test.c
+> +++ b/tests/qtest/virtio-9p-test.c
+> @@ -468,12 +468,12 @@ static void v9fs_rreaddir(P9Req *req, uint32_t *count, uint32_t *nentries,
+>           togo -= 13 + 8 + 1 + 2 + slen, ++n)
+>      {
+>          if (!e) {
+> -            e = g_malloc(sizeof(struct V9fsDirent));
+> +            e = g_new(struct V9fsDirent, 1);
+>              if (entries) {
+>                  *entries = e;
+>              }
+>          } else {
+> -            e = e->next = g_malloc(sizeof(struct V9fsDirent));
+> +            e = e->next = g_new(struct V9fsDirent, 1);
+>          }
+>          e->next = NULL;
+>          /* qid[13] offset[8] type[1] name[s] */
 
-> >
-> > Reviewed-by: Oliver Upton <oupton@google.com>
-> >
-> >> ---
-> >>   arch/arm64/include/asm/kvm_emulate.h | 27 ++++++++----
-> >>   arch/arm64/include/asm/kvm_host.h    |  9 ++++
-> >>   arch/arm64/kvm/reset.c               | 64 ++++++++++++++++++----------
-> >>   3 files changed, 70 insertions(+), 30 deletions(-)
-> >>
-> >> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> >> index d62405ce3e6d..7496deab025a 100644
-> >> --- a/arch/arm64/include/asm/kvm_emulate.h
-> >> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> >> @@ -43,10 +43,22 @@ void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr);
-> >>
-> >>   void kvm_vcpu_wfi(struct kvm_vcpu *vcpu);
-> >>
-> >> +#if defined(__KVM_VHE_HYPERVISOR__) || defined(__KVM_NVHE_HYPERVISOR__)
-> >>   static __always_inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
-> >>   {
-> >>      return !(vcpu->arch.hcr_el2 & HCR_RW);
-> >>   }
-> >> +#else
-> >> +static __always_inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
-> >> +{
-> >> +    struct kvm *kvm = vcpu->kvm;
-> >> +
-> >> +    WARN_ON_ONCE(!test_bit(KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED,
-> >> +                           &kvm->arch.flags));
-> >> +
-> >> +    return test_bit(KVM_ARCH_FLAG_EL1_32BIT, &kvm->arch.flags);
-> >> +}
-> >> +#endif
-> >>
-> >>   static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
-> >>   {
-> >> @@ -72,15 +84,14 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
-> >>              vcpu->arch.hcr_el2 |= HCR_TVM;
-> >>      }
-> >>
-> >> -    if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features))
-> >> +    if (vcpu_el1_is_32bit(vcpu))
-> >>              vcpu->arch.hcr_el2 &= ~HCR_RW;
-> >> -
-> >> -    /*
-> >> -     * TID3: trap feature register accesses that we virtualise.
-> >> -     * For now this is conditional, since no AArch32 feature regs
-> >> -     * are currently virtualised.
-> >> -     */
-> >> -    if (!vcpu_el1_is_32bit(vcpu))
-> >> +    else
-> >> +            /*
-> >> +             * TID3: trap feature register accesses that we virtualise.
-> >> +             * For now this is conditional, since no AArch32 feature regs
-> >> +             * are currently virtualised.
-> >> +             */
-> >>              vcpu->arch.hcr_el2 |= HCR_TID3;
-> >>
-> >>      if (cpus_have_const_cap(ARM64_MISMATCHED_CACHE_TYPE) ||
-> >> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> >> index 11a7ae747ded..22ad977069f5 100644
-> >> --- a/arch/arm64/include/asm/kvm_host.h
-> >> +++ b/arch/arm64/include/asm/kvm_host.h
-> >> @@ -125,6 +125,15 @@ struct kvm_arch {
-> >>   #define KVM_ARCH_FLAG_RETURN_NISV_IO_ABORT_TO_USER 0
-> >>      /* Memory Tagging Extension enabled for the guest */
-> >>   #define KVM_ARCH_FLAG_MTE_ENABLED                  1
-> >> +    /*
-> >> +     * The following two bits are used to indicate the guest's EL1
-> >> +     * register width configuration. A value of KVM_ARCH_FLAG_EL1_32BIT
-> >> +     * bit is valid only when KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED is set.
-> >> +     * Otherwise, the guest's EL1 register width has not yet been
-> >> +     * determined yet.
-> >> +     */
-> >> +#define KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED          2
-> >> +#define KVM_ARCH_FLAG_EL1_32BIT                             3
-> >>      unsigned long flags;
-> >>
-> >>      /*
-> >> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-> >> index ecc40c8cd6f6..cbeb6216ee25 100644
-> >> --- a/arch/arm64/kvm/reset.c
-> >> +++ b/arch/arm64/kvm/reset.c
-> >> @@ -181,27 +181,45 @@ static int kvm_vcpu_enable_ptrauth(struct kvm_vcpu *vcpu)
-> >>      return 0;
-> >>   }
-> >>
-> >> -static bool vcpu_allowed_register_width(struct kvm_vcpu *vcpu)
-> >> +/*
-> >> + * A guest can have either all EL1 32bit or 64bit vcpus only. It is
-> >> + * indicated by a value of KVM_ARCH_FLAG_EL1_32BIT bit in kvm->arch.flags,
-> >> + * which is valid only when KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED in
-> >> + * kvm->arch.flags is set.
-> >> + * This function sets the EL1_32BIT bit based on the given @is32bit (and
-> >> + * sets REG_WIDTH_CONFIGURED bit). When those flags are already set,
-> >> + * @is32bit must be consistent with the flags.
-> >> + * Returns 0 on success, or non-zero otherwise.
-> >> + */
-> >
-> > nit: use kerneldoc style:
-> >
-> >    https://www.kernel.org/doc/html/latest/doc-guide/kernel-doc.html
->
-> Sure, I can fix the comment to use kerneldoc style.
->
->
-> >
-> >> +static int kvm_set_vm_width(struct kvm *kvm, bool is32bit)
-> >>   {
-> >> -    struct kvm_vcpu *tmp;
-> >> -    bool is32bit;
-> >> -    unsigned long i;
-> >> +    bool allowed;
-> >> +
-> >> +    lockdep_assert_held(&kvm->lock);
-> >> +
-> >> +    if (test_bit(KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED, &kvm->arch.flags)) {
-> >> +            /*
-> >> +             * The guest's register width is already configured.
-> >> +             * Make sure that @is32bit is consistent with it.
-> >> +             */
-> >> +            allowed = (is32bit ==
-> >> +                       test_bit(KVM_ARCH_FLAG_EL1_32BIT, &kvm->arch.flags));
-> >> +            return allowed ? 0 : -EINVAL;
-> >
-> > nit: I'd avoid the ternary and just use a boring if/else (though I could
-> > be in the minority here).
->
-> I agree with you and will fix it.
-> (The ternary with 'allowed' was just copied from the previous patch,
->   and I should have changed that in this patch...)
->
-> Thanks,
-> Reiji
->
->
-> >
-> >> +    }
-> >>
-> >> -    is32bit = vcpu_has_feature(vcpu, KVM_ARM_VCPU_EL1_32BIT);
-> >>      if (!cpus_have_const_cap(ARM64_HAS_32BIT_EL1) && is32bit)
-> >> -            return false;
-> >> +            return -EINVAL;
-> >>
-> >>      /* MTE is incompatible with AArch32 */
-> >> -    if (kvm_has_mte(vcpu->kvm) && is32bit)
-> >> -            return false;
-> >> +    if (kvm_has_mte(kvm) && is32bit)
-> >> +            return -EINVAL;
-> >>
-> >> -    /* Check that the vcpus are either all 32bit or all 64bit */
-> >> -    kvm_for_each_vcpu(i, tmp, vcpu->kvm) {
-> >> -            if (vcpu_has_feature(tmp, KVM_ARM_VCPU_EL1_32BIT) != is32bit)
-> >> -                    return false;
-> >> -    }
-> >> +    if (is32bit)
-> >> +            set_bit(KVM_ARCH_FLAG_EL1_32BIT, &kvm->arch.flags);
-> >>
-> >> -    return true;
-> >> +    set_bit(KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED, &kvm->arch.flags);
-> >> +
-> >> +    return 0;
-> >>   }
-> >>
-> >>   /**
-> >> @@ -230,10 +248,17 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
-> >>      u32 pstate;
-> >>
-> >>      mutex_lock(&vcpu->kvm->lock);
-> >> -    reset_state = vcpu->arch.reset_state;
-> >> -    WRITE_ONCE(vcpu->arch.reset_state.reset, false);
-> >> +    ret = kvm_set_vm_width(vcpu->kvm,
-> >> +                           vcpu_has_feature(vcpu, KVM_ARM_VCPU_EL1_32BIT));
-> >> +    if (!ret) {
-> >> +            reset_state = vcpu->arch.reset_state;
-> >> +            WRITE_ONCE(vcpu->arch.reset_state.reset, false);
-> >> +    }
-> >>      mutex_unlock(&vcpu->kvm->lock);
-> >>
-> >> +    if (ret)
-> >> +            return ret;
-> >> +
-> >>      /* Reset PMU outside of the non-preemptible section */
-> >>      kvm_pmu_vcpu_reset(vcpu);
-> >>
-> >> @@ -260,14 +285,9 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
-> >>              }
-> >>      }
-> >>
-> >> -    if (!vcpu_allowed_register_width(vcpu)) {
-> >> -            ret = -EINVAL;
-> >> -            goto out;
-> >> -    }
-> >> -
-> >>      switch (vcpu->arch.target) {
-> >>      default:
-> >> -            if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features)) {
-> >> +            if (vcpu_el1_is_32bit(vcpu)) {
-> >>                      pstate = VCPU_RESET_PSTATE_SVC;
-> >>              } else {
-> >>                      pstate = VCPU_RESET_PSTATE_EL1;
-> >> --
-> >> 2.35.1.723.g4982287a31-goog
-> >>
