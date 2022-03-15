@@ -2,205 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D2B54DA0B7
-	for <lists+kvm@lfdr.de>; Tue, 15 Mar 2022 18:02:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 794834DA0F6
+	for <lists+kvm@lfdr.de>; Tue, 15 Mar 2022 18:14:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350276AbiCORDL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Mar 2022 13:03:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53724 "EHLO
+        id S1350486AbiCORPh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Mar 2022 13:15:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350449AbiCORDG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Mar 2022 13:03:06 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 340335714B;
-        Tue, 15 Mar 2022 10:01:53 -0700 (PDT)
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22FGER9D019722;
-        Tue, 15 Mar 2022 17:01:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : from : to : cc : references : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=UOFhKzT17r8nHIqX6nZiw4Y/vWOMIJIOjcg3nyKy1QQ=;
- b=R3UGugpuMTgE6waYe6YGdG7UhuL+IOk70WHlR4rlVjJlpz2++90ODFIhl5VfmtPJuFgL
- yhXV5WhPBh9h49nAuLqAkUTVW/SfULAbLp7QObDFfeHnwm9JK8rk5hHdVTQLME5sAPXC
- rzjDKCAWn5MfgsQzP1LXeIoNc9aapdtfpYM3JcuLN1wB6Yr3rfGjXX0i/8zVtIcvVzrn
- apYAkwUgsIDTjA0WnuM0UT6q3K1zFF4KOk7ndyMMnsuJwcwY0xYI1p7l/SMFXrUbCwLr
- BTVapz29vWqrmm4AKhcRLwnC7rQmWmBtJK6w+dv2Y5ULXn9kLfRWjAGDlHC2RDgrAKvf Lw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3etvbmcbww-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Mar 2022 17:01:34 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22FGpTNY030717;
-        Tue, 15 Mar 2022 17:01:34 GMT
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3etvbmcbw7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Mar 2022 17:01:34 +0000
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
-        by ppma05wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22FGxCYP013147;
-        Tue, 15 Mar 2022 17:01:33 GMT
-Received: from b03cxnp07028.gho.boulder.ibm.com (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
-        by ppma05wdc.us.ibm.com with ESMTP id 3erk59y3ec-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Mar 2022 17:01:32 +0000
-Received: from b03ledav003.gho.boulder.ibm.com (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
-        by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22FH1ViF33227018
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 15 Mar 2022 17:01:31 GMT
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 56FCF6A051;
-        Tue, 15 Mar 2022 17:01:31 +0000 (GMT)
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E7A9B6A047;
-        Tue, 15 Mar 2022 17:01:28 +0000 (GMT)
-Received: from [9.211.32.184] (unknown [9.211.32.184])
-        by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Tue, 15 Mar 2022 17:01:28 +0000 (GMT)
-Message-ID: <99c7585c-47c5-9995-3fe6-c75f412b3479@linux.ibm.com>
-Date:   Tue, 15 Mar 2022 13:01:27 -0400
+        with ESMTP id S241638AbiCORPd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Mar 2022 13:15:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 45ACF1FCE9
+        for <kvm@vger.kernel.org>; Tue, 15 Mar 2022 10:14:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1647364459;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=u807ZeNN2qGEsYuS4UPVVqtbsA7t3x+ouYSiSBveyD0=;
+        b=FBzoMxqGCTBRgb5zXh2gltNXb2FCY17s019ekhuQMv0tEDHDEuQUZqhq7ef0JN4XcfnrxN
+        5GXpY02k3AoCD4r/wpzsXulxH3h2Ol0pCd4BQubn/PIXf7XeNzHHJIWxMlkommlL+6qqtf
+        jdgrmcHkI0qvy8+VkCu7ynLCVqN+G9M=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-12-1kEhjS2uOWibhhwFvQACJQ-1; Tue, 15 Mar 2022 13:14:16 -0400
+X-MC-Unique: 1kEhjS2uOWibhhwFvQACJQ-1
+Received: by mail-wm1-f70.google.com with SMTP id o33-20020a05600c512100b0038a1d06e525so1495226wms.2
+        for <kvm@vger.kernel.org>; Tue, 15 Mar 2022 10:14:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=u807ZeNN2qGEsYuS4UPVVqtbsA7t3x+ouYSiSBveyD0=;
+        b=1Id2gmQ8cGxIMGvnbqkbpk+RnVpCsd3hxY9gPNXC6D3CvC2Ww2mWJPcUDxvo2qABRO
+         Mu+3HgAA735WLADvj0Qcxd2edCCUwvpQV9HFYwqBIH3xrvEpgkmhprx/2gzXTW6hD50G
+         kVzApyxI+ByGNshXTlsl6iDf+dtkmI86qxWy9kbrNeS4j4lfqLXyhfB3GG2HnDFSrNDw
+         wskp0SMjTHb4JM/gNrVsr7/sDWTYn6ZsMQLkYOQTfRcoeHmgpcayYMxAgoQ5iwdSnjvK
+         hvaNcBLY/88+QhPXWdteMFVFAA0VoARhJ/yh+ywRLbSKZ8Y4p2a5ZlgoU+TCgfqdqg5H
+         x4Ew==
+X-Gm-Message-State: AOAM532fR1kcljjrvXX3I2+ohbhpCNQhY8MMblghO1HrRCLZWErr34E8
+        TmRUBNFoaoi6rlV3Zc0IUoJkqGOti0PA48oh3CoHfFTpcThlH8GAKJPNophah7NRGWbqZ8H5t0c
+        GTyhgBV4ALLMs
+X-Received: by 2002:a5d:5512:0:b0:1ef:5f08:29fb with SMTP id b18-20020a5d5512000000b001ef5f0829fbmr21204931wrv.653.1647364455649;
+        Tue, 15 Mar 2022 10:14:15 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzYqL5fPHSADziBs+XqlZkT9FX7MI9CEk0Zn3ysRNe2yyWlIwJCNPYYOU/70wMG7mwc8FemXw==
+X-Received: by 2002:a5d:5512:0:b0:1ef:5f08:29fb with SMTP id b18-20020a5d5512000000b001ef5f0829fbmr21204918wrv.653.1647364455472;
+        Tue, 15 Mar 2022 10:14:15 -0700 (PDT)
+Received: from gator (cst2-173-70.cust.vodafone.cz. [31.30.173.70])
+        by smtp.gmail.com with ESMTPSA id u11-20020a05600c19cb00b00389efe9c512sm3184824wmq.23.2022.03.15.10.14.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Mar 2022 10:14:14 -0700 (PDT)
+Date:   Tue, 15 Mar 2022 18:14:12 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        thuth@redhat.com, pbonzini@redhat.com
+Subject: Re: [PATCH kvm-unit-tests] arch-run: Introduce QEMU_ARCH
+Message-ID: <20220315171412.5esfm4ygjjq2bbjh@gator>
+References: <20220315080152.224606-1-drjones@redhat.com>
+ <YjCHcV3iyTtSrw3k@monolith.localdoman>
+ <20220315151630.obxraie6ikqrwtrw@gator>
+ <YjC62NycFfevZ4wx@monolith.localdoman>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.0
-Subject: Re: [PATCH v4 15/32] vfio: introduce KVM-owned IOMMU type
-Content-Language: en-US
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>
-Cc:     "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "schnelle@linux.ibm.com" <schnelle@linux.ibm.com>,
-        "farman@linux.ibm.com" <farman@linux.ibm.com>,
-        "pmorel@linux.ibm.com" <pmorel@linux.ibm.com>,
-        "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
-        "hca@linux.ibm.com" <hca@linux.ibm.com>,
-        "gor@linux.ibm.com" <gor@linux.ibm.com>,
-        "gerald.schaefer@linux.ibm.com" <gerald.schaefer@linux.ibm.com>,
-        "agordeev@linux.ibm.com" <agordeev@linux.ibm.com>,
-        "svens@linux.ibm.com" <svens@linux.ibm.com>,
-        "frankja@linux.ibm.com" <frankja@linux.ibm.com>,
-        "david@redhat.com" <david@redhat.com>,
-        "imbrenda@linux.ibm.com" <imbrenda@linux.ibm.com>,
-        "vneethv@linux.ibm.com" <vneethv@linux.ibm.com>,
-        "oberpar@linux.ibm.com" <oberpar@linux.ibm.com>,
-        "freude@linux.ibm.com" <freude@linux.ibm.com>,
-        "thuth@redhat.com" <thuth@redhat.com>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "will@kernel.org" <will@kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>
-References: <20220314194451.58266-1-mjrosato@linux.ibm.com>
- <20220314194451.58266-16-mjrosato@linux.ibm.com>
- <20220314165033.6d2291a5.alex.williamson@redhat.com>
- <20220314231801.GN11336@nvidia.com>
- <BL1PR11MB5271DE700698C5FB11F5EEE78C109@BL1PR11MB5271.namprd11.prod.outlook.com>
- <72dd168c-dd40-356c-1fe5-02bdfca57d73@linux.ibm.com>
-In-Reply-To: <72dd168c-dd40-356c-1fe5-02bdfca57d73@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: N7tfK37i4kJI7EzIQuKp76cTvmkOIo_4
-X-Proofpoint-ORIG-GUID: Ohnogp1Ve9NEPlsuNV3Iw-LKunz56h8i
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-03-15_08,2022-03-15_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
- priorityscore=1501 clxscore=1015 phishscore=0 mlxlogscore=999
- lowpriorityscore=0 malwarescore=0 spamscore=0 impostorscore=0
- suspectscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2203150104
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H4,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YjC62NycFfevZ4wx@monolith.localdoman>
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/15/22 10:17 AM, Matthew Rosato wrote:
-> On 3/15/22 3:57 AM, Tian, Kevin wrote:
->>> From: Jason Gunthorpe <jgg@nvidia.com>
->>> Sent: Tuesday, March 15, 2022 7:18 AM
->>>
->>> On Mon, Mar 14, 2022 at 04:50:33PM -0600, Alex Williamson wrote:
->>>
->>>>> +/*
->>>>> + * The KVM_IOMMU type implies that the hypervisor will control the
->>> mappings
->>>>> + * rather than userspace
->>>>> + */
->>>>> +#define VFIO_KVM_IOMMU            11
->>>>
->>>> Then why is this hosted in the type1 code that exposes a wide variety
->>>> of userspace interfaces?  Thanks,
->>>
->>> It is really badly named, this is the root level of a 2 stage nested
->>> IO page table, and this approach needed a special flag to distinguish
->>> the setup from the normal iommu_domain.
->>>
->>> If we do try to stick this into VFIO it should probably use the
->>> VFIO_TYPE1_NESTING_IOMMU instead - however, we would like to delete
->>> that flag entirely as it was never fully implemented, was never used,
->>> and isn't part of what we are proposing for IOMMU nesting on ARM
->>> anyhow. (So far I've found nobody to explain what the plan here was..)
->>>
->>> This is why I said the second level should be an explicit iommu_domain
->>> all on its own that is explicitly coupled to the KVM to read the page
->>> tables, if necessary.
->>>
->>> But I'm not sure that reading the userspace io page tables with KVM is
->>> even the best thing to do - the iommu driver already has the pinned
->>> memory, it would be faster and more modular to traverse the io page
->>> tables through the pfns in the root iommu_domain than by having KVM do
->>> the translations. Lets see what Matthew says..
->>>
->>
->> Reading this thread it's sort of like an optimization to software 
->> nesting.
-> 
-> Yes, we want to avoid breaking to userspace for a very frequent 
-> operation (RPCIT / updating shadow mappings)
-> 
->> If that is the case does it make more sense to complete the basic form
->> of software nesting first and then adds this optimization?
->>
->> The basic form would allow the userspace to create a special domain
->> type which points to a user/guest page table (like hardware nesting)
->> but doesn't install the user page table to the IOMMU hardware (unlike
->> hardware nesting). When receiving invalidate cmd from userspace > the 
->> iommu driver walks the user page table (1st-level) and the parent
->> page table (2nd-level) to generate a shadow mapping for the
->> invalidated range in the non-nested hardware page table of this
->> special domain type.
->>
->> Once that works what this series does just changes the matter of
->> how the invalidate cmd is triggered. Previously iommu driver receives
->> invalidate cmd from Qemu (via iommufd uAPI) while now receiving
->> the cmd from kvm (via iommufd kAPI) upon interception of RPCIT.
->>  From this angle once the connection between iommufd and kvm fd
->> is established there is even no direct talk between iommu driver and
->> kvm.
-> 
-> But something somewhere still needs to be responsible for 
-> pinning/unpinning of the guest table entries upon each RPCIT 
-> interception.  e.g. the RPCIT intercept can happen because the guest 
-> wants to invalidate some old mappings or has generated some new mappings 
-> over a range, so we must shadow the new mappings (by pinning the guest 
-> entries and placing them in the host hardware table / unpinning 
-> invalidated ones and clearing their entry in the host hardware table).
-> 
+On Tue, Mar 15, 2022 at 04:31:34PM +0000, Alexandru Elisei wrote:
+> Well, kvm-unit-tests selects KVM or TCG under the hood without the user
+> being involved at all.
 
-OK, this got clarified by Jason in another thread: What I was missing 
-here was an assumption that the 1st-level has already mapped and pinned 
-all of guest physical address space; in that case there's no need to 
-invoke pin/unpin operations against a kvm from within the iommu domain 
-(this series as-is does not pin all of the guest physical address space; 
-it does pins/unpins on-demand at RPCIT time)
+The under the hood aspect isn't great. It's best for testers to know what
+they're testing. It's pretty obvious, though, that if you choose
+ARCH != HOST that you'll end up on TCG. And, since KVM has historically
+been the primary focus of kvm-unit-tests, then it's probably reasonable
+to assume KVM is used when ARCH == HOST. However, we still silently fall
+back to TCG, even when ARCH == HOST, if /dev/kvm isn't available! And,
+the whole AArch32 guest support on AArch64 hosts with KVM requiring a
+different qemu binary muddies things further...
+
+Anyway, I hope serious test runners always specify ACCEL and QEMU to
+whatever they plan to test.
+
+> In my opinion, it's slightly better from an
+> usability perspective for kvm-unit-tests to do its best to run the tests
+> based on what the user specifically set (QEMU=qemu-system-arm) than fail to
+> run the tests because of an internal heuristic of which the user might be
+> entirely ignorant (if arm64 and /dev/kvm is available, pick ACCEL=kvm).
+
+If you'd like to post a patch for it, then I'd prefer something like
+below, which spells out the condition that the override is applied
+and also allows $QEMU to be checked by search_qemu_binary() before
+using it to make decisions.
+
+Thanks,
+drew
+
+diff --git a/arm/run b/arm/run
+index 28a0b4ad2729..128489125dcb 100755
+--- a/arm/run
++++ b/arm/run
+@@ -10,16 +10,24 @@ if [ -z "$KUT_STANDALONE" ]; then
+ fi
+ processor="$PROCESSOR"
+ 
+-ACCEL=$(get_qemu_accelerator) ||
++accel=$(get_qemu_accelerator) ||
+        exit $?
+ 
+-if [ "$ACCEL" = "kvm" ]; then
++if [ "$accel" = "kvm" ]; then
+        QEMU_ARCH=$HOST
+ fi
+ 
+ qemu=$(search_qemu_binary) ||
+        exit $?
+ 
++if [ "$QEMU" ] && [ -z "$ACCEL" ] &&
++   [ "$HOST" = "aarch64" ] && [ "$ARCH" = "arm" ] &&
++   [ "$(basename $QEMU)" = "qemu-system-arm" ]; then
++       accel=tcg
++fi
++
++ACCEL=$accel
++
+ if ! $qemu -machine '?' 2>&1 | grep 'ARM Virtual Machine' > /dev/null; then
+        echo "$qemu doesn't support mach-virt ('-machine virt'). Exiting."
+        exit 2
+
