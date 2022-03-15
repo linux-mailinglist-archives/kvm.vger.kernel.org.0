@@ -2,245 +2,227 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0DB7B4D9E0F
-	for <lists+kvm@lfdr.de>; Tue, 15 Mar 2022 15:48:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CCF654D9E2B
+	for <lists+kvm@lfdr.de>; Tue, 15 Mar 2022 15:55:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349441AbiCOOtx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Mar 2022 10:49:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52652 "EHLO
+        id S1349477AbiCOO4k (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Mar 2022 10:56:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349440AbiCOOtw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Mar 2022 10:49:52 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2D2E473B1;
-        Tue, 15 Mar 2022 07:48:36 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id o6-20020a17090a9f8600b001c6562049d9so106274pjp.3;
-        Tue, 15 Mar 2022 07:48:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language
-         :from:to:cc:references:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=3VzbyxIkC9LIY1ou44IQFEMq+DjElES6dtUZJ0q9zxI=;
-        b=mpeCNFYDBcm+hcPyrdp7PqQHpY0IEyOxH+ZOjswEXrhqxfxHl9dgS0fuaPRv0OrcYT
-         V7C8KRtoPiiAXU7lkWBXlO3geYSQEFXxL7U+16XJvGNTxJvbm2XvEYlSQmZvy/UbJkk2
-         HLbXc1dHDu/R34sR/LjhUSQjvztUc4IlD/5fLTvspL7le7NiZlIisLDa9NeeEdJWZGyf
-         nd51/2pm2KHkrAwSqPaYwWoou8EHaMjElDF3m5W8/236jOyelrs3i9on+yZh2R0zHj7h
-         5NsBl42MA0Yn9HWMWOISZpLv78hlTnrsVTMs+EmppuGWgR8udWn7CC8WYddQZCja22I3
-         e2UQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:from:to:cc:references:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=3VzbyxIkC9LIY1ou44IQFEMq+DjElES6dtUZJ0q9zxI=;
-        b=ZydyXn2ytqZnzHUf3kWxxWlNQ9kG5CWGusJe0M4Ld2MqSd6A6ym5PDFMdAoSyw4WvG
-         LjS8RWCu0OGIIe8Tsc5l1JIU2izoXJ1OShw8UrmkT8e9F6Snp4FhFmQf0Ja7zWdRLb2N
-         PP62/f3o+tsepUX0xjXwAlo4oKU3TIueviFNvQjF4VtL5SleUSLEoriLrgUN3rZ1MOri
-         rTpy8hZCcClpkI85nBNlgWMgPCL8Dm3x3ZZ2r5ymMeKC88T+pqpNsnA83lRrP8PMcQDe
-         oRGosM4PupY5PGiMBrO7R5rUyImkfh5jNJ2IkEv6J8cuvR9ovDHDVFNY+83aD0dxpd86
-         /U1w==
-X-Gm-Message-State: AOAM530pExkbBql6W25dxxNfvRwztrFQ8BJ1Iq52bs/eSct35Z9JUEGB
-        8N4VPp6S+qSCiZ9JOGSfNgHMVFkMnP2vCg==
-X-Google-Smtp-Source: ABdhPJxIgRkukd00MlZSj85ypHskl8S5ucWaYC4lvD/FolEZWXar6GMZNuqOBszWmoniShwTbskcVg==
-X-Received: by 2002:a17:903:2448:b0:151:8173:abf5 with SMTP id l8-20020a170903244800b001518173abf5mr28207526pls.55.1647355716068;
-        Tue, 15 Mar 2022 07:48:36 -0700 (PDT)
-Received: from [192.168.255.10] ([203.205.141.110])
-        by smtp.gmail.com with ESMTPSA id r32-20020a17090a43a300b001bf48047434sm3380923pjg.32.2022.03.15.07.48.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Mar 2022 07:48:35 -0700 (PDT)
-Message-ID: <e0f9643b-1cef-1310-7c93-07de426ff484@gmail.com>
-Date:   Tue, 15 Mar 2022 22:48:31 +0800
+        with ESMTP id S1348834AbiCOO4f (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Mar 2022 10:56:35 -0400
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2051.outbound.protection.outlook.com [40.107.92.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F9E554BF0;
+        Tue, 15 Mar 2022 07:55:23 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=mhIwCkPcAmsqs3eZYJyDMoQG9b1CZY2oZaGTc7kfMFyHK/p7shn5OpVWOxXDPEehfPAGHT/ly0bgxnYsLWd65eyyoTFeTu0+h5YDC3Fe6F2l7C+BonUNoI6HI0ftyJiWBB01781pq0m5ZpBo5rg9pnaVExQhggEb64GO3Jr4qiHzHQ8AVtfSIXWzIciKoPaPW8+cuTCKD/eywd7CVYbI82M0hE+4PpM7e6z/xebNMdRil3vcr1Pg1pATPsBP8NL+A9p0KwJ/QBjHdJ6TMZbHb2rDKvvEwf463nhd3qK0+zJlppFio9u5awzuBzD/SG07Di6QRJbnBPnhGNDAPA2gQw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=QZvhT8Q2MfLirZhjy4LH8f866Yd9QTsfEX/k5YoJn9E=;
+ b=MGihEQkUIoLxeTWBZRwDkNFE2btF+dGLl6yiDv7riyDtAA+97KVmaFjvKU2muCr48LhF4YBCLexodMD7ddEE7wPPZLAuPtJ5vI2YdVOuVGPBatIBCVmv7brjI/q8Ornr5xqgWwWIFPWiLelLqXlh9/JksB6GAOFnCDO0SXuvBEVDvQUyM+lCeJlshhJEcUmwjMhtEW7WkkHv12G7rSjjePO+mFq2f+W7nxgd7QzdD+KaNBp7B+k6HvItBJB5r83Xev2ZLBb0TZjzH3NjjUIpL6PW3p7jh7Xivob9Tpj9HGJyqsG6qlgZqYBFvcvYrjEwsG1tbx/HOpSnF+/aC06w6g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QZvhT8Q2MfLirZhjy4LH8f866Yd9QTsfEX/k5YoJn9E=;
+ b=HlFHELjb9X+aZYXZN5yQ6tCPaMj43rgRem4Jq7YBO7rUAJWeUSJeJeVCZHdfbtIz2ZEukO4IXPf5NrDWK+a8bvFXdFC1wpqMF5/eh+JCsV47eSvGJo7fFj9CGBmWGW30RFvGANS9EbVZJqXe9lIMRA+17l/yltvYJV1nHW7XKGNsbsTtA4czHxMq1misgc2VupEbEjhJArA2SIOel5YVJMYUjCT/ENCsNkC3MmSmbnDUiyXBQd3DUPAqSS1C/kvgugU5GLTRreQB31FImpDbQCEo4dpS5HJh+rSvLfqYkDw6eHg3ALzd/aYfAL2Il+s/LuxAyeuKCJoItoaYwt8pNw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by SA0PR12MB4400.namprd12.prod.outlook.com (2603:10b6:806:95::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5081.14; Tue, 15 Mar
+ 2022 14:55:21 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::51a0:4aee:2b4c:ca28]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::51a0:4aee:2b4c:ca28%4]) with mapi id 15.20.5061.029; Tue, 15 Mar 2022
+ 14:55:21 +0000
+Date:   Tue, 15 Mar 2022 11:55:20 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        linux-s390@vger.kernel.org, cohuck@redhat.com,
+        schnelle@linux.ibm.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
+        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
+        svens@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
+        oberpar@linux.ibm.com, freude@linux.ibm.com, thuth@redhat.com,
+        pasic@linux.ibm.com, joro@8bytes.org, will@kernel.org,
+        pbonzini@redhat.com, corbet@lwn.net, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org,
+        linux-doc@vger.kernel.org
+Subject: Re: [PATCH v4 15/32] vfio: introduce KVM-owned IOMMU type
+Message-ID: <20220315145520.GZ11336@nvidia.com>
+References: <20220314194451.58266-1-mjrosato@linux.ibm.com>
+ <20220314194451.58266-16-mjrosato@linux.ibm.com>
+ <20220314165033.6d2291a5.alex.williamson@redhat.com>
+ <20220314231801.GN11336@nvidia.com>
+ <9618afae-2a91-6e4e-e8c3-cb83e2f5c3d9@linux.ibm.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9618afae-2a91-6e4e-e8c3-cb83e2f5c3d9@linux.ibm.com>
+X-ClientProxiedBy: MN2PR07CA0028.namprd07.prod.outlook.com
+ (2603:10b6:208:1a0::38) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.7.0
-Subject: Re: [PATCH v12 00/17] KVM: x86/pmu: Add *basic* support to enable
- guest PEBS via DS
-Content-Language: en-US
-From:   Like Xu <like.xu.linux@gmail.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        x86@kernel.org, linux-kernel@vger.kernel.org,
-        Stephane Eranian <eranian@google.com>
-References: <20220304090427.90888-1-likexu@tencent.com>
-Organization: Tencent
-In-Reply-To: <20220304090427.90888-1-likexu@tencent.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: ba429809-f903-42be-b5b8-08da0693d40e
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4400:EE_
+X-Microsoft-Antispam-PRVS: <SA0PR12MB44005A379A2551CB4C19BECDC2109@SA0PR12MB4400.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: c6oKRT1YECSbmdZaMCoLc74DMUH5WEoBuzRcL+b7ygLWzbpSry7TfSCj1LUM/NcM9JCpDvC6t8QpPeG7/sNuk1Kspj92ZzRYGfgm0jfbMOQJXwvVjo85W6TpRQTguNNT0IuTgXXjMSnMNQ8QEcRe6dzzG/0j9zpushq9XZijW9mKf/xu7jRIw7AyVt9s7VD0uKJGqlx6VWwZVUJwpLePrJQVp57YJM0uXg1RxMLvIpc+jTRl/966BiKxLpfgz0wx6lTGpVTxHbJmbbjU4fh0gT03LQfyWwWqAb+QJbUopFgk1tnd3HskTdIzViyAl34xdxTAlknidK5hDa7vwodPRUnSw/v+Ul/ExeKf1lXnfJWCRTyvgjI8UT24QKrp9nLLqB5guz+qBGK+6UFPExIZhFrZdsHiyZ7dbAM8baNVJVGpR5U+O5usMJuCM3DJR1f7fccz+S871TygLx7F1CKE8cNBgToAP2xvj3rhcRRI8t+q77yAsS/ljsMWDClY7Rh9I2XXQAp2Eaizk4yEV3c2CcXLn+u6KX8tZHNB3Z7xBCNyjnDAyRdCkaVBQ3gCbggqg+GuXOiNNDdokzDsGQz4V3wIi2HCyZtmYkwzC1gFFTqD+1flkNc9BV8oqGpw3Qt/BCTyFw+iPXlasgAQmwjpKg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(2906002)(6486002)(186003)(26005)(5660300002)(8936002)(36756003)(1076003)(7416002)(508600001)(2616005)(4326008)(86362001)(33656002)(6506007)(316002)(6512007)(66946007)(66476007)(66556008)(8676002)(38100700002)(83380400001)(6916009);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?BtjUqvv0m7dCNkhqZYQsLpaVjY98VZ9vS6rdlNFC5LGaaHvKwGIcf5Zm9+k3?=
+ =?us-ascii?Q?VuXNflzfo2vkkGvsY5ecIK+WuKFZnTWqYB+/jB66AEEyLR4CAXFMjnUqZrg5?=
+ =?us-ascii?Q?O2VVUWl2xSLdaGW94/ajkInXmqUOoa+hmSfjdCq62rXeSnjPzx9LYQwGDv27?=
+ =?us-ascii?Q?FlT1JMxqrM8jMuNTE18PAGXgsRvZD3PXAhNDpLuOnIJT6I5hLMD3kzmW+upy?=
+ =?us-ascii?Q?96nBvFmTBae4T+GSgMd8PB23WQfcClhMSoKBu0uX1I6dWUZbobdI+Oopw80U?=
+ =?us-ascii?Q?gxvn6NUm6vA3w+WSJ+2wSqQwFNrn2xaeTmuG0l1yB2p0prpqGBahgRuFZds5?=
+ =?us-ascii?Q?QO9AKwkpFwnpQj/K13Pw6xTRC/wTDaROWRfCchA/chJew9oG++3Cyc4OTByA?=
+ =?us-ascii?Q?10EYHVr3K0zE3DrXwXhjA0/yFWsNlhKxqTRalROFrWw6/uR0mUxnY5lP98EZ?=
+ =?us-ascii?Q?KEbBMI23c5Z8sFzx2daB8v/oDSZV9xpSWwkqerR5mue1e1GC3YhAPe1s+fwi?=
+ =?us-ascii?Q?cQia7vkV5rn2ZzhaZ+EMa3tSaykprjqQwlf+xcnpkscVgVkAqCS1O2O8PDZ8?=
+ =?us-ascii?Q?IPukwHqJB+mIrC0F05QhKyqxSvDhtDylVv6rm9XgpHA1G939iWFPgWUYKlp2?=
+ =?us-ascii?Q?16PkfsIQhv3CIVntCU1AFzp4U7qQPx6wmnplKfJRftzrDOWgUHK/swqzW7ry?=
+ =?us-ascii?Q?t1c3nErLy7g+Je8ffHhtX6VOhvBjpo5GMj8lf6kw1p5V/qDRwaYEV0CY2PdP?=
+ =?us-ascii?Q?vvx16Q9OjmY/RqVJ8ZWm3dc7aXx7Jg2wQ3LVUAFrdgf0gciptCCUwvnwx3Cu?=
+ =?us-ascii?Q?6YhKR0FxotcTkS4ZoWVIlicx0XAzebigSG3bTGpRMi065s4iLZHBpQSchZ+L?=
+ =?us-ascii?Q?xYhAsrBi14RdlcPYZmXWEmXbPsvonUc7HBfE9Kv0kOLsLlcjlnXiNIwAbCH7?=
+ =?us-ascii?Q?E6id6zHQ5WFOKUCoIS19I8ihco8K6UZm3b9QlWXbrfsfZnGMNZNzGiCtw+WH?=
+ =?us-ascii?Q?XT/hLMxZifMeBciTmm/ICqJvie3se/O1sDWQ/BashCjHyfOt2VDDTIev+dhL?=
+ =?us-ascii?Q?ccq4thRWJGhpV+u2gqU9grM92pQZHJZlaftZpsQbwnFFriZWvs78s882MqLJ?=
+ =?us-ascii?Q?quDmqrAfsAGRcWENytOA4WR02ugs2C1UYQCVJodRnrI+3frPqlQgmDNEXEM+?=
+ =?us-ascii?Q?tn/mtsoJ3ogENxnysJ6xcLIs8oqnZUGC9gCJdc9EE1S4xxNQIbwua0xhqFyy?=
+ =?us-ascii?Q?sje36pGqhqGI+b5iF68bUxJngIFYX7cglshlKHsTVEW3N/Kd0Wqt9Y+R6xrw?=
+ =?us-ascii?Q?7C2KI0OREKjocnJrufQXzIFhPwtOdM3Vfxy5mLJnc3LYx8KXip9MYIgbtvUe?=
+ =?us-ascii?Q?0rEWsx2haooasfeJvRYNAzlJqcybK5wJkVvKwuMTLeNdFM4LDx2rOcLRsXel?=
+ =?us-ascii?Q?gWQ5dLINpYSNqTPGbRC4QBMSP+IXPLeZ?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ba429809-f903-42be-b5b8-08da0693d40e
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Mar 2022 14:55:21.6851
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: zZeTAus+Jj9a8rYik82c8zFTSfysQrEceDu/t/PcdCgZRvqQj/yCNu2TdIuXC8Lh
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4400
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Knock knock, do we have any more comments on this patch set, Jim ?
+On Tue, Mar 15, 2022 at 09:36:08AM -0400, Matthew Rosato wrote:
+> > If we do try to stick this into VFIO it should probably use the
+> > VFIO_TYPE1_NESTING_IOMMU instead - however, we would like to delete
+> > that flag entirely as it was never fully implemented, was never used,
+> > and isn't part of what we are proposing for IOMMU nesting on ARM
+> > anyhow. (So far I've found nobody to explain what the plan here was..)
+> > 
+> 
+> I'm open to suggestions on how better to tie this into vfio.  The scenario
+> basically plays out that:
 
-On 4/3/2022 5:04 pm, Like Xu wrote:
-> Hi,
+Ideally I would like it to follow the same 'user space page table'
+design that Eric and Kevin are working on for HW iommu.
+
+You have an 1st iommu_domain that maps and pins the entire guest physical
+address space.
+
+You have an nested iommu_domain that represents the user page table
+(the ioat in your language I think)
+
+When the guest says it wants to set a user page table then you create
+the nested iommu_domain representing that user page table and pass in
+the anchor (guest address of the root IOPTE) to the kernel to do the
+work.
+
+The rule for all other HW's is that the user space page table is
+translated by the top level kernel page table. So when you traverse it
+you fetch the CPU page storing the guest's IOPTE by doing an IOVA
+translation through the first level page table - not through KVM.
+
+Since the first level page table an the KVM GPA should be 1:1 this is
+an equivalent operation.
+
+> 1) the iommu will be domain_alloc'd once VFIO_SET_IOMMU is issued -- so at
+> that time (or earlier) we have to make the decision on whether to use the
+> standard IOMMU or this alternate KVM/nested IOMMU.
+
+So in terms of iommufd I would see it this would be an iommufd 'create
+a device specific iomm_domain' IOCTL and you can pass in a S390
+specific data blob to make it into this special mode.
+
+> > This is why I said the second level should be an explicit iommu_domain
+> > all on its own that is explicitly coupled to the KVM to read the page
+> > tables, if necessary.
 > 
-> Out of more accurate profiling results, this feature still has loyal
-> followers and another new rebased version is here. PeterZ had acked
-> the V9 patchset [0] and Paolo had asked for a new version, so please
-> check the changelog and feel free to review, test and comment.
+> Maybe I misunderstood this.  Are you proposing 2 layers of IOMMU that
+> interact with each other within host kernel space?
 > 
-> [0] https://lore.kernel.org/kvm/YQF7lwM6qzYso0Gg@hirez.programming.kicks-ass.net/
-> [1] https://lore.kernel.org/kvm/95bf3dca-c6d1-02c8-40b6-8bb29a3a7a36@redhat.com/
+> A second level runs the guest tables, pins the appropriate pieces from the
+> guest to get the resulting phys_addr(s) which are then passed via iommu to a
+> first level via map (or unmap)?
+
+
+The first level iommu_domain has the 'type1' map and unmap and pins
+the pages. This is the 1:1 map with the GPA and ends up pinning all
+guest memory because the point is you don't want to take a memory pin
+on your performance path
+
+The second level iommu_domain points to a single IO page table in GPA
+and is created/destroyed whenever the guest traps to the hypervisor to
+manipulate the anchor (ie the GPA of the guest IO page table).
+
+> > But I'm not sure that reading the userspace io page tables with KVM is
+> > even the best thing to do - the iommu driver already has the pinned
+> > memory, it would be faster and more modular to traverse the io page
+> > tables through the pfns in the root iommu_domain than by having KVM do
+> > the translations. Lets see what Matthew says..
 > 
-> ---
+> OK, you lost me a bit here.  And this may be associated with the above.
 > 
-> The guest Precise Event Based Sampling (PEBS) feature can provide an
-> architectural state of the instruction executed after the guest instruction
-> that exactly caused the event. It needs new hardware facility only available
-> on Intel Ice Lake Server platforms. This patch set enables the basic PEBS
-> feature for KVM guests on ICX.
-> 
-> We can use PEBS feature on the Linux guest like native:
-> 
->     # echo 0 > /proc/sys/kernel/watchdog (on the host)
->     # perf record -e instructions:ppp ./br_instr a
->     # perf record -c 100000 -e instructions:pp ./br_instr a
-> 
-> To emulate guest PEBS facility for the above perf usages,
-> we need to implement 2 code paths:
-> 
-> 1) Fast path
-> 
-> This is when the host assigned physical PMC has an identical index as the
-> virtual PMC (e.g. using physical PMC0 to emulate virtual PMC0).
-> This path is used in most common use cases.
-> 
-> 2) Slow path
-> 
-> This is when the host assigned physical PMC has a different index from the
-> virtual PMC (e.g. using physical PMC1 to emulate virtual PMC0) In this case,
-> KVM needs to rewrite the PEBS records to change the applicable counter indexes
-> to the virtual PMC indexes, which would otherwise contain the physical counter
-> index written by PEBS facility, and switch the counter reset values to the
-> offset corresponding to the physical counter indexes in the DS data structure.
-> 
-> The previous version [3] enables both fast path and slow path, which seems
-> a bit more complex as the first step. In this patchset, we want to start with
-> the fast path to get the basic guest PEBS enabled while keeping the slow path
-> disabled. More focused discussion on the slow path [4] is planned to be put to
-> another patchset in the next step.
-> 
-> Compared to later versions in subsequent steps, the functionality to support
-> host-guest PEBS both enabled and the functionality to emulate guest PEBS when
-> the counter is cross-mapped are missing in this patch set
-> (neither of these are typical scenarios).
-> 
-> With the basic support, the guest can retrieve the correct PEBS information from
-> its own PEBS records on the Ice Lake servers. And we expect it should work when
-> migrating to another Ice Lake and no regression about host perf is expected.
-> 
-> Here are the results of pebs test from guest/host for same workload:
-> 
-> perf report on guest:
-> # Samples: 2K of event 'instructions:ppp', # Event count (approx.): 1473377250 # Overhead  Command   Shared Object      Symbol
->     57.74%  br_instr  br_instr           [.] lfsr_cond
->     41.40%  br_instr  br_instr           [.] cmp_end
->      0.21%  br_instr  [kernel.kallsyms]  [k] __lock_acquire
-> 
-> perf report on host:
-> # Samples: 2K of event 'instructions:ppp', # Event count (approx.): 1462721386 # Overhead  Command   Shared Object     Symbol
->     57.90%  br_instr  br_instr          [.] lfsr_cond
->     41.95%  br_instr  br_instr          [.] cmp_end
->      0.05%  br_instr  [kernel.vmlinux]  [k] lock_acquire
->      Conclusion: the profiling results on the guest are similar tothat on the host.
-> 
-> A minimum guest kernel version may be v5.4 or a backport version support
-> Icelake server PEBS.
-> 
-> Please check more details in each commit and feel free to comment.
-> 
-> Previous:
-> https://lore.kernel.org/kvm/20211210133525.46465-1-likexu@tencent.com/
-> 
-> [3]
-> https://lore.kernel.org/kvm/20210104131542.495413-1-like.xu@linux.intel.com/
-> [4]
-> https://lore.kernel.org/kvm/20210115191113.nktlnmivc3edstiv@two.firstfloor.org/
-> 
-> V11->V12:
-> - Apply the new perf interface from tip/perf/core and fix the merge conflict;
-> - Rename "x86_pmu.pebs_ept" to "x86_pmu.pebs_ept"; (Sean)
-> - Rebased on the top of kvm/queue (b13a3befc815); (Paolo)
-> 
-> V10->V11:
-> - Merge perf_guest_info_callbacks static_call to the tip/perf/core;
-> - Keep use perf_guest_cbs in the kvm/queue context before merge window;
-> - Fix MSR_IA32_MISC_ENABLE_EMON bit (Liu XiangDong);
-> - Rebase "Reprogram PEBS event to emulate guest PEBS counter" patch;
-> 
-> V9->V10:
-> - improve readability in core.c(Peter Z)
-> - reuse guest_pebs_idxs(Liu XiangDong)
-> 
-> V8 -> V9 Changelog:
-> -fix a brackets error in xen_guest_state()
-> 
-> V7 -> V8 Changelog:
-> - fix coding style, add {} for single statement of multiple lines(Peter Z)
-> - fix coding style in xen_guest_state() (Boris Ostrovsky)
-> - s/pmu/kvm_pmu/ in intel_guest_get_msrs() (Peter Z)
-> - put lower cost branch in the first place for x86_pmu_handle_guest_pebs() (Peter Z)
-> 
-> V6 -> V7 Changelog:
-> - Fix conditions order and call x86_pmu_handle_guest_pebs() unconditionally; (PeterZ)
-> - Add a new patch to make all that perf_guest_cbs stuff suck less; (PeterZ)
-> - Document IA32_MISC_ENABLE[7] that that behavior matches bare metal; (Sean & Venkatesh)
-> - Update commit message for fixed counter mask refactoring;(PeterZ)
-> - Clarifying comments about {.host and .guest} for intel_guest_get_msrs(); (PeterZ)
-> - Add pebs_capable to store valid PEBS_COUNTER_MASK value; (PeterZ)
-> - Add more comments for perf's precise_ip field; (Andi & PeterZ)
-> - Refactor perf_overflow_handler_t and make it more legible; (PeterZ)
-> - Use "(unsigned long)cpuc->ds" instead of __this_cpu_read(cpu_hw_events.ds); (PeterZ)
-> - Keep using "(struct kvm_pmu *)data" to follow K&R; (Andi)
-> 
-> Like Xu (16):
->    perf/x86/intel: Add EPT-Friendly PEBS for Ice Lake Server
->    perf/x86/intel: Handle guest PEBS overflow PMI for KVM guest
->    perf/x86/core: Pass "struct kvm_pmu *" to determine the guest values
->    KVM: x86/pmu: Set MSR_IA32_MISC_ENABLE_EMON bit when vPMU is enabled
->    KVM: x86/pmu: Introduce the ctrl_mask value for fixed counter
->    KVM: x86/pmu: Add IA32_PEBS_ENABLE MSR emulation for extended PEBS
->    KVM: x86/pmu: Reprogram PEBS event to emulate guest PEBS counter
->    KVM: x86/pmu: Adjust precise_ip to emulate Ice Lake guest PDIR counter
->    KVM: x86/pmu: Add IA32_DS_AREA MSR emulation to support guest DS
->    KVM: x86/pmu: Add PEBS_DATA_CFG MSR emulation to support adaptive PEBS
->    KVM: x86: Set PEBS_UNAVAIL in IA32_MISC_ENABLE when PEBS is enabled
->    KVM: x86/pmu: Move pmc_speculative_in_use() to arch/x86/kvm/pmu.h
->    KVM: x86/pmu: Disable guest PEBS temporarily in two rare situations
->    KVM: x86/pmu: Add kvm_pmu_cap to optimize perf_get_x86_pmu_capability
->    KVM: x86/cpuid: Refactor host/guest CPU model consistency check
->    KVM: x86/pmu: Expose CPUIDs feature bits PDCM, DS, DTES64
-> 
-> Peter Zijlstra (Intel) (1):
->    x86/perf/core: Add pebs_capable to store valid PEBS_COUNTER_MASK value
-> 
->   arch/x86/events/core.c            |   5 +-
->   arch/x86/events/intel/core.c      | 157 +++++++++++++++++++++++++-----
->   arch/x86/events/perf_event.h      |   6 +-
->   arch/x86/include/asm/kvm_host.h   |  16 +++
->   arch/x86/include/asm/msr-index.h  |   6 ++
->   arch/x86/include/asm/perf_event.h |   5 +-
->   arch/x86/kvm/cpuid.c              |  26 ++---
->   arch/x86/kvm/cpuid.h              |   5 +
->   arch/x86/kvm/pmu.c                |  52 +++++++---
->   arch/x86/kvm/pmu.h                |  37 +++++++
->   arch/x86/kvm/vmx/capabilities.h   |  28 +++---
->   arch/x86/kvm/vmx/pmu_intel.c      | 118 ++++++++++++++++++----
->   arch/x86/kvm/vmx/vmx.c            |  24 ++++-
->   arch/x86/kvm/vmx/vmx.h            |   2 +-
->   arch/x86/kvm/x86.c                |  30 ++++--
->   15 files changed, 410 insertions(+), 107 deletions(-)
-> 
+> So, what the current implementation is doing is reading the guest DMA tables
+> (which we must pin the first time we access them) and then map the PTEs of
+> the associated guest DMA entries into the associated host DMA table (so,
+> again pin and place the address, or unpin and invalidate).  Basically we are
+> shadowing the first level DMA table as a copy of the second level DMA table
+> with the host address(es) of the pinned guest page(s).
+
+You can't pin/unpin in this path, there is no real way to handle error
+and ulimit stuff here, plus it is really slow. I didn't notice any of
+this in your patches, so what do you mean by 'pin' above?
+
+To be like other IOMMU nesting drivers the pages should already be
+pinned and stored in the 1st iommu_domain, lets say in an xarray. This
+xarray is populated by type1 map/unmap sytem calls like any
+iommu_domain.
+
+A nested iommu_domain should create the real HW IO page table and
+associate it with the real HW IOMMU and record the parent 1st level iommu_domain.
+
+When you do the shadowing you use the xarray of the 1st level
+iommu_domain to translate from GPA to host physical and there is no
+pinning/etc involved. After walking the guest table and learning the
+final vIOVA it is translated through the xarray to a CPU physical and
+then programmed into the real HW IO page table.
+
+There is no reason to use KVM to do any of this, and is actively wrong
+to place CPU pages from KVM into an IOPTE that did not come through
+the type1 map/unmap calls that do all the proper validation and
+accounting.
+
+Jason
