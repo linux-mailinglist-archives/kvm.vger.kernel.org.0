@@ -2,314 +2,284 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1530D4D9D1C
-	for <lists+kvm@lfdr.de>; Tue, 15 Mar 2022 15:12:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E7D564D9D25
+	for <lists+kvm@lfdr.de>; Tue, 15 Mar 2022 15:14:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241113AbiCOONN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Mar 2022 10:13:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56120 "EHLO
+        id S1349044AbiCOOPR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Mar 2022 10:15:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33862 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349044AbiCOONA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Mar 2022 10:13:00 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55B5C54BD1;
-        Tue, 15 Mar 2022 07:11:47 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22FDTXfn001163;
-        Tue, 15 Mar 2022 14:11:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : content-transfer-encoding
- : mime-version; s=pp1; bh=lgUcleidPgeSbZdOb4sTvjU1fm+T1hemCinHIHwKwXU=;
- b=BIyzRLoxCEgFrpnQuWKJGbqJk5BzqrjN+3TXys0jnrMGIhzFbzhnRR9sCxLRWnkdk7tj
- zz+xFW1iVM9unsBNJvsi1QIAtoV8Nwr0orjtucciGMLLhMACKK5r62T4rlppGdCl9TQv
- LUIZHAZdb8HqpbZhkvfXDPRM4/dWliMRBDOR+NFNH0atx/Qf7HTppuF/y4LusF83gdn/
- lFSenAx4gYbDhD4YVc1JwRXp3dtfYnxEUiUkQYu8Nx0scWhc5b6VMnoY3Q0zw8rfmUMA
- nxCiJHQ3lE2RZurJbcogyrB7P5NjcJIksJ9rIblK31RONgFtF4mggCkLsqzZYNeOywAK jA== 
+        with ESMTP id S237401AbiCOOPP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Mar 2022 10:15:15 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A4693969F;
+        Tue, 15 Mar 2022 07:14:01 -0700 (PDT)
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22FCioGi010949;
+        Tue, 15 Mar 2022 14:13:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : reply-to : subject : to : cc : references : from :
+ in-reply-to : content-type : content-transfer-encoding; s=pp1;
+ bh=I2JuQw69rLIE7kBwkJ7s/EF353rQBCuLMnu9w8fyeRw=;
+ b=fKdr7PDtN3dyppTuMt+LQkUVfrGKTo2hUQ46Zd7S31pcautckL1OWPElwkVbEn6Hfizw
+ 4XfvGb/sqGsvkddHM36LV/277hJd00fL3LhuGPKoqyn8ZJBJIwIz2CMnfmNnaqRUC2ff
+ O4thYZ8B5YAO23FJUsafSRVBNRj2/mC0HimLISJxvvDUjc/eYmCKl0UBLzH2YNCXKj40
+ 0kmd0LuCjb2FbGZW8Jo63pqsSQHouq/4pgp1Sl43GXBm2N2V2PV/fq1wB9sk/uxyGzya
+ +BKZWCakkDW1un4HzRrtaQ8XPWumYnpqO3bPdeDNkUcDc6iviVANCyebkRcPeECIBi7Y FQ== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3etuqvs1pg-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3etu2st29r-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Mar 2022 14:11:46 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22FDpkpH022474;
-        Tue, 15 Mar 2022 14:11:46 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3etuqvs1p0-1
+        Tue, 15 Mar 2022 14:13:56 +0000
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22FDtcWX017886;
+        Tue, 15 Mar 2022 14:13:56 GMT
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3etu2st29g-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Mar 2022 14:11:45 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22FE9JJF013277;
-        Tue, 15 Mar 2022 14:11:44 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma04ams.nl.ibm.com with ESMTP id 3erk58xsw2-1
+        Tue, 15 Mar 2022 14:13:56 +0000
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+        by ppma03dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22FE7vlx016712;
+        Tue, 15 Mar 2022 14:13:55 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+        by ppma03dal.us.ibm.com with ESMTP id 3erk59b5fx-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Mar 2022 14:11:43 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22FEBe8156295826
+        Tue, 15 Mar 2022 14:13:55 +0000
+Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
+        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22FEDrVH32834012
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 15 Mar 2022 14:11:40 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A8F994C044;
-        Tue, 15 Mar 2022 14:11:40 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 875884C040;
-        Tue, 15 Mar 2022 14:11:40 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Tue, 15 Mar 2022 14:11:40 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
-        id 42584E11F3; Tue, 15 Mar 2022 15:11:40 +0100 (CET)
-From:   Christian Borntraeger <borntraeger@linux.ibm.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     KVM <kvm@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>
-Subject: [GIT PULL 7/7] KVM: s390: selftests: Add error memop tests
-Date:   Tue, 15 Mar 2022 15:11:37 +0100
-Message-Id: <20220315141137.357923-8-borntraeger@linux.ibm.com>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220315141137.357923-1-borntraeger@linux.ibm.com>
-References: <20220315141137.357923-1-borntraeger@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: LwtSvwYXdTKwdnKmmwyekFDbq0lzS9HH
-X-Proofpoint-ORIG-GUID: 7Jot3k7dfHkPD_S3HnthXZp2ipbTmDPW
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        Tue, 15 Mar 2022 14:13:53 GMT
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5234E136059;
+        Tue, 15 Mar 2022 14:13:53 +0000 (GMT)
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B8382136055;
+        Tue, 15 Mar 2022 14:13:51 +0000 (GMT)
+Received: from [9.65.71.91] (unknown [9.65.71.91])
+        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Tue, 15 Mar 2022 14:13:51 +0000 (GMT)
+Message-ID: <6083d83b-6867-2525-fdd8-baccde1a599f@linux.ibm.com>
+Date:   Tue, 15 Mar 2022 10:13:51 -0400
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Reply-To: jjherne@linux.ibm.com
+Subject: Re: [PATCH v18 12/18] s390/vfio-ap: reset queues after adapter/domain
+ unassignment
+Content-Language: en-US
+To:     Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     freude@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
+        mjrosato@linux.ibm.com, pasic@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com
+References: <20220215005040.52697-1-akrowiak@linux.ibm.com>
+ <20220215005040.52697-13-akrowiak@linux.ibm.com>
+From:   "Jason J. Herne" <jjherne@linux.ibm.com>
+Organization: IBM
+In-Reply-To: <20220215005040.52697-13-akrowiak@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: sLeAlYw04pAVXCBoN5geiJEdTqGmQQS3
+X-Proofpoint-ORIG-GUID: Es-q2duvSwtNFNcQX_wjahEZqQ5rDups
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
  definitions=2022-03-15_03,2022-03-15_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 bulkscore=0
- phishscore=0 malwarescore=0 mlxlogscore=999 impostorscore=0
- lowpriorityscore=0 clxscore=1015 priorityscore=1501 mlxscore=0
- suspectscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2202240000 definitions=main-2203150092
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ suspectscore=0 bulkscore=0 phishscore=0 priorityscore=1501 spamscore=0
+ lowpriorityscore=0 malwarescore=0 mlxlogscore=999 adultscore=0 mlxscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2203150092
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H4,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+On 2/14/22 19:50, Tony Krowiak wrote:
+> When an adapter or domain is unassigned from an mdev providing the AP
+> configuration to a running KVM guest, one or more of the guest's queues may
+> get dynamically removed. Since the removed queues could get re-assigned to
+> another mdev, they need to be reset. So, when an adapter or domain is
+> unassigned from the mdev, the queues that are removed from the guest's
+> AP configuration will be reset.
+> 
+> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> ---
+...
+>   
+> +static void vfio_ap_unlink_apqn_fr_mdev(struct ap_matrix_mdev *matrix_mdev,
+> +					unsigned long apid, unsigned long apqi,
+> +					struct ap_queue_table *qtable)
+> +{
+> +	struct vfio_ap_queue *q;
+> +
+> +	q = vfio_ap_mdev_get_queue(matrix_mdev, AP_MKQID(apid, apqi));
+> +	/* If the queue is assigned to the matrix mdev, unlink it. */
+> +	if (q)
+> +		vfio_ap_unlink_queue_fr_mdev(q);
+> +
+> +	/* If the queue is assigned to the APCB, store it in @qtable. */
+> +	if (test_bit_inv(apid, matrix_mdev->shadow_apcb.apm) &&
+> +	    test_bit_inv(apqi, matrix_mdev->shadow_apcb.aqm))
+> +		hash_add(qtable->queues, &q->mdev_qnode, q->apqn);
+> +}
+> +
+> +/**
+> + * vfio_ap_mdev_unlink_adapter - unlink all queues associated with unassigned
+> + *				 adapter from the matrix mdev to which the
+> + *				 adapter was assigned.
+> + * @matrix_mdev: the matrix mediated device to which the adapter was assigned.
+> + * @apid: the APID of the unassigned adapter.
+> + * @qtable: table for storing queues associated with unassigned adapter.
+> + */
+>   static void vfio_ap_mdev_unlink_adapter(struct ap_matrix_mdev *matrix_mdev,
+> -					unsigned long apid)
+> +					unsigned long apid,
+> +					struct ap_queue_table *qtable)
+>   {
+>   	unsigned long apqi;
+> +
+> +	for_each_set_bit_inv(apqi, matrix_mdev->matrix.aqm, AP_DOMAINS)
+> +		vfio_ap_unlink_apqn_fr_mdev(matrix_mdev, apid, apqi, qtable);
+> +}
 
-Test that errors occur if key protection disallows access, including
-tests for storage and fetch protection override. Perform tests for both
-logical vcpu and absolute vm ioctls.
-Also extend the existing tests to the vm ioctl.
+Here is an alternate version of the above two functions that stops the
+profileration of the qtables variable into vfio_ap_unlink_apqn_fr_mdev.
+It may seem like a change with no benefit, but it simplifies things a
+bit and avoids the reader from having to sink three functions deep to
+find out where qtables is used. This is 100% untested.
 
-Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-Link: https://lore.kernel.org/r/20220308125841.3271721-6-scgl@linux.ibm.com
-Signed-off-by: Christian Borntraeger <borntraeger@linux.ibm.com>
----
- tools/testing/selftests/kvm/s390x/memop.c | 153 +++++++++++++++++++---
- 1 file changed, 132 insertions(+), 21 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/s390x/memop.c b/tools/testing/selftests/kvm/s390x/memop.c
-index 42282663b38b..b04c2c1b3c30 100644
---- a/tools/testing/selftests/kvm/s390x/memop.c
-+++ b/tools/testing/selftests/kvm/s390x/memop.c
-@@ -422,6 +422,46 @@ static void test_copy_key_fetch_prot(void)
- 	kvm_vm_free(t.kvm_vm);
- }
- 
-+#define ERR_PROT_MOP(...)							\
-+({										\
-+	int rv;									\
-+										\
-+	rv = ERR_MOP(__VA_ARGS__);						\
-+	TEST_ASSERT(rv == 4, "Should result in protection exception");		\
-+})
-+
-+static void test_errors_key(void)
-+{
-+	struct test_default t = test_default_init(guest_copy_key_fetch_prot);
-+
-+	HOST_SYNC(t.vcpu, STAGE_INITED);
-+	HOST_SYNC(t.vcpu, STAGE_SKEYS_SET);
-+
-+	/* vm/vcpu, mismatching keys, fetch protection in effect */
-+	CHECK_N_DO(ERR_PROT_MOP, t.vcpu, LOGICAL, WRITE, mem1, t.size, GADDR_V(mem1), KEY(2));
-+	CHECK_N_DO(ERR_PROT_MOP, t.vcpu, LOGICAL, READ, mem2, t.size, GADDR_V(mem2), KEY(2));
-+	CHECK_N_DO(ERR_PROT_MOP, t.vm, ABSOLUTE, WRITE, mem1, t.size, GADDR_V(mem1), KEY(2));
-+	CHECK_N_DO(ERR_PROT_MOP, t.vm, ABSOLUTE, READ, mem2, t.size, GADDR_V(mem2), KEY(2));
-+
-+	kvm_vm_free(t.kvm_vm);
-+}
-+
-+static void test_errors_key_storage_prot_override(void)
-+{
-+	struct test_default t = test_default_init(guest_copy_key_fetch_prot);
-+
-+	HOST_SYNC(t.vcpu, STAGE_INITED);
-+	t.run->s.regs.crs[0] |= CR0_STORAGE_PROTECTION_OVERRIDE;
-+	t.run->kvm_dirty_regs = KVM_SYNC_CRS;
-+	HOST_SYNC(t.vcpu, STAGE_SKEYS_SET);
-+
-+	/* vm, mismatching keys, storage protection override not applicable to vm */
-+	CHECK_N_DO(ERR_PROT_MOP, t.vm, ABSOLUTE, WRITE, mem1, t.size, GADDR_V(mem1), KEY(2));
-+	CHECK_N_DO(ERR_PROT_MOP, t.vm, ABSOLUTE, READ, mem2, t.size, GADDR_V(mem2), KEY(2));
-+
-+	kvm_vm_free(t.kvm_vm);
-+}
-+
- const uint64_t last_page_addr = -PAGE_SIZE;
- 
- static void guest_copy_key_fetch_prot_override(void)
-@@ -481,6 +521,58 @@ static void test_copy_key_fetch_prot_override(void)
- 	kvm_vm_free(t.kvm_vm);
- }
- 
-+static void test_errors_key_fetch_prot_override_not_enabled(void)
-+{
-+	struct test_default t = test_default_init(guest_copy_key_fetch_prot_override);
-+	vm_vaddr_t guest_0_page, guest_last_page;
-+
-+	guest_0_page = vm_vaddr_alloc(t.kvm_vm, PAGE_SIZE, 0);
-+	guest_last_page = vm_vaddr_alloc(t.kvm_vm, PAGE_SIZE, last_page_addr);
-+	if (guest_0_page != 0 || guest_last_page != last_page_addr) {
-+		print_skip("did not allocate guest pages at required positions");
-+		goto out;
-+	}
-+	HOST_SYNC(t.vcpu, STAGE_INITED);
-+	HOST_SYNC(t.vcpu, STAGE_SKEYS_SET);
-+
-+	/* vcpu, mismatching keys on fetch, fetch protection override not enabled */
-+	CHECK_N_DO(ERR_PROT_MOP, t.vcpu, LOGICAL, READ, mem2, 2048, GADDR_V(0), KEY(2));
-+
-+out:
-+	kvm_vm_free(t.kvm_vm);
-+}
-+
-+static void test_errors_key_fetch_prot_override_enabled(void)
-+{
-+	struct test_default t = test_default_init(guest_copy_key_fetch_prot_override);
-+	vm_vaddr_t guest_0_page, guest_last_page;
-+
-+	guest_0_page = vm_vaddr_alloc(t.kvm_vm, PAGE_SIZE, 0);
-+	guest_last_page = vm_vaddr_alloc(t.kvm_vm, PAGE_SIZE, last_page_addr);
-+	if (guest_0_page != 0 || guest_last_page != last_page_addr) {
-+		print_skip("did not allocate guest pages at required positions");
-+		goto out;
-+	}
-+	HOST_SYNC(t.vcpu, STAGE_INITED);
-+	t.run->s.regs.crs[0] |= CR0_FETCH_PROTECTION_OVERRIDE;
-+	t.run->kvm_dirty_regs = KVM_SYNC_CRS;
-+	HOST_SYNC(t.vcpu, STAGE_SKEYS_SET);
-+
-+	/*
-+	 * vcpu, mismatching keys on fetch,
-+	 * fetch protection override does not apply because memory range acceeded
-+	 */
-+	CHECK_N_DO(ERR_PROT_MOP, t.vcpu, LOGICAL, READ, mem2, 2048 + 1, GADDR_V(0), KEY(2));
-+	CHECK_N_DO(ERR_PROT_MOP, t.vcpu, LOGICAL, READ, mem2, PAGE_SIZE + 2048 + 1,
-+		   GADDR_V(guest_last_page), KEY(2));
-+	/* vm, fetch protected override does not apply */
-+	CHECK_N_DO(ERR_PROT_MOP, t.vm, ABSOLUTE, READ, mem2, 2048, GADDR(0), KEY(2));
-+	CHECK_N_DO(ERR_PROT_MOP, t.vm, ABSOLUTE, READ, mem2, 2048, GADDR_V(guest_0_page), KEY(2));
-+
-+out:
-+	kvm_vm_free(t.kvm_vm);
-+}
-+
- static void guest_idle(void)
- {
- 	GUEST_SYNC(STAGE_INITED); /* for consistency's sake */
-@@ -488,6 +580,37 @@ static void guest_idle(void)
- 		GUEST_SYNC(STAGE_IDLED);
- }
- 
-+static void _test_errors_common(struct test_vcpu vcpu, enum mop_target target, int size)
-+{
-+	int rv;
-+
-+	/* Bad size: */
-+	rv = ERR_MOP(vcpu, target, WRITE, mem1, -1, GADDR_V(mem1));
-+	TEST_ASSERT(rv == -1 && errno == E2BIG, "ioctl allows insane sizes");
-+
-+	/* Zero size: */
-+	rv = ERR_MOP(vcpu, target, WRITE, mem1, 0, GADDR_V(mem1));
-+	TEST_ASSERT(rv == -1 && (errno == EINVAL || errno == ENOMEM),
-+		    "ioctl allows 0 as size");
-+
-+	/* Bad flags: */
-+	rv = ERR_MOP(vcpu, target, WRITE, mem1, size, GADDR_V(mem1), SET_FLAGS(-1));
-+	TEST_ASSERT(rv == -1 && errno == EINVAL, "ioctl allows all flags");
-+
-+	/* Bad guest address: */
-+	rv = ERR_MOP(vcpu, target, WRITE, mem1, size, GADDR((void *)~0xfffUL), CHECK_ONLY);
-+	TEST_ASSERT(rv > 0, "ioctl does not report bad guest memory access");
-+
-+	/* Bad host address: */
-+	rv = ERR_MOP(vcpu, target, WRITE, 0, size, GADDR_V(mem1));
-+	TEST_ASSERT(rv == -1 && errno == EFAULT,
-+		    "ioctl does not report bad host memory address");
-+
-+	/* Bad key: */
-+	rv = ERR_MOP(vcpu, target, WRITE, mem1, size, GADDR_V(mem1), KEY(17));
-+	TEST_ASSERT(rv == -1 && errno == EINVAL, "ioctl allows invalid key");
-+}
-+
- static void test_errors(void)
- {
- 	struct test_default t = test_default_init(guest_idle);
-@@ -495,31 +618,15 @@ static void test_errors(void)
- 
- 	HOST_SYNC(t.vcpu, STAGE_INITED);
- 
--	/* Bad size: */
--	rv = ERR_MOP(t.vcpu, LOGICAL, WRITE, mem1, -1, GADDR_V(mem1));
--	TEST_ASSERT(rv == -1 && errno == E2BIG, "ioctl allows insane sizes");
--
--	/* Zero size: */
--	rv = ERR_MOP(t.vcpu, LOGICAL, WRITE, mem1, 0, GADDR_V(mem1));
--	TEST_ASSERT(rv == -1 && (errno == EINVAL || errno == ENOMEM),
--		    "ioctl allows 0 as size");
--
--	/* Bad flags: */
--	rv = ERR_MOP(t.vcpu, LOGICAL, WRITE, mem1, t.size, GADDR_V(mem1), SET_FLAGS(-1));
--	TEST_ASSERT(rv == -1 && errno == EINVAL, "ioctl allows all flags");
-+	_test_errors_common(t.vcpu, LOGICAL, t.size);
-+	_test_errors_common(t.vm, ABSOLUTE, t.size);
- 
- 	/* Bad operation: */
- 	rv = ERR_MOP(t.vcpu, INVALID, WRITE, mem1, t.size, GADDR_V(mem1));
- 	TEST_ASSERT(rv == -1 && errno == EINVAL, "ioctl allows bad operations");
--
--	/* Bad guest address: */
--	rv = ERR_MOP(t.vcpu, LOGICAL, WRITE, mem1, t.size, GADDR((void *)~0xfffUL), CHECK_ONLY);
--	TEST_ASSERT(rv > 0, "ioctl does not report bad guest memory access");
--
--	/* Bad host address: */
--	rv = ERR_MOP(t.vcpu, LOGICAL, WRITE, 0, t.size, GADDR_V(mem1));
--	TEST_ASSERT(rv == -1 && errno == EFAULT,
--		    "ioctl does not report bad host memory address");
-+	/* virtual addresses are not translated when passing INVALID */
-+	rv = ERR_MOP(t.vm, INVALID, WRITE, mem1, PAGE_SIZE, GADDR(0));
-+	TEST_ASSERT(rv == -1 && errno == EINVAL, "ioctl allows bad operations");
- 
- 	/* Bad access register: */
- 	t.run->psw_mask &= ~(3UL << (63 - 17));
-@@ -560,6 +667,10 @@ int main(int argc, char *argv[])
- 		test_copy_key_storage_prot_override();
- 		test_copy_key_fetch_prot();
- 		test_copy_key_fetch_prot_override();
-+		test_errors_key();
-+		test_errors_key_storage_prot_override();
-+		test_errors_key_fetch_prot_override_not_enabled();
-+		test_errors_key_fetch_prot_override_enabled();
- 	} else {
- 		print_skip("storage key memop extension not supported");
- 	}
+static bool vfio_ap_unlink_apqn_fr_mdev(struct ap_matrix_mdev *matrix_mdev,
+					unsigned long apid, unsigned long apqi)
+{
+	struct vfio_ap_queue *q;
+
+	q = vfio_ap_mdev_get_queue(matrix_mdev, AP_MKQID(apid, apqi));
+	/* If the queue is assigned to the matrix mdev, unlink it. */
+	if (q) {
+		vfio_ap_unlink_queue_fr_mdev(q);
+		return true;
+	}
+	return false;
+}
+
+static void vfio_ap_mdev_unlink_adapter(struct ap_matrix_mdev *matrix_mdev,
+					unsigned long apid,
+					struct ap_queue_table *qtable)
+{
+	unsigned long apqi;
+	bool unlinked;
+
+	for_each_set_bit_inv(apqi, matrix_mdev->matrix.aqm, AP_DOMAINS) {
+		unlinked = vfio_ap_unlink_apqn_fr_mdev(matrix_mdev, apid, apqi, qtable);
+
+		if (unlinked && qtable) {
+			if (test_bit_inv(apid, matrix_mdev->shadow_apcb.apm) &&
+			    test_bit_inv(apqi, matrix_mdev->shadow_apcb.aqm))
+				hash_add(qtable->queues, &q->mdev_qnode,
+					 q->apqn);
+		}
+	}
+}
+
+
+> +static void vfio_ap_mdev_hot_unplug_adapter(struct ap_matrix_mdev *matrix_mdev,
+> +					    unsigned long apid)
+> +{
+> +	int bkt;
+>   	struct vfio_ap_queue *q;
+> +	struct ap_queue_table qtable;
+> +	hash_init(qtable.queues);
+> +	vfio_ap_mdev_unlink_adapter(matrix_mdev, apid, &qtable);
+> +
+> +	if (test_bit_inv(apid, matrix_mdev->shadow_apcb.apm)) {
+> +		clear_bit_inv(apid, matrix_mdev->shadow_apcb.apm);
+> +		vfio_ap_mdev_hotplug_apcb(matrix_mdev);
+> +	}
+>   
+> -	for_each_set_bit_inv(apqi, matrix_mdev->matrix.aqm, AP_DOMAINS) {
+> -		q = vfio_ap_mdev_get_queue(matrix_mdev, AP_MKQID(apid, apqi));
+> +	vfio_ap_mdev_reset_queues(&qtable);
+>   
+> -		if (q)
+> -			vfio_ap_mdev_unlink_queue(q);
+> +	hash_for_each(qtable.queues, bkt, q, mdev_qnode) {
+
+This comment applies to all instances of btk: What is btk? Can we come
+up with a more descriptive name?
+
+> +		vfio_ap_unlink_mdev_fr_queue(q);
+> +		hash_del(&q->mdev_qnode);
+>   	}
+>   }
+...
+> @@ -1273,9 +1320,9 @@ static void vfio_ap_mdev_unset_kvm(struct ap_matrix_mdev *matrix_mdev,
+>   		mutex_lock(&kvm->lock);
+>   		mutex_lock(&matrix_dev->mdevs_lock);
+>   
+> -		kvm_arch_crypto_clear_masks(kvm);
+> -		vfio_ap_mdev_reset_queues(matrix_mdev);
+> -		kvm_put_kvm(kvm);
+> +		kvm_arch_crypto_clear_masks(matrix_mdev->kvm);
+> +		vfio_ap_mdev_reset_queues(&matrix_mdev->qtable);
+> +		kvm_put_kvm(matrix_mdev->kvm);
+>   		matrix_mdev->kvm = NULL;
+
+I understand changing the call to vfio_ap_mdev_reset_queues, but why are we changing the
+kvm pointer on the surrounding lines?
+
+>   
+>   		mutex_unlock(&matrix_dev->mdevs_lock);
+> @@ -1328,14 +1375,17 @@ static int vfio_ap_mdev_reset_queue(struct vfio_ap_queue *q, unsigned int retry)
+>   
+>   	if (!q)
+>   		return 0;
+> +	q->reset_rc = 0;
+
+This line seems unnecessary. You set q->reset_rc in every single case below, so this 0
+will always get overwritten.
+
+>   retry_zapq:
+>   	status = ap_zapq(q->apqn);
+>   	switch (status.response_code) {
+>   	case AP_RESPONSE_NORMAL:
+>   		ret = 0;
+> +		q->reset_rc = status.response_code;
+>   		break;
+>   	case AP_RESPONSE_RESET_IN_PROGRESS:
+> +		q->reset_rc = status.response_code;
+>   		if (retry--) {
+>   			msleep(20);
+>   			goto retry_zapq;
+> @@ -1345,13 +1395,20 @@ static int vfio_ap_mdev_reset_queue(struct vfio_ap_queue *q, unsigned int retry)
+>   	case AP_RESPONSE_Q_NOT_AVAIL:
+>   	case AP_RESPONSE_DECONFIGURED:
+>   	case AP_RESPONSE_CHECKSTOPPED:
+> -		WARN_ON_ONCE(status.irq_enabled);
+> +		WARN_ONCE(status.irq_enabled,
+> +			  "PQAP/ZAPQ for %02x.%04x failed with rc=%u while IRQ enabled",
+> +			  AP_QID_CARD(q->apqn), AP_QID_QUEUE(q->apqn),
+> +			  status.response_code);
+> +		q->reset_rc = status.response_code;
+>   		ret = -EBUSY;
+>   		goto free_resources;
+>   	default:
+>   		/* things are really broken, give up */
+> -		WARN(true, "PQAP/ZAPQ completed with invalid rc (%x)\n",
+> +		WARN(true,
+> +		     "PQAP/ZAPQ for %02x.%04x failed with invalid rc=%u\n",
+> +		     AP_QID_CARD(q->apqn), AP_QID_QUEUE(q->apqn),
+>   		     status.response_code);
+> +		q->reset_rc = status.response_code;
+>   		return -EIO;
+>   	}
+...
+
 -- 
-2.35.1
-
+-- Jason J. Herne (jjherne@linux.ibm.com)
