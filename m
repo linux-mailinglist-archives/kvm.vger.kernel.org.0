@@ -2,213 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D26464DA5B9
-	for <lists+kvm@lfdr.de>; Tue, 15 Mar 2022 23:50:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 975F64DA61C
+	for <lists+kvm@lfdr.de>; Wed, 16 Mar 2022 00:12:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352426AbiCOWvj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Mar 2022 18:51:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55484 "EHLO
+        id S1349818AbiCOXNy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Mar 2022 19:13:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49250 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352393AbiCOWvb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Mar 2022 18:51:31 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D5A05D1A2;
-        Tue, 15 Mar 2022 15:50:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1647384618; x=1678920618;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=AoL+AQKyb3WLrBNANBB4c8DGr0XOP5pxqBpjs6Zn37k=;
-  b=OoBFAhblftbHGfQ88LcYHUWNVM0yrOoFFMpHa3+abHvgnuiYr2WNOYxe
-   CkM7Az3p1R6oX3Hxs2nsEeZcfGrWQ5ocSM8njQWAyYi3IPsTKi1v/xSEl
-   p5Z/2hxPUzS8l2y6Q1EbmB221eCXXpABfZiqt2H3l/RUOl2CPN4t7pjmB
-   bY8yFIdBazHfvBRdWXs9nSrfM68ZPVa2ky1TWa5Xco0aBIigj6pcPOLJY
-   HnHLM4EidL0CBIx7UF3rpyPWV65aQVlyu4u0wFxm1vXhAhz5NvlXEHP/B
-   XKA1iM9iM4aSsp8bnYg1jMNzR1RKUOZ8Y3dLldo5C44rO29+/mBgSkD/E
-   w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10286"; a="256390620"
-X-IronPort-AV: E=Sophos;i="5.90,185,1643702400"; 
-   d="scan'208";a="256390620"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2022 15:50:13 -0700
-X-IronPort-AV: E=Sophos;i="5.90,185,1643702400"; 
-   d="scan'208";a="690368472"
-Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2022 15:50:13 -0700
-From:   isaku.yamahata@intel.com
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>, erdemaktas@google.com,
-        Connor Kuehl <ckuehl@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Subject: [PATCH 6/6] KVM: TDX: Make TDX VM type supported
-Date:   Tue, 15 Mar 2022 15:50:10 -0700
-Message-Id: <c4c6bffb4502df9059f1033e07a702b6de37160d.1647384148.git.isaku.yamahata@intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <cover.1647384147.git.isaku.yamahata@intel.com>
-References: <cover.1647384147.git.isaku.yamahata@intel.com>
+        with ESMTP id S238090AbiCOXNx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Mar 2022 19:13:53 -0400
+Received: from mail-yb1-xb35.google.com (mail-yb1-xb35.google.com [IPv6:2607:f8b0:4864:20::b35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05FD954BD7
+        for <kvm@vger.kernel.org>; Tue, 15 Mar 2022 16:12:41 -0700 (PDT)
+Received: by mail-yb1-xb35.google.com with SMTP id v35so1357220ybi.10
+        for <kvm@vger.kernel.org>; Tue, 15 Mar 2022 16:12:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=bY5xtSrH39029xqE3mOOcec5o9mj3nUWmGzVJpEccxo=;
+        b=Kd8Hv0JDmH3YkSwU8rpWKqK11gwQ5RHa2i26ofq5z9ax+InqOEKhrdmlftL5mlCHG5
+         jwk+gYxQeGW5zFpWK1LImFyaoTxjzGO2tJVtCaPzS97kLptqsz2lexAXlEGun6UleVpr
+         ZwyGMoN/HrFcIZfbPRVFXczcc1F/axmnlaCZywOX1zrb/6tvTeu925CdgSI9zhVTEB9i
+         AEsZBBMGbAE8qEhhLCCJhXUYpgKlqSr9nLQsZNh1TGk0iS78WY79WwrRZzt1991xIKmw
+         wQ7oWPzLQMpQ0BNWzic6O7cBBTlZPtbQTvEIAh791Ls5NFLsEEy8tySw8htT/ExgLOzX
+         kmOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=bY5xtSrH39029xqE3mOOcec5o9mj3nUWmGzVJpEccxo=;
+        b=nWcZhMzBCz36ftPIa1S4zs41YDMKNEb/mqPn9a0+19m0gIcYiTbHBWGWd6W0y0IvM7
+         xK4Fj9+6Q5Sg3UAZAaTThwI4tMi1pDEWDJ+nep+N3nH8BehRT0ao9iyOi/3L2iEPFy78
+         /Jr7dEU2PMm0xs0wWNZhOMUQaDIKsAdVZzOnT/+FnWcwTtVAhTUB7gToz+KT/I9WXJl8
+         vkuh8/ajO9PPMPcrZNFh5yLxSy2S9ACxdKD/rUD7PJInQkgG07jY2m5tKBlPpzSsgYkN
+         NlBveym9gKsqhgCNU/e4PL4Jfpnlw5qLySrbvijNzH10o8kWhfFuYfNRqQ8D8TXTtbWJ
+         ROhg==
+X-Gm-Message-State: AOAM533ncvU8kQrYw0eiTZUAex6AVZhlhkbZdKfMzTxKyrT1nJIXAoU6
+        yM1zfSpMALXxBzbxEvcQ2nTF0xaGBguxivP4otqqJGeQpJc=
+X-Google-Smtp-Source: ABdhPJw+a9V+CQ42uBU5RiZg8cgJJ4ma0rpA3cptTi+WEytuDbMct0Evs4q6GtxXBTEDrLJRR3pheOqaWghQ31HrSqY=
+X-Received: by 2002:a25:bf87:0:b0:622:1e66:e7fd with SMTP id
+ l7-20020a25bf87000000b006221e66e7fdmr25848318ybk.341.1647385959996; Tue, 15
+ Mar 2022 16:12:39 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <20220310164532.1821490-1-bgardon@google.com> <Yio8QtuMd6COcnEw@google.com>
+ <CANgfPd9xr5ev7fEiwBVUi89iHkuywq-Ba9zOeCMSTFmLkO243w@mail.gmail.com> <YiqxtIz+T1LGE1Ju@google.com>
+In-Reply-To: <YiqxtIz+T1LGE1Ju@google.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Tue, 15 Mar 2022 17:12:29 -0600
+Message-ID: <CANgfPd9N0UsA7_uMU4vs43gdH7A3UrcrY-OdmXoxQ2PyctwxsA@mail.gmail.com>
+Subject: Re: [PATCH 00/13] KVM: x86: Add a cap to disable NX hugepages on a VM
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Dunn <daviddunn@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Junaid Shahid <junaids@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+Okay, I'll hold off on the memslot refactor in v2, but if folks have
+feedback on the other aspects of the v1 patch series, I'd appreciate
+it.
+If not, I'll try to get a v2 sent out.
+I think that the commits adding utility functions for the binary stats
+interface to the binary stats test could be queued separately from the
+rest of this series and will be helpful for other folks working on new
+selftests.
 
-As first step TDX VM support, return that TDX VM type supported to device
-model, e.g. qemu.  The callback to create guest TD is vm_init callback for
-KVM_CREATE_VM.  Add a place holder function and call a function to
-initialize TDX module on demand because in that callback VMX is enabled by
-hardware_enable callback (vmx_hardware_enable).
-
-Although guest TD isn't functional at this point, it's possible for
-KVM developer to exercise (partially implemented) TDX KVM code.  Introduce
-X86_TDX_KVM_EXPERIMENTAL to allow TDX KVM code to be exercised.  Once TDX
-KVM is functional, the config will be removed.
-
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
----
- arch/x86/kvm/Kconfig       | 14 ++++++++++++++
- arch/x86/kvm/Makefile      |  1 +
- arch/x86/kvm/vmx/main.c    |  7 ++++++-
- arch/x86/kvm/vmx/tdx.c     | 17 +++++++++++++++++
- arch/x86/kvm/vmx/vmx.c     |  5 -----
- arch/x86/kvm/vmx/x86_ops.h |  7 ++++++-
- 6 files changed, 44 insertions(+), 7 deletions(-)
- create mode 100644 arch/x86/kvm/vmx/tdx.c
-
-diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index 2b1548da00eb..a3287440aa9e 100644
---- a/arch/x86/kvm/Kconfig
-+++ b/arch/x86/kvm/Kconfig
-@@ -98,6 +98,20 @@ config X86_SGX_KVM
- 
- 	  If unsure, say N.
- 
-+config X86_TDX_KVM_EXPERIMENTAL
-+	bool "EXPERIMENTAL Trust Domian Extensions (TDX) KVM support"
-+	default n
-+	depends on INTEL_TDX_HOST
-+	depends on KVM_INTEL
-+	help
-+	  Enable experimental TDX KVM support.  TDX KVM needs many patches and
-+	  the patches will be merged step by step, not at once. Even if TDX KVM
-+	  support is incomplete, enable TDX KVM support so that developper can
-+	  exercise TDX KVM code.  TODO: Remove this configuration once the
-+	  (first step of) TDX KVM support is complete.
-+
-+	  If unsure, say N.
-+
- config KVM_AMD
- 	tristate "KVM for AMD processors support"
- 	depends on KVM
-diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
-index ee4d0999f20f..e2c05195cb95 100644
---- a/arch/x86/kvm/Makefile
-+++ b/arch/x86/kvm/Makefile
-@@ -24,6 +24,7 @@ kvm-$(CONFIG_KVM_XEN)	+= xen.o
- kvm-intel-y		+= vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o \
- 			   vmx/evmcs.o vmx/nested.o vmx/posted_intr.o vmx/main.o
- kvm-intel-$(CONFIG_X86_SGX_KVM)	+= vmx/sgx.o
-+kvm-intel-$(CONFIG_INTEL_TDX_HOST)	+= vmx/tdx.o
- 
- kvm-amd-y		+= svm/svm.o svm/vmenter.o svm/pmu.o svm/nested.o svm/avic.o svm/sev.o
- 
-diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index 459087fcf7b7..086b5106c15a 100644
---- a/arch/x86/kvm/vmx/main.c
-+++ b/arch/x86/kvm/vmx/main.c
-@@ -7,6 +7,11 @@
- #include "pmu.h"
- #include "tdx.h"
- 
-+static bool vt_is_vm_type_supported(unsigned long type)
-+{
-+	return type == KVM_X86_DEFAULT_VM || tdx_is_vm_type_supported(type);
-+}
-+
- struct kvm_x86_ops vt_x86_ops __initdata = {
- 	.name = "kvm_intel",
- 
-@@ -17,7 +22,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
- 	.cpu_has_accelerated_tpr = report_flexpriority,
- 	.has_emulated_msr = vmx_has_emulated_msr,
- 
--	.is_vm_type_supported = vmx_is_vm_type_supported,
-+	.is_vm_type_supported = vt_is_vm_type_supported,
- 	.vm_size = sizeof(struct kvm_vmx),
- 	.vm_init = vmx_vm_init,
- 
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-new file mode 100644
-index 000000000000..02271a3e2733
---- /dev/null
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -0,0 +1,17 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include "x86_ops.h"
-+
-+#undef pr_fmt
-+#define pr_fmt(fmt) "tdx: " fmt
-+
-+static bool __read_mostly enable_tdx = true;
-+module_param_named(tdx, enable_tdx, bool, 0644);
-+bool tdx_is_vm_type_supported(unsigned long type)
-+{
-+#ifdef CONFIG_X86_TDX_KVM_EXPERIMENTAL
-+	return type == KVM_X86_TDX_VM && READ_ONCE(enable_tdx);
-+#else
-+	return false;
-+#endif
-+}
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 191e653355dd..538b91380c06 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7085,11 +7085,6 @@ int vmx_vcpu_create(struct kvm_vcpu *vcpu)
- 	return err;
- }
- 
--bool vmx_is_vm_type_supported(unsigned long type)
--{
--	return type == KVM_X86_DEFAULT_VM;
--}
--
- #define L1TF_MSG_SMT "L1TF CPU bug present and SMT on, data leak possible. See CVE-2018-3646 and https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html for details.\n"
- #define L1TF_MSG_L1D "L1TF CPU bug present and virtualization mitigation disabled, data leak possible. See CVE-2018-3646 and https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html for details.\n"
- 
-diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-index e0a4c6438c88..2fb5df625bb1 100644
---- a/arch/x86/kvm/vmx/x86_ops.h
-+++ b/arch/x86/kvm/vmx/x86_ops.h
-@@ -25,7 +25,6 @@ void vmx_hardware_unsetup(void);
- int vmx_hardware_enable(void);
- void vmx_hardware_disable(void);
- bool report_flexpriority(void);
--bool vmx_is_vm_type_supported(unsigned long type);
- int vmx_vm_init(struct kvm *kvm);
- int vmx_vcpu_create(struct kvm_vcpu *vcpu);
- int vmx_vcpu_pre_run(struct kvm_vcpu *vcpu);
-@@ -127,4 +126,10 @@ void vmx_cancel_hv_timer(struct kvm_vcpu *vcpu);
- #endif
- void vmx_setup_mce(struct kvm_vcpu *vcpu);
- 
-+#ifdef CONFIG_INTEL_TDX_HOST
-+bool tdx_is_vm_type_supported(unsigned long type);
-+#else
-+static inline bool tdx_is_vm_type_supported(unsigned long type) { return false; }
-+#endif
-+
- #endif /* __KVM_X86_VMX_X86_OPS_H */
--- 
-2.25.1
-
+On Thu, Mar 10, 2022 at 8:19 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Thu, Mar 10, 2022, Ben Gardon wrote:
+> > Those patches are a lot of churn, but at least to me, they make the
+> > code much more readable. Currently there are many functions which just
+> > pass along 0 for the memslot, and often have multiple other numerical
+> > arguments, which makes it hard to understand what the function is
+> > doing.
+>
+> Yeah, my solution for that was to rip out all the params.  E.g. the most used
+> function I ended up with is
+>
+>   static inline struct kvm_vm *vm_create_with_one_vcpu(struct kvm_vcpu **vcpu,
+>                                                      void *guest_code)
+>   {
+>         return __vm_create_with_one_vcpu(vcpu, 0, guest_code);
+>   }
+>
+> and then the usage is
+>
+>         vm = vm_create_with_one_vcpu(&vcpu, guest_main);
+>
+>         supp_cpuid = kvm_get_supported_cpuid();
+>         cpuid2 = vcpu_get_cpuid(vcpu);
+>
+> My overarching complaint with the selftests is that they make the hard things hard,
+> and the easy things harder.  If a test wants to be backed by hugepages, it shouldn't
+> have to manually specify a memslot.
+>
+> Let me post my selftests rework as RFC (_very_ RFC at this point).  I was hoping to
+> do more than compile test before posting anything, but it's going to be multiple
+> weeks before I'll get back to it.  Hopefully it'll start a discussion on actually
+> rewriting the framework so that writing new tests is less painful, and so that every
+> new thing that comes along doesn't require poking at 50 different tests.
