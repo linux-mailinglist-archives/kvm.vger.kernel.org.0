@@ -2,126 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6CBF44DA013
-	for <lists+kvm@lfdr.de>; Tue, 15 Mar 2022 17:30:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AB2824DA01B
+	for <lists+kvm@lfdr.de>; Tue, 15 Mar 2022 17:31:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350081AbiCOQa5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Mar 2022 12:30:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45400 "EHLO
+        id S238258AbiCOQcR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Mar 2022 12:32:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350067AbiCOQat (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Mar 2022 12:30:49 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFAF657142;
-        Tue, 15 Mar 2022 09:29:36 -0700 (PDT)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22FGEM4Y029688;
-        Tue, 15 Mar 2022 16:29:18 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=cbkYVQbQRRtLfFZ4wdGkiRutFnpOquBvZJYoshzzZi4=;
- b=caTfq98QMeGQf248z9VAEzG1kRAcOYKzm+X1QOZ5FmuJtUaEx+k71YYYAk1Wz/FgIs4+
- YRKcQSi26TjPnDq5zu+/6QTTt0FrN8brPa1+p/5DGaP575dA+oaBTKybXXhm8Mibft+F
- qYqrSQ2o2k1UKco4FK8nJA9lkEiMG4mM8gcCHm6LAOV4z1CRBfQlrHXtefLglzKEdzHx
- btiTfqQucAH9RE/q8SKADdWYcfLVJELHfwGlPZgQKAEn41AJqzjW0W3y1dzSLD3D9RGI
- pcGyDmwAPx135bzu91zAVrKoK1VyNue49E3vA8BHroMDjsy63McaODciBVrDNuyMlGD4 +A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3etw7p24wv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Mar 2022 16:29:18 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22FGEw13007435;
-        Tue, 15 Mar 2022 16:29:18 GMT
-Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3etw7p24wm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Mar 2022 16:29:18 +0000
-Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
-        by ppma04wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22FGRDhn009206;
-        Tue, 15 Mar 2022 16:29:17 GMT
-Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com [9.57.198.27])
-        by ppma04wdc.us.ibm.com with ESMTP id 3erk59pkqa-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Mar 2022 16:29:17 +0000
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
-        by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22FGTFtc25297208
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 15 Mar 2022 16:29:15 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D2482AC06D;
-        Tue, 15 Mar 2022 16:29:15 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8898FAC05E;
-        Tue, 15 Mar 2022 16:29:04 +0000 (GMT)
-Received: from [9.211.32.184] (unknown [9.211.32.184])
-        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
-        Tue, 15 Mar 2022 16:29:04 +0000 (GMT)
-Message-ID: <5a1c64ac-df10-fb66-ad6d-39adf786f32b@linux.ibm.com>
-Date:   Tue, 15 Mar 2022 12:29:02 -0400
+        with ESMTP id S232897AbiCOQcP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Mar 2022 12:32:15 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 623BC57142
+        for <kvm@vger.kernel.org>; Tue, 15 Mar 2022 09:31:02 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 06BCC1474;
+        Tue, 15 Mar 2022 09:31:02 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 04F7C3F766;
+        Tue, 15 Mar 2022 09:31:00 -0700 (PDT)
+Date:   Tue, 15 Mar 2022 16:31:34 +0000
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        thuth@redhat.com, pbonzini@redhat.com
+Subject: Re: [PATCH kvm-unit-tests] arch-run: Introduce QEMU_ARCH
+Message-ID: <YjC62NycFfevZ4wx@monolith.localdoman>
+References: <20220315080152.224606-1-drjones@redhat.com>
+ <YjCHcV3iyTtSrw3k@monolith.localdoman>
+ <20220315151630.obxraie6ikqrwtrw@gator>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.0
-Subject: Re: [PATCH v4 15/32] vfio: introduce KVM-owned IOMMU type
-Content-Language: en-US
-To:     Jason Gunthorpe <jgg@nvidia.com>, borntraeger@linux.ibm.com
-Cc:     linux-s390@vger.kernel.org, alex.williamson@redhat.com,
-        cohuck@redhat.com, schnelle@linux.ibm.com, farman@linux.ibm.com,
-        pmorel@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
-        svens@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
-        oberpar@linux.ibm.com, freude@linux.ibm.com, thuth@redhat.com,
-        pasic@linux.ibm.com, joro@8bytes.org, will@kernel.org,
-        pbonzini@redhat.com, corbet@lwn.net, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org,
-        linux-doc@vger.kernel.org
-References: <20220314194451.58266-1-mjrosato@linux.ibm.com>
- <20220314194451.58266-16-mjrosato@linux.ibm.com>
- <20220314213808.GI11336@nvidia.com>
- <decc5320-eb3e-af25-fd2b-77fabe56a897@linux.ibm.com>
- <20220315143858.GY11336@nvidia.com>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-In-Reply-To: <20220315143858.GY11336@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: XovYpnHnN8X7XvZsXcj1wbC8jRUcunWF
-X-Proofpoint-GUID: VyCBJft7M62L1ZwToTemOEV0VPlk6L0Q
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-03-15_03,2022-03-15_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- lowpriorityscore=0 malwarescore=0 mlxlogscore=999 suspectscore=0
- phishscore=0 impostorscore=0 spamscore=0 bulkscore=0 clxscore=1015
- adultscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2203150102
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H4,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220315151630.obxraie6ikqrwtrw@gator>
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/15/22 10:38 AM, Jason Gunthorpe wrote:
-> On Tue, Mar 15, 2022 at 09:49:01AM -0400, Matthew Rosato wrote:
-> 
->> The rationale for splitting steps 1 and 2 are that VFIO_SET_IOMMU doesn't
->> have a mechanism for specifying more than the type as an arg, no?  Otherwise
->> yes, you could specify a kvm fd at this point and it would have some other
->> advantages (e.g. skip notifier).  But we still can't use the IOMMU for
->> mapping until step 3.
-> 
-> Stuff like this is why I'd be much happier if this could join our
-> iommfd project so we can have clean modeling of the multiple iommu_domains.
-> 
+Hi,
 
-I'd certainly be willing to collaborate so feel free to loop me in on 
-the discussions; but I got the impression that iommufd is not close to 
-ready (maybe I'm wrong?) -- if so I really don't want to completely 
-delay this zPCI support behind it as it has a significant benefit for 
-kvm guests on s390x :(
+On Tue, Mar 15, 2022 at 04:16:30PM +0100, Andrew Jones wrote:
+> On Tue, Mar 15, 2022 at 12:33:17PM +0000, Alexandru Elisei wrote:
+> > Hi,
+> > 
+> > On Tue, Mar 15, 2022 at 09:01:52AM +0100, Andrew Jones wrote:
+> > > Add QEMU_ARCH, which allows run scripts to specify which architecture
+> > > of QEMU should be used. This is useful on AArch64 when running with
+> > > KVM and running AArch32 tests. For those tests, we *don't* want to
+> > > select the 'arm' QEMU, as would have been selected, but rather the
+> > > $HOST ('aarch64') QEMU.
+> > > 
+> > > To use this new variable, simply ensure it's set prior to calling
+> > > search_qemu_binary().
+> > 
+> > Looks good, tested on an arm64 machine, with ACCEL set to tcg -
+> > run_tests.sh selects qemu-system-arm; ACCEL unset - run_tests.sh selects
+> > ACCEL=kvm and qemu-system-aarch64; also tested on an x86 machine -
+> > run_tests.sh selects ACCEL=tcg and qemu-system-arm:
+> > 
+> > Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > 
+> > One thing I noticed is that if the user sets QEMU=qemu-system-arm on an arm64
+> > machine, run_tests.sh still selects ACCEL=kvm which leads to the following
+> > failure:
+> > 
+> > SKIP selftest-setup (qemu-system-arm: -accel kvm: invalid accelerator kvm)
+> > 
+> > I'm not sure if this deserves a fix, if the user set the QEMU variable I
+> > believe it is probable that the user is also aware of the ACCEL variable
+> > and the error message does a good job explaining what is wrong.
+> 
+> Yes, we assume the user selected the wrong qemu, rather than assuming the
+> user didn't expect KVM to be enabled. If we're wrong, then the error
+> message should hopefully imply to the user that they need to do
+> 
+>  QEMU=qemu-system-arm ACCEL=tcg ...
 
+Yep, it was very easy to figure out what needs to be done to get the tests
+running again.
+
+> 
+> > Just in
+> > case, this is what I did to make kvm-unit-tests pick the right accelerator
+> > (copied-and-pasted the find_word function from scripts/runtime.bash):
+> > 
+> > diff --git a/arm/run b/arm/run
+> > index 94adcddb7399..b0c9613b8d28 100755
+> > --- a/arm/run
+> > +++ b/arm/run
+> > @@ -10,6 +15,10 @@ if [ -z "$KUT_STANDALONE" ]; then
+> >  fi
+> >  processor="$PROCESSOR"
+> > 
+> > +if [ -z $ACCEL ] && [ "$HOST" = "aarch64" ] && ! find_word "qemu-system-arm" "$QEMU"; then
+> 
+> Instead of find_word,
+> 
+>  [ "$QEMU" ] && [ "$(basename $QEMU)" = "qemu-system-arm" ]
+> 
+> > +       ACCEL=tcg
+> > +fi
+> > +
+> 
+> When ACCEL is unset, we currently set it to kvm when we have /dev/kvm and
+> $HOST == $ARCH_NAME or ($HOST == aarch64 && $ARCH == arm) and tcg
+> otherwise. Adding logic like the above would allow overriding the
+> "set to kvm" logic when $QEMU == qemu-system-arm. That makes sense to
+> me, but we trade one assumption for another. We would now assume that
+> $QEMU is correct and the user wants to run with TCG, rather than that
+> $QEMU is wrong and the user wanted to run with KVM.
+> 
+> I think I'd prefer not adding the special case override. I think it's
+> more likely the user expects to run with KVM when running on an AArch64
+> host and that they mistakenly selected the wrong qemu, than that they
+> wanted TCG with qemu-system-arm. We also avoid a few more lines of code
+> and a change in behavior by maintaining the old assumption.
+
+Well, kvm-unit-tests selects KVM or TCG under the hood without the user
+being involved at all. In my opinion, it's slightly better from an
+usability perspective for kvm-unit-tests to do its best to run the tests
+based on what the user specifically set (QEMU=qemu-system-arm) than fail to
+run the tests because of an internal heuristic of which the user might be
+entirely ignorant (if arm64 and /dev/kvm is available, pick ACCEL=kvm).
+
+Regardless, I don't have a strong opinion either way, and it's trivial for
+a user to figure out that ACCEL=tcg will make the tests run. So from my
+side this is mostly academic and the test runner can stay as it is if you
+don't see a reason to change it.
+
+Thanks,
+Alex
