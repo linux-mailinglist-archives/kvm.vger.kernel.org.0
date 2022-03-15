@@ -2,76 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C0AEB4DA16D
-	for <lists+kvm@lfdr.de>; Tue, 15 Mar 2022 18:40:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7FDD84DA173
+	for <lists+kvm@lfdr.de>; Tue, 15 Mar 2022 18:41:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350662AbiCORl6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Mar 2022 13:41:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58122 "EHLO
+        id S1350670AbiCORmP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Mar 2022 13:42:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58660 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350584AbiCORl5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Mar 2022 13:41:57 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 114C558E57;
-        Tue, 15 Mar 2022 10:40:45 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S1346140AbiCORmO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Mar 2022 13:42:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2233D58E4F
+        for <kvm@vger.kernel.org>; Tue, 15 Mar 2022 10:41:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1647366061;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=p0OvKN4Kp+DENpb0oYxjZoPGzpqBUztEkUuhECDJkJo=;
+        b=BU+xc+mUt7hLr5peNbEWo7Fd/1wycw0s4HH+k7eeOxDWNAjoD8xTdVmbj6QRFxKRsgS707
+        YIjHa/7Nrrjt8a65jenPDo4aoITwpDyx1vSbR9lOuVYlagezURUKNAUOxR47F6Lg4qHGwe
+        dlXcdRbJ7XNNzD6C21Gk2u+PU2xwx24=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-575-d1TZQUZ2Pr2KESL0ZfZYeA-1; Tue, 15 Mar 2022 13:40:59 -0400
+X-MC-Unique: d1TZQUZ2Pr2KESL0ZfZYeA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A1F27615AF;
-        Tue, 15 Mar 2022 17:40:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 0DBB3C340F4;
-        Tue, 15 Mar 2022 17:40:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1647366044;
-        bh=rD+17gJMM7JyEghFHY4fbvNf02D4yrV+aRzlaYSEAzo=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=K8U2+2FCwScxNdJdngA9tTKtkyr7AWwmCXrnKbnYqjj6CsZmwFoddYOTm4YaL8kZ3
-         eWJX05yLouDZ6WPaHq9ee+IuaxmAuXY0tQ+5gr3eTf7IXCs8e9wootkXWAtY3ispPv
-         r6piu0sS1dFDJPU+ZNotr/mIlOxeGdfIIwVBxuZiSkXSEai2leuaSoKcjlzoxvtQEL
-         ou4HIgRLOIf2YeKyQrQGhcvWENcd76nxbd+7ErXaCavp8KHcKGE3FfC3Eln+SobMdF
-         UygiEei4QoH+ug6q2V0W4V0xtMzTXEle2YMtEI/QjRjtoFKEiZVFeqLpOIZEZRDMnT
-         Z/T72ojyWgUjg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EB1C6E6D44B;
-        Tue, 15 Mar 2022 17:40:43 +0000 (UTC)
-Subject: Re: [GIT PULL] virtio: a last minute regression fix
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20220314075951-mutt-send-email-mst@kernel.org>
-References: <20220314075951-mutt-send-email-mst@kernel.org>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20220314075951-mutt-send-email-mst@kernel.org>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
-X-PR-Tracked-Commit-Id: 95932ab2ea07b79cdb33121e2f40ccda9e6a73b5
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 6665ca15746dc34606b5d79fae278a101a368437
-Message-Id: <164736604395.1904.10708022196014221360.pr-tracker-bot@kernel.org>
-Date:   Tue, 15 Mar 2022 17:40:43 +0000
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        elic@nvidia.com, jasowang@redhat.com, mail@anirudhrb.com,
-        mst@redhat.com
-X-Spam-Status: No, score=-8.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3277D3C18523;
+        Tue, 15 Mar 2022 17:40:59 +0000 (UTC)
+Received: from localhost (unknown [10.39.194.62])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id DDE6740D1B9A;
+        Tue, 15 Mar 2022 17:40:58 +0000 (UTC)
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        alex.williamson@redhat.com, kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, jgg@nvidia.com,
+        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
+        yishaih@nvidia.com, linux-doc@vger.kernel.org, corbet@lwn.net,
+        hch@infradead.org
+Subject: Re: [PATCH v4] vfio-pci: Provide reviewers and acceptance criteria
+ for variant drivers
+In-Reply-To: <164736509088.181560.2887686123582116702.stgit@omen>
+Organization: Red Hat GmbH
+References: <164736509088.181560.2887686123582116702.stgit@omen>
+User-Agent: Notmuch/0.34 (https://notmuchmail.org)
+Date:   Tue, 15 Mar 2022 18:40:57 +0100
+Message-ID: <87wngvf712.fsf@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The pull request you sent on Mon, 14 Mar 2022 07:59:51 -0400:
+On Tue, Mar 15 2022, Alex Williamson <alex.williamson@redhat.com> wrote:
 
-> https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+> Device specific extensions for devices exposed to userspace through
+> the vfio-pci-core library open both new functionality and new risks.
+> Here we attempt to provided formalized requirements and expectations
+> to ensure that future drivers both collaborate in their interaction
+> with existing host drivers, as well as receive additional reviews
+> from community members with experience in this area.
+>
+> Cc: Jason Gunthorpe <jgg@nvidia.com>
+> Acked-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> Reviewed-by: Yishai Hadas <yishaih@nvidia.com>
+> Acked-by: Kevin Tian <kevin.tian@intel.com>
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/6665ca15746dc34606b5d79fae278a101a368437
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
-Thank you!
+[obviously modulo the missing ack]
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
