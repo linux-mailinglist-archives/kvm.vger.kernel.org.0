@@ -2,113 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A16D4DB0AC
-	for <lists+kvm@lfdr.de>; Wed, 16 Mar 2022 14:12:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 208304DB0D5
+	for <lists+kvm@lfdr.de>; Wed, 16 Mar 2022 14:16:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356129AbiCPNNO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Mar 2022 09:13:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40204 "EHLO
+        id S1344313AbiCPNRi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Mar 2022 09:17:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356233AbiCPNNH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Mar 2022 09:13:07 -0400
-Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AE0E5F8CE
-        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 06:11:52 -0700 (PDT)
-Received: by mail-wm1-x336.google.com with SMTP id p184-20020a1c29c1000000b0037f76d8b484so1369714wmp.5
-        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 06:11:52 -0700 (PDT)
+        with ESMTP id S236573AbiCPNRh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Mar 2022 09:17:37 -0400
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D37E403FE
+        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 06:16:23 -0700 (PDT)
+Received: by mail-pf1-x433.google.com with SMTP id t2so3869217pfj.10
+        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 06:16:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=2i83XDmm2Ev/BgrOHivtFmnY20KZApSWVPqEjlo6vMc=;
-        b=I0LoEtV7ZSyQLZGg+c/ATH4O2ixcWNJOqGH0TXOK79vAFZNjBonSFVp592r0T/7Stp
-         V+v8h5sbrekisgQegIG1FCeFUr22cuWgwFhHMikTRbJ45KfuWPiKQEZUaecWbjihlhrx
-         MENjFnu75doFLFEX9a55JgbJOnVSV6OtSabROElRY3xK6lLAJ0aw2ZocBBCx1KmRY1VD
-         648ynNf+mKMPV5CTv2HEH+9v293oTdsnnSTnEk0PsarBG61B1m+EG2Rv5QMxNLE7csxd
-         stJ/6g1t4tZgZJ4JBasNOBwNeLtT4Uo9ttgG0df9r/Eq5ADZA5ynkNXA22esMLxs2Ako
-         mZlA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=5QoOLQCH6W8SvrDhidEQQuX3kQLXun4tVXl3MOAktVk=;
+        b=Lo1tUTRDYSi1EqEAhNSTV2FAJcCJVYEUHZoyumTe4Fg3zuVUyuqvgfW43DZiMdG+fW
+         gTZsP3hkjaGwUxrtOj4G3LQnnr6I2B9axcFIxk3vQEFlew8fOSbN3cLfGsJfDo1LaydP
+         I3Q60uEnNRpii6LRgAPX82XTKkHYlMPOKyEyAb9R2DH1NYFyqKH0+FrjPJK60vouxrcI
+         Su3OqIhTY0qyQrEnYUug5wDTY/Zd3zyJtiiwbeJuMksEuXhq7h9w/Ks3nRrkiYMq+Z/V
+         ZzJvUjwevVd14JoYl1br8WwjFVRAX7vsGnBu0iJrb7+0eML2IC+J+H7Si5DyKB1qxAar
+         /pcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=2i83XDmm2Ev/BgrOHivtFmnY20KZApSWVPqEjlo6vMc=;
-        b=BpUt4qp65qVYe5W5AG65qnAv+0HZWvX5a7M8WmZJnIyDspB39ecNiA+qpOdIDDEQUC
-         bmsvwViSESNId3Sa9a9Hy8bZBaWxC5YoWxwDpvVLjmHQmESutHohNVcaI8z9cEAAfM+v
-         PI6iXxYfFmghe5bYkc/VV6lI0n7pWXGgq4Kn8G9Lk35/cHkrQzl/s5o+0RTyGR/G4Ijt
-         B0HS3kjDQYY4yAhEygn/U80DwNcpCsIBFqdfSLyyMi0PVXYe1yK8KP9llsL/+K0EIz+9
-         TdGKTZcdKqAxLwtW6y7dYSat3/GMYQutPhTJkgYhFmYokW6EQTBbChuMkEmz0CXOaIyH
-         0T9A==
-X-Gm-Message-State: AOAM533QE9UPhUNPjjdq++ucvCHCrd/emdM7ct/E7KY7YBmAVlougjAw
-        MxEu9JQcEwQuUDcWq6o16yQ=
-X-Google-Smtp-Source: ABdhPJysxaC/TdNQa5HjTO1GOAcmUA/36gHHMfIT3uAptuoqQ0hHz0TwXQvnu9ctJ9Q0e5U7gtlggA==
-X-Received: by 2002:a05:600c:1994:b0:38c:48dd:23ba with SMTP id t20-20020a05600c199400b0038c48dd23bamr4557931wmq.206.1647436311078;
-        Wed, 16 Mar 2022 06:11:51 -0700 (PDT)
-Received: from [192.168.1.115] ([185.126.107.38])
-        by smtp.gmail.com with ESMTPSA id t14-20020a05600c198e00b0038bb71518c1sm1689996wmq.42.2022.03.16.06.11.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 16 Mar 2022 06:11:50 -0700 (PDT)
-Message-ID: <e1f049be-8f98-04a3-6532-995e55fe7471@gmail.com>
-Date:   Wed, 16 Mar 2022 14:11:47 +0100
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=5QoOLQCH6W8SvrDhidEQQuX3kQLXun4tVXl3MOAktVk=;
+        b=K/53ERQs9gIoOCgKYIOl6CMJz+SZ97BSzt4PZt2nTw004whlMx9KfxOS5YSvloVsnT
+         iyuJvexzmsTg7NGQpmU8GRjmJF+WcsP6S2of2dF8+W1elgzP9kEPpoTH09RrR2jkmTxY
+         oF4d1ZkOSxpuUALlWYWpCX4elTZ4Fp5U3W4FaB709jA3SlalyJK8yd53u4XEx5CwNCu9
+         bdCUAtf4MFWw4S+zj1x0zCn51iVXRtu192ZGijNF+/Y3yZ/ExnInygSfCAwmbMVk3gPT
+         hJ7TWdCi+gx+RDJU7u9ihIe/Dtq4J3FZs5hBWtPnGMGOemEVxfVx8jH9MZLsiH9CFMak
+         gWQA==
+X-Gm-Message-State: AOAM533IfvjTHE+AJHVizbZpTwaUzH8HDcrDrHr0Va62fAdgXvDawDiY
+        yB/+g68nHhP8kEm3d3X/qK2Li32EwzL3Ghxo/S8=
+X-Google-Smtp-Source: ABdhPJz6RtgOgg34TPHvPiT760rW1IhoxqnqCvtmFtoRZq64b6vT+XXUT1I9k7F4voJyKuDm+lCrzA2BuIfd3I8Qn8I=
+X-Received: by 2002:a05:6a00:16c7:b0:4f7:e497:69c7 with SMTP id
+ l7-20020a056a0016c700b004f7e49769c7mr12732196pfc.7.1647436582554; Wed, 16 Mar
+ 2022 06:16:22 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.7.0
-Subject: Re: [PATCH 10/27] Replace config-time define HOST_WORDS_BIGENDIAN
-Content-Language: en-US
-To:     marcandre.lureau@redhat.com, qemu-devel@nongnu.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
+References: <CAJSP0QX7O_auRgTKFjHkBbkBK=B3Z-59S6ZZi10tzFTv1_1hkQ@mail.gmail.com>
+ <244647ca-a247-cfc1-d0df-b8c74d434a77@amazon.com> <CAJSP0QVqvvN=sbm=XMT8mxHQNcSfNfTrnWJXXf-QgXwxAfzdcA@mail.gmail.com>
+In-Reply-To: <CAJSP0QVqvvN=sbm=XMT8mxHQNcSfNfTrnWJXXf-QgXwxAfzdcA@mail.gmail.com>
+From:   Stefan Hajnoczi <stefanha@gmail.com>
+Date:   Wed, 16 Mar 2022 13:16:11 +0000
+Message-ID: <CAJSP0QUZS=vcruOixYwsC_Nwy2mvgeemuJimSqv98KsKr4BdSQ@mail.gmail.com>
+Subject: Re: Call for GSoC and Outreachy project ideas for summer 2022
+To:     Alexander Graf <graf@amazon.com>
+Cc:     qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>,
+        Rust-VMM Mailing List <rust-vmm@lists.opendev.org>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
         Gerd Hoffmann <kraxel@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Pavel Pisa <pisa@cmp.felk.cvut.cz>,
-        Vikram Garhwal <fnu.vikram@xilinx.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Dmitry Fleytman <dmitry.fleytman@gmail.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
-        Aurelien Jarno <aurelien@aurel32.net>,
-        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Yanan Wang <wangyanan55@huawei.com>,
-        Laurent Vivier <laurent@vivier.eu>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>,
-        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
-        =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
-        Daniel Henrique Barboza <danielhb413@gmail.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Greg Kurz <groug@kaod.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Alistair Francis <alistair.francis@wdc.com>,
-        Bin Meng <bin.meng@windriver.com>,
-        Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-        Artyom Tarasenko <atar4qemu@gmail.com>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Coiby Xu <Coiby.Xu@gmail.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "open list:Overall KVM CPUs" <kvm@vger.kernel.org>,
-        "open list:ARM PrimeCell and..." <qemu-arm@nongnu.org>,
-        "open list:S390 SCLP-backed..." <qemu-s390x@nongnu.org>,
-        "open list:PowerPC TCG CPUs" <qemu-ppc@nongnu.org>,
-        "open list:RISC-V TCG CPUs" <qemu-riscv@nongnu.org>,
-        "open list:virtio-blk" <qemu-block@nongnu.org>
-References: <20220316095308.2613651-1-marcandre.lureau@redhat.com>
- <e709547a-a0c2-d1bd-7145-d03e9fd1776a@gmail.com>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= 
-        <philippe.mathieu.daude@gmail.com>
-In-Reply-To: <e709547a-a0c2-d1bd-7145-d03e9fd1776a@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+        Sergio Lopez <slp@redhat.com>,
+        Dmitry Fomichev <Dmitry.Fomichev@wdc.com>,
+        =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+        Hannes Reinecke <hare@suse.de>,
+        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+        "Florescu, Andreea" <fandree@amazon.com>,
+        Hanna Reitz <hreitz@redhat.com>,
+        Alex Agache <aagch@amazon.com>,
+        =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        John Snow <jsnow@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>, ohering@suse.de,
+        "Eftime, Petre" <epetre@amazon.com>,
+        Andra-Irina Paraschiv <andraprs@amazon.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
         RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -117,124 +82,101 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16/3/22 14:04, Philippe Mathieu-Daudé wrote:
-> On 16/3/22 10:53, marcandre.lureau@redhat.com wrote:
->> From: Marc-André Lureau <marcandre.lureau@redhat.com>
->>
->> Replace a config-time define with a compile time condition
->> define (compatible with clang and gcc) that must be declared prior to
->> its usage. This avoids having a global configure time define, but also
->> prevents from bad usage, if the config header wasn't included before.
->>
->> This can help to make some code independent from qemu too.
->>
->> gcc supports __BYTE_ORDER__ from about 4.6 and clang from 3.2.
->>
->> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
->> ---
->>   meson.build                             |  1 -
->>   accel/tcg/atomic_template.h             |  4 +-
->>   audio/audio.h                           |  2 +-
->>   hw/display/pl110_template.h             |  6 +--
->>   hw/net/can/ctucan_core.h                |  2 +-
->>   hw/net/vmxnet3.h                        |  4 +-
->>   include/exec/cpu-all.h                  |  4 +-
->>   include/exec/cpu-common.h               |  2 +-
->>   include/exec/memop.h                    |  2 +-
->>   include/exec/memory.h                   |  2 +-
->>   include/fpu/softfloat-types.h           |  2 +-
->>   include/hw/core/cpu.h                   |  2 +-
->>   include/hw/i386/intel_iommu.h           |  6 +--
->>   include/hw/i386/x86-iommu.h             |  4 +-
->>   include/hw/virtio/virtio-access.h       |  6 +--
->>   include/hw/virtio/virtio-gpu-bswap.h    |  2 +-
->>   include/libdecnumber/dconfig.h          |  2 +-
->>   include/net/eth.h                       |  2 +-
->>   include/qemu/bswap.h                    |  8 ++--
->>   include/qemu/compiler.h                 |  2 +
->>   include/qemu/host-utils.h               |  2 +-
->>   include/qemu/int128.h                   |  2 +-
->>   include/ui/qemu-pixman.h                |  2 +-
->>   net/util.h                              |  2 +-
->>   target/arm/cpu.h                        |  8 ++--
->>   target/arm/translate-a64.h              |  2 +-
->>   target/arm/vec_internal.h               |  2 +-
->>   target/i386/cpu.h                       |  2 +-
->>   target/mips/cpu.h                       |  2 +-
->>   target/ppc/cpu.h                        |  2 +-
->>   target/s390x/tcg/vec.h                  |  2 +-
->>   target/xtensa/cpu.h                     |  2 +-
->>   tests/fp/platform.h                     |  4 +-
->>   accel/kvm/kvm-all.c                     |  4 +-
->>   audio/dbusaudio.c                       |  2 +-
->>   disas.c                                 |  2 +-
->>   hw/core/loader.c                        |  4 +-
->>   hw/display/artist.c                     |  6 +--
->>   hw/display/pxa2xx_lcd.c                 |  2 +-
->>   hw/display/vga.c                        | 12 +++---
->>   hw/display/virtio-gpu-gl.c              |  2 +-
->>   hw/s390x/event-facility.c               |  2 +-
->>   hw/virtio/vhost.c                       |  2 +-
->>   linux-user/arm/nwfpe/double_cpdo.c      |  4 +-
->>   linux-user/arm/nwfpe/fpa11_cpdt.c       |  4 +-
->>   linux-user/ppc/signal.c                 |  3 +-
->>   linux-user/syscall.c                    |  6 +--
->>   net/net.c                               |  4 +-
->>   target/alpha/translate.c                |  2 +-
->>   target/arm/crypto_helper.c              |  2 +-
->>   target/arm/helper.c                     |  2 +-
->>   target/arm/kvm64.c                      |  4 +-
->>   target/arm/neon_helper.c                |  2 +-
->>   target/arm/sve_helper.c                 |  4 +-
->>   target/arm/translate-sve.c              |  6 +--
->>   target/arm/translate-vfp.c              |  2 +-
->>   target/arm/translate.c                  |  2 +-
->>   target/hppa/translate.c                 |  2 +-
->>   target/i386/tcg/translate.c             |  2 +-
->>   target/mips/tcg/lmmi_helper.c           |  2 +-
->>   target/mips/tcg/msa_helper.c            | 54 ++++++++++++-------------
->>   target/ppc/arch_dump.c                  |  2 +-
->>   target/ppc/int_helper.c                 | 22 +++++-----
->>   target/ppc/kvm.c                        |  4 +-
->>   target/ppc/mem_helper.c                 |  2 +-
->>   target/riscv/vector_helper.c            |  2 +-
->>   target/s390x/tcg/translate.c            |  2 +-
->>   target/sparc/vis_helper.c               |  4 +-
->>   tcg/tcg-op.c                            |  4 +-
->>   tcg/tcg.c                               | 12 +++---
->>   tests/qtest/vhost-user-blk-test.c       |  2 +-
->>   tests/qtest/virtio-blk-test.c           |  2 +-
->>   ui/vdagent.c                            |  2 +-
->>   ui/vnc.c                                |  2 +-
->>   util/bitmap.c                           |  2 +-
->>   util/host-utils.c                       |  2 +-
->>   target/ppc/translate/vmx-impl.c.inc     |  4 +-
->>   target/ppc/translate/vsx-impl.c.inc     |  2 +-
->>   target/riscv/insn_trans/trans_rvv.c.inc |  4 +-
->>   target/s390x/tcg/translate_vx.c.inc     |  2 +-
->>   tcg/aarch64/tcg-target.c.inc            |  4 +-
->>   tcg/arm/tcg-target.c.inc                |  4 +-
->>   tcg/mips/tcg-target.c.inc               |  2 +-
->>   tcg/ppc/tcg-target.c.inc                | 10 ++---
->>   tcg/riscv/tcg-target.c.inc              |  4 +-
->>   85 files changed, 173 insertions(+), 173 deletions(-)
->>
->> diff --git a/meson.build b/meson.build
->> index f20712cb93d7..88df1bc42973 100644
->> --- a/meson.build
->> +++ b/meson.build
->> @@ -1591,7 +1591,6 @@ config_host_data.set('QEMU_VERSION_MICRO', 
->> meson.project_version().split('.')[2]
->>   config_host_data.set_quoted('CONFIG_HOST_DSOSUF', host_dsosuf)
->>   config_host_data.set('HAVE_HOST_BLOCK_DEVICE', have_host_block_device)
->> -config_host_data.set('HOST_WORDS_BIGENDIAN', host_machine.endian() == 
->> 'big')
-> 
-> Can we poison HOST_WORDS_BIGENDIAN definition to force cleaning old
-> patches before merging them?
+On Mon, 14 Feb 2022 at 13:58, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+>
+> On Wed, 9 Feb 2022 at 14:50, Alexander Graf <graf@amazon.com> wrote:
+> > On 28.01.22 16:47, Stefan Hajnoczi wrote:
+> > > Dear QEMU, KVM, and rust-vmm communities,
+> > > QEMU will apply for Google Summer of Code 2022
+> > > (https://summerofcode.withgoogle.com/) and has been accepted into
+> > > Outreachy May-August 2022 (https://www.outreachy.org/). You can now
+> > > submit internship project ideas for QEMU, KVM, and rust-vmm!
+> > >
+> > > If you have experience contributing to QEMU, KVM, or rust-vmm you can
+> > > be a mentor. It's a great way to give back and you get to work with
+> > > people who are just starting out in open source.
+> > >
+> > > Please reply to this email by February 21st with your project ideas.
+> > >
+> > > Good project ideas are suitable for remote work by a competent
+> > > programmer who is not yet familiar with the codebase. In
+> > > addition, they are:
+> > > - Well-defined - the scope is clear
+> > > - Self-contained - there are few dependencies
+> > > - Uncontroversial - they are acceptable to the community
+> > > - Incremental - they produce deliverables along the way
+> > >
+> > > Feel free to post ideas even if you are unable to mentor the project.
+> > > It doesn't hurt to share the idea!
+> >
+> >
+> > I have one that I'd absolutely *love* to see but not gotten around
+> > implementing myself yet :)
+> >
+> >
+> > Summary:
+> >
+> > Implement -M nitro-enclave in QEMU
+> >
+> > Nitro Enclaves are the first widely adopted implementation of hypervisor
+> > assisted compute isolation. Similar to technologies like SGX, it allows
+> > to spawn a separate context that is inaccessible by the parent Operating
+> > System. This is implemented by "giving up" resources of the parent VM
+> > (CPU cores, memory) to the hypervisor which then spawns a second vmm to
+> > execute a completely separate virtual machine. That new VM only has a
+> > vsock communication channel to the parent and has a built-in lightweight
+> > TPM.
+> >
+> > One big challenge with Nitro Enclaves is that due to its roots in
+> > security, there are very few debugging / introspection capabilities.
+> > That makes OS bringup, debugging and bootstrapping very difficult.
+> > Having a local dev&test environment that looks like an Enclave, but is
+> > 100% controlled by the developer and introspectable would make life a
+> > lot easier for everyone working on them. It also may pave the way to see
+> > Nitro Enclaves adopted in VM environments outside of EC2.
+> >
+> > This project will consist of adding a new machine model to QEMU that
+> > mimics a Nitro Enclave environment, including the lightweight TPM, the
+> > vsock communication channel and building firmware which loads the
+> > special "EIF" file format which contains kernel, initramfs and metadata
+> > from a -kernel image.
+> >
+> > Links:
+> >
+> > https://aws.amazon.com/ec2/nitro/nitro-enclaves/
+> > https://lore.kernel.org/lkml/20200921121732.44291-10-andraprs@amazon.com/T/
+> >
+> > Details:
+> >
+> > Skill level: intermediate - advanced (some understanding of QEMU machine
+> > modeling would be good)
+> > Language: C
+> > Mentor: Maybe me (Alexander Graf), depends on timelines and holiday
+> > season. Let's find an intern first - I promise to find a mentor then :)
+> > Suggested by: Alexander Graf
+> >
+> >
+> > Note: I don't know enough about rust-vmm's debugging capabilities. If it
+> > has gdbstub and a local UART that's easily usable, the project might be
+> > perfectly viable under its umbrella as well - written in Rust then of
+> > course.
+>
+> It would be great to have an open source Enclave environment for
+> development and testing in QEMU.
+>
+> Could you add a little more detail about the tasks involved. Something
+> along the lines of:
+> - Implement a device model for the TPM device (link to spec or driver
+> code below)
+> - Implement vsock device (or is this virtio-mmio vsock?)
+> - Add a test for the TPM device
+> - Add an acceptance test that boots a minimal EIF payload
+>
+> This will give candidates more keywords and links to research this project.
 
-Now noticed elsewhere a patch #11 doing exactly that.
+Hi Alex,
+Would you like me to add this project idea to the list? Please see
+what I wrote above about adding details about the tasks involved.
 
-Addressing Halil comment in "exec/cpu-all.h":
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
+Thanks,
+Stefan
