@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 627DE4DA723
-	for <lists+kvm@lfdr.de>; Wed, 16 Mar 2022 01:55:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 80D7C4DA724
+	for <lists+kvm@lfdr.de>; Wed, 16 Mar 2022 01:55:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352879AbiCPA5B (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Mar 2022 20:57:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50828 "EHLO
+        id S1352881AbiCPA5C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Mar 2022 20:57:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352875AbiCPA5A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Mar 2022 20:57:00 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D84525DE5F
-        for <kvm@vger.kernel.org>; Tue, 15 Mar 2022 17:55:47 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id l16-20020a25bf90000000b00628c3a412cdso764391ybk.10
-        for <kvm@vger.kernel.org>; Tue, 15 Mar 2022 17:55:47 -0700 (PDT)
+        with ESMTP id S1352877AbiCPA5B (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Mar 2022 20:57:01 -0400
+Received: from mail-io1-xd49.google.com (mail-io1-xd49.google.com [IPv6:2607:f8b0:4864:20::d49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C7DB5DE5E
+        for <kvm@vger.kernel.org>; Tue, 15 Mar 2022 17:55:48 -0700 (PDT)
+Received: by mail-io1-xd49.google.com with SMTP id e23-20020a6b6917000000b006406b9433d6so383327ioc.14
+        for <kvm@vger.kernel.org>; Tue, 15 Mar 2022 17:55:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=odxwcNT6QFPw+yc9K3jXY6zXbyWGuQWl0E9RxekFmAA=;
-        b=QBd/98QI7YR1Wcry1SkD4HErXuzfgLrTpJm7g7kzNqH9gdPyFhw72EvEDcDhM9bBr4
-         RS4xa3pjVeOz7hfVBlMvdeJUIJXAbCnmmOPwglmNNh1zVU6yk91panMdYkv96GPuBCIZ
-         rkK1KDi8pLvqixRAfJnxn1A1rq83Az9dCVga+XlTtxvdoY04hfvp6YMoe5hYZ+X89Vng
-         Dra8NNKnDyqQ4dtcmfvoUF8mcLEXeYSHqlRI4Rwzfbi0PIfcdDTTlFdJFVyGamIDTl8y
-         Uf3RZ1+MFjd3R+TAtBfGTmE/sxpVFGWxCQ7HEnVi5PBL+O6DIdVdu/CdLk9pxTZ4jK0Q
-         jlBw==
+        bh=bycAaiF5EsaFu8w+wQH4Es5PJ71+HV/1nI3V1km7Z5k=;
+        b=ewp22yR8J5SMj+k7ktU5S/hjjjcgAy13fWHJczV26Jd9dGvMwDq8zRvkfbMfxMLRiO
+         uSpu464o1th3V3paeGXGU5lsTgVv/xEx9SCy2sDhwu2DFkVjigh3IElxyiqcqMzLkgms
+         4gFt/ufWFtt6HtAbxVv3IPukhgfOuXijer5geVk/PAtwZsC3Zw5nFPU7q5bLp11ezHzD
+         fRKJuy0SONbI+ZeUTna7ajiMK/mXeK3WSqBXRIF7EotEU/knp9LfuOAL5DzqdLIwcquS
+         QC/MPPAtf+uQC05BFkoHwaTOfRlzW9e/XUam+qrABPENDngC1uYWsrNtHBhRBFimdAVA
+         0p+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=odxwcNT6QFPw+yc9K3jXY6zXbyWGuQWl0E9RxekFmAA=;
-        b=YVhwMfc8ePIM9Fokr5Ou8TGZGlGat+KmkQEVsABVNLKOPL34kGAA1OmZ6VrxRuslOy
-         auu8zqq6IL5cK9OVl9ve7TreIm9x0jHn2dh7kgEQboRykCZZTQ0qavuigv/Zs6ukrjm/
-         km3dZRqsUTAzvoGoQ9hvSbNDDNPm6IcrBSC5mytKChHggx3H+c7CBALmvi+cuyH6G5wf
-         CaKTeiRuY3ibUGXtPUlGaKMNaQ7B5mD8DRmWvZJUBL3i3s7nguezb8QMnaWFunDzoq5L
-         FilsNizRrKQ3kRMFJqKAwcOAKhuXXIEsptd56UexDZxEZFweCfXd2Fhogi/Q5s7LVob5
-         U8ZQ==
-X-Gm-Message-State: AOAM530Ahel+xUUk5Hj5WyI9wEpoMG/h4eJbKLaO8PM8CVdnSnhD6sph
-        DEapMZV+4e7vd8ystvrFvhxAMc4PxuM4GdFSoXtXRGZwChrgtMKf6Xsqjv9yHj3Hofvh8b7KGtd
-        D2ddxCBa3MSbnqOO6HffCXuDO2UloOV2xQ0zS4Lz0xYDX4GAuisCenkAlSg==
-X-Google-Smtp-Source: ABdhPJyOEhgzuOB4MjHgkvDK8IInav+cAxX4mMfgp81m1XJGUCw/bxX+UU6H5GHruJvmlHzeqFoKwZvMJV4=
+        bh=bycAaiF5EsaFu8w+wQH4Es5PJ71+HV/1nI3V1km7Z5k=;
+        b=AZH9zmJ9PtM6PpCqgqSt5BxZ56KYo5noUZAYJtSM6aK+xDVlPgTVYBpsdHAzy3N1J6
+         caSHrZqkomXFczIGvSK9dRy7JruINtCIxAvrkvhVXu0I+igGbBXkh9gcS33njhNdoDFj
+         NXIoHv+4hiD8ZNlvgwCk7f+tVKcrV4Q838BEJi2N8M7o+ZbxBmstZ37IFFVGINo8VMsI
+         bTfV+f1jMHlyII922K9sBxwZNdkhpzJTLGrNt4+rMuqnQf6OnV+b/0ZSvAjHnU+5Cisz
+         Z4+qyyy4OCyWo4w0f+cwcCUJVAjrrK3zbAKgnHoG9lgPOMjBSMiCWUAElLKBPiPve0GF
+         oa/g==
+X-Gm-Message-State: AOAM533H1CvwATYjXMBqyfh0G02OqRUAYYRL6aPTq5GjM1Y1rQpg37Ni
+        iMC09/lmpYXbv+RDopMOffh/IhJS+osEKBJeUponJlSOrdRLlwjCJaB1a7dUJd6XN1yk+w1+yai
+        nRmSdQs7OJ5tqqgLezOnw+C0ShCGRv/A6DVag3NZneaMwQJfyGOo3Er0zjg==
+X-Google-Smtp-Source: ABdhPJyWSua1+C6+8kB1YkbF9ExvEOo07TsD+k9MrdKAQj+XCKR5sbsDMDGO5J9jPElSD4tC5WPBmDifSkE=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a25:c385:0:b0:614:d2fd:c9bc with SMTP id
- t127-20020a25c385000000b00614d2fdc9bcmr26841151ybf.270.1647392146944; Tue, 15
- Mar 2022 17:55:46 -0700 (PDT)
-Date:   Wed, 16 Mar 2022 00:55:37 +0000
+ (user=oupton job=sendgmr) by 2002:a05:6e02:1ca5:b0:2c6:68c8:e44e with SMTP id
+ x5-20020a056e021ca500b002c668c8e44emr22684824ill.79.1647392147789; Tue, 15
+ Mar 2022 17:55:47 -0700 (PDT)
+Date:   Wed, 16 Mar 2022 00:55:38 +0000
 In-Reply-To: <20220316005538.2282772-1-oupton@google.com>
-Message-Id: <20220316005538.2282772-2-oupton@google.com>
+Message-Id: <20220316005538.2282772-3-oupton@google.com>
 Mime-Version: 1.0
 References: <20220316005538.2282772-1-oupton@google.com>
 X-Mailer: git-send-email 2.35.1.723.g4982287a31-goog
-Subject: [PATCH 1/2] KVM: x86: Allow userspace to opt out of hypercall patching
+Subject: [PATCH 2/2] selftests: KVM: Test KVM_X86_QUIRK_FIX_HYPERCALL_INSN
 From:   Oliver Upton <oupton@google.com>
 To:     kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -75,103 +75,219 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM handles the VMCALL/VMMCALL instructions very strangely. Even though
-both of these instructions really should #UD when executed on the wrong
-vendor's hardware (i.e. VMCALL on SVM, VMMCALL on VMX), KVM replaces the
-guest's instruction with the appropriate instruction for the vendor.
-Nonetheless, older guest kernels without commit c1118b3602c2 ("x86: kvm:
-use alternatives for VMCALL vs. VMMCALL if kernel text is read-only")
-do not patch in the appropriate instruction using alternatives, likely
-motivating KVM's intervention.
-
-Add a quirk allowing userspace to opt out of hypercall patching. If the
-quirk is disabled, KVM synthesizes a #UD in the guest.
+Add a test that asserts KVM rewrites guest hypercall instructions to
+match the running architecture (VMCALL on VMX, VMMCALL on SVM).
+Additionally, test that with the quirk disabled, KVM no longer rewrites
+guest instructions and instead injects a #UD.
 
 Signed-off-by: Oliver Upton <oupton@google.com>
 ---
- Documentation/virt/kvm/api.rst  |  9 +++++++++
- arch/x86/include/asm/kvm_host.h |  3 ++-
- arch/x86/include/uapi/asm/kvm.h | 11 ++++++-----
- arch/x86/kvm/x86.c              | 11 +++++++++++
- 4 files changed, 28 insertions(+), 6 deletions(-)
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/x86_64/fix_hypercall_test.c | 170 ++++++++++++++++++
+ 3 files changed, 172 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/fix_hypercall_test.c
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 507be67746b0..862314e156ae 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -7233,6 +7233,15 @@ The valid bits in cap.args[0] are:
-                                     Additionally, when this quirk is disabled,
-                                     KVM clears CPUID.01H:ECX[bit 3] if
-                                     IA32_MISC_ENABLE[bit 18] is cleared.
+diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+index 9b67343dc4ab..1f1b6c978bf7 100644
+--- a/tools/testing/selftests/kvm/.gitignore
++++ b/tools/testing/selftests/kvm/.gitignore
+@@ -15,6 +15,7 @@
+ /x86_64/debug_regs
+ /x86_64/evmcs_test
+ /x86_64/emulator_error_test
++/x86_64/fix_hypercall_test
+ /x86_64/get_msr_index_features
+ /x86_64/kvm_clock_test
+ /x86_64/kvm_pv_test
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index 6d69e196f1b7..c9cdbd248727 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -48,6 +48,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/cr4_cpuid_sync_test
+ TEST_GEN_PROGS_x86_64 += x86_64/get_msr_index_features
+ TEST_GEN_PROGS_x86_64 += x86_64/evmcs_test
+ TEST_GEN_PROGS_x86_64 += x86_64/emulator_error_test
++TEST_GEN_PROGS_x86_64 += x86_64/fix_hypercall_test
+ TEST_GEN_PROGS_x86_64 += x86_64/hyperv_clock
+ TEST_GEN_PROGS_x86_64 += x86_64/hyperv_cpuid
+ TEST_GEN_PROGS_x86_64 += x86_64/hyperv_features
+diff --git a/tools/testing/selftests/kvm/x86_64/fix_hypercall_test.c b/tools/testing/selftests/kvm/x86_64/fix_hypercall_test.c
+new file mode 100644
+index 000000000000..1f5c32146f3d
+--- /dev/null
++++ b/tools/testing/selftests/kvm/x86_64/fix_hypercall_test.c
+@@ -0,0 +1,170 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright (C) 2020, Google LLC.
++ *
++ * Tests for KVM paravirtual feature disablement
++ */
++#include <asm/kvm_para.h>
++#include <linux/kvm_para.h>
++#include <linux/stringify.h>
++#include <stdint.h>
 +
-+ KVM_X86_QUIRK_FIX_HYPERCALL_INSN   By default, KVM rewrites guest
-+                                    VMMCALL/VMCALL instructions to match the
-+                                    vendor's hypercall instruction for the
-+                                    system. When this quirk is disabled, KVM
-+                                    will no longer rewrite invalid guest
-+                                    hypercall instructions. Executing the
-+                                    incorrect hypercall instruction will
-+                                    generate a #UD within the guest.
- =================================== ============================================
- 
- 8. Other capabilities.
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 9694dd5e6ccc..832e9af24a85 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1996,6 +1996,7 @@ int memslot_rmap_alloc(struct kvm_memory_slot *slot, unsigned long npages);
- 	 KVM_X86_QUIRK_CD_NW_CLEARED |		\
- 	 KVM_X86_QUIRK_LAPIC_MMIO_HOLE |	\
- 	 KVM_X86_QUIRK_OUT_7E_INC_RIP |		\
--	 KVM_X86_QUIRK_MISC_ENABLE_NO_MWAIT)
-+	 KVM_X86_QUIRK_MISC_ENABLE_NO_MWAIT |	\
-+	 KVM_X86_QUIRK_FIX_HYPERCALL_INSN)
- 
- #endif /* _ASM_X86_KVM_HOST_H */
-diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-index bf6e96011dfe..21614807a2cb 100644
---- a/arch/x86/include/uapi/asm/kvm.h
-+++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -428,11 +428,12 @@ struct kvm_sync_regs {
- 	struct kvm_vcpu_events events;
- };
- 
--#define KVM_X86_QUIRK_LINT0_REENABLED	   (1 << 0)
--#define KVM_X86_QUIRK_CD_NW_CLEARED	   (1 << 1)
--#define KVM_X86_QUIRK_LAPIC_MMIO_HOLE	   (1 << 2)
--#define KVM_X86_QUIRK_OUT_7E_INC_RIP	   (1 << 3)
--#define KVM_X86_QUIRK_MISC_ENABLE_NO_MWAIT (1 << 4)
-+#define KVM_X86_QUIRK_LINT0_REENABLED		(1 << 0)
-+#define KVM_X86_QUIRK_CD_NW_CLEARED		(1 << 1)
-+#define KVM_X86_QUIRK_LAPIC_MMIO_HOLE		(1 << 2)
-+#define KVM_X86_QUIRK_OUT_7E_INC_RIP		(1 << 3)
-+#define KVM_X86_QUIRK_MISC_ENABLE_NO_MWAIT	(1 << 4)
-+#define KVM_X86_QUIRK_FIX_HYPERCALL_INSN	(1 << 5)
- 
- #define KVM_STATE_NESTED_FORMAT_VMX	0
- #define KVM_STATE_NESTED_FORMAT_SVM	1
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index d3a9ce07a565..685c4bc453b4 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9291,6 +9291,17 @@ static int emulator_fix_hypercall(struct x86_emulate_ctxt *ctxt)
- 	char instruction[3];
- 	unsigned long rip = kvm_rip_read(vcpu);
- 
-+	/*
-+	 * If the quirk is disabled, synthesize a #UD and let the guest pick up
-+	 * the pieces.
-+	 */
-+	if (!kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_FIX_HYPERCALL_INSN)) {
-+		ctxt->exception.error_code_valid = false;
-+		ctxt->exception.vector = UD_VECTOR;
-+		ctxt->have_exception = true;
-+		return X86EMUL_PROPAGATE_FAULT;
++#include "apic.h"
++#include "test_util.h"
++#include "kvm_util.h"
++#include "processor.h"
++
++#define VCPU_ID 0
++
++static bool ud_expected;
++
++static void guest_ud_handler(struct ex_regs *regs)
++{
++	GUEST_ASSERT(ud_expected);
++	GUEST_DONE();
++}
++
++extern unsigned char svm_hypercall_insn;
++static uint64_t svm_do_sched_yield(uint8_t apic_id)
++{
++	uint64_t ret;
++
++	asm volatile("mov %1, %%rax\n\t"
++		     "mov %2, %%rbx\n\t"
++		     "svm_hypercall_insn:\n\t"
++		     "vmmcall\n\t"
++		     "mov %%rax, %0\n\t"
++		     : "=r"(ret)
++		     : "r"((uint64_t)KVM_HC_SCHED_YIELD), "r"((uint64_t)apic_id)
++		     : "rax", "rbx", "memory");
++
++	return ret;
++}
++
++extern unsigned char vmx_hypercall_insn;
++static uint64_t vmx_do_sched_yield(uint8_t apic_id)
++{
++	uint64_t ret;
++
++	asm volatile("mov %1, %%rax\n\t"
++		     "mov %2, %%rbx\n\t"
++		     "vmx_hypercall_insn:\n\t"
++		     "vmcall\n\t"
++		     "mov %%rax, %0\n\t"
++		     : "=r"(ret)
++		     : "r"((uint64_t)KVM_HC_SCHED_YIELD), "r"((uint64_t)apic_id)
++		     : "rax", "rbx", "memory");
++
++	return ret;
++}
++
++static void assert_hypercall_insn(unsigned char *exp_insn, unsigned char *obs_insn)
++{
++	uint32_t exp = 0, obs = 0;
++
++	memcpy(&exp, exp_insn, sizeof(exp));
++	memcpy(&obs, obs_insn, sizeof(obs));
++
++	GUEST_ASSERT_EQ(exp, obs);
++}
++
++static void guest_main(void)
++{
++	unsigned char *native_hypercall_insn, *hypercall_insn;
++	uint8_t apic_id;
++
++	apic_id = GET_APIC_ID_FIELD(xapic_read_reg(APIC_ID));
++
++	if (is_intel_cpu()) {
++		native_hypercall_insn = &vmx_hypercall_insn;
++		hypercall_insn = &svm_hypercall_insn;
++		svm_do_sched_yield(apic_id);
++	} else if (is_amd_cpu()) {
++		native_hypercall_insn = &svm_hypercall_insn;
++		hypercall_insn = &vmx_hypercall_insn;
++		vmx_do_sched_yield(apic_id);
++	} else {
++		GUEST_ASSERT(0);
++		/* unreachable */
++		return;
 +	}
 +
- 	static_call(kvm_x86_patch_hypercall)(vcpu, instruction);
- 
- 	return emulator_write_emulated(ctxt, rip, instruction, 3,
++	GUEST_ASSERT(!ud_expected);
++	assert_hypercall_insn(native_hypercall_insn, hypercall_insn);
++	GUEST_DONE();
++}
++
++static void setup_ud_vector(struct kvm_vm *vm)
++{
++	vm_init_descriptor_tables(vm);
++	vcpu_init_descriptor_tables(vm, VCPU_ID);
++	vm_install_exception_handler(vm, UD_VECTOR, guest_ud_handler);
++}
++
++static void enter_guest(struct kvm_vm *vm)
++{
++	struct kvm_run *run;
++	struct ucall uc;
++
++	run = vcpu_state(vm, VCPU_ID);
++
++	vcpu_run(vm, VCPU_ID);
++	switch (get_ucall(vm, VCPU_ID, &uc)) {
++	case UCALL_SYNC:
++		pr_info("%s: %016lx\n", (const char *)uc.args[2], uc.args[3]);
++		break;
++	case UCALL_DONE:
++		return;
++	case UCALL_ABORT:
++		TEST_FAIL("%s at %s:%ld", (const char *)uc.args[0], __FILE__, uc.args[1]);
++	default:
++		TEST_FAIL("Unhandled ucall: %ld\nexit_reason: %u (%s)",
++			  uc.cmd, run->exit_reason, exit_reason_str(run->exit_reason));
++	}
++}
++
++static void test_fix_hypercall(void)
++{
++	struct kvm_vm *vm;
++
++	vm = vm_create_default(VCPU_ID, 0, guest_main);
++	setup_ud_vector(vm);
++
++	ud_expected = false;
++	sync_global_to_guest(vm, ud_expected);
++
++	virt_pg_map(vm, APIC_DEFAULT_GPA, APIC_DEFAULT_GPA);
++
++	enter_guest(vm);
++}
++
++static void test_fix_hypercall_disabled(void)
++{
++	struct kvm_enable_cap cap = {0};
++	struct kvm_vm *vm;
++
++	vm = vm_create_default(VCPU_ID, 0, guest_main);
++	setup_ud_vector(vm);
++
++	cap.cap = KVM_CAP_DISABLE_QUIRKS2;
++	cap.args[0] = KVM_X86_QUIRK_FIX_HYPERCALL_INSN;
++	vm_enable_cap(vm, &cap);
++
++	ud_expected = true;
++	sync_global_to_guest(vm, ud_expected);
++
++	virt_pg_map(vm, APIC_DEFAULT_GPA, APIC_DEFAULT_GPA);
++
++	enter_guest(vm);
++}
++
++int main(void)
++{
++	if (!(kvm_check_cap(KVM_CAP_DISABLE_QUIRKS2) & KVM_X86_QUIRK_FIX_HYPERCALL_INSN)) {
++		print_skip("KVM_X86_QUIRK_HYPERCALL_INSN not supported");
++		exit(KSFT_SKIP);
++	}
++
++	test_fix_hypercall();
++	test_fix_hypercall_disabled();
++}
 -- 
 2.35.1.723.g4982287a31-goog
 
