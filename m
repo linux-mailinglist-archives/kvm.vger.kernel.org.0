@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C59E4DAD83
-	for <lists+kvm@lfdr.de>; Wed, 16 Mar 2022 10:29:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F2CF84DAD8E
+	for <lists+kvm@lfdr.de>; Wed, 16 Mar 2022 10:31:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346468AbiCPJbI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Mar 2022 05:31:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42462 "EHLO
+        id S1353460AbiCPJdJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Mar 2022 05:33:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354862AbiCPJbH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Mar 2022 05:31:07 -0400
+        with ESMTP id S1354982AbiCPJdI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Mar 2022 05:33:08 -0400
 Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCD966542D
-        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 02:29:53 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2386865425
+        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 02:31:54 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 7775DB818CC
-        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 09:29:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AD7BC340E9;
-        Wed, 16 Mar 2022 09:29:51 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id CDD12B818CC
+        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 09:31:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 975DAC340E9;
+        Wed, 16 Mar 2022 09:31:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1647422991;
-        bh=1vXKNeCRC0cZGyzI8jX4TQSJODbg9VTgs4jqJgQbSUw=;
+        s=k20201202; t=1647423111;
+        bh=fSCGQ6arI2RdJ4LoboTdKNwOpNI7I5ehCdLF0DCiPFQ=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=Pi7GoBFZUcF+3h4BPp8qEYOXeUt3hwT7/nE5DtGw5/a+uYrcM9mg2JX85TXVobBLm
-         NZO374EHJYqz+ciqQaJ5F16mcwxz89SIQyA/HmDxHcoNO88CSKdpoxOgCVdn8LU5DT
-         pVXcUBCVQfP4PYfjA8nPM3WLF+0wy/WzogrTAOokDHUKF21xNaFroIrtM7J/GGILp7
-         TV+WlrOk01GTpwzQRn4wp+hJwc/p7YbIRexWBDuoQ7otWVuFgbm01NCs5EmLP3wOi6
-         xJBG/9CXRjj0MVthDfTo4gSs0iGW70v3fVZVG6hJdBN9S2+yLovgfxE4TOl1Pil17X
-         ChIRGHw+mXrYA==
+        b=E2bHf7QGwyp/ofJzfmqlhfCyK/LwaCdR1FBWTbfiGh/MnoW6PX574YwZZz9YEN9kM
+         ugZYQn3XTypMBjhXC5W1EJn08bsJTfYLXCsCBgONmPtBtEK4ZS/Or6volDiv9cFEgG
+         Rsq8XFDHBX5mQWHOC+M0jMZblACja5GkeD0YcjoMGcNIqkXtg+H9oszBR3W+ZfyAdg
+         QqG3aplmhq7mXQQR+A2wMNilxjf71zl42LJxRXt/ADoS5DXCXESUIB1ojVBvzQy/wT
+         sR49H2CekwRBAk20RpUJqPaAeNullB+mfVg57m9Q3Ax4bjyItSoWX2s5/iyEUHmJE5
+         myv++eiqrCcSg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1nUPyW-00EsOD-JP; Wed, 16 Mar 2022 09:29:49 +0000
-Date:   Wed, 16 Mar 2022 09:29:48 +0000
-Message-ID: <87czimz1mb.wl-maz@kernel.org>
+        id 1nUQ0T-00EsQq-7n; Wed, 16 Mar 2022 09:31:49 +0000
+Date:   Wed, 16 Mar 2022 09:31:48 +0000
+Message-ID: <87bky6z1iz.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Oliver Upton <oupton@google.com>
 Cc:     linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
         kvmarm@lists.cs.columbia.edu, kernel-team@android.com,
         Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH 1/4] irqchip/gic-v3: Exposes bit values for GICR_CTLR.{IR, CES}
-In-Reply-To: <YjEeNThfYFtTffWz@google.com>
+Subject: Re: [PATCH 2/4] KVM: arm64: vgic-v3: Implement MMIO-based LPI invalidation
+In-Reply-To: <YjF07lltAEn6X22V@google.com>
 References: <20220314164044.772709-1-maz@kernel.org>
-        <20220314164044.772709-2-maz@kernel.org>
-        <YjEeNThfYFtTffWz@google.com>
+        <20220314164044.772709-3-maz@kernel.org>
+        <YjF07lltAEn6X22V@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -67,38 +67,178 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 15 Mar 2022 23:16:05 +0000,
+On Wed, 16 Mar 2022 05:26:06 +0000,
 Oliver Upton <oupton@google.com> wrote:
 > 
 > Hi Marc,
 > 
-> On Mon, Mar 14, 2022 at 04:40:41PM +0000, Marc Zyngier wrote:
-> > As we're about to expose GICR_CTLR.{IR,CES} to guests, populate
-> > the include file with the architectural values.
+> On Mon, Mar 14, 2022 at 04:40:42PM +0000, Marc Zyngier wrote:
+> > Since GICv4.1, it has become legal for an implementation to advertise
+> > GICR_{INVLPIR,INVALLR,SYNCR} while having an ITS, allowing for a more
+> > efficient invalidation scheme (no guest command queue contention when
+> > multiple CPUs are generating invalidations).
+> > 
+> > Provide the invalidation registers as a primitive to their ITS
+> > counterpart. Note that we don't advertise them to the guest yet
+> > (the architecture allows an implementation to do this).
 > > 
 > > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > > ---
-> >  include/linux/irqchip/arm-gic-v3.h | 2 ++
-> >  1 file changed, 2 insertions(+)
+> >  arch/arm64/kvm/vgic/vgic-its.c     | 62 ++++++++++++++++++++----------
+> >  arch/arm64/kvm/vgic/vgic-mmio-v3.c | 62 ++++++++++++++++++++++++++++++
+> >  arch/arm64/kvm/vgic/vgic.h         |  4 ++
+> >  include/kvm/arm_vgic.h             |  1 +
+> >  4 files changed, 108 insertions(+), 21 deletions(-)
 > > 
-> > diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-> > index 12d91f0dedf9..aeb8ced53880 100644
-> > --- a/include/linux/irqchip/arm-gic-v3.h
-> > +++ b/include/linux/irqchip/arm-gic-v3.h
-> > @@ -127,6 +127,8 @@
-> >  #define GICR_PIDR2			GICD_PIDR2
+> > diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+> > index 089fc2ffcb43..cc62d8a8180f 100644
+> > --- a/arch/arm64/kvm/vgic/vgic-its.c
+> > +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> > @@ -1272,6 +1272,11 @@ static int vgic_its_cmd_handle_clear(struct kvm *kvm, struct vgic_its *its,
+> >  	return 0;
+> >  }
 > >  
-> >  #define GICR_CTLR_ENABLE_LPIS		(1UL << 0)
-> > +#define GICR_CTLR_IR			(1UL << 1)
-> > +#define GICR_CTLR_CES			(1UL << 2)
+> > +int vgic_its_inv_lpi(struct kvm *kvm, struct vgic_irq *irq)
+> > +{
+> > +	return update_lpi_config(kvm, irq, NULL, true);
+> > +}
+> > +
+> >  /*
+> >   * The INV command syncs the configuration bits from the memory table.
+> >   * Must be called with the its_lock mutex held.
+> > @@ -1288,7 +1293,41 @@ static int vgic_its_cmd_handle_inv(struct kvm *kvm, struct vgic_its *its,
+> >  	if (!ite)
+> >  		return E_ITS_INV_UNMAPPED_INTERRUPT;
+> >  
+> > -	return update_lpi_config(kvm, ite->irq, NULL, true);
+> > +	return vgic_its_inv_lpi(kvm, ite->irq);
+> > +}
+> > +
+> > +/**
+> > + * vgic_its_invall - invalidate all LPIs targetting a given vcpu
+> > + * @vcpu: the vcpu for which the RD is targetted by an invalidation
+> > + *
+> > + * Contrary to the INVALL command, this targets a RD instead of a
+> > + * collection, and we don't need to hold the its_lock, since no ITS is
+> > + * involved here.
+> > + */
+> > +int vgic_its_invall(struct kvm_vcpu *vcpu)
+> > +{
+> > +	struct kvm *kvm = vcpu->kvm;
+> > +	int irq_count, i = 0;
+> > +	u32 *intids;
+> > +
+> > +	irq_count = vgic_copy_lpi_list(kvm, vcpu, &intids);
+> > +	if (irq_count < 0)
+> > +		return irq_count;
+> > +
+> > +	for (i = 0; i < irq_count; i++) {
+> > +		struct vgic_irq *irq = vgic_get_irq(kvm, NULL, intids[i]);
+> > +		if (!irq)
+> > +			continue;
+> > +		update_lpi_config(kvm, irq, vcpu, false);
+> > +		vgic_put_irq(kvm, irq);
+> > +	}
+> > +
+> > +	kfree(intids);
+> > +
+> > +	if (vcpu->arch.vgic_cpu.vgic_v3.its_vpe.its_vm)
+> > +		its_invall_vpe(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe);
+> > +
+> > +	return 0;
+> >  }
 > 
-> I think these are backwards (IR is bit 2)
+> nit: the refactoring happening at the same time as the functional change
+> is a bit distracting. Looks fine though.
 
-How embarrassing... The whole thing only works because we always
-advertise the two bits together, and that the GIC driver has the same
-bug. Fortunately, I'm running low on paper bags... ;-)
+Yeah, it didn't seem to warrant an extra patch, given that we're
+really only moving things about.
 
-I'll push a fix for that shortly.
+> 
+> >  /*
+> > @@ -1305,32 +1344,13 @@ static int vgic_its_cmd_handle_invall(struct kvm *kvm, struct vgic_its *its,
+> >  	u32 coll_id = its_cmd_get_collection(its_cmd);
+> >  	struct its_collection *collection;
+> >  	struct kvm_vcpu *vcpu;
+> > -	struct vgic_irq *irq;
+> > -	u32 *intids;
+> > -	int irq_count, i;
+> >  
+> >  	collection = find_collection(its, coll_id);
+> >  	if (!its_is_collection_mapped(collection))
+> >  		return E_ITS_INVALL_UNMAPPED_COLLECTION;
+> >  
+> >  	vcpu = kvm_get_vcpu(kvm, collection->target_addr);
+> > -
+> > -	irq_count = vgic_copy_lpi_list(kvm, vcpu, &intids);
+> > -	if (irq_count < 0)
+> > -		return irq_count;
+> > -
+> > -	for (i = 0; i < irq_count; i++) {
+> > -		irq = vgic_get_irq(kvm, NULL, intids[i]);
+> > -		if (!irq)
+> > -			continue;
+> > -		update_lpi_config(kvm, irq, vcpu, false);
+> > -		vgic_put_irq(kvm, irq);
+> > -	}
+> > -
+> > -	kfree(intids);
+> > -
+> > -	if (vcpu->arch.vgic_cpu.vgic_v3.its_vpe.its_vm)
+> > -		its_invall_vpe(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe);
+> > +	vgic_its_invall(vcpu);
+> >  
+> >  	return 0;
+> >  }
+> > diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> > index 58e40b4874f8..186bf35078bf 100644
+> > --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> > +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> > @@ -525,6 +525,59 @@ static void vgic_mmio_write_pendbase(struct kvm_vcpu *vcpu,
+> >  			   pendbaser) != old_pendbaser);
+> >  }
+> >  
+> > +static unsigned long vgic_mmio_read_sync(struct kvm_vcpu *vcpu,
+> > +					 gpa_t addr, unsigned int len)
+> > +{
+> > +	return !!atomic_read(&vcpu->arch.vgic_cpu.syncr_busy);
+> > +}
+> > +
+> > +static void vgic_make_rdist_busy(struct kvm_vcpu *vcpu, bool busy)
+> 
+> nit: s/make/set, since you use this helper to decrement the counter too.
+
+Sure, works for me.
+
+> > +{
+> > +	if (busy) {
+> > +		atomic_inc(&vcpu->arch.vgic_cpu.syncr_busy);
+> > +		smp_mb__after_atomic();
+> > +	} else {
+> > +		smp_mb__before_atomic();
+> > +		atomic_dec(&vcpu->arch.vgic_cpu.syncr_busy);
+> > +	}
+> > +}
+> > +
+> > +static void vgic_mmio_write_invlpi(struct kvm_vcpu *vcpu,
+> > +				   gpa_t addr, unsigned int len,
+> > +				   unsigned long val)
+> > +{
+> > +	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+> > +	struct vgic_irq *irq;
+> > +
+> > +	if (!vgic_cpu->lpis_enabled)
+> > +		return;
+> > +
+> > +	vgic_make_rdist_busy(vcpu, true);
+> > +
+> > +	irq = vgic_get_irq(vcpu->kvm, NULL, val);
+> > +	if (!irq)
+> > +		return;
+> 
+> Isn't the busy counter unbalanced if you return early?
+
+Huh, well caught. Fix incoming.
 
 Thanks,
 
