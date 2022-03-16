@@ -2,87 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B57B4DACD4
-	for <lists+kvm@lfdr.de>; Wed, 16 Mar 2022 09:49:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0715A4DACDF
+	for <lists+kvm@lfdr.de>; Wed, 16 Mar 2022 09:51:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235424AbiCPIu6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Mar 2022 04:50:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46786 "EHLO
+        id S1354656AbiCPIwj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Mar 2022 04:52:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237574AbiCPIu4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Mar 2022 04:50:56 -0400
+        with ESMTP id S1344461AbiCPIwh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Mar 2022 04:52:37 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1C7E464BD2
-        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 01:49:43 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 517AE64BED
+        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 01:51:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647420582;
+        s=mimecast20190719; t=1647420682;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=4icPmxzgJzoNfLGIPEaiu3EGs4DB/AfIqWIUwU4iOPM=;
-        b=Sq4CeFH7dboTS4xLn78pzUBEGzIOPN7eQAF81MQ5LviDsPcFmG/ejGVF9cZ/uDH3ST7Ict
-        rGgpG8prBmhxHN3wM8G18QeWeWhWqkYREaXTgIGMYPiC0Y7rhh+eEf6JjtE6k3+jNdF9nD
-        un5b85Lym7KK/+6Ri2nIShXu7Kt9pMM=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=WMlu3K6eKY9U4Sitc08oOJDaydm2FxICxmkEb7WkAjg=;
+        b=MX2+1iTrJ17PSfSkT7aTUfMz8DdO5ObOHm0UFGlgG7KxRmhLXqyQyw7ShcyBHw1M1h0+BJ
+        dRZjVXmfQDFQkGuiuUaN1BcMPrqcW32JUA/xMAlXfG60waRkz7tW5cSTcPnVKCTY+inyor
+        qMs6t/+XuyK8pDEcdw7zIsXYNrDqa3U=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-511-vrcNAnWLM8eaguWt0pgmxg-1; Wed, 16 Mar 2022 04:49:41 -0400
-X-MC-Unique: vrcNAnWLM8eaguWt0pgmxg-1
-Received: by mail-pj1-f71.google.com with SMTP id bv2-20020a17090af18200b001c63c69a774so1351688pjb.0
-        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 01:49:40 -0700 (PDT)
+ us-mta-649-VgZkMLtFOPmkNv-1mDQDpA-1; Wed, 16 Mar 2022 04:51:21 -0400
+X-MC-Unique: VgZkMLtFOPmkNv-1mDQDpA-1
+Received: by mail-qk1-f198.google.com with SMTP id l68-20020a378947000000b0067df0c430d8so1064952qkd.13
+        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 01:51:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=4icPmxzgJzoNfLGIPEaiu3EGs4DB/AfIqWIUwU4iOPM=;
-        b=U9aNETWDQsJHPQfEPxiohkkC8HV1OHi/I3LReeHsETy9c7fTzUh4QwLHaPKD1v52CA
-         lq9T0deIF0E2Il58PeKPu0X1umHivLKSkPTIYHEmfTEYK8goM0vIQLDKRmod945duE17
-         hNlIYa+rTU3H8/9ac04vDpd+CZQ6Cl/MsJJPp81A1a/wjKeVJ5F6eWChL2ZRc67A6x+b
-         PdmS8hMiUgQNpfCKh2AmdRLWKR5kii+i3FVHF3Zee+uXp254zyM/N4p4MKQAk8hoz2xB
-         zcG+5wRgUb1sQXqGApJEfXGm0HA/VCE32+bR8jg9ct6NdsflkOrgeG/PfhlMmtRMlDMP
-         RgqQ==
-X-Gm-Message-State: AOAM531KX5ahxvSZ9MdAdEZgkP6iwa5zAeFVmoT6DFvN4JcqgOk/hlCk
-        DGYqwZNX4gx83W9CNpjrc/0UEgW2WgI/3x/9/FT6jQND4sGr/Jw4gDZpsvGSKnY+vOKQNTw9ZOi
-        8zenveb3ieT+I
-X-Received: by 2002:a17:90a:6903:b0:1c6:492:7cad with SMTP id r3-20020a17090a690300b001c604927cadmr8971469pjj.241.1647420579959;
-        Wed, 16 Mar 2022 01:49:39 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxfu8xjnOwLJ2DUAYIdjwL8+oeBFXOUhILAgGJ8izXd1dK+cnJhjNgDsFw8fcJAqon+h3ZuZQ==
-X-Received: by 2002:a17:90a:6903:b0:1c6:492:7cad with SMTP id r3-20020a17090a690300b001c604927cadmr8971439pjj.241.1647420579692;
-        Wed, 16 Mar 2022 01:49:39 -0700 (PDT)
-Received: from xz-m1.local ([191.101.132.128])
-        by smtp.gmail.com with ESMTPSA id ca9-20020a17090af30900b001c658fd7b47sm1716181pjb.36.2022.03.16.01.49.34
+        bh=WMlu3K6eKY9U4Sitc08oOJDaydm2FxICxmkEb7WkAjg=;
+        b=HHKj0QAJvT1LJ6qs1GbCdePoxzXoUrXC4vslYwt3JNRTGypiL5b2WarPEk9g273i+U
+         Oq8fFt1yCOd2NZjp0fov2MU1Kx45gMunYla9lcXtsyBhkx88YiwWQzoa1e4APLP50H34
+         gSu6FSKFag6JnEFL8BYPM/CcZdOD7dzIOCCPkop1no6a3Zcbahl3uC1ijKcKa+75FGz3
+         ie0gD1B64EMpW2WTrgeXgW4xCAg+utMz10pJtQ5tdLn8m/kbaSCKyPrCIjMrkusCgGsH
+         IHPysT7bg0iWEMYqqSISbV5qAzSXYjQLhkI9srz/OvIR5/YYdazPBzsmzPd0pI/udgPq
+         PRNQ==
+X-Gm-Message-State: AOAM531Gj34MbaFAsHpTPXBlDhfazxX/1hOay/CDaTHFr+JTO4Lv30yj
+        iz68ezw37A1Nv5xeloFvnwqotpM/w5DKev+U1QDrckM6Z39hfXKCAw68AR4DQxkN204RZpfhUPl
+        P1FNDQxXNrkUK
+X-Received: by 2002:a05:622a:13c7:b0:2de:6f6e:2fe7 with SMTP id p7-20020a05622a13c700b002de6f6e2fe7mr25263104qtk.198.1647420680814;
+        Wed, 16 Mar 2022 01:51:20 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyuAi0JfY/QXj6XW5ZULZlBNrdNUKgIdO1Q5oMPbc2+3FSG4vHPDg4XW/kGbXoPQVPYst4s7Q==
+X-Received: by 2002:a05:622a:13c7:b0:2de:6f6e:2fe7 with SMTP id p7-20020a05622a13c700b002de6f6e2fe7mr25263088qtk.198.1647420680549;
+        Wed, 16 Mar 2022 01:51:20 -0700 (PDT)
+Received: from sgarzare-redhat (host-212-171-187-184.retail.telecomitalia.it. [212.171.187.184])
+        by smtp.gmail.com with ESMTPSA id bm1-20020a05620a198100b0047bf910892bsm641043qkb.65.2022.03.16.01.51.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Mar 2022 01:49:39 -0700 (PDT)
-Date:   Wed, 16 Mar 2022 16:49:31 +0800
-From:   Peter Xu <peterx@redhat.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Sean Christopherson <seanjc@google.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Ben Gardon <bgardon@google.com>, maciej.szmigiero@oracle.com,
-        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
-        <kvmarm@lists.cs.columbia.edu>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <linux-mips@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <kvm@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>
-Subject: Re: [PATCH v2 18/26] KVM: x86/mmu: Zap collapsible SPTEs at all
- levels in the shadow MMU
-Message-ID: <YjGkmwBIwe64TjqA@xz-m1.local>
-References: <20220311002528.2230172-1-dmatlack@google.com>
- <20220311002528.2230172-19-dmatlack@google.com>
+        Wed, 16 Mar 2022 01:51:19 -0700 (PDT)
+Date:   Wed, 16 Mar 2022 09:51:13 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Krasnov Arseniy Vladimirovich <AVKrasnov@sberdevices.ru>
+Cc:     Rokosov Dmitry Dmitrievich <DDRokosov@sberdevices.ru>,
+        Krasnov Arseniy <oxffffaa@gmail.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC PATCH v2 1/2] af_vsock: SOCK_SEQPACKET receive timeout test
+Message-ID: <20220316085113.jlkj7cflzg77akmm@sgarzare-redhat>
+References: <1474b149-7d4c-27b2-7e5c-ef00a718db76@sberdevices.ru>
+ <2bc15104-37e6-088a-1699-dc27d0e2dadf@sberdevices.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20220311002528.2230172-19-dmatlack@google.com>
+In-Reply-To: <2bc15104-37e6-088a-1699-dc27d0e2dadf@sberdevices.ru>
 X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
@@ -93,57 +81,134 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 11, 2022 at 12:25:20AM +0000, David Matlack wrote:
-> Currently KVM only zaps collapsible 4KiB SPTEs in the shadow MMU (i.e.
-> in the rmap). This is fine for now KVM never creates intermediate huge
-> pages during dirty logging, i.e. a 1GiB page is never partially split to
-> a 2MiB page.
-> 
-> However, this will stop being true once the shadow MMU participates in
-> eager page splitting, which can in fact leave behind partially split
-> huge pages. In preparation for that change, change the shadow MMU to
-> iterate over all necessary levels when zapping collapsible SPTEs.
-> 
-> No functional change intended.
-> 
-> Signed-off-by: David Matlack <dmatlack@google.com>
-> ---
->  arch/x86/kvm/mmu/mmu.c | 26 +++++++++++++++++++-------
->  1 file changed, 19 insertions(+), 7 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 89a7a8d7a632..2032be3edd71 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -6142,18 +6142,30 @@ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
->  	return need_tlb_flush;
->  }
->  
-> +static void kvm_rmap_zap_collapsible_sptes(struct kvm *kvm,
-> +					   const struct kvm_memory_slot *slot)
-> +{
-> +	bool flush;
-> +
-> +	/*
-> +	 * Note, use KVM_MAX_HUGEPAGE_LEVEL - 1 since there's no need to zap
-> +	 * pages that are already mapped at the maximum possible level.
-> +	 */
-> +	flush = slot_handle_level(kvm, slot, kvm_mmu_zap_collapsible_spte,
-> +				  PG_LEVEL_4K, KVM_MAX_HUGEPAGE_LEVEL - 1,
-> +				  true);
-> +
-> +	if (flush)
-> +		kvm_arch_flush_remote_tlbs_memslot(kvm, slot);
-> +
-> +}
+On Wed, Mar 16, 2022 at 07:27:45AM +0000, Krasnov Arseniy Vladimirovich wrote:
+>Test for receive timeout check: connection is established,
+>receiver sets timeout, but sender does nothing. Receiver's
+>'read()' call must return EAGAIN.
+>
+>Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+>---
+> v1 -> v2:
+> 1) Check amount of time spent in 'read()'.
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+The patch looks correct to me, but since it's an RFC and you have to 
+send another version anyway, here are some minor suggestions :-)
 
-IMHO it looks cleaner to write it in the old way (drop the flush var).
-Maybe even unwrap the helper?
+>
+> tools/testing/vsock/vsock_test.c | 79 ++++++++++++++++++++++++++++++++
+> 1 file changed, 79 insertions(+)
+>
+>diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+>index 2a3638c0a008..6d7648cce5aa 100644
+>--- a/tools/testing/vsock/vsock_test.c
+>+++ b/tools/testing/vsock/vsock_test.c
+>@@ -16,6 +16,7 @@
+> #include <linux/kernel.h>
+> #include <sys/types.h>
+> #include <sys/socket.h>
+>+#include <time.h>
+>
+> #include "timeout.h"
+> #include "control.h"
+>@@ -391,6 +392,79 @@ static void test_seqpacket_msg_trunc_server(const struct test_opts *opts)
+> 	close(fd);
+> }
+>
+>+static time_t current_nsec(void)
+>+{
+>+	struct timespec ts;
+>+
+>+	if (clock_gettime(CLOCK_REALTIME, &ts)) {
+>+		perror("clock_gettime(3) failed");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	return (ts.tv_sec * 1000000000ULL) + ts.tv_nsec;
+>+}
+>+
+>+#define RCVTIMEO_TIMEOUT_SEC 1
+>+#define READ_OVERHEAD_NSEC 250000000 /* 0.25 sec */
+>+
+>+static void test_seqpacket_timeout_client(const struct test_opts *opts)
+>+{
+>+	int fd;
+>+	struct timeval tv;
+>+	char dummy;
+>+	time_t read_enter_ns;
+>+	time_t read_overhead_ns;
+>+
+>+	fd = vsock_seqpacket_connect(opts->peer_cid, 1234);
+>+	if (fd < 0) {
+>+		perror("connect");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	tv.tv_sec = RCVTIMEO_TIMEOUT_SEC;
+>+	tv.tv_usec = 0;
+>+
+>+	if (setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, (void *)&tv, sizeof(tv)) == -1) {
+>+		perror("setsockopt 'SO_RCVTIMEO'");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	read_enter_ns = current_nsec();
+>+
+>+	if ((read(fd, &dummy, sizeof(dummy)) != -1) ||
+>+	    (errno != EAGAIN)) {
 
-Thanks,
+Here we can split in 2 checks like in patch 2, since if read() return 
+value is >= 0, errno is not set.
 
--- 
-Peter Xu
+>+		perror("EAGAIN expected");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	read_overhead_ns = current_nsec() - read_enter_ns -
+>+			1000000000ULL * RCVTIMEO_TIMEOUT_SEC;
+>+
+>+	if (read_overhead_ns > READ_OVERHEAD_NSEC) {
+>+		fprintf(stderr,
+>+			"too much time in read(2) with SO_RCVTIMEO: %lu ns\n",
+>+			read_overhead_ns);
+
+What about printing also the expected overhead?
+
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	control_writeln("WAITDONE");
+>+	close(fd);
+>+}
+>+
+>+static void test_seqpacket_timeout_server(const struct test_opts *opts)
+>+{
+>+	int fd;
+>+
+>+	fd = vsock_seqpacket_accept(VMADDR_CID_ANY, 1234, NULL);
+>+	if (fd < 0) {
+>+		perror("accept");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	control_expectln("WAITDONE");
+>+	close(fd);
+>+}
+>+
+> static struct test_case test_cases[] = {
+> 	{
+> 		.name = "SOCK_STREAM connection reset",
+>@@ -431,6 +505,11 @@ static struct test_case test_cases[] = {
+> 		.run_client = test_seqpacket_msg_trunc_client,
+> 		.run_server = test_seqpacket_msg_trunc_server,
+> 	},
+>+	{
+>+		.name = "SOCK_SEQPACKET timeout",
+>+		.run_client = test_seqpacket_timeout_client,
+>+		.run_server = test_seqpacket_timeout_server,
+>+	},
+> 	{},
+> };
+>
+>-- 
+>2.25.1
 
