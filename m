@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1ACC84DACBA
-	for <lists+kvm@lfdr.de>; Wed, 16 Mar 2022 09:44:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8B57B4DACD4
+	for <lists+kvm@lfdr.de>; Wed, 16 Mar 2022 09:49:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345313AbiCPIpj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Mar 2022 04:45:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34276 "EHLO
+        id S235424AbiCPIu6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Mar 2022 04:50:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232210AbiCPIpi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Mar 2022 04:45:38 -0400
+        with ESMTP id S237574AbiCPIu4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Mar 2022 04:50:56 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4D78D340C3
-        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 01:44:21 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1C7E464BD2
+        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 01:49:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647420260;
+        s=mimecast20190719; t=1647420582;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=1ZQesErDQxJhbNTlel7Pn8Vb/5JIOEBvnS29Fn8zDoI=;
-        b=H2MR4lfETyZ8OOYqECrFoBi/8I00uXd53axbeAoRZByXwerQZQN6+jrRFng4q4OHe4Oltz
-        xMh9w55zTP2Y0VZEd+nq9v9PSsGkPuG5BP3CoIGjup9r9CIJIOIr5f4AHvKjHUSpUVgV7R
-        wrAfmc9d3D75CPkuSxHR1hITzI6/W4c=
-Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com
- [209.85.210.197]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=4icPmxzgJzoNfLGIPEaiu3EGs4DB/AfIqWIUwU4iOPM=;
+        b=Sq4CeFH7dboTS4xLn78pzUBEGzIOPN7eQAF81MQ5LviDsPcFmG/ejGVF9cZ/uDH3ST7Ict
+        rGgpG8prBmhxHN3wM8G18QeWeWhWqkYREaXTgIGMYPiC0Y7rhh+eEf6JjtE6k3+jNdF9nD
+        un5b85Lym7KK/+6Ri2nIShXu7Kt9pMM=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-659-XNrPj6ZTP3-v4gefWM-xAA-1; Wed, 16 Mar 2022 04:44:19 -0400
-X-MC-Unique: XNrPj6ZTP3-v4gefWM-xAA-1
-Received: by mail-pf1-f197.google.com with SMTP id w68-20020a62dd47000000b004f6aa5e4824so1451651pff.4
-        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 01:44:19 -0700 (PDT)
+ us-mta-511-vrcNAnWLM8eaguWt0pgmxg-1; Wed, 16 Mar 2022 04:49:41 -0400
+X-MC-Unique: vrcNAnWLM8eaguWt0pgmxg-1
+Received: by mail-pj1-f71.google.com with SMTP id bv2-20020a17090af18200b001c63c69a774so1351688pjb.0
+        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 01:49:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=1ZQesErDQxJhbNTlel7Pn8Vb/5JIOEBvnS29Fn8zDoI=;
-        b=taAes+LNoaRHz9AghLrVImBvitNRHVYQffK8mlkAvHKJ7c1a1CmRqauSS36tBtJi9T
-         /FmEeAGTOePVyN75EGmrLX5NKR/A4W/Sd4Iwi5dTZ07Go/STs50dn6v1kBbJgjA0MHT9
-         OP765cb6oJuwuDWP0Yc0FPRFlVLwDRn/y9VXaBMHu7MYh3f2WDQ8IIoKhWDaDfFj/BQY
-         X2MWcp8illTHcF4lJsMD+2Ppc3OsWErt9UgE/uqNlid0/os9fQVTV2mNUzocyrz2HRmQ
-         /KO8O+Tq6rL6zjUs0rtDiLuGQgG9f9CM8T3KjeBfhuGwjHSkroTCxV9/ow4FHXy/d8YK
-         LjhQ==
-X-Gm-Message-State: AOAM533bek7H3Xlsaa1jufWWqTQ0UqOLNDEzumPb5BE404YFxOqJDejc
-        vtaADJo20/XKvcVq7VI7ShhkfuCjVEH4WtNEYjEQrYCOBa5My2Kd4/bmqb90m+GHqVaTpf3LOXT
-        BOSH8a93ZZirY
-X-Received: by 2002:a05:6a00:170c:b0:4f7:658d:77a2 with SMTP id h12-20020a056a00170c00b004f7658d77a2mr33249773pfc.60.1647420258154;
-        Wed, 16 Mar 2022 01:44:18 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwf5n0IdTCbTV5mIpfQa8fPfAwUPw+X6hCobMzk5jCneFEdxWl5Yk9KwxIn4gIMUVJ5GpzGRg==
-X-Received: by 2002:a05:6a00:170c:b0:4f7:658d:77a2 with SMTP id h12-20020a056a00170c00b004f7658d77a2mr33249747pfc.60.1647420257911;
-        Wed, 16 Mar 2022 01:44:17 -0700 (PDT)
+        bh=4icPmxzgJzoNfLGIPEaiu3EGs4DB/AfIqWIUwU4iOPM=;
+        b=U9aNETWDQsJHPQfEPxiohkkC8HV1OHi/I3LReeHsETy9c7fTzUh4QwLHaPKD1v52CA
+         lq9T0deIF0E2Il58PeKPu0X1umHivLKSkPTIYHEmfTEYK8goM0vIQLDKRmod945duE17
+         hNlIYa+rTU3H8/9ac04vDpd+CZQ6Cl/MsJJPp81A1a/wjKeVJ5F6eWChL2ZRc67A6x+b
+         PdmS8hMiUgQNpfCKh2AmdRLWKR5kii+i3FVHF3Zee+uXp254zyM/N4p4MKQAk8hoz2xB
+         zcG+5wRgUb1sQXqGApJEfXGm0HA/VCE32+bR8jg9ct6NdsflkOrgeG/PfhlMmtRMlDMP
+         RgqQ==
+X-Gm-Message-State: AOAM531KX5ahxvSZ9MdAdEZgkP6iwa5zAeFVmoT6DFvN4JcqgOk/hlCk
+        DGYqwZNX4gx83W9CNpjrc/0UEgW2WgI/3x/9/FT6jQND4sGr/Jw4gDZpsvGSKnY+vOKQNTw9ZOi
+        8zenveb3ieT+I
+X-Received: by 2002:a17:90a:6903:b0:1c6:492:7cad with SMTP id r3-20020a17090a690300b001c604927cadmr8971469pjj.241.1647420579959;
+        Wed, 16 Mar 2022 01:49:39 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxfu8xjnOwLJ2DUAYIdjwL8+oeBFXOUhILAgGJ8izXd1dK+cnJhjNgDsFw8fcJAqon+h3ZuZQ==
+X-Received: by 2002:a17:90a:6903:b0:1c6:492:7cad with SMTP id r3-20020a17090a690300b001c604927cadmr8971439pjj.241.1647420579692;
+        Wed, 16 Mar 2022 01:49:39 -0700 (PDT)
 Received: from xz-m1.local ([191.101.132.128])
-        by smtp.gmail.com with ESMTPSA id o5-20020a056a0015c500b004f76735be68sm2185059pfu.216.2022.03.16.01.44.11
+        by smtp.gmail.com with ESMTPSA id ca9-20020a17090af30900b001c658fd7b47sm1716181pjb.36.2022.03.16.01.49.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Mar 2022 01:44:17 -0700 (PDT)
-Date:   Wed, 16 Mar 2022 16:44:09 +0800
+        Wed, 16 Mar 2022 01:49:39 -0700 (PDT)
+Date:   Wed, 16 Mar 2022 16:49:31 +0800
 From:   Peter Xu <peterx@redhat.com>
 To:     David Matlack <dmatlack@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
@@ -74,41 +74,75 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
         <kvm@vger.kernel.org>,
         "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
         <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>
-Subject: Re: [PATCH v2 17/26] KVM: x86/mmu: Pass access information to
- make_huge_page_split_spte()
-Message-ID: <YjGjWcmn+7sZPjNX@xz-m1.local>
+Subject: Re: [PATCH v2 18/26] KVM: x86/mmu: Zap collapsible SPTEs at all
+ levels in the shadow MMU
+Message-ID: <YjGkmwBIwe64TjqA@xz-m1.local>
 References: <20220311002528.2230172-1-dmatlack@google.com>
- <20220311002528.2230172-18-dmatlack@google.com>
+ <20220311002528.2230172-19-dmatlack@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20220311002528.2230172-18-dmatlack@google.com>
+In-Reply-To: <20220311002528.2230172-19-dmatlack@google.com>
 X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 11, 2022 at 12:25:19AM +0000, David Matlack wrote:
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 85b7bc333302..541b145b2df2 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -1430,7 +1430,7 @@ static int tdp_mmu_split_huge_page(struct kvm *kvm, struct tdp_iter *iter,
->  	 * not been linked in yet and thus is not reachable from any other CPU.
->  	 */
->  	for (i = 0; i < PT64_ENT_PER_PAGE; i++)
-> -		sp->spt[i] = make_huge_page_split_spte(huge_spte, level, i);
-> +		sp->spt[i] = make_huge_page_split_spte(huge_spte, level, i, ACC_ALL);
+On Fri, Mar 11, 2022 at 12:25:20AM +0000, David Matlack wrote:
+> Currently KVM only zaps collapsible 4KiB SPTEs in the shadow MMU (i.e.
+> in the rmap). This is fine for now KVM never creates intermediate huge
+> pages during dirty logging, i.e. a 1GiB page is never partially split to
+> a 2MiB page.
+> 
+> However, this will stop being true once the shadow MMU participates in
+> eager page splitting, which can in fact leave behind partially split
+> huge pages. In preparation for that change, change the shadow MMU to
+> iterate over all necessary levels when zapping collapsible SPTEs.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: David Matlack <dmatlack@google.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 26 +++++++++++++++++++-------
+>  1 file changed, 19 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 89a7a8d7a632..2032be3edd71 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -6142,18 +6142,30 @@ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
+>  	return need_tlb_flush;
+>  }
+>  
+> +static void kvm_rmap_zap_collapsible_sptes(struct kvm *kvm,
+> +					   const struct kvm_memory_slot *slot)
+> +{
+> +	bool flush;
+> +
+> +	/*
+> +	 * Note, use KVM_MAX_HUGEPAGE_LEVEL - 1 since there's no need to zap
+> +	 * pages that are already mapped at the maximum possible level.
+> +	 */
+> +	flush = slot_handle_level(kvm, slot, kvm_mmu_zap_collapsible_spte,
+> +				  PG_LEVEL_4K, KVM_MAX_HUGEPAGE_LEVEL - 1,
+> +				  true);
+> +
+> +	if (flush)
+> +		kvm_arch_flush_remote_tlbs_memslot(kvm, slot);
+> +
+> +}
 
-Pure question: is it possible that huge_spte is RO while we passed in
-ACC_ALL here (which has the write bit set)?  Would it be better if we make
-it a "bool exec" to be clearer?
+Reviewed-by: Peter Xu <peterx@redhat.com>
+
+IMHO it looks cleaner to write it in the old way (drop the flush var).
+Maybe even unwrap the helper?
+
+Thanks,
 
 -- 
 Peter Xu
