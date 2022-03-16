@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E391C4DAD77
-	for <lists+kvm@lfdr.de>; Wed, 16 Mar 2022 10:27:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C59E4DAD83
+	for <lists+kvm@lfdr.de>; Wed, 16 Mar 2022 10:29:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346329AbiCPJ2l (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Mar 2022 05:28:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33574 "EHLO
+        id S1346468AbiCPJbI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Mar 2022 05:31:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234300AbiCPJ2j (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Mar 2022 05:28:39 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB18363500
-        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 02:27:24 -0700 (PDT)
+        with ESMTP id S1354862AbiCPJbH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Mar 2022 05:31:07 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCD966542D
+        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 02:29:53 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 78B8B615AA
-        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 09:27:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7182C340E9;
-        Wed, 16 Mar 2022 09:27:23 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 7775DB818CC
+        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 09:29:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AD7BC340E9;
+        Wed, 16 Mar 2022 09:29:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1647422843;
-        bh=MKTBVvZC36ySOk7uu1pI9+HCSVtzY329jPCiKPZeyp0=;
+        s=k20201202; t=1647422991;
+        bh=1vXKNeCRC0cZGyzI8jX4TQSJODbg9VTgs4jqJgQbSUw=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=pCTi/H+G27JYycabXQk/rSsJajMBy1o7ZdBsCM/SA702IMKk9HYL6dxYlHtotnIcw
-         6AN7PyDHR0EKY1vxBiOGw/V3ZkIwxgm19GKCbAV/vx6KOdCB1lt7IoMlXZW9cJDFvy
-         updRqn0Pembh4FnMIBjVTalhu1Gf+B/ySHwyh4yItzHoxd2tMMMiUtaKqbjlsjaKh9
-         M1LWp5McMvJRfLOCb26c16GgTZdCJswB9ZzzzlhazuUxaqhQwEjxLNaXx5cNdOzMk9
-         sjZcnBMH+EasPadLYtWsoahF71xFVPilJDstJ+f0y3SmQG0ruxgayh0UxXrrmbCuCh
-         qn7Fck0I+M3OA==
+        b=Pi7GoBFZUcF+3h4BPp8qEYOXeUt3hwT7/nE5DtGw5/a+uYrcM9mg2JX85TXVobBLm
+         NZO374EHJYqz+ciqQaJ5F16mcwxz89SIQyA/HmDxHcoNO88CSKdpoxOgCVdn8LU5DT
+         pVXcUBCVQfP4PYfjA8nPM3WLF+0wy/WzogrTAOokDHUKF21xNaFroIrtM7J/GGILp7
+         TV+WlrOk01GTpwzQRn4wp+hJwc/p7YbIRexWBDuoQ7otWVuFgbm01NCs5EmLP3wOi6
+         xJBG/9CXRjj0MVthDfTo4gSs0iGW70v3fVZVG6hJdBN9S2+yLovgfxE4TOl1Pil17X
+         ChIRGHw+mXrYA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1nUPw9-00EsLm-D2; Wed, 16 Mar 2022 09:27:21 +0000
-Date:   Wed, 16 Mar 2022 09:27:21 +0000
-Message-ID: <87ee32z1qe.wl-maz@kernel.org>
+        id 1nUPyW-00EsOD-JP; Wed, 16 Mar 2022 09:29:49 +0000
+Date:   Wed, 16 Mar 2022 09:29:48 +0000
+Message-ID: <87czimz1mb.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Oliver Upton <oupton@google.com>
 Cc:     linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
         kvmarm@lists.cs.columbia.edu, kernel-team@android.com,
         Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH 4/4] KVM: arm64: vgic-v3: Advertise GICR_CTLR.{IR, CES} as a new GICD_IIDR revision
-In-Reply-To: <YjEdhVFKTkS4GiIS@google.com>
+Subject: Re: [PATCH 1/4] irqchip/gic-v3: Exposes bit values for GICR_CTLR.{IR, CES}
+In-Reply-To: <YjEeNThfYFtTffWz@google.com>
 References: <20220314164044.772709-1-maz@kernel.org>
-        <20220314164044.772709-5-maz@kernel.org>
-        <YjEdhVFKTkS4GiIS@google.com>
+        <20220314164044.772709-2-maz@kernel.org>
+        <YjEeNThfYFtTffWz@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -67,138 +67,38 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 15 Mar 2022 23:13:09 +0000,
+On Tue, 15 Mar 2022 23:16:05 +0000,
 Oliver Upton <oupton@google.com> wrote:
 > 
 > Hi Marc,
 > 
-> On Mon, Mar 14, 2022 at 04:40:44PM +0000, Marc Zyngier wrote:
-> > Since adversising GICR_CTLR.{IC,CES} is directly observable from
-> > a guest, we need to make it selectable from userspace.
-> > 
-> > For that, bump the default GICD_IIDR revision and let userspace
-> > downgrade it to the previous default. For GICv2, the two distributor
-> > revisions are strictly equivalent.
+> On Mon, Mar 14, 2022 at 04:40:41PM +0000, Marc Zyngier wrote:
+> > As we're about to expose GICR_CTLR.{IR,CES} to guests, populate
+> > the include file with the architectural values.
 > > 
 > > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > > ---
-> >  arch/arm64/kvm/vgic/vgic-init.c    |  7 ++++++-
-> >  arch/arm64/kvm/vgic/vgic-mmio-v2.c | 18 +++++++++++++++---
-> >  arch/arm64/kvm/vgic/vgic-mmio-v3.c | 23 +++++++++++++++++++++--
-> >  include/kvm/arm_vgic.h             |  3 +++
-> >  4 files changed, 45 insertions(+), 6 deletions(-)
+> >  include/linux/irqchip/arm-gic-v3.h | 2 ++
+> >  1 file changed, 2 insertions(+)
 > > 
-> > diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-> > index fc00304fe7d8..f84e04f334c6 100644
-> > --- a/arch/arm64/kvm/vgic/vgic-init.c
-> > +++ b/arch/arm64/kvm/vgic/vgic-init.c
-> > @@ -319,7 +319,12 @@ int vgic_init(struct kvm *kvm)
+> > diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+> > index 12d91f0dedf9..aeb8ced53880 100644
+> > --- a/include/linux/irqchip/arm-gic-v3.h
+> > +++ b/include/linux/irqchip/arm-gic-v3.h
+> > @@ -127,6 +127,8 @@
+> >  #define GICR_PIDR2			GICD_PIDR2
 > >  
-> >  	vgic_debug_init(kvm);
-> >  
-> > -	dist->implementation_rev = 2;
-> > +	/*
-> > +	 * If userspace didn't set the GIC implementation revision,
-> > +	 * default to the latest and greatest. You know want it.
-> > +	 */
-> > +	if (!dist->implementation_rev)
-> > +		dist->implementation_rev = KVM_VGIC_IMP_REV_LATEST;
-> >  	dist->initialized = true;
-> >  
-> >  out:
-> > diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v2.c b/arch/arm64/kvm/vgic/vgic-mmio-v2.c
-> > index 12e4c223e6b8..f2246c4ca812 100644
-> > --- a/arch/arm64/kvm/vgic/vgic-mmio-v2.c
-> > +++ b/arch/arm64/kvm/vgic/vgic-mmio-v2.c
-> > @@ -73,9 +73,13 @@ static int vgic_mmio_uaccess_write_v2_misc(struct kvm_vcpu *vcpu,
-> >  					   gpa_t addr, unsigned int len,
-> >  					   unsigned long val)
-> >  {
-> > +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
-> > +	u32 reg;
-> > +
-> >  	switch (addr & 0x0c) {
-> >  	case GIC_DIST_IIDR:
-> > -		if (val != vgic_mmio_read_v2_misc(vcpu, addr, len))
-> > +		reg = vgic_mmio_read_v2_misc(vcpu, addr, len);
-> > +		if ((reg ^ val) & ~GICD_IIDR_REVISION_MASK)
-> >  			return -EINVAL;
-> >  
-> >  		/*
-> > @@ -87,8 +91,16 @@ static int vgic_mmio_uaccess_write_v2_misc(struct kvm_vcpu *vcpu,
-> >  		 * migration from old kernels to new kernels with legacy
-> >  		 * userspace.
-> >  		 */
-> > -		vcpu->kvm->arch.vgic.v2_groups_user_writable = true;
-> > -		return 0;
-> > +		reg = FIELD_GET(GICD_IIDR_REVISION_MASK, reg);
-> > +		switch (reg) {
-> > +		case KVM_VGIC_IMP_REV_2:
-> > +		case KVM_VGIC_IMP_REV_3:
-> > +			dist->v2_groups_user_writable = true;
+> >  #define GICR_CTLR_ENABLE_LPIS		(1UL << 0)
+> > +#define GICR_CTLR_IR			(1UL << 1)
+> > +#define GICR_CTLR_CES			(1UL << 2)
 > 
-> Could you eliminate this bool and just pivot off of the implementation
-> version?
+> I think these are backwards (IR is bit 2)
 
-Good point. Having a non-zero implementation will serve the same
-purpose. The drawback is that we lose the documentation aspect of the
-field, but we can probably work around that.
+How embarrassing... The whole thing only works because we always
+advertise the two bits together, and that the GIC driver has the same
+bug. Fortunately, I'm running low on paper bags... ;-)
 
-> 
-> > +			dist->implementation_rev = reg;
-> > +			return 0;
-> > +		default:
-> > +			return -EINVAL;
-> > +		}
-> >  	}
-> >  
-> >  	vgic_mmio_write_v2_misc(vcpu, addr, len, val);
-> > diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> > index a6be403996c6..4c8e4f83e3d1 100644
-> > --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> > +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> > @@ -155,13 +155,27 @@ static int vgic_mmio_uaccess_write_v3_misc(struct kvm_vcpu *vcpu,
-> >  					   unsigned long val)
-> >  {
-> >  	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
-> > +	u32 reg;
-> >  
-> >  	switch (addr & 0x0c) {
-> >  	case GICD_TYPER2:
-> > -	case GICD_IIDR:
-> >  		if (val != vgic_mmio_read_v3_misc(vcpu, addr, len))
-> >  			return -EINVAL;
-> >  		return 0;
-> > +	case GICD_IIDR:
-> > +		reg = vgic_mmio_read_v3_misc(vcpu, addr, len);
-> > +		if ((reg ^ val) & ~GICD_IIDR_REVISION_MASK)
-> > +			return -EINVAL;
-> > +
-> > +		reg = FIELD_GET(GICD_IIDR_REVISION_MASK, reg);
-> > +		switch (reg) {
-> > +		case KVM_VGIC_IMP_REV_2:
-> > +		case KVM_VGIC_IMP_REV_3:
-> > +			dist->implementation_rev = reg;
-> > +			return 0;
-> > +		default:
-> > +			return -EINVAL;
-> > +		}
-> >  	case GICD_CTLR:
-> >  		/* Not a GICv4.1? No HW SGIs */
-> >  		if (!kvm_vgic_global_state.has_gicv4_1)
-> > @@ -232,8 +246,13 @@ static unsigned long vgic_mmio_read_v3r_ctlr(struct kvm_vcpu *vcpu,
-> >  					     gpa_t addr, unsigned int len)
-> >  {
-> >  	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-> > +	unsigned long val;
-> > +
-> > +	val = atomic_read(&vgic_cpu->ctlr);
-> > +	if (vcpu->kvm->arch.vgic.implementation_rev >= KVM_VGIC_IMP_REV_3)
-> 
-> That's a lot of indirection :) Could you make a helper for getting at
-> the implementation revision from a vCPU pointer?
-
-Sure, as there will be two users now.
+I'll push a fix for that shortly.
 
 Thanks,
 
