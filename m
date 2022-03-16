@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3CC504DB7C1
-	for <lists+kvm@lfdr.de>; Wed, 16 Mar 2022 19:07:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B70B4DB7C3
+	for <lists+kvm@lfdr.de>; Wed, 16 Mar 2022 19:08:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348473AbiCPSIu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Mar 2022 14:08:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49922 "EHLO
+        id S1352900AbiCPSJy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Mar 2022 14:09:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52630 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234022AbiCPSIr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Mar 2022 14:08:47 -0400
-Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 574254D9CF
-        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 11:07:33 -0700 (PDT)
-Received: by mail-yb1-xb2f.google.com with SMTP id v130so5820293ybe.13
-        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 11:07:33 -0700 (PDT)
+        with ESMTP id S1346985AbiCPSJx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Mar 2022 14:09:53 -0400
+Received: from mail-yw1-x1134.google.com (mail-yw1-x1134.google.com [IPv6:2607:f8b0:4864:20::1134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FAC540912
+        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 11:08:35 -0700 (PDT)
+Received: by mail-yw1-x1134.google.com with SMTP id 00721157ae682-2e5757b57caso32865207b3.4
+        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 11:08:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=PnmkVyhkE9O12y1T9viSC5Yt4nwOSPLkRDwt3vG/CDc=;
-        b=LjuosIEEYYEzAVjUbeyd05n+XRZzzyXQNWGnpxPY2Xw5NcS8D/uvf0EdccSmRJXhKb
-         VpxTrEcAMFfOx+DDZGxmQq5X9JqfajNjpZ5oh9YWlyb5XlHxa/e/rgKthm6WmIYj32eH
-         mFwav9CCGijv6u7q9+Vsfemo5DDQ58bYM1D38UTdt+0Jv/K0UzeDfncjWD3T+NurGmRP
-         KKmJ/jOKi+kl9wQaNhs75a998Db2r2mVDjCdyQkNxWPakeWljy3n5t0Cc9bE6cio7KZy
-         BT7qh5hXsLc/8tcJopJD7VEVUlEbMUKZO7CGstjRGP7gfreFy2KLA5m30PoD+ocDI6FR
-         FGDQ==
+        bh=3CDjfOL4XFTPKtqkiMbluAfDpGLLRX/OLiG6A0cIlYo=;
+        b=hExUsyci03m5zCmQTtzwqNbi3CA3fC0gMNnhcGQdonXMlNIbl4bgAgKnIUpYUrjCc7
+         xIbiBH+T4/jr8APBvlkTpLWt0hBd7IjhkDZQSOM3GL0AEHXWOw7xfr/iCAk10ANXl4mO
+         sorBYvHdq3G+xzlYmVaoVyE3LCLUN2q0mn/3CCUl9eddB+QwsGD8mIgGhCRlpilm9Nj1
+         8cNvAuKoTKvKldjxZgITbTtauRs5g+pLfgDLrwU7OqeeuptXG1/m04e3+yS24y7cQ3X4
+         eHV1ISKFEac0LgYamNGi83NBHcYRi0oGLWrbmINJV2Xk5Di24z2B2tj95dldAyeAz/Jf
+         +oLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=PnmkVyhkE9O12y1T9viSC5Yt4nwOSPLkRDwt3vG/CDc=;
-        b=CLBk4qd4VzLhrTyBViFViLHlZNOPECtXO16ikg3yimf5NiMUhSrG9uhFWJ8XkwqVf0
-         UDhKuYrnJqtcWLVfZTPc2bkMvTyovv/JHQTHAHoB5arDhG35fAtyCu4v1VsuFNz4Kmvu
-         YfGFEe/hucRA0ubkvjwmt9KMnombCDG5Y3uqJE3/iLGw10yyBvUsjg8q0meukQImW9ah
-         Ib47Un8VM6WDnX1O27f6dSP7BhHE5HOcqqBHyReGzY9/YuJ0PXkq+QFvyNRBJ49PY1Ty
-         iLoGQ/5aoa0VqgcDeWyIOJWHrzDMlzQpmV/I6xZc6wr3J/3qNrF/XLKBEy5xyp+xmd81
-         jWCQ==
-X-Gm-Message-State: AOAM532ViHqq9R1WhODZgt7fYF8YH+kjoZUiCbSK9hl19kRDrvwNSsje
-        yPmNdDRkPgSTmwF/nfMhcXFigHYS6z+uC+y+hhKJuQ==
-X-Google-Smtp-Source: ABdhPJyyXFoQn1uerPs5goPnQmblKmVx5IKBTpH/PqBXtW4BaLiDyXA8LgJB5YBszNuVqJzUMU8TQOGvQDlBfaX/Z0A=
-X-Received: by 2002:a25:d191:0:b0:628:79ad:1e61 with SMTP id
- i139-20020a25d191000000b0062879ad1e61mr1147185ybg.255.1647454052316; Wed, 16
- Mar 2022 11:07:32 -0700 (PDT)
+        bh=3CDjfOL4XFTPKtqkiMbluAfDpGLLRX/OLiG6A0cIlYo=;
+        b=faXzS5ZMCKDpSvT5EnMHGmdEU5aAoyma8u0aynHYoIz5H8ZsBRc2nVWnsdjDyDHXhm
+         5MBOGENOuAd6jRa1cBMtbQ9Vhy8ADrqdbKblGVGTBlCmjdeWNdhYNnkdSmbz0w9NKFtO
+         NZEZ3RHr7uWnM9BVpi2RGdAmvWlh0whXZxFZaaCP7DM5Vt0O66Eb6hZ5MBqusaWl4SGw
+         Rcb/6/Scwn/zOiBSWYXrd8L3RBfWsA8GyKXktNfeJBYMjrOp62Fz8EhFQu+v5CBq5WRP
+         TCCao4q5FQNMEahR9nR3a+4POI1jpfT7tbDZVXFdpADObAnlZik0d33/QDz4/CkU+9Cc
+         2+Kg==
+X-Gm-Message-State: AOAM532i0unnsom4RK3BWFesn0hzOaPU25vkQytBnit3VAVRVd0UiIGo
+        C/XFBNL+L3I99ldOzvS28M4Vae4RUwBVVkbW9tF/Vg==
+X-Google-Smtp-Source: ABdhPJyDTOAGXwtrebGZcXucTwsLsj1Q/imZHVIr0HVDQ+3kr7CTR5NCgMAPcperilieXGykzEPRF8KMiwEtvNQRIpE=
+X-Received: by 2002:a81:53c2:0:b0:2dc:3600:7db3 with SMTP id
+ h185-20020a8153c2000000b002dc36007db3mr1455805ywb.23.1647454114295; Wed, 16
+ Mar 2022 11:08:34 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220311060207.2438667-1-ricarkol@google.com> <20220311060207.2438667-5-ricarkol@google.com>
-In-Reply-To: <20220311060207.2438667-5-ricarkol@google.com>
+References: <20220311060207.2438667-1-ricarkol@google.com> <20220311060207.2438667-3-ricarkol@google.com>
+In-Reply-To: <20220311060207.2438667-3-ricarkol@google.com>
 From:   Ben Gardon <bgardon@google.com>
-Date:   Wed, 16 Mar 2022 12:07:21 -0600
-Message-ID: <CANgfPd8u_K3cOpaUPY8+rU+4RFehj8J61gdzuDyOZv4dSDZ+xQ@mail.gmail.com>
-Subject: Re: [PATCH 04/11] KVM: selftests: Add vm_alloc_page_table_in_memslot
+Date:   Wed, 16 Mar 2022 12:08:23 -0600
+Message-ID: <CANgfPd_iRBDX=mtBy80G0R9U-BfukLV0H3SyrBr+jvK1e8BRvA@mail.gmail.com>
+Subject: Re: [PATCH 02/11] KVM: selftests: Add vm_mem_region_get_src_fd
  library function
 To:     Ricardo Koller <ricarkol@google.com>
 Cc:     kvm <kvm@vger.kernel.org>, kvmarm@lists.cs.columbia.edu,
@@ -77,60 +77,64 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On Fri, Mar 11, 2022 at 12:02 AM Ricardo Koller <ricarkol@google.com> wrote:
 >
-> Add a library function to allocate a page-table physical page in a
-> particular memslot.  The default behavior is to create new page-table
-> pages in memslot 0.
+> Add a library function to get the backing source FD of a memslot.
 >
 > Signed-off-by: Ricardo Koller <ricarkol@google.com>
 
-This is very similar to one of the patches in the NX hugepages control
-series I sent out last week, I guess we both had similar needs at the
-same time.
-Your solution introduces way less churn though, so it's probably
-better. I might use this commit or wait for it to be merged before I
-send out v2 of my NX control series.
-
-In any case,
-Reviewed-by: Ben Gardon <bgardon@google.com>
+This appears to be dead code as of this commit, would recommend
+merging it into the commit in which it's actually used.
 
 > ---
->  tools/testing/selftests/kvm/include/kvm_util_base.h | 1 +
->  tools/testing/selftests/kvm/lib/kvm_util.c          | 8 +++++++-
->  2 files changed, 8 insertions(+), 1 deletion(-)
+>  .../selftests/kvm/include/kvm_util_base.h     |  1 +
+>  tools/testing/selftests/kvm/lib/kvm_util.c    | 23 +++++++++++++++++++
+>  2 files changed, 24 insertions(+)
 >
 > diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> index d6acec0858c0..c8dce12a9a52 100644
+> index 4ed6aa049a91..d6acec0858c0 100644
 > --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
 > +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> @@ -307,6 +307,7 @@ vm_paddr_t vm_phy_page_alloc(struct kvm_vm *vm, vm_paddr_t paddr_min,
->  vm_paddr_t vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
->                               vm_paddr_t paddr_min, uint32_t memslot);
->  vm_paddr_t vm_alloc_page_table(struct kvm_vm *vm);
-> +vm_paddr_t vm_alloc_page_table_in_memslot(struct kvm_vm *vm, uint32_t pt_memslot);
->
->  /*
->   * Create a VM with reasonable defaults
+> @@ -163,6 +163,7 @@ int _kvm_ioctl(struct kvm_vm *vm, unsigned long ioctl, void *arg);
+>  void vm_mem_region_set_flags(struct kvm_vm *vm, uint32_t slot, uint32_t flags);
+>  void vm_mem_region_move(struct kvm_vm *vm, uint32_t slot, uint64_t new_gpa);
+>  void vm_mem_region_delete(struct kvm_vm *vm, uint32_t slot);
+> +int vm_mem_region_get_src_fd(struct kvm_vm *vm, uint32_t memslot);
+>  void vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpuid);
+>  vm_vaddr_t vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min);
+>  vm_vaddr_t vm_vaddr_alloc_pages(struct kvm_vm *vm, int nr_pages);
 > diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index 64ef245b73de..ae21564241c8 100644
+> index d8cf851ab119..64ef245b73de 100644
 > --- a/tools/testing/selftests/kvm/lib/kvm_util.c
 > +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -2409,9 +2409,15 @@ vm_paddr_t vm_phy_page_alloc(struct kvm_vm *vm, vm_paddr_t paddr_min,
->  /* Arbitrary minimum physical address used for virtual translation tables. */
->  #define KVM_GUEST_PAGE_TABLE_MIN_PADDR 0x180000
->
-> +vm_paddr_t vm_alloc_page_table_in_memslot(struct kvm_vm *vm, uint32_t pt_memslot)
-> +{
-> +       return vm_phy_page_alloc(vm, KVM_GUEST_PAGE_TABLE_MIN_PADDR,
-> +                       pt_memslot);
-> +}
-> +
->  vm_paddr_t vm_alloc_page_table(struct kvm_vm *vm)
->  {
-> -       return vm_phy_page_alloc(vm, KVM_GUEST_PAGE_TABLE_MIN_PADDR, 0);
-> +       return vm_alloc_page_table_in_memslot(vm, 0);
+> @@ -580,6 +580,29 @@ kvm_userspace_memory_region_find(struct kvm_vm *vm, uint64_t start,
+>         return &region->region;
 >  }
 >
+> +/*
+> + * KVM Userspace Memory Get Backing Source FD
+> + *
+> + * Input Args:
+> + *   vm - Virtual Machine
+> + *   memslot - KVM memory slot ID
+> + *
+> + * Output Args: None
+> + *
+> + * Return:
+> + *   Backing source file descriptor, -1 if the memslot is an anonymous region.
+> + *
+> + * Returns the backing source fd of a memslot, so tests can use it to punch
+> + * holes, or to setup permissions.
+> + */
+> +int vm_mem_region_get_src_fd(struct kvm_vm *vm, uint32_t memslot)
+> +{
+> +       struct userspace_mem_region *region;
+> +
+> +       region = memslot2region(vm, memslot);
+> +       return region->fd;
+> +}
+> +
 >  /*
+>   * VCPU Find
+>   *
 > --
 > 2.35.1.723.g4982287a31-goog
 >
