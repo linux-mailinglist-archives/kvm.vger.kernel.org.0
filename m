@@ -2,184 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D126D4DAD29
-	for <lists+kvm@lfdr.de>; Wed, 16 Mar 2022 10:04:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 728DF4DAD2C
+	for <lists+kvm@lfdr.de>; Wed, 16 Mar 2022 10:04:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345055AbiCPJFr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Mar 2022 05:05:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51746 "EHLO
+        id S1354802AbiCPJGG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Mar 2022 05:06:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230383AbiCPJFq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Mar 2022 05:05:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4866B517D6
-        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 02:04:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647421471;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=p4b18JDdIA23xku1asRfU8GSHk5Hq4wQ8NYHafXEvJw=;
-        b=Yaxx6FcltDWy2LOOxZfGfLMo/7HIlRXilWehR5OA+3llT9AqV08aTp49cnfwB2dtv2Q1gq
-        QLvYGhyekRc5pIvZWa7C8nUN0lVHoHdvrOHQvA2Zw+6SB+Z+HzMEppdGNBB30FLQZ98QY7
-        AFE07yaMMTWfJTB99Fqpl17cHodwSl0=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-110-ZZiqXhfTOTOJLldNSEaJYg-1; Wed, 16 Mar 2022 05:04:30 -0400
-X-MC-Unique: ZZiqXhfTOTOJLldNSEaJYg-1
-Received: by mail-ed1-f69.google.com with SMTP id l14-20020aa7cace000000b003f7f8e1cbbdso924313edt.20
-        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 02:04:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=p4b18JDdIA23xku1asRfU8GSHk5Hq4wQ8NYHafXEvJw=;
-        b=KghG05/a7KxN0WXjsbplO41j5oVNKEm7ShQFPv9nb+izhhkFKFCW6fYv+cRFnyyBZn
-         yvJxdAk7DYuFDU0cq1U8vzb3QTtalJOGTrCyPs/554FIeh9Ywst+rnnOmvnRhlAsFHlt
-         ie9K4hSPRCLgTavU40sfaofFc0/TWxvQa6dFrFhne39bZohm5QoGXGlEERvlvjdJR4nR
-         MFqB3i/8zj6Us7AGsTc1AkmbUjrR/YXeujU6x0HJxd2CUNb4NvMTmCNTEXFoI6YfgVB9
-         KC7tNKahCOMmNuqq5PXORGC18qrHYu7ojHwnDNsuxz6MWxjTRuwz+L2nCjIUFZgtCk9S
-         oPNg==
-X-Gm-Message-State: AOAM533iLKs+UxyqHTivvHlECp2xdeS8BJ1sy0ERiNibJwIWQrbkyBdY
-        6W0aAwaSp//8q4J2wOMfrIQPfQ7ztpjVpY66krFesNjqUz6eq/eKgiFFUYU3JodH2G2oxgfE6GW
-        JinHYFNuIdWg3
-X-Received: by 2002:a05:6402:484:b0:415:d931:cb2f with SMTP id k4-20020a056402048400b00415d931cb2fmr28755270edv.287.1647421468055;
-        Wed, 16 Mar 2022 02:04:28 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz6vbOkdX2sZ4j3IBSv1ToNL65ZV2X37CiLr293SLnqCYWmt7SMpyk8T2yzkY8h6wuWJMj7tQ==
-X-Received: by 2002:a05:6402:484:b0:415:d931:cb2f with SMTP id k4-20020a056402048400b00415d931cb2fmr28755251edv.287.1647421467847;
-        Wed, 16 Mar 2022 02:04:27 -0700 (PDT)
-Received: from localhost (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id bm24-20020a170906c05800b006d58518e55fsm612760ejb.46.2022.03.16.02.04.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Mar 2022 02:04:27 -0700 (PDT)
-Date:   Wed, 16 Mar 2022 10:04:25 +0100
-From:   Igor Mammedov <imammedo@redhat.com>
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
-        Peter Xu <peterx@redhat.com>, Jason Wang <jasowang@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org,
-        Claudio Fontana <cfontana@suse.de>,
-        "Daniel P . =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>
-Subject: Re: [PATCH 1/4] target/i386: Fix sanity check on max APIC ID /
- X2APIC enablement
-Message-ID: <20220316100425.2758afc3@redhat.com>
-In-Reply-To: <20220314142544.150555-1-dwmw2@infradead.org>
-References: <20220314142544.150555-1-dwmw2@infradead.org>
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.31; x86_64-redhat-linux-gnu)
+        with ESMTP id S1346698AbiCPJGF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Mar 2022 05:06:05 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62FC351E7D;
+        Wed, 16 Mar 2022 02:04:51 -0700 (PDT)
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22G774WW012244;
+        Wed, 16 Mar 2022 09:04:50 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=l4atlXBsPk5jC8TrLGKRcWK9QDytu1hrauGyvjMYFyU=;
+ b=T0uuoNMihXT8dahO/pp1JbEqE/trRwDWNePmAg7vwXziHtmMCfn2v2Vg58Umk/5pDa3D
+ SyGfdn/oCSHaAvS71oy2INBFpM9SPLcmyHGYV0u1ME0eXH7P+6KgFkbtf4cnHcmJ1uVw
+ WocUA+vKThuwlcG6lPgbKaw8cgHx5PrFwKDaOpFXD0LUSg+Qj8bqgJCwhub4ARQLmYSx
+ vprGJY8JdcuPln22ESbcYvuWbdng6iguudUDX69Hoka5gY21dsw5I7IbJJgvP2FBPImu
+ 0KZHvk8twLWM2CHBsU1jVr1EwGZW0VrLBPKacIKHFdjZ8c8S9vRBA+JLxsDtgzY18FBS 6Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3euaysahre-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 16 Mar 2022 09:04:49 +0000
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22G8uB5q024366;
+        Wed, 16 Mar 2022 09:04:49 GMT
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3euaysahqh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 16 Mar 2022 09:04:49 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22G93PFJ020227;
+        Wed, 16 Mar 2022 09:04:46 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma04fra.de.ibm.com with ESMTP id 3erk58qa5w-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 16 Mar 2022 09:04:46 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22G94gmM17433036
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 16 Mar 2022 09:04:43 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E4051A4054;
+        Wed, 16 Mar 2022 09:04:42 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 568F3A405C;
+        Wed, 16 Mar 2022 09:04:42 +0000 (GMT)
+Received: from [9.145.38.138] (unknown [9.145.38.138])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 16 Mar 2022 09:04:42 +0000 (GMT)
+Message-ID: <7268565b-bb34-43fa-463e-8b9bf732b721@linux.ibm.com>
+Date:   Wed, 16 Mar 2022 10:04:41 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.2
+Subject: Re: [PATCH v3 0/4] s390: Ultravisor device
+Content-Language: en-US
+To:     Steffen Eiden <seiden@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Shuah Khan <shuah@kernel.org>, Nico Boehr <nrb@linux.ibm.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+References: <20220304141141.32767-1-seiden@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <20220304141141.32767-1-seiden@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: NqU6Q_uW8C5XA7LJogYLD2n77H-hTHOc
+X-Proofpoint-ORIG-GUID: ZLQSiHcW-dkhd_asy_MjgUUZh1hb0ouw
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-03-16_02,2022-03-15_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxscore=0
+ lowpriorityscore=0 impostorscore=0 clxscore=1015 phishscore=0 bulkscore=0
+ mlxlogscore=999 suspectscore=0 malwarescore=0 spamscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2203160056
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 14 Mar 2022 14:25:41 +0000
-David Woodhouse <dwmw2@infradead.org> wrote:
-
-> The check on x86ms->apic_id_limit in pc_machine_done() had two problems.
+On 3/4/22 15:11, Steffen Eiden wrote:
+> This series adds an Ultravisor(UV) device letting the userspace send some
+> Ultravisor calls to the UV. Currently two calls are supported.
+> Query Ultravisor Information (QUI) and
+> Receive Attestation Measurement (Attest[ation]).
 > 
-> Firstly, we need KVM to support the X2APIC API in order to allow IRQ
-> delivery to APICs >= 255. So we need to call/check kvm_enable_x2apic(),
-> which was done elsewhere in *some* cases but not all.
+> The UV device is implemented as a miscdevice accepting only IOCTLs.
+> The IOCTL cmd specifies the UV call and the IOCTL arg the request
+> and response data depending on the UV call.
+> The device driver writes the UV response in the ioctl argument data.
 > 
-> Secondly, microvm needs the same check. So move it from pc_machine_done()
-> to x86_cpus_init() where it will work for both.
+> The 'uvdevice' does no checks on the request beside faulty userspace
+> addresses, if sizes are in a sane range before allocating in kernel space,
+> and other tests that prevent the system from corruption.
+> Especially, no checks are made, that will be performed by the UV anyway
+> (E.g. 'invalid command' in case of attestation on unsupported hardware).
+> These errors are reported back to Userspace using the UV return code
+> field.
 > 
-> The check in kvm_cpu_instance_init() is now redundant and can be dropped.
+> The first two patches introduce the new device as a module configured to be
+> compiled directly into the kernel (y) similar to the s390 SCLP and CHSH
+> miscdevice modules. Patch 3&4 introduce Kselftests which verify error
+> paths of the ioctl.
 
-Well, I retested with the latest upstream kernel (both guest and host),
-and adding kvm_enable_x2apic() is not sufficient as guest according
-to your patches in kernel caps max APICID at 255 unless kvm-msi-ext-dest-id
-is enabled. And attempt in enabling kvm-msi-ext-dest-id with kernel-irqchip
-fails.
-So number of usable CPUs in guest stays at legacy level, leaving the rest
-of CPUs in limbo.
+Please fixup the commit message in the first patch and then push patches 
+#1 and #3 to devel so we get CI coverage.
 
+For now I'd opt to not include the qui patches but please put them on a 
+branch. They might prove to be useful at a later time.
 
-> Signed-off-by: David Woodhouse <dwmw2@infradead.org>
-> Acked-by: Claudio Fontana <cfontana@suse.de>
-> ---
->  hw/i386/pc.c              |  8 --------
->  hw/i386/x86.c             | 16 ++++++++++++++++
->  target/i386/kvm/kvm-cpu.c |  2 +-
->  3 files changed, 17 insertions(+), 9 deletions(-)
 > 
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index fd55fc725c..d3ab28fec5 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -740,14 +740,6 @@ void pc_machine_done(Notifier *notifier, void *data)
->          /* update FW_CFG_NB_CPUS to account for -device added CPUs */
->          fw_cfg_modify_i16(x86ms->fw_cfg, FW_CFG_NB_CPUS, x86ms->boot_cpus);
->      }
-> -
-> -
-> -    if (x86ms->apic_id_limit > 255 && !xen_enabled() &&
-> -        !kvm_irqchip_in_kernel()) {
-> -        error_report("current -smp configuration requires kernel "
-> -                     "irqchip support.");
-> -        exit(EXIT_FAILURE);
-> -    }
->  }
->  
->  void pc_guest_info_init(PCMachineState *pcms)
-> diff --git a/hw/i386/x86.c b/hw/i386/x86.c
-> index 4cf107baea..8da55d58ea 100644
-> --- a/hw/i386/x86.c
-> +++ b/hw/i386/x86.c
-> @@ -39,6 +39,7 @@
->  #include "sysemu/replay.h"
->  #include "sysemu/sysemu.h"
->  #include "sysemu/cpu-timers.h"
-> +#include "sysemu/xen.h"
->  #include "trace.h"
->  
->  #include "hw/i386/x86.h"
-> @@ -123,6 +124,21 @@ void x86_cpus_init(X86MachineState *x86ms, int default_cpu_version)
->       */
->      x86ms->apic_id_limit = x86_cpu_apic_id_from_index(x86ms,
->                                                        ms->smp.max_cpus - 1) + 1;
-> +
-> +    /*
-> +     * Can we support APIC ID 255 or higher?
-> +     *
-> +     * Under Xen: yes.
-> +     * With userspace emulated lapic: no
-> +     * With KVM's in-kernel lapic: only if X2APIC API is enabled.
-> +     */
-> +    if (x86ms->apic_id_limit > 255 && !xen_enabled() &&
-> +        (!kvm_irqchip_in_kernel() || !kvm_enable_x2apic())) {
-> +        error_report("current -smp configuration requires kernel "
-> +                     "irqchip and X2APIC API support.");
-> +        exit(EXIT_FAILURE);
-> +    }
-> +
->      possible_cpus = mc->possible_cpu_arch_ids(ms);
->      for (i = 0; i < ms->smp.cpus; i++) {
->          x86_cpu_new(x86ms, possible_cpus->cpus[i].arch_id, &error_fatal);
-> diff --git a/target/i386/kvm/kvm-cpu.c b/target/i386/kvm/kvm-cpu.c
-> index d95028018e..c60cb2dafb 100644
-> --- a/target/i386/kvm/kvm-cpu.c
-> +++ b/target/i386/kvm/kvm-cpu.c
-> @@ -165,7 +165,7 @@ static void kvm_cpu_instance_init(CPUState *cs)
->          /* only applies to builtin_x86_defs cpus */
->          if (!kvm_irqchip_in_kernel()) {
->              x86_cpu_change_kvm_default("x2apic", "off");
-> -        } else if (kvm_irqchip_is_split() && kvm_enable_x2apic()) {
-> +        } else if (kvm_irqchip_is_split()) {
->              x86_cpu_change_kvm_default("kvm-msi-ext-dest-id", "on");
->          }
->  
+> v2->v3:
+>     The main change is that QUI is now introduced after Attestation as we
+>     might not want pick it. Also the Kselftest patch is splitted into
+>     Attestation and QUI so that they can be picked without requiring
+>     QUI support of the uvdevice.
+> 
+>    * dropped the Kconfig dependency
+>    * reorganized the series:
+>      - Patch 1 now covers the introduction of the uvdevice and Attestation
+>      - Patch 2 adds QUI to uvdevice
+>      - Patch 3/4 add Kselftests for Attestation and QUI
+>    * fixed some nits
+>    * added some comments
+> 
+> v1->v2:
+>    * ioctl returns -ENOIOCTLCMD in case of a invalid ioctl command
+>    * streamlined reserved field test
+>    * default Kconfig is y instead of m
+>    * improved selftest documentation
+> 
+> Steffen Eiden (4):
+>    drivers/s390/char: Add Ultravisor io device
+>    drivers/s390/char: Add Query Ultravisor Information to uvdevice
+>    selftests: drivers/s390x: Add uvdevice tests
+>    selftests: drivers/s390x: Add uvdevice  QUI tests
+> 
+>   MAINTAINERS                                   |   3 +
+>   arch/s390/include/asm/uv.h                    |  23 +-
+>   arch/s390/include/uapi/asm/uvdevice.h         |  53 +++
+>   drivers/s390/char/Kconfig                     |  10 +
+>   drivers/s390/char/Makefile                    |   1 +
+>   drivers/s390/char/uvdevice.c                  | 320 ++++++++++++++++++
+>   tools/testing/selftests/Makefile              |   1 +
+>   tools/testing/selftests/drivers/.gitignore    |   1 +
+>   .../selftests/drivers/s390x/uvdevice/Makefile |  22 ++
+>   .../selftests/drivers/s390x/uvdevice/config   |   1 +
+>   .../drivers/s390x/uvdevice/test_uvdevice.c    | 281 +++++++++++++++
+>   11 files changed, 715 insertions(+), 1 deletion(-)
+>   create mode 100644 arch/s390/include/uapi/asm/uvdevice.h
+>   create mode 100644 drivers/s390/char/uvdevice.c
+>   create mode 100644 tools/testing/selftests/drivers/s390x/uvdevice/Makefile
+>   create mode 100644 tools/testing/selftests/drivers/s390x/uvdevice/config
+>   create mode 100644 tools/testing/selftests/drivers/s390x/uvdevice/test_uvdevice.c
+> 
 
