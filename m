@@ -2,312 +2,378 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 86C4E4DA918
-	for <lists+kvm@lfdr.de>; Wed, 16 Mar 2022 04:54:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3FCC44DA940
+	for <lists+kvm@lfdr.de>; Wed, 16 Mar 2022 05:22:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243311AbiCPDzU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Mar 2022 23:55:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60640 "EHLO
+        id S245539AbiCPEX3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Mar 2022 00:23:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239609AbiCPDzT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Mar 2022 23:55:19 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37A28329A9
-        for <kvm@vger.kernel.org>; Tue, 15 Mar 2022 20:54:04 -0700 (PDT)
-Received: from dggpemm500023.china.huawei.com (unknown [172.30.72.53])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4KJGV83C0wzcbG9;
-        Wed, 16 Mar 2022 11:49:04 +0800 (CST)
-Received: from [10.174.187.128] (10.174.187.128) by
- dggpemm500023.china.huawei.com (7.185.36.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2308.21; Wed, 16 Mar 2022 11:54:01 +0800
-Subject: Re: [PATCH v6 06/11] s390x: topology: Adding books to CPU topology
-To:     Pierre Morel <pmorel@linux.ibm.com>, <qemu-s390x@nongnu.org>
-CC:     <qemu-devel@nongnu.org>, <borntraeger@de.ibm.com>,
-        <pasic@linux.ibm.com>, <richard.henderson@linaro.org>,
-        <david@redhat.com>, <thuth@redhat.com>, <cohuck@redhat.com>,
-        <mst@redhat.com>, <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
-        <ehabkost@redhat.com>, <marcel.apfelbaum@gmail.com>,
-        <philmd@redhat.com>, <eblake@redhat.com>, <armbru@redhat.com>,
-        <seiden@linux.ibm.com>, <nrb@linux.ibm.com>
-References: <20220217134125.132150-1-pmorel@linux.ibm.com>
- <20220217134125.132150-7-pmorel@linux.ibm.com>
-From:   "wangyanan (Y)" <wangyanan55@huawei.com>
-Message-ID: <e096c7d9-e081-a798-9ead-7e28de10a890@huawei.com>
-Date:   Wed, 16 Mar 2022 11:54:00 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        with ESMTP id S236231AbiCPEX2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Mar 2022 00:23:28 -0400
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EED395C37A
+        for <kvm@vger.kernel.org>; Tue, 15 Mar 2022 21:22:14 -0700 (PDT)
+Received: by mail-pf1-x42b.google.com with SMTP id t5so2269117pfg.4
+        for <kvm@vger.kernel.org>; Tue, 15 Mar 2022 21:22:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:from:subject:to:cc
+         :references:content-language:in-reply-to:content-transfer-encoding;
+        bh=lFJ99hhFmIq7rC1PE0+N4190klv0nwxMR3DLMod1S9A=;
+        b=LdT6RNPOeuJgpJilzt8vWJcsTGkEKvAxcuKl8sOYiz0igZHXtJwWUzfrJqbf9PV51m
+         WDD2JFviWLS7vfFNUamPJDxsIAVYqnAIgAEubZhsuYa6I7eXl35t6uIXNbb78vztI8Za
+         OjI5y/ck9fjAz43X/OU4MspWz9oMyuIGnpb+3pDwTqXmo4EcUdB9D4NHXkXMqe5TQkea
+         rLhe/AZIQtKElHJOn5zSIDXSpyydiLVlXU5FuFkknIMFAhA+OoGa74/n0g9EzhdQtHKL
+         S86e2VFj2DdM9k/Li8RDh/9HCOwp89wCmcJW81Lo4YCINnF8edRz6T9k/1/fqTSWqarS
+         gt/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:from
+         :subject:to:cc:references:content-language:in-reply-to
+         :content-transfer-encoding;
+        bh=lFJ99hhFmIq7rC1PE0+N4190klv0nwxMR3DLMod1S9A=;
+        b=vo3D0eH91Lp8OWRphsYuHyWD2BVbElYo/nF0YA+b3Q/MAeEbDlz7wePAxwP/V8ZjOz
+         xa4eNiLLZU5xalfiTzirnZh/4TNJz+8AjzDm2NJBMgEW+N5T21axUcL9K/kiAmBDcGPO
+         8g1j3jlW066SEZFKOgS1VfX9lGbo1sd7OOpZ2E0gknJDcxTiL4QjVeto8Qt2bt6Eg9Ad
+         7jdB3QZD9sxx7OGthoNoCX/s2088PxAtiZ8DJRkoP5BRkRTfS4P+E4+AOd7ICXSjvBYg
+         EqTiwmZCnep9EcF73QrJxeX18mRsqVxSgVTD5PjIWa3rALX4/TKDM08xKVDkcAjFHqsJ
+         d48g==
+X-Gm-Message-State: AOAM532UtDFvidibxdCS9hbAkUjBAYzw9e91OPT3LoPpmOcM5RqJfrfe
+        1/W1XTVnn17QK0yD59WFUb0O4w==
+X-Google-Smtp-Source: ABdhPJy319o4c6j9g0RGXgiJ7wMLhX3nc6TMODNJnvMiUqbz4GpbnnaeLOS7a6TCdEIb84a5cl4TDA==
+X-Received: by 2002:a63:aa08:0:b0:373:cc0b:5b71 with SMTP id e8-20020a63aa08000000b00373cc0b5b71mr26713469pgf.599.1647404534082;
+        Tue, 15 Mar 2022 21:22:14 -0700 (PDT)
+Received: from [192.168.86.237] (107-203-254-183.lightspeed.sntcca.sbcglobal.net. [107.203.254.183])
+        by smtp.gmail.com with ESMTPSA id j11-20020a056a00234b00b004f7463022absm743536pfj.208.2022.03.15.21.22.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 15 Mar 2022 21:22:13 -0700 (PDT)
+Message-ID: <327cff85-ec57-2585-6ed2-24ff8f190d38@google.com>
+Date:   Tue, 15 Mar 2022 21:22:10 -0700
 MIME-Version: 1.0
-In-Reply-To: <20220217134125.132150-7-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.1
+From:   Reiji Watanabe <reijiw@google.com>
+Subject: Re: [PATCH v4 2/3] KVM: arm64: mixed-width check should be skipped
+ for uninitialized vCPUs
+To:     Oliver Upton <oupton@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <Alexandru.Elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>,
+        Andrew Jones <drjones@redhat.com>,
+        Peng Liang <liangpeng10@huawei.com>,
+        Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>
+References: <20220314061959.3349716-1-reijiw@google.com>
+ <20220314061959.3349716-3-reijiw@google.com> <Yi+j7zGxA80ZR4t7@google.com>
+ <27834312-1877-f244-634d-6e645dea9f9e@google.com>
+ <CAOQ_Qsgw9iUPBA7o_reEbt96NDgVHit46_b_UozyNtNzFaFnHw@mail.gmail.com>
 Content-Language: en-US
-X-Originating-IP: [10.174.187.128]
-X-ClientProxiedBy: dggeme707-chm.china.huawei.com (10.1.199.103) To
- dggpemm500023.china.huawei.com (7.185.36.83)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+In-Reply-To: <CAOQ_Qsgw9iUPBA7o_reEbt96NDgVHit46_b_UozyNtNzFaFnHw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Pierre,
+Hi Oliver,
 
-On 2022/2/17 21:41, Pierre Morel wrote:
-> S390 CPU topology may have up to 5 topology containers.
-> The first container above the cores is level 2, the sockets.
-> We introduce here the books, book is the level containing sockets.
+On Tue, Mar 15, 2022 at 12:48 AM Oliver Upton <oupton@google.com> wrote:
 >
-> Let's add books, level3, containers to the CPU topology.
+> On Mon, Mar 14, 2022 at 11:19 PM Reiji Watanabe <reijiw@google.com> wrote:
+> >
+> > Hi Oliver,
+> >
+> > On 3/14/22 1:22 PM, Oliver Upton wrote:
+> > > On Sun, Mar 13, 2022 at 11:19:58PM -0700, Reiji Watanabe wrote:
+> > >> KVM allows userspace to configure either all EL1 32bit or 64bit vCPUs
+> > >> for a guest.  At vCPU reset, vcpu_allowed_register_width() checks
+> > >> if the vcpu's register width is consistent with all other vCPUs'.
+> > >> Since the checking is done even against vCPUs that are not initialized
+> > >> (KVM_ARM_VCPU_INIT has not been done) yet, the uninitialized vCPUs
+> > >> are erroneously treated as 64bit vCPU, which causes the function to
+> > >> incorrectly detect a mixed-width VM.
+> > >>
+> > >> Introduce KVM_ARCH_FLAG_EL1_32BIT and KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED
+> > >> bits for kvm->arch.flags.  A value of the EL1_32BIT bit indicates that
+> > >> the guest needs to be configured with all 32bit or 64bit vCPUs, and
+> > >> a value of the REG_WIDTH_CONFIGURED bit indicates if a value of the
+> > >> EL1_32BIT bit is valid (already set up). Values in those bits are set at
+> > >> the first KVM_ARM_VCPU_INIT for the guest based on KVM_ARM_VCPU_EL1_32BIT
+> > >> configuration for the vCPU.
+> > >>
+> > >> Check vcpu's register width against those new bits at the vcpu's
+> > >> KVM_ARM_VCPU_INIT (instead of against other vCPUs' register width).
+> > >>
+> > >> Fixes: 66e94d5cafd4 ("KVM: arm64: Prevent mixed-width VM creation")
+> > >> Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> > >
+> > > Hrmph... I hate to be asking this question so late in the game, but...
+> > >
+> > > Are there any bits that we really allow variation per-vCPU besides
+> > > KVM_ARM_VCPU_POWER_OFF? We unintentionally allow for variance with the
+> > > KVM_ARM_VCPU_PSCI_0_2 bit even though that's complete nonsense.
+> > >
+> > > Stated plainly, should we just deny any attempts at asymmetry besides
+> > > POWER_OFF?>
+> > > Besides the nits, I see nothing objectionable with the patch. I'd really
+> > > like to see more generalized constraints on vCPU configuration, but if
+> > > this is the route we take:
+> >
+> > Prohibiting the mixed width configuration is not a new constraint that
+> > this patch creates (this patch fixes a bug that erroneously detects
+> > mixed-width configuration), and enforcing symmetry of other features
+> > among vCPUs is a bit different matter.
 >
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
->   hw/core/machine-smp.c      | 29 ++++++++++++++++++++++-------
->   hw/core/machine.c          |  2 ++
->   hw/s390x/s390-virtio-ccw.c |  1 +
->   include/hw/boards.h        |  4 ++++
->   qapi/machine.json          |  7 ++++++-
->   softmmu/vl.c               |  3 +++
->   6 files changed, 38 insertions(+), 8 deletions(-)
+> Right, I had managed to forget that context for a moment when I
+> replied to you. Then I fully agree with this patch, and the other
+> feature flags can be handled later.
 >
-> diff --git a/hw/core/machine-smp.c b/hw/core/machine-smp.c
-> index b39ed21e65..d7aa39d540 100644
-> --- a/hw/core/machine-smp.c
-> +++ b/hw/core/machine-smp.c
-> @@ -31,6 +31,10 @@ static char *cpu_hierarchy_to_string(MachineState *ms)
->       MachineClass *mc = MACHINE_GET_CLASS(ms);
->       GString *s = g_string_new(NULL);
->   
-> +    if (mc->smp_props.books_supported) {
-> +        g_string_append_printf(s, " * books (%u)", ms->smp.books);
-> +    }
-> +
->       g_string_append_printf(s, "sockets (%u)", ms->smp.sockets);
->   
-Now books become the top level container, string format for sockets should
-be tweaked as " * sockets (%u)". Also we need to cut off the " * " at 
-the head
-of the composite topology string.
->       if (mc->smp_props.dies_supported) {
-> @@ -73,6 +77,7 @@ void machine_parse_smp_config(MachineState *ms,
->   {
->       MachineClass *mc = MACHINE_GET_CLASS(ms);
->       unsigned cpus    = config->has_cpus ? config->cpus : 0;
-> +    unsigned books   = config->has_books ? config->books : 0;
->       unsigned sockets = config->has_sockets ? config->sockets : 0;
->       unsigned dies    = config->has_dies ? config->dies : 0;
->       unsigned clusters = config->has_clusters ? config->clusters : 0;
-> @@ -85,6 +90,7 @@ void machine_parse_smp_config(MachineState *ms,
->        * explicit configuration like "cpus=0" is not allowed.
->        */
->       if ((config->has_cpus && config->cpus == 0) ||
-> +        (config->has_books && config->books == 0) ||
->           (config->has_sockets && config->sockets == 0) ||
->           (config->has_dies && config->dies == 0) ||
->           (config->has_clusters && config->clusters == 0) ||
-> @@ -111,6 +117,13 @@ void machine_parse_smp_config(MachineState *ms,
->       dies = dies > 0 ? dies : 1;
->       clusters = clusters > 0 ? clusters : 1;
->   
-> +    if (!mc->smp_props.books_supported && books > 1) {
-> +        error_setg(errp, "books not supported by this machine's CPU topology");
-> +        return;
-> +    }
-nit: maybe move above part to the similar sanity checks of "dies and 
-clusters"?...
-> +
-> +    books = books > 0 ? books : 1;
-...and put this line together with the similar operation of "dies and 
-clusters"
-> +
->       /* compute missing values based on the provided ones */
->       if (cpus == 0 && maxcpus == 0) {
->           sockets = sockets > 0 ? sockets : 1;
-> @@ -124,33 +137,35 @@ void machine_parse_smp_config(MachineState *ms,
->               if (sockets == 0) {
->                   cores = cores > 0 ? cores : 1;
->                   threads = threads > 0 ? threads : 1;
-> -                sockets = maxcpus / (dies * clusters * cores * threads);
-> +                sockets = maxcpus / (books * dies * clusters * cores * threads);
->               } else if (cores == 0) {
->                   threads = threads > 0 ? threads : 1;
-> -                cores = maxcpus / (sockets * dies * clusters * threads);
-> +                cores = maxcpus / (books * sockets * dies * clusters * threads);
->               }
->           } else {
->               /* prefer cores over sockets since 6.2 */
->               if (cores == 0) {
->                   sockets = sockets > 0 ? sockets : 1;
->                   threads = threads > 0 ? threads : 1;
-> -                cores = maxcpus / (sockets * dies * clusters * threads);
-> +                cores = maxcpus / (books * sockets * dies * clusters * threads);
->               } else if (sockets == 0) {
->                   threads = threads > 0 ? threads : 1;
-> -                sockets = maxcpus / (dies * clusters * cores * threads);
-> +                sockets = maxcpus / (books * dies * clusters * cores * threads);
->               }
->           }
->   
->           /* try to calculate omitted threads at last */
->           if (threads == 0) {
-> -            threads = maxcpus / (sockets * dies * clusters * cores);
-> +            threads = maxcpus / (books * sockets * dies * clusters * cores);
->           }
->       }
->   
-> -    maxcpus = maxcpus > 0 ? maxcpus : sockets * dies * clusters * cores * threads;
-> +    maxcpus = maxcpus > 0 ? maxcpus : books * sockets * dies *
-> +                                      clusters * cores * threads;
->       cpus = cpus > 0 ? cpus : maxcpus;
->   
->       ms->smp.cpus = cpus;
-> +    ms->smp.books = books;
->       ms->smp.sockets = sockets;
->       ms->smp.dies = dies;
->       ms->smp.clusters = clusters;
-> @@ -159,7 +174,7 @@ void machine_parse_smp_config(MachineState *ms,
->       ms->smp.max_cpus = maxcpus;
->   
->       /* sanity-check of the computed topology */
-> -    if (sockets * dies * clusters * cores * threads != maxcpus) {
-> +    if (books * sockets * dies * clusters * cores * threads != maxcpus) {
->           g_autofree char *topo_msg = cpu_hierarchy_to_string(ms);
->           error_setg(errp, "Invalid CPU topology: "
->                      "product of the hierarchy must match maxcpus: "
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index d856485cb4..b8c624d2bf 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -743,6 +743,7 @@ static void machine_get_smp(Object *obj, Visitor *v, const char *name,
->       MachineState *ms = MACHINE(obj);
->       SMPConfiguration *config = &(SMPConfiguration){
->           .has_cpus = true, .cpus = ms->smp.cpus,
-> +        .has_books = true, .books = ms->smp.books,
->           .has_sockets = true, .sockets = ms->smp.sockets,
->           .has_dies = true, .dies = ms->smp.dies,
->           .has_clusters = true, .clusters = ms->smp.clusters,
-> @@ -935,6 +936,7 @@ static void machine_initfn(Object *obj)
->       /* default to mc->default_cpus */
->       ms->smp.cpus = mc->default_cpus;
->       ms->smp.max_cpus = mc->default_cpus;
-> +    ms->smp.books = 1;
->       ms->smp.sockets = 1;
->       ms->smp.dies = 1;
->       ms->smp.clusters = 1;
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index 12903eb2af..193883fba3 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -666,6 +666,7 @@ static void ccw_machine_class_init(ObjectClass *oc, void *data)
->       hc->unplug_request = s390_machine_device_unplug_request;
->       nc->nmi_monitor_handler = s390_nmi;
->       mc->default_ram_id = "s390.ram";
-> +    mc->smp_props.books_supported = true;
->   }
->   
->   static inline bool machine_get_aes_key_wrap(Object *obj, Error **errp)
-> diff --git a/include/hw/boards.h b/include/hw/boards.h
-> index c92ac8815c..bc0f7f22dc 100644
-> --- a/include/hw/boards.h
-> +++ b/include/hw/boards.h
-> @@ -130,11 +130,13 @@ typedef struct {
->    * @prefer_sockets - whether sockets are preferred over cores in smp parsing
->    * @dies_supported - whether dies are supported by the machine
->    * @clusters_supported - whether clusters are supported by the machine
-> + * @books_supported - whether books are supported by the machine
->    */
->   typedef struct {
->       bool prefer_sockets;
->       bool dies_supported;
->       bool clusters_supported;
-> +    bool books_supported;
->   } SMPCompatProps;
->   
->   /**
-> @@ -299,6 +301,7 @@ typedef struct DeviceMemoryState {
->   /**
->    * CpuTopology:
->    * @cpus: the number of present logical processors on the machine
-> + * @books: the number of books on the machine
->    * @sockets: the number of sockets on the machine
-I think we may also need to modify the documentation of "sockets"
-accordingly, like "sockets: the number of sockets in one book" simply?
-We already have some explanation in qemu-options.hx implying that:
-machines will have their own meanings of each topology member
-if they have different supported topology hierarchies.
->    * @dies: the number of dies in one socket
->    * @clusters: the number of clusters in one die
-> @@ -308,6 +311,7 @@ typedef struct DeviceMemoryState {
->    */
->   typedef struct CpuTopology {
->       unsigned int cpus;
-> +    unsigned int books;
->       unsigned int sockets;
->       unsigned int dies;
->       unsigned int clusters;
-> diff --git a/qapi/machine.json b/qapi/machine.json
-> index 42fc68403d..73206f811a 100644
-> --- a/qapi/machine.json
-> +++ b/qapi/machine.json
-> @@ -866,12 +866,13 @@
->   # a CPU is being hotplugged.
->   #
->   # @node-id: NUMA node ID the CPU belongs to
-> +# @book-id: book number within node/board the CPU belongs to
->   # @socket-id: socket number within node/board the CPU belongs to
->   # @die-id: die number within socket the CPU belongs to (since 4.1)
->   # @core-id: core number within die the CPU belongs to
->   # @thread-id: thread number within core the CPU belongs to
->   #
-> -# Note: currently there are 5 properties that could be present
-> +# Note: currently there are 6 properties that could be present
->   #       but management should be prepared to pass through other
->   #       properties with device_add command to allow for future
->   #       interface extension. This also requires the filed names to be kept in
-> @@ -881,6 +882,7 @@
->   ##
->   { 'struct': 'CpuInstanceProperties',
->     'data': { '*node-id': 'int',
-> +            '*book-id': 'int',
->               '*socket-id': 'int',
->               '*die-id': 'int',
->               '*core-id': 'int',
-> @@ -1400,6 +1402,8 @@
->   #
->   # @cpus: number of virtual CPUs in the virtual machine
->   #
-> +# @books: number of books in the CPU topology
-> +#
->   # @sockets: number of sockets in the CPU topology
-here too: maybe "number of sockets per book in the CPU topology".
->   #
->   # @dies: number of dies per socket in the CPU topology
-> @@ -1416,6 +1420,7 @@
->   ##
->   { 'struct': 'SMPConfiguration', 'data': {
->        '*cpus': 'int',
-> +     '*books': 'int',
->        '*sockets': 'int',
->        '*dies': 'int',
->        '*clusters': 'int',
-> diff --git a/softmmu/vl.c b/softmmu/vl.c
-> index 5e1b35ba48..a680fb12d4 100644
-> --- a/softmmu/vl.c
-> +++ b/softmmu/vl.c
-> @@ -720,6 +720,9 @@ static QemuOptsList qemu_smp_opts = {
->           {
->               .name = "cpus",
->               .type = QEMU_OPT_NUMBER,
-> +        }, {
-> +            .name = "books",
-> +            .type = QEMU_OPT_NUMBER,
->           }, {
->               .name = "sockets",
->               .type = QEMU_OPT_NUMBER,
+> >
+> > Having said that, I like the idea, which will be more consistent with
+> > my ID register series (it can simplify things).  But, I'm not sure
+> > if creating the constraint for those features would be a problem for
+> > existing userspace even if allowing variation per-vCPU for the features
+> > was not our intention.
+> > I would guess having the constraint for KVM_ARM_VCPU_PSCI_0_2 should
+> > be fine.  Do you think that should be fine for PMU, SVE, and PTRAUTH*
+> > as well ?
+>
+> Personally, yes, but it prompts the question of if we could break
+> userspace by applying restrictions after the fact. The original patch
+> that applied the register width restrictions didn't cause much of a
+> stir, so it seems possible we could get away with it.
+
+
+I agree that it's possible we might get away with it, and I can try
+that for the other features besides KVM_ARM_VCPU_POWER_OFF :)
+(I will work it on separately from this series)
+
+BTW, if there had been a general interface to configure per-VM feature,
+I would guess that interface might have been chosen for PSCI_0_2.
+Perhaps we should consider creating it the next time per-VM feature
+is introduced.
+
 Thanks,
-Yanan
+Reiji
+
+
+>
+> > >
+> > > Reviewed-by: Oliver Upton <oupton@google.com>
+> > >
+> > >> ---
+> > >>   arch/arm64/include/asm/kvm_emulate.h | 27 ++++++++----
+> > >>   arch/arm64/include/asm/kvm_host.h    |  9 ++++
+> > >>   arch/arm64/kvm/reset.c               | 64 ++++++++++++++++++----------
+> > >>   3 files changed, 70 insertions(+), 30 deletions(-)
+> > >>
+> > >> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> > >> index d62405ce3e6d..7496deab025a 100644
+> > >> --- a/arch/arm64/include/asm/kvm_emulate.h
+> > >> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> > >> @@ -43,10 +43,22 @@ void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr);
+> > >>
+> > >>   void kvm_vcpu_wfi(struct kvm_vcpu *vcpu);
+> > >>
+> > >> +#if defined(__KVM_VHE_HYPERVISOR__) || defined(__KVM_NVHE_HYPERVISOR__)
+> > >>   static __always_inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
+> > >>   {
+> > >>      return !(vcpu->arch.hcr_el2 & HCR_RW);
+> > >>   }
+> > >> +#else
+> > >> +static __always_inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
+> > >> +{
+> > >> +    struct kvm *kvm = vcpu->kvm;
+> > >> +
+> > >> +    WARN_ON_ONCE(!test_bit(KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED,
+> > >> +                           &kvm->arch.flags));
+> > >> +
+> > >> +    return test_bit(KVM_ARCH_FLAG_EL1_32BIT, &kvm->arch.flags);
+> > >> +}
+> > >> +#endif
+> > >>
+> > >>   static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
+> > >>   {
+> > >> @@ -72,15 +84,14 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
+> > >>              vcpu->arch.hcr_el2 |= HCR_TVM;
+> > >>      }
+> > >>
+> > >> -    if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features))
+> > >> +    if (vcpu_el1_is_32bit(vcpu))
+> > >>              vcpu->arch.hcr_el2 &= ~HCR_RW;
+> > >> -
+> > >> -    /*
+> > >> -     * TID3: trap feature register accesses that we virtualise.
+> > >> -     * For now this is conditional, since no AArch32 feature regs
+> > >> -     * are currently virtualised.
+> > >> -     */
+> > >> -    if (!vcpu_el1_is_32bit(vcpu))
+> > >> +    else
+> > >> +            /*
+> > >> +             * TID3: trap feature register accesses that we virtualise.
+> > >> +             * For now this is conditional, since no AArch32 feature regs
+> > >> +             * are currently virtualised.
+> > >> +             */
+> > >>              vcpu->arch.hcr_el2 |= HCR_TID3;
+> > >>
+> > >>      if (cpus_have_const_cap(ARM64_MISMATCHED_CACHE_TYPE) ||
+> > >> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > >> index 11a7ae747ded..22ad977069f5 100644
+> > >> --- a/arch/arm64/include/asm/kvm_host.h
+> > >> +++ b/arch/arm64/include/asm/kvm_host.h
+> > >> @@ -125,6 +125,15 @@ struct kvm_arch {
+> > >>   #define KVM_ARCH_FLAG_RETURN_NISV_IO_ABORT_TO_USER 0
+> > >>      /* Memory Tagging Extension enabled for the guest */
+> > >>   #define KVM_ARCH_FLAG_MTE_ENABLED                  1
+> > >> +    /*
+> > >> +     * The following two bits are used to indicate the guest's EL1
+> > >> +     * register width configuration. A value of KVM_ARCH_FLAG_EL1_32BIT
+> > >> +     * bit is valid only when KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED is set.
+> > >> +     * Otherwise, the guest's EL1 register width has not yet been
+> > >> +     * determined yet.
+> > >> +     */
+> > >> +#define KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED          2
+> > >> +#define KVM_ARCH_FLAG_EL1_32BIT                             3
+> > >>      unsigned long flags;
+> > >>
+> > >>      /*
+> > >> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> > >> index ecc40c8cd6f6..cbeb6216ee25 100644
+> > >> --- a/arch/arm64/kvm/reset.c
+> > >> +++ b/arch/arm64/kvm/reset.c
+> > >> @@ -181,27 +181,45 @@ static int kvm_vcpu_enable_ptrauth(struct kvm_vcpu *vcpu)
+> > >>      return 0;
+> > >>   }
+> > >>
+> > >> -static bool vcpu_allowed_register_width(struct kvm_vcpu *vcpu)
+> > >> +/*
+> > >> + * A guest can have either all EL1 32bit or 64bit vcpus only. It is
+> > >> + * indicated by a value of KVM_ARCH_FLAG_EL1_32BIT bit in kvm->arch.flags,
+> > >> + * which is valid only when KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED in
+> > >> + * kvm->arch.flags is set.
+> > >> + * This function sets the EL1_32BIT bit based on the given @is32bit (and
+> > >> + * sets REG_WIDTH_CONFIGURED bit). When those flags are already set,
+> > >> + * @is32bit must be consistent with the flags.
+> > >> + * Returns 0 on success, or non-zero otherwise.
+> > >> + */
+> > >
+> > > nit: use kerneldoc style:
+> > >
+> > >    https://www.kernel.org/doc/html/latest/doc-guide/kernel-doc.html
+> >
+> > Sure, I can fix the comment to use kerneldoc style.
+> >
+> >
+> > >
+> > >> +static int kvm_set_vm_width(struct kvm *kvm, bool is32bit)
+> > >>   {
+> > >> -    struct kvm_vcpu *tmp;
+> > >> -    bool is32bit;
+> > >> -    unsigned long i;
+> > >> +    bool allowed;
+> > >> +
+> > >> +    lockdep_assert_held(&kvm->lock);
+> > >> +
+> > >> +    if (test_bit(KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED, &kvm->arch.flags)) {
+> > >> +            /*
+> > >> +             * The guest's register width is already configured.
+> > >> +             * Make sure that @is32bit is consistent with it.
+> > >> +             */
+> > >> +            allowed = (is32bit ==
+> > >> +                       test_bit(KVM_ARCH_FLAG_EL1_32BIT, &kvm->arch.flags));
+> > >> +            return allowed ? 0 : -EINVAL;
+> > >
+> > > nit: I'd avoid the ternary and just use a boring if/else (though I could
+> > > be in the minority here).
+> >
+> > I agree with you and will fix it.
+> > (The ternary with 'allowed' was just copied from the previous patch,
+> >   and I should have changed that in this patch...)
+> >
+> > Thanks,
+> > Reiji
+> >
+> >
+> > >
+> > >> +    }
+> > >>
+> > >> -    is32bit = vcpu_has_feature(vcpu, KVM_ARM_VCPU_EL1_32BIT);
+> > >>      if (!cpus_have_const_cap(ARM64_HAS_32BIT_EL1) && is32bit)
+> > >> -            return false;
+> > >> +            return -EINVAL;
+> > >>
+> > >>      /* MTE is incompatible with AArch32 */
+> > >> -    if (kvm_has_mte(vcpu->kvm) && is32bit)
+> > >> -            return false;
+> > >> +    if (kvm_has_mte(kvm) && is32bit)
+> > >> +            return -EINVAL;
+> > >>
+> > >> -    /* Check that the vcpus are either all 32bit or all 64bit */
+> > >> -    kvm_for_each_vcpu(i, tmp, vcpu->kvm) {
+> > >> -            if (vcpu_has_feature(tmp, KVM_ARM_VCPU_EL1_32BIT) != is32bit)
+> > >> -                    return false;
+> > >> -    }
+> > >> +    if (is32bit)
+> > >> +            set_bit(KVM_ARCH_FLAG_EL1_32BIT, &kvm->arch.flags);
+> > >>
+> > >> -    return true;
+> > >> +    set_bit(KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED, &kvm->arch.flags);
+> > >> +
+> > >> +    return 0;
+> > >>   }
+> > >>
+> > >>   /**
+> > >> @@ -230,10 +248,17 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+> > >>      u32 pstate;
+> > >>
+> > >>      mutex_lock(&vcpu->kvm->lock);
+> > >> -    reset_state = vcpu->arch.reset_state;
+> > >> -    WRITE_ONCE(vcpu->arch.reset_state.reset, false);
+> > >> +    ret = kvm_set_vm_width(vcpu->kvm,
+> > >> +                           vcpu_has_feature(vcpu, KVM_ARM_VCPU_EL1_32BIT));
+> > >> +    if (!ret) {
+> > >> +            reset_state = vcpu->arch.reset_state;
+> > >> +            WRITE_ONCE(vcpu->arch.reset_state.reset, false);
+> > >> +    }
+> > >>      mutex_unlock(&vcpu->kvm->lock);
+> > >>
+> > >> +    if (ret)
+> > >> +            return ret;
+> > >> +
+> > >>      /* Reset PMU outside of the non-preemptible section */
+> > >>      kvm_pmu_vcpu_reset(vcpu);
+> > >>
+> > >> @@ -260,14 +285,9 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+> > >>              }
+> > >>      }
+> > >>
+> > >> -    if (!vcpu_allowed_register_width(vcpu)) {
+> > >> -            ret = -EINVAL;
+> > >> -            goto out;
+> > >> -    }
+> > >> -
+> > >>      switch (vcpu->arch.target) {
+> > >>      default:
+> > >> -            if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features)) {
+> > >> +            if (vcpu_el1_is_32bit(vcpu)) {
+> > >>                      pstate = VCPU_RESET_PSTATE_SVC;
+> > >>              } else {
+> > >>                      pstate = VCPU_RESET_PSTATE_EL1;
+> > >> --
+> > >> 2.35.1.723.g4982287a31-goog
+> > >>
