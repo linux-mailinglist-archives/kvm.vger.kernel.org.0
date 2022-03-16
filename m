@@ -2,55 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 77EEF4DAD95
-	for <lists+kvm@lfdr.de>; Wed, 16 Mar 2022 10:34:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 252E94DAD9A
+	for <lists+kvm@lfdr.de>; Wed, 16 Mar 2022 10:37:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354917AbiCPJfs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Mar 2022 05:35:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53364 "EHLO
+        id S1354895AbiCPJie (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Mar 2022 05:38:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354912AbiCPJfq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Mar 2022 05:35:46 -0400
+        with ESMTP id S237334AbiCPJid (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Mar 2022 05:38:33 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 283A42C666
-        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 02:34:31 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF9072E0A4
+        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 02:37:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=xEEFGml7awM3XxmEWTe1XCExGeL5XjES2qGGNswn+uU=; b=onFgeB7qNuG4FU9uLkz8wBCW6v
-        VD+ViFSnvMQLin0R6VWgw21SWgMIIrzNZWHls9GwIxXh0+O9oLdKCdp3TKcQgcHT2/3RG8qu5/9tV
-        UZgWoE6+2p+7puXCOBFprR3tPOo57gRIyy7BU6ftgC0RoZZcydTOiGPZcC+cxMaotmdo1sLNvUY43
-        TaaTMtTDAN44KrQThnj3whX1ZFa81LqYtrXklUvJcRDL+brgdolxUJT623n38GISahYV45q/urZJL
-        RKt1VqOPd7SjoTkmWfpW9v+SHstfS24gg/wN8qV7jQ1qxImSjXZFqIYvnHKyXt3lv071CPyH3vRgy
-        91VTSxnQ==;
-Received: from [2001:8b0:10b:1::3ae] (helo=u3832b3a9db3152.ant.amazon.com)
+        bh=UqyeI+hcM7x9ityMWACDHQ1PQa/3k7VZA2I3ii1ZVeI=; b=RZrMgstWd2tEUDZzBBnPqYc34c
+        KwYeZK2zne6hAbUWTpm7/gRa7IzQVEsdi+EQTHnzFuLdl/2S8VgYgVn00qVR5pWYRhYypZ/7tKekO
+        rKLyLFTh69EjMnZb2KhN+uK1cS2AoVBb3yvJonx4YTDYw/NENB4+S4U80FPDUnnPaBiP9m+JrPvfb
+        XLFF+7qw5yjBEbbTtfwi4d+9Ps7PvM5H3tUJ6fvB/2fHuhQprA1Rrwn6alpW4LlAn3W9Hd5Ablk/3
+        A7slaS3hfs0khFtPao7xUWPa8NrIn0bcS9AWtaHo1Qbq9S2MM0RYkzNQ1rRvWksT1MNjEs2P67z99
+        yvEawCNg==;
+Received: from [2001:8b0:10b:1:4a2a:e3ff:fe14:8625] (helo=u3832b3a9db3152.ant.amazon.com)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nUQ2n-005r7t-Gp; Wed, 16 Mar 2022 09:34:13 +0000
-Message-ID: <11f6725c8b60b6da8b6db04339d7e39a3321ce47.camel@infradead.org>
-Subject: Re: [PATCH 2/4] intel_iommu: Support IR-only mode without DMA
- translation
+        id 1nUQ5c-005rE2-TG; Wed, 16 Mar 2022 09:37:09 +0000
+Message-ID: <d374107ebd48432b6c2b13c13c407a48fdb2d755.camel@infradead.org>
+Subject: Re: [PATCH 1/4] target/i386: Fix sanity check on max APIC ID /
+ X2APIC enablement
 From:   David Woodhouse <dwmw2@infradead.org>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
+To:     Igor Mammedov <imammedo@redhat.com>
+Cc:     qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
+        Peter Xu <peterx@redhat.com>, Jason Wang <jasowang@redhat.com>,
         Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Richard Henderson <richard.henderson@linaro.org>,
         Eduardo Habkost <eduardo@habkost.net>,
         Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org,
         Claudio Fontana <cfontana@suse.de>,
-        Igor Mammedov <imammedo@redhat.com>,
         "Daniel P ." =?ISO-8859-1?Q?Berrang=E9?= <berrange@redhat.com>
-Date:   Wed, 16 Mar 2022 09:34:11 +0000
-In-Reply-To: <20220314182454-mutt-send-email-mst@kernel.org>
+Date:   Wed, 16 Mar 2022 09:37:07 +0000
+In-Reply-To: <20220316100425.2758afc3@redhat.com>
 References: <20220314142544.150555-1-dwmw2@infradead.org>
-         <20220314142544.150555-2-dwmw2@infradead.org>
-         <20220314112001-mutt-send-email-mst@kernel.org>
-         <9db2fb68447b27203e6e006f29e2b960565c37bb.camel@infradead.org>
-         <20220314182454-mutt-send-email-mst@kernel.org>
+         <20220316100425.2758afc3@redhat.com>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-gCoPbDLWIDj5UmvIQmUN"
+        boundary="=-gZuMPh1ASNqgL4h82X0j"
 User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
@@ -65,31 +61,37 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-gCoPbDLWIDj5UmvIQmUN
+--=-gZuMPh1ASNqgL4h82X0j
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, 2022-03-14 at 18:27 -0400, Michael S. Tsirkin wrote:
-> On Mon, Mar 14, 2022 at 03:45:47PM +0000, David Woodhouse wrote:
-> > It's the opposite of a feature =E2=80=94 it's turning the feature *off*=
- ;)
->=20
-> Right. Still - do you believe it's appropriate in soft freeze
-> and if yes why?
->=20
+On Wed, 2022-03-16 at 10:04 +0100, Igor Mammedov wrote:
+> Well, I retested with the latest upstream kernel (both guest and host),
+> and adding kvm_enable_x2apic() is not sufficient as guest according
+> to your patches in kernel caps max APICID at 255 unless kvm-msi-ext-dest-=
+id
+> is enabled. And attempt in enabling kvm-msi-ext-dest-id with kernel-irqch=
+ip
+> fails.
 
-Not sure I care very much. I've reposted it a couple of times, with the
-bug fixes that go along with it, since it was first posted in October
-2020. I confess I don't keep track very much of the freeze status; I'm
-only posting the series again this time because Igor posted a related
-patch.
+Correctly so. We need the split irqchip to support kvm-msi-ext-dest-id
+which is why there's an explicity check for it.
 
-But all it's doing is giving us a way to *disable* functionality; it's
-not adding new functionality. I suppose someone who cares might make an
-argument that that's not so egregious a 'feature' to slip in the middle
-of a set of bug fixes that have been outstanding for so long.
+> So number of usable CPUs in guest stays at legacy level, leaving the rest
+> of CPUs in limbo.
 
---=-gCoPbDLWIDj5UmvIQmUN
+Yep, that's the guest operating system's choice. Not a qemu problem.
+
+Even if you have the split IRQ chip, if you boot a guest without kvm-
+msi-ext-dest-id support, it'll refuse to use higher CPUs.
+
+Or if you boot a guest without X2APIC support, it'll refuse to use
+higher CPUs.=20
+
+That doesn't mean a user should be *forbidden* from launching qemu in
+that configuration.
+
+--=-gZuMPh1ASNqgL4h82X0j
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -181,25 +183,25 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIwMzE2MDkzNDExWjAvBgkqhkiG9w0BCQQxIgQgEk8xJaSs
-GEd8liy0L5P3+QfpjkB76XkSPUacIxD3kaowgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIwMzE2MDkzNzA3WjAvBgkqhkiG9w0BCQQxIgQg4dd+5eGd
+jXuTolj2wSNT5zxkGf6VyGlRjfOwFJVVJocwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgASHt3QphCrNqsSC0xHsjeNgDChx8w/OmKI
-WqydxjXzG/ezvA/nr4XVAdEvTWNrLxb3tX442RBpg2oCQNalbTurEJ8qkl/ZGJsHDNQK1Y9AhKuL
-kaA/zrta80GZUy5DuLRy1bIz1Zd4/7P5xd9shEhvWkc5Vls72rDNGdP56YDfBuBiro0rEC6OlGPw
-xA8ashO8srWISnPImVRWI1JyQEYAF/5jbnhfCJk1Hx1zNypISJ0IwNhxwW7b4SjasgSM0WHOGT9V
-LeuBsnEs62G+D8+HXg1KGzh6C8hbTYN6QcYttcptkYEopSp+P7pYqAV+ZLJJ6u8Y3sHbwDSeUQcu
-MyB1HKSH/j5m2CPP3gqzGbetzNg6sq1hNFCbb15Ic6EiX6uvOBYB3wC1EBYJY39z1ZOcDL3mgnQA
-duxiyQ8X7VELqLdYIZicpE/Kwc2+FEq50oqv5+H4XkmSYJle5/Y5WmXUeYXbyNiF4WM6Brndb20f
-KZ7sgibA23TBWnV/NvVWVOy9VWPJPv1zk0liLJaT5E9yR2kuqOZbNsqI/Q5hUKb6u7u4TTpFvNNJ
-r3uz2iw58cZw+9uTDVBRVLexoaGgPx2pChZtRmc449bPb5mIRBdkVjIhWLaoTgoheE1E2B6vrfXJ
-K8pWcYWJ26AAGUaODhT6awuLRHZPAMWaKJTNIgC/NQAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBjkzN1GZT5gpfD6gT8SkiZF8DRj+dEbaWB
+JbQgghQZ9PxPxXpImkltjeefL0jcmX3MFMuDpD1mz3SCgaJGTlfvlfsiy4Tk7Ip5xHmUYwOVTaEm
+mqO7Ta5b1hrElCKS4+YW514PEkXPzaRisNp3GwpyX3uoZ3Ie0nV8HfdvPRq2WNqpS4cMXMEHepz3
+fO69SLbZGaAIdh/OuJPu3fsfWdA8OxX5L7g3ppLQPX5gGVw0GMsJBn3Wn9zpDlb0edTM8lu3MrHJ
++roOjMv7MHYUDRb6P0KCu3z5yWbj/uyV4FSyeOnNbKNGQwDIyqTzxD/NFuc/GucxlufJz9TROY1T
+dsFMj1nr2np3X7s5WVChbJyWSKqrTbCaW9Fb71cy6yaDgYZ+tIYAZOJQuBRmnhadzVsS9/GZNipw
+MpQXa/D29Uu2bBzPhL3VWzJIIDIy2S/btXfdjoDJjhLLBPFBOGWOirfgOz64ehy1F1383oUQ8x8N
+aUcvrOpARS7cBNAQZnpyPEG2X2D2Te2/P6QWKM3HvuT8hShBvldgm53A854b5fyfhvEQ7t2caEiE
+TEQ+p+hhflrOc+jxn0cfuEQ23ZqRlGdkmecPFMIarnWe2FIg0axs+I7n6kyzyKIO3pDHWwWs+iha
++ckV98xMeVkcYXAsKIAfpegqIUX3uc795QrdXd4M1QAAAAAAAA==
 
 
---=-gCoPbDLWIDj5UmvIQmUN--
+--=-gZuMPh1ASNqgL4h82X0j--
 
