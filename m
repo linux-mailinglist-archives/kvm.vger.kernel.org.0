@@ -2,66 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9CEE14DB068
-	for <lists+kvm@lfdr.de>; Wed, 16 Mar 2022 14:09:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A16D4DB0AC
+	for <lists+kvm@lfdr.de>; Wed, 16 Mar 2022 14:12:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356015AbiCPNKu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Mar 2022 09:10:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33644 "EHLO
+        id S1356129AbiCPNNO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Mar 2022 09:13:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356016AbiCPNKu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Mar 2022 09:10:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C5D6250E25
-        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 06:09:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647436174;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=LUjDUMLR1cceFSXs3+vNunkuSyJVRtv6LfmBiXXSacU=;
-        b=GWpf2XRdf82DWODDlsukM8WV/ZYaAh1SENPbB50w2ikBkFg3eZJe7H+EsStuWBFFj647q3
-        npxf2SfxFEoMKlhu7PyqvjeOu54vcsdRAIyonKYuP6sKM4OXBB3w7aNRKRnqMEC8qjGLLo
-        sf8CToZBPGhZvWPuJHy1bCVlah+RkhY=
-Received: from mail-yw1-f199.google.com (mail-yw1-f199.google.com
- [209.85.128.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-63-K2_RKqAMN1CwwtXxKWJJaw-1; Wed, 16 Mar 2022 09:09:33 -0400
-X-MC-Unique: K2_RKqAMN1CwwtXxKWJJaw-1
-Received: by mail-yw1-f199.google.com with SMTP id 00721157ae682-2e5883a815eso17920687b3.16
-        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 06:09:33 -0700 (PDT)
+        with ESMTP id S1356233AbiCPNNH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Mar 2022 09:13:07 -0400
+Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AE0E5F8CE
+        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 06:11:52 -0700 (PDT)
+Received: by mail-wm1-x336.google.com with SMTP id p184-20020a1c29c1000000b0037f76d8b484so1369714wmp.5
+        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 06:11:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=2i83XDmm2Ev/BgrOHivtFmnY20KZApSWVPqEjlo6vMc=;
+        b=I0LoEtV7ZSyQLZGg+c/ATH4O2ixcWNJOqGH0TXOK79vAFZNjBonSFVp592r0T/7Stp
+         V+v8h5sbrekisgQegIG1FCeFUr22cuWgwFhHMikTRbJ45KfuWPiKQEZUaecWbjihlhrx
+         MENjFnu75doFLFEX9a55JgbJOnVSV6OtSabROElRY3xK6lLAJ0aw2ZocBBCx1KmRY1VD
+         648ynNf+mKMPV5CTv2HEH+9v293oTdsnnSTnEk0PsarBG61B1m+EG2Rv5QMxNLE7csxd
+         stJ/6g1t4tZgZJ4JBasNOBwNeLtT4Uo9ttgG0df9r/Eq5ADZA5ynkNXA22esMLxs2Ako
+         mZlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=LUjDUMLR1cceFSXs3+vNunkuSyJVRtv6LfmBiXXSacU=;
-        b=0AiESkBx2JsXwlSEuRGz6ur2je/f9pinoa9Q5Se5R/SG7xO0NP3tVg9OfCuvRbInYW
-         wfVapXfBuuPOoojDNuYQGM0MZVLH9dcJycDoDHDO2lUtBlwClKplKsPbDUjEVsccPwLi
-         yb/caer/4/YZ/q3o9vJOkp5pxKwvpWsjtzOL7UC1JR9dSmUYS2CNMH+NelUfA4Gh78Zm
-         /KKtDaSX4O1lbK4pH9kseOStGrUt0MBehzGXBeGuhKW2qf1f8bgvCQAbu3o/Wsh+NJIc
-         4GxBZ1Hsosa/HtDbS94Fn9ZJMr9TbMhL/8/F+NB9hDxN2CYi2/EJ5dtpquvG91D++uqh
-         gB6w==
-X-Gm-Message-State: AOAM5334U+pq8qNmaKAVXY3Ht1Z/h2Dhvp8Hf0Lt4Rc4hZTp5ti9GRgN
-        xvFtmH9j1re4E1Ku2BfmgBw5H9CfOPyuYPKQolXQ6gJ8WHe28JFuxHWeJEIOWpi5cLRqmc94cKn
-        8Z44BjuiPgrI2qplAwL/j0En6enZ5
-X-Received: by 2002:a25:af41:0:b0:633:905f:9e9b with SMTP id c1-20020a25af41000000b00633905f9e9bmr2095232ybj.77.1647436173253;
-        Wed, 16 Mar 2022 06:09:33 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwToic1VCw89tOgg6dLGkbX6rIrees3emMg2eW+6ryHxYcS2vnVMbPuSnxY+ZB8fHjLhsti7f5gQsm9BATcOPY=
-X-Received: by 2002:a25:af41:0:b0:633:905f:9e9b with SMTP id
- c1-20020a25af41000000b00633905f9e9bmr2095185ybj.77.1647436173029; Wed, 16 Mar
- 2022 06:09:33 -0700 (PDT)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=2i83XDmm2Ev/BgrOHivtFmnY20KZApSWVPqEjlo6vMc=;
+        b=BpUt4qp65qVYe5W5AG65qnAv+0HZWvX5a7M8WmZJnIyDspB39ecNiA+qpOdIDDEQUC
+         bmsvwViSESNId3Sa9a9Hy8bZBaWxC5YoWxwDpvVLjmHQmESutHohNVcaI8z9cEAAfM+v
+         PI6iXxYfFmghe5bYkc/VV6lI0n7pWXGgq4Kn8G9Lk35/cHkrQzl/s5o+0RTyGR/G4Ijt
+         B0HS3kjDQYY4yAhEygn/U80DwNcpCsIBFqdfSLyyMi0PVXYe1yK8KP9llsL/+K0EIz+9
+         TdGKTZcdKqAxLwtW6y7dYSat3/GMYQutPhTJkgYhFmYokW6EQTBbChuMkEmz0CXOaIyH
+         0T9A==
+X-Gm-Message-State: AOAM533QE9UPhUNPjjdq++ucvCHCrd/emdM7ct/E7KY7YBmAVlougjAw
+        MxEu9JQcEwQuUDcWq6o16yQ=
+X-Google-Smtp-Source: ABdhPJysxaC/TdNQa5HjTO1GOAcmUA/36gHHMfIT3uAptuoqQ0hHz0TwXQvnu9ctJ9Q0e5U7gtlggA==
+X-Received: by 2002:a05:600c:1994:b0:38c:48dd:23ba with SMTP id t20-20020a05600c199400b0038c48dd23bamr4557931wmq.206.1647436311078;
+        Wed, 16 Mar 2022 06:11:51 -0700 (PDT)
+Received: from [192.168.1.115] ([185.126.107.38])
+        by smtp.gmail.com with ESMTPSA id t14-20020a05600c198e00b0038bb71518c1sm1689996wmq.42.2022.03.16.06.11.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 16 Mar 2022 06:11:50 -0700 (PDT)
+Message-ID: <e1f049be-8f98-04a3-6532-995e55fe7471@gmail.com>
+Date:   Wed, 16 Mar 2022 14:11:47 +0100
 MIME-Version: 1.0
-References: <20220316095308.2613651-1-marcandre.lureau@redhat.com> <e709547a-a0c2-d1bd-7145-d03e9fd1776a@gmail.com>
-In-Reply-To: <e709547a-a0c2-d1bd-7145-d03e9fd1776a@gmail.com>
-From:   =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date:   Wed, 16 Mar 2022 17:09:21 +0400
-Message-ID: <CAMxuvaze+OAZevgxnUSiwUN_ARch-Dgd643RYEC+vVm4J84d-Q@mail.gmail.com>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.7.0
 Subject: Re: [PATCH 10/27] Replace config-time define HOST_WORDS_BIGENDIAN
-To:     =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
-        <philippe.mathieu.daude@gmail.com>
-Cc:     qemu-devel <qemu-devel@nongnu.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+Content-Language: en-US
+To:     marcandre.lureau@redhat.com, qemu-devel@nongnu.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Richard Henderson <richard.henderson@linaro.org>,
         Gerd Hoffmann <kraxel@redhat.com>,
         Peter Maydell <peter.maydell@linaro.org>,
@@ -77,16 +72,16 @@ Cc:     qemu-devel <qemu-devel@nongnu.org>,
         Eric Farman <farman@linux.ibm.com>,
         David Hildenbrand <david@redhat.com>,
         Peter Xu <peterx@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
         Aurelien Jarno <aurelien@aurel32.net>,
-        =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
         Eduardo Habkost <eduardo@habkost.net>,
         Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
         Yanan Wang <wangyanan55@huawei.com>,
         Laurent Vivier <laurent@vivier.eu>,
         Jiaxun Yang <jiaxun.yang@flygoat.com>,
         Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
-        =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
+        =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
         Daniel Henrique Barboza <danielhb413@gmail.com>,
         David Gibson <david@gibson.dropbear.id.au>,
         Greg Kurz <groug@kaod.org>,
@@ -105,139 +100,141 @@ Cc:     qemu-devel <qemu-devel@nongnu.org>,
         "open list:PowerPC TCG CPUs" <qemu-ppc@nongnu.org>,
         "open list:RISC-V TCG CPUs" <qemu-riscv@nongnu.org>,
         "open list:virtio-blk" <qemu-block@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+References: <20220316095308.2613651-1-marcandre.lureau@redhat.com>
+ <e709547a-a0c2-d1bd-7145-d03e9fd1776a@gmail.com>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= 
+        <philippe.mathieu.daude@gmail.com>
+In-Reply-To: <e709547a-a0c2-d1bd-7145-d03e9fd1776a@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 16, 2022 at 5:04 PM Philippe Mathieu-Daud=C3=A9
-<philippe.mathieu.daude@gmail.com> wrote:
->
+On 16/3/22 14:04, Philippe Mathieu-Daudé wrote:
 > On 16/3/22 10:53, marcandre.lureau@redhat.com wrote:
-> > From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> >
-> > Replace a config-time define with a compile time condition
-> > define (compatible with clang and gcc) that must be declared prior to
-> > its usage. This avoids having a global configure time define, but also
-> > prevents from bad usage, if the config header wasn't included before.
-> >
-> > This can help to make some code independent from qemu too.
-> >
-> > gcc supports __BYTE_ORDER__ from about 4.6 and clang from 3.2.
-> >
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > ---
-> >   meson.build                             |  1 -
-> >   accel/tcg/atomic_template.h             |  4 +-
-> >   audio/audio.h                           |  2 +-
-> >   hw/display/pl110_template.h             |  6 +--
-> >   hw/net/can/ctucan_core.h                |  2 +-
-> >   hw/net/vmxnet3.h                        |  4 +-
-> >   include/exec/cpu-all.h                  |  4 +-
-> >   include/exec/cpu-common.h               |  2 +-
-> >   include/exec/memop.h                    |  2 +-
-> >   include/exec/memory.h                   |  2 +-
-> >   include/fpu/softfloat-types.h           |  2 +-
-> >   include/hw/core/cpu.h                   |  2 +-
-> >   include/hw/i386/intel_iommu.h           |  6 +--
-> >   include/hw/i386/x86-iommu.h             |  4 +-
-> >   include/hw/virtio/virtio-access.h       |  6 +--
-> >   include/hw/virtio/virtio-gpu-bswap.h    |  2 +-
-> >   include/libdecnumber/dconfig.h          |  2 +-
-> >   include/net/eth.h                       |  2 +-
-> >   include/qemu/bswap.h                    |  8 ++--
-> >   include/qemu/compiler.h                 |  2 +
-> >   include/qemu/host-utils.h               |  2 +-
-> >   include/qemu/int128.h                   |  2 +-
-> >   include/ui/qemu-pixman.h                |  2 +-
-> >   net/util.h                              |  2 +-
-> >   target/arm/cpu.h                        |  8 ++--
-> >   target/arm/translate-a64.h              |  2 +-
-> >   target/arm/vec_internal.h               |  2 +-
-> >   target/i386/cpu.h                       |  2 +-
-> >   target/mips/cpu.h                       |  2 +-
-> >   target/ppc/cpu.h                        |  2 +-
-> >   target/s390x/tcg/vec.h                  |  2 +-
-> >   target/xtensa/cpu.h                     |  2 +-
-> >   tests/fp/platform.h                     |  4 +-
-> >   accel/kvm/kvm-all.c                     |  4 +-
-> >   audio/dbusaudio.c                       |  2 +-
-> >   disas.c                                 |  2 +-
-> >   hw/core/loader.c                        |  4 +-
-> >   hw/display/artist.c                     |  6 +--
-> >   hw/display/pxa2xx_lcd.c                 |  2 +-
-> >   hw/display/vga.c                        | 12 +++---
-> >   hw/display/virtio-gpu-gl.c              |  2 +-
-> >   hw/s390x/event-facility.c               |  2 +-
-> >   hw/virtio/vhost.c                       |  2 +-
-> >   linux-user/arm/nwfpe/double_cpdo.c      |  4 +-
-> >   linux-user/arm/nwfpe/fpa11_cpdt.c       |  4 +-
-> >   linux-user/ppc/signal.c                 |  3 +-
-> >   linux-user/syscall.c                    |  6 +--
-> >   net/net.c                               |  4 +-
-> >   target/alpha/translate.c                |  2 +-
-> >   target/arm/crypto_helper.c              |  2 +-
-> >   target/arm/helper.c                     |  2 +-
-> >   target/arm/kvm64.c                      |  4 +-
-> >   target/arm/neon_helper.c                |  2 +-
-> >   target/arm/sve_helper.c                 |  4 +-
-> >   target/arm/translate-sve.c              |  6 +--
-> >   target/arm/translate-vfp.c              |  2 +-
-> >   target/arm/translate.c                  |  2 +-
-> >   target/hppa/translate.c                 |  2 +-
-> >   target/i386/tcg/translate.c             |  2 +-
-> >   target/mips/tcg/lmmi_helper.c           |  2 +-
-> >   target/mips/tcg/msa_helper.c            | 54 ++++++++++++------------=
--
-> >   target/ppc/arch_dump.c                  |  2 +-
-> >   target/ppc/int_helper.c                 | 22 +++++-----
-> >   target/ppc/kvm.c                        |  4 +-
-> >   target/ppc/mem_helper.c                 |  2 +-
-> >   target/riscv/vector_helper.c            |  2 +-
-> >   target/s390x/tcg/translate.c            |  2 +-
-> >   target/sparc/vis_helper.c               |  4 +-
-> >   tcg/tcg-op.c                            |  4 +-
-> >   tcg/tcg.c                               | 12 +++---
-> >   tests/qtest/vhost-user-blk-test.c       |  2 +-
-> >   tests/qtest/virtio-blk-test.c           |  2 +-
-> >   ui/vdagent.c                            |  2 +-
-> >   ui/vnc.c                                |  2 +-
-> >   util/bitmap.c                           |  2 +-
-> >   util/host-utils.c                       |  2 +-
-> >   target/ppc/translate/vmx-impl.c.inc     |  4 +-
-> >   target/ppc/translate/vsx-impl.c.inc     |  2 +-
-> >   target/riscv/insn_trans/trans_rvv.c.inc |  4 +-
-> >   target/s390x/tcg/translate_vx.c.inc     |  2 +-
-> >   tcg/aarch64/tcg-target.c.inc            |  4 +-
-> >   tcg/arm/tcg-target.c.inc                |  4 +-
-> >   tcg/mips/tcg-target.c.inc               |  2 +-
-> >   tcg/ppc/tcg-target.c.inc                | 10 ++---
-> >   tcg/riscv/tcg-target.c.inc              |  4 +-
-> >   85 files changed, 173 insertions(+), 173 deletions(-)
-> >
-> > diff --git a/meson.build b/meson.build
-> > index f20712cb93d7..88df1bc42973 100644
-> > --- a/meson.build
-> > +++ b/meson.build
-> > @@ -1591,7 +1591,6 @@ config_host_data.set('QEMU_VERSION_MICRO', meson.=
-project_version().split('.')[2]
-> >
-> >   config_host_data.set_quoted('CONFIG_HOST_DSOSUF', host_dsosuf)
-> >   config_host_data.set('HAVE_HOST_BLOCK_DEVICE', have_host_block_device=
-)
-> > -config_host_data.set('HOST_WORDS_BIGENDIAN', host_machine.endian() =3D=
-=3D 'big')
->
+>> From: Marc-André Lureau <marcandre.lureau@redhat.com>
+>>
+>> Replace a config-time define with a compile time condition
+>> define (compatible with clang and gcc) that must be declared prior to
+>> its usage. This avoids having a global configure time define, but also
+>> prevents from bad usage, if the config header wasn't included before.
+>>
+>> This can help to make some code independent from qemu too.
+>>
+>> gcc supports __BYTE_ORDER__ from about 4.6 and clang from 3.2.
+>>
+>> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+>> ---
+>>   meson.build                             |  1 -
+>>   accel/tcg/atomic_template.h             |  4 +-
+>>   audio/audio.h                           |  2 +-
+>>   hw/display/pl110_template.h             |  6 +--
+>>   hw/net/can/ctucan_core.h                |  2 +-
+>>   hw/net/vmxnet3.h                        |  4 +-
+>>   include/exec/cpu-all.h                  |  4 +-
+>>   include/exec/cpu-common.h               |  2 +-
+>>   include/exec/memop.h                    |  2 +-
+>>   include/exec/memory.h                   |  2 +-
+>>   include/fpu/softfloat-types.h           |  2 +-
+>>   include/hw/core/cpu.h                   |  2 +-
+>>   include/hw/i386/intel_iommu.h           |  6 +--
+>>   include/hw/i386/x86-iommu.h             |  4 +-
+>>   include/hw/virtio/virtio-access.h       |  6 +--
+>>   include/hw/virtio/virtio-gpu-bswap.h    |  2 +-
+>>   include/libdecnumber/dconfig.h          |  2 +-
+>>   include/net/eth.h                       |  2 +-
+>>   include/qemu/bswap.h                    |  8 ++--
+>>   include/qemu/compiler.h                 |  2 +
+>>   include/qemu/host-utils.h               |  2 +-
+>>   include/qemu/int128.h                   |  2 +-
+>>   include/ui/qemu-pixman.h                |  2 +-
+>>   net/util.h                              |  2 +-
+>>   target/arm/cpu.h                        |  8 ++--
+>>   target/arm/translate-a64.h              |  2 +-
+>>   target/arm/vec_internal.h               |  2 +-
+>>   target/i386/cpu.h                       |  2 +-
+>>   target/mips/cpu.h                       |  2 +-
+>>   target/ppc/cpu.h                        |  2 +-
+>>   target/s390x/tcg/vec.h                  |  2 +-
+>>   target/xtensa/cpu.h                     |  2 +-
+>>   tests/fp/platform.h                     |  4 +-
+>>   accel/kvm/kvm-all.c                     |  4 +-
+>>   audio/dbusaudio.c                       |  2 +-
+>>   disas.c                                 |  2 +-
+>>   hw/core/loader.c                        |  4 +-
+>>   hw/display/artist.c                     |  6 +--
+>>   hw/display/pxa2xx_lcd.c                 |  2 +-
+>>   hw/display/vga.c                        | 12 +++---
+>>   hw/display/virtio-gpu-gl.c              |  2 +-
+>>   hw/s390x/event-facility.c               |  2 +-
+>>   hw/virtio/vhost.c                       |  2 +-
+>>   linux-user/arm/nwfpe/double_cpdo.c      |  4 +-
+>>   linux-user/arm/nwfpe/fpa11_cpdt.c       |  4 +-
+>>   linux-user/ppc/signal.c                 |  3 +-
+>>   linux-user/syscall.c                    |  6 +--
+>>   net/net.c                               |  4 +-
+>>   target/alpha/translate.c                |  2 +-
+>>   target/arm/crypto_helper.c              |  2 +-
+>>   target/arm/helper.c                     |  2 +-
+>>   target/arm/kvm64.c                      |  4 +-
+>>   target/arm/neon_helper.c                |  2 +-
+>>   target/arm/sve_helper.c                 |  4 +-
+>>   target/arm/translate-sve.c              |  6 +--
+>>   target/arm/translate-vfp.c              |  2 +-
+>>   target/arm/translate.c                  |  2 +-
+>>   target/hppa/translate.c                 |  2 +-
+>>   target/i386/tcg/translate.c             |  2 +-
+>>   target/mips/tcg/lmmi_helper.c           |  2 +-
+>>   target/mips/tcg/msa_helper.c            | 54 ++++++++++++-------------
+>>   target/ppc/arch_dump.c                  |  2 +-
+>>   target/ppc/int_helper.c                 | 22 +++++-----
+>>   target/ppc/kvm.c                        |  4 +-
+>>   target/ppc/mem_helper.c                 |  2 +-
+>>   target/riscv/vector_helper.c            |  2 +-
+>>   target/s390x/tcg/translate.c            |  2 +-
+>>   target/sparc/vis_helper.c               |  4 +-
+>>   tcg/tcg-op.c                            |  4 +-
+>>   tcg/tcg.c                               | 12 +++---
+>>   tests/qtest/vhost-user-blk-test.c       |  2 +-
+>>   tests/qtest/virtio-blk-test.c           |  2 +-
+>>   ui/vdagent.c                            |  2 +-
+>>   ui/vnc.c                                |  2 +-
+>>   util/bitmap.c                           |  2 +-
+>>   util/host-utils.c                       |  2 +-
+>>   target/ppc/translate/vmx-impl.c.inc     |  4 +-
+>>   target/ppc/translate/vsx-impl.c.inc     |  2 +-
+>>   target/riscv/insn_trans/trans_rvv.c.inc |  4 +-
+>>   target/s390x/tcg/translate_vx.c.inc     |  2 +-
+>>   tcg/aarch64/tcg-target.c.inc            |  4 +-
+>>   tcg/arm/tcg-target.c.inc                |  4 +-
+>>   tcg/mips/tcg-target.c.inc               |  2 +-
+>>   tcg/ppc/tcg-target.c.inc                | 10 ++---
+>>   tcg/riscv/tcg-target.c.inc              |  4 +-
+>>   85 files changed, 173 insertions(+), 173 deletions(-)
+>>
+>> diff --git a/meson.build b/meson.build
+>> index f20712cb93d7..88df1bc42973 100644
+>> --- a/meson.build
+>> +++ b/meson.build
+>> @@ -1591,7 +1591,6 @@ config_host_data.set('QEMU_VERSION_MICRO', 
+>> meson.project_version().split('.')[2]
+>>   config_host_data.set_quoted('CONFIG_HOST_DSOSUF', host_dsosuf)
+>>   config_host_data.set('HAVE_HOST_BLOCK_DEVICE', have_host_block_device)
+>> -config_host_data.set('HOST_WORDS_BIGENDIAN', host_machine.endian() == 
+>> 'big')
+> 
 > Can we poison HOST_WORDS_BIGENDIAN definition to force cleaning old
 > patches before merging them?
->
 
-Sure, next patch :)
+Now noticed elsewhere a patch #11 doing exactly that.
+
+Addressing Halil comment in "exec/cpu-all.h":
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
