@@ -2,177 +2,207 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 728DF4DAD2C
-	for <lists+kvm@lfdr.de>; Wed, 16 Mar 2022 10:04:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E391C4DAD77
+	for <lists+kvm@lfdr.de>; Wed, 16 Mar 2022 10:27:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354802AbiCPJGG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Mar 2022 05:06:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52150 "EHLO
+        id S1346329AbiCPJ2l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Mar 2022 05:28:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33574 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346698AbiCPJGF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Mar 2022 05:06:05 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62FC351E7D;
-        Wed, 16 Mar 2022 02:04:51 -0700 (PDT)
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22G774WW012244;
-        Wed, 16 Mar 2022 09:04:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=l4atlXBsPk5jC8TrLGKRcWK9QDytu1hrauGyvjMYFyU=;
- b=T0uuoNMihXT8dahO/pp1JbEqE/trRwDWNePmAg7vwXziHtmMCfn2v2Vg58Umk/5pDa3D
- SyGfdn/oCSHaAvS71oy2INBFpM9SPLcmyHGYV0u1ME0eXH7P+6KgFkbtf4cnHcmJ1uVw
- WocUA+vKThuwlcG6lPgbKaw8cgHx5PrFwKDaOpFXD0LUSg+Qj8bqgJCwhub4ARQLmYSx
- vprGJY8JdcuPln22ESbcYvuWbdng6iguudUDX69Hoka5gY21dsw5I7IbJJgvP2FBPImu
- 0KZHvk8twLWM2CHBsU1jVr1EwGZW0VrLBPKacIKHFdjZ8c8S9vRBA+JLxsDtgzY18FBS 6Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3euaysahre-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 16 Mar 2022 09:04:49 +0000
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22G8uB5q024366;
-        Wed, 16 Mar 2022 09:04:49 GMT
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3euaysahqh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 16 Mar 2022 09:04:49 +0000
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22G93PFJ020227;
-        Wed, 16 Mar 2022 09:04:46 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma04fra.de.ibm.com with ESMTP id 3erk58qa5w-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 16 Mar 2022 09:04:46 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22G94gmM17433036
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 16 Mar 2022 09:04:43 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E4051A4054;
-        Wed, 16 Mar 2022 09:04:42 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 568F3A405C;
-        Wed, 16 Mar 2022 09:04:42 +0000 (GMT)
-Received: from [9.145.38.138] (unknown [9.145.38.138])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 16 Mar 2022 09:04:42 +0000 (GMT)
-Message-ID: <7268565b-bb34-43fa-463e-8b9bf732b721@linux.ibm.com>
-Date:   Wed, 16 Mar 2022 10:04:41 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.2
-Subject: Re: [PATCH v3 0/4] s390: Ultravisor device
-Content-Language: en-US
-To:     Steffen Eiden <seiden@linux.ibm.com>, linux-s390@vger.kernel.org
-Cc:     Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Shuah Khan <shuah@kernel.org>, Nico Boehr <nrb@linux.ibm.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-References: <20220304141141.32767-1-seiden@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <20220304141141.32767-1-seiden@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: NqU6Q_uW8C5XA7LJogYLD2n77H-hTHOc
-X-Proofpoint-ORIG-GUID: ZLQSiHcW-dkhd_asy_MjgUUZh1hb0ouw
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-03-16_02,2022-03-15_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxscore=0
- lowpriorityscore=0 impostorscore=0 clxscore=1015 phishscore=0 bulkscore=0
- mlxlogscore=999 suspectscore=0 malwarescore=0 spamscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2203160056
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S234300AbiCPJ2j (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Mar 2022 05:28:39 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB18363500
+        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 02:27:24 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 78B8B615AA
+        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 09:27:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7182C340E9;
+        Wed, 16 Mar 2022 09:27:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1647422843;
+        bh=MKTBVvZC36ySOk7uu1pI9+HCSVtzY329jPCiKPZeyp0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=pCTi/H+G27JYycabXQk/rSsJajMBy1o7ZdBsCM/SA702IMKk9HYL6dxYlHtotnIcw
+         6AN7PyDHR0EKY1vxBiOGw/V3ZkIwxgm19GKCbAV/vx6KOdCB1lt7IoMlXZW9cJDFvy
+         updRqn0Pembh4FnMIBjVTalhu1Gf+B/ySHwyh4yItzHoxd2tMMMiUtaKqbjlsjaKh9
+         M1LWp5McMvJRfLOCb26c16GgTZdCJswB9ZzzzlhazuUxaqhQwEjxLNaXx5cNdOzMk9
+         sjZcnBMH+EasPadLYtWsoahF71xFVPilJDstJ+f0y3SmQG0ruxgayh0UxXrrmbCuCh
+         qn7Fck0I+M3OA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nUPw9-00EsLm-D2; Wed, 16 Mar 2022 09:27:21 +0000
+Date:   Wed, 16 Mar 2022 09:27:21 +0000
+Message-ID: <87ee32z1qe.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oupton@google.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, kernel-team@android.com,
+        Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH 4/4] KVM: arm64: vgic-v3: Advertise GICR_CTLR.{IR, CES} as a new GICD_IIDR revision
+In-Reply-To: <YjEdhVFKTkS4GiIS@google.com>
+References: <20220314164044.772709-1-maz@kernel.org>
+        <20220314164044.772709-5-maz@kernel.org>
+        <YjEdhVFKTkS4GiIS@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@google.com, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, kernel-team@android.com, andre.przywara@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-8.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/4/22 15:11, Steffen Eiden wrote:
-> This series adds an Ultravisor(UV) device letting the userspace send some
-> Ultravisor calls to the UV. Currently two calls are supported.
-> Query Ultravisor Information (QUI) and
-> Receive Attestation Measurement (Attest[ation]).
+On Tue, 15 Mar 2022 23:13:09 +0000,
+Oliver Upton <oupton@google.com> wrote:
 > 
-> The UV device is implemented as a miscdevice accepting only IOCTLs.
-> The IOCTL cmd specifies the UV call and the IOCTL arg the request
-> and response data depending on the UV call.
-> The device driver writes the UV response in the ioctl argument data.
+> Hi Marc,
 > 
-> The 'uvdevice' does no checks on the request beside faulty userspace
-> addresses, if sizes are in a sane range before allocating in kernel space,
-> and other tests that prevent the system from corruption.
-> Especially, no checks are made, that will be performed by the UV anyway
-> (E.g. 'invalid command' in case of attestation on unsupported hardware).
-> These errors are reported back to Userspace using the UV return code
-> field.
+> On Mon, Mar 14, 2022 at 04:40:44PM +0000, Marc Zyngier wrote:
+> > Since adversising GICR_CTLR.{IC,CES} is directly observable from
+> > a guest, we need to make it selectable from userspace.
+> > 
+> > For that, bump the default GICD_IIDR revision and let userspace
+> > downgrade it to the previous default. For GICv2, the two distributor
+> > revisions are strictly equivalent.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/vgic/vgic-init.c    |  7 ++++++-
+> >  arch/arm64/kvm/vgic/vgic-mmio-v2.c | 18 +++++++++++++++---
+> >  arch/arm64/kvm/vgic/vgic-mmio-v3.c | 23 +++++++++++++++++++++--
+> >  include/kvm/arm_vgic.h             |  3 +++
+> >  4 files changed, 45 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+> > index fc00304fe7d8..f84e04f334c6 100644
+> > --- a/arch/arm64/kvm/vgic/vgic-init.c
+> > +++ b/arch/arm64/kvm/vgic/vgic-init.c
+> > @@ -319,7 +319,12 @@ int vgic_init(struct kvm *kvm)
+> >  
+> >  	vgic_debug_init(kvm);
+> >  
+> > -	dist->implementation_rev = 2;
+> > +	/*
+> > +	 * If userspace didn't set the GIC implementation revision,
+> > +	 * default to the latest and greatest. You know want it.
+> > +	 */
+> > +	if (!dist->implementation_rev)
+> > +		dist->implementation_rev = KVM_VGIC_IMP_REV_LATEST;
+> >  	dist->initialized = true;
+> >  
+> >  out:
+> > diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v2.c b/arch/arm64/kvm/vgic/vgic-mmio-v2.c
+> > index 12e4c223e6b8..f2246c4ca812 100644
+> > --- a/arch/arm64/kvm/vgic/vgic-mmio-v2.c
+> > +++ b/arch/arm64/kvm/vgic/vgic-mmio-v2.c
+> > @@ -73,9 +73,13 @@ static int vgic_mmio_uaccess_write_v2_misc(struct kvm_vcpu *vcpu,
+> >  					   gpa_t addr, unsigned int len,
+> >  					   unsigned long val)
+> >  {
+> > +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+> > +	u32 reg;
+> > +
+> >  	switch (addr & 0x0c) {
+> >  	case GIC_DIST_IIDR:
+> > -		if (val != vgic_mmio_read_v2_misc(vcpu, addr, len))
+> > +		reg = vgic_mmio_read_v2_misc(vcpu, addr, len);
+> > +		if ((reg ^ val) & ~GICD_IIDR_REVISION_MASK)
+> >  			return -EINVAL;
+> >  
+> >  		/*
+> > @@ -87,8 +91,16 @@ static int vgic_mmio_uaccess_write_v2_misc(struct kvm_vcpu *vcpu,
+> >  		 * migration from old kernels to new kernels with legacy
+> >  		 * userspace.
+> >  		 */
+> > -		vcpu->kvm->arch.vgic.v2_groups_user_writable = true;
+> > -		return 0;
+> > +		reg = FIELD_GET(GICD_IIDR_REVISION_MASK, reg);
+> > +		switch (reg) {
+> > +		case KVM_VGIC_IMP_REV_2:
+> > +		case KVM_VGIC_IMP_REV_3:
+> > +			dist->v2_groups_user_writable = true;
 > 
-> The first two patches introduce the new device as a module configured to be
-> compiled directly into the kernel (y) similar to the s390 SCLP and CHSH
-> miscdevice modules. Patch 3&4 introduce Kselftests which verify error
-> paths of the ioctl.
+> Could you eliminate this bool and just pivot off of the implementation
+> version?
 
-Please fixup the commit message in the first patch and then push patches 
-#1 and #3 to devel so we get CI coverage.
-
-For now I'd opt to not include the qui patches but please put them on a 
-branch. They might prove to be useful at a later time.
+Good point. Having a non-zero implementation will serve the same
+purpose. The drawback is that we lose the documentation aspect of the
+field, but we can probably work around that.
 
 > 
-> v2->v3:
->     The main change is that QUI is now introduced after Attestation as we
->     might not want pick it. Also the Kselftest patch is splitted into
->     Attestation and QUI so that they can be picked without requiring
->     QUI support of the uvdevice.
+> > +			dist->implementation_rev = reg;
+> > +			return 0;
+> > +		default:
+> > +			return -EINVAL;
+> > +		}
+> >  	}
+> >  
+> >  	vgic_mmio_write_v2_misc(vcpu, addr, len, val);
+> > diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> > index a6be403996c6..4c8e4f83e3d1 100644
+> > --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> > +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> > @@ -155,13 +155,27 @@ static int vgic_mmio_uaccess_write_v3_misc(struct kvm_vcpu *vcpu,
+> >  					   unsigned long val)
+> >  {
+> >  	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+> > +	u32 reg;
+> >  
+> >  	switch (addr & 0x0c) {
+> >  	case GICD_TYPER2:
+> > -	case GICD_IIDR:
+> >  		if (val != vgic_mmio_read_v3_misc(vcpu, addr, len))
+> >  			return -EINVAL;
+> >  		return 0;
+> > +	case GICD_IIDR:
+> > +		reg = vgic_mmio_read_v3_misc(vcpu, addr, len);
+> > +		if ((reg ^ val) & ~GICD_IIDR_REVISION_MASK)
+> > +			return -EINVAL;
+> > +
+> > +		reg = FIELD_GET(GICD_IIDR_REVISION_MASK, reg);
+> > +		switch (reg) {
+> > +		case KVM_VGIC_IMP_REV_2:
+> > +		case KVM_VGIC_IMP_REV_3:
+> > +			dist->implementation_rev = reg;
+> > +			return 0;
+> > +		default:
+> > +			return -EINVAL;
+> > +		}
+> >  	case GICD_CTLR:
+> >  		/* Not a GICv4.1? No HW SGIs */
+> >  		if (!kvm_vgic_global_state.has_gicv4_1)
+> > @@ -232,8 +246,13 @@ static unsigned long vgic_mmio_read_v3r_ctlr(struct kvm_vcpu *vcpu,
+> >  					     gpa_t addr, unsigned int len)
+> >  {
+> >  	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+> > +	unsigned long val;
+> > +
+> > +	val = atomic_read(&vgic_cpu->ctlr);
+> > +	if (vcpu->kvm->arch.vgic.implementation_rev >= KVM_VGIC_IMP_REV_3)
 > 
->    * dropped the Kconfig dependency
->    * reorganized the series:
->      - Patch 1 now covers the introduction of the uvdevice and Attestation
->      - Patch 2 adds QUI to uvdevice
->      - Patch 3/4 add Kselftests for Attestation and QUI
->    * fixed some nits
->    * added some comments
-> 
-> v1->v2:
->    * ioctl returns -ENOIOCTLCMD in case of a invalid ioctl command
->    * streamlined reserved field test
->    * default Kconfig is y instead of m
->    * improved selftest documentation
-> 
-> Steffen Eiden (4):
->    drivers/s390/char: Add Ultravisor io device
->    drivers/s390/char: Add Query Ultravisor Information to uvdevice
->    selftests: drivers/s390x: Add uvdevice tests
->    selftests: drivers/s390x: Add uvdevice  QUI tests
-> 
->   MAINTAINERS                                   |   3 +
->   arch/s390/include/asm/uv.h                    |  23 +-
->   arch/s390/include/uapi/asm/uvdevice.h         |  53 +++
->   drivers/s390/char/Kconfig                     |  10 +
->   drivers/s390/char/Makefile                    |   1 +
->   drivers/s390/char/uvdevice.c                  | 320 ++++++++++++++++++
->   tools/testing/selftests/Makefile              |   1 +
->   tools/testing/selftests/drivers/.gitignore    |   1 +
->   .../selftests/drivers/s390x/uvdevice/Makefile |  22 ++
->   .../selftests/drivers/s390x/uvdevice/config   |   1 +
->   .../drivers/s390x/uvdevice/test_uvdevice.c    | 281 +++++++++++++++
->   11 files changed, 715 insertions(+), 1 deletion(-)
->   create mode 100644 arch/s390/include/uapi/asm/uvdevice.h
->   create mode 100644 drivers/s390/char/uvdevice.c
->   create mode 100644 tools/testing/selftests/drivers/s390x/uvdevice/Makefile
->   create mode 100644 tools/testing/selftests/drivers/s390x/uvdevice/config
->   create mode 100644 tools/testing/selftests/drivers/s390x/uvdevice/test_uvdevice.c
-> 
+> That's a lot of indirection :) Could you make a helper for getting at
+> the implementation revision from a vCPU pointer?
 
+Sure, as there will be two users now.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
