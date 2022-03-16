@@ -2,57 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 23F144DBA78
-	for <lists+kvm@lfdr.de>; Wed, 16 Mar 2022 23:02:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C9C674DBAC1
+	for <lists+kvm@lfdr.de>; Wed, 16 Mar 2022 23:50:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358199AbiCPWDd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Mar 2022 18:03:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52598 "EHLO
+        id S229667AbiCPWvO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Mar 2022 18:51:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236240AbiCPWDc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Mar 2022 18:03:32 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4864820F5E;
-        Wed, 16 Mar 2022 15:02:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=GtlS9wUSOZ9cfsjzMLAk/9sxHz72iwQmD4i95Y7gkJQ=; b=OmxwiRiGh7EnEXL97rZBDmAXaK
-        At6CvUVW5iPvS71Irp4wkJ8dULsmym7frUR0ocnOiQMsX5Z5XbXJkEs/+ojpCRo7TyzgB87IdwltB
-        4GdrkzDbB1wL7EUP8uzuL2r5vn0883tecRfjDRDL3LT1rDAcbZl3AP4oCIO1uM18RDsRp649uYnA+
-        b9duNID+1QRN9MY+Vb9aD7i2HfMG3BpEvwMexExCBWeo1CC2ic1Usf83nU7vDql5n9ibjQrLfO79B
-        QR7mvzkdAUviuG6B4wP7HshnJN7DzOC1cJydreYb2CD8Lwns9qR8LSrl1oURd1TyulHVoCNg5X0Io
-        205ZL/8g==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=worktop.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nUbiW-006PXt-BM; Wed, 16 Mar 2022 22:02:04 +0000
-Received: by worktop.programming.kicks-ass.net (Postfix, from userid 1000)
-        id C052F9882B3; Wed, 16 Mar 2022 23:02:01 +0100 (CET)
-Date:   Wed, 16 Mar 2022 23:02:01 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     Jamie Heilman <jamie@audible.transient.net>,
-        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org
-Subject: Re: system locks up with CONFIG_SLS=Y; 5.17.0-rc
-Message-ID: <20220316220201.GM8939@worktop.programming.kicks-ass.net>
-References: <YjGzJwjrvxg5YZ0Z@audible.transient.net>
- <YjHYh3XRbHwrlLbR@zn.tnic>
- <YjIwRR5UsTd3W4Bj@audible.transient.net>
- <YjI69aUseN/IuzTj@zn.tnic>
- <YjJFb02Fc0jeoIW4@audible.transient.net>
- <YjJVWYzHQDbI6nZM@zn.tnic>
+        with ESMTP id S229501AbiCPWvO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Mar 2022 18:51:14 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42E722648;
+        Wed, 16 Mar 2022 15:49:59 -0700 (PDT)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1647470996;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=oza3ORRMqARx7p/WoE9Fpi6ZhDSJmA0eJgSO1gtAE88=;
+        b=3iFeBkw9QokPXm8E3kGLD2F8X8Z+kjB9SRn7jOeJdcbg6Qr+OZ8fCgdMfny34hBqjB9X3+
+        GhV/5/iuZ7depwPX6q7Sg6Y2VfUG4FOnX7FO6j47xNZdGRqB3+6ASKs3xzfdNVrvXDg59k
+        Y0y0QX8ltbRFhD69d4DmT4T5xPY3Iof3nALlhuTYhw55hMrsR0zqCS8a+HQwpLs9A94ULU
+        C2EoPjPS3YrnyXfvJJS0ad9N5rHNMKUEi3mXQILyLxaKm+WK3zEqUg4hs/r6vMPR/nZrno
+        D17ipAX3i9M6Bz0YBnL3RXT4EW5jA+pznrscAbL6o4DyuAlohzo1Yu10MCt2Vg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1647470996;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=oza3ORRMqARx7p/WoE9Fpi6ZhDSJmA0eJgSO1gtAE88=;
+        b=5cuXzme2YWlbjHrd8D7xR0J4mzlfQCEuN8HXENUHFH4zk4yY58GpGX/7FAldN1XE9yX99X
+        q2+QyxudUhM22EDw==
+To:     Junaid Shahid <junaids@google.com>, linux-kernel@vger.kernel.org
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com,
+        pjt@google.com, oweisse@google.com, alexandre.chartre@oracle.com,
+        rppt@linux.ibm.com, dave.hansen@linux.intel.com,
+        peterz@infradead.org, luto@kernel.org, linux-mm@kvack.org
+Subject: Re: [RFC PATCH 00/47] Address Space Isolation for KVM
+In-Reply-To: <20220223052223.1202152-1-junaids@google.com>
+References: <20220223052223.1202152-1-junaids@google.com>
+Date:   Wed, 16 Mar 2022 23:49:55 +0100
+Message-ID: <87sfrh3430.ffs@tglx>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YjJVWYzHQDbI6nZM@zn.tnic>
+Content-Type: text/plain
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -60,47 +56,27 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 16, 2022 at 10:23:37PM +0100, Borislav Petkov wrote:
-> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-> index f667bd8df533..e88ce4171c4a 100644
-> --- a/arch/x86/kvm/emulate.c
-> +++ b/arch/x86/kvm/emulate.c
-> @@ -430,8 +430,11 @@ static int fastop(struct x86_emulate_ctxt *ctxt, fastop_t fop);
->  	FOP_END
->  
->  /* Special case for SETcc - 1 instruction per cc */
-> +
-> +#define SETCC_ALIGN 8
+Junaid,
 
-I'd suggest writing that like:
+On Tue, Feb 22 2022 at 21:21, Junaid Shahid wrote:
+>
+> The patches apply on top of Linux v5.16.
 
-	#define SETCC_ALIGN	(4 * (1 + IS_ENABLED(CONFIG_SLS)))
+Why are you posting patches against some randomly chosen release?
 
-That way people can enjoy smaller text when they don't do the whole SLS
-thing.... Also, it appears to me I added an ENDBR to this in
-tip/x86/core, well, that needs fixing too. Tomorrow tho.
+Documentation/process/ is pretty clear about how this works. It's not
+optional.
 
-> +
->  #define FOP_SETCC(op) \
-> -	".align 4 \n\t" \
-> +	".align " __stringify(SETCC_ALIGN) " \n\t" \
->  	".type " #op ", @function \n\t" \
->  	#op ": \n\t" \
->  	ASM_ENDBR \
-> @@ -1049,7 +1052,7 @@ static int em_bsr_c(struct x86_emulate_ctxt *ctxt)
->  static __always_inline u8 test_cc(unsigned int condition, unsigned long flags)
->  {
->  	u8 rc;
-> -	void (*fop)(void) = (void *)em_setcc + 4 * (condition & 0xf);
-> +	void (*fop)(void) = (void *)em_setcc + SETCC_ALIGN * (condition & 0xf);
->  
->  	flags = (flags & EFLAGS_MASK) | X86_EFLAGS_IF;
->  	asm("push %[flags]; popf; " CALL_NOSPEC
-> -- 
-> 2.29.2
-> 
-> -- 
-> Regards/Gruss,
->     Boris.
-> 
-> https://people.kernel.org/tglx/notes-about-netiquette
+> These patches are also available via 
+> gerrit at https://linux-review.googlesource.com/q/topic:asi-rfc.
+
+This is useful because?
+
+If you want to provide patches in a usable form then please expose them
+as git tree which can be pulled and not via the random tool of the day.
+
+Thanks,
+
+        tglx
+
+
