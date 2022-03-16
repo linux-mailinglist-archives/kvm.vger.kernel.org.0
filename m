@@ -2,140 +2,200 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 804094DAE7F
-	for <lists+kvm@lfdr.de>; Wed, 16 Mar 2022 11:51:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AFB6D4DAEBB
+	for <lists+kvm@lfdr.de>; Wed, 16 Mar 2022 12:16:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344523AbiCPKwd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Mar 2022 06:52:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32860 "EHLO
+        id S240971AbiCPLSF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Mar 2022 07:18:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53694 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235242AbiCPKwc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Mar 2022 06:52:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4C3766543D
-        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 03:51:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647427876;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=vu3aeh48Tug76fxpmH2PAoqqXJjQdjheEKaJPV3hhHw=;
-        b=Sl9geH2I7Dd1/GZ8CkydWeia/UpE7SBqc3Z41hsHfHonVFXF1W54KxZZ0i97X9vZUQWAgy
-        G89cew2Z1k0nBK1owIp7F4fzuEsn3eRDP5v4U2eNeVjLcTY2utcIW3ti2rGEN96jGbasnq
-        MEILabIUt26Njw6dv3Wb0pecUm/yNc0=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-534-M9NGR9d5O7yYgZderflXZw-1; Wed, 16 Mar 2022 06:51:13 -0400
-X-MC-Unique: M9NGR9d5O7yYgZderflXZw-1
-Received: by mail-wm1-f72.google.com with SMTP id 14-20020a05600c104e00b003897a167353so892897wmx.8
-        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 03:51:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=vu3aeh48Tug76fxpmH2PAoqqXJjQdjheEKaJPV3hhHw=;
-        b=6erEY4ay9C+ZsfHXtA7EZMhpgS79PIgsMKErIMih5ZOTM2Uvut5qFMQ+epPaoP00qE
-         WmbP4wFOC0e+lUPKvmZ2D6lE73wynnAYQ5heJWLwb27vSkiRQZ71zSv1vIl60YK/Ub2O
-         nxTDS5Z8zqeCtfFrTHNyUJi6ajX/xC4mJaBzCjdii7EiMX/uvyGYqSrqmD5dV9iYMqSR
-         rH39eEhTjehXHi77QRQ7zb8jCdm4Eny2mm81ImtlIIm/NCcwm9ldxLPtGrzMpOccqo0x
-         qG7jRjhcpYcUWxpKNfMFSgw+IhfO0R1bMWiY2bRgCTYV+RC+ZwMLQwNCaxYgWRbvxUvW
-         11SA==
-X-Gm-Message-State: AOAM532OYXg0wGz9Bt8D2doi9zMluM+l7BP5EIw9Rlqh+sj9r5si6e1z
-        jcaQsivTJ31A9BFWYNmWFgRAfrMPhEmLNqbA6frytRfWdeG4TQomZNaOXSCfiOaHdL9jFwLfCkp
-        pqMSrjX3WZN/T
-X-Received: by 2002:a1c:2744:0:b0:382:a9b7:1c8a with SMTP id n65-20020a1c2744000000b00382a9b71c8amr6808711wmn.187.1647427872494;
-        Wed, 16 Mar 2022 03:51:12 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzTLdZCDbB2DZC73GQbo1HkG4OcuIYdVyG+RtfKXW12VXxbS+y0PyvboT8fLPkRQZmWzTJFjQ==
-X-Received: by 2002:a1c:2744:0:b0:382:a9b7:1c8a with SMTP id n65-20020a1c2744000000b00382a9b71c8amr6808701wmn.187.1647427872276;
-        Wed, 16 Mar 2022 03:51:12 -0700 (PDT)
-Received: from gator (cst2-173-70.cust.vodafone.cz. [31.30.173.70])
-        by smtp.gmail.com with ESMTPSA id m185-20020a1c26c2000000b003899ed333ffsm4443134wmm.47.2022.03.16.03.51.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Mar 2022 03:51:11 -0700 (PDT)
-Date:   Wed, 16 Mar 2022 11:51:09 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     pbonzini@redhat.com, thuth@redhat.com,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        suzuki.poulose@arm.com, mark.rutland@arm.com
-Subject: Re: [kvm-unit-tests] Adding the QCBOR library to kvm-unit-tests
-Message-ID: <20220316105109.oi5g532ylijzldte@gator>
-References: <YjCVxT1yo0hi6Vdc@monolith.localdoman>
- <20220315152528.u7zdkjlq6okahidm@gator>
- <YjG/FyAaFsAxTLKd@monolith.localdoman>
+        with ESMTP id S1355295AbiCPLSB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Mar 2022 07:18:01 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1934354BD6
+        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 04:16:47 -0700 (PDT)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22GAtDAg026207;
+        Wed, 16 Mar 2022 11:15:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=i7lC1j/u2sUqN3sHAeUCMSgUm+fHwtg7q6f2c4Apre0=;
+ b=m2X1lv8U9TPohieNsuLEZhQgcls5y5HSty0hHKQIVJ/OqIxgumbLlzZxtKIQ9UxDeYL4
+ 0LYDaCGYfr7L263YEJmQ7YW16drzyflmJDBykPLyLH/DUDWOvdHBzY0RlAlQTX4p6m4c
+ zDtSvZ+ZPKnl1TVCc84ryapStfV7gpt1KtpGeG+yhy2zYIiY8omHYOafUbXtSG/55mlk
+ UOjPRbt1TsVpYiF+cw9+D9qC++dA3FJn5z/9wswmWKaMIGFilx9o6L5edEK77VslKnYO
+ Pl0i0fB1bhoXkTFnBsVEl6wgSAw0De403Wuwdn23vevzA6gc3BGVsKaghJvpdsZbxtsA ug== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3euejk8dfj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 16 Mar 2022 11:15:56 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22GAtRaT026528;
+        Wed, 16 Mar 2022 11:15:55 GMT
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3euejk8dex-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 16 Mar 2022 11:15:55 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22GB7Ko3014653;
+        Wed, 16 Mar 2022 11:15:53 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma05fra.de.ibm.com with ESMTP id 3erk58qgxq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 16 Mar 2022 11:15:52 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22GBFnWX27263458
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 16 Mar 2022 11:15:49 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B451C52050;
+        Wed, 16 Mar 2022 11:15:49 +0000 (GMT)
+Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.15.48])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with SMTP id ED2325204F;
+        Wed, 16 Mar 2022 11:15:47 +0000 (GMT)
+Date:   Wed, 16 Mar 2022 12:15:35 +0100
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Thomas Huth <thuth@redhat.com>
+Cc:     marcandre.lureau@redhat.com, qemu-devel@nongnu.org,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+        "open list:Overall KVM CPUs" <kvm@vger.kernel.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Bin Meng <bin.meng@windriver.com>,
+        Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        Peter Xu <peterx@redhat.com>,
+        Laurent Vivier <laurent@vivier.eu>,
+        Yanan Wang <wangyanan55@huawei.com>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        Alistair Francis <alistair.francis@wdc.com>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Vikram Garhwal <fnu.vikram@xilinx.com>,
+        "open list:virtio-blk" <qemu-block@nongnu.org>,
+        David Hildenbrand <david@redhat.com>,
+        Daniel Henrique Barboza <danielhb413@gmail.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Artyom Tarasenko <atar4qemu@gmail.com>,
+        Pavel Pisa <pisa@cmp.felk.cvut.cz>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Eric Farman <farman@linux.ibm.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Greg Kurz <groug@kaod.org>,
+        "open list:S390 SCLP-backed..." <qemu-s390x@nongnu.org>,
+        "open list:ARM PrimeCell and..." <qemu-arm@nongnu.org>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "open list:PowerPC TCG CPUs" <qemu-ppc@nongnu.org>,
+        Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        "open list:RISC-V TCG CPUs" <qemu-riscv@nongnu.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>,
+        Coiby Xu <Coiby.Xu@gmail.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Aurelien Jarno <aurelien@aurel32.net>,
+        =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>,
+        Halil Pasic <pasic@linux.ibm.com>
+Subject: Re: [PATCH 10/27] Replace config-time define HOST_WORDS_BIGENDIAN
+Message-ID: <20220316121535.16631f9c.pasic@linux.ibm.com>
+In-Reply-To: <9c101703-6aff-4188-a56a-8114281f75f4@redhat.com>
+References: <20220316095308.2613651-1-marcandre.lureau@redhat.com>
+        <9c101703-6aff-4188-a56a-8114281f75f4@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YjG/FyAaFsAxTLKd@monolith.localdoman>
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: FNo06TseD_FsDZln6hAhlXXvsq9GF577
+X-Proofpoint-ORIG-GUID: Fog26UqiLSIm0iBdEUUd_Qdp1Uv0pEYR
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-03-16_03,2022-03-15_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 spamscore=0
+ mlxlogscore=999 impostorscore=0 phishscore=0 priorityscore=1501
+ clxscore=1011 suspectscore=0 bulkscore=0 adultscore=0 malwarescore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2203160068
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 16, 2022 at 10:42:31AM +0000, Alexandru Elisei wrote:
-> Hi,
-> 
-> On Tue, Mar 15, 2022 at 04:25:28PM +0100, Andrew Jones wrote:
-> > On Tue, Mar 15, 2022 at 01:33:57PM +0000, Alexandru Elisei wrote:
-> > > Hi,
-> > > 
-> > > Arm is planning to upstream tests that are being developed as part of the
-> > > Confidential Compute Architecture [1]. Some of the tests target the
-> > > attestation part of creating and managing a confidential compute VM, which
-> > > requires the manipulation of messages in the Concise Binary Object
-> > > Representation (CBOR) format [2].
-> > > 
-> > > I would like to ask if it would be acceptable from a license perspective to
-> > > include the QCBOR library [3] into kvm-unit-tests, which will be used for
-> > > encoding and decoding of CBOR messages.
-> > > 
-> > > The library is licensed under the 3-Clause BSD license, which is compatible
-> > > with GPLv2 [4]. Some of the files that were created inside Qualcomm before
-> > > the library was open-sourced have a slightly modified 3-Clause BSD license,
-> > > where a NON-INFRINGMENT clause is added to the disclaimer:
-> > > 
-> > > "THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
-> > > WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-> > > MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE **AND NON-INFRINGEMENT**
-> > > ARE DISCLAIMED" (emphasis by me on the added clause).
-> > > 
-> > > The files in question include the core files that implement the
-> > > encode/decode functionality, and thus would have to be included in
-> > > kvm-unit-tests. I believe that the above modification does not affect the
-> > > compatibility with GPLv2.
-> > > 
-> > > I would also like to mention that the QCBOR library is also used in Trusted
-> > > Firmware-M [5], which is licensed under BSD 3-Clause.
-> > > 
-> > > [1] https://www.arm.com/architecture/security-features/arm-confidential-compute-architecture
-> > > [2] https://datatracker.ietf.org/doc/html/rfc8949
-> > > [3] https://github.com/laurencelundblade/QCBOR
-> > > [4] https://www.gnu.org/licenses/license-list.html#GPLCompatibleLicenses
-> > > [5] https://git.trustedfirmware.org/TF-M/trusted-firmware-m.git/tree/lib/ext/qcbor
-> > > 
-> > > Thanks,
-> > > Alex
-> > >
+On Wed, 16 Mar 2022 11:28:59 +0100
+Thomas Huth <thuth@redhat.com> wrote:
+
+> On 16/03/2022 10.53, marcandre.lureau@redhat.com wrote:
+> > From: Marc-André Lureau <marcandre.lureau@redhat.com>
 > > 
-> > Assuming the license is OK (I'm not educated in that stuff enough to give
-> > an opinion), then the next question is how do we want to integrate it?
-> > Bring it all in, like we did libfdt? Or use a git submodule?
+> > Replace a config-time define with a compile time condition
+> > define (compatible with clang and gcc) that must be declared prior to
+> > its usage. This avoids having a global configure time define, but also
+> > prevents from bad usage, if the config header wasn't included before.
+> > 
+> > This can help to make some code independent from qemu too.
+> > 
+> > gcc supports __BYTE_ORDER__ from about 4.6 and clang from 3.2.
+> > 
+> > Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+> > ---  
+> [...]
+> > @@ -188,7 +188,7 @@ CPU_CONVERT(le, 64, uint64_t)
+> >    * a compile-time constant if you pass in a constant.  So this can be
+> >    * used to initialize static variables.
+> >    */
+> > -#if defined(HOST_WORDS_BIGENDIAN)
+> > +#if HOST_BIG_ENDIAN
+> >   # define const_le32(_x)                          \
+> >       ((((_x) & 0x000000ffU) << 24) |              \
+> >        (((_x) & 0x0000ff00U) <<  8) |              \
+> > @@ -211,7 +211,7 @@ typedef union {
+> >   
+> >   typedef union {
+> >       float64 d;
+> > -#if defined(HOST_WORDS_BIGENDIAN)
+> > +#if HOST_BIG_ENDIAN
+> >       struct {
+> >           uint32_t upper;
+> >           uint32_t lower;
+> > @@ -235,7 +235,7 @@ typedef union {
+> >   
+> >   typedef union {
+> >       float128 q;
+> > -#if defined(HOST_WORDS_BIGENDIAN)
+> > +#if HOST_BIG_ENDIAN
+> >       struct {
+> >           uint32_t upmost;
+> >           uint32_t upper;
+> > diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
+> > index 0a5e67fb970e..7fdd88adb368 100644
+> > --- a/include/qemu/compiler.h
+> > +++ b/include/qemu/compiler.h
+> > @@ -7,6 +7,8 @@
+> >   #ifndef COMPILER_H
+> >   #define COMPILER_H
+> >   
+> > +#define HOST_BIG_ENDIAN (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)  
 > 
-> This is still a work in progress and at this time I'm not sure how it will
-> end up looking. Do you have a preference for one or the other?
->
+> Why don't you do it this way instead:
+> 
+> #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+> #define HOST_WORDS_BIGENDIAN 1
+> #endif
+> 
+> ... that way you could avoid the churn in all the other files?
+> 
 
-I think I prefer a submodule, but I'm all ears on this. By coincidence the
-same topic is now also being discussed here
-
-https://lore.kernel.org/kvm/334cc93e-9843-daa9-5846-394c199e294f@redhat.com/T/#mb5db3e9143e4f2ca47d24a32b30e7b2f014934e8
-
-Thanks,
-drew 
-
+I guess "prevents from bad usage, if the config header wasn't included
+before" from the commit message is the answer to that question. I agree
+that it is more robust. If we keep the #if defined we really can't
+differentiate between "not defined because not big-endian" and "not
+defined because the appropriate header was not included."
