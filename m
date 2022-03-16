@@ -2,143 +2,560 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A0C244DAC17
-	for <lists+kvm@lfdr.de>; Wed, 16 Mar 2022 08:53:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7CB2F4DAC63
+	for <lists+kvm@lfdr.de>; Wed, 16 Mar 2022 09:24:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354127AbiCPHzF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Mar 2022 03:55:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45834 "EHLO
+        id S1354517AbiCPIZY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Mar 2022 04:25:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46890 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350753AbiCPHzE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Mar 2022 03:55:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 08C0B60CE6
-        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 00:53:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647417229;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=xbrJE+kT+A4TgNq8to760TzvdzqcyJdX7Cp/jTz5ddk=;
-        b=XugeXJ7Eus/5iy1hfbiMcEoIEXCkmqdo1nM5R6fxUkNJOgO/tqeh6nU58s21yLm0sLqu33
-        wBmuu870yMRwQN4fX1IQ3boA70wcc39B+n8bIJU60vjIzwCFLUtzaXMnUATRJt5CScL82a
-        Czrv1Zd0QS14HxXDaaIx8oFLU5RmRdU=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-329-ZIQAyV5JM4KPVLa0CdkP8Q-1; Wed, 16 Mar 2022 03:53:47 -0400
-X-MC-Unique: ZIQAyV5JM4KPVLa0CdkP8Q-1
-Received: by mail-wr1-f71.google.com with SMTP id j44-20020adf912f000000b00203a5a55817so255506wrj.13
-        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 00:53:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=xbrJE+kT+A4TgNq8to760TzvdzqcyJdX7Cp/jTz5ddk=;
-        b=Er4Z5j0XCkVQPci3+D69CztR4Zq9AqBhufCQRJBY7Y/KpVaDTiM7wEI3tmqr7r1kKS
-         H94JOO1zGjiy3OhaxGs+CoA3zEzcDzOXGlz+49o+ycTik/tEwsBpNYStvp/UZfvZexSi
-         x22EiCaC4jveDW7mOPoj88XGZcHlLkX1fambPsSixJh0FTl+FGT00s03pQXHEnwmU8LX
-         nIyoeuh9ycGQJ2m7pW+0VKu41T+PZqVGWeT/e5Pkx93zdVSb57ovPkz4M53a3nKRPco/
-         ZGW1pug8EJ+d8to+18bCh1oWeBJ+2DJVnnu12fqDlNJx+xgBynkPhh5tEvu/+3b6lgXF
-         i7WA==
-X-Gm-Message-State: AOAM532eQyJ9sN/3DykYE11Ltha1QCqAVZUaPfTIia+4QDPqcybpp7vd
-        PqbgC2gh54JtqBgF43/D7sU9jnuAZrpaG+YgjNbMwRH+eEVLTrNg/hctvCVSj0R1KeNcYOib2cZ
-        r5Vc89uSLtl8M
-X-Received: by 2002:a1c:4c13:0:b0:389:a4ab:df7c with SMTP id z19-20020a1c4c13000000b00389a4abdf7cmr6206717wmf.14.1647417226812;
-        Wed, 16 Mar 2022 00:53:46 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz+ih92S8u3acUVacRNC38Qj2+u/ewT64E9VVLdgOqn7mbnYPyPFAiPxKeeFBjt2DWcwzIGBA==
-X-Received: by 2002:a1c:4c13:0:b0:389:a4ab:df7c with SMTP id z19-20020a1c4c13000000b00389a4abdf7cmr6206704wmf.14.1647417226551;
-        Wed, 16 Mar 2022 00:53:46 -0700 (PDT)
-Received: from [10.33.192.232] (nat-pool-str-t.redhat.com. [149.14.88.106])
-        by smtp.gmail.com with ESMTPSA id k18-20020a5d6d52000000b00203da94cf01sm982259wri.14.2022.03.16.00.53.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 16 Mar 2022 00:53:46 -0700 (PDT)
-Message-ID: <334cc93e-9843-daa9-5846-394c199e294f@redhat.com>
-Date:   Wed, 16 Mar 2022 08:53:45 +0100
+        with ESMTP id S1354502AbiCPIZW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Mar 2022 04:25:22 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7C7B17A8A;
+        Wed, 16 Mar 2022 01:24:07 -0700 (PDT)
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22G6gk1x012695;
+        Wed, 16 Mar 2022 08:24:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=acar3pTqCsslQlTgmMa4A6eHgD0bhdy85b8kmuUqmXA=;
+ b=H/3y5ttu/ESEwA06qPT8WicpK3L1Zmobu2E3BNm7Ew5yr4V5dNMLIpgKlSrsYkXE7Gyj
+ JNg/rOGnmstnRvnsZ1Ba2Gt/CnBOYK6zWaq2SZfhVRvrPgGLch/W2G/2RU7J8nAuF7IZ
+ g1FAn8MyiY6pJTSvxuERRD3j5GmGEgN/G0TQDSWWyD3k+kAoq1zGaNgamEleH4dfIrgm
+ kRfenzFPyS2jmx58rwKAd9VZ42oGamlwqdvRVw2OwKMpl5qNNGHP2IS4ACKRoKS/89KV
+ f9JnhGLWPOutwIjMd+pKwegbTITiLM1Q0578yRnzGijHgu8tVPWVTVpZzj6mLjBnAUIy XA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3euav89yke-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 16 Mar 2022 08:24:04 +0000
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22G81SvM009635;
+        Wed, 16 Mar 2022 08:24:03 GMT
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3euav89yjm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 16 Mar 2022 08:24:03 +0000
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22G8DNOk026363;
+        Wed, 16 Mar 2022 08:24:01 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma06fra.de.ibm.com with ESMTP id 3erjshq8mn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 16 Mar 2022 08:24:01 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22G8NwYo30802238
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 16 Mar 2022 08:23:58 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 57717A405F;
+        Wed, 16 Mar 2022 08:23:58 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A6279A405C;
+        Wed, 16 Mar 2022 08:23:57 +0000 (GMT)
+Received: from [9.145.38.138] (unknown [9.145.38.138])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 16 Mar 2022 08:23:57 +0000 (GMT)
+Message-ID: <6ac47100-03c4-1255-f569-1ece4bb23445@linux.ibm.com>
+Date:   Wed, 16 Mar 2022 09:23:57 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.0
-Subject: Re: [kvm-unit-tests PATCH] libfdt: use logical "or" instead of
- bitwise "or" with boolean operands
+ Thunderbird/91.6.2
+Subject: Re: [PATCH v3 1/4] drivers/s390/char: Add Ultravisor io device
 Content-Language: en-US
-To:     Andrew Jones <drjones@redhat.com>, Bill Wendling <morbo@google.com>
-Cc:     kvm@vger.kernel.org, Nikos Nikoleris <nikos.nikoleris@arm.com>,
-        lvivier@redhat.com, frankja@linux.ibm.com, imbrenda@linux.ibm.com,
-        david@redhat.com, pbonzini@redhat.com,
-        kvmarm@lists.cs.columbia.edu, kvm-ppc@vger.kernel.org,
-        linux-s390@vger.kernel.org
-References: <20220316060214.2200695-1-morbo@google.com>
- <20220316074356.n7e5lzrmnal2dcgu@gator>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <20220316074356.n7e5lzrmnal2dcgu@gator>
+To:     Steffen Eiden <seiden@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Shuah Khan <shuah@kernel.org>, Nico Boehr <nrb@linux.ibm.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+References: <20220304141141.32767-1-seiden@linux.ibm.com>
+ <20220304141141.32767-2-seiden@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <20220304141141.32767-2-seiden@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: JNDhmGrB-pForO8Majw7M7zuF0q8aSfQ
+X-Proofpoint-ORIG-GUID: Vk3WlXyiusoyBHG33KbK3QmSU2c88UOi
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-03-16_02,2022-03-15_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=999
+ lowpriorityscore=0 malwarescore=0 phishscore=0 suspectscore=0
+ impostorscore=0 priorityscore=1501 adultscore=0 spamscore=0 mlxscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2203160050
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H4,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16/03/2022 08.43, Andrew Jones wrote:
-> On Tue, Mar 15, 2022 at 11:02:14PM -0700, Bill Wendling wrote:
->> Clang warns about using a bitwise '|' with boolean operands. This seems
->> to be due to a small typo.
->>
->>    lib/libfdt/fdt_rw.c:438:6: warning: use of bitwise '|' with boolean operands [-Werror,-Wbitwise-instead-of-logical]
->>            if (can_assume(LIBFDT_ORDER) |
->>
->> Using '||' removes this warnings.
->>
->> Signed-off-by: Bill Wendling <morbo@google.com>
->> ---
->>   lib/libfdt/fdt_rw.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/lib/libfdt/fdt_rw.c b/lib/libfdt/fdt_rw.c
->> index 13854253ff86..3320e5559cac 100644
->> --- a/lib/libfdt/fdt_rw.c
->> +++ b/lib/libfdt/fdt_rw.c
->> @@ -435,7 +435,7 @@ int fdt_open_into(const void *fdt, void *buf, int bufsize)
->>   			return struct_size;
->>   	}
->>   
->> -	if (can_assume(LIBFDT_ORDER) |
->> +	if (can_assume(LIBFDT_ORDER) ||
->>   	    !fdt_blocks_misordered_(fdt, mem_rsv_size, struct_size)) {
->>   		/* no further work necessary */
->>   		err = fdt_move(fdt, buf, bufsize);
->> -- 
->> 2.35.1.723.g4982287a31-goog
->>
+On 3/4/22 15:11, Steffen Eiden wrote:
+> This patch adds a new miscdevice to expose some Ultravisor functions
+> to userspace. Userspace can send IOCTLs to the uvdevice that will then
+> emit a corresponding Ultravisor Call and hands the result over to
+> userspace. The uvdevice is available if the Ultravisor Call facility is
+> present.
+> Userspace can call call the Retrieve Attestation Measurement
+> Ultravisor Call using IOCTLs on the uvdevice.
 > 
-> This is fixed in libfdt upstream with commit 7be250b4 ("libfdt:
-> Correct condition for reordering blocks"), which is in v1.6.1.
-> We can either take this patch as a backport of 7be250b4 or we
-> can rebase all of our libfdt to v1.6.1. Based on the number of
-> fixes in v1.6.1, which appear to be mostly for compiling with
-> later compilers, I'm in favor of rebasing.
+> The uvdevice will do some sanity checks first.
+> Then, copy the request data to kernel space, build the UVCB,
+> perform the UV call, and copy the result back to userspace.
 
-+1 for updating to v1.6.1 completely.
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 
-> Actually, we can also use this opportunity to [re]visit the
-> idea of changing libfdt to a git submodule. I'd like to hear
-> opinions on that.
 
-I'm always a little bit torn when it comes to this question. Sure, git 
-submodules maybe make the update easier ... but they are a real pita when 
-you're working with remote machines that might not have direct connection to 
-the internet. For example, I'm used to rsync my sources to the non-x86 
-machines, and if you forget to update the submodule to the right state 
-before the sync, you've just lost. So from my side, it's a preference for 
-continuing without submodules (but I won't insist if everybody else wants to 
-have them instead).
-
-  Thomas
+> 
+> Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
+> ---
+>   MAINTAINERS                           |   2 +
+>   arch/s390/include/asm/uv.h            |  23 ++-
+>   arch/s390/include/uapi/asm/uvdevice.h |  51 +++++
+>   drivers/s390/char/Kconfig             |  10 +
+>   drivers/s390/char/Makefile            |   1 +
+>   drivers/s390/char/uvdevice.c          | 264 ++++++++++++++++++++++++++
+>   6 files changed, 350 insertions(+), 1 deletion(-)
+>   create mode 100644 arch/s390/include/uapi/asm/uvdevice.h
+>   create mode 100644 drivers/s390/char/uvdevice.c
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 777cd6fa2b3d..f32e876f45c2 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -10577,9 +10577,11 @@ F:	Documentation/virt/kvm/s390*
+>   F:	arch/s390/include/asm/gmap.h
+>   F:	arch/s390/include/asm/kvm*
+>   F:	arch/s390/include/uapi/asm/kvm*
+> +F:	arch/s390/include/uapi/asm/uvdevice.h
+>   F:	arch/s390/kernel/uv.c
+>   F:	arch/s390/kvm/
+>   F:	arch/s390/mm/gmap.c
+> +F:	drivers/s390/char/uvdevice.c
+>   F:	tools/testing/selftests/kvm/*/s390x/
+>   F:	tools/testing/selftests/kvm/s390x/
+>   
+> diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
+> index 86218382d29c..760dda4024b9 100644
+> --- a/arch/s390/include/asm/uv.h
+> +++ b/arch/s390/include/asm/uv.h
+> @@ -2,7 +2,7 @@
+>   /*
+>    * Ultravisor Interfaces
+>    *
+> - * Copyright IBM Corp. 2019
+> + * Copyright IBM Corp. 2019, 2022
+>    *
+>    * Author(s):
+>    *	Vasily Gorbik <gor@linux.ibm.com>
+> @@ -52,6 +52,7 @@
+>   #define UVC_CMD_UNPIN_PAGE_SHARED	0x0342
+>   #define UVC_CMD_SET_SHARED_ACCESS	0x1000
+>   #define UVC_CMD_REMOVE_SHARED_ACCESS	0x1001
+> +#define UVC_CMD_RETR_ATTEST		0x1020
+>   
+>   /* Bits in installed uv calls */
+>   enum uv_cmds_inst {
+> @@ -76,6 +77,7 @@ enum uv_cmds_inst {
+>   	BIT_UVC_CMD_UNSHARE_ALL = 20,
+>   	BIT_UVC_CMD_PIN_PAGE_SHARED = 21,
+>   	BIT_UVC_CMD_UNPIN_PAGE_SHARED = 22,
+> +	BIT_UVC_CMD_RETR_ATTEST = 28,
+>   };
+>   
+>   enum uv_feat_ind {
+> @@ -218,6 +220,25 @@ struct uv_cb_share {
+>   	u64 reserved28;
+>   } __packed __aligned(8);
+>   
+> +/* Retrieve Attestation Measurement */
+> +struct uv_cb_attest {
+> +	struct uv_cb_header header;	/* 0x0000 */
+> +	u64 reserved08[2];		/* 0x0008 */
+> +	u64 arcb_addr;			/* 0x0018 */
+> +	u64 cont_token;			/* 0x0020 */
+> +	u8  reserved28[6];		/* 0x0028 */
+> +	u16 user_data_len;		/* 0x002e */
+> +	u8  user_data[256];		/* 0x0030 */
+> +	u32 reserved130[3];		/* 0x0130 */
+> +	u32 meas_len;			/* 0x013c */
+> +	u64 meas_addr;			/* 0x0140 */
+> +	u8  config_uid[16];		/* 0x0148 */
+> +	u32 reserved158;		/* 0x0158 */
+> +	u32 add_data_len;		/* 0x015c */
+> +	u64 add_data_addr;		/* 0x0160 */
+> +	u64 reserved168[4];		/* 0x0168 */
+> +} __packed __aligned(8);
+> +
+>   static inline int __uv_call(unsigned long r1, unsigned long r2)
+>   {
+>   	int cc;
+> diff --git a/arch/s390/include/uapi/asm/uvdevice.h b/arch/s390/include/uapi/asm/uvdevice.h
+> new file mode 100644
+> index 000000000000..d40f69345c75
+> --- /dev/null
+> +++ b/arch/s390/include/uapi/asm/uvdevice.h
+> @@ -0,0 +1,51 @@
+> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+> +/*
+> + *  Copyright IBM Corp. 2022
+> + *  Author(s): Steffen Eiden <seiden@linux.ibm.com>
+> + */
+> +#ifndef __S390X_ASM_UVDEVICE_H
+> +#define __S390X_ASM_UVDEVICE_H
+> +
+> +#include <linux/types.h>
+> +
+> +struct uvio_ioctl_cb {
+> +	__u32 flags;
+> +	__u16 uv_rc;			/* UV header rc value */
+> +	__u16 uv_rrc;			/* UV header rrc value */
+> +	__u64 argument_addr;		/* Userspace address of uvio argument */
+> +	__u32 argument_len;
+> +	__u8  reserved14[0x40 - 0x14];	/* must be zero */
+> +};
+> +
+> +#define UVIO_ATT_USER_DATA_LEN		0x100
+> +#define UVIO_ATT_UID_LEN		0x10
+> +struct uvio_attest {
+> +	__u64 arcb_addr;				/* 0x0000 */
+> +	__u64 meas_addr;				/* 0x0008 */
+> +	__u64 add_data_addr;				/* 0x0010 */
+> +	__u8  user_data[UVIO_ATT_USER_DATA_LEN];	/* 0x0018 */
+> +	__u8  config_uid[UVIO_ATT_UID_LEN];		/* 0x0118 */
+> +	__u32 arcb_len;					/* 0x0128 */
+> +	__u32 meas_len;					/* 0x012c */
+> +	__u32 add_data_len;				/* 0x0130 */
+> +	__u16 user_data_len;				/* 0x0134 */
+> +	__u16 reserved136;				/* 0x0136 */
+> +};
+> +
+> +/*
+> + * The following max values define an upper length for the IOCTL in/out buffers.
+> + * However, they do not represent the maximum the Ultravisor allows which is
+> + * often way smaller. By allowing larger buffer sizes we hopefully do not need
+> + * to update the code with every machine update. It is therefore possible for
+> + * userspace to request more memory than actually used by kernel/UV.
+> + */
+> +#define UVIO_ATT_ARCB_MAX_LEN		0x100000
+> +#define UVIO_ATT_MEASUREMENT_MAX_LEN	0x8000
+> +#define UVIO_ATT_ADDITIONAL_MAX_LEN	0x8000
+> +
+> +#define UVIO_DEVICE_NAME "uv"
+> +#define UVIO_TYPE_UVC 'u'
+> +
+> +#define UVIO_IOCTL_ATT _IOWR(UVIO_TYPE_UVC, 0x01, struct uvio_ioctl_cb)
+> +
+> +#endif  /* __S390X_ASM_UVDEVICE_H */
+> diff --git a/drivers/s390/char/Kconfig b/drivers/s390/char/Kconfig
+> index 6cc4b19acf85..c8fa466815ac 100644
+> --- a/drivers/s390/char/Kconfig
+> +++ b/drivers/s390/char/Kconfig
+> @@ -184,3 +184,13 @@ config S390_VMUR
+>   	depends on S390
+>   	help
+>   	  Character device driver for z/VM reader, puncher and printer.
+> +
+> +config S390_UV_UAPI
+> +	def_tristate y
+> +	prompt "Ultravisor userspace API"
+> +	help
+> +	  Selecting exposes parts of the UV interface to userspace
+> +	  by providing a misc character device at /dev/uv.
+> +	  Using IOCTLs one can interact with the UV.
+> +	  The device is only available if the Ultravisor
+> +	  Facility (158) is present.
+> diff --git a/drivers/s390/char/Makefile b/drivers/s390/char/Makefile
+> index c6fdb81a068a..ce32270082f5 100644
+> --- a/drivers/s390/char/Makefile
+> +++ b/drivers/s390/char/Makefile
+> @@ -48,6 +48,7 @@ obj-$(CONFIG_MONREADER) += monreader.o
+>   obj-$(CONFIG_MONWRITER) += monwriter.o
+>   obj-$(CONFIG_S390_VMUR) += vmur.o
+>   obj-$(CONFIG_CRASH_DUMP) += sclp_sdias.o zcore.o
+> +obj-$(CONFIG_S390_UV_UAPI) += uvdevice.o
+>   
+>   hmcdrv-objs := hmcdrv_mod.o hmcdrv_dev.o hmcdrv_ftp.o hmcdrv_cache.o diag_ftp.o sclp_ftp.o
+>   obj-$(CONFIG_HMC_DRV) += hmcdrv.o
+> diff --git a/drivers/s390/char/uvdevice.c b/drivers/s390/char/uvdevice.c
+> new file mode 100644
+> index 000000000000..b720dc8d0bd9
+> --- /dev/null
+> +++ b/drivers/s390/char/uvdevice.c
+> @@ -0,0 +1,264 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + *  Copyright IBM Corp. 2022
+> + *  Author(s): Steffen Eiden <seiden@linux.ibm.com>
+> + *
+> + *  This file provides a Linux misc device to give userspace access to some
+> + *  Ultravisor (UV) functions. The device only accepts IOCTLs and will only
+> + *  be present if the Ultravisor facility (158) is present.
+> + *
+> + *  When userspace sends a valid IOCTL uvdevice will copy the input data to
+> + *  kernel space, do some basic validity checks to avoid kernel/system
+> + *  corruption. Any other check that the Ultravisor does will not be done by
+> + *  the uvdevice to keep changes minimal when adding new functionalities
+> + *  to existing UV-calls.
+> + *  After the checks uvdevice builds a corresponding
+> + *  Ultravisor Call Control Block, and sends the request to the Ultravisor.
+> + *  Then, it copies the response, including the return codes, back to userspace.
+> + *  It is the responsibility of the userspace to check for any error issued
+> + *  by UV and to interpret the UV response. The uvdevice acts as a communication
+> + *  channel for userspace to the Ultravisor.
+> + */
+> +
+> +#include <linux/module.h>
+> +#include <linux/kernel.h>
+> +#include <linux/miscdevice.h>
+> +#include <linux/types.h>
+> +#include <linux/stddef.h>
+> +#include <linux/vmalloc.h>
+> +#include <linux/slab.h>
+> +
+> +#include <asm/uvdevice.h>
+> +#include <asm/uv.h>
+> +
+> +static int uvio_build_uvcb_attest(struct uv_cb_attest *uvcb_attest, u8 *arcb,
+> +				  u8 *meas, u8 *add_data, struct uvio_attest *uvio_attest)
+> +{
+> +	void __user *user_buf_arcb = (void __user *)uvio_attest->arcb_addr;
+> +
+> +	if (copy_from_user(arcb, user_buf_arcb, uvio_attest->arcb_len))
+> +		return -EFAULT;
+> +
+> +	uvcb_attest->header.len = sizeof(*uvcb_attest);
+> +	uvcb_attest->header.cmd = UVC_CMD_RETR_ATTEST;
+> +	uvcb_attest->arcb_addr = (u64)arcb;
+> +	uvcb_attest->cont_token = 0;
+> +	uvcb_attest->user_data_len = uvio_attest->user_data_len;
+> +	memcpy(uvcb_attest->user_data, uvio_attest->user_data, sizeof(uvcb_attest->user_data));
+> +	uvcb_attest->meas_len = uvio_attest->meas_len;
+> +	uvcb_attest->meas_addr = (u64)meas;
+> +	uvcb_attest->add_data_len = uvio_attest->add_data_len;
+> +	uvcb_attest->add_data_addr = (u64)add_data;
+> +
+> +	return 0;
+> +}
+> +
+> +static int uvio_copy_attest_result_to_user(struct uv_cb_attest *uvcb_attest,
+> +					   struct uvio_ioctl_cb *uv_ioctl,
+> +					   u8 *measurement, u8 *add_data,
+> +					   struct uvio_attest *uvio_attest)
+> +{
+> +	struct uvio_attest __user *user_uvio_attest = (void __user *)uv_ioctl->argument_addr;
+> +	void __user *user_buf_add = (void __user *)uvio_attest->add_data_addr;
+> +	void __user *user_buf_meas = (void __user *)uvio_attest->meas_addr;
+> +	void __user *user_buf_uid = &user_uvio_attest->config_uid;
+> +
+> +	if (copy_to_user(user_buf_meas, measurement, uvio_attest->meas_len))
+> +		return -EFAULT;
+> +	if (add_data && copy_to_user(user_buf_add, add_data, uvio_attest->add_data_len))
+> +		return -EFAULT;
+> +	if (copy_to_user(user_buf_uid, uvcb_attest->config_uid, sizeof(uvcb_attest->config_uid)))
+> +		return -EFAULT;
+> +	return 0;
+> +}
+> +
+> +static int get_uvio_attest(struct uvio_ioctl_cb *uv_ioctl, struct uvio_attest *uvio_attest)
+> +{
+> +	u8 __user *user_arg_buf = (u8 __user *)uv_ioctl->argument_addr;
+> +
+> +	if (copy_from_user(uvio_attest, user_arg_buf, sizeof(*uvio_attest)))
+> +		return -EFAULT;
+> +
+> +	if (uvio_attest->arcb_len > UVIO_ATT_ARCB_MAX_LEN)
+> +		return -EINVAL;
+> +	if (uvio_attest->arcb_len == 0)
+> +		return -EINVAL;
+> +	if (uvio_attest->meas_len > UVIO_ATT_MEASUREMENT_MAX_LEN)
+> +		return -EINVAL;
+> +	if (uvio_attest->meas_len == 0)
+> +		return -EINVAL;
+> +	if (uvio_attest->add_data_len > UVIO_ATT_ADDITIONAL_MAX_LEN)
+> +		return -EINVAL;
+> +	if (uvio_attest->reserved136)
+> +		return -EINVAL;
+> +	return 0;
+> +}
+> +
+> +/**
+> + * uvio_attestation() - Perform a Retrieve Attestation Measurement UVC.
+> + *
+> + * uv_ioctl: ioctl control block
+> + *
+> + * uvio_attestation() does a  Retrieve Attestation Measurement Ultravisor Call.
+> + * It verifies that the given userspace addresses are valid and request sizes
+> + * are sane. Every other check is made by the Ultravisor (UV) and won't result
+> + * in a negative return value. It copies the input to kernelspace, builds the
+> + * request, sends the UV-call, and copies the result to userspace.
+> + *
+> + * The Attestation Request has two input and two outputs.
+> + * ARCB and User Data are inputs for the UV generated by userspace.
+> + * Measurement and Additional Data are outputs for userspace generated by UV.
+> + *
+> + * The Attestation Request Control Block (ARCB) is a cryptographically verified
+> + * and secured request to UV and User Data is some plaintext data which is
+> + * going to be included in the Attestation Measurement calculation.
+> + *
+> + * Measurement is a cryptographic measurement of the callers properties,
+> + * optional data configured by the ARCB and the user data. If specified by the
+> + * ARCB, UV will add some Additional Data to the measurement calculation.
+> + * This Additional Data is then returned as well.
+> + *
+> + * If the Retrieve Attestation Measurement UV facility is not present,
+> + * UV will return invalid command rc. This won't be fenced in the driver
+> + * and does not result in a negative return value.
+> + *
+> + * Context: might sleep
+> + *
+> + * Return: 0 on success or a negative error code on error.
+> + */
+> +static int uvio_attestation(struct uvio_ioctl_cb *uv_ioctl)
+> +{
+> +	struct uv_cb_attest *uvcb_attest = NULL;
+> +	struct uvio_attest *uvio_attest = NULL;
+> +	u8 *measurement = NULL;
+> +	u8 *add_data = NULL;
+> +	u8 *arcb = NULL;
+> +	int ret;
+> +
+> +	ret = -EINVAL;
+> +	if (uv_ioctl->argument_len != sizeof(*uvio_attest))
+> +		goto out;
+> +
+> +	ret = -ENOMEM;
+> +	uvio_attest = kzalloc(sizeof(*uvio_attest), GFP_KERNEL);
+> +	if (!uvio_attest)
+> +		goto out;
+> +
+> +	ret = get_uvio_attest(uv_ioctl, uvio_attest);
+> +	if (ret)
+> +		goto out;
+> +
+> +	ret = -ENOMEM;
+> +	arcb = kvzalloc(uvio_attest->arcb_len, GFP_KERNEL);
+> +	measurement = kvzalloc(uvio_attest->meas_len, GFP_KERNEL);
+> +	if (!arcb || !measurement)
+> +		goto out;
+> +
+> +	if (uvio_attest->add_data_len) {
+> +		add_data = kvzalloc(uvio_attest->add_data_len, GFP_KERNEL);
+> +		if (!add_data)
+> +			goto out;
+> +	}
+> +
+> +	uvcb_attest = kzalloc(sizeof(*uvcb_attest), GFP_KERNEL);
+> +	if (!uvcb_attest)
+> +		goto out;
+> +
+> +	ret = uvio_build_uvcb_attest(uvcb_attest, arcb,  measurement, add_data, uvio_attest);
+> +	if (ret)
+> +		goto out;
+> +
+> +	uv_call_sched(0, (u64)uvcb_attest);
+> +
+> +	uv_ioctl->uv_rc = uvcb_attest->header.rc;
+> +	uv_ioctl->uv_rrc = uvcb_attest->header.rrc;
+> +
+> +	ret = uvio_copy_attest_result_to_user(uvcb_attest, uv_ioctl, measurement, add_data,
+> +					      uvio_attest);
+> +out:
+> +	kvfree(arcb);
+> +	kvfree(measurement);
+> +	kvfree(add_data);
+> +	kfree(uvio_attest);
+> +	kfree(uvcb_attest);
+> +	return ret;
+> +}
+> +
+> +static int uvio_copy_and_check_ioctl(struct uvio_ioctl_cb *ioctl, void __user *argp)
+> +{
+> +	if (copy_from_user(ioctl, argp, sizeof(*ioctl)))
+> +		return -EFAULT;
+> +	if (ioctl->flags != 0)
+> +		return -EINVAL;
+> +	if (memchr_inv(ioctl->reserved14, 0, sizeof(ioctl->reserved14)))
+> +		return -EINVAL;
+> +
+> +	return 0;
+> +}
+> +
+> +/*
+> + * IOCTL entry point for the Ultravisor device.
+> + */
+> +static long uvio_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
+> +{
+> +	void __user *argp = (void __user *)arg;
+> +	struct uvio_ioctl_cb *uv_ioctl;
+> +	long ret;
+> +
+> +	ret = -ENOMEM;
+> +	uv_ioctl = vzalloc(sizeof(*uv_ioctl));
+> +	if (!uv_ioctl)
+> +		goto out;
+> +
+> +	switch (cmd) {
+> +	case UVIO_IOCTL_ATT:
+> +		ret = uvio_copy_and_check_ioctl(uv_ioctl, argp);
+> +		if (ret)
+> +			goto out;
+> +		ret = uvio_attestation(uv_ioctl);
+> +		break;
+> +	default:
+> +		ret = -ENOIOCTLCMD;
+> +		break;
+> +	}
+> +	if (ret)
+> +		goto out;
+> +
+> +	if (copy_to_user(argp, uv_ioctl, sizeof(*uv_ioctl)))
+> +		ret = -EFAULT;
+> +
+> + out:
+> +	vfree(uv_ioctl);
+> +	return ret;
+> +}
+> +
+> +static const struct file_operations uvio_dev_fops = {
+> +	.owner = THIS_MODULE,
+> +	.unlocked_ioctl = uvio_ioctl,
+> +	.llseek = no_llseek,
+> +};
+> +
+> +static struct miscdevice uvio_dev_miscdev = {
+> +	.minor = MISC_DYNAMIC_MINOR,
+> +	.name = UVIO_DEVICE_NAME,
+> +	.fops = &uvio_dev_fops,
+> +};
+> +
+> +static void __exit uvio_dev_exit(void)
+> +{
+> +	misc_deregister(&uvio_dev_miscdev);
+> +}
+> +
+> +static int __init uvio_dev_init(void)
+> +{
+> +	if (!test_facility(158))
+> +		return -ENXIO;
+> +	return misc_register(&uvio_dev_miscdev);
+> +}
+> +
+> +module_init(uvio_dev_init);
+> +module_exit(uvio_dev_exit);
+> +
+> +MODULE_AUTHOR("IBM Corporation");
+> +MODULE_LICENSE("GPL");
+> +MODULE_DESCRIPTION("Ultravisor UAPI driver");
 
