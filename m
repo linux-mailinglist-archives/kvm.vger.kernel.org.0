@@ -2,91 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AE9894DAE38
-	for <lists+kvm@lfdr.de>; Wed, 16 Mar 2022 11:27:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 678944DAE3D
+	for <lists+kvm@lfdr.de>; Wed, 16 Mar 2022 11:29:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355134AbiCPK2P (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Mar 2022 06:28:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35140 "EHLO
+        id S1355135AbiCPKaU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Mar 2022 06:30:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344542AbiCPK2N (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Mar 2022 06:28:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D9C6E5BD2A
-        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 03:26:58 -0700 (PDT)
+        with ESMTP id S243190AbiCPKaT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Mar 2022 06:30:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E9A1C5D1A7
+        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 03:29:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647426418;
+        s=mimecast20190719; t=1647426544;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=E9sc2QKvZ6jQfVnVaYNv02EOzH/XkSDclOIFBmE3wrg=;
-        b=igOPGCZLsMmj4vHw1W/4EFF/3L9vWZHr3tVz+Te53t+ghnCGWjPkTPoJXJQ7j0coIDmnQK
-        wExMk2rWKXbidEMrw6BFV5x3QxHA6SdpbaVoyoOgKLsqGdzxyy+TGjrL+ArgDs3HjPm0WR
-        3L0q4nDXVmnWwk9wk58qr5Px6bxuvig=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=3ZG73wxzWLfcdWLW67pCExjrwvhATcoBiJyt8lfU9V8=;
+        b=JS2b4U4zTceV6RnMiyacWTLjyd4lsEM3UOSWSzc7SyMzZ3BGJOHt6bq9Xh3rEHJ4ILBOyi
+        gCBq730yelqQSnOFkQqhvpJGfGMA7fQnmHkcn7uoR/7fk6ZZNjpz2ONWZl8VhP0mPbDef0
+        SstLDaN0ZYGDstwM6y3g/uVompRRJVk=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-483-gEd2hBigPH-8WKD1ULyawg-1; Wed, 16 Mar 2022 06:26:56 -0400
-X-MC-Unique: gEd2hBigPH-8WKD1ULyawg-1
-Received: by mail-pj1-f70.google.com with SMTP id o6-20020a17090a9f8600b001c640fa1499so1484150pjp.3
-        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 03:26:56 -0700 (PDT)
+ us-mta-446-EyYDSczbMWiZcafCVT2P2w-1; Wed, 16 Mar 2022 06:29:02 -0400
+X-MC-Unique: EyYDSczbMWiZcafCVT2P2w-1
+Received: by mail-wr1-f71.google.com with SMTP id a16-20020adff7d0000000b001f0473a6b25so415825wrq.1
+        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 03:29:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=E9sc2QKvZ6jQfVnVaYNv02EOzH/XkSDclOIFBmE3wrg=;
-        b=nysYEVMJuSjL5iXMvHvbekLITxxeOnUg/7nAhwmf4V/h1Pja859+FGEl5mIXUz8z6G
-         CfcAbD7DqV9qM3gIEwiMtqvxmUGhMwYIapOXxq+BhlICWh13vdPOpz9Ov+7GaRFOusHW
-         bprigeNT7ZV2Seat7sNrPhaXjORO/jqF7xLiBtwxa3MR74qkLboPLaTnY2gQajHL7s5V
-         rg7H6h4mZrvmHdaL1GkfIneXeZDnVQdP24Eg4yk3Nbx/iUb5PByg72oBFdOPySfDHSjB
-         wWvKFuEOPl3I+3GYNVknQ/+JmERyQEuxGbPYt86kerH7rdGOUiUwFworMGOB1cIRp3HK
-         1wTA==
-X-Gm-Message-State: AOAM533ueW83FS/5x6sCP10rJTgx+ReHriljJRntgI6ALWTgL/hHFfSV
-        D8l5623OG6oqK7DeN+KWHi4DZVp3vrYSZv+G9dYdJUYFRS0caxBHM+1Zso4Q/3skYuas16FgKUT
-        J1iOcUV8Km4t7
-X-Received: by 2002:a17:903:110c:b0:153:1293:5624 with SMTP id n12-20020a170903110c00b0015312935624mr32609976plh.149.1647426415346;
-        Wed, 16 Mar 2022 03:26:55 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxMSKIOGyF7c+akd053X7Mrr2oeKncFSJFsXk0tI1zZhQcz46nFkjBsMeAlw53IG1hZZsUshg==
-X-Received: by 2002:a17:903:110c:b0:153:1293:5624 with SMTP id n12-20020a170903110c00b0015312935624mr32609927plh.149.1647426414887;
-        Wed, 16 Mar 2022 03:26:54 -0700 (PDT)
-Received: from xz-m1.local ([191.101.132.128])
-        by smtp.gmail.com with ESMTPSA id j67-20020a636e46000000b003740d689ca9sm2122395pgc.62.2022.03.16.03.26.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Mar 2022 03:26:54 -0700 (PDT)
-Date:   Wed, 16 Mar 2022 18:26:46 +0800
-From:   Peter Xu <peterx@redhat.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Sean Christopherson <seanjc@google.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Ben Gardon <bgardon@google.com>, maciej.szmigiero@oracle.com,
-        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
-        <kvmarm@lists.cs.columbia.edu>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <linux-mips@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <kvm@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>
-Subject: Re: [PATCH v2 20/26] KVM: x86/mmu: Extend Eager Page Splitting to
- the shadow MMU
-Message-ID: <YjG7Zh4zwTDsO3L1@xz-m1.local>
-References: <20220311002528.2230172-1-dmatlack@google.com>
- <20220311002528.2230172-21-dmatlack@google.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=3ZG73wxzWLfcdWLW67pCExjrwvhATcoBiJyt8lfU9V8=;
+        b=Bt0WjoalmZeg9jWvxm59rrHikobGpsjW/zA5WDnAKF4pKp1jR6gMuldOSXSSO5cZDV
+         28RViSQcVUDQRLoAtiB+ws0CNPeOX54Rh4Xkym4f/Hpzb3TG5WUHLbi9U5QTT/KuQFPF
+         kC7g1yJTYYDCqohNYv65Bji2s+GpBIm3B7tBNZnCVpUy7EYdRRu4URAok3v6nQUNzQ0G
+         mF2rvL0lP+TuzS7IdytOJE3EDkigqpbNLVyC/Jms9ZeWCTWGXSI2FTpvuWotD7tX3DmK
+         9cEqOeFGdsl08w6obGggKOYMJK17E059TRPKE1dnZd6iaDrPFTxwQviErgTJv5JeKDVL
+         e8dw==
+X-Gm-Message-State: AOAM533zzABNbVShp1Bs5sgtwHO2Vc+NIsqJmumr/yJmNUo+6Uj7JhVj
+        gaZpllAew+p/5PYP3gsAubTklviLhCEG2fynjBT0GaKknlKyQsILBlz8O4DlZVgpWFE8oa3mX2R
+        qDMvGydpSxDJT
+X-Received: by 2002:adf:efc6:0:b0:1f1:e397:44b with SMTP id i6-20020adfefc6000000b001f1e397044bmr23848613wrp.298.1647426541634;
+        Wed, 16 Mar 2022 03:29:01 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxWc3yVEpZmzNiooTnfHTcTX/OjyOlZh11TgDwn9mo+DvgXsgZ+n28MBUHxJT6ufumaLGgdfA==
+X-Received: by 2002:adf:efc6:0:b0:1f1:e397:44b with SMTP id i6-20020adfefc6000000b001f1e397044bmr23848591wrp.298.1647426541370;
+        Wed, 16 Mar 2022 03:29:01 -0700 (PDT)
+Received: from [10.33.192.232] (nat-pool-str-t.redhat.com. [149.14.88.106])
+        by smtp.gmail.com with ESMTPSA id n8-20020a5d5988000000b00203d5f1f3e4sm1366873wri.105.2022.03.16.03.28.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 16 Mar 2022 03:29:00 -0700 (PDT)
+Message-ID: <9c101703-6aff-4188-a56a-8114281f75f4@redhat.com>
+Date:   Wed, 16 Mar 2022 11:28:59 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20220311002528.2230172-21-dmatlack@google.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.0
+Subject: Re: [PATCH 10/27] Replace config-time define HOST_WORDS_BIGENDIAN
+Content-Language: en-US
+To:     marcandre.lureau@redhat.com, qemu-devel@nongnu.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Pavel Pisa <pisa@cmp.felk.cvut.cz>,
+        Vikram Garhwal <fnu.vikram@xilinx.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+        Aurelien Jarno <aurelien@aurel32.net>,
+        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Yanan Wang <wangyanan55@huawei.com>,
+        Laurent Vivier <laurent@vivier.eu>,
+        Jiaxun Yang <jiaxun.yang@flygoat.com>,
+        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+        Daniel Henrique Barboza <danielhb413@gmail.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Greg Kurz <groug@kaod.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Alistair Francis <alistair.francis@wdc.com>,
+        Bin Meng <bin.meng@windriver.com>,
+        Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+        Artyom Tarasenko <atar4qemu@gmail.com>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Coiby Xu <Coiby.Xu@gmail.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "open list:Overall KVM CPUs" <kvm@vger.kernel.org>,
+        "open list:ARM PrimeCell and..." <qemu-arm@nongnu.org>,
+        "open list:S390 SCLP-backed..." <qemu-s390x@nongnu.org>,
+        "open list:PowerPC TCG CPUs" <qemu-ppc@nongnu.org>,
+        "open list:RISC-V TCG CPUs" <qemu-riscv@nongnu.org>,
+        "open list:virtio-blk" <qemu-block@nongnu.org>
+References: <20220316095308.2613651-1-marcandre.lureau@redhat.com>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <20220316095308.2613651-1-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -94,331 +122,65 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 11, 2022 at 12:25:22AM +0000, David Matlack wrote:
-> Extend KVM's eager page splitting to also split huge pages that are
-> mapped by the shadow MMU. Specifically, walk through the rmap splitting
-> all 1GiB pages to 2MiB pages, and splitting all 2MiB pages to 4KiB
-> pages.
+On 16/03/2022 10.53, marcandre.lureau@redhat.com wrote:
+> From: Marc-André Lureau <marcandre.lureau@redhat.com>
 > 
-> Splitting huge pages mapped by the shadow MMU requries dealing with some
-> extra complexity beyond that of the TDP MMU:
+> Replace a config-time define with a compile time condition
+> define (compatible with clang and gcc) that must be declared prior to
+> its usage. This avoids having a global configure time define, but also
+> prevents from bad usage, if the config header wasn't included before.
 > 
-> (1) The shadow MMU has a limit on the number of shadow pages that are
->     allowed to be allocated. So, as a policy, Eager Page Splitting
->     refuses to split if there are KVM_MIN_FREE_MMU_PAGES or fewer
->     pages available.
+> This can help to make some code independent from qemu too.
 > 
-> (2) Huge pages may be mapped by indirect shadow pages which have the
->     possibility of being unsync. As a policy we opt not to split such
->     pages as their translation may no longer be valid.
+> gcc supports __BYTE_ORDER__ from about 4.6 and clang from 3.2.
 > 
-> (3) Splitting a huge page may end up re-using an existing lower level
->     shadow page tables. This is unlike the TDP MMU which always allocates
->     new shadow page tables when splitting.  This commit does *not*
->     handle such aliasing and opts not to split such huge pages.
-> 
-> (4) When installing the lower level SPTEs, they must be added to the
->     rmap which may require allocating additional pte_list_desc structs.
->     This commit does *not* handle such cases and instead opts to leave
->     such lower-level SPTEs non-present. In this situation TLBs must be
->     flushed before dropping the MMU lock as a portion of the huge page
->     region is being unmapped.
-> 
-> Suggested-by: Peter Feiner <pfeiner@google.com>
-> [ This commit is based off of the original implementation of Eager Page
->   Splitting from Peter in Google's kernel from 2016. ]
-> Signed-off-by: David Matlack <dmatlack@google.com>
+> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 > ---
->  .../admin-guide/kernel-parameters.txt         |   3 -
->  arch/x86/kvm/mmu/mmu.c                        | 307 ++++++++++++++++++
->  2 files changed, 307 insertions(+), 3 deletions(-)
-> 
-> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-> index 05161afd7642..495f6ac53801 100644
-> --- a/Documentation/admin-guide/kernel-parameters.txt
-> +++ b/Documentation/admin-guide/kernel-parameters.txt
-> @@ -2360,9 +2360,6 @@
->  			the KVM_CLEAR_DIRTY ioctl, and only for the pages being
->  			cleared.
->  
-> -			Eager page splitting currently only supports splitting
-> -			huge pages mapped by the TDP MMU.
-> -
->  			Default is Y (on).
->  
->  	kvm.enable_vmware_backdoor=[KVM] Support VMware backdoor PV interface.
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 926ddfaa9e1a..dd56b5b9624f 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -727,6 +727,11 @@ static void mmu_free_memory_caches(struct kvm_vcpu *vcpu)
->  
->  static struct pte_list_desc *mmu_alloc_pte_list_desc(struct kvm_mmu_memory_cache *cache)
->  {
-> +	static const gfp_t gfp_nocache = GFP_ATOMIC | __GFP_ACCOUNT | __GFP_ZERO;
-> +
-> +	if (WARN_ON_ONCE(!cache))
-> +		return kmem_cache_alloc(pte_list_desc_cache, gfp_nocache);
-> +
+[...]
+> @@ -188,7 +188,7 @@ CPU_CONVERT(le, 64, uint64_t)
+>    * a compile-time constant if you pass in a constant.  So this can be
+>    * used to initialize static variables.
+>    */
+> -#if defined(HOST_WORDS_BIGENDIAN)
+> +#if HOST_BIG_ENDIAN
+>   # define const_le32(_x)                          \
+>       ((((_x) & 0x000000ffU) << 24) |              \
+>        (((_x) & 0x0000ff00U) <<  8) |              \
+> @@ -211,7 +211,7 @@ typedef union {
+>   
+>   typedef union {
+>       float64 d;
+> -#if defined(HOST_WORDS_BIGENDIAN)
+> +#if HOST_BIG_ENDIAN
+>       struct {
+>           uint32_t upper;
+>           uint32_t lower;
+> @@ -235,7 +235,7 @@ typedef union {
+>   
+>   typedef union {
+>       float128 q;
+> -#if defined(HOST_WORDS_BIGENDIAN)
+> +#if HOST_BIG_ENDIAN
+>       struct {
+>           uint32_t upmost;
+>           uint32_t upper;
+> diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
+> index 0a5e67fb970e..7fdd88adb368 100644
+> --- a/include/qemu/compiler.h
+> +++ b/include/qemu/compiler.h
+> @@ -7,6 +7,8 @@
+>   #ifndef COMPILER_H
+>   #define COMPILER_H
+>   
+> +#define HOST_BIG_ENDIAN (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
 
-I also think this is not proper to be added into this patch.  Maybe it'll
-be more suitable for the rmap_add() rework patch previously, or maybe it
-can be dropped directly if it should never trigger at all. Then we die hard
-at below when referencing it.
+Why don't you do it this way instead:
 
->  	return kvm_mmu_memory_cache_alloc(cache);
->  }
->  
-> @@ -743,6 +748,28 @@ static gfn_t kvm_mmu_page_get_gfn(struct kvm_mmu_page *sp, int index)
->  	return sp->gfn + (index << ((sp->role.level - 1) * PT64_LEVEL_BITS));
->  }
->  
-> +static gfn_t sptep_to_gfn(u64 *sptep)
-> +{
-> +	struct kvm_mmu_page *sp = sptep_to_sp(sptep);
-> +
-> +	return kvm_mmu_page_get_gfn(sp, sptep - sp->spt);
-> +}
-> +
-> +static unsigned int kvm_mmu_page_get_access(struct kvm_mmu_page *sp, int index)
-> +{
-> +	if (!sp->role.direct)
-> +		return sp->shadowed_translation[index].access;
-> +
-> +	return sp->role.access;
-> +}
-> +
-> +static unsigned int sptep_to_access(u64 *sptep)
-> +{
-> +	struct kvm_mmu_page *sp = sptep_to_sp(sptep);
-> +
-> +	return kvm_mmu_page_get_access(sp, sptep - sp->spt);
-> +}
-> +
->  static void kvm_mmu_page_set_gfn_access(struct kvm_mmu_page *sp, int index,
->  					gfn_t gfn, u32 access)
->  {
-> @@ -912,6 +939,9 @@ static int pte_list_add(struct kvm_mmu_memory_cache *cache, u64 *spte,
->  	return count;
->  }
->  
-> +static struct kvm_rmap_head *gfn_to_rmap(gfn_t gfn, int level,
-> +					 const struct kvm_memory_slot *slot);
-> +
->  static void
->  pte_list_desc_remove_entry(struct kvm_rmap_head *rmap_head,
->  			   struct pte_list_desc *desc, int i,
-> @@ -2125,6 +2155,23 @@ static struct kvm_mmu_page *__kvm_mmu_find_shadow_page(struct kvm *kvm,
->  	return sp;
->  }
->  
-> +static struct kvm_mmu_page *kvm_mmu_find_direct_sp(struct kvm *kvm, gfn_t gfn,
-> +						   union kvm_mmu_page_role role)
-> +{
-> +	struct kvm_mmu_page *sp;
-> +	LIST_HEAD(invalid_list);
-> +
-> +	BUG_ON(!role.direct);
-> +
-> +	sp = __kvm_mmu_find_shadow_page(kvm, gfn, role, &invalid_list);
-> +
-> +	/* Direct SPs are never unsync. */
-> +	WARN_ON_ONCE(sp && sp->unsync);
-> +
-> +	kvm_mmu_commit_zap_page(kvm, &invalid_list);
-> +	return sp;
-> +}
-> +
->  /*
->   * Looks up an existing SP for the given gfn and role if one exists. The
->   * return SP is guaranteed to be synced.
-> @@ -6063,12 +6110,266 @@ void kvm_mmu_slot_remove_write_access(struct kvm *kvm,
->  		kvm_arch_flush_remote_tlbs_memslot(kvm, memslot);
->  }
->  
-> +static int prepare_to_split_huge_page(struct kvm *kvm,
-> +				      const struct kvm_memory_slot *slot,
-> +				      u64 *huge_sptep,
-> +				      struct kvm_mmu_page **spp,
-> +				      bool *flush,
-> +				      bool *dropped_lock)
-> +{
-> +	int r = 0;
-> +
-> +	*dropped_lock = false;
-> +
-> +	if (kvm_mmu_available_pages(kvm) <= KVM_MIN_FREE_MMU_PAGES)
-> +		return -ENOSPC;
-> +
-> +	if (need_resched() || rwlock_needbreak(&kvm->mmu_lock))
-> +		goto drop_lock;
-> +
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#define HOST_WORDS_BIGENDIAN 1
+#endif
 
-Not immediately clear on whether there'll be case that *spp is set within
-the current function.  Some sanity check might be nice?
+... that way you could avoid the churn in all the other files?
 
-> +	*spp = kvm_mmu_alloc_direct_sp_for_split(true);
-> +	if (r)
-> +		goto drop_lock;
-> +
-> +	return 0;
-> +
-> +drop_lock:
-> +	if (*flush)
-> +		kvm_arch_flush_remote_tlbs_memslot(kvm, slot);
-> +
-> +	*flush = false;
-> +	*dropped_lock = true;
-> +
-> +	write_unlock(&kvm->mmu_lock);
-> +	cond_resched();
-> +	*spp = kvm_mmu_alloc_direct_sp_for_split(false);
-> +	if (!*spp)
-> +		r = -ENOMEM;
-> +	write_lock(&kvm->mmu_lock);
-> +
-> +	return r;
-> +}
-> +
-> +static struct kvm_mmu_page *kvm_mmu_get_sp_for_split(struct kvm *kvm,
-> +						     const struct kvm_memory_slot *slot,
-> +						     u64 *huge_sptep,
-> +						     struct kvm_mmu_page **spp)
-> +{
-> +	struct kvm_mmu_page *split_sp;
-> +	union kvm_mmu_page_role role;
-> +	unsigned int access;
-> +	gfn_t gfn;
-> +
-> +	gfn = sptep_to_gfn(huge_sptep);
-> +	access = sptep_to_access(huge_sptep);
-> +
-> +	/*
-> +	 * Huge page splitting always uses direct shadow pages since we are
-> +	 * directly mapping the huge page GFN region with smaller pages.
-> +	 */
-> +	role = kvm_mmu_child_role(huge_sptep, true, access);
-> +	split_sp = kvm_mmu_find_direct_sp(kvm, gfn, role);
-> +
-> +	/*
-> +	 * Opt not to split if the lower-level SP already exists. This requires
-> +	 * more complex handling as the SP may be already partially filled in
-> +	 * and may need extra pte_list_desc structs to update parent_ptes.
-> +	 */
-> +	if (split_sp)
-> +		return NULL;
-
-This smells tricky..
-
-Firstly we're trying to lookup the existing SPs that has shadowed this huge
-page in split way, with the access bits fetched from the shadow cache (so
-without hugepage nx effect).  However could the pages be mapped with
-different permissions from the currently hugely mapped page?
-
-IIUC all these is for the fact that we can't allocate pte_list_desc and we
-want to make sure we won't make the pte list to be >1.
-
-But I also see that the pte_list check below...
-
-> +
-> +	swap(split_sp, *spp);
-> +	init_shadow_page(kvm, split_sp, slot, gfn, role);
-> +	trace_kvm_mmu_get_page(split_sp, true);
-> +
-> +	return split_sp;
-> +}
-> +
-> +static int kvm_mmu_split_huge_page(struct kvm *kvm,
-> +				   const struct kvm_memory_slot *slot,
-> +				   u64 *huge_sptep, struct kvm_mmu_page **spp,
-> +				   bool *flush)
-> +
-> +{
-> +	struct kvm_mmu_page *split_sp;
-> +	u64 huge_spte, split_spte;
-> +	int split_level, index;
-> +	unsigned int access;
-> +	u64 *split_sptep;
-> +	gfn_t split_gfn;
-> +
-> +	split_sp = kvm_mmu_get_sp_for_split(kvm, slot, huge_sptep, spp);
-> +	if (!split_sp)
-> +		return -EOPNOTSUPP;
-> +
-> +	/*
-> +	 * Since we did not allocate pte_list_desc_structs for the split, we
-> +	 * cannot add a new parent SPTE to parent_ptes. This should never happen
-> +	 * in practice though since this is a fresh SP.
-> +	 *
-> +	 * Note, this makes it safe to pass NULL to __link_shadow_page() below.
-> +	 */
-> +	if (WARN_ON_ONCE(split_sp->parent_ptes.val))
-> +		return -EINVAL;
-> +
-> +	huge_spte = READ_ONCE(*huge_sptep);
-> +
-> +	split_level = split_sp->role.level;
-> +	access = split_sp->role.access;
-> +
-> +	for (index = 0; index < PT64_ENT_PER_PAGE; index++) {
-> +		split_sptep = &split_sp->spt[index];
-> +		split_gfn = kvm_mmu_page_get_gfn(split_sp, index);
-> +
-> +		BUG_ON(is_shadow_present_pte(*split_sptep));
-> +
-> +		/*
-> +		 * Since we did not allocate pte_list_desc structs for the
-> +		 * split, we can't add a new SPTE that maps this GFN.
-> +		 * Skipping this SPTE means we're only partially mapping the
-> +		 * huge page, which means we'll need to flush TLBs before
-> +		 * dropping the MMU lock.
-> +		 *
-> +		 * Note, this make it safe to pass NULL to __rmap_add() below.
-> +		 */
-> +		if (gfn_to_rmap(split_gfn, split_level, slot)->val) {
-> +			*flush = true;
-> +			continue;
-> +		}
-
-... here.
-
-IIUC this check should already be able to cover all the cases and it's
-accurate on the fact that we don't want to grow any rmap to >1 len.
-
-> +
-> +		split_spte = make_huge_page_split_spte(
-> +				huge_spte, split_level + 1, index, access);
-> +
-> +		mmu_spte_set(split_sptep, split_spte);
-> +		__rmap_add(kvm, NULL, slot, split_sptep, split_gfn, access);
-
-__rmap_add() with a NULL cache pointer is weird.. same as
-__link_shadow_page() below.
-
-I'll stop here for now I guess.. Have you considered having rmap allocation
-ready altogether, rather than making this intermediate step but only add
-that later?  Because all these look hackish to me..  It's also possible
-that I missed something important, if so please shoot.
-
-Thanks,
-
-> +	}
-> +
-> +	/*
-> +	 * Replace the huge spte with a pointer to the populated lower level
-> +	 * page table. Since we are making this change without a TLB flush vCPUs
-> +	 * will see a mix of the split mappings and the original huge mapping,
-> +	 * depending on what's currently in their TLB. This is fine from a
-> +	 * correctness standpoint since the translation will either be identical
-> +	 * or non-present. To account for non-present mappings, the TLB will be
-> +	 * flushed prior to dropping the MMU lock.
-> +	 */
-> +	__drop_large_spte(kvm, huge_sptep, false);
-> +	__link_shadow_page(NULL, huge_sptep, split_sp);
-> +
-> +	return 0;
-> +}
-
--- 
-Peter Xu
+  Thomas
 
