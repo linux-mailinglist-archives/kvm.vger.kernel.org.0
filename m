@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 334E84DC839
-	for <lists+kvm@lfdr.de>; Thu, 17 Mar 2022 15:01:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D24414DC83B
+	for <lists+kvm@lfdr.de>; Thu, 17 Mar 2022 15:02:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234881AbiCQOCj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Mar 2022 10:02:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59882 "EHLO
+        id S233798AbiCQODZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Mar 2022 10:03:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60470 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234883AbiCQOCh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Mar 2022 10:02:37 -0400
+        with ESMTP id S234907AbiCQOCo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Mar 2022 10:02:44 -0400
 Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C0CB1E6E95
-        for <kvm@vger.kernel.org>; Thu, 17 Mar 2022 07:01:16 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAB3D1E3E03
+        for <kvm@vger.kernel.org>; Thu, 17 Mar 2022 07:01:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1647525676; x=1679061676;
+  t=1647525680; x=1679061680;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=2YPIso2chGU+xId7K9jyrzkusbThAcXV4f9RIT1oyos=;
-  b=TiD1xf1tq+dwCK5QNlHpxIZG0/+X0tSlkAzqlBp7NUIS+E4QTi8KIq0t
-   PzVnKQk3HHeHjIkJSu6ogyktxKCgJKf/LemH5lxgGI1wx0Jf8HZ3c5IQ8
-   dbQ5vkmklVD+qPFmulWh93RsCkyCypqqtje+XNEOK2/D3h9QRbdEGwa1m
-   i3NgdCfP/sVTYiAe1JS7C+vCC34oWjujbMX47ST7E7sbJdUVzqL5yEdl0
-   lapSrhqgE/+l2hXweo7QWJalPlnMVnVEy8uY7T5NHl97ZcSeq/QQ2msTS
-   aNDdWs7IqbLAbT8EYknTnaUslmAAjt4xX4OI0os0t8yWmjm5vQHYUYT/O
-   Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10288"; a="239034224"
+  bh=OWxYD+D7oXmfMHoYaaH7cKG0velzlCtLDgG+E/s1DNU=;
+  b=Bd8stQchDeRUaJma7MQfV1ijIVwQrs5DUHWWxgMUoTx97XRdG7kVPsEN
+   tIZHx00VTUaHjz06TZ86OHbBcWwdoie5J2BLPTQggIHoy4Fe0cW+vNvKM
+   j7mScizE7XLC/+31laUfMTnQvvJ1QxuNwKOWEceHPkMF0w9KV2Z7FGyiu
+   bOoP4IJJOG0K9zJ1fK73NODXK8z5H8MQUxTgp9lKK+JGBzfNEwTTAwEQw
+   puQ5OU294/9LnDmiR/Sa7gtS95yts9ejCBK9xbhDM450Usy8xD3H5XAPe
+   Mq3Ez1Tzu3+JrqoCXRz81z3FP1e/tuHFVYuvxe8Qq67i9J2JEQrUyZvVb
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10288"; a="239034262"
 X-IronPort-AV: E=Sophos;i="5.90,188,1643702400"; 
-   d="scan'208";a="239034224"
+   d="scan'208";a="239034262"
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2022 07:01:16 -0700
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2022 07:01:20 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.90,188,1643702400"; 
-   d="scan'208";a="541378653"
+   d="scan'208";a="541378689"
 Received: from lxy-dell.sh.intel.com ([10.239.159.55])
-  by orsmga007.jf.intel.com with ESMTP; 17 Mar 2022 07:01:11 -0700
+  by orsmga007.jf.intel.com with ESMTP; 17 Mar 2022 07:01:16 -0700
 From:   Xiaoyao Li <xiaoyao.li@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
@@ -52,9 +52,9 @@ To:     Paolo Bonzini <pbonzini@redhat.com>,
 Cc:     Connor Kuehl <ckuehl@redhat.com>, isaku.yamahata@intel.com,
         xiaoyao.li@intel.com, erdemaktas@google.com, kvm@vger.kernel.org,
         qemu-devel@nongnu.org, seanjc@google.com
-Subject: [RFC PATCH v3 26/36] i386/tdx: Finalize TDX VM
-Date:   Thu, 17 Mar 2022 21:59:03 +0800
-Message-Id: <20220317135913.2166202-27-xiaoyao.li@intel.com>
+Subject: [RFC PATCH v3 27/36] i386/tdx: Disable SMM for TDX VMs
+Date:   Thu, 17 Mar 2022 21:59:04 +0800
+Message-Id: <20220317135913.2166202-28-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220317135913.2166202-1-xiaoyao.li@intel.com>
 References: <20220317135913.2166202-1-xiaoyao.li@intel.com>
@@ -70,32 +70,46 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Invoke KVM_TDX_FINALIZE_VM to finalize the TD's measurement and make
-the TD vCPUs runnable once machine initialization is complete.
+TDX doesn't support SMM and VMM cannot emulate SMM for TDX VMs because
+VMM cannot manipulate TDX VM's memory.
+
+Disable SMM for TDX VMs and error out if user requests to enable SMM.
 
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 ---
- target/i386/kvm/tdx.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ target/i386/kvm/tdx.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
 diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
-index fc03079571a1..deb9634b27dc 100644
+index deb9634b27dc..ec6f5d7a2e48 100644
 --- a/target/i386/kvm/tdx.c
 +++ b/target/i386/kvm/tdx.c
-@@ -287,6 +287,13 @@ static void tdx_finalize_vm(Notifier *notifier, void *unused)
-              exit(1);
-         }
-     }
-+
-+    r = tdx_vm_ioctl(KVM_TDX_FINALIZE_VM, 0, NULL);
-+    if (r < 0) {
-+        error_report("KVM_TDX_FINALIZE_VM failed %s", strerror(-r));
-+        exit(0);
-+    }
-+    tdx_guest->parent_obj.ready = true;
- }
+@@ -302,12 +302,25 @@ static Notifier tdx_machine_done_notify = {
  
- static Notifier tdx_machine_done_notify = {
+ int tdx_kvm_init(MachineState *ms, Error **errp)
+ {
++    X86MachineState *x86ms = X86_MACHINE(ms);
+     TdxGuest *tdx = (TdxGuest *)object_dynamic_cast(OBJECT(ms->cgs),
+                                                     TYPE_TDX_GUEST);
+     if (!tdx) {
+         return -EINVAL;
+     }
+ 
++    if (!kvm_enable_x2apic()) {
++        error_setg(errp, "Failed to enable x2apic in KVM");
++        return -EINVAL;
++    }
++
++    if (x86ms->smm == ON_OFF_AUTO_AUTO) {
++        x86ms->smm = ON_OFF_AUTO_OFF;
++    } else if (x86ms->smm == ON_OFF_AUTO_ON) {
++        error_setg(errp, "TDX VM doesn't support SMM");
++        return -EINVAL;
++    }
++
+     if (!tdx_caps) {
+         get_tdx_capabilities();
+     }
 -- 
 2.27.0
 
