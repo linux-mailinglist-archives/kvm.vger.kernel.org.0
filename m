@@ -2,193 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EB6E94DBEA1
-	for <lists+kvm@lfdr.de>; Thu, 17 Mar 2022 06:46:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C69044DBEC5
+	for <lists+kvm@lfdr.de>; Thu, 17 Mar 2022 06:53:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229449AbiCQFr3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Mar 2022 01:47:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54708 "EHLO
+        id S229512AbiCQFyb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Mar 2022 01:54:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229437AbiCQFr2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Mar 2022 01:47:28 -0400
-X-Greylist: delayed 598 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 16 Mar 2022 22:17:25 PDT
-Received: from mail.ispras.ru (mail.ispras.ru [83.149.199.84])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C5121E95E4
-        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 22:17:22 -0700 (PDT)
-Received: from [10.12.102.111] (unknown [85.142.117.226])
-        by mail.ispras.ru (Postfix) with ESMTPSA id 5A3F1405A19B;
-        Thu, 17 Mar 2022 05:01:08 +0000 (UTC)
-Message-ID: <0a1fbad0-0e4d-661d-c25a-7a7d70896eb2@ispras.ru>
-Date:   Thu, 17 Mar 2022 08:01:08 +0300
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH v2 3/3] Use g_new() & friends where that makes obvious
- sense
+        with ESMTP id S229379AbiCQFy3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Mar 2022 01:54:29 -0400
+Received: from mail.sberdevices.ru (mail.sberdevices.ru [45.89.227.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A83F8243179;
+        Wed, 16 Mar 2022 22:25:32 -0700 (PDT)
+Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
+        by mail.sberdevices.ru (Postfix) with ESMTP id 4B8325FD06;
+        Thu, 17 Mar 2022 08:25:30 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
+        s=mail; t=1647494730;
+        bh=0glQwIKIiSufGCHmagtfkwCzZanRCG4rlbbnru054do=;
+        h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version;
+        b=Z6AnF60s2ny2xlua2Zj8AjBJDPp9hhIFgtEtfM29II9goDFQCkB+jrCuTKUspD/pK
+         8KdTZc/3JOiCeuthvymI0jrd2c1DXCTZazEmSgq8ZgFWyAsV85Luk7PbGhUPtguPHb
+         KXUxjOmnWKmJbER24GS3/Rq9l4/yz+OwIy7AIEQ8FoQ86a6bzv/biz6A3ih1xmC3nx
+         EGHFx+Gil/myM+ntONqTXlmo8qqsFMytw6MKmHcYybUWHGSkMBDdLyfWc8C1vHl92u
+         RnpjoF607knrefpk479o8zwXbk4UlAMaRWLP9XpP+feh7vEPUHlyuCO0kJ4s2zTNjX
+         R9jQBvOC8wWfQ==
+Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
+        by mail.sberdevices.ru (Postfix) with ESMTP;
+        Thu, 17 Mar 2022 08:25:28 +0300 (MSK)
+From:   Krasnov Arseniy Vladimirovich <AVKrasnov@sberdevices.ru>
+To:     Stefano Garzarella <sgarzare@redhat.com>
+CC:     Krasnov Arseniy <oxffffaa@gmail.com>,
+        Rokosov Dmitry Dmitrievich <DDRokosov@sberdevices.ru>,
+        Krasnov Arseniy Vladimirovich <AVKrasnov@sberdevices.ru>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: [PATCH net-next v3 0/2] af_vsock: add two new tests for,
+ SOCK_SEQPACKET
+Thread-Topic: [PATCH net-next v3 0/2] af_vsock: add two new tests for,
+ SOCK_SEQPACKET
+Thread-Index: AQHYOb9BasW0R6dbkEaL5d59R2bAxg==
+Date:   Thu, 17 Mar 2022 05:24:26 +0000
+Message-ID: <4ecfa306-a374-93f6-4e66-be62895ae4f7@sberdevices.ru>
+Accept-Language: en-US
 Content-Language: en-US
-To:     Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Christian Schoenebeck <qemu_oss@crudebyte.com>,
-        "Gonglei (Arei)" <arei.gonglei@huawei.com>,
-        =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Ani Sinha <ani@anisinha.ca>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Amit Shah <amit@kernel.org>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Anthony Perard <anthony.perard@citrix.com>,
-        Paul Durrant <paul@xen.org>,
-        =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
-        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
-        Corey Minyard <cminyard@mvista.com>,
-        Patrick Venture <venture@google.com>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Peter Xu <peterx@redhat.com>, Jason Wang <jasowang@redhat.com>,
-        =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
-        Daniel Henrique Barboza <danielhb413@gmail.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Greg Kurz <groug@kaod.org>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
-        Jean-Christophe Dubois <jcd@tribudubois.net>,
-        Keith Busch <kbusch@kernel.org>,
-        Klaus Jensen <its@irrelevant.dk>,
-        Yuval Shaia <yuval.shaia.ml@gmail.com>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        Magnus Damm <magnus.damm@gmail.com>,
-        Fabien Chouteau <chouteau@adacore.com>,
-        KONRAD Frederic <frederic.konrad@adacore.com>,
-        Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-        Artyom Tarasenko <atar4qemu@gmail.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        Juan Quintela <quintela@redhat.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Konstantin Kostiuk <kkostiuk@redhat.com>,
-        Michael Roth <michael.roth@amd.com>,
-        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-        Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
-        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-        David Hildenbrand <david@redhat.com>,
-        Wenchao Wang <wenchao.wang@intel.com>,
-        Kamil Rytarowski <kamil@netbsd.org>,
-        Reinoud Zandijk <reinoud@netbsd.org>,
-        Sunil Muthuswamy <sunilmut@microsoft.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Thomas Huth <thuth@redhat.com>, Eric Blake <eblake@redhat.com>,
-        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
-        John Snow <jsnow@redhat.com>, kvm@vger.kernel.org,
-        qemu-arm@nongnu.org, xen-devel@lists.xenproject.org,
-        qemu-ppc@nongnu.org, qemu-block@nongnu.org, haxm-team@intel.com,
-        qemu-s390x@nongnu.org
-References: <20220315144156.1595462-1-armbru@redhat.com>
- <20220315144156.1595462-4-armbru@redhat.com>
-From:   Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
-In-Reply-To: <20220315144156.1595462-4-armbru@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [172.16.1.12]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <C75275A026858344B1E4ABB08198FFEE@sberdevices.ru>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-KSMG-Rule-ID: 4
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Status: not scanned, disabled by settings
+X-KSMG-AntiSpam-Interceptor-Info: not scanned
+X-KSMG-AntiPhishing: not scanned, disabled by settings
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2022/03/17 01:49:00 #18989990
+X-KSMG-AntiVirus-Status: Clean, skipped
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15.03.2022 17:41, Markus Armbruster wrote:
-> g_new(T, n) is neater than g_malloc(sizeof(T) * n).  It's also safer,
-> for two reasons.  One, it catches multiplication overflowing size_t.
-> Two, it returns T * rather than void *, which lets the compiler catch
-> more type errors.
-> 
-> This commit only touches allocations with size arguments of the form
-> sizeof(T).
-> 
-> Patch created mechanically with:
-> 
->      $ spatch --in-place --sp-file scripts/coccinelle/use-g_new-etc.cocci \
-> 	     --macro-file scripts/cocci-macro-file.h FILES...
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> Reviewed-by: Cédric Le Goater <clg@kaod.org>
-> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-> Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->   replay/replay-char.c                     |  4 +--
->   replay/replay-events.c                   | 10 +++---
-> 
-
-Reviewed-by: Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>
-
-> diff --git a/replay/replay-char.c b/replay/replay-char.c
-> index dc0002367e..d2025948cf 100644
-> --- a/replay/replay-char.c
-> +++ b/replay/replay-char.c
-> @@ -50,7 +50,7 @@ void replay_register_char_driver(Chardev *chr)
->   
->   void replay_chr_be_write(Chardev *s, uint8_t *buf, int len)
->   {
-> -    CharEvent *event = g_malloc0(sizeof(CharEvent));
-> +    CharEvent *event = g_new0(CharEvent, 1);
->   
->       event->id = find_char_driver(s);
->       if (event->id < 0) {
-> @@ -85,7 +85,7 @@ void replay_event_char_read_save(void *opaque)
->   
->   void *replay_event_char_read_load(void)
->   {
-> -    CharEvent *event = g_malloc0(sizeof(CharEvent));
-> +    CharEvent *event = g_new0(CharEvent, 1);
->   
->       event->id = replay_get_byte();
->       replay_get_array_alloc(&event->buf, &event->len);
-> diff --git a/replay/replay-events.c b/replay/replay-events.c
-> index 15983dd250..ac47c89834 100644
-> --- a/replay/replay-events.c
-> +++ b/replay/replay-events.c
-> @@ -119,7 +119,7 @@ void replay_add_event(ReplayAsyncEventKind event_kind,
->           return;
->       }
->   
-> -    Event *event = g_malloc0(sizeof(Event));
-> +    Event *event = g_new0(Event, 1);
->       event->event_kind = event_kind;
->       event->opaque = opaque;
->       event->opaque2 = opaque2;
-> @@ -243,17 +243,17 @@ static Event *replay_read_event(int checkpoint)
->           }
->           break;
->       case REPLAY_ASYNC_EVENT_INPUT:
-> -        event = g_malloc0(sizeof(Event));
-> +        event = g_new0(Event, 1);
->           event->event_kind = replay_state.read_event_kind;
->           event->opaque = replay_read_input_event();
->           return event;
->       case REPLAY_ASYNC_EVENT_INPUT_SYNC:
-> -        event = g_malloc0(sizeof(Event));
-> +        event = g_new0(Event, 1);
->           event->event_kind = replay_state.read_event_kind;
->           event->opaque = 0;
->           return event;
->       case REPLAY_ASYNC_EVENT_CHAR_READ:
-> -        event = g_malloc0(sizeof(Event));
-> +        event = g_new0(Event, 1);
->           event->event_kind = replay_state.read_event_kind;
->           event->opaque = replay_event_char_read_load();
->           return event;
-> @@ -263,7 +263,7 @@ static Event *replay_read_event(int checkpoint)
->           }
->           break;
->       case REPLAY_ASYNC_EVENT_NET:
-> -        event = g_malloc0(sizeof(Event));
-> +        event = g_new0(Event, 1);
->           event->event_kind = replay_state.read_event_kind;
->           event->opaque = replay_event_net_load();
->           return event;
+VGhpcyBhZGRzIHR3byB0ZXN0czogZm9yIHJlY2VpdmUgdGltZW91dCBhbmQgcmVhZGluZyB0byBp
+bnZhbGlkDQpidWZmZXIgcHJvdmlkZWQgYnkgdXNlci4gSSBmb3Jnb3QgdG8gcHV0IGJvdGggcGF0
+Y2hlcyB0byBtYWluDQpwYXRjaHNldC4NCg0KQXJzZW5peSBLcmFzbm92KDIpOg0KDQphZl92c29j
+azogU09DS19TRVFQQUNLRVQgcmVjZWl2ZSB0aW1lb3V0IHRlc3QNCmFmX3Zzb2NrOiBTT0NLX1NF
+UVBBQ0tFVCBicm9rZW4gYnVmZmVyIHRlc3QNCg0KdG9vbHMvdGVzdGluZy92c29jay92c29ja190
+ZXN0LmMgfCAyMTUgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrDQoxIGZp
+bGUgY2hhbmdlZCwgMjE1IGluc2VydGlvbnMoKykNCg0KdjEgLT4gdjI6DQogc2VlIGV2ZXJ5IHBh
+dGNoIGFmdGVyICctLS0nIGxpbmUuDQoNCnYyIC0+IHYzOg0KIHNlZSBldmVyeSBwYXRjaCBhZnRl
+ciAnLS0tJyBsaW5lLg0KDQotLSANCjIuMjUuMQ0K
