@@ -2,104 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 540904DC1D5
-	for <lists+kvm@lfdr.de>; Thu, 17 Mar 2022 09:49:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1539F4DC1ED
+	for <lists+kvm@lfdr.de>; Thu, 17 Mar 2022 09:52:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231501AbiCQIu1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Mar 2022 04:50:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41264 "EHLO
+        id S231537AbiCQIyA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Mar 2022 04:54:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45220 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231434AbiCQIu0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Mar 2022 04:50:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6060CBF00C
-        for <kvm@vger.kernel.org>; Thu, 17 Mar 2022 01:49:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647506948;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=gz/W/pn91Pd0cp+FBSUWrFfqAy7FqwqHAAG9hudoc3k=;
-        b=eISSKLK8qX9wW9FtaYNMLuj6nnnMb/4AEkKTzPb8Qg6sShy7zaL4LLm0EcEroZkdgT3QVH
-        f9hxztUtpO3GoWSvK9matt6QrbpxHysLN7ZFzb9g1pViJMjq2omd78LJWr4jCGtUb/ys6a
-        +MKEGZzmbL5GZ720KhxnhPIqY2QSQ/M=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-384-sC9e5eikP1uplfq5QiSpFw-1; Thu, 17 Mar 2022 04:49:07 -0400
-X-MC-Unique: sC9e5eikP1uplfq5QiSpFw-1
-Received: by mail-qt1-f197.google.com with SMTP id x10-20020ac8700a000000b002c3ef8fc44cso3072085qtm.8
-        for <kvm@vger.kernel.org>; Thu, 17 Mar 2022 01:49:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=gz/W/pn91Pd0cp+FBSUWrFfqAy7FqwqHAAG9hudoc3k=;
-        b=2mdl79Hpec4Yvw93jRafGoV/x0oXlyDskfsrq4kcAmo6st9+X7YTFpud4VEJLUeo35
-         07JondwKwlkksYL8yZ2LxzpZRVOJgPj0QRa25q+ITwag+Sh4X8jbr25f/LvNYTljKZEm
-         Gz/Z+wp6X+llKG/sEt5oShdC5XuAyg8yLiWpuyJju6DgLxR+dz3R2D+9nCcPlPV+d0CS
-         /1Gf39fc6WNJ0/z9cL+eQpEuHTbGj0sG35Bo9hANFDxZv7ct/NpPpFZQG+MQ5vOl6Q9f
-         BlCg1KLryfXOuvHw8PDeRz5d1HoMeqqx5LTqKtlvTLdTauTkQm3NTOEcDHd+sGmCztRk
-         Z6eQ==
-X-Gm-Message-State: AOAM532hTIVI1CvtWeKXnfXot3TdjmOEPr5C+JZHvFm/xE7VwFl1DHGu
-        cTwOInpJ/8Ym8+O/UuFqJQgUh/ViWd4whDZtI/A1sKVrlWBh0HP4n4IiTX/zLK+twKkd/53uFJM
-        EGjTEDtBsKebd
-X-Received: by 2002:a05:6214:20ac:b0:435:bc08:3fee with SMTP id 12-20020a05621420ac00b00435bc083feemr2637721qvd.62.1647506946709;
-        Thu, 17 Mar 2022 01:49:06 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzfxE61qldB187jrMNs+6ZiPIrvfd4dvExZrtE1N5vj69apnHkdN+sVPDMzutJ+kVJuhUJMSA==
-X-Received: by 2002:a05:6214:20ac:b0:435:bc08:3fee with SMTP id 12-20020a05621420ac00b00435bc083feemr2637709qvd.62.1647506946520;
-        Thu, 17 Mar 2022 01:49:06 -0700 (PDT)
-Received: from sgarzare-redhat (host-79-42-202-12.retail.telecomitalia.it. [79.42.202.12])
-        by smtp.gmail.com with ESMTPSA id s64-20020a375e43000000b0067b0e68092csm2249499qkb.91.2022.03.17.01.49.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Mar 2022 01:49:05 -0700 (PDT)
-Date:   Thu, 17 Mar 2022 09:49:00 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Krasnov Arseniy Vladimirovich <AVKrasnov@sberdevices.ru>
-Cc:     Krasnov Arseniy <oxffffaa@gmail.com>,
-        Rokosov Dmitry Dmitrievich <DDRokosov@sberdevices.ru>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH net-next v4 1/2] af_vsock: SOCK_SEQPACKET receive timeout
- test
-Message-ID: <20220317084900.e5nxahx4ize2wfcj@sgarzare-redhat>
-References: <97d6d8c6-f7b2-1b03-a3d9-f312c33134ec@sberdevices.ru>
- <3cf108a3-e57f-abf8-e82f-6d6e80c4a37a@sberdevices.ru>
+        with ESMTP id S231248AbiCQIx7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Mar 2022 04:53:59 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B85301CABD6
+        for <kvm@vger.kernel.org>; Thu, 17 Mar 2022 01:52:43 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 4CFBAB81DA7
+        for <kvm@vger.kernel.org>; Thu, 17 Mar 2022 08:52:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01C22C340EE;
+        Thu, 17 Mar 2022 08:52:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1647507161;
+        bh=3MOnGAbOL7YWzZCDMztCvhjS2KbSf1PeCFSM6JMUXls=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=iEPxF6MGs+uvzyw5A6CoxPTpHsWYPHTrNECLD5jcnd9UzfhFrvPYj4YYfalB0n5MM
+         Bz1n5vTMVMKSuqUGE1KiK0FzUxi169Ks5Nl0ro8rtflzqrUCwUkRchc4FvnJaWyD0i
+         0ccnd4ukGDArpUZlwFCRJzLyK2blpvY+lMjtHtRLePx0EvGYzTOUWc9laXdaR5QDP6
+         3fgySvDkxE67sCdS8votp2PVjRVHaVfC0xdBPGzX0i8qAy6bsYWXAonuRz47C72mtB
+         BB1Xyd38gSfgCZy07XDE/ZgXagsoIfT+5M0QhAp3Rtaq5yXjQKuVCBxo2luNeod9s6
+         HJNIMyQ10LuhQ==
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nUls6-00F7oq-II; Thu, 17 Mar 2022 08:52:38 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <3cf108a3-e57f-abf8-e82f-6d6e80c4a37a@sberdevices.ru>
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Date:   Thu, 17 Mar 2022 08:52:38 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oupton@google.com>
+Cc:     Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, drjones@redhat.com,
+        pbonzini@redhat.com, alexandru.elisei@arm.com,
+        eric.auger@redhat.com, reijiw@google.com, rananta@google.com
+Subject: Re: [PATCH v2 2/3] KVM: arm64: selftests: add arch_timer_edge_cases
+In-Reply-To: <YjLY5y+KObV0AR9g@google.com>
+References: <20220317045127.124602-1-ricarkol@google.com>
+ <20220317045127.124602-3-ricarkol@google.com> <YjLY5y+KObV0AR9g@google.com>
+User-Agent: Roundcube Webmail/1.4.13
+Message-ID: <5fe2be916e1dcfe491fd3b40466d1932@kernel.org>
+X-Sender: maz@kernel.org
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: oupton@google.com, ricarkol@google.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, drjones@redhat.com, pbonzini@redhat.com, alexandru.elisei@arm.com, eric.auger@redhat.com, reijiw@google.com, rananta@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-8.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 17, 2022 at 08:31:49AM +0000, Krasnov Arseniy Vladimirovich wrote:
->Test for receive timeout check: connection is established,
->receiver sets timeout, but sender does nothing. Receiver's
->'read()' call must return EAGAIN.
->
->Signed-off-by: Krasnov Arseniy Vladimirovich <AVKrasnov@sberdevices.ru>
->---
-> v3 -> v4:
-> 1) Fix stupid bug about invalid 'if()' line.
->
-> tools/testing/vsock/vsock_test.c | 84 ++++++++++++++++++++++++++++++++
-> 1 file changed, 84 insertions(+)
+On 2022-03-17 06:44, Oliver Upton wrote:
+> On Wed, Mar 16, 2022 at 09:51:26PM -0700, Ricardo Koller wrote:
+>> Add an arch_timer edge-cases selftest. For now, just add some basic
+>> sanity checks, and some stress conditions (like waiting for the timers
+>> while re-scheduling the vcpu). The next commit will add the actual 
+>> edge
+>> case tests.
+>> 
+>> This test fails without a867e9d0cc1 "KVM: arm64: Don't miss pending
+>> interrupts for suspended vCPU".
+>> 
+>> Reviewed-by: Reiji Watanabe <reijiw@google.com>
+>> Reviewed-by: Raghavendra Rao Ananta <rananta@google.com>
+>> Signed-off-by: Ricardo Koller <ricarkol@google.com>
 
-Everything is okay now, tests pass and the patch looks good to me:
+[...]
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+>> +		asm volatile("wfi\n"
+>> +			     "msr daifclr, #2\n"
+>> +			     /* handle IRQ */
+> 
+> I believe an isb is owed here (DDI0487G.b D1.13.4). Annoyingly, I am
+> having a hard time finding the same language in the H.a revision of the
+> manual :-/
+
+D1.3.6 probably is what you are looking for.
+
+"Context synchronization event" is the key phrase to remember
+when grepping through the ARM ARM. And yes, the new layout is
+a nightmare (as if we really needed an additional 2800 pages...).
+
+> 
+>> +			     "msr daifset, #2\n"
+>> +			     : : : "memory");
+>> +	}
+>> +}
+
+[...]
+
+>> +	/* tval should keep down-counting from 0 to -1. */
+>> +	SET_COUNTER(DEF_CNT, test_args.timer);
+>> +	timer_set_tval(test_args.timer, 0);
+>> +	if (use_sched)
+>> +		USERSPACE_SCHEDULE();
+>> +	/* We just need 1 cycle to pass. */
+>> +	isb();
+> 
+> Somewhat paranoid, but:
+> 
+> If the CPU retires the ISB much more quickly than the counter ticks, 
+> its
+> possible that you could observe an invalid TVAL even with a valid
+> implementation.
+
+Worse than that:
+
+- ISB doesn't need to take any time at all. It just needs to ensure
+   that everything is synchronised. Depending on how the CPU is built,
+   this can come for free.
+
+- There is no relation between the counter ticks and CPU cycles.
+
+> What if you spin waiting for CNT to increment before the assertion? 
+> Then
+> you for sureknow (and can tell by reading the test) that the
+> implementation is broken.
+
+That's basically the only way to implement this. You can't rely
+on any other event.
 
 Thanks,
-Stefano
 
+         M.
+-- 
+Jazz is not dead. It just smells funny...
