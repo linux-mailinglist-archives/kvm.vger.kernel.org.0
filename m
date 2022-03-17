@@ -2,186 +2,246 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0AC434DC7ED
-	for <lists+kvm@lfdr.de>; Thu, 17 Mar 2022 14:53:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 151C54DC814
+	for <lists+kvm@lfdr.de>; Thu, 17 Mar 2022 14:59:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234700AbiCQNyQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Mar 2022 09:54:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59476 "EHLO
+        id S234779AbiCQOAq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Mar 2022 10:00:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50992 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233113AbiCQNyP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Mar 2022 09:54:15 -0400
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2083.outbound.protection.outlook.com [40.107.243.83])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 754E3C07;
-        Thu, 17 Mar 2022 06:52:57 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=n2/XVpwvwpeiLNarmywdyiF+wgq9YPtIMaDNWG8c+Xi1K8/+tzM80YQzddmr4n72mr/S2Vrh/xzHqiKNGbtfl867iNwTmYYYk6hf/0Jp17ArBvibvYZ/3MmNX8g5cdPLFv68bdxfvpAsXLMHu1YFaO9j+vWCjL3WwZwTroojQCG24NZIQrnojsvyY7cCG1WjJWl4wzsLR5HGooqmxTrwCTpCw7/7IT2CPWn3gQ8SxoxAWJZwJMGJCE4iwhu5+Bi4p1av38dtsbLI/GhjXR3qJzk6o41hol+1zE/tQlU+SoO6QUE6a/Bk4K3CRzkhm4oPuu79NyA9EJU5GVyghTbHcA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NSEMzNUdjMMqw/xD0BOrGE04iPBZJC0/QLx8daWzblQ=;
- b=Z09kdMqiiLm5N33GR992x1YBYlU0ICwCZ1CpbpJLeH8Lg5Hl/CyM2YfTJPDNMpykTXqKWWIzn7QXPmCZ5PrCetLPvxkhNV6YTnYrpE8lwMqNO5FURszKcFferRBG6m39AfHZRUXFZXvD4iuB7DebDyOY0tkGotW4al9Cwsc7nn5myVzZdqjLcqCJzOXf+dHyL81aStn2uqmhSIHvmRYN5tTFCaUOfE2kSzltbstmsQA8T8W9WHFnqaiAiFebhxcGO61DoS6WV3HA/Q/wOQoisSQUxrsLStDvpI+qHCk3Un9EIH+U3NO+eV7HZlyj6klYGOCOG2uxch4WWaWkBNcMFA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NSEMzNUdjMMqw/xD0BOrGE04iPBZJC0/QLx8daWzblQ=;
- b=SI0TMU45NmmdfeuwdWzFOTrCN702/83K7NjvMJ0oUA4hJC2FHuj/2Uqx4vcsrRq8WbpAsooQLUy+sBDFvBI5RKFFpnOtw1d0X2XbFgeSynRSZ5x4j6qFkCsd91x/KAqZc4YKfPv8ZcIesaeM5CikcqgfjAkiRUuaPr1T1BhiPrY+WVakD5FoY7Sii1H+CD9h8AqNsMz0bTVWoO/btlSjnHxtDoNq6zYEW3ncMEyCX+Tcgq9uAteYgb8pJDC+0PuRHR522T9Vgugr6w0glhNH+MdZzmY9NuBwXN+lT3SSIuLkc4TLLplm75NmHTrqJbXnKU27GBr+x6R7uX8rqLD/Aw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by BL1PR12MB5873.namprd12.prod.outlook.com (2603:10b6:208:395::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5081.14; Thu, 17 Mar
- 2022 13:52:55 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::11a0:970a:4c24:c70c]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::11a0:970a:4c24:c70c%5]) with mapi id 15.20.5081.017; Thu, 17 Mar 2022
- 13:52:55 +0000
-Date:   Thu, 17 Mar 2022 10:52:54 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Robin Murphy <robin.murphy@arm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "david@redhat.com" <david@redhat.com>,
-        "farman@linux.ibm.com" <farman@linux.ibm.com>,
-        "oberpar@linux.ibm.com" <oberpar@linux.ibm.com>,
-        "vneethv@linux.ibm.com" <vneethv@linux.ibm.com>,
-        "agordeev@linux.ibm.com" <agordeev@linux.ibm.com>,
-        "imbrenda@linux.ibm.com" <imbrenda@linux.ibm.com>,
-        "will@kernel.org" <will@kernel.org>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        "frankja@linux.ibm.com" <frankja@linux.ibm.com>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        "gerald.schaefer@linux.ibm.com" <gerald.schaefer@linux.ibm.com>,
-        "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
-        "thuth@redhat.com" <thuth@redhat.com>,
-        "gor@linux.ibm.com" <gor@linux.ibm.com>,
-        "schnelle@linux.ibm.com" <schnelle@linux.ibm.com>,
-        "hca@linux.ibm.com" <hca@linux.ibm.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "freude@linux.ibm.com" <freude@linux.ibm.com>,
-        "pmorel@linux.ibm.com" <pmorel@linux.ibm.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "svens@linux.ibm.com" <svens@linux.ibm.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Zhao, Yan Y" <yan.y.zhao@intel.com>
-Subject: Re: [PATCH v4 14/32] iommu: introduce iommu_domain_alloc_type and
- the KVM type
-Message-ID: <20220317135254.GZ11336@nvidia.com>
-References: <20220314194451.58266-1-mjrosato@linux.ibm.com>
- <20220314194451.58266-15-mjrosato@linux.ibm.com>
- <a9637631-c23b-4158-d2cb-597a36b09a6b@arm.com>
- <BN9PR11MB5276360F6DBDC3A238F3E41A8C129@BN9PR11MB5276.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <BN9PR11MB5276360F6DBDC3A238F3E41A8C129@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-ClientProxiedBy: MN2PR02CA0030.namprd02.prod.outlook.com
- (2603:10b6:208:fc::43) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
+        with ESMTP id S234164AbiCQOAo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Mar 2022 10:00:44 -0400
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BD0889322
+        for <kvm@vger.kernel.org>; Thu, 17 Mar 2022 06:59:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1647525568; x=1679061568;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=YfZo0YkS6/vhGNbAb0uVlbziBrQQFQYvobwvVingPUw=;
+  b=jFSM6FraOyL+8rufBwycL0YiSf/0sE3SzJHpIaRNKUBVnCAcTjx0KuRO
+   TcPCc5C5SBxBziV9868/BPpux7v4NgG4P/KBlt5ImOyZCiEA1Fi1u6wK6
+   6H3IOxg7cowJgc4+ZrmkKQALJ5tBXALu29dRoIwsdmXz6iQHv/ZFZ4oUW
+   uX5z7MbFhw1ssvhDtuLf6WGnzipdOnA8058Ut0sR4QwI0E5mJEJZT2KJ2
+   QvXHVmZsCE6/LLxjXTc4RBksNfzuL+AW09UnakTI88Gjw4xDBQGcREXyR
+   ePATznVKAKjznE88NrfEg+xhuK5HCAmDFj5DKjXx3Kwi+/c6SiHLj/KDs
+   A==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10288"; a="256600101"
+X-IronPort-AV: E=Sophos;i="5.90,188,1643702400"; 
+   d="scan'208";a="256600101"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2022 06:59:18 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.90,188,1643702400"; 
+   d="scan'208";a="541377804"
+Received: from lxy-dell.sh.intel.com ([10.239.159.55])
+  by orsmga007.jf.intel.com with ESMTP; 17 Mar 2022 06:59:14 -0700
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Laszlo Ersek <lersek@redhat.com>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Eric Blake <eblake@redhat.com>
+Cc:     Connor Kuehl <ckuehl@redhat.com>, isaku.yamahata@intel.com,
+        xiaoyao.li@intel.com, erdemaktas@google.com, kvm@vger.kernel.org,
+        qemu-devel@nongnu.org, seanjc@google.com
+Subject: [RFC PATCH v3 00/36] TDX QEMU support
+Date:   Thu, 17 Mar 2022 21:58:37 +0800
+Message-Id: <20220317135913.2166202-1-xiaoyao.li@intel.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 4eae4042-1a28-4fae-8771-08da081d7021
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5873:EE_
-X-Microsoft-Antispam-PRVS: <BL1PR12MB5873BB79843C7C82FE636ACDC2129@BL1PR12MB5873.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: xRg0zCGoDDZ5Aj+QpdYfZUoXKxBRlywHfkWjiYvQxpBp7cS1bJBgFRGBTQ1NgesKM8p9isBc7/KY+n3hzACxnuYGOTwco0ZWx7iZkwwVpHtc13NP/9zqJYZAUY8qUoKODuQLoG2NPcBlx9+9AVuKCZmV/YnZSt+P7r1QZUiIoB7hmhpYMiOlyicgWjUgqbXgqYsoalW1evIaerKW6L7NHSG1GANhnQSYz38kESe/FmipX3cJ0uiXKiD2jqN6xPAIBw+17N1lQ6Z5IxwESpl4kTMCBO9gGKGZUbbZ0EP59GdT6kCFqHuaWWrAakyg1U97TQ5cYUe+5sdvrq94QA8+3dj1CSlaY5KmlbaZiiFSjXDrFATzOVE1FZBX1iW8iij8D7dqp6LgSdUrqInv3m5lOmfL5eqVShymmEH3Yj5F8KX1q5qt26z0DvVf13njbl51H3Tz3HVW0WUGs44Ggm3DnqzDP45QKaJ7TWpP8dV8yfd/ohlBSCCyut9wsmp2OEw2eurkHiNYTmbF2rqagx/KBNpIpqbesYcojGx+Tz8NkwVzjBW16aIDYjRIeak4eGLZunmQFtVCjevB16m/IcmM7v3TNZ0WGLblRSzwMe54zwSeewEOICpiHO140mTgU/DEcaEqun/9ORVb0dnaWd65og==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(2906002)(316002)(6506007)(54906003)(6916009)(33656002)(8936002)(7406005)(5660300002)(7416002)(6512007)(36756003)(53546011)(66946007)(8676002)(66556008)(66476007)(86362001)(2616005)(26005)(1076003)(186003)(508600001)(38100700002)(6486002)(4326008);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Mmhid21MaEZLTHd1bnd2UmxjQ1YxdUN3MG9RTzlDNlFBc0xKUjY2dk1Na29R?=
- =?utf-8?B?UmlHUC9BNm1YZ29nRjN5RE43aEJuNTcvYitGZVVtVnF3WUV6WVBmNE5lcE9p?=
- =?utf-8?B?M25SVjNPUmprTDk0V1I4OGtBVmJhU1JOS2dLK3ZLVFpGakxBV3hpQWxSQk10?=
- =?utf-8?B?cTRXcVZDTHR4MHVYeThJaFF3ZjZlT3VaS2VJdmFuZXN2ZmpRdFh5SEhLKzZK?=
- =?utf-8?B?V3R1eGpnVXdEZTU0Ti8wR1hubWlpSG95a3V5STZ2Vm4wZnNORFgyZFpXNWRY?=
- =?utf-8?B?U3dQME5qWC9WRU5NdmpYSlc4S2J3SnJLWDNYTEtRL01CYmFrQSsySkdxYURj?=
- =?utf-8?B?M3J1SjZvczdwMXl4L0M3ck9teEMreEh0Vmcycy9VN01jSzVPNmVqYXZCNXo1?=
- =?utf-8?B?R0cvaThJdk1rQi9tNmtMcTNFWW9yemthdVpEdmZzaHhvUTBVSFcrZXA3Um9H?=
- =?utf-8?B?b2hTWFk3dmk2bDNUcUl2dlB3MTBIQUVUdWRNYlhTd3EwZzNnSFZwZXQrWEJ1?=
- =?utf-8?B?TUwrMGZQUGFZeFQ2V291WXBwNHExVEpKem5JSXdVSGFhRDhsQUdJR3daOTVv?=
- =?utf-8?B?L2JnTFdYcWgwci9sNDE2RFgwS3p6NXQ4SWpsWTJJK1UyS0g5RHJCSlgwZU00?=
- =?utf-8?B?eDFKeG9ZeklySkdaOTc5NE5YZXRwaEJ4NHYvU0haVTk0T1Rmb1pZelpQOFlK?=
- =?utf-8?B?VDVqMEJpRWZZZDYzOXpLQ3JKazNYeWhYbnJQM3RDVk1FMy80RFgyZ254MWtF?=
- =?utf-8?B?ZkxNV0NqMHBpTjk5U01OMzB6eGFwTFNvRy9ydkJReTAyQVo1L3lwZ0xQNWF0?=
- =?utf-8?B?SWNLb2FzNUFValhZWE1qMStMMC9qTFNKSHl5Q3hrTEI0azdUT2RsaGlsQWdW?=
- =?utf-8?B?M0EydHNxMFM3b3ErOFJabXVVMHBPdjJ3N2REUWpQS1UyUUxlbTUyMDJFWDA5?=
- =?utf-8?B?VGRacTVxMWRBZTdHY1AxeHFSLzBEYTlzYW4wMWpPVFJqdXdyTHlrUmFnaHRP?=
- =?utf-8?B?M0tYZTlLM3JQa2ErZW9uckM2cE1oVVdoM1RFV0s2WnRqalpRMWViTlZZWVU4?=
- =?utf-8?B?dm50bW1VV2RWQ0Z1Z1ZBOWFiZitnK3cwaFI2aEtCVzdEa0VaTEErWVdXYm5N?=
- =?utf-8?B?L1AvRTR4Y0FmdVkwc1psNENheEtWZ29yTU1TUTNReGJab2xYZUJkYldDQ3Vk?=
- =?utf-8?B?bi9nRnZlZHVnTG9LZUVDTGh0QmlPa0lwa25OcTNock1DS2YwaFFjQmRiOStu?=
- =?utf-8?B?Ri9PRHN0MnRnRFVZdk9vTUEySndPczZiYzZEZlVpcm9GaWZvUkxPZHNONE1I?=
- =?utf-8?B?WmIxZHQvcFBsU1VFQ2QrYjQ2U2pUOThRdS9vZHJXS21IOXhuV0JjWDEyV2lV?=
- =?utf-8?B?WXJiUHg4NlpUK1dBbEcvYXhHK1RsbTVseTN3RzliTStPMDdOaDB4eDlERlhT?=
- =?utf-8?B?T2NleStoN2IwN2d6bDF1NjlTaCtLSjZHTHB0WS9zbGRma1U5ZTNOMk1udCtT?=
- =?utf-8?B?YWlZeDZTRkVXSXROSDdJUURyeW5VVHhhU0YrbnVGelA5NlBjZXlxWXJkV0po?=
- =?utf-8?B?d3R0Z2FOeVBzcXAvdWFqYkJub3lsdE80V3ZBK25YS3k0K3B3d3hlMkhpN2hT?=
- =?utf-8?B?Kzl0SE93cHdZVzJoYnV3UmVNbHBBK051c1NlZWRhanBjbE4rOTlWSVFBSWg5?=
- =?utf-8?B?eGNabVhEYThFdTh0OHM4c1lLWTNBWkQ5MG1Xek1pME9OY3laWmVTUnZhbVQ3?=
- =?utf-8?B?WGhCOWxZdGZGVWJXcURMelpkWE9kT1cweTBQMWt0YlpCR0FTejduVEdLVDds?=
- =?utf-8?B?VkY3U2FNTHRJdXd3RFBCQnkzUWpsc1hLQVhieHpHRjhWRDZYanYrcWI0bVFq?=
- =?utf-8?B?eEFkSGJwM0lrTDNWeThENzB0ZVFOT2k4Q01FUk56ZkNDamhpeWlDRGdEZC9x?=
- =?utf-8?Q?LSly1cl/jnuGYNYxZqnxBqyo76Bs1wuF?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4eae4042-1a28-4fae-8771-08da081d7021
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Mar 2022 13:52:55.6384
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: rt4o0qv36qTL9vBSqwNyZnonYn5aDGEDEB/upsxvSmtlOJQPzXnmdSShweSI184k
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5873
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
+        HK_RANDOM_FROM,RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 17, 2022 at 05:47:36AM +0000, Tian, Kevin wrote:
-> > From: Robin Murphy
-> > Sent: Tuesday, March 15, 2022 6:49 PM
-> > 
-> > On 2022-03-14 19:44, Matthew Rosato wrote:
-> > > s390x will introduce an additional domain type that is used for
-> > > managing IOMMU owned by KVM.  Define the type here and add an
-> > > interface for allocating a specified type vs the default type.
-> > 
-> > I'm also not a huge fan of adding a new domain_alloc interface like
-> > this, however if it is justifiable, then please make it take struct
-> > device rather than struct bus_type as an argument.
-> > 
-> > It also sounds like there may be a degree of conceptual overlap here
-> > with what Jean-Philippe is working on for sharing pagetables between KVM
-> > and SMMU for Android pKVM, so it's probably worth some thought over
-> > whether there's any scope for common interfaces in terms of actual
-> > implementation.
-> 
-> Same here. Yan Zhao is working on page table sharing between KVM
-> and VT-d. This is one important usage to build atop iommufd and
-> a set of common interfaces are definitely necessary here. 😊
+This patch series aims to enable TDX support to allow creating and booting a
+TD (TDX VM) with QEMU. It needs to work with corresponding KVM patch
+for TDX [1]. You can find TDX related documents in [2].
 
-I always thought 'page table sharing with KVM' is SVA - ie it requires
-PRI in the IOMMU driver as the KVM page table is fully unpinned and
-dynamic. This S390 case is not doing SVA/PRI
+You can also find this series in below repo in github:
 
-Are people working on teaching KVM to DMA pin every page and avoid
-having a dynamic page table? I'm surprised, a lot of stuff won't work,
-eg write protect..
+https://github.com/intel/qemu-tdx.git
 
-Jason
+and it's based on two cleanup patches
+
+https://lore.kernel.org/qemu-devel/20220310122811.807794-1-xiaoyao.li@intel.com/
+
+
+To boot a TDX VM, it requires several changes/additional steps in the flow:
+
+ 1. specify the vm type KVM_X86_TDX_VM when creating VM with
+    IOCTL(KVM_CREATE_VM);
+ 2. initialize VM scope configuration before creating any VCPU;
+ 3. initialize VCPU scope configuration;
+ 4. initialize virtual firmware in guest private memory before vcpu running;
+
+Besides, TDX VM needs to boot with TDVF (TDX virtual firmware, and come out
+as OVMF). This series adds the support of parsing TDVF, loading TDVF into
+guest's private memory and preparing TD HOB info for TDVF.
+
+[1] KVM TDX basic feature support
+https://lore.kernel.org/all/cover.1646422845.git.isaku.yamahata@intel.com/
+
+[2] https://www.intel.com/content/www/us/en/developer/articles/technical/intel-trust-domain-extensions.html
+
+== Limitation and future work ==
+- Readonly memslot
+
+  TDX only support readonly (write protection) memslot for shared memory, but
+  not for private memory. For simplicity, just mark readonly memslot not
+  supported entirely for TDX. 
+
+- CPU model
+
+  We cannot create a TD with arbitrarily CPU model like what for normal VMs,
+  because only a subset of features can be configured for TD.
+  
+  - It's recommended to use '-cpu host' to create TD;
+  - '+feature/-feature' might not work as expected;
+
+  future work: To introduce specific CPU model for TDs and enhance +/-features
+               for TDs.
+
+- gdb suppport
+
+  gdb support to debug a TD of off-debug mode is future work.
+
+== Patch organization ==
+1           Manually fetch Linux UAPI changes for TDX;
+2-15,24,26  Basic TDX support that parses vm-type and invoke TDX
+            specific IOCTLs
+16-25       Load, parse and initialize TDVF for TDX VM;
+27-31       Disable unsupported functions for TDX VM;
+32-35       Avoid errors due to KVM's requirement on TDX;
+36          Add documentation of TDX;
+
+== Change history ==
+
+Changes from v2:
+- Get vm-type from confidential-guest-support object type;
+- Drop machine_init_done_late_notifiers;
+- Refactor tdx_ioctl implementation;
+- re-use existing pflash interface to load TDVF (i.e., OVMF binaries);
+- introduce new date structure to track memory type instead of changing
+  e820 table;
+- Force smm to off for TDX VM;
+- Drop the patches that suppress level-trigger/SMI/INIT/SIPI since KVM
+  will ingore them;
+- Add documentation;
+
+[v2] https://lore.kernel.org/qemu-devel/cover.1625704980.git.isaku.yamahata@intel.com/
+
+Changes from v1:
+- suppress level trigger/SMI/INIT/SIPI related to IOAPIC.
+- add VM attribute sha384 to TD measurement.
+- guest TSC Hz specification
+
+[v1] https://lore.kernel.org/qemu-devel/cover.1613188118.git.isaku.yamahata@intel.com/
+
+---
+Isaku Yamahata (4):
+  i386/tdvf: Introduce function to parse TDVF metadata
+  i386/tdx: Add TDVF memory via KVM_TDX_INIT_MEM_REGION
+  hw/i386: add option to forcibly report edge trigger in acpi tables
+  i386/tdx: Don't synchronize guest tsc for TDs
+
+Sean Christopherson (2):
+  i386/kvm: Move architectural CPUID leaf generation to separate helper
+  i386/tdx: Don't get/put guest state for TDX VMs
+
+Xiaoyao Li (30):
+  *** HACK *** linux-headers: Update headers to pull in TDX API changes
+  i386: Introduce tdx-guest object
+  target/i386: Implement mc->kvm_type() to get VM type
+  target/i386: Introduce kvm_confidential_guest_init()
+  i386/tdx: Implement tdx_kvm_init() to initialize TDX VM context
+  i386/tdx: Get tdx_capabilities via KVM_TDX_CAPABILITIES
+  i386/tdx: Introduce is_tdx_vm() helper and cache tdx_guest object
+  i386/tdx: Adjust get_supported_cpuid() for TDX VM
+  KVM: Introduce kvm_arch_pre_create_vcpu()
+  i386/tdx: Initialize TDX before creating TD vcpus
+  i386/tdx: Add property sept-ve-disable for tdx-guest object
+  i386/tdx: Wire CPU features up with attributes of TD guest
+  i386/tdx: Validate TD attributes
+  i386/tdx: Implement user specified tsc frequency
+  i386/tdx: Set kvm_readonly_mem_enabled to false for TDX VM
+  pflash_cfi01/tdx: Introduce ram_mode of pflash for TDVF
+  i386/tdx: Parse TDVF metadata for TDX VM
+  i386/tdx: Get and store the mem_ptr of TDVF firmware
+  i386/tdx: Track mem_ptr for each firmware entry of TDVF
+  i386/tdx: Track RAM entries for TDX VM
+  i386/tdx: Create the TD HOB list upon machine init done
+  i386/tdx: Call KVM_TDX_INIT_VCPU to initialize TDX vcpu
+  i386/tdx: Finalize TDX VM
+  i386/tdx: Disable SMM for TDX VMs
+  i386/tdx: Disable PIC for TDX VMs
+  i386/tdx: Don't allow system reset for TDX VMs
+  hw/i386: add eoi_intercept_unsupported member to X86MachineState
+  i386/tdx: Only configure MSR_IA32_UCODE_REV in kvm_init_msrs() for TDs
+  i386/tdx: Skip kvm_put_apicbase() for TDs
+  docs: Add TDX documentation
+
+ accel/kvm/kvm-all.c                        |  16 +-
+ configs/devices/i386-softmmu/default.mak   |   1 +
+ docs/system/confidential-guest-support.rst |   1 +
+ docs/system/i386/tdx.rst                   | 103 ++++
+ docs/system/target-i386.rst                |   1 +
+ hw/block/pflash_cfi01.c                    |  25 +-
+ hw/i386/Kconfig                            |   6 +
+ hw/i386/acpi-build.c                       |  99 ++--
+ hw/i386/acpi-common.c                      |  50 +-
+ hw/i386/meson.build                        |   1 +
+ hw/i386/pc_sysfw.c                         |  49 +-
+ hw/i386/tdvf-hob.c                         | 212 ++++++++
+ hw/i386/tdvf-hob.h                         |  25 +
+ hw/i386/tdvf.c                             | 196 ++++++++
+ hw/i386/uefi.h                             | 198 ++++++++
+ hw/i386/x86.c                              |   7 +
+ include/hw/i386/tdvf.h                     |  60 +++
+ include/hw/i386/x86.h                      |   1 +
+ include/sysemu/kvm.h                       |   1 +
+ linux-headers/asm-x86/kvm.h                |  60 +++
+ linux-headers/linux/kvm.h                  |   2 +
+ qapi/qom.json                              |  17 +
+ target/arm/kvm64.c                         |   5 +
+ target/i386/cpu.h                          |   5 +
+ target/i386/kvm/kvm.c                      | 362 ++++++++------
+ target/i386/kvm/kvm_i386.h                 |   5 +
+ target/i386/kvm/meson.build                |   2 +
+ target/i386/kvm/tdx-stub.c                 |  24 +
+ target/i386/kvm/tdx.c                      | 541 +++++++++++++++++++++
+ target/i386/kvm/tdx.h                      |  56 +++
+ target/i386/sev.c                          |   1 -
+ target/i386/sev.h                          |   2 +
+ target/mips/kvm.c                          |   5 +
+ target/ppc/kvm.c                           |   5 +
+ target/s390x/kvm/kvm.c                     |   5 +
+ 35 files changed, 1940 insertions(+), 209 deletions(-)
+ create mode 100644 docs/system/i386/tdx.rst
+ create mode 100644 hw/i386/tdvf-hob.c
+ create mode 100644 hw/i386/tdvf-hob.h
+ create mode 100644 hw/i386/tdvf.c
+ create mode 100644 hw/i386/uefi.h
+ create mode 100644 include/hw/i386/tdvf.h
+ create mode 100644 target/i386/kvm/tdx-stub.c
+ create mode 100644 target/i386/kvm/tdx.c
+ create mode 100644 target/i386/kvm/tdx.h
+
+-- 
+2.27.0
+
