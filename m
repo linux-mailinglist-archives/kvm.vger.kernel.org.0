@@ -2,106 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F094B4DCE0A
-	for <lists+kvm@lfdr.de>; Thu, 17 Mar 2022 19:52:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 978B04DCED7
+	for <lists+kvm@lfdr.de>; Thu, 17 Mar 2022 20:27:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237681AbiCQSxl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Mar 2022 14:53:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33644 "EHLO
+        id S238019AbiCQT2a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Mar 2022 15:28:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42302 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237666AbiCQSxj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Mar 2022 14:53:39 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDD00221BBF;
-        Thu, 17 Mar 2022 11:52:22 -0700 (PDT)
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22HGA5i9001293;
-        Thu, 17 Mar 2022 18:52:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=AQwtyhv7u4jjFpfrN5RAEteV2hqGptEPoejBb+YABXE=;
- b=rgUPGTIEIbdE4SFQusnyo0PLGn5H5QdjWIq+wdTNqYnVxKxoS/Fyw1wz4DKaUrCgHPbV
- 4NJQlezP1RokvPtYLAT1n7SDet4P1x5+UQ9fcN0XjUbEeARReVtWNLojBgA1EJoUo8ML
- PL1yqaC+FVuc9hnJ6r4KAUuDdPyNpzbTMkyK4doFIjnyDJ2eOE25SkMcQpjfr4C4IPuq
- gEQyELT1susg4Cw76LfqRVKni9RUeFJAGhM2Ohla0CIXuLLfm6cjhShufl34cYKKqhVp
- p9fjvf4ICvxH1Znuu4JUh0cXiIpxwa5ouw2qA+IjNgtlJkI1Y7dxjLXlWbBMq+Mhuyy2 eA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3ev1vq3peq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 17 Mar 2022 18:52:15 +0000
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22HIHWe4020959;
-        Thu, 17 Mar 2022 18:52:15 GMT
-Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3ev1vq3peb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 17 Mar 2022 18:52:15 +0000
-Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
-        by ppma04wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22HIltAc002410;
-        Thu, 17 Mar 2022 18:52:13 GMT
-Received: from b03cxnp08028.gho.boulder.ibm.com (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
-        by ppma04wdc.us.ibm.com with ESMTP id 3erk5a59u5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 17 Mar 2022 18:52:13 +0000
-Received: from b03ledav003.gho.boulder.ibm.com (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
-        by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22HIqCAc24903946
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 17 Mar 2022 18:52:12 GMT
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DFFAC6A054;
-        Thu, 17 Mar 2022 18:52:11 +0000 (GMT)
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9285C6A05D;
-        Thu, 17 Mar 2022 18:52:09 +0000 (GMT)
-Received: from [9.211.32.184] (unknown [9.211.32.184])
-        by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Thu, 17 Mar 2022 18:52:09 +0000 (GMT)
-Message-ID: <494fe1b2-cf44-23a6-a494-52a44041ad79@linux.ibm.com>
-Date:   Thu, 17 Mar 2022 14:51:34 -0400
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.0
-Subject: Re: [PATCH v4 15/32] vfio: introduce KVM-owned IOMMU type
-Content-Language: en-US
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     borntraeger@linux.ibm.com, linux-s390@vger.kernel.org,
-        alex.williamson@redhat.com, cohuck@redhat.com,
-        schnelle@linux.ibm.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
-        hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
-        svens@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
-        oberpar@linux.ibm.com, freude@linux.ibm.com, thuth@redhat.com,
-        pasic@linux.ibm.com, joro@8bytes.org, will@kernel.org,
-        pbonzini@redhat.com, corbet@lwn.net, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org,
-        linux-doc@vger.kernel.org
-References: <20220314194451.58266-1-mjrosato@linux.ibm.com>
- <20220314194451.58266-16-mjrosato@linux.ibm.com>
- <20220314213808.GI11336@nvidia.com>
- <decc5320-eb3e-af25-fd2b-77fabe56a897@linux.ibm.com>
- <20220315143858.GY11336@nvidia.com>
- <5a1c64ac-df10-fb66-ad6d-39adf786f32b@linux.ibm.com>
- <20220315172555.GJ11336@nvidia.com>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-In-Reply-To: <20220315172555.GJ11336@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: kuQpxA9M7txDOpig1s9KywXmLwC1zk1i
-X-Proofpoint-ORIG-GUID: mz6xbnGtBK1Vtsvhdc1q5_yO2bxU49u5
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-03-17_07,2022-03-15_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
- suspectscore=0 spamscore=0 clxscore=1015 impostorscore=0 adultscore=0
- priorityscore=1501 bulkscore=0 malwarescore=0 mlxlogscore=999 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
- definitions=main-2203170104
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        with ESMTP id S238022AbiCQT22 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Mar 2022 15:28:28 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3199721DF10
+        for <kvm@vger.kernel.org>; Thu, 17 Mar 2022 12:27:11 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id e8-20020a259248000000b0063391b39d14so4203606ybo.10
+        for <kvm@vger.kernel.org>; Thu, 17 Mar 2022 12:27:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=SY7x7s2PK1m0DaFeGw30caQr16xmi7SnJs2uqFu6Tyw=;
+        b=Pq2D5ufP3hwcxoUZn3ncrA9U7bKNQL3SmyjNk8EWShIcSoiE9fS1dcvTCE8PZRJ5nj
+         HKOPrvBS32VXg3JkQ9dQfu20mEs6hZFj+7HyzmQu5V+nQDEsIHaa2x5VBsObMyX9X3+X
+         IUMx2+j3jrn+1OFqEOxFcVOeCwx69AHzSKLLiHweW23EBIq9I6sYCQj8ebMOpayayNo0
+         jTnAE4SV8fSM4AUgh7qJF9NtvAETzbbDRzNNhMjrH4Ngq7Zjastm+JTKvoalR7StkvFh
+         4KqcOWDu7c9y/iudHqJbbHbs8/oNUSFlXNbn4iS6rD1Sv+OY5BlwlR0fGtiiV4V5XK9i
+         s+xw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=SY7x7s2PK1m0DaFeGw30caQr16xmi7SnJs2uqFu6Tyw=;
+        b=3XPBaOmnVqTsrS7yxDnWg8ojBPEFk+h3MImT5QYNUAYbxfrgKlAq/KMLIf15lTGoLt
+         OYrGpZZIO1kID+Zxu4yIC1atP4M8Sx+et33GVhsIw/YrlX6ogpBZUKHrwt0J3rupBSH2
+         sSM1xy6l8UDQkL7iLomcnskMH9Yq1S9wSHx8NV4udUOvRkv7jx1DhdiRDiGFs0Zetchg
+         /KIIx6tksdsxcVxY4AqeW39l4jSz43w1wxESFi8DudUMLt3BZNTevh8+phKob/CweFNJ
+         2Z24k2m0nQSsT77i8oclvKKI1ljKdgwVrZUZgp3CKvMlkrvH2OG11XGFrepmRdMz14nW
+         GVsA==
+X-Gm-Message-State: AOAM530JvQmLXWkasHc+GFbaTT4l/fWlwgI5O220Zlfm90e0GuQmVEzh
+        0ZpzyBel2FEKaACr8BUjbWWVxMGLpdz+IKlG8x7ROXoHfYKOiuUr3SyKdGZigGZOYRLM/EgpnaE
+        HbpuHP5FBDRq1N0ZqQ75tALV1kpty+/dVixggCrnNTw6B4xAikz7l38SBFA==
+X-Google-Smtp-Source: ABdhPJwWTSaZMIztaa2dHv/XG9sgD/NjS3ZEbaiRT3d4pb/Xmq+RmjbSJK25dS2htzDnA7JukcKOJ27I6nA=
+X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
+ (user=oupton job=sendgmr) by 2002:a25:4c46:0:b0:633:86ed:31e6 with SMTP id
+ z67-20020a254c46000000b0063386ed31e6mr6641836yba.319.1647545230214; Thu, 17
+ Mar 2022 12:27:10 -0700 (PDT)
+Date:   Thu, 17 Mar 2022 19:27:07 +0000
+Message-Id: <20220317192707.59538-1-oupton@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.1.894.gb6a874cedc-goog
+Subject: [PATCH] x86/cpuid: Stop masking the CPU vendor
+From:   Oliver Upton <oupton@google.com>
+To:     kvm@vger.kernel.org
+Cc:     Will Deacon <will@kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Oliver Upton <oupton@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -109,45 +66,50 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/15/22 1:25 PM, Jason Gunthorpe wrote:
-> On Tue, Mar 15, 2022 at 12:29:02PM -0400, Matthew Rosato wrote:
->> On 3/15/22 10:38 AM, Jason Gunthorpe wrote:
->>> On Tue, Mar 15, 2022 at 09:49:01AM -0400, Matthew Rosato wrote:
->>>
->>>> The rationale for splitting steps 1 and 2 are that VFIO_SET_IOMMU doesn't
->>>> have a mechanism for specifying more than the type as an arg, no?  Otherwise
->>>> yes, you could specify a kvm fd at this point and it would have some other
->>>> advantages (e.g. skip notifier).  But we still can't use the IOMMU for
->>>> mapping until step 3.
->>>
->>> Stuff like this is why I'd be much happier if this could join our
->>> iommfd project so we can have clean modeling of the multiple iommu_domains.
->>>
->>
->> I'd certainly be willing to collaborate so feel free to loop me in on the
->> discussions;
-> 
-> Sure, I have you on my list. I've been waiting for Eric to get a bit
-> further along on his ARM work so you have something appropriate to
-> look at.
-> 
-> In the mean time you can certainly work out the driver details as
-> you've been doing here and hacking through VFIO. The iommu_domain
-> logic is the big work item in this series, not the integration with
-> the uAPI.
->
+commit bc0b99a ("kvm tools: Filter out CPU vendor string") replaced the
+processor's native vendor string with a synthetic one to hack around
+some interesting guest MSR accesses that were not handled in KVM. In
+particular, the MC4_CTL_MASK MSR was accessed for AMD VMs, which isn't
+supported by KVM. This MSR relates to masking MCEs originating from the
+northbridge on real hardware, but is of zero use in virtualization.
 
-A subset of this series (enabling some s390x firmware-assist facilities) 
-is not tied to the iommu and would still provide value while continuing 
-to use vfio_iommu_type1 for all mapping -- so I think I'll look into a 
-next version that shrinks down to that subset (+ re-visit the setup API).
+Speaking more broadly, KVM does in fact do the right thing for such an
+MSR (#GP), and it is annoying but benign that KVM does a printk for the
+MSR. Masking the CPU vendor string is far from ideal, and gets in the
+way of testing vendor-specific CPU features. Stop the shenanigans and
+expose the vendor ID as returned by KVM_GET_SUPPORTED_CPUID.
 
-Separate from that, I will continue looking at implementing the nested 
-iommu_domain logic for s390, and continue to hack through VFIO for now. 
-I'll use an RFC series when I have something more to look at, likely 
-starting with the fully-pinned guest as you suggest; ultimately I'm 
-interested in both scenarios (pinned kvm guest & dynamic pinning during 
-shadow)
+Signed-off-by: Oliver Upton <oupton@google.com>
+---
+ x86/cpuid.c | 8 --------
+ 1 file changed, 8 deletions(-)
 
-Thanks,
-Matt
+diff --git a/x86/cpuid.c b/x86/cpuid.c
+index aa213d5..f4347a8 100644
+--- a/x86/cpuid.c
++++ b/x86/cpuid.c
+@@ -10,7 +10,6 @@
+ 
+ static void filter_cpuid(struct kvm_cpuid2 *kvm_cpuid, int cpu_id)
+ {
+-	unsigned int signature[3];
+ 	unsigned int i;
+ 
+ 	/*
+@@ -20,13 +19,6 @@ static void filter_cpuid(struct kvm_cpuid2 *kvm_cpuid, int cpu_id)
+ 		struct kvm_cpuid_entry2 *entry = &kvm_cpuid->entries[i];
+ 
+ 		switch (entry->function) {
+-		case 0:
+-			/* Vendor name */
+-			memcpy(signature, "LKVMLKVMLKVM", 12);
+-			entry->ebx = signature[0];
+-			entry->ecx = signature[1];
+-			entry->edx = signature[2];
+-			break;
+ 		case 1:
+ 			entry->ebx &= ~(0xff << 24);
+ 			entry->ebx |= cpu_id << 24;
+-- 
+2.35.1.894.gb6a874cedc-goog
+
