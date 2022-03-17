@@ -2,165 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 876BA4DC464
-	for <lists+kvm@lfdr.de>; Thu, 17 Mar 2022 12:04:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 848DB4DC478
+	for <lists+kvm@lfdr.de>; Thu, 17 Mar 2022 12:08:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232785AbiCQLFl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Mar 2022 07:05:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37930 "EHLO
+        id S232851AbiCQLJc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Mar 2022 07:09:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47314 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232739AbiCQLFk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Mar 2022 07:05:40 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEAC214598F;
-        Thu, 17 Mar 2022 04:04:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=PCEn0p+ryj8IwmQoXfYYKrLO2DRtz//hRKf5O/r8Uro=; b=RllbrkU0Nfaj80jprERUL9GuFq
-        Rf9okQ7eJ2ykDseCxxqUBkTcsuacbH7ypXgMqF4v4DxAyK1imY6b9jkqwjVz/72gzDUkXzaLrGK4w
-        zGbdBuSkWSbiD86Z8wnue8dxgovdgLowHajymq9XRfynC6OV3vHj2Jojwk2CwM2IP9E8IazvFvoRw
-        BKfkiM9kIRiH5lbJXnkveZdLQAk0yiBHBLHOGu0A+iFgU6Q5L26jWrI2qpvBpWyzNYv1/6Lq3jcyW
-        Miu89Z/YNR6Q2XZZxemcspV/1rqIMkpTcPuUpIJRAwuxJTf0IrDyCAbUhwgG++mUiup1DWHamd3Fm
-        y7iFgTnQ==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nUnvM-006tiP-GG; Thu, 17 Mar 2022 11:04:08 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 9EF9C3001EA;
-        Thu, 17 Mar 2022 12:04:05 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 805862CA6FC9A; Thu, 17 Mar 2022 12:04:05 +0100 (CET)
-Date:   Thu, 17 Mar 2022 12:04:05 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     Jamie Heilman <jamie@audible.transient.net>,
-        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH -v1.2] kvm/emulate: Fix SETcc emulation function offsets
- with SLS
-Message-ID: <YjMVpfe/9ldmWX8W@hirez.programming.kicks-ass.net>
-References: <YjGzJwjrvxg5YZ0Z@audible.transient.net>
- <YjHYh3XRbHwrlLbR@zn.tnic>
- <YjIwRR5UsTd3W4Bj@audible.transient.net>
- <YjI69aUseN/IuzTj@zn.tnic>
- <YjJFb02Fc0jeoIW4@audible.transient.net>
- <YjJVWYzHQDbI6nZM@zn.tnic>
- <20220316220201.GM8939@worktop.programming.kicks-ass.net>
- <YjMBdMlhVMGLG5ws@zn.tnic>
- <YjMS8eTOhXBOPFOe@zn.tnic>
+        with ESMTP id S230330AbiCQLJa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Mar 2022 07:09:30 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 379E913EB1;
+        Thu, 17 Mar 2022 04:08:14 -0700 (PDT)
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22HAuDsa021666;
+        Thu, 17 Mar 2022 11:08:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=2a6NX32i0fjMUVzjufDPdk9mpLpUddUjkJfO+NmQZGk=;
+ b=QNGUeXmjv/Oo5bHcyRrUnYNUD2w1cBq5g/0E9gKBJi9gNUzMr7OStqvUCcQX0xYDGG7Z
+ s6eGbKhVvrdSybuKHSY04TO3Ii+9C9eedAF3tSCK6oCVvAF2F8ZGxPmtvYloBo0S7R0p
+ OhY23ICeqd+j13nehSBek6AHFK+kh+ekjoFWjwEEW0YaUYZxOBAc8fi28U1TSWj96eoa
+ qjuFbv4IAmmYiHz3w5WWCaEx8CAwrqisocoCs30wwp3GJLc1Km/3DF2tRt2p/DT6oVUk
+ wxB9xftuOJKPfs515zdjZStUUf1vwPy0Rz/goRp9wlClLOR1kTlj9Bg7g94C6HSYW5F8 Aw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3euvh1g14v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 17 Mar 2022 11:08:04 +0000
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22HAXjr3019309;
+        Thu, 17 Mar 2022 11:08:03 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3euvh1g148-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 17 Mar 2022 11:08:03 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22HB2vWC001979;
+        Thu, 17 Mar 2022 11:08:02 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma04ams.nl.ibm.com with ESMTP id 3erk5935dp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 17 Mar 2022 11:08:01 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22HB7xwY55378208
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 17 Mar 2022 11:07:59 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id F149BA4055;
+        Thu, 17 Mar 2022 11:07:58 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6CCD3A4053;
+        Thu, 17 Mar 2022 11:07:58 +0000 (GMT)
+Received: from [9.145.148.38] (unknown [9.145.148.38])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 17 Mar 2022 11:07:58 +0000 (GMT)
+Message-ID: <6175e7fa-070e-8ab2-843a-8019d0dc0c83@linux.ibm.com>
+Date:   Thu, 17 Mar 2022 12:07:58 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH v3 1/4] drivers/s390/char: Add Ultravisor io device
+Content-Language: en-US
+To:     Greg KH <greg@kroah.com>
+Cc:     agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
+        david@redhat.com, frankja@linux.ibm.com, gor@linux.ibm.com,
+        hca@linux.ibm.com, imbrenda@linux.ibm.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-s390@vger.kernel.org, nrb@linux.ibm.com, shuah@kernel.org
+References: <20220304141141.32767-2-seiden@linux.ibm.com>
+ <20220317094706.4921-1-seiden@linux.ibm.com> <YjMGgSstSCZAmcVa@kroah.com>
+From:   Steffen Eiden <seiden@linux.ibm.com>
+Organization: IBM
+In-Reply-To: <YjMGgSstSCZAmcVa@kroah.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 9L-eVfnvB6BgwtUNkaFb8gjLp_Zrnv4g
+X-Proofpoint-ORIG-GUID: rPEBkZtDaCUvipmQ3TmbMvKLBgmPoqvG
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YjMS8eTOhXBOPFOe@zn.tnic>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-03-17_04,2022-03-15_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ mlxlogscore=641 lowpriorityscore=0 clxscore=1011 priorityscore=1501
+ suspectscore=0 mlxscore=0 adultscore=0 bulkscore=0 phishscore=0
+ impostorscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2202240000 definitions=main-2203170066
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H4,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 17, 2022 at 11:52:33AM +0100, Borislav Petkov wrote:
+Hi greg,
 
-> From: Borislav Petkov <bp@suse.de>
+On 3/17/22 10:59, Greg KH wrote:
+> On Thu, Mar 17, 2022 at 09:47:06AM +0000, Steffen Eiden wrote:
+>> This patch adds a new miscdevice to expose some Ultravisor functions
+>> to userspace. Userspace can send IOCTLs to the uvdevice that will then
+>> emit a corresponding Ultravisor Call and hands the result over to
+>> userspace. The uvdevice is available if the Ultravisor Call facility is
+>> present.
+>> Userspace can call the Retrieve Attestation Measurement
+>> Ultravisor Call using IOCTLs on the uvdevice.
+>>
+>> The uvdevice will do some sanity checks first.
+>> Then, copy the request data to kernel space, build the UVCB,
+>> perform the UV call, and copy the result back to userspace.
+>>
+>> Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
+>> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 > 
-> The commit in Fixes started adding INT3 after RETs as a mitigation
-> against straight-line speculation.
+> Do you have a pointer to the userspace code that interacts with this
+> kernel driver?  That would be good to have to verify that the api here
+> is sane.
 > 
-> The fastop SETcc implementation in kvm's insn emulator uses macro magic
-> to generate all possible SETcc functions and to jump to them when
-> emulating the respective instruction.
-> 
-> However, it hardcodes the size and alignment of those functions to 4: a
-> three-byte SETcc insn and a single-byte RET. BUT, with SLS, there's an
-> INT3 that gets slapped after the RET, which brings the whole scheme out
-> of alignment:
-> 
->   15:   0f 90 c0                seto   %al
->   18:   c3                      ret
->   19:   cc                      int3
->   1a:   0f 1f 00                nopl   (%rax)
->   1d:   0f 91 c0                setno  %al
->   20:   c3                      ret
->   21:   cc                      int3
->   22:   0f 1f 00                nopl   (%rax)
->   25:   0f 92 c0                setb   %al
->   28:   c3                      ret
->   29:   cc                      int3
-> 
-> and this explodes like this:
-> 
->   int3: 0000 [#1] PREEMPT SMP PTI
->   CPU: 0 PID: 2435 Comm: qemu-system-x86 Not tainted 5.17.0-rc8-sls #1
->   Hardware name: Dell Inc. Precision WorkStation T3400  /0TP412, BIOS A14 04/30/2012
->   RIP: 0010:setc+0x5/0x8 [kvm]
->   Code: 00 00 0f 1f 00 0f b6 05 43 24 06 00 c3 cc 0f 1f 80 00 00 00 00 0f 90 c0 c3 cc 0f 1f 00 0f 91 c0 c3 cc 0f 1f 00 0f 92 c0 c3 cc <0f> 1f 00 0f 93 c0 c3 cc 0f 1f 00 0f 94 c0 c3 cc 0f 1f 00 0f 95 c0
->   Call Trace:
->    <TASK>
->    ? x86_emulate_insn [kvm]
->    ? x86_emulate_instruction [kvm]
->    ? vmx_handle_exit [kvm_intel]
->    ? kvm_arch_vcpu_ioctl_run [kvm]
->    ? kvm_vcpu_ioctl [kvm]
->    ? __x64_sys_ioctl
->    ? do_syscall_64+0x40/0xa0
->    ? entry_SYSCALL_64_after_hwframe+0x44/0xae
->    </TASK>
-> 
-> Raise the alignment value when SLS is enabled and use a macro for that
-> instead of hard-coding naked numbers.
-> 
-> Fixes: e463a09af2f0 ("x86: Add straight-line-speculation mitigation")
-> Reported-by: Jamie Heilman <jamie@audible.transient.net>
-> Signed-off-by: Borislav Petkov <bp@suse.de>
-> Link: https://lore.kernel.org/r/YjGzJwjrvxg5YZ0Z@audible.transient.net
+There is a userspace tool currently under development, however, not yet 
+ready to be published.
+Currently, I can only point to the Kselftest in this series and the 
+kvm-unit-tests at 
+https://lore.kernel.org/linux-s390/20220203091935.2716-1-seiden@linux.ibm.com/
 
-Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 
-Depending on what Paolo wants, it might make sense to merge this into
-tip/x86/urgent such that we can then resolve the merge conflict vs
-tip/x86/core with something like the below:
+> thanks,
+> 
+> greg k-h
+> 
 
-diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-index 113fd5c1b874..06dfbe9adcdb 100644
---- a/arch/x86/kvm/emulate.c
-+++ b/arch/x86/kvm/emulate.c
-@@ -24,6 +24,7 @@
- #include <linux/stringify.h>
- #include <asm/debugreg.h>
- #include <asm/nospec-branch.h>
-+#include <asm/ibt.h>
- 
- #include "x86.h"
- #include "tss.h"
-@@ -431,7 +432,19 @@ static int fastop(struct x86_emulate_ctxt *ctxt, fastop_t fop);
- 
- /* Special case for SETcc - 1 instruction per cc */
- 
--#define SETCC_ALIGN	(4 * (1 + IS_ENABLED(CONFIG_SLS)))
-+/*
-+ * Depending on .config the SETcc functions look like:
-+ *
-+ * setcc:
-+ * +0	ENDBR		[CONFIG_X86_KERNEL_IBT]
-+ * +4	SETcc	%al
-+ * +7	RET
-+ * +8	INT3		[CONFIG_SLS]
-+ *
-+ * Which gives possible sizes: 4, 5, 8, 9 which when rounded up to the
-+ * next power-of-two alignment become: 4, 8, 16.
-+ */
-+#define SETCC_ALIGN	(4 * (1 + IS_ENABLED(CONFIG_SLS)) * (1 + HAS_KERNEL_IBT))
- 
- #define FOP_SETCC(op) \
- 	".align " __stringify(SETCC_ALIGN) " \n\t" \
+steffen
