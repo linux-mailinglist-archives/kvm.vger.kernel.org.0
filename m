@@ -2,153 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 94E0C4DBED9
-	for <lists+kvm@lfdr.de>; Thu, 17 Mar 2022 06:58:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E8F914DBF0B
+	for <lists+kvm@lfdr.de>; Thu, 17 Mar 2022 07:13:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229522AbiCQGAH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Mar 2022 02:00:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39114 "EHLO
+        id S229632AbiCQGOT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Mar 2022 02:14:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54948 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229459AbiCQGAG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Mar 2022 02:00:06 -0400
-Received: from mail.sberdevices.ru (mail.sberdevices.ru [45.89.227.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5B1B642E;
-        Wed, 16 Mar 2022 22:29:34 -0700 (PDT)
-Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
-        by mail.sberdevices.ru (Postfix) with ESMTP id E26FF5FD05;
-        Thu, 17 Mar 2022 08:29:31 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1647494971;
-        bh=tc4Xqjuow4fJhCGYjA0+j55/jP1xzKSQOWMLd3ai/FM=;
-        h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version;
-        b=Edqk9DKTQ8oyIjQe784h9Ed7H1fyGCm/MgDr/0/PaHL11xQ+oqEEjjVnsFer4CzSQ
-         UaQj1e6tb0Nu7H0osyO8xzgROlIjWJplB5XDvVhB4vmkbchb7rjYMm92GfA8bfUAOg
-         TGKAX/3yetTZlsfJbPwznZiiFDZ03wz2mMF222snl4IlDc4SwfUHGdbVSfYUua9ZB2
-         f7sIeOQsC2yaDJCftRHYJAiEJn8Ws/mlfkt4mQdBX89hdHmByfA2JXW3ca2xbvaEPn
-         KyUWKqU6flSaQl3FElBcNII4UzGvaZfP/IIPrSdQIdcov0LjefOqQSNU838xAsaQkG
-         9zP3a03uDs1FA==
-Received: from S-MS-EXCH02.sberdevices.ru (S-MS-EXCH02.sberdevices.ru [172.16.1.5])
-        by mail.sberdevices.ru (Postfix) with ESMTP;
-        Thu, 17 Mar 2022 08:29:31 +0300 (MSK)
-From:   Krasnov Arseniy Vladimirovich <AVKrasnov@sberdevices.ru>
-To:     Stefano Garzarella <sgarzare@redhat.com>
-CC:     Krasnov Arseniy <oxffffaa@gmail.com>,
-        Krasnov Arseniy Vladimirovich <AVKrasnov@sberdevices.ru>,
-        Rokosov Dmitry Dmitrievich <DDRokosov@sberdevices.ru>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: [PATCH net-next v3 2/2] af_vsock: SOCK_SEQPACKET broken buffer test
-Thread-Topic: [PATCH net-next v3 2/2] af_vsock: SOCK_SEQPACKET broken buffer
- test
-Thread-Index: AQHYOb/NiHIFmSegRUWQFT4fmoBTow==
-Date:   Thu, 17 Mar 2022 05:28:21 +0000
-Message-ID: <c3ce3c67-1bbd-8172-0c98-e0c3cd5a80b6@sberdevices.ru>
-In-Reply-To: <4ecfa306-a374-93f6-4e66-be62895ae4f7@sberdevices.ru>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.16.1.12]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <59C59A4B571B994688BB6554B360AE8D@sberdevices.ru>
-Content-Transfer-Encoding: base64
+        with ESMTP id S229734AbiCQGFz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Mar 2022 02:05:55 -0400
+Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 785DA18179A
+        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 22:37:38 -0700 (PDT)
+Received: by mail-il1-x135.google.com with SMTP id o12so3037198ilg.5
+        for <kvm@vger.kernel.org>; Wed, 16 Mar 2022 22:37:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=eOhA5o/rv2hDIRWbKN8H2klxdoKowJwEzyK4YFjI0Ok=;
+        b=eeGjN5mJoNpfj5kKLs04Hxp8X5XHrjfeLPZrK1GmJPCRupkJZf477uJa/kOmtzy0ah
+         YpIQBOMEEmnBPa2QqUCDk2hxy905PuK7tGHlm1nA8Diqbj8GpX8QcZehpprTbs1pc8zy
+         gJ1O4s1tdr7D6LqnHE/pWm8PcUef5DhVZRSRXlk+gFupMitoIzsVDFACkBPdNGwXgbtT
+         RaAmW2zB98eSXT7Mdyna2gbwqUpFp/Y1Hmehe7Zel/0BoWXMFW80r2wjeAxZeohqY2SR
+         Ie5vR9drsGClueifPs5p0dbl+q8ZPjbwfHuvP2SwJIZhjdFQuXamj1plYXStripntCBf
+         /WFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=eOhA5o/rv2hDIRWbKN8H2klxdoKowJwEzyK4YFjI0Ok=;
+        b=RX3A0//SAJhRrbN9nWiDWWqhxINAFgF/b6+ArVBWKoVMqt3XxkHU9ctTnL8L81iWTE
+         s745bAb36UP2azVsAkJNgbB4QqqGSWkvTzFIOLsROuQD4RN1XaDZwAUW/OyaAe75K3Iq
+         ikWx9PbF5oUx4eDxZkcW61eqdZbtRTBiNYWmdsCZnkAsLtJXuxB1Fl8JZe/Uwj4GOD/l
+         L35V3NvwPn/XDBYacP1g2G1alYSfRoQf22YinDEEhFD7iZoI5OboSksxH9VcZ7K9GTvl
+         PvdjaPgNG2zkX0i2nEVeq2kZhfrpjTwgKilnbPQ3uUfqSyEepvaVXo6d7hPb5gHuDNRA
+         6hpA==
+X-Gm-Message-State: AOAM532EAdIMZrdbyHIiqGoZMggb8JIRTDCF5KiW5FVEDmhPhxxHlIHY
+        j2Kl7sv3EQAWGowylVxVZ88kGA==
+X-Google-Smtp-Source: ABdhPJy6LallOZSL7cqSmQyF4OC2oFoWT6AOIFXJUadLeyXNHu1TKa02/s52DyymredH2yAh2eCM5g==
+X-Received: by 2002:a05:6e02:1aa6:b0:2c7:769e:8403 with SMTP id l6-20020a056e021aa600b002c7769e8403mr1226693ilv.49.1647495457228;
+        Wed, 16 Mar 2022 22:37:37 -0700 (PDT)
+Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
+        by smtp.gmail.com with ESMTPSA id i3-20020a056602134300b0064620a85b6dsm2177542iov.12.2022.03.16.22.37.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Mar 2022 22:37:36 -0700 (PDT)
+Date:   Thu, 17 Mar 2022 05:37:32 +0000
+From:   Oliver Upton <oupton@google.com>
+To:     Jing Zhang <jingzhangos@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
+        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>
+Subject: Re: [PATCH v1 2/2] KVM: arm64: Add debug tracepoint for vcpu exits
+Message-ID: <YjLJHDV58GRMxF2P@google.com>
+References: <20220317005630.3666572-1-jingzhangos@google.com>
+ <20220317005630.3666572-3-jingzhangos@google.com>
 MIME-Version: 1.0
-X-KSMG-Rule-ID: 4
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Status: not scanned, disabled by settings
-X-KSMG-AntiSpam-Interceptor-Info: not scanned
-X-KSMG-AntiPhishing: not scanned, disabled by settings
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2022/03/17 01:49:00 #18989990
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220317005630.3666572-3-jingzhangos@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-QWRkIHRlc3Qgd2hlcmUgc2VuZGVyIHNlbmRzIHR3byBtZXNzYWdlLCBlYWNoIHdpdGggb3duDQpk
-YXRhIHBhdHRlcm4uIFJlYWRlciB0cmllcyB0byByZWFkIGZpcnN0IHRvIGJyb2tlbiBidWZmZXI6
-DQppdCBoYXMgdGhyZWUgcGFnZXMgc2l6ZSwgYnV0IG1pZGRsZSBwYWdlIGlzIHVubWFwcGVkLiBU
-aGVuLA0KcmVhZGVyIHRyaWVzIHRvIHJlYWQgc2Vjb25kIG1lc3NhZ2UgdG8gdmFsaWQgYnVmZmVy
-LiBUZXN0DQpjaGVja3MsIHRoYXQgdW5jb3BpZWQgcGFydCBvZiBmaXJzdCBtZXNzYWdlIHdhcyBk
-cm9wcGVkDQphbmQgdGh1cyBub3QgY29waWVkIGFzIHBhcnQgb2Ygc2Vjb25kIG1lc3NhZ2UuDQoN
-ClNpZ25lZC1vZmYtYnk6IEtyYXNub3YgQXJzZW5peSBWbGFkaW1pcm92aWNoIDxBVktyYXNub3ZA
-c2JlcmRldmljZXMucnU+DQotLS0NCiB2MiAtPiB2MzoNCiAxKSAiZ290IFgsIGV4cGVjdGVkIFki
-IC0+ICJleHBlY3RlZCBYLCBnb3QgWSIuDQogMikgU29tZSBjaGVja3BhdGNoLnBsIGZpeGVzLg0K
-DQogdG9vbHMvdGVzdGluZy92c29jay92c29ja190ZXN0LmMgfCAxMzEgKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKw0KIDEgZmlsZSBjaGFuZ2VkLCAxMzEgaW5zZXJ0aW9ucygrKQ0KDQpk
-aWZmIC0tZ2l0IGEvdG9vbHMvdGVzdGluZy92c29jay92c29ja190ZXN0LmMgYi90b29scy90ZXN0
-aW5nL3Zzb2NrL3Zzb2NrX3Rlc3QuYw0KaW5kZXggZjU0OThkZTY3NTFkLi45YjYzZTQxMjE2NWUg
-MTAwNjQ0DQotLS0gYS90b29scy90ZXN0aW5nL3Zzb2NrL3Zzb2NrX3Rlc3QuYw0KKysrIGIvdG9v
-bHMvdGVzdGluZy92c29jay92c29ja190ZXN0LmMNCkBAIC0xNyw2ICsxNyw3IEBADQogI2luY2x1
-ZGUgPHN5cy90eXBlcy5oPg0KICNpbmNsdWRlIDxzeXMvc29ja2V0Lmg+DQogI2luY2x1ZGUgPHRp
-bWUuaD4NCisjaW5jbHVkZSA8c3lzL21tYW4uaD4NCiANCiAjaW5jbHVkZSAidGltZW91dC5oIg0K
-ICNpbmNsdWRlICJjb250cm9sLmgiDQpAQCAtNDcwLDYgKzQ3MSwxMzEgQEAgc3RhdGljIHZvaWQg
-dGVzdF9zZXFwYWNrZXRfdGltZW91dF9zZXJ2ZXIoY29uc3Qgc3RydWN0IHRlc3Rfb3B0cyAqb3B0
-cykNCiAJY2xvc2UoZmQpOw0KIH0NCiANCisjZGVmaW5lIEJVRl9QQVRURVJOXzEgJ2EnDQorI2Rl
-ZmluZSBCVUZfUEFUVEVSTl8yICdiJw0KKw0KK3N0YXRpYyB2b2lkIHRlc3Rfc2VxcGFja2V0X2lu
-dmFsaWRfcmVjX2J1ZmZlcl9jbGllbnQoY29uc3Qgc3RydWN0IHRlc3Rfb3B0cyAqb3B0cykNCit7
-DQorCWludCBmZDsNCisJdW5zaWduZWQgY2hhciAqYnVmMTsNCisJdW5zaWduZWQgY2hhciAqYnVm
-MjsNCisJaW50IGJ1Zl9zaXplID0gZ2V0cGFnZXNpemUoKSAqIDM7DQorDQorCWZkID0gdnNvY2tf
-c2VxcGFja2V0X2Nvbm5lY3Qob3B0cy0+cGVlcl9jaWQsIDEyMzQpOw0KKwlpZiAoZmQgPCAwKSB7
-DQorCQlwZXJyb3IoImNvbm5lY3QiKTsNCisJCWV4aXQoRVhJVF9GQUlMVVJFKTsNCisJfQ0KKw0K
-KwlidWYxID0gbWFsbG9jKGJ1Zl9zaXplKTsNCisJaWYgKCFidWYxKSB7DQorCQlwZXJyb3IoIidt
-YWxsb2MoKScgZm9yICdidWYxJyIpOw0KKwkJZXhpdChFWElUX0ZBSUxVUkUpOw0KKwl9DQorDQor
-CWJ1ZjIgPSBtYWxsb2MoYnVmX3NpemUpOw0KKwlpZiAoIWJ1ZjIpIHsNCisJCXBlcnJvcigiJ21h
-bGxvYygpJyBmb3IgJ2J1ZjInIik7DQorCQlleGl0KEVYSVRfRkFJTFVSRSk7DQorCX0NCisNCisJ
-bWVtc2V0KGJ1ZjEsIEJVRl9QQVRURVJOXzEsIGJ1Zl9zaXplKTsNCisJbWVtc2V0KGJ1ZjIsIEJV
-Rl9QQVRURVJOXzIsIGJ1Zl9zaXplKTsNCisNCisJaWYgKHNlbmQoZmQsIGJ1ZjEsIGJ1Zl9zaXpl
-LCAwKSAhPSBidWZfc2l6ZSkgew0KKwkJcGVycm9yKCJzZW5kIGZhaWxlZCIpOw0KKwkJZXhpdChF
-WElUX0ZBSUxVUkUpOw0KKwl9DQorDQorCWlmIChzZW5kKGZkLCBidWYyLCBidWZfc2l6ZSwgMCkg
-IT0gYnVmX3NpemUpIHsNCisJCXBlcnJvcigic2VuZCBmYWlsZWQiKTsNCisJCWV4aXQoRVhJVF9G
-QUlMVVJFKTsNCisJfQ0KKw0KKwljbG9zZShmZCk7DQorfQ0KKw0KK3N0YXRpYyB2b2lkIHRlc3Rf
-c2VxcGFja2V0X2ludmFsaWRfcmVjX2J1ZmZlcl9zZXJ2ZXIoY29uc3Qgc3RydWN0IHRlc3Rfb3B0
-cyAqb3B0cykNCit7DQorCWludCBmZDsNCisJdW5zaWduZWQgY2hhciAqYnJva2VuX2J1ZjsNCisJ
-dW5zaWduZWQgY2hhciAqdmFsaWRfYnVmOw0KKwlpbnQgcGFnZV9zaXplID0gZ2V0cGFnZXNpemUo
-KTsNCisJaW50IGJ1Zl9zaXplID0gcGFnZV9zaXplICogMzsNCisJc3NpemVfdCByZXM7DQorCWlu
-dCBwcm90ID0gUFJPVF9SRUFEIHwgUFJPVF9XUklURTsNCisJaW50IGZsYWdzID0gTUFQX1BSSVZB
-VEUgfCBNQVBfQU5PTllNT1VTOw0KKwlpbnQgaTsNCisNCisJZmQgPSB2c29ja19zZXFwYWNrZXRf
-YWNjZXB0KFZNQUREUl9DSURfQU5ZLCAxMjM0LCBOVUxMKTsNCisJaWYgKGZkIDwgMCkgew0KKwkJ
-cGVycm9yKCJhY2NlcHQiKTsNCisJCWV4aXQoRVhJVF9GQUlMVVJFKTsNCisJfQ0KKw0KKwkvKiBT
-ZXR1cCBmaXJzdCBidWZmZXIuICovDQorCWJyb2tlbl9idWYgPSBtbWFwKE5VTEwsIGJ1Zl9zaXpl
-LCBwcm90LCBmbGFncywgLTEsIDApOw0KKwlpZiAoYnJva2VuX2J1ZiA9PSBNQVBfRkFJTEVEKSB7
-DQorCQlwZXJyb3IoIm1tYXAgZm9yICdicm9rZW5fYnVmJyIpOw0KKwkJZXhpdChFWElUX0ZBSUxV
-UkUpOw0KKwl9DQorDQorCS8qIFVubWFwICJob2xlIiBpbiBidWZmZXIuICovDQorCWlmIChtdW5t
-YXAoYnJva2VuX2J1ZiArIHBhZ2Vfc2l6ZSwgcGFnZV9zaXplKSkgew0KKwkJcGVycm9yKCInYnJv
-a2VuX2J1Zicgc2V0dXAiKTsNCisJCWV4aXQoRVhJVF9GQUlMVVJFKTsNCisJfQ0KKw0KKwl2YWxp
-ZF9idWYgPSBtbWFwKE5VTEwsIGJ1Zl9zaXplLCBwcm90LCBmbGFncywgLTEsIDApOw0KKwlpZiAo
-dmFsaWRfYnVmID09IE1BUF9GQUlMRUQpIHsNCisJCXBlcnJvcigibW1hcCBmb3IgJ3ZhbGlkX2J1
-ZiciKTsNCisJCWV4aXQoRVhJVF9GQUlMVVJFKTsNCisJfQ0KKw0KKwkvKiBUcnkgdG8gZmlsbCBi
-dWZmZXIgd2l0aCB1bm1hcHBlZCBtaWRkbGUuICovDQorCXJlcyA9IHJlYWQoZmQsIGJyb2tlbl9i
-dWYsIGJ1Zl9zaXplKTsNCisJaWYgKHJlcyAhPSAtMSkgew0KKwkJZnByaW50ZihzdGRlcnIsDQor
-CQkJImV4cGVjdGVkICdicm9rZW5fYnVmJyByZWFkKDIpIGZhaWx1cmUsIGdvdCAlemlcbiIsDQor
-CQkJcmVzKTsNCisJCWV4aXQoRVhJVF9GQUlMVVJFKTsNCisJfQ0KKw0KKwlpZiAoZXJybm8gIT0g
-RU5PTUVNKSB7DQorCQlwZXJyb3IoInVuZXhwZWN0ZWQgZXJybm8gb2YgJ2Jyb2tlbl9idWYnIik7
-DQorCQlleGl0KEVYSVRfRkFJTFVSRSk7DQorCX0NCisNCisJLyogVHJ5IHRvIGZpbGwgdmFsaWQg
-YnVmZmVyLiAqLw0KKwlyZXMgPSByZWFkKGZkLCB2YWxpZF9idWYsIGJ1Zl9zaXplKTsNCisJaWYg
-KHJlcyA8IDApIHsNCisJCXBlcnJvcigidW5leHBlY3RlZCAndmFsaWRfYnVmJyByZWFkKDIpIGZh
-aWx1cmUiKTsNCisJCWV4aXQoRVhJVF9GQUlMVVJFKTsNCisJfQ0KKw0KKwlpZiAocmVzICE9IGJ1
-Zl9zaXplKSB7DQorCQlmcHJpbnRmKHN0ZGVyciwNCisJCQkiaW52YWxpZCAndmFsaWRfYnVmJyBy
-ZWFkKDIpLCBleHBlY3RlZCAlaSwgZ290ICV6aVxuIiwNCisJCQlidWZfc2l6ZSwgcmVzKTsNCisJ
-CWV4aXQoRVhJVF9GQUlMVVJFKTsNCisJfQ0KKw0KKwlmb3IgKGkgPSAwOyBpIDwgYnVmX3NpemU7
-IGkrKykgew0KKwkJaWYgKHZhbGlkX2J1ZltpXSAhPSBCVUZfUEFUVEVSTl8yKSB7DQorCQkJZnBy
-aW50ZihzdGRlcnIsDQorCQkJCSJpbnZhbGlkIHBhdHRlcm4gZm9yICd2YWxpZF9idWYnIGF0ICVp
-LCBleHBlY3RlZCAlaGhYLCBnb3QgJWhoWFxuIiwNCisJCQkJaSwgQlVGX1BBVFRFUk5fMiwgdmFs
-aWRfYnVmW2ldKTsNCisJCQlleGl0KEVYSVRfRkFJTFVSRSk7DQorCQl9DQorCX0NCisNCisJLyog
-VW5tYXAgYnVmZmVycy4gKi8NCisJbXVubWFwKGJyb2tlbl9idWYsIHBhZ2Vfc2l6ZSk7DQorCW11
-bm1hcChicm9rZW5fYnVmICsgcGFnZV9zaXplICogMiwgcGFnZV9zaXplKTsNCisJbXVubWFwKHZh
-bGlkX2J1ZiwgYnVmX3NpemUpOw0KKwljbG9zZShmZCk7DQorfQ0KKw0KIHN0YXRpYyBzdHJ1Y3Qg
-dGVzdF9jYXNlIHRlc3RfY2FzZXNbXSA9IHsNCiAJew0KIAkJLm5hbWUgPSAiU09DS19TVFJFQU0g
-Y29ubmVjdGlvbiByZXNldCIsDQpAQCAtNTE1LDYgKzY0MSwxMSBAQCBzdGF0aWMgc3RydWN0IHRl
-c3RfY2FzZSB0ZXN0X2Nhc2VzW10gPSB7DQogCQkucnVuX2NsaWVudCA9IHRlc3Rfc2VxcGFja2V0
-X3RpbWVvdXRfY2xpZW50LA0KIAkJLnJ1bl9zZXJ2ZXIgPSB0ZXN0X3NlcXBhY2tldF90aW1lb3V0
-X3NlcnZlciwNCiAJfSwNCisJew0KKwkJLm5hbWUgPSAiU09DS19TRVFQQUNLRVQgaW52YWxpZCBy
-ZWNlaXZlIGJ1ZmZlciIsDQorCQkucnVuX2NsaWVudCA9IHRlc3Rfc2VxcGFja2V0X2ludmFsaWRf
-cmVjX2J1ZmZlcl9jbGllbnQsDQorCQkucnVuX3NlcnZlciA9IHRlc3Rfc2VxcGFja2V0X2ludmFs
-aWRfcmVjX2J1ZmZlcl9zZXJ2ZXIsDQorCX0sDQogCXt9LA0KIH07DQogDQotLSANCjIuMjUuMQ0K
+Hi Jing,
+
+On Thu, Mar 17, 2022 at 12:56:30AM +0000, Jing Zhang wrote:
+> This tracepoint only provides a hook for poking vcpu exits information,
+> not exported to tracefs.
+> A timestamp is added for the last vcpu exit, which would be useful for
+> analysis for vcpu exits.
+> 
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 3 +++
+>  arch/arm64/kvm/arm.c              | 2 ++
+>  arch/arm64/kvm/trace_arm.h        | 8 ++++++++
+>  3 files changed, 13 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index daa68b053bdc..576f2c18d008 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -415,6 +415,9 @@ struct kvm_vcpu_arch {
+>  
+>  	/* Arch specific exit reason */
+>  	enum arm_exit_reason exit_reason;
+> +
+> +	/* Timestamp for the last vcpu exit */
+> +	u64 last_exit_time;
+>  };
+>  
+>  /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index f49ebdd9c990..98631f79c182 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -783,6 +783,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>  	ret = 1;
+>  	run->exit_reason = KVM_EXIT_UNKNOWN;
+>  	while (ret > 0) {
+> +		trace_kvm_vcpu_exits(vcpu);
+>  		/*
+>  		 * Check conditions before entering the guest
+>  		 */
+> @@ -898,6 +899,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>  		local_irq_enable();
+>  
+>  		trace_kvm_exit(ret, kvm_vcpu_trap_get_class(vcpu), *vcpu_pc(vcpu));
+> +		vcpu->arch.last_exit_time = ktime_to_ns(ktime_get());
+>  
+>  		/* Exit types that need handling before we can be preempted */
+>  		handle_exit_early(vcpu, ret);
+> diff --git a/arch/arm64/kvm/trace_arm.h b/arch/arm64/kvm/trace_arm.h
+> index 33e4e7dd2719..3e7dfd640e23 100644
+> --- a/arch/arm64/kvm/trace_arm.h
+> +++ b/arch/arm64/kvm/trace_arm.h
+> @@ -301,6 +301,14 @@ TRACE_EVENT(kvm_timer_emulate,
+>  		  __entry->timer_idx, __entry->should_fire)
+>  );
+>  
+> +/*
+> + * Following tracepoints are not exported in tracefs and provide hooking
+> + * mechanisms only for testing and debugging purposes.
+> + */
+> +DECLARE_TRACE(kvm_vcpu_exits,
+> +	TP_PROTO(struct kvm_vcpu *vcpu),
+> +	TP_ARGS(vcpu));
+> +
+
+When we were discussing this earlier, I wasn't aware of the kvm_exit
+tracepoint which I think encapsulates what you're looking for.
+ESR_EL2.EC is the critical piece to determine what caused the exit.
+
+It is probably also important to call out that this trace point only
+will fire for a 'full' KVM exit (i.e. out of hyp and back to the
+kernel). There are several instances where the exit is handled in hyp
+and we immediately resume the guest.
+
+Now -- I am bordering on clueless with tracepoints, but it isn't
+immediately obvious how the attached program can determine the vCPU that
+triggered the TP. If we are going to propose modularizing certain KVM
+metrics with tracepoints then that would be a rather critical piece of
+information.
+
+Apologies for any confusion I added to the whole situation, but
+hopefully we can still engage in a broader conversation regarding
+how to package up optional KVM metrics.
+
+--
+Thanks,
+Oliver
