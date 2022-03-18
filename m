@@ -2,57 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BEDBC4DD610
-	for <lists+kvm@lfdr.de>; Fri, 18 Mar 2022 09:24:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 73AAF4DD669
+	for <lists+kvm@lfdr.de>; Fri, 18 Mar 2022 09:46:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233744AbiCRIZb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Mar 2022 04:25:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56276 "EHLO
+        id S233932AbiCRIsO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Mar 2022 04:48:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53122 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233761AbiCRIZ2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Mar 2022 04:25:28 -0400
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 940398F9B9
-        for <kvm@vger.kernel.org>; Fri, 18 Mar 2022 01:24:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1647591849; x=1679127849;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references;
-  bh=PZiPD/SuIIsS+EqCtlCd8b/O3jddbps3cq59zfI+mNE=;
-  b=MKK13EE34DHff9jmeOsMaPct1AsG43+pDGuF55uIMfxgrlC/vZfrHfjN
-   NzYI7jNH+3MbjgP9S9OurhyQbhPQM29YhCFBwq1gBcB7CVsjwSrid4lHT
-   tVg1CA8r86DT+p67bXf95Ob8h9ydXVNgJ/87mJnA3fi0ff4g5thqPqAbS
-   EXPyYPQU+YD6wuec3iFT0jm+QkVcl5nggIVduInaZH4eQ/IA4OmfQGqPn
-   EyV+UKycZDNI6V/nAQIG39SUtvU3cPhL/TDoVKqrZYOsSvWLRUIQPJklT
-   WNSZz0+Q850lnNgRmIS7Xj+Ctuk9jaSYSE/JriTcdNK9Bd5wunE2uWcVq
-   g==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10289"; a="343528116"
-X-IronPort-AV: E=Sophos;i="5.90,191,1643702400"; 
-   d="scan'208";a="343528116"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Mar 2022 01:23:57 -0700
-X-IronPort-AV: E=Sophos;i="5.90,191,1643702400"; 
-   d="scan'208";a="558320591"
-Received: from chenyi-pc.sh.intel.com ([10.239.159.73])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Mar 2022 01:23:54 -0700
-From:   Chenyi Qiang <chenyi.qiang@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Chenyi Qiang <chenyi.qiang@intel.com>, qemu-devel@nongnu.org,
-        kvm@vger.kernel.org
-Subject: [PATCH v2 3/3] i386: Add notify VM exit support
-Date:   Fri, 18 Mar 2022 16:29:34 +0800
-Message-Id: <20220318082934.25030-4-chenyi.qiang@intel.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20220318082934.25030-1-chenyi.qiang@intel.com>
-References: <20220318082934.25030-1-chenyi.qiang@intel.com>
-X-Spam-Status: No, score=-5.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        with ESMTP id S233966AbiCRIr7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Mar 2022 04:47:59 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F188B19C838
+        for <kvm@vger.kernel.org>; Fri, 18 Mar 2022 01:46:40 -0700 (PDT)
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22I8j8tR000378
+        for <kvm@vger.kernel.org>; Fri, 18 Mar 2022 08:46:40 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : in-reply-to : references : date : message-id : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=TBsVAhQR9Hi2gm2wQutvQLZbz6/0yaowfWOXuejJpmI=;
+ b=BAaU7JMKCWGH6YCigcnt3qCQmWltyZwRdSg8fmghsqu0sgWNxz6U5IKlmrBLrDVWNRj9
+ A/8QE8Trc2hf7L++o4k2vQHyRebGlI00Fl4OZ55RyrSBS0V77P/hittC8nTlxYJfDtiM
+ +KOB+2c7XRTpg3c45agwvVnrVxjxmpo1ciohGeGnGZPugXFRiH6+0CSKra6bxtu6JyAZ
+ 6Xl4losOgwhxpsybCtzjA3jnAU+n90NKaQocpidA3LcJwLcdiSi2QkNSuX0DQnDTm2FM
+ 7ieEgXqhtkdCrlzgD9e3AGyMzlB4t4CXG3TvCCp5wqk/YOYJrTUORCsmWt62AkUE5RX+ 1g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3euxtr3q29-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 18 Mar 2022 08:46:39 +0000
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22I8kdEU007409
+        for <kvm@vger.kernel.org>; Fri, 18 Mar 2022 08:46:39 GMT
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3euxtr3q1q-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 18 Mar 2022 08:46:39 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22I8ctSQ026424;
+        Fri, 18 Mar 2022 08:46:37 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma04fra.de.ibm.com with ESMTP id 3erk58u5hx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 18 Mar 2022 08:46:37 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22I8kYC951380632
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 18 Mar 2022 08:46:34 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 782E1A404D;
+        Fri, 18 Mar 2022 08:46:34 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 29EB5A405B;
+        Fri, 18 Mar 2022 08:46:34 +0000 (GMT)
+Received: from marcibm (unknown [9.171.66.9])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Fri, 18 Mar 2022 08:46:34 +0000 (GMT)
+From:   Marc Hartmayer <mhartmay@linux.ibm.com>
+To:     Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     frankja@linux.ibm.com, thuth@redhat.com, pbonzini@redhat.com
+Subject: Re: [kvm-unit-tests PATCH] runtime: indicate failure on
+ crash/timeout/abort in TAP
+In-Reply-To: <20220310150322.2111128-1-nrb@linux.ibm.com>
+References: <20220310150322.2111128-1-nrb@linux.ibm.com>
+Date:   Fri, 18 Mar 2022 09:46:32 +0100
+Message-ID: <87bky3veaf.fsf@marcibm.i-did-not-set--mail-host-address--so-tickle-me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: a5a-4vcwg_4jb8BLk6V13EVX6v-P5tBt
+X-Proofpoint-ORIG-GUID: l2Zm7JWHP5vW2vsThy4jsLR_EWgncx5k
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-03-18_07,2022-03-15_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 suspectscore=0
+ spamscore=0 phishscore=0 adultscore=0 malwarescore=0 bulkscore=0
+ impostorscore=0 priorityscore=1501 lowpriorityscore=0 mlxscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2203180045
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -60,203 +90,106 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There are cases that malicious virtual machine can cause CPU stuck (due
-to event windows don't open up), e.g., infinite loop in microcode when
-nested #AC (CVE-2015-5307). No event window means no event (NMI, SMI and
-IRQ) can be delivered. It leads the CPU to be unavailable to host or
-other VMs. Notify VM exit is introduced to mitigate such kind of
-attacks, which will generate a VM exit if no event window occurs in VM
-non-root mode for a specified amount of time (notify window).
+Nico Boehr <nrb@linux.ibm.com> writes:
 
-A new KVM capability KVM_CAP_X86_NOTIFY_VMEXIT is exposed to user space
-so that the user can query the capability and set the expected notify
-window when creating VMs. Because there are some concerns, e.g. a notify
-VM exit may happen with VM_CONTEXT_INVALID set in exit qualification (no
-cases are anticipated that would set this bit), which means VM context
-is corrupted. To avoid the false positive and a well-behaved guest gets
-killed, make this feature disabled by default.
+> When we have crashes, timeouts or aborts, there is currently no indicatio=
+n for
+> this in the TAP output.
+> When all reports() up to this point succeeded, this
+> might result in a TAP file looking completely fine even though things went
+> terribly wrong.
+>
+> For example, when I set the timeout for the diag288 test on s390x to 1 se=
+cond,
+> it fails because it takes quite long, which is properly indicated in the
+> normal output:
+>
+> $ ./run_tests.sh diag288
+> FAIL diag288 (timeout; duration=3D1s)
+>
+> But, when I enable TAP output, I get this:
+>
+> $ ./run_tests.sh -t diag288
+> TAP version 13
+> ok 1 - diag288: diag288: privileged: Program interrupt: expected(2) =3D=
+=3D received(2)
+> ok 2 - diag288: diag288: specification: uneven: Program interrupt: expect=
+ed(6) =3D=3D received(6)
+> ok 3 - diag288: diag288: specification: unsupported action: Program inter=
+rupt: expected(6) =3D=3D received(6)
+> ok 4 - diag288: diag288: specification: unsupported function: Program int=
+errupt: expected(6) =3D=3D received(6)
+> ok 5 - diag288: diag288: specification: no init: Program interrupt: expec=
+ted(6) =3D=3D received(6)
+> ok 6 - diag288: diag288: specification: min timer: Program interrupt: exp=
+ected(6) =3D=3D received(6)
+> 1..6
+>
+> Which looks like a completely fine TAP file, but actually we ran into a t=
+imeout
+> and didn't even run all tests.
+>
+> With this patch, we get an additional line at the end which properly shows
+> something went wrong:
+>
+> not ok 7 - diag288: timeout; duration=3D1s
 
-If notify VM exit happens with VM_INVALID_CONTEXT, hypervisor should
-exit to user space with the exit reason KVM_EXIT_NOTIFY to inform the
-fatal case. Then user space can inject a SHUTDOWN event to the target
-vcpu. This is implemented by injecting a sythesized triple fault event
-to target vcpu.
+This results from the fact that the TAP13 test result is generated by
+the function `RUNTIME_log_stdout` and not by `print_result` (see commit
+6e1d3752d7ca ("tap13: list testcases individually")). In
+`RUNTIME_log_stdout` we don=E2=80=99t have access to the QEMU command exit =
+code.
+So what you=E2=80=99re doing here is to workaround that fact=E2=80=A6 I=E2=
+=80=99m not sure how
+to fix this properly without refactoring the whole code :/ Maybe Paolo
+knows a better fix.
 
-Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
----
- hw/i386/x86.c         | 24 ++++++++++++++++++
- include/hw/i386/x86.h |  3 +++
- target/i386/kvm/kvm.c | 58 ++++++++++++++++++++++++++++---------------
- 3 files changed, 65 insertions(+), 20 deletions(-)
+Some small nits below=E2=80=A6 (I don=E2=80=99t make any comments regarding=
+ quoting
+since it was already suboptimal in the code).
 
-diff --git a/hw/i386/x86.c b/hw/i386/x86.c
-index b84840a1bb..25e6c50b1e 100644
---- a/hw/i386/x86.c
-+++ b/hw/i386/x86.c
-@@ -1309,6 +1309,23 @@ static void machine_set_sgx_epc(Object *obj, Visitor *v, const char *name,
-     qapi_free_SgxEPCList(list);
- }
- 
-+static void x86_machine_get_notify_window(Object *obj, Visitor *v,
-+                                const char *name, void *opaque, Error **errp)
-+{
-+    X86MachineState *x86ms = X86_MACHINE(obj);
-+    int32_t notify_window = x86ms->notify_window;
-+
-+    visit_type_int32(v, name, &notify_window, errp);
-+}
-+
-+static void x86_machine_set_notify_window(Object *obj, Visitor *v,
-+                               const char *name, void *opaque, Error **errp)
-+{
-+    X86MachineState *x86ms = X86_MACHINE(obj);
-+
-+    visit_type_int32(v, name, &x86ms->notify_window, errp);
-+}
-+
- static void x86_machine_initfn(Object *obj)
- {
-     X86MachineState *x86ms = X86_MACHINE(obj);
-@@ -1319,6 +1336,7 @@ static void x86_machine_initfn(Object *obj)
-     x86ms->oem_id = g_strndup(ACPI_BUILD_APPNAME6, 6);
-     x86ms->oem_table_id = g_strndup(ACPI_BUILD_APPNAME8, 8);
-     x86ms->bus_lock_ratelimit = 0;
-+    x86ms->notify_window = -1;
- }
- 
- static void x86_machine_class_init(ObjectClass *oc, void *data)
-@@ -1375,6 +1393,12 @@ static void x86_machine_class_init(ObjectClass *oc, void *data)
-         NULL, NULL);
-     object_class_property_set_description(oc, "sgx-epc",
-         "SGX EPC device");
-+
-+    object_class_property_add(oc, X86_MACHINE_NOTIFY_WINDOW, "int32_t",
-+                                x86_machine_get_notify_window,
-+                                x86_machine_set_notify_window, NULL, NULL);
-+    object_class_property_set_description(oc, X86_MACHINE_NOTIFY_WINDOW,
-+            "Set the notify window required by notify VM exit");
- }
- 
- static const TypeInfo x86_machine_info = {
-diff --git a/include/hw/i386/x86.h b/include/hw/i386/x86.h
-index a145a30370..2a4ca21a94 100644
---- a/include/hw/i386/x86.h
-+++ b/include/hw/i386/x86.h
-@@ -82,6 +82,8 @@ struct X86MachineState {
-      * which means no limitation on the guest's bus locks.
-      */
-     uint64_t bus_lock_ratelimit;
-+
-+    int32_t notify_window;
- };
- 
- #define X86_MACHINE_SMM              "smm"
-@@ -89,6 +91,7 @@ struct X86MachineState {
- #define X86_MACHINE_OEM_ID           "x-oem-id"
- #define X86_MACHINE_OEM_TABLE_ID     "x-oem-table-id"
- #define X86_MACHINE_BUS_LOCK_RATELIMIT  "bus-lock-ratelimit"
-+#define X86_MACHINE_NOTIFY_WINDOW     "notify-window"
- 
- #define TYPE_X86_MACHINE   MACHINE_TYPE_NAME("x86")
- OBJECT_DECLARE_TYPE(X86MachineState, X86MachineClass, X86_MACHINE)
-diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index 3159c9cefe..73fc840ea6 100644
---- a/target/i386/kvm/kvm.c
-+++ b/target/i386/kvm/kvm.c
-@@ -2299,6 +2299,10 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-     int ret;
-     struct utsname utsname;
-     Error *local_err = NULL;
-+    X86MachineState *x86ms;
-+
-+    assert(object_dynamic_cast(OBJECT(ms), TYPE_X86_MACHINE));
-+    x86ms = X86_MACHINE(ms);
- 
-     /*
-      * Initialize SEV context, if required
-@@ -2394,8 +2398,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-     }
- 
-     if (kvm_check_extension(s, KVM_CAP_X86_SMM) &&
--        object_dynamic_cast(OBJECT(ms), TYPE_X86_MACHINE) &&
--        x86_machine_is_smm_enabled(X86_MACHINE(ms))) {
-+        x86_machine_is_smm_enabled(x86ms)) {
-         smram_machine_done.notify = register_smram_listener;
-         qemu_add_machine_init_done_notifier(&smram_machine_done);
-     }
-@@ -2423,25 +2426,31 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-         }
-     }
- 
--    if (object_dynamic_cast(OBJECT(ms), TYPE_X86_MACHINE)) {
--        X86MachineState *x86ms = X86_MACHINE(ms);
-+    if (x86ms->bus_lock_ratelimit > 0) {
-+        ret = kvm_check_extension(s, KVM_CAP_X86_BUS_LOCK_EXIT);
-+        if (!(ret & KVM_BUS_LOCK_DETECTION_EXIT)) {
-+            error_report("kvm: bus lock detection unsupported");
-+            return -ENOTSUP;
-+        }
-+        ret = kvm_vm_enable_cap(s, KVM_CAP_X86_BUS_LOCK_EXIT, 0,
-+                                KVM_BUS_LOCK_DETECTION_EXIT);
-+        if (ret < 0) {
-+            error_report("kvm: Failed to enable bus lock detection cap: %s",
-+                         strerror(-ret));
-+            return ret;
-+        }
-+        ratelimit_init(&bus_lock_ratelimit_ctrl);
-+        ratelimit_set_speed(&bus_lock_ratelimit_ctrl,
-+                            x86ms->bus_lock_ratelimit, BUS_LOCK_SLICE_TIME);
-+    }
- 
--        if (x86ms->bus_lock_ratelimit > 0) {
--            ret = kvm_check_extension(s, KVM_CAP_X86_BUS_LOCK_EXIT);
--            if (!(ret & KVM_BUS_LOCK_DETECTION_EXIT)) {
--                error_report("kvm: bus lock detection unsupported");
--                return -ENOTSUP;
--            }
--            ret = kvm_vm_enable_cap(s, KVM_CAP_X86_BUS_LOCK_EXIT, 0,
--                                    KVM_BUS_LOCK_DETECTION_EXIT);
--            if (ret < 0) {
--                error_report("kvm: Failed to enable bus lock detection cap: %s",
--                             strerror(-ret));
--                return ret;
--            }
--            ratelimit_init(&bus_lock_ratelimit_ctrl);
--            ratelimit_set_speed(&bus_lock_ratelimit_ctrl,
--                                x86ms->bus_lock_ratelimit, BUS_LOCK_SLICE_TIME);
-+    if (kvm_check_extension(s, KVM_CAP_X86_NOTIFY_VMEXIT)) {
-+        ret = kvm_vm_enable_cap(s, KVM_CAP_X86_NOTIFY_VMEXIT, 0,
-+                                x86ms->notify_window);
-+        if (ret < 0) {
-+            error_report("kvm: Failed to enable notify vmexit cap: %s",
-+                         strerror(-ret));
-+            return ret;
-         }
-     }
- 
-@@ -4866,6 +4875,7 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
-     X86CPU *cpu = X86_CPU(cs);
-     uint64_t code;
-     int ret;
-+    struct kvm_vcpu_events events = {};
- 
-     switch (run->exit_reason) {
-     case KVM_EXIT_HLT:
-@@ -4921,6 +4931,14 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
-         /* already handled in kvm_arch_post_run */
-         ret = 0;
-         break;
-+    case KVM_EXIT_NOTIFY:
-+        ret = 0;
-+        if (run->notify.data & KVM_NOTIFY_CONTEXT_INVALID) {
-+            warn_report("KVM: invalid context due to notify vmexit");
-+            events.flags |= KVM_VCPUEVENT_TRIPLE_FAULT;
-+            ret = kvm_vcpu_ioctl(cs, KVM_SET_VCPU_EVENTS, &events);
-+        }
-+        break;
-     default:
-         fprintf(stderr, "KVM: unknown exit reason %d\n", run->exit_reason);
-         ret = -1;
--- 
-2.17.1
+>
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+> ---
+>  scripts/runtime.bash | 12 +++++++++++-
+>  1 file changed, 11 insertions(+), 1 deletion(-)
+>
+> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
+> index 6d5fced94246..b41b3d444e27 100644
+> --- a/scripts/runtime.bash
+> +++ b/scripts/runtime.bash
+> @@ -163,9 +163,19 @@ function run()
+>          print_result "SKIP" $testname "$summary"
+>      elif [ $ret -eq 124 ]; then
+>          print_result "FAIL" $testname "" "timeout; duration=3D$timeout"
+> +        if [[ $tap_output !=3D "no" ]]; then
+> +            echo "not ok TEST_NUMBER - ${testname}: timeout; duration=3D=
+$timeout" >&3
+> +        fi
+>      elif [ $ret -gt 127 ]; then
+> -        print_result "FAIL" $testname "" "terminated on SIG$(kill -l $((=
+$ret - 128)))"
+> +        signame=3D"SIG"$(kill -l $(($ret - 128)))
+> +        print_result "FAIL" $testname "" "terminated on $signame"
+> +        if [[ $tap_output !=3D "no" ]]; then
+> +            echo "not ok TEST_NUMBER - ${testname}: terminated on $signa=
+me" >&3
+> +        fi
+>      else
+> +        if [ $ret -eq 127 ] && [[ $tap_output !=3D "no" ]]; then
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+           This is a new case, no? If so please add a separate
+           patch creating another `elif` branch.
 
+> +            echo "not ok TEST_NUMBER - ${testname}: aborted" >&3
+> +        fi
+>          print_result "FAIL" $testname "$summary"
+>      fi
+>=20=20
+> --=20
+> 2.31.1
+
+Otherwise, this patch fixes the problem you=E2=80=99ve mentioned - although=
+ it
+leads to even more fragmented code. But I can't think of a better (easy)
+fix right now either.
