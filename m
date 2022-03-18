@@ -2,119 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ED9354DD76C
-	for <lists+kvm@lfdr.de>; Fri, 18 Mar 2022 10:54:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 76DAF4DD783
+	for <lists+kvm@lfdr.de>; Fri, 18 Mar 2022 10:56:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234700AbiCRJzv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Mar 2022 05:55:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48244 "EHLO
+        id S234761AbiCRJ5f (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Mar 2022 05:57:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234686AbiCRJzt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Mar 2022 05:55:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A04E4129248
-        for <kvm@vger.kernel.org>; Fri, 18 Mar 2022 02:54:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647597269;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=B0N2tqLbrUYXG1JSQlScpTqqNArTVktmTNzG3PVVQ64=;
-        b=KSNa1vkL5p7Eq2AnvtKNmWV5edLGovzXZqUAPllatqyY330F6R0rdPpuhhsE0RFJ4HuZyO
-        oVB0xeuiTBwaGt959gxQra9qcUH7PNwjG0y3wnIXdZtaxoXq6Sk+YYxo5KOkLU5oZLXVlD
-        y2WDomVTSQ1BNhOw3ZLco6r8Dk31YUo=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-646-9fYZgXstOWOD4vyqxjiEbg-1; Fri, 18 Mar 2022 05:54:28 -0400
-X-MC-Unique: 9fYZgXstOWOD4vyqxjiEbg-1
-Received: by mail-qt1-f197.google.com with SMTP id e28-20020ac8415c000000b002c5e43ca6b7so5315583qtm.9
-        for <kvm@vger.kernel.org>; Fri, 18 Mar 2022 02:54:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=B0N2tqLbrUYXG1JSQlScpTqqNArTVktmTNzG3PVVQ64=;
-        b=s/pLbkPremP8mGCiZvyEoXrvGcD6KmqW+qDX5RShxUQwyKY+b4c//SOVwuns6glFKV
-         f7yD04GgyZBTdQ3eXM/H8SIKPLEK7wRcgacgGWEFCbpILWCgiY9yut/c08ovGC8U60IL
-         U4hJzQKzUcB9etbnhXVoiaBWbGW1HvG27kvdAcciRFzRgLFS9UozFJG9Tzm5djwKPSfx
-         R8J9dXJeCfb1QK67lju9J2/0sckG6l5UQaoQFJNllgamIJb4znXhhh5ENFWvtp+KHZQS
-         L52xZ47L8JDYwity5F7wsOfQ6k3qk10aMI0zW6VCZPO4ArNFQGDNwmDbBSI+5MbdgU4b
-         VFAA==
-X-Gm-Message-State: AOAM532b5oMqkomEYfXpGefpzNIA7mu2WGOXdSUFxIq1S86L6rBq2nFC
-        3HuP2ZRcDaLXSGlYCP+PkvXUUAXgUUvuX88WPa0srp6OLmzyT14vPGgpE/ev5ZH3URWcXwfYzO/
-        Kpadrv2WVFznx
-X-Received: by 2002:a0c:c404:0:b0:431:31c3:3d15 with SMTP id r4-20020a0cc404000000b0043131c33d15mr6517885qvi.116.1647597267948;
-        Fri, 18 Mar 2022 02:54:27 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJww4OeEttXpHADmj/zwubxQlNCZdF6Q1KI9KtTuFS5WVsX1Yj8sug1rDI4IQP0gxF1xEeAyKQ==
-X-Received: by 2002:a0c:c404:0:b0:431:31c3:3d15 with SMTP id r4-20020a0cc404000000b0043131c33d15mr6517872qvi.116.1647597267762;
-        Fri, 18 Mar 2022 02:54:27 -0700 (PDT)
-Received: from sgarzare-redhat (host-87-12-25-114.business.telecomitalia.it. [87.12.25.114])
-        by smtp.gmail.com with ESMTPSA id de26-20020a05620a371a00b0067dc7923b14sm3642875qkb.132.2022.03.18.02.54.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Mar 2022 02:54:27 -0700 (PDT)
-Date:   Fri, 18 Mar 2022 10:54:22 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Anirudh Rayabharam <mail@anirudhrb.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] vhost: handle error while adding split ranges to iotlb
-Message-ID: <20220318095422.a37g7vxaiwqo5wxx@sgarzare-redhat>
-References: <20220312141121.4981-1-mail@anirudhrb.com>
+        with ESMTP id S234760AbiCRJ5d (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Mar 2022 05:57:33 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52DC32B3D41
+        for <kvm@vger.kernel.org>; Fri, 18 Mar 2022 02:56:14 -0700 (PDT)
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22I8aUGH002768
+        for <kvm@vger.kernel.org>; Fri, 18 Mar 2022 09:56:14 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=umoJlNkGKONgabmPJslxv1RvxpbIjTi1I+O7hRURAXc=;
+ b=qazqgSMxdlTN7XMflxHbcKq40EgasTYnl4j9oX7Mw3XP1LqHJ3lgKHwm6euz2x9KqFoq
+ C0omNXs8OYCDegjUziMJ2WswAkmrqntgA/YkgBcJe4It5OxbXlqWjJJ+wQ9Zk78R/yoa
+ 0XS3QBHXxF3boENcsdmV8iilNNi4QObNUSJ6KbtN2ACuXpR5ouCFmfFDDlMONrti2NGS
+ w7XMjOpFgGzFGu6Hp1V2w5vN2awLsHP+9p1KUk2fVZoH/dJZpwghdce0dfFylLCiMrf0
+ TYX53X6vl1OsFPbRLkPUn9QVK/T7Thogd5w22aBjRb7OK49bbtzVaxMUa/ZOvQZfSjSL 8Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3euv2yyny9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 18 Mar 2022 09:56:13 +0000
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22I9Dalj017028
+        for <kvm@vger.kernel.org>; Fri, 18 Mar 2022 09:56:13 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3euv2yynxq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 18 Mar 2022 09:56:13 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22I9rGEO000391;
+        Fri, 18 Mar 2022 09:56:11 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma04ams.nl.ibm.com with ESMTP id 3erk59584m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 18 Mar 2022 09:56:10 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22I9uADT43647362
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 18 Mar 2022 09:56:10 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BE793A405C;
+        Fri, 18 Mar 2022 09:56:07 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7F5A4A405F;
+        Fri, 18 Mar 2022 09:56:07 +0000 (GMT)
+Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1.ibm.com (unknown [9.171.61.11])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 18 Mar 2022 09:56:07 +0000 (GMT)
+Message-ID: <86e8b5d021d5440f75b1635e1f7d2b0e464bd85b.camel@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH] runtime: indicate failure on
+ crash/timeout/abort in TAP
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     Marc Hartmayer <mhartmay@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     frankja@linux.ibm.com, thuth@redhat.com, pbonzini@redhat.com
+Date:   Fri, 18 Mar 2022 10:56:07 +0100
+In-Reply-To: <87bky3veaf.fsf@marcibm.i-did-not-set--mail-host-address--so-tickle-me>
+References: <20220310150322.2111128-1-nrb@linux.ibm.com>
+         <87bky3veaf.fsf@marcibm.i-did-not-set--mail-host-address--so-tickle-me>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20220312141121.4981-1-mail@anirudhrb.com>
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: mPGPcoSHbqaud54I1JLSdzNrpMEhRCCL
+X-Proofpoint-ORIG-GUID: mlM00oOA2l5thyttch77OXHAkyH73RZm
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-03-18_07,2022-03-15_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 phishscore=0
+ malwarescore=0 mlxscore=0 lowpriorityscore=0 suspectscore=0 adultscore=0
+ mlxlogscore=999 spamscore=0 bulkscore=0 impostorscore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
+ definitions=main-2203180051
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Mar 12, 2022 at 07:41:21PM +0530, Anirudh Rayabharam wrote:
->vhost_iotlb_add_range_ctx() handles the range [0, ULONG_MAX] by
->splitting it into two ranges and adding them separately. The return
->value of adding the first range to the iotlb is currently ignored.
->Check the return value and bail out in case of an error.
->
+On Fri, 2022-03-18 at 09:46 +0100, Marc Hartmayer wrote:
+> Nico Boehr <nrb@linux.ibm.com> writes:
+[...]
+> > Which looks like a completely fine TAP file, but actually we ran
+> > into a timeout
+> > and didn't even run all tests.
+> > 
+> > With this patch, we get an additional line at the end which
+> > properly shows
+> > something went wrong:
+> > 
+> > not ok 7 - diag288: timeout; duration=1s
+> 
+> This results from the fact that the TAP13 test result is generated by
+> the function `RUNTIME_log_stdout` and not by `print_result` (see
+> commit
+> 6e1d3752d7ca ("tap13: list testcases individually")). In
+> `RUNTIME_log_stdout` we don’t have access to the QEMU command exit
+> code.
 
-We could add:
+Basically yes. If we had that we could do all the TAP special handling
+there.
+> 
 
-Fixes: e2ae38cf3d91 ("vhost: fix hung thread due to erroneous iotlb entries")
+[...]
+> > diff --git a/scripts/runtime.bash b/scripts/runtime.bash
+> > index 6d5fced94246..b41b3d444e27 100644
+> > --- a/scripts/runtime.bash
+> > +++ b/scripts/runtime.bash
+> > @@ -163,9 +163,19 @@ function run()
+> >          print_result "SKIP" $testname "$summary"
+> >      elif [ $ret -eq 124 ]; then
+> >          print_result "FAIL" $testname "" "timeout;
+> > duration=$timeout"
+> > +        if [[ $tap_output != "no" ]]; then
+> > +            echo "not ok TEST_NUMBER - ${testname}: timeout;
+> > duration=$timeout" >&3
+> > +        fi
+> >      elif [ $ret -gt 127 ]; then
+> > -        print_result "FAIL" $testname "" "terminated on SIG$(kill
+> > -l $(($ret - 128)))"
+> > +        signame="SIG"$(kill -l $(($ret - 128)))
+> > +        print_result "FAIL" $testname "" "terminated on $signame"
+> > +        if [[ $tap_output != "no" ]]; then
+> > +            echo "not ok TEST_NUMBER - ${testname}: terminated on
+> > $signame" >&3
+> > +        fi
+> >      else
+> > +        if [ $ret -eq 127 ] && [[ $tap_output != "no" ]]; then
+>            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>            This is a new case, no? If so please add a separate
+>            patch creating another `elif` branch.
 
->Signed-off-by: Anirudh Rayabharam <mail@anirudhrb.com>
->---
-> drivers/vhost/iotlb.c | 6 +++++-
-> 1 file changed, 5 insertions(+), 1 deletion(-)
->
->diff --git a/drivers/vhost/iotlb.c b/drivers/vhost/iotlb.c
->index 40b098320b2a..5829cf2d0552 100644
->--- a/drivers/vhost/iotlb.c
->+++ b/drivers/vhost/iotlb.c
->@@ -62,8 +62,12 @@ int vhost_iotlb_add_range_ctx(struct vhost_iotlb *iotlb,
-> 	 */
-> 	if (start == 0 && last == ULONG_MAX) {
-> 		u64 mid = last / 2;
->+		int err = vhost_iotlb_add_range_ctx(iotlb, start, mid, addr,
->+				perm, opaque);
->+
->+		if (err)
->+			return err;
->
->-		vhost_iotlb_add_range_ctx(iotlb, start, mid, addr, perm, opaque);
-> 		addr += mid + 1;
-> 		start = mid + 1;
-> 	}
->-- 
->2.35.1
->
+Probably depends on what you mean by 'new'. The else branch handles the
+test aborting (for example, exception in the guest) _and_ the case of
+at least one report failing.
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+In the latter case, I wanted no additional line in the TAP because we
+can already see the failed report there. 
 
+Making the if an elif makes sense, will do that. 
+
+I don't get what you would want to see in a separate patch, can you
+please make a pseudocode example?
