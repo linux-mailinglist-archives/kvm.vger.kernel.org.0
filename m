@@ -2,246 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 632BC4DDBC3
-	for <lists+kvm@lfdr.de>; Fri, 18 Mar 2022 15:36:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D82DD4DDC0F
+	for <lists+kvm@lfdr.de>; Fri, 18 Mar 2022 15:48:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237329AbiCROiN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Mar 2022 10:38:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58988 "EHLO
+        id S237525AbiCROsv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Mar 2022 10:48:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236567AbiCROiK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Mar 2022 10:38:10 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE0B62E51A2
-        for <kvm@vger.kernel.org>; Fri, 18 Mar 2022 07:36:50 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 530E261AC2
-        for <kvm@vger.kernel.org>; Fri, 18 Mar 2022 14:36:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EEE7C340E8;
-        Fri, 18 Mar 2022 14:36:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1647614209;
-        bh=0h3evQx6Yv2gaoIRUruq18FX6Pu8A8sZlELDeSriisk=;
-        h=From:To:Cc:Subject:Date:From;
-        b=L7GxGpTLGkpBvkhgfWt+i9nk929o/zoP8Q30xjb2m0d6cyc/TTAr9WEhMBY4RQUSP
-         wNJqxz2yFj4Pn9vL04mOmV3DL3NOLpJaEt+jRRMkuIfDzW4xDVJknIjB1wduDa0yHL
-         cyG5cQGbP4Ueza4JJoEh6NTo9GoghwJUcPzlvSxOT1/+i/dqZMnSNmT9uo8zpSI/Ps
-         DuuNDTGvQhnZdP4Lh36CsxEiqWlgXtOx0Yl0I26YE9q6SSgst7oLKy+shlLzWQ0JYf
-         3XmqJt4P9u6YUiR32oQqu+kC1WXaQQUAeFBx8O0pGVrqwzNZahdb2M9zZfk+eLMrOB
-         TmevIV1pJYFCg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1nVDih-00FSvn-31; Fri, 18 Mar 2022 14:36:47 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Andrew Walbran <qwandor@google.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Changcheng Deng <deng.changcheng@zte.com.cn>,
-        Fuad Tabba <tabba@google.com>,
-        James Morse <james.morse@arm.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Julia Lawall <Julia.Lawall@inria.fr>,
-        Keir Fraser <keirf@google.com>,
-        Mark Brown <broonie@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Oliver Upton <oupton@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, kernel-team@android.com
-Subject: [GIT PULL] KVM/arm64 updates for 5.18
-Date:   Fri, 18 Mar 2022 14:36:29 +0000
-Message-Id: <20220318143629.863625-1-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
+        with ESMTP id S237716AbiCROsC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Mar 2022 10:48:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AEDDE2EAF5D
+        for <kvm@vger.kernel.org>; Fri, 18 Mar 2022 07:46:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1647614791;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=TNP/cfaogRB9CjpdHZApi9zDHXNx0ATc+DZIQOXTyTo=;
+        b=ifGez4FeWhvyab7uNMZtKmbUe13Y6C2gvAY/cYdlD9dcAjBRrF9AidGC3cSofGmvoMGBaB
+        6eywCmlHCtoUuDcjmOHrUWUoGH4dmTMAbid0iz9eW0wLl9elBl9G0uWCsg2OBZNZ3yrcwG
+        kp6IwOSL6tXd2EMMmhFyfvBy+D8vat0=
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
+ [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-323-2QiQaSrwMR-AUdi24bt8yQ-1; Fri, 18 Mar 2022 10:46:29 -0400
+X-MC-Unique: 2QiQaSrwMR-AUdi24bt8yQ-1
+Received: by mail-il1-f200.google.com with SMTP id v11-20020a92c80b000000b002c7e3b707caso2968623iln.15
+        for <kvm@vger.kernel.org>; Fri, 18 Mar 2022 07:46:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=TNP/cfaogRB9CjpdHZApi9zDHXNx0ATc+DZIQOXTyTo=;
+        b=2VU6woDlkTe2bIrqzQzzDxACQIbqn+k8lf9K69tAthQoKgDBKiB2trEoF31vaP1R50
+         62yNGZu6B1myWymUFZ01nqLjD/iaMoEzk0T6LUbtDX+mS09f+BMGxTFgoaaR4lF1DrjF
+         4PwBHnCIgP3ZEvBnxBrjTufA6U04jSAP5eE6JHEW+PdJ5QntdSim876wbNMCB4Qr+E93
+         gB7sW61E90u7Q3KhAIEQNIMiBsLaIo1BEHegFDqVEOwv4KjWMoQijHaysk7zl+oY3ljM
+         Eqm/McvpQinH2uKMStbudoL/LBkIRqaBhU/OohhcsuLOTJwa+vxhTl9z27IulVbUuKqA
+         cWew==
+X-Gm-Message-State: AOAM530TmuXSxdRhNck4z7r1Z7bj/Aa+4R41ZNpguT2QJ1SxpzfFyaaL
+        3ulDEdxGT86DGUZeEN1Jg00SLdMSZg3z35lWYuV8LVMxvt1tX9W4tEm3PdaQ1Gpry0uH+uOJn5z
+        pfkVuPzwBjkBH
+X-Received: by 2002:a05:6602:1414:b0:63d:d5fd:c16e with SMTP id t20-20020a056602141400b0063dd5fdc16emr4602194iov.39.1647614788626;
+        Fri, 18 Mar 2022 07:46:28 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy2qPUaZR4EQmbFM5xc0105G4QoXfxLhmJxgudtGO9Haizky/1u+FIGD6yx423M2Oe8NioUxg==
+X-Received: by 2002:a05:6602:1414:b0:63d:d5fd:c16e with SMTP id t20-20020a056602141400b0063dd5fdc16emr4602182iov.39.1647614788331;
+        Fri, 18 Mar 2022 07:46:28 -0700 (PDT)
+Received: from redhat.com ([98.55.18.59])
+        by smtp.gmail.com with ESMTPSA id q7-20020a5d87c7000000b0064132d5bd73sm4433845ios.4.2022.03.18.07.46.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Mar 2022 07:46:27 -0700 (PDT)
+Date:   Fri, 18 Mar 2022 08:46:25 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Thorsten Leemhuis <regressions@leemhuis.info>
+Cc:     Paul Menzel <pmenzel@molgen.mpg.de>,
+        James Turner <linuxkernel.foss@dmarc-none.turner.link>,
+        Xinhui Pan <Xinhui.Pan@amd.com>, regressions@lists.linux.dev,
+        kvm@vger.kernel.org, Greg KH <gregkh@linuxfoundation.org>,
+        Lijo Lazar <lijo.lazar@amd.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        amd-gfx@lists.freedesktop.org,
+        Alexander Deucher <Alexander.Deucher@amd.com>,
+        Alex Deucher <alexdeucher@gmail.com>,
+        Christian =?UTF-8?B?S8O2bmln?= <Christian.Koenig@amd.com>
+Subject: Re: [REGRESSION] Too-low frequency limit for AMD GPU
+ PCI-passed-through to Windows VM
+Message-ID: <20220318084625.27d42a51.alex.williamson@redhat.com>
+In-Reply-To: <bc714e87-d1dc-cdda-5a29-25820faaff40@leemhuis.info>
+References: <87ee57c8fu.fsf@turner.link>
+        <CADnq5_Nr5-FR2zP1ViVsD_ZMiW=UHC1wO8_HEGm26K_EG2KDoA@mail.gmail.com>
+        <87czkk1pmt.fsf@dmarc-none.turner.link>
+        <BYAPR12MB46140BE09E37244AE129C01A975C9@BYAPR12MB4614.namprd12.prod.outlook.com>
+        <87sftfqwlx.fsf@dmarc-none.turner.link>
+        <BYAPR12MB4614E2CFEDDDEAABBAB986A0975E9@BYAPR12MB4614.namprd12.prod.outlook.com>
+        <87ee4wprsx.fsf@turner.link>
+        <4b3ed7f6-d2b6-443c-970e-d963066ebfe3@amd.com>
+        <87pmo8r6ob.fsf@turner.link>
+        <5a68afe4-1e9e-c683-e06d-30afc2156f14@leemhuis.info>
+        <CADnq5_MCKTLOfWKWvi94Q9-d5CGdWBoWVxEYL3YXOpMiPnLOyg@mail.gmail.com>
+        <87pmnnpmh5.fsf@dmarc-none.turner.link>
+        <CADnq5_NG_dQCYwqHM0umjTMg5Uud6zC4=MiscH91Y9v7mW9bJA@mail.gmail.com>
+        <092b825a-10ff-e197-18a1-d3e3a097b0e3@leemhuis.info>
+        <877d96to55.fsf@dmarc-none.turner.link>
+        <87lexdw8gd.fsf@turner.link>
+        <d541b534-8b83-b566-56eb-ea8baa7c998e@leemhuis.info>
+        <40b3084a-11b8-0962-4b33-34b56d3a87a3@molgen.mpg.de>
+        <bc714e87-d1dc-cdda-5a29-25820faaff40@leemhuis.info>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com, drjones@redhat.com, qwandor@google.com, catalin.marinas@arm.com, deng.changcheng@zte.com.cn, tabba@google.com, james.morse@arm.com, jingzhangos@google.com, Julia.Lawall@inria.fr, keirf@google.com, broonie@kernel.org, mark.rutland@arm.com, oupton@google.com, reijiw@google.com, ricarkol@google.com, shameerali.kolothum.thodi@huawei.com, suzuki.poulose@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-8.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
+On Fri, 18 Mar 2022 08:01:31 +0100
+Thorsten Leemhuis <regressions@leemhuis.info> wrote:
 
-Here's the bulk of KVM/arm64 updates for 5.18. For this time, a bunch
-of work has gone into the MMU side of things with a new VMID allocator
-and better scalability of the MM locking when tracking dirty pages,
-better debug emulation, new PSCI version, more selftests, and the
-usual bunch of cleanups all over the map.
+> On 18.03.22 06:43, Paul Menzel wrote:
+> >
+> > Am 17.03.22 um 13:54 schrieb Thorsten Leemhuis:  
+> >> On 13.03.22 19:33, James Turner wrote:  
+> >>>  
+> >>>> My understanding at this point is that the root problem is probably
+> >>>> not in the Linux kernel but rather something else (e.g. the machine
+> >>>> firmware or AMD Windows driver) and that the change in f9b7f3703ff9
+> >>>> ("drm/amdgpu/acpi: make ATPX/ATCS structures global (v2)") simply
+> >>>> exposed the underlying problem.  
+> >>
+> >> FWIW: that in the end is irrelevant when it comes to the Linux kernel's
+> >> 'no regressions' rule. For details see:
+> >>
+> >> https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/tree/Documentation/admin-guide/reporting-regressions.rst
+> >>
+> >> https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/tree/Documentation/process/handling-regressions.rst
+> >>
+> >>
+> >> That being said: sometimes for the greater good it's better to not
+> >> insist on that. And I guess that might be the case here.  
+> > 
+> > But who decides that?  
+> 
+> In the end afaics: Linus. But he can't watch each and every discussion,
+> so it partly falls down to people discussing a regression, as they can
+> always decide to get him involved in case they are unhappy with how a
+> regression is handled. That obviously includes me in this case. I simply
+> use my best judgement in such situations. I'm still undecided if that
+> path is appropriate here, that's why I wrote above to see what James
+> would say, as he afaics was the only one that reported this regression.
+> 
+> > Running stuff in a virtual machine is not that uncommon.  
+> 
+> No, it's about passing through a GPU to a VM, which is a lot less common
+> -- and afaics an area where blacklisting GPUs on the host to pass them
+> through is not uncommon (a quick internet search confirmed that, but I
+> might be wrong there).
 
-Please pull,
+Right, interference from host drivers and pre-boot environments is
+always a concern with GPU assignment in particular.  AMD GPUs have a
+long history of poor behavior relative to things like PCI secondary bus
+resets which we use to try to get devices to clean, reusable states for
+assignment.  Here a device is being bound to a host driver that
+initiates some sort of power control, unbound from that driver and
+exposed to new drivers far beyond the scope of the kernel's regression
+policy.  Perhaps it's possible to undo such power control when
+unbinding the device, but it's not necessarily a given that such a
+thing is possible for this device without a cold reset.
 
-	M.
+IMO, it's not fair to restrict the kernel from such advancements.  If
+the use case is within a VM, don't bind host drivers.  It's difficult
+to make promises when dynamically switching between host and userspace
+drivers for devices that don't have functional reset mechanisms.
+Thanks,
 
-The following changes since commit dfd42facf1e4ada021b939b4e19c935dcdd55566:
+Alex
 
-  Linux 5.17-rc3 (2022-02-06 12:20:50 -0800)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-5.18
-
-for you to fetch changes up to 21ea457842759a236eefed2cfaa8cc7e5dc967a0:
-
-  KVM: arm64: fix typos in comments (2022-03-18 14:04:15 +0000)
-
-----------------------------------------------------------------
-KVM/arm64 updates for 5.18
-
-- Proper emulation of the OSLock feature of the debug architecture
-
-- Scalibility improvements for the MMU lock when dirty logging is on
-
-- New VMID allocator, which will eventually help with SVA in VMs
-
-- Better support for PMUs in heterogenous systems
-
-- PSCI 1.1 support, enabling support for SYSTEM_RESET2
-
-- Implement CONFIG_DEBUG_LIST at EL2
-
-- Make CONFIG_ARM64_ERRATUM_2077057 default y
-
-- Reduce the overhead of VM exit when no interrupt is pending
-
-- Remove traces of 32bit ARM host support from the documentation
-
-- Updated vgic selftests
-
-- Various cleanups, doc updates and spelling fixes
-
-----------------------------------------------------------------
-Alexandru Elisei (4):
-      perf: Fix wrong name in comment for struct perf_cpu_context
-      KVM: arm64: Keep a list of probed PMUs
-      KVM: arm64: Add KVM_ARM_VCPU_PMU_V3_SET_PMU attribute
-      KVM: arm64: Refuse to run VCPU if the PMU doesn't match the physical CPU
-
-Changcheng Deng (1):
-      KVM: arm64: Remove unneeded semicolons
-
-Jing Zhang (3):
-      KVM: arm64: Use read/write spin lock for MMU protection
-      KVM: arm64: Add fast path to handle permission relaxation during dirty logging
-      KVM: selftests: Add vgic initialization for dirty log perf test for ARM
-
-Julia Lawall (1):
-      KVM: arm64: fix typos in comments
-
-Julien Grall (1):
-      KVM: arm64: Align the VMID allocation with the arm64 ASID
-
-Keir Fraser (1):
-      KVM: arm64: pkvm: Implement CONFIG_DEBUG_LIST at EL2
-
-Marc Zyngier (14):
-      Merge branch kvm-arm64/oslock into kvmarm-master/next
-      Merge branch kvm-arm64/mmu-rwlock into kvmarm-master/next
-      Merge branch kvm-arm64/fpsimd-doc into kvmarm-master/next
-      Merge branch kvm-arm64/vmid-allocator into kvmarm-master/next
-      Merge branch kvm-arm64/selftest/vgic-5.18 into kvmarm-master/next
-      Merge branch kvm-arm64/misc-5.18 into kvmarm-master/next
-      KVM: arm64: Do not change the PMU event filter after a VCPU has run
-      KVM: arm64: Keep a per-VM pointer to the default PMU
-      Merge branch kvm-arm64/pmu-bl into kvmarm-master/next
-      Merge branch kvm-arm64/psci-1.1 into kvmarm-master/next
-      KVM: arm64: Only open the interrupt window on exit due to an interrupt
-      Merge branch kvm-arm64/misc-5.18 into kvmarm-master/next
-      Merge branch kvm-arm64/psci-1.1 into kvmarm-master/next
-      KVM: arm64: Generalise VM features into a set of flags
-
-Mark Brown (4):
-      KVM: arm64: Add comments for context flush and sync callbacks
-      KVM: arm64: Add some more comments in kvm_hyp_handle_fpsimd()
-      arm64/fpsimd: Clarify the purpose of using last in fpsimd_save()
-      KVM: arm64: Enable Cortex-A510 erratum 2077057 by default
-
-Oliver Upton (8):
-      KVM: arm64: Correctly treat writes to OSLSR_EL1 as undefined
-      KVM: arm64: Stash OSLSR_EL1 in the cpu context
-      KVM: arm64: Allow guest to set the OSLK bit
-      KVM: arm64: Emulate the OS Lock
-      selftests: KVM: Add OSLSR_EL1 to the list of blessed regs
-      selftests: KVM: Test OS lock behavior
-      KVM: arm64: Drop unused param from kvm_psci_version()
-      Documentation: KVM: Update documentation to indicate KVM is arm64-only
-
-Ricardo Koller (5):
-      kvm: selftests: aarch64: fix assert in gicv3_access_reg
-      kvm: selftests: aarch64: pass vgic_irq guest args as a pointer
-      kvm: selftests: aarch64: fix the failure check in kvm_set_gsi_routing_irqchip_check
-      kvm: selftests: aarch64: fix some vgic related comments
-      kvm: selftests: aarch64: use a tighter assert in vgic_poke_irq()
-
-Shameer Kolothum (3):
-      KVM: arm64: Introduce a new VMID allocator for KVM
-      KVM: arm64: Make VMID bits accessible outside of allocator
-      KVM: arm64: Make active_vmids invalid on vCPU schedule out
-
-Will Deacon (4):
-      KVM: arm64: Bump guest PSCI version to 1.1
-      KVM: arm64: Expose PSCI SYSTEM_RESET2 call to the guest
-      KVM: arm64: Indicate SYSTEM_RESET2 in kvm_run::system_event flags field
-      KVM: arm64: Really propagate PSCI SYSTEM_RESET2 arguments to userspace
-
- Documentation/virt/kvm/api.rst                     |  92 +++++-----
- Documentation/virt/kvm/devices/vcpu.rst            |  36 +++-
- arch/arm64/Kconfig                                 |   1 +
- arch/arm64/include/asm/kvm_host.h                  |  45 ++++-
- arch/arm64/include/asm/kvm_mmu.h                   |   4 +-
- arch/arm64/include/asm/sysreg.h                    |   8 +
- arch/arm64/include/uapi/asm/kvm.h                  |  11 ++
- arch/arm64/kernel/fpsimd.c                         |   8 +-
- arch/arm64/kernel/image-vars.h                     |   3 +
- arch/arm64/kvm/Makefile                            |   2 +-
- arch/arm64/kvm/arm.c                               | 142 +++++----------
- arch/arm64/kvm/debug.c                             |  26 ++-
- arch/arm64/kvm/fpsimd.c                            |  14 +-
- arch/arm64/kvm/guest.c                             |   2 +-
- arch/arm64/kvm/handle_exit.c                       |   2 +-
- arch/arm64/kvm/hyp/include/hyp/switch.h            |   4 +
- arch/arm64/kvm/hyp/nvhe/Makefile                   |   3 +-
- arch/arm64/kvm/hyp/nvhe/list_debug.c               |  54 ++++++
- arch/arm64/kvm/hyp/nvhe/mem_protect.c              |   3 +-
- arch/arm64/kvm/hyp/nvhe/page_alloc.c               |   4 +-
- arch/arm64/kvm/hyp/nvhe/stub.c                     |  22 ---
- arch/arm64/kvm/mmio.c                              |   3 +-
- arch/arm64/kvm/mmu.c                               |  52 +++---
- arch/arm64/kvm/pmu-emul.c                          | 141 +++++++++++----
- arch/arm64/kvm/psci.c                              |  66 +++++--
- arch/arm64/kvm/sys_regs.c                          |  74 ++++++--
- arch/arm64/kvm/vgic/vgic.c                         |   2 +-
- arch/arm64/kvm/vmid.c                              | 196 +++++++++++++++++++++
- include/kvm/arm_pmu.h                              |   5 +
- include/kvm/arm_psci.h                             |   9 +-
- include/linux/perf_event.h                         |   2 +-
- include/uapi/linux/psci.h                          |   4 +
- tools/arch/arm64/include/uapi/asm/kvm.h            |   1 +
- .../selftests/kvm/aarch64/debug-exceptions.c       |  58 +++++-
- tools/testing/selftests/kvm/aarch64/get-reg-list.c |   1 +
- tools/testing/selftests/kvm/aarch64/vgic_irq.c     |  45 +++--
- tools/testing/selftests/kvm/dirty_log_perf_test.c  |  10 ++
- tools/testing/selftests/kvm/lib/aarch64/gic_v3.c   |  12 +-
- tools/testing/selftests/kvm/lib/aarch64/vgic.c     |   9 +-
- 39 files changed, 865 insertions(+), 311 deletions(-)
- create mode 100644 arch/arm64/kvm/hyp/nvhe/list_debug.c
- delete mode 100644 arch/arm64/kvm/hyp/nvhe/stub.c
- create mode 100644 arch/arm64/kvm/vmid.c
