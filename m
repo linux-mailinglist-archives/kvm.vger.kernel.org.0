@@ -2,122 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 808D64DDB3F
+	by mail.lfdr.de (Postfix) with ESMTP id 352664DDB3E
 	for <lists+kvm@lfdr.de>; Fri, 18 Mar 2022 15:07:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237047AbiCROIn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Mar 2022 10:08:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41768 "EHLO
+        id S237053AbiCROIu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Mar 2022 10:08:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42216 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237054AbiCROIl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Mar 2022 10:08:41 -0400
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0841B55231
-        for <kvm@vger.kernel.org>; Fri, 18 Mar 2022 07:07:21 -0700 (PDT)
-Received: by mail-pl1-x62a.google.com with SMTP id q11so7014613pln.11
-        for <kvm@vger.kernel.org>; Fri, 18 Mar 2022 07:07:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=0q1HcjYUqnmyItc5DrqiMrG7Yl1LzJEhHDG1dkuS69Y=;
-        b=RlHIJLDFeG4TkmZesMDCshKfOUZF+9NhD6xPMrH8gZmP9B6KErriPsctYstMztOMRW
-         yxwulMzzpWhc1+WbRmj3dqnU7kGCPfzO1SC8BSlOvWBgcMjNwVQq3rB6hk0pkUvI/h/e
-         TDzI1T6ZKb7pcmBz0a0kr3WxPsndnXPzb8Q/SRtR6m6kIi+qHV8n6EsWIPnQ43joz5z2
-         WYIAWbmNJyLQrysS+OpQyhq0qB+rFsetX9J7hHE1FKsGGuJX/05EQzI48P9MZdQgjMfw
-         7Kn/kvyFMKOBUA8NN9VPkRxqrSWAdeAdtW2qB1nlNEqez/gx90QsANhXffkc0wGG9eUr
-         hKvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=0q1HcjYUqnmyItc5DrqiMrG7Yl1LzJEhHDG1dkuS69Y=;
-        b=hb43zjcZ07cTvnW7UttKDJh0PuwFxgfGX23NBfgc1Aptou1pNvum9Ut+O6RYEW2Zvw
-         MSNjzghTXu3WZ595SFJhujyggdTebtlPsgvnPGJN1/CbU3BfK1X10zCSBTkBkMgS2eyW
-         GOulfBZjOHeN8mvhZWJdPAMVkq0KlBiCwcoeYzLLAC1ut4rzWTpOxxAOkBs8vDvjU5nI
-         KUBPYgJwVRgKv5vQ8LEFnEemJ9As5oDsXY/L6MMW3inzJ4FuPl6bHA6ZDGk6bzQkfniu
-         FIhDbW6TUkpZ6maYTEtF514DO8J/zXG5+t+P6Ht9NJEsuT6FplUhSioJFJR0bngab115
-         GpiQ==
-X-Gm-Message-State: AOAM5328wehr2DNXvhaTcCbW4vRk0usOd3fKOF/D55hZXWoFwx8aHP2j
-        uu4wnCrpmfT/5mkjNVvjOiE=
-X-Google-Smtp-Source: ABdhPJyFumqFEDeamSKRGeSLnoDdZwsKMkNEbaj/svyQoFspLX0+QU4iHJZ76uhYoIPSem5LDv3alw==
-X-Received: by 2002:a17:902:a3ca:b0:14f:d48e:aff3 with SMTP id q10-20020a170902a3ca00b0014fd48eaff3mr10148558plb.167.1647612440411;
-        Fri, 18 Mar 2022 07:07:20 -0700 (PDT)
-Received: from [192.168.1.115] ([185.126.107.38])
-        by smtp.gmail.com with ESMTPSA id c11-20020a056a000acb00b004f35ee129bbsm10654221pfl.140.2022.03.18.07.07.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 18 Mar 2022 07:07:20 -0700 (PDT)
-Message-ID: <f418548e-c24c-1bc3-4e16-d7a775298a18@gmail.com>
-Date:   Fri, 18 Mar 2022 15:07:13 +0100
+        with ESMTP id S237051AbiCROIt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Mar 2022 10:08:49 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35B1CFF2
+        for <kvm@vger.kernel.org>; Fri, 18 Mar 2022 07:07:28 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id D1F49B823E5
+        for <kvm@vger.kernel.org>; Fri, 18 Mar 2022 14:07:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 953BEC340E8;
+        Fri, 18 Mar 2022 14:07:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1647612445;
+        bh=C3OQt/00TuxMRT85jYxLnQpTSKyb+BvUMIF15Qmze5E=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=JZOI6CxP9H5taRrXVzzRPxfzZWcCotG7UiXtDahIEn8LzrU8lw9ulCnGuKH3ftYFT
+         bzS7pnDJxxw9cPt9uSmta2JYM21Cs0CPkrvhOcLT0j414yDVHGI/KFM5A8UttMpnnJ
+         +xdaylg85g/H0r6rtlt0hYZ71rIcFfEtcxcnRn9vGWJPxWdxwsWpEp1LqJP9DIGdq5
+         YlEWcC5OzOUvACmsn6fw99UhLx1CjThJ1ElLquOQVOA46lm0pi3VS9uDOmQWW+WIvw
+         56UhSPk1QcnCtsN/Nl4UNv2RvZJlMVEoMn6XEHS2DzH9V++Wdy1uGzfh9SkrDrKhCQ
+         9n8WMpBLURQJA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nVDGF-00FSSq-2K; Fri, 18 Mar 2022 14:07:23 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     kvmarm@lists.cs.columbia.edu, Oliver Upton <oupton@google.com>
+Cc:     wanpengli@tencent.com, jmattson@google.com, pbonzini@redhat.com,
+        vkuznets@redhat.com, pshier@google.com, atishp@atishpatra.org,
+        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, joro@8bytes.org
+Subject: Re: (subset) [PATCH v4 00/15] KVM: arm64: PSCI SYSTEM_SUSPEND + SYSTEM_RESET2 bugfix
+Date:   Fri, 18 Mar 2022 14:07:20 +0000
+Message-Id: <164761240231.2295955.10089198303947734980.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220311174001.605719-1-oupton@google.com>
+References: <20220311174001.605719-1-oupton@google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.7.0
-Subject: Re: [RFC PATCH v3 17/36] pflash_cfi01/tdx: Introduce ram_mode of
- pflash for TDVF
-Content-Language: en-US
-To:     Xiaoyao Li <xiaoyao.li@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Laszlo Ersek <lersek@redhat.com>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Eric Blake <eblake@redhat.com>
-Cc:     Connor Kuehl <ckuehl@redhat.com>, isaku.yamahata@intel.com,
-        erdemaktas@google.com, kvm@vger.kernel.org, qemu-devel@nongnu.org,
-        seanjc@google.com
-References: <20220317135913.2166202-1-xiaoyao.li@intel.com>
- <20220317135913.2166202-18-xiaoyao.li@intel.com>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= 
-        <philippe.mathieu.daude@gmail.com>
-In-Reply-To: <20220317135913.2166202-18-xiaoyao.li@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, oupton@google.com, wanpengli@tencent.com, jmattson@google.com, pbonzini@redhat.com, vkuznets@redhat.com, pshier@google.com, atishp@atishpatra.org, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, joro@8bytes.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-8.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On Fri, 11 Mar 2022 17:39:46 +0000, Oliver Upton wrote:
+> **NOTE** Patch 2 is a bugfix for commit d43583b890e7 ("KVM: arm64:
+> Expose PSCI SYSTEM_RESET2 call to the guest") on kvmarm/next. Without
+> this patch, it is possible for the guest to call
+> PSCI_1_1_FN64_SYSTEM_RESET2 from AArch32.
+> 
+> The PSCI v1.0 specification describes a call, SYSTEM_SUSPEND, which
+> allows software to request that the system be placed into the lowest
+> possible power state and await an IMPLEMENTATION DEFINED wakeup event.
+> This call is optional in v1.0 and v1.1. KVM does not currently support
+> this optional call.
+> 
+> [...]
 
-On 17/3/22 14:58, Xiaoyao Li wrote:
-> TDX VM needs to boot with Trust Domain Virtual Firmware (TDVF). Unlike
-> that OVMF is mapped as rom device, TDVF needs to be mapped as private
-> memory. This is because TDX architecture doesn't provide read-only
-> capability for VMM, and it doesn't support instruction emulation due
-> to guest memory and registers are not accessible for VMM.
-> 
-> On the other hand, OVMF can work as TDVF, which is usually configured
-> as pflash device in QEMU. To keep the same usage (QEMU parameter),
-> introduce ram_mode to pflash for TDVF. When it's creating a TDX VM,
-> ram_mode will be enabled automatically that map the firmware as RAM.
-> 
-> Note, this implies two things:
->   1. TDVF (OVMF) is not read-only (write-protected).
-> 
->   2. It doesn't support non-volatile UEFI variables as what pflash
->      supports that the change to non-volatile UEFI variables won't get
->      synced back to backend vars.fd file.
-> 
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> ---
->   hw/block/pflash_cfi01.c | 25 ++++++++++++++++++-------
->   hw/i386/pc_sysfw.c      | 14 +++++++++++---
->   2 files changed, 29 insertions(+), 10 deletions(-)
+Applied to next, thanks!
 
-If you don't need a pflash device, don't use it: simply map your nvram
-region as ram in your machine. No need to clutter the pflash model like
-that.
+[01/15] KVM: arm64: Generalise VM features into a set of flags
+        commit: 06394531b425794dc56f3d525b7994d25b8072f7
 
-NAcked-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Cheers,
+
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
+
 
