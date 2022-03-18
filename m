@@ -2,157 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 76DAF4DD783
-	for <lists+kvm@lfdr.de>; Fri, 18 Mar 2022 10:56:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E264C4DD7B5
+	for <lists+kvm@lfdr.de>; Fri, 18 Mar 2022 11:10:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234761AbiCRJ5f (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Mar 2022 05:57:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56760 "EHLO
+        id S234852AbiCRKLP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Mar 2022 06:11:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51848 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234760AbiCRJ5d (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Mar 2022 05:57:33 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52DC32B3D41
-        for <kvm@vger.kernel.org>; Fri, 18 Mar 2022 02:56:14 -0700 (PDT)
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22I8aUGH002768
-        for <kvm@vger.kernel.org>; Fri, 18 Mar 2022 09:56:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=umoJlNkGKONgabmPJslxv1RvxpbIjTi1I+O7hRURAXc=;
- b=qazqgSMxdlTN7XMflxHbcKq40EgasTYnl4j9oX7Mw3XP1LqHJ3lgKHwm6euz2x9KqFoq
- C0omNXs8OYCDegjUziMJ2WswAkmrqntgA/YkgBcJe4It5OxbXlqWjJJ+wQ9Zk78R/yoa
- 0XS3QBHXxF3boENcsdmV8iilNNi4QObNUSJ6KbtN2ACuXpR5ouCFmfFDDlMONrti2NGS
- w7XMjOpFgGzFGu6Hp1V2w5vN2awLsHP+9p1KUk2fVZoH/dJZpwghdce0dfFylLCiMrf0
- TYX53X6vl1OsFPbRLkPUn9QVK/T7Thogd5w22aBjRb7OK49bbtzVaxMUa/ZOvQZfSjSL 8Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3euv2yyny9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 18 Mar 2022 09:56:13 +0000
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22I9Dalj017028
-        for <kvm@vger.kernel.org>; Fri, 18 Mar 2022 09:56:13 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3euv2yynxq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 18 Mar 2022 09:56:13 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22I9rGEO000391;
-        Fri, 18 Mar 2022 09:56:11 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma04ams.nl.ibm.com with ESMTP id 3erk59584m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 18 Mar 2022 09:56:10 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22I9uADT43647362
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 18 Mar 2022 09:56:10 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BE793A405C;
-        Fri, 18 Mar 2022 09:56:07 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7F5A4A405F;
-        Fri, 18 Mar 2022 09:56:07 +0000 (GMT)
-Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1.ibm.com (unknown [9.171.61.11])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 18 Mar 2022 09:56:07 +0000 (GMT)
-Message-ID: <86e8b5d021d5440f75b1635e1f7d2b0e464bd85b.camel@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH] runtime: indicate failure on
- crash/timeout/abort in TAP
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     Marc Hartmayer <mhartmay@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     frankja@linux.ibm.com, thuth@redhat.com, pbonzini@redhat.com
-Date:   Fri, 18 Mar 2022 10:56:07 +0100
-In-Reply-To: <87bky3veaf.fsf@marcibm.i-did-not-set--mail-host-address--so-tickle-me>
-References: <20220310150322.2111128-1-nrb@linux.ibm.com>
-         <87bky3veaf.fsf@marcibm.i-did-not-set--mail-host-address--so-tickle-me>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
+        with ESMTP id S234895AbiCRKLN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Mar 2022 06:11:13 -0400
+Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C4C51FC9CA;
+        Fri, 18 Mar 2022 03:09:47 -0700 (PDT)
+Received: by mail-yb1-xb31.google.com with SMTP id z8so14981555ybh.7;
+        Fri, 18 Mar 2022 03:09:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=iBlbICW23CBGTF3so1ajLzBTrtOLAUSZttkTvYtR9U4=;
+        b=KnCaC9+6NKn7pDuY3hd2njUC1wF3s5xGR9C0PDWkiqUlDIqnvdtG6OrPmErrmk2bBl
+         i/WPQzcLnkRhywTHSUmDMZHZ0GlowVQoJeH2g4mL6X6U3jG3AI4IvhKZJJFmjPbYUXKm
+         R7UAeKnMiALz4HvQk26o1tzbV5c9m84gDcW9HQjKn/SxT4eQO+JwXWEH07wvgj2i/Z1T
+         O6cro+exHmh1+bAB8sRl6KBdc32uIv0fzi3pmUYeL0DcPvjMwnHklX2n0F9O7bJNGOcu
+         8jIxG3jpP6nrWC1EGm5Ve2Dxy9nrAS0579oGxj+AKV6y7aGUhQO+lPJrhPYAyHq1cxzn
+         40Gg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=iBlbICW23CBGTF3so1ajLzBTrtOLAUSZttkTvYtR9U4=;
+        b=A47RpgpnEpdM7hx2hl+pn+Y37bqOX0PZwrSv8dcQU/ekI0eknyXk2Df5rgRkN4uaQg
+         EnFBGFEgRtcB2NUpS1wTOeitY/fL5doJVmQNurSer5O2QeEpbm0OVq2sVfgnHsVt0edV
+         eYkoMr3aIcY+y35aK8Cp7/b1eZ7QUy7mYwLjViVAQ+mZ9998bGd+mypIhhFB4b56MEJ1
+         QKx/MJzOf/Ei3PSJw/7xL76EhMFXf/WJIqlYskMsGHzapAUlwzuI2Bx/lQYt6bJUVEPR
+         RwDZxOIAl9eWV6rMqjar+qR8gH+3hyW4nmpcfCM4DFQbLL7+F7+aHCEH9bcH5qM4tjVh
+         h8uw==
+X-Gm-Message-State: AOAM5326ymbuirqYk98FzppuJMSSI/2efkkunEjOu1613jtxfy6jO0nM
+        N946lZDDtQzyPTlnx5yeqSfyD5pAf8XtGufj9fpjGnZctLM=
+X-Google-Smtp-Source: ABdhPJwIdDnVNEDU80uHFFUxuzkAqD7VZYbyHnJJrzK5rhGtuTtx1motzqejrVY10v71l4Ql13DBTL9pU8Cr1oGoexg=
+X-Received: by 2002:a25:588b:0:b0:633:a978:79b2 with SMTP id
+ m133-20020a25588b000000b00633a97879b2mr6131924ybb.138.1647598186680; Fri, 18
+ Mar 2022 03:09:46 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: mPGPcoSHbqaud54I1JLSdzNrpMEhRCCL
-X-Proofpoint-ORIG-GUID: mlM00oOA2l5thyttch77OXHAkyH73RZm
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-03-18_07,2022-03-15_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 phishscore=0
- malwarescore=0 mlxscore=0 lowpriorityscore=0 suspectscore=0 adultscore=0
- mlxlogscore=999 spamscore=0 bulkscore=0 impostorscore=0 priorityscore=1501
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
- definitions=main-2203180051
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <1646987354-28644-1-git-send-email-wanpengli@tencent.com>
+In-Reply-To: <1646987354-28644-1-git-send-email-wanpengli@tencent.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Fri, 18 Mar 2022 18:09:35 +0800
+Message-ID: <CANRm+CycTii50jwRwVsyG0X-jRRZY8YaypYHNKO1ObYbcSuuaw@mail.gmail.com>
+Subject: Re: [PATCH 0/5] KVM: X86: Scaling Guest OS Critical Sections with boosting
+To:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2022-03-18 at 09:46 +0100, Marc Hartmayer wrote:
-> Nico Boehr <nrb@linux.ibm.com> writes:
-[...]
-> > Which looks like a completely fine TAP file, but actually we ran
-> > into a timeout
-> > and didn't even run all tests.
-> > 
-> > With this patch, we get an additional line at the end which
-> > properly shows
-> > something went wrong:
-> > 
-> > not ok 7 - diag288: timeout; duration=1s
-> 
-> This results from the fact that the TAP13 test result is generated by
-> the function `RUNTIME_log_stdout` and not by `print_result` (see
-> commit
-> 6e1d3752d7ca ("tap13: list testcases individually")). In
-> `RUNTIME_log_stdout` we don’t have access to the QEMU command exit
-> code.
-
-Basically yes. If we had that we could do all the TAP special handling
-there.
-> 
-
-[...]
-> > diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-> > index 6d5fced94246..b41b3d444e27 100644
-> > --- a/scripts/runtime.bash
-> > +++ b/scripts/runtime.bash
-> > @@ -163,9 +163,19 @@ function run()
-> >          print_result "SKIP" $testname "$summary"
-> >      elif [ $ret -eq 124 ]; then
-> >          print_result "FAIL" $testname "" "timeout;
-> > duration=$timeout"
-> > +        if [[ $tap_output != "no" ]]; then
-> > +            echo "not ok TEST_NUMBER - ${testname}: timeout;
-> > duration=$timeout" >&3
-> > +        fi
-> >      elif [ $ret -gt 127 ]; then
-> > -        print_result "FAIL" $testname "" "terminated on SIG$(kill
-> > -l $(($ret - 128)))"
-> > +        signame="SIG"$(kill -l $(($ret - 128)))
-> > +        print_result "FAIL" $testname "" "terminated on $signame"
-> > +        if [[ $tap_output != "no" ]]; then
-> > +            echo "not ok TEST_NUMBER - ${testname}: terminated on
-> > $signame" >&3
-> > +        fi
-> >      else
-> > +        if [ $ret -eq 127 ] && [[ $tap_output != "no" ]]; then
->            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
->            This is a new case, no? If so please add a separate
->            patch creating another `elif` branch.
-
-Probably depends on what you mean by 'new'. The else branch handles the
-test aborting (for example, exception in the guest) _and_ the case of
-at least one report failing.
-
-In the latter case, I wanted no additional line in the TAP because we
-can already see the failed report there. 
-
-Making the if an elif makes sense, will do that. 
-
-I don't get what you would want to see in a separate patch, can you
-please make a pseudocode example?
+kindly ping, :)
+On Fri, 11 Mar 2022 at 16:30, Wanpeng Li <kernellwp@gmail.com> wrote:
+>
+> The missing semantic gap that occurs when a guest OS is preempted
+> when executing its own critical section, this leads to degradation
+> of application scalability. We try to bridge this semantic gap in
+> some ways, by passing guest preempt_count to the host and checking
+> guest irq disable state, the hypervisor now knows whether guest
+> OSes are running in the critical section, the hypervisor yield-on-spin
+> heuristics can be more smart this time to boost the vCPU candidate
+> who is in the critical section to mitigate this preemption problem,
+> in addition, it is more likely to be a potential lock holder.
+>
+> Testing on 96 HT 2 socket Xeon CLX server, with 96 vCPUs VM 100GB RAM,
+> one VM running benchmark, the other(none-2) VMs running cpu-bound
+> workloads, There is no performance regression for other benchmarks
+> like Unixbench etc.
+>
+> 1VM
+>             vanilla    optimized    improved
+>
+> hackbench -l 50000
+>               28         21.45        30.5%
+> ebizzy -M
+>              12189       12354        1.4%
+> dbench
+>              712 MB/sec  722 MB/sec   1.4%
+>
+> 2VM:
+>             vanilla    optimized    improved
+>
+> hackbench -l 10000
+>               29.4        26          13%
+> ebizzy -M
+>              3834        4033          5%
+> dbench
+>            42.3 MB/sec  44.1 MB/sec   4.3%
+>
+> 3VM:
+>             vanilla    optimized    improved
+>
+> hackbench -l 10000
+>               47         35.46        33%
+> ebizzy -M
+>              3828        4031         5%
+> dbench
+>            30.5 MB/sec  31.16 MB/sec  2.3%
+>
+> Wanpeng Li (5):
+>   KVM: X86: Add MSR_KVM_PREEMPT_COUNT support
+>   KVM: X86: Add guest interrupt disable state support
+>   KVM: X86: Boost vCPU which is in the critical section
+>   x86/kvm: Add MSR_KVM_PREEMPT_COUNT guest support
+>   KVM: X86: Expose PREEMT_COUNT CPUID feature bit to guest
+>
+>  Documentation/virt/kvm/cpuid.rst     |  3 ++
+>  arch/x86/include/asm/kvm_host.h      |  7 ++++
+>  arch/x86/include/uapi/asm/kvm_para.h |  2 +
+>  arch/x86/kernel/kvm.c                | 10 +++++
+>  arch/x86/kvm/cpuid.c                 |  3 +-
+>  arch/x86/kvm/x86.c                   | 60 ++++++++++++++++++++++++++++
+>  include/linux/kvm_host.h             |  1 +
+>  virt/kvm/kvm_main.c                  |  7 ++++
+>  8 files changed, 92 insertions(+), 1 deletion(-)
+>
+> --
+> 2.25.1
+>
