@@ -2,224 +2,246 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E89A4DDB6D
-	for <lists+kvm@lfdr.de>; Fri, 18 Mar 2022 15:17:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 632BC4DDBC3
+	for <lists+kvm@lfdr.de>; Fri, 18 Mar 2022 15:36:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235765AbiCROTI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Mar 2022 10:19:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51852 "EHLO
+        id S237329AbiCROiN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Mar 2022 10:38:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58988 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232201AbiCROTH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Mar 2022 10:19:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A81C12BFD61
-        for <kvm@vger.kernel.org>; Fri, 18 Mar 2022 07:17:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647613067;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=34a2izy+Md/H3J6ntBVzk4NIh156pl6jSuOFoCNNS/A=;
-        b=NPfa6W/hpqbfwj+BOYpBtklj/Uybq/BvCkzPbftqtXe1UNHOxZTG3Qo2HJr9wp9ZEbtbJN
-        0HogMcuCIFramasfSdDnbhi05HnT4QDj9rITwonfYvtYKUnvDytZA6SRKVMcpqYapoq4wj
-        qhOeAyQXc4SWiIsxEZr9IubGGY4C5yU=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-435-_f1Gdx7JOiuOSYctIJ4Dyg-1; Fri, 18 Mar 2022 10:17:46 -0400
-X-MC-Unique: _f1Gdx7JOiuOSYctIJ4Dyg-1
-Received: by mail-ed1-f70.google.com with SMTP id l24-20020a056402231800b00410f19a3103so4981594eda.5
-        for <kvm@vger.kernel.org>; Fri, 18 Mar 2022 07:17:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=34a2izy+Md/H3J6ntBVzk4NIh156pl6jSuOFoCNNS/A=;
-        b=P40KpRVbBa6Zs0Gj0H46wTSNOnzSBMfjrBdBgpmqTfDM5vsVpPw2E8XVHGpemU9kFj
-         7bWNcoTeG0e6VRJcj64xuJpRIWgeGe8ZMqx2aRGr0AgL1dhzK7RV8hMPOycV+VqItdqF
-         pW6pK3exAo3Z+UUuIXaM3qmJiQID6KygSVVxJnkE49UIq0zVIe3g3YsS/2GH+gMjJ/tx
-         ca16YH9MgKaVluon4FqWofKtCipJ6WftswYPWZDKnPMhBEFDEQygzvdjdzEqWrobldtJ
-         2n1jftkY7JTYy+GG42Er3mVr3Mirvd808bbeCqxhQZrN3gBev/GQnwDyhUOAHPy4k86n
-         9MCA==
-X-Gm-Message-State: AOAM533E0CTsoDWZQlS4p+vo/wZX+UNffgGcr9fGpyl4UtCAbJW5CTVb
-        BQmePUqFT9GoQYj9z0dCUD3mwFkFX7Kpghsspf3Zm/7PYKQqSOkxhwPPEQjnB0DrBWDFeIHqQhH
-        GLTN3WoAjr9Rl
-X-Received: by 2002:a17:906:3fd4:b0:6da:8ab0:a882 with SMTP id k20-20020a1709063fd400b006da8ab0a882mr8832515ejj.572.1647613064979;
-        Fri, 18 Mar 2022 07:17:44 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy8R0ZR1dAMXTAv7hzseHyeFjUMPARrEk9U6m19eXLmT1evzkwQu/HBJYnizfHEDX0fFRWnSw==
-X-Received: by 2002:a17:906:3fd4:b0:6da:8ab0:a882 with SMTP id k20-20020a1709063fd400b006da8ab0a882mr8832496ejj.572.1647613064691;
-        Fri, 18 Mar 2022 07:17:44 -0700 (PDT)
-Received: from localhost (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id h1-20020a170906530100b006df78d85eabsm3812958ejo.111.2022.03.18.07.17.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Mar 2022 07:17:44 -0700 (PDT)
-Date:   Fri, 18 Mar 2022 15:17:42 +0100
-From:   Igor Mammedov <imammedo@redhat.com>
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>, berrange@redhat.com,
-        qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org,
-        Claudio Fontana <cfontana@suse.de>, vkuznets@redhat.com
-Subject: Re: [PATCH 1/4] target/i386: Fix sanity check on max APIC ID /
- X2APIC enablement
-Message-ID: <20220318151742.6653ad7d@redhat.com>
-In-Reply-To: <1c7ae19b8ca87b1fcf0b70f4057e24c7e21720f4.camel@infradead.org>
-References: <20220314142544.150555-1-dwmw2@infradead.org>
-        <20220316100425.2758afc3@redhat.com>
-        <d374107ebd48432b6c2b13c13c407a48fdb2d755.camel@infradead.org>
-        <20220316055333-mutt-send-email-mst@kernel.org>
-        <c359ac8572d0193dd65bb384f68873d24d0c72d3.camel@infradead.org>
-        <20220316064631-mutt-send-email-mst@kernel.org>
-        <20220316122842.0bc78825@redhat.com>
-        <2d2eb49f7a59918521c1614debe5b87017f5789b.camel@infradead.org>
-        <20220317094209.2888b431@redhat.com>
-        <20220317100536.6ccabfe0@redhat.com>
-        <1c7ae19b8ca87b1fcf0b70f4057e24c7e21720f4.camel@infradead.org>
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.31; x86_64-redhat-linux-gnu)
+        with ESMTP id S236567AbiCROiK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Mar 2022 10:38:10 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE0B62E51A2
+        for <kvm@vger.kernel.org>; Fri, 18 Mar 2022 07:36:50 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 530E261AC2
+        for <kvm@vger.kernel.org>; Fri, 18 Mar 2022 14:36:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EEE7C340E8;
+        Fri, 18 Mar 2022 14:36:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1647614209;
+        bh=0h3evQx6Yv2gaoIRUruq18FX6Pu8A8sZlELDeSriisk=;
+        h=From:To:Cc:Subject:Date:From;
+        b=L7GxGpTLGkpBvkhgfWt+i9nk929o/zoP8Q30xjb2m0d6cyc/TTAr9WEhMBY4RQUSP
+         wNJqxz2yFj4Pn9vL04mOmV3DL3NOLpJaEt+jRRMkuIfDzW4xDVJknIjB1wduDa0yHL
+         cyG5cQGbP4Ueza4JJoEh6NTo9GoghwJUcPzlvSxOT1/+i/dqZMnSNmT9uo8zpSI/Ps
+         DuuNDTGvQhnZdP4Lh36CsxEiqWlgXtOx0Yl0I26YE9q6SSgst7oLKy+shlLzWQ0JYf
+         3XmqJt4P9u6YUiR32oQqu+kC1WXaQQUAeFBx8O0pGVrqwzNZahdb2M9zZfk+eLMrOB
+         TmevIV1pJYFCg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nVDih-00FSvn-31; Fri, 18 Mar 2022 14:36:47 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Andrew Walbran <qwandor@google.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Changcheng Deng <deng.changcheng@zte.com.cn>,
+        Fuad Tabba <tabba@google.com>,
+        James Morse <james.morse@arm.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Julia Lawall <Julia.Lawall@inria.fr>,
+        Keir Fraser <keirf@google.com>,
+        Mark Brown <broonie@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Oliver Upton <oupton@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, kernel-team@android.com
+Subject: [GIT PULL] KVM/arm64 updates for 5.18
+Date:   Fri, 18 Mar 2022 14:36:29 +0000
+Message-Id: <20220318143629.863625-1-maz@kernel.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com, drjones@redhat.com, qwandor@google.com, catalin.marinas@arm.com, deng.changcheng@zte.com.cn, tabba@google.com, james.morse@arm.com, jingzhangos@google.com, Julia.Lawall@inria.fr, keirf@google.com, broonie@kernel.org, mark.rutland@arm.com, oupton@google.com, reijiw@google.com, ricarkol@google.com, shameerali.kolothum.thodi@huawei.com, suzuki.poulose@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-8.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 17 Mar 2022 11:13:44 +0000
-David Woodhouse <dwmw2@infradead.org> wrote:
+Hi Paolo,
 
-> On Thu, 2022-03-17 at 10:05 +0100, Igor Mammedov wrote:
-> > re-sending reply as something went wrong with headers (I suspect Daniel=
-'s name formatting)
-> > and email got bounced back.
-> >=20
-> > On Wed, 16 Mar 2022 14:31:33 +0000
-> > David Woodhouse <dwmw2@infradead.org> wrote:
-> >  =20
-> > > On Wed, 2022-03-16 at 12:28 +0100, Igor Mammedov wrote:   =20
-> > > > Generally Daniel is right, as long as it's something that what real=
- hardware
-> > > > supports. (usually it's job if upper layers which know what guest O=
-S is used,
-> > > > and can tweak config based on that knowledge).
-> > > >=20
-> > > > But it's virt only extension and none (tested with
-> > > >  Windows (hangs on boot),
-> > > >  Linux (brings up only first 255 cpus)
-> > > > ) of mainline OSes ended up up working as expected (i.e. user asked=
- for this
-> > > > many CPUs but can't really use them as expected).     =20
-> > >=20
-> > > As I said, that kind of failure mode will happen even with the split
-> > > irq chip and EXT_DEST_ID, with Windows and older (pre-5.10) Linux
-> > > kernels.
-> > >=20
-> > > For older guests it would also happen on real hardware, and in VMs
-> > > where you expose an IOMMU with interrupt remapping. Some guests don't
-> > > support interrupt remapping, or don't support X2APIC at all.
-> > >    =20
-> > > > Which would just lead to users reporting (obscure) bugs.     =20
-> > >=20
-> > > It's not virt only. This could happen with real hardware.   =20
-> >=20
-> > I was talking about EXT_DEST_ID kvm extension. =20
->=20
-> Then I'm confused, because that isn't the conversation we were having
-> before. And in that case what you say above about Linux only bringing
-> up the first 255 CPUs directly contradicts what you say below, my own
-> experience, and the whole *point* of the EXT_DEST_ID extension :)
+Here's the bulk of KVM/arm64 updates for 5.18. For this time, a bunch
+of work has gone into the MMU side of things with a new VMID allocator
+and better scalability of the MM locking when tracking dirty pages,
+better debug emulation, new PSCI version, more selftests, and the
+usual bunch of cleanups all over the map.
 
-Now I'm lost in translation too :)
+Please pull,
 
-> Let's start again. You observed that Linux guests fail to bring up >254
-> vcPUs if qemu doesn't enable the EXT_DEST_ID support, and your fix was
-> to require EXT_DEST_ID (as a side-effect of requiring split irqchip).
->=20
-> This reminded me of the fixes I'd been posting since 2020 which still
-> haven't been merged, so I dusted those off and resent them.
->=20
-> I didn't incorporate your change, and objected to your patch because I
-> think it's pointless babysitting.
+	M.
 
-1)
+The following changes since commit dfd42facf1e4ada021b939b4e19c935dcdd55566:
 
-> Yes, in the general case if you want
-> your guest to use more than 254 vCPUs you need to take a moment to
-> think about precisely what your guest operating system requires in
-> order to support that.
->=20
-> At the very least it needs X2APIC support, and then you need *one* of:
->=20
->  =E2=80=A2 EXT_DEST_ID,
->  =E2=80=A2 Interrupt remapping, or
->  =E2=80=A2 just using those vCPUs without external interrupts.
->=20
-> Both of the first two require the split irqchip, so your patch just
-> doesn't let users rely on that last option. I conceded (cited below)
-> because I don't know of any existing guest OS which does use that last
-> option. I'd attempted to make Linux do so, but eventually abandoned it:
-> https://git.infradead.org/users/dwmw2/linux.git/shortlog/refs/heads/irqaf=
-finity
+  Linux 5.17-rc3 (2022-02-06 12:20:50 -0800)
 
-Given that is was abandoned, it's unlikely that the last option was ever
-used (and before EXT_DEST_ID, qemu was requiring irq remapping to start
-guest with so many vcpus). If there will be a user for it in the future
-we can relax restriction given that it will be properly documented/
-user gets sane error/warning messages, so they could figure out what to do.
+are available in the Git repository at:
 
-> But now you seem to be making a different argument?
->=20
-> > > Anyway, as far as I'm concerned it doesn't matter very much whether we
-> > > insist on the split irq chip or not. Feel free to repost your patch
-> > > rebased on top of my fixes, which are also in my tree at
-> > > https://git.infradead.org/users/dwmw2/qemu.git
-> > >=20
-> > >=20
-> > > The check you're modifying has moved to x86_cpus_init().   =20
-> >=20
-> > if we are to keep iommu dependency then moving to x86_cpus_init()
-> > isn't an option, it should be done at pc_machine_done() time. =20
->=20
-> Thus far, I didn't think anyone had been talking about a dependency on
-> IOMMU. That doesn't make any sense at all. EXT_DEST_ID is perfectly
-> sufficient for Linux kernels from 5.10 onwards and they don't need the
-> IOMMU.
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-5.18
 
-IOMMU was required before EXT_DEST_ID due to irq-remapping dependency,
-and that conservative config worked fine for both Linux and Windows
-guests. That's why I've raised question if we should revert restriction
-to the way it was back then.
+for you to fetch changes up to 21ea457842759a236eefed2cfaa8cc7e5dc967a0:
 
-With Linux pre-5.10 guests, dmesg output at least complains about
-IRQ remapping, so user has a small chance to be able to figure out
-that IOMMU should be configured to get all CPUs working.
-For post-5.10, all one gets is "bad cpu" without any clue as to why,
-if EXT_DEST_ID is not advertised by hypervisor.
-It would be better if guest kernel printed some error/warning in that case.
+  KVM: arm64: fix typos in comments (2022-03-18 14:04:15 +0000)
 
-If we start with IOMMU, (Win/Linux) guests boot fine (modulo ancient ones)
-(irq-remapping is 'on' by default since qemu-4.0).
+----------------------------------------------------------------
+KVM/arm64 updates for 5.18
 
-> So no. Post your patch to s/kvm_irqchip_in_kernel/kvm_irqchip_is_split/
-> in x86_cpus_init() by all means; I don't care much about that and I've
-> even incorporated that change into my tree at
-> https://git.infradead.org/users/dwmw2/qemu.git so that if I do have to
-> repost these fixes yet again, it'll be included.
+- Proper emulation of the OSLock feature of the debug architecture
 
-Looks fine to me, thanks.
+- Scalibility improvements for the MMU lock when dirty logging is on
 
-> But let's not re-add the IOMMU dependency. That would be wrong.
+- New VMID allocator, which will eventually help with SVA in VMs
 
-We should document possible options, somewhere in QEMU.
-So not only few would know about what options to use and when.
-Something along lines above [1].
+- Better support for PMUs in heterogenous systems
 
+- PSCI 1.1 support, enabling support for SYSTEM_RESET2
+
+- Implement CONFIG_DEBUG_LIST at EL2
+
+- Make CONFIG_ARM64_ERRATUM_2077057 default y
+
+- Reduce the overhead of VM exit when no interrupt is pending
+
+- Remove traces of 32bit ARM host support from the documentation
+
+- Updated vgic selftests
+
+- Various cleanups, doc updates and spelling fixes
+
+----------------------------------------------------------------
+Alexandru Elisei (4):
+      perf: Fix wrong name in comment for struct perf_cpu_context
+      KVM: arm64: Keep a list of probed PMUs
+      KVM: arm64: Add KVM_ARM_VCPU_PMU_V3_SET_PMU attribute
+      KVM: arm64: Refuse to run VCPU if the PMU doesn't match the physical CPU
+
+Changcheng Deng (1):
+      KVM: arm64: Remove unneeded semicolons
+
+Jing Zhang (3):
+      KVM: arm64: Use read/write spin lock for MMU protection
+      KVM: arm64: Add fast path to handle permission relaxation during dirty logging
+      KVM: selftests: Add vgic initialization for dirty log perf test for ARM
+
+Julia Lawall (1):
+      KVM: arm64: fix typos in comments
+
+Julien Grall (1):
+      KVM: arm64: Align the VMID allocation with the arm64 ASID
+
+Keir Fraser (1):
+      KVM: arm64: pkvm: Implement CONFIG_DEBUG_LIST at EL2
+
+Marc Zyngier (14):
+      Merge branch kvm-arm64/oslock into kvmarm-master/next
+      Merge branch kvm-arm64/mmu-rwlock into kvmarm-master/next
+      Merge branch kvm-arm64/fpsimd-doc into kvmarm-master/next
+      Merge branch kvm-arm64/vmid-allocator into kvmarm-master/next
+      Merge branch kvm-arm64/selftest/vgic-5.18 into kvmarm-master/next
+      Merge branch kvm-arm64/misc-5.18 into kvmarm-master/next
+      KVM: arm64: Do not change the PMU event filter after a VCPU has run
+      KVM: arm64: Keep a per-VM pointer to the default PMU
+      Merge branch kvm-arm64/pmu-bl into kvmarm-master/next
+      Merge branch kvm-arm64/psci-1.1 into kvmarm-master/next
+      KVM: arm64: Only open the interrupt window on exit due to an interrupt
+      Merge branch kvm-arm64/misc-5.18 into kvmarm-master/next
+      Merge branch kvm-arm64/psci-1.1 into kvmarm-master/next
+      KVM: arm64: Generalise VM features into a set of flags
+
+Mark Brown (4):
+      KVM: arm64: Add comments for context flush and sync callbacks
+      KVM: arm64: Add some more comments in kvm_hyp_handle_fpsimd()
+      arm64/fpsimd: Clarify the purpose of using last in fpsimd_save()
+      KVM: arm64: Enable Cortex-A510 erratum 2077057 by default
+
+Oliver Upton (8):
+      KVM: arm64: Correctly treat writes to OSLSR_EL1 as undefined
+      KVM: arm64: Stash OSLSR_EL1 in the cpu context
+      KVM: arm64: Allow guest to set the OSLK bit
+      KVM: arm64: Emulate the OS Lock
+      selftests: KVM: Add OSLSR_EL1 to the list of blessed regs
+      selftests: KVM: Test OS lock behavior
+      KVM: arm64: Drop unused param from kvm_psci_version()
+      Documentation: KVM: Update documentation to indicate KVM is arm64-only
+
+Ricardo Koller (5):
+      kvm: selftests: aarch64: fix assert in gicv3_access_reg
+      kvm: selftests: aarch64: pass vgic_irq guest args as a pointer
+      kvm: selftests: aarch64: fix the failure check in kvm_set_gsi_routing_irqchip_check
+      kvm: selftests: aarch64: fix some vgic related comments
+      kvm: selftests: aarch64: use a tighter assert in vgic_poke_irq()
+
+Shameer Kolothum (3):
+      KVM: arm64: Introduce a new VMID allocator for KVM
+      KVM: arm64: Make VMID bits accessible outside of allocator
+      KVM: arm64: Make active_vmids invalid on vCPU schedule out
+
+Will Deacon (4):
+      KVM: arm64: Bump guest PSCI version to 1.1
+      KVM: arm64: Expose PSCI SYSTEM_RESET2 call to the guest
+      KVM: arm64: Indicate SYSTEM_RESET2 in kvm_run::system_event flags field
+      KVM: arm64: Really propagate PSCI SYSTEM_RESET2 arguments to userspace
+
+ Documentation/virt/kvm/api.rst                     |  92 +++++-----
+ Documentation/virt/kvm/devices/vcpu.rst            |  36 +++-
+ arch/arm64/Kconfig                                 |   1 +
+ arch/arm64/include/asm/kvm_host.h                  |  45 ++++-
+ arch/arm64/include/asm/kvm_mmu.h                   |   4 +-
+ arch/arm64/include/asm/sysreg.h                    |   8 +
+ arch/arm64/include/uapi/asm/kvm.h                  |  11 ++
+ arch/arm64/kernel/fpsimd.c                         |   8 +-
+ arch/arm64/kernel/image-vars.h                     |   3 +
+ arch/arm64/kvm/Makefile                            |   2 +-
+ arch/arm64/kvm/arm.c                               | 142 +++++----------
+ arch/arm64/kvm/debug.c                             |  26 ++-
+ arch/arm64/kvm/fpsimd.c                            |  14 +-
+ arch/arm64/kvm/guest.c                             |   2 +-
+ arch/arm64/kvm/handle_exit.c                       |   2 +-
+ arch/arm64/kvm/hyp/include/hyp/switch.h            |   4 +
+ arch/arm64/kvm/hyp/nvhe/Makefile                   |   3 +-
+ arch/arm64/kvm/hyp/nvhe/list_debug.c               |  54 ++++++
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c              |   3 +-
+ arch/arm64/kvm/hyp/nvhe/page_alloc.c               |   4 +-
+ arch/arm64/kvm/hyp/nvhe/stub.c                     |  22 ---
+ arch/arm64/kvm/mmio.c                              |   3 +-
+ arch/arm64/kvm/mmu.c                               |  52 +++---
+ arch/arm64/kvm/pmu-emul.c                          | 141 +++++++++++----
+ arch/arm64/kvm/psci.c                              |  66 +++++--
+ arch/arm64/kvm/sys_regs.c                          |  74 ++++++--
+ arch/arm64/kvm/vgic/vgic.c                         |   2 +-
+ arch/arm64/kvm/vmid.c                              | 196 +++++++++++++++++++++
+ include/kvm/arm_pmu.h                              |   5 +
+ include/kvm/arm_psci.h                             |   9 +-
+ include/linux/perf_event.h                         |   2 +-
+ include/uapi/linux/psci.h                          |   4 +
+ tools/arch/arm64/include/uapi/asm/kvm.h            |   1 +
+ .../selftests/kvm/aarch64/debug-exceptions.c       |  58 +++++-
+ tools/testing/selftests/kvm/aarch64/get-reg-list.c |   1 +
+ tools/testing/selftests/kvm/aarch64/vgic_irq.c     |  45 +++--
+ tools/testing/selftests/kvm/dirty_log_perf_test.c  |  10 ++
+ tools/testing/selftests/kvm/lib/aarch64/gic_v3.c   |  12 +-
+ tools/testing/selftests/kvm/lib/aarch64/vgic.c     |   9 +-
+ 39 files changed, 865 insertions(+), 311 deletions(-)
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/list_debug.c
+ delete mode 100644 arch/arm64/kvm/hyp/nvhe/stub.c
+ create mode 100644 arch/arm64/kvm/vmid.c
