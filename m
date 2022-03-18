@@ -2,138 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E264C4DD7B5
-	for <lists+kvm@lfdr.de>; Fri, 18 Mar 2022 11:10:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A708C4DD867
+	for <lists+kvm@lfdr.de>; Fri, 18 Mar 2022 11:48:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234852AbiCRKLP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Mar 2022 06:11:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51848 "EHLO
+        id S235068AbiCRKtT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Mar 2022 06:49:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234895AbiCRKLN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Mar 2022 06:11:13 -0400
-Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C4C51FC9CA;
-        Fri, 18 Mar 2022 03:09:47 -0700 (PDT)
-Received: by mail-yb1-xb31.google.com with SMTP id z8so14981555ybh.7;
-        Fri, 18 Mar 2022 03:09:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=iBlbICW23CBGTF3so1ajLzBTrtOLAUSZttkTvYtR9U4=;
-        b=KnCaC9+6NKn7pDuY3hd2njUC1wF3s5xGR9C0PDWkiqUlDIqnvdtG6OrPmErrmk2bBl
-         i/WPQzcLnkRhywTHSUmDMZHZ0GlowVQoJeH2g4mL6X6U3jG3AI4IvhKZJJFmjPbYUXKm
-         R7UAeKnMiALz4HvQk26o1tzbV5c9m84gDcW9HQjKn/SxT4eQO+JwXWEH07wvgj2i/Z1T
-         O6cro+exHmh1+bAB8sRl6KBdc32uIv0fzi3pmUYeL0DcPvjMwnHklX2n0F9O7bJNGOcu
-         8jIxG3jpP6nrWC1EGm5Ve2Dxy9nrAS0579oGxj+AKV6y7aGUhQO+lPJrhPYAyHq1cxzn
-         40Gg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=iBlbICW23CBGTF3so1ajLzBTrtOLAUSZttkTvYtR9U4=;
-        b=A47RpgpnEpdM7hx2hl+pn+Y37bqOX0PZwrSv8dcQU/ekI0eknyXk2Df5rgRkN4uaQg
-         EnFBGFEgRtcB2NUpS1wTOeitY/fL5doJVmQNurSer5O2QeEpbm0OVq2sVfgnHsVt0edV
-         eYkoMr3aIcY+y35aK8Cp7/b1eZ7QUy7mYwLjViVAQ+mZ9998bGd+mypIhhFB4b56MEJ1
-         QKx/MJzOf/Ei3PSJw/7xL76EhMFXf/WJIqlYskMsGHzapAUlwzuI2Bx/lQYt6bJUVEPR
-         RwDZxOIAl9eWV6rMqjar+qR8gH+3hyW4nmpcfCM4DFQbLL7+F7+aHCEH9bcH5qM4tjVh
-         h8uw==
-X-Gm-Message-State: AOAM5326ymbuirqYk98FzppuJMSSI/2efkkunEjOu1613jtxfy6jO0nM
-        N946lZDDtQzyPTlnx5yeqSfyD5pAf8XtGufj9fpjGnZctLM=
-X-Google-Smtp-Source: ABdhPJwIdDnVNEDU80uHFFUxuzkAqD7VZYbyHnJJrzK5rhGtuTtx1motzqejrVY10v71l4Ql13DBTL9pU8Cr1oGoexg=
-X-Received: by 2002:a25:588b:0:b0:633:a978:79b2 with SMTP id
- m133-20020a25588b000000b00633a97879b2mr6131924ybb.138.1647598186680; Fri, 18
- Mar 2022 03:09:46 -0700 (PDT)
+        with ESMTP id S235465AbiCRKsI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Mar 2022 06:48:08 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 877DE2C578B;
+        Fri, 18 Mar 2022 03:46:50 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id 38854210EA;
+        Fri, 18 Mar 2022 10:46:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1647600409; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=MM0r6zvbwpydkDT1R+F5hWqdXa0Z4qMXYmUqvX1aq+0=;
+        b=DAqHahI8SUMzWGkPbqH5Mq42I+OEoNkvTWiw5arB+cdPMBbGR9lroaBnc8ZrbQkkgucBUV
+        UbgWFfgRm5siAM3mZbr4a/xyAAiPVRdVWBKDZHvmt/INrYk+c/7Aqpalss0w20PEYODiR6
+        WK+iSOZZMJPwJYHnxYTTcB4VjnvcF8U=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1647600409;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=MM0r6zvbwpydkDT1R+F5hWqdXa0Z4qMXYmUqvX1aq+0=;
+        b=2ALG9+Ur1c+C7IND5+u9jvYZx36lL1rhRQQoms1FcFNfJRtuXz3iZHyH+Y0uKOdY9dHIeg
+        dO2HDmsMt2rdUICg==
+Received: from vasant-suse.suse.de (unknown [10.163.24.178])
+        by relay2.suse.de (Postfix) with ESMTP id D713BA3B81;
+        Fri, 18 Mar 2022 10:46:48 +0000 (UTC)
+From:   Vasant Karasulli <vkarasulli@suse.de>
+To:     linux-kernel@vger.kernel.org, jroedel@suse.de, kvm@vger.kernel.org
+Cc:     bp@alien8.de, x86@kernel.org, thomas.lendacky@amd.com,
+        varad.gautam@suse.com, Vasant Karasulli <vkarasulli@suse.de>
+Subject: [PATCH v6 0/4] x86/tests: Add tests for AMD SEV-ES #VC handling
+Date:   Fri, 18 Mar 2022 11:46:42 +0100
+Message-Id: <20220318104646.8313-1-vkarasulli@suse.de>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-References: <1646987354-28644-1-git-send-email-wanpengli@tencent.com>
-In-Reply-To: <1646987354-28644-1-git-send-email-wanpengli@tencent.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Fri, 18 Mar 2022 18:09:35 +0800
-Message-ID: <CANRm+CycTii50jwRwVsyG0X-jRRZY8YaypYHNKO1ObYbcSuuaw@mail.gmail.com>
-Subject: Re: [PATCH 0/5] KVM: X86: Scaling Guest OS Critical Sections with boosting
-To:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-kindly ping, :)
-On Fri, 11 Mar 2022 at 16:30, Wanpeng Li <kernellwp@gmail.com> wrote:
->
-> The missing semantic gap that occurs when a guest OS is preempted
-> when executing its own critical section, this leads to degradation
-> of application scalability. We try to bridge this semantic gap in
-> some ways, by passing guest preempt_count to the host and checking
-> guest irq disable state, the hypervisor now knows whether guest
-> OSes are running in the critical section, the hypervisor yield-on-spin
-> heuristics can be more smart this time to boost the vCPU candidate
-> who is in the critical section to mitigate this preemption problem,
-> in addition, it is more likely to be a potential lock holder.
->
-> Testing on 96 HT 2 socket Xeon CLX server, with 96 vCPUs VM 100GB RAM,
-> one VM running benchmark, the other(none-2) VMs running cpu-bound
-> workloads, There is no performance regression for other benchmarks
-> like Unixbench etc.
->
-> 1VM
->             vanilla    optimized    improved
->
-> hackbench -l 50000
->               28         21.45        30.5%
-> ebizzy -M
->              12189       12354        1.4%
-> dbench
->              712 MB/sec  722 MB/sec   1.4%
->
-> 2VM:
->             vanilla    optimized    improved
->
-> hackbench -l 10000
->               29.4        26          13%
-> ebizzy -M
->              3834        4033          5%
-> dbench
->            42.3 MB/sec  44.1 MB/sec   4.3%
->
-> 3VM:
->             vanilla    optimized    improved
->
-> hackbench -l 10000
->               47         35.46        33%
-> ebizzy -M
->              3828        4031         5%
-> dbench
->            30.5 MB/sec  31.16 MB/sec  2.3%
->
-> Wanpeng Li (5):
->   KVM: X86: Add MSR_KVM_PREEMPT_COUNT support
->   KVM: X86: Add guest interrupt disable state support
->   KVM: X86: Boost vCPU which is in the critical section
->   x86/kvm: Add MSR_KVM_PREEMPT_COUNT guest support
->   KVM: X86: Expose PREEMT_COUNT CPUID feature bit to guest
->
->  Documentation/virt/kvm/cpuid.rst     |  3 ++
->  arch/x86/include/asm/kvm_host.h      |  7 ++++
->  arch/x86/include/uapi/asm/kvm_para.h |  2 +
->  arch/x86/kernel/kvm.c                | 10 +++++
->  arch/x86/kvm/cpuid.c                 |  3 +-
->  arch/x86/kvm/x86.c                   | 60 ++++++++++++++++++++++++++++
->  include/linux/kvm_host.h             |  1 +
->  virt/kvm/kvm_main.c                  |  7 ++++
->  8 files changed, 92 insertions(+), 1 deletion(-)
->
-> --
-> 2.25.1
->
+Hi All,
+
+   This is the version 6 of the patch written to add tests for
+   AMD SEV-ES #VC handling. This version attempts to
+   address review comments to the previous version of the patch in
+   https://lore.kernel.org/kvm/20220208162623.18368-1-vkarasulli@suse.de/.
+
+   Changes in this version:
+   1. The patch in the previous version is split into 4 parts.
+   2. Constants in function sev_es_nae_mmio are replaced by macros.
+
+PS: I am resending this version because I made a mistake in the subject.
+Apologies for the spam.
+
+Thanks,
+Vasant
+
+
+Vasant Karasulli (4):
+  x86/tests: Add Kconfig options for testing AMD SEV related features.
+  x86/tests: Add KUnit based tests to validate Linux's VC handling for
+    instructions cpuid and wbinvd. These tests: 1. install a kretprobe
+    on the #VC handler (sev_es_ghcb_hv_call, to    access GHCB
+    before/after the resulting VMGEXIT). 2. trigger an NAE by executing
+    either cpuid or wbinvd. 3. check that the kretprobe was hit with the
+    right exit_code available    in GHCB.
+  x86/tests: Add KUnit based tests to validate Linux's VC handling for
+      instructions accessing registers such as MSR and DR7. These tests:
+        1. install a kretprobe on the #VC handler (sev_es_ghcb_hv_call,
+    to        access GHCB before/after the resulting VMGEXIT).     2.
+    trigger an NAE by accessing either MSR or DR7.     3. check that the
+    kretprobe was hit with the right exit_code available        in GHCB.
+  x86/tests: Add KUnit based tests to validate Linux's VC handling for
+          IO instructions. These tests:         1. install a kretprobe
+    on the #VC handler (sev_es_ghcb_hv_call, to            access GHCB
+    before/after the resulting VMGEXIT).         2. trigger an NAE by
+    issuing an IO instruction.         3. check that the kretprobe was
+    hit with the right exit_code available            in GHCB.
+
+ arch/x86/Kbuild              |   2 +
+ arch/x86/Kconfig.debug       |  16 ++++
+ arch/x86/kernel/Makefile     |   7 ++
+ arch/x86/tests/Makefile      |   3 +
+ arch/x86/tests/sev-test-vc.c | 155 +++++++++++++++++++++++++++++++++++
+ 5 files changed, 183 insertions(+)
+ create mode 100644 arch/x86/tests/Makefile
+ create mode 100644 arch/x86/tests/sev-test-vc.c
+
+
+base-commit: 09688c0166e76ce2fb85e86b9d99be8b0084cdf9
+prerequisite-patch-id: b74bc39d7ca69ad86b5f9090047c44ab039f4622
+prerequisite-patch-id: a53a291b59b4ceaffa25a9a08dfa08b5a78a01b9
+--
+2.32.0
+
