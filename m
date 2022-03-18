@@ -2,54 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1AEA14DDF47
-	for <lists+kvm@lfdr.de>; Fri, 18 Mar 2022 17:47:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B5324DDF4F
+	for <lists+kvm@lfdr.de>; Fri, 18 Mar 2022 17:48:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239325AbiCRQsV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Mar 2022 12:48:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37494 "EHLO
+        id S239360AbiCRQt5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Mar 2022 12:49:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239211AbiCRQsV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Mar 2022 12:48:21 -0400
+        with ESMTP id S238988AbiCRQtz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Mar 2022 12:49:55 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 179F22B04F5
-        for <kvm@vger.kernel.org>; Fri, 18 Mar 2022 09:47:02 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B1D701DDFEB
+        for <kvm@vger.kernel.org>; Fri, 18 Mar 2022 09:48:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647622021;
+        s=mimecast20190719; t=1647622114;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding;
         bh=zJxxfiqWeV928wIFzDvUgwTHej56l1Ux3PCeiMRY0A4=;
-        b=MUvOZHJ4JVK6EtjN6pKJOMQDKWAiIECC9unEHJgoNmKMUa6SWPlalTmwS5AwbuOFouNp36
-        TfW9uVp2P/QY3chWcwd6Hhkroa8A4H/Q5A5rth7vEfthVHo52fHN0DhuXUWMXHN3gkgzTf
-        iRxVWw8y2Hj++9jTsZ2I41VGoJgW7og=
+        b=QMyBRvjocIEtmvLzx0JXK0yGEHLe+EHVSrXri/6kbk1X3waD9wMhtNXzJz9yYYV1CRxR/4
+        lhRp2uiet4eMK1f648zD0HmZ5xtDToB8dtnYVispKmfISiUHm3P+zi0nkkMwr0H41FRZle
+        6OpQ7yY0rXKctgdGdasW/8e+eFFHMY4=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-511-f2MXQznNPpaAp2Uiry8KxA-1; Fri, 18 Mar 2022 12:46:58 -0400
-X-MC-Unique: f2MXQznNPpaAp2Uiry8KxA-1
+ us-mta-505-W2JG4-YaMn6m-RQcbMa-4g-1; Fri, 18 Mar 2022 12:48:33 -0400
+X-MC-Unique: W2JG4-YaMn6m-RQcbMa-4g-1
 Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C090985A5BC;
-        Fri, 18 Mar 2022 16:46:57 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7C83685A5BE;
+        Fri, 18 Mar 2022 16:48:33 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A3E354292CB;
-        Fri, 18 Mar 2022 16:46:57 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5F6A1401E86;
+        Fri, 18 Mar 2022 16:48:33 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: [PATCH] Revert "KVM: x86/mmu: Zap only TDP MMU leafs in kvm_zap_gfn_range()"
-Date:   Fri, 18 Mar 2022 12:46:57 -0400
-Message-Id: <20220318164657.2743860-1-pbonzini@redhat.com>
+Subject: [FYI PATCH] Revert "KVM: x86/mmu: Zap only TDP MMU leafs in kvm_zap_gfn_range()"
+Date:   Fri, 18 Mar 2022 12:48:33 -0400
+Message-Id: <20220318164833.2745138-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
 X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
