@@ -2,47 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A26944E20CC
-	for <lists+kvm@lfdr.de>; Mon, 21 Mar 2022 07:56:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4447D4E20E0
+	for <lists+kvm@lfdr.de>; Mon, 21 Mar 2022 08:02:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344661AbiCUG5k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Mar 2022 02:57:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56164 "EHLO
+        id S1343540AbiCUHDn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Mar 2022 03:03:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344643AbiCUG5j (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Mar 2022 02:57:39 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4594F24587
-        for <kvm@vger.kernel.org>; Sun, 20 Mar 2022 23:56:14 -0700 (PDT)
+        with ESMTP id S1344695AbiCUHDg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Mar 2022 03:03:36 -0400
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7A9D4924C
+        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 00:02:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1647845774; x=1679381774;
+  t=1647846132; x=1679382132;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=nhvADs+tynBIlqMFJkoupURGmVmdXZA4EkmDJ1XRbig=;
-  b=XJVI5tY20Fdd++bo8e3NtpcyOO/IUZbKJJHBMhwjmdVtr9TS+DWJAtTN
-   pdojyo+z6xrWqVZejJYAmchnJTg5qMLJBtPeAWslyxBAD3QdVKtyktXO+
-   z/WnOhliUH13zcc+OHw2azAI3sfLSM7+0kANm2tOqez8AX/UmIff2mnH/
-   sOo2L2ldjSBj49aBNYgGgXuBGld+joak5ALybMGbgXQr8qHdZyRP+Y48J
-   gqlRS8rAzwcFd3ivNax5ITP930G8efNawuTg5CzV9NnII/UQHyZPSkCeF
-   ACcVrpDmqBOWYpZYMhlOL2rdN7YOsI0OcPwvs1SvOOQxRvUggjZA8PWhG
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10292"; a="244955932"
+  bh=0iRvrFKjuNuyC9lG4vhN/9p1QBkTE+Phuzunp0EN+tg=;
+  b=dFjlEBv5T88PLsXgPxj/lHsZDKqh+OXqyv5KGHiMq6j+GeXM4hjz6XQF
+   TyHoChx9N9YplJ6AsG9EA6+tfpfOfSHSclc4UezVOJLI6vN8iQkEVN+5I
+   Y0KWDEJMkthwvnl4Nb46d2TS4IUT3mbVd/48F3lu3sNRh6uYNwKRMRNFr
+   RhhWfsgunGRczjA448RkLjgF7JdkCrPd3AaT2wOkoKGgqaizRvW5rh9a/
+   IhdzJIVJis1kKEQrTpJJrpwM6wnXjI7NSIlzz+8D+z+Yn7fXasYMRSPQe
+   DK0A6To0dETjHcg2NjqpY/vISl6Lnjz+50ZpNRZB3M2Ag2zy2fvoD55jP
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10292"; a="282309522"
 X-IronPort-AV: E=Sophos;i="5.90,197,1643702400"; 
-   d="scan'208";a="244955932"
+   d="scan'208";a="282309522"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2022 23:56:13 -0700
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2022 00:02:12 -0700
 X-IronPort-AV: E=Sophos;i="5.90,197,1643702400"; 
-   d="scan'208";a="559734025"
+   d="scan'208";a="559736846"
 Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.249.169.245]) ([10.249.169.245])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2022 23:56:08 -0700
-Message-ID: <680200c2-d0c5-d36b-c88e-4721bab63443@intel.com>
-Date:   Mon, 21 Mar 2022 14:56:07 +0800
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2022 00:02:06 -0700
+Message-ID: <9de4a579-b1f7-294e-34b1-09849f6d79b3@intel.com>
+Date:   Mon, 21 Mar 2022 15:02:04 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
  Firefox/91.0 Thunderbird/91.6.1
-Subject: Re: [RFC PATCH v3 06/36] i386/tdx: Get tdx_capabilities via
- KVM_TDX_CAPABILITIES
+Subject: Re: [RFC PATCH v3 09/36] KVM: Introduce kvm_arch_pre_create_vcpu()
 Content-Language: en-US
 To:     Isaku Yamahata <isaku.yamahata@gmail.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -59,79 +58,89 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         kvm@vger.kernel.org, Connor Kuehl <ckuehl@redhat.com>,
         seanjc@google.com, qemu-devel@nongnu.org, erdemaktas@google.com
 References: <20220317135913.2166202-1-xiaoyao.li@intel.com>
- <20220317135913.2166202-7-xiaoyao.li@intel.com>
- <20220318020838.GB4006347@ls.amr.corp.intel.com>
+ <20220317135913.2166202-10-xiaoyao.li@intel.com>
+ <20220318165627.GB4049379@ls.amr.corp.intel.com>
 From:   Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20220318020838.GB4006347@ls.amr.corp.intel.com>
+In-Reply-To: <20220318165627.GB4049379@ls.amr.corp.intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-6.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
-        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H3,
+        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_HI,RCVD_IN_MSPIKE_H3,
         RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=no autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/18/2022 10:08 AM, Isaku Yamahata wrote:
-> On Thu, Mar 17, 2022 at 09:58:43PM +0800,
+On 3/19/2022 12:56 AM, Isaku Yamahata wrote:
+> On Thu, Mar 17, 2022 at 09:58:46PM +0800,
 > Xiaoyao Li <xiaoyao.li@intel.com> wrote:
 > 
->> diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
->> index e3b94373b316..bed337e5ba18 100644
->> --- a/target/i386/kvm/tdx.c
->> +++ b/target/i386/kvm/tdx.c
->> @@ -14,10 +14,77 @@
->>   #include "qemu/osdep.h"
->>   #include "qapi/error.h"
->>   #include "qom/object_interfaces.h"
->> +#include "sysemu/kvm.h"
+>> Introduce kvm_arch_pre_create_vcpu(), to perform arch-dependent
+>> work prior to create any vcpu. This is for i386 TDX because it needs
+>> call TDX_INIT_VM before creating any vcpu.
+>>
+>> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+>> ---
+>>   accel/kvm/kvm-all.c    | 7 +++++++
+>>   include/sysemu/kvm.h   | 1 +
+>>   target/arm/kvm64.c     | 5 +++++
+>>   target/i386/kvm/kvm.c  | 5 +++++
+>>   target/mips/kvm.c      | 5 +++++
+>>   target/ppc/kvm.c       | 5 +++++
+>>   target/s390x/kvm/kvm.c | 5 +++++
+>>   7 files changed, 33 insertions(+)
+>>
+>> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+>> index 27864dfaeaaa..a4bb449737a6 100644
+>> --- a/accel/kvm/kvm-all.c
+>> +++ b/accel/kvm/kvm-all.c
+>> @@ -465,6 +465,13 @@ int kvm_init_vcpu(CPUState *cpu, Error **errp)
 >>   
->>   #include "hw/i386/x86.h"
->>   #include "tdx.h"
+>>       trace_kvm_init_vcpu(cpu->cpu_index, kvm_arch_vcpu_id(cpu));
 >>   
->> +enum tdx_ioctl_level{
->> +    TDX_VM_IOCTL,
->> +    TDX_VCPU_IOCTL,
->> +};
->> +
->> +static int __tdx_ioctl(void *state, enum tdx_ioctl_level level, int cmd_id,
->> +                        __u32 metadata, void *data)
->> +{
->> +    struct kvm_tdx_cmd tdx_cmd;
->> +    int r;
->> +
->> +    memset(&tdx_cmd, 0x0, sizeof(tdx_cmd));
->> +
->> +    tdx_cmd.id = cmd_id;
->> +    tdx_cmd.metadata = metadata;
->> +    tdx_cmd.data = (__u64)(unsigned long)data;
->> +
->> +    switch (level) {
->> +    case TDX_VM_IOCTL:
->> +        r = kvm_vm_ioctl(kvm_state, KVM_MEMORY_ENCRYPT_OP, &tdx_cmd);
->> +        break;
->> +    case TDX_VCPU_IOCTL:
->> +        r = kvm_vcpu_ioctl(state, KVM_MEMORY_ENCRYPT_OP, &tdx_cmd);
->> +        break;
->> +    default:
->> +        error_report("Invalid tdx_ioctl_level %d", level);
->> +        exit(1);
+>> +    ret = kvm_arch_pre_create_vcpu(cpu);
+>> +    if (ret < 0) {
+>> +        error_setg_errno(errp, -ret,
+>> +                         "kvm_init_vcpu: kvm_arch_pre_create_vcpu() failed");
+>> +        goto err;
 >> +    }
 >> +
->> +    return r;
+>>       ret = kvm_get_vcpu(s, kvm_arch_vcpu_id(cpu));
+>>       if (ret < 0) {
+>>           error_setg_errno(errp, -ret, "kvm_init_vcpu: kvm_get_vcpu failed (%lu)",
+>> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+>> index a783c7886811..0e94031ab7c7 100644
+>> --- a/include/sysemu/kvm.h
+>> +++ b/include/sysemu/kvm.h
+>> @@ -373,6 +373,7 @@ int kvm_arch_put_registers(CPUState *cpu, int level);
+>>   
+>>   int kvm_arch_init(MachineState *ms, KVMState *s);
+>>   
+>> +int kvm_arch_pre_create_vcpu(CPUState *cpu);
+>>   int kvm_arch_init_vcpu(CPUState *cpu);
+>>   int kvm_arch_destroy_vcpu(CPUState *cpu);
+>>   
+>> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+>> index ccadfbbe72be..ae7336851c62 100644
+>> --- a/target/arm/kvm64.c
+>> +++ b/target/arm/kvm64.c
+>> @@ -935,6 +935,11 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>>       return kvm_arm_init_cpreg_list(cpu);
+>>   }
+>>   
+>> +int kvm_arch_pre_create_vcpu(CPUState *cpu)
+>> +{
+>> +    return 0;
 >> +}
 >> +
->> +#define tdx_vm_ioctl(cmd_id, metadata, data) \
->> +        __tdx_ioctl(NULL, TDX_VM_IOCTL, cmd_id, metadata, data)
->> +
->> +#define tdx_vcpu_ioctl(cpu, cmd_id, metadata, data) \
->> +        __tdx_ioctl(cpu, TDX_VCPU_IOCTL, cmd_id, metadata, data)
 > 
-> No point to use macro.  Normal (inline) function can works.
-> 
+> Weak symbol can be used to avoid update all the arch.
 
-OK. Will change it to inline function.
+OK. will use __attribute__ ((weak))
+
+> Thanks,
+
