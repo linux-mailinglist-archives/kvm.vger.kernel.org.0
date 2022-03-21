@@ -2,76 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DA3644E331F
-	for <lists+kvm@lfdr.de>; Mon, 21 Mar 2022 23:56:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3DCDB4E3314
+	for <lists+kvm@lfdr.de>; Mon, 21 Mar 2022 23:48:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230431AbiCUWvb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Mar 2022 18:51:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52636 "EHLO
+        id S229763AbiCUWt5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Mar 2022 18:49:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52264 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230321AbiCUWvZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Mar 2022 18:51:25 -0400
-Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45BB438D2A7
-        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 15:42:11 -0700 (PDT)
-Received: by mail-oi1-x22b.google.com with SMTP id s207so17782768oie.11
-        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 15:42:11 -0700 (PDT)
+        with ESMTP id S230088AbiCUWta (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Mar 2022 18:49:30 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E4712C67C
+        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 15:44:01 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id mq8-20020a17090b380800b001c6f8962e95so348180pjb.1
+        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 15:44:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=cWpcGr+6ZtCAxiOUcLCZPyeMFzj0VHLkO5iJ3VF02f4=;
-        b=oPx98dOIQ/h3ttHAG6/6YwYcqg7z9+fT8e3p530qSb0AGiFlCEiUBJAA/XHPNn4av5
-         IrNtz8J9D20C6CiPUqebgtBCtysnGTdWktCDdQQs23F09r5EekY59q/QOGyFZmB1xxfW
-         iPiRF6qWA438fV0Atp3T6GDy4p3WkKjn3pXPJY8DftTvsoIYnhx3dewT0KiDW7OdVKd2
-         D5jkB0If67Rs4Rb9WKLpYB9DEaiUmVpxgcsD6wURVIpcpxYxfvS9JbQjxsYeNeAONUGC
-         sCJiC5kqVR6g0fxwD0pkSb8T3MyE4sKdLwkPLYGUzH0GZJBZwRKxR5SuRgv3+eWXj/8S
-         Db2Q==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=duWOk9J5Rn3bjagoFq9i2kDyIyZnSP5TRc8u4qHhNfc=;
+        b=Pbm8QX/YyzkKPwPzsQYphCPvViUlrGZ4HzV1Z42L6Cf/bmYgIou7g0C9QUdXKWoy+7
+         DjYM69lY6J38IsyXQke7TIIR5Lr1K5waEfqw8b2N1GXPLRd4TiDMI41YBW4iAv1F1dLI
+         CyHmC9cUT5wQhKKT/iHDgPjDVqpr/U0PL1+4RkVl+HNbk45Wc5pp2AGcDP96NbVSdSTo
+         ps9qYmkf9aTdutmz15SjIpucdkZjOl05F+Nj+c6meZGiY/oxe8o/R65JNC01KiGnsiUi
+         wpJgG0LIISGTBMU0aFmwqmk2Q8yvJcUM0mv/VSxoTVzsnXGDxuu1MKLg8+9jEUZs2bhW
+         UUmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=cWpcGr+6ZtCAxiOUcLCZPyeMFzj0VHLkO5iJ3VF02f4=;
-        b=un7sR9SWBVwEC/3EmcQuGkJdKf9hS8feze+WNNUja0lpaiugQDBKgaTPVkInPuv88P
-         A+rlkUZKP5wzb71HGUMp+zBWiIxcJ6hGX9CIgct1/ancOFmjUc/gI4BLcER6cGl98hkZ
-         mQwd2IzoAn/CF78Syx0HE7a/E8B3c792E85K2EhiUfL7+iXhFqgN7cePm/HxsCVjbUcL
-         6oO6Hgto4OQc29oXD/e6DUtZDA4U80894UhO0Eg9soFRy5RXkG7VeNOdypi0CWR9sc6E
-         YdQuIwuhLnBaiwQkJVYeLaa1nuPV/+UL9hlDPhI5d9kfgtoAab0g0wa3PUJmgu79usi4
-         W2mQ==
-X-Gm-Message-State: AOAM533cGM55vg9bIl3g7yO+rIfMDfJb3Vdg8bpw4f7XAMwP0DZpTbpn
-        u4HPWh2CUI1KBm3nA5RzmosBZAhd1k4PtBeITpNLNg==
-X-Google-Smtp-Source: ABdhPJzmp3+qClIwuDyUCvItf45iFI8+VRyansEFfvpBFMcmDrxdR8LgWMKyewhdXFB3NkgmvKZ4FjVRRZQaygCfEtc=
-X-Received: by 2002:a05:6808:118d:b0:2d9:a01a:48c2 with SMTP id
- j13-20020a056808118d00b002d9a01a48c2mr698989oil.269.1647902530829; Mon, 21
- Mar 2022 15:42:10 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220301143650.143749-1-mlevitsk@redhat.com> <20220301143650.143749-5-mlevitsk@redhat.com>
- <CALMp9eRjY6sX0OEBeYw4RsQKSjKvXKWOqRe=GVoQnmjy6D8deg@mail.gmail.com>
- <6a7f13d1-ed00-b4a6-c39b-dd8ba189d639@redhat.com> <CALMp9eRRT6pi6tjZvsFbEhrgS+zsNg827iLD4Hvzsa4PeB6W-Q@mail.gmail.com>
- <abe8584fa3691de1d6ae6c6617b8ea750b30fd1c.camel@redhat.com>
- <CALMp9eSUSexhPWMWXE1HpSD+movaYcdge_J95LiLCnJyMEp3WA@mail.gmail.com> <8071f0f0a857b0775f1fb2d1ebd86ffc4fd9096b.camel@redhat.com>
-In-Reply-To: <8071f0f0a857b0775f1fb2d1ebd86ffc4fd9096b.camel@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 21 Mar 2022 15:41:59 -0700
-Message-ID: <CALMp9eQgDpL0eD_GZde-s+THPWvQ0v6kmj3z_023f_KPERAyyA@mail.gmail.com>
-Subject: Re: [PATCH v3 4/7] KVM: x86: nSVM: support PAUSE filter threshold and
- count when cpu_pm=on
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=duWOk9J5Rn3bjagoFq9i2kDyIyZnSP5TRc8u4qHhNfc=;
+        b=UWqRSvEa/wBz6ACPSesFixg2ptYPYrqclcuAdDkOF5vf+SFd/VVpy6Y4HGRx2fYndQ
+         pOwzQnIwhVAjEo6G/540yQm5ijVVZUBm4rUR6BXfsFBDSpffjz2kJChMleC8VXnP8YvG
+         ZC6tveyRr6Rakj06ix2YMnMoLXJ5tnPkZSmmijPqgFpnkrsqSmTUFKFjPMLou+fAiZPV
+         BVBwLQj8fYBjk2k4siBcsbeyNdZtwceMzrmnBqmVKYbootDhllB+yC7sNZCNULq6Syw9
+         4hxoVB+b6pDV7ypaPOAPjM6enpzfUBcmQXOM38bqRjy/sbsnfeBuCw8m/Xgrbf7nEuD9
+         CXOg==
+X-Gm-Message-State: AOAM532yaJXLi8gxnRL3SUAYjKz7WgxltAemog8NPtsdA13mEGK+d3XL
+        sPyCDye1zFJciJDPJ137Yk/NmJdFvbPC
+X-Google-Smtp-Source: ABdhPJytHGDouKoHJ9pRLVFB3Z6mEk4NzNC1Z7XTnWfFcOGBMjMjihWhYrp1JPCBQ/kOlhRedUpIllb6zEum
+X-Received: from bgardon.sea.corp.google.com ([2620:15c:100:202:b76a:f152:cb5e:5cd2])
+ (user=bgardon job=sendgmr) by 2002:a17:902:ea09:b0:154:4af3:bb77 with SMTP id
+ s9-20020a170902ea0900b001544af3bb77mr9669730plg.4.1647902640776; Mon, 21 Mar
+ 2022 15:44:00 -0700 (PDT)
+Date:   Mon, 21 Mar 2022 15:43:49 -0700
+Message-Id: <20220321224358.1305530-1-bgardon@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.1.894.gb6a874cedc-goog
+Subject: [PATCH v2 0/9] KVM: x86/MMU: Optimize disabling dirty logging
+From:   Ben Gardon <bgardon@google.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
-        Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
-        Wanpeng Li <wanpengli@tencent.com>
+        David Matlack <dmatlack@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Dunn <daviddunn@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Ben Gardon <bgardon@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -79,113 +69,115 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 21, 2022 at 3:11 PM Maxim Levitsky <mlevitsk@redhat.com> wrote:
->
-> On Mon, 2022-03-21 at 14:59 -0700, Jim Mattson wrote:
-> > On Mon, Mar 21, 2022 at 2:36 PM Maxim Levitsky <mlevitsk@redhat.com> wrote:
-> > > On Wed, 2022-03-09 at 11:07 -0800, Jim Mattson wrote:
-> > > > On Wed, Mar 9, 2022 at 10:47 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
-> > > > > On 3/9/22 19:35, Jim Mattson wrote:
-> > > > > > I didn't think pause filtering was virtualizable, since the value of
-> > > > > > the internal counter isn't exposed on VM-exit.
-> > > > > >
-> > > > > > On bare metal, for instance, assuming the hypervisor doesn't intercept
-> > > > > > CPUID, the following code would quickly trigger a PAUSE #VMEXIT with
-> > > > > > the filter count set to 2.
-> > > > > >
-> > > > > > 1:
-> > > > > > pause
-> > > > > > cpuid
-> > > > > > jmp 1
-> > > > > >
-> > > > > > Since L0 intercepts CPUID, however, L2 will exit to L0 on each loop
-> > > > > > iteration, and when L0 resumes L2, the internal counter will be set to
-> > > > > > 2 again. L1 will never see a PAUSE #VMEXIT.
-> > > > > >
-> > > > > > How do you handle this?
-> > > > > >
-> > > > >
-> > > > > I would expect that the same would happen on an SMI or a host interrupt.
-> > > > >
-> > > > >         1:
-> > > > >         pause
-> > > > >         outl al, 0xb2
-> > > > >         jmp 1
-> > > > >
-> > > > > In general a PAUSE vmexit will mostly benefit the VM that is pausing, so
-> > > > > having a partial implementation would be better than disabling it
-> > > > > altogether.
-> > > >
-> > > > Indeed, the APM does say, "Certain events, including SMI, can cause
-> > > > the internal count to be reloaded from the VMCB." However, expanding
-> > > > that set of events so much that some pause loops will *never* trigger
-> > > > a #VMEXIT seems problematic. If the hypervisor knew that the PAUSE
-> > > > filter may not be triggered, it could always choose to exit on every
-> > > > PAUSE.
-> > > >
-> > > > Having a partial implementation is only better than disabling it
-> > > > altogether if the L2 pause loop doesn't contain a hidden #VMEXIT to
-> > > > L0.
-> > > >
-> > >
-> > > Hi!
-> > >
-> > > You bring up a very valid point, which I didn't think about.
-> > >
-> > > However after thinking about this, I think that in practice,
-> > > this isn't a show stopper problem for exposing this feature to the guest.
-> > >
-> > >
-> > > This is what I am thinking:
-> > >
-> > > First lets assume that the L2 is malicious. In this case no doubt
-> > > it can craft such a loop which will not VMexit on PAUSE.
-> > > But that isn't a problem - instead of this guest could have just used NOP
-> > > which is not possible to intercept anyway - no harm is done.
-> > >
-> > > Now lets assume a non malicious L2:
-> > >
-> > >
-> > > First of all the problem can only happen when a VM exit is intercepted by L0,
-> > > and not by L1. Both above cases usually don't pass this criteria since L1 is highly
-> > > likely to intercept both CPUID and IO port access. It is also highly unlikely
-> > > to allow L2 direct access to L1's mmio ranges.
-> > >
-> > > Overall there are very few cases of deterministic vm exit which is intercepted
-> > > by L0 but not L1. If that happens then L1 will not catch the PAUSE loop,
-> > > which is not different much from not catching it because of not suitable
-> > > thresholds.
-> > >
-> > > Also note that this is an optimization only - due to count and threshold,
-> > > it is not guaranteed to catch all pause loops - in fact hypervisor has
-> > > to guess these values, and update them in attempt to catch as many such
-> > > loops as it can.
-> > >
-> > > I think overall it is OK to expose that feature to the guest
-> > > and it should even improve performance in some cases - currently
-> > > at least nested KVM intercepts every PAUSE otherwise.
-> >
-> > Can I at least request that this behavior be documented as a KVM
-> > virtual CPU erratum?
->
-> 100%. Do you have a pointer where to document it?
+Currently disabling dirty logging with the TDP MMU is extremely slow.
+On a 96 vCPU / 96G VM it takes ~256 seconds to disable dirty logging
+with the TDP MMU, as opposed to ~4 seconds with the legacy MMU. This
+series optimizes TLB flushes and introduces in-place large page
+promotion, to bring the disable dirty log time down to ~3 seconds.
 
-I think this will be the first KVM virtual CPU erratum documented,
-though there are plenty of others that I'd like to see documented
-(e.g. nVMX processes posted interrupts on emulated VM-entry, AMD's
-merged PMU counters are only 48 bits wide, etc.).
+Testing:
+Ran KVM selftests and kvm-unit-tests on an Intel Haswell. This
+series introduced no new failures.
 
-Maybe Paolo has some ideas?
+Performance:
 
-> Best regards,
->         Maxim Levitsky
->
-> >
-> > > Best regards,
-> > >         Maxim Levitsky
-> > >
-> > >
-> > >
-> > >
->
->
+Without this series, TDP MMU:
+> ./dirty_log_perf_test -v 96 -s anonymous_hugetlb_1gb
+Test iterations: 2
+Testing guest mode: PA-bits:ANY, VA-bits:48,  4K pages
+guest physical test memory offset: 0x3fe7c0000000
+Populate memory time: 4.972184425s
+Enabling dirty logging time: 0.001943807s
+
+Iteration 1 dirty memory time: 0.061862112s
+Iteration 1 get dirty log time: 0.001416413s
+Iteration 1 clear dirty log time: 1.417428057s
+Iteration 2 dirty memory time: 0.664103656s
+Iteration 2 get dirty log time: 0.000676724s
+Iteration 2 clear dirty log time: 1.149387201s
+Disabling dirty logging time: 256.682188868s
+Get dirty log over 2 iterations took 0.002093137s. (Avg 0.001046568s/iteration)
+Clear dirty log over 2 iterations took 2.566815258s. (Avg 1.283407629s/iteration)
+
+Without this series, Legacy MMU:
+> ./dirty_log_perf_test -v 96 -s anonymous_hugetlb_1gb
+Test iterations: 2
+Testing guest mode: PA-bits:ANY, VA-bits:48,  4K pages
+guest physical test memory offset: 0x3fe7c0000000
+Populate memory time: 4.892940915s
+Enabling dirty logging time: 0.001864603s
+
+Iteration 1 dirty memory time: 0.060490391s
+Iteration 1 get dirty log time: 0.001416277s
+Iteration 1 clear dirty log time: 0.323548614s
+Iteration 2 dirty memory time: 29.217064826s
+Iteration 2 get dirty log time: 0.000696202s
+Iteration 2 clear dirty log time: 0.907089084s
+Disabling dirty logging time: 4.246216551s
+Get dirty log over 2 iterations took 0.002112479s. (Avg 0.001056239s/iteration)
+Clear dirty log over 2 iterations took 1.230637698s. (Avg 0.615318849s/iteration)
+
+With this series, TDP MMU:
+(Updated since RFC. Pulling out patches 1-4 could have a performance impact.)
+> ./dirty_log_perf_test -v 96 -s anonymous_hugetlb_1gb
+Test iterations: 2
+Testing guest mode: PA-bits:ANY, VA-bits:48,  4K pages
+guest physical test memory offset: 0x3fe7c0000000
+Populate memory time: 4.878083336s
+Enabling dirty logging time: 0.001874340s
+
+Iteration 1 dirty memory time: 0.054867383s
+Iteration 1 get dirty log time: 0.001368377s
+Iteration 1 clear dirty log time: 1.406960856s
+Iteration 2 dirty memory time: 0.679301083s
+Iteration 2 get dirty log time: 0.000662905s
+Iteration 2 clear dirty log time: 1.138263359s
+Disabling dirty logging time: 3.169381810s
+Get dirty log over 2 iterations took 0.002031282s. (Avg 0.001015641s/iteration)
+Clear dirty log over 2 iterations took 2.545224215s. (Avg 1.272612107s/iteration)
+
+Patch breakdown:
+Patches 1-4 remove the need for a vCPU pointer to make_spte
+Patches 5-8 are small refactors in preparation for in-place lpage promotion
+Patch 9 implements in-place largepage promotion when disabling dirty logging
+
+Changelog:
+RFC -> v1:
+	Dropped the first 4 patches from the series. Patch 1 was sent
+	separately, patches 2-4 will be taken over by Sean Christopherson.
+	Incorporated David Matlack's Reviewed-by.
+v1 -> v2:
+	Several patches were queued and dropped from this revision.
+	Incorporated feedback from Peter Xu on the last patch in the series.
+	Refreshed performance data
+		Between versions 1 and 2 of this series, disable time without
+		the TDP MMU went from 45s to 256, a major regression. I was
+		testing on a skylake before and haswell this time, but that
+		does not explain the huge performance loss.
+
+Ben Gardon (9):
+  KVM: x86/mmu: Move implementation of make_spte to a helper
+  KVM: x86/mmu: Factor mt_mask out of __make_spte
+  KVM: x86/mmu: Factor shadow_zero_check out of __make_spte
+  KVM: x86/mmu: Replace vcpu argument with kvm pointer in make_spte
+  KVM: x86/mmu: Factor out the meat of reset_tdp_shadow_zero_bits_mask
+  KVM: x86/mmu: Factor out part of vmx_get_mt_mask which does not depend
+    on vcpu
+  KVM: x86/mmu: Add try_get_mt_mask to x86_ops
+  KVM: x86/mmu: Make kvm_is_mmio_pfn usable outside of spte.c
+  KVM: x86/mmu: Promote pages in-place when disabling dirty logging
+
+ arch/x86/include/asm/kvm-x86-ops.h |  1 +
+ arch/x86/include/asm/kvm_host.h    |  2 +
+ arch/x86/kvm/mmu/mmu.c             | 21 +++++----
+ arch/x86/kvm/mmu/mmu_internal.h    |  6 +++
+ arch/x86/kvm/mmu/spte.c            | 39 +++++++++++-----
+ arch/x86/kvm/mmu/spte.h            |  6 +++
+ arch/x86/kvm/mmu/tdp_mmu.c         | 73 +++++++++++++++++++++++++++++-
+ arch/x86/kvm/svm/svm.c             |  9 ++++
+ arch/x86/kvm/vmx/vmx.c             | 25 ++++++++--
+ 9 files changed, 155 insertions(+), 27 deletions(-)
+
+-- 
+2.35.1.894.gb6a874cedc-goog
+
