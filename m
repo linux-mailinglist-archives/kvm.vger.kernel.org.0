@@ -2,105 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3CB824E1E2D
-	for <lists+kvm@lfdr.de>; Sun, 20 Mar 2022 23:53:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AA8924E1E76
+	for <lists+kvm@lfdr.de>; Mon, 21 Mar 2022 01:26:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242624AbiCTWyi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 20 Mar 2022 18:54:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51090 "EHLO
+        id S1343908AbiCUA2K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 20 Mar 2022 20:28:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240990AbiCTWyh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 20 Mar 2022 18:54:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D77BE36697
-        for <kvm@vger.kernel.org>; Sun, 20 Mar 2022 15:53:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647816790;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=lbklHsC4p2zDoA9Qm45sY9QvlkWdqqX9EtVTWkPxbLA=;
-        b=TcNXjRqi/sMoz/p1eroeIlV8om0e909RmQme1L3vYD7ftn0dINAU/ouGFmIeBdqHCCsFGE
-        VRsaV8Es6s2PXM/n2gSWTdphJNFWqBzZnxYmVQzF2YHJrPAij4lVc29ibYl48xVMmUj8KD
-        CR2+/7q3Kna6eC9g0vB/Mh5GSrxWL9E=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-370-uo_bysOPMe--bO16Ca0JAw-1; Sun, 20 Mar 2022 18:53:08 -0400
-X-MC-Unique: uo_bysOPMe--bO16Ca0JAw-1
-Received: by mail-ed1-f71.google.com with SMTP id l24-20020a056402231800b00410f19a3103so7696618eda.5
-        for <kvm@vger.kernel.org>; Sun, 20 Mar 2022 15:53:08 -0700 (PDT)
+        with ESMTP id S1343898AbiCUA2H (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 20 Mar 2022 20:28:07 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 086E7DE90C
+        for <kvm@vger.kernel.org>; Sun, 20 Mar 2022 17:26:41 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id 11-20020a62180b000000b004fa65805047so5574625pfy.12
+        for <kvm@vger.kernel.org>; Sun, 20 Mar 2022 17:26:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=vksLZSJ/1XSsrv5+Q44yzVYsU90jJzgSeUJqyoBHB3k=;
+        b=gSwfSIzdqD5scy88k1Ask13XrPPk0tjFpkIl+D/qDCh4rUVNM82SuDTRYhdU6aYvrv
+         xtz+rBdoSrGFv2yFWdyQB33Uhb2WIK+kLFiN1toCSPE2yT8CCK7JrNY29nMvpz6xT3LJ
+         AiMjx5FbnXVooaM53zgB5DAgGak5uuyMy6HH6XopU7hbPNVEiZWu7upyAqjmajQeUEdB
+         8STDcUpcAKOXoU8Qhu/dMstGg2NPwAkT1DMsmHgnilrDL/mn95g2YdxLr5gBwQrBeP99
+         UtM7aQ3xVNgjPXm67mAEmjZfb9utG4B3LJ7kL34i8AY/tBX/FIWgTQutidvArslq8Gvw
+         gYFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=lbklHsC4p2zDoA9Qm45sY9QvlkWdqqX9EtVTWkPxbLA=;
-        b=LsHklVUzJ3q2ML+6axXWm78K21nFeJF1pE+0UpY30RQb8fD0/dXdxwuDciMxMFK2Gw
-         1tQ2qQaY+Z0csSY6kQLuc/IYipMgSBccolZ94aCRY8ACriwdOZZIMYkylzWoTNIMULii
-         D1aa6ZXrlk3OoqXG3PHF/yFDJjqYu/dgqgD8HZ8fWF5jqFwqm6LakLO7+Wv1KUJepkzV
-         RRLgSx81HZcSj0yj/fmAK0t2VKcRDy+ZAFmUn2oiIhUVr2vH02AJtPIzK+4Seu6eWABt
-         vHDuczuf9E7amuJZ/JNf1OHC5Kj8WO4ZxHzr9G4EpNcSzpipdpV2Jh0k9K5E801XqaK+
-         61vg==
-X-Gm-Message-State: AOAM532MBz8AHKVYJ6rPbfryBHIdadgM2Z7Lo4wwQluCj2Uro3yzOBb6
-        muznJP9BjlPO1ub3JGHdzSEgv4aplHZQ8RBnzQmxs6RbvFjx3BxBM0s153kZkC8uxSF96ZtY/KK
-        lh5HbiVa4X6sb
-X-Received: by 2002:a17:907:7287:b0:6df:8f48:3f76 with SMTP id dt7-20020a170907728700b006df8f483f76mr17022715ejc.411.1647816787615;
-        Sun, 20 Mar 2022 15:53:07 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxZe9l6Up1iG5LURVWCj/AihbE5iv/oi8hjD6mxD1AXkSiAxFIFKMfPOvm35kPXKaxucLH/AQ==
-X-Received: by 2002:a17:907:7287:b0:6df:8f48:3f76 with SMTP id dt7-20020a170907728700b006df8f483f76mr17022701ejc.411.1647816787435;
-        Sun, 20 Mar 2022 15:53:07 -0700 (PDT)
-Received: from redhat.com ([2.55.132.0])
-        by smtp.gmail.com with ESMTPSA id t14-20020a170906608e00b006d1455acc62sm6300968ejj.74.2022.03.20.15.53.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 20 Mar 2022 15:53:06 -0700 (PDT)
-Date:   Sun, 20 Mar 2022 18:53:01 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Alexander Graf <graf@amazon.com>
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>,
-        QEMU Developers <qemu-devel@nongnu.org>,
-        linux-hyperv@vger.kernel.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        "Michael Kelley (LINUX)" <mikelley@microsoft.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        adrian@parity.io, Laszlo Ersek <lersek@redhat.com>,
-        Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Jann Horn <jannh@google.com>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        "Brown, Len" <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
-        Linux PM <linux-pm@vger.kernel.org>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        Theodore Ts'o <tytso@mit.edu>, Arnd Bergmann <arnd@arndb.de>
-Subject: Re: propagating vmgenid outward and upward
-Message-ID: <20220320185049-mutt-send-email-mst@kernel.org>
-References: <Yh4+9+UpanJWAIyZ@zx2c4.com>
- <c5181fb5-38fb-f261-9de5-24655be1c749@amazon.com>
- <CAHmME9rTMDkE7UA3_wg87mrDVYps+YaHw+dZwF0EbM0zC4pQQw@mail.gmail.com>
- <47137806-9162-0f60-e830-1a3731595c8c@amazon.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <47137806-9162-0f60-e830-1a3731595c8c@amazon.com>
-X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=vksLZSJ/1XSsrv5+Q44yzVYsU90jJzgSeUJqyoBHB3k=;
+        b=neOVR56acEwV4UkhYghpw36mprOonMXBAe47GRKMAWXvyU5vlKr/kuo2VfuYDav2GK
+         oQLW7SQ0toZiA9PbNpyrYDudGW8lq9qOYLVxi1jhkzRGsgBXYgRG1xirpkE4dma+K72r
+         5KWW89hKBLs5CdFihJVIVex3XMSTnTbszttE77Fb4SIDmSV0MAso2llOCq32+aCMZNm1
+         M3WAg49iJfCiagzYerJdYd8bng/9SAs0T82Mj8saG+3UvdHF3HvfGKGCUZJjNXKdJts0
+         dCz9kZS0ciUDBvfjQ2hPCt/ug7gpZgR8/eG0EnOI9HZWypxhNcm2wn6/SCKR3D6qTBI1
+         bJiA==
+X-Gm-Message-State: AOAM5338Pro11MPpt5kKfY2gQB+R551Ned44V3Jewucg0VY64u04nh3j
+        q30VuQpt5C+lbiSFu41W8tBZAQp6d/Px
+X-Google-Smtp-Source: ABdhPJw4cNpBAihFupLLJmA3rASvy2aFHNimtbkLxURoSjoyJy9KyK20TBvmXKdqAJHIt2bGqyp8Lf2ehl8/
+X-Received: from mizhang-super.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1071])
+ (user=mizhang job=sendgmr) by 2002:a05:6a00:1248:b0:4f7:db0:4204 with SMTP id
+ u8-20020a056a00124800b004f70db04204mr21033266pfi.27.1647822400512; Sun, 20
+ Mar 2022 17:26:40 -0700 (PDT)
+Reply-To: Mingwei Zhang <mizhang@google.com>
+Date:   Mon, 21 Mar 2022 00:26:34 +0000
+Message-Id: <20220321002638.379672-1-mizhang@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.1.894.gb6a874cedc-goog
+Subject: [PATCH 0/4] Verify dirty logging works properly with page stats
+From:   Mingwei Zhang <mizhang@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>,
+        Mingwei Zhang <mizhang@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Peter Xu <peterx@redhat.com>, Ben Gardon <bgorden@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 10, 2022 at 12:18:04PM +0100, Alexander Graf wrote:
-> I agree on the slightly racy compromise
+This patchset is to verify if dirty logging works properly by checking page
+stats from the per-VM interface. We discovered one performance bug in
+disallowed_hugepage_adjust() which prevents KVM from recovering large pages
+for the guest. The selftest logic added later could help validate the
+problem.
 
-Thought hard about this, I think I agree, and I guess as a minimum we
-can start with at least the ACPI+RNG patch, right? That will already
-address wireguard ...
+The patchset borrowes two patches come from Ben's series: "[PATCH 00/13]
+KVM: x86: Add a cap to disable NX hugepages on a VM" [1], which completes the
+selftest library functions to use the stats interface.
+
+[1] https://lore.kernel.org/all/20220310164532.1821490-2-bgardon@google.com/T/
+
+Ben Gardon (2):
+  selftests: KVM: Dump VM stats in binary stats test
+  selftests: KVM: Test reading a single stat
+
+Mingwei Zhang (2):
+  KVM: x86/mmu: explicitly check nx_hugepage in
+    disallowed_hugepage_adjust()
+  selftests: KVM: use dirty logging to check if page stats work
+    correctly
+
+ arch/x86/kvm/mmu/mmu.c                        |  14 +-
+ .../selftests/kvm/dirty_log_perf_test.c       |  52 +++++
+ .../selftests/kvm/include/kvm_util_base.h     |   2 +
+ .../selftests/kvm/kvm_binary_stats_test.c     |   6 +
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 196 ++++++++++++++++++
+ 5 files changed, 268 insertions(+), 2 deletions(-)
 
 -- 
-MST
+2.35.1.894.gb6a874cedc-goog
 
