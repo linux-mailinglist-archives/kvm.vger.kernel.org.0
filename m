@@ -2,78 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4627D4E3250
-	for <lists+kvm@lfdr.de>; Mon, 21 Mar 2022 22:24:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5354D4E3341
+	for <lists+kvm@lfdr.de>; Mon, 21 Mar 2022 23:56:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229924AbiCUVZ0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Mar 2022 17:25:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41244 "EHLO
+        id S229982AbiCUWxG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Mar 2022 18:53:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45384 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229506AbiCUVZX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Mar 2022 17:25:23 -0400
-Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 256AB30A8A0
-        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 14:23:29 -0700 (PDT)
-Received: by mail-io1-xd2e.google.com with SMTP id k25so18189285iok.8
-        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 14:23:29 -0700 (PDT)
+        with ESMTP id S230477AbiCUWws (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Mar 2022 18:52:48 -0400
+Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60B944616E2
+        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 15:40:07 -0700 (PDT)
+Received: by mail-wr1-x431.google.com with SMTP id r10so22655466wrp.3
+        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 15:40:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=V23Av844hT2iFSeIr93jDSQK2woq0bdnV8wCQgIMoaE=;
-        b=BqfRdd0MToidp4NjdCpAich3wttPHJSpHpciVyLjQYcZsQkijxHSCAHv+HkEZIGTgl
-         nePdD/fu9HssIKM3/iRRr9O6Q850Xdt2xyBdSd0KrQWpILVWMvIqbr3SL1b5J2mYLhQF
-         q7dKEofLVqNIVA/2J+/T+33KhsyBWLMNjUMwYFAXmxXdNUGSMMJHL3N+agbrFjKv9lyp
-         gaOGglAqzzIHE5DU5FSazp96uv06kGagV0SeCVj+/JyZMQ9q5rZnZFh/I0ESw4wpwaWq
-         PK/B817iaPIH0ofKG1ZeWyOuxSc/Pr0atnQ9tEOZf0wO3pd25Qz79ZiCiXjPPlpERWZh
-         +cGg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=9lfgL3STyhcbUTg/2mdbbAna/81RZPKVO1DCdewIE0c=;
+        b=gyWTW65QfHhxvHH2bxgBaFULc3nQpwZVt/AImeBaMsagLh7ZILfBIv+cpBZ1WSMI9Y
+         TOPeV02sp4XiVQ8lLN4FhnC7+vP3gy404ImwUap5qVGjKFQLADRuLKDINVF1PWzZB4oh
+         U1mEyqWzxsu3MtArm0qnwbxI0Tx9hdG/LVKbNXemcrBdZ3oknTgvP+A4O4F1hDotj6c7
+         FVqupN7ClUGTVzfsEfmwX4wkAgsXCHqtd+IxXQCc+4lmBRSffgJC9BQPVBCIHWW3kbD/
+         9j6hHMT86dOmHX2WVzZ5qGs1t/Zz97eNKhrycXInFxW646D96NZqUdSy6LBktZ2feENm
+         LGqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=V23Av844hT2iFSeIr93jDSQK2woq0bdnV8wCQgIMoaE=;
-        b=s6k9BIwFvlhqhmgGOkh4tlL1xhD3fIClZuTBHAxy0E0Jfm3kYNyRXxgT/xgnFfWQdI
-         oLnB5HDr9+uzW4JJiw0lq3VAsDsTV3CetTHQPwr/H+R8izTa7IM/AcJKkhsezkO6zcb9
-         lXjbIGsQDSWqzsasZmbplXE8zLtKjqLH0pPnTY8uJrL0TwRZclBgC8a00J663M1eMbqc
-         SMmcHVdVlabdfj9rGMCo0oWdIu4Rv09q4NHPq2UiyyGY02HwpidU+plNClDhon2q9D3D
-         XyOOBmvJhakkhL8ygugag3/1rjGmU5gl7sQaVtcNvbz5Jhv8igFrDRxQnED+VKoGYrVu
-         PHJA==
-X-Gm-Message-State: AOAM532zCL+9MSI1lOLc8qVJUC5G/1hQ4Wh65lfIcDStBK6os1+5GebD
-        G8dG9+/FRVxWBZwbFYF4AqrLDA==
-X-Google-Smtp-Source: ABdhPJw7am/OXOHnmmLihwjh5ITdfwrRXoAaHgvjiimS2VG0z8UWBPOXUWWvgxTYXi6hRapDf+jkMA==
-X-Received: by 2002:a05:6638:1352:b0:321:547b:daa2 with SMTP id u18-20020a056638135200b00321547bdaa2mr572926jad.128.1647897808224;
-        Mon, 21 Mar 2022 14:23:28 -0700 (PDT)
-Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
-        by smtp.gmail.com with ESMTPSA id x4-20020a056e021bc400b002c8360eda7asm1181740ilv.88.2022.03.21.14.23.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Mar 2022 14:23:27 -0700 (PDT)
-Date:   Mon, 21 Mar 2022 21:23:24 +0000
-From:   Oliver Upton <oupton@google.com>
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     "Franke, Daniel" <dff@amazon.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=9lfgL3STyhcbUTg/2mdbbAna/81RZPKVO1DCdewIE0c=;
+        b=UrGe8faXT0ZadXzEdxfPX5FL6Bpb4On2dwaePveaXCgQX54j993E8A220vR1InSspw
+         /gJJa2PNKV5/IsHW5z5BjLEqcBZM10nX6cM5xIEzL8c8DXTFybDHMueTVlnOlB2CHMP2
+         1Epht53paT/cHcTBt9Z058e+klGlZEID7Jx3+YHBmsJeb7W1qzrNE53+SE6bDVyDqV+t
+         pdzjeL7zNc7SmKa0LH+MNFou3NKZoY6WQhouuyTB9GXO1tfPyP/uTEjnBhBvSgLVI68P
+         UsguRFt43LTU/PwBf9P9liwj/Cf1OcDn4H/UkS++w5acxOM4/lffHZGiwiBBrwQUYDww
+         ILtw==
+X-Gm-Message-State: AOAM530qtueg8vdOLDihaq1bh/2UEChA/ESIDdRLvJ6RkRy5i7ND8ULK
+        XPAoJFW6z0RCZRHwCC4FJNsVH2Hu07YEtradSwkzEB6emq3F5w==
+X-Google-Smtp-Source: ABdhPJyawG4O85guPSFaNHQuFtdGjIUfvponf4x7mJ068IZhUDgnWrnpRgCdV86cGiMMISGbZ7KYluPjZMFypJf0Ncc=
+X-Received: by 2002:a2e:6804:0:b0:245:f269:618 with SMTP id
+ c4-20020a2e6804000000b00245f2690618mr16315718lja.198.1647900072176; Mon, 21
+ Mar 2022 15:01:12 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220321002638.379672-1-mizhang@google.com> <20220321002638.379672-4-mizhang@google.com>
+In-Reply-To: <20220321002638.379672-4-mizhang@google.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Mon, 21 Mar 2022 15:00:45 -0700
+Message-ID: <CALzav=dU5TPfhp1=n+zo+AcPkL4rpWCRpMCL91vE5z20R+mmjg@mail.gmail.com>
+Subject: Re: [PATCH 3/4] KVM: x86/mmu: explicitly check nx_hugepage in disallowed_hugepage_adjust()
+To:     Mingwei Zhang <mizhang@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: Re: [PATCH] Documentation: KVM: Describe guest TSC scaling in
- migration algorithm
-Message-ID: <YjjszGb+svKpgADH@google.com>
-References: <YjWNfQThS4URRMZC@google.com>
- <e48bc11a5c4b0864616686cb1365dfb4c11b5b61.camel@infradead.org>
- <a6011bed-79b4-72ab-843c-315bf3fcf51e@redhat.com>
- <3548e754-28ae-f6c4-5d4c-c316ae6fbbb0@redhat.com>
- <100b54469a8d59976bbd96f50dd4cd33.squirrel@twosheds.infradead.org>
- <9ca10e3a-cd99-714a-76ad-6f1b83bb0abf@redhat.com>
- <YjbrOz+yT4R7FaX1@google.com>
- <1680281fee4384d27bd97dba117f391a.squirrel@twosheds.infradead.org>
- <YjfI/Sl3lFEFOIWc@google.com>
- <42cde62812d47489a4017c8cc2ca1397e1ad1d66.camel@infradead.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <42cde62812d47489a4017c8cc2ca1397e1ad1d66.camel@infradead.org>
+        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Ben Gardon <bgardon@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Peter Xu <peterx@redhat.com>, Ben Gardon <bgorden@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -85,54 +74,75 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 21, 2022 at 07:43:21PM +0000, David Woodhouse wrote:
-> On Mon, 2022-03-21 at 00:38 +0000, Oliver Upton wrote:
-> > On Sun, Mar 20, 2022 at 09:46:35AM -0000, David Woodhouse wrote:
-> > > But coincidentally since then I have started having conversations with
-> > > people who really want the guest to have an immediate knowledge of the
-> > > adjtimex maxerror etc. on the new host immediately after the migration.
-> > > Maybe the "if the migration isn't fast enough then let the guest know it's
-> > > now unsynced" is OK, but I'll need to work out what "immediately" means
-> > > when we have a guest userspace component involved in it.
-> > 
-> > This has also been an area of interest to me. I think we've all seen the
-> > many ways in which doing migrations behind the guest's can put software
-> > in an extremely undesirable state on the other end. If those
-> > conversations are taking place on the mailing lists, could you please CC
-> > me?
-> > 
-> > Our (Google) TSC adjustment clamping and userspace notification mechanism
-> > was a halfway kludge to keep things happy on the other end. And it
-> > generally has worked well, but misses a fundamental point.
-> > 
-> > The hypervisor should tell the guest kernel about time travel and let it
-> > cascade that information throughout the guest system. Regardless of what
-> > we do to the TSC, we invariably destroy one of the two guest clocks along
-> > the way. If we told the guest "you time traveled X seconds", it could
-> > fold that into its own idea of real time. Guest kernel can then fire off
-> > events to inform software that wants to keep up with clock changes, and
-> > even a new event to let NTP know its probably running on different
-> > hardware.
-> > 
-> > Time sucks :-)
-> 
-> So, we already have PVCLOCK_GUEST_STOPPED which tells the guest that
-> its clock may have experienced a jump. Linux guests will use this to
-> kick various watchdogs to prevent them whining. Shouldn't we *also* be
-> driving the NTP reset from that same signal?
+On Sun, Mar 20, 2022 at 5:26 PM Mingwei Zhang <mizhang@google.com> wrote:
+>
+> Add extra check to specify the case of nx hugepage and allow KVM to
+> reconstruct large mapping after dirty logging is disabled. Existing code
+> works only for nx hugepage but the condition is too general in that does
+> not consider other usage case (such as dirty logging).
 
-Right, but I'd argue that interface has some problems too. It
-depends on the guest polling instead of an interrupt from the
-hypervisor. It also has no way of informing the kernel exactly how much
-time has elapsed.
+KVM calls kvm_mmu_zap_collapsible_sptes() when dirty logging is
+disabled. Why is that not sufficient?
 
-The whole point of all these hacks that we've done internally is that we,
-the hypervisor, know full well how much real time hasv advanced during the
-VM blackout. If we can at least let the guest know how much to fudge real
-time, it can then poke NTP for better refinement. I worry about using NTP
-as the sole source of truth for such a mechanism, since you'll need to go
-out to the network and any reads until the response comes back are hosed.
+> Moreover, existing
+> code assumes that a present PMD or PUD indicates that there exist 'smaller
+> SPTEs' under the paging structure. This assumption may no be true if
+> consider the zapping leafs only behavior in MMU.
 
---
-Thanks,
-Oliver
+Good point. Although, that code just got reverted. Maybe say something like:
+
+  This assumption may not be true in the future if KVM gains support
+for zapping only leaf SPTEs.
+
+>
+> Missing the check causes KVM incorrectly regards the faulting page as a NX
+> huge page and refuse to map it at desired level. And this leads to back
+> performance in shadow mmu and potentiall TDP mmu.
+
+s/potentiall/potentially/
+
+>
+> Fixes: b8e8c8303ff2 ("kvm: mmu: ITLB_MULTIHIT mitigation")
+> Cc: stable@vger.kernel.org
+>
+> Reviewed-by: Ben Gardon <bgardon@google.com>
+> Signed-off-by: Mingwei Zhang <mizhang@google.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 14 ++++++++++++--
+>  1 file changed, 12 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 5628d0ba637e..4d358c273f6c 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -2919,6 +2919,16 @@ void disallowed_hugepage_adjust(struct kvm_page_fault *fault, u64 spte, int cur_
+>             cur_level == fault->goal_level &&
+>             is_shadow_present_pte(spte) &&
+>             !is_large_pte(spte)) {
+> +               struct kvm_mmu_page *sp;
+> +               u64 page_mask;
+> +               /*
+> +                * When nx hugepage flag is not set, there is no reason to
+> +                * go down to another level. This helps demand paging to
+> +                * generate large mappings.
+> +                */
+> +               sp = to_shadow_page(spte & PT64_BASE_ADDR_MASK);
+> +               if (!sp->lpage_disallowed)
+> +                       return;
+>                 /*
+>                  * A small SPTE exists for this pfn, but FNAME(fetch)
+>                  * and __direct_map would like to create a large PTE
+> @@ -2926,8 +2936,8 @@ void disallowed_hugepage_adjust(struct kvm_page_fault *fault, u64 spte, int cur_
+>                  * patching back for them into pfn the next 9 bits of
+>                  * the address.
+>                  */
+> -               u64 page_mask = KVM_PAGES_PER_HPAGE(cur_level) -
+> -                               KVM_PAGES_PER_HPAGE(cur_level - 1);
+> +               page_mask = KVM_PAGES_PER_HPAGE(cur_level) -
+> +                       KVM_PAGES_PER_HPAGE(cur_level - 1);
+>                 fault->pfn |= fault->gfn & page_mask;
+>                 fault->goal_level--;
+>         }
+> --
+> 2.35.1.894.gb6a874cedc-goog
+>
