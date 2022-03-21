@@ -2,87 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 740ED4E2434
-	for <lists+kvm@lfdr.de>; Mon, 21 Mar 2022 11:19:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 68EA74E2447
+	for <lists+kvm@lfdr.de>; Mon, 21 Mar 2022 11:25:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346284AbiCUKUv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Mar 2022 06:20:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34474 "EHLO
+        id S1346307AbiCUK0p (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Mar 2022 06:26:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346262AbiCUKUk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Mar 2022 06:20:40 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2374C2CC9C;
-        Mon, 21 Mar 2022 03:19:15 -0700 (PDT)
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22L9Pt0q015588;
-        Mon, 21 Mar 2022 10:19:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=b9rgkHJbHKZ27YCfeW4MQUexcpse6aSh3Py6GAPryYk=;
- b=OYhsLPvZl6ajaZobBKQz6fBo2h3n3HVEU8sVZ0d3ycJa0AzOaoXJcjoLEZCYBki9FMY+
- zVXNtrM1++PSL2xvuobFHw/ywqFo6vDorA6Osftrvkec5pepGmBxlhw6GGnppFM5EzJl
- EW5m6QBh3RGPtryr8og84Xo+VSpB0x4rWDa2T6j8neMFFqfOdfY/fbSsfjAiCd6qGY2a
- xfM5QfINTKvGZuHcX/3V8HGJ11y1g+iuDQHbH7CAKfi9CaVPgOxa94tu+j65tAlml3x4
- ubQVNPAVrvbW3bRqT8zqz/B4YoLDXjA90JWyKTIY5VdL8hcP7wGpzFjzs90P3+ajGnXM qA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3exkk3w1x4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 21 Mar 2022 10:19:14 +0000
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22LA7Icx035236;
-        Mon, 21 Mar 2022 10:19:13 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3exkk3w1w7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 21 Mar 2022 10:19:13 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22LAEZ2G029744;
-        Mon, 21 Mar 2022 10:19:11 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma04ams.nl.ibm.com with ESMTP id 3ew6t8uju7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 21 Mar 2022 10:19:11 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22LAJ8Zc36831596
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 21 Mar 2022 10:19:08 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2D76E11C052;
-        Mon, 21 Mar 2022 10:19:08 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DC8B511C04C;
-        Mon, 21 Mar 2022 10:19:07 +0000 (GMT)
-Received: from t46lp57.lnxne.boe (unknown [9.152.108.100])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 21 Mar 2022 10:19:07 +0000 (GMT)
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com,
-        david@redhat.com, farman@linux.ibm.com
-Subject: [kvm-unit-tests PATCH v1 9/9] s390x: stsi: check zero and ignored bits in r0 and r1
-Date:   Mon, 21 Mar 2022 11:19:04 +0100
-Message-Id: <20220321101904.387640-10-nrb@linux.ibm.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20220321101904.387640-1-nrb@linux.ibm.com>
-References: <20220321101904.387640-1-nrb@linux.ibm.com>
+        with ESMTP id S1346288AbiCUK0o (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Mar 2022 06:26:44 -0400
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CD10AD10D
+        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 03:25:19 -0700 (PDT)
+Received: by mail-il1-f198.google.com with SMTP id z15-20020a92d6cf000000b002c811796c23so1600357ilp.3
+        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 03:25:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=dfW60HFiHGAShL8WQ035qSGxvkVFI45Rn0aZ23BkU28=;
+        b=c4k5GUva3pxkZQN4qLJ+p7zL17dpqaG7S+qlm+2YnT9yM3nAWVxWGpoPN7Ra07vCVD
+         FfgYGtHr8N7Q79oUEuI91NjtEmvXT5zlqBvMynd2QMxgvTgnG8lJdz66rlgHjqQGb6ww
+         zw8PKRgCgXBvJmHkw9P6lDypbG1lhg17YzJLZxmJ7q9yrWiRetAYbKP7tdHgFrDKRI1p
+         AOExk8Jqb0k7O2AKALb9fa7Z+MeepV73o0GoFez/r16VtolgNgs0f6UeaW5ImF02dZNW
+         oj3l9oyR0JLM6J6xYr075yCyvjxdLvjVrIYNuiVHhyLyaZljlsGiDHJt1YaYatW55mLS
+         RsbA==
+X-Gm-Message-State: AOAM53315fIn0a4eIgKvlmq7HpYqJUcQ1VKpGCuPNND1M70ZuX//UNsl
+        9Xi0FMjybsUGxdmtLuKW3UEEebZvCPVgpW8yuSIbG4+RFeKR
+X-Google-Smtp-Source: ABdhPJzTTfOJKl5sHEqG/aH+fRC99gL8AQSHgsFCfD+Y3/oMzeqUJ5gW/d/Cnhwf0JiDWw7bg0Os01JLLPMauK0QHoCaDBrPR/j2
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Oh9hi1Fos_GJSgRcd_8ogjMvAOCs7Mxx
-X-Proofpoint-ORIG-GUID: oWQ0L9xq_X1hgYSZGx-ehmfjktzwSxrm
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-03-21_04,2022-03-21_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- lowpriorityscore=0 mlxscore=0 malwarescore=0 phishscore=0 mlxlogscore=999
- bulkscore=0 adultscore=0 clxscore=1015 spamscore=0 suspectscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2203210066
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+X-Received: by 2002:a5d:8796:0:b0:645:bd36:3833 with SMTP id
+ f22-20020a5d8796000000b00645bd363833mr9579909ion.158.1647858318498; Mon, 21
+ Mar 2022 03:25:18 -0700 (PDT)
+Date:   Mon, 21 Mar 2022 03:25:18 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000b6df0f05dab7e92c@google.com>
+Subject: [syzbot] WARNING in kvm_mmu_notifier_invalidate_range_start (2)
+From:   syzbot <syzbot+6bde52d89cfdf9f61425@syzkaller.appspotmail.com>
+To:     agordeev@linux.ibm.com, aleksandar.qemu.devel@gmail.com,
+        alexandru.elisei@arm.com, benh@kernel.crashing.org,
+        borntraeger@linux.ibm.com, bp@alien8.de, catalin.marinas@arm.com,
+        chenhuacai@kernel.org, dave.hansen@linux.intel.com,
+        david@redhat.com, dja@axtens.net, frankja@linux.ibm.com,
+        gor@linux.ibm.com, hca@linux.ibm.com, hpa@zytor.com,
+        imbrenda@linux.ibm.com, james.morse@arm.com, jmattson@google.com,
+        joro@8bytes.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-mips@vger.kernel.org, linux-s390@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, lukas.bulwahn@gmail.com,
+        maciej.szmigiero@oracle.com, maz@kernel.org, mingo@redhat.com,
+        mpe@ellerman.id.au, paulus@samba.org, pbonzini@redhat.com,
+        seanjc@google.com, suzuki.poulose@arm.com,
+        syzkaller-bugs@googlegroups.com, tglx@linutronix.de,
+        tsbogend@alpha.franken.de, vkuznets@redhat.com,
+        wanpengli@tencent.com, will@kernel.org, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
+        SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -90,79 +67,85 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We previously only checked for two zero bits, one in r0 and one in r1.
-Let's check all the bits which must be zero and which are ignored
-to extend the coverage.
+Hello,
 
-Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+syzbot found the following issue on:
+
+HEAD commit:    56e337f2cf13 Revert "gpio: Revert regression in sysfs-gpio..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=13821b8d700000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=d35f9bc6884af6c9
+dashboard link: https://syzkaller.appspot.com/bug?extid=6bde52d89cfdf9f61425
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12a2d0a9700000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13d34fd9700000
+
+The issue was bisected to:
+
+commit ed922739c9199bf515a3e7fec3e319ce1edeef2a
+Author: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+Date:   Mon Dec 6 19:54:28 2021 +0000
+
+    KVM: Use interval tree to do fast hva lookup in memslots
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=142aa59d700000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=162aa59d700000
+console output: https://syzkaller.appspot.com/x/log.txt?x=122aa59d700000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+6bde52d89cfdf9f61425@syzkaller.appspotmail.com
+Fixes: ed922739c919 ("KVM: Use interval tree to do fast hva lookup in memslots")
+
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 3599 at arch/x86/kvm/../../../virt/kvm/kvm_main.c:529 __kvm_handle_hva_range arch/x86/kvm/../../../virt/kvm/kvm_main.c:529 [inline]
+WARNING: CPU: 0 PID: 3599 at arch/x86/kvm/../../../virt/kvm/kvm_main.c:529 kvm_mmu_notifier_invalidate_range_start+0x97a/0xb20 arch/x86/kvm/../../../virt/kvm/kvm_main.c:714
+Modules linked in:
+CPU: 0 PID: 3599 Comm: syz-executor221 Not tainted 5.17.0-rc8-syzkaller-00003-g56e337f2cf13 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+RIP: 0010:__kvm_handle_hva_range arch/x86/kvm/../../../virt/kvm/kvm_main.c:529 [inline]
+RIP: 0010:kvm_mmu_notifier_invalidate_range_start+0x97a/0xb20 arch/x86/kvm/../../../virt/kvm/kvm_main.c:714
+Code: 00 48 c7 c2 60 0c a2 89 be b9 01 00 00 48 c7 c7 c0 10 a2 89 c6 05 ed 71 76 0c 01 e8 79 84 ff 07 e9 73 ff ff ff e8 b6 cd 6f 00 <0f> 0b e9 88 fc ff ff e8 aa cd 6f 00 0f 0b e9 58 fc ff ff e8 9e cd
+RSP: 0018:ffffc90001caf948 EFLAGS: 00010293
+RAX: 0000000000000000 RBX: 000000002000d000 RCX: 0000000000000000
+RDX: ffff888020d83a00 RSI: ffffffff8108f27a RDI: 0000000000000003
+RBP: ffffc90002b76290 R08: 000000002000d000 R09: ffffc90002b762e3
+R10: ffffffff8108eb1c R11: 0000000000000001 R12: ffffc90002b7f240
+R13: ffffc90002b75000 R14: ffffc90001cafc18 R15: 000000002000d000
+FS:  0000555555a55300(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000020000088 CR3: 0000000074ce9000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ mn_hlist_invalidate_range_start mm/mmu_notifier.c:493 [inline]
+ __mmu_notifier_invalidate_range_start+0x2ff/0x800 mm/mmu_notifier.c:548
+ mmu_notifier_invalidate_range_start include/linux/mmu_notifier.h:459 [inline]
+ move_page_tables+0x2642/0x2d20 mm/mremap.c:498
+ move_vma+0x48c/0xf40 mm/mremap.c:629
+ mremap_to mm/mremap.c:862 [inline]
+ __do_sys_mremap+0xf01/0x1560 mm/mremap.c:972
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x7f11faab5089
+Code: 28 c3 e8 2a 14 00 00 66 2e 0f 1f 84 00 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffc17608428 EFLAGS: 00000246 ORIG_RAX: 0000000000000019
+RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f11faab5089
+RDX: 0000000000001000 RSI: fffffffffffffe74 RDI: 000000002000d000
+RBP: 00007f11faa79070 R08: 0000000020007000 R09: 0000000000000000
+R10: 0000000000000003 R11: 0000000000000246 R12: 00007f11faa79100
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+ </TASK>
+
+
 ---
- s390x/stsi.c | 42 ++++++++++++++++++++++++++++++++----------
- 1 file changed, 32 insertions(+), 10 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/s390x/stsi.c b/s390x/stsi.c
-index dccc53e7a816..94a579dc3b58 100644
---- a/s390x/stsi.c
-+++ b/s390x/stsi.c
-@@ -9,6 +9,7 @@
-  */
- 
- #include <libcflat.h>
-+#include <bitops.h>
- #include <asm/page.h>
- #include <asm/asm-offsets.h>
- #include <asm/interrupt.h>
-@@ -19,19 +20,40 @@ static uint8_t pagebuf[PAGE_SIZE * 2] __attribute__((aligned(PAGE_SIZE * 2)));
- 
- static void test_specs(void)
- {
-+	int i;
-+	int cc;
-+
- 	report_prefix_push("specification");
- 
--	report_prefix_push("inv r0");
--	expect_pgm_int();
--	stsi(pagebuf, 0, 1 << 8, 0);
--	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
--	report_prefix_pop();
-+	for (i = 36; i <= 55; i++) {
-+		report_prefix_pushf("set invalid r0 bit %d", i);
-+		expect_pgm_int();
-+		stsi(pagebuf, 0, BIT(63 - i), 0);
-+		check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
-+		report_prefix_pop();
-+	}
- 
--	report_prefix_push("inv r1");
--	expect_pgm_int();
--	stsi(pagebuf, 1, 0, 1 << 16);
--	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
--	report_prefix_pop();
-+	for (i = 32; i <= 47; i++) {
-+		report_prefix_pushf("set invalid r1 bit %d", i);
-+		expect_pgm_int();
-+		stsi(pagebuf, 1, 0, BIT(63 - i));
-+		check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
-+		report_prefix_pop();
-+	}
-+
-+	for (i = 0; i < 32; i++) {
-+		report_prefix_pushf("r0 bit %d ignored", i);
-+		cc = stsi(pagebuf, 3, 2 | BIT(63 - i), 2);
-+		report(!cc, "CC = 0");
-+		report_prefix_pop();
-+	}
-+
-+	for (i = 0; i < 32; i++) {
-+		report_prefix_pushf("r1 bit %d ignored", i);
-+		cc = stsi(pagebuf, 3, 2, 2 | BIT(63 - i));
-+		report(!cc, "CC = 0");
-+		report_prefix_pop();
-+	}
- 
- 	report_prefix_push("unaligned");
- 	expect_pgm_int();
--- 
-2.31.1
-
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+syzbot can test patches for this issue, for details see:
+https://goo.gl/tpsmEJ#testing-patches
