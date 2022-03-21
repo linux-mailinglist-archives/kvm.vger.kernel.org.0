@@ -2,222 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E4A04E30DE
-	for <lists+kvm@lfdr.de>; Mon, 21 Mar 2022 20:43:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BD42C4E30E4
+	for <lists+kvm@lfdr.de>; Mon, 21 Mar 2022 20:46:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345508AbiCUTpK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Mar 2022 15:45:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37860 "EHLO
+        id S1352817AbiCUTqw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Mar 2022 15:46:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344392AbiCUTpJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Mar 2022 15:45:09 -0400
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E369772E10
-        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 12:43:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=NaWk3NGevyS5dd+cePIAMwSEayz7JRXrqp+sHwA431Y=; b=jAZB860fOXMDZ+QQsD34DLzuVI
-        YGRSTtFZ10gIkaTCm6sE+QoOsq+L5z3Aupa3ZcujVjxzqn4RfnHEF34Aki+W6+75rO7GJI3Yl/eD/
-        KphAjy7ViTslLXYIdSPVN+7EuLD94pLcoBD0ZE1kzlW9yVSGphalI0mixuZMsSrxhjSLiDzEjmKiI
-        TNN/RZOGe72CMBMU+Dz8LsrVbFMu7+KRpGb2vj4ZTRMHlUk3NxsJZRczVvR6bzrLeyzIwWnbXAI9X
-        nT0kElukJzBOmEbfO+Ia8bg/mkjKmAPDHSLSJUu1KA7yJq/CiT0BjafxzCwDf01hqpfjGprbmoFIE
-        Zxce/ybw==;
-Received: from [2001:8b0:10b:1:4a2a:e3ff:fe14:8625] (helo=u3832b3a9db3152.ant.amazon.com)
-        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nWNw4-003Dgl-8D; Mon, 21 Mar 2022 19:43:24 +0000
-Message-ID: <42cde62812d47489a4017c8cc2ca1397e1ad1d66.camel@infradead.org>
-Subject: Re: [PATCH] Documentation: KVM: Describe guest TSC scaling in
- migration algorithm
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Oliver Upton <oupton@google.com>, "Franke, Daniel" <dff@amazon.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Date:   Mon, 21 Mar 2022 19:43:21 +0000
-In-Reply-To: <YjfI/Sl3lFEFOIWc@google.com>
-References: <YjTRyssYQhbxeNHA@google.com>
-         <0bff64ae-0420-2f69-10ba-78b9c5ac7b81@redhat.com>
-         <YjWNfQThS4URRMZC@google.com>
-         <e48bc11a5c4b0864616686cb1365dfb4c11b5b61.camel@infradead.org>
-         <a6011bed-79b4-72ab-843c-315bf3fcf51e@redhat.com>
-         <3548e754-28ae-f6c4-5d4c-c316ae6fbbb0@redhat.com>
-         <100b54469a8d59976bbd96f50dd4cd33.squirrel@twosheds.infradead.org>
-         <9ca10e3a-cd99-714a-76ad-6f1b83bb0abf@redhat.com>
-         <YjbrOz+yT4R7FaX1@google.com>
-         <1680281fee4384d27bd97dba117f391a.squirrel@twosheds.infradead.org>
-         <YjfI/Sl3lFEFOIWc@google.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-n1BoGn9keVAeoGgQmVuR"
-User-Agent: Evolution 3.36.5-0ubuntu1 
+        with ESMTP id S1351077AbiCUTqv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Mar 2022 15:46:51 -0400
+Received: from mail-oi1-x233.google.com (mail-oi1-x233.google.com [IPv6:2607:f8b0:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C655874627
+        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 12:45:24 -0700 (PDT)
+Received: by mail-oi1-x233.google.com with SMTP id q129so15374591oif.4
+        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 12:45:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=c6hvIp8pXUul8MkAQabiAJVZoLIOX+w0hp2vYhnD0VY=;
+        b=Bi05ptWWCkEbMqWa/GgMTXmQ0l8nUFiBK+PQAd2R3cK5s0ZoFzi4Zplo6KR1OEEn1l
+         UgHmzcQx2Kl2uXlsbwjHYyIhClBptTsSJ+kbaoWcnB2cj4MOCHWkkDOz3KVpik7LQM5E
+         D7XKw9DMh8n3pbzR1HWCj0FdsRb8egX7GPlrZyITn3EuOMc340R29fNl+oFYSe75DQEB
+         MbcvbKBZ7i/lVUg8ckWvGbp8ypRCqFA41KqPzO8YwTnAypN8IN+tZVUxJLLLGDpGwdSb
+         F6VOeS+QyhDGjW2CKTjkJQXih4PJGzVx7+FheHc5V42MfwM4AuxAGHj+VZWkn7o/IU8U
+         XuHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=c6hvIp8pXUul8MkAQabiAJVZoLIOX+w0hp2vYhnD0VY=;
+        b=kU4kiaKDmyH0xyOHfrMjRvOaGBTdvJyTUay1GwJhwPyUMGjG6iwLBgDK0Mua7Xhl8w
+         7pmszZYbMIO8WzCvSotwnqco8DEspumqB23BKcEEIfchnpElqhOfhP7DwVizp0GTaqAW
+         etFJFmiPJ0kBtCPAa2IfNlb84m5b35Jphy8s+CX3TQ4TcftSiDCjBVva/DPX99PjLHIQ
+         gQqHUZPMeXwMusatO3kbF5w+1UpuoWA4BgiNV90+WD84q91qldFohSMlhqtNrM6dz2nj
+         y25CqTjTYZ+RkqHsrcLzEbMPmXLvQmXRYLoadjgi+GwRmBAqTiWyG0kKoktQulN6yak2
+         KQVw==
+X-Gm-Message-State: AOAM530qoUEo3+oTnZRPPp/mmkeTAEo/Ju1b8bfRHkloPnFCpXwf2Gke
+        40vQ5AnQq4P9FEDVDN49Pnv49oBGeODDfoU+l/OL/g==
+X-Google-Smtp-Source: ABdhPJxCnw6snm/lyG9Cg9XjtSD7+KuAcQaSBkeGoIOCxcBUkRCVrdPKiHTftbvO+UZOYtWavYKgw/2Lx4GI6pnWVRE=
+X-Received: by 2002:a05:6808:1592:b0:2d9:fd1a:1a69 with SMTP id
+ t18-20020a056808159200b002d9fd1a1a69mr409841oiw.110.1647891923912; Mon, 21
+ Mar 2022 12:45:23 -0700 (PDT)
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+References: <20220321150214.1895231-1-pgonda@google.com> <CAA03e5HEKPxfGZ57r=intg_ogTp_JPAio36QJXqviMZM_KmvEg@mail.gmail.com>
+ <CAMkAt6qbauEn1jGUYLQc6QURhCHLu7eDmzJhfHZZXN9FGbQOMA@mail.gmail.com>
+In-Reply-To: <CAMkAt6qbauEn1jGUYLQc6QURhCHLu7eDmzJhfHZZXN9FGbQOMA@mail.gmail.com>
+From:   Marc Orr <marcorr@google.com>
+Date:   Mon, 21 Mar 2022 12:45:13 -0700
+Message-ID: <CAA03e5GDyM1O6aEYcpUnTY4JLBvOqQugWzpXefD9YGEkSuALVA@mail.gmail.com>
+Subject: Re: [PATCH] Add KVM_EXIT_SHUTDOWN metadata for SEV-ES
+To:     Peter Gonda <pgonda@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>, Borislav Petkov <bp@alien8.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Joerg Roedel <jroedel@suse.de>,
+        Sean Christopherson <seanjc@google.com>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Mar 21, 2022 at 11:08 AM Peter Gonda <pgonda@google.com> wrote:
+>
+> > > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> > > index 75fa6dd268f0..5f9d37dd3f6f 100644
+> > > --- a/arch/x86/kvm/svm/sev.c
+> > > +++ b/arch/x86/kvm/svm/sev.c
+> > > @@ -2735,8 +2735,13 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
+> > >                 pr_info("SEV-ES guest requested termination: %#llx:%#llx\n",
+> > >                         reason_set, reason_code);
+> > >
+> > > -               ret = -EINVAL;
+> > > -               break;
+> > > +               vcpu->run->exit_reason = KVM_EXIT_SHUTDOWN;
+> > > +               vcpu->run->shutdown.reason = KVM_SHUTDOWN_SEV_TERM;
+> > > +               vcpu->run->shutdown.ndata = 2;
+> > > +               vcpu->run->shutdown.data[0] = reason_set;
+> > > +               vcpu->run->shutdown.data[1] = reason_code;
+> > > +
+> > > +               return 0;
+> >
+> > Maybe I'm missing something, but don't we want to keep returning an error?
+> >
+> > rationale: Current behavior: return -EINVAL to userpsace, but
+> > userpsace cannot infer where the -EINVAL came from. After this patch:
+> > We should still return -EINVAL to userspace, but now userspace can
+> > parse this new info in the KVM run struct to properly terminate.
+> >
+>
+> I removed the error return code here since an SEV guest may request a
+> termination due to no fault of the host at all. This is now inline
+> with any other shutdown requested by the guest. I don't have a strong
+> preference here but EINVAL doesn't seem correct in all cases, do
+> others have any thoughts on this?
 
---=-n1BoGn9keVAeoGgQmVuR
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, 2022-03-21 at 00:38 +0000, Oliver Upton wrote:
-> On Sun, Mar 20, 2022 at 09:46:35AM -0000, David Woodhouse wrote:
-> > But coincidentally since then I have started having conversations with
-> > people who really want the guest to have an immediate knowledge of the
-> > adjtimex maxerror etc. on the new host immediately after the migration.
-> > Maybe the "if the migration isn't fast enough then let the guest know i=
-t's
-> > now unsynced" is OK, but I'll need to work out what "immediately" means
-> > when we have a guest userspace component involved in it.
->=20
-> This has also been an area of interest to me. I think we've all seen the
-> many ways in which doing migrations behind the guest's can put software
-> in an extremely undesirable state on the other end. If those
-> conversations are taking place on the mailing lists, could you please CC
-> me?
->=20
-> Our (Google) TSC adjustment clamping and userspace notification mechanism
-> was a halfway kludge to keep things happy on the other end. And it
-> generally has worked well, but misses a fundamental point.
->=20
-> The hypervisor should tell the guest kernel about time travel and let it
-> cascade that information throughout the guest system. Regardless of what
-> we do to the TSC, we invariably destroy one of the two guest clocks along
-> the way. If we told the guest "you time traveled X seconds", it could
-> fold that into its own idea of real time. Guest kernel can then fire off
-> events to inform software that wants to keep up with clock changes, and
-> even a new event to let NTP know its probably running on different
-> hardware.
->=20
-> Time sucks :-)
-
-So, we already have PVCLOCK_GUEST_STOPPED which tells the guest that
-its clock may have experienced a jump. Linux guests will use this to
-kick various watchdogs to prevent them whining. Shouldn't we *also* be
-driving the NTP reset from that same signal?
-
---=-n1BoGn9keVAeoGgQmVuR
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIwMzIxMTk0MzIxWjAvBgkqhkiG9w0BCQQxIgQg9AnijD52
-XNGAGFkkGmrphNKxmWSdGVC8SJECnduKHD4wgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBZeQM66iqV0IHFgaHd74eGJ5g8rS/0ITbH
-/jeG2bDrn3IweIyIXY1C302jkS2LbDgD0HuwYV/XJ+2A8iOXkzdKgTRcR+wo3Fhw8eUawb0DgGZY
-p2zffo+ka9NYjMha3tx22YE7JlKDsVj57Ctmt7caLXyE0FbrLhusdxu7BPyFNvgqgV8R/yivlALF
-NIznC1FJHMhHROh3GLe5y83Be8kvaYBVXqYnl8Pkk9czL2N1lvbRNZGMY9oTcpGSgCz1SerarmHt
-n4P18nNSkR/DnfZxVHEZ0HIukGtsbvmZPdc9BitK8j7Xd+GQglkY3w6151HjbpbxVKdsgTmIpXB5
-FMTl8RoZo6WsbV7g9z70mkwWXXWTp1JHO32/hHdExjtpX/RvUOD8Tx7mqZBwrx8Xsa0YdMfSu+MR
-wPZD7epoQawKwLEXPIjoviyh/ZLupV3H9cMNtlv0Q4LJ2AZHICbr32ev/UEHCYQljvqa1Tuho9mA
-y0L7TRWuyi4LphFVAsMsAqF0ml0K+g97bIe3vD8mKh3e3r+l2jLYRniLQ53EasoNKfNG2F7u8g29
-hrExWHfT+CSQnfLrymasZHqU47hi90otAiJOQqSmbTH+nhQa3B83JXhZxwE0ELfwAeOVrtjfw6Us
-v2ft+d7FXg14985ra+Jm3J8FhCcdd9Gn89qkLIXHRwAAAAAAAA==
-
-
---=-n1BoGn9keVAeoGgQmVuR--
-
+Makes sense. Yeah, let's see if others have an opinion. Otherwise, I'm
+fine either way. Now that you mention it, returning an error to
+userspace when the guest triggered the self-termination, and could've
+done so for reasons outside the host's control, is a little odd. But
+at the same time, it's just as likely that the guest is
+self-terminating due to a host-side error. So I guess it's not clear
+whether returning an error here is "right" or "wrong".
