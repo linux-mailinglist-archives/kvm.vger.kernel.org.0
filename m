@@ -2,209 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A0D564E1EBD
-	for <lists+kvm@lfdr.de>; Mon, 21 Mar 2022 02:33:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D06A34E1F2B
+	for <lists+kvm@lfdr.de>; Mon, 21 Mar 2022 03:56:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344000AbiCUBeu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 20 Mar 2022 21:34:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48366 "EHLO
+        id S1344246AbiCUC5W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 20 Mar 2022 22:57:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44120 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343991AbiCUBet (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 20 Mar 2022 21:34:49 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26F512AE8
-        for <kvm@vger.kernel.org>; Sun, 20 Mar 2022 18:33:24 -0700 (PDT)
-Received: from kwepemi100018.china.huawei.com (unknown [172.30.72.57])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4KMHF82P2Tzcb68;
-        Mon, 21 Mar 2022 09:33:16 +0800 (CST)
-Received: from kwepemm600020.china.huawei.com (7.193.23.147) by
- kwepemi100018.china.huawei.com (7.221.188.35) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Mon, 21 Mar 2022 09:33:21 +0800
-Received: from [10.174.187.192] (10.174.187.192) by
- kwepemm600020.china.huawei.com (7.193.23.147) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Mon, 21 Mar 2022 09:33:21 +0800
-Subject: Re: Report an error on GICv4.1 vcpu de-schedule
-To:     Marc Zyngier <maz@kernel.org>
-CC:     <linux-arm-kernel@lists.infradead.org>,
-        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
-        "wanghaibin.wang@huawei.com" <wanghaibin.wang@huawei.com>,
-        "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-        <Martin.Weidmann@arm.com>, <tangnianyao@huawei.com>,
-        <chengjian8@huawei.com>
-References: <4aae10ba-b39a-5f84-754b-69c2eb0a2c03@huawei.com>
- <87v8wcyjbn.wl-maz@kernel.org>
-From:   Jingyi Wang <wangjingyi11@huawei.com>
-Message-ID: <115f1c12-cde7-faa4-59bb-33ba12cb5a37@huawei.com>
-Date:   Mon, 21 Mar 2022 09:33:19 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        with ESMTP id S1344238AbiCUC5V (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 20 Mar 2022 22:57:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C089759A41
+        for <kvm@vger.kernel.org>; Sun, 20 Mar 2022 19:55:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1647831356;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=NO2jMNKPbBxPcOjWsAxlUEBqWe3bFA7aWl8mJ0qi/hQ=;
+        b=XDCpPIBkkLeSMiLhRaC/kCeoPFNEB1pPyw/I6xPdylSfV7bQ5TRIGMXLSrlivXCTCDsgHD
+        l5nLeu+RJPnUXiuPv9YiLNGQUYX6TjkOOHyaOJUrmFhpvQfZIM4w/950Gsj3BYIvsfaXQI
+        VGyLVGfcDrjJ8OV0FBcy06xYoG/1a3I=
+Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
+ [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-491-22AwWbXdPqaMRZcL1Mr6iA-1; Sun, 20 Mar 2022 22:55:55 -0400
+X-MC-Unique: 22AwWbXdPqaMRZcL1Mr6iA-1
+Received: by mail-lf1-f71.google.com with SMTP id x26-20020a056512131a00b00448708fa822so3411329lfu.6
+        for <kvm@vger.kernel.org>; Sun, 20 Mar 2022 19:55:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=NO2jMNKPbBxPcOjWsAxlUEBqWe3bFA7aWl8mJ0qi/hQ=;
+        b=5ohBNBdK/1DHiH8zMB2S+YaljZLx9zKywbg8HbmIvGVtQW7Bc+tMAuVbD1Tns2Y1MM
+         WEAgSqNd3waSiYGyBCSg3UzmddTEta3FhJ2IhXcKEPE0STvqqiueZR38WdXtTWLnb/g5
+         GU47jJOC5jEF7NwNA9iedWvOxFR/3McZjEqmzJ3FoEbV3mJxaDzHukoHjAdLsZ5nJ8pm
+         fpl8riNPDWnBO5CYXw+EQ/17V5L/LT8heBXYPX8/RiAtryxMEmXnDWF3BE28KRuJRp1v
+         sB9YbEHDkbJiHU31Ohc8EZle10Y0IpHK8IfrxUYUqakSmEwC2GwkO6jXO4O6ZWmZgL/G
+         ldPA==
+X-Gm-Message-State: AOAM5317cV8alyzmG9uBsq9zrIDKZicX+FNtuN9NcWajri7fMWoJZp74
+        11swulePxbT2Tz19jgudY6Fmqcm562kVSrW3erK3HTlS7nOQ0sLNZ3cbu904600BUs/OL1omJJc
+        AMamOpysmr3R2NKn7ZAXstOBOlxr3
+X-Received: by 2002:a2e:824e:0:b0:249:7e3d:c862 with SMTP id j14-20020a2e824e000000b002497e3dc862mr4913446ljh.97.1647831354089;
+        Sun, 20 Mar 2022 19:55:54 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyn4DYJfL7k43PA+Q+9rNfsf0PxiZcBUxbi0IZnQ1UxD/sDF7hmUd0d6p8+yDx5iXE6+RNwYtqAi0iA6OLkqTs=
+X-Received: by 2002:a2e:824e:0:b0:249:7e3d:c862 with SMTP id
+ j14-20020a2e824e000000b002497e3dc862mr4913431ljh.97.1647831353900; Sun, 20
+ Mar 2022 19:55:53 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87v8wcyjbn.wl-maz@kernel.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.187.192]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemm600020.china.huawei.com (7.193.23.147)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+References: <20220320074449.4909-1-mail@anirudhrb.com>
+In-Reply-To: <20220320074449.4909-1-mail@anirudhrb.com>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Mon, 21 Mar 2022 10:55:42 +0800
+Message-ID: <CACGkMEtRrmXP-xjggRRSeoJT=9JTAXktPnZdvK-KYbKr4Zxc8g@mail.gmail.com>
+Subject: Re: [PATCH v2] vhost: handle error while adding split ranges to iotlb
+To:     Anirudh Rayabharam <mail@anirudhrb.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        kvm <kvm@vger.kernel.org>,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        netdev <netdev@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-3.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+On Sun, Mar 20, 2022 at 3:45 PM Anirudh Rayabharam <mail@anirudhrb.com> wrote:
+>
+> vhost_iotlb_add_range_ctx() handles the range [0, ULONG_MAX] by
+> splitting it into two ranges and adding them separately. The return
+> value of adding the first range to the iotlb is currently ignored.
+> Check the return value and bail out in case of an error.
+>
+> Fixes: e2ae38cf3d91 ("vhost: fix hung thread due to erroneous iotlb entries")
+> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+> Signed-off-by: Anirudh Rayabharam <mail@anirudhrb.com>
 
-On 3/17/2022 6:17 PM, Marc Zyngier wrote:
-> Hi Jingyi,
-> 
-> On Thu, 17 Mar 2022 07:27:45 +0000,
-> Jingyi Wang <wangjingyi11@huawei.com> wrote:
->>
->> Hi Marc，
->>
->> The patch "KVM: arm64: Delay the polling of the GICR_VPENDBASER.Dirty
->> bit"(57e3cebd022fbc035dcf190ac789fd2ffc747f5b) remove the polling of
->> GICR_VPENDBASER.Dirty bit in vcpu_load() , while check the VPT parsing
->> ready in kvm_vgic_flush_hwstate() for better performance.
->>
->> Most time it works, but we have met an error on our hardware recently.
->> In preemptable kernel, the vcpu can be preempted between vcpu_load and
->> kvm_vgic_flush_hwstate. As a result, it get de-scheduled and
->> its_clear_vpend_valid() is called
->>
->> 	val = gicr_read_vpendbaser(vlpi_base + GICR_VPENDBASER);
->> 	val &= ~GICR_VPENDBASER_Valid;
->> 	val &= ~clr;
->> 	val |= set;
->> 	gicr_write_vpendbaser(val, vlpi_base + GICR_VPENDBASER);
->>
->>
->> The function clears Valid bit meanwhile GICR_VPENDBASER_Dirty
->> maybe still 1, which cause the subsequent GICR_VPENDBASER_Dirty polling
->> fail and report ""ITS virtual pending table not cleaning".
->>
->> We have communicated with Martin from ARM and get the conclusion
->> that we should not change valid bit while the dirty bit not clear——
->> "The dirty bit reports whether the last schedule /de-schedule
->> operation has completed.The restriction on not changing Valid when Dirty
->> is 1, is so that hardware can always complete the last operation for
->> starting the next".
-> 
-> Indeed, the spec is crystal clear about that, and clearing Valid while
-> Dirty is set is plain wrong.
-> 
->>
->> I think maybe we can check dirty bit clear before clearing the valid bit
->> in its_clear_vpend_valid() code. Hope to know your opinion about this
->> issue.
-> 
-> Yes, that's what should happen. I came up with the patch below. Please
-> give it a shot and let me know if that helps. If it does, I'll queue
-> it as a fix.
-> 
-> Thanks,
-> 
-> 	M.
-> 
->>From c23ccc9cfa603e30ac189d43af75f03b60d780bc Mon Sep 17 00:00:00 2001
-> From: Marc Zyngier <maz@kernel.org>
-> Date: Thu, 17 Mar 2022 09:49:02 +0000
-> Subject: [PATCH] irqchip/gic-v4: Wait for GICR_VPENDBASER.Dirty to clear
->   before descheduling
-> 
-> The way KVM drives GICv4.{0,1} is as follows:
-> - vcpu_load() makes the VPE resident, instructing the RD to start
->    scanning for interrupts
-> - just before entering the guest, we check that the RD has finished
->    scanning and that we can start running the vcpu
-> - on preemption, we deschedule the VPE by making it invalid on
->    the RD
-> 
-> However, we are preemptible between the first two steps. If it so
-> happens *and* that the RD was still scanning, we nonetheless write
-> to the GICR_VPENDBASER register while Dirty is set, and bad things
-> happen (we're in UNPRED land).
-> 
-> This affects both the 4.0 and 4.1 implementations.
-> 
-> Make sure Dirty is cleared before performing the deschedule,
-> meaning that its_clear_vpend_valid() becomes a sort of full VPE
-> residency barrier.
-> 
-> Reported-by: Jingyi Wang <wangjingyi11@huawei.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Fixes: 57e3cebd022f ("KVM: arm64: Delay the polling of the GICR_VPENDBASER.Dirty
-> bit")
-> Link: https://lore.kernel.org/r/4aae10ba-b39a-5f84-754b-69c2eb0a2c03@huawei.com
+Acked-by: Jason Wang <jasowang@redhat.com>
+
 > ---
->   drivers/irqchip/irq-gic-v3-its.c | 28 +++++++++++++++++++---------
->   1 file changed, 19 insertions(+), 9 deletions(-)
-> 
-> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-> index 9e93ff2b6375..c9b1df980899 100644
-> --- a/drivers/irqchip/irq-gic-v3-its.c
-> +++ b/drivers/irqchip/irq-gic-v3-its.c
-> @@ -3011,18 +3011,12 @@ static int __init allocate_lpi_tables(void)
->   	return 0;
->   }
->   
-> -static u64 its_clear_vpend_valid(void __iomem *vlpi_base, u64 clr, u64 set)
-> +static u64 read_vpend_dirty_clear(void __iomem *vlpi_base)
->   {
->   	u32 count = 1000000;	/* 1s! */
->   	bool clean;
->   	u64 val;
->   
-> -	val = gicr_read_vpendbaser(vlpi_base + GICR_VPENDBASER);
-> -	val &= ~GICR_VPENDBASER_Valid;
-> -	val &= ~clr;
-> -	val |= set;
-> -	gicr_write_vpendbaser(val, vlpi_base + GICR_VPENDBASER);
-> -
->   	do {
->   		val = gicr_read_vpendbaser(vlpi_base + GICR_VPENDBASER);
->   		clean = !(val & GICR_VPENDBASER_Dirty);
-> @@ -3033,10 +3027,26 @@ static u64 its_clear_vpend_valid(void __iomem *vlpi_base, u64 clr, u64 set)
->   		}
->   	} while (!clean && count);
->   
-> -	if (unlikely(val & GICR_VPENDBASER_Dirty)) {
-> +	if (unlikely(!clean))
->   		pr_err_ratelimited("ITS virtual pending table not cleaning\n");
+>
+> v2:
+> - Add "Fixes:" tag and "Reviewed-by:".
+>
+> v1:
+> https://lore.kernel.org/kvm/20220312141121.4981-1-mail@anirudhrb.com/
+>
+> ---
+>  drivers/vhost/iotlb.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/vhost/iotlb.c b/drivers/vhost/iotlb.c
+> index 40b098320b2a..5829cf2d0552 100644
+> --- a/drivers/vhost/iotlb.c
+> +++ b/drivers/vhost/iotlb.c
+> @@ -62,8 +62,12 @@ int vhost_iotlb_add_range_ctx(struct vhost_iotlb *iotlb,
+>          */
+>         if (start == 0 && last == ULONG_MAX) {
+>                 u64 mid = last / 2;
+> +               int err = vhost_iotlb_add_range_ctx(iotlb, start, mid, addr,
+> +                               perm, opaque);
 > +
-> +	return val;
-> +}
-> +
-> +static u64 its_clear_vpend_valid(void __iomem *vlpi_base, u64 clr, u64 set)
-> +{
-> +	u64 val;
-> +
-> +	/* Make sure we wait until the RD is done with the initial scan */
-> +	val = read_vpend_dirty_clear(vlpi_base);
-> +	val &= ~GICR_VPENDBASER_Valid;
-> +	val &= ~clr;
-> +	val |= set;
-> +	gicr_write_vpendbaser(val, vlpi_base + GICR_VPENDBASER);
-> +
-> +	val = read_vpend_dirty_clear(vlpi_base);
-> +	if (unlikely(val & GICR_VPENDBASER_Dirty))
->   		val |= GICR_VPENDBASER_PendingLast;
-> -	}
->   
->   	return val;
->   }
-> 
+> +               if (err)
+> +                       return err;
+>
+> -               vhost_iotlb_add_range_ctx(iotlb, start, mid, addr, perm, opaque);
+>                 addr += mid + 1;
+>                 start = mid + 1;
+>         }
+> --
+> 2.35.1
+>
 
-
-This patch works fine on the hardware.
-Tested-by:Nianyao Tang <tangnianyao@huawei.com>
-
-Thanks,
-Jingyi
