@@ -2,138 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6AF054E3379
-	for <lists+kvm@lfdr.de>; Mon, 21 Mar 2022 23:56:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D32924E3355
+	for <lists+kvm@lfdr.de>; Mon, 21 Mar 2022 23:56:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230064AbiCUWxr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Mar 2022 18:53:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44310 "EHLO
+        id S230166AbiCUWzA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Mar 2022 18:55:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45448 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230456AbiCUWwr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Mar 2022 18:52:47 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 981E83C7CC9
-        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 15:40:04 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id mr5-20020a17090b238500b001c67366ae93so704574pjb.4
-        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 15:40:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=2bnfXbBF+GtABV7TekdcS8ywNlhlzjjtfwzNNUAvbZU=;
-        b=YhQl6a0dmNzIoS/RJf/U72upVEm129lZRy+fpmrRDWlj2gC8kVoCCiHOd7F+Qn8w0c
-         t317CBAL13gk3J/sEwp3XNVf/QMVST0JJIol+7dwwF1CEWjK74P+QguUpCICkZAoIBJT
-         EOYh4d0IkyNf6lJu/IOZYQgr+37wq6EUoyZ75NtBpWWhz+mTD/NUX4YMJ0n8nrqx5zPM
-         ZQr5YS3raBcA4r9aFcrUzsRotxCj0PlJXgTbrbcoWEEL0+uqcIUtRAuoLmr7W6vo2imG
-         UNgCIYcWgt8dryUF/gRgqQkutzAg6kBVhU5vd/TSsCErCSuLD2q2kuGOjVB/sq0IfX+h
-         DLjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=2bnfXbBF+GtABV7TekdcS8ywNlhlzjjtfwzNNUAvbZU=;
-        b=VyuvqbPtZpgppnpwuM+Fbj1QqZYppuyuRGwHA+MuF3DDEj6juqnnVZ90avunIG8VSp
-         Iu5v9CFEd0+kTnSDTllbdeHhYiPgQ+J2Br5RFlbAhNZiCck7l9DRPCH8rDxQA0H2Gg/f
-         QiMKvUl4PIpSOQEiey8D9ADXTC1syWTsp++uMqRH26st60NuLDaih06NHkFEsl68i9no
-         K04/ahFBbHgG2QdLxs4Y6FkGczh/pGRxkMHqiey/Qxg1aBPXZaUI7FsbzrXP7EFanpHV
-         YjO1WCJUabC7VR2Z+pDEiy/nHGy0yxP1pQOmAhb1WQsDgsIjt1HKvofX/tgqQ99N/H8Z
-         MmOQ==
-X-Gm-Message-State: AOAM533Ik9wy8jZQLuyHkewzqi3y5qQAT50P9ZJHlimUMcNTGmDST07B
-        q9c+6u1GaOui+6ikeSVvQbONOlxleuQ=
-X-Google-Smtp-Source: ABdhPJziEg0hHHZvKpi0xSAoMLh2Nnte4eWxjp0cNaoW2ym1Y2QGelYCN+v4wvy9wRuu4urkFcdLnA==
-X-Received: by 2002:a17:903:22ca:b0:154:5625:e0 with SMTP id y10-20020a17090322ca00b00154562500e0mr7564482plg.15.1647900405473;
-        Mon, 21 Mar 2022 15:06:45 -0700 (PDT)
-Received: from localhost ([192.55.54.52])
-        by smtp.gmail.com with ESMTPSA id u126-20020a637984000000b0038147b4f53esm15129971pgc.93.2022.03.21.15.06.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Mar 2022 15:06:45 -0700 (PDT)
-Date:   Mon, 21 Mar 2022 15:06:43 -0700
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Philippe Mathieu-Daud??? <philippe.mathieu.daude@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Philippe Mathieu-Daud??? <f4bug@amsat.org>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        "Daniel P. Berrang???" <berrange@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Laszlo Ersek <lersek@redhat.com>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Eric Blake <eblake@redhat.com>, isaku.yamahata@intel.com,
-        kvm@vger.kernel.org, Connor Kuehl <ckuehl@redhat.com>,
-        seanjc@google.com, qemu-devel@nongnu.org, erdemaktas@google.com,
-        isaku.yamahata@gmail.com
-Subject: Re: [RFC PATCH v3 17/36] pflash_cfi01/tdx: Introduce ram_mode of
- pflash for TDVF
-Message-ID: <20220321220643.GA76113@ls.amr.corp.intel.com>
-References: <20220317135913.2166202-1-xiaoyao.li@intel.com>
- <20220317135913.2166202-18-xiaoyao.li@intel.com>
- <f418548e-c24c-1bc3-4e16-d7a775298a18@gmail.com>
- <7a8233e4-0cae-b05a-7931-695a7ee87fc9@intel.com>
+        with ESMTP id S230143AbiCUWye (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Mar 2022 18:54:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BDD5E3A6BE3
+        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 15:33:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1647901989;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=RMdmC49b3ZJ1Mqx/y/k2hlufZoUHk8hDl93lzACB4nw=;
+        b=OH2CjVlnfYwNhPsJkO8HgCiRedtAJz8zirhavQtP2hZH/TKFvsefWGvvmE02F8m5/9TAym
+        jTd774ag9o7Vs6PfOAGJ2Yath6CgHhvPJBvLxT8khBMyNoRirRXoAl1BWnrZ2Mf58SjNrO
+        gy3nHc03XwGg0QethseuDUiOLL93Dlc=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-671-wz3tO8UnOc2-hffHDtKRqg-1; Mon, 21 Mar 2022 18:11:28 -0400
+X-MC-Unique: wz3tO8UnOc2-hffHDtKRqg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 900543C14845;
+        Mon, 21 Mar 2022 22:11:27 +0000 (UTC)
+Received: from starship (unknown [10.40.194.231])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7F9902026D2D;
+        Mon, 21 Mar 2022 22:11:24 +0000 (UTC)
+Message-ID: <8071f0f0a857b0775f1fb2d1ebd86ffc4fd9096b.camel@redhat.com>
+Subject: Re: [PATCH v3 4/7] KVM: x86: nSVM: support PAUSE filter threshold
+ and count when cpu_pm=on
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Ingo Molnar <mingo@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
+        Wanpeng Li <wanpengli@tencent.com>
+Date:   Tue, 22 Mar 2022 00:11:23 +0200
+In-Reply-To: <CALMp9eSUSexhPWMWXE1HpSD+movaYcdge_J95LiLCnJyMEp3WA@mail.gmail.com>
+References: <20220301143650.143749-1-mlevitsk@redhat.com>
+         <20220301143650.143749-5-mlevitsk@redhat.com>
+         <CALMp9eRjY6sX0OEBeYw4RsQKSjKvXKWOqRe=GVoQnmjy6D8deg@mail.gmail.com>
+         <6a7f13d1-ed00-b4a6-c39b-dd8ba189d639@redhat.com>
+         <CALMp9eRRT6pi6tjZvsFbEhrgS+zsNg827iLD4Hvzsa4PeB6W-Q@mail.gmail.com>
+         <abe8584fa3691de1d6ae6c6617b8ea750b30fd1c.camel@redhat.com>
+         <CALMp9eSUSexhPWMWXE1HpSD+movaYcdge_J95LiLCnJyMEp3WA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <7a8233e4-0cae-b05a-7931-695a7ee87fc9@intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.4
+X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 21, 2022 at 04:54:51PM +0800,
-Xiaoyao Li <xiaoyao.li@intel.com> wrote:
-
-> On 3/18/2022 10:07 PM, Philippe Mathieu-Daudé wrote:
-> > Hi,
+On Mon, 2022-03-21 at 14:59 -0700, Jim Mattson wrote:
+> On Mon, Mar 21, 2022 at 2:36 PM Maxim Levitsky <mlevitsk@redhat.com> wrote:
+> > On Wed, 2022-03-09 at 11:07 -0800, Jim Mattson wrote:
+> > > On Wed, Mar 9, 2022 at 10:47 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+> > > > On 3/9/22 19:35, Jim Mattson wrote:
+> > > > > I didn't think pause filtering was virtualizable, since the value of
+> > > > > the internal counter isn't exposed on VM-exit.
+> > > > > 
+> > > > > On bare metal, for instance, assuming the hypervisor doesn't intercept
+> > > > > CPUID, the following code would quickly trigger a PAUSE #VMEXIT with
+> > > > > the filter count set to 2.
+> > > > > 
+> > > > > 1:
+> > > > > pause
+> > > > > cpuid
+> > > > > jmp 1
+> > > > > 
+> > > > > Since L0 intercepts CPUID, however, L2 will exit to L0 on each loop
+> > > > > iteration, and when L0 resumes L2, the internal counter will be set to
+> > > > > 2 again. L1 will never see a PAUSE #VMEXIT.
+> > > > > 
+> > > > > How do you handle this?
+> > > > > 
+> > > > 
+> > > > I would expect that the same would happen on an SMI or a host interrupt.
+> > > > 
+> > > >         1:
+> > > >         pause
+> > > >         outl al, 0xb2
+> > > >         jmp 1
+> > > > 
+> > > > In general a PAUSE vmexit will mostly benefit the VM that is pausing, so
+> > > > having a partial implementation would be better than disabling it
+> > > > altogether.
+> > > 
+> > > Indeed, the APM does say, "Certain events, including SMI, can cause
+> > > the internal count to be reloaded from the VMCB." However, expanding
+> > > that set of events so much that some pause loops will *never* trigger
+> > > a #VMEXIT seems problematic. If the hypervisor knew that the PAUSE
+> > > filter may not be triggered, it could always choose to exit on every
+> > > PAUSE.
+> > > 
+> > > Having a partial implementation is only better than disabling it
+> > > altogether if the L2 pause loop doesn't contain a hidden #VMEXIT to
+> > > L0.
+> > > 
 > > 
-> > On 17/3/22 14:58, Xiaoyao Li wrote:
-> > > TDX VM needs to boot with Trust Domain Virtual Firmware (TDVF). Unlike
-> > > that OVMF is mapped as rom device, TDVF needs to be mapped as private
-> > > memory. This is because TDX architecture doesn't provide read-only
-> > > capability for VMM, and it doesn't support instruction emulation due
-> > > to guest memory and registers are not accessible for VMM.
-> > > 
-> > > On the other hand, OVMF can work as TDVF, which is usually configured
-> > > as pflash device in QEMU. To keep the same usage (QEMU parameter),
-> > > introduce ram_mode to pflash for TDVF. When it's creating a TDX VM,
-> > > ram_mode will be enabled automatically that map the firmware as RAM.
-> > > 
-> > > Note, this implies two things:
-> > > ?? 1. TDVF (OVMF) is not read-only (write-protected).
-> > > 
-> > > ?? 2. It doesn't support non-volatile UEFI variables as what pflash
-> > > ???????? supports that the change to non-volatile UEFI variables won't get
-> > > ???????? synced back to backend vars.fd file.
-> > > 
-> > > Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> > > ---
-> > > ?? hw/block/pflash_cfi01.c | 25 ++++++++++++++++++-------
-> > > ?? hw/i386/pc_sysfw.c?????????? | 14 +++++++++++---
-> > > ?? 2 files changed, 29 insertions(+), 10 deletions(-)
+> > Hi!
 > > 
-> > If you don't need a pflash device, don't use it: simply map your nvram
-> > region as ram in your machine. No need to clutter the pflash model like
-> > that.
+> > You bring up a very valid point, which I didn't think about.
+> > 
+> > However after thinking about this, I think that in practice,
+> > this isn't a show stopper problem for exposing this feature to the guest.
+> > 
+> > 
+> > This is what I am thinking:
+> > 
+> > First lets assume that the L2 is malicious. In this case no doubt
+> > it can craft such a loop which will not VMexit on PAUSE.
+> > But that isn't a problem - instead of this guest could have just used NOP
+> > which is not possible to intercept anyway - no harm is done.
+> > 
+> > Now lets assume a non malicious L2:
+> > 
+> > 
+> > First of all the problem can only happen when a VM exit is intercepted by L0,
+> > and not by L1. Both above cases usually don't pass this criteria since L1 is highly
+> > likely to intercept both CPUID and IO port access. It is also highly unlikely
+> > to allow L2 direct access to L1's mmio ranges.
+> > 
+> > Overall there are very few cases of deterministic vm exit which is intercepted
+> > by L0 but not L1. If that happens then L1 will not catch the PAUSE loop,
+> > which is not different much from not catching it because of not suitable
+> > thresholds.
+> > 
+> > Also note that this is an optimization only - due to count and threshold,
+> > it is not guaranteed to catch all pause loops - in fact hypervisor has
+> > to guess these values, and update them in attempt to catch as many such
+> > loops as it can.
+> > 
+> > I think overall it is OK to expose that feature to the guest
+> > and it should even improve performance in some cases - currently
+> > at least nested KVM intercepts every PAUSE otherwise.
 > 
-> I know it's dirty to hack the pflash device. The purpose is to make the user
-> interface unchanged that people can still use
-> 
-> 	-drive if=pflash,format=raw,unit=0,file=/path/to/OVMF_CODE.fd
->         -drive if=pflash,format=raw,unit=1,file=/path/to/OVMF_VARS.fd
-> 
-> to create TD guest.
+> Can I at least request that this behavior be documented as a KVM
+> virtual CPU erratum?
 
-For the compatibility for qemu command line, you don't have to modify pflash
-device.  Don't instantiate pflash at pc_system_flash_create(), and at
-pc_system_firmware_init(), you can retrieve necessary parameters, and then
-populate memory.  Although it's still hacky, it would be cleaner a bit.
--- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+100%. Do you have a pointer where to document it?
+
+Best regards,
+	Maxim Levitsky
+
+> 
+> > Best regards,
+> >         Maxim Levitsky
+> > 
+> > 
+> > 
+> > 
+
+
