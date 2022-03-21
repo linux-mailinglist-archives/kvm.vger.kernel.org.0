@@ -2,480 +2,250 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CDAB64E2B5F
-	for <lists+kvm@lfdr.de>; Mon, 21 Mar 2022 15:59:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A804B4E2B60
+	for <lists+kvm@lfdr.de>; Mon, 21 Mar 2022 15:59:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349742AbiCUPAj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Mar 2022 11:00:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58232 "EHLO
+        id S1349745AbiCUPAt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Mar 2022 11:00:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234542AbiCUPAf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Mar 2022 11:00:35 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCA6A26AFD;
-        Mon, 21 Mar 2022 07:59:09 -0700 (PDT)
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22LDTohc026936;
-        Mon, 21 Mar 2022 14:59:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=2+brqg8pFznMD7NS0LZNPbZJrg7wX1Ij6J5257FRkn0=;
- b=ov6mV8LRObCF1Qt2sgD888B6XCvuhw1/Rw/z4A4paURGhEGMTyz/es2B8HAQuc1DE34C
- HSWW42ViqeOtsTmgK8IUKpnnNjos26ijjfXgaeHK6zCOGm0izp9uf2kix4B1rQ13jbTi
- QWkt1SPdjJZqLgyzkXZUZ3CT3pwnqGfVSE0plDu/w473kxz8HGCc5cbbtZDXzYzbn/ZM
- pBhZcUamS2i96XIoPm/51m56Q3sggweITK3gMsHaljO1IS7CsjiSnkpxmeNO7/wNTyh3
- XbRLa+VLTQRY3i8dsH3gNTTVVz1nVgp0aIqXsOibPKtNvNxP/53MQ/DqFWyp7RzL9ta4 lA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3exqu3wc29-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 21 Mar 2022 14:59:08 +0000
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22LCa3ZC007229;
-        Mon, 21 Mar 2022 14:59:08 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3exqu3wc1r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 21 Mar 2022 14:59:08 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22LErPVu003699;
-        Mon, 21 Mar 2022 14:59:06 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma04ams.nl.ibm.com with ESMTP id 3ew6t8v6k1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 21 Mar 2022 14:59:06 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22LElOBN35062024
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 21 Mar 2022 14:47:24 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5E95A4203F;
-        Mon, 21 Mar 2022 14:59:03 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E1B7E42041;
-        Mon, 21 Mar 2022 14:59:02 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.2.232])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 21 Mar 2022 14:59:02 +0000 (GMT)
-Date:   Mon, 21 Mar 2022 15:59:00 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Nico Boehr <nrb@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, thuth@redhat.com, david@redhat.com,
-        farman@linux.ibm.com
-Subject: Re: [kvm-unit-tests PATCH v1 4/9] s390x: smp: add test for
- SIGP_STORE_ADTL_STATUS order
-Message-ID: <20220321155900.77bd89d8@p-imbrenda>
-In-Reply-To: <20220321101904.387640-5-nrb@linux.ibm.com>
-References: <20220321101904.387640-1-nrb@linux.ibm.com>
-        <20220321101904.387640-5-nrb@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        with ESMTP id S234542AbiCUPAs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Mar 2022 11:00:48 -0400
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F03F126AFD
+        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 07:59:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Q2PhQGWoWGrCzVIA2ASKJe7jiAz0oWuhrNlm+rDbVcM=; b=ar6mZflquf08lSGudZQ+W9b3Xv
+        7JV0pMjX8amLxQhiBO/KqVEExQUE/CnmRvdTK8EkB4unApQXMDsqEY6xkr/ROi+MTqVaMpB67uL75
+        x+PYR/Pz7Do3BhfAWl3Wz9lsMyGHxnrgobpv5mLKaaWrCv7dd1eEHr4D2ZGHveaeUq5TDaJs8t5Jk
+        GYOJbIvvr7KNBDbVQoApOykh1Qm86r66WarAy+Ofbmsz1pdPm61Ye6a+aD6HWsKLVsTg8gB4RM8Jx
+        b95OVJNt2JY2jEyN4EStli3SwYHmMSKSSCN84ajgRkx+anvHr7dyJ0M/OhTqOnV6FK8FQ1f2gnHqV
+        cY+uP5wQ==;
+Received: from [2001:8b0:10b:1:4a2a:e3ff:fe14:8625] (helo=u3832b3a9db3152.ant.amazon.com)
+        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nWJUw-0039Gw-IZ; Mon, 21 Mar 2022 14:59:06 +0000
+Message-ID: <8c95bc2d6603a18cbed970cd04db280c0d92b5bf.camel@infradead.org>
+Subject: Re: [PATCH] Documentation: KVM: Describe guest TSC scaling in
+ migration algorithm
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Oliver Upton <oupton@google.com>
+Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Date:   Mon, 21 Mar 2022 14:59:04 +0000
+In-Reply-To: <47aee17c-cc65-02f0-4494-472ab6e80fad@redhat.com>
+References: <20220316045308.2313184-1-oupton@google.com>
+         <34ccef81-fe54-a3fc-0ba9-06189b2c1d33@redhat.com>
+         <YjTRyssYQhbxeNHA@google.com>
+         <0bff64ae-0420-2f69-10ba-78b9c5ac7b81@redhat.com>
+         <YjWNfQThS4URRMZC@google.com>
+         <e48bc11a5c4b0864616686cb1365dfb4c11b5b61.camel@infradead.org>
+         <a6011bed-79b4-72ab-843c-315bf3fcf51e@redhat.com>
+         <3548e754-28ae-f6c4-5d4c-c316ae6fbbb0@redhat.com>
+         <100b54469a8d59976bbd96f50dd4cd33.squirrel@twosheds.infradead.org>
+         <9ca10e3a-cd99-714a-76ad-6f1b83bb0abf@redhat.com>
+         <YjbrOz+yT4R7FaX1@google.com>
+         <9afd33cb-4052-fe15-d3ae-69a14ca252b0@redhat.com>
+         <20f53c124a4a592f8dcf1fa6ae1d71fa1e2ec23b.camel@infradead.org>
+         <47aee17c-cc65-02f0-4494-472ab6e80fad@redhat.com>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-tx8s+CcUN9Dk4IjCnL6/"
+User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: _rSc9V6N-b990z-6bxKjr5oXB8ZbXf5v
-X-Proofpoint-GUID: xpgRLpr97O2fL4OujXZOzyp2Dnncpkvk
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-03-21_06,2022-03-21_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 suspectscore=0
- malwarescore=0 clxscore=1015 phishscore=0 spamscore=0 mlxlogscore=999
- priorityscore=1501 impostorscore=0 mlxscore=0 lowpriorityscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2203210093
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 21 Mar 2022 11:18:59 +0100
-Nico Boehr <nrb@linux.ibm.com> wrote:
 
-> Add a test for SIGP_STORE_ADDITIONAL_STATUS order.
-> 
-> There are several cases to cover:
-> - when neither vector nor guarded-storage facility is available, check
->   the order is rejected.
-> - when one of the facilities is there, test the order is rejected and
->   adtl_status is not touched when the target CPU is running or when an
->   invalid CPU address is specified. Also check the order is rejected
->   in case of invalid alignment.
-> - when the vector facility is there, write some data to the CPU's
->   vector registers and check we get the right contents.
-> - when the guarded-storage facility is there, populate the CPU's
->   guarded-storage registers with some data and again check we get the
->   right contents.
-> 
-> To make sure we cover all these cases, adjust unittests.cfg to run the
-> smp tests with both guarded-storage and vector facility off and on.
-> 
-> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-> ---
->  s390x/smp.c         | 259 ++++++++++++++++++++++++++++++++++++++++++++
->  s390x/unittests.cfg |   6 +
->  2 files changed, 265 insertions(+)
-> 
-> diff --git a/s390x/smp.c b/s390x/smp.c
-> index e5a16eb5a46a..5d3265f6be64 100644
-> --- a/s390x/smp.c
-> +++ b/s390x/smp.c
-> @@ -16,6 +16,7 @@
->  #include <asm/sigp.h>
->  
->  #include <smp.h>
-> +#include <gs.h>
->  #include <alloc_page.h>
->  
->  static int testflag = 0;
-> @@ -37,6 +38,19 @@ static const struct sigp_invalid_cases cases_valid_cpu_addr[] = {
->  	{ INVALID_ORDER_CODE,         "invalid order code" },
->  };
->  
-> +/*
-> + * We keep two structs, one for comparing when we want to assert it's not
-> + * touched.
-> + */
-> +static uint8_t adtl_status[2][4096] __attribute__((aligned(4096)));
+--=-tx8s+CcUN9Dk4IjCnL6/
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-it's a little bit ugly. maybe define a struct, with small buffers inside
-for the vector and gs areas? that way we would not need ugly magic
-numbers below (see below)
+On Mon, 2022-03-21 at 14:10 +0100, Paolo Bonzini wrote:
+> On 3/21/22 13:16, David Woodhouse wrote:
+> > Hm, I still don't really understand why it's a 5-tuple and why we care
+> > about the *host* TSC at all.
+> >=20
+> > Fundamentally, guest state is *guest* state. There is a 3-tuple of
+> >   { NTP-synchronized time of day, Guest KVM clock, Guest TSC value }
+> >=20
+> > (plus a TSC offset from vCPU0, for each other vCPU perhaps.)
+> >=20
+> > All else is redundant, and including host values is just wrong. [...]
+> > I don't understand why the actual *value* of the host TSC is something
+> > that userspace needs to see.
+>=20
+> Ok, I understand now.
+>=20
+> You're right, you don't need the value of the host TSC; you only need a=
+=20
+> {hostTOD, guestNS, guestTSC} tuple for every vCPU recorded on the source.
 
-> +
-> +#define NUM_VEC_REGISTERS 32
-> +#define VEC_REGISTER_SIZE 16
-> +static uint8_t expected_vec_contents[NUM_VEC_REGISTERS][VEC_REGISTER_SIZE];
-> +
-> +static struct gs_cb gs_cb;
-> +static struct gs_epl gs_epl;
-> +
->  static void test_invalid(void)
->  {
->  	const struct sigp_invalid_cases *c;
-> @@ -200,6 +214,247 @@ static void test_store_status(void)
->  	report_prefix_pop();
->  }
->  
-> +static int have_adtl_status(void)
-> +{
-> +	return test_facility(133) || test_facility(129);
-> +}
-> +
-> +static void test_store_adtl_status(void)
-> +{
-> +	uint32_t status = -1;
-> +	int cc;
-> +
-> +	report_prefix_push("store additional status");
-> +
-> +	if (!have_adtl_status()) {
-> +		report_skip("no guarded-storage or vector facility installed");
-> +		goto out;
-> +	}
-> +
-> +	memset(adtl_status, 0xff, sizeof(adtl_status));
-> +
-> +	report_prefix_push("running");
-> +	smp_cpu_restart(1);
-> +
-> +	cc = smp_sigp(1, SIGP_STORE_ADDITIONAL_STATUS,
-> +		  (unsigned long)adtl_status, &status);
-> +
-> +	report(cc == 1, "CC = 1");
-> +	report(status == SIGP_STATUS_INCORRECT_STATE, "status = INCORRECT_STATE");
-> +	report(!memcmp(adtl_status[0], adtl_status[1], sizeof(adtl_status[0])),
-> +	       "additional status not touched");
-> +
-> +	report_prefix_pop();
-> +
-> +	report_prefix_push("invalid CPU address");
-> +
-> +	cc = sigp(INVALID_CPU_ADDRESS, SIGP_STORE_ADDITIONAL_STATUS,
-> +		  (unsigned long)adtl_status, &status);
-> +	report(cc == 3, "CC = 3");
-> +	report(!memcmp(adtl_status[0], adtl_status[1], sizeof(adtl_status[0])),
-> +	       "additional status not touched");
-> +
-> +	report_prefix_pop();
-> +
-> +	report_prefix_push("unaligned");
-> +	smp_cpu_stop(1);
-> +
-> +	cc = smp_sigp(1, SIGP_STORE_ADDITIONAL_STATUS,
-> +		  (unsigned long)adtl_status + 256, &status);
-> +	report(cc == 1, "CC = 1");
-> +	report(status == SIGP_STATUS_INVALID_PARAMETER, "status = INVALID_PARAMETER");
-> +
-> +	report_prefix_pop();
-> +
-> +out:
-> +	report_prefix_pop();
-> +}
-> +
-> +static void test_store_adtl_status_unavail(void)
-> +{
-> +	uint32_t status = 0;
-> +	int cc;
-> +
-> +	report_prefix_push("store additional status unvailable");
-> +
-> +	if (have_adtl_status()) {
-> +		report_skip("guarded-storage or vector facility installed");
-> +		goto out;
-> +	}
-> +
-> +	report_prefix_push("not accepted");
-> +	smp_cpu_stop(1);
-> +
-> +	cc = smp_sigp(1, SIGP_STORE_ADDITIONAL_STATUS,
-> +		  (unsigned long)adtl_status, &status);
-> +
-> +	report(cc == 1, "CC = 1");
-> +	report(status == SIGP_STATUS_INVALID_ORDER,
-> +	       "status = INVALID_ORDER");
-> +
-> +	report_prefix_pop();
-> +
-> +out:
-> +	report_prefix_pop();
-> +}
-> +
-> +static void restart_write_vector(void)
-> +{
-> +	uint8_t *vec_reg;
-> +	uint8_t *vec_reg_16_31 = &expected_vec_contents[16][0];
+Actually, isn't that still redundant? All we really need is a *single*
+{ hostTOD, guestNS } for the KVM clock, and then each vCPU has its own
+{ guestNS, guestTSC } tuple.
 
-add a comment to explain that vlm only handles at most 16 registers at
-a time
+> If all the frequencies are the same, that can be "packed" as {hostTOD,=
+=20
+> guestNS, anyTSC} plus N offsets.  The N offsets in turn can be=20
+> KVM_VCPU_TSC_OFFSET if you use the hostTSC, or the offsets between vCPU0=
+=20
+> and the others if you use the vCPU0 guestTSC.
+>=20
+> I think reasoning in terms of the host TSC is nicer in general, because=
+=20
+> it doesn't make vCPU0 special.  But apart from the aesthetics of having=
+=20
+> a "special" vCPU, making vCPU0 special is actually harder, because the=
+=20
+> TSC frequencies need not be the same for all vCPUs.  I think that is a=
+=20
+> mistake in the KVM API, but it was done long before I was involved (and=
+=20
+> long before I actually understood this stuff).
 
-> +	int i;
-> +
-> +	for (i = 0; i < NUM_VEC_REGISTERS; i++) {
-> +		vec_reg = &expected_vec_contents[i][0];
-> +		memset(vec_reg, i, VEC_REGISTER_SIZE);
-> +	}
+If each vCPU has its own { guestNS, guestTSC } tuple that actually
+works out just fine even if they have different frequencies. The
+*common* case would be that they are all at the same frequency and have
+the same value at the same time. But other cases can be accommodated.
 
-this way vector register 0 stays 0.
-either special case it (e.g. 16, or whatever), or put a magic value
-somewhere in every register
+I'm not averse to *reasoning* in terms of the host TSC; I just don't
+like exposing the actual numbers to userspace and forcing userspace to
+access it through some new ABI just in order to translate some other
+fundamental property (either the time of day, or the guest data) into
+that domain. And I especially don't like considering it part of 'guest
+state'.
 
-> +
-> +	ctl_set_bit(0, CTL0_VECTOR);
-> +
-> +	asm volatile (
-> +		"	.machine z13\n"
-> +		"	vlm 0,15, %[vec_reg_0_15]\n"
-> +		"	vlm 16,31, %[vec_reg_16_31]\n"
-> +		:
-> +		: [vec_reg_0_15] "Q"(expected_vec_contents),
-> +		  [vec_reg_16_31] "Q"(*vec_reg_16_31)
-> +		: "v0", "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9",
-> +		  "v10", "v11", "v12", "v13", "v14", "v15", "v16", "v17", "v18",
-> +		  "v19", "v20", "v21", "v22", "v23", "v24", "v25", "v26", "v27",
-> +		  "v28", "v29", "v30", "v31", "memory"
-> +	);
-> +
-> +	ctl_clear_bit(0, CTL0_VECTOR);
-> +
-> +	set_flag(1);
-> +
-> +	/*
-> +	 * function epilogue will restore floating point registers and hence
-> +	 * destroy vector register contents
-> +	 */
-> +	while (1)
-> +		;
-> +}
-> +
-> +static void cpu_write_magic_to_vector_regs(uint16_t cpu_idx)
-> +{
-> +	struct psw new_psw;
-> +
-> +	smp_cpu_stop(cpu_idx);
-> +
-> +	new_psw.mask = extract_psw_mask();
-> +	new_psw.addr = (unsigned long)restart_write_vector;
-> +
-> +	set_flag(0);
-> +
-> +	smp_cpu_start(cpu_idx, new_psw);
-> +
-> +	wait_for_flag();
-> +}
-> +
-> +static void test_store_adtl_status_vector(void)
-> +{
-> +	uint32_t status = -1;
-> +	struct psw psw;
-> +	int cc;
-> +
-> +	report_prefix_push("store additional status vector");
-> +
-> +	if (!test_facility(129)) {
-> +		report_skip("vector facility not installed");
-> +		goto out;
-> +	}
-> +
-> +	cpu_write_magic_to_vector_regs(1);
-> +	smp_cpu_stop(1);
-> +
-> +	memset(adtl_status, 0xff, sizeof(adtl_status));
-> +
-> +	cc = smp_sigp(1, SIGP_STORE_ADDITIONAL_STATUS,
-> +		  (unsigned long)adtl_status, &status);
-> +	report(!cc, "CC = 0");
-> +
-> +	report(!memcmp(adtl_status, expected_vec_contents, sizeof(expected_vec_contents)),
-> +	       "additional status contents match");
+Right now when I'm not frowning at TSC synchronisation issues, I'm
+working on guest transparent live migration from actual Xen, to
+KVM-pretending-to-be-Xen. That kind of insanity is only really possible
+with a strict adherence to the design principle that "guest state is
+guest state", without conflating it with host/implementation details :)
 
-it would be interesting to check that nothing is stored past the end of
-the buffer.
+--=-tx8s+CcUN9Dk4IjCnL6/
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
 
-moreover, I think you should also explicitly test with lc_10, to make
-sure that works as well (no need to rerun the guest, just add another
-sigp call)
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIwMzIxMTQ1OTA0WjAvBgkqhkiG9w0BCQQxIgQgFCrzcB6w
+UrG/85qTcn19MrqtHOQeq3ab0J0+LLGKW4Ywgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgADbggXscbR46zsvoVDyEcYFMAgtVTrnych
+sXVaBcJveWcPo8YYccKRX6VvdDZbzn10w/V5hbPptaJwakV47IuKq9iKYSx5Z4mlTsPG46qt7Zcb
+rQxRa8GFke8KPipPaT+2wY4dcPoq+cp/WwpAQ3gW68B1s2ChJ/5SOvBNqBX7u8hA7JRXIdjzN8G3
+OKDKEFYrujdjktk6JDlQGUCSHy+QbISTVwoniBxmqAZWy6xkATzcDnuyfLey/dBR+l6KAo+rKAdj
+OSRuXNIV4XbuseIC85rj9BES2VmeqJXY+8F3H0W3Y7YEgcex6ZoBz3CRLacP6zOHztA9Gc1d7izT
+xRz1BGwy7f6MlbV0uJIf7jqsVpWv0V5jVylp5OnptnZFOm/xC5vhNsySa/81B6GGNkBCzsqC3DvX
+TwXAtWWIG4hI0qUN+U5rQfFOfs+RTsp6oPc0ZHrcT4lYp9e8QF827LxcXUOVsnqkzd1LyCjaK4AN
+3VY+cu1kPv9yIiOjlpvrr8ph+n8Ywr77kaZvtZHQRv7E6vRF92EBRyqotWFrJg6Ji1DrewZOqiTY
+dO5JVualDY8D3OwSOSpkHWpql+jT7i/oi06F90AoDOdVAqhuSVJ23wDV1qpAfxGCwZUMgF+w5qJS
+Yev8KGCpwPcWhEHQdSrP+0qFOy8fzFe2AIXD5QnsTgAAAAAAAA==
 
-> +
-> +	/*
-> +	 * To avoid the floating point/vector registers being cleaned up, we
-> +	 * stopped CPU1 right in the middle of a function. Hence the cleanup of
-> +	 * the function didn't run yet and the stackpointer is messed up.
-> +	 * Destroy and re-initalize the CPU to fix that.
-> +	 */
-> +	smp_cpu_destroy(1);
-> +	psw.mask = extract_psw_mask();
-> +	psw.addr = (unsigned long)test_func;
-> +	smp_cpu_setup(1, psw);
-> +
-> +out:
-> +	report_prefix_pop();
-> +}
-> +
-> +static void restart_write_gs_regs(void)
-> +{
-> +	const unsigned long gs_area = 0x2000000;
-> +	const unsigned long gsc = 25; /* align = 32 M, section size = 512K */
-> +
-> +	ctl_set_bit(2, CTL2_GUARDED_STORAGE);
-> +
-> +	gs_cb.gsd = gs_area | gsc;
-> +	gs_cb.gssm = 0xfeedc0ffe;
-> +	gs_cb.gs_epl_a = (uint64_t) &gs_epl;
-> +
-> +	load_gs_cb(&gs_cb);
-> +
-> +	set_flag(1);
-> +
-> +	ctl_clear_bit(2, CTL2_GUARDED_STORAGE);
 
-what happens when the function returns? is r14 set up properly? (or
-maybe we just don't care, since we are going to stop the CPU anyway?)
-
-> +}
-> +
-> +static void cpu_write_to_gs_regs(uint16_t cpu_idx)
-> +{
-> +	struct psw new_psw;
-> +
-> +	smp_cpu_stop(cpu_idx);
-> +
-> +	new_psw.mask = extract_psw_mask();
-> +	new_psw.addr = (unsigned long)restart_write_gs_regs;
-> +
-> +	set_flag(0);
-> +
-> +	smp_cpu_start(cpu_idx, new_psw);
-> +
-> +	wait_for_flag();
-> +}
-> +
-> +static void test_store_adtl_status_gs(void)
-> +{
-> +	const unsigned long adtl_status_lc_11 = 11;
-> +	uint32_t status = 0;
-> +	int cc;
-> +
-> +	report_prefix_push("store additional status guarded-storage");
-> +
-> +	if (!test_facility(133)) {
-> +		report_skip("guarded-storage facility not installed");
-> +		goto out;
-> +	}
-> +
-> +	cpu_write_to_gs_regs(1);
-> +	smp_cpu_stop(1);
-> +
-> +	memset(adtl_status, 0xff, sizeof(adtl_status));
-> +
-> +	cc = smp_sigp(1, SIGP_STORE_ADDITIONAL_STATUS,
-> +		  (unsigned long)adtl_status | adtl_status_lc_11, &status);
-> +	report(!cc, "CC = 0");
-> +
-> +	report(!memcmp(&adtl_status[0][1024], &gs_cb, sizeof(gs_cb)),
-
-e.g. the 1024 is one of those "magic number" I mentioned above 
-
-> +	       "additional status contents match");
-
-it would be interesting to test that nothing is stored after the end of
-the buffer (i.e. everything is still 0xff in the second half of the
-page)
-
-> +
-> +out:
-> +	report_prefix_pop();
-> +}
-> +
->  static void ecall(void)
->  {
->  	unsigned long mask;
-> @@ -388,6 +643,10 @@ int main(void)
->  	test_stop();
->  	test_stop_store_status();
->  	test_store_status();
-> +	test_store_adtl_status_unavail();
-> +	test_store_adtl_status_vector();
-> +	test_store_adtl_status_gs();
-> +	test_store_adtl_status();
->  	test_ecall();
->  	test_emcall();
->  	test_sense_running();
-> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-> index 1600e714c8b9..2d0adc503917 100644
-> --- a/s390x/unittests.cfg
-> +++ b/s390x/unittests.cfg
-> @@ -77,6 +77,12 @@ extra_params=-name kvm-unit-test --uuid 0fb84a86-727c-11ea-bc55-0242ac130003 -sm
->  [smp]
->  file = smp.elf
->  smp = 2
-> +extra_params = -cpu host,gs=on,vx=on
-> +
-> +[smp-no-vec-no-gs]
-> +file = smp.elf
-> +smp = 2
-> +extra_params = -cpu host,gs=off,vx=off
-
-using "host" will break TCG
-(and using "qemu" will break secure execution)
-
-there are two possible solutions:
-
-use "max" and deal with the warnings, or split each testcase in two,
-one using host cpu and "accel = kvm" and the other with "accel = tcg"
-and qemu cpu.
-
-what should happen if only one of the two features is installed? should
-the buffer for the unavailable feature be stored with 0 or should it be
-left untouched? is it worth testing those scenarios?
-
->  
->  [sclp-1g]
->  file = sclp.elf
+--=-tx8s+CcUN9Dk4IjCnL6/--
 
