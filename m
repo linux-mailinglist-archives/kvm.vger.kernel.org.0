@@ -2,75 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D6D644E33EE
-	for <lists+kvm@lfdr.de>; Tue, 22 Mar 2022 00:11:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 474564E34F4
+	for <lists+kvm@lfdr.de>; Tue, 22 Mar 2022 00:49:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231936AbiCUXAV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Mar 2022 19:00:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47448 "EHLO
+        id S233497AbiCUXuh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Mar 2022 19:50:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232513AbiCUW6V (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Mar 2022 18:58:21 -0400
-Received: from mail-yb1-xb2a.google.com (mail-yb1-xb2a.google.com [IPv6:2607:f8b0:4864:20::b2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9914B4F477
-        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 15:35:47 -0700 (PDT)
-Received: by mail-yb1-xb2a.google.com with SMTP id m67so30684318ybm.4
-        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 15:35:47 -0700 (PDT)
+        with ESMTP id S233452AbiCUXue (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Mar 2022 19:50:34 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 720CD1890D2
+        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 16:48:52 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id h12-20020a63530c000000b0037c8f45bf1bso7916074pgb.7
+        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 16:48:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=zYTd46XXMIR/EBFVjL4wkBggwgjqAKgJIG8foIWgEVU=;
-        b=qFwNYGnX+e22tchIGIjV+ocVkIfa8G9W7pb7GhR3piqlo1M6aJsZoF80AetZeF33t+
-         qbJcMOfLLkvkiJWn1u+R0LhkbJ2d1jVaLpiv1qETysL+Lpa7AA+Ie/WzQHZgN8abrohh
-         lCG5aB5mh5J3MjGse5g2KRTGwV/RX6g31qlMk2decWxmy61hJRWdF2fVUSOv6OhhP90k
-         LZWBGL474isIc5KzWCCj0i0KP+hqPOsclgI8XG9smN9dTq9QkoW4Wz4YqxLn0IeaJXgT
-         I9iqtEBurdtBHJHpJnTzA8P0N8CqvPoTKrZNXA8v8YJiPAIhlVTdFeYsSV4+78j+yprF
-         txog==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=+YgbvkkZm51JaV0SRfX6aMNQ49mjL4BnSXqIV4X04TI=;
+        b=JEsyu2p4UrM4kdyFX8ELj2HBqWsLGkUlCdK1mQpR48w0KFTiqn3IQrFZiDsmRe53dO
+         q+RLZ8rRK+706kUMUPA27q51x859mpxgZW7ZNjIWjII+IcGETPYR9fIUC4908mPsHcWN
+         P6i/m4jZ5+gM0PzdESSfxFfgKSh/NYrPr3mWLt658axPdZu0EPZb07btYxILomMU30z9
+         tZGptvmO/tCSN9OSk9NFXMShsm4jzHT4vPClV59WQ8ecrIYmtbx2DaLDxCRnHFtsmSSB
+         IqEYNFXeFbxxpj258R+Sqn6cZhPm6M6UWh/Tg4a80ZTd4ArYmOpEY/Qx3BTm7EIpoX/5
+         KD+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=zYTd46XXMIR/EBFVjL4wkBggwgjqAKgJIG8foIWgEVU=;
-        b=ODOOaznbUq1g8fVO8CJzYfbE/4Bfyc3vyFRW05qyJ+OkGxU5YbBWpfwljURIbqmKbs
-         SakiRnCRfGWYoPjD5/XOpGu+eeOC9C483ilP9UruE0EYa9hfcUsBUz3xj4iBq1Orn6Cm
-         TqSLldxHiZ/hLUCyPDgYz4Ka6UQ+vdzZDA1WiT2rIu25qtQCUc5zidDjFcQlf7VXxgpH
-         2VtQw0vdVgE42atozNsVDRmpV3maY20Yui+p9zl+3Fyt4C4+0Y6XgcuSWqeHhmOA4HNH
-         gn3hS8EKf1TELhqYOnhfFRO1P1UZThaTqX6YmJZHIVCnQwIf7aAr6I0g39H2P9/98Ul2
-         4jig==
-X-Gm-Message-State: AOAM532xui48PLyO0TaaqhzcjAJXIpTciQ/waoqIQQsU1GO5xtyPwb8l
-        r4i7x/hOLUTjqj8Y2fyuRVBH2ystoKTjL1mHKAdMk4xmPwm6Hg==
-X-Google-Smtp-Source: ABdhPJz83L5u7fcF/6pdKAPYZlCmmDwyFkbR0yvukYMy/bmnO8xACe84WQdxXh8v47Ko37hEaoSD67qkhnDw6a2llBc=
-X-Received: by 2002:a9d:6e04:0:b0:5af:6426:6d39 with SMTP id
- e4-20020a9d6e04000000b005af64266d39mr8523074otr.75.1647900004351; Mon, 21 Mar
- 2022 15:00:04 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220301143650.143749-1-mlevitsk@redhat.com> <20220301143650.143749-5-mlevitsk@redhat.com>
- <CALMp9eRjY6sX0OEBeYw4RsQKSjKvXKWOqRe=GVoQnmjy6D8deg@mail.gmail.com>
- <6a7f13d1-ed00-b4a6-c39b-dd8ba189d639@redhat.com> <CALMp9eRRT6pi6tjZvsFbEhrgS+zsNg827iLD4Hvzsa4PeB6W-Q@mail.gmail.com>
- <abe8584fa3691de1d6ae6c6617b8ea750b30fd1c.camel@redhat.com>
-In-Reply-To: <abe8584fa3691de1d6ae6c6617b8ea750b30fd1c.camel@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 21 Mar 2022 14:59:53 -0700
-Message-ID: <CALMp9eSUSexhPWMWXE1HpSD+movaYcdge_J95LiLCnJyMEp3WA@mail.gmail.com>
-Subject: Re: [PATCH v3 4/7] KVM: x86: nSVM: support PAUSE filter threshold and
- count when cpu_pm=on
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=+YgbvkkZm51JaV0SRfX6aMNQ49mjL4BnSXqIV4X04TI=;
+        b=rJ02wrh/nFI1Hs/vqYCcOP+fN8wcaVGFITOynKyU2VeVlPgVlpOoPTuohSsDb+zdZx
+         GtN9YitI9ixkCe2cTpazk8IccQRw16vjR5FuNw/cjXXD7e49+BzXgmTgLt3eZzO795kO
+         T35ETgJRZbHH8ZnXyUQozQiSixJZHm9mJZAva0hVWZ5qK/buAAmzo5Nu7qvV49auaK/7
+         EJKYDRbwfxnwzRV79LC7R6GgOQz4dOfVSwp7joiltmGUxFknpQUjy9cVgeVkaLCtf1FB
+         B9F/C7Y4DL/QB4Q6Ei+lNy2ohS9G59r2Ao2JZNy+OmzZeZJB3xY9AGgqeExZ0luDlNuS
+         3VTw==
+X-Gm-Message-State: AOAM533btVmkNORkfxDbMNVja4ntrSgx48JQJJ6IkFO0x+LOsgOJZWAR
+        ydaWTB1VfLwPpXhO+okabLf//XWz3wgq
+X-Google-Smtp-Source: ABdhPJy5vW2ib87DOG/MIKm2vPI8btmyDLD7ahy4eJgfzjwSHviAxOjNJptPyVTiiKUXZpc/7YFtKI4Jbvtn
+X-Received: from bgardon.sea.corp.google.com ([2620:15c:100:202:b76a:f152:cb5e:5cd2])
+ (user=bgardon job=sendgmr) by 2002:a17:90a:8a05:b0:1c6:e527:c613 with SMTP id
+ w5-20020a17090a8a0500b001c6e527c613mr1669303pjn.143.1647906530831; Mon, 21
+ Mar 2022 16:48:50 -0700 (PDT)
+Date:   Mon, 21 Mar 2022 16:48:33 -0700
+Message-Id: <20220321234844.1543161-1-bgardon@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.1.894.gb6a874cedc-goog
+Subject: [PATCH v2 00/11] KVM: x86: Add a cap to disable NX hugepages on a VM
+From:   Ben Gardon <bgardon@google.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
-        Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
-        Wanpeng Li <wanpengli@tencent.com>
+        David Matlack <dmatlack@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Dunn <daviddunn@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Ben Gardon <bgardon@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,97 +69,69 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 21, 2022 at 2:36 PM Maxim Levitsky <mlevitsk@redhat.com> wrote:
->
-> On Wed, 2022-03-09 at 11:07 -0800, Jim Mattson wrote:
-> > On Wed, Mar 9, 2022 at 10:47 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
-> > > On 3/9/22 19:35, Jim Mattson wrote:
-> > > > I didn't think pause filtering was virtualizable, since the value of
-> > > > the internal counter isn't exposed on VM-exit.
-> > > >
-> > > > On bare metal, for instance, assuming the hypervisor doesn't intercept
-> > > > CPUID, the following code would quickly trigger a PAUSE #VMEXIT with
-> > > > the filter count set to 2.
-> > > >
-> > > > 1:
-> > > > pause
-> > > > cpuid
-> > > > jmp 1
-> > > >
-> > > > Since L0 intercepts CPUID, however, L2 will exit to L0 on each loop
-> > > > iteration, and when L0 resumes L2, the internal counter will be set to
-> > > > 2 again. L1 will never see a PAUSE #VMEXIT.
-> > > >
-> > > > How do you handle this?
-> > > >
-> > >
-> > > I would expect that the same would happen on an SMI or a host interrupt.
-> > >
-> > >         1:
-> > >         pause
-> > >         outl al, 0xb2
-> > >         jmp 1
-> > >
-> > > In general a PAUSE vmexit will mostly benefit the VM that is pausing, so
-> > > having a partial implementation would be better than disabling it
-> > > altogether.
-> >
-> > Indeed, the APM does say, "Certain events, including SMI, can cause
-> > the internal count to be reloaded from the VMCB." However, expanding
-> > that set of events so much that some pause loops will *never* trigger
-> > a #VMEXIT seems problematic. If the hypervisor knew that the PAUSE
-> > filter may not be triggered, it could always choose to exit on every
-> > PAUSE.
-> >
-> > Having a partial implementation is only better than disabling it
-> > altogether if the L2 pause loop doesn't contain a hidden #VMEXIT to
-> > L0.
-> >
->
-> Hi!
->
-> You bring up a very valid point, which I didn't think about.
->
-> However after thinking about this, I think that in practice,
-> this isn't a show stopper problem for exposing this feature to the guest.
->
->
-> This is what I am thinking:
->
-> First lets assume that the L2 is malicious. In this case no doubt
-> it can craft such a loop which will not VMexit on PAUSE.
-> But that isn't a problem - instead of this guest could have just used NOP
-> which is not possible to intercept anyway - no harm is done.
->
-> Now lets assume a non malicious L2:
->
->
-> First of all the problem can only happen when a VM exit is intercepted by L0,
-> and not by L1. Both above cases usually don't pass this criteria since L1 is highly
-> likely to intercept both CPUID and IO port access. It is also highly unlikely
-> to allow L2 direct access to L1's mmio ranges.
->
-> Overall there are very few cases of deterministic vm exit which is intercepted
-> by L0 but not L1. If that happens then L1 will not catch the PAUSE loop,
-> which is not different much from not catching it because of not suitable
-> thresholds.
->
-> Also note that this is an optimization only - due to count and threshold,
-> it is not guaranteed to catch all pause loops - in fact hypervisor has
-> to guess these values, and update them in attempt to catch as many such
-> loops as it can.
->
-> I think overall it is OK to expose that feature to the guest
-> and it should even improve performance in some cases - currently
-> at least nested KVM intercepts every PAUSE otherwise.
+Given the high cost of NX hugepages in terms of TLB performance, it may
+be desirable to disable the mitigation on a per-VM basis. In the case of public
+cloud providers with many VMs on a single host, some VMs may be more trusted
+than others. In order to maximize performance on critical VMs, while still
+providing some protection to the host from iTLB Multihit, allow the mitigation
+to be selectively disabled.
 
-Can I at least request that this behavior be documented as a KVM
-virtual CPU erratum?
+Disabling NX hugepages on a VM is relatively straightforward, but I took this
+as an opportunity to add some NX hugepages test coverage and clean up selftests
+infrastructure a bit.
 
->
-> Best regards,
->         Maxim Levitsky
->
->
->
->
+This series was tested with the new selftest and the rest of the KVM selftests
+on an Intel Haswell machine.
+
+The following tests failed, but I do not believe that has anything to do with
+this series:
+	userspace_io_test
+	vmx_nested_tsc_scaling_test
+	vmx_preemption_timer_test
+
+Changelog:
+v1->v2:
+	Dropped the complicated memslot refactor in favor of Ricardo Koller's
+	patch with a similar effect.
+	Incorporated David Dunn's feedback and reviewed by tag: shortened waits
+	to speed up test.
+
+Ben Gardon (10):
+  KVM: selftests: Dump VM stats in binary stats test
+  KVM: selftests: Test reading a single stat
+  KVM: selftests: Add memslot parameter to elf_load
+  KVM: selftests: Improve error message in vm_phy_pages_alloc
+  KVM: selftests: Add NX huge pages test
+  KVM: x86/MMU: Factor out updating NX hugepages state for a VM
+  KVM: x86/MMU: Track NX hugepages on a per-VM basis
+  KVM: x86/MMU: Allow NX huge pages to be disabled on a per-vm basis
+  KVM: x86: Fix errant brace in KVM capability handling
+  KVM: x86/MMU: Require reboot permission to disable NX hugepages
+
+Ricardo Koller (1):
+  KVM: selftests: Add vm_alloc_page_table_in_memslot library function
+
+ arch/x86/include/asm/kvm_host.h               |   3 +
+ arch/x86/kvm/mmu.h                            |   9 +-
+ arch/x86/kvm/mmu/mmu.c                        |  23 +-
+ arch/x86/kvm/mmu/spte.c                       |   7 +-
+ arch/x86/kvm/mmu/spte.h                       |   3 +-
+ arch/x86/kvm/mmu/tdp_mmu.c                    |   3 +-
+ arch/x86/kvm/x86.c                            |  24 +-
+ include/uapi/linux/kvm.h                      |   1 +
+ tools/testing/selftests/kvm/Makefile          |   3 +-
+ .../selftests/kvm/include/kvm_util_base.h     |  10 +
+ .../selftests/kvm/kvm_binary_stats_test.c     |   6 +
+ tools/testing/selftests/kvm/lib/elf.c         |  13 +-
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 230 +++++++++++++++++-
+ .../kvm/lib/x86_64/nx_huge_pages_guest.S      |  45 ++++
+ .../selftests/kvm/x86_64/nx_huge_pages_test.c | 160 ++++++++++++
+ .../kvm/x86_64/nx_huge_pages_test.sh          |  25 ++
+ 16 files changed, 538 insertions(+), 27 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/lib/x86_64/nx_huge_pages_guest.S
+ create mode 100644 tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
+ create mode 100755 tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.sh
+
+-- 
+2.35.1.894.gb6a874cedc-goog
+
