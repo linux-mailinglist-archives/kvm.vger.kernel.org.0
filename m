@@ -2,116 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C7C34E21FE
-	for <lists+kvm@lfdr.de>; Mon, 21 Mar 2022 09:17:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B25144E222B
+	for <lists+kvm@lfdr.de>; Mon, 21 Mar 2022 09:28:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345210AbiCUIRa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Mar 2022 04:17:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49046 "EHLO
+        id S1345232AbiCUIaK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Mar 2022 04:30:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345229AbiCUIRK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Mar 2022 04:17:10 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A616F1265AA
-        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 01:15:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1647850525; x=1679386525;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=emHGj6ghKUk9AmDI87yzqr6a+usVYgHge4IUp6jmt9M=;
-  b=Krl8vsOTBJxRFeTAuFPbYIxgymlTktr2dTExz0s9vU27kh8qrrMDljJf
-   xKih35zZsLvSUqwiumm1NPcdTiE5J1OhHsNofr3XxcmOon2J5+79fUlEl
-   8Qn5dWO3gexDBRYU3sMEScc+2xfl2EJReEwYt0FvjUlioT7d5/aHSAJND
-   s/o56a4fC9A26RIuj8ZJ0IyvQRsH9Kto/KkMoE7IhALv/ycwIq11SfnUC
-   Vyp8EIzKPFXAfZRgbi2KNBSq+f7/wn8qlTBaiF709wf9m4lfQ42xdXMzD
-   a2O02hK/ozSSihBNk76o5b+cRjPbsgPhGjhqG8GjCT2eQiTRerv4zsBaf
-   Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10292"; a="237440229"
-X-IronPort-AV: E=Sophos;i="5.90,198,1643702400"; 
-   d="scan'208";a="237440229"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2022 01:15:24 -0700
-X-IronPort-AV: E=Sophos;i="5.90,198,1643702400"; 
-   d="scan'208";a="500092839"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.255.28.249]) ([10.255.28.249])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2022 01:15:19 -0700
-Message-ID: <398611c0-cccc-2d4c-171f-68a93b55dea5@intel.com>
-Date:   Mon, 21 Mar 2022 16:15:17 +0800
+        with ESMTP id S237054AbiCUIaJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Mar 2022 04:30:09 -0400
+Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D52F219C29
+        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 01:28:41 -0700 (PDT)
+Received: by mail-io1-xd35.google.com with SMTP id d62so15845119iog.13
+        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 01:28:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Cfg0pudYuT/u9wGQCidgxonBzl21c0eXO7Xcpwo6DvA=;
+        b=i7pv6ta+HcQyz03nNrIY/wwiH4PmYxUxoVygyzR65sr5D7TIWBtE50wN/vm7DFq3Ny
+         JCFfR6YE94Ec1NI59HTf0yCMDdNbFZ566y+1EoHu741K0oYhUvMDga/syvsdgowQMYYE
+         WDTQcvcf1IcdlrRaUbVn8a9UQsSurtP4PnVx/pGuf5cuNoaWg0SgNWNYfzn8rWo2VHEC
+         m4QlSycQ6JKjDoY0RvAWA3tkfsbRxkO8TEO7cv73TwfFHu/ix/mTKKDHEEjKZZ13xZiK
+         sun05CpBOCvf2Fg9+wwEmmK6xAsRfgpNvFaNvjXaie+Oj78pscbozGzmN/nHVby39LF6
+         kSIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Cfg0pudYuT/u9wGQCidgxonBzl21c0eXO7Xcpwo6DvA=;
+        b=cVfpFNhUQu/xX98bGam0IXZfe8eGjIyLgYW/O/0cUsG6+UU1wH1YbXgO2YlVmX6kuv
+         ZfLnoeByqODnfu8VIsyrT5K8qhVQX1pWbvJf0t5MceKPJ49OsyOlQBu3WvI3SmMjyeMs
+         fjkxbw8jhRZG//i9pIiwhAx1GW9ZVIGmsYjE6qz5qGtkg+EeEWr80iCbDNk/RdrzTaLO
+         +9Sgvpd9HIOpZEBEt+ZvMaQK0KLgiTYY4e0QfmDASWe8SE25lLGvRRLQkCUxTqZIKSxq
+         Soy0swgpaWRyGYrmcxHJSmFaqSJX797iWsov5J6jUg6cGykWhAQfnRr0qI6fbxakEPgR
+         C6Ug==
+X-Gm-Message-State: AOAM530gLI37D4e95cwuBhfAU+aNWb6nztjkEZJi3jOhcRoe/IpuWmmg
+        QiKPfGBv+T5Vi88uwLR/d0wGKA==
+X-Google-Smtp-Source: ABdhPJwTWqgxMSuyUPTzaj4+SQGyUK+bH9j8AzPeOFjf5Lmv+3MyOVV6SsDOnasb4Gvf4p4Yfg6qUQ==
+X-Received: by 2002:a02:b048:0:b0:311:85be:a797 with SMTP id q8-20020a02b048000000b0031185bea797mr9850764jah.284.1647851321010;
+        Mon, 21 Mar 2022 01:28:41 -0700 (PDT)
+Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
+        by smtp.gmail.com with ESMTPSA id x2-20020a056602160200b006463c1977f9sm8361965iow.22.2022.03.21.01.28.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Mar 2022 01:28:40 -0700 (PDT)
+Date:   Mon, 21 Mar 2022 08:28:37 +0000
+From:   Oliver Upton <oupton@google.com>
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>
+Subject: Re: [PATCH v5 2/2] KVM: arm64: selftests: Introduce vcpu_width_config
+Message-ID: <Yjg3Nd1KYmJX5rSG@google.com>
+References: <20220321050804.2701035-1-reijiw@google.com>
+ <20220321050804.2701035-3-reijiw@google.com>
+ <YjgYh89k8s+w34FQ@google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.6.1
-Subject: Re: [RFC PATCH v3 16/36] i386/tdx: Set kvm_readonly_mem_enabled to
- false for TDX VM
-Content-Language: en-US
-To:     Isaku Yamahata <isaku.yamahata@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Philippe Mathieu-Daud??? <f4bug@amsat.org>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        "Daniel P. Berrang???" <berrange@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Laszlo Ersek <lersek@redhat.com>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Eric Blake <eblake@redhat.com>, isaku.yamahata@intel.com,
-        kvm@vger.kernel.org, Connor Kuehl <ckuehl@redhat.com>,
-        seanjc@google.com, qemu-devel@nongnu.org, erdemaktas@google.com
-References: <20220317135913.2166202-1-xiaoyao.li@intel.com>
- <20220317135913.2166202-17-xiaoyao.li@intel.com>
- <20220318171117.GC4049379@ls.amr.corp.intel.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20220318171117.GC4049379@ls.amr.corp.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
-        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YjgYh89k8s+w34FQ@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/19/2022 1:11 AM, Isaku Yamahata wrote:
-> On Thu, Mar 17, 2022 at 09:58:53PM +0800,
-> Xiaoyao Li <xiaoyao.li@intel.com> wrote:
+On Mon, Mar 21, 2022 at 06:17:43AM +0000, Oliver Upton wrote:
+> Hi Reiji,
 > 
->> TDX only supports readonly for shared memory but not for private memory.
->>
->> In the view of QEMU, it has no idea whether a memslot is used by shared
->> memory of private. Thus just mark kvm_readonly_mem_enabled to false to
->> TDX VM for simplicity.
->>
->> Note, pflash has dependency on readonly capability from KVM while TDX
->> wants to reuse pflash interface to load TDVF (as OVMF). Excuse TDX VM
->> for readonly check in pflash.
->>
->> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
->> ---
->>   hw/i386/pc_sysfw.c    | 2 +-
->>   target/i386/kvm/tdx.c | 9 +++++++++
->>   2 files changed, 10 insertions(+), 1 deletion(-)
->>
->> diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
->> index c8b17af95353..75b34d02cb4f 100644
->> --- a/hw/i386/pc_sysfw.c
->> +++ b/hw/i386/pc_sysfw.c
->> @@ -245,7 +245,7 @@ void pc_system_firmware_init(PCMachineState *pcms,
->>           /* Machine property pflash0 not set, use ROM mode */
->>           x86_bios_rom_init(MACHINE(pcms), "bios.bin", rom_memory, false);
->>       } else {
->> -        if (kvm_enabled() && !kvm_readonly_mem_enabled()) {
->> +        if (kvm_enabled() && (!kvm_readonly_mem_enabled() && !is_tdx_vm())) {
+> On Sun, Mar 20, 2022 at 10:08:04PM -0700, Reiji Watanabe wrote:
+
+[...]
+
+> > +#define _GNU_SOURCE
 > 
-> Is this called before tdx_kvm_init()?
+> In other instances where we define _GNU_SOURCE, it is said we do it for
+> program_invocation_short_name. Nonetheless, I cannot find anywhere that
+> the symbol is actually being used.
+> 
+> This looks to be some leftover crud from our internal test library
+> before we upstreamed KVM selftests a few years ago.
+>
 
-yes.
+Ah, it's because we're actually using program_invocation_name. This
+already gets defined in lib/kvm_util.c, so except for a few oddball
+tests that directly call kvm_vm_elf_load(), this is unnecessary.
 
-pc_init1()/ pc_q35_init()
-  pc_memory_init()
-     pc_system_firmware_init()
-
-is called after configure_accelerator() to configure kvm.
+--
+Thanks,
+Oliver
