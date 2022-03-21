@@ -2,140 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 565C14E2E76
-	for <lists+kvm@lfdr.de>; Mon, 21 Mar 2022 17:47:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E8B34E2EB6
+	for <lists+kvm@lfdr.de>; Mon, 21 Mar 2022 18:02:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351394AbiCUQsY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Mar 2022 12:48:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34718 "EHLO
+        id S1351560AbiCURDZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Mar 2022 13:03:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58880 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351385AbiCUQsW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Mar 2022 12:48:22 -0400
-Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E7E51697AE;
-        Mon, 21 Mar 2022 09:46:56 -0700 (PDT)
+        with ESMTP id S1351665AbiCURDR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Mar 2022 13:03:17 -0400
+Received: from mail-yw1-x1136.google.com (mail-yw1-x1136.google.com [IPv6:2607:f8b0:4864:20::1136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F167179417
+        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 10:01:51 -0700 (PDT)
+Received: by mail-yw1-x1136.google.com with SMTP id 00721157ae682-2e5757b57caso162919837b3.4
+        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 10:01:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1647881216; x=1679417216;
-  h=from:to:cc:subject:date:message-id:mime-version;
-  bh=11MtvQeckV9uTaf9kXjew1AzhoHaTDnjRXrFiqHtAhA=;
-  b=GsLz068INP7SZizwqCIBwLZ9ZcHj3khI+u4m7NIuX08V4llusTZmH6Ko
-   amQEBJsGq2KOB8Jfsc6fKNxpP2yWrwwRI3XQJlVKH343iFyzS9GQBCnFv
-   tSemVtzumRs6H5sRz+PbO/xeNHBvec1Q6cw0iG1VuvV3WrafFkNmHOU4+
-   Q=;
-X-Amazon-filename: 0001-KVM-x86-xen-add-support-for-32-bit-guests-in-SCHEDOP.patch
-X-IronPort-AV: E=Sophos;i="5.90,199,1643673600"; 
-   d="scan'208,223";a="72785739"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-pdx-2b-31df91b1.us-west-2.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP; 21 Mar 2022 16:46:33 +0000
-Received: from EX13D32EUB002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-        by email-inbound-relay-pdx-2b-31df91b1.us-west-2.amazon.com (Postfix) with ESMTPS id 3E18041D51;
-        Mon, 21 Mar 2022 16:46:33 +0000 (UTC)
-Received: from EX13D43EUB002.ant.amazon.com (10.43.166.8) by
- EX13D32EUB002.ant.amazon.com (10.43.166.114) with Microsoft SMTP Server (TLS)
- id 15.0.1497.32; Mon, 21 Mar 2022 16:46:32 +0000
-Received: from EX13D43EUB002.ant.amazon.com ([10.43.166.8]) by
- EX13D43EUB002.ant.amazon.com ([10.43.166.8]) with mapi id 15.00.1497.033;
- Mon, 21 Mar 2022 16:46:31 +0000
-From:   "Kaya, Metin" <metikaya@amazon.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-CC:     "Woodhouse, David" <dwmw@amazon.co.uk>,
-        "Durrant, Paul" <pdurrant@amazon.co.uk>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>
-Subject: [PATCH 1/1] KVM: x86/xen: add support for 32-bit guests in
- SCHEDOP_poll
-Thread-Topic: [PATCH 1/1] KVM: x86/xen: add support for 32-bit guests in
- SCHEDOP_poll
-Thread-Index: AQHYPUKXQJvuOGfU2UCQzahjrnQ1Og==
-Date:   Mon, 21 Mar 2022 16:46:31 +0000
-Message-ID: <1647881191688.60603@amazon.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-GB
-X-MS-Has-Attach: yes
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.43.161.153]
-Content-Type: multipart/mixed; boundary="_002_164788119168860603amazoncom_"
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=6+wORUoNfICBtxmGPwtdgPTUaJLcSyMgmBDuQ2HCAno=;
+        b=IeyG5ExpMtTqyaIwUHCF/IOH7aYaWYNAr1yot4O1eNYRTzjb0lkspVlKTsPwL8phzi
+         606KemObIc7ChoYqhUL65J3/Y9r7y1h4k5p4lK4SxACbwwpL5J/ES2jZbiSTC8zjYxw3
+         EjJHOoWPC+LkY8cjfj1HUTqloG6/ygcXnnSvc7+tYlJLuAR9aKDBt6QxDUN7rJsKzBkA
+         V7GAGPUS1zBcgASkBCxxTWbXgtTgAzvFW7ylslsR2P3nMwzlolgI3cONVlIyZR9eK4OU
+         Zmh2xfrYm+cPLFWBAGWW/TkKsGtop8E0wyCImRneAZEvwYbd4sIcXnEGv0YgIYNYuCOj
+         /ppw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=6+wORUoNfICBtxmGPwtdgPTUaJLcSyMgmBDuQ2HCAno=;
+        b=3M7SRDLz3et0HnV6uJIS31xWGyyZY7rsrYw2y1lWhVsWQ8/o6o6UnptDMsX5BW66U0
+         VHb6LvEsTp2tjAoUq83muC42Awu9BEJnYn9HDycUPUhXiNMPduKpb76YEc5cN8I4qUn+
+         /UDIm/qA/u9VYrVYcCpE1l1gHdWSqzj9GlRl4M0r4N9wIuUebNmINJxXogq4/CQazhtM
+         pi0FdL9ihMiSg3+rjXmyW/sMoQU6LCvlGx5R+p7yziX23J4ygSxbPY22OD9Cajlgs0SC
+         JUaj1celaWLjXO3Vq7lEwtvSM6IL+pJ1z0GG9HRrEYj7uUnNkkF5s47WDB9I9t4gUmmh
+         YnUA==
+X-Gm-Message-State: AOAM530kaJ0hOMyQNCtoyj3x2cVLp8E7D4W4D3WfY4YpsQlILUCBg/xU
+        i+Sp1KxhZ3qXvoBmz0Cv2SjQYuQ3btGf43k3D9djUw==
+X-Google-Smtp-Source: ABdhPJy5WiSeEDwjtsW7VTh7ar42L2Iwd9KZtr8ajbdqynfYg2O5DFVnLDKH95thDtcrPtTUuOYSD5sxkur7ut9Ijts=
+X-Received: by 2002:a81:15ce:0:b0:2e5:e189:7366 with SMTP id
+ 197-20020a8115ce000000b002e5e1897366mr16268503ywv.188.1647882110705; Mon, 21
+ Mar 2022 10:01:50 -0700 (PDT)
 MIME-Version: 1.0
-X-Spam-Status: No, score=-13.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <20220311060207.2438667-1-ricarkol@google.com> <20220311060207.2438667-3-ricarkol@google.com>
+ <CANgfPd_iRBDX=mtBy80G0R9U-BfukLV0H3SyrBr+jvK1e8BRvA@mail.gmail.com> <YjTrz40SD3HmebBh@google.com>
+In-Reply-To: <YjTrz40SD3HmebBh@google.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Mon, 21 Mar 2022 10:01:39 -0700
+Message-ID: <CANgfPd9kbyfkOoBasqMtDuC4SD=j99Y0fMReC8hOHDOYhv5AQQ@mail.gmail.com>
+Subject: Re: [PATCH 02/11] KVM: selftests: Add vm_mem_region_get_src_fd
+ library function
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     kvm <kvm@vger.kernel.org>, kvmarm@lists.cs.columbia.edu,
+        Andrew Jones <drjones@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Oliver Upton <oupton@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>,
+        Axel Rasmussen <axelrasmussen@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---_002_164788119168860603amazoncom_
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+On Fri, Mar 18, 2022 at 1:30 PM Ricardo Koller <ricarkol@google.com> wrote:
+>
+> On Wed, Mar 16, 2022 at 12:08:23PM -0600, Ben Gardon wrote:
+> > On Fri, Mar 11, 2022 at 12:02 AM Ricardo Koller <ricarkol@google.com> wrote:
+> > >
+> > > Add a library function to get the backing source FD of a memslot.
+> > >
+> > > Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> >
+> > This appears to be dead code as of this commit, would recommend
+> > merging it into the commit in which it's actually used.
+>
+> I was trying to separate lib changes (which are mostly arch independent)
+> with the actual test. Would move the commit to be right before the one
+> that uses be better? and maybe add a commit comment mentioning how it's
+> going to be used.
 
+Ah, that makes sense, I can see why you'd want to separate them.
+Moving it right before the commit where it's used sounds fine to me.
+Thanks!
 
---_002_164788119168860603amazoncom_
-Content-Type: text/x-patch;
-	name="0001-KVM-x86-xen-add-support-for-32-bit-guests-in-SCHEDOP.patch"
-Content-Description: 0001-KVM-x86-xen-add-support-for-32-bit-guests-in-SCHEDOP.patch
-Content-Disposition: attachment;
-	filename="0001-KVM-x86-xen-add-support-for-32-bit-guests-in-SCHEDOP.patch";
-	size=2871; creation-date="Mon, 21 Mar 2022 16:46:18 GMT";
-	modification-date="Mon, 21 Mar 2022 16:46:18 GMT"
-Content-Transfer-Encoding: base64
-
-RnJvbSA0OTExMzk1OTU1MDUyNWJlNDBjMjNlOGJmYzRhZGRmNjllZGVjYTQ3IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBNZXRpbiBLYXlhIDxtZXRpa2F5YUBhbWF6b24uY29tPgpEYXRl
-OiBNb24sIDIxIE1hciAyMDIyIDExOjA1OjMyICswMDAwClN1YmplY3Q6IFtQQVRDSF0gS1ZNOiB4
-ODYveGVuOiBhZGQgc3VwcG9ydCBmb3IgMzItYml0IGd1ZXN0cyBpbiBTQ0hFRE9QX3BvbGwKClRo
-aXMgcGF0Y2ggaW50cm9kdWNlcyBjb21wYXQgdmVyc2lvbiBvZiBzdHJ1Y3Qgc2NoZWRfcG9sbCBm
-b3IKU0NIRURPUF9wb2xsIHN1Yi1vcGVyYXRpb24gb2Ygc2NoZWRfb3AgaHlwZXJjYWxsLCByZWFk
-cyBjb3JyZWN0IGFtb3VudApvZiBkYXRhICgxNiBieXRlcyBpbiAzMi1iaXQgY2FzZSwgMjQgYnl0
-ZXMgb3RoZXJ3aXNlKSBieSB1c2luZyBuZXcKY29tcGF0X3NjaGVkX3BvbGwgc3RydWN0LCBjb3Bp
-ZXMgaXQgdG8gc2NoZWRfcG9sbCBwcm9wZXJseSwgYW5kIGxldHMKcmVzdCBvZiB0aGUgY29kZSBy
-dW4gYXMgaXMuCgpTaWduZWQtb2ZmLWJ5OiBNZXRpbiBLYXlhIDxtZXRpa2F5YUBhbWF6b24uY29t
-PgpSZXZpZXdlZC1ieTogRGF2aWQgV29vZGhvdXNlIDxkd213QGFtYXpvbi5jby51az4KUmV2aWV3
-ZWQtYnk6IFBhdWwgRHVycmFudCA8cGR1cnJhbnRAYW1hem9uLmNvLnVrPgotLS0KIGFyY2gveDg2
-L2t2bS94ZW4uYyB8IDMwICsrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLQogYXJjaC94ODYv
-a3ZtL3hlbi5oIHwgIDcgKysrKysrKwogMiBmaWxlcyBjaGFuZ2VkLCAzMyBpbnNlcnRpb25zKCsp
-LCA0IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2FyY2gveDg2L2t2bS94ZW4uYyBiL2FyY2gv
-eDg2L2t2bS94ZW4uYwppbmRleCA3ZDAxOTgzZDEwODcuLmMwMjE2M2JmMWE5NyAxMDA2NDQKLS0t
-IGEvYXJjaC94ODYva3ZtL3hlbi5jCisrKyBiL2FyY2gveDg2L2t2bS94ZW4uYwpAQCAtOTk4LDIw
-ICs5OTgsNDIgQEAgc3RhdGljIGJvb2wga3ZtX3hlbl9zY2hlZG9wX3BvbGwoc3RydWN0IGt2bV92
-Y3B1ICp2Y3B1LCBib29sIGxvbmdtb2RlLAogCWV2dGNobl9wb3J0X3QgcG9ydCwgKnBvcnRzOwog
-CWdwYV90IGdwYTsKIAotCWlmICghbG9uZ21vZGUgfHwgIWxhcGljX2luX2tlcm5lbCh2Y3B1KSB8
-fAorCWlmICghbGFwaWNfaW5fa2VybmVsKHZjcHUpIHx8CiAJICAgICEodmNwdS0+a3ZtLT5hcmNo
-Lnhlbl9odm1fY29uZmlnLmZsYWdzICYgS1ZNX1hFTl9IVk1fQ09ORklHX0VWVENITl9TRU5EKSkK
-IAkJcmV0dXJuIGZhbHNlOwogCiAJaWR4ID0gc3JjdV9yZWFkX2xvY2soJnZjcHUtPmt2bS0+c3Jj
-dSk7CiAJZ3BhID0ga3ZtX21tdV9ndmFfdG9fZ3BhX3N5c3RlbSh2Y3B1LCBwYXJhbSwgTlVMTCk7
-CiAJc3JjdV9yZWFkX3VubG9jaygmdmNwdS0+a3ZtLT5zcmN1LCBpZHgpOwotCi0JaWYgKCFncGEg
-fHwga3ZtX3ZjcHVfcmVhZF9ndWVzdCh2Y3B1LCBncGEsICZzY2hlZF9wb2xsLAotCQkJCQlzaXpl
-b2Yoc2NoZWRfcG9sbCkpKSB7CisJaWYgKCFncGEpIHsKIAkJKnIgPSAtRUZBVUxUOwogCQlyZXR1
-cm4gdHJ1ZTsKIAl9CiAKKwlpZiAoSVNfRU5BQkxFRChDT05GSUdfNjRCSVQpICYmIGxvbmdtb2Rl
-KSB7CisJCWlmIChrdm1fdmNwdV9yZWFkX2d1ZXN0KHZjcHUsIGdwYSwgJnNjaGVkX3BvbGwsCisJ
-CQkJCXNpemVvZihzY2hlZF9wb2xsKSkpIHsKKwkJCSpyID0gLUVGQVVMVDsKKwkJCXJldHVybiB0
-cnVlOworCQl9CisJfSBlbHNlIHsKKwkJc3RydWN0IGNvbXBhdF9zY2hlZF9wb2xsIHNwOworCisJ
-CS8qCisJCSAqIFdlIGFzc3VtZSBzaXplIG9mIGNvbXBhdF9zY2hlZF9wb2xsIGlzIDE2IGJ5dGVz
-IGluIDMyLWJpdAorCQkgKiBlbnZpcm9ubWVudC4gTGV0J3MgYmUgaG9uZXN0LgorCQkgKi8KKwkJ
-QlVJTERfQlVHX09OKHNpemVvZihzdHJ1Y3QgY29tcGF0X3NjaGVkX3BvbGwpICE9IDE2KTsKKwor
-CQlpZiAoa3ZtX3ZjcHVfcmVhZF9ndWVzdCh2Y3B1LCBncGEsICZzcCwgc2l6ZW9mKHNwKSkpIHsK
-KwkJCSpyID0gLUVGQVVMVDsKKwkJCXJldHVybiB0cnVlOworCQl9CisJCXNjaGVkX3BvbGwucG9y
-dHMgPSAoZXZ0Y2huX3BvcnRfdCAqKSh1bnNpZ25lZCBsb25nKShzcC5wb3J0cyk7CisJCXNjaGVk
-X3BvbGwubnJfcG9ydHMgPSBzcC5ucl9wb3J0czsKKwkJc2NoZWRfcG9sbC50aW1lb3V0ID0gc3Au
-dGltZW91dDsKKwl9CisKIAlpZiAodW5saWtlbHkoc2NoZWRfcG9sbC5ucl9wb3J0cyA+IDEpKSB7
-CiAJCS8qIFhlbiAodW5vZmZpY2lhbGx5KSBsaW1pdHMgbnVtYmVyIG9mIHBvbGxlcnMgdG8gMTI4
-ICovCiAJCWlmIChzY2hlZF9wb2xsLm5yX3BvcnRzID4gMTI4KSB7CmRpZmYgLS1naXQgYS9hcmNo
-L3g4Ni9rdm0veGVuLmggYi9hcmNoL3g4Ni9rdm0veGVuLmgKaW5kZXggZWU1YzRhZTA3NTVjLi5i
-NWIyMDhjZDhjOWYgMTAwNjQ0Ci0tLSBhL2FyY2gveDg2L2t2bS94ZW4uaAorKysgYi9hcmNoL3g4
-Ni9rdm0veGVuLmgKQEAgLTE5Niw2ICsxOTYsMTMgQEAgc3RydWN0IGNvbXBhdF9zaGFyZWRfaW5m
-byB7CiAJc3RydWN0IGNvbXBhdF9hcmNoX3NoYXJlZF9pbmZvIGFyY2g7CiB9OwogCitzdHJ1Y3Qg
-Y29tcGF0X3NjaGVkX3BvbGwgeworCS8qIFRoaXMgaXMgYWN0dWFsbHkgYSBwb2ludGVyIHdoaWNo
-IGhhcyB0byBiZSA0IGJ5dGVzIGluIHNpemUuICovCisJdWludDMyX3QgcG9ydHM7CisJdW5zaWdu
-ZWQgaW50IG5yX3BvcnRzOworCXVpbnQ2NF90IHRpbWVvdXQ7Cit9IF9fcGFja2VkOworCiAjZGVm
-aW5lIENPTVBBVF9FVlRDSE5fMkxfTlJfQ0hBTk5FTFMgKDggKgkJCQlcCiAJCQkJICAgICAgc2l6
-ZW9mX2ZpZWxkKHN0cnVjdCBjb21wYXRfc2hhcmVkX2luZm8sIFwKIAkJCQkJCSAgIGV2dGNobl9w
-ZW5kaW5nKSkKLS0gCjIuMzIuMAoK
-
---_002_164788119168860603amazoncom_--
+>
+>
+> >
+> > > ---
+> > >  .../selftests/kvm/include/kvm_util_base.h     |  1 +
+> > >  tools/testing/selftests/kvm/lib/kvm_util.c    | 23 +++++++++++++++++++
+> > >  2 files changed, 24 insertions(+)
+> > >
+> > > diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> > > index 4ed6aa049a91..d6acec0858c0 100644
+> > > --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
+> > > +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> > > @@ -163,6 +163,7 @@ int _kvm_ioctl(struct kvm_vm *vm, unsigned long ioctl, void *arg);
+> > >  void vm_mem_region_set_flags(struct kvm_vm *vm, uint32_t slot, uint32_t flags);
+> > >  void vm_mem_region_move(struct kvm_vm *vm, uint32_t slot, uint64_t new_gpa);
+> > >  void vm_mem_region_delete(struct kvm_vm *vm, uint32_t slot);
+> > > +int vm_mem_region_get_src_fd(struct kvm_vm *vm, uint32_t memslot);
+> > >  void vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpuid);
+> > >  vm_vaddr_t vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min);
+> > >  vm_vaddr_t vm_vaddr_alloc_pages(struct kvm_vm *vm, int nr_pages);
+> > > diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> > > index d8cf851ab119..64ef245b73de 100644
+> > > --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> > > +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> > > @@ -580,6 +580,29 @@ kvm_userspace_memory_region_find(struct kvm_vm *vm, uint64_t start,
+> > >         return &region->region;
+> > >  }
+> > >
+> > > +/*
+> > > + * KVM Userspace Memory Get Backing Source FD
+> > > + *
+> > > + * Input Args:
+> > > + *   vm - Virtual Machine
+> > > + *   memslot - KVM memory slot ID
+> > > + *
+> > > + * Output Args: None
+> > > + *
+> > > + * Return:
+> > > + *   Backing source file descriptor, -1 if the memslot is an anonymous region.
+> > > + *
+> > > + * Returns the backing source fd of a memslot, so tests can use it to punch
+> > > + * holes, or to setup permissions.
+> > > + */
+> > > +int vm_mem_region_get_src_fd(struct kvm_vm *vm, uint32_t memslot)
+> > > +{
+> > > +       struct userspace_mem_region *region;
+> > > +
+> > > +       region = memslot2region(vm, memslot);
+> > > +       return region->fd;
+> > > +}
+> > > +
+> > >  /*
+> > >   * VCPU Find
+> > >   *
+> > > --
+> > > 2.35.1.723.g4982287a31-goog
+> > >
