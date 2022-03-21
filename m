@@ -2,121 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9688A4E2ECE
-	for <lists+kvm@lfdr.de>; Mon, 21 Mar 2022 18:09:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6FE854E2EE6
+	for <lists+kvm@lfdr.de>; Mon, 21 Mar 2022 18:15:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351681AbiCURKP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Mar 2022 13:10:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54520 "EHLO
+        id S243076AbiCURQu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Mar 2022 13:16:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351677AbiCURKM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Mar 2022 13:10:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D0A462BF2
-        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 10:08:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647882523;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=dJfkHmVteh3T64TEzHnOxY0U7R9RqYwPmRB3l1CleQU=;
-        b=DsjwguDXoeUrla7MDJh5Ni/NSgrao3jraCGbuaj2SLc4Jw2rCyb4A+9xTtSbfQValZ3dBT
-        FpMooLsUnV3mSqprTJ0IaeIGDAG7ToX4dVkXfIJ1UvFDFqPReEmeFLRpzuaZcWYUXRrL7m
-        T5z7YzoNjKtVLhx/5QGOOQoGqYkcNug=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-88-KlV3U4ByNeu6a6RUBmKeEg-1; Mon, 21 Mar 2022 13:08:42 -0400
-X-MC-Unique: KlV3U4ByNeu6a6RUBmKeEg-1
-Received: by mail-ed1-f69.google.com with SMTP id l24-20020a056402231800b00410f19a3103so9000446eda.5
-        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 10:08:42 -0700 (PDT)
+        with ESMTP id S234380AbiCURQt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Mar 2022 13:16:49 -0400
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F40836B7D
+        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 10:15:23 -0700 (PDT)
+Received: by mail-lj1-x22f.google.com with SMTP id 17so20841850lji.1
+        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 10:15:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ASR2Tp21xFTBKs2aldi8ocrtwajoK0X33Y9PeeH/QZU=;
+        b=DQasT1Sp9Zq9weVTaBBAUkSy7Jl9Mc3HJtFf945qq9AXunEtCTOG164JbIacqmXf6W
+         iAaaVHB5+Q1ipwaMayQ7FTjZckUeLBC+3tfERVEEsSuZqRlZNTX1xBHQgOCrEDI2++mu
+         VAKVIQPk2Key3jbGlD4PZn3xca+ObSYOwbJ1M4xLrTKN9gWDrVVHqCtSFopJXSWJd/Bu
+         TCxHuQ38Ofn5voBFf8/MbG04rmjJ9I5r0LuIMwH34mNc6hxNdh7wrebR+613nFqdCfb3
+         qmYY8SHkGtwgFQZdVHhjF99R14lt1xFgtWaifbKQxQTzC9j6UZpA58notU4rLq2RTDy0
+         EK7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=dJfkHmVteh3T64TEzHnOxY0U7R9RqYwPmRB3l1CleQU=;
-        b=S1N5AWwqI+4whh7SCEwnqrRQqGzEBgyETqGqm84VuHuqb0xrg7HyvSOx3ncBiOAVwJ
-         YtwWxkz2a5kebSxWZnbtsvyA22swdeROxK7GQ7eQpSLbeDM4+CYYb+18VaCFSrIrvu1P
-         tGsDGMNnMPJBXha8MLXiWd4URUqAD2x2zij8XtS23UxXcOEumNU7R0qKZqi8vl76WNu6
-         u5v3au30xtOxNss3ivBFskQ/nNQ+WGJadIMpoMWDGyZPrOwPjH/KYK+qv/0PUxYsBxwM
-         wzFrK++vFsveQuoSZtMPMwghnXLAjegNqf+6Crq9Sno/mTsjkyWq0vLDCY2jtfBoQIp7
-         FrZQ==
-X-Gm-Message-State: AOAM5336x3hVDI0+WjKxZ0gFpZK+xr9ECjwmopEc7xu5FHn8GPrBKduz
-        sOt77fEazJT8s/CrX0knA+O4PFI5zO9axG1s/7JeE4tiHi9Zk/UZkt2wk3s8liqXMAg4A+eRbn+
-        mWV4ShqC/odVT
-X-Received: by 2002:a17:906:ae0c:b0:6a6:a09f:f8d5 with SMTP id le12-20020a170906ae0c00b006a6a09ff8d5mr21214474ejb.627.1647882521152;
-        Mon, 21 Mar 2022 10:08:41 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy9vOllZzruoK6Px19KOGf8G+AZzG2Lh5NsWDQstKlL8pkmJxJy/bkjawSFGfb/CaNq0Q1wkQ==
-X-Received: by 2002:a17:906:ae0c:b0:6a6:a09f:f8d5 with SMTP id le12-20020a170906ae0c00b006a6a09ff8d5mr21214429ejb.627.1647882520644;
-        Mon, 21 Mar 2022 10:08:40 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.googlemail.com with ESMTPSA id bd12-20020a056402206c00b00418c9bf71cbsm8003710edb.68.2022.03.21.10.08.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Mar 2022 10:08:39 -0700 (PDT)
-Message-ID: <d94532b7-67bc-295b-fe40-73c519b6f916@redhat.com>
-Date:   Mon, 21 Mar 2022 18:08:38 +0100
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ASR2Tp21xFTBKs2aldi8ocrtwajoK0X33Y9PeeH/QZU=;
+        b=0n1cwKuPUhOCnrtUtglgI9h9tuu4TR2d0jZH2/oLAkKxiuDenFoeJ/UqHXFqasn4eU
+         4xON4EBCIsEFv5uu9c5iQ9CQ0MWK1VmZ5+O/z5hqN6U8f6AauW65HQX6bgq3kkeK/Dcq
+         b2N//GMH0jYpF6TCPrDWsIvxjXE6ReyeW8Grt0J7wFdStUm6eV5iNrvYKSbytmo6DAt1
+         3tuKrYVpU8GWkSLW5Zu2o50kzjmCs/Mml97TKMi+uJvYcyCOb7nUtI3FRDR/KxorIu6G
+         84zUJ7CMnnXXWGh8xqW/TMnctj2HWDGP8qty3WN1gb3I+n2L2RVqQDmAJGQ3D91R6ihq
+         00+A==
+X-Gm-Message-State: AOAM531EuG+piD5dmvDywPPzogL08Y9IxnhOk8E08Tkjj35e0dD1HaC0
+        MRg2r5QH0cWkMPpiry/P2sQ+bvupgLSFDt0J9dSiVw==
+X-Google-Smtp-Source: ABdhPJy/ZfSIQDd1JA4aixgH4poyogQFYXTkSKoAkSkbJFmGoOIHzrbSC2uss7OMkvJYkXva6SeI2I7+zD9/CK9PxYM=
+X-Received: by 2002:a05:651c:553:b0:247:df66:8698 with SMTP id
+ q19-20020a05651c055300b00247df668698mr16133887ljp.331.1647882918885; Mon, 21
+ Mar 2022 10:15:18 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [PATCH] Add KVM_EXIT_SHUTDOWN metadata for SEV-ES
-Content-Language: en-US
-To:     Peter Gonda <pgonda@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>, Borislav Petkov <bp@alien8.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Joerg Roedel <jroedel@suse.de>, Marc Orr <marcorr@google.com>,
+References: <20220317005630.3666572-1-jingzhangos@google.com>
+ <20220317005630.3666572-3-jingzhangos@google.com> <YjLJHDV58GRMxF2P@google.com>
+In-Reply-To: <YjLJHDV58GRMxF2P@google.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Mon, 21 Mar 2022 10:14:52 -0700
+Message-ID: <CALzav=fnkU3s+RXGO-LVJCj75FsxvR13n-y1nV1ksp=aLF-etA@mail.gmail.com>
+Subject: Re: [PATCH v1 2/2] KVM: arm64: Add debug tracepoint for vcpu exits
+To:     Oliver Upton <oupton@google.com>
+Cc:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
+        KVMARM <kvmarm@lists.cs.columbia.edu>,
+        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
-        LKML <linux-kernel@vger.kernel.org>
-References: <20220321150214.1895231-1-pgonda@google.com>
- <f8500809-610e-ce44-9906-785b7ddc0911@redhat.com>
- <CAMkAt6pNE9MC7U_qQDwTrFG5e8qaiWZ6f0HzR+mk4dCNC2Ue8A@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <CAMkAt6pNE9MC7U_qQDwTrFG5e8qaiWZ6f0HzR+mk4dCNC2Ue8A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+        Reiji Watanabe <reijiw@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/21/22 16:42, Peter Gonda wrote:
-> On Mon, Mar 21, 2022 at 9:27 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->>
->> On 3/21/22 16:02, Peter Gonda wrote:
->>> SEV-ES guests can request termination using the GHCB's MSR protocol. See
->>> AMD's GHCB spec section '4.1.13 Termination Request'. Currently when a
->>> guest does this the userspace VMM sees an KVM_EXIT_UNKNOWN (-EVINAL)
->>> return code from KVM_RUN. By adding a KVM_EXIT_SHUTDOWN_ENTRY to kvm_run
->>> struct the userspace VMM can clearly see the guest has requested a SEV-ES
->>> termination including the termination reason code set and reason code.
->>>
->>> Signed-off-by: Peter Gonda <pgonda@google.com>
->>> Cc: Borislav Petkov <bp@alien8.de>
->>> Cc: Tom Lendacky <thomas.lendacky@amd.com>
->>> Cc: Brijesh Singh <brijesh.singh@amd.com>
->>> Cc: Joerg Roedel <jroedel@suse.de>
->>> Cc: Marc Orr <marcorr@google.com>
->>> Cc: Sean Christopherson <seanjc@google.com>
->>> Cc: kvm@vger.kernel.org
->>> Cc: linux-kernel@vger.kernel.org
->>
->> Looks good, but it has to also add a capability.
-> 
-> Thanks for the quick review! Just so I understand. I should add
-> KVM_CAP_SEV_TERM or something, then if that has been enabled do the
-> new functionality, else keep the old functionality?
+On Wed, Mar 16, 2022 at 10:37 PM Oliver Upton <oupton@google.com> wrote:
+>
+> Hi Jing,
+>
+> On Thu, Mar 17, 2022 at 12:56:30AM +0000, Jing Zhang wrote:
+> > This tracepoint only provides a hook for poking vcpu exits information,
+> > not exported to tracefs.
+> > A timestamp is added for the last vcpu exit, which would be useful for
+> > analysis for vcpu exits.
+> >
+> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_host.h | 3 +++
+> >  arch/arm64/kvm/arm.c              | 2 ++
+> >  arch/arm64/kvm/trace_arm.h        | 8 ++++++++
+> >  3 files changed, 13 insertions(+)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index daa68b053bdc..576f2c18d008 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -415,6 +415,9 @@ struct kvm_vcpu_arch {
+> >
+> >       /* Arch specific exit reason */
+> >       enum arm_exit_reason exit_reason;
+> > +
+> > +     /* Timestamp for the last vcpu exit */
+> > +     u64 last_exit_time;
+> >  };
+> >
+> >  /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index f49ebdd9c990..98631f79c182 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -783,6 +783,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+> >       ret = 1;
+> >       run->exit_reason = KVM_EXIT_UNKNOWN;
+> >       while (ret > 0) {
+> > +             trace_kvm_vcpu_exits(vcpu);
+> >               /*
+> >                * Check conditions before entering the guest
+> >                */
+> > @@ -898,6 +899,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+> >               local_irq_enable();
+> >
+> >               trace_kvm_exit(ret, kvm_vcpu_trap_get_class(vcpu), *vcpu_pc(vcpu));
+> > +             vcpu->arch.last_exit_time = ktime_to_ns(ktime_get());
+> >
+> >               /* Exit types that need handling before we can be preempted */
+> >               handle_exit_early(vcpu, ret);
+> > diff --git a/arch/arm64/kvm/trace_arm.h b/arch/arm64/kvm/trace_arm.h
+> > index 33e4e7dd2719..3e7dfd640e23 100644
+> > --- a/arch/arm64/kvm/trace_arm.h
+> > +++ b/arch/arm64/kvm/trace_arm.h
+> > @@ -301,6 +301,14 @@ TRACE_EVENT(kvm_timer_emulate,
+> >                 __entry->timer_idx, __entry->should_fire)
+> >  );
+> >
+> > +/*
+> > + * Following tracepoints are not exported in tracefs and provide hooking
+> > + * mechanisms only for testing and debugging purposes.
+> > + */
+> > +DECLARE_TRACE(kvm_vcpu_exits,
+> > +     TP_PROTO(struct kvm_vcpu *vcpu),
+> > +     TP_ARGS(vcpu));
+> > +
+>
+> When we were discussing this earlier, I wasn't aware of the kvm_exit
+> tracepoint which I think encapsulates what you're looking for.
+> ESR_EL2.EC is the critical piece to determine what caused the exit.
+>
+> It is probably also important to call out that this trace point only
+> will fire for a 'full' KVM exit (i.e. out of hyp and back to the
+> kernel). There are several instances where the exit is handled in hyp
+> and we immediately resume the guest.
+>
+> Now -- I am bordering on clueless with tracepoints, but it isn't
+> immediately obvious how the attached program can determine the vCPU that
+> triggered the TP. If we are going to propose modularizing certain KVM
+> metrics with tracepoints then that would be a rather critical piece of
+> information.
+>
+> Apologies for any confusion I added to the whole situation, but
+> hopefully we can still engage in a broader conversation regarding
+> how to package up optional KVM metrics.
 
-No, much simpler; just something for which KVM_CHECK_EXTENSION returns 
-1, so that userspace knows that there is a "shutdown" member to be 
-filled by KVM_EXIT_SHUTDOWN.  e.g. KVM_CAP_EXIT_SHUTDOWN_REASON.
+These are all good questions.
 
-Paolo
+For context to non-Google folks on the mailing list, we are interested
+in exploring Marc's idea of using tracepoint hooking as a way for e.g.
+cloud providers to implement proprietary stats without having to
+modify KVM.
 
+Adding specific tracepoints (like this series does) is probably
+premature until we have figured out the broader design for how
+out-of-module stats will work end-to-end and get that infrastructure
+merged upstream.
+
+>
+> --
+> Thanks,
+> Oliver
