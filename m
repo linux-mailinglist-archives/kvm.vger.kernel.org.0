@@ -2,177 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6FE854E2EE6
-	for <lists+kvm@lfdr.de>; Mon, 21 Mar 2022 18:15:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CEBDE4E2EE8
+	for <lists+kvm@lfdr.de>; Mon, 21 Mar 2022 18:16:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243076AbiCURQu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Mar 2022 13:16:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51366 "EHLO
+        id S1351721AbiCURQy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Mar 2022 13:16:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51570 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234380AbiCURQt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Mar 2022 13:16:49 -0400
-Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F40836B7D
-        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 10:15:23 -0700 (PDT)
-Received: by mail-lj1-x22f.google.com with SMTP id 17so20841850lji.1
-        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 10:15:22 -0700 (PDT)
+        with ESMTP id S234380AbiCURQx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Mar 2022 13:16:53 -0400
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99F9D3CFC6;
+        Mon, 21 Mar 2022 10:15:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ASR2Tp21xFTBKs2aldi8ocrtwajoK0X33Y9PeeH/QZU=;
-        b=DQasT1Sp9Zq9weVTaBBAUkSy7Jl9Mc3HJtFf945qq9AXunEtCTOG164JbIacqmXf6W
-         iAaaVHB5+Q1ipwaMayQ7FTjZckUeLBC+3tfERVEEsSuZqRlZNTX1xBHQgOCrEDI2++mu
-         VAKVIQPk2Key3jbGlD4PZn3xca+ObSYOwbJ1M4xLrTKN9gWDrVVHqCtSFopJXSWJd/Bu
-         TCxHuQ38Ofn5voBFf8/MbG04rmjJ9I5r0LuIMwH34mNc6hxNdh7wrebR+613nFqdCfb3
-         qmYY8SHkGtwgFQZdVHhjF99R14lt1xFgtWaifbKQxQTzC9j6UZpA58notU4rLq2RTDy0
-         EK7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ASR2Tp21xFTBKs2aldi8ocrtwajoK0X33Y9PeeH/QZU=;
-        b=0n1cwKuPUhOCnrtUtglgI9h9tuu4TR2d0jZH2/oLAkKxiuDenFoeJ/UqHXFqasn4eU
-         4xON4EBCIsEFv5uu9c5iQ9CQ0MWK1VmZ5+O/z5hqN6U8f6AauW65HQX6bgq3kkeK/Dcq
-         b2N//GMH0jYpF6TCPrDWsIvxjXE6ReyeW8Grt0J7wFdStUm6eV5iNrvYKSbytmo6DAt1
-         3tuKrYVpU8GWkSLW5Zu2o50kzjmCs/Mml97TKMi+uJvYcyCOb7nUtI3FRDR/KxorIu6G
-         84zUJ7CMnnXXWGh8xqW/TMnctj2HWDGP8qty3WN1gb3I+n2L2RVqQDmAJGQ3D91R6ihq
-         00+A==
-X-Gm-Message-State: AOAM531EuG+piD5dmvDywPPzogL08Y9IxnhOk8E08Tkjj35e0dD1HaC0
-        MRg2r5QH0cWkMPpiry/P2sQ+bvupgLSFDt0J9dSiVw==
-X-Google-Smtp-Source: ABdhPJy/ZfSIQDd1JA4aixgH4poyogQFYXTkSKoAkSkbJFmGoOIHzrbSC2uss7OMkvJYkXva6SeI2I7+zD9/CK9PxYM=
-X-Received: by 2002:a05:651c:553:b0:247:df66:8698 with SMTP id
- q19-20020a05651c055300b00247df668698mr16133887ljp.331.1647882918885; Mon, 21
- Mar 2022 10:15:18 -0700 (PDT)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1647882926; x=1679418926;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:mime-version;
+  bh=mMM9NAx5eo2hK5QQll1zqCg6yT1+1KOsTu0MhDOKwCY=;
+  b=d3SEkDswPF9ZEl4UZ9li2xf+ajXfk0ZFRxnlVJhCNL/Ai89ESV8tBCJr
+   RpG4IDC4KuRYkEWp4Xf4tZtETCluMCX0y6NBjb8uX4g5Ll4IHFk3bT1F2
+   MP/NIMTKU3t9YpKT2RRPtIwxfu9svccNcUDlURu3Xuhq4tEMR2Ufh7ULR
+   w=;
+X-Amazon-filename: 0001-KVM-x86-xen-add-support-for-32-bit-guests-in-SCHEDOP.patch
+X-IronPort-AV: E=Sophos;i="5.90,199,1643673600"; 
+   d="scan'208,223";a="186510121"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-iad-1e-0bfdb89e.us-east-1.amazon.com) ([10.43.8.2])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP; 21 Mar 2022 17:15:16 +0000
+Received: from EX13D32EUB001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
+        by email-inbound-relay-iad-1e-0bfdb89e.us-east-1.amazon.com (Postfix) with ESMTPS id B4935E00E7;
+        Mon, 21 Mar 2022 17:15:15 +0000 (UTC)
+Received: from EX13D43EUB002.ant.amazon.com (10.43.166.8) by
+ EX13D32EUB001.ant.amazon.com (10.43.166.125) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.32; Mon, 21 Mar 2022 17:15:14 +0000
+Received: from EX13D43EUB002.ant.amazon.com ([10.43.166.8]) by
+ EX13D43EUB002.ant.amazon.com ([10.43.166.8]) with mapi id 15.00.1497.033;
+ Mon, 21 Mar 2022 17:15:14 +0000
+From:   "Kaya, Metin" <metikaya@amazon.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+CC:     "Woodhouse, David" <dwmw@amazon.co.uk>,
+        "Durrant, Paul" <pdurrant@amazon.co.uk>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>
+Subject: Re: [PATCH v2 1/1] KVM: x86/xen: add support for 32-bit guests in
+ SCHEDOP_poll
+Thread-Topic: [PATCH v2 1/1] KVM: x86/xen: add support for 32-bit guests in
+ SCHEDOP_poll
+Thread-Index: AQHYPUc6LvcJQy+oDUqe5JacL/SQ1A==
+Date:   Mon, 21 Mar 2022 17:15:14 +0000
+Message-ID: <1647882914508.15309@amazon.com>
+References: <1647881191688.60603@amazon.com>
+In-Reply-To: <1647881191688.60603@amazon.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-GB
+X-MS-Has-Attach: yes
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.43.160.240]
+Content-Type: multipart/mixed; boundary="_002_164788291450815309amazoncom_"
 MIME-Version: 1.0
-References: <20220317005630.3666572-1-jingzhangos@google.com>
- <20220317005630.3666572-3-jingzhangos@google.com> <YjLJHDV58GRMxF2P@google.com>
-In-Reply-To: <YjLJHDV58GRMxF2P@google.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Mon, 21 Mar 2022 10:14:52 -0700
-Message-ID: <CALzav=fnkU3s+RXGO-LVJCj75FsxvR13n-y1nV1ksp=aLF-etA@mail.gmail.com>
-Subject: Re: [PATCH v1 2/2] KVM: arm64: Add debug tracepoint for vcpu exits
-To:     Oliver Upton <oupton@google.com>
-Cc:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
-        KVMARM <kvmarm@lists.cs.columbia.edu>,
-        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Raghavendra Rao Ananta <rananta@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-13.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 16, 2022 at 10:37 PM Oliver Upton <oupton@google.com> wrote:
->
-> Hi Jing,
->
-> On Thu, Mar 17, 2022 at 12:56:30AM +0000, Jing Zhang wrote:
-> > This tracepoint only provides a hook for poking vcpu exits information,
-> > not exported to tracefs.
-> > A timestamp is added for the last vcpu exit, which would be useful for
-> > analysis for vcpu exits.
-> >
-> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_host.h | 3 +++
-> >  arch/arm64/kvm/arm.c              | 2 ++
-> >  arch/arm64/kvm/trace_arm.h        | 8 ++++++++
-> >  3 files changed, 13 insertions(+)
-> >
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index daa68b053bdc..576f2c18d008 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -415,6 +415,9 @@ struct kvm_vcpu_arch {
-> >
-> >       /* Arch specific exit reason */
-> >       enum arm_exit_reason exit_reason;
-> > +
-> > +     /* Timestamp for the last vcpu exit */
-> > +     u64 last_exit_time;
-> >  };
-> >
-> >  /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index f49ebdd9c990..98631f79c182 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -783,6 +783,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
-> >       ret = 1;
-> >       run->exit_reason = KVM_EXIT_UNKNOWN;
-> >       while (ret > 0) {
-> > +             trace_kvm_vcpu_exits(vcpu);
-> >               /*
-> >                * Check conditions before entering the guest
-> >                */
-> > @@ -898,6 +899,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
-> >               local_irq_enable();
-> >
-> >               trace_kvm_exit(ret, kvm_vcpu_trap_get_class(vcpu), *vcpu_pc(vcpu));
-> > +             vcpu->arch.last_exit_time = ktime_to_ns(ktime_get());
-> >
-> >               /* Exit types that need handling before we can be preempted */
-> >               handle_exit_early(vcpu, ret);
-> > diff --git a/arch/arm64/kvm/trace_arm.h b/arch/arm64/kvm/trace_arm.h
-> > index 33e4e7dd2719..3e7dfd640e23 100644
-> > --- a/arch/arm64/kvm/trace_arm.h
-> > +++ b/arch/arm64/kvm/trace_arm.h
-> > @@ -301,6 +301,14 @@ TRACE_EVENT(kvm_timer_emulate,
-> >                 __entry->timer_idx, __entry->should_fire)
-> >  );
-> >
-> > +/*
-> > + * Following tracepoints are not exported in tracefs and provide hooking
-> > + * mechanisms only for testing and debugging purposes.
-> > + */
-> > +DECLARE_TRACE(kvm_vcpu_exits,
-> > +     TP_PROTO(struct kvm_vcpu *vcpu),
-> > +     TP_ARGS(vcpu));
-> > +
->
-> When we were discussing this earlier, I wasn't aware of the kvm_exit
-> tracepoint which I think encapsulates what you're looking for.
-> ESR_EL2.EC is the critical piece to determine what caused the exit.
->
-> It is probably also important to call out that this trace point only
-> will fire for a 'full' KVM exit (i.e. out of hyp and back to the
-> kernel). There are several instances where the exit is handled in hyp
-> and we immediately resume the guest.
->
-> Now -- I am bordering on clueless with tracepoints, but it isn't
-> immediately obvious how the attached program can determine the vCPU that
-> triggered the TP. If we are going to propose modularizing certain KVM
-> metrics with tracepoints then that would be a rather critical piece of
-> information.
->
-> Apologies for any confusion I added to the whole situation, but
-> hopefully we can still engage in a broader conversation regarding
-> how to package up optional KVM metrics.
+--_002_164788291450815309amazoncom_
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-These are all good questions.
+v2: Updated a comment and added a new one.=0A=
+________________________________________=0A=
+From: Kaya, Metin=0A=
+Sent: 21 March 2022 16:46=0A=
+To: Paolo Bonzini; kvm@vger.kernel.org=0A=
+Cc: Woodhouse, David; Durrant, Paul; Boris Ostrovsky; linux-kernel@vger.ker=
+nel.org; x86@kernel.org=0A=
+Subject: [PATCH 1/1] KVM: x86/xen: add support for 32-bit guests in SCHEDOP=
+_poll=0A=
 
-For context to non-Google folks on the mailing list, we are interested
-in exploring Marc's idea of using tracepoint hooking as a way for e.g.
-cloud providers to implement proprietary stats without having to
-modify KVM.
+--_002_164788291450815309amazoncom_
+Content-Type: text/x-patch;
+	name="0001-KVM-x86-xen-add-support-for-32-bit-guests-in-SCHEDOP.patch"
+Content-Description: 0001-KVM-x86-xen-add-support-for-32-bit-guests-in-SCHEDOP.patch
+Content-Disposition: attachment;
+	filename="0001-KVM-x86-xen-add-support-for-32-bit-guests-in-SCHEDOP.patch";
+	size=2919; creation-date="Mon, 21 Mar 2022 17:14:19 GMT";
+	modification-date="Mon, 21 Mar 2022 17:14:19 GMT"
+Content-Transfer-Encoding: base64
 
-Adding specific tracepoints (like this series does) is probably
-premature until we have figured out the broader design for how
-out-of-module stats will work end-to-end and get that infrastructure
-merged upstream.
+RnJvbSBmMTlhODgzMmUyZTU2Zjg0M2ZkYzYyNzQwZGIxMzgxZDUwOTQ2YmUzIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBNZXRpbiBLYXlhIDxtZXRpa2F5YUBhbWF6b24uY29tPgpEYXRl
+OiBNb24sIDIxIE1hciAyMDIyIDExOjA1OjMyICswMDAwClN1YmplY3Q6IFtQQVRDSF0gS1ZNOiB4
+ODYveGVuOiBhZGQgc3VwcG9ydCBmb3IgMzItYml0IGd1ZXN0cyBpbiBTQ0hFRE9QX3BvbGwKClRo
+aXMgcGF0Y2ggaW50cm9kdWNlcyBjb21wYXQgdmVyc2lvbiBvZiBzdHJ1Y3Qgc2NoZWRfcG9sbCBm
+b3IKU0NIRURPUF9wb2xsIHN1Yi1vcGVyYXRpb24gb2Ygc2NoZWRfb3AgaHlwZXJjYWxsLCByZWFk
+cyBjb3JyZWN0IGFtb3VudApvZiBkYXRhICgxNiBieXRlcyBpbiAzMi1iaXQgY2FzZSwgMjQgYnl0
+ZXMgb3RoZXJ3aXNlKSBieSB1c2luZyBuZXcKY29tcGF0X3NjaGVkX3BvbGwgc3RydWN0LCBjb3Bp
+ZXMgaXQgdG8gc2NoZWRfcG9sbCBwcm9wZXJseSwgYW5kIGxldHMKcmVzdCBvZiB0aGUgY29kZSBy
+dW4gYXMgaXMuCgpTaWduZWQtb2ZmLWJ5OiBNZXRpbiBLYXlhIDxtZXRpa2F5YUBhbWF6b24uY29t
+PgpSZXZpZXdlZC1ieTogRGF2aWQgV29vZGhvdXNlIDxkd213QGFtYXpvbi5jby51az4KUmV2aWV3
+ZWQtYnk6IFBhdWwgRHVycmFudCA8cGR1cnJhbnRAYW1hem9uLmNvLnVrPgotLS0KIGFyY2gveDg2
+L2t2bS94ZW4uYyB8IDMxICsrKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0KIGFyY2gveDg2
+L2t2bS94ZW4uaCB8ICA3ICsrKysrKysKIDIgZmlsZXMgY2hhbmdlZCwgMzQgaW5zZXJ0aW9ucygr
+KSwgNCBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9hcmNoL3g4Ni9rdm0veGVuLmMgYi9hcmNo
+L3g4Ni9rdm0veGVuLmMKaW5kZXggN2QwMTk4M2QxMDg3Li4yZDBhNWQyY2E2ZjEgMTAwNjQ0Ci0t
+LSBhL2FyY2gveDg2L2t2bS94ZW4uYworKysgYi9hcmNoL3g4Ni9rdm0veGVuLmMKQEAgLTk5OCwy
+MCArOTk4LDQzIEBAIHN0YXRpYyBib29sIGt2bV94ZW5fc2NoZWRvcF9wb2xsKHN0cnVjdCBrdm1f
+dmNwdSAqdmNwdSwgYm9vbCBsb25nbW9kZSwKIAlldnRjaG5fcG9ydF90IHBvcnQsICpwb3J0czsK
+IAlncGFfdCBncGE7CiAKLQlpZiAoIWxvbmdtb2RlIHx8ICFsYXBpY19pbl9rZXJuZWwodmNwdSkg
+fHwKKwlpZiAoIWxhcGljX2luX2tlcm5lbCh2Y3B1KSB8fAogCSAgICAhKHZjcHUtPmt2bS0+YXJj
+aC54ZW5faHZtX2NvbmZpZy5mbGFncyAmIEtWTV9YRU5fSFZNX0NPTkZJR19FVlRDSE5fU0VORCkp
+CiAJCXJldHVybiBmYWxzZTsKIAogCWlkeCA9IHNyY3VfcmVhZF9sb2NrKCZ2Y3B1LT5rdm0tPnNy
+Y3UpOwogCWdwYSA9IGt2bV9tbXVfZ3ZhX3RvX2dwYV9zeXN0ZW0odmNwdSwgcGFyYW0sIE5VTEwp
+OwogCXNyY3VfcmVhZF91bmxvY2soJnZjcHUtPmt2bS0+c3JjdSwgaWR4KTsKLQotCWlmICghZ3Bh
+IHx8IGt2bV92Y3B1X3JlYWRfZ3Vlc3QodmNwdSwgZ3BhLCAmc2NoZWRfcG9sbCwKLQkJCQkJc2l6
+ZW9mKHNjaGVkX3BvbGwpKSkgeworCWlmICghZ3BhKSB7CiAJCSpyID0gLUVGQVVMVDsKIAkJcmV0
+dXJuIHRydWU7CiAJfQogCisJaWYgKElTX0VOQUJMRUQoQ09ORklHXzY0QklUKSAmJiBsb25nbW9k
+ZSkgeworCQlpZiAoa3ZtX3ZjcHVfcmVhZF9ndWVzdCh2Y3B1LCBncGEsICZzY2hlZF9wb2xsLAor
+CQkJCQlzaXplb2Yoc2NoZWRfcG9sbCkpKSB7CisJCQkqciA9IC1FRkFVTFQ7CisJCQlyZXR1cm4g
+dHJ1ZTsKKwkJfQorCX0gZWxzZSB7CisJCXN0cnVjdCBjb21wYXRfc2NoZWRfcG9sbCBzcDsKKwor
+CQkvKgorCQkgKiBTYW5pdHkgY2hlY2sgdGhhdCBfX3BhY2tlZCB0cmljayB3b3JrcyBmaW5lIGFu
+ZCBzaXplIG9mCisJCSAqIGNvbXBhdF9zY2hlZF9wb2xsIGlzIDE2IGJ5dGVzIGp1c3QgbGlrZSBp
+biB0aGUgcmVhbCBYZW4KKwkJICogMzItYml0IGNhc2UuCisJCSAqLworCQlCVUlMRF9CVUdfT04o
+c2l6ZW9mKHN0cnVjdCBjb21wYXRfc2NoZWRfcG9sbCkgIT0gMTYpOworCisJCWlmIChrdm1fdmNw
+dV9yZWFkX2d1ZXN0KHZjcHUsIGdwYSwgJnNwLCBzaXplb2Yoc3ApKSkgeworCQkJKnIgPSAtRUZB
+VUxUOworCQkJcmV0dXJuIHRydWU7CisJCX0KKwkJc2NoZWRfcG9sbC5wb3J0cyA9IChldnRjaG5f
+cG9ydF90ICopKHVuc2lnbmVkIGxvbmcpKHNwLnBvcnRzKTsKKwkJc2NoZWRfcG9sbC5ucl9wb3J0
+cyA9IHNwLm5yX3BvcnRzOworCQlzY2hlZF9wb2xsLnRpbWVvdXQgPSBzcC50aW1lb3V0OworCX0K
+KwogCWlmICh1bmxpa2VseShzY2hlZF9wb2xsLm5yX3BvcnRzID4gMSkpIHsKIAkJLyogWGVuICh1
+bm9mZmljaWFsbHkpIGxpbWl0cyBudW1iZXIgb2YgcG9sbGVycyB0byAxMjggKi8KIAkJaWYgKHNj
+aGVkX3BvbGwubnJfcG9ydHMgPiAxMjgpIHsKZGlmZiAtLWdpdCBhL2FyY2gveDg2L2t2bS94ZW4u
+aCBiL2FyY2gveDg2L2t2bS94ZW4uaAppbmRleCBlZTVjNGFlMDc1NWMuLjhiMzZkMzQ2ZmM5YyAx
+MDA2NDQKLS0tIGEvYXJjaC94ODYva3ZtL3hlbi5oCisrKyBiL2FyY2gveDg2L2t2bS94ZW4uaApA
+QCAtMTk2LDYgKzE5NiwxMyBAQCBzdHJ1Y3QgY29tcGF0X3NoYXJlZF9pbmZvIHsKIAlzdHJ1Y3Qg
+Y29tcGF0X2FyY2hfc2hhcmVkX2luZm8gYXJjaDsKIH07CiAKK3N0cnVjdCBjb21wYXRfc2NoZWRf
+cG9sbCB7CisJLyogVGhpcyBpcyBhY3R1YWxseSBhIGd1ZXN0IHZpcnR1YWwgYWRkcmVzcyB3aGlj
+aCBwb2ludHMgdG8gcG9ydHMuICovCisJdWludDMyX3QgcG9ydHM7CisJdW5zaWduZWQgaW50IG5y
+X3BvcnRzOworCXVpbnQ2NF90IHRpbWVvdXQ7Cit9IF9fcGFja2VkOworCiAjZGVmaW5lIENPTVBB
+VF9FVlRDSE5fMkxfTlJfQ0hBTk5FTFMgKDggKgkJCQlcCiAJCQkJICAgICAgc2l6ZW9mX2ZpZWxk
+KHN0cnVjdCBjb21wYXRfc2hhcmVkX2luZm8sIFwKIAkJCQkJCSAgIGV2dGNobl9wZW5kaW5nKSkK
+LS0gCjIuMzIuMAoK
 
->
-> --
-> Thanks,
-> Oliver
+--_002_164788291450815309amazoncom_--
