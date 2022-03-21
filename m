@@ -2,67 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 25DBC4E32AD
-	for <lists+kvm@lfdr.de>; Mon, 21 Mar 2022 23:37:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DA3644E331F
+	for <lists+kvm@lfdr.de>; Mon, 21 Mar 2022 23:56:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229510AbiCUWhl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Mar 2022 18:37:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50640 "EHLO
+        id S230431AbiCUWvb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Mar 2022 18:51:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52636 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229502AbiCUWhk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Mar 2022 18:37:40 -0400
-Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 765CD482525
-        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 15:25:40 -0700 (PDT)
-Received: by mail-lf1-x131.google.com with SMTP id t25so26883279lfg.7
-        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 15:25:40 -0700 (PDT)
+        with ESMTP id S230321AbiCUWvZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Mar 2022 18:51:25 -0400
+Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45BB438D2A7
+        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 15:42:11 -0700 (PDT)
+Received: by mail-oi1-x22b.google.com with SMTP id s207so17782768oie.11
+        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 15:42:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=174oOQBn0fyyPOME33fxi6ZYYLy/uC/7bWFXFETZpkQ=;
-        b=bwhTGLYQycrJ+z9zDqbYI3PNgdpiVnH0J4Kfgd1Vyq4twj1tCNeyCazfcEqgZRa7/o
-         /stYkcUmR30etffbFq6NQuGOK5B7LotJR+sZBqgzNLiVXQb0JQJGjbdDN7QGCJDj+RFq
-         +zWqBfSspkEZ+7CMmDH5KU7bhv0Z5hAmCAIaqGQ7XlU29M1AYADyoH73XBfngp4Iw/KZ
-         7hKA/n/mum0aHXa7/gTnAFclhHpCPu4cl+lIkB1ZwR2LoBJkh5HDvEMugHPBdLZsCVVj
-         KhcuAGsuVYzPrEG7DINl4t7E505I8lq/qmCPZ38aDaIpedGVVyciXCBPexb5K9t3pcl5
-         2+rA==
+        bh=cWpcGr+6ZtCAxiOUcLCZPyeMFzj0VHLkO5iJ3VF02f4=;
+        b=oPx98dOIQ/h3ttHAG6/6YwYcqg7z9+fT8e3p530qSb0AGiFlCEiUBJAA/XHPNn4av5
+         IrNtz8J9D20C6CiPUqebgtBCtysnGTdWktCDdQQs23F09r5EekY59q/QOGyFZmB1xxfW
+         iPiRF6qWA438fV0Atp3T6GDy4p3WkKjn3pXPJY8DftTvsoIYnhx3dewT0KiDW7OdVKd2
+         D5jkB0If67Rs4Rb9WKLpYB9DEaiUmVpxgcsD6wURVIpcpxYxfvS9JbQjxsYeNeAONUGC
+         sCJiC5kqVR6g0fxwD0pkSb8T3MyE4sKdLwkPLYGUzH0GZJBZwRKxR5SuRgv3+eWXj/8S
+         Db2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=174oOQBn0fyyPOME33fxi6ZYYLy/uC/7bWFXFETZpkQ=;
-        b=opCsDI5I2VeLy9eGdvl3x6hqzdWKsL81VulaAxf0UdeeMBWINey9PXY3GFyNrR2uGq
-         B+EigI0Se7Yi0aiD5ot+EkA4KHPoeLjfr4rQKXpaN5YE2wQHOsDh7bnQfmx7l7o6z784
-         H1I6fKfbwDZLhe0XGLqO3vPXcHdMHn27yu4afvbJcOgkmiIXszW/SO1H4pez2MBk3q9B
-         l4r9Rg3Hto18HL1SKHxFepRZpuOhkIFgOWxEB2iuTH3AiohilUnMDIKab7iXtly/+1Zo
-         NvjcGlkvsjGxq8Zo1pyqqCbHcyXM1i5pjbmJtswvDJL+aLkxmWmlR4Hkogoi5jw5NKFy
-         6nLQ==
-X-Gm-Message-State: AOAM532XZgs8qmYXcDj34b3hDa5PEx8bC7wCOTGEb96z+BMCqps4Mmg3
-        KiGziitRfp3zvFX49ZSGnCr29Qn/vT4haGFrzFMCVzrqJt0=
-X-Google-Smtp-Source: ABdhPJwpozCcbej623QSrjdR2iRrofqIOPIBxiJYga7zOjmvy8zsTMu8Be27CzPe/oak9GPCwvhEMjt0eFFBFImUeWQ=
-X-Received: by 2002:a19:490f:0:b0:448:4bf8:6084 with SMTP id
- w15-20020a19490f000000b004484bf86084mr15705861lfa.537.1647901021259; Mon, 21
- Mar 2022 15:17:01 -0700 (PDT)
+        bh=cWpcGr+6ZtCAxiOUcLCZPyeMFzj0VHLkO5iJ3VF02f4=;
+        b=un7sR9SWBVwEC/3EmcQuGkJdKf9hS8feze+WNNUja0lpaiugQDBKgaTPVkInPuv88P
+         A+rlkUZKP5wzb71HGUMp+zBWiIxcJ6hGX9CIgct1/ancOFmjUc/gI4BLcER6cGl98hkZ
+         mQwd2IzoAn/CF78Syx0HE7a/E8B3c792E85K2EhiUfL7+iXhFqgN7cePm/HxsCVjbUcL
+         6oO6Hgto4OQc29oXD/e6DUtZDA4U80894UhO0Eg9soFRy5RXkG7VeNOdypi0CWR9sc6E
+         YdQuIwuhLnBaiwQkJVYeLaa1nuPV/+UL9hlDPhI5d9kfgtoAab0g0wa3PUJmgu79usi4
+         W2mQ==
+X-Gm-Message-State: AOAM533cGM55vg9bIl3g7yO+rIfMDfJb3Vdg8bpw4f7XAMwP0DZpTbpn
+        u4HPWh2CUI1KBm3nA5RzmosBZAhd1k4PtBeITpNLNg==
+X-Google-Smtp-Source: ABdhPJzmp3+qClIwuDyUCvItf45iFI8+VRyansEFfvpBFMcmDrxdR8LgWMKyewhdXFB3NkgmvKZ4FjVRRZQaygCfEtc=
+X-Received: by 2002:a05:6808:118d:b0:2d9:a01a:48c2 with SMTP id
+ j13-20020a056808118d00b002d9a01a48c2mr698989oil.269.1647902530829; Mon, 21
+ Mar 2022 15:42:10 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220321002638.379672-1-mizhang@google.com> <20220321002638.379672-4-mizhang@google.com>
- <CALzav=dU5TPfhp1=n+zo+AcPkL4rpWCRpMCL91vE5z20R+mmjg@mail.gmail.com>
-In-Reply-To: <CALzav=dU5TPfhp1=n+zo+AcPkL4rpWCRpMCL91vE5z20R+mmjg@mail.gmail.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Mon, 21 Mar 2022 15:16:34 -0700
-Message-ID: <CALzav=fFK1725dVBc=N181qP-Nua8M0rsKhXm1=zTRmG2Msjgg@mail.gmail.com>
-Subject: Re: [PATCH 3/4] KVM: x86/mmu: explicitly check nx_hugepage in disallowed_hugepage_adjust()
-To:     Mingwei Zhang <mizhang@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+References: <20220301143650.143749-1-mlevitsk@redhat.com> <20220301143650.143749-5-mlevitsk@redhat.com>
+ <CALMp9eRjY6sX0OEBeYw4RsQKSjKvXKWOqRe=GVoQnmjy6D8deg@mail.gmail.com>
+ <6a7f13d1-ed00-b4a6-c39b-dd8ba189d639@redhat.com> <CALMp9eRRT6pi6tjZvsFbEhrgS+zsNg827iLD4Hvzsa4PeB6W-Q@mail.gmail.com>
+ <abe8584fa3691de1d6ae6c6617b8ea750b30fd1c.camel@redhat.com>
+ <CALMp9eSUSexhPWMWXE1HpSD+movaYcdge_J95LiLCnJyMEp3WA@mail.gmail.com> <8071f0f0a857b0775f1fb2d1ebd86ffc4fd9096b.camel@redhat.com>
+In-Reply-To: <8071f0f0a857b0775f1fb2d1ebd86ffc4fd9096b.camel@redhat.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Mon, 21 Mar 2022 15:41:59 -0700
+Message-ID: <CALMp9eQgDpL0eD_GZde-s+THPWvQ0v6kmj3z_023f_KPERAyyA@mail.gmail.com>
+Subject: Re: [PATCH v3 4/7] KVM: x86: nSVM: support PAUSE filter threshold and
+ count when cpu_pm=on
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Ingo Molnar <mingo@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
         Sean Christopherson <seanjc@google.com>,
+        Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Ben Gardon <bgardon@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Peter Xu <peterx@redhat.com>, Ben Gardon <bgorden@google.com>
+        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
+        Wanpeng Li <wanpengli@tencent.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
@@ -75,88 +79,113 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 21, 2022 at 3:00 PM David Matlack <dmatlack@google.com> wrote:
+On Mon, Mar 21, 2022 at 3:11 PM Maxim Levitsky <mlevitsk@redhat.com> wrote:
 >
-> On Sun, Mar 20, 2022 at 5:26 PM Mingwei Zhang <mizhang@google.com> wrote:
+> On Mon, 2022-03-21 at 14:59 -0700, Jim Mattson wrote:
+> > On Mon, Mar 21, 2022 at 2:36 PM Maxim Levitsky <mlevitsk@redhat.com> wrote:
+> > > On Wed, 2022-03-09 at 11:07 -0800, Jim Mattson wrote:
+> > > > On Wed, Mar 9, 2022 at 10:47 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+> > > > > On 3/9/22 19:35, Jim Mattson wrote:
+> > > > > > I didn't think pause filtering was virtualizable, since the value of
+> > > > > > the internal counter isn't exposed on VM-exit.
+> > > > > >
+> > > > > > On bare metal, for instance, assuming the hypervisor doesn't intercept
+> > > > > > CPUID, the following code would quickly trigger a PAUSE #VMEXIT with
+> > > > > > the filter count set to 2.
+> > > > > >
+> > > > > > 1:
+> > > > > > pause
+> > > > > > cpuid
+> > > > > > jmp 1
+> > > > > >
+> > > > > > Since L0 intercepts CPUID, however, L2 will exit to L0 on each loop
+> > > > > > iteration, and when L0 resumes L2, the internal counter will be set to
+> > > > > > 2 again. L1 will never see a PAUSE #VMEXIT.
+> > > > > >
+> > > > > > How do you handle this?
+> > > > > >
+> > > > >
+> > > > > I would expect that the same would happen on an SMI or a host interrupt.
+> > > > >
+> > > > >         1:
+> > > > >         pause
+> > > > >         outl al, 0xb2
+> > > > >         jmp 1
+> > > > >
+> > > > > In general a PAUSE vmexit will mostly benefit the VM that is pausing, so
+> > > > > having a partial implementation would be better than disabling it
+> > > > > altogether.
+> > > >
+> > > > Indeed, the APM does say, "Certain events, including SMI, can cause
+> > > > the internal count to be reloaded from the VMCB." However, expanding
+> > > > that set of events so much that some pause loops will *never* trigger
+> > > > a #VMEXIT seems problematic. If the hypervisor knew that the PAUSE
+> > > > filter may not be triggered, it could always choose to exit on every
+> > > > PAUSE.
+> > > >
+> > > > Having a partial implementation is only better than disabling it
+> > > > altogether if the L2 pause loop doesn't contain a hidden #VMEXIT to
+> > > > L0.
+> > > >
+> > >
+> > > Hi!
+> > >
+> > > You bring up a very valid point, which I didn't think about.
+> > >
+> > > However after thinking about this, I think that in practice,
+> > > this isn't a show stopper problem for exposing this feature to the guest.
+> > >
+> > >
+> > > This is what I am thinking:
+> > >
+> > > First lets assume that the L2 is malicious. In this case no doubt
+> > > it can craft such a loop which will not VMexit on PAUSE.
+> > > But that isn't a problem - instead of this guest could have just used NOP
+> > > which is not possible to intercept anyway - no harm is done.
+> > >
+> > > Now lets assume a non malicious L2:
+> > >
+> > >
+> > > First of all the problem can only happen when a VM exit is intercepted by L0,
+> > > and not by L1. Both above cases usually don't pass this criteria since L1 is highly
+> > > likely to intercept both CPUID and IO port access. It is also highly unlikely
+> > > to allow L2 direct access to L1's mmio ranges.
+> > >
+> > > Overall there are very few cases of deterministic vm exit which is intercepted
+> > > by L0 but not L1. If that happens then L1 will not catch the PAUSE loop,
+> > > which is not different much from not catching it because of not suitable
+> > > thresholds.
+> > >
+> > > Also note that this is an optimization only - due to count and threshold,
+> > > it is not guaranteed to catch all pause loops - in fact hypervisor has
+> > > to guess these values, and update them in attempt to catch as many such
+> > > loops as it can.
+> > >
+> > > I think overall it is OK to expose that feature to the guest
+> > > and it should even improve performance in some cases - currently
+> > > at least nested KVM intercepts every PAUSE otherwise.
 > >
-> > Add extra check to specify the case of nx hugepage and allow KVM to
-> > reconstruct large mapping after dirty logging is disabled. Existing code
-> > works only for nx hugepage but the condition is too general in that does
-> > not consider other usage case (such as dirty logging).
+> > Can I at least request that this behavior be documented as a KVM
+> > virtual CPU erratum?
 >
-> KVM calls kvm_mmu_zap_collapsible_sptes() when dirty logging is
-> disabled. Why is that not sufficient?
+> 100%. Do you have a pointer where to document it?
 
-Ahh I see, kvm_mmu_zap_collapsible_sptes() only zaps the leaf SPTEs.
-Could you add a blurb about this in the commit message for future
-reference?
+I think this will be the first KVM virtual CPU erratum documented,
+though there are plenty of others that I'd like to see documented
+(e.g. nVMX processes posted interrupts on emulated VM-entry, AMD's
+merged PMU counters are only 48 bits wide, etc.).
 
->
-> > Moreover, existing
-> > code assumes that a present PMD or PUD indicates that there exist 'smaller
-> > SPTEs' under the paging structure. This assumption may no be true if
-> > consider the zapping leafs only behavior in MMU.
->
-> Good point. Although, that code just got reverted. Maybe say something like:
->
->   This assumption may not be true in the future if KVM gains support
-> for zapping only leaf SPTEs.
+Maybe Paolo has some ideas?
 
-Nevermind, support for zapping leaf SPTEs already exists for zapping
-collapsible SPTEs.
-
-
-
+> Best regards,
+>         Maxim Levitsky
 >
 > >
-> > Missing the check causes KVM incorrectly regards the faulting page as a NX
-> > huge page and refuse to map it at desired level. And this leads to back
-> > performance in shadow mmu and potentiall TDP mmu.
+> > > Best regards,
+> > >         Maxim Levitsky
+> > >
+> > >
+> > >
+> > >
 >
-> s/potentiall/potentially/
 >
-> >
-> > Fixes: b8e8c8303ff2 ("kvm: mmu: ITLB_MULTIHIT mitigation")
-> > Cc: stable@vger.kernel.org
-> >
-> > Reviewed-by: Ben Gardon <bgardon@google.com>
-> > Signed-off-by: Mingwei Zhang <mizhang@google.com>
-> > ---
-> >  arch/x86/kvm/mmu/mmu.c | 14 ++++++++++++--
-> >  1 file changed, 12 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index 5628d0ba637e..4d358c273f6c 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -2919,6 +2919,16 @@ void disallowed_hugepage_adjust(struct kvm_page_fault *fault, u64 spte, int cur_
-> >             cur_level == fault->goal_level &&
-> >             is_shadow_present_pte(spte) &&
-> >             !is_large_pte(spte)) {
-> > +               struct kvm_mmu_page *sp;
-> > +               u64 page_mask;
-> > +               /*
-> > +                * When nx hugepage flag is not set, there is no reason to
-> > +                * go down to another level. This helps demand paging to
-> > +                * generate large mappings.
-> > +                */
-> > +               sp = to_shadow_page(spte & PT64_BASE_ADDR_MASK);
-> > +               if (!sp->lpage_disallowed)
-> > +                       return;
-> >                 /*
-> >                  * A small SPTE exists for this pfn, but FNAME(fetch)
-> >                  * and __direct_map would like to create a large PTE
-> > @@ -2926,8 +2936,8 @@ void disallowed_hugepage_adjust(struct kvm_page_fault *fault, u64 spte, int cur_
-> >                  * patching back for them into pfn the next 9 bits of
-> >                  * the address.
-> >                  */
-> > -               u64 page_mask = KVM_PAGES_PER_HPAGE(cur_level) -
-> > -                               KVM_PAGES_PER_HPAGE(cur_level - 1);
-> > +               page_mask = KVM_PAGES_PER_HPAGE(cur_level) -
-> > +                       KVM_PAGES_PER_HPAGE(cur_level - 1);
-> >                 fault->pfn |= fault->gfn & page_mask;
-> >                 fault->goal_level--;
-> >         }
-> > --
-> > 2.35.1.894.gb6a874cedc-goog
-> >
