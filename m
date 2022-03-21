@@ -2,198 +2,222 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1188A4E3007
-	for <lists+kvm@lfdr.de>; Mon, 21 Mar 2022 19:32:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E4A04E30DE
+	for <lists+kvm@lfdr.de>; Mon, 21 Mar 2022 20:43:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352194AbiCUSd7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Mar 2022 14:33:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45374 "EHLO
+        id S1345508AbiCUTpK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Mar 2022 15:45:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352180AbiCUSd6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Mar 2022 14:33:58 -0400
-Received: from mail-yw1-x112c.google.com (mail-yw1-x112c.google.com [IPv6:2607:f8b0:4864:20::112c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE62A7461D
-        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 11:32:32 -0700 (PDT)
-Received: by mail-yw1-x112c.google.com with SMTP id 00721157ae682-2e5e176e1b6so88384107b3.13
-        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 11:32:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=oyGzY8l76MsegSAn4xQxjQPLkZzO2340czzi6D4Ior8=;
-        b=Ej2kjVjfZTFuj5I2XgPtiMJGOUTZa2UlGmehWn+6/bXjwFlLt3vvGW6qp/Za/xN9fH
-         v4Hk1/ip8lasFXz+5aL0B0M4VJKXF4qVcUb8276ltduclc2KWaFsTGi0zr9B/RraDkhA
-         fD8Czx/aQABtevWJt4MhO+ulvmAvvgEWsYNu8CEdVK4z2gSYbB1y+P6/TTIzQ9nMvewJ
-         NSf7sxvzM2YrA+iNNLQk0A3q6U2Y3HMlG3dOjFEtwnRc8eszCrWcScnCMTHDNIjjlrc7
-         wZEsROJjcoKd7liyPjdKYFNXAYGT6OgRr62kuQd1sp6xXzufWYlAjm0Uom1qisVS4QRg
-         Cc+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=oyGzY8l76MsegSAn4xQxjQPLkZzO2340czzi6D4Ior8=;
-        b=E9isvz5+VURW4s/3hfyWncTw1kPWGpKsqxX9LzodhPZLyrg/KDeFrWPP4E/bNWVXV7
-         LDbIw0gGuPvI4ubDxorp4NnFXocwCN9zBFXCqZPGIZ+v9iFOFgd+ixW8p7lZqjJIdfKT
-         /nzaYC4WSWCsuJi4VnxfHSUB98ikO+lUCoWiqjhlJRC2Ti6E2l1QhImpowL8RqbEtukW
-         HRX6/3m1itv83PP8gPqHM54LObHSvz33bT7oWG7b1om7eeIJsC/P4PmRBxtUPAume1tR
-         7St+6jxMM9iEgLU5Ko2AMa7CC6T2XF56ZHVnkOy52bwyl1x6eIxzFA8JQY9UuMNJ5gM8
-         vfPQ==
-X-Gm-Message-State: AOAM530/D6FNAXmxTgaaRJ4+bLsPCQGa3Y2etmWT7bNJde1Qte+Njz/H
-        Qtf1HRDuHB/b4jEMsBWETdOCWglDI7bAw8L1vltlzLossfcrUQ==
-X-Google-Smtp-Source: ABdhPJxA6zr4oETTteNTPmtvHbM8zDj8C+zMYhYAnSX9zKGVMbUu+sWYmd4DjTXO2SwQH+b//ZyEGy15S2jfvqLpPYo=
-X-Received: by 2002:a81:351:0:b0:2e5:9cb9:8c44 with SMTP id
- 78-20020a810351000000b002e59cb98c44mr26060988ywd.250.1647887551971; Mon, 21
- Mar 2022 11:32:31 -0700 (PDT)
-MIME-Version: 1.0
-References: <cover.1646422845.git.isaku.yamahata@intel.com> <f3293bd872a916bf33165a2ec0d6fc50533b817f.1646422845.git.isaku.yamahata@intel.com>
-In-Reply-To: <f3293bd872a916bf33165a2ec0d6fc50533b817f.1646422845.git.isaku.yamahata@intel.com>
-From:   Sagi Shahar <sagis@google.com>
-Date:   Mon, 21 Mar 2022 11:32:21 -0700
-Message-ID: <CAAhR5DFPsmxYXXXZ9WNW=MDWRRz5jrntPvsnKw7VTrRh5CbohQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v5 083/104] KVM: x86: Split core of hypercall
- emulation to helper function
-To:     "Yamahata, Isaku" <isaku.yamahata@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+        with ESMTP id S1344392AbiCUTpJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Mar 2022 15:45:09 -0400
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E369772E10
+        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 12:43:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=NaWk3NGevyS5dd+cePIAMwSEayz7JRXrqp+sHwA431Y=; b=jAZB860fOXMDZ+QQsD34DLzuVI
+        YGRSTtFZ10gIkaTCm6sE+QoOsq+L5z3Aupa3ZcujVjxzqn4RfnHEF34Aki+W6+75rO7GJI3Yl/eD/
+        KphAjy7ViTslLXYIdSPVN+7EuLD94pLcoBD0ZE1kzlW9yVSGphalI0mixuZMsSrxhjSLiDzEjmKiI
+        TNN/RZOGe72CMBMU+Dz8LsrVbFMu7+KRpGb2vj4ZTRMHlUk3NxsJZRczVvR6bzrLeyzIwWnbXAI9X
+        nT0kElukJzBOmEbfO+Ia8bg/mkjKmAPDHSLSJUu1KA7yJq/CiT0BjafxzCwDf01hqpfjGprbmoFIE
+        Zxce/ybw==;
+Received: from [2001:8b0:10b:1:4a2a:e3ff:fe14:8625] (helo=u3832b3a9db3152.ant.amazon.com)
+        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nWNw4-003Dgl-8D; Mon, 21 Mar 2022 19:43:24 +0000
+Message-ID: <42cde62812d47489a4017c8cc2ca1397e1ad1d66.camel@infradead.org>
+Subject: Re: [PATCH] Documentation: KVM: Describe guest TSC scaling in
+ migration algorithm
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Oliver Upton <oupton@google.com>, "Franke, Daniel" <dff@amazon.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Connor Kuehl <ckuehl@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        Joerg Roedel <joro@8bytes.org>
+Date:   Mon, 21 Mar 2022 19:43:21 +0000
+In-Reply-To: <YjfI/Sl3lFEFOIWc@google.com>
+References: <YjTRyssYQhbxeNHA@google.com>
+         <0bff64ae-0420-2f69-10ba-78b9c5ac7b81@redhat.com>
+         <YjWNfQThS4URRMZC@google.com>
+         <e48bc11a5c4b0864616686cb1365dfb4c11b5b61.camel@infradead.org>
+         <a6011bed-79b4-72ab-843c-315bf3fcf51e@redhat.com>
+         <3548e754-28ae-f6c4-5d4c-c316ae6fbbb0@redhat.com>
+         <100b54469a8d59976bbd96f50dd4cd33.squirrel@twosheds.infradead.org>
+         <9ca10e3a-cd99-714a-76ad-6f1b83bb0abf@redhat.com>
+         <YjbrOz+yT4R7FaX1@google.com>
+         <1680281fee4384d27bd97dba117f391a.squirrel@twosheds.infradead.org>
+         <YjfI/Sl3lFEFOIWc@google.com>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-n1BoGn9keVAeoGgQmVuR"
+User-Agent: Evolution 3.36.5-0ubuntu1 
+MIME-Version: 1.0
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 4, 2022 at 12:00 PM <isaku.yamahata@intel.com> wrote:
->
-> From: Sean Christopherson <sean.j.christopherson@intel.com>
->
-> By necessity, TDX will use a different register ABI for hypercalls.
-> Break out the core functionality so that it may be reused for TDX.
->
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> ---
->  arch/x86/include/asm/kvm_host.h |  4 +++
->  arch/x86/kvm/x86.c              | 54 ++++++++++++++++++++-------------
->  2 files changed, 37 insertions(+), 21 deletions(-)
->
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 8dab9f16f559..33b75b0e3de1 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1818,6 +1818,10 @@ void kvm_request_apicv_update(struct kvm *kvm, bool activate,
->  void __kvm_request_apicv_update(struct kvm *kvm, bool activate,
->                                 unsigned long bit);
->
-> +unsigned long __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
-> +                                     unsigned long a0, unsigned long a1,
-> +                                     unsigned long a2, unsigned long a3,
-> +                                     int op_64_bit);
->  int kvm_emulate_hypercall(struct kvm_vcpu *vcpu);
->
->  int kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 error_code,
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 314ae43e07bf..9acb33a17445 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -9090,26 +9090,15 @@ static int complete_hypercall_exit(struct kvm_vcpu *vcpu)
->         return kvm_skip_emulated_instruction(vcpu);
->  }
->
-> -int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
-> +unsigned long __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
-> +                                     unsigned long a0, unsigned long a1,
-> +                                     unsigned long a2, unsigned long a3,
-> +                                     int op_64_bit)
->  {
-> -       unsigned long nr, a0, a1, a2, a3, ret;
-> -       int op_64_bit;
-> -
-> -       if (kvm_xen_hypercall_enabled(vcpu->kvm))
-> -               return kvm_xen_hypercall(vcpu);
-> -
-> -       if (kvm_hv_hypercall_enabled(vcpu))
-> -               return kvm_hv_hypercall(vcpu);
-> -
-> -       nr = kvm_rax_read(vcpu);
-> -       a0 = kvm_rbx_read(vcpu);
-> -       a1 = kvm_rcx_read(vcpu);
-> -       a2 = kvm_rdx_read(vcpu);
-> -       a3 = kvm_rsi_read(vcpu);
-> +       unsigned long ret;
->
->         trace_kvm_hypercall(nr, a0, a1, a2, a3);
->
-> -       op_64_bit = is_64_bit_hypercall(vcpu);
->         if (!op_64_bit) {
->                 nr &= 0xFFFFFFFF;
->                 a0 &= 0xFFFFFFFF;
-> @@ -9118,11 +9107,6 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
->                 a3 &= 0xFFFFFFFF;
->         }
->
-> -       if (static_call(kvm_x86_get_cpl)(vcpu) != 0) {
-> -               ret = -KVM_EPERM;
-> -               goto out;
-> -       }
-> -
->         ret = -KVM_ENOSYS;
->
->         switch (nr) {
-> @@ -9181,6 +9165,34 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
->                 ret = -KVM_ENOSYS;
->                 break;
->         }
-> +       return ret;
-> +}
-> +EXPORT_SYMBOL_GPL(__kvm_emulate_hypercall);
-> +
-> +int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
-> +{
-> +       unsigned long nr, a0, a1, a2, a3, ret;
-> +       int op_64_bit;
-> +
-> +       if (kvm_xen_hypercall_enabled(vcpu->kvm))
-> +               return kvm_xen_hypercall(vcpu);
-> +
-> +       if (kvm_hv_hypercall_enabled(vcpu))
-> +               return kvm_hv_hypercall(vcpu);
-> +
-> +       nr = kvm_rax_read(vcpu);
-> +       a0 = kvm_rbx_read(vcpu);
-> +       a1 = kvm_rcx_read(vcpu);
-> +       a2 = kvm_rdx_read(vcpu);
-> +       a3 = kvm_rsi_read(vcpu);
-> +       op_64_bit = is_64_bit_mode(vcpu);
 
-I think this should be "op_64_bit = is_64_bit_hypercall(vcpu);"
-is_64_bit_mode was replaced with is_64_bit_hypercall to support
-protected guests here:
-https://lore.kernel.org/all/87cztf8h43.fsf@vitty.brq.redhat.com/T/
+--=-n1BoGn9keVAeoGgQmVuR
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Without it, op_64_bit will be set to 0 for TD VMs which will cause the
-upper 32 bit of the registers to be cleared in __kvm_emulate_hypercall
+On Mon, 2022-03-21 at 00:38 +0000, Oliver Upton wrote:
+> On Sun, Mar 20, 2022 at 09:46:35AM -0000, David Woodhouse wrote:
+> > But coincidentally since then I have started having conversations with
+> > people who really want the guest to have an immediate knowledge of the
+> > adjtimex maxerror etc. on the new host immediately after the migration.
+> > Maybe the "if the migration isn't fast enough then let the guest know i=
+t's
+> > now unsynced" is OK, but I'll need to work out what "immediately" means
+> > when we have a guest userspace component involved in it.
+>=20
+> This has also been an area of interest to me. I think we've all seen the
+> many ways in which doing migrations behind the guest's can put software
+> in an extremely undesirable state on the other end. If those
+> conversations are taking place on the mailing lists, could you please CC
+> me?
+>=20
+> Our (Google) TSC adjustment clamping and userspace notification mechanism
+> was a halfway kludge to keep things happy on the other end. And it
+> generally has worked well, but misses a fundamental point.
+>=20
+> The hypervisor should tell the guest kernel about time travel and let it
+> cascade that information throughout the guest system. Regardless of what
+> we do to the TSC, we invariably destroy one of the two guest clocks along
+> the way. If we told the guest "you time traveled X seconds", it could
+> fold that into its own idea of real time. Guest kernel can then fire off
+> events to inform software that wants to keep up with clock changes, and
+> even a new event to let NTP know its probably running on different
+> hardware.
+>=20
+> Time sucks :-)
 
-> +
-> +       if (static_call(kvm_x86_get_cpl)(vcpu) != 0) {
-> +               ret = -KVM_EPERM;
-> +               goto out;
-> +       }
-> +
-> +       ret = __kvm_emulate_hypercall(vcpu, nr, a0, a1, a2, a3, op_64_bit);
->  out:
->         if (!op_64_bit)
->                 ret = (u32)ret;
-> --
-> 2.25.1
->
+So, we already have PVCLOCK_GUEST_STOPPED which tells the guest that
+its clock may have experienced a jump. Linux guests will use this to
+kick various watchdogs to prevent them whining. Shouldn't we *also* be
+driving the NTP reset from that same signal?
 
-Sagi
+--=-n1BoGn9keVAeoGgQmVuR
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIwMzIxMTk0MzIxWjAvBgkqhkiG9w0BCQQxIgQg9AnijD52
+XNGAGFkkGmrphNKxmWSdGVC8SJECnduKHD4wgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBZeQM66iqV0IHFgaHd74eGJ5g8rS/0ITbH
+/jeG2bDrn3IweIyIXY1C302jkS2LbDgD0HuwYV/XJ+2A8iOXkzdKgTRcR+wo3Fhw8eUawb0DgGZY
+p2zffo+ka9NYjMha3tx22YE7JlKDsVj57Ctmt7caLXyE0FbrLhusdxu7BPyFNvgqgV8R/yivlALF
+NIznC1FJHMhHROh3GLe5y83Be8kvaYBVXqYnl8Pkk9czL2N1lvbRNZGMY9oTcpGSgCz1SerarmHt
+n4P18nNSkR/DnfZxVHEZ0HIukGtsbvmZPdc9BitK8j7Xd+GQglkY3w6151HjbpbxVKdsgTmIpXB5
+FMTl8RoZo6WsbV7g9z70mkwWXXWTp1JHO32/hHdExjtpX/RvUOD8Tx7mqZBwrx8Xsa0YdMfSu+MR
+wPZD7epoQawKwLEXPIjoviyh/ZLupV3H9cMNtlv0Q4LJ2AZHICbr32ev/UEHCYQljvqa1Tuho9mA
+y0L7TRWuyi4LphFVAsMsAqF0ml0K+g97bIe3vD8mKh3e3r+l2jLYRniLQ53EasoNKfNG2F7u8g29
+hrExWHfT+CSQnfLrymasZHqU47hi90otAiJOQqSmbTH+nhQa3B83JXhZxwE0ELfwAeOVrtjfw6Us
+v2ft+d7FXg14985ra+Jm3J8FhCcdd9Gn89qkLIXHRwAAAAAAAA==
+
+
+--=-n1BoGn9keVAeoGgQmVuR--
+
