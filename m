@@ -2,153 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CEBDE4E2EE8
-	for <lists+kvm@lfdr.de>; Mon, 21 Mar 2022 18:16:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 563E44E2EED
+	for <lists+kvm@lfdr.de>; Mon, 21 Mar 2022 18:18:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351721AbiCURQy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Mar 2022 13:16:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51570 "EHLO
+        id S1351739AbiCURSf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Mar 2022 13:18:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58118 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234380AbiCURQx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Mar 2022 13:16:53 -0400
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99F9D3CFC6;
-        Mon, 21 Mar 2022 10:15:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1647882926; x=1679418926;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:mime-version;
-  bh=mMM9NAx5eo2hK5QQll1zqCg6yT1+1KOsTu0MhDOKwCY=;
-  b=d3SEkDswPF9ZEl4UZ9li2xf+ajXfk0ZFRxnlVJhCNL/Ai89ESV8tBCJr
-   RpG4IDC4KuRYkEWp4Xf4tZtETCluMCX0y6NBjb8uX4g5Ll4IHFk3bT1F2
-   MP/NIMTKU3t9YpKT2RRPtIwxfu9svccNcUDlURu3Xuhq4tEMR2Ufh7ULR
-   w=;
-X-Amazon-filename: 0001-KVM-x86-xen-add-support-for-32-bit-guests-in-SCHEDOP.patch
-X-IronPort-AV: E=Sophos;i="5.90,199,1643673600"; 
-   d="scan'208,223";a="186510121"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-iad-1e-0bfdb89e.us-east-1.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP; 21 Mar 2022 17:15:16 +0000
-Received: from EX13D32EUB001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
-        by email-inbound-relay-iad-1e-0bfdb89e.us-east-1.amazon.com (Postfix) with ESMTPS id B4935E00E7;
-        Mon, 21 Mar 2022 17:15:15 +0000 (UTC)
-Received: from EX13D43EUB002.ant.amazon.com (10.43.166.8) by
- EX13D32EUB001.ant.amazon.com (10.43.166.125) with Microsoft SMTP Server (TLS)
- id 15.0.1497.32; Mon, 21 Mar 2022 17:15:14 +0000
-Received: from EX13D43EUB002.ant.amazon.com ([10.43.166.8]) by
- EX13D43EUB002.ant.amazon.com ([10.43.166.8]) with mapi id 15.00.1497.033;
- Mon, 21 Mar 2022 17:15:14 +0000
-From:   "Kaya, Metin" <metikaya@amazon.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-CC:     "Woodhouse, David" <dwmw@amazon.co.uk>,
-        "Durrant, Paul" <pdurrant@amazon.co.uk>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>
-Subject: Re: [PATCH v2 1/1] KVM: x86/xen: add support for 32-bit guests in
- SCHEDOP_poll
-Thread-Topic: [PATCH v2 1/1] KVM: x86/xen: add support for 32-bit guests in
- SCHEDOP_poll
-Thread-Index: AQHYPUc6LvcJQy+oDUqe5JacL/SQ1A==
-Date:   Mon, 21 Mar 2022 17:15:14 +0000
-Message-ID: <1647882914508.15309@amazon.com>
-References: <1647881191688.60603@amazon.com>
-In-Reply-To: <1647881191688.60603@amazon.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-GB
-X-MS-Has-Attach: yes
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.43.160.240]
-Content-Type: multipart/mixed; boundary="_002_164788291450815309amazoncom_"
+        with ESMTP id S234380AbiCURSd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Mar 2022 13:18:33 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3AB1F64BDC
+        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 10:17:07 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 00E5D1042;
+        Mon, 21 Mar 2022 10:17:07 -0700 (PDT)
+Received: from [10.57.38.68] (unknown [10.57.38.68])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EEBF93F66F;
+        Mon, 21 Mar 2022 10:17:05 -0700 (PDT)
+Message-ID: <b1a6c704-d8e3-c49e-49da-d82f8fdf9120@arm.com>
+Date:   Mon, 21 Mar 2022 17:17:04 +0000
 MIME-Version: 1.0
-X-Spam-Status: No, score=-13.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [kvmtool PATCH 2/2] aarch64: Add support for MTE
+Content-Language: en-GB
+To:     Alexandru Elisei <alexandru.elisei@arm.com>,
+        Vladimir Murzin <vladimir.murzin@arm.com>
+Cc:     will@kernel.org, kvm@vger.kernel.org,
+        julien.thierry.kdev@gmail.com,
+        linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com
+References: <20220321152820.246700-1-alexandru.elisei@arm.com>
+ <20220321152820.246700-3-alexandru.elisei@arm.com>
+ <3cf3b621-5a07-5c06-cb9f-f9c776b6717d@arm.com>
+ <Yjiw/mdfLyMW2gFh@monolith.localdoman>
+From:   Steven Price <steven.price@arm.com>
+In-Reply-To: <Yjiw/mdfLyMW2gFh@monolith.localdoman>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---_002_164788291450815309amazoncom_
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+On 21/03/2022 17:08, Alexandru Elisei wrote:
+> Hi,
+> 
+> On Mon, Mar 21, 2022 at 03:40:18PM +0000, Vladimir Murzin wrote:
+>> Hi Alexandru,
+>>
+>> On 3/21/22 3:28 PM, Alexandru Elisei wrote:
+>>> MTE has been supported in Linux since commit 673638f434ee ("KVM: arm64:
+>>> Expose KVM_ARM_CAP_MTE"), add support for it in kvmtool.
+>>>
+>>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+>>> ---
+>>>  arm/aarch32/include/kvm/kvm-arch.h        |  3 +++
+>>>  arm/aarch64/include/kvm/kvm-arch.h        |  1 +
+>>>  arm/aarch64/include/kvm/kvm-config-arch.h |  2 ++
+>>>  arm/aarch64/kvm.c                         | 13 +++++++++++++
+>>>  arm/include/arm-common/kvm-config-arch.h  |  1 +
+>>>  arm/kvm.c                                 |  3 +++
+>>>  6 files changed, 23 insertions(+)
+>>>
+>>> diff --git a/arm/aarch32/include/kvm/kvm-arch.h b/arm/aarch32/include/kvm/kvm-arch.h
+>>> index bee2fc255a82..5616b27e257e 100644
+>>> --- a/arm/aarch32/include/kvm/kvm-arch.h
+>>> +++ b/arm/aarch32/include/kvm/kvm-arch.h
+>>> @@ -5,6 +5,9 @@
+>>>  
+>>>  #define kvm__arch_get_kern_offset(...)	0x8000
+>>>  
+>>> +struct kvm;
+>>> +static inline void kvm__arch_enable_mte(struct kvm *kvm) {}
+>>> +
+>>>  #define ARM_MAX_MEMORY(...)	ARM_LOMAP_MAX_MEMORY
+>>>  
+>>>  #define MAX_PAGE_SIZE	SZ_4K
+>>> diff --git a/arm/aarch64/include/kvm/kvm-arch.h b/arm/aarch64/include/kvm/kvm-arch.h
+>>> index 5e5ee41211ed..9124f6919d0f 100644
+>>> --- a/arm/aarch64/include/kvm/kvm-arch.h
+>>> +++ b/arm/aarch64/include/kvm/kvm-arch.h
+>>> @@ -6,6 +6,7 @@
+>>>  struct kvm;
+>>>  unsigned long long kvm__arch_get_kern_offset(struct kvm *kvm, int fd);
+>>>  int kvm__arch_get_ipa_limit(struct kvm *kvm);
+>>> +void kvm__arch_enable_mte(struct kvm *kvm);
+>>>  
+>>>  #define ARM_MAX_MEMORY(kvm)	({					\
+>>>  	u64 max_ram;							\
+>>> diff --git a/arm/aarch64/include/kvm/kvm-config-arch.h b/arm/aarch64/include/kvm/kvm-config-arch.h
+>>> index 04be43dfa9b2..11250365d8d5 100644
+>>> --- a/arm/aarch64/include/kvm/kvm-config-arch.h
+>>> +++ b/arm/aarch64/include/kvm/kvm-config-arch.h
+>>> @@ -6,6 +6,8 @@
+>>>  			"Run AArch32 guest"),				\
+>>>  	OPT_BOOLEAN('\0', "pmu", &(cfg)->has_pmuv3,			\
+>>>  			"Create PMUv3 device"),				\
+>>> +	OPT_BOOLEAN('\0', "mte", &(cfg)->has_mte,			\
+>>> +			"Enable memory tagging extension"),		\
+>>>  	OPT_U64('\0', "kaslr-seed", &(cfg)->kaslr_seed,			\
+>>>  			"Specify random seed for Kernel Address Space "	\
+>>>  			"Layout Randomization (KASLR)"),
+>>> diff --git a/arm/aarch64/kvm.c b/arm/aarch64/kvm.c
+>>> index 56a0aedc263d..46548f8ee96e 100644
+>>> --- a/arm/aarch64/kvm.c
+>>> +++ b/arm/aarch64/kvm.c
+>>> @@ -81,3 +81,16 @@ int kvm__get_vm_type(struct kvm *kvm)
+>>>  
+>>>  	return KVM_VM_TYPE_ARM_IPA_SIZE(ipa_bits);
+>>>  }
+>>> +
+>>> +void kvm__arch_enable_mte(struct kvm *kvm)
+>>> +{
+>>> +	struct kvm_enable_cap cap = {
+>>> +		.cap = KVM_CAP_ARM_MTE,
+>>> +	};
+>>> +
+>>> +	if (!kvm__supports_extension(kvm, KVM_CAP_ARM_MTE))
+>>> +		die("MTE capability is not supported");
+>>> +
+>>> +	if (ioctl(kvm->vm_fd, KVM_ENABLE_CAP, &cap))
+>>> +		die_perror("KVM_ENABLE_CAP(KVM_CAP_ARM_MTE)");
+>>> +}
+>>> diff --git a/arm/include/arm-common/kvm-config-arch.h b/arm/include/arm-common/kvm-config-arch.h
+>>> index 5734c46ab9e6..16e8d500a71b 100644
+>>> --- a/arm/include/arm-common/kvm-config-arch.h
+>>> +++ b/arm/include/arm-common/kvm-config-arch.h
+>>> @@ -9,6 +9,7 @@ struct kvm_config_arch {
+>>>  	bool		virtio_trans_pci;
+>>>  	bool		aarch32_guest;
+>>>  	bool		has_pmuv3;
+>>> +	bool		has_mte;
+>>>  	u64		kaslr_seed;
+>>>  	enum irqchip_type irqchip;
+>>>  	u64		fw_addr;
+>>> diff --git a/arm/kvm.c b/arm/kvm.c
+>>> index 80d233f13d0b..f2db93953778 100644
+>>> --- a/arm/kvm.c
+>>> +++ b/arm/kvm.c
+>>> @@ -86,6 +86,9 @@ void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64 ram_size)
+>>>  	/* Create the virtual GIC. */
+>>>  	if (gic__create(kvm, kvm->cfg.arch.irqchip))
+>>>  		die("Failed to create virtual GIC");
+>>> +
+>>> +	if (kvm->cfg.arch.has_mte)
+>>> +		kvm__arch_enable_mte(kvm);
+>>>  }
+>>
+>> Can we enable it unconditionally if KVM_CAP_ARM_MTE is supported like we do for
+>> PAC and SVE?
+> 
+> I thought about that, the reason I chose to enable it based a kvmtool
+> command line option, instead of always being enabled if available, is
+> because of the overhead of sanitising the MTE tags on each stage 2 data
+> abort. Steven, am I overreacting and that overhead is negligible?
 
-v2: Updated a comment and added a new one.=0A=
-________________________________________=0A=
-From: Kaya, Metin=0A=
-Sent: 21 March 2022 16:46=0A=
-To: Paolo Bonzini; kvm@vger.kernel.org=0A=
-Cc: Woodhouse, David; Durrant, Paul; Boris Ostrovsky; linux-kernel@vger.ker=
-nel.org; x86@kernel.org=0A=
-Subject: [PATCH 1/1] KVM: x86/xen: add support for 32-bit guests in SCHEDOP=
-_poll=0A=
+I don't have any figures from hardware I'm afraid, so I can't say what
+the actual time overhead is in reality (but I suspect it's measurable).
 
---_002_164788291450815309amazoncom_
-Content-Type: text/x-patch;
-	name="0001-KVM-x86-xen-add-support-for-32-bit-guests-in-SCHEDOP.patch"
-Content-Description: 0001-KVM-x86-xen-add-support-for-32-bit-guests-in-SCHEDOP.patch
-Content-Disposition: attachment;
-	filename="0001-KVM-x86-xen-add-support-for-32-bit-guests-in-SCHEDOP.patch";
-	size=2919; creation-date="Mon, 21 Mar 2022 17:14:19 GMT";
-	modification-date="Mon, 21 Mar 2022 17:14:19 GMT"
-Content-Transfer-Encoding: base64
+However there is also a memory overhead when it comes to swapping MTE
+tagged memory out. The tags have to be stored somewhere (currently they
+remain in memory) so there's >3% overhead[1] in terms of memory when
+swapped out.
 
-RnJvbSBmMTlhODgzMmUyZTU2Zjg0M2ZkYzYyNzQwZGIxMzgxZDUwOTQ2YmUzIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBNZXRpbiBLYXlhIDxtZXRpa2F5YUBhbWF6b24uY29tPgpEYXRl
-OiBNb24sIDIxIE1hciAyMDIyIDExOjA1OjMyICswMDAwClN1YmplY3Q6IFtQQVRDSF0gS1ZNOiB4
-ODYveGVuOiBhZGQgc3VwcG9ydCBmb3IgMzItYml0IGd1ZXN0cyBpbiBTQ0hFRE9QX3BvbGwKClRo
-aXMgcGF0Y2ggaW50cm9kdWNlcyBjb21wYXQgdmVyc2lvbiBvZiBzdHJ1Y3Qgc2NoZWRfcG9sbCBm
-b3IKU0NIRURPUF9wb2xsIHN1Yi1vcGVyYXRpb24gb2Ygc2NoZWRfb3AgaHlwZXJjYWxsLCByZWFk
-cyBjb3JyZWN0IGFtb3VudApvZiBkYXRhICgxNiBieXRlcyBpbiAzMi1iaXQgY2FzZSwgMjQgYnl0
-ZXMgb3RoZXJ3aXNlKSBieSB1c2luZyBuZXcKY29tcGF0X3NjaGVkX3BvbGwgc3RydWN0LCBjb3Bp
-ZXMgaXQgdG8gc2NoZWRfcG9sbCBwcm9wZXJseSwgYW5kIGxldHMKcmVzdCBvZiB0aGUgY29kZSBy
-dW4gYXMgaXMuCgpTaWduZWQtb2ZmLWJ5OiBNZXRpbiBLYXlhIDxtZXRpa2F5YUBhbWF6b24uY29t
-PgpSZXZpZXdlZC1ieTogRGF2aWQgV29vZGhvdXNlIDxkd213QGFtYXpvbi5jby51az4KUmV2aWV3
-ZWQtYnk6IFBhdWwgRHVycmFudCA8cGR1cnJhbnRAYW1hem9uLmNvLnVrPgotLS0KIGFyY2gveDg2
-L2t2bS94ZW4uYyB8IDMxICsrKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0KIGFyY2gveDg2
-L2t2bS94ZW4uaCB8ICA3ICsrKysrKysKIDIgZmlsZXMgY2hhbmdlZCwgMzQgaW5zZXJ0aW9ucygr
-KSwgNCBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9hcmNoL3g4Ni9rdm0veGVuLmMgYi9hcmNo
-L3g4Ni9rdm0veGVuLmMKaW5kZXggN2QwMTk4M2QxMDg3Li4yZDBhNWQyY2E2ZjEgMTAwNjQ0Ci0t
-LSBhL2FyY2gveDg2L2t2bS94ZW4uYworKysgYi9hcmNoL3g4Ni9rdm0veGVuLmMKQEAgLTk5OCwy
-MCArOTk4LDQzIEBAIHN0YXRpYyBib29sIGt2bV94ZW5fc2NoZWRvcF9wb2xsKHN0cnVjdCBrdm1f
-dmNwdSAqdmNwdSwgYm9vbCBsb25nbW9kZSwKIAlldnRjaG5fcG9ydF90IHBvcnQsICpwb3J0czsK
-IAlncGFfdCBncGE7CiAKLQlpZiAoIWxvbmdtb2RlIHx8ICFsYXBpY19pbl9rZXJuZWwodmNwdSkg
-fHwKKwlpZiAoIWxhcGljX2luX2tlcm5lbCh2Y3B1KSB8fAogCSAgICAhKHZjcHUtPmt2bS0+YXJj
-aC54ZW5faHZtX2NvbmZpZy5mbGFncyAmIEtWTV9YRU5fSFZNX0NPTkZJR19FVlRDSE5fU0VORCkp
-CiAJCXJldHVybiBmYWxzZTsKIAogCWlkeCA9IHNyY3VfcmVhZF9sb2NrKCZ2Y3B1LT5rdm0tPnNy
-Y3UpOwogCWdwYSA9IGt2bV9tbXVfZ3ZhX3RvX2dwYV9zeXN0ZW0odmNwdSwgcGFyYW0sIE5VTEwp
-OwogCXNyY3VfcmVhZF91bmxvY2soJnZjcHUtPmt2bS0+c3JjdSwgaWR4KTsKLQotCWlmICghZ3Bh
-IHx8IGt2bV92Y3B1X3JlYWRfZ3Vlc3QodmNwdSwgZ3BhLCAmc2NoZWRfcG9sbCwKLQkJCQkJc2l6
-ZW9mKHNjaGVkX3BvbGwpKSkgeworCWlmICghZ3BhKSB7CiAJCSpyID0gLUVGQVVMVDsKIAkJcmV0
-dXJuIHRydWU7CiAJfQogCisJaWYgKElTX0VOQUJMRUQoQ09ORklHXzY0QklUKSAmJiBsb25nbW9k
-ZSkgeworCQlpZiAoa3ZtX3ZjcHVfcmVhZF9ndWVzdCh2Y3B1LCBncGEsICZzY2hlZF9wb2xsLAor
-CQkJCQlzaXplb2Yoc2NoZWRfcG9sbCkpKSB7CisJCQkqciA9IC1FRkFVTFQ7CisJCQlyZXR1cm4g
-dHJ1ZTsKKwkJfQorCX0gZWxzZSB7CisJCXN0cnVjdCBjb21wYXRfc2NoZWRfcG9sbCBzcDsKKwor
-CQkvKgorCQkgKiBTYW5pdHkgY2hlY2sgdGhhdCBfX3BhY2tlZCB0cmljayB3b3JrcyBmaW5lIGFu
-ZCBzaXplIG9mCisJCSAqIGNvbXBhdF9zY2hlZF9wb2xsIGlzIDE2IGJ5dGVzIGp1c3QgbGlrZSBp
-biB0aGUgcmVhbCBYZW4KKwkJICogMzItYml0IGNhc2UuCisJCSAqLworCQlCVUlMRF9CVUdfT04o
-c2l6ZW9mKHN0cnVjdCBjb21wYXRfc2NoZWRfcG9sbCkgIT0gMTYpOworCisJCWlmIChrdm1fdmNw
-dV9yZWFkX2d1ZXN0KHZjcHUsIGdwYSwgJnNwLCBzaXplb2Yoc3ApKSkgeworCQkJKnIgPSAtRUZB
-VUxUOworCQkJcmV0dXJuIHRydWU7CisJCX0KKwkJc2NoZWRfcG9sbC5wb3J0cyA9IChldnRjaG5f
-cG9ydF90ICopKHVuc2lnbmVkIGxvbmcpKHNwLnBvcnRzKTsKKwkJc2NoZWRfcG9sbC5ucl9wb3J0
-cyA9IHNwLm5yX3BvcnRzOworCQlzY2hlZF9wb2xsLnRpbWVvdXQgPSBzcC50aW1lb3V0OworCX0K
-KwogCWlmICh1bmxpa2VseShzY2hlZF9wb2xsLm5yX3BvcnRzID4gMSkpIHsKIAkJLyogWGVuICh1
-bm9mZmljaWFsbHkpIGxpbWl0cyBudW1iZXIgb2YgcG9sbGVycyB0byAxMjggKi8KIAkJaWYgKHNj
-aGVkX3BvbGwubnJfcG9ydHMgPiAxMjgpIHsKZGlmZiAtLWdpdCBhL2FyY2gveDg2L2t2bS94ZW4u
-aCBiL2FyY2gveDg2L2t2bS94ZW4uaAppbmRleCBlZTVjNGFlMDc1NWMuLjhiMzZkMzQ2ZmM5YyAx
-MDA2NDQKLS0tIGEvYXJjaC94ODYva3ZtL3hlbi5oCisrKyBiL2FyY2gveDg2L2t2bS94ZW4uaApA
-QCAtMTk2LDYgKzE5NiwxMyBAQCBzdHJ1Y3QgY29tcGF0X3NoYXJlZF9pbmZvIHsKIAlzdHJ1Y3Qg
-Y29tcGF0X2FyY2hfc2hhcmVkX2luZm8gYXJjaDsKIH07CiAKK3N0cnVjdCBjb21wYXRfc2NoZWRf
-cG9sbCB7CisJLyogVGhpcyBpcyBhY3R1YWxseSBhIGd1ZXN0IHZpcnR1YWwgYWRkcmVzcyB3aGlj
-aCBwb2ludHMgdG8gcG9ydHMuICovCisJdWludDMyX3QgcG9ydHM7CisJdW5zaWduZWQgaW50IG5y
-X3BvcnRzOworCXVpbnQ2NF90IHRpbWVvdXQ7Cit9IF9fcGFja2VkOworCiAjZGVmaW5lIENPTVBB
-VF9FVlRDSE5fMkxfTlJfQ0hBTk5FTFMgKDggKgkJCQlcCiAJCQkJICAgICAgc2l6ZW9mX2ZpZWxk
-KHN0cnVjdCBjb21wYXRfc2hhcmVkX2luZm8sIFwKIAkJCQkJCSAgIGV2dGNobl9wZW5kaW5nKSkK
-LS0gCjIuMzIuMAoK
+So I think probably the opt-in approach makes sense, but I've no strong
+feelings and I can see the benefits for the default being "every available".
 
---_002_164788291450815309amazoncom_--
+Steve
+
+[1] For each 4k page a 128 byte buffer is allocated for the pages
+(3.125% overhead), but on top of that there's the kmalloc overhead and
+an Xarray to store the pointer in. I haven't done the maths but it
+probably comes out closer to 4%.
+
+> Also, as far as I know, PAC and SVE incur basically no overhead in KVM
+> until the guest starts to use those features.
+> 
+> Do you have a specific reason for wanting MTE to always be enabled if
+> available? I'm happy to be convinced to make MTE enabled by default, I
+> don't have preference either way.
+> 
+> Thanks,
+> Alex
+
