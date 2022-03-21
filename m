@@ -2,81 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0FA814E1E88
-	for <lists+kvm@lfdr.de>; Mon, 21 Mar 2022 01:51:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 00F224E1EF1
+	for <lists+kvm@lfdr.de>; Mon, 21 Mar 2022 03:02:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343948AbiCUAwq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 20 Mar 2022 20:52:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46658 "EHLO
+        id S1344126AbiCUCDX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 20 Mar 2022 22:03:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58338 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232714AbiCUAwp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 20 Mar 2022 20:52:45 -0400
-Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 007AD140F3
-        for <kvm@vger.kernel.org>; Sun, 20 Mar 2022 17:51:21 -0700 (PDT)
-Received: by mail-io1-xd2e.google.com with SMTP id h63so15158239iof.12
-        for <kvm@vger.kernel.org>; Sun, 20 Mar 2022 17:51:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=z96X8M63Et3y7PJDqcFSz7o73T5HSrhCu2qF6/QRNXg=;
-        b=VJLo3j74Q654FlzIJBSn3mXOoQUKvuJQxOUXGiX0Df2q6wQz56gbM8zEMQ337ZQ9aD
-         6+Q/CNsiXsMeEGF8tUGRqSsce6yXJAECXiq6AROWecOa0T0hO1eF5mm9r4JhFzI4D/ul
-         aV9EGCwqXaAV8QhkJ+JIW3f2V5tSIbzPWm6a30iOmQ2EUTZ8jFdUbIiSWH7joyufjD3y
-         cNfbQRrtKjQ418L6Ai6euG81jKQJ5EHLnBdnYQ8EYnsIjyq9eeXa5r5ojr7TF8XglQpD
-         uFIpYH2bGax361VrCBRClwVZw0YIIfazTnJbEHnRtd3sMZzYb0/6jPRnivG8JPAtlA2T
-         WxxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=z96X8M63Et3y7PJDqcFSz7o73T5HSrhCu2qF6/QRNXg=;
-        b=qmuOPWKdpqUJZdy+K4g3yHm63uvCVyw17pkXUlx5qZ35ZA1Jh5xV87IKD2YRLBO+vF
-         RqD3KVpiRp7+LjZAplSuuKZS4VfnQVJMsSCP0WDKXHRQi939l+7mSVlpwdIlbJjRTprn
-         OMPoHQk98t6odUcM/XToUwjY0JNWpzRjWvUDGIQodRWNSr798OBGUh45LeKMD2XGrqaw
-         991RlkLxTIIhTM28wzVtQD/h8DDide2LKLNPyt+HTPoHcqUyPwSnxQLuMKO/mkvN5vss
-         v+porJgL4k2DUl5XYw6IYI/H72pzHCbgqM2w+QWGBu47tahkjS3CtWb2zgQhHGLSwn9K
-         Uo2A==
-X-Gm-Message-State: AOAM531yzFtFZXq9JyCgFXbIXNeUIilWx21xAnYi9UOW0H8R5coaKRYk
-        CdUt2O5ju4fHcELlIqxn9fcrwg==
-X-Google-Smtp-Source: ABdhPJwXzJvtxxZiT9kHMg8huqU9BdX8iCLsGBQ3ZQELVJXQ4Kc89wEYYeuIn+HeIvLWU3RdxGZtag==
-X-Received: by 2002:a6b:750c:0:b0:641:3b39:7b24 with SMTP id l12-20020a6b750c000000b006413b397b24mr9109157ioh.139.1647823881141;
-        Sun, 20 Mar 2022 17:51:21 -0700 (PDT)
-Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
-        by smtp.gmail.com with ESMTPSA id i5-20020a6bf405000000b00645be60c31csm7880265iog.23.2022.03.20.17.51.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 20 Mar 2022 17:51:20 -0700 (PDT)
-Date:   Mon, 21 Mar 2022 00:51:17 +0000
-From:   Oliver Upton <oupton@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: Re: [PATCH] Documentation: KVM: Describe guest TSC scaling in
- migration algorithm
-Message-ID: <YjfMBYsse95znupa@google.com>
-References: <YjTRyssYQhbxeNHA@google.com>
- <0bff64ae-0420-2f69-10ba-78b9c5ac7b81@redhat.com>
- <YjWNfQThS4URRMZC@google.com>
- <e48bc11a5c4b0864616686cb1365dfb4c11b5b61.camel@infradead.org>
- <a6011bed-79b4-72ab-843c-315bf3fcf51e@redhat.com>
- <3548e754-28ae-f6c4-5d4c-c316ae6fbbb0@redhat.com>
- <100b54469a8d59976bbd96f50dd4cd33.squirrel@twosheds.infradead.org>
- <9ca10e3a-cd99-714a-76ad-6f1b83bb0abf@redhat.com>
- <YjbrOz+yT4R7FaX1@google.com>
- <9afd33cb-4052-fe15-d3ae-69a14ca252b0@redhat.com>
+        with ESMTP id S238328AbiCUCDT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 20 Mar 2022 22:03:19 -0400
+Received: from out1-smtp.messagingengine.com (out1-smtp.messagingengine.com [66.111.4.25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31CA1160167;
+        Sun, 20 Mar 2022 19:01:55 -0700 (PDT)
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+        by mailout.nyi.internal (Postfix) with ESMTP id C579D5C010A;
+        Sun, 20 Mar 2022 22:01:52 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute3.internal (MEProxy); Sun, 20 Mar 2022 22:01:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=turner.link; h=
+        cc:cc:content-type:date:date:from:from:in-reply-to:in-reply-to
+        :message-id:mime-version:references:reply-to:sender:subject
+        :subject:to:to; s=fm3; bh=uXQFEtZDztyGX9AqVl1DV7goVhiMjSgo2VCtiW
+        c9Ki8=; b=ZARfCnE0qOE6r2TNSfo5JUnuSRgVMItuvc+hzB1EuKdG87zevOdYOk
+        9e6856l2J2TYvMr2fhsC705gBJ23mlHBTJJkZ/Gcdcy0/xheFs6ICIHeN75PVT7G
+        iqBs/4UWq/2EmZia8TPmlZr+nIYr08SGXpZw+GEdHRBlzOZl9dupzWOYcBePz2Cx
+        GPSn1/ABJ6e0+IUeQA0k0lr8J4cdJwA8Dbbkn/Tx+ZkKBUU0XAtwAjQ0xlIIap2n
+        7RaSw+DFsizjC/rjWVt/9omoPalsWtMXuI4+t/1KsqTRPxv7L7ybWVNH85YDbILs
+        OWcNbZmEWhcEErBCdU1mvdV/WkUkcWwg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:date:date:from:from
+        :in-reply-to:in-reply-to:message-id:mime-version:references
+        :reply-to:sender:subject:subject:to:to:x-me-proxy:x-me-proxy
+        :x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=uXQFEtZDztyGX9AqV
+        l1DV7goVhiMjSgo2VCtiWc9Ki8=; b=QvSwI85adgO3ty/9m5FB9zLE9x3Gf/nOT
+        /HD/CNxZtbczkOOuWaQjiSQO4TbxKPVGdoM6+ShctBBliwIXqbHPYEFkqjaK6xMt
+        mOWdkmT2j7ZHatiEjjhUDZSnVzf7kMgvU5dd2hsgd3ig6OMPlr3adz5I8Z0PijKX
+        QU5QE3cIpdjWZm31HD5uFg1dJsKwbYwjCursog3VM2ROlW0m7k7jmNL3NzzcUd3g
+        agkIAR8dE3SDGp5PK4kYi3JLA5rjtG+eQm1TjLCuTDEPb21OuvdIG31G8pL2R0/O
+        hKNfbTsPLOik9q/UJtw4sZguf3UIqZfLXb/+zHH+3zID41XBiqVDw==
+X-ME-Sender: <xms:kNw3YvWHFKGgbMX_qpuRPJjMnzq5sqk6B92Ytu8ohIlwZ5Tk0f3xug>
+    <xme:kNw3YnkdthuW8-IXpAeMrQSDgw6mOhr1TFD8sx4B0-VHt-IuZ4R2Z2YGLQt-k86XJ
+    Djf2VrryevIDTA2zw>
+X-ME-Received: <xmr:kNw3Yraa8XthFjCkwZQM_7o1VmzL-hHAO8DqjqBdFKhxmKAppVorfKkl2f09Z-JwV-WN7KcyRe_3TioUda3pQNN1-1OQx2EN6pQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvvddrudegvddggeduucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfhfhvffuffgjkfggtgesthdtredttddttdenucfhrhhomheplfgrmhgvshcu
+    vfhurhhnvghruceolhhinhhugihkvghrnhgvlhdrfhhoshhssegumhgrrhgtqdhnohhnvg
+    drthhurhhnvghrrdhlihhnkheqnecuggftrfgrthhtvghrnhepfffhveeugfevteeileej
+    vdeltdegtdeggfeujefgveekueevkeehheehffduleevnecuffhomhgrihhnpegrrhgthh
+    hlihhnuhigrdhorhhgnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghi
+    lhhfrhhomheplhhinhhugihkvghrnhgvlhdrfhhoshhssegumhgrrhgtqdhnohhnvgdrth
+    hurhhnvghrrdhlihhnkh
+X-ME-Proxy: <xmx:kNw3YqXPiY-kEqyj9eZYEkRKkTK-VSv-wHKOmIigxQmuO2L9tKfDyw>
+    <xmx:kNw3Yplrm6z9OuMM72uhI218UV6yFyOdpffW8AhGe3sojdx04sRa9w>
+    <xmx:kNw3YnfiyoDDNxyJ4CnebyAfuUReEKaz4lJ2j4hjDHeACI3BuwBBtQ>
+    <xmx:kNw3Yu-UqEZOZ0UEJSMqnW6mmSMsR5FIMcXZOJZHOpWluFpTx-vXTw>
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
+ 20 Mar 2022 22:01:51 -0400 (EDT)
+References: <87ee57c8fu.fsf@turner.link>
+ <87sftfqwlx.fsf@dmarc-none.turner.link>
+ <BYAPR12MB4614E2CFEDDDEAABBAB986A0975E9@BYAPR12MB4614.namprd12.prod.outlook.com>
+ <87ee4wprsx.fsf@turner.link>
+ <4b3ed7f6-d2b6-443c-970e-d963066ebfe3@amd.com>
+ <87pmo8r6ob.fsf@turner.link>
+ <5a68afe4-1e9e-c683-e06d-30afc2156f14@leemhuis.info>
+ <CADnq5_MCKTLOfWKWvi94Q9-d5CGdWBoWVxEYL3YXOpMiPnLOyg@mail.gmail.com>
+ <87pmnnpmh5.fsf@dmarc-none.turner.link>
+ <CADnq5_NG_dQCYwqHM0umjTMg5Uud6zC4=MiscH91Y9v7mW9bJA@mail.gmail.com>
+ <092b825a-10ff-e197-18a1-d3e3a097b0e3@leemhuis.info>
+ <877d96to55.fsf@dmarc-none.turner.link> <87lexdw8gd.fsf@turner.link>
+ <d541b534-8b83-b566-56eb-ea8baa7c998e@leemhuis.info>
+ <40b3084a-11b8-0962-4b33-34b56d3a87a3@molgen.mpg.de>
+ <bc714e87-d1dc-cdda-5a29-25820faaff40@leemhuis.info>
+ <20220318084625.27d42a51.alex.williamson@redhat.com>
+ <CADnq5_OE7JpffYggKsu92DAjur1CCSqZQ7LbMqcfmAk68FerDA@mail.gmail.com>
+ <20220318092552.518a50ef.alex.williamson@redhat.com>
+From:   James Turner <linuxkernel.foss@dmarc-none.turner.link>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Alex Deucher <alexdeucher@gmail.com>,
+        Thorsten Leemhuis <regressions@leemhuis.info>,
+        Paul Menzel <pmenzel@molgen.mpg.de>,
+        Xinhui Pan <Xinhui.Pan@amd.com>, regressions@lists.linux.dev,
+        kvm@vger.kernel.org, Greg KH <gregkh@linuxfoundation.org>,
+        Lijo Lazar <lijo.lazar@amd.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        amd-gfx list <amd-gfx@lists.freedesktop.org>,
+        Alexander Deucher <Alexander.Deucher@amd.com>,
+        Christian =?utf-8?Q?K=C3=B6nig?= <Christian.Koenig@amd.com>
+Subject: Re: [REGRESSION] Too-low frequency limit for AMD GPU
+ PCI-passed-through to Windows VM
+Date:   Sun, 20 Mar 2022 21:26:51 -0400
+In-reply-to: <20220318092552.518a50ef.alex.williamson@redhat.com>
+Message-ID: <87mthkkqr4.fsf@turner.link>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9afd33cb-4052-fe15-d3ae-69a14ca252b0@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H3,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -84,64 +107,98 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Mar 20, 2022 at 02:39:34PM +0100, Paolo Bonzini wrote:
-> On 3/20/22 09:52, Oliver Upton wrote:
-> > What do you folks think about having a new R/O vCPU attribute that
-> > returns a { TOD, guest_tsc } pair? I believe that would immediately
-> > satisfy the needs of upstream to implement clock-advancing live
-> > migration.
-> 
-> I don't think this adds much.  The missing link is on the destination side,
-> not the source side.
+>>> Right, interference from host drivers and pre-boot environments is
+>>> always a concern with GPU assignment in particular. AMD GPUs have a
+>>> long history of poor behavior relative to things like PCI secondary
+>>> bus resets which we use to try to get devices to clean, reusable
+>>> states for assignment. Here a device is being bound to a host driver
+>>> that initiates some sort of power control, unbound from that driver
+>>> and exposed to new drivers far beyond the scope of the kernel's
+>>> regression policy. Perhaps it's possible to undo such power control
+>>> when unbinding the device, but it's not necessarily a given that
+>>> such a thing is possible for this device without a cold reset.
+>>>
+>>> IMO, it's not fair to restrict the kernel from such advancements. If
+>>> the use case is within a VM, don't bind host drivers. It's difficult
+>>> to make promises when dynamically switching between host and
+>>> userspace drivers for devices that don't have functional reset
+>>> mechanisms.
 
-I think it'll work:
+To clarify, the GPU is never bound to the `amdgpu` driver on the host.
+I'm binding it to `vfio-pci` on the host at boot, specifically to avoid
+issues with dynamic rebinding. To do this, I'm passing
+`vfio-pci.ids=1002:6981,1002:aae0` on the kernel command line, and I've
+confirmed that this option is working:
 
- Source:
-  - Pick a vCPU and save its { TOD, guest_TSC } pair
-  - Save the tsc offset of every vCPU
-  - Using all of the offsets, calculate the drift of all the follower
-    vCPUs from the leader vCPU (from step 1)
-  - Save the TSC frequency
+% lspci -nnk -d 1002:6981
+01:00.0 VGA compatible controller [0300]: Advanced Micro Devices, Inc. [AMD/ATI] Lexa XT [Radeon PRO WX 3200] [1002:6981]
+	Subsystem: Dell Device [1028:0926]
+	Kernel driver in use: vfio-pci
+	Kernel modules: amdgpu
 
- Destination:
-  - Restore the TSC frequency
-  - Read the { TOD, guest_TSC } pair for the first vCPU
-  - Compare with the source value to work out delta_guest_TSC and
-    delta_TOD
-  - Apply delta_guest_TSC to all vCPUs in a VM
-  - If you want to account for realtime, apply guest_tsc_freq *
-    delta_TOD to every vCPU in the VM
-  - Account for drift between leader/follower vCPUs
+% lspci -nnk -d 1002:aae0
+01:00.1 Audio device [0403]: Advanced Micro Devices, Inc. [AMD/ATI] Baffin HDMI/DP Audio [Radeon RX 550 640SP / RX 560/560X] [1002:aae0]
+	Subsystem: Dell Device [1028:0926]
+	Kernel driver in use: vfio-pci
+	Kernel modules: snd_hda_intel
 
-Userspace has some math to do, but IMO it needs to until we have a
-better mechanism for helping the guest clean up a slow migration.
-It does eliminate the need for doing TSC scaling in userspace, which
-I think is the trickiest piece of it all.
+Starting with
+f9b7f3703ff9 ("drm/amdgpu/acpi: make ATPX/ATCS structures global (v2)")
+this is insufficient for the GPU to work properly in the VM, since the
+`amdgpu` module is calling global ACPI methods which affect the GPU even
+though it's not bound to the `amdgpu` driver.
 
-Alternative could be to say that the VM has a single, authoritative {
-TOD, guest_TSC } clock that can be read or written. Any vCPU offsets
-then account for guest-induced drift in TSCs.
+>> Additionally, operating the isolated device in a VM on a constrained
+>> environment like a laptop may have other adverse side effects.  The
+>> driver in the guest would ideally know that this is a laptop and needs
+>> to properly interact with APCI to handle power management on the
+>> device.  If that is not the case, the driver in the guest may end up
+>> running the device out of spec with what the platform supports.  It's
+>> also likely to break suspend and resume, especially on systems which
+>> use S0ix since the firmware will generally only turn off certain power
+>> rails if all of the devices on the rails have been put into the proper
+>> state.  That state may vary depending on the platform requirements.
 
-> To recap, the data that needs to be migrated from source to destination is
-> the hostTSC+hostTOD pairing (returned by KVM_GET_CLOCK) plus one of each of
-> the following:
-> 
-> * either guestTSCOffset or a guestTSC synced with the hostTSC
-> 
-> * either guestTODOffset or a guestTOD synced with the hostTOD.
-> 
-> * either guestTSCScale or hostTSCFreq
-> 
-> Right now we have guestTSCOffset as a vCPU attribute, we have guestTOD
-> returned by KVM_GET_CLOCK, and we plan to have hostTSCFreq in sysfs. It's a
-> bit mix-and-match, but it's already a 5-tuple that the destination can use.
-> What's missing is a ioctl on the destination side that relieves userspace
-> from having to do the math.
+Fwiw, the guest Windows AMD driver can tell that it's a mobile GPU, and
+as a result, the driver GUI locks various performance parameters to the
+defaults. The cooling system and power supply seem to work without
+issues. As the load on the GPU increases, the fan speed increases. The
+GPU stays below the critical temperature with plenty of margin, even at
+100% load. The voltage reported by the GPU adjusts with the load, and I
+haven't experienced any glitches which would suggest that the GPU is not
+getting enough power or something. I haven't tried suspend/resume.
 
-That ioctl will work fine, but userspace needs to accept all the
-nastiness that ensues. If it yanks the guest too hard into the future
-it'll need to pick up the pieces when the guest kernel panics.
+What are the differences between a laptop and desktop, aside from the
+size of the cooling system? Could the issue reported here affect desktop
+systems, too?
 
---
-Thanks,
-Oliver
+As far as what to do for this issue: Personally, I don't mind
+blacklisting `amdgpu` on my machine. My primary concerns are:
+
+1. Other users may experience this issue and have trouble figuring out
+   what's happening, or they may not even realize that they're
+   experiencing significantly-lower-than-expected performance.
+
+2. It's possible that this issue affects some machines which use an AMD
+   GPU for the host and a second AMD GPU for the guest. For those
+   machines, blacklisting `amdgpu` would not be an option, since that
+   would disable the AMD GPU for the host.
+
+I've tried to help with concern 1 by mentioning this issue on the Arch
+Linux Wiki [1]. Another thing that would help is to print a warning
+message to the kernel ring buffer when an AMD GPU is bound to `vfio-pci`
+and the `amdgpu` module is loaded. (It would say something like,
+"Although the <GPU_NAME> device is bound to `vfio-pci`, loading the
+`amdgpu` module may still affect it via ACPI. Consider blacklisting
+`amdgpu` if the GPU does not behave as expected.")
+
+I'm not sure if there's any way to address concern 2, aside from fixing
+the firmware / Windows AMD driver.
+
+I thought of one more thing I could test -- I could try a Linux guest
+instead of a Windows guest to determine if the issue is due to the
+firmware or the guest Windows AMD driver. Would that be helpful?
+
+[1]: https://wiki.archlinux.org/title/PCI_passthrough_via_OVMF#Too-low_frequency_limit_for_AMD_GPU_passed-through_to_virtual_machine
+
+James
