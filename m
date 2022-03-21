@@ -2,102 +2,198 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0280A4E2FA7
-	for <lists+kvm@lfdr.de>; Mon, 21 Mar 2022 19:08:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1188A4E3007
+	for <lists+kvm@lfdr.de>; Mon, 21 Mar 2022 19:32:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352006AbiCUSJs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Mar 2022 14:09:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42456 "EHLO
+        id S1352194AbiCUSd7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Mar 2022 14:33:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45374 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351998AbiCUSJr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Mar 2022 14:09:47 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB8D838BDF
-        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 11:08:20 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id mr5-20020a17090b238500b001c67366ae93so12534559pjb.4
-        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 11:08:20 -0700 (PDT)
+        with ESMTP id S1352180AbiCUSd6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Mar 2022 14:33:58 -0400
+Received: from mail-yw1-x112c.google.com (mail-yw1-x112c.google.com [IPv6:2607:f8b0:4864:20::112c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE62A7461D
+        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 11:32:32 -0700 (PDT)
+Received: by mail-yw1-x112c.google.com with SMTP id 00721157ae682-2e5e176e1b6so88384107b3.13
+        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 11:32:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=67U3Z2XcJlRBA5r6fKuHVpCEmGfkLy5vZyJ9ghD60yU=;
-        b=TNT/gBllZiZ0tYMdVN2h6Nu1CfHmFRNsSVWVmgJWqeTocFJGIIb3xLUflmb2Xbhx9q
-         MdCYvUZD5LDw5yukGlzFxb99EQ2GcdFYgCARWv7Gr3pEXX5U/g50pBVxVPt4ZhNr5a/x
-         VjRv4M+nh6x3wJLti+SzX17OoJu+otOr8x0imo4nv1hUeFQFLvxbtR2BGsXICYiMY/mo
-         jVNmkdGSHAZsv8nLSjjTsW33LViVjtzjXtQwj/z22oc/mKR3Vcy0kT925uiJpr1p/KUN
-         7Ur/VXTjPYzzwM52Vq/bT5vSSWzJgai4h979kSvYjTeUU47hNNnekH1eV9HVlobSULM1
-         lO7w==
+        bh=oyGzY8l76MsegSAn4xQxjQPLkZzO2340czzi6D4Ior8=;
+        b=Ej2kjVjfZTFuj5I2XgPtiMJGOUTZa2UlGmehWn+6/bXjwFlLt3vvGW6qp/Za/xN9fH
+         v4Hk1/ip8lasFXz+5aL0B0M4VJKXF4qVcUb8276ltduclc2KWaFsTGi0zr9B/RraDkhA
+         fD8Czx/aQABtevWJt4MhO+ulvmAvvgEWsYNu8CEdVK4z2gSYbB1y+P6/TTIzQ9nMvewJ
+         NSf7sxvzM2YrA+iNNLQk0A3q6U2Y3HMlG3dOjFEtwnRc8eszCrWcScnCMTHDNIjjlrc7
+         wZEsROJjcoKd7liyPjdKYFNXAYGT6OgRr62kuQd1sp6xXzufWYlAjm0Uom1qisVS4QRg
+         Cc+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=67U3Z2XcJlRBA5r6fKuHVpCEmGfkLy5vZyJ9ghD60yU=;
-        b=A3mebpryjWqDMTu9Kc3T0AkqSWem5qCMGvsfk362hfGIRURCyP1jQF+tbm447AG7Lo
-         HqNaA34NB2vD6PFIhs3I0uX87OaRRBTGf8c4pfLwBiGJGS6oQHy/NCKtDLuVJqaTIcCF
-         Uc7k6Wlgv6ThUzYB2mjXq9F6+VmmhpLnRUDmPLHtc2JeZUbGNnuzy+ZTS01DjZLUtAHX
-         AqVCkPNUEkSQX7bJH3Mfyi6q/q6tcCVBktIbVUKwgpHxi85OeEBZzuIZhf6fqFgRtDRx
-         F7XEvX2mKjmSqPEpZo9HG8GL+0TGhnCvhN6nv0DetKOI8VbULRzC48wCNUCf3BICSp2L
-         iAxQ==
-X-Gm-Message-State: AOAM532t5XhC4syyM8hs3khV78mtV9XhrY3wXA7bc9rgkWHZ/l7rcqET
-        21K1SmIGRZMrbUpbJ559UpdE5rwX8SSf/lyO05JR3Q==
-X-Google-Smtp-Source: ABdhPJxdli37Q36UY14MXho3b/hG+Vqt/k/9g6vJskN9EhAP7yYNslsyHljpL+3GW0IP6iAmmXS2Blrig2Hpco3/F/I=
-X-Received: by 2002:a17:90a:5407:b0:1bf:43ce:f11b with SMTP id
- z7-20020a17090a540700b001bf43cef11bmr367471pjh.31.1647886099922; Mon, 21 Mar
- 2022 11:08:19 -0700 (PDT)
+        bh=oyGzY8l76MsegSAn4xQxjQPLkZzO2340czzi6D4Ior8=;
+        b=E9isvz5+VURW4s/3hfyWncTw1kPWGpKsqxX9LzodhPZLyrg/KDeFrWPP4E/bNWVXV7
+         LDbIw0gGuPvI4ubDxorp4NnFXocwCN9zBFXCqZPGIZ+v9iFOFgd+ixW8p7lZqjJIdfKT
+         /nzaYC4WSWCsuJi4VnxfHSUB98ikO+lUCoWiqjhlJRC2Ti6E2l1QhImpowL8RqbEtukW
+         HRX6/3m1itv83PP8gPqHM54LObHSvz33bT7oWG7b1om7eeIJsC/P4PmRBxtUPAume1tR
+         7St+6jxMM9iEgLU5Ko2AMa7CC6T2XF56ZHVnkOy52bwyl1x6eIxzFA8JQY9UuMNJ5gM8
+         vfPQ==
+X-Gm-Message-State: AOAM530/D6FNAXmxTgaaRJ4+bLsPCQGa3Y2etmWT7bNJde1Qte+Njz/H
+        Qtf1HRDuHB/b4jEMsBWETdOCWglDI7bAw8L1vltlzLossfcrUQ==
+X-Google-Smtp-Source: ABdhPJxA6zr4oETTteNTPmtvHbM8zDj8C+zMYhYAnSX9zKGVMbUu+sWYmd4DjTXO2SwQH+b//ZyEGy15S2jfvqLpPYo=
+X-Received: by 2002:a81:351:0:b0:2e5:9cb9:8c44 with SMTP id
+ 78-20020a810351000000b002e59cb98c44mr26060988ywd.250.1647887551971; Mon, 21
+ Mar 2022 11:32:31 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220321150214.1895231-1-pgonda@google.com> <CAA03e5HEKPxfGZ57r=intg_ogTp_JPAio36QJXqviMZM_KmvEg@mail.gmail.com>
-In-Reply-To: <CAA03e5HEKPxfGZ57r=intg_ogTp_JPAio36QJXqviMZM_KmvEg@mail.gmail.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Mon, 21 Mar 2022 12:08:08 -0600
-Message-ID: <CAMkAt6qbauEn1jGUYLQc6QURhCHLu7eDmzJhfHZZXN9FGbQOMA@mail.gmail.com>
-Subject: Re: [PATCH] Add KVM_EXIT_SHUTDOWN metadata for SEV-ES
-To:     Marc Orr <marcorr@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>, Borislav Petkov <bp@alien8.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Joerg Roedel <jroedel@suse.de>,
-        Sean Christopherson <seanjc@google.com>,
-        LKML <linux-kernel@vger.kernel.org>
+References: <cover.1646422845.git.isaku.yamahata@intel.com> <f3293bd872a916bf33165a2ec0d6fc50533b817f.1646422845.git.isaku.yamahata@intel.com>
+In-Reply-To: <f3293bd872a916bf33165a2ec0d6fc50533b817f.1646422845.git.isaku.yamahata@intel.com>
+From:   Sagi Shahar <sagis@google.com>
+Date:   Mon, 21 Mar 2022 11:32:21 -0700
+Message-ID: <CAAhR5DFPsmxYXXXZ9WNW=MDWRRz5jrntPvsnKw7VTrRh5CbohQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v5 083/104] KVM: x86: Split core of hypercall
+ emulation to helper function
+To:     "Yamahata, Isaku" <isaku.yamahata@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Connor Kuehl <ckuehl@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> > index 75fa6dd268f0..5f9d37dd3f6f 100644
-> > --- a/arch/x86/kvm/svm/sev.c
-> > +++ b/arch/x86/kvm/svm/sev.c
-> > @@ -2735,8 +2735,13 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
-> >                 pr_info("SEV-ES guest requested termination: %#llx:%#llx\n",
-> >                         reason_set, reason_code);
-> >
-> > -               ret = -EINVAL;
-> > -               break;
-> > +               vcpu->run->exit_reason = KVM_EXIT_SHUTDOWN;
-> > +               vcpu->run->shutdown.reason = KVM_SHUTDOWN_SEV_TERM;
-> > +               vcpu->run->shutdown.ndata = 2;
-> > +               vcpu->run->shutdown.data[0] = reason_set;
-> > +               vcpu->run->shutdown.data[1] = reason_code;
-> > +
-> > +               return 0;
+On Fri, Mar 4, 2022 at 12:00 PM <isaku.yamahata@intel.com> wrote:
 >
-> Maybe I'm missing something, but don't we want to keep returning an error?
+> From: Sean Christopherson <sean.j.christopherson@intel.com>
 >
-> rationale: Current behavior: return -EINVAL to userpsace, but
-> userpsace cannot infer where the -EINVAL came from. After this patch:
-> We should still return -EINVAL to userspace, but now userspace can
-> parse this new info in the KVM run struct to properly terminate.
+> By necessity, TDX will use a different register ABI for hypercalls.
+> Break out the core functionality so that it may be reused for TDX.
+>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h |  4 +++
+>  arch/x86/kvm/x86.c              | 54 ++++++++++++++++++++-------------
+>  2 files changed, 37 insertions(+), 21 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 8dab9f16f559..33b75b0e3de1 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1818,6 +1818,10 @@ void kvm_request_apicv_update(struct kvm *kvm, bool activate,
+>  void __kvm_request_apicv_update(struct kvm *kvm, bool activate,
+>                                 unsigned long bit);
+>
+> +unsigned long __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
+> +                                     unsigned long a0, unsigned long a1,
+> +                                     unsigned long a2, unsigned long a3,
+> +                                     int op_64_bit);
+>  int kvm_emulate_hypercall(struct kvm_vcpu *vcpu);
+>
+>  int kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 error_code,
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 314ae43e07bf..9acb33a17445 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -9090,26 +9090,15 @@ static int complete_hypercall_exit(struct kvm_vcpu *vcpu)
+>         return kvm_skip_emulated_instruction(vcpu);
+>  }
+>
+> -int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+> +unsigned long __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
+> +                                     unsigned long a0, unsigned long a1,
+> +                                     unsigned long a2, unsigned long a3,
+> +                                     int op_64_bit)
+>  {
+> -       unsigned long nr, a0, a1, a2, a3, ret;
+> -       int op_64_bit;
+> -
+> -       if (kvm_xen_hypercall_enabled(vcpu->kvm))
+> -               return kvm_xen_hypercall(vcpu);
+> -
+> -       if (kvm_hv_hypercall_enabled(vcpu))
+> -               return kvm_hv_hypercall(vcpu);
+> -
+> -       nr = kvm_rax_read(vcpu);
+> -       a0 = kvm_rbx_read(vcpu);
+> -       a1 = kvm_rcx_read(vcpu);
+> -       a2 = kvm_rdx_read(vcpu);
+> -       a3 = kvm_rsi_read(vcpu);
+> +       unsigned long ret;
+>
+>         trace_kvm_hypercall(nr, a0, a1, a2, a3);
+>
+> -       op_64_bit = is_64_bit_hypercall(vcpu);
+>         if (!op_64_bit) {
+>                 nr &= 0xFFFFFFFF;
+>                 a0 &= 0xFFFFFFFF;
+> @@ -9118,11 +9107,6 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+>                 a3 &= 0xFFFFFFFF;
+>         }
+>
+> -       if (static_call(kvm_x86_get_cpl)(vcpu) != 0) {
+> -               ret = -KVM_EPERM;
+> -               goto out;
+> -       }
+> -
+>         ret = -KVM_ENOSYS;
+>
+>         switch (nr) {
+> @@ -9181,6 +9165,34 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+>                 ret = -KVM_ENOSYS;
+>                 break;
+>         }
+> +       return ret;
+> +}
+> +EXPORT_SYMBOL_GPL(__kvm_emulate_hypercall);
+> +
+> +int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+> +{
+> +       unsigned long nr, a0, a1, a2, a3, ret;
+> +       int op_64_bit;
+> +
+> +       if (kvm_xen_hypercall_enabled(vcpu->kvm))
+> +               return kvm_xen_hypercall(vcpu);
+> +
+> +       if (kvm_hv_hypercall_enabled(vcpu))
+> +               return kvm_hv_hypercall(vcpu);
+> +
+> +       nr = kvm_rax_read(vcpu);
+> +       a0 = kvm_rbx_read(vcpu);
+> +       a1 = kvm_rcx_read(vcpu);
+> +       a2 = kvm_rdx_read(vcpu);
+> +       a3 = kvm_rsi_read(vcpu);
+> +       op_64_bit = is_64_bit_mode(vcpu);
+
+I think this should be "op_64_bit = is_64_bit_hypercall(vcpu);"
+is_64_bit_mode was replaced with is_64_bit_hypercall to support
+protected guests here:
+https://lore.kernel.org/all/87cztf8h43.fsf@vitty.brq.redhat.com/T/
+
+Without it, op_64_bit will be set to 0 for TD VMs which will cause the
+upper 32 bit of the registers to be cleared in __kvm_emulate_hypercall
+
+> +
+> +       if (static_call(kvm_x86_get_cpl)(vcpu) != 0) {
+> +               ret = -KVM_EPERM;
+> +               goto out;
+> +       }
+> +
+> +       ret = __kvm_emulate_hypercall(vcpu, nr, a0, a1, a2, a3, op_64_bit);
+>  out:
+>         if (!op_64_bit)
+>                 ret = (u32)ret;
+> --
+> 2.25.1
 >
 
-I removed the error return code here since an SEV guest may request a
-termination due to no fault of the host at all. This is now inline
-with any other shutdown requested by the guest. I don't have a strong
-preference here but EINVAL doesn't seem correct in all cases, do
-others have any thoughts on this?
+Sagi
