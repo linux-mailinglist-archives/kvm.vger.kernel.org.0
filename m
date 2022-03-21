@@ -2,155 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E8B34E2EB6
-	for <lists+kvm@lfdr.de>; Mon, 21 Mar 2022 18:02:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D09F74E2ED2
+	for <lists+kvm@lfdr.de>; Mon, 21 Mar 2022 18:09:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351560AbiCURDZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Mar 2022 13:03:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58880 "EHLO
+        id S1351643AbiCURJM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Mar 2022 13:09:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51258 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351665AbiCURDR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Mar 2022 13:03:17 -0400
-Received: from mail-yw1-x1136.google.com (mail-yw1-x1136.google.com [IPv6:2607:f8b0:4864:20::1136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F167179417
-        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 10:01:51 -0700 (PDT)
-Received: by mail-yw1-x1136.google.com with SMTP id 00721157ae682-2e5757b57caso162919837b3.4
-        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 10:01:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=6+wORUoNfICBtxmGPwtdgPTUaJLcSyMgmBDuQ2HCAno=;
-        b=IeyG5ExpMtTqyaIwUHCF/IOH7aYaWYNAr1yot4O1eNYRTzjb0lkspVlKTsPwL8phzi
-         606KemObIc7ChoYqhUL65J3/Y9r7y1h4k5p4lK4SxACbwwpL5J/ES2jZbiSTC8zjYxw3
-         EjJHOoWPC+LkY8cjfj1HUTqloG6/ygcXnnSvc7+tYlJLuAR9aKDBt6QxDUN7rJsKzBkA
-         V7GAGPUS1zBcgASkBCxxTWbXgtTgAzvFW7ylslsR2P3nMwzlolgI3cONVlIyZR9eK4OU
-         Zmh2xfrYm+cPLFWBAGWW/TkKsGtop8E0wyCImRneAZEvwYbd4sIcXnEGv0YgIYNYuCOj
-         /ppw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=6+wORUoNfICBtxmGPwtdgPTUaJLcSyMgmBDuQ2HCAno=;
-        b=3M7SRDLz3et0HnV6uJIS31xWGyyZY7rsrYw2y1lWhVsWQ8/o6o6UnptDMsX5BW66U0
-         VHb6LvEsTp2tjAoUq83muC42Awu9BEJnYn9HDycUPUhXiNMPduKpb76YEc5cN8I4qUn+
-         /UDIm/qA/u9VYrVYcCpE1l1gHdWSqzj9GlRl4M0r4N9wIuUebNmINJxXogq4/CQazhtM
-         pi0FdL9ihMiSg3+rjXmyW/sMoQU6LCvlGx5R+p7yziX23J4ygSxbPY22OD9Cajlgs0SC
-         JUaj1celaWLjXO3Vq7lEwtvSM6IL+pJ1z0GG9HRrEYj7uUnNkkF5s47WDB9I9t4gUmmh
-         YnUA==
-X-Gm-Message-State: AOAM530kaJ0hOMyQNCtoyj3x2cVLp8E7D4W4D3WfY4YpsQlILUCBg/xU
-        i+Sp1KxhZ3qXvoBmz0Cv2SjQYuQ3btGf43k3D9djUw==
-X-Google-Smtp-Source: ABdhPJy5WiSeEDwjtsW7VTh7ar42L2Iwd9KZtr8ajbdqynfYg2O5DFVnLDKH95thDtcrPtTUuOYSD5sxkur7ut9Ijts=
-X-Received: by 2002:a81:15ce:0:b0:2e5:e189:7366 with SMTP id
- 197-20020a8115ce000000b002e5e1897366mr16268503ywv.188.1647882110705; Mon, 21
- Mar 2022 10:01:50 -0700 (PDT)
+        with ESMTP id S1346553AbiCURJL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Mar 2022 13:09:11 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1B4E4AF1F1
+        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 10:07:42 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B05001042;
+        Mon, 21 Mar 2022 10:07:41 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id ACBA23F66F;
+        Mon, 21 Mar 2022 10:07:39 -0700 (PDT)
+Date:   Mon, 21 Mar 2022 17:08:14 +0000
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Vladimir Murzin <vladimir.murzin@arm.com>
+Cc:     will@kernel.org, kvm@vger.kernel.org,
+        julien.thierry.kdev@gmail.com,
+        linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com,
+        steven.price@arm.com
+Subject: Re: [kvmtool PATCH 2/2] aarch64: Add support for MTE
+Message-ID: <Yjiw/mdfLyMW2gFh@monolith.localdoman>
+References: <20220321152820.246700-1-alexandru.elisei@arm.com>
+ <20220321152820.246700-3-alexandru.elisei@arm.com>
+ <3cf3b621-5a07-5c06-cb9f-f9c776b6717d@arm.com>
 MIME-Version: 1.0
-References: <20220311060207.2438667-1-ricarkol@google.com> <20220311060207.2438667-3-ricarkol@google.com>
- <CANgfPd_iRBDX=mtBy80G0R9U-BfukLV0H3SyrBr+jvK1e8BRvA@mail.gmail.com> <YjTrz40SD3HmebBh@google.com>
-In-Reply-To: <YjTrz40SD3HmebBh@google.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Mon, 21 Mar 2022 10:01:39 -0700
-Message-ID: <CANgfPd9kbyfkOoBasqMtDuC4SD=j99Y0fMReC8hOHDOYhv5AQQ@mail.gmail.com>
-Subject: Re: [PATCH 02/11] KVM: selftests: Add vm_mem_region_get_src_fd
- library function
-To:     Ricardo Koller <ricarkol@google.com>
-Cc:     kvm <kvm@vger.kernel.org>, kvmarm@lists.cs.columbia.edu,
-        Andrew Jones <drjones@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Oliver Upton <oupton@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Raghavendra Rao Ananta <rananta@google.com>,
-        Axel Rasmussen <axelrasmussen@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3cf3b621-5a07-5c06-cb9f-f9c776b6717d@arm.com>
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 18, 2022 at 1:30 PM Ricardo Koller <ricarkol@google.com> wrote:
->
-> On Wed, Mar 16, 2022 at 12:08:23PM -0600, Ben Gardon wrote:
-> > On Fri, Mar 11, 2022 at 12:02 AM Ricardo Koller <ricarkol@google.com> wrote:
-> > >
-> > > Add a library function to get the backing source FD of a memslot.
-> > >
-> > > Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> >
-> > This appears to be dead code as of this commit, would recommend
-> > merging it into the commit in which it's actually used.
->
-> I was trying to separate lib changes (which are mostly arch independent)
-> with the actual test. Would move the commit to be right before the one
-> that uses be better? and maybe add a commit comment mentioning how it's
-> going to be used.
+Hi,
 
-Ah, that makes sense, I can see why you'd want to separate them.
-Moving it right before the commit where it's used sounds fine to me.
-Thanks!
+On Mon, Mar 21, 2022 at 03:40:18PM +0000, Vladimir Murzin wrote:
+> Hi Alexandru,
+> 
+> On 3/21/22 3:28 PM, Alexandru Elisei wrote:
+> > MTE has been supported in Linux since commit 673638f434ee ("KVM: arm64:
+> > Expose KVM_ARM_CAP_MTE"), add support for it in kvmtool.
+> > 
+> > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > ---
+> >  arm/aarch32/include/kvm/kvm-arch.h        |  3 +++
+> >  arm/aarch64/include/kvm/kvm-arch.h        |  1 +
+> >  arm/aarch64/include/kvm/kvm-config-arch.h |  2 ++
+> >  arm/aarch64/kvm.c                         | 13 +++++++++++++
+> >  arm/include/arm-common/kvm-config-arch.h  |  1 +
+> >  arm/kvm.c                                 |  3 +++
+> >  6 files changed, 23 insertions(+)
+> > 
+> > diff --git a/arm/aarch32/include/kvm/kvm-arch.h b/arm/aarch32/include/kvm/kvm-arch.h
+> > index bee2fc255a82..5616b27e257e 100644
+> > --- a/arm/aarch32/include/kvm/kvm-arch.h
+> > +++ b/arm/aarch32/include/kvm/kvm-arch.h
+> > @@ -5,6 +5,9 @@
+> >  
+> >  #define kvm__arch_get_kern_offset(...)	0x8000
+> >  
+> > +struct kvm;
+> > +static inline void kvm__arch_enable_mte(struct kvm *kvm) {}
+> > +
+> >  #define ARM_MAX_MEMORY(...)	ARM_LOMAP_MAX_MEMORY
+> >  
+> >  #define MAX_PAGE_SIZE	SZ_4K
+> > diff --git a/arm/aarch64/include/kvm/kvm-arch.h b/arm/aarch64/include/kvm/kvm-arch.h
+> > index 5e5ee41211ed..9124f6919d0f 100644
+> > --- a/arm/aarch64/include/kvm/kvm-arch.h
+> > +++ b/arm/aarch64/include/kvm/kvm-arch.h
+> > @@ -6,6 +6,7 @@
+> >  struct kvm;
+> >  unsigned long long kvm__arch_get_kern_offset(struct kvm *kvm, int fd);
+> >  int kvm__arch_get_ipa_limit(struct kvm *kvm);
+> > +void kvm__arch_enable_mte(struct kvm *kvm);
+> >  
+> >  #define ARM_MAX_MEMORY(kvm)	({					\
+> >  	u64 max_ram;							\
+> > diff --git a/arm/aarch64/include/kvm/kvm-config-arch.h b/arm/aarch64/include/kvm/kvm-config-arch.h
+> > index 04be43dfa9b2..11250365d8d5 100644
+> > --- a/arm/aarch64/include/kvm/kvm-config-arch.h
+> > +++ b/arm/aarch64/include/kvm/kvm-config-arch.h
+> > @@ -6,6 +6,8 @@
+> >  			"Run AArch32 guest"),				\
+> >  	OPT_BOOLEAN('\0', "pmu", &(cfg)->has_pmuv3,			\
+> >  			"Create PMUv3 device"),				\
+> > +	OPT_BOOLEAN('\0', "mte", &(cfg)->has_mte,			\
+> > +			"Enable memory tagging extension"),		\
+> >  	OPT_U64('\0', "kaslr-seed", &(cfg)->kaslr_seed,			\
+> >  			"Specify random seed for Kernel Address Space "	\
+> >  			"Layout Randomization (KASLR)"),
+> > diff --git a/arm/aarch64/kvm.c b/arm/aarch64/kvm.c
+> > index 56a0aedc263d..46548f8ee96e 100644
+> > --- a/arm/aarch64/kvm.c
+> > +++ b/arm/aarch64/kvm.c
+> > @@ -81,3 +81,16 @@ int kvm__get_vm_type(struct kvm *kvm)
+> >  
+> >  	return KVM_VM_TYPE_ARM_IPA_SIZE(ipa_bits);
+> >  }
+> > +
+> > +void kvm__arch_enable_mte(struct kvm *kvm)
+> > +{
+> > +	struct kvm_enable_cap cap = {
+> > +		.cap = KVM_CAP_ARM_MTE,
+> > +	};
+> > +
+> > +	if (!kvm__supports_extension(kvm, KVM_CAP_ARM_MTE))
+> > +		die("MTE capability is not supported");
+> > +
+> > +	if (ioctl(kvm->vm_fd, KVM_ENABLE_CAP, &cap))
+> > +		die_perror("KVM_ENABLE_CAP(KVM_CAP_ARM_MTE)");
+> > +}
+> > diff --git a/arm/include/arm-common/kvm-config-arch.h b/arm/include/arm-common/kvm-config-arch.h
+> > index 5734c46ab9e6..16e8d500a71b 100644
+> > --- a/arm/include/arm-common/kvm-config-arch.h
+> > +++ b/arm/include/arm-common/kvm-config-arch.h
+> > @@ -9,6 +9,7 @@ struct kvm_config_arch {
+> >  	bool		virtio_trans_pci;
+> >  	bool		aarch32_guest;
+> >  	bool		has_pmuv3;
+> > +	bool		has_mte;
+> >  	u64		kaslr_seed;
+> >  	enum irqchip_type irqchip;
+> >  	u64		fw_addr;
+> > diff --git a/arm/kvm.c b/arm/kvm.c
+> > index 80d233f13d0b..f2db93953778 100644
+> > --- a/arm/kvm.c
+> > +++ b/arm/kvm.c
+> > @@ -86,6 +86,9 @@ void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64 ram_size)
+> >  	/* Create the virtual GIC. */
+> >  	if (gic__create(kvm, kvm->cfg.arch.irqchip))
+> >  		die("Failed to create virtual GIC");
+> > +
+> > +	if (kvm->cfg.arch.has_mte)
+> > +		kvm__arch_enable_mte(kvm);
+> >  }
+> 
+> Can we enable it unconditionally if KVM_CAP_ARM_MTE is supported like we do for
+> PAC and SVE?
 
->
->
-> >
-> > > ---
-> > >  .../selftests/kvm/include/kvm_util_base.h     |  1 +
-> > >  tools/testing/selftests/kvm/lib/kvm_util.c    | 23 +++++++++++++++++++
-> > >  2 files changed, 24 insertions(+)
-> > >
-> > > diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> > > index 4ed6aa049a91..d6acec0858c0 100644
-> > > --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-> > > +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> > > @@ -163,6 +163,7 @@ int _kvm_ioctl(struct kvm_vm *vm, unsigned long ioctl, void *arg);
-> > >  void vm_mem_region_set_flags(struct kvm_vm *vm, uint32_t slot, uint32_t flags);
-> > >  void vm_mem_region_move(struct kvm_vm *vm, uint32_t slot, uint64_t new_gpa);
-> > >  void vm_mem_region_delete(struct kvm_vm *vm, uint32_t slot);
-> > > +int vm_mem_region_get_src_fd(struct kvm_vm *vm, uint32_t memslot);
-> > >  void vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpuid);
-> > >  vm_vaddr_t vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min);
-> > >  vm_vaddr_t vm_vaddr_alloc_pages(struct kvm_vm *vm, int nr_pages);
-> > > diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> > > index d8cf851ab119..64ef245b73de 100644
-> > > --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> > > +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> > > @@ -580,6 +580,29 @@ kvm_userspace_memory_region_find(struct kvm_vm *vm, uint64_t start,
-> > >         return &region->region;
-> > >  }
-> > >
-> > > +/*
-> > > + * KVM Userspace Memory Get Backing Source FD
-> > > + *
-> > > + * Input Args:
-> > > + *   vm - Virtual Machine
-> > > + *   memslot - KVM memory slot ID
-> > > + *
-> > > + * Output Args: None
-> > > + *
-> > > + * Return:
-> > > + *   Backing source file descriptor, -1 if the memslot is an anonymous region.
-> > > + *
-> > > + * Returns the backing source fd of a memslot, so tests can use it to punch
-> > > + * holes, or to setup permissions.
-> > > + */
-> > > +int vm_mem_region_get_src_fd(struct kvm_vm *vm, uint32_t memslot)
-> > > +{
-> > > +       struct userspace_mem_region *region;
-> > > +
-> > > +       region = memslot2region(vm, memslot);
-> > > +       return region->fd;
-> > > +}
-> > > +
-> > >  /*
-> > >   * VCPU Find
-> > >   *
-> > > --
-> > > 2.35.1.723.g4982287a31-goog
-> > >
+I thought about that, the reason I chose to enable it based a kvmtool
+command line option, instead of always being enabled if available, is
+because of the overhead of sanitising the MTE tags on each stage 2 data
+abort. Steven, am I overreacting and that overhead is negligible?
+
+Also, as far as I know, PAC and SVE incur basically no overhead in KVM
+until the guest starts to use those features.
+
+Do you have a specific reason for wanting MTE to always be enabled if
+available? I'm happy to be convinced to make MTE enabled by default, I
+don't have preference either way.
+
+Thanks,
+Alex
