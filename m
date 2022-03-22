@@ -2,318 +2,261 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 875164E48F1
-	for <lists+kvm@lfdr.de>; Tue, 22 Mar 2022 23:09:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3FBF34E4901
+	for <lists+kvm@lfdr.de>; Tue, 22 Mar 2022 23:16:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233929AbiCVWK7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Mar 2022 18:10:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33516 "EHLO
+        id S237715AbiCVWR2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Mar 2022 18:17:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234966AbiCVWK6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Mar 2022 18:10:58 -0400
-Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42A8E22BFE
-        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 15:09:29 -0700 (PDT)
-Received: by mail-lj1-x230.google.com with SMTP id bn33so25849692ljb.6
-        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 15:09:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=YulFfxGuY3s5pZU2mZSRJ47ZNRwCdbPLLqIFBwNkP1w=;
-        b=qZGito7rUgupqtfaAd4svmkZQfQWv/+FGxP7lfQo/9FKefYWqfZxVgM2UbTS2hzF/6
-         Am/pdfCVWJZf0OUQgl29Mkd5wxd6RmGNbIJ+i4quxJGdXX3JM8hmrE74m8u/+DA9k+lx
-         SOhfUBm0cUGCH73x0694q54PQATIgIG9REuIvlLhqTyMHAM0+fdLfHEFIw7gkrUJ90AU
-         dQmTminPU88Y4AOtXY1+eLSCeHglaIgmLWMjDv9Pqgq/S3b/+UGHHV30UTdBbZISjo4E
-         ubS0u1BpEQMxGkjc/OrpQPrLQHf73eswGXVmiJi9QoJnWiMR6reLnm7xvxkTqgvLszBF
-         Z4aQ==
+        with ESMTP id S237625AbiCVWRY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Mar 2022 18:17:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id ACD9C54BEA
+        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 15:15:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1647987348;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Plq65sjLL0seJ7WvmjtQdv4sWgADshYNALH0Py3ngKI=;
+        b=iMXaiUen2xwE73JvBxpJgEZDin78wKILHzSWCz5yQ6I6KpPIgKJcjM6/Pj0+k34hHBj3yL
+        B89qifx6cdE45/0jJc53HxdIu+apjS1wNX7GhQ5AnVm74FPth3WnHmsSJ63MruScrO/ZtM
+        PYlRAZ+b5VkO2iWRdQuSE6JWdCdHukg=
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
+ [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-641-ZdFqIx5hMbiNjLscG08mgA-1; Tue, 22 Mar 2022 18:15:47 -0400
+X-MC-Unique: ZdFqIx5hMbiNjLscG08mgA-1
+Received: by mail-io1-f71.google.com with SMTP id i19-20020a5d9353000000b006495ab76af6so10394451ioo.0
+        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 15:15:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=YulFfxGuY3s5pZU2mZSRJ47ZNRwCdbPLLqIFBwNkP1w=;
-        b=2S4+aXhT2Znb0Zwmq15wvMLw8Oc4hZpcIIDXEaE/pdn5pj42VOqtFFCL6DHIQZvayy
-         GLSxGtM+O0A4o2dmAY+nrYlsmTQZpratW5VEyk0PIXX0hlZOCqNjrm1JthX0H5aTpjQq
-         V48XGoneVwRftHPA7zRESx+ycT/eE1O3jlKCSZiaHHDsFfpt7uphrfc/LNgO1/1iEgdc
-         4/I7pWHy1s5YdXQC/qeCYGTQEu0o9C66ZT1qBQy38o9Qcrzm1kBMzgNC/bLeiVL0QFES
-         DHQaYYmu8sUs9qKkjKzFn4rRSphskoo+OfyWi37Wc7idwxpQWWfIeW+eOSwrF4yWQgoO
-         00vA==
-X-Gm-Message-State: AOAM532JYGNchv40WUlk/I6nyTXjCpZ2DJiyj6S5jfRcK7d75QVvSfhV
-        4xO9iDuB9dkQtAV+5IWVP0xGjqljjBV7HKYCm6pNQA==
-X-Google-Smtp-Source: ABdhPJyo+PHJdKkv1Rsy+fLHM3hSBk/m9RSBycD2dahs0AuT8nMD+Oec514GvjsYeS1kaZZN/zRX88tmNvGh5X45Yv4=
-X-Received: by 2002:a2e:9119:0:b0:247:e306:1379 with SMTP id
- m25-20020a2e9119000000b00247e3061379mr20328662ljg.361.1647986967344; Tue, 22
- Mar 2022 15:09:27 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=Plq65sjLL0seJ7WvmjtQdv4sWgADshYNALH0Py3ngKI=;
+        b=ESFIrNXZoj42k3502qs0bKrFUqFKIdJKkEaDzfJ+simtt7g9jOIo8jc/ZIUWBOG5TW
+         Z8qgh9dGp/8+QpkVYAbR8P9ShYhF+3eTfhNHWPLkR5Q3gjm57ohx1TOSMKBJuAxrXJy6
+         ywTH+wPNDjuG77USenbzNcKeWj2wgN40S4lb2bkm0wS3yKLPpWTY/jTJ6kpWduObrMAt
+         36QCj4MHpnHKdh6O7ZA3aryz2k4TS+vcPVEm3yZqfkVwGh5okCX9hjXl9fOIGv3neNfM
+         4FOsyrISKBXiQU2P/HHxjuLf9za4oXOnThReNTl5uxAht3mZYWtulDJRzur8Kv/0jy6m
+         tnWA==
+X-Gm-Message-State: AOAM531Y4iIu1x7LLxdCzMIJC0lX4zCVfURa5fLg6LPL1G2ANAv1Y4gi
+        Efpl7G3wZ3D7CEWvzpnZR7DOYTnE1xbt0Io4DQ3kYtCM3HsmoCLrOYMBbnI/t9OoyyNYBWk000s
+        KDxaKoBtIFz3c
+X-Received: by 2002:a6b:6902:0:b0:649:d744:e0da with SMTP id e2-20020a6b6902000000b00649d744e0damr992073ioc.211.1647987346869;
+        Tue, 22 Mar 2022 15:15:46 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyxjk0g8Sn80FYrVpeaQccm0Nksq/bB6kFNnm5nbL6fD3Uhbg9fTikYRNK1AIqrXjXzanDEWg==
+X-Received: by 2002:a6b:6902:0:b0:649:d744:e0da with SMTP id e2-20020a6b6902000000b00649d744e0damr992055ioc.211.1647987346557;
+        Tue, 22 Mar 2022 15:15:46 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id s13-20020a6bdc0d000000b006408888551dsm10103375ioc.8.2022.03.22.15.15.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Mar 2022 15:15:46 -0700 (PDT)
+Date:   Tue, 22 Mar 2022 16:15:44 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Eric Auger <eric.auger@redhat.com>,
+        iommu@lists.linux-foundation.org, Jason Wang <jasowang@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        Yi Liu <yi.l.liu@intel.com>, Keqian Zhu <zhukeqian1@huawei.com>
+Subject: Re: [PATCH RFC 07/12] iommufd: Data structure to provide IOVA to
+ PFN mapping
+Message-ID: <20220322161544.54fd459d.alex.williamson@redhat.com>
+In-Reply-To: <7-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
+References: <0-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
+        <7-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-References: <20220311002528.2230172-1-dmatlack@google.com> <20220311002528.2230172-5-dmatlack@google.com>
- <YjBTal9gWoEKybxi@xz-m1.local>
-In-Reply-To: <YjBTal9gWoEKybxi@xz-m1.local>
-From:   David Matlack <dmatlack@google.com>
-Date:   Tue, 22 Mar 2022 15:09:00 -0700
-Message-ID: <CALzav=ewmDSc+wviY17Fz_nD4TfRd=+h0h5-zPVgqhbxmuVq2Q@mail.gmail.com>
-Subject: Re: [PATCH v2 04/26] KVM: x86/mmu: Decompose kvm_mmu_get_page() into
- separate functions
-To:     Peter Xu <peterx@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Sean Christopherson <seanjc@google.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Ben Gardon <bgardon@google.com>,
-        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
-        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
-        <kvmarm@lists.cs.columbia.edu>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <linux-mips@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <kvm@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 15, 2022 at 1:51 AM Peter Xu <peterx@redhat.com> wrote:
->
-> On Fri, Mar 11, 2022 at 12:25:06AM +0000, David Matlack wrote:
-> > Decompose kvm_mmu_get_page() into separate helper functions to increase
-> > readability and prepare for allocating shadow pages without a vcpu
-> > pointer.
-> >
-> > Specifically, pull the guts of kvm_mmu_get_page() into 3 helper
-> > functions:
-> >
-> > __kvm_mmu_find_shadow_page() -
-> >   Walks the page hash checking for any existing mmu pages that match the
-> >   given gfn and role. Does not attempt to synchronize the page if it is
-> >   unsync.
-> >
-> > kvm_mmu_find_shadow_page() -
-> >   Wraps __kvm_mmu_find_shadow_page() and handles syncing if necessary.
-> >
-> > kvm_mmu_new_shadow_page()
-> >   Allocates and initializes an entirely new kvm_mmu_page. This currently
-> >   requries a vcpu pointer for allocation and looking up the memslot but
-> >   that will be removed in a future commit.
-> >
-> >   Note, kvm_mmu_new_shadow_page() is temporary and will be removed in a
-> >   subsequent commit. The name uses "new" rather than the more typical
-> >   "alloc" to avoid clashing with the existing kvm_mmu_alloc_page().
-> >
-> > No functional change intended.
-> >
-> > Signed-off-by: David Matlack <dmatlack@google.com>
->
-> Looks good to me, a few nitpicks and questions below.
->
-> > ---
-> >  arch/x86/kvm/mmu/mmu.c         | 132 ++++++++++++++++++++++++---------
-> >  arch/x86/kvm/mmu/paging_tmpl.h |   5 +-
-> >  arch/x86/kvm/mmu/spte.c        |   5 +-
-> >  3 files changed, 101 insertions(+), 41 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index 23c2004c6435..80dbfe07c87b 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -2027,16 +2027,25 @@ static void clear_sp_write_flooding_count(u64 *spte)
-> >       __clear_sp_write_flooding_count(sptep_to_sp(spte));
-> >  }
-> >
-> > -static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu, gfn_t gfn,
-> > -                                          union kvm_mmu_page_role role)
-> > +/*
-> > + * Searches for an existing SP for the given gfn and role. Makes no attempt to
-> > + * sync the SP if it is marked unsync.
-> > + *
-> > + * If creating an upper-level page table, zaps unsynced pages for the same
-> > + * gfn and adds them to the invalid_list. It's the callers responsibility
-> > + * to call kvm_mmu_commit_zap_page() on invalid_list.
-> > + */
-> > +static struct kvm_mmu_page *__kvm_mmu_find_shadow_page(struct kvm *kvm,
-> > +                                                    gfn_t gfn,
-> > +                                                    union kvm_mmu_page_role role,
-> > +                                                    struct list_head *invalid_list)
-> >  {
-> >       struct hlist_head *sp_list;
-> >       struct kvm_mmu_page *sp;
-> >       int collisions = 0;
-> > -     LIST_HEAD(invalid_list);
-> >
-> > -     sp_list = &vcpu->kvm->arch.mmu_page_hash[kvm_page_table_hashfn(gfn)];
-> > -     for_each_valid_sp(vcpu->kvm, sp, sp_list) {
-> > +     sp_list = &kvm->arch.mmu_page_hash[kvm_page_table_hashfn(gfn)];
-> > +     for_each_valid_sp(kvm, sp, sp_list) {
-> >               if (sp->gfn != gfn) {
-> >                       collisions++;
-> >                       continue;
-> > @@ -2053,60 +2062,109 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu, gfn_t gfn,
-> >                        * upper-level page will be write-protected.
-> >                        */
-> >                       if (role.level > PG_LEVEL_4K && sp->unsync)
-> > -                             kvm_mmu_prepare_zap_page(vcpu->kvm, sp,
-> > -                                                      &invalid_list);
-> > +                             kvm_mmu_prepare_zap_page(kvm, sp, invalid_list);
-> > +
-> >                       continue;
-> >               }
-> >
-> > -             /* unsync and write-flooding only apply to indirect SPs. */
-> > -             if (sp->role.direct)
-> > -                     goto trace_get_page;
-> > +             /* Write-flooding is only tracked for indirect SPs. */
-> > +             if (!sp->role.direct)
-> > +                     __clear_sp_write_flooding_count(sp);
-> >
-> > -             if (sp->unsync) {
-> > -                     /*
-> > -                      * The page is good, but is stale.  kvm_sync_page does
-> > -                      * get the latest guest state, but (unlike mmu_unsync_children)
-> > -                      * it doesn't write-protect the page or mark it synchronized!
-> > -                      * This way the validity of the mapping is ensured, but the
-> > -                      * overhead of write protection is not incurred until the
-> > -                      * guest invalidates the TLB mapping.  This allows multiple
-> > -                      * SPs for a single gfn to be unsync.
-> > -                      *
-> > -                      * If the sync fails, the page is zapped.  If so, break
-> > -                      * in order to rebuild it.
-> > -                      */
-> > -                     if (!kvm_sync_page(vcpu, sp, &invalid_list))
-> > -                             break;
-> > +             goto out;
-> > +     }
-> >
-> > -                     WARN_ON(!list_empty(&invalid_list));
-> > -                     kvm_flush_remote_tlbs(vcpu->kvm);
-> > -             }
-> > +     sp = NULL;
-> >
-> > -             __clear_sp_write_flooding_count(sp);
-> > +out:
-> > +     if (collisions > kvm->stat.max_mmu_page_hash_collisions)
-> > +             kvm->stat.max_mmu_page_hash_collisions = collisions;
-> > +
-> > +     return sp;
-> > +}
-> >
-> > -trace_get_page:
-> > -             trace_kvm_mmu_get_page(sp, false);
-> > +/*
-> > + * Looks up an existing SP for the given gfn and role if one exists. The
-> > + * return SP is guaranteed to be synced.
-> > + */
-> > +static struct kvm_mmu_page *kvm_mmu_find_shadow_page(struct kvm_vcpu *vcpu,
-> > +                                                  gfn_t gfn,
-> > +                                                  union kvm_mmu_page_role role)
-> > +{
-> > +     struct kvm_mmu_page *sp;
-> > +     LIST_HEAD(invalid_list);
-> > +
-> > +     sp = __kvm_mmu_find_shadow_page(vcpu->kvm, gfn, role, &invalid_list);
-> > +     if (!sp)
-> >               goto out;
-> > +
-> > +     if (sp->unsync) {
-> > +             /*
-> > +              * The page is good, but is stale.  kvm_sync_page does
-> > +              * get the latest guest state, but (unlike mmu_unsync_children)
-> > +              * it doesn't write-protect the page or mark it synchronized!
-> > +              * This way the validity of the mapping is ensured, but the
-> > +              * overhead of write protection is not incurred until the
-> > +              * guest invalidates the TLB mapping.  This allows multiple
-> > +              * SPs for a single gfn to be unsync.
-> > +              *
-> > +              * If the sync fails, the page is zapped and added to the
-> > +              * invalid_list.
-> > +              */
-> > +             if (!kvm_sync_page(vcpu, sp, &invalid_list)) {
-> > +                     sp = NULL;
-> > +                     goto out;
-> > +             }
-> > +
-> > +             WARN_ON(!list_empty(&invalid_list));
->
-> Not related to this patch because I think it's a pure movement here,
-> however I have a question on why invalid_list is guaranteed to be empty..
->
-> I'm thinking the case where when lookup the page we could have already
-> called kvm_mmu_prepare_zap_page() there, then when reach here (which is the
-> kvm_sync_page==true case) invalid_list shouldn't be touched in
-> kvm_sync_page(), so it looks possible that it still contains some page to
-> be commited?
+On Fri, 18 Mar 2022 14:27:32 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
+> +/*
+> + * The area takes a slice of the pages from start_bytes to start_byte + length
+> + */
+> +static struct iopt_area *
+> +iopt_alloc_area(struct io_pagetable *iopt, struct iopt_pages *pages,
+> +		unsigned long iova, unsigned long start_byte,
+> +		unsigned long length, int iommu_prot, unsigned int flags)
+> +{
+> +	struct iopt_area *area;
+> +	int rc;
+> +
+> +	area = kzalloc(sizeof(*area), GFP_KERNEL);
+> +	if (!area)
+> +		return ERR_PTR(-ENOMEM);
+> +
+> +	area->iopt = iopt;
+> +	area->iommu_prot = iommu_prot;
+> +	area->page_offset = start_byte % PAGE_SIZE;
+> +	area->pages_node.start = start_byte / PAGE_SIZE;
+> +	if (check_add_overflow(start_byte, length - 1, &area->pages_node.last))
+> +		return ERR_PTR(-EOVERFLOW);
+> +	area->pages_node.last = area->pages_node.last / PAGE_SIZE;
+> +	if (WARN_ON(area->pages_node.last >= pages->npages))
+> +		return ERR_PTR(-EOVERFLOW);
 
-I also had this question when I was re-organizing this code but
-haven't had the time to look into it yet.
+@area leaked in the above two error cases.
 
->
-> > +             kvm_flush_remote_tlbs(vcpu->kvm);
-> >       }
-> >
-> > +out:
->
-> I'm wondering whether this "out" can be dropped.. with something like:
->
->         sp = __kvm_mmu_find_shadow_page(...);
->
->         if (sp && sp->unsync) {
->                 if (kvm_sync_page(vcpu, sp, &invalid_list)) {
->                         ..
->                 } else {
->                         sp = NULL;
->                 }
->         }
+> +
+> +	down_write(&iopt->iova_rwsem);
+> +	if (flags & IOPT_ALLOC_IOVA) {
+> +		rc = iopt_alloc_iova(iopt, &iova,
+> +				     (uintptr_t)pages->uptr + start_byte,
+> +				     length);
+> +		if (rc)
+> +			goto out_unlock;
+> +	}
+> +
+> +	if (check_add_overflow(iova, length - 1, &area->node.last)) {
+> +		rc = -EOVERFLOW;
+> +		goto out_unlock;
+> +	}
+> +
+> +	if (!(flags & IOPT_ALLOC_IOVA)) {
+> +		if ((iova & (iopt->iova_alignment - 1)) ||
+> +		    (length & (iopt->iova_alignment - 1)) || !length) {
+> +			rc = -EINVAL;
+> +			goto out_unlock;
+> +		}
+> +
+> +		/* No reserved IOVA intersects the range */
+> +		if (interval_tree_iter_first(&iopt->reserved_iova_itree, iova,
+> +					     area->node.last)) {
+> +			rc = -ENOENT;
+> +			goto out_unlock;
+> +		}
+> +
+> +		/* Check that there is not already a mapping in the range */
+> +		if (iopt_area_iter_first(iopt, iova, area->node.last)) {
+> +			rc = -EADDRINUSE;
+> +			goto out_unlock;
+> +		}
+> +	}
+> +
+> +	/*
+> +	 * The area is inserted with a NULL pages indicating it is not fully
+> +	 * initialized yet.
+> +	 */
+> +	area->node.start = iova;
+> +	interval_tree_insert(&area->node, &area->iopt->area_itree);
+> +	up_write(&iopt->iova_rwsem);
+> +	return area;
+> +
+> +out_unlock:
+> +	up_write(&iopt->iova_rwsem);
+> +	kfree(area);
+> +	return ERR_PTR(rc);
+> +}
+...
+> +/**
+> + * iopt_access_pages() - Return a list of pages under the iova
+> + * @iopt: io_pagetable to act on
+> + * @iova: Starting IOVA
+> + * @length: Number of bytes to access
+> + * @out_pages: Output page list
+> + * @write: True if access is for writing
+> + *
+> + * Reads @npages starting at iova and returns the struct page * pointers. These
+> + * can be kmap'd by the caller for CPU access.
+> + *
+> + * The caller must perform iopt_unaccess_pages() when done to balance this.
+> + *
+> + * iova can be unaligned from PAGE_SIZE. The first returned byte starts at
+> + * page_to_phys(out_pages[0]) + (iova % PAGE_SIZE). The caller promises not to
+> + * touch memory outside the requested iova slice.
+> + *
+> + * FIXME: callers that need a DMA mapping via a sgl should create another
+> + * interface to build the SGL efficiently
+> + */
+> +int iopt_access_pages(struct io_pagetable *iopt, unsigned long iova,
+> +		      unsigned long length, struct page **out_pages, bool write)
+> +{
+> +	unsigned long cur_iova = iova;
+> +	unsigned long last_iova;
+> +	struct iopt_area *area;
+> +	int rc;
+> +
+> +	if (!length)
+> +		return -EINVAL;
+> +	if (check_add_overflow(iova, length - 1, &last_iova))
+> +		return -EOVERFLOW;
+> +
+> +	down_read(&iopt->iova_rwsem);
+> +	for (area = iopt_area_iter_first(iopt, iova, last_iova); area;
+> +	     area = iopt_area_iter_next(area, iova, last_iova)) {
+> +		unsigned long last = min(last_iova, iopt_area_last_iova(area));
+> +		unsigned long last_index;
+> +		unsigned long index;
+> +
+> +		/* Need contiguous areas in the access */
+> +		if (iopt_area_iova(area) < cur_iova || !area->pages) {
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Should this be (cur_iova != iova && iopt_area_iova(area) < cur_iova)?
 
-Sure will do. I used the goto to reduce the amount of indentation, but
-I can definitely get rid of it.
+I can't see how we'd require in-kernel page users to know the iopt_area
+alignment from userspace, so I think this needs to skip the first
+iteration.  Thanks,
 
->
-> [...]
->
-> > +static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu, gfn_t gfn,
-> > +                                          union kvm_mmu_page_role role)
-> > +{
-> > +     struct kvm_mmu_page *sp;
-> > +     bool created = false;
-> > +
-> > +     sp = kvm_mmu_find_shadow_page(vcpu, gfn, role);
-> > +     if (sp)
-> > +             goto out;
-> > +
-> > +     created = true;
-> > +     sp = kvm_mmu_new_shadow_page(vcpu, gfn, role);
-> > +
-> > +out:
-> > +     trace_kvm_mmu_get_page(sp, created);
-> >       return sp;
->
-> Same here, wondering whether we could drop the "out" by:
->
->         sp = kvm_mmu_find_shadow_page(vcpu, gfn, role);
->         if (!sp) {
->                 created = true;
->                 sp = kvm_mmu_new_shadow_page(vcpu, gfn, role);
->         }
->
->         trace_kvm_mmu_get_page(sp, created);
->         return sp;
+Alex
 
-Ditto.
+> +			rc = -EINVAL;
+> +			goto out_remove;
+> +		}
+> +
+> +		index = iopt_area_iova_to_index(area, cur_iova);
+> +		last_index = iopt_area_iova_to_index(area, last);
+> +		rc = iopt_pages_add_user(area->pages, index, last_index,
+> +					 out_pages, write);
+> +		if (rc)
+> +			goto out_remove;
+> +		if (last == last_iova)
+> +			break;
+> +		/*
+> +		 * Can't cross areas that are not aligned to the system page
+> +		 * size with this API.
+> +		 */
+> +		if (cur_iova % PAGE_SIZE) {
+> +			rc = -EINVAL;
+> +			goto out_remove;
+> +		}
+> +		cur_iova = last + 1;
+> +		out_pages += last_index - index;
+> +		atomic_inc(&area->num_users);
+> +	}
+> +
+> +	up_read(&iopt->iova_rwsem);
+> +	return 0;
+> +
+> +out_remove:
+> +	if (cur_iova != iova)
+> +		iopt_unaccess_pages(iopt, iova, cur_iova - iova);
+> +	up_read(&iopt->iova_rwsem);
+> +	return rc;
+> +}
 
->
-> Thanks,
->
-> --
-> Peter Xu
->
