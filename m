@@ -2,67 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 66C814E4994
-	for <lists+kvm@lfdr.de>; Wed, 23 Mar 2022 00:13:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0898C4E49D6
+	for <lists+kvm@lfdr.de>; Wed, 23 Mar 2022 00:58:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235216AbiCVXPD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Mar 2022 19:15:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59234 "EHLO
+        id S240797AbiCWAAI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Mar 2022 20:00:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238806AbiCVXPC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Mar 2022 19:15:02 -0400
-Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEF342657A
-        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 16:13:33 -0700 (PDT)
-Received: by mail-lj1-x233.google.com with SMTP id q5so25980287ljb.11
-        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 16:13:33 -0700 (PDT)
+        with ESMTP id S240803AbiCWAAG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Mar 2022 20:00:06 -0400
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB70F1FA65
+        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 16:58:36 -0700 (PDT)
+Received: by mail-lf1-x12a.google.com with SMTP id w27so49652lfa.5
+        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 16:58:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=CdD+JYhTfxheiUR7WNwAiovzVBuyAP5TWLhgOgwTzlU=;
-        b=r5LxUfBlV4o0eg0saZlM8YXqFp9/mrkNnZNAvD22bfn3s0c3E6p2vqW2yDsxcjbzIW
-         7/3ADewiXm5aW98z3QE21KGI7W13CBycQcHpOf3hosEjxsIxZb7al6/J69SUQwwpsG5z
-         REz7UOD4kVW1kMGf3KAKgInu7U64UqJp0sn3iZ/L9CeHM10yKqSlR0ggQln6fPUZpGpw
-         dI4vb1jO7CaauNaGFhDDIRt/YBmW8SKEfZZr5nrTss3oeI4xU+x5ujpq8FhjI8XU9w/z
-         bvazSD042TV4Kw1We5XrWuqKetZz9vRLxZytcr7b36IJm2ApBVAgURtkAdyaH95HE3Yb
-         3OXQ==
+        bh=Tlu9SL5J8R6omNurz/8ecWUmBgsP2CZL3lQ7lttJwIo=;
+        b=RrfGYgXpjnJ8ez8X6CM7k+LaOf3xmCUxJSQMhdEXy4J5Q+IBIRBCH1wKcXexUWIhlT
+         THFZxMbK3Rh9Ak7v5s96Wl/fIrQQocvtsSIRyNDqJzvwdHeVL3bYtldUbd4bDKf1mHEV
+         kBB0PwBVITYpyD4qWwUJ7e1ADJlk7b5Z0uvoXGZudW8GwXMJpE79P4tFHsrLK+iYLY6U
+         tB5jU3pv7Bu4mjv83RAWnlerAvQmfrRyxVg0GKQtsKMoaqv8lJsQ21+5+nnzyadDL9IE
+         iT05UhKXjQfs1p+615uNJigSwoRkmdhO1UafP11DRN3NrO+xo4+AjJnHqBPwG/5CYSp3
+         t8sA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=CdD+JYhTfxheiUR7WNwAiovzVBuyAP5TWLhgOgwTzlU=;
-        b=UndqUF5YeOLgp3GW/wvZhkVZcq/9/glPP7D92PnhmxUM8g7ffAz1FPUaPkXaDgcSd6
-         IsLI+6DEqWdoe65xNUVccxejELN5WH2Jo48DrsZcpa4R+sYegeq5OJ0eHgjzIEU3ZB1k
-         Xmd9NdlLYLK5skay/QFvyI7VFMEICX+igL1OomL3wn+o32MaykIw9i/W7D/BbKwlk+2u
-         W9N8UrElBV27myfj6RiN1zt1SCd2QUkoWJpd5qP9qUp6xwJcQK0WtPdr3Y9DeXz+Y5OF
-         u7+e/Plg8SANyKgnXDcmYRpBeQI2QC17XW9UzMjtqanJdXeyEISUSjXs4wCbZvD8kYub
-         Y6kg==
-X-Gm-Message-State: AOAM53030Ap0MJQdo9+LgBLFaXu9fjqnNheCHWgOkbhJeugcprQbt1yS
-        ZBaHRcAzUHh956pHJuds5NAK+5Xmo5UVAz55dRqeIw==
-X-Google-Smtp-Source: ABdhPJwAlGxr/1zawHOEblcIMu7Aqs0xO0V2N6++er6ast4QTNh0buwlDd9LFnxCQshsU2V7TjQxdDbA73wA3gTefp8=
-X-Received: by 2002:a05:651c:54c:b0:249:9d06:24ef with SMTP id
- q12-20020a05651c054c00b002499d0624efmr2192669ljp.331.1647990811807; Tue, 22
- Mar 2022 16:13:31 -0700 (PDT)
+        bh=Tlu9SL5J8R6omNurz/8ecWUmBgsP2CZL3lQ7lttJwIo=;
+        b=wXqk7NdDpiifgtZBRbFXPAeh4bhYYxASXdgToo0/u6slti7G4xu9a2aGo/wJAAvhz1
+         0YzKYL19Sxj9Vaco4Bmr6d6ldYPTtFnI8Fl2dqLVLSVCuo7dTlTE+9y7JWhNiq7SIdNv
+         L89phgTpi6eXpRJhqQZ8TCokfgG9UGPOjmvexyPK0sRzGCCsHNcFxtyxr2gi4Q11miTx
+         yALWNr3gsYg+1UFEonVO45jBTkk8gGLzVvtB6uRhVUwfYa1vqFUluAe7E9eoSemqZCuD
+         v/7vkCRUJjLUoFKYg5BFHEESGQnOqyP+M/XRkSB9pR2XXFs/VK7NWnBYx7ybDUdwkwBK
+         4IIA==
+X-Gm-Message-State: AOAM5334OaJXOQQOYv5Rz9LXYOyFTSIkPtACRm5yAUPYNSCobCnh/8c1
+        32/niwf9vSG9TICyEcY6+3zOM6coyzj+9LI2ysb74Q==
+X-Google-Smtp-Source: ABdhPJzAHjryVgyItrSJbyclkF/PK/xzk6cO8k9gztUg+3u5ufFEp9D+g2GXAVQOphYpNtog59blAdCJnA5c63QCI6o=
+X-Received: by 2002:a05:6512:1114:b0:448:388c:b79f with SMTP id
+ l20-20020a056512111400b00448388cb79fmr19983100lfg.250.1647993514765; Tue, 22
+ Mar 2022 16:58:34 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220311002528.2230172-1-dmatlack@google.com> <20220311002528.2230172-22-dmatlack@google.com>
- <CAAhSdy1GzqknT1=tO0+LcjYkVQYRm0yUrpMbqo0UY5Ge6AdU0g@mail.gmail.com>
-In-Reply-To: <CAAhSdy1GzqknT1=tO0+LcjYkVQYRm0yUrpMbqo0UY5Ge6AdU0g@mail.gmail.com>
+References: <20220311002528.2230172-1-dmatlack@google.com> <20220311002528.2230172-21-dmatlack@google.com>
+ <YjG7Zh4zwTDsO3L1@xz-m1.local>
+In-Reply-To: <YjG7Zh4zwTDsO3L1@xz-m1.local>
 From:   David Matlack <dmatlack@google.com>
-Date:   Tue, 22 Mar 2022 16:13:05 -0700
-Message-ID: <CALzav=e3EoY0ev1nYC3kfFO0LBXnN1bgY2vcPJPcGxkiB3TuPA@mail.gmail.com>
-Subject: Re: [PATCH v2 21/26] KVM: Allow for different capacities in
- kvm_mmu_memory_cache structs
-To:     Anup Patel <anup@brainfault.org>
+Date:   Tue, 22 Mar 2022 16:58:08 -0700
+Message-ID: <CALzav=fRFzbGEVhdMSwhX1Gs1++DGW6MOWvKzeQ-RTtLsus=SQ@mail.gmail.com>
+Subject: Re: [PATCH v2 20/26] KVM: x86/mmu: Extend Eager Page Splitting to the
+ shadow MMU
+To:     Peter Xu <peterx@redhat.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
         Huacai Chen <chenhuacai@kernel.org>,
         Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup@brainfault.org>,
         Paul Walmsley <paul.walmsley@sifive.com>,
         Palmer Dabbelt <palmer@dabbelt.com>,
         Albert Ou <aou@eecs.berkeley.edu>,
         Sean Christopherson <seanjc@google.com>,
         Andrew Jones <drjones@redhat.com>,
-        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
+        Ben Gardon <bgardon@google.com>,
         "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
         "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
         <kvmarm@lists.cs.columbia.edu>,
@@ -84,282 +85,367 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 18, 2022 at 10:27 PM Anup Patel <anup@brainfault.org> wrote:
+(On Wed, Mar 16, 2022 at 3:27 AM Peter Xu <peterx@redhat.com> wrote:
 >
-> On Fri, Mar 11, 2022 at 5:56 AM David Matlack <dmatlack@google.com> wrote:
+> On Fri, Mar 11, 2022 at 12:25:22AM +0000, David Matlack wrote:
+> > Extend KVM's eager page splitting to also split huge pages that are
+> > mapped by the shadow MMU. Specifically, walk through the rmap splitting
+> > all 1GiB pages to 2MiB pages, and splitting all 2MiB pages to 4KiB
+> > pages.
 > >
-> > Allow the capacity of the kvm_mmu_memory_cache struct to be chosen at
-> > declaration time rather than being fixed for all declarations. This will
-> > be used in a follow-up commit to declare an cache in x86 with a capacity
-> > of 512+ objects without having to increase the capacity of all caches in
-> > KVM.
+> > Splitting huge pages mapped by the shadow MMU requries dealing with some
+> > extra complexity beyond that of the TDP MMU:
 > >
-> > This change requires each cache now specify its capacity at runtime,
-> > since the cache struct itself no longer has a fixed capacity known at
-> > compile time. To protect against someone accidentally defining a
-> > kvm_mmu_memory_cache struct directly (without the extra storage), this
-> > commit includes a WARN_ON() in kvm_mmu_topup_memory_cache().
+> > (1) The shadow MMU has a limit on the number of shadow pages that are
+> >     allowed to be allocated. So, as a policy, Eager Page Splitting
+> >     refuses to split if there are KVM_MIN_FREE_MMU_PAGES or fewer
+> >     pages available.
 > >
-> > This change, unfortunately, adds some grottiness to
-> > kvm_phys_addr_ioremap() in arm64, which uses a function-local (i.e.
-> > stack-allocated) kvm_mmu_memory_cache struct. Since C does not allow
-> > anonymous structs in functions, the new wrapper struct that contains
-> > kvm_mmu_memory_cache and the objects pointer array, must be named, which
-> > means dealing with an outer and inner struct. The outer struct can't be
-> > dropped since then there would be no guarantee the kvm_mmu_memory_cache
-> > struct and objects array would be laid out consecutively on the stack.
+> > (2) Huge pages may be mapped by indirect shadow pages which have the
+> >     possibility of being unsync. As a policy we opt not to split such
+> >     pages as their translation may no longer be valid.
 > >
-> > No functional change intended.
+> > (3) Splitting a huge page may end up re-using an existing lower level
+> >     shadow page tables. This is unlike the TDP MMU which always allocates
+> >     new shadow page tables when splitting.  This commit does *not*
+> >     handle such aliasing and opts not to split such huge pages.
 > >
+> > (4) When installing the lower level SPTEs, they must be added to the
+> >     rmap which may require allocating additional pte_list_desc structs.
+> >     This commit does *not* handle such cases and instead opts to leave
+> >     such lower-level SPTEs non-present. In this situation TLBs must be
+> >     flushed before dropping the MMU lock as a portion of the huge page
+> >     region is being unmapped.
+> >
+> > Suggested-by: Peter Feiner <pfeiner@google.com>
+> > [ This commit is based off of the original implementation of Eager Page
+> >   Splitting from Peter in Google's kernel from 2016. ]
 > > Signed-off-by: David Matlack <dmatlack@google.com>
 > > ---
-> >  arch/arm64/include/asm/kvm_host.h |  2 +-
-> >  arch/arm64/kvm/arm.c              |  1 +
-> >  arch/arm64/kvm/mmu.c              | 13 +++++++++----
-> >  arch/mips/include/asm/kvm_host.h  |  2 +-
-> >  arch/mips/kvm/mips.c              |  2 ++
-> >  arch/riscv/include/asm/kvm_host.h |  2 +-
-> >  arch/riscv/kvm/vcpu.c             |  1 +
-> >  arch/x86/include/asm/kvm_host.h   |  8 ++++----
-> >  arch/x86/kvm/mmu/mmu.c            |  9 +++++++++
-> >  include/linux/kvm_types.h         | 19 +++++++++++++++++--
-> >  virt/kvm/kvm_main.c               | 10 +++++++++-
-> >  11 files changed, 55 insertions(+), 14 deletions(-)
+> >  .../admin-guide/kernel-parameters.txt         |   3 -
+> >  arch/x86/kvm/mmu/mmu.c                        | 307 ++++++++++++++++++
+> >  2 files changed, 307 insertions(+), 3 deletions(-)
 > >
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index 5bc01e62c08a..1369415290dd 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -357,7 +357,7 @@ struct kvm_vcpu_arch {
-> >         bool pause;
+> > diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+> > index 05161afd7642..495f6ac53801 100644
+> > --- a/Documentation/admin-guide/kernel-parameters.txt
+> > +++ b/Documentation/admin-guide/kernel-parameters.txt
+> > @@ -2360,9 +2360,6 @@
+> >                       the KVM_CLEAR_DIRTY ioctl, and only for the pages being
+> >                       cleared.
 > >
-> >         /* Cache some mmu pages needed inside spinlock regions */
-> > -       struct kvm_mmu_memory_cache mmu_page_cache;
-> > +       DEFINE_KVM_MMU_MEMORY_CACHE(mmu_page_cache);
+> > -                     Eager page splitting currently only supports splitting
+> > -                     huge pages mapped by the TDP MMU.
+> > -
+> >                       Default is Y (on).
 > >
-> >         /* Target CPU and feature flags */
-> >         int target;
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index ecc5958e27fe..5e38385be0ef 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -319,6 +319,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
-> >         vcpu->arch.target = -1;
-> >         bitmap_zero(vcpu->arch.features, KVM_VCPU_MAX_FEATURES);
-> >
-> > +       vcpu->arch.mmu_page_cache.capacity = KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE;
-> >         vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
-> >
-> >         /* Set up the timer */
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index bc2aba953299..940089ba65ad 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -765,7 +765,12 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
-> >  {
-> >         phys_addr_t addr;
-> >         int ret = 0;
-> > -       struct kvm_mmu_memory_cache cache = { 0, __GFP_ZERO, NULL, };
-> > +       DEFINE_KVM_MMU_MEMORY_CACHE(cache) page_cache = {
-> > +               .cache = {
-> > +                       .gfp_zero = __GFP_ZERO,
-> > +                       .capacity = KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE,
-> > +               },
-> > +       };
-> >         struct kvm_pgtable *pgt = kvm->arch.mmu.pgt;
-> >         enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_DEVICE |
-> >                                      KVM_PGTABLE_PROT_R |
-> > @@ -778,14 +783,14 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
-> >         guest_ipa &= PAGE_MASK;
-> >
-> >         for (addr = guest_ipa; addr < guest_ipa + size; addr += PAGE_SIZE) {
-> > -               ret = kvm_mmu_topup_memory_cache(&cache,
-> > +               ret = kvm_mmu_topup_memory_cache(&page_cache.cache,
-> >                                                  kvm_mmu_cache_min_pages(kvm));
-> >                 if (ret)
-> >                         break;
-> >
-> >                 spin_lock(&kvm->mmu_lock);
-> >                 ret = kvm_pgtable_stage2_map(pgt, addr, PAGE_SIZE, pa, prot,
-> > -                                            &cache);
-> > +                                            &page_cache.cache);
-> >                 spin_unlock(&kvm->mmu_lock);
-> >                 if (ret)
-> >                         break;
-> > @@ -793,7 +798,7 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
-> >                 pa += PAGE_SIZE;
-> >         }
-> >
-> > -       kvm_mmu_free_memory_cache(&cache);
-> > +       kvm_mmu_free_memory_cache(&page_cache.cache);
-> >         return ret;
-> >  }
-> >
-> > diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
-> > index 717716cc51c5..935511d7fc3a 100644
-> > --- a/arch/mips/include/asm/kvm_host.h
-> > +++ b/arch/mips/include/asm/kvm_host.h
-> > @@ -347,7 +347,7 @@ struct kvm_vcpu_arch {
-> >         unsigned long pending_exceptions_clr;
-> >
-> >         /* Cache some mmu pages needed inside spinlock regions */
-> > -       struct kvm_mmu_memory_cache mmu_page_cache;
-> > +       DEFINE_KVM_MMU_MEMORY_CACHE(mmu_page_cache);
-> >
-> >         /* vcpu's vzguestid is different on each host cpu in an smp system */
-> >         u32 vzguestid[NR_CPUS];
-> > diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-> > index a25e0b73ee70..45c7179144dc 100644
-> > --- a/arch/mips/kvm/mips.c
-> > +++ b/arch/mips/kvm/mips.c
-> > @@ -387,6 +387,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
-> >         if (err)
-> >                 goto out_free_gebase;
-> >
-> > +       vcpu->arch.mmu_page_cache.capacity = KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE;
-> > +
-> >         return 0;
-> >
-> >  out_free_gebase:
-> > diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
-> > index 99ef6a120617..5bd4902ebda3 100644
-> > --- a/arch/riscv/include/asm/kvm_host.h
-> > +++ b/arch/riscv/include/asm/kvm_host.h
-> > @@ -186,7 +186,7 @@ struct kvm_vcpu_arch {
-> >         struct kvm_sbi_context sbi_context;
-> >
-> >         /* Cache pages needed to program page tables with spinlock held */
-> > -       struct kvm_mmu_memory_cache mmu_page_cache;
-> > +       DEFINE_KVM_MMU_MEMORY_CACHE(mmu_page_cache);
-> >
-> >         /* VCPU power-off state */
-> >         bool power_off;
-> > diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-> > index 624166004e36..6a5f5aa45bac 100644
-> > --- a/arch/riscv/kvm/vcpu.c
-> > +++ b/arch/riscv/kvm/vcpu.c
-> > @@ -94,6 +94,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
-> >
-> >         /* Mark this VCPU never ran */
-> >         vcpu->arch.ran_atleast_once = false;
-> > +       vcpu->arch.mmu_page_cache.capacity = KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE;
-> >         vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
->
-> There another function stage2_ioremap() which also needs to change
-> because this function creates a kvm_mmu_memory_cache on stack.
-
-Thanks for catching that. Will fix in v3.
-
->
-> Regards,
-> Anup
->
-> >
-> >         /* Setup ISA features available to VCPU */
-> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> > index 0f5a36772bdc..544dde11963b 100644
-> > --- a/arch/x86/include/asm/kvm_host.h
-> > +++ b/arch/x86/include/asm/kvm_host.h
-> > @@ -692,10 +692,10 @@ struct kvm_vcpu_arch {
-> >          */
-> >         struct kvm_mmu *walk_mmu;
-> >
-> > -       struct kvm_mmu_memory_cache mmu_pte_list_desc_cache;
-> > -       struct kvm_mmu_memory_cache mmu_shadow_page_cache;
-> > -       struct kvm_mmu_memory_cache mmu_shadowed_translation_cache;
-> > -       struct kvm_mmu_memory_cache mmu_page_header_cache;
-> > +       DEFINE_KVM_MMU_MEMORY_CACHE(mmu_pte_list_desc_cache);
-> > +       DEFINE_KVM_MMU_MEMORY_CACHE(mmu_shadow_page_cache);
-> > +       DEFINE_KVM_MMU_MEMORY_CACHE(mmu_shadowed_translation_cache);
-> > +       DEFINE_KVM_MMU_MEMORY_CACHE(mmu_page_header_cache);
-> >
-> >         /*
-> >          * QEMU userspace and the guest each have their own FPU state.
+> >       kvm.enable_vmware_backdoor=[KVM] Support VMware backdoor PV interface.
 > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index dd56b5b9624f..24e7e053e05b 100644
+> > index 926ddfaa9e1a..dd56b5b9624f 100644
 > > --- a/arch/x86/kvm/mmu/mmu.c
 > > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -5817,12 +5817,21 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
+> > @@ -727,6 +727,11 @@ static void mmu_free_memory_caches(struct kvm_vcpu *vcpu)
+> >
+> >  static struct pte_list_desc *mmu_alloc_pte_list_desc(struct kvm_mmu_memory_cache *cache)
 > >  {
-> >         int ret;
-> >
-> > +       vcpu->arch.mmu_pte_list_desc_cache.capacity =
-> > +               KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE;
-> >         vcpu->arch.mmu_pte_list_desc_cache.kmem_cache = pte_list_desc_cache;
-> >         vcpu->arch.mmu_pte_list_desc_cache.gfp_zero = __GFP_ZERO;
-> >
-> > +       vcpu->arch.mmu_page_header_cache.capacity =
-> > +               KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE;
-> >         vcpu->arch.mmu_page_header_cache.kmem_cache = mmu_page_header_cache;
-> >         vcpu->arch.mmu_page_header_cache.gfp_zero = __GFP_ZERO;
-> >
-> > +       vcpu->arch.mmu_shadowed_translation_cache.capacity =
-> > +               KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE;
+> > +     static const gfp_t gfp_nocache = GFP_ATOMIC | __GFP_ACCOUNT | __GFP_ZERO;
 > > +
-> > +       vcpu->arch.mmu_shadow_page_cache.capacity =
-> > +               KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE;
-> >         vcpu->arch.mmu_shadow_page_cache.gfp_zero = __GFP_ZERO;
-> >
-> >         vcpu->arch.mmu = &vcpu->arch.root_mmu;
-> > diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
-> > index ac1ebb37a0ff..579cf39986ec 100644
-> > --- a/include/linux/kvm_types.h
-> > +++ b/include/linux/kvm_types.h
-> > @@ -83,14 +83,29 @@ struct gfn_to_pfn_cache {
-> >   * MMU flows is problematic, as is triggering reclaim, I/O, etc... while
-> >   * holding MMU locks.  Note, these caches act more like prefetch buffers than
-> >   * classical caches, i.e. objects are not returned to the cache on being freed.
-> > + *
-> > + * The storage for the cache object pointers is laid out after the struct, to
-> > + * allow different declarations to choose different capacities. The capacity
-> > + * field defines the number of object pointers available after the struct.
-> >   */
-> >  struct kvm_mmu_memory_cache {
-> >         int nobjs;
-> > +       int capacity;
-> >         gfp_t gfp_zero;
-> >         struct kmem_cache *kmem_cache;
-> > -       void *objects[KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE];
-> > +       void *objects[];
-> >  };
-> > -#endif
+> > +     if (WARN_ON_ONCE(!cache))
+> > +             return kmem_cache_alloc(pte_list_desc_cache, gfp_nocache);
 > > +
-> > +#define __DEFINE_KVM_MMU_MEMORY_CACHE(_name, _capacity)                \
-> > +       struct {                                                \
-> > +               struct kvm_mmu_memory_cache _name;              \
-> > +               void *_name##_objects[_capacity];               \
-> > +       }
-> > +
-> > +#define DEFINE_KVM_MMU_MEMORY_CACHE(_name) \
-> > +       __DEFINE_KVM_MMU_MEMORY_CACHE(_name, KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE)
-> > +
-> > +#endif /* KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE */
+>
+> I also think this is not proper to be added into this patch.  Maybe it'll
+> be more suitable for the rmap_add() rework patch previously, or maybe it
+> can be dropped directly if it should never trigger at all. Then we die hard
+> at below when referencing it.
+
+I can drop this, Ben suggested the same. cache should really never be
+NULL so there's no need for this backup code.
+
+>
+> >       return kvm_mmu_memory_cache_alloc(cache);
+> >  }
 > >
-> >  #define HALT_POLL_HIST_COUNT                   32
+> > @@ -743,6 +748,28 @@ static gfn_t kvm_mmu_page_get_gfn(struct kvm_mmu_page *sp, int index)
+> >       return sp->gfn + (index << ((sp->role.level - 1) * PT64_LEVEL_BITS));
+> >  }
 > >
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index 9581a24c3d17..1d849ba9529f 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -371,9 +371,17 @@ int kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min)
+> > +static gfn_t sptep_to_gfn(u64 *sptep)
+> > +{
+> > +     struct kvm_mmu_page *sp = sptep_to_sp(sptep);
+> > +
+> > +     return kvm_mmu_page_get_gfn(sp, sptep - sp->spt);
+> > +}
+> > +
+> > +static unsigned int kvm_mmu_page_get_access(struct kvm_mmu_page *sp, int index)
+> > +{
+> > +     if (!sp->role.direct)
+> > +             return sp->shadowed_translation[index].access;
+> > +
+> > +     return sp->role.access;
+> > +}
+> > +
+> > +static unsigned int sptep_to_access(u64 *sptep)
+> > +{
+> > +     struct kvm_mmu_page *sp = sptep_to_sp(sptep);
+> > +
+> > +     return kvm_mmu_page_get_access(sp, sptep - sp->spt);
+> > +}
+> > +
+> >  static void kvm_mmu_page_set_gfn_access(struct kvm_mmu_page *sp, int index,
+> >                                       gfn_t gfn, u32 access)
 > >  {
-> >         void *obj;
+> > @@ -912,6 +939,9 @@ static int pte_list_add(struct kvm_mmu_memory_cache *cache, u64 *spte,
+> >       return count;
+> >  }
 > >
-> > +       /*
-> > +        * The capacity fieldmust be initialized since the storage for the
-> > +        * objects pointer array is laid out after the kvm_mmu_memory_cache
-> > +        * struct and not known at compile time.
-> > +        */
-> > +       if (WARN_ON(mc->capacity == 0))
-> > +               return -EINVAL;
+> > +static struct kvm_rmap_head *gfn_to_rmap(gfn_t gfn, int level,
+> > +                                      const struct kvm_memory_slot *slot);
 > > +
-> >         if (mc->nobjs >= min)
-> >                 return 0;
-> > -       while (mc->nobjs < ARRAY_SIZE(mc->objects)) {
-> > +       while (mc->nobjs < mc->capacity) {
-> >                 obj = mmu_memory_cache_alloc_obj(mc, GFP_KERNEL_ACCOUNT);
-> >                 if (!obj)
-> >                         return mc->nobjs >= min ? 0 : -ENOMEM;
-> > --
-> > 2.35.1.723.g4982287a31-goog
+> >  static void
+> >  pte_list_desc_remove_entry(struct kvm_rmap_head *rmap_head,
+> >                          struct pte_list_desc *desc, int i,
+> > @@ -2125,6 +2155,23 @@ static struct kvm_mmu_page *__kvm_mmu_find_shadow_page(struct kvm *kvm,
+> >       return sp;
+> >  }
 > >
+> > +static struct kvm_mmu_page *kvm_mmu_find_direct_sp(struct kvm *kvm, gfn_t gfn,
+> > +                                                union kvm_mmu_page_role role)
+> > +{
+> > +     struct kvm_mmu_page *sp;
+> > +     LIST_HEAD(invalid_list);
+> > +
+> > +     BUG_ON(!role.direct);
+> > +
+> > +     sp = __kvm_mmu_find_shadow_page(kvm, gfn, role, &invalid_list);
+> > +
+> > +     /* Direct SPs are never unsync. */
+> > +     WARN_ON_ONCE(sp && sp->unsync);
+> > +
+> > +     kvm_mmu_commit_zap_page(kvm, &invalid_list);
+> > +     return sp;
+> > +}
+> > +
+> >  /*
+> >   * Looks up an existing SP for the given gfn and role if one exists. The
+> >   * return SP is guaranteed to be synced.
+> > @@ -6063,12 +6110,266 @@ void kvm_mmu_slot_remove_write_access(struct kvm *kvm,
+> >               kvm_arch_flush_remote_tlbs_memslot(kvm, memslot);
+> >  }
+> >
+> > +static int prepare_to_split_huge_page(struct kvm *kvm,
+> > +                                   const struct kvm_memory_slot *slot,
+> > +                                   u64 *huge_sptep,
+> > +                                   struct kvm_mmu_page **spp,
+> > +                                   bool *flush,
+> > +                                   bool *dropped_lock)
+> > +{
+> > +     int r = 0;
+> > +
+> > +     *dropped_lock = false;
+> > +
+> > +     if (kvm_mmu_available_pages(kvm) <= KVM_MIN_FREE_MMU_PAGES)
+> > +             return -ENOSPC;
+> > +
+> > +     if (need_resched() || rwlock_needbreak(&kvm->mmu_lock))
+> > +             goto drop_lock;
+> > +
+>
+> Not immediately clear on whether there'll be case that *spp is set within
+> the current function.  Some sanity check might be nice?
+
+Sorry I'm not sure what you mean here. What kind of sanity check did
+you have in mind?
+
+>
+> > +     *spp = kvm_mmu_alloc_direct_sp_for_split(true);
+> > +     if (r)
+> > +             goto drop_lock;
+> > +
+> > +     return 0;
+> > +
+> > +drop_lock:
+> > +     if (*flush)
+> > +             kvm_arch_flush_remote_tlbs_memslot(kvm, slot);
+> > +
+> > +     *flush = false;
+> > +     *dropped_lock = true;
+> > +
+> > +     write_unlock(&kvm->mmu_lock);
+> > +     cond_resched();
+> > +     *spp = kvm_mmu_alloc_direct_sp_for_split(false);
+> > +     if (!*spp)
+> > +             r = -ENOMEM;
+> > +     write_lock(&kvm->mmu_lock);
+> > +
+> > +     return r;
+> > +}
+> > +
+> > +static struct kvm_mmu_page *kvm_mmu_get_sp_for_split(struct kvm *kvm,
+> > +                                                  const struct kvm_memory_slot *slot,
+> > +                                                  u64 *huge_sptep,
+> > +                                                  struct kvm_mmu_page **spp)
+> > +{
+> > +     struct kvm_mmu_page *split_sp;
+> > +     union kvm_mmu_page_role role;
+> > +     unsigned int access;
+> > +     gfn_t gfn;
+> > +
+> > +     gfn = sptep_to_gfn(huge_sptep);
+> > +     access = sptep_to_access(huge_sptep);
+> > +
+> > +     /*
+> > +      * Huge page splitting always uses direct shadow pages since we are
+> > +      * directly mapping the huge page GFN region with smaller pages.
+> > +      */
+> > +     role = kvm_mmu_child_role(huge_sptep, true, access);
+> > +     split_sp = kvm_mmu_find_direct_sp(kvm, gfn, role);
+> > +
+> > +     /*
+> > +      * Opt not to split if the lower-level SP already exists. This requires
+> > +      * more complex handling as the SP may be already partially filled in
+> > +      * and may need extra pte_list_desc structs to update parent_ptes.
+> > +      */
+> > +     if (split_sp)
+> > +             return NULL;
+>
+> This smells tricky..
+>
+> Firstly we're trying to lookup the existing SPs that has shadowed this huge
+> page in split way, with the access bits fetched from the shadow cache (so
+> without hugepage nx effect).
+
+Yeah this is tricky for sure.
+
+For direct shadow pages, sp->role.access is always the guest access
+permissions being shadowed (or ACC_ALL for situations where there is
+no shadowing, e.g. __direct_map() and the TDP MMU). That's why we use
+shadow translation cache to lookup up an existing SP or creating a new
+SP, rather than taking the access permissions from the huge SPTE
+itself (which may have KVM-specific policies applied such as HugePage
+NX, access tracking, etc.). In other words, we want to look up
+existing SPs in the same exact way that the fault handler looks them
+up.
+
+> However could the pages be mapped with
+> different permissions from the currently hugely mapped page?
+
+Yes, I think there can be some differences, such as:
+
+ - The child SPTEs may have execute permission granted due to HugePage
+NX while the huge page does not.
+ - The child SPTEs may be in a different access tracking state than
+the huge page.
+
+There may be others. But no matter what, the same differences are
+possible when we split a huge page during a fault, which leads me to
+conclude it is safe.
+
+>
+> IIUC all these is for the fact that we can't allocate pte_list_desc and we
+> want to make sure we won't make the pte list to be >1.
+>
+> But I also see that the pte_list check below...
+>
+> > +
+> > +     swap(split_sp, *spp);
+> > +     init_shadow_page(kvm, split_sp, slot, gfn, role);
+> > +     trace_kvm_mmu_get_page(split_sp, true);
+> > +
+> > +     return split_sp;
+> > +}
+> > +
+> > +static int kvm_mmu_split_huge_page(struct kvm *kvm,
+> > +                                const struct kvm_memory_slot *slot,
+> > +                                u64 *huge_sptep, struct kvm_mmu_page **spp,
+> > +                                bool *flush)
+> > +
+> > +{
+> > +     struct kvm_mmu_page *split_sp;
+> > +     u64 huge_spte, split_spte;
+> > +     int split_level, index;
+> > +     unsigned int access;
+> > +     u64 *split_sptep;
+> > +     gfn_t split_gfn;
+> > +
+> > +     split_sp = kvm_mmu_get_sp_for_split(kvm, slot, huge_sptep, spp);
+> > +     if (!split_sp)
+> > +             return -EOPNOTSUPP;
+> > +
+> > +     /*
+> > +      * Since we did not allocate pte_list_desc_structs for the split, we
+> > +      * cannot add a new parent SPTE to parent_ptes. This should never happen
+> > +      * in practice though since this is a fresh SP.
+> > +      *
+> > +      * Note, this makes it safe to pass NULL to __link_shadow_page() below.
+> > +      */
+> > +     if (WARN_ON_ONCE(split_sp->parent_ptes.val))
+> > +             return -EINVAL;
+> > +
+> > +     huge_spte = READ_ONCE(*huge_sptep);
+> > +
+> > +     split_level = split_sp->role.level;
+> > +     access = split_sp->role.access;
+> > +
+> > +     for (index = 0; index < PT64_ENT_PER_PAGE; index++) {
+> > +             split_sptep = &split_sp->spt[index];
+> > +             split_gfn = kvm_mmu_page_get_gfn(split_sp, index);
+> > +
+> > +             BUG_ON(is_shadow_present_pte(*split_sptep));
+> > +
+> > +             /*
+> > +              * Since we did not allocate pte_list_desc structs for the
+> > +              * split, we can't add a new SPTE that maps this GFN.
+> > +              * Skipping this SPTE means we're only partially mapping the
+> > +              * huge page, which means we'll need to flush TLBs before
+> > +              * dropping the MMU lock.
+> > +              *
+> > +              * Note, this make it safe to pass NULL to __rmap_add() below.
+> > +              */
+> > +             if (gfn_to_rmap(split_gfn, split_level, slot)->val) {
+> > +                     *flush = true;
+> > +                     continue;
+> > +             }
+>
+> ... here.
+>
+> IIUC this check should already be able to cover all the cases and it's
+> accurate on the fact that we don't want to grow any rmap to >1 len.
+>
+> > +
+> > +             split_spte = make_huge_page_split_spte(
+> > +                             huge_spte, split_level + 1, index, access);
+> > +
+> > +             mmu_spte_set(split_sptep, split_spte);
+> > +             __rmap_add(kvm, NULL, slot, split_sptep, split_gfn, access);
+>
+> __rmap_add() with a NULL cache pointer is weird.. same as
+> __link_shadow_page() below.
+>
+> I'll stop here for now I guess.. Have you considered having rmap allocation
+> ready altogether, rather than making this intermediate step but only add
+> that later?  Because all these look hackish to me..  It's also possible
+> that I missed something important, if so please shoot.
+>
+> Thanks,
+>
+> > +     }
+> > +
+> > +     /*
+> > +      * Replace the huge spte with a pointer to the populated lower level
+> > +      * page table. Since we are making this change without a TLB flush vCPUs
+> > +      * will see a mix of the split mappings and the original huge mapping,
+> > +      * depending on what's currently in their TLB. This is fine from a
+> > +      * correctness standpoint since the translation will either be identical
+> > +      * or non-present. To account for non-present mappings, the TLB will be
+> > +      * flushed prior to dropping the MMU lock.
+> > +      */
+> > +     __drop_large_spte(kvm, huge_sptep, false);
+> > +     __link_shadow_page(NULL, huge_sptep, split_sp);
+> > +
+> > +     return 0;
+> > +}
+>
+> --
+> Peter Xu
+>
