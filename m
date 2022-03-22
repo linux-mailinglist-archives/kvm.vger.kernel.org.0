@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EB8154E44F6
-	for <lists+kvm@lfdr.de>; Tue, 22 Mar 2022 18:23:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 40C224E44FC
+	for <lists+kvm@lfdr.de>; Tue, 22 Mar 2022 18:23:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239555AbiCVRYy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Mar 2022 13:24:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41224 "EHLO
+        id S239573AbiCVRZA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Mar 2022 13:25:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41570 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239560AbiCVRYy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Mar 2022 13:24:54 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F8BD13FA0
-        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 10:23:24 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id b5-20020a170902b60500b001532ec9005aso2717848pls.10
-        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 10:23:24 -0700 (PDT)
+        with ESMTP id S239556AbiCVRY6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Mar 2022 13:24:58 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AFC114038
+        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 10:23:27 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id d145-20020a621d97000000b004f7285f67e8so11698748pfd.2
+        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 10:23:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=7ggpAtHNiDJ+NnsLo7ScZ5icbm1fKGUxqGcBJCAEY6Y=;
-        b=mqg3pc+6i6V/WC/2nUh0x/0RXtMDSlRE8rCEA2QSpbd1/19ON/Ef3H/Q8YD6UH990U
-         m5SSErCS/i5EZsNXySHNv0yPxAr6sKj6Id5hTc7JjuTIkR7k354RVJ20WCuPNIP8Dsii
-         z3pujgswQD40fhtW31IvyoXmCvfKEP8wlB/HWBP5bWl2cO2YiRaeAVCry5w+6q4qmysy
-         6wED+XCVQ1UVCxtFf9om1e+mzHzxzR92DpatXmSRRuUDR46jm38sUkojVr9OxBILR2QD
-         4OclWsiNpSxfBpE2qlcj7w7lHF0etmhBlMBUjYdfD+juEHJbC/PpMSWGjBvg6JX+7e1/
-         CtoQ==
+        bh=A2OVfh4jna2fjjys5QzYhnEURgOUCehkINqKA/XnhEE=;
+        b=KK7kUh3po8iC/Gm8apsdZvHGwC1JoIeebfUmsd/3SXEXyatzCijqZAmSwSo6wwadQH
+         JUKCVydqn3ltAAGTyC80LbVyLW1FzvlGwyIlxEf6cCtgoTXMZIWqAvGZEt/PWFG05BDV
+         6N59RPQ2Q4dFqq6szU3GV7VdmcqvLQP/2TW+f8JXDd6D4U4H2kLMbutw3kgNL6jTyUTf
+         4UOiHjqC8Qo/CiH3tTGaxh4UcmX6VbQ4gf9SS23L0BRckdawkCrzGuk2Xfy5FTsg9Zz/
+         v4a5McWHyEyw3XQFNDidhoJ4MG36QM+fzberYvyLcayIyCdHWe51dJ7Iu1XuF3EpPI9I
+         8Hgg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=7ggpAtHNiDJ+NnsLo7ScZ5icbm1fKGUxqGcBJCAEY6Y=;
-        b=XPJ4vIDP0XJoEOClmWZMt0bzyo+fry7/EJA6jIK1+utv+7oW2j4CMPUIxdpWy6vifV
-         W/gnp4gOAO9hacEBSRa8msy+yl8wcqiKpPSoxQ16jy4xMg5xZNY1IWSASFpqqhkkO6Ws
-         Jy4d8iYWOouK2IP2YrTsRhVnQ1B3CZCzArCAJe7JwA8ltU16zT/ttT3HlYs0eyIHgEmO
-         m5nn5T3mWPZhanaq1J2z5NZj5aXmDjQn9+q7ndFE9qBx6x9irIYvmIGO/ndm6O8lv7Y8
-         6leby57T6xYlgm0B78yqzkQUXTR/UTlGqMtkj/irdKlO5EN2ngOf1qCFHfqJro2dscqH
-         Oi2A==
-X-Gm-Message-State: AOAM5319IFu+dQLfvyzFS5EC7JOQrnU/Vl9/dYRjV+Mdc3hSDdcEW11P
-        w5Tb5gi2ED7IYLQ5KeIef8x/1JzU7T+BOrvDO1qmyFtPY0ydWP06MheNJ/8Dr4trO7KRh8gDyyh
-        T8tZIPvHqu4kBoC22Hx3ijDNCjCLcyMjPtMehZRDbHQgtVDo9XPKrPcndS5dqaVM=
-X-Google-Smtp-Source: ABdhPJyhU7hmeOiqa0P0D3pB5tvCb/IIOpleA1rmE8VxLD5P5L6UlLlxLsc3gmLGCUOoq3qoZytbYSHsU4UJ7Q==
+        bh=A2OVfh4jna2fjjys5QzYhnEURgOUCehkINqKA/XnhEE=;
+        b=oW8Ajw9pmaoUkiWdooFG66m/YD108XHYdZgcDK8MspuSOY8/33cd8IAI7VsaTll2LE
+         OaU9vCOuWjZqTCO+pGRJwFBBIO0VzGRbeJyUobIExoNI3hVAjrF0+3IeSr684gombLgQ
+         qoCQ4lqueF5M7oDttmfPT7rikH6Jnz1A2YW8fQqEBI1SCTdSqLJjcSAGoI55uDkXrWEh
+         VCM3A6AMPBIjchvsQBDht+zJ++qRkKLjX795u0TTovzL4u4kROZcMxb4r1t08UXKRYVH
+         ApNemQeEdTyFotUDxi2Ph/5ofG7/GG67sG+XB57BYlf2gd1LvOKO6J5RUWLUNgUM0V5N
+         /u5w==
+X-Gm-Message-State: AOAM53283bWZjzxAeXt5TCsZa+zWVqQQRL2xkpLAXDxQlpk3AS33odIf
+        kv2QKm79xNx+sQLALfXVa23pAVVCWgcF9i4oy0MdmYjRPJ2i/1cZNOi/h4wx7b0XFkVGsDr9LPi
+        VF+jIbg13Ux7FVEfUIDIGOq3qPGn1WLpCzknfY2+2j2JqvRKGYeioJsTWlPZbz3k=
+X-Google-Smtp-Source: ABdhPJxPCzEWdiZmf1k/k9aSVDd11Orxgxmcb/v81+3NychWWnJaU5A7hAIzcW0g2gazih+FM+9T5Lwo3MaotA==
 X-Received: from ricarkol2.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
- (user=ricarkol job=sendgmr) by 2002:a17:903:2288:b0:154:50ba:2e31 with SMTP
- id b8-20020a170903228800b0015450ba2e31mr12250063plh.132.1647969804148; Tue,
- 22 Mar 2022 10:23:24 -0700 (PDT)
-Date:   Tue, 22 Mar 2022 10:23:16 -0700
+ (user=ricarkol job=sendgmr) by 2002:a17:90b:e81:b0:1c6:5a9c:5afa with SMTP id
+ fv1-20020a17090b0e8100b001c65a9c5afamr102565pjb.1.1647969805974; Tue, 22 Mar
+ 2022 10:23:25 -0700 (PDT)
+Date:   Tue, 22 Mar 2022 10:23:17 -0700
 In-Reply-To: <20220322172319.2943101-1-ricarkol@google.com>
-Message-Id: <20220322172319.2943101-2-ricarkol@google.com>
+Message-Id: <20220322172319.2943101-3-ricarkol@google.com>
 Mime-Version: 1.0
 References: <20220322172319.2943101-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.35.1.894.gb6a874cedc-goog
-Subject: [PATCH v3 1/4] KVM: arm64: selftests: add timer_get_tval() lib function
+Subject: [PATCH v3 2/4] KVM: selftests: add is_cpu_online() utility function
 From:   Ricardo Koller <ricarkol@google.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
         drjones@redhat.com
@@ -70,53 +70,50 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add timer_get_tval() into the arch timer library functions in
-selftests/kvm. Bonus: change the set_tval function to get an int32_t
-(tval is signed).
+Add is_cpu_online() utility function: a wrapper for
+"/sys/devices/system/cpu/cpu%d/online".
 
-Reviewed-by: Oliver Upton <oupton@google.com>
-Reviewed-by: Reiji Watanabe <reijiw@google.com>
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- .../selftests/kvm/include/aarch64/arch_timer.h | 18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
+ tools/testing/selftests/kvm/include/test_util.h |  2 ++
+ tools/testing/selftests/kvm/lib/test_util.c     | 16 ++++++++++++++++
+ 2 files changed, 18 insertions(+)
 
-diff --git a/tools/testing/selftests/kvm/include/aarch64/arch_timer.h b/tools/testing/selftests/kvm/include/aarch64/arch_timer.h
-index cb7c03de3a21..93f35a4fc1aa 100644
---- a/tools/testing/selftests/kvm/include/aarch64/arch_timer.h
-+++ b/tools/testing/selftests/kvm/include/aarch64/arch_timer.h
-@@ -79,7 +79,7 @@ static inline uint64_t timer_get_cval(enum arch_timer timer)
- 	return 0;
+diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/testing/selftests/kvm/include/test_util.h
+index 99e0dcdc923f..14084dc4e152 100644
+--- a/tools/testing/selftests/kvm/include/test_util.h
++++ b/tools/testing/selftests/kvm/include/test_util.h
+@@ -143,4 +143,6 @@ static inline void *align_ptr_up(void *x, size_t size)
+ 	return (void *)align_up((unsigned long)x, size);
  }
  
--static inline void timer_set_tval(enum arch_timer timer, uint32_t tval)
-+static inline void timer_set_tval(enum arch_timer timer, int32_t tval)
- {
- 	switch (timer) {
- 	case VIRTUAL:
-@@ -95,6 +95,22 @@ static inline void timer_set_tval(enum arch_timer timer, uint32_t tval)
- 	isb();
- }
++bool is_cpu_online(int pcpu);
++
+ #endif /* SELFTEST_KVM_TEST_UTIL_H */
+diff --git a/tools/testing/selftests/kvm/lib/test_util.c b/tools/testing/selftests/kvm/lib/test_util.c
+index 6d23878bbfe1..81950e6b6d10 100644
+--- a/tools/testing/selftests/kvm/lib/test_util.c
++++ b/tools/testing/selftests/kvm/lib/test_util.c
+@@ -334,3 +334,19 @@ long get_run_delay(void)
  
-+static inline int32_t timer_get_tval(enum arch_timer timer)
+ 	return val[1];
+ }
++
++bool is_cpu_online(int pcpu)
 +{
-+	isb();
-+	switch (timer) {
-+	case VIRTUAL:
-+		return (int32_t)read_sysreg(cntv_tval_el0);
-+	case PHYSICAL:
-+		return (int32_t)read_sysreg(cntp_tval_el0);
-+	default:
-+		GUEST_ASSERT_1(0, timer);
-+	}
++	char p[128];
++	FILE *fp;
++	int ret;
 +
-+	/* We should not reach here */
-+	return 0;
++	snprintf(p, sizeof(p), "/sys/devices/system/cpu/cpu%d/online", pcpu);
++	fp = fopen(p, "r");
++	if (!fp)
++		return false;
++	assert(fscanf(fp, "%d ", &ret) == 1);
++	fclose(fp);
++
++	return !!ret;
 +}
-+
- static inline void timer_set_ctl(enum arch_timer timer, uint32_t ctl)
- {
- 	switch (timer) {
 -- 
 2.35.1.894.gb6a874cedc-goog
 
