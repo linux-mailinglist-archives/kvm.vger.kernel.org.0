@@ -2,78 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E1B64E3D23
-	for <lists+kvm@lfdr.de>; Tue, 22 Mar 2022 12:05:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1CD024E3D2D
+	for <lists+kvm@lfdr.de>; Tue, 22 Mar 2022 12:07:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233875AbiCVLGg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Mar 2022 07:06:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39454 "EHLO
+        id S233908AbiCVLIp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Mar 2022 07:08:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231460AbiCVLGf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Mar 2022 07:06:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 550812BD9
-        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 04:05:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647947107;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=u6xsoBjxsxLTVGWYLLINl5J9vLFCebDJnf+raJ3Dpk4=;
-        b=OzNsbYv6liHGYsrRbw+D/uJYyoCNzjzSIlAozwT9v3rh3PlIC6xK0BGlVgvIGnLlQ82Et1
-        7tLWAUrpAHI07SbPYz8Ce06mCfpuw1x7i+NeHI+ucx001mKMwPWxtse/Ig6/0w5KxSFa0w
-        zT2TXKC4XyLmQqC8iXCDXQTUPfNKPfg=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-571-ruEtj5qhOxiYjLx07JVNUw-1; Tue, 22 Mar 2022 07:05:06 -0400
-X-MC-Unique: ruEtj5qhOxiYjLx07JVNUw-1
-Received: by mail-wm1-f72.google.com with SMTP id t2-20020a7bc3c2000000b003528fe59cb9so712911wmj.5
-        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 04:05:05 -0700 (PDT)
+        with ESMTP id S233036AbiCVLIo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Mar 2022 07:08:44 -0400
+Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 398908021D;
+        Tue, 22 Mar 2022 04:07:17 -0700 (PDT)
+Received: by mail-wm1-x32f.google.com with SMTP id 123-20020a1c1981000000b0038b3616a71aso1277212wmz.4;
+        Tue, 22 Mar 2022 04:07:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=nuGWDZlXSZNQGXcVqmqYeVN3TUgNMalMalmgFdEvLsg=;
+        b=X4RgYA0+Ajt10eWG3Cch8vH9Av08UbBn9ubtGq13/DWrudpJ9HsL8NBFjPSUVGn6mf
+         NwZdtF8uAnK4t8OaDZfbPuRFUb4M2szufCnJ77oIudRfuZLBsOnsBCXuc3SQ72PreVmi
+         0GJ/rFbF3XQbbIu5UtA/wmNCTc3XeseBSjrjD9iZZc2s30/TIfUnVH0tJsLMwKBduBX2
+         ewi2AwR9tjbRS3WiL/OxG3kh57cl7AM7sScY2C7rjg9503Y7oRUad4M4U7CxJ4HmHe9t
+         qmLv+HZ+Nm5KMpqztfekztjTkYJaz7eW3eNz9JlLspoqijvuTMz5RuSezD7rNbpBR+kz
+         fsOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=u6xsoBjxsxLTVGWYLLINl5J9vLFCebDJnf+raJ3Dpk4=;
-        b=MzbQ825Q1QH/z0wzBBKWPScByA8X8LxTTPLyA0beM1+RJ2hHW4wGEOJ8H3Tey4S0Oc
-         48RrKOgUw6ut6Vx90kpU9EWmd2bqn3Pr30+vP+9kimdpvV/bk/Xs91etA/S19bkrAqhs
-         Fytm8Mj3dKdBbX7MeLrKrgEUyPAtRGQEZLcPHRECSmV4i3THFJkcsYOfFtdUkZy+ZS1r
-         5A2exTXDL9gLxsK+ohcYtp8Auum/V8IlccxPwtB1OWQbNoyHAUB3aRkiCzXtvz+F1CVf
-         iRZr69e5B5RaivBFjjYEcDQ1xWyFRp/psWGzO2M/KextoeS815dbuXkQcH8y8Vlrh11u
-         xMdg==
-X-Gm-Message-State: AOAM5325vevda+xbI3HGihmIa805cawWlY1aVl826R2TFKnjrNdC7mBD
-        BXdRg1S7h129XIGM5vbSYNk75ck5hwxqR3F15t7dQ+N4t7/Xw03EvZANkgeGg5d/K55h0m5D9kt
-        QFu4nVCHvIOva
-X-Received: by 2002:a5d:62cf:0:b0:203:d97c:3bae with SMTP id o15-20020a5d62cf000000b00203d97c3baemr21869333wrv.237.1647947104877;
-        Tue, 22 Mar 2022 04:05:04 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwMvnee+CNJXVAgVktpFQqnx3i6NALtWWlwrTDwbe3sitvGME2Wgo26PGxLl76EcQQrhQNg9Q==
-X-Received: by 2002:a5d:62cf:0:b0:203:d97c:3bae with SMTP id o15-20020a5d62cf000000b00203d97c3baemr21869316wrv.237.1647947104650;
-        Tue, 22 Mar 2022 04:05:04 -0700 (PDT)
-Received: from [10.33.192.183] (nat-pool-str-t.redhat.com. [149.14.88.106])
-        by smtp.gmail.com with ESMTPSA id 2-20020a056000154200b00203ee1fd1desm13428813wry.64.2022.03.22.04.05.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Mar 2022 04:05:03 -0700 (PDT)
-Message-ID: <06f6fa45-0eeb-3f5b-5140-300a142d9464@redhat.com>
-Date:   Tue, 22 Mar 2022 12:05:03 +0100
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+         :mime-version:content-transfer-encoding;
+        bh=nuGWDZlXSZNQGXcVqmqYeVN3TUgNMalMalmgFdEvLsg=;
+        b=DlGi3IbJeAO0unAtcTHLQcc5bFw5qfzrTBdJKSSPVyXfg+M+NjkkAaA8N1vID/ltaZ
+         glG2ydn1/LP/V84VMvXojNSzucNNBeFuRyxJWv/rHws6LTzg5GbNQJ/qaOE5VCGQ287l
+         ruzk4yQP0xdU2Vst9wmC8EMsyyq4GklfgCn08PasF3HK8KsU5MNWwhqafeqpJWWvXFCF
+         4m2Ap57pWVpGJWU9w8avtUieDEKc2QL4rYdTjZ/eFSgBld3IWh7qinQuexepiiv/a8Ig
+         YCBd+O9f5fm8G+rzbNr54JQ69RjEg7nKjD+a0Vjysbv/VwruoMwnzTTZGcmNQxBsSs4Y
+         OIfA==
+X-Gm-Message-State: AOAM531zCU7Vkfih9EikUL89N0cNSQz/tNxlBDi0yyDrdxygiwPC2etk
+        6zt1WqNmr7yWiy3AJ8XMzpF/YVqqZRY=
+X-Google-Smtp-Source: ABdhPJyYkc/0WmhNc7t3CoJMz8icf/aTLLqcf8k5iFIr0sUggSjDbLvekBHQdd0qX0SvqiTcjPEdCQ==
+X-Received: by 2002:adf:e348:0:b0:1f0:537:1807 with SMTP id n8-20020adfe348000000b001f005371807mr22271075wrj.11.1647947235642;
+        Tue, 22 Mar 2022 04:07:15 -0700 (PDT)
+Received: from avogadro.lan ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id f13-20020a05600c4e8d00b0038c949ef0d5sm1746379wmq.8.2022.03.22.04.07.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Mar 2022 04:07:15 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     mlevitsk@redhat.com, jmattson@google.com
+Subject: [PATCH 0/3] Documentation: KVM: add a place to document API quirks and (x86) CPU errata
+Date:   Tue, 22 Mar 2022 12:07:09 +0100
+Message-Id: <20220322110712.222449-1-pbonzini@redhat.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.0
-Subject: Re: [kvm-unit-tests PATCH] runtime: indicate failure on
- crash/timeout/abort in TAP
-Content-Language: en-US
-To:     Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     mhartmay@linux.ibm.com, frankja@linux.ibm.com, pbonzini@redhat.com
-References: <20220310150322.2111128-1-nrb@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <20220310150322.2111128-1-nrb@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -81,87 +68,57 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/03/2022 16.03, Nico Boehr wrote:
-> When we have crashes, timeouts or aborts, there is currently no indication for
-> this in the TAP output. When all reports() up to this point succeeded, this
-> might result in a TAP file looking completely fine even though things went
-> terribly wrong.
-> 
-> For example, when I set the timeout for the diag288 test on s390x to 1 second,
-> it fails because it takes quite long, which is properly indicated in the
-> normal output:
-> 
-> $ ./run_tests.sh diag288
-> FAIL diag288 (timeout; duration=1s)
-> 
-> But, when I enable TAP output, I get this:
-> 
-> $ ./run_tests.sh -t diag288
-> TAP version 13
-> ok 1 - diag288: diag288: privileged: Program interrupt: expected(2) == received(2)
-> ok 2 - diag288: diag288: specification: uneven: Program interrupt: expected(6) == received(6)
-> ok 3 - diag288: diag288: specification: unsupported action: Program interrupt: expected(6) == received(6)
-> ok 4 - diag288: diag288: specification: unsupported function: Program interrupt: expected(6) == received(6)
-> ok 5 - diag288: diag288: specification: no init: Program interrupt: expected(6) == received(6)
-> ok 6 - diag288: diag288: specification: min timer: Program interrupt: expected(6) == received(6)
-> 1..6
-> 
-> Which looks like a completely fine TAP file, but actually we ran into a timeout
-> and didn't even run all tests.
-> 
-> With this patch, we get an additional line at the end which properly shows
-> something went wrong:
-> 
-> not ok 7 - diag288: timeout; duration=1s
-> 
-> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-> ---
->   scripts/runtime.bash | 12 +++++++++++-
->   1 file changed, 11 insertions(+), 1 deletion(-)
-> 
-> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-> index 6d5fced94246..b41b3d444e27 100644
-> --- a/scripts/runtime.bash
-> +++ b/scripts/runtime.bash
-> @@ -163,9 +163,19 @@ function run()
->           print_result "SKIP" $testname "$summary"
->       elif [ $ret -eq 124 ]; then
->           print_result "FAIL" $testname "" "timeout; duration=$timeout"
-> +        if [[ $tap_output != "no" ]]; then
+Reorganize Documentation/virt/kvm to be less x86-centric, and add a new
+file to document the ways in which x86 emulation is "wrong".  There are
+surely many more, for now just add the skeleton.  Please reply to this
+message with things that you'd like to see documented.
 
-I'd like to avoid "[[" in new code, and the double negation (!= "no) also 
-looks a little bit ugly ... could you please replace this line with:
+While at it add also a section for places where the KVM API is bad or
+returns wrong values.  Please also include them in reply to this message
+if you are interested in seeing them documented.
 
-	if [ "$tap_output" = "yes" ]; then
+Paolo
 
-?
+Paolo Bonzini (3):
+  Documentation: KVM: add separate directories for architecture-specific
+    documentation
+  Documentation: KVM: add virtual CPU errata documentation
+  Documentation: KVM: add API issues section
 
-> +            echo "not ok TEST_NUMBER - ${testname}: timeout; duration=$timeout" >&3
-> +        fi
->       elif [ $ret -gt 127 ]; then
-> -        print_result "FAIL" $testname "" "terminated on SIG$(kill -l $(($ret - 128)))"
-> +        signame="SIG"$(kill -l $(($ret - 128)))
-> +        print_result "FAIL" $testname "" "terminated on $signame"
-> +        if [[ $tap_output != "no" ]]; then
+ Documentation/virt/kvm/api.rst                | 46 +++++++++++++++++++
+ Documentation/virt/kvm/index.rst              | 28 ++++-------
+ Documentation/virt/kvm/s390/index.rst         | 12 +++++
+ .../virt/kvm/{ => s390}/s390-diag.rst         |  0
+ .../virt/kvm/{ => s390}/s390-pv-boot.rst      |  0
+ Documentation/virt/kvm/{ => s390}/s390-pv.rst |  0
+ .../kvm/{ => x86}/amd-memory-encryption.rst   |  0
+ Documentation/virt/kvm/{ => x86}/cpuid.rst    |  0
+ Documentation/virt/kvm/x86/errata.rst         | 39 ++++++++++++++++
+ .../virt/kvm/{ => x86}/halt-polling.rst       |  0
+ .../virt/kvm/{ => x86}/hypercalls.rst         |  0
+ Documentation/virt/kvm/x86/index.rst          | 19 ++++++++
+ Documentation/virt/kvm/{ => x86}/mmu.rst      |  0
+ Documentation/virt/kvm/{ => x86}/msr.rst      |  0
+ .../virt/kvm/{ => x86}/nested-vmx.rst         |  0
+ .../kvm/{ => x86}/running-nested-guests.rst   |  0
+ .../virt/kvm/{ => x86}/timekeeping.rst        |  0
+ 17 files changed, 124 insertions(+), 20 deletions(-)
+ create mode 100644 Documentation/virt/kvm/s390/index.rst
+ rename Documentation/virt/kvm/{ => s390}/s390-diag.rst (100%)
+ rename Documentation/virt/kvm/{ => s390}/s390-pv-boot.rst (100%)
+ rename Documentation/virt/kvm/{ => s390}/s390-pv.rst (100%)
+ rename Documentation/virt/kvm/{ => x86}/amd-memory-encryption.rst (100%)
+ rename Documentation/virt/kvm/{ => x86}/cpuid.rst (100%)
+ create mode 100644 Documentation/virt/kvm/x86/errata.rst
+ rename Documentation/virt/kvm/{ => x86}/halt-polling.rst (100%)
+ rename Documentation/virt/kvm/{ => x86}/hypercalls.rst (100%)
+ create mode 100644 Documentation/virt/kvm/x86/index.rst
+ rename Documentation/virt/kvm/{ => x86}/mmu.rst (100%)
+ rename Documentation/virt/kvm/{ => x86}/msr.rst (100%)
+ rename Documentation/virt/kvm/{ => x86}/nested-vmx.rst (100%)
+ rename Documentation/virt/kvm/{ => x86}/running-nested-guests.rst (100%)
+ rename Documentation/virt/kvm/{ => x86}/timekeeping.rst (100%)
 
-dito
-
-> +            echo "not ok TEST_NUMBER - ${testname}: terminated on $signame" >&3
-> +        fi
->       else
-> +        if [ $ret -eq 127 ] && [[ $tap_output != "no" ]]; then
-
-dito (especially since this mixes [ and [[ in one line)
-
-> +            echo "not ok TEST_NUMBER - ${testname}: aborted" >&3
-> +        fi
->           print_result "FAIL" $testname "$summary"
->       fi
-
-As Marc already mentioned, it's indeed a little bit sad that we now have 
-parts of the TAP handling in run_tests.sh and some parts in 
-scripts/runtime.bash, but I also can't think of a much nicer solution right 
-now ... so with this cosmetics fixed:
-
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+-- 
+2.35.1
 
