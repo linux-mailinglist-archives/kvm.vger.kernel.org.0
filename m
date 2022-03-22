@@ -2,116 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CAADB4E3E0F
-	for <lists+kvm@lfdr.de>; Tue, 22 Mar 2022 13:05:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9453E4E3E5E
+	for <lists+kvm@lfdr.de>; Tue, 22 Mar 2022 13:20:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234530AbiCVMGx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Mar 2022 08:06:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53974 "EHLO
+        id S234832AbiCVMWD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Mar 2022 08:22:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230414AbiCVMGx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Mar 2022 08:06:53 -0400
-Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3065433BB
-        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 05:05:25 -0700 (PDT)
-Received: by mail-wm1-x332.google.com with SMTP id v130-20020a1cac88000000b00389d0a5c511so1963062wme.5
-        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 05:05:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=LsogzIW20PFbxNVUsODKUNH/SwjRh3rmWCB3ikdFeq8=;
-        b=LNuU/fRaR5WkXZ8+KarznGMNy6S5Sn0lf0qOij6gVQfMzGs6HWGARVSb4Fa3rpv/Ef
-         wUDqxkDuoTiY7YhLRFbll+aGhgyzIZfja8j4tpidxMyHwxI4I+SH4Kh0p+J/UjxE6zbo
-         sKzd5ay5ymu0E7JLzDcYT5JX6rOZYJWrSK87IsDqB6Bpx4+nl8EGc9IaJBh6O+xR+y49
-         FcErGEus8P91TWOkmU5VG4RL2ZkNujDHhlcwSrfEreqte70svS9qlOaVXC6EKdMVrzcK
-         S+8MwTpSnK9iTlyjNYK5xrEW2PNAxxoReIYvh1QT/0f1ngGsxaCV6An9R+1uq15pEO7T
-         Zmmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=LsogzIW20PFbxNVUsODKUNH/SwjRh3rmWCB3ikdFeq8=;
-        b=uDhN9GV42ueUGa09bEhykjttGxx/UespzGDCNnQXgGKeL+XCLOtgUSuBu0KKHc6kM7
-         ymF99cUQPY0ifa+IbhpgTckSnCZQmUB7GAezYcMDBOylon+jAejz5HigOkJ35a8Wk12V
-         tt6K9vUz/JjdlHnVfRCYku7/SL3P+r286YPxvyrxAxFSGqUt3QsM5h9ij1M28Vh9y9tf
-         ecPdBmO+6FVk7FG1+2ueJz+6nQComiSYnki4RQgompYh6l7AYHNOWVF5TS0oQBmwyhA4
-         UYoLUV0Nn65zUYQJANhHSoyii9BjJ+eamITXIRKZcs2Uxn9GYmb4s8BHDp4HYl+XApwX
-         ZYAA==
-X-Gm-Message-State: AOAM532BhjpL+krUblxszizGN9xdAEsnq70g4ExBVFLPiCBzNu0GnaKm
-        c9yA6mTTkvVRjt+fmPpRbM4VZFZ4XpY=
-X-Google-Smtp-Source: ABdhPJwpGb8MYLFgQMP5JIu70aj+GrxjBxenjonIHryZ3l2jiFc0vhUI6qyrJHXnBszicHTyorRoUg==
-X-Received: by 2002:a7b:c14d:0:b0:38c:801a:a8b3 with SMTP id z13-20020a7bc14d000000b0038c801aa8b3mr3352236wmi.40.1647950724424;
-        Tue, 22 Mar 2022 05:05:24 -0700 (PDT)
-Received: from localhost.localdomain (198.red-83-50-65.dynamicip.rima-tde.net. [83.50.65.198])
-        by smtp.gmail.com with ESMTPSA id r13-20020adfbb0d000000b00203e0efdd3bsm15376668wrg.107.2022.03.22.05.05.23
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 22 Mar 2022 05:05:24 -0700 (PDT)
-From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= 
-        <philippe.mathieu.daude@gmail.com>
-To:     qemu-devel@nongnu.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        with ESMTP id S234828AbiCVMV7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Mar 2022 08:21:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 00BEB6E295
+        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 05:20:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1647951631;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=GMuDRGg3lIcChTtYMxg+25gDdhcuPe/2uiUlW2/Y36Q=;
+        b=FlS2m6bJ2J62xFpSm2jRycT+xln0wc9h+5AiCp4v7fUOJRVpLpdnK2p9OyHUCkKrwiHfDH
+        t57xm6Lz0poF+CnfaPVgfgyaC1z+/4DkeYYJMrOCKbSPgEXwLdE4XJFPjWn+AqO9H5FgEz
+        g2wGvUtW2s+nThPV0KK0fZCcNVOdar4=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-515-ziReuRaUNkq0VAaoldJBOQ-1; Tue, 22 Mar 2022 08:20:27 -0400
+X-MC-Unique: ziReuRaUNkq0VAaoldJBOQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B31C3106657C;
+        Tue, 22 Mar 2022 12:20:26 +0000 (UTC)
+Received: from sirius.home.kraxel.org (unknown [10.39.196.67])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 775A9C27E96;
+        Tue, 22 Mar 2022 12:20:26 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+        id CF30C180062E; Tue, 22 Mar 2022 13:20:24 +0100 (CET)
+Date:   Tue, 22 Mar 2022 13:20:24 +0100
+From:   Gerd Hoffmann <kraxel@redhat.com>
+To:     Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc:     Xiaoyao Li <xiaoyao.li@intel.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= 
+        <philippe.mathieu.daude@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Cornelia Huck <cohuck@redhat.com>,
         Marcelo Tosatti <mtosatti@redhat.com>,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
-        Mark Kanda <mark.kanda@oracle.com>
-Subject: [RFC PATCH-for-7.0 v4] target/i386/kvm: Free xsave_buf when destroying vCPU
-Date:   Tue, 22 Mar 2022 13:05:22 +0100
-Message-Id: <20220322120522.26200-1-philippe.mathieu.daude@gmail.com>
-X-Mailer: git-send-email 2.35.1
+        Laszlo Ersek <lersek@redhat.com>,
+        Eric Blake <eblake@redhat.com>,
+        Connor Kuehl <ckuehl@redhat.com>, isaku.yamahata@intel.com,
+        erdemaktas@google.com, kvm@vger.kernel.org, qemu-devel@nongnu.org,
+        seanjc@google.com
+Subject: Re: [RFC PATCH v3 17/36] pflash_cfi01/tdx: Introduce ram_mode of
+ pflash for TDVF
+Message-ID: <20220322122024.blyut6mnszhyw6hz@sirius.home.kraxel.org>
+References: <20220317135913.2166202-1-xiaoyao.li@intel.com>
+ <20220317135913.2166202-18-xiaoyao.li@intel.com>
+ <f418548e-c24c-1bc3-4e16-d7a775298a18@gmail.com>
+ <7a8233e4-0cae-b05a-7931-695a7ee87fc9@intel.com>
+ <20220322092141.qsgv3pqlvlemgrgw@sirius.home.kraxel.org>
+ <YjmXFZRCbKXTkAhN@redhat.com>
+ <20220322103518.ljbi4pvghbgjxm7k@sirius.home.kraxel.org>
+ <YjmqOolbafWkMEHN@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YjmqOolbafWkMEHN@redhat.com>
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+  Hi,
 
-Fix vCPU hot-unplug related leak reported by Valgrind:
+> At the time I did try a gross hack that (IIRC) disabled the
+> rom_reset logic, and munged x86_bios_rom_init so that it would
+> force load it straight at the RAM location.
 
-  ==132362== 4,096 bytes in 1 blocks are definitely lost in loss record 8,440 of 8,549
-  ==132362==    at 0x4C3B15F: memalign (vg_replace_malloc.c:1265)
-  ==132362==    by 0x4C3B288: posix_memalign (vg_replace_malloc.c:1429)
-  ==132362==    by 0xB41195: qemu_try_memalign (memalign.c:53)
-  ==132362==    by 0xB41204: qemu_memalign (memalign.c:73)
-  ==132362==    by 0x7131CB: kvm_init_xsave (kvm.c:1601)
-  ==132362==    by 0x7148ED: kvm_arch_init_vcpu (kvm.c:2031)
-  ==132362==    by 0x91D224: kvm_init_vcpu (kvm-all.c:516)
-  ==132362==    by 0x9242C9: kvm_vcpu_thread_fn (kvm-accel-ops.c:40)
-  ==132362==    by 0xB2EB26: qemu_thread_start (qemu-thread-posix.c:556)
-  ==132362==    by 0x7EB2159: start_thread (in /usr/lib64/libpthread-2.28.so)
-  ==132362==    by 0x9D45DD2: clone (in /usr/lib64/libc-2.28.so)
+Sounds reasonable.  The whole rom logic exists to handle resets,
+but with confidential guests we don't need that, we can't change
+guest state to perform a reset anyway ...
 
-Reported-by: Mark Kanda <mark.kanda@oracle.com>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
-Based on a series from Mark:
-https://lore.kernel.org/qemu-devel/20220321141409.3112932-1-mark.kanda@oracle.com/
+take care,
+  Gerd
 
-RFC because currently no time to test
----
- target/i386/kvm/kvm.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index ef2c68a6f4..e93440e774 100644
---- a/target/i386/kvm/kvm.c
-+++ b/target/i386/kvm/kvm.c
-@@ -2072,6 +2072,8 @@ int kvm_arch_destroy_vcpu(CPUState *cs)
-     X86CPU *cpu = X86_CPU(cs);
-     CPUX86State *env = &cpu->env;
- 
-+    g_free(env->xsave_buf);
+diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+index 4cf107baea34..169ef96682de 100644
+--- a/hw/i386/x86.c
++++ b/hw/i386/x86.c
+@@ -1115,15 +1115,26 @@ void x86_bios_rom_init(MachineState *ms, const char *default_firmware,
+         goto bios_error;
+     }
+     bios = g_malloc(sizeof(*bios));
 +
-     if (cpu->kvm_msr_buf) {
-         g_free(cpu->kvm_msr_buf);
-         cpu->kvm_msr_buf = NULL;
--- 
-2.35.1
+     memory_region_init_ram(bios, NULL, "pc.bios", bios_size, &error_fatal);
+-    if (!isapc_ram_fw) {
+-        memory_region_set_readonly(bios, true);
+-    }
+-    ret = rom_add_file_fixed(bios_name, (uint32_t)(-bios_size), -1);
+-    if (ret != 0) {
+-    bios_error:
+-        fprintf(stderr, "qemu: could not load PC BIOS '%s'\n", bios_name);
+-        exit(1);
++    if (1 /* confidential computing */) {
++        /*
++         * The concept of a "reset" simply doesn't exist for
++         * confidential computing guests, we have to destroy and
++         * re-launch them instead.  So there is no need to register
++         * the firmware as rom to properly re-initialize on reset.
++         * Just go for a straight file load instead.
++         */
++        void *ptr = memory_region_get_ram_ptr(bios);
++        load_image_size(filename, ptr, bios_size);
++    } else {
++        if (!isapc_ram_fw) {
++            memory_region_set_readonly(bios, true);
++        }
++        ret = rom_add_file_fixed(bios_name, (uint32_t)(-bios_size), -1);
++        if (ret != 0) {
++            goto bios_error;
++        }
+     }
+     g_free(filename);
+ 
+@@ -1144,6 +1155,11 @@ void x86_bios_rom_init(MachineState *ms, const char *default_firmware,
+     memory_region_add_subregion(rom_memory,
+                                 (uint32_t)(-bios_size),
+                                 bios);
++    return;
++
++bios_error:
++    fprintf(stderr, "qemu: could not load PC BIOS '%s'\n", bios_name);
++    exit(1);
+ }
+ 
+ bool x86_machine_is_smm_enabled(const X86MachineState *x86ms)
 
