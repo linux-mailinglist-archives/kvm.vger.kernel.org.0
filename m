@@ -2,100 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B4F484E47E9
-	for <lists+kvm@lfdr.de>; Tue, 22 Mar 2022 21:57:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EF7134E4853
+	for <lists+kvm@lfdr.de>; Tue, 22 Mar 2022 22:35:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230110AbiCVU7A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Mar 2022 16:59:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59280 "EHLO
+        id S235724AbiCVVhY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Mar 2022 17:37:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36972 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229947AbiCVU67 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Mar 2022 16:58:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 800F825C6E
-        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 13:57:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647982649;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ZFOIWCfiW5FFrVsIemo3EMJNkTkxh5cnHQBDMq/mWQI=;
-        b=IG+eWhjQLnNoWIPDepvrvJexrKEnLJze3WQJnBEucw9ajZzuwQVM5EtM4vmmgo8zOe43An
-        eOCBB8kfXtlaM8zB3t1QUtCkolaFcnnPR60hg+hOScdI9pVHnNDegACwB66Aap+L4lNSDF
-        BtWwhN51eFpkP0YQVAZtYgE7GE06t+A=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-205-1Bc-Xk0XMbCz5LOqwYu3Vw-1; Tue, 22 Mar 2022 16:57:28 -0400
-X-MC-Unique: 1Bc-Xk0XMbCz5LOqwYu3Vw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C37C1185A7A4
-        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 20:57:27 +0000 (UTC)
-Received: from starship (unknown [10.40.194.231])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D0F044010A02;
-        Tue, 22 Mar 2022 20:57:26 +0000 (UTC)
-Message-ID: <9373a32313e166f807b7b188a6c0c4665e098327.camel@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH 0/9] KVM unit tests for SVM options
- features
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     Cathy Avery <cavery@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Date:   Tue, 22 Mar 2022 22:57:25 +0200
-In-Reply-To: <20220322205613.250925-1-mlevitsk@redhat.com>
-References: <20220322205613.250925-1-mlevitsk@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        with ESMTP id S235712AbiCVVhX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Mar 2022 17:37:23 -0400
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 625A528E1D
+        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 14:35:54 -0700 (PDT)
+Received: by mail-lf1-x132.google.com with SMTP id h7so14537337lfl.2
+        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 14:35:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=sViZwtjH37C2XjD/KE9d074ZFGD0e8UmC54d60/mnYU=;
+        b=ebY6Y8EZFsj2YWkZmzXxWKTa838I7KidQLIn4kAYg9sttbpf/NkPi3l2U1jJYTLAlB
+         o3VVXMXG4KYYAZi67D6xT1lRKw/dRKgKj7EyVhkBRSgVP90yv2a8viotUNqczCnN0zhm
+         hQlzeIjr5Hk8szwaGLH5ipnDoziJkZS/arKaatD1nrUwVQJCGLvVIAQi2vFLuKthMXC0
+         x8VwcqbnAgE3oPNYkDWpb81BeTSuzLiBJcBS9l8ZNelR296YLxRYBUnrfzbaRwZ1U0MR
+         BhGR57yCQQxMat/5AOOwVTtCLN9XAX0GqI2xqiQTmbWkEZtOc8/lNJWG4929NrQ1B4Gn
+         tTTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=sViZwtjH37C2XjD/KE9d074ZFGD0e8UmC54d60/mnYU=;
+        b=dno4GYKfdY1lz0BPEura91/EpTA/6S7TNvFO87EKv5oPnVj5dVqy9onhzJC2+AVt7Z
+         m7ZvoIeZQo4bV/po3rBG5HjxHUyF6AJOVlkF/mRXa9nrYoRqe0nnTW2yruaTQvdGPOa1
+         kQ+2CM7cnuwBK34o2jtS3A1TbVY+E7Lcc7MRHssCzkNnQRgZBkY75IjRcvz36hrXomNU
+         3MmESGCTIa2BofJkk7j5FsQPxomH3MBggsUF9uYMdlbSgPjt6tPZQA7iZtgzIFkgTuOA
+         Nb1PzdXJDDfEggy5puiqohjHcfuJXHvzGrR6Krtd5y26R+dTg096n9OOX8A+ks8TM3qG
+         AgpA==
+X-Gm-Message-State: AOAM533bpBNtc5f53302n9sKsXmo1wFte8rQLzufF94XZxamU3M7bUaf
+        7GUSxoE16Uqb/fYh33aMNPrU5s2vOhzJq9EhU+yO2g==
+X-Google-Smtp-Source: ABdhPJwc0JSNlPahbAdqv7iJH7vq7Pz7uIXFYdwFmk0odM80FGtfrbr+pmJyyGlCdcWSaGWKIPpevvVfQwGTW0XRuvY=
+X-Received: by 2002:a19:f206:0:b0:448:5b9d:811c with SMTP id
+ q6-20020a19f206000000b004485b9d811cmr19184431lfh.102.1647984952540; Tue, 22
+ Mar 2022 14:35:52 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+References: <20220311002528.2230172-1-dmatlack@google.com> <20220311002528.2230172-6-dmatlack@google.com>
+ <YjBTtz6wo/zQEHCv@xz-m1.local>
+In-Reply-To: <YjBTtz6wo/zQEHCv@xz-m1.local>
+From:   David Matlack <dmatlack@google.com>
+Date:   Tue, 22 Mar 2022 14:35:25 -0700
+Message-ID: <CALzav=c0ccztDULiVMwR4K20iYc0WH53ApeOCorhjKwaMNL5Sg@mail.gmail.com>
+Subject: Re: [PATCH v2 05/26] KVM: x86/mmu: Rename shadow MMU functions that
+ deal with shadow pages
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Sean Christopherson <seanjc@google.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Ben Gardon <bgardon@google.com>,
+        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
+        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
+        <kvmarm@lists.cs.columbia.edu>,
+        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
+        <linux-mips@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
+        <kvm@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
+        <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-03-22 at 22:56 +0200, Maxim Levitsky wrote:
-> Those are few fixes and unit tests I used to
-> test svm optional features and few more svm feaures.
-> 
-> Best regards,
->     Maxim Levitsky
-> 
-> Maxim Levitsky (9):
->   pmu_lbr: few fixes
->   svm: Fix reg_corruption test, to avoid timer interrupt firing in later
->     tests.
->   svm: NMI is an "exception" and not interrupt in x86 land
->   svm: intercept shutdown in all svm tests by default
->   svm: add SVM_BARE_VMRUN
->   svm: add tests for LBR virtualization
->   svm: add tests for case when L1 intercepts various hardware interrupts
->   svm: add test for nested tsc scaling
->   svm: add test for pause filter and threshold
-> 
->  lib/x86/msr.h       |   1 +
->  lib/x86/processor.h |   4 +
->  x86/pmu_lbr.c       |   6 +
->  x86/svm.c           |  57 ++---
->  x86/svm.h           |  71 +++++-
->  x86/svm_tests.c     | 582 +++++++++++++++++++++++++++++++++++++++++++-
->  x86/unittests.cfg   |   8 +-
->  7 files changed, 688 insertions(+), 41 deletions(-)
-> 
-> -- 
-> 2.26.3
-> 
-> 
-typo: I mean SVM optional features.
+On Tue, Mar 15, 2022 at 1:52 AM Peter Xu <peterx@redhat.com> wrote:
+>
+> On Fri, Mar 11, 2022 at 12:25:07AM +0000, David Matlack wrote:
+> > Rename 3 functions:
+> >
+> >   kvm_mmu_get_page()   -> kvm_mmu_get_shadow_page()
+> >   kvm_mmu_alloc_page() -> kvm_mmu_alloc_shadow_page()
+> >   kvm_mmu_free_page()  -> kvm_mmu_free_shadow_page()
+> >
+> > This change makes it clear that these functions deal with shadow pages
+> > rather than struct pages. Prefer "shadow_page" over the shorter "sp"
+> > since these are core routines.
+> >
+> > Signed-off-by: David Matlack <dmatlack@google.com>
+>
+> Acked-by: Peter Xu <peterx@redhat.com>
 
-Best regards,
-	Maxim Levitsky
+What's the reason to use Acked-by for this patch but Reviewed-by for others?
 
+
+>
+> --
+> Peter Xu
+>
