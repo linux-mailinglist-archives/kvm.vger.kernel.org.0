@@ -2,81 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 292834E39AE
-	for <lists+kvm@lfdr.de>; Tue, 22 Mar 2022 08:34:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F4234E39CD
+	for <lists+kvm@lfdr.de>; Tue, 22 Mar 2022 08:45:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237544AbiCVHdS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Mar 2022 03:33:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38242 "EHLO
+        id S229769AbiCVHqt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Mar 2022 03:46:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49668 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237518AbiCVHdR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Mar 2022 03:33:17 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E8EC1CFCD;
-        Tue, 22 Mar 2022 00:31:50 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id v4so14960610pjh.2;
-        Tue, 22 Mar 2022 00:31:50 -0700 (PDT)
+        with ESMTP id S229764AbiCVHq2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Mar 2022 03:46:28 -0400
+Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AF1C29822
+        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 00:42:38 -0700 (PDT)
+Received: by mail-io1-xd29.google.com with SMTP id z6so9767155iot.0
+        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 00:42:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=r4xA4YpWvDAW9lMA2GfpmJRYpPh3E38DjIkUV0HV+uY=;
-        b=XNxhv4/i9m6xgW7eDDhyYG5Ouj06COWiugANv4Hkgo/bnHhuClzi/M1F8FtdhuUz1Z
-         /H3sM5jaLVfiRLC/RbTSr2MQt4XDfMmPFlyOQ2bXzz/wIGD+kba5AY4rDD04iDgxk7S0
-         WL+pt8MqZ22r8E9Y/WzOT3H84OufyyXg1FW8TJCB2VssakOsljaCIFdQZHDiklMp65cD
-         EG3mxmqPc6YnxE+zmv+JY/wbwJeEhliVwN5Eu8oXvTj15G5tjOkdatnEjOZA41ygJCdr
-         ZzqWfUrdxqcEyTQBWAcnr580fWrRaowZuJlqGQO4mY/jqp188491P3DmC9kikYcaYYGx
-         0AlQ==
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=rHrnAaz5t76UG2JwgEvwPleGU0MvRMDMpxjoGYiF+CQ=;
+        b=AqNqTzOP6nOh+P8EhP5YaQVXwSpBaB4EOZgmXMB0voLFwbLZUI7NgJbtOZQlaeY6Nz
+         gVqNg3sl4QnKntKarOFgu/rZPofdwCq26OzT8CyuxJygAsmIGcv6V/SGCoaKagPsk6Wp
+         9yE7Gc4gVL9dAO7/BST/RG+q306x2Qe/kwi4SDDP30yrio0KgPodEbHKzMacVWho7kta
+         J2HGFOb+tZM1fJRBadYLB3E+O07sN1tBk4U1gSTjwCelgE0p5yzO3x10KX4tbLCJvQru
+         yrFJ2+a88cR2VFFoBEIs8CA+owPGwCuypJiT50r1aYNtyOfk+XmyvCD/sU0Xu8bLaFTF
+         4vPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=r4xA4YpWvDAW9lMA2GfpmJRYpPh3E38DjIkUV0HV+uY=;
-        b=mnPvFZxGn86s33RQuh+Fcz9Yl3IMCHYJVKH54/1RSXju5fVsV/YOA3LnRhSXh/FwH/
-         KVH6cmAP15A4vORabc+jyxh4/Nk+Yuuc6g/bIAi/+X0bfqnKtuNV/SmWTAUz/b2phn8r
-         lCDZpgW7XuXX8UcFPSuUr4+FtlYMJlQfnG2a7TtJPtUVurZZeHP0z6Mr/Hl+7l01Csl0
-         SUHY8haU6mYeJRFdQWzX1eMfF9igQTA9CEpsCdJjGxL1OOA+gcdnx9rSpjFL+dfzxFRy
-         ai3Hw+x8kVS0RV8wA/1jGl77/dF0L0427pSiJeB9POXhHmEbdOAeU9OCQHzfeUhLo1Ix
-         nm7w==
-X-Gm-Message-State: AOAM533715zWRndaoS7zbx6CNL8NxDTabhZbyxEvvkmDAI1XMSibLvS6
-        CoQAIjXkyfA37GflXHY14zE=
-X-Google-Smtp-Source: ABdhPJw37CzyUc9LRpoPZhJ7Cqz1Vq5kO/UE+2fGyOYqk66Y101+bDEBftdrZmW6wzUiUmdiS8rH7w==
-X-Received: by 2002:a17:902:f683:b0:153:ee22:18b7 with SMTP id l3-20020a170902f68300b00153ee2218b7mr16451640plg.159.1647934310027;
-        Tue, 22 Mar 2022 00:31:50 -0700 (PDT)
-Received: from [192.168.255.10] ([203.205.141.112])
-        by smtp.gmail.com with ESMTPSA id t8-20020aa79468000000b004f764340d8bsm23806525pfq.92.2022.03.22.00.31.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Mar 2022 00:31:49 -0700 (PDT)
-Message-ID: <7c3c082c-2cad-44ae-1b66-6b1ab73dc11e@gmail.com>
-Date:   Tue, 22 Mar 2022 15:31:43 +0800
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=rHrnAaz5t76UG2JwgEvwPleGU0MvRMDMpxjoGYiF+CQ=;
+        b=r8SDHyiNQjwD4SkoK3luQgclgtMteLovnF6+bvj6OZM6cPYSSJ3JMJasFCpOxIucV/
+         TZH3CvpWOFdRDLA8SH8+qCPYj0LIJym+xmf/YqAuurZ+vuBliqgs+ipBD5O762yuom3k
+         r5sTshIRfTENvERnxIiMXBfPbk7/ByDMm4qnvZ2xpQlDlHNCBvVmbsmINWvNn3+LfzwF
+         N8ntM8oFdShSBZPRJVCUJllmoa2lSee8vW2TamiMX7Y8xDWYzpKPAHicTqkK8WTViQ1z
+         6aJkHhK+abupZtcCJe4buU1oz3jc19fw7KMp/XDhBisTe8wLIpNcQegPabugvq0f6D3b
+         DqLA==
+X-Gm-Message-State: AOAM533SLzBIcEWzrbde1wkdnCwP6qf5cRnI7/N0rQZwj7qSTYMVaTTc
+        tuQDCc9InSAhA6FxbF5fKVx9Dg==
+X-Google-Smtp-Source: ABdhPJxdEupF10MGveiVRreMiqsEJc59sTLObwFckWBLfHJmNdEDcg4GwP43G51CHlniwAF+42ZCBw==
+X-Received: by 2002:a05:6638:2195:b0:31a:8815:f0c0 with SMTP id s21-20020a056638219500b0031a8815f0c0mr8418816jaj.301.1647934957686;
+        Tue, 22 Mar 2022 00:42:37 -0700 (PDT)
+Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
+        by smtp.gmail.com with ESMTPSA id f2-20020a056e020b4200b002c805b9b4c4sm6259885ilu.16.2022.03.22.00.42.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Mar 2022 00:42:36 -0700 (PDT)
+Date:   Tue, 22 Mar 2022 07:42:33 +0000
+From:   Oliver Upton <oupton@google.com>
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>,
+        Andrew Jones <drjones@redhat.com>,
+        Fuad Tabba <tabba@google.com>,
+        Peng Liang <liangpeng10@huawei.com>,
+        Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>
+Subject: Re: [PATCH v6 01/25] KVM: arm64: Introduce a validation function for
+ an ID register
+Message-ID: <Yjl96UQ7lUovKBWD@google.com>
+References: <20220311044811.1980336-1-reijiw@google.com>
+ <20220311044811.1980336-2-reijiw@google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.7.0
-Subject: Re: [PATCH 7/7] kvm: x86/cpuid: Fix Architectural Performance
- Monitoring support
-Content-Language: en-US
-To:     Sandipan Das <sandipan.das@amd.com>
-Cc:     peterz@infradead.org, bp@alien8.de, dave.hansen@linux.intel.com,
-        acme@kernel.org, mark.rutland@arm.com,
-        alexander.shishkin@linux.intel.com, namhyung@kernel.org,
-        jolsa@kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        pbonzini@redhat.com, jmattson@google.com, eranian@google.com,
-        ananth.narayan@amd.com, ravi.bangoria@amd.com,
-        santosh.shukla@amd.com, kvm list <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        linux-perf-users@vger.kernel.org, x86@kernel.org
-References: <cover.1647498015.git.sandipan.das@amd.com>
- <bc58ac02d642ea1fcbd04a525046dfe978e9f323.1647498015.git.sandipan.das@amd.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-Organization: Tencent
-In-Reply-To: <bc58ac02d642ea1fcbd04a525046dfe978e9f323.1647498015.git.sandipan.das@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+Content-Type: multipart/mixed; boundary="Jy922konoFvWkL0i"
+Content-Disposition: inline
+In-Reply-To: <20220311044811.1980336-2-reijiw@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -84,47 +84,203 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17/3/2022 2:28 pm, Sandipan Das wrote:
-> CPUID 0xA provides information on Architectural Performance
-> Monitoring features on some x86 processors. It advertises a
-> PMU version which Qemu uses to determine the availability of
-> additional MSRs to manage the PMCs.
-> 
-> Upon receiving a KVM_GET_SUPPORTED_CPUID ioctl request for
-> the same, the kernel constructs return values based on the
-> x86_pmu_capability irrespective of the vendor.
-> 
-> This CPUID function and additional MSRs are not supported on
-> AMD processors. If PerfMonV2 is detected, the PMU version is
-> set to 2 and guest startup breaks because of an attempt to
-> access a non-existent MSR. Return zeros to avoid this.
-> 
-> Fixes: a6c06ed1a60a ("KVM: Expose the architectural performance monitoring CPUID leaf")
-> Reported-by: Vasant Hegde <vasant.hegde@amd.com>
 
-The new 0003 patch introduces this issue (and more kvm issues)
-due to "x86_pmu.version = 2", so this is not a fix in the strictest sense.
+--Jy922konoFvWkL0i
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Btw, do you need my effort to virtualize AMD PerfMonV2 ?
+Hi Reiji,
 
-> Signed-off-by: Sandipan Das <sandipan.das@amd.com>
-> ---
->   arch/x86/kvm/cpuid.c | 5 +++++
->   1 file changed, 5 insertions(+)
+On Thu, Mar 10, 2022 at 08:47:47PM -0800, Reiji Watanabe wrote:
+> Introduce arm64_check_features(), which does a basic validity checking
+> of an ID register value against the register's limit value, which is
+> generally the host's sanitized value.
 > 
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index b8f8d268d058..1d9ca5726167 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -865,6 +865,11 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
->   		union cpuid10_eax eax;
->   		union cpuid10_edx edx;
->   
-> +		if (boot_cpu_data.x86_vendor == X86_VENDOR_AMD) {
-> +			entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
-> +			break;
-> +		}
-> +
->   		perf_get_x86_pmu_capability(&cap);
->   
->   		/*
+> This function will be used by the following patches to check if an ID
+> register value that userspace tries to set for a guest can be supported
+> on the host.
+> 
+> The validation is done using arm64_ftr_bits_kvm, which is created from
+> arm64_ftr_regs, with some entries overwritten by entries from
+> arm64_ftr_bits_kvm_override.
+> 
+> Signed-off-by: Reiji Watanabe <reijiw@google.com>
+
+I have some concerns regarding the API between cpufeature and KVM that's
+being proposed here. It would appear that we are adding some of KVM's
+implementation details into the cpufeature code. In particular, I see
+that KVM's limitations on AA64DFR0 are being copied here.
+
+Additionally, I think it would be preferable to expose this in a manner
+that does not require CONFIG_KVM guards in other parts of the kernel.
+
+WDYT about having KVM keep its set of feature overrides and otherwise
+rely on the kernel's feature tables? I messed around with the idea a
+bit until I could get something workable (attached). I only compile
+tested this :)
+
+--
+Thanks,
+Oliver
+
+--Jy922konoFvWkL0i
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0001-arm64-cpufeature-Expose-a-helper-for-validating-feat.patch"
+
+From e095ae6f138418bdb0981b6ef2c07930736aa2c2 Mon Sep 17 00:00:00 2001
+From: Oliver Upton <oupton@google.com>
+Date: Tue, 22 Mar 2022 07:22:28 +0000
+Subject: [PATCH] arm64: cpufeature: Expose a helper for validating feature
+ registers
+
+KVM is another part of the kernel that needs to deal with feature
+registers. Subsequent changes to KVM will make the feature ID registers
+writable from userspace, allowing VMMs to limit the exposed ISA to its
+guests. However, KVM does not have any good constructs for validating
+whether a particular register value constitutes a subset of the features
+supported by the system.
+
+Add a helper to check that a feature register value is a subset of the
+system's safe value. Allow the caller to specify a set of overridden
+feature fields for the case where KVM is more restrictive than the
+kernel.
+
+Signed-off-by: Oliver Upton <oupton@google.com>
+Change-Id: Iffb134b5517d143377832d9236d5840183283e7f
+---
+ arch/arm64/include/asm/cpufeature.h |  8 +++
+ arch/arm64/kernel/cpufeature.c      | 82 +++++++++++++++++++++++++++--
+ 2 files changed, 85 insertions(+), 5 deletions(-)
+
+diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+index ef6be92b1921..3cda05f5c0e9 100644
+--- a/arch/arm64/include/asm/cpufeature.h
++++ b/arch/arm64/include/asm/cpufeature.h
+@@ -63,6 +63,12 @@ struct arm64_ftr_bits {
+ 	s64		safe_val; /* safe value for FTR_EXACT features */
+ };
+ 
++/* Terminator for an array of struct arm64_ftr_bits */
++#define ARM64_FTR_END					\
++	{						\
++		.width = 0,				\
++	}
++
+ /*
+  * Describe the early feature override to the core override code:
+  *
+@@ -632,6 +638,8 @@ void check_local_cpu_capabilities(void);
+ u64 read_sanitised_ftr_reg(u32 id);
+ u64 __read_sysreg_by_encoding(u32 sys_id);
+ 
++bool arm64_ftr_reg_valid(u32 sys_id, u64 val, const struct arm64_ftr_bits *override);
++
+ static inline bool cpu_supports_mixed_endian_el0(void)
+ {
+ 	return id_aa64mmfr0_mixed_endian_el0(read_cpuid(ID_AA64MMFR0_EL1));
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index e5f23dab1c8d..ba09fbd7b2d0 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -172,11 +172,6 @@ EXPORT_SYMBOL(cpu_hwcap_keys);
+ #define S_ARM64_FTR_BITS(VISIBLE, STRICT, TYPE, SHIFT, WIDTH, SAFE_VAL) \
+ 	__ARM64_FTR_BITS(FTR_SIGNED, VISIBLE, STRICT, TYPE, SHIFT, WIDTH, SAFE_VAL)
+ 
+-#define ARM64_FTR_END					\
+-	{						\
+-		.width = 0,				\
+-	}
+-
+ static void cpu_enable_cnp(struct arm64_cpu_capabilities const *cap);
+ 
+ static bool __system_matches_cap(unsigned int n);
+@@ -751,6 +746,83 @@ static s64 arm64_ftr_safe_value(const struct arm64_ftr_bits *ftrp, s64 new,
+ 	return ret;
+ }
+ 
++static bool arm64_ftr_field_valid(const struct arm64_ftr_bits *ftrp, s64 new,
++				 s64 cur)
++{
++	return arm64_ftr_safe_value(ftrp, new, cur) == new;
++}
++
++bool __arm64_ftr_reg_valid(const struct arm64_ftr_bits *ftr_bits, u64 val,
++			   u64 safe_val, u64 *mask)
++{
++	const struct arm64_ftr_bits *ftrp;
++	s64 bits, safe_bits;
++	u64 ftr_mask;
++
++	for (ftrp = ftr_bits; ftrp->width; ftrp++) {
++		/*
++		 * Skip validation of the field if mask indicates the field has
++		 * already been checked.
++		 */
++		ftr_mask = arm64_ftr_mask(ftr_bits);
++		if (*mask & ftr_mask)
++			continue;
++
++		*mask |= ftr_mask;
++
++		safe_bits = arm64_ftr_value(ftr_bits, safe_val);
++		bits = arm64_ftr_value(ftr_bits, val);
++
++		/*
++		 * Check to see if 'val' attempts to advertise more than is
++		 * actually supported.
++		 */
++		if (!arm64_ftr_field_valid(ftr_bits, bits, safe_bits))
++			return false;
++	}
++
++	return true;
++}
++
++/**
++ * arm64_ftr_reg_valid() - Determines if a feature register value constitutes a
++ * subset of features supported by the system.
++ *
++ * @sys_reg: The encoded feature register ID
++ * @val: The feature value register to check
++ * @override: Pointer to an ARM64_FTR_END terminated array of overrides. Certain
++ *	      subsystems (such as KVM) are more restrictive than the kernel and
++ *	      impose tighter limits on certain feature fields.
++ *
++ * Return: true if 'val' is an allowed subset of features w.r.t. the system and
++ * the caller-provided overrides.
++ */
++bool arm64_ftr_reg_valid(u32 sys_reg, u64 val, const struct arm64_ftr_bits *override)
++{
++	const struct arm64_ftr_reg *reg = get_arm64_ftr_reg(sys_reg);
++	u64 safe_val;
++	u64 mask = 0;
++
++	if (!reg)
++		return false;
++
++	safe_val = read_sanitised_ftr_reg(sys_reg);
++
++	/*
++	 * Use caller overrides for checking field validity, then check what's
++	 * remaining with our feature table.
++	 */
++	if (!__arm64_ftr_reg_valid(override, val, safe_val, &mask) ||
++	    !__arm64_ftr_reg_valid(reg->ftr_bits, val, safe_val, &mask))
++		return false;
++
++	/* Ensure that no unrecognized fields are set */
++	if (val & ~mask)
++		return false;
++
++	return true;
++}
++
+ static void __init sort_ftr_regs(void)
+ {
+ 	unsigned int i;
+-- 
+2.35.1.894.gb6a874cedc-goog
+
+
+--Jy922konoFvWkL0i--
