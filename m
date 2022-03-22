@@ -2,188 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6BF7D4E44EC
-	for <lists+kvm@lfdr.de>; Tue, 22 Mar 2022 18:22:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3965A4E44ED
+	for <lists+kvm@lfdr.de>; Tue, 22 Mar 2022 18:22:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236813AbiCVRXn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Mar 2022 13:23:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38274 "EHLO
+        id S236835AbiCVRYD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Mar 2022 13:24:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236739AbiCVRXm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Mar 2022 13:23:42 -0400
-Received: from new1-smtp.messagingengine.com (new1-smtp.messagingengine.com [66.111.4.221])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02332275FA
-        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 10:22:13 -0700 (PDT)
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
-        by mailnew.nyi.internal (Postfix) with ESMTP id C20565801B2;
-        Tue, 22 Mar 2022 13:22:10 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute2.internal (MEProxy); Tue, 22 Mar 2022 13:22:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
-         h=cc:cc:content-type:date:date:from:from:in-reply-to
-        :in-reply-to:message-id:mime-version:references:reply-to:sender
-        :subject:subject:to:to; s=fm3; bh=DKA1S+zaOnp0EXg0D/eCjdJnTBqB3w
-        lH33M2skJaIIM=; b=kUjswknOc/LNgIBFH7zcVbzZV9YF/Q7z7pKdb1AQC2FC6e
-        tzxhuA3aNM7wNZzPtyEtnsPihfCxdYq4JV1l2ve6fTch6rDfr61f7+4xLQBY8GAG
-        Z4H/2nh9Mdfc8j4wrXjcwJs9303SEHhbq1+XKBLkJqBVzhpIGLv75bBitbKEjYzn
-        7HRrsZ9Cz7abydk5FnBX9cKXa31Cn6tK/pXZvAVhNEEueJV6HI6QUhPH5FtC2M1x
-        yPxITWXQs7HQQRtyekZloFU2ESBiMFUewLOq0lEbsPb4d4+jGa2v/CQZHCfLtJQp
-        ug3mXazcnjhZTW9Mz0SZN/HmL4N89/cRdYNqYAwg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:date:date:from:from
-        :in-reply-to:in-reply-to:message-id:mime-version:references
-        :reply-to:sender:subject:subject:to:to:x-me-proxy:x-me-proxy
-        :x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=DKA1S+zaOnp0EXg0D
-        /eCjdJnTBqB3wlH33M2skJaIIM=; b=dbnSSTgUklpqQhwWFknQDnahg1Ryed2g7
-        wZ0PE3zLkLNJpLCKyefyvIzDT1zdqKS0G43qgA4EidVFIWdForoozWc7RWaJ0BW4
-        3r3L3gR7+QeaibY37sjTIFuJVwZ3E+FC8iej7yL5lRnra7n8fkxbge4yWFaaaPNr
-        gasE8fIyPuP0EtOKfvrde3Va2Zc1Ge9Fhhc2aeU3W+Rg9uX2+9pLEPYBlawvbirN
-        vESQFI4Y/HCFWVPYAuOyfE69fJ/jrRMYIBSMKi5u9sppOJQrIJ0irBz5VrR99jGk
-        niEfkdZ4sh/2I7LfxNxuTUVKZXmv5ej/Da4vUOHhwCVJ3d3eWhRWw==
-X-ME-Sender: <xms:wAU6YuiDVSiO5DXDfSL8EIMJPMlDj54UyI_sfzAOFASsHtGMDphZBg>
-    <xme:wAU6YvC1wRJ4Pxg8ngkDfAEPQ0xqzNpje2B93LCNzR3fLKD5slrs57CvkQ6hzA-MA
-    MO7QN7gFJpfj1rOVFo>
-X-ME-Received: <xmr:wAU6YmFvkNY5p9PlD_Cw_LT0A6zz4RfLSj-c-dcgQdAukt_SOaChW2UNw_k-lh11iO-gqeOtvp9zgH0V7w>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvvddrudeghedgleejucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvffukfhfgggtuggjsehgtderredttdejnecuhfhrohhmpefmlhgruhhs
-    ucflvghnshgvnhcuoehithhssehirhhrvghlvghvrghnthdrughkqeenucggtffrrghtth
-    gvrhhnpeejgeduffeuieetkeeileekvdeuleetveejudeileduffefjeegfffhuddvudff
-    keenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehith
-    hssehirhhrvghlvghvrghnthdrughk
-X-ME-Proxy: <xmx:wAU6YnT-3y9ba53YTbdzDilaJdXcBx0lP9NRYpcahWvudI3S6ZAyQQ>
-    <xmx:wAU6YrxTLwhzw0WFqIxp-d74Cf2UQRYGNgd8JFhrgumPo2LmigxrBQ>
-    <xmx:wAU6Yl4rmLv7PAa_H7QhvkfyzDaoXDiwKlGZYaq58M_gYE7Kj1ksNw>
-    <xmx:wgU6Ylh8R0wqYvzc50CjDVm3cmAN4T0qVUWveuXkCGEB5-jlmI349w>
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 22 Mar 2022 13:22:00 -0400 (EDT)
-Date:   Tue, 22 Mar 2022 18:21:58 +0100
-From:   Klaus Jensen <its@irrelevant.dk>
-To:     Markus Armbruster <armbru@redhat.com>
-Cc:     qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Christian Schoenebeck <qemu_oss@crudebyte.com>,
-        "Gonglei (Arei)" <arei.gonglei@huawei.com>,
-        =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Ani Sinha <ani@anisinha.ca>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Amit Shah <amit@kernel.org>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Anthony Perard <anthony.perard@citrix.com>,
-        Paul Durrant <paul@xen.org>,
-        =?utf-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>,
-        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
-        Corey Minyard <cminyard@mvista.com>,
-        Patrick Venture <venture@google.com>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Peter Xu <peterx@redhat.com>, Jason Wang <jasowang@redhat.com>,
-        =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
-        Daniel Henrique Barboza <danielhb413@gmail.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Greg Kurz <groug@kaod.org>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
-        Jean-Christophe Dubois <jcd@tribudubois.net>,
-        Keith Busch <kbusch@kernel.org>,
-        Yuval Shaia <yuval.shaia.ml@gmail.com>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        Magnus Damm <magnus.damm@gmail.com>,
-        Fabien Chouteau <chouteau@adacore.com>,
-        KONRAD Frederic <frederic.konrad@adacore.com>,
-        Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-        Artyom Tarasenko <atar4qemu@gmail.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        Juan Quintela <quintela@redhat.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Konstantin Kostiuk <kkostiuk@redhat.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
-        Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
-        Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
-        David Hildenbrand <david@redhat.com>,
-        Wenchao Wang <wenchao.wang@intel.com>,
-        Kamil Rytarowski <kamil@netbsd.org>,
-        Reinoud Zandijk <reinoud@netbsd.org>,
-        Sunil Muthuswamy <sunilmut@microsoft.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Thomas Huth <thuth@redhat.com>, Eric Blake <eblake@redhat.com>,
-        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
-        John Snow <jsnow@redhat.com>, kvm@vger.kernel.org,
-        qemu-arm@nongnu.org, xen-devel@lists.xenproject.org,
-        qemu-ppc@nongnu.org, qemu-block@nongnu.org, haxm-team@intel.com,
-        qemu-s390x@nongnu.org
-Subject: Re: [PATCH v2 3/3] Use g_new() & friends where that makes obvious
- sense
-Message-ID: <YjoFtvvV/LtGt2X9@apples>
-References: <20220315144156.1595462-1-armbru@redhat.com>
- <20220315144156.1595462-4-armbru@redhat.com>
+        with ESMTP id S236816AbiCVRYA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Mar 2022 13:24:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9CB9175628
+        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 10:22:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1647969751;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=r2t4WcUjTvJPZ4sNYR9JpWBmhFW0NZyq4C3NRSxwXgw=;
+        b=fJuu5O+Wv0++C0zRJyXm859RBp07lrG8DINh3X+8odkwnjiM9fT8fOvScg004JajmabY1N
+        /hOLre7s6nMJ5VEuB01AzlPdAz7Lc0BcwDqYbZjQQ7Q5z+33/D1+rfwdSdLqwWU82CwH1N
+        9U2pfHWOXBck0FtQOuPslPOKlfl6oxA=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-86-Sv7Nofa9O5GeM_qs2NF-sA-1; Tue, 22 Mar 2022 13:22:30 -0400
+X-MC-Unique: Sv7Nofa9O5GeM_qs2NF-sA-1
+Received: by mail-wr1-f70.google.com with SMTP id a17-20020a5d6cb1000000b00203f85a2ed9so2006823wra.7
+        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 10:22:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=r2t4WcUjTvJPZ4sNYR9JpWBmhFW0NZyq4C3NRSxwXgw=;
+        b=s9EYKt/DRnODTxVJd5XQbOjHbJ7Ae059Ua0MdnBQ3WzfsgfNs8TgKIEsV71nsbgRd9
+         Cn/7tBX7fesftI3SodMpMFpF+CDsV4o+ILhneD/GBg3uvHfPSxo7XUXkwSe3pBhFoEDM
+         YVV7jAO69xiXYnaOvG/GWk1b6dDWIppzLR1kiknr8C4VCA9WLOOPg4dZ+GcnrOM6OySI
+         rrhOX6afD4vomzhwu4jSm145GjTBGiLgYfZXBy/wbob8qzMDbNVR9+yvZUZ3x8uLkmzZ
+         j5KMMJdsDyAAQErpd5dNMLRzbfE3bOiWbhtkRKSK9+/u1Q7meTIKA0PjtnnyqW96VM10
+         SXyA==
+X-Gm-Message-State: AOAM533iVWUJjQXX4KPrV4Gj2zptdthxCPN7CfCta36+jp5oAhvLwaVN
+        45utaEWqRSKHFAFoyTHnSYX/UpRQq8XjBblf4Wmf8k1AhGl3isY6UoHPsVT7Dpe+wqH/TMURrce
+        qwoGD/dXSdwQd
+X-Received: by 2002:a05:6000:1d1:b0:203:f283:73a7 with SMTP id t17-20020a05600001d100b00203f28373a7mr19985474wrx.383.1647969748758;
+        Tue, 22 Mar 2022 10:22:28 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJykvKE/iPKe/k7sXH4WjY8ppWKBlQgMkFsNFTB6pdLCmBaAHy6C/hR/83fffmd6LXqDQMHoQQ==
+X-Received: by 2002:a05:6000:1d1:b0:203:f283:73a7 with SMTP id t17-20020a05600001d100b00203f28373a7mr19985453wrx.383.1647969748453;
+        Tue, 22 Mar 2022 10:22:28 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id m185-20020a1ca3c2000000b0038c836a5c13sm2225928wme.20.2022.03.22.10.22.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 22 Mar 2022 10:22:27 -0700 (PDT)
+Message-ID: <59cef642-ccd0-ba99-ec88-4a1cee7f53ed@redhat.com>
+Date:   Tue, 22 Mar 2022 18:22:25 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="W/A79Jf9YM97F5Ll"
-Content-Disposition: inline
-In-Reply-To: <20220315144156.1595462-4-armbru@redhat.com>
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [kvm-unit-tests PATCH] Allow to compile without -Werror
+Content-Language: en-US
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
+Cc:     Andrew Jones <drjones@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+References: <20220322171504.941686-1-thuth@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20220322171504.941686-1-thuth@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
---W/A79Jf9YM97F5Ll
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Mar 15 15:41, Markus Armbruster wrote:
-> g_new(T, n) is neater than g_malloc(sizeof(T) * n).  It's also safer,
-> for two reasons.  One, it catches multiplication overflowing size_t.
-> Two, it returns T * rather than void *, which lets the compiler catch
-> more type errors.
->=20
-> This commit only touches allocations with size arguments of the form
-> sizeof(T).
->=20
-> Patch created mechanically with:
->=20
->     $ spatch --in-place --sp-file scripts/coccinelle/use-g_new-etc.cocci \
-> 	     --macro-file scripts/cocci-macro-file.h FILES...
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+On 3/22/22 18:15, Thomas Huth wrote:
+> Newer compiler versions sometimes introduce new warnings - and compiling
+> with -Werror will fail there, of course. Thus users of the kvm-unit-tests
+> like the buildroot project have to disable the "-Werror" in the Makefile
+> with an additional patch, which is cumbersome.
+> Thus let's add a switch to the configure script that allows to explicitly
+> turn the -Werror switch on or off. And enable it only by default for
+> developer builds (i.e. in checked-out git repositories) ... and for
+> tarball releases, it's nicer if it is disabled by default, so that the
+> end users do not have to worry about this.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  hw/nvme/ns.c                             |  2 +-
+>   See also the patch from the buildroot project:
+>   https://git.busybox.net/buildroot/tree/package/kvm-unit-tests/0001-Makefile-remove-Werror-to-avoid-build-failures.patch
+> 
+>   Makefile  |  2 +-
+>   configure | 16 ++++++++++++++++
+>   2 files changed, 17 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Makefile b/Makefile
+> index 24686dd..6ed5dea 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -62,7 +62,7 @@ include $(SRCDIR)/$(TEST_DIR)/Makefile
+>   
+>   COMMON_CFLAGS += -g $(autodepend-flags) -fno-strict-aliasing -fno-common
+>   COMMON_CFLAGS += -Wall -Wwrite-strings -Wempty-body -Wuninitialized
+> -COMMON_CFLAGS += -Wignored-qualifiers -Werror -Wno-missing-braces
+> +COMMON_CFLAGS += -Wignored-qualifiers -Wno-missing-braces $(CONFIG_WERROR)
+>   
+>   frame-pointer-flag=-f$(if $(KEEP_FRAME_POINTER),no-,)omit-frame-pointer
+>   fomit_frame_pointer := $(call cc-option, $(frame-pointer-flag), "")
+> diff --git a/configure b/configure
+> index c4fb4a2..86c3095 100755
+> --- a/configure
+> +++ b/configure
+> @@ -31,6 +31,13 @@ page_size=
+>   earlycon=
+>   efi=
+>   
+> +# Enable -Werror by default for git repositories only (i.e. developer builds)
+> +if [ -e "$srcdir"/.git ]; then
+> +    werror=-Werror
+> +else
+> +    werror=
+> +fi
+> +
+>   usage() {
+>       cat <<-EOF
+>   	Usage: $0 [options]
+> @@ -75,6 +82,8 @@ usage() {
+>   	                           Specify a PL011 compatible UART at address ADDR. Supported
+>   	                           register stride is 32 bit only.
+>   	    --[enable|disable]-efi Boot and run from UEFI (disabled by default, x86_64 only)
+> +	    --[enable|disable]-werror
+> +	                           Select whether to compile with the -Werror compiler flag
+>   EOF
+>       exit 1
+>   }
+> @@ -148,6 +157,12 @@ while [[ "$1" = -* ]]; do
+>   	--disable-efi)
+>   	    efi=n
+>   	    ;;
+> +	--enable-werror)
+> +	    werror=-Werror
+> +	    ;;
+> +	--disable-werror)
+> +	    werror=
+> +	    ;;
+>   	--help)
+>   	    usage
+>   	    ;;
+> @@ -371,6 +386,7 @@ WA_DIVIDE=$wa_divide
+>   GENPROTIMG=${GENPROTIMG-genprotimg}
+>   HOST_KEY_DOCUMENT=$host_key_document
+>   CONFIG_EFI=$efi
+> +CONFIG_WERROR=$werror
+>   GEN_SE_HEADER=$gen_se_header
+>   EOF
+>   if [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
 
-For hw/nvme,
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
-Acked-by: Klaus Jensen <k.jensen@samsung.com>
+Thanks,
 
---W/A79Jf9YM97F5Ll
-Content-Type: application/pgp-signature; name="signature.asc"
+Paolo
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEUigzqnXi3OaiR2bATeGvMW1PDekFAmI6BbQACgkQTeGvMW1P
-DemVHQf/UvBrob2AKXn7QLs1LPvjspegusuMZAUULXyiS7FJ456DBSy0wWUweIj0
-+PKX+HOXbZu7s0mUXhZ0GpiD5V39c/M7/18p620LaokIDnuwuI1Mshnytrk5gao6
-EyfSap+WxrF/ys8BQ7X22h6juLgDsY4J/QwuHEk+rcjSO4YQpeJBpp+3AsOFbWbl
-7wx6aFzLcoAWIWr5zc9BwboE5w9Ot7/fSBdn1GnbWUfVr0VxCJGv5oU833IsOcbL
-3Kufe+QE2ZxyD7v+mHI1/THkr9rFYaWJ8f4HAfQ5XfoOo/ULXo6qkw4fM04tD3ex
-oGvzJovacGYnvSvYmde1KMydB+oNXQ==
-=KxTS
------END PGP SIGNATURE-----
-
---W/A79Jf9YM97F5Ll--
