@@ -2,71 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 21F174E3531
-	for <lists+kvm@lfdr.de>; Tue, 22 Mar 2022 01:07:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A080A4E3567
+	for <lists+kvm@lfdr.de>; Tue, 22 Mar 2022 01:25:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233687AbiCUXvW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Mar 2022 19:51:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59824 "EHLO
+        id S233706AbiCVAMa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Mar 2022 20:12:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57718 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233692AbiCUXvO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Mar 2022 19:51:14 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC020195D8A
-        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 16:49:21 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id j1-20020a170903028100b0014b1f9e0068so6234635plr.8
-        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 16:49:21 -0700 (PDT)
+        with ESMTP id S233568AbiCVAM2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Mar 2022 20:12:28 -0400
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63B462128F0
+        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 17:09:41 -0700 (PDT)
+Received: by mail-lf1-x133.google.com with SMTP id k21so10662660lfe.4
+        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 17:09:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=m5T3Hbrl4DyDMOn7A4MiOSbjCSgOB5xSxPj2asSn9Wg=;
-        b=Zacml26OoL/GF6NlL2gXG5FXZUDRoVGueOLiN6hKDPI9ASu/bkCxXaoxGt8/F0Mh5J
-         FWAq8pUohHlkR4XmRKhyQX+XZq5v4u5JIPCUzw9V+zwzW3CD09XBZejqxuTyU+Ii6p5B
-         h+Y6Mgnp/2n0gVU4Y4TPVDo9iP7NTj1BSTk5eHfqbtDS08cJpEdPHNTIFJhzeaylgWGK
-         HCBBpc9KmVs32VdzG55JHsK/Ub+SjtOb9RQrJSwQiVk1whsye2wBJCWaosKcrBzNQroP
-         kwSzod88EmWiLZ9h8zLQyjncwJB9lHtFgRayQOIFH24ZZj+dulNmO9RI7Mi8JwBXLPiG
-         qoOQ==
+        bh=HajGksMSq1RuOfUtCvBANBROHaJPWfbgSuMQb23l8Ro=;
+        b=KzdT/r2b+R4xT9E4ZyW0pA3n2KF3e8r8r9jgILDidIfEfyel8zLeYcb4r+2u77UaAh
+         pc/Yg7QbJagANBD+oN8ancQDLMRPWyDJebAxBSNT9aCf0VYWKS06DjU5/zEIIvIk/Q1I
+         nkFXsdVMcPK3kwVbf1u62S2hNnKfQJJGatVAcFntq5+bMjZCKrPRgwPh4QP/D7wL2/4t
+         /vuDNvin8RXFKN5DQ+DqwE7aVzCojlTAeCvJabLCq0ozAw1AsOEfMz9D2xPgs0gsviGo
+         lwX3Ai+CSBpgrtHkmrqXgloO6s8kyNJX1xf/sV1gZ7EapjUJdQ7cTcxqO5zK3qZxUVnP
+         TVRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=m5T3Hbrl4DyDMOn7A4MiOSbjCSgOB5xSxPj2asSn9Wg=;
-        b=xnmpUA7Zoq44nbrOgqOqycBJOTwyfaPOt6d8gzFbP1LHgJtunIoYnMDUDZ7ywt98kI
-         NMSxDWbYYleEbHQ0fE9O92rcfI0IXSXw4gqKYSgy/kYbngg7avvMoPb/EbZmTf/ajR8Z
-         HEfACHSlAqCL5LeLKSTDdXF5gGuWAlvj4YyfEn2CNEMsv4NYJ8LKmd844nYKj05IhDZ+
-         okxTvAUkyq3yTRN8ISF7bXKQqQfRPscD70KArAueLRjbPOfpr6zEYjTL3zyZ7uonuZDq
-         w4Dz/LPVNRpgyJr664rp+Ee2EI6ZJBmJiE+OONse1LKivwwSmHxX9fJ4HVgpsFvvxL90
-         UtvQ==
-X-Gm-Message-State: AOAM530mIclMN0y+KryagLprVLitxo/LxuIT6S4wX7yQqg4gAO4aUBJx
-        V4vCYVTQR+5PM4foi6ROrS7vVuoJOnaZ
-X-Google-Smtp-Source: ABdhPJxiNgqjZsgRsl/JaT3z6xvFFNLrDtQigGPFZbUOauwKxglp+Z1PfpkQGMLQS016z4FSanVYNBEijQ/w
-X-Received: from bgardon.sea.corp.google.com ([2620:15c:100:202:b76a:f152:cb5e:5cd2])
- (user=bgardon job=sendgmr) by 2002:a17:90b:e81:b0:1c6:5a9c:5afa with SMTP id
- fv1-20020a17090b0e8100b001c65a9c5afamr204556pjb.1.1647906560754; Mon, 21 Mar
- 2022 16:49:20 -0700 (PDT)
-Date:   Mon, 21 Mar 2022 16:48:44 -0700
-In-Reply-To: <20220321234844.1543161-1-bgardon@google.com>
-Message-Id: <20220321234844.1543161-12-bgardon@google.com>
-Mime-Version: 1.0
-References: <20220321234844.1543161-1-bgardon@google.com>
-X-Mailer: git-send-email 2.35.1.894.gb6a874cedc-goog
-Subject: [PATCH v2 11/11] KVM: x86/MMU: Require reboot permission to disable
- NX hugepages
-From:   Ben Gardon <bgardon@google.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=HajGksMSq1RuOfUtCvBANBROHaJPWfbgSuMQb23l8Ro=;
+        b=irpJ027K7TENf3+6KpmQBnwYbkqv39idHJzgZ1TbWN2dFJFXY/FT13jGhdsAPWJ+yd
+         o+xAy6nt/yYzgN/tTd5xo08Xn0AmuxCGyZ2UPNiXhdQ8IkBPQrLBUldRta+sqP/Vsu/a
+         /e+oI00gOVHiaK+vw80yz6SUzPykKildPBafFVlDyNeJvFqgfL4I/qKbosVPNlvXQ4PN
+         ee55CT5BNqwj5N495md+jfNsCcxDsHVVJMRyvjl70GwLv81332JpjtScKrZNMMhBME2F
+         7Iiyx9uUn61T9yzbBRWpRlydZ+uxqUodidmsuCo2d+Yn1K4OrufYlmWL6Uota1XgTwIX
+         Kd8Q==
+X-Gm-Message-State: AOAM530JiByy8IV9yk220B+uA1Xgw3vG5uo7S3dk7xAeWIkxuLlQu1tq
+        Eds+OhqwxJqka2RALZQ2MwBDrE54aGT0KOsJlRft0g==
+X-Google-Smtp-Source: ABdhPJyr2CHJfKFlgXHv7B6Wio+Fhr9ZiDa/iuyftFTLzzh0ztintaAMADr5wc/dGTnXMgI7Ud+S7N2nKq2tEXPmjGg=
+X-Received: by 2002:a19:674c:0:b0:448:3f49:e6d5 with SMTP id
+ e12-20020a19674c000000b004483f49e6d5mr16515926lfj.518.1647907691443; Mon, 21
+ Mar 2022 17:08:11 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220311002528.2230172-1-dmatlack@google.com> <20220311002528.2230172-21-dmatlack@google.com>
+ <YjG7Zh4zwTDsO3L1@xz-m1.local>
+In-Reply-To: <YjG7Zh4zwTDsO3L1@xz-m1.local>
+From:   David Matlack <dmatlack@google.com>
+Date:   Mon, 21 Mar 2022 17:07:44 -0700
+Message-ID: <CALzav=fPvi2eHt2Dbuti=9A1yw_bFFwgY_AFN2wSvbCLVyUjFQ@mail.gmail.com>
+Subject: Re: [PATCH v2 20/26] KVM: x86/mmu: Extend Eager Page Splitting to the
+ shadow MMU
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
         Sean Christopherson <seanjc@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        David Dunn <daviddunn@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Ben Gardon <bgardon@google.com>
+        Andrew Jones <drjones@redhat.com>,
+        Ben Gardon <bgardon@google.com>,
+        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
+        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
+        <kvmarm@lists.cs.columbia.edu>,
+        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
+        <linux-mips@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
+        <kvm@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
+        <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,207 +85,343 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Ensure that the userspace actor attempting to disable NX hugepages has
-permission to reboot the system. Since disabling NX hugepages would
-allow a guest to crash the system, it is similar to reboot permissions.
+On Wed, Mar 16, 2022 at 3:27 AM Peter Xu <peterx@redhat.com> wrote:
+>
+> On Fri, Mar 11, 2022 at 12:25:22AM +0000, David Matlack wrote:
+> > Extend KVM's eager page splitting to also split huge pages that are
+> > mapped by the shadow MMU. Specifically, walk through the rmap splitting
+> > all 1GiB pages to 2MiB pages, and splitting all 2MiB pages to 4KiB
+> > pages.
+> >
+> > Splitting huge pages mapped by the shadow MMU requries dealing with some
+> > extra complexity beyond that of the TDP MMU:
+> >
+> > (1) The shadow MMU has a limit on the number of shadow pages that are
+> >     allowed to be allocated. So, as a policy, Eager Page Splitting
+> >     refuses to split if there are KVM_MIN_FREE_MMU_PAGES or fewer
+> >     pages available.
+> >
+> > (2) Huge pages may be mapped by indirect shadow pages which have the
+> >     possibility of being unsync. As a policy we opt not to split such
+> >     pages as their translation may no longer be valid.
+> >
+> > (3) Splitting a huge page may end up re-using an existing lower level
+> >     shadow page tables. This is unlike the TDP MMU which always allocates
+> >     new shadow page tables when splitting.  This commit does *not*
+> >     handle such aliasing and opts not to split such huge pages.
+> >
+> > (4) When installing the lower level SPTEs, they must be added to the
+> >     rmap which may require allocating additional pte_list_desc structs.
+> >     This commit does *not* handle such cases and instead opts to leave
+> >     such lower-level SPTEs non-present. In this situation TLBs must be
+> >     flushed before dropping the MMU lock as a portion of the huge page
+> >     region is being unmapped.
+> >
+> > Suggested-by: Peter Feiner <pfeiner@google.com>
+> > [ This commit is based off of the original implementation of Eager Page
+> >   Splitting from Peter in Google's kernel from 2016. ]
+> > Signed-off-by: David Matlack <dmatlack@google.com>
+> > ---
+> >  .../admin-guide/kernel-parameters.txt         |   3 -
+> >  arch/x86/kvm/mmu/mmu.c                        | 307 ++++++++++++++++++
+> >  2 files changed, 307 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+> > index 05161afd7642..495f6ac53801 100644
+> > --- a/Documentation/admin-guide/kernel-parameters.txt
+> > +++ b/Documentation/admin-guide/kernel-parameters.txt
+> > @@ -2360,9 +2360,6 @@
+> >                       the KVM_CLEAR_DIRTY ioctl, and only for the pages being
+> >                       cleared.
+> >
+> > -                     Eager page splitting currently only supports splitting
+> > -                     huge pages mapped by the TDP MMU.
+> > -
+> >                       Default is Y (on).
+> >
+> >       kvm.enable_vmware_backdoor=[KVM] Support VMware backdoor PV interface.
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index 926ddfaa9e1a..dd56b5b9624f 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -727,6 +727,11 @@ static void mmu_free_memory_caches(struct kvm_vcpu *vcpu)
+> >
+> >  static struct pte_list_desc *mmu_alloc_pte_list_desc(struct kvm_mmu_memory_cache *cache)
+> >  {
+> > +     static const gfp_t gfp_nocache = GFP_ATOMIC | __GFP_ACCOUNT | __GFP_ZERO;
+> > +
+> > +     if (WARN_ON_ONCE(!cache))
+> > +             return kmem_cache_alloc(pte_list_desc_cache, gfp_nocache);
+> > +
+>
+> I also think this is not proper to be added into this patch.  Maybe it'll
+> be more suitable for the rmap_add() rework patch previously, or maybe it
+> can be dropped directly if it should never trigger at all. Then we die hard
+> at below when referencing it.
+>
+> >       return kvm_mmu_memory_cache_alloc(cache);
+> >  }
+> >
+> > @@ -743,6 +748,28 @@ static gfn_t kvm_mmu_page_get_gfn(struct kvm_mmu_page *sp, int index)
+> >       return sp->gfn + (index << ((sp->role.level - 1) * PT64_LEVEL_BITS));
+> >  }
+> >
+> > +static gfn_t sptep_to_gfn(u64 *sptep)
+> > +{
+> > +     struct kvm_mmu_page *sp = sptep_to_sp(sptep);
+> > +
+> > +     return kvm_mmu_page_get_gfn(sp, sptep - sp->spt);
+> > +}
+> > +
+> > +static unsigned int kvm_mmu_page_get_access(struct kvm_mmu_page *sp, int index)
+> > +{
+> > +     if (!sp->role.direct)
+> > +             return sp->shadowed_translation[index].access;
+> > +
+> > +     return sp->role.access;
+> > +}
+> > +
+> > +static unsigned int sptep_to_access(u64 *sptep)
+> > +{
+> > +     struct kvm_mmu_page *sp = sptep_to_sp(sptep);
+> > +
+> > +     return kvm_mmu_page_get_access(sp, sptep - sp->spt);
+> > +}
+> > +
+> >  static void kvm_mmu_page_set_gfn_access(struct kvm_mmu_page *sp, int index,
+> >                                       gfn_t gfn, u32 access)
+> >  {
+> > @@ -912,6 +939,9 @@ static int pte_list_add(struct kvm_mmu_memory_cache *cache, u64 *spte,
+> >       return count;
+> >  }
+> >
+> > +static struct kvm_rmap_head *gfn_to_rmap(gfn_t gfn, int level,
+> > +                                      const struct kvm_memory_slot *slot);
+> > +
+> >  static void
+> >  pte_list_desc_remove_entry(struct kvm_rmap_head *rmap_head,
+> >                          struct pte_list_desc *desc, int i,
+> > @@ -2125,6 +2155,23 @@ static struct kvm_mmu_page *__kvm_mmu_find_shadow_page(struct kvm *kvm,
+> >       return sp;
+> >  }
+> >
+> > +static struct kvm_mmu_page *kvm_mmu_find_direct_sp(struct kvm *kvm, gfn_t gfn,
+> > +                                                union kvm_mmu_page_role role)
+> > +{
+> > +     struct kvm_mmu_page *sp;
+> > +     LIST_HEAD(invalid_list);
+> > +
+> > +     BUG_ON(!role.direct);
+> > +
+> > +     sp = __kvm_mmu_find_shadow_page(kvm, gfn, role, &invalid_list);
+> > +
+> > +     /* Direct SPs are never unsync. */
+> > +     WARN_ON_ONCE(sp && sp->unsync);
+> > +
+> > +     kvm_mmu_commit_zap_page(kvm, &invalid_list);
+> > +     return sp;
+> > +}
+> > +
+> >  /*
+> >   * Looks up an existing SP for the given gfn and role if one exists. The
+> >   * return SP is guaranteed to be synced.
+> > @@ -6063,12 +6110,266 @@ void kvm_mmu_slot_remove_write_access(struct kvm *kvm,
+> >               kvm_arch_flush_remote_tlbs_memslot(kvm, memslot);
+> >  }
+> >
+> > +static int prepare_to_split_huge_page(struct kvm *kvm,
+> > +                                   const struct kvm_memory_slot *slot,
+> > +                                   u64 *huge_sptep,
+> > +                                   struct kvm_mmu_page **spp,
+> > +                                   bool *flush,
+> > +                                   bool *dropped_lock)
+> > +{
+> > +     int r = 0;
+> > +
+> > +     *dropped_lock = false;
+> > +
+> > +     if (kvm_mmu_available_pages(kvm) <= KVM_MIN_FREE_MMU_PAGES)
+> > +             return -ENOSPC;
+> > +
+> > +     if (need_resched() || rwlock_needbreak(&kvm->mmu_lock))
+> > +             goto drop_lock;
+> > +
+>
+> Not immediately clear on whether there'll be case that *spp is set within
+> the current function.  Some sanity check might be nice?
+>
+> > +     *spp = kvm_mmu_alloc_direct_sp_for_split(true);
+> > +     if (r)
+> > +             goto drop_lock;
+> > +
+> > +     return 0;
+> > +
+> > +drop_lock:
+> > +     if (*flush)
+> > +             kvm_arch_flush_remote_tlbs_memslot(kvm, slot);
+> > +
+> > +     *flush = false;
+> > +     *dropped_lock = true;
+> > +
+> > +     write_unlock(&kvm->mmu_lock);
+> > +     cond_resched();
+> > +     *spp = kvm_mmu_alloc_direct_sp_for_split(false);
+> > +     if (!*spp)
+> > +             r = -ENOMEM;
+> > +     write_lock(&kvm->mmu_lock);
+> > +
+> > +     return r;
+> > +}
+> > +
+> > +static struct kvm_mmu_page *kvm_mmu_get_sp_for_split(struct kvm *kvm,
+> > +                                                  const struct kvm_memory_slot *slot,
+> > +                                                  u64 *huge_sptep,
+> > +                                                  struct kvm_mmu_page **spp)
+> > +{
+> > +     struct kvm_mmu_page *split_sp;
+> > +     union kvm_mmu_page_role role;
+> > +     unsigned int access;
+> > +     gfn_t gfn;
+> > +
+> > +     gfn = sptep_to_gfn(huge_sptep);
+> > +     access = sptep_to_access(huge_sptep);
+> > +
+> > +     /*
+> > +      * Huge page splitting always uses direct shadow pages since we are
+> > +      * directly mapping the huge page GFN region with smaller pages.
+> > +      */
+> > +     role = kvm_mmu_child_role(huge_sptep, true, access);
+> > +     split_sp = kvm_mmu_find_direct_sp(kvm, gfn, role);
+> > +
+> > +     /*
+> > +      * Opt not to split if the lower-level SP already exists. This requires
+> > +      * more complex handling as the SP may be already partially filled in
+> > +      * and may need extra pte_list_desc structs to update parent_ptes.
+> > +      */
+> > +     if (split_sp)
+> > +             return NULL;
+>
+> This smells tricky..
+>
+> Firstly we're trying to lookup the existing SPs that has shadowed this huge
+> page in split way, with the access bits fetched from the shadow cache (so
+> without hugepage nx effect).  However could the pages be mapped with
+> different permissions from the currently hugely mapped page?
+>
+> IIUC all these is for the fact that we can't allocate pte_list_desc and we
+> want to make sure we won't make the pte list to be >1.
+>
+> But I also see that the pte_list check below...
+>
+> > +
+> > +     swap(split_sp, *spp);
+> > +     init_shadow_page(kvm, split_sp, slot, gfn, role);
+> > +     trace_kvm_mmu_get_page(split_sp, true);
+> > +
+> > +     return split_sp;
+> > +}
+> > +
+> > +static int kvm_mmu_split_huge_page(struct kvm *kvm,
+> > +                                const struct kvm_memory_slot *slot,
+> > +                                u64 *huge_sptep, struct kvm_mmu_page **spp,
+> > +                                bool *flush)
+> > +
+> > +{
+> > +     struct kvm_mmu_page *split_sp;
+> > +     u64 huge_spte, split_spte;
+> > +     int split_level, index;
+> > +     unsigned int access;
+> > +     u64 *split_sptep;
+> > +     gfn_t split_gfn;
+> > +
+> > +     split_sp = kvm_mmu_get_sp_for_split(kvm, slot, huge_sptep, spp);
+> > +     if (!split_sp)
+> > +             return -EOPNOTSUPP;
+> > +
+> > +     /*
+> > +      * Since we did not allocate pte_list_desc_structs for the split, we
+> > +      * cannot add a new parent SPTE to parent_ptes. This should never happen
+> > +      * in practice though since this is a fresh SP.
+> > +      *
+> > +      * Note, this makes it safe to pass NULL to __link_shadow_page() below.
+> > +      */
+> > +     if (WARN_ON_ONCE(split_sp->parent_ptes.val))
+> > +             return -EINVAL;
+> > +
+> > +     huge_spte = READ_ONCE(*huge_sptep);
+> > +
+> > +     split_level = split_sp->role.level;
+> > +     access = split_sp->role.access;
+> > +
+> > +     for (index = 0; index < PT64_ENT_PER_PAGE; index++) {
+> > +             split_sptep = &split_sp->spt[index];
+> > +             split_gfn = kvm_mmu_page_get_gfn(split_sp, index);
+> > +
+> > +             BUG_ON(is_shadow_present_pte(*split_sptep));
+> > +
+> > +             /*
+> > +              * Since we did not allocate pte_list_desc structs for the
+> > +              * split, we can't add a new SPTE that maps this GFN.
+> > +              * Skipping this SPTE means we're only partially mapping the
+> > +              * huge page, which means we'll need to flush TLBs before
+> > +              * dropping the MMU lock.
+> > +              *
+> > +              * Note, this make it safe to pass NULL to __rmap_add() below.
+> > +              */
+> > +             if (gfn_to_rmap(split_gfn, split_level, slot)->val) {
+> > +                     *flush = true;
+> > +                     continue;
+> > +             }
+>
+> ... here.
+>
+> IIUC this check should already be able to cover all the cases and it's
+> accurate on the fact that we don't want to grow any rmap to >1 len.
+>
+> > +
+> > +             split_spte = make_huge_page_split_spte(
+> > +                             huge_spte, split_level + 1, index, access);
+> > +
+> > +             mmu_spte_set(split_sptep, split_spte);
+> > +             __rmap_add(kvm, NULL, slot, split_sptep, split_gfn, access);
+>
+> __rmap_add() with a NULL cache pointer is weird.. same as
+> __link_shadow_page() below.
+>
+> I'll stop here for now I guess.. Have you considered having rmap allocation
+> ready altogether, rather than making this intermediate step but only add
+> that later?  Because all these look hackish to me..  It's also possible
+> that I missed something important, if so please shoot.
 
-This approach is the simplest permission gating, but passing a file
-descriptor opened for write for the module parameter would also work
-well and be more precise.
-The latter approach was suggested by Sean Christopherson.
+I'd be happy to do it that way. The reasons I broke it up into the
+intermediate steps are:
+ - At Google we only support up to including this patch. We don't
+handle the cases where the rmap or parent_ptes list need to grow.
+ - It seemed like a good way to break up the support into smaller
+patches. But I think this backfired since the intermediate steps
+introduce their own complexity such as passing in NULL to
+__rmap_add().
 
-Suggested-by: Jim Mattson <jmattson@google.com>
-Signed-off-by: Ben Gardon <bgardon@google.com>
----
- arch/x86/kvm/x86.c                            | 18 ++++++-
- .../selftests/kvm/include/kvm_util_base.h     |  2 +
- tools/testing/selftests/kvm/lib/kvm_util.c    |  7 +++
- .../selftests/kvm/x86_64/nx_huge_pages_test.c | 49 ++++++++++++++-----
- .../kvm/x86_64/nx_huge_pages_test.sh          |  2 +-
- 5 files changed, 65 insertions(+), 13 deletions(-)
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 74351cbb9b5b..995f30667619 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4256,7 +4256,6 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_SYS_ATTRIBUTES:
- 	case KVM_CAP_VAPIC:
- 	case KVM_CAP_ENABLE_CAP:
--	case KVM_CAP_VM_DISABLE_NX_HUGE_PAGES:
- 		r = 1;
- 		break;
- 	case KVM_CAP_EXIT_HYPERCALL:
-@@ -4359,6 +4358,14 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_DISABLE_QUIRKS2:
- 		r = KVM_X86_VALID_QUIRKS;
- 		break;
-+	case KVM_CAP_VM_DISABLE_NX_HUGE_PAGES:
-+		/*
-+		 * Since the risk of disabling NX hugepages is a guest crashing
-+		 * the system, ensure the userspace process has permission to
-+		 * reboot the system.
-+		 */
-+		r = capable(CAP_SYS_BOOT);
-+		break;
- 	default:
- 		break;
- 	}
-@@ -6050,6 +6057,15 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 		mutex_unlock(&kvm->lock);
- 		break;
- 	case KVM_CAP_VM_DISABLE_NX_HUGE_PAGES:
-+		/*
-+		 * Since the risk of disabling NX hugepages is a guest crashing
-+		 * the system, ensure the userspace process has permission to
-+		 * reboot the system.
-+		 */
-+		if (!capable(CAP_SYS_BOOT)) {
-+			r = -EPERM;
-+			break;
-+		}
- 		kvm->arch.disable_nx_huge_pages = true;
- 		kvm_update_nx_huge_pages(kvm);
- 		r = 0;
-diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-index 72163ba2f878..4db8251c3ce5 100644
---- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-@@ -411,4 +411,6 @@ uint64_t vm_get_single_stat(struct kvm_vm *vm, const char *stat_name);
- 
- uint32_t guest_get_vcpuid(void);
- 
-+void vm_disable_nx_huge_pages(struct kvm_vm *vm);
-+
- #endif /* SELFTEST_KVM_UTIL_BASE_H */
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 9d72d1bb34fa..46a7fa08d3e0 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -2765,3 +2765,10 @@ uint64_t vm_get_single_stat(struct kvm_vm *vm, const char *stat_name)
- 	return value;
- }
- 
-+void vm_disable_nx_huge_pages(struct kvm_vm *vm)
-+{
-+	struct kvm_enable_cap cap = { 0 };
-+
-+	cap.cap = KVM_CAP_VM_DISABLE_NX_HUGE_PAGES;
-+	vm_enable_cap(vm, &cap);
-+}
-diff --git a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
-index 2bcbe4efdc6a..5ce98f759bc8 100644
---- a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
-@@ -57,13 +57,40 @@ static void check_split_count(struct kvm_vm *vm, int expected_splits)
- 		    expected_splits, actual_splits);
- }
- 
-+static void help(void)
-+{
-+	puts("");
-+	printf("usage: nx_huge_pages_test.sh [-x]\n");
-+	puts("");
-+	printf(" -x: Allow executable huge pages on the VM.\n");
-+	puts("");
-+	exit(0);
-+}
-+
- int main(int argc, char **argv)
- {
- 	struct kvm_vm *vm;
- 	struct timespec ts;
-+	bool disable_nx = false;
-+	int opt;
-+
-+	while ((opt = getopt(argc, argv, "x")) != -1) {
-+		switch (opt) {
-+		case 'x':
-+			disable_nx = true;
-+			break;
-+		case 'h':
-+		default:
-+			help();
-+			break;
-+		}
-+	}
- 
- 	vm = vm_create(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES, O_RDWR);
- 
-+	if (disable_nx)
-+		vm_disable_nx_huge_pages(vm);
-+
- 	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS_HUGETLB,
- 				    HPAGE_PADDR_START, HPAGE_SLOT,
- 				    HPAGE_SLOT_NPAGES, 0);
-@@ -83,21 +110,21 @@ int main(int argc, char **argv)
- 	 * at 2M.
- 	 */
- 	run_guest_code(vm, guest_code0);
--	check_2m_page_count(vm, 2);
--	check_split_count(vm, 2);
-+	check_2m_page_count(vm, disable_nx ? 4 : 2);
-+	check_split_count(vm, disable_nx ? 0 : 2);
- 
- 	/*
- 	 * guest_code1 is in the same huge page as data1, so it will cause
- 	 * that huge page to be remapped at 4k.
- 	 */
- 	run_guest_code(vm, guest_code1);
--	check_2m_page_count(vm, 1);
--	check_split_count(vm, 3);
-+	check_2m_page_count(vm, disable_nx ? 4 : 1);
-+	check_split_count(vm, disable_nx ? 0 : 3);
- 
- 	/* Run guest_code0 again to check that is has no effect. */
- 	run_guest_code(vm, guest_code0);
--	check_2m_page_count(vm, 1);
--	check_split_count(vm, 3);
-+	check_2m_page_count(vm, disable_nx ? 4 : 1);
-+	check_split_count(vm, disable_nx ? 0 : 3);
- 
- 	/*
- 	 * Give recovery thread time to run. The wrapper script sets
-@@ -110,7 +137,7 @@ int main(int argc, char **argv)
- 	/*
- 	 * Now that the reclaimer has run, all the split pages should be gone.
- 	 */
--	check_2m_page_count(vm, 1);
-+	check_2m_page_count(vm, disable_nx ? 4 : 1);
- 	check_split_count(vm, 0);
- 
- 	/*
-@@ -118,13 +145,13 @@ int main(int argc, char **argv)
- 	 * again to check that pages are mapped at 2M again.
- 	 */
- 	run_guest_code(vm, guest_code0);
--	check_2m_page_count(vm, 2);
--	check_split_count(vm, 2);
-+	check_2m_page_count(vm, disable_nx ? 4 : 2);
-+	check_split_count(vm, disable_nx ? 0 : 2);
- 
- 	/* Pages are once again split from running guest_code1. */
- 	run_guest_code(vm, guest_code1);
--	check_2m_page_count(vm, 1);
--	check_split_count(vm, 3);
-+	check_2m_page_count(vm, disable_nx ? 4 : 1);
-+	check_split_count(vm, disable_nx ? 0 : 3);
- 
- 	kvm_vm_free(vm);
- 
-diff --git a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.sh b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.sh
-index 19fc95723fcb..29f999f48848 100755
---- a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.sh
-+++ b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.sh
-@@ -14,7 +14,7 @@ echo 1 > /sys/module/kvm/parameters/nx_huge_pages_recovery_ratio
- echo 100 > /sys/module/kvm/parameters/nx_huge_pages_recovery_period_ms
- echo 200 > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
- 
--./nx_huge_pages_test
-+./nx_huge_pages_test "${@}"
- RET=$?
- 
- echo $NX_HUGE_PAGES > /sys/module/kvm/parameters/nx_huge_pages
--- 
-2.35.1.894.gb6a874cedc-goog
-
+>
+> Thanks,
+>
+> > +     }
+> > +
+> > +     /*
+> > +      * Replace the huge spte with a pointer to the populated lower level
+> > +      * page table. Since we are making this change without a TLB flush vCPUs
+> > +      * will see a mix of the split mappings and the original huge mapping,
+> > +      * depending on what's currently in their TLB. This is fine from a
+> > +      * correctness standpoint since the translation will either be identical
+> > +      * or non-present. To account for non-present mappings, the TLB will be
+> > +      * flushed prior to dropping the MMU lock.
+> > +      */
+> > +     __drop_large_spte(kvm, huge_sptep, false);
+> > +     __link_shadow_page(NULL, huge_sptep, split_sp);
+> > +
+> > +     return 0;
+> > +}
+>
+> --
+> Peter Xu
+>
