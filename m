@@ -2,149 +2,219 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E8D74E468E
-	for <lists+kvm@lfdr.de>; Tue, 22 Mar 2022 20:18:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 143AA4E4693
+	for <lists+kvm@lfdr.de>; Tue, 22 Mar 2022 20:21:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230509AbiCVTUI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Mar 2022 15:20:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50606 "EHLO
+        id S231370AbiCVTWd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Mar 2022 15:22:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230507AbiCVTUG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Mar 2022 15:20:06 -0400
-Received: from smtp-fw-9103.amazon.com (smtp-fw-9103.amazon.com [207.171.188.200])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9291167D26
-        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 12:18:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1647976718; x=1679512718;
-  h=from:to:cc:subject:date:message-id:content-id:
-   content-transfer-encoding:mime-version;
-  bh=MjWWG7NFaQWR5DaeB1/Y/sWxhLmnHK4kpweIk3pw3tA=;
-  b=pyTEsryi+NbxVfMfWmJlyzxiBluQMRN+XYh9tQUg053pCFLnDCJ54Hv5
-   trW8pEIwOu78mBNWNK3iUbCJlxBZ/Pmqb/5k73rwrZZh9ptP7XKkZohNg
-   DnebuDr/Toq97MsHEE00KI3+rdBDTB2Hdf1pZ/gy+bT8mTk9jP+xu0OHT
-   E=;
-X-IronPort-AV: E=Sophos;i="5.90,202,1643673600"; 
-   d="scan'208";a="1001552544"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2c-d9fba5dd.us-west-2.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-9103.sea19.amazon.com with ESMTP; 22 Mar 2022 19:18:24 +0000
-Received: from EX13MTAUEE001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-        by email-inbound-relay-pdx-2c-d9fba5dd.us-west-2.amazon.com (Postfix) with ESMTPS id 4C1E540C74;
-        Tue, 22 Mar 2022 19:18:24 +0000 (UTC)
-Received: from EX13D03UEE001.ant.amazon.com (10.43.62.140) by
- EX13MTAUEE001.ant.amazon.com (10.43.62.226) with Microsoft SMTP Server (TLS)
- id 15.0.1497.32; Tue, 22 Mar 2022 19:18:20 +0000
-Received: from EX13D03UEE001.ant.amazon.com (10.43.62.140) by
- EX13D03UEE001.ant.amazon.com (10.43.62.140) with Microsoft SMTP Server (TLS)
- id 15.0.1497.32; Tue, 22 Mar 2022 19:18:20 +0000
-Received: from EX13D03UEE001.ant.amazon.com ([10.43.62.140]) by
- EX13D03UEE001.ant.amazon.com ([10.43.62.140]) with mapi id 15.00.1497.033;
- Tue, 22 Mar 2022 19:18:20 +0000
-From:   "Franke, Daniel" <dff@amazon.com>
-To:     Oliver Upton <oupton@google.com>,
-        David Woodhouse <dwmw2@infradead.org>
-CC:     Paolo Bonzini <pbonzini@redhat.com>,
+        with ESMTP id S231251AbiCVTWc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Mar 2022 15:22:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 396A9674D2
+        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 12:21:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1647976863;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=uobYkTlHaU5hNxcuMpSrqFNKe1fOGuBAldZ6JiUI3Lc=;
+        b=F4peW2D/ahr5n3uOke8ZYI532FiYGC7yLn5IlyBiz9G7/aZs4k3MqJPu5gFHNxnGi89VYV
+        DoMXN+8HtMMR/SUHogPW118Snyi44YBnAJ9ndqaC0a/RsqS9yaLsZytVK2NqX5/bofSNpj
+        /65/TFjOeQaBBpxXrsG8U8SNA5nSdI4=
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
+ [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-519-5xJqRu29ML6AtdGD-Z_6lg-1; Tue, 22 Mar 2022 15:21:00 -0400
+X-MC-Unique: 5xJqRu29ML6AtdGD-Z_6lg-1
+Received: by mail-il1-f200.google.com with SMTP id y7-20020a92d207000000b002c7f55e413bso6575285ily.5
+        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 12:21:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:organization
+         :mime-version:content-transfer-encoding;
+        bh=uobYkTlHaU5hNxcuMpSrqFNKe1fOGuBAldZ6JiUI3Lc=;
+        b=1Bb4QU2s8OU3Xany16NdMUC9mNT8vTXfblpQz0bLWpwDg/7qf0blpjAShwf0WgijHP
+         ym2x/df/5smIy/VRYG1rwhBntGQ8DKQBuebyDJ5VFR23ABvMhDRBJv/MQwQZWl/3gq+z
+         ll7QJPAKUQcxb83VaLvuZ22uszO7lcGm5KpWcj5i7KFeOpOpT6BP/+5EzqP5jtYTY526
+         rzQr2Po2Q2gqUNfkF2O+YT9/ocRMTdHZD6/29ktHm6esRh/K08sFaQuHJ4ftbzH9VKKC
+         BEkDII4vN2VSw9gtTJ3qZWVhRuyjmkQdoAI5QahCmyw7cxg9cNLuzSeFp8eiT76BXqMM
+         T2dg==
+X-Gm-Message-State: AOAM531wbrtffi4es2Nt6btm3jg3J2a9CdC343WFeoU0fGNWOFt3uubK
+        yJabyuMxMBMHLPbErxmgzb10ct+uM4UVIlaPUJnn1FGh1Fv7Gb0W2wsH1owoImmKAW11PLS6Gxj
+        wuFmgx2FVZiQo
+X-Received: by 2002:a05:6e02:eca:b0:2c8:ffd:2f54 with SMTP id i10-20020a056e020eca00b002c80ffd2f54mr7938415ilk.228.1647976859474;
+        Tue, 22 Mar 2022 12:20:59 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy+yx9F9n69WeYYL/Ic50YblisiZdhUyh7eXisnUvnL4XX/n74xcyANfF9pxxkjfkzt6BgpeQ==
+X-Received: by 2002:a05:6e02:eca:b0:2c8:ffd:2f54 with SMTP id i10-20020a056e020eca00b002c80ffd2f54mr7938400ilk.228.1647976859223;
+        Tue, 22 Mar 2022 12:20:59 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id r9-20020a6bd909000000b00649276ea9fesm10040705ioc.7.2022.03.22.12.20.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Mar 2022 12:20:58 -0700 (PDT)
+Date:   Tue, 22 Mar 2022 13:20:57 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        "Vitaly Kuznetsov" <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        "Jim Mattson" <jmattson@google.com>, Joerg Roedel <joro@8bytes.org>
-Subject: Re: [PATCH] Documentation: KVM: Describe guest TSC scaling in
- migration algorithm
-Thread-Topic: [PATCH] Documentation: KVM: Describe guest TSC scaling in
- migration algorithm
-Thread-Index: AQHYPiGXkmdxBhn0T0ChBle2fi5XeQ==
-Date:   Tue, 22 Mar 2022 19:18:20 +0000
-Message-ID: <5BD1FCB2-3164-4785-B4D0-94E19E6D7537@amazon.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.43.61.251]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <8713E527938226478AC63A67F87DC999@amazon.com>
-Content-Transfer-Encoding: base64
+        Abhishek Sahu <abhsahu@nvidia.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Longfang Liu <liulongfang@huawei.com>,
+        Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        Yishai Hadas <yishaih@nvidia.com>
+Subject: [GIT PULL] VFIO updates for v5.18-rc1
+Message-ID: <20220322132057.5cf2a4a1.alex.williamson@redhat.com>
+Organization: Red Hat
 MIME-Version: 1.0
-X-Spam-Status: No, score=-12.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gMy8yMS8yMiwgNToyNCBQTSwgIk9saXZlciBVcHRvbiIgPG91cHRvbkBnb29nbGUuY29tPiB3
-cm90ZToNCiA+ICBSaWdodCwgYnV0IEknZCBhcmd1ZSB0aGF0IGludGVyZmFjZSBoYXMgc29tZSBw
-cm9ibGVtcyB0b28uIEl0DQogPiAgIGRlcGVuZHMgb24gdGhlIGd1ZXN0IHBvbGxpbmcgaW5zdGVh
-ZCBvZiBhbiBpbnRlcnJ1cHQgZnJvbSB0aGUNCiA+ICAgaHlwZXJ2aXNvci4gSXQgYWxzbyBoYXMg
-bm8gd2F5IG9mIGluZm9ybWluZyB0aGUga2VybmVsIGV4YWN0bHkgaG93IG11Y2gNCiA+ICAgdGlt
-ZSBoYXMgZWxhcHNlZC4NCg0KID4gICBUaGUgd2hvbGUgcG9pbnQgb2YgYWxsIHRoZXNlIGhhY2tz
-IHRoYXQgd2UndmUgZG9uZSBpbnRlcm5hbGx5IGlzIHRoYXQgd2UsDQogPiAgIHRoZSBoeXBlcnZp
-c29yLCBrbm93IGZ1bGwgd2VsbCBob3cgbXVjaCByZWFsIHRpbWUgaGFzdiBhZHZhbmNlZCBkdXJp
-bmcgdGhlDQogPiAgIFZNIGJsYWNrb3V0LiBJZiB3ZSBjYW4gYXQgbGVhc3QgbGV0IHRoZSBndWVz
-dCBrbm93IGhvdyBtdWNoIHRvIGZ1ZGdlIHJlYWwNCiA+ICAgdGltZSwgaXQgY2FuIHRoZW4gcG9r
-ZSBOVFAgZm9yIGJldHRlciByZWZpbmVtZW50LiBJIHdvcnJ5IGFib3V0IHVzaW5nIE5UUA0KID4g
-ICBhcyB0aGUgc29sZSBzb3VyY2Ugb2YgdHJ1dGggZm9yIHN1Y2ggYSBtZWNoYW5pc20sIHNpbmNl
-IHlvdSdsbCBuZWVkIHRvIGdvDQogPiAgIG91dCB0byB0aGUgbmV0d29yayBhbmQgYW55IHJlYWRz
-IHVudGlsIHRoZSByZXNwb25zZSBjb21lcyBiYWNrIGFyZSBob3NlZC4NCg0KKEknbSBhIGtlcm5l
-bCBuZXdiaWUsIHNvIHBsZWFzZSBleGN1c2UgYW55IGlnbm9yYW5jZSB3aXRoIHJlc3BlY3QgdG8g
-a2VybmVsDQpJbnRlcm5hbHMgb3Iga2VybmVsL2h5cGVydmlzb3IgaW50ZXJmYWNlcy4pDQoNCldl
-IGNhbiBoYXZlIGl0IGJvdGggd2F5cywgSSB0aGluay4gTGV0IHRoZSBoeXBlcnZpc29yIG1hbmlw
-dWxhdGUgdGhlIGd1ZXN0IFRTQw0Kc28gYXMgdG8ga2VlcCB0aGUgZ3Vlc3Qga2VybmVsJ3MgaWRl
-YSBvZiByZWFsIHRpbWUgYXMgYWNjdXJhdGUgYXMgcG9zc2libGUgDQp3aXRob3V0IGFueSBhd2Fy
-ZW5lc3MgcmVxdWlyZWQgb24gdGhlIGd1ZXN0J3Mgc2lkZS4gKkFsc28qIGdpdmUgdGhlIGd1ZXN0
-IGtlcm5lbA0KYSBub3RpZmljYXRpb24gaW4gdGhlIGZvcm0gb2YgYSBLVk1fUFZDTE9DS19TVE9Q
-UEVEIGV2ZW50IG9yIHdoYXRldmVyIGVsc2UsDQphbmQgbGV0IHRoZSBrZXJuZWwgcHJvcGFnYXRl
-IHRoaXMgbm90aWZpY2F0aW9uIHRvIHVzZXJzcGFjZSBzbyB0aGF0IHRoZSBOVFANCmRhZW1vbiBj
-YW4gcmVjb21ib2J1bGF0ZSBpdHNlbGYgYXMgcXVpY2tseSBhcyBwb3NzaWJsZSwgdHJlYXRpbmcg
-d2hhdGV2ZXIgVFNDDQphZGp1c3RtZW50IHdhcyByZWNlaXZlZCBhcyBiZXN0LWVmZm9ydCBvbmx5
-Lg0KDQpUaGUgS1ZNX1BWQ0xPQ0tfU1RPUFBFRCBldmVudCBzaG91bGQgdHJpZ2dlciBhIGNoYW5n
-ZSBpbiBzb21lIG9mIHRoZQ0KZ2xvYmFscyBrZXB0IGJ5IGtlcm5lbC90aW1lL250cC5jICh3aGlj
-aCBhcmUgdmlzaWJsZSB0byB1c2Vyc3BhY2UgdGhyb3VnaA0KYWRqdGltZXgoMikpLiBJbiBwYXJ0
-aWN1bGFyLCBgdGltZV9lc3RlcnJvcmAgYW5kIGB0aW1lX21heGVycm9yYCBzaG91bGQgZ2V0IHJl
-c2V0DQp0byBgTlRQX1BIQVNFX0xJTUlUYCBhbmQgdGltZV9zdGF0dXMgc2hvdWxkIGdldCByZXNl
-dCB0byBgU1RBX1VOU1lOQ2AuDQoNClRoZSBhZm9yZW1lbnRpb25lZCBmaWVsZHMgZ2V0IG92ZXJ3
-cml0dGVuIGJ5IHRoZSBOVFAgZGFlbW9uIGV2ZXJ5IHBvbGxpbmcNCmludGVydmFsLCBhbmQgd2hh
-dGV2ZXIgbm90aWZpY2F0aW9uIGdldHMgc2VudCB0byB1c2Vyc3BhY2UgaXMgZ29pbmcgdG8gYmUN
-CmFzeW5jaHJvbm91cywgc28gd2UgbmVlZCB0byBhdm9pZCByYWNlIGNvbmRpdGlvbnMgd2hlcmVp
-biB1c2Vyc3BhY2UgY2xvYmJlcnMNCnRoZW0gd2l0aCBpdHMgb3V0ZGF0ZWQgaWRlYSBvZiB0aGVp
-ciBjb3JyZWN0IHZhbHVlIGJlZm9yZSB0aGUgbm90aWZpY2F0aW9uIGFycml2ZXMuDQpJIHByb3Bv
-c2UgYWxsb2NhdGluZyBvbmUgb2YgdGhlIHVudXNlZCBmaWVsZHMgYXQgdGhlIGVuZCBvZiBgc3Ry
-dWN0IHRpbWV4YCBhcyBhDQpgY2xvY2t2ZXJgIGZpZWxkLiBUaGlzIGZpZWxkIHdpbGwgYmUgMCBh
-dCBib290IHRpbWUsIGFuZCBnZXQgaW5jcmVtZW50ZWQgYWZ0ZXINCmNsb2NrIGRpc2NvbnRpbnVp
-dHkgc3VjaCBhcyBhIEtWTSBibGFja291dCwgYW4gQUNQSSBzdXNwZW5kLXRvLVJBTSBldmVudCwN
-Cm9yIGEgbWFudWFsIHNldHRpbmcgb2YgdGhlIGNsb2NrIHRocm91Z2ggY2xvY2tfc2V0dGltZSgz
-KSBvciBzaW1pbGFyLiBBdWdtZW50DQpgbW9kZXNgIHdpdGggYW4gYEFESl9DTE9DS1ZFUmAgYml0
-LCB3aXRoIHRoZSBzZW1hbnRpY3MgIm1ha2UgdGhpcyBjYWxsIGZhaWwNCklmIHRoZSBgY2xvY2t2
-ZXJgIEkgcGFzc2VkIGluIGlzIG5vdCBjdXJyZW50Ii4NCg0KQXMgZm9yIHRoZSBmb3JtIG9mIHRo
-ZSBub3RpZmljYXRpb24gdG8gdXNlcnNwYWNlLi4uIGR1bm5vLCBJIHRoaW5rIGEgbmV0bGluaw0K
-aW50ZXJmYWNlIG1ha2VzIHRoZSBtb3N0IHNlbnNlPyBJJ20gbm90IHRvbyBvcGluaW9uYXRlZCBo
-ZXJlLiBXaGF0ZXZlciB3ZQ0KZGVjaWRlLCBJJ2xsIGJlIGhhcHB5IHRvIGNvbnRyaWJ1dGUgdGhl
-IHBhdGNoZXMgdG8gY2hyb255IGFuZCBudHBkLiBUaGUgTlRQDQpkYWVtb24gc2hvdWxkIGhhbmRs
-ZSB0aGlzIG5vdGlmaWNhdGlvbiBieSBlc3NlbnRpYWxseSByZXNldHRpbmcgaXRzIHN0YXRlIHRv
-DQpob3cgaXQgd2FzIGF0IGZpcnN0IHN0YXJ0dXAsIGNvbnNpZGVyaW5nIGl0c2VsZiB1bnN5bmNo
-cm9uaXplZCBhbmQgaW1tZWRpYXRlbHkNCmtpY2tpbmcgb2ZmIG5ldyBxdWVyaWVzIHRvIGFsbCBp
-dHMgcGVlcnMuDQoNCk9uZSBvdGhlciB0aGluZyB0aGUgTlRQIGRhZW1vbiBtaWdodCB3YW50IHRv
-IGRvIHdpdGggdGhpcyBub3RpZmljYXRpb24gaXMNCmNsb2JiZXIgaXRzIGRyaWZ0IGZpbGUsIGJ1
-dCBvbmx5IGlmIGl0J3MgcnVubmluZyBvbiBkaWZmZXJlbnQgaGFyZHdhcmUgdGhhbiBiZWZvcmUu
-DQpCdXQgdGhpcyByZXF1aXJlcyBnZXR0aW5nIHRoYXQgYml0IG9mIGluZm9ybWF0aW9uIGZyb20g
-dGhlIGh5cGVydmlzb3IgdG8gdGhlDQprZXJuZWwgYW5kIEkgaGF2ZW4ndCB0aG91Z2h0IGFib3V0
-IGhvdyB0aGlzIHNob3VsZCB3b3JrLg0KDQpUaGVyZSdzIGEgbWlub3IgcHJvYmxlbSByZW1haW5p
-bmcgaGVyZSwgd2hpY2ggaW1wYWN0cyBOVFAgc2VydmVycyBidXQgbm90DQpjbGllbnRzLiBOVFAg
-c2VydmVycyBkb24ndCB1c2UgYWRqdGltZXggdG8gZ2V0IHRoZSB0aW1lc3RhbXBzIHRoZSB1c2Ug
-dG8NCnBvcHVsYXRlIE5UUCBwYWNrZXRzOyB0aGV5IGp1c3QgdXNlIGNsb2NrX2dldHRpbWUsIGJl
-Y2F1c2UgdGhlIGxhdHRlciBpcyBhDQpWRFNPIGNhbGwgYW5kIHRoZSBmb3JtZXIgaXMgbm90LiBU
-aGF0IG1lYW5zIHRoYXQgdGhleSBtYXkgbm90IGxlYXJuIG9mIHRoZQ0KYGNsb2NrdmVyYCBzdGVw
-IGluIHRpbWUgdG8gYW5zd2VyIGFueSBxdWVyaWVzIHRoYXQgY29tZSBpbiBpbW1lZGlhdGVseQ0K
-cG9zdC1ibGFja291dC4gU28sIHRoZSBzZXJ2ZXIgbWF5IGJyaWVmbHkgYmVjb21lIGEgZmFsc2V0
-aWNrZXIgaWYgdGhlDQpoeXBlcnZpc29yIGRpZCB0b28gcG9vciBhIGpvYiB3aXRoIHRoZSBUU0Mg
-c3RlcC4gSSBkb24ndCB0aGluayB0aGlzIGlzIGEgYmlnDQpkZWFsIG9yIHNvbWV0aGluZyB0aGF0
-IG5lZWRzIHRvIGJlIGFkZHJlc3NlZCBpbiB0aGUgZmlyc3QgaXRlcmF0aW9uLiBUaGUNCmxvbmct
-dGVybSBzb2x1dGlvbiBpcyB0byBtYWtlIGFkanRpbWV4IGFsc28gYmUgYSBWRFNPIHdoZW4gYG1v
-ZGVzYCBpcw0KMCwgc28gdGhhdCBOVFAgZGFlbW9ucyBjYW4gdXNlIGl0IGZvciBldmVyeXRoaW5n
-Lg0KDQo=
+Hi Linus,
+
+The following changes since commit cfb92440ee71adcc2105b0890bb01ac3cddb8507:
+
+  Linux 5.17-rc5 (2022-02-20 13:07:20 -0800)
+
+are available in the Git repository at:
+
+  https://github.com/awilliam/linux-vfio.git tags/vfio-v5.18-rc1
+
+for you to fetch changes up to f621eb13facb7681a79f4fec8ec6553ae160da76:
+
+  vfio-pci: Provide reviewers and acceptance criteria for variant drivers (2022-03-17 09:57:11 -0600)
+
+----------------------------------------------------------------
+VFIO updates for v5.18-rc1
+
+ - Introduce new device migration uAPI and implement device specific
+   mlx5 vfio-pci variant driver supporting new protocol (Jason Gunthorpe,
+   Yishai Hadas, Leon Romanovsky)
+
+ - New HiSilicon acc vfio-pci variant driver, also supporting migration
+   interface (Shameer Kolothum, Longfang Liu)
+
+ - D3hot fixes for vfio-pci-core (Abhishek Sahu)
+
+ - Document new vfio-pci variant driver acceptance criteria
+   (Alex Williamson)
+
+ - Fix UML build unresolved ioport_{un}map() functions
+   (Alex Williamson)
+
+ - Fix MAINTAINERS due to header movement (Lukas Bulwahn)
+
+----------------------------------------------------------------
+Abhishek Sahu (2):
+      vfio/pci: fix memory leak during D3hot to D0 transition
+      vfio/pci: wake-up devices around reset functions
+
+Alex Williamson (4):
+      vfio/pci: Stub vfio_pci_vga_rw when !CONFIG_VFIO_PCI_VGA
+      Merge tag 'mlx5-vfio-v10' of https://git.kernel.org/pub/scm/linux/kernel/git/mellanox/linux into v5.18/vfio/next/mlx5-migration-v10
+      Merge branches 'v5.18/vfio/next/mlx5-migration-v10', 'v5.18/vfio/next/pm-fixes' and 'v5.18/vfio/next/uml-build-fix' into v5.18/vfio/next/next
+      vfio-pci: Provide reviewers and acceptance criteria for variant drivers
+
+Jason Gunthorpe (6):
+      PCI/IOV: Add pci_iov_vf_id() to get VF index
+      PCI/IOV: Add pci_iov_get_pf_drvdata() to allow VF reaching the drvdata of a PF
+      vfio: Have the core code decode the VFIO_DEVICE_FEATURE ioctl
+      vfio: Define device migration protocol v2
+      vfio: Extend the device migration protocol with RUNNING_P2P
+      vfio: Remove migration protocol v1 documentation
+
+Leon Romanovsky (2):
+      net/mlx5: Reuse exported virtfn index function call
+      PCI/IOV: Fix wrong kernel-doc identifier
+
+Longfang Liu (3):
+      crypto: hisilicon/qm: Move few definitions to common header
+      crypto: hisilicon/qm: Set the VF QM state register
+      hisi_acc_vfio_pci: Add support for VFIO live migration
+
+Lukas Bulwahn (1):
+      MAINTAINERS: adjust entry for header movement in hisilicon qm driver
+
+Shameer Kolothum (6):
+      crypto: hisilicon/qm: Move the QM header to include/linux
+      hisi_acc_qm: Move VF PCI device IDs to common header
+      hisi_acc_vfio_pci: add new vfio_pci driver for HiSilicon ACC devices
+      hisi_acc_vfio_pci: Restrict access to VF dev BAR2 migration region
+      hisi_acc_vfio_pci: Add helper to retrieve the struct pci_driver
+      hisi_acc_vfio_pci: Use its own PCI reset_done error handler
+
+Yishai Hadas (9):
+      net/mlx5: Disable SRIOV before PF removal
+      net/mlx5: Expose APIs to get/put the mlx5 core device
+      net/mlx5: Introduce migration bits and structures
+      net/mlx5: Add migration commands definitions
+      vfio/mlx5: Expose migration commands over mlx5 device
+      vfio/mlx5: Implement vfio_pci driver for mlx5 devices
+      vfio/pci: Expose vfio_pci_core_aer_err_detected()
+      vfio/mlx5: Use its own PCI reset_done error handler
+      vfio/mlx5: Fix to not use 0 as NULL pointer
+
+ Documentation/driver-api/index.rst                 |    1 +
+ .../vfio-pci-device-specific-driver-acceptance.rst |   35 +
+ .../maintainer/maintainer-entry-profile.rst        |    1 +
+ MAINTAINERS                                        |   25 +-
+ drivers/crypto/hisilicon/hpre/hpre.h               |    2 +-
+ drivers/crypto/hisilicon/hpre/hpre_main.c          |   19 +-
+ drivers/crypto/hisilicon/qm.c                      |   68 +-
+ drivers/crypto/hisilicon/sec2/sec.h                |    2 +-
+ drivers/crypto/hisilicon/sec2/sec_main.c           |   21 +-
+ drivers/crypto/hisilicon/sgl.c                     |    2 +-
+ drivers/crypto/hisilicon/zip/zip.h                 |    2 +-
+ drivers/crypto/hisilicon/zip/zip_main.c            |   17 +-
+ drivers/net/ethernet/mellanox/mlx5/core/cmd.c      |   10 +
+ drivers/net/ethernet/mellanox/mlx5/core/main.c     |   45 +
+ .../net/ethernet/mellanox/mlx5/core/mlx5_core.h    |    1 +
+ drivers/net/ethernet/mellanox/mlx5/core/sriov.c    |   17 +-
+ drivers/pci/iov.c                                  |   43 +
+ drivers/vfio/pci/Kconfig                           |    5 +
+ drivers/vfio/pci/Makefile                          |    4 +
+ drivers/vfio/pci/hisilicon/Kconfig                 |   15 +
+ drivers/vfio/pci/hisilicon/Makefile                |    4 +
+ drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c     | 1326 ++++++++++++++++++++
+ drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h     |  116 ++
+ drivers/vfio/pci/mlx5/Kconfig                      |   10 +
+ drivers/vfio/pci/mlx5/Makefile                     |    4 +
+ drivers/vfio/pci/mlx5/cmd.c                        |  259 ++++
+ drivers/vfio/pci/mlx5/cmd.h                        |   36 +
+ drivers/vfio/pci/mlx5/main.c                       |  676 ++++++++++
+ drivers/vfio/pci/vfio_pci.c                        |    1 +
+ drivers/vfio/pci/vfio_pci_core.c                   |  162 ++-
+ drivers/vfio/pci/vfio_pci_rdwr.c                   |    2 +
+ drivers/vfio/vfio.c                                |  296 ++++-
+ .../hisilicon/qm.h => include/linux/hisi_acc_qm.h  |   49 +
+ include/linux/mlx5/driver.h                        |    3 +
+ include/linux/mlx5/mlx5_ifc.h                      |  147 ++-
+ include/linux/pci.h                                |   15 +-
+ include/linux/pci_ids.h                            |    3 +
+ include/linux/vfio.h                               |   53 +
+ include/linux/vfio_pci_core.h                      |   13 +
+ include/uapi/linux/vfio.h                          |  406 +++---
+ 40 files changed, 3558 insertions(+), 358 deletions(-)
+ create mode 100644 Documentation/driver-api/vfio-pci-device-specific-driver-acceptance.rst
+ create mode 100644 drivers/vfio/pci/hisilicon/Kconfig
+ create mode 100644 drivers/vfio/pci/hisilicon/Makefile
+ create mode 100644 drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+ create mode 100644 drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+ create mode 100644 drivers/vfio/pci/mlx5/Kconfig
+ create mode 100644 drivers/vfio/pci/mlx5/Makefile
+ create mode 100644 drivers/vfio/pci/mlx5/cmd.c
+ create mode 100644 drivers/vfio/pci/mlx5/cmd.h
+ create mode 100644 drivers/vfio/pci/mlx5/main.c
+ rename drivers/crypto/hisilicon/qm.h => include/linux/hisi_acc_qm.h (87%)
+
