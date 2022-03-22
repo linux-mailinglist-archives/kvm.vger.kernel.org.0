@@ -2,108 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A66504E3C84
-	for <lists+kvm@lfdr.de>; Tue, 22 Mar 2022 11:35:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B16474E3C93
+	for <lists+kvm@lfdr.de>; Tue, 22 Mar 2022 11:40:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233059AbiCVKgu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Mar 2022 06:36:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50638 "EHLO
+        id S233131AbiCVKkK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Mar 2022 06:40:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232184AbiCVKgt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Mar 2022 06:36:49 -0400
+        with ESMTP id S233103AbiCVKkJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Mar 2022 06:40:09 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 10027517F2
-        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 03:35:22 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 10D945AA6F
+        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 03:38:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647945321;
+        s=mimecast20190719; t=1647945516;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=hbI+0FzLxTrgNPKLf6m2jvf61c9iUbJknKGuFHYfZhA=;
-        b=JwgkJxfU/ciG4SzQ3T6XZgKzXdze/nCI8Fo4Wnz+haj//9jHC1wpFN7TxHNLaz5NSiudvC
-        zyWBnx7UZ8ZJa70JSWPq+9SARdk6h9fTYckwmEs4x3zjppvo5eKlO0rBzQMsTKPM8PTpVq
-        QyPX2xLwfD4Ci7z8M4m/9RRP2Hu9Lho=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=VkoZGCDazaob935cf0K6/xqwp1grV8y7vA1EUagsdw8=;
+        b=CXZUZIISL19ZPcrKNiw1uktdfJJltoX+O5e0iWZUNkMrx7VXY9YyKDn1nux9C86FznBE0Y
+        nhP8UUh6SFJVKM15phBho9H5PVSdIRhsfOAYFs7BPU3FA/R+Vo2CiAGjgKCosVEfUKvODZ
+        /LnkHvblfQJxe1Y7mS4N+evqWkwcCbY=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-327-oEW3ZFZpPMeTxttwcMNKDQ-1; Tue, 22 Mar 2022 06:35:20 -0400
-X-MC-Unique: oEW3ZFZpPMeTxttwcMNKDQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2A7C428035E0;
-        Tue, 22 Mar 2022 10:35:20 +0000 (UTC)
-Received: from sirius.home.kraxel.org (unknown [10.39.196.67])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id DFA45C26E9A;
-        Tue, 22 Mar 2022 10:35:19 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-        id 88B50180062E; Tue, 22 Mar 2022 11:35:18 +0100 (CET)
-Date:   Tue, 22 Mar 2022 11:35:18 +0100
-From:   Gerd Hoffmann <kraxel@redhat.com>
-To:     Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc:     Xiaoyao Li <xiaoyao.li@intel.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= 
-        <philippe.mathieu.daude@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Laszlo Ersek <lersek@redhat.com>,
-        Eric Blake <eblake@redhat.com>,
-        Connor Kuehl <ckuehl@redhat.com>, isaku.yamahata@intel.com,
-        erdemaktas@google.com, kvm@vger.kernel.org, qemu-devel@nongnu.org,
-        seanjc@google.com
-Subject: Re: [RFC PATCH v3 17/36] pflash_cfi01/tdx: Introduce ram_mode of
- pflash for TDVF
-Message-ID: <20220322103518.ljbi4pvghbgjxm7k@sirius.home.kraxel.org>
-References: <20220317135913.2166202-1-xiaoyao.li@intel.com>
- <20220317135913.2166202-18-xiaoyao.li@intel.com>
- <f418548e-c24c-1bc3-4e16-d7a775298a18@gmail.com>
- <7a8233e4-0cae-b05a-7931-695a7ee87fc9@intel.com>
- <20220322092141.qsgv3pqlvlemgrgw@sirius.home.kraxel.org>
- <YjmXFZRCbKXTkAhN@redhat.com>
+ us-mta-663-mn9j-GWkOtyuJp67VAMDSQ-1; Tue, 22 Mar 2022 06:38:34 -0400
+X-MC-Unique: mn9j-GWkOtyuJp67VAMDSQ-1
+Received: by mail-qk1-f198.google.com with SMTP id 195-20020a3707cc000000b0067b0c849285so11496100qkh.5
+        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 03:38:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=VkoZGCDazaob935cf0K6/xqwp1grV8y7vA1EUagsdw8=;
+        b=XnShLH0eLHBx7RkT3hZ9odhboTyYxB5/i3qIolYHXoOuhsE0euSfj4zVM6U9FtZLal
+         7uIKNdUwz8TXAMgwSqUKvq7qqwauFHz1JSkHiXwmDguQt4kqseHy23ToOT9cvVmlVkuL
+         4hxQzYzLBe9wTbynxYLoLIFFknZrNoMlUmv5zmDtRjTveHtxih7ql2yYGgz/PcB5HoGt
+         cUixnihN3v4IQRb0PB5N6IWQ8LoYm1X2H+ACmo8c15aYUN3Y3kqnmvQB+AshF62htYzw
+         YHLxRZEunpZ4P1Z6ALYaoAQ3re/t7RCvi0QbpNcMLl9rZ4XF0wV3vhyteN0/tNLHGPU3
+         FJug==
+X-Gm-Message-State: AOAM531My8HZmyyDTtFyXauYkWRs58CKAD0cIOWMI9W0MjEOhmBvvqal
+        2IeMtBBFLsmmhnEFZRXeiFBji9myY1bnZ+AtDGInCoGMY9jZFTHa3GIOdj79/+/yzg9i5qNKuDt
+        SVEYSL5G/Id0O
+X-Received: by 2002:a05:6214:29ca:b0:441:1f8c:e58d with SMTP id gh10-20020a05621429ca00b004411f8ce58dmr7306557qvb.111.1647945514088;
+        Tue, 22 Mar 2022 03:38:34 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz4XnbEotBgwmm8Kokd0VkMAvlrSAfcDAHK9dNDeWtrOWpekkIQX4QyQevtVagOHVlC3sFqKg==
+X-Received: by 2002:a05:6214:29ca:b0:441:1f8c:e58d with SMTP id gh10-20020a05621429ca00b004411f8ce58dmr7306547qvb.111.1647945513838;
+        Tue, 22 Mar 2022 03:38:33 -0700 (PDT)
+Received: from step1.redhat.com ([87.12.25.114])
+        by smtp.gmail.com with ESMTPSA id q123-20020a378e81000000b0067eb3d6f605sm1532443qkd.0.2022.03.22.03.38.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Mar 2022 03:38:33 -0700 (PDT)
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     netdev@vger.kernel.org
+Cc:     virtualization@lists.linux-foundation.org,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Asias He <asias@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Stefan Hajnoczi <stefanha@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>
+Subject: [PATCH net] vsock/virtio: enable VQs early on probe
+Date:   Tue, 22 Mar 2022 11:38:23 +0100
+Message-Id: <20220322103823.83411-1-sgarzare@redhat.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YjmXFZRCbKXTkAhN@redhat.com>
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-  Hi,
+virtio spec requires drivers to set DRIVER_OK before using VQs.
+This is set automatically after probe returns, but virtio-vsock
+driver uses VQs in the probe function to fill rx and event VQs
+with new buffers.
 
-> > Just using -bios OVMF.fd might work too.  Daniel tried that recently for
-> > sev, but ran into problems with wiring up ovmf metadata parsing for
-> > -bios.  Don't remember the details though.
-> 
-> It was related to the BIOS shadowing, whereby QEMU loads it at one
-> address, and then when CPUs start it is copied to another address.
+Let's fix this, calling virtio_device_ready() before using VQs
+in the probe function.
 
-Is this the top 128k of the firmware being copied below 1M so the
-firmware reset vector is available in real mode address space?
+Fixes: 0ea9e1d3a9e3 ("VSOCK: Introduce virtio_transport.ko")
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+---
+ net/vmw_vsock/virtio_transport.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-> This was not compatible with the way AMD SEV wants to do measurement
-> of the firmware. May or may not be relevant for TDX, I don't know
-> enough about TDX to say.
-
-TDX boots in 32bit mode, so simply skipping any real mode compatibility
-stuff shouldn't cause any problems here.
-
-Not sure about SEV.  There is this SevProcessorReset entry in the ovmf
-metadata block.  Is that the SEV reset vector?  If SEV cpu bringup
-doesn't go through real mode either we maybe can just skip the BIOS
-shadowing setup for confidential computing guests ...
-
-take care,
-  Gerd
+diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+index 5afc194a58bb..b1962f8cd502 100644
+--- a/net/vmw_vsock/virtio_transport.c
++++ b/net/vmw_vsock/virtio_transport.c
+@@ -622,6 +622,8 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
+ 	INIT_WORK(&vsock->event_work, virtio_transport_event_work);
+ 	INIT_WORK(&vsock->send_pkt_work, virtio_transport_send_pkt_work);
+ 
++	virtio_device_ready(vdev);
++
+ 	mutex_lock(&vsock->tx_lock);
+ 	vsock->tx_run = true;
+ 	mutex_unlock(&vsock->tx_lock);
+-- 
+2.35.1
 
