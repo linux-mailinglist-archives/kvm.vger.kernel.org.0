@@ -2,164 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 596484E35DA
-	for <lists+kvm@lfdr.de>; Tue, 22 Mar 2022 02:09:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DFC404E35FD
+	for <lists+kvm@lfdr.de>; Tue, 22 Mar 2022 02:34:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234544AbiCVBHw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Mar 2022 21:07:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40710 "EHLO
+        id S234686AbiCVBel (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Mar 2022 21:34:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53588 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234503AbiCVBHo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Mar 2022 21:07:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D70FF49692
-        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 18:06:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647911175;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=a37Iy4acq0RECreesuZ9P5gY0hyf9x+k89MXGTdyb6g=;
-        b=CkdgW1vAdSmy1jAVGlZLSX7eqDVxh8UQeTa7StoMZmzjX/AX8TBmQ+/4e8KaxcICfN2kDM
-        gPyRCD9gjHiffs7vIDS51OffdfWZbjnZsH2uxMTKF8YGIjkDi/Na1LZucqEU1tRn1igfUC
-        CVqKYB6NfdEWnRqQNRxHMQyvi8mjSv0=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-189-sCM1BnxDOzO1wmc2uFs5xw-1; Mon, 21 Mar 2022 17:36:07 -0400
-X-MC-Unique: sCM1BnxDOzO1wmc2uFs5xw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0ED4C2999B2C;
-        Mon, 21 Mar 2022 21:36:07 +0000 (UTC)
-Received: from starship (unknown [10.40.194.231])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 559A040D2821;
-        Mon, 21 Mar 2022 21:36:02 +0000 (UTC)
-Message-ID: <abe8584fa3691de1d6ae6c6617b8ea750b30fd1c.camel@redhat.com>
-Subject: Re: [PATCH v3 4/7] KVM: x86: nSVM: support PAUSE filter threshold
- and count when cpu_pm=on
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Jim Mattson <jmattson@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
-        Wanpeng Li <wanpengli@tencent.com>
-Date:   Mon, 21 Mar 2022 23:36:01 +0200
-In-Reply-To: <CALMp9eRRT6pi6tjZvsFbEhrgS+zsNg827iLD4Hvzsa4PeB6W-Q@mail.gmail.com>
-References: <20220301143650.143749-1-mlevitsk@redhat.com>
-         <20220301143650.143749-5-mlevitsk@redhat.com>
-         <CALMp9eRjY6sX0OEBeYw4RsQKSjKvXKWOqRe=GVoQnmjy6D8deg@mail.gmail.com>
-         <6a7f13d1-ed00-b4a6-c39b-dd8ba189d639@redhat.com>
-         <CALMp9eRRT6pi6tjZvsFbEhrgS+zsNg827iLD4Hvzsa4PeB6W-Q@mail.gmail.com>
+        with ESMTP id S234673AbiCVBek (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Mar 2022 21:34:40 -0400
+Received: from mail-il1-x149.google.com (mail-il1-x149.google.com [IPv6:2607:f8b0:4864:20::149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2C041FB53C
+        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 18:33:13 -0700 (PDT)
+Received: by mail-il1-x149.google.com with SMTP id o14-20020a92d38e000000b002c7f344af18so5518763ilo.2
+        for <kvm@vger.kernel.org>; Mon, 21 Mar 2022 18:33:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=qjnBCMCBFj8PplPtYytxZfhoVlLYfUvFpjjjdycnFWE=;
+        b=pII/Xw7Dal4aBB+0PLm2RyxWxoqjmtvsNRZQUUfR8ns77VDJYyDzs2nROTIb/UUqAA
+         pOLPYNJLawy0NMA2CTpM/hp7vTo7rIebJsWKYgdAdRvsxw9rBxbE5a2hL+ma38I9AtbL
+         xJlNHTMBF+w4lcS3PXcjeCxP1olVlxESHzW0LMS1qpFdc72NqG7R+mndkElUfBpFX7oV
+         c0/MgLBIHNm2lFKCG/S3LAAHjSMU9Zlct80kEqajjVsWN0oBRQwd9zgVqwYl4Ecs1z8R
+         mRwQw5elwVXfc1hf9Mm1hfeyorNWbGBLLqTIJwPApN5eRiuoSnQ10XVgqx8O4VkWvWoC
+         7Ldg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=qjnBCMCBFj8PplPtYytxZfhoVlLYfUvFpjjjdycnFWE=;
+        b=Oit9yktsV1vqqVlPgI8ukP3+uU6qUp0duhFQf1+V/mSRRt9LdKD2R+wm5jk9IgNMaM
+         cNTdOobWJbWW76OMeUlMycYrQxD4LIqNUQ5FoHpAkLQ4IzopSLxmRU1aOF3w2wzLjaXg
+         0W8c5G52uQg/N6q2zX64UqweHqIrvugIeDS8V7bEspxgDoI/cEKlHeJwFZH4zxM7NWy2
+         avQENOFqiESHQNBSirUkJdxyLClo3eM+LmTGKn94aNe7RTQXyLLt/hcy3JUFUtScBFeJ
+         42ro9PJizakgfN7P5jrgWuWYUF2eSDuJyLyXuP1zE5o/lCNXXwAf5hAe3moSfeThwSBL
+         Z+pw==
+X-Gm-Message-State: AOAM533UdkWaHWbL5Ebk0QYAn8YBt1U0zyLX0QvcTwMg64yDFTvhbMUA
+        Wv8tSdqkMPGLsV/PBIOWMup8XGp1Uhw=
+X-Google-Smtp-Source: ABdhPJwbCwwXb7MoS1YP0fzzPvJ9s+3FAN1k0iq644mgxX1DYCS9sZ9azTh6FyvitRYmbm8F1GECFravlPg=
+X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
+ (user=oupton job=sendgmr) by 2002:a05:6602:73c:b0:649:5e22:f3ee with SMTP id
+ g28-20020a056602073c00b006495e22f3eemr8149186iox.156.1647912792555; Mon, 21
+ Mar 2022 18:33:12 -0700 (PDT)
+Date:   Tue, 22 Mar 2022 01:33:10 +0000
+In-Reply-To: <20220318193831.482349-1-oupton@google.com>
+Message-Id: <20220322013310.1880100-1-oupton@google.com>
+Mime-Version: 1.0
+References: <20220318193831.482349-1-oupton@google.com>
+X-Mailer: git-send-email 2.35.1.894.gb6a874cedc-goog
+Subject: [PATCH] KVM: arm64: Drop unneeded minor version check from PSCI v1.x handler
+From:   Oliver Upton <oupton@google.com>
+To:     kvmarm@lists.cs.columbia.edu
+Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>, Oliver Upton <oupton@google.com>
 Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
-X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2022-03-09 at 11:07 -0800, Jim Mattson wrote:
-> On Wed, Mar 9, 2022 at 10:47 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
-> > On 3/9/22 19:35, Jim Mattson wrote:
-> > > I didn't think pause filtering was virtualizable, since the value of
-> > > the internal counter isn't exposed on VM-exit.
-> > > 
-> > > On bare metal, for instance, assuming the hypervisor doesn't intercept
-> > > CPUID, the following code would quickly trigger a PAUSE #VMEXIT with
-> > > the filter count set to 2.
-> > > 
-> > > 1:
-> > > pause
-> > > cpuid
-> > > jmp 1
-> > > 
-> > > Since L0 intercepts CPUID, however, L2 will exit to L0 on each loop
-> > > iteration, and when L0 resumes L2, the internal counter will be set to
-> > > 2 again. L1 will never see a PAUSE #VMEXIT.
-> > > 
-> > > How do you handle this?
-> > > 
-> > 
-> > I would expect that the same would happen on an SMI or a host interrupt.
-> > 
-> >         1:
-> >         pause
-> >         outl al, 0xb2
-> >         jmp 1
-> > 
-> > In general a PAUSE vmexit will mostly benefit the VM that is pausing, so
-> > having a partial implementation would be better than disabling it
-> > altogether.
-> 
-> Indeed, the APM does say, "Certain events, including SMI, can cause
-> the internal count to be reloaded from the VMCB." However, expanding
-> that set of events so much that some pause loops will *never* trigger
-> a #VMEXIT seems problematic. If the hypervisor knew that the PAUSE
-> filter may not be triggered, it could always choose to exit on every
-> PAUSE.
-> 
-> Having a partial implementation is only better than disabling it
-> altogether if the L2 pause loop doesn't contain a hidden #VMEXIT to
-> L0.
-> 
+We already sanitize the guest's PSCI version when it is being written by
+userspace, rejecting unsupported version numbers. Additionally, the
+'minor' parameter to kvm_psci_1_x_call() is a constant known at compile
+time for all callsites.
 
-Hi!
- 
-You bring up a very valid point, which I didn't think about.
- 
-However after thinking about this, I think that in practice,
-this isn't a show stopper problem for exposing this feature to the guest.
- 
+Though it is benign, the additional check against the
+PSCI kvm_psci_1_x_call() is unnecessary and likely to be missed the next
+time KVM raises its maximum PSCI version. Drop the check altogether and
+rely on sanitization when the PSCI version is set by userspace.
 
-This is what I am thinking:
- 
-First lets assume that the L2 is malicious. In this case no doubt
-it can craft such a loop which will not VMexit on PAUSE.
-But that isn't a problem - instead of this guest could have just used NOP
-which is not possible to intercept anyway - no harm is done.
- 
-Now lets assume a non malicious L2:
+No functional change intended.
 
+Signed-off-by: Oliver Upton <oupton@google.com>
+---
 
-First of all the problem can only happen when a VM exit is intercepted by L0,
-and not by L1. Both above cases usually don't pass this criteria since L1 is highly
-likely to intercept both CPUID and IO port access. It is also highly unlikely
-to allow L2 direct access to L1's mmio ranges.
- 
-Overall there are very few cases of deterministic vm exit which is intercepted
-by L0 but not L1. If that happens then L1 will not catch the PAUSE loop,
-which is not different much from not catching it because of not suitable
-thresholds.
- 
-Also note that this is an optimization only - due to count and threshold,
-it is not guaranteed to catch all pause loops - in fact hypervisor has
-to guess these values, and update them in attempt to catch as many such
-loops as it can.
- 
-I think overall it is OK to expose that feature to the guest
-and it should even improve performance in some cases - currently
-at least nested KVM intercepts every PAUSE otherwise.
- 
-Best regards,
-	Maxim Levitsky
+Sorry for not sending this with the other ones. I took another read and
+do not believe this check is necessary + might hurt when we raise the
+PSCI version again.
 
+Applies on top of the series [1], which itself is based on kvmarm/next
+at commit:
 
+  21ea45784275 ("KVM: arm64: fix typos in comments")
 
+[1]: http://lore.kernel.org/r/20220318193831.482349-1-oupton@google.com
+
+ arch/arm64/kvm/psci.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
+index 0d771468b708..7cd3fe62275f 100644
+--- a/arch/arm64/kvm/psci.c
++++ b/arch/arm64/kvm/psci.c
+@@ -315,9 +315,6 @@ static int kvm_psci_1_x_call(struct kvm_vcpu *vcpu, u32 minor)
+ 	unsigned long val;
+ 	int ret = 1;
+ 
+-	if (minor > 1)
+-		return -EINVAL;
+-
+ 	val = kvm_psci_check_allowed_function(vcpu, psci_fn);
+ 	if (val)
+ 		goto out;
+-- 
+2.35.1.894.gb6a874cedc-goog
 
