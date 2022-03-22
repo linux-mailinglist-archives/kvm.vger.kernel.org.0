@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 052B34E45E2
-	for <lists+kvm@lfdr.de>; Tue, 22 Mar 2022 19:22:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 58BAD4E4605
+	for <lists+kvm@lfdr.de>; Tue, 22 Mar 2022 19:30:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237769AbiCVSX1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Mar 2022 14:23:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37276 "EHLO
+        id S239042AbiCVScG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Mar 2022 14:32:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240253AbiCVSX0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Mar 2022 14:23:26 -0400
-Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A71B8D697
-        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 11:21:58 -0700 (PDT)
-Received: by mail-lf1-x12c.google.com with SMTP id l20so31144091lfg.12
-        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 11:21:58 -0700 (PDT)
+        with ESMTP id S239912AbiCVScD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Mar 2022 14:32:03 -0400
+Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FAC390FDE
+        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 11:30:35 -0700 (PDT)
+Received: by mail-lj1-x235.google.com with SMTP id c15so25141237ljr.9
+        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 11:30:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=WAKfsHYufu3U00AAQ3K6rkkqvblKGp7U0moxttx1nDc=;
-        b=g2Mo8JicfcFH/ca4r/k8qwzNmJcqohXhHSc8ZN1vggO+ws0hE9XyigO2hPYcPZWWtk
-         wNEza19s0fPDjH5GX8/kKgwDj/AAV9pY4XeHmvC71+6Y6ICWamfbXU6C9YM9stEziAjS
-         Pyzvv0cV9b5kaL2Vw0X3sHjwvfQugdxpBZP6WpNszpT8tGNVYT59NDnhX2XhWEiAEB2q
-         R6auCiZeG6hXuo36MJY34i1dlEJGkAos2ZUzCMTTS5Ma09OmY4Ad9S5p/J99OkWTba+X
-         viy50q5OpxBRGYxh9kdfQAiI1GToU553m9eY93dV6MAHbc4QHm6K6V/UCEWO+8O6FNPA
-         Fxtw==
+        bh=0CNUQIx7db9tcPXPC9iqjrJoWI5B8XllhjqFE5N8sVg=;
+        b=CF2Wkl42pAxFG3JegPzy0+/N/gpywxj733ZXOFng8/BIcG6njGR+YAz27HK7YLMvj9
+         zFdMX8QKWmGj9CEYEZtyS8SpNQ4Mtndo7DHMJf3YeTeITeLH4DAFFiV4R3Rq5+9j1MSf
+         i1dZwBk/3skV8dWO5LjqtEL+QB2F6rU3Gpf8GrAbcSjnfNBllAacDIuTnr9VWfbbybWF
+         +YFtcLfSfvwrvRkkoUmCPF/Le7MHeh2uBzbt41SRv1S+WHTomhdlwsURFgIMwhpIVTig
+         EbbgVuPNES+r8im5hJ1+nIuCQwBaowhiv3JT0WSWqhNY+UATI4uYOpIqu9cu9XxqPW/s
+         I2Ew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=WAKfsHYufu3U00AAQ3K6rkkqvblKGp7U0moxttx1nDc=;
-        b=pMVhEGoJJZcyJ9fAuSsEMp6ylIImMF7w6jswRtcNuMevncaSTemJpaPEGluu8PO0Ul
-         GAqmp4U7HVrMG7aL3h5sL/6fJXyi6FLax6UB9aIHEKOs1K5zsY9HefagXzWjfcb4qVg2
-         yLEa/tsRqWCz9lRC3xVFQiWiU2MghjOD5THS+Vfx7zN3/xbk58BNGJpn85bfaSLdKKrV
-         W7Kd1Ik1EFsIBFPEqDEhLOyX1jizS0TQGifuVrEgzh9+CmYvBzpmmyw00k0FMdMNv8UN
-         xQRTWs+4CEaL+1V4i91HHIG1F8Ff/4eVTuLG/wQkiTQHpGANyMqszdx6AFmpj09UP1mL
-         j+Og==
-X-Gm-Message-State: AOAM530VHbY3CMV/sdVq1scCO2QS1MfoVS4XH3CUA4L0gXX3F6y3N/dC
-        4BW6T3wKk3fQTqtcVLBGvfz4lv4FGU3oBgJ5X59CUA==
-X-Google-Smtp-Source: ABdhPJyrSF1plRNyRh9A7BhcuZu0NWWd/cVBt3Nl5hNQUOvH0RUPVILChyti/fD/O7GaiC+DirE+BwoMtfWc3XC9kZI=
-X-Received: by 2002:a05:6512:1114:b0:448:388c:b79f with SMTP id
- l20-20020a056512111400b00448388cb79fmr19109715lfg.250.1647973316603; Tue, 22
- Mar 2022 11:21:56 -0700 (PDT)
+        bh=0CNUQIx7db9tcPXPC9iqjrJoWI5B8XllhjqFE5N8sVg=;
+        b=A0s0I9v4WZhcj9aNTpXZx0ickdzkFDyPJ9927RNLKN3FnduGfqqt4FD6rnhR3YTGXm
+         TnEgiGLIviMYVIbZ2JZ5yEjU8VNNnVi+VU2WNaqEHjrpv9WLxqRzCHsV7/Gp24vRdjm0
+         tg+okrei5Ad2TxbSNBwqSZyLLHFdWxLohmVWhTx6QNM1sr4tm8vRrbbHbJSay7qkt4Jt
+         s2Q4bMjWXOG8agrJ3Cp61auoiiJVIMFNprB/k09Aaaf0kxoa8tej/uFl4QlKFyoAaapV
+         sP7TGU9j+y0lm2UEZCoxXgGe1aBoy2ro1u65z/ebg9DN/da2zc5MiuVJsVNVHL4lVYjJ
+         RT5A==
+X-Gm-Message-State: AOAM530Qx8uptFo9eC7YRZ2CvcjeCz9WAS7OgKKp3SN/3+qCDiubwmAv
+        l8RxZuEqfV+gcj+nz6swqPAtLIltTiz653yV355LQw==
+X-Google-Smtp-Source: ABdhPJyNKn6/OXQhxmGccGBHaz+yDflLiBEtNop/JRI2h4pzs1fJKVRhlCid5p3SD4A9PdS2WyGUl7n7vQSW1PqSoi4=
+X-Received: by 2002:a2e:6804:0:b0:245:f269:618 with SMTP id
+ c4-20020a2e6804000000b00245f2690618mr19192245lja.198.1647973833489; Tue, 22
+ Mar 2022 11:30:33 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220311002528.2230172-1-dmatlack@google.com> <20220311002528.2230172-3-dmatlack@google.com>
- <YjBEWm3YsuSKj+ES@xz-m1.local>
-In-Reply-To: <YjBEWm3YsuSKj+ES@xz-m1.local>
+References: <20220311002528.2230172-1-dmatlack@google.com> <20220311002528.2230172-4-dmatlack@google.com>
+ <YjBLFZWtdfwhNosG@xz-m1.local>
+In-Reply-To: <YjBLFZWtdfwhNosG@xz-m1.local>
 From:   David Matlack <dmatlack@google.com>
-Date:   Tue, 22 Mar 2022 11:21:30 -0700
-Message-ID: <CALzav=cMFL=ZZyV5uckbhb3RqC0LhOnnooiJGKKN26F69TF63A@mail.gmail.com>
-Subject: Re: [PATCH v2 02/26] KVM: x86/mmu: Use a bool for direct
+Date:   Tue, 22 Mar 2022 11:30:07 -0700
+Message-ID: <CALzav=dAW999FKid08Ry0YxPA+3Dt8HERrbn6YMkAnk0h+4h_A@mail.gmail.com>
+Subject: Re: [PATCH v2 03/26] KVM: x86/mmu: Derive shadow MMU page role from parent
 To:     Peter Xu <peterx@redhat.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
         Huacai Chen <chenhuacai@kernel.org>,
@@ -84,29 +84,88 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 15, 2022 at 12:46 AM Peter Xu <peterx@redhat.com> wrote:
+On Tue, Mar 15, 2022 at 1:15 AM Peter Xu <peterx@redhat.com> wrote:
 >
-> On Fri, Mar 11, 2022 at 12:25:04AM +0000, David Matlack wrote:
-> > The parameter "direct" can either be true or false, and all of the
-> > callers pass in a bool variable or true/false literal, so just use the
-> > type bool.
+> On Fri, Mar 11, 2022 at 12:25:05AM +0000, David Matlack wrote:
+> > Instead of computing the shadow page role from scratch for every new
+> > page, we can derive most of the information from the parent shadow page.
+> > This avoids redundant calculations and reduces the number of parameters
+> > to kvm_mmu_get_page().
+> >
+> > Preemptively split out the role calculation to a separate function for
+> > use in a following commit.
 > >
 > > No functional change intended.
 > >
 > > Signed-off-by: David Matlack <dmatlack@google.com>
 >
-> If we care about this.. how about convert another one altogether?
+> Looks right..
 >
-> TRACE_EVENT(kvm_hv_stimer_expiration,
->         TP_PROTO(int vcpu_id, int timer_index, int direct, int msg_send_result),
->         TP_ARGS(vcpu_id, timer_index, direct, msg_send_result),
+> Reviewed-by: Peter Xu <peterx@redhat.com>
+>
+> Two more comments/questions below.
+>
+> > +static union kvm_mmu_page_role kvm_mmu_child_role(u64 *sptep, bool direct, u32 access)
+> > +{
+> > +     struct kvm_mmu_page *parent_sp = sptep_to_sp(sptep);
+> > +     union kvm_mmu_page_role role;
+> > +
+> > +     role = parent_sp->role;
+> > +     role.level--;
+> > +     role.access = access;
+> > +     role.direct = direct;
+> > +
+> > +     /*
+> > +      * If the guest has 4-byte PTEs then that means it's using 32-bit,
+> > +      * 2-level, non-PAE paging. KVM shadows such guests using 4 PAE page
+> > +      * directories, each mapping 1/4 of the guest's linear address space
+> > +      * (1GiB). The shadow pages for those 4 page directories are
+> > +      * pre-allocated and assigned a separate quadrant in their role.
+> > +      *
+> > +      * Since we are allocating a child shadow page and there are only 2
+> > +      * levels, this must be a PG_LEVEL_4K shadow page. Here the quadrant
+> > +      * will either be 0 or 1 because it maps 1/2 of the address space mapped
+> > +      * by the guest's PG_LEVEL_4K page table (or 4MiB huge page) that it
+> > +      * is shadowing. In this case, the quadrant can be derived by the index
+> > +      * of the SPTE that points to the new child shadow page in the page
+> > +      * directory (parent_sp). Specifically, every 2 SPTEs in parent_sp
+> > +      * shadow one half of a guest's page table (or 4MiB huge page) so the
+> > +      * quadrant is just the parity of the index of the SPTE.
+> > +      */
+> > +     if (role.has_4_byte_gpte) {
+> > +             BUG_ON(role.level != PG_LEVEL_4K);
+> > +             role.quadrant = (sptep - parent_sp->spt) % 2;
+> > +     }
+>
+> This made me wonder whether role.quadrant can be dropped, because it seems
+> it can be calculated out of the box with has_4_byte_gpte, level and spte
+> offset.  I could have missed something, though..
 
-My preference would be to keep this commit specific to uses of
-"direct" that are related to shadow pages.
+I think you're right that we could compute it on-the-fly. But it'd be
+non-trivial to remove since it's currently used to ensure the sp->role
+and sp->gfn uniquely identifies each shadow page (e.g. when checking
+for collisions in the mmu_page_hash).
 
-The parameter `direct` in trace_kvm_hv_stimer_expiration() looks like
-it could be converted as well, but is a different concept altogether
-despite having the same variable name.
+>
+> > +
+> > +     return role;
+> > +}
+> > +
+> > +static struct kvm_mmu_page *kvm_mmu_get_child_sp(struct kvm_vcpu *vcpu,
+> > +                                              u64 *sptep, gfn_t gfn,
+> > +                                              bool direct, u32 access)
+> > +{
+> > +     union kvm_mmu_page_role role;
+> > +
+> > +     role = kvm_mmu_child_role(sptep, direct, access);
+> > +     return kvm_mmu_get_page(vcpu, gfn, role);
+>
+> Nit: it looks nicer to just drop the temp var?
+>
+>         return kvm_mmu_get_page(vcpu, gfn,
+>                                 kvm_mmu_child_role(sptep, direct, access));
+
+Yeah that's simpler. I just have an aversion to line wrapping :)
 
 >
 > Thanks,
