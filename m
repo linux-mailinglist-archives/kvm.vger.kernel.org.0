@@ -2,162 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 479744E3F94
-	for <lists+kvm@lfdr.de>; Tue, 22 Mar 2022 14:31:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A1CA4E3FA4
+	for <lists+kvm@lfdr.de>; Tue, 22 Mar 2022 14:36:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234509AbiCVNck (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Mar 2022 09:32:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50164 "EHLO
+        id S235648AbiCVNhw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Mar 2022 09:37:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233715AbiCVNch (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Mar 2022 09:32:37 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B239A2DD5E;
-        Tue, 22 Mar 2022 06:31:07 -0700 (PDT)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22MBXLeE018278;
-        Tue, 22 Mar 2022 13:31:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=HpA+lBmDwGJzna4wzGRAGzKQulBYXqZmgl9iArsAFEc=;
- b=lJaWQAiiK3lzj51BoGP6QnFpOiHEL+f+njm+UWQ0UeDofLAuT3pxX+DojE0DSxjiZL6U
- /OegKzfgbuleIKFFI1Ts7DmO8na2O2r4mxx1ftuTwpE1D9OtrSZHVNnae1Q7T5TCe3SJ
- X8BXxZ7dWgDGTXy/ZfUjRQvl2tNbhhkV0V63BgGZtTqrUuqBDClIFtcJeTPl0wUms4lR
- KWw6F8M9khdFJLrIHtrBgSGW+ISnyOQaWUYgRZfpHJUmUhXql0GgZJQKzZqpvA3J9D9a
- DWFHG7tq10JsR5Irb3JEgmW+DD8f3AIBuRm1TEJtdZcpg/1Im0VK5qJuRUy/aDjIPV4L tg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3eyautpnf6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 22 Mar 2022 13:31:03 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22MDFVj5027042;
-        Tue, 22 Mar 2022 13:31:03 GMT
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3eyautpnew-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 22 Mar 2022 13:31:03 +0000
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
-        by ppma03dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22MDHXcl007307;
-        Tue, 22 Mar 2022 13:31:02 GMT
-Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
-        by ppma03dal.us.ibm.com with ESMTP id 3ew6t9hbh7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 22 Mar 2022 13:31:02 +0000
-Received: from b03ledav001.gho.boulder.ibm.com (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
-        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22MDV0MJ20709874
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 22 Mar 2022 13:31:00 GMT
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 27FDB6E062;
-        Tue, 22 Mar 2022 13:31:00 +0000 (GMT)
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F3B3F6E060;
-        Tue, 22 Mar 2022 13:30:58 +0000 (GMT)
-Received: from [9.65.234.56] (unknown [9.65.234.56])
-        by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Tue, 22 Mar 2022 13:30:58 +0000 (GMT)
-Message-ID: <0f9ab763-9596-c157-8f1e-e65088bf3aab@linux.ibm.com>
-Date:   Tue, 22 Mar 2022 09:30:58 -0400
+        with ESMTP id S235634AbiCVNhv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Mar 2022 09:37:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D3BFF7B137
+        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 06:36:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1647956181;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=yEfbx3KDPFlRi9NsR3t9OxuLawKBXpgCccFQfHQvcxA=;
+        b=NiQSgX5t4rKEK6e25+vvVswrgluzj7pQqCaQpFqDv5qqDJ12e6bnSoL8KA1rE8k7Mnew+0
+        IYannNNRQw+fuKefyrvHxiIQp0q7CwuVZ6btshHbDY78VCjNw2rvVfLpfu4Hy362TMRfhm
+        MAV81cjRudpPPlwaKD7IP9qhIpMhMdQ=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-656-2Z3yqIFWON-dm2FFJyrWXQ-1; Tue, 22 Mar 2022 09:36:20 -0400
+X-MC-Unique: 2Z3yqIFWON-dm2FFJyrWXQ-1
+Received: by mail-wm1-f71.google.com with SMTP id q6-20020a1cf306000000b0038c5726365aso931181wmq.3
+        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 06:36:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=yEfbx3KDPFlRi9NsR3t9OxuLawKBXpgCccFQfHQvcxA=;
+        b=d8DVpiJvmi0eZmy97QPZopNRXrGKhiEQxhpEQy42GC105+b7P/keyT8H02WHOFKg2e
+         Bb03LyRy8HR9YFs3SDCmyHVCp+B8O7OKUY3ScOBVBB08HZfwRYJbwyQYIMhsTJN7NNmS
+         73yXWem17JvZ52LgUYjRWr9wNIfYjEBGnDjeHRN/aza5aaiUYuqKjIWIpWE4usz34cSZ
+         rZq9jdDfApo243gf5B1gGCaE5DmRtUW44udW4NdYzmL1UGSG1jT5N1rYFLGQdIBlOIF0
+         6NXIP63NLCG6zGKwGERIBaeHbjgGqEacpRDvRpUZTmJqELjTIEjbNuPVkV6A6AflDkuP
+         v8Ng==
+X-Gm-Message-State: AOAM533TPTfnv5KlEsUzk+rplIo+UtiK63TqiMQNwFV04/bTHeEcjL/2
+        f3T4ghSNv+1ceYqMDUy2qHz2a0l6ZgA5X7Gk3Fh8FCsMX1qS6XNh/9gamlfoAgZ0xkaTyI1xfRz
+        THsOzB6/euwD2
+X-Received: by 2002:a5d:5982:0:b0:204:1b19:40da with SMTP id n2-20020a5d5982000000b002041b1940damr6150027wri.23.1647956179332;
+        Tue, 22 Mar 2022 06:36:19 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzt2WiiDuMgW7o4aI8TTeUozv/0SKfKOVFu6npOXGitY0mPpGVzP8XK+kXs7cco7hBpouXLOw==
+X-Received: by 2002:a5d:5982:0:b0:204:1b19:40da with SMTP id n2-20020a5d5982000000b002041b1940damr6150004wri.23.1647956179070;
+        Tue, 22 Mar 2022 06:36:19 -0700 (PDT)
+Received: from redhat.com ([2.55.132.0])
+        by smtp.gmail.com with ESMTPSA id q14-20020a1cf30e000000b0038986a18ec8sm1910031wmq.46.2022.03.22.06.36.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Mar 2022 06:36:18 -0700 (PDT)
+Date:   Tue, 22 Mar 2022 09:36:14 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     netdev@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        Asias He <asias@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Stefan Hajnoczi <stefanha@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net] vsock/virtio: enable VQs early on probe
+Message-ID: <20220322092723-mutt-send-email-mst@kernel.org>
+References: <20220322103823.83411-1-sgarzare@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH v18 13/18] s390/vfio-ap: implement in-use callback for
- vfio_ap driver
-Content-Language: en-US
-To:     jjherne@linux.ibm.com, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     freude@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
-        mjrosato@linux.ibm.com, pasic@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com
-References: <20220215005040.52697-1-akrowiak@linux.ibm.com>
- <20220215005040.52697-14-akrowiak@linux.ibm.com>
- <37e98e6e-35a7-a77a-b057-e19b307c631a@linux.ibm.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-In-Reply-To: <37e98e6e-35a7-a77a-b057-e19b307c631a@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: ld6WgwifEOk6QCcEriFpJGHb8n3IZHSk
-X-Proofpoint-ORIG-GUID: KDkUGfMlekwWBt1i2Hg0TIl3E6zSU8Lp
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-03-22_04,2022-03-22_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- mlxlogscore=999 priorityscore=1501 mlxscore=0 malwarescore=0 bulkscore=0
- adultscore=0 lowpriorityscore=0 impostorscore=0 clxscore=1015 phishscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2203220076
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H4,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220322103823.83411-1-sgarzare@redhat.com>
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Mar 22, 2022 at 11:38:23AM +0100, Stefano Garzarella wrote:
+> virtio spec requires drivers to set DRIVER_OK before using VQs.
+> This is set automatically after probe returns, but virtio-vsock
+> driver uses VQs in the probe function to fill rx and event VQs
+> with new buffers.
 
 
-On 3/22/22 09:13, Jason J. Herne wrote:
-> On 2/14/22 19:50, Tony Krowiak wrote:
-> ...
->> diff --git a/drivers/s390/crypto/vfio_ap_ops.c 
->> b/drivers/s390/crypto/vfio_ap_ops.c
->> index e9f7ec6fc6a5..63dfb9b89581 100644
->> --- a/drivers/s390/crypto/vfio_ap_ops.c
->> +++ b/drivers/s390/crypto/vfio_ap_ops.c
->> @@ -617,10 +617,32 @@ static int 
->> vfio_ap_mdev_verify_no_sharing(unsigned long *mdev_apm,
->>       return 0;
->>   }
->>   +/**
->> + * vfio_ap_mdev_validate_masks - verify that the APQNs assigned to 
->> the mdev are
->> + *                 not reserved for the default zcrypt driver and
->> + *                 are not assigned to another mdev.
->> + *
->> + * @matrix_mdev: the mdev to which the APQNs being validated are 
->> assigned.
->> + *
->> + * Return: One of the following values:
->> + * o the error returned from the 
->> ap_apqn_in_matrix_owned_by_def_drv() function,
->> + *   most likely -EBUSY indicating the ap_perms_mutex lock is 
->> already held.
->> + * o EADDRNOTAVAIL if an APQN assigned to @matrix_mdev is reserved 
->> for the
->> + *           zcrypt default driver.
->> + * o EADDRINUSE if an APQN assigned to @matrix_mdev is assigned to 
->> another mdev
->> + * o A zero indicating validation succeeded.
->> + */
->>   static int vfio_ap_mdev_validate_masks(struct ap_matrix_mdev 
->> *matrix_mdev)
->>   {
->> -    if (ap_apqn_in_matrix_owned_by_def_drv(matrix_mdev->matrix.apm,
->> -                           matrix_mdev->matrix.aqm))
->> +    int ret;
->> +
->> +    ret = ap_apqn_in_matrix_owned_by_def_drv(matrix_mdev->matrix.apm,
->> +                         matrix_mdev->matrix.aqm);
->> +
->> +    if (ret < 0)
->> +        return ret;
->> +
->> +    if (ret == 1)
->>           return -EADDRNOTAVAIL;
->
-> I took a look at ap_apqn_in_matrix_owned_by_def_drv(). It appears that 
-> this function
-> can only ever return 0 or 1. This patch is changed to watch for a 
-> negative return
-> value from ap_apqn_in_matrix_owned_by_def_drv(). Am I missing something?
+So this is a spec violation. absolutely.
 
-That's odd, careless error, I'll fix it.
+> Let's fix this, calling virtio_device_ready() before using VQs
+> in the probe function.
+> 
+> Fixes: 0ea9e1d3a9e3 ("VSOCK: Introduce virtio_transport.ko")
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> ---
+>  net/vmw_vsock/virtio_transport.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+> index 5afc194a58bb..b1962f8cd502 100644
+> --- a/net/vmw_vsock/virtio_transport.c
+> +++ b/net/vmw_vsock/virtio_transport.c
+> @@ -622,6 +622,8 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
+>  	INIT_WORK(&vsock->event_work, virtio_transport_event_work);
+>  	INIT_WORK(&vsock->send_pkt_work, virtio_transport_send_pkt_work);
+>  
+> +	virtio_device_ready(vdev);
+> +
+>  	mutex_lock(&vsock->tx_lock);
+>  	vsock->tx_run = true;
+>  	mutex_unlock(&vsock->tx_lock);
 
->
->
+Here's the whole code snippet:
+
+
+        mutex_lock(&vsock->tx_lock);
+        vsock->tx_run = true;
+        mutex_unlock(&vsock->tx_lock);
+
+        mutex_lock(&vsock->rx_lock);
+        virtio_vsock_rx_fill(vsock);
+        vsock->rx_run = true;
+        mutex_unlock(&vsock->rx_lock);
+
+        mutex_lock(&vsock->event_lock);
+        virtio_vsock_event_fill(vsock);
+        vsock->event_run = true;
+        mutex_unlock(&vsock->event_lock);
+
+        if (virtio_has_feature(vdev, VIRTIO_VSOCK_F_SEQPACKET))
+                vsock->seqpacket_allow = true;
+
+        vdev->priv = vsock;
+        rcu_assign_pointer(the_virtio_vsock, vsock);
+
+        mutex_unlock(&the_virtio_vsock_mutex);
+
+
+I worry that this is not the only problem here:
+seqpacket_allow and setting of vdev->priv at least after
+device is active look suspicious.
+E.g.:
+
+static void virtio_vsock_event_done(struct virtqueue *vq)
+{
+        struct virtio_vsock *vsock = vq->vdev->priv;
+
+        if (!vsock)
+                return;
+        queue_work(virtio_vsock_workqueue, &vsock->event_work);
+}
+
+looks like it will miss events now they will be reported earlier.
+One might say that since vq has been kicked it might send
+interrupts earlier too so not a new problem, but
+there's a chance device actually waits until DRIVER_OK
+to start operating.
+
+
+> -- 
+> 2.35.1
 
