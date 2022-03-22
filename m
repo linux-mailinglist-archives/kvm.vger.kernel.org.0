@@ -2,114 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D00F4E3B23
-	for <lists+kvm@lfdr.de>; Tue, 22 Mar 2022 09:48:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ED3344E3B62
+	for <lists+kvm@lfdr.de>; Tue, 22 Mar 2022 10:02:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231153AbiCVItz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Mar 2022 04:49:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53842 "EHLO
+        id S232164AbiCVJEN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Mar 2022 05:04:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230054AbiCVItx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Mar 2022 04:49:53 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFA056D3A9
-        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 01:48:25 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S232161AbiCVJEM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Mar 2022 05:04:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B0E567E088
+        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 02:02:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1647939764;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=kIECeaOGNGThyDsccgXqUeks22kwbKKUnoocC2+ZGhY=;
+        b=PhMo9LKaXTLlIYFed9E3XC6Vxy/0fxAAVHYVAI7q+aRd4b2rQqtMN/398dsrw3JJpUGeaz
+        rrXw6pFWaywQG84pahL61nQyi9Lr+lPQdzop2mLlDVmZkinhB2x2brouJgCg2g6xTloYeH
+        F6XrlT+GCgpdnyDtrVq/0uwFtjsdbHQ=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-639-Etli3fYZNuKVkCjWzVCwuA-1; Tue, 22 Mar 2022 05:02:41 -0400
+X-MC-Unique: Etli3fYZNuKVkCjWzVCwuA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 529F061620
-        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 08:48:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD3E6C340EC;
-        Tue, 22 Mar 2022 08:48:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1647938904;
-        bh=Uds2yt6H1y65fhPnvGjWXdpR5/JP7jfcOFrj7qPJFcI=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=H8N/fMRWalNI5m8S8DWvtFYQR414v1HclflHQBJ2eZ7Owv67YZpxoLOpksAW4cqQj
-         xWyd4yVE8YVuf8wMafMuz0Bfbj1WVkIpYe3Zq1DEH/xnW07Yb0l7aKluRRubYMb6tW
-         UCM4J27TlZgN0JX83SM9aFgbMGjNpcZStR2zDEjdCAI79NcET5Sr75x4OReCgZmD/7
-         qGq2z6udGF3HrDz2iLPavDUtzmQx75NCjxC1b0psRA9q0ne+suVtVYmEyyTo96aqqv
-         PahlcJVVcFY7cHLSrKhSYCFH+g2M43vxkCPsTkgnm96r3ihGz2wuyB6T076vgWCM82
-         pQQbtEEyGwWjg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1nWaBi-00GDUi-3I; Tue, 22 Mar 2022 08:48:22 +0000
-Date:   Tue, 22 Mar 2022 08:48:21 +0000
-Message-ID: <87cziextii.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     Oliver Upton <oupton@google.com>
-Cc:     Reiji Watanabe <reijiw@google.com>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 2/2] KVM: arm64: Actually prevent SMC64 SYSTEM_RESET2 from AArch32
-In-Reply-To: <YjljaS3Jeste4/ID@google.com>
-References: <20220318193831.482349-1-oupton@google.com>
-        <20220318193831.482349-3-oupton@google.com>
-        <CAAeT=FwR-=U_0WvKqV4UTCmo8x1=atBVtTQeirwiF3XCo+S=1g@mail.gmail.com>
-        <YjljaS3Jeste4/ID@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oupton@google.com, reijiw@google.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org, pshier@google.com, ricarkol@google.com, pbonzini@redhat.com, will@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AFE6938008A1;
+        Tue, 22 Mar 2022 09:02:40 +0000 (UTC)
+Received: from sirius.home.kraxel.org (unknown [10.39.196.67])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6747A40C1257;
+        Tue, 22 Mar 2022 09:02:40 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+        id E4EC9180062E; Tue, 22 Mar 2022 10:02:38 +0100 (CET)
+Date:   Tue, 22 Mar 2022 10:02:38 +0100
+From:   Gerd Hoffmann <kraxel@redhat.com>
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Laszlo Ersek <lersek@redhat.com>,
+        Eric Blake <eblake@redhat.com>,
+        Connor Kuehl <ckuehl@redhat.com>, isaku.yamahata@intel.com,
+        erdemaktas@google.com, kvm@vger.kernel.org, qemu-devel@nongnu.org,
+        seanjc@google.com
+Subject: Re: [RFC PATCH v3 12/36] i386/tdx: Add property sept-ve-disable for
+ tdx-guest object
+Message-ID: <20220322090238.6job2whybu6ntor7@sirius.home.kraxel.org>
+References: <20220317135913.2166202-1-xiaoyao.li@intel.com>
+ <20220317135913.2166202-13-xiaoyao.li@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220317135913.2166202-13-xiaoyao.li@intel.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 22 Mar 2022 05:49:29 +0000,
-Oliver Upton <oupton@google.com> wrote:
-> 
-> On Mon, Mar 21, 2022 at 09:41:39PM -0700, Reiji Watanabe wrote:
-> > On 3/18/22 12:38 PM, Oliver Upton wrote:
-> > > The SMCCC does not allow the SMC64 calling convention to be used from
-> > > AArch32. While KVM checks to see if the calling convention is allowed in
-> > > PSCI_1_0_FN_PSCI_FEATURES, it does not actually prevent calls to
-> > > unadvertised PSCI v1.0+ functions.
-> > >
-> > > Check to see if the requested function is allowed from the guest's
-> > > execution state. Deny the call if it is not.
-> > >
-> > > Fixes: d43583b890e7 ("KVM: arm64: Expose PSCI SYSTEM_RESET2 call to the guest")
-> > > Cc: Will Deacon <will@kernel.org>
-> > > Signed-off-by: Oliver Upton <oupton@google.com>
-> > 
-> > Reviewed-by: Reiji Watanabe <reijiw@google.com>
-> 
-> Appreciated :-)
-> 
-> > BTW, considering the new kvm_psci_check_allowed_function()implementation
-> > in the patch-1, it might be better to call kvm_psci_check_allowed_function()
-> > from kvm_psci_call() instead?  Then, we could avoid the similar issue
-> > next time we support a newer PSCI version.
-> 
-> Good point. If Marc doesn't bite in the next day or two I'll address
-> this with a new spin, otherwise I'll do a separate cleanup. Just want to
-> avoid spamming on this topic since I already replied with yet another
-> patch [1].
+On Thu, Mar 17, 2022 at 09:58:49PM +0800, Xiaoyao Li wrote:
+> Add sept-ve-disable property for tdx-guest object. It's used to
+> configure bit 28 of TD attributes.
 
-Please do, and I'll queue that for -rc1.
+What is this?
 
-Thanks,
+> --- a/qapi/qom.json
+> +++ b/qapi/qom.json
+> @@ -792,10 +792,13 @@
+>  #
+>  # @attributes: TDX guest's attributes (default: 0)
+>  #
+> +# @sept-ve-disable: attributes.sept-ve-disable[bit 28] (default: 0)
 
-	M.
+I'd suggest to document this here.
 
--- 
-Without deviation from the norm, progress is not possible.
+thanks,
+  Gerd
+
