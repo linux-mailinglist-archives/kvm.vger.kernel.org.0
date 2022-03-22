@@ -2,164 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D859A4E414C
-	for <lists+kvm@lfdr.de>; Tue, 22 Mar 2022 15:29:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7BE634E417A
+	for <lists+kvm@lfdr.de>; Tue, 22 Mar 2022 15:36:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231964AbiCVOaT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Mar 2022 10:30:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51362 "EHLO
+        id S237899AbiCVOiQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Mar 2022 10:38:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55250 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237959AbiCVOaM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Mar 2022 10:30:12 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7516C5F8C7
-        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 07:28:42 -0700 (PDT)
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22MCNC6c015818;
-        Tue, 22 Mar 2022 14:28:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=Z11ip5jrLOij8BXLnCPgbTlxu3V4V2bH59QABl1feLg=;
- b=BczGLBtEMxnowfT8fLOgC1GFwTyCE/2HfKvumu6qJLy8/qhSr58Xv/NV1gDqqGD7wqfH
- yqnrXGSHgknAZty02m9eyuTGjUhN9WIEu+OHItaqjgUY4/Kpds+UbKra3KuN7l45+3KX
- qwesFXxcS/QcDiDC+znU/AfluG2pfgxbwCEv73crkmiJi5HS5SFyDRF02hQrV+/17PpU
- QcZs6O2904T/FCCI/in2lQ7m92LEh2CUBWeaTcrLF2kMD2nGTsfGfBdw06N9Roa2uWnd
- lVwoz2lSGWvCt7LSGgYncKixjkHN4fMCB/0AQr7G2peUyG2hv2rN4NpBtAQH9VwDqO2w 8Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3ey86uucc8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 22 Mar 2022 14:28:29 +0000
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22MDPw2E015728;
-        Tue, 22 Mar 2022 14:28:29 GMT
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3ey86uucbe-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 22 Mar 2022 14:28:29 +0000
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22MEHoxM028025;
-        Tue, 22 Mar 2022 14:28:26 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma02fra.de.ibm.com with ESMTP id 3ew6t8ngak-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 22 Mar 2022 14:28:26 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22MESNIX25821494
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 22 Mar 2022 14:28:24 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BC18DA4059;
-        Tue, 22 Mar 2022 14:28:23 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7AFA8A4040;
-        Tue, 22 Mar 2022 14:28:22 +0000 (GMT)
-Received: from sig-9-145-28-179.uk.ibm.com (unknown [9.145.28.179])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 22 Mar 2022 14:28:22 +0000 (GMT)
-Message-ID: <808a871b3918dc067031085de3e8af6b49c6ef89.camel@linux.ibm.com>
-Subject: Re: [PATCH RFC 04/12] kernel/user: Allow user::locked_vm to be
- usable for iommufd
-From:   Niklas Schnelle <schnelle@linux.ibm.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Eric Auger <eric.auger@redhat.com>,
-        iommu@lists.linux-foundation.org, Jason Wang <jasowang@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        Yi Liu <yi.l.liu@intel.com>, Keqian Zhu <zhukeqian1@huawei.com>
-Date:   Tue, 22 Mar 2022 15:28:22 +0100
-In-Reply-To: <4-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
-References: <4-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-18.el8) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: ZmEmteEVUeELimln3m8Svl5vaJY_h_ne
-X-Proofpoint-ORIG-GUID: 2jgrEHbOtCoiWH372ljhi9hP5boIxdqN
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-03-22_04,2022-03-22_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxlogscore=999
- impostorscore=0 bulkscore=0 adultscore=0 suspectscore=0 malwarescore=0
- priorityscore=1501 lowpriorityscore=0 mlxscore=0 spamscore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
- definitions=main-2203220082
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S237892AbiCVOiI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Mar 2022 10:38:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 05F976AA52
+        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 07:36:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1647959800;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=dOj1GKJWSWVxdAPCqvgvT1u26bVfFeq3QZ8vKHNzDPY=;
+        b=JLW51DjHlne2/HpaYrwy/g838nJtgFPimIYHSeN2Mo8eaEQuHtsVQZP+qQMmTiXByqsxt/
+        1Y8W47iwqPVDdHxtpQbxTW5cnJ+CJ1nISGQMvKIlDVmdV1mrTQobPfSPp2C6k1xauEBHYL
+        8QdBSF/qJ6tpBBfXu33n/oU/DxsEryg=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-649-ue21NQ5kOgCBz0yLK98WXQ-1; Tue, 22 Mar 2022 10:36:38 -0400
+X-MC-Unique: ue21NQ5kOgCBz0yLK98WXQ-1
+Received: by mail-qt1-f199.google.com with SMTP id x10-20020ac8700a000000b002c3ef8fc44cso11678383qtm.8
+        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 07:36:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=dOj1GKJWSWVxdAPCqvgvT1u26bVfFeq3QZ8vKHNzDPY=;
+        b=xudVfoYeuQGFFcriK7AYmsCcNmzUHYtJ44qEsKEMQmhK0v2G383c7mq33AUGRmcuHj
+         GD3vADvAkpf2aSqac7GGmO9qwqeXNFfslnE0h17E1N65HmI4UvWZBemPkj74sGnMOVcs
+         Z8AZNnw1pHT3ZPhsL+wk4u+p98RmFobWAT3RsUOQ2X6aOW83kyJEQNCoqNrXdsFYuAMU
+         VIdDszyLHOFbGGoEEvleWP5hdRXVyGW88kdzrDhSh4Fy6x2d7SEPOFQxME5aDdVdbT08
+         S5v/5n30BzMvKa3Kngmwk2Whm9+3DbE93dV8IIIP5VMG9ZqG207N91/W7nTBvGd54dvs
+         pI8w==
+X-Gm-Message-State: AOAM530dz9Xi3a+yIB3ABKYCOPl8bpIyoI8Z8MgmonTZWxun4NONVS/E
+        gKvUhWMQLQV/8KFopyVZ7AAJxbGU6Z3W6cD72xJQ+eStI+nqiDrkCu4JjTG55NYmqrg+x6lJuSw
+        LiBRe6kjvhkrW
+X-Received: by 2002:a05:620a:28d2:b0:67e:c956:7ca8 with SMTP id l18-20020a05620a28d200b0067ec9567ca8mr471786qkp.683.1647959798183;
+        Tue, 22 Mar 2022 07:36:38 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwXDv4AGOYhcpwZ3iXOsgSE7vB8MlD/bpaFwtt1h5AIpAisGg+eAfZ6KhHHNlDh4AUml/kF1w==
+X-Received: by 2002:a05:620a:28d2:b0:67e:c956:7ca8 with SMTP id l18-20020a05620a28d200b0067ec9567ca8mr471763qkp.683.1647959797928;
+        Tue, 22 Mar 2022 07:36:37 -0700 (PDT)
+Received: from sgarzare-redhat (host-87-12-25-114.business.telecomitalia.it. [87.12.25.114])
+        by smtp.gmail.com with ESMTPSA id h27-20020a05620a13fb00b0067b3615e4acsm8944129qkl.70.2022.03.22.07.36.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Mar 2022 07:36:37 -0700 (PDT)
+Date:   Tue, 22 Mar 2022 15:36:31 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     netdev@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Stefan Hajnoczi <stefanha@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net] vsock/virtio: enable VQs early on probe
+Message-ID: <20220322143631.gt32cshbwyetq2fh@sgarzare-redhat>
+References: <20220322103823.83411-1-sgarzare@redhat.com>
+ <20220322092723-mutt-send-email-mst@kernel.org>
+ <20220322140500.bn5yrqj5ljckhcdb@sgarzare-redhat>
+ <20220322100835-mutt-send-email-mst@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20220322100835-mutt-send-email-mst@kernel.org>
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2022-03-18 at 14:27 -0300, Jason Gunthorpe wrote:
-> Following the pattern of io_uring, perf, skb, and bpf iommfd will use
-                                                iommufd ----^
-> user->locked_vm for accounting pinned pages. Ensure the value is included
-> in the struct and export free_uid() as iommufd is modular.
-> 
-> user->locked_vm is the correct accounting to use for ulimit because it is
-> per-user, and the ulimit is not supposed to be per-process. Other
-> places (vfio, vdpa and infiniband) have used mm->pinned_vm and/or
-> mm->locked_vm for accounting pinned pages, but this is only per-process
-> and inconsistent with the majority of the kernel.
+On Tue, Mar 22, 2022 at 10:09:06AM -0400, Michael S. Tsirkin wrote:
+>On Tue, Mar 22, 2022 at 03:05:00PM +0100, Stefano Garzarella wrote:
+>> On Tue, Mar 22, 2022 at 09:36:14AM -0400, Michael S. Tsirkin wrote:
+>> > On Tue, Mar 22, 2022 at 11:38:23AM +0100, Stefano Garzarella wrote:
+>> > > virtio spec requires drivers to set DRIVER_OK before using VQs.
+>> > > This is set automatically after probe returns, but virtio-vsock
+>> > > driver uses VQs in the probe function to fill rx and event VQs
+>> > > with new buffers.
+>> >
+>> >
+>> > So this is a spec violation. absolutely.
+>> >
+>> > > Let's fix this, calling virtio_device_ready() before using VQs
+>> > > in the probe function.
+>> > >
+>> > > Fixes: 0ea9e1d3a9e3 ("VSOCK: Introduce virtio_transport.ko")
+>> > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+>> > > ---
+>> > >  net/vmw_vsock/virtio_transport.c | 2 ++
+>> > >  1 file changed, 2 insertions(+)
+>> > >
+>> > > diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+>> > > index 5afc194a58bb..b1962f8cd502 100644
+>> > > --- a/net/vmw_vsock/virtio_transport.c
+>> > > +++ b/net/vmw_vsock/virtio_transport.c
+>> > > @@ -622,6 +622,8 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
+>> > >  	INIT_WORK(&vsock->event_work, virtio_transport_event_work);
+>> > >  	INIT_WORK(&vsock->send_pkt_work, virtio_transport_send_pkt_work);
+>> > >
+>> > > +	virtio_device_ready(vdev);
+>> > > +
+>> > >  	mutex_lock(&vsock->tx_lock);
+>> > >  	vsock->tx_run = true;
+>> > >  	mutex_unlock(&vsock->tx_lock);
+>> >
+>> > Here's the whole code snippet:
+>> >
+>> >
+>> >        mutex_lock(&vsock->tx_lock);
+>> >        vsock->tx_run = true;
+>> >        mutex_unlock(&vsock->tx_lock);
+>> >
+>> >        mutex_lock(&vsock->rx_lock);
+>> >        virtio_vsock_rx_fill(vsock);
+>> >        vsock->rx_run = true;
+>> >        mutex_unlock(&vsock->rx_lock);
+>> >
+>> >        mutex_lock(&vsock->event_lock);
+>> >        virtio_vsock_event_fill(vsock);
+>> >        vsock->event_run = true;
+>> >        mutex_unlock(&vsock->event_lock);
+>> >
+>> >        if (virtio_has_feature(vdev, VIRTIO_VSOCK_F_SEQPACKET))
+>> >                vsock->seqpacket_allow = true;
+>> >
+>> >        vdev->priv = vsock;
+>> >        rcu_assign_pointer(the_virtio_vsock, vsock);
+>> >
+>> >        mutex_unlock(&the_virtio_vsock_mutex);
+>> >
+>> >
+>> > I worry that this is not the only problem here:
+>> > seqpacket_allow and setting of vdev->priv at least after
+>> > device is active look suspicious.
+>>
+>> Right, so if you agree I'll move these before virtio_device_ready().
+>>
+>> > E.g.:
+>> >
+>> > static void virtio_vsock_event_done(struct virtqueue *vq)
+>> > {
+>> >        struct virtio_vsock *vsock = vq->vdev->priv;
+>> >
+>> >        if (!vsock)
+>> >                return;
+>> >        queue_work(virtio_vsock_workqueue, &vsock->event_work);
+>> > }
+>> >
+>> > looks like it will miss events now they will be reported earlier.
+>> > One might say that since vq has been kicked it might send
+>> > interrupts earlier too so not a new problem, but
+>> > there's a chance device actually waits until DRIVER_OK
+>> > to start operating.
+>>
+>> Yes I see, should I break into 2 patches (one where I move the code already
+>> present and this one)?
+>>
+>> Maybe a single patch is fine since it's the complete solution.
+>>
+>> Thank you for the detailed explanation,
+>> Stefano
+>
+>Two I think since movement can be backported to before the hardening
+>effort.
 
-Since this will replace parts of vfio this difference seems
-significant. Can you explain this a bit more?
+Yep, maybe 3 since seqpacket was added later.
 
-I'm also a bit confused how io_uring handles this. When I stumbled over
-the problem fixed by 6b7898eb180d ("io_uring: fix imbalanced sqo_mm
-accounting") and from that commit description I seem to rember that
-io_uring also accounts in mm->locked_vm too? In fact I stumbled over
-that because the wrong accounting in io_uring exhausted the applied to
-vfio (I was using a QEMU utilizing io_uring itself).
-
-> 
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> ---
->  include/linux/sched/user.h | 2 +-
->  kernel/user.c              | 1 +
->  2 files changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/linux/sched/user.h b/include/linux/sched/user.h
-> index 00ed419dd46413..c47dae71dad3c8 100644
-> --- a/include/linux/sched/user.h
-> +++ b/include/linux/sched/user.h
-> @@ -24,7 +24,7 @@ struct user_struct {
->  	kuid_t uid;
->  
->  #if defined(CONFIG_PERF_EVENTS) || defined(CONFIG_BPF_SYSCALL) || \
-> -    defined(CONFIG_NET) || defined(CONFIG_IO_URING)
-> +    defined(CONFIG_NET) || defined(CONFIG_IO_URING) || IS_ENABLED(CONFIG_IOMMUFD)
->  	atomic_long_t locked_vm;
->  #endif
->  #ifdef CONFIG_WATCH_QUEUE
-> diff --git a/kernel/user.c b/kernel/user.c
-> index e2cf8c22b539a7..d667debeafd609 100644
-> --- a/kernel/user.c
-> +++ b/kernel/user.c
-> @@ -185,6 +185,7 @@ void free_uid(struct user_struct *up)
->  	if (refcount_dec_and_lock_irqsave(&up->__count, &uidhash_lock, &flags))
->  		free_user(up, flags);
->  }
-> +EXPORT_SYMBOL_GPL(free_uid);
->  
->  struct user_struct *alloc_uid(kuid_t uid)
->  {
-
+Thanks,
+Stefano
 
