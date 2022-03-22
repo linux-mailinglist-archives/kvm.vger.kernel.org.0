@@ -2,114 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 32D764E3D3B
-	for <lists+kvm@lfdr.de>; Tue, 22 Mar 2022 12:08:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B48484E3D57
+	for <lists+kvm@lfdr.de>; Tue, 22 Mar 2022 12:17:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234011AbiCVLJA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Mar 2022 07:09:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46716 "EHLO
+        id S233995AbiCVLTB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Mar 2022 07:19:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233989AbiCVLIx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Mar 2022 07:08:53 -0400
-Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E2F682D00;
-        Tue, 22 Mar 2022 04:07:25 -0700 (PDT)
-Received: by mail-wm1-x334.google.com with SMTP id j13-20020a05600c1c0d00b0038c8f94aac2so1642221wms.3;
-        Tue, 22 Mar 2022 04:07:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:from:to:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=7thz8A1qDZ9O9kPPviZdxO9DIiJuxrdkli/BxSR2ssw=;
-        b=n/DsP31Ag3DGCqh9F+O3ZhVFcPBnDla0XMad+AH7nL3g2GNpOYX98M0MANxLiDA7ft
-         WTnGACa4Ie/Jj27sjx6d4hEbGhC20DPbw3KpuEhHuUbvhk5n1p/0vHC4e8kgs4dNxG1Q
-         /zl/yc/O43fRMTg1UgTy0LAmRm71oixqEqi9sT8fZYb3RaZW6PRSLYYEmqbaP/ruyJ5h
-         u7LDrunerom5ZG97edOsrhuy65hCQZRxHMPncTBUTRmTK6QAmp5Py9XYdyn3wthcoW5F
-         3FaMcPLKri9qFypW1QHXeZKCcto5I6DaouqPT37cM/6ew8IYS8xtubc0lrCPJG2R6nfm
-         U/dw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:from:to:subject:date:message-id
-         :in-reply-to:references:mime-version:content-transfer-encoding;
-        bh=7thz8A1qDZ9O9kPPviZdxO9DIiJuxrdkli/BxSR2ssw=;
-        b=V/IjkCURh39gg/ES7njl/FsDC3Nwaa02g0EBQazwdi5LaQDoWY4aFeL8Y+3o1PQg04
-         qdd0MZhZv4UjtOP4czPWHZASmCepqRDgFY8JpRYUYOkWc+SaDXm0iF+ijOfUpjfhA4aX
-         HiL70khih3cbTj+LRxZ0QnIrc3I7g7h5ZrI759V5YH6QpQ9nq9k8pE9oLpn5v8Djkgzf
-         6xJSgP5WSDU7mZaWWI5NgfEhxxSF1mzi+9lVc1mI36UT5rSRCUp4kZniFtWE59HfKW+C
-         XS+tMVfZhnTXYJc6XZVXA6iPZYLUXPRM17vC20SS8TLXAl8yHYeSbCj4l+DtqyFaJbd0
-         ObWw==
-X-Gm-Message-State: AOAM533mg0KB//24CUFrKOsh3Qj3aXsev6Jh18gotM2+Kv1F0AF7pg3+
-        lo/BpEXiyMfXkq+Xpn94YbUyStS0RyA=
-X-Google-Smtp-Source: ABdhPJwlHPsjgi7u2ucteECw2jdvrPzfehXTh8hSg4hWYqw6Xpqyt9hupR+psdsbQWA/eeAP5+L6rw==
-X-Received: by 2002:a1c:e908:0:b0:38c:782c:2a62 with SMTP id q8-20020a1ce908000000b0038c782c2a62mr3128805wmc.135.1647947243799;
-        Tue, 22 Mar 2022 04:07:23 -0700 (PDT)
-Received: from avogadro.lan ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id y11-20020a056000168b00b002041af9a73fsm4221856wrd.84.2022.03.22.04.07.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Mar 2022 04:07:23 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [PATCH 2/2] Documentation: kvm: include new locks
-Date:   Tue, 22 Mar 2022 12:07:20 +0100
-Message-Id: <20220322110720.222499-3-pbonzini@redhat.com>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220322110720.222499-1-pbonzini@redhat.com>
-References: <20220322110720.222499-1-pbonzini@redhat.com>
+        with ESMTP id S231830AbiCVLS6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Mar 2022 07:18:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D68307DAA6
+        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 04:17:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1647947849;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=H41xAxhmddWJigWYNLoIQApqV9cFykwx5iF2pkoPt5s=;
+        b=STf45Yy4MfGsXBxphRmz2jQtAAyLwCSX3k95VXX2CVwGPjuFK1OEXdbu8ZsLa8c20cI0A/
+        oZtvYKbO6oFc+XAsNydIf/rnDd33fg18Cag6OA1nrReZINOkxEYG+GVV7iRbZSMDm22nMr
+        BadaV31TcqhWdf2khP8RT2iXBdvImm8=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-630-1rSftk1YNRuRWh2eK2P3EQ-1; Tue, 22 Mar 2022 07:17:26 -0400
+X-MC-Unique: 1rSftk1YNRuRWh2eK2P3EQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 765EA1C04B68;
+        Tue, 22 Mar 2022 11:17:25 +0000 (UTC)
+Received: from starship (unknown [10.40.194.231])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A00ED1121314;
+        Tue, 22 Mar 2022 11:17:19 +0000 (UTC)
+Message-ID: <58702837572513e99eb859e2fc4d0e60ac27910d.camel@redhat.com>
+Subject: Re: [PATCH v3 4/7] KVM: x86: nSVM: support PAUSE filter threshold
+ and count when cpu_pm=on
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>
+Cc:     kvm@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
+        Wanpeng Li <wanpengli@tencent.com>
+Date:   Tue, 22 Mar 2022 13:17:18 +0200
+In-Reply-To: <b81c095a-30b2-95c6-1b5f-dfa102f5790a@redhat.com>
+References: <20220301143650.143749-1-mlevitsk@redhat.com>
+         <20220301143650.143749-5-mlevitsk@redhat.com>
+         <CALMp9eRjY6sX0OEBeYw4RsQKSjKvXKWOqRe=GVoQnmjy6D8deg@mail.gmail.com>
+         <6a7f13d1-ed00-b4a6-c39b-dd8ba189d639@redhat.com>
+         <CALMp9eRRT6pi6tjZvsFbEhrgS+zsNg827iLD4Hvzsa4PeB6W-Q@mail.gmail.com>
+         <abe8584fa3691de1d6ae6c6617b8ea750b30fd1c.camel@redhat.com>
+         <CALMp9eSUSexhPWMWXE1HpSD+movaYcdge_J95LiLCnJyMEp3WA@mail.gmail.com>
+         <8071f0f0a857b0775f1fb2d1ebd86ffc4fd9096b.camel@redhat.com>
+         <CALMp9eQgDpL0eD_GZde-s+THPWvQ0v6kmj3z_023f_KPERAyyA@mail.gmail.com>
+         <b81c095a-30b2-95c6-1b5f-dfa102f5790a@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-kvm->mn_invalidate_lock and kvm->slots_arch_lock were not included in the
-documentation, add them.
+On Tue, 2022-03-22 at 11:12 +0100, Paolo Bonzini wrote:
+> On 3/21/22 23:41, Jim Mattson wrote:
+> > > 100%. Do you have a pointer where to document it?
+> > I think this will be the first KVM virtual CPU erratum documented,
+> > though there are plenty of others that I'd like to see documented
+> > (e.g. nVMX processes posted interrupts on emulated VM-entry, AMD's
+> > merged PMU counters are only 48 bits wide, etc.).
+> > 
+> > Maybe Paolo has some ideas?
+> 
+> So let's document them, that's a great idea.  I can help writing them 
+> down if you have a pointer to prior email discussions.  I'll send a 
+> skeleton.
+> 
+> Paolo
+> 
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- Documentation/virt/kvm/locking.rst | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+Things that I know that don't work 100% correctly in KVM:
 
-diff --git a/Documentation/virt/kvm/locking.rst b/Documentation/virt/kvm/locking.rst
-index 4f21063bfbd6..486efcd36fd6 100644
---- a/Documentation/virt/kvm/locking.rst
-+++ b/Documentation/virt/kvm/locking.rst
-@@ -226,6 +226,12 @@ time it will be set using the Dirty tracking mechanism described above.
- :Comment:	'raw' because hardware enabling/disabling must be atomic /wrt
- 		migration.
- 
-+``kvm->mn_invalidate_lock``
-+^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+
-+:Type:          spinlock_t
-+:Arch:          any
-+:Protects:      mn_active_invalidate_count, mn_memslots_update_rcuwait
- 
- ``kvm_arch::tsc_write_lock``
- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-@@ -255,6 +261,15 @@ time it will be set using the Dirty tracking mechanism described above.
- 		The srcu index can be stored in kvm_vcpu->srcu_idx per vcpu
- 		if it is needed by multiple functions.
- 
-+``kvm->slots_arch_lock``
-+^^^^^^^^^^^^^^^^^^^^^^^^
-+:Type:          mutex
-+:Arch:          any (only needed on x86 though)
-+:Protects:      any arch-specific fields of memslots that have to be modified
-+                in a ``kvm->srcu`` read-side critical section.
-+:Comment:       must be held before reading the pointer to the current memslots,
-+                until after all changes to the memslots are complete
-+
- ``wakeup_vcpus_on_cpu_lock``
- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
- :Type:		spinlock_t
--- 
-2.35.1
+*  Relocation apic base. changing apic id also likely broken at least in some
+   cases, and sure is with AVIC enabled.
+
+   also likely some other obscure bits of the in-kernel emulation of APIC/IO apic/PIC/etc
+   don't work correctly.
+
+*  Emulator is not complete, so if you do unsupported instruction
+   on mmio, it should fail.
+   Also without unrestricted guest, emulator has to be used sometimes
+   for arbitrary code so it wil fail fast.
+
+*  Shadow mmu doesn't fully reflect real tlb, as tlb is usualy
+   not shared between cpus.
+   Also KVM's shadow mmu is more speculative vs real mmu - breaks old guests like win9x.
+
+   Also no way to disable 1GB pages when NPT/EPT is enabled, since guest paging doesn't
+   trap into the KVM.
+
+*  Various minor issues with debug based on single stepping / DRs, etc,
+   most of which I don't know well. Most of these can be fixed but it low priority,
+   and I have seen many fixes in this area recently.
+   Also proper support for nested monitor trap likely broken.
+
+*  Various msrs are hardcoded/not supported - not much specific info on this.
+   In particular no real support for mtrrs / pat - in fact KVM likes the guest memory to be
+   always WB to avoid various cpu erratas.
+
+
+Best regards,
+	Maxim Levitsky
 
