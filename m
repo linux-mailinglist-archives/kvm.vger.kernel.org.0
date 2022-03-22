@@ -2,61 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0CABD4E3D30
+	by mail.lfdr.de (Postfix) with ESMTP id A3BB44E3D32
 	for <lists+kvm@lfdr.de>; Tue, 22 Mar 2022 12:07:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233963AbiCVLIu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Mar 2022 07:08:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46552 "EHLO
+        id S233995AbiCVLIy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Mar 2022 07:08:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233947AbiCVLIt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Mar 2022 07:08:49 -0400
-Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FE0480212;
-        Tue, 22 Mar 2022 04:07:21 -0700 (PDT)
-Received: by mail-wm1-x331.google.com with SMTP id bg31-20020a05600c3c9f00b00381590dbb33so1275074wmb.3;
-        Tue, 22 Mar 2022 04:07:20 -0700 (PDT)
+        with ESMTP id S233973AbiCVLIv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Mar 2022 07:08:51 -0400
+Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5845A81667;
+        Tue, 22 Mar 2022 04:07:23 -0700 (PDT)
+Received: by mail-wm1-x32d.google.com with SMTP id q20so10424164wmq.1;
+        Tue, 22 Mar 2022 04:07:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=PyWMhkHDA8FmVbcGzMZ4aLs+B2iNMXC/LNGOuXbuKpU=;
-        b=iQCE9QOgyw6+P9QVFLZAqRW03I/v4JSOqAJWIh5qRkD2sHMeVC9mZS4KjYbYEF+1k6
-         o4BGtsO6wS6PzkxrkVjCWSNZ+PELapUEkIDc7I9glm8E9c/4BMMzYwgvegiJxSYQoLts
-         0ZwSKqdAHt2KJnQXijV7qw5CGVr3pLOJfPRRqR9oARvw/T2S863WB1W9WvJnX0yOqAdH
-         a+QrSbsFSFSmBKfadMrPReHwfNdREk0kDpicDsCzKoteaGZjfs8PgbDGqv+ZAnfn7r4v
-         EVNZLySbtOOt6KlMLnInyn36i7sTDJuXQj91OZXjicEZh5lwzdhZ+UHYgP9fVBrUftza
-         Gfjw==
+        h=sender:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=G9NF/ByvMZihSi8ycFZxd0KaxgpJjfhbjqpzyReIHA4=;
+        b=ezlqtlyUZMMiSdjOMfwXeF3Z2UZKLjwusVLC04xgFmalO4LHIho6PG/IKjsVFrziw8
+         a+PTTxlbE2uaoT4Xk/acHIr4gJsOULx9mESGktVz4tCyOLmuTteypMCIjyWjGjIMHI5m
+         7t1KgV0jbp4k5tx93HXqGvIENa/Lj4/vwbN38Ar8JJ9kkPSIFv1Ln3fsPoSLg3ieHeJb
+         c7XtrFidQyRQ4yFHDodYrV6sCCHC9IZSVavYVuza2kebd8L5JRXmU2TcF+uqt1gS/KFN
+         /u2nawhKoZmRn5O+kOTyk0MqQE8VxIl07etAWXeGzNA6VodsKP75m/oRptWR/z5D84+l
+         Op1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-         :in-reply-to:references:mime-version:content-transfer-encoding;
-        bh=PyWMhkHDA8FmVbcGzMZ4aLs+B2iNMXC/LNGOuXbuKpU=;
-        b=a0gDgNdNUpOKzREEd2W9Kmi8CVXaQ+eCLY0ExTTsXpSnsEOxL/f5HQGdXLZQp9+6g9
-         VjEJOXdOyBOUw1flI+hgGG4ABlMUZjFbRcnE6tqGeNhTkv0LdKFY38g+cr9kOHIK7Klw
-         XiOkd5oPrpH3Pg19R8yZXSLpwMZGhJ1jAYlHWios+v6e0rsnZQqRG2MtEH6XBFOzI69C
-         C0aGc+88jSSgQF+zb04Ode9C77s9/hNNe1k+xvSODZsEabTSjKjYoA1qhl5dVbi9IlUM
-         2bYNdjSwTsSZGbXhYjisfrw3OGMXVlM/L4ejP2k7yxaj9my7yEwxtsM+l2xynfmzNjuQ
-         98Iw==
-X-Gm-Message-State: AOAM532XeVAYxWF3j5DpJgarF0efBihmbRSe6NQF0KNN8qK+L51zGsq9
-        7jPbx4iAxtmpDkcxlfsb1jBPi6XsclQ=
-X-Google-Smtp-Source: ABdhPJxlFbZVNjAss+JR1DFkgQFHuwfEo2WgGvgMyD3D5ryBmDRfyGcdhKMgU74bUwPECCY3/iGNug==
-X-Received: by 2002:a5d:6101:0:b0:204:871e:9912 with SMTP id v1-20020a5d6101000000b00204871e9912mr2504628wrt.60.1647947239442;
-        Tue, 22 Mar 2022 04:07:19 -0700 (PDT)
+        h=x-gm-message-state:sender:from:to:subject:date:message-id
+         :mime-version:content-transfer-encoding;
+        bh=G9NF/ByvMZihSi8ycFZxd0KaxgpJjfhbjqpzyReIHA4=;
+        b=IT0oSdW/AQJ0bm8KuxCx5GR943D+Nwtcqo+1elKApy4Af513NmXH1NrtI8p3ZWEf52
+         Rrj9ChP2o4/0EplHJGvaIDEQNM8cgLTSMc1tVU1i923jnH1mT5fZj3MCWcj3rsb9bon8
+         QEBj2CW8ueDapfhqVrf5KeLbo605Q7g5PY99Jt3YdLD1kdtz+rC5d6Dgywv8rWKavUwn
+         mghaxhWkjHKG0aHEz9RM21s2ES/fGN3zFk13UriTSeN2TA+Rv4+A/2tqCI07w4Oh0sY/
+         1C57VZhv9Jkym8TdsWR/AaPo9s0py22ypfY92EB0dLFX/O/09IkEQiI/s6BYX3aeY4zC
+         fgpg==
+X-Gm-Message-State: AOAM533rBTamrObqUaaXQTAGl1KMt6c4KCSNgxTwBv+hJLY+L1s5grBy
+        zZ1SO1oie2t8X6XqSv45FPJjEQx5HBY=
+X-Google-Smtp-Source: ABdhPJx+sJa1O7YnBhUXmGPttjLXE2biLyySMCCW2bmHtZ31GvxGjcAnlRGLYAE4tHWSR4KHP7z/yQ==
+X-Received: by 2002:a5d:526d:0:b0:203:d69f:3a66 with SMTP id l13-20020a5d526d000000b00203d69f3a66mr21673708wrc.74.1647947241856;
+        Tue, 22 Mar 2022 04:07:21 -0700 (PDT)
 Received: from avogadro.lan ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id f13-20020a05600c4e8d00b0038c949ef0d5sm1746379wmq.8.2022.03.22.04.07.18
+        by smtp.gmail.com with ESMTPSA id y11-20020a056000168b00b002041af9a73fsm4221856wrd.84.2022.03.22.04.07.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Mar 2022 04:07:18 -0700 (PDT)
+        Tue, 22 Mar 2022 04:07:21 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     mlevitsk@redhat.com, jmattson@google.com
-Subject: [PATCH 3/3] Documentation: KVM: add API issues section
-Date:   Tue, 22 Mar 2022 12:07:12 +0100
-Message-Id: <20220322110712.222449-4-pbonzini@redhat.com>
+Subject: [PATCH 0/2] Documentation: kvm: improvements to locking.rst
+Date:   Tue, 22 Mar 2022 12:07:18 +0100
+Message-Id: <20220322110720.222499-1-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220322110712.222449-1-pbonzini@redhat.com>
-References: <20220322110712.222449-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -70,70 +67,15 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a section to document all the different ways in which the KVM API sucks.
+Improve the formatting and update the documentation.
 
-I am sure there are way more, give people a place to vent so that userspace
-authors are aware.
+Paolo Bonzini (2):
+  Documentation: kvm: fixes for locking.rst
+  Documentation: kvm: include new locks
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- Documentation/virt/kvm/api.rst | 46 ++++++++++++++++++++++++++++++++++
- 1 file changed, 46 insertions(+)
+ Documentation/virt/kvm/locking.rst | 43 +++++++++++++++++++++++-------
+ 1 file changed, 34 insertions(+), 9 deletions(-)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 9f3172376ec3..8787fcd3b23f 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -7575,3 +7575,49 @@ The argument to KVM_ENABLE_CAP is also a bitmask, and must be a subset
- of the result of KVM_CHECK_EXTENSION.  KVM will forward to userspace
- the hypercalls whose corresponding bit is in the argument, and return
- ENOSYS for the others.
-+
-+9. Known KVM API problems
-+=========================
-+
-+In some cases, KVM's API has some inconsistencies or common pitfalls
-+that userspace need to be aware of.  This section details some of
-+these issues.
-+
-+Most of them are architecture specific, so the section is split by
-+architecture.
-+
-+9.1. x86
-+--------
-+
-+``KVM_GET_SUPPORTED_CPUID`` issues
-+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+
-+In general, ``KVM_GET_SUPPORTED_CPUID`` is designed so that it is possible
-+to take its result and pass it directly to ``KVM_SET_CPUID2``.  This section
-+documents some cases in which that requires some care.
-+
-+Local APIC features
-+~~~~~~~~~~~~~~~~~~~
-+
-+CPU[EAX=1]:ECX[21] (X2APIC) is reported by ``KVM_GET_SUPPORTED_CPUID``,
-+but it can only be enabled if ``KVM_CREATE_IRQCHIP`` or
-+``KVM_ENABLE_CAP(KVM_CAP_IRQCHIP_SPLIT)`` are used to enable in-kernel emulation of
-+the local APIC.
-+
-+The same is true for the ``KVM_FEATURE_PV_UNHALT`` paravirtualized feature.
-+
-+CPU[EAX=1]:ECX[24] (TSC_DEADLINE) is not reported by ``KVM_GET_SUPPORTED_CPUID``.
-+It can be enabled if ``KVM_CAP_TSC_DEADLINE_TIMER`` is present and the kernel
-+has enabled in-kernel emulation of the local APIC.
-+
-+Obsolete ioctls and capabilities
-+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+
-+KVM_CAP_DISABLE_QUIRKS does not let userspace know which quirks are actually
-+available.  Use ``KVM_CHECK_EXTENSION(KVM_CAP_DISABLE_QUIRKS2)`` instead if
-+available.
-+
-+Ordering of KVM_GET_*/KVM_SET_* ioctls
-+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+
-+TBD
 -- 
 2.35.1
 
