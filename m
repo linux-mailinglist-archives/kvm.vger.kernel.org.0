@@ -2,74 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 158E14E3F8B
-	for <lists+kvm@lfdr.de>; Tue, 22 Mar 2022 14:29:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 479744E3F94
+	for <lists+kvm@lfdr.de>; Tue, 22 Mar 2022 14:31:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235609AbiCVNa6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Mar 2022 09:30:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43736 "EHLO
+        id S234509AbiCVNck (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Mar 2022 09:32:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234496AbiCVNaz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Mar 2022 09:30:55 -0400
-Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A79F127CC4
-        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 06:29:28 -0700 (PDT)
-Received: by mail-wm1-x32e.google.com with SMTP id p184-20020a1c29c1000000b0037f76d8b484so1724199wmp.5
-        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 06:29:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=fG9HbzCKw1GM4kFdIeLZU3ef1PIf/GnDdByrJY9IDtI=;
-        b=l5cRMLA71wXL2GFyxJNtw3l5sIjkmgSK8OimI6mBXsbfcJww6pyRvb2QBR0n8E9tu5
-         QsM6iL/G6rJUuUz1eY3+e6+BMXhxuta/cTCRhO2+FuEOwak0t+uEssoVwrv3KGNH3Lgj
-         9xpy0SvHttXboqsRjfC3KcgDlXncw9PgcwCz7QkEKfCSjrEF6HOSCvZ87w110XEd+hHB
-         dnHoUwGPb4xuULdAEeX/l0oGnsMmW9oZvZst/2PlJ6p9PQyp+B+K7jBjDW5Vb6Zm/tQX
-         F9Ko40p1EuaBDK1Vag73lEO2JU5K85ujGCjUf/uvO4LQv4tXBglhJGhbEaM3Jyeswtz0
-         0xqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=fG9HbzCKw1GM4kFdIeLZU3ef1PIf/GnDdByrJY9IDtI=;
-        b=14a9JBci9WMczv/jluor+yfelz+ApHKCVEBK4A7fNPS+hw+oJ2yP89s/hhBTuRgks0
-         5fG1m0vaVgl26+h7puxChhlliX341bLJRUnUky7XaQ72zijJNSgaJb5MFDbkdPr00I7Q
-         VyCoXOnqJQ1OtIzb6a6G0LDoMqU87miKxhHdOyN10h+lq5TGZ4O/hZv/c3a65d9rT+Cn
-         6iaJvpcuxHYqjg2NsSYnor6nbIygMDTLC65AlAw8/Qyux5r+vXWha8ahoxvLyO0NReZD
-         oiVeZ/x9Z6BwBI5E5tzjO57PETqv0UkNfwzLqZupYNUbA3t2cyH3Au35Ganrnl/Bco9F
-         VwqA==
-X-Gm-Message-State: AOAM531bpQFTjQg2JIQrsD3H+HFIRmi2dws3uRIZP4qANQYm2cFBGs8L
-        Cc34FrQlrW9oo0va2ve1Pps=
-X-Google-Smtp-Source: ABdhPJwMQA3KXffkE8yeaemCOJpEmz59thlUG4Zt55AGFcq7ZvPvgziVKGuj+23qtyYOAkANdkQZZA==
-X-Received: by 2002:a05:6000:1687:b0:205:80b7:afca with SMTP id y7-20020a056000168700b0020580b7afcamr525192wrd.665.1647955767166;
-        Tue, 22 Mar 2022 06:29:27 -0700 (PDT)
-Received: from [192.168.1.33] (198.red-83-50-65.dynamicip.rima-tde.net. [83.50.65.198])
-        by smtp.gmail.com with ESMTPSA id g6-20020a5d5406000000b001f049726044sm15548581wrv.79.2022.03.22.06.29.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Mar 2022 06:29:26 -0700 (PDT)
-Message-ID: <e4603209-651f-a0a0-d7be-255e0ddf2db7@gmail.com>
-Date:   Tue, 22 Mar 2022 14:29:25 +0100
+        with ESMTP id S233715AbiCVNch (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Mar 2022 09:32:37 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B239A2DD5E;
+        Tue, 22 Mar 2022 06:31:07 -0700 (PDT)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22MBXLeE018278;
+        Tue, 22 Mar 2022 13:31:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=HpA+lBmDwGJzna4wzGRAGzKQulBYXqZmgl9iArsAFEc=;
+ b=lJaWQAiiK3lzj51BoGP6QnFpOiHEL+f+njm+UWQ0UeDofLAuT3pxX+DojE0DSxjiZL6U
+ /OegKzfgbuleIKFFI1Ts7DmO8na2O2r4mxx1ftuTwpE1D9OtrSZHVNnae1Q7T5TCe3SJ
+ X8BXxZ7dWgDGTXy/ZfUjRQvl2tNbhhkV0V63BgGZtTqrUuqBDClIFtcJeTPl0wUms4lR
+ KWw6F8M9khdFJLrIHtrBgSGW+ISnyOQaWUYgRZfpHJUmUhXql0GgZJQKzZqpvA3J9D9a
+ DWFHG7tq10JsR5Irb3JEgmW+DD8f3AIBuRm1TEJtdZcpg/1Im0VK5qJuRUy/aDjIPV4L tg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3eyautpnf6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 22 Mar 2022 13:31:03 +0000
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22MDFVj5027042;
+        Tue, 22 Mar 2022 13:31:03 GMT
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3eyautpnew-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 22 Mar 2022 13:31:03 +0000
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+        by ppma03dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22MDHXcl007307;
+        Tue, 22 Mar 2022 13:31:02 GMT
+Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
+        by ppma03dal.us.ibm.com with ESMTP id 3ew6t9hbh7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 22 Mar 2022 13:31:02 +0000
+Received: from b03ledav001.gho.boulder.ibm.com (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
+        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22MDV0MJ20709874
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 22 Mar 2022 13:31:00 GMT
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 27FDB6E062;
+        Tue, 22 Mar 2022 13:31:00 +0000 (GMT)
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id F3B3F6E060;
+        Tue, 22 Mar 2022 13:30:58 +0000 (GMT)
+Received: from [9.65.234.56] (unknown [9.65.234.56])
+        by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Tue, 22 Mar 2022 13:30:58 +0000 (GMT)
+Message-ID: <0f9ab763-9596-c157-8f1e-e65088bf3aab@linux.ibm.com>
+Date:   Tue, 22 Mar 2022 09:30:58 -0400
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.7.0
-Subject: Re: [RFC PATCH-for-7.0 v4] target/i386/kvm: Free xsave_buf when
- destroying vCPU
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH v18 13/18] s390/vfio-ap: implement in-use callback for
+ vfio_ap driver
 Content-Language: en-US
-To:     qemu-devel@nongnu.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
-        Mark Kanda <mark.kanda@oracle.com>
-References: <20220322120522.26200-1-philippe.mathieu.daude@gmail.com>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= 
-        <philippe.mathieu.daude@gmail.com>
-In-Reply-To: <20220322120522.26200-1-philippe.mathieu.daude@gmail.com>
+To:     jjherne@linux.ibm.com, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     freude@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
+        mjrosato@linux.ibm.com, pasic@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com
+References: <20220215005040.52697-1-akrowiak@linux.ibm.com>
+ <20220215005040.52697-14-akrowiak@linux.ibm.com>
+ <37e98e6e-35a7-a77a-b057-e19b307c631a@linux.ibm.com>
+From:   Tony Krowiak <akrowiak@linux.ibm.com>
+In-Reply-To: <37e98e6e-35a7-a77a-b057-e19b307c631a@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: ld6WgwifEOk6QCcEriFpJGHb8n3IZHSk
+X-Proofpoint-ORIG-GUID: KDkUGfMlekwWBt1i2Hg0TIl3E6zSU8Lp
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-03-22_04,2022-03-22_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ mlxlogscore=999 priorityscore=1501 mlxscore=0 malwarescore=0 bulkscore=0
+ adultscore=0 lowpriorityscore=0 impostorscore=0 clxscore=1015 phishscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2203220076
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H4,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -77,30 +99,65 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22/3/22 13:05, Philippe Mathieu-Daudé wrote:
-> From: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> 
-> Fix vCPU hot-unplug related leak reported by Valgrind:
-> 
->    ==132362== 4,096 bytes in 1 blocks are definitely lost in loss record 8,440 of 8,549
->    ==132362==    at 0x4C3B15F: memalign (vg_replace_malloc.c:1265)
->    ==132362==    by 0x4C3B288: posix_memalign (vg_replace_malloc.c:1429)
->    ==132362==    by 0xB41195: qemu_try_memalign (memalign.c:53)
->    ==132362==    by 0xB41204: qemu_memalign (memalign.c:73)
->    ==132362==    by 0x7131CB: kvm_init_xsave (kvm.c:1601)
->    ==132362==    by 0x7148ED: kvm_arch_init_vcpu (kvm.c:2031)
->    ==132362==    by 0x91D224: kvm_init_vcpu (kvm-all.c:516)
->    ==132362==    by 0x9242C9: kvm_vcpu_thread_fn (kvm-accel-ops.c:40)
->    ==132362==    by 0xB2EB26: qemu_thread_start (qemu-thread-posix.c:556)
->    ==132362==    by 0x7EB2159: start_thread (in /usr/lib64/libpthread-2.28.so)
->    ==132362==    by 0x9D45DD2: clone (in /usr/lib64/libc-2.28.so)
-> 
-> Reported-by: Mark Kanda <mark.kanda@oracle.com>
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
-> Based on a series from Mark:
-> https://lore.kernel.org/qemu-devel/20220321141409.3112932-1-mark.kanda@oracle.com/
-> 
-> RFC because currently no time to test
 
-Mark, do you mind testing this patch?
+
+On 3/22/22 09:13, Jason J. Herne wrote:
+> On 2/14/22 19:50, Tony Krowiak wrote:
+> ...
+>> diff --git a/drivers/s390/crypto/vfio_ap_ops.c 
+>> b/drivers/s390/crypto/vfio_ap_ops.c
+>> index e9f7ec6fc6a5..63dfb9b89581 100644
+>> --- a/drivers/s390/crypto/vfio_ap_ops.c
+>> +++ b/drivers/s390/crypto/vfio_ap_ops.c
+>> @@ -617,10 +617,32 @@ static int 
+>> vfio_ap_mdev_verify_no_sharing(unsigned long *mdev_apm,
+>>       return 0;
+>>   }
+>>   +/**
+>> + * vfio_ap_mdev_validate_masks - verify that the APQNs assigned to 
+>> the mdev are
+>> + *                 not reserved for the default zcrypt driver and
+>> + *                 are not assigned to another mdev.
+>> + *
+>> + * @matrix_mdev: the mdev to which the APQNs being validated are 
+>> assigned.
+>> + *
+>> + * Return: One of the following values:
+>> + * o the error returned from the 
+>> ap_apqn_in_matrix_owned_by_def_drv() function,
+>> + *   most likely -EBUSY indicating the ap_perms_mutex lock is 
+>> already held.
+>> + * o EADDRNOTAVAIL if an APQN assigned to @matrix_mdev is reserved 
+>> for the
+>> + *           zcrypt default driver.
+>> + * o EADDRINUSE if an APQN assigned to @matrix_mdev is assigned to 
+>> another mdev
+>> + * o A zero indicating validation succeeded.
+>> + */
+>>   static int vfio_ap_mdev_validate_masks(struct ap_matrix_mdev 
+>> *matrix_mdev)
+>>   {
+>> -    if (ap_apqn_in_matrix_owned_by_def_drv(matrix_mdev->matrix.apm,
+>> -                           matrix_mdev->matrix.aqm))
+>> +    int ret;
+>> +
+>> +    ret = ap_apqn_in_matrix_owned_by_def_drv(matrix_mdev->matrix.apm,
+>> +                         matrix_mdev->matrix.aqm);
+>> +
+>> +    if (ret < 0)
+>> +        return ret;
+>> +
+>> +    if (ret == 1)
+>>           return -EADDRNOTAVAIL;
+>
+> I took a look at ap_apqn_in_matrix_owned_by_def_drv(). It appears that 
+> this function
+> can only ever return 0 or 1. This patch is changed to watch for a 
+> negative return
+> value from ap_apqn_in_matrix_owned_by_def_drv(). Am I missing something?
+
+That's odd, careless error, I'll fix it.
+
+>
+>
+
