@@ -2,100 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B177B4E4D87
-	for <lists+kvm@lfdr.de>; Wed, 23 Mar 2022 08:45:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 920FB4E4DB2
+	for <lists+kvm@lfdr.de>; Wed, 23 Mar 2022 08:59:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233112AbiCWHrG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Mar 2022 03:47:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37146 "EHLO
+        id S242382AbiCWIAd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Mar 2022 04:00:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45346 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231208AbiCWHrF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Mar 2022 03:47:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2777771A10
-        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 00:45:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1648021535;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=CORX4nBqIOhmV9u+b+wR9hXc3g4iCThhdDjIc63jHp4=;
-        b=a/wHK8G9attDvUIsqE1YFrjakz990ySM8QPyARodUqHkxmk92/RZ7XaotTyeUy6gWe+PV+
-        BKIXB5Q91oX69tDeH2hmSrj13xxyWFDJ5ldGOpDPRrbyvw14csRb6mClDga0jm7RtUb95f
-        ZcQzTM8f9IdZVbE2jHoYzyd/4BFcjIo=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-320-MJwVlglmPOSgzVEDjdWnLw-1; Wed, 23 Mar 2022 03:45:33 -0400
-X-MC-Unique: MJwVlglmPOSgzVEDjdWnLw-1
-Received: by mail-wr1-f72.google.com with SMTP id p9-20020adf9589000000b001e333885ac1so216096wrp.10
-        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 00:45:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=CORX4nBqIOhmV9u+b+wR9hXc3g4iCThhdDjIc63jHp4=;
-        b=4SMdaIPWQURQsgOPIHxWudDu50P8GhdCU4LhalbzRJ4m7fpe670BQhcSkc6sB8y6l4
-         bfY4WsK2/bLyoa0U6rwmBNk4yenWzEF/OlTpaEZRk6KU3ofRwPIl3EtmGEJl7vt4bYeg
-         vAToEEBUZR0O73keVYKqDncFfCSWKWeqqdXNprakPo5h5boVWaRj0Ss+erfZG9vssQXK
-         m5ORYEuldXORb5sKpjMyp3OFA0gRBHILiL6/QXoDvp2+UzYCMX5KgcCVZr+fyOT5TFvZ
-         HN/o1rky6Wu/Tn4tZYjJkNDgBwqZ1djWbY3UQ3LhHbedHoZuqnexY2JioLCxZ6omkVXg
-         shtQ==
-X-Gm-Message-State: AOAM530EbEUxrccnvw5s5RpoPmq1uKYcpkMqoCycsFw9Uu0iVFIQSHbR
-        TjWeENRLTfCMl8aAxPnFiSiq2MmRSU8stB/0S4gA324OQaUiBBOBn5rywJ/Bp+0qKm4f9aT6luH
-        wyeFyDPkt6qTI
-X-Received: by 2002:adf:fd44:0:b0:203:f45f:ce92 with SMTP id h4-20020adffd44000000b00203f45fce92mr21915388wrs.45.1648021532446;
-        Wed, 23 Mar 2022 00:45:32 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz40npTJz/m9d67QKkaLGDo6gg2kPGdkQ1QbPgBU/R+5VUmuYThix2eVeOErhTc2jILZk9pcw==
-X-Received: by 2002:adf:fd44:0:b0:203:f45f:ce92 with SMTP id h4-20020adffd44000000b00203f45fce92mr21915370wrs.45.1648021532213;
-        Wed, 23 Mar 2022 00:45:32 -0700 (PDT)
-Received: from gator (cst2-173-70.cust.vodafone.cz. [31.30.173.70])
-        by smtp.gmail.com with ESMTPSA id o9-20020a1c4d09000000b0038ca75056e2sm4917668wmh.45.2022.03.23.00.45.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Mar 2022 00:45:31 -0700 (PDT)
-Date:   Wed, 23 Mar 2022 08:45:30 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Thomas Huth <thuth@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH] Allow to compile without -Werror
-Message-ID: <20220323074530.nxqcqmkyutfpx2pz@gator>
-References: <20220322171504.941686-1-thuth@redhat.com>
+        with ESMTP id S242375AbiCWIAc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Mar 2022 04:00:32 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF2BC32EFD;
+        Wed, 23 Mar 2022 00:59:03 -0700 (PDT)
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22N7Nj2E030074;
+        Wed, 23 Mar 2022 07:59:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Kyr8kev9+gNTTph7gkssJCVXKyDOvFDGTXEnkQ9Nm1A=;
+ b=B6+8u/0CDv/5ob/GwUFSRT4H8/y7IPlvqLyrPMNCF6UGoI8YYt0bbjlAHahPTFH/k72Q
+ g59PRPxFZXWvCcqIMglw1BnPlISEQU4hf+9cP76WrGyiGHpS4kBf0ms/0hdx4zhVLB9S
+ gqHFTePmDklY3g1dufRMRRptEmpbWw6Jv9bMwBatF2rt6rtisAAPajly+3RrPUyPIVK9
+ 9Bw9CzJ3ahdiHVBuqLJiJjSQSHRpSaVRw7Xi/VcZh1aaYEzS6yxGbJ9tI7meZTfAkfSO
+ R/3KuWcXgMjBby9DNDgU6EkGjDOF4+H3JGHQxj+RYHCGO3mwQjpUYeDGX5DXNfNFNqpe aw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3eyy4f0hub-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 23 Mar 2022 07:59:03 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22N7VIHs023215;
+        Wed, 23 Mar 2022 07:59:02 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3eyy4f0htq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 23 Mar 2022 07:59:02 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22N7ws5B018636;
+        Wed, 23 Mar 2022 07:59:00 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma06ams.nl.ibm.com with ESMTP id 3ew6ej00hk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 23 Mar 2022 07:59:00 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22N7wvND50200932
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 23 Mar 2022 07:58:57 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7AFEA11C04A;
+        Wed, 23 Mar 2022 07:58:57 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 01ABA11C04C;
+        Wed, 23 Mar 2022 07:58:57 +0000 (GMT)
+Received: from [9.145.94.199] (unknown [9.145.94.199])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 23 Mar 2022 07:58:56 +0000 (GMT)
+Message-ID: <44618f05-9aee-5aa5-b036-dd838285b26f@linux.ibm.com>
+Date:   Wed, 23 Mar 2022 08:58:56 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220322171504.941686-1-thuth@redhat.com>
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [PATCH] KVM: s390: Fix lockdep issue in vm memop
+Content-Language: en-US
+To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        Sven Schnelle <svens@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20220322153204.2637400-1-scgl@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <20220322153204.2637400-1-scgl@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: jC8grO_4q80IxcdgQp2aLwrFrCDR-3sr
+X-Proofpoint-GUID: LN6PtDnGfq-7m3KgOANAn4JQeeFBSlJD
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-03-22_08,2022-03-22_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ lowpriorityscore=0 mlxlogscore=999 malwarescore=0 bulkscore=0
+ impostorscore=0 phishscore=0 mlxscore=0 adultscore=0 priorityscore=1501
+ spamscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2203230042
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 22, 2022 at 06:15:04PM +0100, Thomas Huth wrote:
-> Newer compiler versions sometimes introduce new warnings - and compiling
-> with -Werror will fail there, of course. Thus users of the kvm-unit-tests
-> like the buildroot project have to disable the "-Werror" in the Makefile
-> with an additional patch, which is cumbersome.
-> Thus let's add a switch to the configure script that allows to explicitly
-> turn the -Werror switch on or off. And enable it only by default for
-> developer builds (i.e. in checked-out git repositories) ... and for
-> tarball releases, it's nicer if it is disabled by default, so that the
-> end users do not have to worry about this.
+On 3/22/22 16:32, Janis Schoetterl-Glausch wrote:
+> Issuing a memop on a protected vm does not make sense,
+
+Issuing a vm memop on a protected vm...
+
+The cpu memop still makes sense, no?
+
+> neither is the memory readable/writable, nor does it make sense to check
+> storage keys. This is why the ioctl will return -EINVAL when it detects
+> the vm to be protected. However, in order to ensure that the vm cannot
+> become protected during the memop, the kvm->lock would need to be taken
+> for the duration of the ioctl. This is also required because
+> kvm_s390_pv_is_protected asserts that the lock must be held.
+> Instead, don't try to prevent this. If user space enables secure
+> execution concurrently with a memop it must accecpt the possibility of
+> the memop failing.
+> Still check if the vm is currently protected, but without locking and
+> consider it a heuristic.
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Fixes: ef11c9463ae0 ("KVM: s390: Add vm IOCTL for key checked guest absolute memory access")
+> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+
+Makes sense to me.
+
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+
 > ---
->  See also the patch from the buildroot project:
->  https://git.busybox.net/buildroot/tree/package/kvm-unit-tests/0001-Makefile-remove-Werror-to-avoid-build-failures.patch
+>   arch/s390/kvm/kvm-s390.c | 11 ++++++++++-
+>   1 file changed, 10 insertions(+), 1 deletion(-)
 > 
->  Makefile  |  2 +-
->  configure | 16 ++++++++++++++++
->  2 files changed, 17 insertions(+), 1 deletion(-)
->
- 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index ca96f84db2cc..53adbe86a68f 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -2385,7 +2385,16 @@ static int kvm_s390_vm_mem_op(struct kvm *kvm, struct kvm_s390_mem_op *mop)
+>   		return -EINVAL;
+>   	if (mop->size > MEM_OP_MAX_SIZE)
+>   		return -E2BIG;
+> -	if (kvm_s390_pv_is_protected(kvm))
+> +	/*
+> +	 * This is technically a heuristic only, if the kvm->lock is not
+> +	 * taken, it is not guaranteed that the vm is/remains non-protected.
+> +	 * This is ok from a kernel perspective, wrongdoing is detected
+> +	 * on the access, -EFAULT is returned and the vm may crash the
+> +	 * next time it accesses the memory in question.
+> +	 * There is no sane usecase to do switching and a memop on two
+> +	 * different CPUs at the same time.
+> +	 */
+> +	if (kvm_s390_pv_get_handle(kvm))
+>   		return -EINVAL;
+>   	if (mop->flags & KVM_S390_MEMOP_F_SKEY_PROTECTION) {
+>   		if (access_key_invalid(mop->key))
+> 
+> base-commit: c9b8fecddb5bb4b67e351bbaeaa648a6f7456912
 
