@@ -2,158 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F68C4E5982
-	for <lists+kvm@lfdr.de>; Wed, 23 Mar 2022 21:04:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B7E194E5987
+	for <lists+kvm@lfdr.de>; Wed, 23 Mar 2022 21:05:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238744AbiCWUGX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Mar 2022 16:06:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47222 "EHLO
+        id S242759AbiCWUHM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Mar 2022 16:07:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50350 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235103AbiCWUGW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Mar 2022 16:06:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 42D7B8564D
-        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 13:04:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1648065890;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=bGz+TFNC14CQU3pjAYcKlEhO5o+YwP5watp7iY8Dy4Y=;
-        b=dMXH5cL22UsQirNK5lZPWe151C+vMxa44fmwGiqrO1Sd54GKWpCHqABpw0F+s7bdxBRn42
-        0tiH4ClaCV//6o/5eKzKKo9iF4RxVmvicOA/LAOMb8Pq3od6/zPAFnKqLCV7C8bCVWqQpl
-        qR8c9mRG0t6d3cjspTFfah7UGY9hkP0=
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
- [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-154-b__8X_BdMPeWzhyJwVkgzA-1; Wed, 23 Mar 2022 16:04:49 -0400
-X-MC-Unique: b__8X_BdMPeWzhyJwVkgzA-1
-Received: by mail-il1-f200.google.com with SMTP id x6-20020a923006000000b002bea39c3974so1512652ile.12
-        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 13:04:49 -0700 (PDT)
+        with ESMTP id S242610AbiCWUHL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Mar 2022 16:07:11 -0400
+Received: from mail-yw1-x1134.google.com (mail-yw1-x1134.google.com [IPv6:2607:f8b0:4864:20::1134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1FF388B0F
+        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 13:05:39 -0700 (PDT)
+Received: by mail-yw1-x1134.google.com with SMTP id 00721157ae682-2e592e700acso30205537b3.5
+        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 13:05:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=0ltQEm4jkJpPFO26laIPZcGY83DKyfBZ1sw0JUywVss=;
+        b=Yuz2n+O88bMGFiLvP9JQxndEu9C7Bjz6BlwPzjdaGBLhQqxtKjxKwgQzPGtuW6RBpA
+         fLSqBttEmGFiP58M7lAc+Cbl+gPbR/8iiTR/B8SuFYIXOxo3I11NNt8XN5PqBDwtvUSI
+         TBEiBrieiwW1BfhbgQOc+eWIJfqUk6hlDxl+FxNVQjPTFAcqN7aGFtn82h5SOCBwTmyk
+         B5EcSifU3q45VDJG0gz7lGIgg9C4z+Wk24+xgjoCChJPqnHmECF8iMbDGmLCKGHN4ty1
+         eWXHa5DjNcpfK2fCwYGIA8ioxzhGm33Vz1l4GcXlZz6hpdIwWMeNSxtRD+g1SVfrMQNt
+         DTyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=bGz+TFNC14CQU3pjAYcKlEhO5o+YwP5watp7iY8Dy4Y=;
-        b=EnWUdpr17VgYFfS8s4jbSICKk2MD8nK7B/Gqsw75L18cnKXjebky7mB1wFe+rYWHQ2
-         aPG8gVaNaidH5lnAA3Md00krS9VXr9pGqMp7CFIeQJxg0v5P1Qak6DfdGq3K24sRhACW
-         Ncc70e6wEazbtI7YMd5GTNSZzfuUXNA5c2bp/2gz+ByyjpHj6Oee2eRnlpAPB8LInT3+
-         YG/1p+pAEdU0RLgGRrtal5jJ/qltzKKhtuuqxjZQu4nrE4tHFrepAJgNiGy4pTCFIiZe
-         AqxAMLvAp79kiUzoQIyfT5ezs/ExbTc5rE+7812igfZs5NhGSaKtxBnAmZ/wH3V0y0YU
-         AlPw==
-X-Gm-Message-State: AOAM530FaoD1WTQ4W9KfBtnSd4DXPoSeRa7hRGTZOhNBWHsOR1nXWDCO
-        +GUUm0JctgGX4OOKfOQifwXllkr0edtnK9AhQevt1wb6dMoEbm9w0SkhvcartwkVrQvo0Jbjsw9
-        LY5/k1aTOXUPe
-X-Received: by 2002:a05:6638:ec3:b0:321:367c:a325 with SMTP id q3-20020a0566380ec300b00321367ca325mr950220jas.156.1648065888421;
-        Wed, 23 Mar 2022 13:04:48 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxi4Uc0TDUDV75l1oBqwHgylR118BxFgoAIzQq/nFzh0iyGv7+dfItdpVxdNTEbmSJZU9IBnw==
-X-Received: by 2002:a05:6638:ec3:b0:321:367c:a325 with SMTP id q3-20020a0566380ec300b00321367ca325mr950206jas.156.1648065888213;
-        Wed, 23 Mar 2022 13:04:48 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id j15-20020a056e02154f00b002c7828da4desm458912ilu.0.2022.03.23.13.04.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Mar 2022 13:04:47 -0700 (PDT)
-Date:   Wed, 23 Mar 2022 14:04:46 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Eric Auger <eric.auger@redhat.com>,
-        iommu@lists.linux-foundation.org, Jason Wang <jasowang@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        Yi Liu <yi.l.liu@intel.com>, Keqian Zhu <zhukeqian1@huawei.com>
-Subject: Re: [PATCH RFC 08/12] iommufd: IOCTLs for the io_pagetable
-Message-ID: <20220323140446.097fd8cc.alex.williamson@redhat.com>
-In-Reply-To: <20220323193439.GS11336@nvidia.com>
-References: <0-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
-        <8-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
-        <20220323131038.3b5cb95b.alex.williamson@redhat.com>
-        <20220323193439.GS11336@nvidia.com>
-Organization: Red Hat
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=0ltQEm4jkJpPFO26laIPZcGY83DKyfBZ1sw0JUywVss=;
+        b=1ZbclWW7p069cz/aKI66xV50caVTmGY9409Oa46xvTnHuOxRmr6rcSEEf4I5svx6p7
+         qe3uR+CYBptmlgYXvaQtyFsO22I87SJC9RInEsYrYi4b06AC5fMJlnl7KLJh0iTpMVwa
+         mMb2EKls/VZI+of/McJmrEnMonFGN67ZhqgM7O3yKY/xqZB9+EldWFEPdDGoDT0jlBL0
+         fMuJi/fMKEYcIZqn6j3AoaXDYLTqitrXvFC71i51iTQtSclNbgdxrkdR8pLZRAKzSKm2
+         miIzph1U2pW7H8IdZTlc3Dxvw9VZfIKxnpOI8JxRBFjJaEzvnmk2/3JT07Plt1457x6A
+         6wow==
+X-Gm-Message-State: AOAM531GBmCrCgdfc9drfefdxfBWZoGGKwSim4H7qY59M9DEHT7lB6WT
+        tqY+i+gCKKaZNnn3NNInE667rSdF4ocICj4hnZ1yFw==
+X-Google-Smtp-Source: ABdhPJxDiIpzZ7WTx+jmKbHOAdv97rA0H0HYvVB8Owy+/SsU5Pne5Z9Fdnds0uwjTSiQ39wWWyqxQEfiZ+2F2Ldkyt0=
+X-Received: by 2002:a0d:e80e:0:b0:2e5:ba68:80bc with SMTP id
+ r14-20020a0de80e000000b002e5ba6880bcmr1771295ywe.350.1648065938422; Wed, 23
+ Mar 2022 13:05:38 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+References: <cover.1646422845.git.isaku.yamahata@intel.com>
+ <cedda3dbe8597356374ef64de26ecef0d8cd7a62.1646422845.git.isaku.yamahata@intel.com>
+ <CAAYXXYy3QLWyq9QrEnrsOLB3r44QTgKaOW4=HhOozDuw1073Gg@mail.gmail.com> <20220323175552.GG1964605@ls.amr.corp.intel.com>
+In-Reply-To: <20220323175552.GG1964605@ls.amr.corp.intel.com>
+From:   Erdem Aktas <erdemaktas@google.com>
+Date:   Wed, 23 Mar 2022 13:05:27 -0700
+Message-ID: <CAAYXXYygcwW-Ai5qAAMpp_GprywV2=x02JYXfJxY2ac_EMKLvw@mail.gmail.com>
+Subject: Re: [RFC PATCH v5 064/104] KVM: TDX: Implement TDX vcpu enter/exit path
+To:     Isaku Yamahata <isaku.yamahata@gmail.com>
+Cc:     "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "open list:KERNEL VIRTUAL MACHINE (KVM)" <kvm@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Connor Kuehl <ckuehl@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 23 Mar 2022 16:34:39 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
-
-> On Wed, Mar 23, 2022 at 01:10:38PM -0600, Alex Williamson wrote:
-> > On Fri, 18 Mar 2022 14:27:33 -0300
-> > Jason Gunthorpe <jgg@nvidia.com> wrote:
-> >   
-> > > +static int conv_iommu_prot(u32 map_flags)
-> > > +{
-> > > +	int iommu_prot;
+On Wed, Mar 23, 2022 at 10:55 AM Isaku Yamahata
+<isaku.yamahata@gmail.com> wrote:
+>
+> On Tue, Mar 22, 2022 at 10:28:42AM -0700,
+> Erdem Aktas <erdemaktas@google.com> wrote:
+>
+> > On Fri, Mar 4, 2022 at 11:50 AM <isaku.yamahata@intel.com> wrote:
+> > > @@ -509,6 +512,37 @@ void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+> > >         vcpu->kvm->vm_bugged = true;
+> > >  }
+> > >
+> > > +u64 __tdx_vcpu_run(hpa_t tdvpr, void *regs, u32 regs_mask);
 > > > +
-> > > +	/*
-> > > +	 * We provide no manual cache coherency ioctls to userspace and most
-> > > +	 * architectures make the CPU ops for cache flushing privileged.
-> > > +	 * Therefore we require the underlying IOMMU to support CPU coherent
-> > > +	 * operation.
-> > > +	 */
-> > > +	iommu_prot = IOMMU_CACHE;  
-> > 
-> > Where is this requirement enforced?  AIUI we'd need to test
-> > IOMMU_CAP_CACHE_COHERENCY somewhere since functions like
-> > intel_iommu_map() simply drop the flag when not supported by HW.  
-> 
-> You are right, the correct thing to do is to fail device
-> binding/attach entirely if IOMMU_CAP_CACHE_COHERENCY is not there,
-> however we can't do that because Intel abuses the meaning of
-> IOMMU_CAP_CACHE_COHERENCY to mean their special no-snoop behavior is
-> supported.
-> 
-> I want Intel to split out their special no-snoop from IOMMU_CACHE and
-> IOMMU_CAP_CACHE_COHERENCY so these things have a consisent meaning in
-> all iommu drivers. Once this is done vfio and iommufd should both
-> always set IOMMU_CACHE and refuse to work without
-> IOMMU_CAP_CACHE_COHERENCY. (unless someone knows of an !IOMMU_CACHE
-> arch that does in fact work today with vfio, somehow, but I don't..)
+> > > +static noinstr void tdx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
+> > > +                                       struct vcpu_tdx *tdx)
+> > > +{
+> > > +       guest_enter_irqoff();
+> > > +       tdx->exit_reason.full = __tdx_vcpu_run(tdx->tdvpr.pa, vcpu->arch.regs, 0);
+> > > +       guest_exit_irqoff();
+> > > +}
+> > > +
+> > > +fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu)
+> > > +{
+> > > +       struct vcpu_tdx *tdx = to_tdx(vcpu);
+> > > +
+> > > +       if (unlikely(vcpu->kvm->vm_bugged)) {
+> > > +               tdx->exit_reason.full = TDX_NON_RECOVERABLE_VCPU;
+> > > +               return EXIT_FASTPATH_NONE;
+> > > +       }
+> > > +
+> > > +       trace_kvm_entry(vcpu);
+> > > +
+> > > +       tdx_vcpu_enter_exit(vcpu, tdx);
+> > > +
+> > > +       vcpu->arch.regs_avail &= ~VMX_REGS_LAZY_LOAD_SET;
+> > > +       trace_kvm_exit(vcpu, KVM_ISA_VMX);
+> > > +
+> > > +       if (tdx->exit_reason.error || tdx->exit_reason.non_recoverable)
+> > > +               return EXIT_FASTPATH_NONE;
+> >
+> > Looks like the above if statement has no effect. Just checking if this
+> > is intentional.
+>
+> I'm not sure if I get your point.  tdx->exit_reason is updated by the above
+> tdx_cpu_enter_exit().  So it makes sense to check .error or .non_recoverable.
+> --
+> Isaku Yamahata <isaku.yamahata@gmail.com>
 
-IIRC, the DMAR on Intel CPUs dedicated to IGD was where we'd often see
-lack of snoop-control support, causing us to have mixed coherent and
-non-coherent domains.  I don't recall if you go back far enough in VT-d
-history if the primary IOMMU might have lacked this support.  So I
-think there are systems we care about with IOMMUs that can't enforce
-DMA coherency.
+What I mean is, if there is an error, it returns EXIT_FASTPATH_NONE
+but if there is no error, it still returns EXIT_FASTPATH_NONE.
 
-As it is today, if the IOMMU reports IOMMU_CAP_CACHE_COHERENCY and all
-mappings make use of IOMMU_CACHE, then all DMA is coherent.  Are you
-suggesting IOMMU_CAP_CACHE_COHERENCY should indicate that all mappings
-are coherent regardless of mapping protection flags?  What's the point
-of IOMMU_CACHE at that point?
+The code is like below, the if-statement might be there as a
+placeholder to check errors but it has no impact on what is returned
+from this function.
 
-> I added a fixme about this.
-> 
-> > This also seems like an issue relative to vfio compatibility that I
-> > don't see mentioned in that patch.  Thanks,  
-> 
-> Yes, it was missed in the notes for vfio compat that Intel no-snoop is
-> not working currently, I fixed it.
-
-Right, I see it in the comments relative to extensions, but missed in
-the commit log.  Thanks,
-
-Alex
-
+       if (tdx->exit_reason.error || tdx->exit_reason.non_recoverable)
+               return EXIT_FASTPATH_NONE;
+       return EXIT_FASTPATH_NONE;
