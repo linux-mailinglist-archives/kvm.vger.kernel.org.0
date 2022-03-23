@@ -2,64 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D09C64E583B
-	for <lists+kvm@lfdr.de>; Wed, 23 Mar 2022 19:16:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DB2E04E584D
+	for <lists+kvm@lfdr.de>; Wed, 23 Mar 2022 19:22:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232332AbiCWSSJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Mar 2022 14:18:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45586 "EHLO
+        id S245629AbiCWSXb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Mar 2022 14:23:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59648 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245521AbiCWSRw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Mar 2022 14:17:52 -0400
-Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D361988B30
-        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 11:16:22 -0700 (PDT)
-Received: by mail-io1-xd32.google.com with SMTP id x4so2683282iop.7
-        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 11:16:22 -0700 (PDT)
+        with ESMTP id S239738AbiCWSXa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Mar 2022 14:23:30 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07C36890AB
+        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 11:22:00 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id e6-20020a17090a77c600b001c795ee41e9so2093374pjs.4
+        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 11:22:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=nMqxdIZgJ4df2glO3AXxvZM8Vb5idq1c8Jw7C91a7Vc=;
-        b=p43R9GLwlW8RzbEXi8zCiRwYsoq1VH3VbGU7vQ8dDRiLQNTTwvSxVUgbRv97gty1nU
-         gBWq8BpTOJl3argEvXZePHDxsmy1SR8wOHYa9Mc5QC84mXyij9bggiFnh6GG7MsGhONZ
-         DWNUl/8mdwnRLkc+0BskLlHPtksxf9odD3frJghi5DKJtnnybDhNTpCAsjT7VOiEkeT6
-         OSN407EU7F9qBwpdyBSK/G+TqEHrtUeM9w1btYhMRm4bDdhtf6x+t0PuNcoEwqZO8NmB
-         0ND+M4SL+uaZW51ehTiehp0P+GScV8fbrdXwb5riFHisJTGltXQTF35BvRNfbvcmrGdc
-         BcQA==
+        bh=HwXsboqz7k+wKrfipOk4DNs4mMmptEqDFu/VTWeb9ZU=;
+        b=CN/PX4pE4aYnOxwsm40V+KrokbNR16/dSQD3iNts8MJofP8HlO6GpT+h22msgeHGhs
+         ST9IQSbtqSGVy+UkycoeSWQsj9v82NLTIjT3G8DlD2v0SYLIWz/i11SJORUvAnYmMuTP
+         3D79oFc0E77ldLCgmQEpW6K5ao6tBlW6F/lN8KSDMeg5HzM1gEvvAqFoiKOyp6xGAQVf
+         QnGDKa8yD2QHqKQCfTg8lu09id8wYeS/Qq7L4FmMKS4MD5BlUllEYreo6LWIkGoSgz0Q
+         T0ZxB2kwqLjtoQapFqul1N1SEm/epY5E1PT5uuturo4ZtcLI8fXzNqnxU2WTUCjFmaWQ
+         2kkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=nMqxdIZgJ4df2glO3AXxvZM8Vb5idq1c8Jw7C91a7Vc=;
-        b=JpLlKW0Ea4q21/dBbaOewIDXVmkD1Ts3IfkoFDv7ZM68flWWI6VVBHisybjD2ILIVk
-         N1grNhTkoD825NbxLYzgzca+OaEccRwvpItxyLZM1PwXvCKfkoRIKg8SYJByOcB7qMT2
-         AqXxrQ+DBQolORKLO1y5CLmKraLzjHvZwbUMHYhseLTLNT6stPr/Ny9y08J1s+6q4Shg
-         beACV/uk926uawfIzZJ4t9zsC7RAusaun3jA0khQQmNqus1ojWt9MECszYNORS8P4ppu
-         lUgtchB93MCkbscBUOtMnYQ20ueyauoA3dJAeFAd6uucYgVo1EuUQA5Wx0xzw+WJsV5b
-         FIfA==
-X-Gm-Message-State: AOAM532mbg6G0KNyHdrNOeNNX9FMSEt5vk2H5BegHzegbvMJ9ZMiVopz
-        RjJSdLpwHvlljDGE5LEg3AbaLA==
-X-Google-Smtp-Source: ABdhPJz21mhhHYj2VEdsCwKHh095WxTo6GZp1tVD+4wVhwAzkpj23tCt6tZvUXBt2e4Xi/BR9V8V6A==
-X-Received: by 2002:a05:6638:328f:b0:31a:12ca:b4d3 with SMTP id f15-20020a056638328f00b0031a12cab4d3mr610421jav.19.1648059382139;
-        Wed, 23 Mar 2022 11:16:22 -0700 (PDT)
-Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
-        by smtp.gmail.com with ESMTPSA id f9-20020a5ec709000000b00645ec64112asm279808iop.42.2022.03.23.11.16.21
+        bh=HwXsboqz7k+wKrfipOk4DNs4mMmptEqDFu/VTWeb9ZU=;
+        b=EO65HkV3TsiSwH/Op1c9sm2BBw3Ys/dhakrjOLi6obfpm5XPrghvOtZ8SqTVipVUFj
+         DCA3x46H68wqmsyDBOvscr2AdqWXbgPb7ycePgEu+oi/DV0sd7QkCKsHm1ZRj2wioQif
+         O4FRyCX7Gof3B5c7AYLSa3cs7C1y4Xtb8qCR6A05nYo1vhWnOwaPDbi6/WXKIi6AlA07
+         XvTt0bupotIwUn4jpPoJTePjJTFYDv62C+Y/CPd7TVmECu3z+KlAH5d/wilRap5juJdf
+         AR+ymQ7aGVpqiM5cxnYErXSybxo69TTIga3PVwZx2qwVYzo7GjEWj2j6OFkYVD0hHjG+
+         UUcg==
+X-Gm-Message-State: AOAM533rqz7/RQsX/Gg+Irfuq+BUTVjoaqmYV/t3gKqhe49rKZTjfW76
+        8GPlQZIygdyrfTnAq40G9i2/zw==
+X-Google-Smtp-Source: ABdhPJwfUfqzM2AAjmkT+qb1Sp4piX1tk1H2e1mkKMc5NjjnY/FwnHwrRBnJTZQY2IxNX4IFCKMwXg==
+X-Received: by 2002:a17:902:d512:b0:154:7580:6e78 with SMTP id b18-20020a170902d51200b0015475806e78mr1443684plg.35.1648059719285;
+        Wed, 23 Mar 2022 11:21:59 -0700 (PDT)
+Received: from google.com (226.75.127.34.bc.googleusercontent.com. [34.127.75.226])
+        by smtp.gmail.com with ESMTPSA id h14-20020a63384e000000b00366ba5335e7sm407689pgn.72.2022.03.23.11.21.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Mar 2022 11:16:21 -0700 (PDT)
-Date:   Wed, 23 Mar 2022 18:16:18 +0000
-From:   Oliver Upton <oupton@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        mlevitsk@redhat.com, jmattson@google.com
-Subject: Re: [PATCH 3/3] Documentation: KVM: add API issues section
-Message-ID: <Yjtj8qESPWIL221r@google.com>
-References: <20220322110712.222449-1-pbonzini@redhat.com>
- <20220322110712.222449-4-pbonzini@redhat.com>
+        Wed, 23 Mar 2022 11:21:58 -0700 (PDT)
+Date:   Wed, 23 Mar 2022 18:21:55 +0000
+From:   Mingwei Zhang <mizhang@google.com>
+To:     Ben Gardon <bgardon@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Peter Xu <peterx@redhat.com>, Ben Gardon <bgardon@google.com>
+Subject: Re: [PATCH 4/4] selftests: KVM: use dirty logging to check if page
+ stats work correctly
+Message-ID: <YjtlQ3PJT7TBa/fK@google.com>
+References: <20220321002638.379672-1-mizhang@google.com>
+ <20220321002638.379672-5-mizhang@google.com>
+ <CANgfPd-Q_a5kc9on3Lcps=1tghAGvacbojPu9uS37bspupskGg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220322110712.222449-4-pbonzini@redhat.com>
+In-Reply-To: <CANgfPd-Q_a5kc9on3Lcps=1tghAGvacbojPu9uS37bspupskGg@mail.gmail.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -71,25 +80,164 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
-
-On Tue, Mar 22, 2022 at 12:07:12PM +0100, Paolo Bonzini wrote:
-> Add a section to document all the different ways in which the KVM API sucks.
+On Mon, Mar 21, 2022, Ben Gardon wrote:
+> On Sun, Mar 20, 2022 at 5:26 PM Mingwei Zhang <mizhang@google.com> wrote:
+> >
+> > When dirty logging is enabled, KVM splits the all hugepage mapping in
+> > NPT/EPT into the smallest 4K size. This property could be used to check if
 > 
-> I am sure there are way more, give people a place to vent so that userspace
-> authors are aware.
+> Note this is only true if eager page splitting is enabled. It would be
+> more accurate to say:
+> "While dirty logging is enabled, KVM will re-map any accessed page in
+> NPT/EPT at 4K."
 > 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> > the page stats metrics work properly in KVM mmu. At the same time, this
+> > logic might be used the other way around: using page stats to verify if
+> > dirty logging really splits all huge pages. Moreover, when dirty logging is
+> 
+> It might be worth having a follow up commit which checks if eager
+> splitting is enabled and changes the assertions accordingly.
+> 
+> > disabled, KVM zaps corresponding SPTEs and we could check whether the large
+> > pages come back when guest touches the pages again.
+> >
+> > So add page stats checking in dirty logging performance selftest. In
+> > particular, add checks in three locations:
+> >  - just after vm is created;
+> >  - after populating memory into vm but before enabling dirty logging;
+> >  - just after turning on dirty logging.
+> 
+> Note a key stage here is after dirty logging is enabled, and then the
+> VM touches all the memory in the data region.
+> I believe that's the point at which you're making the assertion that
+> all mappings are 4k currently, which is the right place if eager
+> splitting is not enabled.
+> 
+> >  - after one final iteration after turning off dirty logging.
+> >
+> > Tested using commands:
+> >  - ./dirty_log_perf_test -s anonymous_hugetlb_1gb
+> >  - ./dirty_log_perf_test -s anonymous_thp
+> >
+> > Cc: Sean Christopherson <seanjc@google.com>
+> > Cc: David Matlack <dmatlack@google.com>
+> > Cc: Jing Zhang <jingzhangos@google.com>
+> > Cc: Peter Xu <peterx@redhat.com>
+> >
+> > Suggested-by: Ben Gardon <bgorden@google.com>
+> > Signed-off-by: Mingwei Zhang <mizhang@google.com>
+> > ---
+> >  .../selftests/kvm/dirty_log_perf_test.c       | 52 +++++++++++++++++++
+> >  1 file changed, 52 insertions(+)
+> >
+> > diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+> > index 1954b964d1cf..ab0457d91658 100644
+> > --- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
+> > +++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+> > @@ -19,6 +19,10 @@
+> >  #include "perf_test_util.h"
+> >  #include "guest_modes.h"
+> >
+> > +#ifdef __x86_64__
+> > +#include "processor.h"
+> > +#endif
+> > +
+> >  /* How many host loops to run by default (one KVM_GET_DIRTY_LOG for each loop)*/
+> >  #define TEST_HOST_LOOP_N               2UL
+> >
+> > @@ -185,6 +189,14 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+> >                                  p->slots, p->backing_src,
+> >                                  p->partition_vcpu_memory_access);
+> >
+> > +#ifdef __x86_64__
+> > +       TEST_ASSERT(vm_get_single_stat(vm, "pages_4k") == 0,
+> > +                   "4K page is non zero");
+> > +       TEST_ASSERT(vm_get_single_stat(vm, "pages_2m") == 0,
+> > +                   "2M page is non zero");
+> > +       TEST_ASSERT(vm_get_single_stat(vm, "pages_1g") == 0,
+> > +                   "1G page is non zero");
+> > +#endif
+> >         perf_test_set_wr_fract(vm, p->wr_fract);
+> >
+> >         guest_num_pages = (nr_vcpus * guest_percpu_mem_size) >> vm_get_page_shift(vm);
+> > @@ -222,6 +234,16 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+> >         pr_info("Populate memory time: %ld.%.9lds\n",
+> >                 ts_diff.tv_sec, ts_diff.tv_nsec);
+> >
+> > +#ifdef __x86_64__
+> > +       TEST_ASSERT(vm_get_single_stat(vm, "pages_4k") != 0,
+> > +                   "4K page is zero");
+> > +       if (p->backing_src == VM_MEM_SRC_ANONYMOUS_THP)
+> 
+> This should also handle 2M hugetlb memory.
+> I think there might be a library function to translate backing src
+> type to page size too, which could make this check cleaner.
+> 
+Just went through the selftest code again, it seems this logic a quite
+x86 and there were no similar checks in other places. So I think I'll
+just add another condition here for now.
 
-Do you think we should vent about our mistakes inline with the
-descriptions of the corresponding UAPI? One example that comes to mind
-is ARM's CNTV_CVAL_EL0/CNTVCT_EL0 mixup, which is mentioned in 4.68
-'KVM_SET_ONE_REG'. That, of course, doesn't cover the
-previously-undocumented bits of UAPI that are problematic :)
-
-If we go that route we likely should have a good format for documenting
-the ugliness.
-
---
-Thanks,
-Oliver
+> > +               TEST_ASSERT(vm_get_single_stat(vm, "pages_2m") != 0,
+> > +                           "2M page is zero");
+> > +       if (p->backing_src == VM_MEM_SRC_ANONYMOUS_HUGETLB_1GB)
+> > +               TEST_ASSERT(vm_get_single_stat(vm, "pages_1g") != 0,
+> > +                           "1G page is zero");
+> > +#endif
+> >         /* Enable dirty logging */
+> >         clock_gettime(CLOCK_MONOTONIC, &start);
+> >         enable_dirty_logging(vm, p->slots);
+> > @@ -267,6 +289,14 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+> >                                 iteration, ts_diff.tv_sec, ts_diff.tv_nsec);
+> >                 }
+> >         }
+> > +#ifdef __x86_64__
+> > +       TEST_ASSERT(vm_get_single_stat(vm, "pages_4k") != 0,
+> > +                   "4K page is zero after dirty logging");
+> > +       TEST_ASSERT(vm_get_single_stat(vm, "pages_2m") == 0,
+> > +                   "2M page is non-zero after dirty logging");
+> > +       TEST_ASSERT(vm_get_single_stat(vm, "pages_1g") == 0,
+> > +                   "1G page is non-zero after dirty logging");
+> > +#endif
+> 
+> Note this is after dirty logging has been enabled, AND all pages in
+> the data region have been written by the guest.
+> 
+> >
+> >         /* Disable dirty logging */
+> >         clock_gettime(CLOCK_MONOTONIC, &start);
+> > @@ -275,6 +305,28 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+> >         pr_info("Disabling dirty logging time: %ld.%.9lds\n",
+> >                 ts_diff.tv_sec, ts_diff.tv_nsec);
+> >
+> > +#ifdef __x86_64__
+> > +       /*
+> > +        * Increment iteration to run the vcpus again to verify if huge pages
+> > +        * come back.
+> > +        */
+> > +       iteration++;
+> > +       pr_info("Starting the final iteration to verify page stats\n");
+> > +
+> > +       for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++) {
+> > +               while (READ_ONCE(vcpu_last_completed_iteration[vcpu_id])
+> > +                      != iteration)
+> > +                       ;
+> > +       }
+> 
+> We might as well do this on all archs. Even without the stats, it at
+> least validates that disabling dirty logging doesn't break the VM.
+> 
+> > +
+> > +       if (p->backing_src == VM_MEM_SRC_ANONYMOUS_THP)
+> > +               TEST_ASSERT(vm_get_single_stat(vm, "pages_2m") != 0,
+> > +                           "2M page is zero");
+> > +       if (p->backing_src == VM_MEM_SRC_ANONYMOUS_HUGETLB_1GB)
+> > +               TEST_ASSERT(vm_get_single_stat(vm, "pages_1g") != 0,
+> > +                           "1G page is zero");
+> > +#endif
+> > +
+> >         /* Tell the vcpu thread to quit */
+> >         host_quit = true;
+> >         perf_test_join_vcpu_threads(nr_vcpus);
+> > --
+> > 2.35.1.894.gb6a874cedc-goog
+> >
