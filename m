@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 744144E5B80
-	for <lists+kvm@lfdr.de>; Wed, 23 Mar 2022 23:54:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4260C4E5B82
+	for <lists+kvm@lfdr.de>; Wed, 23 Mar 2022 23:54:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241410AbiCWWzu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Mar 2022 18:55:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46490 "EHLO
+        id S1345338AbiCWWzv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Mar 2022 18:55:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345331AbiCWWzs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Mar 2022 18:55:48 -0400
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F59B8D681
-        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 15:54:18 -0700 (PDT)
-Received: by mail-pf1-x449.google.com with SMTP id 138-20020a621690000000b004fa807ac59aso1646935pfw.19
-        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 15:54:18 -0700 (PDT)
+        with ESMTP id S241390AbiCWWzu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Mar 2022 18:55:50 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDD208CDA5
+        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 15:54:19 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id o15-20020a17090aac0f00b001c6595a43dbso1796516pjq.4
+        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 15:54:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=RQZ9oTCQlO2kkOxWGWPVIC9nBisyNLoKeQuBeACdbVQ=;
-        b=p+g7bWwB50EB/w3hkgA0rVNT57FGibDrrLJK/XlvKLVxecBZRbJrvIbXJ+jcvXAkzn
-         S1Ze9G7u8gofjR6Kp6iU/N1kcmwr6vx4FewGe8GM9o6xh5Ixh5kUqRrEYob4wRf9NtBL
-         4Dv/9xTXxLXO61IseJp55nta5dXslqhiINmTaykUsTyh75+6wK1aw0BDi5hMhMh2Mzmj
-         uCq6mZhZUl4qxzzojSU6UU1eioFrn9aWOO/MbqlItHvp78eaOO7o9GOctz6iLmCFOnx6
-         W0vtrPT9wQpToA7Vu1IysUe8y7nqgNr03LQmZKjtFIZlbAuxiXzehToAeivCsGyDUMuZ
-         alXw==
+        bh=vKLQzM6klqpkjmFS7GU8Jq/66Sy+Fcb5x77LNB4tmdY=;
+        b=T2r1Caf2OJOtk5scJPySOp/9x5bj+Apl8WHaB3jSMoOIz1MKaQBurKnGDjtE5j7HIZ
+         9OzExFu8pSpHjGFZCP3Cuj1ybKmX1oCev7O7tSC+rgrYeVIw8Tr3sNK35PzvXat/KSR9
+         dolxuhItD4Ol+BlA6VIzVmvkJT0NxWvmxp88V7/W1lTGTKFLRyWtGRd2iEMSN5A9yy2H
+         Seddhj/2HySTBw0pKeLTmrJNHMvXNP+/FAmkaEkHGZlS45r7/IWEwWw6nH+c7krdYanH
+         JOCd4/NjP0nSTfd43jcxEdgU+kxdHjcnaruKZsOp4e5k8y/vNSOOSipI3Y41Bg2nBs6n
+         bCpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=RQZ9oTCQlO2kkOxWGWPVIC9nBisyNLoKeQuBeACdbVQ=;
-        b=7gSDhzcHbkyjNadbCyFBWnM6NXYqajnU12tFFFUoq+0kIv0pCsF0AewcvVczhDLW5C
-         8tSYLDEi3UsNPfPrWU5FWo/A0KCO9WinMQt6xNgND9CpGAHkBEPgUlBZEbA8ToG4wZWG
-         WOH3zUULmEVu6UJeMUzowHFtWjhF3zcILKMd1cIEmR3pZtRBnUhLCgVpPqMs3A0fmG8o
-         fxPwd+S7q6Zc7nSCdWEjrL7W5FBx/TqeJHUP5UFPFi2S9kjDu71+UwXCJn++6jIbJMFR
-         Yn+6R8YiJSt4wQCCy4iijV26/GQW7zgHBQUniUGGFQpBLc5x1jo98vLWucURxXNMM1pW
-         2qkg==
-X-Gm-Message-State: AOAM533j7A7sIL5FZyATiyBHQrqbkr7vLc0RRVzn2mzkfEH/7I4DF3Pu
-        HegQ/761L3dJaIyO88enUcibGtZ4N+4eJ8oqiSynRfqcB41lOwEpYHiWoX/Nk7JS2waZBDbbiZj
-        N+mErykfsS91HcsJzVdcAKqmptHL0HYcnkPTXQOrzBmq1n95rfMgjHP1w7+RsbxA=
-X-Google-Smtp-Source: ABdhPJzZggTEZsz9VHBBQHG8G2jPGTIF3aQKjvOX95a74j+hsAPzoyo4bO9e+VNMfrpeBTP6J5d5Gh+F73mgOw==
+        bh=vKLQzM6klqpkjmFS7GU8Jq/66Sy+Fcb5x77LNB4tmdY=;
+        b=0SGyQqWau2M0BuFyU09G5ltwDwTdQiIJJNN1XSNaue9EzFIj3fhN4keiblCTyl+JDn
+         fLp605pfRcF2xu9LDtcQgonyjrlzUXRrbY2aFbfPUikUwPVKX/CWT9uMrylY/QIbgibC
+         Ls9j4mKRqklxcmxmeUbe+szUi7x7y/LtXWdvYtCxgiTADymE94Ric6E3cYd2rLII5iZk
+         vkPvt8eKy+Hd9+qIQLI7HSFUw2/pl8GP3U32OZwYv7GA29OTWZ/L/5dya5R6TjBYIeOO
+         bKt4Z6s1rn4BZ/eYufJbs2zlQXS3dLIyeityqlYcCn4/egU1qhEqWjYF7tczgUPx12B6
+         K0cg==
+X-Gm-Message-State: AOAM531kkDIRk9XmnKCOr9rue0x+BqJ2NOIEnJE3YQhptfxKCRTxYw79
+        yQiwfWDLcflauIqZuYBvagd6H0MxWNpUr/iQsnJ+HoqLf5/N732kGSyY2M9MMWx7UjAZNzvSCKr
+        xct/QFhRYW21ZiP2muS/3HGxGT0vZkrTNHRghnHvr0XSVc41zMYtHrhEBYaWuy4U=
+X-Google-Smtp-Source: ABdhPJyAZxVTIQwmd51afsdptnZnXVDyKJtPsBQk9LT1jHkerS5r8cmHIz4Q/xt8p3x6a0B6SZillADFV5BM/Q==
 X-Received: from ricarkol2.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
- (user=ricarkol job=sendgmr) by 2002:a63:6c01:0:b0:37c:73a0:a175 with SMTP id
- h1-20020a636c01000000b0037c73a0a175mr1622779pgc.415.1648076057479; Wed, 23
- Mar 2022 15:54:17 -0700 (PDT)
-Date:   Wed, 23 Mar 2022 15:53:59 -0700
+ (user=ricarkol job=sendgmr) by 2002:a17:902:8bcc:b0:14f:2294:232e with SMTP
+ id r12-20020a1709028bcc00b0014f2294232emr2362408plo.105.1648076059147; Wed,
+ 23 Mar 2022 15:54:19 -0700 (PDT)
+Date:   Wed, 23 Mar 2022 15:54:00 -0700
 In-Reply-To: <20220323225405.267155-1-ricarkol@google.com>
-Message-Id: <20220323225405.267155-6-ricarkol@google.com>
+Message-Id: <20220323225405.267155-7-ricarkol@google.com>
 Mime-Version: 1.0
 References: <20220323225405.267155-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.35.1.894.gb6a874cedc-goog
-Subject: [PATCH v2 05/11] KVM: selftests: Add missing close and munmap in __vm_mem_region_delete
+Subject: [PATCH v2 06/11] KVM: selftests: Add vm_mem_region_get_src_fd library function
 From:   Ricardo Koller <ricarkol@google.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
         drjones@redhat.com
@@ -71,32 +71,60 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Deleting a memslot (when freeing a VM) is not closing the backing fd,
-nor it's unmapping the alias mapping. Fix by adding the missing close
-and munmap.
+Add a library function to get the backing source FD of a memslot.
 
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- tools/testing/selftests/kvm/lib/kvm_util.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ .../selftests/kvm/include/kvm_util_base.h     |  1 +
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 23 +++++++++++++++++++
+ 2 files changed, 24 insertions(+)
 
+diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+index 3a69b35e37cc..c8dce12a9a52 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util_base.h
++++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+@@ -163,6 +163,7 @@ int _kvm_ioctl(struct kvm_vm *vm, unsigned long ioctl, void *arg);
+ void vm_mem_region_set_flags(struct kvm_vm *vm, uint32_t slot, uint32_t flags);
+ void vm_mem_region_move(struct kvm_vm *vm, uint32_t slot, uint64_t new_gpa);
+ void vm_mem_region_delete(struct kvm_vm *vm, uint32_t slot);
++int vm_mem_region_get_src_fd(struct kvm_vm *vm, uint32_t memslot);
+ void vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpuid);
+ vm_vaddr_t vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min);
+ vm_vaddr_t vm_vaddr_alloc_pages(struct kvm_vm *vm, int nr_pages);
 diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index e18f1c93e4b4..268ad3d75fe2 100644
+index 268ad3d75fe2..a0a9cd575fac 100644
 --- a/tools/testing/selftests/kvm/lib/kvm_util.c
 +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -679,6 +679,12 @@ static void __vm_mem_region_delete(struct kvm_vm *vm,
- 	sparsebit_free(&region->unused_phy_pages);
- 	ret = munmap(region->mmap_start, region->mmap_size);
- 	TEST_ASSERT(ret == 0, "munmap failed, rc: %i errno: %i", ret, errno);
-+	if (region->fd >= 0) {
-+		/* There's an extra map shen using shared memory. */
-+		ret = munmap(region->mmap_alias, region->mmap_size);
-+		TEST_ASSERT(ret == 0, "munmap failed, rc: %i errno: %i", ret, errno);
-+		close(region->fd);
-+	}
- 
- 	free(region);
+@@ -580,6 +580,29 @@ kvm_userspace_memory_region_find(struct kvm_vm *vm, uint64_t start,
+ 	return &region->region;
  }
+ 
++/*
++ * KVM Userspace Memory Get Backing Source FD
++ *
++ * Input Args:
++ *   vm - Virtual Machine
++ *   memslot - KVM memory slot ID
++ *
++ * Output Args: None
++ *
++ * Return:
++ *   Backing source file descriptor, -1 if the memslot is an anonymous region.
++ *
++ * Returns the backing source fd of a memslot, so tests can use it to punch
++ * holes, or to setup permissions.
++ */
++int vm_mem_region_get_src_fd(struct kvm_vm *vm, uint32_t memslot)
++{
++	struct userspace_mem_region *region;
++
++	region = memslot2region(vm, memslot);
++	return region->fd;
++}
++
+ /*
+  * VCPU Find
+  *
 -- 
 2.35.1.894.gb6a874cedc-goog
 
