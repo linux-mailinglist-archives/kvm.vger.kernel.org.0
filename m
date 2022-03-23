@@ -2,101 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2CAED4E4F56
-	for <lists+kvm@lfdr.de>; Wed, 23 Mar 2022 10:26:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 13FC54E4F6A
+	for <lists+kvm@lfdr.de>; Wed, 23 Mar 2022 10:30:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243229AbiCWJ1k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Mar 2022 05:27:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55580 "EHLO
+        id S243288AbiCWJcN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Mar 2022 05:32:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38724 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243156AbiCWJ1j (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Mar 2022 05:27:39 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E919874DC5
-        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 02:26:08 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 82BA8617D8
-        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 09:26:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE8EEC340E8;
-        Wed, 23 Mar 2022 09:26:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1648027567;
-        bh=6o8eSL9XfXN3YyWF8WOf0UgeocTfb9Qxb/lKmNgQD3k=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=TFK9YzhcOSM+7+DW03OfGZ6iv4ZXu8m+2lyggptU4cD5cN+dAqP54VpzFohtjD2W3
-         Jk8zJZaf7iP8YyfFpWU9jNzxFJsZHNOobxbqodw6pTt7XD7e7P2EWskhbvt41TvLR4
-         kdOd7fNlSKnHaBjLkJPY+SZf2nyneZpk/QR/FgChqDC5ugUODivxijDFUpBdxl9sow
-         JfC6jtEkuyWzUYBROPdFF0fkVcPe6tFk+6mxuzlWYJpeG0uICd6TknefMz70rdHrjm
-         W0HK/R3Y3cgCp5gYT7bkpcrSX5i8IUu3Fpeh5F1lfi7ir18s2bZj8XdjDh5y2jXT1U
-         GqPxjryM9Nm2Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1nWxFl-00GSfx-Eq; Wed, 23 Mar 2022 09:26:05 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     kvmarm@lists.cs.columbia.edu, Oliver Upton <oupton@google.com>
-Cc:     Ricardo Koller <ricarkol@google.com>,
-        Peter Shier <pshier@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        Will Deacon <will@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v2 0/3] KVM: arm64: Fixes for SMC64 SYSTEM_RESET2 calls
-Date:   Wed, 23 Mar 2022 09:26:02 +0000
-Message-Id: <164802753806.768438.14771552683123752395.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220322183538.2757758-1-oupton@google.com>
-References: <20220322183538.2757758-1-oupton@google.com>
+        with ESMTP id S233726AbiCWJcK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Mar 2022 05:32:10 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57BA76C921;
+        Wed, 23 Mar 2022 02:30:41 -0700 (PDT)
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22N8YxRY027388;
+        Wed, 23 Mar 2022 09:30:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=JouOfhBmCn9pvnl66Xpebm/f5DMDoZhzGlnaJC7Pihk=;
+ b=fTjLo2TVEmfky+mt8VP7tKaNg3cM/QTinFYwNtsELAznjy5Jpg3AWm3Rv9399xJHOvwg
+ 2/wuAUxgGo1OCmPIV9B/dGPZgu77kUiR4LAHZnmnxNCD5j9E3pbZdav2jIf+2x9rn32o
+ QYdZpTkIQebcOLAgNfWBluje6XrvjQMtwWR5edmFJaS2YYRqE3kCljC4hKkHnoVzB2xB
+ 3RfjmXYFMHx5lkX+gTa3QwkK7PvjRly73dlio92A7aKZ948XC/WZuAqJSPjv9nfaQ96Z
+ T+mZqMqs9xcB5CYa8Zmy3fiaaG/J3LwnKuLXve+jYl7pNrhBeNeOXD+LBErPEKV81ITF yA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3eyvravub8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 23 Mar 2022 09:30:40 +0000
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22N9UewK031142;
+        Wed, 23 Mar 2022 09:30:40 GMT
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3eyvravua6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 23 Mar 2022 09:30:40 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22N9THNP009880;
+        Wed, 23 Mar 2022 09:30:36 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma04fra.de.ibm.com with ESMTP id 3ew6t8q1b7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 23 Mar 2022 09:30:36 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22N9UaF244368134
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 23 Mar 2022 09:30:36 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B630652051;
+        Wed, 23 Mar 2022 09:30:32 +0000 (GMT)
+Received: from [9.171.50.35] (unknown [9.171.50.35])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 3D6AB52050;
+        Wed, 23 Mar 2022 09:30:32 +0000 (GMT)
+Message-ID: <968319ed-ae4b-02fe-41c4-06799e940d94@linux.ibm.com>
+Date:   Wed, 23 Mar 2022 10:30:32 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.0
+Subject: Re: [PATCH] KVM: s390: Fix lockdep issue in vm memop
+Content-Language: en-US
+To:     Janosch Frank <frankja@linux.ibm.com>,
+        Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        Sven Schnelle <svens@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20220322153204.2637400-1-scgl@linux.ibm.com>
+ <44618f05-9aee-5aa5-b036-dd838285b26f@linux.ibm.com>
+ <95c28949-8732-8812-c255-79467dafb5c8@linux.ibm.com>
+ <7bcd8720-1c92-4e14-0c93-51d604f017a4@linux.ibm.com>
+From:   Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <7bcd8720-1c92-4e14-0c93-51d604f017a4@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, oupton@google.com, ricarkol@google.com, pshier@google.com, reijiw@google.com, suzuki.poulose@arm.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, will@kernel.org, pbonzini@redhat.com, alexandru.elisei@arm.com, james.morse@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-8.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: AHC1a6CJhtm_B1XSyEQz9Ea4w891V2ge
+X-Proofpoint-ORIG-GUID: ZMvIBKup2d96Qntgs3wUx-xIBoeG-kz5
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-03-23_05,2022-03-22_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 clxscore=1015
+ priorityscore=1501 lowpriorityscore=0 phishscore=0 spamscore=0 bulkscore=0
+ adultscore=0 mlxscore=0 impostorscore=0 malwarescore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
+ definitions=main-2203230055
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 22 Mar 2022 18:35:35 +0000, Oliver Upton wrote:
-> This series addresses a couple of issues with how KVM exposes SMC64
-> calls to its guest. It is currently possible for an AArch32 guest to
-> discover the SMC64 SYSTEM_RESET2 function (via
-> PSCI_1_0_FN_PSCI_FEATURES) and even make a call to it. SMCCC does not
-> allow for 64 bit calls to be made from a 32 bit state.
+
+
+Am 23.03.22 um 09:57 schrieb Janosch Frank:
+> On 3/23/22 09:52, Janis Schoetterl-Glausch wrote:
+>> On 3/23/22 08:58, Janosch Frank wrote:
+>>> On 3/22/22 16:32, Janis Schoetterl-Glausch wrote:
+>>>> Issuing a memop on a protected vm does not make sense,
+>>>
+>>> Issuing a vm memop on a protected vm...
+>>>
+>>> The cpu memop still makes sense, no?
+>>
+>> The vcpu memop does hold the vcpu->lock, so no lockdep issue.
+>> If you issue a vcpu memop while enabling protected virtualization,
+>> the memop might find that the vcpu is not protected, while other vcpus
+>> might already be, but I don't think there's a way to create secure memory
+>> concurrent with the memop.
 > 
-> Patch 1 cleans up the way we filter SMC64 calls in PSCI. Using a switch
-> with case statements for each possibly-filtered function is asking for
-> trouble. Instead, pivot off of the bit that indicates the desired
-> calling convention. This plugs the PSCI_FEATURES hole for SYSTEM_RESET2.
+> I just wanted you to make this a bit more specific since we now have vm and vcpu memops. vm memops don't make sense for pv guests but vcpu ones are needed to access the sida.
+
+Right, I think changing the commit messages
+- Issuing a memop on a protected vm does not make sense
++ Issuing a vm memop on a protected vm does not make sense
+
+does make sense.
+
 > 
-> [...]
-
-Applied to fixes, thanks!
-
-[1/3] KVM: arm64: Generally disallow SMC64 for AArch32 guests
-      commit: 905ec3226f8150f73838a36cb79ba79e1d789e8e
-[2/3] KVM: arm64: Actually prevent SMC64 SYSTEM_RESET2 from AArch32
-      commit: 3e1b3dbad320e1532fdf09e5b80e35d62a0fd82b
-[3/3] KVM: arm64: Drop unneeded minor version check from PSCI v1.x handler
-      commit: 8872d9b3e35a0ecb80d6413bba403d4aaf49af63
-
-Cheers,
-
-	M.
--- 
-Without deviation from the norm, progress is not possible.
-
-
+>>>
+>>>> neither is the memory readable/writable, nor does it make sense to check
+>>>> storage keys. This is why the ioctl will return -EINVAL when it detects
+>>>> the vm to be protected. However, in order to ensure that the vm cannot
+>>>> become protected during the memop, the kvm->lock would need to be taken
+>>>> for the duration of the ioctl. This is also required because
+>>>> kvm_s390_pv_is_protected asserts that the lock must be held.
+>>>> Instead, don't try to prevent this. If user space enables secure
+>>>> execution concurrently with a memop it must accecpt the possibility of
+>>>> the memop failing.
+>>>> Still check if the vm is currently protected, but without locking and
+>>>> consider it a heuristic.
+>>>>
+>>>> Fixes: ef11c9463ae0 ("KVM: s390: Add vm IOCTL for key checked guest absolute memory access")
+>>>> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+>>>
+>>> Makes sense to me.
+>>>
+>>> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+>>>
+>>>> ---
+>>>>    arch/s390/kvm/kvm-s390.c | 11 ++++++++++-
+>>>>    1 file changed, 10 insertions(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+>>>> index ca96f84db2cc..53adbe86a68f 100644
+>>>> --- a/arch/s390/kvm/kvm-s390.c
+>>>> +++ b/arch/s390/kvm/kvm-s390.c
+>>>> @@ -2385,7 +2385,16 @@ static int kvm_s390_vm_mem_op(struct kvm *kvm, struct kvm_s390_mem_op *mop)
+>>>>            return -EINVAL;
+>>>>        if (mop->size > MEM_OP_MAX_SIZE)
+>>>>            return -E2BIG;
+>>>> -    if (kvm_s390_pv_is_protected(kvm))
+>>>> +    /*
+>>>> +     * This is technically a heuristic only, if the kvm->lock is not
+>>>> +     * taken, it is not guaranteed that the vm is/remains non-protected.
+>>>> +     * This is ok from a kernel perspective, wrongdoing is detected
+>>>> +     * on the access, -EFAULT is returned and the vm may crash the
+>>>> +     * next time it accesses the memory in question.
+>>>> +     * There is no sane usecase to do switching and a memop on two
+>>>> +     * different CPUs at the same time.
+>>>> +     */
+>>>> +    if (kvm_s390_pv_get_handle(kvm))
+>>>>            return -EINVAL;
+>>>>        if (mop->flags & KVM_S390_MEMOP_F_SKEY_PROTECTION) {
+>>>>            if (access_key_invalid(mop->key))
+>>>>
+>>>> base-commit: c9b8fecddb5bb4b67e351bbaeaa648a6f7456912
+>>>
+>>
+> 
