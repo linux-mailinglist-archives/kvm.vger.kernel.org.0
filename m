@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 74C5A4E5B85
-	for <lists+kvm@lfdr.de>; Wed, 23 Mar 2022 23:54:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B25E94E5B86
+	for <lists+kvm@lfdr.de>; Wed, 23 Mar 2022 23:54:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345341AbiCWWzy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Mar 2022 18:55:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47026 "EHLO
+        id S1345351AbiCWWzz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Mar 2022 18:55:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46774 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345334AbiCWWzx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Mar 2022 18:55:53 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE78D9025C
-        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 15:54:21 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-2e6aaf57a0eso18058807b3.11
-        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 15:54:21 -0700 (PDT)
+        with ESMTP id S1345340AbiCWWzy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Mar 2022 18:55:54 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 097608D681
+        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 15:54:23 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id x18-20020a170902ea9200b00153e0dbca9bso1522413plb.9
+        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 15:54:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=tGi3aEd1DymP1QEbX6UeAl67uwr+ad2Hf0K4ePd8bfw=;
-        b=jQsYsRBasQR1L4DI2LummKhWRUdIgIsWSYMGQIJH1zR+QfjonGaosVz3ExDMZitkh7
-         /Y3oUJ0UJMFbx99FZRtCdnCBcTtOtUIE2XrSNeQAyjNB6JFYlt+0Wr++I8VlJNoauYKh
-         HKPDsa6XDQRjiei5KLCXYprjYW9bf/fqXvoxr44A3TiQqc0PeJ/zPnAB8QgZxXibBjRm
-         0LTqMiZFLVvEfL3R26nNGtKeZ4TMWLd/IzjK6JLgj0oKHO1ECbVU/RWbVSeBJVUmn3YP
-         xSz3I0vcXTyRAFIbLyo7tNdrXjqlKe9nHQQ4AFRCK9r1ge6zeNWdnJvfbhgiIi/nGhXc
-         TLOQ==
+        bh=rNNhRfKhYknMP2+oJNC4EO4oFb/4JLt8/J+1Ulwb074=;
+        b=fcvWs/M+OJroPCiM23XkgUWvmtBZv19XWU8pgUAWdJSm2HusVFqNt28RzQrt/t2l3w
+         kdnTH1+Lkj19lUhY+ewLR83Amgot0T086obsthKAvw5ww0g1hDdLdWnLAUdYeTZliIE4
+         kl2oI+GwPq7NBmTx1tsnI61h65IZYcZkUyhe1G4tq5nabV5tS4skuTB5hx8mb+srtcsi
+         gUtprmAUDrIGCsXGcOIFGI7av3RTDpjprQeWNjE+ZY1xTIe7MYFX7aVm2JlLtKyYSqwE
+         erZLyDHHqWFnnSxMY/0fEgTwyrISc5KxCqH20R9tjpfg1ol8iFppXePAdkYQeSW6kZlY
+         ZWdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=tGi3aEd1DymP1QEbX6UeAl67uwr+ad2Hf0K4ePd8bfw=;
-        b=VovHzBC1zS4EoC37EvPQeFGPAH0t74300EhwgCzRfn4KKKBvitiOPgwlwmMKsUHv4L
-         TztAv9c3Y9DGCVGxpDMmkMMkIuMLj8CJ9e7Pku6dG2ZWJXqOhqJ1npgNyTo7CL7htQ8i
-         IwWSn4RJXUMQOVtoYwkgd/WI4IcMNUZeJqyrJ2Jehubm23JT3kpeJErB5Ohpr9bOrH20
-         ZDJmtOkOdfT/MMjHGhpl9HtPCnm0FqRB8ib/fbA2oHgSRza4o1yiyHEZ0iEmtb766ZW/
-         kZskawyJSsci5lCQE+1w97NKv3c4ILWrbxoSNtDFVhnUuHy81qepvWP9jdmKkFCRx2xw
-         FEIw==
-X-Gm-Message-State: AOAM533f5qUXEYNOj0WqH6kRMuUn2BMBmC6REvs3/jzfyVH2vVc9eN2i
-        UoOEP8xIOEl+MQ0b1GQN9ap6Et/fSFMAt/iHnxJUuJUaT5MwUQZE9u/45fxkAZoHaQx45QJdpQv
-        19qrHzGLtmTAD3LI1jXpbiWzDPsf7oydlNcoWWdurld8TF3cUCRp8fIt3RDalBHo=
-X-Google-Smtp-Source: ABdhPJzKD0HIIXn4MSLGTHZN/023n14qhjP9uuLtZ7yqmi2KvdrUEmYVfRRYBoJgBUGVlbjGZ+DarMn/9lzYZQ==
+        bh=rNNhRfKhYknMP2+oJNC4EO4oFb/4JLt8/J+1Ulwb074=;
+        b=5xC+DG5d6SSyNUiNdNZPRicAVhihxRntZ7U2P7cQIqco7bsv8uLUyZI4ODX+/mmFvO
+         0qHQIncfyaFbvlI4n3LXoRpfKqed7c1Gi+cx4W4GW6akikRDDlB8eO9EFYlJvgHbcIyl
+         o5YNvDzLWqAlVrvbcLkPXfYEK8sfzvEDdRUgGJ4l5vV1p5ccz5GRDlH6ZcXTyb5kEsEM
+         lLqGnUhaTWYJ1+ETpGxCA6xC+XnMJBWIXvqyuM0LTp8qDFy3PAVqzSxe6MZy9ukfw4YG
+         AXr0S1A4BGhCEJ2DfRXkfbBqSzhB85/ZSK15B7el0jkV7iRSuG/2IU0sDP6bi3OQllVe
+         v0rA==
+X-Gm-Message-State: AOAM532rfvgBc4LgvLlcQwomRxZHB70H7m+sCaiSMEeYaa2uaK0rBN/Y
+        2/G1ahR1VKiYqHEVTXOxCXRmIokoxfbOueSTfNfDg8YdfEc8KJxmEFdgBu2ByRTImEDmydZb55G
+        CuPxC7uyyS+LMZS+/oxQ5SB2YV2yD1SyMZp3bOc06bTUwoqGOw4GHf4pBSc8wS6Q=
+X-Google-Smtp-Source: ABdhPJzZcZCSZNlq91/IIXrO/vTBcBMJURE15e8jxPmh/Bne7GSzSCwhKyzaScOvedmnAsB3HGQ+Qutp6F+1og==
 X-Received: from ricarkol2.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
- (user=ricarkol job=sendgmr) by 2002:a0d:e297:0:b0:2e5:9bbc:2455 with SMTP id
- l145-20020a0de297000000b002e59bbc2455mr2327528ywe.21.1648076060784; Wed, 23
- Mar 2022 15:54:20 -0700 (PDT)
-Date:   Wed, 23 Mar 2022 15:54:01 -0700
+ (user=ricarkol job=sendgmr) by 2002:a17:903:249:b0:153:857c:a1fe with SMTP id
+ j9-20020a170903024900b00153857ca1femr2562597plh.44.1648076062416; Wed, 23 Mar
+ 2022 15:54:22 -0700 (PDT)
+Date:   Wed, 23 Mar 2022 15:54:02 -0700
 In-Reply-To: <20220323225405.267155-1-ricarkol@google.com>
-Message-Id: <20220323225405.267155-8-ricarkol@google.com>
+Message-Id: <20220323225405.267155-9-ricarkol@google.com>
 Mime-Version: 1.0
 References: <20220323225405.267155-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.35.1.894.gb6a874cedc-goog
-Subject: [PATCH v2 07/11] KVM: selftests: aarch64: Add aarch64/page_fault_test
+Subject: [PATCH v2 08/11] KVM: selftests: aarch64: Add userfaultfd tests into page_fault_test
 From:   Ricardo Koller <ricarkol@google.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
         drjones@redhat.com
@@ -71,709 +71,339 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a new test for stage 2 faults when using different combinations of
-guest accesses (e.g., write, S1PTW), backing source type (e.g., anon)
-and types of faults (e.g., read on hugetlbfs with a hole). The next
-commits will add different handling methods and more faults (e.g., uffd
-and dirty logging). This first commit starts by adding two sanity checks
-for all types of accesses: AF setting by the hw, and accessing memslots
-with holes.
-
-Note that this commit borrows some code from kvm-unit-tests: RET,
-MOV_X0, and flush_tlb_page.
+Add some userfaultfd tests into page_fault_test. Punch holes into the
+data and/or page-table memslots, perform some accesses, and check that
+the faults are taken (or not taken) when expected.
 
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../selftests/kvm/aarch64/page_fault_test.c   | 667 ++++++++++++++++++
- 2 files changed, 668 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/aarch64/page_fault_test.c
+ .../selftests/kvm/aarch64/page_fault_test.c   | 232 +++++++++++++++++-
+ 1 file changed, 229 insertions(+), 3 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index bc5f89b3700e..6a192798b217 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -103,6 +103,7 @@ TEST_GEN_PROGS_x86_64 += system_counter_offset_test
- TEST_GEN_PROGS_aarch64 += aarch64/arch_timer
- TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
- TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
-+TEST_GEN_PROGS_aarch64 += aarch64/page_fault_test
- TEST_GEN_PROGS_aarch64 += aarch64/psci_cpu_on_test
- TEST_GEN_PROGS_aarch64 += aarch64/vgic_init
- TEST_GEN_PROGS_aarch64 += aarch64/vgic_irq
 diff --git a/tools/testing/selftests/kvm/aarch64/page_fault_test.c b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-new file mode 100644
-index 000000000000..00477a4f10cb
---- /dev/null
+index 00477a4f10cb..99449eaddb2b 100644
+--- a/tools/testing/selftests/kvm/aarch64/page_fault_test.c
 +++ b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-@@ -0,0 +1,667 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * page_fault_test.c - Test stage 2 faults.
-+ *
-+ * This test tries different combinations of guest accesses (e.g., write,
-+ * S1PTW), backing source type (e.g., anon) and types of faults (e.g., read on
-+ * hugetlbfs with a hole). It checks that the expected handling method is
-+ * called (e.g., uffd faults with the right address and write/read flag).
-+ */
-+
-+#define _GNU_SOURCE
-+#include <linux/bitmap.h>
-+#include <fcntl.h>
-+#include <test_util.h>
-+#include <kvm_util.h>
-+#include <processor.h>
-+#include "guest_modes.h"
-+#include "userfaultfd_util.h"
-+
-+#define VCPU_ID					0
-+
-+#define TEST_MEM_SLOT_INDEX			1
-+#define TEST_PT_SLOT_INDEX			2
-+
-+/* Max number of backing pages per guest page */
-+#define BACKING_PG_PER_GUEST_PG			(64 / 4)
-+
-+/* Test memslot in backing source pages */
-+#define TEST_MEMSLOT_BACKING_SRC_NPAGES		(1 * BACKING_PG_PER_GUEST_PG)
-+
-+/* PT memslot size in backing source pages */
-+#define PT_MEMSLOT_BACKING_SRC_NPAGES		(4 * BACKING_PG_PER_GUEST_PG)
-+
-+/* Guest virtual addresses that point to the test page and its PTE. */
-+#define GUEST_TEST_GVA				0xc0000000
-+#define GUEST_TEST_EXEC_GVA			0xc0000008
-+#define GUEST_TEST_PTE_GVA			0xd0000000
-+
-+/* Access flag */
-+#define PTE_AF					(1ULL << 10)
-+
-+/* Acces flag update enable/disable */
-+#define TCR_EL1_HA				(1ULL << 39)
-+
-+#define CMD_SKIP_TEST				(-1LL)
-+#define CMD_HOLE_PT				(1ULL << 2)
-+#define CMD_HOLE_TEST				(1ULL << 3)
-+
-+#define PREPARE_FN_NR				10
-+#define CHECK_FN_NR				10
-+
-+static const uint64_t test_gva = GUEST_TEST_GVA;
-+static const uint64_t test_exec_gva = GUEST_TEST_EXEC_GVA;
-+static const uint64_t pte_gva = GUEST_TEST_PTE_GVA;
-+uint64_t pte_gpa;
-+
-+enum { PT, TEST, NR_MEMSLOTS};
-+
-+struct memslot_desc {
-+	void *hva;
-+	uint64_t gpa;
-+	uint64_t size;
-+	uint64_t guest_pages;
-+	uint64_t backing_pages;
-+	enum vm_mem_backing_src_type src_type;
-+	uint32_t idx;
-+} memslot[NR_MEMSLOTS] = {
-+	{
-+		.idx = TEST_PT_SLOT_INDEX,
-+		.backing_pages = PT_MEMSLOT_BACKING_SRC_NPAGES,
-+	},
-+	{
-+		.idx = TEST_MEM_SLOT_INDEX,
-+		.backing_pages = TEST_MEMSLOT_BACKING_SRC_NPAGES,
-+	},
-+};
-+
-+static struct event_cnt {
-+	int aborts;
-+	int fail_vcpu_runs;
-+} events;
-+
-+struct test_desc {
-+	const char *name;
-+	uint64_t mem_mark_cmd;
-+	/* Skip the test if any prepare function returns false */
-+	bool (*guest_prepare[PREPARE_FN_NR])(void);
-+	void (*guest_test)(void);
-+	void (*guest_test_check[CHECK_FN_NR])(void);
-+	void (*dabt_handler)(struct ex_regs *regs);
-+	void (*iabt_handler)(struct ex_regs *regs);
-+	uint32_t pt_memslot_flags;
-+	uint32_t test_memslot_flags;
-+	void (*guest_pre_run)(struct kvm_vm *vm);
-+	bool skip;
-+	struct event_cnt expected_events;
-+};
-+
-+struct test_params {
-+	enum vm_mem_backing_src_type src_type;
-+	struct test_desc *test_desc;
-+};
-+
-+
-+static inline void flush_tlb_page(uint64_t vaddr)
+@@ -57,6 +57,8 @@ uint64_t pte_gpa;
+ enum { PT, TEST, NR_MEMSLOTS};
+ 
+ struct memslot_desc {
++	size_t paging_size;
++	char *data_copy;
+ 	void *hva;
+ 	uint64_t gpa;
+ 	uint64_t size;
+@@ -78,6 +80,9 @@ struct memslot_desc {
+ static struct event_cnt {
+ 	int aborts;
+ 	int fail_vcpu_runs;
++	int uffd_faults;
++	/* uffd_faults is incremented from multiple threads. */
++	pthread_mutex_t uffd_faults_mutex;
+ } events;
+ 
+ struct test_desc {
+@@ -87,6 +92,8 @@ struct test_desc {
+ 	bool (*guest_prepare[PREPARE_FN_NR])(void);
+ 	void (*guest_test)(void);
+ 	void (*guest_test_check[CHECK_FN_NR])(void);
++	int (*uffd_pt_handler)(int mode, int uffd, struct uffd_msg *msg);
++	int (*uffd_test_handler)(int mode, int uffd, struct uffd_msg *msg);
+ 	void (*dabt_handler)(struct ex_regs *regs);
+ 	void (*iabt_handler)(struct ex_regs *regs);
+ 	uint32_t pt_memslot_flags;
+@@ -305,6 +312,56 @@ static void no_iabt_handler(struct ex_regs *regs)
+ 	GUEST_ASSERT_1(false, regs->pc);
+ }
+ 
++static int uffd_generic_handler(int uffd_mode, int uffd,
++		struct uffd_msg *msg, struct memslot_desc *memslot,
++		bool expect_write)
 +{
-+	uint64_t page = vaddr >> 12;
-+
-+	dsb(ishst);
-+	asm("tlbi vaae1is, %0" :: "r" (page));
-+	dsb(ish);
-+	isb();
-+}
-+
-+#define RET			0xd65f03c0
-+#define MOV_X0(x)		(0xd2800000 | (((x) & 0xffff) << 5))
-+
-+static void guest_test_nop(void)
-+{}
-+
-+static void guest_test_write64(void)
-+{
-+	uint64_t val;
-+
-+	WRITE_ONCE(*((uint64_t *)test_gva), 0x0123456789ABCDEF);
-+	val = READ_ONCE(*(uint64_t *)test_gva);
-+	GUEST_ASSERT_EQ(val, 0x0123456789ABCDEF);
-+}
-+
-+/* Check the system for atomic instructions. */
-+static bool guest_check_lse(void)
-+{
-+	uint64_t isar0 = read_sysreg(id_aa64isar0_el1);
-+	uint64_t atomic = (isar0 >> 20) & 7;
-+
-+	return atomic >= 2;
-+}
-+
-+/* Compare and swap instruction. */
-+static void guest_test_cas(void)
-+{
-+	uint64_t val;
-+	uint64_t addr = test_gva;
-+
-+	GUEST_ASSERT_EQ(guest_check_lse(), 1);
-+	asm volatile(".arch_extension lse\n"
-+		     "casal %0, %1, [%2]\n"
-+			:: "r" (0), "r" (0x0123456789ABCDEF), "r" (addr));
-+	val = READ_ONCE(*(uint64_t *)(addr));
-+	GUEST_ASSERT_EQ(val, 0x0123456789ABCDEF);
-+}
-+
-+static void guest_test_read64(void)
-+{
-+	uint64_t val;
-+
-+	val = READ_ONCE(*(uint64_t *)test_gva);
-+	GUEST_ASSERT_EQ(val, 0);
-+}
-+
-+/* Address translation instruction */
-+static void guest_test_at(void)
-+{
-+	uint64_t par;
-+	uint64_t addr = 0;
-+
-+	asm volatile("at s1e1r, %0" :: "r" (test_gva));
-+	par = read_sysreg(par_el1);
-+
-+	/* Bit 1 indicates whether the AT was successful */
-+	GUEST_ASSERT_EQ(par & 1, 0);
-+	/* The PA in bits [51:12] */
-+	addr = par & (((1ULL << 40) - 1) << 12);
-+	GUEST_ASSERT_EQ(addr, memslot[TEST].gpa);
-+}
-+
-+static void guest_test_dc_zva(void)
-+{
-+	/* The smallest guaranteed block size (bs) is a word. */
-+	uint16_t val;
-+
-+	asm volatile("dc zva, %0\n"
-+			"dsb ish\n"
-+			:: "r" (test_gva));
-+	val = READ_ONCE(*(uint16_t *)test_gva);
-+	GUEST_ASSERT_EQ(val, 0);
-+}
-+
-+static void guest_test_ld_preidx(void)
-+{
-+	uint64_t val;
-+	uint64_t addr = test_gva - 8;
-+
-+	/*
-+	 * This ends up accessing "test_gva + 8 - 8", where "test_gva - 8"
-+	 * is not backed by a memslot.
-+	 */
-+	asm volatile("ldr %0, [%1, #8]!"
-+			: "=r" (val), "+r" (addr));
-+	GUEST_ASSERT_EQ(val, 0);
-+	GUEST_ASSERT_EQ(addr, test_gva);
-+}
-+
-+static void guest_test_st_preidx(void)
-+{
-+	uint64_t val = 0x0123456789ABCDEF;
-+	uint64_t addr = test_gva - 8;
-+
-+	asm volatile("str %0, [%1, #8]!"
-+			: "+r" (val), "+r" (addr));
-+
-+	GUEST_ASSERT_EQ(addr, test_gva);
-+	val = READ_ONCE(*(uint64_t *)test_gva);
-+}
-+
-+static bool guest_set_ha(void)
-+{
-+	uint64_t mmfr1 = read_sysreg(id_aa64mmfr1_el1);
-+	uint64_t hadbs = mmfr1 & 6;
-+	uint64_t tcr;
-+
-+	/* Skip if HA is not supported. */
-+	if (hadbs == 0)
-+		return false;
-+
-+	tcr = read_sysreg(tcr_el1) | TCR_EL1_HA;
-+	write_sysreg(tcr, tcr_el1);
-+	isb();
-+
-+	return true;
-+}
-+
-+static bool guest_clear_pte_af(void)
-+{
-+	*((uint64_t *)pte_gva) &= ~PTE_AF;
-+	flush_tlb_page(pte_gva);
-+
-+	return true;
-+}
-+
-+static void guest_check_pte_af(void)
-+{
-+	flush_tlb_page(pte_gva);
-+	GUEST_ASSERT_EQ(*((uint64_t *)pte_gva) & PTE_AF, PTE_AF);
-+}
-+
-+static void guest_test_exec(void)
-+{
-+	int (*code)(void) = (int (*)(void))test_exec_gva;
++	uint64_t addr = msg->arg.pagefault.address;
++	uint64_t flags = msg->arg.pagefault.flags;
++	struct uffdio_copy copy;
 +	int ret;
 +
-+	ret = code();
-+	GUEST_ASSERT_EQ(ret, 0x77);
-+}
++	TEST_ASSERT(uffd_mode == UFFDIO_REGISTER_MODE_MISSING,
++			"The only expected UFFD mode is MISSING");
++	ASSERT_EQ(!!(flags & UFFD_PAGEFAULT_FLAG_WRITE), expect_write);
++	ASSERT_EQ(addr, (uint64_t)memslot->hva);
 +
-+static bool guest_prepare(struct test_desc *test)
-+{
-+	bool (*prepare_fn)(void);
-+	int i;
++	pr_debug("uffd fault: addr=%p write=%d\n",
++			(void *)addr, !!(flags & UFFD_PAGEFAULT_FLAG_WRITE));
 +
-+	for (i = 0; i < PREPARE_FN_NR; i++) {
-+		prepare_fn = test->guest_prepare[i];
-+		if (prepare_fn && !prepare_fn())
-+			return false;
++	copy.src = (uint64_t)memslot->data_copy;
++	copy.dst = addr;
++	copy.len = memslot->paging_size;
++	copy.mode = 0;
++
++	ret = ioctl(uffd, UFFDIO_COPY, &copy);
++	if (ret == -1) {
++		pr_info("Failed UFFDIO_COPY in 0x%lx with errno: %d\n",
++				addr, errno);
++		return ret;
 +	}
 +
-+	return true;
-+}
-+
-+static void guest_test_check(struct test_desc *test)
-+{
-+	void (*check_fn)(void);
-+	int i;
-+
-+	for (i = 0; i < CHECK_FN_NR; i++) {
-+		check_fn = test->guest_test_check[i];
-+		if (!check_fn)
-+			continue;
-+		check_fn();
-+	}
-+}
-+
-+static void guest_code(struct test_desc *test)
-+{
-+	if (!test->guest_test)
-+		test->guest_test = guest_test_nop;
-+
-+	if (!guest_prepare(test))
-+		GUEST_SYNC(CMD_SKIP_TEST);
-+
-+	GUEST_SYNC(test->mem_mark_cmd);
-+	test->guest_test();
-+
-+	guest_test_check(test);
-+	GUEST_DONE();
-+}
-+
-+static void no_dabt_handler(struct ex_regs *regs)
-+{
-+	GUEST_ASSERT_1(false, read_sysreg(far_el1));
-+}
-+
-+static void no_iabt_handler(struct ex_regs *regs)
-+{
-+	GUEST_ASSERT_1(false, regs->pc);
-+}
-+
-+static void punch_hole_in_memslot(struct kvm_vm *vm,
-+		struct memslot_desc *memslot)
-+{
-+	int ret, fd;
-+	void *hva;
-+
-+	fd = vm_mem_region_get_src_fd(vm, memslot->idx);
-+	if (fd != -1) {
-+		ret = fallocate(fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
-+				0, memslot->size);
-+		TEST_ASSERT(ret == 0, "fallocate failed, errno: %d\n", errno);
-+	} else {
-+		hva = addr_gpa2hva(vm, memslot->gpa);
-+		ret = madvise(hva, memslot->size, MADV_DONTNEED);
-+		TEST_ASSERT(ret == 0, "madvise failed, errno: %d\n", errno);
-+	}
-+}
-+
-+static void handle_cmd(struct kvm_vm *vm, int cmd)
-+{
-+	if (cmd & CMD_HOLE_PT)
-+		punch_hole_in_memslot(vm, &memslot[PT]);
-+	if (cmd & CMD_HOLE_TEST)
-+		punch_hole_in_memslot(vm, &memslot[TEST]);
-+}
-+
-+static void sync_stats_from_guest(struct kvm_vm *vm)
-+{
-+	struct event_cnt *ec = addr_gva2hva(vm, (uint64_t)&events);
-+
-+	events.aborts += ec->aborts;
-+}
-+
-+void fail_vcpu_run_no_handler(int ret)
-+{
-+	TEST_FAIL("Unexpected vcpu run failure\n");
-+}
-+
-+static uint64_t get_total_guest_pages(enum vm_guest_mode mode,
-+		struct test_params *p)
-+{
-+	uint64_t large_page_size = get_backing_src_pagesz(p->src_type);
-+	uint64_t guest_page_size = vm_guest_mode_params[mode].page_size;
-+	uint64_t size;
-+
-+	size = PT_MEMSLOT_BACKING_SRC_NPAGES * large_page_size;
-+	size += TEST_MEMSLOT_BACKING_SRC_NPAGES * large_page_size;
-+
-+	return size / guest_page_size;
-+}
-+
-+static void load_exec_code_for_test(void)
-+{
-+	uint32_t *code;
-+
-+	/* Write this "code" into test_exec_gva */
-+	assert(test_exec_gva - test_gva);
-+	code = memslot[TEST].hva + 8;
-+
-+	code[0] = MOV_X0(0x77);
-+	code[1] = RET;
-+}
-+
-+static void setup_guest_args(struct kvm_vm *vm, struct test_desc *test)
-+{
-+	vm_vaddr_t test_desc_gva;
-+
-+	test_desc_gva = vm_vaddr_alloc_page(vm);
-+	memcpy(addr_gva2hva(vm, test_desc_gva), test,
-+			sizeof(struct test_desc));
-+	vcpu_args_set(vm, 0, 1, test_desc_gva);
-+}
-+
-+static void setup_abort_handlers(struct kvm_vm *vm, struct test_desc *test)
-+{
-+	vm_init_descriptor_tables(vm);
-+	vcpu_init_descriptor_tables(vm, VCPU_ID);
-+	if (!test->dabt_handler)
-+		test->dabt_handler = no_dabt_handler;
-+	if (!test->iabt_handler)
-+		test->iabt_handler = no_iabt_handler;
-+	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
-+			0x25, test->dabt_handler);
-+	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
-+			0x21, test->iabt_handler);
-+}
-+
-+static void setup_memslots(struct kvm_vm *vm, enum vm_guest_mode mode,
-+		struct test_params *p)
-+{
-+	uint64_t large_page_size = get_backing_src_pagesz(p->src_type);
-+	uint64_t guest_page_size = vm_guest_mode_params[mode].page_size;
-+	struct test_desc *test = p->test_desc;
-+	uint64_t hole_gpa;
-+	uint64_t alignment;
-+	int i;
-+
-+	/* Calculate the test and PT memslot sizes */
-+	for (i = 0; i < NR_MEMSLOTS; i++) {
-+		memslot[i].size = large_page_size * memslot[i].backing_pages;
-+		memslot[i].guest_pages = memslot[i].size / guest_page_size;
-+		memslot[i].src_type = p->src_type;
-+	}
-+
-+	TEST_ASSERT(memslot[TEST].size >= guest_page_size,
-+			"The test memslot should have space one guest page.\n");
-+	TEST_ASSERT(memslot[PT].size >= (4 * guest_page_size),
-+			"The PT memslot sould have space for 4 guest pages.\n");
-+
-+	/* Place the memslots GPAs at the end of physical memory */
-+	alignment = max(large_page_size, guest_page_size);
-+	memslot[TEST].gpa = (vm_get_max_gfn(vm) - memslot[TEST].guest_pages) *
-+		guest_page_size;
-+	memslot[TEST].gpa = align_down(memslot[TEST].gpa, alignment);
-+	/* Add a 1-guest_page-hole between the two memslots */
-+	hole_gpa = memslot[TEST].gpa - guest_page_size;
-+	virt_pg_map(vm, test_gva - guest_page_size, hole_gpa);
-+	memslot[PT].gpa = hole_gpa - (memslot[PT].guest_pages *
-+			guest_page_size);
-+	memslot[PT].gpa = align_down(memslot[PT].gpa, alignment);
-+
-+	/* Create memslots for and test data and a PTE. */
-+	vm_userspace_mem_region_add(vm, p->src_type, memslot[PT].gpa,
-+			memslot[PT].idx, memslot[PT].guest_pages,
-+			test->pt_memslot_flags);
-+	vm_userspace_mem_region_add(vm, p->src_type, memslot[TEST].gpa,
-+			memslot[TEST].idx, memslot[TEST].guest_pages,
-+			test->test_memslot_flags);
-+
-+	for (i = 0; i < NR_MEMSLOTS; i++)
-+		memslot[i].hva = addr_gpa2hva(vm, memslot[i].gpa);
-+
-+	/* Map the test test_gva using the PT memslot. */
-+	_virt_pg_map(vm, test_gva, memslot[TEST].gpa,
-+			4 /* NORMAL (See DEFAULT_MAIR_EL1) */,
-+			TEST_PT_SLOT_INDEX);
-+
-+	/*
-+	 * Find the PTE of the test page and map it in the guest so it can
-+	 * clear the AF.
-+	 */
-+	pte_gpa = vm_get_pte_gpa(vm, test_gva);
-+	TEST_ASSERT(memslot[PT].gpa <= pte_gpa &&
-+			pte_gpa < (memslot[PT].gpa + memslot[PT].size),
-+			"The EPT should be in the PT memslot.");
-+	/* This is an artibrary requirement just to make things simpler. */
-+	TEST_ASSERT(pte_gpa % guest_page_size == 0,
-+			"The pte_gpa (%p) should be aligned to the guest page (%lx).",
-+			(void *)pte_gpa, guest_page_size);
-+	virt_pg_map(vm, pte_gva, pte_gpa);
-+}
-+
-+static void check_event_counts(struct test_desc *test)
-+{
-+	ASSERT_EQ(test->expected_events.aborts,	events.aborts);
-+}
-+
-+static void print_test_banner(enum vm_guest_mode mode, struct test_params *p)
-+{
-+	struct test_desc *test = p->test_desc;
-+
-+	pr_debug("Test: %s\n", test->name);
-+	pr_debug("Testing guest mode: %s\n", vm_guest_mode_string(mode));
-+	pr_debug("Testing memory backing src type: %s\n",
-+			vm_mem_backing_src_alias(p->src_type)->name);
-+}
-+
-+static void reset_event_counts(void)
-+{
-+	memset(&events, 0, sizeof(events));
-+}
-+
-+static bool vcpu_run_loop(struct kvm_vm *vm, struct test_desc *test)
-+{
-+	bool skip_test = false;
-+	struct ucall uc;
-+	int stage;
-+
-+	for (stage = 0; ; stage++) {
-+		vcpu_run(vm, VCPU_ID);
-+
-+		switch (get_ucall(vm, VCPU_ID, &uc)) {
-+		case UCALL_SYNC:
-+			if (uc.args[1] == CMD_SKIP_TEST) {
-+				pr_debug("Skipped.\n");
-+				skip_test = true;
-+				goto done;
-+			}
-+			handle_cmd(vm, uc.args[1]);
-+			break;
-+		case UCALL_ABORT:
-+			TEST_FAIL("%s at %s:%ld\n\tvalues: %#lx, %#lx",
-+				(const char *)uc.args[0],
-+				__FILE__, uc.args[1], uc.args[2], uc.args[3]);
-+			break;
-+		case UCALL_DONE:
-+			pr_debug("Done.\n");
-+			goto done;
-+		default:
-+			TEST_FAIL("Unknown ucall %lu", uc.cmd);
-+		}
-+	}
-+
-+done:
-+	return skip_test;
-+}
-+
-+static void run_test(enum vm_guest_mode mode, void *arg)
-+{
-+	struct test_params *p = (struct test_params *)arg;
-+	struct test_desc *test = p->test_desc;
-+	struct kvm_vm *vm;
-+	bool skip_test = false;
-+
-+	print_test_banner(mode, p);
-+
-+	vm = vm_create_with_vcpus(mode, 1, DEFAULT_GUEST_PHY_PAGES,
-+			get_total_guest_pages(mode, p), 0, guest_code, NULL);
-+	ucall_init(vm, NULL);
-+
-+	reset_event_counts();
-+	setup_memslots(vm, mode, p);
-+
-+	load_exec_code_for_test();
-+	setup_abort_handlers(vm, test);
-+	setup_guest_args(vm, test);
-+
-+	if (test->guest_pre_run)
-+		test->guest_pre_run(vm);
-+
-+	sync_global_to_guest(vm, memslot);
-+
-+	skip_test = vcpu_run_loop(vm, test);
-+
-+	sync_stats_from_guest(vm);
-+	ucall_uninit(vm);
-+	kvm_vm_free(vm);
-+
-+	if (!skip_test)
-+		check_event_counts(test);
-+}
-+
-+static void for_each_test_and_guest_mode(void (*func)(enum vm_guest_mode, void *),
-+		enum vm_mem_backing_src_type src_type);
-+
-+static void help(char *name)
-+{
-+	puts("");
-+	printf("usage: %s [-h] [-s mem-type]\n", name);
-+	puts("");
-+	guest_modes_help();
-+	backing_src_help("-s");
-+	puts("");
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	enum vm_mem_backing_src_type src_type;
-+	int opt;
-+
-+	setbuf(stdout, NULL);
-+
-+	src_type = DEFAULT_VM_MEM_SRC;
-+
-+	guest_modes_append_default();
-+
-+	while ((opt = getopt(argc, argv, "hm:s:")) != -1) {
-+		switch (opt) {
-+		case 'm':
-+			guest_modes_cmdline(optarg);
-+			break;
-+		case 's':
-+			src_type = parse_backing_src_type(optarg);
-+			break;
-+		case 'h':
-+		default:
-+			help(argv[0]);
-+			exit(0);
-+		}
-+	}
-+
-+	for_each_test_and_guest_mode(run_test, src_type);
++	pthread_mutex_lock(&events.uffd_faults_mutex);
++	events.uffd_faults += 1;
++	pthread_mutex_unlock(&events.uffd_faults_mutex);
 +	return 0;
 +}
 +
-+#define SNAME(s)		#s
-+#define SCAT(a, b)		SNAME(a ## _ ## b)
-+
-+#define TEST_BASIC_ACCESS(__a, ...)						\
-+{										\
-+	.name			= SNAME(BASIC_ACCESS ## _ ## __a),		\
-+	.guest_test		= __a,						\
-+	.expected_events	= { 0 },					\
-+	__VA_ARGS__								\
++static int uffd_pt_write_handler(int mode, int uffd, struct uffd_msg *msg)
++{
++	return uffd_generic_handler(mode, uffd, msg, &memslot[PT], true);
 +}
 +
-+#define __AF_TEST_ARGS								\
-+	.guest_prepare		= { guest_set_ha, guest_clear_pte_af, },	\
-+	.guest_test_check	= { guest_check_pte_af, },			\
++static int uffd_test_write_handler(int mode, int uffd, struct uffd_msg *msg)
++{
++	return uffd_generic_handler(mode, uffd, msg, &memslot[TEST], true);
++}
 +
-+#define __AF_LSE_TEST_ARGS							\
-+	.guest_prepare		= { guest_set_ha, guest_clear_pte_af,		\
-+				    guest_check_lse, },				\
-+	.guest_test_check	= { guest_check_pte_af, },			\
++static int uffd_test_read_handler(int mode, int uffd, struct uffd_msg *msg)
++{
++	return uffd_generic_handler(mode, uffd, msg, &memslot[TEST], false);
++}
 +
-+#define __PREPARE_LSE_TEST_ARGS							\
-+	.guest_prepare		= { guest_check_lse, },
+ static void punch_hole_in_memslot(struct kvm_vm *vm,
+ 		struct memslot_desc *memslot)
+ {
+@@ -314,11 +371,11 @@ static void punch_hole_in_memslot(struct kvm_vm *vm,
+ 	fd = vm_mem_region_get_src_fd(vm, memslot->idx);
+ 	if (fd != -1) {
+ 		ret = fallocate(fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
+-				0, memslot->size);
++				0, memslot->paging_size);
+ 		TEST_ASSERT(ret == 0, "fallocate failed, errno: %d\n", errno);
+ 	} else {
+ 		hva = addr_gpa2hva(vm, memslot->gpa);
+-		ret = madvise(hva, memslot->size, MADV_DONTNEED);
++		ret = madvise(hva, memslot->paging_size, MADV_DONTNEED);
+ 		TEST_ASSERT(ret == 0, "madvise failed, errno: %d\n", errno);
+ 	}
+ }
+@@ -457,9 +514,60 @@ static void setup_memslots(struct kvm_vm *vm, enum vm_guest_mode mode,
+ 	virt_pg_map(vm, pte_gva, pte_gpa);
+ }
+ 
++static void setup_uffd(enum vm_guest_mode mode, struct test_params *p,
++		struct uffd_desc **uffd)
++{
++	struct test_desc *test = p->test_desc;
++	uint64_t large_page_size = get_backing_src_pagesz(p->src_type);
++	int i;
 +
-+#define TEST_HW_ACCESS_FLAG(__a)						\
-+	TEST_BASIC_ACCESS(__a, __AF_TEST_ARGS)
++	/*
++	 * When creating the map, we might not only have created a pte page,
++	 * but also an intermediate level (pte_gpa != gpa[PT]). So, we
++	 * might need to demand page both.
++	 */
++	memslot[PT].paging_size = align_up(pte_gpa - memslot[PT].gpa,
++			large_page_size) + large_page_size;
++	memslot[TEST].paging_size = large_page_size;
 +
-+#define TEST_ACCESS_ON_HOLE_NO_FAULTS(__a, ...)					\
++	for (i = 0; i < NR_MEMSLOTS; i++) {
++		memslot[i].data_copy = malloc(memslot[i].paging_size);
++		TEST_ASSERT(memslot[i].data_copy, "Failed malloc.");
++		memcpy(memslot[i].data_copy, memslot[i].hva,
++				memslot[i].paging_size);
++	}
++
++	uffd[PT] = NULL;
++	if (test->uffd_pt_handler)
++		uffd[PT] = uffd_setup_demand_paging(
++				UFFDIO_REGISTER_MODE_MISSING, 0,
++				memslot[PT].hva, memslot[PT].paging_size,
++				test->uffd_pt_handler);
++
++	uffd[TEST] = NULL;
++	if (test->uffd_test_handler)
++		uffd[TEST] = uffd_setup_demand_paging(
++				UFFDIO_REGISTER_MODE_MISSING, 0,
++				memslot[TEST].hva, memslot[TEST].paging_size,
++				test->uffd_test_handler);
++}
++
+ static void check_event_counts(struct test_desc *test)
+ {
+ 	ASSERT_EQ(test->expected_events.aborts,	events.aborts);
++	ASSERT_EQ(test->expected_events.uffd_faults, events.uffd_faults);
++}
++
++static void free_uffd(struct test_desc *test, struct uffd_desc **uffd)
++{
++	int i;
++
++	if (test->uffd_pt_handler)
++		uffd_stop_demand_paging(uffd[PT]);
++	if (test->uffd_test_handler)
++		uffd_stop_demand_paging(uffd[TEST]);
++	for (i = 0; i < NR_MEMSLOTS; i++)
++		free(memslot[i].data_copy);
+ }
+ 
+ static void print_test_banner(enum vm_guest_mode mode, struct test_params *p)
+@@ -517,6 +625,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 	struct test_params *p = (struct test_params *)arg;
+ 	struct test_desc *test = p->test_desc;
+ 	struct kvm_vm *vm;
++	struct uffd_desc *uffd[NR_MEMSLOTS];
+ 	bool skip_test = false;
+ 
+ 	print_test_banner(mode, p);
+@@ -528,7 +637,14 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 	reset_event_counts();
+ 	setup_memslots(vm, mode, p);
+ 
++	/*
++	 * Set some code at memslot[TEST].hva for the guest to execute (only
++	 * applicable to the EXEC tests). This has to be done before
++	 * setup_uffd() as that function copies the memslot data for the uffd
++	 * handler.
++	 */
+ 	load_exec_code_for_test();
++	setup_uffd(mode, p, uffd);
+ 	setup_abort_handlers(vm, test);
+ 	setup_guest_args(vm, test);
+ 
+@@ -542,7 +658,12 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 	sync_stats_from_guest(vm);
+ 	ucall_uninit(vm);
+ 	kvm_vm_free(vm);
++	free_uffd(test, uffd);
+ 
++	/*
++	 * Make sure this is called after the uffd threads have exited (and
++	 * updated their respective event counters).
++	 */
+ 	if (!skip_test)
+ 		check_event_counts(test);
+ }
+@@ -625,6 +746,43 @@ int main(int argc, char *argv[])
+ 	__VA_ARGS__								\
+ }
+ 
++#define TEST_ACCESS_ON_HOLE_UFFD(__a, __uffd_handler, ...)			\
 +{										\
-+	.name			= SNAME(ACCESS_ON_HOLE_NO_FAULTS ## _ ## __a),	\
++	.name			= SNAME(ACCESS_ON_HOLE_UFFD ## _ ## __a),	\
 +	.guest_test		= __a,						\
 +	.mem_mark_cmd		= CMD_HOLE_TEST,				\
-+	.expected_events	= { 0 },					\
++	.uffd_test_handler	= __uffd_handler,				\
++	.expected_events	= { .uffd_faults = 1, },			\
 +	__VA_ARGS__								\
 +}
 +
-+static struct test_desc tests[] = {
-+	/* Check that HW is setting the AF (sanity checks). */
-+	TEST_HW_ACCESS_FLAG(guest_test_read64),
-+	TEST_HW_ACCESS_FLAG(guest_test_ld_preidx),
-+	TEST_BASIC_ACCESS(guest_test_cas, __AF_LSE_TEST_ARGS),
-+	TEST_HW_ACCESS_FLAG(guest_test_write64),
-+	TEST_HW_ACCESS_FLAG(guest_test_st_preidx),
-+	TEST_HW_ACCESS_FLAG(guest_test_dc_zva),
-+	TEST_HW_ACCESS_FLAG(guest_test_exec),
-+
-+	/* Accessing a hole shouldn't fault (more sanity checks). */
-+	TEST_ACCESS_ON_HOLE_NO_FAULTS(guest_test_read64),
-+	TEST_ACCESS_ON_HOLE_NO_FAULTS(guest_test_cas, __PREPARE_LSE_TEST_ARGS),
-+	TEST_ACCESS_ON_HOLE_NO_FAULTS(guest_test_ld_preidx),
-+	TEST_ACCESS_ON_HOLE_NO_FAULTS(guest_test_write64),
-+	TEST_ACCESS_ON_HOLE_NO_FAULTS(guest_test_at),
-+	TEST_ACCESS_ON_HOLE_NO_FAULTS(guest_test_dc_zva),
-+	TEST_ACCESS_ON_HOLE_NO_FAULTS(guest_test_st_preidx),
-+
-+	{ 0 },
-+};
-+
-+static void for_each_test_and_guest_mode(
-+		void (*func)(enum vm_guest_mode m, void *a),
-+		enum vm_mem_backing_src_type src_type)
-+{
-+	struct test_desc *t;
-+
-+	for (t = &tests[0]; t->name; t++) {
-+		if (t->skip)
-+			continue;
-+
-+		struct test_params p = {
-+			.src_type = src_type,
-+			.test_desc = t,
-+		};
-+
-+		for_each_guest_mode(run_test, &p);
-+	}
++#define TEST_S1PTW_ON_HOLE_UFFD(__a, __uffd_handler, ...)			\
++{										\
++	.name			= SNAME(S1PTW_ON_HOLE_UFFD ## _ ## __a),	\
++	.guest_test		= __a,						\
++	.mem_mark_cmd		= CMD_HOLE_PT,					\
++	.uffd_pt_handler	= __uffd_handler,				\
++	.expected_events	= { .uffd_faults = 1, },			\
++	__VA_ARGS__								\
 +}
++
++#define TEST_S1PTW_ON_HOLE_UFFD_AF(__a, __uffd_handler)				\
++	TEST_S1PTW_ON_HOLE_UFFD(__a, __uffd_handler, __AF_TEST_ARGS)
++
++#define TEST_ACCESS_AND_S1PTW_ON_HOLE_UFFD(__a, __th, __ph, ...)		\
++{										\
++	.name			= SNAME(ACCESS_S1PTW_ON_HOLE_UFFD ## _ ## __a),	\
++	.guest_test		= __a,						\
++	.mem_mark_cmd		= CMD_HOLE_PT | CMD_HOLE_TEST,			\
++	.uffd_pt_handler	= __ph,						\
++	.uffd_test_handler	= __th,						\
++	.expected_events	= { .uffd_faults = 2, },			\
++	__VA_ARGS__								\
++}
++
++#define TEST_ACCESS_AND_S1PTW_ON_HOLE_UFFD_AF(__a, __th, __ph)			\
++	TEST_ACCESS_AND_S1PTW_ON_HOLE_UFFD(__a, __th, __ph, __AF_TEST_ARGS)
++
+ static struct test_desc tests[] = {
+ 	/* Check that HW is setting the AF (sanity checks). */
+ 	TEST_HW_ACCESS_FLAG(guest_test_read64),
+@@ -640,10 +798,78 @@ static struct test_desc tests[] = {
+ 	TEST_ACCESS_ON_HOLE_NO_FAULTS(guest_test_cas, __PREPARE_LSE_TEST_ARGS),
+ 	TEST_ACCESS_ON_HOLE_NO_FAULTS(guest_test_ld_preidx),
+ 	TEST_ACCESS_ON_HOLE_NO_FAULTS(guest_test_write64),
+-	TEST_ACCESS_ON_HOLE_NO_FAULTS(guest_test_at),
+ 	TEST_ACCESS_ON_HOLE_NO_FAULTS(guest_test_dc_zva),
+ 	TEST_ACCESS_ON_HOLE_NO_FAULTS(guest_test_st_preidx),
+ 
++	/* UFFD basic (sanity checks) */
++	TEST_ACCESS_ON_HOLE_UFFD(guest_test_read64, uffd_test_read_handler),
++	TEST_ACCESS_ON_HOLE_UFFD(guest_test_cas, uffd_test_read_handler,
++			__PREPARE_LSE_TEST_ARGS),
++	TEST_ACCESS_ON_HOLE_UFFD(guest_test_ld_preidx, uffd_test_read_handler),
++	TEST_ACCESS_ON_HOLE_UFFD(guest_test_write64, uffd_test_write_handler),
++	TEST_ACCESS_ON_HOLE_UFFD(guest_test_st_preidx, uffd_test_write_handler),
++	TEST_ACCESS_ON_HOLE_UFFD(guest_test_dc_zva, uffd_test_write_handler),
++	TEST_ACCESS_ON_HOLE_UFFD(guest_test_exec, uffd_test_read_handler),
++
++	/* UFFD fault due to S1PTW. Note how they are all write faults. */
++	TEST_S1PTW_ON_HOLE_UFFD(guest_test_read64, uffd_pt_write_handler),
++	TEST_S1PTW_ON_HOLE_UFFD(guest_test_cas, uffd_pt_write_handler,
++			__PREPARE_LSE_TEST_ARGS),
++	TEST_S1PTW_ON_HOLE_UFFD(guest_test_at, uffd_pt_write_handler),
++	TEST_S1PTW_ON_HOLE_UFFD(guest_test_ld_preidx, uffd_pt_write_handler),
++	TEST_S1PTW_ON_HOLE_UFFD(guest_test_write64, uffd_pt_write_handler),
++	TEST_S1PTW_ON_HOLE_UFFD(guest_test_dc_zva, uffd_pt_write_handler),
++	TEST_S1PTW_ON_HOLE_UFFD(guest_test_st_preidx, uffd_pt_write_handler),
++	TEST_S1PTW_ON_HOLE_UFFD(guest_test_exec, uffd_pt_write_handler),
++
++	/* UFFD fault due to S1PTW with AF. Note how they all write faults. */
++	TEST_S1PTW_ON_HOLE_UFFD_AF(guest_test_read64, uffd_pt_write_handler),
++	TEST_S1PTW_ON_HOLE_UFFD(guest_test_cas, uffd_pt_write_handler,
++			__AF_LSE_TEST_ARGS),
++	/*
++	 * Can't test the AF case for address translation insts (D5.4.11) as
++	 * it's IMPDEF whether that marks the AF.
++	 */
++	TEST_S1PTW_ON_HOLE_UFFD_AF(guest_test_ld_preidx, uffd_pt_write_handler),
++	TEST_S1PTW_ON_HOLE_UFFD_AF(guest_test_write64, uffd_pt_write_handler),
++	TEST_S1PTW_ON_HOLE_UFFD_AF(guest_test_st_preidx, uffd_pt_write_handler),
++	TEST_S1PTW_ON_HOLE_UFFD_AF(guest_test_dc_zva, uffd_pt_write_handler),
++	TEST_S1PTW_ON_HOLE_UFFD_AF(guest_test_exec, uffd_pt_write_handler),
++
++	/* UFFD faults due to an access and its S1PTW. */
++	TEST_ACCESS_AND_S1PTW_ON_HOLE_UFFD(guest_test_read64,
++			uffd_test_read_handler, uffd_pt_write_handler),
++	TEST_ACCESS_AND_S1PTW_ON_HOLE_UFFD(guest_test_cas,
++			uffd_test_read_handler, uffd_pt_write_handler,
++			__PREPARE_LSE_TEST_ARGS),
++	TEST_ACCESS_AND_S1PTW_ON_HOLE_UFFD(guest_test_ld_preidx,
++			uffd_test_read_handler, uffd_pt_write_handler),
++	TEST_ACCESS_AND_S1PTW_ON_HOLE_UFFD(guest_test_write64,
++			uffd_test_write_handler, uffd_pt_write_handler),
++	TEST_ACCESS_AND_S1PTW_ON_HOLE_UFFD(guest_test_dc_zva,
++			uffd_test_write_handler, uffd_pt_write_handler),
++	TEST_ACCESS_AND_S1PTW_ON_HOLE_UFFD(guest_test_st_preidx,
++			uffd_test_write_handler, uffd_pt_write_handler),
++	TEST_ACCESS_AND_S1PTW_ON_HOLE_UFFD(guest_test_exec,
++			uffd_test_read_handler, uffd_pt_write_handler),
++
++	/* UFFD faults due to an access and its S1PTW with AF. */
++	TEST_ACCESS_AND_S1PTW_ON_HOLE_UFFD_AF(guest_test_read64,
++			uffd_test_read_handler, uffd_pt_write_handler),
++	TEST_ACCESS_AND_S1PTW_ON_HOLE_UFFD(guest_test_cas,
++			uffd_test_read_handler, uffd_pt_write_handler,
++			__AF_LSE_TEST_ARGS),
++	TEST_ACCESS_AND_S1PTW_ON_HOLE_UFFD_AF(guest_test_ld_preidx,
++			uffd_test_read_handler, uffd_pt_write_handler),
++	TEST_ACCESS_AND_S1PTW_ON_HOLE_UFFD_AF(guest_test_write64,
++			uffd_test_write_handler, uffd_pt_write_handler),
++	TEST_ACCESS_AND_S1PTW_ON_HOLE_UFFD_AF(guest_test_dc_zva,
++			uffd_test_write_handler, uffd_pt_write_handler),
++	TEST_ACCESS_AND_S1PTW_ON_HOLE_UFFD_AF(guest_test_st_preidx,
++			uffd_test_write_handler, uffd_pt_write_handler),
++	TEST_ACCESS_AND_S1PTW_ON_HOLE_UFFD_AF(guest_test_exec,
++			uffd_test_read_handler, uffd_pt_write_handler),
++
+ 	{ 0 },
+ };
+ 
 -- 
 2.35.1.894.gb6a874cedc-goog
 
