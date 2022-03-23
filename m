@@ -2,78 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ACEED4E599F
-	for <lists+kvm@lfdr.de>; Wed, 23 Mar 2022 21:13:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0F8DF4E59BC
+	for <lists+kvm@lfdr.de>; Wed, 23 Mar 2022 21:18:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239470AbiCWUPI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Mar 2022 16:15:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37982 "EHLO
+        id S1343691AbiCWUT2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Mar 2022 16:19:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47376 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240376AbiCWUPH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Mar 2022 16:15:07 -0400
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A036E8933B
-        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 13:13:37 -0700 (PDT)
-Received: by mail-pj1-x102d.google.com with SMTP id e6-20020a17090a77c600b001c795ee41e9so2387262pjs.4
-        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 13:13:37 -0700 (PDT)
+        with ESMTP id S239619AbiCWUT1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Mar 2022 16:19:27 -0400
+Received: from mail-yb1-xb2b.google.com (mail-yb1-xb2b.google.com [IPv6:2607:f8b0:4864:20::b2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BA4A8BF15
+        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 13:17:57 -0700 (PDT)
+Received: by mail-yb1-xb2b.google.com with SMTP id y38so2141182ybi.8
+        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 13:17:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=87pHWuuOeFMvF2m5qztZ+3SsMU0YaX9iK1MT2LhBueA=;
-        b=i0dxUGbj8ISDKpsBHPxbsOd7JTE3/LT6oezBVS6Ygw/H9fWokSh4gd5bkwFf/BPoyD
-         tDzGiwsddBiPHtxhLGhPFOn0MV7GUVY83bsrHiJI49gXo9Bpe/vfnzxjhI/FAP2yVj0v
-         Qj+bKYYF0Qbd7D7EZCx4bzcqvRb9A7zCUrJv0Zj6zKMkOvUjnsSFRA7S/N2bOIuHnPRC
-         Cd6lsZdoZLnJlya/JqvEo0lj4HBx5zoAFKPATsBZpsixaO94Jcqb97e/8KwnjLbPmtCQ
-         78wzcsMeqUOYIR3ui7b1LgCEMrubpbyqB1VLqscEOiGzIYkMsK090kdy9qWKW2uW7qDp
-         OFWw==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=+f+hkXEMqCDbBc5k9itvwvl/EyJykaOvhcwPJN5igM8=;
+        b=cgJ5PdNPSnzZO53gJodR4J6UqkOLzbinHvabBtMW9HEiEwzobQs/HEA0DX5wJQhqJ8
+         wcq0ZpWhgVTaXL6ym68hyA+Iw7b6slyEn2XEMmkMraqOwCDf5nCwDX4rWzVWIhdh/DAW
+         zzylVqv0dJHs0tgjPuBwWspI9L49c+m8Gmwy8buYp3OxUhHyka764i5BLu5jxjzLD13v
+         eu1pq1U5K8Kyhwo68WR+/EekLa99GqF/CBJJGUIRm/p7IQRuK6pvtc0EOXaEP516MBi4
+         i4+IdwDeVF4DB7ZYAn3uQoRAhSm5m2fs9BX3P1XRKkFUp+ghy4Yq7uahkcl/RkU4AM1w
+         IX6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=87pHWuuOeFMvF2m5qztZ+3SsMU0YaX9iK1MT2LhBueA=;
-        b=jpwPBIVedwdrMRPyMqGFI81wlqPk2iEbE07W+ZSrNHrLiXgFUR94/rCsH9M0emJW4/
-         tYbOEWF9xzgyWcXHq5iG8DdtXpzJSG0NMvEw7uWV6lLA1drkcEwzmTYQ7Q/O+m7PdC7a
-         SNl/K/hrbJ5fgsk/Hi4vS7DbjbpnS0kaHByK/ltw/OsQS92td544rvejigJIF1o0LngH
-         C9L7A5O43db/TcKUbHENd/RPrHtL2ePgyMt2Ew/m+eqkUplX7gF2oHtDs44HmbRTu1XO
-         yrx5pEfJlcFL12oNUXu3rbquvqw/TUFTnikPVYTXNqSORcTnRmLKXE0bDg+gYttk2SwL
-         n3bQ==
-X-Gm-Message-State: AOAM530lpqAvhndiNrFX8S62/hoJNpx+AKAmTP/zGeTOolEv2V3s/HYW
-        D/FjGAnQcZdZdPWHFJiFr2nmsQ==
-X-Google-Smtp-Source: ABdhPJxW0nWbCs+fKb2VZ7Dp78kvE0grHKXIDDZuoMohOONgFKBhBJ2rsNLjNNxzfGq6158DqpeawQ==
-X-Received: by 2002:a17:902:7887:b0:154:4f3f:ec54 with SMTP id q7-20020a170902788700b001544f3fec54mr1810342pll.156.1648066416930;
-        Wed, 23 Mar 2022 13:13:36 -0700 (PDT)
-Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
-        by smtp.gmail.com with ESMTPSA id b2-20020a639302000000b003808dc4e133sm505007pge.81.2022.03.23.13.13.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Mar 2022 13:13:36 -0700 (PDT)
-Date:   Wed, 23 Mar 2022 13:13:32 -0700
-From:   Ricardo Koller <ricarkol@google.com>
-To:     Oliver Upton <oupton@google.com>
-Cc:     Reiji Watanabe <reijiw@google.com>, Marc Zyngier <maz@kernel.org>,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Fuad Tabba <tabba@google.com>,
-        Peng Liang <liangpeng10@huawei.com>,
-        Peter Shier <pshier@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>
-Subject: Re: [PATCH v6 11/25] KVM: arm64: Add remaining ID registers to
- id_reg_desc_table
-Message-ID: <Yjt/bJidLEPsiPfQ@google.com>
-References: <20220311044811.1980336-1-reijiw@google.com>
- <20220311044811.1980336-12-reijiw@google.com>
- <Yjt6qvYliEDqzF9j@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=+f+hkXEMqCDbBc5k9itvwvl/EyJykaOvhcwPJN5igM8=;
+        b=DD85V8TiGxAa4xkYqTkhpTpXhipIG0KC5Bpb/DuI31F7qy/Kb6AtyjOBxDWDacCuNL
+         ftpJRNjxSpYkZ3lyBO7q9WgAMZ4D5d0BUtN4KvmktsjoE3sZqNMWBmPx8wXeac+yWz4E
+         zFlfekO9LiUPgXYfZcBzAG0TAe8xHu2D8ReyPT7otQfehkn02CYTTSQy4tDv2W8bI5K9
+         S0pRR67gs1YdnVbdPy00pxUKSg9tm6FnA61UIDqWMM5r8OEPTsAxfnMfWPmK+kswy9Bs
+         Uw/VAKkCitUf3Ph3R/pfE7zru/2JiTBTA3LJtigI+dyRHcxPl36Lm2OBQAlRMhnNtw4Q
+         BblA==
+X-Gm-Message-State: AOAM531pFxVMseWpiVuMNzBwZf657Xvx1pFLATXu3ccPDu5bNITTMN0B
+        Bimso84+ei+sBujr+uQMF95h95zW9hVQJaSmCScpeg==
+X-Google-Smtp-Source: ABdhPJyAMqmsqsOhRiAmhz+lBqJttS0XHfqfbeokZE5gB4NHjjgwuACok/noPo6+zxu6wq+bOBMZJNdRNSIhWic2BFA=
+X-Received: by 2002:a25:7387:0:b0:633:8a4d:ae8 with SMTP id
+ o129-20020a257387000000b006338a4d0ae8mr1790817ybc.286.1648066676402; Wed, 23
+ Mar 2022 13:17:56 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Yjt6qvYliEDqzF9j@google.com>
+References: <cover.1646422845.git.isaku.yamahata@intel.com>
+ <6e096d8509ef40ce3e25c1e132643e772641241b.1646422845.git.isaku.yamahata@intel.com>
+ <CAAYXXYy-LU+FCt3VDubjhwYPk1TEKc9qshPp2r8tTvcXXPRnOQ@mail.gmail.com> <20220323190812.GH1964605@ls.amr.corp.intel.com>
+In-Reply-To: <20220323190812.GH1964605@ls.amr.corp.intel.com>
+From:   Erdem Aktas <erdemaktas@google.com>
+Date:   Wed, 23 Mar 2022 13:17:45 -0700
+Message-ID: <CAAYXXYwW9dMMz=tp9kM6P9P29xBMNhgkPA90vX-mEjNaActFiw@mail.gmail.com>
+Subject: Re: [RFC PATCH v5 073/104] KVM: TDX: track LP tdx vcpu run and
+ teardown vcpus on descroing the guest TD
+To:     Isaku Yamahata <isaku.yamahata@gmail.com>
+Cc:     "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "open list:KERNEL VIRTUAL MACHINE (KVM)" <kvm@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Connor Kuehl <ckuehl@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -85,45 +74,124 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 23, 2022 at 07:53:14PM +0000, Oliver Upton wrote:
-> Hi Reiji,
-> 
-> On Thu, Mar 10, 2022 at 08:47:57PM -0800, Reiji Watanabe wrote:
-> > Add hidden or reserved ID registers, and remaining ID registers,
-> > which don't require special handling, to id_reg_desc_table.
-> > Add 'flags' field to id_reg_desc, which is used to indicates hiddden
-> > or reserved registers. Since now id_reg_desc_init() is called even
-> > for hidden/reserved registers, change it to not do anything for them.
-> > 
-> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> 
-> I think there is a very important detail of the series that probably
-> should be highlighted. We are only allowing AArch64 feature registers to
-> be configurable, right? AArch32 feature registers remain visible with
-> their default values passed through to the guest. If you've already
-> stated this as a precondition elsewhere then my apologies for the noise.
+So the tdh_vp_flush should always succeed while vm is being torn down.
+Thanks Isaku for the explanation, and I think it would be great to add
+the error message.
 
-Aren't AArch64 ID regs architecturally mapped to their AArch32
-counterparts?  They should show the same values.  I'm not sure if it's a
-problem (and if KVM is faithful to that rule),
-> 
-> I don't know if adding support for this to AArch32 registers is
-> necessarily the right step forward, either. 32 bit support is working
-> just fine and IMO its OK to limit new KVM features to AArch64-only so
-> long as it doesn't break 32 bit support. Marc of course is the authority
-> on that, though :-)
-> 
-> If for any reason a guest uses a feature present in the AArch32 feature
-> register but hidden from the AArch64 register, we could be in a
-> particularly difficult position. Especially if we enabled traps based on
-> the AArch64 value and UNDEF the guest.
-> 
-> One hack we could do is skip trap configuration if AArch32 is visible at
-> either EL1 or EL0, but that may not be the most elegant solution.
-> Otherwise, if we are AArch64-only at every EL then the definition of the
-> AArch32 feature registers is architecturally UNKNOWN, so we can dodge
-> the problem altogether. What are your thoughts?
-> 
+-Erdem
+
+On Wed, Mar 23, 2022 at 12:08 PM Isaku Yamahata
+<isaku.yamahata@gmail.com> wrote:
+>
+> On Tue, Mar 22, 2022 at 05:54:45PM -0700,
+> Erdem Aktas <erdemaktas@google.com> wrote:
+>
+> > On Fri, Mar 4, 2022 at 11:50 AM <isaku.yamahata@intel.com> wrote:
+> > > diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> > > index a6b1a8ce888d..690298fb99c7 100644
+> > > --- a/arch/x86/kvm/vmx/tdx.c
+> > > +++ b/arch/x86/kvm/vmx/tdx.c
+> > > @@ -48,6 +48,14 @@ struct tdx_capabilities tdx_caps;
+> > >  static DEFINE_MUTEX(tdx_lock);
+> > >  static struct mutex *tdx_mng_key_config_lock;
+> > >
+> > > +/*
+> > > + * A per-CPU list of TD vCPUs associated with a given CPU.  Used when a CPU
+> > > + * is brought down to invoke TDH_VP_FLUSH on the approapriate TD vCPUS.
+> > > + * Protected by interrupt mask.  This list is manipulated in process context
+> > > + * of vcpu and IPI callback.  See tdx_flush_vp_on_cpu().
+> > > + */
+> > > +static DEFINE_PER_CPU(struct list_head, associated_tdvcpus);
+> > > +
+> > >  static u64 hkid_mask __ro_after_init;
+> > >  static u8 hkid_start_pos __ro_after_init;
+> > >
+> > > @@ -87,6 +95,8 @@ static inline bool is_td_finalized(struct kvm_tdx *kvm_tdx)
+> > >
+> > >  static inline void tdx_disassociate_vp(struct kvm_vcpu *vcpu)
+> > >  {
+> > > +       list_del(&to_tdx(vcpu)->cpu_list);
+> > > +
+> > >         /*
+> > >          * Ensure tdx->cpu_list is updated is before setting vcpu->cpu to -1,
+> > >          * otherwise, a different CPU can see vcpu->cpu = -1 and add the vCPU
+> > > @@ -97,6 +107,22 @@ static inline void tdx_disassociate_vp(struct kvm_vcpu *vcpu)
+> > >         vcpu->cpu = -1;
+> > >  }
+> > >
+> > > +void tdx_hardware_enable(void)
+> > > +{
+> > > +       INIT_LIST_HEAD(&per_cpu(associated_tdvcpus, raw_smp_processor_id()));
+> > > +}
+> > > +
+> > > +void tdx_hardware_disable(void)
+> > > +{
+> > > +       int cpu = raw_smp_processor_id();
+> > > +       struct list_head *tdvcpus = &per_cpu(associated_tdvcpus, cpu);
+> > > +       struct vcpu_tdx *tdx, *tmp;
+> > > +
+> > > +       /* Safe variant needed as tdx_disassociate_vp() deletes the entry. */
+> > > +       list_for_each_entry_safe(tdx, tmp, tdvcpus, cpu_list)
+> > > +               tdx_disassociate_vp(&tdx->vcpu);
+> > > +}
+> > > +
+> > >  static void tdx_clear_page(unsigned long page)
+> > >  {
+> > >         const void *zero_page = (const void *) __va(page_to_phys(ZERO_PAGE(0)));
+> > > @@ -230,9 +256,11 @@ void tdx_mmu_prezap(struct kvm *kvm)
+> > >         struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
+> > >         cpumask_var_t packages;
+> > >         bool cpumask_allocated;
+> > > +       struct kvm_vcpu *vcpu;
+> > >         u64 err;
+> > >         int ret;
+> > >         int i;
+> > > +       unsigned long j;
+> > >
+> > >         if (!is_hkid_assigned(kvm_tdx))
+> > >                 return;
+> > > @@ -248,6 +276,17 @@ void tdx_mmu_prezap(struct kvm *kvm)
+> > >                 return;
+> > >         }
+> > >
+> > > +       kvm_for_each_vcpu(j, vcpu, kvm)
+> > > +               tdx_flush_vp_on_cpu(vcpu);
+> > > +
+> > > +       mutex_lock(&tdx_lock);
+> > > +       err = tdh_mng_vpflushdone(kvm_tdx->tdr.pa);
+> >
+> > Hi Isaku,
+>
+> Hi.
+>
+>
+> > I am wondering about the impact of the failures on these functions. Is
+> > there any other function which recovers any failures here?
+> > When I look at the tdx_flush_vp function, it seems like it can fail
+> > due to task migration so tdx_flush_vp_on_cpu might also fail and if it
+> > fails, tdh_mng_vpflushdone returns err. Since tdx_vm_teardown does not
+> > return any error , how the VMM can free the keyid used in this TD.
+> > Will they be forever in "used state"?
+> > Also if tdx_vm_teardown fails, the kvm_tdx->hkid is never set to -1
+> > which will prevent tdx_vcpu_free to free and reclaim the resources
+> > allocated for the vcpu.
+>
+> mmu_prezap() is called via release callback of mmu notifier when the last mmu
+> reference of this process is dropped.  It is after all kvm vcpu fd and kvm vm
+> fd were closed.  vcpu will never run.  But we still hold kvm_vcpu structures.
+> There is no race between tdh_vp_flush()/tdh_mng_vpflushdone() here and process
+> migration.  tdh_vp_flush()/tdh_mng_vp_flushdone() should success.
+>
+> The cpuid check in tdx_flush_vp() is for vcpu_load() which may race with process
+> migration.
+>
+> Anyway what if one of those TDX seamcalls fails?  HKID is leaked and will be
+> never used because there is no good way to free and use HKID safely.  Such
+> failure is due to unknown issue and probably a bug.
+>
+> One mitigation is to add pr_err() when HKID leak happens.  I'll add such message
+> on next respin.
+>
+> thanks,
 > --
-> Thanks,
-> Oliver
+> Isaku Yamahata <isaku.yamahata@gmail.com>
