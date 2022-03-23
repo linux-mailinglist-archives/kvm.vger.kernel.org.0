@@ -2,97 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C0CF4E5AB4
-	for <lists+kvm@lfdr.de>; Wed, 23 Mar 2022 22:33:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DAE684E5B35
+	for <lists+kvm@lfdr.de>; Wed, 23 Mar 2022 23:22:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344901AbiCWVe2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Mar 2022 17:34:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38940 "EHLO
+        id S1344631AbiCWWYT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Mar 2022 18:24:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241081AbiCWVe1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Mar 2022 17:34:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8E5783FBE8
-        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 14:32:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1648071176;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=oh11iooAkmJrsdwWBjuA6GGBECOmBuX2cXQQcpcqSuY=;
-        b=Xel+mS7/qETXRUFTspUtNzwhBThOliaN05yXgU6xkR1b13Vu6/Hax/fwcvOwPJVHioI7Bz
-        iOZ9+mXNkzKmtnbgGOODqZ1tGgLXRfRJ9/hfmRAx20URM+wktWrkHzJ9XIkXNqJhvuF7SF
-        HRQQ3M7T8204KUjGKiOR/qB0RcUVwho=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-557-cSxkFXQZMpmXiaRC3htGGw-1; Wed, 23 Mar 2022 17:32:54 -0400
-X-MC-Unique: cSxkFXQZMpmXiaRC3htGGw-1
-Received: by mail-ej1-f71.google.com with SMTP id mm20-20020a170906cc5400b006dfec7725f3so1446142ejb.15
-        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 14:32:54 -0700 (PDT)
+        with ESMTP id S239488AbiCWWYT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Mar 2022 18:24:19 -0400
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3ECD89CEB
+        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 15:22:48 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id d19so2503820pfv.7
+        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 15:22:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=yuhCT1XYYGgw1dNBRxPY3XRz8+9xX+vJlVURnfEK72s=;
+        b=a6UMluZevPKT+3Dg9RSgS2V8HA5VIKtIYAYHNtZAilzCYPLEkP61tf7mwIeq9BnxHV
+         X0SgovhpKa/+gqiVJN6lWUp1uqPIgn+vMHpzy4VXM3c5yJiRCCC7UOKbGbnjbjkhLAE7
+         RHoBAkQ9xUgD9dL1xMdBPTjxKpnSLtsHOUrHXa/tPYiz85ecbU2IYJE4lBhgWY8zKwGF
+         vqpuZjlGklfvuQhQrNXTf+r2eBpbhmqcZmGyDOFQNN46b1i50uXvRmRLSPk2NVi2GwpT
+         8vFYEZYuHVzaBo1/gI+EK2Y8aj0KQFDtW7xPe3JsxzKdlPYgnKKD2PAnzmnuMs1FyqJE
+         PHDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=oh11iooAkmJrsdwWBjuA6GGBECOmBuX2cXQQcpcqSuY=;
-        b=3PhZ7+DfsAVc4pUefZtNBRF8AD8nb/iZZq1RDCWnMw8AKEOJ6F5MMYG9GqhR6g/WJ8
-         Z0kj05jdM5I4F1X+i1xLJWUHuHhAz9VIXtWJnWGX0hmahf4kkv/XolS2sRjixF+VJHD/
-         ev442KR52meWRHtSk+tSeuFFlBrkQQ1nfWbtsS84etpzfIpJqOrwQv8sxhhOYCOyZA/2
-         PlVAX4bGqJgc+sw/LHz3L6wX0nNPLDpfsEYudjtX8rnc5hiQta7/no/YLgeyohKNZcT+
-         WLNE9B1UsUZkZgpR4SqhrlDHlZGSKyPCaJxhIYxinA7rvgsC3cxE/5LASadD3ba/KwMJ
-         SYWg==
-X-Gm-Message-State: AOAM532ba/24FoGaIUOIig1UWii8KwNPVln1YnLDpZrJCQnSRLyHpwSY
-        ULCCOddJV/4IVC33EVpto5wc/McKDw0gWTp1kObbJWH4nAfyAL2LfMCCd28lDFWNEbt3J8+VUBp
-        H9Gaj6gLXGaUW
-X-Received: by 2002:a05:6402:454:b0:416:2db7:685b with SMTP id p20-20020a056402045400b004162db7685bmr2783664edw.43.1648071173694;
-        Wed, 23 Mar 2022 14:32:53 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwHYr8na/zz+NGxL5TIMj/1NzKsoC6teN3liiWE+FHimqyjued/mO1iRCI2LxxCqk4X8SpvwA==
-X-Received: by 2002:a05:6402:454:b0:416:2db7:685b with SMTP id p20-20020a056402045400b004162db7685bmr2783648edw.43.1648071173499;
-        Wed, 23 Mar 2022 14:32:53 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:1c09:f536:3de6:228c? ([2001:b07:6468:f312:1c09:f536:3de6:228c])
-        by smtp.googlemail.com with ESMTPSA id r16-20020a056402019000b00418ed60c332sm476712edv.65.2022.03.23.14.32.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Mar 2022 14:32:52 -0700 (PDT)
-Message-ID: <a35f9408-9d54-654c-6639-64192f03ba3b@redhat.com>
-Date:   Wed, 23 Mar 2022 22:32:50 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [PATCH 3/3] Documentation: KVM: add API issues section
-Content-Language: en-US
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=yuhCT1XYYGgw1dNBRxPY3XRz8+9xX+vJlVURnfEK72s=;
+        b=QZa1ogLDnILV9OKgOn0JrmulrebxMOEtk2PsqnOlm043o5jmnnJkJVoGFaJJhkl1DE
+         rmjaXcSL59PEnHhEjBe4GIkBhBK7CDEZuDcSfC+i8H7dTfCSY1kYjcMEdjCh6rkedKfX
+         hSzGRpauiA9WzYEiTKS7jwqdzJhegQjwmg+rZSh3Ah8NN/XlYXwzsbq5aHQRghY3mf8n
+         Mi6QOwtpZZ0OT1ddgNahxE7lSeaX38TM1wHLZc41MmoalEShwUj40bvjXKT4EA5oK0Gh
+         k353nP30blSC4Q7MA/gJsRU/dvYBQAMsauZv7h5ix19jtr/hTAUs4KVxHqIIp8+eohcT
+         ZUMA==
+X-Gm-Message-State: AOAM533Bkq8bG4mjHAA8TsV4mR1RGEqC3ojzxOSFyZ6BGykQI/YnEZ7F
+        l9whZzIBKDg8BuMNhUBxdeXgsw==
+X-Google-Smtp-Source: ABdhPJzfVU2lcXkwbXmRJ0QbmK41CUoL1lq9MqK1Ux1D5KLG5O0S8v51famIcyUnsJNrUX/Wy/YeJQ==
+X-Received: by 2002:a63:7f0e:0:b0:381:54ca:6fd0 with SMTP id a14-20020a637f0e000000b0038154ca6fd0mr1631352pgd.524.1648074167926;
+        Wed, 23 Mar 2022 15:22:47 -0700 (PDT)
+Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
+        by smtp.gmail.com with ESMTPSA id fy9-20020a17090b020900b001c690bc05c4sm675504pjb.0.2022.03.23.15.22.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Mar 2022 15:22:47 -0700 (PDT)
+Date:   Wed, 23 Mar 2022 15:22:43 -0700
+From:   Ricardo Koller <ricarkol@google.com>
 To:     Oliver Upton <oupton@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        mlevitsk@redhat.com, jmattson@google.com
-References: <20220322110712.222449-1-pbonzini@redhat.com>
- <20220322110712.222449-4-pbonzini@redhat.com> <Yjtj8qESPWIL221r@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <Yjtj8qESPWIL221r@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Cc:     Reiji Watanabe <reijiw@google.com>, Marc Zyngier <maz@kernel.org>,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>,
+        Andrew Jones <drjones@redhat.com>,
+        Fuad Tabba <tabba@google.com>,
+        Peng Liang <liangpeng10@huawei.com>,
+        Peter Shier <pshier@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>
+Subject: Re: [PATCH v6 11/25] KVM: arm64: Add remaining ID registers to
+ id_reg_desc_table
+Message-ID: <Yjuds73S1sO1UpJI@google.com>
+References: <20220311044811.1980336-1-reijiw@google.com>
+ <20220311044811.1980336-12-reijiw@google.com>
+ <Yjt6qvYliEDqzF9j@google.com>
+ <Yjt/bJidLEPsiPfQ@google.com>
+ <YjuGqunshjhCoIs5@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YjuGqunshjhCoIs5@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/23/22 19:16, Oliver Upton wrote:
-> Do you think we should vent about our mistakes inline with the
-> descriptions of the corresponding UAPI? One example that comes to mind
-> is ARM's CNTV_CVAL_EL0/CNTVCT_EL0 mixup, which is mentioned in 4.68
-> 'KVM_SET_ONE_REG'. That, of course, doesn't cover the
-> previously-undocumented bits of UAPI that are problematic:)
+On Wed, Mar 23, 2022 at 08:44:26PM +0000, Oliver Upton wrote:
+> On Wed, Mar 23, 2022 at 01:13:32PM -0700, Ricardo Koller wrote:
+> > On Wed, Mar 23, 2022 at 07:53:14PM +0000, Oliver Upton wrote:
+> > > Hi Reiji,
+> > > 
+> > > On Thu, Mar 10, 2022 at 08:47:57PM -0800, Reiji Watanabe wrote:
+> > > > Add hidden or reserved ID registers, and remaining ID registers,
+> > > > which don't require special handling, to id_reg_desc_table.
+> > > > Add 'flags' field to id_reg_desc, which is used to indicates hiddden
+> > > > or reserved registers. Since now id_reg_desc_init() is called even
+> > > > for hidden/reserved registers, change it to not do anything for them.
+> > > > 
+> > > > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> > > 
+> > > I think there is a very important detail of the series that probably
+> > > should be highlighted. We are only allowing AArch64 feature registers to
+> > > be configurable, right? AArch32 feature registers remain visible with
+> > > their default values passed through to the guest. If you've already
+> > > stated this as a precondition elsewhere then my apologies for the noise.
+> > 
+> > Aren't AArch64 ID regs architecturally mapped to their AArch32
+> > counterparts?  They should show the same values.  I'm not sure if it's a
+> > problem (and if KVM is faithful to that rule),
+> 
+> I believe it's a bit more subtle than that. The AArch32 feature registers
+> are architecturally mapped to certain encodings accessible from AArch64.
+> For example, ID_PFR0_EL1 is actually a 64 bit register where bits [31:0]
+> map to the ID_PFR0 AArch32 register. ID_PFR0_EL1 is only accessible from
+> AArch64 with the MRS instruction, and ID_PFR0 is only accessible from
+> AArch32 with the MRC instruction. KVM just so happens to handle both of
+> these reads from the same sys_reg_desc.
+> 
+> AFAIK, there does not exist a direct bit mapping between the
+> ID_*_EL1 <-> ID_AA64*_EL1 registers. But hey, could be wrong :)
 
-It depends.  My intention was to use this document more for hidden 
-interdependencies, in this case between KVM_GET_SUPPORTED_CPUID and 
-KVM_CREATE_IRQCHIP, KVM_ENABLE_CAP(KVM_CAP_IRQCHIP_SPLIT), 
-KVM_CAP_TSC_DEADLINE_TIMER.
+I think you are right. ID_PFR0_EL1[31:0] doesn't even have the same
+field as ID_AA64PFR0_EL1[31:0]. The only exception would be RAS which is
+at [31:28] on both, but it doesn't say anywhere that ID_PFR0_EL1.RAS
+maps architecturally to ID_AA64PFR0_EL1.RAS. So, I think we can assume
+it doesn't (?).
 
-Paolo
+Thanks,
+Ricardo
 
+> 
+> --
+> Thanks,
+> Oliver
