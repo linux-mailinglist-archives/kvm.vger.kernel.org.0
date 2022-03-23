@@ -2,181 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 41E564E5911
-	for <lists+kvm@lfdr.de>; Wed, 23 Mar 2022 20:22:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C765A4E5935
+	for <lists+kvm@lfdr.de>; Wed, 23 Mar 2022 20:34:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344164AbiCWTXv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Mar 2022 15:23:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43160 "EHLO
+        id S1344293AbiCWTgQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Mar 2022 15:36:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234812AbiCWTXr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Mar 2022 15:23:47 -0400
-Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72374888FB
-        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 12:22:17 -0700 (PDT)
-Received: by mail-io1-xd2e.google.com with SMTP id e22so2899191ioe.11
-        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 12:22:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=JlMssrBS5MsWzr4IlAQ1DcKlCFmfRWojcGydLqsuTtY=;
-        b=SMG6cDmX+eXpRQ94AqhVqDKxEoEuWDo5YwwCRBPkxeUSTJIBdfNA7sSU3zJkicwEgb
-         aHqD6tW07HceqvJp6mNptONcqESdKtAJ4t4iK3VaQCsSF0JIO8nocEaUyLVKxno1lDKp
-         6jbLYrMGLdeGqdhZ7MJissy9yA8ijNrm81J9D8pA8iklFPVM1EdLrAGKIt4r+cOZDoq/
-         ZStvN0KQGX3lb7eNnqtliwowc3pZHjYv1PYJECBaXM0/o50dQdb25DOueNGYXNr9fPZp
-         BMdZg0S7oX94Ty2B1QvUD17nhtXKWcKacDcl0Vr8Nix9ZDHa/GzSMHOmW+53X80mxxh1
-         lVgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=JlMssrBS5MsWzr4IlAQ1DcKlCFmfRWojcGydLqsuTtY=;
-        b=rR4sxSARosvBnNKodi3AKfAYncZt4EAbFSFeFw0FK1HYY+IURq6cxIp+bB6BXOjdC8
-         Bl/gSsK5TkYeqKDXwaxSmadhqkoEGZcPn6cpvTCq2nDlDkZWG+1fWmMPO58vD7j/oj3Q
-         5cdhKSQ3DG1anLAeyu8eICSeFdK2KFX5uqoBIE4drAKA2NaDgizvywJtt7iLWtnHt1J2
-         FGTvi9UhGi5qUqSxx4jk7PPrN2RRnFiKL1ho1ScjnVCekf0o/q2YPW51M2bg2MDNE3uZ
-         iAN//FqdLDYGZfr7lf5v37NbfF4Y51kBVrujnDdbupL2Vf17kzN5ce6E6fdXHoaeKKQC
-         9mkg==
-X-Gm-Message-State: AOAM532FqnTWDUF0REhCmwEuXcEs2H4aEmojFPJt2t59JgLSvoKBXRi+
-        tLFI1N48ClJuznrKCHX5C4urgg==
-X-Google-Smtp-Source: ABdhPJwngJg/5LHhODSUq+zIVlvVV5bBB3J5MW1sVvzghvqD9c55m4X7Zxu6PadTGaeTnZhTx2kmgQ==
-X-Received: by 2002:a05:6602:1493:b0:649:1890:cffd with SMTP id a19-20020a056602149300b006491890cffdmr844378iow.167.1648063336566;
-        Wed, 23 Mar 2022 12:22:16 -0700 (PDT)
-Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
-        by smtp.gmail.com with ESMTPSA id d3-20020a056e020c0300b002c7b42b4b0esm422584ile.65.2022.03.23.12.22.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Mar 2022 12:22:15 -0700 (PDT)
-Date:   Wed, 23 Mar 2022 19:22:12 +0000
-From:   Oliver Upton <oupton@google.com>
-To:     Reiji Watanabe <reijiw@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Fuad Tabba <tabba@google.com>,
-        Peng Liang <liangpeng10@huawei.com>,
-        Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>
-Subject: Re: [PATCH v6 02/25] KVM: arm64: Save ID registers' sanitized value
- per guest
-Message-ID: <YjtzZI8Lw2uzjm90@google.com>
-References: <20220311044811.1980336-1-reijiw@google.com>
- <20220311044811.1980336-3-reijiw@google.com>
-MIME-Version: 1.0
+        with ESMTP id S1344277AbiCWTgO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Mar 2022 15:36:14 -0400
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2060.outbound.protection.outlook.com [40.107.220.60])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 611A363F6
+        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 12:34:42 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=QUURyahsFQMmnEnB2xaFU1Zm/tqXUtKHLJBEdht3Z0F3+Vp5afbnf2l45j/IQ+RQz+DYdzs2RYwuqm6huoWISzazP6dYb/MP7TLlcbt5/wvIJIU+uNQKGV7Oj03/SczvqWT0UZPqxImL9NAVaKGZnrkI5GwWxN8Bm1Z+5iHFFqDD1SblbN9/hdYo+of74HP8tzt8B53EnU7i2j+xKxyavNPoaz6Xi0pZDzDJyg3EqrFX8UBXYX18ihtlaVufMs3tPRVZk0D6kF1kcBaiu2KDbHmDM1lj+rt/PJZvcvWNZkMRpol24YCOA4b/BqKOyPwAH7/oMIq1jUaZChWa3+LwCQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=cYBrssyTkYV5+CPenOKVA9YMmMERH0t8MgrAibiGmWA=;
+ b=O4Px8Ylyw/gEx2YZkCywbcPYhfv71NM9iNxIdDAGJe2w+rwubGVBrGWpuswkeN09SaV4Nw2/1Z3UJA6WfAc//TQhnQkh2HXqf5S7+TJAY0Ae9ZH9/oYamQkXnuxdUzAqxMOy7UFNg/jGBatsGco2+4BuWqAOjkStMikS8MVZiajxFr9ZUKDdZaiBUxyblMiTPqXyRg2IJBPuau8IlHAlV+dsocjSfTM9wypvLN4NBe5XDnsejSydp+nPhkPvxTig88R0jgHv+LuyMZ+GFJsEh/h4cV/7EU1Jnj4q8Cfm1iQXZdoE1YSNPPb4pbKcoDVRj/Bwxzo8avh705iCijyQWA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=cYBrssyTkYV5+CPenOKVA9YMmMERH0t8MgrAibiGmWA=;
+ b=fBctiu/RR8O28psOir4kdD5jhAjWVmIgQV7U7jMdbJoCLrNqgTynYTXYGo0dXfK6hkuN0G3/AbPgrlTltJCpm/C+YuzgBrWMbMjiKkyVJjivcY0M17i1rnXj7zHV1wGeBlEArpWH3EA96thc4T2oZbi9qo35zw+ssPq0yhJyUw+7ogDzJHd9oirKtju4I82myqdjhCSXOa9sBaFWZcFbJf26TA1rN6S11NbHaS6UP+Qco/71qJEqIIUPe2/+ecFnQgSY3wMnvmXQR87REFzNL4wSglC2Aaw+09M5RBgkZC81xnjRRURyOsJcTzCf617eY8C11jw9KUs+j3q17Xejvg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by MN2PR12MB4502.namprd12.prod.outlook.com (2603:10b6:208:263::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5102.16; Wed, 23 Mar
+ 2022 19:34:40 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::11a0:970a:4c24:c70c]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::11a0:970a:4c24:c70c%6]) with mapi id 15.20.5102.017; Wed, 23 Mar 2022
+ 19:34:40 +0000
+Date:   Wed, 23 Mar 2022 16:34:39 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Eric Auger <eric.auger@redhat.com>,
+        iommu@lists.linux-foundation.org, Jason Wang <jasowang@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        Yi Liu <yi.l.liu@intel.com>, Keqian Zhu <zhukeqian1@huawei.com>
+Subject: Re: [PATCH RFC 08/12] iommufd: IOCTLs for the io_pagetable
+Message-ID: <20220323193439.GS11336@nvidia.com>
+References: <0-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
+ <8-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
+ <20220323131038.3b5cb95b.alex.williamson@redhat.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220311044811.1980336-3-reijiw@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20220323131038.3b5cb95b.alex.williamson@redhat.com>
+X-ClientProxiedBy: MN2PR19CA0050.namprd19.prod.outlook.com
+ (2603:10b6:208:19b::27) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 7fa218bc-9d79-4c52-a510-08da0d042c5d
+X-MS-TrafficTypeDiagnostic: MN2PR12MB4502:EE_
+X-Microsoft-Antispam-PRVS: <MN2PR12MB4502E0C4797B203647513DB8C2189@MN2PR12MB4502.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Ox81EMa3WkLrvXlju1aA1tgmTeeQj3qAgAgkfuXSqj1JubSoofPdo83SHOg4arMMZgp0zXQk7CDjOecNq5k2NTwnEc6EK9dTiF414l5aHFT9D20L/N9TisbJaLZnxubRW7RsE0om054HCem3uyyBggKM8NINOBqQJkJSq63NbnEfwQZ10uphrL4LI5DopSeAX5hjYyl5A+35RstP3OYvUP5cnwu+DeHEtAXx8LzkcnkbrEIB/cztj8yVkt7oHbUP1NRgoaN2Hoegylhm4orffJquZIvN3NXqYGbc7a+EwrZIlLtt5jDgyQofe3nPAazWdsUz82zHbZjsV2dRNLlJh0kSujr5ThvY/dHt8Ywqih74HjgVB3Wmi22M4seDFwfgkYoNnLfzoMJFoE1F6soZFh2CAwJr1OEuEr8H4dePhTcQC1LJq8UPNF71Dvc17oOiXVde0gPQ1cPLAojUwQe24HJMX6ZVeIV3J8L45RE6N8hH60Tk70ijf0FymVetrLIoRuiWQuHVj6LNCZHi/mPnqIM/lMVDBr7HWdy0ZVvfBh4ndivaOvEy9NvanUc5wPE/lqGNX9WeqlBzHqgrO0G8bzDNog/3nXqsKFcWb6fvR0YumuStLPXMRI0Wmoz39JDLsqIFA4t40y6J+Bgjg9MUew==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(8936002)(508600001)(6506007)(7416002)(186003)(1076003)(26005)(316002)(86362001)(36756003)(54906003)(6916009)(2906002)(33656002)(4326008)(6512007)(66946007)(6486002)(66556008)(66476007)(38100700002)(5660300002)(2616005)(8676002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?gH6ZFkerTz6ovMMLz+Y9TWnSeiig4UIAG6D3oJQU4O6EAPs0OPdFb3IhGcnP?=
+ =?us-ascii?Q?/It0PXIzoO2fjxoDLRNM5meqWdoXI0Iuduu3xEI19P846y1cXslzFnZIU6i7?=
+ =?us-ascii?Q?bcHIugtre/C9yPIdN+S5nmzLZT2niYbjiGDQ8sL2vXsiIKbvg8ml9qX0R9Sz?=
+ =?us-ascii?Q?AhEdSs6wGZ3zIaYkazcDnk0iSJyIfnfQwJ7FSB+hLbhbu1pVg0SQF/urOolt?=
+ =?us-ascii?Q?7JxMdjX/7LpdbmXdeOODsCo8fJoHDd0AljV70whlWctY2M/jkD91HKWsWnfq?=
+ =?us-ascii?Q?GcFpBhLdCzwFcBMGL7QbytFhjS+M0xnPYbhplqhHpRONBmihZYV0dn5Rkg61?=
+ =?us-ascii?Q?hsUXZ71tCPTtymbMqkFQAYkBNQYG114v6Py4UQpjatxX0lKo2x7viLpmKBXz?=
+ =?us-ascii?Q?kHThq5LJT4uXHUM38D86XPQ649X+sJVbJ72DnkbM5FEglfwemry1Z6SJVAtn?=
+ =?us-ascii?Q?ZJ5B8wzy138IA5DPL9UiTfYL+wyGbIDN9nd2zxdNLYv8+w86TqVGhayf+pTm?=
+ =?us-ascii?Q?qmaZTImnLZaHf/fzBRYO5TlYpvU+KBuwjCFIlVxXoB22ZtNvYEMqCDlIfXFk?=
+ =?us-ascii?Q?PTpzBCU7MBCAwA5oT9AxblRoKQCdUUHyjW3JnmlHYuvMt8acs++lnovViaIe?=
+ =?us-ascii?Q?08YjhPKvmIbTGzH+xYlV6leMPKSqXcK5aNfO85JeefcOV7OWlhR+rRpjdJOb?=
+ =?us-ascii?Q?z3MBAypGoLVN8u/fiuVB1WpnAzi/f+FH3zuBmUTS++c8iDU01pj0Ur00KjxX?=
+ =?us-ascii?Q?mt0K3OlRLadi93nEEgzFlNh79+OXf7sonig8+Uv/E3yLDjPmWNOW6NbR1zhr?=
+ =?us-ascii?Q?mEfJEM22fRfpPLIDNRABFAJjt7VDucMP0tp6gp6A5BlEiRVEvYUv4fQs9nN9?=
+ =?us-ascii?Q?gmq8llOss/yaQZbQlF120H8usON3RnW5Dh3mckaZ7KE5yaADoU2zoaEgfZ0U?=
+ =?us-ascii?Q?AlI7TJUFYc6h0qJdJ56l63TPbtb3GVI2/R9RYE5/JmNXb7x3TTKZi5JarIc+?=
+ =?us-ascii?Q?gocOY+I3/S65JF1wnSvZJjFrDieBIPsQAn9JN1+9AKru4QX2OnwbNb/Yg2I+?=
+ =?us-ascii?Q?KN87q5wSPpxOaqSmfXwsrD8Q5GqM76R3tkPCiRYTbYtpSxq4yTPF2tsOYpyG?=
+ =?us-ascii?Q?IMmAlZWcvruS8VWa/n5jQTqK6tE21IOrPp3gY4gKnnGQz68GkLsiLdtIjN2v?=
+ =?us-ascii?Q?YICoyN6Id1XL+/2F7FmMSrnk+tD7rv7rgG6ovlub8+qLU9mA3wA5yyEVsM5B?=
+ =?us-ascii?Q?KW3GhNcvPZ9YrTSlvfk/zPnCM4FtpiQx8CjE/J45gtriG0bIrk2d5uu/6cs4?=
+ =?us-ascii?Q?e0rF/N4PAQyNZC1Me6vJDTAraP+FJXDTNSns+GwHxqlmd/Kvi+yVNxgZhwye?=
+ =?us-ascii?Q?ngMD/jUiowj/y+9J44WS8nMPXAQOn50y6X+lS7+A/n29X0aupW3d8eayFmJ5?=
+ =?us-ascii?Q?lUFDaCl4Ru17xTkSEyuSAzyrkPe8Vgcl?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7fa218bc-9d79-4c52-a510-08da0d042c5d
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Mar 2022 19:34:40.4991
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 3dmp0Jw9BZS4gOzOvxR9ZrxJ/NGWykjHcfzUiYApEAOzKUxkg+1AHBA1wBfSS8fJ
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4502
+X-Spam-Status: No, score=0.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SORTED_RECIPS,SPF_HELO_PASS,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Reiji,
-
-On Thu, Mar 10, 2022 at 08:47:48PM -0800, Reiji Watanabe wrote:
-> Introduce id_regs[] in kvm_arch as a storage of guest's ID registers,
-> and save ID registers' sanitized value in the array at KVM_CREATE_VM.
-> Use the saved ones when ID registers are read by the guest or
-> userspace (via KVM_GET_ONE_REG).
+On Wed, Mar 23, 2022 at 01:10:38PM -0600, Alex Williamson wrote:
+> On Fri, 18 Mar 2022 14:27:33 -0300
+> Jason Gunthorpe <jgg@nvidia.com> wrote:
 > 
-> Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> ---
->  arch/arm64/include/asm/kvm_host.h | 12 ++++++
->  arch/arm64/kvm/arm.c              |  1 +
->  arch/arm64/kvm/sys_regs.c         | 65 ++++++++++++++++++++++++-------
->  3 files changed, 63 insertions(+), 15 deletions(-)
+> > +static int conv_iommu_prot(u32 map_flags)
+> > +{
+> > +	int iommu_prot;
+> > +
+> > +	/*
+> > +	 * We provide no manual cache coherency ioctls to userspace and most
+> > +	 * architectures make the CPU ops for cache flushing privileged.
+> > +	 * Therefore we require the underlying IOMMU to support CPU coherent
+> > +	 * operation.
+> > +	 */
+> > +	iommu_prot = IOMMU_CACHE;
 > 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 2869259e10c0..c041e5afe3d2 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -101,6 +101,13 @@ struct kvm_s2_mmu {
->  struct kvm_arch_memory_slot {
->  };
->  
-> +/*
-> + * (Op0, Op1, CRn, CRm, Op2) of ID registers is (3, 0, 0, crm, op2),
-> + * where 0<=crm<8, 0<=op2<8.
+> Where is this requirement enforced?  AIUI we'd need to test
+> IOMMU_CAP_CACHE_COHERENCY somewhere since functions like
+> intel_iommu_map() simply drop the flag when not supported by HW.
 
-Doesn't the Feature ID register scheme only apply to CRm={1-7},
-op2={0-7}? I believe CRm=0, op2={1-4,7} are in fact UNDEFINED, not RAZ
-like the other ranges. Furthermore, the registers that are defined in
-that range do not go through the read_id_reg() plumbing.
+You are right, the correct thing to do is to fail device
+binding/attach entirely if IOMMU_CAP_CACHE_COHERENCY is not there,
+however we can't do that because Intel abuses the meaning of
+IOMMU_CAP_CACHE_COHERENCY to mean their special no-snoop behavior is
+supported.
 
-> + */
-> +#define KVM_ARM_ID_REG_MAX_NUM	64
-> +#define IDREG_IDX(id)		((sys_reg_CRm(id) << 3) | sys_reg_Op2(id))
-> +
->  struct kvm_arch {
->  	struct kvm_s2_mmu mmu;
->  
-> @@ -137,6 +144,9 @@ struct kvm_arch {
->  	/* Memory Tagging Extension enabled for the guest */
->  	bool mte_enabled;
->  	bool ran_once;
-> +
-> +	/* ID registers for the guest. */
-> +	u64 id_regs[KVM_ARM_ID_REG_MAX_NUM];
+I want Intel to split out their special no-snoop from IOMMU_CACHE and
+IOMMU_CAP_CACHE_COHERENCY so these things have a consisent meaning in
+all iommu drivers. Once this is done vfio and iommufd should both
+always set IOMMU_CACHE and refuse to work without
+IOMMU_CAP_CACHE_COHERENCY. (unless someone knows of an !IOMMU_CACHE
+arch that does in fact work today with vfio, somehow, but I don't..)
 
-This is a decently large array. Should we embed it in kvm_arch or
-allocate at init?
+I added a fixme about this.
 
-[...]
+> This also seems like an issue relative to vfio compatibility that I
+> don't see mentioned in that patch.  Thanks,
 
-> +
-> +/*
-> + * Set the guest's ID registers that are defined in sys_reg_descs[]
-> + * with ID_SANITISED() to the host's sanitized value.
-> + */
-> +void set_default_id_regs(struct kvm *kvm)
+Yes, it was missed in the notes for vfio compat that Intel no-snoop is
+not working currently, I fixed it.
 
-nit, more relevant if you take the above suggestion: maybe call it
-kvm_init_id_regs()?
-
-> +{
-> +	int i;
-> +	u32 id;
-> +	const struct sys_reg_desc *rd;
-> +	u64 val;
-> +
-> +	for (i = 0; i < ARRAY_SIZE(sys_reg_descs); i++) {
-
-You could avoid walking the entire system register table, since we
-already know the start and end values for the Feature ID register range.
-
-maybe:
-
-  #define FEATURE_ID_RANGE_START	SYS_ID_PFR0_EL1
-  #define FEATURE_ID_RANGE_END		sys_reg(3, 0, 0, 7, 7)
-
-  u32 sys_reg;
-
-  for (sys_reg = FEATURE_ID_RANGE_START; sys_reg <= FEATURE_ID_RANGE_END; sys_reg++)
-
-But, it depends on if this check is necessary:
-
-> +		rd = &sys_reg_descs[i];
-> +		if (rd->access != access_id_reg)
-> +			/* Not ID register, or hidden/reserved ID register */
-> +			continue;
-
-Which itself is dependent on whether KVM is going to sparsely or
-verbosely define its feature filtering tables per the other thread. So
-really only bother with this if that is the direction you're going.
-
---
 Thanks,
-Oliver
+Jason
