@@ -2,147 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 365544E5B71
-	for <lists+kvm@lfdr.de>; Wed, 23 Mar 2022 23:48:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E06344E5B74
+	for <lists+kvm@lfdr.de>; Wed, 23 Mar 2022 23:51:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345326AbiCWWtk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Mar 2022 18:49:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58410 "EHLO
+        id S241331AbiCWWxD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Mar 2022 18:53:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233476AbiCWWth (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Mar 2022 18:49:37 -0400
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BF00BF60;
-        Wed, 23 Mar 2022 15:48:05 -0700 (PDT)
-Received: by mail-pf1-x42a.google.com with SMTP id b13so669936pfv.0;
-        Wed, 23 Mar 2022 15:48:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=Esw6C6yt45apyLHALqu5qIDakKO1rV7h7Ry+mvo3u2o=;
-        b=A778ZUvX2skq0M28t9gXLFc3NtYOoip4s6Wc63WdMFmA0UmhWL6xXs74oRzGf8FsLL
-         1bt27MzYxyiKyuwP7SfzSnjwtlfB8wJzBUdCFC+x3X/jA/2rDr3KjPcND7bBluJFs9E/
-         1S3AtnZOkzwCX4CT4QXQ7VOE/rVudY45F/rYaeo6M4yqURsaxxueezcxkL67rqtnAqs0
-         +JE+lRft367UPvsSuvjGdVHnOu6wSAciJU1BDMHe00ibn/dUCkeUIHYzKQ/+uPaz0wkk
-         Kmcx482CHwwDjKHNBy/xkEso4wDmnmJf3aUEVZFcQsypwOu/xaojypyG5iBBYIKVRZfg
-         w5AA==
+        with ESMTP id S233476AbiCWWxB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Mar 2022 18:53:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 21DC28FE72
+        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 15:51:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1648075889;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=zXrtNBop4eytCkK2KN6cn5OV3XYINsz2pixN2ZjW6Ik=;
+        b=bubOzKKHrDSveK3Qnn2pQ831cFYZARexybcO7MF5E8Rjc0Ld26+XX98F3TODytd4dsTrN1
+        2uTsovIx1vB05pmjMyU4/MOgnCQ1l3MNwyZiKKkJPqMqidLlT6LEJEYOLGnXpjIis5Kmem
+        DHbdstc7SX77/0Cl8gndtmVtNryqjro=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-374-kpNKX_9kPC-FvH_Hlc-W-Q-1; Wed, 23 Mar 2022 18:51:28 -0400
+X-MC-Unique: kpNKX_9kPC-FvH_Hlc-W-Q-1
+Received: by mail-io1-f72.google.com with SMTP id f5-20020a6be805000000b00649b9faf257so1969872ioh.9
+        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 15:51:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=Esw6C6yt45apyLHALqu5qIDakKO1rV7h7Ry+mvo3u2o=;
-        b=B5fKY+R1QDQFzDlTi4buATQHWTSuH1pmvQf0tPptUPI/TYpNvhuzZ1f8thE9ERwXyT
-         QELDPj2PPJbwgup8AAEnFCOZ6jKcAMgqAiVabL/1Yw3glqL9KPTKeF9NH8jxvnRp3DAM
-         rAUWdnQi+pXzvpgdOg+QV+jbKRjfKqrkBVH+GsxhVyBEy4YUwCOfiAso1TV4vaWhuj6t
-         glPY/cJTPo/OoOfJfcirqeODKJOUMGpxZ5s9FYrhE1+TXn2u+O8i6qOKaEMMGaxvUPn3
-         VvfaBV3YCQA4FK98wBzV9974kcfARM67D0zfNfxysS85KaOkpygyN75Gx0DGNPrbwPqL
-         QQnw==
-X-Gm-Message-State: AOAM531N0YDDOLkJ681eyoHmnWx6T+whHq6Pwz7Xmtcncz8MXXFXiX5I
-        /GNPN98sjFsjTFOsyEVl2F8=
-X-Google-Smtp-Source: ABdhPJwVEp2dAMq6o96Oj+IkouScYXnEXoMsYUZ/U+QZJMDsY0qy/tOyCyTjcIgwXbx0h2OQNRci8w==
-X-Received: by 2002:a63:1258:0:b0:381:640e:9be5 with SMTP id 24-20020a631258000000b00381640e9be5mr1682329pgs.184.1648075684528;
-        Wed, 23 Mar 2022 15:48:04 -0700 (PDT)
-Received: from localhost (c-107-3-154-88.hsd1.ca.comcast.net. [107.3.154.88])
-        by smtp.gmail.com with ESMTPSA id a22-20020a056a000c9600b004f7ba8b445asm879627pfv.65.2022.03.23.15.48.03
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=zXrtNBop4eytCkK2KN6cn5OV3XYINsz2pixN2ZjW6Ik=;
+        b=w+sk1oza/x5ZBbu+QJ0hvphP3EuJk3RcRvuQFpqJtxkeVglTMNr5Dqs/s8SUd+D+JW
+         LsTCAvoAXpQSvYSDy5/GwJd2F/Lks3NV6r1KF+8GzjA0340DZPx025OLdlR1qBWV2N7A
+         mC4UWwS4bnC7iAya7buFzytgyFh/vhBS8mht6xHITLMg8glwtqVckFkmIpiNfNpxCZxT
+         0gKvhbMMFGRMyqwDnPbCFcYpTwZcLExd9VAtcK8bFwgWF5mmlhxUEUiZdfJ/02NMuEQM
+         0shSDzNxb6I98/ABbM27eexrh6aXo/Z/xmYZqeMrHEtEGfIjS0eZlc4V9f1Mz8Cyr4ZG
+         dT4w==
+X-Gm-Message-State: AOAM533wuynzOyIhWpmXnIjdD3dfpJbYVdlQn6zW1BgX+ADBGntUc6Nu
+        MfYeg0Q6VB479/dw8k8iWjVY+jdsDgJ1xWSywQT0f3Tudj+ewTH6gg8q+ZkFTJ+RQnmUXMxU4l+
+        m2X509sh5122n
+X-Received: by 2002:a02:6a60:0:b0:315:4758:1be1 with SMTP id m32-20020a026a60000000b0031547581be1mr1206119jaf.316.1648075887553;
+        Wed, 23 Mar 2022 15:51:27 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzaJn0eLN0Gn/0djTc0vdh5GoRl0UtWStWyphWNYG4Z5xTQIQiC8E7G1j0lHiTi9xOjH2m+wQ==
+X-Received: by 2002:a02:6a60:0:b0:315:4758:1be1 with SMTP id m32-20020a026a60000000b0031547581be1mr1206105jaf.316.1648075887341;
+        Wed, 23 Mar 2022 15:51:27 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id b11-20020a92c56b000000b002c76a618f52sm697615ilj.63.2022.03.23.15.51.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Mar 2022 15:48:04 -0700 (PDT)
-Date:   Wed, 23 Mar 2022 15:48:02 -0700
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     Erdem Aktas <erdemaktas@google.com>
-Cc:     Isaku Yamahata <isaku.yamahata@gmail.com>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        "open list:KERNEL VIRTUAL MACHINE (KVM)" <kvm@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Connor Kuehl <ckuehl@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Subject: Re: [RFC PATCH v5 064/104] KVM: TDX: Implement TDX vcpu enter/exit
- path
-Message-ID: <20220323224802.GA181823@private.email.ne.jp>
-References: <cover.1646422845.git.isaku.yamahata@intel.com>
- <cedda3dbe8597356374ef64de26ecef0d8cd7a62.1646422845.git.isaku.yamahata@intel.com>
- <CAAYXXYy3QLWyq9QrEnrsOLB3r44QTgKaOW4=HhOozDuw1073Gg@mail.gmail.com>
- <20220323175552.GG1964605@ls.amr.corp.intel.com>
- <CAAYXXYygcwW-Ai5qAAMpp_GprywV2=x02JYXfJxY2ac_EMKLvw@mail.gmail.com>
+        Wed, 23 Mar 2022 15:51:27 -0700 (PDT)
+Date:   Wed, 23 Mar 2022 16:51:25 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Eric Auger <eric.auger@redhat.com>,
+        iommu@lists.linux-foundation.org, Jason Wang <jasowang@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        Yi Liu <yi.l.liu@intel.com>, Keqian Zhu <zhukeqian1@huawei.com>
+Subject: Re: [PATCH RFC 11/12] iommufd: vfio container FD ioctl
+ compatibility
+Message-ID: <20220323165125.5efd5976.alex.williamson@redhat.com>
+In-Reply-To: <11-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
+References: <0-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
+        <11-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAAYXXYygcwW-Ai5qAAMpp_GprywV2=x02JYXfJxY2ac_EMKLvw@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 23, 2022 at 01:05:27PM -0700,
-Erdem Aktas <erdemaktas@google.com> wrote:
+On Fri, 18 Mar 2022 14:27:36 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-> On Wed, Mar 23, 2022 at 10:55 AM Isaku Yamahata
-> <isaku.yamahata@gmail.com> wrote:
-> >
-> > On Tue, Mar 22, 2022 at 10:28:42AM -0700,
-> > Erdem Aktas <erdemaktas@google.com> wrote:
-> >
-> > > On Fri, Mar 4, 2022 at 11:50 AM <isaku.yamahata@intel.com> wrote:
-> > > > @@ -509,6 +512,37 @@ void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
-> > > >         vcpu->kvm->vm_bugged = true;
-> > > >  }
-> > > >
-> > > > +u64 __tdx_vcpu_run(hpa_t tdvpr, void *regs, u32 regs_mask);
-> > > > +
-> > > > +static noinstr void tdx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
-> > > > +                                       struct vcpu_tdx *tdx)
-> > > > +{
-> > > > +       guest_enter_irqoff();
-> > > > +       tdx->exit_reason.full = __tdx_vcpu_run(tdx->tdvpr.pa, vcpu->arch.regs, 0);
-> > > > +       guest_exit_irqoff();
-> > > > +}
-> > > > +
-> > > > +fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu)
-> > > > +{
-> > > > +       struct vcpu_tdx *tdx = to_tdx(vcpu);
-> > > > +
-> > > > +       if (unlikely(vcpu->kvm->vm_bugged)) {
-> > > > +               tdx->exit_reason.full = TDX_NON_RECOVERABLE_VCPU;
-> > > > +               return EXIT_FASTPATH_NONE;
-> > > > +       }
-> > > > +
-> > > > +       trace_kvm_entry(vcpu);
-> > > > +
-> > > > +       tdx_vcpu_enter_exit(vcpu, tdx);
-> > > > +
-> > > > +       vcpu->arch.regs_avail &= ~VMX_REGS_LAZY_LOAD_SET;
-> > > > +       trace_kvm_exit(vcpu, KVM_ISA_VMX);
-> > > > +
-> > > > +       if (tdx->exit_reason.error || tdx->exit_reason.non_recoverable)
-> > > > +               return EXIT_FASTPATH_NONE;
-> > >
-> > > Looks like the above if statement has no effect. Just checking if this
-> > > is intentional.
-> >
-> > I'm not sure if I get your point.  tdx->exit_reason is updated by the above
-> > tdx_cpu_enter_exit().  So it makes sense to check .error or .non_recoverable.
-> > --
-> > Isaku Yamahata <isaku.yamahata@gmail.com>
+> iommufd can directly implement the /dev/vfio/vfio container IOCTLs by
+> mapping them into io_pagetable operations. Doing so allows the use of
+> iommufd by symliking /dev/vfio/vfio to /dev/iommufd. Allowing VFIO to
+> SET_CONTAINER using a iommufd instead of a container fd is a followup
+> series.
 > 
-> What I mean is, if there is an error, it returns EXIT_FASTPATH_NONE
-> but if there is no error, it still returns EXIT_FASTPATH_NONE.
+> Internally the compatibility API uses a normal IOAS object that, like
+> vfio, is automatically allocated when the first device is
+> attached.
 > 
-> The code is like below, the if-statement might be there as a
-> placeholder to check errors but it has no impact on what is returned
-> from this function.
+> Userspace can also query or set this IOAS object directly using the
+> IOMMU_VFIO_IOAS ioctl. This allows mixing and matching new iommufd only
+> features while still using the VFIO style map/unmap ioctls.
 > 
->        if (tdx->exit_reason.error || tdx->exit_reason.non_recoverable)
->                return EXIT_FASTPATH_NONE;
->        return EXIT_FASTPATH_NONE;
+> While this is enough to operate qemu, it is still a bit of a WIP with a
+> few gaps to be resolved:
+> 
+>  - Only the TYPE1v2 mode is supported where unmap cannot punch holes or
+>    split areas. The old mode can be implemented with a new operation to
+>    split an iopt_area into two without disturbing the iopt_pages or the
+>    domains, then unmapping a whole area as normal.
+> 
+>  - Resource limits rely on memory cgroups to bound what userspace can do
+>    instead of the module parameter dma_entry_limit.
+> 
+>  - VFIO P2P is not implemented. Avoiding the follow_pfn() mis-design will
+>    require some additional work to properly expose PFN lifecycle between
+>    VFIO and iommfd
+> 
+>  - Various components of the mdev API are not completed yet
+>
+>  - Indefinite suspend of SW access (VFIO_DMA_MAP_FLAG_VADDR) is not
+>    implemented.
+> 
+>  - The 'dirty tracking' is not implemented
+> 
+>  - A full audit for pedantic compatibility details (eg errnos, etc) has
+>    not yet been done
+> 
+>  - powerpc SPAPR is left out, as it is not connected to the iommu_domain
+>    framework. My hope is that SPAPR will be moved into the iommu_domain
+>    framework as a special HW specific type and would expect power to
+>    support the generic interface through a normal iommu_domain.
 
-Got it. It doesn't make sense. I'll fix it with the next respin.
--- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+My overall question here would be whether we can actually achieve a
+compatibility interface that has sufficient feature transparency that we
+can dump vfio code in favor of this interface, or will there be enough
+niche use cases that we need to keep type1 and vfio containers around
+through a deprecation process?
+
+The locked memory differences for one seem like something that libvirt
+wouldn't want hidden and we have questions regarding support for vaddr
+hijacking and different ideas how to implement dirty page tracking, not
+to mention the missing features that are currently well used, like p2p
+mappings, coherency tracking, mdev, etc.
+
+It seems like quite an endeavor to fill all these gaps, while at the
+same time QEMU will be working to move to use iommufd directly in order
+to gain all the new features.
+
+Where do we focus attention?  Is symlinking device files our proposal
+to userspace and is that something achievable, or do we want to use
+this compatibility interface as a means to test the interface and
+allow userspace to make use of it for transition, if their use cases
+allow it, perhaps eventually performing the symlink after deprecation
+and eventual removal of the vfio container and type1 code?  Thanks,
+
+Alex
+
