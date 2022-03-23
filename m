@@ -2,93 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C5C5F4E55A1
-	for <lists+kvm@lfdr.de>; Wed, 23 Mar 2022 16:47:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A57E4E55A5
+	for <lists+kvm@lfdr.de>; Wed, 23 Mar 2022 16:48:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230099AbiCWPtN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Mar 2022 11:49:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45876 "EHLO
+        id S238839AbiCWPtj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Mar 2022 11:49:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46636 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229919AbiCWPtN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Mar 2022 11:49:13 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EBAA70F70;
-        Wed, 23 Mar 2022 08:47:43 -0700 (PDT)
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22NFg2EY021676;
-        Wed, 23 Mar 2022 15:47:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=UhzFUbcuGI/+y/LiaprpiH5BDe/vR4kN0Z184NRcGZk=;
- b=f3mM6+E9oW+MpnWjI6F9bZFh5neAY2BbGEAaiRSL7LR7pNdo9ffpsS08kqByM/1vM9LA
- ogMp6nU6OncqUU0NBBiHZxW6792zVUh3qS7cXWxnxcHNDWvCt971kOy50RLqIpm68Vc7
- mSojNdiCTKnfjr2alwrhTd+S3WpvUIs4tlXHkKgABpmOKV0gkvs5M2KUuWBZ/qIn0YHo
- Z03tN7Z6hqDO0aW8R2P9bu0iAFIXTkfTgzNrTmfhWYv/OcAvAzW3rY68BJ8SId0YCfIl
- dD9YBxjoFP3uWwjC2rqs9QgHjcCJP9OuytFxNCH1iLq622XMLEs089k305tzF2SbLRjx gw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3f06drg4gf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Mar 2022 15:47:42 +0000
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22NFhnQG030012;
-        Wed, 23 Mar 2022 15:47:41 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3f06drg4fw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Mar 2022 15:47:41 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22NFN6dj030104;
-        Wed, 23 Mar 2022 15:47:39 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma03ams.nl.ibm.com with ESMTP id 3ew6t90w9d-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Mar 2022 15:47:39 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22NFlaeN23986546
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 23 Mar 2022 15:47:36 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A7A68AE056;
-        Wed, 23 Mar 2022 15:47:36 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 469F1AE053;
-        Wed, 23 Mar 2022 15:47:36 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.2.232])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 23 Mar 2022 15:47:36 +0000 (GMT)
-Date:   Wed, 23 Mar 2022 16:47:33 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Nico Boehr <nrb@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, thuth@redhat.com, david@redhat.com,
-        farman@linux.ibm.com
-Subject: Re: [kvm-unit-tests PATCH v1 4/9] s390x: smp: add test for
- SIGP_STORE_ADTL_STATUS order
-Message-ID: <20220323164733.4f36eb20@p-imbrenda>
-In-Reply-To: <1d1fa70ec01e7a3284d997dc05272fe144288fa0.camel@linux.ibm.com>
-References: <20220321101904.387640-1-nrb@linux.ibm.com>
-        <20220321101904.387640-5-nrb@linux.ibm.com>
-        <20220321155900.77bd89d8@p-imbrenda>
-        <1d1fa70ec01e7a3284d997dc05272fe144288fa0.camel@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        with ESMTP id S245248AbiCWPtf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Mar 2022 11:49:35 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D57B2B86C
+        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 08:48:02 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C3F93D6E;
+        Wed, 23 Mar 2022 08:48:01 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 122723F73D;
+        Wed, 23 Mar 2022 08:47:59 -0700 (PDT)
+Date:   Wed, 23 Mar 2022 15:48:31 +0000
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Steven Price <steven.price@arm.com>
+Cc:     Vladimir Murzin <vladimir.murzin@arm.com>, will@kernel.org,
+        kvm@vger.kernel.org, julien.thierry.kdev@gmail.com,
+        linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com
+Subject: Re: [kvmtool PATCH 2/2] aarch64: Add support for MTE
+Message-ID: <YjtBT8hZGL4ruxES@monolith.localdoman>
+References: <20220321152820.246700-1-alexandru.elisei@arm.com>
+ <20220321152820.246700-3-alexandru.elisei@arm.com>
+ <3cf3b621-5a07-5c06-cb9f-f9c776b6717d@arm.com>
+ <Yjiw/mdfLyMW2gFh@monolith.localdoman>
+ <7e5ebae0-db08-ad87-0fa9-26da048a9b72@arm.com>
+ <YjsMlZV1NBooKiYR@monolith.localdoman>
+ <00099507-c436-dd51-8714-d1a91431e4d0@arm.com>
+ <4731158c-b197-aba9-de64-fc5130cc152d@arm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: vewUwdP4u_hlzwvZgzulUmYAvnzph37B
-X-Proofpoint-ORIG-GUID: EBdGWF8LemN-B66shHW4IYIuDBgEZp19
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-03-23_07,2022-03-23_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- priorityscore=1501 impostorscore=0 malwarescore=0 bulkscore=0
- mlxlogscore=999 suspectscore=0 adultscore=0 spamscore=0 phishscore=0
- mlxscore=0 lowpriorityscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2202240000 definitions=main-2203230084
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <4731158c-b197-aba9-de64-fc5130cc152d@arm.com>
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -97,251 +50,238 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 23 Mar 2022 15:19:33 +0100
-Nico Boehr <nrb@linux.ibm.com> wrote:
+Hi,
 
-> On Mon, 2022-03-21 at 15:59 +0100, Claudio Imbrenda wrote:
-> > On Mon, 21 Mar 2022 11:18:59 +0100
-> > Nico Boehr <nrb@linux.ibm.com> wrote: =20
-> > > diff --git a/s390x/smp.c b/s390x/smp.c
-> > > index e5a16eb5a46a..5d3265f6be64 100644
-> > > --- a/s390x/smp.c =20
-> [...]
-> > > +/*
-> > > + * We keep two structs, one for comparing when we want to assert
-> > > it's not
-> > > + * touched.
-> > > + */
-> > > +static uint8_t adtl_status[2][4096]
-> > > __attribute__((aligned(4096))); =20
-> >=20
-> > it's a little bit ugly. maybe define a struct, with small buffers
-> > inside
-> > for the vector and gs areas? that way we would not need ugly magic
-> > numbers below (see below) =20
->=20
-> OK, will do.
->=20
-> [...]
-> > > +static void restart_write_vector(void)
-> > > +{
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0uint8_t *vec_reg;
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0uint8_t *vec_reg_16_31 =3D=
- &expected_vec_contents[16][0]; =20
-> >=20
-> > add a comment to explain that vlm only handles at most 16 registers
-> > at
-> > a time =20
->=20
-> OK will do.
->=20
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int i;
-> > > +
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0for (i =3D 0; i < NUM_VEC_=
-REGISTERS; i++) {
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0vec_reg =3D &expected_vec_contents[i][0];
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0memset(vec_reg, i, VEC_REGISTER_SIZE);
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0} =20
-> >=20
-> > this way vector register 0 stays 0.
-> > either special case it (e.g. 16, or whatever), or put a magic value
-> > somewhere in every register =20
->=20
-> adtl_status is initalized with 0xff. Are you OK with i + 1 so we avoid
-> zero?
+Catalin, Steven, Vladimir, thank you all for the feedback. I'll make MTE
+enabled by default in the next iteration of this series.
 
-that is fine
+Thanks,
+Alex
 
->=20
-> [...]
-> > > +static void test_store_adtl_status_vector(void)
-> > > +{
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0uint32_t status =3D -1;
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct psw psw;
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int cc;
-> > > +
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0report_prefix_push("store =
-additional status vector");
-> > > +
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!test_facility(129)) {
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0report_skip("vector facility not installed");
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0goto out;
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-> > > +
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0cpu_write_magic_to_vector_=
-regs(1);
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0smp_cpu_stop(1);
-> > > +
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0memset(adtl_status, 0xff, =
-sizeof(adtl_status));
-> > > +
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0cc =3D smp_sigp(1, SIGP_ST=
-ORE_ADDITIONAL_STATUS,
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (unsigned long)adtl_status, &status);
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0report(!cc, "CC =3D 0");
-> > > +
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0report(!memcmp(adtl_status=
-, expected_vec_contents,
-> > > sizeof(expected_vec_contents)),
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 "additional status contents match"); =20
-> >=20
-> > it would be interesting to check that nothing is stored past the end
-> > of
-> > the buffer. =20
->=20
-> I will add checks to ensure reserved fields are not modified.
->=20
-> > moreover, I think you should also explicitly test with lc_10, to make
-> > sure that works as well (no need to rerun the guest, just add another
-> > sigp call) =20
->=20
-> I will test vector with LC 0, 10, 11, 12 and guarded storage with LC 11
-> and 12.
->=20
-> [...]
-> > > +static void restart_write_gs_regs(void)
-> > > +{
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0const unsigned long gs_are=
-a =3D 0x2000000;
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0const unsigned long gsc =
-=3D 25; /* align =3D 32 M, section size
-> > > =3D 512K */
-> > > +
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ctl_set_bit(2, CTL2_GUARDE=
-D_STORAGE);
-> > > +
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0gs_cb.gsd =3D gs_area | gs=
-c;
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0gs_cb.gssm =3D 0xfeedc0ffe;
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0gs_cb.gs_epl_a =3D (uint64=
-_t) &gs_epl;
-> > > +
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0load_gs_cb(&gs_cb);
-> > > +
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0set_flag(1);
-> > > +
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ctl_clear_bit(2, CTL2_GUAR=
-DED_STORAGE); =20
-> >=20
-> > what happens when the function returns? is r14 set up properly? (or
-> > maybe we just don't care, since we are going to stop the CPU anyway?) =
-=20
->=20
-> We have an endless loop in smp_cpu_setup_state.=C2=A0So r14 will point th=
-ere
-> (verified with gdb).
->=20
-> In the end, I think we don't care. This is in contrast to the vector
-> test, where the epilogue will clean up the floating point regs.
-
-then add a comment explaining that :)
-
->=20
-> [...]
-> > > +static void test_store_adtl_status_gs(void)
-> > > +{
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0const unsigned long adtl_s=
-tatus_lc_11 =3D 11;
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0uint32_t status =3D 0;
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int cc;
-> > > +
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0report_prefix_push("store =
-additional status guarded-
-> > > storage");
-> > > +
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!test_facility(133)) {
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0report_skip("guarded-storage facility not
-> > > installed");
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0goto out;
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-> > > +
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0cpu_write_to_gs_regs(1);
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0smp_cpu_stop(1);
-> > > +
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0memset(adtl_status, 0xff, =
-sizeof(adtl_status));
-> > > +
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0cc =3D smp_sigp(1, SIGP_ST=
-ORE_ADDITIONAL_STATUS,
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (unsigned long)adtl_status | adtl_status_lc_=
-11,
-> > > &status);
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0report(!cc, "CC =3D 0");
-> > > +
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0report(!memcmp(&adtl_statu=
-s[0][1024], &gs_cb,
-> > > sizeof(gs_cb)), =20
-> >=20
-> > e.g. the 1024 is one of those "magic number" I mentioned above  =20
->=20
-> OK, fixed.
->=20
-> >  =20
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 "additional status contents match"); =20
-> >=20
-> > it would be interesting to test that nothing is stored after the end
-> > of
-> > the buffer (i.e. everything is still 0xff in the second half of the
-> > page) =20
->=20
-> Yes, done.
->=20
-> [...]
-> > >=20
-> > > diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-> > > index 1600e714c8b9..2d0adc503917 100644
-> > > --- a/s390x/unittests.cfg
-> > > +++ b/s390x/unittests.cfg
-> > > @@ -77,6 +77,12 @@ extra_params=3D-name kvm-unit-test --uuid
-> > > 0fb84a86-727c-11ea-bc55-0242ac130003 -sm
-> > > =C2=A0[smp]
-> > > =C2=A0file =3D smp.elf
-> > > =C2=A0smp =3D 2
-> > > +extra_params =3D -cpu host,gs=3Don,vx=3Don
-> > > +
-> > > +[smp-no-vec-no-gs]
-> > > +file =3D smp.elf
-> > > +smp =3D 2
-> > > +extra_params =3D -cpu host,gs=3Doff,vx=3Doff =20
-> >=20
-> > using "host" will break TCG
-> > (and using "qemu" will break secure execution)
-> >=20
-> > there are two possible solutions:
-> >=20
-> > use "max" and deal with the warnings, or split each testcase in two,
-> > one using host cpu and "accel =3D kvm" and the other with "accel =3D tc=
-g"
-> > and qemu cpu. =20
->=20
-> Uh, thanks for pointing out. I will split in accel =3D tcg and accel =3D
-> kvm.
->=20
-> > what should happen if only one of the two features is installed?
-> > should
-> > the buffer for the unavailable feature be stored with 0 or should it
-> > be
-> > left untouched? is it worth testing those scenarios? =20
->=20
-> The PoP specifies: "A facility=E2=80=99s registers are only
-> stored in the MCESA when the facility is installed."
->=20
-> Maybe I miss something, but it doesn't seem worth it. It would mean
-> adding yet another instance to the unittests.cfg. Since once needs to
-> provide the memory for the registers even when the facility isn't
-> there, there seems little risk for breaking something when we store if
-> the facility isn't there.
-
-I mean, technically we should check that nothing is stored for
-facilities that are not present, but I guess it's not worth it=20
-and that would indeed double the number of entries in unittests.cfg
+On Wed, Mar 23, 2022 at 02:15:55PM +0000, Steven Price wrote:
+> On 23/03/2022 13:57, Vladimir Murzin wrote:
+> > Hi,
+> > 
+> > On 3/23/22 12:03 PM, Alexandru Elisei wrote:
+> >> Hi,
+> >>
+> >> On Wed, Mar 23, 2022 at 10:31:15AM +0000, Vladimir Murzin wrote:
+> >>> On 3/21/22 5:08 PM, Alexandru Elisei wrote:
+> >>>> Hi,
+> >>>>
+> >>>> On Mon, Mar 21, 2022 at 03:40:18PM +0000, Vladimir Murzin wrote:
+> >>>>> Hi Alexandru,
+> >>>>>
+> >>>>> On 3/21/22 3:28 PM, Alexandru Elisei wrote:
+> >>>>>> MTE has been supported in Linux since commit 673638f434ee ("KVM:
+> >>>>>> arm64:
+> >>>>>> Expose KVM_ARM_CAP_MTE"), add support for it in kvmtool.
+> >>>>>>
+> >>>>>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> >>>>>> ---
+> >>>>>>    arm/aarch32/include/kvm/kvm-arch.h        |  3 +++
+> >>>>>>    arm/aarch64/include/kvm/kvm-arch.h        |  1 +
+> >>>>>>    arm/aarch64/include/kvm/kvm-config-arch.h |  2 ++
+> >>>>>>    arm/aarch64/kvm.c                         | 13 +++++++++++++
+> >>>>>>    arm/include/arm-common/kvm-config-arch.h  |  1 +
+> >>>>>>    arm/kvm.c                                 |  3 +++
+> >>>>>>    6 files changed, 23 insertions(+)
+> >>>>>>
+> >>>>>> diff --git a/arm/aarch32/include/kvm/kvm-arch.h
+> >>>>>> b/arm/aarch32/include/kvm/kvm-arch.h
+> >>>>>> index bee2fc255a82..5616b27e257e 100644
+> >>>>>> --- a/arm/aarch32/include/kvm/kvm-arch.h
+> >>>>>> +++ b/arm/aarch32/include/kvm/kvm-arch.h
+> >>>>>> @@ -5,6 +5,9 @@
+> >>>>>>    #define kvm__arch_get_kern_offset(...)    0x8000
+> >>>>>> +struct kvm;
+> >>>>>> +static inline void kvm__arch_enable_mte(struct kvm *kvm) {}
+> >>>>>> +
+> >>>>>>    #define ARM_MAX_MEMORY(...)    ARM_LOMAP_MAX_MEMORY
+> >>>>>>    #define MAX_PAGE_SIZE    SZ_4K
+> >>>>>> diff --git a/arm/aarch64/include/kvm/kvm-arch.h
+> >>>>>> b/arm/aarch64/include/kvm/kvm-arch.h
+> >>>>>> index 5e5ee41211ed..9124f6919d0f 100644
+> >>>>>> --- a/arm/aarch64/include/kvm/kvm-arch.h
+> >>>>>> +++ b/arm/aarch64/include/kvm/kvm-arch.h
+> >>>>>> @@ -6,6 +6,7 @@
+> >>>>>>    struct kvm;
+> >>>>>>    unsigned long long kvm__arch_get_kern_offset(struct kvm *kvm,
+> >>>>>> int fd);
+> >>>>>>    int kvm__arch_get_ipa_limit(struct kvm *kvm);
+> >>>>>> +void kvm__arch_enable_mte(struct kvm *kvm);
+> >>>>>>    #define ARM_MAX_MEMORY(kvm)    ({                    \
+> >>>>>>        u64 max_ram;                            \
+> >>>>>> diff --git a/arm/aarch64/include/kvm/kvm-config-arch.h
+> >>>>>> b/arm/aarch64/include/kvm/kvm-config-arch.h
+> >>>>>> index 04be43dfa9b2..11250365d8d5 100644
+> >>>>>> --- a/arm/aarch64/include/kvm/kvm-config-arch.h
+> >>>>>> +++ b/arm/aarch64/include/kvm/kvm-config-arch.h
+> >>>>>> @@ -6,6 +6,8 @@
+> >>>>>>                "Run AArch32 guest"),                \
+> >>>>>>        OPT_BOOLEAN('\0', "pmu", &(cfg)->has_pmuv3,            \
+> >>>>>>                "Create PMUv3 device"),                \
+> >>>>>> +    OPT_BOOLEAN('\0', "mte", &(cfg)->has_mte,            \
+> >>>>>> +            "Enable memory tagging extension"),        \
+> >>>>>>        OPT_U64('\0', "kaslr-seed", &(cfg)->kaslr_seed,            \
+> >>>>>>                "Specify random seed for Kernel Address Space "    \
+> >>>>>>                "Layout Randomization (KASLR)"),
+> >>>>>> diff --git a/arm/aarch64/kvm.c b/arm/aarch64/kvm.c
+> >>>>>> index 56a0aedc263d..46548f8ee96e 100644
+> >>>>>> --- a/arm/aarch64/kvm.c
+> >>>>>> +++ b/arm/aarch64/kvm.c
+> >>>>>> @@ -81,3 +81,16 @@ int kvm__get_vm_type(struct kvm *kvm)
+> >>>>>>        return KVM_VM_TYPE_ARM_IPA_SIZE(ipa_bits);
+> >>>>>>    }
+> >>>>>> +
+> >>>>>> +void kvm__arch_enable_mte(struct kvm *kvm)
+> >>>>>> +{
+> >>>>>> +    struct kvm_enable_cap cap = {
+> >>>>>> +        .cap = KVM_CAP_ARM_MTE,
+> >>>>>> +    };
+> >>>>>> +
+> >>>>>> +    if (!kvm__supports_extension(kvm, KVM_CAP_ARM_MTE))
+> >>>>>> +        die("MTE capability is not supported");
+> >>>>>> +
+> >>>>>> +    if (ioctl(kvm->vm_fd, KVM_ENABLE_CAP, &cap))
+> >>>>>> +        die_perror("KVM_ENABLE_CAP(KVM_CAP_ARM_MTE)");
+> >>>>>> +}
+> >>>>>> diff --git a/arm/include/arm-common/kvm-config-arch.h
+> >>>>>> b/arm/include/arm-common/kvm-config-arch.h
+> >>>>>> index 5734c46ab9e6..16e8d500a71b 100644
+> >>>>>> --- a/arm/include/arm-common/kvm-config-arch.h
+> >>>>>> +++ b/arm/include/arm-common/kvm-config-arch.h
+> >>>>>> @@ -9,6 +9,7 @@ struct kvm_config_arch {
+> >>>>>>        bool        virtio_trans_pci;
+> >>>>>>        bool        aarch32_guest;
+> >>>>>>        bool        has_pmuv3;
+> >>>>>> +    bool        has_mte;
+> >>>>>>        u64        kaslr_seed;
+> >>>>>>        enum irqchip_type irqchip;
+> >>>>>>        u64        fw_addr;
+> >>>>>> diff --git a/arm/kvm.c b/arm/kvm.c
+> >>>>>> index 80d233f13d0b..f2db93953778 100644
+> >>>>>> --- a/arm/kvm.c
+> >>>>>> +++ b/arm/kvm.c
+> >>>>>> @@ -86,6 +86,9 @@ void kvm__arch_init(struct kvm *kvm, const char
+> >>>>>> *hugetlbfs_path, u64 ram_size)
+> >>>>>>        /* Create the virtual GIC. */
+> >>>>>>        if (gic__create(kvm, kvm->cfg.arch.irqchip))
+> >>>>>>            die("Failed to create virtual GIC");
+> >>>>>> +
+> >>>>>> +    if (kvm->cfg.arch.has_mte)
+> >>>>>> +        kvm__arch_enable_mte(kvm);
+> >>>>>>    }
+> >>>>>
+> >>>>> Can we enable it unconditionally if KVM_CAP_ARM_MTE is supported
+> >>>>> like we do for
+> >>>>> PAC and SVE?
+> >>>>
+> >>>> I thought about that, the reason I chose to enable it based a kvmtool
+> >>>> command line option, instead of always being enabled if available, is
+> >>>> because of the overhead of sanitising the MTE tags on each stage 2 data
+> >>>> abort. Steven, am I overreacting and that overhead is negligible?
+> >>>>
+> >>>> Also, as far as I know, PAC and SVE incur basically no overhead in KVM
+> >>>> until the guest starts to use those features.
+> >>>>
+> >>>> Do you have a specific reason for wanting MTE to always be enabled if
+> >>>> available? I'm happy to be convinced to make MTE enabled by default, I
+> >>>> don't have preference either way.
+> >>>
+> >>> Well, automatically enabling if available would align with what we do
+> >>> for
+> >>> other features in kvmtool and Linux itself - we tend to default y for
+> >>> new
+> >>> features, even MTE, thus improving chances to get reports back early if
+> >>> something (even performance) goes wrong. Just my 2p.
+> >>
+> >> According to Steven, for each 4k page the kernel uses an 128 byte
+> >> buffer to
+> >> store the tags, and then some extra memory is used to keep track of the
+> >> buffers. Let's take the case of a VM with 1GB of memory, and be
+> >> conservative and only account for the tag buffer. In this case, the tag
+> >> buffers alone will be 32MB.
+> > 
+> > Right, IIUC, that memory is allocated on demand when we about to swap
+> > the page
+> > out or perform hibernation, so there is no reservation done upfront or I'm
+> > missing something?
+> 
+> That's correct, sorry if I didn't make that clear earlier. The host
+> memory is only allocated when the MTE-enabled guest's pages are swapped
+> out. So if they are never swapped out there's no memory overhead.
+> 
+> >>
+> >> For a VM with 1GB of memory created with kvmtool built from current
+> >> master
+> >> (commit faae833a746f), pmap shows a total memory usage of 1268388K.
+> >> Subtracting the memory of the VM, we are left with 214MB of memory
+> >> consumed
+> >> by kvmtool. Having MTE enabled would increase the memory overhead of
+> >> kvmtool by 32/214*100 = 15%.
+> >>
+> > 
+> > I admit, I might be missing something, but given that extra tag storage
+> > allocated for swap/hibernation overhead can be applied to any process which
+> > uses MTE, no?
+> 
+> One difference is that the entire VM is considered MTE memory, whereas
+> in a normal application only those pages mapped with PROT_MTE take the
+> overhead. So the memory overhead of applications running in the VM is
+> higher than the same application outside of the VM (assuming the memory
+> is swapped out by the host).
+> 
+> >> Of course, this memory overhead scales with the amount of memory the VM
+> >> has. The buffer size that KVM uses might change in the future, but
+> >> since we
+> >> cannot predict the future (might become larger or smaller), I'm working
+> >> with what is implement today.
+> >>
+> > 
+> > Fair enough. IMO, we will see more MTE capable hardware, OTOH, memory
+> > overhead
+> > won't magically disappear, so should we start thinking how to reduce it?
+> > I noticed that code saves tags one to one, so for guest which doesn't
+> > actively use MTE whole page would be tagged with zero, cannot that case be
+> > optimized? or maybe be go further and compress tags?
+> 
+> Compressing tags is certainly something that could be considered (an
+> early revision of the MTE swap did optimise the zero case).
+> 
+> However Linux is lazy with the tags - if an application needs memory but
+> doesn't use the tags then only the data portion will be zeroed and the
+> tags will be left with whatever value they had previously (as they are
+> not accessible by the application). This could mean that a MTE-enabled
+> guest ends with with remarkably few pages with zeroed tags after it has
+> been running for a while.
+> 
+> From the host it's not possible to determine whether the tags are useful
+> or not so they have to be saved regardless.
+> 
+> That said I don't have a strong opinion on the default, as long as
+> there's an option to disable MTE then having the default with it turned
+> on is fine by me.
+> 
+> >> The kernel documentation for MTE suggests that in order to take advantage
+> >> of it, software must be modified and recompiled. That means that users
+> >> that
+> >> don't want to use MTE won't get to exercise MTE because they won't be
+> >> using
+> >> MTE enabled software, but they will pay the overhead regardless. This of
+> >> course assumes that going forward software won't be using MTE by default.
+> >>
+> >> kvmtool is supposed to be simple, fast and less resource intensive than
+> >> other hypervisors, that's why I think having MTE disabled by default
+> >> is the
+> >> best way to implement the capability.
+> > 
+> > I see kvmtool as bleeding edge hacking tool, so closer it to the edge is
+> > better :)
+> 
+> I have to admit I like the "just works" approach that the defaults give
+> you (e.g. p9 filesystem from host, no need to configure root filesystems
+> etc), so there's definitely something to be said for MTE "just working"
+> in kvmtool too.
+> 
+> Steve
