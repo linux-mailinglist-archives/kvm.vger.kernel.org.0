@@ -2,57 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 841034E57AD
+	by mail.lfdr.de (Postfix) with ESMTP id 38B734E57AC
 	for <lists+kvm@lfdr.de>; Wed, 23 Mar 2022 18:37:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343661AbiCWRiR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Mar 2022 13:38:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55358 "EHLO
+        id S237520AbiCWRiO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Mar 2022 13:38:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55406 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343722AbiCWRiF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Mar 2022 13:38:05 -0400
+        with ESMTP id S1343740AbiCWRiI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Mar 2022 13:38:08 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B816A7E0A7
-        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 10:36:35 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AC0A67EB03
+        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 10:36:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1648056994;
+        s=mimecast20190719; t=1648056997;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=MzwRKwBdRCLittF2Yi0pCWERtTQbkRUJ2eaS0FEovlY=;
-        b=Xewj6prr/PfyAN7XEgdfF1nGgQo8B3kuDeUBfaobfFQw6fbAQlamUC4ZgI1PR7QCH3uj+C
-        IpIkUeMuXZas1Y32/oVYZY8mXxj0qWQDE9rbSvZ5SpM5odM4uRF+sYwdnUnSxfiagh18Hx
-        MvLtxyxnzUVm27XTA4KNPuWPXSK0Akg=
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=B/auHUunRKmj44ZRhZ4Uljn8hCNOGxN6qXBgu6Qo8Sg=;
+        b=QKHyfpuRSUuiZJtghqAfKumY87h4n23tRuTtMD6kWlm1KMgNuIscxae+pxJ05Vv/aAs6Mu
+        MSMUOzUBCf0YJuorfzB6UMoINsDOCPxpG36Rddji/EyGNMoakqzvKt/7ZqVMlqSchW3Se4
+        uN9kzc9f7i+MwHc+d8fnZbFE0YEt+vA=
 Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
  [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-103-53HN21O-NZqNE4Dq4hT-yQ-1; Wed, 23 Mar 2022 13:36:33 -0400
-X-MC-Unique: 53HN21O-NZqNE4Dq4hT-yQ-1
-Received: by mail-qt1-f198.google.com with SMTP id bq21-20020a05622a1c1500b002e06d6279d5so1751613qtb.7
-        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 10:36:33 -0700 (PDT)
+ us-mta-581-ZaefITVGMMK6zv1jGaihJg-1; Wed, 23 Mar 2022 13:36:36 -0400
+X-MC-Unique: ZaefITVGMMK6zv1jGaihJg-1
+Received: by mail-qt1-f198.google.com with SMTP id k11-20020ac8604b000000b002e1a4109edeso1737447qtm.15
+        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 10:36:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=MzwRKwBdRCLittF2Yi0pCWERtTQbkRUJ2eaS0FEovlY=;
-        b=PAIbo4VTLjOp0xpEDeso9NeghD2PlxClTb//q1PEFI/hZ1CoyNVRI9FeHi0nism1rN
-         IcW429S3HVVfPuqAy5wUvr4vRmdb11y/5bp4rrgpOKapQL0W+0EbAMiKVWdVr6BUja/f
-         vfhlYTl22+VA436+T5iyaXDDX06Xup+U2vHYsuTvACJV5sf97OzfIR/1Wgw+bPGFP/47
-         j1uHKnqdTbo42Jm31tsfWfsdN6IaKUdZSMU6nal0wrrUTqVEvrCFty2jlDldkeYPsi9V
-         +9m88eHzmdfyivKO7xQVBSBx3EW/20JOUdKTf6BuxLrDmFZpxG/muxAw0ik98LhYk9ky
-         jxQQ==
-X-Gm-Message-State: AOAM531y9APWI4xAJljZlqjFsC1rf48B22M3TN6fa8soTa1M/uvep7tk
-        Yp7ZvyQ618H5BDBdtoWI8yUuBGTHJxYXSg+5tuoPilgnofP1vgt6lwmv97fCKqZnA19fHSu4LZt
-        vkLe1dAtUCdU5
-X-Received: by 2002:a05:6214:2509:b0:435:7443:2dad with SMTP id gf9-20020a056214250900b0043574432dadmr938552qvb.47.1648056991873;
-        Wed, 23 Mar 2022 10:36:31 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxeN8QDcW/nCBes+HF3p4Qa8YtXACGqrPDG30FPUtcA4s5rpDfAh0kaotVknOsyPTvs3/VKmw==
-X-Received: by 2002:a05:6214:2509:b0:435:7443:2dad with SMTP id gf9-20020a056214250900b0043574432dadmr938508qvb.47.1648056991171;
-        Wed, 23 Mar 2022 10:36:31 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=B/auHUunRKmj44ZRhZ4Uljn8hCNOGxN6qXBgu6Qo8Sg=;
+        b=bCn4SB1hcQhpRNbqV/hrQ3PJ8OqnosFxw6PTZ7egMQ+hh5jCmKWymqBcrLRdIOL5cf
+         MUqdh6wNkxewo2FjfaqfGuf/cCWCac9NSB3mQEzZt6YLvVYUbJ0JJeirKD5LpswUAbMg
+         OvgfEzjlxWvq1QnoqScvRkDLh3SCX4lu00PnIdodwkzM+1JDlObZm84Pr21o2UkX6zPs
+         2JriR0Bwv5l+rFYmBZ2UNoNToYEANlXOd4JL1Pdkd3cSPKG9z8x4Uw2F19FnMF+8xJzT
+         lxkDIgmbw7y54WQ2hNdezBB3mj2xnjQ4A+1F7Ca/1B2jhsqDaSboroMyg1utdeUyKS9J
+         JnaA==
+X-Gm-Message-State: AOAM531yYwZ1Z9pairHKXkTNgJ/sHf3q6M7AViiQfvb+WO63I23RzF/D
+        nMAPyTNyWYE8Yin84sHQr7I3X+CWLTqzRX7TqnnFxtfr7mkdZv40Vq6lljy+H0NhV1Ka5SoOKwX
+        2F1liNezpj0sw
+X-Received: by 2002:a05:620a:15cf:b0:67d:f378:5cf8 with SMTP id o15-20020a05620a15cf00b0067df3785cf8mr745277qkm.354.1648056995704;
+        Wed, 23 Mar 2022 10:36:35 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxTUiRkn6eha8XU1o1IqDFFHEY3objSBoDDAqSNfC0KM2Zb1piJWjlVMzOTuJp+NKhZ0Bg0SA==
+X-Received: by 2002:a05:620a:15cf:b0:67d:f378:5cf8 with SMTP id o15-20020a05620a15cf00b0067df3785cf8mr745251qkm.354.1648056995111;
+        Wed, 23 Mar 2022 10:36:35 -0700 (PDT)
 Received: from step1.redhat.com (host-87-12-25-114.business.telecomitalia.it. [87.12.25.114])
-        by smtp.gmail.com with ESMTPSA id h14-20020a05622a170e00b002e1a65754d8sm476127qtk.91.2022.03.23.10.36.27
+        by smtp.gmail.com with ESMTPSA id h14-20020a05622a170e00b002e1a65754d8sm476127qtk.91.2022.03.23.10.36.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Mar 2022 10:36:30 -0700 (PDT)
+        Wed, 23 Mar 2022 10:36:34 -0700 (PDT)
 From:   Stefano Garzarella <sgarzare@redhat.com>
 To:     netdev@vger.kernel.org
 Cc:     Jakub Kicinski <kuba@kernel.org>,
@@ -63,11 +64,12 @@ Cc:     Jakub Kicinski <kuba@kernel.org>,
         Stefano Garzarella <sgarzare@redhat.com>,
         virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
         "David S. Miller" <davem@davemloft.net>
-Subject: [PATCH net v3 0/3] vsock/virtio: enable VQs early on probe and finish the setup before using them
-Date:   Wed, 23 Mar 2022 18:36:22 +0100
-Message-Id: <20220323173625.91119-1-sgarzare@redhat.com>
+Subject: [PATCH net v3 1/3] vsock/virtio: initialize vdev->priv before using VQs
+Date:   Wed, 23 Mar 2022 18:36:23 +0100
+Message-Id: <20220323173625.91119-2-sgarzare@redhat.com>
 X-Mailer: git-send-email 2.35.1
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20220323173625.91119-1-sgarzare@redhat.com>
+References: <20220323173625.91119-1-sgarzare@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -81,25 +83,38 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The first patch fixes a virtio-spec violation. The other two patches
-complete the driver configuration before using the VQs in the probe.
+When we fill VQs with empty buffers and kick the host, it may send
+an interrupt. `vdev->priv` must be initialized before this since it
+is used in the virtqueue callbacks.
 
-The patch order should simplify backporting in stable branches.
+Fixes: 0deab087b16a ("vsock/virtio: use RCU to avoid use-after-free on the_virtio_vsock")
+Suggested-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+---
+ net/vmw_vsock/virtio_transport.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-v3:
-- re-ordered the patch to improve bisectability [MST]
-
-v2: https://lore.kernel.org/netdev/20220323084954.11769-1-sgarzare@redhat.com/
-v1: https://lore.kernel.org/netdev/20220322103823.83411-1-sgarzare@redhat.com/
-
-Stefano Garzarella (3):
-  vsock/virtio: initialize vdev->priv before using VQs
-  vsock/virtio: read the negotiated features before using VQs
-  vsock/virtio: enable VQs early on probe
-
- net/vmw_vsock/virtio_transport.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
-
+diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+index 5afc194a58bb..3e5513934c9f 100644
+--- a/net/vmw_vsock/virtio_transport.c
++++ b/net/vmw_vsock/virtio_transport.c
+@@ -622,6 +622,8 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
+ 	INIT_WORK(&vsock->event_work, virtio_transport_event_work);
+ 	INIT_WORK(&vsock->send_pkt_work, virtio_transport_send_pkt_work);
+ 
++	vdev->priv = vsock;
++
+ 	mutex_lock(&vsock->tx_lock);
+ 	vsock->tx_run = true;
+ 	mutex_unlock(&vsock->tx_lock);
+@@ -639,7 +641,6 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
+ 	if (virtio_has_feature(vdev, VIRTIO_VSOCK_F_SEQPACKET))
+ 		vsock->seqpacket_allow = true;
+ 
+-	vdev->priv = vsock;
+ 	rcu_assign_pointer(the_virtio_vsock, vsock);
+ 
+ 	mutex_unlock(&the_virtio_vsock_mutex);
 -- 
 2.35.1
 
