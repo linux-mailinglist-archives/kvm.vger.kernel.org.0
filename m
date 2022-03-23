@@ -2,95 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 920FB4E4DB2
-	for <lists+kvm@lfdr.de>; Wed, 23 Mar 2022 08:59:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C62634E4DBE
+	for <lists+kvm@lfdr.de>; Wed, 23 Mar 2022 09:05:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242382AbiCWIAd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Mar 2022 04:00:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45346 "EHLO
+        id S242182AbiCWIGx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Mar 2022 04:06:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242375AbiCWIAc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Mar 2022 04:00:32 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF2BC32EFD;
-        Wed, 23 Mar 2022 00:59:03 -0700 (PDT)
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22N7Nj2E030074;
-        Wed, 23 Mar 2022 07:59:03 GMT
+        with ESMTP id S232267AbiCWIGv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Mar 2022 04:06:51 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9D5570F7D
+        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 01:05:21 -0700 (PDT)
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22N6OBn2030534
+        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 08:05:21 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=Kyr8kev9+gNTTph7gkssJCVXKyDOvFDGTXEnkQ9Nm1A=;
- b=B6+8u/0CDv/5ob/GwUFSRT4H8/y7IPlvqLyrPMNCF6UGoI8YYt0bbjlAHahPTFH/k72Q
- g59PRPxFZXWvCcqIMglw1BnPlISEQU4hf+9cP76WrGyiGHpS4kBf0ms/0hdx4zhVLB9S
- gqHFTePmDklY3g1dufRMRRptEmpbWw6Jv9bMwBatF2rt6rtisAAPajly+3RrPUyPIVK9
- 9Bw9CzJ3ahdiHVBuqLJiJjSQSHRpSaVRw7Xi/VcZh1aaYEzS6yxGbJ9tI7meZTfAkfSO
- R/3KuWcXgMjBby9DNDgU6EkGjDOF4+H3JGHQxj+RYHCGO3mwQjpUYeDGX5DXNfNFNqpe aw== 
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=c7YxH2DmgEInXa5Okd/n3RJIbQXmoI5Z9dyZLta8FhE=;
+ b=ZJnY9PcBwZLmhnPb+JD+MThahlAHFt7Sw9E3G2a9IN9Ulh5cJFdMiueaud87J4S0vcKB
+ lt/GUsBveM3dny6B86QgeCwKxlvBO3ti/mMVDUDBGiEJpbHT3dX8jcvWESujsevAmTQy
+ S6IdGNtmWr3Qk6pIvb9WvkR8jS4lhF/ErG6J66uuMI3I1ueIghLxkpWiGP9JQDlGGt22
+ Xt2FRArfC+mCV1auA/JP1OYhIac1xT/T/xNzgYDlaANvsfCQGKlcwSZEyc6IaYqcev3K
+ JK7Fd6Hy9sOkMA/EtNBrhMRaqngdHMPR4v7++lKk4h4su7bzm0mIBTD3Lw7ibsOyLDsK /Q== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3eyy4f0hub-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Mar 2022 07:59:03 +0000
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22N7VIHs023215;
-        Wed, 23 Mar 2022 07:59:02 GMT
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3eyx8e1nmc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 08:05:20 +0000
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22N7jSTa015829
+        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 08:05:20 GMT
 Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3eyy4f0htq-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3eyx8e1nkw-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Mar 2022 07:59:02 +0000
+        Wed, 23 Mar 2022 08:05:20 +0000
 Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22N7ws5B018636;
-        Wed, 23 Mar 2022 07:59:00 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma06ams.nl.ibm.com with ESMTP id 3ew6ej00hk-1
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22N7x01F018682;
+        Wed, 23 Mar 2022 08:05:18 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma06ams.nl.ibm.com with ESMTP id 3ew6ej01g8-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Mar 2022 07:59:00 +0000
+        Wed, 23 Mar 2022 08:05:18 +0000
 Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22N7wvND50200932
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22N85Gpo39715298
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 23 Mar 2022 07:58:57 GMT
+        Wed, 23 Mar 2022 08:05:16 GMT
 Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7AFEA11C04A;
-        Wed, 23 Mar 2022 07:58:57 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 2BABB11C066;
+        Wed, 23 Mar 2022 08:05:16 +0000 (GMT)
 Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 01ABA11C04C;
-        Wed, 23 Mar 2022 07:58:57 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id EDA1011C06E;
+        Wed, 23 Mar 2022 08:05:15 +0000 (GMT)
 Received: from [9.145.94.199] (unknown [9.145.94.199])
         by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 23 Mar 2022 07:58:56 +0000 (GMT)
-Message-ID: <44618f05-9aee-5aa5-b036-dd838285b26f@linux.ibm.com>
-Date:   Wed, 23 Mar 2022 08:58:56 +0100
-MIME-Version: 1.0
+        Wed, 23 Mar 2022 08:05:15 +0000 (GMT)
+Message-ID: <ebb093d8-7aa0-a141-cb3e-4b8dfe849bd8@linux.ibm.com>
+Date:   Wed, 23 Mar 2022 09:05:15 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.7.0
-Subject: Re: [PATCH] KVM: s390: Fix lockdep issue in vm memop
+Subject: Re: [kvm-unit-tests PATCH] Allow to compile without -Werror
 Content-Language: en-US
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Sven Schnelle <svens@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220322153204.2637400-1-scgl@linux.ibm.com>
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+References: <20220322171504.941686-1-thuth@redhat.com>
 From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <20220322153204.2637400-1-scgl@linux.ibm.com>
+In-Reply-To: <20220322171504.941686-1-thuth@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: jC8grO_4q80IxcdgQp2aLwrFrCDR-3sr
-X-Proofpoint-GUID: LN6PtDnGfq-7m3KgOANAn4JQeeFBSlJD
+X-Proofpoint-GUID: OKDRNsHhyF63mpvtlTqsC8Zu43xmh2k2
+X-Proofpoint-ORIG-GUID: J4fEJkW37eNK6YwmzUq0R2OrYZwLmQti
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
  definitions=2022-03-22_08,2022-03-22_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- lowpriorityscore=0 mlxlogscore=999 malwarescore=0 bulkscore=0
- impostorscore=0 phishscore=0 mlxscore=0 adultscore=0 priorityscore=1501
- spamscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2203230042
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
+ malwarescore=0 suspectscore=0 mlxscore=0 adultscore=0 phishscore=0
+ priorityscore=1501 spamscore=0 mlxlogscore=913 lowpriorityscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2203230047
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H4,
         RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -99,58 +95,95 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/22/22 16:32, Janis Schoetterl-Glausch wrote:
-> Issuing a memop on a protected vm does not make sense,
-
-Issuing a vm memop on a protected vm...
-
-The cpu memop still makes sense, no?
-
-> neither is the memory readable/writable, nor does it make sense to check
-> storage keys. This is why the ioctl will return -EINVAL when it detects
-> the vm to be protected. However, in order to ensure that the vm cannot
-> become protected during the memop, the kvm->lock would need to be taken
-> for the duration of the ioctl. This is also required because
-> kvm_s390_pv_is_protected asserts that the lock must be held.
-> Instead, don't try to prevent this. If user space enables secure
-> execution concurrently with a memop it must accecpt the possibility of
-> the memop failing.
-> Still check if the vm is currently protected, but without locking and
-> consider it a heuristic.
+On 3/22/22 18:15, Thomas Huth wrote:
+> Newer compiler versions sometimes introduce new warnings - and compiling
+> with -Werror will fail there, of course. Thus users of the kvm-unit-tests
+> like the buildroot project have to disable the "-Werror" in the Makefile
+> with an additional patch, which is cumbersome.
+> Thus let's add a switch to the configure script that allows to explicitly
+> turn the -Werror switch on or off. And enable it only by default for
+> developer builds (i.e. in checked-out git repositories) ... and for
+> tarball releases, it's nicer if it is disabled by default, so that the
+> end users do not have to worry about this.
 > 
-> Fixes: ef11c9463ae0 ("KVM: s390: Add vm IOCTL for key checked guest absolute memory access")
-> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-Makes sense to me.
+I'm tempted to introduce a -W-unused-* switch so the compiler doesn't 
+annoy me anymore when I'm working on new things. But on the other hand 
+I'd forget to disable it before submission :-)
 
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+
+Anyway:
+Acked-by: Janosch Frank <frankja@linux.ibm.com>
+
 
 > ---
->   arch/s390/kvm/kvm-s390.c | 11 ++++++++++-
->   1 file changed, 10 insertions(+), 1 deletion(-)
+>   See also the patch from the buildroot project:
+>   https://git.busybox.net/buildroot/tree/package/kvm-unit-tests/0001-Makefile-remove-Werror-to-avoid-build-failures.patch
 > 
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index ca96f84db2cc..53adbe86a68f 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -2385,7 +2385,16 @@ static int kvm_s390_vm_mem_op(struct kvm *kvm, struct kvm_s390_mem_op *mop)
->   		return -EINVAL;
->   	if (mop->size > MEM_OP_MAX_SIZE)
->   		return -E2BIG;
-> -	if (kvm_s390_pv_is_protected(kvm))
-> +	/*
-> +	 * This is technically a heuristic only, if the kvm->lock is not
-> +	 * taken, it is not guaranteed that the vm is/remains non-protected.
-> +	 * This is ok from a kernel perspective, wrongdoing is detected
-> +	 * on the access, -EFAULT is returned and the vm may crash the
-> +	 * next time it accesses the memory in question.
-> +	 * There is no sane usecase to do switching and a memop on two
-> +	 * different CPUs at the same time.
-> +	 */
-> +	if (kvm_s390_pv_get_handle(kvm))
->   		return -EINVAL;
->   	if (mop->flags & KVM_S390_MEMOP_F_SKEY_PROTECTION) {
->   		if (access_key_invalid(mop->key))
+>   Makefile  |  2 +-
+>   configure | 16 ++++++++++++++++
+>   2 files changed, 17 insertions(+), 1 deletion(-)
 > 
-> base-commit: c9b8fecddb5bb4b67e351bbaeaa648a6f7456912
+> diff --git a/Makefile b/Makefile
+> index 24686dd..6ed5dea 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -62,7 +62,7 @@ include $(SRCDIR)/$(TEST_DIR)/Makefile
+>   
+>   COMMON_CFLAGS += -g $(autodepend-flags) -fno-strict-aliasing -fno-common
+>   COMMON_CFLAGS += -Wall -Wwrite-strings -Wempty-body -Wuninitialized
+> -COMMON_CFLAGS += -Wignored-qualifiers -Werror -Wno-missing-braces
+> +COMMON_CFLAGS += -Wignored-qualifiers -Wno-missing-braces $(CONFIG_WERROR)
+>   
+>   frame-pointer-flag=-f$(if $(KEEP_FRAME_POINTER),no-,)omit-frame-pointer
+>   fomit_frame_pointer := $(call cc-option, $(frame-pointer-flag), "")
+> diff --git a/configure b/configure
+> index c4fb4a2..86c3095 100755
+> --- a/configure
+> +++ b/configure
+> @@ -31,6 +31,13 @@ page_size=
+>   earlycon=
+>   efi=
+>   
+> +# Enable -Werror by default for git repositories only (i.e. developer builds)
+> +if [ -e "$srcdir"/.git ]; then
+> +    werror=-Werror
+> +else
+> +    werror=
+> +fi
+> +
+>   usage() {
+>       cat <<-EOF
+>   	Usage: $0 [options]
+> @@ -75,6 +82,8 @@ usage() {
+>   	                           Specify a PL011 compatible UART at address ADDR. Supported
+>   	                           register stride is 32 bit only.
+>   	    --[enable|disable]-efi Boot and run from UEFI (disabled by default, x86_64 only)
+> +	    --[enable|disable]-werror
+> +	                           Select whether to compile with the -Werror compiler flag
+>   EOF
+>       exit 1
+>   }
+> @@ -148,6 +157,12 @@ while [[ "$1" = -* ]]; do
+>   	--disable-efi)
+>   	    efi=n
+>   	    ;;
+> +	--enable-werror)
+> +	    werror=-Werror
+> +	    ;;
+> +	--disable-werror)
+> +	    werror=
+> +	    ;;
+>   	--help)
+>   	    usage
+>   	    ;;
+> @@ -371,6 +386,7 @@ WA_DIVIDE=$wa_divide
+>   GENPROTIMG=${GENPROTIMG-genprotimg}
+>   HOST_KEY_DOCUMENT=$host_key_document
+>   CONFIG_EFI=$efi
+> +CONFIG_WERROR=$werror
+>   GEN_SE_HEADER=$gen_se_header
+>   EOF
+>   if [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
 
