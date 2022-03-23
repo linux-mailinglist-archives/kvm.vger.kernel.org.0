@@ -2,307 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 079354E4A39
-	for <lists+kvm@lfdr.de>; Wed, 23 Mar 2022 01:55:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E787C4E4B62
+	for <lists+kvm@lfdr.de>; Wed, 23 Mar 2022 04:22:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240988AbiCWA41 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Mar 2022 20:56:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60770 "EHLO
+        id S241484AbiCWDX1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Mar 2022 23:23:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50252 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231238AbiCWA4Z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Mar 2022 20:56:25 -0400
-Received: from mail-yw1-x1129.google.com (mail-yw1-x1129.google.com [IPv6:2607:f8b0:4864:20::1129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16F901C120
-        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 17:54:57 -0700 (PDT)
-Received: by mail-yw1-x1129.google.com with SMTP id 00721157ae682-2e592e700acso1239117b3.5
-        for <kvm@vger.kernel.org>; Tue, 22 Mar 2022 17:54:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=sfUegMBeYYiiRns59gtWp+YXqbRso2Oj2xnfPVvjevI=;
-        b=U+sX/fLtiqTK3yvsXkikjSeItH+X+nSGQyje2Br7Q4iQiy3UqEuL3dLrgkOhnl8pTR
-         9fFzC3G5a7JJGVRHUgz40lzRl+b6Q0TGQikCkbI/THRdfHLT3Qa1+9kDMgUJv+hLe3Ms
-         a1Z+oGmbhGaq2ON0g4ns2fG5kvHNn+9R4WqA43aSw+KVETGgPErmaIABI7mXxy0ZbXAw
-         xiVAJ97GB5PBWV1VBulnR9ZvuJohS1ARzJ7sWQC7/6BqqZ/ajWUlj7TbZjMaOUDAEtLn
-         c4KMJXD5UnsGl6SoOCdACj8BZh08zN6DuLKCdCeizK7I7lVACXROBgchN+QPTHVgz0uE
-         XRRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=sfUegMBeYYiiRns59gtWp+YXqbRso2Oj2xnfPVvjevI=;
-        b=pNr2va9CtJc8vWYEewQOETUhfy9wSICfWyjdAXhosLSgJ32Oip77YAvWr5Xl8CEEwJ
-         OiZ9NrSJLYIHZ7I9KhoMf8zceN7Q2554w2EHm/wvIPZ4FS16i8WWDNBc20GvUweo+mrm
-         euYIPCd7zqaQN+0tOkDlRPX16eFtynb5++gUSa1wkGpB89O71g0kLCcHUQSWY6OLRw8q
-         1IV9qcW0rPlX4eKaUFrEQNkbZdjoKXf1xObXTFvzwqC5fR2fLXI7DPlkS35sHEq4OldP
-         LOfLTwWdKYckPeGOCXFkSDp5WQAxp/Zy1+TUhX372gnpO7XrdkjbOfA+VpryYXszJAjw
-         zgtA==
-X-Gm-Message-State: AOAM533XR+YYmX2zvnmvDr0zsTyAnEprkko9oN4pRwUQ+hCpsL1T+9qx
-        TaJFTj8g92GHlADsgEa1yhIIjn+2Kj9S6HOzj9obmQ==
-X-Google-Smtp-Source: ABdhPJwP70fUFnI4oX1eztrDbLnE0rxmFFr92MzCuhKOI6K04pTXyBgw2tJIVhHfZeW0+RChnNOSxeXahkwqWvADr/w=
-X-Received: by 2002:a81:108c:0:b0:2e5:cfac:e62e with SMTP id
- 134-20020a81108c000000b002e5cface62emr27418779ywq.113.1647996896020; Tue, 22
- Mar 2022 17:54:56 -0700 (PDT)
+        with ESMTP id S241479AbiCWDXZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Mar 2022 23:23:25 -0400
+Received: from mga06.intel.com (mga06.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23D585E16E;
+        Tue, 22 Mar 2022 20:21:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1648005716; x=1679541716;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=XIfRWjEGfNMX6ibJfPtmnxSY1SMu9id+mL65MJpDFqk=;
+  b=JKGKA4o0Y+jFGcG5X4o+QvfRkXqX4GdNgfamMIkfe9mxL9fQ100PYHZi
+   9NV/znJ0+etptTiFbF1v8SQ1Tcp1PwI0P53jnwKEYs46Vm60RJhHoy2Mp
+   Tk2kKoC3Xv5ognciEgvWcZbyk00wMbL/+M1PnXPB7KWxjz7IVaJsFhZml
+   m06mjGlzjnAMjhk6yW0J5wX8r6TbF4Nhq4dYSByacLQ5z1ZjVNWQWr3e/
+   fc7nZv78K0RxkmO3FygMY+gKz58kexdYnlwyw8lBZAxwdT5SbQ/2/ZjHZ
+   4QVZBO336qJGYnrtEUPpAfHcvKlHuEvdAIYjEy3xPrwUMvDXn093kRQM3
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10294"; a="318720294"
+X-IronPort-AV: E=Sophos;i="5.90,203,1643702400"; 
+   d="scan'208";a="318720294"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Mar 2022 20:21:55 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.90,203,1643702400"; 
+   d="scan'208";a="560710185"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orsmga008.jf.intel.com with ESMTP; 22 Mar 2022 20:21:55 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.27; Tue, 22 Mar 2022 20:21:55 -0700
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Tue, 22 Mar 2022 20:21:54 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21 via Frontend Transport; Tue, 22 Mar 2022 20:21:54 -0700
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.44) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2308.21; Tue, 22 Mar 2022 20:21:54 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=B7ddt7VEBywTS8fW/AX5b8xTD//zICbObdIGhSCQAYUn9bJKt6nzmlg0bsFAvlZNpbQjJfdxtWLkfEgqIfeXxPR2LjZWYz48K0S9q9nOX/XYRSH8DZLWgelci+IT1eGky6dZE1+ekXRE3Mlxn1G72M3j7a0hvJPVQM175K3VLAq8dA7icykIr51PUeZTJ/oxuiu9b/aAbjCpCBQu8Nz/bxx448/JM2FaeXTB0a05zsa8bjOaKtHukkrQl2IC6Z8JJMZ1+FEVgZ4bwaqUopmTk/kgGiLJYKmWsQ1he9/T+V7aM82QLwDTabN2vS7OjnEssf9fi72ZhTBkR3RM0yxu7w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=rcXeocYqu0zs+VFuDQuS4fGI1abH8BJ9GQ7zPnMbFk8=;
+ b=kIpbEUnhkuoak2uMJG7PLGfckRQe68IolXX2DW7nHbNE/YBgIMLgP9wTvbHr9OkJXNynj8fp7lUNV1hNeSyZUwM7pv77P7W6O36DK6ebxMMZr1lZ7yS9NtruRGonAy/iXFUy3PdaS62Aa/yViywfa6gUQOzd66IBdJAs5iK8JRgsmIdh+Vo/MB0ACXI3RL2gnoF0XiGsK8AwkJAZUEQhK956/A76BxdkMRvk93jLwfDOmHRf3sGZUpKvA7p84RyVHqQDNCq/qtZmbTDsRoqulvTlWe0HQVLrgGszX8JA2gbRfwNabbRcwxOMC8xCeSUlaGner28IDfAcMe3wREo+Lw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by MWHPR1101MB2094.namprd11.prod.outlook.com (2603:10b6:301:4e::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5081.18; Wed, 23 Mar
+ 2022 03:21:51 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::4df7:2fc6:c7cf:ffa0]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::4df7:2fc6:c7cf:ffa0%4]) with mapi id 15.20.5081.023; Wed, 23 Mar 2022
+ 03:21:51 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     "Huang, Kai" <kai.huang@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+CC:     "Hansen, Dave" <dave.hansen@intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "Huang, Kai" <kai.huang@intel.com>
+Subject: RE: [PATCH v2 01/21] x86/virt/tdx: Detect SEAM
+Thread-Topic: [PATCH v2 01/21] x86/virt/tdx: Detect SEAM
+Thread-Index: AQHYNsguZd+eTSAGi0uYcpCMOLG73KzMW1/Q
+Date:   Wed, 23 Mar 2022 03:21:50 +0000
+Message-ID: <BN9PR11MB527657C2AA8B9ACD94C9D5468C189@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <cover.1647167475.git.kai.huang@intel.com>
+ <a258224c26b6a08400d9a8678f5d88f749afe51e.1647167475.git.kai.huang@intel.com>
+In-Reply-To: <a258224c26b6a08400d9a8678f5d88f749afe51e.1647167475.git.kai.huang@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-version: 11.6.401.20
+dlp-product: dlpe-windows
+dlp-reaction: no-action
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: ef1d64ef-b4e0-4cdb-735a-08da0c7c45ee
+x-ms-traffictypediagnostic: MWHPR1101MB2094:EE_
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr,ExtFwd
+x-microsoft-antispam-prvs: <MWHPR1101MB2094289C56C923445EAAF4078C189@MWHPR1101MB2094.namprd11.prod.outlook.com>
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: DWxw+5e/b4WSfYKtHjQwVgovckK9W9ltTTHmGZyRPoeU1IPWTs+rz63tNp3JVyZ0YfyptmzWM82TmgzM1VDtzIqZNxmeCwMdbsifvipu3CVLPA3EmuNMRfC8ugs6c560/rY1/VyMZUtBx0bU3xg+2IXJJv5iYnXhPjw0D3MbgD5YoR38lfK0/qgl5nYibqpZOxjNl+EPHHSagKdGnRcf7wheBcB1cT2fqbakOtt8RWTcHNVqOK3QDN3NTiCkReaKJ2/xtFwoTvPXWwuqztYXAp49Esafn5Da7a7+qB/qrLJ0l5qHr8w9fDFkHPj5h+eNoOxjMjCsK5/ie2KxB6LRgwcG4V89jmACxQ8ldYp67oDHP8dJHM3G16kz5EZ7Zg1oH8uvStQw14RXIRfR8hM5TR3QIfIbxFwMSCr2BE0J2FtIqPh+DSEG7GLwUIy4NUVkU6cOHnbCjKiWSulIqDPZ0Zk1B0d4GC81VeW45gxEEnG3HuqhP+1x0EtuGELbslHvhwUwacsqerc2YrMM0Cs0lMcQ82xp+VhFHAbWn1D7YcbwxWzrNqP47PqUTTl3ZICsKN+xkgkKLEkMO3paxJrfT4U6L24AlHo+G3Pgc0+Kal/5GnuRmkjWRghGE6qoAm/EOR38plm9xGKy3qgiNEZJHpjsSNlaW/f1woj8uiTrz0icWLTL7LM77Zm6vl6sQLeifwv915aD+8B/PPr91SEhJQ==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(4744005)(54906003)(7696005)(8936002)(76116006)(66476007)(64756008)(66446008)(86362001)(110136005)(8676002)(66946007)(52536014)(4326008)(9686003)(38100700002)(66556008)(5660300002)(82960400001)(508600001)(122000001)(38070700005)(2906002)(6506007)(83380400001)(186003)(33656002)(71200400001)(55016003)(26005)(316002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?6+u/HlR2gIuqALTnLNEmysg+B+ysvND+HTk3zaxJZmslIRqjjW35duWmTdU3?=
+ =?us-ascii?Q?ztaXqjExv+rLdRn0nkJKYBJfj/1o5xblTk8PhdL/l0wnz6ZNyPA4b3NItLET?=
+ =?us-ascii?Q?wkMhxfjuwwp1MuoethSI/cHxrgaVPd/65tR8uBWIzE2MFvYy7DvPQS2RZjRa?=
+ =?us-ascii?Q?CuTYaB2BOyBOaClKNA9UnoV3TcmdEIl2oPxE25xU1iEMt1ZtcE1usE9e623k?=
+ =?us-ascii?Q?HEL3PDfarsVw8d5vJHn9UMTZ3BPY8JrmMYVCFr6io38+MasmpKi139+YtuIg?=
+ =?us-ascii?Q?8TF8PozI3Lhd3llaePGYLMHMap9xvDAl1ZS8+RK7ERxGAeDoyGoWQ0MqM4yJ?=
+ =?us-ascii?Q?vyg+JJoE5Hu21bq6JuFiJILfou4snSX9RMoJQDGNepnhjQNPfyzJ+uCaYcQe?=
+ =?us-ascii?Q?mSTPhwaBxwj5s33Ze10W4hPKEjbY0f3NltvhMufRUVT8ou+sA6GmO+QgIxJ4?=
+ =?us-ascii?Q?Ys6dXtozZEeFSHd38M/CaIgHqcxl/dagAmCkLinpBXx6Ca+THW4QIGBipWY7?=
+ =?us-ascii?Q?SDct5oQWem9jJkk/Nt5R488ODHkkaAr/F+6i3mSplyKctCVhf+67g3bDd9eZ?=
+ =?us-ascii?Q?oF/tBDKXldAeBp9gX9WbpuugTWLAKNe0PmYu5yUOEzdszUrUSSV4zIeX+wHS?=
+ =?us-ascii?Q?G8ojFpl0B5T4Mx+9dBHZN2U8Xdr+u3xaE5UsjSvTXJL1IrqiBBgGhWog/sB3?=
+ =?us-ascii?Q?Wt/KzaC/Om4F+MDJ4NH4kAYiYHvXIFqaHo+8+xiSzI+RW6Lr82ovV+bZIyvT?=
+ =?us-ascii?Q?Hk5+v8dO5uByeyoXjfj1ZzooeuZpphQ0e4IpVBs+2uS+fncLEKRFxvOyjkpr?=
+ =?us-ascii?Q?xG0dDLzC+U439RUw5UJsiLFJRLoeWA84RRVN7lHRs301pgFBgnXtvsD1E9dd?=
+ =?us-ascii?Q?6VwFQlkntzCr2fWEzzcgtXCN/kBLBFsdu+6pG6ZaXoO9YFRc8xYKOO0z4CjP?=
+ =?us-ascii?Q?fH4NKZa/kVpJ5KoWXyauZOF9DcJPbq7ueA42ph5lM2u3ruBaoxNxBIP6wmxL?=
+ =?us-ascii?Q?SS0dH2YsMZ6N3rktyJa95iGS5WBuw7Che0ZmeMcsZFaeAurG7AW9FUVIypF4?=
+ =?us-ascii?Q?xWiIavihO8lKb29N3+QqQJD393VLRM1w9sqzzc+Xcq3NQndiYgEXJDQvY2aq?=
+ =?us-ascii?Q?cR7j8TvrLBbGxov3CctH2388ln8htKTgjoUDDm+eyMWRE+uGF+dN6R5T5/1I?=
+ =?us-ascii?Q?r+2wV5Xg8Al1CEDqyCzWV3af90o+B/7JmDUFFw0+1Bmd/fWMJdM5Z7TkY2K/?=
+ =?us-ascii?Q?S+8FvvEiT3Hyd13zuAmn6SriR/3kq6uKWKMfF+5VJp1hbqooyUfP0XZ9cOzV?=
+ =?us-ascii?Q?iOyjXXAODaIUAyBLwJ+gl90wx4aK0alZOvaEqnWhegeam1v9YdY3SFgnwhaa?=
+ =?us-ascii?Q?EBe3nnmZdK6bXmHqRHZNS9fxcnU20ZXhVRpAg7r+D618jQ2nJHCqY2b3fbj7?=
+ =?us-ascii?Q?9XctwBPFWs9cvrd0aOLVqyNTB9SfHcDb?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <cover.1646422845.git.isaku.yamahata@intel.com> <6e096d8509ef40ce3e25c1e132643e772641241b.1646422845.git.isaku.yamahata@intel.com>
-In-Reply-To: <6e096d8509ef40ce3e25c1e132643e772641241b.1646422845.git.isaku.yamahata@intel.com>
-From:   Erdem Aktas <erdemaktas@google.com>
-Date:   Tue, 22 Mar 2022 17:54:45 -0700
-Message-ID: <CAAYXXYy-LU+FCt3VDubjhwYPk1TEKc9qshPp2r8tTvcXXPRnOQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v5 073/104] KVM: TDX: track LP tdx vcpu run and
- teardown vcpus on descroing the guest TD
-To:     "Yamahata, Isaku" <isaku.yamahata@intel.com>
-Cc:     "open list:KERNEL VIRTUAL MACHINE (KVM)" <kvm@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Connor Kuehl <ckuehl@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ef1d64ef-b4e0-4cdb-735a-08da0c7c45ee
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Mar 2022 03:21:51.3985
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: E29lC5qOU3+bGvYivftMU+bhluocjxIJXNMPnRJ7o/DhKhwQV8dV6Hp/LJMpZ39SY3tVQmxoCKG/yKIWDS/kMg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR1101MB2094
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 4, 2022 at 11:50 AM <isaku.yamahata@intel.com> wrote:
->
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
->
-> When shutting down the machine, (VMX or TDX) vcpus needs to be shutdown on
-> each pcpu.  Do the similar for TDX with TDX SEAMCALL APIs.
->
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> ---
->  arch/x86/kvm/vmx/main.c    | 23 +++++++++++--
->  arch/x86/kvm/vmx/tdx.c     | 70 ++++++++++++++++++++++++++++++++++++--
->  arch/x86/kvm/vmx/tdx.h     |  2 ++
->  arch/x86/kvm/vmx/x86_ops.h |  4 +++
->  4 files changed, 95 insertions(+), 4 deletions(-)
->
-> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-> index 2cd5ba0e8788..882358ac270b 100644
-> --- a/arch/x86/kvm/vmx/main.c
-> +++ b/arch/x86/kvm/vmx/main.c
-> @@ -13,6 +13,25 @@ static bool vt_is_vm_type_supported(unsigned long type)
->         return type == KVM_X86_DEFAULT_VM || tdx_is_vm_type_supported(type);
->  }
->
-> +static int vt_hardware_enable(void)
-> +{
-> +       int ret;
+> From: Kai Huang <kai.huang@intel.com>
+> Sent: Sunday, March 13, 2022 6:50 PM
+>=20
+> @@ -715,6 +716,8 @@ static void init_intel(struct cpuinfo_x86 *c)
+>  	if (cpu_has(c, X86_FEATURE_TME))
+>  		detect_tme(c);
+>=20
+> +	tdx_detect_cpu(c);
 > +
-> +       ret = vmx_hardware_enable();
-> +       if (ret)
-> +               return ret;
-> +
-> +       tdx_hardware_enable();
-> +       return 0;
-> +}
-> +
-> +static void vt_hardware_disable(void)
-> +{
-> +       /* Note, TDX *and* VMX need to be disabled if TDX is enabled. */
-> +       tdx_hardware_disable();
-> +       vmx_hardware_disable();
-> +}
-> +
->  static __init int vt_hardware_setup(void)
->  {
->         int ret;
-> @@ -199,8 +218,8 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
->
->         .hardware_unsetup = vt_hardware_unsetup,
->
-> -       .hardware_enable = vmx_hardware_enable,
-> -       .hardware_disable = vmx_hardware_disable,
-> +       .hardware_enable = vt_hardware_enable,
-> +       .hardware_disable = vt_hardware_disable,
->         .cpu_has_accelerated_tpr = report_flexpriority,
->         .has_emulated_msr = vmx_has_emulated_msr,
->
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index a6b1a8ce888d..690298fb99c7 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -48,6 +48,14 @@ struct tdx_capabilities tdx_caps;
->  static DEFINE_MUTEX(tdx_lock);
->  static struct mutex *tdx_mng_key_config_lock;
->
-> +/*
-> + * A per-CPU list of TD vCPUs associated with a given CPU.  Used when a CPU
-> + * is brought down to invoke TDH_VP_FLUSH on the approapriate TD vCPUS.
-> + * Protected by interrupt mask.  This list is manipulated in process context
-> + * of vcpu and IPI callback.  See tdx_flush_vp_on_cpu().
-> + */
-> +static DEFINE_PER_CPU(struct list_head, associated_tdvcpus);
-> +
->  static u64 hkid_mask __ro_after_init;
->  static u8 hkid_start_pos __ro_after_init;
->
-> @@ -87,6 +95,8 @@ static inline bool is_td_finalized(struct kvm_tdx *kvm_tdx)
->
->  static inline void tdx_disassociate_vp(struct kvm_vcpu *vcpu)
->  {
-> +       list_del(&to_tdx(vcpu)->cpu_list);
-> +
->         /*
->          * Ensure tdx->cpu_list is updated is before setting vcpu->cpu to -1,
->          * otherwise, a different CPU can see vcpu->cpu = -1 and add the vCPU
-> @@ -97,6 +107,22 @@ static inline void tdx_disassociate_vp(struct kvm_vcpu *vcpu)
->         vcpu->cpu = -1;
->  }
->
-> +void tdx_hardware_enable(void)
-> +{
-> +       INIT_LIST_HEAD(&per_cpu(associated_tdvcpus, raw_smp_processor_id()));
-> +}
-> +
-> +void tdx_hardware_disable(void)
-> +{
-> +       int cpu = raw_smp_processor_id();
-> +       struct list_head *tdvcpus = &per_cpu(associated_tdvcpus, cpu);
-> +       struct vcpu_tdx *tdx, *tmp;
-> +
-> +       /* Safe variant needed as tdx_disassociate_vp() deletes the entry. */
-> +       list_for_each_entry_safe(tdx, tmp, tdvcpus, cpu_list)
-> +               tdx_disassociate_vp(&tdx->vcpu);
-> +}
-> +
->  static void tdx_clear_page(unsigned long page)
->  {
->         const void *zero_page = (const void *) __va(page_to_phys(ZERO_PAGE(0)));
-> @@ -230,9 +256,11 @@ void tdx_mmu_prezap(struct kvm *kvm)
->         struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
->         cpumask_var_t packages;
->         bool cpumask_allocated;
-> +       struct kvm_vcpu *vcpu;
->         u64 err;
->         int ret;
->         int i;
-> +       unsigned long j;
->
->         if (!is_hkid_assigned(kvm_tdx))
->                 return;
-> @@ -248,6 +276,17 @@ void tdx_mmu_prezap(struct kvm *kvm)
->                 return;
->         }
->
-> +       kvm_for_each_vcpu(j, vcpu, kvm)
-> +               tdx_flush_vp_on_cpu(vcpu);
-> +
-> +       mutex_lock(&tdx_lock);
-> +       err = tdh_mng_vpflushdone(kvm_tdx->tdr.pa);
 
-Hi Isaku,
+TDX is not reported as a x86 feature. and the majority of detection
+and initialization have been conducted on demand in this series
+(as explained in patch04). Why is SEAM (and latter keyid) so different
+to be detected at early boot phase?
 
-I am wondering about the impact of the failures on these functions. Is
-there any other function which recovers any failures here?
-When I look at the tdx_flush_vp function, it seems like it can fail
-due to task migration so tdx_flush_vp_on_cpu might also fail and if it
-fails, tdh_mng_vpflushdone returns err. Since tdx_vm_teardown does not
-return any error , how the VMM can free the keyid used in this TD.
-Will they be forever in "used state"?
-Also if tdx_vm_teardown fails, the kvm_tdx->hkid is never set to -1
-which will prevent tdx_vcpu_free to free and reclaim the resources
-allocated for the vcpu.
-
--Erdem
-> +       mutex_unlock(&tdx_lock);
-> +       if (WARN_ON_ONCE(err)) {
-> +               pr_tdx_error(TDH_MNG_VPFLUSHDONE, err, NULL);
-> +               return;
-> +       }
-> +
->         cpumask_allocated = zalloc_cpumask_var(&packages, GFP_KERNEL);
->         for_each_online_cpu(i) {
->                 if (cpumask_allocated &&
-> @@ -472,8 +511,22 @@ int tdx_vcpu_create(struct kvm_vcpu *vcpu)
->
->  void tdx_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->  {
-> -       if (vcpu->cpu != cpu)
-> -               tdx_flush_vp_on_cpu(vcpu);
-> +       struct vcpu_tdx *tdx = to_tdx(vcpu);
-> +
-> +       if (vcpu->cpu == cpu)
-> +               return;
-> +
-> +       tdx_flush_vp_on_cpu(vcpu);
-> +
-> +       local_irq_disable();
-> +       /*
-> +        * Pairs with the smp_wmb() in tdx_disassociate_vp() to ensure
-> +        * vcpu->cpu is read before tdx->cpu_list.
-> +        */
-> +       smp_rmb();
-> +
-> +       list_add(&tdx->cpu_list, &per_cpu(associated_tdvcpus, cpu));
-> +       local_irq_enable();
->  }
->
->  void tdx_prepare_switch_to_guest(struct kvm_vcpu *vcpu)
-> @@ -522,6 +575,19 @@ void tdx_vcpu_free(struct kvm_vcpu *vcpu)
->                 tdx_reclaim_td_page(&tdx->tdvpx[i]);
->         kfree(tdx->tdvpx);
->         tdx_reclaim_td_page(&tdx->tdvpr);
-> +
-> +       /*
-> +        * kvm_free_vcpus()
-> +        *   -> kvm_unload_vcpu_mmu()
-> +        *
-> +        * does vcpu_load() for every vcpu after they already disassociated
-> +        * from the per cpu list when tdx_vm_teardown(). So we need to
-> +        * disassociate them again, otherwise the freed vcpu data will be
-> +        * accessed when do list_{del,add}() on associated_tdvcpus list
-> +        * later.
-> +        */
-> +       tdx_flush_vp_on_cpu(vcpu);
-> +       WARN_ON(vcpu->cpu != -1);
->  }
->
->  void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
-> diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-> index 8b1cf9c158e3..180360a65545 100644
-> --- a/arch/x86/kvm/vmx/tdx.h
-> +++ b/arch/x86/kvm/vmx/tdx.h
-> @@ -81,6 +81,8 @@ struct vcpu_tdx {
->         struct tdx_td_page tdvpr;
->         struct tdx_td_page *tdvpx;
->
-> +       struct list_head cpu_list;
-> +
->         union tdx_exit_reason exit_reason;
->
->         bool initialized;
-> diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-> index ceafd6e18f4e..aae0f4449ec5 100644
-> --- a/arch/x86/kvm/vmx/x86_ops.h
-> +++ b/arch/x86/kvm/vmx/x86_ops.h
-> @@ -132,6 +132,8 @@ void __init tdx_pre_kvm_init(unsigned int *vcpu_size,
->  bool tdx_is_vm_type_supported(unsigned long type);
->  void __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops);
->  void tdx_hardware_unsetup(void);
-> +void tdx_hardware_enable(void);
-> +void tdx_hardware_disable(void);
->
->  int tdx_vm_init(struct kvm *kvm);
->  void tdx_mmu_prezap(struct kvm *kvm);
-> @@ -156,6 +158,8 @@ static inline void tdx_pre_kvm_init(
->  static inline bool tdx_is_vm_type_supported(unsigned long type) { return false; }
->  static inline void tdx_hardware_setup(struct kvm_x86_ops *x86_ops) {}
->  static inline void tdx_hardware_unsetup(void) {}
-> +static inline void tdx_hardware_enable(void) {}
-> +static inline void tdx_hardware_disable(void) {}
->
->  static inline int tdx_vm_init(struct kvm *kvm) { return -EOPNOTSUPP; }
->  static inline void tdx_mmu_prezap(struct kvm *kvm) {}
-> --
-> 2.25.1
->
+Thanks
+Kevin
