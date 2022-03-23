@@ -2,200 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D6E414E51CF
-	for <lists+kvm@lfdr.de>; Wed, 23 Mar 2022 13:03:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5BFA64E5221
+	for <lists+kvm@lfdr.de>; Wed, 23 Mar 2022 13:27:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244082AbiCWMEg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Mar 2022 08:04:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52846 "EHLO
+        id S242232AbiCWM2h (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Mar 2022 08:28:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58364 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244081AbiCWMEe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Mar 2022 08:04:34 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id F08BF30E
-        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 05:03:03 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AEC1F1477;
-        Wed, 23 Mar 2022 05:03:03 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 114993F73B;
-        Wed, 23 Mar 2022 05:03:01 -0700 (PDT)
-Date:   Wed, 23 Mar 2022 12:03:33 +0000
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Vladimir Murzin <vladimir.murzin@arm.com>
-Cc:     will@kernel.org, kvm@vger.kernel.org,
-        julien.thierry.kdev@gmail.com,
-        linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com,
-        steven.price@arm.com
-Subject: Re: [kvmtool PATCH 2/2] aarch64: Add support for MTE
-Message-ID: <YjsMlZV1NBooKiYR@monolith.localdoman>
-References: <20220321152820.246700-1-alexandru.elisei@arm.com>
- <20220321152820.246700-3-alexandru.elisei@arm.com>
- <3cf3b621-5a07-5c06-cb9f-f9c776b6717d@arm.com>
- <Yjiw/mdfLyMW2gFh@monolith.localdoman>
- <7e5ebae0-db08-ad87-0fa9-26da048a9b72@arm.com>
+        with ESMTP id S231716AbiCWM2g (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Mar 2022 08:28:36 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD0D47B136;
+        Wed, 23 Mar 2022 05:27:06 -0700 (PDT)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1648038424;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=SDVMgslzXL3gRKImFxqbLng/cEJIgHfuf5NzQdxe1Rg=;
+        b=M8SZiYDMlrcjHucSj/axq2y7HuL5uQmzl3JY2EFLvPwjY8o13wROJFJBpC3fcXFlr2jFp2
+        j3F4QGSVe98OBOfO3bqZJsiAl2PPCihB0TSLQlXAg3PAq4Z7jqaKXHZMd9rq9VBwoECa83
+        F6BTXPSJguIc+HZSA9cS7igyG3HmOJggwEuljr+ju8ZInv2/lw7Y19ymsy7g9aItKl5NUJ
+        GqQEhOKFAUNDebiOGhbuyr/LSw1aImeQnAzIp5bxr1EBZgowqTgdMVyytA+/W7WADyjltV
+        EkKMjg5XgRIrQJXURJAARw3JWlM3Yq4IS9G7yDOOkHXsXztZcniiulKsypqxtQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1648038424;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=SDVMgslzXL3gRKImFxqbLng/cEJIgHfuf5NzQdxe1Rg=;
+        b=UnGujgWRRnYP7tr5iZh/XI9r+CA+RRPnpEJExESxRzR8lYsUazcydY0eOCqTeMrkpW0S3j
+        rAh0Vs8tx3I2UyAQ==
+To:     Paolo Bonzini <bonzini@gnu.org>, dave.hansen@linux.intel.com
+Cc:     yang.zhong@intel.com, ravi.v.shankar@intel.com, mingo@redhat.com,
+        "Chang S. Bae" <chang.seok.bae@intel.com>, bp@alien8.de,
+        x86@kernel.org, linux-kernel@vger.kernel.org,
+        KVM list <kvm@vger.kernel.org>
+Subject: Re: ping Re: [PATCH v4 0/2] x86: Fix ARCH_REQ_XCOMP_PERM and update
+ the test
+In-Reply-To: <a0bded7d-5bc0-12b9-2aca-c1c92d958293@gnu.org>
+References: <20220129173647.27981-1-chang.seok.bae@intel.com>
+ <a0bded7d-5bc0-12b9-2aca-c1c92d958293@gnu.org>
+Date:   Wed, 23 Mar 2022 13:27:04 +0100
+Message-ID: <87a6dgam7b.ffs@tglx>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7e5ebae0-db08-ad87-0fa9-26da048a9b72@arm.com>
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+Paolo,
 
-On Wed, Mar 23, 2022 at 10:31:15AM +0000, Vladimir Murzin wrote:
-> On 3/21/22 5:08 PM, Alexandru Elisei wrote:
-> > Hi,
-> > 
-> > On Mon, Mar 21, 2022 at 03:40:18PM +0000, Vladimir Murzin wrote:
-> > > Hi Alexandru,
-> > > 
-> > > On 3/21/22 3:28 PM, Alexandru Elisei wrote:
-> > > > MTE has been supported in Linux since commit 673638f434ee ("KVM: arm64:
-> > > > Expose KVM_ARM_CAP_MTE"), add support for it in kvmtool.
-> > > > 
-> > > > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > > > ---
-> > > >   arm/aarch32/include/kvm/kvm-arch.h        |  3 +++
-> > > >   arm/aarch64/include/kvm/kvm-arch.h        |  1 +
-> > > >   arm/aarch64/include/kvm/kvm-config-arch.h |  2 ++
-> > > >   arm/aarch64/kvm.c                         | 13 +++++++++++++
-> > > >   arm/include/arm-common/kvm-config-arch.h  |  1 +
-> > > >   arm/kvm.c                                 |  3 +++
-> > > >   6 files changed, 23 insertions(+)
-> > > > 
-> > > > diff --git a/arm/aarch32/include/kvm/kvm-arch.h b/arm/aarch32/include/kvm/kvm-arch.h
-> > > > index bee2fc255a82..5616b27e257e 100644
-> > > > --- a/arm/aarch32/include/kvm/kvm-arch.h
-> > > > +++ b/arm/aarch32/include/kvm/kvm-arch.h
-> > > > @@ -5,6 +5,9 @@
-> > > >   #define kvm__arch_get_kern_offset(...)	0x8000
-> > > > +struct kvm;
-> > > > +static inline void kvm__arch_enable_mte(struct kvm *kvm) {}
-> > > > +
-> > > >   #define ARM_MAX_MEMORY(...)	ARM_LOMAP_MAX_MEMORY
-> > > >   #define MAX_PAGE_SIZE	SZ_4K
-> > > > diff --git a/arm/aarch64/include/kvm/kvm-arch.h b/arm/aarch64/include/kvm/kvm-arch.h
-> > > > index 5e5ee41211ed..9124f6919d0f 100644
-> > > > --- a/arm/aarch64/include/kvm/kvm-arch.h
-> > > > +++ b/arm/aarch64/include/kvm/kvm-arch.h
-> > > > @@ -6,6 +6,7 @@
-> > > >   struct kvm;
-> > > >   unsigned long long kvm__arch_get_kern_offset(struct kvm *kvm, int fd);
-> > > >   int kvm__arch_get_ipa_limit(struct kvm *kvm);
-> > > > +void kvm__arch_enable_mte(struct kvm *kvm);
-> > > >   #define ARM_MAX_MEMORY(kvm)	({					\
-> > > >   	u64 max_ram;							\
-> > > > diff --git a/arm/aarch64/include/kvm/kvm-config-arch.h b/arm/aarch64/include/kvm/kvm-config-arch.h
-> > > > index 04be43dfa9b2..11250365d8d5 100644
-> > > > --- a/arm/aarch64/include/kvm/kvm-config-arch.h
-> > > > +++ b/arm/aarch64/include/kvm/kvm-config-arch.h
-> > > > @@ -6,6 +6,8 @@
-> > > >   			"Run AArch32 guest"),				\
-> > > >   	OPT_BOOLEAN('\0', "pmu", &(cfg)->has_pmuv3,			\
-> > > >   			"Create PMUv3 device"),				\
-> > > > +	OPT_BOOLEAN('\0', "mte", &(cfg)->has_mte,			\
-> > > > +			"Enable memory tagging extension"),		\
-> > > >   	OPT_U64('\0', "kaslr-seed", &(cfg)->kaslr_seed,			\
-> > > >   			"Specify random seed for Kernel Address Space "	\
-> > > >   			"Layout Randomization (KASLR)"),
-> > > > diff --git a/arm/aarch64/kvm.c b/arm/aarch64/kvm.c
-> > > > index 56a0aedc263d..46548f8ee96e 100644
-> > > > --- a/arm/aarch64/kvm.c
-> > > > +++ b/arm/aarch64/kvm.c
-> > > > @@ -81,3 +81,16 @@ int kvm__get_vm_type(struct kvm *kvm)
-> > > >   	return KVM_VM_TYPE_ARM_IPA_SIZE(ipa_bits);
-> > > >   }
-> > > > +
-> > > > +void kvm__arch_enable_mte(struct kvm *kvm)
-> > > > +{
-> > > > +	struct kvm_enable_cap cap = {
-> > > > +		.cap = KVM_CAP_ARM_MTE,
-> > > > +	};
-> > > > +
-> > > > +	if (!kvm__supports_extension(kvm, KVM_CAP_ARM_MTE))
-> > > > +		die("MTE capability is not supported");
-> > > > +
-> > > > +	if (ioctl(kvm->vm_fd, KVM_ENABLE_CAP, &cap))
-> > > > +		die_perror("KVM_ENABLE_CAP(KVM_CAP_ARM_MTE)");
-> > > > +}
-> > > > diff --git a/arm/include/arm-common/kvm-config-arch.h b/arm/include/arm-common/kvm-config-arch.h
-> > > > index 5734c46ab9e6..16e8d500a71b 100644
-> > > > --- a/arm/include/arm-common/kvm-config-arch.h
-> > > > +++ b/arm/include/arm-common/kvm-config-arch.h
-> > > > @@ -9,6 +9,7 @@ struct kvm_config_arch {
-> > > >   	bool		virtio_trans_pci;
-> > > >   	bool		aarch32_guest;
-> > > >   	bool		has_pmuv3;
-> > > > +	bool		has_mte;
-> > > >   	u64		kaslr_seed;
-> > > >   	enum irqchip_type irqchip;
-> > > >   	u64		fw_addr;
-> > > > diff --git a/arm/kvm.c b/arm/kvm.c
-> > > > index 80d233f13d0b..f2db93953778 100644
-> > > > --- a/arm/kvm.c
-> > > > +++ b/arm/kvm.c
-> > > > @@ -86,6 +86,9 @@ void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64 ram_size)
-> > > >   	/* Create the virtual GIC. */
-> > > >   	if (gic__create(kvm, kvm->cfg.arch.irqchip))
-> > > >   		die("Failed to create virtual GIC");
-> > > > +
-> > > > +	if (kvm->cfg.arch.has_mte)
-> > > > +		kvm__arch_enable_mte(kvm);
-> > > >   }
-> > > 
-> > > Can we enable it unconditionally if KVM_CAP_ARM_MTE is supported like we do for
-> > > PAC and SVE?
-> > 
-> > I thought about that, the reason I chose to enable it based a kvmtool
-> > command line option, instead of always being enabled if available, is
-> > because of the overhead of sanitising the MTE tags on each stage 2 data
-> > abort. Steven, am I overreacting and that overhead is negligible?
-> > 
-> > Also, as far as I know, PAC and SVE incur basically no overhead in KVM
-> > until the guest starts to use those features.
-> > 
-> > Do you have a specific reason for wanting MTE to always be enabled if
-> > available? I'm happy to be convinced to make MTE enabled by default, I
-> > don't have preference either way.
-> 
-> Well, automatically enabling if available would align with what we do for
-> other features in kvmtool and Linux itself - we tend to default y for new
-> features, even MTE, thus improving chances to get reports back early if
-> something (even performance) goes wrong. Just my 2p.
+On Wed, Mar 23 2022 at 12:04, Paolo Bonzini wrote:
+> can this series be included in 5.18 and CCed to stable?
 
-According to Steven, for each 4k page the kernel uses an 128 byte buffer to
-store the tags, and then some extra memory is used to keep track of the
-buffers. Let's take the case of a VM with 1GB of memory, and be
-conservative and only account for the tag buffer. In this case, the tag
-buffers alone will be 32MB.
-
-For a VM with 1GB of memory created with kvmtool built from current master
-(commit faae833a746f), pmap shows a total memory usage of 1268388K.
-Subtracting the memory of the VM, we are left with 214MB of memory consumed
-by kvmtool. Having MTE enabled would increase the memory overhead of
-kvmtool by 32/214*100 = 15%.
-
-Of course, this memory overhead scales with the amount of memory the VM
-has. The buffer size that KVM uses might change in the future, but since we
-cannot predict the future (might become larger or smaller), I'm working
-with what is implement today.
-
-The kernel documentation for MTE suggests that in order to take advantage
-of it, software must be modified and recompiled. That means that users that
-don't want to use MTE won't get to exercise MTE because they won't be using
-MTE enabled software, but they will pay the overhead regardless. This of
-course assumes that going forward software won't be using MTE by default.
-
-kvmtool is supposed to be simple, fast and less resource intensive than
-other hypervisors, that's why I think having MTE disabled by default is the
-best way to implement the capability.
+working on it. There is another issue with that which I'm currently
+looking into.
 
 Thanks,
-Alex
+
+        tglx
