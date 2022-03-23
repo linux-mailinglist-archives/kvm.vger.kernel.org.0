@@ -2,145 +2,220 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EC5364E560F
-	for <lists+kvm@lfdr.de>; Wed, 23 Mar 2022 17:09:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D43904E563F
+	for <lists+kvm@lfdr.de>; Wed, 23 Mar 2022 17:21:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238753AbiCWQKm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Mar 2022 12:10:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48766 "EHLO
+        id S237011AbiCWQXF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Mar 2022 12:23:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238404AbiCWQKl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Mar 2022 12:10:41 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2064.outbound.protection.outlook.com [40.107.220.64])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D6C83B3D7
-        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 09:09:11 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UH0Di3AxnaWfRe14ZTsrXU4Ma6j5T+t8WWMeb/fQ4OEsyIvlZUU8nbqhHjhaYnOSSKF9/3dUEreiEcSWsQ4k5qiOin2CQH/gnMKhoZxPJFR3+e3jw9BCNHhvSPz9SRaXPxc1K1j8EIaWTCKzCufQ7Mkpj7RTRyBk2O3m1REzI8KEev0IYvtmKFZpU8/I0d8EWgLzEdTJpH1YUDB7ZpcRnAG3qjugot0hPZAGkt0Won//yolb5exM/stgIdCeEx//yo7kZ4dOK/PBpE+h15MrXgU5oyH14Ol/yajSZOTQTceZOjA9yMM/I90pzkK9WTLY4neOUXxMEqJ9G1nP12/ZEA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5uB7D+EW4rL0CtmDwhp7l5H5E+hLKriMEpj2Yq/XLbg=;
- b=SF2ouXxZf4jN5/GG+rsoL9QIkaUCuk1XgN9BruMlIdzC0UhKRnqzyjNKwlRZ5TjNYr5MQq5azFHWfwN1gS+gsmiqhAe39Tj7LEgTz07wjGeoX8A3KhaxEVtnQVXlVlSYCJ4L1qk8QtCrSg/ZaE3xzuIYDfTd6NIvYcPKkW/Uhh5ZqwCNlgZURFpNNXJ7gT2wmqOy8AtpkK1R6TmJRjY7TDs8DD5JAesOnH2PlOAz8FMQBOQps4AX3EIA9rBQUJhymOU35dhk9TNUKcyNHskzyZlSa0unVS/Ho+y3XyqP6Jzh+SL3vSWgugD4oO3OuGP/s0g+CEVvxhAX7pZZL1WGXg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5uB7D+EW4rL0CtmDwhp7l5H5E+hLKriMEpj2Yq/XLbg=;
- b=HgkOfU75UbLOIL+2xxM9Y8/QJzkURRPvTGUW7mLe6uON3bhdgSdOd04LQ/wbm5ZZDbXGpYsAXpOpYk3Gb8qkUF1M9MM7hiGZ4iErtq9wls1hoCKEcsZmP6OQFtn3EunVXmMkE5s6kP91jZy3DZQWULYKMi4FTOUirpYRLlb6L6qvyCLucqqnAdOEcGyEzOslo8hCJxzC4Kwnd756yEevm5BlT4wLkhkoNDMMaF43HkBNqpaGT5ydZMVxGm6PSb5PbHD+bc2ItxARSCK+jYB6efg8lG4G3Ez5Z+BoKCQGudaEMK/vJL8Irx1up8+HS2MTLFnwln4om/0kABFLlyrE7A==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by DM5PR12MB1564.namprd12.prod.outlook.com (2603:10b6:4:f::21) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5081.15; Wed, 23 Mar 2022 16:09:09 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::11a0:970a:4c24:c70c]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::11a0:970a:4c24:c70c%6]) with mapi id 15.20.5102.017; Wed, 23 Mar 2022
- 16:09:09 +0000
-Date:   Wed, 23 Mar 2022 13:09:07 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Niklas Schnelle <schnelle@linux.ibm.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Eric Auger <eric.auger@redhat.com>,
-        iommu@lists.linux-foundation.org, Jason Wang <jasowang@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        Yi Liu <yi.l.liu@intel.com>, Keqian Zhu <zhukeqian1@huawei.com>
-Subject: Re: [PATCH RFC 05/12] iommufd: PFN handling for iopt_pages
-Message-ID: <20220323160907.GN11336@nvidia.com>
-References: <5-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
- <910ee0690554fcfff282996f3e78b3d7b77145c3.camel@linux.ibm.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <910ee0690554fcfff282996f3e78b3d7b77145c3.camel@linux.ibm.com>
-X-ClientProxiedBy: MN2PR16CA0006.namprd16.prod.outlook.com
- (2603:10b6:208:134::19) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
+        with ESMTP id S236415AbiCWQXD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Mar 2022 12:23:03 -0400
+Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 810BA6E8E2
+        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 09:21:33 -0700 (PDT)
+Received: by mail-io1-xd34.google.com with SMTP id z6so2333666iot.0
+        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 09:21:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=4N4f2kqMt6aSFm1V0Ap+fXBWktjxTNcae8aDTJMwFQw=;
+        b=g/DfNDhHQyAVTKyQA3X022da7pKxyhMZrxFDwywmc7xjD+TQPHIWbDfJqiU0jdmF2J
+         KYycb9LsX386oVX7uhIReoxq6KK/ep6ZUmzWMXR8bXMDbFYOsDSKaunJgNdx0ixhPEzz
+         PsnFut9WcUeZy+LkBzOPgv8elbpCyJGWkJCXyU0KNqHIici6TJPYY8nx7oX8v6DHSFgg
+         e/qaHiznwJdVGEr5q5boeCp8M/Fv4ZUfkm5c0Hr/2eIzWmQWTStpZ+0m9P0JQf2Ojae+
+         qDDJF3JivpL9qq5q/RZahsj4OSjnV1wCIhvIyu9PtoR+PSpjZXTTgFeT/bLjzov/VsgA
+         NXYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=4N4f2kqMt6aSFm1V0Ap+fXBWktjxTNcae8aDTJMwFQw=;
+        b=zp7Kt+DM41/LzamYjwvlw0088mt6jUyskW5fZu9CMiS1aE09GLfLrxykXiH8vlnnwJ
+         xHDlZa7qwUAG41+Nb0S12wrS+isdYYk2Fwpk8erVXU8QJcrJkESat2EPNhvsxDBF8fBH
+         XwDJYfAySxADZx7qzePoaQ033ycYhS5OkiiwG/uZV62JRbe8c3SFoxnHsy1Y8acD0s0l
+         5TryS6XnP8stX9XziKywEIMT4EoGWfg+NeTYRRs6xNqnbqeeHIoAMKNqrnz67lZ3C4mn
+         qmh99W7FbD3UCv3guRDdGwtjDR+N/EZ2Cc+32eYFdUQecppoN7LFp+4G5G0Rar1x7f7k
+         j1eQ==
+X-Gm-Message-State: AOAM530KsDtlGk3Pxlyx/MBmdg/iOXyqqlvMur8HdqaU268qplwA9Isj
+        Ra2RLJJDKM+cIz0fEzwFc+RP5Q==
+X-Google-Smtp-Source: ABdhPJwUg4HhlXyE/vBCv/uEv82asnis0brQpwzWooIAd7SolbuVakOHCskK5Dnz8vccnam3kwoPFw==
+X-Received: by 2002:a6b:fd0c:0:b0:645:d261:ba25 with SMTP id c12-20020a6bfd0c000000b00645d261ba25mr470995ioi.124.1648052492635;
+        Wed, 23 Mar 2022 09:21:32 -0700 (PDT)
+Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
+        by smtp.gmail.com with ESMTPSA id v1-20020a92d241000000b002c82ba9d58esm217843ilg.9.2022.03.23.09.21.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Mar 2022 09:21:31 -0700 (PDT)
+Date:   Wed, 23 Mar 2022 16:21:28 +0000
+From:   Oliver Upton <oupton@google.com>
+To:     David Woodhouse <dwmw2@infradead.org>
+Cc:     "Franke, Daniel" <dff@amazon.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [PATCH] Documentation: KVM: Describe guest TSC scaling in
+ migration algorithm
+Message-ID: <YjtJCDvLAXphkxhK@google.com>
+References: <5BD1FCB2-3164-4785-B4D0-94E19E6D7537@amazon.com>
+ <YjpFP+APSqjU7fUi@google.com>
+ <9fe6ac14df519ca8df42d3a7fd54ee0c49c58922.camel@infradead.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: b578cc47-4f60-4822-0d8f-08da0ce7765e
-X-MS-TrafficTypeDiagnostic: DM5PR12MB1564:EE_
-X-Microsoft-Antispam-PRVS: <DM5PR12MB156478EEEC6420D3B4235992C2189@DM5PR12MB1564.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: /EfsPiSswIPyJdJds9vGfZ6Pf202bpLu3rzoqVruMLX32OBWQo6ljGWXoBopxf9gQVsaGnuDBLOr1K4OVk1C368qLylWAxUzDZ4tWhc3WjaoKlX4LSyJ4v82dU0rH7cXg0Dqb7qcKZTp5Q7ggsViT6yTxiPHVYBrGoiChzkei7HnPX/OWP3I4yO/vERzGbrF3aF1PhNwIJbWj0BxTCa/dcPJEGi7BMfCBo03660xSAQwTh+ZDW24j6613cyU+FzCGXUYA5j5ECScyygNjLmsjppYrZxZbHNY78521ghejnqUhb21KjWq/2Gt19tg4Q3EXdtfhr3ce2WFaHs6WEpYIeln9qcDdJpeejGs5lKgsKlH9auBMhSMLJsNFSkKsTxfSBIpEXusy50PmV2U802l5LJL7eFuKcTcUBMpWSe1puMYqjPnqVdU80TBhh1if0cgCaEdG1elF9KUt4evwpT2Jkp5PfgrhHVXhba+mNH7+b3cvSHYp2y9ykADwoH6Wwo/djI0uvhRnb2FI2cfhfJ+Wu8JArwK9BSD1SlannXLjMJX1jIoIkS+auVlhqUuy0kAWcM7V7WFLQK2ix+Hlg29ROtoscz+sCx00jey5NUEt+Pg72+2P2L7bN4EI7Qt0+d2SFxM+8IjwvunknCDTOhgBA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(2616005)(66556008)(33656002)(54906003)(66476007)(38100700002)(186003)(5660300002)(83380400001)(26005)(508600001)(7416002)(4744005)(6916009)(1076003)(316002)(8936002)(66946007)(36756003)(6506007)(6486002)(2906002)(6512007)(8676002)(4326008)(86362001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?e2OnNgWuQ+iab8EWZEBCrDBW4+oEP9fJ5MfOraP0SFcaJQlTxpBISENsqacI?=
- =?us-ascii?Q?vKIX60xPZeWV7VFDN10+Tf0WhnPca1sbYmAUDOlK01YEruI4b22kX5ZSYo+q?=
- =?us-ascii?Q?cC6JtHqdQ+N9wnQ8XhkQTQrS9ZvY5v47TRlTBEa8bwiQuNCCxVasDMAKzChY?=
- =?us-ascii?Q?rMO6DT/rOPAic8tn/c+vFGUv4c4RRDsxAJ1pAqRdsW9BVt40u0f0DhMYNHie?=
- =?us-ascii?Q?udd/7SDwIHOEjVEj19EqUBvdIAmF/Wosrt6DxGexlbxVA7XeDVlTeK1tjk9Y?=
- =?us-ascii?Q?B+u8is5JPRnwbIKvyo4Wg9YoxvlvAkYP0+gFLXx/PjB17KaQ95PEWgYzUANP?=
- =?us-ascii?Q?1rbJoxjlRCYAJLsu0nUHjtFaYyw/xTuBGD6F7XyzaKIIII7bgIs4QNhZ94un?=
- =?us-ascii?Q?yOkxlr2Y8zvNQMEc6I//19mU2fsyCYX9uXISk1zQbbLrh07CPb2jWq35lH8r?=
- =?us-ascii?Q?nQO20E/wTewE/NivkgnLHuNXFtZ4LJ8kikrby4KNL6qDXlNoKqQXnVA3dYQq?=
- =?us-ascii?Q?OVCrtxa04NmjgeUtnuRjj+/ENxfSwHkDgRYK835wkqR9pMZgDE1t+kYy128B?=
- =?us-ascii?Q?heX4yPDIHjweQxUV5+MCtYg04G32a6cdmVcU89OQyGjaLL5Zb87TA4Prsgz/?=
- =?us-ascii?Q?RLceVDZ7emKaQBrrMUDjwh0F9Tgm8fVHF2B9N5i7Btnls4IwyGvJh6F0gU+1?=
- =?us-ascii?Q?+tysuyfaGejOmvxICnLnnDGuPN2EOl+qRQQAOY8G0aZoJ7RxBPFC6kEVPauV?=
- =?us-ascii?Q?bd66xfq7LUAd1E0XbgAkSXwxUx0vZ/eFyPtkytNHuwdwMDSNS7uB3CD9bTzF?=
- =?us-ascii?Q?tj4GidgjmdwGZrVZ14wRGS6mgXgZtLj5bgTpt1rLlZt+HahQtyUupn2I0jce?=
- =?us-ascii?Q?wKPNIHgtbokKwXaE6gdIW0Vl/sX+e/jcKJ8Z50VuCrfNzKY/E9ClHfzBkTRa?=
- =?us-ascii?Q?j2tH9+TWLxAfJez/x4CdveeAIQtn//JRGKD3VCG2AViD5TfbFSpFPQrefqrh?=
- =?us-ascii?Q?McbixE+gMVZgAH77YWqrh/vjRgmmpfJEKllfSiijl5vu/cXT/pnxoDqPawqh?=
- =?us-ascii?Q?66JIoM+GAmTqWIudyexu0IWG6PIzywysZ1J++EjvUyXdPFE8jMril4jfN+Vf?=
- =?us-ascii?Q?CXvRSa30mmOg+tjIQHZFD9v3dESm5exifddLdk6H5IwAJJ6tE0C6f9efugUP?=
- =?us-ascii?Q?ef124jJkYu/Wwo0XaxrW8DMcTZcF/j/eLzXn+6KrwD/X6kHsLIVYeKKj0QBs?=
- =?us-ascii?Q?kUKhZiCYH6xlCLRPOMsk2844JyUz0asAJa4bqLoEpK+lTEmlMV1C8tNDMOQZ?=
- =?us-ascii?Q?0PbX70IJjv8QYwI10h1K3cqiBJqv3rUpJHLI4c6Kqp19Br88tuWeITffyB3X?=
- =?us-ascii?Q?kMP6dkAPUBaN6X8EkQaUpRkEqD/jLJJ37wp9jnWFlHID+nViAhiGer2wpEku?=
- =?us-ascii?Q?kXHZcWZpMzPb3uHUkzH2XlhL2epN8KuH?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b578cc47-4f60-4822-0d8f-08da0ce7765e
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Mar 2022 16:09:09.2168
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ukDNQTM3mFhBwGKcGqjXwHuhfQrX3jiJxzZwUv/p0YZK/0deB2JYaGWnSN+O99BE
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1564
-X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <9fe6ac14df519ca8df42d3a7fd54ee0c49c58922.camel@infradead.org>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 23, 2022 at 04:37:50PM +0100, Niklas Schnelle wrote:
-> > +/*
-> > + * This holds a pinned page list for multiple areas of IO address space. The
-> > + * pages always originate from a linear chunk of userspace VA. Multiple
-> > + * io_pagetable's, through their iopt_area's, can share a single iopt_pages
-> > + * which avoids multi-pinning and double accounting of page consumption.
-> > + *
-> > + * indexes in this structure are measured in PAGE_SIZE units, are 0 based from
-> > + * the start of the uptr and extend to npages. pages are pinned dynamically
-> > + * according to the intervals in the users_itree and domains_itree, npages
-> > + * records the current number of pages pinned.
+On Wed, Mar 23, 2022 at 12:35:17PM +0000, David Woodhouse wrote:
+> On Tue, 2022-03-22 at 21:53 +0000, Oliver Upton wrote:
+> > But what happens to CLOCK_MONOTONIC in this case? We are still accepting
+> > the fact that live migrations destroy CLOCK_MONOTONIC if we directly
+> > advance the guest TSCs to account for elapsed time. The definition of
+> > CLOCK_MONOTONIC is that the clock does not count while the system is
+> > suspended. From the viewpoint of the guest, a live migration appears to
+> > be a forced suspend operation at an arbitrary instruction boundary.
+> > There is no realistic way for the guest to give the illusion that
+> > MONOTONIC has stopped without help from the hypervisor.
 > 
-> This sounds wrong or at least badly named. If npages records the
-> current number of pages pinned then what does npinned record?
+> I'm a little lost there. CLOCK_MONOTONIC is *permitted* to stop when
+> the guest is suspended, but it's not *mandatory*, surely?
+> 
+> I can buy your assertion that the brownout period of a live migration
+> (or the time for the host kernel to kexec in the case of live update) 
+> can be considered a suspend... but regardless of whether that makes it
+> mandatory to stop the clocks, I prefer to see it a different way. 
+> 
+> In normal operation — especially with CPU overcommit and/or throttling
+> — there are times when none of the guest's vCPUs will be scheduled for
+> short periods of time. We don't *have* to stop CLOCK_MONOTONIC when
+> that happens, do we?
+> 
 
-Oh, it is a typo, the 2nd npages should be npinned, thanks
+You're absolutely right. We've at least accepted MONOTONIC behaving the
+way it does for time lost to host scheduling, and expose this through
+steal_time for the guest scheduler.
 
-Jason
+> If we want live migration to be guest-transparent, shouldn't we treat
+> is as much as possible as one of those times when the vCPUs just happen
+> not to be running for a moment?
+
+There is still a subtle difference between host scheduler pressure and
+live migration. Its hard to crisply state whether or not the VM is
+actually suspended, as any one of its vCPU threads could actually be
+running. Migration is one of those events where we positively know the
+guest isn't running at all.
+
+> On a live update, where the host does a kexec and then resumes the
+> guest state, the host TSC reference is precisely the same as before the
+> upate. We basically don't want to change *anything* that the guest sees
+> in its pvclock information. In fact, we have a local patch to
+> 'KVM_SET_CLOCK_FROM_GUEST' for the live update case, which ensures
+> exactly that. We then add a delta to the guest TSC as we create each
+> vCPU in the new KVM; the *offset* interface would be beneficial to us
+> here (since that offset doesn't change) but we're not using it yet.
+> 
+> For live migration, the same applies — we can just add a delta to the
+> clock and the guest TSC values, commensurate with the amount of
+> wallclock time that elapsed from serialisation on the source host, to
+> deserialisation on the destination.
+> 
+> And it all looks *just* like it would if the vCPUs happened not to be
+> scheduled for a little while, because the host was busy.
+
+We could continue to get away with TSC advancement, but the critical
+part IMO is the upper bound. And what happens when we exceed it.
+
+There is no authoritative documentation around what time looks like as a
+guest of KVM, and futhermore what happens when a guest experiences time
+travel. Now we're in a particularly undesirable situation where there
+are at least three known definitions for time during a migration
+(upstream QEMU, Google, Amazon) and it is ~impossible to program guest
+software to anticipate our shenanigans.
+
+If we are to do this right we probably need to agree on documented
+behavior. If we decide that advancing TSCs is acceptable up to 'X'
+seconds, guest kernels could take a change to relax expectations at
+least up to this value.
+
+> > > The KVM_PVCLOCK_STOPPED event should trigger a change in some of the
+> > > globals kept by kernel/time/ntp.c (which are visible to userspace through
+> > > adjtimex(2)). In particular, `time_esterror` and `time_maxerror` should get reset
+> > > to `NTP_PHASE_LIMIT` and time_status should get reset to `STA_UNSYNC`.
+> > 
+> > I do not disagree that NTP needs to throw the book out after a live
+> > migration.
+> > 
+> > But, the issue is how we convey that to the guest. KVM_PVCLOCK_STOPPED
+> > relies on the guest polling a shared structure, and who knows when the
+> > guest is going to check the structure again? If we inject an interrupt
+> > the guest is likely to check this state in a reasonable amount of time.
+> 
+> Ah, but that's the point. A flag in shared memory can be checked
+> whenever the guest needs to know that it's operating on valid state.
+> Linux will check it *every* time from pvclock_clocksource_read().
+> 
+> As opposed to a separate interrupt which eventually gets processed some
+> indefinite amount of time in the future.
+
+There are a few annoying things with pvclock, though. It is a per-vCPU
+structure, so special care must be taken to act exactly once on a
+migration. Also, since commit 7539b174aef4 ("x86: kvmguest: use TSC
+clocksource if invariant TSC is exposed") the guest kernel could pick
+the TSC over the pvclock by default, so its hard to say when the pvclock
+structure is checked again. This is what I had in mind when suggesting a
+doorbell is needed, as there is no good way to know what clocksource the
+guest is using.
+
+> > Doing this the other way around (advance the TSC, tell the guest to fix
+> > MONOTONIC) is fundamentally wrong, as it violates two invariants of the
+> > monotonic clock. Monotonic counts during a migration, which really is a
+> > forced suspend. Additionally, you cannot step the monotonic clock.
+> > 
+> I dont understand why we can't "step the monotonic clock". Any time
+> merely refrain from scheduling the vCPUs for any period of time, that
+> is surely indistinguishable from a "step" in the monotonic clock,
+> surely?
+
+Right, there is some nebulous threshold that we've defined as an
+acceptable amount of time to 'step' the monotonic clock. I think that
+everything to date is built around the assumption that it is a small
+amount of time of O(timeslice). Pinning down the upper bound should at
+least make clocks more predictable on virtualization.
+
+> > Sorry to revisit this conversation yet again. Virtualization isn't going
+> > away any time soon and the illusion that migrations are invisible to the
+> > guest is simply not true.
+> 
+> I'll give you the assertion that migrations aren't completely
+> invisible, but I still think they should be *equivalent* to the vCPU
+> just not being scheduled for a moment.
+
+I sure hope that migrations are fast enough that it is indistinguishable
+from scheduler pressure. I think the situations where that is not the
+case are particularly interesting. Defining a limit and having a
+mechanism for remedial action could make things more predictable for
+guest software.
+
+But agree, and shame on us for the broken virtual hardware when that
+isn't the case :-)
+
+--
+Thanks,
+Oliver
+
