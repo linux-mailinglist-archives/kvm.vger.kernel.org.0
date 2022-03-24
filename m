@@ -2,125 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0DC5D4E5C5C
-	for <lists+kvm@lfdr.de>; Thu, 24 Mar 2022 01:33:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 74CF84E5C75
+	for <lists+kvm@lfdr.de>; Thu, 24 Mar 2022 01:53:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346805AbiCXAfS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Mar 2022 20:35:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52358 "EHLO
+        id S1346914AbiCXAyz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Mar 2022 20:54:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41118 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237377AbiCXAfQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Mar 2022 20:35:16 -0400
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2088.outbound.protection.outlook.com [40.107.244.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6ACF486E17
-        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 17:33:46 -0700 (PDT)
+        with ESMTP id S1346883AbiCXAyy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Mar 2022 20:54:54 -0400
+X-Greylist: delayed 428 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 23 Mar 2022 17:53:24 PDT
+Received: from mx0b-002c1b01.pphosted.com (mx0b-002c1b01.pphosted.com [148.163.155.12])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72D4E38A0;
+        Wed, 23 Mar 2022 17:53:24 -0700 (PDT)
+Received: from pps.filterd (m0127843.ppops.net [127.0.0.1])
+        by mx0b-002c1b01.pphosted.com (8.16.1.2/8.16.1.2) with ESMTP id 22NI3M77032434;
+        Wed, 23 Mar 2022 17:45:09 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com; h=from : to : cc :
+ subject : date : message-id : content-transfer-encoding : content-type :
+ mime-version; s=proofpoint20171006;
+ bh=xvw8oFGXK2FX+zdktznVnyYyeB2EtcWItboE2A/aqQs=;
+ b=xgox/49gDpaU0en5Q90gjikwiI4dye5c5VszljT0oZIL1F+hSjSTP+f6BB4b1/ImpP06
+ ra/MFVB2n85yNXdfJG/EpPi2M8kBeFsH5Ve9+uc0bokcV90jSsESRQkEyHh3cFb5z8Jj
+ pocudMX+ySrg6Z+c1I6LJHmry6XTE0oV3Be/5puPF3nuQzTXkYkBqXi6b4l3ZpDfhSME
+ z9Jse3kfkZMuOuYyaEiSMxpc0qiGt3ewhWzI/WjAMPxTviMaqIgkcfTi527sDg77MkIg
+ T8EHKBJmCLNBOhdy8KpYs6Vj58SVs7ppLx2sC+un6D54Qn2TN4UGBqZ0vfB7UeCKOJEB 6Q== 
+Received: from nam12-mw2-obe.outbound.protection.outlook.com (mail-mw2nam12lp2044.outbound.protection.outlook.com [104.47.66.44])
+        by mx0b-002c1b01.pphosted.com (PPS) with ESMTPS id 3ewd9h23ny-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 23 Mar 2022 17:45:09 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nTjaM64RyN8TanDNCYybRRqhiPp8YB7+5ABIorhDsP5JB+cvuTRQ5ggr9yDaxA+CUT9FKt11Zgg4hqQVfCIDmYQRzJYptbm24d1v+e3l2pKvP2bMuzMaOA0hcWp5K0NRr3bwnmh7YC1A81BMPJJ891+JzCvwT6BSpGEJENCQA82Z/6F5GzSHTUjyLE5vIKkb5RUgtwvtfzMgwv8fB4mGRb26p8Vm8RCa8636mzRUatboQEaiImZfYk9C5z6CObluqlKynDNGA93ILgqCcokjaiH/hfzz0bkEFklW1xiV2+F6RdNn1ZY58CPjH3btN4MYVgyKkp/sXKIMHbB+XUJfqA==
+ b=TUENNJd7RisfdsIUZV7S5/IvamOw73vzT3gnuKdeob68h7LVa1kcHj6M108UCGwtnhAondeUrn/sgGi4BxSfD2LgFlcfRTuUdmgkBYPelWtUN1mgfjdHzdCQZv1acoZrq2dbDQ6XOTGWJV4GU7poXDyonl7yUhwQeXoQR0ld4COj5VCbvbsglVzgC0AgW4i/03N8Ex0a3dEdjt823Za7qkwhw2EAqSVKyaBmEIbQJvpENMHIDg2onO3PydWKulnYpFaLX47fUAPMxW2g3aZ7S5kIJXd2psn+rV7YXldBXI0JaGBYsnvNmh2bIqUfpPKHV9i7vxO1tzmx+PPTPBvTIQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gTvv8Ft76zbg6Ek+SGWbAEMX593J51FgfzosdomK6vU=;
- b=F8ggEO2EUKWqjccKBphbT7W+7MQ2GHwh0XRlK6ysjU2/CqRMY1/eD3nJVPTiISWqrDf12VrV5Suu6hikym7SG+kHmnI5eV4siJMKkb+XXKphZLKQYMgro4fr+9aACGxjjZh3rttpnEDnrLGN7Ig8OJt+tbFslsufTrrDI3ktJGTD9dxfGLjdQQfXev8kxr31Ng6l6sC+p3yE9hnjZycO/DIM4exbITmc1bC5q7kpvugnz9oA/div1S1HojYXP5vs6YQRykn+jhCvuClRaV+wvdk3LWqNvfEhAiotyWAT7qPXLwYhPUl+dj4iYuEiYdLqplCcY85YF+JtptRNjhGlCA==
+ bh=xvw8oFGXK2FX+zdktznVnyYyeB2EtcWItboE2A/aqQs=;
+ b=cjGmZdnzK8uALN8YJhhZ8iIbDNouVl6AzJHCxzf7YdX4d0sPFABBvW2ncLb2SM2gcWfhk8SuRny2lsOkIFheG5m3iG8dUmp1VRC4pHgR2YjfCw0AhQS6Sk8uoQZXKsfzLIBUkCZgLCauZAg1JTdA6A+w8gIDX9KWzv8gaNtnLAeCEzKdOabSTsbMeQhwS8fNQ0e0p9GQ6i7o7pVpxlCMsPS05BSQq0NCjJaIJYNlpftnDm2MjAvqnJA0mfqcM6PL0yZ5S65o0HbWZBIYu+PeT4FTsNxhMycx2UalffMkcpWftGUE/g7sZIUH6E00nB4JYqSFu0NroEdFAN7IfNQCxQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gTvv8Ft76zbg6Ek+SGWbAEMX593J51FgfzosdomK6vU=;
- b=gie+lEUuCVtLfbMz90X+dDVgiBIOh/74nBtQBoNQYHxur6BMReFHTLArgavm0XjJ4nwSYS5CbTzl/dJzDX77oVJgWnFuIlx3Yo5eeLYK6hZ39tadKpq4Zx7J5G1lYvlZfL229B6qsNeBwrJGkIUMlAefYPViJox4Lg4CMuY8tbP3G2G2eQmk351mt7QSEzMvC5V+9eWcU0tTeTS41ivnA4fXknUDFEmcqxVtOlOHQmAJa1qME0eKXblpsYGB+oVSWWD/60erxF9hk9lyDXs2KPyzYNOE9qZ7Jp4fU453PNmCgrmEPuHgZqwMDUYs6CGEYQHjMpYIKkMpm9ERhlpLQw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by DM6PR12MB4762.namprd12.prod.outlook.com (2603:10b6:5:7b::17) with
+ smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
+ dkim=pass header.d=nutanix.com; arc=none
+Received: from BL0PR02MB4579.namprd02.prod.outlook.com (2603:10b6:208:4b::10)
+ by CH2PR02MB6328.namprd02.prod.outlook.com (2603:10b6:610:5::25) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5102.16; Thu, 24 Mar
- 2022 00:33:44 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::11a0:970a:4c24:c70c]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::11a0:970a:4c24:c70c%6]) with mapi id 15.20.5102.017; Thu, 24 Mar 2022
- 00:33:44 +0000
-Date:   Wed, 23 Mar 2022 21:33:42 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Eric Auger <eric.auger@redhat.com>,
-        iommu@lists.linux-foundation.org, Jason Wang <jasowang@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        Yi Liu <yi.l.liu@intel.com>, Keqian Zhu <zhukeqian1@huawei.com>
-Subject: Re: [PATCH RFC 11/12] iommufd: vfio container FD ioctl compatibility
-Message-ID: <20220324003342.GV11336@nvidia.com>
-References: <0-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
- <11-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
- <20220323165125.5efd5976.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220323165125.5efd5976.alex.williamson@redhat.com>
-X-ClientProxiedBy: MN2PR01CA0020.prod.exchangelabs.com (2603:10b6:208:10c::33)
- To MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5081.15; Thu, 24 Mar
+ 2022 00:45:06 +0000
+Received: from BL0PR02MB4579.namprd02.prod.outlook.com
+ ([fe80::b970:801c:2b4e:d3cf]) by BL0PR02MB4579.namprd02.prod.outlook.com
+ ([fe80::b970:801c:2b4e:d3cf%4]) with mapi id 15.20.5081.023; Thu, 24 Mar 2022
+ 00:45:06 +0000
+From:   Jon Kohler <jon@nutanix.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     Jon Kohler <jon@nutanix.com>
+Subject: [PATCH] KVM: x86: optimize PKU branching in kvm_load_{guest|host}_xsave_state
+Date:   Wed, 23 Mar 2022 20:44:39 -0400
+Message-Id: <20220324004439.6709-1-jon@nutanix.com>
+X-Mailer: git-send-email 2.30.1 (Apple Git-130)
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SJ0PR13CA0093.namprd13.prod.outlook.com
+ (2603:10b6:a03:2c5::8) To BL0PR02MB4579.namprd02.prod.outlook.com
+ (2603:10b6:208:4b::10)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: b3e88ebb-4cb7-4e26-a257-08da0d2df3d7
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4762:EE_
-X-Microsoft-Antispam-PRVS: <DM6PR12MB476295CB65609C78512DCDA6C2199@DM6PR12MB4762.namprd12.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: 93fb9380-cde2-441a-4c2b-08da0d2f8a3e
+X-MS-TrafficTypeDiagnostic: CH2PR02MB6328:EE_
+X-Microsoft-Antispam-PRVS: <CH2PR02MB6328A7F01ECB8E9E3E52B3AEAF199@CH2PR02MB6328.namprd02.prod.outlook.com>
+x-proofpoint-crosstenant: true
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: BSScVDpbgNy0trT9bABQtZeVC3GUyFvl1v/ZZ/k5ydnrkq88G0EuyO9Vpw8eBn/Iyuwyfv/gDzJDSqvSvUMECwlbJ80qxpiesl9VyC0TMhs69SXI0WTtrVvi1Cm6ZoqPoPrkr1xatxqR1NLG0I/I5dSlTFrScBXGGZIeec6IcA3STYoqORwb4jyBPwqACehpU4tS56sx5q2NKkRrEEqp9+baolBWqWAR0t5UYVgg/vG++Qmomvd/wZgWZQXsvZvLp0QxbSEl66viN6uNx6lT8SWeRvtCkUh7lke/iizXmZYBBA31ZAf24TyzUZSL6Yzyz2GBoASF5eIAovXebcme9Clt3Qu4Jg/SW7aDLOxfz9qIro+p2/lKtK0fwkA/CzQTNcljtWoYcAb9KnRuELnelgv0C1FhrqzgIuV9C8hbYDL6bMs8pS135XHIba0mnvbH+P8hvHStioFMdQsq/+birNk6/qVZnAjwmX6tlWMrL+ijZapeV/g+Ex5Ujq00/SWj2NaNddfOvKsxPvLqwmIEMTfrebMdVs1bsi0V7OeHWLoWp0dSSw1AgCX2MG7sPg5JUTksAqN63Hj+tnSEpBoH5gse1M8MWDEDPaUHRLm1ckIqN+i4TXV5rOBPnyynRWhkwYwqNWfRsbT6rN26Xt+oVg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(54906003)(66556008)(6916009)(66476007)(66946007)(2616005)(26005)(186003)(36756003)(4326008)(8676002)(316002)(1076003)(6506007)(6512007)(33656002)(86362001)(6486002)(508600001)(2906002)(83380400001)(38100700002)(5660300002)(7416002)(8936002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: 1Iz+bIYrfizXQAZmbqiTTNLze8FcsD59l0uFduiXCxeK3aT/HHGqt6QFr70ueKw3+ANbFbQfsNHi7sFfZLxE8v6kBJ6fcilm+CP9undf+mJCArruhCbGCP8EcU1iArK2PqO51Ytj1mnQQcsFkHQUJJoOgWH5qf0SKcdggDG+A8w2Yo0J6GsVW53ZlAUwnP4sBrDxRE26z98FnChFWJFpLxDSMjJ78VN6bJnCYBreOMrcuNZGGt0PWgC0+lW2gyN1NUO8wXu4y0uUK1EpK3zuohmG6pSKt+z1WWO0YTlZxdg4XZUaDItJ26AwJm8rrSMdfdshpdTUHXIE71LerrSoIqdbJjt0StNCB61sRSRxkEN4kZCcn+HYzxO88ZQtueqkMLRJiFBeA3w1XP9Ur54psS4uE9FNkEezndUEt3vf+l1KSq3H0nEuqTqBYBPgsbTFt7iPB2SP3+T6VNu5KXvS6DHXstRWPIbP7bLP/B40Zblysj3V6YaiDvgJCfdVaeHe0rDAqExqO8GGx28aqr0ZhuglefDvF2wHrr22GLQ5joJELnRFtn21KSHHPqldgUiBMDYow93xtJleR6/RujpHuvP3pffqBdfARhXnFBIOAlTmxEB7YQ6Rio0/NxkAT7CpSEayZ6+HqfnhxgU0UgZSsIMrjsf7ddUihLZ+DFHWEC/Gb+qInBtT3lASUy5UjHTK
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR02MB4579.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(6506007)(6512007)(52116002)(2906002)(921005)(8936002)(6666004)(5660300002)(7416002)(508600001)(83380400001)(86362001)(186003)(107886003)(1076003)(2616005)(6486002)(66946007)(36756003)(8676002)(66476007)(110136005)(38100700002)(66556008)(316002)(4326008);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?bz9YUfmaU5ZGeYl/Wki/MrIr2ykHl03H9KrgQjZFb3svAYs7WbiBxXeCF84W?=
- =?us-ascii?Q?CrusJqWtdH3x4gMUsj4mEIfsXJjmj56hPNs2c7HnVe72sETj3wBJ2wkMtOHU?=
- =?us-ascii?Q?VvIkMlyDzUDtOxnxfmVFLSctiv3ZfxU6C3Mkl+9g90BNYIlVaTJyZIvx7wuL?=
- =?us-ascii?Q?SjqZo+DxApXyRN31lVkDsQJ9IXcIYDcFnyPKL+L91mtqlMG7nuZd1BjzpuKM?=
- =?us-ascii?Q?WxG2IVAaj+UbO8Zj8bEDnvTILjSStb12pwludTKuB45nO2m918yqiyfMQLtH?=
- =?us-ascii?Q?BgvRl0nzaxjNWSnE3EVb3J+YkrGRXe8FCOnkVDivhvoRVqBUTw5lmWSsJCVq?=
- =?us-ascii?Q?qFdeDPrXwaQ4smTm+rMfYY2L10aG/wm9LnAUGMjBYwuPo2AvI/pR/hv80ElW?=
- =?us-ascii?Q?4YmMEKA0xSqv2068rRm6DQ04UDNQHXHe4EHi7eQWD9QAaUxf7+qvHQKweCRu?=
- =?us-ascii?Q?8UsAzmleTK1OIH/kFp0Laduvf6mGLsVcik8ZOCvssNBAQHE7Us1OKxPcEqnc?=
- =?us-ascii?Q?Ceoh3iaGVYzP6wceuysBE74CwxxrFLQQ8q35MnbeIaENLOzYnS6teWEL3z3n?=
- =?us-ascii?Q?Jp9PWOjqFHBlQ9myncHytnBiGxYORqWZpYDPOoWCfWDcVjxZzjOLB3zdCSMn?=
- =?us-ascii?Q?vawCQOzKYPFxOldYFtKx3DlQqBKTdpYv+iJas18BYBOIuBo8uRD/9CClMdWH?=
- =?us-ascii?Q?lVPfwMmRxnSksjrqCIGrfHlBq9ggABlXqa1+J5ZryN//6bEM1RdwlMC/02IX?=
- =?us-ascii?Q?rv7y+wemK57fA0oxbO4RrOndNjriZTvx8BptmMzVVhFSzChej+VpB+y9EHpE?=
- =?us-ascii?Q?vbvNY8hextNMsL6XDV5ldlaUChNSlGJVtrNkn+bcCQYSDaoVSl2T2ZobpxOe?=
- =?us-ascii?Q?RV5JcNR59/ngshIAniS8kng6WVddpeb1wql9DZen7jyGr0/I4FQWmVC8kNUF?=
- =?us-ascii?Q?63QPta8Q39N4M3+zggznjbTCQa+2aaJQHgWZZ8t7auFEz4IcCGBIyzugiI1C?=
- =?us-ascii?Q?tlyeg3SKzPpdUjwTQ845UtknXPTXuZAJtji6uTonUGC3rpVgvS9sI19NbT47?=
- =?us-ascii?Q?baPZHHl+Au8Yac/SIe8j6H0gsRnt5rj2wm5f+8yuk8a35rbWIwm8yPrTMqj9?=
- =?us-ascii?Q?oIxZyWYiY9tTZQHzrzLHAXRH8f7rt0WhvITB8zmzXBQmf9Zm5ZqUW1PpzKah?=
- =?us-ascii?Q?kUZLteSYtwbUk6CHP7EsN/SQKjYs1QbaA2NDQN5lrXrJNvjxpLXMKXb7GuYu?=
- =?us-ascii?Q?kFDKNvWp0d+Vqb9hrg1HCsGueFFhk6OgP31O+jGIQdctLoCCytTJBBrNhVbq?=
- =?us-ascii?Q?1uqI+DJ68JiGdvAcDF0SreQWZPQtZ+s2hvKpMO6SfrEHSGuigC3M0FoxY+xc?=
- =?us-ascii?Q?3AxM8wdcI2/bjOr0NIHvXBoX0kLk+aH7iMvKgcqzqQniEMP/Z2hPGKdjVx2k?=
- =?us-ascii?Q?iA4V53gL5RVIX63EQsQQDPFSGeO7rwBg?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b3e88ebb-4cb7-4e26-a257-08da0d2df3d7
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?V649NF+yUK2SBtBegy5a9gJTaad9JYeqQG1ni12eGfa/b7j9TE2QooORi5KX?=
+ =?us-ascii?Q?IEW1CKPaUukIwUl4YQMgzbHglOk/Yn1oGjY7/7CCDaayJL1UMsyB7UMIkfZ5?=
+ =?us-ascii?Q?vd+RjubCX1uOECXrvVd1OpBe+Y5sP+YaWDoeOny08mYSiio11dQQXClQVidm?=
+ =?us-ascii?Q?j8lY6p7Rc9tHsQ3rvIESF2+f/t63twB9CchADL+lYfV+o7Llkpbduvyo/r+E?=
+ =?us-ascii?Q?3qqUJughKD5drq42t69pB448BugJimDoV0lznibI5aIHV4Wft6oF2gn21VPs?=
+ =?us-ascii?Q?iTBJPlTY/j1kEGciavDE6XDR/9ZeSDV7QMQFTnxUfiX1hhU8JY4oda+crWyy?=
+ =?us-ascii?Q?w5CGAXuoyysecMjvBQRBUEnNaSblRJaZU1dwInBiCV52Ru2RHsKJaGynrduw?=
+ =?us-ascii?Q?ExVIB8ExCjCFrcUF0VVt0vS2yext/V1b+D4shDT9ZYyqeuReRQ28A6L6I25S?=
+ =?us-ascii?Q?oUQQMhVL9QlnShzuTMNFThxpSrfgGdcPlENmpmp8SQhPHfyIgxuzH1dpZgNT?=
+ =?us-ascii?Q?A3GRsyFtjTz4hOLNpSuvU0JoBmPnTK4CaPGwuEIwNISC9apnW6YpgQzc97t0?=
+ =?us-ascii?Q?j+6qAI4s60QlrmW4u4aQUL9MXxkD7cLF5vr1ym77mVm8lbP8Cxt1+8XH/bmA?=
+ =?us-ascii?Q?0wkAsMBP/nf0Gvhqti0gh/R7d7/zb+Jv+wuMou0kQ2dVBZOpPaTWxI2WDYro?=
+ =?us-ascii?Q?KzgWxBF7lPqEpGK636Lh+Mxb4lrXkD4Nva21vJJYFQ3dn/PNAxxmbDZSGIav?=
+ =?us-ascii?Q?ZwF7kCXJoqt+y/kiRlPaXbMGlXYYY7TrGN2CkEM511vBeZf+Wjg1/OEQNKSo?=
+ =?us-ascii?Q?y3ejFfLc7rmQNuvtj/OQRHzh8h3lBeGGy9qJWI4kYTSWEYhcsy8+RiO9hgff?=
+ =?us-ascii?Q?vQcLTx4Vtde4JiH1k1LIHZPOobbZXiOgaIFSiv9iDKEezUBuOXUhfOR002fT?=
+ =?us-ascii?Q?vLyJXQPPgWGGvzSMEqVCxgqcrJwojmnbEPJvST9UbRSg+LIfMgjZ7UPt3Nyn?=
+ =?us-ascii?Q?xFIiBpYnWDwh5T0UKks54qCcNeSsPblIaFQuJHPtuoYrmx5wAMcCuG5WXRps?=
+ =?us-ascii?Q?WNGQtSZa0MIPKK0B47jG0jwxbFrSoTK0QnZmMOrHFuIsM9rkBgV45ENgzwri?=
+ =?us-ascii?Q?yI/olP9JZlbP/LGRfrDc7QqUJ9n8G7+6lYBODMBczGNinOMTa1A9MiuCEzQU?=
+ =?us-ascii?Q?7jOSrLszm08cbkef+a/Tde1952p+1UvDJRLG4rOU4qyXhSWm78m1xwiE76c0?=
+ =?us-ascii?Q?7LQ8EVethlRwXldS+CucG4ZNWGvDqwqm9O6aNkezWtaOQwNd4htt4HvR1Qb6?=
+ =?us-ascii?Q?JMiYeNkak2dVdvIbZGDFC/6nr897ZjmUPKIZGyi3YzbQZeifaAq0Q4HPoGdX?=
+ =?us-ascii?Q?ip1rIQm9P06Ft7PVlDlFssmFhn0WLG6eArFsEAMNXqIIFqp2KPyhVjJwIuOp?=
+ =?us-ascii?Q?8AW4CC1VK3SN2KtMffmS10oxAl9RXOnK15BDHr/5P6B7OYUtXaE8aFDrU0YE?=
+ =?us-ascii?Q?KodU+pmXylCZ6c1Z+GYe/YXJTcsggYS64xs7ryJXVpTXScpSkiQI2BPy04CQ?=
+ =?us-ascii?Q?9vCayO6uxv9OqbL1lS4=3D?=
+X-OriginatorOrg: nutanix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 93fb9380-cde2-441a-4c2b-08da0d2f8a3e
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR02MB4579.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Mar 2022 00:33:44.3593
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Mar 2022 00:45:06.2965
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-Id: bb047546-786f-4de1-bd75-24e5b6f79043
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: CJ0RdnMv5LUIz4/Z9Vp+nYKmMkTH833C43Blb3EiRlEdSJ9Qes1K4+yi02FYYHPR
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4762
-X-Spam-Status: No, score=0.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SORTED_RECIPS,SPF_HELO_PASS,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
+X-MS-Exchange-CrossTenant-UserPrincipalName: BwISqhz+SrBy2dlrcPJEQV61V9YLGDUug+tVLc/zy3T5emPhvea8aak5j+E4ShXkS2usVzl2Cgv0N/8yakcHQoKn68z1qnZ/96kZ4Vaoe3E=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR02MB6328
+X-Proofpoint-ORIG-GUID: lab09Vizh82JyJ5PXnkFBUIjmp9yCZoi
+X-Proofpoint-GUID: lab09Vizh82JyJ5PXnkFBUIjmp9yCZoi
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-03-23_08,2022-03-23_01,2022-02-23_01
+X-Proofpoint-Spam-Reason: safe
+X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -128,95 +138,72 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 23, 2022 at 04:51:25PM -0600, Alex Williamson wrote:
+kvm_load_{guest|host}_xsave_state handles xsave on vm entry and exit,
+part of which is managing memory protection key state. The latest
+arch.pkru is updated with a rdpkru, and if that doesn't match the base
+host_pkru (which about 70% of the time), we issue a __write_pkru.
 
-> My overall question here would be whether we can actually achieve a
-> compatibility interface that has sufficient feature transparency that we
-> can dump vfio code in favor of this interface, or will there be enough
-> niche use cases that we need to keep type1 and vfio containers around
-> through a deprecation process?
+To improve performance, implement the following optimizations:
+ 1. Reorder if conditions prior to wrpkru in both
+    kvm_load_{guest|host}_xsave_state.
 
-Other than SPAPR, I think we can.
+    Flip the ordering of the || condition so that XFEATURE_MASK_PKRU is
+    checked first, which when instrumented in our environment appeared
+    to be always true and less overall work than kvm_read_cr4_bits.
 
-> The locked memory differences for one seem like something that
-> libvirt wouldn't want hidden
+    For kvm_load_guest_xsave_state, hoist arch.pkru != host_pkru ahead
+    one position. When instrumented, I saw this be true roughly ~70% of
+    the time vs the other conditions which were almost always true.
+    With this change, we will avoid 3rd condition check ~30% of the time.
 
-I'm first interested to have an understanding how this change becomes
-a real problem in practice that requires libvirt to do something
-different for vfio or iommufd. We can discuss in the other thread
+ 2. Wrap PKU sections with CONFIG_X86_INTEL_MEMORY_PROTECTION_KEYS,
+    as if the user compiles out this feature, we should not have
+    these branches at all.
 
-If this is the make or break point then I think we can deal with it
-either by going back to what vfio does now or perhaps some other
-friendly compat approach..
+Signed-off-by: Jon Kohler <jon@nutanix.com>
+---
+ arch/x86/kvm/x86.c | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
 
-> and we have questions regarding support for vaddr hijacking
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 6db3a506b402..2b00123a5d50 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -950,11 +950,13 @@ void kvm_load_guest_xsave_state(struct kvm_vcpu *vcpu)
+ 			wrmsrl(MSR_IA32_XSS, vcpu->arch.ia32_xss);
+ 	}
 
-I'm not sure what vaddr hijacking is? Do you mean
-VFIO_DMA_MAP_FLAG_VADDR ? There is a comment that outlines my plan to
-implement it in a functionally compatible way without the deadlock
-problem. I estimate this as a small project.
++#ifdef CONFIG_X86_INTEL_MEMORY_PROTECTION_KEYS
+ 	if (static_cpu_has(X86_FEATURE_PKU) &&
+-	    (kvm_read_cr4_bits(vcpu, X86_CR4_PKE) ||
+-	     (vcpu->arch.xcr0 & XFEATURE_MASK_PKRU)) &&
+-	    vcpu->arch.pkru != vcpu->arch.host_pkru)
++	    vcpu->arch.pkru != vcpu->arch.host_pkru &&
++	    ((vcpu->arch.xcr0 & XFEATURE_MASK_PKRU) ||
++	     kvm_read_cr4_bits(vcpu, X86_CR4_PKE)))
+ 		write_pkru(vcpu->arch.pkru);
++#endif /* CONFIG_X86_INTEL_MEMORY_PROTECTION_KEYS */
+ }
+ EXPORT_SYMBOL_GPL(kvm_load_guest_xsave_state);
 
-> and different ideas how to implement dirty page tracking, 
+@@ -963,13 +965,15 @@ void kvm_load_host_xsave_state(struct kvm_vcpu *vcpu)
+ 	if (vcpu->arch.guest_state_protected)
+ 		return;
 
-I don't think this is compatibility. No kernel today triggers qemu to
-use this feature as no kernel supports live migration. No existing
-qemu will trigger this feature with new kernels that support live
-migration v2. Therefore we can adjust qemu's dirty tracking at the
-same time we enable migration v2 in qemu.
++#ifdef CONFIG_X86_INTEL_MEMORY_PROTECTION_KEYS
+ 	if (static_cpu_has(X86_FEATURE_PKU) &&
+-	    (kvm_read_cr4_bits(vcpu, X86_CR4_PKE) ||
+-	     (vcpu->arch.xcr0 & XFEATURE_MASK_PKRU))) {
++	    ((vcpu->arch.xcr0 & XFEATURE_MASK_PKRU) ||
++	     kvm_read_cr4_bits(vcpu, X86_CR4_PKE))) {
+ 		vcpu->arch.pkru = rdpkru();
+ 		if (vcpu->arch.pkru != vcpu->arch.host_pkru)
+ 			write_pkru(vcpu->arch.host_pkru);
+ 	}
++#endif /* CONFIG_X86_INTEL_MEMORY_PROTECTION_KEYS */
 
-With Joao's work we are close to having a solid RFC to come with
-something that can be fully implemented.
+ 	if (kvm_read_cr4_bits(vcpu, X86_CR4_OSXSAVE)) {
 
-Hopefully we can agree to this soon enough that qemu can come with a
-full package of migration v2 support including the dirty tracking
-solution.
+--
+2.30.1 (Apple Git-130)
 
-> not to mention the missing features that are currently well used,
-> like p2p mappings, coherency tracking, mdev, etc.
-
-I consider these all mandatory things, they won't be left out.
-
-The reason they are not in the RFC is mostly because supporting them
-requires work outside just this iommufd area, and I'd like this series
-to remain self-contained.
-
-I've already got a draft to add DMABUF support to VFIO PCI which
-nicely solves the follow_pfn security problem, we want to do this for
-another reason already. I'm waiting for some testing feedback before
-posting it. Need some help from Daniel make the DMABUF revoke semantic
-him and I have been talking about. In the worst case can copy the
-follow_pfn approach.
-
-Intel no-snoop is simple enough, just needs some Intel cleanup parts.
-
-mdev will come along with the final VFIO integration, all the really
-hard parts are done already. The VFIO integration is a medium sized
-task overall.
-
-So, I'm not ready to give up yet :)
-
-> Where do we focus attention?  Is symlinking device files our proposal
-> to userspace and is that something achievable, or do we want to use
-> this compatibility interface as a means to test the interface and
-> allow userspace to make use of it for transition, if their use cases
-> allow it, perhaps eventually performing the symlink after deprecation
-> and eventual removal of the vfio container and type1 code?  Thanks,
-
-symlinking device files is definitely just a suggested way to expedite
-testing.
-
-Things like qemu that are learning to use iommufd-only features should
-learn to directly open iommufd instead of vfio container to activate
-those features.
-
-Looking long down the road I don't think we want to have type 1 and
-iommufd code forever. So, I would like to make an option to compile
-out vfio container support entirely and have that option arrange for
-iommufd to provide the container device node itself.
-
-I think we can get there pretty quickly, or at least I haven't got
-anything that is scaring me alot (beyond SPAPR of course)
-
-For the dpdk/etcs of the world I think we are already there.
-
-Jason
