@@ -2,250 +2,241 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 10D6C4E5F94
-	for <lists+kvm@lfdr.de>; Thu, 24 Mar 2022 08:38:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 25E704E5F98
+	for <lists+kvm@lfdr.de>; Thu, 24 Mar 2022 08:39:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348534AbiCXHjf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Mar 2022 03:39:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52922 "EHLO
+        id S1348701AbiCXHlJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Mar 2022 03:41:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241935AbiCXHje (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Mar 2022 03:39:34 -0400
-Received: from mail-il1-x132.google.com (mail-il1-x132.google.com [IPv6:2607:f8b0:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95C73BFF
-        for <kvm@vger.kernel.org>; Thu, 24 Mar 2022 00:38:01 -0700 (PDT)
-Received: by mail-il1-x132.google.com with SMTP id d3so2622437ilr.10
-        for <kvm@vger.kernel.org>; Thu, 24 Mar 2022 00:38:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=qEd63tIHMzkTiVmix/zg5Kepcn4SZRubYZZ/89R7on8=;
-        b=jKz9hFzC1npUxMvPjw2v2QBb2R3g5FzAGFs0wFMmeWF2nY8HLH+jyEA6rg6Ry39w8v
-         FDsopU9fYI7Pc7UgQFdshHTKC70tg6pKTUtRzBHs98YU6fwEjdhCPtxxRx8EH3+d8KcY
-         n5ke898/AG6x//tWxLv+g9iryK6mDQbODSbM+DUA9WGjyKugNl1fPSNrSkQxrzK0jW02
-         xr10uHLGt2xYo1COLDQGU8hni9ZD7CXr7inEXZa6ZzsYRZGg9aDZo6HGdwUjClnHrXon
-         2Jv3P6FRFO3kyZB+Y2mCXM6ic1j2uSjqLXWiNrMXwM7nIlhVD4qs7J7dIuSW3h5VYe1O
-         ZLNQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=qEd63tIHMzkTiVmix/zg5Kepcn4SZRubYZZ/89R7on8=;
-        b=jfp+XOa3yMoFF2OJk+m0xQlqKk/ujZEFhNEOG3ORh3VaEaxrqdC7q2MCjpOuEDsc7d
-         y3XEdFG6zT+zz8quTqqKvDnawsJZQZG2P4mXjm5bSJyvbCue6IrL92J12Z1ktB/1uSLH
-         /5qlK7q37lPrCWy0h125v4Dlnt8LZQDG7q8/ZGFQO0FiUAwNKErK4lWXwqJQ7Aa9kABy
-         y3Wd3dgt8CcL3bKX/DfdStI7rRDDQcZiIA1FcA9hVGIL2WriNgI9ojYYvLMSJsNA8l5T
-         c5GEE6o7IILfqx0vG0VokBCIjcYSeQZwU9On48he8hB3C30AbNRLksZGgUNK1vCXHvWH
-         GQ3A==
-X-Gm-Message-State: AOAM530jaro7vc0VEhEvCXDXVSbMKmYNl+kuDARuT6ykeL8vYzPBwQ7r
-        eox3zy1KMVKfgl79e7TBN+848A==
-X-Google-Smtp-Source: ABdhPJzC+kBxrijRCsVFsazTYtmdKoMBi4MqBzTj6FEmvblV/o8eXsvmpCIHcyepqbMA6aJNEcp91Q==
-X-Received: by 2002:a05:6e02:16c7:b0:2c7:e458:d863 with SMTP id 7-20020a056e0216c700b002c7e458d863mr1997250ilx.71.1648107480057;
-        Thu, 24 Mar 2022 00:38:00 -0700 (PDT)
-Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
-        by smtp.gmail.com with ESMTPSA id f4-20020a92b504000000b002c21ef70a81sm1201411ile.7.2022.03.24.00.37.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Mar 2022 00:37:59 -0700 (PDT)
-Date:   Thu, 24 Mar 2022 07:37:56 +0000
-From:   Oliver Upton <oupton@google.com>
-To:     Reiji Watanabe <reijiw@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Fuad Tabba <tabba@google.com>,
-        Peng Liang <liangpeng10@huawei.com>,
-        Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>
-Subject: Re: [PATCH v6 01/25] KVM: arm64: Introduce a validation function for
- an ID register
-Message-ID: <Yjwf1BpigvzlT8r9@google.com>
-References: <20220311044811.1980336-1-reijiw@google.com>
- <20220311044811.1980336-2-reijiw@google.com>
- <Yjl96UQ7lUovKBWD@google.com>
- <CAAeT=FzELqXZiWjZ9aRNqYRbX0zx6LdhETiZUS+CMvax2vLRQw@mail.gmail.com>
- <YjrG0xiubC108tIN@google.com>
- <CAAeT=FxEwuwg310vhWQeBJ9UouHNaJNcPqvbLYh7nXp7aFFq=Q@mail.gmail.com>
+        with ESMTP id S241935AbiCXHlI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Mar 2022 03:41:08 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 020595E766;
+        Thu, 24 Mar 2022 00:39:36 -0700 (PDT)
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22O4pbBm012974;
+        Thu, 24 Mar 2022 07:39:36 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=mRbbFnGWvVlAn/PvdhUWT6XytJ4Hr9/ADHu1SFl1VSQ=;
+ b=tVktvGISMrevWHOz/kqKSChzO5Vl4mwVouI+amh9oLDQ4M0Eu6oMUXhQvowVLpYAxMFs
+ MFuzkDM7Kg9K59o2lKKzZpNpLa1MOSiCb6jcOSaxvFEscYUVrfkgAWn89m6zcfkdmWCT
+ OPk86LsCKTZ8gAXmzNx5TQ2aW0eJBYRyQHN5fbT868O//IxKIqWMkHS1PAiBi7z6byp9
+ rcW/Ka037mq5l9qT7Gl/n2h2wzHiCyp21ZHycMnQ6eDFluxNyTLUSzCBC8aER6kF1+J8
+ yxYAf8bZAEJrZo0jgU8T3o30pqY6u0ErSqzUlCHvNIrnzjuvVGT3CuF3Zgbq0ImRVIEb Bw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3f0j03jn5h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 24 Mar 2022 07:39:35 +0000
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22O7IYox001637;
+        Thu, 24 Mar 2022 07:39:35 GMT
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3f0j03jn56-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 24 Mar 2022 07:39:35 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22O7btvi014350;
+        Thu, 24 Mar 2022 07:39:33 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma05fra.de.ibm.com with ESMTP id 3ew6t9gste-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 24 Mar 2022 07:39:33 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22O7dUbL38994424
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 24 Mar 2022 07:39:30 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6F377A4051;
+        Thu, 24 Mar 2022 07:39:30 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1E7FDA4040;
+        Thu, 24 Mar 2022 07:39:30 +0000 (GMT)
+Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1.ibm.com (unknown [9.171.8.199])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 24 Mar 2022 07:39:30 +0000 (GMT)
+Message-ID: <7a624f37d23d8095e56a6ecc6b872b8b933b58bb.camel@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v2 4/9] s390x: smp: add test for
+ SIGP_STORE_ADTL_STATUS order
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        frankja@linux.ibm.com, thuth@redhat.com, david@redhat.com,
+        farman@linux.ibm.com
+Date:   Thu, 24 Mar 2022 08:39:29 +0100
+In-Reply-To: <20220323184512.192f878b@p-imbrenda>
+References: <20220323170325.220848-1-nrb@linux.ibm.com>
+         <20220323170325.220848-5-nrb@linux.ibm.com>
+         <20220323184512.192f878b@p-imbrenda>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAAeT=FxEwuwg310vhWQeBJ9UouHNaJNcPqvbLYh7nXp7aFFq=Q@mail.gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 2g8h1qB_cMnbq9pXqEz2t8lzY0zY8FOi
+X-Proofpoint-GUID: mrSRVshWkUp1Ukd9iRNC9Trdylqfa73p
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-03-23_08,2022-03-23_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxscore=0
+ mlxlogscore=999 clxscore=1015 malwarescore=0 spamscore=0
+ priorityscore=1501 lowpriorityscore=0 suspectscore=0 bulkscore=0
+ phishscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2202240000 definitions=main-2203240043
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Reiji,
-
-On Wed, Mar 23, 2022 at 11:00:25PM -0700, Reiji Watanabe wrote:
-> Hi Oliver,
+On Wed, 2022-03-23 at 18:45 +0100, Claudio Imbrenda wrote:
+> On Wed, 23 Mar 2022 18:03:20 +0100
+> Nico Boehr <nrb@linux.ibm.com> wrote:
 > 
-> > > > I have some concerns regarding the API between cpufeature and KVM that's
-> > > > being proposed here. It would appear that we are adding some of KVM's
-> > > > implementation details into the cpufeature code. In particular, I see
-> > > > that KVM's limitations on AA64DFR0 are being copied here.
-> > >
-> > > I assume "KVM's limitation details" you meant is about
-> > > ftr_id_aa64dfr0_kvm.
-> > > Entries in arm64_ftr_bits_kvm_override shouldn't be added based
-> > > on KVM's implementation.  When cpufeature.c doesn't handle lower level
-> > > of (or fewer) features as the "safe" value for fields, the field should
-> > > be added to arm64_ftr_bits_kvm_override.  As PMUVER and DEBUGVER are not
-> > > treated as LOWER_SAFE, they were added in arm64_ftr_bits_kvm_override.
-> >
-> > I believe the fact that KVM is more permissive on PMUVER and DEBUGVER
-> > than cpufeature is in fact a detail of KVM, no? read_id_reg() already
+[...]
+> > +
+> > +static int memisset(void *s, int c, size_t n)
 > 
-> What cpufeature knows is that consumers of the validation function
-> needs the validation of each field based on ID register schemes that
-> are described in Arm ARM (basically lower safe).
-> As lower values of PMUVER/DEBUGVER indicates lower level of features
-> or fewer level of features, those entries are to provide validation
-> based on that.  So, entries in arm64_ftr_bits_kvm_override will be added
-> to adjust cpufeture's behavior based on ID register schemes, and KVM may
-> or may not use them.
-> 
-> I need to remove the word "kvm" from variable/function/structure names
-> and put more clear comments:)
+> function should return bool..
 
-I'll admit I definitely drilled down on the fact that KVM is the only
-actual user of these, and not the fact that it was realigning the fields
-with the Arm ARM :)
-
-> > implicitly trusts the cpufeature code filtering and applies additional
-> > limitations on top of what we get back. Similarly, there are fields
-> > where KVM is more restrictive than cpufeature (ID_AA64DFR0_PMSVER).
-> >
-> > Each of those constraints could theoretically be expressed as an
-> > arm64_ftr_bits structure within KVM.
-> 
-> It's not impossible but it's a bit tricky (With __arm64_ftr_reg_valid(),
-> it might look straight forward, but I don't think that treats FTR_EXACT
-> correctly. Please see update_cpu_ftr_reg).
->
-
-Ah right. __arm64_ftr_reg_valid() needs to trust either the value that
-comes from the boot CPU, or ->safe_val if the cores are different in the
-system. And what does it mean if the caller specified FTR_EXACT?
-
-I'll think on this more if I have any other suggestions.
+Sure, changed.
 
 [...]
-
-> > It also seems to me that if I wanted to raise the permitted DEBUGVER for KVM,
-> > would I have to make a change outside of KVM.
+> > +static void test_store_adtl_status(void)
+> > +{
+> > 
+[...]
+> > +
+> > +       report_prefix_push("unaligned");
+> > +       smp_cpu_stop(1);
+> > +
+> > +       cc = smp_sigp(1, SIGP_STORE_ADDITIONAL_STATUS,
+> > +                 (unsigned long)&adtl_status + 256, &status);
+> > +       report(cc == 1, "CC = 1");
+> > +       report(status == SIGP_STATUS_INVALID_PARAMETER, "status =
+> > INVALID_PARAMETER");
 > 
-> Could you elaborate this a little more?
+> and check again that nothing has been written to
 
-Urgh. Ignore me, I fixated to heavily on the SAFE_VAL you used for
-DEBUGVER, not the fact that it was LOWER_SAFE.
+Oh, thanks. Fixed.
 
-> More specific concern I have about providing the override (with the
-> existing arm64_ftr_bits) would be when field values of arm64_ftr_bits
-> (i.e. LOWER_SAFE to EXACT) in cpufeature are changed due to kernel's
-> implementation reasons, which might affect KVM (may need to pass
-> extra override to arm64_ftr_reg_valid).
-> But, by having cpufeature provide the validation based on the ID
-> register schemes, cpufeature should be changed to provide the same
-> validation in that case (i.e. if DFR0.PERFMON is changed from LOWER_SAFE
-> to EXACT like AA64DFR0.PMUVER, DFR0.PERFMON should be added in
-> arm64_ftr_bits_kvm_override with LOWER_SAFE).
+[...]
+> > +static void test_store_adtl_status_unavail(void)
+> > +{
+> > +       uint32_t status = 0;
+> > +       int cc;
+> > +
+> > +       report_prefix_push("store additional status unvailable");
+> > +
+> > +       if (have_adtl_status()) {
+> > +               report_skip("guarded-storage or vector facility
+> > installed");
+> > +               goto out;
+> > +       }
+> > +
+> > +       report_prefix_push("not accepted");
+> > +       smp_cpu_stop(1);
+> > +
+> > +       cc = smp_sigp(1, SIGP_STORE_ADDITIONAL_STATUS,
+> > +                 (unsigned long)&adtl_status, &status);
+> > +
+> > +       report(cc == 1, "CC = 1");
+> > +       report(status == SIGP_STATUS_INVALID_ORDER,
+> > +              "status = INVALID_ORDER");
+> > +
 > 
-> So, if I go with the option to provide override to cpufeature, IMHO it
-> would be preferable for cpufeature to provide the validation based
-> on ID schemes instead of with the current need-based policy (, which
-> might get changed) for clear separation.
+> I would still check that nothing is written even when the order is
+> rejected
 
-Sounds good. Per your suggestion above, changing the
-naming/documentation around what is being added to cpufeature removes
-the confusion that it relates to KVM and really is a precise
-implementation of the rules in the Arm ARM.
+Won't hurt, added.
 
-> > > Another option that I considered earlier was having a full set of
-> > > arm64_ftr_bits in KVM for its validation. At the time, I thought
-> > > statically) having a full set of arm64_ftr_bits in KVM is not good in
-> > > terms of maintenance.  But, considering that again, since most of
-> > > fields are unsigned and lower safe fields, and KVM doesn't necessarily
-> > > have to statically have a full set of arm64_ftr_bits
-> >
-> > I think the argument could be made for KVM having its own static +
-> > verbose cpufeature tables. We've already been bitten by scenarios where
+[...]
+> > +static void restart_write_vector(void)
+> > +{
+> > +       uint8_t *vec_reg;
+> > +       /*
+> > +        * vlm handles at most 16 registers at a time
+> > +        */
 > 
-> What does "verbose cpufeature tables" mean ?
+> this comment can /* go on a single line */
 
-Currently KVM implements a sparsely-defined denylist on top of whatever
-we get back from read_sanitised_ftr_reg(). We do not have an absolute
-upper bound for all fields in the feature registers, so there are times
-where unsupported features leak through to the guest much like the SPE
-commit I mentioned below.
+OK
 
-What I am suggesting is that KVM define an absolute limit on what it
-virtualizes for *all* fields, including what is presently RAZ. We have
-absolutely no idea whether or not we can virtualize new features that
-come in later revisions of the spec. It does mean we will need to
-raise those limits from time to time, but would rather do that than
-accidentally expose a feature we cannot virtualize.
-
-> > cpufeature exposes a feature that we simply do not virtualize in KVM.
-> > That really can become a game of whack-a-mole. commit 96f4f6809bee
-> > ("KVM: arm64: Don't advertise FEAT_SPE to guests") is a good example,
-> > and I can really see no end to these sorts of issues without an
-> > overhaul. We'd need to also find a way to leverage the existing
-> > infrasturcture for working out a system-wide safe value, but this time
-> > with KVM's table of registers.
-> > KVM would then need to take a change to expose any new feature that has
-> > no involvement of EL2. Personally, I'd take that over the possibility of
-> > another unhandled feature slipping through and blowing up a guest kernel
-> > when running on newer hardware.
+[...]
+> > +               /*
+> > +                * i+1 to avoid zero content
+> > +                */
 > 
-> Userspace with configurable ID registers would eliminate such problems
-> on known systems, but I agree that KVM itself should prevent it.
-> It will be inconvenient for some people, but it would be safer in general.
+> same /* here */
 
-We cannot require userspace to write to these registers to run a guest
-given the fact that the present ABI doesn't. Given that fact, KVM is
-still responsible for having sane default values for these registers.
+OK, changed.
 
-If a field that we do not handle implies a feature we do not virtualize
-on newer hardware, invariably our guest will see it and likely panic
-when it realizes the vCPU is out of spec.
-
-Maybe the feature bits tables is a bit extreme given the fact that it
-does define the architected handling of each field. I think the upper
-bound on register values I mentioned above would do the trick and avoid
-copy/pasting a whole set of structures we don't desperately need.
-
-> > > (dynamically generate during KVM's initialization)
-> >
-> > This was another one of my concerns with the current state of this
-> > patch. I found the register table construction at runtime hard to
-> > follow. I think it could be avoided with a helper that has a prescribed
-> > set of rules (caller-provided field definition takes precedence over the
-> > general one).
+[...]
+> > +static void __store_adtl_status_vector_lc(unsigned long lc)
+> > +{
+> > +       uint32_t status = -1;
+> > +       struct psw psw;
+> > +       int cc;
+> > +
+> > +       report_prefix_pushf("LC %lu", lc);
+> > +
+> > +       if (!test_facility(133) && lc) {
+> > +               report_skip("not supported, no guarded-storage
+> > facility");
+> > +               goto out;
+> > +       }
 > 
-> Sure, I will improve that if I continue to keep the current way.
-> With the option of having a separate KVM's arm64_ftr_bits,
-> the code will be very different, but I will keep that in mind.
+> I think this ^ should not be there at all
 
-arm64_ftr_bits might be a bit extreme in KVM after all, I'll retract
-that suggestion in favor of what I said above :)
+It must be. If we don't have guarded-storage only LC 0 is allowed:
 
-Thanks for being patient working through all of this with me.
+"When the guarded-storage facility is not installed, the
+length and alignment of the MCESA is 1024 bytes.
+When the guarded-storage facility is installed, the
+length characteristic (LC) in bits 60-63 of the
+MCESAD specifies the length and alignment of the
+MCESA as a power of two"
 
---
-Best,
-Oliver
+See below for the reason why we don't have gs here.
+
+[...]
+> > diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
+> > index 1600e714c8b9..843fd323bce9 100644
+> > --- a/s390x/unittests.cfg
+> > +++ b/s390x/unittests.cfg
+> > @@ -74,9 +74,29 @@ extra_params=-device diag288,id=watchdog0 --
+> > watchdog-action inject-nmi
+> >  file = stsi.elf
+> >  extra_params=-name kvm-unit-test --uuid 0fb84a86-727c-11ea-bc55-
+> > 0242ac130003 -smp 1,maxcpus=8
+> >  
+> > -[smp]
+> > +[smp-kvm]
+> >  file = smp.elf
+> >  smp = 2
+> > +accel = kvm
+> > +extra_params = -cpu host,gs=on,vx=on
+> > +
+> > +[smp-no-vec-no-gs-kvm]
+> > +file = smp.elf
+> > +smp = 2
+> > +accel = kvm
+> > +extra_params = -cpu host,gs=off,vx=off
+> > +
+> > +[smp-tcg]
+> > +file = smp.elf
+> > +smp = 2
+> > +accel = tcg
+> > +extra_params = -cpu qemu,vx=on
+> 
+> why not gs=on as well?
+
+I am not an expert in QEMU CPU model, but it seems to me TCG doesn't
+support it.
+
