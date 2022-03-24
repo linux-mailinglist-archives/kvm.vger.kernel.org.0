@@ -2,156 +2,195 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A5664E663C
-	for <lists+kvm@lfdr.de>; Thu, 24 Mar 2022 16:43:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C194B4E6652
+	for <lists+kvm@lfdr.de>; Thu, 24 Mar 2022 16:52:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351370AbiCXPpS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Mar 2022 11:45:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52238 "EHLO
+        id S1344780AbiCXPxb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Mar 2022 11:53:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351316AbiCXPpS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Mar 2022 11:45:18 -0400
-Received: from mail-wr1-x44a.google.com (mail-wr1-x44a.google.com [IPv6:2a00:1450:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA2412A72D
-        for <kvm@vger.kernel.org>; Thu, 24 Mar 2022 08:43:45 -0700 (PDT)
-Received: by mail-wr1-x44a.google.com with SMTP id p18-20020adfba92000000b001e8f7697cc7so1804691wrg.20
-        for <kvm@vger.kernel.org>; Thu, 24 Mar 2022 08:43:45 -0700 (PDT)
+        with ESMTP id S1349021AbiCXPx3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Mar 2022 11:53:29 -0400
+Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 421EFAC92F
+        for <kvm@vger.kernel.org>; Thu, 24 Mar 2022 08:51:54 -0700 (PDT)
+Received: by mail-wm1-x336.google.com with SMTP id q20so2999260wmq.1
+        for <kvm@vger.kernel.org>; Thu, 24 Mar 2022 08:51:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=rWoUPKu0AaJWm8l2aQCNG1PmHsFWS0Tjs1BlR+KeXSo=;
-        b=F42fUyJCuMK5arWCFGN29kI5mU1nxES6fc2W7TIjsAOLovM99OY8KNdVq/oTHni2mF
-         E7ovxFATJU9oVS/0qDYxcaoyl7zlGDJYMMEoFT33/qBygNRaeenX7k4Y3fYFLGzVIgDD
-         91aRQP543zaepKPUwi+uYrTl4byb/pE+gn2DW7113WbzDcqabEfx1/J9gqZx5hkT5Z6Y
-         Z9/MA0ILTViF7rYYYSpzAasabejhJjvMGMpU4rMoAZRZn0JlC4kpT6hQt/Sd9Hmph8jB
-         +pY1zBgLwVoa8Pca1UkqN6Yq/DNN/GCcPAKmkB98G9sVMakZZgm2cWR307aseM60oYIP
-         9X6A==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=NEtaF19RLk3IuGGWvhhX/z9a33LLQAJ182dON6UK5Yo=;
+        b=fk9RkDsYVyolj4TSgLqmrYuEXdokpvUU9jaV0JAO9n+wmTm4I2wgbn37yCP2KfXBWI
+         /2WqZepo3GcWY397TcvebHgjb3u1LCH+XB9TxdoIB3HsM02i0vXyZ51l25KENYsebBZB
+         QbTnr2t8ehr+TLPj7+dmYDh6R8fCKi7yxBgoArhQu4dZbntaUZ1LBgcwvG5trGBp1A56
+         W+b4dCBOtKMZ3YZueQKIC57OQp6xiYvcBVHV3A/C4PLGpqp2vi4+Ry8IOI2z1wZxIy3O
+         C7pTxWtH0Fh0R0Nw9NrQNwKE2s6PQE6Nl1IN7bH79+T+kGNjIm0Ol7dDbMJr62zC41Tt
+         NK4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=rWoUPKu0AaJWm8l2aQCNG1PmHsFWS0Tjs1BlR+KeXSo=;
-        b=StxQlsSo5d9BOI8xHlbQeCw55tF0EPQk9oBUDIdD1CT78lXrnDcFwM/Aa3EUCiaoKa
-         nCatVEMrSXJeF2RYj8g8s/xrUAVZMoMyNQGNwtqMmaIFozno73C2QyV7EQzXnmzZEa7o
-         xLqeUTjp7ycgJBEHAsE/eESqbV5ZwYfG4SK6p2VtCiT38S2n9KOeNs6sfhWJ8hZKoqAe
-         uspAIwCIRTkhD2fY7JOvscuCPSpONJDOhIIXm9k8zwsOHd0EFh4q+l+LghQ0uz1ZUc1x
-         6x1X/q3WmhKLbvV1JydOq01mlBbEF/z1pQwbVI7P1Vs9YFh1D67G1zfSafp7NpqGH0au
-         kedQ==
-X-Gm-Message-State: AOAM532dQEHPL7ctguAtLMlqDc8f17E58919TmRME8NszN/YP2Hn9HiM
-        OC4afRFveixEStcJ9lJ8AtIjga5/uthfBudBmwyZ7h5RMIOvT+oQwlgGAMgHzwcwq/VDpLLpLnD
-        ftvFUhoIUCQhkBXNhexahaG/kBuNhuMInGQxMoStDV13f9sMRe92PKJWU3WxkuNS7HVGOKVXd6Q
-        ==
-X-Google-Smtp-Source: ABdhPJx0dUAc+CPGDR5fCVWncoXBTYBEoFnp3BZG+yihBm+1aLnW1hvzxkvOCAtA/5o6APLgOSlW+cYrdOQktSzt0fg=
-X-Received: from sene.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:27c4])
- (user=sebastianene job=sendgmr) by 2002:a1c:7518:0:b0:381:c77:ceec with SMTP
- id o24-20020a1c7518000000b003810c77ceecmr5353400wmc.57.1648136624209; Thu, 24
- Mar 2022 08:43:44 -0700 (PDT)
-Date:   Thu, 24 Mar 2022 15:43:05 +0000
-Message-Id: <20220324154304.2572891-1-sebastianene@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.35.1.894.gb6a874cedc-goog
-Subject: [PATCH kvmtool v1] Make --no-pvtime command argument arm specific
-From:   Sebastian Ene <sebastianene@google.com>
-To:     kvm@vger.kernel.org
-Cc:     qperret@google.com, maz@kernel.org, kvmarm@lists.cs.columbia.edu,
-        will@kernel.org, julien.thierry.kdev@gmail.com,
-        Sebastian Ene <sebastianene@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=NEtaF19RLk3IuGGWvhhX/z9a33LLQAJ182dON6UK5Yo=;
+        b=Gf6kzM31YjVtKdTbYOUBTfe28bY5Jx5UQH9K9JgF8UB4wYY+hu2ZrasLd8mqWuoqUy
+         v6aP+bzXoLH2kjl8lIwVEihn3nblWJpIlW/QBh1tFGJBAgkVB/+qRMjfv55zlHQFjDIp
+         jgWi2857AreXfgHHKij06Mr7xxm8fvTTLkSsTT3SgRw5HWVI8T0gMRxPxYVgKiydhGHO
+         VPYEYd0vB7dp/k90rx4XTLc8c0OZnrxw42rS6nxzHJPO7JbI0iUQA1dnIPUbRtt0CWXM
+         R1QnxK0OWUBSS2GaoafsPTIzHZQL+nxbrv2FqyjF13RxpdD+MnQxGyhnQmsZSE0sKQAI
+         NMng==
+X-Gm-Message-State: AOAM532KWFRlGAITDqJHAG1uQnrWMYFOlW/iCaUOQ56d4Iv4a1avrZLn
+        F4tUEMo5Om1++EFmyvbszRCGgw==
+X-Google-Smtp-Source: ABdhPJyoUHp29/XUyIZlxpqS/7kDffVwFSGviWgbTb92w3/eFRlsR7S6xMVteMn3CazvbWUm8x2Sjw==
+X-Received: by 2002:a05:600c:4e8b:b0:38c:90cf:1158 with SMTP id f11-20020a05600c4e8b00b0038c90cf1158mr15120363wmq.107.1648137112585;
+        Thu, 24 Mar 2022 08:51:52 -0700 (PDT)
+Received: from google.com ([2a00:79e0:d:210:6aea:58cf:f2e0:7796])
+        by smtp.gmail.com with ESMTPSA id y13-20020adffa4d000000b00203e3ca2701sm4051307wrr.45.2022.03.24.08.51.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Mar 2022 08:51:52 -0700 (PDT)
+Date:   Thu, 24 Mar 2022 15:51:48 +0000
+From:   Quentin Perret <qperret@google.com>
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-api@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, maz@kernel.org,
+        will@kernel.org
+Subject: Re: [PATCH v5 00/13] KVM: mm: fd-based approach for supporting KVM
+ guest private memory
+Message-ID: <YjyS6A0o4JASQK+B@google.com>
+References: <20220310140911.50924-1-chao.p.peng@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220310140911.50924-1-chao.p.peng@linux.intel.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The stolen time option is available only for aarch64 and is enabled by
-default. Move the option that disables stolen time functionality in the
-arch specific path.
+Hi Chao,
 
-Signed-off-by: Sebastian Ene <sebastianene@google.com>
----
- arm/aarch64/include/kvm/kvm-config-arch.h | 5 +++--
- arm/aarch64/pvtime.c                      | 4 ++--
- arm/include/arm-common/kvm-config-arch.h  | 1 +
- builtin-run.c                             | 2 --
- include/kvm/kvm-config.h                  | 1 -
- 5 files changed, 6 insertions(+), 7 deletions(-)
++CC Will and Marc for visibility.
 
-diff --git a/arm/aarch64/include/kvm/kvm-config-arch.h b/arm/aarch64/include/kvm/kvm-config-arch.h
-index 04be43d..a9b0576 100644
---- a/arm/aarch64/include/kvm/kvm-config-arch.h
-+++ b/arm/aarch64/include/kvm/kvm-config-arch.h
-@@ -8,8 +8,9 @@
- 			"Create PMUv3 device"),				\
- 	OPT_U64('\0', "kaslr-seed", &(cfg)->kaslr_seed,			\
- 			"Specify random seed for Kernel Address Space "	\
--			"Layout Randomization (KASLR)"),
--
-+			"Layout Randomization (KASLR)"),		\
-+	OPT_BOOLEAN('\0', "no-pvtime", &(cfg)->no_pvtime, "Disable"	\
-+			" stolen time"),
- #include "arm-common/kvm-config-arch.h"
- 
- #endif /* KVM__KVM_CONFIG_ARCH_H */
-diff --git a/arm/aarch64/pvtime.c b/arm/aarch64/pvtime.c
-index 2f5774e..a49cf3e 100644
---- a/arm/aarch64/pvtime.c
-+++ b/arm/aarch64/pvtime.c
-@@ -48,13 +48,13 @@ int kvm_cpu__setup_pvtime(struct kvm_cpu *vcpu)
- 	bool has_stolen_time;
- 	u64 pvtime_guest_addr = ARM_PVTIME_BASE + vcpu->cpu_id *
- 		ARM_PVTIME_STRUCT_SIZE;
--	struct kvm_config *kvm_cfg = NULL;
-+	struct kvm_config_arch *kvm_cfg = NULL;
- 	struct kvm_device_attr pvtime_attr = (struct kvm_device_attr) {
- 		.group	= KVM_ARM_VCPU_PVTIME_CTRL,
- 		.attr	= KVM_ARM_VCPU_PVTIME_IPA
- 	};
- 
--	kvm_cfg = &vcpu->kvm->cfg;
-+	kvm_cfg = &vcpu->kvm->cfg.arch;
- 	if (kvm_cfg->no_pvtime)
- 		return 0;
- 
-diff --git a/arm/include/arm-common/kvm-config-arch.h b/arm/include/arm-common/kvm-config-arch.h
-index 5734c46..9f97778 100644
---- a/arm/include/arm-common/kvm-config-arch.h
-+++ b/arm/include/arm-common/kvm-config-arch.h
-@@ -12,6 +12,7 @@ struct kvm_config_arch {
- 	u64		kaslr_seed;
- 	enum irqchip_type irqchip;
- 	u64		fw_addr;
-+	bool no_pvtime;
- };
- 
- int irqchip_parser(const struct option *opt, const char *arg, int unset);
-diff --git a/builtin-run.c b/builtin-run.c
-index 7c8be9d..9a1a0c1 100644
---- a/builtin-run.c
-+++ b/builtin-run.c
-@@ -128,8 +128,6 @@ void kvm_run_set_wrapper_sandbox(void)
- 			" rootfs"),					\
- 	OPT_STRING('\0', "hugetlbfs", &(cfg)->hugetlbfs_path, "path",	\
- 			"Hugetlbfs path"),				\
--	OPT_BOOLEAN('\0', "no-pvtime", &(cfg)->no_pvtime, "Disable"	\
--			" stolen time"),				\
- 									\
- 	OPT_GROUP("Kernel options:"),					\
- 	OPT_STRING('k', "kernel", &(cfg)->kernel_filename, "kernel",	\
-diff --git a/include/kvm/kvm-config.h b/include/kvm/kvm-config.h
-index 48adf27..6a5720c 100644
---- a/include/kvm/kvm-config.h
-+++ b/include/kvm/kvm-config.h
-@@ -62,7 +62,6 @@ struct kvm_config {
- 	bool no_dhcp;
- 	bool ioport_debug;
- 	bool mmio_debug;
--	bool no_pvtime;
- };
- 
- #endif
--- 
-2.35.1.894.gb6a874cedc-goog
+On Thursday 10 Mar 2022 at 22:08:58 (+0800), Chao Peng wrote:
+> This is the v5 of this series which tries to implement the fd-based KVM
+> guest private memory. The patches are based on latest kvm/queue branch
+> commit:
+> 
+>   d5089416b7fb KVM: x86: Introduce KVM_CAP_DISABLE_QUIRKS2
+>  
+> Introduction
+> ------------
+> In general this patch series introduce fd-based memslot which provides
+> guest memory through memory file descriptor fd[offset,size] instead of
+> hva/size. The fd can be created from a supported memory filesystem
+> like tmpfs/hugetlbfs etc. which we refer as memory backing store. KVM
+> and the the memory backing store exchange callbacks when such memslot
+> gets created. At runtime KVM will call into callbacks provided by the
+> backing store to get the pfn with the fd+offset. Memory backing store
+> will also call into KVM callbacks when userspace fallocate/punch hole
+> on the fd to notify KVM to map/unmap secondary MMU page tables.
+> 
+> Comparing to existing hva-based memslot, this new type of memslot allows
+> guest memory unmapped from host userspace like QEMU and even the kernel
+> itself, therefore reduce attack surface and prevent bugs.
+> 
+> Based on this fd-based memslot, we can build guest private memory that
+> is going to be used in confidential computing environments such as Intel
+> TDX and AMD SEV. When supported, the memory backing store can provide
+> more enforcement on the fd and KVM can use a single memslot to hold both
+> the private and shared part of the guest memory. 
+> 
+> mm extension
+> ---------------------
+> Introduces new MFD_INACCESSIBLE flag for memfd_create(), the file created
+> with these flags cannot read(), write() or mmap() etc via normal
+> MMU operations. The file content can only be used with the newly
+> introduced memfile_notifier extension.
+> 
+> The memfile_notifier extension provides two sets of callbacks for KVM to
+> interact with the memory backing store:
+>   - memfile_notifier_ops: callbacks for memory backing store to notify
+>     KVM when memory gets allocated/invalidated.
+>   - memfile_pfn_ops: callbacks for KVM to call into memory backing store
+>     to request memory pages for guest private memory.
+> 
+> The memfile_notifier extension also provides APIs for memory backing
+> store to register/unregister itself and to trigger the notifier when the
+> bookmarked memory gets fallocated/invalidated.
+> 
+> memslot extension
+> -----------------
+> Add the private fd and the fd offset to existing 'shared' memslot so that
+> both private/shared guest memory can live in one single memslot. A page in
+> the memslot is either private or shared. A page is private only when it's
+> already allocated in the backing store fd, all the other cases it's treated
+> as shared, this includes those already mapped as shared as well as those
+> having not been mapped. This means the memory backing store is the place
+> which tells the truth of which page is private.
+> 
+> Private memory map/unmap and conversion
+> ---------------------------------------
+> Userspace's map/unmap operations are done by fallocate() ioctl on the
+> backing store fd.
+>   - map: default fallocate() with mode=0.
+>   - unmap: fallocate() with FALLOC_FL_PUNCH_HOLE.
+> The map/unmap will trigger above memfile_notifier_ops to let KVM map/unmap
+> secondary MMU page tables.
 
+I recently came across this series which is interesting for the
+Protected KVM work that's currently ongoing in the Android world (see
+[1], [2] or [3] for more details). The idea is similar in a number of
+ways to the Intel TDX stuff (from what I understand, but I'm clearly not
+understanding it all so, ...) or the Arm CCA solution, but using stage-2
+MMUs instead of encryption; and leverages the caveat of the nVHE
+KVM/arm64 implementation to isolate the control of stage-2 MMUs from the
+host.
+
+For Protected KVM (and I suspect most other confidential computing
+solutions), guests have the ability to share some of their pages back
+with the host kernel using a dedicated hypercall. This is necessary
+for e.g. virtio communications, so these shared pages need to be mapped
+back into the VMM's address space. I'm a bit confused about how that
+would work with the approach proposed here. What is going to be the
+approach for TDX?
+
+It feels like the most 'natural' thing would be to have a KVM exit
+reason describing which pages have been shared back by the guest, and to
+then allow the VMM to mmap those specific pages in response in the
+memfd. Is this something that has been discussed or considered?
+
+Thanks,
+Quentin
+
+[1] https://lwn.net/Articles/836693/
+[2] https://www.youtube.com/watch?v=wY-u6n75iXc
+[3] https://www.youtube.com/watch?v=54q6RzS9BpQ&t=10862s
