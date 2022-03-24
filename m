@@ -2,281 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4DB004E63D8
-	for <lists+kvm@lfdr.de>; Thu, 24 Mar 2022 14:03:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 347254E6452
+	for <lists+kvm@lfdr.de>; Thu, 24 Mar 2022 14:46:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344952AbiCXNFD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Mar 2022 09:05:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60916 "EHLO
+        id S1350562AbiCXNsL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Mar 2022 09:48:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58266 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240451AbiCXNE7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Mar 2022 09:04:59 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80EDD1D309;
-        Thu, 24 Mar 2022 06:03:27 -0700 (PDT)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22OBSvM9001910;
-        Thu, 24 Mar 2022 13:03:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=Eb+WaqPqa3qboWhTqB+pb8M09dkEarLaC5/qd0nW5OY=;
- b=WQLCKV2gDUSDJrLijkaB/9vKyM9Ex3xfe8GPjTvsi0ObI5vODcYLVHC5Z4avU0Mr3Tgy
- umFKTrOIahkKUWuQ70fKX7CtHQ9hLGkJBpxtH5Xu8G6oRJYT0764dDJ3OaWLpFmZNXIk
- KfBlquyFucEvUzVEVA3mkqi22SWxqbS8qt5G5gFpyNIAhIbz7LQnPfrn/CozH725CZf2
- l17GrLCSrVFNklHRwM31gZnu5yl/3dgvS6upstYZtrqHuR3f3Q0aqS7HMqInQcA8WPco
- vxTRZrWkdf3U2AlnP4FWSR/fvgkgaceh9dy/xgLX9Cu0/lPLo2Vm9KNgv8qRGL+1x+te WQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3f0mwte6he-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 24 Mar 2022 13:03:27 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22OCDJU2015978;
-        Thu, 24 Mar 2022 13:03:26 GMT
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3f0mwte6g2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 24 Mar 2022 13:03:26 +0000
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22OCxpls004279;
-        Thu, 24 Mar 2022 13:03:23 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma02fra.de.ibm.com with ESMTP id 3ew6t8sbcc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 24 Mar 2022 13:03:23 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22OCpYxh49218024
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 24 Mar 2022 12:51:35 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 97773A4055;
-        Thu, 24 Mar 2022 13:03:20 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2BE3CA404D;
-        Thu, 24 Mar 2022 13:03:20 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.9.72])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 24 Mar 2022 13:03:20 +0000 (GMT)
-Date:   Thu, 24 Mar 2022 14:03:17 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Nico Boehr <nrb@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, thuth@redhat.com, david@redhat.com,
-        farman@linux.ibm.com
-Subject: Re: [kvm-unit-tests PATCH v2 4/9] s390x: smp: add test for
- SIGP_STORE_ADTL_STATUS order
-Message-ID: <20220324140317.49a86cdd@p-imbrenda>
-In-Reply-To: <7a624f37d23d8095e56a6ecc6b872b8b933b58bb.camel@linux.ibm.com>
-References: <20220323170325.220848-1-nrb@linux.ibm.com>
-        <20220323170325.220848-5-nrb@linux.ibm.com>
-        <20220323184512.192f878b@p-imbrenda>
-        <7a624f37d23d8095e56a6ecc6b872b8b933b58bb.camel@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        with ESMTP id S1350593AbiCXNsF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Mar 2022 09:48:05 -0400
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2071.outbound.protection.outlook.com [40.107.236.71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAAC88A332
+        for <kvm@vger.kernel.org>; Thu, 24 Mar 2022 06:46:30 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=EuMTCLuv8ZigCGbC9NdIQwm3valLZcddOvDJZbzL/MAAQqC9usscosZd7KOUzhUaDwl8XE8wcjyMqFYjZZBrLpEEBqH+DqPwtl+WCV5EpOYB4D0KAf3iaQED6YLV7dWsOpnlyN6ZGe8iKXLrSoiUTR/uWPuo98OUQcu/NizMTHA2vG+QFnbc1KKl7T8uVbR61/6uPRH0ImVTcKCNUr6QLziOBw4ns8Sm9x5BQbcPQ/4WIpn/BOoHoLo7Yb6tYMru8uNdeLEVNc2BBRXH9fFK2IXP8ltfpJwNs9ooXOp6MWChQfPzHQGhVZEs7LxyL1wD4LwKtG8N6obM+c9OQpXoEg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=FNbf00Qbyiq5Wb+/2J03ft1DPMHGW/EVrDNMKJiCz/s=;
+ b=bcZTASKUYoNOs078p3AyWIMrOPGYAQeJvwEgI7Qkl5G4DBhQ66bKc5dgWTaclEJ41seT3uwzCqVRQVzqgOUJ3lazQYORkZe/QU0pDnjmnzvURVLgPARxXoByda3gs0LzXtlsyyHbngZFq1CkOb73ssNYyFkVEnoTbY4ELzdrN89W1FjhBoTaGfyh90O3AO7fGEC7lYzxmLnHTDv+IznJrvAlh5SinVsq1bkHpEGCTZ/wkxHvjDjMpViykj4xWO1U/Tb1XD/xPFdBW3XeDjCl5XHsAO5D1aoUjgLPBfOJtV04pX7/XdZMRphFlFDWJMarsQO+GJ3T0OQVZYhq1oUNww==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FNbf00Qbyiq5Wb+/2J03ft1DPMHGW/EVrDNMKJiCz/s=;
+ b=CSOtBHimpKHQ/RGvYdnnx0QhgVGgOYJei46OPttc17UE7nsFSZJAzYejSTF4YtvaxFiXxRrojPimbtRs90jTXE3tTWmTHPdwEbqEGScrttQdN4R4PlL61Kw6Qapwxcq9GxopGE5+TnL4cisYN1mvqQjEoVcoVHLhWnHE2H1cjWy6/nt4Z+Vbwf45RZorBUPbfTzK5/VU2yc9ULyzq96e9Sv28i8e5i1vHkQstFmzSb8bVrPKaw0DNzHFBpwaT0mQT1UjRo0afLPkjXNQcrZYn3fhhth8ARev10ytlq6Z8MEVFclTFWCaO+tXy+uW6/yZ+ITazuX3iFMRjyDmR6vPcA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by SA0PR12MB4382.namprd12.prod.outlook.com (2603:10b6:806:9a::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5081.17; Thu, 24 Mar
+ 2022 13:46:23 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::11a0:970a:4c24:c70c]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::11a0:970a:4c24:c70c%6]) with mapi id 15.20.5102.019; Thu, 24 Mar 2022
+ 13:46:23 +0000
+Date:   Thu, 24 Mar 2022 10:46:22 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Eric Auger <eric.auger@redhat.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        Jason Wang <jasowang@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        "Martins, Joao" <joao.m.martins@oracle.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        Keqian Zhu <zhukeqian1@huawei.com>
+Subject: Re: [PATCH RFC 08/12] iommufd: IOCTLs for the io_pagetable
+Message-ID: <20220324134622.GB1184709@nvidia.com>
+References: <0-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
+ <8-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
+ <20220323131038.3b5cb95b.alex.williamson@redhat.com>
+ <20220323193439.GS11336@nvidia.com>
+ <20220323140446.097fd8cc.alex.williamson@redhat.com>
+ <20220323203418.GT11336@nvidia.com>
+ <20220323225438.GA1228113@nvidia.com>
+ <BN9PR11MB5276EB80AFCC3003955A46248C199@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BN9PR11MB5276EB80AFCC3003955A46248C199@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-ClientProxiedBy: MN2PR19CA0056.namprd19.prod.outlook.com
+ (2603:10b6:208:19b::33) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: wBVrOe85zcRXMt88h4wfOIHtV-6MqBra
-X-Proofpoint-ORIG-GUID: wjEPIudvwesDUMXa0dcdc5rFSY_axg2v
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-03-24_04,2022-03-24_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- suspectscore=0 mlxscore=0 mlxlogscore=999 lowpriorityscore=0
- malwarescore=0 bulkscore=0 impostorscore=0 adultscore=0 clxscore=1015
- phishscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2203240075
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 5a716c61-36d9-4226-005a-08da0d9caf3d
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4382:EE_
+X-Microsoft-Antispam-PRVS: <SA0PR12MB43821B34CC5AB62699C6B5F1C2199@SA0PR12MB4382.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: yJwjDe4W2li55jm+fzSMqy2G4Z8o9LmGYF2pLTZKxS3JbBfBW6J7ydyiE1djMvknj0a7CjqP8M2+sjORWX7y3Y/gUWo8GPffv/m7L22/whyt+ZrWkpaakUO2hpRQqWcVy84GZ90PfoXnttN+dkgbPR49zKJ0ECrX/E7D6Ei3Z020GEyy+e2Rpeh8zBsPSDlIUG40OpsX4+ZZHMx943A/4WABMOMDyULYY98zT3c8XeJr7xhr2M7rD4in0ANjUzVSmXi8fJug5vJX1NvIZzwd8ZH2IwG/bGhD2IGZJK83ZCuFkMnxbw2g0rWvvjGNvhQCxYAPACARdyrGq+xFV/YmMSwhzFOtnN76+nnSACxHf73mchij1Ap9r3tTPv0PVdtzSluSUbC5sxpMDh4Ga80K8b4eijJgSFWuA0lg6P6t3+7HHKN86eYFJPXRFyPpelbqdSCq3ni9sGveHE0z5uX3g11/cXQx6tBAFIhCryontK+RYw88R1t4ws50lQH8RP1LYDs5iUfIU2BzF3b6THsBuFXd57ZcsuwTy3fSF0hxa8KLJV/t8gzH4DY0Hmc6kHqZpR7bt7ArfXygx7+879CqsY4O53o03K6brv23DUVyidPNB+Kxab4qR4jXPneaualXR/biZraXNa1mwcpPXxOOSmbAyakYIfBY+n8C4CJIwByeEnB10BsFaYNcFl4yJWDI0nvJ03V9cnU9Y13mCBe/dewbo7qw32C2lKwEAa3R9g4=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(7416002)(5660300002)(508600001)(2906002)(316002)(33656002)(8676002)(38100700002)(4326008)(83380400001)(4744005)(6486002)(1076003)(6506007)(54906003)(66946007)(8936002)(26005)(2616005)(6916009)(66476007)(186003)(86362001)(66556008)(966005)(6512007)(36756003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?7cs5MgiYrdx5BnJfaGACELmlophr0FSxtEmBJQjW/G3jlHCpPsYd4OEWsC1i?=
+ =?us-ascii?Q?MARwKy/zQt9KU8FM4imz6R79qQrJVW9xQY3/oOaeD70zcHnm1FyD6OBUB74r?=
+ =?us-ascii?Q?+cksxnBkbfBN2NveyeL/msdULSzCGYJrX1hgL8CqIAbdraq6z+nEupVZ7ILH?=
+ =?us-ascii?Q?q/XQOJV2/Qnp34cWL0VY0zr15jZZtc1K8BQDfCTMzHe3RBRELgKClGxi/s6E?=
+ =?us-ascii?Q?R2OJUHFCVCiokaI7sqqhL/bNSjzomr2AHRywScAo7XRPX9rnEcYrRwEh2F0l?=
+ =?us-ascii?Q?XhNmgUlWM2aWOpVWnpeocgzm20dihlrTCB2pIoDsLIFUhgBbFzGm0qkpYygu?=
+ =?us-ascii?Q?NcB0EWwPOQDvkzUJUZIUIgpZHZojRlK5n0t1YrTQA6jSddiNR32Pt5nNbT+O?=
+ =?us-ascii?Q?fuoBB5Y7MDa2vxQ6f7MF6iItKPIBTuWpiXPlg6Pwt3HXhD+JF1qbAuuTPVUp?=
+ =?us-ascii?Q?YqQqEkDo7b8m6XTLREZ+oBPA10imRULXbiqH49M0OoCviGlMXAC3JjnWdqud?=
+ =?us-ascii?Q?BXz8c1orCOvhc12sIBNCUW1NJj5RqzWd3DlHRD8oi/qkngOxxSNH43tRAJ0u?=
+ =?us-ascii?Q?dnir33Wee44rWv8rNygUwpqDrHbwweQReqisjaJLry1bnuOodag+HYKxpnU6?=
+ =?us-ascii?Q?0Iz56WZDY0KW5HEb8low8r4NBsTWt0k97robGSM5HvVNuMvdSuzRr/u8RUUz?=
+ =?us-ascii?Q?kun7INay2wu7mQ7SVSI/iTP6FFtO41SrS3pP8wHj/kxVS/c4MiAYOkzlZrX6?=
+ =?us-ascii?Q?BAX5j3myyEWSXisIixwZ9gYT0KEZQyGpmUo+P2TRE7Y62NoAIFLEc8cmnFFX?=
+ =?us-ascii?Q?79GP8y4tbZ4SyWYlHf8U5Ph9YViZ4wupCO+457HSsC0wdo77i8wBX6EU+tYX?=
+ =?us-ascii?Q?DTam2Kcnhpwv3tkP6I1z/WB3OjWoJQf3kCdAUQUojeyDTHKwxt3+nOWg1q40?=
+ =?us-ascii?Q?nxfTPlSwpIZtLM/OznSDw0znhCwmaFj/XQl71TmfAgqypUJlac/F9a3dHmCh?=
+ =?us-ascii?Q?txejQDUfBvrKFBkQPjgut90b+4hL+fhC7I04bT79MEmjd0CpkCZXYP/k3Y7u?=
+ =?us-ascii?Q?CYipmkRB6zlF4fcaQdF6s66USJWoVOnuPvNVdHfpEzg3++1LoHj/NXOQTjac?=
+ =?us-ascii?Q?5omcKspaMs3tnLz6zftAMLsGtL9qVyZObMjAGvJpSUtsRrIdXC7uDBOqw8dm?=
+ =?us-ascii?Q?BboE2fGaovSv2DrlzmsaClTV0W8frtgZ+ebZ52nTv+oaNCgBK6cwGcdRs8Uc?=
+ =?us-ascii?Q?lgQCrpsBuM1IxmTrS8mM/YD13fOx8g/clMKZGLrGvC7dAaywNamxTWZ+soJW?=
+ =?us-ascii?Q?bMP3ZysisTC405UELcsrnex0ZCuylwu+KYs4zmlxk2IorVoMiRXgd6ooJcNr?=
+ =?us-ascii?Q?HvbS50XV3WIjkv5nY/xnTf8brN9K9RRXTGv9oxc5QqMWQRq6LWC2raoD+Z+Z?=
+ =?us-ascii?Q?21froFDI6oSxGyQm354m5FSUZgKZht8Y?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5a716c61-36d9-4226-005a-08da0d9caf3d
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Mar 2022 13:46:23.5697
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Qu/ASwAzMD82hJQPT8TjcSBf/LhPdkBlgjx/ShSvVDAuUN1j5tddkrbnKYGtVcIW
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4382
+X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 24 Mar 2022 08:39:29 +0100
-Nico Boehr <nrb@linux.ibm.com> wrote:
+On Thu, Mar 24, 2022 at 07:25:03AM +0000, Tian, Kevin wrote:
 
-> On Wed, 2022-03-23 at 18:45 +0100, Claudio Imbrenda wrote:
-> > On Wed, 23 Mar 2022 18:03:20 +0100
-> > Nico Boehr <nrb@linux.ibm.com> wrote:
-> >  =20
-> [...]
-> > > +
-> > > +static int memisset(void *s, int c, size_t n) =20
-> >=20
-> > function should return bool.. =20
->=20
-> Sure, changed.
->=20
-> [...]
-> > > +static void test_store_adtl_status(void)
-> > > +{
-> > >  =20
-> [...]
-> > > +
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0report_prefix_push("unalig=
-ned");
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0smp_cpu_stop(1);
-> > > +
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0cc =3D smp_sigp(1, SIGP_ST=
-ORE_ADDITIONAL_STATUS,
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (unsigned long)&adtl_status + 256, &status);
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0report(cc =3D=3D 1, "CC =
-=3D 1");
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0report(status =3D=3D SIGP_=
-STATUS_INVALID_PARAMETER, "status =3D
-> > > INVALID_PARAMETER"); =20
-> >=20
-> > and check again that nothing has been written to =20
->=20
-> Oh, thanks. Fixed.
->=20
-> [...]
-> > > +static void test_store_adtl_status_unavail(void)
-> > > +{
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0uint32_t status =3D 0;
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int cc;
-> > > +
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0report_prefix_push("store =
-additional status unvailable");
-> > > +
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (have_adtl_status()) {
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0report_skip("guarded-storage or vector facility
-> > > installed");
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0goto out;
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-> > > +
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0report_prefix_push("not ac=
-cepted");
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0smp_cpu_stop(1);
-> > > +
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0cc =3D smp_sigp(1, SIGP_ST=
-ORE_ADDITIONAL_STATUS,
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (unsigned long)&adtl_status, &status);
-> > > +
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0report(cc =3D=3D 1, "CC =
-=3D 1");
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0report(status =3D=3D SIGP_=
-STATUS_INVALID_ORDER,
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 "status =3D INVALID_ORDER");
-> > > + =20
-> >=20
-> > I would still check that nothing is written even when the order is
-> > rejected =20
->=20
-> Won't hurt, added.
->=20
-> [...]
-> > > +static void restart_write_vector(void)
-> > > +{
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0uint8_t *vec_reg;
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/*
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * vlm handles at most 16 =
-registers at a time
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */ =20
-> >=20
-> > this comment can /* go on a single line */ =20
->=20
-> OK
->=20
-> [...]
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0/*
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 * i+1 to avoid zero content
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 */ =20
-> >=20
-> > same /* here */ =20
->=20
-> OK, changed.
->=20
-> [...]
-> > > +static void __store_adtl_status_vector_lc(unsigned long lc)
-> > > +{
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0uint32_t status =3D -1;
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct psw psw;
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int cc;
-> > > +
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0report_prefix_pushf("LC %l=
-u", lc);
-> > > +
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!test_facility(133) &&=
- lc) {
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0report_skip("not supported, no guarded-storage
-> > > facility");
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0goto out;
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0} =20
-> >=20
-> > I think this ^ should not be there at all =20
->=20
-> It must be. If we don't have guarded-storage only LC 0 is allowed:
->=20
-> "When the guarded-storage facility is not installed, the
-> length and alignment of the MCESA is 1024 bytes.
-> When the guarded-storage facility is installed, the
-> length characteristic (LC) in bits 60-63 of the
-> MCESAD specifies the length and alignment of the
-> MCESA as a power of two"
+> Based on that here is a quick tweak of the force-snoop part (not compiled).
 
-hmm, it seems like that without guarded storage LC is ignored, and the
-size is hardcoded to 1024.
+I liked your previous idea better, that IOMMU_CAP_CACHE_COHERENCY
+started out OK but got weird. So lets fix it back to the way it was.
 
-this is getting a little out of hand now
+How about this:
 
-I think you should make this into a separate test
+https://github.com/jgunthorpe/linux/commits/intel_no_snoop
 
->=20
-> See below for the reason why we don't have gs here.
->=20
-> [...]
-> > > diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-> > > index 1600e714c8b9..843fd323bce9 100644
-> > > --- a/s390x/unittests.cfg
-> > > +++ b/s390x/unittests.cfg
-> > > @@ -74,9 +74,29 @@ extra_params=3D-device diag288,id=3Dwatchdog0 --
-> > > watchdog-action inject-nmi
-> > > =C2=A0file =3D stsi.elf
-> > > =C2=A0extra_params=3D-name kvm-unit-test --uuid 0fb84a86-727c-11ea-bc=
-55-
-> > > 0242ac130003 -smp 1,maxcpus=3D8
-> > > =C2=A0
-> > > -[smp]
-> > > +[smp-kvm]
-> > > =C2=A0file =3D smp.elf
-> > > =C2=A0smp =3D 2
-> > > +accel =3D kvm
-> > > +extra_params =3D -cpu host,gs=3Don,vx=3Don
-> > > +
-> > > +[smp-no-vec-no-gs-kvm]
-> > > +file =3D smp.elf
-> > > +smp =3D 2
-> > > +accel =3D kvm
-> > > +extra_params =3D -cpu host,gs=3Doff,vx=3Doff
-> > > +
-> > > +[smp-tcg]
-> > > +file =3D smp.elf
-> > > +smp =3D 2
-> > > +accel =3D tcg
-> > > +extra_params =3D -cpu qemu,vx=3Don =20
-> >=20
-> > why not gs=3Don as well? =20
->=20
-> I am not an expert in QEMU CPU model, but it seems to me TCG doesn't
-> support it.
+b11c19a4b34c2a iommu: Move the Intel no-snoop control off of IOMMU_CACHE
+5263947f9d5f36 vfio: Require that device support DMA cache coherence
+eab4b381c64a30 iommu: Restore IOMMU_CAP_CACHE_COHERENCY to its original meaning
+2752e12bed48f6 iommu: Replace uses of IOMMU_CAP_CACHE_COHERENCY with dev_is_dma_coherent()
 
-it seems indeed so. maybe add a comment to explain
+If you like it could you take it from here?
 
->=20
-
+Thanks,
+Jason
