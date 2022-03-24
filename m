@@ -2,140 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E4DF44E69CB
-	for <lists+kvm@lfdr.de>; Thu, 24 Mar 2022 21:26:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4B0754E69E9
+	for <lists+kvm@lfdr.de>; Thu, 24 Mar 2022 21:40:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353371AbiCXUZd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Mar 2022 16:25:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45826 "EHLO
+        id S1346156AbiCXUlz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Mar 2022 16:41:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58764 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242893AbiCXUZc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Mar 2022 16:25:32 -0400
-Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17603B8209
-        for <kvm@vger.kernel.org>; Thu, 24 Mar 2022 13:24:00 -0700 (PDT)
-Received: by mail-pg1-x532.google.com with SMTP id k14so4762033pga.0
-        for <kvm@vger.kernel.org>; Thu, 24 Mar 2022 13:24:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=+deFKAAvG1IExHzs7Ey5q7jagiNbsrjto223/L+snd0=;
-        b=Znk/UqwO6g8KsGi2N1lmUXz1sgxGNyiUkGWZGoYcktt4qVmXNELV/cuiFM8vVcoG6V
-         5LYbQfMxUkMyjkNmsBDR7Q1x/zXVNmiSMr9wd7y2fhNICdoqsIxWywmo2gxWT/JF1jQo
-         FeLRbi2ORaHUo3DbO/F1JRhrMqb9nARAgsK1S6ATPfDD8U2E85M076204H0Pem8tssav
-         R3nJc6Piyi21cn/P7+5/ka4ENAqFGOqReCQIpHHdU3ZoJBrGcTOtkizT/WPMtEUC9K5g
-         jmBPepdm1skpcfaekubV4AB06LZrc/NAST30WQ+fMvYIxASJ5F5f+38VPSq35AyrK65J
-         oKDQ==
+        with ESMTP id S239357AbiCXUly (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Mar 2022 16:41:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 057BC972D5
+        for <kvm@vger.kernel.org>; Thu, 24 Mar 2022 13:40:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1648154421;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=YcqkWAtIoHhKaWHguuTSHckFy2uV+KOK7nFBpa+JxJo=;
+        b=edyc0AxSXd8NLDHyCBrRSZkqpxYDlY2ZSnHi/mP8s7PwYG8MOOzaSGcPk+egg0i+6lx8qx
+        NZMswZh3DZt0WsRVtRMh4dAYHeLcbcD2PKBPCznqspLVLWToVVjyWHQi10Iqikefe+GlTC
+        9z656H5e3lalYuALxt4MyavzKltSZh8=
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
+ [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-408-Ip1NUAW7M8Kue-YtAecCaQ-1; Thu, 24 Mar 2022 16:40:19 -0400
+X-MC-Unique: Ip1NUAW7M8Kue-YtAecCaQ-1
+Received: by mail-il1-f200.google.com with SMTP id u15-20020a92da8f000000b002c863d2f21dso2979400iln.15
+        for <kvm@vger.kernel.org>; Thu, 24 Mar 2022 13:40:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=+deFKAAvG1IExHzs7Ey5q7jagiNbsrjto223/L+snd0=;
-        b=Fwo0zk/SxzM/Meatjv20dW2ZdC68c/lPVy4TsdsHCwEYuF3xRmwQ8WMaq72RTm9/vx
-         XbGJJ0UyrBnaP5msft2Qz/MLrUl/GyVMXGSLW4YaxWENOsg2V6D2S3WbDQdBu8nbM96j
-         /2iU1tAb5FoSxC/difgClLcRSTODI/ytG3tkxyKTamJCALddch+LCRrShPsYMq06Msp6
-         paX1ZkzpMErv8p9sioR/dOQ0/hYXuVMgG9c1gz06ZTt0VBkdwGk3LuOlSv+uwpjoi6SK
-         luRhoJe8f8cfz9V96SLm+Bmterir22lpzohu5ZkFX+FTDPTzvIPKfrtodHL07zAnWUfi
-         RxKA==
-X-Gm-Message-State: AOAM533kGPUye5U8AY5GhllTRifbjivngq4aTSql4yzMlrOTwrJw/no7
-        8GHxt2+1US2zSCEaQxLXFRoZg6apGRfffJNiqy2z7w==
-X-Google-Smtp-Source: ABdhPJxTwFMhv13gS2/VlfiC3K4DQxqCgghC0iWGormtJ2+ksX6zo9S2rpGpYpjojaRk5suMxroWbFg91R/7jupEX7w=
-X-Received: by 2002:a65:56cb:0:b0:378:82ed:d74 with SMTP id
- w11-20020a6556cb000000b0037882ed0d74mr5346825pgs.491.1648153439287; Thu, 24
- Mar 2022 13:23:59 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=YcqkWAtIoHhKaWHguuTSHckFy2uV+KOK7nFBpa+JxJo=;
+        b=M+4+GZnePdB78W6UGWqs9ERy/N189gqbK2mYoFD202WBfjkaotiIKHKL4iBxv2N30I
+         374xmz5dIepL0fQEpeMWLUre1TkLXTt1V0YKkXZK6bjvKJ6ujbxwGhyzzd+Joy5rUIZf
+         AnYxRs61NjbyKAlsGq0WxKxqXimLu/gdIyP4Od3NKcxY8fedueWJ0C/MUmZDnSMiUsYu
+         FhoLsxweRmDpmf7wiP1bk3GR2IJmhsE6hdfMRe4VeiavlZetytzQi2KACnvhcdxG4iPC
+         aWE55bPsbJb5pEu/ucVktn/pmGMKDNj7U6v/UlKL1cTRfnvJFkQg2s8eGxLCeo5VOcum
+         aNwg==
+X-Gm-Message-State: AOAM532My/VKpcheCLUoB0Kh0jniS+acAZODOC/Snd4j2t6noMH8vRh9
+        hh8O53FfEvdfSsuqRNe1hZVsLzhe1vtALkcC16vcUmGNNQEj8wN5+zol8Xchjr0c4TgU+Ke1zMR
+        x2nudj13NEu5p
+X-Received: by 2002:a5d:9da0:0:b0:646:4297:19de with SMTP id ay32-20020a5d9da0000000b00646429719demr3763034iob.192.1648154418994;
+        Thu, 24 Mar 2022 13:40:18 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwopmqoCIMeyEsE8B56txeb229eqdmXoF3CZI0belX8dei6vqWnikSzyfxA9iLbrgAEVuuhIw==
+X-Received: by 2002:a5d:9da0:0:b0:646:4297:19de with SMTP id ay32-20020a5d9da0000000b00646429719demr3763023iob.192.1648154418710;
+        Thu, 24 Mar 2022 13:40:18 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id q4-20020a056e0215c400b002c5fdff3087sm2320928ilu.29.2022.03.24.13.40.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Mar 2022 13:40:18 -0700 (PDT)
+Date:   Thu, 24 Mar 2022 14:40:15 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe via iommu <iommu@lists.linux-foundation.org>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        kvm@vger.kernel.org, Niklas Schnelle <schnelle@linux.ibm.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>
+Subject: Re: [PATCH RFC 04/12] kernel/user: Allow user::locked_vm to be
+ usable for iommufd
+Message-ID: <20220324144015.031ca277.alex.williamson@redhat.com>
+In-Reply-To: <20220322161521.GJ11336@nvidia.com>
+References: <4-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
+        <808a871b3918dc067031085de3e8af6b49c6ef89.camel@linux.ibm.com>
+        <20220322145741.GH11336@nvidia.com>
+        <20220322092923.5bc79861.alex.williamson@redhat.com>
+        <20220322161521.GJ11336@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-References: <20220311044811.1980336-1-reijiw@google.com> <20220311044811.1980336-12-reijiw@google.com>
- <Yjt6qvYliEDqzF9j@google.com>
-In-Reply-To: <Yjt6qvYliEDqzF9j@google.com>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Thu, 24 Mar 2022 13:23:42 -0700
-Message-ID: <CAAeT=FwkXSpwtCOrggwg=V72TYCRb24rqHYVUGd+gTEA-jN66w@mail.gmail.com>
-Subject: Re: [PATCH v6 11/25] KVM: arm64: Add remaining ID registers to id_reg_desc_table
-To:     Oliver Upton <oupton@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Fuad Tabba <tabba@google.com>,
-        Peng Liang <liangpeng10@huawei.com>,
-        Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Oliver,
+On Tue, 22 Mar 2022 13:15:21 -0300
+Jason Gunthorpe via iommu <iommu@lists.linux-foundation.org> wrote:
 
-On Wed, Mar 23, 2022 at 12:53 PM Oliver Upton <oupton@google.com> wrote:
->
-> Hi Reiji,
->
-> On Thu, Mar 10, 2022 at 08:47:57PM -0800, Reiji Watanabe wrote:
-> > Add hidden or reserved ID registers, and remaining ID registers,
-> > which don't require special handling, to id_reg_desc_table.
-> > Add 'flags' field to id_reg_desc, which is used to indicates hiddden
-> > or reserved registers. Since now id_reg_desc_init() is called even
-> > for hidden/reserved registers, change it to not do anything for them.
-> >
-> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
->
-> I think there is a very important detail of the series that probably
-> should be highlighted. We are only allowing AArch64 feature registers to
-> be configurable, right? AArch32 feature registers remain visible with
-> their default values passed through to the guest. If you've already
-> stated this as a precondition elsewhere then my apologies for the noise.
->
-> I don't know if adding support for this to AArch32 registers is
-> necessarily the right step forward, either. 32 bit support is working
-> just fine and IMO its OK to limit new KVM features to AArch64-only so
-> long as it doesn't break 32 bit support. Marc of course is the authority
-> on that, though :-)
->
-> If for any reason a guest uses a feature present in the AArch32 feature
-> register but hidden from the AArch64 register, we could be in a
-> particularly difficult position. Especially if we enabled traps based on
-> the AArch64 value and UNDEF the guest.
->
-> One hack we could do is skip trap configuration if AArch32 is visible at
-> either EL1 or EL0, but that may not be the most elegant solution.
-> Otherwise, if we are AArch64-only at every EL then the definition of the
-> AArch32 feature registers is architecturally UNKNOWN, so we can dodge
-> the problem altogether. What are your thoughts?
+> On Tue, Mar 22, 2022 at 09:29:23AM -0600, Alex Williamson wrote:
+> 
+> > I'm still picking my way through the series, but the later compat
+> > interface doesn't mention this difference as an outstanding issue.
+> > Doesn't this difference need to be accounted in how libvirt manages VM
+> > resource limits?    
+> 
+> AFACIT, no, but it should be checked.
+> 
+> > AIUI libvirt uses some form of prlimit(2) to set process locked
+> > memory limits.  
+> 
+> Yes, and ulimit does work fully. prlimit adjusts the value:
+> 
+> int do_prlimit(struct task_struct *tsk, unsigned int resource,
+> 		struct rlimit *new_rlim, struct rlimit *old_rlim)
+> {
+> 	rlim = tsk->signal->rlim + resource;
+> [..]
+> 		if (new_rlim)
+> 			*rlim = *new_rlim;
+> 
+> Which vfio reads back here:
+> 
+> drivers/vfio/vfio_iommu_type1.c:        unsigned long pfn, limit = rlimit(RLIMIT_MEMLOCK) >> PAGE_SHIFT;
+> drivers/vfio/vfio_iommu_type1.c:        unsigned long limit = rlimit(RLIMIT_MEMLOCK) >> PAGE_SHIFT;
+> 
+> And iommufd does the same read back:
+> 
+> 	lock_limit =
+> 		task_rlimit(pages->source_task, RLIMIT_MEMLOCK) >> PAGE_SHIFT;
+> 	npages = pages->npinned - pages->last_npinned;
+> 	do {
+> 		cur_pages = atomic_long_read(&pages->source_user->locked_vm);
+> 		new_pages = cur_pages + npages;
+> 		if (new_pages > lock_limit)
+> 			return -ENOMEM;
+> 	} while (atomic_long_cmpxchg(&pages->source_user->locked_vm, cur_pages,
+> 				     new_pages) != cur_pages);
+> 
+> So it does work essentially the same.
 
-Thank you so much for your review, Oliver!
+Well, except for the part about vfio updating mm->locked_vm and iommufd
+updating user->locked_vm, a per-process counter versus a per-user
+counter.  prlimit specifically sets process resource limits, which get
+reflected in task_rlimit.
 
-For aarch32 guests (when KVM_ARM_VCPU_EL1_32BIT is configured),
-yes, the current series is problematic as you mentioned...
-I am thinking of disallowing configuring ID registers (keep ID
-registers immutable) for the aarch32 guests for now at least.
-(will document that)
+For example, let's say a user has two 4GB VMs and they're hot-adding
+vfio devices to each of them, so libvirt needs to dynamically modify
+the locked memory limit for each VM.  AIUI, libvirt would look at the
+VM size and call prlimit to set that value.  If libvirt does this to
+both VMs, then each has a task_rlimit of 4GB.  In vfio we add pinned
+pages to mm->locked_vm, so this works well.  In the iommufd loop above,
+we're comparing a per-task/process limit to a per-user counter.  So I'm
+a bit lost how both VMs can pin their pages here.
 
-For aarch64 guests that support EL0 aarch32, it would generally
-be a userspace bug if userspace sets inconsistent values in 32bit
-and 64bit ID registers. KVM doesn't provide a complete consistency
-checking for ID registers, but this could be added later as needed.
+Am I missing some assumption about how libvirt users prlimit or
+sandboxes users?
 
-It might be a good idea to skip trap configuration to avoid being
-affected by the issue.  On the other hand, this might provide a
-good opportunity to detect such userspace issue.  As this could
-happen only with new userspace code that changes ID registers,
-I might rather prefer the latter?
+> The difference is more subtle, iouring/etc puts the charge in the user
+> so it is additive with things like iouring and additively spans all
+> the users processes.
+> 
+> However vfio is accounting only per-process and only for itself - no
+> other subsystem uses locked as the charge variable for DMA pins.
+> 
+> The user visible difference will be that a limit X that worked with
+> VFIO may start to fail after a kernel upgrade as the charge accounting
+> is now cross user and additive with things like iommufd.
 
-Thanks,
-Reiji
+And that's exactly the concern.
+ 
+> This whole area is a bit peculiar (eg mlock itself works differently),
+> IMHO, but with most of the places doing pins voting to use
+> user->locked_vm as the charge it seems the right path in today's
+> kernel.
+
+The philosophy of whether it's ultimately a better choice for the
+kernel aside, if userspace breaks because we're accounting in a
+per-user pool rather than a per-process pool, then our compatibility
+layer ain't so transparent.
+
+> Ceratinly having qemu concurrently using three different subsystems
+> (vfio, rdma, iouring) issuing FOLL_LONGTERM and all accounting for
+> RLIMIT_MEMLOCK differently cannot be sane or correct.
+
+I think everyone would agree with that, but it also seems there are
+real differences between task_rlimits and per-user vs per-process
+accounting buckets and I'm confused how that's not a blocker for trying
+to implement transparent compatibility.  Thanks,
+
+Alex
+
