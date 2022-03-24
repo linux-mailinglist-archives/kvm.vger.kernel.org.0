@@ -2,127 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 638E84E60B3
-	for <lists+kvm@lfdr.de>; Thu, 24 Mar 2022 09:53:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5BE824E6102
+	for <lists+kvm@lfdr.de>; Thu, 24 Mar 2022 10:20:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349050AbiCXIzJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Mar 2022 04:55:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47502 "EHLO
+        id S1349184AbiCXJWJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Mar 2022 05:22:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237920AbiCXIzG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Mar 2022 04:55:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 168FD6D3B5
-        for <kvm@vger.kernel.org>; Thu, 24 Mar 2022 01:53:34 -0700 (PDT)
+        with ESMTP id S237756AbiCXJWI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Mar 2022 05:22:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 10A645DA42
+        for <kvm@vger.kernel.org>; Thu, 24 Mar 2022 02:20:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1648112013;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
+        s=mimecast20190719; t=1648113636;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=IJbIkl3tOBYBOsFF1RkaEbz4ogjAna9YQQVV57sAQkA=;
-        b=OJzempDXtenO9wuNpO1m7k+qRqT4cbjbty65qRDLgfKlJpW3m5sLktp/UUnQHc8bzRhbKV
-        lQdhqQiHJvX0LDJ1kik+w0GUTG0KAf9js+Y55vgVA3cn+NXOhCmwyvkPQAS1fQrPkUIOZf
-        vEoZKq+NKm+rVKyD0A4lW2KLIrEk6q8=
+        bh=m6cTh4I7UZgOvgJZg1g3+MamKX/v6MrkfYevPTqDtOQ=;
+        b=T3dzAKokgF24odxQyjCqAf2BZNNdTP+Vc7dnEea7pfyYY+0fQVqwB0bKpNPf1OSgdW6gzo
+        h/M1kPsP4lqJNqUOWCG2oDnfQ0q5tNOfmrFWWg6kM+CNCOK/k6XUvLO1ZspzyFb//2joU3
+        uqHBvmUMywGtdxoRkXP43bBiAyw6MI0=
 Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
  [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-588-9nIOWJdqMDeqxHmDcDzsFw-1; Thu, 24 Mar 2022 04:53:29 -0400
-X-MC-Unique: 9nIOWJdqMDeqxHmDcDzsFw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+ us-mta-251-gVDYTvbPMXGAN7VyNstF0A-1; Thu, 24 Mar 2022 05:20:32 -0400
+X-MC-Unique: gVDYTvbPMXGAN7VyNstF0A-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3D2FD28078E1;
-        Thu, 24 Mar 2022 08:53:29 +0000 (UTC)
-Received: from redhat.com (unknown [10.33.36.80])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E457D2024CB6;
-        Thu, 24 Mar 2022 08:52:41 +0000 (UTC)
-Date:   Thu, 24 Mar 2022 08:52:39 +0000
-From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Gerd Hoffmann <kraxel@redhat.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= 
-        <philippe.mathieu.daude@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Laszlo Ersek <lersek@redhat.com>,
-        Eric Blake <eblake@redhat.com>,
-        Connor Kuehl <ckuehl@redhat.com>, isaku.yamahata@intel.com,
-        erdemaktas@google.com, kvm@vger.kernel.org, qemu-devel@nongnu.org,
-        seanjc@google.com
-Subject: Re: [RFC PATCH v3 17/36] pflash_cfi01/tdx: Introduce ram_mode of
- pflash for TDVF
-Message-ID: <YjwxV6++RxdpXt6M@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20220317135913.2166202-1-xiaoyao.li@intel.com>
- <20220317135913.2166202-18-xiaoyao.li@intel.com>
- <f418548e-c24c-1bc3-4e16-d7a775298a18@gmail.com>
- <7a8233e4-0cae-b05a-7931-695a7ee87fc9@intel.com>
- <20220322092141.qsgv3pqlvlemgrgw@sirius.home.kraxel.org>
- <YjmXFZRCbKXTkAhN@redhat.com>
- <e7fb2eab-b2b1-dd0e-4821-4cca40751d15@intel.com>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 360163806648;
+        Thu, 24 Mar 2022 09:20:32 +0000 (UTC)
+Received: from localhost (unknown [10.39.195.77])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id AD764140262B;
+        Thu, 24 Mar 2022 09:20:31 +0000 (UTC)
+Date:   Thu, 24 Mar 2022 09:20:30 +0000
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>, Asias He <asias@redhat.com>,
+        Arseny Krasnov <arseny.krasnov@kaspersky.com>,
+        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCH net v3 0/3] vsock/virtio: enable VQs early on probe and
+ finish the setup before using them
+Message-ID: <Yjw33hb1u4Da6pKK@stefanha-x1.localdomain>
+References: <20220323173625.91119-1-sgarzare@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="eKzvWnn8+0FZDZiL"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <e7fb2eab-b2b1-dd0e-4821-4cca40751d15@intel.com>
-User-Agent: Mutt/2.1.5 (2021-12-30)
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.4
+In-Reply-To: <20220323173625.91119-1-sgarzare@redhat.com>
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
 X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 24, 2022 at 02:13:53PM +0800, Xiaoyao Li wrote:
-> On 3/22/2022 5:29 PM, Daniel P. Berrangé wrote:
-> > On Tue, Mar 22, 2022 at 10:21:41AM +0100, Gerd Hoffmann wrote:
-> > >    Hi,
-> > > 
-> > > > > If you don't need a pflash device, don't use it: simply map your nvram
-> > > > > region as ram in your machine. No need to clutter the pflash model like
-> > > > > that.
-> > > 
-> > > Using the pflash device for something which isn't actually flash looks a
-> > > bit silly indeed.
-> > > 
-> > > > 
-> > > > I know it's dirty to hack the pflash device. The purpose is to make the user
-> > > > interface unchanged that people can still use
-> > > > 
-> > > > 	-drive if=pflash,format=raw,unit=0,file=/path/to/OVMF_CODE.fd
-> > > >          -drive if=pflash,format=raw,unit=1,file=/path/to/OVMF_VARS.fd
-> > > > 
-> > > > to create TD guest.
-> > > 
-> > > Well, if persistent vars are not supported anyway there is little reason
-> > > to split the firmware into CODE and VARS files.  You can use just use
-> > > OVMF.fd with a single pflash device.  libvirt recently got support for
-> > > that.
-> > 
-> > Agreed.
-> 
-> The purpose of using split firmware is that people can share the same
-> code.fd while using different vars.fd
 
-That's fine for firmware that writes to vars.fd, but it was said earlier
-that changes aren't written with TDX (nor are they written with SEV),
-so a separate vars.fd serves no pupose in these cases.
+--eKzvWnn8+0FZDZiL
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-With regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+On Wed, Mar 23, 2022 at 06:36:22PM +0100, Stefano Garzarella wrote:
+> The first patch fixes a virtio-spec violation. The other two patches
+> complete the driver configuration before using the VQs in the probe.
+>=20
+> The patch order should simplify backporting in stable branches.
+>=20
+> v3:
+> - re-ordered the patch to improve bisectability [MST]
+>=20
+> v2: https://lore.kernel.org/netdev/20220323084954.11769-1-sgarzare@redhat=
+=2Ecom/
+> v1: https://lore.kernel.org/netdev/20220322103823.83411-1-sgarzare@redhat=
+=2Ecom/
+>=20
+> Stefano Garzarella (3):
+>   vsock/virtio: initialize vdev->priv before using VQs
+>   vsock/virtio: read the negotiated features before using VQs
+>   vsock/virtio: enable VQs early on probe
+>=20
+>  net/vmw_vsock/virtio_transport.c | 11 +++++++----
+>  1 file changed, 7 insertions(+), 4 deletions(-)
+>=20
+> --=20
+> 2.35.1
+>=20
+
+A subtle point is that we still drop events and rx packets during the
+window where DRIVER_OK has been set but vqs haven't been filled.
+This is acceptable because it's unavoidable and equivalent to events
+happening before DRIVER_OK is set. What this revision *does* fix is that
+vq used buffer notifications are no longer lost. Good.
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--eKzvWnn8+0FZDZiL
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmI8N94ACgkQnKSrs4Gr
+c8j+jAgAl3SNYonulML5v3KQQY538H3xIog/TepsoHOzV9JYFRnvHbKd45XUy9uQ
+/SWZsBt1J4gXz73ejgF+aNpMhfy5rNvFzEETQhsdm8Jd9Nsdh9bmh53GBaYzXm8M
+SzhrB2Zje+VAVpemGrAWfpSSIuc8ZbZYUOb2eQzpWelR2GKiVyqAXdjyZzbr5CLI
+n0T9fgrzNIejcl6AQ0sGKNw8a60ArlWdU0EHQzaT5hmeDbUF3dsZ9lfGT5IFrxpu
+ksdPyCe5vidOQye9dRAvRQVXhVpo9MPAL83jcKY09QWpSrsz3UJZZbYAbULbOQhO
+IrbJvaefmdbRXxr1Ylv8d1qhJ9pWXA==
+=bbzl
+-----END PGP SIGNATURE-----
+
+--eKzvWnn8+0FZDZiL--
 
