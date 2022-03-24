@@ -2,83 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 85CEE4E5FEB
-	for <lists+kvm@lfdr.de>; Thu, 24 Mar 2022 09:08:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5DBC14E601B
+	for <lists+kvm@lfdr.de>; Thu, 24 Mar 2022 09:13:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348774AbiCXIKJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Mar 2022 04:10:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40898 "EHLO
+        id S236401AbiCXIPA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Mar 2022 04:15:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52088 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347283AbiCXIKH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Mar 2022 04:10:07 -0400
+        with ESMTP id S240266AbiCXIO4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Mar 2022 04:14:56 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BB52449920
-        for <kvm@vger.kernel.org>; Thu, 24 Mar 2022 01:08:34 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0EC496D3A0
+        for <kvm@vger.kernel.org>; Thu, 24 Mar 2022 01:13:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1648109313;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        s=mimecast20190719; t=1648109603;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=SU4E4d+EQ6sdIzJU8wyzsXPKrg3wnnVy1ZJmMoN/oGw=;
-        b=DiHrk+H6PPj1OEZRT6Po60+6VVtz5oYEs+NUFRgUxuTZyLYrml+GkemXpilD9pMdXhAriy
-        tzPA8zajQMdEJKVl5jIvd9/rj4n2cHBFR+aNqBmnL5w66piYmuw0FzoD/KR15om1P9UWGU
-        QL0WpDiYeO5jWLvIr+0vCkhLaoA+Kr4=
+        bh=kdR6oSXMqEs5QEeFJD+qqMG0zJL2wvv5dMMWUkVUeNU=;
+        b=Qj1n2Y9TOQV5Ts7llIm2bw4FY1BnT/QpckIcUViJhfZcdA5vOObhGa+ic7a7IeyxEKj3lU
+        wSDMDMmyTUBJOvLdXfTHimnM0g8935xB7+P6SmJLMPA33hqj0GHIWMXx0Yp5QzeKExhuoT
+        HbT+hlPtpo/iWr8CEWAgYcNfrfyV0B0=
 Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
  [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-217-dVR-ESqvNXS5tfMI9MaDnA-1; Thu, 24 Mar 2022 04:08:32 -0400
-X-MC-Unique: dVR-ESqvNXS5tfMI9MaDnA-1
-Received: by mail-wr1-f71.google.com with SMTP id s8-20020adfc548000000b00203eba1052eso1408213wrf.1
-        for <kvm@vger.kernel.org>; Thu, 24 Mar 2022 01:08:32 -0700 (PDT)
+ us-mta-137-FOmuI4pDNvGSmCvUg0h43w-1; Thu, 24 Mar 2022 04:13:21 -0400
+X-MC-Unique: FOmuI4pDNvGSmCvUg0h43w-1
+Received: by mail-wr1-f71.google.com with SMTP id i64-20020adf90c6000000b00203f2b5e090so1407556wri.9
+        for <kvm@vger.kernel.org>; Thu, 24 Mar 2022 01:13:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=SU4E4d+EQ6sdIzJU8wyzsXPKrg3wnnVy1ZJmMoN/oGw=;
-        b=6kOcqyCuP4umRSFOKxofTU/9/zQ08AprEx4cQNuQdxrpHZdK4A5L56Eda1EL82NtKK
-         d3BN0LvKo8rzVlGn1wJ4G+1GezduqDIXGpLWM6RK5/m4XI+USNjD28gHOmMSA6GeZjxO
-         znnDOcCBcZJNpb8yKzfaj8wfd1+0dRBMWEcSSMLemF/Yp946JnypHsvidhiI+eb+KzOz
-         S3+v7p/zaWaOWXQ0xRBxsaDojSe1NmHGzdggsQ0b/huXXulwGI7CpQ1QamGLyNtENluU
-         rdjzyokxklYHcXXzOlYEh8y1huv+B8LS9xtt9hOHB6hzmZ4q7DHEmdfVI4Ur41iXqQV2
-         OdOg==
-X-Gm-Message-State: AOAM532i8zeTPe+1rlcnFvgZW7CZoIUduHEw7WuoDhIKfrFhNMgdjL6Y
-        tovf2TPVhnRf8cHsU/ZMJS1PBzJmt5tfcHIUMyy32DO482NSKnuQtXTvKLryhktzoIBiUj0JGxK
-        VYEAmt+9VwMRF
-X-Received: by 2002:a1c:29c3:0:b0:350:9797:b38f with SMTP id p186-20020a1c29c3000000b003509797b38fmr13060142wmp.22.1648109311263;
-        Thu, 24 Mar 2022 01:08:31 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyHcnWjquihS0Yb64SRxvQtrTJwe4xJa7MDXtanktK95XA2/7IxPTOgHdNxbVyWqH3m6oZ4Mg==
-X-Received: by 2002:a1c:29c3:0:b0:350:9797:b38f with SMTP id p186-20020a1c29c3000000b003509797b38fmr13060126wmp.22.1648109311024;
-        Thu, 24 Mar 2022 01:08:31 -0700 (PDT)
-Received: from [192.168.8.104] (tmo-098-218.customers.d1-online.com. [80.187.98.218])
-        by smtp.gmail.com with ESMTPSA id e12-20020a5d6d0c000000b001a65e479d20sm2190191wrq.83.2022.03.24.01.08.29
+        h=x-gm-message-state:reply-to:subject:to:cc:references:from
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-transfer-encoding:content-language;
+        bh=kdR6oSXMqEs5QEeFJD+qqMG0zJL2wvv5dMMWUkVUeNU=;
+        b=ZVcyP0YoqvM0u8VgrlC478Uy/u9h3ssML7eXqw/AqG5IrkB+eSrPe2oiTe03ZBPYen
+         ZrRGE5+EJcbxY6/wQkmZsLGlit6nVK2VATK3IlB1pNvj6e9QrLZLfXkb0Svhm9cL9Fr6
+         X9uCPQU3lS6yoqQdS2dDAdPLqMLVTQpWOtJHRS7pxhNZYq0xaZwnE8zmVsDZ44kfqc9X
+         xMcA3rk+WCoFoGYKW7kCd6UKclAqYK/Jb3NfHJWq6AVquma1NJwYlRuwzOjDL6YeNcZc
+         wIa10P0vESQJ2QzQ4r0iE80U2pN/Pi6YfaC0NDZSjru0j34fC2ryg1jEt40NbuYW+CwA
+         XgTA==
+X-Gm-Message-State: AOAM530dhxFJUOLoWb55RnBEWiMf+Wx5WnnBxz2DQuYrjDFia2k0lq1e
+        B5uI7yd1DMGll2f287Lw7oIfFWCWB6K62k/RVOONVeZmmLv4rNabA6KEyi31WhU+YdAP/ssGjjo
+        XH8rTOGn4W0+t
+X-Received: by 2002:adf:ed44:0:b0:203:f01a:8823 with SMTP id u4-20020adfed44000000b00203f01a8823mr3532528wro.715.1648109600330;
+        Thu, 24 Mar 2022 01:13:20 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJykb968cvCLnkpRKg9daNsEmZubE3gLy10E3lBlAv85eiKoR4YsMpEUVyx/aU9lxRLfqvVTYg==
+X-Received: by 2002:adf:ed44:0:b0:203:f01a:8823 with SMTP id u4-20020adfed44000000b00203f01a8823mr3532497wro.715.1648109600033;
+        Thu, 24 Mar 2022 01:13:20 -0700 (PDT)
+Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id f1-20020a1c6a01000000b0038c9f6a3634sm5479485wmc.7.2022.03.24.01.13.18
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Mar 2022 01:08:30 -0700 (PDT)
-Message-ID: <6d8edf09-0055-ff7a-22b5-92679f777f5b@redhat.com>
-Date:   Thu, 24 Mar 2022 09:08:28 +0100
+        Thu, 24 Mar 2022 01:13:19 -0700 (PDT)
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH RFC 11/12] iommufd: vfio container FD ioctl compatibility
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        iommu@lists.linux-foundation.org, Jason Wang <jasowang@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        Yi Liu <yi.l.liu@intel.com>, Keqian Zhu <zhukeqian1@huawei.com>
+References: <0-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
+ <11-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
+ <20220323165125.5efd5976.alex.williamson@redhat.com>
+ <20220324003342.GV11336@nvidia.com>
+From:   Eric Auger <eric.auger@redhat.com>
+Message-ID: <09a6557f-b881-081c-abdf-266516f7b0eb@redhat.com>
+Date:   Thu, 24 Mar 2022 09:13:17 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.0
-Subject: Re: [PATCH kvm-unit-tests v2 1/6] lib: s390x: smp: Retry SIGP SENSE
- on CC2
-Content-Language: en-US
-To:     Eric Farman <farman@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Nico Boehr <nrb@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-References: <20220311173822.1234617-1-farman@linux.ibm.com>
- <20220311173822.1234617-2-farman@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <20220311173822.1234617-2-farman@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <20220324003342.GV11336@nvidia.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
         RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -86,39 +101,102 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/03/2022 18.38, Eric Farman wrote:
-> The routine smp_cpu_stopped() issues a SIGP SENSE, and returns true
-> if it received a CC1 (STATUS STORED) with the STOPPED or CHECK STOP
-> bits enabled. Otherwise, it returns false.
-> 
-> This is misleading, because a CC2 (BUSY) merely indicates that the
-> order code could not be processed, not that the CPU is operating.
-> It could be operating but in the process of being stopped.
-> 
-> Convert the invocation of the SIGP SENSE to retry when a CC2 is
-> received, so we get a more definitive answer.
-> 
-> Signed-off-by: Eric Farman <farman@linux.ibm.com>
-> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
-> Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
-> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> ---
->   lib/s390x/smp.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
-> index 46e1b022..368d6add 100644
-> --- a/lib/s390x/smp.c
-> +++ b/lib/s390x/smp.c
-> @@ -78,7 +78,7 @@ bool smp_cpu_stopped(uint16_t idx)
->   {
->   	uint32_t status;
->   
-> -	if (smp_sigp(idx, SIGP_SENSE, 0, &status) != SIGP_CC_STATUS_STORED)
-> +	if (smp_sigp_retry(idx, SIGP_SENSE, 0, &status) != SIGP_CC_STATUS_STORED)
->   		return false;
->   	return !!(status & (SIGP_STATUS_CHECK_STOP|SIGP_STATUS_STOPPED));
->   }
+Hi,
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+On 3/24/22 1:33 AM, Jason Gunthorpe wrote:
+> On Wed, Mar 23, 2022 at 04:51:25PM -0600, Alex Williamson wrote:
+>
+>> My overall question here would be whether we can actually achieve a
+>> compatibility interface that has sufficient feature transparency that we
+>> can dump vfio code in favor of this interface, or will there be enough
+>> niche use cases that we need to keep type1 and vfio containers around
+>> through a deprecation process?
+> Other than SPAPR, I think we can.
+>
+>> The locked memory differences for one seem like something that
+>> libvirt wouldn't want hidden
+> I'm first interested to have an understanding how this change becomes
+> a real problem in practice that requires libvirt to do something
+> different for vfio or iommufd. We can discuss in the other thread
+>
+> If this is the make or break point then I think we can deal with it
+> either by going back to what vfio does now or perhaps some other
+> friendly compat approach..
+>
+>> and we have questions regarding support for vaddr hijacking
+> I'm not sure what vaddr hijacking is? Do you mean
+> VFIO_DMA_MAP_FLAG_VADDR ? There is a comment that outlines my plan to
+> implement it in a functionally compatible way without the deadlock
+> problem. I estimate this as a small project.
+>
+>> and different ideas how to implement dirty page tracking, 
+> I don't think this is compatibility. No kernel today triggers qemu to
+> use this feature as no kernel supports live migration. No existing
+> qemu will trigger this feature with new kernels that support live
+> migration v2. Therefore we can adjust qemu's dirty tracking at the
+> same time we enable migration v2 in qemu.
+>
+> With Joao's work we are close to having a solid RFC to come with
+> something that can be fully implemented.
+>
+> Hopefully we can agree to this soon enough that qemu can come with a
+> full package of migration v2 support including the dirty tracking
+> solution.
+>
+>> not to mention the missing features that are currently well used,
+>> like p2p mappings, coherency tracking, mdev, etc.
+> I consider these all mandatory things, they won't be left out.
+>
+> The reason they are not in the RFC is mostly because supporting them
+> requires work outside just this iommufd area, and I'd like this series
+> to remain self-contained.
+>
+> I've already got a draft to add DMABUF support to VFIO PCI which
+> nicely solves the follow_pfn security problem, we want to do this for
+> another reason already. I'm waiting for some testing feedback before
+> posting it. Need some help from Daniel make the DMABUF revoke semantic
+> him and I have been talking about. In the worst case can copy the
+> follow_pfn approach.
+>
+> Intel no-snoop is simple enough, just needs some Intel cleanup parts.
+>
+> mdev will come along with the final VFIO integration, all the really
+> hard parts are done already. The VFIO integration is a medium sized
+> task overall.
+>
+> So, I'm not ready to give up yet :)
+>
+>> Where do we focus attention?  Is symlinking device files our proposal
+>> to userspace and is that something achievable, or do we want to use
+>> this compatibility interface as a means to test the interface and
+>> allow userspace to make use of it for transition, if their use cases
+>> allow it, perhaps eventually performing the symlink after deprecation
+>> and eventual removal of the vfio container and type1 code?  Thanks,
+> symlinking device files is definitely just a suggested way to expedite
+> testing.
+>
+> Things like qemu that are learning to use iommufd-only features should
+> learn to directly open iommufd instead of vfio container to activate
+> those features.
+>
+> Looking long down the road I don't think we want to have type 1 and
+> iommufd code forever. So, I would like to make an option to compile
+> out vfio container support entirely and have that option arrange for
+> iommufd to provide the container device node itself.
+I am currently working on migrating the QEMU VFIO device onto the new
+API because since after our discussions the compat mode cannot be used
+anyway to implemented nesting. I hope I will be able to present
+something next week.
+
+Thanks
+
+Eric
+>
+> I think we can get there pretty quickly, or at least I haven't got
+> anything that is scaring me alot (beyond SPAPR of course)
+>
+> For the dpdk/etcs of the world I think we are already there.
+>
+> Jason
+>
 
