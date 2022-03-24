@@ -2,124 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5BE824E6102
-	for <lists+kvm@lfdr.de>; Thu, 24 Mar 2022 10:20:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AF5654E612A
+	for <lists+kvm@lfdr.de>; Thu, 24 Mar 2022 10:37:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349184AbiCXJWJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Mar 2022 05:22:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58016 "EHLO
+        id S239549AbiCXJjF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Mar 2022 05:39:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43018 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237756AbiCXJWI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Mar 2022 05:22:08 -0400
+        with ESMTP id S233759AbiCXJjD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Mar 2022 05:39:03 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 10A645DA42
-        for <kvm@vger.kernel.org>; Thu, 24 Mar 2022 02:20:36 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A47A09F388
+        for <kvm@vger.kernel.org>; Thu, 24 Mar 2022 02:37:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1648113636;
+        s=mimecast20190719; t=1648114650;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=m6cTh4I7UZgOvgJZg1g3+MamKX/v6MrkfYevPTqDtOQ=;
-        b=T3dzAKokgF24odxQyjCqAf2BZNNdTP+Vc7dnEea7pfyYY+0fQVqwB0bKpNPf1OSgdW6gzo
-        h/M1kPsP4lqJNqUOWCG2oDnfQ0q5tNOfmrFWWg6kM+CNCOK/k6XUvLO1ZspzyFb//2joU3
-        uqHBvmUMywGtdxoRkXP43bBiAyw6MI0=
+        bh=z13C+cFsOjA9oyUdtfruMEl5Jb9AVjMyAZ5/T/RGscA=;
+        b=i4C22Le7JzQINeW06JzGtG/jgEFK7fbfjumyVvu/RMymlw6+TYzoknsdvbiUqnyIohOY/5
+        I4mJPkr74e7aSf2+OhZtQhMBiF9a8EAPs7FbSO2FRQjPGfA2O5ogFg+d3q+M70Nznrw+oj
+        PKLpmcoH4Ys49cs7xEVrbn+Yfq1gCcI=
 Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
  [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-251-gVDYTvbPMXGAN7VyNstF0A-1; Thu, 24 Mar 2022 05:20:32 -0400
-X-MC-Unique: gVDYTvbPMXGAN7VyNstF0A-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+ us-mta-261-iG0TfI8gMdKrSU85ZQ0etQ-1; Thu, 24 Mar 2022 05:37:27 -0400
+X-MC-Unique: iG0TfI8gMdKrSU85ZQ0etQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 360163806648;
-        Thu, 24 Mar 2022 09:20:32 +0000 (UTC)
-Received: from localhost (unknown [10.39.195.77])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AD764140262B;
-        Thu, 24 Mar 2022 09:20:31 +0000 (UTC)
-Date:   Thu, 24 Mar 2022 09:20:30 +0000
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>, Asias He <asias@redhat.com>,
-        Arseny Krasnov <arseny.krasnov@kaspersky.com>,
-        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH net v3 0/3] vsock/virtio: enable VQs early on probe and
- finish the setup before using them
-Message-ID: <Yjw33hb1u4Da6pKK@stefanha-x1.localdomain>
-References: <20220323173625.91119-1-sgarzare@redhat.com>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id ED8DE296A610;
+        Thu, 24 Mar 2022 09:37:26 +0000 (UTC)
+Received: from sirius.home.kraxel.org (unknown [10.39.196.67])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id B1CF2C27D86;
+        Thu, 24 Mar 2022 09:37:26 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+        id 37BC518000AA; Thu, 24 Mar 2022 10:37:25 +0100 (CET)
+Date:   Thu, 24 Mar 2022 10:37:25 +0100
+From:   Gerd Hoffmann <kraxel@redhat.com>
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Laszlo Ersek <lersek@redhat.com>,
+        Eric Blake <eblake@redhat.com>,
+        Connor Kuehl <ckuehl@redhat.com>, isaku.yamahata@intel.com,
+        erdemaktas@google.com, kvm@vger.kernel.org, qemu-devel@nongnu.org,
+        seanjc@google.com
+Subject: Re: [RFC PATCH v3 12/36] i386/tdx: Add property sept-ve-disable for
+ tdx-guest object
+Message-ID: <20220324093725.hs3kpcehsbklacnj@sirius.home.kraxel.org>
+References: <20220317135913.2166202-1-xiaoyao.li@intel.com>
+ <20220317135913.2166202-13-xiaoyao.li@intel.com>
+ <20220322090238.6job2whybu6ntor7@sirius.home.kraxel.org>
+ <b452d357-8fc2-c49c-8c19-a57b1ff287e8@intel.com>
+ <20220324075703.7ha44rd463uwnl55@sirius.home.kraxel.org>
+ <4fc788e8-1805-c7cd-243d-ccd2a6314a68@intel.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="eKzvWnn8+0FZDZiL"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220323173625.91119-1-sgarzare@redhat.com>
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
+In-Reply-To: <4fc788e8-1805-c7cd-243d-ccd2a6314a68@intel.com>
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
 X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+  Hi,
 
---eKzvWnn8+0FZDZiL
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> #VE can be triggered in various situations. e.g., CPUID on some leaves, and
+> RD/WRMSR on some MSRs. #VE on pending page is just one of the sources, Linux
+> just wants to disable this kind of #VE since it wants to prevent unexpected
+> #VE during SYSCALL gap.
 
-On Wed, Mar 23, 2022 at 06:36:22PM +0100, Stefano Garzarella wrote:
-> The first patch fixes a virtio-spec violation. The other two patches
-> complete the driver configuration before using the VQs in the probe.
->=20
-> The patch order should simplify backporting in stable branches.
->=20
-> v3:
-> - re-ordered the patch to improve bisectability [MST]
->=20
-> v2: https://lore.kernel.org/netdev/20220323084954.11769-1-sgarzare@redhat=
-=2Ecom/
-> v1: https://lore.kernel.org/netdev/20220322103823.83411-1-sgarzare@redhat=
-=2Ecom/
->=20
-> Stefano Garzarella (3):
->   vsock/virtio: initialize vdev->priv before using VQs
->   vsock/virtio: read the negotiated features before using VQs
->   vsock/virtio: enable VQs early on probe
->=20
->  net/vmw_vsock/virtio_transport.c | 11 +++++++----
->  1 file changed, 7 insertions(+), 4 deletions(-)
->=20
-> --=20
-> 2.35.1
->=20
+Linux guests can't disable those on their own?  Requiring this being
+configured on the host looks rather fragile to me ...
 
-A subtle point is that we still drop events and rx packets during the
-window where DRIVER_OK has been set but vqs haven't been filled.
-This is acceptable because it's unavoidable and equivalent to events
-happening before DRIVER_OK is set. What this revision *does* fix is that
-vq used buffer notifications are no longer lost. Good.
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---eKzvWnn8+0FZDZiL
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmI8N94ACgkQnKSrs4Gr
-c8j+jAgAl3SNYonulML5v3KQQY538H3xIog/TepsoHOzV9JYFRnvHbKd45XUy9uQ
-/SWZsBt1J4gXz73ejgF+aNpMhfy5rNvFzEETQhsdm8Jd9Nsdh9bmh53GBaYzXm8M
-SzhrB2Zje+VAVpemGrAWfpSSIuc8ZbZYUOb2eQzpWelR2GKiVyqAXdjyZzbr5CLI
-n0T9fgrzNIejcl6AQ0sGKNw8a60ArlWdU0EHQzaT5hmeDbUF3dsZ9lfGT5IFrxpu
-ksdPyCe5vidOQye9dRAvRQVXhVpo9MPAL83jcKY09QWpSrsz3UJZZbYAbULbOQhO
-IrbJvaefmdbRXxr1Ylv8d1qhJ9pWXA==
-=bbzl
------END PGP SIGNATURE-----
-
---eKzvWnn8+0FZDZiL--
+take care,
+  Gerd
 
