@@ -2,70 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6DE994E67FE
-	for <lists+kvm@lfdr.de>; Thu, 24 Mar 2022 18:44:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 687D14E6825
+	for <lists+kvm@lfdr.de>; Thu, 24 Mar 2022 18:54:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347055AbiCXRpw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Mar 2022 13:45:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34644 "EHLO
+        id S1351059AbiCXR4Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Mar 2022 13:56:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33088 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352378AbiCXRpu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Mar 2022 13:45:50 -0400
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6F7A24BFB
-        for <kvm@vger.kernel.org>; Thu, 24 Mar 2022 10:44:18 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id n18so5511598plg.5
-        for <kvm@vger.kernel.org>; Thu, 24 Mar 2022 10:44:18 -0700 (PDT)
+        with ESMTP id S1343825AbiCXR4Z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Mar 2022 13:56:25 -0400
+Received: from mail-io1-xd2f.google.com (mail-io1-xd2f.google.com [IPv6:2607:f8b0:4864:20::d2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC4F8B53F3
+        for <kvm@vger.kernel.org>; Thu, 24 Mar 2022 10:54:52 -0700 (PDT)
+Received: by mail-io1-xd2f.google.com with SMTP id c23so6281568ioi.4
+        for <kvm@vger.kernel.org>; Thu, 24 Mar 2022 10:54:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=JfImJNUCbOehpPz7FrsS+IWbAILIBYPU3ZnKO+FYvRQ=;
-        b=s6x6LiUDzlAFTcLdWRbBUmnmxmCBr8FcdjXVQg4gtGYz1RPMAHUhAXgCqEBkFFwcac
-         zvjHpBFRKv3l5P67SdaEE3NMmyz1r9Jl7TpFz/IzyAdERdMynMkMAZZZuTuJnmA7Ppi9
-         zCcFIOZVEEnj6a4EsZgR/uLOPfbrFQytJ8x2JUyhKouhD5cGpRCLKJDVJ5Syhl+HHHuj
-         SA7pyYynBbJZiM2Z1y+OJLgg+1vsLcSmzEtTo44ktiCo7W2gDJBaYI5C84+8wo9yl8Ry
-         tvbi+0x1xyks/qHr8Ju5UdWYiNoFiXE7INhmWQGI1O3VCDl1YYg8YaN+wUAcjHXL+pPI
-         Bofw==
+        bh=gpG1idH+Yq/AlWXjwzOnwn1kVIZQXLkaIHYX97/MawQ=;
+        b=MYpAl0OQXl6DvwrVD7oy+bSQQqNg8SzP7VXOO84WaYazJhr9XS2f5kxDw24CAaifTr
+         XYAEnoOIj46wwuvT0rRDJAfb1aoGKUamh9vzpKSzPEOEY+bJYsaPhBoaINOBXhEmOAiw
+         KiedNaBLZ3jdwTBxaM/VKdEvZdBAryD3zg3fpOvnZ4cB81KKHHb+eJhpWqpsj7Hn7cjJ
+         m1i4GTvG4gz6KPMJIEu7blaa1fXR1yDB7K4DH0wCvMfRckd60AUbHwP+/DWoye89eoQc
+         I7I5cSKenjipPbDxDB1h2Jg2wbo79tKxwivIUKIr25hGbyxwtosPkudzXi5SCnSnMA6G
+         evRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=JfImJNUCbOehpPz7FrsS+IWbAILIBYPU3ZnKO+FYvRQ=;
-        b=oq06K+/KRHVn0yU/j3HOQeiLRCewVANw704y2DvjsXESss7Xdv/DFIya3VPIOAXmVo
-         p/XSdJ4ley4IbVzKLG8Vca1gSd6bAJdKESHAMcgRpxAQP6WB/tX+ShJRpcrikxxSPoti
-         JQkA4TQbIz4o4YAXX64gR5d8gcEeORRpH1VUJwgFs92dnHvUrhVZkA3XPZPUHyURqbpb
-         NbHp4CnXwqR6qhuIZqAV2ZZLyE9AU4AmjFO4LWSUfEpalCjY5EalT6HYAtUWTKxCBRCv
-         CzAS3XVDW4sQWGtCzdZXKmjUdXHblqzROkAF0Xo7Nc9+/ZO6OpXktTCjgEYhW+bKfAhJ
-         eE3g==
-X-Gm-Message-State: AOAM532gXsE+thk8rsZGvMxhWiE8o+LpWwIA0Sfb6zo1c7nboxZUVcmC
-        tk/av6X/hTyR11FkdXw7WT2uZw==
-X-Google-Smtp-Source: ABdhPJwEj/KvNOhl0CTc+LyA5hlt/xvDR3AEUhD3yUm9iBY5YXLElLl+8Yf9fpqWuYmxZtPv8d92Xg==
-X-Received: by 2002:a17:90b:2308:b0:1c6:96f9:8d0 with SMTP id mt8-20020a17090b230800b001c696f908d0mr19641036pjb.127.1648143858087;
-        Thu, 24 Mar 2022 10:44:18 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id u204-20020a6279d5000000b004fa58625a80sm4100754pfc.53.2022.03.24.10.44.17
+        bh=gpG1idH+Yq/AlWXjwzOnwn1kVIZQXLkaIHYX97/MawQ=;
+        b=4vvDtqTcbOkCPwZJdt9BwbPWDiNBrmHsWsbzIz26N328CI7WEUzG/pM354+eRDxchZ
+         BM92UFOMTu6jFlKxc8yVK0rjziz4UbQRKLm/nF9IAV6ncnhMNLE07qQgqB2lD6JVlxr4
+         vy1rmPwNTamsg47vs3P1eBKbWxl5lo4+gLAc+TBP+Lof9p6r5bEWSdiSyAaeAmudHlRr
+         sfOdeCx+jFkVjilv8lnOSCdyMSt0rAPJxx0wD5xgszFDOrfT/3zlaSSFrV87ZGW7Y91/
+         v1ukpVHYYJ6Md4li99UG4AQEX9vDmijeXdqnmKG+HnZ/ip5qJsqi/GSzp+Qd4biHa3PX
+         R1Mw==
+X-Gm-Message-State: AOAM531wTvtKvi/zCBeHgiZhGYsf8pbeLVtg6+dF3bsgtN/NqpN6eN2k
+        MWpoZxmfmF1rwTMreKtCwLkC8g==
+X-Google-Smtp-Source: ABdhPJzbnF79TQYRTFkOeaXA/rSl336nRsKoUTSPeMgbge7b88rutsAZOrGq0gv9kjT12x/P/sclOg==
+X-Received: by 2002:a05:6638:2651:b0:321:64e1:ef44 with SMTP id n17-20020a056638265100b0032164e1ef44mr3392957jat.202.1648144492021;
+        Thu, 24 Mar 2022 10:54:52 -0700 (PDT)
+Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
+        by smtp.gmail.com with ESMTPSA id i81-20020a6bb854000000b00649c1b67a6csm1740776iof.28.2022.03.24.10.54.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Mar 2022 10:44:17 -0700 (PDT)
-Date:   Thu, 24 Mar 2022 17:44:14 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Oliver Upton <oupton@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        David Dunn <daviddunn@google.com>,
-        Peter Shier <pshier@google.com>
-Subject: Re: [PATCH 1/2] KVM: x86: Allow userspace to opt out of hypercall
- patching
-Message-ID: <Yjyt7tKSDhW66fnR@google.com>
-References: <20220316005538.2282772-1-oupton@google.com>
- <20220316005538.2282772-2-oupton@google.com>
+        Thu, 24 Mar 2022 10:54:51 -0700 (PDT)
+Date:   Thu, 24 Mar 2022 17:54:48 +0000
+From:   Oliver Upton <oupton@google.com>
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>,
+        Andrew Jones <drjones@redhat.com>,
+        Fuad Tabba <tabba@google.com>,
+        Peng Liang <liangpeng10@huawei.com>,
+        Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>
+Subject: Re: [PATCH v6 02/25] KVM: arm64: Save ID registers' sanitized value
+ per guest
+Message-ID: <YjywaFuHp8DL7Q9T@google.com>
+References: <20220311044811.1980336-1-reijiw@google.com>
+ <20220311044811.1980336-3-reijiw@google.com>
+ <YjtzZI8Lw2uzjm90@google.com>
+ <8adf6145-085e-9868-b2f8-65dfbdb5d88f@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220316005538.2282772-2-oupton@google.com>
+In-Reply-To: <8adf6145-085e-9868-b2f8-65dfbdb5d88f@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -77,45 +86,62 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 16, 2022, Oliver Upton wrote:
-> KVM handles the VMCALL/VMMCALL instructions very strangely. Even though
-> both of these instructions really should #UD when executed on the wrong
-> vendor's hardware (i.e. VMCALL on SVM, VMMCALL on VMX), KVM replaces the
-> guest's instruction with the appropriate instruction for the vendor.
-> Nonetheless, older guest kernels without commit c1118b3602c2 ("x86: kvm:
-> use alternatives for VMCALL vs. VMMCALL if kernel text is read-only")
-> do not patch in the appropriate instruction using alternatives, likely
-> motivating KVM's intervention.
+Hi Reiji,
+
+On Thu, Mar 24, 2022 at 09:23:10AM -0700, Reiji Watanabe wrote:
+
+[...]
+
+> > > + */
+> > > +#define KVM_ARM_ID_REG_MAX_NUM	64
+> > > +#define IDREG_IDX(id)		((sys_reg_CRm(id) << 3) | sys_reg_Op2(id))
+> > > +
+> > >   struct kvm_arch {
+> > >   	struct kvm_s2_mmu mmu;
+> > > @@ -137,6 +144,9 @@ struct kvm_arch {
+> > >   	/* Memory Tagging Extension enabled for the guest */
+> > >   	bool mte_enabled;
+> > >   	bool ran_once;
+> > > +
+> > > +	/* ID registers for the guest. */
+> > > +	u64 id_regs[KVM_ARM_ID_REG_MAX_NUM];
+> > 
+> > This is a decently large array. Should we embed it in kvm_arch or
+> > allocate at init?
 > 
-> Add a quirk allowing userspace to opt out of hypercall patching.
+> 
+> What is the reason why you think you might want to allocate it at init ?
 
-A quirk may not be appropriate, per Paolo, the whole cross-vendor thing is
-intentional.
+Well, its a 512 byte array of mostly cold data. We're probably
+convinced that the guest is going to access these registers at most once
+per vCPU at boot.
 
-https://lore.kernel.org/all/20211210222903.3417968-1-seanjc@google.com
+For the vCPU context at least, we only allocate space for registers we
+actually care about (enum vcpu_sysreg). My impression of the feature
+register ranges is that there are a lot of registers which are RAZ, so I
+don't believe we need to make room for uninteresting values.
 
-> If the quirk is disabled, KVM synthesizes a #UD in the guest.
+Additionally, struct kvm is visible to EL2 if running nVHE. I
+don't believe hyp will ever need to look at these register values.
 
-...
+[...]
 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index d3a9ce07a565..685c4bc453b4 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -9291,6 +9291,17 @@ static int emulator_fix_hypercall(struct x86_emulate_ctxt *ctxt)
->  	char instruction[3];
->  	unsigned long rip = kvm_rip_read(vcpu);
->  
-> +	/*
-> +	 * If the quirk is disabled, synthesize a #UD and let the guest pick up
-> +	 * the pieces.
-> +	 */
-> +	if (!kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_FIX_HYPERCALL_INSN)) {
-> +		ctxt->exception.error_code_valid = false;
-> +		ctxt->exception.vector = UD_VECTOR;
-> +		ctxt->have_exception = true;
-> +		return X86EMUL_PROPAGATE_FAULT;
+> > Which itself is dependent on whether KVM is going to sparsely or
+> > verbosely define its feature filtering tables per the other thread. So
+> > really only bother with this if that is the direction you're going.
+> 
+> Even just going through for ID register ranges, we should do the check
+> to skip hidden/reserved ID registers (not to call read_sanitised_ftr_reg).
+> 
+> Yes, it's certainly possible to avoid walking the entire system register,
+> and I will fix it.  The reason why I didn't care it so much was just
+> because the code (walking the entire system register) will be removed by
+> the following patches:)
 
-This should return X86EMUL_UNHANDLEABLE instead of manually injecting a #UD.  That
-will also end up generating a #UD in most cases, but will play nice with
-KVM_CAP_EXIT_ON_EMULATION_FAILURE.
+Let me go through the series again and see how this flows. If there is a
+way to avoid rewriting code introduced earlier in the series I would
+suggest going that route.
+
+--
+Thanks,
+Oliver
