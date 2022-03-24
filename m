@@ -2,113 +2,284 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 00A924E5E86
-	for <lists+kvm@lfdr.de>; Thu, 24 Mar 2022 07:14:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E3B54E5EDE
+	for <lists+kvm@lfdr.de>; Thu, 24 Mar 2022 07:44:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241671AbiCXGPe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Mar 2022 02:15:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53818 "EHLO
+        id S1346285AbiCXGqI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Mar 2022 02:46:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232070AbiCXGPd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Mar 2022 02:15:33 -0400
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8A9C7B132
-        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 23:14:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1648102441; x=1679638441;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=UOpTd7StGhej4ruU8H47HWJvgta4QrBbISqx81PRTkk=;
-  b=DbuR9Z+rruDUeig0S1ozqWGpbJcxyeJdU/26atbDflW6TLWROIb1XzX3
-   qZ7qT8UQy/eIb4IGMCa+RV4J9vWr3jd2bmFc238RqP62btsf7sgwI57/T
-   VpKTuTY8yAk91eXQJlILoqwaE+eL5ocEU+4BkIDQwztfibETXXIGU7M1a
-   3ujOmBcQDCDHkfTKiaWiS3WcyU4Xk8NgWiJCalTay6s/iNcNlGRp2PUJJ
-   A6PgltbEr6k21B/nydCnipHNMp+dmPEiJhcLn0CIT/M8oOdLZLIau5v9a
-   sampehzJpilgQ9ogL8BHOgSkWl87EeA9hjq1wrhfP5O2j/hXaaPfR0DUp
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10295"; a="238897384"
-X-IronPort-AV: E=Sophos;i="5.90,206,1643702400"; 
-   d="scan'208";a="238897384"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Mar 2022 23:14:01 -0700
-X-IronPort-AV: E=Sophos;i="5.90,206,1643702400"; 
-   d="scan'208";a="561229879"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.249.201.150]) ([10.249.201.150])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Mar 2022 23:13:56 -0700
-Message-ID: <e7fb2eab-b2b1-dd0e-4821-4cca40751d15@intel.com>
-Date:   Thu, 24 Mar 2022 14:13:53 +0800
+        with ESMTP id S234676AbiCXGqH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Mar 2022 02:46:07 -0400
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D57618FE5D
+        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 23:44:35 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id q5so3786702plg.3
+        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 23:44:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=g92GNbyRw2zP4NyiWEWVoR29xzKSW1YDOFU5CW6awjI=;
+        b=W4GNbRWFeYIGRK4Kd7v0BV7d/8+EzcVQiKjbyIzkj5P3MuR5r+MRKX9NhxplmdKQDG
+         h8WJzXqIT4A+HtJuFsxwdcEqw4e4OmMkge71MMjZX6cAHKOeJxIUAA7PoZ0oQwcy3gr2
+         fIkcPWrt7XSykEo1w+cXHy0g0PolVivZf8uxR1KBcRa/C2rOiNZZ4GvnwKQEquHpSZ/U
+         0T4yNv6LDdymEHb+hx3KavSwMNsBgEzA5sTHbpRFeV64zSfbMVyJjvAc9+bl5w8S8h//
+         9JF1hrq2ZNjq885slruDknDbG7C3hZD3JrbAuC1iCofwjLsqVdOqqEniNERfVGXM+FgQ
+         ib1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=g92GNbyRw2zP4NyiWEWVoR29xzKSW1YDOFU5CW6awjI=;
+        b=20cvCJFqauZvYKGRnQs3eXyARDtZz940tyh4MHoFV8TkPfzNRZMRc9LDNgCD4LRG9B
+         ayeu6+erA2usbIulkBltLGtSvmnI3fJGAVDL8mwFd05unJmrVo+vzuK5Ns1sQpjL3Pqt
+         orM4iKwceyjXQ1mnIjbRI69gGP9miQWlDdOVJYWX5Li0GXnWKXeW9ugvbNBY5lH+H7xE
+         jOzYbd943KLIlxw/U3tjLMSIxLcfFHOC/VscckBY7FhllrYw7dChxkDi/TeQhHKHPTN4
+         08kLyK/W9k6G5xix38TaepOs5AvouBj79Me8zMs6Dmvn0WI9u9P4/5yxTT6NVxYW1YFj
+         PEKg==
+X-Gm-Message-State: AOAM530ixrfv2bHdsjDMkWXkL0zjZQk7+7YEFo68+n6ViGQU9Afq26yb
+        SlFkiXoeyCuhnPAiJrm95gAT6m5Dr5hY8b8rcLJuWl810BrZKQ==
+X-Google-Smtp-Source: ABdhPJxNinvVGW4deP+GBGN8X1rgQnrl5ZgxEDZnW3lw1JKkzdIl06MSnl7IU0ErWLwb3H3bXRi167e2wOA/hFXCuCk=
+X-Received: by 2002:a17:902:c9c2:b0:154:68e7:7c5a with SMTP id
+ q2-20020a170902c9c200b0015468e77c5amr4185987pld.122.1648104275145; Wed, 23
+ Mar 2022 23:44:35 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.6.1
-Subject: Re: [RFC PATCH v3 17/36] pflash_cfi01/tdx: Introduce ram_mode of
- pflash for TDVF
-Content-Language: en-US
-To:     =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-        Gerd Hoffmann <kraxel@redhat.com>
-Cc:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= 
-        <philippe.mathieu.daude@gmail.com>,
+References: <20220311174001.605719-1-oupton@google.com> <20220311174001.605719-10-oupton@google.com>
+ <CAAeT=FyGUZMy-TUZuHu+bZtUY9NfjBQ79JKBX0xK4kEqFTO1OQ@mail.gmail.com> <YjlxkE2h6K9cTOTP@google.com>
+In-Reply-To: <YjlxkE2h6K9cTOTP@google.com>
+From:   Reiji Watanabe <reijiw@google.com>
+Date:   Wed, 23 Mar 2022 23:44:19 -0700
+Message-ID: <CAAeT=FwMCOy_0kVU+ZJw+J5QUnJQ6BhBxvDYMf0axz-Xyjo4LQ@mail.gmail.com>
+Subject: Re: [PATCH v4 09/15] KVM: arm64: Add support for userspace to suspend
+ a vCPU
+To:     Oliver Upton <oupton@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        James Morse <james.morse@arm.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm-riscv@lists.infradead.org,
+        kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Laszlo Ersek <lersek@redhat.com>,
-        Eric Blake <eblake@redhat.com>,
-        Connor Kuehl <ckuehl@redhat.com>, isaku.yamahata@intel.com,
-        erdemaktas@google.com, kvm@vger.kernel.org, qemu-devel@nongnu.org,
-        seanjc@google.com
-References: <20220317135913.2166202-1-xiaoyao.li@intel.com>
- <20220317135913.2166202-18-xiaoyao.li@intel.com>
- <f418548e-c24c-1bc3-4e16-d7a775298a18@gmail.com>
- <7a8233e4-0cae-b05a-7931-695a7ee87fc9@intel.com>
- <20220322092141.qsgv3pqlvlemgrgw@sirius.home.kraxel.org>
- <YjmXFZRCbKXTkAhN@redhat.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <YjmXFZRCbKXTkAhN@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
-        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        Peter Shier <pshier@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/22/2022 5:29 PM, Daniel P. Berrangé wrote:
-> On Tue, Mar 22, 2022 at 10:21:41AM +0100, Gerd Hoffmann wrote:
->>    Hi,
->>
->>>> If you don't need a pflash device, don't use it: simply map your nvram
->>>> region as ram in your machine. No need to clutter the pflash model like
->>>> that.
->>
->> Using the pflash device for something which isn't actually flash looks a
->> bit silly indeed.
->>
->>>
->>> I know it's dirty to hack the pflash device. The purpose is to make the user
->>> interface unchanged that people can still use
->>>
->>> 	-drive if=pflash,format=raw,unit=0,file=/path/to/OVMF_CODE.fd
->>>          -drive if=pflash,format=raw,unit=1,file=/path/to/OVMF_VARS.fd
->>>
->>> to create TD guest.
->>
->> Well, if persistent vars are not supported anyway there is little reason
->> to split the firmware into CODE and VARS files.  You can use just use
->> OVMF.fd with a single pflash device.  libvirt recently got support for
->> that.
-> 
-> Agreed.
+Hi Oliver,
 
-The purpose of using split firmware is that people can share the same 
-code.fd while using different vars.fd
+On Mon, Mar 21, 2022 at 11:49 PM Oliver Upton <oupton@google.com> wrote:
+>
+> On Mon, Mar 21, 2022 at 11:19:33PM -0700, Reiji Watanabe wrote:
+> > Hi Oliver,
+> >
+> > On Fri, Mar 11, 2022 at 9:41 AM Oliver Upton <oupton@google.com> wrote:
+> > >
+> > > Introduce a new MP state, KVM_MP_STATE_SUSPENDED, which indicates a vCPU
+> > > is in a suspended state. In the suspended state the vCPU will block
+> > > until a wakeup event (pending interrupt) is recognized.
+> > >
+> > > Add a new system event type, KVM_SYSTEM_EVENT_WAKEUP, to indicate to
+> > > userspace that KVM has recognized one such wakeup event. It is the
+> > > responsibility of userspace to then make the vCPU runnable, or leave it
+> > > suspended until the next wakeup event.
+> > >
+> > > Signed-off-by: Oliver Upton <oupton@google.com>
+> > > ---
+> > >  Documentation/virt/kvm/api.rst    | 37 +++++++++++++++++++++++++++++--
+> > >  arch/arm64/include/asm/kvm_host.h |  1 +
+> > >  arch/arm64/kvm/arm.c              | 35 +++++++++++++++++++++++++++++
+> > >  include/uapi/linux/kvm.h          |  2 ++
+> > >  4 files changed, 73 insertions(+), 2 deletions(-)
+> > >
+> > > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> > > index 5625c08b4a0e..426bcdc1216d 100644
+> > > --- a/Documentation/virt/kvm/api.rst
+> > > +++ b/Documentation/virt/kvm/api.rst
+> > > @@ -1482,14 +1482,43 @@ Possible values are:
+> > >                                   [s390]
+> > >     KVM_MP_STATE_LOAD             the vcpu is in a special load/startup state
+> > >                                   [s390]
+> > > +   KVM_MP_STATE_SUSPENDED        the vcpu is in a suspend state and is waiting
+> > > +                                 for a wakeup event [arm64]
+> > >     ==========================    ===============================================
+> > >
+> > >  On x86, this ioctl is only useful after KVM_CREATE_IRQCHIP. Without an
+> > >  in-kernel irqchip, the multiprocessing state must be maintained by userspace on
+> > >  these architectures.
+> > >
+> > > -For arm64/riscv:
+> > > -^^^^^^^^^^^^^^^^
+> > > +For arm64:
+> > > +^^^^^^^^^^
+> > > +
+> > > +If a vCPU is in the KVM_MP_STATE_SUSPENDED state, KVM will emulate the
+> > > +architectural execution of a WFI instruction.
+> > > +
+> > > +If a wakeup event is recognized, KVM will exit to userspace with a
+> > > +KVM_SYSTEM_EVENT exit, where the event type is KVM_SYSTEM_EVENT_WAKEUP. If
+> > > +userspace wants to honor the wakeup, it must set the vCPU's MP state to
+> > > +KVM_MP_STATE_RUNNABLE. If it does not, KVM will continue to await a wakeup
+> > > +event in subsequent calls to KVM_RUN.
+> > > +
+> > > +.. warning::
+> > > +
+> > > +     If userspace intends to keep the vCPU in a SUSPENDED state, it is
+> > > +     strongly recommended that userspace take action to suppress the
+> > > +     wakeup event (such as masking an interrupt). Otherwise, subsequent
+> > > +     calls to KVM_RUN will immediately exit with a KVM_SYSTEM_EVENT_WAKEUP
+> > > +     event and inadvertently waste CPU cycles.
+> > > +
+> > > +     Additionally, if userspace takes action to suppress a wakeup event,
+> > > +     it is strongly recommended that it also restore the vCPU to its
+> >
+> > Nit: s/restore/restores/ ?
+> >
+> >
+> > > +     original state when the vCPU is made RUNNABLE again. For example,
+> > > +     if userspace masked a pending interrupt to suppress the wakeup,
+> > > +     the interrupt should be unmasked before returning control to the
+> > > +     guest.
+> > > +
+> > > +For riscv:
+> > > +^^^^^^^^^^
+> > >
+> > >  The only states that are valid are KVM_MP_STATE_STOPPED and
+> > >  KVM_MP_STATE_RUNNABLE which reflect if the vcpu is paused or not.
+> > > @@ -5914,6 +5943,7 @@ should put the acknowledged interrupt vector into the 'epr' field.
+> > >    #define KVM_SYSTEM_EVENT_SHUTDOWN       1
+> > >    #define KVM_SYSTEM_EVENT_RESET          2
+> > >    #define KVM_SYSTEM_EVENT_CRASH          3
+> > > +  #define KVM_SYSTEM_EVENT_WAKEUP         4
+> > >                         __u32 type;
+> > >                         __u64 flags;
+> > >                 } system_event;
+> > > @@ -5938,6 +5968,9 @@ Valid values for 'type' are:
+> > >     has requested a crash condition maintenance. Userspace can choose
+> > >     to ignore the request, or to gather VM memory core dump and/or
+> > >     reset/shutdown of the VM.
+> > > + - KVM_SYSTEM_EVENT_WAKEUP -- the guest is in a suspended state and KVM
+> >
+> > Nit: Shouldn't 'the guest' be 'the vcpu' ?
+> >
+> > > +   has recognized a wakeup event. Userspace may honor this event by marking
+> > > +   the exiting vCPU as runnable, or deny it and call KVM_RUN again.
+> > >
+> > >  Valid flags are:
+> > >
+> > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > > index da58eb96d2a8..899f2c0b4c7b 100644
+> > > --- a/arch/arm64/include/asm/kvm_host.h
+> > > +++ b/arch/arm64/include/asm/kvm_host.h
+> > > @@ -46,6 +46,7 @@
+> > >  #define KVM_REQ_RECORD_STEAL   KVM_ARCH_REQ(3)
+> > >  #define KVM_REQ_RELOAD_GICv4   KVM_ARCH_REQ(4)
+> > >  #define KVM_REQ_RELOAD_PMU     KVM_ARCH_REQ(5)
+> > > +#define KVM_REQ_SUSPEND                KVM_ARCH_REQ(6)
+> > >
+> > >  #define KVM_DIRTY_LOG_MANUAL_CAPS   (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE | \
+> > >                                      KVM_DIRTY_LOG_INITIALLY_SET)
+> > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > > index 8eed0556ccaa..b94efa05d869 100644
+> > > --- a/arch/arm64/kvm/arm.c
+> > > +++ b/arch/arm64/kvm/arm.c
+> > > @@ -444,6 +444,18 @@ bool kvm_arm_vcpu_stopped(struct kvm_vcpu *vcpu)
+> > >         return vcpu->arch.mp_state.mp_state == KVM_MP_STATE_STOPPED;
+> > >  }
+> > >
+> > > +static void kvm_arm_vcpu_suspend(struct kvm_vcpu *vcpu)
+> > > +{
+> > > +       vcpu->arch.mp_state.mp_state = KVM_MP_STATE_SUSPENDED;
+> > > +       kvm_make_request(KVM_REQ_SUSPEND, vcpu);
+> > > +       kvm_vcpu_kick(vcpu);
+> > > +}
+> > > +
+> > > +static bool kvm_arm_vcpu_suspended(struct kvm_vcpu *vcpu)
+> > > +{
+> > > +       return vcpu->arch.mp_state.mp_state == KVM_MP_STATE_SUSPENDED;
+> > > +}
+> > > +
+> > >  int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
+> > >                                     struct kvm_mp_state *mp_state)
+> > >  {
+> > > @@ -464,6 +476,9 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+> > >         case KVM_MP_STATE_STOPPED:
+> > >                 kvm_arm_vcpu_power_off(vcpu);
+> > >                 break;
+> > > +       case KVM_MP_STATE_SUSPENDED:
+> > > +               kvm_arm_vcpu_suspend(vcpu);
+> > > +               break;
+> > >         default:
+> > >                 ret = -EINVAL;
+> > >         }
+> > > @@ -648,6 +663,23 @@ void kvm_vcpu_wfi(struct kvm_vcpu *vcpu)
+> > >         preempt_enable();
+> > >  }
+> > >
+> > > +static int kvm_vcpu_suspend(struct kvm_vcpu *vcpu)
+> > > +{
+> > > +       if (!kvm_arm_vcpu_suspended(vcpu))
+> > > +               return 1;
+> > > +
+> > > +       kvm_vcpu_wfi(vcpu);
+> > > +
+> > > +       /*
+> > > +        * The suspend state is sticky; we do not leave it until userspace
+> > > +        * explicitly marks the vCPU as runnable. Request that we suspend again
+> > > +        * later.
+> > > +        */
+> > > +       kvm_make_request(KVM_REQ_SUSPEND, vcpu);
+> > > +       kvm_vcpu_set_system_event_exit(vcpu, KVM_SYSTEM_EVENT_WAKEUP, 0);
+> > > +       return 0;
+> > > +}
+> > > +
+> > >  /**
+> > >   * check_vcpu_requests - check and handle pending vCPU requests
+> > >   * @vcpu:      the VCPU pointer
+> > > @@ -686,6 +718,9 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
+> > >                 if (kvm_check_request(KVM_REQ_RELOAD_PMU, vcpu))
+> > >                         kvm_pmu_handle_pmcr(vcpu,
+> > >                                             __vcpu_sys_reg(vcpu, PMCR_EL0));
+> > > +
+> > > +               if (kvm_check_request(KVM_REQ_SUSPEND, vcpu))
+> > > +                       return kvm_vcpu_suspend(vcpu);
+> >
+> > It appears that one of the cases that kvm_vcpu_suspend() returns
+> > is when a pending signal is detected, and the exit reason will be
+> > KVM_EXIT_SYSTEM_EVENT in this case.  On the other hand, when a
+> > pending signal is detected earlier in xfer_to_guest_mode_handle_work(),
+> > KVM_RUN returns -EINTR even if the vCPU is in KVM_MP_STATE_SUSPENDED
+> > state. Shouldn't those behaviors be consistent ? (Perhaps -EINTR?)
+>
+> Great catch!
+>
+> I should probably check that the vCPU is actually runnable with
+> kvm_arch_vcpu_runnable() before setting up a system event exit. That is
+> after all what the documentation of this whole API says it does, right?
+> :)
+>
+> If the vCPU thread were poked for any other reason this should return 1
+> and let the kvm_vcpu_exit_request()/xfer_to_guest_mode_handle_work()
+> pairing clean up anything else.
 
+Yes, that sounds good.
 
-
+Thanks,
+Reiji
