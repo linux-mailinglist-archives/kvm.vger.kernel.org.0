@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BC7CC4E5E29
-	for <lists+kvm@lfdr.de>; Thu, 24 Mar 2022 06:32:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1DF034E5E2A
+	for <lists+kvm@lfdr.de>; Thu, 24 Mar 2022 06:32:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347707AbiCXFdi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Mar 2022 01:33:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42650 "EHLO
+        id S1347608AbiCXFdx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Mar 2022 01:33:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347549AbiCXFdg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Mar 2022 01:33:36 -0400
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2072.outbound.protection.outlook.com [40.107.92.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A65896828
-        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 22:32:03 -0700 (PDT)
+        with ESMTP id S1347683AbiCXFdw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Mar 2022 01:33:52 -0400
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2059.outbound.protection.outlook.com [40.107.223.59])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16E7895489
+        for <kvm@vger.kernel.org>; Wed, 23 Mar 2022 22:32:21 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kHUf+8ebvhW8IaLxtluGGRLfJeXMTuiLa+ubvtbjlr/ec9M2sR+TpKoEc0i3k8E2KFLD57oYiK7zXQtg7clHRpI5RAaNVLNOK9qz8+K66yep6dz1g62gMw1CRYFnK61JUVlWvt6WCqQnTuxDEtc/gKi1WcK1FcWglefMI3ivIJ383B4FnLIj3dRLOuXc76EQEn1vqNhkGZ9mJqx6C12PquZ8jXfp8Jq1WgDI74Mzb77sfnBmOAKP9VyTkgyADYJxKMMZcunxjlgnvFNb7HRC9Jiwek/cvjZwhSSNlC90K28v1jHQ+MptohuEvFR4jc0I/8ZQOBAEX4x3KhRgMw5dYg==
+ b=Gw+p+Jh5V9ht/CGQ3D+D9QrRy5FBUto9zPRruH80fneXiMYodeJalyPezW8nlap6gQ/X4WnPvgR63Gknc2Qmrk/BCMnGfLErlFdukMfrLi8S5WRLHkJrwCx0y5MUSwYQ7U/8QrLG/4J2yaEDw0mqDWyndAmMLXOzUd8lALBQukLyAOJDVqUDCM09G+8SQ5O2pJSRTKEn82qkjHTMeZFQYBYqDvZkqkW5w9SdbYrYe8dxhkOZgN9EOIUVHcQOjdDqBsMGbUyywhtWnbn693x/kUciuBXhMMAXD8sIITlHJnOaevmDXTFo47hVZwKxPEJMyHsPwL6BVpkB/vYDzhHe9g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Lm6UCfZ85LRAva+xxk+Mtk8x/0YIdODmSV9RTCZcGjg=;
- b=YYEIKqa1bbGpNLSb3fnsKGLioLabtK5msmuCdz9/OlHi6Ob0e4NQcb+Sjh96L4USQF4F18wpJ4fyC2DAPYc4yDQN6X3RxMcfFxSYX2clO7CehWO4Xw2Kvcz7YTTcRXJD3PNZvewFWJ50XM2Q4vPBX84hXjtHHSoTM1j05lQeYaCdaf8Iy/k5bzlKXGGf2azRbhECIdbsz6ItYgAj1qYZOcxODXecwGOKEPqHExZI4Ukjq771MmkCXL7jyk4TbORYU5hA7ZB4h3dHYXPdopycQ+wqnnWYppR1x2qJgrjVh8mcWUN2aKh3cfgJpAUiBQGm2QWTiCWP9C3CUeKdBItq9A==
+ bh=Zz8SnjWcHBOJjum7s8hIY2z4hKBwmysXEdBaGF2IT5I=;
+ b=LxYOmWB9BTTQVienrNz/Ezg+N5sTq92BzbJ5frQk0xYkFSXj7bHi4RE5B3H/EeejNi6DJvUAFxgkIj/h8DZJ7Rd1a79dguB7KVbUd+qwqCdKXZVCHmGmz38161w6HElQE68BY2jOv6QndzYCTOQE4xHmMJuGkMhhVLe3b4sPAgDpacqBMB43cLEIX5xvWE32qsIDWJwtujTCa7ziA6ZIfopGmHcMeH+O77R0uZmCxAgAu473xqC+LOhQM8JTPLJXJJUfFsS//3JrRLE5CtiefQSV4L+gmYzhQ9artWu0BmgYVEBFBBWO2tmPNWhc01kvKGGHspFzX1begD78VvnASg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Lm6UCfZ85LRAva+xxk+Mtk8x/0YIdODmSV9RTCZcGjg=;
- b=vC2Lrp752py/jPgdDVB/x+Uhqaq04lxVVM+vdFplJ8trUtiql7C9X3YNvcsHizXwttUNmDCZTOlyBaaFBD3TCA10mGo9SPvCq32s+6fJFuDv2LVDdoqRwskfxoYQ142LqPL/Sc3gjxkrp3VFauCaMnQCp870WdZAOfzwM/lklkc=
-Received: from BN6PR2001CA0014.namprd20.prod.outlook.com
- (2603:10b6:404:b4::24) by BN8PR12MB3202.namprd12.prod.outlook.com
- (2603:10b6:408:9c::29) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5102.18; Thu, 24 Mar
- 2022 05:31:55 +0000
-Received: from BN8NAM11FT041.eop-nam11.prod.protection.outlook.com
- (2603:10b6:404:b4:cafe::c1) by BN6PR2001CA0014.outlook.office365.com
- (2603:10b6:404:b4::24) with Microsoft SMTP Server (version=TLS1_2,
+ bh=Zz8SnjWcHBOJjum7s8hIY2z4hKBwmysXEdBaGF2IT5I=;
+ b=q4HMoFGB+ZJ7HXP1aZAGFSAOXc995hifET11vAHGH0t1rmlcmw7qTZ15ITBTsee4k0taN7bKgBIS3zMTSD4NayDxnfmTiyaPVgBcCx9bV1YJpmWeLHmnd+8gurKUavJagll4sWXuE4kc0Xf/H7BSX7KbyuFsuhzkY5yfoJbNfuI=
+Received: from BN9PR03CA0884.namprd03.prod.outlook.com (2603:10b6:408:13c::19)
+ by DM6PR12MB2970.namprd12.prod.outlook.com (2603:10b6:5:3b::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5081.17; Thu, 24 Mar
+ 2022 05:32:19 +0000
+Received: from BN8NAM11FT012.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:13c:cafe::85) by BN9PR03CA0884.outlook.office365.com
+ (2603:10b6:408:13c::19) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5102.16 via Frontend
- Transport; Thu, 24 Mar 2022 05:31:55 +0000
+ Transport; Thu, 24 Mar 2022 05:32:19 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -46,19 +46,19 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com;
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BN8NAM11FT041.mail.protection.outlook.com (10.13.177.18) with Microsoft SMTP
+ BN8NAM11FT012.mail.protection.outlook.com (10.13.177.55) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5102.17 via Frontend Transport; Thu, 24 Mar 2022 05:31:55 +0000
+ 15.20.5102.17 via Frontend Transport; Thu, 24 Mar 2022 05:32:18 +0000
 Received: from bhadra.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Thu, 24 Mar
- 2022 00:31:53 -0500
+ 2022 00:32:16 -0500
 From:   Manali Shukla <manali.shukla@amd.com>
 To:     <pbonzini@redhat.com>, <seanjc@google.com>
 CC:     <kvm@vger.kernel.org>
-Subject: [kvm-unit-tests PATCH v2 2/4] x86: nSVM: Move all nNPT test cases from svm_tests.c to a separate file.
-Date:   Thu, 24 Mar 2022 05:30:44 +0000
-Message-ID: <20220324053046.200556-3-manali.shukla@amd.com>
+Subject: [kvm-unit-tests PATCH v2 3/4] x86: nSVM: Allow nSVM tests run with PT_USER_MASK enabled
+Date:   Thu, 24 Mar 2022 05:30:45 +0000
+Message-ID: <20220324053046.200556-4-manali.shukla@amd.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220324053046.200556-1-manali.shukla@amd.com>
 References: <20220324053046.200556-1-manali.shukla@amd.com>
@@ -70,24 +70,24 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: de5bf6fd-a988-46fd-5f03-08da0d579bce
-X-MS-TrafficTypeDiagnostic: BN8PR12MB3202:EE_
-X-Microsoft-Antispam-PRVS: <BN8PR12MB3202EEDDC2D5E03E312358EEFD199@BN8PR12MB3202.namprd12.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: 650f4c31-f334-40d9-9aac-08da0d57a9bb
+X-MS-TrafficTypeDiagnostic: DM6PR12MB2970:EE_
+X-Microsoft-Antispam-PRVS: <DM6PR12MB2970F3F15E8FC5E97B9BAD24FD199@DM6PR12MB2970.namprd12.prod.outlook.com>
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 7T3AstMHaeVq7aCQNijEVs0WFTZbkEYy3Jy/cGbJhtd3m/ZxnohdQekgwWKDu1rfbNR38bZBvXt2Iy5OW3EHN+XOQLLk8bm7XQH0mYjiyvFrL/RF+EkYokkh94pEUaTo4nldXwq0dnxKkBb7avk0Ji8XhLqx3XoBmG20Dk6aX5NIvA6Y9rmLjdOUiG9uPREiyVohyjlyoFJKRs5zQk6JDBJ7Mh1jGC9RqIMj64pLGNmUCMyBBfY/ltI8+h3dS3tXpIs9oDc2hc66zkIQNuTpJOFYNBNQXOoLeTOZ7nR1NHyMQs5Wsl9ZYYLHL1LBqG+p/U9ByO3JPoJVU02ShWMPp/BIi2BhCYCVIkRktE47EPjS5GnE4bdw4BuI0RiW1J/7lgdutmi3eCrXJPbrzdIeY5T+qDUoro7ZyR0RIOQLfeax0NNt1LzAq9DkQ26itzJgvejbDNYYk5ZB29pAW5poOOJOEE/xcha7GvW2L+cIYeTp2iZm7W+EgTITeppdtl61S32vukMUj8VbyrE4dJuS8BveeO/xErsutAyo1mbTLm5NK2pYmFPKxKwVID2Ni9gtI0icFQhCKPenqSG324lJDVwGpaFipi115mo2DksZULtCTXCmNv5PLrKcm0rx27UtTK/GeluxGf9YT77rFzi2IyaAJy6qKOyO8L3uw8wN+1c0St+aJUAB8cd1sHeETIP9jtwFLFgUvKME6c0Ehv7zqg==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230001)(4636009)(36840700001)(46966006)(40470700004)(8936002)(44832011)(30864003)(82310400004)(5660300002)(81166007)(356005)(1076003)(186003)(16526019)(26005)(2616005)(40460700003)(336012)(426003)(316002)(110136005)(508600001)(6666004)(7696005)(36860700001)(4326008)(47076005)(83380400001)(8676002)(70586007)(70206006)(36756003)(2906002)(86362001)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: k5DMeGt2uvPAqfZ/CQGZ7bKT0GL3LvfNYItLL8+4ZGvYirZnOT6dV1FeGex+GIGKIpWb22KIJx2ZOqdXLe9oNMHYwAy8n9BtfrPhBvrYG9A4XyuB1Lvlb1n9KpruIoSM1ZWB9/fHkoVPBFFhfY4SflbXNIyS7ess5zkp1VWP8hAfBj+exjSXSvhPi1PG7aOhi85NG+7A2G6cneswKRrsJKyXNQMIn0eMOAI3xixaGbuk0nkw/4V43oDhi7iG5rhtsVW8njQTWFGyzXv+SLmnzeeVQ356T4QU5YFJKN7rc7XI1KS+ripmPhi/kiNrHDqgUGmX8VlIGUVHnDvK3TLoPqi1vBOikc/cTwbdjaYGVa7mrCIUEjLyZqSBPG7YkYkNFaor7k8cKZoGEh9ug8XqZkIcMjLtzC3vLoy46uMzhYv5z+hIDZ3QPMIknXoD6YTNkq8dbqxGox/7Ffir6n7F/myFG+2vkWWh70uKx8HzUWryLq33Zm6w662Q307dCpIucz22qSjSfQgOxn1fy/VXA0SZaQUZ54swUly5jwesFIbkPqUulCrmEiE2PBKWNJgGgiUnpu/G0KDQs60mBkFL4230jzWG+9edFPtFhgnNk6d2kzMpbUiYIhiq2Xr+PIoqCiys7D304SIYAM94pKI5C91haU5UB+bdBuGFqpvxpyDkCfbKiW0aYpk3Kkzpq1fdowhxGJDX4jBxShvKGOb5iA==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230001)(4636009)(40470700004)(36840700001)(46966006)(40460700003)(508600001)(1076003)(82310400004)(70206006)(81166007)(356005)(2616005)(186003)(70586007)(26005)(4326008)(16526019)(110136005)(8936002)(6666004)(316002)(8676002)(36860700001)(83380400001)(2906002)(7696005)(47076005)(44832011)(86362001)(5660300002)(36756003)(426003)(336012)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Mar 2022 05:31:55.3030
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Mar 2022 05:32:18.6525
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: de5bf6fd-a988-46fd-5f03-08da0d579bce
+X-MS-Exchange-CrossTenant-Network-Message-Id: 650f4c31-f334-40d9-9aac-08da0d57a9bb
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT041.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT012.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN8PR12MB3202
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB2970
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
@@ -98,904 +98,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-nNPT test cases are moved to a separate file svm_npt.c
-so that they can be run independently with PTE_USER_MASK disabled.
+Commit 916635a813e975600335c6c47250881b7a328971
+(nSVM: Add test for NPT reserved bit and #NPF error code behavior)
+clears PT_USER_MASK for all svm testcases. Any tests that requires
+usermode access will fail after this commit.
 
-Rest of the test cases can be run with PTE_USER_MASK enabled.
+Above mentioned commit did changes in main() due to which other
+nSVM tests became "incompatible" with usermode
 
-No functional change intended.
+Solution to this problem would be to set PT_USER_MASK on all PTEs.
+So that KUT will build other tests with PT_USER_MASK set on
+all PTEs.
 
 Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Manali Shukla <manali.shukla@amd.com>
 ---
- x86/Makefile.common |   2 +
- x86/Makefile.x86_64 |   2 +
- x86/svm.c           |   8 -
- x86/svm_npt.c       | 386 ++++++++++++++++++++++++++++++++++++++++++++
- x86/svm_tests.c     | 372 ++----------------------------------------
- x86/unittests.cfg   |   6 +
- 6 files changed, 405 insertions(+), 371 deletions(-)
- create mode 100644 x86/svm_npt.c
+ x86/svm_tests.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/x86/Makefile.common b/x86/Makefile.common
-index b903988..5590afe 100644
---- a/x86/Makefile.common
-+++ b/x86/Makefile.common
-@@ -107,6 +107,8 @@ $(TEST_DIR)/access_test.$(bin): $(TEST_DIR)/access.o
- 
- $(TEST_DIR)/vmx.$(bin): $(TEST_DIR)/access.o
- 
-+$(TEST_DIR)/svm_npt.$(bin): $(TEST_DIR)/svm.o
-+
- $(TEST_DIR)/kvmclock_test.$(bin): $(TEST_DIR)/kvmclock.o
- 
- $(TEST_DIR)/hyperv_synic.$(bin): $(TEST_DIR)/hyperv.o
-diff --git a/x86/Makefile.x86_64 b/x86/Makefile.x86_64
-index f18c1e2..dbe5967 100644
---- a/x86/Makefile.x86_64
-+++ b/x86/Makefile.x86_64
-@@ -42,6 +42,7 @@ endif
- ifneq ($(CONFIG_EFI),y)
- tests += $(TEST_DIR)/access_test.$(exe)
- tests += $(TEST_DIR)/svm.$(exe)
-+tests += $(TEST_DIR)/svm_npt.$(exe)
- tests += $(TEST_DIR)/vmx.$(exe)
- endif
- 
-@@ -55,3 +56,4 @@ $(TEST_DIR)/hyperv_clock.$(bin): $(TEST_DIR)/hyperv_clock.o
- 
- $(TEST_DIR)/vmx.$(bin): $(TEST_DIR)/vmx_tests.o
- $(TEST_DIR)/svm.$(bin): $(TEST_DIR)/svm_tests.o
-+$(TEST_DIR)/svm_npt.$(bin): $(TEST_DIR)/svm_npt.o
-diff --git a/x86/svm.c b/x86/svm.c
-index e93e780..d0d523a 100644
---- a/x86/svm.c
-+++ b/x86/svm.c
-@@ -449,11 +449,3 @@ int run_svm_tests(int ac, char **av)
- 
- 	return report_summary();
- }
--
--int main(int ac, char **av)
--{
--    pteval_t opt_mask = 0;
--
--    __setup_vm(&opt_mask);
--    return run_svm_tests(ac, av);
--}
-diff --git a/x86/svm_npt.c b/x86/svm_npt.c
-new file mode 100644
-index 0000000..4f80d9a
---- /dev/null
-+++ b/x86/svm_npt.c
-@@ -0,0 +1,386 @@
-+#include "svm.h"
-+#include "vm.h"
-+#include "alloc_page.h"
-+#include "vmalloc.h"
-+
-+static void *scratch_page;
-+
-+static void null_test(struct svm_test *test)
-+{
-+}
-+
-+static void npt_np_prepare(struct svm_test *test)
-+{
-+    u64 *pte;
-+
-+    scratch_page = alloc_page();
-+    pte = npt_get_pte((u64)scratch_page);
-+
-+    *pte &= ~1ULL;
-+}
-+
-+static void npt_np_test(struct svm_test *test)
-+{
-+    (void) *(volatile u64 *)scratch_page;
-+}
-+
-+static bool npt_np_check(struct svm_test *test)
-+{
-+    u64 *pte = npt_get_pte((u64)scratch_page);
-+
-+    *pte |= 1ULL;
-+
-+    return (vmcb->control.exit_code == SVM_EXIT_NPF)
-+           && (vmcb->control.exit_info_1 == 0x100000004ULL);
-+}
-+
-+static void npt_nx_prepare(struct svm_test *test)
-+{
-+    u64 *pte;
-+
-+    test->scratch = rdmsr(MSR_EFER);
-+    wrmsr(MSR_EFER, test->scratch | EFER_NX);
-+
-+    /* Clear the guest's EFER.NX, it should not affect NPT behavior. */
-+    vmcb->save.efer &= ~EFER_NX;
-+
-+    pte = npt_get_pte((u64)null_test);
-+
-+    *pte |= PT64_NX_MASK;
-+}
-+
-+static bool npt_nx_check(struct svm_test *test)
-+{
-+    u64 *pte = npt_get_pte((u64)null_test);
-+
-+    wrmsr(MSR_EFER, test->scratch);
-+
-+    *pte &= ~PT64_NX_MASK;
-+
-+    return (vmcb->control.exit_code == SVM_EXIT_NPF)
-+           && (vmcb->control.exit_info_1 == 0x100000015ULL);
-+}
-+
-+static void npt_us_prepare(struct svm_test *test)
-+{
-+    u64 *pte;
-+
-+    scratch_page = alloc_page();
-+    pte = npt_get_pte((u64)scratch_page);
-+
-+    *pte &= ~(1ULL << 2);
-+}
-+
-+static void npt_us_test(struct svm_test *test)
-+{
-+    (void) *(volatile u64 *)scratch_page;
-+}
-+
-+static bool npt_us_check(struct svm_test *test)
-+{
-+    u64 *pte = npt_get_pte((u64)scratch_page);
-+
-+    *pte |= (1ULL << 2);
-+
-+    return (vmcb->control.exit_code == SVM_EXIT_NPF)
-+           && (vmcb->control.exit_info_1 == 0x100000005ULL);
-+}
-+
-+static void npt_rw_prepare(struct svm_test *test)
-+{
-+
-+    u64 *pte;
-+
-+    pte = npt_get_pte(0x80000);
-+
-+    *pte &= ~(1ULL << 1);
-+}
-+
-+static void npt_rw_test(struct svm_test *test)
-+{
-+    u64 *data = (void*)(0x80000);
-+
-+    *data = 0;
-+}
-+
-+static bool npt_rw_check(struct svm_test *test)
-+{
-+    u64 *pte = npt_get_pte(0x80000);
-+
-+    *pte |= (1ULL << 1);
-+
-+    return (vmcb->control.exit_code == SVM_EXIT_NPF)
-+        && (vmcb->control.exit_info_1 == 0x100000007ULL);
-+}
-+
-+static void npt_rw_pfwalk_prepare(struct svm_test *test)
-+{
-+
-+    u64 *pte;
-+
-+    pte = npt_get_pte(read_cr3());
-+
-+    *pte &= ~(1ULL << 1);
-+}
-+
-+static bool npt_rw_pfwalk_check(struct svm_test *test)
-+{
-+    u64 *pte = npt_get_pte(read_cr3());
-+
-+    *pte |= (1ULL << 1);
-+
-+    return (vmcb->control.exit_code == SVM_EXIT_NPF)
-+           && (vmcb->control.exit_info_1 == 0x200000007ULL)
-+       && (vmcb->control.exit_info_2 == read_cr3());
-+}
-+
-+static void npt_l1mmio_prepare(struct svm_test *test)
-+{
-+}
-+
-+u32 nested_apic_version1;
-+u32 nested_apic_version2;
-+
-+static void npt_l1mmio_test(struct svm_test *test)
-+{
-+    volatile u32 *data = (volatile void*)(0xfee00030UL);
-+
-+    nested_apic_version1 = *data;
-+    nested_apic_version2 = *data;
-+}
-+
-+static bool npt_l1mmio_check(struct svm_test *test)
-+{
-+    volatile u32 *data = (volatile void*)(0xfee00030);
-+    u32 lvr = *data;
-+
-+    return nested_apic_version1 == lvr && nested_apic_version2 == lvr;
-+}
-+
-+static void npt_rw_l1mmio_prepare(struct svm_test *test)
-+{
-+
-+    u64 *pte;
-+
-+    pte = npt_get_pte(0xfee00080);
-+
-+    *pte &= ~(1ULL << 1);
-+}
-+
-+static void npt_rw_l1mmio_test(struct svm_test *test)
-+{
-+    volatile u32 *data = (volatile void*)(0xfee00080);
-+
-+    *data = *data;
-+}
-+
-+static bool npt_rw_l1mmio_check(struct svm_test *test)
-+{
-+    u64 *pte = npt_get_pte(0xfee00080);
-+
-+    *pte |= (1ULL << 1);
-+
-+    return (vmcb->control.exit_code == SVM_EXIT_NPF)
-+           && (vmcb->control.exit_info_1 == 0x100000007ULL);
-+}
-+
-+static void basic_guest_main(struct svm_test *test)
-+{
-+}
-+
-+static void __svm_npt_rsvd_bits_test(u64 *pxe, u64 rsvd_bits, u64 efer,
-+                     ulong cr4, u64 guest_efer, ulong guest_cr4)
-+{
-+    u64 pxe_orig = *pxe;
-+    int exit_reason;
-+    u64 pfec;
-+
-+    wrmsr(MSR_EFER, efer);
-+    write_cr4(cr4);
-+
-+    vmcb->save.efer = guest_efer;
-+    vmcb->save.cr4  = guest_cr4;
-+
-+    *pxe |= rsvd_bits;
-+
-+    exit_reason = svm_vmrun();
-+
-+    report(exit_reason == SVM_EXIT_NPF,
-+           "Wanted #NPF on rsvd bits = 0x%lx, got exit = 0x%x", rsvd_bits, exit_reason);
-+
-+    if (pxe == npt_get_pdpe() || pxe == npt_get_pml4e()) {
-+        /*
-+         * The guest's page tables will blow up on a bad PDPE/PML4E,
-+         * before starting the final walk of the guest page.
-+         */
-+        pfec = 0x20000000full;
-+    } else {
-+        /* RSVD #NPF on final walk of guest page. */
-+        pfec = 0x10000000dULL;
-+
-+        /* PFEC.FETCH=1 if NX=1 *or* SMEP=1. */
-+        if ((cr4 & X86_CR4_SMEP) || (efer & EFER_NX))
-+            pfec |= 0x10;
-+
-+    }
-+
-+    report(vmcb->control.exit_info_1 == pfec,
-+           "Wanted PFEC = 0x%lx, got PFEC = %lx, PxE = 0x%lx.  "
-+           "host.NX = %u, host.SMEP = %u, guest.NX = %u, guest.SMEP = %u",
-+           pfec, vmcb->control.exit_info_1, *pxe,
-+           !!(efer & EFER_NX), !!(cr4 & X86_CR4_SMEP),
-+           !!(guest_efer & EFER_NX), !!(guest_cr4 & X86_CR4_SMEP));
-+
-+    *pxe = pxe_orig;
-+}
-+
-+static void _svm_npt_rsvd_bits_test(u64 *pxe, u64 pxe_rsvd_bits,  u64 efer,
-+                    ulong cr4, u64 guest_efer, ulong guest_cr4)
-+{
-+    u64 rsvd_bits;
-+    int i;
-+
-+    /*
-+     * RDTSC or RDRAND can sometimes fail to generate a valid reserved bits
-+     */
-+    if (!pxe_rsvd_bits) {
-+        report_skip("svm_npt_rsvd_bits_test: Reserved bits are not valid");
-+        return;
-+    }
-+
-+    /*
-+     * Test all combinations of guest/host EFER.NX and CR4.SMEP.  If host
-+     * EFER.NX=0, use NX as the reserved bit, otherwise use the passed in
-+     * @pxe_rsvd_bits.
-+     */
-+    for (i = 0; i < 16; i++) {
-+        if (i & 1) {
-+            rsvd_bits = pxe_rsvd_bits;
-+            efer |= EFER_NX;
-+        } else {
-+            rsvd_bits = PT64_NX_MASK;
-+            efer &= ~EFER_NX;
-+        }
-+        if (i & 2)
-+            cr4 |= X86_CR4_SMEP;
-+        else
-+            cr4 &= ~X86_CR4_SMEP;
-+        if (i & 4)
-+            guest_efer |= EFER_NX;
-+        else
-+            guest_efer &= ~EFER_NX;
-+        if (i & 8)
-+            guest_cr4 |= X86_CR4_SMEP;
-+        else
-+            guest_cr4 &= ~X86_CR4_SMEP;
-+
-+        __svm_npt_rsvd_bits_test(pxe, rsvd_bits, efer, cr4,
-+                     guest_efer, guest_cr4);
-+    }
-+}
-+
-+static u64 get_random_bits(u64 hi, u64 low)
-+{
-+    unsigned retry = 5;
-+    u64 rsvd_bits = 0;
-+
-+    if (this_cpu_has(X86_FEATURE_RDRAND)) {
-+        do {
-+            rsvd_bits = (rdrand() << low) & GENMASK_ULL(hi, low);
-+            retry--;
-+        } while (!rsvd_bits && retry);
-+    }
-+
-+    if (!rsvd_bits) {
-+        retry = 5;
-+        do {
-+            rsvd_bits = (rdtsc() << low) & GENMASK_ULL(hi, low);
-+            retry--;
-+        } while (!rsvd_bits && retry);
-+    }
-+
-+    return rsvd_bits;
-+}
-+
-+static void svm_npt_rsvd_bits_test(void)
-+{
-+    u64   saved_efer, host_efer, sg_efer, guest_efer;
-+    ulong saved_cr4,  host_cr4,  sg_cr4,  guest_cr4;
-+
-+    if (!npt_supported()) {
-+        report_skip("NPT not supported");
-+        return;
-+    }
-+
-+    saved_efer = host_efer  = rdmsr(MSR_EFER);
-+    saved_cr4  = host_cr4   = read_cr4();
-+    sg_efer    = guest_efer = vmcb->save.efer;
-+    sg_cr4     = guest_cr4  = vmcb->save.cr4;
-+
-+    test_set_guest(basic_guest_main);
-+
-+   /*
-+    * 4k PTEs don't have reserved bits if MAXPHYADDR >= 52, just skip the
-+    * sub-test.  The NX test is still valid, but the extra bit of coverage
-+    * isn't worth the extra complexity.
-+    */
-+    if (cpuid_maxphyaddr() >= 52)
-+        goto skip_pte_test;
-+
-+    _svm_npt_rsvd_bits_test(npt_get_pte((u64)basic_guest_main),
-+                get_random_bits(51, cpuid_maxphyaddr()),
-+                host_efer, host_cr4, guest_efer, guest_cr4);
-+
-+skip_pte_test:
-+    _svm_npt_rsvd_bits_test(npt_get_pde((u64)basic_guest_main),
-+                get_random_bits(20, 13) | PT_PAGE_SIZE_MASK,
-+                host_efer, host_cr4, guest_efer, guest_cr4);
-+
-+    _svm_npt_rsvd_bits_test(npt_get_pdpe(),
-+                PT_PAGE_SIZE_MASK |
-+                    (this_cpu_has(X86_FEATURE_GBPAGES) ? get_random_bits(29, 13) : 0),
-+                host_efer, host_cr4, guest_efer, guest_cr4);
-+
-+    _svm_npt_rsvd_bits_test(npt_get_pml4e(), BIT_ULL(8),
-+                host_efer, host_cr4, guest_efer, guest_cr4);
-+
-+    wrmsr(MSR_EFER, saved_efer);
-+    write_cr4(saved_cr4);
-+    vmcb->save.efer = sg_efer;
-+    vmcb->save.cr4  = sg_cr4;
-+}
-+
-+int main(int ac, char **av)
-+{
-+    pteval_t opt_mask = 0;
-+
-+    __setup_vm(&opt_mask);
-+    return run_svm_tests(ac, av);
-+}
-+
-+#define TEST(name) { #name, .v2 = name }
-+
-+struct svm_test svm_tests[] = {
-+    { "npt_nx", npt_supported, npt_nx_prepare,
-+      default_prepare_gif_clear, null_test,
-+      default_finished, npt_nx_check },
-+    { "npt_np", npt_supported, npt_np_prepare,
-+      default_prepare_gif_clear, npt_np_test,
-+      default_finished, npt_np_check },
-+    { "npt_us", npt_supported, npt_us_prepare,
-+      default_prepare_gif_clear, npt_us_test,
-+      default_finished, npt_us_check },
-+    { "npt_rw", npt_supported, npt_rw_prepare,
-+      default_prepare_gif_clear, npt_rw_test,
-+      default_finished, npt_rw_check },
-+    { "npt_rw_pfwalk", npt_supported, npt_rw_pfwalk_prepare,
-+      default_prepare_gif_clear, null_test,
-+      default_finished, npt_rw_pfwalk_check },
-+    { "npt_l1mmio", npt_supported, npt_l1mmio_prepare,
-+      default_prepare_gif_clear, npt_l1mmio_test,
-+      default_finished, npt_l1mmio_check },
-+    { "npt_rw_l1mmio", npt_supported, npt_rw_l1mmio_prepare,
-+      default_prepare_gif_clear, npt_rw_l1mmio_test,
-+      default_finished, npt_rw_l1mmio_check },
-+    TEST(svm_npt_rsvd_bits_test)
-+};
 diff --git a/x86/svm_tests.c b/x86/svm_tests.c
-index 0707786..41980d9 100644
+index 41980d9..fce466e 100644
 --- a/x86/svm_tests.c
 +++ b/x86/svm_tests.c
-@@ -10,11 +10,10 @@
+@@ -10,7 +10,6 @@
  #include "isr.h"
  #include "apic.h"
  #include "delay.h"
-+#include "vmalloc.h"
+-#include "vmalloc.h"
  
  #define SVM_EXIT_MAX_DR_INTERCEPT 0x3f
  
--static void *scratch_page;
--
- #define LATENCY_RUNS 1000000
+@@ -2736,9 +2735,7 @@ static void svm_nm_test(void)
  
- extern u16 cpu_online_count;
-@@ -698,181 +697,6 @@ static bool sel_cr0_bug_check(struct svm_test *test)
-     return vmcb->control.exit_code == SVM_EXIT_CR0_SEL_WRITE;
+ int main(int ac, char **av)
+ {
+-    pteval_t opt_mask = 0;
+-
+-    __setup_vm(&opt_mask);
++    setup_vm();
+     return run_svm_tests(ac, av);
  }
  
--static void npt_nx_prepare(struct svm_test *test)
--{
--    u64 *pte;
--
--    test->scratch = rdmsr(MSR_EFER);
--    wrmsr(MSR_EFER, test->scratch | EFER_NX);
--
--    /* Clear the guest's EFER.NX, it should not affect NPT behavior. */
--    vmcb->save.efer &= ~EFER_NX;
--
--    pte = npt_get_pte((u64)null_test);
--
--    *pte |= PT64_NX_MASK;
--}
--
--static bool npt_nx_check(struct svm_test *test)
--{
--    u64 *pte = npt_get_pte((u64)null_test);
--
--    wrmsr(MSR_EFER, test->scratch);
--
--    *pte &= ~PT64_NX_MASK;
--
--    return (vmcb->control.exit_code == SVM_EXIT_NPF)
--           && (vmcb->control.exit_info_1 == 0x100000015ULL);
--}
--
--static void npt_np_prepare(struct svm_test *test)
--{
--    u64 *pte;
--
--    scratch_page = alloc_page();
--    pte = npt_get_pte((u64)scratch_page);
--
--    *pte &= ~1ULL;
--}
--
--static void npt_np_test(struct svm_test *test)
--{
--    (void) *(volatile u64 *)scratch_page;
--}
--
--static bool npt_np_check(struct svm_test *test)
--{
--    u64 *pte = npt_get_pte((u64)scratch_page);
--
--    *pte |= 1ULL;
--
--    return (vmcb->control.exit_code == SVM_EXIT_NPF)
--           && (vmcb->control.exit_info_1 == 0x100000004ULL);
--}
--
--static void npt_us_prepare(struct svm_test *test)
--{
--    u64 *pte;
--
--    scratch_page = alloc_page();
--    pte = npt_get_pte((u64)scratch_page);
--
--    *pte &= ~(1ULL << 2);
--}
--
--static void npt_us_test(struct svm_test *test)
--{
--    (void) *(volatile u64 *)scratch_page;
--}
--
--static bool npt_us_check(struct svm_test *test)
--{
--    u64 *pte = npt_get_pte((u64)scratch_page);
--
--    *pte |= (1ULL << 2);
--
--    return (vmcb->control.exit_code == SVM_EXIT_NPF)
--           && (vmcb->control.exit_info_1 == 0x100000005ULL);
--}
--
--static void npt_rw_prepare(struct svm_test *test)
--{
--
--    u64 *pte;
--
--    pte = npt_get_pte(0x80000);
--
--    *pte &= ~(1ULL << 1);
--}
--
--static void npt_rw_test(struct svm_test *test)
--{
--    u64 *data = (void*)(0x80000);
--
--    *data = 0;
--}
--
--static bool npt_rw_check(struct svm_test *test)
--{
--    u64 *pte = npt_get_pte(0x80000);
--
--    *pte |= (1ULL << 1);
--
--    return (vmcb->control.exit_code == SVM_EXIT_NPF)
--           && (vmcb->control.exit_info_1 == 0x100000007ULL);
--}
--
--static void npt_rw_pfwalk_prepare(struct svm_test *test)
--{
--
--    u64 *pte;
--
--    pte = npt_get_pte(read_cr3());
--
--    *pte &= ~(1ULL << 1);
--}
--
--static bool npt_rw_pfwalk_check(struct svm_test *test)
--{
--    u64 *pte = npt_get_pte(read_cr3());
--
--    *pte |= (1ULL << 1);
--
--    return (vmcb->control.exit_code == SVM_EXIT_NPF)
--           && (vmcb->control.exit_info_1 == 0x200000007ULL)
--	   && (vmcb->control.exit_info_2 == read_cr3());
--}
--
--static void npt_l1mmio_prepare(struct svm_test *test)
--{
--}
--
--u32 nested_apic_version1;
--u32 nested_apic_version2;
--
--static void npt_l1mmio_test(struct svm_test *test)
--{
--    volatile u32 *data = (volatile void*)(0xfee00030UL);
--
--    nested_apic_version1 = *data;
--    nested_apic_version2 = *data;
--}
--
--static bool npt_l1mmio_check(struct svm_test *test)
--{
--    volatile u32 *data = (volatile void*)(0xfee00030);
--    u32 lvr = *data;
--
--    return nested_apic_version1 == lvr && nested_apic_version2 == lvr;
--}
--
--static void npt_rw_l1mmio_prepare(struct svm_test *test)
--{
--
--    u64 *pte;
--
--    pte = npt_get_pte(0xfee00080);
--
--    *pte &= ~(1ULL << 1);
--}
--
--static void npt_rw_l1mmio_test(struct svm_test *test)
--{
--    volatile u32 *data = (volatile void*)(0xfee00080);
--
--    *data = *data;
--}
--
--static bool npt_rw_l1mmio_check(struct svm_test *test)
--{
--    u64 *pte = npt_get_pte(0xfee00080);
--
--    *pte |= (1ULL << 1);
--
--    return (vmcb->control.exit_code == SVM_EXIT_NPF)
--           && (vmcb->control.exit_info_1 == 0x100000007ULL);
--}
--
- #define TSC_ADJUST_VALUE    (1ll << 32)
- #define TSC_OFFSET_VALUE    (~0ull << 48)
- static bool ok;
-@@ -2604,173 +2428,9 @@ static void svm_test_singlestep(void)
- 		vmcb->save.rip == (u64)&guest_end, "Test EFLAGS.TF on VMRUN: guest execution completion");
- }
- 
--static void __svm_npt_rsvd_bits_test(u64 *pxe, u64 rsvd_bits, u64 efer,
--				     ulong cr4, u64 guest_efer, ulong guest_cr4)
--{
--	u64 pxe_orig = *pxe;
--	int exit_reason;
--	u64 pfec;
--
--	wrmsr(MSR_EFER, efer);
--	write_cr4(cr4);
--
--	vmcb->save.efer = guest_efer;
--	vmcb->save.cr4  = guest_cr4;
--
--	*pxe |= rsvd_bits;
--
--	exit_reason = svm_vmrun();
--
--	report(exit_reason == SVM_EXIT_NPF,
--	       "Wanted #NPF on rsvd bits = 0x%lx, got exit = 0x%x", rsvd_bits, exit_reason);
--
--	if (pxe == npt_get_pdpe() || pxe == npt_get_pml4e()) {
--		/*
--		 * The guest's page tables will blow up on a bad PDPE/PML4E,
--		 * before starting the final walk of the guest page.
--		 */
--		pfec = 0x20000000full;
--	} else {
--		/* RSVD #NPF on final walk of guest page. */
--		pfec = 0x10000000dULL;
--
--		/* PFEC.FETCH=1 if NX=1 *or* SMEP=1. */
--		if ((cr4 & X86_CR4_SMEP) || (efer & EFER_NX))
--			pfec |= 0x10;
--
--	}
--
--	report(vmcb->control.exit_info_1 == pfec,
--	       "Wanted PFEC = 0x%lx, got PFEC = %lx, PxE = 0x%lx.  "
--	       "host.NX = %u, host.SMEP = %u, guest.NX = %u, guest.SMEP = %u",
--	       pfec, vmcb->control.exit_info_1, *pxe,
--	       !!(efer & EFER_NX), !!(cr4 & X86_CR4_SMEP),
--	       !!(guest_efer & EFER_NX), !!(guest_cr4 & X86_CR4_SMEP));
--
--	*pxe = pxe_orig;
--}
--
--static void _svm_npt_rsvd_bits_test(u64 *pxe, u64 pxe_rsvd_bits,  u64 efer,
--				    ulong cr4, u64 guest_efer, ulong guest_cr4)
--{
--	u64 rsvd_bits;
--	int i;
--
--	/*
--	 * RDTSC or RDRAND can sometimes fail to generate a valid reserved bits
--	 */
--	if (!pxe_rsvd_bits) {
--		report_skip("svm_npt_rsvd_bits_test: Reserved bits are not valid");
--		return;
--	}
--
--	/*
--	 * Test all combinations of guest/host EFER.NX and CR4.SMEP.  If host
--	 * EFER.NX=0, use NX as the reserved bit, otherwise use the passed in
--	 * @pxe_rsvd_bits.
--	 */
--	for (i = 0; i < 16; i++) {
--		if (i & 1) {
--			rsvd_bits = pxe_rsvd_bits;
--			efer |= EFER_NX;
--		} else {
--			rsvd_bits = PT64_NX_MASK;
--			efer &= ~EFER_NX;
--		}
--		if (i & 2)
--			cr4 |= X86_CR4_SMEP;
--		else
--			cr4 &= ~X86_CR4_SMEP;
--		if (i & 4)
--			guest_efer |= EFER_NX;
--		else
--			guest_efer &= ~EFER_NX;
--		if (i & 8)
--			guest_cr4 |= X86_CR4_SMEP;
--		else
--			guest_cr4 &= ~X86_CR4_SMEP;
--
--		__svm_npt_rsvd_bits_test(pxe, rsvd_bits, efer, cr4,
--					 guest_efer, guest_cr4);
--	}
--}
--
--static u64 get_random_bits(u64 hi, u64 low)
--{
--	unsigned retry = 5;
--	u64 rsvd_bits = 0;
--
--	if (this_cpu_has(X86_FEATURE_RDRAND)) {
--		do {
--			rsvd_bits = (rdrand() << low) & GENMASK_ULL(hi, low);
--			retry--;
--		} while (!rsvd_bits && retry);
--	}
--
--	if (!rsvd_bits) {
--		retry = 5;
--		do {
--			rsvd_bits = (rdtsc() << low) & GENMASK_ULL(hi, low);
--			retry--;
--		} while (!rsvd_bits && retry);
--	}
--
--	return rsvd_bits;
--}
--
--
--static void svm_npt_rsvd_bits_test(void)
--{
--	u64   saved_efer, host_efer, sg_efer, guest_efer;
--	ulong saved_cr4,  host_cr4,  sg_cr4,  guest_cr4;
--
--	if (!npt_supported()) {
--		report_skip("NPT not supported");
--		return;
--	}
--
--	saved_efer = host_efer  = rdmsr(MSR_EFER);
--	saved_cr4  = host_cr4   = read_cr4();
--	sg_efer    = guest_efer = vmcb->save.efer;
--	sg_cr4     = guest_cr4  = vmcb->save.cr4;
--
--	test_set_guest(basic_guest_main);
--
--	/*
--	 * 4k PTEs don't have reserved bits if MAXPHYADDR >= 52, just skip the
--	 * sub-test.  The NX test is still valid, but the extra bit of coverage
--	 * isn't worth the extra complexity.
--	 */
--	if (cpuid_maxphyaddr() >= 52)
--		goto skip_pte_test;
--
--	_svm_npt_rsvd_bits_test(npt_get_pte((u64)basic_guest_main),
--				get_random_bits(51, cpuid_maxphyaddr()),
--				host_efer, host_cr4, guest_efer, guest_cr4);
--
--skip_pte_test:
--	_svm_npt_rsvd_bits_test(npt_get_pde((u64)basic_guest_main),
--				get_random_bits(20, 13) | PT_PAGE_SIZE_MASK,
--				host_efer, host_cr4, guest_efer, guest_cr4);
--
--	_svm_npt_rsvd_bits_test(npt_get_pdpe(),
--				PT_PAGE_SIZE_MASK |
--					(this_cpu_has(X86_FEATURE_GBPAGES) ? get_random_bits(29, 13) : 0),
--				host_efer, host_cr4, guest_efer, guest_cr4);
--
--	_svm_npt_rsvd_bits_test(npt_get_pml4e(), BIT_ULL(8),
--				host_efer, host_cr4, guest_efer, guest_cr4);
--
--	wrmsr(MSR_EFER, saved_efer);
--	write_cr4(saved_cr4);
--	vmcb->save.efer = sg_efer;
--	vmcb->save.cr4  = sg_cr4;
--}
--
- static bool volatile svm_errata_reproduced = false;
- static unsigned long volatile physical = 0;
- 
--
- /*
-  *
-  * Test the following errata:
-@@ -3074,6 +2734,14 @@ static void svm_nm_test(void)
-         "fnop with CR0.TS and CR0.EM unset no #NM excpetion");
- }
- 
-+int main(int ac, char **av)
-+{
-+    pteval_t opt_mask = 0;
-+
-+    __setup_vm(&opt_mask);
-+    return run_svm_tests(ac, av);
-+}
-+
- struct svm_test svm_tests[] = {
-     { "null", default_supported, default_prepare,
-       default_prepare_gif_clear, null_test,
-@@ -3117,27 +2785,6 @@ struct svm_test svm_tests[] = {
-     { "sel_cr0_bug", default_supported, sel_cr0_bug_prepare,
-       default_prepare_gif_clear, sel_cr0_bug_test,
-        sel_cr0_bug_finished, sel_cr0_bug_check },
--    { "npt_nx", npt_supported, npt_nx_prepare,
--      default_prepare_gif_clear, null_test,
--      default_finished, npt_nx_check },
--    { "npt_np", npt_supported, npt_np_prepare,
--      default_prepare_gif_clear, npt_np_test,
--      default_finished, npt_np_check },
--    { "npt_us", npt_supported, npt_us_prepare,
--      default_prepare_gif_clear, npt_us_test,
--      default_finished, npt_us_check },
--    { "npt_rw", npt_supported, npt_rw_prepare,
--      default_prepare_gif_clear, npt_rw_test,
--      default_finished, npt_rw_check },
--    { "npt_rw_pfwalk", npt_supported, npt_rw_pfwalk_prepare,
--      default_prepare_gif_clear, null_test,
--      default_finished, npt_rw_pfwalk_check },
--    { "npt_l1mmio", npt_supported, npt_l1mmio_prepare,
--      default_prepare_gif_clear, npt_l1mmio_test,
--      default_finished, npt_l1mmio_check },
--    { "npt_rw_l1mmio", npt_supported, npt_rw_l1mmio_prepare,
--      default_prepare_gif_clear, npt_rw_l1mmio_test,
--      default_finished, npt_rw_l1mmio_check },
-     { "tsc_adjust", tsc_adjust_supported, tsc_adjust_prepare,
-       default_prepare_gif_clear, tsc_adjust_test,
-       default_finished, tsc_adjust_check },
-@@ -3189,7 +2836,6 @@ struct svm_test svm_tests[] = {
-       vgif_check },
-     TEST(svm_cr4_osxsave_test),
-     TEST(svm_guest_state_test),
--    TEST(svm_npt_rsvd_bits_test),
-     TEST(svm_vmrun_errata_test),
-     TEST(svm_vmload_vmsave),
-     TEST(svm_test_singlestep),
-diff --git a/x86/unittests.cfg b/x86/unittests.cfg
-index 9a70ba3..0d14721 100644
---- a/x86/unittests.cfg
-+++ b/x86/unittests.cfg
-@@ -240,6 +240,12 @@ smp = 2
- extra_params = -cpu max,+svm -m 4g
- arch = x86_64
- 
-+[svm_npt]
-+file = svm_npt.flat
-+smp = 2
-+extra_params = -cpu max,+svm -m 4g
-+arch = x86_64
-+
- [taskswitch]
- file = taskswitch.flat
- arch = i386
 -- 
 2.30.2
 
