@@ -2,189 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4B0754E69E9
-	for <lists+kvm@lfdr.de>; Thu, 24 Mar 2022 21:40:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4B8C14E6A3D
+	for <lists+kvm@lfdr.de>; Thu, 24 Mar 2022 22:31:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346156AbiCXUlz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Mar 2022 16:41:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58764 "EHLO
+        id S1355361AbiCXVdY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Mar 2022 17:33:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56110 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239357AbiCXUly (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Mar 2022 16:41:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 057BC972D5
-        for <kvm@vger.kernel.org>; Thu, 24 Mar 2022 13:40:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1648154421;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=YcqkWAtIoHhKaWHguuTSHckFy2uV+KOK7nFBpa+JxJo=;
-        b=edyc0AxSXd8NLDHyCBrRSZkqpxYDlY2ZSnHi/mP8s7PwYG8MOOzaSGcPk+egg0i+6lx8qx
-        NZMswZh3DZt0WsRVtRMh4dAYHeLcbcD2PKBPCznqspLVLWToVVjyWHQi10Iqikefe+GlTC
-        9z656H5e3lalYuALxt4MyavzKltSZh8=
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
- [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-408-Ip1NUAW7M8Kue-YtAecCaQ-1; Thu, 24 Mar 2022 16:40:19 -0400
-X-MC-Unique: Ip1NUAW7M8Kue-YtAecCaQ-1
-Received: by mail-il1-f200.google.com with SMTP id u15-20020a92da8f000000b002c863d2f21dso2979400iln.15
-        for <kvm@vger.kernel.org>; Thu, 24 Mar 2022 13:40:19 -0700 (PDT)
+        with ESMTP id S1354202AbiCXVcw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Mar 2022 17:32:52 -0400
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7CA5ADD6D
+        for <kvm@vger.kernel.org>; Thu, 24 Mar 2022 14:31:19 -0700 (PDT)
+Received: by mail-pf1-x433.google.com with SMTP id b13so3073450pfv.0
+        for <kvm@vger.kernel.org>; Thu, 24 Mar 2022 14:31:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=PkVWjMpiO98nzKDVQQrcUIwfsuWOhTX7zsEIwTfXQz8=;
+        b=A0A6FAu85y4IM7Zo4rk6dxWiWIM9dUf4Os4IUjZ3SSIulTjV98iyKNbN2AIj2gb7TV
+         sQ+xrKPhSeg4c+s324IsR/3LnTh3Sb5Tjkqv7rDerWbWZsSDobupIxEHcyEeR656C1/P
+         rjnshrunYyXzx8NkmBRRrv3jJ3WMFa00cAUj/3Xe/w90ZLDpZpWEuzYRaV+t+VV7mgNJ
+         i5u/qGMQYovyhH3M1cX7iF9+38RmLqtjl0CRmTu8EX1UfUM1qWaLdjJbyqE0MchcrACz
+         FFNnprPyCdHUsslti/xCAEBD0GXl+XDLp9eYu9PtPJV2C3OZCDrIfzDZN6lcjdKeqM2N
+         crRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=YcqkWAtIoHhKaWHguuTSHckFy2uV+KOK7nFBpa+JxJo=;
-        b=M+4+GZnePdB78W6UGWqs9ERy/N189gqbK2mYoFD202WBfjkaotiIKHKL4iBxv2N30I
-         374xmz5dIepL0fQEpeMWLUre1TkLXTt1V0YKkXZK6bjvKJ6ujbxwGhyzzd+Joy5rUIZf
-         AnYxRs61NjbyKAlsGq0WxKxqXimLu/gdIyP4Od3NKcxY8fedueWJ0C/MUmZDnSMiUsYu
-         FhoLsxweRmDpmf7wiP1bk3GR2IJmhsE6hdfMRe4VeiavlZetytzQi2KACnvhcdxG4iPC
-         aWE55bPsbJb5pEu/ucVktn/pmGMKDNj7U6v/UlKL1cTRfnvJFkQg2s8eGxLCeo5VOcum
-         aNwg==
-X-Gm-Message-State: AOAM532My/VKpcheCLUoB0Kh0jniS+acAZODOC/Snd4j2t6noMH8vRh9
-        hh8O53FfEvdfSsuqRNe1hZVsLzhe1vtALkcC16vcUmGNNQEj8wN5+zol8Xchjr0c4TgU+Ke1zMR
-        x2nudj13NEu5p
-X-Received: by 2002:a5d:9da0:0:b0:646:4297:19de with SMTP id ay32-20020a5d9da0000000b00646429719demr3763034iob.192.1648154418994;
-        Thu, 24 Mar 2022 13:40:18 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwopmqoCIMeyEsE8B56txeb229eqdmXoF3CZI0belX8dei6vqWnikSzyfxA9iLbrgAEVuuhIw==
-X-Received: by 2002:a5d:9da0:0:b0:646:4297:19de with SMTP id ay32-20020a5d9da0000000b00646429719demr3763023iob.192.1648154418710;
-        Thu, 24 Mar 2022 13:40:18 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id q4-20020a056e0215c400b002c5fdff3087sm2320928ilu.29.2022.03.24.13.40.17
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=PkVWjMpiO98nzKDVQQrcUIwfsuWOhTX7zsEIwTfXQz8=;
+        b=3ZmYoi25EaafpyYJiUOugv2mZhkkGwcBQi9TXWXiMpd3wrXjFQ2nWrcBK5b9Nq4xQm
+         yKVgxbYQBbgpKHQXHmO/smZOkyZPr17kABejj2OpB9XQwCHYatdUOw84+m2dAAAogn1t
+         +82b2IVAZWeQTCeuljpv1WiHb1R4xlmGJQImbgWLlkOM0MLAABlptv9zvvsECprFjKS7
+         FVgagd1EG+bMYM215QUxybwoJJa80q3rTrMTBUQPodlx/+z1zT9AFYEaipfznM6f9Pci
+         sfKY7y0jcUT9dF7zrZ1SDQ5OfF+zy7YVMm4wf3vuajd7cjhqoeke1LZmww+fc98zrlx0
+         g6Dg==
+X-Gm-Message-State: AOAM530LYJuHvhyyHSCluPXArLslfD3bJ2NzsApyXdHZepN3BumaijPo
+        Rf3ucrujDydx08mC9aJq8GUn8g==
+X-Google-Smtp-Source: ABdhPJyNXAQ+2L6fResIakOaE6XHoiEy3QRCUcnDi5KbkAdZjQv98JflphIymS2xgPFzyRyM8nz54Q==
+X-Received: by 2002:a62:fb0f:0:b0:4f2:6d3f:5ffb with SMTP id x15-20020a62fb0f000000b004f26d3f5ffbmr6683025pfm.55.1648157479119;
+        Thu, 24 Mar 2022 14:31:19 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id q18-20020aa78432000000b004fb0a5aa2c7sm342172pfn.183.2022.03.24.14.31.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Mar 2022 13:40:18 -0700 (PDT)
-Date:   Thu, 24 Mar 2022 14:40:15 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe via iommu <iommu@lists.linux-foundation.org>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        kvm@vger.kernel.org, Niklas Schnelle <schnelle@linux.ibm.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>
-Subject: Re: [PATCH RFC 04/12] kernel/user: Allow user::locked_vm to be
- usable for iommufd
-Message-ID: <20220324144015.031ca277.alex.williamson@redhat.com>
-In-Reply-To: <20220322161521.GJ11336@nvidia.com>
-References: <4-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
-        <808a871b3918dc067031085de3e8af6b49c6ef89.camel@linux.ibm.com>
-        <20220322145741.GH11336@nvidia.com>
-        <20220322092923.5bc79861.alex.williamson@redhat.com>
-        <20220322161521.GJ11336@nvidia.com>
-Organization: Red Hat
+        Thu, 24 Mar 2022 14:31:18 -0700 (PDT)
+Date:   Thu, 24 Mar 2022 21:31:14 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Oliver Upton <oupton@google.com>,
+        Peter Shier <pshier@google.com>
+Subject: Re: [PATCH 00/21] KVM: x86: Event/exception fixes and cleanups
+Message-ID: <YjzjIhyw6aqsSI7Q@google.com>
+References: <20220311032801.3467418-1-seanjc@google.com>
+ <08548cb00c4b20426e5ee9ae2432744d6fa44fe8.camel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <08548cb00c4b20426e5ee9ae2432744d6fa44fe8.camel@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 22 Mar 2022 13:15:21 -0300
-Jason Gunthorpe via iommu <iommu@lists.linux-foundation.org> wrote:
+On Sun, Mar 13, 2022, Maxim Levitsky wrote:
+> On Fri, 2022-03-11 at 03:27 +0000, Sean Christopherson wrote:
+> > The main goal of this series is to fix KVM's longstanding bug of not
+> > honoring L1's exception intercepts wants when handling an exception that
+> > occurs during delivery of a different exception.  E.g. if L0 and L1 are
+> > using shadow paging, and L2 hits a #PF, and then hits another #PF while
+> > vectoring the first #PF due to _L1_ not having a shadow page for the IDT,
+> > KVM needs to check L1's intercepts before morphing the #PF => #PF => #DF
+> > so that the #PF is routed to L1, not injected into L2 as a #DF.
+> > 
+> > nVMX has hacked around the bug for years by overriding the #PF injector
+> > for shadow paging to go straight to VM-Exit, and nSVM has started doing
+> > the same.  The hacks mostly work, but they're incomplete, confusing, and
+> > lead to other hacky code, e.g. bailing from the emulator because #PF
+> > injection forced a VM-Exit and suddenly KVM is back in L1.
+> > 
+> > Everything leading up to that are related fixes and cleanups I encountered
+> > along the way; some through code inspection, some through tests (I truly
+> > thought this series was finished 10 commits and 3 days ago...).
+> > 
+> > Nothing in here is all that urgent; all bugs tagged for stable have been
+> > around for multiple releases (years in most cases).
+> > 
+> I am just curious. Are you aware that I worked on this few months ago?
 
-> On Tue, Mar 22, 2022 at 09:29:23AM -0600, Alex Williamson wrote:
-> 
-> > I'm still picking my way through the series, but the later compat
-> > interface doesn't mention this difference as an outstanding issue.
-> > Doesn't this difference need to be accounted in how libvirt manages VM
-> > resource limits?    
-> 
-> AFACIT, no, but it should be checked.
-> 
-> > AIUI libvirt uses some form of prlimit(2) to set process locked
-> > memory limits.  
-> 
-> Yes, and ulimit does work fully. prlimit adjusts the value:
-> 
-> int do_prlimit(struct task_struct *tsk, unsigned int resource,
-> 		struct rlimit *new_rlim, struct rlimit *old_rlim)
-> {
-> 	rlim = tsk->signal->rlim + resource;
-> [..]
-> 		if (new_rlim)
-> 			*rlim = *new_rlim;
-> 
-> Which vfio reads back here:
-> 
-> drivers/vfio/vfio_iommu_type1.c:        unsigned long pfn, limit = rlimit(RLIMIT_MEMLOCK) >> PAGE_SHIFT;
-> drivers/vfio/vfio_iommu_type1.c:        unsigned long limit = rlimit(RLIMIT_MEMLOCK) >> PAGE_SHIFT;
-> 
-> And iommufd does the same read back:
-> 
-> 	lock_limit =
-> 		task_rlimit(pages->source_task, RLIMIT_MEMLOCK) >> PAGE_SHIFT;
-> 	npages = pages->npinned - pages->last_npinned;
-> 	do {
-> 		cur_pages = atomic_long_read(&pages->source_user->locked_vm);
-> 		new_pages = cur_pages + npages;
-> 		if (new_pages > lock_limit)
-> 			return -ENOMEM;
-> 	} while (atomic_long_cmpxchg(&pages->source_user->locked_vm, cur_pages,
-> 				     new_pages) != cur_pages);
-> 
-> So it does work essentially the same.
+Ah, so that's why I had a feeling of deja vu when factoring out kvm_queued_exception.
+I completely forgot about it :-/  In my defense, that was nearly a year ago[1][2], though
+I suppose one could argue 11 == "a few" :-)
 
-Well, except for the part about vfio updating mm->locked_vm and iommufd
-updating user->locked_vm, a per-process counter versus a per-user
-counter.  prlimit specifically sets process resource limits, which get
-reflected in task_rlimit.
+[1] https://lore.kernel.org/all/20210225154135.405125-1-mlevitsk@redhat.com
+[2] https://lore.kernel.org/all/20210401143817.1030695-3-mlevitsk@redhat.com
 
-For example, let's say a user has two 4GB VMs and they're hot-adding
-vfio devices to each of them, so libvirt needs to dynamically modify
-the locked memory limit for each VM.  AIUI, libvirt would look at the
-VM size and call prlimit to set that value.  If libvirt does this to
-both VMs, then each has a task_rlimit of 4GB.  In vfio we add pinned
-pages to mm->locked_vm, so this works well.  In the iommufd loop above,
-we're comparing a per-task/process limit to a per-user counter.  So I'm
-a bit lost how both VMs can pin their pages here.
+> I am sure that you even reviewed some of my code back then.
 
-Am I missing some assumption about how libvirt users prlimit or
-sandboxes users?
+Yep, now that I've found the threads I remember discussing the mechanics.
 
-> The difference is more subtle, iouring/etc puts the charge in the user
-> so it is additive with things like iouring and additively spans all
-> the users processes.
-> 
-> However vfio is accounting only per-process and only for itself - no
-> other subsystem uses locked as the charge variable for DMA pins.
-> 
-> The user visible difference will be that a limit X that worked with
-> VFIO may start to fail after a kernel upgrade as the charge accounting
-> is now cross user and additive with things like iommufd.
+> If so, could you have had at least mentioned this and/or pinged me to continue
+> working on this instead of re-implementing it?
 
-And that's exactly the concern.
- 
-> This whole area is a bit peculiar (eg mlock itself works differently),
-> IMHO, but with most of the places doing pins voting to use
-> user->locked_vm as the charge it seems the right path in today's
-> kernel.
+I'm invoking Hanlon's razor[*]; I certainly didn't intended to stomp over your
+work, I simply forgot.
 
-The philosophy of whether it's ultimately a better choice for the
-kernel aside, if userspace breaks because we're accounting in a
-per-user pool rather than a per-process pool, then our compatibility
-layer ain't so transparent.
+As for the technical aspects, looking back at your series, I strongly considered
+taking the same approach of splitting pending vs. injected (again, without any
+recollection of your work).  I ultimately opted to go with the "immediated morph
+to pending VM-Exit" approach as it allows KVM to do the right thing in almost every
+case without requiring new ABI, and even if KVM screws up, e.g. queues multiple
+pending exceptions.  It also neatly handles one-off things like async #PF in L2.
 
-> Ceratinly having qemu concurrently using three different subsystems
-> (vfio, rdma, iouring) issuing FOLL_LONGTERM and all accounting for
-> RLIMIT_MEMLOCK differently cannot be sane or correct.
+However, I hadn't considered your approach, which addresses the ABI conundrum by
+processing pending=>injected immediately after handling the VM-Exit.  I can't think
+of any reason that wouldn't work, but I really don't like splitting the event
+priority logic, nor do I like having two event injection sites (getting rid of the
+extra calls to kvm_check_nested_events() is still on my wish list).  If we could go
+back in time, I would likely vote for properly tracking injected vs. pending, but
+since we're mostly stuck with KVM's ABI, I prefer the "immediately morph to pending
+VM-Exit" hack over the "immediately morph to 'injected' exception" hack.
 
-I think everyone would agree with that, but it also seems there are
-real differences between task_rlimits and per-user vs per-process
-accounting buckets and I'm confused how that's not a blocker for trying
-to implement transparent compatibility.  Thanks,
-
-Alex
-
+[*] https://en.wikipedia.org/wiki/Hanlon%27s_razor
