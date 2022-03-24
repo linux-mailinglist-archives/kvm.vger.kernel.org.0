@@ -2,225 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 480804E6B08
-	for <lists+kvm@lfdr.de>; Fri, 25 Mar 2022 00:12:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B370A4E6B5B
+	for <lists+kvm@lfdr.de>; Fri, 25 Mar 2022 00:58:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355650AbiCXXNh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Mar 2022 19:13:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49664 "EHLO
+        id S242353AbiCXX7u (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Mar 2022 19:59:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344431AbiCXXNf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Mar 2022 19:13:35 -0400
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1anam02on2070.outbound.protection.outlook.com [40.107.96.70])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 205D513E2B
-        for <kvm@vger.kernel.org>; Thu, 24 Mar 2022 16:12:03 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VuWBF3WW9nCosEPOdWapo1t/ZUPmmEFgJQrkVnzNE/48RCAiW3PYxx5pBvVwQJfOA22Ka1hUFx7DG9FB6qPzgc+blUSGHiOex6djw7sZHAcDbJgNKsxYl3JDklX6+aruD+Bv5LamlRxqJy5yGvGaMIf/V9Q4jbKTzvMTVwjeLet5IAjR7ZT6urTAXz0wQMk1X/bTJL2XxG70sDpM/5UBgVVv/huvPWI+DBLGBjpzupUb1NsJeXom9e7QS8j8JMDm9F0s3v+T12xXl8d0d3CeSgIfvj+49T4qvEUkVfUyLik4LNuuAdINw78KYt3YIQ2F0uvNWT/POIorS9HBD/tb9w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=a5C3I/x8fsN22LI/ybh42jBcVvj7lpmJwG8ZOG5xqmo=;
- b=Vx7YlswWRqbuEb+0sk4XXXdyYfxIxqB8Db8g+lVCJa+5qy6bnfsxNFXeiMbRC/fLOEgkJMK4aQ1zPp+B++Vdqs7o0FE3bZH3oXQwnYovzkzwHbwZp7PWJAYiYCAvwXnRw+877VsHUCOMwklXpnuCo4jwY4IBUaFfH9nkkeR3PizGpZ56cnmuGi58r34XVGOU8wuDoZwlbKp69zJ9hcu4Wcgv5rQhzwQCcvAiqyFUe1ziKofSUJE9xgbVl5Z6InMct7Jy8ECoVMDMyksblAdrc6XOmX7LxEPwEXZmZ9wP99KRshrUcEvd2dHtJwnL92le9peRXx7E5pPTwCWuJ18L1w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=a5C3I/x8fsN22LI/ybh42jBcVvj7lpmJwG8ZOG5xqmo=;
- b=T8ShO00XsiXPzJ6AlgaRJO06y3kaQ9UrmOoS//nWu4Gb+WZpXV5aj4Hati95G6O1hD5zVHT7xQJsIUbhNgLHxeA/twV0VjC+nJYqxe7j4Vo6+QfJB7rGszWZBBHe6DRZEmM7WmMAwqRLjkoa2I6M25yz6HyzTh9UhSpnNwam8+5ZhKNBZd4xXmfuRqjghUVPlZ83NmpgoyNvE1E3rPYrOy8elex4by+FulxmPs//iUqtaM9fAQWVyCqqvjmBwKMHiCnWCmeoTN1DnsLqLOIP9ymylfnxLACD+RLSLY3kJxevK6wQ90b5NSneHu3w9cYe8ncypd4LAu8SMhI/21K62g==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by DM6PR12MB3033.namprd12.prod.outlook.com (2603:10b6:5:11e::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5081.15; Thu, 24 Mar
- 2022 23:12:00 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::11a0:970a:4c24:c70c]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::11a0:970a:4c24:c70c%6]) with mapi id 15.20.5102.019; Thu, 24 Mar 2022
- 23:12:00 +0000
-Date:   Thu, 24 Mar 2022 20:11:59 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Eric Auger <eric.auger@redhat.com>,
-        iommu@lists.linux-foundation.org, Jason Wang <jasowang@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        Yi Liu <yi.l.liu@intel.com>, Keqian Zhu <zhukeqian1@huawei.com>
-Subject: Re: [PATCH RFC 11/12] iommufd: vfio container FD ioctl compatibility
-Message-ID: <20220324231159.GA11336@nvidia.com>
-References: <0-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
- <11-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
- <20220323165125.5efd5976.alex.williamson@redhat.com>
- <20220324003342.GV11336@nvidia.com>
- <20220324160403.42131028.alex.williamson@redhat.com>
+        with ESMTP id S1357254AbiCXX67 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Mar 2022 19:58:59 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 160CBBB915
+        for <kvm@vger.kernel.org>; Thu, 24 Mar 2022 16:57:27 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id gb19so6088842pjb.1
+        for <kvm@vger.kernel.org>; Thu, 24 Mar 2022 16:57:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=vRsyPprShKsOrs8+V50RHwTMspRZS0ZwGV5m58o59To=;
+        b=TmQMvKZGl8j4AC9+v4TQ2kXOWE4RsoO0PUQfyv8K/3eGGglVyfPUBvNkpbx0WADAVX
+         SWv5U0hghEFJvoNS53WxJmlQFThHCmccIV1OwXx1IXqVnhCRJj5ldB6GIIhFUZQkpUBs
+         UPjpN35CdmUItN+SdZk8EO7smqV0JHbBFVaYUlEebB3I1hwHuVAfvKEofiSV1nC5THKW
+         w6ey9Plu7+StcESpsTklDBdQNKgozR0jlWd46ClmNPXiLIJjSIZmlti/qMaK1N9OCVSO
+         Ld3Gyz0ZuPiC04+rT0BO8fWXZbOL9QsskVlym4Iwep5HWIc0Z5Ko4gZ2na5rQl1vT7Z8
+         b7Dw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=vRsyPprShKsOrs8+V50RHwTMspRZS0ZwGV5m58o59To=;
+        b=QK81EWLCNW0N5juEWbzOeWNl3yiutSJhz9yTzvNAHKa4pS39QRZfa5gdMA88JOEGck
+         KJ4I1/l49HmIhAhI2e0AkjNapE0UN1nG27l5vRUWScUQliGZ+U2jvJcWuGxWZkUAaXDM
+         jYDgWBYpm9Nmvwj0u3BRCriTMlWdP1fKHrxt8yogtS+G+t+oK26BX2+zVnNs/CDA3DUI
+         gj/QpRJ+b807W7OfZ3VAl/Z43aTJY5soRicz3kQ/CzBX3Y5zLMjm9rNyjpMCgZYYjhYd
+         Ilk1WqhydCexBqRvCAlAs3leFvYdn076gFsSbUtninds9eSIOO+ptLAJhGkP7oKe/11C
+         6Nfw==
+X-Gm-Message-State: AOAM532KwynZVAs25KdKbjyNhXGLebf0aknpi9o/FuvvV6TUdlphI3nO
+        UCht9XdPWIA8VKJRJAeHqHv89Z2KShVGrQ==
+X-Google-Smtp-Source: ABdhPJwAsmCkNyblumfyVgiJS5ne1xqn/dmpkY+KcZ9kHHTNU6HKNEuQtpYMbNoVb+ysMF8FKofOxg==
+X-Received: by 2002:a17:90b:1811:b0:1c7:832a:3388 with SMTP id lw17-20020a17090b181100b001c7832a3388mr9399924pjb.40.1648166246379;
+        Thu, 24 Mar 2022 16:57:26 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id ep2-20020a17090ae64200b001c6a7c22aedsm3792497pjb.37.2022.03.24.16.57.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Mar 2022 16:57:25 -0700 (PDT)
+Date:   Thu, 24 Mar 2022 23:57:21 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: Re: [FYI PATCH] Revert "KVM: x86/mmu: Zap only TDP MMU leafs in
+ kvm_zap_gfn_range()"
+Message-ID: <Yj0FYSC2sT4k/ELl@google.com>
+References: <20220318164833.2745138-1-pbonzini@redhat.com>
+ <d6367754-7782-7c29-e756-ac02dbd4520b@redhat.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220324160403.42131028.alex.williamson@redhat.com>
-X-ClientProxiedBy: MN2PR22CA0026.namprd22.prod.outlook.com
- (2603:10b6:208:238::31) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 0ddeddb3-6eb5-469d-ba2f-08da0debb382
-X-MS-TrafficTypeDiagnostic: DM6PR12MB3033:EE_
-X-Microsoft-Antispam-PRVS: <DM6PR12MB303373A7E3A502CA98BE831EC2199@DM6PR12MB3033.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: d7Xd7gbhkThTYi4zt/bwfCedQLj+/6JO+O5p3dNCA9mgWVZdHALOPsKZvZ84UZNnWdbulrECBPLHDfHbiW1wFYPaVxDlgcTsX+2vcrmiy0XAcw0bJVzh7OyxbU3Ss63//zEeXxBYRklkayJ+gFC6OL0rzF7JwET9jvVcEOulTcQkyDgEJA2xB89uD2980KrhRFu+4oUN+g9kJW4nSi6beSHd3R6GwB9Mwal1Td1Itb5vDSb8DnuRLfEMyO/4b0xN3IVRCsb//1Gumt8fgyDy477i3H6z9F21YZoGDpsqBXSCdQ7yWGgXA3VUEM7vuWA2Dsk9FSfV0Y917aanANJteqM8ZT2iPwks+FW4l2AA1ujK8nyQ+/wYfXH3veBm/TxY0sDIWkaIdOc43IkOIXmU+dJJGST6jncoDYvJ+mk+Nc962fOHObpGOALvwAcnKByC2TubHFia1WLQ3IZcOikgjqbqokg1z049NdQtnvv2Te6wLb+7ddrgaF2QKtIu6HhZ7Kd7WgvBCZilT/zIvgTdiVl5UnRdYpGrIDbYiYZiU5uvRtw5n7ZGD0/kyvSZVy7IOdW5xthX0fsxI2FZ/Sbz2hnh06rOurdXzOPmPRi6EIRzj2RKkg5MY3S1apxaizNQwhwyU4MUyimeLv9x9G3ThQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(33656002)(186003)(26005)(83380400001)(5660300002)(8676002)(6506007)(4326008)(38100700002)(7416002)(66556008)(66946007)(508600001)(2906002)(66476007)(45080400002)(1076003)(8936002)(316002)(36756003)(6512007)(2616005)(86362001)(6916009)(54906003)(6486002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?42ls4xPyZab5WR8wW+6vk107w29qYz1/F285oCT28S8l9QnIn7Ibk44rGnqJ?=
- =?us-ascii?Q?saWEda3R/Ns2F2/GmXh3ij2PGtB63OoR8qVzIqsxmJE89bajE31RAzRFEGxk?=
- =?us-ascii?Q?zl9gaO25wPuMgy6Ud2UWRCQhzYacG78Q8O1ciE0BdT+fEIodhZBpNkGuDrWL?=
- =?us-ascii?Q?/N9bc5yPtrLTir9S4VMXgQC7KmXHmesiSH/fPmEdYTbAXjwmNyxAJBjRGn48?=
- =?us-ascii?Q?bOm5yD4KTKsgrf7grq/QmAlckJksfb6eRN/y9ZjYGICbMu32PR5HtWQ7xu6s?=
- =?us-ascii?Q?Ti+rOXOtEGtfDaJ1MXVrnCNoURF2GyJHm+3XQtO4h3gfwPpBEvLprLKgc3aD?=
- =?us-ascii?Q?g7EbqEnckbHbEQ2WUowx7w3XGSBvtL8ZxQn0MZqoHRZpB107eEssbixJrOph?=
- =?us-ascii?Q?aVl7RTL26080vd0JV5QxzXIipfxAu/W1ekohHto6lHxQf32nEnbfNeXzAcJU?=
- =?us-ascii?Q?J94djqqRnTGzc/RdeHtK1Fllt5spQmQUlAjrsJdmeAW2J+2nsVYXVl1KY3wl?=
- =?us-ascii?Q?LlzW028ukPIDACuzr3q6JARfg8Y+xvHSCJVHV3HJ8b9V+9eKwzuUkS+uX9Ya?=
- =?us-ascii?Q?woxyNoezFDWL/CgEhNYvnBYXVHW/KiPfr+qhHJ298i0GvxDT2AtPyDEW7bVs?=
- =?us-ascii?Q?uZAVF02dpjLhsKUHOXc5EMXj2R8HRacaaBAQxgY812SG1FvF/IMZfvQxl6iX?=
- =?us-ascii?Q?cPGZcG82pgvae78CzubQPoMitReCjts4EcOhll7059Tr4uBLxrdSn0RmSZhy?=
- =?us-ascii?Q?nXPRGS6YlVSEWb86wq+ZzEbGqwwgribGw5j6ydJ+Bd5Jirmw6j6ml02ZbQ+g?=
- =?us-ascii?Q?wGXv7Tz8msKPbR6KLNKPOzj16/bT5gVtjyBqlLW0er9cFFL0gYWxKP2ZAFnc?=
- =?us-ascii?Q?BtMh1WZyD4MGhMAOGWMR0XrV4nM801enNmjHbIXUqatCgdHKvssyunvtb8Q6?=
- =?us-ascii?Q?Q2OZUI0V6lARtzSG2sg9CtLJR6yFKtQ1XeYkDRvb81BhDJ+F3lASPZAs5pq0?=
- =?us-ascii?Q?FlcSXrgml5EH0BoanyI0gQGyS3sUJkHsY8BILGztfkWiVII/fuP0IR/84eZW?=
- =?us-ascii?Q?frBaAL1Iu9PouSsFxq4lndcSaFyO1Jvrbq+Y+2U+3Bv6FhRTgENv8BL/dOPI?=
- =?us-ascii?Q?PBKfb2PMbKZV1xefBqjUvUZ7D3Ny0JjqA9pzrpcJVXGVajttEvD/F5ZMFv4b?=
- =?us-ascii?Q?H6lK3SxEEWOzEAUID88ltBVMRhywpjquEpMSma3YamA04mma7s/L6FuY5mXR?=
- =?us-ascii?Q?h123aluZTKoRrQau2Vhxa+8/BrQEgKSeIkEzfoWzoq7r2526wWia6T0LxOD3?=
- =?us-ascii?Q?bX6Asy9OIutGJUrK1wXEGtjPbO4nN7qYwyNiF/TBzF6yFmvkNHvYMgoFuX16?=
- =?us-ascii?Q?kX3b8MqGpf3dnH2H2NDSjRhMzpczmm14KvRWv4aSwnI9ET4jXYMEzLOFMoMX?=
- =?us-ascii?Q?lNwpDDm6avjoC905uDNwetcU7Cr6YAfC?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0ddeddb3-6eb5-469d-ba2f-08da0debb382
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Mar 2022 23:12:00.8397
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: HpdqQm+dcO+l7knzkCN6IDoWYXYaBu25PrBnQi4YVbeKtd8iDfgwZyenRwX279QR
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3033
-X-Spam-Status: No, score=0.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SORTED_RECIPS,SPF_HELO_PASS,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
-        version=3.4.6
+In-Reply-To: <d6367754-7782-7c29-e756-ac02dbd4520b@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 24, 2022 at 04:04:03PM -0600, Alex Williamson wrote:
-> On Wed, 23 Mar 2022 21:33:42 -0300
-> Jason Gunthorpe <jgg@nvidia.com> wrote:
-> 
-> > On Wed, Mar 23, 2022 at 04:51:25PM -0600, Alex Williamson wrote:
+On Mon, Mar 21, 2022, Paolo Bonzini wrote:
+> On 3/18/22 17:48, Paolo Bonzini wrote:
+> > This reverts commit cf3e26427c08ad9015956293ab389004ac6a338e.
 > > 
-> > > My overall question here would be whether we can actually achieve a
-> > > compatibility interface that has sufficient feature transparency that we
-> > > can dump vfio code in favor of this interface, or will there be enough
-> > > niche use cases that we need to keep type1 and vfio containers around
-> > > through a deprecation process?  
+> > Multi-vCPU Hyper-V guests started crashing randomly on boot with the
+> > latest kvm/queue and the problem can be bisected the problem to this
+> > particular patch. Basically, I'm not able to boot e.g. 16-vCPU guest
+> > successfully anymore. Both Intel and AMD seem to be affected. Reverting
+> > the commit saves the day.
 > > 
-> > Other than SPAPR, I think we can.
+> > Reported-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > 
-> Does this mean #ifdef CONFIG_PPC in vfio core to retain infrastructure
-> for POWER support?
-
-Certainly initialy - I have no ability to do better than that.
-
-I'm hoping someone from IBM will be willing to work on this in the
-long run and we can do better.
-
-> > I don't think this is compatibility. No kernel today triggers qemu to
-> > use this feature as no kernel supports live migration. No existing
-> > qemu will trigger this feature with new kernels that support live
-> > migration v2. Therefore we can adjust qemu's dirty tracking at the
-> > same time we enable migration v2 in qemu.
+> This is not enough, the following is also needed to account
+> for "KVM: x86/mmu: Defer TLB flush to caller when freeing TDP MMU shadow
+> pages":
 > 
-> I guess I was assuming that enabling v2 migration in QEMU was dependent
-> on the existing type1 dirty tracking because it's the only means we
-> have to tell QEMU that all memory is perpetually dirty when we have a
-> DMA device.  Is that not correct?
-
-I haven't looked closely at this part in qemu, but IMHO, if qemu sees
-that it has VFIO migration support but does not have any DMA dirty
-tracking capability it should not do precopy flows.
-
-If there is a bug here we should certainly fix it before progressing
-the v2 patches. I'll ask Yishai & Co to take a look.
-
-> > Intel no-snoop is simple enough, just needs some Intel cleanup parts.
-
-Patches for this exist now
- 
-> > mdev will come along with the final VFIO integration, all the really
-> > hard parts are done already. The VFIO integration is a medium sized
-> > task overall.
-> > 
-> > So, I'm not ready to give up yet :)
+> ------------------- 8< ----------------
+> From: Paolo Bonzini <pbonzini@redhat.com>
+> Subject: [PATCH] kvm: x86/mmu: Flush TLB before zap_gfn_range releases RCU
 > 
-> Ok, that's a more promising outlook than I was inferring from the long
-> list of missing features.
+> Since "KVM: x86/mmu: Zap only TDP MMU leafs in kvm_zap_gfn_range()"
+> is going to be reverted, it's not going to be true anymore that
+> the zap-page flow does not free any 'struct kvm_mmu_page'.  Introduce
+> an early flush before tdp_mmu_zap_leafs() returns, to preserve
+> bisectability.
 
-Yeah, it is just long, but they are not scary things, just priorites
-and patch planning.
+Can I have 1-2 weeks to try and root cause and fix the underlying issue before
+sending reverts to Linus?  I really don't want to paper over a TLB flushing bug
+or an off-by-one bug, and I really, really don't want to end up with another
+scenario where KVM zaps everything just because.
 
-> > I think we can get there pretty quickly, or at least I haven't got
-> > anything that is scaring me alot (beyond SPAPR of course)
-> > 
-> > For the dpdk/etcs of the world I think we are already there.
-> 
-> That's essentially what I'm trying to reconcile, we're racing both
-> to round out the compatibility interface to fully support QEMU, while
-> also updating QEMU to use iommufd directly so it won't need that full
-> support.  It's a confusing message.  Thanks,
+Vitaly, can you provide repro instructions?  A nearly-complete QEMU command line
+would be wonderful :-)  Is the issue unique to any particular guest kernel?  I've
+been unable to repro with a 112 vCPU Linux guest with these Hyper-V enlightenments:
 
-The long term purpose of compatibility is to provide a config option
-to allow type 1 to be turned off and continue to support old user
-space (eg in containers) that is running old qemu/dpdk/spdk/etc.
+$ : dm | grep -i hyper-v
+[    0.000000] Hypervisor detected: Microsoft Hyper-V
+[    0.000000] Hyper-V: privilege flags low 0x2aff, high 0x830, hints 0x4e2c, misc 0x80d12
+[    0.000000] Hyper-V Host Build:14393-10.0-0-0.0
+[    0.000000] Hyper-V: Nested features: 0x80101
+[    0.000000] Hyper-V: LAPIC Timer Frequency: 0x3d0900
+[    0.000000] Hyper-V: Using hypercall for remote TLB flush
+[    0.000004] tsc: Marking TSC unstable due to running on Hyper-V
+[    0.129376] Booting paravirtualized kernel on Hyper-V
+[    0.140419] Hyper-V: PV spinlocks disabled
+[    0.247500] Hyper-V: Using IPI hypercalls
+[    0.247502] Hyper-V: Using enlightened APIC (x2apic mode)
 
-This shows that we have a plan/path to allow a distro to support only
-one iommu interface in their kernel should they choose without having
-to sacrifice uABI compatibility.
+Actually, since this is apparently specific to kvm_zap_gfn_range(), can you add
+printk "tracing" in update_mtrr(), kvm_post_set_cr0(), and __kvm_request_apicv_update()
+to see what is actually triggering zaps?  Capturing the start and end GFNs would be very
+helpful for the MTRR case.
 
-As for racing, my intention is to leave the compat interface alone for
-awhile - the more urgent things in on my personal list are the RFC
-for dirty tracking, mlx5 support for dirty tracking, and VFIO preparation
-for iommufd support.
-
-Eric and Yi are focusing on userspace page tables and qemu updates.
-
-Joao is working on implementing iommu driver dirty tracking
-
-Lu and Jacob are working on getting PASID support infrastructure
-together.
-
-There is alot going on!
-
-A question to consider is what would you consider the minimum bar for
-merging?
-
-Thanks,
-Jason
+The APICv update seems unlikely to affect only Hyper-V guests, though there is the auto
+EOI crud.  And the other two only come into play with non-coherent DMA.  In other words,
+figuring out exactly what sequence leads to failure should be straightforward.
