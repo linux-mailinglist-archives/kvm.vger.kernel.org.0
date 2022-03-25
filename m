@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 50AFD4E7DF5
-	for <lists+kvm@lfdr.de>; Sat, 26 Mar 2022 01:23:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6220C4E7C31
+	for <lists+kvm@lfdr.de>; Sat, 26 Mar 2022 01:21:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231982AbiCYUFg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Mar 2022 16:05:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44748 "EHLO
+        id S232220AbiCYUHP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Mar 2022 16:07:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51178 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232120AbiCYUFW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Mar 2022 16:05:22 -0400
+        with ESMTP id S232115AbiCYUG7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Mar 2022 16:06:59 -0400
 Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42C47109A62
-        for <kvm@vger.kernel.org>; Fri, 25 Mar 2022 12:58:03 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 736C056219
+        for <kvm@vger.kernel.org>; Fri, 25 Mar 2022 13:02:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=desiato.20200630; h=MIME-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=Ytp398qXwjaJTWVZEOw+bWOowwSzyywbZTN0VPguK8o=; b=VOtn/ZPEr4RE2GLSGn9Wvjf9dn
-        YGirK+cxLLE+17PG0L/WmSOGhEoIC3rrDqmYteI0GHpw4BmdtgDpOOchR7n4bdAK2Nf9nJtESq7QA
-        BrBQ7UAHeSGIXP8uRkputVBvG3tPiSxsdCMjagZI5lWmUbHCu2T4riTAlOJ1o/e2wTehXqUPMxYpx
-        GiQqbDCU8FdyL0ZhrAkmTudxQbBTrk3TbkzWsV1+1Nzx9/uACskJAM3YNNw2CZmh2RWreO+WXFAGG
-        LJs00n7c7Tut9ZVfTyV//gH3sdG8X4gkobnveOkFb2c8ia3ZBP3tDV6pdk86GzQuZcoeJ/2QO70dA
-        +s4qs8gQ==;
+        bh=/9lfVxC7ZdQyE9fYbqtU0BMSHAUQon1/P72NYfz/8CM=; b=OMxWn+m6iP8pAeiyT+zq2JWco+
+        NY8u+LjGZsY64LrIwl1poDwkySGl1Jf1TmCuLW/Zk6l02Xjugu/uYtsR+gkQXVkW1P8jCLTc5DnKl
+        LYyfQWkIKiMKH9+9MfnSoLWYmLibsCGO7q+3qIaLs5q6Z9HE34WVmN2DYr45Qs4qeup+exxRPTuz1
+        z7n5fWdzvCMcMvkKJweN4IfhqNEJA2U7hWR8Q9BOA9BPkTK8TNPuf+pY8K4/5vE8Y3q7js3/GyTPQ
+        Vk9YttXQ3aeD64S9KRKLjlHyenLhgUEC89N5IypfJdgomG8HTSpoSLG7pYPjxsfVt9i64S8wUzNt3
+        LQoix9mQ==;
 Received: from [2001:8b0:10b:1:4a2a:e3ff:fe14:8625] (helo=u3832b3a9db3152.ant.amazon.com)
         by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nXq47-004VXs-JA; Fri, 25 Mar 2022 19:57:43 +0000
-Message-ID: <2a429106053983f4ba7a6226fd5329ce3120907a.camel@infradead.org>
+        id 1nXq8J-004Vdv-2A; Fri, 25 Mar 2022 20:02:03 +0000
+Message-ID: <ea733ae3ef7134f029c8a4507c4a71cbd22b362a.camel@infradead.org>
 Subject: Re: [PATCH v3 00/17] KVM: Add Xen event channel acceleration
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
@@ -40,12 +40,13 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Boris Ostrovsky <boris.ostrovsky@oracle.com>,
         Metin Kaya <metikaya@amazon.co.uk>,
         Paul Durrant <pdurrant@amazon.co.uk>
-Date:   Fri, 25 Mar 2022 19:57:41 +0000
-In-Reply-To: <820368fe-690f-8294-736b-52ddea863fa5@redhat.com>
+Date:   Fri, 25 Mar 2022 20:02:00 +0000
+In-Reply-To: <2a429106053983f4ba7a6226fd5329ce3120907a.camel@infradead.org>
 References: <20220303154127.202856-1-dwmw2@infradead.org>
          <820368fe-690f-8294-736b-52ddea863fa5@redhat.com>
+         <2a429106053983f4ba7a6226fd5329ce3120907a.camel@infradead.org>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-SS5N+5IvNHm85180vG2T"
+        boundary="=-o2BwZH/0U/6t3fBI+B2L"
 User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
@@ -60,122 +61,42 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-SS5N+5IvNHm85180vG2T
+--=-o2BwZH/0U/6t3fBI+B2L
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, 2022-03-25 at 19:19 +0100, Paolo Bonzini wrote:
-> On 3/3/22 16:41, David Woodhouse wrote:
-> > This series adds event channel acceleration for Xen guests. In particul=
-ar
-> > it allows guest vCPUs to send each other IPIs without having to bounce
-> > all the way out to the userspace VMM in order to do so. Likewise, the
-> > Xen singleshot timer is added, and a version of SCHEDOP_poll. Those
-> > major features are based on Joao and Boris' patches from 2019.
-> >=20
-> > Cleaning up the event delivery into the vcpu_info involved using the ne=
-w
-> > gfn_to_pfn_cache for that, and that means I ended up doing so for *all*
-> > the places the guest can have a pvclock.
-> >=20
-> > v0: Proof-of-concept RFC
-> >=20
-> > v1:
-> >   =E2=80=A2 Drop the runstate fix which is merged now.
-> >   =E2=80=A2 Add Sean's gfn_to_pfn_cache API change at the start of the =
-series.
-> >   =E2=80=A2 Add KVM self tests
-> >   =E2=80=A2 Minor bug fixes
-> >=20
-> > v2:
-> >   =E2=80=A2 Drop dirty handling from gfn_to_pfn_cache
-> >   =E2=80=A2 Fix !CONFIG_KVM_XEN build and duplicate call to kvm_xen_ini=
-t_vcpu()
-> >=20
-> > v3:
-> >   =E2=80=A2 Add KVM_XEN_EVTCHN_RESET to clear all outbound ports.
-> >   =E2=80=A2 Clean up a stray #if	1 in a part of the the test case that =
-was once
-> >     being recalcitrant.
-> >   =E2=80=A2 Check kvm_xen_has_pending_events() in kvm_vcpu_has_events()=
- and *not*
-> >     kvm_xen_has_pending_timer() which is checked from elsewhere.
-> >   =E2=80=A2 Fix warnings noted by the kernel test robot <
-> > lkp@intel.com
-> > >:
-> >      =E2=80=A2 Make kvm_xen_init_timer() static.
-> >      =E2=80=A2 Make timer delta calculation use an explicit s64 to fix =
-32-bit build.
->=20
-> I've seen this:
->=20
-> [1790637.031490] BUG: Bad page state in process qemu-kvm  pfn:03401
-> [1790637.037503] page:0000000077fc41af refcount:0 mapcount:1=20
-> mapping:0000000000000000 index:0x7f4ab7e01 pfn:0x3401
-> [1790637.047592] head:0000000032101bf5 order:9 compound_mapcount:1=20
-> compound_pincount:0
-> [1790637.055250] anon flags:=20
-> 0xfffffc009000e(referenced|uptodate|dirty|head|swapbacked|node=3D0|zone=
-=3D1|lastcpupid=3D0x1fffff)
-> [1790637.065949] raw: 000fffffc0000000 ffffda4b800d0001 0000000000000903=
+On Fri, 2022-03-25 at 19:57 +0000, David Woodhouse wrote:
+> On Fri, 2022-03-25 at 19:19 +0100, Paolo Bonzini wrote:
+> > I am absolutely not sure that this series is the culprit in any way, bu=
+t=20
+> > anyway I'll try to reproduce (it happened at the end of a RHEL7.2=20
+> > installation) and let you know.  If not, it is something that already=
 =20
-> dead000000000200
-> [1790637.073869] raw: 0000000000000100 0000000000000000 00000000ffffffff=
-=20
-> 0000000000000000
-> [1790637.081791] head: 000fffffc009000e dead000000000100=20
-> dead000000000122 ffffa0636279fb01
-> [1790637.089797] head: 00000007f4ab7e00 0000000000000000=20
-> 00000000ffffffff 0000000000000000
-> [1790637.097795] page dumped because: nonzero compound_mapcount
-> [1790637.103455] Modules linked in: kvm_intel(OE) kvm(OE) overlay tun=20
-> tls ib_core rpcsec_gss_krb5 auth_rpcgss nfsv4 dns_resolver nfs lockd=20
-> grace fscache netfs rfkill sunrpc intel_rapl_msr intel_rapl_common=20
-> isst_if_common skx_edac nfit libnvdimm x86_pkg_temp_thermal=20
-> intel_powerclamp coretemp ipmi_ssif iTCO_wdt intel_pmc_bxt irqbypass=20
-> iTCO_vendor_support acpi_ipmi rapl dell_smbios ipmi_si mei_me=20
-> intel_cstate dcdbas ipmi_devintf i2c_i801 intel_uncore=20
-> dell_wmi_descriptor wmi_bmof mei lpc_ich intel_pch_thermal i2c_smbus=20
-> ipmi_msghandler acpi_power_meter xfs crct10dif_pclmul i40e crc32_pclmul=
-=20
-> crc32c_intel megaraid_sas ghash_clmulni_intel tg3 mgag200 wmi fuse [last=
-=20
-> unloaded: kvm]
-> [1790637.162636] CPU: 12 PID: 3056318 Comm: qemu-kvm Kdump: loaded=20
-> Tainted: G        W IOE    --------- ---  5.16.0-0.rc6.41.fc36.x86_64 #1
-> [1790637.174878] Hardware name: Dell Inc. PowerEdge R440/08CYF7, BIOS=20
-> 1.6.11 11/20/2018
-> [1790637.182618] Call Trace:
-> [1790637.185246]  <TASK>
-> [1790637.187524]  dump_stack_lvl+0x48/0x5e
-> [1790637.191373]  bad_page.cold+0x63/0x94
-> [1790637.195123]  free_tail_pages_check+0xbb/0x110
-> [1790637.199656]  free_pcp_prepare+0x270/0x310
-> [1790637.203843]  free_unref_page+0x1d/0x120
-> [1790637.207856]  kvm_gfn_to_pfn_cache_refresh+0x2c2/0x400 [kvm]
-> [1790637.213662]  kvm_setup_guest_pvclock+0x4b/0x180 [kvm]
-> [1790637.218913]  kvm_guest_time_update+0x26d/0x330 [kvm]
-> [1790637.224080]  vcpu_enter_guest+0x31c/0x1390 [kvm]
-> [1790637.228908]  kvm_arch_vcpu_ioctl_run+0x132/0x830 [kvm]
-> [1790637.234254]  kvm_vcpu_ioctl+0x270/0x680 [kvm]
+> > made its way to Linus.
+> >=20
 >=20
-> followed by other badness with the same call stack:
+> Hrm.... could it be a double/multiple free? This will come from
+> __release_gpc() which is called from the end of
+> kvm_gfn_to_pfn_cache_refresh() and which releases the *old* PFN.
 >=20
-> [1790637.376127] page dumped because:=20
-> VM_BUG_ON_PAGE(page_ref_count(page) =3D=3D 0)
+> How could we get there without... oh... could it be this?
 >=20
-> I am absolutely not sure that this series is the culprit in any way, but=
-=20
-> anyway I'll try to reproduce (it happened at the end of a RHEL7.2=20
-> installation) and let you know.  If not, it is something that already=20
-> made its way to Linus.
+> --- a/virt/kvm/pfncache.c
+> +++ b/virt/kvm/pfncache.c
+> @@ -176,6 +176,7 @@ int kvm_gfn_to_pfn_cache_refresh(struct kvm *kvm, str=
+uct gfn_to_pfn_cache *gpc,
+>                 gpc->uhva =3D gfn_to_hva_memslot(gpc->memslot, gfn);
+> =20
+>                 if (kvm_is_error_hva(gpc->uhva)) {
+> +                       gpc->pfn =3D KVM_PFN_ERR_FAULT;
+>                         ret =3D -EFAULT;
+>                         goto out;
+>                 }
+>=20
 >=20
 
-Hrm.... could it be a double/multiple free? This will come from
-__release_gpc() which is called from the end of
-kvm_gfn_to_pfn_cache_refresh() and which releases the *old* PFN.
-
-How could we get there without... oh... could it be this?
+If you're going to try to reproduce, better to do it like this instead I su=
+ppose:
 
 --- a/virt/kvm/pfncache.c
 +++ b/virt/kvm/pfncache.c
@@ -184,13 +105,13 @@ t gfn_to_pfn_cache *gpc,
                 gpc->uhva =3D gfn_to_hva_memslot(gpc->memslot, gfn);
 =20
                 if (kvm_is_error_hva(gpc->uhva)) {
-+                       gpc->pfn =3D KVM_PFN_ERR_FAULT;
++                       printk("Imma free PFN %llx again later. Oops!\n", g=
+pc->pfn);
                         ret =3D -EFAULT;
                         goto out;
                 }
 
-
---=-SS5N+5IvNHm85180vG2T
+--=-o2BwZH/0U/6t3fBI+B2L
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -282,25 +203,25 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIwMzI1MTk1NzQxWjAvBgkqhkiG9w0BCQQxIgQgWEI06lEX
-d6isJWdbTJK908nRqqeV5UATAbssY16wdbMwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIwMzI1MjAwMjAxWjAvBgkqhkiG9w0BCQQxIgQgVvzhI23/
+gojiZZYc9zdxqzeESXxyUb3Rggh0Pz8kCGowgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBmdyTWC/Q/uT3nrf8NhP+zT8VRexxOhM3W
-PuCtr4S/2jwGuhkSbw3GSb5qUIOLDwdYrUONoo8xDLXiGyZfKusPr1etDVuvG4Qz9NZl3XOXvTxD
-avQ491sWJ0IYp4nWoSLx0R1ooha591odW6ovmRmZFR/4KhIrXlp5cXVCBxXZydkoPBcJMccOxEWe
-XP9LoczTR5jLswsY3CQntk8oMFgMO0lyK2gKijV+ggUjVYXU5OJrWzB57MyRUk5FP+6banwqVekc
-lhMMZ2V0IoDzvBRpC5mU1D7qX0t9yVMMwRKN/sSN4PdkEzCuHqYYFt3ZGoYqWQV14OdtJzdPy3Kf
-oXBszyL3GuoDRb1nxucCVfI15MXsY8ajovlXEiyicK8mM+oHHos9TYa7CKoy2qf+0kiKRQRkHMX8
-eKvyZfwo4yQpq1NDQqpM9M5BgGcxgV3uMcuUKTaSaFuDCJ6n5n3BKu1o1W+J7IjwnM+87j4/o121
-64K5rpYYzF3zByQfYEhioT9EahMrvBNJGB/ItdSIOujlB+XMkEOo6dCw5hCB79Y8JOom7seqzC2I
-nqR64R6rCYMX/rhr4KqpzuE5ny0me2u8YQ4V1GYA3MYnjtCltI++DF+EJGguAj8f1BABpo+9Z7zt
-/fsERgcFy5oPn1CspVaR9tL8NgwcMJrUoYo8W0j7GgAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAsHuDl7C0UEkhTto20FEzBeRFxQZYGcteE
+Yb2a7Jl51baBZ/stOzE98773TzYePFby6ahvnrQZAAJd1JEbUduRGtYOfpwaZRUZqAOiI6EqCJH/
+dRCSX24f6NbQTCrridHC/edI8uPIIV58Yee1J69jC9l1lvw1/59a8eSDl4+Z9B59UbLTrBsDnYlN
+P+O9hdmHJlPndJ0G9/fOmNvsTJnzAbghQPGCHg50Z48ephaaXiOxbTBL5w2IWMtWhkyjToJ91lS0
+Q1xkuNpuyYRhoo7Qo36W9QOIKrZMy1TC/xWe3/vf9h+KHG+Ar5XPAua6PCu3H6enbWKS9MLJzgCF
++A8481CiI0QtRTjpvcnD/43kvyRr8wXjlVbvxU4tVeJWWdZgdyG9Xkc91QVjYpRAOWmPc7acsDwN
+blw/ifQDBMYdvSS5TkoBPnLlqGPnNGxzA9KN6GMJnc5CL7UTJPjoIvq738SY0h6TWED5bdRUGOEC
+mYlxEsrLUCQQs1J+S0r+9cmR7BjzFi8+rocAA2bhEs/9g2lCHKh5Ya7jenAwtsaUBDW2KdYhT+v6
+NogIp4r1Qn0f/AfE0sW0PPiJTaGsnAAkhP13bh+irIuBLpq4gxtAm/Ay7O4RiBqUxEIqjR7gMQFZ
+74qWD5glJj6Y8QS2ux9XYDWRKPTUdwh3D8I3OUTu8AAAAAAAAA==
 
 
---=-SS5N+5IvNHm85180vG2T--
+--=-o2BwZH/0U/6t3fBI+B2L--
 
