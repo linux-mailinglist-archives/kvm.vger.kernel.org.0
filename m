@@ -2,102 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D2D04E6C20
-	for <lists+kvm@lfdr.de>; Fri, 25 Mar 2022 02:39:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EE73B4E6C31
+	for <lists+kvm@lfdr.de>; Fri, 25 Mar 2022 02:44:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357557AbiCYBke (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Mar 2022 21:40:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48562 "EHLO
+        id S1357676AbiCYBpi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Mar 2022 21:45:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40276 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357623AbiCYBiA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Mar 2022 21:38:00 -0400
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 961EBA0BC8
-        for <kvm@vger.kernel.org>; Thu, 24 Mar 2022 18:35:37 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id k6so6557247plg.12
-        for <kvm@vger.kernel.org>; Thu, 24 Mar 2022 18:35:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=rCO5xCPhDILvckAs1DWy7jjaavYTT5p+k0wQ03BON1s=;
-        b=jJxzoyGo/jbSrD3YG2JjZXPep7kMLHmxwW6vSfAXfHLVteVWPtNXhIGQNkEG/V4PGX
-         T9gTyNQFtZxoNXDu7zp+myJxPpyaCxekqpU67HPonBLL2h7XS4sNRnziOFMvtRVofxmo
-         5boBhKOfowBY8xZ/ItCWRu4l6uii4ZfC/+jYwYFTp3tNeW2mpWfC5/evH9pf6H9EwMLl
-         gkjPvPzZKpn+Skj9TKMS+yj3yN3mj2kRTT5qymlrEJfi8Smy2GMvLce0i/JLDir5B2dT
-         yiHAmPbXb4K3ljPe7va5an5TTsrqe1SrRTqiDtbxi0u5h8P0RLHNEutM4ZReEd5wQ48W
-         rKjA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=rCO5xCPhDILvckAs1DWy7jjaavYTT5p+k0wQ03BON1s=;
-        b=sq3VPz3Defyge3hihOa1M77lQU6OXAR8HOZ5vqSRz2aKpCGvxilsyMzxhXI//Bx04i
-         rEUBUW1gN254XFqH/jBJHxzcFxRyjF4hCaY5wuhNFef42nFGscaEYw0A3xvh8gE5ly0x
-         zOjTQ9R9BQwhJEiL85w3fqEQzLoeNCD3dV+4OADTxXCOUjE+UKT6XVv4UqKFjVNTkWnE
-         KhLGvd5h4NIMN8ncOj0ICusWnXgMwHYmElh2qRVPjVHVZugGvG8KNxOt1nyhqKXQRXEz
-         Eev0sewoA700wjnr7et8QXE0CM1ioi85vj3FPlKPd7WQNu1tPqcmUmjK4QJPjw3/RseV
-         VEwA==
-X-Gm-Message-State: AOAM531LSGTJPei3B7Req4SwBZ3bmSEqDCZHzbsabEyPHTcULUXk4246
-        9hnUmHr5gmvhb8CKM7ylJxw=
-X-Google-Smtp-Source: ABdhPJzV8t3K39iGcanesqu8Uhy9Iu/kxOvIrFqahEV1vqUxabyoGzYMlPJ/9ugwu1+oeLpXn2bniA==
-X-Received: by 2002:a17:90a:1a:b0:1c6:c1ee:c3fb with SMTP id 26-20020a17090a001a00b001c6c1eec3fbmr22086302pja.50.1648172136859;
-        Thu, 24 Mar 2022 18:35:36 -0700 (PDT)
-Received: from localhost ([192.55.54.52])
-        by smtp.gmail.com with ESMTPSA id u9-20020a056a00158900b004faad3ae570sm5036781pfk.189.2022.03.24.18.35.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Mar 2022 18:35:36 -0700 (PDT)
-Date:   Thu, 24 Mar 2022 18:35:34 -0700
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     Gerd Hoffmann <kraxel@redhat.com>
-Cc:     Xiaoyao Li <xiaoyao.li@intel.com>, isaku.yamahata@intel.com,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        "Daniel P. Berrang???" <berrange@redhat.com>, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Connor Kuehl <ckuehl@redhat.com>,
-        Eric Blake <eblake@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Philippe Mathieu-Daud??? <f4bug@amsat.org>,
-        qemu-devel@nongnu.org, seanjc@google.com, erdemaktas@google.com,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Laszlo Ersek <lersek@redhat.com>, isaku.yamahata@gmail.com
-Subject: Re: [RFC PATCH v3 12/36] i386/tdx: Add property sept-ve-disable for
- tdx-guest object
-Message-ID: <20220325013534.GA1229975@ls.amr.corp.intel.com>
-References: <20220317135913.2166202-1-xiaoyao.li@intel.com>
- <20220317135913.2166202-13-xiaoyao.li@intel.com>
- <20220322090238.6job2whybu6ntor7@sirius.home.kraxel.org>
- <b452d357-8fc2-c49c-8c19-a57b1ff287e8@intel.com>
- <20220324075703.7ha44rd463uwnl55@sirius.home.kraxel.org>
- <4fc788e8-1805-c7cd-243d-ccd2a6314a68@intel.com>
- <20220324093725.hs3kpcehsbklacnj@sirius.home.kraxel.org>
+        with ESMTP id S1357579AbiCYBox (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Mar 2022 21:44:53 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FBFE9D4F8;
+        Thu, 24 Mar 2022 18:40:14 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 022C4B82729;
+        Fri, 25 Mar 2022 01:40:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8BEA5C340EE;
+        Fri, 25 Mar 2022 01:40:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1648172411;
+        bh=3v2bd6rKVB2eCYg9MW6NP9HAxCJIVx1Ix0gW27bXTbs=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=Z8oHpxcysqv0ZHS7Qow49u0f8/Z0gMF0jBlFvbuy4Do4CBp0pAmWXc0T2MfaXsTw3
+         WDGAkLRm22rGwCZ+qUpu0A2Bd2x/q61j9gAlkwMKzrm3WCZvMlLD/YRw3HEQiMYWid
+         smUsHqQfQquHt09xxGZ+K0Iw+lZxbGSCrY0tGrYKrBDr2AxYiVa0mspqIgbfelXyiL
+         2WRxYrm7YlSR1kPeuC2OAWY/1hzXSchM64rBzrtoQneCOyWioGkAAxeMK2scri8WTU
+         P2/Nh/w3i4gXkfz1D/kb878/WAJYe8emOwEjwlIFzX/MuwwWAjrXNPt3DV1TaAoDeL
+         V5G+sM2MtOObA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6B87BF0383F;
+        Fri, 25 Mar 2022 01:40:11 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220324093725.hs3kpcehsbklacnj@sirius.home.kraxel.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v3 0/3] vsock/virtio: enable VQs early on probe and finish
+ the setup before using them
+From:   patchwork-bot+netdevbpf@kernel.org
+Message-Id: <164817241143.12279.13966814935964027710.git-patchwork-notify@kernel.org>
+Date:   Fri, 25 Mar 2022 01:40:11 +0000
+References: <20220323173625.91119-1-sgarzare@redhat.com>
+In-Reply-To: <20220323173625.91119-1-sgarzare@redhat.com>
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     netdev@vger.kernel.org, kuba@kernel.org, mst@redhat.com,
+        asias@redhat.com, arseny.krasnov@kaspersky.com,
+        stefanha@redhat.com, pabeni@redhat.com,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        davem@davemloft.net
+X-Spam-Status: No, score=-8.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 24, 2022 at 10:37:25AM +0100,
-Gerd Hoffmann <kraxel@redhat.com> wrote:
+Hello:
 
-> > #VE can be triggered in various situations. e.g., CPUID on some leaves, and
-> > RD/WRMSR on some MSRs. #VE on pending page is just one of the sources, Linux
-> > just wants to disable this kind of #VE since it wants to prevent unexpected
-> > #VE during SYSCALL gap.
+This series was applied to netdev/net.git (master)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 23 Mar 2022 18:36:22 +0100 you wrote:
+> The first patch fixes a virtio-spec violation. The other two patches
+> complete the driver configuration before using the VQs in the probe.
 > 
-> Linux guests can't disable those on their own?  Requiring this being
-> configured on the host looks rather fragile to me ...
+> The patch order should simplify backporting in stable branches.
+> 
+> v3:
+> - re-ordered the patch to improve bisectability [MST]
+> 
+> [...]
 
-Guest can get the attributes. (But can't change it).  If the attributes isn't
-what the guest expects, the guest can stop working itself.
+Here is the summary with links:
+  - [net,v3,1/3] vsock/virtio: initialize vdev->priv before using VQs
+    https://git.kernel.org/netdev/net/c/4b5f1ad5566a
+  - [net,v3,2/3] vsock/virtio: read the negotiated features before using VQs
+    https://git.kernel.org/netdev/net/c/c1011c0b3a9c
+  - [net,v3,3/3] vsock/virtio: enable VQs early on probe
+    https://git.kernel.org/netdev/net/c/88704454ef8b
+
+You are awesome, thank you!
 -- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
