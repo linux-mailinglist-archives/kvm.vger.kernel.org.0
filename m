@@ -2,226 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6220C4E7C31
-	for <lists+kvm@lfdr.de>; Sat, 26 Mar 2022 01:21:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 32B8C4E7DD4
+	for <lists+kvm@lfdr.de>; Sat, 26 Mar 2022 01:23:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232220AbiCYUHP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Mar 2022 16:07:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51178 "EHLO
+        id S232114AbiCYUUN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Mar 2022 16:20:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232115AbiCYUG7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Mar 2022 16:06:59 -0400
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 736C056219
-        for <kvm@vger.kernel.org>; Fri, 25 Mar 2022 13:02:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=/9lfVxC7ZdQyE9fYbqtU0BMSHAUQon1/P72NYfz/8CM=; b=OMxWn+m6iP8pAeiyT+zq2JWco+
-        NY8u+LjGZsY64LrIwl1poDwkySGl1Jf1TmCuLW/Zk6l02Xjugu/uYtsR+gkQXVkW1P8jCLTc5DnKl
-        LYyfQWkIKiMKH9+9MfnSoLWYmLibsCGO7q+3qIaLs5q6Z9HE34WVmN2DYr45Qs4qeup+exxRPTuz1
-        z7n5fWdzvCMcMvkKJweN4IfhqNEJA2U7hWR8Q9BOA9BPkTK8TNPuf+pY8K4/5vE8Y3q7js3/GyTPQ
-        Vk9YttXQ3aeD64S9KRKLjlHyenLhgUEC89N5IypfJdgomG8HTSpoSLG7pYPjxsfVt9i64S8wUzNt3
-        LQoix9mQ==;
-Received: from [2001:8b0:10b:1:4a2a:e3ff:fe14:8625] (helo=u3832b3a9db3152.ant.amazon.com)
-        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nXq8J-004Vdv-2A; Fri, 25 Mar 2022 20:02:03 +0000
-Message-ID: <ea733ae3ef7134f029c8a4507c4a71cbd22b362a.camel@infradead.org>
-Subject: Re: [PATCH v3 00/17] KVM: Add Xen event channel acceleration
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Metin Kaya <metikaya@amazon.co.uk>,
-        Paul Durrant <pdurrant@amazon.co.uk>
-Date:   Fri, 25 Mar 2022 20:02:00 +0000
-In-Reply-To: <2a429106053983f4ba7a6226fd5329ce3120907a.camel@infradead.org>
-References: <20220303154127.202856-1-dwmw2@infradead.org>
-         <820368fe-690f-8294-736b-52ddea863fa5@redhat.com>
-         <2a429106053983f4ba7a6226fd5329ce3120907a.camel@infradead.org>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-o2BwZH/0U/6t3fBI+B2L"
-User-Agent: Evolution 3.36.5-0ubuntu1 
+        with ESMTP id S232018AbiCYUUM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Mar 2022 16:20:12 -0400
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5B3458388
+        for <kvm@vger.kernel.org>; Fri, 25 Mar 2022 13:18:37 -0700 (PDT)
+Received: by mail-pf1-x436.google.com with SMTP id h19so6365373pfv.1
+        for <kvm@vger.kernel.org>; Fri, 25 Mar 2022 13:18:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=+BiLrsol8UooQIBgOwX5PV4NHr4Qkzt2YsBo+6MoPXY=;
+        b=C7dF2Wm/2i36wTwed281ekQrLIxMZdr+6MdijR84uMjQjAJ7ewmU19tDcBy5dR1/Jl
+         ON+2Ft8Sp0zatWxRfpWJtVfULKQfoMAuCkt9ypaGCW5tXqJPrlVlTbDcQ/CxFwmkm1VW
+         ikC7zVMIEfKqVQ93eeNSp3tVBeBNR5Z8zLlML1qMtguVfo+NgYqjAeFfvqsqdvD2yOxQ
+         sW8/RbCg26TuKWs8YghjRgG/jREeztcnK/QYW2SSrV/hBHM+Z2XO5e6FiR28NLW/zBI/
+         bc/xMoDdN7QNjuVOxVlQvUy1WjLpnAYzuqO+ZM8emxchaln3d1cVcen5aiDgXWPMspK3
+         l3pA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=+BiLrsol8UooQIBgOwX5PV4NHr4Qkzt2YsBo+6MoPXY=;
+        b=Mry3cemBIkFcLaWZgQzHmb0e1d0NOReBUjarJz1IoAmRbgkWVzoh/LZGtQvOLHqVXd
+         mB1aa2wBZ7lUoYPL1iBs4B6GuHvLK23dsUZ6iDyuC6XM5gKJx2/4VUwT+8WyYpin5+cj
+         xm0r7g7BinuuqZdpNhMx427V8n5ModhZdVbEUv09erTULXmjqxPwKMvUBTgNlYsPClP4
+         r5BgfEsrQUyO3tn44gbdywZlInktlyhmtOye+WEGW8NnfapUicGUtvQsEd/fDupAoeeA
+         W2u3Mfz7KfvvXYP2zINz3runGPQXU777hpk8j9cI7AEa7oF9v/2w9EgR0eAJAsGy9ZHW
+         VeDg==
+X-Gm-Message-State: AOAM5339jvuy7Q4kdKHheSnu0cHmDkrcdOn/J8fVxHm40QEsnOMNSm5Y
+        jAHUY8ih8nE5so20FPkINgD+PQ==
+X-Google-Smtp-Source: ABdhPJxVK7LN8fN0CxrEFZyc2Ktita/GU1jn9CKCcSGfof8Md3k9iTge7MCfm39/1dTm5ftjtPJdmQ==
+X-Received: by 2002:a63:6c45:0:b0:37c:714a:4ffe with SMTP id h66-20020a636c45000000b0037c714a4ffemr978294pgc.513.1648239516919;
+        Fri, 25 Mar 2022 13:18:36 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id b10-20020a056a00114a00b004f784ba5e6asm8074729pfm.17.2022.03.25.13.18.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Mar 2022 13:18:36 -0700 (PDT)
+Date:   Fri, 25 Mar 2022 20:18:32 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [FYI PATCH] Revert "KVM: x86/mmu: Zap only TDP MMU leafs in
+ kvm_zap_gfn_range()"
+Message-ID: <Yj4jmAjj5ZTJodQM@google.com>
+References: <20220318164833.2745138-1-pbonzini@redhat.com>
+ <d6367754-7782-7c29-e756-ac02dbd4520b@redhat.com>
+ <Yj0FYSC2sT4k/ELl@google.com>
+ <87r16qnkgl.fsf@redhat.com>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87r16qnkgl.fsf@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, Mar 25, 2022, Vitaly Kuznetsov wrote:
+> Sean Christopherson <seanjc@google.com> writes:
+> > Actually, since this is apparently specific to kvm_zap_gfn_range(), can you add
+> > printk "tracing" in update_mtrr(), kvm_post_set_cr0(), and __kvm_request_apicv_update()
+> > to see what is actually triggering zaps?  Capturing the start and end GFNs would be very
+> > helpful for the MTRR case.
+> >
+> > The APICv update seems unlikely to affect only Hyper-V guests, though there is the auto
+> > EOI crud.  And the other two only come into play with non-coherent DMA.  In other words,
+> > figuring out exactly what sequence leads to failure should be straightforward.
+> 
+> The tricky part here is that Hyper-V doesn't crash immediately, the
+> crash is always different (if you look at the BSOD) and happens at
+> different times. Crashes mention various stuff like trying to execute
+> non-executable memory, ...
+> 
+> I've added tracing you've suggested:
+> - __kvm_request_apicv_update() happens only once in the very beginning.
 
---=-o2BwZH/0U/6t3fBI+B2L
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+And thinking through this again, APICv changes should never result in a shadow
+page being zapped as they'll only zap a 4k range.
 
-On Fri, 2022-03-25 at 19:57 +0000, David Woodhouse wrote:
-> On Fri, 2022-03-25 at 19:19 +0100, Paolo Bonzini wrote:
-> > I am absolutely not sure that this series is the culprit in any way, bu=
-t=20
-> > anyway I'll try to reproduce (it happened at the end of a RHEL7.2=20
-> > installation) and let you know.  If not, it is something that already=
-=20
-> > made its way to Linus.
-> >=20
->=20
-> Hrm.... could it be a double/multiple free? This will come from
-> __release_gpc() which is called from the end of
-> kvm_gfn_to_pfn_cache_refresh() and which releases the *old* PFN.
->=20
-> How could we get there without... oh... could it be this?
->=20
-> --- a/virt/kvm/pfncache.c
-> +++ b/virt/kvm/pfncache.c
-> @@ -176,6 +176,7 @@ int kvm_gfn_to_pfn_cache_refresh(struct kvm *kvm, str=
-uct gfn_to_pfn_cache *gpc,
->                 gpc->uhva =3D gfn_to_hva_memslot(gpc->memslot, gfn);
-> =20
->                 if (kvm_is_error_hva(gpc->uhva)) {
-> +                       gpc->pfn =3D KVM_PFN_ERR_FAULT;
->                         ret =3D -EFAULT;
->                         goto out;
+> - update_mtrr() never actually reaches kvm_zap_gfn_range()
+> 
+> - kvm_post_set_cr0() happen in early boot but the crash happen much much
+>   later. E.g.:
+
+Ah rats, I got the sequencing of the revert messed up.  mmu_notifier is also in
+play, via kvm_tdp_mmu_unmap_gfn_range().
+
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 4fa4d8269e5b..db7c5a05e574 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -870,6 +870,8 @@ EXPORT_SYMBOL_GPL(load_pdptrs);
+>  
+>  void kvm_post_set_cr0(struct kvm_vcpu *vcpu, unsigned long old_cr0, unsigned long cr0)
+>  {
+> +       trace_printk("vCPU %d %lx %lx\n", vcpu->vcpu_id, old_cr0, cr0);
+
+This doesn't guarantee kvm_zap_gfn_range() will be reached.   The guest has to
+have non-coherente DMA and be running with the CD/NW memtyp quirk.  Moving the
+print inside the if statement would show if KVM is actually zapping in those
+cases.
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index d3a9ce07a565..25c7d8fc3287 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -887,8 +887,10 @@ void kvm_post_set_cr0(struct kvm_vcpu *vcpu, unsigned long old_cr0, unsigned lon
+
+        if (((cr0 ^ old_cr0) & X86_CR0_CD) &&
+            kvm_arch_has_noncoherent_dma(vcpu->kvm) &&
+-           !kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_CD_NW_CLEARED))
++           !kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_CD_NW_CLEARED)) {
++               trace_printk("vCPU %d %lx %lx\n", vcpu->vcpu_id, old_cr0, cr0);
+                kvm_zap_gfn_range(vcpu->kvm, 0, ~0ULL);
++       }
+ }
+ EXPORT_SYMBOL_GPL(kvm_post_set_cr0);
+
+> kvm_hv_set_msr_pw() call is when Hyper-V writes to HV_X64_MSR_CRASH_CTL
+> ('hv-crash' QEMU flag is needed to enable the feature). The debug patch
+> is:
+> 
+> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+> index a32f54ab84a2..59a72f6ced99 100644
+> --- a/arch/x86/kvm/hyperv.c
+> +++ b/arch/x86/kvm/hyperv.c
+> @@ -1391,6 +1391,7 @@ static int kvm_hv_set_msr_pw(struct kvm_vcpu *vcpu, u32 msr, u64 data,
+>  
+>                         /* Send notification about crash to user space */
+>                         kvm_make_request(KVM_REQ_HV_CRASH, vcpu);
+> +                       trace_printk("%d\n", vcpu->vcpu_id);
 >                 }
->=20
->=20
+>                 break;
+>         case HV_X64_MSR_RESET:
+> 
+> So it's 20 seconds (!) between the last kvm_post_set_cr0() call and the
+> crash. My (disappointing) conclusion is: the problem can be anywhere and
+> Hyper-V detects it much much later.
 
-If you're going to try to reproduce, better to do it like this instead I su=
-ppose:
+And reproduced... 'twas indeed the mmu_notifier.  Hyper-V 2019 booted just fine,
+until I turned on KSM and cranked up the scanning.
 
---- a/virt/kvm/pfncache.c
-+++ b/virt/kvm/pfncache.c
-@@ -176,6 +176,7 @@ int kvm_gfn_to_pfn_cache_refresh(struct kvm *kvm, struc=
-t gfn_to_pfn_cache *gpc,
-                gpc->uhva =3D gfn_to_hva_memslot(gpc->memslot, gfn);
-=20
-                if (kvm_is_error_hva(gpc->uhva)) {
-+                       printk("Imma free PFN %llx again later. Oops!\n", g=
-pc->pfn);
-                        ret =3D -EFAULT;
-                        goto out;
-                }
+The bug has nothing to do with zapping only leafs, it's a simple goof where the
+TLB flush gets lost.  Not sure why only Hyper-V detects the issue; maybe because
+it maintains a pool of zeroed pages that are KSM-friendly?
 
---=-o2BwZH/0U/6t3fBI+B2L
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+I'll send a patch to reintroduce the reverted code.
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIwMzI1MjAwMjAxWjAvBgkqhkiG9w0BCQQxIgQgVvzhI23/
-gojiZZYc9zdxqzeESXxyUb3Rggh0Pz8kCGowgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAsHuDl7C0UEkhTto20FEzBeRFxQZYGcteE
-Yb2a7Jl51baBZ/stOzE98773TzYePFby6ahvnrQZAAJd1JEbUduRGtYOfpwaZRUZqAOiI6EqCJH/
-dRCSX24f6NbQTCrridHC/edI8uPIIV58Yee1J69jC9l1lvw1/59a8eSDl4+Z9B59UbLTrBsDnYlN
-P+O9hdmHJlPndJ0G9/fOmNvsTJnzAbghQPGCHg50Z48ephaaXiOxbTBL5w2IWMtWhkyjToJ91lS0
-Q1xkuNpuyYRhoo7Qo36W9QOIKrZMy1TC/xWe3/vf9h+KHG+Ar5XPAua6PCu3H6enbWKS9MLJzgCF
-+A8481CiI0QtRTjpvcnD/43kvyRr8wXjlVbvxU4tVeJWWdZgdyG9Xkc91QVjYpRAOWmPc7acsDwN
-blw/ifQDBMYdvSS5TkoBPnLlqGPnNGxzA9KN6GMJnc5CL7UTJPjoIvq738SY0h6TWED5bdRUGOEC
-mYlxEsrLUCQQs1J+S0r+9cmR7BjzFi8+rocAA2bhEs/9g2lCHKh5Ya7jenAwtsaUBDW2KdYhT+v6
-NogIp4r1Qn0f/AfE0sW0PPiJTaGsnAAkhP13bh+irIuBLpq4gxtAm/Ay7O4RiBqUxEIqjR7gMQFZ
-74qWD5glJj6Y8QS2ux9XYDWRKPTUdwh3D8I3OUTu8AAAAAAAAA==
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index c71debdbc732..a641737725d1 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -885,7 +885,7 @@ bool kvm_tdp_mmu_zap_leafs(struct kvm *kvm, int as_id, gfn_t start, gfn_t end,
+        struct kvm_mmu_page *root;
 
+        for_each_tdp_mmu_root_yield_safe(kvm, root, as_id)
+-               flush = tdp_mmu_zap_leafs(kvm, root, start, end, can_yield, false);
++               flush = tdp_mmu_zap_leafs(kvm, root, start, end, can_yield, flush);
 
---=-o2BwZH/0U/6t3fBI+B2L--
-
+        return flush;
+ }
