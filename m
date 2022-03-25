@@ -2,77 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 453824E7681
-	for <lists+kvm@lfdr.de>; Fri, 25 Mar 2022 16:14:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DFD054E77CB
+	for <lists+kvm@lfdr.de>; Fri, 25 Mar 2022 16:37:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357206AbiCYPP2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Mar 2022 11:15:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34696 "EHLO
+        id S1376633AbiCYPcn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Mar 2022 11:32:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377486AbiCYPOo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Mar 2022 11:14:44 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EF9DC32
-        for <kvm@vger.kernel.org>; Fri, 25 Mar 2022 08:13:05 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id q11so8297793pln.11
-        for <kvm@vger.kernel.org>; Fri, 25 Mar 2022 08:13:05 -0700 (PDT)
+        with ESMTP id S1376947AbiCYPce (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Mar 2022 11:32:34 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95805C58
+        for <kvm@vger.kernel.org>; Fri, 25 Mar 2022 08:28:02 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id q8-20020a656a88000000b003810f119b61so4054781pgu.10
+        for <kvm@vger.kernel.org>; Fri, 25 Mar 2022 08:28:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=F5PY9X/jp0F4AgxSPkBkfgIyJrI2tyNfex9j4AupEbk=;
-        b=HmQuyS8md0PfvL+aGN85J4Lkm/vGXCQvpc/ISSNkxX1kjJOFD2GzH4dbWHzLnxrcZn
-         yejEeN+M5vd+milk5coOyyjZ68MwLLgzzJKbhoaom7SDa5J4ghXvBrZYlhJA4C12gSS3
-         ombiTcVWYo3Pt9IyuBui81rxtprixViYxTsGjgaESz+SsRhYdhL6s1vSo1o05VNBo9xH
-         Y0Irgux8iAjuKv5u6ZhQUD5AjEou4BHpcxIuyEsGFeRvFhsyOgcAKp6Qfan50PKOmkQP
-         +rEY9ZuRtlqIAfRSSXUuMQvagsHqrnMclgtwjm7W+27EwS8StEzUUZqy/U3xN4iVKkvd
-         68dw==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=jseiWq5rrotCj6SE0FBptrsHZWDpsUi2UXSPKIK8dgk=;
+        b=qyj0I5f/xCwa7XbbOHfpc0HtWHoZJDCrm8oH5zdbf6PWdOkuMnRWCRwpmeJLFy6Pk4
+         BD9jxrgwW4DibjBjEecGiDmhKz6q4KBJt05GfIZgi02QmSSyWZTMIa5Z2ocgabwfPwRb
+         KgYR1kDmFYtPRQOAcz58wG5migaS//k4C4jcdJT3v7hK91gdAyrGlmxuHxtJmnD6pZhL
+         TWQlp+8iC2YP03AWDyWz5sUsT71gOhJv2wAUio4R9/lV8PGN2WoD7KY2T3oG3Qbl2Pkw
+         RlgtSK1l85bdwlEiiiBIqRI4ZhHNmshjH/uebn69L5DpK/w1eRU9mPm9PujE9YrVCsSg
+         iegQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=F5PY9X/jp0F4AgxSPkBkfgIyJrI2tyNfex9j4AupEbk=;
-        b=IikTBVVWXoVELA7HiHbOuFIKEPxtnD4FSM2nZkPrJvyZ4gRUiphxJmtIJIrgEtLZJm
-         X0Kq/7ZizbOxubxNxrwV0BoKZmHR9+txpME2Z2MVHzgxgyNqh0pqpxyGp9kqC2EzW+hY
-         of7icoj88SzHLKMT8fmkWG0634HNz/kWhOswaSPy+xseJRvA7PrUn6ao55gjVOA37qmA
-         gaY0Fu18+so3HW7bkOxvm5rB00N8ar9xEDCy2aLNSrcKGuT7YmxetSKAmCEMfzs2hUxD
-         cUaD5tjJ7Suf6f7+5b/9mMmnS5xYky4qLu61JuldBMBYpoLfjAUrm14EeY16mEI1vLHn
-         2PGQ==
-X-Gm-Message-State: AOAM53161PVSwQ7lOnDa2OsdSTNxEcGkyGPxXLm6i487CmCIONdIZL4F
-        iRbBfzzpx0uxuDs8Q2I74T1wyQ==
-X-Google-Smtp-Source: ABdhPJwc/sVCV5MbQy209QJPcZg2mXqaNy4LQDF1x6hrbgePnG/Gd8+vwGXUaI/HJC0PUMslKFcNPg==
-X-Received: by 2002:a17:903:1205:b0:151:8ae9:93ea with SMTP id l5-20020a170903120500b001518ae993eamr12288183plh.37.1648221184638;
-        Fri, 25 Mar 2022 08:13:04 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id r1-20020a63b101000000b00380989bcb1bsm5682437pgf.5.2022.03.25.08.13.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Mar 2022 08:13:03 -0700 (PDT)
-Date:   Fri, 25 Mar 2022 15:13:00 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Mingwei Zhang <mizhang@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        David Hildenbrand <david@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>
-Subject: Re: [PATCH v4 18/30] KVM: x86/mmu: Zap only TDP MMU leafs in
- kvm_zap_gfn_range()
-Message-ID: <Yj3b/IhXU9eutjoS@google.com>
-References: <20220303193842.370645-1-pbonzini@redhat.com>
- <20220303193842.370645-19-pbonzini@redhat.com>
- <CAL715WJc3QdFe4gkbefW5zHPaYZfErG9vQmOLsbXz=kbaB-6uw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAL715WJc3QdFe4gkbefW5zHPaYZfErG9vQmOLsbXz=kbaB-6uw@mail.gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=jseiWq5rrotCj6SE0FBptrsHZWDpsUi2UXSPKIK8dgk=;
+        b=X2YiSrSkBv8ZSLBgVzziZ6itOZYfcGqKCM5bcHXIzydc+sc2b4q/9aWKKuF2mv5WzL
+         RywyTFUkqJQGr2zfsxujByygi2SpqlIPfEs9/65SYb/SqFFXHwa+Vush5jxtmh7p4x4M
+         d5/y8BRDyTUYFA25CFX3JwWNRrduNQPymUqaaC1H3kDLJaDvf6NmW2zbq5+PwIgzEFox
+         /H/gTFElQdNF+qG4kzya8L5m+bpJ769g62yj9MBx1PwKfJivD+6ZUW2lVDFBFNmPW3km
+         eCpbSNvrvyTfrz3+0RgwvxkDA5+kWi73NYYQbNfe/xKVHTP0FzoAHONJ0yhjm4Q5ogUm
+         9/wA==
+X-Gm-Message-State: AOAM531/1RhgIt6cs15EzbCgIklVUbEd7IQa9LACAHjF68kRz+zKMA4s
+        U0x1wQS3yRkwMncuXiZyvv9wMvsms48Q3B11FtOm9lyHNKmwkZCN9w+38IdgPWkQ3L74bbZCPza
+        l+kUJEzaN/Un6xUOD7bTzwhl3ZnMExlEwfU6aU3l0+jPHsBsw4vi3R/Q4Gg==
+X-Google-Smtp-Source: ABdhPJxnHXPOftbmUzztnT/5uAtdts5+6+KWOTXoOsKFfFQLqGLDAimI3h4Cn0X0PA8ojfUlnRZuom5jMQE=
+X-Received: from pgonda1.kir.corp.google.com ([2620:15c:29:203:655c:5ed9:95b6:394a])
+ (user=pgonda job=sendgmr) by 2002:a17:90a:e545:b0:1c6:d783:6e64 with SMTP id
+ ei5-20020a17090ae54500b001c6d7836e64mr26086984pjb.222.1648222081542; Fri, 25
+ Mar 2022 08:28:01 -0700 (PDT)
+Date:   Fri, 25 Mar 2022 08:27:58 -0700
+Message-Id: <20220325152758.335626-1-pgonda@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.1.1021.g381101b075-goog
+Subject: [PATCH v2] Add KVM_EXIT_SHUTDOWN metadata for SEV-ES
+From:   Peter Gonda <pgonda@google.com>
+To:     kvm@vger.kernel.org
+Cc:     Peter Gonda <pgonda@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Joerg Roedel <jroedel@suse.de>, Marc Orr <marcorr@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -80,47 +70,109 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Mar 13, 2022, Mingwei Zhang wrote:
-> On Thu, Mar 3, 2022 at 11:39 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
-> > @@ -898,13 +879,13 @@ static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
-> >   * SPTEs have been cleared and a TLB flush is needed before releasing the
-> >   * MMU lock.
-> >   */
-> > -bool __kvm_tdp_mmu_zap_gfn_range(struct kvm *kvm, int as_id, gfn_t start,
-> > -                                gfn_t end, bool can_yield, bool flush)
-> > +bool kvm_tdp_mmu_zap_leafs(struct kvm *kvm, int as_id, gfn_t start, gfn_t end,
-> > +                          bool can_yield, bool flush)
-> >  {
-> >         struct kvm_mmu_page *root;
-> >
-> >         for_each_tdp_mmu_root_yield_safe(kvm, root, as_id)
-> > -               flush = zap_gfn_range(kvm, root, start, end, can_yield, flush);
-> > +               flush = tdp_mmu_zap_leafs(kvm, root, start, end, can_yield, false);
-> 
-> hmm, I think we might have to be very careful here. If we only zap
-> leafs, then there could be side effects. For instance, the code in
-> disallowed_hugepage_adjust() may not work as intended. If you check
-> the following condition in arch/x86/kvm/mmu/mmu.c:2918
-> 
-> if (cur_level > PG_LEVEL_4K &&
->     cur_level == fault->goal_level &&
->     is_shadow_present_pte(spte) &&
->     !is_large_pte(spte)) {
-> 
-> If we previously use 4K mappings in this range due to various reasons
-> (dirty logging etc), then afterwards, we zap the range. Then the guest
-> touches a 4K and now we should map the range with whatever the maximum
-> level we can for the guest.
-> 
-> However, if we just zap only the leafs, then when the code comes to
-> the above location, is_shadow_present_pte(spte) will return true,
-> since the spte is a non-leaf (say a regular PMD entry). The whole if
-> statement will be true, then we never allow remapping guest memory
-> with huge pages.
+SEV-ES guests can request termination using the GHCB's MSR protocol. See
+AMD's GHCB spec section '4.1.13 Termination Request'. Currently when a
+guest does this the userspace VMM sees an KVM_EXIT_UNKNOWN (-EVINAL)
+return code from KVM_RUN. By adding a KVM_EXIT_SHUTDOWN_ENTRY to kvm_run
+struct the userspace VMM can clear see the guest has requested a SEV-ES
+termination including the termination reason code set and reason code.
 
-But that's at worst a performance issue, and arguably working as intended.  The
-zap in this case is never due to the _guest_ unmapping the pfn, so odds are good
-the guest will want to map back in the same pfns with the same permissions.
-Zapping shadow pages so that the guest can maybe create a hugepage may end up
-being a lot of extra work for no benefit.  Or it may be a net positive.  Either
-way, it's not a functional issue.
+Signed-off-by: Peter Gonda <pgonda@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: Brijesh Singh <brijesh.singh@amd.com>
+Cc: Joerg Roedel <jroedel@suse.de>
+Cc: Marc Orr <marcorr@google.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+
+---
+
+V2
+ * Add KVM_CAP_EXIT_SHUTDOWN_REASON check for KVM_CHECK_EXTENSION.
+
+Tested by making an SEV-ES guest call sev_es_terminate() with hardcoded
+reason code set and reason code and then observing the codes from the
+userspace VMM in the kvm_run.shutdown.data fields.
+
+---
+ arch/x86/kvm/svm/sev.c   |  9 +++++++--
+ include/uapi/linux/kvm.h | 13 +++++++++++++
+ virt/kvm/kvm_main.c      |  1 +
+ 3 files changed, 21 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 75fa6dd268f0..5f9d37dd3f6f 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -2735,8 +2735,13 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
+ 		pr_info("SEV-ES guest requested termination: %#llx:%#llx\n",
+ 			reason_set, reason_code);
+ 
+-		ret = -EINVAL;
+-		break;
++		vcpu->run->exit_reason = KVM_EXIT_SHUTDOWN;
++		vcpu->run->shutdown.reason = KVM_SHUTDOWN_SEV_TERM;
++		vcpu->run->shutdown.ndata = 2;
++		vcpu->run->shutdown.data[0] = reason_set;
++		vcpu->run->shutdown.data[1] = reason_code;
++
++		return 0;
+ 	}
+ 	default:
+ 		/* Error, keep GHCB MSR value as-is */
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 8616af85dc5d..017c03421c48 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -271,6 +271,12 @@ struct kvm_xen_exit {
+ #define KVM_EXIT_XEN              34
+ #define KVM_EXIT_RISCV_SBI        35
+ 
++/* For KVM_EXIT_SHUTDOWN */
++/* Standard VM shutdown request. No additional metadata provided. */
++#define KVM_SHUTDOWN_REQ	0
++/* SEV-ES termination request */
++#define KVM_SHUTDOWN_SEV_TERM	1
++
+ /* For KVM_EXIT_INTERNAL_ERROR */
+ /* Emulate instruction failed. */
+ #define KVM_INTERNAL_ERROR_EMULATION	1
+@@ -311,6 +317,12 @@ struct kvm_run {
+ 		struct {
+ 			__u64 hardware_exit_reason;
+ 		} hw;
++		/* KVM_EXIT_SHUTDOWN */
++		struct {
++			__u64 reason;
++			__u32 ndata;
++			__u64 data[16];
++		} shutdown;
+ 		/* KVM_EXIT_FAIL_ENTRY */
+ 		struct {
+ 			__u64 hardware_entry_failure_reason;
+@@ -1145,6 +1157,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_PMU_CAPABILITY 212
+ #define KVM_CAP_DISABLE_QUIRKS2 213
+ #define KVM_CAP_VM_TSC_CONTROL 214
++#define KVM_CAP_EXIT_SHUTDOWN_REASON 215
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 70e05af5ebea..03b6e472f32c 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -4299,6 +4299,7 @@ static long kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
+ 	case KVM_CAP_CHECK_EXTENSION_VM:
+ 	case KVM_CAP_ENABLE_CAP_VM:
+ 	case KVM_CAP_HALT_POLL:
++	case KVM_CAP_EXIT_SHUTDOWN_REASON:
+ 		return 1;
+ #ifdef CONFIG_KVM_MMIO
+ 	case KVM_CAP_COALESCED_MMIO:
+-- 
+2.35.1.1021.g381101b075-goog
+
