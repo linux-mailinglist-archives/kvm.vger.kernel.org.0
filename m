@@ -2,98 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E8DA4E77EC
-	for <lists+kvm@lfdr.de>; Fri, 25 Mar 2022 16:37:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 620E24E7867
+	for <lists+kvm@lfdr.de>; Fri, 25 Mar 2022 16:51:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357435AbiCYPgl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Mar 2022 11:36:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46522 "EHLO
+        id S245408AbiCYPx1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Mar 2022 11:53:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58700 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1378499AbiCYPeu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Mar 2022 11:34:50 -0400
-Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15CBC17E27
-        for <kvm@vger.kernel.org>; Fri, 25 Mar 2022 08:32:13 -0700 (PDT)
-Received: by mail-lj1-x22b.google.com with SMTP id bn33so10802545ljb.6
-        for <kvm@vger.kernel.org>; Fri, 25 Mar 2022 08:32:12 -0700 (PDT)
+        with ESMTP id S1376990AbiCYPxU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Mar 2022 11:53:20 -0400
+Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37BC550E1B;
+        Fri, 25 Mar 2022 08:51:46 -0700 (PDT)
+Received: by mail-lj1-x231.google.com with SMTP id a30so3396567ljq.13;
+        Fri, 25 Mar 2022 08:51:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=pqAwg5Oe0ABBOfGoX9y/4LgWIX2OVsyxY46msHc+wyg=;
-        b=ZMIqbgNe+2ITEtw+XQ2yUO5BaYaigXz5b80FzNWyJm+UO6fQ1oEwvSR/gtJR5BbIpv
-         XjzggeVYDiglIB95xRlpgMc44LMJwsLKIJV1pPRj5VO5hqc2Ev5Kbt72tNqRT+/l1sRq
-         HbQ9aF0bk4OKOF9PAcs644vbkh740F3aDjn3GtBJaHd4I/PKN8hjIK3ILPBOOXOI0N2F
-         stiDATdIDYZQWGB7fhE178uUw5DGydLPvzn6IoZ1wgTG9nTjFcHLTLGidvXHCHFJFN6z
-         TbCHt5/lopL1PYPpJ42XD4PB19Z3/46Oz4cxbw0++NGfmca4u/zPHIjiWfvRAURuZKj6
-         YtzQ==
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :references:from:in-reply-to;
+        bh=p6bJQfqvBfV8ypBWgRO+fxUT6Hho7lDeNEv68zPpbaM=;
+        b=mY2XTJHXnHDEubK3XQ1hIpvutXFwerqhwu1HRkwfurvei+YCx36wTpkh4N0qeYwatN
+         rElZivtOsR19fbMPh8vUGRUw+imcdfzn7koCggV5XwJZFlajV/dxOp1I8MU3GEC7USFp
+         2q9C/SXEVnunPO37MpA6acXygAHucq0ZOBoQ0AHiNrLXM32nSr4w53F6mn4NNMNaa6xz
+         gUog+BJMxd7TfTYZQ0/PK7A+50ua9FxCG49jDud0bDADAfSbKIpIBEPKEYbTtMeSpBFL
+         7lTM2YkgvpffP0dRnngdC4TYoMOobs29unWbQW2STlOYQjx7dLKPhuE5cX5Bq5jEk3Z4
+         BVtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=pqAwg5Oe0ABBOfGoX9y/4LgWIX2OVsyxY46msHc+wyg=;
-        b=VNC8nUQAZBfH/J2jO9unZKd3wc7vOlB4VXiHJVp+SHmSboRKZ/szgNy68XHgbqLQs5
-         e/gCt5yw9K0r0EB3LBV+qU4sGiMzcxWv83aScs1UIQe4aMAF0sb1oq+0x4DcTB/mq2X4
-         RB5v250id/ey1Hjze//q0UesKErc2fYMSEKSR/AI477kaCzUafma3J7qvCc8k8YCzQGb
-         7hmE8EAjMz20sr5uwf3Zq78tu9ENtw05Z7t9mLXLTIRxdttX9VDnH2t2EdniwXIVwUsq
-         oinpEYKkrzNMoOqFmKRnV8HB8mMwWcAduaoKnKb2J0Aom1cZTI8Ifem10Xelvja2HbQl
-         b7qQ==
-X-Gm-Message-State: AOAM533Ng4JVHXJ3x+4HBXqNTuQbLXjPHnto33dg0IEx7mtiwkQxnLD5
-        H7dnwYals4cXZHYgpaLj0e+4jGvH718OX5bM48sM5A==
-X-Google-Smtp-Source: ABdhPJw+hSmT+YBuv+j3btvbGvxRqinB1Vxe+1MI2P+uYUf5Vx5jPhvQj0/vPsEjNIJkSTGaNx/5KFlkLKziDfWBWEI=
-X-Received: by 2002:a2e:1617:0:b0:24a:a6b4:40b2 with SMTP id
- w23-20020a2e1617000000b0024aa6b440b2mr974521ljd.83.1648222331100; Fri, 25 Mar
- 2022 08:32:11 -0700 (PDT)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:references:from:in-reply-to;
+        bh=p6bJQfqvBfV8ypBWgRO+fxUT6Hho7lDeNEv68zPpbaM=;
+        b=Rjvogec1vkgbwNnBoR6oNgDk8k3mzGBUyed7+A+ugmV1BD3CaDzUyqOiNws4QA6pMF
+         nGLxFgeUr9XdArjgUaGOnAZecAsjF9izH2t6UBftNaTOYNQsOhnxlhVhpRsYhcBfHgfc
+         paD+ZFhF2Ys3h5VrCMGF519d9aRC/ubjytdCY9aCmM05WdrObgBk/ZsKIW9zHedvMlkT
+         UN/woPovGnm0OD3PxhFErHGOW2b9KR9L48YZN5cXCMR9JUR2zwT9VMDsKVHyxZt/9TTj
+         V2fo/linSf9XIZ6jV7h0OHLL8jY/uMvu0qf8ya4hB47W8qR4DrVQJssfv42yfehLdrph
+         rF9Q==
+X-Gm-Message-State: AOAM5335+Bt0UfWhBr+ozBusAf2+3k2waxvJfBnZ7XORXr2LAbQl7dBy
+        l+4kr8fQkOp/c+LDmyxnWRo=
+X-Google-Smtp-Source: ABdhPJyaR77ltfm4joCNtoqFq4nh2sdn3hlz/scZ7EVaTILDIBB6/Yd38iO3jRMQDIbMamWyXZX3Sg==
+X-Received: by 2002:a2e:6e0d:0:b0:247:fc9c:284e with SMTP id j13-20020a2e6e0d000000b00247fc9c284emr8726856ljc.251.1648223504444;
+        Fri, 25 Mar 2022 08:51:44 -0700 (PDT)
+Received: from [192.168.1.11] ([94.103.225.225])
+        by smtp.gmail.com with ESMTPSA id o7-20020ac24c47000000b0044a15c4e0aesm741758lfk.272.2022.03.25.08.51.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 25 Mar 2022 08:51:43 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="------------xd9s8aJo1C2Exy5fYVGAfcXa"
+Message-ID: <1a1172db-12f6-1173-b526-89e4da00e96a@gmail.com>
+Date:   Fri, 25 Mar 2022 18:51:40 +0300
 MIME-Version: 1.0
-References: <20220325152758.335626-1-pgonda@google.com> <d0366a14-6492-d2b9-215e-2ee310d9f8ae@redhat.com>
-In-Reply-To: <d0366a14-6492-d2b9-215e-2ee310d9f8ae@redhat.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Fri, 25 Mar 2022 09:31:59 -0600
-Message-ID: <CAMkAt6rACYqFXA_6pa9JUnx0=3vyM6PeaNkq-Yih4KM6saf6PQ@mail.gmail.com>
-Subject: Re: [PATCH v2] Add KVM_EXIT_SHUTDOWN metadata for SEV-ES
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm list <kvm@vger.kernel.org>, Borislav Petkov <bp@alien8.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Joerg Roedel <jroedel@suse.de>, Marc Orr <marcorr@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.1
+Subject: Re: [syzbot] general protection fault in kvm_mmu_uninit_tdp_mmu
+Content-Language: en-US
+To:     syzbot <syzbot+717ed82268812a643b28@syzkaller.appspotmail.com>,
+        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
+        jmattson@google.com, joro@8bytes.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, mingo@redhat.com,
+        pbonzini@redhat.com, seanjc@google.com,
+        syzkaller-bugs@googlegroups.com, tglx@linutronix.de,
+        vkuznets@redhat.com, wanpengli@tencent.com, x86@kernel.org
+References: <000000000000a5cb1305db0aaf48@google.com>
+From:   Pavel Skripkin <paskripkin@gmail.com>
+In-Reply-To: <000000000000a5cb1305db0aaf48@google.com>
+X-Spam-Status: No, score=0.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 25, 2022 at 9:29 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 3/25/22 16:27, Peter Gonda wrote:
-> > SEV-ES guests can request termination using the GHCB's MSR protocol. See
-> > AMD's GHCB spec section '4.1.13 Termination Request'. Currently when a
-> > guest does this the userspace VMM sees an KVM_EXIT_UNKNOWN (-EVINAL)
-> > return code from KVM_RUN. By adding a KVM_EXIT_SHUTDOWN_ENTRY to kvm_run
-> > struct the userspace VMM can clear see the guest has requested a SEV-ES
-> > termination including the termination reason code set and reason code.
-> >
-> > Signed-off-by: Peter Gonda <pgonda@google.com>
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Cc: Borislav Petkov <bp@alien8.de>
-> > Cc: Tom Lendacky <thomas.lendacky@amd.com>
-> > Cc: Brijesh Singh <brijesh.singh@amd.com>
-> > Cc: Joerg Roedel <jroedel@suse.de>
-> > Cc: Marc Orr <marcorr@google.com>
-> > Cc: Sean Christopherson <seanjc@google.com>
-> > Cc: kvm@vger.kernel.org
-> > Cc: linux-kernel@vger.kernel.org
->
-> This is missing an update to Documentation/.
->
+This is a multi-part message in MIME format.
+--------------xd9s8aJo1C2Exy5fYVGAfcXa
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-My mistake. I'll send another revision. Is the behavior of
-KVM_CAP_EXIT_SHUTDOWN_REASON OK? Or should we only return 1 for SEV-ES
-guests?
+On 3/25/22 16:10, syzbot wrote:
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    f9006d9269ea Add linux-next specific files for 20220321
+> git tree:       linux-next
+> console output: https://syzkaller.appspot.com/x/log.txt?x=101191bd700000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=c1619ffa2b0259a1
+> dashboard link: https://syzkaller.appspot.com/bug?extid=717ed82268812a643b28
+> compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=109e8f5d700000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1666180b700000
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+717ed82268812a643b28@syzkaller.appspotmail.com
+> 
+
+The following code is not safe:
+
+arch/x86/kvm/mmu/tdp_mmu.c:
+
+28	kvm->arch.tdp_mmu_zap_wq =
+29		alloc_workqueue("kvm", WQ_UNBOUND|WQ_MEM_RECLAIM|WQ_CPU_INTENSIVE, 0);
+30
+31	return true;
+
+
+Looks like kvm_mmu_init_tdp_mmu() error value is just ignored, and then 
+all kvm_*_init_vm() functions are void, so the easiest solution is to 
+check that tdp_mmu_zap_wq is valid pointer
+
+
+#syz test: 
+git://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
+
+
+
+
+With regards,
+Pavel Skripkin
+--------------xd9s8aJo1C2Exy5fYVGAfcXa
+Content-Type: text/plain; charset=UTF-8; name="ph"
+Content-Disposition: attachment; filename="ph"
+Content-Transfer-Encoding: base64
+
+ZGlmZiAtLWdpdCBhL2FyY2gveDg2L2t2bS9tbXUvdGRwX21tdS5jIGIvYXJjaC94ODYva3Zt
+L21tdS90ZHBfbW11LmMKaW5kZXggZTdlNzg3NjI1MWIzLi5iM2U4ZmY3YWM1YjAgMTAwNjQ0
+Ci0tLSBhL2FyY2gveDg2L2t2bS9tbXUvdGRwX21tdS5jCisrKyBiL2FyY2gveDg2L2t2bS9t
+bXUvdGRwX21tdS5jCkBAIC00OCw4ICs0OCwxMCBAQCB2b2lkIGt2bV9tbXVfdW5pbml0X3Rk
+cF9tbXUoc3RydWN0IGt2bSAqa3ZtKQogCWlmICgha3ZtLT5hcmNoLnRkcF9tbXVfZW5hYmxl
+ZCkKIAkJcmV0dXJuOwogCi0JZmx1c2hfd29ya3F1ZXVlKGt2bS0+YXJjaC50ZHBfbW11X3ph
+cF93cSk7Ci0JZGVzdHJveV93b3JrcXVldWUoa3ZtLT5hcmNoLnRkcF9tbXVfemFwX3dxKTsK
+KwlpZiAoa3ZtLT5hcmNoLnRkcF9tbXVfemFwX3dxKSB7CisJCWZsdXNoX3dvcmtxdWV1ZShr
+dm0tPmFyY2gudGRwX21tdV96YXBfd3EpOworCQlkZXN0cm95X3dvcmtxdWV1ZShrdm0tPmFy
+Y2gudGRwX21tdV96YXBfd3EpOworCX0KIAogCVdBUk5fT04oIWxpc3RfZW1wdHkoJmt2bS0+
+YXJjaC50ZHBfbW11X3BhZ2VzKSk7CiAJV0FSTl9PTighbGlzdF9lbXB0eSgma3ZtLT5hcmNo
+LnRkcF9tbXVfcm9vdHMpKTsKQEAgLTExOSw5ICsxMjEsMTEgQEAgc3RhdGljIHZvaWQgdGRw
+X21tdV96YXBfcm9vdF93b3JrKHN0cnVjdCB3b3JrX3N0cnVjdCAqd29yaykKIAogc3RhdGlj
+IHZvaWQgdGRwX21tdV9zY2hlZHVsZV96YXBfcm9vdChzdHJ1Y3Qga3ZtICprdm0sIHN0cnVj
+dCBrdm1fbW11X3BhZ2UgKnJvb3QpCiB7Ci0Jcm9vdC0+dGRwX21tdV9hc3luY19kYXRhID0g
+a3ZtOwotCUlOSVRfV09SSygmcm9vdC0+dGRwX21tdV9hc3luY193b3JrLCB0ZHBfbW11X3ph
+cF9yb290X3dvcmspOwotCXF1ZXVlX3dvcmsoa3ZtLT5hcmNoLnRkcF9tbXVfemFwX3dxLCAm
+cm9vdC0+dGRwX21tdV9hc3luY193b3JrKTsKKwlpZiAoa3ZtLT5hcmNoLnRkcF9tbXVfemFw
+X3dxKSB7CisJCXJvb3QtPnRkcF9tbXVfYXN5bmNfZGF0YSA9IGt2bTsKKwkJSU5JVF9XT1JL
+KCZyb290LT50ZHBfbW11X2FzeW5jX3dvcmssIHRkcF9tbXVfemFwX3Jvb3Rfd29yayk7CisJ
+CXF1ZXVlX3dvcmsoa3ZtLT5hcmNoLnRkcF9tbXVfemFwX3dxLCAmcm9vdC0+dGRwX21tdV9h
+c3luY193b3JrKTsKKwl9CiB9CiAKIHN0YXRpYyBpbmxpbmUgYm9vbCBrdm1fdGRwX3Jvb3Rf
+bWFya19pbnZhbGlkKHN0cnVjdCBrdm1fbW11X3BhZ2UgKnBhZ2UpCg==
+
+--------------xd9s8aJo1C2Exy5fYVGAfcXa--
