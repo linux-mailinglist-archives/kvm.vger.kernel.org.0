@@ -2,121 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3BB504E790B
-	for <lists+kvm@lfdr.de>; Fri, 25 Mar 2022 17:38:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B52734E790C
+	for <lists+kvm@lfdr.de>; Fri, 25 Mar 2022 17:39:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245467AbiCYQkC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Mar 2022 12:40:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34124 "EHLO
+        id S245613AbiCYQkU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Mar 2022 12:40:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243097AbiCYQkB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Mar 2022 12:40:01 -0400
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B577321801;
-        Fri, 25 Mar 2022 09:38:22 -0700 (PDT)
-Received: by mail-lf1-x12a.google.com with SMTP id 5so14318991lfp.1;
-        Fri, 25 Mar 2022 09:38:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=0333UXko0p5skH7Gomva2kccUTt68Iz1OddCSPNf2js=;
-        b=jQgYuAem9ZYHlkccaCCJhjCW8khFDISSGHhsexNPblMgnhrPWV6cZ+LP1hWfT23Y2y
-         5XdcS34yhn+TTIdoXcW5n37aTxJrhg9KmsliYM6buKG7yHueuBWcc6ubWkcZECq7RgR8
-         uPrXcQ77KZEUNpiPyTNybauYdgNaJTXYWT99kJhv69uzeRMiiRvbw7VssZYC1APWkwWZ
-         NAi5JIW+JeT2wgnVsg2/HAxg/+sGpub5ezabhgD5XKOyMQvjJZmGBMstEoT9HeSw99Fv
-         VBiidvdDQ4IzS90KBbe2aAMrHgZFzjwdlC38Vvs2TvyHhRahzVgeViBLOqlDDuVDzPfq
-         NKZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=0333UXko0p5skH7Gomva2kccUTt68Iz1OddCSPNf2js=;
-        b=79CvEfiISFdRKBTu/IKjoW1rnvKt42io+RyVYdXTOHkoHv6etbNRQvOHXBAMsund/T
-         +siMbwiYw86Dx/UNSvcvmRxvyseS5FVSo3ptpulfgPmd5yhSYCs7oTbtOXkoK5KKgYTc
-         wr3D+O3uN8ZSEtfUeWKMrVbUq2wO8v0ZX+TZ/4/Nmoq9r/5jq/P9MCJzGwVQXBlMnbAg
-         Vc2EpYK1F0eoyVzJLhYfqCaM5Cjlm4PP1TQxA/wEgeG6T9lrTg9J/GRnE9d/arxZvX+b
-         bQM3S3g2b87HhwWqNr7REXYWM6kd1uuWVBQFgseAHEh3ztCKRw8cX6S3/FTSgjmCyp+r
-         EWaw==
-X-Gm-Message-State: AOAM533ABP5KROJNUYsYKSFFFZQk8RETe67ODyw4gfmRFhxbUyZlt+Qq
-        TV93UdldLx4iCdWSgk2zHwM=
-X-Google-Smtp-Source: ABdhPJx8pJ6C1WooGaA1yRgGm+J6PwJoe8pUYUfcN8+tFB+qD+JiAjBTgkW/Y57geIMTolesj2+now==
-X-Received: by 2002:a05:6512:68d:b0:44a:cc2:78b5 with SMTP id t13-20020a056512068d00b0044a0cc278b5mr8057577lfe.43.1648226300542;
-        Fri, 25 Mar 2022 09:38:20 -0700 (PDT)
-Received: from localhost.localdomain ([94.103.225.225])
-        by smtp.gmail.com with ESMTPSA id i14-20020a198c4e000000b0044a279d25d2sm755352lfj.244.2022.03.25.09.38.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Mar 2022 09:38:20 -0700 (PDT)
-From:   Pavel Skripkin <paskripkin@gmail.com>
-To:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com
-Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Pavel Skripkin <paskripkin@gmail.com>,
-        syzbot+717ed82268812a643b28@syzkaller.appspotmail.com
-Subject: [RFC PATCH] KVM: x86/mmu: fix general protection fault in kvm_mmu_uninit_tdp_mmu
-Date:   Fri, 25 Mar 2022 19:38:15 +0300
-Message-Id: <20220325163815.3514-1-paskripkin@gmail.com>
-X-Mailer: git-send-email 2.35.1
+        with ESMTP id S245582AbiCYQkQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Mar 2022 12:40:16 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC74523BD2;
+        Fri, 25 Mar 2022 09:38:35 -0700 (PDT)
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22PFJl6l006066;
+        Fri, 25 Mar 2022 16:38:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=13SSTdWe3Z8ZLyg4huZnZSLnGAHEoVVg+j9naH3JkqE=;
+ b=iXWl+L5hKLf43oBjLlltaficUvl3DYhj+dECKqwMnioX3sNn9FVOdI0orkBITi3fpKSZ
+ Ziwf/V3g4rt0pTVGkHjRJEFcH8MBfYxtPnMDAYRrRxidx9efkQy5KuUKLISY673S4euW
+ LHAZD55z5wZkGUqvKUO3R3UmfYDcDXl56iX4dySI/EI8y/ENRiSroJ2BMc3NyM+TXQKK
+ G3g7v9gy2AWtcBDkJg3f5sV21PMM8JI6/uUn8Ef8BlJtbIn4PM/1LzrdEkBJh541/fWc
+ N4BNR0Kb20hyU5oRMnGk83IE6dzWrDa/6XCOfGFL+XLuZVw9KjFTWgLaimvfxAwVvH13 cw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3f0rgtgex6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 25 Mar 2022 16:38:34 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22PGR4oX030856;
+        Fri, 25 Mar 2022 16:38:34 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3f0rgtgewq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 25 Mar 2022 16:38:34 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22PGSJ8N005698;
+        Fri, 25 Mar 2022 16:38:32 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 3ew6t95p2y-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 25 Mar 2022 16:38:31 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22PGcSsF28639492
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 25 Mar 2022 16:38:28 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 71DDE4C046;
+        Fri, 25 Mar 2022 16:38:28 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 08E6C4C040;
+        Fri, 25 Mar 2022 16:38:28 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.4.92])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 25 Mar 2022 16:38:27 +0000 (GMT)
+Date:   Fri, 25 Mar 2022 17:38:25 +0100
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     Heiko Carstens <hca@linux.ibm.com>, Nico Boehr <nrb@linux.ibm.com>,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com,
+        david@redhat.com, farman@linux.ibm.com
+Subject: Re: [kvm-unit-tests PATCH v2 3/9] s390x: gs: move to new header
+ file
+Message-ID: <20220325173825.2df90f51@p-imbrenda>
+In-Reply-To: <34d7549b-40c0-a010-3a05-2adbe5f9c41d@linux.ibm.com>
+References: <20220323170325.220848-1-nrb@linux.ibm.com>
+        <20220323170325.220848-4-nrb@linux.ibm.com>
+        <YjytK7iW7ucw/Gwj@osiris>
+        <a2870c6b-6b2a-0a81-435e-ec0f472697c6@linux.ibm.com>
+        <20220325153048.48306e40@p-imbrenda>
+        <34d7549b-40c0-a010-3a05-2adbe5f9c41d@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Us7CWJbYuQ8wtapvr7f2tJbrcKmfi-4Y
+X-Proofpoint-GUID: AoV9ocPcgz0ZIHNVVTbT0EjJ933psDce
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-03-25_05,2022-03-24_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 mlxscore=0
+ bulkscore=0 adultscore=0 phishscore=0 priorityscore=1501 impostorscore=0
+ suspectscore=0 clxscore=1015 lowpriorityscore=0 mlxlogscore=916
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2203250090
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Syzbot reported GPF in kvm_mmu_uninit_tdp_mmu(), which is caused by
-passing NULL pointer to flush_workqueue().
+On Fri, 25 Mar 2022 16:07:47 +0100
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-tdp_mmu_zap_wq is allocated via alloc_workqueue() which may fail. There
-is no error hanling and kvm_mmu_uninit_tdp_mmu() return value is simply
-ignored. Even all kvm_*_init_vm() functions are void, so the easiest
-solution is to check that tdp_mmu_zap_wq is valid pointer before passing
-it somewhere.
+> On 3/25/22 15:30, Claudio Imbrenda wrote:
+> > On Fri, 25 Mar 2022 08:29:11 +0100
+> > Janosch Frank <frankja@linux.ibm.com> wrote:
+> >   
+> >> On 3/24/22 18:40, Heiko Carstens wrote:  
+> >>> On Wed, Mar 23, 2022 at 06:03:19PM +0100, Nico Boehr wrote:
+> >>> ...  
+> >>>> +static inline unsigned long load_guarded(unsigned long *p)
+> >>>> +{
+> >>>> +	unsigned long v;
+> >>>> +
+> >>>> +	asm(".insn rxy,0xe3000000004c, %0,%1"
+> >>>> +	    : "=d" (v)
+> >>>> +	    : "m" (*p)
+> >>>> +	    : "r14", "memory");
+> >>>> +	return v;
+> >>>> +}  
+> >>>
+> >>> It was like that before, but why is r14 within the clobber list?
+> >>> That doesn't make sense.  
+> >>
+> >> r14 is changed in the gs handler of the gs test which is executed if the
+> >> "guarded" part of the load takes place.  
+> > 
+> > I will add a comment explaining that when picking the patch  
+> 
+> Do we need load_guarded() in this new header?
+> The load/store_gscb() functions have potential to be shared across tests 
+> but the lg doesn't need to be executed, no?
+> 
+> We could opt to leave it in gs.c instead
 
-Fixes: 22b94c4b63eb ("KVM: x86/mmu: Zap invalidated roots via asynchronous worker")
-Reported-and-tested-by: syzbot+717ed82268812a643b28@syzkaller.appspotmail.com
-Signed-off-by: Pavel Skripkin <paskripkin@gmail.com>
----
- arch/x86/kvm/mmu/tdp_mmu.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
+yes, probably a better idea. I'd still add the comment, though :)
 
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index e7e7876251b3..b3e8ff7ac5b0 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -48,8 +48,10 @@ void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm)
- 	if (!kvm->arch.tdp_mmu_enabled)
- 		return;
- 
--	flush_workqueue(kvm->arch.tdp_mmu_zap_wq);
--	destroy_workqueue(kvm->arch.tdp_mmu_zap_wq);
-+	if (kvm->arch.tdp_mmu_zap_wq) {
-+		flush_workqueue(kvm->arch.tdp_mmu_zap_wq);
-+		destroy_workqueue(kvm->arch.tdp_mmu_zap_wq);
-+	}
- 
- 	WARN_ON(!list_empty(&kvm->arch.tdp_mmu_pages));
- 	WARN_ON(!list_empty(&kvm->arch.tdp_mmu_roots));
-@@ -119,9 +121,11 @@ static void tdp_mmu_zap_root_work(struct work_struct *work)
- 
- static void tdp_mmu_schedule_zap_root(struct kvm *kvm, struct kvm_mmu_page *root)
- {
--	root->tdp_mmu_async_data = kvm;
--	INIT_WORK(&root->tdp_mmu_async_work, tdp_mmu_zap_root_work);
--	queue_work(kvm->arch.tdp_mmu_zap_wq, &root->tdp_mmu_async_work);
-+	if (kvm->arch.tdp_mmu_zap_wq) {
-+		root->tdp_mmu_async_data = kvm;
-+		INIT_WORK(&root->tdp_mmu_async_work, tdp_mmu_zap_root_work);
-+		queue_work(kvm->arch.tdp_mmu_zap_wq, &root->tdp_mmu_async_work);
-+	}
- }
- 
- static inline bool kvm_tdp_root_mark_invalid(struct kvm_mmu_page *page)
--- 
-2.35.1
-
+shall I just fix this up when picking?
