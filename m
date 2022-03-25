@@ -2,92 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3057A4E7DFD
-	for <lists+kvm@lfdr.de>; Sat, 26 Mar 2022 01:23:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 722F64E7CCF
+	for <lists+kvm@lfdr.de>; Sat, 26 Mar 2022 01:22:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232173AbiCYUYS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Mar 2022 16:24:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53014 "EHLO
+        id S233404AbiCYV1s (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Mar 2022 17:27:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232168AbiCYUYR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Mar 2022 16:24:17 -0400
-Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26C4766CBD
-        for <kvm@vger.kernel.org>; Fri, 25 Mar 2022 13:22:42 -0700 (PDT)
-Received: by mail-pg1-x536.google.com with SMTP id w21so7297602pgm.7
-        for <kvm@vger.kernel.org>; Fri, 25 Mar 2022 13:22:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=cSxVhb71z+Ee83vpaUYArlMABtaVLB8rzZSlwyaMw5Y=;
-        b=KOZWScWPx5LRthiYDgPnYHcm3/Fe4PAO4T9J+5Ol7Lm1rlbLvP/B0+KyVQD0rTaF4p
-         wv1DwFSBGhrVba45FhNgBzQR9lUWbJdjYBQFxGsFehV0gt2yQaxXxse/HodR5w2iwy3A
-         HXijCz6A3szsLmM4fRii8V1p21M+LerdSCjeJ6TLY6BTSHwXIF/eM81Hm54tc57e+vc7
-         RYZquCLfJGxGsk2HVd54V83PUA0kNwSwY8lXY4Yri9PDAMlQAjHnFHHh+sKoNVrjLLvm
-         bWUBTDaW95QQFMlT8iHYvpphTo4tRtUP2EFSiLdeeEiIJdX0sROyhBDyPYgj7qbhA+nP
-         Zu7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=cSxVhb71z+Ee83vpaUYArlMABtaVLB8rzZSlwyaMw5Y=;
-        b=EvJZwzHk+lGlvI7vc+j2TDNBgBPaQk8prh4edYOM83/wXsLsm4ReErW5I/wDSZP3nm
-         SBV/IJbad/gKYAaM+l+rJpo0GNZJ7WKYimQhrtjOey/8VQKLr8Evii7+UAxivgBUcoYs
-         l6QiGA7AcYEX72hVvPh9cPnlAuNQS6FGnWjJs4ICy5/QlWB+1eAbVpVtO+SrJs8ESMG+
-         38JLk2mgZ9IR+TtAn3ibgBsPfdCfIk3zW7hr0lgXKdR4YZ8y6eSeKWqf0HJo8zD4hQGy
-         aiMbKCWBNbZ2oG9BGzyU2McqrHgvpQ9iDOOj1LQfNAvcMQr1j4vkskl6pKL04sEVvPLK
-         69DQ==
-X-Gm-Message-State: AOAM533MbfBDM0L7yGpJRu2pOIoWVhgUCOuY6WVXYSw1mrJpqsxVqyKW
-        i31n5n1ND65nZqRfBPuywOwpeA==
-X-Google-Smtp-Source: ABdhPJzsYhW4Lj1IXnf4NIGQcY6MlWE3y8J/vp4aaF0mlpwG6vx59jXFeTzBbZah9AjymJqdXjJkyg==
-X-Received: by 2002:a63:4859:0:b0:381:ede3:9af0 with SMTP id x25-20020a634859000000b00381ede39af0mr1013244pgk.87.1648239761482;
-        Fri, 25 Mar 2022 13:22:41 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id gb5-20020a17090b060500b001c6d46f7e75sm13815829pjb.30.2022.03.25.13.22.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Mar 2022 13:22:40 -0700 (PDT)
-Date:   Fri, 25 Mar 2022 20:22:37 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: Re: [FYI PATCH] Revert "KVM: x86/mmu: Zap only TDP MMU leafs in
- kvm_zap_gfn_range()"
-Message-ID: <Yj4kjRSuBDfupRqW@google.com>
-References: <20220318164833.2745138-1-pbonzini@redhat.com>
- <d6367754-7782-7c29-e756-ac02dbd4520b@redhat.com>
- <Yj0FYSC2sT4k/ELl@google.com>
- <78e3f054-829e-b00d-6c65-9ae622f301df@redhat.com>
+        with ESMTP id S233390AbiCYV1q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Mar 2022 17:27:46 -0400
+Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDB6AC12E8;
+        Fri, 25 Mar 2022 14:26:09 -0700 (PDT)
+Received: from MUA
+        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94.2)
+        (envelope-from <mail@maciej.szmigiero.name>)
+        id 1nXrRS-0001Yx-9B; Fri, 25 Mar 2022 22:25:54 +0100
+Message-ID: <e64d9972-339c-c661-afbd-38f1f2ea476a@maciej.szmigiero.name>
+Date:   Fri, 25 Mar 2022 22:25:47 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <78e3f054-829e-b00d-6c65-9ae622f301df@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Oliver Upton <oupton@google.com>,
+        Peter Shier <pshier@google.com>
+References: <20220311032801.3467418-1-seanjc@google.com>
+ <08548cb00c4b20426e5ee9ae2432744d6fa44fe8.camel@redhat.com>
+ <YjzjIhyw6aqsSI7Q@google.com>
+From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Subject: Re: [PATCH 00/21] KVM: x86: Event/exception fixes and cleanups
+In-Reply-To: <YjzjIhyw6aqsSI7Q@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 25, 2022, Paolo Bonzini wrote:
-> On 3/25/22 00:57, Sean Christopherson wrote:
-> > Can I have 1-2 weeks to try and root cause and fix the underlying issue before
-> > sending reverts to Linus?  I really don't want to paper over a TLB flushing bug
-> > or an off-by-one bug, and I really, really don't want to end up with another
-> > scenario where KVM zaps everything just because.
+On 24.03.2022 22:31, Sean Christopherson wrote:
+> On Sun, Mar 13, 2022, Maxim Levitsky wrote:
+>> On Fri, 2022-03-11 at 03:27 +0000, Sean Christopherson wrote:
+>>> The main goal of this series is to fix KVM's longstanding bug of not
+>>> honoring L1's exception intercepts wants when handling an exception that
+>>> occurs during delivery of a different exception.  E.g. if L0 and L1 are
+>>> using shadow paging, and L2 hits a #PF, and then hits another #PF while
+>>> vectoring the first #PF due to _L1_ not having a shadow page for the IDT,
+>>> KVM needs to check L1's intercepts before morphing the #PF => #PF => #DF
+>>> so that the #PF is routed to L1, not injected into L2 as a #DF.
+>>>
+>>> nVMX has hacked around the bug for years by overriding the #PF injector
+>>> for shadow paging to go straight to VM-Exit, and nSVM has started doing
+>>> the same.  The hacks mostly work, but they're incomplete, confusing, and
+>>> lead to other hacky code, e.g. bailing from the emulator because #PF
+>>> injection forced a VM-Exit and suddenly KVM is back in L1.
+>>>
+>>> Everything leading up to that are related fixes and cleanups I encountered
+>>> along the way; some through code inspection, some through tests (I truly
+>>> thought this series was finished 10 commits and 3 days ago...).
+>>>
+>>> Nothing in here is all that urgent; all bugs tagged for stable have been
+>>> around for multiple releases (years in most cases).
+>>>
+>> I am just curious. Are you aware that I worked on this few months ago?
 > 
-> Well, too late...  I didn't want to send a pull request that was broken,
+> Ah, so that's why I had a feeling of deja vu when factoring out kvm_queued_exception.
+> I completely forgot about it :-/  In my defense, that was nearly a year ago[1][2], though
+> I suppose one could argue 11 == "a few" :-)
+> 
+> [1] https://lore.kernel.org/all/20210225154135.405125-1-mlevitsk@redhat.com
+> [2] https://lore.kernel.org/all/20210401143817.1030695-3-mlevitsk@redhat.com
+> 
+>> I am sure that you even reviewed some of my code back then.
+> 
+> Yep, now that I've found the threads I remember discussing the mechanics.
+> 
+>> If so, could you have had at least mentioned this and/or pinged me to continue
+>> working on this instead of re-implementing it?
+> 
+> I'm invoking Hanlon's razor[*]; I certainly didn't intended to stomp over your
+> work, I simply forgot.
+> 
+> As for the technical aspects, looking back at your series, I strongly considered
+> taking the same approach of splitting pending vs. injected (again, without any
+> recollection of your work).  I ultimately opted to go with the "immediated morph
+> to pending VM-Exit" approach as it allows KVM to do the right thing in almost every
+> case without requiring new ABI, and even if KVM screws up, e.g. queues multiple
+> pending exceptions.  It also neatly handles one-off things like async #PF in L2.
+> 
+> However, I hadn't considered your approach, which addresses the ABI conundrum by
+> processing pending=>injected immediately after handling the VM-Exit.  I can't think
+> of any reason that wouldn't work, but I really don't like splitting the event
+> priority logic, nor do I like having two event injection sites (getting rid of the
+> extra calls to kvm_check_nested_events() is still on my wish list).  If we could go
+> back in time, I would likely vote for properly tracking injected vs. pending, but
+> since we're mostly stuck with KVM's ABI, I prefer the "immediately morph to pending
+> VM-Exit" hack over the "immediately morph to 'injected' exception" hack.
 
-Ah, I didn't see that it was in the initial pull request, thought it was only in
-kvm/next.  I'll send a full patch.
+So, what's the plan here: is your patch set Sean considered to supersede
+Maxim's earlier proposed changes or will you post an updated patch set
+incorporating at least some of them?
 
-> Mingwei provided a convincing reason for the breakage.
+I am asking because I have a series that touches the same general area
+of KVM [1] and would preferably have it based on the final form of the
+event injection code to avoid unforeseen negative interactions between
+these changes.
 
-No, the side effects are completely benign, and arguably desirable.  The issue is
-that KVM loses a pending TLB flush if there are multiple roots.
+Thanks,
+Maciej
+
+[1]: https://lore.kernel.org/kvm/d04e096a-b12e-91e2-204e-b3643a62d705@maciej.szmigiero.name/
