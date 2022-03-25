@@ -2,113 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 720BC4E7400
-	for <lists+kvm@lfdr.de>; Fri, 25 Mar 2022 14:13:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2767F4E7415
+	for <lists+kvm@lfdr.de>; Fri, 25 Mar 2022 14:21:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245078AbiCYNOc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Mar 2022 09:14:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53122 "EHLO
+        id S1354224AbiCYNXX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Mar 2022 09:23:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230039AbiCYNOb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Mar 2022 09:14:31 -0400
-Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D639D0ABD
-        for <kvm@vger.kernel.org>; Fri, 25 Mar 2022 06:12:55 -0700 (PDT)
-Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-2e5e176e1b6so82378007b3.13
-        for <kvm@vger.kernel.org>; Fri, 25 Mar 2022 06:12:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=AZpjuFFTl/dm9JwX45C9HkZ4zP02fAm50fBmj/eKc24=;
-        b=MDuTCzZqXNu3MurxUT6XKuZ8py+H/UWo9XXjk2ZSe137gGe6dkSUqIwQUcEoZUFAix
-         iioVWl1aqpst3x70OCZYakPHYnTMr89sDakCKdRdpvfyiOIKw1Cj+BtqBoqyIVleG1N3
-         RWDbSrHIH4DYF0pJYrUQusGqlNVQM0YVLrhmq5ct2Jsl3wMxpq1e/i56zvKJrKExdvyG
-         yptuf7JjhLuGk6E+tanRBUVjCCPJwegLPYsmRBaB9FqRwUlguoV8CrWQPshxk+hM2K7J
-         OcyzPmnD9r7mCg4P4VvFBqi43rbKcyf3dEokBc5ugiM8JqGk0ghLZXX36YkvTZdkCXXL
-         Jdvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=AZpjuFFTl/dm9JwX45C9HkZ4zP02fAm50fBmj/eKc24=;
-        b=1FiKez+o8NmNUNweIpMC66UuMLsaujBkCqVeBU/Cw7uIwpyCmrI2tq+pa/KXjDtUA+
-         5Li+H9XpS9NUCTBXZEPyPcvfWn+dlD5T9jVFd7N5cnzSKRs3BsD3Z89cMCGYAHjP17WQ
-         UnUe/LcjYUVo1Z5qWFLD2xXl+F4vmUiuUtJqkPxTBGvIZ58OwCdmU8TAI9C3+qVbLbyI
-         2l4oBjkWwbcpLdou2KwEoIJvLKsLJnQON1C+wF5xLDAQ504QpXUGmnEet3OOBGRWf7lM
-         oVRO9jtJki4v3yAAIm/FfSPUlLQZpIBH50Om8YRh0ZFNmfRb7f33pKziPH0DM4Hn3QH0
-         WtFw==
-X-Gm-Message-State: AOAM5326bIDEc19+KIg9Zdq51Ktjo2/cj1zDtZYs5dBC0flaxmjZHxWu
-        rMUST5Vd0vLYJU9JJW3CNraK3r9DS2uRiPEzZnAA2A==
-X-Google-Smtp-Source: ABdhPJyysXq5eLimDLgPlp6UAlqerubnGEJMcsS79SqknmWKfMmF+kjiIkImD+dIO+wYTdvhD+heCuufdaXgorzZEWM=
-X-Received: by 2002:a0d:f603:0:b0:2d1:57e5:234 with SMTP id
- g3-20020a0df603000000b002d157e50234mr10757640ywf.469.1648213972622; Fri, 25
- Mar 2022 06:12:52 -0700 (PDT)
+        with ESMTP id S1353248AbiCYNXV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Mar 2022 09:23:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id EAB5CC6834
+        for <kvm@vger.kernel.org>; Fri, 25 Mar 2022 06:21:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1648214507;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=jHB6BR0YbApCBzRoAgSeCurDpGlWHsYv9gOGQx13pb0=;
+        b=Al5Jj0HXFw2Uw9Vm+GAcsXO6SY61XlNdJk+lQ+6iMbQRN6Yvz7UIN1gYBCCUjvPKN/BST2
+        mWr6Lq0nsk/xfTMfGu/xoZRxzlf/eVhgvcvzSGvHjAq1ZlpBlIVV8fYZnWj5E3Eus+qEif
+        5jFmd53EnQ3mGHvaGydXX0Jn0OnBsyY=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-654-pQDQAainO_GMcwUfculRtg-1; Fri, 25 Mar 2022 09:21:43 -0400
+X-MC-Unique: pQDQAainO_GMcwUfculRtg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 772D3866DF1;
+        Fri, 25 Mar 2022 13:21:43 +0000 (UTC)
+Received: from fedora.redhat.com (unknown [10.40.194.62])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7FA622166B16;
+        Fri, 25 Mar 2022 13:21:41 +0000 (UTC)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
+Subject: [PATCH 0/3] KVM: x86: Prefent NULL prointer dereference in kvm_irq_delivery_to_apic_fast()
+Date:   Fri, 25 Mar 2022 14:21:37 +0100
+Message-Id: <20220325132140.25650-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-References: <20220318085931.3899316-1-liucong2@kylinos.cn>
-In-Reply-To: <20220318085931.3899316-1-liucong2@kylinos.cn>
-From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Fri, 25 Mar 2022 13:12:39 +0000
-Message-ID: <CAFEAcA8uqRbZzEaZOh4xjeqhEbxy82UxjeRBMfhNsbAoXzk_Vg@mail.gmail.com>
-Subject: Re: [PATCH] kvm/arm64: Fix memory section did not set to kvm
-To:     Cong Liu <liucong2@kylinos.cn>
-Cc:     pbonzini@redhat.com, kvm@vger.kernel.org, qemu-devel@nongnu.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
+X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 18 Mar 2022 at 14:24, Cong Liu <liucong2@kylinos.cn> wrote:
->
-> on the arm64 platform, the PAGESIZE is 64k, the default qxl rom
-> bar size is 8k(QXL_ROM_SZ), in the case memory size less than
-> one page size, kvm_align_section return zero,  the memory section
-> did not commit kvm.
+Syzkaller found the following crash:
 
-Can you give more details on how this happens? The only place
-we use QXL_ROM_SZ is in the qxl_rom_size() function, and that
-rounds up the value it returns to the qemu_real_host_page_size.
-That change was added in commit ce7015d9e8669e, exagctly to
-fix what sounds like the same problem you're hitting where
-KVM is in use and the host page size is larger than 8K.
-Are you using an old version of QEMU that doesn't have that fix ?
+general protection fault, probably for non-canonical address
+0xdffffc0000000013: 0000 [#1] PREEMPT SMP KASAN NOPTI
+KASAN: null-ptr-deref in range [0x0000000000000098-0x000000000000009f]
+CPU: 1 PID: 679 Comm: syz-executor210 Not tainted 5.17.0-rc8 #6
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+1.10.2-1ubuntu1~cloud0 04/01/2014
+RIP: 0010:kvm_irq_delivery_to_apic_fast+0x3dd/0x670 arch/x86/kvm/lapic.c:995
+...
+Call Trace:
+ <TASK>
+ kvm_irq_delivery_to_apic+0xb8/0x860 arch/x86/kvm/irq_comm.c:54
+ synic_set_irq+0x169/0x340 arch/x86/kvm/hyperv.c:463
+ synic_deliver_msg arch/x86/kvm/hyperv.c:770 [inline]
+ stimer_send_msg arch/x86/kvm/hyperv.c:793 [inline]
+ stimer_expiration arch/x86/kvm/hyperv.c:817 [inline]
+ kvm_hv_process_stimers+0xe85/0x1210 arch/x86/kvm/hyperv.c:849
+ vcpu_enter_guest+0x37cb/0x4070 arch/x86/kvm/x86.c:9947
+ vcpu_run arch/x86/kvm/x86.c:10261 [inline]
+...
 
-> Signed-off-by: Cong Liu <liucong2@kylinos.cn>
-> ---
->  accel/kvm/kvm-all.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index 27864dfaea..f57cab811b 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -318,6 +318,7 @@ static hwaddr kvm_align_section(MemoryRegionSection *section,
->                                  hwaddr *start)
->  {
->      hwaddr size = int128_get64(section->size);
-> +    size = ROUND_UP(size, qemu_real_host_page_size);
->      hwaddr delta, aligned;
->
->      /* kvm works in page size chunks, but the function may be called
+The immediate issue is that kvm_irq_delivery_to_apic_fast() dereferences
+'src' while in some cases it can be NULL. A sentinel against this is added
+in PATCH2 of the series, however, the condition should not happen in the
+first place. synic_set_irq() should not call kvm_irq_delivery_to_apic() with
+'shorthand = APIC_DEST_SELF' and 'vcpu->arch.apic == NULL' and this is also
+'fixed' by PATCH1. The root cause of the problem, however, is that VMM was
+allowed to  enable Hyper-V synthetic timer when IRQ chip wasn't created.
+This is fixed by PATCH3.
 
-The comment we can just see starting here says:
+Vitaly Kuznetsov (3):
+  KVM: x86: Check lapic_in_kernel() before attempting to set a SynIC irq
+  KVM: x86: Avoid theoretical NULL pointer dereference in
+    kvm_irq_delivery_to_apic_fast()
+  KVM: x86: Forbid VMM to set SYNIC/STIMER MSRs when SynIC wasn't
+    activated
 
-    /* kvm works in page size chunks, but the function may be called
-       with sub-page size and unaligned start address. Pad the start
-       address to next and truncate size to previous page boundary. */
+ arch/x86/kvm/hyperv.c | 12 +++++++++---
+ arch/x86/kvm/lapic.c  |  4 ++++
+ 2 files changed, 13 insertions(+), 3 deletions(-)
 
-but your change means that's no longer true.
+-- 
+2.35.1
 
-More generally, rounding up the size here seems dubious -- there
-is no guarantee that whatever follows the small lump of RAM
-in the address space is sensible to treat as really being
-part of the same thing.
-
-thanks
--- PMM
