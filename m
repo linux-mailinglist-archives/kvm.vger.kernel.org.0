@@ -2,85 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E836B4E8746
-	for <lists+kvm@lfdr.de>; Sun, 27 Mar 2022 12:43:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F8634E8749
+	for <lists+kvm@lfdr.de>; Sun, 27 Mar 2022 12:44:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232636AbiC0Kmr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 27 Mar 2022 06:42:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41444 "EHLO
+        id S232950AbiC0Kpe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 27 Mar 2022 06:45:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44468 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232429AbiC0Kmq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 27 Mar 2022 06:42:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7955D1A388
-        for <kvm@vger.kernel.org>; Sun, 27 Mar 2022 03:41:07 -0700 (PDT)
+        with ESMTP id S232725AbiC0KpU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 27 Mar 2022 06:45:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7DD221AD93
+        for <kvm@vger.kernel.org>; Sun, 27 Mar 2022 03:43:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1648377666;
+        s=mimecast20190719; t=1648377821;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=1mFTcX2t9p3wv/uCdWkqMzj2ugqVepjYfseDXDJCz6Q=;
-        b=fD6DWWyS0GrjR47VNO3xunhsB+HEmcdvndl2xCpyQvWLpzCmlfYfhw1Cxn8gcQp9peR9SH
-        hQQtT+vEXV7svQ+rZl/zTCzaW/YLKtnU00qQpKy1yblBgdUFYL67eEfKL/M1K6A15dIUQN
-        7iTQUQG1xNVf60Xv4TbwJ78OAeF1LAE=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=H2GIa+mmtal947w7XJ46Ep9n19VMMmjtdQlQdQQuEsg=;
+        b=JYRX4/Dbr6I9FErfsls0fSF7O0cAOpS0RU0o9EodxTJ7vg/gdx9Pnzk1lay2IK5WIfPclo
+        fW7WQaAwe0sqxgjo1Dj2w9ySSTV8eKUTzw99INxW0y4Y6gneovhqyc8F59J6WZySkgfvDa
+        ECXX8dwHyvWblSVj0WV4dv7NceYQxJI=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-356-ZfHeork8OsW5zLXoWvwXBQ-1; Sun, 27 Mar 2022 06:41:04 -0400
-X-MC-Unique: ZfHeork8OsW5zLXoWvwXBQ-1
-Received: by mail-ed1-f72.google.com with SMTP id j39-20020a05640223a700b0041992453601so5219384eda.1
-        for <kvm@vger.kernel.org>; Sun, 27 Mar 2022 03:41:04 -0700 (PDT)
+ us-mta-93-bYap0brnPFuz_aLNHOblKw-1; Sun, 27 Mar 2022 06:43:40 -0400
+X-MC-Unique: bYap0brnPFuz_aLNHOblKw-1
+Received: by mail-ed1-f71.google.com with SMTP id m21-20020a50d7d5000000b00418c7e4c2bbso7499016edj.6
+        for <kvm@vger.kernel.org>; Sun, 27 Mar 2022 03:43:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=1mFTcX2t9p3wv/uCdWkqMzj2ugqVepjYfseDXDJCz6Q=;
-        b=KzVPAKTkrDAeskQmBx+3mCkPlQwGWDQ2xkliokW2fn/74UKqnP6JWOIPQ3lGeou/E/
-         wdRybYWH4kwvRYxIdDtLklbETQ6gHp3FEKwH1ObSNABWV0xtMzSJIqtP3BCDMizwEpWg
-         fqBUZjyCfAgQYGGdzVybSYGqrKQDo6pgnMtTINKPp2Zwg0Km1DzW3fntsz7nA4ArKBMk
-         lKOkNcCCICeK7WwphR3bZz6h1oW/PdJH4qDuEK1Td7aLt6WswS42JNF1H5IeKZeXdsGY
-         5mBuJRWimKj31dIzuV5EXf96Tq5+/KAWyRxyP2vwQjM++VyOYhQG2Y/xYv3l/ozmj64k
-         11Ew==
-X-Gm-Message-State: AOAM531Eoc4PboRIOPDes1OTL9/tW+uDn3WDEh8Ga14fgO6PKNfxBwaY
-        aLYn79wrFio1YWfeyIOmSdXaJQnD26Cigi5eWSc+cAH/MU1LeGNy2d2j5ShjkjJPTmAJWK/f8iR
-        V+X/IIbX2zgnk
-X-Received: by 2002:a17:906:17db:b0:6da:f8d8:ab53 with SMTP id u27-20020a17090617db00b006daf8d8ab53mr21089982eje.274.1648377663427;
-        Sun, 27 Mar 2022 03:41:03 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJytaQvKY2CY47C0QVZPuli4dV3wY/7Vyq9dDldBV4fgLQZcD0AOfYQcDpZA6+PHM7wg3h7irw==
-X-Received: by 2002:a17:906:17db:b0:6da:f8d8:ab53 with SMTP id u27-20020a17090617db00b006daf8d8ab53mr21089962eje.274.1648377663200;
-        Sun, 27 Mar 2022 03:41:03 -0700 (PDT)
+        bh=H2GIa+mmtal947w7XJ46Ep9n19VMMmjtdQlQdQQuEsg=;
+        b=pzZO24mgufT6TBZS444yK0SPG53GaZeWOVHq5e/ouKcORLi3PQAIVwY2q0vkGVDhci
+         k0TDujLWtrE5Tqd4SS1ju+oxIjMig51A6VEvX0sNyqo7uU8IYqbZKaOstzmnOFawvUxr
+         wjdR7MfbgSKpuP4I5owVxtxMCGn0Lry7bMdh9dlsrA6d2MH44PV7bjD49H+wClZaTF+z
+         ECwGHfCyi5I+S5mNiLxxEdETBd4G34T5jV0fUJ8ttI6MXVJRqiWHHkur4jiJCvnBJx0h
+         3CzqiW5xMpGN/wKy0EznExAlMA9etAMlNmkCzbK/kHdy85oEe8GbWfiEM6LqrwiPRsrw
+         uuxw==
+X-Gm-Message-State: AOAM533RBTTpzRvsXbP/jg0hJA/yqlhopRrpxlV0K7SfG8hHHRJa14i9
+        aK3V7dQxHt/mSIxSw1444t4HCX1U01jVzbS1YsQr28PKToigcMLU6FIQG0jOVr0pIFvJUt4d1Nu
+        boM0lJufNfC6q
+X-Received: by 2002:a17:907:1606:b0:6df:f528:4033 with SMTP id hb6-20020a170907160600b006dff5284033mr21505235ejc.433.1648377818832;
+        Sun, 27 Mar 2022 03:43:38 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyNsu4Jla66PU/uo2G0ZAf26Kt9rppr5HPcOcpESaC2zmv6zoGD5Ds5s4BA5nFsiY0f1omrBA==
+X-Received: by 2002:a17:907:1606:b0:6df:f528:4033 with SMTP id hb6-20020a170907160600b006dff5284033mr21505206ejc.433.1648377818572;
+        Sun, 27 Mar 2022 03:43:38 -0700 (PDT)
 Received: from ?IPV6:2001:b07:6468:f312:8ca6:a836:a237:fed1? ([2001:b07:6468:f312:8ca6:a836:a237:fed1])
-        by smtp.googlemail.com with ESMTPSA id v26-20020a50955a000000b00418ebdb07ddsm5606052eda.56.2022.03.27.03.40.59
+        by smtp.googlemail.com with ESMTPSA id jv19-20020a170907769300b006e095c047d6sm3213295ejc.109.2022.03.27.03.43.37
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 27 Mar 2022 03:41:02 -0700 (PDT)
-Message-ID: <b754fa0a-4f9e-1ea5-6c77-f2410b7f8456@redhat.com>
-Date:   Sun, 27 Mar 2022 12:40:59 +0200
+        Sun, 27 Mar 2022 03:43:38 -0700 (PDT)
+Message-ID: <e8488e5c-7372-fc6e-daee-56633028854a@redhat.com>
+Date:   Sun, 27 Mar 2022 12:43:36 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.4.0
-Subject: Re: [PATCH] KVM: x86/mmu: Speed up slot_rmap_walk_next for sparsely
- populated rmaps
+Subject: Re: [PATCH] KVM: x86: optimize PKU branching in
+ kvm_load_{guest|host}_xsave_state
 Content-Language: en-US
-To:     Vipin Sharma <vipinsh@google.com>,
-        David Matlack <dmatlack@google.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+To:     Jon Kohler <jon@nutanix.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-References: <20220325233125.413634-1-vipinsh@google.com>
- <CALzav=e6W2VSp=btmqTpQJ=3bH+Bw3D8sLApkTTvMMKAnw_LAw@mail.gmail.com>
- <CAHVum0dOfJ5HuscNq0tA6BnUJK34v4CPCTkD4piHc7FObZOsng@mail.gmail.com>
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20220324004439.6709-1-jon@nutanix.com>
+ <Yj5bCw0q5n4ZgSuU@google.com>
+ <387E8E8B-81B9-40FF-8D52-76821599B7E4@nutanix.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <CAHVum0dOfJ5HuscNq0tA6BnUJK34v4CPCTkD4piHc7FObZOsng@mail.gmail.com>
+In-Reply-To: <387E8E8B-81B9-40FF-8D52-76821599B7E4@nutanix.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
         SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -89,27 +94,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/26/22 01:31, Vipin Sharma wrote:
->>> -static void slot_rmap_walk_next(struct slot_rmap_walk_iterator *iterator)
->>> +static noinline void
+On 3/26/22 02:37, Jon Kohler wrote:
+>>>     Flip the ordering of the || condition so that XFEATURE_MASK_PKRU is
+>>>     checked first, which when instrumented in our environment appeared
+>>>     to be always true and less overall work than kvm_read_cr4_bits.
 >>
->> What is the reason to add noinline?
+>> If it's always true, then it should be checked last, not first.  And if
 > 
-> My understanding is that since this method is called from
-> __always_inline methods, noinline will avoid gcc inlining the
-> slot_rmap_walk_next in those functions and generate smaller code.
+> Sean thanks for the review. This would be a left handed || short circuit, so
+> wouldn’t we want always true to be first?
+
+Yes.
+
+>> Not that it really matters, since static_cpu_has() will patch out all the branches,
+>> and in practice who cares about a JMP or NOP(s)?  But...
 > 
+> The reason I’ve been pursuing this is that the guest+host xsave adds up to
+> a bit over ~1% as measured by perf top in an exit heavy workload. This is
+> the first in a few patch we’ve drummed up to to get it back towards zero.
+> I’ll send the rest out next week.
 
-Iterators are written in such a way that it's way more beneficial to 
-inline them.  After inlining, compilers replace the aggregates (in this 
-case, struct slot_rmap_walk_iterator) with one variable per field and 
-that in turn enables a lot of optimizations, so the iterators should 
-actually be always_inline if anything.
+Can you add a testcase to x86/vmexit.c in kvm-unit-tests, too?
 
-For the same reason I'd guess the effect on the generated code should be 
-small (next time please include the output of "size mmu.o"), but should 
-still be there.  I'll do a quick check of the generated code and apply 
-the patch.
+Thanks,
 
 Paolo
 
