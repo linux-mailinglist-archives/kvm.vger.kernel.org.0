@@ -2,100 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 612FF4E8AEE
-	for <lists+kvm@lfdr.de>; Mon, 28 Mar 2022 00:50:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B6B0F4E8AFD
+	for <lists+kvm@lfdr.de>; Mon, 28 Mar 2022 00:57:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234302AbiC0WwQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 27 Mar 2022 18:52:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48048 "EHLO
+        id S233104AbiC0W6t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 27 Mar 2022 18:58:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37400 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229999AbiC0WwP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 27 Mar 2022 18:52:15 -0400
-Received: from mail-ed1-x544.google.com (mail-ed1-x544.google.com [IPv6:2a00:1450:4864:20::544])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 445D63388F
-        for <kvm@vger.kernel.org>; Sun, 27 Mar 2022 15:50:36 -0700 (PDT)
-Received: by mail-ed1-x544.google.com with SMTP id w25so14992440edi.11
-        for <kvm@vger.kernel.org>; Sun, 27 Mar 2022 15:50:36 -0700 (PDT)
+        with ESMTP id S229508AbiC0W6r (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 27 Mar 2022 18:58:47 -0400
+Received: from mail-io1-xd36.google.com (mail-io1-xd36.google.com [IPv6:2607:f8b0:4864:20::d36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9245338780
+        for <kvm@vger.kernel.org>; Sun, 27 Mar 2022 15:57:08 -0700 (PDT)
+Received: by mail-io1-xd36.google.com with SMTP id e22so15082713ioe.11
+        for <kvm@vger.kernel.org>; Sun, 27 Mar 2022 15:57:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=VSEH8Q3Lr+Mcr/0lsL1VFPftJp7ALZ21MKYEz4sry74=;
-        b=gx+9Hq2FqjzLYfLE+uD7MRf1Z/TWcMFWeoMZPx4W+7EoYvq0SkWwiEobMx44Uq/Ytn
-         az3wwBIe9wNF5xUkbTwLQU1Pv8RMhy8IxnAMy/RwCb8MVcKpUO0U1ID+eOPgnCGdmXru
-         Uyn8YKM2C9Az0FRZyo39nfy+WgCcLiZGQ+R3aYybohTVZwPxh+eVnx6ZV5Gdos1LSXSM
-         07ukpoEPd+mxiwDoDmP1TS96Jn+UErW+ahwhcP0X0Kn+dsxg2Bbnw5EZzzRo1F3auYIh
-         wFx2LtfLQvlyHnAwK6xivcGXzoivDn3AzDhwh/GO612YvTWOART+40T9mkxOqV4ncP4D
-         J8Ew==
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=CjWd0tIkzvNawm0BRbire5c+xv5CyJVt3CvwKbjZGYU=;
+        b=HU76r327df81wux7lLJZxlV3xKwgkiZjrfmZN0JJlNrgn286Yoa3KZ3e+NFurt2IgZ
+         n0v7rnpAql29TEOlz4ors0rA686wMsjljCfDmr2eg13AAHxepLJbv2rHOW7lwfO8dVqh
+         v13zcVXNXuLHhcIOcJZUJNCoqTpfPKD+uRKD1VEOT8N+plRJkMFTUo1/Lak5SOkDR31A
+         eKAjnziVgArmkcd4r2Z3iTyGhshRtWtKDXMkYlOME/wloMIutNcV6ZnUX/WmXrdp04tV
+         2Uh4pSP1wPgF/AqyyqdxgblfNNGCtY57PicJzBObHDvMKzNQQ3qFEVoU0CY2sYcJScbK
+         DEzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=VSEH8Q3Lr+Mcr/0lsL1VFPftJp7ALZ21MKYEz4sry74=;
-        b=raOIoWALL9NMKB7DaWFtzgkR+Wwza62IzMGqnPKVLjxMSJWv+tLvNJwLTSE+oks5Lf
-         xSN8TOeejJiqHevk67VT0sbbjyBEoCzaj5Ba+9/DtxxnN0v+nnKeohYSMaCZXTRWOuYw
-         qIZmRmZjSMbJvWNRTniZbiVFZ7mMv0abEfJDwV5SslPO4X6LJWZjlcjdAvKB1zMoombv
-         VN8ZKoPhdb0nJH5Uw4EE64aJqXDDHkTJZwHGhGA3D3z14dr7EwdTkyOv0drxxvdF41sj
-         hCouQOTWrO7mglaBGcwf7jrcXmrLr3rcXf/Iqqykll6a/IGUhU8pzSOh0ijuCLiPAjfW
-         6N6Q==
-X-Gm-Message-State: AOAM532+AOtt3xVM5rFlytfCvf8V4DAS2lkgZNPRQxrRbpkr8J5ChFW+
-        YgRUrItn17oSS8Py5sPTRut658QSHomVXcWaJ3E=
-X-Google-Smtp-Source: ABdhPJzTu/+3kS6pMgJ+0BGLmu2UaggHrLg09EiONBfK0bQpfHr2MOqylj5bac4WiXaIe/rP+WjHg46HSEUoMk8g2mo=
-X-Received: by 2002:aa7:cc82:0:b0:410:d2b0:1a07 with SMTP id
- p2-20020aa7cc82000000b00410d2b01a07mr12655473edt.359.1648421434625; Sun, 27
- Mar 2022 15:50:34 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=CjWd0tIkzvNawm0BRbire5c+xv5CyJVt3CvwKbjZGYU=;
+        b=vDIGZ4R2QJ1K379zlaQzVhm0xtmzLD6mdVuruaUE4ni0HD5/PE2ppRIt3Ylb3RblpD
+         obtYwi+CZoc+FUFK7o+M8GOnkOxfcis5f1Tkxhx/76XXtYtIwzNoUWnGJzcs5eGMpKC1
+         2VRXStM8IKWUqDHpEe2rpwrCi4v9HlvC/U5mWyM8FJ9ikQX9Djto2oGsE30Zht3aIc+M
+         RCQKHQCEzObz6WqlYOzv4F3s1SJ1XcjQlFZE5s0Hvj0DLjEsf/a4HHkMclCDGDA+0E/d
+         S56ovu4Mf26yX3TO2sIsXfdgUBWABOMsZgf6y61hBvu/Bt2XuuCUnwnyUGH39Xqu1jHu
+         7WCA==
+X-Gm-Message-State: AOAM531J+nlyi1L2/KhXYD3REqAB9/wa8YWIQ+Xk9iMs73IrJE9ByhDm
+        tgD2fqSKKMCmdeLDFW+JMGIrJw==
+X-Google-Smtp-Source: ABdhPJzjbeGKj2yG5O0QaikywUktGbrV4+4ADpjpuGoc+EZm/o+U4LtS5BnIg2inPsj+f6pnLX9jsA==
+X-Received: by 2002:a05:6602:22da:b0:645:ec83:6393 with SMTP id e26-20020a05660222da00b00645ec836393mr4926399ioe.165.1648421827735;
+        Sun, 27 Mar 2022 15:57:07 -0700 (PDT)
+Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
+        by smtp.gmail.com with ESMTPSA id d15-20020a92360f000000b002c81e1fdae1sm6168555ila.85.2022.03.27.15.57.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 27 Mar 2022 15:57:06 -0700 (PDT)
+Date:   Sun, 27 Mar 2022 22:57:03 +0000
+From:   Oliver Upton <oupton@google.com>
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>,
+        Andrew Jones <drjones@redhat.com>,
+        Fuad Tabba <tabba@google.com>,
+        Peng Liang <liangpeng10@huawei.com>,
+        Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>
+Subject: Re: [PATCH v6 02/25] KVM: arm64: Save ID registers' sanitized value
+ per guest
+Message-ID: <YkDrv2JdZhVFnGMk@google.com>
+References: <20220311044811.1980336-1-reijiw@google.com>
+ <20220311044811.1980336-3-reijiw@google.com>
+ <YjtzZI8Lw2uzjm90@google.com>
+ <8adf6145-085e-9868-b2f8-65dfbdb5d88f@google.com>
+ <YjywaFuHp8DL7Q9T@google.com>
+ <CAAeT=FwkSUb59Uc35CJgerJdBM5ZCUExNnz2Zs2oHFLn0Jjbsg@mail.gmail.com>
 MIME-Version: 1.0
-Received: by 2002:a50:294b:0:0:0:0:0 with HTTP; Sun, 27 Mar 2022 15:50:33
- -0700 (PDT)
-Reply-To: christopherdaniel830@gmail.com
-From:   Christopher Daniel <cd01100222@gmail.com>
-Date:   Sun, 27 Mar 2022 22:50:33 +0000
-Message-ID: <CAO=CV9JeVnd4Mn2cpfai_wcAD2pZQysg+pZUa-7B9w9DVMiZbg@mail.gmail.com>
-Subject: Hello
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: Yes, score=6.0 required=5.0 tests=BAYES_50,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FROM,FREEMAIL_REPLYTO,FREEMAIL_REPLYTO_END_DIGIT,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        UNDISC_FREEM autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Report: * -0.0 RCVD_IN_DNSWL_NONE RBL: Sender listed at
-        *      https://www.dnswl.org/, no trust
-        *      [2a00:1450:4864:20:0:0:0:544 listed in]
-        [list.dnswl.org]
-        *  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
-        *      [score: 0.4202]
-        * -0.0 SPF_PASS SPF: sender matches SPF record
-        *  0.2 FREEMAIL_REPLYTO_END_DIGIT Reply-To freemail username ends in
-        *      digit
-        *      [christopherdaniel830[at]gmail.com]
-        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
-        *  0.0 FREEMAIL_FROM Sender email is commonly abused enduser mail
-        *      provider
-        *      [cd01100222[at]gmail.com]
-        *  0.2 FREEMAIL_ENVFROM_END_DIGIT Envelope-from freemail username ends
-        *       in digit
-        *      [cd01100222[at]gmail.com]
-        * -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
-        *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
-        *       valid
-        * -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
-        *      envelope-from domain
-        * -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
-        *      author's domain
-        * -0.0 T_SCC_BODY_TEXT_LINE No description available.
-        *  3.9 UNDISC_FREEM Undisclosed recipients + freemail reply-to
-        *  1.0 FREEMAIL_REPLYTO Reply-To/From or Reply-To/body contain
-        *      different freemails
-X-Spam-Level: *****
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAAeT=FwkSUb59Uc35CJgerJdBM5ZCUExNnz2Zs2oHFLn0Jjbsg@mail.gmail.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-.
-I wish to invite you to participate in our Investment Funding Program,
-get back to me for more details if interested please.
+On Fri, Mar 25, 2022 at 07:35:39PM -0700, Reiji Watanabe wrote:
+> Hi Oliver,
+> 
+> > > > > + */
+> > > > > +#define KVM_ARM_ID_REG_MAX_NUM   64
+> > > > > +#define IDREG_IDX(id)            ((sys_reg_CRm(id) << 3) | sys_reg_Op2(id))
+> > > > > +
+> > > > >   struct kvm_arch {
+> > > > >           struct kvm_s2_mmu mmu;
+> > > > > @@ -137,6 +144,9 @@ struct kvm_arch {
+> > > > >           /* Memory Tagging Extension enabled for the guest */
+> > > > >           bool mte_enabled;
+> > > > >           bool ran_once;
+> > > > > +
+> > > > > + /* ID registers for the guest. */
+> > > > > + u64 id_regs[KVM_ARM_ID_REG_MAX_NUM];
+> > > >
+> > > > This is a decently large array. Should we embed it in kvm_arch or
+> > > > allocate at init?
+> > >
+> > >
+> > > What is the reason why you think you might want to allocate it at init ?
+> >
+> > Well, its a 512 byte array of mostly cold data. We're probably
+> > convinced that the guest is going to access these registers at most once
+> > per vCPU at boot.
+> >
+> > For the vCPU context at least, we only allocate space for registers we
+> > actually care about (enum vcpu_sysreg). My impression of the feature
+> > register ranges is that there are a lot of registers which are RAZ, so I
+> > don't believe we need to make room for uninteresting values.
+> >
+> > Additionally, struct kvm is visible to EL2 if running nVHE. I
+> > don't believe hyp will ever need to look at these register values.
+> 
+> As saving/restoring breakpoint/watchpoint registers for guests
+> might need a special handling when AA64DFR0_EL1.BRPs get changed,
+> next version of the series will use the data in the array at
+> EL2 nVHE.  They are cold data, and almost half of the entries
+> will be RAZ at the moment though:)
 
-Regards.
-Christopher Daniel.
+Shouldn't we always be doing a full context switch based on what
+registers are present in hardware? We probably don't want to leave host
+watchpoints/breakpoints visible to the guest.
+
+Additionally, if we are narrowing the guest's view of the debug
+hardware, are we going to need to start trapping debug register
+accesses? Unexposed breakpoint registers are supposed to UNDEF if we
+obey the Arm ARM to the letter. Even if we decide to not care about
+unexposed regs, I believe certain combinations of ID_AA64DF0_EL1.{BRPs,
+CTX_CMPs} might require that we emulate.
+
+--
+Thanks,
+Oliver
