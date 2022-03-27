@@ -2,163 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 451B64E8817
-	for <lists+kvm@lfdr.de>; Sun, 27 Mar 2022 16:29:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 902FF4E8853
+	for <lists+kvm@lfdr.de>; Sun, 27 Mar 2022 17:06:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235736AbiC0Oaj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 27 Mar 2022 10:30:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57474 "EHLO
+        id S235777AbiC0PIG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 27 Mar 2022 11:08:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47290 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235716AbiC0Oai (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 27 Mar 2022 10:30:38 -0400
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2067.outbound.protection.outlook.com [40.107.244.67])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F2EB220CE
-        for <kvm@vger.kernel.org>; Sun, 27 Mar 2022 07:28:59 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MHmG2oc71beAhWRGChYXW5d986hPqikxdD9hLprtElaONU2b6GHbBWdONbK4sQCpVzaWjy27XjIAScAs9eNlehWeBpw3GW1YUnahvbRkurlAj0R0oKNoTfWmE34+DLo+ai6AqL8ymebFITWK4t4DkSlGY7OFh1gCV9OJSEZd5tKsQJBusR+FYuEVi6vtKdfBEn8F28GrTcVSwpViENT/EsxqlrwD8QnOFwhY0KSAlM1yb191o5I+T49cu52HcNUhZlf4K8zfB7GcLE9HlxxaoOKXTUTutAKfH2OrxKhznUsPCi67P5ET1MCcPmaSJmff8Kr2xCpCWXaTl2y3GNjXxQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1l4HSKElN2Un/BIBx3obbU4nSivzf/BIpJZrPCPBLYE=;
- b=EAjHsnzHnxQYBDLmAzck1mTRP83Dpa9C1Ua4Wss0KdRhJhAbAsg34N3lyB6o3Hhvg3Wb6NQptQVUgx6P3jEaDgRsQgp05xnN3rK12+waeZFExEk+SDO/eqmNLZBGsrs32/fPfJ6QkWKQngENh3sfIv1PYvbGu1kg8bg1r4lwQtzDTLQ/3bfh8+lDT+0hjM5/k/XfjAw/n2gYrARnM3n6tnmRHQrNqNhTmizN1yf10lwE82ccy7lq2TinyQJCxZoJ3+DYjvLiq4Qj6djipEaxypDXNmxQ/vr5gDAzhnffw2u3mxVLw0XyAjq6DSHCAdVAYbR8uNeCsEXhErIM8muQTQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1l4HSKElN2Un/BIBx3obbU4nSivzf/BIpJZrPCPBLYE=;
- b=moetQALElJfK+lFebhJMugDefvc4CXkPbsDxVwV2QEKk7RQ2KJfwqlLnnrVNUcGPMggvB/OuJiSGXRd/yEtpeDkvJkiy2ftEQc7DYvRobFETgXxT/oeFhN/jGQJxZx7V54gaZHOcUAYbwHGvaJ7TSxRdE0oE7gjGiDQQ9r2GU229SxmqIr3LD2ym/4NCIY6OaqMn6dYVQEW1vzZwWfXIz8cobvaXdYuknawtQjy9ieGLjHax/ijyGpU1gEztv/UEu9OOo1preeBpgG8KtYro1YkG+mHhyKqEH35js2HGjjIUk30D+RzXIa5wR0WBzXNyWzB2rLVYwh4wJQmEgxoL2A==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by CH0PR12MB5108.namprd12.prod.outlook.com (2603:10b6:610:bf::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5102.17; Sun, 27 Mar
- 2022 14:28:55 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::11a0:970a:4c24:c70c]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::11a0:970a:4c24:c70c%6]) with mapi id 15.20.5102.022; Sun, 27 Mar 2022
- 14:28:54 +0000
-Date:   Sun, 27 Mar 2022 11:28:53 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Eric Auger <eric.auger@redhat.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        Jason Wang <jasowang@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        "Martins, Joao" <joao.m.martins@oracle.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        Keqian Zhu <zhukeqian1@huawei.com>,
-        "Xu, Terrence" <terrence.xu@intel.com>
-Subject: Re: [PATCH RFC 08/12] iommufd: IOCTLs for the io_pagetable
-Message-ID: <20220327142853.GF1342626@nvidia.com>
-References: <0-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
- <8-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
- <20220323131038.3b5cb95b.alex.williamson@redhat.com>
- <20220323193439.GS11336@nvidia.com>
- <20220323140446.097fd8cc.alex.williamson@redhat.com>
- <20220323203418.GT11336@nvidia.com>
- <20220323225438.GA1228113@nvidia.com>
- <BN9PR11MB5276EB80AFCC3003955A46248C199@BN9PR11MB5276.namprd11.prod.outlook.com>
- <20220324134622.GB1184709@nvidia.com>
- <BN9PR11MB52760D5905410D0907B6260B8C1C9@BN9PR11MB5276.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BN9PR11MB52760D5905410D0907B6260B8C1C9@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-ClientProxiedBy: BL1PR13CA0299.namprd13.prod.outlook.com
- (2603:10b6:208:2bc::34) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
+        with ESMTP id S234601AbiC0PIF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 27 Mar 2022 11:08:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 72BB041985
+        for <kvm@vger.kernel.org>; Sun, 27 Mar 2022 08:06:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1648393585;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=kRrEX4hnlAxo6wDrCfxKsONrmV+bOzrMHx67TeVnS8Q=;
+        b=VLsz5liHFxWO96d7IyneEDMzkcazyxigZ8OWpVIscYe2Sxe8q4Ov/aTfL3N15Cm0STV9GJ
+        JM3YbyIoNlTtQFiIpdchEAKNspzFyZDU6KZi7TYGH4uCDy6cRlD5wQyrYshDEmQCWRZC3i
+        4rxSGkSGRsoFC2m7dUo4mHdho0D5DEw=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-190-rJ7w-bCtNVy_7aZ85C39BA-1; Sun, 27 Mar 2022 11:06:20 -0400
+X-MC-Unique: rJ7w-bCtNVy_7aZ85C39BA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7EE5F80281D;
+        Sun, 27 Mar 2022 15:06:17 +0000 (UTC)
+Received: from starship (unknown [10.40.194.231])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9CD081457F13;
+        Sun, 27 Mar 2022 15:06:09 +0000 (UTC)
+Message-ID: <e605082ac8361c1932bfddfe2055660c7cea5f2b.camel@redhat.com>
+Subject: Re: [PATCH 00/21] KVM: x86: Event/exception fixes and cleanups
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Oliver Upton <oupton@google.com>,
+        Peter Shier <pshier@google.com>
+Date:   Sun, 27 Mar 2022 18:06:07 +0300
+In-Reply-To: <YjzjIhyw6aqsSI7Q@google.com>
+References: <20220311032801.3467418-1-seanjc@google.com>
+         <08548cb00c4b20426e5ee9ae2432744d6fa44fe8.camel@redhat.com>
+         <YjzjIhyw6aqsSI7Q@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 21542064-1924-43a3-4688-08da0ffe1f1e
-X-MS-TrafficTypeDiagnostic: CH0PR12MB5108:EE_
-X-Microsoft-Antispam-PRVS: <CH0PR12MB510804CED3000D163D1677E7C21C9@CH0PR12MB5108.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ikTEhCMjlNjuZhcMmt6CODzLt0s5vSL5DIIEAF2OLcuJ1nPJnfgc38ScTuj34pZlA1s3re8uLq9rvEuT4GFHnSdO1YtHfHM3QCpjtMQuN9ZCcw413YfpRJzqZJQuGS2vw3H2oixjxROr5DO1TeaaAK5pcJefmZ7nKbJ6HzW4BfRiEanuEiUpFGa26JweH2Yky+5Tq9v/zL4lwT7o/9dIzo8hzUZYhD8FCSCJ6Znmhm1mSHv0Pw+wNKgFmhgZ/VExfDmtCBnU3T26qjqaS12Ql6CojN9g6n6Q79y1hkigV0LXThLrg2b2uxXwZRFT140ZKmxhGhznOhx6SYs/DG2QZ86FdZMzT6v3pN9glq1GbEnkvA7IwYOkhRValgY7XwtClhrSwxxsrcOlgIKU5PZ2e++wFolQfpon9+2b4PXh58/JVy8cez4s6ORRTQHWutC4sLfEhBv/HBAIPrMPTMgS8hCC+EpdxGdvwRH3m2+DL0pAXIKHJHHJxmRmhRZ9d5lDBS4Kr18pCsAbJYfdELHyTA38UWcqp4GuiYZhYSj0yl1WUmbEuK+tSl6XQKCsexyh7uruIbDtOqTs83rFiqj1c26Y35uDMo8lq4XmJUzr/w5vbDC8CwMlaYV9/HJacqnO2MTUK1/IMuj3dYe5WtLiFA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(83380400001)(26005)(1076003)(8936002)(6486002)(2616005)(186003)(6506007)(4326008)(6916009)(38100700002)(508600001)(66476007)(54906003)(66556008)(66946007)(4744005)(5660300002)(8676002)(33656002)(36756003)(86362001)(7416002)(316002)(2906002)(6512007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?tWJLdSQtEy3akQHYqnqPVbSp6OV6AA1dEE4qarOOgdKed3J4FpvrinIfOL/u?=
- =?us-ascii?Q?tnOVMw6x4kB+qJiu7wpmdTfcRYfeAESplw3LjG/rE3r9YemSKfB2BFO9Y1hg?=
- =?us-ascii?Q?OCW06ewZX4HT83whQAnJQ9WIuL0iBxtBBrGc22tb7fm8vt18iw7WGp+Tt8Tm?=
- =?us-ascii?Q?p5rM5oQvrv8vo/KTNAhdRxyOlyqpVwXVJDoO408KkMA+9j+/1d75aUyt/47W?=
- =?us-ascii?Q?iC3LMLRzp1A3E6P0wLFly3ilavmMhrzW7muyWjbhHozOLeXEYvY6k/i2HdKl?=
- =?us-ascii?Q?34BeDMCUEkzOi2gpGHl8c/MZdK5oCtLbrwjn/s5gb2+vZ45uyAnPCRveWWPx?=
- =?us-ascii?Q?QmakIf/y84o7N7S3uDJ+S7Xch/AuDxEolGijJ8NhvmtMOJFRJYnJitoToXTY?=
- =?us-ascii?Q?2uIT0mwHQIzqZODCPhjf1AVVuouRCzBs+7D1ly+MxY1f2vF51CR08WqNE+bt?=
- =?us-ascii?Q?65yhByObJFWosQKjxCHYxnLs2seJE1bZwHgQpIUtx2UDGVXjW76wkBQY7EFf?=
- =?us-ascii?Q?AmwmY/bpheA3+3VjF5G8zIT01w3Yax2giTKIxmqdHfulWbwA0h0ZUt+8Edb6?=
- =?us-ascii?Q?1CtOkkz2RwtGK/idLX+FrvfRzZkTPFSFhVaMMhbN3ubplPdGowvxtCBuw4Gh?=
- =?us-ascii?Q?8Gphbx+ciL0DlNpygsb3/o8gqhr7URaOk74mUdLTk2O3bC83KyrpeZW1mIiC?=
- =?us-ascii?Q?0H2n7+Os2SDt+L0NEY3+2+JTV8UQTHoIWTWMCsSQqsUIBfhASI/pvjUj/ceV?=
- =?us-ascii?Q?VWunnJm2hVXUwDcqtVq/oTnQKrK7VWCJbmPLqQTmIBGjMdgX68V2E4YkRwqH?=
- =?us-ascii?Q?fgezTs73kyIbOiE/8ZhoXClTcfB+AOPY/fqyf9DYamlJtUHVeHIY3b8a/PFP?=
- =?us-ascii?Q?vPmEBByAQP5aMIlCPQpMLD7XAgvQj3byWI3kaxk6BW0FB/ZzbGOOJYYkVwxa?=
- =?us-ascii?Q?V5BZRGe38DoPQ9NMApEMj+MNwkd9zds7n5J80UN62Yq4n+EMxO0oFyEh8R04?=
- =?us-ascii?Q?RzzT34uB+E0EGx5qiCBWHi3AX6u3bnlYkosYZ0bStvqqGZfzny6vnVqxKWdQ?=
- =?us-ascii?Q?YgoxDW+Uljdbx2tNMX3jdjiLh23cFwILZn3LAS2OHR7F6rrK/Mj8DuAWEy2n?=
- =?us-ascii?Q?XBb3n39fjl+TnsfLV08nZizJiFq7w35HEkXTcln/9OexOSRa5TRfgWSjUtB2?=
- =?us-ascii?Q?SgtUfVTHXIRBB5ZDp/IB2Tlsi34si27GpHO/rBNeI2qpYKlo+V4Jg8ihexKC?=
- =?us-ascii?Q?NVbpc+Ean2oCCzvkttGOVtxdJJ0/naRlfPoBU899rd/+0z5IMEvWJ4Q4tN2G?=
- =?us-ascii?Q?ISQQ3khCG/JaRcx8P7KPuQqcK2Pccb355QRQLw7hTtp7c+7c2Ouf8LhuyFhs?=
- =?us-ascii?Q?yoz0K7G6IsEIyJbmXMg7EHoAop7/pUT+gWJ+RFDjmMjEOim0S12hpafQN1Iz?=
- =?us-ascii?Q?VAjvQcBg6NXH+GDpUDjLs/D6nJyOlcMiwo07SY4hzi6BK7l//50RcWy04STZ?=
- =?us-ascii?Q?jEnQjusTrAcJLsh3TcEbCfBh9RijSe0rQafNTjbSgWD/r8ZKkKjRwgDLw1l/?=
- =?us-ascii?Q?lc4RKSb6GloyXnh7MLj4pWunmNMFvOUF+nsdOck5+UAV0KIhDh52cd6URHdB?=
- =?us-ascii?Q?OD1Sf5ynp/wyO0ZiMQ7Almsoq+pT88xCZmWSks/rigBAvtdwzpSGAWeMCYg+?=
- =?us-ascii?Q?/J8Pk19oxD/E24VkBJOGBRwNzlEIK1XGpkBCNqL5GdYAnsqd6xuEH5VYjZAH?=
- =?us-ascii?Q?XPB3SC51VQ=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 21542064-1924-43a3-4688-08da0ffe1f1e
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Mar 2022 14:28:54.7502
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: z3NCa183EJy3bQLzBNgQZmaW8SjrvLBCS3G/VpSAiUfikut/HcM6RCUd83wkJTi1
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB5108
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
+X-Spam-Status: No, score=-3.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Mar 27, 2022 at 02:32:23AM +0000, Tian, Kevin wrote:
-
-> > this looks good to me except that the 2nd patch (eab4b381) should be
-> > the last one otherwise it affects bisect. and in that case the subject
-> > would be simply about removing the capability instead of
-> > restoring...
-
-Oh because VFIO won't sent IOMMU_CACHE in this case? Hmm. OK
-
-> > let me find a box to verify it.
+On Thu, 2022-03-24 at 21:31 +0000, Sean Christopherson wrote:
+> On Sun, Mar 13, 2022, Maxim Levitsky wrote:
+> > On Fri, 2022-03-11 at 03:27 +0000, Sean Christopherson wrote:
+> > > The main goal of this series is to fix KVM's longstanding bug of not
+> > > honoring L1's exception intercepts wants when handling an exception that
+> > > occurs during delivery of a different exception.  E.g. if L0 and L1 are
+> > > using shadow paging, and L2 hits a #PF, and then hits another #PF while
+> > > vectoring the first #PF due to _L1_ not having a shadow page for the IDT,
+> > > KVM needs to check L1's intercepts before morphing the #PF => #PF => #DF
+> > > so that the #PF is routed to L1, not injected into L2 as a #DF.
+> > > 
+> > > nVMX has hacked around the bug for years by overriding the #PF injector
+> > > for shadow paging to go straight to VM-Exit, and nSVM has started doing
+> > > the same.  The hacks mostly work, but they're incomplete, confusing, and
+> > > lead to other hacky code, e.g. bailing from the emulator because #PF
+> > > injection forced a VM-Exit and suddenly KVM is back in L1.
+> > > 
+> > > Everything leading up to that are related fixes and cleanups I encountered
+> > > along the way; some through code inspection, some through tests (I truly
+> > > thought this series was finished 10 commits and 3 days ago...).
+> > > 
+> > > Nothing in here is all that urgent; all bugs tagged for stable have been
+> > > around for multiple releases (years in most cases).
+> > > 
+> > I am just curious. Are you aware that I worked on this few months ago?
 > 
-> My colleague (Terrence) has the environment and helped verify it.
+> Ah, so that's why I had a feeling of deja vu when factoring out kvm_queued_exception.
+> I completely forgot about it :-/  In my defense, that was nearly a year ago[1][2], though
+> I suppose one could argue 11 == "a few" :-)
 > 
-> He will give his tested-by after you send out the formal series.
+> [1] https://lore.kernel.org/all/20210225154135.405125-1-mlevitsk@redhat.com
+> [2] https://lore.kernel.org/all/20210401143817.1030695-3-mlevitsk@redhat.com
+> 
+> > I am sure that you even reviewed some of my code back then.
+> 
+> Yep, now that I've found the threads I remember discussing the mechanics.
+> 
+> > If so, could you have had at least mentioned this and/or pinged me to continue
+> > working on this instead of re-implementing it?
+> 
+> I'm invoking Hanlon's razor[*]; I certainly didn't intended to stomp over your
+> work, I simply forgot.
 
-Okay, I can send it after the merge window
+Thank you very much for the explanation, and I am glad that it was a honest mistake.
 
-Jason
+Other than that I am actually very happy that you posted this patch series,
+as this gives more chance that this long standing issue will be fixed,
+and if your patches are better/simpler/less invasive to KVM and still address the issue, 
+I fully support using them instead of mine.
+ 
+Totally agree with you about your thoughts about splitting pending/injected exception,
+I also can't say I liked my approach that much, for the same reasons you mentioned.
+ 
+It is also the main reason I put the whole thing on the backlog lately, 
+because I was feeling that I am changing too much of the KVM, 
+for a relatively theoretical issue.
+ 
+ 
+I will review your patches, compare them to mine, and check if you or I missed something.
+
+PS:
+
+Back then, I also did an extensive review on few cases when qemu injects exceptions itself,
+which it does thankfully rarely. There are several (theoretical) issues there.
+I don't remember those details, I need to refresh my memory.
+
+AFAIK, qemu injects #MC sometimes when it gets it from the kernel in form of a signal,
+if I recall this correctly, and it also reflects back #DB, when guest debug was enabled
+(and that is the reason for some work I did in this area, like the KVM_GUESTDBG_BLOCKIRQ thing)
+
+Qemu does this without considering nested and/or pending exception/etc.
+It just kind of abuses the KVM_SET_VCPU_EVENTS for that.
+
+Best regards,
+	Maxim Levitsky
+
+
+> 
+> As for the technical aspects, looking back at your series, I strongly considered
+> taking the same approach of splitting pending vs. injected (again, without any
+> recollection of your work).  I ultimately opted to go with the "immediated morph
+> to pending VM-Exit" approach as it allows KVM to do the right thing in almost every
+> case without requiring new ABI, and even if KVM screws up, e.g. queues multiple
+> pending exceptions.  It also neatly handles one-off things like async #PF in L2.
+> 
+> However, I hadn't considered your approach, which addresses the ABI conundrum by
+> processing pending=>injected immediately after handling the VM-Exit.  I can't think
+> of any reason that wouldn't work, but I really don't like splitting the event
+> priority logic, nor do I like having two event injection sites (getting rid of the
+> extra calls to kvm_check_nested_events() is still on my wish list).  If we could go
+> back in time, I would likely vote for properly tracking injected vs. pending, but
+> since we're mostly stuck with KVM's ABI, I prefer the "immediately morph to pending
+> VM-Exit" hack over the "immediately morph to 'injected' exception" hack.
+> 
+> [*] https://en.wikipedia.org/wiki/Hanlon%27s_razor
+> 
+
+
