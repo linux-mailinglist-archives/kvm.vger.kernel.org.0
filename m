@@ -2,121 +2,244 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F8634E8749
-	for <lists+kvm@lfdr.de>; Sun, 27 Mar 2022 12:44:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 583EB4E87CD
+	for <lists+kvm@lfdr.de>; Sun, 27 Mar 2022 14:47:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232950AbiC0Kpe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 27 Mar 2022 06:45:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44468 "EHLO
+        id S235699AbiC0Msg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 27 Mar 2022 08:48:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232725AbiC0KpU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 27 Mar 2022 06:45:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7DD221AD93
-        for <kvm@vger.kernel.org>; Sun, 27 Mar 2022 03:43:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1648377821;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=H2GIa+mmtal947w7XJ46Ep9n19VMMmjtdQlQdQQuEsg=;
-        b=JYRX4/Dbr6I9FErfsls0fSF7O0cAOpS0RU0o9EodxTJ7vg/gdx9Pnzk1lay2IK5WIfPclo
-        fW7WQaAwe0sqxgjo1Dj2w9ySSTV8eKUTzw99INxW0y4Y6gneovhqyc8F59J6WZySkgfvDa
-        ECXX8dwHyvWblSVj0WV4dv7NceYQxJI=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-93-bYap0brnPFuz_aLNHOblKw-1; Sun, 27 Mar 2022 06:43:40 -0400
-X-MC-Unique: bYap0brnPFuz_aLNHOblKw-1
-Received: by mail-ed1-f71.google.com with SMTP id m21-20020a50d7d5000000b00418c7e4c2bbso7499016edj.6
-        for <kvm@vger.kernel.org>; Sun, 27 Mar 2022 03:43:39 -0700 (PDT)
+        with ESMTP id S232193AbiC0Msf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 27 Mar 2022 08:48:35 -0400
+Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCBC2433BC
+        for <kvm@vger.kernel.org>; Sun, 27 Mar 2022 05:46:54 -0700 (PDT)
+Received: by mail-lf1-x12d.google.com with SMTP id p10so14629449lfa.12
+        for <kvm@vger.kernel.org>; Sun, 27 Mar 2022 05:46:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=+Po5H3u33NVDjq5XuznsSKSE8osOGQmkJBE/XbOGny4=;
+        b=ZLxe0fFbPFwrNzDdBRqPD08ww3o8DqnadhJJwIV/N7Q1s0OkAuoPnw9aEK1VAOVTyh
+         d6IGahbofmOUJLSPCzcqVmVdmjX3n7BHAFnRIZnJsY6ybiYtxCiLh08vs/hpXGHQOEAw
+         2XYAZu+0hYCIdiO+jwRfksdAyfBNolpRtDxK2W+Puc65lzhdpCpogGPYxFL6f/NiQWPw
+         1SA8eFXpBdy5X7sR/HL3SDueBL+ix0OpU40fcWg4Y7WUk7eiOSU52iiMKySgdXXlaGLA
+         mWaK42xWj6gmR125P/RztZdo32tidMJ26rl84YN3jAMehbrIWHHvOYi2BtUStPe0x+uu
+         eNTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=H2GIa+mmtal947w7XJ46Ep9n19VMMmjtdQlQdQQuEsg=;
-        b=pzZO24mgufT6TBZS444yK0SPG53GaZeWOVHq5e/ouKcORLi3PQAIVwY2q0vkGVDhci
-         k0TDujLWtrE5Tqd4SS1ju+oxIjMig51A6VEvX0sNyqo7uU8IYqbZKaOstzmnOFawvUxr
-         wjdR7MfbgSKpuP4I5owVxtxMCGn0Lry7bMdh9dlsrA6d2MH44PV7bjD49H+wClZaTF+z
-         ECwGHfCyi5I+S5mNiLxxEdETBd4G34T5jV0fUJ8ttI6MXVJRqiWHHkur4jiJCvnBJx0h
-         3CzqiW5xMpGN/wKy0EznExAlMA9etAMlNmkCzbK/kHdy85oEe8GbWfiEM6LqrwiPRsrw
-         uuxw==
-X-Gm-Message-State: AOAM533RBTTpzRvsXbP/jg0hJA/yqlhopRrpxlV0K7SfG8hHHRJa14i9
-        aK3V7dQxHt/mSIxSw1444t4HCX1U01jVzbS1YsQr28PKToigcMLU6FIQG0jOVr0pIFvJUt4d1Nu
-        boM0lJufNfC6q
-X-Received: by 2002:a17:907:1606:b0:6df:f528:4033 with SMTP id hb6-20020a170907160600b006dff5284033mr21505235ejc.433.1648377818832;
-        Sun, 27 Mar 2022 03:43:38 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyNsu4Jla66PU/uo2G0ZAf26Kt9rppr5HPcOcpESaC2zmv6zoGD5Ds5s4BA5nFsiY0f1omrBA==
-X-Received: by 2002:a17:907:1606:b0:6df:f528:4033 with SMTP id hb6-20020a170907160600b006dff5284033mr21505206ejc.433.1648377818572;
-        Sun, 27 Mar 2022 03:43:38 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:8ca6:a836:a237:fed1? ([2001:b07:6468:f312:8ca6:a836:a237:fed1])
-        by smtp.googlemail.com with ESMTPSA id jv19-20020a170907769300b006e095c047d6sm3213295ejc.109.2022.03.27.03.43.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 27 Mar 2022 03:43:38 -0700 (PDT)
-Message-ID: <e8488e5c-7372-fc6e-daee-56633028854a@redhat.com>
-Date:   Sun, 27 Mar 2022 12:43:36 +0200
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=+Po5H3u33NVDjq5XuznsSKSE8osOGQmkJBE/XbOGny4=;
+        b=mZ2osKr2abhv0ldkapoMLSmDpiDWfa9KkM0QEiDVjX74vevTjYz+g0cshCH8DMkok8
+         UOa2QW5Zvq+KIqc0qD29rYzXaFpDwp0WixDzlEIG17oH8R02BPle8PHDuytwTztldVAO
+         Dhs+qp6KxwAbRq1Cweq2SKWUu/jvr/O0OHcLUOxAZ8D2nEGGRDwGlhXswjJlVv7Pzbkx
+         VNTXysdKNfrKSTri30Z+PB+bExauhpnuSQrWUrJkuMSpsvulhwmlnQ/U/CpT5u674zei
+         Khe2NrP/BHDbhiGRePQeB0q3g7f4joQExYR/+J/dpLdAR/tFeP+HjkA8sst+XPuTlixC
+         Y7Ww==
+X-Gm-Message-State: AOAM531Zk7p++YR3ZiM3vMoqVcwgpcMz/hpaP8MnarlrCIqOsOCNd0an
+        d9osLT76VQM2411XqmHfpDiz/wJZZcgg9g==
+X-Google-Smtp-Source: ABdhPJyxEkFp5oM1du/if9BeikzX9EtRKF+h0x/U/mh36CzyQYk3aNgMSMQr8onVMEct00nvJmOOWQ==
+X-Received: by 2002:a05:6512:3c92:b0:448:5062:268 with SMTP id h18-20020a0565123c9200b0044850620268mr15956285lfv.84.1648385212967;
+        Sun, 27 Mar 2022 05:46:52 -0700 (PDT)
+Received: from sisu-ThinkPad-E14-Gen-2 (88-115-234-153.elisa-laajakaista.fi. [88.115.234.153])
+        by smtp.gmail.com with ESMTPSA id bp3-20020a056512158300b0044318361eedsm1363422lfb.204.2022.03.27.05.46.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 27 Mar 2022 05:46:52 -0700 (PDT)
+Date:   Sun, 27 Mar 2022 15:46:51 +0300
+From:   Martin Radev <martin.b.radev@gmail.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     Andre Przywara <andre.przywara@arm.com>, kvm@vger.kernel.org,
+        will@kernel.org, julien.thierry.kdev@gmail.com
+Subject: Re: [PATCH v2 kvmtool 0/5] Fix few small issues in virtio code
+Message-ID: <YkBcuwMi7gPy9Wew@sisu-ThinkPad-E14-Gen-2>
+References: <20220303231050.2146621-1-martin.b.radev@gmail.com>
+ <YioRnsym4HmOSgjl@monolith.localdoman>
+ <20220311112321.2f71b6bd@donnerap.cambridge.arm.com>
+ <Yi926JwV50u86yRB@monolith.localdoman>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [PATCH] KVM: x86: optimize PKU branching in
- kvm_load_{guest|host}_xsave_state
-Content-Language: en-US
-To:     Jon Kohler <jon@nutanix.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20220324004439.6709-1-jon@nutanix.com>
- <Yj5bCw0q5n4ZgSuU@google.com>
- <387E8E8B-81B9-40FF-8D52-76821599B7E4@nutanix.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <387E8E8B-81B9-40FF-8D52-76821599B7E4@nutanix.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Yi926JwV50u86yRB@monolith.localdoman>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/26/22 02:37, Jon Kohler wrote:
->>>     Flip the ordering of the || condition so that XFEATURE_MASK_PKRU is
->>>     checked first, which when instrumented in our environment appeared
->>>     to be always true and less overall work than kvm_read_cr4_bits.
->>
->> If it's always true, then it should be checked last, not first.  And if
+Thanks for the explanation and suggestion.
+Is this better?
+
+From 4ed0d9d3d3c39eb5b23b04227c3fee53b77d9aa5 Mon Sep 17 00:00:00 2001
+From: Martin Radev <martin.b.radev@gmail.com>
+Date: Fri, 25 Mar 2022 23:25:42 +0200
+Subject: kvmtool: Have stack be not executable on x86
+
+This patch fixes an issue of having the stack be executable
+for x86 builds by ensuring that the two objects bios-rom.o
+and entry.o have the section .note.GNU-stack.
+
+Suggested-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Signed-off-by: Martin Radev <martin.b.radev@gmail.com>
+---
+ x86/bios/bios-rom.S | 5 +++++
+ x86/bios/entry.S    | 5 +++++
+ 2 files changed, 10 insertions(+)
+
+diff --git a/x86/bios/bios-rom.S b/x86/bios/bios-rom.S
+index 3269ce9..d1c8b25 100644
+--- a/x86/bios/bios-rom.S
++++ b/x86/bios/bios-rom.S
+@@ -10,3 +10,8 @@
+ GLOBAL(bios_rom)
+ 	.incbin "x86/bios/bios.bin"
+ END(bios_rom)
++
++/*
++ * Add this section to ensure final binary has a non-executable stack.
++ */
++.section .note.GNU-stack,"",@progbits
+diff --git a/x86/bios/entry.S b/x86/bios/entry.S
+index 85056e9..1b71f89 100644
+--- a/x86/bios/entry.S
++++ b/x86/bios/entry.S
+@@ -90,3 +90,8 @@ GLOBAL(__locals)
+ #include "local.S"
+ 
+ END(__locals)
++
++/*
++ * Add this section to ensure final binary has a non-executable stack.
++ */
++.section .note.GNU-stack,"",@progbits
+-- 
+2.25.1
+
+On Mon, Mar 14, 2022 at 05:11:08PM +0000, Alexandru Elisei wrote:
+> Hi,
 > 
-> Sean thanks for the review. This would be a left handed || short circuit, so
-> wouldn’t we want always true to be first?
-
-Yes.
-
->> Not that it really matters, since static_cpu_has() will patch out all the branches,
->> and in practice who cares about a JMP or NOP(s)?  But...
+> On Fri, Mar 11, 2022 at 11:23:21AM +0000, Andre Przywara wrote:
+> > On Thu, 10 Mar 2022 14:56:30 +0000
+> > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> > 
+> > Hi,
+> > 
+> > > Hi Martin,
+> > > 
+> > > On Fri, Mar 04, 2022 at 01:10:45AM +0200, Martin Radev wrote:
+> > > > Hello everyone,
+> > > >   
+> > > [..]
+> > > > The Makefile change is kept in its original form because I didn't understand
+> > > > if there is an issue with it on aarch64.  
+> > > 
+> > > I'll try to explain it better. According to this blogpost about executable
+> > > stacks [1], gcc marks the stack as executable automatically for assembly
+> > > (.S) files. C files have their stack mark as non-executable by default. If
+> > > any of the object files have the stack executable, then the resulting
+> > > binary also has the stack marked as executable (obviously).
+> > > 
+> > > To mark the stack as non-executable in assembly files, the empty section
+> > > .note.GNU-stack must be present in the file. This is a marking to tell
+> > > the linker that the final executable does not require an executable stack.
+> > > When the linker finds this section, it will create a PT_GNU_STACK empty
+> > > segment in the final executable. This segment tells Linux to mark the stack
+> > > as non-executable when it loads the binary.
+> > 
+> > Ah, many thanks for the explanation, that makes sense.
+> > 
+> > > The only assembly files that kvmtool compiles into objects are the x86
+> > > files x86/bios/entry.S and x86/bios/bios-rom.S; the other architectures are
+> > > not affected by this. I haven't found any instances where these files (and
+> > > the other files they are including) do a call/jmp to something on the
+> > > stack, so I've added the .note.GNU-Stack section to the files:
+> > 
+> > Yes, looks that the same to me, actually the assembly looks more like
+> > marshalling arguments than actual code, so we should be safe.
+> > 
+> > Alex, can you send this as a proper patch. It should be somewhat
+> > independent of Martin's series, code-wise, so at least it should apply and
+> > build.
 > 
-> The reason I’ve been pursuing this is that the guest+host xsave adds up to
-> a bit over ~1% as measured by perf top in an exit heavy workload. This is
-> the first in a few patch we’ve drummed up to to get it back towards zero.
-> I’ll send the rest out next week.
-
-Can you add a testcase to x86/vmexit.c in kvm-unit-tests, too?
-
-Thanks,
-
-Paolo
-
+> Martin, would you like to pick up the diff and turn it into a proper patch? You
+> don't need to credit me as the author, you can just add a Suggested-by:
+> Alexandru Elisei <alexandru.elisei@arm.com> tag in the commit message. Or do you
+> want me to turn this into a patch? If I do, I'll add a Reported-by: Martin Radev
+> <martin.b.radev@gmail.com> tag to it.
+> 
+> I don't have a preference, I am asking because you were the first person who
+> discovered and tried to fix this.
+> 
+> Thanks,
+> Alex
+> 
+> > 
+> > Cheers,
+> > Andre
+> > 
+> > > 
+> > > diff --git a/x86/bios/bios-rom.S b/x86/bios/bios-rom.S
+> > > index 3269ce9793ae..571029fc157e 100644
+> > > --- a/x86/bios/bios-rom.S
+> > > +++ b/x86/bios/bios-rom.S
+> > > @@ -10,3 +10,6 @@
+> > >  GLOBAL(bios_rom)
+> > >         .incbin "x86/bios/bios.bin"
+> > >  END(bios_rom)
+> > > +
+> > > +# Mark the stack as non-executable.
+> > > +.section .note.GNU-stack,"",@progbits
+> > > diff --git a/x86/bios/entry.S b/x86/bios/entry.S
+> > > index 85056e9816c4..4d5bb663a25d 100644
+> > > --- a/x86/bios/entry.S
+> > > +++ b/x86/bios/entry.S
+> > > @@ -90,3 +90,6 @@ GLOBAL(__locals)
+> > >  #include "local.S"
+> > > 
+> > >  END(__locals)
+> > > +
+> > > +# Mark the stack as non-executable.
+> > > +.section .note.GNU-stack,"",@progbits
+> > > 
+> > > which makes the final executable have a non-executable stack. Did some very
+> > > *light* testing by booting a guest, and everything looked right to me.
+> > > 
+> > > [1] https://www.airs.com/blog/archives/518
+> > > 
+> > > Thanks,
+> > > Alex
+> > > 
+> > > > 
+> > > > Martin Radev (5):
+> > > >   kvmtool: Add WARN_ONCE macro
+> > > >   virtio: Sanitize config accesses
+> > > >   virtio: Check for overflows in QUEUE_NOTIFY and QUEUE_SEL
+> > > >   Makefile: Mark stack as not executable
+> > > >   mmio: Sanitize addr and len
+> > > > 
+> > > >  Makefile                |  7 +++--
+> > > >  include/kvm/util.h      | 10 +++++++
+> > > >  include/kvm/virtio-9p.h |  1 +
+> > > >  include/kvm/virtio.h    |  3 ++-
+> > > >  mmio.c                  |  4 +++
+> > > >  virtio/9p.c             | 27 ++++++++++++++-----
+> > > >  virtio/balloon.c        | 10 ++++++-
+> > > >  virtio/blk.c            | 10 ++++++-
+> > > >  virtio/console.c        | 10 ++++++-
+> > > >  virtio/mmio.c           | 44 +++++++++++++++++++++++++-----
+> > > >  virtio/net.c            | 12 +++++++--
+> > > >  virtio/pci.c            | 59 ++++++++++++++++++++++++++++++++++++++---
+> > > >  virtio/rng.c            |  8 +++++-
+> > > >  virtio/scsi.c           | 10 ++++++-
+> > > >  virtio/vsock.c          | 10 ++++++-
+> > > >  15 files changed, 199 insertions(+), 26 deletions(-)
+> > > > 
+> > > > -- 
+> > > > 2.25.1
+> > > >   
+> > 
