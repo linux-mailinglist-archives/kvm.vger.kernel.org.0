@@ -2,67 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C0AC24E9EB0
-	for <lists+kvm@lfdr.de>; Mon, 28 Mar 2022 20:07:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A96F54E9EBE
+	for <lists+kvm@lfdr.de>; Mon, 28 Mar 2022 20:15:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245012AbiC1SJe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Mar 2022 14:09:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54392 "EHLO
+        id S245121AbiC1SQx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Mar 2022 14:16:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237822AbiC1SJd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Mar 2022 14:09:33 -0400
-Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 610414CD41
-        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 11:07:52 -0700 (PDT)
-Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-2db2add4516so158597707b3.1
-        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 11:07:52 -0700 (PDT)
+        with ESMTP id S238455AbiC1SQw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Mar 2022 14:16:52 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E24E6443F8
+        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 11:15:10 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id i11so15393610plr.1
+        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 11:15:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=xqEEYU+NLqFNxKimuVXTLE3KxvDawYGyrEy7eiTScjA=;
-        b=GVaqpK4Ssj9998AfJa+CpInccGgJL7vEcfAbsBngm1KCw4+9l6XkgiTPlEOFhsVLyC
-         fsEhzEG0XayeUGip009EAR1gqR2BL71b2WgZd5Z0MuNoewBMqbbFFXifRpVPZ4iZrokE
-         kZbE8f/j/Vh977Ad3M3HNxwRwuFAIp8ikE1mdyWUz0Q4IoZRXD/Yc5zIX11Ctjm6vTXg
-         6lGabFQjHkekXT9JZY4Jfrdlapmxe2YCgymRJqDHsdqWwaALuoFzooUhvIadhgwHh6H7
-         /PUibGcEtOi9NprMj5ngNphjeWIXSrL7yPKrT/LwvSUAmdVnSR9bMls4jwiQeT1xFRYk
-         c01A==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Yx9kLPZnDKhG+ivFoq+Z75QS1wPbQ4/wxiiI/bt3KCk=;
+        b=BTPpWTU8xrIwoxNqU6R1SSY0gPXLBH+zjlrIdX/FdmWY88Uj0bMGhuiEPCRpNq794v
+         TB3d6mGf0oczE0OzBTfSNngIUHBFcfRbJvzVl6w4k7sBIziwW/A6CCsTDRMNdPpVSsVq
+         JE5xGaF3bi7sLoGDWWg9L7lyMuX/Gi2LyW7sQG34e4NeAAh9M75FVZN7lZe36yHNivVp
+         VaRoHiYlDBkxao5T6kbaNsY4O15oyN2NClhmmqZq/gxx2UmRid59HwKLcKZYj77aTZc3
+         D13YfxDBj346PkTGdKndOIxCFIHEhROiPEGagSCxXpcdqrW7ssGDTg/Ne1mdyIxGXa9f
+         mOZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=xqEEYU+NLqFNxKimuVXTLE3KxvDawYGyrEy7eiTScjA=;
-        b=F8oM4wvdvNdNNuDPnzIWkcVuyBx8HIDOLxqsDCDeDUNiYUxVS9emz1b+1pORJqYTRS
-         ZbcydKA8VEHl4dTCfGEK0gZ80h181Q+Tx9qfyVyH5c6uerHcCrFq4FiKy2mZtXf9HGCa
-         HKAJc3o0yo0p/SUBFkbtfNHpefz5YDmE8WfT/kuYlI0vK/Bdb6tw7xtZQPAh7DauaznW
-         Z+EwKCprtY6pQVnPBuasScdchvNbW661ZfVBytYPlVr98a15P5xVSxeDsziAlweaZDgx
-         kdKNm4yLxhNK0tXD/mf8xJlcYdnFIQk9AtOesJ/HTlap4npFO2dpo8T1K6q8LOqGffw9
-         LptA==
-X-Gm-Message-State: AOAM531jWs0Rj+6wFlvw3Ezs0Lk4hyRnxSlE8CeSA3e/1UAKVT9F5Wnr
-        5z5gUVKwz0k7t8+LaINGvuVIiF+sdiqCDJqewdC+NQ==
-X-Google-Smtp-Source: ABdhPJwBX4wzJFV8HgmL6kvM/2YV+ny2vJqb8cJOrJJ84g3r057Gi2H+pH4Lbvo+0flYaOKrw2ZHeFIzb70uXkmLaNA=
-X-Received: by 2002:a81:15ce:0:b0:2e5:e189:7366 with SMTP id
- 197-20020a8115ce000000b002e5e1897366mr27257565ywv.188.1648490871291; Mon, 28
- Mar 2022 11:07:51 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220321224358.1305530-1-bgardon@google.com> <20220321224358.1305530-10-bgardon@google.com>
- <YkH0O2Qh7lRizGtC@google.com>
-In-Reply-To: <YkH0O2Qh7lRizGtC@google.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Mon, 28 Mar 2022 11:07:40 -0700
-Message-ID: <CANgfPd8V_34TBb3m-JpmczZnY3t5aaFwHNZq1W0eknumbrXCRw@mail.gmail.com>
-Subject: Re: [PATCH v2 9/9] KVM: x86/mmu: Promote pages in-place when
- disabling dirty logging
-To:     David Matlack <dmatlack@google.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Yx9kLPZnDKhG+ivFoq+Z75QS1wPbQ4/wxiiI/bt3KCk=;
+        b=PElhV8jtQgbmUhJmpE+cg+EXfo8vRHeEOk4bY60Q7IJfpvnrOhnipBHhQlRkCB1hlp
+         WLU8H/aSCKXfw7PKIQZGGGBx/MJdzkWSHff3VvA9ot9y1pB6iZEIibeCFAJYCAxOG68H
+         x/5C0/sgWRvF0TlGUDJlxt8DXyl0pMGUAKVBoxjlOJWyq3zwj/ySbx7QSHGoEy6njfFJ
+         O7jy6gyy+83nXuRoBwm6yONpcFVm/2LOshS2IT9E+qSv5xNvD/BOerE4mNsVRXfITDlr
+         /WEO2DiNqhHt6hLG/aaIKB+w/nIx4QN4xmxYErDdRAfvjD1zfHCMfqVKylRFPF8N3GU8
+         BiNw==
+X-Gm-Message-State: AOAM532ciW6V1ZaTeOoIbn9fBZe+eUp1zDJBBv/t8NyjnXkC8iI2g6n0
+        N8/4CnOu3BWEa6XPkNcUcf+RFQ==
+X-Google-Smtp-Source: ABdhPJyxl/grzo9wrN4NyoMupFLzcrY8lyyPwkdDjRKFBM0KgUaIFFSabfBfzkW8SlJl1Ha/MHGT9g==
+X-Received: by 2002:a17:90a:3b06:b0:1c6:7140:348d with SMTP id d6-20020a17090a3b0600b001c67140348dmr418330pjc.99.1648491310293;
+        Mon, 28 Mar 2022 11:15:10 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id c18-20020a056a000ad200b004f0f9696578sm18399890pfl.141.2022.03.28.11.15.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Mar 2022 11:15:09 -0700 (PDT)
+Date:   Mon, 28 Mar 2022 18:15:05 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Mingwei Zhang <mizhang@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        David Dunn <daviddunn@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Junaid Shahid <junaids@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Ben Gardon <bgardon@google.com>,
+        David Matlack <dmatlack@google.com>
+Subject: Re: [PATCH] KVM: x86/mmu: add lockdep check before
+ lookup_address_in_mm()
+Message-ID: <YkH7KZbamhKpCidK@google.com>
+References: <20220327205803.739336-1-mizhang@google.com>
+ <YkHRYY6x1Ewez/g4@google.com>
+ <CAL715WL7ejOBjzXy9vbS_M2LmvXcC-CxmNr+oQtCZW0kciozHA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAL715WL7ejOBjzXy9vbS_M2LmvXcC-CxmNr+oQtCZW0kciozHA@mail.gmail.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -74,213 +79,23 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 28, 2022 at 10:45 AM David Matlack <dmatlack@google.com> wrote:
+On Mon, Mar 28, 2022, Mingwei Zhang wrote:
+> With that, I start to feel this is a bug. The issue is just so rare
+> that it has never triggered a problem.
 >
-> On Mon, Mar 21, 2022 at 03:43:58PM -0700, Ben Gardon wrote:
-> > When disabling dirty logging, the TDP MMU currently zaps each leaf entry
-> > mapping memory in the relevant memslot. This is very slow. Doing the zaps
-> > under the mmu read lock requires a TLB flush for every zap and the
-> > zapping causes a storm of ETP/NPT violations.
-> >
-> > Instead of zapping, replace the split large pages with large page
-> > mappings directly. While this sort of operation has historically only
-> > been done in the vCPU page fault handler context, refactorings earlier
-> > in this series and the relative simplicity of the TDP MMU make it
-> > possible here as well.
-> >
-> > Running the dirty_log_perf_test on an Intel Skylake with 96 vCPUs and 1G
-> > of memory per vCPU, this reduces the time required to disable dirty
-> > logging from over 45 seconds to just over 1 second. It also avoids
-> > provoking page faults, improving vCPU performance while disabling
-> > dirty logging.
-> >
-> > Signed-off-by: Ben Gardon <bgardon@google.com>
-> > ---
-> >  arch/x86/kvm/mmu/mmu.c          |  4 +-
-> >  arch/x86/kvm/mmu/mmu_internal.h |  6 +++
-> >  arch/x86/kvm/mmu/tdp_mmu.c      | 73 ++++++++++++++++++++++++++++++++-
-> >  3 files changed, 79 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index 6f98111f8f8b..a99c23ef90b6 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -100,7 +100,7 @@ module_param_named(flush_on_reuse, force_flush_and_sync_on_reuse, bool, 0644);
-> >   */
-> >  bool tdp_enabled = false;
-> >
-> > -static int max_huge_page_level __read_mostly;
-> > +int max_huge_page_level;
-> >  static int tdp_root_level __read_mostly;
-> >  static int max_tdp_level __read_mostly;
-> >
-> > @@ -4486,7 +4486,7 @@ static inline bool boot_cpu_is_amd(void)
-> >   * the direct page table on host, use as much mmu features as
-> >   * possible, however, kvm currently does not do execution-protection.
-> >   */
-> > -static void
-> > +void
-> >  build_tdp_shadow_zero_bits_mask(struct rsvd_bits_validate *shadow_zero_check,
-> >                               int shadow_root_level)
-> >  {
-> > diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-> > index 1bff453f7cbe..6c08a5731fcb 100644
-> > --- a/arch/x86/kvm/mmu/mmu_internal.h
-> > +++ b/arch/x86/kvm/mmu/mmu_internal.h
-> > @@ -171,4 +171,10 @@ void *mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc);
-> >  void account_huge_nx_page(struct kvm *kvm, struct kvm_mmu_page *sp);
-> >  void unaccount_huge_nx_page(struct kvm *kvm, struct kvm_mmu_page *sp);
-> >
-> > +void
-> > +build_tdp_shadow_zero_bits_mask(struct rsvd_bits_validate *shadow_zero_check,
-> > +                             int shadow_root_level);
-> > +
-> > +extern int max_huge_page_level __read_mostly;
-> > +
-> >  #endif /* __KVM_X86_MMU_INTERNAL_H */
-> > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> > index af60922906ef..eb8929e394ec 100644
-> > --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> > @@ -1709,6 +1709,66 @@ void kvm_tdp_mmu_clear_dirty_pt_masked(struct kvm *kvm,
-> >               clear_dirty_pt_masked(kvm, root, gfn, mask, wrprot);
-> >  }
-> >
-> > +static bool try_promote_lpage(struct kvm *kvm,
-> > +                           const struct kvm_memory_slot *slot,
-> > +                           struct tdp_iter *iter)
->
-> Use "huge_page" instead of "lpage" to be consistent with eager page
-> splitting and the rest of the Linux kernel. Some of the old KVM methods
-> still use "lpage" and "large page", but we're slowly moving away from
-> that.
+> lookup_address_in_mm() walks the host page table as if it is a
+> sequence of _static_ memory chunks. This is clearly dangerous.
 
-Ah good catch. Paolo, if you want me to send a v2 to address all these
-comments, I can. Otherwise I'll just reply to the questions below.
+Yeah, it's broken.  The proper fix is do something like what perf uses, or maybe
+just genericize and reuse the code from commit 8af26be06272
+("perf/core: Fix arch_perf_get_page_size()).
 
->
-> > +{
-> > +     struct kvm_mmu_page *sp = sptep_to_sp(iter->sptep);
-> > +     struct rsvd_bits_validate shadow_zero_check;
-> > +     bool map_writable;
-> > +     kvm_pfn_t pfn;
-> > +     u64 new_spte;
-> > +     u64 mt_mask;
-> > +
-> > +     /*
-> > +      * If addresses are being invalidated, don't do in-place promotion to
-> > +      * avoid accidentally mapping an invalidated address.
-> > +      */
-> > +     if (unlikely(kvm->mmu_notifier_count))
-> > +             return false;
->
-> Why is this necessary? Seeing this makes me wonder if we need a similar
-> check for eager page splitting.
+> But right now,  kvm_mmu_max_mapping_level() are used in other places
+> as well: kvm_mmu_zap_collapsible_spte(), which does not satisfy the
+> strict requirement of walking the host page table.
 
-This is needed here, but not in the page splitting case, because we
-are potentially mapping new memory.
-If a page is split for dirt logging, but then the backing transparent
-huge page is split for some reason, we could race with the THP split.
-Since we're mapping the entire huge page, this could wind up mapping
-more memory than it should. Checking the MMU notifier count prevents
-that. It's not needed in the splitting case because the memory in
-question is already mapped. We're essentially trying to do what the
-page fault handler does, since we know that's safe and it's what
-replaces the zapped page with a huge page. The page fault handler
-checks for MMU notifiers, so we need to as well.
->
-> > +
-> > +     if (iter->level > max_huge_page_level || iter->gfn < slot->base_gfn ||
-> > +         iter->gfn >= slot->base_gfn + slot->npages)
-> > +             return false;
-> > +
-> > +     pfn = __gfn_to_pfn_memslot(slot, iter->gfn, true, NULL, true,
-> > +                                &map_writable, NULL);
-> > +     if (is_error_noslot_pfn(pfn))
-> > +             return false;
-> > +
-> > +     /*
-> > +      * Can't reconstitute an lpage if the consituent pages can't be
-> > +      * mapped higher.
-> > +      */
-> > +     if (iter->level > kvm_mmu_max_mapping_level(kvm, slot, iter->gfn,
-> > +                                                 pfn, PG_LEVEL_NUM))
-> > +             return false;
-> > +
-> > +     build_tdp_shadow_zero_bits_mask(&shadow_zero_check, iter->root_level);
-> > +
-> > +     /*
-> > +      * In some cases, a vCPU pointer is required to get the MT mask,
-> > +      * however in most cases it can be generated without one. If a
-> > +      * vCPU pointer is needed kvm_x86_try_get_mt_mask will fail.
-> > +      * In that case, bail on in-place promotion.
-> > +      */
-> > +     if (unlikely(!static_call(kvm_x86_try_get_mt_mask)(kvm, iter->gfn,
-> > +                                                        kvm_is_mmio_pfn(pfn),
-> > +                                                        &mt_mask)))
-> > +             return false;
-> > +
-> > +     __make_spte(kvm, sp, slot, ACC_ALL, iter->gfn, pfn, 0, false, true,
-> > +               map_writable, mt_mask, &shadow_zero_check, &new_spte);
-> > +
-> > +     if (tdp_mmu_set_spte_atomic(kvm, iter, new_spte))
-> > +             return true;
-> > +
-> > +     /* Re-read the SPTE as it must have been changed by another thread. */
-> > +     iter->old_spte = READ_ONCE(*rcu_dereference(iter->sptep));
->
-> Huge page promotion could be retried in this case.
-
-That's true, but retries always get complicated since we need to
-guarantee forward progress and then you get into counting retries and
-it adds complexity. Given how rare this race should be, I'm inclined
-to just let it fall back to zapping the spte.
-
->
-> > +
-> > +     return false;
-> > +}
-> > +
-> >  /*
-> >   * Clear leaf entries which could be replaced by large mappings, for
-> >   * GFNs within the slot.
-> > @@ -1729,8 +1789,17 @@ static void zap_collapsible_spte_range(struct kvm *kvm,
-> >               if (tdp_mmu_iter_cond_resched(kvm, &iter, false, true))
-> >                       continue;
-> >
-> > -             if (!is_shadow_present_pte(iter.old_spte) ||
-> > -                 !is_last_spte(iter.old_spte, iter.level))
-> > +             if (iter.level > max_huge_page_level ||
-> > +                 iter.gfn < slot->base_gfn ||
-> > +                 iter.gfn >= slot->base_gfn + slot->npages)
->
-> I feel like I've been seeing this "does slot contain gfn" calculation a
-> lot in recent commits. It's probably time to create a helper function.
-> No need to do this clean up as part of your series though, unless you
-> want to :).
->
-> > +                     continue;
-> > +
-> > +             if (!is_shadow_present_pte(iter.old_spte))
-> > +                     continue;
-> > +
-> > +             /* Try to promote the constitutent pages to an lpage. */
-> > +             if (!is_last_spte(iter.old_spte, iter.level) &&
-> > +                 try_promote_lpage(kvm, slot, &iter))
-> >                       continue;
->
-> If iter.old_spte is not a leaf, the only loop would always continue to
-> the next SPTE. Now we try to promote it and if that fails we run through
-> the rest of the loop. This seems broken. For example, in the next line
-> we end up grabbing the pfn of the non-leaf SPTE (which would be the PFN
-> of the TDP MMU page table?) and treat that as the PFN backing this GFN,
-> which is wrong.
->
-> In the worst case we end up zapping an SPTE that we didn't need to, but
-> we should still fix up this code.
->
-> >
-> >               pfn = spte_to_pfn(iter.old_spte);
-> > --
-> > 2.35.1.894.gb6a874cedc-goog
-> >
+The host pfn size is used only as a hueristic, so false postives/negatives are
+ok, the only race that needs to be avoided is dereferencing freed page table
+memory.  lookup_address_in_pgd() is really broken because it doesn't even ensure
+a given PxE is READ_ONCE().  I suppose one could argue the caller is broken, but
+I doubt KVM is the only user that doesn't provide the necessary protections.
