@@ -2,62 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 146754E8B9A
-	for <lists+kvm@lfdr.de>; Mon, 28 Mar 2022 03:30:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C31EC4E8BAF
+	for <lists+kvm@lfdr.de>; Mon, 28 Mar 2022 03:41:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237273AbiC1Bbv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 27 Mar 2022 21:31:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44404 "EHLO
+        id S237308AbiC1BnS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 27 Mar 2022 21:43:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237266AbiC1Bbu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 27 Mar 2022 21:31:50 -0400
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7EFC192A3;
-        Sun, 27 Mar 2022 18:30:10 -0700 (PDT)
+        with ESMTP id S230002AbiC1BnR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 27 Mar 2022 21:43:17 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CDC848895;
+        Sun, 27 Mar 2022 18:41:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1648431010; x=1679967010;
+  t=1648431698; x=1679967698;
   h=message-id:subject:from:to:cc:date:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=beeEYxcAp4r2iI1wWi4YsTfFuc4wGRqsztjNxGViHVo=;
-  b=XO8g38G2bWH4+JnyjpMH6hxOntFrTFxmN/dc2izRzl2LkLfjpUWGS2r+
-   a2X27CFZf7WAhfKbrRLiCTkJMdu6d8WR0eO6ztj9uekGE/z7QIkp8heqd
-   OXKC0WgCnwMLxCiWOibsaDvwnfU6kz+CyiCZa+b1oeB4kAo14QJFyq+bs
-   MJ3YFx/3WS6/PYFjaZwbCKlTdT4Kg0RDTKwrTF2ZqxVR2AmEZCkiyoGt4
-   2xhhVuk+2xuy/2B5v1V63L1AlqRiIWwpXSPVqOXuMe9/ZEbeMaiQGNiO/
-   jko2p/F6lfPfS6TW1sSzbzP6Lrif7up/PQahfQ9TUtx/Gmtuthq4Ei2jH
+  bh=jLSjB5TiH7kJ9GJHi06kkk1lwOsQ6eqXdeUcYlJC/LI=;
+  b=lqxdHVp0l/IkoyG7QVEQcQfJoD+Xa+07d7gRe4Ie/ntro7W+zgQS2NJD
+   pao0f8QFw8F6uc6B/1sXd1ewWwaj7IaYsfzzLstY1H8iCFutETrcKg/mF
+   jUo8LQy6tG55hTaxj1WJltYVtSS/E8yo0BdQp/JjVwgG2hbXhCg+kNTie
+   Km1tRUg/kd+DdBc2KNIIpnmxrORJl2VNFXkiJMzyMzIZGfOXQpCNklZci
+   LsVxTSeBZZAzJxZUVVgA7LuSp7AggjpfCxojc2qh0zWg04woSJjIwHTG8
+   YMFlh4ScX5x8VTnVXe3J0YQnrO8DEH6t3Yh9TPt6vZJ4AH+FqZYtjp8Ci
    Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10299"; a="257718836"
+X-IronPort-AV: E=McAfee;i="6200,9189,10299"; a="258858639"
 X-IronPort-AV: E=Sophos;i="5.90,216,1643702400"; 
-   d="scan'208";a="257718836"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2022 18:30:10 -0700
+   d="scan'208";a="258858639"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2022 18:41:38 -0700
 X-IronPort-AV: E=Sophos;i="5.90,216,1643702400"; 
-   d="scan'208";a="585016682"
+   d="scan'208";a="502341505"
 Received: from stung2-mobl.gar.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.255.94.73])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2022 18:30:07 -0700
-Message-ID: <f211441a6d23321e22517684159e2c28c8492b86.camel@intel.com>
-Subject: Re: [PATCH v2 09/21] x86/virt/tdx: Get information about TDX module
- and convertible memory
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2022 18:41:35 -0700
+Message-ID: <926af8966a2233574ee0e679d9fc3c8209477156.camel@intel.com>
+Subject: Re: [PATCH v2 03/21] x86/virt/tdx: Implement the SEAMCALL base
+ function
 From:   Kai Huang <kai.huang@intel.com>
-To:     Isaku Yamahata <isaku.yamahata@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        dave.hansen@intel.com, seanjc@google.com, pbonzini@redhat.com,
-        kirill.shutemov@linux.intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, peterz@infradead.org,
-        tony.luck@intel.com, ak@linux.intel.com, dan.j.williams@intel.com,
-        isaku.yamahata@intel.com
-Date:   Mon, 28 Mar 2022 14:30:05 +1300
-In-Reply-To: <20220324174301.GA1212881@ls.amr.corp.intel.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Cc:     "Hansen, Dave" <dave.hansen@intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>
+Date:   Mon, 28 Mar 2022 14:41:32 +1300
+In-Reply-To: <BN9PR11MB5276B5986582F9AD11D993618C189@BN9PR11MB5276.namprd11.prod.outlook.com>
 References: <cover.1647167475.git.kai.huang@intel.com>
-         <98c1010509aa412e7f05b12187cacf40451d5246.1647167475.git.kai.huang@intel.com>
-         <20220324174301.GA1212881@ls.amr.corp.intel.com>
+         <269a053607357eedd9a1e8ddf0e7240ae0c3985c.1647167475.git.kai.huang@intel.com>
+         <BN9PR11MB5276B5986582F9AD11D993618C189@BN9PR11MB5276.namprd11.prod.outlook.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -66,84 +73,74 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-> > +
-> > +static int sanitize_cmrs(struct cmr_info *cmr_array, int cmr_num)
-> > +{
-> > +	int i, j;
-> > +
-> > +	/*
-> > +	 * Intel TDX module spec, 20.7.3 CMR_INFO:
-> > +	 *
-> > +	 *   TDH.SYS.INFO leaf function returns a MAX_CMRS (32) entry
-> > +	 *   array of CMR_INFO entries. The CMRs are sorted from the
-> > +	 *   lowest base address to the highest base address, and they
-> > +	 *   are non-overlapping.
-> > +	 *
-> > +	 * This implies that BIOS may generate invalid empty entries
-> > +	 * if total CMRs are less than 32.  Skip them manually.
-> > +	 */
-> > +	for (i = 0; i < cmr_num; i++) {
-> > +		struct cmr_info *cmr = &cmr_array[i];
-> > +		struct cmr_info *prev_cmr = NULL;
-> > +
-> > +		/* Skip further invalid CMRs */
-> > +		if (!cmr_valid(cmr))
-> > +			break;
-> > +
-> > +		if (i > 0)
-> > +			prev_cmr = &cmr_array[i - 1];
-> > +
-> > +		/*
-> > +		 * It is a TDX firmware bug if CMRs are not
-> > +		 * in address ascending order.
-> > +		 */
-> > +		if (prev_cmr && ((prev_cmr->base + prev_cmr->size) >
-> > +					cmr->base)) {
-> > +			pr_err("Firmware bug: CMRs not in address ascending order.\n");
-> > +			return -EFAULT;
-> > +		}
-> > +	}
-> > +
-> > +	/*
-> > +	 * Also a sane BIOS should never generate invalid CMR(s) between
-> > +	 * two valid CMRs.  Sanity check this and simply return error in
-> > +	 * this case.
-> > +	 */
-> > +	for (j = i; j < cmr_num; j++)
-> > +		if (cmr_valid(&cmr_array[j])) {
-> > +			pr_err("Firmware bug: invalid CMR(s) among valid CMRs.\n");
-> > +			return -EFAULT;
-> > +		}
+On Wed, 2022-03-23 at 16:35 +1300, Tian, Kevin wrote:
+> > From: Kai Huang <kai.huang@intel.com>
+> > Sent: Sunday, March 13, 2022 6:50 PM
+> > 
+> > Secure Arbitration Mode (SEAM) is an extension of VMX architecture.  It
+> > defines a new VMX root operation (SEAM VMX root) and a new VMX non-
+> > root
+> > operation (SEAM VMX non-root) which isolate from legacy VMX root and
+> > VMX
+> > non-root mode.
 > 
-> This check doesn't make sense because above i-for loop has break.
+> s/isolate/are isolated/
 
-The break in above i-for loop will hit at the first invalid CMR entry.  Yes "j =
-i" will make double check on this invalid CMR entry, but it should have no
-problem.  Or we can change to "j = i + 1" to skip the first invalid CMR entry.
-
-Does this make sense?
+OK thanks.
 
 > 
-> > +
-> > +	/*
-> > +	 * Trim all tail invalid empty CMRs.  BIOS should generate at
-> > +	 * least one valid CMR, otherwise it's a TDX firmware bug.
-> > +	 */
-> > +	tdx_cmr_num = i;
-> > +	if (!tdx_cmr_num) {
-> > +		pr_err("Firmware bug: No valid CMR.\n");
-> > +		return -EFAULT;
-> > +	}
+> > 
+> > A CPU-attested software module (called the 'TDX module') runs in SEAM
+> > VMX root to manage the crypto protected VMs running in SEAM VMX non-
+> > root.
+> > SEAM VMX root is also used to host another CPU-attested software module
+> > (called the 'P-SEAMLDR') to load and update the TDX module.
+> > 
+> > Host kernel transits to either the P-SEAMLDR or the TDX module via the
+> > new SEAMCALL instruction.  SEAMCALLs are host-side interface functions
+> > defined by the P-SEAMLDR and the TDX module around the new SEAMCALL
+> > instruction.  They are similar to a hypercall, except they are made by
 > 
-> Something strange.
-> Probably we'd like to check it by decrementing.
-> for (i = cmr_num; i >= 0; i--)
->   if (!cmr_valid()) // if last invalid cmr
->      tdx_cmr_num
->   // more check. overlapping
+> "SEAMCALLs are ... functions ... around the new SEAMCALL instruction"
 > 
+> This is confusing. Probably just:
 
-I don't know how does this look strange to you? As replied above, "i" is the
-index to the first invalid CMR entry (or cmr_num, which is array size), so
-"tdx_cmr_num = i" initializes the total valid CMR number, correct?
+May I ask why is it confusing?
+
+> 
+> "SEAMCALL functions are defined and handled by the P-SEAMLDR and
+> the TDX module"
+> 
+> > host kernel to the SEAM software.
+> > 
+> > SEAMCALLs use an ABI different from the x86-64 system-v ABI.  Instead,
+> > they share the same ABI with the TDCALL.  %rax is used to carry both the
+> > SEAMCALL leaf function number (input) and the completion status code
+> > (output).  Additional GPRs (%rcx, %rdx, %r8->%r11) may be further used
+> > as both input and output operands in individual leaf SEAMCALLs.
+> > 
+> > Implement a C function __seamcall() to do SEAMCALL using the assembly
+> > macro used by __tdx_module_call() (the implementation of TDCALL).  The
+> > only exception not covered here is TDENTER leaf function which takes
+> > all GPRs and XMM0-XMM15 as both input and output.  The caller of TDENTER
+> > should implement its own logic to call TDENTER directly instead of using
+> > this function.
+> > 
+> > SEAMCALL instruction is essentially a VMExit from VMX root to SEAM VMX
+> > root, and it can fail with VMfailInvalid, for instance, when the SEAM
+> > software module is not loaded.  The C function __seamcall() returns
+> > TDX_SEAMCALL_VMFAILINVALID, which doesn't conflict with any actual error
+> > code of SEAMCALLs, to uniquely represent this case.
+> 
+> SEAMCALL is TDX specific, is it? If yes, there is no need to have both
+> TDX and SEAMCALL in one macro, i.e. above can be SEAMCALL_VMFAILINVALID.
+
+This is defined in TDX guest series.  I just use it.
+
+https://lore.kernel.org/lkml/20220324152415.grt6xvhblmd4uccu@black.fi.intel.com/T/#md0b1aa563bd003ab625de159612a0d07e3ded7cb
+
+
+
+-- 
+Thanks,
+-Kai
