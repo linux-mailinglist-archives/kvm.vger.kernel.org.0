@@ -2,145 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C31EC4E8BAF
-	for <lists+kvm@lfdr.de>; Mon, 28 Mar 2022 03:41:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 15CDD4E8BCB
+	for <lists+kvm@lfdr.de>; Mon, 28 Mar 2022 03:53:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237308AbiC1BnS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 27 Mar 2022 21:43:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47578 "EHLO
+        id S234637AbiC1Bz1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 27 Mar 2022 21:55:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44056 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230002AbiC1BnR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 27 Mar 2022 21:43:17 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CDC848895;
-        Sun, 27 Mar 2022 18:41:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1648431698; x=1679967698;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=jLSjB5TiH7kJ9GJHi06kkk1lwOsQ6eqXdeUcYlJC/LI=;
-  b=lqxdHVp0l/IkoyG7QVEQcQfJoD+Xa+07d7gRe4Ie/ntro7W+zgQS2NJD
-   pao0f8QFw8F6uc6B/1sXd1ewWwaj7IaYsfzzLstY1H8iCFutETrcKg/mF
-   jUo8LQy6tG55hTaxj1WJltYVtSS/E8yo0BdQp/JjVwgG2hbXhCg+kNTie
-   Km1tRUg/kd+DdBc2KNIIpnmxrORJl2VNFXkiJMzyMzIZGfOXQpCNklZci
-   LsVxTSeBZZAzJxZUVVgA7LuSp7AggjpfCxojc2qh0zWg04woSJjIwHTG8
-   YMFlh4ScX5x8VTnVXe3J0YQnrO8DEH6t3Yh9TPt6vZJ4AH+FqZYtjp8Ci
-   Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10299"; a="258858639"
-X-IronPort-AV: E=Sophos;i="5.90,216,1643702400"; 
-   d="scan'208";a="258858639"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2022 18:41:38 -0700
-X-IronPort-AV: E=Sophos;i="5.90,216,1643702400"; 
-   d="scan'208";a="502341505"
-Received: from stung2-mobl.gar.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.255.94.73])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2022 18:41:35 -0700
-Message-ID: <926af8966a2233574ee0e679d9fc3c8209477156.camel@intel.com>
-Subject: Re: [PATCH v2 03/21] x86/virt/tdx: Implement the SEAMCALL base
- function
-From:   Kai Huang <kai.huang@intel.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Cc:     "Hansen, Dave" <dave.hansen@intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>
-Date:   Mon, 28 Mar 2022 14:41:32 +1300
-In-Reply-To: <BN9PR11MB5276B5986582F9AD11D993618C189@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <cover.1647167475.git.kai.huang@intel.com>
-         <269a053607357eedd9a1e8ddf0e7240ae0c3985c.1647167475.git.kai.huang@intel.com>
-         <BN9PR11MB5276B5986582F9AD11D993618C189@BN9PR11MB5276.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
+        with ESMTP id S237406AbiC1BzY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 27 Mar 2022 21:55:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 86C862625
+        for <kvm@vger.kernel.org>; Sun, 27 Mar 2022 18:53:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1648432424;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=2dO/oV1qOltZyPId5baa2irih13HA1zn6mOKO291fhY=;
+        b=YJfwTswsCZlK+pdf2uysa8otMmCqxmZ/IDHxMRQryEBnthuXseoyj7YJqTcuEupepx/egY
+        +LZZDB1L4LGAyH+DIhTaLttBYrpY5xzIQuPEaMoR3Ief5o+4IZLYZZCVS0tLGvqvn1qsk+
+        Z29WDCfmPdLIYe3Uy9hhG/qCkU+ke9Q=
+Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
+ [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-256-j2BemGfQMIiuZyQlv6tnGw-1; Sun, 27 Mar 2022 21:53:40 -0400
+X-MC-Unique: j2BemGfQMIiuZyQlv6tnGw-1
+Received: by mail-lj1-f200.google.com with SMTP id h4-20020a2ea484000000b002480c04898aso5242303lji.6
+        for <kvm@vger.kernel.org>; Sun, 27 Mar 2022 18:53:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=2dO/oV1qOltZyPId5baa2irih13HA1zn6mOKO291fhY=;
+        b=T/je8Qx/0hnV8uyJS/DcDtIPoVwHYGxVlPI/74AnNhKX5sbl8y5bIOw++Xe57wViv7
+         mrkcapLO2sx8m7Ebk/esSXRv9xW0BH1SNGrvK6PI/V9klPKsmnPIiwBJyKQjCZ3eQgwN
+         T/jUGcVrPsz+EiS8rx4Fwh+pVF1ZnOnHYyNR0HrGcmbxYL0GOo2oo3f8mupyon+OEx8P
+         7pNAZQyR6TQIkdKli9sV2hCMkA99q8Mi+CKAUWPC84LR60KtzCQ0lio0s8BMKcnINNxn
+         YOfKzf5T8BU8yXutJIns0eFaTjWw5mXjUwBMFlEoRLPaTOsOVrmRFZzS1z3yp2S5cz43
+         pV1Q==
+X-Gm-Message-State: AOAM532vhcJBx3VEnay/LIg5BMTsATdSQ3wME1rlL3IKKfkfH93K+Ujc
+        4IGKWPgECieSO00xeqjqKOmgF4vaT5YKVWIXVM0woeqJ/ZVrHy4KCZg4ma2Ifof9xkqPAstM9qs
+        knkFrXCBG0AtpDZ99EHGzID6KnYGz
+X-Received: by 2002:a05:6512:3341:b0:433:b033:bd22 with SMTP id y1-20020a056512334100b00433b033bd22mr17655625lfd.190.1648432419152;
+        Sun, 27 Mar 2022 18:53:39 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxq8kzelEt+v1IsX1TZPbDlKbWX97klqcRsVueoo1G7JjrBUCzhgXc3wVkBT8uRlLsPpQUWTvhiKwixigMDGIE=
+X-Received: by 2002:a05:6512:3341:b0:433:b033:bd22 with SMTP id
+ y1-20020a056512334100b00433b033bd22mr17655598lfd.190.1648432418951; Sun, 27
+ Mar 2022 18:53:38 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+References: <808a871b3918dc067031085de3e8af6b49c6ef89.camel@linux.ibm.com>
+ <20220322145741.GH11336@nvidia.com> <20220322092923.5bc79861.alex.williamson@redhat.com>
+ <20220322161521.GJ11336@nvidia.com> <BN9PR11MB5276BED72D82280C0A4C6F0C8C199@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <CACGkMEutpbOc_+5n3SDuNDyHn19jSH4ukSM9i0SUgWmXDydxnA@mail.gmail.com>
+ <BN9PR11MB5276E3566D633CEE245004D08C199@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <CACGkMEvTmCFqAsc4z=2OXOdr7X--0BSDpH06kCiAP5MHBjaZtg@mail.gmail.com>
+ <BN9PR11MB5276ECF1F1C7D0A80DA086D18C199@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <CACGkMEtpWemw6tj=suxNjvSHuixyzhMJBYmqdbhQkinuWNADCQ@mail.gmail.com> <20220324114605.GX11336@nvidia.com>
+In-Reply-To: <20220324114605.GX11336@nvidia.com>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Mon, 28 Mar 2022 09:53:27 +0800
+Message-ID: <CACGkMEtTVMuc-JebEbTrb3vRUVaNJ28FV_VyFRdRquVQN9VeQA@mail.gmail.com>
+Subject: Re: [PATCH RFC 04/12] kernel/user: Allow user::locked_vm to be usable
+ for iommufd
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Eric Auger <eric.auger@redhat.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        "Martins, Joao" <joao.m.martins@oracle.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        Keqian Zhu <zhukeqian1@huawei.com>,
+        Sean Mooney <smooney@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-3.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2022-03-23 at 16:35 +1300, Tian, Kevin wrote:
-> > From: Kai Huang <kai.huang@intel.com>
-> > Sent: Sunday, March 13, 2022 6:50 PM
-> > 
-> > Secure Arbitration Mode (SEAM) is an extension of VMX architecture.  It
-> > defines a new VMX root operation (SEAM VMX root) and a new VMX non-
-> > root
-> > operation (SEAM VMX non-root) which isolate from legacy VMX root and
-> > VMX
-> > non-root mode.
-> 
-> s/isolate/are isolated/
+On Thu, Mar 24, 2022 at 7:46 PM Jason Gunthorpe <jgg@nvidia.com> wrote:
+>
+> On Thu, Mar 24, 2022 at 11:50:47AM +0800, Jason Wang wrote:
+>
+> > It's simply because we don't want to break existing userspace. [1]
+>
+> I'm still waiting to hear what exactly breaks in real systems.
+>
+> As I explained this is not a significant change, but it could break
+> something in a few special scenarios.
+>
+> Also the one place we do have ABI breaks is security, and ulimit is a
+> security mechanism that isn't working right. So we do clearly need to
+> understand *exactly* what real thing breaks - if anything.
+>
+> Jason
+>
 
-OK thanks.
+To tell the truth, I don't know. I remember that Openstack may do some
+accounting so adding Sean for more comments. But we really can't image
+openstack is the only userspace that may use this.
 
-> 
-> > 
-> > A CPU-attested software module (called the 'TDX module') runs in SEAM
-> > VMX root to manage the crypto protected VMs running in SEAM VMX non-
-> > root.
-> > SEAM VMX root is also used to host another CPU-attested software module
-> > (called the 'P-SEAMLDR') to load and update the TDX module.
-> > 
-> > Host kernel transits to either the P-SEAMLDR or the TDX module via the
-> > new SEAMCALL instruction.  SEAMCALLs are host-side interface functions
-> > defined by the P-SEAMLDR and the TDX module around the new SEAMCALL
-> > instruction.  They are similar to a hypercall, except they are made by
-> 
-> "SEAMCALLs are ... functions ... around the new SEAMCALL instruction"
-> 
-> This is confusing. Probably just:
+To me, it looks more easier to not answer this question by letting
+userspace know about the change,
 
-May I ask why is it confusing?
+Thanks
 
-> 
-> "SEAMCALL functions are defined and handled by the P-SEAMLDR and
-> the TDX module"
-> 
-> > host kernel to the SEAM software.
-> > 
-> > SEAMCALLs use an ABI different from the x86-64 system-v ABI.  Instead,
-> > they share the same ABI with the TDCALL.  %rax is used to carry both the
-> > SEAMCALL leaf function number (input) and the completion status code
-> > (output).  Additional GPRs (%rcx, %rdx, %r8->%r11) may be further used
-> > as both input and output operands in individual leaf SEAMCALLs.
-> > 
-> > Implement a C function __seamcall() to do SEAMCALL using the assembly
-> > macro used by __tdx_module_call() (the implementation of TDCALL).  The
-> > only exception not covered here is TDENTER leaf function which takes
-> > all GPRs and XMM0-XMM15 as both input and output.  The caller of TDENTER
-> > should implement its own logic to call TDENTER directly instead of using
-> > this function.
-> > 
-> > SEAMCALL instruction is essentially a VMExit from VMX root to SEAM VMX
-> > root, and it can fail with VMfailInvalid, for instance, when the SEAM
-> > software module is not loaded.  The C function __seamcall() returns
-> > TDX_SEAMCALL_VMFAILINVALID, which doesn't conflict with any actual error
-> > code of SEAMCALLs, to uniquely represent this case.
-> 
-> SEAMCALL is TDX specific, is it? If yes, there is no need to have both
-> TDX and SEAMCALL in one macro, i.e. above can be SEAMCALL_VMFAILINVALID.
-
-This is defined in TDX guest series.  I just use it.
-
-https://lore.kernel.org/lkml/20220324152415.grt6xvhblmd4uccu@black.fi.intel.com/T/#md0b1aa563bd003ab625de159612a0d07e3ded7cb
-
-
-
--- 
-Thanks,
--Kai
