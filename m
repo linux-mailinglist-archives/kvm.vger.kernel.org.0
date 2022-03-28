@@ -2,99 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CE6324EA144
-	for <lists+kvm@lfdr.de>; Mon, 28 Mar 2022 22:17:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8B53A4EA148
+	for <lists+kvm@lfdr.de>; Mon, 28 Mar 2022 22:18:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344400AbiC1USs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Mar 2022 16:18:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53512 "EHLO
+        id S1344417AbiC1UUV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Mar 2022 16:20:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55828 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234040AbiC1USr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Mar 2022 16:18:47 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1B076623F
-        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 13:17:04 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 74C4CB81202
-        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 20:17:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EA94C3411E
-        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 20:17:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1648498622;
-        bh=F88P3EjB8xr5i+2/B7u8QJbACQEAp4uoybtn389DnK4=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=MbUyJVBBtcRiSqPMHyR5eTY53fRuRdbMY7WKUQUsWXQwbwdNFdMe++QlbME3I4aU5
-         k3luwth9XutktPcZBag3IYt3MRDRVYipv+ZzpOr7tGe+3ve7q6cUGAJ7CxEMMj3/aW
-         Hn9ibm5hfHZrw6B5z8MboqK7NPTNAU7quqrhjeNASOVNcUCE0o0AsnUU3OwsZO4HnJ
-         90zbcgiajFjUNlPdgUK1jhw6+zfiJd1YWeZix/64m2xxjMvS8gbUzOOW44PxtF/0aF
-         JrbiOj4D48tJXtEhCKjFeD5xeHKQ1BXX5i0o4k4HE4lMRy4HAZr/gvPFhsTu4t9kdC
-         xmPOKxGci3a9Q==
-Received: by mail-ej1-f50.google.com with SMTP id bg10so30999052ejb.4
-        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 13:17:02 -0700 (PDT)
-X-Gm-Message-State: AOAM530dK3tmYbFgWVTiSsMpdDopDfUSEFgcvtNlpTq2YvbBm+YAVQFs
-        Wss01aBjxeocDXeMFGOaDx0zzixwdtjcKdXVGEQlzQ==
-X-Google-Smtp-Source: ABdhPJyUCfqNMjY4j/zDrp5thzUNKGPE9xMYQkN6ReIG1dPzUmJOgX3w9dDbnVfGV3lDWzlxjIqdp/oS80009PSifH0=
-X-Received: by 2002:a17:906:c10d:b0:6e0:dc2a:338d with SMTP id
- do13-20020a170906c10d00b006e0dc2a338dmr14671860ejc.538.1648498620006; Mon, 28
- Mar 2022 13:17:00 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220310140911.50924-1-chao.p.peng@linux.intel.com>
-In-Reply-To: <20220310140911.50924-1-chao.p.peng@linux.intel.com>
-From:   Andy Lutomirski <luto@kernel.org>
-Date:   Mon, 28 Mar 2022 13:16:48 -0700
-X-Gmail-Original-Message-ID: <CALCETrWk1Y47JQC=V028A7Tmc9776Oo4AjgwqRtd9K=XDh6=TA@mail.gmail.com>
-Message-ID: <CALCETrWk1Y47JQC=V028A7Tmc9776Oo4AjgwqRtd9K=XDh6=TA@mail.gmail.com>
-Subject: Re: [PATCH v5 00/13] KVM: mm: fd-based approach for supporting KVM
- guest private memory
-To:     Chao Peng <chao.p.peng@linux.intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-api@vger.kernel.org, qemu-devel@nongnu.org,
+        with ESMTP id S1344409AbiC1UUT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Mar 2022 16:20:19 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C1AF22523
+        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 13:18:37 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id mp6-20020a17090b190600b001c6841b8a52so288218pjb.5
+        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 13:18:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=zEO73/klvJY0XxHebACPXmzj87UKrtx/E5ofQ5laclI=;
+        b=BJAjHvV8b5+6vXki2ZavfOGiTz+fQzVf6GH0KLCn8oWPZj8Xv17daoOP3mLHYUmOAY
+         4Zz+BBZfO+4GcsfIxt5gROivUg8hjIkEXrqgS+GnVHY42ulcI+eXZErbEYH+SB7dChAF
+         Bs1CfsRO/+OfdOtJFrHzrNrJVoQVJGEoZ8T8rVehX6v+qKFxu+J1Y9jDBuVWo6UKjZ3G
+         jKqAPXuiUG2B/NLjsNyaOHZ+7/lvm5cmT/ovWVirGSctJYD29ODlWxx+LweM3V/zZ5nN
+         i3S4hf2LII6zqXZZPvF1WrNNDsD7iftRN9mM9MGHrkbjl06JygwBAuJAaJmiA5ZR/dwB
+         Ek6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=zEO73/klvJY0XxHebACPXmzj87UKrtx/E5ofQ5laclI=;
+        b=XoWET4mnTNfNwEL8QjfW7KkCCpowgE7bXEPHbtUzKgrLN++ZLUeQQjiS5e5HuU9Q7M
+         33UPIz8OiY9gfA8jhZiNMRJxJMvoHz6D2vHZVwT2uQMSTy9s/TH5bdTJeXhnCtCm+fAW
+         VMgtaYKOaJz13ke1oLZKXdCZrOmjdOH1ZopM1XXHNR54gkZKj8nYMh2hcO1RJKwGE2qx
+         f31HfUsKCvXqtwRGPW+ZfP4HlmKVIw5AhhpwRWIcVhYClZPkUkI4PcXH79clE2oCSbuu
+         YY9LR2akCabk5iWOZ3Yro6n1Kg3AwYqvSkeW06BLFYtquCuEY5sgNgjsPWPxQfZQJpLn
+         CzRQ==
+X-Gm-Message-State: AOAM532Gq70Ix82Qyr4iDl7aGx5lEMOq9hae3hjyAGG8eS4Cl1q06AhM
+        deUqoDNzmD8Tym8v2nCDgAIfBw==
+X-Google-Smtp-Source: ABdhPJx1XdHg366ztNik62gGZ7COHZ7IZzQ7cjiOLii9D6aAlRskMzBPqX02oU/FSQnuaFD1HroyKA==
+X-Received: by 2002:a17:902:d2c6:b0:156:2b2c:ab54 with SMTP id n6-20020a170902d2c600b001562b2cab54mr621389plc.52.1648498716333;
+        Mon, 28 Mar 2022 13:18:36 -0700 (PDT)
+Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
+        by smtp.gmail.com with ESMTPSA id 13-20020aa7920d000000b004fa94f26b48sm16471350pfo.118.2022.03.28.13.18.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Mar 2022 13:18:35 -0700 (PDT)
+Date:   Mon, 28 Mar 2022 20:18:31 +0000
+From:   David Matlack <dmatlack@google.com>
+To:     Ben Gardon <bgardon@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
+        Peter Xu <peterx@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        David Dunn <daviddunn@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Junaid Shahid <junaids@google.com>
+Subject: Re: [PATCH v2 07/11] KVM: x86/MMU: Factor out updating NX hugepages
+ state for a VM
+Message-ID: <YkIYF6HzLy+l6tu8@google.com>
+References: <20220321234844.1543161-1-bgardon@google.com>
+ <20220321234844.1543161-8-bgardon@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220321234844.1543161-8-bgardon@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 10, 2022 at 6:09 AM Chao Peng <chao.p.peng@linux.intel.com> wrote:
->
-> This is the v5 of this series which tries to implement the fd-based KVM
-> guest private memory. The patches are based on latest kvm/queue branch
-> commit:
->
->   d5089416b7fb KVM: x86: Introduce KVM_CAP_DISABLE_QUIRKS2
+On Mon, Mar 21, 2022 at 04:48:40PM -0700, Ben Gardon wrote:
+> Factor out the code to update the NX hugepages state for an individual
+> VM. This will be expanded in future commits to allow per-VM control of
+> Nx hugepages.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Ben Gardon <bgardon@google.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 18 +++++++++++-------
+>  1 file changed, 11 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 3b8da8b0745e..1b59b56642f1 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -6195,6 +6195,15 @@ static void __set_nx_huge_pages(bool val)
+>  	nx_huge_pages = itlb_multihit_kvm_mitigation = val;
+>  }
+>  
+> +static int kvm_update_nx_huge_pages(struct kvm *kvm)
+> +{
+> +	mutex_lock(&kvm->slots_lock);
+> +	kvm_mmu_zap_all_fast(kvm);
+> +	mutex_unlock(&kvm->slots_lock);
+> +
+> +	wake_up_process(kvm->arch.nx_lpage_recovery_thread);
+> +}
+> +
+>  static int set_nx_huge_pages(const char *val, const struct kernel_param *kp)
+>  {
+>  	bool old_val = nx_huge_pages;
+> @@ -6217,13 +6226,8 @@ static int set_nx_huge_pages(const char *val, const struct kernel_param *kp)
+>  
+>  		mutex_lock(&kvm_lock);
+>  
 
-Can this series be run and a VM booted without TDX?  A feature like
-that might help push it forward.
+nit: This blank line is asymmetrical with mutex_unlock().
 
---Andy
+> -		list_for_each_entry(kvm, &vm_list, vm_list) {
+> -			mutex_lock(&kvm->slots_lock);
+> -			kvm_mmu_zap_all_fast(kvm);
+> -			mutex_unlock(&kvm->slots_lock);
+> -
+> -			wake_up_process(kvm->arch.nx_lpage_recovery_thread);
+> -		}
+> +		list_for_each_entry(kvm, &vm_list, vm_list)
+> +			kvm_set_nx_huge_pages(kvm);
+
+This should be kvm_update_nx_huge_pages() right?
+
+>  		mutex_unlock(&kvm_lock);
+>  	}
+>  
+> -- 
+> 2.35.1.894.gb6a874cedc-goog
+> 
