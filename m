@@ -2,55 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0E2094E9E9A
-	for <lists+kvm@lfdr.de>; Mon, 28 Mar 2022 20:07:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C0AC24E9EB0
+	for <lists+kvm@lfdr.de>; Mon, 28 Mar 2022 20:07:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242997AbiC1SGd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Mar 2022 14:06:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47032 "EHLO
+        id S245012AbiC1SJe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Mar 2022 14:09:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233683AbiC1SGa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Mar 2022 14:06:30 -0400
-Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6C2A4BFFC
-        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 11:04:48 -0700 (PDT)
-Received: by mail-pg1-x52e.google.com with SMTP id t4so9757051pgc.1
-        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 11:04:48 -0700 (PDT)
+        with ESMTP id S237822AbiC1SJd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Mar 2022 14:09:33 -0400
+Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 610414CD41
+        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 11:07:52 -0700 (PDT)
+Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-2db2add4516so158597707b3.1
+        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 11:07:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Ym/L1wBpDfLtNFYglb5eik8J+ZADs+Mxo8dMLHDIgV0=;
-        b=JWB0uri4NhVLpGuhzaP6omiJxFh+N6igYL2QbafBZatuK8GtgilikAUUQfcEkJl9wQ
-         2skQvDSUo+QMjRe4Vq0ipUufHfPSE2C2fzWmL/E7sMtpWPWJFR1FLOsBmdCm9HOHzXEt
-         yayMV6b+Awot34BckY+CuNWx864MNrfv4zC++1Mfxle2jUQHy4bUJTm97tdfZUR4A7dp
-         9QdBiZK0g7wZ32cr9l81iMisnMhxmxy006GUhGTI9rOJQ1/HcMxwFZZn6DDGsY9E85hG
-         P1FidWr4vXP/LzVnH7wc2TVdmAqGZvpuUuRA89S2j34ES3txBLDpPUa5NJrNlP5VLJfn
-         X5rA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=xqEEYU+NLqFNxKimuVXTLE3KxvDawYGyrEy7eiTScjA=;
+        b=GVaqpK4Ssj9998AfJa+CpInccGgJL7vEcfAbsBngm1KCw4+9l6XkgiTPlEOFhsVLyC
+         fsEhzEG0XayeUGip009EAR1gqR2BL71b2WgZd5Z0MuNoewBMqbbFFXifRpVPZ4iZrokE
+         kZbE8f/j/Vh977Ad3M3HNxwRwuFAIp8ikE1mdyWUz0Q4IoZRXD/Yc5zIX11Ctjm6vTXg
+         6lGabFQjHkekXT9JZY4Jfrdlapmxe2YCgymRJqDHsdqWwaALuoFzooUhvIadhgwHh6H7
+         /PUibGcEtOi9NprMj5ngNphjeWIXSrL7yPKrT/LwvSUAmdVnSR9bMls4jwiQeT1xFRYk
+         c01A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Ym/L1wBpDfLtNFYglb5eik8J+ZADs+Mxo8dMLHDIgV0=;
-        b=kOCq47PcQXPiL1SQ+TgMDuz1FCxhDfzJcPGpqoSr/jPNmdstQQNkyRqxgjg65kWl/z
-         8LIzNlu30aL8A0s/kOCRaHzh5sqkaDlmZLAulR9hJ6N/CXXUo3n9vXJvRLe79xMIqTGC
-         QkvRW0j0GZpyDQoigwkLF8NjyWy783rQ4nC5qYPNgopjk5tEZlj4/c4HiEulktHR8aIo
-         QSMNeu5ruAtp7OqKVCMKCB7E0BLjca1qGY+sNdTjIXwmWlshoPJ54HZnGb+PqEfz9HKw
-         IC9nEClZ00nU5yuyNYpdf0eF4BBm54IDM62w9tpR1Jax3TCASm9Mvp6or6Q2whX+XIqp
-         vTtQ==
-X-Gm-Message-State: AOAM530jQNlDf2mQg9qfbP8aUblP2yY4aKsifbfjdQjtVjhRvPbbaxAy
-        ZosEclNWtHajw1oR59Ot9eBGoQ==
-X-Google-Smtp-Source: ABdhPJz6cmAET3X2l8oi9XiqgexGDczM4h6l+4EdHGvw31KNYFpDUf/5HHI7EuZ0lQttFGrQKlsXbg==
-X-Received: by 2002:a05:6a00:1496:b0:4fb:34a7:dcce with SMTP id v22-20020a056a00149600b004fb34a7dccemr11419180pfu.70.1648490687914;
-        Mon, 28 Mar 2022 11:04:47 -0700 (PDT)
-Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
-        by smtp.gmail.com with ESMTPSA id 21-20020a630115000000b00382a0895661sm13558768pgb.11.2022.03.28.11.04.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Mar 2022 11:04:46 -0700 (PDT)
-Date:   Mon, 28 Mar 2022 18:04:43 +0000
-From:   David Matlack <dmatlack@google.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=xqEEYU+NLqFNxKimuVXTLE3KxvDawYGyrEy7eiTScjA=;
+        b=F8oM4wvdvNdNNuDPnzIWkcVuyBx8HIDOLxqsDCDeDUNiYUxVS9emz1b+1pORJqYTRS
+         ZbcydKA8VEHl4dTCfGEK0gZ80h181Q+Tx9qfyVyH5c6uerHcCrFq4FiKy2mZtXf9HGCa
+         HKAJc3o0yo0p/SUBFkbtfNHpefz5YDmE8WfT/kuYlI0vK/Bdb6tw7xtZQPAh7DauaznW
+         Z+EwKCprtY6pQVnPBuasScdchvNbW661ZfVBytYPlVr98a15P5xVSxeDsziAlweaZDgx
+         kdKNm4yLxhNK0tXD/mf8xJlcYdnFIQk9AtOesJ/HTlap4npFO2dpo8T1K6q8LOqGffw9
+         LptA==
+X-Gm-Message-State: AOAM531jWs0Rj+6wFlvw3Ezs0Lk4hyRnxSlE8CeSA3e/1UAKVT9F5Wnr
+        5z5gUVKwz0k7t8+LaINGvuVIiF+sdiqCDJqewdC+NQ==
+X-Google-Smtp-Source: ABdhPJwBX4wzJFV8HgmL6kvM/2YV+ny2vJqb8cJOrJJ84g3r057Gi2H+pH4Lbvo+0flYaOKrw2ZHeFIzb70uXkmLaNA=
+X-Received: by 2002:a81:15ce:0:b0:2e5:e189:7366 with SMTP id
+ 197-20020a8115ce000000b002e5e1897366mr27257565ywv.188.1648490871291; Mon, 28
+ Mar 2022 11:07:51 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220321224358.1305530-1-bgardon@google.com> <20220321224358.1305530-10-bgardon@google.com>
+ <YkH0O2Qh7lRizGtC@google.com>
+In-Reply-To: <YkH0O2Qh7lRizGtC@google.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Mon, 28 Mar 2022 11:07:40 -0700
+Message-ID: <CANgfPd8V_34TBb3m-JpmczZnY3t5aaFwHNZq1W0eknumbrXCRw@mail.gmail.com>
+Subject: Re: [PATCH v2 9/9] KVM: x86/mmu: Promote pages in-place when
+ disabling dirty logging
+To:     David Matlack <dmatlack@google.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Peter Xu <peterx@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
@@ -58,15 +62,7 @@ Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         David Dunn <daviddunn@google.com>,
         Jing Zhang <jingzhangos@google.com>,
         Junaid Shahid <junaids@google.com>
-Subject: Re: [PATCH v2 6/9] KVM: x86/mmu: Factor out part of vmx_get_mt_mask
- which does not depend on vcpu
-Message-ID: <YkH4u7O8uSNKl+eE@google.com>
-References: <20220321224358.1305530-1-bgardon@google.com>
- <20220321224358.1305530-7-bgardon@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220321224358.1305530-7-bgardon@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -78,83 +74,213 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 21, 2022 at 03:43:55PM -0700, Ben Gardon wrote:
-> Factor out the parts of vmx_get_mt_mask which do not depend on the vCPU
-> argument. This also requires adding some error reporting to the helper
-> function to say whether it was possible to generate the MT mask without
-> a vCPU argument. This refactoring will allow the MT mask to be computed
-> when noncoherent DMA is not enabled on a VM.
+On Mon, Mar 28, 2022 at 10:45 AM David Matlack <dmatlack@google.com> wrote:
+>
+> On Mon, Mar 21, 2022 at 03:43:58PM -0700, Ben Gardon wrote:
+> > When disabling dirty logging, the TDP MMU currently zaps each leaf entry
+> > mapping memory in the relevant memslot. This is very slow. Doing the zaps
+> > under the mmu read lock requires a TLB flush for every zap and the
+> > zapping causes a storm of ETP/NPT violations.
+> >
+> > Instead of zapping, replace the split large pages with large page
+> > mappings directly. While this sort of operation has historically only
+> > been done in the vCPU page fault handler context, refactorings earlier
+> > in this series and the relative simplicity of the TDP MMU make it
+> > possible here as well.
+> >
+> > Running the dirty_log_perf_test on an Intel Skylake with 96 vCPUs and 1G
+> > of memory per vCPU, this reduces the time required to disable dirty
+> > logging from over 45 seconds to just over 1 second. It also avoids
+> > provoking page faults, improving vCPU performance while disabling
+> > dirty logging.
+> >
+> > Signed-off-by: Ben Gardon <bgardon@google.com>
+> > ---
+> >  arch/x86/kvm/mmu/mmu.c          |  4 +-
+> >  arch/x86/kvm/mmu/mmu_internal.h |  6 +++
+> >  arch/x86/kvm/mmu/tdp_mmu.c      | 73 ++++++++++++++++++++++++++++++++-
+> >  3 files changed, 79 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index 6f98111f8f8b..a99c23ef90b6 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -100,7 +100,7 @@ module_param_named(flush_on_reuse, force_flush_and_sync_on_reuse, bool, 0644);
+> >   */
+> >  bool tdp_enabled = false;
+> >
+> > -static int max_huge_page_level __read_mostly;
+> > +int max_huge_page_level;
+> >  static int tdp_root_level __read_mostly;
+> >  static int max_tdp_level __read_mostly;
+> >
+> > @@ -4486,7 +4486,7 @@ static inline bool boot_cpu_is_amd(void)
+> >   * the direct page table on host, use as much mmu features as
+> >   * possible, however, kvm currently does not do execution-protection.
+> >   */
+> > -static void
+> > +void
+> >  build_tdp_shadow_zero_bits_mask(struct rsvd_bits_validate *shadow_zero_check,
+> >                               int shadow_root_level)
+> >  {
+> > diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+> > index 1bff453f7cbe..6c08a5731fcb 100644
+> > --- a/arch/x86/kvm/mmu/mmu_internal.h
+> > +++ b/arch/x86/kvm/mmu/mmu_internal.h
+> > @@ -171,4 +171,10 @@ void *mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc);
+> >  void account_huge_nx_page(struct kvm *kvm, struct kvm_mmu_page *sp);
+> >  void unaccount_huge_nx_page(struct kvm *kvm, struct kvm_mmu_page *sp);
+> >
+> > +void
+> > +build_tdp_shadow_zero_bits_mask(struct rsvd_bits_validate *shadow_zero_check,
+> > +                             int shadow_root_level);
+> > +
+> > +extern int max_huge_page_level __read_mostly;
+> > +
+> >  #endif /* __KVM_X86_MMU_INTERNAL_H */
+> > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> > index af60922906ef..eb8929e394ec 100644
+> > --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> > @@ -1709,6 +1709,66 @@ void kvm_tdp_mmu_clear_dirty_pt_masked(struct kvm *kvm,
+> >               clear_dirty_pt_masked(kvm, root, gfn, mask, wrprot);
+> >  }
+> >
+> > +static bool try_promote_lpage(struct kvm *kvm,
+> > +                           const struct kvm_memory_slot *slot,
+> > +                           struct tdp_iter *iter)
+>
+> Use "huge_page" instead of "lpage" to be consistent with eager page
+> splitting and the rest of the Linux kernel. Some of the old KVM methods
+> still use "lpage" and "large page", but we're slowly moving away from
+> that.
 
-We could probably make vmx_get_mt_mask() entirely independent of
-the kvm_vcpu, but it would take more work.
+Ah good catch. Paolo, if you want me to send a v2 to address all these
+comments, I can. Otherwise I'll just reply to the questions below.
 
-For MTRRs, the guest must update them on all CPUs at once (SDM 11.11.8)
-so we could just cache vCPU 0's MTRRs at the VM level and use that here.
-(From my experience, Intel CPUs implement MTRRs at the core level.
-Properly emulating that would require a different EPT table for every
-virtual core.)
+>
+> > +{
+> > +     struct kvm_mmu_page *sp = sptep_to_sp(iter->sptep);
+> > +     struct rsvd_bits_validate shadow_zero_check;
+> > +     bool map_writable;
+> > +     kvm_pfn_t pfn;
+> > +     u64 new_spte;
+> > +     u64 mt_mask;
+> > +
+> > +     /*
+> > +      * If addresses are being invalidated, don't do in-place promotion to
+> > +      * avoid accidentally mapping an invalidated address.
+> > +      */
+> > +     if (unlikely(kvm->mmu_notifier_count))
+> > +             return false;
+>
+> Why is this necessary? Seeing this makes me wonder if we need a similar
+> check for eager page splitting.
 
-For CR0.CD, I'm not exactly sure what the semantics are for MP systems
-but I can't imagine it's valid for software to configure CR0.CD
-differently on different cores. I would have to scoure the SDM closely
-to confirm, but we could probably do something like cache
-max(CR0.CD for all vCPUs) at the VM level and use that to indicate if
-caching is disabled.
+This is needed here, but not in the page splitting case, because we
+are potentially mapping new memory.
+If a page is split for dirt logging, but then the backing transparent
+huge page is split for some reason, we could race with the THP split.
+Since we're mapping the entire huge page, this could wind up mapping
+more memory than it should. Checking the MMU notifier count prevents
+that. It's not needed in the splitting case because the memory in
+question is already mapped. We're essentially trying to do what the
+page fault handler does, since we know that's safe and it's what
+replaces the zapped page with a huge page. The page fault handler
+checks for MMU notifiers, so we need to as well.
+>
+> > +
+> > +     if (iter->level > max_huge_page_level || iter->gfn < slot->base_gfn ||
+> > +         iter->gfn >= slot->base_gfn + slot->npages)
+> > +             return false;
+> > +
+> > +     pfn = __gfn_to_pfn_memslot(slot, iter->gfn, true, NULL, true,
+> > +                                &map_writable, NULL);
+> > +     if (is_error_noslot_pfn(pfn))
+> > +             return false;
+> > +
+> > +     /*
+> > +      * Can't reconstitute an lpage if the consituent pages can't be
+> > +      * mapped higher.
+> > +      */
+> > +     if (iter->level > kvm_mmu_max_mapping_level(kvm, slot, iter->gfn,
+> > +                                                 pfn, PG_LEVEL_NUM))
+> > +             return false;
+> > +
+> > +     build_tdp_shadow_zero_bits_mask(&shadow_zero_check, iter->root_level);
+> > +
+> > +     /*
+> > +      * In some cases, a vCPU pointer is required to get the MT mask,
+> > +      * however in most cases it can be generated without one. If a
+> > +      * vCPU pointer is needed kvm_x86_try_get_mt_mask will fail.
+> > +      * In that case, bail on in-place promotion.
+> > +      */
+> > +     if (unlikely(!static_call(kvm_x86_try_get_mt_mask)(kvm, iter->gfn,
+> > +                                                        kvm_is_mmio_pfn(pfn),
+> > +                                                        &mt_mask)))
+> > +             return false;
+> > +
+> > +     __make_spte(kvm, sp, slot, ACC_ALL, iter->gfn, pfn, 0, false, true,
+> > +               map_writable, mt_mask, &shadow_zero_check, &new_spte);
+> > +
+> > +     if (tdp_mmu_set_spte_atomic(kvm, iter, new_spte))
+> > +             return true;
+> > +
+> > +     /* Re-read the SPTE as it must have been changed by another thread. */
+> > +     iter->old_spte = READ_ONCE(*rcu_dereference(iter->sptep));
+>
+> Huge page promotion could be retried in this case.
 
-> 
-> No functional change intended.
-> 
-> 
-> Signed-off-by: Ben Gardon <bgardon@google.com>
-> ---
->  arch/x86/kvm/vmx/vmx.c | 24 +++++++++++++++++++-----
->  1 file changed, 19 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index e8963f5af618..69c654567475 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -7149,9 +7149,26 @@ static int __init vmx_check_processor_compat(void)
->  	return 0;
->  }
->  
-> +static bool vmx_try_get_mt_mask(struct kvm *kvm, gfn_t gfn,
-> +				bool is_mmio, u64 *mask)
-> +{
-> +	if (is_mmio) {
-> +		*mask =  MTRR_TYPE_UNCACHABLE << VMX_EPT_MT_EPTE_SHIFT;
-> +		return true;
-> +	}
-> +
-> +	if (!kvm_arch_has_noncoherent_dma(kvm)) {
-> +		*mask = (MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT) | VMX_EPT_IPAT_BIT;
-> +		return true;
-> +	}
-> +
-> +	return false;
-> +}
-> +
->  static u64 vmx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
->  {
->  	u8 cache;
-> +	u64 mask;
->  
->  	/* We wanted to honor guest CD/MTRR/PAT, but doing so could result in
->  	 * memory aliases with conflicting memory types and sometimes MCEs.
-> @@ -7171,11 +7188,8 @@ static u64 vmx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
->  	 * EPT memory type is used to emulate guest CD/MTRR.
->  	 */
->  
-> -	if (is_mmio)
-> -		return MTRR_TYPE_UNCACHABLE << VMX_EPT_MT_EPTE_SHIFT;
-> -
-> -	if (!kvm_arch_has_noncoherent_dma(vcpu->kvm))
-> -		return (MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT) | VMX_EPT_IPAT_BIT;
-> +	if (vmx_try_get_mt_mask(vcpu->kvm, gfn, is_mmio, &mask))
-> +		return mask;
->  
->  	if (kvm_read_cr0(vcpu) & X86_CR0_CD) {
->  		if (kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_CD_NW_CLEARED))
-> -- 
-> 2.35.1.894.gb6a874cedc-goog
-> 
+That's true, but retries always get complicated since we need to
+guarantee forward progress and then you get into counting retries and
+it adds complexity. Given how rare this race should be, I'm inclined
+to just let it fall back to zapping the spte.
+
+>
+> > +
+> > +     return false;
+> > +}
+> > +
+> >  /*
+> >   * Clear leaf entries which could be replaced by large mappings, for
+> >   * GFNs within the slot.
+> > @@ -1729,8 +1789,17 @@ static void zap_collapsible_spte_range(struct kvm *kvm,
+> >               if (tdp_mmu_iter_cond_resched(kvm, &iter, false, true))
+> >                       continue;
+> >
+> > -             if (!is_shadow_present_pte(iter.old_spte) ||
+> > -                 !is_last_spte(iter.old_spte, iter.level))
+> > +             if (iter.level > max_huge_page_level ||
+> > +                 iter.gfn < slot->base_gfn ||
+> > +                 iter.gfn >= slot->base_gfn + slot->npages)
+>
+> I feel like I've been seeing this "does slot contain gfn" calculation a
+> lot in recent commits. It's probably time to create a helper function.
+> No need to do this clean up as part of your series though, unless you
+> want to :).
+>
+> > +                     continue;
+> > +
+> > +             if (!is_shadow_present_pte(iter.old_spte))
+> > +                     continue;
+> > +
+> > +             /* Try to promote the constitutent pages to an lpage. */
+> > +             if (!is_last_spte(iter.old_spte, iter.level) &&
+> > +                 try_promote_lpage(kvm, slot, &iter))
+> >                       continue;
+>
+> If iter.old_spte is not a leaf, the only loop would always continue to
+> the next SPTE. Now we try to promote it and if that fails we run through
+> the rest of the loop. This seems broken. For example, in the next line
+> we end up grabbing the pfn of the non-leaf SPTE (which would be the PFN
+> of the TDP MMU page table?) and treat that as the PFN backing this GFN,
+> which is wrong.
+>
+> In the worst case we end up zapping an SPTE that we didn't need to, but
+> we should still fix up this code.
+>
+> >
+> >               pfn = spte_to_pfn(iter.old_spte);
+> > --
+> > 2.35.1.894.gb6a874cedc-goog
+> >
