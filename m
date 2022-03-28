@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A96384E928A
-	for <lists+kvm@lfdr.de>; Mon, 28 Mar 2022 12:33:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E4114E928B
+	for <lists+kvm@lfdr.de>; Mon, 28 Mar 2022 12:33:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240265AbiC1KfV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Mar 2022 06:35:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49484 "EHLO
+        id S240268AbiC1KfX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Mar 2022 06:35:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49552 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230412AbiC1KfU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Mar 2022 06:35:20 -0400
+        with ESMTP id S240264AbiC1KfV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Mar 2022 06:35:21 -0400
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8661A13D28
-        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 03:33:38 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 70430FD20
+        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 03:33:40 -0700 (PDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3F6A01042;
-        Mon, 28 Mar 2022 03:33:38 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 248E21480;
+        Mon, 28 Mar 2022 03:33:40 -0700 (PDT)
 Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 05DB33F66F;
-        Mon, 28 Mar 2022 03:33:36 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DEE513F66F;
+        Mon, 28 Mar 2022 03:33:38 -0700 (PDT)
 From:   Alexandru Elisei <alexandru.elisei@arm.com>
 To:     will@kernel.org, kvm@vger.kernel.org,
         julien.thierry.kdev@gmail.com,
         linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com,
         steven.price@arm.com, vladimir.murzin@arm.com
-Subject: [kvmtool PATCH v3 1/2] update_headers.sh: Sync ABI headers with Linux v5.17
-Date:   Mon, 28 Mar 2022 11:33:27 +0100
-Message-Id: <20220328103328.18768-2-alexandru.elisei@arm.com>
+Subject: [kvmtool PATCH v3 2/2] aarch64: Add support for MTE
+Date:   Mon, 28 Mar 2022 11:33:28 +0100
+Message-Id: <20220328103328.18768-3-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20220328103328.18768-1-alexandru.elisei@arm.com>
 References: <20220328103328.18768-1-alexandru.elisei@arm.com>
@@ -42,128 +42,122 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+MTE has been supported in Linux since commit 673638f434ee ("KVM: arm64:
+Expose KVM_ARM_CAP_MTE"), add support for it in kvmtool. MTE is enabled by
+default.
+
+Enabling the MTE capability incurs a cost, both in time (for each
+translation fault the tags need to be cleared), and in space (the tags need
+to be saved when a physical page is swapped out). This overhead is expected
+to be negligible for most users, but for those cases where it matters
+(like performance benchmarks), a --disable-mte option has been added.
+
+Reviewed-by: Vladimir Murzin <vladimir.murzin@arm.com>
+Tested-by: Vladimir Murzin <vladimir.murzin@arm.com>
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- arm/aarch64/include/asm/kvm.h |  5 +++++
- include/linux/kvm.h           | 18 ++++++++++++++++++
- x86/include/asm/kvm.h         | 19 ++++++++++++++++++-
- 3 files changed, 41 insertions(+), 1 deletion(-)
+ arm/aarch32/include/kvm/kvm-arch.h        |  3 +++
+ arm/aarch64/include/kvm/kvm-arch.h        |  1 +
+ arm/aarch64/include/kvm/kvm-config-arch.h |  2 ++
+ arm/aarch64/kvm.c                         | 22 ++++++++++++++++++++++
+ arm/include/arm-common/kvm-config-arch.h  |  1 +
+ arm/kvm.c                                 |  2 ++
+ 6 files changed, 31 insertions(+)
 
-diff --git a/arm/aarch64/include/asm/kvm.h b/arm/aarch64/include/asm/kvm.h
-index b3edde68bc3e..323e251ed37b 100644
---- a/arm/aarch64/include/asm/kvm.h
-+++ b/arm/aarch64/include/asm/kvm.h
-@@ -281,6 +281,11 @@ struct kvm_arm_copy_mte_tags {
- #define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_REQUIRED	3
- #define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED     	(1U << 4)
+diff --git a/arm/aarch32/include/kvm/kvm-arch.h b/arm/aarch32/include/kvm/kvm-arch.h
+index bee2fc255a82..5616b27e257e 100644
+--- a/arm/aarch32/include/kvm/kvm-arch.h
++++ b/arm/aarch32/include/kvm/kvm-arch.h
+@@ -5,6 +5,9 @@
  
-+#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3	KVM_REG_ARM_FW_REG(3)
-+#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3_NOT_AVAIL		0
-+#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3_AVAIL		1
-+#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3_NOT_REQUIRED	2
+ #define kvm__arch_get_kern_offset(...)	0x8000
+ 
++struct kvm;
++static inline void kvm__arch_enable_mte(struct kvm *kvm) {}
 +
- /* SVE registers */
- #define KVM_REG_ARM64_SVE		(0x15 << KVM_REG_ARM_COPROC_SHIFT)
+ #define ARM_MAX_MEMORY(...)	ARM_LOMAP_MAX_MEMORY
  
-diff --git a/include/linux/kvm.h b/include/linux/kvm.h
-index 1daa45268de2..507ee1f2aa96 100644
---- a/include/linux/kvm.h
-+++ b/include/linux/kvm.h
-@@ -1131,6 +1131,10 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_EXIT_ON_EMULATION_FAILURE 204
- #define KVM_CAP_ARM_MTE 205
- #define KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM 206
-+#define KVM_CAP_VM_GPA_BITS 207
-+#define KVM_CAP_XSAVE2 208
-+#define KVM_CAP_SYS_ATTRIBUTES 209
-+#define KVM_CAP_PPC_AIL_MODE_3 210
+ #define MAX_PAGE_SIZE	SZ_4K
+diff --git a/arm/aarch64/include/kvm/kvm-arch.h b/arm/aarch64/include/kvm/kvm-arch.h
+index 5e5ee41211ed..9124f6919d0f 100644
+--- a/arm/aarch64/include/kvm/kvm-arch.h
++++ b/arm/aarch64/include/kvm/kvm-arch.h
+@@ -6,6 +6,7 @@
+ struct kvm;
+ unsigned long long kvm__arch_get_kern_offset(struct kvm *kvm, int fd);
+ int kvm__arch_get_ipa_limit(struct kvm *kvm);
++void kvm__arch_enable_mte(struct kvm *kvm);
  
- #ifdef KVM_CAP_IRQ_ROUTING
+ #define ARM_MAX_MEMORY(kvm)	({					\
+ 	u64 max_ram;							\
+diff --git a/arm/aarch64/include/kvm/kvm-config-arch.h b/arm/aarch64/include/kvm/kvm-config-arch.h
+index 04be43dfa9b2..206756c7e706 100644
+--- a/arm/aarch64/include/kvm/kvm-config-arch.h
++++ b/arm/aarch64/include/kvm/kvm-config-arch.h
+@@ -6,6 +6,8 @@
+ 			"Run AArch32 guest"),				\
+ 	OPT_BOOLEAN('\0', "pmu", &(cfg)->has_pmuv3,			\
+ 			"Create PMUv3 device"),				\
++	OPT_BOOLEAN('\0', "disable-mte", &(cfg)->mte_disabled,		\
++			"Disable Memory Tagging Extension"),		\
+ 	OPT_U64('\0', "kaslr-seed", &(cfg)->kaslr_seed,			\
+ 			"Specify random seed for Kernel Address Space "	\
+ 			"Layout Randomization (KASLR)"),
+diff --git a/arm/aarch64/kvm.c b/arm/aarch64/kvm.c
+index 56a0aedc263d..28d608d98831 100644
+--- a/arm/aarch64/kvm.c
++++ b/arm/aarch64/kvm.c
+@@ -81,3 +81,25 @@ int kvm__get_vm_type(struct kvm *kvm)
  
-@@ -1162,11 +1166,20 @@ struct kvm_irq_routing_hv_sint {
- 	__u32 sint;
- };
- 
-+struct kvm_irq_routing_xen_evtchn {
-+	__u32 port;
-+	__u32 vcpu;
-+	__u32 priority;
-+};
+ 	return KVM_VM_TYPE_ARM_IPA_SIZE(ipa_bits);
+ }
 +
-+#define KVM_IRQ_ROUTING_XEN_EVTCHN_PRIO_2LEVEL ((__u32)(-1))
++void kvm__arch_enable_mte(struct kvm *kvm)
++{
++	struct kvm_enable_cap cap = {
++		.cap = KVM_CAP_ARM_MTE,
++	};
 +
- /* gsi routing entry types */
- #define KVM_IRQ_ROUTING_IRQCHIP 1
- #define KVM_IRQ_ROUTING_MSI 2
- #define KVM_IRQ_ROUTING_S390_ADAPTER 3
- #define KVM_IRQ_ROUTING_HV_SINT 4
-+#define KVM_IRQ_ROUTING_XEN_EVTCHN 5
- 
- struct kvm_irq_routing_entry {
- 	__u32 gsi;
-@@ -1178,6 +1191,7 @@ struct kvm_irq_routing_entry {
- 		struct kvm_irq_routing_msi msi;
- 		struct kvm_irq_routing_s390_adapter adapter;
- 		struct kvm_irq_routing_hv_sint hv_sint;
-+		struct kvm_irq_routing_xen_evtchn xen_evtchn;
- 		__u32 pad[8];
- 	} u;
- };
-@@ -1208,6 +1222,7 @@ struct kvm_x86_mce {
- #define KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL	(1 << 1)
- #define KVM_XEN_HVM_CONFIG_SHARED_INFO		(1 << 2)
- #define KVM_XEN_HVM_CONFIG_RUNSTATE		(1 << 3)
-+#define KVM_XEN_HVM_CONFIG_EVTCHN_2LEVEL	(1 << 4)
- 
- struct kvm_xen_hvm_config {
- 	__u32 flags;
-@@ -2031,4 +2046,7 @@ struct kvm_stats_desc {
- 
- #define KVM_GET_STATS_FD  _IO(KVMIO,  0xce)
- 
-+/* Available with KVM_CAP_XSAVE2 */
-+#define KVM_GET_XSAVE2		  _IOR(KVMIO,  0xcf, struct kvm_xsave)
++	if (kvm->cfg.arch.mte_disabled) {
++		pr_debug("MTE disabled by user");
++		return;
++	}
 +
- #endif /* __LINUX_KVM_H */
-diff --git a/x86/include/asm/kvm.h b/x86/include/asm/kvm.h
-index 5a776a08f78c..bf6e96011dfe 100644
---- a/x86/include/asm/kvm.h
-+++ b/x86/include/asm/kvm.h
-@@ -373,9 +373,23 @@ struct kvm_debugregs {
- 	__u64 reserved[9];
- };
- 
--/* for KVM_CAP_XSAVE */
-+/* for KVM_CAP_XSAVE and KVM_CAP_XSAVE2 */
- struct kvm_xsave {
-+	/*
-+	 * KVM_GET_XSAVE2 and KVM_SET_XSAVE write and read as many bytes
-+	 * as are returned by KVM_CHECK_EXTENSION(KVM_CAP_XSAVE2)
-+	 * respectively, when invoked on the vm file descriptor.
-+	 *
-+	 * The size value returned by KVM_CHECK_EXTENSION(KVM_CAP_XSAVE2)
-+	 * will always be at least 4096. Currently, it is only greater
-+	 * than 4096 if a dynamic feature has been enabled with
-+	 * ``arch_prctl()``, but this may change in the future.
-+	 *
-+	 * The offsets of the state save areas in struct kvm_xsave follow
-+	 * the contents of CPUID leaf 0xD on the host.
-+	 */
- 	__u32 region[1024];
-+	__u32 extra[0];
- };
- 
- #define KVM_MAX_XCRS	16
-@@ -438,6 +452,9 @@ struct kvm_sync_regs {
- 
- #define KVM_STATE_VMX_PREEMPTION_TIMER_DEADLINE	0x00000001
- 
-+/* attributes for system fd (group 0) */
-+#define KVM_X86_XCOMP_GUEST_SUPP	0
++	if (!kvm__supports_extension(kvm, KVM_CAP_ARM_MTE)) {
++		pr_debug("MTE capability not available");
++		return;
++	}
 +
- struct kvm_vmx_nested_state_data {
- 	__u8 vmcs12[KVM_STATE_NESTED_VMX_VMCS_SIZE];
- 	__u8 shadow_vmcs12[KVM_STATE_NESTED_VMX_VMCS_SIZE];
++	if (ioctl(kvm->vm_fd, KVM_ENABLE_CAP, &cap))
++		die_perror("KVM_ENABLE_CAP(KVM_CAP_ARM_MTE)");
++
++	pr_debug("MTE capability enabled");
++}
+diff --git a/arm/include/arm-common/kvm-config-arch.h b/arm/include/arm-common/kvm-config-arch.h
+index 5734c46ab9e6..f2049994d859 100644
+--- a/arm/include/arm-common/kvm-config-arch.h
++++ b/arm/include/arm-common/kvm-config-arch.h
+@@ -9,6 +9,7 @@ struct kvm_config_arch {
+ 	bool		virtio_trans_pci;
+ 	bool		aarch32_guest;
+ 	bool		has_pmuv3;
++	bool		mte_disabled;
+ 	u64		kaslr_seed;
+ 	enum irqchip_type irqchip;
+ 	u64		fw_addr;
+diff --git a/arm/kvm.c b/arm/kvm.c
+index 80d233f13d0b..c5913000e1ed 100644
+--- a/arm/kvm.c
++++ b/arm/kvm.c
+@@ -86,6 +86,8 @@ void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64 ram_size)
+ 	/* Create the virtual GIC. */
+ 	if (gic__create(kvm, kvm->cfg.arch.irqchip))
+ 		die("Failed to create virtual GIC");
++
++	kvm__arch_enable_mte(kvm);
+ }
+ 
+ #define FDT_ALIGN	SZ_2M
 -- 
 2.35.1
 
