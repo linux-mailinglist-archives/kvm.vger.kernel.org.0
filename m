@@ -2,91 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 25DFF4EA3E1
-	for <lists+kvm@lfdr.de>; Tue, 29 Mar 2022 01:49:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 09B644EA3EA
+	for <lists+kvm@lfdr.de>; Tue, 29 Mar 2022 02:02:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230527AbiC1Xqe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Mar 2022 19:46:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43244 "EHLO
+        id S231202AbiC1X5H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Mar 2022 19:57:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49050 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230501AbiC1Xqc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Mar 2022 19:46:32 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B1551B79F;
-        Mon, 28 Mar 2022 16:44:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1648511091; x=1680047091;
-  h=message-id:date:mime-version:to:cc:references:from:
-   subject:in-reply-to:content-transfer-encoding;
-  bh=3jk71mGBq4jweO0Vzo+J+A884TrUY4CUV/3JBmqa96o=;
-  b=XA9wbtBBT3JoTkCdk04xzKLLQdSUrwxqzeBBqV950rsbrlzQN7l8n6Ka
-   DKzVi4fhaovr3TLF6IiyrO2sbg+DVfvm7MWvszQC29finEPyb8ZkNeRmh
-   lwSgbKKoe6ozM4oZuGOWV37MzyN9Xdw8eP8D1+r5tZkdJyF6a7tXsw+bN
-   7S4coHE4Adxr/lGC6+hSckUcwqq3YqgyDd0iSxdMhUO9yGH7WtQyV2cQX
-   5A2V1rJsgJuhp0iwwO5uR3O4iPBeUg+MDow+EJsV89Mno0JCdBTExJo+D
-   5jnwwCUqJyoY5SIgO5jP/Dx+eRLGEol9okx7hM/L3MzTRolvNYp8Sj7kJ
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10300"; a="246613670"
-X-IronPort-AV: E=Sophos;i="5.90,218,1643702400"; 
-   d="scan'208";a="246613670"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2022 16:44:50 -0700
-X-IronPort-AV: E=Sophos;i="5.90,218,1643702400"; 
-   d="scan'208";a="832670327"
-Received: from weiweihx-mobl.amr.corp.intel.com (HELO [10.255.229.113]) ([10.255.229.113])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2022 16:44:49 -0700
-Message-ID: <f0b7ecb0-a0f1-95f3-4594-bc19eab4d2f2@intel.com>
-Date:   Mon, 28 Mar 2022 16:44:50 -0700
+        with ESMTP id S231131AbiC1X5G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Mar 2022 19:57:06 -0400
+Received: from mail-oi1-x243.google.com (mail-oi1-x243.google.com [IPv6:2607:f8b0:4864:20::243])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A9E583B0B
+        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 16:55:23 -0700 (PDT)
+Received: by mail-oi1-x243.google.com with SMTP id i7so3302013oie.7
+        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 16:55:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:sender:from:date:message-id:subject:to;
+        bh=CNNPGySxSq7bZ1La6vvay1kp1T7RaMnfdFjrr49KhAk=;
+        b=OPWmxHBXrFgvGabY2GOHuxG9c+aQG16+AUQ7ckt+Y8GHTQTPAMprUXlshQuFEL5XBW
+         FKuNn9o6PngXfrFU704VlQKA8G5TKd6VpWKcZzviUjEKh0QslIOGxGpnJ3iWptAN3cet
+         ZyhVT+XkRs7hqYvepLSmMI24mHrM8GbiysN2WCQFID41Ix2a5y3AikSTXC+3N42hVBU4
+         d3dsJkAhSkrEPQq+rKl76jL95PjxNetgj1faqqFmmbIuP5/XN9/bJRwNhkw5sVXAGrZl
+         5hyQR6w2A+l2zacuU2iAlRLwWroz4uecBlUN7yFrryzJBDEUV72JqZp/KfCfoFUbb3YD
+         fevA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:sender:from:date:message-id:subject
+         :to;
+        bh=CNNPGySxSq7bZ1La6vvay1kp1T7RaMnfdFjrr49KhAk=;
+        b=obZESshBJ6CdUbuaVSMqdWVHzprlZ8dcYbBIA+N72pNAzWVZPtSK5kYrwQecN5dLRT
+         Mk7UONc2m63Ywyve3YJV3Pr4hrpng4FJFbcNayRf7T3TBSwS6bQeYS9VYMxSaDvuMiLj
+         0fUgidqo8vohUZXf0htBQf9FB+3Qa96XimPXg+FqDHAVx+Sr4chhJ/Vhw0/pw7TxUZV9
+         QtnDXxdzOYB6Br9HYe4YTH8YhBdljwv4sW6RPj3g+NEZCAJhR+dZ7EUNchyxMXzNKrCj
+         i2c/4vCFukUcY4sNX1y+cyJBIosh+jJPKVYLaQOiPJP0Zku/FIJYRsW+Jlhf45VlOW8G
+         B0qw==
+X-Gm-Message-State: AOAM533jVMcFxi99oNPCyk8ZXkW0fp11laqYy+L5paQqaPhLYFif0g+a
+        5AiXk79GEgugPHDgwE4Y9xk4LuFQkd6hoeEczbo=
+X-Google-Smtp-Source: ABdhPJwKAaLe9mXJ3bRTJDB3vM+iqkGaCqvOJGmnPpvI3ecKXYXu5wRh7Bv2f/UNnjy8Gt7BLlf7I2zmMsoYj1PBNq4=
+X-Received: by 2002:a05:6808:e8b:b0:2d9:d744:1eee with SMTP id
+ k11-20020a0568080e8b00b002d9d7441eeemr809444oil.129.1648511722942; Mon, 28
+ Mar 2022 16:55:22 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Content-Language: en-US
-To:     Kai Huang <kai.huang@intel.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        seanjc@google.com, pbonzini@redhat.com,
-        kirill.shutemov@linux.intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, peterz@infradead.org,
-        tony.luck@intel.com, ak@linux.intel.com, dan.j.williams@intel.com,
-        isaku.yamahata@intel.com
-References: <cover.1647167475.git.kai.huang@intel.com>
- <98c1010509aa412e7f05b12187cacf40451d5246.1647167475.git.kai.huang@intel.com>
- <20220324174301.GA1212881@ls.amr.corp.intel.com>
- <f211441a6d23321e22517684159e2c28c8492b86.camel@intel.com>
- <20220328202225.GA1525925@ls.amr.corp.intel.com>
- <60bf1aa7-b004-0ea7-7efc-37b4a1ea2461@intel.com>
- <9d8d20f62f82e052893fa32368d6a228a2140728.camel@intel.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-Subject: Re: [PATCH v2 09/21] x86/virt/tdx: Get information about TDX module
- and convertible memory
-In-Reply-To: <9d8d20f62f82e052893fa32368d6a228a2140728.camel@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+Sender: mrslila88haber@gmail.com
+Received: by 2002:a4a:e08f:0:0:0:0:0 with HTTP; Mon, 28 Mar 2022 16:55:22
+ -0700 (PDT)
+From:   "Dr. Nance Terry Lee" <nance173terry@gmail.com>
+Date:   Mon, 28 Mar 2022 23:55:22 +0000
+X-Google-Sender-Auth: HWLTq-QoVGfPHm9MMm4ApaEQKF0
+Message-ID: <CAODWenaCOBHLc-a6MXtK4gWs+Djn2bKC6UPe6UXPN61iB5ZUng@mail.gmail.com>
+Subject: Hello My Dear Friend
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: Yes, score=7.5 required=5.0 tests=BAYES_50,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,HK_SCAM,
+        LOTS_OF_MONEY,MONEY_FRAUD_5,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,UNDISC_MONEY autolearn=no autolearn_force=no
         version=3.4.6
+X-Spam-Report: * -0.0 RCVD_IN_DNSWL_NONE RBL: Sender listed at
+        *      https://www.dnswl.org/, no trust
+        *      [2607:f8b0:4864:20:0:0:0:243 listed in]
+        [list.dnswl.org]
+        *  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
+        *      [score: 0.5000]
+        * -0.0 SPF_PASS SPF: sender matches SPF record
+        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
+        *  0.0 FREEMAIL_FROM Sender email is commonly abused enduser mail
+        *      provider
+        *      [mrslila88haber[at]gmail.com]
+        * -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
+        *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
+        *       valid
+        * -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
+        *      envelope-from domain
+        * -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
+        *      author's domain
+        * -0.0 T_SCC_BODY_TEXT_LINE No description available.
+        *  0.8 HK_SCAM No description available.
+        *  0.0 LOTS_OF_MONEY Huge... sums of money
+        *  3.4 UNDISC_MONEY Undisclosed recipients + money/fraud signs
+        *  2.7 MONEY_FRAUD_5 Lots of money and many fraud phrases
+X-Spam-Level: *******
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/28/22 16:40, Kai Huang wrote:
-> Btw if you have time, could you help to review this series? Or could you take a
-> look at whether the overall design is OK, for instance, the design limitations
-> described in the cover letter?
+Hello My Dear Friend,
 
-Kai, it's on my list, but it's a long list.
+I am Dr. Nance Terry Lee, the United Nations Representative Washington
+-DC - USA.
+I hereby inform you that your UN pending compensation funds the sum of
+$4.2million has been approved to be released to you through Diplomatic
+Courier Service.
 
-If you want to help, there are at least two other *big* TDX patch sets
-out there that need eyeballs:
+In the light of the above, you are advised to send your full receiving
+information as below:
 
-> https://lore.kernel.org/all/20220318153048.51177-1-kirill.shutemov@linux.intel.com/
+1. Your full name
+2. Full receiving address
+3. Your mobile number
+4. Nearest airport
 
-and
+Upon the receipt of the above information, I will proceed with the
+delivery process of your compensation funds to your door step through
+our special agent, if you have any questions, don't hesitate to ask
+me.
 
-> https://lore.kernel.org/all/20220310140911.50924-1-chao.p.peng@linux.intel.com/
+Kindly revert back to this office immediately.
 
+Thanks.
+Dr. Nance Terry Lee.
+United Nations Representative
+Washington-DC USA.
+Tel: +1-703-9877 5463
+Fax: +1-703-9268 5422
