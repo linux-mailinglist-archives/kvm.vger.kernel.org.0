@@ -2,182 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 75BD54E9EAF
-	for <lists+kvm@lfdr.de>; Mon, 28 Mar 2022 20:07:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E2094E9E9A
+	for <lists+kvm@lfdr.de>; Mon, 28 Mar 2022 20:07:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244902AbiC1SEE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Mar 2022 14:04:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38878 "EHLO
+        id S242997AbiC1SGd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Mar 2022 14:06:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244903AbiC1SCw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Mar 2022 14:02:52 -0400
-Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23A074CD59
-        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 11:01:06 -0700 (PDT)
-Received: by mail-wr1-x432.google.com with SMTP id h23so21509249wrb.8
-        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 11:01:06 -0700 (PDT)
+        with ESMTP id S233683AbiC1SGa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Mar 2022 14:06:30 -0400
+Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6C2A4BFFC
+        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 11:04:48 -0700 (PDT)
+Received: by mail-pg1-x52e.google.com with SMTP id t4so9757051pgc.1
+        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 11:04:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=ytrSkwXUDSFcv9NwzDcZHJvhwX8Ip28tSIzF/72ZJ1Q=;
-        b=VcyTOLVPq+V1OSY1Zl84llZUOW1+DiM07S87IWjY6+20V2jBdQ1vm+S2GV9qIJPtqv
-         pLK4CJ9etgGbTHFOsHk97o/HxvnmIVI4mMk+EGHbRX6CJrIFhyvnSC6Rfimd+X/hl2uA
-         a6RBgH4fTtSovkIx/LH5QsjPzVnFtvX03n05rdHb2Niy7y93hqADUsfUaEgwWTWY0DGl
-         GeMqskNlS97LRMAsvI02JTysyyghYlfjb9mf6gG4HlbTYhYnGIBhn3XdBYfTYXBaOwsF
-         95L6ejUjlhIht89eN92IqbUGGnk20Xbj3EaFlV+lYxgRhw/js5pXwNxfvBz/LaSuxyZ9
-         fpdA==
+        bh=Ym/L1wBpDfLtNFYglb5eik8J+ZADs+Mxo8dMLHDIgV0=;
+        b=JWB0uri4NhVLpGuhzaP6omiJxFh+N6igYL2QbafBZatuK8GtgilikAUUQfcEkJl9wQ
+         2skQvDSUo+QMjRe4Vq0ipUufHfPSE2C2fzWmL/E7sMtpWPWJFR1FLOsBmdCm9HOHzXEt
+         yayMV6b+Awot34BckY+CuNWx864MNrfv4zC++1Mfxle2jUQHy4bUJTm97tdfZUR4A7dp
+         9QdBiZK0g7wZ32cr9l81iMisnMhxmxy006GUhGTI9rOJQ1/HcMxwFZZn6DDGsY9E85hG
+         P1FidWr4vXP/LzVnH7wc2TVdmAqGZvpuUuRA89S2j34ES3txBLDpPUa5NJrNlP5VLJfn
+         X5rA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=ytrSkwXUDSFcv9NwzDcZHJvhwX8Ip28tSIzF/72ZJ1Q=;
-        b=SkdzsfCH3YTo8ewM+mAdBWAXcJAPTxPqo0YzblJl9YaIoTWL7u5YhuLVmNBULMuJN2
-         ppO7EWQ/gGCpQjEQtDBkkkDiDy8NlGfV/08kB7iiXbQjswWFP8x0WYrtTm9WMRO/G/eb
-         jk7+lYAhL+GDp8oIahIvfY6GZ6j/igWVu0agONV5CjHxhLMcJ4hXQrIbvk2IBeUGkNdK
-         14+9grzKe+GKR2kT9IGVB1x3u/XDey8bNNi3aRtBEcJ+ZAoJIk7ic+oiLyoEi/ASHqsy
-         oVUFfkwlC54LWePP2y/PSOS7CtSAsMENQCm06zB4u3Tl2N1P4/A66avhyPDNL6asiUN0
-         1H5A==
-X-Gm-Message-State: AOAM532onzfASCBMoi2LwEVNfwmhfVWjqbl1lczoe6+SqHBU7Vc3f+ws
-        5tBcC432ov28ZSR5D+WtqamyTg==
-X-Google-Smtp-Source: ABdhPJz/DFJ+XVXhJNrPMlWXh7xu5l3qH4Q/QymhLpFp1U0q32kHVhkRByS9xkteULaLyJt8VbhF/w==
-X-Received: by 2002:adf:fac8:0:b0:203:fb08:ff7 with SMTP id a8-20020adffac8000000b00203fb080ff7mr24674238wrs.648.1648490463028;
-        Mon, 28 Mar 2022 11:01:03 -0700 (PDT)
-Received: from google.com ([2a00:79e0:d:210:2cfc:d300:5bbc:f8a0])
-        by smtp.gmail.com with ESMTPSA id bi20-20020a05600c3d9400b0038cfe80eeddsm142468wmb.29.2022.03.28.11.01.01
+        bh=Ym/L1wBpDfLtNFYglb5eik8J+ZADs+Mxo8dMLHDIgV0=;
+        b=kOCq47PcQXPiL1SQ+TgMDuz1FCxhDfzJcPGpqoSr/jPNmdstQQNkyRqxgjg65kWl/z
+         8LIzNlu30aL8A0s/kOCRaHzh5sqkaDlmZLAulR9hJ6N/CXXUo3n9vXJvRLe79xMIqTGC
+         QkvRW0j0GZpyDQoigwkLF8NjyWy783rQ4nC5qYPNgopjk5tEZlj4/c4HiEulktHR8aIo
+         QSMNeu5ruAtp7OqKVCMKCB7E0BLjca1qGY+sNdTjIXwmWlshoPJ54HZnGb+PqEfz9HKw
+         IC9nEClZ00nU5yuyNYpdf0eF4BBm54IDM62w9tpR1Jax3TCASm9Mvp6or6Q2whX+XIqp
+         vTtQ==
+X-Gm-Message-State: AOAM530jQNlDf2mQg9qfbP8aUblP2yY4aKsifbfjdQjtVjhRvPbbaxAy
+        ZosEclNWtHajw1oR59Ot9eBGoQ==
+X-Google-Smtp-Source: ABdhPJz6cmAET3X2l8oi9XiqgexGDczM4h6l+4EdHGvw31KNYFpDUf/5HHI7EuZ0lQttFGrQKlsXbg==
+X-Received: by 2002:a05:6a00:1496:b0:4fb:34a7:dcce with SMTP id v22-20020a056a00149600b004fb34a7dccemr11419180pfu.70.1648490687914;
+        Mon, 28 Mar 2022 11:04:47 -0700 (PDT)
+Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
+        by smtp.gmail.com with ESMTPSA id 21-20020a630115000000b00382a0895661sm13558768pgb.11.2022.03.28.11.04.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Mar 2022 11:01:02 -0700 (PDT)
-Date:   Mon, 28 Mar 2022 19:00:58 +0100
-From:   Quentin Perret <qperret@google.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+        Mon, 28 Mar 2022 11:04:46 -0700 (PDT)
+Date:   Mon, 28 Mar 2022 18:04:43 +0000
+From:   David Matlack <dmatlack@google.com>
+To:     Ben Gardon <bgardon@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, maz@kernel.org,
-        will@kernel.org
-Subject: Re: [PATCH v5 00/13] KVM: mm: fd-based approach for supporting KVM
- guest private memory
-Message-ID: <YkH32nx+YsJuUbmZ@google.com>
-References: <20220310140911.50924-1-chao.p.peng@linux.intel.com>
- <YjyS6A0o4JASQK+B@google.com>
- <YkHspg+YzOsbUaCf@google.com>
+        David Dunn <daviddunn@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Junaid Shahid <junaids@google.com>
+Subject: Re: [PATCH v2 6/9] KVM: x86/mmu: Factor out part of vmx_get_mt_mask
+ which does not depend on vcpu
+Message-ID: <YkH4u7O8uSNKl+eE@google.com>
+References: <20220321224358.1305530-1-bgardon@google.com>
+ <20220321224358.1305530-7-bgardon@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YkHspg+YzOsbUaCf@google.com>
+In-Reply-To: <20220321224358.1305530-7-bgardon@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Sean,
+On Mon, Mar 21, 2022 at 03:43:55PM -0700, Ben Gardon wrote:
+> Factor out the parts of vmx_get_mt_mask which do not depend on the vCPU
+> argument. This also requires adding some error reporting to the helper
+> function to say whether it was possible to generate the MT mask without
+> a vCPU argument. This refactoring will allow the MT mask to be computed
+> when noncoherent DMA is not enabled on a VM.
 
-Thanks for the reply, this helps a lot.
+We could probably make vmx_get_mt_mask() entirely independent of
+the kvm_vcpu, but it would take more work.
 
-On Monday 28 Mar 2022 at 17:13:10 (+0000), Sean Christopherson wrote:
-> On Thu, Mar 24, 2022, Quentin Perret wrote:
-> > For Protected KVM (and I suspect most other confidential computing
-> > solutions), guests have the ability to share some of their pages back
-> > with the host kernel using a dedicated hypercall. This is necessary
-> > for e.g. virtio communications, so these shared pages need to be mapped
-> > back into the VMM's address space. I'm a bit confused about how that
-> > would work with the approach proposed here. What is going to be the
-> > approach for TDX?
-> > 
-> > It feels like the most 'natural' thing would be to have a KVM exit
-> > reason describing which pages have been shared back by the guest, and to
-> > then allow the VMM to mmap those specific pages in response in the
-> > memfd. Is this something that has been discussed or considered?
+For MTRRs, the guest must update them on all CPUs at once (SDM 11.11.8)
+so we could just cache vCPU 0's MTRRs at the VM level and use that here.
+(From my experience, Intel CPUs implement MTRRs at the core level.
+Properly emulating that would require a different EPT table for every
+virtual core.)
+
+For CR0.CD, I'm not exactly sure what the semantics are for MP systems
+but I can't imagine it's valid for software to configure CR0.CD
+differently on different cores. I would have to scoure the SDM closely
+to confirm, but we could probably do something like cache
+max(CR0.CD for all vCPUs) at the VM level and use that to indicate if
+caching is disabled.
+
 > 
-> The proposed solution is to exit to userspace with a new exit reason, KVM_EXIT_MEMORY_ERROR,
-> when the guest makes the hypercall to request conversion[1].  The private fd itself
-> will never allow mapping memory into userspace, instead userspace will need to punch
-> a hole in the private fd backing store.  The absense of a valid mapping in the private
-> fd is how KVM detects that a pfn is "shared" (memslots without a private fd are always
-> shared)[2].
-
-Right. I'm still a bit confused about how the VMM is going to get the
-shared page mapped in its page-table. Once it has punched a hole into
-the private fd, how is it supposed to access the actual physical page
-that the guest shared? Is there an assumption somewhere that the VMM
-should have this page mapped in via an alias that it can legally access
-only once it has punched a hole at the corresponding offset in the
-private fd or something along those lines?
-
-> The key point is that KVM never decides to convert between shared and private, it's
-> always a userspace decision.  Like normal memslots, where userspace has full control
-> over what gfns are a valid, this gives userspace full control over whether a gfn is
-> shared or private at any given time.
-
-I'm understanding this as 'the VMM is allowed to punch holes in the
-private fd whenever it wants'. Is this correct? What happens if it does
-so for a page that a guest hasn't shared back?
-
-> Another important detail is that this approach means the kernel and KVM treat the
-> shared backing store and private backing store as independent, albeit related,
-> entities.  This is very deliberate as it makes it easier to reason about what is
-> and isn't allowed/required.  E.g. the kernel only needs to handle freeing private
-> memory, there is no special handling for conversion to shared because no such path
-> exists as far as host pfns are concerned.  And userspace doesn't need any new "rules"
-> for protecting itself against a malicious guest, e.g. userspace already needs to
-> ensure that it has a valid mapping prior to accessing guest memory (or be able to
-> handle any resulting signals).  A malicious guest can DoS itself by instructing
-> userspace to communicate over memory that is currently mapped private, but there
-> are no new novel attack vectors from the host's perspective as coercing the host
-> into accessing an invalid mapping after shared=>private conversion is just a variant
-> of a use-after-free.
-
-Interesting. I was (maybe incorrectly) assuming that it would be
-difficult to handle illegal host accesses w/ TDX. IOW, this would
-essentially crash the host. Is this remotely correct or did I get that
-wrong?
-
-> One potential conversions that's TBD (at least, I think it is, I haven't read through
-> this most recent version) is how to support populating guest private memory with
-> non-zero data, e.g. to allow in-place conversion of the initial guest firmware instead
-> of having to an extra memcpy().
-
-Right. FWIW, in the pKVM case we should be pretty immune to this I
-think. The initial firmware is loaded in guest memory by the hypervisor
-itself (the EL2 code in arm64 speak) as the first vCPU starts running.
-And that firmware can then use e.g. virtio to load the guest payload and
-measure/check it. IOW, we currently don't have expectations regarding
-the initial state of guest memory, but it might be handy to have support
-for pre-loading the payload in the future (should save a copy as you
-said).
-
-> [1] KVM will also exit to userspace with the same info on "implicit" conversions,
->     i.e. if the guest accesses the "wrong" GPA.  Neither SEV-SNP nor TDX mandate
->     explicit conversions in their guest<->host ABIs, so KVM has to support implicit
->     conversions :-/
+> No functional change intended.
 > 
-> [2] Ideally (IMO), KVM would require userspace to completely remove the private memslot,
->     but that's too slow due to use of SRCU in both KVM and userspace (QEMU at least uses
->     SRCU for memslot changes).
+> 
+> Signed-off-by: Ben Gardon <bgardon@google.com>
+> ---
+>  arch/x86/kvm/vmx/vmx.c | 24 +++++++++++++++++++-----
+>  1 file changed, 19 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index e8963f5af618..69c654567475 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -7149,9 +7149,26 @@ static int __init vmx_check_processor_compat(void)
+>  	return 0;
+>  }
+>  
+> +static bool vmx_try_get_mt_mask(struct kvm *kvm, gfn_t gfn,
+> +				bool is_mmio, u64 *mask)
+> +{
+> +	if (is_mmio) {
+> +		*mask =  MTRR_TYPE_UNCACHABLE << VMX_EPT_MT_EPTE_SHIFT;
+> +		return true;
+> +	}
+> +
+> +	if (!kvm_arch_has_noncoherent_dma(kvm)) {
+> +		*mask = (MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT) | VMX_EPT_IPAT_BIT;
+> +		return true;
+> +	}
+> +
+> +	return false;
+> +}
+> +
+>  static u64 vmx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
+>  {
+>  	u8 cache;
+> +	u64 mask;
+>  
+>  	/* We wanted to honor guest CD/MTRR/PAT, but doing so could result in
+>  	 * memory aliases with conflicting memory types and sometimes MCEs.
+> @@ -7171,11 +7188,8 @@ static u64 vmx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
+>  	 * EPT memory type is used to emulate guest CD/MTRR.
+>  	 */
+>  
+> -	if (is_mmio)
+> -		return MTRR_TYPE_UNCACHABLE << VMX_EPT_MT_EPTE_SHIFT;
+> -
+> -	if (!kvm_arch_has_noncoherent_dma(vcpu->kvm))
+> -		return (MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT) | VMX_EPT_IPAT_BIT;
+> +	if (vmx_try_get_mt_mask(vcpu->kvm, gfn, is_mmio, &mask))
+> +		return mask;
+>  
+>  	if (kvm_read_cr0(vcpu) & X86_CR0_CD) {
+>  		if (kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_CD_NW_CLEARED))
+> -- 
+> 2.35.1.894.gb6a874cedc-goog
+> 
