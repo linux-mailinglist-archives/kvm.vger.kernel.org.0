@@ -2,119 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5FF9B4E9ADB
-	for <lists+kvm@lfdr.de>; Mon, 28 Mar 2022 17:22:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F2A2F4E9D1C
+	for <lists+kvm@lfdr.de>; Mon, 28 Mar 2022 19:13:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235445AbiC1PX4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Mar 2022 11:23:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40860 "EHLO
+        id S244472AbiC1ROf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Mar 2022 13:14:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37738 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235034AbiC1PX4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Mar 2022 11:23:56 -0400
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F9BE36E2F
-        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 08:22:15 -0700 (PDT)
-Received: by mail-pl1-x629.google.com with SMTP id m18so10127653plx.3
-        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 08:22:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=y4jeTiPmh1/itpZ2SuVLZQIg9+4PUK2a47pmdNYYEis=;
-        b=L3pixW/Cy+d6kb+DaPDXJhFrNwxshMt65sz1EF/s5RgGdKGDS6g3aRLUqeTpR+o6cN
-         NQTYRsGi6TiDyHWh3X1cKu6gfV8RkX24XKesUMuUqdnVP37QBORRNKM3ONBe3BP/jG8v
-         Ritz/O+fzOW06bgdmIBc/WweczvT+/2m5trvzZddkpSl+G+Y3KrdMBRhv8WnCRlkJA/2
-         VApy6Zjufznsyj7u+eWW6qTrM/+ymbIWgvHIOGtJLxclgDH0DFCHy4M5Y1claAyUXfb9
-         rBGojNoUTT/aev1AkvpohsXSTyUvbFyNzYWxwUyt9Y7ybCOm93nQwbQV6kk/oAgHc7Q/
-         jlvw==
+        with ESMTP id S244465AbiC1ROe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Mar 2022 13:14:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 93BEA63BC8
+        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 10:12:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1648487571;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=WAtr0LP2USxNpnB9STkRM5vT/HSx8javxned67kz0BE=;
+        b=F7ljEjf9/F7+T10o02MkKDrzKWhG4t52h/R7Qmzqqbq58MORiTtlkE5MWQuz3LqAJHaGLK
+        L8JqFMqjD0EtT0ytb2DSEgw24La+6vnTagWOROWZbsvItTjknhcWqCUVT91fLTDDGvJZ9o
+        pMVf5sWxjSfBeP28OmjK4zFcxBsVuRg=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-39-nldWzhRpPwmf9KTCdU9YmA-1; Mon, 28 Mar 2022 13:12:50 -0400
+X-MC-Unique: nldWzhRpPwmf9KTCdU9YmA-1
+Received: by mail-ed1-f70.google.com with SMTP id l24-20020a056402231800b00410f19a3103so9313274eda.5
+        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 10:12:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=y4jeTiPmh1/itpZ2SuVLZQIg9+4PUK2a47pmdNYYEis=;
-        b=T+3A3gHQ1NXA0Uu0aXeXkWQVnilN/vVHXGuTdli2Hw7SFwfHVV1CORTui/WqUs2tGO
-         ShyjPC6ogLC8oOuyRNPAPoDZpP8DahNBVC+6B7jrYGeYD1Ys1KSI8bH1yhtsovMq8d2U
-         4TmQjLlIamtdaPavQ4pb+mxnnbCebFxOWa2mciX7FvJMUNgK22g0VahGGVqgv0hbnFaB
-         TyERpZ8ZbZqXNfi99Jqa+hu15+P2hz0Hf+vexJX/xAuNfky3vrowZ5ixIlHJviOkF/72
-         kfIuZDLbdErG3H920l3sof6XcY6+iwo2MhY8l6L+LaDVptRPJ4qw8vd406C/z/7yd0/R
-         TO0w==
-X-Gm-Message-State: AOAM5307KkY7fcfHflOkvzfN/4p/LOzk+l5hkYYeoZhbUqsJ5sur4jYM
-        CsBdhdpVZ2R3ZEGMUILZCpQCvA==
-X-Google-Smtp-Source: ABdhPJwh98Nt+R5Qe2Lc1Z3eIP/trP/h2ooEjxCKyasqXlNIxP5pG+KKoPRjwFbVUbqLxRe9Xm5kEw==
-X-Received: by 2002:a17:90b:4b0e:b0:1c6:f499:1cc9 with SMTP id lx14-20020a17090b4b0e00b001c6f4991cc9mr41573650pjb.133.1648480934928;
-        Mon, 28 Mar 2022 08:22:14 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id i67-20020a636d46000000b00398344a27cfsm4996038pgc.8.2022.03.28.08.22.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Mar 2022 08:22:14 -0700 (PDT)
-Date:   Mon, 28 Mar 2022 15:22:10 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        syzbot <syzbot+6bde52d89cfdf9f61425@syzkaller.appspotmail.com>,
-        david@redhat.com, frankja@linux.ibm.com, imbrenda@linux.ibm.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, will@kernel.org,
-        Linux-MM <linux-mm@kvack.org>,
-        Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [syzbot] WARNING in kvm_mmu_notifier_invalidate_range_start (2)
-Message-ID: <YkHSopxM7oGb1Nhc@google.com>
-References: <000000000000b6df0f05dab7e92c@google.com>
- <33b6fb1d-b35c-faab-4737-01427c48d09d@redhat.com>
- <6730ea89-8d85-bf30-28e5-01ca7ebdacea@oracle.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=WAtr0LP2USxNpnB9STkRM5vT/HSx8javxned67kz0BE=;
+        b=27rR3syycQw1lg3T6gbJB7jglpHY1CF+x8/s1OBAiYclDPWHHhogottaqx3QOrwUSL
+         7VlJqbpdTpfUi6ispYzgV3CdoaUx9wiVd093/cCcHJ9G4rmaW2vrRRMip6UZ9EC1BlJd
+         lvZbYaW63rA2oXFTVp7jQvJY0uh1kQy7eBT5GLeXqgj0iQDHGjD+elgpE0G+6ki1w0/x
+         lJgo4jB16PsDRZrAfhY/rJXresiuQMTgYvzUVBDEJ7nQcX2GFCgEO+Orgxz69QpcaR1E
+         l3DqKRfV6Ls4hDexX4Nj5QqPV4+8gWG2H5WlSLquECRoKDqsezkSP/pOpzNfGQteqyHy
+         kevA==
+X-Gm-Message-State: AOAM532yYub2+ZfKcUQVyZQYQZN2DkRauc9YMTgBzXERPZ5veNa6iB9q
+        /rqegOnejByvhZX0o1HMDgnrssxe/md+mRO2v1jHVKbUw9EeGNPUZ0yFdl+7i59G8SC3hrvnVFy
+        RGGPyCv3A3DPz
+X-Received: by 2002:a17:907:c16:b0:6db:682:c8c9 with SMTP id ga22-20020a1709070c1600b006db0682c8c9mr29907119ejc.153.1648487568874;
+        Mon, 28 Mar 2022 10:12:48 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzoABRhK5yZ0JW/SGZSVJLT8XCL03jsbsmzA/8MI2IhCq8xMboMQCemSCrwCjRMZtuStMQFiA==
+X-Received: by 2002:a17:907:c16:b0:6db:682:c8c9 with SMTP id ga22-20020a1709070c1600b006db0682c8c9mr29907090ejc.153.1648487568649;
+        Mon, 28 Mar 2022 10:12:48 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:8ca6:a836:a237:fed1? ([2001:b07:6468:f312:8ca6:a836:a237:fed1])
+        by smtp.googlemail.com with ESMTPSA id u26-20020a05640207da00b00419a14928e5sm5270689edy.28.2022.03.28.10.12.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 28 Mar 2022 10:12:47 -0700 (PDT)
+Message-ID: <bfe9a0ce-7f83-4264-e450-a53e4e08d785@redhat.com>
+Date:   Mon, 28 Mar 2022 19:12:45 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <6730ea89-8d85-bf30-28e5-01ca7ebdacea@oracle.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [PATCH v4 2/6] KVM: x86: nSVM: implement nested LBR
+ virtualization
+Content-Language: en-US
+To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
+Cc:     Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
+        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Jim Mattson <jmattson@google.com>, x86@kernel.org,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>
+References: <20220322174050.241850-1-mlevitsk@redhat.com>
+ <20220322174050.241850-3-mlevitsk@redhat.com>
+ <fca4a420-bdb4-0b46-c346-bee5500be43a@redhat.com>
+ <612b6524258b949e381efec12d85b4e82be53308.camel@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <612b6524258b949e381efec12d85b4e82be53308.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 21, 2022, Maciej S. Szmigiero wrote:
-> On 21.03.2022 12:01, Paolo Bonzini wrote:
-> > On 3/21/22 11:25, syzbot wrote:
-> > diff --git a/mm/mremap.c b/mm/mremap.c
-> > index 002eec83e91e..0e175aef536e 100644
-> > --- a/mm/mremap.c
-> > +++ b/mm/mremap.c
-> > @@ -486,6 +486,9 @@ unsigned long move_page_tables(struct vm_area_struct
-> >       pmd_t *old_pmd, *new_pmd;
-> >       pud_t *old_pud, *new_pud;
-> > 
-> > +    if (!len)
-> > +        return 0;
-> > +
-> >       old_end = old_addr + len;
-> >       flush_cache_range(vma, old_addr, old_end);
-> > 
-> > but there are several other ways to fix this elsewhere in the call chain:
-> > 
-> > - check for old_len == 0 somewhere in mremap_to
-> > 
-> > - skip the call in __mmu_notifier_invalidate_range_start and
-> >   __mmu_notifier_invalidate_range_end, if people agree not to play
-> >   whack-a-mole with the callers of mmu_notifier_invalidate_range_*.
-> > 
-> > - remove the warning in KVM
-> 
-> This probably depends whether it is actually legal to call MMU notifiers
-> with a zero range, the first time this warning triggered it was the caller
-> that was fixed [1].
-> 
-> By the way, the warning-on-zero-range was added during memslots patch set
-> review process [2], but I think it ultimately does make sense.
+On 3/27/22 17:12, Maxim Levitsky wrote:
+> - with LBR virtualization supported, the guest can set this msr to any value
+> as long as it doesn't set reserved bits and then read back the written value,
+> but it is not used by the CPU, unless LBR bit is set in MSR_IA32_DEBUGCTLMSR,
+> because only then LBR virtualization is enabled, which makes the CPU
+> load the guest value on VM entry.
+>   
+> This means that MSR_IA32_DEBUGCTLMSR.BTF will magically start working when
+> MSR_IA32_DEBUGCTLMSR.LBR is set as well, and will not work otherwise.
 
-My vote is to play whack-a-mole.  This particular flavor isn't all that interesting,
-but the HugeTLB bug was a genuine off-by-one error.  Given the low (so far) number
-of unique reports, IMO the benefits of detecting buggy callers outweighs the cost of
-having to fix/address benign paths where userspace is doing something silly.
+That can be fixed by context-switching DEBUGCTLMSR by hand when LBR=0 && 
+BTF=1.  Would you like to give it a shot?
+
+Paolo
+
