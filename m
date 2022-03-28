@@ -2,229 +2,410 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 240D74E95C5
-	for <lists+kvm@lfdr.de>; Mon, 28 Mar 2022 13:53:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AAC244E95F6
+	for <lists+kvm@lfdr.de>; Mon, 28 Mar 2022 13:57:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234500AbiC1LzH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Mar 2022 07:55:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52706 "EHLO
+        id S241999AbiC1L7J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Mar 2022 07:59:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42490 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241960AbiC1Lyp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Mar 2022 07:54:45 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3A8D21E0A;
-        Mon, 28 Mar 2022 04:47:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1648468067; x=1680004067;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=sdjQJv75sK1aGz4Vc27aHfqAEkvxMFvqr6XfGzcGD/Q=;
-  b=azBZEeWNc8XB/Q1NeNNEpoSU1gW1Tn7W1U9q0ufKLwDmr1l1OfBPJb5x
-   2TzIxgq0EeJ652+Jfxxv4nPNzpz5tsHCRn3ZlTnmCAQr4Q0SlaLSS4LJb
-   6yCNUzPizgaobBf86ItBdXg4hpJ82du6G4Vvr6s9eYtJBOcjwfEniQWwV
-   Bp+R/jZ0+oQULp3gCPjSKdRR7IChfMkkdYkkKLnWKUeoohD9o61YWut/6
-   QHbtTjAIQX4fNTec3s7TggM/NjjYoY7WdT8zfcaTI1MeRuafmd1Af2OlK
-   mMGoXsINpJktAKRu+p+EOfK+keYTBbhRiDAkwAJdh09KwAa3JM4d4HJaA
-   g==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10299"; a="238910928"
-X-IronPort-AV: E=Sophos;i="5.90,217,1643702400"; 
-   d="scan'208";a="238910928"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2022 04:47:47 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.90,217,1643702400"; 
-   d="scan'208";a="553883561"
-Received: from orsmsx604.amr.corp.intel.com ([10.22.229.17])
-  by fmsmga007.fm.intel.com with ESMTP; 28 Mar 2022 04:47:47 -0700
-Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
- ORSMSX604.amr.corp.intel.com (10.22.229.17) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.27; Mon, 28 Mar 2022 04:47:46 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.27 via Frontend Transport; Mon, 28 Mar 2022 04:47:46 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.102)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2308.21; Mon, 28 Mar 2022 04:47:46 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lYvP5Nx5Q1QUj3KEj9H+l197NdumNRGmJQLFcYObqzyIMA1c4gRdyUWU9RjPktH2UFbbPZiBGctHE7zom8CopHDDpMqi1+mpwVK+MjW1sCAaFtaGiZ8+kTXAPNPirHhKcoxwxjXL6u9plwfWnqfuJk0tyXnJWTj1hAMc0CZHq+qGHRt8qFV0jP/p9p9aEFaliHXddobBPokdbWFUyz+MZeUiikV0GcPXYdrex1F5avxeGc4nkoK+iVeh5m3ZoElMSPnmbZb8OTA1UuU6UIxDbd1ai8P+fa/A1M3jFqKr2AYB1n3QXBFImfi5xnDaBN9ZRM8LfLA6wiHO/yT+/MddtQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=sdjQJv75sK1aGz4Vc27aHfqAEkvxMFvqr6XfGzcGD/Q=;
- b=h61lu8TqVZpWfwWv4nkplcihkKelLOBr03yIqbZdf/A1x6d5kawMQJ2OfODvOWPDP4bWnrvZZPZuBWn3eiOgSZYxTCxziemcaOiGLnuIWB091ny2cbNZR7Ot4zKMJA+wVMM9H0zoZxH5cMKg2Qv/WapP9//z58TZ8bI+qaZ/QPPea6S6TfW9V0/2xnsKDReIHUFSv/CuhvcQGEwfBSLVoHMkEmPB6w7qSlhjH8ZIeuQv5WV1b4ffx5CdxE1kssOGx1T9HgWn3UCyi7QmsnfDrRKyc6HQrq3e77rEY9SSxe3yjgrdBUBwV1YAcXZItCfAcRvhgrOAENRcVIQPGtLNwQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by DM6PR11MB3292.namprd11.prod.outlook.com (2603:10b6:5:5a::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5102.22; Mon, 28 Mar
- 2022 11:47:43 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::4df7:2fc6:c7cf:ffa0]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::4df7:2fc6:c7cf:ffa0%4]) with mapi id 15.20.5102.023; Mon, 28 Mar 2022
- 11:47:43 +0000
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     "Huang, Kai" <kai.huang@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Gleixner, Thomas" <thomas.gleixner@intel.com>
-CC:     "Hansen, Dave" <dave.hansen@intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>
-Subject: RE: [PATCH v2 04/21] x86/virt/tdx: Add skeleton for detecting and
- initializing TDX on demand
-Thread-Topic: [PATCH v2 04/21] x86/virt/tdx: Add skeleton for detecting and
- initializing TDX on demand
-Thread-Index: AQHYNsgzm2oe8d+tekOJ9ppfgUsWm6zMfiBAgAeiz4CAAGozsIAAEnGAgAAOOPA=
-Date:   Mon, 28 Mar 2022 11:47:42 +0000
-Message-ID: <BN9PR11MB52761E8DE55DC8872EC093758C1D9@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <cover.1647167475.git.kai.huang@intel.com>
-         <279af00f90a93491d5ec86672506146153909e5c.1647167475.git.kai.huang@intel.com>
-         <BL1PR11MB52713CA82D52248B0905C91D8C189@BL1PR11MB5271.namprd11.prod.outlook.com>
-         <a68b378a40310c38f731f4bc7f0a9cc0d89efe92.camel@intel.com>
-         <BN9PR11MB52760B743E208684A098B61C8C1D9@BN9PR11MB5276.namprd11.prod.outlook.com>
- <b4d97c46c52dbbecc6061f743b172015a73ec189.camel@intel.com>
-In-Reply-To: <b4d97c46c52dbbecc6061f743b172015a73ec189.camel@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-version: 11.6.401.20
-dlp-product: dlpe-windows
-dlp-reaction: no-action
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 3e9cd2a6-8f4c-4bdb-df0d-08da10b0c4ea
-x-ms-traffictypediagnostic: DM6PR11MB3292:EE_
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr,ExtFwd
-x-microsoft-antispam-prvs: <DM6PR11MB329222956E1B27128557B8A78C1D9@DM6PR11MB3292.namprd11.prod.outlook.com>
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 6su9WnWjTs98erWaDQ/W9s+g94TGnyIFYLmtx+w2/15hhtdVRmzcW/KPJjgpMUlUMCAVJDi8ac7d9aC+K86T8iGhKZ9J/F22pw1FnzkmAqgzbhnWd0qyN1CUWzTmuSGjTfr0JgTmIId2Pu681alSHmNTxVgQzfEWKDeRh1LMShikFv5R4YZnz1E+3r8+HuoRGHyIsqHoaILfEl9DoU642qi6U8IHGHi1jG3Bb3U2Sfn3T6mKOBIlo5oFpkn04IzZCj0+0Lf5o+Ut1V9A2LNM8pdEWByw3PoaSQbkDvISkinidh0FkezqM4eKODAFlAV2dqSjVwLMiwYCrawVVhR/f2uE08R2BO1SLq+ALBVkYqjjs3XQfhGgcHkHLPRvMKy0ZIwlWF2GKLKonoKiJdRPwGfAB9XWwAgxYqRuHcCjHhO0/T7MXjI7cBZRkYA/Y2Wbp3Yd38gTGEysYRGhfZkrDPJYUHV8d05i3gP1GkO27atO0gsRUfXK2Xwfq0EELluj2v7lVo8kTIjLNTF7Nncp2yBCZhC5froloAZIu4200AUHqWHJYItD4Egmv03VY9ouSA1rsZxI7UimD7jVFxL7rLW/D6JzSp1zUJ2eXUOI6Dpj1mfKLUcc91LONgqCqHtvp4+iFmMVp3sinbOLWsEB/+KRZ5nnLuqULmn/XvqEOAvQNTxTi6PaprLeZ6O8QWFLfrT/HbpGHSZ78HZHUdceQA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(54906003)(186003)(38070700005)(316002)(5660300002)(110136005)(26005)(122000001)(83380400001)(38100700002)(6636002)(508600001)(33656002)(66476007)(66446008)(8676002)(76116006)(71200400001)(66556008)(82960400001)(7696005)(2906002)(64756008)(55016003)(6506007)(8936002)(66946007)(52536014)(4326008)(86362001)(9686003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?NHhveitiN3pLTGNMNUhoRWlMRFYvU3hLRDZVMkhGK1VzbnBkTElDdjFkbHRN?=
- =?utf-8?B?OXQ4ejMzVlR4aFI3T1VDUytjejR1TE9OeVBybWxWNG9aMG1yRWlON2Z5c1B6?=
- =?utf-8?B?SEpiSTVFS3lTanZuc2Q1cGtRV2VFUUsySnZoTzRkQmplSjNKSHMyUTZzYUVi?=
- =?utf-8?B?WWNRd0lQM2NNQjJOWkdzRnFHSVhUTFJadTFXUmlXVXQxeEUxbHF1U1ZHR2Yr?=
- =?utf-8?B?UjROVkxSbzRCT0Y2azhXcmxORFhoR2R0OWJTbmQ0c3J6a2VaWWdWUkpYTkpm?=
- =?utf-8?B?Y0tHR3BWNGNCdUIxRnhlNDJBb3oxUUFWc1dXVkc5ZVpNUE9nbjd1WkJXUmM0?=
- =?utf-8?B?RnpsZXVmaW93L1FrYUNQemZZR3BFOGtsR3YrOFI0eDRYNThUUnNnV0tCYzAr?=
- =?utf-8?B?RDM0V1FrS0hVZjBCQ21jMmVBbzNlYis1UGdTY2l1NVFnSDFaS1U5YVNYa0Er?=
- =?utf-8?B?dGR2Z01KeVpkK24zblJOQ202SHpiOEhJQko1MlVmZnd6SEtwZlFLR3pta2VN?=
- =?utf-8?B?bXltRlM2YnQvNEJvd2JKc1RtUVVFZ2c2LzFwRmJVdUpCbHRNcFF5QW5nT240?=
- =?utf-8?B?ZEliYkhUZ3A1MDlmK3BiRk9QcG4xcDFXSUJvRTRIV2dlbldxemtWMWZ4UU1I?=
- =?utf-8?B?Q0haVW1NMGVOU0ZVWHhrY24xWmVPbk1lR0RQVm5sRXFvMExzeDhYak9VM1J4?=
- =?utf-8?B?VTlvbk9veEdDelIwdTZ0eWk3Qk9XWElUT2VLekxzREVTRTU2cmE0OTJmOWZv?=
- =?utf-8?B?M056dFNKaC9zekI5QlB0bjFqK1NkQlpiYy9qWlQ4amdzblBtVGFDOHZKVGwz?=
- =?utf-8?B?Q0N1SWZoeVpoQlZwNUpyQmZkaW1STWJZUWxtTGhuaGVDUHFnN0FNSjlmdEZa?=
- =?utf-8?B?RnRRcVNOUlRiaXJjZXJnWjZGUnZKd1hpZXhjWnQ4RGtKeEFwaGV0UVRyTTBU?=
- =?utf-8?B?Z21yaVVBRmU5RHBLbmNBcE0yQ3B3KzJ6djhXQU5oQU1oWnhPZWxlcHhCL0Ry?=
- =?utf-8?B?M2RPUU9qaEF2dnlVUzRFcWdEc0RZZzlTbVpFclI4bXJneElCcEN0WTl3VG5o?=
- =?utf-8?B?MFhvZWZ6bFFkcGtsbnNGSy84dnJ4QzBucTFlanl2aFFVdk8xVkxiTE5mcmpV?=
- =?utf-8?B?SUt6TWd3cytRNWREcVlVV3NOQnVzamxWa0g1cTFMZ0I0SVl2VEZxdytyVis2?=
- =?utf-8?B?NHQ5VzZFK056TlFLS0lueDNHc1pUckpDRmJyZ2FlbFN6dzlTRStiVEVvK1NH?=
- =?utf-8?B?eDRnejVtZUZoYWpGWWVmZFZ6STJCNUJCK2VYV2tobzdsNVMyZjVReUc2Vm1F?=
- =?utf-8?B?RG8raWg0N3daQ0t5ZXZSRFhZRmNMdVBuZmVnek9pZFlmS0poc3hxS09qOUpD?=
- =?utf-8?B?dkxZRDMrempBU3NJaXpuL2VYUEE2VVNKbGdzeFZEZ0V3cW9ySEFjRUZuWUV1?=
- =?utf-8?B?TVRWb2JsRFlrQ3Z5WjJsakU5YUhJL0UyY1o2Mk5PRnF6K05qRkxveEc4YUVw?=
- =?utf-8?B?RUZOUWlDVVFJbWxld0pRczlNeXZPZmJKOWYrZ2luYWw2RjFIdWQ1ZmR5bmNV?=
- =?utf-8?B?QU1PWi91NVBHeFRwTTBYWWVwaGpMbDltaHZjOURrbEN1ZkNuUlM2WFJQNkN6?=
- =?utf-8?B?RWxGZ0NsSXpSV2UwTkU4QTBKc3lIOXAzMDVnUDlRZWM1MGllV2VlVnZkYWZh?=
- =?utf-8?B?K0t3UzQxSFZ4VllXVCtXWjVOVGx4MGRTcUJpVUNEYjN6bFBtUzFkZVhQcVRW?=
- =?utf-8?B?YWYwaXBFK0k3cSszQ21ScXdZTCtUK3QzNXY2bUg2Y0ljQzhxd3VpSlFrL1Az?=
- =?utf-8?B?NGlvYTN4VndkUnd5a1VQdzFCaC9WTTRMWWZkOFF4SUpzSGJPcityRCttNy9D?=
- =?utf-8?B?MUU1dzJSL1lacEthb3ZWRHg4YzJ3VVp6cTFTT282Y3FXRzhESks2VllERFJL?=
- =?utf-8?B?T0tSSDltLzNicWF3R3Y3U2VpOC9mWUYrYjUwN0Zad1kzNGw3LzlwZ09UdFpL?=
- =?utf-8?B?ckFzK2JsMHlXRWgrN1docGJoaXZnMGljNHhZTmN3Z095SnVaTm00d3Q4WnRB?=
- =?utf-8?B?a0gwTitDM1NVZk1YZDcxRUU5RHVSY1BaTGEvM1o4Q1lqUEZ5VTZiMkh1S0NP?=
- =?utf-8?B?VllmSFpKZmdqcG5GNnB6eGhKSFRBdG96Z3duWUx5T2JNUjdaYUpFdHZIYyti?=
- =?utf-8?B?U3ROVkFMNlhLcXBNQjE5TE9SZUF3dVQzTEExMHhoMTRqaWhaTVZxbStKS3JW?=
- =?utf-8?B?dkRvUHR0dlhDekQvV1VTd29rVlBTUWhTKzBlUUcvZGFtR1pUMmg2alNGQU9J?=
- =?utf-8?B?bTkxdDRhU3hqS0l6WjdmUFU0VTkyaTBQY1ArOEsxQ2RtWlNSdnZkQT09?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        with ESMTP id S242149AbiC1L5p (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Mar 2022 07:57:45 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 597EC3CA76;
+        Mon, 28 Mar 2022 04:54:36 -0700 (PDT)
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22SBjZhX027084;
+        Mon, 28 Mar 2022 11:54:36 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : to : cc : references : from : subject : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=ze2J/ENhugHCcmF12duJDc7SMNLGo2VEJG0SOjFA7cM=;
+ b=HOsezpx2HGdK2L4PIOy4hZ9B6vNKj9yGJ+zdh3rsQo4jgMqYt9XtU/RDIYuBKYlNFGq8
+ 2HgY6jxXb+CefXc+vsKr7NyBsr+r8iJyXE8aIkYYXEPoBuf7HzaJCTGq8MmrXBGT9o4q
+ nBYU8iUMvf9ob/v1Zzwt7JgX4+ije4Fbka+idJMnMb1JnvWkhTDGCJ0o+alMSCrMidiN
+ OrUTZ8RhTCiOw06u6gXZyVHhsHLo/+Im3aYdUnZVqEY6/34XUwqe7+2qzclpwCPOFc5R
+ 1jAnpPz9ziJpX+iIUVPhgxpP1MnoTrlmw1OIgi5FK9dVEWfs/+AueBnMXTEmTNR8UVLS tQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3f3ce605aj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 28 Mar 2022 11:54:35 +0000
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22SBjXo2026911;
+        Mon, 28 Mar 2022 11:54:35 GMT
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3f3ce6059w-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 28 Mar 2022 11:54:35 +0000
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22SBrQwi019932;
+        Mon, 28 Mar 2022 11:54:33 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma06fra.de.ibm.com with ESMTP id 3f1t3hua7e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 28 Mar 2022 11:54:32 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22SBsTAX42205554
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 28 Mar 2022 11:54:29 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A3D6EAE053;
+        Mon, 28 Mar 2022 11:54:29 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 396F1AE04D;
+        Mon, 28 Mar 2022 11:54:29 +0000 (GMT)
+Received: from [9.145.52.48] (unknown [9.145.52.48])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 28 Mar 2022 11:54:29 +0000 (GMT)
+Message-ID: <2fafa98b-e342-047a-3a94-cf4111bc7198@linux.ibm.com>
+Date:   Mon, 28 Mar 2022 13:54:28 +0200
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3e9cd2a6-8f4c-4bdb-df0d-08da10b0c4ea
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Mar 2022 11:47:42.8941
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: anY+2ZGijjkXfg42fDyCEJoW7b9csdUk9a5s+YRMg7PwQOl+omwhToHE38xEvX/Z+9LlIlQFzepSceX1X8lklA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB3292
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Content-Language: en-US
+To:     Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Cc:     imbrenda@linux.ibm.com, thuth@redhat.com, david@redhat.com,
+        farman@linux.ibm.com
+References: <20220328093048.869830-1-nrb@linux.ibm.com>
+ <20220328093048.869830-3-nrb@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH 2/2] s390x: add test for SIGP STORE_ADTL_STATUS order
+In-Reply-To: <20220328093048.869830-3-nrb@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 9lE1M1ykl3704IxeysEg9RCa-JqUide0
+X-Proofpoint-ORIG-GUID: R33KznhnNdhFEEHrwfzkbgV55p2E_4rP
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-03-28_04,2022-03-28_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=999
+ bulkscore=0 clxscore=1015 lowpriorityscore=0 suspectscore=0
+ priorityscore=1501 impostorscore=0 mlxscore=0 spamscore=0 phishscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2203280066
+X-Spam-Status: No, score=-3.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiBGcm9tOiBIdWFuZywgS2FpIDxrYWkuaHVhbmdAaW50ZWwuY29tPg0KPiBTZW50OiBNb25kYXks
-IE1hcmNoIDI4LCAyMDIyIDU6MjQgUE0NCj4gPg0KPiA+IGNwdV9wcmVzZW50X21hc2sgZG9lcyBu
-b3QgYWx3YXlzIHJlcHJlc2VudCBCSU9TLWVuYWJsZWQgQ1BVcyBkdWUNCj4gPiB0byB0aG9zZSBi
-b290IG9wdGlvbnMuIFRoZW4gd2h5IGRvIHdlIGNhcmUgd2hldGhlciBDUFVzIGluIHRoaXMgbWFz
-aw0KPiA+IChpZiBvbmx5IHJlcHJlc2VudGluZyBhIHN1YnNldCBvZiBCSU9TLWVuYWJsZWQgQ1BV
-cykgYXJlIGF0IGxlYXN0IGJyb3VnaHQNCj4gPiB1cCBvbmNlPyBJdCB3aWxsIGZhaWwgYXQgVERI
-LlNZUy5DT05GSUcgYW55d2F5Lg0KPiANCj4gQXMgSSBzYWlkLCB0aGlzIGlzIHVzZWQgdG8gbWFr
-ZSBzdXJlIFNFQU1SUiBoYXMgYmVlbiBkZXRlY3RlZCBvbiBhbGwgY3B1cywgc28NCj4gdGhhdCBh
-bnkgQklPUyBtaXNjb25maWd1cmF0aW9uIG9uIFNFQU1SUiBoYXMgYmVlbiBkZXRlY3RlZC4gIE90
-aGVyd2lzZSwNCj4gc2VhbXJyX2VuYWJsZWQoKSBtYXkgbm90IGJlIHJlbGlhYmxlICh0aGVvcmV0
-aWNhbGx5KS4NCg0KKmFsbCBjcHVzKiBpcyBxdWVzdGlvbmFibGUuIA0KDQpTYXkgQklPUyBlbmFi
-bGVkIDggQ1BVczogWzAgLSA3XQ0KDQpjcHVfcHJlc2VudF9tYXAgY292ZXJzIFswIC0gNV0sIGR1
-ZSB0byBucl9jcHVzPTYNCg0KWW91IGNvbXBhcmVkIGNwdXNfYm9vdGVkX29uY2VfbWFzayB0byBj
-cHVfcHJlc2VudF9tYXNrIHNvIGlmIG1heGNwdXMNCmlzIHNldCB0byBhIG51bWJlciA8IG5yX2Nw
-dXMgU0VBTVJSIGlzIGNvbnNpZGVyZWQgZGlzYWJsZWQgYmVjYXVzZSB5b3UNCmNhbm5vdCB2ZXJp
-ZnkgQ1BVcyBiZXR3ZWVuIFttYXhfY3B1cywgbnJfY3B1cykuIElmIGZvbGxvd2luZyB0aGUgc2Ft
-ZQ0KcmF0aW9uYWxlIHRoZW4geW91IGFsc28gbmVlZCBhIHByb3BlciB3YXkgdG8gZGV0ZWN0IHRo
-ZSBjYXNlIHdoZXJlIG5yX2NwdXMNCjwgQklPUyBlbmFibGVkIG51bWJlciBpLmUuIHdoZW4geW91
-IGNhbm5vdCB2ZXJpZnkgU0VBTVJSIG9uIENQVXMNCmJldHdlZW4gW25yX2NwdXMsIDddLiBvdGhl
-cndpc2UgdGhpcyBjaGVjayBpcyBqdXN0IGluY29tcGxldGUuDQoNCkJ1dCB0aGUgZW50aXJlIGNo
-ZWNrIGlzIGFjdHVhbGx5IHVubmVjZXNzYXJ5LiBZb3UganVzdCBuZWVkIHRvIHZlcmlmeSBTRUFN
-UlINCmFuZCBkbyBURFggY3B1IGluaXQgb24gb25saW5lIENQVXMuIEFueSBnYXAgYmV0d2VlbiBv
-bmxpbmUgb25lcyBhbmQgQklPUw0KZW5hYmxlZCBvbmVzIHdpbGwgYmUgY2F1Z2h0IGJ5IHRoZSBU
-RFggbW9kdWxlIGF0IFRESC5TWVMuQ09ORklHIHBvaW50Lg0KDQo+IA0KPiBBbHRlcm5hdGl2ZWx5
-LCBJIHRoaW5rIHdlIGNhbiBhbHNvIGFkZCBjaGVjayB0byBkaXNhYmxlIFREWCB3aGVuICdtYXhj
-cHVzJw0KPiBoYXMNCj4gYmVlbiBzcGVjaWZpZWQsIGJ1dCBJIHRoaW5rIHRoZSBjdXJyZW50IHdh
-eSBpcyBiZXR0ZXIuDQo+IA0KPiA+DQo+ID4gYnR3IHlvdXIgY29tbWVudCBzYWlkIHRoYXQgJ21h
-eGNwdXMnIGlzIGJhc2ljYWxseSBhbiBpbnZhbGlkIG1vZGUNCj4gPiBkdWUgdG8gTUNFIGJyb2Fk
-Y2FzZSBwcm9ibGVtLiBJIGRpZG4ndCBmaW5kIGFueSBjb2RlIHRvIGJsb2NrIGl0IHdoZW4NCj4g
-PiBNQ0UgaXMgZW5hYmxlZCwNCj4gDQo+IFBsZWFzZSBzZWUgYmVsb3cgY29tbWVudCBpbiBjcHVf
-c210X2FsbG93ZWQoKToNCj4gDQo+IHN0YXRpYyBpbmxpbmUgYm9vbCBjcHVfc210X2FsbG93ZWQo
-dW5zaWduZWQgaW50IGNwdSkNCj4gew0KPiAJLi4uDQo+ICAgICAgICAgLyoNCj4gICAgICAgICAg
-KiBPbiB4ODYgaXQncyByZXF1aXJlZCB0byBib290IGFsbCBsb2dpY2FsIENQVXMgYXQgbGVhc3Qg
-b25jZSBzbw0KPiAgICAgICAgICAqIHRoYXQgdGhlIGluaXQgY29kZSBjYW4gZ2V0IGEgY2hhbmNl
-IHRvIHNldCBDUjQuTUNFIG9uIGVhY2gNCj4gICAgICAgICAgKiBDUFUuIE90aGVyd2lzZSwgYSBi
-cm9hZGNhc3RlZCBNQ0Ugb2JzZXJ2aW5nIENSNC5NQ0U9MGIgb24gYW55DQo+ICAgICAgICAgICog
-Y29yZSB3aWxsIHNodXRkb3duIHRoZSBtYWNoaW5lLg0KPiAgICAgICAgICAqLw0KPiAJIHJldHVy
-biAhY3B1bWFza190ZXN0X2NwdShjcHUsICZjcHVzX2Jvb3RlZF9vbmNlX21hc2spOw0KPiB9DQoN
-Ckkgc2F3IHRoYXQgY29kZS4gTXkgcG9pbnQgaXMgbW9yZSBhYm91dCB5b3VyIHN0YXRlbWVudCB0
-aGF0IG1heGNwdXMNCmlzIGFsbW9zdCBpbnZhbGlkIGR1ZSB0byBhYm92ZSBzaXR1YXRpb24gdGhl
-biB3aHkgZGlkbid0IHdlIGRvIGFueXRoaW5nDQp0byBkb2N1bWVudCBzdWNoIHJlc3RyaWN0aW9u
-IG9yIHRocm93IG91dCBhIHdhcm5pbmcgd2hlbiBpdCdzDQptaXNjb25maWd1cmVkLi4uDQoNCj4g
-DQo+ID4gdGh1cyB3b25kZXIgdGhlIHJhdGlvbmFsZSBiZWhpbmQgYW5kIHdoZXRoZXIgdGhhdA0K
-PiA+IHJhdGlvbmFsZSBjYW4gYmUgYnJvdWdodCB0byB0aGlzIHNlcmllcyAoaS5lLiBubyBjaGVj
-ayBhZ2FpbnN0IHRob3NlDQo+ID4gY29uZmxpY3RpbmcgYm9vdCBvcHRpb25zIGFuZCBqdXN0IGxl
-dCBTRUFNQ0FMTCBpdHNlbGYgdG8gZGV0ZWN0IGFuZCBmYWlsKS4NCj4gPg0KPiA+IEBUaG9tYXMs
-IGFueSBndWlkYW5jZSBoZXJlPw0KPiA+DQo+ID4gVGhhbmtzDQo+ID4gS2V2aW4NCg0K
+On 3/28/22 11:30, Nico Boehr wrote:
+> Add a test for SIGP STORE_ADDITIONAL_STATUS order.
+> 
+> There are several cases to cover:
+> - when neither vector nor guarded-storage facility is available, check
+>    the order is rejected.
+> - when one of the facilities is there, test the order is rejected and
+>    adtl_status is not touched when the target CPU is running or when an
+>    invalid CPU address is specified. Also check the order is rejected
+>    in case of invalid alignment.
+> - when the vector facility is there, write some data to the CPU's
+>    vector registers and check we get the right contents.
+> - when the guarded-storage facility is there, populate the CPU's
+>    guarded-storage registers with some data and again check we get the
+>    right contents.
+> 
+> To make sure we cover all these cases, adjust unittests.cfg to run the
+> test with both guarded-storage and vector facility off and on. In TCG, we don't
+> have guarded-storage support, so we just run with vector facility off and on.
+> 
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+> ---
+>   s390x/Makefile      |   1 +
+>   s390x/adtl_status.c | 407 ++++++++++++++++++++++++++++++++++++++++++++
+>   s390x/unittests.cfg |  25 +++
+>   3 files changed, 433 insertions(+)
+>   create mode 100644 s390x/adtl_status.c
+> 
+> diff --git a/s390x/Makefile b/s390x/Makefile
+> index 53b0fe044fe7..47e915fbdc51 100644
+> --- a/s390x/Makefile
+> +++ b/s390x/Makefile
+> @@ -26,6 +26,7 @@ tests += $(TEST_DIR)/edat.elf
+>   tests += $(TEST_DIR)/mvpg-sie.elf
+>   tests += $(TEST_DIR)/spec_ex-sie.elf
+>   tests += $(TEST_DIR)/firq.elf
+> +tests += $(TEST_DIR)/adtl_status.elf
+>   
+>   pv-tests += $(TEST_DIR)/pv-diags.elf
+>   
+> diff --git a/s390x/adtl_status.c b/s390x/adtl_status.c
+> new file mode 100644
+> index 000000000000..7a2bd2b07804
+> --- /dev/null
+> +++ b/s390x/adtl_status.c
+> @@ -0,0 +1,407 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Tests sigp store additional status order
+> + *
+> + * Copyright IBM Corp. 2022
+> + *
+> + * Authors:
+> + *    Nico Boehr <nrb@linux.ibm.com>
+> + */
+> +#include <libcflat.h>
+> +#include <asm/asm-offsets.h>
+> +#include <asm/interrupt.h>
+> +#include <asm/page.h>
+> +#include <asm/facility.h>
+> +#include <asm-generic/barrier.h>
+> +#include <asm/sigp.h>
+> +
+> +#include <smp.h>
+> +#include <gs.h>
+> +#include <alloc_page.h>
+> +
+> +static int testflag = 0;
+> +
+> +#define INVALID_CPU_ADDRESS -4711
+> +
+> +struct mcesa_lc12 {
+> +	uint8_t vector_reg[0x200];            /* 0x000 */
+
+Hrm we could do:
+__uint128_t vregs[32];
+
+or:
+uint64_t vregs[16][2];
+
+or leave it as it is.
+
+> +	uint8_t reserved200[0x400 - 0x200];   /* 0x200 */
+> +	struct gs_cb gs_cb;                   /* 0x400 */
+> +	uint8_t reserved420[0x800 - 0x420];   /* 0x420 */
+> +	uint8_t reserved800[0x1000 - 0x800];  /* 0x800 */
+> +};
+
+Do we have plans to use this struct in the future for other tests?
+
+> +
+> +static struct mcesa_lc12 adtl_status __attribute__((aligned(4096)));
+> +
+> +#define NUM_VEC_REGISTERS 32
+> +#define VEC_REGISTER_SIZE 16
+
+I'd shove that into lib/s390x/asm/float.h or create a vector.h as
+#define VEC_REGISTERS_NUM 32
+#define VEC_REGISTERS_SIZE 16
+
+Most likely vector.h since we can do both int and float with vector regs.
+
+> +static uint8_t expected_vec_contents[NUM_VEC_REGISTERS][VEC_REGISTER_SIZE];
+> +
+> +static struct gs_cb gs_cb;
+> +static struct gs_epl gs_epl;
+> +
+> +static bool memisset(void *s, int c, size_t n)
+> +{
+> +	uint8_t *p = s;
+> +	size_t i;
+> +
+> +	for (i = 0; i < n; i++) {
+> +		if (p[i] != c) {
+> +			return false;
+> +		}
+> +	}
+> +
+> +	return true;
+> +}
+> +
+> +static void wait_for_flag(void)
+> +{
+> +	while (!testflag)
+> +		mb();
+> +}
+> +
+> +static void set_flag(int val)
+> +{
+> +	mb();
+> +	testflag = val;
+> +	mb();
+> +}
+> +
+> +static void test_func(void)
+> +{
+> +	set_flag(1);
+> +}
+> +
+> +static int have_adtl_status(void)
+
+bool
+
+> +{
+> +	return test_facility(133) || test_facility(129);
+> +}
+> +
+> +static void test_store_adtl_status(void)
+> +{
+> +	uint32_t status = -1;
+> +	int cc;
+> +
+> +	report_prefix_push("store additional status");
+> +
+> +	if (!have_adtl_status()) {
+> +		report_skip("no guarded-storage or vector facility installed");
+> +		goto out;
+> +	}
+> +
+> +	memset(&adtl_status, 0xff, sizeof(adtl_status));
+> +
+> +	report_prefix_push("running");
+> +	smp_cpu_restart(1);
+> +
+> +	cc = smp_sigp(1, SIGP_STORE_ADDITIONAL_STATUS,
+> +		  (unsigned long)&adtl_status, &status);
+> +
+> +	report(cc == 1, "CC = 1");
+> +	report(status == SIGP_STATUS_INCORRECT_STATE, "status = INCORRECT_STATE");
+> +	report(memisset(&adtl_status, 0xff, sizeof(adtl_status)),
+> +	       "additional status not touched");
+> +
+> +	report_prefix_pop();
+> +
+> +	report_prefix_push("invalid CPU address");
+> +
+> +	cc = sigp(INVALID_CPU_ADDRESS, SIGP_STORE_ADDITIONAL_STATUS,
+> +		  (unsigned long)&adtl_status, &status);
+> +	report(cc == 3, "CC = 3");
+> +	report(memisset(&adtl_status, 0xff, sizeof(adtl_status)),
+> +	       "additional status not touched");
+> +
+> +	report_prefix_pop();
+> +
+> +	report_prefix_push("unaligned");
+> +	smp_cpu_stop(1);
+> +
+> +	cc = smp_sigp(1, SIGP_STORE_ADDITIONAL_STATUS,
+> +		  (unsigned long)&adtl_status + 256, &status);
+> +	report(cc == 1, "CC = 1");
+> +	report(status == SIGP_STATUS_INVALID_PARAMETER, "status = INVALID_PARAMETER");
+> +	report(memisset(&adtl_status, 0xff, sizeof(adtl_status)),
+> +	       "additional status not touched");
+> +
+> +	report_prefix_pop();
+> +
+> +out:
+> +	report_prefix_pop();
+> +}
+> +
+> +static void test_store_adtl_status_unavail(void)
+> +{
+> +	uint32_t status = 0;
+> +	int cc;
+> +
+> +	report_prefix_push("store additional status unvailable");
+
+unavailable
+
+> +
+> +	if (have_adtl_status()) {
+> +		report_skip("guarded-storage or vector facility installed");
+> +		goto out;
+> +	}
+> +
+> +	report_prefix_push("not accepted");
+> +	smp_cpu_stop(1);
+> +
+> +	memset(&adtl_status, 0xff, sizeof(adtl_status));
+> +
+> +	cc = smp_sigp(1, SIGP_STORE_ADDITIONAL_STATUS,
+> +		  (unsigned long)&adtl_status, &status);
+> +
+> +	report(cc == 1, "CC = 1");
+> +	report(status == SIGP_STATUS_INVALID_ORDER,
+> +	       "status = INVALID_ORDER");
+> +	report(memisset(&adtl_status, 0xff, sizeof(adtl_status)),
+> +	       "additional status not touched");
+> +
+> +	report_prefix_pop();
+> +
+> +out:
+> +	report_prefix_pop();
+> +}
+> +
+> +static void restart_write_vector(void)
+> +{
+> +	uint8_t *vec_reg;
+> +	/* vlm handles at most 16 registers at a time */
+> +	uint8_t *vec_reg_16_31 = &expected_vec_contents[16][0];
+> +	int i;
+> +
+> +	for (i = 0; i < NUM_VEC_REGISTERS; i++) {
+> +		vec_reg = &expected_vec_contents[i][0];
+> +		/* i+1 to avoid zero content */
+> +		memset(vec_reg, i + 1, VEC_REGISTER_SIZE);
+> +	}
+> +
+> +	ctl_set_bit(0, CTL0_VECTOR);
+> +
+> +	asm volatile (
+> +		"	.machine z13\n"
+> +		"	vlm 0,15, %[vec_reg_0_15]\n"
+> +		"	vlm 16,31, %[vec_reg_16_31]\n"
+> +		:
+> +		: [vec_reg_0_15] "Q"(expected_vec_contents),
+> +		  [vec_reg_16_31] "Q"(*vec_reg_16_31)
+> +		: "v0", "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9",
+> +		  "v10", "v11", "v12", "v13", "v14", "v15", "v16", "v17", "v18",
+> +		  "v19", "v20", "v21", "v22", "v23", "v24", "v25", "v26", "v27",
+> +		  "v28", "v29", "v30", "v31", "memory"
+
+We change memory on a load?
+
+> +	);
+
+We could also move vlm as a function to vector.h and do two calls.
+
+[...]
+> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
+> index 1600e714c8b9..2e65106fa140 100644
+> --- a/s390x/unittests.cfg
+> +++ b/s390x/unittests.cfg
+> @@ -78,6 +78,31 @@ extra_params=-name kvm-unit-test --uuid 0fb84a86-727c-11ea-bc55-0242ac130003 -sm
+>   file = smp.elf
+>   smp = 2
+>   
+> +[adtl_status-kvm]
+
+Hmmmmm (TM) I don't really want to mix - and _.
+Having spec_ex-sie.c is already bad enough.
+
+> +file = adtl_status.elf
+> +smp = 2
+> +accel = kvm
+> +extra_params = -cpu host,gs=on,vx=on
+> +
+> +[adtl_status-no-vec-no-gs-kvm]
+> +file = adtl_status.elf
+> +smp = 2
+> +accel = kvm
+> +extra_params = -cpu host,gs=off,vx=off
+> +
+> +[adtl_status-tcg]
+> +file = adtl_status.elf
+> +smp = 2
+> +accel = tcg
+> +# no guarded-storage support in tcg
+> +extra_params = -cpu qemu,vx=on
+> +
+> +[adtl_status-no-vec-no-gs-tcg]
+> +file = adtl_status.elf
+> +smp = 2
+> +accel = tcg
+> +extra_params = -cpu qemu,gs=off,vx=off
+> +
+
+Are you trying to sort this in any way?
+Normally we put new entries at the EOF.
+
+>   [sclp-1g]
+>   file = sclp.elf
+>   extra_params = -m 1G
+
