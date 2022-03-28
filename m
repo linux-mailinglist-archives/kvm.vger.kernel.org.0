@@ -2,87 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 290234EA311
-	for <lists+kvm@lfdr.de>; Tue, 29 Mar 2022 00:41:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A0D164EA322
+	for <lists+kvm@lfdr.de>; Tue, 29 Mar 2022 00:41:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229986AbiC1Wf1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Mar 2022 18:35:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48382 "EHLO
+        id S230062AbiC1WnQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Mar 2022 18:43:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44488 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229913AbiC1WfZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Mar 2022 18:35:25 -0400
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBE3C5FAB
-        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 15:33:41 -0700 (PDT)
-Received: by mail-pg1-x534.google.com with SMTP id c2so13256261pga.10
-        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 15:33:41 -0700 (PDT)
+        with ESMTP id S230060AbiC1WnL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Mar 2022 18:43:11 -0400
+Received: from mail-yw1-x112b.google.com (mail-yw1-x112b.google.com [IPv6:2607:f8b0:4864:20::112b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DFC44C79C
+        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 15:41:30 -0700 (PDT)
+Received: by mail-yw1-x112b.google.com with SMTP id 00721157ae682-2e6ceb45174so125670417b3.8
+        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 15:41:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=2ABviws9BXbfxTsMHoYmEcQBLN3yu8stMpTqnw9eDk8=;
-        b=rYUjTKzGOFHx6d15Tswooja+d30xBTDDUHatG0/ZcYrDXuH0PfkjhUH1PWeOTfidl+
-         vYJIWPT6oxLsddoyOabTrOO1tVAq7mc/vYWGRF/xHT6Zkm9YinxTH/0vsmRSLsdzVkKr
-         6pd96qJfscL7yKbX4y+A5Mu5s1jsgn8U+dy5S4ZqCvCfco0t//embRohXdJdoJUpkoR/
-         +rAdfVLcRZcp7qqE5ZtyTqie24GhbftV5PTRJAHm1SFW93aYXxALqSwG5/AMgSwMco3+
-         dtnGSwv8eE42JLUTvRoXFyxnboBZbMprh1RRTGVK+iAeHGKfsjUevmvmc+QSSrVtaClB
-         o0gQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=oYCH6Tbs6UcHw4KzVWnqyB1tic3vYPe5BOmHRgVgeGc=;
+        b=DXMddp8E6FufRbI7n5Mavm/b4sDlNGwYT7SziIoihbl7tK7WJf2VlYhXskH/Lotqxw
+         varDp4naHpHQRsmUWhXkzmBOR7a7R9a176GfXY3o7xQbejLy19s+q+erD9NXDpcxObqV
+         maBZvTQCN+RdX5ppq0tht/ip46gP3e8Qp4Odw8a/DSGU6LthwR6TMI2zcxwOvhrUWzYr
+         WyHvsvcNdMtX023I/zWUxPAbnqUZpVomxEqS9C83U1JnXsEBNw89KUTu8gDyGWJfwPWB
+         nKT0gCELCe0m5MhqA4TVxR9TZ585fhUs8KQ7Nwr1vwoOD2pD+TL+YIuzOWg0xyk+c8ik
+         zoBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=2ABviws9BXbfxTsMHoYmEcQBLN3yu8stMpTqnw9eDk8=;
-        b=NnZbyyZJtzoRoNUMXBflFLRFAh0k7762hyxGSrlj+l6qHqqt5WXnU9iiwhzb/ZfPkA
-         F2YibLFzfnkfOmLTnfY46j+uYYSXayPx5yRzxl3nLvOeWW+n9uQp9wrAokzgX9lIJ5Bl
-         6fIs18svbmgMC7Uyf2Lg58r6dTJEvUHDxZAcycsWIu0mfuZYwlLr9Z1mz9GZg/hy7S9I
-         RzL6PtzFDtRztT2YOM8dgdZGMWNoZaPM3gesK2b8MAAP13UZBdgsEeawhzmHC/a0ru1L
-         xYB79Os+L0wcBwCMmbWPJ1aL6McILu11At8U2s0Oy0+BaI30QOEtU3cQdogZUhzOD3Yo
-         /V+Q==
-X-Gm-Message-State: AOAM531JcIbePF9QeDpLsScTGgZTrdEviXSB8yHcbg9GE5vBrO4Uf9bN
-        6nceLzYstc952LcTLJjuXINi4Q==
-X-Google-Smtp-Source: ABdhPJwxvlht5QIP7qnxQ/NrpyslimX+9K7yNm7qbqA6RcGg490QKIvotfYQ+yrSTDNk0Bag7lNL6A==
-X-Received: by 2002:a05:6a00:21c8:b0:4c4:4bd:dc17 with SMTP id t8-20020a056a0021c800b004c404bddc17mr24814255pfj.57.1648506821242;
-        Mon, 28 Mar 2022 15:33:41 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id 22-20020a17090a019600b001c6457e1760sm479337pjc.21.2022.03.28.15.33.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Mar 2022 15:33:40 -0700 (PDT)
-Date:   Mon, 28 Mar 2022 22:33:37 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Chao Peng <chao.p.peng@linux.intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-api@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com
-Subject: Re: [PATCH v5 07/13] KVM: Add KVM_EXIT_MEMORY_ERROR exit
-Message-ID: <YkI3wa3rmWTOrpmw@google.com>
-References: <20220310140911.50924-1-chao.p.peng@linux.intel.com>
- <20220310140911.50924-8-chao.p.peng@linux.intel.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=oYCH6Tbs6UcHw4KzVWnqyB1tic3vYPe5BOmHRgVgeGc=;
+        b=0mfj8FullQMAp8HSvDb185fvHS/fz8QyvAvvUTO4bcbODkJFZbKW9FPrEvD01yg50l
+         g95Zu44Wb7zqDgtrqJ9qlq/LdoQj/I4g/n197xpIg7sVC7qbUblUqocOrCMzvFVYMbRL
+         8a/gy0JKyB9cA9iJoIRzrS/k7Tlk3oSVVkBdR2tLH3DCxBoCpEAZb7o8U8eXY4Gz839l
+         ucJNEiaNYNh3bTY/M7nFFXmloL6rdeCoBZSbmwi+nbnJo4OagZ9iYRZLnQePOY0VSDdJ
+         hI4u4KOmmyvegzc7MxCsDSzZqJdBd3gbAb+pTmGC9jERxsUfRxTHsU1OghnCwj+io0A9
+         QHmQ==
+X-Gm-Message-State: AOAM530YBk/k83SXVwitg5Gxo+bYPbc6tj8HZ4+XXB/JuB4vUzZ9LGvt
+        Ak/RStior5g/jI+L+INvuyPsgGEqtMBqsPqvWpQj2Q==
+X-Google-Smtp-Source: ABdhPJxD8jid1ituckpG2t6iuULWOFy82bVcu9QN/LK3fH6g7pJWwcDl10kAUx7sb6qz3x62A+urpqCoemYCdl7qCEM=
+X-Received: by 2002:a81:15ce:0:b0:2e5:e189:7366 with SMTP id
+ 197-20020a8115ce000000b002e5e1897366mr28596553ywv.188.1648507289066; Mon, 28
+ Mar 2022 15:41:29 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220310140911.50924-8-chao.p.peng@linux.intel.com>
+References: <20220321234844.1543161-1-bgardon@google.com> <20220321234844.1543161-8-bgardon@google.com>
+ <YkIYF6HzLy+l6tu8@google.com>
+In-Reply-To: <YkIYF6HzLy+l6tu8@google.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Mon, 28 Mar 2022 15:41:18 -0700
+Message-ID: <CANgfPd_XYoFAcrwkKE-fkS-wP7omNxC36fagT=OGaSE8Er3JXQ@mail.gmail.com>
+Subject: Re: [PATCH v2 07/11] KVM: x86/MMU: Factor out updating NX hugepages
+ state for a VM
+To:     David Matlack <dmatlack@google.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Dunn <daviddunn@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Junaid Shahid <junaids@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -94,62 +74,65 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 10, 2022, Chao Peng wrote:
-> This new KVM exit allows userspace to handle memory-related errors. It
-> indicates an error happens in KVM at guest memory range [gpa, gpa+size).
-> The flags includes additional information for userspace to handle the
-> error. Currently bit 0 is defined as 'private memory' where '1'
-> indicates error happens due to private memory access and '0' indicates
-> error happens due to shared memory access.
-> 
-> After private memory is enabled, this new exit will be used for KVM to
-> exit to userspace for shared memory <-> private memory conversion in
-> memory encryption usage.
-> 
-> In such usage, typically there are two kind of memory conversions:
->   - explicit conversion: happens when guest explicitly calls into KVM to
->     map a range (as private or shared), KVM then exits to userspace to
->     do the map/unmap operations.
->   - implicit conversion: happens in KVM page fault handler.
->     * if the fault is due to a private memory access then causes a
->       userspace exit for a shared->private conversion request when the
->       page has not been allocated in the private memory backend.
->     * If the fault is due to a shared memory access then causes a
->       userspace exit for a private->shared conversion request when the
->       page has already been allocated in the private memory backend.
-> 
-> Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> ---
->  Documentation/virt/kvm/api.rst | 22 ++++++++++++++++++++++
->  include/uapi/linux/kvm.h       |  9 +++++++++
->  2 files changed, 31 insertions(+)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index f76ac598606c..bad550c2212b 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -6216,6 +6216,28 @@ array field represents return values. The userspace should update the return
->  values of SBI call before resuming the VCPU. For more details on RISC-V SBI
->  spec refer, https://github.com/riscv/riscv-sbi-doc.
->  
-> +::
-> +
-> +		/* KVM_EXIT_MEMORY_ERROR */
-> +		struct {
-> +  #define KVM_MEMORY_EXIT_FLAG_PRIVATE	(1 << 0)
-> +			__u32 flags;
-> +			__u32 padding;
-> +			__u64 gpa;
-> +			__u64 size;
-> +		} memory;
-> +If exit reason is KVM_EXIT_MEMORY_ERROR then it indicates that the VCPU has
+On Mon, Mar 28, 2022 at 1:18 PM David Matlack <dmatlack@google.com> wrote:
+>
+> On Mon, Mar 21, 2022 at 04:48:40PM -0700, Ben Gardon wrote:
+> > Factor out the code to update the NX hugepages state for an individual
+> > VM. This will be expanded in future commits to allow per-VM control of
+> > Nx hugepages.
+> >
+> > No functional change intended.
+> >
+> > Signed-off-by: Ben Gardon <bgardon@google.com>
+> > ---
+> >  arch/x86/kvm/mmu/mmu.c | 18 +++++++++++-------
+> >  1 file changed, 11 insertions(+), 7 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index 3b8da8b0745e..1b59b56642f1 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -6195,6 +6195,15 @@ static void __set_nx_huge_pages(bool val)
+> >       nx_huge_pages = itlb_multihit_kvm_mitigation = val;
+> >  }
+> >
+> > +static int kvm_update_nx_huge_pages(struct kvm *kvm)
+> > +{
+> > +     mutex_lock(&kvm->slots_lock);
+> > +     kvm_mmu_zap_all_fast(kvm);
+> > +     mutex_unlock(&kvm->slots_lock);
+> > +
+> > +     wake_up_process(kvm->arch.nx_lpage_recovery_thread);
+> > +}
+> > +
+> >  static int set_nx_huge_pages(const char *val, const struct kernel_param *kp)
+> >  {
+> >       bool old_val = nx_huge_pages;
+> > @@ -6217,13 +6226,8 @@ static int set_nx_huge_pages(const char *val, const struct kernel_param *kp)
+> >
+> >               mutex_lock(&kvm_lock);
+> >
+>
+> nit: This blank line is asymmetrical with mutex_unlock().
+>
+> > -             list_for_each_entry(kvm, &vm_list, vm_list) {
+> > -                     mutex_lock(&kvm->slots_lock);
+> > -                     kvm_mmu_zap_all_fast(kvm);
+> > -                     mutex_unlock(&kvm->slots_lock);
+> > -
+> > -                     wake_up_process(kvm->arch.nx_lpage_recovery_thread);
+> > -             }
+> > +             list_for_each_entry(kvm, &vm_list, vm_list)
+> > +                     kvm_set_nx_huge_pages(kvm);
+>
+> This should be kvm_update_nx_huge_pages() right?
 
-Doh, I'm pretty sure I suggested KVM_EXIT_MEMORY_ERROR.  Any objection to using
-KVM_EXIT_MEMORY_FAULT instead of KVM_EXIT_MEMORY_ERROR?  "ERROR" makes me think
-of ECC errors, i.e. uncorrected #MC in x86 land, not more generic "faults".  That
-would align nicely with -EFAULT.
+Oh woops, duh. Apparently I did not compile-test this patch individually.
 
-> +encountered a memory error which is not handled by KVM kernel module and
-> +userspace may choose to handle it. The 'flags' field indicates the memory
-> +properties of the exit.
+>
+> >               mutex_unlock(&kvm_lock);
+> >       }
+> >
+> > --
+> > 2.35.1.894.gb6a874cedc-goog
+> >
