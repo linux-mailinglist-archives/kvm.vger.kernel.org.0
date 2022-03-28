@@ -2,259 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 90F094E9ABF
-	for <lists+kvm@lfdr.de>; Mon, 28 Mar 2022 17:12:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B535B4E9ACD
+	for <lists+kvm@lfdr.de>; Mon, 28 Mar 2022 17:16:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244432AbiC1POb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Mar 2022 11:14:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38524 "EHLO
+        id S233207AbiC1PSg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Mar 2022 11:18:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244431AbiC1POC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Mar 2022 11:14:02 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D33460CCE;
-        Mon, 28 Mar 2022 08:12:19 -0700 (PDT)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22SF8ob2004421;
-        Mon, 28 Mar 2022 15:12:18 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=7PrPlNCGXR2LA0VBNeuq9yp2OFaSKxLMh9HG1oVBWeE=;
- b=smeaPCb6dGjAYtZiXOSN040osAmfoF4C3pyS0WgcF60DcDCnAcOnRgXzZpTDzsrUJWxA
- D70nJELNFbMHhykROQjwQOj2bIlujWvaiFq6hTTHEn7NnGNlfPsNns+za/e0q8u57MwD
- uSPeIh6rGxv78wG2VaiGJgshVexJ4wEeZa65plYCYYfTFM4MX5Qn/GscyVSVUoyMnjwI
- r7Iu5+PkUKoSU577HpEX+iF008h26e2QnJEx7iT0wsxo0gSNYhdH8jPyn1OlZxkZnvsS
- pILYX65/CIkVh9NumcrY2SozPpQbmf8Pm0wF9IBQMX3eCWH5cmRmcB5IiPkXCfg/aj16 qw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3f3dykt2tq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 28 Mar 2022 15:12:18 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22SF9lKq010177;
-        Mon, 28 Mar 2022 15:12:17 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3f3dykt2t8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 28 Mar 2022 15:12:17 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22SEvgAf025403;
-        Mon, 28 Mar 2022 15:12:16 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma03ams.nl.ibm.com with ESMTP id 3f1tf9c8a7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 28 Mar 2022 15:12:16 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22SFCCbf43254058
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 28 Mar 2022 15:12:12 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CF9BC4203F;
-        Mon, 28 Mar 2022 15:12:12 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8344242042;
-        Mon, 28 Mar 2022 15:12:12 +0000 (GMT)
-Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1.ibm.com (unknown [9.171.10.159])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 28 Mar 2022 15:12:12 +0000 (GMT)
-Message-ID: <c1b585cbd42cff9920488a74ee5a40ed0d5b13f8.camel@linux.ibm.com>
-Subject: Re: [PATCH 2/2] s390x: add test for SIGP STORE_ADTL_STATUS order
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Cc:     imbrenda@linux.ibm.com, thuth@redhat.com, david@redhat.com,
-        farman@linux.ibm.com
-Date:   Mon, 28 Mar 2022 17:12:12 +0200
-In-Reply-To: <2fafa98b-e342-047a-3a94-cf4111bc7198@linux.ibm.com>
-References: <20220328093048.869830-1-nrb@linux.ibm.com>
-         <20220328093048.869830-3-nrb@linux.ibm.com>
-         <2fafa98b-e342-047a-3a94-cf4111bc7198@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
+        with ESMTP id S230330AbiC1PSe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Mar 2022 11:18:34 -0400
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8F151FCF8
+        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 08:16:53 -0700 (PDT)
+Received: by mail-pf1-x430.google.com with SMTP id w7so10238584pfu.11
+        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 08:16:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=V2BkG1eTX10cucUGmcHAn94FhLtFZhm8llsNlwvtRuc=;
+        b=sALbJwx8VGCOa6mzxzDleDWU1dPFqfgqIX1UyiHh3zAj5ZCTtCKO3xjq94w2VrpetQ
+         y0OlGDN2AP01yDewUz/x8/cbYm9hbsQQ7RsIAkSDsaia0hIWnniT0PPDDAg9NMxLqT7f
+         CUh5MKcp8D4mUEodbmDVwDeIhz1E/LoLuUEAg/360b4C0vFGeHSOm9fHdeUV1wr2NJyf
+         D4l1oUU7gaTWjmf8iToex55XptSW+KJX3nCVq3VNVumPDFyAXJrvmiPnfTWg6AKp5THL
+         hN3Tbi1K4CiHHiW9fzyPr6xYQmlwrDUIYWzTSDQIl2m4MSCeIu7Wjc4IHwm43yWIdm+N
+         MUEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=V2BkG1eTX10cucUGmcHAn94FhLtFZhm8llsNlwvtRuc=;
+        b=Mp3HN59B1v+R5e8JorK2Y9Vk0Gu1nXF84zHEfKebGHWtaWYHhkP6c6gRCqzeUN76sD
+         0OTSsd5/bJ+cVfc5pFodhayhnE+pa2p7hhzccRfIzX2Qz9KEkup0FbOBrB97gcXQpeQ3
+         8nKONLzMaoczc9k0C5xjE6R/d8q/xdqvkIQgGuvU808aaApjkYk2M3p3kZuXZn7fedR5
+         MhIQbhB9c0sIoN6KtjeuMnRbhfEo4v2B7CuUY5SEXK+/eJRrSA3I1N8tiW7PX2LKC9go
+         eQUmCDXKjp7YyqqbmJLn9NAJRIqsZ2fuqfOzDaiYgi61HCdE1K8XHeGTDB4IkcV4JBYF
+         OfZw==
+X-Gm-Message-State: AOAM532YscDSDM5QIrsQ9J8BU5EWu5oLK0mBEbVrPgHbRuNFswh404AY
+        8E/iasb48oWyvbIoNN8G08Wfuw==
+X-Google-Smtp-Source: ABdhPJymvUPIEff3uEiOhFC8PqKbbFXCngUaPAQ96GGUp2FYuqQpLllY+Mk5xWbNxDWjkvXLJTlEUw==
+X-Received: by 2002:a05:6a00:b51:b0:4fa:ece9:15e4 with SMTP id p17-20020a056a000b5100b004faece915e4mr22481702pfo.27.1648480612981;
+        Mon, 28 Mar 2022 08:16:52 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id p10-20020a056a0026ca00b004fb44e0cb17sm6083630pfw.116.2022.03.28.08.16.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Mar 2022 08:16:52 -0700 (PDT)
+Date:   Mon, 28 Mar 2022 15:16:49 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Mingwei Zhang <mizhang@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>,
+        David Matlack <dmatlack@google.com>
+Subject: Re: [PATCH] KVM: x86/mmu: add lockdep check before
+ lookup_address_in_mm()
+Message-ID: <YkHRYY6x1Ewez/g4@google.com>
+References: <20220327205803.739336-1-mizhang@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: SQLilvbPPwp61umNpQ0Ifj7XuxUzZdXP
-X-Proofpoint-GUID: YGCJew7QzVpvvvLp4LBoQUZVfNvSyHgx
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-03-28_06,2022-03-28_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- phishscore=0 mlxscore=0 clxscore=1015 malwarescore=0 spamscore=0
- bulkscore=0 impostorscore=0 adultscore=0 suspectscore=0 mlxlogscore=999
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2203280087
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220327205803.739336-1-mizhang@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2022-03-28 at 13:54 +0200, Janosch Frank wrote:
-> > diff --git a/s390x/adtl_status.c b/s390x/adtl_status.c
-> > new file mode 100644
-> > index 000000000000..7a2bd2b07804
-> > --- /dev/null
-> > +++ b/s390x/adtl_status.c
-[...]
-> > +struct mcesa_lc12 {
-> > +       uint8_t vector_reg[0x200];            /* 0x000 */
+On Sun, Mar 27, 2022, Mingwei Zhang wrote:
+> Add a lockdep check before invoking lookup_address_in_mm().
+> lookup_address_in_mm() walks all levels of host page table without
+> accquiring any lock. This is usually unsafe unless we are walking the
+> kernel addresses (check other usage cases of lookup_address_in_mm and
+> lookup_address_in_pgd).
 > 
-> Hrm we could do:
-> __uint128_t vregs[32];
+> Walking host page table (especially guest addresses) usually requires
+> holding two types of locks: 1) mmu_lock in mm or the lock that protects
+> the reverse maps of host memory in range; 2) lock for the leaf paging
+> structures.
 > 
-> or:
-> uint64_t vregs[16][2];
+> One exception case is when we take the mmu_lock of the secondary mmu.
+> Holding mmu_lock of KVM MMU in either read mode or write mode prevents host
+> level entities from modifying the host page table concurrently. This is
+> because all of them will have to invoke KVM mmu_notifier first before doing
+> the actual work. Since KVM mmu_notifier invalidation operations always take
+> the mmu write lock, we are safe if we hold the mmu lock here.
 > 
-> or leave it as it is.
-
-No strong preference about the type. uint8_t makes it easy to check the
-offsets.
-
+> Note: this means that KVM cannot allow concurrent multiple mmu_notifier
+> invalidation callbacks by using KVM mmu read lock. Since, otherwise, any
+> host level entity can cause race conditions with this one. Walking host
+> page table here may get us stale information or may trigger NULL ptr
+> dereference that is hard to reproduce.
 > 
-> > +       uint8_t reserved200[0x400 - 0x200];   /* 0x200 */
-> > +       struct gs_cb gs_cb;                   /* 0x400 */
-> > +       uint8_t reserved420[0x800 - 0x420];   /* 0x420 */
-> > +       uint8_t reserved800[0x1000 - 0x800];  /* 0x800 */
-> > +};
+> Having a lockdep check here will prevent or at least warn future
+> development that directly walks host page table simply in a KVM ioctl
+> function. In addition, it provides a record for any future development on
+> KVM mmu_notifier.
 > 
-> Do we have plans to use this struct in the future for other tests?
-
-Maybe at some point if we add checks for machine check handling, but
-right now we don't have the infrastructure in kvm-unit-tests to do that
-I think.
-
+> Cc: Sean Christopherson <seanjc@google.com>
+> Cc: Ben Gardon <bgardon@google.com>
+> Cc: David Matlack <dmatlack@google.com>
 > 
-> > +
-> > +static struct mcesa_lc12 adtl_status
-> > __attribute__((aligned(4096)));
-> > +
-> > +#define NUM_VEC_REGISTERS 32
-> > +#define VEC_REGISTER_SIZE 16
+> Signed-off-by: Mingwei Zhang <mizhang@google.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 18 ++++++++++++++++++
+>  1 file changed, 18 insertions(+)
 > 
-> I'd shove that into lib/s390x/asm/float.h or create a vector.h as
-> #define VEC_REGISTERS_NUM 32
-> #define VEC_REGISTERS_SIZE 16
-> 
-> Most likely vector.h since we can do both int and float with vector
-> regs.
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 1361eb4599b4..066bb5435156 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -2820,6 +2820,24 @@ static int host_pfn_mapping_level(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn,
+>  	 */
+>  	hva = __gfn_to_hva_memslot(slot, gfn);
+>  
+> +	/*
+> +	 * lookup_address_in_mm() walks all levels of host page table without
+> +	 * accquiring any lock. This is not safe when KVM does not take the
+> +	 * mmu_lock. Holding mmu_lock in either read mode or write mode prevents
+> +	 * host level entities from modifying the host page table. This is
+> +	 * because all of them will have to invoke KVM mmu_notifier first before
+> +	 * doing the actual work. Since KVM mmu_notifier invalidation operations
+> +	 * always take the mmu write lock, we are safe if we hold the mmu lock
+> +	 * here.
+> +	 *
+> +	 * Note: this means that KVM cannot allow concurrent multiple
+> +	 * mmu_notifier invalidation callbacks by using KVM mmu read lock.
+> +	 * Otherwise, any host level entity can cause race conditions with this
+> +	 * one. Walking host page table here may get us stale information or may
+> +	 * trigger NULL ptr dereference that is hard to reproduce.
+> +	 */
+> +	lockdep_assert_held(&kvm->mmu_lock);
 
-OK, will do.
+Holding mmu_lock isn't strictly required.  It would also be safe to use this helper
+if mmu_notifier_retry_hva() were checked after grabbing the mapping level, before
+consuming it.  E.g. we could theoretically move this to kvm_faultin_pfn().
 
-[...]
-> > +
-> > +static int have_adtl_status(void)
-> 
-> bool
+And simply holding the lock isn't sufficient, i.e. the lockdep gives a false sense
+of security.  E.g. calling this while holding mmu_lock but without first checking
+mmu_notifier_count would let it run concurrently with host PTE modifications.
 
-Changed.
-
-[...]
-> > +static void test_store_adtl_status_unavail(void)
-> > +{
-> > +       uint32_t status = 0;
-> > +       int cc;
-> > +
-> > +       report_prefix_push("store additional status unvailable");
-> 
-> unavailable
-
-Thanks.
-
-[...]
-> > +static void restart_write_vector(void)
-> > +{
-> > +       uint8_t *vec_reg;
-> > +       /* vlm handles at most 16 registers at a time */
-> > +       uint8_t *vec_reg_16_31 = &expected_vec_contents[16][0];
-> > +       int i;
-> > +
-> > +       for (i = 0; i < NUM_VEC_REGISTERS; i++) {
-> > +               vec_reg = &expected_vec_contents[i][0];
-> > +               /* i+1 to avoid zero content */
-> > +               memset(vec_reg, i + 1, VEC_REGISTER_SIZE);
-> > +       }
-> > +
-> > +       ctl_set_bit(0, CTL0_VECTOR);
-> > +
-> > +       asm volatile (
-> > +               "       .machine z13\n"
-> > +               "       vlm 0,15, %[vec_reg_0_15]\n"
-> > +               "       vlm 16,31, %[vec_reg_16_31]\n"
-> > +               :
-> > +               : [vec_reg_0_15] "Q"(expected_vec_contents),
-> > +                 [vec_reg_16_31] "Q"(*vec_reg_16_31)
-> > +               : "v0", "v1", "v2", "v3", "v4", "v5", "v6", "v7",
-> > "v8", "v9",
-> > +                 "v10", "v11", "v12", "v13", "v14", "v15", "v16",
-> > "v17", "v18",
-> > +                 "v19", "v20", "v21", "v22", "v23", "v24", "v25",
-> > "v26", "v27",
-> > +                 "v28", "v29", "v30", "v31", "memory"
-> 
-> We change memory on a load?
-
-To my understanding, this might be neccesary if expected_vec_contents
-ends up in a register, but that won't happen, so I can remove it.
-
-> 
-> > +       );
-> 
-> We could also move vlm as a function to vector.h and do two calls.
-
-I think that won't work because that function might clean its float
-registers in the epilogue and hence destroy the contents. Except if you
-have an idea on how to avoid that?
-
-[...]
-> > diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-> > index 1600e714c8b9..2e65106fa140 100644
-> > --- a/s390x/unittests.cfg
-> > +++ b/s390x/unittests.cfg
-> > @@ -78,6 +78,31 @@ extra_params=-name kvm-unit-test --uuid
-> > 0fb84a86-727c-11ea-bc55-0242ac130003 -sm
-> >   file = smp.elf
-> >   smp = 2
-> >   
-> > +[adtl_status-kvm]
-> 
-> Hmmmmm (TM) I don't really want to mix - and _.
-> Having spec_ex-sie.c is already bad enough.
-
-Yes, thanks.
-
-> 
-> > +file = adtl_status.elf
-> > +smp = 2
-> > +accel = kvm
-> > +extra_params = -cpu host,gs=on,vx=on
-> > +
-> > +[adtl_status-no-vec-no-gs-kvm]
-> > +file = adtl_status.elf
-> > +smp = 2
-> > +accel = kvm
-> > +extra_params = -cpu host,gs=off,vx=off
-> > +
-> > +[adtl_status-tcg]
-> > +file = adtl_status.elf
-> > +smp = 2
-> > +accel = tcg
-> > +# no guarded-storage support in tcg
-> > +extra_params = -cpu qemu,vx=on
-> > +
-> > +[adtl_status-no-vec-no-gs-tcg]
-> > +file = adtl_status.elf
-> > +smp = 2
-> > +accel = tcg
-> > +extra_params = -cpu qemu,gs=off,vx=off
-> > +
-> 
-> Are you trying to sort this in any way?
-> Normally we put new entries at the EOF.
-
-Oh, this was a leftover from when this was still part of the smp test,
-moved to the end now.
+I'm definitely in favor of adding a comment to document the mmu_notifier
+interactions, but I don't like adding a lockdep.
