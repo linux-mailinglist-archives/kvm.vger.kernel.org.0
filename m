@@ -2,74 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A2394E9F5C
-	for <lists+kvm@lfdr.de>; Mon, 28 Mar 2022 21:02:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A37E4E9F93
+	for <lists+kvm@lfdr.de>; Mon, 28 Mar 2022 21:14:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245432AbiC1TEH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Mar 2022 15:04:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58776 "EHLO
+        id S245538AbiC1TPm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Mar 2022 15:15:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245425AbiC1TEF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Mar 2022 15:04:05 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8ACA2633B0
-        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 12:02:23 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id mr5-20020a17090b238500b001c67366ae93so145151pjb.4
-        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 12:02:23 -0700 (PDT)
+        with ESMTP id S245534AbiC1TPk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Mar 2022 15:15:40 -0400
+Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A16C488AA
+        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 12:13:59 -0700 (PDT)
+Received: by mail-lf1-x129.google.com with SMTP id w7so26476694lfd.6
+        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 12:13:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=dhGOVKb9V844LyshAqhDj5/BrH7dOz55cb0nSa/g+AI=;
-        b=mbyainUX7U9+PGRKvsG6MkdGVAraaJJxQoF1i6MIBe+WIc39mfspIaC7yE9nl9xIm/
-         HT9FKTPfF7oE40F5O3vgolnL7UAc5NalFgMeuPp5fPRUA9iHou8VcEVn7F3wN4a0KjUb
-         uiH4zRG5RRJ20rQojcdFUmt2wgtG3IKHqT92MpFZ3oObaoRueCy13H5h8z2IY6aMrqVI
-         RpUiTJ6qJpJdmGwDdaVMcUnlGcD8iKlkMzE4/xXnGhKqeKrUUvLB3I9WH4RbGxLmrNEv
-         XmTjBxxEnaQc74jCdX3keX/ogcZKcnaJj9tNYx8ubOz94BSSrWjsDrRLrd1oH4O11xIz
-         7L0Q==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=fPHcThhavYQoi1CRvCTyZV8TYj/0992Wtfs4sW93D/I=;
+        b=Ndlw/8Us34OEJZq/npk2kS+igmzvUQCNI/fg/kB0v2fEuXBXD2WikwIN4dTzk2MNqu
+         9TJWkML/0Xv7P8la/hH3Mn7LYbKA9mMzyt6kgbUQBELx8ZyjdHH8IsnNAdScOe1Hxw+E
+         cXoTsKmvvOY1MZ5izparRhp5siMFuJ87zMo45G4hBxF6MIs3bbeOXbkNw6qi02/I5hzf
+         Aud6rjbOuNpdq/SvyDaYW4T/0lIGeuaaGETpTl3k/4p5x6kvk++bfbgfFPIIkBlT20kJ
+         DsUltenM6gEZ58KIVZcn8lFBlXba9ulIvOWSqCs1hMQXlsXAWn/0j0j4zMD0I4kb8nf2
+         wn7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=dhGOVKb9V844LyshAqhDj5/BrH7dOz55cb0nSa/g+AI=;
-        b=FAsKJbI/KNjSlm8GFH/GjH2WAESm8XsurH7eB9JuospU2sUnagVQmKuAdUn6Wi7uxb
-         hsl7bJoujQ8vMK6ISHGU5gBBjIhPHYYuD7bGo9D8ZP3Tptr0opxyQXzX0kWgahMG2v14
-         wkyCvYK1pDFC52B8zEnh2J2pTBGDcSq1LBeeq1uKJoApBZZ4M0davlVNNX8Ysge7kgua
-         gq2Z9Ma8V/C6+zqkRU+lVKsfiryO9Ri8p8/7XtIm2wEcUHMzt/3kZK0iXeJtYHaBbJkk
-         l2t3XPMxRG8qAwsXjn7jNBm5JtLa7lSE1yw/Wxa0OYA6B6L9Ke0BaCeeCQ3pONDUxR1l
-         mbRg==
-X-Gm-Message-State: AOAM532pSUFAGQ2FHVYmMHcPAf7/fCDAUVnip0Jrlwlf8vRT41YHOv/w
-        QbFhQEJxJ5wxb2N1BqkZqnwtbw==
-X-Google-Smtp-Source: ABdhPJyPcEQSb9YWAxCjR6tmvyHD19VhWLbrkj0LPTRLxwkDA3sS6e6UBZXuI16SCQuxnisLLZr8Eg==
-X-Received: by 2002:a17:902:d904:b0:154:a967:2b83 with SMTP id c4-20020a170902d90400b00154a9672b83mr27020146plz.124.1648494142870;
-        Mon, 28 Mar 2022 12:02:22 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id 21-20020a630115000000b00382a0895661sm13622059pgb.11.2022.03.28.12.02.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Mar 2022 12:02:22 -0700 (PDT)
-Date:   Mon, 28 Mar 2022 19:02:18 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=fPHcThhavYQoi1CRvCTyZV8TYj/0992Wtfs4sW93D/I=;
+        b=iH5AlT2nbM+7cuw+mrujqMiNkxitQ2BBUirw1YXLYeV7DOK2iVdwvq1vno24DpMV+a
+         Xbk+swvxB4eKLo1ckQ44uRk4gSqGtXbfDuH1ZXZ8SjhQlE/IImmVqFLmYwVG6gu1SS0y
+         HYB1wsjeLoQiqZ71AjjCXqJ7ekBxPWIunIWYBJiFlV/0kf1kNI4X7+v3/tFN2wS1G/px
+         ntyBB9JWZpksZa9zWPz2KMl9WNZ1TzE4oU6bYwShLMX/4DrDfW2/N4szs4FisOLpohTG
+         TkD9cX3jtbjzcu3zgU4SmiZTz/OjesrN88C6Aa6qWt00iDJtR04RyyItbt3esYP4TdLL
+         xL2g==
+X-Gm-Message-State: AOAM533Dv3Sw4LmFqugCfRz4jJvfprtsKxw6Cekp0roNxHrJ+M4EsyKL
+        5ofxT78afXSCsQve9fN+xf9zEDUV9co12Ahr5zWLog==
+X-Google-Smtp-Source: ABdhPJyonMOo0lWVKSKdR2MkojMlBg3HqAgbTvfhfHLEW1XK+4ZAsDlUjefFU7c4OUBEsk0QLt7A3pB4rS7fCAVcbgk=
+X-Received: by 2002:ac2:5d49:0:b0:44a:37de:9d98 with SMTP id
+ w9-20020ac25d49000000b0044a37de9d98mr21134273lfd.580.1648494834715; Mon, 28
+ Mar 2022 12:13:54 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220325233125.413634-1-vipinsh@google.com> <CALzav=e6W2VSp=btmqTpQJ=3bH+Bw3D8sLApkTTvMMKAnw_LAw@mail.gmail.com>
+ <CAHVum0dOfJ5HuscNq0tA6BnUJK34v4CPCTkD4piHc7FObZOsng@mail.gmail.com> <b754fa0a-4f9e-1ea5-6c77-f2410b7f8456@redhat.com>
+In-Reply-To: <b754fa0a-4f9e-1ea5-6c77-f2410b7f8456@redhat.com>
+From:   Vipin Sharma <vipinsh@google.com>
+Date:   Mon, 28 Mar 2022 12:13:18 -0700
+Message-ID: <CAHVum0cynwp5Phx=v2LV33Hsa8viq0jpVLh0Q_ZtpUZVy6Lm9w@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86/mmu: Speed up slot_rmap_walk_next for sparsely
+ populated rmaps
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     David Matlack <dmatlack@google.com>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        Oliver Upton <oupton@google.com>
-Subject: Re: [RFC PATCH 000/105] KVM: selftests: Overhaul APIs, purge VCPU_ID
-Message-ID: <YkIGOmog8QCYyg/1@google.com>
-References: <20220311055056.57265-1-seanjc@google.com>
- <20220314110653.a46vy5hqegt75wpb@gator>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220314110653.a46vy5hqegt75wpb@gator>
+        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -81,9 +73,67 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 14, 2022, Andrew Jones wrote:
-> Also, I see at least patch 1/105 is a fix. It'd be nice to post all fixes
-> separately so they get in sooner than later.
+Thank you David and Paolo, for checking this patch carefully. With
+hindsight, I should have explicitly mentioned adding "noinline" in my
+patch email.
 
-Yeah, and I'm pretty sure there's at least one other arm64 bug fix buried in the
-series.  I'll get those extracted and posted separately.
+On Sun, Mar 27, 2022 at 3:41 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 3/26/22 01:31, Vipin Sharma wrote:
+> >>> -static void slot_rmap_walk_next(struct slot_rmap_walk_iterator *iterator)
+> >>> +static noinline void
+> >>
+> >> What is the reason to add noinline?
+> >
+> > My understanding is that since this method is called from
+> > __always_inline methods, noinline will avoid gcc inlining the
+> > slot_rmap_walk_next in those functions and generate smaller code.
+> >
+>
+> Iterators are written in such a way that it's way more beneficial to
+> inline them.  After inlining, compilers replace the aggregates (in this
+> case, struct slot_rmap_walk_iterator) with one variable per field and
+> that in turn enables a lot of optimizations, so the iterators should
+> actually be always_inline if anything.
+>
+> For the same reason I'd guess the effect on the generated code should be
+> small (next time please include the output of "size mmu.o"), but should
+> still be there.  I'll do a quick check of the generated code and apply
+> the patch.
+
+Yeah, I should have added the "size mmu.o" output. Here is what I have found:
+
+size arch/x86/kvm/mmu/mmu.o
+
+Without noinline:
+              text      data     bss       dec        hex filename
+          89938   15793      72  105803   19d4b arch/x86/kvm/mmu/mmu.o
+
+With noinline:
+              text      data     bss        dec       hex filename
+          90058   15793      72  105923   19dc3 arch/x86/kvm/mmu/mmu.o
+
+With noinline, increase in size = 120
+
+Curiously, I also checked file size with "ls -l" command
+File size:
+        Without noinline: 1394272 bytes
+        With noinline: 1381216 bytes
+
+With noinline, decrease in size = 13056 bytes
+
+I also disassembled mmu.o via "objdump -d" and found following
+Total lines in the generated assembly:
+        Without noinline: 23438
+        With noinline: 23393
+
+With noinline, decrease in assembly code = 45
+
+I can see in assembly code that there are multiple "call" operations
+in the "with noinline" object file, which is expected and has less
+lines of code compared to "without noinline". I am not sure why the
+size command is showing an increase in text segment for "with
+noinline" and what to infer with all of this data.
+
+Thanks
+Vipin
