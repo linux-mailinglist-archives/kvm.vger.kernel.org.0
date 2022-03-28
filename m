@@ -2,150 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 750DD4E9D2F
-	for <lists+kvm@lfdr.de>; Mon, 28 Mar 2022 19:15:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 026F84E9D4A
+	for <lists+kvm@lfdr.de>; Mon, 28 Mar 2022 19:18:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244492AbiC1RPA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Mar 2022 13:15:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38114 "EHLO
+        id S244543AbiC1RTK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Mar 2022 13:19:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51824 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244486AbiC1RO5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Mar 2022 13:14:57 -0400
-Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52730D62
-        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 10:13:15 -0700 (PDT)
-Received: by mail-pf1-x429.google.com with SMTP id t5so13287268pfg.4
-        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 10:13:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=xkOsBgVuG0zCndlt1G8crnufHuKqrN/5aTVkYRyBZfc=;
-        b=YDY+YeRkB1EvXc+KqVUKjZJIfyymRN45O804LxSksnIdheInoNyrxLgz1F47fxHVQL
-         O0Kja0/2Q4FdPsdKGceWLGPOsgIB7koi3bsv2jQY5FvEw9UpUJEaEeBfe/lq8itIV2He
-         SQnYSKK1Fz1SViat1FInTLq4FgbBR06LBs+nbppiyo+/q2iYabnxipScvrMV4E1MSScm
-         IuEuDnKZdCEpPFMGG4zz4wq7C6Q1bv6ZTbkfGcUvtR4ftGNRAKLv/g8foAvB0eSaH3Lv
-         j5RVx3sG+vmQwgxgF8/tNjDTKl16iAAeEO1TLbSC9OarbzM8Xt1ZEbnWEKcUJqGexWp3
-         CiSQ==
+        with ESMTP id S240270AbiC1RTJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Mar 2022 13:19:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id CF84D63BE1
+        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 10:17:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1648487848;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=kFq5xIrtlE0LH/UrNTPMMjVa4bF/UcCC/THRar2iFcc=;
+        b=gYycaqy+kr9Hgk4v828zE/JcBThfT+uoZrvv0kaLgcncaGTbC6jdv6bWy9VfDdA6XtxBgb
+        LA0gjOQ18yfc397IhDhzT7bBQ2kDy4M2dlY9fElaDq0kbauXBSg4PixJDoiaAu3K3Wl/aJ
+        PC6uNBXA9JqEvPtlFMUWB9bX9Dkoc4A=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-568-h-rU1GDRPKi-Q_W234syFg-1; Mon, 28 Mar 2022 13:17:26 -0400
+X-MC-Unique: h-rU1GDRPKi-Q_W234syFg-1
+Received: by mail-il1-f197.google.com with SMTP id m16-20020a928710000000b002c7be7653d1so8191607ild.4
+        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 10:17:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=xkOsBgVuG0zCndlt1G8crnufHuKqrN/5aTVkYRyBZfc=;
-        b=ud7pLQZlR3ZLYQ8lpOtT3yHfHQGFtha8/q5QGqcQ9uhDzE39XK7HbUtPnR9a5LbeAL
-         zdRBHl/GUPHT2N1Qi/o2eP513tyguOygLmesC+vDkSkTeU50Oq6kntxEAzSPWza1M/zs
-         WAnmt5+qkbbKhjWux2tKlqZiA4JJYtx5OaCsuCZi09HUVJTb5KTGbFj1+oL9QB06jFFr
-         bGJ1SlST5IvZ0+6Efvq9NQtNMZM6HN3sxm7OtiTHhQFilzbAY15dB4HVlbCWKCUFHgiG
-         HImLCIbrEzMbqObQ4Lld6w54EgSu/Ej363bp+DeYfs2gbK+yJhN0WfBsIFNwFzboSR5c
-         RbLA==
-X-Gm-Message-State: AOAM531ceA4WSj1AAzl82vYmW1eISfKddYSduJT5dQFHeG6d5F4umQYV
-        7bEBkx0hLg/d16j3oG8Jq04DFg==
-X-Google-Smtp-Source: ABdhPJyjv96+m6AY6ltlDIh6YwZCGgDdQJCULPA3+nexLHL1Y3Cwco6Ne/HueLnONAhilf3ume3wCw==
-X-Received: by 2002:a05:6a00:1a02:b0:4fb:20f0:c1aa with SMTP id g2-20020a056a001a0200b004fb20f0c1aamr15081324pfv.45.1648487594529;
-        Mon, 28 Mar 2022 10:13:14 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id f91-20020a17090a706400b001c7858a6879sm80756pjk.12.2022.03.28.10.13.13
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=kFq5xIrtlE0LH/UrNTPMMjVa4bF/UcCC/THRar2iFcc=;
+        b=hHedguECOyCF9biVJDaSIJ1+cmnc6N+uyqoTpZgZFSslSJl8zhmgOd14FxaYGZ1pil
+         4c5RJfeOSGeIFXFsPzkeEKTJHb4Z5Nt+BkdOd9iFjJviyFPZ3xxIZi/zjfSEqVW4NbnH
+         NqBuGFpLyOTSVvdeL3604czDNeEIk+smSn6R833zXJyBstZSouY7POgr5DJR/V+xvk6x
+         0Nz9qz1+GKU4pyQovz91kSr44p8Q7FFwx7TnItTz3rnL7EjxXe5KxXA7LZHGXwVwCM1x
+         scQcqvjy9tE8e7jckGlUx4pCBv8vcA5Px0ZsW8q048m2Zvnf5QlvGA1S07KbWg9foznf
+         KExg==
+X-Gm-Message-State: AOAM530fe9A7TGX3czNAEKcEY4WG3m53nJV4fGkz8icU7i4u8ZFQ4+EJ
+        PE/ToUUJypBrR/P+GcDRoc9KqsTVlNWV+BQMGGvnXssOkke+22hSqY2yqIKaSyvDVIzgBWRWAvA
+        aMyyN+34/BBV1
+X-Received: by 2002:a05:6602:2494:b0:64c:86a7:9fe9 with SMTP id g20-20020a056602249400b0064c86a79fe9mr1305003ioe.171.1648487845630;
+        Mon, 28 Mar 2022 10:17:25 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyRWO2iQoEBPA6dqLLt3lHbvXF79rpJ35GLftd2YlzpdVdpYHvZvRm2FU0alz72N0akwN5Zzg==
+X-Received: by 2002:a05:6602:2494:b0:64c:86a7:9fe9 with SMTP id g20-20020a056602249400b0064c86a79fe9mr1304982ioe.171.1648487845379;
+        Mon, 28 Mar 2022 10:17:25 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id c6-20020a056e020bc600b002c6731e7cb8sm7563658ilu.31.2022.03.28.10.17.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Mar 2022 10:13:13 -0700 (PDT)
-Date:   Mon, 28 Mar 2022 17:13:10 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Quentin Perret <qperret@google.com>
-Cc:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, maz@kernel.org,
-        will@kernel.org
-Subject: Re: [PATCH v5 00/13] KVM: mm: fd-based approach for supporting KVM
- guest private memory
-Message-ID: <YkHspg+YzOsbUaCf@google.com>
-References: <20220310140911.50924-1-chao.p.peng@linux.intel.com>
- <YjyS6A0o4JASQK+B@google.com>
+        Mon, 28 Mar 2022 10:17:25 -0700 (PDT)
+Date:   Mon, 28 Mar 2022 11:17:23 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Eric Auger <eric.auger@redhat.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        Jason Wang <jasowang@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        "Martins, Joao" <joao.m.martins@oracle.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        Keqian Zhu <zhukeqian1@huawei.com>
+Subject: Re: [PATCH RFC 08/12] iommufd: IOCTLs for the io_pagetable
+Message-ID: <20220328111723.24fa5118.alex.williamson@redhat.com>
+In-Reply-To: <20220324134622.GB1184709@nvidia.com>
+References: <0-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
+        <8-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
+        <20220323131038.3b5cb95b.alex.williamson@redhat.com>
+        <20220323193439.GS11336@nvidia.com>
+        <20220323140446.097fd8cc.alex.williamson@redhat.com>
+        <20220323203418.GT11336@nvidia.com>
+        <20220323225438.GA1228113@nvidia.com>
+        <BN9PR11MB5276EB80AFCC3003955A46248C199@BN9PR11MB5276.namprd11.prod.outlook.com>
+        <20220324134622.GB1184709@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YjyS6A0o4JASQK+B@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 24, 2022, Quentin Perret wrote:
-> For Protected KVM (and I suspect most other confidential computing
-> solutions), guests have the ability to share some of their pages back
-> with the host kernel using a dedicated hypercall. This is necessary
-> for e.g. virtio communications, so these shared pages need to be mapped
-> back into the VMM's address space. I'm a bit confused about how that
-> would work with the approach proposed here. What is going to be the
-> approach for TDX?
+On Thu, 24 Mar 2022 10:46:22 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
+
+> On Thu, Mar 24, 2022 at 07:25:03AM +0000, Tian, Kevin wrote:
 > 
-> It feels like the most 'natural' thing would be to have a KVM exit
-> reason describing which pages have been shared back by the guest, and to
-> then allow the VMM to mmap those specific pages in response in the
-> memfd. Is this something that has been discussed or considered?
+> > Based on that here is a quick tweak of the force-snoop part (not compiled).  
+> 
+> I liked your previous idea better, that IOMMU_CAP_CACHE_COHERENCY
+> started out OK but got weird. So lets fix it back to the way it was.
+> 
+> How about this:
+> 
+> https://github.com/jgunthorpe/linux/commits/intel_no_snoop
+> 
+> b11c19a4b34c2a iommu: Move the Intel no-snoop control off of IOMMU_CACHE
+> 5263947f9d5f36 vfio: Require that device support DMA cache coherence
 
-The proposed solution is to exit to userspace with a new exit reason, KVM_EXIT_MEMORY_ERROR,
-when the guest makes the hypercall to request conversion[1].  The private fd itself
-will never allow mapping memory into userspace, instead userspace will need to punch
-a hole in the private fd backing store.  The absense of a valid mapping in the private
-fd is how KVM detects that a pfn is "shared" (memslots without a private fd are always
-shared)[2].
+I have some issues with the argument here:
 
-The key point is that KVM never decides to convert between shared and private, it's
-always a userspace decision.  Like normal memslots, where userspace has full control
-over what gfns are a valid, this gives userspace full control over whether a gfn is
-shared or private at any given time.
+  This will block device/platform/iommu combinations that do not
+  support cache coherent DMA - but these never worked anyhow as VFIO
+  did not expose any interface to perform the required cache
+  maintenance operations.
 
-Another important detail is that this approach means the kernel and KVM treat the
-shared backing store and private backing store as independent, albeit related,
-entities.  This is very deliberate as it makes it easier to reason about what is
-and isn't allowed/required.  E.g. the kernel only needs to handle freeing private
-memory, there is no special handling for conversion to shared because no such path
-exists as far as host pfns are concerned.  And userspace doesn't need any new "rules"
-for protecting itself against a malicious guest, e.g. userspace already needs to
-ensure that it has a valid mapping prior to accessing guest memory (or be able to
-handle any resulting signals).  A malicious guest can DoS itself by instructing
-userspace to communicate over memory that is currently mapped private, but there
-are no new novel attack vectors from the host's perspective as coercing the host
-into accessing an invalid mapping after shared=>private conversion is just a variant
-of a use-after-free.
+VFIO never intended to provide such operations, it only tried to make
+the coherence of the device visible to userspace such that it can
+perform operations via other means, for example via KVM.  The "never
+worked" statement here seems false.
 
-One potential conversions that's TBD (at least, I think it is, I haven't read through
-this most recent version) is how to support populating guest private memory with
-non-zero data, e.g. to allow in-place conversion of the initial guest firmware instead
-of having to an extra memcpy().
+Commit b11c19a4b34c2a also appears to be a behavioral change.  AIUI
+vfio_domain.enforce_cache_coherency would only be set on Intel VT-d
+where snoop-control is supported, this translates to KVM emulating
+coherency instructions everywhere except VT-d w/ snoop-control.
 
-[1] KVM will also exit to userspace with the same info on "implicit" conversions,
-    i.e. if the guest accesses the "wrong" GPA.  Neither SEV-SNP nor TDX mandate
-    explicit conversions in their guest<->host ABIs, so KVM has to support implicit
-    conversions :-/
+My understanding of AMD-Vi is that no-snoop TLPs are always coherent, so
+this would trigger unnecessary wbinvd emulation on those platforms.  I
+don't know if other archs need similar, but it seems we're changing
+polarity wrt no-snoop TLPs from "everyone is coherent except this case
+on Intel" to "everyone is non-coherent except this opposite case on
+Intel".  Thanks,
 
-[2] Ideally (IMO), KVM would require userspace to completely remove the private memslot,
-    but that's too slow due to use of SRCU in both KVM and userspace (QEMU at least uses
-    SRCU for memslot changes).
+Alex
+
+> eab4b381c64a30 iommu: Restore IOMMU_CAP_CACHE_COHERENCY to its original meaning
+> 2752e12bed48f6 iommu: Replace uses of IOMMU_CAP_CACHE_COHERENCY with dev_is_dma_coherent()
+> 
+> If you like it could you take it from here?
+> 
+> Thanks,
+> Jason
+> 
+
