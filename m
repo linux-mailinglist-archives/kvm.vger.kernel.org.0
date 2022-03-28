@@ -2,126 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 15CDD4E8BCB
-	for <lists+kvm@lfdr.de>; Mon, 28 Mar 2022 03:53:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 26A1A4E8BD0
+	for <lists+kvm@lfdr.de>; Mon, 28 Mar 2022 03:58:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234637AbiC1Bz1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 27 Mar 2022 21:55:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44056 "EHLO
+        id S237415AbiC1B7o (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 27 Mar 2022 21:59:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55590 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237406AbiC1BzY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 27 Mar 2022 21:55:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 86C862625
-        for <kvm@vger.kernel.org>; Sun, 27 Mar 2022 18:53:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1648432424;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=2dO/oV1qOltZyPId5baa2irih13HA1zn6mOKO291fhY=;
-        b=YJfwTswsCZlK+pdf2uysa8otMmCqxmZ/IDHxMRQryEBnthuXseoyj7YJqTcuEupepx/egY
-        +LZZDB1L4LGAyH+DIhTaLttBYrpY5xzIQuPEaMoR3Ief5o+4IZLYZZCVS0tLGvqvn1qsk+
-        Z29WDCfmPdLIYe3Uy9hhG/qCkU+ke9Q=
-Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
- [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-256-j2BemGfQMIiuZyQlv6tnGw-1; Sun, 27 Mar 2022 21:53:40 -0400
-X-MC-Unique: j2BemGfQMIiuZyQlv6tnGw-1
-Received: by mail-lj1-f200.google.com with SMTP id h4-20020a2ea484000000b002480c04898aso5242303lji.6
-        for <kvm@vger.kernel.org>; Sun, 27 Mar 2022 18:53:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=2dO/oV1qOltZyPId5baa2irih13HA1zn6mOKO291fhY=;
-        b=T/je8Qx/0hnV8uyJS/DcDtIPoVwHYGxVlPI/74AnNhKX5sbl8y5bIOw++Xe57wViv7
-         mrkcapLO2sx8m7Ebk/esSXRv9xW0BH1SNGrvK6PI/V9klPKsmnPIiwBJyKQjCZ3eQgwN
-         T/jUGcVrPsz+EiS8rx4Fwh+pVF1ZnOnHYyNR0HrGcmbxYL0GOo2oo3f8mupyon+OEx8P
-         7pNAZQyR6TQIkdKli9sV2hCMkA99q8Mi+CKAUWPC84LR60KtzCQ0lio0s8BMKcnINNxn
-         YOfKzf5T8BU8yXutJIns0eFaTjWw5mXjUwBMFlEoRLPaTOsOVrmRFZzS1z3yp2S5cz43
-         pV1Q==
-X-Gm-Message-State: AOAM532vhcJBx3VEnay/LIg5BMTsATdSQ3wME1rlL3IKKfkfH93K+Ujc
-        4IGKWPgECieSO00xeqjqKOmgF4vaT5YKVWIXVM0woeqJ/ZVrHy4KCZg4ma2Ifof9xkqPAstM9qs
-        knkFrXCBG0AtpDZ99EHGzID6KnYGz
-X-Received: by 2002:a05:6512:3341:b0:433:b033:bd22 with SMTP id y1-20020a056512334100b00433b033bd22mr17655625lfd.190.1648432419152;
-        Sun, 27 Mar 2022 18:53:39 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxq8kzelEt+v1IsX1TZPbDlKbWX97klqcRsVueoo1G7JjrBUCzhgXc3wVkBT8uRlLsPpQUWTvhiKwixigMDGIE=
-X-Received: by 2002:a05:6512:3341:b0:433:b033:bd22 with SMTP id
- y1-20020a056512334100b00433b033bd22mr17655598lfd.190.1648432418951; Sun, 27
- Mar 2022 18:53:38 -0700 (PDT)
-MIME-Version: 1.0
-References: <808a871b3918dc067031085de3e8af6b49c6ef89.camel@linux.ibm.com>
- <20220322145741.GH11336@nvidia.com> <20220322092923.5bc79861.alex.williamson@redhat.com>
- <20220322161521.GJ11336@nvidia.com> <BN9PR11MB5276BED72D82280C0A4C6F0C8C199@BN9PR11MB5276.namprd11.prod.outlook.com>
- <CACGkMEutpbOc_+5n3SDuNDyHn19jSH4ukSM9i0SUgWmXDydxnA@mail.gmail.com>
- <BN9PR11MB5276E3566D633CEE245004D08C199@BN9PR11MB5276.namprd11.prod.outlook.com>
- <CACGkMEvTmCFqAsc4z=2OXOdr7X--0BSDpH06kCiAP5MHBjaZtg@mail.gmail.com>
- <BN9PR11MB5276ECF1F1C7D0A80DA086D18C199@BN9PR11MB5276.namprd11.prod.outlook.com>
- <CACGkMEtpWemw6tj=suxNjvSHuixyzhMJBYmqdbhQkinuWNADCQ@mail.gmail.com> <20220324114605.GX11336@nvidia.com>
-In-Reply-To: <20220324114605.GX11336@nvidia.com>
-From:   Jason Wang <jasowang@redhat.com>
-Date:   Mon, 28 Mar 2022 09:53:27 +0800
-Message-ID: <CACGkMEtTVMuc-JebEbTrb3vRUVaNJ28FV_VyFRdRquVQN9VeQA@mail.gmail.com>
-Subject: Re: [PATCH RFC 04/12] kernel/user: Allow user::locked_vm to be usable
- for iommufd
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Eric Auger <eric.auger@redhat.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        "Martins, Joao" <joao.m.martins@oracle.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        Keqian Zhu <zhukeqian1@huawei.com>,
-        Sean Mooney <smooney@redhat.com>
+        with ESMTP id S230063AbiC1B7o (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 27 Mar 2022 21:59:44 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B18A9F22;
+        Sun, 27 Mar 2022 18:58:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1648432684; x=1679968684;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=HWbUKhpiaUkbTeJ1ZO05TuJVN6I6HUz7DlqTLZxPn/U=;
+  b=Uzr4FANWcX42rR/k6zzHaF0MVycs8rDE0WcJGfL5FEOCZf65CePloP2W
+   Gar7BZd8m/eKNu+3h66uPiJQYml7OahtA4U2AbalxEWaDb06i10TGQi7L
+   SrdzQovjKyUozv13lwNF9IO1gNHMZs+rKftXZ5NreqBU512d91zjw/xPR
+   lju7rCGMQyDug7E3S3Y3IvgZ5K0qqelI/7RwHKb/tBxhT7Ef4Ugr3xUZG
+   x0wTUIsrvjafNmCaBr24dggfT1dEqQ4u7KMGIJdPFf2+V8NTYUEjHGyt4
+   j9tz6b73CCqck/M08jWWVHFmuZHq/sRLVdt7tLLw5eWWFvlBboNmWDCNu
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10299"; a="238825077"
+X-IronPort-AV: E=Sophos;i="5.90,216,1643702400"; 
+   d="scan'208";a="238825077"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2022 18:58:04 -0700
+X-IronPort-AV: E=Sophos;i="5.90,216,1643702400"; 
+   d="scan'208";a="787060999"
+Received: from stung2-mobl.gar.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.255.94.73])
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2022 18:58:01 -0700
+Message-ID: <a68b378a40310c38f731f4bc7f0a9cc0d89efe92.camel@intel.com>
+Subject: Re: [PATCH v2 04/21] x86/virt/tdx: Add skeleton for detecting and
+ initializing TDX on demand
+From:   Kai Huang <kai.huang@intel.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Cc:     "Hansen, Dave" <dave.hansen@intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>
+Date:   Mon, 28 Mar 2022 14:57:59 +1300
+In-Reply-To: <BL1PR11MB52713CA82D52248B0905C91D8C189@BL1PR11MB5271.namprd11.prod.outlook.com>
+References: <cover.1647167475.git.kai.huang@intel.com>
+         <279af00f90a93491d5ec86672506146153909e5c.1647167475.git.kai.huang@intel.com>
+         <BL1PR11MB52713CA82D52248B0905C91D8C189@BL1PR11MB5271.namprd11.prod.outlook.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-3.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 24, 2022 at 7:46 PM Jason Gunthorpe <jgg@nvidia.com> wrote:
->
-> On Thu, Mar 24, 2022 at 11:50:47AM +0800, Jason Wang wrote:
->
-> > It's simply because we don't want to break existing userspace. [1]
->
-> I'm still waiting to hear what exactly breaks in real systems.
->
-> As I explained this is not a significant change, but it could break
-> something in a few special scenarios.
->
-> Also the one place we do have ABI breaks is security, and ulimit is a
-> security mechanism that isn't working right. So we do clearly need to
-> understand *exactly* what real thing breaks - if anything.
->
-> Jason
->
+On Wed, 2022-03-23 at 19:49 +1300, Tian, Kevin wrote:
+> > From: Kai Huang <kai.huang@intel.com>
+> > Sent: Sunday, March 13, 2022 6:50 PM
+> > +static bool seamrr_enabled(void)
+> > +{
+> > +     /*
+> > +      * To detect any BIOS misconfiguration among cores, all logical
+> > +      * cpus must have been brought up at least once.  This is true
+> > +      * unless 'maxcpus' kernel command line is used to limit the
+> > +      * number of cpus to be brought up during boot time.  However
+> > +      * 'maxcpus' is basically an invalid operation mode due to the
+> > +      * MCE broadcast problem, and it should not be used on a TDX
+> > +      * capable machine.  Just do paranoid check here and WARN()
+> > +      * if not the case.
+> > +      */
+> > +     if (WARN_ON_ONCE(!cpumask_equal(&cpus_booted_once_mask,
+> > +                                     cpu_present_mask)))
+> > +             return false;
+> > +
+> 
+> cpu_present_mask doesn't always represent BIOS-enabled CPUs as it
+> can be further restricted by 'nr_cpus' and 'possible_cpus'. From this
+> angle above check doesn't capture all misconfigured boot options
+> which is incompatible with TDX. Then is such partial check still useful
+> or better to just document those restrictions and let TDX module
+> capture any violation later as what you explained in __init_tdx()?
+> 
+> Thanks
+> Kevin
 
-To tell the truth, I don't know. I remember that Openstack may do some
-accounting so adding Sean for more comments. But we really can't image
-openstack is the only userspace that may use this.
+The purpose of checking cpus_booted_once_mask aganist cpu_present_mask is NOT to
+check whether all BIOS-enabled CPUs are brought up at least once.  Instead, the
+purpose is to check whether all cpus that kernel can use are brought up at least
+once (TDX-capable machine doesn't support ACPI CPU hotplug and all cpus are
+marked as enabled in MADT table, therefore cpu_present_mask is used instead of
+cpu_possible_mask).  This is used to make sure SEAMRR has been detected on all
+cpus that kernel can use.  
 
-To me, it looks more easier to not answer this question by letting
-userspace know about the change,
+Checking whether "all BIOS-enabled cpus are up" is not done here (neither in
+this series as we discussed it seems there's no appropriate variable to
+represent it).  And we just let TDH.SYS.CONFIG to fail if TDH.SYS.LP.INIT is not
+done on all BIOS-enabled CPUs. 
 
-Thanks
-
+-- 
+Thanks,
+-Kai
