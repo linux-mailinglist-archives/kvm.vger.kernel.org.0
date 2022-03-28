@@ -2,151 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B8EF84EA12B
-	for <lists+kvm@lfdr.de>; Mon, 28 Mar 2022 22:12:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CE6324EA144
+	for <lists+kvm@lfdr.de>; Mon, 28 Mar 2022 22:17:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344202AbiC1UOF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Mar 2022 16:14:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38304 "EHLO
+        id S1344400AbiC1USs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Mar 2022 16:18:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343842AbiC1UOF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Mar 2022 16:14:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 422A05373C
-        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 13:12:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1648498343;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=WqVT3KvgQV+tZRe7WZblIXuVXsuTLMlVvflnQm6HlpY=;
-        b=hXqUzzXFgYJSi9c0MOyIaksQouoE75XLqLGntE+GPcB3U29ugyb//WRFh/yFFq++3YCA0h
-        OdqsTQgvbtOwcd5AF3N/apclm0J4sX1RZVp2tTC44HJ02Ty9NkW79i63XnQFyen563f1Wl
-        LU3kNUde/x9kSGSEgcYJQ594De8RpZc=
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
- [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-202-LywtZ_YnMW2RfyjH6BAHAg-1; Mon, 28 Mar 2022 16:12:21 -0400
-X-MC-Unique: LywtZ_YnMW2RfyjH6BAHAg-1
-Received: by mail-io1-f69.google.com with SMTP id i19-20020a5d9353000000b006495ab76af6so11126900ioo.0
-        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 13:12:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=WqVT3KvgQV+tZRe7WZblIXuVXsuTLMlVvflnQm6HlpY=;
-        b=WGxN2y/ci60SrWlKDcTS+nVG9iSLZdI+UmPbgWAsksWNRRFWm3dHnZWiej6uYlPkIe
-         TJzyQPqtu2XQ01Q6mdQOqDjwIKCGrSk4a6xBtKujUejmLxaOkE+iwIj2SpX/WHSjKUNv
-         az6IuE565XYqYqxuMAl6i39nFcvUWV5aXUdpUhk+WMILTSusehOcccBIVXvaJBLy+vk2
-         aUddd+WXyO/bc7YepJOMlFmkgOv40eSXJpb6HdqARdLY54qYFnF92sYKxkA/+TxLdmRt
-         DNYX26AG1imcRh+8rj3QkRjt6d3bmLD5sp5kEGjMX9N4O//LwJpLVNHN2nAP41P6kx/Y
-         2L5Q==
-X-Gm-Message-State: AOAM5335o/0wKsrUyfb4gVYHyJ/N4IfFjE8leqYamUZNDo/2rWB1gnN6
-        Kl7DTOpkRxnoChiCaXAdwIc1FU2+fUf7hFomdjZRHVigMeVSmq7Zfe/OiXT6q2MzBM08AbXXdCD
-        dsqmW+EcTosky
-X-Received: by 2002:a5e:820a:0:b0:649:5b8:d02c with SMTP id l10-20020a5e820a000000b0064905b8d02cmr7471322iom.50.1648498340717;
-        Mon, 28 Mar 2022 13:12:20 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzBWieBEZJKb+4gcLO8gWGz0t+u2tDXAulAsD5Gd3ckb0X+PQp44Pjwj/KZIpU70TvWYk/mng==
-X-Received: by 2002:a5e:820a:0:b0:649:5b8:d02c with SMTP id l10-20020a5e820a000000b0064905b8d02cmr7471310iom.50.1648498340498;
-        Mon, 28 Mar 2022 13:12:20 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id f4-20020a92b504000000b002c21ef70a81sm7949207ile.7.2022.03.28.13.12.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Mar 2022 13:12:20 -0700 (PDT)
-Date:   Mon, 28 Mar 2022 14:12:19 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Longpeng(Mike)" <longpeng2@huawei.com>
-Cc:     <pbonzini@redhat.com>, <qemu-devel@nongnu.org>,
-        <kvm@vger.kernel.org>, <arei.gonglei@huawei.com>,
-        <huangzhichao@huawei.com>, <yechuan@huawei.com>
-Subject: Re: [PATCH v6 0/5] optimize the downtime for vfio migration
-Message-ID: <20220328141219.5da6e010.alex.williamson@redhat.com>
-In-Reply-To: <20220326060226.1892-1-longpeng2@huawei.com>
-References: <20220326060226.1892-1-longpeng2@huawei.com>
-Organization: Red Hat
+        with ESMTP id S234040AbiC1USr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Mar 2022 16:18:47 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1B076623F
+        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 13:17:04 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 74C4CB81202
+        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 20:17:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EA94C3411E
+        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 20:17:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1648498622;
+        bh=F88P3EjB8xr5i+2/B7u8QJbACQEAp4uoybtn389DnK4=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=MbUyJVBBtcRiSqPMHyR5eTY53fRuRdbMY7WKUQUsWXQwbwdNFdMe++QlbME3I4aU5
+         k3luwth9XutktPcZBag3IYt3MRDRVYipv+ZzpOr7tGe+3ve7q6cUGAJ7CxEMMj3/aW
+         Hn9ibm5hfHZrw6B5z8MboqK7NPTNAU7quqrhjeNASOVNcUCE0o0AsnUU3OwsZO4HnJ
+         90zbcgiajFjUNlPdgUK1jhw6+zfiJd1YWeZix/64m2xxjMvS8gbUzOOW44PxtF/0aF
+         JrbiOj4D48tJXtEhCKjFeD5xeHKQ1BXX5i0o4k4HE4lMRy4HAZr/gvPFhsTu4t9kdC
+         xmPOKxGci3a9Q==
+Received: by mail-ej1-f50.google.com with SMTP id bg10so30999052ejb.4
+        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 13:17:02 -0700 (PDT)
+X-Gm-Message-State: AOAM530dK3tmYbFgWVTiSsMpdDopDfUSEFgcvtNlpTq2YvbBm+YAVQFs
+        Wss01aBjxeocDXeMFGOaDx0zzixwdtjcKdXVGEQlzQ==
+X-Google-Smtp-Source: ABdhPJyUCfqNMjY4j/zDrp5thzUNKGPE9xMYQkN6ReIG1dPzUmJOgX3w9dDbnVfGV3lDWzlxjIqdp/oS80009PSifH0=
+X-Received: by 2002:a17:906:c10d:b0:6e0:dc2a:338d with SMTP id
+ do13-20020a170906c10d00b006e0dc2a338dmr14671860ejc.538.1648498620006; Mon, 28
+ Mar 2022 13:17:00 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+References: <20220310140911.50924-1-chao.p.peng@linux.intel.com>
+In-Reply-To: <20220310140911.50924-1-chao.p.peng@linux.intel.com>
+From:   Andy Lutomirski <luto@kernel.org>
+Date:   Mon, 28 Mar 2022 13:16:48 -0700
+X-Gmail-Original-Message-ID: <CALCETrWk1Y47JQC=V028A7Tmc9776Oo4AjgwqRtd9K=XDh6=TA@mail.gmail.com>
+Message-ID: <CALCETrWk1Y47JQC=V028A7Tmc9776Oo4AjgwqRtd9K=XDh6=TA@mail.gmail.com>
+Subject: Re: [PATCH v5 00/13] KVM: mm: fd-based approach for supporting KVM
+ guest private memory
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-api@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, 26 Mar 2022 14:02:21 +0800
-"Longpeng(Mike)" <longpeng2@huawei.com> wrote:
+On Thu, Mar 10, 2022 at 6:09 AM Chao Peng <chao.p.peng@linux.intel.com> wrote:
+>
+> This is the v5 of this series which tries to implement the fd-based KVM
+> guest private memory. The patches are based on latest kvm/queue branch
+> commit:
+>
+>   d5089416b7fb KVM: x86: Introduce KVM_CAP_DISABLE_QUIRKS2
 
-> From: Longpeng <longpeng2@huawei.com>
-> 
-> Hi guys,
->  
-> In vfio migration resume phase, the cost would increase if the
-> vfio device has more unmasked vectors. We try to optimize it in
-> this series.
->  
-> You can see the commit message in PATCH 6 for details.
->  
-> Patch 1-3 are simple cleanups and fixup.
-> Patch 4 are the preparations for the optimization.
-> Patch 5 optimizes the vfio msix setup path.
-> 
-> v5: https://lore.kernel.org/all/20211103081657.1945-1-longpeng2@huawei.com/T/
-> 
-> Change v5->v6:
->  - remove the Patch 4("kvm: irqchip: extract kvm_irqchip_add_deferred_msi_route")
->     of v5, and use KVMRouteChange API instead. [Paolo, Longpeng]
-> 
-> Changes v4->v5:
->  - setup the notifier and irqfd in the same function to makes
->    the code neater.    [Alex]
-> 
-> Changes v3->v4:
->  - fix several typos and grammatical errors [Alex]
->  - remove the patches that fix and clean the MSIX common part
->    from this series [Alex]
->  - Patch 6:
->     - use vector->use directly and fill it with -1 on error
->       paths [Alex]
->     - add comment before enable deferring to commit [Alex]
->     - move the code that do_use/release on vector 0 into an
->       "else" branch [Alex]
->     - introduce vfio_prepare_kvm_msi_virq_batch() that enables
->       the 'defer_kvm_irq_routing' flag [Alex]
->     - introduce vfio_commit_kvm_msi_virq_batch() that clears the
->       'defer_kvm_irq_routing' flag and does further work [Alex]
-> 
-> Changes v2->v3:
->  - fix two errors [Longpeng]
-> 
-> Changes v1->v2:
->  - fix several typos and grammatical errors [Alex, Philippe]
->  - split fixups and cleanups into separate patches  [Alex, Philippe]
->  - introduce kvm_irqchip_add_deferred_msi_route to
->    minimize code changes    [Alex]
->  - enable the optimization in msi setup path    [Alex]
-> 
-> Longpeng (Mike) (5):
->   vfio: simplify the conditional statements in vfio_msi_enable
->   vfio: move re-enabling INTX out of the common helper
->   vfio: simplify the failure path in vfio_msi_enable
->   Revert "vfio: Avoid disabling and enabling vectors repeatedly in VFIO
->     migration"
->   vfio: defer to commit kvm irq routing when enable msi/msix
-> 
->  hw/vfio/pci.c | 183 +++++++++++++++++++++++++++++++-------------------
->  hw/vfio/pci.h |   2 +
->  2 files changed, 115 insertions(+), 70 deletions(-)
-> 
+Can this series be run and a VM booted without TDX?  A feature like
+that might help push it forward.
 
-Nice to see you found a solution with Paolo's suggestion for
-begin/commit batching.  Looks ok to me; I'll queue this for after the
-v7.0 QEMU release and look for further reviews and comments in the
-interim.  Thanks,
-
-Alex
-
+--Andy
