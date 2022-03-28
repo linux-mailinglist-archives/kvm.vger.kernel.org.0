@@ -2,38 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6E4114E928B
-	for <lists+kvm@lfdr.de>; Mon, 28 Mar 2022 12:33:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2CDBB4E94AC
+	for <lists+kvm@lfdr.de>; Mon, 28 Mar 2022 13:30:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240268AbiC1KfX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Mar 2022 06:35:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49552 "EHLO
+        id S241506AbiC1Lbp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Mar 2022 07:31:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240264AbiC1KfV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Mar 2022 06:35:21 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 70430FD20
-        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 03:33:40 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 248E21480;
-        Mon, 28 Mar 2022 03:33:40 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DEE513F66F;
-        Mon, 28 Mar 2022 03:33:38 -0700 (PDT)
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     will@kernel.org, kvm@vger.kernel.org,
-        julien.thierry.kdev@gmail.com,
-        linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com,
-        steven.price@arm.com, vladimir.murzin@arm.com
-Subject: [kvmtool PATCH v3 2/2] aarch64: Add support for MTE
-Date:   Mon, 28 Mar 2022 11:33:28 +0100
-Message-Id: <20220328103328.18768-3-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220328103328.18768-1-alexandru.elisei@arm.com>
-References: <20220328103328.18768-1-alexandru.elisei@arm.com>
+        with ESMTP id S241443AbiC1Lav (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Mar 2022 07:30:51 -0400
+Received: from mail-yb1-xb2a.google.com (mail-yb1-xb2a.google.com [IPv6:2607:f8b0:4864:20::b2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DB4556C02
+        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 04:24:21 -0700 (PDT)
+Received: by mail-yb1-xb2a.google.com with SMTP id o5so25415876ybe.2
+        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 04:24:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=xmOofWXPDOZiFtpjDyUYyMlgL0oxxk8dYXPeAiOLviQ=;
+        b=Zgz2ilLvTSiR0eGyvyuCcsc6wgeDI7hcj5K316U+DlfEhZWtGLtjS5uJfYPdEkS4af
+         gWoHcRMGR8lFRKgx7x6GDmq/rzR5HObeRun5RUq5ZMphJaZ7D4SjCjxLNwCb0moJPaRI
+         ZicVa5YnXpAUAMNfzb1uJLERuW0utOEsKnnDgR9LOizI6WrgAzJbhWUzPLNv+g3f4YWO
+         GlBk6m/r9Bh1aEz5dXbgX4PWWSofMhnJBujYA2vE80pxoQ5a7tN72kOlCgKq/KKmnl4b
+         TiLUPfrYSu5lNka0xz+lK3wSKWKY9MlKCS2zjgfI50PKGEda3No65xvfeQG5ep+BJHXf
+         RmeA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=xmOofWXPDOZiFtpjDyUYyMlgL0oxxk8dYXPeAiOLviQ=;
+        b=4Ol0RogTl8YzT/USv3jxWs278CpJS0HL4nNlfE61pc2Eom38zETRMVgYgE1ap22C+n
+         49+L/XGMbUjJf5yH/645ipOYYK5MKvWzxaXbXm+2hSjQnUzkH2OMGvR3HqqbG8uqg6qW
+         ry/8jNGIAd4T4ldEulkBbsHK2DDhOqMBHtPpklOSIP8bMdpDh6ZOj548nY0dZE7/D1/4
+         cprEPT6qG392gOhE5SGhlbYl3zZcywr036LqdjuWTEXnt+G7BrJ+ooCoI3cPxC+KH9vp
+         1D+RDPxcgIbZ56pQ0PuqCxYne7YW2J7MVEuRx1IseWD3A0EFDMicnRJYs7rKhDNUya7H
+         vR3A==
+X-Gm-Message-State: AOAM533ndDmyqADiAHeT3z8f1cylh8jW6YQkObZWP74rUbzAR+f0bywv
+        xaJGKlD+miPBZ3R//Zvv2/HQqjNioEGLms35ewgK+A==
+X-Google-Smtp-Source: ABdhPJyhARaz0zB0XWC2DwGU6wSO/IqjixjS3s3LvBF5QV0n1cWGYTbiHYLWfvgRDRW+dS9wjQ1aPbqbu2e+dFomcuY=
+X-Received: by 2002:a5b:6c1:0:b0:633:b5c7:b9b7 with SMTP id
+ r1-20020a5b06c1000000b00633b5c7b9b7mr22215825ybq.67.1648466660275; Mon, 28
+ Mar 2022 04:24:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
+References: <mw2ty4ijin-mw2ty4ijio@nsmail6.0> <CAFEAcA_xpi2kCdHK-K=T3-pbHjWS47xyCzG47wg3HBSKFo4z8w@mail.gmail.com>
+ <de27054a-900b-d1fc-69be-82cb6c893c44@kylinos.cn>
+In-Reply-To: <de27054a-900b-d1fc-69be-82cb6c893c44@kylinos.cn>
+From:   Peter Maydell <peter.maydell@linaro.org>
+Date:   Mon, 28 Mar 2022 11:24:06 +0000
+Message-ID: <CAFEAcA8MbzCvEWL0eu41-hPBTs9OZf1WV168RQCb9K3ZHC-pqw@mail.gmail.com>
+Subject: Re: [PATCH] kvm/arm64: Fix memory section did not set to kvm
+To:     Cong Liu <liucong2@kylinos.cn>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org, qemu-devel@nongnu.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -42,122 +65,81 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-MTE has been supported in Linux since commit 673638f434ee ("KVM: arm64:
-Expose KVM_ARM_CAP_MTE"), add support for it in kvmtool. MTE is enabled by
-default.
+On Mon, 28 Mar 2022 at 10:42, Cong Liu <liucong2@kylinos.cn> wrote:
+> On 2022/3/25 23:00, Peter Maydell wrote:
+> > This is correct behaviour. If the memory region is less than
+> > a complete host page then it is not possible for KVM to
+> > map it into the guest as directly accessible memory,
+> > because that can only be done in host-page sized chunks,
+> > and if the MR is a RAM region smaller than the page then
+> > there simply is not enough backing RAM there to map without
+> > incorrectly exposing to the guest whatever comes after the
+> > contents of the MR.
+>
+> actually, even with fixed 8192 qxl rom bar size, the RAMBlock
+> size corresponding to MemoryRegion will also be 64k.
 
-Enabling the MTE capability incurs a cost, both in time (for each
-translation fault the tags need to be cleared), and in space (the tags need
-to be saved when a physical page is swapped out). This overhead is expected
-to be negligible for most users, but for those cases where it matters
-(like performance benchmarks), a --disable-mte option has been added.
+Where does this rounding up happen? In any case, it would
+still be wrong -- if the ROM bar is 8192 large then the
+guest should get a fault writing to bytes past 8191, not
+reads-as-written.
 
-Reviewed-by: Vladimir Murzin <vladimir.murzin@arm.com>
-Tested-by: Vladimir Murzin <vladimir.murzin@arm.com>
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
- arm/aarch32/include/kvm/kvm-arch.h        |  3 +++
- arm/aarch64/include/kvm/kvm-arch.h        |  1 +
- arm/aarch64/include/kvm/kvm-config-arch.h |  2 ++
- arm/aarch64/kvm.c                         | 22 ++++++++++++++++++++++
- arm/include/arm-common/kvm-config-arch.h  |  1 +
- arm/kvm.c                                 |  2 ++
- 6 files changed, 31 insertions(+)
+> so it can
+> map into the guest as directly accessible memory. now it failed
+> just because we use the wrong size. ROUND_UP(n, d) requires
+> that d be a power of 2, it is faster than QEMU_ALIGN_UP().
+> and the qemu_real_host_page_size should always a power of 2.
+> seems we can use this patch and no need to fall back to "treat
+> like MMIO device access".
+>
+> >
+> > For memory regions smaller than a page, KVM and QEMU will
+> > fall back to "treat like MMIO device access". As long as the
 
-diff --git a/arm/aarch32/include/kvm/kvm-arch.h b/arm/aarch32/include/kvm/kvm-arch.h
-index bee2fc255a82..5616b27e257e 100644
---- a/arm/aarch32/include/kvm/kvm-arch.h
-+++ b/arm/aarch32/include/kvm/kvm-arch.h
-@@ -5,6 +5,9 @@
- 
- #define kvm__arch_get_kern_offset(...)	0x8000
- 
-+struct kvm;
-+static inline void kvm__arch_enable_mte(struct kvm *kvm) {}
-+
- #define ARM_MAX_MEMORY(...)	ARM_LOMAP_MAX_MEMORY
- 
- #define MAX_PAGE_SIZE	SZ_4K
-diff --git a/arm/aarch64/include/kvm/kvm-arch.h b/arm/aarch64/include/kvm/kvm-arch.h
-index 5e5ee41211ed..9124f6919d0f 100644
---- a/arm/aarch64/include/kvm/kvm-arch.h
-+++ b/arm/aarch64/include/kvm/kvm-arch.h
-@@ -6,6 +6,7 @@
- struct kvm;
- unsigned long long kvm__arch_get_kern_offset(struct kvm *kvm, int fd);
- int kvm__arch_get_ipa_limit(struct kvm *kvm);
-+void kvm__arch_enable_mte(struct kvm *kvm);
- 
- #define ARM_MAX_MEMORY(kvm)	({					\
- 	u64 max_ram;							\
-diff --git a/arm/aarch64/include/kvm/kvm-config-arch.h b/arm/aarch64/include/kvm/kvm-config-arch.h
-index 04be43dfa9b2..206756c7e706 100644
---- a/arm/aarch64/include/kvm/kvm-config-arch.h
-+++ b/arm/aarch64/include/kvm/kvm-config-arch.h
-@@ -6,6 +6,8 @@
- 			"Run AArch32 guest"),				\
- 	OPT_BOOLEAN('\0', "pmu", &(cfg)->has_pmuv3,			\
- 			"Create PMUv3 device"),				\
-+	OPT_BOOLEAN('\0', "disable-mte", &(cfg)->mte_disabled,		\
-+			"Disable Memory Tagging Extension"),		\
- 	OPT_U64('\0', "kaslr-seed", &(cfg)->kaslr_seed,			\
- 			"Specify random seed for Kernel Address Space "	\
- 			"Layout Randomization (KASLR)"),
-diff --git a/arm/aarch64/kvm.c b/arm/aarch64/kvm.c
-index 56a0aedc263d..28d608d98831 100644
---- a/arm/aarch64/kvm.c
-+++ b/arm/aarch64/kvm.c
-@@ -81,3 +81,25 @@ int kvm__get_vm_type(struct kvm *kvm)
- 
- 	return KVM_VM_TYPE_ARM_IPA_SIZE(ipa_bits);
- }
-+
-+void kvm__arch_enable_mte(struct kvm *kvm)
-+{
-+	struct kvm_enable_cap cap = {
-+		.cap = KVM_CAP_ARM_MTE,
-+	};
-+
-+	if (kvm->cfg.arch.mte_disabled) {
-+		pr_debug("MTE disabled by user");
-+		return;
-+	}
-+
-+	if (!kvm__supports_extension(kvm, KVM_CAP_ARM_MTE)) {
-+		pr_debug("MTE capability not available");
-+		return;
-+	}
-+
-+	if (ioctl(kvm->vm_fd, KVM_ENABLE_CAP, &cap))
-+		die_perror("KVM_ENABLE_CAP(KVM_CAP_ARM_MTE)");
-+
-+	pr_debug("MTE capability enabled");
-+}
-diff --git a/arm/include/arm-common/kvm-config-arch.h b/arm/include/arm-common/kvm-config-arch.h
-index 5734c46ab9e6..f2049994d859 100644
---- a/arm/include/arm-common/kvm-config-arch.h
-+++ b/arm/include/arm-common/kvm-config-arch.h
-@@ -9,6 +9,7 @@ struct kvm_config_arch {
- 	bool		virtio_trans_pci;
- 	bool		aarch32_guest;
- 	bool		has_pmuv3;
-+	bool		mte_disabled;
- 	u64		kaslr_seed;
- 	enum irqchip_type irqchip;
- 	u64		fw_addr;
-diff --git a/arm/kvm.c b/arm/kvm.c
-index 80d233f13d0b..c5913000e1ed 100644
---- a/arm/kvm.c
-+++ b/arm/kvm.c
-@@ -86,6 +86,8 @@ void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64 ram_size)
- 	/* Create the virtual GIC. */
- 	if (gic__create(kvm, kvm->cfg.arch.irqchip))
- 		die("Failed to create virtual GIC");
-+
-+	kvm__arch_enable_mte(kvm);
- }
- 
- #define FDT_ALIGN	SZ_2M
--- 
-2.35.1
+> I don't understand how it works, can you help explain or tell me
+> which part of the code I should read to understand?
 
+The KVM code in the kernel takes a fault because there is
+nothing mapped at that address in the stage 2 page tables.
+This results in kvm_handle_guest_abort() being called.
+This function sorts out various cases it can handle
+(eg "this is backed by host RAM which we need to page in")
+and cases which are always errors (eg "the guest tried to
+fetch an instruction from non-RAM"). For the cases of
+"treat like MMIO device access" it calls io_mem_abort().
+In io_mem_abort() we check whether the guest instruction that
+did the load/store was a sensible one (this is the
+kvm_vcpu_dabt_isvalid() check). Assuming that it was, then
+we fill in some kvm_run struct fields with the parameters like
+access size, address, etc (which the host CPU tells us in the
+ESR_ELx syndrome register) cause an exit to userspace with
+KVM_EXIT_MMIO as the reason.
+
+In QEMU, the code in kvm_cpu_exec() has a case for the
+KVM_EXIT_MMIO code. It just calls address_space_rw()
+using the address, length, etc parameters that the kernel
+gave us. If this is a load then the loaded data is filled
+in in the kvm_run struct. Then it loops back around to do a
+KVM_RUN ioctl, handing control back to the kernel.
+
+In the kernel, in the arm64 kvm_arch_vcpu_ioctl_run()
+we check whether we've just come back from a KVM_EXIT_MMIO
+exit, and if so call kvm_handle_mmio_return(). If the
+faulting instruction was a load, we read the data from
+the kvm_run struct, sign extend as appropriate, and write
+to the appropriate guest register. Then we increment the
+guest program counter. Finally we start execution in the
+guest in the normal way.
+
+> the test code appended.
+> it works with some differences between arm64 and x86. in x86, it
+> printf rom_test->magic and rom_test->id correctly, but in arm64.
+> it printf rom_test->magic correctly. when I try to print the
+> rom_test->id. I get "load/store instruction decoding not
+> implemented" error message.
+
+You don't show the guest code, which is the thing that matters
+here. In any case for the QXL ROM we already have the fix,
+which is to make the ROM as big as the host page size.
+
+-- PMM
