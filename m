@@ -2,107 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 63BBF4E9A1E
-	for <lists+kvm@lfdr.de>; Mon, 28 Mar 2022 16:51:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CCA104E9A27
+	for <lists+kvm@lfdr.de>; Mon, 28 Mar 2022 16:53:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244070AbiC1OxQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Mar 2022 10:53:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35434 "EHLO
+        id S244097AbiC1Oyn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Mar 2022 10:54:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37038 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244111AbiC1OxH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Mar 2022 10:53:07 -0400
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F7473F8A7
-        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 07:51:26 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id b13so10971423pfv.0
-        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 07:51:26 -0700 (PDT)
+        with ESMTP id S244092AbiC1Oym (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Mar 2022 10:54:42 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A00E5DE56
+        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 07:53:01 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id o3-20020a17090a3d4300b001c6bc749227so15916170pjf.1
+        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 07:53:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=obleDDk1Z4CONGxAkHZNS2tjDM/nuYlv6cPwOVJDufY=;
-        b=h8Ok29DH4z6N0TfkIQj67vjU5KD03U8eMxwkX7kHs1WHIbA4lLyhTbcKvx33kZrWV5
-         4tWfsq4cMxVflItMlDGuqv7OJV1eH4KdzObOzdOtizGAIkxs5mrn85cRduSTqrnG00PQ
-         lL3IUJdXqE+IrbTYrjk1tVVXals52dlLJhfHN08n6eJ+rnGqFHEtsew3k8F56JnePW/4
-         Zw7A6sVXJ+Aq9Tjx6/ONd0HiSUFF1MWVPcy4GVHXqAPwBhLU2ccTWenC/NJysEW/Rd95
-         T3atXP4WAJ0g/Hnd6AHuxCGN4fX4Zp/B2DOVWsUW09lZPzOuSOBmfGQUZqJmRMe9+EP3
-         BWiA==
+         :content-disposition:in-reply-to;
+        bh=szL7lceaP/NxR0+lC2cN5AaRzpZIx1sqZ2iEfehaPgU=;
+        b=dWoW0WSt+vofTr+ILF/HwHxImbE9tGNhavUUeWUHY4WvJIuRkKIJBouTRGpch6aByh
+         BOCESJWtyC9Iu76Ajmq58cWmG3JORjH1N3DUNyraC9UHpqtMgq5J0B7YvvIwCiB4qSuq
+         43EA1b7BzZ2gstsbw3w8peW/pUMClebmhupAU6Is6uLzwHPCvvmMNApimCrwyzdm/Ogc
+         mRYGeomM5FLr79ZfvojBlNJCv+Y03N/h38wNank/TQ/Bgl3Zpp+EdIMaiOjSkX9MRwim
+         EKf9jK+/Xhy0XPU89tIm71stvekDcCJDBojjObxOlzFtX+2WvswVa86Asj04kDqvnjXi
+         Yq6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=obleDDk1Z4CONGxAkHZNS2tjDM/nuYlv6cPwOVJDufY=;
-        b=G3U0u4vxDszhjl5ygw4TrFzFBTL7GyjmOBiue9HCVuD+koB7b7AaTUVqh0qhOawnyC
-         knQUMw938qglz4PhDCaVgRlsuZ2HuE+ipCXSZU93HP8PhlGF4PvQt5dW3hztZp7WXTMy
-         4TS/oaSlYkT7lPZ2SxeHV1C7rJMqdb6lkFaiwUgL63Ef7qJ19uQ/YaoRTfbetIpf5Yhb
-         Vgc/x1/NKXs5AVXYeAqokYw0ETcyvjAyZO74FRw1+OBrGHmb8O8h9MRJ2l6wYRakMLp0
-         +ZAXBI0LBOI8Zwq8Bs5V5dkh39JrZs++cBipBD7oUVS2FBwB1sfcDMrrYg8WooP2DZ46
-         GmLQ==
-X-Gm-Message-State: AOAM530L31YTX87IR9aSc1d9if9wFGII3PxhIAY9DLa5pj9xMt4pE+hI
-        uyoDOv6ETnIK2Lv9MoMacJsH6Q==
-X-Google-Smtp-Source: ABdhPJx6O3QG54jbtM3+68GYNfgyadHMEYPzXTEypnpZ1C+mZMHehDR1WLLZmYv16OhknEgRZIk0wg==
-X-Received: by 2002:a63:68c6:0:b0:380:3fbc:dfb6 with SMTP id d189-20020a6368c6000000b003803fbcdfb6mr10592508pgc.326.1648479085523;
-        Mon, 28 Mar 2022 07:51:25 -0700 (PDT)
+         :mime-version:content-disposition:in-reply-to;
+        bh=szL7lceaP/NxR0+lC2cN5AaRzpZIx1sqZ2iEfehaPgU=;
+        b=gvQXXWr6t2DpbRXe+zOPgSmc8Vsxjicjzpclk8Jm1z2wOwmwBYETTl1Gxc2jGFwMZn
+         urS/8eCftRktHWm/JeeM/uh8oUrnETcgpW0Qd9XAkrMiE1QmJUyCNkTfMP6aMLYWZmaB
+         u+sb4jm5EydPdM0Tl2eIvCssliCNL2hw+e1vYx9ShHzPGaQrUEvAFjWs66AJ1lOvtJoc
+         zP2tu2dYB4V6617YWAN5fTpWWC3EXT0TYyUEwjSxC9xPQ90DB4rl1jLW4zIv7rnChjIy
+         I5zJJxCsF19ckh55jrbxc/kwERsJaQNlNjsvy88Cs1AavMOoyATJ6TDDTJPCE1dzU3Ka
+         rqpA==
+X-Gm-Message-State: AOAM531jiir5QcKogwFQ1DksRFZJLMo+sTSMv9NwuDKKpq30/ESjecBZ
+        OHX2p8BdJd4Ohm7W2r/JI0Ue4yfSJ+c4jQ==
+X-Google-Smtp-Source: ABdhPJyIClNMv5o0NWmY1p1hSJAbH+a7bM/zRuKCdQmA7b/Y9V8XkwNQyyrDzOcaszKj/ka4JXU7Gg==
+X-Received: by 2002:a17:90b:f82:b0:1c6:58b9:bd36 with SMTP id ft2-20020a17090b0f8200b001c658b9bd36mr41688643pjb.141.1648479180804;
+        Mon, 28 Mar 2022 07:53:00 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id h12-20020a056a00230c00b004faf2563bcasm15408065pfh.114.2022.03.28.07.51.24
+        by smtp.gmail.com with ESMTPSA id a16-20020a637050000000b00385f92b13d1sm13066121pgn.43.2022.03.28.07.52.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Mar 2022 07:51:24 -0700 (PDT)
-Date:   Mon, 28 Mar 2022 14:51:21 +0000
+        Mon, 28 Mar 2022 07:53:00 -0700 (PDT)
+Date:   Mon, 28 Mar 2022 14:52:56 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Jon Kohler <jon@nutanix.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] KVM: x86: optimize PKU branching in
- kvm_load_{guest|host}_xsave_state
-Message-ID: <YkHLaS2IPZDCToXk@google.com>
-References: <20220324004439.6709-1-jon@nutanix.com>
- <Yj5bCw0q5n4ZgSuU@google.com>
- <387E8E8B-81B9-40FF-8D52-76821599B7E4@nutanix.com>
- <e8488e5c-7372-fc6e-daee-56633028854a@redhat.com>
- <1E31F2B6-96BF-42E0-AD41-3C512D98D74B@nutanix.com>
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>
+Subject: Re: [PATCH] KVM: x86/mmu: Zap only TDP MMU leafs in zap range and
+ mmu_notifier unmap
+Message-ID: <YkHLyP1LvH0MYN25@google.com>
+References: <20220325230348.2587437-1-seanjc@google.com>
+ <87lewuo4ge.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1E31F2B6-96BF-42E0-AD41-3C512D98D74B@nutanix.com>
+In-Reply-To: <87lewuo4ge.fsf@redhat.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 28, 2022, Jon Kohler wrote:
+On Mon, Mar 28, 2022, Vitaly Kuznetsov wrote:
+> Sean Christopherson <seanjc@google.com> writes:
 > 
+> > Re-introduce zapping only leaf SPTEs in kvm_zap_gfn_range() and
+> > kvm_tdp_mmu_unmap_gfn_range(), this time without losing a pending TLB
+> > flush when processing multiple roots (including nested TDP shadow roots).
+> > Dropping the TLB flush resulted in random crashes when running Hyper-V
+> > Server 2019 in a guest with KSM enabled in the host (or any source of
+> > mmu_notifier invalidations, KSM is just the easiest to force).
+> >
+> > This effectively revert commits 873dd122172f8cce329113cfb0dfe3d2344d80c0
+> > and fcb93eb6d09dd302cbef22bd95a5858af75e4156, and thus restores commit
+> > cf3e26427c08ad9015956293ab389004ac6a338e, plus this delta on top:
+> >
+> > bool kvm_tdp_mmu_zap_leafs(struct kvm *kvm, int as_id, gfn_t start, gfn_t end,
+> >         struct kvm_mmu_page *root;
+> >
+> >         for_each_tdp_mmu_root_yield_safe(kvm, root, as_id)
+> > -               flush = tdp_mmu_zap_leafs(kvm, root, start, end, can_yield, false);
+> > +               flush = tdp_mmu_zap_leafs(kvm, root, start, end, can_yield, flush);
+> >
+> >         return flush;
+> >  }
+> >
 > 
-> > On Mar 27, 2022, at 6:43 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> > 
-> > On 3/26/22 02:37, Jon Kohler wrote:
-> >>>>    Flip the ordering of the || condition so that XFEATURE_MASK_PKRU is
-> >>>>    checked first, which when instrumented in our environment appeared
-> >>>>    to be always true and less overall work than kvm_read_cr4_bits.
-> >>> 
-> >>> If it's always true, then it should be checked last, not first.  And if
-> >> Sean thanks for the review. This would be a left handed || short circuit, so
-> >> wouldn’t we want always true to be first?
-> > 
-> > Yes.
+> I confirm this fixes the issue I was seeing, thanks!
 > 
-> Ack, thanks.
+> Tested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-Yeah, I lost track of whether it was a || or &&.
+Phew!  I think I would have cried were that not the case :-)  Thanks for testing!
