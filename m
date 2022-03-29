@@ -2,68 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 558AC4EB26D
-	for <lists+kvm@lfdr.de>; Tue, 29 Mar 2022 19:03:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D72F74EB2B8
+	for <lists+kvm@lfdr.de>; Tue, 29 Mar 2022 19:33:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240033AbiC2RFV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Mar 2022 13:05:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35672 "EHLO
+        id S240219AbiC2RfC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Mar 2022 13:35:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238569AbiC2RFS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 29 Mar 2022 13:05:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 28A2F38D9A
-        for <kvm@vger.kernel.org>; Tue, 29 Mar 2022 10:03:35 -0700 (PDT)
+        with ESMTP id S235372AbiC2RfA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Mar 2022 13:35:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8EEE1B3D
+        for <kvm@vger.kernel.org>; Tue, 29 Mar 2022 10:33:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1648573414;
+        s=mimecast20190719; t=1648575195;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cyh9GNwkSeiWX8VVWJet6cmrStrv1Y1BhHYKMAKCy08=;
-        b=VTprXS5uGy6tvSDYozLj7qRZk3wewZgARXSQMvrbdT4frkGEiJkzNuU7R5SD4krrcyZQKf
-        qVWVhUWqhocv3qyM2eliZSO8Qyhbo7Kj2gmOYT8nn25KuXZQwONcYYAindz2F3cWchgzfc
-        CqfsiP7l5kNTjFraeX90dP+Qea4lY3k=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+         content-transfer-encoding:content-transfer-encoding;
+        bh=DoTRqQDJbdqwPWMurSzwBFSAKdvVaPy59umte0ZT9sw=;
+        b=ZC2/sTA6+Tk8MJIFyQp5MrddeOz2DexwHZBfCovo4XgUH1HFZVodeWHqahh52DIq2JJR7m
+        As3sqfTK4RTTFcLJa4e7/sgHdAOUwhT5LmvtSE9fCxvMGWybbjYcdQ8m0w7/VmBEgz16VL
+        BpfkP0Y/ol2CsgdysjRtZoYFwpepmWg=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-622-TUmrXiUmNSC-oWrUklKYyg-1; Tue, 29 Mar 2022 13:03:22 -0400
-X-MC-Unique: TUmrXiUmNSC-oWrUklKYyg-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+ us-mta-629-wM6pXmknNyezFYRp8c2AZw-1; Tue, 29 Mar 2022 13:32:03 -0400
+X-MC-Unique: wM6pXmknNyezFYRp8c2AZw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4D5FB28035F1;
-        Tue, 29 Mar 2022 17:03:22 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 10F218F11D5;
+        Tue, 29 Mar 2022 17:32:02 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 07465464DDB;
-        Tue, 29 Mar 2022 17:03:22 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B422AC0809D;
+        Tue, 29 Mar 2022 17:31:57 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>
-Subject: Re: [PATCH] KVM: x86/mmu: Zap only TDP MMU leafs in zap range and mmu_notifier unmap
-Date:   Tue, 29 Mar 2022 13:03:21 -0400
-Message-Id: <20220329170321.163437-1-pbonzini@redhat.com>
-In-Reply-To: <20220325230348.2587437-1-seanjc@google.com>
-References: 
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     seanjc@google.com,
+        syzbot+6bde52d89cfdf9f61425@syzkaller.appspotmail.com,
+        linux-mm@kvack.org, akpm@linux-foundation.org,
+        stable@vger.kernel.org
+Subject: [PATCH] mm: avoid pointless invalidate_range_start/end on mremap(old_size=0)
+Date:   Tue, 29 Mar 2022 13:31:55 -0400
+Message-Id: <20220329173155.172439-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Queued, thanks.
+If an mremap() syscall with old_size=0 ends up in move_page_tables(),
+it will call invalidate_range_start()/invalidate_range_end() unnecessarily,
+i.e. with an empty range.
 
-Paolo
+This causes a WARN in KVM's mmu_notifier.  In the past, empty ranges
+have been diagnosed to be off-by-one bugs, hence the WARNing.
+Given the low (so far) number of unique reports, the benefits of
+detecting more buggy callers seem to outweigh the cost of having
+to fix cases such as this one, where userspace is doing something
+silly.  In this particular case, an early return from move_page_tables()
+is enough to fix the issue.
 
+Reported-by: syzbot+6bde52d89cfdf9f61425@syzkaller.appspotmail.com
+Cc: linux-mm@kvack.org
+Cc: akpm@linux-foundation.org
+Cc: stable@vger.kernel.org
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ mm/mremap.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/mm/mremap.c b/mm/mremap.c
+index 002eec83e91e..0e175aef536e 100644
+--- a/mm/mremap.c
++++ b/mm/mremap.c
+@@ -486,6 +486,9 @@ unsigned long move_page_tables(struct vm_area_struct *vma,
+ 	pmd_t *old_pmd, *new_pmd;
+ 	pud_t *old_pud, *new_pud;
+ 
++	if (!len)
++		return 0;
++
+ 	old_end = old_addr + len;
+ 	flush_cache_range(vma, old_addr, old_end);
+ 
+-- 
+2.31.1
 
