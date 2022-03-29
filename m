@@ -2,98 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D72F74EB2B8
-	for <lists+kvm@lfdr.de>; Tue, 29 Mar 2022 19:33:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4F2C64EB2F5
+	for <lists+kvm@lfdr.de>; Tue, 29 Mar 2022 19:52:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240219AbiC2RfC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Mar 2022 13:35:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34780 "EHLO
+        id S240368AbiC2Ry2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Mar 2022 13:54:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235372AbiC2RfA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 29 Mar 2022 13:35:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8EEE1B3D
-        for <kvm@vger.kernel.org>; Tue, 29 Mar 2022 10:33:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1648575195;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=DoTRqQDJbdqwPWMurSzwBFSAKdvVaPy59umte0ZT9sw=;
-        b=ZC2/sTA6+Tk8MJIFyQp5MrddeOz2DexwHZBfCovo4XgUH1HFZVodeWHqahh52DIq2JJR7m
-        As3sqfTK4RTTFcLJa4e7/sgHdAOUwhT5LmvtSE9fCxvMGWybbjYcdQ8m0w7/VmBEgz16VL
-        BpfkP0Y/ol2CsgdysjRtZoYFwpepmWg=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-629-wM6pXmknNyezFYRp8c2AZw-1; Tue, 29 Mar 2022 13:32:03 -0400
-X-MC-Unique: wM6pXmknNyezFYRp8c2AZw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 10F218F11D5;
-        Tue, 29 Mar 2022 17:32:02 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B422AC0809D;
-        Tue, 29 Mar 2022 17:31:57 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     seanjc@google.com,
-        syzbot+6bde52d89cfdf9f61425@syzkaller.appspotmail.com,
-        linux-mm@kvack.org, akpm@linux-foundation.org,
-        stable@vger.kernel.org
-Subject: [PATCH] mm: avoid pointless invalidate_range_start/end on mremap(old_size=0)
-Date:   Tue, 29 Mar 2022 13:31:55 -0400
-Message-Id: <20220329173155.172439-1-pbonzini@redhat.com>
+        with ESMTP id S240351AbiC2RyV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Mar 2022 13:54:21 -0400
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81FC11ED05D;
+        Tue, 29 Mar 2022 10:52:37 -0700 (PDT)
+Received: by mail-pj1-x1031.google.com with SMTP id p4-20020a17090ad30400b001c7ca87c05bso2508586pju.1;
+        Tue, 29 Mar 2022 10:52:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=pQtwmQnPApqxl6a1qQafAVmNSaeDO1TUxN8vDTFvE9o=;
+        b=kcAhcgdBWZB/5xNlBMsZ8SeU1XU7vhJRw5PdIqWOGc/QGZezZM+p0Ev0+T1+4lz9um
+         vVfPWqcOQT16tsjVm4NHi4g88OJHtxIRg6SbbUU2wTyIFlZW3kErv1o9kN1osamqxZMd
+         18omSGkrGcViPmFtc+Ztyw8WevNcOFhnEShRcxOIAvHd4fFLQpY6xIqAORoB7/H0ZWx8
+         +O49D87VS33nHHSLgfGb6169Ua/ovkJoBltcgoC2Ggc9bgNObvH70KbYUfWK/j4vcNua
+         2Bk5PfNECfwoCPt85yOti6qg0fCctJAoGoftKkRDvboxXLKMJn6FQYki7s/Nj5Np3t4q
+         8pGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=pQtwmQnPApqxl6a1qQafAVmNSaeDO1TUxN8vDTFvE9o=;
+        b=Ra1cX6vTKkr9l8y5c6VusjkJcOlNuYfeTqlmZLvmIjbSOzeBoqS/XJtCxWmOKjekL0
+         Ff4pw/ctKTdR65d8Me0GdduMmkjm7PMV3mtOfwrU95ovi6T/Mvwdk6XTYmsvxDpuoNQW
+         YC5czLvvaSYl9JEM0cG+m3VabRavKeHmWtUlDOMVAebjpeVZYU58QWZp/olsVZPCx6jv
+         XURVf2OLCz4Ncg+I5y9kf4BqzSSp8WpjyNrpKa0xPWNK+CPC4jnv0QwvpuELreulz5/n
+         wk+1E2ztSgi9R4H5buLUMUc+wSuu4mMUmVtM3v2G0+kCgero3eoB5mjlsrNEylmgPFoe
+         nFXQ==
+X-Gm-Message-State: AOAM532FI15FZK45VXbgjMIkMqPq5ixkD44R1X2sW4kSC+Uv3BOM4wbM
+        KKIOr/BZ17M2z87vIYeIIak=
+X-Google-Smtp-Source: ABdhPJwYGa5KMAEW7uS9gBKnxEtSXxrla89FTrBVEJvRlifU/5KAvcPBT73SyAy/Hje6IOTbvvCwAw==
+X-Received: by 2002:a17:903:186:b0:154:3606:7a73 with SMTP id z6-20020a170903018600b0015436067a73mr31930870plg.89.1648576356704;
+        Tue, 29 Mar 2022 10:52:36 -0700 (PDT)
+Received: from localhost ([192.55.54.52])
+        by smtp.gmail.com with ESMTPSA id 132-20020a62168a000000b004f40e8b3133sm21624407pfw.188.2022.03.29.10.52.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Mar 2022 10:52:36 -0700 (PDT)
+Date:   Tue, 29 Mar 2022 10:52:34 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     "Huang, Kai" <kai.huang@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Hansen, Dave" <dave.hansen@intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        isaku.yamahata@gmail.com
+Subject: Re: [PATCH v2 01/21] x86/virt/tdx: Detect SEAM
+Message-ID: <20220329175234.GA1915371@ls.amr.corp.intel.com>
+References: <cover.1647167475.git.kai.huang@intel.com>
+ <a258224c26b6a08400d9a8678f5d88f749afe51e.1647167475.git.kai.huang@intel.com>
+ <BN9PR11MB527657C2AA8B9ACD94C9D5468C189@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <51982ec477e43c686c5c64731715fee528750d85.camel@intel.com>
+ <BN9PR11MB52765EE37C00F0FFA01447968C1D9@BN9PR11MB5276.namprd11.prod.outlook.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BN9PR11MB52765EE37C00F0FFA01447968C1D9@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If an mremap() syscall with old_size=0 ends up in move_page_tables(),
-it will call invalidate_range_start()/invalidate_range_end() unnecessarily,
-i.e. with an empty range.
+On Mon, Mar 28, 2022 at 08:10:47AM +0000,
+"Tian, Kevin" <kevin.tian@intel.com> wrote:
 
-This causes a WARN in KVM's mmu_notifier.  In the past, empty ranges
-have been diagnosed to be off-by-one bugs, hence the WARNing.
-Given the low (so far) number of unique reports, the benefits of
-detecting more buggy callers seem to outweigh the cost of having
-to fix cases such as this one, where userspace is doing something
-silly.  In this particular case, an early return from move_page_tables()
-is enough to fix the issue.
+> > From: Huang, Kai <kai.huang@intel.com>
+> > Sent: Monday, March 28, 2022 11:55 AM
+> >
+> > SEAMRR and TDX KeyIDs are configured by BIOS and they are static during
+> > machine's runtime.  On the other hand, TDX module can be updated and
+> > reinitialized at runtime (not supported in this series but will be supported in
+> > the future).  Theoretically, even P-SEAMLDR can be updated at runtime
+> > (although
+> > I think unlikely to be supported in Linux).  Therefore I think detecting
+> > SEAMRR
+> > and TDX KeyIDs at boot fits better.
+> 
+> If those info are static it's perfectly fine to detect them until they are
+> required... and following are not solid cases (e.g. just exposing SEAM
+> alone doesn't tell the availability of TDX) but let's also hear the opinions
+> from others.
 
-Reported-by: syzbot+6bde52d89cfdf9f61425@syzkaller.appspotmail.com
-Cc: linux-mm@kvack.org
-Cc: akpm@linux-foundation.org
-Cc: stable@vger.kernel.org
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- mm/mremap.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/mm/mremap.c b/mm/mremap.c
-index 002eec83e91e..0e175aef536e 100644
---- a/mm/mremap.c
-+++ b/mm/mremap.c
-@@ -486,6 +486,9 @@ unsigned long move_page_tables(struct vm_area_struct *vma,
- 	pmd_t *old_pmd, *new_pmd;
- 	pud_t *old_pud, *new_pud;
- 
-+	if (!len)
-+		return 0;
-+
- 	old_end = old_addr + len;
- 	flush_cache_range(vma, old_addr, old_end);
- 
+One use case is cloud use case.  If TDX module is initialized dynamically at
+runtime, cloud management system wants to know if the physical machine is
+capable of TDX in addition to if TDX module is initialized.  Also how many TDs
+can be run on the machine even when TDX module is not initialized yet.  The
+management system will schedule TDs based on those information.
 -- 
-2.31.1
-
+Isaku Yamahata <isaku.yamahata@gmail.com>
