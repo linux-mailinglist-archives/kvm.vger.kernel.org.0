@@ -2,134 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6943D4EA413
-	for <lists+kvm@lfdr.de>; Tue, 29 Mar 2022 02:15:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BB0494EA411
+	for <lists+kvm@lfdr.de>; Tue, 29 Mar 2022 02:15:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231325AbiC2AGG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Mar 2022 20:06:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51608 "EHLO
+        id S231308AbiC2AGh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Mar 2022 20:06:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53904 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231297AbiC2AGD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Mar 2022 20:06:03 -0400
-Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AB0F5596
-        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 17:04:21 -0700 (PDT)
-Received: by mail-pg1-x532.google.com with SMTP id s72so13397791pgc.5
-        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 17:04:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=etgjqyAwbvR6Km5d+2cDKN373f0iHJRr9ymO9u+KgK4=;
-        b=G5YIvVl22ePZITTXQy7vowBlWgCkZizGIGOI6pI2XX9x6vtJv/N8rYqMnVC1NBJmDl
-         Xi+sHsYUIN+SJvKP8OhZ+TiWYKsB4cnA6blgTh8kV07ztljdTDT58Zz7wNd5brW8jMKi
-         MeGC0zhst3Ze45rOieg8y/L1qR1ehb0uYXPOVkW1do58sPgFqUFnszIPRO9ZxP9E/VDu
-         Hg6Vj8ktwcYNsYL0mPC653HM7uXxVOtZT2l2L6hyenJnUzEd16GnIxOc9EHXvkyvvGnf
-         OmD5GfIZ3n5oGbfX95H+OgOqSCiAjQRN+aczvRBQ7z8EFIt+C0RkUgE4xiw6oc4aMGhH
-         c2MQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=etgjqyAwbvR6Km5d+2cDKN373f0iHJRr9ymO9u+KgK4=;
-        b=A0rER6zqi+3Tv1MrFCrwK8+dnQkUKWzjT4JTBb7fztF83ewBazwe+1qRnTpDwtX1zp
-         B9ZnaqN30LVKjHev/NTsc0OwGkjIK1QQKoWRM1muQszw92lGHFZ3bnGjz0EwIc62vKHT
-         qH3JeIbnFSJ62iiQiJgMZdWkCZv7Kls6h0sBXm7/gTvHaB3W++xNemIJBV0f9qXt4pjx
-         0HqzyH4x5uHZBu4lUM73zHbnlSx0c12qWEBtxg80BQWpNzVPWB/386BxG7jcL7A4U+Fr
-         Uq3L/m83uRoUI6iL6gOwg3118R+NTLkQFQlPHCWSKUBhow0ql7KAYPq5xtz2x4UPX7Y9
-         RaoA==
-X-Gm-Message-State: AOAM530v2DoXm/MrejoTGD+ltSjvE22TrqWctH+wz3V7igvIMNWDucBN
-        orHG/SqPazbHI9RYNQhG5bfzcw==
-X-Google-Smtp-Source: ABdhPJx8yKtkbTnvKDhEF6CrTpFMthUus1w5B4uh8qOQh+zUkITN5OLbQQgaCn3E+3ynmkMH71yJkQ==
-X-Received: by 2002:a63:e545:0:b0:382:8dd9:a870 with SMTP id z5-20020a63e545000000b003828dd9a870mr11790668pgj.621.1648512260958;
-        Mon, 28 Mar 2022 17:04:20 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id 204-20020a6302d5000000b00385f29b02b2sm14336170pgc.50.2022.03.28.17.04.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Mar 2022 17:04:20 -0700 (PDT)
-Date:   Tue, 29 Mar 2022 00:04:16 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     "Nakajima, Jun" <jun.nakajima@intel.com>
-Cc:     "Lutomirski, Andy" <luto@kernel.org>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        KVM list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-api@vger.kernel.org" <linux-api@vger.kernel.org>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        "Hansen, Dave" <dave.hansen@intel.com>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "david@redhat.com" <david@redhat.com>
-Subject: Re: [PATCH v5 00/13] KVM: mm: fd-based approach for supporting KVM
- guest private memory
-Message-ID: <YkJNAPPpdiL24kJF@google.com>
-References: <20220310140911.50924-1-chao.p.peng@linux.intel.com>
- <CALCETrWk1Y47JQC=V028A7Tmc9776Oo4AjgwqRtd9K=XDh6=TA@mail.gmail.com>
- <7CCE5220-0ACF-48EE-9366-93CABDA91065@intel.com>
+        with ESMTP id S231252AbiC2AGg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Mar 2022 20:06:36 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE8BE286EF;
+        Mon, 28 Mar 2022 17:04:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1648512292; x=1680048292;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=juvWbMsYnrH6myWOknKMBFZebQXalGrID0LpNJMhQT0=;
+  b=ZshH2fPGNu2gnPbjtPzuXWHQxZi4dls7iE6X7/GSCT/X6IftuuHy7FMo
+   sP47F48u3uDfkrmU1DHg1QXmyTOTNXwrkIn/jSiHpjGqarO6n2BcCrp/7
+   PT7j3cInR+zX/CZrh/BRDDgb+ElaltIu2V3KigTeIN8dbfohPAi0Cjidx
+   XHPaACjNu4gxrWmXy2as3o7RqHU/BgsC/o40MJbTxhLhOMItdW0ITS5HB
+   L1+hj6l1Sp8bnoEuSD0P1pxkI0TbQ4O+zGI3L38dpdmNGmApnXHZDII57
+   h0oJsP+khgUC88AQDQdfPMsoj64vvM+CfdzfCB4RWPh31tO0J3BadvrQw
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10300"; a="322314150"
+X-IronPort-AV: E=Sophos;i="5.90,218,1643702400"; 
+   d="scan'208";a="322314150"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2022 17:04:52 -0700
+X-IronPort-AV: E=Sophos;i="5.90,218,1643702400"; 
+   d="scan'208";a="585377933"
+Received: from nhawacha-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.27.18])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2022 17:04:48 -0700
+Message-ID: <3921284602d9a9ed36df7fe651ca25b29a3de0de.camel@intel.com>
+Subject: Re: [PATCH v2 09/21] x86/virt/tdx: Get information about TDX module
+ and convertible memory
+From:   Kai Huang <kai.huang@intel.com>
+To:     Dave Hansen <dave.hansen@intel.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        seanjc@google.com, pbonzini@redhat.com,
+        kirill.shutemov@linux.intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, peterz@infradead.org,
+        tony.luck@intel.com, ak@linux.intel.com, dan.j.williams@intel.com,
+        isaku.yamahata@intel.com
+Date:   Tue, 29 Mar 2022 13:04:46 +1300
+In-Reply-To: <f0b7ecb0-a0f1-95f3-4594-bc19eab4d2f2@intel.com>
+References: <cover.1647167475.git.kai.huang@intel.com>
+         <98c1010509aa412e7f05b12187cacf40451d5246.1647167475.git.kai.huang@intel.com>
+         <20220324174301.GA1212881@ls.amr.corp.intel.com>
+         <f211441a6d23321e22517684159e2c28c8492b86.camel@intel.com>
+         <20220328202225.GA1525925@ls.amr.corp.intel.com>
+         <60bf1aa7-b004-0ea7-7efc-37b4a1ea2461@intel.com>
+         <9d8d20f62f82e052893fa32368d6a228a2140728.camel@intel.com>
+         <f0b7ecb0-a0f1-95f3-4594-bc19eab4d2f2@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <7CCE5220-0ACF-48EE-9366-93CABDA91065@intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 28, 2022, Nakajima, Jun wrote:
-> > On Mar 28, 2022, at 1:16 PM, Andy Lutomirski <luto@kernel.org> wrote:
-> > 
-> > On Thu, Mar 10, 2022 at 6:09 AM Chao Peng <chao.p.peng@linux.intel.com> wrote:
-> >> 
-> >> This is the v5 of this series which tries to implement the fd-based KVM
-> >> guest private memory. The patches are based on latest kvm/queue branch
-> >> commit:
-> >> 
-> >>  d5089416b7fb KVM: x86: Introduce KVM_CAP_DISABLE_QUIRKS2
-> > 
-> > Can this series be run and a VM booted without TDX?  A feature like
-> > that might help push it forward.
-> > 
-> > —Andy
+On Mon, 2022-03-28 at 16:44 -0700, Dave Hansen wrote:
+> On 3/28/22 16:40, Kai Huang wrote:
+> > Btw if you have time, could you help to review this series? Or could you take a
+> > look at whether the overall design is OK, for instance, the design limitations
+> > described in the cover letter?
 > 
-> Since the userspace VMM (e.g. QEMU) loses direct access to private memory of
-> the VM, the guest needs to avoid using the private memory for (virtual) DMA
-> buffers, for example. Otherwise, it would need to use bounce buffers, i.e. we
-> would need changes to the VM. I think we can try that (i.e. add only bounce
-> buffer changes). What do you think?
+> Kai, it's on my list, but it's a long list.
+> 
+> If you want to help, there are at least two other *big* TDX patch sets
+> out there that need eyeballs:
+> 
+> > https://lore.kernel.org/all/20220318153048.51177-1-kirill.shutemov@linux.intel.com/
+> 
+> and
+> 
+> > https://lore.kernel.org/all/20220310140911.50924-1-chao.p.peng@linux.intel.com/
+> 
 
-I would love to be able to test this series and run full-blown VMs without TDX or
-SEV hardware.
+Yes I am aware of them.  I'll comment if I think that can help to speed up. 
+Thanks for the info!
 
-The other option for getting test coverage is KVM selftests, which don't have an
-existing guest that needs to be enlightened.  Vishal is doing work on that front,
-though I think it's still in early stages.  Long term, selftests will also be great
-for negative testing.
+-- 
+Thanks,
+-Kai
+
+
