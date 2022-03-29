@@ -2,280 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 10A7C4EAF24
-	for <lists+kvm@lfdr.de>; Tue, 29 Mar 2022 16:19:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C16964EB01A
+	for <lists+kvm@lfdr.de>; Tue, 29 Mar 2022 17:20:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237820AbiC2OVI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Mar 2022 10:21:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41870 "EHLO
+        id S238444AbiC2PWM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Mar 2022 11:22:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236614AbiC2OVH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 29 Mar 2022 10:21:07 -0400
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD68963C6
-        for <kvm@vger.kernel.org>; Tue, 29 Mar 2022 07:19:23 -0700 (PDT)
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1648563560;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=gC3hDeP6xDMAGbmPmAwHT/7gHDPuXesaXf648iZZiGY=;
-        b=tWyM3W9ZTLiEhs2gEQhON7NDb3u8Ca5xxqMlLWLyUufqna7hbpaP2y+8qEZvJ0VmtY3kKV
-        f8Q2X0UjY0QPJmbWeYN4LN4sA7o0WzskkDEiEMZeCBPlnffEHTshLkxPUC6T7RQ0KHdhSD
-        2inaSBV1/pbzMMbC9z2i9dTb1Hl2KKLgFoa/gVWsTtCK8VB4m8FbBLyDHpU3zqZHQCeRw0
-        qoT57ynscuWRejeVc21EPZy7si0duMGW11CU3UmSxJ2M3NgSSWu9it5yt3DllK6xreD7kv
-        ZCas4LzPxAucvrWNvFZVFd2Thb6tmgbgSGJuhOTwoj9Zak0rJm1UWbvVl4i2eQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1648563560;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=gC3hDeP6xDMAGbmPmAwHT/7gHDPuXesaXf648iZZiGY=;
-        b=t86PdnCAIQDblWgeBTuO2qSD47WNkL4ZhPQheBjCAxDU3CZuwvJp4QP220r0J4XyOrKBs6
-        VWwpSUz3rWYp3BAA==
-To:     Oliver Upton <oupton@google.com>, "Franke, Daniel" <dff@amazon.com>
-Cc:     David Woodhouse <dwmw2@infradead.org>,
+        with ESMTP id S235516AbiC2PWK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Mar 2022 11:22:10 -0400
+Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45D2CB0A5D
+        for <kvm@vger.kernel.org>; Tue, 29 Mar 2022 08:20:24 -0700 (PDT)
+Received: by mail-yb1-xb31.google.com with SMTP id f23so1669658ybj.7
+        for <kvm@vger.kernel.org>; Tue, 29 Mar 2022 08:20:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=mqf77QeoL5E8gq/UNbdnceI0Lqcn9TnB8ZcBKbA//HY=;
+        b=gzfose0LqAREB7zRFZHRdNffeFoQlP8t4o4t8O+im03BrN8m99rmINX5UePPZJdCiI
+         kMOYFj16jCWs/XA5tlLbXYovRDJrZL9S7pOUws5JSPWv8SKhcmpPp4D5pWhNr2yv6WhG
+         i4wjTXUsf6VAWxZq1VSq/jOT916GRkv75TyZnUse/j8N5PiuCT5rYpMNAcMhwBqRXe4J
+         g80Uro+2EmhRXPMTFTjqXHDqWu7nAO/cXZtoMEpng1yojJhZYGaXK2aRPQZM1IGb77s2
+         nvhUYbJtyb2I4zLJ4zBYT9Iqi+OoxlzngK05QW4gWIzWFlF1oL+aDuizguL3sy3as+DR
+         nrwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=mqf77QeoL5E8gq/UNbdnceI0Lqcn9TnB8ZcBKbA//HY=;
+        b=J9uqbOSOT8MWm1cRcDLsLYe7iJGEbeYSD8q8LuYwmdQX7oaIsYGZKEBVuiNCeBKVfJ
+         U0//xgP+Icb1qSh/8/7c+BTSZoh/SD8A+HCnHwQ5KDebbBR3EdIwx+xzhH0iAsATymTJ
+         xLfwjtU+QFmhY6iHNUBdXktixY7RyYLN23wo9mP9s8kLmava+39wlqZpuxdnLvkMIEqr
+         skc8wm4gFTFB+2KrYr/LSc9QLNTtCdC6ajdraSa6w2a/PivRb2X+c/z2/TwBd0pDkmu9
+         EYhlTCf3moYhXuYVKfBtSxueLoFoHVij4g2TC15p6jyz+HCruzjzhQzFA1e2dWz+JFm/
+         aX8Q==
+X-Gm-Message-State: AOAM5331ODsgZ9L1FhSJkkJGA3fJ1ZVb9oGhqKdNHWR2LAelhh2VsvlM
+        yRvGInpxc4sn6By27hajddoI1TipodMjUfHsCh4Erw==
+X-Google-Smtp-Source: ABdhPJwTGzMwHTVoUHzH/SEOKRVgEO0IwzEv+Q8tSvRoNS9k6jrg6Gq+mgZ9LssHpyLF5AKwYur63FvMHokmW40AQPM=
+X-Received: by 2002:a25:9909:0:b0:624:57e:d919 with SMTP id
+ z9-20020a259909000000b00624057ed919mr29166744ybn.494.1648567223068; Tue, 29
+ Mar 2022 08:20:23 -0700 (PDT)
+MIME-Version: 1.0
+From:   Naresh Kamboju <naresh.kamboju@linaro.org>
+Date:   Tue, 29 Mar 2022 20:50:12 +0530
+Message-ID: <CA+G9fYsd+zXJqsxuYkWLQo0aYwmqLVA_YeBu+sr546bGA+1Nfg@mail.gmail.com>
+Subject: WARNING: at arch/x86/kvm/../../../virt/kvm/kvm_main.c:3156 mark_page_dirty_in_slot
+To:     "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>, kvm list <kvm@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        lkft-triage@lists.linaro.org
+Cc:     Shuah Khan <shuah@kernel.org>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: Re: [PATCH] Documentation: KVM: Describe guest TSC scaling in
- migration algorithm
-In-Reply-To: <YjpFP+APSqjU7fUi@google.com>
-References: <5BD1FCB2-3164-4785-B4D0-94E19E6D7537@amazon.com>
- <YjpFP+APSqjU7fUi@google.com>
-Date:   Tue, 29 Mar 2022 16:19:19 +0200
-Message-ID: <875ynwg7tk.ffs@tglx>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+        Thomas Gleixner <tglx@linutronix.de>,
+        Linus Torvalds <torvalds@linux-foundation.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 22 2022 at 21:53, Oliver Upton wrote:
-> On Tue, Mar 22, 2022 at 07:18:20PM +0000, Franke, Daniel wrote:
->> The KVM_PVCLOCK_STOPPED event should trigger a change in some of the
->> globals kept by kernel/time/ntp.c (which are visible to userspace through
->> adjtimex(2)). In particular, `time_esterror` and `time_maxerror` should get reset
->> to `NTP_PHASE_LIMIT` and time_status should get reset to `STA_UNSYNC`.
->
-> I do not disagree that NTP needs to throw the book out after a live
-> migration.
->
-> But, the issue is how we convey that to the guest. KVM_PVCLOCK_STOPPED
-> relies on the guest polling a shared structure, and who knows when the
-> guest is going to check the structure again? If we inject an interrupt
-> the guest is likely to check this state in a reasonable amount of time.
->
-> Thomas, we're talking about how to not wreck time (as bad) under
-> virtualization. I know this has been an area of interest to you for a
-> while ;-) The idea is that the hypervisor should let the guest know
-> about time travel.
+While running kselftest kvm test cases on x86_64 devices the following
+kernel warning was reported.
 
-Finally. It only took 10+ years of ranting :)
+metadata:
+  git_ref: master
+  git_repo: https://gitlab.com/Linaro/lkft/mirrors/torvalds/linux-mainline
+  git_sha: 1930a6e739c4b4a654a69164dbe39e554d228915
+  git_describe: v5.17-12882-g1930a6e739c4
+  kernel_version: 5.17.0
+  kernel-config: https://builds.tuxbuild.com/272RGo17Agp9s62duqGs3mP2d0S/config
 
-> Let's just assume for now that the hypervisor will *not* quiesce
-> the guest into an S2IDLE state before migration. I think quiesced
-> migrations are a good thing to have in the toolbelt, but there will
-> always be host-side problems that require us to migrate a VM off a host
-> immediately with no time to inform the guest.
 
-Quiesced migrations are the right thing on the principle of least
-surprise.
+# selftests: kvm: evmcs_test
+# Running L1 which uses EVMCS to run L2
+# Injecting NMI into L1 before L2 had a chance to run after restore
+# Trying extra KVM_GET_NESTED_STATE/KVM_SET_NESTED_STATE cycle
+ok 4 selftests: kvm: evmcs_test
+# selftests: kvm: emulator_error_test
+# module parameter 'allow_smaller_maxphyaddr' is not set.  Skipping test.
+ok 5 selftests: kvm: emulator_error_test
+# selftests: kvm: hyperv_clock
+[   62.510388] ------------[ cut here ]------------
+[   62.515064] WARNING: CPU: 1 PID: 915 at
+arch/x86/kvm/../../../virt/kvm/kvm_main.c:3156
+mark_page_dirty_in_slot+0xba/0xd0
+[   62.525968] Modules linked in: x86_pkg_temp_thermal fuse
+[   62.531307] CPU: 1 PID: 915 Comm: hyperv_clock Not tainted 5.17.0 #1
+[   62.537691] Hardware name: Supermicro SYS-5019S-ML/X11SSH-F, BIOS
+2.0b 07/27/2017
+[   62.545185] RIP: 0010:mark_page_dirty_in_slot+0xba/0xd0
+[   62.550452] Code: 89 ea 09 c6 e8 57 d4 00 00 5b 41 5c 41 5d 41 5e
+5d c3 48 8b 83 c0 00 00 00 49 63 d5 f0 48 0f ab 10 5b 41 5c 41 5d 41
+5e 5d c3 <0f> 0b 5b 41 5c 41 5d 41 5e 5d c3 0f 1f 44 00 00 eb 80 0f 1f
+40 00
+[   62.569265] RSP: 0018:ffffa347c1663b50 EFLAGS: 00010246
+[   62.574502] RAX: 0000000080000000 RBX: ffff8f01149ce600 RCX: 0000000000000000
+[   62.581700] RDX: 0000000000000000 RSI: ffffffffa302ab31 RDI: ffffffffa302ab31
+[   62.588874] RBP: ffffa347c1663b70 R08: 0000000000000000 R09: 0000000000000001
+[   62.596046] R10: 0000000000000001 R11: 0000000000000000 R12: ffffa347c1665000
+[   62.603213] R13: 0000000000000022 R14: 0000000000000000 R15: 0000000000000004
+[   62.610389] FS:  00007fe3799c1740(0000) GS:ffff8f041fc80000(0000)
+knlGS:0000000000000000
+[   62.618697] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   62.624467] CR2: 0000000000000000 CR3: 000000010614e004 CR4: 00000000003726e0
+[   62.631684] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+[   62.638833] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+[   62.646009] Call Trace:
+[   62.648480]  <TASK>
+[   62.650604]  __kvm_write_guest_page+0xc8/0x100
+[   62.655112]  kvm_write_guest+0x61/0xb0
+[   62.658884]  kvm_hv_invalidate_tsc_page+0xd3/0x140
+[   62.663699]  ? kvm_hv_invalidate_tsc_page+0x72/0x140
+[   62.668684]  kvm_arch_vm_ioctl+0x20f/0xbc0
+[   62.672798]  ? __lock_acquire+0x3af/0x2450
+[   62.676956]  ? __this_cpu_preempt_check+0x13/0x20
+[   62.681706]  kvm_vm_ioctl+0x6f1/0xe20
+[   62.685423]  ? ktime_get_coarse_real_ts64+0xc7/0xd0
+[   62.690323]  ? __this_cpu_preempt_check+0x13/0x20
+[   62.695048]  ? lockdep_hardirqs_on+0x7e/0x100
+[   62.699423]  ? blk_log_with_error+0x3b/0x70
+[   62.703644]  ? __audit_syscall_entry+0xcd/0x130
+[   62.708220]  ? selinux_file_ioctl+0xa6/0x130
+[   62.712542]  ? selinux_file_ioctl+0xa6/0x130
+[   62.716869]  __x64_sys_ioctl+0x91/0xc0
+[   62.720686]  do_syscall_64+0x5c/0x80
+[   62.724305]  ? __this_cpu_preempt_check+0x13/0x20
+[   62.729059]  ? lock_is_held_type+0xdd/0x130
+[   62.733264]  ? do_syscall_64+0x69/0x80
+[   62.737069]  ? __this_cpu_preempt_check+0x13/0x20
+[   62.741791]  ? lockdep_hardirqs_on+0x7e/0x100
+[   62.746219]  ? syscall_exit_to_user_mode+0x3e/0x50
+[   62.751082]  ? do_syscall_64+0x69/0x80
+[   62.754904]  entry_SYSCALL_64_after_hwframe+0x44/0xae
+[   62.760027] RIP: 0033:0x7fe3792bf8f7
+[   62.763687] Code: b3 66 90 48 8b 05 a1 35 2c 00 64 c7 00 26 00 00
+00 48 c7 c0 ff ff ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 b8 10 00 00
+00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 71 35 2c 00 f7 d8 64 89
+01 48
+[   62.782497] RSP: 002b:00007ffe035acf38 EFLAGS: 00000246 ORIG_RAX:
+0000000000000010
+[   62.790131] RAX: ffffffffffffffda RBX: 000000004030ae7b RCX: 00007fe3792bf8f7
+[   62.797334] RDX: 00007ffe035acf70 RSI: 000000004030ae7b RDI: 0000000000000006
+[   62.804539] RBP: 0000000000000007 R08: 000000000040e320 R09: 0000000000000007
+[   62.811737] R10: 000000000004da6b R11: 0000000000000246 R12: 00007fe3799c7000
+[   62.818914] R13: 0000000000000007 R14: 00000000000058cb R15: 00000000000e8f42
+[   62.826141]  </TASK>
+[   62.828378] irq event stamp: 6435
+[   62.831765] hardirqs last  enabled at (6445): [<ffffffffa3272a88>]
+__up_console_sem+0x58/0x60
+[   62.840354] hardirqs last disabled at (6454): [<ffffffffa3272a6d>]
+__up_console_sem+0x3d/0x60
+[   62.848944] softirqs last  enabled at (6392): [<ffffffffa4600341>]
+__do_softirq+0x341/0x4cc
+[   62.857362] softirqs last disabled at (6473): [<ffffffffa31ef29f>]
+irq_exit_rcu+0xdf/0x140
+[   62.865700] ---[ end trace 0000000000000000 ]---
+ok 6 selftests: kvm: hyperv_clock
 
-> Given that, we're deciding which clock is going to get wrecked during
-> a migration and what the guest can do afterwards to clean it up.
-> Whichever clock gets wrecked is going to have a window where reads race
-> with the eventual fix, and could be completely wrong. My thoughts:
->
-> We do not advance the TSC during a migration and notify the
-> guest (interrupt, shared structure) about how much it has
-> time traveled (delta_REALTIME). REALTIME is wrong until the interrupt
-> is handled in the guest, but should fire off all of the existing
-> mechanisms for a clock step. Userspace gets notified with
-> TFD_TIMER_CANCEL_ON_SET. I believe you have proposed something similar
-> as a way to make live migration less sinister from the guest
-> perspective.
+Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
 
-That still is an information _after_ the fact and not well defined.
+--
+Linaro LKFT
+https://lkft.linaro.org
 
-> It seems possible to block racing reads of REALTIME if we protect it with
-> a migration sequence counter. Host raises the sequence after a migration
-> when control is yielded back to the guest. The sequence is odd if an
-> update is pending. Guest increments the sequence again after the
-> interrupt handler accounts for time travel. That has the side effect of
-> blocking all realtime clock reads until the interrupt is handled. But
-> what are the value of those reads if we know they're wrong? There is
-> also the implication that said shared memory interface gets mapped
-> through to userspace for vDSO, haven't thought at all about those
-> implications yet.
-
-So you need two sequence counters to be checked similar to the
-pv_clock() case, which prevents the usage of TSC without the pv_clock()
-overhead.
-
-That also means that CLOCK_REALTIME, CLOCK_TAI and CLOCK_REALTIME_COARSE
-will need to become special cased in the VDSO and all realtime based
-syscall interfaces.
-
-I'm sure that will be well received from a performance perspective.
-
-Aside of that where do you put the limit? Just user space visible read
-outs? What about the kernel? Ignore it in the kernel and hope that
-nothing will break? That's going to create really hard to diagnose
-issues, which I'm absolutely not interested in.
-
-You can't expand this scheme to the kernel in general because the CPU
-which should handle the update might be in an interrupt disabled region
-reading clock REALTIME....
-
-Also this would just make the race window smaller. It does not solve the
-problem in a consistent way. Don't even think about it. It's just
-another layer of duct tape over the existing ones.
-
-As I explained before, this does not solve the following:
-
-   T = now();
-   -----------> interruption of some sort (Tout)
-   use(T);
-
-Any use case which cares about Tout being less than a certain threshold
-has to be carefully designed to handle this. See also below.
-
-> Doing this the other way around (advance the TSC, tell the guest to fix
-> MONOTONIC) is fundamentally wrong, as it violates two invariants of the
-> monotonic clock. Monotonic counts during a migration, which really is a
-> forced suspend. Additionally, you cannot step the monotonic clock.
-
-A migration _should_ have suspend semantics, but the forced suspend
-which is done by migration today does not have proper defined semantics
-at all.
-
-Also clock monotonic can be stepped forward under certain circumstances
-and the kernel is very well able to handle it within well defined
-limits. Think about scheduled out vCPUs. From their perspective clock
-monotonic is stepping forwards.
-
-The problem starts when the 'force suspended' time becomes excessive, as
-that causes the mass expiry of clock monotonic timers with all the nasty
-side effects described in a3ed0e4393d6. In the worst case it's going to
-exceed the catchup limit of non-suspended timekeeping (~440s for a TSC
-@2GHz) which in fact breaks the world and some more.
-
-So let me go back to the use cases:
-
- 1) Regular freeze of a VM to disk and resume at some arbitrary point in
-    the future.
-
- 2) Live migration
-
-In both cases the proper solution is to make the guest go into a well
-defined state (suspend) and resume it on restore. Everything just works
-because it is well defined.
-
-Though you say that there is a special case (not that I believe it):
-
-> but there will always be host-side problems that require us to migrate
-> a VM off a host immediately with no time to inform the guest.
-
-which is basically what we do today for the very wrong reasons. There you
-have two situations:
-
-  1) Trestart - Tstop < TOLERABLE_THRESHOLD
-
-     That's the easy case as you just can adjust TSC on restore by that
-     amount on all vCPUs and be done with it. Just works like scheduling
-     out all vCPUs for some time.
-
-  2) Trestart - Tstop >= TOLERABLE_THRESHOLD
-
-     Avoid adjusting TSC for the reasons above. That leaves you with the
-     options of
-
-     A) Make NTP unhappy as of today
-
-     B) Provide information about the fact that the vCPUs got scheduled
-        out for a long time and teach NTP to be smart about it.
-
-        Right now NTP decides to declare itself unstable when it
-        observes the time jump on CLOCK_REALTIME from the NTP server.
-
-        That's exactly the situation described above:
-
-        T = now();
-        -----------> interruption of some sort (Tout)
-        use(T);
-
-        NTP observes that T is inconsistent because it does not know
-        about Tout due to the fact that neither clock MONOTONIC nor
-        clock BOOTTIME advanced.
-
-        So here is where you can bring PV information into play by
-        providing a migration sequence number in PV shared memory.
-
-        On source host:
-           Stop the guest dead in it's tracks.
-           Record metadata:
-             - migration sequence number
-             - clock TAI as observed on the host
-           Transfer the image along with metadata
-
-        On destination host:
-           Restore memory image
-           Expose metadata in PV:
-             - migration sequence number + 1
-             - Tout (dest/source host delta of clock TAI)
-           Run guest
-
-        Guest kernel:
-
-           - Keep track of the PV migration sequence number.
-
-             If it changed act accordingly by injecting the TAI delta,
-             which updates NTP state, wakes TFD_TIMER_CANCEL_ON_SET,
-             etc...
-
-             We have to do that in the kernel because we cannot rely on
-             NTP being running.
-
-             That can be an explicit IPI injected from the host or just
-             polling from the tick. It doesn't matter much.
-
-           - Expose information to user space:
-               - Migration sequence counter
-
-           - Add some smarts to adjtimex() to prevent user space racing
-             against a pending migration update in the kernel.
-
-        NTP:
-           - utilize the sequence counter information 
-
-             seq = get_migration_sequence();
-
-             do stuff();
-        
-             if (seq != get_migration_sequence())
-             	do_something_smart();
-             else
-                proceed_as_usual();
-
-        That still will leave everything else exposed to
-        CLOCK_REALTIME/TAI jumping forward, but there is nothing you can
-        do about that and any application which cares about this has to
-        be able to deal with it anyway.
-
-Hmm?
-
-Thanks,
-
-        tglx
+[1] https://lkft.validation.linaro.org/scheduler/job/4805876#L1528
