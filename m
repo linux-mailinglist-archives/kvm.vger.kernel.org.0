@@ -2,175 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C16964EB01A
-	for <lists+kvm@lfdr.de>; Tue, 29 Mar 2022 17:20:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 622564EB0CF
+	for <lists+kvm@lfdr.de>; Tue, 29 Mar 2022 17:37:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238444AbiC2PWM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Mar 2022 11:22:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52318 "EHLO
+        id S238793AbiC2PhI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Mar 2022 11:37:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235516AbiC2PWK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 29 Mar 2022 11:22:10 -0400
-Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45D2CB0A5D
-        for <kvm@vger.kernel.org>; Tue, 29 Mar 2022 08:20:24 -0700 (PDT)
-Received: by mail-yb1-xb31.google.com with SMTP id f23so1669658ybj.7
-        for <kvm@vger.kernel.org>; Tue, 29 Mar 2022 08:20:24 -0700 (PDT)
+        with ESMTP id S238775AbiC2PhH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Mar 2022 11:37:07 -0400
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27EFE108557;
+        Tue, 29 Mar 2022 08:35:24 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id y6so15425003plg.2;
+        Tue, 29 Mar 2022 08:35:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=mqf77QeoL5E8gq/UNbdnceI0Lqcn9TnB8ZcBKbA//HY=;
-        b=gzfose0LqAREB7zRFZHRdNffeFoQlP8t4o4t8O+im03BrN8m99rmINX5UePPZJdCiI
-         kMOYFj16jCWs/XA5tlLbXYovRDJrZL9S7pOUws5JSPWv8SKhcmpPp4D5pWhNr2yv6WhG
-         i4wjTXUsf6VAWxZq1VSq/jOT916GRkv75TyZnUse/j8N5PiuCT5rYpMNAcMhwBqRXe4J
-         g80Uro+2EmhRXPMTFTjqXHDqWu7nAO/cXZtoMEpng1yojJhZYGaXK2aRPQZM1IGb77s2
-         nvhUYbJtyb2I4zLJ4zBYT9Iqi+OoxlzngK05QW4gWIzWFlF1oL+aDuizguL3sy3as+DR
-         nrwg==
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=hXXDAsVberZERpiqBZUmvRldgBLnXTkqn777k+qHy4M=;
+        b=EAI87mx8MDRK8xMXQNaElYaVk5+kOjZwSRg0qmZhjJvyEtzYi5sj8ZVsQzpF3jYH7E
+         0PpQzdUEfa7xfxiTAtz+TmaLS9UvmI2vxlRHvcPeMjdy4tUw1d0vukOHfYp4J42xxJJf
+         VH61yfGoH1H7NLWvCp82IdFZejvh+FS6ANiW8uehWkpvoCxXzkabUonIarc9ARo3F/aH
+         4gemyU8oMXKtUYSuSGoL7JREfxm3SxGYqRviRTBBqh8Ro/HI6BUU+P/eiayBi2laq7pn
+         Z5iKQr9DPzNUEQ9kzoDOv0GO1so+6U1iw/oDDQtCYZ90d0O25Jw771ASIihAULa6/BwU
+         5Mgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=mqf77QeoL5E8gq/UNbdnceI0Lqcn9TnB8ZcBKbA//HY=;
-        b=J9uqbOSOT8MWm1cRcDLsLYe7iJGEbeYSD8q8LuYwmdQX7oaIsYGZKEBVuiNCeBKVfJ
-         U0//xgP+Icb1qSh/8/7c+BTSZoh/SD8A+HCnHwQ5KDebbBR3EdIwx+xzhH0iAsATymTJ
-         xLfwjtU+QFmhY6iHNUBdXktixY7RyYLN23wo9mP9s8kLmava+39wlqZpuxdnLvkMIEqr
-         skc8wm4gFTFB+2KrYr/LSc9QLNTtCdC6ajdraSa6w2a/PivRb2X+c/z2/TwBd0pDkmu9
-         EYhlTCf3moYhXuYVKfBtSxueLoFoHVij4g2TC15p6jyz+HCruzjzhQzFA1e2dWz+JFm/
-         aX8Q==
-X-Gm-Message-State: AOAM5331ODsgZ9L1FhSJkkJGA3fJ1ZVb9oGhqKdNHWR2LAelhh2VsvlM
-        yRvGInpxc4sn6By27hajddoI1TipodMjUfHsCh4Erw==
-X-Google-Smtp-Source: ABdhPJwTGzMwHTVoUHzH/SEOKRVgEO0IwzEv+Q8tSvRoNS9k6jrg6Gq+mgZ9LssHpyLF5AKwYur63FvMHokmW40AQPM=
-X-Received: by 2002:a25:9909:0:b0:624:57e:d919 with SMTP id
- z9-20020a259909000000b00624057ed919mr29166744ybn.494.1648567223068; Tue, 29
- Mar 2022 08:20:23 -0700 (PDT)
-MIME-Version: 1.0
-From:   Naresh Kamboju <naresh.kamboju@linaro.org>
-Date:   Tue, 29 Mar 2022 20:50:12 +0530
-Message-ID: <CA+G9fYsd+zXJqsxuYkWLQo0aYwmqLVA_YeBu+sr546bGA+1Nfg@mail.gmail.com>
-Subject: WARNING: at arch/x86/kvm/../../../virt/kvm/kvm_main.c:3156 mark_page_dirty_in_slot
-To:     "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>, kvm list <kvm@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        lkft-triage@lists.linaro.org
-Cc:     Shuah Khan <shuah@kernel.org>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=hXXDAsVberZERpiqBZUmvRldgBLnXTkqn777k+qHy4M=;
+        b=W9HD5efWPZdXr60gj3yiCrT5REvWnMXunOCvHvSqoXC6A8aUIUKVvTlitNZIjmW3HQ
+         TqbZvkc5Cx3s25On1kUVFooFcc6aHXK21PsYSV1b9pSHfIYkYNwGSVdPhQZnbq4hkE39
+         Lnm1WpdRY1qHf/8O1gQTwkxuR9uRY32yAQOb8dUee7qn1Bue3j69LGR/1JCMSfJVCopw
+         v57VdGa425QF0aQ4srf/+ELzfnLdV/fdq/kubEY9dLGMwn5Db7O9v3e8drjAkBdO0Yii
+         hzR8O3t7f9Qwwr4rlrVAG5N5GEVJFs+0NaaRAcsjkjnKiwmSYYqejzVhgIQLBxDqe2hr
+         /g2g==
+X-Gm-Message-State: AOAM533NC2ve52/RnkGd0/PBrehhBIy+3K4S9x0Yl6mZxuAv/FW0lMbQ
+        GTceD9EO5eK0QUVQ/UFjWAaQAH/gK/E=
+X-Google-Smtp-Source: ABdhPJwLcsla511HPCq1O4W/HZJVKhb6M0IsTGvQX7oPVlOP3QJPE75EqnWX9k9z0OTuejGHdavSZA==
+X-Received: by 2002:a17:902:ea92:b0:153:d046:5711 with SMTP id x18-20020a170902ea9200b00153d0465711mr31245213plb.77.1648568123323;
+        Tue, 29 Mar 2022 08:35:23 -0700 (PDT)
+Received: from localhost ([47.251.3.230])
+        by smtp.gmail.com with ESMTPSA id b16-20020a056a00115000b004f6ff260c9esm19292309pfm.207.2022.03.29.08.35.22
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 29 Mar 2022 08:35:23 -0700 (PDT)
+From:   Lai Jiangshan <jiangshanlai@gmail.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Linus Torvalds <torvalds@linux-foundation.org>
-Content-Type: text/plain; charset="UTF-8"
+        Sean Christopherson <seanjc@google.com>
+Cc:     Lai Jiangshan <jiangshan.ljs@antgroup.com>
+Subject: [RFC PATCH V2 0/4] KVM: X86: Add and use shadow page with level expanded or acting as pae_root
+Date:   Tue, 29 Mar 2022 23:36:00 +0800
+Message-Id: <20220329153604.507475-1-jiangshanlai@gmail.com>
+X-Mailer: git-send-email 2.19.1.6.gb485710b
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-While running kselftest kvm test cases on x86_64 devices the following
-kernel warning was reported.
+From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 
-metadata:
-  git_ref: master
-  git_repo: https://gitlab.com/Linaro/lkft/mirrors/torvalds/linux-mainline
-  git_sha: 1930a6e739c4b4a654a69164dbe39e554d228915
-  git_describe: v5.17-12882-g1930a6e739c4
-  kernel_version: 5.17.0
-  kernel-config: https://builds.tuxbuild.com/272RGo17Agp9s62duqGs3mP2d0S/config
+(Request For Help for testing on AMD machine with 32 bit L1 hypervisor,
+see information below)
 
+KVM handles root pages specially for these cases:
 
-# selftests: kvm: evmcs_test
-# Running L1 which uses EVMCS to run L2
-# Injecting NMI into L1 before L2 had a chance to run after restore
-# Trying extra KVM_GET_NESTED_STATE/KVM_SET_NESTED_STATE cycle
-ok 4 selftests: kvm: evmcs_test
-# selftests: kvm: emulator_error_test
-# module parameter 'allow_smaller_maxphyaddr' is not set.  Skipping test.
-ok 5 selftests: kvm: emulator_error_test
-# selftests: kvm: hyperv_clock
-[   62.510388] ------------[ cut here ]------------
-[   62.515064] WARNING: CPU: 1 PID: 915 at
-arch/x86/kvm/../../../virt/kvm/kvm_main.c:3156
-mark_page_dirty_in_slot+0xba/0xd0
-[   62.525968] Modules linked in: x86_pkg_temp_thermal fuse
-[   62.531307] CPU: 1 PID: 915 Comm: hyperv_clock Not tainted 5.17.0 #1
-[   62.537691] Hardware name: Supermicro SYS-5019S-ML/X11SSH-F, BIOS
-2.0b 07/27/2017
-[   62.545185] RIP: 0010:mark_page_dirty_in_slot+0xba/0xd0
-[   62.550452] Code: 89 ea 09 c6 e8 57 d4 00 00 5b 41 5c 41 5d 41 5e
-5d c3 48 8b 83 c0 00 00 00 49 63 d5 f0 48 0f ab 10 5b 41 5c 41 5d 41
-5e 5d c3 <0f> 0b 5b 41 5c 41 5d 41 5e 5d c3 0f 1f 44 00 00 eb 80 0f 1f
-40 00
-[   62.569265] RSP: 0018:ffffa347c1663b50 EFLAGS: 00010246
-[   62.574502] RAX: 0000000080000000 RBX: ffff8f01149ce600 RCX: 0000000000000000
-[   62.581700] RDX: 0000000000000000 RSI: ffffffffa302ab31 RDI: ffffffffa302ab31
-[   62.588874] RBP: ffffa347c1663b70 R08: 0000000000000000 R09: 0000000000000001
-[   62.596046] R10: 0000000000000001 R11: 0000000000000000 R12: ffffa347c1665000
-[   62.603213] R13: 0000000000000022 R14: 0000000000000000 R15: 0000000000000004
-[   62.610389] FS:  00007fe3799c1740(0000) GS:ffff8f041fc80000(0000)
-knlGS:0000000000000000
-[   62.618697] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[   62.624467] CR2: 0000000000000000 CR3: 000000010614e004 CR4: 00000000003726e0
-[   62.631684] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[   62.638833] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[   62.646009] Call Trace:
-[   62.648480]  <TASK>
-[   62.650604]  __kvm_write_guest_page+0xc8/0x100
-[   62.655112]  kvm_write_guest+0x61/0xb0
-[   62.658884]  kvm_hv_invalidate_tsc_page+0xd3/0x140
-[   62.663699]  ? kvm_hv_invalidate_tsc_page+0x72/0x140
-[   62.668684]  kvm_arch_vm_ioctl+0x20f/0xbc0
-[   62.672798]  ? __lock_acquire+0x3af/0x2450
-[   62.676956]  ? __this_cpu_preempt_check+0x13/0x20
-[   62.681706]  kvm_vm_ioctl+0x6f1/0xe20
-[   62.685423]  ? ktime_get_coarse_real_ts64+0xc7/0xd0
-[   62.690323]  ? __this_cpu_preempt_check+0x13/0x20
-[   62.695048]  ? lockdep_hardirqs_on+0x7e/0x100
-[   62.699423]  ? blk_log_with_error+0x3b/0x70
-[   62.703644]  ? __audit_syscall_entry+0xcd/0x130
-[   62.708220]  ? selinux_file_ioctl+0xa6/0x130
-[   62.712542]  ? selinux_file_ioctl+0xa6/0x130
-[   62.716869]  __x64_sys_ioctl+0x91/0xc0
-[   62.720686]  do_syscall_64+0x5c/0x80
-[   62.724305]  ? __this_cpu_preempt_check+0x13/0x20
-[   62.729059]  ? lock_is_held_type+0xdd/0x130
-[   62.733264]  ? do_syscall_64+0x69/0x80
-[   62.737069]  ? __this_cpu_preempt_check+0x13/0x20
-[   62.741791]  ? lockdep_hardirqs_on+0x7e/0x100
-[   62.746219]  ? syscall_exit_to_user_mode+0x3e/0x50
-[   62.751082]  ? do_syscall_64+0x69/0x80
-[   62.754904]  entry_SYSCALL_64_after_hwframe+0x44/0xae
-[   62.760027] RIP: 0033:0x7fe3792bf8f7
-[   62.763687] Code: b3 66 90 48 8b 05 a1 35 2c 00 64 c7 00 26 00 00
-00 48 c7 c0 ff ff ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 b8 10 00 00
-00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 71 35 2c 00 f7 d8 64 89
-01 48
-[   62.782497] RSP: 002b:00007ffe035acf38 EFLAGS: 00000246 ORIG_RAX:
-0000000000000010
-[   62.790131] RAX: ffffffffffffffda RBX: 000000004030ae7b RCX: 00007fe3792bf8f7
-[   62.797334] RDX: 00007ffe035acf70 RSI: 000000004030ae7b RDI: 0000000000000006
-[   62.804539] RBP: 0000000000000007 R08: 000000000040e320 R09: 0000000000000007
-[   62.811737] R10: 000000000004da6b R11: 0000000000000246 R12: 00007fe3799c7000
-[   62.818914] R13: 0000000000000007 R14: 00000000000058cb R15: 00000000000e8f42
-[   62.826141]  </TASK>
-[   62.828378] irq event stamp: 6435
-[   62.831765] hardirqs last  enabled at (6445): [<ffffffffa3272a88>]
-__up_console_sem+0x58/0x60
-[   62.840354] hardirqs last disabled at (6454): [<ffffffffa3272a6d>]
-__up_console_sem+0x3d/0x60
-[   62.848944] softirqs last  enabled at (6392): [<ffffffffa4600341>]
-__do_softirq+0x341/0x4cc
-[   62.857362] softirqs last disabled at (6473): [<ffffffffa31ef29f>]
-irq_exit_rcu+0xdf/0x140
-[   62.865700] ---[ end trace 0000000000000000 ]---
-ok 6 selftests: kvm: hyperv_clock
+direct mmu (nonpaping for 32 bit guest):
+	gCR0_PG=0
+shadow mmu (shadow paping for 32 bit guest):
+	gCR0_PG=1,gEFER_LMA=0,gCR4_PSE=0
+	gCR0_PG=1,gEFER_LMA=0,gCR4_PSE=1
+direct mmu (NPT for 32bit host):
+	hEFER_LMA=0
+shadow nested NPT (for 32bit L1 hypervisor):
+	gCR0_PG=1,gEFER_LMA=0,gCR4_PSE=0,hEFER_LMA=0
+	gCR0_PG=1,gEFER_LMA=0,gCR4_PSE=1,hEFER_LMA=0
+	gCR0_PG=1,gEFER_LMA=0,gCR4_PSE={0|1},hEFER_LMA=1,hCR4_LA57={0|1}
+Shadow nested NPT for 64bit L1 hypervisor:
+	gEFER_LMA=1,gCR4_LA57=0,hEFER_LMA=1,hCR4_LA57=1
 
-Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+They are either using special roots or matched the condition 
+((mmu->shadow_root_level > mmu->root_level) && !mm->direct_map)
+(refered as level expansion) or both.
 
---
-Linaro LKFT
-https://lkft.linaro.org
+All the cases are using special roots except the last one.
+Many cases are doing level expansion including the last one.
 
-[1] https://lkft.validation.linaro.org/scheduler/job/4805876#L1528
+When special roots are used, the root page will not be backed by
+kvm_mmu_page.  So they must be treated specially, but not all places
+is considering this problem, and Sean is adding some code to check
+this special roots.
+
+When level expansion, the kvm treats them silently always.
+
+These treaments incur problems or complication, see the changelog
+of every patch.
+
+These patches were made when I reviewed all the usage of shadow_root_level
+and root_level.  Many root level patches are sent and accepted.
+
+These patches has not been tested with shadow NPT cases listed above.
+Because I don't have guest images can act as 32 bit L1 hypervisor, nor
+I can access to AMD machine with 5 level paging.  I'm a bit reluctant
+to ask for the resource, so I send the patches and wish someone test
+them and modify them.  At least, it provides some thinking and reveals
+problems of the existing code and of the AMD cases.
+( *Request For Help* here.)
+
+These patches have been tested with the all cases except the shadow-NPT
+cases, the code coverage is believed to be more than 95% (hundreds of
+code related to shadow-NPT are shoved, and be replaced with common
+role.pae_root and role.passthrough code with only 8 line of code is
+added for shadow-NPT, only 2 line of code is not covered in my tests).
+
+[V1]: https://lore.kernel.org/lkml/20211210092508.7185-1-jiangshanlai@gmail.com/
+
+Changed from V1:
+	Apply Sean's comments and suggestion. (Too much to list. Thanks!)
+	Add some comments.
+	Change changelog for role.pae_root patch.
+
+Lai Jiangshan (4):
+  KVM: X86: Add arguement gfn and role to kvm_mmu_alloc_page()
+  KVM: X86: Introduce role.passthrough for level expanded pagetable
+  KVM: X86: Alloc role.pae_root shadow page
+  KVM: X86: Use passthrough and pae_root shadow page for 32bit guests
+
+ Documentation/virt/kvm/mmu.rst  |   7 +
+ arch/x86/include/asm/kvm_host.h |  16 +-
+ arch/x86/kvm/mmu/mmu.c          | 400 +++++++++-----------------------
+ arch/x86/kvm/mmu/paging_tmpl.h  |  15 +-
+ 4 files changed, 138 insertions(+), 300 deletions(-)
+
+-- 
+2.19.1.6.gb485710b
+
