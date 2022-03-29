@@ -2,74 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 212324EB5E0
-	for <lists+kvm@lfdr.de>; Wed, 30 Mar 2022 00:28:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CCB494EB642
+	for <lists+kvm@lfdr.de>; Wed, 30 Mar 2022 00:59:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237084AbiC2WaC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Mar 2022 18:30:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37100 "EHLO
+        id S238679AbiC2XBR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Mar 2022 19:01:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234969AbiC2WaA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 29 Mar 2022 18:30:00 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04D4E637A
-        for <kvm@vger.kernel.org>; Tue, 29 Mar 2022 15:28:16 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id i11so7602426plg.12
-        for <kvm@vger.kernel.org>; Tue, 29 Mar 2022 15:28:15 -0700 (PDT)
+        with ESMTP id S238409AbiC2XBQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Mar 2022 19:01:16 -0400
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FEDD47391
+        for <kvm@vger.kernel.org>; Tue, 29 Mar 2022 15:59:32 -0700 (PDT)
+Received: by mail-pj1-x102e.google.com with SMTP id o3-20020a17090a3d4300b001c6bc749227so4428953pjf.1
+        for <kvm@vger.kernel.org>; Tue, 29 Mar 2022 15:59:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=vjcQWfLhbG0uWlWmdRXNd421Er7E9z2hWWjFUh0KLac=;
-        b=OGLO94A5JWnv/1HgSvDkWtlZJ3KU0e1HVGPbLk1//DxgmJp5CzBFGqzrXpYKOet3CI
-         MRdJXVjjM/YvN6nR0cdWOtpHtnrIaBS8AGoqWHODJ1D3gmNv7gKi/29MLo/3pNmq8BXr
-         B1Is/E6Y3bdgDcyCcoaVmdiPfJgUdpKWNMbxpMxQlSHg1/wrvj1TvGYhWtfUV0Sxrbw2
-         LPm/I0nN8vCvFXQf+AVGIqSE/SU8aLItoAQFJ626eiC4xjbHLmSNGjuk2t0eQYd+xAcx
-         dsmBEMPa3ZexRfAacNlqhWctL1dkGfh6QS9hihyJt2JJNu/Yhblhckoiyax1sVGHsUJG
-         Mh9w==
+        bh=mf3QS3aKf3OHFfM5f9hNYG9RXB66tqh8JCr2CM0gjzg=;
+        b=hcCXx4lxQRydW8fhhYenNxDF9eCX3D5z22cl3TUAF0ArEkpyvnaFkMUrZiTD+uxW1b
+         fzLKlTjb1ER8GWLeqEv/GZM0JD2pr+clNaclG5dJYK+b+OsFKiKbi/fiKXt2QtlqAe6d
+         +WiGb1fe7LBdenaLFRkCNV4O+/wq9C21bQ3/7mTUj0rTRnM7IxvhIdWFPbpgwh5lqN77
+         0CuyMzE32y5PIm4wt69WLLkEs74QUcnESHmZShRiegnwC+AbQ3L07AYSyWfuSxkEnn22
+         VpbLYMJeFUxNPAw8sfMq9QxBI8YUuuqfgjXUebc+Trzn0+CrT7vuHi5v0ir7uW0ntOp/
+         AIbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=vjcQWfLhbG0uWlWmdRXNd421Er7E9z2hWWjFUh0KLac=;
-        b=ksBCLEYSJI1MePuujxTS8G9Y56ms6fgM8oCC/HJne6wCIpsO1DGgOz/rDwR2/oGAef
-         TVk6Ctc7G+/27eFnlb7tsdkaEl1vTHg4Hup8jdNBp6HAEr1Ww22He3ziiOLcc0BesAit
-         ZXZJ7QA3ZeRj49bmFzhj7Yu8h8rFD76T6HIvkzdzVkdxEh147jAkfvr8vEQbp8pI8znd
-         a3b1HBKJM8FyBZmGRWX8n+UPLgowYHgoSg3wwNZvsN3bBEy6/EJbU1TXjT/Fi9uTZ2F5
-         R7NFszAfHXXBXdV5HRHD8ML4zM8b2DPVJvfm7De9ntxmexiQhPTS9HrEfg7Gous0rYJ+
-         FpbQ==
-X-Gm-Message-State: AOAM5330e1FNUGKMpBxpiyHsP1wVUMx95bMQtHArmo8x/pY6TFNHSsc7
-        IL78JOg/DQr1nFf3bzjnP41FkQ==
-X-Google-Smtp-Source: ABdhPJzgAPJDsue3uchTl3K7kEiko/T1kxeOR+TSgffxAJ/PrZ1l3QiItWqukpVDfkpMLPfIyYOVrQ==
-X-Received: by 2002:a17:902:e2c3:b0:155:c75c:335d with SMTP id l3-20020a170902e2c300b00155c75c335dmr27420796plc.33.1648592895356;
-        Tue, 29 Mar 2022 15:28:15 -0700 (PDT)
+        bh=mf3QS3aKf3OHFfM5f9hNYG9RXB66tqh8JCr2CM0gjzg=;
+        b=L2aySj1C8SFTqNbBB8nMLBzdZNID5MLVKdZsyG3bzavEfQmQSd08twQVTkb+uYi5M3
+         PTVVmD8zUGfM2+7e0zj+94cipcWERz+g+faR9uUNrYb+ReJdT8uGjnlJEkDd0uni+I8D
+         iROqoKFsbtJt4HcMw5kuhvMMF+6h1OB1/LfohFiRHNv98cymZ9sATLso5bWAQW9sFJiw
+         h9rQ4qrrKkIgncJROV2Ghiz45U2FvhaGd10JbVg1zOgkwgvg3+tyI1OL7ITV1tx87X5n
+         5EHHBxql1Hus1jGFfMA8ZmgWT6QP8maj/XLLhkYCZYwtDZu4VOICUaJ7UPF18sC6KLcc
+         uICQ==
+X-Gm-Message-State: AOAM532GfPZujiMffPprBVvZwT77LDj05BSMMGq4HOgiRwI1sbCyfSQ/
+        fEa6L4DaR2sk1H4DDh8saX19frUOwlrG4g==
+X-Google-Smtp-Source: ABdhPJzHMuNYqPgKGcciAnrghVvSghsdodOQmBc2A0L2W3nlDYsD7Ul8QdYdevQmBRSuUZeRU5/X+w==
+X-Received: by 2002:a17:90b:2248:b0:1c9:87d5:11eb with SMTP id hk8-20020a17090b224800b001c987d511ebmr1509844pjb.114.1648594771874;
+        Tue, 29 Mar 2022 15:59:31 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id k62-20020a17090a4cc400b001c7ea7f487asm3868557pjh.39.2022.03.29.15.28.14
+        by smtp.gmail.com with ESMTPSA id f21-20020a056a00239500b004fb02a7a45bsm17321859pfc.214.2022.03.29.15.59.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Mar 2022 15:28:14 -0700 (PDT)
-Date:   Tue, 29 Mar 2022 22:28:10 +0000
+        Tue, 29 Mar 2022 15:59:31 -0700 (PDT)
+Date:   Tue, 29 Mar 2022 22:59:27 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Mingwei Zhang <mizhang@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Peter Xu <peterx@redhat.com>,
-        Yosry Ahmed <yosryahmed@google.com>
-Subject: Re: [PATCH v2 3/4] KVM: x86/mmu: explicitly check nx_hugepage in
- disallowed_hugepage_adjust()
-Message-ID: <YkOH+k7sE2x5wz+f@google.com>
-References: <20220323184915.1335049-1-mizhang@google.com>
- <20220323184915.1335049-5-mizhang@google.com>
- <YkOHDeh8JgWc8iFb@google.com>
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 1/4] KVM: x86: Move kvm_ops_static_call_update() to
+ x86.c
+Message-ID: <YkOPT7TJf74C2Wq8@google.com>
+References: <20220307115920.51099-1-likexu@tencent.com>
+ <20220307115920.51099-2-likexu@tencent.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YkOHDeh8JgWc8iFb@google.com>
+In-Reply-To: <20220307115920.51099-2-likexu@tencent.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -81,14 +75,17 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 29, 2022, Sean Christopherson wrote:
-> > Fixes: b8e8c8303ff2 ("kvm: mmu: ITLB_MULTIHIT mitigation")
-> > Cc: stable@vger.kernel.org
+On Mon, Mar 07, 2022, Like Xu wrote:
+> From: Like Xu <likexu@tencent.com>
 > 
-> I vote to keep the Fixes tag, but drop the Cc: stable@ and NAK any MANUALSEL/AUTOSEL
-> for backporting this to stable trees.  Yes, it's a bug, but the NX huge page zapping
-> kthread will (eventually) reclaim the lost performance.  On the flip side, if there's
-> an edge case we mess up (see below), then we've introduced a far worse bug.
+> The kvm_ops_static_call_update() is defined in kvm_host.h. That's
+> completely unnecessary, it should have exactly one caller,
+> kvm_arch_hardware_setup().  As a prep match, move
+> kvm_ops_static_call_update() to x86.c, then it can reference
+> the kvm_pmu_ops stuff.
+> 
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Like Xu <likexu@tencent.com>
+> ---
 
-Doh, that's wrong.  The whole problem is that these pages aren't on the NX list...
-I think I'd still vote to not send this to stable, but it's a weak vote.
+Reviewed-by: Sean Christopherson <seanjc@google.com>
