@@ -2,257 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E63784EA470
-	for <lists+kvm@lfdr.de>; Tue, 29 Mar 2022 03:10:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B96C44EA47C
+	for <lists+kvm@lfdr.de>; Tue, 29 Mar 2022 03:14:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229582AbiC2BJI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Mar 2022 21:09:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57272 "EHLO
+        id S229491AbiC2BOx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Mar 2022 21:14:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50018 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229498AbiC2BJG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Mar 2022 21:09:06 -0400
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4E65BE1E
-        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 18:07:23 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id i11so4947280plg.12
-        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 18:07:23 -0700 (PDT)
+        with ESMTP id S229379AbiC2BOv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Mar 2022 21:14:51 -0400
+Received: from mail-ot1-x349.google.com (mail-ot1-x349.google.com [IPv6:2607:f8b0:4864:20::349])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7C3341304
+        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 18:13:09 -0700 (PDT)
+Received: by mail-ot1-x349.google.com with SMTP id m12-20020a9d7acc000000b005b21f450ed2so9045411otn.20
+        for <kvm@vger.kernel.org>; Mon, 28 Mar 2022 18:13:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=cNnTmAvvT74txMtnR1Krg2oFiWxKy8LARzL6TDyTD4o=;
-        b=DvgMoOvqdYe05z7xIk2xxTjtFeY0wTCREKrq+N4CnyKjdrRt8WUVn7fDh/7Hv33Yvw
-         6vGSPZrLwGmej2gARCAHRGm5JjspY9xemeSP9SyTLApd+gm2vh5EqX5ZtAjmYjQLxJlM
-         mTCxddjigvYS6sZSL9uITKgA/cwxk07nvRE9bu63miL2bFkDja/VBSYemnKH22fCNYNA
-         N99zAG33rrNyqC/iG/AidER5o/TivRzMV7cH+M0zDOdlOG5jUdAzykuasEJiAcdCD8uw
-         wV68VMfWHAtxgveLagbihh6cakI4+fUdQla2XnEcgKB9K07pevIvSoIwi3oSenHtrewI
-         ofsQ==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=nYlE+C/axixPppHHbcO/XGK1yVRHkszjXFRKMgmo2rQ=;
+        b=tUZNXLhTPTopRQyZVbL8Vxdk++9/mwdVfpzx2zNYKV1d3E/6Kg6zw6o0PSKaWu26Y1
+         pG1gfCQFJzSZdys9ABwQ1NIBkX62MZJ6XdDGpjd9VvNaS4Pm/4M6RTUzEVwDm4VUEY3c
+         AvbGNQLFPOEUxr2O9hbCT0Y6CXJ9zQykHhFNsZtgolLyid4BWiF7gsm9Mq6N7Oo3XtjT
+         3m7EebjNmgk1vWU5ojSN1cvxV/nuAyN7B/NiGZ7H6PDfg6IEVoA1zXw3Ru+QOaR+RX7l
+         j280fbEy7glIONhzteHunuyH7rmj9wuQ3Swek9km8eOogW1f+hVDtsHIyG8/Lrc/9uoM
+         ub3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=cNnTmAvvT74txMtnR1Krg2oFiWxKy8LARzL6TDyTD4o=;
-        b=jAFCtt6nu4zlx/aIfNeTgNCKeIfnQBfonss4KhARX5ErOl8gwSGhZvHqN4X+5mh63E
-         GfFqpBrUAyxJKYE3hEUedwpzswP9nEw0Ae9nXJqX9Y9urAVJiXwfuilS5A8CklxoVFPi
-         hmp8JYYSUIW5H+4NaMrM56zdJGha1R2gG1nW5NQF02T48TQpEA/Yf8S8S6dpmH+/LNMn
-         LHkv3QBTT7U/Q948a+zz9mgCskNju7PxH7wIcTSWS91YvNmRUlKE8DOuNx5vUOP2SRbh
-         kPfPX7k2qlhJK9G01Ovg4HyOiuc0w+FwdAUs9Ij9TN75vYwdN+t5yxqQvenEPGkhVTfF
-         10eg==
-X-Gm-Message-State: AOAM531rcAp3JOW18FUfFVsyFKK2LWmyKss4Pf21u/QFu6PtQGdrOgqB
-        4jinkhJH9SqlSdWQTr61/iPxFw==
-X-Google-Smtp-Source: ABdhPJwFVDGrpZrIFv666CmEg0Frn74tTh8fMgDvSijnAmWVcdIxb5iQWG0VKn06IiR/gpJrlSZDdg==
-X-Received: by 2002:a17:90a:3181:b0:1c7:6d18:391a with SMTP id j1-20020a17090a318100b001c76d18391amr1893417pjb.30.1648516042944;
-        Mon, 28 Mar 2022 18:07:22 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id y16-20020a637d10000000b00381268f2c6fsm14432627pgc.4.2022.03.28.18.07.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Mar 2022 18:07:22 -0700 (PDT)
-Date:   Tue, 29 Mar 2022 01:07:18 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Chao Peng <chao.p.peng@linux.intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-api@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com
-Subject: Re: [PATCH v5 09/13] KVM: Handle page fault for private memory
-Message-ID: <YkJbxiL/Az7olWlq@google.com>
-References: <20220310140911.50924-1-chao.p.peng@linux.intel.com>
- <20220310140911.50924-10-chao.p.peng@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220310140911.50924-10-chao.p.peng@linux.intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=nYlE+C/axixPppHHbcO/XGK1yVRHkszjXFRKMgmo2rQ=;
+        b=FS5anynGTPUxq9FhvC+l3Gn0bMNiP4Lx8wvAmcERzoK8iciTR6YSQSWeVwxjfrxC8M
+         X5zdmmcYu3dOZK8rDjgQta35eBXhaPMiIcKmCFwVYAP7jGrG4WqEbE+oPmE4MN31vVfW
+         HQt0UckkESSqG70WKOcyDAuOSOJTOSVdqBZOc3rzIRbViMpkXVKJzsVTc+jM53EZfJNY
+         jqg0dzOd1g46BTI2qq0JPeYGLCMDLYKg4H/3Bth30/HZvfmV0nF8jpn/Nm+ZgDzFMR9R
+         vjdhkXMzQTWnxLRnvIC9IfmVsY+ygKe4bywv61D4ICN6Lt4apnkJLfxcSgMCaQd61Jjo
+         tf0A==
+X-Gm-Message-State: AOAM530Y/pvYzSCCLcOqDwnK8VixKjHJ0MXrJeFo+/mwLhYNPcvcWdEv
+        HFJmqLn1lcKFMQOYy2A1kC11+96htzY=
+X-Google-Smtp-Source: ABdhPJwwujhcPW9Bu1rOL7Be1SGcb234TZlpdxtAkIVxfUSk/Vnz+sZ0hNqbYylYDqlhN4vDVQTbAJrgTQ8=
+X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
+ (user=oupton job=sendgmr) by 2002:a9d:6f07:0:b0:5b2:38e8:41f7 with SMTP id
+ n7-20020a9d6f07000000b005b238e841f7mr113246otq.308.1648516389241; Mon, 28 Mar
+ 2022 18:13:09 -0700 (PDT)
+Date:   Tue, 29 Mar 2022 01:12:58 +0000
+Message-Id: <20220329011301.1166265-1-oupton@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.1.1021.g381101b075-goog
+Subject: [PATCH 0/3] KVM: arm64: Limit feature register reads from AArch32
+From:   Oliver Upton <oupton@google.com>
+To:     kvmarm@lists.cs.columbia.edu
+Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Oliver Upton <oupton@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 10, 2022, Chao Peng wrote:
-> @@ -3890,7 +3893,59 @@ static bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
->  				  kvm_vcpu_gfn_to_hva(vcpu, gfn), &arch);
->  }
->  
-> -static bool kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault, int *r)
-> +static bool kvm_vcpu_is_private_gfn(struct kvm_vcpu *vcpu, gfn_t gfn)
-> +{
-> +	/*
-> +	 * At this time private gfn has not been supported yet. Other patch
-> +	 * that enables it should change this.
-> +	 */
-> +	return false;
-> +}
-> +
-> +static bool kvm_faultin_pfn_private(struct kvm_vcpu *vcpu,
-> +				    struct kvm_page_fault *fault,
-> +				    bool *is_private_pfn, int *r)
+KVM/arm64 does not restrict the guest's view of the AArch32 feature
+registers when read from AArch32. HCR_EL2.TID3 is cleared for AArch32
+guests, meaning that register reads come straight from hardware. This is
+problematic as KVM relies on read_sanitised_ftr_reg() to expose a set of
+features consistent for a particular system.
 
-@is_private_pfn should be a field in @fault, not a separate parameter, and it
-should be a const property set by the original caller.  I would also name it
-"is_private", because if KVM proceeds past this point, it will be a property of
-the fault/access _and_ the pfn
+Appropriate handlers must first be put in place for CP10 and CP15 ID
+register accesses before setting TID3. Rather than exhaustively
+enumerating each of the encodings for CP10 and CP15 registers, take the
+lazy route and aim the register accesses at the AArch64 system register
+table.
 
-I say it's a property of the fault because the below kvm_vcpu_is_private_gfn()
-should instead be:
+Patch 1 reroutes the CP15 registers into the AArch64 table, taking care
+to immediately RAZ undefined ranges of registers. This is done to avoid
+possibly conflicting with encodings for future AArch64 registers.
 
-	if (fault->is_private)
+Patch 2 installs an exit handler for the CP10 ID registers and also
+relies on the general AArch64 register handler to implement reads.
 
-The kvm_vcpu_is_private_gfn() check is TDX centric.  For SNP, private vs. shared
-is communicated via error code.  For software-only (I'm being optimistic ;-) ),
-we'd probably need to track private vs. shared internally in KVM, I don't think
-we'd want to force it to be a property of the gfn.
+Finally, patch 3 actually sets TID3 for AArch32 guests, providing
+known-safe values for feature register accesses.
 
-Then you can also move the fault->is_private waiver into is_page_fault_stale(),
-and drop the local is_private_pfn in direct_page_fault().
+I'll leave it as an exercise for the reader to decide whether or not I'm
+being _too_ lazy here ;-)
 
-> +{
-> +	int order;
-> +	unsigned int flags = 0;
-> +	struct kvm_memory_slot *slot = fault->slot;
-> +	long pfn = kvm_memfile_get_pfn(slot, fault->gfn, &order);
+Series applies cleanly to kvmarm/fixes at commit:
 
-If get_lock_pfn() and thus kvm_memfile_get_pfn() returns a pure error code instead
-of multiplexing the pfn, then this can be:
+  8872d9b3e35a ("KVM: arm64: Drop unneeded minor version check from PSCI v1.x handler")
 
-	bool is_private_pfn;
+Tested with AArch32 kvm-unit-tests and booting an AArch32 debian image
+on a Raspberry Pi 4. Nothing seems to have gone up in smoke yet...
 
-	is_private_pfn = !!kvm_memfile_get_pfn(slot, fault->gfn, &fault->pfn, &order);
+Oliver Upton (3):
+  KVM: arm64: Wire up CP15 feature registers to their AArch64
+    equivalents
+  KVM: arm64: Plumb cp10 ID traps through the AArch64 sysreg handler
+  KVM: arm64: Start trapping ID registers for 32 bit guests
 
-That self-documents the "pfn < 0" == shared logic.
+ arch/arm64/include/asm/kvm_emulate.h |   8 --
+ arch/arm64/include/asm/kvm_host.h    |   1 +
+ arch/arm64/kvm/handle_exit.c         |   1 +
+ arch/arm64/kvm/sys_regs.c            | 128 +++++++++++++++++++++++++++
+ 4 files changed, 130 insertions(+), 8 deletions(-)
 
-> +
-> +	if (kvm_vcpu_is_private_gfn(vcpu, fault->addr >> PAGE_SHIFT)) {
-> +		if (pfn < 0)
-> +			flags |= KVM_MEMORY_EXIT_FLAG_PRIVATE;
-> +		else {
-> +			fault->pfn = pfn;
-> +			if (slot->flags & KVM_MEM_READONLY)
-> +				fault->map_writable = false;
-> +			else
-> +				fault->map_writable = true;
-> +
-> +			if (order == 0)
-> +				fault->max_level = PG_LEVEL_4K;
+-- 
+2.35.1.1021.g381101b075-goog
 
-This doesn't correctly handle order > 0, but less than the next page size, in which
-case max_level needs to be PG_LEVEL_4k.  It also doesn't handle the case where
-max_level > PG_LEVEL_2M.
-
-That said, I think the proper fix is to have the get_lock_pfn() API return the max
-mapping level, not the order.  KVM, and presumably any other secondary MMU that might
-use these APIs, doesn't care about the order of the struct page, KVM cares about the
-max size/level of page it can map into the guest.  And similar to the previous patch,
-"order" is specific to struct page, which we are trying to avoid.
-
-> +			*is_private_pfn = true;
-
-This is where KVM guarantees that is_private_pfn == fault->is_private.
-
-> +			*r = RET_PF_FIXED;
-> +			return true;
-
-Ewww.  This is super confusing.  Ditto for the "*r = -1" magic number.  I totally
-understand why you took this approach, it's just hard to follow because it kinda
-follows the kvm_faultin_pfn() semantics, but then inverts true and false in this
-one case.
-
-I think the least awful option is to forego the helper and open code everything.
-If we ever refactor kvm_faultin_pfn() to be less weird then we can maybe move this
-to a helper.
-
-Open coding isn't too bad if you reorganize things so that the exit-to-userspace
-path is a dedicated, early check.  IMO, it's a lot easier to read this way, open
-coded or not.
-
-I think this is correct?  "is_private_pfn" and "level" are locals, everything else
-is in @fault.
-
-	if (kvm_slot_is_private(slot)) {
-		is_private_pfn = !!kvm_memfile_get_pfn(slot, fault->gfn,
-						       &fault->pfn, &level);
-
-		if (fault->is_private != is_private_pfn) {
-			if (is_private_pfn)
-				kvm_memfile_put_pfn(slot, fault->pfn);
-
-			vcpu->run->exit_reason = KVM_EXIT_MEMORY_ERROR;
-			if (fault->is_private)
-				vcpu->run->memory.flags = KVM_MEMORY_EXIT_FLAG_PRIVATE;
-			else
-				vcpu->run->memory.flags = 0;
-			vcpu->run->memory.padding = 0;
-			vcpu->run->memory.gpa = fault->gfn << PAGE_SHIFT;
-			vcpu->run->memory.size = PAGE_SIZE;
-			*r = 0;
-			return true;
-		}
-
-		/*
-		 * fault->pfn is all set if the fault is for a private pfn, just
-		 * need to update other metadata.
-		 */
-		if (fault->is_private) {
-			fault->max_level = min(fault->max_level, level);
-			fault->map_writable = !(slot->flags & KVM_MEM_READONLY);
-			return false;
-		}
-
-		/* Fault is shared, fallthrough to the standard path. */
-	}
-
-	async = false;
-
-> @@ -4016,7 +4076,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
->  	else
->  		write_lock(&vcpu->kvm->mmu_lock);
->  
-> -	if (is_page_fault_stale(vcpu, fault, mmu_seq))
-> +	if (!is_private_pfn && is_page_fault_stale(vcpu, fault, mmu_seq))
-
-As above, I'd prefer this check go in is_page_fault_stale().  It means shadow MMUs
-will suffer a pointless check, but I don't think that's a big issue.  Oooh, unless
-we support software-only, which would play nice with nested and probably even legacy
-shadow paging.  Fun :-)
-
->  		goto out_unlock;
->  
->  	r = make_mmu_pages_available(vcpu);
-> @@ -4033,7 +4093,12 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
->  		read_unlock(&vcpu->kvm->mmu_lock);
->  	else
->  		write_unlock(&vcpu->kvm->mmu_lock);
-> -	kvm_release_pfn_clean(fault->pfn);
-> +
-> +	if (is_private_pfn)
-
-And this can be
-
-	if (fault->is_private)
-
-Same feedback for paging_tmpl.h.
