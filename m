@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7320F4EB3CE
-	for <lists+kvm@lfdr.de>; Tue, 29 Mar 2022 21:02:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D570C4EB3F8
+	for <lists+kvm@lfdr.de>; Tue, 29 Mar 2022 21:13:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240794AbiC2TDm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Mar 2022 15:03:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55362 "EHLO
+        id S237012AbiC2TOu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Mar 2022 15:14:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41290 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233414AbiC2TDl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 29 Mar 2022 15:03:41 -0400
-Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E1BFE09B5
-        for <kvm@vger.kernel.org>; Tue, 29 Mar 2022 12:01:58 -0700 (PDT)
-Received: by mail-pg1-x535.google.com with SMTP id s72so15607122pgc.5
-        for <kvm@vger.kernel.org>; Tue, 29 Mar 2022 12:01:58 -0700 (PDT)
+        with ESMTP id S237082AbiC2TOt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Mar 2022 15:14:49 -0400
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EA6DE33A5
+        for <kvm@vger.kernel.org>; Tue, 29 Mar 2022 12:13:06 -0700 (PDT)
+Received: by mail-pf1-x42f.google.com with SMTP id s8so16712066pfk.12
+        for <kvm@vger.kernel.org>; Tue, 29 Mar 2022 12:13:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=2XeIM1SVjYsGalPDLQxopalWmUCHnrUjVEEJ+tulJdw=;
-        b=fkATFbG5P1QdsRl3f5I5TTNI5ChWdFQqj0PejuKROxLUJnUOxzgKe+W4LhC5IZAI4H
-         YtsmX3rK45fXNWubfbpZPqb9DnxrrAbfux1L4qkhlnrcAasThinipJ2Q3eV/AR/L8pQY
-         cRcROodkTR03YOK9g3nobLnLQ905Gk1gr+g/5/aOMWcSLRh80tKrndhIfqqoN+N3vRsS
-         DIOkXafKz0QlgKRKQ9CcqexPq7225Bm1SKVztp6KtFJXqZwd53geDw7ldIZ4DNNPAqx+
-         3sIDGdLWnk5KF2cMv6hxUP0l3WPVCea9ErtR4WnbKShs+t9nnnof7J9xgjZLKizrsTPW
-         Bp7A==
+        bh=1sRXKTYViBqnNTxehrfiPd1DYbEATFyG4C7S2pQ8qtk=;
+        b=pc8wAJj+CGPClFtc4+6SxMMF/hTDKxwPn6EK6m+9FfRx27Qyy31qCAugysYpXwlHiK
+         a0kUGxK6Xfyusctttk3qEf0tK6tcNRZVC0ueQWru0qGnf/xQLnN9yB4UEhBh55GBLxLt
+         cFjVzP27q2Jbjet5ZlPU3AzKv8YUQVETYTNGVpsh9BLXbZGgX7Laxe7Wbsh1pkzmNQd5
+         RT1DHO3tEEfJFNloe7cH+mP9GhmOEje2wvBrJ7X8qHIVfsdTFM8N3zeTBWAQPouP/7Qc
+         E+5bWo7OtgVpxMuq7z9X5OGWkMU+uUppgPyk83J8z1ADfUaMuhzNtfpxuM8aS7z8GBcU
+         BCkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=2XeIM1SVjYsGalPDLQxopalWmUCHnrUjVEEJ+tulJdw=;
-        b=xBhNePSxh/pxxbm8jDCMO722qAg6Ucl1/cfOLPE2Ex/GOfK852LDXu81iFRUdYIHW9
-         EyfFhZ9JzjUcQfC5h3iCN7ORtWDZASx35WZweEfg9reyAcHRFStyYXGChhj9XDtPRBye
-         /pnZId1rCAynmDRU4RfGoM9/59kTIINbaCNzgihchweIjFdmc/D8bCojO9Ji4KWI5Gnm
-         Ek6kajO+XIsQj2epirGr3RSiBTzz2lc5oPWbuglPvaGF5KEao9ZshzzmR1ft4piRcOL5
-         wdUmqxq55QJCQNA4Kho/oLBCNHxburDNIgxGzcGCYe7HvMI6epNgESFewwNMUM6GwYXQ
-         d7Gg==
-X-Gm-Message-State: AOAM531ZpLbNEEgdhQl+peg3RAfxeiiWCx7mclFtEefh9cNIpQ8wycRa
-        QeM9v+bPkn1JiQ+ruhLdQfFjwg==
-X-Google-Smtp-Source: ABdhPJzEpA97rJvGQuEnxLNNeV8mQMFbR/iU9G4YS04U64x9rSctBZQKrTxpUvsX+m2/3qlD8psMvg==
-X-Received: by 2002:a63:7888:0:b0:398:91:7b5e with SMTP id t130-20020a637888000000b0039800917b5emr3047768pgc.212.1648580517007;
-        Tue, 29 Mar 2022 12:01:57 -0700 (PDT)
+        bh=1sRXKTYViBqnNTxehrfiPd1DYbEATFyG4C7S2pQ8qtk=;
+        b=7utyBqEO62VDelK4WWWebTg87lXOVbCV6jdVyMt6mQvw11abQitxyfD5r4f3oB39q8
+         RQO6i3R/NEGNe2XjZzxcRqw+e2CQaApiViMQoFvhnTmUuttgSz+9JMvDz8Xqs+zCved7
+         5x2Ra7GArUbMRfzer4mqsEHbs3kpFJj4vC4sUVP/yiOGVvvVuR8+9aDKlCZwSyG2hB4O
+         sAlAKAI4hdYgDX9bT++7Z+bj6UjpRbkjLINR1nXyf6Pkua/6xZa+76tTUedOv64WCdBg
+         xpAv//z35Y+cTIoTUKBypUBEtU2IOm5f/CUjZITQIeNZ8aCnwlR7O1uOSfCMr4yqzdCN
+         d/eQ==
+X-Gm-Message-State: AOAM530KiWYoNMQxdymi+3ss6QRtP+Y/OzUu078dpw6pTHHI1SmO5D5a
+        ZAjhMl6R/P4x+lLt7M4glae4XA==
+X-Google-Smtp-Source: ABdhPJyYp/V6OUPnq1zyxa80O7VCUFqnzL/BqLshFvCAlq+hazZ3NircvxGibV5N8Gx554xqH7ZZkA==
+X-Received: by 2002:a05:6a00:1c95:b0:4fa:81f5:b9d4 with SMTP id y21-20020a056a001c9500b004fa81f5b9d4mr7825994pfw.49.1648581185482;
+        Tue, 29 Mar 2022 12:13:05 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id ip1-20020a17090b314100b001c7b10fe359sm3975575pjb.5.2022.03.29.12.01.55
+        by smtp.gmail.com with ESMTPSA id r11-20020a17090b050b00b001c741fd4890sm3627743pjz.9.2022.03.29.12.13.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Mar 2022 12:01:55 -0700 (PDT)
-Date:   Tue, 29 Mar 2022 19:01:52 +0000
+        Tue, 29 Mar 2022 12:13:04 -0700 (PDT)
+Date:   Tue, 29 Mar 2022 19:13:00 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Chao Peng <chao.p.peng@linux.intel.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -75,15 +75,14 @@ Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
         luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
         ak@linux.intel.com, david@redhat.com
-Subject: Re: [PATCH v5 10/13] KVM: Register private memslot to memory backing
- store
-Message-ID: <YkNXoCBjfpfI67QF@google.com>
+Subject: Re: [PATCH v5 12/13] KVM: Expose KVM_MEM_PRIVATE
+Message-ID: <YkNaPLVLk/pO0zjr@google.com>
 References: <20220310140911.50924-1-chao.p.peng@linux.intel.com>
- <20220310140911.50924-11-chao.p.peng@linux.intel.com>
+ <20220310140911.50924-13-chao.p.peng@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220310140911.50924-11-chao.p.peng@linux.intel.com>
+In-Reply-To: <20220310140911.50924-13-chao.p.peng@linux.intel.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -96,242 +95,117 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Thu, Mar 10, 2022, Chao Peng wrote:
-> Add 'notifier' to memslot to make it a memfile_notifier node and then
-> register it to memory backing store via memfile_register_notifier() when
-> memslot gets created. When memslot is deleted, do the reverse with
-> memfile_unregister_notifier(). Note each KVM memslot can be registered
-> to different memory backing stores (or the same backing store but at
-> different offset) independently.
+> KVM_MEM_PRIVATE is not exposed by default but architecture code can turn
+> on it by implementing kvm_arch_private_memory_supported().
 > 
 > Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
 > Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
 > ---
 >  include/linux/kvm_host.h |  1 +
->  virt/kvm/kvm_main.c      | 75 ++++++++++++++++++++++++++++++++++++----
->  2 files changed, 70 insertions(+), 6 deletions(-)
+>  virt/kvm/kvm_main.c      | 24 +++++++++++++++++++-----
+>  2 files changed, 20 insertions(+), 5 deletions(-)
 > 
 > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 6e1d770d6bf8..9b175aeca63f 100644
+> index 186b9b981a65..0150e952a131 100644
 > --- a/include/linux/kvm_host.h
 > +++ b/include/linux/kvm_host.h
-> @@ -567,6 +567,7 @@ struct kvm_memory_slot {
->  	struct file *private_file;
->  	loff_t private_offset;
->  	struct memfile_pfn_ops *pfn_ops;
-> +	struct memfile_notifier notifier;
->  };
+> @@ -1432,6 +1432,7 @@ bool kvm_arch_dy_has_pending_interrupt(struct kvm_vcpu *vcpu);
+>  int kvm_arch_post_init_vm(struct kvm *kvm);
+>  void kvm_arch_pre_destroy_vm(struct kvm *kvm);
+>  int kvm_arch_create_vm_debugfs(struct kvm *kvm);
+> +bool kvm_arch_private_memory_supported(struct kvm *kvm);
 >  
->  static inline bool kvm_slot_is_private(const struct kvm_memory_slot *slot)
+>  #ifndef __KVM_HAVE_ARCH_VM_ALLOC
+>  /*
 > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index d11a2628b548..67349421eae3 100644
+> index 52319f49d58a..df5311755a40 100644
 > --- a/virt/kvm/kvm_main.c
 > +++ b/virt/kvm/kvm_main.c
-> @@ -840,6 +840,37 @@ static int kvm_init_mmu_notifier(struct kvm *kvm)
+> @@ -1485,10 +1485,19 @@ static void kvm_replace_memslot(struct kvm *kvm,
+>  	}
+>  }
 >  
->  #endif /* CONFIG_MMU_NOTIFIER && KVM_ARCH_WANT_MMU_NOTIFIER */
->  
-> +#ifdef CONFIG_MEMFILE_NOTIFIER
-> +static inline int kvm_memfile_register(struct kvm_memory_slot *slot)
-
-This is a good oppurtunity to hide away the memfile details a bit.  Maybe
-kvm_private_mem_{,un}register()?
-
+> -static int check_memory_region_flags(const struct kvm_userspace_memory_region *mem)
+> +bool __weak kvm_arch_private_memory_supported(struct kvm *kvm)
 > +{
-> +	return memfile_register_notifier(file_inode(slot->private_file),
-> +					 &slot->notifier,
-> +					 &slot->pfn_ops);
+> +	return false;
 > +}
 > +
-> +static inline void kvm_memfile_unregister(struct kvm_memory_slot *slot)
-> +{
-> +	if (slot->private_file) {
-> +		memfile_unregister_notifier(file_inode(slot->private_file),
-> +					    &slot->notifier);
-> +		fput(slot->private_file);
-
-This should not do fput(), it makes the helper imbalanced with respect to the
-register path and will likely lead to double fput().  Indeed, if preparing the
-region fails, __kvm_set_memory_region() will double up on fput() due to checking
-its local "file" for null, not slot->private for null.
-
-> +		slot->private_file = NULL;
-> +	}
-> +}
-> +
-> +#else /* !CONFIG_MEMFILE_NOTIFIER */
-> +
-> +static inline int kvm_memfile_register(struct kvm_memory_slot *slot)
-> +{
-
-This should WARN_ON_ONCE().  Ditto for unregister.
-
-> +	return -EOPNOTSUPP;
-> +}
-> +
-> +static inline void kvm_memfile_unregister(struct kvm_memory_slot *slot)
-> +{
-> +}
-> +
-> +#endif /* CONFIG_MEMFILE_NOTIFIER */
-> +
->  #ifdef CONFIG_HAVE_KVM_PM_NOTIFIER
->  static int kvm_pm_notifier_call(struct notifier_block *bl,
->  				unsigned long state,
-> @@ -884,6 +915,9 @@ static void kvm_destroy_dirty_bitmap(struct kvm_memory_slot *memslot)
->  /* This does not remove the slot from struct kvm_memslots data structures */
->  static void kvm_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot)
+> +static int check_memory_region_flags(struct kvm *kvm,
+> +				const struct kvm_userspace_memory_region *mem)
 >  {
-> +	if (slot->flags & KVM_MEM_PRIVATE)
-> +		kvm_memfile_unregister(slot);
-
-With fput() move out of unregister, this needs to be:
-
-	if (slot->flags & KVM_MEM_PRIVATE) {
-		kvm_private_mem_unregister(slot);
-		fput(slot->private_file);
-	}
-> +
->  	kvm_destroy_dirty_bitmap(slot);
+>  	u32 valid_flags = KVM_MEM_LOG_DIRTY_PAGES;
 >  
->  	kvm_arch_free_memslot(kvm, slot);
-> @@ -1738,6 +1772,12 @@ static int kvm_set_memslot(struct kvm *kvm,
->  		kvm_invalidate_memslot(kvm, old, invalid_slot);
->  	}
->  
-> +	if (new->flags & KVM_MEM_PRIVATE && change == KVM_MR_CREATE) {
-> +		r = kvm_memfile_register(new);
-> +		if (r)
-> +			return r;
-> +	}
-
-This belongs in kvm_prepare_memory_region().  The shenanigans for DELETE and MOVE
-are special.
-
+> +	if (kvm_arch_private_memory_supported(kvm))
+> +		valid_flags |= KVM_MEM_PRIVATE;
 > +
->  	r = kvm_prepare_memory_region(kvm, old, new, change);
->  	if (r) {
->  		/*
-> @@ -1752,6 +1792,10 @@ static int kvm_set_memslot(struct kvm *kvm,
->  		} else {
->  			mutex_unlock(&kvm->slots_arch_lock);
->  		}
-> +
-> +		if (new->flags & KVM_MEM_PRIVATE && change == KVM_MR_CREATE)
-> +			kvm_memfile_unregister(new);
-> +
->  		return r;
->  	}
->  
-> @@ -1817,6 +1861,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
->  	enum kvm_mr_change change;
->  	unsigned long npages;
->  	gfn_t base_gfn;
-> +	struct file *file = NULL;
-
-Nit, naming this private_file would help understand its use.  Though I think it's
-easier to not have a local variable.  More below.
-
+>  #ifdef __KVM_HAVE_READONLY_MEM
+>  	valid_flags |= KVM_MEM_READONLY;
+>  #endif
+> @@ -1900,7 +1909,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
 >  	int as_id, id;
 >  	int r;
 >  
-> @@ -1890,14 +1935,24 @@ int __kvm_set_memory_region(struct kvm *kvm,
->  			return 0;
->  	}
+> -	r = check_memory_region_flags(mem);
+> +	r = check_memory_region_flags(kvm, mem);
+>  	if (r)
+>  		return r;
 >  
-> +	if (mem->flags & KVM_MEM_PRIVATE) {
-> +		file = fdget(region_ext->private_fd).file;
+> @@ -1913,10 +1922,12 @@ int __kvm_set_memory_region(struct kvm *kvm,
+>  		return -EINVAL;
+>  	if (mem->guest_phys_addr & (PAGE_SIZE - 1))
+>  		return -EINVAL;
+> -	/* We can read the guest memory with __xxx_user() later on. */
+>  	if ((mem->userspace_addr & (PAGE_SIZE - 1)) ||
+> -	    (mem->userspace_addr != untagged_addr(mem->userspace_addr)) ||
+> -	     !access_ok((void __user *)(unsigned long)mem->userspace_addr,
+> +	    (mem->userspace_addr != untagged_addr(mem->userspace_addr)))
+> +		return -EINVAL;
+> +	/* We can read the guest memory with __xxx_user() later on. */
+> +	if (!(mem->flags & KVM_MEM_PRIVATE) &&
+> +	    !access_ok((void __user *)(unsigned long)mem->userspace_addr,
 
-This can use fget() instead of fdget().
+This should sanity check private_offset for private memslots.  At a bare minimum,
+wrapping should be disallowed.
 
-> +		if (!file)
+>  			mem->memory_size))
+>  		return -EINVAL;
+>  	if (as_id >= KVM_ADDRESS_SPACE_NUM || id >= KVM_MEM_SLOTS_NUM)
+> @@ -1957,6 +1968,9 @@ int __kvm_set_memory_region(struct kvm *kvm,
+>  		if ((kvm->nr_memslot_pages + npages) < kvm->nr_memslot_pages)
+>  			return -EINVAL;
+>  	} else { /* Modify an existing slot. */
+> +		/* Private memslots are immutable, they can only be deleted. */
+> +		if (mem->flags & KVM_MEM_PRIVATE)
 > +			return -EINVAL;
-> +	}
-> +
->  	if ((change == KVM_MR_CREATE || change == KVM_MR_MOVE) &&
-> -	    kvm_check_memslot_overlap(slots, id, base_gfn, base_gfn + npages))
-> -		return -EEXIST;
-> +	    kvm_check_memslot_overlap(slots, id, base_gfn, base_gfn + npages)) {
-> +		r = -EEXIST;
-> +		goto out;
-> +	}
->  
->  	/* Allocate a slot that will persist in the memslot. */
->  	new = kzalloc(sizeof(*new), GFP_KERNEL_ACCOUNT);
-> -	if (!new)
-> -		return -ENOMEM;
-> +	if (!new) {
-> +		r = -ENOMEM;
-> +		goto out;
-> +	}
->  
->  	new->as_id = as_id;
->  	new->id = id;
-> @@ -1905,10 +1960,18 @@ int __kvm_set_memory_region(struct kvm *kvm,
->  	new->npages = npages;
->  	new->flags = mem->flags;
->  	new->userspace_addr = mem->userspace_addr;
-> +	new->private_file = file;
-> +	new->private_offset = mem->flags & KVM_MEM_PRIVATE ?
-> +			      region_ext->private_offset : 0;
 
-"new" is zero-allocated, so all the private stuff, including the fget(), can be
-wrapped in a single KVM_MEM_PRIVATE check.  Moving fget() eliminates the number
-of gotos needed (the above -EEXIST and -ENOMEM paths don't need to be modified).
+These sanity checks belong in "KVM: Register private memslot to memory backing store",
+e.g. that patch is "broken" without the immutability restriction.  It's somewhat moot
+because the code is unreachable, but it makes reviewing confusing/difficult.
 
->  	r = kvm_set_memslot(kvm, old, new, change);
-> -	if (r)
-> -		kfree(new);
-> +	if (!r)
-> +		return r;
+But rather than move the sanity checks back, I think I'd prefer to pull all of patch 10
+here.  I think it also makes sense to drop "KVM: Use memfile_pfn_ops to obtain pfn for
+private pages" and add the pointer in "struct kvm_memory_slot" in patch "KVM: Extend the
+memslot to support fd-based private memory", with the use of the ops folded into
+"KVM: Handle page fault for private memory".  Adding code to KVM and KVM-x86 in a single
+patch is ok, and overall makes things easier to review because the new helpers have a
+user right away, especially since there will be #ifdeffery.
 
-Use goto, e.g.
+I.e. end up with something like:
 
-	if (r)
-		goto out;
+  mm: Introduce memfile_notifier
+  mm/shmem: Restrict MFD_INACCESSIBLE memory against RLIMIT_MEMLOCK
+  KVM: Extend the memslot to support fd-based private memory
+  KVM: Use kvm_userspace_memory_region_ext
+  KVM: Add KVM_EXIT_MEMORY_ERROR exit
+  KVM: Handle page fault for private memory
+  KVM: Register private memslot to memory backing store
+  KVM: Zap existing KVM mappings when pages changed in the private fd
+  KVM: Enable and expose KVM_MEM_PRIVATE
 
-	return 0;
-
-Burying the happy path in a taken if-statement is confusing and error prone,
-mostly because it breaks well-established kernel patterns.  Note, there's no need
-for a separate out_free since new->private_file will be NULL in either case.  I
-don't have a strong preference, I just find it easier to read code that's more
-explicit, but I'm a-ok collapsing them into a single label.
-
-	if ((change == KVM_MR_CREATE || change == KVM_MR_MOVE) &&
-	    kvm_check_memslot_overlap(slots, id, base_gfn, base_gfn + npages))
-		return -EEXIST;
-
-	/* Allocate a slot that will persist in the memslot. */
-	new = kzalloc(sizeof(*new), GFP_KERNEL_ACCOUNT);
-	if (!new)
-		return -ENOMEM;
-
-	new->as_id = as_id;
-	new->id = id;
-	new->base_gfn = base_gfn;
-	new->npages = npages;
-	new->flags = mem->flags;
-	new->userspace_addr = mem->userspace_addr;
-
-	if (mem->flags & KVM_MEM_PRIVATE) {
-		new->private_file = fget(mem->private_fd);
-		if (!new->private_file) {
-			r = -EINVAL;
-			goto out_free;
-		}
-		new->private_offset = mem->private_offset;
-	}
-
-	r = kvm_set_memslot(kvm, old, new, change);
-	if (r)
-		goto out;
-
-	return 0;
-
-out:
-	if (new->private_file)
-		fput(new->private_file);
-
-out_free:
-	kfree(new);
-	return r;
+>  		if ((mem->userspace_addr != old->userspace_addr) ||
+>  		    (npages != old->npages) ||
+>  		    ((mem->flags ^ old->flags) & KVM_MEM_READONLY))
+> -- 
+> 2.17.1
+> 
