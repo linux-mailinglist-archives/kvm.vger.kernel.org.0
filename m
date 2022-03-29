@@ -2,60 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 622564EB0CF
-	for <lists+kvm@lfdr.de>; Tue, 29 Mar 2022 17:37:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C563B4EB0C0
+	for <lists+kvm@lfdr.de>; Tue, 29 Mar 2022 17:37:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238793AbiC2PhI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Mar 2022 11:37:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57816 "EHLO
+        id S238814AbiC2PhO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Mar 2022 11:37:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58160 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238775AbiC2PhH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 29 Mar 2022 11:37:07 -0400
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27EFE108557;
-        Tue, 29 Mar 2022 08:35:24 -0700 (PDT)
-Received: by mail-pl1-x62e.google.com with SMTP id y6so15425003plg.2;
-        Tue, 29 Mar 2022 08:35:24 -0700 (PDT)
+        with ESMTP id S238809AbiC2PhN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Mar 2022 11:37:13 -0400
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB73824F2A1;
+        Tue, 29 Mar 2022 08:35:29 -0700 (PDT)
+Received: by mail-pf1-x42b.google.com with SMTP id t2so16203269pfj.10;
+        Tue, 29 Mar 2022 08:35:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=hXXDAsVberZERpiqBZUmvRldgBLnXTkqn777k+qHy4M=;
-        b=EAI87mx8MDRK8xMXQNaElYaVk5+kOjZwSRg0qmZhjJvyEtzYi5sj8ZVsQzpF3jYH7E
-         0PpQzdUEfa7xfxiTAtz+TmaLS9UvmI2vxlRHvcPeMjdy4tUw1d0vukOHfYp4J42xxJJf
-         VH61yfGoH1H7NLWvCp82IdFZejvh+FS6ANiW8uehWkpvoCxXzkabUonIarc9ARo3F/aH
-         4gemyU8oMXKtUYSuSGoL7JREfxm3SxGYqRviRTBBqh8Ro/HI6BUU+P/eiayBi2laq7pn
-         Z5iKQr9DPzNUEQ9kzoDOv0GO1so+6U1iw/oDDQtCYZ90d0O25Jw771ASIihAULa6/BwU
-         5Mgw==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=ZaW1ShDM/2OnGyJMP0bodXnVQNIFn7WzT1GlIkRksjI=;
+        b=aaN6MeHg94Te4I7Cta6tWpMAP48QzzbdXtyKtQcmJhXBSppoWEBehBQxN3CiutZyKk
+         25MgVQg7jcZIGeWDsuiou57WsZGo8lRLVLLkRyrCHHuvcuCiepsoEYwuDNRQ8oXhJJTP
+         LcvswQ1ojfMcbVzgX939FhqAfnXo3D92dJWvyOtypFfUET7zNMKep2y1NsHeZhoJLCag
+         E9OG7aQJSwXBM3d0JAU7BRIjcVYCOMR6Gfp9ipt2Gq/YfJIG/y1Piyn93joxp+f0vnm/
+         6H+mih7UgzIL2lbVci6bgxGto6K61ZF2QU0BdeTMnwQlycKznLX+NZr0zdABGXe0IaP8
+         auvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=hXXDAsVberZERpiqBZUmvRldgBLnXTkqn777k+qHy4M=;
-        b=W9HD5efWPZdXr60gj3yiCrT5REvWnMXunOCvHvSqoXC6A8aUIUKVvTlitNZIjmW3HQ
-         TqbZvkc5Cx3s25On1kUVFooFcc6aHXK21PsYSV1b9pSHfIYkYNwGSVdPhQZnbq4hkE39
-         Lnm1WpdRY1qHf/8O1gQTwkxuR9uRY32yAQOb8dUee7qn1Bue3j69LGR/1JCMSfJVCopw
-         v57VdGa425QF0aQ4srf/+ELzfnLdV/fdq/kubEY9dLGMwn5Db7O9v3e8drjAkBdO0Yii
-         hzR8O3t7f9Qwwr4rlrVAG5N5GEVJFs+0NaaRAcsjkjnKiwmSYYqejzVhgIQLBxDqe2hr
-         /g2g==
-X-Gm-Message-State: AOAM533NC2ve52/RnkGd0/PBrehhBIy+3K4S9x0Yl6mZxuAv/FW0lMbQ
-        GTceD9EO5eK0QUVQ/UFjWAaQAH/gK/E=
-X-Google-Smtp-Source: ABdhPJwLcsla511HPCq1O4W/HZJVKhb6M0IsTGvQX7oPVlOP3QJPE75EqnWX9k9z0OTuejGHdavSZA==
-X-Received: by 2002:a17:902:ea92:b0:153:d046:5711 with SMTP id x18-20020a170902ea9200b00153d0465711mr31245213plb.77.1648568123323;
-        Tue, 29 Mar 2022 08:35:23 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=ZaW1ShDM/2OnGyJMP0bodXnVQNIFn7WzT1GlIkRksjI=;
+        b=vz1qzv/RATkdG2I9ViIUz/uoBv2MjEVWG/saqym+Nn/JOvSoGvTsPCw8h0gmSPPNYU
+         oiulyr817ybQN1KNIyGm7YA+XFkS3oxnujUOHTaGwmmdtryhHdLR4jOsgWOgb4FKmEax
+         WB7HcpWCbB20J69Z2aMqA2B4sW/Dfm83D920x0H3Tg2SA4U2FWwp2LobDRWFEdki5oga
+         4oAT8l4FZ0stGxiPmhH1mziOxGeueTPv1200EopYXHyYh1bne4rWJepLC0EA6MrweSsy
+         0NmFRHd3DxarXWVpPNUKnkmY0phZz3WK9ZPrWr0ofs6ztoKZ7+QimSih3YDtdhqxTJeM
+         1f0g==
+X-Gm-Message-State: AOAM533iv7zoGuHl9pl4YT9oewjGaONZ5pGF+O15wxV0ljtpHMg7vTmv
+        mHxrOt1ajHV1LtLVjOyUU9bVi6D/h6o=
+X-Google-Smtp-Source: ABdhPJzMZGcLUB+u0PAc7F/aUR6QHUYJvodEUQrvUOixwzoxts5ogPz/PzbJAPFg4ZixNSganJluWw==
+X-Received: by 2002:a63:7b4a:0:b0:398:1337:e304 with SMTP id k10-20020a637b4a000000b003981337e304mr2407519pgn.371.1648568129045;
+        Tue, 29 Mar 2022 08:35:29 -0700 (PDT)
 Received: from localhost ([47.251.3.230])
-        by smtp.gmail.com with ESMTPSA id b16-20020a056a00115000b004f6ff260c9esm19292309pfm.207.2022.03.29.08.35.22
+        by smtp.gmail.com with ESMTPSA id s4-20020a056a00194400b004fb358ffe84sm12474241pfk.104.2022.03.29.08.35.27
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 29 Mar 2022 08:35:23 -0700 (PDT)
+        Tue, 29 Mar 2022 08:35:28 -0700 (PDT)
 From:   Lai Jiangshan <jiangshanlai@gmail.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>
-Cc:     Lai Jiangshan <jiangshan.ljs@antgroup.com>
-Subject: [RFC PATCH V2 0/4] KVM: X86: Add and use shadow page with level expanded or acting as pae_root
-Date:   Tue, 29 Mar 2022 23:36:00 +0800
-Message-Id: <20220329153604.507475-1-jiangshanlai@gmail.com>
+Cc:     Lai Jiangshan <jiangshan.ljs@antgroup.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>
+Subject: [RFC PATCH V2 1/4] KVM: X86: Add arguement gfn and role to kvm_mmu_alloc_page()
+Date:   Tue, 29 Mar 2022 23:36:01 +0800
+Message-Id: <20220329153604.507475-2-jiangshanlai@gmail.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
+In-Reply-To: <20220329153604.507475-1-jiangshanlai@gmail.com>
+References: <20220329153604.507475-1-jiangshanlai@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -70,78 +80,55 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 
-(Request For Help for testing on AMD machine with 32 bit L1 hypervisor,
-see information below)
+kvm_mmu_alloc_page() will access to more bits of the role.
 
-KVM handles root pages specially for these cases:
+Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
+---
+ arch/x86/kvm/mmu/mmu.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-direct mmu (nonpaping for 32 bit guest):
-	gCR0_PG=0
-shadow mmu (shadow paping for 32 bit guest):
-	gCR0_PG=1,gEFER_LMA=0,gCR4_PSE=0
-	gCR0_PG=1,gEFER_LMA=0,gCR4_PSE=1
-direct mmu (NPT for 32bit host):
-	hEFER_LMA=0
-shadow nested NPT (for 32bit L1 hypervisor):
-	gCR0_PG=1,gEFER_LMA=0,gCR4_PSE=0,hEFER_LMA=0
-	gCR0_PG=1,gEFER_LMA=0,gCR4_PSE=1,hEFER_LMA=0
-	gCR0_PG=1,gEFER_LMA=0,gCR4_PSE={0|1},hEFER_LMA=1,hCR4_LA57={0|1}
-Shadow nested NPT for 64bit L1 hypervisor:
-	gEFER_LMA=1,gCR4_LA57=0,hEFER_LMA=1,hCR4_LA57=1
-
-They are either using special roots or matched the condition 
-((mmu->shadow_root_level > mmu->root_level) && !mm->direct_map)
-(refered as level expansion) or both.
-
-All the cases are using special roots except the last one.
-Many cases are doing level expansion including the last one.
-
-When special roots are used, the root page will not be backed by
-kvm_mmu_page.  So they must be treated specially, but not all places
-is considering this problem, and Sean is adding some code to check
-this special roots.
-
-When level expansion, the kvm treats them silently always.
-
-These treaments incur problems or complication, see the changelog
-of every patch.
-
-These patches were made when I reviewed all the usage of shadow_root_level
-and root_level.  Many root level patches are sent and accepted.
-
-These patches has not been tested with shadow NPT cases listed above.
-Because I don't have guest images can act as 32 bit L1 hypervisor, nor
-I can access to AMD machine with 5 level paging.  I'm a bit reluctant
-to ask for the resource, so I send the patches and wish someone test
-them and modify them.  At least, it provides some thinking and reveals
-problems of the existing code and of the AMD cases.
-( *Request For Help* here.)
-
-These patches have been tested with the all cases except the shadow-NPT
-cases, the code coverage is believed to be more than 95% (hundreds of
-code related to shadow-NPT are shoved, and be replaced with common
-role.pae_root and role.passthrough code with only 8 line of code is
-added for shadow-NPT, only 2 line of code is not covered in my tests).
-
-[V1]: https://lore.kernel.org/lkml/20211210092508.7185-1-jiangshanlai@gmail.com/
-
-Changed from V1:
-	Apply Sean's comments and suggestion. (Too much to list. Thanks!)
-	Add some comments.
-	Change changelog for role.pae_root patch.
-
-Lai Jiangshan (4):
-  KVM: X86: Add arguement gfn and role to kvm_mmu_alloc_page()
-  KVM: X86: Introduce role.passthrough for level expanded pagetable
-  KVM: X86: Alloc role.pae_root shadow page
-  KVM: X86: Use passthrough and pae_root shadow page for 32bit guests
-
- Documentation/virt/kvm/mmu.rst  |   7 +
- arch/x86/include/asm/kvm_host.h |  16 +-
- arch/x86/kvm/mmu/mmu.c          | 400 +++++++++-----------------------
- arch/x86/kvm/mmu/paging_tmpl.h  |  15 +-
- 4 files changed, 138 insertions(+), 300 deletions(-)
-
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index a7cb877f3784..8449ae089593 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -1706,13 +1706,14 @@ static void drop_parent_pte(struct kvm_mmu_page *sp,
+ 	mmu_spte_clear_no_track(parent_pte);
+ }
+ 
+-static struct kvm_mmu_page *kvm_mmu_alloc_page(struct kvm_vcpu *vcpu, int direct)
++static struct kvm_mmu_page *kvm_mmu_alloc_page(struct kvm_vcpu *vcpu, gfn_t gfn,
++					       union kvm_mmu_page_role role)
+ {
+ 	struct kvm_mmu_page *sp;
+ 
+ 	sp = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_page_header_cache);
+ 	sp->spt = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_shadow_page_cache);
+-	if (!direct)
++	if (!role.direct)
+ 		sp->gfns = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_gfn_array_cache);
+ 	set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
+ 
+@@ -1724,6 +1725,8 @@ static struct kvm_mmu_page *kvm_mmu_alloc_page(struct kvm_vcpu *vcpu, int direct
+ 	sp->mmu_valid_gen = vcpu->kvm->arch.mmu_valid_gen;
+ 	list_add(&sp->link, &vcpu->kvm->arch.active_mmu_pages);
+ 	kvm_mod_used_mmu_pages(vcpu->kvm, +1);
++	sp->gfn = gfn;
++	sp->role = role;
+ 	return sp;
+ }
+ 
+@@ -2107,10 +2110,7 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
+ 
+ 	++vcpu->kvm->stat.mmu_cache_miss;
+ 
+-	sp = kvm_mmu_alloc_page(vcpu, direct);
+-
+-	sp->gfn = gfn;
+-	sp->role = role;
++	sp = kvm_mmu_alloc_page(vcpu, gfn, role);
+ 	hlist_add_head(&sp->hash_link, sp_list);
+ 	if (!direct) {
+ 		account_shadowed(vcpu->kvm, sp);
 -- 
 2.19.1.6.gb485710b
 
