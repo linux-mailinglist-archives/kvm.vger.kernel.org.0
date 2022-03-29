@@ -2,164 +2,233 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4CF1D4EB410
-	for <lists+kvm@lfdr.de>; Tue, 29 Mar 2022 21:23:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 12C9A4EB426
+	for <lists+kvm@lfdr.de>; Tue, 29 Mar 2022 21:34:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234102AbiC2TYz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Mar 2022 15:24:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49936 "EHLO
+        id S240978AbiC2TgB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Mar 2022 15:36:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32998 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240933AbiC2TYx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 29 Mar 2022 15:24:53 -0400
-Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34C376D969
-        for <kvm@vger.kernel.org>; Tue, 29 Mar 2022 12:23:10 -0700 (PDT)
-Received: by mail-pf1-x429.google.com with SMTP id b15so16778337pfm.5
-        for <kvm@vger.kernel.org>; Tue, 29 Mar 2022 12:23:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=leHL94h+MpS4/OEOPtJEdh0aJz+CrPTMrBVs83Qfv3E=;
-        b=f9RP67uwP/U4yYMwWleoqNxKjYfD+VZ9bI5mxhlSyD+CCMlJ5FCF77eVp5wFXeZEON
-         V2IkeIbb0iHzwsqI2Do5dROL5K53gUBZaDEYt42cPjujky5xN1evllqzZccVhRjtEiQc
-         BtFaX3WWMuJUXnlj4vHNmqhdRoF82wpMpPdh3QXX4XHcC1vsLHj9RZKCIyFRbJXDEpb4
-         6grrlWOCR3R9b9US42EBjL5V5jC63ILxWOO/exIV0gi7WqmoC2YAHWbBTYwrE7uxi8LY
-         nvZYtSC+jvXOJc6q3t8LNy6rdjjy8WQl8/HONzcHWfFl4cAyGvjbsH3Nd/l/9l36p+7v
-         Jaqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=leHL94h+MpS4/OEOPtJEdh0aJz+CrPTMrBVs83Qfv3E=;
-        b=ySOG0f48iNgbyCsAMQzMRqOZMImnlq7wFok1O2f1nDJF76VBsm8Sd9gRFE5KidmN95
-         mWJg+3PvdOpd9xuiEh2h7OtZdbSyOde51gaJ2CGhhip0F2EpO2ssqUL8QPhVGIhMJLow
-         dP1izmWOTsBeQuY59t2FCxYZDGkGNxAmj1RxBK9NDRuCuUlFhgryqgAAZ0fLh7jYWypM
-         61b2yH8N2qFMzYoL0gijY71RtRGqt+8cQqHOtTRoUIC+3XYyppkYFQFKLIxQVCyNiZve
-         tzWcnwKHl1SgsgJrWg04iX2WbSaz4KcjZx3XJZMhR4ijky/Rnux8a5kQ51UhALALY6hu
-         Q1OA==
-X-Gm-Message-State: AOAM5312gJT+i2ATvDwON9nuqU7E6SB4djjCGKHNNhmD9KmeGfJnHX8z
-        JvDyaU2AJXnp/wZtqFPHWuxVag==
-X-Google-Smtp-Source: ABdhPJwjnUern9b0nwzFDfrc+KHUoi+vzEO/eEg7u0tJsu4zhLLogQOi1j9Ecq4LcoDSrQKd/DUgkw==
-X-Received: by 2002:a05:6a00:1908:b0:4f7:8813:b2cb with SMTP id y8-20020a056a00190800b004f78813b2cbmr28993474pfi.54.1648581789396;
-        Tue, 29 Mar 2022 12:23:09 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id j6-20020a17090a588600b001c699d77503sm3584376pji.2.2022.03.29.12.23.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Mar 2022 12:23:08 -0700 (PDT)
-Date:   Tue, 29 Mar 2022 19:23:04 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Chao Peng <chao.p.peng@linux.intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-api@vger.kernel.org, qemu-devel@nongnu.org,
+        with ESMTP id S234102AbiC2TgA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Mar 2022 15:36:00 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04FB45D18E
+        for <kvm@vger.kernel.org>; Tue, 29 Mar 2022 12:34:16 -0700 (PDT)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1648582454;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=dPTYv8oZoZk/pXXJmyyCi5d1/1rNE6WDpyTpsQnrolg=;
+        b=Xw0oqvh9VEvhGT3zLsv/z/ZsEiCFSPpeN6bQH8PuYklikmf0IDZCsliMBzwsYXbpW6zf3w
+        ArTfHrZ3MrGMM4hTK1BFzLwhO6N+aw9+tpVMSdMwpXfmjgzv5KstnK87PJA5TmqtdDLIE9
+        x/aMwq6iVBpuGgzV12IaHgJEDX9vW89HJj2V0HdLo3gWSnBU+OXQ+lz6wzjsNfYN6FQqFa
+        0RfS7ZFQukg2GdtM9bp6iMmDKklFVqbMZt7AyHl/ynyGGVj0Br2/6o7Op/gxJktfX0nHUz
+        2g/rzjW61Ozr4aKdIxX7kQm4fw0SmzzcbfAZbCFhG/loQcSdPyc8z6epyibMzg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1648582454;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=dPTYv8oZoZk/pXXJmyyCi5d1/1rNE6WDpyTpsQnrolg=;
+        b=TQSuKq5qrPKHW4z80aYWk/f6fmtnuIbSdLb02zp9DEZwb4LcwswYCh2g8YmxJHwnw1Sd7L
+        991zNClnKyBKh1DQ==
+To:     Oliver Upton <oupton@google.com>
+Cc:     "Franke, Daniel" <dff@amazon.com>,
+        David Woodhouse <dwmw2@infradead.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com
-Subject: Re: [PATCH v5 11/13] KVM: Zap existing KVM mappings when pages
- changed in the private fd
-Message-ID: <YkNcmGsOw4MThaym@google.com>
-References: <20220310140911.50924-1-chao.p.peng@linux.intel.com>
- <20220310140911.50924-12-chao.p.peng@linux.intel.com>
+        Joerg Roedel <joro@8bytes.org>
+Subject: Re: [PATCH] Documentation: KVM: Describe guest TSC scaling in
+ migration algorithm
+In-Reply-To: <CAOQ_QsgDY0oeS0kU62MWMWj9JR3mKfU_p=MC7kto=LX5tQ2PPA@mail.gmail.com>
+References: <5BD1FCB2-3164-4785-B4D0-94E19E6D7537@amazon.com>
+ <YjpFP+APSqjU7fUi@google.com> <875ynwg7tk.ffs@tglx>
+ <CAOQ_QsgDY0oeS0kU62MWMWj9JR3mKfU_p=MC7kto=LX5tQ2PPA@mail.gmail.com>
+Date:   Tue, 29 Mar 2022 21:34:13 +0200
+Message-ID: <87sfr0eeoa.ffs@tglx>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220310140911.50924-12-chao.p.peng@linux.intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 10, 2022, Chao Peng wrote:
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 67349421eae3..52319f49d58a 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -841,8 +841,43 @@ static int kvm_init_mmu_notifier(struct kvm *kvm)
->  #endif /* CONFIG_MMU_NOTIFIER && KVM_ARCH_WANT_MMU_NOTIFIER */
->  
->  #ifdef CONFIG_MEMFILE_NOTIFIER
-> +static void kvm_memfile_notifier_handler(struct memfile_notifier *notifier,
-> +					 pgoff_t start, pgoff_t end)
-> +{
-> +	int idx;
-> +	struct kvm_memory_slot *slot = container_of(notifier,
-> +						    struct kvm_memory_slot,
-> +						    notifier);
-> +	struct kvm_gfn_range gfn_range = {
-> +		.slot		= slot,
-> +		.start		= start - (slot->private_offset >> PAGE_SHIFT),
-> +		.end		= end - (slot->private_offset >> PAGE_SHIFT),
-> +		.may_block 	= true,
-> +	};
-> +	struct kvm *kvm = slot->kvm;
-> +
-> +	gfn_range.start = max(gfn_range.start, slot->base_gfn);
-> +	gfn_range.end = min(gfn_range.end, slot->base_gfn + slot->npages);
-> +
-> +	if (gfn_range.start >= gfn_range.end)
-> +		return;
-> +
-> +	idx = srcu_read_lock(&kvm->srcu);
-> +	KVM_MMU_LOCK(kvm);
-> +	kvm_unmap_gfn_range(kvm, &gfn_range);
-> +	kvm_flush_remote_tlbs(kvm);
+Oliver,
 
-This should check the result of kvm_unmap_gfn_range() and flush only if necessary.
+On Tue, Mar 29 2022 at 09:02, Oliver Upton wrote:
+> On Tue, Mar 29, 2022 at 7:19 AM Thomas Gleixner <tglx@linutronix.de> wrote:
+>> > Doing this the other way around (advance the TSC, tell the guest to fix
+>> > MONOTONIC) is fundamentally wrong, as it violates two invariants of the
+>> > monotonic clock. Monotonic counts during a migration, which really is a
+>> > forced suspend. Additionally, you cannot step the monotonic clock.
+>>
+>> A migration _should_ have suspend semantics, but the forced suspend
+>> which is done by migration today does not have proper defined semantics
+>> at all.
+>>
+>> Also clock monotonic can be stepped forward under certain circumstances
+>> and the kernel is very well able to handle it within well defined
+>> limits. Think about scheduled out vCPUs. From their perspective clock
+>> monotonic is stepping forwards.
+>>
+>
+> Right. For better or worse, the kernel has been conditioned to
+> tolerate small steps due to scheduling. There is just zero definition
+> around how much slop is allowed.
 
-kvm->mmu_notifier_seq needs to be incremented, otherwise KVM will incorrectly
-install a SPTE if the mapping is zapped between retrieving the pfn in faultin and
-installing it after acquire mmu_lock.
+From the experience with the MONO=BOOT experiment, I'd say anything < 1
+second is unlikely to cause larger trouble, but there might be user
+space applications/configurations which disagree :)
 
+>> The problem starts when the 'force suspended' time becomes excessive, as
+>> that causes the mass expiry of clock monotonic timers with all the nasty
+>> side effects described in a3ed0e4393d6. In the worst case it's going to
+>> exceed the catchup limit of non-suspended timekeeping (~440s for a TSC
+>> @2GHz) which in fact breaks the world and some more.
+>>
+>> So let me go back to the use cases:
+>>
+>>  1) Regular freeze of a VM to disk and resume at some arbitrary point in
+>>     the future.
+>>
+>>  2) Live migration
+>>
+>> In both cases the proper solution is to make the guest go into a well
+>> defined state (suspend) and resume it on restore. Everything just works
+>> because it is well defined.
+>>
+>> Though you say that there is a special case (not that I believe it):
+>
+> I believe the easier special case to articulate is when the hypervisor
+> has already done its due diligence to warn the guest about a
+> migration. Guest doesn't heed the warning and doesn't quiesce. The
+> most predictable state at this point is probably just to kill the VM
+> on the spot, but that is likely to be a _very_ tough sell :)
 
-> +	KVM_MMU_UNLOCK(kvm);
-> +	srcu_read_unlock(&kvm->srcu, idx);
-> +}
-> +
-> +static struct memfile_notifier_ops kvm_memfile_notifier_ops = {
-> +	.invalidate = kvm_memfile_notifier_handler,
-> +	.fallocate = kvm_memfile_notifier_handler,
-> +};
-> +
->  static inline int kvm_memfile_register(struct kvm_memory_slot *slot)
->  {
-> +	slot->notifier.ops = &kvm_memfile_notifier_ops;
->  	return memfile_register_notifier(file_inode(slot->private_file),
->  					 &slot->notifier,
->  					 &slot->pfn_ops);
-> @@ -1963,6 +1998,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
->  	new->private_file = file;
->  	new->private_offset = mem->flags & KVM_MEM_PRIVATE ?
->  			      region_ext->private_offset : 0;
-> +	new->kvm = kvm;
->  
->  	r = kvm_set_memslot(kvm, old, new, change);
->  	if (!r)
-> -- 
-> 2.17.1
-> 
+I'm all for it. It's very well defined.
+
+> So assuming that it's still possible for a non-cooperative suspend
+> (live migration, VM freeze, etc.) there's still a need to stop the
+> bleeding. I think you touch on what that may look like:
+>
+>>   1) Trestart - Tstop < TOLERABLE_THRESHOLD
+>>
+>>      That's the easy case as you just can adjust TSC on restore by that
+>>      amount on all vCPUs and be done with it. Just works like scheduling
+>>      out all vCPUs for some time.
+>>
+>>   2) Trestart - Tstop >= TOLERABLE_THRESHOLD
+>>
+>>      Avoid adjusting TSC for the reasons above.
+>
+> Which naturally will prompt the question: what is the value of
+> TOLERABLE_THRESHOLD? Speaking from experience (Google already does
+> something similar, but without a good fallback for exceeding the
+> threshold), there's ~zero science in deriving that value. But, IMO if
+> it's at least documented we can make the shenanigans at least a bit
+> more predictable. It also makes it very easy to define who
+> (guest/host) is responsible for cleaning up the mess.
+
+See above, but the hyperscalers with experience on heavy host overload
+might have better information when keeping a vCPU scheduled out starts
+to create problems in the guest.
+
+> In absence of documentation there's an unlimited license for VM
+> operators to do as they please and I fear we will forever perpetuate
+> the pain of time in virt.
+
+You can prevent that, by making 'Cooperate within time or die hard' the
+policy. :)
+
+>>              if (seq != get_migration_sequence())
+>>                 do_something_smart();
+>>              else
+>>                 proceed_as_usual();
+>
+> Agreed pretty much the whole way through. There's no point in keeping
+> NTP naive at this point.
+>
+> There's a need to sound the alarm for NTP regardless of whether
+> TOLERABLE_THRESHOLD is exceeded. David pointed out that the host
+> advancing the guest clocks (delta injection or TSC advancement) could
+> inject some error. Also, hardware has likely changed and the new parts
+> will have their own errors as well.
+
+There is no reason why you can't use the #2 scheme for the #1 case
+too:
+
+>>         On destination host:
+>>            Restore memory image
+>>            Expose metadata in PV:
+>>              - migration sequence number + 1
+
+                - Flag whether Tout was compensated already via
+                  TSC or just set Tout = 0
+
+>>              - Tout (dest/source host delta of clock TAI)
+>>            Run guest
+>>
+>>         Guest kernel:
+>>
+>>            - Keep track of the PV migration sequence number.
+>>
+>>              If it changed act accordingly by injecting the TAI delta,
+>>              which updates NTP state, wakes TFD_TIMER_CANCEL_ON_SET,
+>>              etc...
+
+                if it was compensated via TSC already, it might be
+                sufficient to just reset NTP state.
+
+>>         NTP:
+>>            - utilize the sequence counter information
+                ....
+
+OTOH, the question is whether it's worth it.
+
+If we assume that the sane case is a cooperative guest and the forced
+migration is the last resort, then we can just avoid the extra magic and
+the discussion around the correct value for TOLERABLE_THRESHOLD
+alltogether.
+
+I suggest to start from a TOLERABLE_THRESHOLD=0 assumption to keep it
+simple in the first step. Once this has been established, you can still
+experiment with the threshold and figure out whether it matters.
+
+In fact, doing the host side TSC compensation is just an excuse for VM
+operators not to make the guest cooperative, because it might solve
+their main problems for the vast majority of migrations.
+
+Forcing them to doing it right is definitely the better option, which
+means the 'Cooperate or die hard' policy is the best one you can
+chose. :)
+
+>>         That still will leave everything else exposed to
+>>         CLOCK_REALTIME/TAI jumping forward, but there is nothing you can
+>>         do about that and any application which cares about this has to
+>>         be able to deal with it anyway.
+>
+> Right. There's no cure-all between hypervisor/guest kernel that could
+> fix the problem for userspace entirely.
+
+In the same way as there is no cure for time jumps caused by
+settimeofday(), daylight saving changes, leap seconds etc., unless the
+application is carefully designed to deal with that.
+
+> Appreciate you chiming in on this topic yet again.
+
+I still hope that this get's fixed _before_ I retire :)
+
+Thanks,
+
+        tglx
