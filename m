@@ -2,125 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B93794EA5A4
-	for <lists+kvm@lfdr.de>; Tue, 29 Mar 2022 05:01:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A44A4EA5C2
+	for <lists+kvm@lfdr.de>; Tue, 29 Mar 2022 05:10:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231415AbiC2DDB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Mar 2022 23:03:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58756 "EHLO
+        id S231468AbiC2DMg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Mar 2022 23:12:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36774 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231375AbiC2DC6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Mar 2022 23:02:58 -0400
-Received: from out0-129.mail.aliyun.com (out0-129.mail.aliyun.com [140.205.0.129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 110DA24372C;
-        Mon, 28 Mar 2022 20:01:15 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018047199;MF=darcy.sh@antgroup.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---.NF0ngh4_1648522872;
-Received: from localhost(mailfrom:darcy.sh@antgroup.com fp:SMTPD_---.NF0ngh4_1648522872)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Tue, 29 Mar 2022 11:01:13 +0800
-From:   "SU Hang" <darcy.sh@antgroup.com>
-To:     seanjc@google.com, kvm@vger.kernel.org
-Cc:     "Lai Jiangshan" <jiangshan.ljs@antgroup.com>,
-        "SU Hang" <darcy.sh@antgroup.com>,
-        "Thomas Gleixner" <tglx@linutronix.de>,
-        "Ingo Molnar" <mingo@redhat.com>, "Borislav Petkov" <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, <x86@kernel.org>,
-        "Paolo Bonzini" <pbonzini@redhat.com>,
-        "=?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?=" <rkrcmar@redhat.com>,
-        <linux-kernel@vger.kernel.org>
-Subject: [PATCH v2 2/2] KVM: x86/mmu: Derive EPT violation RWX bits from EPTE RWX bits
-Date:   Tue, 29 Mar 2022 11:01:07 +0800
-Message-Id: <20220329030108.97341-3-darcy.sh@antgroup.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
-In-Reply-To: <20220329030108.97341-1-darcy.sh@antgroup.com>
-References: <20220329030108.97341-1-darcy.sh@antgroup.com>
+        with ESMTP id S231124AbiC2DMe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Mar 2022 23:12:34 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D4A823DE92;
+        Mon, 28 Mar 2022 20:10:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1648523452; x=1680059452;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=FMMPTBKB75Ni5yGfK4sTBPJjLiQ1Oz9Onw+uBAgTlqg=;
+  b=S6Mhl8GMXXMNXkCJAy5HDMJZaHvfuiPe9eIItqnsq8qfTcXQK1yI077O
+   lomBg++TPUNVmyCGB4Kbel667X+NvANM8m9CTr6h5rk2MnyKfi0QE6A9q
+   QAr8I9qwHEW8Z9CjOOl2qhdyYIC8yRX9NqjlWt18gOCNYlMhxCsN2jQvv
+   7ljFiNHTSmf9F6UDt3pxdCjf6A1LhOyHMED3SG0nBmosrqf0vWLL5DZDm
+   +MaEma2n5qmgdxRjxAiCNaeUBJQmbIdk0n/+8jnSDtBjJISK3Q24zjeWy
+   qS6fLoYhoUofzJi9YYdrmEZ+fA8JUEDryus+lJpZMVUBBoBUvMJA0sEFV
+   A==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10300"; a="345585914"
+X-IronPort-AV: E=Sophos;i="5.90,219,1643702400"; 
+   d="scan'208";a="345585914"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2022 20:10:52 -0700
+X-IronPort-AV: E=Sophos;i="5.90,219,1643702400"; 
+   d="scan'208";a="719358482"
+Received: from rmsatyan-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.255.94.240])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2022 20:10:48 -0700
+Message-ID: <15c0212fc4ff591a878369ea6ae964e43574a8d9.camel@intel.com>
+Subject: Re: [PATCH v2 04/21] x86/virt/tdx: Add skeleton for detecting and
+ initializing TDX on demand
+From:   Kai Huang <kai.huang@intel.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Gleixner, Thomas" <thomas.gleixner@intel.com>
+Cc:     "Hansen, Dave" <dave.hansen@intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>
+Date:   Tue, 29 Mar 2022 16:10:46 +1300
+In-Reply-To: <BN9PR11MB5276C837FE25BACCD53DB5D58C1E9@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <cover.1647167475.git.kai.huang@intel.com>
+         <279af00f90a93491d5ec86672506146153909e5c.1647167475.git.kai.huang@intel.com>
+         <BL1PR11MB52713CA82D52248B0905C91D8C189@BL1PR11MB5271.namprd11.prod.outlook.com>
+         <a68b378a40310c38f731f4bc7f0a9cc0d89efe92.camel@intel.com>
+         <BN9PR11MB52760B743E208684A098B61C8C1D9@BN9PR11MB5276.namprd11.prod.outlook.com>
+         <b4d97c46c52dbbecc6061f743b172015a73ec189.camel@intel.com>
+         <BN9PR11MB52761E8DE55DC8872EC093758C1D9@BN9PR11MB5276.namprd11.prod.outlook.com>
+         <8f85e6ad76508e0b7ac8667b1c0b7b3b43d67ef8.camel@intel.com>
+         <BN9PR11MB5276C837FE25BACCD53DB5D58C1E9@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Sean Christopherson <seanjc@google.com>
 
-Derive the mask of RWX bits reported on EPT violations from the mask of
-RWX bits that are shoved into EPT entries; the layout is the same, the
-EPT violation bits are simply shifted by three.  Use the new shift and a
-slight copy-paste of the mask derivation instead of completely open
-coding the same to convert between the EPT entry bits and the exit
-qualification when synthesizing a nested EPT Violation.
+> > > 
+> > > *all cpus* is questionable.
+> > > 
+> > > Say BIOS enabled 8 CPUs: [0 - 7]
+> > > 
+> > > cpu_present_map covers [0 - 5], due to nr_cpus=6
+> > > 
+> > > You compared cpus_booted_once_mask to cpu_present_mask so if
+> > maxcpus
+> > > is set to a number < nr_cpus SEAMRR is considered disabled because you
+> > > cannot verify CPUs between [max_cpus, nr_cpus).
 
-No functional change intended.
+Sorry my bad.  We can verify CPUs between [max_cpus, nr_cpus).  When any cpu
+within that range becomes online, the detection code is run.  The paranoid check
+in seamrr_enabled() is used to check whether all cpus within [max_cpus, nr_cpus)
+(if there's any -- cpus within [0, max_cpus) are up during boot) have been
+brought up at least once. 
 
-Cc: SU Hang <darcy.sh@antgroup.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/include/asm/vmx.h     | 7 +------
- arch/x86/kvm/mmu/paging_tmpl.h | 8 +++++++-
- arch/x86/kvm/vmx/vmx.c         | 4 +---
- 3 files changed, 9 insertions(+), 10 deletions(-)
+> > 
+> > SEAMRR is not considered as disabled in this case, at least in my intention.
+> 
+> the function is called seamrr_enabled(), and false is returned if above
+> check is not passed. So it is the intention from the code.
 
-diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
-index 3586d4aeaac7..46bc7072f6a2 100644
---- a/arch/x86/include/asm/vmx.h
-+++ b/arch/x86/include/asm/vmx.h
-@@ -543,17 +543,12 @@ enum vm_entry_failure_code {
- #define EPT_VIOLATION_ACC_READ_BIT	0
- #define EPT_VIOLATION_ACC_WRITE_BIT	1
- #define EPT_VIOLATION_ACC_INSTR_BIT	2
--#define EPT_VIOLATION_READABLE_BIT	3
--#define EPT_VIOLATION_WRITABLE_BIT	4
--#define EPT_VIOLATION_EXECUTABLE_BIT	5
- #define EPT_VIOLATION_GVA_IS_VALID_BIT	7
- #define EPT_VIOLATION_GVA_TRANSLATED_BIT 8
- #define EPT_VIOLATION_ACC_READ		(1 << EPT_VIOLATION_ACC_READ_BIT)
- #define EPT_VIOLATION_ACC_WRITE		(1 << EPT_VIOLATION_ACC_WRITE_BIT)
- #define EPT_VIOLATION_ACC_INSTR		(1 << EPT_VIOLATION_ACC_INSTR_BIT)
--#define EPT_VIOLATION_READABLE		(1 << EPT_VIOLATION_READABLE_BIT)
--#define EPT_VIOLATION_WRITABLE		(1 << EPT_VIOLATION_WRITABLE_BIT)
--#define EPT_VIOLATION_EXECUTABLE	(1 << EPT_VIOLATION_EXECUTABLE_BIT)
-+#define EPT_VIOLATION_RWX_MASK		(VMX_EPT_RWX_MASK << EPT_VIOLATION_RWX_SHIFT)
- #define EPT_VIOLATION_GVA_IS_VALID	(1 << EPT_VIOLATION_GVA_IS_VALID_BIT)
- #define EPT_VIOLATION_GVA_TRANSLATED	(1 << EPT_VIOLATION_GVA_TRANSLATED_BIT)
+The false is returned if something error is discovered among cpus [0 -
+present_cpus].  It returns true even if we cannot verify [present_cpus,
+bios_enabled_cpus).
 
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index db594366f60c..a4a9d7f2d3bd 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -531,7 +531,13 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
- 			vcpu->arch.exit_qualification |= EPT_VIOLATION_ACC_READ;
- 		if (fetch_fault)
- 			vcpu->arch.exit_qualification |= EPT_VIOLATION_ACC_INSTR;
--		vcpu->arch.exit_qualification |= (pte_access & 0x7) << 3;
-+
-+		/*
-+		 * Note, pte_access holds the raw RWX bits from the EPTE, not
-+		 * ACC_*_MASK flags!
-+		 */
-+		vcpu->arch.exit_qualification |= (pte_access & VMX_EPT_RWX_MASK) <<
-+						 EPT_VIOLATION_RWX_SHIFT;
- 	}
- #endif
- 	walker->fault.address = addr;
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 5b629acafa69..9c1f6d3dceef 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -5410,9 +5410,7 @@ static int handle_ept_violation(struct kvm_vcpu *vcpu)
- 	error_code |= (exit_qualification & EPT_VIOLATION_ACC_INSTR)
- 		      ? PFERR_FETCH_MASK : 0;
- 	/* ept page table entry is present? */
--	error_code |= (exit_qualification &
--		       (EPT_VIOLATION_READABLE | EPT_VIOLATION_WRITABLE |
--			EPT_VIOLATION_EXECUTABLE))
-+	error_code |= (exit_qualification & EPT_VIOLATION_RWX_MASK)
- 		      ? PFERR_PRESENT_MASK : 0;
+> 
+> > My
+> > understanding on the spec is if SEAMRR is configured as enabled on one core
+> > (the
+> > SEAMRR MSRs are core-scope), the SEAMCALL instruction can work on that
+> > core.  It
+> > is TDX's requirement that some SEAMCALL needs to be done on all BIOS-
+> > enabled
+> > CPUs to finish TDX initialization, but not SEAM's.
+> > 
+> > From this perspective, if we forget TDX at this moment but talk about SEAM
+> > alone, it might make sense to not just treat SEAMRR as disabled if kernel
+> > usable
+> > cpus are limited by 'nr_cpus'.  The chance that BIOS misconfigured SEAMRR is
+> > really rare.  If kernel can detect potential BIOS misconfiguration, it
+> > should do
+> > it.  Otherwise, perhaps it's more reasonable not to just treat SEAM as
+> > disabled.
+> 
+> My problem is just that you didn't adopt consistency policy for CPUs in
+> [maxcpus, nr_cpus) and CPUs in [nr_cpus, nr_bios_enabled_cpus). This is
+> the only trouble to me no matter what policy you want to pursue...
 
- 	error_code |= (exit_qualification & EPT_VIOLATION_GVA_TRANSLATED) != 0 ?
---
-2.32.0.3.g01195cf9f
+Let's separate SEAMRR detection and TDX initialization.  The paranoid check is
+only for SEAM detection, but not for TDX initialization.  As I said, it is TDX's
+requirement that some SEAMCALL must be run on all bios-enabled cpus, but not
+SEAM's.
+
+
+-- 
+Thanks,
+-Kai
+
 
