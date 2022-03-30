@@ -2,125 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E581D4EC684
-	for <lists+kvm@lfdr.de>; Wed, 30 Mar 2022 16:28:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8AC114EC6EE
+	for <lists+kvm@lfdr.de>; Wed, 30 Mar 2022 16:44:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346834AbiC3OaG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Mar 2022 10:30:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53326 "EHLO
+        id S1347131AbiC3OqK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Mar 2022 10:46:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57098 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343900AbiC3OaD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Mar 2022 10:30:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3D8B0205BD0
-        for <kvm@vger.kernel.org>; Wed, 30 Mar 2022 07:28:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1648650497;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=0MdzdhvbcfTH7B0x9nhddVD3XG1EagzEGRM2HvvMoaM=;
-        b=URkSKNdrjdGvwpy+7NhX/C2hgs298shyXZ1qiTMwEoKzUTpc5vFGUSmW6+Pl5Bx+QTGSwc
-        C0MCHhfzu79GFwJLKwsx2beB7hsnmLnnXn2q60CokUrXTKgkbQiLqP+2w2/LSTH75JuGEd
-        tAJmfghaPXFaR+L8dSjVo4q/NIcxhm8=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-210-EsA0cQqVPUyta1QYRAgifQ-1; Wed, 30 Mar 2022 10:28:13 -0400
-X-MC-Unique: EsA0cQqVPUyta1QYRAgifQ-1
-Received: by mail-qk1-f197.google.com with SMTP id c19-20020a05620a0cf300b005f17891c015so12622400qkj.18
-        for <kvm@vger.kernel.org>; Wed, 30 Mar 2022 07:28:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=0MdzdhvbcfTH7B0x9nhddVD3XG1EagzEGRM2HvvMoaM=;
-        b=YIuBtmyY/jpwy3RJs8fQPBjP+fw2kN2cQ8vDvkXffvI9f9Q+ZPquJiuWJ5wawFdT4a
-         AYObGWvgGuQoA0XPTvZ9bRn+NN15Tz/d+RFFQRguyLcVqz3K52Mpb+QHSBopiO4JjaSI
-         62tjFFgXjc4/kpskcdg7tYJdyLrmBOmbRTxcBu7WVTh2Hu8V7JWXUcd0pRsBip21PVp/
-         cSIW31EczpRG0q51OeHsveDB6NwH1PjWLJyL+Uba64CmKE7I2NUm/ot08BMrA07WE/zZ
-         FquFlA/XD4+75z2RrA3OHbhrF8w7e95aO1Qkn5IofT4EvdYs8SMIssx88PPl6vve4Q5+
-         u1JA==
-X-Gm-Message-State: AOAM5304xqn4/+ud4UUaYvV/LdAjUav3JdZNVCbQr/d3jEWO63z0WTf2
-        /lx28AyMRgr97Y20Tpc6Enyux9H3ppVJnO+7CmQ40BjQ7sh6+HHuEB6IXCn2T2+t4NOVe8aE05d
-        fBsxxupm4nSqT
-X-Received: by 2002:ac8:580d:0:b0:2e1:c641:8c21 with SMTP id g13-20020ac8580d000000b002e1c6418c21mr32693445qtg.677.1648650492836;
-        Wed, 30 Mar 2022 07:28:12 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxj9mfWzYsrvAU4I7K8iuYgWUFquDhfKr86ywKhvihB398kljxjsCy0kviStlHnrVX/SZQbLA==
-X-Received: by 2002:ac8:580d:0:b0:2e1:c641:8c21 with SMTP id g13-20020ac8580d000000b002e1c6418c21mr32693412qtg.677.1648650492602;
-        Wed, 30 Mar 2022 07:28:12 -0700 (PDT)
-Received: from xz-m1.local (cpec09435e3e0ee-cmc09435e3e0ec.cpe.net.cable.rogers.com. [99.241.198.116])
-        by smtp.gmail.com with ESMTPSA id d12-20020a05620a158c00b00648ec3fcbdfsm10572195qkk.72.2022.03.30.07.28.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Mar 2022 07:28:12 -0700 (PDT)
-Date:   Wed, 30 Mar 2022 10:28:10 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Sean Christopherson <seanjc@google.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Ben Gardon <bgardon@google.com>,
-        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
-        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
-        <kvmarm@lists.cs.columbia.edu>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <linux-mips@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
-        <kvm@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>
-Subject: Re: [PATCH v2 05/26] KVM: x86/mmu: Rename shadow MMU functions that
- deal with shadow pages
-Message-ID: <YkRo+rJwYJoOmXmW@xz-m1.local>
-References: <20220311002528.2230172-1-dmatlack@google.com>
- <20220311002528.2230172-6-dmatlack@google.com>
- <YjBTtz6wo/zQEHCv@xz-m1.local>
- <CALzav=c0ccztDULiVMwR4K20iYc0WH53ApeOCorhjKwaMNL5Sg@mail.gmail.com>
+        with ESMTP id S1347173AbiC3Opv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Mar 2022 10:45:51 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D97B48908D;
+        Wed, 30 Mar 2022 07:43:58 -0700 (PDT)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22UDfBuF011029;
+        Wed, 30 Mar 2022 14:43:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=LTMljJOOPp378oux6hBciPV/9YXm+DR31cW8efnxgyc=;
+ b=bVvo72jle6jUqwYhHzKbCmNZJFtqaoXbaezrMqq6EudvH1+BwSVUOcXPnMQIfFE+hcse
+ iDxA74yDm7BgrW+ujy4Tnhe8kALJhGERKZz9oe2RN3J7FOIQ8JyhGbUOyfzSX4Ekha4C
+ t+q4myfESsgFrOujiLdTRXgmucEi56Xhl6nX9ODjBB1kO1Br9nAZ259xra5l49u8ET1S
+ eFwfWCezADLO2Uhvzl00LMkdLMm3MdNBYXYCEjxSVoH4d6/KFB5xy06gddxHefgqFlvH
+ oYNUJglSTH8TGopf8/MXLXliUSkBDf8Tu0kJDeJ4lrRvdcFV7sEACOYNlQtOoF0rVsW8 Vg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3f3ydcsmxb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 30 Mar 2022 14:43:57 +0000
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22UEDn7R027794;
+        Wed, 30 Mar 2022 14:43:57 GMT
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3f3ydcsmvj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 30 Mar 2022 14:43:57 +0000
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22UEcmbD015456;
+        Wed, 30 Mar 2022 14:43:51 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma01fra.de.ibm.com with ESMTP id 3f1tf8qgc3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 30 Mar 2022 14:43:51 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22UEhmE143385316
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 30 Mar 2022 14:43:48 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 131F94C044;
+        Wed, 30 Mar 2022 14:43:48 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8962B4C040;
+        Wed, 30 Mar 2022 14:43:47 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.13.95])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 30 Mar 2022 14:43:47 +0000 (GMT)
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
+        scgl@linux.ibm.com, borntraeger@de.ibm.com, pmorel@linux.ibm.com,
+        pasic@linux.ibm.com, nrb@linux.ibm.com, thuth@redhat.com,
+        david@redhat.com
+Subject: [kvm-unit-tests PATCH v1 0/4] lib: s390x: Refactor and rename vm.[ch]
+Date:   Wed, 30 Mar 2022 16:43:35 +0200
+Message-Id: <20220330144339.261419-1-imbrenda@linux.ibm.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CALzav=c0ccztDULiVMwR4K20iYc0WH53ApeOCorhjKwaMNL5Sg@mail.gmail.com>
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: ZAfxmmFdDQnVLexoG3uXbFEhelTubXbb
+X-Proofpoint-GUID: xC2soxHcQh25nhUhly4Rwq_akm_GZ2Os
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-03-30_04,2022-03-30_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
+ clxscore=1015 malwarescore=0 mlxscore=0 mlxlogscore=641 suspectscore=0
+ spamscore=0 lowpriorityscore=0 phishscore=0 impostorscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2203300071
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 22, 2022 at 02:35:25PM -0700, David Matlack wrote:
-> On Tue, Mar 15, 2022 at 1:52 AM Peter Xu <peterx@redhat.com> wrote:
-> >
-> > On Fri, Mar 11, 2022 at 12:25:07AM +0000, David Matlack wrote:
-> > > Rename 3 functions:
-> > >
-> > >   kvm_mmu_get_page()   -> kvm_mmu_get_shadow_page()
-> > >   kvm_mmu_alloc_page() -> kvm_mmu_alloc_shadow_page()
-> > >   kvm_mmu_free_page()  -> kvm_mmu_free_shadow_page()
-> > >
-> > > This change makes it clear that these functions deal with shadow pages
-> > > rather than struct pages. Prefer "shadow_page" over the shorter "sp"
-> > > since these are core routines.
-> > >
-> > > Signed-off-by: David Matlack <dmatlack@google.com>
-> >
-> > Acked-by: Peter Xu <peterx@redhat.com>
-> 
-> What's the reason to use Acked-by for this patch but Reviewed-by for others?
+Refactor and rename vm.[ch] to hardware.[ch]
 
-A weak version of r-b?  I normally don't do the rename when necessary (and
-I'm pretty poor at naming..), in this case I don't have a strong opinion.
-I should have left nothing then it's less confusing. :)
+* Remove some uneeded #includes for vm.h
+* Rename vm.[ch] to hardware.[ch]
+* Move host_is_zvm6 to the library (was in a testcase)
+* Consolidate all detection functions into detect_host, which returns
+  what host system the test is running on
+* Rename vm_is_* functions to host_is_*, which are then just wrappers
+  around detect_host
+* Move machine type macros from arch_def.h to hardware.h, add machine
+  types for all known machines
+* Add machine_is_* functions
+* Refactor and rename get_machine_id to be a simple wrapper for stidp
+* Add back get_machine_id using the stidp wrapper
+
+Claudio Imbrenda (4):
+  s390x: remove spurious includes
+  lib: s390: rename and refactor vm.[ch]
+  lib: s390x: functions for machine models
+  lib: s390x: stidp wrapper and move get_machine_id
+
+ s390x/Makefile           |   2 +-
+ lib/s390x/asm/arch_def.h |   7 +-
+ lib/s390x/hardware.h     | 134 +++++++++++++++++++++++++++++++++++++++
+ lib/s390x/vm.h           |  15 -----
+ lib/s390x/hardware.c     |  86 +++++++++++++++++++++++++
+ lib/s390x/vm.c           |  92 ---------------------------
+ s390x/cpumodel.c         |   4 +-
+ s390x/mvpg-sie.c         |   1 -
+ s390x/mvpg.c             |   4 +-
+ s390x/pv-diags.c         |   1 -
+ s390x/skey.c             |  28 +-------
+ s390x/spec_ex-sie.c      |   1 -
+ s390x/uv-host.c          |   4 +-
+ 13 files changed, 230 insertions(+), 149 deletions(-)
+ create mode 100644 lib/s390x/hardware.h
+ delete mode 100644 lib/s390x/vm.h
+ create mode 100644 lib/s390x/hardware.c
+ delete mode 100644 lib/s390x/vm.c
 
 -- 
-Peter Xu
+2.34.1
 
