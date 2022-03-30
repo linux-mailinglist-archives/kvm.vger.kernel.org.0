@@ -2,110 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BEC9C4EB7BA
-	for <lists+kvm@lfdr.de>; Wed, 30 Mar 2022 03:18:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 290B64EB88C
+	for <lists+kvm@lfdr.de>; Wed, 30 Mar 2022 04:56:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241591AbiC3BUf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Mar 2022 21:20:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55836 "EHLO
+        id S242156AbiC3C5w (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Mar 2022 22:57:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55892 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234408AbiC3BUe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 29 Mar 2022 21:20:34 -0400
-Received: from mail-yw1-x112c.google.com (mail-yw1-x112c.google.com [IPv6:2607:f8b0:4864:20::112c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C18847384;
-        Tue, 29 Mar 2022 18:18:50 -0700 (PDT)
-Received: by mail-yw1-x112c.google.com with SMTP id 00721157ae682-2e5e176e1b6so202247447b3.13;
-        Tue, 29 Mar 2022 18:18:50 -0700 (PDT)
+        with ESMTP id S242148AbiC3C5u (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Mar 2022 22:57:50 -0400
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDAA9B6C;
+        Tue, 29 Mar 2022 19:56:06 -0700 (PDT)
+Received: by mail-pf1-x430.google.com with SMTP id h19so16584587pfv.1;
+        Tue, 29 Mar 2022 19:56:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=SnZBSyZar3/cpU2H1RzHZf2a0uvetUDmC7HqxBo+h7A=;
-        b=dfr0ZWv4GAasLPKufTMYblXVd1edCvaJVrOyVpf1oXqqJ7o1OgHvvSnaz3BYt4Q429
-         iddtQlNar88/RztYNbULqaXccn7FvhGCSo1Zick3THkFdquBL2zCmLy864qplc4wtOka
-         4CXqvaXr5tilv9RWkpb6pyviGYxMBXijxdWPyrZ0+7fHn2dEwBjgf3lWPWQIOfUYpvCu
-         niRX668YjBFEonkVt6Ws4Exd6kH41c5qN6v4tDna/ysf6kELSBg3zLfuLeEA1TM5aCEz
-         vRDbSIU2Uh/i/F3I8OhimUhM0B7FJiICBWfS8aUHgEUc2nO36kNVwOVSfDXiszgY4Ync
-         ChBA==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=yDTHn/+rErQ1GIm4EG6ELcr2d0dp2bkrDwck7VKtVYk=;
+        b=IxdQ60tMukoYLEsgDLz2wic8YwgwGpuXy9Q2s10HuFOTOk9U3D9pSOZLfOHhTcncQb
+         dvKTC2qgTS8nIb/S/Jm6sILAg//GYq8CpBLk+kXIbcQMSC38YGPPE1SpbY0SH2eRteXl
+         Zh7t6TMOMXhkgYM8n/Gwyad0HNuYdYYDw+860ca6+Tu+tGYJeG7BwI0JDzlt88+aIClI
+         mICMtPURvF0TqjSY2QSA8MqVEuQ7m1abAN5O2xuJnp45B0T/+jXmycblG17Iym/KgyBb
+         CxXZuw5lje+jmcbkMbaswZVA/WrIfWhuzCTOZLm3pBGBljLs2AKfOJaJLa3/JYZ5VL24
+         PZIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=SnZBSyZar3/cpU2H1RzHZf2a0uvetUDmC7HqxBo+h7A=;
-        b=l9Q5/egDumr1MovoPq3SLrKyVABX9cEznbgJxxZflib/Tn4oaweuJpZYZk2Hor7OXi
-         ZiaeV4CI8ayG4Y34yq8NsDCAmmF1G+IHmAgk1Tbbh9G7fxNH9XTOZvcdlE1ZHR2RrD2s
-         i2a46b4N0uQJoUPSq1KdwCBzizhRrWWVLAXTCf7MOImbpa1wSIfcfuV24SuwqfFoj3+u
-         UDrwO0dWPgkyEgWuL6KDbOeRmGGGEDJbvWHF0pleRwpuN3AZsqsphUEMhDjl5eITmZYm
-         1FG3BRl+GCD5Z8b0deHkY86Pu1Aw2uPlLuVZ3qIbT8tJjjf/4JF7Exg8EA1l46MXeka8
-         ujGQ==
-X-Gm-Message-State: AOAM5314aRIs5H7QqxP/DoI33eWG6+JnOq7oI3qwyBS5CK2Q4nfQvUBE
-        PrG+91cddeLIkQyk+s9ncWae44+y8Yi1nQ/h5yepbw8a
-X-Google-Smtp-Source: ABdhPJyqmuGbxulZVwamMCOfGf1zB8iFlPgQdWct/ZOfcEeEfhURZrR42hOqo7G4JAKbNvQn/Yj4I5Rh6VkVrMOu9sc=
-X-Received: by 2002:a81:1704:0:b0:2e5:d98b:e185 with SMTP id
- 4-20020a811704000000b002e5d98be185mr34019442ywx.354.1648603129650; Tue, 29
- Mar 2022 18:18:49 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=yDTHn/+rErQ1GIm4EG6ELcr2d0dp2bkrDwck7VKtVYk=;
+        b=ZW85sbraY78CMCiXEUyttqSlfT9W46+AmeUPvBNi+ov7LHdqSRoG9I/D4QSxS+Dv7T
+         k3EYuhg/buj26ez3lNccW+hWIe0leykaROB981++tmzQpyn7jv15HAaObYV2qs36T6D8
+         ykYlBKE2GASifrU0iEiM9zz8ikKLqgnZjqb5YDGULQacjFygkXYG08svPNgwBeHQbPbQ
+         uKvJPMGUgZX7vI2rBM3YyD54TvU5n1K+0Lg4DTyKZlt+PLi7r0rKz7EedEyZ2Djp5A74
+         XAF1RZZuTU1eSQcn0NL8J6ynF81akXnkawBUGiVb7NXaKitF+UAXeKJvTzY9FvQFdaTX
+         SS9g==
+X-Gm-Message-State: AOAM532BrvWoLS+7gIV8dMQbdnl87uynA3a+ZVeHsyJKTOLbTeuYeMUl
+        WSjmLIJkUdI+ueF49UHifh4BvqLYToxiPGdQ97I=
+X-Google-Smtp-Source: ABdhPJzFM+ydPvI4a+aXkKUnZfkjG9Br6nO3e7OLKGHaehw55ov1PBH6VyYrljXzDZERQTamrcTIJw==
+X-Received: by 2002:a65:6909:0:b0:382:53c4:43c5 with SMTP id s9-20020a656909000000b0038253c443c5mr4263204pgq.502.1648608966358;
+        Tue, 29 Mar 2022 19:56:06 -0700 (PDT)
+Received: from localhost.localdomain (118-166-41-36.dynamic-ip.hinet.net. [118.166.41.36])
+        by smtp.gmail.com with ESMTPSA id me5-20020a17090b17c500b001c63699ff60sm4532951pjb.57.2022.03.29.19.55.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Mar 2022 19:56:05 -0700 (PDT)
+From:   Zhiguang Ni <zhiguangni01@gmail.com>
+To:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, hpa@zytor.com
+Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Zhiguang Ni <zhiguangni01@gmail.com>
+Subject: [PATCH] KVM: use kvcalloc for array allocations
+Date:   Wed, 30 Mar 2022 10:55:47 +0800
+Message-Id: <20220330025547.246126-1-zhiguangni01@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <1648216709-44755-1-git-send-email-wanpengli@tencent.com>
- <1648216709-44755-4-git-send-email-wanpengli@tencent.com> <YkOfJeXm8MiMOEyh@google.com>
-In-Reply-To: <YkOfJeXm8MiMOEyh@google.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Wed, 30 Mar 2022 09:18:38 +0800
-Message-ID: <CANRm+CxtyyGvBKMt2XpqvWwukAmZHvE7-SBKc7wLcYLR5D7v9g@mail.gmail.com>
-Subject: Re: [PATCH RESEND 3/5] KVM: X86: Boost vCPU which is in critical section
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+        FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 30 Mar 2022 at 08:07, Sean Christopherson <seanjc@google.com> wrote:
->
-> On Fri, Mar 25, 2022, Wanpeng Li wrote:
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 425fd7f38fa9..6b300496bbd0 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -10375,6 +10375,28 @@ static int vcpu_run(struct kvm_vcpu *vcpu)
-> >       return r;
-> >  }
-> >
-> > +static int kvm_vcpu_non_preemptable(struct kvm_vcpu *vcpu)
->
-> s/preemtable/preemptible
->
-> And I'd recommend inverting the return, and also return a bool, i.e.
->
-> static bool kvm_vcpu_is_preemptible(struct kvm_vcpu *vcpu)
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-Good suggestion.
+Instead of using array_size, use a function that takes care of the
+multiplication.  While at it, switch to kvcalloc since this allocation
+should not be very large.
 
->
-> > +{
-> > +     int count;
-> > +
-> > +     if (!vcpu->arch.pv_pc.preempt_count_enabled)
-> > +             return 0;
-> > +
-> > +     if (!kvm_read_guest_cached(vcpu->kvm, &vcpu->arch.pv_pc.preempt_count_cache,
-> > +         &count, sizeof(int)))
-> > +             return (count & ~PREEMPT_NEED_RESCHED);
->
-> This cements PREEMPT_NEED_RESCHED into KVM's guest/host ABI.  I doubt the sched
-> folks will be happy with that.
->
-> > +
-> > +     return 0;
-> > +}
-> > +
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Zhiguang Ni <zhiguangni01@gmail.com>
+---
+ arch/x86/kvm/cpuid.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 32007f902bba..58b0b4e0263c 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -1290,8 +1290,7 @@ int kvm_dev_ioctl_get_cpuid(struct kvm_cpuid2 *cpuid,
+ 	if (sanity_check_entries(entries, cpuid->nent, type))
+ 		return -EINVAL;
+ 
+-	array.entries = vzalloc(array_size(sizeof(struct kvm_cpuid_entry2),
+-					   cpuid->nent));
++	array.entries = kvcalloc(sizeof(struct kvm_cpuid_entry2), cpuid->nent, GFP_KERNEL);
+ 	if (!array.entries)
+ 		return -ENOMEM;
+ 
+@@ -1309,7 +1308,7 @@ int kvm_dev_ioctl_get_cpuid(struct kvm_cpuid2 *cpuid,
+ 		r = -EFAULT;
+ 
+ out_free:
+-	vfree(array.entries);
++	kvfree(array.entries);
+ 	return r;
+ }
+ 
+-- 
+2.25.1
+
