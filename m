@@ -2,76 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 701D14ECFF8
-	for <lists+kvm@lfdr.de>; Thu, 31 Mar 2022 01:21:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 91F5C4ED048
+	for <lists+kvm@lfdr.de>; Thu, 31 Mar 2022 01:42:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351806AbiC3XW1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Mar 2022 19:22:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43602 "EHLO
+        id S1351828AbiC3XoR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Mar 2022 19:44:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45774 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343757AbiC3XW0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Mar 2022 19:22:26 -0400
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F7822A27F
-        for <kvm@vger.kernel.org>; Wed, 30 Mar 2022 16:20:41 -0700 (PDT)
-Received: by mail-pg1-x533.google.com with SMTP id w21so18630980pgm.7
-        for <kvm@vger.kernel.org>; Wed, 30 Mar 2022 16:20:41 -0700 (PDT)
+        with ESMTP id S1343740AbiC3XoP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Mar 2022 19:44:15 -0400
+Received: from mail-yb1-xb2d.google.com (mail-yb1-xb2d.google.com [IPv6:2607:f8b0:4864:20::b2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 637C65A097
+        for <kvm@vger.kernel.org>; Wed, 30 Mar 2022 16:42:28 -0700 (PDT)
+Received: by mail-yb1-xb2d.google.com with SMTP id t11so39498259ybi.6
+        for <kvm@vger.kernel.org>; Wed, 30 Mar 2022 16:42:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=nrxYfNyK7S9x3Z4TVz6BHoXQgDDsXzELpg8P7G1ivg8=;
-        b=kRrEQEOfK4vi4t86gOlwSDhe0QxixvlP3Y+iGpGQ+YI02dzbgJjUnSBPKJmZoJKUit
-         0pvaqdznhG3rOnDKxa4dCb9nvBeym00O+b6Bf9gGvITnHIPrGDtsyydg+2/ouQtfLPFY
-         KF/Qvp5wr0kSin82mbEatQ5upUewJoA1VSEsPJClJBZ1u8HU0HtS8QYx5iWtjnjegPRb
-         GRLDPQw1jw8cy+4/24EodHLv4lU0iayGdt94948UMQeHb9de2W+p4AGYkXFqkvCfRJOY
-         KEsphq+fuLy/sBb6HCM4uQg6tO4z/E0oUSZvvGbcrPBdrdqkGfhYFu6+sjmgCSwY8UXJ
-         KKxw==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=sFzKhHOoRyTVpr52xMm1knuU49YxhisG7vddivzWO2M=;
+        b=g6zqsF0+yuqQFC0iPHTGP+5yBxPoTF7UoQ9EK6cFdFBv4rAy8KJEOTAevZQBsu129C
+         jWx247NofR5yMjC6vWJCtiRroZrIKP7ZD+8nsP+EAoRzB1wHjyHZwiAAq+lnAp3oOLSY
+         GEB8C+1vWGfzA7Vz58OCzJ4pFyNYGILTZ4eSbLX/SGfE1E62mrrY5OAlKqSFwJtPSQoR
+         CYMp+BTQ1x2BjvK3LoxwT0sXp4X9vak8jH5fABFUHEbFivcJ6KtqJQZdYxFYs9eGfhyj
+         OQpCoJjH70Tn0Lq9dRPmnlC20VntvYK3XZaGTcTQaLk+irN2W4z5yeBoKFjlnHqyLrsa
+         gTvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=nrxYfNyK7S9x3Z4TVz6BHoXQgDDsXzELpg8P7G1ivg8=;
-        b=MMiLFNOg0u8yAI9UvjMrgqyVVdH4OyTiNq3h8K9FsubGWJDE/9kElHRY44lVUB7W6l
-         sadp4J2ZdrGTGFaC7+Br4IGFF9it56/muls7wsrA7/zf2st8W70vzLRpJWmCVyVJRBWq
-         N5QcuxJd58qZnI4e1LcgUcmu8V3BlAG9gIis7m75di/R5sGhuF0SbepCWKIZzbBV8438
-         Pq8xbTWc8EYwC34KbQdLH4SQRt7/CrxDB4gFQYJqdfD7ufERVfxQyVKlmqhRUe8AQPrv
-         yz/wO1SD+0hyLA5uSEZkQUkxovpGUh/ce8okY/pMddNhHMVuTvXJbe+HyihWt5uvu91C
-         5Lnw==
-X-Gm-Message-State: AOAM533md48jKZ58Q2cTv1HRaJtg5nVfOW+N6Ygr7guqyHtnuPTVCuk8
-        02w5Z1ezJFIQ1lD84gNKFHSNQg==
-X-Google-Smtp-Source: ABdhPJwAfwTqt60SdaK0tl9eBDOrfHucuy+UPjttuNW2XE/EijzVSSD3+SeaKx1tonZQV1WGxMEshA==
-X-Received: by 2002:a05:6a00:194c:b0:4fb:32b9:dfb6 with SMTP id s12-20020a056a00194c00b004fb32b9dfb6mr1983349pfk.17.1648682440631;
-        Wed, 30 Mar 2022 16:20:40 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id u10-20020a17090a2b8a00b001c6594e5ddcsm7584150pjd.15.2022.03.30.16.20.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Mar 2022 16:20:39 -0700 (PDT)
-Date:   Wed, 30 Mar 2022 23:20:36 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Jon Grimm <Jon.Grimm@amd.com>,
-        David Kaplan <David.Kaplan@amd.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Liam Merwick <liam.merwick@oracle.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/5] KVM: nSVM: Don't forget about L1-injected events
-Message-ID: <YkTlxCV9wmA3fTlN@google.com>
-References: <cover.1646944472.git.maciej.szmigiero@oracle.com>
- <a28577564a7583c32f0029f2307f63ca8869cf22.1646944472.git.maciej.szmigiero@oracle.com>
- <YkTSul0CbYi/ae0t@google.com>
- <8f9ae64a-dc64-6f46-8cd4-ffd2648a9372@maciej.szmigiero.name>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=sFzKhHOoRyTVpr52xMm1knuU49YxhisG7vddivzWO2M=;
+        b=swFRPivYZKPIXniqUCrhDi8AcBHOF+2vARb/tEkAboPU2NFDufRnCiqUxeevCc1BzK
+         gLCaSeDwhSKvFcqlDjMAOoFQO88CgnFKj2c0YJymkJ6n7bGbr+nUGHqro24VdurebREv
+         AetuSG8rgYDD8d//+Dsifcs2PV6v0V9A5olc8BxVPh4KugHvFu8tQBawxBj5ftRIwE3t
+         zR27NQdXgCJn0lB2jwOc3AXSiRLx1sb9DUeSu6bLq8bwI8u3kxGn0g2rUKSMRXxrn48H
+         n2qRjzoTcU4lrpI+YfdAxJfRGjph930tbKCn5+10ZOKAJdXAhArgUrZ+XETFxMUhHc6O
+         2SQQ==
+X-Gm-Message-State: AOAM531exYPG+djnQlW+R3oFaayTgYdASUZAUuIIujHIUFNdJh44/lDU
+        JKIx84YtZSH/1A3NfB19FyhGqGmKQ52hJrPeoVdWVg==
+X-Google-Smtp-Source: ABdhPJzMv6rOEFkM+lPxchcVQP3SxrX21qtRVYYB0rFUxyUvPuH3hfL8GwkekKn7qcutgUfxOtjtmIa6jmJTbsQVlR0=
+X-Received: by 2002:a25:780a:0:b0:633:ccea:3430 with SMTP id
+ t10-20020a25780a000000b00633ccea3430mr2125795ybc.26.1648683747537; Wed, 30
+ Mar 2022 16:42:27 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8f9ae64a-dc64-6f46-8cd4-ffd2648a9372@maciej.szmigiero.name>
+References: <20220330174621.1567317-1-bgardon@google.com> <20220330174621.1567317-11-bgardon@google.com>
+ <YkSbH3XR0YFzrZik@google.com>
+In-Reply-To: <YkSbH3XR0YFzrZik@google.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Wed, 30 Mar 2022 16:42:16 -0700
+Message-ID: <CANgfPd9V8+WfhvQO1TdOFnd4H=ux1Qrn6CB8OWrxQrErRekVCw@mail.gmail.com>
+Subject: Re: [PATCH v3 10/11] KVM: x86/MMU: Require reboot permission to
+ disable NX hugepages
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Dunn <daviddunn@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Junaid Shahid <junaids@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -83,54 +74,18 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 31, 2022, Maciej S. Szmigiero wrote:
-> On 30.03.2022 23:59, Sean Christopherson wrote:
-> > On Thu, Mar 10, 2022, Maciej S. Szmigiero wrote:
-> > > @@ -3627,6 +3632,14 @@ static void svm_complete_interrupts(struct kvm_vcpu *vcpu)
-> > >   	if (!(exitintinfo & SVM_EXITINTINFO_VALID))
-> > >   		return;
-> > > +	/* L1 -> L2 event re-injection needs a different handling */
-> > > +	if (is_guest_mode(vcpu) &&
-> > > +	    exit_during_event_injection(svm, svm->nested.ctl.event_inj,
-> > > +					svm->nested.ctl.event_inj_err)) {
-> > > +		nested_svm_maybe_reinject(vcpu);
-> > 
-> > Why is this manually re-injecting?  More specifically, why does the below (out of
-> > sight in the diff) code that re-queues the exception/interrupt not work?  The
-> > re-queued event should be picked up by nested_save_pending_event_to_vmcb12() and
-> > propagatred to vmcb12.
-> 
-> A L1 -> L2 injected event should either be re-injected until successfully
-> injected into L2 or propagated to VMCB12 if there is a nested VMEXIT
-> during its delivery.
-> 
-> svm_complete_interrupts() does not do such re-injection in some cases
-> (soft interrupts, soft exceptions, #VC) - it is trying to resort to
-> emulation instead, which is incorrect in this case.
-> 
-> I think it's better to split out this L1 -> L2 nested case to a
-> separate function in nested.c rather than to fill
-> svm_complete_interrupts() in already very large svm.c with "if" blocks
-> here and there.
+On Wed, Mar 30, 2022 at 11:02 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Wed, Mar 30, 2022, Ben Gardon wrote:
+> > Ensure that the userspace actor attempting to disable NX hugepages has
+> > permission to reboot the system. Since disabling NX hugepages would
+> > allow a guest to crash the system, it is similar to reboot permissions.
+>
+> This patch needs to be squashed with the patch that introduces the capability,
+> otherwise you're introdcuing a bug and then fixing it in the same series.
 
-Ah, I see it now.  WTF.
-
-Ugh, commit 66fd3f7f901f ("KVM: Do not re-execute INTn instruction.") fixed VMX,
-but left SVM broken.
-
-Re-executing the INTn is wrong, the instruction has already completed decode and
-execution.  E.g. if there's there's a code breakpoint on the INTn, rewinding will
-cause a spurious #DB.
-
-KVM's INT3 shenanigans are bonkers, but I guess there's no better option given
-that the APM says "Software interrupts cannot be properly injected if the processor
-does not support the NextRIP field.".  What a mess.
-
-Anyways, for the common nrips=true case, I strongly prefer that we properly fix
-the non-nested case and re-inject software interrupts, which should in turn
-naturally fix this nested case.  And for nrips=false, my vote is to either punt
-and document it as a "KVM erratum", or straight up make nested require nrips.
-
-Note, that also requires updating svm_queue_exception(), which assumes it will
-only be handed hardware exceptions, i.e. hardcodes type EXEPT.  That's blatantly
-wrong, e.g. if userspace injects a software exception via KVM_SET_VCPU_EVENTS.
+I'm happy to do that. I figured that leaving it as a separate patch
+would provide an easy way to separate the discussion on how to
+implement the new cap versus how to restrict it.
+I don't know if I'd consider not having this patch a bug, especially
+since it can make testing kind of a pain, but I see your point.
