@@ -2,75 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A8DB4EC583
-	for <lists+kvm@lfdr.de>; Wed, 30 Mar 2022 15:21:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9DFF64EC5BB
+	for <lists+kvm@lfdr.de>; Wed, 30 Mar 2022 15:36:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345939AbiC3NX0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Mar 2022 09:23:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38988 "EHLO
+        id S1345630AbiC3NiP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Mar 2022 09:38:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35724 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345945AbiC3NXX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Mar 2022 09:23:23 -0400
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6033849258;
-        Wed, 30 Mar 2022 06:21:32 -0700 (PDT)
-Received: by mail-pf1-x42a.google.com with SMTP id t2so18666674pfj.10;
-        Wed, 30 Mar 2022 06:21:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=8nw22u+xHMe9fEPa90YlblMBN0qhe5TLiCzKqkUTaPk=;
-        b=DGTDb2piuMNSX1ocTvi3AgZ/zh/nZgXbI1NmaBMNFkyNFHFe87oL8m3+25F8Ikpox+
-         rSuMgxRb1BqcIavmW45SICWb0Y1by0mxVPKMi0VAvI6KSc6ta3UNl0GnDHICTMVrYKTv
-         OREwfevpS0zD9+v3JFN9mmRRldzMXToModiCtR7/W7/Uq4ykBL5dPwFecdRbjMnhl07T
-         BTH1qqJvc/E9ZJ2RA3i/ewSADD+hTaSccvnVAJTQZtzaLx5sAodP2YNMWbwYm8iIY0IH
-         AXolyffPAd4jxSFZKP5ph9350Z6akdlSZ/JmdVaCrlekOQkffAfeomkCg3zz9/FfSfrf
-         sryw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=8nw22u+xHMe9fEPa90YlblMBN0qhe5TLiCzKqkUTaPk=;
-        b=WUjXAMcJydBgBd5fmVMVBUovw+cc3IC4tkmjs/mPZxsQA5J9DJGjnUFlUX/fyNjxDt
-         adIEM6byGi3TGY38eZFe1aPS5C6BI4K73uFC1+JyPFwCWDAwWvQATvrAcfvstPC1WUOx
-         OVktmaF7Q2VT4nZKuOzI6U1iG79twJaUVQvTnrcU8We8ej2OJP2JiTNwC/9jthtxL3mF
-         seYdi7FU1A96Vj5SZstT45AestRg8AryorSAvxIPtJNXhzUHH8zZhzidGyCGGbEvkqs9
-         mR7dwjDS4NtokAi/z3K+x7STi9oMwSj3fOQ4IAzXuDKSRGCuotMZg4F5TM0l2X22l7hE
-         gjOg==
-X-Gm-Message-State: AOAM533GfB/eI0TvWRJcJQqA7lRTzDza6PQHwD6yCHRjNavL1tcES7hW
-        NrbeWI1D+KHB/e7mFbzLCNoe6IV7UUo=
-X-Google-Smtp-Source: ABdhPJz7oQNtfn+VtdgpdE1iMMIo/rzxa/gB6z+S92MZdUmP63OJ/qYU2hRbag2b+u4RaQm68ZOUgg==
-X-Received: by 2002:a05:6a00:2887:b0:4fa:e10c:7ca with SMTP id ch7-20020a056a00288700b004fae10c07camr32963153pfb.9.1648646491590;
-        Wed, 30 Mar 2022 06:21:31 -0700 (PDT)
-Received: from localhost ([198.11.178.15])
-        by smtp.gmail.com with ESMTPSA id h6-20020a056a00218600b004f65315bb37sm25254776pfi.13.2022.03.30.06.21.30
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 30 Mar 2022 06:21:31 -0700 (PDT)
-From:   Lai Jiangshan <jiangshanlai@gmail.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Lai Jiangshan <jiangshan.ljs@antgroup.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>
-Subject: [RFC PATCH V3 4/4] KVM: X86: Use passthrough and pae_root shadow page for 32bit guests
-Date:   Wed, 30 Mar 2022 21:21:52 +0800
-Message-Id: <20220330132152.4568-5-jiangshanlai@gmail.com>
-X-Mailer: git-send-email 2.19.1.6.gb485710b
-In-Reply-To: <20220330132152.4568-1-jiangshanlai@gmail.com>
-References: <20220330132152.4568-1-jiangshanlai@gmail.com>
+        with ESMTP id S237223AbiC3NiM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Mar 2022 09:38:12 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 241BB3B548
+        for <kvm@vger.kernel.org>; Wed, 30 Mar 2022 06:36:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1648647387; x=1680183387;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=XlOrzMjIgjga9Qogp/sf4WoZdQBlzvyEx62qpd/HivA=;
+  b=nQp7yL+te7z5X4+vr3YAjFUdt6G0kNFFo6tnotBnfA+wfxBnTdFOLP8D
+   2oxiadHSu5NeEtQAFWUxaT8sl2cD1gzfjJzQOBMFswAv9m67i4z16rYGT
+   01x8LHgLklHTUcdpzmpTE81NH9GUnPPISeFUYuuwGQcENyBSZJmYLAxcY
+   Z4Sbwwy5Ksr0T44moTb3yvqVp3Lb2kInz7v61IG3FyYIELEc5BFRbh8MM
+   +JDbdaAT0H5BNPuwSZ4ht88f2jpnFwFN+vgmVLWNgKVZJBB0L98qin6zY
+   5jlhpoPl2tRFx7W+zDt+DqiQn03xF+kBAgrNosFbJLRhc1yIN0WIxbVbK
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10301"; a="259516399"
+X-IronPort-AV: E=Sophos;i="5.90,222,1643702400"; 
+   d="scan'208";a="259516399"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2022 06:36:26 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.90,222,1643702400"; 
+   d="scan'208";a="719977304"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orsmga005.jf.intel.com with ESMTP; 30 Mar 2022 06:36:26 -0700
+Received: from fmsmsx609.amr.corp.intel.com (10.18.126.89) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.27; Wed, 30 Mar 2022 06:36:25 -0700
+Received: from fmsmsx605.amr.corp.intel.com (10.18.126.85) by
+ fmsmsx609.amr.corp.intel.com (10.18.126.89) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.27; Wed, 30 Mar 2022 06:36:25 -0700
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx605.amr.corp.intel.com (10.18.126.85) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.27 via Frontend Transport; Wed, 30 Mar 2022 06:36:25 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.105)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2308.27; Wed, 30 Mar 2022 06:36:23 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jc7NNTcxNUhPH9PGG3JID5E3SvXke7luZ2S+65qsV7R7COj1hgh44RxkDwN4WWiL0QiTlXQTFuQ10XDxFaYZS6TbIvT8cI9dYA+Duervkpg44hwb/pS014V/FsaCjHHjQei30ZXNqX4zsDp87OnowwZvx3CWZrrS7rcQFuX5o7NnsWue+fsvmPKWvAa4ZNexG9tA39MY2jIplf3/ccBgBY/K/e/sjwmmAYz52eX6s8EcGWjYtCsEapQ30JEWjgEZP40OhlJdgfVUqpvU1Me7rpRIGfk53QcAxu+xldj2qh6pSZjbB1g2BZVhVPnq2UDzbTT4FSRYiZdeqipwWVLBnQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=txIBlilEltMW8RqivGs/wPvKlZgViV+oBKB1v0A9HVo=;
+ b=BzuN2Fe8jwhT1QvXUVu3feeM5iAesjhn40PKzqQtT3uieKoZU9+BGs2jhG7oaRQNUN0IJvVTJc++AaH2or6YMWzLCStg/zISy+YXVbCG18QniDliAL9FJ8FQVo9aEfVkJNbx7vFOjLNRaxEr7DtVAygBKRIEci8OO131RQnivpziCD1r+lGmbo4SWAfbHbJ6er5z3hdsZFWhls1kqYF51T4jhyh40R5veWv+ZQTUsMi7hG2silh8DP9qRnAidr4Cfy7225/e770273RaSNOr4YBPIf5vdc3rfoXooZ13TnGY1Rx+VaRrpfGDHyFynOhQ8V5rnww1gZQ7MXkzof5lBg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH0PR11MB5658.namprd11.prod.outlook.com (2603:10b6:510:e2::23)
+ by PH0PR11MB4904.namprd11.prod.outlook.com (2603:10b6:510:40::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5102.17; Wed, 30 Mar
+ 2022 13:36:19 +0000
+Received: from PH0PR11MB5658.namprd11.prod.outlook.com
+ ([fe80::bc9d:6f72:8bb1:ca36]) by PH0PR11MB5658.namprd11.prod.outlook.com
+ ([fe80::bc9d:6f72:8bb1:ca36%8]) with mapi id 15.20.5123.019; Wed, 30 Mar 2022
+ 13:36:19 +0000
+Message-ID: <cf303486-fd80-591c-f9a4-d39591c7d0b8@intel.com>
+Date:   Wed, 30 Mar 2022 21:35:52 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Firefox/91.0 Thunderbird/91.5.0
+Subject: Re: [PATCH RFC 08/12] iommufd: IOCTLs for the io_pagetable
+Content-Language: en-US
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     Alex Williamson <alex.williamson@redhat.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Eric Auger <eric.auger@redhat.com>,
+        <iommu@lists.linux-foundation.org>,
+        Jason Wang <jasowang@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        "Kevin Tian" <kevin.tian@intel.com>, <kvm@vger.kernel.org>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        "Shameerali Kolothum Thodi" <shameerali.kolothum.thodi@huawei.com>,
+        Keqian Zhu <zhukeqian1@huawei.com>
+References: <8-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
+From:   Yi Liu <yi.l.liu@intel.com>
+In-Reply-To: <8-v1-e79cd8d168e8+6-iommufd_jgg@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: HK2PR02CA0170.apcprd02.prod.outlook.com
+ (2603:1096:201:1f::30) To PH0PR11MB5658.namprd11.prod.outlook.com
+ (2603:10b6:510:e2::23)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 15a29cba-35e6-444a-0beb-08da125245eb
+X-MS-TrafficTypeDiagnostic: PH0PR11MB4904:EE_
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-Microsoft-Antispam-PRVS: <PH0PR11MB4904981A908CDFAC475D24E9C31F9@PH0PR11MB4904.namprd11.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: UMAkcNFmpn9xoyu7GCZ5BAMRjSs9lIfjmAVTTR7iq4Gx647K9QluehHhyyyV9pYhkJGZ9fHqpXt4nNE58bhKme+5O7QJ6jrLoMhbyvVZahMKjTx3+PYXQwyJuNsVh0Eu6kateCZpoN22pic8/FP+h39H7hv9u3uMFt3tCJbYI+fnSB5xO80ianJZM3G7jRvChLtIg4TA88BhbyosbIx6s+D4imp5w9UJQn6U6VMGpMyPeuTgT7X/tLkrGoDZjK8kyaQU2+9UmLpKUK2YrCmnLJphrD/NgfU/BgaIFsIFLjTvEJw9uAipKDqdSKYIraq7hQDVMkI1odmtdcbtnPh+k/zEc+hPiELwud4n+4DdMoKZvHLyGu3DrFqJn5H4mGw3XJuWYBERnyTIbpT9KsyubHpZ7Z2GX9dXn7DJKGX+6HpgEAiWEIFB/ral0ndeB92AhUd7gx0QcQ99RgfkTNY6XGsXiDZH6W9wFpeMJMvFt8TBlW9vE1fNZ1aoD5uxnoZK46PWkDlCVJknZHNNj7F8GlWdrBkv/axBVoPNsBhchVjGRvICi40BL4NU/BKfjXY3meAzPWnZGFmWjmJXhyW/KtjVMAM23lfxVsM3f1WtpaQYACXsOa9wVSWHOf2LA+LPepjfzGwKUlwgpcD35AzSnmBaymLVaCM734GM5zjDXfr08Cw9GjOJmB9Lo0LpUjGya4nWeXlw/ZY8o60UTGLkOW5SRKvRcYpX4xzoSQZ9UXqYNBh63ibR/WekBj14YSrg
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5658.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(7416002)(30864003)(54906003)(53546011)(5660300002)(508600001)(6506007)(66556008)(6666004)(66476007)(66946007)(6486002)(8936002)(6916009)(316002)(36756003)(6512007)(82960400001)(26005)(86362001)(83380400001)(186003)(4326008)(2906002)(31696002)(8676002)(31686004)(38100700002)(2616005)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Q2IrM040Ri9kaEt1dzBoVEh4M2ZBTWp1RDR4ZTQrY2trenp4bVcxTEdLZjlR?=
+ =?utf-8?B?VjdiZFhaRmE2QXQxM1Z0THFsZ01rU2hZa2thUFJBUys1d1VLRXdRSHRjUnRj?=
+ =?utf-8?B?eWFPOW14bjZEa3RkaGVlSzdhWWpwWkx3eHB4MUROZVhYQkJkU2ZqejN0L1ZV?=
+ =?utf-8?B?R216aFBpZ3UrRWFVMWQySUNYdytPd0VlMENMaXBvZ2E2NjgxbGlCZXNvWnpi?=
+ =?utf-8?B?WXpuYlZRczhTdW9ZVkFEamZhakpONU9sYU1XbEZ2S3pXeUovUUpxd1lOYjR4?=
+ =?utf-8?B?N1YxUkhQbHlMdUhCVldkczRLMEdaMm82eUdoeEVWd0xqMi96UEs0aDg3Slh6?=
+ =?utf-8?B?MUJ1em41V0pubk1QSWsrbHJQRHdpSmU2SGo3TTNqcEZZelg2WVFKdHV0WGFo?=
+ =?utf-8?B?WjA0QUd2Q2o1V0hEUkw1aGZsbiszdFFmcVM0aFJoUGYxM0NYUFJjd3JVZEhn?=
+ =?utf-8?B?cGtvaXkxM0VmVjFHSXZCQjhUcmVyVjZOdUVLVVZHUjlLTWZvQTc5MEUyNzdw?=
+ =?utf-8?B?bGJCaFQ2OUNubldmd2RwZEhiK1Zwa0ZGWERxZEFodnFIMytvUy9acTdOYlR1?=
+ =?utf-8?B?TWVuWVZ6L1FwcnpxVEpsN0c0ZHIwQlBLUFdtTHNqTXpIWjlCRHFvb0RUN1ZQ?=
+ =?utf-8?B?TXVMUU9oUWJ3c0tVeTVjT1RtelE3MXlicWlvV1Y1bnFDVndqWDQzWS81dDVF?=
+ =?utf-8?B?RXVrSXl0L05LRi9kaEgxbG4vT2lOZEd3WVFnbFZpTDhWR2txTkIrc3ZmSXRq?=
+ =?utf-8?B?V3Z0S0pUREExWkxxTjdRZGRUbmkrV2RaaVN2cERkL0s5Rndwamx4YkhFUXhV?=
+ =?utf-8?B?R1RJaXVJeWhBQXRob3FWQnpKVFlhVGJ3TUxHcHgyejRRaVVTL2thWW1iQ3FZ?=
+ =?utf-8?B?RUFyamtmL0lrQm5TVnlHdVpDVmJ0ZmpyQ0V4VWMyVUEya3Uya2kvU0ZoL00x?=
+ =?utf-8?B?YXNvMWd0Rit3a3VTYTkyREtPOTUzME9COENLeUZwd1VSK21qUTk0WWJPZVp1?=
+ =?utf-8?B?QUNQN3IxSzZaZDlpYXovVlozRUkrbjJtV0FzRzVxRmZrMzhSNEVvR0l4M05w?=
+ =?utf-8?B?SEtETHd6Mjd0WXV1REwzemZEcVdMNTg2djFERy9peTQwZTFIbDkyKzFsa21h?=
+ =?utf-8?B?bGR0b3AxSjhLUHpQK0kreXhxNTBiWWRtZDg4UElneU1CMEdNeVdqbHJnY3Fu?=
+ =?utf-8?B?V3pYYWtUam5SUHhkVEJ1TkcxYXUwUCtYcENXSWNyZjZ4R0FUdCsyaWx0dlgz?=
+ =?utf-8?B?Y3ltYWs3QWFJcUsxS3dQOHlPaWZQRnZ5OCtKaS9LOGZTc2E3RE1ZVmIvUzgr?=
+ =?utf-8?B?dlRqOUtBaktncEQzVHJUV1lOd3R4YXczSktYZ0lDTlZxRUdrcENpYmhZK0Vo?=
+ =?utf-8?B?S0ZPQ1daZkV1L2U0cWlIeFNVaFpRQVZRcG1PcUs2WndoSFRxT1FLTURGNDNY?=
+ =?utf-8?B?NCsrWTRPaWxoT2h6bTE5TFlyUnl3OWI5Qy9GUHJYdldUancrRW5ZM1FYQ0ZD?=
+ =?utf-8?B?ZmRRa09mMjBuUXVIZ1JFZWNtQVBnVVhBbjNlcmZpemRtWlh5ZUVyVXh0SUMx?=
+ =?utf-8?B?d0IwY3pBT01NK25qTE9EVHVwZXBzS2VsL1NoS3FLVHdjMm5ZbUlFWkUvMEI2?=
+ =?utf-8?B?NHZ0akZQM3dFb2RKWmhlT2JQUHdYN2xheGUvdEswamxmL1NhQ0wxeEtvUnVl?=
+ =?utf-8?B?akhUdlRncGxIWEJiRERTOTNFWm8xYkRMdFB1ZXpLNnlNQWxoUDZ6RDhaMlU1?=
+ =?utf-8?B?bkx5RDd4R2UyMmNKbjBaejBZaWZleXAxUlBXelNYSXQvZ0NaN1c1NE5UbzE3?=
+ =?utf-8?B?SllkYUlDbU9ZTFFNY2FySnBaVjZhamJDT2xsYjR1VVc5d29sVmNQOEttcTNa?=
+ =?utf-8?B?cm0yYXI3bGxCKytiN3N0bjlVWmp2WjBwdGlEMHlPL2dTZmI1QTd4S1pmNEFh?=
+ =?utf-8?B?K0tWVUpsN2w4VUZjQ056OWFRd1ZIWFd1bTRoeFVhRldTTzZ5U05wdGJvTU5G?=
+ =?utf-8?B?aituUmxqYmlCT3dwTXJlcXJOQTdTdFdERmpqajh6d1N4SVVoUDExbHV6bEQy?=
+ =?utf-8?B?RDNLU3ZMMnVrcjB1NUhpSFZQblY1eXB2TTJGa3ZNWVpXbXVlcFhPRGI2MW9x?=
+ =?utf-8?B?RWVRcXFEWU9jYmxudFJ2MURVdGFhbUpmWGtpVGhUam9paFBwaEVzaTkzdUw3?=
+ =?utf-8?B?Q2hYcnpsR3lKS0hIMDJXeEU4akU2dVFMWXE5aUhCNDRXYTFJS2RxendodXlk?=
+ =?utf-8?B?SkxtN3c1emxsSHlTNlZ1dXRsSnVXdEVvbEU5dG1sVWZwYTZnd0dpaDl2WU8z?=
+ =?utf-8?B?RnFwZkhKWk5KWnJBZ25mSFI5WEZUMXJMdUNPNkJLVTRqZnRGYU9lZz09?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 15a29cba-35e6-444a-0beb-08da125245eb
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5658.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Mar 2022 13:36:19.7403
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Fz4v5GigqERd06BcL3n1Uxw5atShnFxTRFBFGaP+hxw158qYL8u7ABc57OHP2CNqE+G+aD+9zAqnQ95FN+PO0Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB4904
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,509 +179,543 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
+Hi Jason,
 
-Use role.pae_root = 1 for shadow_root_level == 3 no matter if it is
-shadow MMU or not.
+On 2022/3/19 01:27, Jason Gunthorpe wrote:
+> Connect the IOAS to its IOCTL interface. This exposes most of the
+> functionality in the io_pagetable to userspace.
+> 
+> This is intended to be the core of the generic interface that IOMMUFD will
+> provide. Every IOMMU driver should be able to implement an iommu_domain
+> that is compatible with this generic mechanism.
+> 
+> It is also designed to be easy to use for simple non virtual machine
+> monitor users, like DPDK:
+>   - Universal simple support for all IOMMUs (no PPC special path)
+>   - An IOVA allocator that considerds the aperture and the reserved ranges
+>   - io_pagetable allows any number of iommu_domains to be connected to the
+>     IOAS
+> 
+> Along with room in the design to add non-generic features to cater to
+> specific HW functionality.
+> 
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> ---
+>   drivers/iommu/iommufd/Makefile          |   1 +
+>   drivers/iommu/iommufd/ioas.c            | 248 ++++++++++++++++++++++++
+>   drivers/iommu/iommufd/iommufd_private.h |  27 +++
+>   drivers/iommu/iommufd/main.c            |  17 ++
+>   include/uapi/linux/iommufd.h            | 132 +++++++++++++
+>   5 files changed, 425 insertions(+)
+>   create mode 100644 drivers/iommu/iommufd/ioas.c
+> 
+> diff --git a/drivers/iommu/iommufd/Makefile b/drivers/iommu/iommufd/Makefile
+> index b66a8c47ff55ec..2b4f36f1b72f9d 100644
+> --- a/drivers/iommu/iommufd/Makefile
+> +++ b/drivers/iommu/iommufd/Makefile
+> @@ -1,6 +1,7 @@
+>   # SPDX-License-Identifier: GPL-2.0-only
+>   iommufd-y := \
+>   	io_pagetable.o \
+> +	ioas.o \
+>   	main.o \
+>   	pages.o
+>   
+> diff --git a/drivers/iommu/iommufd/ioas.c b/drivers/iommu/iommufd/ioas.c
+> new file mode 100644
+> index 00000000000000..c530b2ba74b06b
+> --- /dev/null
+> +++ b/drivers/iommu/iommufd/ioas.c
+> @@ -0,0 +1,248 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (c) 2021-2022, NVIDIA CORPORATION & AFFILIATES
+> + */
+> +#include <linux/interval_tree.h>
+> +#include <linux/iommufd.h>
+> +#include <linux/iommu.h>
+> +#include <uapi/linux/iommufd.h>
+> +
+> +#include "io_pagetable.h"
+> +
+> +void iommufd_ioas_destroy(struct iommufd_object *obj)
+> +{
+> +	struct iommufd_ioas *ioas = container_of(obj, struct iommufd_ioas, obj);
+> +	int rc;
+> +
+> +	rc = iopt_unmap_all(&ioas->iopt);
+> +	WARN_ON(rc);
+> +	iopt_destroy_table(&ioas->iopt);
+> +}
+> +
+> +struct iommufd_ioas *iommufd_ioas_alloc(struct iommufd_ctx *ictx)
+> +{
+> +	struct iommufd_ioas *ioas;
+> +	int rc;
+> +
+> +	ioas = iommufd_object_alloc(ictx, ioas, IOMMUFD_OBJ_IOAS);
+> +	if (IS_ERR(ioas))
+> +		return ioas;
+> +
+> +	rc = iopt_init_table(&ioas->iopt);
+> +	if (rc)
+> +		goto out_abort;
+> +	return ioas;
+> +
+> +out_abort:
+> +	iommufd_object_abort(ictx, &ioas->obj);
+> +	return ERR_PTR(rc);
+> +}
+> +
+> +int iommufd_ioas_alloc_ioctl(struct iommufd_ucmd *ucmd)
+> +{
+> +	struct iommu_ioas_alloc *cmd = ucmd->cmd;
+> +	struct iommufd_ioas *ioas;
+> +	int rc;
+> +
+> +	if (cmd->flags)
+> +		return -EOPNOTSUPP;
+> +
+> +	ioas = iommufd_ioas_alloc(ucmd->ictx);
+> +	if (IS_ERR(ioas))
+> +		return PTR_ERR(ioas);
+> +
+> +	cmd->out_ioas_id = ioas->obj.id;
+> +	rc = iommufd_ucmd_respond(ucmd, sizeof(*cmd));
+> +	if (rc)
+> +		goto out_table;
+> +	iommufd_object_finalize(ucmd->ictx, &ioas->obj);
+> +	return 0;
+> +
+> +out_table:
+> +	iommufd_ioas_destroy(&ioas->obj);
+> +	return rc;
+> +}
+> +
+> +int iommufd_ioas_iova_ranges(struct iommufd_ucmd *ucmd)
+> +{
+> +	struct iommu_ioas_iova_ranges __user *uptr = ucmd->ubuffer;
+> +	struct iommu_ioas_iova_ranges *cmd = ucmd->cmd;
+> +	struct iommufd_ioas *ioas;
+> +	struct interval_tree_span_iter span;
+> +	u32 max_iovas;
+> +	int rc;
+> +
+> +	if (cmd->__reserved)
+> +		return -EOPNOTSUPP;
+> +
+> +	max_iovas = cmd->size - sizeof(*cmd);
+> +	if (max_iovas % sizeof(cmd->out_valid_iovas[0]))
+> +		return -EINVAL;
+> +	max_iovas /= sizeof(cmd->out_valid_iovas[0]);
+> +
+> +	ioas = iommufd_get_ioas(ucmd, cmd->ioas_id);
+> +	if (IS_ERR(ioas))
+> +		return PTR_ERR(ioas);
+> +
+> +	down_read(&ioas->iopt.iova_rwsem);
+> +	cmd->out_num_iovas = 0;
+> +	for (interval_tree_span_iter_first(
+> +		     &span, &ioas->iopt.reserved_iova_itree, 0, ULONG_MAX);
+> +	     !interval_tree_span_iter_done(&span);
+> +	     interval_tree_span_iter_next(&span)) {
+> +		if (!span.is_hole)
+> +			continue;
+> +		if (cmd->out_num_iovas < max_iovas) {
+> +			rc = put_user((u64)span.start_hole,
+> +				      &uptr->out_valid_iovas[cmd->out_num_iovas]
+> +					       .start);
+> +			if (rc)
+> +				goto out_put;
+> +			rc = put_user(
+> +				(u64)span.last_hole,
+> +				&uptr->out_valid_iovas[cmd->out_num_iovas].last);
+> +			if (rc)
+> +				goto out_put;
+> +		}
+> +		cmd->out_num_iovas++;
+> +	}
+> +	rc = iommufd_ucmd_respond(ucmd, sizeof(*cmd));
+> +	if (rc)
+> +		goto out_put;
+> +	if (cmd->out_num_iovas > max_iovas)
+> +		rc = -EMSGSIZE;
+> +out_put:
+> +	up_read(&ioas->iopt.iova_rwsem);
+> +	iommufd_put_object(&ioas->obj);
+> +	return rc;
+> +}
+> +
+> +static int conv_iommu_prot(u32 map_flags)
+> +{
+> +	int iommu_prot;
+> +
+> +	/*
+> +	 * We provide no manual cache coherency ioctls to userspace and most
+> +	 * architectures make the CPU ops for cache flushing privileged.
+> +	 * Therefore we require the underlying IOMMU to support CPU coherent
+> +	 * operation.
+> +	 */
+> +	iommu_prot = IOMMU_CACHE;
+> +	if (map_flags & IOMMU_IOAS_MAP_WRITEABLE)
+> +		iommu_prot |= IOMMU_WRITE;
+> +	if (map_flags & IOMMU_IOAS_MAP_READABLE)
+> +		iommu_prot |= IOMMU_READ;
+> +	return iommu_prot;
+> +}
+> +
+> +int iommufd_ioas_map(struct iommufd_ucmd *ucmd)
+> +{
+> +	struct iommu_ioas_map *cmd = ucmd->cmd;
+> +	struct iommufd_ioas *ioas;
+> +	unsigned int flags = 0;
+> +	unsigned long iova;
+> +	int rc;
+> +
+> +	if ((cmd->flags &
+> +	     ~(IOMMU_IOAS_MAP_FIXED_IOVA | IOMMU_IOAS_MAP_WRITEABLE |
+> +	       IOMMU_IOAS_MAP_READABLE)) ||
+> +	    cmd->__reserved)
+> +		return -EOPNOTSUPP;
+> +	if (cmd->iova >= ULONG_MAX || cmd->length >= ULONG_MAX)
+> +		return -EOVERFLOW;
+> +
+> +	ioas = iommufd_get_ioas(ucmd, cmd->ioas_id);
+> +	if (IS_ERR(ioas))
+> +		return PTR_ERR(ioas);
+> +
+> +	if (!(cmd->flags & IOMMU_IOAS_MAP_FIXED_IOVA))
+> +		flags = IOPT_ALLOC_IOVA;
+> +	iova = cmd->iova;
+> +	rc = iopt_map_user_pages(&ioas->iopt, &iova,
+> +				 u64_to_user_ptr(cmd->user_va), cmd->length,
+> +				 conv_iommu_prot(cmd->flags), flags);
+> +	if (rc)
+> +		goto out_put;
+> +
+> +	cmd->iova = iova;
+> +	rc = iommufd_ucmd_respond(ucmd, sizeof(*cmd));
+> +out_put:
+> +	iommufd_put_object(&ioas->obj);
+> +	return rc;
+> +}
+> +
+> +int iommufd_ioas_copy(struct iommufd_ucmd *ucmd)
+> +{
+> +	struct iommu_ioas_copy *cmd = ucmd->cmd;
+> +	struct iommufd_ioas *src_ioas;
+> +	struct iommufd_ioas *dst_ioas;
+> +	struct iopt_pages *pages;
+> +	unsigned int flags = 0;
+> +	unsigned long iova;
+> +	unsigned long start_byte;
+> +	int rc;
+> +
+> +	if ((cmd->flags &
+> +	     ~(IOMMU_IOAS_MAP_FIXED_IOVA | IOMMU_IOAS_MAP_WRITEABLE |
+> +	       IOMMU_IOAS_MAP_READABLE)))
+> +		return -EOPNOTSUPP;
+> +	if (cmd->length >= ULONG_MAX)
+> +		return -EOVERFLOW;
+> +
+> +	src_ioas = iommufd_get_ioas(ucmd, cmd->src_ioas_id);
+> +	if (IS_ERR(src_ioas))
+> +		return PTR_ERR(src_ioas);
+> +	/* FIXME: copy is not limited to an exact match anymore */
+> +	pages = iopt_get_pages(&src_ioas->iopt, cmd->src_iova, &start_byte,
+> +			       cmd->length);
+> +	iommufd_put_object(&src_ioas->obj);
+> +	if (IS_ERR(pages))
+> +		return PTR_ERR(pages);
+> +
+> +	dst_ioas = iommufd_get_ioas(ucmd, cmd->dst_ioas_id);
+> +	if (IS_ERR(dst_ioas)) {
+> +		iopt_put_pages(pages);
+> +		return PTR_ERR(dst_ioas);
+> +	}
+> +
+> +	if (!(cmd->flags & IOMMU_IOAS_MAP_FIXED_IOVA))
+> +		flags = IOPT_ALLOC_IOVA;
+> +	iova = cmd->dst_iova;
+> +	rc = iopt_map_pages(&dst_ioas->iopt, pages, &iova, start_byte,
+> +			    cmd->length, conv_iommu_prot(cmd->flags), flags);
+> +	if (rc) {
+> +		iopt_put_pages(pages);
+> +		goto out_put_dst;
+> +	}
+> +
+> +	cmd->dst_iova = iova;
+> +	rc = iommufd_ucmd_respond(ucmd, sizeof(*cmd));
+> +out_put_dst:
+> +	iommufd_put_object(&dst_ioas->obj);
+> +	return rc;
+> +}
+> +
+> +int iommufd_ioas_unmap(struct iommufd_ucmd *ucmd)
+> +{
+> +	struct iommu_ioas_unmap *cmd = ucmd->cmd;
+> +	struct iommufd_ioas *ioas;
+> +	int rc;
+> +
+> +	ioas = iommufd_get_ioas(ucmd, cmd->ioas_id);
+> +	if (IS_ERR(ioas))
+> +		return PTR_ERR(ioas);
+> +
+> +	if (cmd->iova == 0 && cmd->length == U64_MAX) {
+> +		rc = iopt_unmap_all(&ioas->iopt);
+> +	} else {
+> +		if (cmd->iova >= ULONG_MAX || cmd->length >= ULONG_MAX) {
+> +			rc = -EOVERFLOW;
+> +			goto out_put;
+> +		}
+> +		rc = iopt_unmap_iova(&ioas->iopt, cmd->iova, cmd->length);
+> +	}
+> +
+> +out_put:
+> +	iommufd_put_object(&ioas->obj);
+> +	return rc;
+> +}
+> diff --git a/drivers/iommu/iommufd/iommufd_private.h b/drivers/iommu/iommufd/iommufd_private.h
+> index bcf08e61bc87e9..d24c9dac5a82a9 100644
+> --- a/drivers/iommu/iommufd/iommufd_private.h
+> +++ b/drivers/iommu/iommufd/iommufd_private.h
+> @@ -96,6 +96,7 @@ static inline int iommufd_ucmd_respond(struct iommufd_ucmd *ucmd,
+>   enum iommufd_object_type {
+>   	IOMMUFD_OBJ_NONE,
+>   	IOMMUFD_OBJ_ANY = IOMMUFD_OBJ_NONE,
+> +	IOMMUFD_OBJ_IOAS,
+>   	IOMMUFD_OBJ_MAX,
+>   };
+>   
+> @@ -147,4 +148,30 @@ struct iommufd_object *_iommufd_object_alloc(struct iommufd_ctx *ictx,
+>   			     type),                                            \
+>   		     typeof(*(ptr)), obj)
+>   
+> +/*
+> + * The IO Address Space (IOAS) pagetable is a virtual page table backed by the
+> + * io_pagetable object. It is a user controlled mapping of IOVA -> PFNs. The
+> + * mapping is copied into all of the associated domains and made available to
+> + * in-kernel users.
+> + */
+> +struct iommufd_ioas {
+> +	struct iommufd_object obj;
+> +	struct io_pagetable iopt;
+> +};
+> +
+> +static inline struct iommufd_ioas *iommufd_get_ioas(struct iommufd_ucmd *ucmd,
+> +						    u32 id)
+> +{
+> +	return container_of(iommufd_get_object(ucmd->ictx, id,
+> +					       IOMMUFD_OBJ_IOAS),
+> +			    struct iommufd_ioas, obj);
+> +}
+> +
+> +struct iommufd_ioas *iommufd_ioas_alloc(struct iommufd_ctx *ictx);
+> +int iommufd_ioas_alloc_ioctl(struct iommufd_ucmd *ucmd);
+> +void iommufd_ioas_destroy(struct iommufd_object *obj);
+> +int iommufd_ioas_iova_ranges(struct iommufd_ucmd *ucmd);
+> +int iommufd_ioas_map(struct iommufd_ucmd *ucmd);
+> +int iommufd_ioas_copy(struct iommufd_ucmd *ucmd);
+> +int iommufd_ioas_unmap(struct iommufd_ucmd *ucmd);
+>   #endif
+> diff --git a/drivers/iommu/iommufd/main.c b/drivers/iommu/iommufd/main.c
+> index ae8db2f663004f..e506f493b54cfe 100644
+> --- a/drivers/iommu/iommufd/main.c
+> +++ b/drivers/iommu/iommufd/main.c
+> @@ -184,6 +184,10 @@ static int iommufd_fops_release(struct inode *inode, struct file *filp)
+>   }
+>   
+>   union ucmd_buffer {
+> +	struct iommu_ioas_alloc alloc;
+> +	struct iommu_ioas_iova_ranges iova_ranges;
+> +	struct iommu_ioas_map map;
+> +	struct iommu_ioas_unmap unmap;
+>   	struct iommu_destroy destroy;
+>   };
+>   
+> @@ -205,6 +209,16 @@ struct iommufd_ioctl_op {
+>   	}
+>   static struct iommufd_ioctl_op iommufd_ioctl_ops[] = {
+>   	IOCTL_OP(IOMMU_DESTROY, iommufd_destroy, struct iommu_destroy, id),
+> +	IOCTL_OP(IOMMU_IOAS_ALLOC, iommufd_ioas_alloc_ioctl,
+> +		 struct iommu_ioas_alloc, out_ioas_id),
+> +	IOCTL_OP(IOMMU_IOAS_COPY, iommufd_ioas_copy, struct iommu_ioas_copy,
+> +		 src_iova),
+> +	IOCTL_OP(IOMMU_IOAS_IOVA_RANGES, iommufd_ioas_iova_ranges,
+> +		 struct iommu_ioas_iova_ranges, __reserved),
+> +	IOCTL_OP(IOMMU_IOAS_MAP, iommufd_ioas_map, struct iommu_ioas_map,
+> +		 __reserved),
+> +	IOCTL_OP(IOMMU_IOAS_UNMAP, iommufd_ioas_unmap, struct iommu_ioas_unmap,
+> +		 length),
+>   };
+>   
+>   static long iommufd_fops_ioctl(struct file *filp, unsigned int cmd,
+> @@ -270,6 +284,9 @@ struct iommufd_ctx *iommufd_fget(int fd)
+>   }
+>   
+>   static struct iommufd_object_ops iommufd_object_ops[] = {
+> +	[IOMMUFD_OBJ_IOAS] = {
+> +		.destroy = iommufd_ioas_destroy,
+> +	},
+>   };
+>   
+>   static struct miscdevice iommu_misc_dev = {
+> diff --git a/include/uapi/linux/iommufd.h b/include/uapi/linux/iommufd.h
+> index 2f7f76ec6db4cb..ba7b17ec3002e3 100644
+> --- a/include/uapi/linux/iommufd.h
+> +++ b/include/uapi/linux/iommufd.h
+> @@ -37,6 +37,11 @@
+>   enum {
+>   	IOMMUFD_CMD_BASE = 0x80,
+>   	IOMMUFD_CMD_DESTROY = IOMMUFD_CMD_BASE,
+> +	IOMMUFD_CMD_IOAS_ALLOC,
+> +	IOMMUFD_CMD_IOAS_IOVA_RANGES,
+> +	IOMMUFD_CMD_IOAS_MAP,
+> +	IOMMUFD_CMD_IOAS_COPY,
+> +	IOMMUFD_CMD_IOAS_UNMAP,
+>   };
+>   
+>   /**
+> @@ -52,4 +57,131 @@ struct iommu_destroy {
+>   };
+>   #define IOMMU_DESTROY _IO(IOMMUFD_TYPE, IOMMUFD_CMD_DESTROY)
+>   
+> +/**
+> + * struct iommu_ioas_alloc - ioctl(IOMMU_IOAS_ALLOC)
+> + * @size: sizeof(struct iommu_ioas_alloc)
+> + * @flags: Must be 0
+> + * @out_ioas_id: Output IOAS ID for the allocated object
+> + *
+> + * Allocate an IO Address Space (IOAS) which holds an IO Virtual Address (IOVA)
+> + * to memory mapping.
+> + */
+> +struct iommu_ioas_alloc {
+> +	__u32 size;
+> +	__u32 flags;
+> +	__u32 out_ioas_id;
+> +};
+> +#define IOMMU_IOAS_ALLOC _IO(IOMMUFD_TYPE, IOMMUFD_CMD_IOAS_ALLOC)
+> +
+> +/**
+> + * struct iommu_ioas_iova_ranges - ioctl(IOMMU_IOAS_IOVA_RANGES)
+> + * @size: sizeof(struct iommu_ioas_iova_ranges)
+> + * @ioas_id: IOAS ID to read ranges from
+> + * @out_num_iovas: Output total number of ranges in the IOAS
+> + * @__reserved: Must be 0
+> + * @out_valid_iovas: Array of valid IOVA ranges. The array length is the smaller
+> + *                   of out_num_iovas or the length implied by size.
+> + * @out_valid_iovas.start: First IOVA in the allowed range
+> + * @out_valid_iovas.last: Inclusive last IOVA in the allowed range
+> + *
+> + * Query an IOAS for ranges of allowed IOVAs. Operation outside these ranges is
+> + * not allowed. out_num_iovas will be set to the total number of iovas
+> + * and the out_valid_iovas[] will be filled in as space permits.
+> + * size should include the allocated flex array.
+> + */
+> +struct iommu_ioas_iova_ranges {
+> +	__u32 size;
+> +	__u32 ioas_id;
+> +	__u32 out_num_iovas;
+> +	__u32 __reserved;
+> +	struct iommu_valid_iovas {
+> +		__aligned_u64 start;
+> +		__aligned_u64 last;
+> +	} out_valid_iovas[];
+> +};
+> +#define IOMMU_IOAS_IOVA_RANGES _IO(IOMMUFD_TYPE, IOMMUFD_CMD_IOAS_IOVA_RANGES)
+> +
+> +/**
+> + * enum iommufd_ioas_map_flags - Flags for map and copy
+> + * @IOMMU_IOAS_MAP_FIXED_IOVA: If clear the kernel will compute an appropriate
+> + *                             IOVA to place the mapping at
+> + * @IOMMU_IOAS_MAP_WRITEABLE: DMA is allowed to write to this mapping
+> + * @IOMMU_IOAS_MAP_READABLE: DMA is allowed to read from this mapping
+> + */
+> +enum iommufd_ioas_map_flags {
+> +	IOMMU_IOAS_MAP_FIXED_IOVA = 1 << 0,
+> +	IOMMU_IOAS_MAP_WRITEABLE = 1 << 1,
+> +	IOMMU_IOAS_MAP_READABLE = 1 << 2,
+> +};
+> +
+> +/**
+> + * struct iommu_ioas_map - ioctl(IOMMU_IOAS_MAP)
+> + * @size: sizeof(struct iommu_ioas_map)
+> + * @flags: Combination of enum iommufd_ioas_map_flags
+> + * @ioas_id: IOAS ID to change the mapping of
+> + * @__reserved: Must be 0
+> + * @user_va: Userspace pointer to start mapping from
+> + * @length: Number of bytes to map
+> + * @iova: IOVA the mapping was placed at. If IOMMU_IOAS_MAP_FIXED_IOVA is set
+> + *        then this must be provided as input.
+> + *
+> + * Set an IOVA mapping from a user pointer. If FIXED_IOVA is specified then the
+> + * mapping will be established at iova, otherwise a suitable location will be
+> + * automatically selected and returned in iova.
+> + */
+> +struct iommu_ioas_map {
+> +	__u32 size;
+> +	__u32 flags;
+> +	__u32 ioas_id;
+> +	__u32 __reserved;
+> +	__aligned_u64 user_va;
+> +	__aligned_u64 length;
+> +	__aligned_u64 iova;
+> +};
+> +#define IOMMU_IOAS_MAP _IO(IOMMUFD_TYPE, IOMMUFD_CMD_IOAS_MAP)
+> +
+> +/**
+> + * struct iommu_ioas_copy - ioctl(IOMMU_IOAS_COPY)
+> + * @size: sizeof(struct iommu_ioas_copy)
+> + * @flags: Combination of enum iommufd_ioas_map_flags
+> + * @dst_ioas_id: IOAS ID to change the mapping of
+> + * @src_ioas_id: IOAS ID to copy from
 
-When it is shadow MMU, level expansion might occur and use passthrough
-sp (0 < role.glevel < role.level) for expanded shadow pagetable.
+so the dst and src ioas_id are allocated via the same iommufd.
+right? just out of curious, do you think it is possible that
+the srs/dst ioas_ids are from different iommufds? In that case
+may need to add src/dst iommufd. It's not needed today, just to
+see if any blocker in kernel to support such copy. :-)
 
-And remove the unneeded special roots.  Now all the root pages and
-pagetable pointed by a present spte in kvm_mmu are backed by struct
-kvm_mmu_page, and to_shadow_page() is guaranteed to be not NULL.
+> + * @length: Number of bytes to copy and map
+> + * @dst_iova: IOVA the mapping was placed at. If IOMMU_IOAS_MAP_FIXED_IOVA is
+> + *            set then this must be provided as input.
+> + * @src_iova: IOVA to start the copy
+> + *
+> + * Copy an already existing mapping from src_ioas_id and establish it in
+> + * dst_ioas_id. The src iova/length must exactly match a range used with
+> + * IOMMU_IOAS_MAP.
+> + */
+> +struct iommu_ioas_copy {
+> +	__u32 size;
+> +	__u32 flags;
+> +	__u32 dst_ioas_id;
+> +	__u32 src_ioas_id;
+> +	__aligned_u64 length;
+> +	__aligned_u64 dst_iova;
+> +	__aligned_u64 src_iova;
+> +};
+> +#define IOMMU_IOAS_COPY _IO(IOMMUFD_TYPE, IOMMUFD_CMD_IOAS_COPY)
+> +
+> +/**
+> + * struct iommu_ioas_unmap - ioctl(IOMMU_IOAS_UNMAP)
+> + * @size: sizeof(struct iommu_ioas_copy)
+> + * @ioas_id: IOAS ID to change the mapping of
+> + * @iova: IOVA to start the unmapping at
+> + * @length: Number of bytes to unmap
+> + *
+> + * Unmap an IOVA range. The iova/length must exactly match a range
+> + * used with IOMMU_IOAS_PAGETABLE_MAP, or be the values 0 & U64_MAX.
+> + * In the latter case all IOVAs will be unmaped.
+> + */
+> +struct iommu_ioas_unmap {
+> +	__u32 size;
+> +	__u32 ioas_id;
+> +	__aligned_u64 iova;
+> +	__aligned_u64 length;
+> +};
+> +#define IOMMU_IOAS_UNMAP _IO(IOMMUFD_TYPE, IOMMUFD_CMD_IOAS_UNMAP)
+>   #endif
 
-shadow_walk() and the intialization of shadow page are much simplified
-since there is not special roots.
-
-Affect cases:
-direct mmu (nonpaping for 32 bit guest):
-	gCR0_PG=0 (pae_root=1)
-shadow mmu (shadow paping for 32 bit guest):
-	gCR0_PG=1,gEFER_LMA=0,gCR4_PSE=0 (pae_root=1,passthrough)
-	gCR0_PG=1,gEFER_LMA=0,gCR4_PSE=1 (pae_root=1,no passthrough)
-direct mmu (NPT for 32bit host):
-	hEFER_LMA=0 (pae_root=1)
-shadow nested NPT (for 32bit L1 hypervisor):
-	gCR0_PG=1,gEFER_LMA=0,gCR4_PSE=0,hEFER_LMA=0
-		(pae_root=1,passthrough)
-	gCR0_PG=1,gEFER_LMA=0,gCR4_PSE=1,hEFER_LMA=0
-		(pae_root=1,no passthrough)
-	gCR0_PG=1,gEFER_LMA=0,gCR4_PSE={0|1},hEFER_LMA=1,hCR4_LA57={0|1}
-		(pae_root=0,passthrough)
-		(default_pae_pdpte is not used even guest is using PAE paging)
-
-Shadow nested NPT for 64bit L1 hypervisor has been already handled:
-	gEFER_LMA=1,gCR4_LA57=0,hEFER_LMA=1,hCR4_LA57=1
-		(pae_root=0,passthrough)
-
-FNAME(walk_addr_generic) adds initialization code for shadow nested NPT
-for 32bit L1 hypervisor when the level increment might be more than one,
-for example, 2->4, 2->5, 3->5.
-
-After this patch, the PAE Page-Directory-Pointer-Table is also write
-protected (including NPT's).
-
-Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
----
- arch/x86/include/asm/kvm_host.h |   4 -
- arch/x86/kvm/mmu/mmu.c          | 290 +-------------------------------
- arch/x86/kvm/mmu/paging_tmpl.h  |  13 +-
- 3 files changed, 20 insertions(+), 287 deletions(-)
-
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 658c493e7617..26aab4418844 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -467,10 +467,6 @@ struct kvm_mmu {
- 	*/
- 	u32 pkru_mask;
- 
--	u64 *pae_root;
--	u64 *pml4_root;
--	u64 *pml5_root;
--
- 	/*
- 	 * check zero bits on shadow page table entries, these
- 	 * bits include not only hardware reserved bits but also
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 81ccaa7c1165..27498caa3990 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -2196,26 +2196,6 @@ static void shadow_walk_init_using_root(struct kvm_shadow_walk_iterator *iterato
- 	iterator->addr = addr;
- 	iterator->shadow_addr = root;
- 	iterator->level = vcpu->arch.mmu->shadow_root_level;
--
--	if (iterator->level >= PT64_ROOT_4LEVEL &&
--	    vcpu->arch.mmu->root_level < PT64_ROOT_4LEVEL &&
--	    !vcpu->arch.mmu->direct_map)
--		iterator->level = PT32E_ROOT_LEVEL;
--
--	if (iterator->level == PT32E_ROOT_LEVEL) {
--		/*
--		 * prev_root is currently only used for 64-bit hosts. So only
--		 * the active root_hpa is valid here.
--		 */
--		BUG_ON(root != vcpu->arch.mmu->root.hpa);
--
--		iterator->shadow_addr
--			= vcpu->arch.mmu->pae_root[(addr >> 30) & 3];
--		iterator->shadow_addr &= PT64_BASE_ADDR_MASK;
--		--iterator->level;
--		if (!iterator->shadow_addr)
--			iterator->level = 0;
--	}
- }
- 
- static void shadow_walk_init(struct kvm_shadow_walk_iterator *iterator,
-@@ -3328,18 +3308,7 @@ void kvm_mmu_free_roots(struct kvm *kvm, struct kvm_mmu *mmu,
- 					   &invalid_list);
- 
- 	if (free_active_root) {
--		if (to_shadow_page(mmu->root.hpa)) {
--			mmu_free_root_page(kvm, &mmu->root.hpa, &invalid_list);
--		} else if (mmu->pae_root) {
--			for (i = 0; i < 4; ++i) {
--				if (!IS_VALID_PAE_ROOT(mmu->pae_root[i]))
--					continue;
--
--				mmu_free_root_page(kvm, &mmu->pae_root[i],
--						   &invalid_list);
--				mmu->pae_root[i] = INVALID_PAE_ROOT;
--			}
--		}
-+		mmu_free_root_page(kvm, &mmu->root.hpa, &invalid_list);
- 		mmu->root.hpa = INVALID_PAGE;
- 		mmu->root.pgd = 0;
- 	}
-@@ -3404,7 +3373,6 @@ static int mmu_alloc_direct_roots(struct kvm_vcpu *vcpu)
- 	struct kvm_mmu *mmu = vcpu->arch.mmu;
- 	u8 shadow_root_level = mmu->shadow_root_level;
- 	hpa_t root;
--	unsigned i;
- 	int r;
- 
- 	write_lock(&vcpu->kvm->mmu_lock);
-@@ -3415,24 +3383,9 @@ static int mmu_alloc_direct_roots(struct kvm_vcpu *vcpu)
- 	if (is_tdp_mmu_enabled(vcpu->kvm)) {
- 		root = kvm_tdp_mmu_get_vcpu_root_hpa(vcpu);
- 		mmu->root.hpa = root;
--	} else if (shadow_root_level >= PT64_ROOT_4LEVEL) {
-+	} else if (shadow_root_level >= PT32E_ROOT_LEVEL) {
- 		root = mmu_alloc_root(vcpu, 0, 0, shadow_root_level, true);
- 		mmu->root.hpa = root;
--	} else if (shadow_root_level == PT32E_ROOT_LEVEL) {
--		if (WARN_ON_ONCE(!mmu->pae_root)) {
--			r = -EIO;
--			goto out_unlock;
--		}
--
--		for (i = 0; i < 4; ++i) {
--			WARN_ON_ONCE(IS_VALID_PAE_ROOT(mmu->pae_root[i]));
--
--			root = mmu_alloc_root(vcpu, i << (30 - PAGE_SHIFT),
--					      i << 30, PT32_ROOT_LEVEL, true);
--			mmu->pae_root[i] = root | PT_PRESENT_MASK |
--					   shadow_me_mask;
--		}
--		mmu->root.hpa = __pa(mmu->pae_root);
- 	} else {
- 		WARN_ONCE(1, "Bad TDP root level = %d\n", shadow_root_level);
- 		r = -EIO;
-@@ -3510,10 +3463,8 @@ static int mmu_first_shadow_root_alloc(struct kvm *kvm)
- static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_mmu *mmu = vcpu->arch.mmu;
--	u64 pdptrs[4], pm_mask;
- 	gfn_t root_gfn, root_pgd;
- 	hpa_t root;
--	unsigned i;
- 	int r;
- 
- 	root_pgd = mmu->get_guest_pgd(vcpu);
-@@ -3522,21 +3473,6 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
- 	if (mmu_check_root(vcpu, root_gfn))
- 		return 1;
- 
--	/*
--	 * On SVM, reading PDPTRs might access guest memory, which might fault
--	 * and thus might sleep.  Grab the PDPTRs before acquiring mmu_lock.
--	 */
--	if (mmu->root_level == PT32E_ROOT_LEVEL) {
--		for (i = 0; i < 4; ++i) {
--			pdptrs[i] = mmu->get_pdptr(vcpu, i);
--			if (!(pdptrs[i] & PT_PRESENT_MASK))
--				continue;
--
--			if (mmu_check_root(vcpu, pdptrs[i] >> PAGE_SHIFT))
--				return 1;
--		}
--	}
--
- 	r = mmu_first_shadow_root_alloc(vcpu->kvm);
- 	if (r)
- 		return r;
-@@ -3546,70 +3482,9 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
- 	if (r < 0)
- 		goto out_unlock;
- 
--	/*
--	 * Do we shadow a long mode page table? If so we need to
--	 * write-protect the guests page table root.
--	 */
--	if (mmu->root_level >= PT64_ROOT_4LEVEL) {
--		root = mmu_alloc_root(vcpu, root_gfn, 0,
--				      mmu->shadow_root_level, false);
--		mmu->root.hpa = root;
--		goto set_root_pgd;
--	}
--
--	if (WARN_ON_ONCE(!mmu->pae_root)) {
--		r = -EIO;
--		goto out_unlock;
--	}
--
--	/*
--	 * We shadow a 32 bit page table. This may be a legacy 2-level
--	 * or a PAE 3-level page table. In either case we need to be aware that
--	 * the shadow page table may be a PAE or a long mode page table.
--	 */
--	pm_mask = PT_PRESENT_MASK | shadow_me_mask;
--	if (mmu->shadow_root_level >= PT64_ROOT_4LEVEL) {
--		pm_mask |= PT_ACCESSED_MASK | PT_WRITABLE_MASK | PT_USER_MASK;
--
--		if (WARN_ON_ONCE(!mmu->pml4_root)) {
--			r = -EIO;
--			goto out_unlock;
--		}
--		mmu->pml4_root[0] = __pa(mmu->pae_root) | pm_mask;
--
--		if (mmu->shadow_root_level == PT64_ROOT_5LEVEL) {
--			if (WARN_ON_ONCE(!mmu->pml5_root)) {
--				r = -EIO;
--				goto out_unlock;
--			}
--			mmu->pml5_root[0] = __pa(mmu->pml4_root) | pm_mask;
--		}
--	}
--
--	for (i = 0; i < 4; ++i) {
--		WARN_ON_ONCE(IS_VALID_PAE_ROOT(mmu->pae_root[i]));
--
--		if (mmu->root_level == PT32E_ROOT_LEVEL) {
--			if (!(pdptrs[i] & PT_PRESENT_MASK)) {
--				mmu->pae_root[i] = INVALID_PAE_ROOT;
--				continue;
--			}
--			root_gfn = pdptrs[i] >> PAGE_SHIFT;
--		}
--
--		root = mmu_alloc_root(vcpu, root_gfn, i << 30,
--				      PT32_ROOT_LEVEL, false);
--		mmu->pae_root[i] = root | pm_mask;
--	}
--
--	if (mmu->shadow_root_level == PT64_ROOT_5LEVEL)
--		mmu->root.hpa = __pa(mmu->pml5_root);
--	else if (mmu->shadow_root_level == PT64_ROOT_4LEVEL)
--		mmu->root.hpa = __pa(mmu->pml4_root);
--	else
--		mmu->root.hpa = __pa(mmu->pae_root);
--
--set_root_pgd:
-+	root = mmu_alloc_root(vcpu, root_gfn, 0,
-+			      mmu->shadow_root_level, false);
-+	mmu->root.hpa = root;
- 	mmu->root.pgd = root_pgd;
- out_unlock:
- 	write_unlock(&vcpu->kvm->mmu_lock);
-@@ -3617,77 +3492,6 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
- 	return r;
- }
- 
--static int mmu_alloc_special_roots(struct kvm_vcpu *vcpu)
--{
--	struct kvm_mmu *mmu = vcpu->arch.mmu;
--	bool need_pml5 = mmu->shadow_root_level > PT64_ROOT_4LEVEL;
--	u64 *pml5_root = NULL;
--	u64 *pml4_root = NULL;
--	u64 *pae_root;
--
--	/*
--	 * When shadowing 32-bit or PAE NPT with 64-bit NPT, the PML4 and PDP
--	 * tables are allocated and initialized at root creation as there is no
--	 * equivalent level in the guest's NPT to shadow.  Allocate the tables
--	 * on demand, as running a 32-bit L1 VMM on 64-bit KVM is very rare.
--	 */
--	if (mmu->direct_map || mmu->root_level >= PT64_ROOT_4LEVEL ||
--	    mmu->shadow_root_level < PT64_ROOT_4LEVEL)
--		return 0;
--
--	/*
--	 * NPT, the only paging mode that uses this horror, uses a fixed number
--	 * of levels for the shadow page tables, e.g. all MMUs are 4-level or
--	 * all MMus are 5-level.  Thus, this can safely require that pml5_root
--	 * is allocated if the other roots are valid and pml5 is needed, as any
--	 * prior MMU would also have required pml5.
--	 */
--	if (mmu->pae_root && mmu->pml4_root && (!need_pml5 || mmu->pml5_root))
--		return 0;
--
--	/*
--	 * The special roots should always be allocated in concert.  Yell and
--	 * bail if KVM ends up in a state where only one of the roots is valid.
--	 */
--	if (WARN_ON_ONCE(!tdp_enabled || mmu->pae_root || mmu->pml4_root ||
--			 (need_pml5 && mmu->pml5_root)))
--		return -EIO;
--
--	/*
--	 * Unlike 32-bit NPT, the PDP table doesn't need to be in low mem, and
--	 * doesn't need to be decrypted.
--	 */
--	pae_root = (void *)get_zeroed_page(GFP_KERNEL_ACCOUNT);
--	if (!pae_root)
--		return -ENOMEM;
--
--#ifdef CONFIG_X86_64
--	pml4_root = (void *)get_zeroed_page(GFP_KERNEL_ACCOUNT);
--	if (!pml4_root)
--		goto err_pml4;
--
--	if (need_pml5) {
--		pml5_root = (void *)get_zeroed_page(GFP_KERNEL_ACCOUNT);
--		if (!pml5_root)
--			goto err_pml5;
--	}
--#endif
--
--	mmu->pae_root = pae_root;
--	mmu->pml4_root = pml4_root;
--	mmu->pml5_root = pml5_root;
--
--	return 0;
--
--#ifdef CONFIG_X86_64
--err_pml5:
--	free_page((unsigned long)pml4_root);
--err_pml4:
--	free_page((unsigned long)pae_root);
--	return -ENOMEM;
--#endif
--}
--
- static bool is_unsync_root(hpa_t root)
- {
- 	struct kvm_mmu_page *sp;
-@@ -3725,8 +3529,7 @@ static bool is_unsync_root(hpa_t root)
- 
- void kvm_mmu_sync_roots(struct kvm_vcpu *vcpu)
- {
--	int i;
--	struct kvm_mmu_page *sp;
-+	hpa_t root = vcpu->arch.mmu->root.hpa;
- 
- 	if (vcpu->arch.mmu->direct_map)
- 		return;
-@@ -3736,31 +3539,11 @@ void kvm_mmu_sync_roots(struct kvm_vcpu *vcpu)
- 
- 	vcpu_clear_mmio_info(vcpu, MMIO_GVA_ANY);
- 
--	if (vcpu->arch.mmu->root_level >= PT64_ROOT_4LEVEL) {
--		hpa_t root = vcpu->arch.mmu->root.hpa;
--		sp = to_shadow_page(root);
--
--		if (!is_unsync_root(root))
--			return;
--
--		write_lock(&vcpu->kvm->mmu_lock);
--		mmu_sync_children(vcpu, sp, true);
--		write_unlock(&vcpu->kvm->mmu_lock);
-+	if (!is_unsync_root(root))
- 		return;
--	}
- 
- 	write_lock(&vcpu->kvm->mmu_lock);
--
--	for (i = 0; i < 4; ++i) {
--		hpa_t root = vcpu->arch.mmu->pae_root[i];
--
--		if (IS_VALID_PAE_ROOT(root)) {
--			root &= PT64_BASE_ADDR_MASK;
--			sp = to_shadow_page(root);
--			mmu_sync_children(vcpu, sp, true);
--		}
--	}
--
-+	mmu_sync_children(vcpu, to_shadow_page(root), true);
- 	write_unlock(&vcpu->kvm->mmu_lock);
- }
- 
-@@ -5162,9 +4945,6 @@ int kvm_mmu_load(struct kvm_vcpu *vcpu)
- 	int r;
- 
- 	r = mmu_topup_memory_caches(vcpu, !vcpu->arch.mmu->direct_map);
--	if (r)
--		goto out;
--	r = mmu_alloc_special_roots(vcpu);
- 	if (r)
- 		goto out;
- 	if (vcpu->arch.mmu->direct_map)
-@@ -5635,65 +5415,14 @@ slot_handle_level_4k(struct kvm *kvm, const struct kvm_memory_slot *memslot,
- 				 PG_LEVEL_4K, flush_on_yield);
- }
- 
--static void free_mmu_pages(struct kvm_mmu *mmu)
--{
--	if (!tdp_enabled && mmu->pae_root)
--		set_memory_encrypted((unsigned long)mmu->pae_root, 1);
--	free_page((unsigned long)mmu->pae_root);
--	free_page((unsigned long)mmu->pml4_root);
--	free_page((unsigned long)mmu->pml5_root);
--}
--
- static int __kvm_mmu_create(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu)
- {
--	struct page *page;
- 	int i;
- 
- 	mmu->root.hpa = INVALID_PAGE;
- 	mmu->root.pgd = 0;
- 	for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++)
- 		mmu->prev_roots[i] = KVM_MMU_ROOT_INFO_INVALID;
--
--	/* vcpu->arch.guest_mmu isn't used when !tdp_enabled. */
--	if (!tdp_enabled && mmu == &vcpu->arch.guest_mmu)
--		return 0;
--
--	/*
--	 * When using PAE paging, the four PDPTEs are treated as 'root' pages,
--	 * while the PDP table is a per-vCPU construct that's allocated at MMU
--	 * creation.  When emulating 32-bit mode, cr3 is only 32 bits even on
--	 * x86_64.  Therefore we need to allocate the PDP table in the first
--	 * 4GB of memory, which happens to fit the DMA32 zone.  TDP paging
--	 * generally doesn't use PAE paging and can skip allocating the PDP
--	 * table.  The main exception, handled here, is SVM's 32-bit NPT.  The
--	 * other exception is for shadowing L1's 32-bit or PAE NPT on 64-bit
--	 * KVM; that horror is handled on-demand by mmu_alloc_special_roots().
--	 */
--	if (tdp_enabled && kvm_mmu_get_tdp_level(vcpu) > PT32E_ROOT_LEVEL)
--		return 0;
--
--	page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_DMA32);
--	if (!page)
--		return -ENOMEM;
--
--	mmu->pae_root = page_address(page);
--
--	/*
--	 * CR3 is only 32 bits when PAE paging is used, thus it's impossible to
--	 * get the CPU to treat the PDPTEs as encrypted.  Decrypt the page so
--	 * that KVM's writes and the CPU's reads get along.  Note, this is
--	 * only necessary when using shadow paging, as 64-bit NPT can get at
--	 * the C-bit even when shadowing 32-bit NPT, and SME isn't supported
--	 * by 32-bit kernels (when KVM itself uses 32-bit NPT).
--	 */
--	if (!tdp_enabled)
--		set_memory_decrypted((unsigned long)mmu->pae_root, 1);
--	else
--		WARN_ON_ONCE(shadow_me_mask);
--
--	for (i = 0; i < 4; ++i)
--		mmu->pae_root[i] = INVALID_PAE_ROOT;
--
- 	return 0;
- }
- 
-@@ -5722,7 +5451,6 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
- 
- 	return ret;
-  fail_allocate_root:
--	free_mmu_pages(&vcpu->arch.guest_mmu);
- 	return ret;
- }
- 
-@@ -6363,8 +6091,6 @@ int kvm_mmu_module_init(void)
- void kvm_mmu_destroy(struct kvm_vcpu *vcpu)
- {
- 	kvm_mmu_unload(vcpu);
--	free_mmu_pages(&vcpu->arch.root_mmu);
--	free_mmu_pages(&vcpu->arch.guest_mmu);
- 	mmu_free_memory_caches(vcpu);
- }
- 
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index 1015f33e0758..62a762bbcf87 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -365,6 +365,16 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
- 	pte           = mmu->get_guest_pgd(vcpu);
- 	have_ad       = PT_HAVE_ACCESSED_DIRTY(mmu);
- 
-+	/* kvm_mmu_get_page() might use this values for allocating passthrough
-+	 * shadow page.
-+	 */
-+	walker->table_gfn[4] = gpte_to_gfn(pte);
-+	walker->pt_access[4] = ACC_ALL;
-+	walker->table_gfn[3] = gpte_to_gfn(pte);
-+	walker->pt_access[3] = ACC_ALL;
-+	walker->table_gfn[2] = gpte_to_gfn(pte);
-+	walker->pt_access[2] = ACC_ALL;
-+
- #if PTTYPE == 64
- 	walk_nx_mask = 1ULL << PT64_NX_SHIFT;
- 	if (walker->level == PT32E_ROOT_LEVEL) {
-@@ -710,7 +720,8 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
- 		 * Verify that the gpte in the page we've just write
- 		 * protected is still there.
- 		 */
--		if (FNAME(gpte_changed)(vcpu, gw, it.level - 1))
-+		if (it.level - 1 < top_level &&
-+		    FNAME(gpte_changed)(vcpu, gw, it.level - 1))
- 			goto out_gpte_changed;
- 
- 		if (sp)
 -- 
-2.19.1.6.gb485710b
-
+Regards,
+Yi Liu
