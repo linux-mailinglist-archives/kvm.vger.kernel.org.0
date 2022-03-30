@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E89664EC67C
-	for <lists+kvm@lfdr.de>; Wed, 30 Mar 2022 16:26:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E581D4EC684
+	for <lists+kvm@lfdr.de>; Wed, 30 Mar 2022 16:28:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236048AbiC3O1k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Mar 2022 10:27:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44452 "EHLO
+        id S1346834AbiC3OaG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Mar 2022 10:30:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53326 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237050AbiC3O1j (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Mar 2022 10:27:39 -0400
+        with ESMTP id S1343900AbiC3OaD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Mar 2022 10:30:03 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 840B22FE5F
-        for <kvm@vger.kernel.org>; Wed, 30 Mar 2022 07:25:54 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3D8B0205BD0
+        for <kvm@vger.kernel.org>; Wed, 30 Mar 2022 07:28:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1648650353;
+        s=mimecast20190719; t=1648650497;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=zvLJ8hpn4uLcUl3yh6ObtYr+cK026HnJjPhO9peO7nY=;
-        b=cJzamLumouYUBvlLsAolXa6qZr6Q695KQaX9HD0UMGwfusCBxmT13AcBkJu9PG3Whshld5
-        fchw4zhEKZMgD+j9PQ9F4Jp61e6sroYVg4dm/Ghkk4yT+8GMJB3kFw6dau1o8z+q5oADyd
-        qoAgsxkc3m6oNQNN8aAZw+mZrn5E0uw=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=0MdzdhvbcfTH7B0x9nhddVD3XG1EagzEGRM2HvvMoaM=;
+        b=URkSKNdrjdGvwpy+7NhX/C2hgs298shyXZ1qiTMwEoKzUTpc5vFGUSmW6+Pl5Bx+QTGSwc
+        C0MCHhfzu79GFwJLKwsx2beB7hsnmLnnXn2q60CokUrXTKgkbQiLqP+2w2/LSTH75JuGEd
+        tAJmfghaPXFaR+L8dSjVo4q/NIcxhm8=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-142-3Lsjl1tvMlS3fIhB7ajVQQ-1; Wed, 30 Mar 2022 10:25:52 -0400
-X-MC-Unique: 3Lsjl1tvMlS3fIhB7ajVQQ-1
-Received: by mail-qt1-f198.google.com with SMTP id h11-20020a05622a170b00b002e0769b9018so17529428qtk.14
-        for <kvm@vger.kernel.org>; Wed, 30 Mar 2022 07:25:51 -0700 (PDT)
+ us-mta-210-EsA0cQqVPUyta1QYRAgifQ-1; Wed, 30 Mar 2022 10:28:13 -0400
+X-MC-Unique: EsA0cQqVPUyta1QYRAgifQ-1
+Received: by mail-qk1-f197.google.com with SMTP id c19-20020a05620a0cf300b005f17891c015so12622400qkj.18
+        for <kvm@vger.kernel.org>; Wed, 30 Mar 2022 07:28:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=zvLJ8hpn4uLcUl3yh6ObtYr+cK026HnJjPhO9peO7nY=;
-        b=VnQiJ725+0Y+OHPS10j88EU8/ewqaa6KhXjFYqhdKjittubqUsmBs/rcM3AFHyW6nj
-         8owzoWxuFuKI6swzO6Vd7Z+Enfbl5CdbjyBYqVP0DbEPvd2dnj8zES/IqVfi/vUMBox8
-         gXZ4dsDoLeA52lVewPw3hQHmjoJaJt8Ai3DzPQdOQrxBkuj7OcyL7Vrq6ejh0X3MMmt7
-         3MaDIMOo1BrOigOZ01jkeCe4JtbKynZrZBg0Hctg0iuTnSFvhEzTyrUCg9nF4xs6nsr8
-         q1l02ZpEaGdExoXX/s0Y7CRYEic1VCER48zfrvwyC1/ZAWTS8qpyI19Zbe2C67cvT94V
-         0xYw==
-X-Gm-Message-State: AOAM530HupwkyuqxX9/5hw7is37jlgktwzs7LYQUUlAqP8KzLnE602/E
-        KIO3VGaLkp5DLahdhqj9fh6DZJY8PbZ1fH7vYdkkOKubxTWFZ/y4NeZhJ195eJ3YElFlcc6BCzs
-        JfZiOo32QCKmp
-X-Received: by 2002:a05:620a:d8b:b0:67b:1371:1796 with SMTP id q11-20020a05620a0d8b00b0067b13711796mr23958838qkl.415.1648650351526;
-        Wed, 30 Mar 2022 07:25:51 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw/r6U4mfqyrEs1oP/UnFbQv8EJ+XyurLMqYNaOVonYcHLEFbhhLYUdoEZC2YnVcD0Y5xCzUQ==
-X-Received: by 2002:a05:620a:d8b:b0:67b:1371:1796 with SMTP id q11-20020a05620a0d8b00b0067b13711796mr23958817qkl.415.1648650351226;
-        Wed, 30 Mar 2022 07:25:51 -0700 (PDT)
+        bh=0MdzdhvbcfTH7B0x9nhddVD3XG1EagzEGRM2HvvMoaM=;
+        b=YIuBtmyY/jpwy3RJs8fQPBjP+fw2kN2cQ8vDvkXffvI9f9Q+ZPquJiuWJ5wawFdT4a
+         AYObGWvgGuQoA0XPTvZ9bRn+NN15Tz/d+RFFQRguyLcVqz3K52Mpb+QHSBopiO4JjaSI
+         62tjFFgXjc4/kpskcdg7tYJdyLrmBOmbRTxcBu7WVTh2Hu8V7JWXUcd0pRsBip21PVp/
+         cSIW31EczpRG0q51OeHsveDB6NwH1PjWLJyL+Uba64CmKE7I2NUm/ot08BMrA07WE/zZ
+         FquFlA/XD4+75z2RrA3OHbhrF8w7e95aO1Qkn5IofT4EvdYs8SMIssx88PPl6vve4Q5+
+         u1JA==
+X-Gm-Message-State: AOAM5304xqn4/+ud4UUaYvV/LdAjUav3JdZNVCbQr/d3jEWO63z0WTf2
+        /lx28AyMRgr97Y20Tpc6Enyux9H3ppVJnO+7CmQ40BjQ7sh6+HHuEB6IXCn2T2+t4NOVe8aE05d
+        fBsxxupm4nSqT
+X-Received: by 2002:ac8:580d:0:b0:2e1:c641:8c21 with SMTP id g13-20020ac8580d000000b002e1c6418c21mr32693445qtg.677.1648650492836;
+        Wed, 30 Mar 2022 07:28:12 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxj9mfWzYsrvAU4I7K8iuYgWUFquDhfKr86ywKhvihB398kljxjsCy0kviStlHnrVX/SZQbLA==
+X-Received: by 2002:ac8:580d:0:b0:2e1:c641:8c21 with SMTP id g13-20020ac8580d000000b002e1c6418c21mr32693412qtg.677.1648650492602;
+        Wed, 30 Mar 2022 07:28:12 -0700 (PDT)
 Received: from xz-m1.local (cpec09435e3e0ee-cmc09435e3e0ec.cpe.net.cable.rogers.com. [99.241.198.116])
-        by smtp.gmail.com with ESMTPSA id f34-20020a05622a1a2200b002e1a35ed1desm18226730qtb.94.2022.03.30.07.25.49
+        by smtp.gmail.com with ESMTPSA id d12-20020a05620a158c00b00648ec3fcbdfsm10572195qkk.72.2022.03.30.07.28.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Mar 2022 07:25:50 -0700 (PDT)
-Date:   Wed, 30 Mar 2022 10:25:49 -0400
+        Wed, 30 Mar 2022 07:28:12 -0700 (PDT)
+Date:   Wed, 30 Mar 2022 10:28:10 -0400
 From:   Peter Xu <peterx@redhat.com>
 To:     David Matlack <dmatlack@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
@@ -75,17 +75,17 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
         <kvm@vger.kernel.org>,
         "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
         <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>
-Subject: Re: [PATCH v2 03/26] KVM: x86/mmu: Derive shadow MMU page role from
- parent
-Message-ID: <YkRobUbpk1bM2zBQ@xz-m1.local>
+Subject: Re: [PATCH v2 05/26] KVM: x86/mmu: Rename shadow MMU functions that
+ deal with shadow pages
+Message-ID: <YkRo+rJwYJoOmXmW@xz-m1.local>
 References: <20220311002528.2230172-1-dmatlack@google.com>
- <20220311002528.2230172-4-dmatlack@google.com>
- <YjBLFZWtdfwhNosG@xz-m1.local>
- <CALzav=dAW999FKid08Ry0YxPA+3Dt8HERrbn6YMkAnk0h+4h_A@mail.gmail.com>
+ <20220311002528.2230172-6-dmatlack@google.com>
+ <YjBTtz6wo/zQEHCv@xz-m1.local>
+ <CALzav=c0ccztDULiVMwR4K20iYc0WH53ApeOCorhjKwaMNL5Sg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CALzav=dAW999FKid08Ry0YxPA+3Dt8HERrbn6YMkAnk0h+4h_A@mail.gmail.com>
+In-Reply-To: <CALzav=c0ccztDULiVMwR4K20iYc0WH53ApeOCorhjKwaMNL5Sg@mail.gmail.com>
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
@@ -97,49 +97,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 22, 2022 at 11:30:07AM -0700, David Matlack wrote:
-> > > +static union kvm_mmu_page_role kvm_mmu_child_role(u64 *sptep, bool direct, u32 access)
-> > > +{
-> > > +     struct kvm_mmu_page *parent_sp = sptep_to_sp(sptep);
-> > > +     union kvm_mmu_page_role role;
-> > > +
-> > > +     role = parent_sp->role;
-> > > +     role.level--;
-> > > +     role.access = access;
-> > > +     role.direct = direct;
-> > > +
-> > > +     /*
-> > > +      * If the guest has 4-byte PTEs then that means it's using 32-bit,
-> > > +      * 2-level, non-PAE paging. KVM shadows such guests using 4 PAE page
-> > > +      * directories, each mapping 1/4 of the guest's linear address space
-> > > +      * (1GiB). The shadow pages for those 4 page directories are
-> > > +      * pre-allocated and assigned a separate quadrant in their role.
-> > > +      *
-> > > +      * Since we are allocating a child shadow page and there are only 2
-> > > +      * levels, this must be a PG_LEVEL_4K shadow page. Here the quadrant
-> > > +      * will either be 0 or 1 because it maps 1/2 of the address space mapped
-> > > +      * by the guest's PG_LEVEL_4K page table (or 4MiB huge page) that it
-> > > +      * is shadowing. In this case, the quadrant can be derived by the index
-> > > +      * of the SPTE that points to the new child shadow page in the page
-> > > +      * directory (parent_sp). Specifically, every 2 SPTEs in parent_sp
-> > > +      * shadow one half of a guest's page table (or 4MiB huge page) so the
-> > > +      * quadrant is just the parity of the index of the SPTE.
-> > > +      */
-> > > +     if (role.has_4_byte_gpte) {
-> > > +             BUG_ON(role.level != PG_LEVEL_4K);
-> > > +             role.quadrant = (sptep - parent_sp->spt) % 2;
-> > > +     }
+On Tue, Mar 22, 2022 at 02:35:25PM -0700, David Matlack wrote:
+> On Tue, Mar 15, 2022 at 1:52 AM Peter Xu <peterx@redhat.com> wrote:
 > >
-> > This made me wonder whether role.quadrant can be dropped, because it seems
-> > it can be calculated out of the box with has_4_byte_gpte, level and spte
-> > offset.  I could have missed something, though..
+> > On Fri, Mar 11, 2022 at 12:25:07AM +0000, David Matlack wrote:
+> > > Rename 3 functions:
+> > >
+> > >   kvm_mmu_get_page()   -> kvm_mmu_get_shadow_page()
+> > >   kvm_mmu_alloc_page() -> kvm_mmu_alloc_shadow_page()
+> > >   kvm_mmu_free_page()  -> kvm_mmu_free_shadow_page()
+> > >
+> > > This change makes it clear that these functions deal with shadow pages
+> > > rather than struct pages. Prefer "shadow_page" over the shorter "sp"
+> > > since these are core routines.
+> > >
+> > > Signed-off-by: David Matlack <dmatlack@google.com>
+> >
+> > Acked-by: Peter Xu <peterx@redhat.com>
 > 
-> I think you're right that we could compute it on-the-fly. But it'd be
-> non-trivial to remove since it's currently used to ensure the sp->role
-> and sp->gfn uniquely identifies each shadow page (e.g. when checking
-> for collisions in the mmu_page_hash).
+> What's the reason to use Acked-by for this patch but Reviewed-by for others?
 
-Makes sense.
+A weak version of r-b?  I normally don't do the rename when necessary (and
+I'm pretty poor at naming..), in this case I don't have a strong opinion.
+I should have left nothing then it's less confusing. :)
 
 -- 
 Peter Xu
