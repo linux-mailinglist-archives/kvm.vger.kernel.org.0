@@ -2,229 +2,193 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B32464ECC4F
-	for <lists+kvm@lfdr.de>; Wed, 30 Mar 2022 20:30:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 509904ECC5C
+	for <lists+kvm@lfdr.de>; Wed, 30 Mar 2022 20:36:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350059AbiC3ScA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Mar 2022 14:32:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43612 "EHLO
+        id S1350267AbiC3SiP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Mar 2022 14:38:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53914 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350540AbiC3Sbg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Mar 2022 14:31:36 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC31D5BD12
-        for <kvm@vger.kernel.org>; Wed, 30 Mar 2022 11:28:25 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id y193-20020a25dcca000000b00636d788e549so15161398ybe.5
-        for <kvm@vger.kernel.org>; Wed, 30 Mar 2022 11:28:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=jmgCw6kISPnali1TsGqrUP2G6TvOrvnV5m3QbxQ3ssQ=;
-        b=kEdBAyQBFBp4Qp370oNm6uwMhIbqmivDpG4x7fY59Eb7SP6v68K3JYFXDoABc9rAy3
-         YfqWdY9J061PoYjrth242bXd1LDvoKTbBTby7PhTO7RfY51SdX7qA1ubTgE20STzRcbz
-         tTavbw/GBGy+AZpnAnIaFPTaZ17Pg2JDs46ON5Dh4D/MxnVhzUOQ+hjYn5cgiY77f/QB
-         L5Wj3aihbe/ahGFKdFyEFJ6PwW1iRevrszRDKJm1sV9dK7BKPjns1ihnwGnr0c2c9ZO3
-         irzBXN8L7a2TTpbW+v5Akd8Z9rGrgSQkPWNO8bgA7IXluomk1AQZApeKEIjV7jPtVCWw
-         yFqg==
+        with ESMTP id S1351129AbiC3SdR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Mar 2022 14:33:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 500EF50E13
+        for <kvm@vger.kernel.org>; Wed, 30 Mar 2022 11:30:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1648665029;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=RZbGTsE6fj+tWEXGzmO8DRMy8Cnx5er20TMqeDcb2Ps=;
+        b=DNf8MTKDF/DYRQViU+G0054tVcBrV29xlB5AVaRq1F6oTI5H9NslWB3riFQWDbjAS9ChsF
+        3YgfJWlthEoAL7MyomwYm5byiLkqS1sfYgpQ/9yb8IH/2Xkfp8R4QXZ2Gs52CDLPinnBdB
+        NQbmvixveVtJbdm0WnOxQhfWrpicavU=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-198-fRUICFYrME-1u2W3DYZA6g-1; Wed, 30 Mar 2022 14:30:27 -0400
+X-MC-Unique: fRUICFYrME-1u2W3DYZA6g-1
+Received: by mail-qt1-f198.google.com with SMTP id z18-20020ac84552000000b002e201c79cd4so18086410qtn.2
+        for <kvm@vger.kernel.org>; Wed, 30 Mar 2022 11:30:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=jmgCw6kISPnali1TsGqrUP2G6TvOrvnV5m3QbxQ3ssQ=;
-        b=1G2GICfVCmDUKfJjQstfLl8Cr8he1w7QFEZyLvv14t6K2Xu8mLo5Afn7ZFXVJYUG6D
-         bU19QEIuo7YW2zquxUJpcNHm/ca0GwWVDMoB4K+QJe+5zYIAt3SZcLRZYNdmR+YMydYY
-         8NJ26fzGzwtxrJ+Lof/VOg9iC3MNXbiSNS0/0n94U/lB63Yn7ASf6b110rSSIVJw1nRM
-         MgLvvs1Ggl/nsbmiTH4XsH4CpJbygjh4DXFqdORbc6ZrkZBequLI7QFv9wSp7PNiz6nM
-         Xw9ikdcfgbyc4XnEWn7B/C4cgzfb+xaOrDkX+vkFpDwL2OaZEqn/te9qG1OA//X8qXxL
-         GegA==
-X-Gm-Message-State: AOAM533SKJJCl69TqzQcTGa/m5IZqqynWgXbqcOo5ZPxOu+6gTQRFQn4
-        rHzdWIVG3OxutaMn1ap/4SYEleen6+/3jTM022dVnBEVwlvAIAs/QT1wsFXMW5XYfypLvIg/Y8C
-        CHNO7GXjKs2PZ0Iw8eixOhBVVjRl5dRtjsQBDJK2Ik0heV2EdUHXeZXphSQ==
-X-Google-Smtp-Source: ABdhPJyRZIjpFV9+Yx2mRL79pA3Rp0G3GDJQzgMvekoEb1wy8pluFXuFuUuuY/RFQJGQ7mSAOhMWjB8j21g=
-X-Received: from pgonda1.kir.corp.google.com ([2620:15c:29:203:7348:3252:2b73:955c])
- (user=pgonda job=sendgmr) by 2002:a25:8c10:0:b0:61d:b17e:703d with SMTP id
- k16-20020a258c10000000b0061db17e703dmr988403ybl.154.1648664904800; Wed, 30
- Mar 2022 11:28:24 -0700 (PDT)
-Date:   Wed, 30 Mar 2022 11:28:21 -0700
-Message-Id: <20220330182821.2633150-1-pgonda@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.35.1.1094.g7c7d902a7c-goog
-Subject: [PATCH v3] KVM, SEV: Add KVM_EXIT_SHUTDOWN metadata for SEV-ES
-From:   Peter Gonda <pgonda@google.com>
-To:     kvm@vger.kernel.org
-Cc:     Peter Gonda <pgonda@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=RZbGTsE6fj+tWEXGzmO8DRMy8Cnx5er20TMqeDcb2Ps=;
+        b=uspM+XtjGdVO03IF+XFKnBhME8vK4MISYdS7n+z5ZsuAyfD87FhY4rldVvJIRZsRsD
+         lNDUToSSLFB50GCJ0z0Yd8EDAUZxZfgFfIi7psfA2LgiqintMLWmGQQg8rdYafN8tw0O
+         1qg+IPN7138leiLMEmSjaJxXpsjjq98i8CxBBsZDVUBdERHSJWMjsBzaUBFGtNioSOs8
+         f2TkxnXbT3fwb29IVM7F2AshHvo3vJWZvWEpnQoWhCf3NkxBjfi28lnZowSKJ1Ip10O9
+         CeHD5HDEP/lYdJwp3IOVzG1sQ0Ce/JqvsT3ioA+W94PpMZC1JgqOu/Raj/TmVIexutVK
+         vTiw==
+X-Gm-Message-State: AOAM5309lxNVynQIy0P8HZDYrexmB1D7BAucxHMGLmHH2bqs2GH/4bFw
+        OvbCoJl0Upkjwx+UyGu9AcQmwpkdSBvLe+VTIp9KMFOIYVAIWKv8wujLTNYIcbbsWhTTriKV1Kd
+        thcNGDXV1rwfJ
+X-Received: by 2002:a37:414c:0:b0:67e:6d68:c585 with SMTP id o73-20020a37414c000000b0067e6d68c585mr756747qka.196.1648665026790;
+        Wed, 30 Mar 2022 11:30:26 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxV7GTt34CXdG/qDCogIthPSHMHYYlDRsKEVG6uvoZamRv82rxB1y8ernA5KphBy4D/a0zmOw==
+X-Received: by 2002:a37:414c:0:b0:67e:6d68:c585 with SMTP id o73-20020a37414c000000b0067e6d68c585mr756718qka.196.1648665026496;
+        Wed, 30 Mar 2022 11:30:26 -0700 (PDT)
+Received: from xz-m1.local (cpec09435e3e0ee-cmc09435e3e0ec.cpe.net.cable.rogers.com. [99.241.198.116])
+        by smtp.gmail.com with ESMTPSA id p13-20020a05622a048d00b002e1ce0c627csm18698113qtx.58.2022.03.30.11.30.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Mar 2022 11:30:26 -0700 (PDT)
+Date:   Wed, 30 Mar 2022 14:30:24 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Sean Christopherson <seanjc@google.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Ben Gardon <bgardon@google.com>,
+        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
+        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
+        <kvmarm@lists.cs.columbia.edu>,
+        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
+        <linux-mips@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)" 
+        <kvm@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
+        <kvm-riscv@lists.infradead.org>, Peter Feiner <pfeiner@google.com>
+Subject: Re: [PATCH v2 16/26] KVM: x86/mmu: Cache the access bits of shadowed
+ translations
+Message-ID: <YkShwFaRqlQpyL87@xz-m1.local>
+References: <20220311002528.2230172-1-dmatlack@google.com>
+ <20220311002528.2230172-17-dmatlack@google.com>
+ <YjGgjTnP/9sG8L+2@xz-m1.local>
+ <CALzav=fZQYC7YyTbZqbkYTYVUXCq4skc6pkQ2S59BoSxbkKUhw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CALzav=fZQYC7YyTbZqbkYTYVUXCq4skc6pkQ2S59BoSxbkKUhw@mail.gmail.com>
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SEV-ES guests can request termination using the GHCB's MSR protocol. See
-AMD's GHCB spec section '4.1.13 Termination Request'. Currently when a
-guest does this the userspace VMM sees an KVM_EXIT_UNKNOWN (-EVINAL)
-return code from KVM_RUN. By adding a KVM_EXIT_SHUTDOWN_ENTRY to kvm_run
-struct the userspace VMM can clearly see the guest has requested a SEV-ES
-termination including the termination reason code set and reason code.
+On Tue, Mar 22, 2022 at 03:51:54PM -0700, David Matlack wrote:
+> On Wed, Mar 16, 2022 at 1:32 AM Peter Xu <peterx@redhat.com> wrote:
+> >
+> > On Fri, Mar 11, 2022 at 12:25:18AM +0000, David Matlack wrote:
+> > > In order to split a huge page we need to know what access bits to assign
+> > > to the role of the new child page table. This can't be easily derived
+> > > from the huge page SPTE itself since KVM applies its own access policies
+> > > on top, such as for HugePage NX.
+> > >
+> > > We could walk the guest page tables to determine the correct access
+> > > bits, but that is difficult to plumb outside of a vCPU fault context.
+> > > Instead, we can store the original access bits for each leaf SPTE
+> > > alongside the GFN in the gfns array. The access bits only take up 3
+> > > bits, which leaves 61 bits left over for gfns, which is more than
+> > > enough. So this change does not require any additional memory.
+> >
+> > I have a pure question on why eager page split needs to worry on hugepage
+> > nx..
+> >
+> > IIUC that was about forbidden huge page being mapped as executable.  So
+> > afaiu the only missing bit that could happen if we copy over the huge page
+> > ptes is the executable bit.
+> >
+> > But then?  I think we could get a page fault on fault->exec==true on the
+> > split small page (because when we copy over it's cleared, even though the
+> > page can actually be executable), but it should be well resolved right
+> > after that small page fault.
+> >
+> > The thing is IIUC this is a very rare case, IOW, it should mostly not
+> > happen in 99% of the use case?  And there's a slight penalty when it
+> > happens, but only perf-wise.
+> >
+> > As I'm not really fluent with the code base, perhaps I missed something?
+> 
+> You're right that we could get away with not knowing the shadowed
+> access permissions to assign to the child SPTEs when splitting a huge
+> SPTE. We could just copy the huge SPTE access permissions and then let
+> the execute bit be repaired on fault (although those faults would be a
+> performance cost).
+> 
+> But the access permissions are also needed to lookup an existing
+> shadow page (or create a new shadow page) to use to split the huge
+> page. For example, let's say we are going to split a huge page that
+> does not have execute permissions enabled. That could be because NX
+> HugePages are enabled or because we are shadowing a guest translation
+> that does not allow execution (or both). We wouldn't want to propagate
+> the no-execute permission into the child SP role.access if the
+> shadowed translation really does allow execution (and vice versa).
 
-Signed-off-by: Peter Gonda <pgonda@google.com>
+Then the follow up (pure) question is what will happen if we simply
+propagate the no-exec permission into the child SP?
 
----
-V3
- * Add Documentation/ update.
- * Updated other KVM_EXIT_SHUTDOWN exits to clear ndata and set reason
-   to KVM_SHUTDOWN_REQ.
+I think that only happens with direct sptes where guest used huge pages
+because that's where the shadow page will be huge, so IIUC that's checked
+here when the small page fault triggers:
 
-V2
- * Add KVM_CAP_EXIT_SHUTDOWN_REASON check for KVM_CHECK_EXTENSION.
+static void validate_direct_spte(struct kvm_vcpu *vcpu, u64 *sptep,
+				   unsigned direct_access)
+{
+	if (is_shadow_present_pte(*sptep) && !is_large_pte(*sptep)) {
+		struct kvm_mmu_page *child;
 
-Tested by making an SEV-ES guest call sev_es_terminate() with hardcoded
-reason code set and reason code and then observing the codes from the
-userspace VMM in the kvm_run.shutdown.data fields.
+		/*
+		 * For the direct sp, if the guest pte's dirty bit
+		 * changed form clean to dirty, it will corrupt the
+		 * sp's access: allow writable in the read-only sp,
+		 * so we should update the spte at this point to get
+		 * a new sp with the correct access.
+		 */
+		child = to_shadow_page(*sptep & PT64_BASE_ADDR_MASK);
+		if (child->role.access == direct_access)
+			return;
 
-Change-Id: I55dcdf0f42bfd70d0e59829ae70c2fb067b60809
----
- Documentation/virt/kvm/api.rst | 12 ++++++++++++
- arch/x86/kvm/svm/sev.c         |  9 +++++++--
- arch/x86/kvm/svm/svm.c         |  2 ++
- arch/x86/kvm/vmx/vmx.c         |  2 ++
- arch/x86/kvm/x86.c             |  2 ++
- include/uapi/linux/kvm.h       | 13 +++++++++++++
- virt/kvm/kvm_main.c            |  1 +
- 7 files changed, 39 insertions(+), 2 deletions(-)
+		drop_parent_pte(child, sptep);
+		kvm_flush_remote_tlbs_with_address(vcpu->kvm, child->gfn, 1);
+	}
+}
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 2aebb89576d1..d53a66a3760e 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -7834,3 +7834,15 @@ only be invoked on a VM prior to the creation of VCPUs.
- At this time, KVM_PMU_CAP_DISABLE is the only capability.  Setting
- this capability will disable PMU virtualization for that VM.  Usermode
- should adjust CPUID leaf 0xA to reflect that the PMU is disabled.
-+
-+8.36 KVM_CAP_EXIT_SHUTDOWN_REASON
-+---------------------------
-+
-+:Capability KVM_CAP_EXIT_SHUTDOWN_REASON
-+:Architectures: x86
-+:Type: vm
-+
-+This capability means shutdown metadata may be included in
-+kvm_run.shutdown when a vCPU exits with KVM_EXIT_SHUTDOWN. This
-+may help userspace determine the guest's reason for termination and
-+if the guest should be restarted or an error caused the shutdown.
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 75fa6dd268f0..5f9d37dd3f6f 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -2735,8 +2735,13 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
- 		pr_info("SEV-ES guest requested termination: %#llx:%#llx\n",
- 			reason_set, reason_code);
- 
--		ret = -EINVAL;
--		break;
-+		vcpu->run->exit_reason = KVM_EXIT_SHUTDOWN;
-+		vcpu->run->shutdown.reason = KVM_SHUTDOWN_SEV_TERM;
-+		vcpu->run->shutdown.ndata = 2;
-+		vcpu->run->shutdown.data[0] = reason_set;
-+		vcpu->run->shutdown.data[1] = reason_code;
-+
-+		return 0;
- 	}
- 	default:
- 		/* Error, keep GHCB MSR value as-is */
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 6535adee3e9c..c2cc10776517 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -1953,6 +1953,8 @@ static int shutdown_interception(struct kvm_vcpu *vcpu)
- 	kvm_vcpu_reset(vcpu, true);
- 
- 	kvm_run->exit_reason = KVM_EXIT_SHUTDOWN;
-+	vcpu->run->shutdown.reason = KVM_SHUTDOWN_REQ;
-+	vcpu->run->shutdown.ndata = 0;
- 	return 0;
- }
- 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 84a7500cd80c..85b21fc490e4 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -4988,6 +4988,8 @@ static __always_inline int handle_external_interrupt(struct kvm_vcpu *vcpu)
- static int handle_triple_fault(struct kvm_vcpu *vcpu)
- {
- 	vcpu->run->exit_reason = KVM_EXIT_SHUTDOWN;
-+	vcpu->run->shutdown.reason = KVM_SHUTDOWN_REQ;
-+	vcpu->run->shutdown.ndata = 0;
- 	vcpu->mmio_needed = 0;
- 	return 0;
- }
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index d3a9ce07a565..f7cd224a4c32 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9999,6 +9999,8 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 				kvm_x86_ops.nested_ops->triple_fault(vcpu);
- 			} else {
- 				vcpu->run->exit_reason = KVM_EXIT_SHUTDOWN;
-+				vcpu->run->shutdown.reason = KVM_SHUTDOWN_REQ;
-+				vcpu->run->shutdown.ndata = 0;
- 				vcpu->mmio_needed = 0;
- 				r = 0;
- 				goto out;
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 8616af85dc5d..017c03421c48 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -271,6 +271,12 @@ struct kvm_xen_exit {
- #define KVM_EXIT_XEN              34
- #define KVM_EXIT_RISCV_SBI        35
- 
-+/* For KVM_EXIT_SHUTDOWN */
-+/* Standard VM shutdown request. No additional metadata provided. */
-+#define KVM_SHUTDOWN_REQ	0
-+/* SEV-ES termination request */
-+#define KVM_SHUTDOWN_SEV_TERM	1
-+
- /* For KVM_EXIT_INTERNAL_ERROR */
- /* Emulate instruction failed. */
- #define KVM_INTERNAL_ERROR_EMULATION	1
-@@ -311,6 +317,12 @@ struct kvm_run {
- 		struct {
- 			__u64 hardware_exit_reason;
- 		} hw;
-+		/* KVM_EXIT_SHUTDOWN */
-+		struct {
-+			__u64 reason;
-+			__u32 ndata;
-+			__u64 data[16];
-+		} shutdown;
- 		/* KVM_EXIT_FAIL_ENTRY */
- 		struct {
- 			__u64 hardware_entry_failure_reason;
-@@ -1145,6 +1157,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_PMU_CAPABILITY 212
- #define KVM_CAP_DISABLE_QUIRKS2 213
- #define KVM_CAP_VM_TSC_CONTROL 214
-+#define KVM_CAP_EXIT_SHUTDOWN_REASON 215
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 70e05af5ebea..03b6e472f32c 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -4299,6 +4299,7 @@ static long kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
- 	case KVM_CAP_CHECK_EXTENSION_VM:
- 	case KVM_CAP_ENABLE_CAP_VM:
- 	case KVM_CAP_HALT_POLL:
-+	case KVM_CAP_EXIT_SHUTDOWN_REASON:
- 		return 1;
- #ifdef CONFIG_KVM_MMIO
- 	case KVM_CAP_COALESCED_MMIO:
+Due to missing EXEC the role.access check will not match with direct
+access, which is the guest pgtable value which has EXEC set.  Then IIUC
+we'll simply drop the no-exec SP and replace it with a new one with exec
+perm.  The question is, would that untimately work too?
+
+Even if that works, I agree this sounds tricky because we're potentially
+caching fake sp.role conditionally and it seems we never do that before.
+It's just that the other option that you proposed here seems to add other
+way of complexity on caching spte permission information while kvm doesn't
+do either before.  IMHO we need to see which is the best trade off.
+
+I could have missed something else, though.
+
+Thanks,
+
 -- 
-2.35.1.1094.g7c7d902a7c-goog
+Peter Xu
 
