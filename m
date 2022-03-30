@@ -2,98 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1142C4EC983
-	for <lists+kvm@lfdr.de>; Wed, 30 Mar 2022 18:18:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E81AF4EC9D1
+	for <lists+kvm@lfdr.de>; Wed, 30 Mar 2022 18:43:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348760AbiC3QUN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Mar 2022 12:20:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50890 "EHLO
+        id S1348891AbiC3Qo6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Mar 2022 12:44:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348733AbiC3QUK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Mar 2022 12:20:10 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C190415A20
-        for <kvm@vger.kernel.org>; Wed, 30 Mar 2022 09:18:20 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id y16so8346019pju.4
-        for <kvm@vger.kernel.org>; Wed, 30 Mar 2022 09:18:20 -0700 (PDT)
+        with ESMTP id S1344228AbiC3Qo4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Mar 2022 12:44:56 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 113FD1BE4EE
+        for <kvm@vger.kernel.org>; Wed, 30 Mar 2022 09:43:11 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id 138-20020a621690000000b004fa807ac59aso12286931pfw.19
+        for <kvm@vger.kernel.org>; Wed, 30 Mar 2022 09:43:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=nLFu3lC46wywpXjsuIK0ZHIhaIdPVQVthjLJWcG1bqs=;
-        b=ObdhiCZmnQ357m81FhFtTehR9aYW6P4+BOjn381CbSMHEsU1E7K3XcewtQe3sJCPWQ
-         Csyxq34Lypg3+bYvidjj+H3qoa/rNI7SuZbTd3AoCwOk6Mqd2uRtxKjVcVzSJoZodMTf
-         D/y6FT6RGJsMSbkAlI8a0sPYLgZwkMMWyNwRd4fxHKehurrHJxHet0aUP9LncDJtE3cQ
-         UPOz+IFAmZ6u0RgCGDhAInm8qhjfecUTWrGa0uueQmXiVf0afirovk1cfrPKwTF9EAHS
-         gOr/NoP4PJTR2EKpDT/fo37IVT+5E6uWqx4jWGTeL/5PLf3qFXEVzRH+FzhiYJwPOXLr
-         Ejdw==
+        h=date:message-id:mime-version:subject:from:to:cc
+         :content-transfer-encoding;
+        bh=5nXtXrVSYraXOswJ0un7Hm7h4MEowJ6UqwfZSK0k/Ho=;
+        b=KeiIrhzTnbxNfQgZB940dzCguVNEiqsc5GU+Ia3dHTg9v3MLhmKmLclbWTPEPhRjQc
+         Yw6Nhb7RjuYwA3ku+Zn6mwKzTJcgxXWnoytSqvgaXKw9zytgardjMdoiv99jWNUI6Kew
+         oelbriE/+VtiBlvubit/TXo9yVqGra5BJR9qTpDpASIrEfFBRFRf+wWzAmMt16cIn2zR
+         Ds4qpj7JKOIq9+hhwoMoGw5gh3ucoS3YqrWjbj3EP7IbYMB4WdHEAj3JAF5xKbCBcfRf
+         k78SJvN9EH5cE4tDT1w75vjwrCa1R4oU0BAUrl6C6sKNem5qu2Dm5uBdwyilOwo6ifNp
+         uDqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=nLFu3lC46wywpXjsuIK0ZHIhaIdPVQVthjLJWcG1bqs=;
-        b=NfMAMsMF9e6VevoHgI655rjUnlKXX58rRYHyKBmOno9cBc5uVpPKB4DDJZxteFZsqB
-         WHr55/asIM91U9QU14h5WCkyYcxH9sFQf9ZfDutSD+dXwxeeRYopW7f7XGCjymsXEKF/
-         Fap9YuzGbYiy3hnDP5Dyx2KErjj03o9SnkbkkZOhxu/JzKKBEn6U2XMxCGUwhfoRzJd9
-         5Du1HystVY3/OrEIvxqVGkGIBQmJPth+2fyln5KUCGmgT/hBGIuXoNqzEnwSY0xA5lqk
-         r+PpfNZKEiRrbOZGxD+51pClJlzDoXKr145cjTAbus2gVW0yRB5kuGP9oQzRgDPJZg5a
-         npuQ==
-X-Gm-Message-State: AOAM533TVlMVAgaDXBDHfUxrmaoFw8xHHy3zhagBfZsqBTlzI7DoftsM
-        Ie/zeVCXnjpljPfS/u1bUWhWYA==
-X-Google-Smtp-Source: ABdhPJzu0B5xizLOKCwUOp7QXz7jXFJn2pPNsklxdxdBWzWCsDjkD8HDdgo8h4C6dlF1WJ0c8QhdzA==
-X-Received: by 2002:a17:903:2305:b0:154:4aa2:e800 with SMTP id d5-20020a170903230500b001544aa2e800mr29560plh.167.1648657099936;
-        Wed, 30 Mar 2022 09:18:19 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id b14-20020a056a000cce00b004fabc39519esm25365204pfv.5.2022.03.30.09.18.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Mar 2022 09:18:19 -0700 (PDT)
-Date:   Wed, 30 Mar 2022 16:18:15 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Steven Price <steven.price@arm.com>
-Cc:     Quentin Perret <qperret@google.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, maz@kernel.org,
-        will@kernel.org
-Subject: Re: [PATCH v5 00/13] KVM: mm: fd-based approach for supporting KVM
- guest private memory
-Message-ID: <YkSCx7q4Dl25mSp8@google.com>
-References: <20220310140911.50924-1-chao.p.peng@linux.intel.com>
- <YjyS6A0o4JASQK+B@google.com>
- <YkHspg+YzOsbUaCf@google.com>
- <YkH32nx+YsJuUbmZ@google.com>
- <YkIFW25WgV2WIQHb@google.com>
- <YkM7eHCHEBe5NkNH@google.com>
- <88620519-029e-342b-0a85-ce2a20eaf41b@arm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <88620519-029e-342b-0a85-ce2a20eaf41b@arm.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc
+         :content-transfer-encoding;
+        bh=5nXtXrVSYraXOswJ0un7Hm7h4MEowJ6UqwfZSK0k/Ho=;
+        b=cXt9XsB1IjLkXE2naaLwgF6FWoBK2EzAJLyO9Gm4zAI7Al+HZRxe7V/MwFAD7VSumE
+         SmxIwk0Vb/ay6tGUoWFmRx/g8s9mUWdaDMyiZUyJkm6ku8WrOjk0Y0n23I0wm5qutUYn
+         KQiAdmTyMuxteTMWdZZq3Juuos58z/VaAoon2MupEv2y07uzcGNiM4oi1K0vqq/UQKbt
+         BMLEL5HgkZO6TPc0LwSswkdq5kdJ2oayMEPqub4Kb2t6d9U6unDTBucLqVYb68WnLtvJ
+         k8RqCwIYWJsAPrNw631EiVLWA/Vp9l3lj32lr2wYt3VjbiZbWjWSyOG7J1JfVoiLsD8A
+         t+MQ==
+X-Gm-Message-State: AOAM5322YwB4zBOY4+YXokC4pccpKXT5djx5M7RILQzN2ZWefIA0NAoS
+        Uv15k0Q0TR6FWF8St7CtWjmkR5fLNDfiPyoJ2cqMcSt0LvmMC/JybXe7sXdF5+ceXKYZx1TLJ5E
+        Xk+to/IdLfsKgJNHGOnj7Pb0buuHxoGoR2TkNPDWfhqIyXIwmXLC28GTiYw==
+X-Google-Smtp-Source: ABdhPJwcTlkloq4QtJPS4G/HHgbttrIqnocT95vp1xV2O3KKx7i5gdZX29AMHSrnOU+jzj+SLb5cPdIUXUo=
+X-Received: from pgonda1.kir.corp.google.com ([2620:15c:29:203:94cc:eed1:3c93:b600])
+ (user=pgonda job=sendgmr) by 2002:a17:902:c2d8:b0:154:b384:917b with SMTP id
+ c24-20020a170902c2d800b00154b384917bmr216875pla.58.1648658590332; Wed, 30 Mar
+ 2022 09:43:10 -0700 (PDT)
+Date:   Wed, 30 Mar 2022 09:43:06 -0700
+Message-Id: <20220330164306.2376085-1-pgonda@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.1.1094.g7c7d902a7c-goog
+Subject: [PATCH] KVM: SEV: Add cond_resched() to loop in sev_clflush_pages()
+From:   Peter Gonda <pgonda@google.com>
+To:     kvm@vger.kernel.org
+Cc:     Peter Gonda <pgonda@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
         autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -101,79 +68,106 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 30, 2022, Steven Price wrote:
-> On 29/03/2022 18:01, Quentin Perret wrote:
-> > Is implicit sharing a thing? E.g., if a guest makes a memory access in
-> > the shared gpa range at an address that doesn't have a backing memslot,
-> > will KVM check whether there is a corresponding private memslot at the
-> > right offset with a hole punched and report a KVM_EXIT_MEMORY_ERROR? Or
-> > would that just generate an MMIO exit as usual?
-> 
-> My understanding is that the guest needs some way of tagging whether a
-> page is expected to be shared or private. On the architectures I'm aware
-> of this is done by effectively stealing a bit from the IPA space and
-> pretending it's a flag bit.
-> 
-> So when a guest access causes a fault, the flag bit (really part of the
-> intermediate physical address) is compared against whether the page is
-> present in the private fd. If they correspond (i.e. a private access and
-> the private fd has a page, or a shared access and there's a hole in the
-> private fd) then the appropriate page is mapped and the guest continues.
-> If there's a mismatch then a KVM_EXIT_MEMORY_ERROR exit is trigged and
-> the VMM is expected to fix up the situation (either convert the page or
-> kill the guest if this was unexpected).
+Add resched to avoid warning from sev_clflush_pages() with large number
+of pages.
 
-x86 architectures do steal a bit, but it's not strictly required.  The guest can
-communicate its desired private vs. shared state via hypercall.  I refer to the
-hypercall method as explicit conversion, and reacting to a page fault due to
-accessing the "wrong" PA variant as implicit conversion.
+Signed-off-by: Peter Gonda <pgonda@google.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 
-I have dreams of supporting a software-only implementation on x86, a la pKVM, if
-only for testing and debug purposes.  In that case, only explicit conversion is
-supported.
+---
+Here is a warning similar to what I've seen many times running large SEV
+VMs:
+[  357.714051] CPU 15: need_resched set for > 52000222 ns (52 ticks) withou=
+t schedule
+[  357.721623] WARNING: CPU: 15 PID: 35848 at kernel/sched/core.c:3733 sche=
+duler_tick+0x2f9/0x3f0
+[  357.730222] Modules linked in: kvm_amd uhaul vfat fat hdi2_standard_ftl =
+hdi2_megablocks hdi2_pmc hdi2_pmc_eeprom hdi2 stg elephant_dev_num ccp i2c_=
+mux_ltc4306 i2c_mux i2c_via_ipmi i2c_piix4 google_bmc_usb google_bmc_gpioi2=
+c_mb_common google_bmc_mailbox cdc_acm xhci_pci xhci_hcd sha3_generic gq nv=
+_p2p_glue accel_class
+[  357.758261] CPU: 15 PID: 35848 Comm: switchto-defaul Not tainted 4.15.0-=
+smp-DEV #11
+[  357.765912] Hardware name: Google, Inc.                                 =
+                      Arcadia_IT_80/Arcadia_IT_80, BIOS 30.20.2-gce 11/05/2=
+021
+[  357.779372] RIP: 0010:scheduler_tick+0x2f9/0x3f0
+[  357.783988] RSP: 0018:ffff98558d1c3dd8 EFLAGS: 00010046
+[  357.789207] RAX: 741f23206aa8dc00 RBX: 0000005349236a42 RCX: 00000000000=
+00007
+[  357.796339] RDX: 0000000000000006 RSI: 0000000000000002 RDI: ffff98558d1=
+d5a98
+[  357.803463] RBP: ffff98558d1c3ea0 R08: 0000000000100ceb R09: 00000000000=
+00000
+[  357.810597] R10: ffff98558c958c00 R11: ffffffff94850740 R12: 00000000031=
+975de
+[  357.817729] R13: 0000000000000000 R14: ffff98558d1e2640 R15: ffff9852573=
+9ea40
+[  357.824862] FS:  00007f87503eb700(0000) GS:ffff98558d1c0000(0000) knlGS:=
+0000000000000000
+[  357.832948] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  357.838695] CR2: 00005572fe74b080 CR3: 0000007bea706006 CR4: 00000000003=
+60ef0
+[  357.845828] Call Trace:
+[  357.848277]  <IRQ>
+[  357.850294]  [<ffffffff94411420>] ? tick_setup_sched_timer+0x130/0x130
+[  357.856818]  [<ffffffff943ed60d>] ? rcu_sched_clock_irq+0x6ed/0x850
+[  357.863084]  [<ffffffff943fdf02>] ? __run_timers+0x42/0x260
+[  357.868654]  [<ffffffff94411420>] ? tick_setup_sched_timer+0x130/0x130
+[  357.875182]  [<ffffffff943fd35b>] update_process_times+0x7b/0x90
+[  357.881188]  [<ffffffff944114a2>] tick_sched_timer+0x82/0xd0
+[  357.886845]  [<ffffffff94400671>] __run_hrtimer+0x81/0x200
+[  357.892331]  [<ffffffff943ff222>] hrtimer_interrupt+0x192/0x450
+[  357.898252]  [<ffffffff950002fa>] ? __do_softirq+0x2fa/0x33e
+[  357.903911]  [<ffffffff94e02edc>] smp_apic_timer_interrupt+0xac/0x1d0
+[  357.910349]  [<ffffffff94e01ef6>] apic_timer_interrupt+0x86/0x90
+[  357.916347]  </IRQ>
+[  357.918452] RIP: 0010:clflush_cache_range+0x3f/0x50
+[  357.923324] RSP: 0018:ffff98529af89cc0 EFLAGS: 00000246 ORIG_RAX: ffffff=
+ffffffff12
+[  357.930889] RAX: 0000000000000040 RBX: 0000000000038135 RCX: ffff985233d=
+36000
+[  357.938013] RDX: ffff985233d36000 RSI: 0000000000001000 RDI: ffff985233d=
+35000
+[  357.945145] RBP: ffff98529af89cc0 R08: 0000000000000001 R09: ffffb5753fb=
+23000
+[  357.952271] R10: 000000000003fe00 R11: 0000000000000008 R12: 00000000000=
+40000
+[  357.959401] R13: ffff98525739ea40 R14: ffffb5753fb22000 R15: ffff98532a5=
+8dd80
+[  357.966536]  [<ffffffffc07afd41>] svm_register_enc_region+0xd1/0x170 [kv=
+m_amd]
+[  357.973758]  [<ffffffff94246e8c>] kvm_arch_vm_ioctl+0x84c/0xb00
+[  357.979677]  [<ffffffff9455980f>] ? handle_mm_fault+0x6ff/0x1370
+[  357.985683]  [<ffffffff9423412b>] kvm_vm_ioctl+0x69b/0x720
+[  357.991167]  [<ffffffff945dfd9d>] do_vfs_ioctl+0x47d/0x680
+[  357.996654]  [<ffffffff945e0188>] SyS_ioctl+0x68/0x90
+[  358.001706]  [<ffffffff942066f1>] do_syscall_64+0x71/0x110
+[  358.007192]  [<ffffffff94e00081>] entry_SYSCALL_64_after_hwframe+0x3d/0x=
+a2
 
-I'd actually prefer TDX and SNP only allow explicit conversion, i.e. let the host
-treat accesses to the "wrong" PA as illegal, but sadly the guest/host ABIs for
-both TDX and SNP require the host to support implicit conversions.
+Tested by running a large 256gib SEV VM several times, saw no warnings.
+Without the change warnings are seen.
 
-> >>>> The key point is that KVM never decides to convert between shared and private, it's
-> >>>> always a userspace decision.  Like normal memslots, where userspace has full control
-> >>>> over what gfns are a valid, this gives userspace full control over whether a gfn is
-> >>>> shared or private at any given time.
-> >>>
-> >>> I'm understanding this as 'the VMM is allowed to punch holes in the
-> >>> private fd whenever it wants'. Is this correct?
-> >>
-> >> From the kernel's perspective, yes, the VMM can punch holes at any time.  From a
-> >> "do I want to DoS my guest" perspective, the VMM must honor its contract with the
-> >> guest and not spuriously unmap private memory.
-> >>
-> >>> What happens if it does so for a page that a guest hasn't shared back?
-> >>
-> >> When the hole is punched, KVM will unmap the corresponding private SPTEs.  If the
-> >> guest is still accessing the page as private, the next access will fault and KVM
-> >> will exit to userspace with KVM_EXIT_MEMORY_ERROR.  Of course the guest is probably
-> >> hosed if the hole punch was truly spurious, as at least hardware-based protected VMs
-> >> effectively destroy data when a private page is unmapped from the guest private SPTEs.
-> >>
-> >> E.g. Linux guests for TDX and SNP will panic/terminate in such a scenario as they
-> >> will get a fault (injected by trusted hardware/firmware) saying that the guest is
-> >> trying to access an unaccepted/unvalidated page (TDX and SNP require the guest to
-> >> explicit accept all private pages that aren't part of the guest's initial pre-boot
-> >> image).
-> > 
-> > I suppose this is necessary is to prevent the VMM from re-fallocating
-> > in a hole it previously punched and re-entering the guest without
-> > notifying it?
-> 
-> I don't know specifically about TDX/SNP, but one thing we want to
-> prevent with CCA is the VMM deallocating/reallocating a private page
-> without the guest being aware (i.e. corrupting the guest's state).So
-> punching a hole will taint the address such that a future access by the
-> guest is fatal (unless the guest first jumps through the right hoops to
-> acknowledge that it was expecting such a thing).
+---
+ arch/x86/kvm/svm/sev.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Yep, both TDX and SNP will trigger a fault in the guest if the host removes and
-reinserts a private page.  The current plan for Linux guests is to track whether
-or not a given page has been accepted as private, and panic/die if a fault due
-to unaccepted private page occurs.
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 75fa6dd268f0..c2fe89ecdb2d 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -465,6 +465,7 @@ static void sev_clflush_pages(struct page *pages[], uns=
+igned long npages)
+ 		page_virtual =3D kmap_atomic(pages[i]);
+ 		clflush_cache_range(page_virtual, PAGE_SIZE);
+ 		kunmap_atomic(page_virtual);
++		cond_resched();
+ 	}
+ }
+=20
+--=20
+2.35.1.1094.g7c7d902a7c-goog
+
