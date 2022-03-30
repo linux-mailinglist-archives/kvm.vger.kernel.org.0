@@ -2,76 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AE4E34EC7AF
-	for <lists+kvm@lfdr.de>; Wed, 30 Mar 2022 17:03:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B627F4EC905
+	for <lists+kvm@lfdr.de>; Wed, 30 Mar 2022 18:01:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347745AbiC3PEq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Mar 2022 11:04:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43510 "EHLO
+        id S1348514AbiC3QDM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Mar 2022 12:03:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346246AbiC3PEp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Mar 2022 11:04:45 -0400
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE7C2657BF;
-        Wed, 30 Mar 2022 08:03:00 -0700 (PDT)
-Received: by mail-pf1-x436.google.com with SMTP id z16so18948393pfh.3;
-        Wed, 30 Mar 2022 08:03:00 -0700 (PDT)
+        with ESMTP id S1348497AbiC3QDK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Mar 2022 12:03:10 -0400
+Received: from mail-yw1-x112b.google.com (mail-yw1-x112b.google.com [IPv6:2607:f8b0:4864:20::112b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E25B1593B6;
+        Wed, 30 Mar 2022 09:01:24 -0700 (PDT)
+Received: by mail-yw1-x112b.google.com with SMTP id 00721157ae682-2e5e9025c20so224445667b3.7;
+        Wed, 30 Mar 2022 09:01:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=0MBVxiaFywM4pu0z4oSgGZuG1yRrtK/NM7ZzynJsPqs=;
-        b=mAvL3DNgMxVPREzhXaFeaZCJ6SVPQ+W6KvhjSCLUsOEPVc80aU60ecGUmz5hZeqQSt
-         bXCZ0PIAYCrM9FtK7uup3fwK4i06fuQNZudaN2n82Ttt4w7RwwwDS8LHq05xD0pBQnb+
-         9gj270uiZEof/V3yFjWiam+pg3TsQp3d9k/7hS05LnS05uBCC6meQb6+/Mr4TNApzCog
-         nKMj1gJ3T1YRI9SWOazIxV1VU3wDWdyHyguAVeKzcAeQwTEuTQ3PTt1jgbsUskfINpdv
-         NKyCrAEauGpMfhDsw0c3f7dwp2Jor6sJsjQ5ueMIKPzf4gFt2NcZCRc+oY2YJtwb/Fi6
-         7oqQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=kjZketVP9CFkspy1PCl99/PtzZngJWwIzjlL5Zl64m0=;
+        b=n1FphQ40TOVvrDwgCRv9ZKYtjg1Pg2dsYmXFyUPdaRqirnSzRi2WzoqjjNPwajEZlv
+         ecDpkUjaXQuRrfNMThba/BUeePs1cwMbdNILgCbAdunjosL5oxqIbWc16WuZUZhrjGnT
+         zRJ+5+5yl1k03MewnrDpaGatwBhdFD6AISoRmmey8/tS6cTIi/7N349FreaYkDzP1hR9
+         D3j8wpneeHZ9cOYVBEf20MqD3Dng+CLh6jZ5buQn/uls4p6EbWGfknkc6k/Ue5tG7dqK
+         j03AYd0TbpNaUNHKCScJcA/pNQKqwILlkZ56DphYyG87xw5Jl8nf6TBejVaaEEqbmRER
+         x4cA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=0MBVxiaFywM4pu0z4oSgGZuG1yRrtK/NM7ZzynJsPqs=;
-        b=sRyMv5IjnyZCi/X3Ix+3L6xR4ifmMsg7DLkBYxv23ItqiIPbiPGrUznqyAPoncx1BO
-         HXAmlPEPC577T9Is0oBDlpjyQ23cWWL0JKHetjI8AkRufUVYFkp9L2Pzv7fs3C6IrzM7
-         5xFLbnamcREQHQh0GxMbpMShky2OjSOwFYyXj/nHHx5LkNVn3PbZDifLXfZvyKzQMYYm
-         OY/PqMk1RnBc+C9Q6QoERh+A3qqUHLIx91UD6U7UFZf63ZcEcX2k224WJl08bwcbQfA+
-         qLGlOTdBTryqYHwRBtEOp2Qt5NptOUOnTStcRtFA988dMuvWke9yfzYA5Xsbu1ZnNYWU
-         xytw==
-X-Gm-Message-State: AOAM530szbMr/2nRhn0D2T9YAo/9Zlz30dbKeaVpmzQ8aPhKRFC/j3zC
-        jmwAESgV52Kpkqccco58bXc=
-X-Google-Smtp-Source: ABdhPJzlWyEeJUhUtrp7faglokIfFffPYkbsvRd8O9FRMCJ/TXHpsn1idVEWlRM6wEmqxz2+UoPQzA==
-X-Received: by 2002:a63:dd0a:0:b0:378:4b73:5b3b with SMTP id t10-20020a63dd0a000000b003784b735b3bmr6456622pgg.564.1648652580087;
-        Wed, 30 Mar 2022 08:03:00 -0700 (PDT)
-Received: from [192.168.255.10] ([203.205.141.114])
-        by smtp.gmail.com with ESMTPSA id ip1-20020a17090b314100b001c7b10fe359sm7235305pjb.5.2022.03.30.08.02.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 30 Mar 2022 08:02:59 -0700 (PDT)
-Message-ID: <ee0892bb-ba1e-251d-8e19-ac26b4c0799d@gmail.com>
-Date:   Wed, 30 Mar 2022 23:02:54 +0800
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=kjZketVP9CFkspy1PCl99/PtzZngJWwIzjlL5Zl64m0=;
+        b=c9lzT5KB8ji7GHNsmuMiGlzh5snmeBhzVWyAAU/d5K/ahTWqUEPSXb6DE5YUdBPoix
+         qN9gC94BFjZTdSVMO3z9KgVxanJFjiQLBDCr/63GiGXRdZsAjIxPb6WFfKB7HZMOHSh7
+         kDbQVPxl5brs1ApnePrFyHwBmFogcdLyDdwvfjQNLzSPxe6k2QEEYyezjozTkWhpmz99
+         r03dYeaTfrS0nm3s6KJO2lKjXsxjRSNER8zJugj5Ap8LfgfNaZ3ySbmixa6zylBM8dvL
+         VdUKdS4npy9VUShYkv+6X2VwJGzX+2rFFG3SozWVxSRkVtGLwyxvcNSSzukzY/YjzH7t
+         SbaA==
+X-Gm-Message-State: AOAM5301wmH6W6UXPt3Hkb8avnAqwsz3jX9VssWQ1QGcsXtXgSc4afvu
+        JeKtg8Aa2n3rr8MsGy1zdC/OcJ8+2lfOnUt1DI0i3SRQpNM=
+X-Google-Smtp-Source: ABdhPJwXtdByR/9hUinxGFuk8X+7vugCI3mUN2zADV8B2V9ek2t+ILN5fwvIBlxq3GlpTIjvTeXltjGHjTGpmvFteaM=
+X-Received: by 2002:a81:7983:0:b0:2e5:9d0a:1c52 with SMTP id
+ u125-20020a817983000000b002e59d0a1c52mr269047ywc.411.1648656083991; Wed, 30
+ Mar 2022 09:01:23 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.7.0
-Subject: Re: [PATCH v3.1 0/4] KVM: x86: Use static calls to reduce kvm_pmu_ops
- overhead
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+References: <20220330132152.4568-1-jiangshanlai@gmail.com> <20220330132152.4568-3-jiangshanlai@gmail.com>
+In-Reply-To: <20220330132152.4568-3-jiangshanlai@gmail.com>
+From:   Lai Jiangshan <jiangshanlai@gmail.com>
+Date:   Thu, 31 Mar 2022 00:01:12 +0800
+Message-ID: <CAJhGHyBajHJ8hDy--7mofH=25Ji6L2+jUvfZ1oTQ2gcqqupyFA@mail.gmail.com>
+Subject: Re: [RFC PATCH V3 2/4] KVM: X86: Introduce role.glevel for level
+ expanded pagetable
+To:     LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Lai Jiangshan <jiangshan.ljs@antgroup.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Like Xu <likexu@tencent.com>
-References: <20220329235054.3534728-1-seanjc@google.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-Organization: Tencent
-In-Reply-To: <20220329235054.3534728-1-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
+        linux-doc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
         RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -80,34 +77,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 30/3/2022 7:50 am, Sean Christopherson wrote:
-> This is a minor iteration on Like's v3 to allow kvm_pmu_ops (the global
-> variable, not the struct) be static.  I ran the PMU unit tests and compiled,
-> but otherwise it's untested.  Strongly recommend waiting for Like to give
-> a thumbs up before applying :-)
+On Wed, Mar 30, 2022 at 9:21 PM Lai Jiangshan <jiangshanlai@gmail.com> wrote:
 
-Uh, thank you for picking up this optimization and it passes my test cases.
+> @@ -1713,7 +1721,7 @@ static struct kvm_mmu_page *kvm_mmu_alloc_page(struct kvm_vcpu *vcpu, gfn_t gfn,
+>
+>         sp = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_page_header_cache);
+>         sp->spt = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_shadow_page_cache);
+> -       if (!role.direct)
+> +       if (role.glevel == role.level)
+>                 sp->gfns = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_gfn_array_cache);
+>         set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
+>
+> @@ -2054,6 +2062,8 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
+>                 quadrant &= (1 << ((PT32_PT_BITS - PT64_PT_BITS) * level)) - 1;
+>                 role.quadrant = quadrant;
+>         }
+> +       if (level < role.glevel)
+> +               role.glevel = level;
 
-> 
-> [*] https://lore.kernel.org/all/20220307115920.51099-1-likexu@tencent.com
-> 
-> Like Xu (4):
->    KVM: x86: Move kvm_ops_static_call_update() to x86.c
->    KVM: x86: Copy kvm_pmu_ops by value to eliminate layer of indirection
->    KVM: x86: Move .pmu_ops to kvm_x86_init_ops and tag as __initdata
->    KVM: x86: Use static calls to reduce kvm_pmu_ops overhead
-> 
->   arch/x86/include/asm/kvm-x86-pmu-ops.h | 31 ++++++++++++
->   arch/x86/include/asm/kvm_host.h        | 17 +------
->   arch/x86/kvm/pmu.c                     | 66 ++++++++++++++++++--------
->   arch/x86/kvm/pmu.h                     |  7 +--
->   arch/x86/kvm/svm/pmu.c                 |  2 +-
->   arch/x86/kvm/svm/svm.c                 |  2 +-
->   arch/x86/kvm/vmx/pmu_intel.c           |  2 +-
->   arch/x86/kvm/vmx/vmx.c                 |  2 +-
->   arch/x86/kvm/x86.c                     | 21 +++++++-
->   9 files changed, 102 insertions(+), 48 deletions(-)
->   create mode 100644 arch/x86/include/asm/kvm-x86-pmu-ops.h
-> 
-> 
-> base-commit: 19164ad08bf668bca4f4bfbaacaa0a47c1b737a6
+missing:
+
+if (direct)
+   role.glevel = 0;
+
+>
+>         sp_list = &vcpu->kvm->arch.mmu_page_hash[kvm_page_table_hashfn(gfn)];
+>         for_each_valid_sp(vcpu->kvm, sp, sp_list) {
