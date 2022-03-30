@@ -2,189 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C0B584ECE86
-	for <lists+kvm@lfdr.de>; Wed, 30 Mar 2022 23:06:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 470EF4ECED0
+	for <lists+kvm@lfdr.de>; Wed, 30 Mar 2022 23:28:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348660AbiC3VEP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Mar 2022 17:04:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48560 "EHLO
+        id S1351236AbiC3V3s (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Mar 2022 17:29:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41228 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231735AbiC3VEO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Mar 2022 17:04:14 -0400
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E83542EF4;
-        Wed, 30 Mar 2022 14:02:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=fbzAdETuYtKmCBns1dES+4iuVS2Ip2J1bAvk+DbsuNA=; b=Xu0Nx8YZsOa67vabF1emupJ6hV
-        pVIB1BM8uqH4UIRVgYJ/op4PK5vEzflCKL7k2RvLKXTsSaJ5FfwW2cDDorBtANnhYGVcQajWAhF50
-        lEYDFdVgYDBA5FuZ2rBrSJzrC5Ac3k7vOGTkMbLWC1D2jw8UWnYIkAZybco9tZePwP6XYCHkzOLnp
-        bi7NCgY6GBuJVBGHsAnVBT8a2UyUc0KKYUtouYCkfVOJzt6yYyOHoqeZiMUGxd6ufzx29PduEa1j4
-        WuFeWyKIpGKPwUE9n+ldTYRNUULi/UebWT9o66JG3Idk0zKXc+GPK2YOL5OYRCVC9I5XcppqVldHI
-        wkpQAWvg==;
-Received: from [2001:8b0:10b:1:4a2a:e3ff:fe14:8625] (helo=u3832b3a9db3152.ant.amazon.com)
-        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nZfSB-006IpU-V6; Wed, 30 Mar 2022 21:02:10 +0000
-Message-ID: <67e1660a0f5cf657fd2c54ddbe06607a4ae0cb42.camel@infradead.org>
-Subject: Re: [EXTERNAL] linux-next: Signed-off-bys missing for commits in
- the kvm tree
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Stephen Rothwell <sfr@canb.auug.org.au>,
-        Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Date:   Wed, 30 Mar 2022 22:02:05 +0100
-In-Reply-To: <20220331074036.68c3dcdc@canb.auug.org.au>
-References: <20220331074036.68c3dcdc@canb.auug.org.au>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-FcUtZcDdOJOhRDCkqeix"
-User-Agent: Evolution 3.36.5-0ubuntu1 
+        with ESMTP id S242702AbiC3V3r (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Mar 2022 17:29:47 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6ED2344747
+        for <kvm@vger.kernel.org>; Wed, 30 Mar 2022 14:28:01 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id h23-20020a17090a051700b001c9c1dd3acbso1464145pjh.3
+        for <kvm@vger.kernel.org>; Wed, 30 Mar 2022 14:28:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=vN9uvU8bkhJgYN2OitlbKPDgRCZok2QbVcUF878z/wM=;
+        b=IQx0L5aQf66UczNgN+LhtlzuJS+bkdz06vFPIbaVx2DkCEsgyaiqgwWD12MNZnV/Yq
+         xOnU8wHckgHeP/bGT8Q2CJ04mfHIN2Kze6HWqGKcrCfR0U1ajWKW40gEylNf8Bj0L5Lc
+         6RyiZMmFWgZ/8qJ1QiQLjmUcxcApOgbZWj3eT1Dnue1RCjw6nki5rmx1M3/dgOPLLsCE
+         hC6JbHVF0KV9EuwXX7+5Y0Mr7b/CmQBnoe7+rkZqgR9gQI6f2dO3ovALr0wVtch1bvnY
+         t9iWYq/WS2stSleglwtuhLXr1uteXlTMXBhv1ZHGhvp4CmoGj27HnP0xzsvE6pP7Lsp6
+         8gCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=vN9uvU8bkhJgYN2OitlbKPDgRCZok2QbVcUF878z/wM=;
+        b=VtHrGYZyIQf5XlezlL06thkP/gxNHHE4VDOhu7KG9WWHViHL0l0JG+I1UVqUvKOn54
+         M8bjtYosC8b97DTy7w1VKp+lyoc/g3KjRaTqatFsXPD/j4kvxcxIbvQEQnXBtpMJ1aZ0
+         Nd+7ibXFkrbeShPJLLhHP4wz+fnH6EEKTplTr2v9UGAzOqYqoMyeVuZMb1OJpJ9j3sAW
+         FWdNu2joQSJ/B8ODD+Ejn6u7SOJyL24SvPWQ1BWJc+TceyxozlwYN7U8oXyWmpHoALix
+         xxm3YaW4Sx1Z08GCDNx71Adhm45+fX7sRJDrGDWyDW2L5LorEmtdWn1qP3CphFafrUdY
+         RF/w==
+X-Gm-Message-State: AOAM533jWZNPnuN6A+1H5w1+RrTffXTfMpkNlQDgLNUkMC1k3kfjAipc
+        7SRU9py16Yh4zqhwWtETVw8xsQ==
+X-Google-Smtp-Source: ABdhPJzPeMqomGyqG5K2JJ7uvrWHjl5jOr+EIfR8eIBr6A/CxG+NwQt7TKETjTc2mUy8h1bL4A+Y7A==
+X-Received: by 2002:a17:90a:380d:b0:1c9:d9bb:7602 with SMTP id w13-20020a17090a380d00b001c9d9bb7602mr1770709pjb.216.1648675680717;
+        Wed, 30 Mar 2022 14:28:00 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id u10-20020a63b54a000000b00380ea901cd2sm19845176pgo.6.2022.03.30.14.27.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Mar 2022 14:28:00 -0700 (PDT)
+Date:   Wed, 30 Mar 2022 21:27:56 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Chenyi Qiang <chenyi.qiang@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Xiaoyao Li <xiaoyao.li@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 5/7] KVM: MMU: Add support for PKS emulation
+Message-ID: <YkTLXGdu2I9i44ti@google.com>
+References: <20220221080840.7369-1-chenyi.qiang@intel.com>
+ <20220221080840.7369-6-chenyi.qiang@intel.com>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220221080840.7369-6-chenyi.qiang@intel.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Feb 21, 2022, Chenyi Qiang wrote:
+> @@ -277,14 +278,18 @@ static inline u8 permission_fault(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
+>  	WARN_ON(pfec & (PFERR_PK_MASK | PFERR_RSVD_MASK));
+>  	if (unlikely(mmu->pkr_mask)) {
+>  		u32 pkr_bits, offset;
+> +		u32 pkr;
+>  
+>  		/*
+> -		* PKRU defines 32 bits, there are 16 domains and 2
+> -		* attribute bits per domain in pkru.  pte_pkey is the
+> -		* index of the protection domain, so pte_pkey * 2 is
+> -		* is the index of the first bit for the domain.
+> +		* PKRU and PKRS both define 32 bits. There are 16 domains
+> +		* and 2 attribute bits per domain in them. pte_key is the
+> +		* index of the protection domain, so pte_pkey * 2 is the
+> +		* index of the first bit for the domain. The use of PKRU
+> +		* versus PKRS is selected by the address type, as determined
+> +		* by the U/S bit in the paging-structure entries.
+>  		*/
+> -		pkr_bits = (vcpu->arch.pkru >> (pte_pkey * 2)) & 3;
+> +		pkr = pte_access & PT_USER_MASK ? vcpu->arch.pkru : kvm_read_pkrs(vcpu);
 
---=-FcUtZcDdOJOhRDCkqeix
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Blindly reading PKRU/PKRS is wrong.  I think this magic insanity will be functionally
+correct due to update_pkr_bitmask() clearing the appropriate bits in pkr_mask based
+on CR4.PK*, but the read should never happen.  PKRU is benign, but I believe reading
+PKRS will result in VMREAD to an invalid field if PKRU is supported and enabled, but
+PKRS is not supported.
 
-On Thu, 2022-03-31 at 07:40 +1100, Stephen Rothwell wrote:
-> Hi all,
->=20
-> Commit
->=20
->   0a1b5a0416dc ("KVM: x86/xen: Add self tests for KVM_XEN_HVM_CONFIG_EVTC=
-HN_SEND")
->=20
-> is missing a Signed-off-by from its author.
->=20
+I belive the easiest solution is:
 
-Oops.
+		if (pte_access & PT_USER_MASK)
+			pkr = is_cr4_pke(mmu) ? vcpu->arch.pkru : 0;
+		else
+			pkr = is_cr4_pks(mmu) ? kvm_read_pkrs(vcpu) : 0;
 
-Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-
-
---=-FcUtZcDdOJOhRDCkqeix
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIwMzMwMjEwMjA1WjAvBgkqhkiG9w0BCQQxIgQgJ4g/DW/k
-qliIV7CxDQNs7mwIGwFnK4TWWEPL7kuuLHUwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAQVsmxmNjlRu6dRiv+++OEU+OzqlFNudMg
-60hWBrE70uyk3owmnjWq0OQMW5M1KlQ/b2H4jbi3CgjfGqzWogJwdD6tQ/Lz5FEZa3UPPqZ3peuU
-wmlKQZPb0sgTiFucAXyGZO1k0+Zu8XqQEJxPA+7wp+hpS5j18UhZawvNW2cUKlGWakwpX8537bwQ
-MO5fA9kv3pJIdVhIcQNXiLxChqzQkntYqWQHYQw/WEpSqTuf07bVrcCtw49DIHzsyd5MJAKtKHhy
-egIuQ7AIhiTyxiR8+cthK9i6jNuwVO1PkRiqF5CdZcJfrmr+TnFTFgLAQaNe/wHoCKpK9aPF/IOQ
-oZKsNSE0l+pr5yuY9FOomgYUbIi+uQTWKEF5t7q6Udjef96XkncirKpSu6ccMyVq4TF8NQLxuNmB
-nNviNo2/ahMtMlDNDDxa+9/Ualkalp4oGu4FuDnf8w2fUwk9IiINL4vOJHysJlSwrdtfN4jbVwBO
-wEgw0xUfWWj5FQf2tFrx/5TOlUtksdpM/XSrV5v6WT0+25I1EBU+lRnPD813JDkXl6u8xO2lSxGm
-nQ/Y4akwLz6dH5Jve5ge+JOiABsg4luc+gwThHIH9k6r8WUH4MNjlbDgRGh1x6zMMFB0uG5AwL6I
-MHQb8Mh/iy8KJpOX4+FulWDByOggqnfVRn7W4sud5AAAAAAAAA==
+The is_cr4_pk*() helpers are restricted to mmu.c, but this presents a good
+opportunity to extra the PKR stuff to a separate, non-inline helper (as a prep
+patch).  E.g.
 
 
---=-FcUtZcDdOJOhRDCkqeix--
+	WARN_ON(pfec & (PFERR_PK_MASK | PFERR_RSVD_MASK));
+	if (unlikely(mmu->pkr_mask))
+		u32 pkr_bits = kvm_mmu_pkr_bits(vcpu, mmu, pte_access, pte_pkey);
 
+		errcode |= -pkr_bits & PFERR_PK_MASK;
+		fault |= (pkr_bits != 0);
+	}
+
+	return -(u32)fault & errcode;
+
+permission_fault() is inline because it's heavily used for shadow paging, but
+when using TDP, it's far less performance critical.  PKR is TDP-only, so moving
+it out-of-line should be totally ok (this is also why this patch is "unlikely").
