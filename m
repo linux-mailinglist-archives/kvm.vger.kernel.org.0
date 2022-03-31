@@ -2,78 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B2204EDE5B
-	for <lists+kvm@lfdr.de>; Thu, 31 Mar 2022 18:06:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D671A4EDE48
+	for <lists+kvm@lfdr.de>; Thu, 31 Mar 2022 18:06:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239603AbiCaQGZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 31 Mar 2022 12:06:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40998 "EHLO
+        id S239612AbiCaQG0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 31 Mar 2022 12:06:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41110 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236954AbiCaQGX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 31 Mar 2022 12:06:23 -0400
+        with ESMTP id S239598AbiCaQGY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 31 Mar 2022 12:06:24 -0400
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3A13B879;
-        Thu, 31 Mar 2022 09:04:35 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E5D2522E7;
+        Thu, 31 Mar 2022 09:04:37 -0700 (PDT)
 Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22VFENf7016699;
-        Thu, 31 Mar 2022 16:04:35 GMT
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22VFahOM016016;
+        Thu, 31 Mar 2022 16:04:36 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=MddiOPWhgpVDu/wZoAjOydjdF2Xsvvpw/2vdvVBApbQ=;
- b=Kfgbna1cKyiOT45Q6GfHard9iTTVVcGJUHolIWSWnosKRyTpszI9EAb6uguaz0RnrJp6
- Q9qBkfYH397dVdbspcXZacD5d09JDX0cTF4l1vKAZuDl1lhMs5/qBpl6sSwPZo1wE5/1
- KApXTnpZ8sQ7qESj0KHrIYxK4rsQEl83A0t8joB8/oKI9j4SFjL6uUJXZvflqTRfsdkm
- MzoDEtjWVTvTxh8t33+yfZERpHyta1l7bdNWOzA8RH4LufLWE2uWZbwj1eFle+FwGwl5
- PNP0jPk9wZ/Mz+V9LnxgPXU4FZwp1IgZ0pwcfyrTWJAxllawAglNKBOUW8ADd/FdJRlP 5w== 
+ bh=rLVE9VtZ0lAKGc3RPIIxPATf7KxinhW7F4dIGiR+imI=;
+ b=oxtMAui833Y7Y+YDwDko1vrnLnYEyx5sF0/m3RSQ2GkydRhjbAiVISeV3rHZ699b5Yw/
+ OWmDW7QlgpCIolTdbJRCgntb5jWf3K+sowcEMuXOtim0hM83Og0ytADjBmd/4K/tJNa2
+ y9evB4eqQgpjWAUUqFyNjUqoel8wtJPomn52XPTmoXl4IcG87LLiWXqgpt/IQ4dFyKp9
+ xEv1GPlLqzS2wCEHS2WBuPTuCIplfsKzCcQImmKwCCnAoalaUbQsE4F4yXezlFO3AIu7
+ xjI0ThpvW9ZMpyaQogo7+jctprsjZ7jKISBmQPkrI3T5qyJFiQqKY595cHmuOXNXlgjb xw== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3f57rmu9tx-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3f57rmu9ua-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 31 Mar 2022 16:04:35 +0000
+        Thu, 31 Mar 2022 16:04:36 +0000
 Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22VEkSuO005706;
-        Thu, 31 Mar 2022 16:04:35 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3f57rmu9t4-1
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22VFxA1T023891;
+        Thu, 31 Mar 2022 16:04:36 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3f57rmu9te-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 31 Mar 2022 16:04:35 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22VG1FoP003948;
-        Thu, 31 Mar 2022 16:04:32 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma01fra.de.ibm.com with ESMTP id 3f1tf8ses5-1
+        Thu, 31 Mar 2022 16:04:36 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22VG19ek004830;
+        Thu, 31 Mar 2022 16:04:33 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma02fra.de.ibm.com with ESMTP id 3f1tf91fe6-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 31 Mar 2022 16:04:32 +0000
+        Thu, 31 Mar 2022 16:04:33 +0000
 Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22VG4TTZ34472428
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22VG4afh40370478
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 31 Mar 2022 16:04:29 GMT
+        Thu, 31 Mar 2022 16:04:36 GMT
 Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8A64B11C04C;
-        Thu, 31 Mar 2022 16:04:29 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 2279111C052;
+        Thu, 31 Mar 2022 16:04:30 +0000 (GMT)
 Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0E01911C050;
+        by IMSVA (Postfix) with ESMTP id 9D31411C050;
         Thu, 31 Mar 2022 16:04:29 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.145.13.95])
         by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 31 Mar 2022 16:04:28 +0000 (GMT)
+        Thu, 31 Mar 2022 16:04:29 +0000 (GMT)
 From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
 To:     kvm@vger.kernel.org
 Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
         scgl@linux.ibm.com, borntraeger@de.ibm.com, pmorel@linux.ibm.com,
         pasic@linux.ibm.com, nrb@linux.ibm.com, thuth@redhat.com,
         david@redhat.com
-Subject: [kvm-unit-tests PATCH v2 2/5] s390x: skey: remove check for old z/VM version
-Date:   Thu, 31 Mar 2022 18:04:16 +0200
-Message-Id: <20220331160419.333157-3-imbrenda@linux.ibm.com>
+Subject: [kvm-unit-tests PATCH v2 3/5] lib: s390: rename and refactor vm.[ch]
+Date:   Thu, 31 Mar 2022 18:04:17 +0200
+Message-Id: <20220331160419.333157-4-imbrenda@linux.ibm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220331160419.333157-1-imbrenda@linux.ibm.com>
 References: <20220331160419.333157-1-imbrenda@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Z66LNtjqUFZ2IetjVhgEh0xDDl6qrLyR
-X-Proofpoint-ORIG-GUID: ydiBU9mexjt3RaYubQQPzFy9rx7K9dKr
+X-Proofpoint-GUID: TTNUo2oYEqp5qQo389_7-p5jAWYaYq6Q
+X-Proofpoint-ORIG-GUID: k39CQbGENUMLsdIhHeDgSA01ZEdwwo1i
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
  definitions=2022-03-31_05,2022-03-31_01,2022-02-23_01
@@ -92,71 +92,326 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Remove the check for z/VM 6.x, since it is not needed anymore.
+Refactor and rename vm.[ch] to hardware.[ch]
+
+* Rename vm.[ch] to hardware.[ch]
+* Consolidate all detection functions into detect_host, which returns
+  what host system the test is running on
+* Rename vm_is_* functions to host_is_*, which are then just wrappers
+  around detect_host
 
 Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 ---
- s390x/skey.c | 37 ++++---------------------------------
- 1 file changed, 4 insertions(+), 33 deletions(-)
+ s390x/Makefile       |  2 +-
+ lib/s390x/hardware.h | 40 +++++++++++++++++++
+ lib/s390x/vm.h       | 15 --------
+ lib/s390x/hardware.c | 69 +++++++++++++++++++++++++++++++++
+ lib/s390x/vm.c       | 92 --------------------------------------------
+ s390x/cpumodel.c     |  4 +-
+ s390x/mvpg.c         |  4 +-
+ 7 files changed, 114 insertions(+), 112 deletions(-)
+ create mode 100644 lib/s390x/hardware.h
+ delete mode 100644 lib/s390x/vm.h
+ create mode 100644 lib/s390x/hardware.c
+ delete mode 100644 lib/s390x/vm.c
 
-diff --git a/s390x/skey.c b/s390x/skey.c
-index 58a55436..edad53e9 100644
---- a/s390x/skey.c
-+++ b/s390x/skey.c
-@@ -65,33 +65,9 @@ static void test_set(void)
- 	       "set key test");
- }
- 
--/* Returns true if we are running under z/VM 6.x */
--static bool check_for_zvm6(void)
+diff --git a/s390x/Makefile b/s390x/Makefile
+index 53b0fe04..9d3a1fd7 100644
+--- a/s390x/Makefile
++++ b/s390x/Makefile
+@@ -78,7 +78,7 @@ cflatobjs += lib/s390x/sclp-console.o
+ cflatobjs += lib/s390x/interrupt.o
+ cflatobjs += lib/s390x/mmu.o
+ cflatobjs += lib/s390x/smp.o
+-cflatobjs += lib/s390x/vm.o
++cflatobjs += lib/s390x/hardware.o
+ cflatobjs += lib/s390x/css_dump.o
+ cflatobjs += lib/s390x/css_lib.o
+ cflatobjs += lib/s390x/malloc_io.o
+diff --git a/lib/s390x/hardware.h b/lib/s390x/hardware.h
+new file mode 100644
+index 00000000..e5910ea5
+--- /dev/null
++++ b/lib/s390x/hardware.h
+@@ -0,0 +1,40 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ * Functions to retrieve information about the host system.
++ *
++ * Copyright (c) 2020 Red Hat Inc
++ * Copyright 2022 IBM Corp.
++ *
++ * Authors:
++ *  Claudio Imbrenda <imbrenda@linux.ibm.com>
++ */
++
++#ifndef _S390X_HARDWARE_H_
++#define _S390X_HARDWARE_H_
++#include <asm/arch_def.h>
++
++enum s390_host {
++	HOST_IS_UNKNOWN,
++	HOST_IS_LPAR,
++	HOST_IS_KVM,
++	HOST_IS_TCG
++};
++
++enum s390_host detect_host(void);
++
++static inline bool host_is_tcg(void)
++{
++	return detect_host() == HOST_IS_TCG;
++}
++
++static inline bool host_is_kvm(void)
++{
++	return detect_host() == HOST_IS_KVM;
++}
++
++static inline bool host_is_lpar(void)
++{
++	return detect_host() == HOST_IS_LPAR;
++}
++
++#endif  /* _S390X_HARDWARE_H_ */
+diff --git a/lib/s390x/vm.h b/lib/s390x/vm.h
+deleted file mode 100644
+index 4456b48c..00000000
+--- a/lib/s390x/vm.h
++++ /dev/null
+@@ -1,15 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0-or-later */
+-/*
+- * Functions to retrieve VM-specific information
+- *
+- * Copyright (c) 2020 Red Hat Inc
+- */
+-
+-#ifndef _S390X_VM_H_
+-#define _S390X_VM_H_
+-
+-bool vm_is_tcg(void);
+-bool vm_is_kvm(void);
+-bool vm_is_lpar(void);
+-
+-#endif  /* _S390X_VM_H_ */
+diff --git a/lib/s390x/hardware.c b/lib/s390x/hardware.c
+new file mode 100644
+index 00000000..2bcf9c4c
+--- /dev/null
++++ b/lib/s390x/hardware.c
+@@ -0,0 +1,69 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ * Functions to retrieve information about the host system.
++ *
++ * Copyright (c) 2020 Red Hat Inc
++ * Copyright 2022 IBM Corp.
++ *
++ * Authors:
++ *  Thomas Huth <thuth@redhat.com>
++ *  Claudio Imbrenda <imbrenda@linux.ibm.com>
++ */
++
++#include <libcflat.h>
++#include <alloc_page.h>
++#include <asm/arch_def.h>
++#include "hardware.h"
++#include "stsi.h"
++
++/* The string "QEMU" in EBCDIC */
++static const uint8_t qemu_ebcdic[] = { 0xd8, 0xc5, 0xd4, 0xe4 };
++/* The string "KVM/" in EBCDIC */
++static const uint8_t kvm_ebcdic[] = { 0xd2, 0xe5, 0xd4, 0x61 };
++
++static enum s390_host do_detect_host(void *buf)
++{
++	struct sysinfo_3_2_2 *stsi_322 = buf;
++
++	if (stsi_get_fc() == 2)
++		return HOST_IS_LPAR;
++
++	if (stsi_get_fc() != 3)
++		return HOST_IS_UNKNOWN;
++
++	if (!stsi(buf, 1, 1, 1)) {
++		/*
++		 * If the manufacturer string is "QEMU" in EBCDIC, then we
++		 * are on TCG (otherwise the string is "IBM" in EBCDIC)
++		 */
++		if (!memcmp((char *)buf + 32, qemu_ebcdic, sizeof(qemu_ebcdic)))
++			return HOST_IS_TCG;
++	}
++
++	if (!stsi(buf, 3, 2, 2)) {
++		/*
++		 * If the manufacturer string is "KVM/" in EBCDIC, then we
++		 * are on KVM.
++		 */
++		if (!memcmp(&stsi_322->vm[0].cpi, kvm_ebcdic, sizeof(kvm_ebcdic)))
++			return HOST_IS_KVM;
++	}
++
++	return HOST_IS_UNKNOWN;
++}
++
++enum s390_host detect_host(void)
++{
++	static enum s390_host host = HOST_IS_UNKNOWN;
++	static bool initialized = false;
++	void *buf;
++
++	if (initialized)
++		return host;
++
++	buf = alloc_page();
++	host = do_detect_host(buf);
++	free_page(buf);
++	initialized = true;
++	return host;
++}
+diff --git a/lib/s390x/vm.c b/lib/s390x/vm.c
+deleted file mode 100644
+index 33fb1c45..00000000
+--- a/lib/s390x/vm.c
++++ /dev/null
+@@ -1,92 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0-or-later */
+-/*
+- * Functions to retrieve VM-specific information
+- *
+- * Copyright (c) 2020 Red Hat Inc
+- *
+- * Authors:
+- *  Thomas Huth <thuth@redhat.com>
+- */
+-
+-#include <libcflat.h>
+-#include <alloc_page.h>
+-#include <asm/arch_def.h>
+-#include "vm.h"
+-#include "stsi.h"
+-
+-/**
+- * Detect whether we are running with TCG (instead of KVM)
+- */
+-bool vm_is_tcg(void)
 -{
--	int dcbt;	/* Descriptor block count */
--	int nr;
--	static const unsigned char zvm6[] = {
--		/* This is "z/VM    6" in EBCDIC */
--		0xa9, 0x61, 0xe5, 0xd4, 0x40, 0x40, 0x40, 0x40, 0xf6
--	};
+-	const char qemu_ebcdic[] = { 0xd8, 0xc5, 0xd4, 0xe4 };
+-	static bool initialized = false;
+-	static bool is_tcg = false;
+-	uint8_t *buf;
 -
--	if (stsi(pagebuf, 3, 2, 2))
--		return false;
+-	if (initialized)
+-		return is_tcg;
 -
--	dcbt = pagebuf[31] & 0xf;
--
--	for (nr = 0; nr < dcbt; nr++) {
--		if (!memcmp(&pagebuf[32 + nr * 64 + 24], zvm6, sizeof(zvm6)))
--			return true;
+-	if (stsi_get_fc() != 3) {
+-		initialized = true;
+-		return is_tcg;
 -	}
 -
--	return false;
+-	buf = alloc_page();
+-	assert(buf);
+-
+-	if (stsi(buf, 1, 1, 1))
+-		goto out;
+-
+-	/*
+-	 * If the manufacturer string is "QEMU" in EBCDIC, then we
+-	 * are on TCG (otherwise the string is "IBM" in EBCDIC)
+-	 */
+-	is_tcg = !memcmp(&buf[32], qemu_ebcdic, sizeof(qemu_ebcdic));
+-	initialized = true;
+-out:
+-	free_page(buf);
+-	return is_tcg;
 -}
 -
- static void test_priv(void)
- {
- 	union skey skey;
--	bool is_zvm6 = check_for_zvm6();
- 
- 	memset(pagebuf, 0, PAGE_SIZE * 2);
- 	report_prefix_push("privileged");
-@@ -106,15 +82,10 @@ static void test_priv(void)
- 	report(skey.str.acc != 3, "skey did not change on exception");
- 
- 	report_prefix_push("iske");
--	if (is_zvm6) {
--		/* There is a known bug with z/VM 6, so skip the test there */
--		report_skip("not working on z/VM 6");
--	} else {
--		expect_pgm_int();
--		enter_pstate();
--		get_storage_key(pagebuf);
--		check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
+-/**
+- * Detect whether we are running with KVM
+- */
+-bool vm_is_kvm(void)
+-{
+-	/* EBCDIC for "KVM/" */
+-	const uint8_t kvm_ebcdic[] = { 0xd2, 0xe5, 0xd4, 0x61 };
+-	static bool initialized;
+-	static bool is_kvm;
+-	struct sysinfo_3_2_2 *stsi_322;
+-
+-	if (initialized)
+-		return is_kvm;
+-
+-	if (stsi_get_fc() != 3 || vm_is_tcg()) {
+-		initialized = true;
+-		return is_kvm;
 -	}
-+	expect_pgm_int();
-+	enter_pstate();
-+	get_storage_key(pagebuf);
-+	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
- 	report_prefix_pop();
+-
+-	stsi_322 = alloc_page();
+-	assert(stsi_322);
+-
+-	if (stsi(stsi_322, 3, 2, 2))
+-		goto out;
+-
+-	/*
+-	 * If the manufacturer string is "KVM/" in EBCDIC, then we
+-	 * are on KVM.
+-	 */
+-	is_kvm = !memcmp(&stsi_322->vm[0].cpi, kvm_ebcdic, sizeof(kvm_ebcdic));
+-	initialized = true;
+-out:
+-	free_page(stsi_322);
+-	return is_kvm;
+-}
+-
+-bool vm_is_lpar(void)
+-{
+-	return stsi_get_fc() == 2;
+-}
+-
+diff --git a/s390x/cpumodel.c b/s390x/cpumodel.c
+index 23ccf842..5c0b73e0 100644
+--- a/s390x/cpumodel.c
++++ b/s390x/cpumodel.c
+@@ -10,7 +10,7 @@
+  */
  
- 	report_prefix_pop();
+ #include <asm/facility.h>
+-#include <vm.h>
++#include <hardware.h>
+ #include <sclp.h>
+ #include <uv.h>
+ #include <asm/uv.h>
+@@ -118,7 +118,7 @@ int main(void)
+ 	for (i = 0; i < ARRAY_SIZE(dep); i++) {
+ 		report_prefix_pushf("%d implies %d", dep[i].facility, dep[i].implied);
+ 		if (test_facility(dep[i].facility)) {
+-			report_xfail(dep[i].expected_tcg_fail && vm_is_tcg(),
++			report_xfail(dep[i].expected_tcg_fail && host_is_tcg(),
+ 				     test_facility(dep[i].implied),
+ 				     "implication not correct");
+ 		} else {
+diff --git a/s390x/mvpg.c b/s390x/mvpg.c
+index 2b7c6cc9..62f0fc5a 100644
+--- a/s390x/mvpg.c
++++ b/s390x/mvpg.c
+@@ -20,7 +20,7 @@
+ #include <smp.h>
+ #include <alloc_page.h>
+ #include <bitops.h>
+-#include <vm.h>
++#include <hardware.h>
+ 
+ /* Used to build the appropriate test values for register 0 */
+ #define KFC(x) ((x) << 10)
+@@ -251,7 +251,7 @@ static void test_mmu_prot(void)
+ 	fresh += PAGE_SIZE;
+ 
+ 	/* Known issue in TCG: CCO flag is not honoured */
+-	if (vm_is_tcg()) {
++	if (host_is_tcg()) {
+ 		report_prefix_push("TCG");
+ 		report_skip("destination invalid");
+ 		report_skip("source invalid");
 -- 
 2.34.1
 
