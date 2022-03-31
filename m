@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 03D624ED265
-	for <lists+kvm@lfdr.de>; Thu, 31 Mar 2022 06:35:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BDA244ED25E
+	for <lists+kvm@lfdr.de>; Thu, 31 Mar 2022 06:35:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229830AbiCaEZE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 31 Mar 2022 00:25:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36818 "EHLO
+        id S229379AbiCaESy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 31 Mar 2022 00:18:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41230 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229919AbiCaEYt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 31 Mar 2022 00:24:49 -0400
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2606C10DA6C;
-        Wed, 30 Mar 2022 21:14:06 -0700 (PDT)
+        with ESMTP id S231523AbiCaES2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 31 Mar 2022 00:18:28 -0400
+Received: from mga06.intel.com (mga06.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B279A185958;
+        Wed, 30 Mar 2022 21:05:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1648700047; x=1680236047;
+  t=1648699505; x=1680235505;
   h=message-id:subject:from:to:cc:date:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Lrf29M1FoQwZkT3rwYPlkkdAMRzetcMAr56weDYEJfw=;
-  b=VXoqaOWaJ+Z1bw2UKOkAMqNjGsOabwgJL1IiFSU2wF9PRWFp6QizkD/2
-   s6lflT3f4QrNWky5ej8bcUYVo/R6CPknQfvdRJpiQQ6EnGRR+qd2LPBxT
-   HRC2lT7MV6ftfDu/ZQF7dSruS7V5MGOLIWb6VE2KMbAhTw6nKlXyJu41x
-   kxpZrv7oKYWXVHPe+cN/0Z76fKBhSydGOC6fOs1iMTMp1MMlKqYn8tcUL
-   Jnz+CCBekyQWLw4TVVDj1RYVp+WrfCeSYG7FLkZTNXU3exTzB3gwNMblY
-   ATQFLhovh2sN2sry8Y5TcWyKeHsV641XTQnz1OGjG0jSpQl9uHmHtWN+N
-   g==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10302"; a="240301454"
+  bh=FkLKjF9yc6i0+3dBxoVynuN9myC6clq7eWtCrJIDA2k=;
+  b=YT4XyPCJwdrhWmfoETTC8pisSpDehLNBkiaDu0KWgMNRPvWenCCck20O
+   LuC53Fb9eDFOU3/X8YoF+8FjIH6ffNGtA4LPKOXhzpK+rHBmqf/s85mUl
+   0t7E6T8jr8QecgchALSLb3oQdXSmB6Q41Mlt3aBzAEI5GIfrjNyzF6CL/
+   K1RGafI5eMAWYxAjfdxtsPRfjQDVjdhCs7/7UUAW78iWB8WdZy1Qrro1v
+   A06XWUMtkCG1hemZW/IfM3Pd9T4DpNUTaD7/4bD52y0HARXpkZf+PWaQG
+   3bbj3IpdBf+k4OtmLaJeYygDkxDUqa44Wxd/q4zYU9npY6eF1f7EHUka5
+   A==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10302"; a="320406326"
 X-IronPort-AV: E=Sophos;i="5.90,224,1643702400"; 
-   d="scan'208";a="240301454"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2022 20:02:28 -0700
+   d="scan'208";a="320406326"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2022 20:31:14 -0700
 X-IronPort-AV: E=Sophos;i="5.90,224,1643702400"; 
-   d="scan'208";a="838892137"
+   d="scan'208";a="650114022"
 Received: from dhathawa-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.53.226])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2022 20:02:26 -0700
-Message-ID: <03d3c1ac92cee3b0e8e325da0f703d1dd9657b4b.camel@intel.com>
-Subject: Re: [RFC PATCH v5 021/104] KVM: x86: Introduce hooks to free VM
- callback prezap and vm_free
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2022 20:31:12 -0700
+Message-ID: <36aac3cb7c7447db6454ee396e25eea3bad378e6.camel@intel.com>
+Subject: Re: [RFC PATCH v5 008/104] KVM: TDX: Add a function to initialize
+ TDX module
 From:   Kai Huang <kai.huang@intel.com>
 To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
@@ -46,16 +46,16 @@ Cc:     isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
         Jim Mattson <jmattson@google.com>, erdemaktas@google.com,
         Connor Kuehl <ckuehl@redhat.com>,
         Sean Christopherson <seanjc@google.com>
-Date:   Thu, 31 Mar 2022 16:02:24 +1300
-In-Reply-To: <af18a5c763a78af2b7de6e6e0841d9e61a571dc4.1646422845.git.isaku.yamahata@intel.com>
+Date:   Thu, 31 Mar 2022 16:31:10 +1300
+In-Reply-To: <b92217283fa96b85e9a683ca3fcf1b368cf8d1c4.1646422845.git.isaku.yamahata@intel.com>
 References: <cover.1646422845.git.isaku.yamahata@intel.com>
-         <af18a5c763a78af2b7de6e6e0841d9e61a571dc4.1646422845.git.isaku.yamahata@intel.com>
+         <b92217283fa96b85e9a683ca3fcf1b368cf8d1c4.1646422845.git.isaku.yamahata@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -65,83 +65,199 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Fri, 2022-03-04 at 11:48 -0800, isaku.yamahata@intel.com wrote:
-> From: Kai Huang <kai.huang@intel.com>
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
 > 
-> Before tearing down private page tables, TDX requires some resources of the
-> guest TD to be destroyed (i.e. keyID must have been reclaimed, etc).  Add
-> prezap callback before tearing down private page tables for it.
+> Memory used for TDX is encrypted with an encryption key.  An encryption key
+> is assigned to guest TD, and TDX memory is encrypted.  VMM calculates Trust
+> Domain Memory Range (TDMR), a range of memory pages that can hold TDX
+> memory encrypted with an encryption key.  VMM allocates memory regions for
+> Physical Address Metadata Table (PAMT) which the TDX module uses to track
+> page states. Used for TDX memory, assigned to which guest TD, etc.  VMM
+> gives PAMT regions to the TDX module and initializes it which is also
+> encrypted.
+
+Not sure why above are related to this patch.  Perhaps you can just say TDX
+module is detected and initialized on demand via tdx_detect() and tdx_init().
+
 > 
-> TDX needs to free some resources after other resources (i.e. vcpu related
-> resources).  Add vm_free callback at the end of kvm_arch_destroy_vm().
+> TDX requires more initialization steps in addition to VMX.  As a
+> preparation step, check if the CPU feature is available and enable VMX
+> because the TDX module API requires VMX to be enabled to be functional.
+
+Those are not reflected in this patch either.
+
+> The next step is basic platform initialization.  Check if TDX module API is
+> available, call system-wide initialization API (TDH.SYS.INIT), and call LP
+> initialization API (TDH.SYS.LP.INIT).  Lastly, get system-wide
+> parameters (TDH.SYS.INFO), allocate PAMT for TDX module to track page
+> states (TDH.SYS.CONFIG), configure encryption key (TDH.SYS.KEY.CONFIG), and
+> initialize PAMT (TDH.SYS.TDMR.INIT).
+
+Again, not sure why those are related.
+
 > 
-> Signed-off-by: Kai Huang <kai.huang@intel.com>
+> A TDX host patch series implements those details and it provides APIs,
+> seamrr_enabled() to check if CPU feature is available, init_tdx() to
+> initialize the TDX module, tdx_get_tdsysinfo() to get TDX system
+> parameters.
+
+init_tdx() -> tdx_init().
+
+"A TDX host patch series" should not be in the formal commit message, I suppose.
+
+> 
+> Add a wrapper function to initialize the TDX module and get system-wide
+> parameters via those APIs.  Because TDX requires VMX enabled, It will be
+> called on-demand when the first guest TD is created via x86 KVM init_vm
+> callback.
+
+Why not just merge this patch with the change where you implement the init_vm
+callback?  Then you can just declare this patch as "detect and initialize TDX
+module when first VM is created", or something like that..
+
+> 
 > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 > ---
->  arch/x86/include/asm/kvm-x86-ops.h | 2 ++
->  arch/x86/include/asm/kvm_host.h    | 2 ++
->  arch/x86/kvm/x86.c                 | 8 ++++++++
->  3 files changed, 12 insertions(+)
+>  arch/x86/kvm/vmx/tdx.c | 89 ++++++++++++++++++++++++++++++++++++++++++
+>  arch/x86/kvm/vmx/tdx.h |  4 ++
+>  2 files changed, 93 insertions(+)
 > 
-> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-> index 8125d43d3566..ef48dcc98cfc 100644
-> --- a/arch/x86/include/asm/kvm-x86-ops.h
-> +++ b/arch/x86/include/asm/kvm-x86-ops.h
-> @@ -20,7 +20,9 @@ KVM_X86_OP(has_emulated_msr)
->  KVM_X86_OP(vcpu_after_set_cpuid)
->  KVM_X86_OP(is_vm_type_supported)
->  KVM_X86_OP(vm_init)
-> +KVM_X86_OP_NULL(mmu_prezap)
->  KVM_X86_OP_NULL(vm_destroy)
-> +KVM_X86_OP_NULL(vm_free)
->  KVM_X86_OP(vcpu_create)
->  KVM_X86_OP(vcpu_free)
->  KVM_X86_OP(vcpu_reset)
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 8de357a9ad30..5ff7a0fba311 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1326,7 +1326,9 @@ struct kvm_x86_ops {
->  	bool (*is_vm_type_supported)(unsigned long vm_type);
->  	unsigned int vm_size;
->  	int (*vm_init)(struct kvm *kvm);
-> +	void (*mmu_prezap)(struct kvm *kvm);
->  	void (*vm_destroy)(struct kvm *kvm);
-> +	void (*vm_free)(struct kvm *kvm);
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index 8ed3ec342e28..8adc87ad1807 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -13,9 +13,98 @@
+>  static bool __read_mostly enable_tdx = true;
+>  module_param_named(tdx, enable_tdx, bool, 0644);
 >  
->  	/* Create, but do not attach this VCPU */
->  	int (*vcpu_create)(struct kvm_vcpu *vcpu);
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index f6438750d190..a48f5c69fadb 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -11779,6 +11779,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
->  	kvm_page_track_cleanup(kvm);
->  	kvm_xen_destroy_vm(kvm);
->  	kvm_hv_destroy_vm(kvm);
-> +	static_call_cond(kvm_x86_vm_free)(kvm);
->  }
+> +#define TDX_MAX_NR_CPUID_CONFIGS					\
+> +	((sizeof(struct tdsysinfo_struct) -				\
+> +		offsetof(struct tdsysinfo_struct, cpuid_configs))	\
+> +		/ sizeof(struct tdx_cpuid_config))
+> +
+> +struct tdx_capabilities {
+> +	u8 tdcs_nr_pages;
+> +	u8 tdvpx_nr_pages;
+> +
+> +	u64 attrs_fixed0;
+> +	u64 attrs_fixed1;
+> +	u64 xfam_fixed0;
+> +	u64 xfam_fixed1;
+> +
+> +	u32 nr_cpuid_configs;
+> +	struct tdx_cpuid_config cpuid_configs[TDX_MAX_NR_CPUID_CONFIGS];
+> +};
+> +
+> +/* Capabilities of KVM + the TDX module. */
+> +struct tdx_capabilities tdx_caps;
+> +
+>  static u64 hkid_mask __ro_after_init;
+>  static u8 hkid_start_pos __ro_after_init;
+
+The two seems are not used in this patch.
+
+Please make sure each patch can compile w/o warning.
+
 >  
->  static void memslot_rmap_free(struct kvm_memory_slot *slot)
-> @@ -12036,6 +12037,13 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
->  
->  void kvm_arch_flush_shadow_all(struct kvm *kvm)
+> +static int __tdx_module_setup(void)
+> +{
+> +	const struct tdsysinfo_struct *tdsysinfo;
+> +	int ret = 0;
+> +
+> +	BUILD_BUG_ON(sizeof(*tdsysinfo) != 1024);
+> +	BUILD_BUG_ON(TDX_MAX_NR_CPUID_CONFIGS != 37);
+> +
+> +	ret = tdx_detect();
+> +	if (ret) {
+> +		pr_info("Failed to detect TDX module.\n");
+> +		return ret;
+> +	}
+> +
+> +	ret = tdx_init();
+> +	if (ret) {
+> +		pr_info("Failed to initialize TDX module.\n");
+> +		return ret;
+> +	}
+> +
+> +	tdsysinfo = tdx_get_sysinfo();
+> +	if (tdx_caps.nr_cpuid_configs > TDX_MAX_NR_CPUID_CONFIGS)
+> +		return -EIO;
+> +
+> +	tdx_caps = (struct tdx_capabilities) {
+> +		.tdcs_nr_pages = tdsysinfo->tdcs_base_size / PAGE_SIZE,
+> +		/*
+> +		 * TDVPS = TDVPR(4K page) + TDVPX(multiple 4K pages).
+> +		 * -1 for TDVPR.
+> +		 */
+> +		.tdvpx_nr_pages = tdsysinfo->tdvps_base_size / PAGE_SIZE - 1,
+> +		.attrs_fixed0 = tdsysinfo->attributes_fixed0,
+> +		.attrs_fixed1 = tdsysinfo->attributes_fixed1,
+> +		.xfam_fixed0 =	tdsysinfo->xfam_fixed0,
+> +		.xfam_fixed1 = tdsysinfo->xfam_fixed1,
+> +		.nr_cpuid_configs = tdsysinfo->num_cpuid_config,
+> +	};
+> +	if (!memcpy(tdx_caps.cpuid_configs, tdsysinfo->cpuid_configs,
+> +			tdsysinfo->num_cpuid_config *
+> +			sizeof(struct tdx_cpuid_config)))
+> +		return -EIO;
+> +
+> +	return 0;
+> +}
+> +
+> +int tdx_module_setup(void)
+> +{
+> +	static DEFINE_MUTEX(tdx_init_lock);
+> +	static bool __read_mostly tdx_module_initialized;
+> +	int ret = 0;
+> +
+> +	mutex_lock(&tdx_init_lock);
+
+It took me a while to figure out why this mutex is needed.  Please see my above
+suggestion to merge this patch to the change that implements init_vm() callback.
+
+> +
+> +	if (!tdx_module_initialized) {
+> +		if (enable_tdx) {
+> +			ret = __tdx_module_setup();
+
+I think you can move tdx_detect() and tdx_init() out of your mutex.  They are
+internally protected by mutex.
+
+> +			if (ret)
+> +				enable_tdx = false;
+> +			else
+> +				tdx_module_initialized = true;
+> +		} else
+> +			ret = -EOPNOTSUPP;
+> +	}
+> +
+> +	mutex_unlock(&tdx_init_lock);
+> +	return ret;
+> +}
+> +
+>  static int __init __tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
 >  {
-> +	/*
-> +	 * kvm_mmu_zap_all() zaps both private and shared page tables.  Before
-> +	 * tearing down private page tables, TDX requires some TD resources to
-> +	 * be destroyed (i.e. keyID must have been reclaimed, etc).  Invoke
-> +	 * kvm_x86_mmu_prezap() for this.
-> +	 */
-> +	static_call_cond(kvm_x86_mmu_prezap)(kvm);
->  	kvm_mmu_zap_all(kvm);
->  }
+>  	u32 max_pa;
+> diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
+> index daf6bfc6502a..d448e019602c 100644
+> --- a/arch/x86/kvm/vmx/tdx.h
+> +++ b/arch/x86/kvm/vmx/tdx.h
+> @@ -3,6 +3,8 @@
+>  #define __KVM_X86_TDX_H
 >  
-
-The two callbacks are introduced here but they are actually implemented in 2
-patches later (patch 24 KVM: TDX: create/destroy VM structure).  Why not just
-squash this patch to patch 24?  Or at least you can put this patch right before
-patch 24.
-
-Please feel free to remove my SoB and From if this bothers you to squash.
-
+>  #ifdef CONFIG_INTEL_TDX_HOST
+> +int tdx_module_setup(void);
+> +
+>  struct kvm_tdx {
+>  	struct kvm kvm;
+>  };
+> @@ -35,6 +37,8 @@ static inline struct vcpu_tdx *to_tdx(struct kvm_vcpu *vcpu)
+>  	return container_of(vcpu, struct vcpu_tdx, vcpu);
+>  }
+>  #else
+> +static inline int tdx_module_setup(void) { return -ENODEV; };
+> +
+>  struct kvm_tdx;
+>  struct vcpu_tdx;
+>  
 
