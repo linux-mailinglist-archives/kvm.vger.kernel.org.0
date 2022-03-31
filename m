@@ -2,176 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 61FEF4EE477
-	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 01:07:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F243C4EE482
+	for <lists+kvm@lfdr.de>; Fri,  1 Apr 2022 01:10:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242818AbiCaXJa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 31 Mar 2022 19:09:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56134 "EHLO
+        id S242840AbiCaXME (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 31 Mar 2022 19:12:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34558 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242805AbiCaXJ1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 31 Mar 2022 19:09:27 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59AA424CED6
-        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 16:07:35 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id p4-20020a17090ad30400b001c7ca87c05bso3710103pju.1
-        for <kvm@vger.kernel.org>; Thu, 31 Mar 2022 16:07:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=qRJmN8JDG7m72p3VxsXuKnTc88XHvYZJpC/RFCon9dM=;
-        b=aMwVbgfWGFLicig1gsSp/2jhSdYkiuTO1sd60UIlMKfjmpZpl5LkWpSarIu7YDUBU3
-         rpmb+z7cl8bVsE19t3bKrk/98bKoakg/taFBzWkzbIDxIrhfdDPDGXS3V+Vxe1xURGWj
-         WvuJItBvoHNgb2dsWSoRjyDQPEqWuMfS+HSKacI4VjKVxZOhbhF5tnw4zTQlVzNT70vu
-         5QhsS41hLl//IjuCrBUqLumqai/xWHvj59KY2P8a6gCRhTmEtmSpKeph2yaiiH/rJ0Dt
-         C7UsXmnOaK5uHBz8v+8ZT3DQyJxB9hIkbE9e/9Blb8rqFnm+zzLheVrYV4gTl5EtIqTU
-         yMDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=qRJmN8JDG7m72p3VxsXuKnTc88XHvYZJpC/RFCon9dM=;
-        b=Q5aaiLDejpHFINiurzPARJiLHWkLWdGX7U50d2iar9IVumTy/+gVAg+RXHactXVukN
-         bc36YuyxVQN3T45ja7ymRjXNSOJRFXvr0iHHiH2ql/WIchzyMH9RJ7W/obKDOso3xT+P
-         GRYbyX78GR/OubSksYJGEQW9H6FRaUNA6XnrVJUA3yi24I4cvhKoYt27vZYkcQBNqqxs
-         cL1pg80umSiR1+MT6GbzPJ/83Kt217kqf1eltgSOTX/B72SoH1l2MbdqI0ZX5dI2d0U3
-         QYh1z+aZ0bIK3CyustpdNu1L3cNIPGtVdrNiq2D4+gZm4N9MwkH9ofRmtaMDj5f6EilT
-         DOzw==
-X-Gm-Message-State: AOAM532BZW2uGntyHTJrAjXWwNEef9mcDXR1KD3UKYsERZ1416idNAO2
-        RZllXAxhWLL8/pOocAdhGZrUag==
-X-Google-Smtp-Source: ABdhPJwcvMMyYOYWUXp6ynrxs98Tajw+xE+iCgBuHmT4zvMeroO3/+V6AvYJmeHor1eycxWFbkpIew==
-X-Received: by 2002:a17:903:124a:b0:154:c7a4:9374 with SMTP id u10-20020a170903124a00b00154c7a49374mr7673970plh.68.1648768054442;
-        Thu, 31 Mar 2022 16:07:34 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id s10-20020a056a00178a00b004fda49fb25dsm552215pfg.9.2022.03.31.16.07.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 31 Mar 2022 16:07:33 -0700 (PDT)
-Date:   Thu, 31 Mar 2022 23:07:30 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Zeng Guang <guang.zeng@intel.com>
+        with ESMTP id S231898AbiCaXMD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 31 Mar 2022 19:12:03 -0400
+Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3A3DEA76C;
+        Thu, 31 Mar 2022 16:10:13 -0700 (PDT)
+Received: from MUA
+        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94.2)
+        (envelope-from <mail@maciej.szmigiero.name>)
+        id 1na3vO-000676-Nb; Fri, 01 Apr 2022 01:09:54 +0200
+Message-ID: <f4cdaf45-c869-f3bb-2ba2-3c0a4da12a6d@maciej.szmigiero.name>
+Date:   Fri, 1 Apr 2022 01:09:48 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jethro Beekman <jethro@fortanix.com>,
-        Kai Huang <kai.huang@intel.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, Robert Hu <robert.hu@intel.com>,
-        Gao Chao <chao.gao@intel.com>
-Subject: Re: [PATCH v7 5/8] KVM: x86: Add support for vICR APIC-write
- VM-Exits in x2APIC mode
-Message-ID: <YkY0MvAIPiISfk4u@google.com>
-References: <20220304080725.18135-1-guang.zeng@intel.com>
- <20220304080725.18135-6-guang.zeng@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220304080725.18135-6-guang.zeng@intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        Joerg Roedel <joro@8bytes.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Jon Grimm <Jon.Grimm@amd.com>,
+        David Kaplan <David.Kaplan@amd.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Liam Merwick <liam.merwick@oracle.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <cover.1646944472.git.maciej.szmigiero@oracle.com>
+ <a28577564a7583c32f0029f2307f63ca8869cf22.1646944472.git.maciej.szmigiero@oracle.com>
+ <YkTSul0CbYi/ae0t@google.com>
+ <8f9ae64a-dc64-6f46-8cd4-ffd2648a9372@maciej.szmigiero.name>
+ <YkTlxCV9wmA3fTlN@google.com>
+From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Subject: Re: [PATCH 3/5] KVM: nSVM: Don't forget about L1-injected events
+In-Reply-To: <YkTlxCV9wmA3fTlN@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 04, 2022, Zeng Guang wrote:
-> Upcoming Intel CPUs will support virtual x2APIC MSR writes to the vICR,
-> i.e. will trap and generate an APIC-write VM-Exit instead of intercepting
-> the WRMSR.  Add support for handling "nodecode" x2APIC writes, which
-> were previously impossible.
+On 31.03.2022 01:20, Sean Christopherson wrote:
+> On Thu, Mar 31, 2022, Maciej S. Szmigiero wrote:
+>> On 30.03.2022 23:59, Sean Christopherson wrote:
+>>> On Thu, Mar 10, 2022, Maciej S. Szmigiero wrote:
+>>>> @@ -3627,6 +3632,14 @@ static void svm_complete_interrupts(struct kvm_vcpu *vcpu)
+>>>>    	if (!(exitintinfo & SVM_EXITINTINFO_VALID))
+>>>>    		return;
+>>>> +	/* L1 -> L2 event re-injection needs a different handling */
+>>>> +	if (is_guest_mode(vcpu) &&
+>>>> +	    exit_during_event_injection(svm, svm->nested.ctl.event_inj,
+>>>> +					svm->nested.ctl.event_inj_err)) {
+>>>> +		nested_svm_maybe_reinject(vcpu);
+>>>
+>>> Why is this manually re-injecting?  More specifically, why does the below (out of
+>>> sight in the diff) code that re-queues the exception/interrupt not work?  The
+>>> re-queued event should be picked up by nested_save_pending_event_to_vmcb12() and
+>>> propagatred to vmcb12.
+>>
+>> A L1 -> L2 injected event should either be re-injected until successfully
+>> injected into L2 or propagated to VMCB12 if there is a nested VMEXIT
+>> during its delivery.
+>>
+>> svm_complete_interrupts() does not do such re-injection in some cases
+>> (soft interrupts, soft exceptions, #VC) - it is trying to resort to
+>> emulation instead, which is incorrect in this case.
+>>
+>> I think it's better to split out this L1 -> L2 nested case to a
+>> separate function in nested.c rather than to fill
+>> svm_complete_interrupts() in already very large svm.c with "if" blocks
+>> here and there.
 > 
-> Note, x2APIC MSR writes are 64 bits wide.
+> Ah, I see it now.  WTF.
 > 
-> Signed-off-by: Zeng Guang <guang.zeng@intel.com>
-> ---
->  arch/x86/kvm/lapic.c | 22 +++++++++++++++++++---
->  1 file changed, 19 insertions(+), 3 deletions(-)
+> Ugh, commit 66fd3f7f901f ("KVM: Do not re-execute INTn instruction.") fixed VMX,
+> but left SVM broken.
 > 
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 629c116b0d3e..22929b5b3f9b 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -67,6 +67,7 @@ static bool lapic_timer_advance_dynamic __read_mostly;
->  #define LAPIC_TIMER_ADVANCE_NS_MAX     5000
->  /* step-by-step approximation to mitigate fluctuation */
->  #define LAPIC_TIMER_ADVANCE_ADJUST_STEP 8
-> +static int kvm_lapic_msr_read(struct kvm_lapic *apic, u32 reg, u64 *data);
->  
->  static inline void __kvm_lapic_set_reg(char *regs, int reg_off, u32 val)
->  {
-> @@ -2227,10 +2228,25 @@ EXPORT_SYMBOL_GPL(kvm_lapic_set_eoi);
->  /* emulate APIC access in a trap manner */
->  void kvm_apic_write_nodecode(struct kvm_vcpu *vcpu, u32 offset)
->  {
-> -	u32 val = kvm_lapic_get_reg(vcpu->arch.apic, offset);
-> +	struct kvm_lapic *apic = vcpu->arch.apic;
-> +	u64 val;
-> +
-> +	if (apic_x2apic_mode(apic)) {
-> +		/*
-> +		 * When guest APIC is in x2APIC mode and IPI virtualization
-> +		 * is enabled, accessing APIC_ICR may cause trap-like VM-exit
-> +		 * on Intel hardware. Other offsets are not possible.
-> +		 */
-> +		if (WARN_ON_ONCE(offset != APIC_ICR))
-> +			return;
->  
-> -	/* TODO: optimize to just emulate side effect w/o one more write */
-> -	kvm_lapic_reg_write(vcpu->arch.apic, offset, val);
-> +		kvm_lapic_msr_read(apic, offset, &val);
-> +		kvm_apic_send_ipi(apic, (u32)val, (u32)(val >> 32));
-
-This needs to clear the APIC_ICR_BUSY bit.  It'd also be nice to trace this write.
-The easiest thing is to use kvm_x2apic_icr_write().  Kinda silly as it'll generate
-an extra write, but on the plus side the TODO comment doesn't have to move :-D
-
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index c4c3155d98db..58bf296ee313 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -2230,6 +2230,7 @@ void kvm_apic_write_nodecode(struct kvm_vcpu *vcpu, u32 offset)
-        struct kvm_lapic *apic = vcpu->arch.apic;
-        u64 val;
-
-+       /* TODO: optimize to just emulate side effect w/o one more write */
-        if (apic_x2apic_mode(apic)) {
-                /*
-                 * When guest APIC is in x2APIC mode and IPI virtualization
-@@ -2240,10 +2241,9 @@ void kvm_apic_write_nodecode(struct kvm_vcpu *vcpu, u32 offset)
-                        return;
-
-                kvm_lapic_msr_read(apic, offset, &val);
--               kvm_apic_send_ipi(apic, (u32)val, (u32)(val >> 32));
-+               kvm_x2apic_icr_write(apic, val);
-        } else {
-                val = kvm_lapic_get_reg(apic, offset);
--               /* TODO: optimize to just emulate side effect w/o one more write */
-                kvm_lapic_reg_write(apic, offset, (u32)val);
-        }
- }
-
-
-> +	} else {
-> +		val = kvm_lapic_get_reg(apic, offset);
-> +		/* TODO: optimize to just emulate side effect w/o one more write */
-> +		kvm_lapic_reg_write(apic, offset, (u32)val);
-> +	}
->  }
->  EXPORT_SYMBOL_GPL(kvm_apic_write_nodecode);
->  
-> -- 
-> 2.27.0
+> Re-executing the INTn is wrong, the instruction has already completed decode and
+> execution.  E.g. if there's there's a code breakpoint on the INTn, rewinding will
+> cause a spurious #DB.
 > 
+> KVM's INT3 shenanigans are bonkers, but I guess there's no better option given
+> that the APM says "Software interrupts cannot be properly injected if the processor
+> does not support the NextRIP field.".  What a mess.
+
+Note that KVM currently always tries to re-execute the current instruction
+when asked to re-inject a #BP or a #OF, even when nrips are enabled.
+
+Also, #BP (and #OF, too) is returned as type SVM_EXITINTINFO_TYPE_EXEPT,
+not as SVM_EXITINTINFO_TYPE_SOFT (soft interrupt), so it should be
+re-injected accordingly.
+
+> Anyways, for the common nrips=true case, I strongly prefer that we properly fix
+> the non-nested case and re-inject software interrupts, which should in turn
+> naturally fix this nested case.  
+
+This would also need making the #BP or #OF current instruction
+re-execution conditional on (at least) nrips support.
+
+I am not sure, however, whether this won't introduce any regressions.
+That's why this patch set changed the behavior here only for the
+L1 -> L2 case.
+
+Another issue is whether a L1 hypervisor can legally inject a #VC
+into its L2 (since these are never re-injected).
+
+We still need L1 -> L2 event injection detection to restore the NextRIP
+field when re-injecting an event that uses it.
+
+> And for nrips=false, my vote is to either punt
+> and document it as a "KVM erratum", or straight up make nested require nrips.
+
+A quick Internet search shows that the first CPUs with NextRIP were the
+second-generation Family 10h CPUs (Phenom II, Athlon II, etc.).
+They started being released in early 2009, so we probably don't need to
+worry about the non-nrips case too much.
+
+For the nested case, orthodox reading of the aforementioned APM sentence
+would mean that a L1 hypervisor is not allowed either to make use of such
+event injection in the non-nrips case.
+
+> Note, that also requires updating svm_queue_exception(), which assumes it will
+> only be handed hardware exceptions, i.e. hardcodes type EXEPT.  That's blatantly
+> wrong, e.g. if userspace injects a software exception via KVM_SET_VCPU_EVENTS.
+
+svm_queue_exception() uses SVM_EVTINJ_TYPE_EXEPT, which is correct even
+for software exceptions (#BP or #OF).
+It does work indeed, as the self test included in this patch set
+demonstrates.
+
+Thanks,
+Maciej
